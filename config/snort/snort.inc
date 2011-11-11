@@ -238,25 +238,10 @@ function build_base_whitelist($build_netlist, $wanip, $wangw, $wandns, $vips, $v
 function Running_Ck($snort_uuid, $if_real, $id) {
 	global $config;
 
-	$snort_up_ck = exec("/bin/ps -U snort | /usr/bin/grep snort | /usr/bin/awk '{print \$1;}'");
-
-	if(snort_up_ck == '') {
-		$snort_up = 'no';
-		return $snort_up;
-	}
-
-	if(snort_up_ck != ''){
-
-		/* use ob_clean to clear output buffer, this code needs to be watched */
-		ob_clean();
-		$snort_up_prell = exec("/bin/ps -U snort | /usr/bin/grep \"\-R {$snort_uuid}\" | /usr/bin/awk '{print \$1;}'");
-
-		if ($snort_up_prell != '') {
-			$snort_uph = 'yes';
-		}else{
-			$snort_uph = 'no';
-		}
-	}
+	$snort_uph = 'no';
+	$snort_up_prell = exec("/bin/ps -ax | /usr/bin/grep \"R {$snort_uuid}\" | /usr/bin/grep -v grep  | /usr/bin/awk '{print \$1;}'");
+	if ($snort_up_prell != '')
+		$snort_uph = 'yes';
 
 	return $snort_uph;
 }
@@ -265,24 +250,10 @@ function Running_Ck($snort_uuid, $if_real, $id) {
 function Running_Ck_b($snort_uuid, $if_real, $id) {
 	global $config;
 
-	$snort_up_ck_b = exec("/bin/ps -U snort | /usr/bin/grep barnyard2 | /usr/bin/awk '{print \$1;}'");
-
-	if($snort_up_ck_b == ''){
-		$snort_up_b = 'no';
-		return $snort_up_b;
-	}
-
-	if(snort_up_ck_b != '') {
-		
-		ob_clean();
-		$snort_up_pre_b = exec("/bin/ps -U snort | grep \"f snort_{$snort_uuid}_{$if_real}.u2\" | awk '{print \$1;}'");
-
-		if ($snort_up_pre_b != '') {
-			$snort_up_b = 'yes';
-		}else{
-			$snort_up_b = 'no';
-		}
-	}
+	$snort_up_b = 'no';
+	$snort_up_pre_b = exec("/bin/ps -ax | /usr/bin/grep barnyard2 | /usr/bin/grep \"f snort_{$snort_uuid}_{$if_real}.u2\" | /usr/bin/grep -v grep | /usr/bin/awk '{print \$1;}'");
+	if ($snort_up_pre_b != '')
+		$snort_up_b = 'yes';
 
 	return $snort_up_b;
 }
@@ -293,43 +264,25 @@ function Running_Stop($snort_uuid, $if_real, $id) {
 	/* if snort.sh crashed this will remove the pid */
 	@unlink('/tmp/snort.sh.pid');
 	
-	$start_up_s = exec("/bin/ps -U snort | grep \"\-R {$snort_uuid}\" | awk '{ print \$1; }'");
-	$start_up_r = exec("/bin/ps -U root | grep \"\-R {$snort_uuid}\" | awk '{ print \$1; }'");
-	
-	$start2_upb_s = exec("/bin/ps -U snort | grep \"snort_{$snort_uuid}_{$if_real}.u2\" | awk '{ print \$1; }'");
-	$start2_upb_r = exec("/bin/ps -U root | grep \"snort_{$snort_uuid}_{$if_real}.u2\" | awk '{ print \$1; }'");
+	$start_up = exec("/bin/ps -ax | /usr/bin/grep \"R {$snort_uuid}\" | /usr/bin/grep -v grep | /usr/bin/awk '{ print \$1; }'");
+	$start_upb = exec("/bin/ps -ax | /usr/bin/grep \"snort_{$snort_uuid}_{$if_real}.u2\" | /usr/bin/grep -v grep | /usr/bin/awk '{ print \$1; }'");
 
-	if ($start_up_s != '' || $start_up_r != '' || $start2_upb_s != '' || $start2_upb_r != '') {
-		if ($start_up_s != '')
-		{
-			exec("/bin/kill {$start_up_s}");
-			exec("rm /var/log/snort/run/snort_{$if_real}{$snort_uuid}*");
-			exec("rm /var/log/snort/snort_{$snort_uuid}_{$if_real}*");
-		}
-
-		if ($start2_upb_s != '')
-		{
-			exec("/bin/kill {$start2_upb_s}");
-			exec("/bin/rm /var/run/barnyard2_{$snort_uuid}_{$if_real}*");
-		}
-
-		if ($start_up_r != '')
-		{
-			exec("/bin/kill {$start_up_r}");
-			exec("rm /var/log/snort/run/snort_{$if_real}{$snort_uuid}*");
-			exec("rm /var/log/snort/snort_{$snort_uuid}_{$if_real}*");
-		}
-
-		if ($start2_upb_r != '')
-		{
-			exec("/bin/kill {$start2_upb_r}");
-			exec("/bin/rm /var/run/barnyard2_{$snort_uuid}_{$if_real}*");
-		}
-
-		/* Log Iface stop */
-		exec("/usr/bin/logger -p daemon.info -i -t SnortStartup 'Interface Rule STOP for {$snort_uuid}_{$if_real}...'");
-		sleep(2); // Give time so GUI displays correctly
+	if ($start_up != '') {
+		exec("/bin/kill {$start_up}");
+		exec("/bin/rm /var/log/snort/run/snort_{$if_real}{$snort_uuid}*");
+		exec("/bin/rm /var/log/snort/snort_{$snort_uuid}_{$if_real}*");
+		exec("/bin/rm -r /usr/local/etc/snort/snort_{$snort_uuid}_{$if_real}");
 	}
+
+	if ($start_upb != '') {
+		exec("/bin/kill {$start_upb}");
+		exec("/bin/rm /var/run/barnyard2_{$snort_uuid}_{$if_real}*");
+		exec("/bin/rm /var/log/snort/snort.u2_{$snort_uuid}_{$if_real}*");
+	}
+
+	/* Log Iface stop */
+	exec("/usr/bin/logger -p daemon.info -i -t SnortStartup 'Interface Rule STOP for {$snort_uuid}_{$if_real}...'");
+	sleep(2); // Give time so GUI displays correctly
 }
 
 function Running_Start($snort_uuid, $if_real, $id) {
@@ -341,11 +294,14 @@ function Running_Start($snort_uuid, $if_real, $id) {
 	$snort_info_chk = $config['installedpackages']['snortglobal']['rule'][$id]['enable'];
 	if ($snort_info_chk == 'on')
 		exec("/usr/local/bin/snort -R \"{$snort_uuid}\" -D -q -l /var/log/snort --pid-path /var/log/snort/run -G {$snort_uuid} -c /usr/local/etc/snort/snort_{$snort_uuid}_{$if_real}/snort.conf -i {$if_real}");
+	else
+		return;
+
 	/* define snortbarnyardlog_chk */
 	/* top will have trouble if the uuid is to far back */
 	$snortbarnyardlog_info_chk = $config['installedpackages']['snortglobal']['rule'][$id]['barnyard_enable'];
 	$snortbarnyardlog_mysql_info_chk = $config['installedpackages']['snortglobal']['rule'][$id]['barnyard_mysql'];
-	if ($snortbarnyardlog_info_chk == 'on' && $snortbarnyardlog_mysql_info_chk != '' && $snort_info_chk == 'on') {
+	if ($snortbarnyardlog_info_chk == 'on' && $snortbarnyardlog_mysql_info_chk != '') {
 		exec("/usr/local/bin/barnyard2 -f \"snort_{$snort_uuid}_{$if_real}.u2\" --pid-path /var/log/snort/run -c /usr/local/etc/snort/snort_{$snort_uuid}_{$if_real}/barnyard2.conf -d /var/log/snort -D -q");
 	}
 
@@ -973,13 +929,18 @@ function sync_snort_package_all($id, $if_real, $snort_uuid)
 	//exec("/sbin/sysctl net.bpf.maxinsns=512");
 	//exec("/sbin/sysctl net.inet.tcp.rfc1323=1");
 
-	/* do not start config build if rules is empty */
-	if (!is_array($config['installedpackages']['snortglobal']['rule']))
-		return;
-	if (!is_array($config['installedpackages']['snortglobal']['rule'][$id]))
-		return;
-
 	conf_mount_rw();
+
+	/* do not start config build if rules is empty */
+	if (!is_array($config['installedpackages']['snortglobal']['rule'])) {
+		exec('/bin/rm /usr/local/etc/rc.d/snort.sh');
+		conf_mount_ro();
+		return;
+	}
+	if (!is_array($config['installedpackages']['snortglobal']['rule'][$id])) {
+		conf_mount_ro();
+		return;
+	}
 
 	$snort_uuid = $config['installedpackages']['snortglobal']['rule'][$id]['uuid'];
 	$result_lan = $config['installedpackages']['snortglobal']['rule'][$id]['interface'];
@@ -1024,11 +985,14 @@ function sync_snort_package_empty()
 	//exec("/sbin/sysctl net.bpf.maxinsns=512");
 	//exec("/sbin/sysctl net.inet.tcp.rfc1323=1");
 
-	/* do not start config build if rules is empty */
-	if (!is_array($config['installedpackages']['snortglobal']['rule']))
-		return;
-
 	conf_mount_rw();
+
+	/* do not start config build if rules is empty */
+	if (!is_array($config['installedpackages']['snortglobal']['rule'])) {
+		exec('/bin/rm /usr/local/etc/rc.d/snort.sh');
+		conf_mount_ro();
+		return;
+	}
 
 	foreach ($config['installedpackages']['snortglobal']['rule'] as $id => $value) {
 		$if_real = snort_get_real_interface($value['interface']);
