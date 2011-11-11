@@ -284,7 +284,7 @@ if (isset($_GET['dup']))
 
 			write_config();
 
-			sync_snort_package_all($id, $if_real, $snort_uuid);
+			sync_snort_package_config();
 			sleep(1);
 
 			/* if snort.sh crashed this will remove the pid */
@@ -303,7 +303,7 @@ if (isset($_GET['dup']))
 
 	if ($_POST["Submit2"]) {
 
-		sync_snort_package_all($id, $if_real, $snort_uuid);
+		sync_snort_package_config();
 		sleep(1);
 
 		Running_Start($snort_uuid, $if_real, $id);

@@ -75,7 +75,7 @@ if (isset($_POST['del_x'])) {
 			conf_mount_ro();
 		}
 	  
-		sync_snort_package_empty();
+		sync_snort_package_config();
 	  
 		header( 'Expires: Sat, 26 Jul 1997 05:00:00 GMT' );
 		header( 'Last-Modified: ' . gmdate( 'D, d M Y H:i:s' ) . ' GMT' );
@@ -98,7 +98,7 @@ if ($_GET['act'] == 'toggle' && is_numeric($id)) {
 	/* Log Iface stop */
 	exec("/usr/bin/logger -p daemon.info -i -t SnortStartup 'Toggle for {$snort_uuid}_{$if_real}...'");
 
-	sync_snort_package_all($id, $if_real, $snort_uuid);
+	sync_snort_package_config();
 
 	$tester2 = Running_Ck($snort_uuid, $if_real, $id);
 

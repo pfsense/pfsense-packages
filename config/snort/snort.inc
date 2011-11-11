@@ -592,7 +592,7 @@ function snort_postinstall()
 	if ($config['installedpackages']['snortglobal']['forcekeepsettings'] == 'on') {
 		update_status(gettext("Saved settings detected..."));
 		update_output_window(gettext("Please wait... rebuilding files..."));
-		sync_snort_package_empty();
+		sync_snort_package_config();
 		update_output_window(gettext("Finnished Rebuilding files..."));
 	}
 }
@@ -845,135 +845,8 @@ function snort_rules_up_install_cron($should_install) {
 	}
 }
 
-function sync_snort_package_remove_old()
-{
-	global $config, $g;
-
-	$snort_dir_scan = '/usr/local/etc/snort';
-
-	// scan dirm might have to make this into a funtion
-	$dh_scan  = opendir($snort_dir_scan);
-	while (false !== ($dir_filename = readdir($dh_scan))) {
-		$list_dir_files[] = $dir_filename;
-	}
-
-	// find  patern in a array, very cool code
-	class array_ereg {
-		function array_ereg($pattern) { $this->pattern = $pattern; }
-		function ereg($string) {
-			return ereg($this->pattern, $string);
-		}
-	}
-
-	$rule_array2 = $config['installedpackages']['snortglobal']['rule'];
-	foreach ($rule_array2 as $id => $value) {
-		$result_lan = $value['interface'];
-		$if_real = snort_get_real_interface($result_lan);
-
-		$snort_rules_list[] = "snort_{$id}{$if_real}";
-	}
-
-	$snort_dir_filter = array_filter($list_dir_files, array(new array_ereg("snort_"), 'ereg'));
-	$snort_dir_filter_search_result = array_diff($snort_dir_filter, $snort_rules_list);
-
-	foreach ($snort_dir_filter_search_result as $value)
-		exec("/bin/rm -r /usr/local/etc/snort/$value");
-
-}
-
-/* make sure this func on writes to files and does not start snort */
-function sync_snort_package() {
-	global $config, $g;
-
-	/* all new files are for the user snort nologin */
-	if (!is_dir('/var/log/snort'))
-		exec('/bin/mkdir -p /var/log/snort');
-
-	if (!is_dir('/var/log/snort/run'))
-		exec('/bin/mkdir -p /var/log/snort/run');
-
-	if (!is_dir('/var/log/snort/barnyard2'))
-		exec('/bin/mkdir -p /var/log/snort/barnyard2');
-
-	/* all new files are for the user snort nologin */
-	if (!file_exists('/var/log/snort/alert'))
-		exec('/usr/bin/touch /var/log/snort/alert');
-
-	/* XXX: These are needed if snort is run as snort user
-	mwexec('/usr/sbin/chown -R snort:snort /var/log/snort', true);
-	mwexec('/usr/sbin/chown -R snort:snort /usr/local/etc/snort', true);
-	mwexec('/usr/sbin/chown -R snort:snort /usr/local/lib/snort', true);
-	mwexec('/usr/sbin/chown snort:snort /tmp/snort*', true);
-	mwexec('/usr/sbin/chown snort:snort /var/db/whitelist', true);
-	*/
-
-	/* important  */
-	mwexec('/bin/chmod 770 /var/db/whitelist', true);
-	mwexec('/bin/chmod 770 /var/run/snort*', true);
-	mwexec('/bin/chmod 770 /tmp/snort*', true);
-	mwexec('/bin/chmod -R 770 /var/log/snort', true);
-	mwexec('/bin/chmod -R 770 /usr/local/lib/snort', true);
-	mwexec('/bin/chmod -R 770 /usr/local/etc/snort/', true);
-}
-
-/* only run when a single iface needs to sync */
-function sync_snort_package_all($id, $if_real, $snort_uuid)
-{
-	global $config, $g;
-
-	/* RedDevil suggested code */
-	/* TODO: more testing needs to be done */
-	/* may cause voip to fail */
-	//exec("/sbin/sysctl net.bpf.bufsize=8388608");
-	//exec("/sbin/sysctl net.bpf.maxbufsize=4194304");
-	//exec("/sbin/sysctl net.bpf.maxinsns=512");
-	//exec("/sbin/sysctl net.inet.tcp.rfc1323=1");
-
-	conf_mount_rw();
-
-	/* do not start config build if rules is empty */
-	if (!is_array($config['installedpackages']['snortglobal']['rule'])) {
-		exec('/bin/rm /usr/local/etc/rc.d/snort.sh');
-		conf_mount_ro();
-		return;
-	}
-	if (!is_array($config['installedpackages']['snortglobal']['rule'][$id])) {
-		conf_mount_ro();
-		return;
-	}
-
-	$snort_uuid = $config['installedpackages']['snortglobal']['rule'][$id]['uuid'];
-	$result_lan = $config['installedpackages']['snortglobal']['rule'][$id]['interface'];
-	$if_real = snort_get_real_interface($result_lan);
-
-	/* only build whitelist when needed */
-	if ($config['installedpackages']['snortglobal']['rule'][$id]['blockoffenders7'] == 'on')
-		create_snort_whitelist($id, $if_real);
-
-	/* only build threshold when needed */
-	if ($config['installedpackages']['snortglobal']['rule'][$id]['suppresslistname'] != 'default')
-		create_snort_suppress($id, $if_real);
-
-	/* create snort configuration file */
-	create_snort_conf($id, $if_real, $snort_uuid);
-
-	/* if rules exist cp rules to each iface */
-	create_rules_iface($id, $if_real, $snort_uuid);
-
-	/* create snort bootup file snort.sh only create once */
-	create_snort_sh();
-
-	/* create barnyard2 configuration file */
-	if ($config['installedpackages']['snortglobal']['rule'][$id]['barnyard_enable'] == 'on')
-		create_barnyard2_conf($id, $if_real, $snort_uuid);
-
-	sync_snort_package();
-
-	conf_mount_ro();
-}
-
 /* Only run when all ifaces needed to sync. Expects filesystem rw */
-function sync_snort_package_empty()
+function sync_snort_package_config()
 {
 	global $config, $g;
 
@@ -1015,8 +888,7 @@ function sync_snort_package_empty()
 			create_rules_iface($id, $if_real, $snort_uuid);
 
 			/* create barnyard2 configuration file */
-			$snortbarnyardlog_info_chk = $value['barnyard_enable'];
-			if ($snortbarnyardlog_info_chk == 'on')
+			if ($value['barnyard_enable'] == 'on')
 				create_barnyard2_conf($id, $if_real, $snort_uuid);
 		}
 	}
@@ -1024,60 +896,38 @@ function sync_snort_package_empty()
 	/* create snort bootup file snort.sh only create once */
 	create_snort_sh();
 
-	sync_snort_package();
+	/* all new files are for the user snort nologin */
+	if (!is_dir('/var/log/snort'))
+		exec('/bin/mkdir -p /var/log/snort');
+
+	if (!is_dir('/var/log/snort/run'))
+		exec('/bin/mkdir -p /var/log/snort/run');
+
+	if (!is_dir('/var/log/snort/barnyard2'))
+		exec('/bin/mkdir -p /var/log/snort/barnyard2');
+
+	/* all new files are for the user snort nologin */
+	if (!file_exists('/var/log/snort/alert'))
+		exec('/usr/bin/touch /var/log/snort/alert');
+
+	/* XXX: These are needed if snort is run as snort user
+	mwexec('/usr/sbin/chown -R snort:snort /var/log/snort', true);
+	mwexec('/usr/sbin/chown -R snort:snort /usr/local/etc/snort', true);
+	mwexec('/usr/sbin/chown -R snort:snort /usr/local/lib/snort', true);
+	mwexec('/usr/sbin/chown snort:snort /tmp/snort*', true);
+	mwexec('/usr/sbin/chown snort:snort /var/db/whitelist', true);
+	*/
+
+	/* important  */
+	mwexec('/bin/chmod 770 /var/db/whitelist', true);
+	mwexec('/bin/chmod 770 /var/run/snort*', true);
+	mwexec('/bin/chmod 770 /tmp/snort*', true);
+	mwexec('/bin/chmod -R 770 /var/log/snort', true);
+	mwexec('/bin/chmod -R 770 /usr/local/lib/snort', true);
+	mwexec('/bin/chmod -R 770 /usr/local/etc/snort/', true);
 
 	conf_mount_ro();
 }
-
-/* only bootup and ip refresh */
-function sync_snort_package_config()
-{
-	global $config, $g;
-
-	/* RedDevil suggested code */
-	/* TODO: more testing needs to be done */
-	/* may cause voip to fail */
-	//exec("/sbin/sysctl net.bpf.bufsize=8388608");
-	//exec("/sbin/sysctl net.bpf.maxbufsize=4194304");
-	//exec("/sbin/sysctl net.bpf.maxinsns=512");
-	//exec("/sbin/sysctl net.inet.tcp.rfc1323=1");
-
-	/* do not start config build if rules is empty */
-	if (!is_array($config['installedpackages']['snortglobal']['rule']))
-		return;
-
-	conf_mount_rw();
-
-	foreach ($config['installedpackages']['snortglobal']['rule'] as $id => $value) {
-
-		$result_lan = $value['interface'];
-		$if_real = snort_get_real_interface($result_lan);
-		$snort_uuid = $value['uuid'];
-
-		if (!empty($if_real) && !empty($snort_uuid)) {
-
-			/* only build whitelist when needed */
-			if ($value['blockoffenders7'] == 'on')
-				create_snort_whitelist($id, $if_real);
-
-			/* only build threshold when needed */
-			if ($value['suppresslistname'] != 'default')
-				create_snort_suppress($id, $if_real);
-
-			/* create snort configuration file */
-			create_snort_conf($id, $if_real, $snort_uuid);
-
-			/* create barnyard2 configuration file */
-			if ($value['barnyard_enable'] == 'on')
-				create_barnyard2_conf($id, $if_real, $snort_uuid);
-		}
-	}
-
-	sync_snort_package();
-
-	conf_mount_ro();
-}
-
 
 /* Start of main config files */
 
@@ -1214,8 +1064,8 @@ function create_snort_sh()
 
 #### Fake start only used on bootup and Pfsense IP changes
 #### Only try to restart if snort is running on Iface
-if [ "`/bin/ps -auwx | /usr/bin/grep "R {$snort_uuid}" | /usr/bin/grep -v grep | /usr/bin/awk '{print $2;}'`" != "" ]; then
-	snort_pid=`/bin/ps -auwx | /usr/bin/grep -v grep | /usr/bin/grep "R {$snort_uuid}" | /usr/bin/awk '{print $2;}'`
+if [ "`/bin/ps -ax | /usr/bin/grep "R {$snort_uuid}" | /usr/bin/grep -v grep | /usr/bin/awk '{print $1;}'`" != "" ]; then
+	snort_pid=`/bin/ps -ax | /usr/bin/grep "R {$snort_uuid}" | /usr/bin/grep -v grep | /usr/bin/awk '{print $1;}'`
 	/usr/bin/logger -p daemon.info -i -t SnortStartup "Snort already running, soft restart"
 
 	#### Restart Iface
@@ -1236,9 +1086,9 @@ EOE;
 
 			$snort_sh_text4[] = <<<EOF
 
-pid_s=`/bin/ps -auwx | /usr/bin/grep "R {$snort_uuid}" | /usr/bin/grep -v grep |  /usr/bin/awk '{print \$2;}'`
+pid_s=`/bin/ps -ax | /usr/bin/grep "R {$snort_uuid}" | /usr/bin/grep -v grep |  /usr/bin/awk '{print \$1;}'`
 sleep 3
-pid_b=`/bin/ps -auwx | /usr/bin/grep "snort_{$snort_uuid}_{$if_real}.u2" | /usr/bin/grep -v grep | /usr/bin/awk '{print \$2;}'`
+pid_b=`/bin/ps -ax | /usr/bin/grep "snort_{$snort_uuid}_{$if_real}.u2" | /usr/bin/grep -v grep | /usr/bin/awk '{print \$1;}'`
 if [ \${pid_s} ] ; then
 		
 	/bin/echo "snort.sh run" > /tmp/snort.sh.pid
@@ -1270,26 +1120,13 @@ EOF;
 rc_start() {
 
 	/bin/echo "snort.sh run" > /tmp/snort.sh.pid
-
-	#### Remake the configs on boot Important!
-	/usr/local/bin/php -f /usr/local/pkg/pf/snort_dynamic_ip_reload.php &
-	/usr/bin/logger -p daemon.info -i -t SnortStartup "Snort Startup files Sync..."
-
 	$start_snort_iface_start
-
 	/bin/rm /tmp/snort.sh.pid
 }
 
 rc_stop() {
 
-	#### Check for double starts, Pfsense has problems with that
-	if /bin/ls /tmp/snort.sh.pid > /dev/null ; then
-		/usr/bin/logger -p daemon.info -i -t SnortStartup "Error: snort.sh IS running"
-		exit 0
-	fi
-
 	$start_snort_iface_stop
-
 	/bin/rm /tmp/snort.sh.pid
 	/bin/rm /var/run/snort*
 

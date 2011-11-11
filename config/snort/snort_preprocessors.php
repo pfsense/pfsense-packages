@@ -113,7 +113,7 @@ if ($_POST) {
 		write_config();
 
 		$if_real = snort_get_real_interface($pconfig['interface']);
-		sync_snort_package_all($id, $if_real, $snort_uuid);
+		sync_snort_package_config();
 
 		/* after click go to this page */
 		header( 'Expires: Sat, 26 Jul 1997 05:00:00 GMT' );

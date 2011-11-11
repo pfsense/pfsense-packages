@@ -184,7 +184,7 @@ if ($_POST['submit']) {
 		write_config();
 
 		/* create whitelist and homenet file  then sync files */
-		sync_snort_package_empty();
+		sync_snort_package_config();
 
 		header("Location: /snort/snort_interfaces_whitelist.php");
 		exit;

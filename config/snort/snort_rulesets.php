@@ -149,7 +149,7 @@ if ($_POST["Submit"]) {
 	$a_nat[$id]['rulesets'] = $enabled_items;
 
 	write_config();
-	sync_snort_package_all($id, $if_real, $iface_uuid);
+	sync_snort_package_config();
 
 	header( 'Expires: Sat, 26 Jul 1997 05:00:00 GMT' );
 	header( 'Last-Modified: ' . gmdate( 'D, d M Y H:i:s' ) . ' GMT' );
