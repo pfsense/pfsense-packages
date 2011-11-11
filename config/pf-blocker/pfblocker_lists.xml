@@ -201,7 +201,7 @@
 	    	<type>select</type>
  				<options>
  				<option><name>Never</name><value>Never</value></option>
- 				<option><name>Every Hours</name><value>01hour</value></option>
+ 				<option><name>Every Hour</name><value>01hour</value></option>
 				<option><name>Every 4 Hours</name><value>04hours</value></option>
 				<option><name>Every 12 Hours</name><value>12hours</value></option>
 				<option><name>Once a day</name><value>EveryDay</value></option>
