@@ -157,7 +157,7 @@ while (false !== ($filename = readdir($dh)))
 	//only populate this array if its a rule file
 	$isrulefile = strstr($filename, ".rules");
 	if ($isrulefile !== false)
-		$files[] = $filename;
+		$files[] = basename($filename);
 }
 sort($files);
 

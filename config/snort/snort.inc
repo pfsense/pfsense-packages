@@ -354,7 +354,7 @@ function snort_file_list($snort_log_dir, $snort_log_file)
 	$dir = opendir ("$snort_log_dir");
 	while (false !== ($file = readdir($dir))) {
 		if (strpos($file, "$snort_log_file",1) )
-			$file_list[] = $file;
+			$file_list[] = basename($file);
 	}
 	return $file_list;
 }
