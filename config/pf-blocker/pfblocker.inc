@@ -34,6 +34,7 @@ require_once("functions.inc");
 require_once("pkg-utils.inc");
 require_once("globals.inc");
 require_once("filter.inc");
+require_once("services.inc");
 
 function pfb_text_area_decode($text){
 	return preg_replace('/\r\n/', "\n",base64_decode($text));	
@@ -169,7 +170,7 @@ function sync_package_pfblocker() {
 				case "Deny_Outbound":
 						$rule = $base_rule;
 						$rule["type"] = $deny_action_outbound;
-						$rule["descr"]= "pfBlocker Outbound rule";
+						$rule["descr"]= "$pfb_alias auto rule";
 						$rule["source"]=array("any"=>"");
 						$rule["destination"]= array("address"=> $pfb_alias);
 						if ($pfblocker_config['enable_log'])
@@ -179,7 +180,7 @@ function sync_package_pfblocker() {
 				case "Deny_Inbound":
 						$rule = $base_rule;
 						$rule["type"] = $deny_action_inbound;
-						$rule["descr"]= "pfBlocker Inbound rule";
+						$rule["descr"]= "$pfb_alias auto rule";
 						$rule["source"]= array("address"=> $pfb_alias);
 						$rule["destination"]=array("any"=>"");
 						if ($pfblocker_config['enable_log'])
@@ -189,7 +190,7 @@ function sync_package_pfblocker() {
 				case "Permit_Outbound":
 						$rule = $base_rule;
 						$rule["type"] = "pass";
-						$rule["descr"]= "pfBlocker Outbound rule";
+						$rule["descr"]= "$pfb_alias auto rule";
 						$rule["source"]=array("any"=>"");
 						$rule["destination"]= array("address"=> $pfb_alias);
 						if ($pfblocker_config['enable_log'])
@@ -199,7 +200,7 @@ function sync_package_pfblocker() {
 				case "Permit_Inbound":
 						$rule = $base_rule;
 						$rule["type"] = "pass";
-						$rule["descr"]= "pfBlocker Inbound rule";
+						$rule["descr"]= "$pfb_alias auto rule";
 						$rule["source"]= array("address"=> $pfb_alias);
 						$rule["destination"]=array("any"=>"");
 						if ($pfblocker_config['enable_log'])
@@ -291,7 +292,7 @@ function sync_package_pfblocker() {
 						case "Deny_Outbound":
 							$rule = $base_rule;
 							$rule["type"] = $deny_action_outbound;
-							$rule["descr"]= "pfBlocker Outbound rule";
+							$rule["descr"]= "$alias auto rule";
 							$rule["source"]=array("any"=>"");
 							$rule["destination"]= array("address"=> $alias);
 							if ($pfblocker_config['enable_log'])
@@ -301,7 +302,7 @@ function sync_package_pfblocker() {
 						case "Deny_Inbound":
 							$rule = $base_rule;
 							$rule["type"] = $deny_action_inbound;
-							$rule["descr"]= "pfBlocker Inbound rule";
+							$rule["descr"]= "$alias auto rule";
 							$rule["source"]= array("address"=> $alias);
 							$rule["destination"]=array("any"=>"");
 							if ($pfblocker_config['enable_log'])
@@ -311,7 +312,7 @@ function sync_package_pfblocker() {
 						case "Permit_Outbound":
 							$rule = $base_rule;
 							$rule["type"] = "pass";
-							$rule["descr"]= "pfBlocker Outbound rule";
+							$rule["descr"]= "$alias auto rule";
 							$rule["source"]=array("any"=>"");
 							$rule["destination"]= array("address"=> $alias);
 							if ($pfblocker_config['enable_log'])
@@ -321,7 +322,7 @@ function sync_package_pfblocker() {
 						case "Permit_Inbound":
 							$rule = $base_rule;
 							$rule["type"] = "pass";
-							$rule["descr"]= "pfBlocker Inbound rule";
+							$rule["descr"]= "$alias auto rule";
 							$rule["source"]= array("address"=> $alias);
 							$rule["destination"]=array("any"=>"");
 							if ($pfblocker_config['enable_log'])
@@ -440,10 +441,29 @@ function sync_package_pfblocker() {
 		}
 		$config['filter']['rule']=$new_rules;
 		}	
-
+	
 	if ($message == ""){
-		#save and apply all changes
-
+		#check cron
+		$cron_found=0;
+		if (is_array($config['cron']['item'])){
+			$new_cron=array();
+			foreach($config['cron']['item'] as $cron){
+					if ($cron["command"] == "/usr/local/www/pfblocker.php cron")
+						$cron_found=1;
+					$new_cron['item'][]=$cron;
+				}
+				if ($cron_found == 0){
+					$new_cron['item'][]=array(	"minute" =>	"0",
+												"hour"	 =>	"*",
+												"mday" 	 =>	"*",
+												"month"  =>	"*",
+												"wday"	 =>	"*",
+												"who"	 =>	"root",
+												"command"=>	"/usr/local/www/pfblocker.php cron");
+					$config['cron']=$new_cron;
+				}
+		}
+		
 		# to be removed in final version
 		$aliases_list[]="pfBlockerInbound"; #remove previous version lists
 		$aliases_list[]="pfBlockerOutbound";#remove previous version lists
@@ -452,11 +472,15 @@ function sync_package_pfblocker() {
 		#update pfctrl tables
 		foreach ($aliases_list as $table)
 			exec("/sbin/pfctl -t " . escapeshellarg($table) . " -T kill 2>&1", $result_pfb);
-
+	
 		#write config
    		write_config();
 
-		#load filter file after editing
+		#update cron
+		if ($cron_found == 0)
+			configure_cron();
+		
+   		#load filter file after editing
 		filter_configure();
 
 		#sync config
@@ -471,11 +495,10 @@ function sync_package_pfblocker() {
 }
 
 function pfblocker_validate_input($post, &$input_errors) {
+	global $config;
 	foreach ($post as $key => $value) {
 		if (empty($value))
 			continue;
-		if($key == "greet_time" && !preg_match("/(\d+),(\d+)(s|m|h|w)/",$value))
-				$input_errors[] = "Wrong greet time sintax.";			
 		if($key == "message_size_limit" && !is_numeric($value))
 				$input_errors[] = "Message size limit must be numeric.";
 		if($key == "process_limit" && !is_numeric($value))

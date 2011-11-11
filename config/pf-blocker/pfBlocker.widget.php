@@ -28,7 +28,7 @@
 @require_once("guiconfig.inc");
 @require_once("pfsense-utils.inc");
 @require_once("functions.inc");
-
+?><div id='pfBlocker'><?php 
 echo "<table style=\"padding-top:0px; padding-bottom:0px; padding-left:0px; padding-right:0px\" width=\"100%\" border=\"0\" cellpadding=\"0\" 
 cellspacing=\"0\"";
 echo"  <tr>";
@@ -47,6 +47,16 @@ foreach ($config['aliases']['alias'] as $cbalias){
 				}
 		}
 	}
+
+#check rule count
+#(label, evaluations,packets total, bytes total, packets in, bytes in,packets out, bytes out)
+$packets=exec("/sbin/pfctl -s labels",$debug);
+foreach ($debug as $line){
+		#USER_RULE: pfBlocker Outbound rule 1656 0 0 0 0 0 0
+		if (preg_match("/USER_RULE: (\w+).*\s+\d+\s+(\d+)\s+\d+\s+\d+\s+\d+\s+\d+\s+\d+/",$line,$matches))
+			${$matches[1]}+=$matches[2];
+}
+	
 $rules=$config['filter']['rule'];
 #echo "<pre>";
 foreach($rules as $rule){
@@ -61,14 +71,34 @@ print "<pre>";
 #exit;
 	print "<td class=\"listlr\"><strong>Alias</strong></td>";
 	print "<td class=\"listlr\"><strong>CIDRs</strong></td>";
+	print "<td class=\"listlr\"><strong>Packets</strong></td>";
 	print "<td class=\"listlr\"><strong>Status</strong></td></tr>";	
-
-
 foreach ($pfb_table as $alias => $values){
 	print "<td class=\"listlr\">".$alias ."</td>";
 	print "<td class=\"listlr\">".$values["count"]."</td>";
+	print "<td class=\"listlr\">".${$alias}."</td>";
 	print "<td class=\"listlr\">".$values["img"]."</td></tr>";	
 }
 echo"  </tr>";
-echo"</table>";
+echo"</table></div>";
 ?>
+<script type="text/javascript">
+	function getstatus_pfblocker() {
+		scroll(0,0);
+		var url = "/widgets/widgets/pfBlocker.widget.php";
+		var pars = 'getupdatestatus=yes';
+		var myAjax = new Ajax.Request(
+			url,
+			{
+				method: 'get',
+				parameters: pars,
+				onComplete: activitycallback_pfblocker
+			});
+		//I know it's ugly but works.
+		setTimeout('getstatus_pfblocker()', 10000);
+		}
+	function activitycallback_pfblocker(transport) {
+		$('pfBlocker').innerHTML = transport.responseText;
+	}
+	getstatus_pfblocker();
+</script>

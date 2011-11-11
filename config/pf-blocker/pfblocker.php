@@ -12,16 +12,41 @@ if (preg_match("/(\w+)/",$_REQUEST['pfb'],$matches))
 	get_networks($matches[1]);
 #}
 
-if ($argv[1]=='cron' && preg_match("/\d+/",$argv[2],$matches)){
-        #require_once("/etc/inc/util.inc");
-        #require_once("/etc/inc/functions.inc");
-        #require_once("/etc/inc/etpkg-utils.inc");
-        #require_once("/etc/inc/globals.inc");
-        #require_once("/etc/inc/filter.inc");
+if ($argv[1]=='cron'){
+	require_once("/etc/inc/util.inc");
+	require_once("/etc/inc/functions.inc");
+	require_once("/etc/inc/pkg-utils.inc");
+	require_once("/etc/inc/globals.inc");
+	require_once("/etc/inc/filter.inc");
+	$hour=date('H');
+	$pfbdir='/usr/local/pkg/pfblocker';
+	$updates=0;
+	$cron=array('01hour' => 1,
+				'04hours' => 4,
+				'12hours' => 12,
+				'EveryDay' => 23);
+	
+	if($config['installedpackages']['pfblockerlists']['config'] != "")
+		foreach($config['installedpackages']['pfblockerlists']['config'] as $list){
+			if (is_array($list['row']))
+			  foreach ($list['row'] as $row){
+			  	if ($row['url'] != "" && $hour > 0 ){
+					$md5_url = md5($row['url']);
+					$update_hour=(array_key_exists($list['cron'], $cron)?$cron[$list['cron']]:25);
+					if($row['url'] && ($hour%$update_hour == 0)){
+						print $update_hour." ".$pfbdir.'/'.$md5_url.'.txt'."\n";
+						unlink_if_exists($pfbdir.'/'.$md5_url.'.txt');
+						$updates++;
+						}
+			  		}
+			  }
+	}
+	
+	if ($updates > 0){
         include "/usr/local/pkg/pfblocker.inc";
-        print "id".$argv[2];
-        sync_package_pfblocker($argv[2]);
-        }
+        sync_package_pfblocker();
+		}
+	}
 	
 function pfblocker_get_countries(){
 $files= array (	"Africa" => "/usr/local/pkg/Africa_cidr.txt",
