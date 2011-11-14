@@ -403,6 +403,9 @@ function unbound_resync_config() {
 	$unboundnetcfg = unbound_get_network_interface_addresses();
 	foreach($unboundnetcfg as $netent) {
 		foreach($netent as $entry) {
+			# If virtual interface then skip
+			if (!$entry['network'] && $entry['subnet'])
+				continue;
 			$unbound_bind_interfaces .="interface: {$entry['ipaddr']}\n";
 			if($entry['ipaddr'] != "127.0.0.1" && $entry['ipaddr'] != "::1" )
 				$unbound_allowed_networks .= "access-control: {$entry['network']}/{$entry['subnet']} allow\n";
