@@ -34,7 +34,7 @@ $pfSversion = str_replace("\n", "", file_get_contents("/etc/version"));
 if(strstr($pfSversion, "1.2"))
 	$one_two = true;
 
-$pgtitle = "Postfix: View Configuration";
+$pgtitle = "Services: Postfix View Configuration";
 include("head.inc");
 
 ?>
@@ -60,7 +60,7 @@ include("head.inc");
 	$tab_array[] = array(gettext("Antispam"), false, "/pkg_edit.php?xml=postfix_antispam.xml&id=0");
 	$tab_array[] = array(gettext("XMLRPC Sync"), false, "/pkg_edit.php?xml=postfix_sync.xml&id=0");
 	$tab_array[] = array(gettext("View config files"), true, "/postfix_view_config.php");
-	
+	$tab_array[] = array(gettext("Search Email"), false, "/postfix_search.php");
 	display_top_tabs($tab_array);
 ?>
 		</td></tr>

@@ -118,6 +118,10 @@
 			<text>View config files</text>
 			<url>/postfix_view_config.php</url>
 		</tab>
+		<tab>
+			<text>Search Email</text>
+			<url>/postfix_search.php</url>
+		</tab>
 	</tabs>
 	<fields>
 		<field>

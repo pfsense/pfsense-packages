@@ -119,6 +119,10 @@
 			<text>View config files</text>
 			<url>/postfix_view_config.php</url>
 		</tab>
+		<tab>
+			<text>Search Email</text>
+			<url>/postfix_search.php</url>
+		</tab>
 </tabs>
 	<fields>
 		<field>
@@ -133,13 +137,21 @@
 				<option><name>Strong</name><value>strong</value></option>
 				<option><name>Basic</name><value>basic</value></option>
 			</options>
-			<description>Enable sender, client, recipients and rfc verification</description>
+			<description><![CDATA[<strong>Default: Strong</strong><br>
+								Enable sender, client, recipients and rfc verification.<br>]]></description>
+		</field>
+		<field>
+			<fielddescr>Helo Hostname</fielddescr>
+			<fieldname>reject_unknown_helo_hostname</fieldname>
+			<type>checkbox</type>
+			<description><![CDATA[<strong>Default: Checked</strong><br>
+								Reject unknow helo hostname during smtp communication.]]></description>
 		</field>
 		<field>
 			<fielddescr>Zombie blocker</fielddescr>
 			<fieldname>zombie_blocker</fieldname>
 			<description>
-			<![CDATA[<a target=_new href='http://www.postfix.org/POSTSCREEN_README.html'>Use postfix 2.8 Postscreen feature to detect zombie spammers</a>]]>
+			<![CDATA[<strong>Default: Enabled with enforce</strong><br><a target=_new href='http://www.postfix.org/POSTSCREEN_README.html'>Use postfix 2.8 Postscreen feature to detect zombie spammers</a>]]>
 			</description>
 	    	<type>select</type>
  				<options>
@@ -154,7 +166,7 @@
 			<fieldname>greet_time</fieldname>
 			<type>input</type>
 			<size>10</size>
-			<description><![CDATA[<strong>syntax: 2,6s&nbsp;&nbsp;&nbsp;</strong>(default: up to 2 seconds under stress, up to 6 seconds otherwise)<br>
+			<description><![CDATA[<strong>Default: up to 2 seconds under stress, up to 6 seconds otherwises</strong><br>syntax: 2,6s<br>
 								The amount of time that postscreen will wait for an SMTP client to send a command before its turn, and for DNS blocklist lookup results to arrive .<br>
 								Specify a non-zero time value (an integral value plus an optional one-letter suffix that specifies the time unit).<br>
 								Time units: s (seconds), m (minutes), h (hours), d (days), w (weeks).]]>
@@ -186,7 +198,7 @@
 				<option><name>Enabled</name><value>enabled</value></option>
 				<option><name>Disabled</name><value>disabled</value></option>
 				</options>
-			<description><![CDATA[Safety net to keep mail queued that would otherwise be returned to the sender.<br>
+			<description><![CDATA[<strong>Default: Enabled only in postscreen</strong><br>Safety net to keep mail queued that would otherwise be returned to the sender.<br>
 								This parameter disables locally-generated bounces, and prevents the Postfix SMTP server from rejecting mail permanently, by changing 5xx reply codes into 4xx.<br>
 								However, soft_bounce is no cure for address rewriting mistakes or mail routing mistakes.]]>
 			</description>
@@ -208,7 +220,7 @@
 		<field>
 			<fielddescr>RBL threshold</fielddescr>
 			<fieldname>rbl_threshold</fieldname>
-			<description>How many RBL Lists Postscreen must find clien's ip address to block sender.</description>
+			<description><![CDATA[<strong>Default: 2</strong><br>How many RBL Lists Postscreen must find clien's ip address to block sender.]]></description>
 	    	<type>select</type>
  				<options>
 				<option><name>1</name><value>1</value></option>
@@ -223,13 +235,13 @@
 			<fieldname>postfix_spf</fieldname>
 			<type>select</type>
  				<options>
-				<option><name>REJECT the mail when the sender credentials FAILS (Recomended)</name><value>reject_spf_invalid_sender</value></option>
+				<option><name>REJECT the mail when the sender credentials FAILS</name><value>reject_spf_invalid_sender</value></option>
 				<option><name>PERMIT the mail when the sender credentials SUCCEED</name><value>permit_spf_valid_sender</value></option>
 				<option><name>Just show in header that the mail failed the test</name><value>spf_mark_only</value></option>
 				<option><name>Do not check SPF records</name><value>disable</value></option>
 				</options>
 			<description>
-			<![CDATA[<a target=_new href='http://www.openspf.org/Introduction'>The Sender Policy Framework (SPF) is an open standard specifying a technical method to prevent sender address forgery.</a>]]>
+			<![CDATA[<strong>Default: REJECT the mail when the sender credentials FAILS</strong><br><a target=_new href='http://www.openspf.org/Introduction'>The Sender Policy Framework (SPF) is an open standard specifying a technical method to prevent sender address forgery.</a>]]>
 			</description>
 		</field>
 		<field>

@@ -42,6 +42,7 @@ function px_get_real_interface_address($iface) {
 	global $config;
 	$iface = convert_friendly_interface_to_real_interface_name($iface);
 	$line = trim(shell_exec("ifconfig $iface | grep inet | grep -v inet6"));
+	$postfix_enabled=$config['installedpackages']['postfix']['config'][0]['enable_postfix'];
 	list($dummy, $ip, $dummy2, $netmask) = explode(" ", $line);
 	return array($ip, long2ip(hexdec($netmask)));
 }
@@ -53,6 +54,8 @@ function sync_relay_recipients($via_cron="cron"){
 		$relay_recipients="";
 		$relay_ldap_recipients="";
 		$ad_export="/usr/local/etc/postfix/adexport.pl";
+		$cron_cmd="/usr/local/bin/php -q /usr/local/www/postfix_recipients.php";
+		$postfix_enabled=$config['installedpackages']['postfix']['config'][0]['enable_postfix'];
 		foreach ($config['installedpackages']['postfixrecipients']['config'] as $postfix_recipients_config) {
 			if($postfix_recipients_config['location'] && file_exists($postfix_recipients_config['location']))
 				$relay_recipients .= file_get_contents($postfix_recipients_config['location']);
@@ -61,36 +64,26 @@ function sync_relay_recipients($via_cron="cron"){
 			if($postfix_recipients_config['enable_ldap']){
 				#validate cront job
 				if(preg_match("/(\d+)(\w)/",$postfix_recipients_config['freq'],$matches)){
-					$cron_sufix="\t*\t*\troot\t/usr/local/bin/php /usr/local/www/postfix_recipients.php";
+					$cron_postfix=array("minute" =>	"*",
+										"hour"	 =>	"*",
+										"mday" 	 =>	"*",
+										"month"  =>	"*",
+										"wday"	 =>	"*",
+										"who"	 =>	"root",
+										"command"=>	$cron_cmd);
 					switch ($matches[2]){
 						case m:
-							$cron= "*/".$matches[1]."\t*\t*".$cron_sufix;
+							$cron_postfix["month"]="*/".$matches[1];
 							break;
 						case h:
-							$cron= "0\t*/".$matches[1]."\t*".$cron_sufix;
+							$cron_postfix["hour"]="*/".$matches[1];
 							break;
 						case d:
-							$cron= "0\t0\t*/".$matches[1].$cron_sufix;
+							$cron_postfix["mday"]="*/".$matches[1];
 							break;
 						default:
 							$input_errors[] = "A valid number with a time reference is required for the field 'Frequency'";
 					}
-					#update cront job file
-					$crontab = file('/etc/crontab');
-					foreach ($crontab as $line)
-						$new_cron.=(preg_match("/postfix_recipients.php/",$line)?$cron."\n":$line);
-					#include if conf does not exist in crontab
-					$new_cron.=(!preg_match("/postfix_recipients.php/",$new_cron)?"\n".$cron."\n\n":"");	
-					file_put_contents("/etc/crontab",$new_cron, LOCK_EX);
-					#check crontab changes
-					$md5_new_file = trim(md5_file('/etc/crontab'));
-					if(file_exists('/etc/crontab.md5'))
-						$md5_old_file = trim(file_get_contents('/etc/crontab.md5'));
-					if($md5_new_file <> $md5_old_file){
-						mwexec('/usr/bin/killall -HUP cron');
-						file_put_contents("/etc/crontab.md5",$md5_new_file, LOCK_EX);
-					}
-				}
 				$relay_ldap_recipients="";
 				if ($via_cron == "gui"){
 					#running via pfsense gui, not time for ldap fetch.
@@ -139,7 +132,106 @@ function sync_relay_recipients($via_cron="cron"){
 					file_put_contents("/usr/local/etc/postfix/relay_ldap_recipients.txt",$relay_ldap_recipients, LOCK_EX);
 					}
 				}
+			}
+			#check crontab 
+			$new_cron=array();
+			$cron_cmd_sqlite = "";
+			$cron_postfix_sqlite="";
+			#check crontab Sqlite databases
+			if (is_array($config['installedpackages']['postfix']['config']) && $postfix_enabled=="on"){
+				$cron_sqlite_queue=$config['installedpackages']['postfix']['config'][0]['update_sqlite'];
+				$cron_cmd_sqlite="/usr/local/bin/php -q /usr/local/www/postfix.php";
+				if ($cron_sqlite_queue != "" && $cron_sqlite_queue != "never"){
+					$cron_postfix_sqlite=array("minute" =>	"*",
+											"hour"	 =>	"*",
+											"mday" 	 =>	"*",
+											"month"  =>	"*",
+											"wday"	 =>	"*",
+											"who"	 =>	"root",
+											"command"=>	"");
+					switch ($cron_sqlite_queue){
+						case '10min':
+							$cron_postfix_sqlite["minute"]="*/10";
+							$cron_postfix_sqlite["command"] = $cron_cmd_sqlite ." 10min";
+							break;
+						case '01hour':
+							$cron_postfix_sqlite["minute"]="0";
+							$cron_postfix_sqlite["command"] = $cron_cmd_sqlite ." 01hour";
+							break;
+						case '24hours':
+							$cron_postfix_sqlite["minute"]="0";
+							$cron_postfix_sqlite["hour"]="0";
+							$cron_postfix_sqlite["command"] = $cron_cmd_sqlite ." 24hours";
+							break;
+						}
+				}
+			}
+			
+			#check crontab relay recipients
+			$cron_found="";
+			if (is_array($config['cron']['item'])){
+				#print "<pre>";
+				foreach($config['cron']['item'] as $cron){
+					#check valid_recipients cron
+					if ($cron["command"] == $cron_cmd){
+						#postfix cron cmd found
+						if($postfix_enabled=="on")
+							$cron_found=$cron;
+						if($postfix_recipients_config['enable_ldap'] && $postfix_enabled=="on")
+							#update cron schedule
+							$new_cron['item'][]=$cron_postfix;
+						}
+					#check sqlite update queue	
+					else if(!preg_match("/.usr.local.www.postfix.php/",$cron["command"])){
+						#keep all non postfix cron cmds if not empty
+						if ($cron["command"] != "")
+							$new_cron['item'][]=$cron;
+						}
+					}
+			$write_cron=1;
+			# Check if crontab must be changed to valid recipients cmd
+			if ($postfix_recipients_config['enable_ldap']){
+				if ($cron_found!=$cron_postfix){
+					#update postfix cron schedule	
+					if (! is_array($cron_found) && $postfix_enabled=="on")
+						$new_cron['item'][]=$cron_postfix;
+					$write_cron=1;
+					}
+				}
+			else{
+				if (is_array($cron_found)){
+					#remove postfix cron cmd
+					$write_cron=1;
+					}
+				}
+			#check if cron must be changed to Sqlite cmd
+			if($cron_sqlite_queue != "" && $cron_sqlite_queue != "never"){
+				$new_cron['item'][]=$cron_postfix_sqlite;
+				$config['cron']=$new_cron;
+				$write_cron=1;
+				}
+			}
+
+			#call cron functions	
+			if ($write_cron==1){
+				$config['cron']=$new_cron;
+				write_config();
+				configure_cron();
+				}
+			#remove postfix old cron call
+			$old_cron=0;
+			$crontab = file('/etc/crontab');
+			$new_crontab="";
+			foreach ($crontab as $line){
+				if (preg_match("/php..usr.local.www.postfix_recipients.php/",$line))
+					$old_cron=1;
+				else
+					$new_crontab .= $line;
+				}
+			if ($old_cron==1)	
+				file_put_contents("/etc/crontab",$new_crontab, LOCK_EX);
 		}
+		
 	#save all relay recipients and reload postfix
 	file_put_contents("/usr/local/etc/postfix/relay_recipients",$relay_ldap_recipients."\n".$relay_recipients, LOCK_EX);
 	exec("/usr/local/sbin/postmap /usr/local/etc/postfix/relay_recipients");
@@ -286,7 +378,7 @@ EOF;
 			break;
 		}	
 	}
-	
+	$reject_unknown_helo_hostname=($antispam['reject_unknown_helo_hostname']?"reject_unknown_helo_hostname":"");
 	if ($antispam['header_check'] == "strong")
 	{
 	$postfix_main .= <<<EOF
@@ -298,7 +390,7 @@ smtpd_delay_reject = yes
 
 # Don't talk to mail systems that don't know their own hostname.
 smtpd_helo_required = yes
-smtpd_helo_restrictions = reject_unknown_helo_hostname
+smtpd_helo_restrictions ={$reject_unknown_helo_hostname}
 
 smtpd_sender_restrictions = reject_non_fqdn_sender,
 				reject_unknown_sender_domain,
@@ -334,7 +426,7 @@ smtpd_delay_reject = yes
 	
 # Don't talk to mail systems that don't know their own hostname.
 smtpd_helo_required = yes
-smtpd_helo_restrictions = reject_unknown_helo_hostname
+smtpd_helo_restrictions = {$reject_unknown_helo_hostname}
 
 smtpd_sender_restrictions = reject_unknown_sender_domain,
 				RBLRBLRBL							

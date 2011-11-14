@@ -44,7 +44,7 @@
 	<requirements>Describe your package requirements here</requirements>
 	<faq>Currently there are no FAQ items provided.</faq>
 	<name>postfix</name>
-	<version>1.2</version>
+	<version>1.3</version>
 	<title>Services: Postfix relay and antispam</title>
 	<include_file>/usr/local/pkg/postfix.inc</include_file>
 	<menu>
@@ -52,6 +52,12 @@
 		<tooltiptext>Configure Postfix Forwarder</tooltiptext>
 		<section>Services</section>
 		<url>pkg_edit.php?xml=postfix.xml&amp;id=0</url>
+	</menu>
+	<menu>
+		<name>Search Email</name>
+		<tooltiptext>Search postfix logs</tooltiptext>
+		<section>Diagnostics</section>
+		<url>/postfix_search.php</url>
 	</menu>
 	<service>
 		<name>postfix</name>
@@ -94,6 +100,17 @@
 		<chmod>0755</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
+		<item>http://www.pfsense.org/packages/config/postfix/postfix_search.php</item>
+		<prefix>/usr/local/www/</prefix>
+		<chmod>0755</chmod>
+	</additional_files_needed>
+	<additional_files_needed>
+		<item>http://www.pfsense.org/packages/config/postfix/postfix.php</item>
+		<prefix>/usr/local/www/</prefix>
+		<chmod>0755</chmod>
+	</additional_files_needed>
+
+	<additional_files_needed>
 		<item>http://www.pfsense.org/packages/config/postfix/adexport.pl</item>
 		<prefix>/usr/local/etc/postfix/</prefix>
 		<chmod>0755</chmod>
@@ -124,6 +141,10 @@
 			<text>View config files</text>
 			<url>/postfix_view_config.php</url>
 		</tab>
+		<tab>
+			<text>Search Email</text>
+			<url>/postfix_search.php</url>
+		</tab>
 </tabs>
 	<fields>
 		<field>
@@ -139,7 +160,8 @@
 		<field>
 			<fielddescr>Listen interface(s)</fielddescr>
 			<fieldname>enabled_interface</fieldname>
-			<description><![CDATA[Interface(s) that daemon will bind to.<br>Do not listen on WAN without a good "antispam/close relay" configuration.]]></description>
+			<description><![CDATA[Interface(s) that daemon will bind to.<br>Do not listen on WAN without a good "antispam/close relay" configuration.<br>
+									If you need postfix on other ip then Interface address, choose localhost and then create a nat rule from external ip to localhost.]]></description>
 			<type>interfaces_selection</type>
 			<required/>
 			<default_value>loopback</default_value>
@@ -189,7 +211,22 @@
 				<option><name>Disable logging</name><value>none</value></option>
 				</options>
 		</field>
-		
+		<field>
+			<fielddescr>Update Sqlite</fielddescr>
+			<fieldname>update_sqlite</fieldname>
+			<description><![CDATA[Choose how often pfSense will transfer log files to Sqlite database.<BR>
+								  To use <strong>Diagnostics -> Search mail</strong> you need to:<br>
+								  Select Loggin Destination to /var/log/maillog<br>
+								  Select update Sqlite frequency<br>
+								  Inlcude <strong>/^Subject:/ WARN</strong> line in Acl Headers after all your Subject rules.]]></description>
+	    	<type>select</type>
+ 				<options>
+				<option><name>Every 10 minutes</name><value>10min</value></option>
+				<option><name>Every Hour</name><value>01hour</value></option>
+				<option><name>Once a day</name><value>24hours</value></option>
+				<option><name>Never</name><value>never</value></option>
+				</options>
+		</field>		
 		<field>
 			<fielddescr>Debug peer list</fielddescr>
 			<fieldname>debug_list</fieldname>
