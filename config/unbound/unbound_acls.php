@@ -83,7 +83,7 @@ if ($_POST) {
 			if (!is_ipaddr($networkacl[$x]['acl_network']))
 				$input_errors[] = gettext("You must enter a valid network IP address for {$networkacl[$x]['acl_network']}.");
 
-			if (is_ipaddrv4($networkacl[$x]['acl_network'])) {
+			if (is_ipaddr($networkacl[$x]['acl_network'])) {
 				if (!is_subnet($networkacl[$x]['acl_network']."/".$networkacl[$x]['mask']))
 					$input_errors[] = gettext("You must enter a valid IPv4 netmask for {$networkacl[$x]['acl_network']}/{$networkacl[$x]['mask']}.");
 			} else if (function_exists("is_ipaddrv6")) {
