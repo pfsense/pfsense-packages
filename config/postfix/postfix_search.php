@@ -91,7 +91,7 @@ include("head.inc");
 					<tr>
                         <td width="22%" valign="top" class="vncell"><?=gettext("Subject: ");?></td>
                         <td width="78%" class="vtable"><input type="text" class="formfld unknown" id="subject" size="65%">
-                          <br><?=gettext("");?></td>
+                          <br><?=gettext("Subject to search, wildcard is '%'");?></td>
 					</tr>
 					<tr>
                         <td width="22%" valign="top" class="vncell"><?=gettext("Message_id: ");?></td>
@@ -168,7 +168,7 @@ include("head.inc");
 					
 							<tr>
 							<td width="22%" valign="top"></td>
-                        <td width="78%"><input name="Submit" type="submit" class="formbtn" value="<?=gettext("Search");?>" onclick="getsearch_results(true)">
+                        <td width="78%"><input name="Submit" type="submit" class="formbtn" id="search" value="<?=gettext("Search");?>" onclick="getsearch_results(true)">
 						</table>
 						
 				</div>
@@ -197,12 +197,20 @@ function loopSelected(id)
 }
 
 function getsearch_results() {
-		scroll(0,0);
 		var $new_from=$('from').value.replace("\n", "','");
 		var $new_to=$('to').value.replace("\n", "','");
 		var $new_sid=$('sid').value.replace("\n", "','");
 		var $files=loopSelected('Select1');
 		var $fields=loopSelected('fields');
+		if ($files ==""){
+			alert ("Please select at least one file.");
+			}
+		if ($fields ==""){
+			alert ("Please select at least one message field to display results.");
+			}
+		else{
+		$('search').value="Searching...";
+		$('search_results').innerHTML="";
 		var $queuetype=$('queuetype').options[$('queuetype').selectedIndex].text;
 		var $queuemax=$('queuemax').options[$('queuemax').selectedIndex].text;
 		var $pars="from="+$new_from+"&to="+$new_to+"&sid="+$new_sid+"&limit="+$queuemax+"&fields="+$fields+"&status="+$('status').value;
@@ -217,8 +225,11 @@ function getsearch_results() {
 				onComplete: activitycallback_postfix_search
 			});
 		}
+		}
 	function activitycallback_postfix_search(transport) {
 		$('search_results').innerHTML = transport.responseText;
+		scroll(0,900);
+		$('search').value="Search";
 	}
 </script>
 <!-- </form> -->

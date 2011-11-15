@@ -268,7 +268,7 @@ if ($_REQUEST['files']!= ""){
 	$stm_fetch=array();
 	$total_result=0;
 	foreach ($files as $postfix_db)
-		if (file_exists($postfix_dir.'/'.$postfix_db)){
+		if (file_exists($postfix_dir.'/'.$postfix_db)){ 
 			$last_next="";
 			$dbhandle = sqlite_open($postfix_dir.'/'.$postfix_db, 0666, $error);
 			$stm='select * from '.$queue;
