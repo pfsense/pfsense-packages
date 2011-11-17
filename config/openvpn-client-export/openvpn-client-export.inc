@@ -132,7 +132,7 @@ function openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $usetoke
 	}
 
 	// lookup user certificate info
-	if ($settings['mode'] != "server_user") {
+	if ($settings['mode'] == "server_tls_user") {
 		if ($settings['authmode'] == "Local Database") {
 			$cert = $user['cert'][$crtid];
 		} else {
@@ -143,6 +143,10 @@ function openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $usetoke
 		// If $cert is not an array, it's a certref not a cert.
 		if (!is_array($cert))
 			$cert = lookup_cert($cert);
+	} elseif (($settings['mode'] == "server_tls") || (($settings['mode'] == "server_tls_user") && ($settings['authmode'] != "Local Database"))) {
+		$cert = $config['cert'][$crtid];
+		if (!$cert)
+			return false;
 	} else
 		$nokeys = true;
 
@@ -315,7 +319,7 @@ function openvpn_client_export_installer($srvid, $usrid, $crtid, $useaddr, $uset
 	}
 
 	// lookup user certificate info
-	if ($settings['mode'] != "server_user") {
+	if ($settings['mode'] == "server_tls_user") {
 		if ($settings['authmode'] == "Local Database") {
 			$cert = $user['cert'][$crtid];
 		} else {
@@ -326,6 +330,10 @@ function openvpn_client_export_installer($srvid, $usrid, $crtid, $useaddr, $uset
 		// If $cert is not an array, it's a certref not a cert.
 		if (!is_array($cert))
 			$cert = lookup_cert($cert);
+	} elseif (($settings['mode'] == "server_tls") || (($settings['mode'] == "server_tls_user") && ($settings['authmode'] != "Local Database"))) {
+		$cert = $config['cert'][$crtid];
+		if (!$cert)
+			return false;
 	} else
 		$nokeys = true;
 
@@ -350,7 +358,7 @@ function openvpn_client_export_installer($srvid, $usrid, $crtid, $useaddr, $uset
 		$pwdfle .= "{$proxy['password']}\r\n";
 		file_put_contents("{$confdir}/{$proxy['passwdfile']}", $pwdfle);
 	}
-	$conf = openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $usetoken, $nokeys, $proxy, false, "", false, $doslines=true, $advancedoptions);
+	$conf = openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $usetoken, $nokeys, $proxy, false, "", false, true, $advancedoptions);
 	if (!$conf) {
 		$input_errors[] = "Could not create a config to export.";
 		return false;
@@ -442,7 +450,7 @@ function viscosity_openvpn_client_config_exporter($srvid, $usrid, $crtid, $usead
 	}
 
 	// lookup user certificate info
-	if ($settings['mode'] != "server_user") {
+	if ($settings['mode'] == "server_tls_user") {
 		if ($settings['authmode'] == "Local Database") {
 			$cert = $user['cert'][$crtid];
 		} else {
@@ -453,7 +461,12 @@ function viscosity_openvpn_client_config_exporter($srvid, $usrid, $crtid, $usead
 		// If $cert is not an array, it's a certref not a cert.
 		if (!is_array($cert))
 			$cert = lookup_cert($cert);
-	}
+	} elseif (($settings['mode'] == "server_tls") || (($settings['mode'] == "server_tls_user") && ($settings['authmode'] != "Local Database"))) {
+		$cert = $config['cert'][$crtid];
+		if (!$cert)
+			return false;
+	} else
+		$nokeys = true;
 
 	// create template directory
 	mkdir($tempdir, 0700, true);

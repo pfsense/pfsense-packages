@@ -59,7 +59,7 @@ foreach($a_server as $sindex => $server) {
 	$ras_certs = array();
 	if (stripos($server['mode'], "server") === false)
 		continue;
-	if ($server['authmode'] == "Local Database" && ($server['mode'] != "server_user")) {
+	if (($server['mode'] == "server_tls_user") && ($server['authmode'] == "Local Database")) {
 		foreach($a_user as $uindex => $user) {
 			if (!is_array($user['cert']))
 				continue;
@@ -78,7 +78,7 @@ foreach($a_server as $sindex => $server) {
 				$ras_user[] = $ras_userent;
 			}
 		}
-	} elseif ((!empty($server['authmode']) && ($server['mode'] != "server_user")) || ($server['mode'] == "server_tls")) {
+	} elseif (($server['mode'] == "server_tls") || (($server['mode'] == "server_tls_user") && ($server['authmode'] != "Local Database"))) {
 		foreach($a_cert as $cindex => $cert) {
 			if ($cert['caref'] != $server['caref'])
 				continue;
