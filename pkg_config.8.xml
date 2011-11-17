@@ -45,20 +45,6 @@
 		<configurationfile>filemgr.xml</configurationfile>
 	</package>
 	<package>
-		<name>Country Block</name>
-		<website/>
-		<descr>Block countries</descr>
-		<category>Firewall</category>
-		<pkginfolink>http://forum.pfsense.org/index.php/topic,25732.0.html</pkginfolink>
-		<config_file>http://pfsense.org/packages/config/countryblock/countryblock.xml</config_file>
-		<depends_on_package_base_url>http://files.pfsense.org/packages/7/All/</depends_on_package_base_url>
-		<version>0.2.4</version>
-		<status>Beta</status>
-		<required_version>2.0</required_version>
-		<maintainer>tom@tomschaefer.org</maintainer>
-		<configurationfile>countryblock.xml</configurationfile>
-	</package>
-	<package>
 		<name>pfBlocker</name>
 		<website/>
 		<descr><![CDATA[Introduce Enhanced Aliastable Feature to pfsense.<br>
@@ -69,25 +55,11 @@
 		<pkginfolink>http://forum.pfsense.org/index.php/topic,42543.0.html</pkginfolink>
 		<config_file>http://pfsense.org/packages/config/pf-blocker/pfblocker.xml</config_file>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
-		<version>0.1.4.6</version>
-		<status>Beta</status>
+		<version>1.0</version>
+		<status>Release</status>
 		<required_version>2.0</required_version>
 		<maintainer>tom@tomschaefer.org marcellocoutinho@gmail.com</maintainer>
 		<configurationfile>pfblocker.xml</configurationfile>
-	</package>
-	<package>
-		<name>IP-Blocklist</name>
-		<website/>
-		<descr>IP-Blocklist is the new PeerBlock. IP lists are used to add deny/allow rules to the firewall for in &amp; out traffic.</descr>
-		<category>Firewall</category>
-		<pkginfolink>http://forum.pfsense.org/index.php/topic,24769.0.html</pkginfolink>
-		<config_file>http://pfsense.org/packages/config/ipblocklist/8/ipblocklist.xml</config_file>
-		<depends_on_package_base_url>http://files.pfsense.org/packages/7/All/</depends_on_package_base_url>
-		<version>0.3.5</version>
-		<status>Beta</status>
-		<required_version>2.0</required_version>
-		<maintainer>tom@tomschaefer.org</maintainer>
-		<configurationfile>ipblocklist.xml</configurationfile>
 	</package>
 	<package>
 		<name>anyterm</name>
