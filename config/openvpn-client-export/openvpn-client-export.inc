@@ -230,6 +230,15 @@ function openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $usetoke
 	// - Disable for now, it requires the server cert to include special options
 	//$conf .= "remote-cert-tls server{$nl}";
 
+	// Extra protection for the server cert, if it's supported
+	if (function_exists("cert_get_purpose")) {
+		if (is_array($server_cert) && ($server_cert['crt'])) {
+			$purpose = cert_get_purpose($server_cert['crt'], true);
+			if ($purpose['server'] == 'Yes')
+				$conf .= "ns-cert-type server";
+		}
+	}
+
 	// add optional settings
 	if ($settings['compression'])
 		$conf .= "comp-lzo{$nl}";
