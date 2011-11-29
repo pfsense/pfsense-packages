@@ -541,8 +541,19 @@ EOF;
 		file_put_contents($crtfile, base64_decode($cert['crt']));
 
 		// write user .key
-		$keyfile = "{$tempdir}/key.key";
-		file_put_contents($keyfile, base64_decode($cert['prv']));
+		if (!empty($outpass)) {
+			$keyfile = "{$tempdir}/key.key";
+			$clearkeyfile = "{$tempdir}/key-clear.key";
+			file_put_contents($clearkeyfile, base64_decode($cert['prv']));
+			$eoutpass = escapeshellarg($outpass);
+			$ekeyfile = escapeshellarg($keyfile);
+			$eclearkeyfile = escapeshellarg($clearkeyfile);
+			exec("/usr/bin/openssl rsa -in ${eclearkeyfile} -out ${ekeyfile} -des3 -passout pass:${eoutpass}");
+			unlink($clearkeyfile);
+		} else {
+			$keyfile = "{$tempdir}/key.key";
+			file_put_contents($keyfile, base64_decode($cert['prv']));
+		}
 	}
 
 	// TLS support?

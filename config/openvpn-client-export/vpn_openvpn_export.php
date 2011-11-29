@@ -673,7 +673,7 @@ function useproxy_changed(obj) {
 									</td>
 									<td>
 										<span class="vexpl">
-											Use a password to protect the pkcs12 file contents.
+											Use a password to protect the pkcs12 file contents or key in Viscosity bundle.
 										</span>
 									</td>
 								</tr>
