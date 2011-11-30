@@ -185,7 +185,7 @@ function getactivity(action) {
     var url  = "./squidguard_blacklist.php";
     var pars = 'getactivity=yes';
 
-    if (action == 'download')          pars = pars + '&blacklist_download_start=yes&blacklist_url=' + el('blacklist_url').value;
+    if (action == 'download')          pars = pars + '&blacklist_download_start=yes&blacklist_url=' + encodeURIComponent(el('blacklist_url').value);
     if (action == 'cancel')            pars = pars + '&blacklist_download_cancel=yes';
     if (action == 'restore_default')   pars = pars + '&blacklist_restore_default=yes';
     if (action == 'clear_log')         pars = pars + '&blacklist_clear_log=yes';
