@@ -45,10 +45,22 @@ $img['Healthy']="<img src ='/themes/{$g['theme']}/images/icons/icon_interface_up
 #var_dump($pfb_table);
 #exit;
 ?><div id='postfix'><?php 
+global $config;
 
+
+$size=$config['installedpackages']['postfix']['config'][0]['widget_size'];
+if (preg_match('/\d+/',$config['installedpackages']['postfix']['config'][0]['widget_days']))
+	$days=$config['installedpackages']['postfix']['config'][0]['widget_days'] * -1;	
+else
+	$days=-3;
+if (preg_match('/\d+/',$config['installedpackages']['postfix']['config'][0]['widget_size']))
+	$size=$config['installedpackages']['postfix']['config'][0]['widget_size'];	
+else
+	$size='100000000';#100mb
+	
 $postfix_dir="/var/db/postfix/";
 $curr_time = time();
-for ($z = 0; $z > -3; $z--){
+for ($z = 0; $z > $days; $z--){
 
 if ($z==0)
 	$postfix_db=date("Y-m-d");
@@ -56,39 +68,45 @@ else
 	$postfix_db=date("Y-m-d",strtotime("$z day",$curr_time));
 	
 if (file_exists($postfix_dir.'/'.$postfix_db.".db")){
-	$dbhandle = sqlite_open($postfix_dir.'/'.$postfix_db.".db", 0666, $error);
 	#noqueue
 	open_table();
 	print "<td class=\"vncellt\"><strong><center>$postfix_db</center></strong></td>";
 	close_table();
 	open_table();
-	$stm="select count(*) as total from mail_noqueue";
-	$result = sqlite_query($dbhandle, $stm);
-	$row_noqueue = sqlite_fetch_array($result, SQLITE_ASSOC);
-
-	#queue
-	$result = sqlite_query($dbhandle, $stm);
-	$stm="select status,count(*) as total from mail_queue group by status order by status";
-	$result = sqlite_query($dbhandle, $stm);
-	$reader="";
-	$count="";
-	for ($i = 1; $i <= 15; $i++) {
-				$row = sqlite_fetch_array($result, SQLITE_ASSOC);
-				 if (is_array($row)){
-				 	if (preg_match("/\w+/",$row['status'])){
-				 	$reader.="<td class=\"listlr\"width=50%><strong>".ucfirst($row['status'])."</strong></td>\n";
-				 	if ($row['status']=="reject")
-				 		$row['total']=+$row_noqueue['total']; 
-					$count.="<td class=\"listlr\">".$row['total']."</td>\n";
-				 	}
-				 }
-				}
-	print "<tr>".$reader."</tr>";
-	print "<tr>".$count."</tr>";
+	if (@filesize($postfix_dir.'/'.$postfix_db.".db")< $size){
+		$dbhandle = sqlite_open($postfix_dir.'/'.$postfix_db.".db", 0666, $error);
+		$stm="select count(*) as total from mail_noqueue";
+		$result = sqlite_query($dbhandle, $stm);
+		$row_noqueue = sqlite_fetch_array($result, SQLITE_ASSOC);
+	
+		#queue
+		$result = sqlite_query($dbhandle, $stm);
+		$stm="select mail_status.info as status,count(*) as total from mail_to,mail_status where mail_to.status=mail_status.id group by status order by mail_status.info";
+		$result = sqlite_query($dbhandle, $stm);
+		$reader="";
+		$count="";
+		for ($i = 1; $i <= 15; $i++) {
+					$row = sqlite_fetch_array($result, SQLITE_ASSOC);
+					 if (is_array($row)){
+					 	if (preg_match("/\w+/",$row['status'])){
+					 	$reader.="<td class=\"listlr\"width=50%><strong>".ucfirst($row['status'])."</strong></td>\n";
+					 	if ($row['status']=="reject")
+					 		$row['total']=+$row_noqueue['total']; 
+						$count.="<td class=\"listlr\">".$row['total']."</td>\n";
+					 	}
+					 }
+					}
+		print "<tr>".$reader."</tr>";
+		print "<tr>".$count."</tr>";
+		$result = sqlite_query($dbhandle, $stm);
+		sqlite_close($dbhandle);
+		}
+	else{
+		print "<td class=\"listlr\"width=100%><center>File size is too large.</center></td>";
+		}
 	close_table();
 	echo "<br>";
-	$result = sqlite_query($dbhandle, $stm);
-	sqlite_close($dbhandle);
+	
 }
 }
 echo"  </tr>";
@@ -107,11 +125,10 @@ echo"</table></div>";
 				parameters: pars,
 				onComplete: activitycallback_postfix
 			});
-		//I know it's ugly but works.
-		setTimeout('getstatus_postfix()', 60000);
 		}
 	function activitycallback_postfix(transport) {
 		$('postfix').innerHTML = transport.responseText;
+		setTimeout('getstatus_postfix()', 60000);
 	}
 	getstatus_postfix();
 </script>

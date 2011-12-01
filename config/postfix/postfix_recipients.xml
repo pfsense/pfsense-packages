@@ -51,77 +51,49 @@
 		<section>Services</section>
 		<url>pkg_edit.php?xml=postfix.xml&amp;id=0</url>
 	</menu>
-	<service>
-		<name>postfix</name>
-		<rcfile>postfix.sh</rcfile>
-		<executable>master</executable>
-	</service>
-	<additional_files_needed>
-		<item>http://www.pfsense.org/packages/config/postfix/postfix.inc</item>
-		<prefix>/usr/local/pkg/</prefix>
-		<chmod>0755</chmod>
-	</additional_files_needed>
-	<additional_files_needed>
-		<item>http://www.pfsense.org/packages/config/postfix/postfix_acl.xml</item>
-		<prefix>/usr/local/pkg/</prefix>
-		<chmod>0755</chmod>
-	</additional_files_needed>
-	<additional_files_needed>
-		<item>http://www.pfsense.org/packages/config/postfix/postfix_recipients.xml</item>
-		<prefix>/usr/local/pkg/</prefix>
-		<chmod>0755</chmod>
-	</additional_files_needed>
-	<additional_files_needed>
-		<item>http://www.pfsense.org/packages/config/postfix/postfix_antispam.xml</item>
-		<prefix>/usr/local/pkg/</prefix>
-		<chmod>0755</chmod>
-	</additional_files_needed>
-
-		<additional_files_needed>
-		<item>http://www.pfsense.org/packages/config/postfix/postfix_sync.xml</item>
-		<prefix>/usr/local/pkg/</prefix>
-		<chmod>0755</chmod>
-	</additional_files_needed>
-		<additional_files_needed>
-		<item>http://www.pfsense.org/packages/config/postfix/postfix_view_config.php</item>
-		<prefix>/usr/local/www/</prefix>
-		<chmod>0755</chmod>
-	</additional_files_needed>
-	<additional_files_needed>
-		<item>http://www.pfsense.org/packages/config/postfix/postfix_recipients.php</item>
-		<prefix>/usr/local/www/</prefix>
-		<chmod>0755</chmod>
-	</additional_files_needed>
 <tabs>
 		<tab>
 			<text>General</text>
 			<url>/pkg_edit.php?xml=postfix.xml&amp;id=0</url>
 		</tab>
 		<tab>
-			<text>ACLs / Filter Maps</text>
-			<url>/pkg_edit.php?xml=postfix_acl.xml&amp;id=0</url>
+			<text>Domains</text>
+			<url>/pkg_edit.php?xml=postfix_domains.xml&amp;id=0</url>
 		</tab>
 		<tab>
-			<text>Valid recipients</text>
+			<text>Recipients</text>
 			<url>/pkg_edit.php?xml=postfix_recipients.xml&amp;id=0</url>
 			<active/>
+		</tab>
+		<tab>
+			<text>Access Lists</text>
+			<url>/pkg_edit.php?xml=postfix_acl.xml&amp;id=0</url>
 		</tab>
 		<tab>
 			<text>Antispam</text>
 			<url>/pkg_edit.php?xml=postfix_antispam.xml&amp;id=0</url>
 		</tab>
 		<tab>
-			<text>XMLRPC Sync</text>
+			<text>Sync</text>
 			<url>/pkg_edit.php?xml=postfix_sync.xml&amp;id=0</url>
 		</tab>
 		<tab>
-			<text>View config files</text>
+			<text>View config</text>
 			<url>/postfix_view_config.php</url>
 		</tab>
-				<tab>
-			<text>Search Email</text>
+		<tab>
+			<text>Search mail</text>
 			<url>/postfix_search.php</url>
 		</tab>
+		<tab>
+			<text>Queue</text>
+			<url>/postfix_queue.php</url>
+		</tab>
+		<tab>
+			<text>About</text>
+			<url>/postfix_about.php</url>
+		</tab>
+	
 </tabs>
 	<fields>
 		<field>
