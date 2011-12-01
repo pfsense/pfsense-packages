@@ -447,7 +447,7 @@
 		<config_file>http://www.pfsense.com/packages/config/postfix/postfix.xml</config_file>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
 		<depends_on_package>postfix-2.8.7,1.tbz</depends_on_package>
-		<depends_on_package>perl-5.12.4_3.tbz</depends_on_package>
+		<depends_on_package>perl-5.10.1_3.tbz</depends_on_package>
 		<depends_on_package_pbi>postfix-2.8.5-amd64.pbi</depends_on_package_pbi>
 		<version>2.8.7,1 pkg v.2.3</version>
 		<status>RC1</status>
