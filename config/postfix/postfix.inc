@@ -266,7 +266,8 @@ function sync_package_postfix() {
 	$relay_domains = "";
 	$transport = "";
 	$postfix_config=$config['installedpackages']['postfix']['config'][0];
-	$postfix_domains=$config['installedpackages']['postfixdomains']['config'][0];
+	if (is_array($config['installedpackages']['postfixdomains']))
+		$postfix_domains=$config['installedpackages']['postfixdomains']['config'][0];
 	$message_size_limit=($postfix_config['message_size_limit']?$postfix_config['message_size_limit']:"10240000");
 	$process_limit=($postfix_config['process_limit']?$postfix_config['process_limit']:"100");
 	if (is_array($postfix_domains['row'])) {
