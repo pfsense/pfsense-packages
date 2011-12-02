@@ -723,6 +723,22 @@
 		<build_port_path>/usr/ports/net/freeradius</build_port_path>
 		<build_port_path>/usr/ports/devel/libltdl</build_port_path>
 	</package>
+<package>
+		<name>freeradius2</name>
+		<website>http://www.freeradius.org/</website>
+		<descr>freeRADIUS 2.1.12 - The package is based on freeradius package. DO NOT USE ON PRODUCTIVE SYSTEMS AND NOT TOGETHER WITH freeradius. Both packages are using the same config files!!!</descr>
+		<category>System</category>
+		<version>2.1.12 pkg v0.1</version>
+		<status>Alpha</status>
+		<required_version>2.0</required_version>
+		<maintainer>none</maintainer>
+		<depends_on_package_base_url>ftp://ftp.freebsd.org/pub/FreeBSD/ports/amd64/packages-8-stable/Latest/</depends_on_package_base_url>
+		<depends_on_package>freeradius.tbz</depends_on_package>
+		<config_file>http://192.168.0.10/packages/config/freeradius2/freeradius.xml</config_file>
+		<configurationfile>freeradius.xml</configurationfile>
+		<build_port_path>/usr/ports/net/freeradius</build_port_path>
+		<after_install_info>Please visit Services: freeRADIUS</after_install_info>
+</package>
 	<package>
 		<name>bandwidthd</name>
 		<website>http://bandwidthd.sourceforge.net/</website>
