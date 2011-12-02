@@ -734,7 +734,7 @@
 		<maintainer>none</maintainer>
 		<depends_on_package_base_url>ftp://ftp.freebsd.org/pub/FreeBSD/ports/amd64/packages-8-stable/Latest/</depends_on_package_base_url>
 		<depends_on_package>freeradius.tbz</depends_on_package>
-		<config_file>http://192.168.0.10/packages/config/freeradius2/freeradius.xml</config_file>
+		<config_file>http://192.168.0.10/pfsense-packages/config/freeradius2/freeradius.xml</config_file>
 		<configurationfile>freeradius.xml</configurationfile>
 		<build_port_path>/usr/ports/net/freeradius</build_port_path>
 		<after_install_info>Please visit Services: freeRADIUS</after_install_info>
