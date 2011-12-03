@@ -782,7 +782,7 @@
 		<status>Alpha</status>
 		<required_version>2.0</required_version>
 		<maintainer>Nachtfalke</maintainer>
-		<depends_on_package_base_url>ftp://ftp.freebsd.org/pub/FreeBSD/ports/amd64/packages-8-stable/Latest/</depends_on_package_base_url>
+		<depends_on_package_base_url>http://ftp.freebsd.org/pub/FreeBSD/ports/amd64/packages-8-stable/Latest/</depends_on_package_base_url>
 		<depends_on_package>freeradius.tbz</depends_on_package>
 		<config_file>http://www.pfsense.org/packages/config/freeradius2/freeradius.xml</config_file>
 		<configurationfile>freeradius.xml</configurationfile>
