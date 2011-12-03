@@ -786,7 +786,7 @@
 		<depends_on_package>freeradius.tbz</depends_on_package>
 		<config_file>http://www.pfsense.org/packages/config/freeradius2/freeradius.xml</config_file>
 		<configurationfile>freeradius.xml</configurationfile>
-		<build_port_path>/usr/ports/net/freeradius</build_port_path>
+		<build_port_path>/usr/ports/net/freeradius2</build_port_path>
 		<after_install_info>Please visit Services: freeRADIUS</after_install_info>
 	</package>
 	<package>
