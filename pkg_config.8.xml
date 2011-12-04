@@ -735,20 +735,20 @@
 		<name>freeradius2</name>
 		<website>http://www.freeradius.org/</website>
 		<descr></descr>
-		<descr><![CDATA[!!! EXPERIMENTAL !!!<br>
-						freeRADIUS 2.1.12 - The package is based on freeradius 1.1.8 package.<br>
-						DO NOT USE ON PRODUCTIVE SYSTEMS AND NOT TOGETHER WITH freeradius. Both packages are using the same config files!!!]]></descr>
+		<descr><![CDATA[EXPERIMENTAL !<br>
+				freeRADIUS 2.1.12 - The package is based on freeradius 1.1.8 package.<br>
+				DO NOT USE ON PRODUCTIVE SYSTEMS AND NOT TOGETHER WITH freeradius. Both packages are using the same config files]]></descr>
 		<category>System</category>
 		<version>2.1.12 pkg v0.1</version>
 		<status>Alpha</status>
 		<required_version>2.0</required_version>
 		<maintainer>Nachtfalke</maintainer>
-		<depends_on_package_base_url>ftp://ftp.freebsd.org/pub/FreeBSD/ports/amd64/packages-8-stable/Latest/</depends_on_package_base_url>
-		<depends_on_package>freeradius.tbz</depends_on_package>
-		<depends_on_package>python27.tbz</depends_on_package>
-		<depends_on_package>perl.tbz</depends_on_package>
-		<depends_on_package>libltdl.tbz</depends_on_package>
-		<depends_on_package>gdbm.tbz</depends_on_package>
+		<depends_on_package_base_url>http://ftp.freebsd.org/pub/FreeBSD/ports/i386/packages-8-stable/All/</depends_on_package_base_url>
+		<depends_on_package>freeradius-2.1.12.tbz</depends_on_package>
+		<depends_on_package>python27-2.7.2_3.tbz</depends_on_package>
+		<depends_on_package>perl-5.12.4_3.tbz</depends_on_package>
+		<depends_on_package>libltdl-2.4_1.tbz</depends_on_package>
+		<depends_on_package>gdbm-1.9.1.tbz</depends_on_package>
 		<config_file>http://www.pfsense.org/packages/config/freeradius2/freeradius.xml</config_file>
 		<configurationfile>freeradius.xml</configurationfile>
 		<build_port_path>/usr/ports/net/freeradius2</build_port_path>
