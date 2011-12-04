@@ -6,7 +6,10 @@ define('RADDB', '/usr/local/etc/raddb');
 
 function freeradius_deinstall_command() {
 	exec("cd /var/db/pkg && pkg_delete `ls | grep freeradius`");
+	exec("cd /var/db/pkg && pkg_delete `ls | grep python`");
+	exec("cd /var/db/pkg && pkg_delete `ls | grep perl`");
 	exec("cd /var/db/pkg && pkg_delete `ls | grep libltdl`");
+	exec("cd /var/db/pkg && pkg_delete `ls | grep gdbm`");
 }
 
 function freeradius_install_command() {
@@ -27,7 +30,7 @@ function freeradius_install_command() {
 	$rcfile = array();
 	$rcfile['file'] = 'radiusd.sh';
 	$rcfile['start'] = '/usr/local/etc/rc.d/radiusd onestart';
-	$rcfile['stop'] = '/usr/local/etc/rc.d/radiusd stop';
+	$rcfile['stop'] = '/usr/local/etc/rc.d/radiusd onestop';
         conf_mount_rw();
 	write_rcfile($rcfile);
         conf_mount_ro();
@@ -108,12 +111,6 @@ listen {
         ipaddr = $interface_ip 
         port = 1813 
 }
-
-
-
-
-
-
 
  
 security {
@@ -297,7 +294,7 @@ modules {
 		cache-size = 5000
 	}
 	
-  counter monthly {
+	counter monthly {
 		filename = \${raddbdir}/db.monthly
 		key = User-Name
 		count-attribute = Acct-Session-Time
@@ -364,9 +361,9 @@ instantiate {
 	exec
 	expr
 	daily
-  weekly
-  monthly
-  forever
+	weekly
+	monthly
+	forever
 }
  
 authorize {
@@ -488,50 +485,50 @@ function freeradius_users_resync() {
 	$additionaloptions=$user['additionaloptions'];
 	$atrib=''; 
 	$head="$username User-Password == ".'"'.$password.'"';
-      if ($multiconnect <> '') {
-        $head .=", Simultaneous-Use := $multiconnect";
-       }
-      if ($userexpiration <> '') {
-        $head .=", Expiration := ".'"'.$userexpiration.'"';
-       }
-      if ($subnetmask<> '') {
-        $head .=", Framed-IP-Netmask = $subnetmask";
-       }
-      if ($gateway<> '') {
-        $head .=", Framed-Route = $gateway";
-       }
-      if ($onlinetime <> '') {
-        $head .=", Login-Time := ". '"' . $onlinetime .'"';
-       }
-      if ($ip <> '') {
-        if ($atrib <> '') { $atrib .=","; }
-        $atrib .="\r\n\tFramed-IP-Address = $ip";
-       }
-      if ($sessiontime <> '') {
-        if ($atrib <> '') { $atrib .=","; }
-        $atrib .="\r\n\tSession-Timeout := $sessiontime";
-       }
-      if ($vlanid <> '') {
-        if ($atrib <> '') { $atrib .=","; }
-        $atrib .="\r\n\tTunnel-Type = VLAN,\r\n\tTunnel-Medium-Type = IEEE-802,\r\n\tTunnel-Private-Group-ID = \"$vlanid\"";
-       }
-      if ($additionaloptions <> '') {
-        if ($atrib <> '') { $atrib .=","; }
-        $atrib .="\r\n\t$additionaloptions";
-       }
-       
-      $conf .= <<<EOD
-$head 
+	if ($multiconnect <> '') {
+	$head .=", Simultaneous-Use := $multiconnect";
+	}
+	if ($userexpiration <> '') {
+	$head .=", Expiration := ".'"'.$userexpiration.'"';
+	}
+	if ($subnetmask<> '') {
+	$head .=", Framed-IP-Netmask = $subnetmask";
+	}
+	if ($gateway<> '') {
+	$head .=", Framed-Route = $gateway";
+	}
+	if ($onlinetime <> '') {
+	$head .=", Login-Time := ". '"' . $onlinetime .'"';
+	}
+	if ($ip <> '') {
+	if ($atrib <> '') { $atrib .=","; }
+	$atrib .="\r\n\tFramed-IP-Address = $ip";
+	}
+	if ($sessiontime <> '') {
+	if ($atrib <> '') { $atrib .=","; }
+	$atrib .="\r\n\tSession-Timeout := $sessiontime";
+	}
+	if ($vlanid <> '') {
+	if ($atrib <> '') { $atrib .=","; }
+	$atrib .="\r\n\tTunnel-Type = VLAN,\r\n\tTunnel-Medium-Type = IEEE-802,\r\n\tTunnel-Private-Group-ID = \"$vlanid\"";
+	}
+	if ($additionaloptions <> '') {
+	if ($atrib <> '') { $atrib .=","; }
+	$atrib .="\r\n\t$additionaloptions";
+	}
+
+	$conf .= <<<EOD
+	$head
 	$atrib
 
 EOD;
-		}
+	}
 	}
 	$filename = RADDB . '/users';
-        conf_mount_rw();
+	conf_mount_rw();
 	file_put_contents($filename, $conf);
 	chmod($filename, 0600);
-        conf_mount_ro();
+	conf_mount_ro();
 
 	restart_service('freeradius');
 }
@@ -557,17 +554,17 @@ EOD;
 	}
 	else {
 		$conf .= <<<EOD
-client 127.0.0.1 {
-	secret = pfsense
-	shortname = localhost
-}
+		client 127.0.0.1 {
+		secret = pfsense
+		shortname = localhost
+		}
 
 EOD;
 	}
 
-        conf_mount_rw();
+	conf_mount_rw();
 	file_put_contents(RADDB . '/clients.conf', $conf);
-        conf_mount_ro();
+	conf_mount_ro();
 	restart_service("freeradius");
 }
 ?>
