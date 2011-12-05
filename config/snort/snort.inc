@@ -1581,6 +1581,20 @@ function generate_snort_conf($id, $if_real, $snort_uuid)
 		$def_sip_proxy_ports_type = "5060:5090,16384:32768";
 	else
 		$def_sip_proxy_ports_type = "$def_sip_proxy_ports_info_chk";
+		
+	/* def SIP_IP */
+	$def_sip_ip_info_chk = $snortcfg['def_sip_ip'];
+	if ($def_sip_ip_info_chk == "")
+		$def_sip_ip_type = "\$HOME_NET";
+	else
+		$def_sip_ip_type = "$def_sip_ip_info_chk";
+
+	/* def SIP_PORTS */
+	$def_sip_ports_info_chk = $snortcfg['def_sip_ports'];
+	if ($def_sip_ports_info_chk == "")
+		$def_sip_ports_type = "5060:5090,16384:32768";
+	else
+		$def_sip_ports_type = "$def_sip_ports_info_chk";
 
 	/* def AUTH_PORTS */
 	$def_auth_ports_info_chk = $snortcfg['def_auth_ports'];
@@ -1964,6 +1978,7 @@ var IMAP_SERVERS [{$def_imap_servers_type}]
 var RPC_SERVERS \$HOME_NET
 var WWW_SERVERS [{$def_www_servers_type}]
 var SIP_PROXY_IP [{$def_sip_proxy_ip_type}]
+var SIP_IP [{$def_sip_ip_type}]
 var AIM_SERVERS \
 [64.12.24.0/23,64.12.28.0/23,64.12.161.0/24,64.12.163.0/24,64.12.200.0/24,205.188.3.0/24,205.188.5.0/24,205.188.7.0/24,205.188.9.0/24,205.188.153.0/24,205.188.179.0/24,205.188.248.0/24]
 
@@ -1997,6 +2012,7 @@ portvar TELNET_PORTS [{$def_telnet_ports_type}]
 portvar MAIL_PORTS [{$def_mail_ports_type}]
 portvar SSL_PORTS [{$def_ssl_ports_type}]
 portvar SIP_PROXY_PORTS [{$def_sip_proxy_ports_type}]
+portvar SIP_PORTS [{$def_sip_ports_type}]
 
 # DCERPC NCACN-IP-TCP
 portvar DCERPC_NCACN_IP_TCP [139,445]
