@@ -465,8 +465,8 @@
 						Do not try with any other version.]]></descr>
 		<category>Services</category>
 		<config_file>http://www.pfsense.com/packages/config/mailscanner/mailscanner.xml</config_file>
-		<pkginfolink>http://forum.pfsense.org/index.php/topic,40622.0.html</pkginfolink>
-		<depends_on_package_base_url>ftp://ftp.freebsd.org/pub/FreeBSD/releases/amd64/8.2-RELEASE/packages/All/</depends_on_package_base_url>
+		<pkginfolink>http://forum.pfsense.org/index.php/topic,43687.0.html</pkginfolink>
+		<depends_on_package_base_url>http://ftp-archive.freebsd.org/pub/FreeBSD-Archive/old-releases/amd64/8.2-RELEASE/packages/All/</depends_on_package_base_url>
 		<depends_on_package>MailScanner-4.81.4_2.tbz</depends_on_package>
 		<depends_on_package>pyzor-0.5.0_1.tbz</depends_on_package>
 		<depends_on_package>re2c-0.13.5.tbz</depends_on_package>
