@@ -1945,7 +1945,7 @@ function squidguard_setup_cron($task_key, $options, $on_off)
 # *****************************************************************************
 function squidguard_ramdisk($enable)
 {
-    $ramsize = 200;
+    $ramsize = 300;
 
     # delete old squidguard ramdisk
     if (file_exists("/dev/md15")) {
