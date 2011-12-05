@@ -391,8 +391,10 @@ EOF;
 	if($antispam['antispam_enabled']){
 		switch ($antispam['antispam_software']){
 			case "mailscanner":
-			$header_check .= (!preg_match('@/ HOLD@',$header_check)?"\n/^Received:/ HOLD\n":"\n");
-			$postfix_main_antispam = "#Saving all mail after header/body/rbl/spf checks to mailscanner\n\n";
+			if ($antispam['hold_mode']=='auto'){
+				$header_check .= "\n/^Received:/ HOLD\n";
+				$postfix_main_antispam = "#Saving all mail after header/body/rbl/spf checks to mailscanner\n\n";
+				}
 			break;
 			case "policyd2":
 			if ($antispam['antispam_location']){

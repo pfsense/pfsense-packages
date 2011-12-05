@@ -62,7 +62,7 @@ function get_cmd(){
 	}
 	if ($_REQUEST['cmd'] =='qshape'){
 		if ($_REQUEST['qshape']!="")
-			exec("/usr/local/bin/qshape ". preg_replace("/\W/"," ",$_REQUEST['qshape']), $qshape);			
+			exec("/usr/local/bin/qshape -".preg_replace("/\W/","",$_REQUEST['type'])." ". preg_replace("/\W/","",$_REQUEST['qshape']), $qshape);			
 		else
 			exec("/usr/local/bin/qshape", $qshape);
 		print '<table class="tabcont" width="100%" border="0" cellpadding="8" cellspacing="0">';
@@ -167,6 +167,15 @@ else{
 							<option value="maildrop">maildrop</option>
 						</select><br><?=gettext("Select how often queue will be queried.");?></td>
 					</tr>
+					<tr>					
+                        <td width="22%" valign="top" class="vncell"><?=gettext("qshape Report type: ");?></td>
+                        <td width="78%" class="vtable">
+                        <select name="drop3" id="qtype">
+							<option value="s" selected>sender domain</option>
+							<option value="p">parent domain</option>
+						</select><br><?=gettext("Select between sender or parent domains to order by.");?></td>
+					</tr>
+
 					<tr>
 							<td width="22%" valign="top"></td>
                         <td width="78%"><input name="Submit" type="button" class="formbtn" id="run" value="<?=gettext("show queue");?>" onclick="get_queue('mailq')"><div id="search_help"></div></td>
@@ -212,6 +221,7 @@ else{
 				var q_args=loopSelected('qshape');
 				var pars = 'cmd='+$('cmd').options[$('cmd').selectedIndex].value;
 				var pars = pars + '&qshape='+q_args;
+				var pars = pars + '&type='+$('qtype').options[$('qtype').selectedIndex].value;
 				var url = "/postfix_queue.php";
 				var myAjax = new Ajax.Request(
 					url,

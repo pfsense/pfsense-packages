@@ -239,6 +239,22 @@
 			<description></description>
 		</field>
 		<field>
+			<fielddescr>Message Hold mode</fielddescr>
+			<fieldname>hold_mode</fieldname>
+			<description><![CDATA[Select how postfix will hold messages to mailscanner.<br>
+								When using auto mode, postfix will hold all messages.<br>
+								When using manual mode, include options like this in acl headers:<br>
+								/^to:.*admin@mydomain.com/ OK<br>
+								/^from:.*user@extdomain.com/ OK<br>
+								/^from:/ HOLD<br>
+								/^to:.*@mydomain.com/ HOLD]]></description>
+	    	<type>select</type>
+ 				<options>
+				<option><name>Auto mode</name><value>auto</value></option>
+				<option><name>Manual mode using ACLs</name><value>manual</value></option>
+				</options>
+		</field>
+		<field>
 			<fielddescr>Software</fielddescr>
 			<fieldname>antispam_software</fieldname>
 			<description>Select Third part solution to use. See postfix forwarder package info page for instaling instructions</description>

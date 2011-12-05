@@ -140,7 +140,7 @@ function grep_log(){
 	
 	$total_lines=0;
 	$days=array();
-	$grep="postfix.\(cleanup\|smtp\|error\|qmgr\)";
+	$grep="\(MailScanner\|postfix.cleanup\|postfix.smtp\|postfix.error\|postfix.qmgr\)";
 	$curr_time = time();
 	$log_time=strtotime($postfix_arg['time'],$curr_time);
 	$m=date('M',strtotime($postfix_arg['time'],$curr_time));
@@ -181,9 +181,19 @@ function grep_log(){
 				$stm_queue[$day].='insert or ignore into mail_from(sid,date,server,client) values ('.$values.');'."\n";
 			${$email[3]}=$email[3];
 		}
-		#Nov 14 09:29:32 srvch011 postfix/error[58443]: 2B8EB1F5A5A: to=<hildae.sva@pi.email.com>, relay=none, delay=0.66, delays=0.63/0/0/0.02, dsn=4.4.3, status=deferred (delivery temporarily suspended: Host or domain name not found. Name service error for name=mail.pi.trf1.gov.br type=A: Host not found, try again)
+		#Dec  2 22:21:18 pfsense MailScanner[60670]: Requeue: 8DC3BBDEAF.A29D3 to 5AD9ABDEB5
+		else if (preg_match("/(\w+\s+\d+\s+[0-9,:]+) (\w+) MailScanner.*Requeue: (\w+)\W\w+ to (\w+)/",$line,$email)){
+			$stm_queue[$day].= "update or ignore mail_from set sid='".$email[4]."' where sid='".$email[3]."';\n";
+		}
+		#Dec  5 14:06:10 srvchunk01 MailScanner[19589]: Message 775201F44B1.AED2C from 209.185.111.50 (marcellocoutinho@mailtest.com) to sede.mail.test.com is spam, SpamAssassin (not cached, escore=99.202, requerido 6, autolearn=spam, DKIM_SIGNED 0.10, DKIM_VALID -0.10, DKIM_VALID_AU -0.10, FREEMAIL_FROM 0.00, HTML_MESSAGE 0.00, RCVD_IN_DNSWL_LOW -0.70, WORM_TEST2 100.00)
+		else if (preg_match("/(\w+\s+\d+\s+[0-9,:]+) (\w+) MailScanner\W\d+\W+\w+\s+(\w+).* is spam, (.*)/",$line,$email)){
+			$stm_queue[$day].= "insert or ignore into mail_status (info) values ('spam');\n";
+			print "\n#######################################\nSPAM:".$email[4].$email[3].$email[2]."\n#######################################\n";
+			$stm_queue[$day].= "update or ignore mail_to set status=(select id from mail_status where info='spam'), status_info='".preg_replace("/(\<|\>|\s+|\'|\")/"," ",$email[4])."' where from_id in (select id from mail_from where sid='".$email[3]."' and server='".$email[2]."');\n";
+		}
+		#Nov 14 09:29:32 srvch011 postfix/error[58443]: 2B8EB1F5A5A: to=<hildae.sva@pi.email.com>, relay=none, delay=0.66, delays=0.63/0/0/0.02, dsn=4.4.3, status=deferred (delivery temporarily suspended: Host or domain name not found. Name service error for name=mail.pi.test.com type=A: Host not found, try again)
 		#Nov  3 21:45:32 srvch011 postfix/smtp[18041]: 4CE321F4887: to=<viinil@vitive.com.br>, relay=smtpe1.eom[81.00.20.9]:25, delay=1.9, delays=0.06/0.01/0.68/1.2, dsn=2.0.0, status=sent (250 2.0.0 Ok: queued as 2C33E2382C8)
-		#Nov 16 00:00:14 srvch011 postfix/smtp[7363]: 7AEB91F797D: to=<alessandra.bueno@mg.trf1.gov.br>, relay=mail.mg.trf1.gov.br[172.25.3.5]:25, delay=39, delays=35/1.1/0.04/2.7, dsn=5.7.1, status=bounced (host mail.mg.trf1.gov.br[172.25.3.5] said: 550 5.7.1 Unable to relay for alessandra.bueno@mg.trf1.gov.br (in reply to RCPT TO command))
+		#Nov 16 00:00:14 srvch011 postfix/smtp[7363]: 7AEB91F797D: to=<alessandra.bueno@mg.test.com>, relay=mail.mg.test.com[172.25.3.5]:25, delay=39, delays=35/1.1/0.04/2.7, dsn=5.7.1, status=bounced (host mail.mg.test.com[172.25.3.5] said: 550 5.7.1 Unable to relay for alessandra.bueno@mg.test.com (in reply to RCPT TO command))
 		else if(preg_match("/(\w+\s+\d+\s+[0-9,:]+) (\w+) postfix.\w+\W\d+\W+(\w+): to=\<(.*)\>, relay=(.*), delay=([0-9,.]+), .* dsn=([0-9,.]+), status=(\w+) (.*)/",$line,$email)){
 			$stm_queue[$day].= "insert or ignore into mail_status (info) values ('".$email[8]."');\n";
 			$stm_queue[$day].= "insert or ignore into mail_to (from_id,too,status,status_info,relay,delay,dsn) values ((select id from mail_from where sid='".$email[3]."' and server='".$email[2]."'),'".strtolower($email[4])."',(select id from mail_status where info='".$email[8]."'),'".preg_replace("/(\<|\>|\s+|\'|\")/"," ",$email[9])."','".$email[5]."','".$email[6]."','".$email[7]."');\n";	
@@ -223,16 +233,23 @@ function grep_log(){
 			$status['status']=$email[4];
 			$stm_queue[$day].= "insert or ignore into mail_status (info) values ('".$email[4]."');\n";
 			if ($email[4] =="warning"){
-				$stm_queue[$day].= "insert or ignore into mail_status (info) values ('incoming');\n";
+				if (${$status['sid']}=='hold'){
+					$status['status']='hold';
+					}
+				else{
+					$status['status']='incoming';
+					$stm_queue[$day].= "insert or ignore into mail_status (info) values ('".$status['status']."');\n";
+					}
 				#print "$line\n";
 				$status['status_info']=preg_replace("/(\<|\>|\s+|\'|\")/"," ",$email[11]);
 				$status['subject']=preg_replace("/header Subject: /","",$email[5]);
 				$status['subject']=preg_replace("/(\<|\>|\s+|\'|\")/"," ",$status['subject']);
 				$stm_queue[$day].="update mail_from set subject='".$status['subject']."', fromm='".strtolower($status['from'])."',helo='".$status['helo']."' where sid='".$status['sid']."';\n";
-				$stm_queue[$day].="insert or ignore into mail_to (from_id,too,status,status_info) VALUES ((select id from mail_from where sid='".$email[3]."' and server='".$email[2]."'),'".strtolower($status['to'])."',(select id from mail_status where info='incoming'),'".$status['status_info']."');\n";
-				$stm_queue[$day].="update or ignore mail_to set status=(select id from mail_status where info='incoming'), status_info='".$status['status_info']."', too='".strtolower($status['to'])."' where from_id in (select id from mail_from where sid='".$status['sid']."' and server='".$email[2]."');\n";
+				$stm_queue[$day].="insert or ignore into mail_to (from_id,too,status,status_info) VALUES ((select id from mail_from where sid='".$email[3]."' and server='".$email[2]."'),'".strtolower($status['to'])."',(select id from mail_status where info='".$status['status']."'),'".$status['status_info']."');\n";
+				$stm_queue[$day].="update or ignore mail_to set status=(select id from mail_status where info='".$status['status']."'), status_info='".$status['status_info']."', too='".strtolower($status['to'])."' where from_id in (select id from mail_from where sid='".$status['sid']."' and server='".$email[2]."');\n";
 				}
 			else{
+				${$status['sid']}=$status['status'];
 				$stm_queue[$day].="update mail_from set fromm='".strtolower($status['from'])."',helo='".$status['helo']."' where sid='".$status['sid']."';\n";
 				$status['status_info']=preg_replace("/(\<|\>|\s+|\'|\")/"," ",$email[5].$email[11]);
 				$stm_queue[$day].="insert or ignore into mail_to (from_id,too,status,status_info) VALUES ((select id from mail_from where sid='".$email[3]."' and server='".$email[2]."'),'".strtolower($status['to'])."',(select id from mail_status where info='".$email[4]."'),'".$status['status_info']."');\n";
