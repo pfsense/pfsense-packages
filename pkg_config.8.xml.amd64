@@ -799,10 +799,10 @@
 		<website>http://www.freeradius.org/</website>
 		<descr><![CDATA[!!! EXPERIMENTAL !!!<br>
 				freeRADIUS 2.1.12 - The package is based on freeradius 1.1.8 package.<br>
-				DO NOT USE ON PRODUCTIVE SYSTEMS AND NOT TOGETHER WITH freeradius. Both packages are using the same config files]]></descr>
+				DO NOT USE ON PRODUCTION SYSTEMS AND NOT TOGETHER WITH freeradius. Both packages are using the same config files]]></descr>
 		<pkginfolink>http://forum.pfsense.org/index.php/topic,43675.0.html</pkginfolink>
 		<category>System</category>
-		<version>2.1.12 pkg v0.1</version>
+		<version>2.1.12 pkg v0.2</version>
 		<status>Alpha</status>
 		<required_version>2.0</required_version>
 		<maintainer>Nachtfalke</maintainer>
