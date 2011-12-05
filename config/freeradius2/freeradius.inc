@@ -23,6 +23,11 @@ function freeradius_install_command() {
 				unlink(RADDB . "/$file");
 		}
 	}
+	
+	exec("chown -R root:wheel /usr/local/etc/raddb");
+	exec("chown -R root:wheel /usr/local/lib/freeradius-2.1.12");
+	exec("chown -R root:wheel /var/run/radiusd");
+	
 	closedir($handle);
 
 	freeradius_settings_resync();
@@ -212,12 +217,12 @@ modules {
 		ignore_null = no
 	}
  
-	#realm ntdomain {
-		#format = prefix
-		#delimiter = "\\"
-		#ignore_default = no
-		#ignore_null = no
-	#}
+	realm ntdomain {
+		format = prefix
+		delimiter = "\\\"
+		ignore_default = no
+		ignore_null = no
+	}
  
 	checkval {
 		item-name = Calling-Station-Id
