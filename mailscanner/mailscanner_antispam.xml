@@ -1,0 +1,401 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE packagegui SYSTEM "./schema/packages.dtd">
+<?xml-stylesheet type="text/xsl" href="./xsl/package.xsl"?>
+<packagegui>
+	<copyright>
+	<![CDATA[
+/* $Id$ */
+/* ========================================================================== */
+/*
+    mailscanner_antispam.xml
+    part of the mailscanner package for pfSense
+    Copyright (C) 2011 Marcello Coutinho
+    All rights reserved.            
+                                                                  */
+/* ========================================================================== */
+/*
+    Redistribution and use in source and binary forms, with or without
+    modification, are permitted provided that the following conditions are met:
+
+     1. Redistributions of source code must retain the above copyright notice,
+        this list of conditions and the following disclaimer.
+
+     2. Redistributions in binary form must reproduce the above copyright
+        notice, this list of conditions and the following disclaimer in the
+        documentation and/or other materials provided with the distribution.
+
+    THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
+    INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+    AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+    AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+    OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+    INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+    POSSIBILITY OF SUCH DAMAGE.
+                                                                              */
+/* ========================================================================== */
+	]]>
+	</copyright>
+	<description>Describe your package here</description>
+	<requirements>Describe your package requirements here</requirements>
+	<faq>Currently there are no FAQ items provided.</faq>
+	<name>msantispam</name>
+	<version>1.1</version>
+	<title>Services: MailScanner</title>
+	<include_file>/usr/local/pkg/mailscanner.inc</include_file>
+<tabs>
+		<tab>
+			<text>General</text>
+			<url>/pkg_edit.php?xml=mailscanner.xml&amp;id=0</url>
+		</tab>
+		<tab>
+			<text>Attachments</text>
+			<url>/pkg_edit.php?xml=mailscanner_attachments.xml&amp;id=0</url>
+		</tab>
+		<tab>
+			<text>Antivirus</text>
+			<url>/pkg_edit.php?xml=mailscanner_antivirus.xml&amp;id=0</url>
+		</tab>
+		<tab>
+			<text>Content</text>
+			<url>/pkg_edit.php?xml=mailscanner_content.xml&amp;id=0</url>
+		</tab>
+		<tab>
+			<text>AntiSpam</text>
+			<url>/pkg_edit.php?xml=mailscanner_antispam.xml&amp;id=0</url>
+			<active/>			
+		</tab>
+		<tab>
+			<text>Alerts</text>
+			<url>/pkg_edit.php?xml=mailscanner_alerts.xml&amp;id=0</url>
+		</tab>
+			<tab>
+			<text>Reporting</text>
+			<url>/pkg_edit.php?xml=mailscanner_report.xml&amp;id=0</url>
+		</tab>
+		<tab>
+			<text>XMLRPC Sync</text>
+			<url>/pkg_edit.php?xml=mailscanner_sync.xml&amp;id=0</url>
+		</tab>
+		<tab>
+			<text>About</text>
+			<url>/mailscanner_about.php</url>
+		</tab>	
+		
+	
+</tabs>
+
+	<fields>
+		<field>
+			<name>RBL Checks</name>
+			<type>listtopic</type>
+		</field>
+			<field>
+			<fielddescr>Features</fielddescr>
+			<fieldname>rblfeatures</fieldname>
+			<description>
+			<![CDATA[Select RBL features to enable. Mailscanner default options are in (&nbsp;).<br>
+					<strong>Note: RBL checks are recommended in postfix postscreen daemon.<br>
+					It's not recommended to run it twice.</strong>]]>
+			</description>
+	    	<type>select</type>
+ 				<options>
+				<option><name>Spam Checks (yes)</name><value>spam_checks</value></option>
+				<option><name>Is Definitely Spam (no)</name><value>is_definitely_spam</value></option>
+				<option><name>Definite Spam Is High Scoring (no)</name><value>is_definitely_hi_spam</value></option>
+				</options>
+				<size>04</size>
+				<multiple/>
+		</field>
+		<field>
+			<fielddescr>Spam Lists do be spam</fielddescr>
+			<fieldname>spam_lists</fieldname>
+			<type>input</type>
+			<description><![CDATA[How many RBL lists ip must be included to be spam.Default is:<strong>1</strong>]]>
+			</description>
+			<size>5</size>
+		</field>
+		<field>
+			<fielddescr>Hi Spam Lists do be spam</fielddescr>
+			<fieldname>hi_spam_lists</fieldname>
+			<type>input</type>
+			<description><![CDATA[How many RBL lists ip must be included to be Hi spam.Default is <strong>3</strong>]]>
+			</description>
+			<size>5</size>
+		</field>
+		<field>
+			<fielddescr>Spam Lists Timeout</fielddescr>
+			<fieldname>rbl_timeout</fieldname>
+			<type>input</type>
+			<description><![CDATA[List check timeout.<strong>10</strong>]]>
+			</description>
+			<size>5</size>
+		</field>
+
+		<field>
+			<name>Spam Assassin</name>
+			<type>listtopic</type>
+		</field>
+			<field>
+			<fielddescr>Features</fielddescr>
+			<fieldname>safeatures</fieldname>
+			<description>
+			<![CDATA[Select Spamassassin features to enable. Mailscanner default options are in (&nbsp;).]]>
+			</description>
+	    	<type>select</type>
+ 				<options>
+				<option><name>Use SpamAssassin (yes)</name><value>use_sa</value></option>
+				<option><name>SpamAssassin Auto Whitelist (yes)</name><value>sa_auto_whitelist</value></option>
+				<option><name>Check SpamAssassin If On Spam List (yes)</name><value>check_sa_if_on_spam_list</value></option>
+				<option><name>Include Binary Attachments In SpamAssassin (no)</name><value>include_sa_bin_attachments</value></option>
+				<option><name>Spam Score (yes)</name><value>spam_score</value></option>
+				<option><name>Cache SpamAssassin Results (yes)</name><value>cache_spamassassin_results</value></option>
+				<option><name>Wait During Bayes Rebuild (no)</name><value>wait_during_bayes_rebuild</value></option>
+				</options>
+				<size>08</size>
+				<multiple/>
+		</field>
+		<field>
+			<fielddescr>Max SpamAssassin Size</fielddescr>
+			<fieldname>sa_max</fieldname>
+			<type>input</type>
+			<description><![CDATA[Max Spam Assassin Size. Default is <strong>40k</strong>]]>
+			</description>
+			<size>5</size>
+		</field>
+		<field>
+			<fielddescr>Required SpamAssassin Score</fielddescr>
+			<fieldname>sa_score</fieldname>
+			<type>input</type>
+			<description><![CDATA[If a message achieves a SpamAssassin score higher than this value, it is spam. Default is <strong>6</strong>]]>
+			</description>
+			<size>5</size>
+		</field>
+		<field>
+			<fielddescr>Spam Actions</fielddescr>
+			<fieldname>spam_actions</fieldname>
+			<description>
+			<![CDATA[This is a list of actions to take when a message is spam. It can be any combination. Default is <strong>Deliver</strong>]]>
+			</description>
+	    	<type>select</type>
+ 				<options>
+				<option><name>Deliver</name><value>deliver</value></option>
+				<option><name>Delete</name><value>delete</value></option>
+				<option><name>store</name><value>store</value></option>
+				<option><name>bounce</name><value>bounce</value></option>
+				<option><name>Strip HTML</name><value>strip_html</value></option>
+				<option><name>attachment</name><value>attachment</value></option>
+				<option><name>Notify</name><value>notify</value></option>
+				</options>
+				<size>08</size>
+				<multiple/>
+		</field>
+		<field>
+			<fielddescr>Required SpamAssassin HI Score</fielddescr>
+			<fieldname>hi_score</fieldname>
+			<type>input</type>
+			<description><![CDATA[If a message achieves a SpamAssassin score higher than this value,then the "High Scoring Spam Actions" are used.<br>
+								You may want to use this to deliver moderate scores, while deleting very high scoring messsages. Default is <strong>20</strong>]]>
+			</description>
+			<size>5</size>
+		</field>
+		<field>
+			<fielddescr>HI Spam Actions</fielddescr>
+			<fieldname>hispam_actions</fieldname>
+			<description>
+			<![CDATA[This is a list of actions to take when a message is spam. It can be any combination. Default is <strong>Delete</strong>]]>
+			</description>
+	    	<type>select</type>
+ 				<options>
+				<option><name>Deliver</name><value>deliver</value></option>
+				<option><name>Delete</name><value>delete</value></option>
+				<option><name>store</name><value>store</value></option>
+				<option><name>bounce</name><value>bounce</value></option>
+				<option><name>Strip HTML</name><value>strip_html</value></option>
+				<option><name>attachment</name><value>attachment</value></option>
+				<option><name>Notify</name><value>notify</value></option>
+				</options>
+				<size>08</size>
+				<multiple/>
+		</field>
+		<field>
+			<fielddescr>Rebuild bayes every</fielddescr>
+			<fieldname>rebuild_bayes</fieldname>
+			<type>input</type>
+			<description><![CDATA[If you are using the Bayesian statistics engine on a busy server, you may well need to force a Bayesian database rebuild and expiry at regular intervals.<br>
+								  This is measures in seconds.Default is <strong>86400</strong>]]>
+			</description>
+			<size>5</size>
+		</field>
+		<field>
+			<fielddescr>custom SpamAssassin Options</fielddescr>
+			<fieldname>sa_custom</fieldname>
+			<description><![CDATA[These options will be include in Mailscanner.conf file.]]></description>
+			<type>textarea</type>
+			<cols>50</cols>
+			<rows>4</rows>
+			<encoding>base64</encoding>
+		</field>
+		<field>
+			<name>MCP (Message Content Protection)</name>
+			<type>listtopic</type>
+		</field>
+		<field>
+			<fielddescr>MCP Features</fielddescr>
+			<fieldname>mcp_features</fieldname>
+			<type>select</type>
+ 				<options>
+ 				<option><name>MCP Checks (no)</name><value>mcp_checks</value></option>
+				<option><name>Bounce MCP As Attachment (no)</name><value>bounce_mcp</value></option>
+				<option><name>Is Definitely MCP (no)</name><value>is_mcp</value></option>
+				<option><name>Is Definitely NOT MCP (no)</name><value>is_not_mcp</value></option>
+				<option><name>Definite MCP Is High Scoring (no)</name><value>mcp_is_high_score</value></option>
+				<option><name>Always Include MCP Report (no)</name><value>include_mcp_report</value></option>
+				<option><name>Detailed MCP Report (yes)</name><value>detailled_mcp_report</value></option>
+				<option><name>Include Scores In MCP Report (no)</name><value>score_mcp_report</value></option>
+				<option><name>Log MCP (no)</name><value>log_mcp</value></option>
+				</options>
+				<multiple/>
+				<size>10</size>
+			<description><![CDATA[Select Spamassassin features to enable. Mailscanner default options are in (&nbsp;).]]>
+			</description>
+		</field>
+		<field>
+			<fielddescr>MCP Required SpamAssassin Score</fielddescr>
+			<fieldname>mcp_score</fieldname>
+			<type>input</type>
+			<description><![CDATA[If a message achieves a MCP score higher than this value, it fails MCP check. Default is <strong>1</strong>]]>
+			</description>
+			<size>5</size>
+		</field>
+		<field>
+			<fielddescr>MCP Actions</fielddescr>
+			<fieldname>mcp_actions</fieldname>
+			<description>
+			<![CDATA[Choose actions to take when a message is fails on mcp check. Default is <strong>Deliver</strong>]]>
+			</description>
+	    	<type>select</type>
+ 				<options>
+				<option><name>Deliver</name><value>deliver</value></option>
+				<option><name>Delete</name><value>delete</value></option>
+				<option><name>store</name><value>store</value></option>
+				<option><name>bounce</name><value>bounce</value></option>
+				<option><name>Strip HTML</name><value>strip_html</value></option>
+				<option><name>attachment</name><value>attachment</value></option>
+				<option><name>Notify</name><value>Notify</value></option>
+				</options>
+				<size>08</size>
+				<multiple/>
+		</field>
+		<field>
+			<fielddescr>MCP Hi SpamAssassin Score</fielddescr>
+			<fieldname>mcp_hi_score</fieldname>
+			<type>input</type>
+			<description><![CDATA[If a message achieves a MCP score higher than this value, it fails MCP check as HI MCP. Default is <strong>10</strong>]]>
+			</description>
+			<size>5</size>
+		</field>
+		<field>
+			<fielddescr>MCP Hi Actions</fielddescr>
+			<fieldname>mcp_hi_actions</fieldname>
+			<description>
+			<![CDATA[Choose actions to take when a message is fails on Hi mcp check. Default is <strong>Delete</strong>]]>
+			</description>
+	    	<type>select</type>
+ 				<options>
+				<option><name>Deliver</name><value>deliver</value></option>
+				<option><name>Delete</name><value>delete</value></option>
+				<option><name>store</name><value>store</value></option>
+				<option><name>bounce</name><value>bounce</value></option>
+				<option><name>Strip HTML</name><value>strip_html</value></option>
+				<option><name>attachment</name><value>attachment</value></option>
+				<option><name>Notify</name><value>Notify</value></option>
+				</options>
+				<size>08</size>
+				<multiple/>
+		</field>
+		<field>
+			<fielddescr>MCP Max SpamAssassin Size</fielddescr>
+			<fieldname>mcp_max</fieldname>
+			<type>input</type>
+			<description><![CDATA[Max MCP Spam Assassin Size. Default is <strong>200k</strong>]]>
+			</description>
+			<size>5</size>
+		</field>
+		<field>
+			<name>Antispam Files</name>
+			<type>listtopic</type>
+		</field>
+		<field>
+			<fielddescr>spam.assassin.prefs.conf</fielddescr>
+			<fieldname>sa_pref_file</fieldname>
+			<description><![CDATA[Edit spam.assassin.prefs.conf. Leave Blank to load sample file.]]></description>
+			<type>textarea</type>
+			<cols>80</cols>
+			<rows>15</rows>
+			<encoding>base64</encoding>
+		</field>
+		<field>
+			<fielddescr>spam.lists.conf</fielddescr>
+			<fieldname>rbl_file</fieldname>
+			<description><![CDATA[Edit spam.lists.conf. Leave Blank to load sample file.<br>
+								<strong>Use this list only when not using postscreen RBL checks(postfix-forwareder package).</strong>]]></description>
+			<type>textarea</type>
+			<cols>80</cols>
+			<rows>15</rows>
+			<encoding>base64</encoding>
+		</field>
+		<field>
+			<fielddescr>bounce.rules</fielddescr>
+			<fieldname>bounce</fieldname>
+			<description><![CDATA[Edit spam.assassin.prefs.conf. Leave Blank to load sample file.]]></description>
+			<type>textarea</type>
+			<cols>80</cols>
+			<rows>15</rows>
+			<encoding>base64</encoding>
+		</field>
+		<field>
+			<fielddescr>max.message.size.rules</fielddescr>
+			<fieldname>max_message_size</fieldname>
+			<description><![CDATA[Edit spam.assassin.prefs.conf. Leave Blank to load sample file.]]></description>
+			<type>textarea</type>
+			<cols>80</cols>
+			<rows>15</rows>
+			<encoding>base64</encoding>
+		</field>
+		<field>
+			<fielddescr>spam.whitelist.rules</fielddescr>
+			<fieldname>spam_whitelist</fieldname>
+			<description><![CDATA[Edit spam.assassin.prefs.conf. Leave Blank to load sample file.]]></description>
+			<type>textarea</type>
+			<cols>80</cols>
+			<rows>15</rows>
+			<encoding>base64</encoding>
+		</field>
+
+		<field>
+			<fielddescr>mcp.spam.assassin.prefs.conf</fielddescr>
+			<fieldname>mcp_pref_file</fieldname>
+			<description><![CDATA[Edit mcp.spam.assassin.prefs.conf. Leave Blank to load sample file.]]></description>
+			<type>textarea</type>
+			<cols>80</cols>
+			<rows>15</rows>
+			<encoding>base64</encoding>
+		</field>
+
+	</fields>
+	<custom_php_install_command>
+		mailscanner_php_install_command();
+	</custom_php_install_command>
+	<custom_php_deinstall_command>
+		mailscanner_php_deinstall_command();
+	</custom_php_deinstall_command>
+	<custom_php_validation_command>
+		mailscanner_validate_input($_POST, &amp;$input_errors);
+	</custom_php_validation_command>	
+	<custom_php_resync_config_command>
+		sync_package_mailscanner();
+	</custom_php_resync_config_command>
+</packagegui>

@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE packagegui SYSTEM "./schema/packages.dtd">
+<?xml-stylesheet type="text/xsl" href="./xsl/package.xsl"?>
+<packagegui>
+	<copyright>
+	<![CDATA[
+/* $Id$ */
+/* ========================================================================== */
+/*
+    mailscanner_antivirus.xml
+    part of the mailscaner package for pfSense
+    Copyright (C) 2011 Marcello Coutinho
+    All rights reserved.            
+                                                                  */
+/* ========================================================================== */
+/*
+    Redistribution and use in source and binary forms, with or without
+    modification, are permitted provided that the following conditions are met:
+
+     1. Redistributions of source code must retain the above copyright notice,
+        this list of conditions and the following disclaimer.
+
+     2. Redistributions in binary form must reproduce the above copyright
+        notice, this list of conditions and the following disclaimer in the
+        documentation and/or other materials provided with the distribution.
+
+    THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
+    INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+    AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+    AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+    OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+    INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+    POSSIBILITY OF SUCH DAMAGE.
+                                                                              */
+/* ========================================================================== */
+	]]>
+	</copyright>
+	<description>Describe your package here</description>
+	<requirements>Describe your package requirements here</requirements>
+	<faq>Currently there are no FAQ items provided.</faq>
+	<name>msantivirus</name>
+	<version>1.1</version>
+	<title>Services: MailScanner</title>
+	<include_file>/usr/local/pkg/mailscanner.inc</include_file>
+<tabs>
+		<tab>
+			<text>General</text>
+			<url>/pkg_edit.php?xml=mailscanner.xml&amp;id=0</url>
+		</tab>
+		<tab>
+			<text>Attachments</text>
+			<url>/pkg_edit.php?xml=mailscanner_attachments.xml&amp;id=0</url>
+		</tab>
+		<tab>
+			<text>Antivirus</text>
+			<url>/pkg_edit.php?xml=mailscanner_antivirus.xml&amp;id=0</url>
+			<active/>
+		</tab>
+		<tab>
+			<text>Content</text>
+			<url>/pkg_edit.php?xml=mailscanner_content.xml&amp;id=0</url>
+		</tab>
+		<tab>
+			<text>AntiSpam</text>
+			<url>/pkg_edit.php?xml=mailscanner_antispam.xml&amp;id=0</url>
+		</tab>
+		<tab>
+			<text>Alerts</text>
+			<url>/pkg_edit.php?xml=mailscanner_alerts.xml&amp;id=0</url>
+		</tab>
+			<tab>
+			<text>Reporting</text>
+			<url>/pkg_edit.php?xml=mailscanner_report.xml&amp;id=0</url>
+		</tab>
+		<tab>
+			<text>XMLRPC Sync</text>
+			<url>/pkg_edit.php?xml=mailscanner_sync.xml&amp;id=0</url>
+		</tab>
+		<tab>
+			<text>About</text>
+			<url>/mailscanner_about.php</url>
+		</tab>
+</tabs>
+	<fields>
+		<field>
+			<name>Antivirus</name>
+			<type>listtopic</type>
+		</field>
+		<field>
+			<fielddescr>Virus scanner features</fielddescr>
+			<fieldname>features</fieldname>
+			<description>
+			<![CDATA[Select virus scanner tests to enable. Mailscanner default options are in (&nbsp;).]]>
+			</description>
+	    	<type>select</type>
+ 				<options>
+ 				<option><name>Virus Scanning (yes)</name><value>VirusScanning</value></option>
+				<option><name>Deliver Disinfected Files (no)</name><value>DeliverDisinfectedFiles</value></option>
+				<option><name>Still Deliver Silent Viruses (no)</name><value>StillDeliverSilentViruses</value></option>
+				<option><name>Block Encrypted Messages (no)</name><value>BlockEncryptedMessagese</value></option>
+				<option><name>Block Unencrypted Messages (no)</name><value>BlockUnencryptedMessages</value></option>
+				<option><name>Allow Password-Protected Archives (no)</name><value>AllowPassword-ProtectedArchive</value></option>
+				<option><name>Check Filenames In Password-Protected Archives (yes)</name><value>CheckFilenamesInPassword-ProtectedArchives</value></option>
+				</options>
+				<size>08</size>
+				<multiple/>
+		</field>
+		<field>
+			<fielddescr>Virus scanner</fielddescr>
+			<fieldname>virus_scanner</fieldname>
+			<type>select</type>
+ 				<options>
+ 				<option><name>auto</name><value>auto</value></option>
+ 				<option><name>clamav</name><value>clamav</value></option>
+				<option><name>none</name><value>none</value></option>
+				</options>
+			<description><![CDATA[Do you want to scan email for viruses?]]>
+			</description>
+		</field>
+
+		<field>
+		<fielddescr>Virus Scanner Timeout</fielddescr>
+				<fieldname>timeout</fieldname>
+				<description><![CDATA[The maximum length of time the commercial virus scanner is allowed to run for 1 batch of messages (in seconds).<br>
+									<strong>Default is 300.</strong>]]></description>
+				<type>input</type>
+				<size>5</size>
+		</field>	
+		<field>
+			<fielddescr>Silent Virus</fielddescr>
+			<fieldname>silent_virus</fieldname>
+			<description>
+			<![CDATA[Strings listed here will be searched for in the output of the virus scanners.<br>It is used to list which viruses should be handled differently from other viruses.<br>
+					Mailscanner default options are in (&nbsp;).]]>
+			</description>
+	    	<type>select</type>
+ 				<options>
+				<option><name>HTML-Iframe (yes)</name><value>HTML-Iframe</value></option>
+				<option><name>HTML-Codebase (no)</name><value>HTML-Codebase</value></option>
+				<option><name>HTML-Script (no)</name><value>HTML-Script</value></option>
+				<option><name>HTML-Form (no)</name><value>HTML-Form</value></option>
+				<option><name>Zip-Password (no)</name><value>Zip-Password</value></option>
+				<option><name>All-viruses (yes)</name><value>All-viruses</value></option>
+				</options>
+				<size>07</size>
+				<multiple/>
+		</field>
+		<field>
+		<fielddescr>Spam-Virus Header</fielddescr>
+				<fieldname>virus_header</fieldname>
+				<description><![CDATA[Some virus scanners now use their signatures to detect spam as well as viruses. These "viruses" are called "spam-viruses".<br>
+								When they are found the following header will be added to your message before it is passed to SpamAssassin, listing all the "spam-viruses" that were found as a comma-separated list.<br>
+								<strong>Default is X-%org-name%-MailScanner-SpamVirus-Report:</strong>]]></description>
+				<type>input</type>
+				<size>30</size>
+		</field>
+		<field>
+			<fielddescr>Custom antivirus options</fielddescr>
+			<fieldname>custom</fieldname>
+			<description><![CDATA[Paste your custom mailscanner antivirus settings here.]]></description>
+			<type>textarea</type>
+			<cols>60</cols>
+			<rows>15</rows>
+			<encoding>base64</encoding>
+		</field>
+	</fields>
+	<custom_php_install_command>
+		mailscanner_php_install_command();
+	</custom_php_install_command>
+	<custom_php_deinstall_command>
+		mailscanner_php_deinstall_command();
+	</custom_php_deinstall_command>
+	<custom_php_validation_command>
+		mailscanner_validate_input($_POST, &amp;$input_errors);
+	</custom_php_validation_command>	
+	<custom_php_resync_config_command>
+		sync_package_mailscanner();
+	</custom_php_resync_config_command>
+</packagegui>

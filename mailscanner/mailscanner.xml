@@ -1,0 +1,340 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE packagegui SYSTEM "./schema/packages.dtd">
+<?xml-stylesheet type="text/xsl" href="./xsl/package.xsl"?>
+<packagegui>
+	<copyright>
+	<![CDATA[
+/* $Id$ */
+/* ========================================================================== */
+/*
+    mailscanner.xml
+    part of the mailscaner package for pfSense
+    Copyright (C) 2011 Marcello Coutinho
+    All rights reserved.            
+                                                                  */
+/* ========================================================================== */
+/*
+    Redistribution and use in source and binary forms, with or without
+    modification, are permitted provided that the following conditions are met:
+
+     1. Redistributions of source code must retain the above copyright notice,
+        this list of conditions and the following disclaimer.
+
+     2. Redistributions in binary form must reproduce the above copyright
+        notice, this list of conditions and the following disclaimer in the
+        documentation and/or other materials provided with the distribution.
+
+    THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
+    INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+    AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+    AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+    OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+    INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+    POSSIBILITY OF SUCH DAMAGE.
+                                                                              */
+/* ========================================================================== */
+	]]>
+	</copyright>
+	<description>Describe your package here</description>
+	<requirements>Describe your package requirements here</requirements>
+	<faq>Currently there are no FAQ items provided.</faq>
+	<name>mailscanner</name>
+	<version>1.1</version>
+	<title>Services: MailScanner</title>
+	<include_file>/usr/local/pkg/mailscanner.inc</include_file>
+	<menu>
+		<name>Mailscanner</name>
+		<tooltiptext>Configure MailScanner service</tooltiptext>
+		<section>Services</section>
+		<url>pkg_edit.php?xml=mailscanner.xml&amp;id=0</url>
+	</menu>
+	<service>
+		<name>mailscanner</name>
+		<rcfile>mailscanner</rcfile>
+		<executable>MailScanner</executable>
+		<description>MailScanner</description>
+	</service>
+	<additional_files_needed>
+		<item>http://www.pfsense.org/packages/config/mailscanner/mailscanner.inc</item>
+		<prefix>/usr/local/pkg/</prefix>
+		<chmod>0755</chmod>
+	</additional_files_needed>
+	<additional_files_needed>
+		<item>http://www.pfsense.org/packages/config/mailscanner/mailscanner.xml</item>
+		<prefix>/usr/local/pkg/</prefix>
+		<chmod>0755</chmod>
+	</additional_files_needed>
+	<additional_files_needed>
+		<item>http://www.pfsense.org/packages/config/mailscanner/mailscanner_report.xml</item>
+		<prefix>/usr/local/pkg/</prefix>
+		<chmod>0755</chmod>
+	</additional_files_needed>
+	<additional_files_needed>
+		<item>http://www.pfsense.org/packages/config/mailscanner/mailscanner_antispam.xml</item>
+		<prefix>/usr/local/pkg/</prefix>
+		<chmod>0755</chmod>
+	</additional_files_needed>
+	<additional_files_needed>
+		<item>http://www.pfsense.org/packages/config/mailscanner/mailscanner_alerts.xml</item>
+		<prefix>/usr/local/pkg/</prefix>
+		<chmod>0755</chmod>
+	</additional_files_needed>
+	<additional_files_needed>
+		<item>http://www.pfsense.org/packages/config/mailscanner/mailscanner_antivirus.xml</item>
+		<prefix>/usr/local/pkg/</prefix>
+		<chmod>0755</chmod>
+	</additional_files_needed>
+	<additional_files_needed>
+		<item>http://www.pfsense.org/packages/config/mailscanner/mailscanner_attachments.xml</item>
+		<prefix>/usr/local/pkg/</prefix>
+		<chmod>0755</chmod>
+	</additional_files_needed>
+	<additional_files_needed>
+		<item>http://www.pfsense.org/packages/config/mailscanner/mailscanner_content.xml</item>
+		<prefix>/usr/local/pkg/</prefix>
+		<chmod>0755</chmod>
+	</additional_files_needed>
+	<additional_files_needed>
+		<item>http://www.pfsense.org/packages/config/mailscanner/mailscanner_sync.xml</item>
+		<prefix>/usr/local/pkg/</prefix>
+		<chmod>0755</chmod>
+	</additional_files_needed>
+<tabs>
+		<tab>
+			<text>General</text>
+			<url>/pkg_edit.php?xml=mailscanner.xml&amp;id=0</url>
+			<active/>
+		</tab>
+		<tab>
+			<text>Attachments</text>
+			<url>/pkg_edit.php?xml=mailscanner_attachments.xml&amp;id=0</url>
+		</tab>
+		<tab>
+			<text>Antivirus</text>
+			<url>/pkg_edit.php?xml=mailscanner_antivirus.xml&amp;id=0</url>
+		</tab>
+		<tab>
+			<text>Content</text>
+			<url>/pkg_edit.php?xml=mailscanner_content.xml&amp;id=0</url>
+		</tab>
+		<tab>
+			<text>AntiSpam</text>
+			<url>/pkg_edit.php?xml=mailscanner_antispam.xml&amp;id=0</url>
+		</tab>
+		<tab>
+			<text>Alerts</text>
+			<url>/pkg_edit.php?xml=mailscanner_alerts.xml&amp;id=0</url>
+		</tab>
+			<tab>
+			<text>Reporting</text>
+			<url>/pkg_edit.php?xml=mailscanner_report.xml&amp;id=0</url>
+		</tab>
+		<tab>
+			<text>XMLRPC Sync</text>
+			<url>/pkg_edit.php?xml=mailscanner_sync.xml&amp;id=0</url>
+		</tab>	
+		<tab>
+			<text>About</text>
+			<url>/mailscanner_about.php</url>
+		</tab>	
+</tabs>
+
+	<fields>
+		<field>
+			<name>System Settings</name>
+			<type>listtopic</type>
+		</field>
+		<field>
+			<fielddescr>Enable Mailscanner</fielddescr>
+			<fieldname>enable</fieldname>
+			<description>Enable mailscanner daemon.</description>
+			<type>checkbox</type>
+		</field>
+		<field>
+			<fielddescr>Org name</fielddescr>
+			<fieldname>orgname</fieldname>
+			<type>input</type>
+			<description><![CDATA[orgname,long org name<br>Hint: Company]]>
+			</description>
+			<size>30</size>
+		</field>
+		<field>
+			<fielddescr>Long Org name</fielddescr>
+			<fieldname>longorgname</fieldname>
+			<type>input</type>
+			<description><![CDATA[orgname,long org name<br>Hint: My company inc.]]>
+			</description>
+			<size>30</size>
+		</field>
+		<field>
+			<fielddescr>web-site</fielddescr>
+			<fieldname>website</fieldname>
+			<type>input</type>
+			<description><![CDATA[Organization web site<br>Hint: www.company.com]]>
+			</description>
+			<size>30</size>
+		</field>
+
+		<field>
+			<fielddescr>Max Children</fielddescr>
+			<fieldname>max_children</fieldname>
+			<type>input</type>
+			<description><![CDATA[How many MailScanner processes do you want to run at a time?<br>
+								If you are running on a small system with limited RAM, you should note that each child takes just over 20MB.<br>
+								As a rough guide, try 5 children per CPU. But read the notes above.]]>
+			</description>
+			<size>05</size>
+		</field>
+			<field>
+			<fielddescr>Processing Incoming email</fielddescr>
+			<fieldname>pim</fieldname>
+			<description>
+			<![CDATA[Select MailScanner Processing Incoming Email. Mailscanner default options are in (&nbsp;).]]>
+			</description>
+	    	<type>select</type>
+ 				<options>
+				<option><name>Scan Messages (yes)</name><value>ScanMessages</value></option>
+				<option><name>Reject Message (no)</name><value>RejectMessage</value></option>
+				</options>
+				<size>03</size>
+				<multiple/>
+		</field>
+		<field>
+			<name>Logging</name>
+			<type>listtopic</type>
+		</field>
+		<field>		
+		<fielddescr>Syslog Facility</fielddescr>
+				<fieldname>syslog_facility</fieldname>
+				<description><![CDATA[Syslog Facility info.<br>
+								<strong>Default is mail]]></description>
+				<type>input</type>
+				<size>20</size>
+		</field>	
+		<field>
+			<fielddescr>Logging</fielddescr>
+			<fieldname>syslog</fieldname>
+			<description>
+			<![CDATA[Select virus scanner tests to enable. Mailscanner default options are in (&nbsp;).]]>
+			</description>
+	    	<type>select</type>
+ 				<options>
+				<option><name>Log Speed (no)</name><value>LogSpeed</value></option>
+				<option><name>Log Spam (no)</name><value>LogSpam</value></option>
+				<option><name>Log Non Spam (no)</name><value>LogNonSpam</value></option>
+				<option><name>Log Delivery And Non-Delivery (no)</name><value>LogDeliveryAndNon-Delivery</value></option>
+				<option><name>Log Permitted Filenames (no)</name><value>LogPermittedFilenames</value></option>
+				<option><name>Log Permitted Filetypes (no)</name><value>LogPermittedFiletypes</value></option>
+				<option><name>Log Permitted File MIME Types (no)</name><value>LogPermittedFileMIMETypes</value></option>
+				<option><name>Log Silent Viruses (no)</name><value>LogSilentViruses</value></option>
+				<option><name>Log Dangerous HTML Tags (no)</name><value>LogDangerousHTMLTags</value></option>
+				<option><name>Log SpamAssassin Rule Actions (yes)</name><value>LogSpamAssassinRuleActions</value></option>
+				</options>
+				<size>11</size>
+				<multiple/>
+		</field>
+		
+			<field>
+			<name>Advanced Settings</name>
+			<type>listtopic</type>
+		</field>
+		<field>
+			<fielddescr>Advanced features</fielddescr>
+			<fieldname>advanced</fieldname>
+			<description>
+			<![CDATA[Select mailscanner attachments tests to enable. Mailscanner default options are in (&nbsp;).]]>
+			</description>
+	    	<type>select</type>
+ 				<options>
+				<option><name>Use Default Rules With Multiple Recipients (no)</name><value>UseDefaultRulesWithMultipleRecipients</value></option>
+				<option><name>Read IP Address From Received Header (no)</name><value>ReadIPAddressFromReceivedHeader</value></option>
+				<option><name>Debug (no)</name><value>DebugMailScanner</value></option>
+				<option><name>Debug SpamAssassin (no)</name><value>DebugSpamAssassin</value></option>
+				<option><name>Run In Foreground (no)</name><value>RunInForeground</value></option>
+				<option><name>Always Looked Up Last (no)</name><value>AlwaysLookedUpLast</value></option>
+				<option><name>Run In Foreground (no)</name><value>RunInForeground</value></option>
+				<option><name>Always Looked Up Last (no)</name><value>AlwaysLookedUpLast</value></option>
+				<option><name>Always Looked Up Last After Batch (no)</name><value>AlwaysLookedUpLastAfterBatch</value></option>
+				<option><name>Deliver In Background (yes)</name><value>DeliverInBackground</value></option>
+				<option><name>Split Exim Spool (no)</name><value>Split Exim Spool</value></option>
+				<option><name>Automatic Syntax Check (yes)</name><value>AutomaticSyntaxCheck</value></option>
+				</options>
+				<size>13</size>
+				<multiple/>
+		</field>
+		<field>
+			<fielddescr>Deliver Method</fielddescr>
+			<fieldname>deliver_method</fieldname>
+			<description>
+			<![CDATA[Attempt immediate delivery of messages, or just place them in the outgoing queue for the MTA to deliver when it wants to?]]>
+			</description>
+	    	<type>select</type>
+ 				<options>
+				<option><name>batch (default)</name><value>batch</value></option>
+				<option><name>queue</name><value>queue</value></option>
+				</options>
+		</field>
+		<field>
+			<fielddescr>Minimum Code Status </fielddescr>
+			<fieldname>minimum_code</fieldname>
+			<description>
+			<![CDATA[Minimum acceptable code stability status -- if we come across code that's not at least as stable as this, we barf.]]>
+			</description>
+	    	<type>select</type>
+ 				<options>
+				<option><name>batch (default)</name><value>batch</value></option>
+				<option><name>none - there may not even be any code</name><value>none</value></option>
+				<option><name>unsupported   - code may be completely untested, a contributed dirty hack anything, really.</name><value>unsupported</value></option>
+				<option><name>alpha         - code is pretty well untested. Don't assume it will work</name><value>alpha</value></option>
+				<option><name>beta          - code is tested a bit. It should work.</name><value>beta</value></option>
+				<option><name>supported     - code *should* be reliable</name><value>supported</value></option>
+				</options>
+		</field>
+		<field>
+			<fielddescr>Spam Score Number Format</fielddescr>
+			<fieldname>spam_score_format</fieldname>
+			<type>input</type>
+			<description><![CDATA[When putting the value of the spam score of a message into the headers, how do you want to format it.<br>
+								If you don't know how to use sprintf() or printf() in C, please *do not modify* this value.<br>
+								A few examples for you:<br>
+								%d     ==> 12<br>
+								%5.2f  ==> 12.34<br>
+								%05.1f ==> 012.3<br>
+								Default %d]]>
+			</description>
+			<size>5</size>
+		</field>
+		<field>
+			<fielddescr>SpamAssassin Cache Timings</fielddescr>
+			<fieldname>cache_timings</fieldname>
+			<type>input</type>
+			<description><![CDATA[Do not change this unless you absolutely have to, these numbers have been carefully calculated.<br>
+								They affect the length of time that different types of message are stored in the SpamAssassin cache which can be configured earlier in this file (look for "Cache").<br>
+								The numbers are all set in seconds. They are:<br>
+								1. Non-Spam cache lifetime                  		 = 30 minutes<br>
+								2. Spam (low scoring) cache lifetime                 = 5 minutes<br>
+								3. High-Scoring spam cache lifetime                  = 3 hours<br>
+								4. Viruses cache lifetime                            = 2 days<br>
+								5. How often to check the cache for expired messages = 10 minutes<br>
+								Default: = 1800,300,10800,172800,600 ]]>
+			</description>
+			<size>30</size>
+		</field>
+		
+	</fields>
+	<custom_php_install_command>
+		mailscanner_php_install_command();
+	</custom_php_install_command>
+	<custom_php_deinstall_command>
+		mailscanner_php_deinstall_command();
+	</custom_php_deinstall_command>
+	<custom_php_validation_command>
+		mailscanner_validate_input($_POST, &amp;$input_errors);
+	</custom_php_validation_command>	
+	<custom_php_resync_config_command>
+		sync_package_mailscanner();
+	</custom_php_resync_config_command>
+</packagegui>
