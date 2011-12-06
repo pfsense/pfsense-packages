@@ -88,7 +88,7 @@ if (isset($id) && $a_nat[$id]) {
 	$pconfig['def_imap_servers'] = $a_nat[$id]['def_imap_servers'];
 	$pconfig['def_imap_ports'] = $a_nat[$id]['def_imap_ports'];
 	$pconfig['def_sip_proxy_ip'] = $a_nat[$id]['def_sip_proxy_ip'];
-	$pconfig['def_sip_servers_ip'] = $a_nat[$id]['def_sip_servers_ip'];
+	$pconfig['def_sip_servers'] = $a_nat[$id]['def_sip_servers'];
 	$pconfig['def_sip_ports'] = $a_nat[$id]['def_sip_ports'];
 	$pconfig['def_sip_proxy_ports'] = $a_nat[$id]['def_sip_proxy_ports'];
 	$pconfig['def_auth_ports'] = $a_nat[$id]['def_auth_ports'];
@@ -141,7 +141,7 @@ if ($_POST) {
 		if ($_POST['def_imap_ports'] != "") { $natent['def_imap_ports'] = $_POST['def_imap_ports']; }else{ $natent['def_imap_ports'] = ""; }
 		if ($_POST['def_sip_proxy_ip'] != "") { $natent['def_sip_proxy_ip'] = $_POST['def_sip_proxy_ip']; }else{ $natent['def_sip_proxy_ip'] = ""; }
 		if ($_POST['def_sip_proxy_ports'] != "") { $natent['def_sip_proxy_ports'] = $_POST['def_sip_proxy_ports']; }else{ $natent['def_sip_proxy_ports'] = ""; }
-		if ($_POST['def_sip_ip'] != "") { $natent['def_sip_ip'] = $_POST['def_sip_ip']; }else{ $natent['def_sip_ip'] = ""; }
+		if ($_POST['def_sip_servers'] != "") { $natent['def_sip_servers'] = $_POST['def_sip_servers']; }else{ $natent['def_sip_servers'] = ""; }
 		if ($_POST['def_sip_ports'] != "") { $natent['def_sip_ports'] = $_POST['def_sip_ports']; }else{ $natent['def_sip_ports'] = ""; }
 		if ($_POST['def_auth_ports'] != "") { $natent['def_auth_ports'] = $_POST['def_auth_ports']; }else{ $natent['def_auth_ports'] = ""; }
 		if ($_POST['def_finger_ports'] != "") { $natent['def_finger_ports'] = $_POST['def_finger_ports']; }else{ $natent['def_finger_ports'] = ""; }
@@ -449,9 +449,9 @@ echo "{$snort_general_css}\n";
 			</tr>			
 			<tr>
 				<td width="22%" valign="top" class="vncell2">Define SIP_SERVERS</td>
-				<td width="78%" class="vtable"><input name="def_sip_ip"
-					type="text" class="formfld" id="def_sip_ip" size="40"
-					value="<?=htmlspecialchars($pconfig['def_sip_ip']);?>"> <br>
+				<td width="78%" class="vtable"><input name="def_sip_servers"
+					type="text" class="formfld" id="def_sip_servers" size="40"
+					value="<?=htmlspecialchars($pconfig['def_sip_servers']);?>"> <br>
 				<span class="vexpl">Example: "192.168.1.3/24,192.168.1.4/24". Leave
 				blank to scan all networks.</span></td>
 			</tr>
