@@ -137,6 +137,7 @@ function varnish_get_url_mappings_txt() {
 					#director with no host or url, so director for catch all traffic not specified in config
 					$lasturlmappings = "\telse\t{\n\t\tset req.backend = ".$url['directorname'].";\n\t\t}\n";
 					$catch_all = "set";
+					$isfirst = false;
 					}
 			else{
 				if(!$isfirst) 
@@ -149,12 +150,13 @@ function varnish_get_url_mappings_txt() {
 					$urlfailover = "\t\t\tset req.backend = ".$url['failover'].";";
 					$urlmappings .= "\t\tif (req.restarts == 0) {\n".$urlbackend.$tabs.$directo_grace_time.$tabs."}";
 					$urlmappings .= "\n\t\telse\t{\n".$urlfailover.$tabs.$directo_grace_time.$tabs."}\n\t\t}\n";
+					$isfirst = false;
 					}
 				else{
 					$tabs=($url['grace']?"\n\t\t":"");
 					$urlmappings .= $urlbackend.$tabs.$directo_grace_time."\n\t\t}\n";	
+					$isfirst = false;
 					}			
-				$isfirst = false;
 				}
   			}
   		}
