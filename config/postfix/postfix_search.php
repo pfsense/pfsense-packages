@@ -120,6 +120,7 @@ include("head.inc");
 							<option value="bounced">bounced</option>
 							<option value="reject">reject</option>
 							<option value="spam">spam</option>
+							<option value="hold">hold</option>
 							<option value="incoming">incoming</option>
 						</select><br><?=gettext("Max log messages to fetch per Sqlite file.");?></td>
 					</tr>

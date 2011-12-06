@@ -470,6 +470,9 @@
 		<depends_on_package>MailScanner-4.81.4_2.tbz</depends_on_package>
 		<depends_on_package>pyzor-0.5.0_1.tbz</depends_on_package>
 		<depends_on_package>re2c-0.13.5.tbz</depends_on_package>
+		<depends_on_package>p5-perl-ldap-0.4001.tbz</depends_on_package>
+		<depends_on_package>p5-Mail-SPF-2.007.tbz</depends_on_package>
+		<depends_on_package>p5-IP-Country-2.27.tbz</depends_on_package>
 		<version>4.8.1 pkg v.0.1</version>
 		<status>alpha</status>
 		<required_version>2.0</required_version>
