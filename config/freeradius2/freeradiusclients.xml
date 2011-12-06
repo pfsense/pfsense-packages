@@ -48,7 +48,7 @@
 	<name>freeradiusclients</name>
 	<version>none</version>
 	<title>FreeRADIUS: Clients</title>
-	<include_file>freeradius.inc</include_file>
+	<include_file>/usr/local/pkg/freeradius.inc</include_file>
 	<tabs>
                 <tab>
                         <text>Users</text>
