@@ -805,7 +805,7 @@
 				DO NOT USE ON PRODUCTION SYSTEMS AND NOT TOGETHER WITH freeradius. Both packages are using the same config files]]></descr>
 		<pkginfolink>http://forum.pfsense.org/index.php/topic,43675.0.html</pkginfolink>
 		<category>System</category>
-		<version>2.1.12 pkg v0.2</version>
+		<version>2.1.12 pkg v0.3</version>
 		<status>Alpha</status>
 		<required_version>2.0</required_version>
 		<maintainer>Nachtfalke</maintainer>

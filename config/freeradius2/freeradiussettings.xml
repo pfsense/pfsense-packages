@@ -49,7 +49,7 @@
 	<version>none</version>
 	<title>FreeRADIUS: Settings</title>
 	<aftersaveredirect>pkg_edit.php?xml=freeradiussettings.xml&amp;id=0</aftersaveredirect>
-	<include_file>freeradius.inc</include_file>
+	<include_file>/usr/local/pkg/freeradius.inc</include_file>
 	<tabs>
                 <tab>
                         <text>Users</text>
