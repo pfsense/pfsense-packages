@@ -37,7 +37,7 @@ require_once("functions.inc");
 require_once("filter.inc");
 
 /* package version */
-$snort_package_version = 'Snort 2.9.1 pkg v. 2.0';
+$snort_package_version = 'Snort 2.9.1 pkg v. 2.0.2';
 
 /* Allow additional execution time 0 = no limit. */
 ini_set('max_execution_time', '9999');
@@ -1582,12 +1582,12 @@ function generate_snort_conf($id, $if_real, $snort_uuid)
 	else
 		$def_sip_proxy_ports_type = "$def_sip_proxy_ports_info_chk";
 		
-	/* def SIP_IP */
-	$def_sip_ip_info_chk = $snortcfg['def_sip_ip'];
-	if ($def_sip_ip_info_chk == "")
-		$def_sip_ip_type = "\$HOME_NET";
+	/* def SIP_SERVERS */
+	$def_sip_servers_info_chk = $snortcfg['def_sip_servers'];
+	if ($def_sip_servers_info_chk == "")
+		$def_sip_servers_type = "\$HOME_NET";
 	else
-		$def_sip_ip_type = "$def_sip_ip_info_chk";
+		$def_sip_servers_type = "$def_sip_servers_info_chk";
 
 	/* def SIP_PORTS */
 	$def_sip_ports_info_chk = $snortcfg['def_sip_ports'];
@@ -1978,7 +1978,7 @@ var IMAP_SERVERS [{$def_imap_servers_type}]
 var RPC_SERVERS \$HOME_NET
 var WWW_SERVERS [{$def_www_servers_type}]
 var SIP_PROXY_IP [{$def_sip_proxy_ip_type}]
-var SIP_IP [{$def_sip_ip_type}]
+var SIP_SERVERS [{$def_sip_servers_type}]
 var AIM_SERVERS \
 [64.12.24.0/23,64.12.28.0/23,64.12.161.0/24,64.12.163.0/24,64.12.200.0/24,205.188.3.0/24,205.188.5.0/24,205.188.7.0/24,205.188.9.0/24,205.188.153.0/24,205.188.179.0/24,205.188.248.0/24]
 

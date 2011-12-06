@@ -111,7 +111,7 @@ if (isset($id) && $a_nat[$id]) {
 		$pconfig['def_imap_servers'] = $a_nat[$id]['def_imap_servers'];
 		$pconfig['def_imap_ports'] = $a_nat[$id]['def_imap_ports'];
 		$pconfig['def_sip_proxy_ip'] = $a_nat[$id]['def_sip_proxy_ip'];
-		$pconfig['def_sip_servers_ip'] = $a_nat[$id]['def_sip_servers_ip'];
+		$pconfig['def_sip_servers'] = $a_nat[$id]['def_sip_servers'];
 		$pconfig['def_sip_ports'] = $a_nat[$id]['def_sip_ports'];		
 		$pconfig['def_sip_proxy_ports'] = $a_nat[$id]['def_sip_proxy_ports'];
 		$pconfig['def_auth_ports'] = $a_nat[$id]['def_auth_ports'];
@@ -255,7 +255,7 @@ if (isset($_GET['dup']))
 			if ($pconfig['def_imap_servers'] != "") { $natent['def_imap_servers'] = $pconfig['def_imap_servers']; }
 			if ($pconfig['def_imap_ports'] != "") { $natent['def_imap_ports'] = $pconfig['def_imap_ports']; }
 			if ($pconfig['def_sip_proxy_ip'] != "") { $natent['def_sip_proxy_ip'] = $pconfig['def_sip_proxy_ip']; }
-			if ($pconfig['def_sip_ip'] != "") { $natent['def_sip_ip'] = $pconfig['def_sip_ip']; }else{ $natent['def_sip_ip'] = ""; }
+			if ($pconfig['def_sip_servers'] != "") { $natent['def_sip_servers'] = $pconfig['def_sip_servers']; }else{ $natent['def_sip_servers'] = ""; }
 			if ($pconfig['def_sip_ports'] != "") { $natent['def_sip_ports'] = $pconfig['def_sip_ports']; }else{ $natent['def_sip_ports'] = ""; }			
 			if ($pconfig['def_sip_proxy_ports'] != "") { $natent['def_sip_proxy_ports'] = $pconfig['def_sip_proxy_ports']; }
 			if ($pconfig['def_auth_ports'] != "") { $natent['def_auth_ports'] = $pconfig['def_auth_ports']; }
