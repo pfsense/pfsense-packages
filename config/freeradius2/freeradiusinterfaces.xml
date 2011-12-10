@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE packagegui SYSTEM "./schema/packages.dtd">
+<?xml-stylesheet type="text/xsl" href="./xsl/package.xsl"?>
+<packagegui>
+	<copyright>
+		<![CDATA[
+/* $Id$ */
+/* ========================================================================== */
+/*
+    authng.xml
+    part of pfSense (http://www.pfSense.com)
+    Copyright (C) 2007 to whom it may belong
+    All rights reserved.
+ 
+    Based on m0n0wall (http://m0n0.ch/wall)
+    Copyright (C) 2003-2006 Manuel Kasper <mk@neon1.net>.
+    All rights reserved.
+                                                                              */
+/* ========================================================================== */
+/*
+    Redistribution and use in source and binary forms, with or without
+    modification, are permitted provided that the following conditions are met:
+
+     1. Redistributions of source code must retain the above copyright notice,
+        this list of conditions and the following disclaimer.
+
+     2. Redistributions in binary form must reproduce the above copyright
+        notice, this list of conditions and the following disclaimer in the
+        documentation and/or other materials provided with the distribution.
+
+    THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
+    INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+    AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+    AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+    OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+    INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+    POSSIBILITY OF SUCH DAMAGE.
+                                                                              */
+/* ========================================================================== */
+		]]>
+	</copyright>
+	<description>Describe your package here.</description>
+	<requirements>Describe your package requirements here</requirements>
+	<faq>Currently there are no FAQ items provided.</faq>
+	<name>freeradiusinterfaces</name>
+	<version>none</version>
+	<title>FreeRADIUS: Interfaces</title>
+	<include_file>/usr/local/pkg/freeradius.inc</include_file>
+	<tabs>
+		<tab>
+			<text>Users</text>
+			<url>/pkg.php?xml=freeradius.xml</url>
+		</tab>
+		<tab>
+			<text>NAS / Clients</text>
+			<url>/pkg.php?xml=freeradiusclients.xml</url>
+		</tab>
+		<tab>
+			<text>Interfaces</text>
+			<url>/pkg.php?xml=freeradiusinterfaces.xml</url>
+			<active/>
+		</tab>
+		<tab>
+			<text>Settings</text>
+			<url>/pkg_edit.php?xml=freeradiussettings.xml&amp;id=0</url>
+		</tab>
+	</tabs>
+	<adddeleteeditpagefields>
+		<columnitem>
+			<fielddescr>Listening Interface</fielddescr>
+			<fieldname>varinterfaceip</fieldname>
+		</columnitem>
+		<columnitem>
+			<fielddescr>Port</fielddescr>
+			<fieldname>varinterfaceport</fieldname>
+		</columnitem>
+		<columnitem>
+			<fielddescr>Interface Type</fielddescr>
+			<fieldname>varinterfacetype</fieldname>
+		</columnitem>
+		<columnitem>
+			<fielddescr>IP Version</fielddescr>
+			<fieldname>varinterfaceipversion</fieldname>
+		</columnitem>
+		<columnitem>
+			<fielddescr>Description</fielddescr>
+			<fieldname>description</fieldname>
+		</columnitem>
+	</adddeleteeditpagefields>
+	<fields>
+		<field>
+			<fielddescr>Listening Interface</fielddescr>
+			<fieldname>varinterfaceip</fieldname>
+			<description>Enter the IP address of the listening interface. e.g. 192.168.100.1 (Default: *)</description>
+			<type>input</type>
+			<default_value>*</default_value>
+			<required/>
+		</field>
+		<field>
+			<fielddescr>Port</fielddescr>
+			<fieldname>varinterfaceport</fieldname>
+			<description>Enter the port number of the listening interface. e.g. 1812 (Default: 1812)</description>
+			<type>input</type>
+			<default_value>1812</default_value>
+			<required/>
+		</field>
+		<field>
+			<fielddescr>Interface Type</fielddescr>
+			<fieldname>varinterfacetype</fieldname>
+			<description>Enter the type of the listening interface. (Default: auth)</description>
+			<type>select</type>
+			<default_value>auth</default_value>
+					<options>
+						<option><name>Auth</name><value>auth</value></option>
+						<option><name>Acct</name><value>acct</value></option>
+						<option><name>Proxy</name><value>proxy</value></option>
+						<option><name>Detail</name><value>detail</value></option>
+						<option><name>Status</name><value>status</value></option>
+						<option><name>CoA</name><value>coa</value></option>
+					</options>
+			<required/>
+		</field>
+		<field>
+			<fielddescr>IP Version</fielddescr>
+			<fieldname>varinterfaceipversion</fieldname>
+			<description>Enter the IP version of the listening interface. (Default: IPv4)</description>
+			<type>select</type>
+			<default_value>ipaddr</default_value>
+					<options>
+						<option><name>IPv4</name><value>ipaddr</value></option>
+						<option><name>IPv6</name><value>ipv6addr</value></option>
+					</options>
+			<required/>
+		</field>
+		<field>
+			<fielddescr>Description</fielddescr>
+			<fieldname>description</fieldname>
+			<description>Enter any description you like for this interface.</description>
+			<type>input</type>
+		</field>
+	</fields>
+	<custom_delete_php_command>
+		freeradius_settings_resync();
+	</custom_delete_php_command>
+	<custom_php_resync_config_command>
+		freeradius_settings_resync();
+	</custom_php_resync_config_command>
+</packagegui>

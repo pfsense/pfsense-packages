@@ -6,10 +6,9 @@ define('RADDB', '/usr/local/etc/raddb');
 
 function freeradius_deinstall_command() {
 	exec("cd /var/db/pkg && pkg_delete `ls | grep freeradius`");
-	exec("cd /var/db/pkg && pkg_delete `ls | grep python`");
-	exec("cd /var/db/pkg && pkg_delete `ls | grep perl`");
-	exec("cd /var/db/pkg && pkg_delete `ls | grep libltdl`");
-	exec("cd /var/db/pkg && pkg_delete `ls | grep gdbm`");
+	exec("rm -rf /usr/local/etc/raddb/");
+	exec("rm -rf /var/log/raddb/");
+	exec("rm -rf /var/log/radacct/");
 }
 
 function freeradius_install_command() {
@@ -26,7 +25,8 @@ function freeradius_install_command() {
 	
 	exec("chown -R root:wheel /usr/local/etc/raddb");
 	exec("chown -R root:wheel /usr/local/lib/freeradius-2.1.12");
-	exec("chown -R root:wheel /var/run/radiusd");
+	exec("chown -R root:wheel /var/log/raddb");
+	exec("chown -R root:wheel /var/log/radacct");
 	
 	closedir($handle);
 
@@ -44,22 +44,23 @@ function freeradius_install_command() {
 
 function freeradius_settings_resync() {
 	global $config;
-	$settings = $config['installedpackages']['freeradiussettings']['config'][0];
-	$iface = ($settings['interface'] ? $settings['interface'] : 'LAN');
-	$iface = convert_friendly_interface_to_real_interface_name($iface);
-	$iface_ip = find_interface_ip($iface);
-	$interface_ip = $settings['interface_ip'];
-	$port = ($settings['port'] != '' ? $settings['port'] : 0);
-	$radiuslogging = $settings['radiuslogging'];
-	$radiuslogbadpass = $settings['radiuslogbadpass'];
-	$radiusloggoodpass = $settings['radiusloggoodpass'];
-	$max_requests_var = $settings['max_requests_var'];
-	$max_request_time_var = $settings['max_request_time_var'];
-	$cleanup_delay_var = $settings['cleanup_delay_var'];
-	$logdir_var = $settings['logdir_var'];
+	$conf = '';
+	
+	// Definition variables for freeradiussettings
+	$varsettings = $config['installedpackages']['freeradiussettings']['config'][0];
+	$varsettingsmaxrequesttime = $varsettings['varsettingsmaxrequesttime'];
+	$varsettingscleanupdelay = $varsettings['varsettingscleanupdelay'];
+	$varsettingsmaxrequests = $varsettings['varsettingsmaxrequests'];
+	$varsettingslogdir = $varsettings['varsettingslogdir'];
+	$varsettingsstrippednames = $varsettings['varsettingsstrippednames'];
+	$varsettingsauth = $varsettings['varsettingsauth'];
+	$varsettingsauthbadpass = $varsettings['varsettingsauthbadpass'];
+	$varsettingsauthgoodpass = $varsettings['varsettingsauthgoodpass'];
+	$varsettingshostnamelookups = $varsettings['varsettingshostnamelookups'];
+	$varsettingsallowcoredumps = $varsettings['varsettingsallowcoredumps'];
+	$varsettingsregularexpressions = $varsettings['varsettingsregularexpressions'];
+	$varsettingsextendedexpressions = $varsettings['varsettingsextendedexpressions'];
 
-	// FreeRADIUS's configuration is huge
-	// This is the standard default config file, trimmed down a bit. Somebody might want to implement more options. It should be as simple as editing this, then also providing the settings in each file that was included here (or maybe just put the config inlined here).
 	$conf = <<<EOD
 prefix = /usr/local
 exec_prefix = \${prefix}
@@ -73,72 +74,84 @@ confdir = \${raddbdir}
 run_dir = \${localstatedir}/run
 libdir = \${exec_prefix}/lib/freeradius-2.1.12
 pidfile = \${run_dir}/radiusd.pid
-#user = nobody
-#group = nobody
-max_request_time = $max_request_time_var
-delete_blocked_requests = no
-cleanup_delay = $cleanup_delay_var
-max_requests = $max_requests_var
-hostname_lookups = no
-allow_core_dumps = no
-regular_expressions	= yes
-extended_expressions	= yes
-usercollide = no
-lower_user = no
-lower_pass = no
-nospace_user = no
-nospace_pass = no
-checkrad = \${sbindir}/checkrad
+#chroot = /path/to/chroot/directory
+#user = freeradius
+#group = freeradius
 
+###############################################################################
+### Is not present in freeradius 2.x radiusd.conf anymore but it was in 1.x ###
+### delete_blocked_requests = no                                            ###
+### usercollide = no                                                        ###
+### lower_user = no                                                         ###
+### lower_pass = no                                                         ###
+### nospace_user = no                                                       ###
+### nospace_pass = no                                                       ###
+###############################################################################
+
+max_request_time = $varsettingsmaxrequesttime
+cleanup_delay = $varsettingscleanupdelay
+max_requests = $varsettingsmaxrequests
+hostname_lookups = $varsettingshostnamelookups
+allow_core_dumps = $varsettingsallowcoredumps
+regular_expressions = $varsettingsregularexpressions
+extended_expressions = $varsettingsextendedexpressions
+
+EOD;
+
+$arrinterfaces = $config['installedpackages']['freeradiusinterfaces']['config'];
+	if (is_array($arrinterfaces)) {
+		foreach ($arrinterfaces as $item) {
+			$varinterfaceip = $item['varinterfaceip'];
+			$varinterfaceport = $item['varinterfaceport'];
+			$varinterfacetype = $item['varinterfacetype'];
+			$varinterfaceipversion = $item['varinterfaceipversion'];
+			$description = $item['description'];
+			$conf .= <<<EOD
+
+listen {
+		type = $varinterfacetype
+		$varinterfaceipversion = $varinterfaceip
+		port = $varinterfaceport
+}
+
+EOD;
+		}	// end foreach
+	}		// end if
+$conf .= <<<EOD
 
 log {
-        destination = $logdir_var 
-        file = \${logdir}/radius.log
-        syslog_facility = daemon
-        stripped_names = no
-        auth = $radiuslogging 
-        auth_badpass = $radiuslogbadpass 
-        auth_goodpass = $radiusloggoodpass 
-#       msg_goodpass = ""
-#       msg_badpass = ""
+	destination = $varsettingslogdir
+	file = \${logdir}/radius.log
+	syslog_facility = daemon
+	stripped_names = $varsettingsstrippednames
+	auth = $varsettingsauth
+	auth_badpass = $varsettingsauthbadpass
+	auth_goodpass = $varsettingsauthgoodpass
+	###msg_goodpass = ""
+	###msg_badpass = ""
 }
-
-
-listen {
-        type = auth
-        ipaddr = $interface_ip 
-        port = $port 
-}
-
-
-listen {
-        type = acct
-        ipaddr = $interface_ip 
-        port = 1813 
-}
-
- 
-security {
-	max_attributes = 200
-	reject_delay = 1
-	status_server = no
-}
- 
-proxy_requests = yes
+checkrad = \${sbindir}/checkrad
+security 	{
+			###max_attributes = 200
+			###reject_delay = 1
+			###status_server = no  ###raddb/sites-available/status ###wohl nur fuer Experten - erstmal weglassen
+			}
+			###proxy_requests = yes   ###auf "yes" lassen. Sorgt fuer weniger Probleme und kostet wenig/nichts (RAM)
 \$INCLUDE  \${confdir}/proxy.conf
- 
-\$INCLUDE  \${confdir}/clients.conf
- 
+\$INCLUDE  \${confdir}/clients.conf   ###Jegliche Konfiguration wird in der clients.conf durchgeführt
+thread pool {
+			###start_servers = 5
+			###max_servers = 32
+			###min_spare_servers = 3
+			###max_spare_servers = 10
+			###max_queue_size = 65536
+			###max_requests_per_server = 0
+			}
+
+
 #snmp = no
 #\$INCLUDE  \${confdir}/snmp.conf
- 
-thread pool {
-	start_servers = 5
-	max_servers = 32
-	min_spare_servers = 3
-	max_spare_servers = 10
-	max_requests_per_server = 0
-}
+
  
 modules {
 	pap {
@@ -219,6 +232,7 @@ modules {
  
 	realm ntdomain {
 		format = prefix
+		### There is "\\\" in freeradius.inc file and output is "\\" in radiusd.conf
 		delimiter = "\\\"
 		ignore_default = no
 		ignore_null = no
@@ -464,63 +478,66 @@ post-proxy {
 }
 
 EOD;
-        conf_mount_rw();
+	exec("chown -R root:wheel /var/log/raddb");
+	exec("chown -R root:wheel /var/log/radacct");
+
+		conf_mount_rw();
 	file_put_contents(RADDB . '/radiusd.conf', $conf);
         conf_mount_ro();
 	restart_service("freeradius");
 }
 
 function freeradius_users_resync() {
-	global $config;
+global $config;
 
-	$conf = '';
-	$users = $config['installedpackages']['freeradius']['config'];
-	if (is_array($users)) {
-		foreach ($users as $user) {
-			$username = $user['username'];
-			$password = $user['password'];
-	$multiconnect = $user['multiconnect'];
-	$ip = $user['ip'];
-        $subnetmask = $user['subnetmask'];
-        $gateway = $user['gateway'];
-	$userexpiration=$user['expiration'];
-	$sessiontime=$user['sessiontime'];
-	$onlinetime=$user['onlinetime'];
-	$vlanid=$user['vlanid'];
-	$additionaloptions=$user['additionaloptions'];
-	$atrib=''; 
-	$head="$username User-Password == ".'"'.$password.'"';
-	if ($multiconnect <> '') {
-	$head .=", Simultaneous-Use := $multiconnect";
-	}
-	if ($userexpiration <> '') {
-	$head .=", Expiration := ".'"'.$userexpiration.'"';
-	}
-	if ($subnetmask<> '') {
-	$head .=", Framed-IP-Netmask = $subnetmask";
-	}
-	if ($gateway<> '') {
-	$head .=", Framed-Route = $gateway";
-	}
-	if ($onlinetime <> '') {
-	$head .=", Login-Time := ". '"' . $onlinetime .'"';
-	}
-	if ($ip <> '') {
-	if ($atrib <> '') { $atrib .=","; }
-	$atrib .="\r\n\tFramed-IP-Address = $ip";
-	}
-	if ($sessiontime <> '') {
-	if ($atrib <> '') { $atrib .=","; }
-	$atrib .="\r\n\tSession-Timeout := $sessiontime";
-	}
-	if ($vlanid <> '') {
-	if ($atrib <> '') { $atrib .=","; }
-	$atrib .="\r\n\tTunnel-Type = VLAN,\r\n\tTunnel-Medium-Type = IEEE-802,\r\n\tTunnel-Private-Group-ID = \"$vlanid\"";
-	}
-	if ($additionaloptions <> '') {
-	if ($atrib <> '') { $atrib .=","; }
-	$atrib .="\r\n\t$additionaloptions";
-	}
+$conf = '';
+$users = $config['installedpackages']['freeradius']['config'];
+if (is_array($users)) {
+	foreach ($users as $user) {
+		$username = $user['username'];
+		$password = $user['password'];
+		$multiconnect = $user['multiconnect'];
+		$ip = $user['ip'];
+		$subnetmask = $user['subnetmask'];
+		$gateway = $user['gateway'];
+		$userexpiration=$user['expiration'];
+		$sessiontime=$user['sessiontime'];
+		$onlinetime=$user['onlinetime'];
+		$vlanid=$user['vlanid'];
+		$additionaloptions=$user['additionaloptions'];
+		$atrib=''; 
+		$head="$username User-Password == ".'"'.$password.'"';
+		if ($multiconnect <> '') {
+		$head .=", Simultaneous-Use := $multiconnect";
+		}
+		if ($userexpiration <> '') {
+		$head .=", Expiration := ".'"'.$userexpiration.'"';
+		}
+		if ($subnetmask<> '') {
+		$head .=", Framed-IP-Netmask = $subnetmask";
+		}
+		if ($gateway<> '') {
+		$head .=", Framed-Route = $gateway";
+		}
+		if ($onlinetime <> '') {
+		$head .=", Login-Time := ". '"' . $onlinetime .'"';
+		}
+		if ($ip <> '') {
+		if ($atrib <> '') { $atrib .=","; }
+		$atrib .="\r\n\tFramed-IP-Address = $ip";
+		}
+		if ($sessiontime <> '') {
+		if ($atrib <> '') { $atrib .=","; }
+		$atrib .="\r\n\tSession-Timeout := $sessiontime";
+		}
+		if ($vlanid <> '') {
+		if ($atrib <> '') { $atrib .=","; }
+		$atrib .="\r\n\tTunnel-Type = VLAN,\r\n\tTunnel-Medium-Type = IEEE-802,\r\n\tTunnel-Private-Group-ID = \"$vlanid\"";
+		}
+		if ($additionaloptions <> '') {
+		if ($atrib <> '') { $atrib .=","; }
+		$atrib .="\r\n\t$additionaloptions";
+		}
 
 	$conf .= <<<EOD
 	$head
@@ -528,7 +545,8 @@ function freeradius_users_resync() {
 
 EOD;
 	}
-	}
+}
+
 	$filename = RADDB . '/users';
 	conf_mount_rw();
 	file_put_contents($filename, $conf);
@@ -542,16 +560,43 @@ function freeradius_clients_resync() {
 	global $config;
 
 	$conf = '';
-	$clients = $config['installedpackages']['freeradiusclients']['config'];
-	if (is_array($clients) && !empty($clients)) {
-		foreach ($clients as $item) {
-			$client = $item['client'];
-			$secret = $item['sharedsecret'];
-			$shortname = $item['shortname'];
+	$arrclients = $config['installedpackages']['freeradiusclients']['config'];
+	if (is_array($arrclients) && !empty($arrclients)) {
+		foreach ($arrclients as $item) {
+			$varclientip = $item['varclientip'];
+			$varclientsharedsecret = $item['varclientsharedsecret'];
+			$varclientipversion = $item['varclientipversion'];
+			$varclientshortname = $item['varclientshortname'];
+			$varclientproto = $item['varclientproto'];
+			$varrequiremessageauthenticator = $item['varrequiremessageauthenticator'];
+			$varclientnastype = $item['varclientnastype'];
+			$varclientmaxconnections = $item['varclientmaxconnections'];
 			$conf .= <<<EOD
-client $client {
-	secret = $secret
-	shortname = $shortname
+
+client $varclientshortname {
+	$varclientipversion = $varclientip
+
+		### udp or tcp - udp is default
+	proto = $varclientproto
+	secret = $varclientsharedsecret
+
+		### RFC5080: User Message-Authenticator in Access-Request. But older sqitches, accesspoints, NAS do not include that. Default: no
+	require_message_authenticator = $varrequiremessageauthenticator
+
+		### Takes only effect if you use TCP as protocol. This is the mirror of "max_requests" from "Settings" tab. Default 16
+	max_connections = $varclientmaxconnections
+	shortname = $varclientshortname
+
+		### Optional: Used by checkrad.pl for simultaneous use checks. Default: other
+	nastype     = $varclientnastype
+
+		### Optional: will be used in future releases
+	#login       = !root
+	#password    = someadminpas
+							
+		### Additional configuration needed. See: raddb/sites-available/originate-coa
+	#virtual_server = home1
+	#coa_server = coa
 }
 
 EOD;
@@ -559,10 +604,11 @@ EOD;
 	}
 	else {
 		$conf .= <<<EOD
-		client 127.0.0.1 {
-		secret = pfsense
-		shortname = localhost
-		}
+client pfsense {
+	ipaddr = 127.0.0.1
+	secret = pfsense
+	shortname = pfsense
+}
 
 EOD;
 	}

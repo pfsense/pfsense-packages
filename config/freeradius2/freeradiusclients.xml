@@ -2,8 +2,8 @@
 <!DOCTYPE packagegui SYSTEM "./schema/packages.dtd">
 <?xml-stylesheet type="text/xsl" href="./xsl/package.xsl"?>
 <packagegui>
-        <copyright>
-        <![CDATA[
+	<copyright>
+		<![CDATA[
 /* $Id$ */
 /* ========================================================================== */
 /*
@@ -40,38 +40,62 @@
     POSSIBILITY OF SUCH DAMAGE.
                                                                               */
 /* ========================================================================== */
-        ]]>
-        </copyright>
-    <description>Describe your package here</description>
-    <requirements>Describe your package requirements here</requirements>
-    <faq>Currently there are no FAQ items provided.</faq>
+		]]>
+	</copyright>
+	<description>Describe your package here</description>
+	<requirements>Describe your package requirements here</requirements>
+	<faq>Currently there are no FAQ items provided.</faq>
 	<name>freeradiusclients</name>
 	<version>none</version>
 	<title>FreeRADIUS: Clients</title>
 	<include_file>/usr/local/pkg/freeradius.inc</include_file>
 	<tabs>
-                <tab>
-                        <text>Users</text>
-                        <url>/pkg.php?xml=freeradius.xml</url>
-                </tab>
-                <tab>
-                        <text>Clients</text>
-                        <url>/pkg.php?xml=freeradiusclients.xml</url>
+		<tab>
+			<text>Users</text>
+			<url>/pkg.php?xml=freeradius.xml</url>
+		</tab>
+		<tab>
+			<text>NAS / Clients</text>
+			<url>/pkg.php?xml=freeradiusclients.xml</url>
 			<active/>
-                </tab>
-                <tab>
-                        <text>Settings</text>
-                        <url>/pkg_edit.php?xml=freeradiussettings.xml&amp;id=0</url>
-                </tab>
-        </tabs>
+		</tab>
+		<tab>
+			<text>Interfaces</text>
+			<url>/pkg.php?xml=freeradiusinterfaces.xml</url>
+		</tab>
+		<tab>
+			<text>Settings</text>
+			<url>/pkg_edit.php?xml=freeradiussettings.xml&amp;id=0</url>
+		</tab>
+	</tabs>
 	<adddeleteeditpagefields>
 		<columnitem>
-			<fielddescr>Client</fielddescr>
-			<fieldname>client</fieldname>
+			<fielddescr>Client IP Address</fielddescr>
+			<fieldname>varclientip</fieldname>
 		</columnitem>
 		<columnitem>
-			<fielddescr>Shortname</fielddescr>
-			<fieldname>shortname</fieldname>
+			<fielddescr>Client IP Version</fielddescr>
+			<fieldname>varclientipversion</fieldname>
+		</columnitem>
+		<columnitem>
+			<fielddescr>Client Shortname</fielddescr>
+			<fieldname>varclientshortname</fieldname>
+		</columnitem>
+		<columnitem>
+			<fielddescr>Client Protocol</fielddescr>
+			<fieldname>varclientproto</fieldname>
+		</columnitem>
+		<columnitem>
+			<fielddescr>Client NAS Type</fielddescr>
+			<fieldname>varclientnastype</fieldname>
+		</columnitem>
+		<columnitem>
+			<fielddescr>Require Message Authenticator</fielddescr>
+			<fieldname>varrequiremessageauthenticator</fieldname>
+		</columnitem>
+		<columnitem>
+			<fielddescr>Max Connections</fielddescr>
+			<fieldname>varclientmaxconnections</fieldname>
 		</columnitem>
 		<columnitem>
 			<fielddescr>Description</fielddescr>
@@ -80,30 +104,92 @@
 	</adddeleteeditpagefields>
 	<fields>
 		<field>
-			<fielddescr>Client</fielddescr>
-			<fieldname>client</fieldname>
-			<description>Enter the client's IP address.</description>
+			<fielddescr>Client IP Address</fielddescr>
+			<fieldname>varclientip</fieldname>
+			<description>Enter the IP address of the client. This is in general the IP of the NAS (switch,accesspoint).</description>
 			<type>input</type>
 			<required/>
 		</field>
 		<field>
-			<fielddescr>Shortname</fielddescr>
-			<fieldname>shortname</fieldname>
-			<description>Enter the client's shortname.</description>
+			<fielddescr>Client IP Version</fielddescr>
+			<fieldname>varclientipversion</fieldname>
+			<type>select</type>
+			<default_value>ipaddr</default_value>
+					<options>
+						<option><name>IPv4</name><value>ipaddr</value></option>
+						<option><name>IPv6</name><value>ipv6addr</value></option>
+					</options>
+			<required/>
+		</field>		
+		<field>
+			<fielddescr>Client Shortname</fielddescr>
+			<fieldname>varclientshortname</fieldname>
+			<description>Enter shortname of the client. This is in general the IP of the NAS (switch,accesspoint).</description>
 			<type>input</type>
 			<required/>
 		</field>
 		<field>
-			<fielddescr>Shared Secret</fielddescr>
-			<fieldname>sharedsecret</fieldname>
-			<description>Enter the client's shared secret here</description>
+			<fielddescr>Client Shared Secret</fielddescr>
+			<fieldname>varclientsharedsecret</fieldname>
+			<description>Enter the shared secret of the client here. This is the shared secret (password) which the NAS (switch or accesspoint) needs to communicate with the RADIUS server.</description>
 			<type>password</type>
 			<required/>
 		</field>
 		<field>
+			<fielddescr>Client Protocol</fielddescr>
+			<fieldname>varclientproto</fieldname>
+			<description>Enter the protocol the client uses. (Default: udp)</description>
+			<type>select</type>
+			<default_value>udp</default_value>
+					<options>
+						<option><name>UDP</name><value>udp</value></option>
+						<option><name>TCP</name><value>tcp</value></option>
+					</options>
+			<required/>
+		</field>
+		<field>
+			<fielddescr>Client NAS Type</fielddescr>
+			<fieldname>varclientnastype</fieldname>
+			<description>Enter the NAS type of the client. This is used by checkrad.pl for simultaneous use checks. (Default: other)</description>
+			<type>select</type>
+			<default_value>other</default_value>
+					<options>
+						<option><name>CISCO Systems</name><value>cisco</value></option>
+						<option><name>Computone PowerRack</name><value>computone</value></option>
+						<option><name>Livingston PortMaster</name><value>livingston</value></option>
+						<option><name>Ascend Max 4000 family</name><value>max40xx</value></option>
+						<option><name>Multitech CommPlete Server</name><value>multitech</value></option>
+						<option><name>3Com/USR NetServer</name><value>netserver</value></option>
+						<option><name>Cyclades PathRAS</name><value>pathras</value></option>
+						<option><name>Patton 2800 family</name><value>patton</value></option>
+						<option><name>Cistron PortSlave</name><value>portslave</value></option>
+						<option><name>3Com/USR TotalControl</name><value>tc</value></option>
+						<option><name>3Com/USR Hiper Arc Total Control</name><value>usrhiper</value></option>
+						<option><name>other</name><value>other</value></option>
+					</options>
+		</field>
+		<field>
+			<fielddescr>Require Message Authenticator</fielddescr>
+			<fieldname>varrequiremessageauthenticator</fieldname>
+			<description>RFC5080 requires Message-Authenticator in Access-Request. But older NAS (switches or accesspoints) do not include that. (Default: no)</description>
+			<type>select</type>
+			<default_value>no</default_value>
+					<options>
+						<option><name>No</name><value>no</value></option>
+						<option><name>Yes</name><value>yes</value></option>
+					</options>
+		</field>
+		<field>
+			<fielddescr>Max Connections</fielddescr>
+			<fieldname>varclientmaxconnections</fieldname>
+			<description>Takes only effect if you use TCP as protocol. This is the mirror of "Max Requests Server" from "Settings" tab. (Default 16)</description>
+			<type>input</type>
+			<default_value>16</default_value>
+		</field>
+		<field>
 			<fielddescr>Description</fielddescr>
 			<fieldname>description</fieldname>
-			<description>Enter the description of the user here</description>
+			<description>Enter any description you like for this client.</description>
 			<type>input</type>
 		</field>
 	</fields>
