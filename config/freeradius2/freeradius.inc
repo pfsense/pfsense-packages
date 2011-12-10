@@ -25,8 +25,6 @@ function freeradius_install_command() {
 	
 	exec("chown -R root:wheel /usr/local/etc/raddb");
 	exec("chown -R root:wheel /usr/local/lib/freeradius-2.1.12");
-	exec("chown -R root:wheel /var/log/raddb");
-	exec("chown -R root:wheel /var/log/radacct");
 	
 	closedir($handle);
 
@@ -60,6 +58,17 @@ function freeradius_settings_resync() {
 	$varsettingsallowcoredumps = $varsettings['varsettingsallowcoredumps'];
 	$varsettingsregularexpressions = $varsettings['varsettingsregularexpressions'];
 	$varsettingsextendedexpressions = $varsettings['varsettingsextendedexpressions'];
+	
+	$varsettingsmaxattributes = $varsettings['varsettingsmaxattributes'];
+	$varsettingsrejectdelay = $varsettings['varsettingsrejectdelay'];
+	$varsettingsstartservers = $varsettings['varsettingsstartservers'];
+	$varsettingsmaxservers = $varsettings['varsettingsmaxservers'];
+	$varsettingsminspareservers = $varsettings['varsettingsminspareservers'];
+	$varsettingsmaxspareservers = $varsettings['varsettingsmaxspareservers'];
+	$varsettingsmaxqueuesize = $varsettings['varsettingsmaxqueuesize'];
+	$varsettingsmaxrequestsperserver = $varsettings['varsettingsmaxrequestsperserver'];
+		
+	
 
 	$conf = <<<EOD
 prefix = /usr/local
@@ -130,23 +139,25 @@ log {
 	###msg_goodpass = ""
 	###msg_badpass = ""
 }
+
 checkrad = \${sbindir}/checkrad
 security 	{
-			###max_attributes = 200
-			###reject_delay = 1
-			###status_server = no  ###raddb/sites-available/status ###wohl nur fuer Experten - erstmal weglassen
-			}
-			###proxy_requests = yes   ###auf "yes" lassen. Sorgt fuer weniger Probleme und kostet wenig/nichts (RAM)
+	max_attributes = $varsettingsmaxattributes
+	reject_delay = $varsettingsrejectdelay
+	status_server = no  							### Needs additional config in raddb/sites-available/status
+}
+	proxy_requests = yes
+
 \$INCLUDE  \${confdir}/proxy.conf
-\$INCLUDE  \${confdir}/clients.conf   ###Jegliche Konfiguration wird in der clients.conf durchgeführt
+\$INCLUDE  \${confdir}/clients.conf
 thread pool {
-			###start_servers = 5
-			###max_servers = 32
-			###min_spare_servers = 3
-			###max_spare_servers = 10
-			###max_queue_size = 65536
-			###max_requests_per_server = 0
-			}
+	start_servers = $varsettingsstartservers
+	max_servers = $varsettingsmaxservers
+	min_spare_servers = $varsettingsminspareservers
+	max_spare_servers = $varsettingsmaxspareservers
+	max_queue_size = $varsettingsmaxqueuesize
+	max_requests_per_server = $varsettingsmaxrequestsperserver
+}
 
 
 #snmp = no
@@ -478,8 +489,6 @@ post-proxy {
 }
 
 EOD;
-	exec("chown -R root:wheel /var/log/raddb");
-	exec("chown -R root:wheel /var/log/radacct");
 
 		conf_mount_rw();
 	file_put_contents(RADDB . '/radiusd.conf', $conf);

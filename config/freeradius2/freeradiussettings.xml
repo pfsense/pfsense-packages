@@ -191,6 +191,62 @@
 						<option><name>Disable</name><value>no</value></option>
 						<option><name>Enable</name><value>yes</value></option>
 					</options>
+		</field>
+		<field>
+			<fielddescr>Maximum Number of Attributes</fielddescr>
+			<fieldname>varsettingsmaxattributes</fieldname>
+			<description>The maximum number of attributes permitted in a RADIUS packet. Packets which have more than this number of attributes in them will be dropped. (Default: 200)</description>
+			<type>input</type>
+			<default_value>200</default_value>
+		</field>
+		<field>
+			<fielddescr>Access-Reject Delay</fielddescr>
+			<fieldname>varsettingsrejectdelay</fieldname>
+			<description>When sending an Access-Reject it can be delayed for a few seconds. This may help slow down a DoS attack. It also helps to slow down people trying to brute-force crack a users password. (Default: 1)(Immediately: 0)</description>
+			<type>input</type>
+			<default_value>1</default_value>
+		</field>
+		<field>
+			<fielddescr>Number of Threads After Start</fielddescr>
+			<fieldname>varsettingsstartservers</fieldname>
+			<description>The thread pool is a long-lived group of threads which take turns (round-robin) handling any incoming requests. (Default: 5)</description>
+			<type>input</type>
+			<default_value>5</default_value>
+		</field>
+		<field>
+			<fielddescr>Maximum Number of Threads</fielddescr>
+			<fieldname>varsettingsmaxservers</fieldname>
+			<description>If this limit is ever reached, clients will be locked out so it should not be set to low. (Default: 32)</description>
+			<type>input</type>
+			<default_value>32</default_value>
+		</field>
+		<field>
+			<fielddescr>Min Spare Servers</fielddescr>
+			<fieldname>varsettingsminspareservers</fieldname>
+			<description>This dynamically adjusts the "Number of Threads After Start". If the RADIUS server has to handle MANY requests and LESS than "Min Spare Servers" are left than the RADIUS server will INCREASE the number of running threads. (Default: 3)</description>
+			<type>input</type>
+			<default_value>3</default_value>
+		</field>
+		<field>
+			<fielddescr>Max Spare Servers</fielddescr>
+			<fieldname>varsettingsmaxspareservers</fieldname>
+			<description>This dynamically adjusts the "Number of Threads After Start". If the RADIUS server has to handle FEW requests and MORE than "Max Spare Servers" are left than the RADIUS server will DECREASE the number of running threads. (Default: 10)</description>
+			<type>input</type>
+			<default_value>10</default_value>
+		</field>
+		<field>
+			<fielddescr>Server Packet Queue Size</fielddescr>
+			<fieldname>varsettingsmaxqueuesize</fieldname>
+			<description>This is the queue size where the server stores packets before processing them. (Default: 65536)</description>
+			<type>input</type>
+			<default_value>65536</default_value>
+		</field>
+		<field>
+			<fielddescr>Maximum Requests per Server</fielddescr>
+			<fieldname>varsettingsmaxrequestsperserver</fieldname>
+			<description>You should only change this if you encounter memory leaks while running RADIUS. (Default: 0)</description>
+			<type>input</type>
+			<default_value>0</default_value>
 		</field>		
 	</fields>
 	<custom_delete_php_command>
