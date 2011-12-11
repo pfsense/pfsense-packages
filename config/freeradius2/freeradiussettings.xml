@@ -71,61 +71,8 @@
 	</tabs>
 	<fields>
 		<field>
-			<fielddescr>Logging Destination of RADIUS</fielddescr>
-			<fieldname>varsettingslogdir</fieldname>
-			<description>Choose the destination where freeRADIUS should log. Logging must be enabled.(Default: radius.log)</description>
-			<type>select</type>
-			<default_value>files</default_value>
-					<options>
-						<option><name>/var/log/radius.log</name><value>files</value></option>
-						<option><name>System Logs -> System</name><value>syslog</value></option>
-						<option><name>stdout</name><value>stdout</value></option>
-						<option><name>stderr</name><value>stderr</value></option>
-					</options>
-		</field>
-		<field>
-			<fielddescr>RADIUS Logging</fielddescr>
-			<fieldname>varsettingsauth</fieldname>
-			<description>Choose if you want to enable logging. (Default: Disabled)</description>
-			<type>select</type>
-			<default_value>no</default_value>
-					<options>
-						<option><name>Disable</name><value>no</value></option>
-						<option><name>Enable</name><value>yes</value></option>
-					</options>
-		</field>
-		<field>
-			<fielddescr>Log Bad Authentication Attempts</fielddescr>
-			<fieldname>varsettingsauthbadpass</fieldname>
-			<description>Choose if you want to log bad authentication attempts. Logging must be enabled. (Default: no)</description>
-			<type>select</type>
-			<default_value>no</default_value>
-					<options>
-						<option><name>no</name><value>no</value></option>
-						<option><name>Log</name><value>yes</value></option>
-					</options>
-		</field>
-		<field>
-			<fielddescr>Log good authentication attempts?</fielddescr>
-			<fieldname>varsettingsauthgoodpass</fieldname>
-			<description>Choose if you want to log good authentication attempts. Logging must be enabled. (Default: no)</description>
-			<type>select</type>
-			<default_value>no</default_value>
-					<options>
-						<option><name>no</name><value>no</value></option>
-						<option><name>Log</name><value>yes</value></option>
-					</options>
-		</field>
-		<field>
-			<fielddescr>Log Stripped Names</fielddescr>
-			<fieldname>varsettingsstrippednames</fieldname>
-			<description>Choose if you want to log the full User-Name attribute as it was found in the request. Logging must be enabled. (Default: no)</description>
-			<type>select</type>
-			<default_value>no</default_value>
-					<options>
-						<option><name>no</name><value>no</value></option>
-						<option><name>Log</name><value>yes</value></option>
-					</options>
+			<name>GENERAL CONFIGURATION</name>
+			<type>listtopic</type>
 		</field>		
 		<field>
 			<fielddescr>Maximum Requests Server</fielddescr>
@@ -193,6 +140,71 @@
 					</options>
 		</field>
 		<field>
+			<name>LOGGING CONFIGURATION</name>
+			<type>listtopic</type>
+		</field>
+		<field>
+			<fielddescr>Logging Destination of RADIUS</fielddescr>
+			<fieldname>varsettingslogdir</fieldname>
+			<description>Choose the destination where freeRADIUS should log. Logging must be enabled.(Default: radius.log)</description>
+			<type>select</type>
+			<default_value>files</default_value>
+					<options>
+						<option><name>/var/log/radius.log</name><value>files</value></option>
+						<option><name>System Logs -> System</name><value>syslog</value></option>
+						<option><name>stdout</name><value>stdout</value></option>
+						<option><name>stderr</name><value>stderr</value></option>
+					</options>
+		</field>
+		<field>
+			<fielddescr>RADIUS Logging</fielddescr>
+			<fieldname>varsettingsauth</fieldname>
+			<description>Choose if you want to enable logging. (Default: Disabled)</description>
+			<type>select</type>
+			<default_value>no</default_value>
+					<options>
+						<option><name>Disable</name><value>no</value></option>
+						<option><name>Enable</name><value>yes</value></option>
+					</options>
+		</field>
+		<field>
+			<fielddescr>Log Bad Authentication Attempts</fielddescr>
+			<fieldname>varsettingsauthbadpass</fieldname>
+			<description>Choose if you want to log bad authentication attempts. Logging must be enabled. (Default: no)</description>
+			<type>select</type>
+			<default_value>no</default_value>
+					<options>
+						<option><name>no</name><value>no</value></option>
+						<option><name>Log</name><value>yes</value></option>
+					</options>
+		</field>
+		<field>
+			<fielddescr>Log good authentication attempts?</fielddescr>
+			<fieldname>varsettingsauthgoodpass</fieldname>
+			<description>Choose if you want to log good authentication attempts. Logging must be enabled. (Default: no)</description>
+			<type>select</type>
+			<default_value>no</default_value>
+					<options>
+						<option><name>no</name><value>no</value></option>
+						<option><name>Log</name><value>yes</value></option>
+					</options>
+		</field>
+		<field>
+			<fielddescr>Log Stripped Names</fielddescr>
+			<fieldname>varsettingsstrippednames</fieldname>
+			<description>Choose if you want to log the full User-Name attribute as it was found in the request. Logging must be enabled. (Default: no)</description>
+			<type>select</type>
+			<default_value>no</default_value>
+					<options>
+						<option><name>no</name><value>no</value></option>
+						<option><name>Log</name><value>yes</value></option>
+					</options>
+		</field>
+		<field>
+			<name>SECURITY CONFIGURATION</name>
+			<type>listtopic</type>
+		</field>
+		<field>
 			<fielddescr>Maximum Number of Attributes</fielddescr>
 			<fieldname>varsettingsmaxattributes</fieldname>
 			<description>The maximum number of attributes permitted in a RADIUS packet. Packets which have more than this number of attributes in them will be dropped. (Default: 200)</description>
@@ -205,6 +217,10 @@
 			<description>When sending an Access-Reject it can be delayed for a few seconds. This may help slow down a DoS attack. It also helps to slow down people trying to brute-force crack a users password. (Default: 1)(Immediately: 0)</description>
 			<type>input</type>
 			<default_value>1</default_value>
+		</field>
+		<field>
+			<name>THREAD POOL CONFIGURATION</name>
+			<type>listtopic</type>
 		</field>
 		<field>
 			<fielddescr>Number of Threads After Start</fielddescr>

@@ -11,7 +11,7 @@
     part of pfSense (http://www.pfSense.com)
     Copyright (C) 2007 to whom it may belong
     All rights reserved.
- 
+
     Based on m0n0wall (http://m0n0.ch/wall)
     Copyright (C) 2003-2006 Manuel Kasper <mk@neon1.net>.
     All rights reserved.
@@ -42,7 +42,7 @@
 /* ========================================================================== */
 		]]>
 	</copyright>
-	<description>Describe your package here.</description>
+	<description>Describe your package here</description>
 	<requirements>Describe your package requirements here</requirements>
 	<faq>Currently there are no FAQ items provided.</faq>
 	<name>freeradiusinterfaces</name>
@@ -70,7 +70,7 @@
 	</tabs>
 	<adddeleteeditpagefields>
 		<columnitem>
-			<fielddescr>Listening Interface</fielddescr>
+			<fielddescr>Interface IP Address</fielddescr>
 			<fieldname>varinterfaceip</fieldname>
 		</columnitem>
 		<columnitem>
@@ -92,9 +92,13 @@
 	</adddeleteeditpagefields>
 	<fields>
 		<field>
-			<fielddescr>Listening Interface</fielddescr>
+			<name>GENERAL CONFIGURATION</name>
+			<type>listtopic</type>
+		</field>	
+		<field>
+			<fielddescr>Interface IP Address</fielddescr>
 			<fieldname>varinterfaceip</fieldname>
-			<description>Enter the IP address of the listening interface. e.g. 192.168.100.1 (Default: *)</description>
+			<description><![CDATA[Enter the IP address of the listening interface. e.g. 192.168.100.1 (Default: *)]]></description>
 			<type>input</type>
 			<default_value>*</default_value>
 			<required/>
@@ -102,7 +106,12 @@
 		<field>
 			<fielddescr>Port</fielddescr>
 			<fieldname>varinterfaceport</fieldname>
-			<description>Enter the port number of the listening interface. e.g. 1812 (Default: 1812)</description>
+			<description><![CDATA[Enter the port number of the listening interface. Different interface types need different ports.<br>
+							You could use this as an example:<br>
+							auth  = 1812<br>
+							acct  = 1813<br>
+							proxy = 1814<br>
+							<b>IMPORTANT:</b> For <b>every interface type</b> listening on the <b>same IP address</b> you need <b>different ports</b>.]]></description>
 			<type>input</type>
 			<default_value>1812</default_value>
 			<required/>
