@@ -122,22 +122,22 @@
 	</adddeleteeditpagefields>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
-		<chmod>0775</chmod>
+		<chmod>0755</chmod>
 		<item>http://www.pfsense.org/packages/config/freeradius2/freeradiusclients.xml</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
-		<chmod>0775</chmod>
+		<chmod>0755</chmod>
 		<item>http://www.pfsense.org/packages/config/freeradius2/freeradiussettings.xml</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
-		<chmod>0775</chmod>
+		<chmod>0755</chmod>
 		<item>http://www.pfsense.org/packages/config/freeradius2/freeradiusinterfaces.xml</item>
 	</additional_files_needed>	
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
-		<chmod>0775</chmod>
+		<chmod>0755</chmod>
 		<item>http://www.pfsense.org/packages/config/freeradius2/freeradius.inc</item>
 	</additional_files_needed>
 	<fields>
