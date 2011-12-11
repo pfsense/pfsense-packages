@@ -758,13 +758,13 @@
 	<package>
 		<name>freeradius2</name>
 		<website>http://www.freeradius.org/</website>
-		<descr><![CDATA[!!! EXPERIMENTAL !!!<br>
-				freeRADIUS 2.1.12<br>
-				DO NOT USE ON PRODUCTIVE SYSTEMS AND NOT TOGETHER WITH freeradius. Both packages are using the same config files]]></descr>
+		<descr><![CDATA[freeRADIUS 2.1.12 - A free implementation of the RADIUS protocol.<br>
+				Do not use together with freeradius package. Both are using the same config files.<br>
+				Should be now as stable as freeradius package but needs more testing.]]></descr>
 		<pkginfolink>http://forum.pfsense.org/index.php/topic,43675.0.html</pkginfolink>
 		<category>System</category>
-		<version>2.1.12 pkg v0.8</version>
-		<status>Alpha</status>
+		<version>2.1.12 pkg v1.0</version>
+		<status>BETA</status>
 		<required_version>2.0</required_version>
 		<maintainer>Nachtfalke</maintainer>
 		<depends_on_package_base_url>http://ftp.freebsd.org/pub/FreeBSD/ports/i386/packages-8-stable/All/</depends_on_package_base_url>
