@@ -759,11 +759,10 @@
 		<name>freeradius2</name>
 		<website>http://www.freeradius.org/</website>
 		<descr><![CDATA[freeRADIUS 2.1.12 - A free implementation of the RADIUS protocol.<br>
-				Do not use together with freeradius package. Both are using the same config files.<br>
-				Should be now as stable as freeradius package but needs more testing.]]></descr>
+				Do not use together with freeradius package. Both are using the same XML files.]]></descr>
 		<pkginfolink>http://forum.pfsense.org/index.php/topic,43675.0.html</pkginfolink>
 		<category>System</category>
-		<version>2.1.12 pkg v1.0</version>
+		<version>2.1.12 pkg v1.0.1</version>
 		<status>BETA</status>
 		<required_version>2.0</required_version>
 		<maintainer>Nachtfalke</maintainer>
