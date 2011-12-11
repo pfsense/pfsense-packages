@@ -9,6 +9,7 @@ function freeradius_deinstall_command() {
 	exec("rm -rf /usr/local/etc/raddb/");
 	exec("rm -rf /var/log/raddb/");
 	exec("rm -rf /var/log/radacct/");
+	exec("rm -f /var/log/radius.log");
 }
 
 function freeradius_install_command() {
@@ -58,7 +59,6 @@ function freeradius_settings_resync() {
 	$varsettingsallowcoredumps = $varsettings['varsettingsallowcoredumps'];
 	$varsettingsregularexpressions = $varsettings['varsettingsregularexpressions'];
 	$varsettingsextendedexpressions = $varsettings['varsettingsextendedexpressions'];
-	
 	$varsettingsmaxattributes = $varsettings['varsettingsmaxattributes'];
 	$varsettingsrejectdelay = $varsettings['varsettingsrejectdelay'];
 	$varsettingsstartservers = $varsettings['varsettingsstartservers'];
@@ -104,6 +104,7 @@ hostname_lookups = $varsettingshostnamelookups
 allow_core_dumps = $varsettingsallowcoredumps
 regular_expressions = $varsettingsregularexpressions
 extended_expressions = $varsettingsextendedexpressions
+proxy_requests = yes
 
 EOD;
 
@@ -144,9 +145,8 @@ checkrad = \${sbindir}/checkrad
 security 	{
 	max_attributes = $varsettingsmaxattributes
 	reject_delay = $varsettingsrejectdelay
-	status_server = no  							### Needs additional config in raddb/sites-available/status
+	status_server = no  			### Needs additional config in raddb/sites-available/status
 }
-	proxy_requests = yes
 
 \$INCLUDE  \${confdir}/proxy.conf
 \$INCLUDE  \${confdir}/clients.conf
@@ -490,7 +490,7 @@ post-proxy {
 
 EOD;
 
-		conf_mount_rw();
+	conf_mount_rw();
 	file_put_contents(RADDB . '/radiusd.conf', $conf);
         conf_mount_ro();
 	restart_service("freeradius");

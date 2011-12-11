@@ -86,7 +86,7 @@
 			<fieldname>varclientproto</fieldname>
 		</columnitem>
 		<columnitem>
-			<fielddescr>Client NAS Type</fielddescr>
+			<fielddescr>Client Type</fielddescr>
 			<fieldname>varclientnastype</fieldname>
 		</columnitem>
 		<columnitem>
@@ -103,6 +103,10 @@
 		</columnitem>
 	</adddeleteeditpagefields>
 	<fields>
+		<field>
+			<name>GENERAL CONFIGURATION</name>
+			<type>listtopic</type>
+		</field>	
 		<field>
 			<fielddescr>Client IP Address</fielddescr>
 			<fieldname>varclientip</fieldname>
@@ -136,6 +140,10 @@
 			<required/>
 		</field>
 		<field>
+			<name>MISCELLANEOUS CONFIGURATION</name>
+			<type>listtopic</type>
+		</field>		
+		<field>
 			<fielddescr>Client Protocol</fielddescr>
 			<fieldname>varclientproto</fieldname>
 			<description>Enter the protocol the client uses. (Default: udp)</description>
@@ -145,10 +153,9 @@
 						<option><name>UDP</name><value>udp</value></option>
 						<option><name>TCP</name><value>tcp</value></option>
 					</options>
-			<required/>
 		</field>
 		<field>
-			<fielddescr>Client NAS Type</fielddescr>
+			<fielddescr>Client Type</fielddescr>
 			<fieldname>varclientnastype</fieldname>
 			<description>Enter the NAS type of the client. This is used by checkrad.pl for simultaneous use checks. (Default: other)</description>
 			<type>select</type>
