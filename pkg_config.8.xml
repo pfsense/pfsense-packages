@@ -490,7 +490,7 @@
 		<required_version>2.0</required_version>
 		<config_file>http://www.pfsense.com/packages/config/varnish64/varnish_backends.xml</config_file>
 		<configurationfile>varnish_backends.xml</configurationfile>
-		<depends_on_package_base_url>http://ftp-archive.freebsd.org/pub/FreeBSD/ports/i386/packages-stable/All/</depends_on_package_base_url>
+		<depends_on_package_base_url>http://ftp.freebsd.org/pub/FreeBSD/ports/i386/packages-8-stable/All/</depends_on_package_base_url>
 		<depends_on_package_pbi>gcc-4.2.5.20090325_5-i386.pbi varnish-3.0.1_2-i386.pbi</depends_on_package_pbi>
 		<depends_on_package>varnish-3.0.2.tbz</depends_on_package>
 		<depends_on_package>pcre-8.20.tbz</depends_on_package>
