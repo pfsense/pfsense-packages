@@ -63,7 +63,11 @@ if (isset($id) && $a_backend[$id]) {
 	$pconfig['stats_password'] = $a_backend[$id]['stats_password'];
 	$pconfig['stats_uri'] = $a_backend[$id]['stats_uri'];
 	$pconfig['stats_realm'] = $a_backend[$id]['stats_realm'];
-	
+	$pconfig['stats_node_enabled'] = $a_backend[$id]['stats_node_enabled'];
+	$pconfig['stats_node'] = $a_backend[$id]['stats_node'];
+	$pconfig['stats_desc'] = $a_backend[$id]['stats_desc'];
+	$pconfig['stats_refresh'] = $a_backend[$id]['stats_refresh'];
+		
 	$pconfig['type'] = $a_backend[$id]['type'];
 	$pconfig['extaddr'] = $a_backend[$id]['extaddr'];	
 	$pconfig['max_connections'] = $a_backend[$id]['max_connections'];	
@@ -87,8 +91,8 @@ if ($_POST) {
 		$reqdfields = explode(" ", "name connection_timeout server_timeout stats_username stats_password stats_uri stats_realm");
 		$reqdfieldsn = explode(",", "Name,Connection timeout,Server timeout,Stats Username,Stats Password,Stats Uri,Stats Realm");		
 	} else {
-		$reqdfields = explode(" ", "name connection_timeout server_timeout monitor_uri");
-		$reqdfieldsn = explode(",", "Name,Connection timeout,Server timeout,Monitor Uri");		
+		$reqdfields = explode(" ", "name connection_timeout server_timeout");
+		$reqdfieldsn = explode(",", "Name,Connection timeout,Server timeout");		
 	}
 	
 	do_input_validation($_POST, $reqdfields, $reqdfieldsn, &$input_errors);
@@ -227,6 +231,10 @@ if ($_POST) {
 		update_if_changed("stats_password", $backend['stats_password'], $_POST['stats_password']);
 		update_if_changed("stats_uri", $backend['stats_uri'], $_POST['stats_uri']);
 		update_if_changed("stats_realm", $backend['stats_realm'], $_POST['stats_realm']);
+		update_if_changed("stats_node_enabled", $backend['stats_node_enabled'], $_POST['stats_node_enabled']);
+		update_if_changed("stats_node", $backend['stats_node'], $_POST['stats_node']);
+		update_if_changed("stats_desc", $backend['stats_desc'], $_POST['stats_desc']);
+		update_if_changed("stats_desc", $backend['stats_refresh'], $_POST['stats_refresh']);
 		update_if_changed("type", $backend['type'], $_POST['type']);
 		update_if_changed("port", $backend['port'], $_POST['port']);
 		update_if_changed("extaddr", $backend['extaddr'], $_POST['extaddr']);
@@ -351,17 +359,29 @@ include("head.inc");
 		var stats_username_row=document.getElementById('stats_username_row');
 		var stats_password_row=document.getElementById('stats_password_row');
 		var stats_uri_row=document.getElementById('stats_uri_row');
+		var stats_node_enabled_row=document.getElementById('stats_node_enabled_row');
+		var stats_node_row=document.getElementById('stats_node_row');
+		var stats_desc_row=document.getElementById('stats_desc_row');
+		var stats_desc_row=document.getElementById('stats_refresh_row');
 		
 		if (stats_enabled.checked) {
 			stats_realm_row.style.display='';
 			stats_username_row.style.display='';
 			stats_password_row.style.display='';
 			stats_uri_row.style.display='';
+			stats_node_enabled_row.style.display='';
+			stats_node_row.style.display='';
+			stats_desc_row.style.display='';
+			stats_refresh_row.style.display='';
 		} else {
 			stats_realm_row.style.display='none';
 			stats_username_row.style.display='none';
 			stats_password_row.style.display='none';
 			stats_uri_row.style.display='none';
+			stats_node_enabled_row.style.display='none';
+			stats_node_row.style.display='none';
+			stats_desc_row.style.display='none';
+			stats_refresh_row.style.display='none';
 		}
 	}
 </script>
@@ -428,7 +448,7 @@ set by the 'retries' parameter (2).</div>
 				<table width="100%">
 				<tr>
 					<td width="20%" valign="top">
-						<input type="radio" name="balance" id="balance" value="roundrobin"<?php if($pconfig['balance'] == "roundrobin") echo " CHECKED"; ?>>Round robin
+						<input type="radio" name="balance" id="balance" value="roundrobin"<?php if($pconfig['balance'] == "roundrobin") echo " CHECKED"; ?>>Round robin</input>
 					</td>
 					<td>
 						  Each server is used in turns, according to their weights.
@@ -438,8 +458,38 @@ set by the 'retries' parameter (2).</div>
 		                  on the fly for slow starts for instance.
 					</td>
 				</tr>
+				<tr>
+					<td width="20%" valign="top">
+						<input type="radio" name="balance" id="balance" value="static-rr"<?php if($pconfig['balance'] == "static-rr") echo " CHECKED"; ?>>Static Round Robin</input>
+					</td>
+					<td>
+						Each server is used in turns, according to their weights.
+				This algorithm is as similar to roundrobin except that it is
+				static, which means that changing a server's weight on the
+				fly will have no effect. On the other hand, it has no design
+				limitation on the number of servers, and when a server goes
+				up, it is always immediately reintroduced into the farm, once
+				the full map is recomputed. It also uses slightly less CPU to
+				run (around -1%).					
+					</td>
+				</tr>
+				<tr>
+					<td width="20%" valign="top">
+						<input type="radio" name="balance" id="balance" value="leastconn"<?php if($pconfig['balance'] == "leastconn") echo " CHECKED"; ?>>Least Connections</input>
+					</td>
+					<td>
+						  The server with the lowest number of connections receives the
+				connection. Round-robin is performed within groups of servers
+				of the same load to ensure that all servers will be used. Use
+				of this algorithm is recommended where very long sessions are
+				expected, such as LDAP, SQL, TSE, etc... but is not very well
+				suited for protocols using short sessions such as HTTP. This
+				algorithm is dynamic, which means that server weights may be
+				adjusted on the fly for slow starts for instance.
+					</td>
+				</tr>
 				  <tr><td valign="top"><input type="radio" name="balance" id="balance" value="source"<?php if($pconfig['balance'] == 
-"source") echo " CHECKED"; ?>>Source</td><td>
+"source") echo " CHECKED"; ?>>Source</input></td><td>
 		 			  The source IP address is hashed and divided by the total
 	                  weight of the running servers to designate which server will
 	                  receive the request. This ensures that the same client IP
@@ -491,6 +541,34 @@ set by the 'retries' parameter (2).</div>
 				<br/>
 			</td>
 		</tr>
+		<tr align="left" id='stats_node_enabled_row' name='stats_node_enabled_row' <?if ($pconfig['stats_enabled']!='yes') echo "style=\"display: none;\"";?>>
+			<td width="22%" valign="top" class="vncell">Stats Enable Node Name</td>
+			<td width="78%" class="vtable" colspan="2">
+				<input id="stats_node_enabled" name="stats_node_enabled" type="checkbox" value="yes" <?php if ($pconfig['stats_node_enabled']=='yes') echo "checked"; ?>>
+				<br/>
+			</td>
+		</tr>
+		<tr align="left" id='stats_node_row' name='stats_node_row' <?if ($pconfig['stats_enabled']!='yes') echo "style=\"display: none;\"";?>>
+			<td width="22%" valign="top" class="vncell">Stats Node</td>
+			<td width="78%" class="vtable" colspan="2">
+				<input id="stats_node" name="stats_node" type="text" <?if(isset($pconfig['stats_node'])) echo "value=\"{$pconfig['stats_node']}\"";?> size="64"><br/>
+				The node name is displayed in the stats and helps to differentiate which server in a cluster is actually serving clients.<br/>
+				Leave blank to use the system name.
+			</td>
+		</tr>
+		<tr align="left" id='stats_desc_row' name='stats_desc_row' <?if ($pconfig['stats_enabled']!='yes') echo "style=\"display: none;\"";?>>
+			<td width="22%" valign="top" class="vncell">Stats Description</td>
+			<td width="78%" class="vtable" colspan="2">
+				<input id="stats_desc" name="stats_desc" type="text" <?if(isset($pconfig['stats_node'])) echo "value=\"{$pconfig['stats_desc']}\"";?> size="64"><br/>
+			</td>
+		</tr>
+		<tr align="left" id='stats_refresh_row' name='stats_refresh_row' <?if ($pconfig['stats_enabled']!='yes') echo "style=\"display: none;\"";?>>
+			<td width="22%" valign="top" class="vncell">Stats Refresh</td>
+			<td width="78%" class="vtable" colspan="2">
+				<input id="stats_refresh" name="stats_refresh" type="text" <?if(isset($pconfig['stats_refresh'])) echo "value=\"{$pconfig['stats_refresh']}\"";?> size="10" maxlength="30"><br/>
+				Specify the refresh rate of the stats page in seconds, or specified time unit (us, ms, s, m, h, d).
+			</td>
+		</tr>
 		<tr align="left">
 			<td width="22%" valign="top" id="monitorport_text" class="vncell">Monitor Uri</td>
 			<td width="78%" class="vtable" colspan="2">
@@ -503,7 +581,7 @@ set by the 'retries' parameter (2).</div>
 				<tr align="left">
 					<td width="22%" valign="top" class="vncellreq">Port</td>
 					<td width="78%" class="vtable" colspan="2">
-						<input name="port" type="text" <?if(isset($pconfig['port'])) echo "value=\"{$pconfig['port']}\"";?> size="10" maxlength="10">
+						<input name="port" type="text" <?if(isset($pconfig['port'])) echo "value=\"{$pconfig['port']}\"";?> size="30" maxlength="500">
 						<div>The port to listen to.  To specify multiple ports, separate with a comma (,). EXAMPLE: 80,443</div>
 					</td>
 				</tr>
