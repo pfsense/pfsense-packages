@@ -201,7 +201,8 @@ function haproxy_configure() {
 			if($backend['cookie_name'])
 				fwrite ($fd, "\tcookie\t\t\t" . $backend['cookie_name'] . " insert indirect\n");
 
-			fwrite ($fd, "\toption\t\t\t{$httpchk} HEAD " . $backend['monitor_uri'] . " HTTP/1.0\n");
+			if($backend['monitor_uri'])
+				fwrite ($fd, "\toption\t\t\t{$httpchk} HEAD " . $backend['monitor_uri'] . " HTTP/1.0\n");
 
 			if($backend['stats_enabled']=='yes') {
 				fwrite ($fd, "\tstats\t\t\tenable\n");
@@ -212,6 +213,12 @@ function haproxy_configure() {
 				else 
 					fwrite ($fd, "\tstats\t\t\trealm .\n");
 				fwrite ($fd, "\tstats\t\t\tauth " . $backend['stats_username'].":". $backend['stats_password']."\n");
+				if($backend['stats_node_enabled']=='yes')
+					fwrite ($fd, "\tstats\t\t\tshow-node " . $backend['stats_node'] . "\n");
+				if($backend['stats_desc'])
+					fwrite ($fd, "\tstats\t\t\tshow-desc " . $backend['stats_desc'] . "\n");
+				if($backend['stats_refresh'])
+					fwrite ($fd, "\tstats\t\t\trefresh " . $backend['stats_refresh'] . "\n");
 			}
 
 			$a_acl=&$frontend['ha_acls']['item'];
@@ -230,7 +237,7 @@ function haproxy_configure() {
 							continue;
 						if($backends == $backend['name']) {
 							$server_ports = array();
-							if($server['status']=='active') {
+							if($server['status'] != 'inactive') {
 								if($server['cookie']) 
 									$cookie = " cookie {$server['cookie']} ";
 								else 
@@ -249,12 +256,17 @@ function haproxy_configure() {
 								} else {
 									$advanced_txt = "";
 								}
+								if($server['status'] != 'active') {
+									$status = " " . $server['status'];
+								} else {
+									$status = "";
+								}
 								if($server['checkinter']) 
 									$checkinter = "check inter {$server['checkinter']}";
 								else 
 									$checkinter = "check inter 1000";
 								foreach($server_ports as $pport) 
-									fwrite ($fd, "\tserver\t\t\t" . $server['name'] . " " . $server['address'].":" . $pport . " $cookie " . " $checkinter weight " . $server['weight'] . "{$advanced_txt}\n");
+									fwrite ($fd, "\tserver\t\t\t" . $server['name'] . " " . $server['address'].":" . $pport . " $cookie " . " $checkinter weight " . $server['weight'] . $status . "{$advanced_txt}\n");
 							}
 						}
 					}
@@ -350,11 +362,11 @@ function haproxy_do_xmlrpc_sync($sync_to_ip, $password) {
 	$xml['haproxy'] = $config['installedpackages']['haproxy'];
 
 	// Prevent sync loops
-	unset($xml['synchost1']);
-	unset($xml['synchost2']);
-	unset($xml['synchost3']);
-	unset($xml['syncpassword']);
-
+	unset($xml['haproxy']['synchost1']);
+	unset($xml['haproxy']['synchost2']);
+	unset($xml['haproxy']['synchost3']);
+	unset($xml['haproxy']['syncpassword']);
+	
 	/* assemble xmlrpc payload */
 	$params = array(
 		XML_RPC_encode($password),
