@@ -453,7 +453,7 @@
 		<config_file>http://www.pfsense.com/packages/config/postfix/postfix.xml</config_file>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
 		<depends_on_package>postfix-2.8.7,1.tbz</depends_on_package>
-		<depends_on_package>perl-5.10.1_3.tbz</depends_on_package>
+		<depends_on_package>perl-5.12.4_3.tbz</depends_on_package>
 		<depends_on_package_pbi>postfix-2.8.5-amd64.pbi</depends_on_package_pbi>
 		<version>2.8.7,1 pkg v.2.3.1</version>
 		<status>RC1</status>
@@ -466,20 +466,13 @@
 		<name>mailscanner-dev</name>
 		<website>www.mailscanner.info</website>
 		<descr><![CDATA[MailScanner is an e-mail security and anti-spam package for e-mail gateway systems.<br>
-						This is a level3 mail scanning tool with high CPU load.<br>
-						This package requires perl v. 5.10.1_3<br>
-						Do not try with any other version.]]></descr>
+						This is a level3 mail scanning tool with high CPU load.]]></descr>
 		<category>Services</category>
 		<config_file>http://www.pfsense.com/packages/config/mailscanner/mailscanner.xml</config_file>
 		<pkginfolink>http://forum.pfsense.org/index.php/topic,43687.0.html</pkginfolink>
-		<depends_on_package_base_url>http://ftp-archive.freebsd.org/pub/FreeBSD-Archive/old-releases/amd64/8.2-RELEASE/packages/All/</depends_on_package_base_url>
-		<depends_on_package>MailScanner-4.81.4_2.tbz</depends_on_package>
-		<depends_on_package>pyzor-0.5.0_1.tbz</depends_on_package>
-		<depends_on_package>re2c-0.13.5.tbz</depends_on_package>
-		<depends_on_package>p5-perl-ldap-0.4001.tbz</depends_on_package>
-		<depends_on_package>p5-Mail-SPF-2.007.tbz</depends_on_package>
-		<depends_on_package>p5-IP-Country-2.27.tbz</depends_on_package>
-		<version>4.8.1 pkg v.0.1</version>
+		<depends_on_package_base_url>http://e-sac.siteseguro.ws/pfsense/8/amd64/All/</depends_on_package_base_url>
+		<depends_on_package>MailScanner-4.83.5.tbz</depends_on_package>
+		<version>4.83.5 pkg v.0.1</version>
 		<status>alpha</status>
 		<required_version>2.0</required_version>
 		<configurationfile>mailscanner.xml</configurationfile>
