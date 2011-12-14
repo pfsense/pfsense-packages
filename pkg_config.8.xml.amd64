@@ -101,7 +101,7 @@
 		<version>3.0.2 pkg v.0.1</version>
 		<status>BETA</status>
 		<required_version>2.0</required_version>
-		<config_file>http://www.pfsense.com/packages/config/varnish64/varnish_backends.xml</config_file>
+		<config_file>http://www.pfsense.com/packages/config/varnish3/varnish_backends.xml</config_file>
 		<configurationfile>varnish_backends.xml</configurationfile>
 		<depends_on_package_base_url>http://e-sac.siteseguro.ws/pfsense/8/amd64/All/</depends_on_package_base_url>
 		<depends_on_package_pbi>varnish-3.0.1_2-amd64.pbi gcc-4.2.5.20090325_5-amd64.pbi</depends_on_package_pbi>
