@@ -270,6 +270,8 @@ function clearcombo(){
 			<td width="78%" class="vtable" colspan="2">
 				<select name="status">
 				<option value="active"  <?php if($pconfig['status']=='active') echo "SELECTED";?>>active</option>
+				<option value="backup" <?php  if($pconfig['status']=='backup') echo "SELECTED";?>>backup</option>
+				<option value="disabled" <?php  if($pconfig['status']=='disabled') echo "SELECTED";?>>disabled</option>
 				<option value="inactive" <?php  if($pconfig['status']=='inactive') echo "SELECTED";?>>inactive</option>
 				</select>
 			</td>
