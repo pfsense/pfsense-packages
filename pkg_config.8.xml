@@ -74,15 +74,17 @@
 		<configurationfile>anyterm.xml</configurationfile>
 	</package>
 	<package>
-		<pkginfolink>http://doc.pfsense.org/index.php/haproxy_package</pkginfolink>
 		<name>haproxy</name>
+		<pkginfolink>http://doc.pfsense.org/index.php/haproxy_package</pkginfolink>
 		<descr>The Reliable, High Performance TCP/HTTP Load Balancer</descr>
 		<website>http://haproxy.1wt.eu/</website>
 		<category>Services</category>
-		<version>0.29</version>
+		<version>0.30</version>
 		<status>BETA</status>
-		<required_version>1.2.3</required_version>
+		<required_version>2.0</required_version>
 		<config_file>http://www.pfsense.com/packages/config/haproxy/haproxy.xml</config_file>
+		<depends_on_package_base_url>http://e-sac.siteseguro.ws/pfsense/8/All/</depends_on_package_base_url>
+		<depends_on_package>haproxy-1.4.18.tbz</depends_on_package>
 		<configurationfile>haproxy.xml</configurationfile>
 		<build_port_path>/usr/ports/net/haproxy</build_port_path>
 	</package>

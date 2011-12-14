@@ -44,13 +44,13 @@
 	<name>haproxy</name>
 	<version>1.0</version>
 	<title>HAProxy</title>
-	<aftersaveredirect>/pkg_ediwt.php?xml=haproxy_servers.php</aftersaveredirect>
+	<aftersaveredirect>/pkg_edit.php?xml=haproxy_servers.php</aftersaveredirect>
 	<include_file>/usr/local/pkg/haproxy.inc</include_file>
 	<menu>
 		<name>HAProxy</name>
 		<tooltiptext></tooltiptext>
 		<section>Services</section>
-		<url>/haproxy_frontends.php</url>
+		<url>/haproxy_global.php</url>
 	</menu>
 	<service>
 		<name>HAProxy</name>
@@ -96,15 +96,18 @@
 	<custom_php_resync_config_command>
 	</custom_php_resync_config_command>
 	<custom_php_install_command>
+		/*
+		included in package install
 		$freebsdv=trim(`uname -r | cut -d'.' -f1`);
 		conf_mount_rw();
 		`fetch -q -o /usr/local/sbin/ http://www.pfsense.org/packages/config/haproxy/binaries{$freebsdv}/haproxy`;
 		exec("chmod a+rx /usr/local/sbin/haproxy");
+		*/
 		haproxy_custom_php_install_command();
 	</custom_php_install_command>
 	<custom_php_deinstall_command>
 		haproxy_custom_php_deinstall_command();
 	</custom_php_deinstall_command>
-	<custom_php_command_before_form>	
+	<custom_php_command_before_form>
 	</custom_php_command_before_form>
 </packagegui>
