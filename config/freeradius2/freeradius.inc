@@ -9,6 +9,10 @@ function freeradius_deinstall_command() {
 	exec("rm -rf /usr/local/etc/raddb/");
 	exec("rm -rf /var/log/raddb/");
 	exec("rm -rf /var/log/radacct/");
+	exec("rm -rf /var/run/radiusd/");
+	exec("rm -f /var/log/radius.log");
+	exec("rm -f /var/log/radutmp");
+	exec("rm -f /var/log/radwtmp");
 }
 
 function freeradius_install_command() {
@@ -66,8 +70,6 @@ function freeradius_settings_resync() {
 	$varsettingsmaxspareservers = $varsettings['varsettingsmaxspareservers'];
 	$varsettingsmaxqueuesize = $varsettings['varsettingsmaxqueuesize'];
 	$varsettingsmaxrequestsperserver = $varsettings['varsettingsmaxrequestsperserver'];
-		
-	
 
 	$conf = <<<EOD
 prefix = /usr/local
@@ -147,7 +149,7 @@ checkrad = \${sbindir}/checkrad
 security 	{
 	max_attributes = $varsettingsmaxattributes
 	reject_delay = $varsettingsrejectdelay
-	status_server = no  						### Needs additional config in raddb/sites-available/status
+	status_server = no  		### Needs additional config in raddb/sites-available/status
 }
 
 proxy_requests = yes
@@ -188,9 +190,9 @@ instantiate {
 
 EOD;
 
-		conf_mount_rw();
+	conf_mount_rw();
 	file_put_contents(RADDB . '/radiusd.conf', $conf);
-        conf_mount_ro();
+	conf_mount_ro();
 	restart_service("freeradius");
 }
 
@@ -205,8 +207,8 @@ $username = $user['username'];
 $password = $user['password'];
 $multiconnect = $user['multiconnect'];
 $ip = $user['ip'];
-        $subnetmask = $user['subnetmask'];
-        $gateway = $user['gateway'];
+$subnetmask = $user['subnetmask'];
+$gateway = $user['gateway'];
 $userexpiration=$user['expiration'];
 $sessiontime=$user['sessiontime'];
 $onlinetime=$user['onlinetime'];
@@ -253,13 +255,13 @@ $atrib
 EOD;
 }
 }
-$filename = RADDB . '/users';
-        conf_mount_rw();
-file_put_contents($filename, $conf);
-chmod($filename, 0600);
+	$filename = RADDB . '/users';
+	conf_mount_rw();
+	file_put_contents($filename, $conf);
+	chmod($filename, 0600);
         conf_mount_ro();
 
-restart_service('freeradius');
+	restart_service('freeradius');
 }
 
 function freeradius_clients_resync() {
