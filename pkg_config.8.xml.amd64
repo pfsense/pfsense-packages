@@ -449,12 +449,36 @@
 		<depends_on_package>postfix-2.8.7,1.tbz</depends_on_package>
 		<depends_on_package>perl-5.10.1_3.tbz</depends_on_package>
 		<depends_on_package_pbi>postfix-2.8.5-amd64.pbi</depends_on_package_pbi>
-		<version>2.8.7,1 pkg v.2.3</version>
+		<version>2.8.7,1 pkg v.2.3.1</version>
 		<status>RC1</status>
 		<required_version>2.0</required_version>
 		<configurationfile>postfix.xml</configurationfile>
 		<build_port_path>/usr/ports/mail/postfix</build_port_path>
 		<build_options>WITH_PCRE=true WITH_SPF=true WITH_SASL2=true WITH_TLS=true</build_options>
+	</package>
+	<package>
+		<name>mailscanner-dev</name>
+		<website>www.mailscanner.info</website>
+		<descr><![CDATA[MailScanner is an e-mail security and anti-spam package for e-mail gateway systems.<br>
+						This is a level3 mail scanning tool with high CPU load.<br>
+						This package requires perl v. 5.10.1_3<br>
+						Do not try with any other version.]]></descr>
+		<category>Services</category>
+		<config_file>http://www.pfsense.com/packages/config/mailscanner/mailscanner.xml</config_file>
+		<pkginfolink>http://forum.pfsense.org/index.php/topic,43687.0.html</pkginfolink>
+		<depends_on_package_base_url>http://ftp-archive.freebsd.org/pub/FreeBSD-Archive/old-releases/amd64/8.2-RELEASE/packages/All/</depends_on_package_base_url>
+		<depends_on_package>MailScanner-4.81.4_2.tbz</depends_on_package>
+		<depends_on_package>pyzor-0.5.0_1.tbz</depends_on_package>
+		<depends_on_package>re2c-0.13.5.tbz</depends_on_package>
+		<depends_on_package>p5-perl-ldap-0.4001.tbz</depends_on_package>
+		<depends_on_package>p5-Mail-SPF-2.007.tbz</depends_on_package>
+		<depends_on_package>p5-IP-Country-2.27.tbz</depends_on_package>
+		<version>4.8.1 pkg v.0.1</version>
+		<status>alpha</status>
+		<required_version>2.0</required_version>
+		<configurationfile>mailscanner.xml</configurationfile>
+		<build_port_path>/usr/ports/mail/mailscanner</build_port_path>
+		<build_options></build_options>
 	</package>
 	<package>
 		<name>siproxd</name>
@@ -778,10 +802,10 @@
 		<website>http://www.freeradius.org/</website>
 		<descr><![CDATA[!!! EXPERIMENTAL !!!<br>
 				freeRADIUS 2.1.12 - The package is based on freeradius 1.1.8 package.<br>
-				DO NOT USE ON PRODUCTIVE SYSTEMS AND NOT TOGETHER WITH freeradius. Both packages are using the same config files]]></descr>
+				DO NOT USE ON PRODUCTION SYSTEMS AND NOT TOGETHER WITH freeradius. Both packages are using the same config files]]></descr>
 		<pkginfolink>http://forum.pfsense.org/index.php/topic,43675.0.html</pkginfolink>
 		<category>System</category>
-		<version>2.1.12 pkg v0.1</version>
+		<version>2.1.12 pkg v0.3</version>
 		<status>Alpha</status>
 		<required_version>2.0</required_version>
 		<maintainer>Nachtfalke</maintainer>
@@ -917,6 +941,23 @@
 		<build_port_path>/usr/ports/sysutils/lcdproc</build_port_path>
 		<build_options>WITH_USB=true</build_options>
 	</package>
+	<package>
+		<name>LCDproc-dev</name>
+		<descr>LCD display driver - Development version</descr>
+		<website>http://www.lcdproc.org/</website>
+		<category>Utility</category>
+		<version>lcdproc-0.5.4 pkg v. 0.1</version>
+		<status>BETA</status>
+		<required_version>2.0</required_version>
+		<maintainer>michele@nt2.it</maintainer>
+		<depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
+		<depends_on_package>lcdproc-0.5.4.tbz</depends_on_package>
+		<depends_on_package_pbi>lcdproc-0.5.4-amd64.pbi</depends_on_package_pbi>
+		<config_file>http://www.pfsense.org/packages/config/lcdproc-dev/lcdproc.xml</config_file>
+		<configurationfile>lcdproc.xml</configurationfile>
+		<build_port_path>/usr/ports/sysutils/lcdproc</build_port_path>
+		<build_options>WITH_USB=true WITH_enable-drivers=all</build_options>
+	</package>	
 	<package>
 		<name>arpwatch</name>
 		<descr>Arpwatch monitors ethernet/ip address pairings. It also logs certain changes to syslog.</descr>
