@@ -138,6 +138,13 @@
 		return($status);
 	}
 	
+	function get_version() {
+		global $g;
+		$version = @file_get_contents("/etc/version");
+		$version = trim($version);
+		return("{$g['product_name']} {$version}");
+	}	
+	
 	function get_cpufrequency(){
 		$cpufreqs = "";
 		exec("/sbin/sysctl -n dev.cpu.0.freq_levels", $cpufreqs);
@@ -473,19 +480,20 @@
 		$lcd_cmds = array();
 		$lcd_cmds[] = "hello";
 		$lcd_cmds[] = "client_set name pfSense";
-		$lcd_cmds[] = "screen_add welcome_scr";
-		$lcd_cmds[] = "screen_set welcome_scr heartbeat off";
-		$lcd_cmds[] = "screen_set welcome_scr name welcome";
-		$lcd_cmds[] = "screen_set welcome_scr duration $refresh_frequency";
-		$lcd_cmds[] = "widget_add welcome_scr title_wdgt title";
-		$lcd_cmds[] = "widget_add welcome_scr text_wdgt scroller";
-		add_summary_declaration($lcd_cmds, "welcome_scr");
-		
+
 		/* process screens to display */
 		if(is_array($lcdproc_screens_config)) {
 			foreach($lcdproc_screens_config as $name => $screen) {
 				if($screen == "on") {
 					switch($name) {
+						case "scr_version":
+							$lcd_cmds[] = "screen_add $name";
+							$lcd_cmds[] = "screen_set $name heartbeat off";
+							$lcd_cmds[] = "screen_set $name name $name";
+							$lcd_cmds[] = "screen_set $name duration $refresh_frequency";
+							$lcd_cmds[] = "widget_add $name title_wdgt string";
+							$lcd_cmds[] = "widget_add $name text_wdgt scroller";
+							break;					
 						case "scr_time":
 							$lcd_cmds[] = "screen_add $name";
 							$lcd_cmds[] = "screen_set $name heartbeat off";
@@ -607,8 +615,6 @@
 		if(empty($g['product_name'])) {
 			$g['product_name'] = "pfSense";
 		}
-		$version = @file_get_contents("/etc/version");
-		$version = trim($version);
 		$refresh_frequency = get_lcdpanel_refresh_frequency();
 		/* keep a counter to see how many times we can loop */
 		$i = 1;
@@ -622,9 +628,9 @@
 				$lcd_summary_data = "";}
 
 			$lcd_cmds = array();
-			$lcd_cmds[] = "widget_set welcome_scr title_wdgt \"Welcome to\"";
-			$lcd_cmds[] = "widget_set welcome_scr text_wdgt 1 2 $lcdpanel_width 2 h 2 \"{$g['product_name']} {$version}\"";
-			add_summary_values($lcd_cmds, "welcome_scr", $lcd_summary_data, $lcdpanel_width);
+			
+			/* initializes the widget counter */
+			$widget_counter = 0;
 			
 			/* process screens to display */
 			foreach((array) $lcdproc_screens_config as $name => $screen) {
@@ -632,6 +638,11 @@
 					continue;
 				}
 				switch($name) {
+					case "scr_version":
+						$version = get_version();
+						$lcd_cmds[] = "widget_set $name title_wdgt 1 1 \"Welcome to\"";
+						$lcd_cmds[] = "widget_set $name text_wdgt 1 2 $lcdpanel_width 2 h 2 \"{$version}\"";
+						break;				
 					case "scr_time":
 						$time = date("n/j/Y H:i");
 						$lcd_cmds[] = "widget_set $name title_wdgt 1 1 \"+ System Time\"";
@@ -701,9 +712,10 @@
 						break;
 				}
 				add_summary_values($lcd_cmds, $name, $lcd_summary_data, $lcdpanel_width);
+				$widget_counter++;
 			}
 			send_lcd_commands($lcd, $lcd_cmds);
-			sleep($refresh_frequency);
+			sleep($refresh_frequency * $widget_counter);
 			$i++;
 		}
 	}
