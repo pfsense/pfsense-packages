@@ -261,6 +261,12 @@
 	</custom_php_resync_config_command>
 	<custom_php_install_command>
 		freeradius_install_command();
+		freeradius_settings_command();
+		freeradius_clients_command();
+		freeradius_users_command();
+		exec("chown -R root:wheel /usr/local/etc/raddb");
+		exec("chown -R root:wheel /usr/local/lib/freeradius-2.1.12");
+		exec("rm -f /usr/local/etc/raddb/sites-enabled/control-socket");
 	</custom_php_install_command>
 	<custom_php_deinstall_command>
 		freeradius_deinstall_command();
