@@ -2,7 +2,7 @@
 <packagegui>
 	<title>Services: LCDproc 0.5.4 pkg v. 0.1</title>
 	<name>lcdproc</name>
-	<version>0.5.4 pkg v. 0.1</version>
+	<version>0.5.4 pkg v. 0.2</version>
 	<savetext>Save</savetext>
 	<include_file>/usr/local/pkg/lcdproc.inc</include_file>
 	<tabs>
@@ -23,17 +23,17 @@
 		<url>/pkg_edit.php?xml=lcdproc.xml&amp;id=0</url>
 	</menu>
 	<additional_files_needed>
-		<item>http://www.pfsense.org/packages/config/lcdproc/lcdproc.inc</item>
+		<item>http://www.pfsense.org/packages/config/lcdproc-dev/lcdproc.inc</item>
 	    <prefix>/usr/local/pkg/</prefix>
 	    <chmod>0755</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
-		<item>http://www.pfsense.org/packages/config/lcdproc/lcdproc_screens.xml</item>
+		<item>http://www.pfsense.org/packages/config/lcdproc-dev/lcdproc_screens.xml</item>
 	    <prefix>/usr/local/pkg/</prefix>
 	    <chmod>0755</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
-		<item>http://www.pfsense.org/packages/config/lcdproc/lcdproc_client.php</item>
+		<item>http://www.pfsense.org/packages/config/lcdproc-dev/lcdproc_client.php</item>
 	    <prefix>/usr/local/pkg/</prefix>
 	    <chmod>0755</chmod>
 	</additional_files_needed>
