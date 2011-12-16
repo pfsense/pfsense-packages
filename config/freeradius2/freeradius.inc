@@ -27,14 +27,7 @@ function freeradius_install_command() {
 		}
 	}
 	
-	exec("chown -R root:wheel /usr/local/etc/raddb");
-	exec("chown -R root:wheel /usr/local/lib/freeradius-2.1.12");
-	// disable an experimental module of freeRADIUS which could be a security issue if not configured correctly!
-	exec("rm -f /usr/local/etc/raddb/sites-enabled/control-socket");
-	
 	closedir($handle);
-
-	freeradius_settings_resync();
 
 	$rcfile = array();
 	$rcfile['file'] = 'radiusd.sh';
