@@ -80,7 +80,7 @@
 			<url>/pkg_edit.php?xml=mailscanner_sync.xml&amp;id=0</url>
 		</tab>
 		<tab>
-			<text>About</text>
+			<text>Help</text>
 			<url>/mailscanner_about.php</url>
 		</tab>	
 		
@@ -89,16 +89,16 @@
 
 	<fields>
 		<field>
-			<name>RBL Checks</name>
+			<name>Spam Checks</name>
 			<type>listtopic</type>
 		</field>
 			<field>
 			<fielddescr>Features</fielddescr>
 			<fieldname>rblfeatures</fieldname>
 			<description>
-			<![CDATA[Select RBL features to enable. Mailscanner default options are in (&nbsp;).<br>
-					<strong>Note: RBL checks are recommended in postfix postscreen daemon.<br>
-					It's not recommended to run it twice.</strong>]]>
+			<![CDATA[Select spam check features to enable.<br>
+					If you unselect <strong>Spam Checks</strong> then *no* spam checks will be done at all.<br>
+       				This includes both MailScanner's own checks and SpamAssassin.]]>
 			</description>
 	    	<type>select</type>
  				<options>
@@ -108,6 +108,17 @@
 				</options>
 				<size>04</size>
 				<multiple/>
+		</field>
+			<field>
+			<fielddescr>Rbl checks</fielddescr>
+			<fieldname>rblchecks</fieldname>
+			<description>
+			<![CDATA[Enable Rbl ckecks on Mailscanner.<br>
+					Rbl ckecks are included in postscreen daemon.<br>
+					For better performance, configure it in postscreen.<br>
+					<strong>It's not recommended to run it twice.</strong>]]>
+			</description>
+	    	<type>checkbox</type>
 		</field>
 		<field>
 			<fielddescr>Spam Lists do be spam</fielddescr>
@@ -142,7 +153,12 @@
 			<fielddescr>Features</fielddescr>
 			<fieldname>safeatures</fieldname>
 			<description>
-			<![CDATA[Select Spamassassin features to enable. Mailscanner default options are in (&nbsp;).]]>
+			<![CDATA[Select Spamassassin features to enable. Mailscanner default options are in (&nbsp;).<br>
+			    	<strong>Bayes</strong> needs a lot o CPU to work properly<br>
+			    	<strong>Razor2</strong> needs access to tcp ports 2703 and 7 (outgoing)<br>
+    				<strong>Pyzor</strong> needs access to udp port 24441 (outgoing)<br>
+    				<strong>DCC</strong> needs access to udp port 6277 (outgoing)<br>
+    				<strong>DNS</strong> access is mandatory for all<br>]]>
 			</description>
 	    	<type>select</type>
  				<options>
@@ -153,8 +169,13 @@
 				<option><name>Spam Score (yes)</name><value>spam_score</value></option>
 				<option><name>Cache SpamAssassin Results (yes)</name><value>cache_spamassassin_results</value></option>
 				<option><name>Wait During Bayes Rebuild (no)</name><value>wait_during_bayes_rebuild</value></option>
+				<option><name>Use Pyzor plugin (yes)</name><value>use_pyzor</value></option>
+				<option><name>Use Razor plugin (yes)</name><value>use_razor</value></option>
+				<option><name>Use DCC plugin (yes)</name><value>use_dcc</value></option>
+				<option><name>Use Bayes (yes)</name><value>use_bayes</value></option>
+				<option><name>Use Bayes Auto Learn (yes)</name><value>use_auto_learn_bayes</value></option>
 				</options>
-				<size>08</size>
+				<size>13</size>
 				<multiple/>
 		</field>
 		<field>

@@ -41,7 +41,7 @@
 	<description>Describe your package here</description>
 	<requirements>Describe your package requirements here</requirements>
 	<faq>Currently there are no FAQ items provided.</faq>
-	<name>mailscanner_sync</name>
+	<name>mailscannersync</name>
 	<version>1.0</version>
 	<title>Services: MailScanner</title>
 	<include_file>/usr/local/pkg/mailscanner.inc</include_file>
@@ -80,7 +80,7 @@
 			<active/>
 		</tab>
 		<tab>
-			<text>About</text>
+			<text>Help</text>
 			<url>/mailscanner_about.php</url>
 		</tab>
 </tabs>

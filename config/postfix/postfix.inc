@@ -351,7 +351,12 @@ EOF;
 	#Header Maps
 	if ($config['installedpackages']['postfixacl']['config'][0]['header_maps']){
 		$postfix_main .= "header_checks = pcre:/usr/local/etc/postfix/header_check\n";
+		$postfix_main .= "header_size_limit = 1024000\n";
 		$header_check = px_text_area_decode($config['installedpackages']['postfixacl']['config'][0]['header_maps']);
+		}
+	#Sender access
+	if ($config['installedpackages']['postfixacl']['config'][0]['sender_access']){
+		$sender_access = px_text_area_decode($config['installedpackages']['postfixacl']['config'][0]['sender_access']);
 		}
 	#MIME Maps
 	if ($config['installedpackages']['postfixacl']['config'][0]['mime_maps']){
@@ -454,6 +459,7 @@ smtpd_recipient_restrictions = permit_mynetworks,
 				reject_unauth_destination,
 				reject_unauth_pipelining,
 				reject_multi_recipient_bounce,
+				check_sender_access hash:/usr/local/etc/postfix/sender_access,
 				SPFSPFSPFRBLRBLRBL
 
 EOF;
@@ -637,13 +643,14 @@ MASTEREOF2;
 	file_put_contents("/usr/local/etc/postfix/main.cf", $postfix_main, LOCK_EX);
 	file_put_contents("/usr/local/etc/postfix/master.cf", $postfix_master, LOCK_EX);
 	file_put_contents("/usr/local/etc/postfix/transport", $transport, LOCK_EX);
+	file_put_contents("/usr/local/etc/postfix/sender_access", $sender_access, LOCK_EX);
 	file_put_contents("/usr/local/etc/postfix/cal_cidr", $cal_cidr, LOCK_EX);
 	file_put_contents("/usr/local/etc/postfix/cal_pcre", $cal_pcre, LOCK_EX);
 	file_put_contents("/usr/local/etc/postfix/header_check", $header_check, LOCK_EX);
 	file_put_contents("/usr/local/etc/postfix/mime_check", $mime_check, LOCK_EX);
 	file_put_contents("/usr/local/etc/postfix/body_check", $body_check, LOCK_EX);
 	file_put_contents("/usr/local/etc/postfix/mynetwork_table", $mynetworks, LOCK_EX);
-	$FILES=array("transport");
+	$FILES=array("transport","sender_access");
 	foreach ($FILES as $file)
 		{
 		mwexec("/usr/local/sbin/postmap /usr/local/etc/postfix/".$file);

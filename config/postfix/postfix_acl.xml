@@ -115,6 +115,23 @@
 			<encoding>base64</encoding>
 		</field>
 		<field>
+			<fielddescr>Sender</fielddescr>
+			<fieldname>sender_access</fieldname>
+			<description><![CDATA[<strong>HASH filters</strong> that implements whitelisting and blacklisting of full or partial email addresses and domains as specified in the MAIL FROM field :<br>
+									myfriend@example.com    OK<br>
+									junk@spam.com           REJECT<br>
+									marketing@              REJECT<br>
+									theboss@                OK<br>
+									deals.marketing.com     REJECT<br>
+									somedomain.com          OK<br>
+								See http://www.postfix.org/postconf.5.html#smtpd_sender_restrictions for more help]]>
+			</description>
+			<type>textarea</type>
+			<cols>83</cols>
+			<rows>15</rows>
+			<encoding>base64</encoding>
+		</field>
+		<field>
 			<fielddescr>MIME</fielddescr>
 			<fieldname>mime_maps</fieldname>
 			<description><![CDATA[<strong>PCRE filters</strong><a href=http://www.postfix.org/pcre_table.5.html> that are applied to MIME related message headers only.</a> Hint:<br>

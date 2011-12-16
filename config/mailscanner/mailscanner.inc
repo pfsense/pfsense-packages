@@ -181,7 +181,7 @@ function sync_package_mailscanner() {
 	$mcp_action=($antispam['mcp_action']?preg_replace("/,/"," ",$antispam['mcp_action']):"deliver");
 	$mcp_hi_action=($antispam['mcp_hi_action']?preg_replace("/,/"," ",$antispam['mcp_hi_action']):"delete");
 	$mcp_max=($antispam['mcp_max']?$antispam['mcp_max']:"200k");
-	
+		
 	/*
 Language Strings = %report-dir%/languages.conf
 */
@@ -328,6 +328,7 @@ Run As Group = postfix
 Queue Scan Interval = 6
 Incoming Queue Dir = /var/spool/postfix/hold
 Outgoing Queue Dir = /var/spool/postfix/incoming
+Incoming Work Dir = /var/spool/MailScanner/incoming
 Quarantine Dir = /var/spool/MailScanner/quarantine
 PID file = /var/run/MailScanner.pid
 Restart Every = 14400
@@ -361,7 +362,7 @@ Max Unsafe Messages Per Scan = 30
 Max Normal Queue Size = 800
 Scan Messages =	{$scan_messages}
 Reject Message = {$reject_message}
-Maximum Processing Attempts = 6
+Maximum Processing Attempts = 10
 Processing Attempts Database = /var/spool/MailScanner/incoming/Processing.db
 Maximum Attachments Per Message = 200
 Expand TNEF = {$expand_tnef}
@@ -411,6 +412,21 @@ Block Encrypted Messages = {$block_encrypted}
 Block Unencrypted Messages = {$block_unencrypted}
 Allow Password-Protected Archives = {$allow_password}
 Check Filenames In Password-Protected Archives = {$check_filenames}
+Monitors for ClamAV Updates = /var/db/clamav/*.cvd
+ClamAVmodule Maximum Recursion Level = 8
+ClamAVmodule Maximum Files = 1000
+ClamAVmodule Maximum File Size = 10000000 # (10 Mbytes)
+ClamAVmodule Maximum Compression Ratio = 25
+Allowed Sophos Error Messages =
+Sophos IDE Dir = /opt/sophos-av/lib/sav
+Sophos Lib Dir = /opt/sophos-av/lib
+Monitors For Sophos Updates = /opt/sophos-av/lib/sav/*.ide
+Clamd Port = 3310
+Clamd Socket = /var/run/clamav/clamd.sock
+Clamd Lock File = # /var/lock/subsys/clamd
+Clamd Use Threads = no
+ClamAV Full Message Scan = yes
+Fpscand Port = 10200
 {$custom_antivirus_options}
 
 #
@@ -459,6 +475,7 @@ Archives: Allow File MIME Types =
 Archives: Deny Filetypes =
 Archives: Deny File MIME Types =
 Archives: Filetype Rules = %etc-dir%/archives.filetype.rules.conf
+Default Rename Pattern = __FILENAME__.disarmed
 
 #
 # Reports and Responses
@@ -555,6 +572,7 @@ Virus Subject Text = [Virus?]
 Filename Modify Subject = start
 Filename Subject Text = [Filename?]
 Content Modify Subject = start
+Content Subject Text = [Dangerous Content?]
 Size Modify Subject = start
 Size Subject Text = [Size]
 Disarmed Modify Subject = start
@@ -678,7 +696,7 @@ Sender SpamAssassin Report = %report-dir%/sender.spam.sa.report.txt
 Inline Spam Warning = %report-dir%/inline.spam.warning.txt
 Recipient Spam Report = %report-dir%/recipient.spam.report.txt
 Enable Spam Bounce = %rules-dir%/bounce.rules
-
+Bounce Spam As Attachment = no
 #
 # Logging
 # -------
@@ -754,7 +772,7 @@ Sender MCP Report = %report-dir%/sender.mcp.report.txt
 Use Default Rules With Multiple Recipients = {$default_rule_multiple}
 Read IP Address From Received Header = {$read_ipaddress}
 Spam Score Number Format = {$spam_score_format}
-MailScanner Version Number = 4.79.11
+MailScanner Version Number = 4.83.5
 SpamAssassin Cache Timings = {$cache_timings}
 Debug = {$debug}
 Debug SpamAssassin = {$debug_spam}
@@ -777,14 +795,6 @@ include /usr/local/etc/MailScanner/conf.d/*
 EOF;
 	#write files
 	conf_mount_rw();
-	$mlang=strtolower($report['language']);
-	$mfiles[]="/usr/local/etc/MailScanner/virus.scanners.conf";
-	$mfiles[]="/usr/local/share/MailScanner/reports/{$mlang}/inline.spam.warning.txt";
-	$mfiles[]="/usr/local/share/MailScanner/reports/{$mlang}/languages.conf";
-	
-	foreach ($mfiles as $mfile)
-		if (! file_exists ($mfile))
-			copy($mfile.".sample",$mfile);
 	if (!is_dir("/var/spool/MailScanner/incoming")){
 		mkdir("/var/spool/MailScanner/incoming", 0755,true);
 		chown ('/var/spool/MailScanner/incoming','postfix');
@@ -794,7 +804,96 @@ EOF;
 		chown ('/var/spool/MailScanner/quarantine','postfix');
 		}
 	chown ('/var/spool/postfix','postfix');
+	
+	$mlang=strtolower($report['language']);
+	$mfiles[]="/usr/local/etc/MailScanner/virus.scanners.conf";
+	$mfiles[]="/usr/local/share/MailScanner/reports/{$mlang}/inline.spam.warning.txt";
+	$mfiles[]="/usr/local/share/MailScanner/reports/{$mlang}/languages.conf";
+	
+	foreach ($mfiles as $mfile)
+		if (! file_exists ($mfile))
+			copy($mfile.".sample",$mfile);
+			
 
+	#update spam.assassin.prefs.conf
+	$sa_temp=ms_text_area_decode($config['installedpackages']['msantispam']['config'][0]['sa_pref_file']);
+	$pattern[0]='/#ifplugin/';
+	$pattern[1]='/#pyzor_path/';
+	$pattern[2]='/usr.bin.pyzor/';
+	$pattern[3]='/#dcc_path/';
+	$pattern[4]='/#endif/';
+	$replacement[0]="ifplugin";
+	$replacement[1]="pyzor_path";
+	$replacement[2]="usr/local/bin/pyzor";
+	$replacement[3]="dcc_path";
+	$replacement[4]="endif";
+	if (preg_match('/use_razor/',$antispam['safeatures'])){
+			$pattern[5]='/\nuse_razor2\s+0/';
+			$replacement[5]="\n".'# use_razor2		0';
+			}
+	else{
+		$pattern[5]='/\n#\s+use_razor2\s+0/';
+		$replacement[5]="\n".'use_razor2		0';
+		}
+	if (preg_match('/use_dcc/',$antispam['safeatures'])){
+		$pattern[6]='/\nuse_dcc\s+0/';
+		$replacement[6]="\n".'# use_dcc		0';
+		}
+	else{
+		$pattern[6]='/\n#\s+use_dcc\s+0/';
+		$replacement[6]="\n".'use_dcc		0';
+		}
+	if (preg_match('/use_pyzor/',$antispam['safeatures'])){
+		$pattern[7]='/\nuse_pyzor\s+0/';
+		$replacement[7]="\n".'# use_pyzor	0';
+		}
+	else{
+		$pattern[7]='/\n#\s+use_pyzor\s+0/';
+		$replacement[7]="\n".'# use_pyzor		0';
+		}
+	if (preg_match('/use_auto_learn_bayes/',$antispam['safeatures'])){
+		$pattern[8]='/\nbayes_auto_learn\s+0/';
+		$replacement[8]="\n".'# bayes_auto_learn	0';
+		}
+	else{
+		$pattern[8]='/\n#\s+bayes_auto_learn\s+0/';
+		$replacement[8]="\n".'bayes_auto_learn	0';
+		}
+	if (preg_match('/use_bayes/',$antispam['safeatures'])){
+		$pattern[9]='/\nuse_bayes\s+0/';
+		$replacement[9]="\n".'# use_bayes	0';
+		}
+	else{
+		$pattern[9]='/\n#\s+use_bayes\s+0/';
+		$replacement[9]="\n".'use_bayes	0';
+		}
+	if (preg_match('/sa_auto_whitelist/',$antispam['safeatures'])){
+		$pattern[10]='/\nuse_auto_whitelist\s+0/';
+		$replacement[10]="\n".'# use_auto_whitelist 0';
+		}
+	else{
+		$pattern[10]='/\n#\s*use_auto_whitelist 0/';
+		$replacement[10]="\n".'use_auto_whitelist	0';
+		}
+	if ($antispam['rblchecks']){
+		$pattern[11]='/\nskip_rbl_checks\s+1/';
+		$replacement[11]="\n".'# skip_rbl_checks	1';
+		}
+	else{
+		$pattern[11]='/\n#\s+skip_rbl_checks\s+\d/';
+		$replacement[11]="\n".'skip_rbl_checks	1';
+		}
+	$pattern[12]='/bayes_ignore_header ([a-zA-Z0-9_.-]+)MailScanner/';
+	$replacement[12]="bayes_ignore_header ".($mailscanner['orgname']!=""?$mailscanner['orgname']:"pfsense")."-MailScanner";
+	$pattern[13]='/envelope_sender_header X([a-zA-Z0-9_.-]+)MailScanner-From/';
+	$replacement[13]="envelope_sender_header X-".($mailscanner['orgname']!=""?$mailscanner['orgname']:"pfsense")."-MailScanner-From";
+	
+	
+	$sa_temp=preg_replace($pattern,$replacement,$sa_temp);
+	#rint "pre".$sa_temp;exit;
+	$config['installedpackages']['msantispam']['config'][0]['sa_pref_file']=base64_encode($sa_temp);
+	write_config();
+	
 	file_put_contents($mailscanner_dir."/MailScanner.conf", $mc, LOCK_EX);
 	file_put_contents($mailscanner_dir."/filename.rules.conf",ms_text_area_decode($config['installedpackages']['msattachments']['config'][0]['filename_rules']),LOCK_EX);
 	file_put_contents($mailscanner_dir."/filetype.rules.conf",ms_text_area_decode($config['installedpackages']['msattachments']['config'][0]['filetype_rules']),LOCK_EX);
@@ -803,7 +902,7 @@ EOF;
 	file_put_contents($mailscanner_dir."/phishing.safe.sites.conf",ms_text_area_decode($config['installedpackages']['mscontent']['config'][0]['phishing_safe']),LOCK_EX);
 	file_put_contents($mailscanner_dir."/phishing.bad.sites.conf",ms_text_area_decode($config['installedpackages']['mscontent']['config'][0]['phishing_bad']),LOCK_EX);
 	file_put_contents($mailscanner_dir."/country.domains.conf",ms_text_area_decode($config['installedpackages']['mscontent']['config'][0]['country_domains']),LOCK_EX);
-	file_put_contents($mailscanner_dir.'/spam.assassin.prefs.conf',ms_text_area_decode($config['installedpackages']['msantispam']['config'][0]['sa_pref_file']),LOCK_EX);
+	file_put_contents($mailscanner_dir.'/spam.assassin.prefs.conf',$sa_temp,LOCK_EX);
 	file_put_contents($mailscanner_dir.'/spam.lists.conf',ms_text_area_decode($config['installedpackages']['msantispam']['config'][0]['rbl_file']),LOCK_EX);
 	file_put_contents($mailscanner_dir.'/mcp/mcp.spam.assassin.prefs.conf',ms_text_area_decode($config['installedpackages']['msantispam']['config'][0]['mcp_pref_file']),LOCK_EX);
 	file_put_contents($mailscanner_dir.'/rules/bounce.rules',ms_text_area_decode($config['installedpackages']['msantispam']['config'][0]['bounce']),LOCK_EX);
@@ -839,6 +938,22 @@ EOF;
 			unlink_if_exists($libexec_dir.'clamav-wrapper');
 		}
 		else{
+			chown('/var/run/clamav/', 'postfix');
+			chown('/var/log/clamav/', 'postfix');
+			chown('/var/db/clamav/', 'postfix');
+			if (file_exists('/var/db/clamav/bytecode.cld'))
+				chown('/var/db/clamav/bytecode.cld', 'postfix');
+			if (file_exists('/var/db/clamav/daily.cld'))
+				chown('/var/db/clamav/daily.cld', 'postfix');
+			if (file_exists('/var/db/clamav/main.cvd'))
+				chown('/var/db/clamav/main.cvd', 'postfix');
+			if (file_exists('/var/db/clamav/mirrors.dat'))
+				chown('/var/db/clamav/mirrors.dat', 'postfix');
+			if (file_exists('/var/log/clamav/clamd.log'))
+				chown('/var/log/clamav/clamd.log', 'postfix');
+			if (file_exists('/var/log/clamav/freshclam.log'))
+				chown('/var/log/clamav/freshclam.log', 'postfix');
+			
 			copy($libexec_dir.'clamav-autoupdate.sample',$libexec_dir.'clamav-autoupdate');
 			chmod ($libexec_dir.'clamav-autoupdate',0755);
 			copy($libexec_dir.'clamav-wrapper.sample',$libexec_dir.'clamav-wrapper');
@@ -847,6 +962,39 @@ EOF;
 				log_error('No clamav database found, running freshclam in background.');
 				mwexec_bg('/usr/local/bin/freshclam');
 				}
+			#clamav-wrapper file
+			$cconf=$libexec_dir."clamav-wrapper";
+			$cconf_file=file_get_contents($cconf);
+			if (preg_match('/"clamav"/',$cconf_file)){
+				$cconf_file=preg_replace('/"clamav"/','"postfix"',$cconf_file);
+				file_put_contents($cconf, $cconf_file, LOCK_EX);
+				}
+				
+			#freshclam conf file
+			$cconf="/usr/local/etc/freshclam.conf";
+			$cconf_file=file_get_contents($cconf);
+			if (preg_match('/DatabaseOwner clamav/',$cconf_file)){
+				$cconf_file=preg_replace("/DatabaseOwner clamav/","DatabaseOwner postfix",$cconf_file);
+				file_put_contents($cconf, $cconf_file, LOCK_EX);
+				}
+				
+			#clamd conf file
+			$cconf="/usr/local/etc/clamd.conf";
+			$cconf_file=file_get_contents($cconf);
+			if (preg_match('/User clamav/',$cconf_file)){
+				$cconf_file=preg_replace("/User clamav/","User postfix",$cconf_file);
+				file_put_contents($cconf, $cconf_file, LOCK_EX);
+				}
+			#clamd script file
+			$script='/usr/local/etc/rc.d/clamav-clamd';
+			$script_file=file_get_contents($script);
+			if (preg_match('/NO/',$script_file)){
+				$script_file=preg_replace("/NO/","YES",$script_file);
+				file_put_contents($script, $script_file, LOCK_EX);
+				chmod ($script,0755);
+				}
+			mwexec_bg("$script fastrestart");
+				
 		}
 	}
 	else{
@@ -854,7 +1002,39 @@ EOF;
 		unlink_if_exists($libexec_dir.'clamav-wrapper');
 	}
 	
+	#check dcc startup script
+			$script='/usr/local/etc/rc.d/dccifd';
+			$script_file=file_get_contents($script);
+			if (preg_match('/NO/',$script_file)){
+				$script_file=preg_replace("/NO/","YES",$script_file);
+				file_put_contents($script, $script_file, LOCK_EX);
+				chmod ($script,0755);
+				}
+			mwexec_bg("$script fastrestart");
+	#check dcc config file
+			$script='/usr/local/dcc/dcc_conf';
+			$script_file=file_get_contents($script);
+			if (preg_match('/DCCIFD_ENABLE=off/',$script_file)){
+				$script_file=preg_replace("/DCCIFD_ENABLE=off/","DCCIFD_ENABLE=on",$script_file);
+				file_put_contents($script, $script_file, LOCK_EX);
+				}
+			
 	$script='/usr/local/etc/rc.d/mailscanner';
+
+	#fix MIME::ToolUtils deprecated function and usecure dependency calls in /usr/local/sbin/mailscanner
+	$cconf="/usr/local/sbin/mailscanner";
+	$cconf_file=file_get_contents($cconf);
+	$pattern2[0]='/perl\W+I/';
+	$pattern2[1]='/\smy .current = config MIME::ToolUtils/';
+	$replacement2[0]='perl -U -I';
+	$replacement2[1]=' #my $current = config MIME::ToolUtils';
+	if (preg_match('/perl\W+I/',$cconf_file)){
+		$cconf_file=preg_replace($pattern2,$replacement2,$cconf_file);
+		file_put_contents($cconf, $cconf_file, LOCK_EX);
+		#force old process stop	
+		mwexec("$script stop");
+		}	
+	
 	$script_file=file_get_contents($script);
 	if (preg_match('/NO/',$script_file)){
 		$script_file=preg_replace("/NO/","YES",$script_file);
@@ -871,6 +1051,20 @@ EOF;
 		chmod ($script,0444);
 	}
 	conf_mount_ro();
+	$synconchanges = $config['installedpackages']['mailscannersync']['config'][0]['synconchanges'];
+	if(!$synconchanges && !$syncondbchanges) 
+		return;
+	log_error("[mailscanner] mailscanner_xmlrpc_sync.php is starting.");
+	foreach ($config['installedpackages']['mailscannersync']['config'] as $rs ){
+		foreach($rs['row'] as $sh){
+		$sync_to_ip = $sh['ipaddress'];
+		$password   = $sh['password'];
+		$sync_type = $sh['sync_type'];
+		if($password && $sync_to_ip)
+			mailscanner_do_xmlrpc_sync($sync_to_ip, $password,$sync_type);
+		}
+	}
+	log_error("[postfix] postfix_xmlrpc_sync.php is ending.");
 
 }
 
@@ -900,6 +1094,106 @@ function mailscanner_php_deinstall_command() {
 	conf_mount_rw();
 	unlink_if_exists("/usr/local/etc/rc.d/mailscanner.sh");
 	conf_mount_ro();
+}
+
+function mailscanner_do_xmlrpc_sync($sync_to_ip, $password,$sync_type) {
+	global $config, $g;
+
+	if(!$password)
+		return;
+
+	if(!$sync_to_ip)
+		return;
+
+	$xmlrpc_sync_neighbor = $sync_to_ip;
+    if($config['system']['webgui']['protocol'] != "") {
+		$synchronizetoip = $config['system']['webgui']['protocol'];
+		$synchronizetoip .= "://";
+    }
+    $port = $config['system']['webgui']['port'];
+    /* if port is empty lets rely on the protocol selection */
+    if($port == "") {
+		if($config['system']['webgui']['protocol'] == "http") 
+			$port = "80";
+		else 
+			$port = "443";
+    }
+	$synchronizetoip .= $sync_to_ip;
+
+	/* xml will hold the sections to sync */
+	$xml = array();
+	$sync_xml=$config['installedpackages']['mailscannersync']['config'][0]['synconchanges'];
+	if ($sync_xml){
+		log_error("Include mailscanner config");
+		$xml['mailscanner'] = $config['installedpackages']['mailscanner'];
+		$xml['msreport'] = $config['installedpackages']['msreport'];
+		$xml['mscontent'] = $config['installedpackages']['mscontent'];
+		$xml['msantivirus'] = $config['installedpackages']['msantivirus'];
+		$xml['msantispam'] = $config['installedpackages']['msantispam'];
+		$xml['msalerts'] = $config['installedpackages']['msalerts'];
+		}
+	if (count($xml) > 0){
+		/* assemble xmlrpc payload */
+		$params = array(
+			XML_RPC_encode($password),
+			XML_RPC_encode($xml)
+		);
+	
+		/* set a few variables needed for sync code borrowed from filter.inc */
+		$url = $synchronizetoip;
+		log_error("Beginning mailscanner XMLRPC sync to {$url}:{$port}.");
+		$method = 'pfsense.merge_installedpackages_section_xmlrpc';
+		$msg = new XML_RPC_Message($method, $params);
+		$cli = new XML_RPC_Client('/xmlrpc.php', $url, $port);
+		$cli->setCredentials('admin', $password);
+		if($g['debug'])
+			$cli->setDebug(1);
+		/* send our XMLRPC message and timeout after 250 seconds */
+		$resp = $cli->send($msg, "250");
+		if(!$resp) {
+			$error = "A communications error occurred while attempting mailscanner XMLRPC sync with {$url}:{$port}.";
+			log_error($error);
+			file_notice("sync_settings", $error, "Mailscanner Settings Sync", "");
+		} elseif($resp->faultCode()) {
+			$cli->setDebug(1);
+			$resp = $cli->send($msg, "250");
+			$error = "An error code was received while attempting mailscanner XMLRPC sync with {$url}:{$port} - Code " . $resp->faultCode() . ": " . $resp->faultString();
+			log_error($error);
+			file_notice("sync_settings", $error, "mailscanner Settings Sync", "");
+		} else {
+			log_error("mailscanner XMLRPC sync successfully completed with {$url}:{$port}.");
+		}
+		
+		/* tell postfix to reload our settings on the destionation sync host. */
+		$method = 'pfsense.exec_php';
+		$execcmd  = "require_once('/usr/local/pkg/mailscanner.inc');\n";
+		$execcmd .= "sync_package_mailscanner();";
+		
+		/* assemble xmlrpc payload */
+		$params = array(
+			XML_RPC_encode($password),
+			XML_RPC_encode($execcmd)
+		);
+	
+		log_error("mailscanner XMLRPC reload data {$url}:{$port}.");
+		$msg = new XML_RPC_Message($method, $params);
+		$cli = new XML_RPC_Client('/xmlrpc.php', $url, $port);
+		$cli->setCredentials('admin', $password);
+		$resp = $cli->send($msg, "250");
+		if(!$resp) {
+			$error = "A communications error occurred while attempting mailscanner XMLRPC sync with {$url}:{$port} (pfsense.exec_php).";
+			log_error($error);
+			file_notice("sync_settings", $error, "mailscanner Settings Sync", "");
+		} elseif($resp->faultCode()) {
+			$cli->setDebug(1);
+			$resp = $cli->send($msg, "250");
+			$error = "An error code was received while attempting mailscanner XMLRPC sync with {$url}:{$port} - Code " . $resp->faultCode() . ": " . $resp->faultString();
+			log_error($error);
+			file_notice("sync_settings", $error, "mailscanner Settings Sync", "");
+		} else {
+			log_error("mailscanner XMLRPC reload data success with {$url}:{$port} (pfsense.exec_php).");
+		}
+	}
 }
 
 ?>

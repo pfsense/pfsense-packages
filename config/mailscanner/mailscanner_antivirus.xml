@@ -80,7 +80,7 @@
 			<url>/pkg_edit.php?xml=mailscanner_sync.xml&amp;id=0</url>
 		</tab>
 		<tab>
-			<text>About</text>
+			<text>Help</text>
 			<url>/mailscanner_about.php</url>
 		</tab>
 </tabs>
@@ -115,6 +115,7 @@
  				<options>
  				<option><name>auto</name><value>auto</value></option>
  				<option><name>clamav</name><value>clamav</value></option>
+ 				<option><name>clamd</name><value>clamd</value></option>
 				<option><name>none</name><value>none</value></option>
 				</options>
 			<description><![CDATA[Do you want to scan email for viruses?]]>

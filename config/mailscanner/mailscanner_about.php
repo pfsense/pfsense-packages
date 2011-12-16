@@ -60,7 +60,7 @@ include("head.inc");
 	$tab_array[] = array(gettext("Alerts"), false, "/pkg_edit.php?xml=mailscanner_alerts.xml&id=0");
 	$tab_array[] = array(gettext("Reporting"), false, "/pkg_edit.php?xml=mailscanner_report.xml&id=0");
 	$tab_array[] = array(gettext("XMLRPC Sync"), false, "/pkg_edit.php?xml=mailscanner_sync.xml&id=0");
-	$tab_array[] = array(gettext("About"), true, "/mailscanner_about.php");
+	$tab_array[] = array(gettext("Help"), true, "/mailscanner_about.php");
 	display_top_tabs($tab_array);
 ?>
 		</td></tr>
@@ -71,6 +71,17 @@ include("head.inc");
 					<table class="tabcont" width="100%" border="0" cellpadding="8" cellspacing="0">
 					<tr><td></td></tr>
 						<tr>
+						<td colspan="2" valign="top" class="listtopic"><?=gettext("Help docs"); ?></td>
+						</tr>
+						<tr>
+                        <td width="22%" valign="top" class="vncell"><?=gettext("FAQ ");?></td>
+						<td width="78%" class="vtable"><?=gettext("<a target=_new href='http://www.mailscanner.info/wiki/doku.php?id=maq:index'>Most Asked Questions</a><br><br>");?>
+                        </tr>
+						<tr>
+                        <td width="22%" valign="top" class="vncell"><?=gettext("Performance ");?></td>
+                        <td width="78%" class="vtable"><?=gettext("<a target=_new href='http://wiki.apache.org/spamassassin/FasterPerformance'>How do I get SpamAssassin to run faster?</a><br><br>");?></td>
+                        </tr>
+                        <tr>
 						<td colspan="2" valign="top" class="listtopic"><?=gettext("About Mailscanner package"); ?></td>
 						</tr>
 						<tr>
