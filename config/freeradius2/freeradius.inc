@@ -29,6 +29,8 @@ function freeradius_install_command() {
 	
 	exec("chown -R root:wheel /usr/local/etc/raddb");
 	exec("chown -R root:wheel /usr/local/lib/freeradius-2.1.12");
+	// disable an experimental module of freeRADIUS which could be a security issue if not configured correctly!
+	exec("rm -f /usr/local/etc/raddb/sites-enabled/control-socket");
 	
 	closedir($handle);
 
@@ -146,14 +148,15 @@ log {
 }
 
 checkrad = \${sbindir}/checkrad
-security 	{
+security {
 	max_attributes = $varsettingsmaxattributes
 	reject_delay = $varsettingsrejectdelay
 	status_server = no  		### Needs additional config in raddb/sites-available/status
 }
 
-proxy_requests = yes
-\$INCLUDE  proxy.conf
+### disbale proxy module. In most environments we do not need to proxy requests to another RADIUS PROXY server
+#proxy_requests = yes
+#\$INCLUDE  proxy.conf
 \$INCLUDE  clients.conf
 thread pool {
 	start_servers = $varsettingsstartservers
@@ -259,7 +262,7 @@ EOD;
 	conf_mount_rw();
 	file_put_contents($filename, $conf);
 	chmod($filename, 0600);
-        conf_mount_ro();
+	conf_mount_ro();
 
 	restart_service('freeradius');
 }
@@ -296,11 +299,11 @@ client $varclientshortname {
 	shortname = $varclientshortname
 
 		### Optional: Used by checkrad.pl for simultaneous use checks. Default: other
-	nastype     = $varclientnastype
+	nastype = $varclientnastype
 
 		### Optional: will be used in future releases
-	#login       = !root
-	#password    = someadminpas
+	#login = !root
+	#password = someadminpas
 							
 		### Additional configuration needed. See: raddb/sites-available/originate-coa
 	#virtual_server = home1
