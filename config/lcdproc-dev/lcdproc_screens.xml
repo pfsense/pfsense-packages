@@ -24,6 +24,11 @@
 	</menu>
 	<fields>
 		<field>
+			<fielddescr>Enable Version</fielddescr>
+			<fieldname>scr_version</fieldname>
+			<type>checkbox</type>
+		</field>	
+		<field>
 			<fielddescr>Enable Time</fielddescr>
 			<fieldname>scr_time</fieldname>
 			<type>checkbox</type>
