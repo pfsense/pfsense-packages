@@ -78,6 +78,15 @@ include("head.inc");
 						<td width="78%" class="vtable"><?=gettext("<a target=_new href='http://www.mailscanner.info/wiki/doku.php?id=maq:index'>Most Asked Questions</a><br><br>");?>
                         </tr>
 						<tr>
+                        <td width="22%" valign="top" class="vncell"><?=gettext("Help Index");?></td>
+						<td width="78%" class="vtable"><?=gettext("<a target=_new href='http://www.mailscanner.info/MailScanner.conf.index.html'>Mailscanner Configuration Index</a><br><br>");?>
+                        </tr>
+						<tr>
+                        <td width="22%" valign="top" class="vncell"><?=gettext("Getting the best");?></td>
+						<td width="78%" class="vtable"><?=gettext("<a target=_new href='http://www.mailscanner.info/gettingthebest.html'>Getting The Best Out Of MailScanner</a><br><br>");?>
+                        </tr>
+                        
+						<tr>
                         <td width="22%" valign="top" class="vncell"><?=gettext("Performance ");?></td>
                         <td width="78%" class="vtable"><?=gettext("<a target=_new href='http://wiki.apache.org/spamassassin/FasterPerformance'>How do I get SpamAssassin to run faster?</a><br><br>");?></td>
                         </tr>
