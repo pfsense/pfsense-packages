@@ -49,7 +49,7 @@
 		if((int)exec('pgrep LCDd | wc -l') > 0)
 			return true;
 		return false;
-	}	
+	}
 
 	function lcdproc_write_config($file, $text) {
 		$handle = fopen($file, 'w');
@@ -75,16 +75,16 @@
 	function before_form_lcdproc($pkg) {
 		global $config;
 
-		config_lock();		
-		
+		config_lock();
+
 		config_unlock();
 	}
 
 	function before_form_lcdproc_screens($pkg) {
 		global $config;
 
-		config_lock();		
-		
+		config_lock();
+
 		config_unlock();
 	}
 
@@ -147,6 +147,9 @@
 					continue;
 					break;
 				case "20x4":
+					continue;
+					break;
+				case "40x2":
 					continue;
 					break;
 				default:
@@ -228,12 +231,12 @@
 			$config_text .= "DownKey=Down\n";
 
 			/* lcdproc default driver definitions */
-			switch($lcdproc_config[driver]) {	
+			switch($lcdproc_config[driver]) {
 				case "bayrad":
 					$config_text .= "[{$lcdproc_config['driver']}]\n";
 					$config_text .= "Device={$realport}\n";
 					$config_text .= "Speed=9600\n";
-					break;				
+					break;
 				case "CFontz":
 					$config_text .= "[{$lcdproc_config['driver']}]\n";
 					$config_text .= "Device={$realport}\n";
@@ -292,6 +295,18 @@
 					$config_text .= "OffBrightness=0\n";
 					$config_text .= "Brightness=500\n";
 					break;
+				case "EyeboxOne":
+					$config_text .= "[{$lcdproc_config['driver']}]\n";
+					$config_text .= "Device={$realport}\n";
+					$config_text .= "Backlight=yes\n";
+					$config_text .= "Speed=19200\n";
+					break;
+				case "glk":
+					$config_text .= "[{$lcdproc_config['driver']}]\n";
+					$config_text .= "Device={$realport}\n";
+					$config_text .= "Contrast=560\n";
+					$config_text .= "Speed=19200\n";
+					break;
 				case "hd44780":
 					$config_text .= "[{$lcdproc_config['driver']}]\n";
 					$config_text .= "driverpath=/usr/local/lib/lcdproc/\n";
@@ -307,13 +322,78 @@
 					$config_text .= "DelayMult=1\n";
 					$config_text .= "DelayBus=true\n";
 					$config_text .= "Size={$lcdproc_config['size']}\n";
-					break;						
+					break;
+				case "icp_a106":
+					$config_text .= "[{$lcdproc_config['driver']}]\n";
+					$config_text .= "Device={$realport}\n";
+					break;
+				case "IOWarrior":
+					$config_text .= "[{$lcdproc_config['driver']}]\n";
+					$config_text .= "Size={$lcdproc_config['size']}\n";
+					break;
+				case "lb216":
+					$config_text .= "[{$lcdproc_config['driver']}]\n";
+					$config_text .= "Device={$realport}\n";
+					$config_text .= "Brightness=255\n";
+					$config_text .= "Speed=9600\n";
+					$config_text .= "Reboot=no\n";
+					break;
+				case "lcdm001":
+					$config_text .= "[{$lcdproc_config['driver']}]\n";
+					$config_text .= "Device={$realport}\n";
+					break;
+				case "lcterm":
+					$config_text .= "[{$lcdproc_config['driver']}]\n";
+					$config_text .= "Device={$realport}\n";
+					$config_text .= "Size={$lcdproc_config['size']}\n";
+					break;
+				case "MD8800":
+					$config_text .= "[{$lcdproc_config['driver']}]\n";
+					$config_text .= "Device={$realport}\n";
+					$config_text .= "Size={$lcdproc_config['size']}\n";
+					$config_text .= "Brightness=1000\n";
+					$config_text .= "OffBrightness=0\n";
+					break;
+				case "ms6931":
+					$config_text .= "[{$lcdproc_config['driver']}]\n";
+					$config_text .= "Device={$realport}\n";
+					$config_text .= "Brightness=255\n";
+					$config_text .= "Reboot=no\n";
+					break;
+				case "mtc_s16209x":
+					$config_text .= "[{$lcdproc_config['driver']}]\n";
+					$config_text .= "Device={$realport}\n";
+					$config_text .= "Brightness=255\n";
+					$config_text .= "Reboot=no\n";
+					break;
+				case "MtxOrb":
+					$config_text .= "[{$lcdproc_config['driver']}]\n";
+					$config_text .= "Device={$realport}\n";
+					$config_text .= "Size={$lcdproc_config['size']}\n";
+					$config_text .= "Contrast=480\n";
+					$config_text .= "Type=lcd\n";
+					$config_text .= "hasAdjustableBacklight=yes\n";
+					$config_text .= "Reboot=no\n";
+					$config_text .= "Brightness=1000\n";
+					$config_text .= "OffBrightness=0\n";
+					$config_text .= "Speed=19200\n";
+					break;
 				case "nexcom":
 					$config_text .= "[{$lcdproc_config['driver']}]\n";
 					$config_text .= "driverpath =/usr/local/lib/lcdproc/\n";
 					$config_text .= "Device={$realport}\n";
 					$config_text .= "Size={$lcdproc_config['size']}\n";
-					break;		
+					break;
+				case "NoritakeVFD":
+					$config_text .= "[{$lcdproc_config['driver']}]\n";
+					$config_text .= "Device={$realport}\n";
+					$config_text .= "Size={$lcdproc_config['size']}\n";
+					$config_text .= "Brightness=1000\n";
+					$config_text .= "OffBrightness=0\n";
+					$config_text .= "Speed=9600\n";
+					$config_text .= "Parity=0\n";
+					$config_text .= "Reboot=no\n";
+					break;
 				case "picolcd":
 					$config_text .= "[{$lcdproc_config['driver']}]\n";
 					$config_text .= "driverpath=/usr/local/lib/lcdproc/\n";
@@ -336,15 +416,47 @@
 					$config_text .= "Device={$realport}\n";
 					$config_text .= "Size={$lcdproc_config['size']}\n";
 					break;
+				case "sed1330":
+					$config_text .= "[{$lcdproc_config['driver']}]\n";
+					break;
+				case "sed1520":
+					$config_text .= "[{$lcdproc_config['driver']}]\n";
+					break;
+				case "serialPOS":
+					$config_text .= "[{$lcdproc_config['driver']}]\n";
+					$config_text .= "Device={$realport}\n";
+					$config_text .= "Size={$lcdproc_config['size']}\n";
+					$config_text .= "Type=AEDEX\n";
+					$config_text .= "Speed=9600\n";
+					break;
+				case "serialVFD":
+					$config_text .= "[{$lcdproc_config['driver']}]\n";
+					$config_text .= "use_parallel=no\n";
+					$config_text .= "Device={$realport}\n";
+					$config_text .= "Size={$lcdproc_config['size']}\n";
+					$config_text .= "Type=0\n";  //Just the first
+					$config_text .= "Brightness=1000\n";
+					$config_text .= "OffBrightness=0\n";
+					$config_text .= "Speed=9600\n";
+					$config_text .= "ISO_8859_1=yes\n";
+					break;
+				case "shuttleVFD":
+					$config_text .= "[{$lcdproc_config['driver']}]\n";
+					break;
 				case "SureElec":
 					$config_text .= "[{$lcdproc_config['driver']}]\n";
 					$config_text .= "driverpath =/usr/local/lib/lcdproc/\n";
 					$config_text .= "Device={$realport}\n";
 					$config_text .= "Size={$lcdproc_config['size']}\n";
-					$config_text .= "Edition=2\n";					
+					$config_text .= "Edition=2\n";
 					$config_text .= "Contrast=200\n";
-					$config_text .= "Brightness=480\n";	
+					$config_text .= "Brightness=480\n";
 					$config_text .= "Speed=19200\n";
+					break;
+				case "sli":
+					$config_text .= "[{$lcdproc_config['driver']}]\n";
+					$config_text .= "Device={$realport}\n";
+					$config_text .= "Speed=9600\n";
 					break;
 				default:
 					lcdproc_warn("The chosen lcdproc driver is not a valid choice");
@@ -370,12 +482,12 @@ EOD;
 			$stop = <<<EOD
 
 if [ `ps auxw |awk '/LCD[d]/ {print $2}'| wc -l` != 0  ]; then
-	ps auxw |awk '/LCD[d]/ {print $2}'|xargs kill 
-	sleep 1	
+	ps auxw |awk '/LCD[d]/ {print $2}'|xargs kill
+	sleep 1
 fi
 if [ `ps auxw |awk '/lcdclient.s[h]/ {print $2}'| wc -l` != 0  ]; then
 	ps auxw |awk '/lcdclient.s[h]/ {print $2}'|xargs kill
-	sleep 1	
+	sleep 1
 fi
 
 EOD;
