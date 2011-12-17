@@ -32,8 +32,9 @@
 	 */
 	require_once("config.inc");
 	require_once("functions.inc");
+	require_once("interfaces.inc");
 	require_once("/usr/local/pkg/lcdproc.inc");
-
+	
 	function get_pfstate() {
 		global $config;
 		$matches = "";
@@ -70,25 +71,12 @@
 		return $memUsage;
 	}
 
-	/*function array_combine($arr1, $arr2) {
-		$out = array();
-
-		$arr1 = array_values($arr1);
-		$arr2 = array_values($arr2);
-
-		foreach($arr1 as $key1 => $value1) {
-			$out[(string)$value1] = $arr2[$key1];
-		}
-
-		return $out;
-	}*/
-
 	/* Calculates non-idle CPU time and returns as a percentage */
 	function cpu_usage() {
-		$duration = 1;
+		$duration = 250000;
 		$diff = array('user', 'nice', 'sys', 'intr', 'idle');
 		$cpuTicks = array_combine($diff, explode(" ", `/sbin/sysctl -n kern.cp_time`));
-		sleep($duration);
+		usleep($duration);
 		$cpuTicks2 = array_combine($diff, explode(" ", `/sbin/sysctl -n kern.cp_time`));
 
 		$totalStart = array_sum($cpuTicks);
@@ -157,6 +145,19 @@
 		$status = "$curfreq\/$maxfreq Mhz";
 		return($status);
 	}
+	
+	function get_cpufrequency_perc(){
+		$cpufreqs = "";
+		exec("/sbin/sysctl -n dev.cpu.0.freq_levels", $cpufreqs);
+		$cpufreqs = explode(" ", trim($cpufreqs[0]));
+		$maxfreq = explode("/", $cpufreqs[0]);
+		$maxfreq = $maxfreq[0];
+		$curfreq = "";
+		exec("/sbin/sysctl -n dev.cpu.0.freq", $curfreq);
+		$curfreq = trim($curfreq[0]);
+		$status = $curfreq/$maxfreq * 100;
+		return($status);
+	}	
 
 	function get_interfaces_stats() {
 		global $g;
@@ -454,6 +455,41 @@
 		}
 	}
 	
+	function get_traffic_stats(&$in_data, &$out_data){
+		global $config;
+		global $traffic_last_ugmt, $traffic_last_ifin, $traffic_last_ifout;
+		$lcdproc_screen_config = $config['installedpackages']['lcdprocscreens']['config'][0];	
+		/* read the configured interface */
+		$ifnum = $lcdproc_screen_config['scr_traffic_interface'];
+		/* get the real interface name (code from ifstats.php)*/
+		$realif = get_real_interface($ifnum);
+		if(!$realif)
+			$realif = $ifnum; // Need for IPSec case interface.
+		/* get the interface stats (code from ifstats.php)*/
+		$ifinfo = pfSense_get_interface_stats($realif);
+		/* get the current time (code from ifstats.php)*/
+		$temp = gettimeofday();
+		$timing = (double)$temp["sec"] + (double)$temp["usec"] / 1000000.0;
+		/* calculate the traffic stats */
+		$deltatime = $timing - $traffic_last_ugmt;
+		$in_data = "IN:  " . formatSpeedBits(((double)$ifinfo['inbytes']-$traffic_last_ifin)/$deltatime);
+		$out_data = "OUT: " . formatSpeedBits(((double)$ifinfo['outbytes']-$traffic_last_ifout)/$deltatime);
+		$traffic_last_ugmt = $timing;
+		$traffic_last_ifin = (double)$ifinfo['inbytes'];
+		$traffic_last_ifout = (double)$ifinfo['outbytes'];
+	}
+	
+	function formatSpeedBits($speed) {
+	  /* format speed in bits/sec, input: bytes/sec 
+	  Code from: graph.php ported to PHP*/	  
+	  if ($speed < 125000)
+		{return sprintf("%3d.1 Kbps", $speed / 125);}		
+	  if ($speed < 125000000)
+		{return sprintf("%3d.1 Mbps", $speed / 125000);}
+	  // else
+	  return sprintf("%3d.1 Gbps", $speed / 125000000);
+	}
+	
 	function add_summary_declaration(&$lcd_cmds, $name) {
 		$lcdpanel_height = get_lcdpanel_height();
 		if ($lcdpanel_height >= "4")
@@ -466,7 +502,10 @@
 	function add_summary_values(&$lcd_cmds, $name, $lcd_summary_data, $lcdpanel_width) {
 		if ($lcd_summary_data != "")
 		{
-			$lcd_cmds[] = "widget_set $name title_summary 1 3 $lcdpanel_width 3 h 2 \"CPU MEM STATES\"";
+			if ($lcdpanel_width > "16")
+				{$lcd_cmds[] = "widget_set $name title_summary 1 3 $lcdpanel_width 3 h 2 \"CPU MEM STATES FREQ\"";}
+			else
+				{$lcd_cmds[] = "widget_set $name title_summary 1 3 $lcdpanel_width 3 h 2 \"CPU MEM STATES\"";}
 			$lcd_cmds[] = "widget_set $name text_summary 1 4 $lcdpanel_width 4 h 2 \"{$lcd_summary_data}\"";
 		}
 	}
@@ -597,7 +636,15 @@
 							$lcd_cmds[] = "screen_set $name duration $refresh_frequency";
 							$lcd_cmds[] = "widget_add $name title_wdgt string";
 							$lcd_cmds[] = "widget_add $name text_wdgt scroller";
-							break;							
+							break;
+						case "scr_traffic":
+							$lcd_cmds[] = "screen_add $name";
+							$lcd_cmds[] = "screen_set $name heartbeat off";
+							$lcd_cmds[] = "screen_set $name name $name";
+							$lcd_cmds[] = "screen_set $name duration $refresh_frequency";
+							$lcd_cmds[] = "widget_add $name title_wdgt string";
+							$lcd_cmds[] = "widget_add $name text_wdgt string";
+							break;
 					}
 					add_summary_declaration($lcd_cmds, $name);
 				}
@@ -615,6 +662,7 @@
 		if(empty($g['product_name'])) {
 			$g['product_name'] = "pfSense";
 		}
+		
 		$refresh_frequency = get_lcdpanel_refresh_frequency();
 		/* keep a counter to see how many times we can loop */
 		$i = 1;
@@ -622,7 +670,10 @@
 			/* prepare the summary data */
 			if ($lcdpanel_height >= "4") {
 				$summary_states = split("/",get_pfstate());
-				$lcd_summary_data = sprintf("%02d%% %02d%% %6d", cpu_usage(),  mem_usage(), $summary_states[0]);			
+				$lcd_summary_data = sprintf("%02d%% %02d%% %6d", cpu_usage(),  mem_usage(), $summary_states[0]);
+				if ($lcdpanel_width > "16") {
+					$lcd_summary_data = $lcd_summary_data . sprintf(" %3d%%", get_cpufrequency_perc());
+				}
 			}
 			else {	
 				$lcd_summary_data = "";}
@@ -710,16 +761,27 @@
 						$lcd_cmds[] = "widget_set $name title_wdgt 1 1 \"+ CPU Frequency\"";
 						$lcd_cmds[] = "widget_set $name text_wdgt 1 2 $lcdpanel_width 2 h 2 \"{$cpufreq}\"";
 						break;
+					case "scr_traffic":
+						get_traffic_stats($in_data, $out_data);
+						$lcd_cmds[] = "widget_set $name title_wdgt 1 1 \"{$in_data}\"";
+						$lcd_cmds[] = "widget_set $name text_wdgt 1 2 \"{$out_data}\"";
+						break;					
 				}
 				add_summary_values($lcd_cmds, $name, $lcd_summary_data, $lcdpanel_width);
-				$widget_counter++;
+				if ($name != "scr_traffic_interface") {
+					$widget_counter++;
+					add_summary_values($lcd_cmds, $name, $lcd_summary_data, $lcdpanel_width);
+				}
 			}
 			send_lcd_commands($lcd, $lcd_cmds);
 			sleep($refresh_frequency * $widget_counter);
 			$i++;
 		}
 	}
-
+	/* Initialize the wan traffic counters */
+	$traffic_last_ugmt = 0;
+	$traffic_last_ifin = 0;
+	$traffic_last_ifout = 0;
 	/* Connect to the LCDd port and interface with the LCD */
 	$lcd = fsockopen(LCDPROC_HOST, LCDPROC_PORT, $errno, $errstr, 10);
 	if (!$lcd) {
