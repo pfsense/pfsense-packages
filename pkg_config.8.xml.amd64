@@ -826,6 +826,34 @@
 		<after_install_info>Please visit Services: freeRADIUS</after_install_info>
 	</package>
 	<package>
+		<name>freeradius2-experimental-modules</name>
+		<website>http://www.freeradius.org/</website>
+		<descr><![CDATA[A free implementation of the RADIUS protocol.<br>
+				Do not use together with freeradius package. Both are using the same XML files.<br>
+				With experimental modules.]]></descr>
+		<pkginfolink>http://forum.pfsense.org/index.php/topic,43675.0.html</pkginfolink>
+		<category>System</category>
+		<version>2.1.12 pkg v1.1.1</version>
+		<status>BETA</status>
+		<required_version>2.0</required_version>
+		<maintainer>Nachtfalke</maintainer>
+		<depends_on_package_base_url>http://ftp.freebsd.org/pub/FreeBSD/ports/amd64/packages-8-stable/All/</depends_on_package_base_url>
+		<depends_on_package>freeradius-2.1.12.tbz</depends_on_package>
+		<depends_on_package>python27-2.7.2_3.tbz</depends_on_package>
+		<depends_on_package>perl-5.12.4_3.tbz</depends_on_package>
+		<depends_on_package>libltdl-2.4_1.tbz</depends_on_package>
+		<depends_on_package>gdbm-1.9.1.tbz</depends_on_package>
+		<config_file>http://www.pfsense.org/packages/config/freeradius2/freeradius.xml</config_file>
+		<configurationfile>freeradius.xml</configurationfile>
+		<build_port_path>/usr/ports/net/freeradius2</build_port_path>
+		<build_port_path>/usr/ports/lang/python27</build_port_path>
+		<build_port_path>/usr/ports/lang/perl5.12</build_port_path>
+		<build_port_path>/usr/ports/devel/libltdl</build_port_path>
+		<build_port_path>/usr/ports/databases/gdbm</build_port_path>
+		<after_install_info>Please visit Services: freeRADIUS</after_install_info>
+		<build_options>WITH_LDAP=yes WITH_KERBEROS=yes WITH_EXPERIMENTAL=yes</build_options>
+	</package>
+	<package>
 		<name>bandwidthd</name>
 		<website>http://bandwidthd.sourceforge.net/</website>
 		<descr>BandwidthD tracks usage of TCP/IP network subnets and builds html files with graphs to display utilization. Charts are built by individual IPs, and by default display utilization over 2 day, 8 day, 40 day, and 400 day periods. Furthermore, each ip address's utilization can be logged out at intervals of 3.3 minutes, 10 minutes, 1 hour or 12 hours in cdf format, or to a backend database server. HTTP, TCP, UDP, ICMP, VPN, and P2P traffic are color coded.</descr>
