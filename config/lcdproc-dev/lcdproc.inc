@@ -169,7 +169,9 @@
 		global $g;
 		global $config;
 		global $input_errors;
-
+		
+		/* I just stop the package */
+		lcdproc_action('stop');
 		config_lock();
 
 		$lcdproc_config = $config['installedpackages']['lcdproc']['config'][0];
@@ -201,6 +203,7 @@
 					break;
 				default:
 					lcdproc_warn("The selected com port is not valid!");
+					config_unlock();
 					return;
 			}
 
@@ -481,12 +484,12 @@ EOD;
 			/* generate rc file start and stop */
 			$stop = <<<EOD
 
-if [ `ps auxw |awk '/LCD[d]/ {print $2}'| wc -l` != 0  ]; then
-	ps auxw |awk '/LCD[d]/ {print $2}'|xargs kill
-	sleep 1
-fi
 if [ `ps auxw |awk '/lcdclient.s[h]/ {print $2}'| wc -l` != 0  ]; then
 	ps auxw |awk '/lcdclient.s[h]/ {print $2}'|xargs kill
+	sleep 1
+fi
+if [ `ps auxw |awk '/LCD[d]/ {print $2}'| wc -l` != 0  ]; then
+	ps auxw |awk '/LCD[d]/ {print $2}'|xargs kill
 	sleep 1
 fi
 
@@ -507,10 +510,10 @@ EOD;
 			conf_mount_ro();
 
 			/* or restart lcdproc if settings were changed */
-			if(lcdproc_running($_POST['comport'])) {
+			if(lcdproc_running()) {
 				lcdproc_notice("Restarting service lcdproc");
 				lcdproc_action('restart');
-			}
+			}			
 		}
 
 		if((! $lcdproc_config['driver']) || ($lcdproc_config['comport'] == "none")) {
