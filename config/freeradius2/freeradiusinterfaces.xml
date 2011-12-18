@@ -42,7 +42,7 @@
 /* ========================================================================== */
 		]]>
 	</copyright>
-	<description>Describe your package here</description>
+	<description><![CDATA[Describe your package here]]></description>
 	<requirements>Describe your package requirements here</requirements>
 	<faq>Currently there are no FAQ items provided.</faq>
 	<name>freeradiusinterfaces</name>
@@ -66,6 +66,10 @@
 		<tab>
 			<text>Settings</text>
 			<url>/pkg_edit.php?xml=freeradiussettings.xml&amp;id=0</url>
+		</tab>
+		<tab>
+			<text>EAP</text>
+			<url>/pkg_edit.php?xml=freeradiuseapconf.xml&amp;id=0</url>
 		</tab>
 	</tabs>
 	<adddeleteeditpagefields>
@@ -119,7 +123,7 @@
 		<field>
 			<fielddescr>Interface Type</fielddescr>
 			<fieldname>varinterfacetype</fieldname>
-			<description>Enter the type of the listening interface. (Default: auth)</description>
+			<description><![CDATA[Enter the type of the listening interface. (Default: auth)]]></description>
 			<type>select</type>
 			<default_value>auth</default_value>
 					<options>
@@ -135,7 +139,7 @@
 		<field>
 			<fielddescr>IP Version</fielddescr>
 			<fieldname>varinterfaceipversion</fieldname>
-			<description>Enter the IP version of the listening interface. (Default: IPv4)</description>
+			<description><![CDATA[Enter the IP version of the listening interface. (Default: IPv4)]]></description>
 			<type>select</type>
 			<default_value>ipaddr</default_value>
 					<options>
@@ -147,7 +151,7 @@
 		<field>
 			<fielddescr>Description</fielddescr>
 			<fieldname>description</fieldname>
-			<description>Enter any description you like for this interface.</description>
+			<description><![CDATA[Enter any description you like for this interface.]]></description>
 			<type>input</type>
 		</field>
 	</fields>
