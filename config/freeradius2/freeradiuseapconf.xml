@@ -1,0 +1,290 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE packagegui SYSTEM "./schema/packages.dtd">
+<?xml-stylesheet type="text/xsl" href="./xsl/package.xsl"?>
+<packagegui>
+		<copyright>
+		<![CDATA[
+/* $Id$ */
+/* ========================================================================== */
+/*
+    authng.xml
+    part of pfSense (http://www.pfSense.com)
+    Copyright (C) 2007 to whom it may belong
+    All rights reserved.
+
+    Based on m0n0wall (http://m0n0.ch/wall)
+    Copyright (C) 2003-2006 Manuel Kasper <mk@neon1.net>.
+    All rights reserved.
+                                                                              */
+/* ========================================================================== */
+/*
+    Redistribution and use in source and binary forms, with or without
+    modification, are permitted provided that the following conditions are met:
+
+     1. Redistributions of source code must retain the above copyright notice,
+        this list of conditions and the following disclaimer.
+
+     2. Redistributions in binary form must reproduce the above copyright
+        notice, this list of conditions and the following disclaimer in the
+        documentation and/or other materials provided with the distribution.
+
+    THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
+    INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+    AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+    AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+    OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+    INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+    POSSIBILITY OF SUCH DAMAGE.
+                                                                              */
+/* ========================================================================== */
+		]]>
+	</copyright>
+	<description><![CDATA[Describe your package here]]></description>
+	<requirements>Describe your package requirements here</requirements>
+	<faq>Currently there are no FAQ items provided.</faq>
+	<name>freeradiuseapconf</name>
+	<version>none</version>
+	<title>FreeRADIUS: Settings</title>
+	<aftersaveredirect>pkg_edit.php?xml=freeradiuseapconf.xml&amp;id=0</aftersaveredirect>
+	<include_file>/usr/local/pkg/freeradius.inc</include_file>
+	<tabs>
+		<tab>
+			<text>Users</text>
+			<url>/pkg.php?xml=freeradius.xml</url>
+		</tab>
+		<tab>
+			<text>NAS / Clients</text>
+			<url>/pkg.php?xml=freeradiusclients.xml</url>
+		</tab>
+		<tab>
+			<text>Interfaces</text>
+			<url>/pkg.php?xml=freeradiusinterfaces.xml</url>
+		</tab>
+		<tab>
+			<text>Settings</text>
+			<url>/pkg_edit.php?xml=freeradiussettings.xml&amp;id=0</url>
+		</tab>
+		<tab>
+			<text>EAP</text>
+			<url>/pkg_edit.php?xml=freeradiuseapconf.xml&amp;id=0</url>
+			<active/>
+		</tab>
+	</tabs>
+	<fields>
+		<field>
+			<name>EAP</name>
+			<type>listtopic</type>
+		</field>
+		<field>
+			<fielddescr>Default EAP Type</fielddescr>
+			<fieldname>vareapconfdefaulteaptype</fieldname>
+			<description><![CDATA[Invoke the default supported EAP type when EAP-Identity response is received. (Default: md5)]]></description>
+			<type>select</type>
+			<default_value>md5</default_value>
+					<options>
+						<option><name>MD5</name><value>md5</value></option>
+						<option><name>LEAP</name><value>leap</value></option>
+						<option><name>GTC</name><value>gtc</value></option>
+					</options>
+		</field>
+		<field>
+			<fielddescr>Expiration of EAP-Response/Request List</fielddescr>
+			<fieldname>vareapconftimerexpire</fieldname>
+			<description><![CDATA[A list is maintained to correlate EAP-Response packets with EAP-Request packets. Define the expire time of the list. (Default: 60)]]></description>
+			<type>input</type>
+			<default_value>60</default_value>
+		</field>
+		<field>
+			<fielddescr>Ignore Unknown EAP Types</fielddescr>
+			<fieldname>vareapconfignoreunknowneaptypes</fieldname>
+			<description><![CDATA[If the RADIUS does not know the EAP type it rejects it. If set to "yes" an other module <b>must</b> be configured to proxy the request to a further RADIUS server. (Default: no)]]></description>
+			<type>select</type>
+			<default_value>no</default_value>
+					<options>
+						<option><name>No</name><value>no</value></option>
+						<option><name>Yes</name><value>yes</value></option>
+					</options>
+		</field>
+		<field>
+			<fielddescr>CISCO Accounting Username Bug</fielddescr>
+			<fieldname>vareapconfciscoaccountingusernamebug</fieldname>
+			<description><![CDATA[CISCO AP1230B firmware 12.2(13)JA1 has a bug which can be workaround by setting this to "yes". (Default: no)]]></description>
+			<type>select</type>
+			<default_value>no</default_value>
+					<options>
+						<option><name>No</name><value>no</value></option>
+						<option><name>Yes</name><value>yes</value></option>
+					</options>
+		</field>
+		<field>
+			<fielddescr>Maximum Sessions Tracking per Server</fielddescr>
+			<fieldname>vareapconfmaxsessions</fieldname>
+			<description><![CDATA[Help to prevent DoS attacks by limiting the number of sessions that the server is tracking. (Default: 4096)]]></description>
+			<type>input</type>
+			<default_value>4096</default_value>
+		</field>
+		<field>
+			<name>EAP-TLS and EAP-TLS with OCSP support</name>
+			<type>listtopic</type>
+		</field>
+		<field>
+			<fielddescr>Private Key Password</fielddescr>
+			<fieldname>vareapconfprivatekeypassword</fieldname>
+			<description><![CDATA[Enter the private key of the password. (Default: whatever)]]></description>
+			<type>password</type>
+			<default_value>whatever</default_value>
+		</field>
+		<field>
+			<fielddescr>Private Key File</fielddescr>
+			<fieldname>vareapconfprivatekeyfile</fieldname>
+			<description><![CDATA[Enter the filename of the private key file. The file <b>must</b> in /usr/local/etc/raddb/certs/ (Default: server.pem)]]></description>
+			<type>input</type>
+			<default_value>server.pem</default_value>
+		</field>
+		<field>
+			<fielddescr>Private Key File</fielddescr>
+			<fieldname>vareapconfprivatekeyfile</fieldname>
+			<description><![CDATA[Enter the filename of the private key file. The file <b>must</b> be in /usr/local/etc/raddb/certs/ (Default: server.pem)]]></description>
+			<type>input</type>
+			<default_value>server.pem</default_value>
+		</field>
+		<field>
+			<fielddescr>Server Certificate File</fielddescr>
+			<fieldname>vareapconfcertificatefile</fieldname>
+			<description><![CDATA[Enter the filename of the Certificate file. The file <b>must</b> be in /usr/local/etc/raddb/certs/ (Default: server.pem)]]></description>
+			<type>input</type>
+			<default_value>server.pem</default_value>
+		</field>
+		<field>
+			<fielddescr>CA File</fielddescr>
+			<fieldname>vareapconfcafile</fieldname>
+			<description><![CDATA[Enter the filename of the CA file. The file <b>must</b> be in /usr/local/etc/raddb/certs/ (Default: ca.pem)]]></description>
+			<type>input</type>
+			<default_value>ca.pem</default_value>
+		</field>
+		<field>
+			<fielddescr>DH File</fielddescr>
+			<fieldname>vareapconfdhfile</fieldname>
+			<description><![CDATA[Enter the filename of the DH file. The file <b>must</b> be in /usr/local/etc/raddb/certs/ (Default: dh)]]></description>
+			<type>input</type>
+			<default_value>dh</default_value>
+		</field>
+		<field>
+			<fielddescr>Random File</fielddescr>
+			<fieldname>vareapconfrandomfile</fieldname>
+			<description><![CDATA[Enter the filename of the random file. The file <b>must</b> be in /usr/local/etc/raddb/certs/ (Default: random)]]></description>
+			<type>input</type>
+			<default_value>random</default_value>
+		</field>
+		<field>
+			<fielddescr>Enable OCSP</fielddescr>
+			<fieldname>vareapconfocspenable</fieldname>
+			<description><![CDATA[Choose if you like to enable or disable OCSP support. (Default: Disable)]]></description>
+			<type>select</type>
+			<default_value>no</default_value>
+					<options>
+						<option><name>Disable</name><value>no</value></option>
+						<option><name>Enable</name><value>yes</value></option>
+					</options>
+		</field>
+		<field>
+			<fielddescr>Override OCSP Responder URL</fielddescr>
+			<fieldname>vareapconfocspoverridecerturl</fieldname>
+			<description><![CDATA[The OCSP responder URL is extracted from the certificate. You can override it below. (Default: no)]]></description>
+			<type>select</type>
+			<default_value>no</default_value>
+					<options>
+						<option><name>No</name><value>no</value></option>
+						<option><name>Yes</name><value>yes</value></option>
+					</options>
+		</field>
+		<field>
+			<fielddescr>OCSP Responder</fielddescr>
+			<fieldname>vareapconfocspurl</fieldname>
+			<description><![CDATA[Enter the URL of the OCSP responder. OCSP <b>must</b> be enabled for this to work. (Default: http://127.0.0.1/ocsp/)]]></description>
+			<type>input</type>
+			<default_value>http://127.0.0.1/ocsp/</default_value>
+		</field>
+		<field>
+			<name>EAP-TTLS</name>
+			<type>listtopic</type>
+		</field>
+		<field>
+			<fielddescr>Default EAP Type</fielddescr>
+			<fieldname>vareapconfttlsdefaulteaptype</fieldname>
+			<description><![CDATA[The tunneled EAP session needs a default EAP type which is separate from the one for the non-tunneled EAP module. (Default: MD5)]]></description>
+			<type>select</type>
+			<default_value>md5</default_value>
+					<options>
+						<option><name>MD5</name><value>md5</value></option>
+					</options>
+		</field>
+		<field>
+			<fielddescr>Copy Request to Tunnel</fielddescr>
+			<fieldname>vareapconfttlscopyrequesttotunnel</fieldname>
+			<description><![CDATA[By setting this configuration entry to "yes", any attribute which is <b>not</b> in the tunneled authentication request, but which <b>is</b> available outside of the tunnel, is copied to the tunneled request. (Default: no)]]></description>
+			<type>select</type>
+			<default_value>no</default_value>
+					<options>
+						<option><name>No</name><value>no</value></option>
+						<option><name>Yes</name><value>yes</value></option>
+					</options>
+		</field>		
+		<field>
+			<fielddescr>Use Tunneled Reply</fielddescr>
+			<fieldname>vareapconfttlsusetunneledreply</fieldname>
+			<description><![CDATA[By setting this configuration entry to 'yes', any attribute which NOT in the tunneled authentication request, but which IS available outside of the tunnel, is copied to the tunneled request. (Default: no)]]></description>
+			<type>select</type>
+			<default_value>no</default_value>
+					<options>
+						<option><name>No</name><value>no</value></option>
+						<option><name>Yes</name><value>yes</value></option>
+					</options>
+		</field>
+		<field>
+			<name>EAP-PEAP with MSCHAPv2</name>
+			<type>listtopic</type>
+		</field>
+		<field>
+			<fielddescr>Default EAP Type</fielddescr>
+			<fieldname>vareapconfpeapdefaulteaptype</fieldname>
+			<description><![CDATA[The tunneled EAP session needs a default EAP type which is separate from the one for the non-tunneled EAP module. (Default: MSCHAPv2)]]></description>
+			<type>select</type>
+			<default_value>mschapv2</default_value>
+					<options>
+						<option><name>MSCHAPv2</name><value>mschapv2</value></option>
+					</options>
+		</field>
+		<field>
+			<fielddescr>Copy Request to Tunnel</fielddescr>
+			<fieldname>vareapconfpeapcopyrequesttotunnel</fieldname>
+			<description><![CDATA[By setting this configuration entry to "yes", any attribute which is <b>not</b> in the tunneled authentication request, but which <b>is</b> available outside of the tunnel, is copied to the tunneled request. (Default: no)]]></description>
+			<type>select</type>
+			<default_value>no</default_value>
+					<options>
+						<option><name>No</name><value>no</value></option>
+						<option><name>Yes</name><value>yes</value></option>
+					</options>
+		</field>		
+		<field>
+			<fielddescr>Use Tunneled Reply</fielddescr>
+			<fieldname>vareapconfpeapusetunneledreply</fieldname>
+			<description><![CDATA[By setting this configuration entry to 'yes', any attribute which NOT in the tunneled authentication request, but which IS available outside of the tunnel, is copied to the tunneled request. (Default: no)]]></description>
+			<type>select</type>
+			<default_value>no</default_value>
+					<options>
+						<option><name>No</name><value>no</value></option>
+						<option><name>Yes</name><value>yes</value></option>
+					</options>
+		</field>		
+	</fields>
+	<custom_delete_php_command>
+		freeradius_eapconf_resync();
+	</custom_delete_php_command>
+	<custom_php_resync_config_command>
+		freeradius_eapconf_resync();
+	</custom_php_resync_config_command>
+</packagegui>
