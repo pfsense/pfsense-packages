@@ -509,11 +509,12 @@ EOD;
 					));
 			conf_mount_ro();
 
-			/* or restart lcdproc if settings were changed */
+			/* or restart lcdproc if settings were changed 
+			Removed because of issues during reinstall.
 			if(lcdproc_running()) {
 				lcdproc_notice("Restarting service lcdproc");
 				lcdproc_action('restart');
-			}			
+			}			*/
 		}
 
 		if((! $lcdproc_config['driver']) || ($lcdproc_config['comport'] == "none")) {
