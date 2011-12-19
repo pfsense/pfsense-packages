@@ -258,7 +258,7 @@ function unbound_get_network_interface_addresses() {
 			$unbound_interfaces[$i]['ipv4']['ipaddr'] = $interfaces[$unboundif]['ipaddr'];
 			$unbound_interfaces[$i]['ipv4']['subnet'] = $interfaces[$unboundif]['subnet'];
 			$unbound_interfaces[$i]['ipv4']['network'] = gen_subnet($unbound_interfaces[$i]['ipv4']['ipaddr'],$unbound_interfaces[$i]['ipv4']['subnet']);
-			
+
 			// Check for CARP addresses and also return those - only IPv4 for now
 			if (isset($config['virtualip'])) {
 				if(is_array($config['virtualip']['vip'])) {
@@ -384,9 +384,8 @@ function unbound_acls_config() {
 			}			
 		}
 		return $unboundcfg;
-	} else {
+	} else
 		return;
-	}
 }
 
 function unbound_resync_config() {
@@ -404,7 +403,7 @@ function unbound_resync_config() {
 	foreach($unboundnetcfg as $netent) {
 		foreach($netent as $entry) {
 			# If virtual interface then skip
-			if (!$entry['network'] && $entry['subnet'])
+			if (!$entry['network'] && !$entry['subnet'])
 				continue;
 			$unbound_bind_interfaces .="interface: {$entry['ipaddr']}\n";
 			if($entry['ipaddr'] != "127.0.0.1" && $entry['ipaddr'] != "::1" )
