@@ -72,6 +72,10 @@
 			<url>/pkg_edit.php?xml=freeradiuseapconf.xml&amp;id=0</url>
 			<active/>
 		</tab>
+		<tab>
+			<text>SQL</text>
+			<url>/pkg_edit.php?xml=freeradiussqlconf.xml&amp;id=0</url>
+		</tab>
 	</tabs>
 	<fields>
 		<field>
@@ -127,20 +131,20 @@
 			<default_value>4096</default_value>
 		</field>
 		<field>
-			<name>EAP-TLS and EAP-TLS with OCSP support</name>
+			<name>EAP-TLS</name>
 			<type>listtopic</type>
 		</field>
 		<field>
 			<fielddescr>Private Key Password</fielddescr>
 			<fieldname>vareapconfprivatekeypassword</fieldname>
-			<description><![CDATA[Enter the private key of the password. (Default: whatever)]]></description>
+			<description><![CDATA[Enter the password of the private key. (Default: whatever)]]></description>
 			<type>password</type>
 			<default_value>whatever</default_value>
 		</field>
 		<field>
 			<fielddescr>Private Key File</fielddescr>
 			<fieldname>vareapconfprivatekeyfile</fieldname>
-			<description><![CDATA[Enter the filename of the private key file. The file <b>must</b> in /usr/local/etc/raddb/certs/ (Default: server.pem)]]></description>
+			<description><![CDATA[Enter the filename of the private key file. The file <b>must</b> be in /usr/local/etc/raddb/certs/ (Default: server.pem)]]></description>
 			<type>input</type>
 			<default_value>server.pem</default_value>
 		</field>
@@ -178,6 +182,10 @@
 			<description><![CDATA[Enter the filename of the random file. The file <b>must</b> be in /usr/local/etc/raddb/certs/ (Default: random)]]></description>
 			<type>input</type>
 			<default_value>random</default_value>
+		</field>
+		<field>
+			<name>EAP-TLS with OCSP support</name>
+			<type>listtopic</type>
 		</field>
 		<field>
 			<fielddescr>Enable OCSP</fielddescr>

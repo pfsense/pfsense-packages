@@ -68,6 +68,13 @@ function freeradius_settings_resync() {
 	$varsettingsmaxspareservers = $varsettings['varsettingsmaxspareservers'];
 	$varsettingsmaxqueuesize = $varsettings['varsettingsmaxqueuesize'];
 	$varsettingsmaxrequestsperserver = $varsettings['varsettingsmaxrequestsperserver'];
+	
+	// These lines are uncommented in fuction "freeradius_settings_resync" to INCLUDE / enable eap.conf
+	$sqlconf = $config['installedpackages']['freeradiussqlconf']['config'][0];
+	$varsqlconfenable = $sqlconf['varsqlconfenable'];
+	$varsqlconfenablecounter = $sqlconf['varsqlconfenablecounter'];
+	
+	
 
 	$conf = <<<EOD
 prefix = /usr/local
@@ -166,8 +173,19 @@ thread pool {
 modules {
 	\$INCLUDE \${confdir}/modules/
 	\$INCLUDE eap.conf
-	#\$INCLUDE sql.conf
+	
+	### Original line
+	### Enable sql.conf INCLUDE
+	###\$INCLUDE sql.conf
+	$varsqlconfenable
+	
+	
+	### Original line
+	### Enable sql/mysql/counter.conf INCLUDE
 	#\$INCLUDE sql/mysql/counter.conf
+	$varsqlconfenablecounter
+	
+	
 	#\$INCLUDE sqlippool.conf
 }
 
@@ -448,6 +466,85 @@ function freeradius_eapconf_resync() {
 EOD;
 
 	$filename = RADDB . '/eap.conf';
+	conf_mount_rw();
+	file_put_contents($filename, $conf);
+	chmod($filename, 0600);
+	conf_mount_ro();
+
+	restart_service('freeradius');
+}
+
+function freeradius_sqlconf_resync() {
+	global $config;
+	$conf = '';
+
+	$sqlconf = $config['installedpackages']['freeradiussqlconf']['config'][0];
+	
+	// Variables: SQL
+	$varsqlconfdatabase = $sqlconf['varsqlconfdatabase'];
+	$varsqlconfserver = $sqlconf['varsqlconfserver'];
+	$varsqlconfport = $sqlconf['varsqlconfport'];
+	$varsqlconflogin = $sqlconf['varsqlconflogin'];
+	$varsqlconfpassword = $sqlconf['varsqlconfpassword'];
+	$varsqlconfradiusdb = $sqlconf['varsqlconfradiusdb'];
+	$varsqlconfaccttable1 = $sqlconf['varsqlconfaccttable1'];
+	$varsqlconfaccttable2 = $sqlconf['varsqlconfaccttable2'];
+	$varsqlconfpostauthtable = $sqlconf['varsqlconfpostauthtable'];
+	$varsqlconfauthchecktable = $sqlconf['varsqlconfauthchecktable'];
+	$varsqlconfauthreplytable = $sqlconf['varsqlconfauthreplytable'];
+	$varsqlconfgroupchecktable = $sqlconf['varsqlconfgroupchecktable'];
+	$varsqlconfgroupreplytable = $sqlconf['varsqlconfgroupreplytable'];
+	$varsqlconfusergrouptable = $sqlconf['varsqlconfusergrouptable'];
+	$varsqlconfreadgroups = $sqlconf['varsqlconfreadgroups'];
+	$varsqlconfdeletestalesessions = $sqlconf['varsqlconfdeletestalesessions'];
+	$varsqlconfsqltrace = $sqlconf['varsqlconfsqltrace'];
+	$varsqlconfnumsqlsocks = $sqlconf['varsqlconfnumsqlsocks'];
+	$varsqlconfconnectfailureretrydelay = $sqlconf['varsqlconfconnectfailureretrydelay'];
+	$varsqlconflifetime = $sqlconf['varsqlconflifetime'];
+	$varsqlconfmaxqueries = $sqlconf['varsqlconfmaxqueries'];
+	$varsqlconfreadclients = $sqlconf['varsqlconfreadclients'];
+	$varsqlconfnastable = $sqlconf['varsqlconfnastable'];
+	
+	// These lines are uncommented in fuction "freeradius_settings_resync" to INCLUDE / enable eap.conf
+	// $sqlconf = $config['installedpackages']['freeradiussqlconf']['config'][0];
+	// $varsqlconfenable = $sqlconf['varsqlconfenable'];
+	// $varsqlconfenablecounter = $sqlconf['varsqlconfenablecounter'];
+	
+
+	$conf .= <<<EOD
+
+sql {
+	database = "$varsqlconfdatabase"
+	driver = "rlm_sql_\${database}"
+	server = "$varsqlconfserver"
+	port = $varsqlconfport
+	login = "$varsqlconflogin"
+	password = "$varsqlconfpassword"
+	radius_db = "$varsqlconfradiusdb"
+	acct_table1 = "$varsqlconfaccttable1"
+	acct_table2 = "$varsqlconfaccttable2"
+	postauth_table = "$varsqlconfpostauthtable"
+	authcheck_table = "$varsqlconfauthchecktable"
+	authreply_table = "$varsqlconfauthreplytable"
+	groupcheck_table = "$varsqlconfgroupchecktable"
+	groupreply_table = "$varsqlconfgroupreplytable"
+	usergroup_table = "$varsqlconfusergrouptable"
+	read_groups = $varsqlconfreadgroups
+	deletestalesessions = $varsqlconfdeletestalesessions
+	sqltrace = $varsqlconfsqltrace
+	sqltracefile = \${logdir}/sqltrace.sql
+	num_sql_socks = $varsqlconfnumsqlsocks
+	connect_failure_retry_delay = $varsqlconfconnectfailureretrydelay
+	lifetime = $varsqlconflifetime
+	max_queries = $varsqlconfmaxqueries
+	readclients = $varsqlconfreadclients
+	nas_table = "$varsqlconfnastable"
+	\$INCLUDE sql/\${database}/dialup.conf
+}
+
+EOD;
+
+	$filename = RADDB . '/sql.conf';
 	conf_mount_rw();
 	file_put_contents($filename, $conf);
 	chmod($filename, 0600);
