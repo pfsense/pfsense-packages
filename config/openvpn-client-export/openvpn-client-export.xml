@@ -7,12 +7,6 @@
 	<backup_file></backup_file>
 	<aftersaveredirect></aftersaveredirect>
 	<configpath></configpath>
-	<menu>
-		<name>OpenVPN Client Export</name>
-		<tooltiptext>OpenVPN Client Export Utility</tooltiptext>
-		<section>VPN</section>
-		<url>vpn_openvpn_export.php</url>
-	</menu>
 	<tabs>
 		<tab>
 			<name>Client Export</name>
