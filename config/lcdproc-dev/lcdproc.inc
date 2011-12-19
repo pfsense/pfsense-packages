@@ -26,31 +26,19 @@
         ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
         POSSIBILITY OF SUCH DAMAGE.
 */
-
 	require_once("config.inc");
 	require_once("functions.inc");
-
+	require_once("service-utils.inc");
 	/* LCDproc */
 	define('LCDPROC_RCFILE', '/usr/local/etc/rc.d/lcdproc.sh');
 	define('LCDPROC_CLIENT', '/tmp/lcdclient.sh');
 	define('LCDPROC_CONFIG','/usr/local/etc/LCDd.conf');
 	define('LCDPROC_HOST','localhost');
 	define('LCDPROC_PORT','13666');
-
+	define('LCDPROC_SERVICE_NAME','lcdproc');
+	/* Functions */	
 	function lcdproc_notice ($msg) { syslog(LOG_NOTICE, "lcdproc: {$msg}"); }
 	function lcdproc_warn ($msg) { syslog(LOG_WARNING, "lcdproc: {$msg}"); }
-
-	function lcdproc_action ($action) {
-		if (file_exists(LCDPROC_RCFILE))
-			mwexec(LCDPROC_RCFILE.' '.$action);
-	}
-
-	function lcdproc_running () {
-		if((int)exec('pgrep LCDd | wc -l') > 0)
-			return true;
-		return false;
-	}
-
 	function lcdproc_write_config($file, $text) {
 		$handle = fopen($file, 'w');
 		if(!$handle) {
@@ -60,7 +48,6 @@
 		fwrite($handle, $text);
 		fclose($handle);
 	}
-
 	function lcdproc_write_script($file, $text) {
 		$handle = fopen($file, 'wx');
 		if(!$handle) {
@@ -71,23 +58,16 @@
 		fclose($handle);
 		chmod($file, 0755);
 	}
-
 	function before_form_lcdproc($pkg) {
 		global $config;
-
 		config_lock();
-
 		config_unlock();
 	}
-
 	function before_form_lcdproc_screens($pkg) {
 		global $config;
-
 		config_lock();
-
 		config_unlock();
 	}
-
 	function validate_form_lcdproc($post, $input_errors) {
 		if($post['comport']) {
 			switch($post['comport']) {
@@ -161,22 +141,17 @@
 	function validate_form_lcdproc_screens($post, $input_errors) {
 		// No validation required ?!
 	}
-
 	function sync_package_lcdproc_screens() {
 		sync_package_lcdproc();
-	}
+	}	
 	function sync_package_lcdproc() {
 		global $g;
 		global $config;
-		global $input_errors;
-		
-		/* I just stop the package */
-		lcdproc_action('stop');
+		global $input_errors;		
+		lcdproc_notice("Sync: Begin package sync");
 		config_lock();
-
 		$lcdproc_config = $config['installedpackages']['lcdproc']['config'][0];
 		$lcdproc_screens_config = $config['installedpackages']['lcdprocscreens']['config'][0];
-
 		/* since config is written before this file invoked we don't need to read post data */
 		if($lcdproc_config['enable'] && ($lcdproc_config['comport'] != "none")) {
 			switch($lcdproc_config['comport']) {
@@ -206,7 +181,6 @@
 					config_unlock();
 					return;
 			}
-
 			$config_text = "[server]\n";
 			$config_text .= "Driver={$lcdproc_config[driver]}\n";
 			$config_text .= "Bind=127.0.0.1\n";
@@ -232,7 +206,6 @@
 			$config_text .= "EnterKey=Enter\n";
 			$config_text .= "UpKey=Up\n";
 			$config_text .= "DownKey=Down\n";
-
 			/* lcdproc default driver definitions */
 			switch($lcdproc_config[driver]) {
 				case "bayrad":
@@ -465,11 +438,9 @@
 					lcdproc_warn("The chosen lcdproc driver is not a valid choice");
 					unset($lcdproc_config[driver]);
 			}
-
 			/* generate rc file start and stop */
 			$client_script = <<<EOD
 #!/bin/sh
-
 # script starts a lcd client and always keeps it active.
 counter=1
 while [ "\$counter" -ne 0 ]
@@ -478,12 +449,9 @@ do
 	/usr/local/bin/php -f /usr/local/pkg/lcdproc_client.php
 	sleep 1
 done
-
 EOD;
-
 			/* generate rc file start and stop */
 			$stop = <<<EOD
-
 if [ `ps auxw |awk '/lcdclient.s[h]/ {print $2}'| wc -l` != 0  ]; then
 	ps auxw |awk '/lcdclient.s[h]/ {print $2}'|xargs kill
 	sleep 1
@@ -492,12 +460,10 @@ if [ `ps auxw |awk '/LCD[d]/ {print $2}'| wc -l` != 0  ]; then
 	ps auxw |awk '/LCD[d]/ {print $2}'|xargs kill
 	sleep 1
 fi
-
 EOD;
 			$start = $stop ."\n";
 			$start .= "\t/usr/local/sbin/LCDd -c ". LCDPROC_CONFIG ."\n";
 			$start .= "\t". LCDPROC_CLIENT ." &\n";
-
 			/* write out the configuration */
 			conf_mount_rw();
 			lcdproc_write_script(LCDPROC_CLIENT, $client_script);
@@ -508,26 +474,22 @@ EOD;
 					'stop' => $stop
 					));
 			conf_mount_ro();
-
-			/* or restart lcdproc if settings were changed 
-			Removed because of issues during reinstall.
-			if(lcdproc_running()) {
-				lcdproc_notice("Restarting service lcdproc");
-				lcdproc_action('restart');
-			}			*/
+			/* or restart lcdproc if settings were changed*/
+			if(is_service_running(LCDPROC_SERVICE_NAME)) {
+				lcdproc_notice("Sync: Restarting the service");
+				restart_service(LCDPROC_SERVICE_NAME);
+			}			
 		}
-
 		if((! $lcdproc_config['driver']) || ($lcdproc_config['comport'] == "none")) {
 			/* no parameters user does not want lcdproc running */
 			/* lets stop the service and remove the rc file */
-
 			if(file_exists(LCDPROC_RCFILE)) {
 				if(!$lcdproc_config['enable']) {
 					lcdproc_notice('Stopping service: lcdproc disabled');
 				} else {
 					lcdproc_notice('Stopping service: no com port selected');
 				}
-				lcdproc_action('stop');
+				stop_service(LCDPROC_SERVICE_NAME);
 				conf_mount_rw();
 				unlink(LCDPROC_RCFILE);
 				unlink(LCDPROC_CLIENT);
@@ -536,6 +498,6 @@ EOD;
 			}
 		}
 		config_unlock();
+		lcdproc_notice("Sync: End package sync");
 	}
-
 ?>
