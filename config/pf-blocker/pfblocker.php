@@ -11,7 +11,8 @@ function get_networks($pfb){
 if (preg_match("/(\w+)/",$_REQUEST['pfb'],$matches))
 	get_networks($matches[1]);
 #}
-
+if ($argv[1]=='uc')
+	pfblocker_get_countries();
 if ($argv[1]=='cron'){
 	require_once("/etc/inc/util.inc");
 	require_once("/etc/inc/functions.inc");
@@ -215,17 +216,21 @@ $xml= <<<EOF
 		<fieldname>action</fieldname>
 		<description><![CDATA[Default:<strong>Disabled</strong><br>
 						Select action for countries you have selected in {$cont}<br><br>
-						<strong>Note: </strong><br>'Deny Inbound' - Will deny access from selected countries to your network.<br>
-								'Deny Outbound' - Will deny access from your users to countries you selected to block<br>
+						<strong>Note: </strong><br>'Deny Both' - Will deny access on Both directions.<br>
+								'Deny Inbound' - Will deny access from selected countries to your network.<br>
+								'Deny Outbound' - Will deny access from your users to countries you selected to block.<br>
 								'Permit Inbound' - Will allow access from selected countries to your network.<br>
-								'Permit Outbound' - Will allow access from your users to countries you selected to block<br>
-								'Alias Only' - Will create alias <strong>{$cont}</strong> with selected countries to help custom rule assignments.<br>
-								'Disabled' - Will just keep selection and do nothing to selected countries.<br>]]></description>
+								'Permit Outbound' - Will allow access from your users to countries you selected to block.<br>
+								'Disabled' - Will just keep selection and do nothing to selected countries.<br>
+								'Alias Only' - Will create alias <strong>pfBlocker{$cont}</strong> with selected countries to help custom rule assignments.<br><br>
+								<strong>While creating rules with this alias, keep aliasname in the beggining of rule description and do not end description with 'rule'.<br></strong>
+								Custom rules with 'Aliasname something rule' description will be removed by package.]]></description>
 	    	<type>select</type>
  				<options>
 				<option><name>Disabled</name><value>Disabled</value></option>
  				<option><name>Deny Inbound</name><value>Deny_Inbound</value></option>
 				<option><name>Deny Outbound</name><value>Deny_Outbound</value></option>
+				<option><name>Deny Both</name><value>Deny_Both</value></option>
 				<option><name>Permit Inbound</name><value>Permit_Inbound</value></option>
 				<option><name>Permit Outbound</name><value>Permit_Outbound</value></option>
 				<option><name>Alias only</name><value>Alias_only</value></option>			

@@ -167,6 +167,15 @@ function sync_package_pfblocker() {
 					  		 	 "detail"=> "DO NOT EDIT THIS ALIAS");
 			#Create rule if action permits
 			  switch($continent_config['action']){
+			  	case "Deny_Both":
+			  			$rule = $base_rule;
+						$rule["type"] = $deny_action_inbound;
+						$rule["descr"]= "$pfb_alias auto rule";
+						$rule["source"]= array("address"=> $pfb_alias);
+						$rule["destination"]=array("any"=>"");
+						if ($pfblocker_config['enable_log'])
+								$rule["log"]="";
+						$deny_inbound[]=$rule;					
 				case "Deny_Outbound":
 						$rule = $base_rule;
 						$rule["type"] = $deny_action_outbound;
@@ -254,6 +263,11 @@ function sync_package_pfblocker() {
 							${$alias}.= $matches[1]."\n";
 							$new_file.= $matches[1]."\n";
 							}
+							# Single ip addresses 
+						    if (preg_match("/(\d+\.\d+\.\d+\.\d+)\s+/",$line,$matches)){
+							${$alias}.= $matches[1]."/32\n";
+							$new_file.= $matches[1]."/32\n";
+							}
 							# Network range 192.168.0.0-192.168.0.254
 							if (preg_match("/(\d+\.\d+\.\d+\.\d+)-(\d+\.\d+\.\d+\.\d+)/",$line,$matches)){
 								$cidr= pfblocker_Range2CIDR($matches[1],$matches[2]);
@@ -289,6 +303,15 @@ function sync_package_pfblocker() {
 					  		 	 "detail"=> "DO NOT EDIT THIS ALIAS");
 					#Create rule if action permits
 					switch($list['action']){
+						case "Deny_Both":
+							$rule = $base_rule;
+							$rule["type"] = $deny_action_inbound;
+							$rule["descr"]= "$alias auto rule";
+							$rule["source"]= array("address"=> $alias);
+							$rule["destination"]=array("any"=>"");
+							if ($pfblocker_config['enable_log'])
+								$rule["log"]="";
+							$deny_inbound[]=$rule;
 						case "Deny_Outbound":
 							$rule = $base_rule;
 							$rule["type"] = $deny_action_outbound;
