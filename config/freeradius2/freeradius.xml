@@ -85,6 +85,10 @@
 			<text>EAP</text>
 			<url>/pkg_edit.php?xml=freeradiuseapconf.xml&amp;id=0</url>
 		</tab>
+		<tab>
+			<text>SQL</text>
+			<url>/pkg_edit.php?xml=freeradiussqlconf.xml&amp;id=0</url>
+		</tab>
 	</tabs>
 
 	<adddeleteeditpagefields>
@@ -272,6 +276,7 @@
 		freeradius_clients_resync();
 		freeradius_users_resync();
 		freeradius_eapconf_resync();
+		freeradius_sqlconf_resync();
 		exec("rm -f /usr/local/etc/raddb/sites-enabled/control-socket");
 		exec("rm -f /usr/local/etc/raddb/sites-enabled/inner-tunnel");
 	</custom_php_install_command>

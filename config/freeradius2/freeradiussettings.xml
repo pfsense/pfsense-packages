@@ -72,6 +72,10 @@
 			<text>EAP</text>
 			<url>/pkg_edit.php?xml=freeradiuseapconf.xml&amp;id=0</url>
 		</tab>
+		<tab>
+			<text>SQL</text>
+			<url>/pkg_edit.php?xml=freeradiussqlconf.xml&amp;id=0</url>
+		</tab>
 	</tabs>
 	<fields>
 		<field>
