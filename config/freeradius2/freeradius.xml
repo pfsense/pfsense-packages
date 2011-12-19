@@ -90,7 +90,36 @@
 			<url>/pkg_edit.php?xml=freeradiussqlconf.xml&amp;id=0</url>
 		</tab>
 	</tabs>
-
+	<additional_files_needed>
+		<prefix>/usr/local/pkg/</prefix>
+		<chmod>0755</chmod>
+		<item>http://www.pfsense.org/packages/config/freeradius2/freeradiusclients.xml</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/pkg/</prefix>
+		<chmod>0755</chmod>
+		<item>http://www.pfsense.org/packages/config/freeradius2/freeradiussettings.xml</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/pkg/</prefix>
+		<chmod>0755</chmod>
+		<item>http://www.pfsense.org/packages/config/freeradius2/freeradiuseapconf.xml</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/pkg/</prefix>
+		<chmod>0755</chmod>
+		<item>http://www.pfsense.org/packages/config/freeradius2/freeradiussqlconf.xml</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/pkg/</prefix>
+		<chmod>0755</chmod>
+		<item>http://www.pfsense.org/packages/config/freeradius2/freeradiusinterfaces.xml</item>
+	</additional_files_needed>	
+	<additional_files_needed>
+		<prefix>/usr/local/pkg/</prefix>
+		<chmod>0755</chmod>
+		<item>http://www.pfsense.org/packages/config/freeradius2/freeradius.inc</item>
+	</additional_files_needed>
 	<adddeleteeditpagefields>
 		<columnitem>
 			<fielddescr>Username</fielddescr>
@@ -129,32 +158,7 @@
 			<fieldname>vlanid</fieldname>
 		</columnitem>
 	</adddeleteeditpagefields>
-	<additional_files_needed>
-		<prefix>/usr/local/pkg/</prefix>
-		<chmod>0755</chmod>
-		<item>http://www.pfsense.org/packages/config/freeradius2/freeradiusclients.xml</item>
-	</additional_files_needed>
-	<additional_files_needed>
-		<prefix>/usr/local/pkg/</prefix>
-		<chmod>0755</chmod>
-		<item>http://www.pfsense.org/packages/config/freeradius2/freeradiussettings.xml</item>
-	</additional_files_needed>
-	<additional_files_needed>
-		<prefix>/usr/local/pkg/</prefix>
-		<chmod>0755</chmod>
-		<item>http://www.pfsense.org/packages/config/freeradius2/freeradiuseapconf.xml</item>
-	</additional_files_needed>
-	<additional_files_needed>
-		<prefix>/usr/local/pkg/</prefix>
-		<chmod>0755</chmod>
-		<item>http://www.pfsense.org/packages/config/freeradius2/freeradiusinterfaces.xml</item>
-	</additional_files_needed>	
-	<additional_files_needed>
-		<prefix>/usr/local/pkg/</prefix>
-		<chmod>0755</chmod>
-		<item>http://www.pfsense.org/packages/config/freeradius2/freeradius.inc</item>
-	</additional_files_needed>
-	<fields>
+		<fields>
 		<field>
 			<name>GENERAL CONFIGURATION</name>
 			<type>listtopic</type>
@@ -263,6 +267,17 @@
 			<rows>10</rows>
 			<cols>75</cols>
 		</field>
+		<field>
+			<fielddescr>Output</fielddescr>
+			<fieldname>usersoutput</fieldname>			
+			<description><![CDATA[This is for experts only and should be treat with care!<br>
+								You may append (after all options from above) custom RADIUS options to this user account (separated by commas).<br>
+								<b>IMPORTANT:</b> If you don't format this field correctly freeRADIUS will not start because of syntax errors.<br>
+								Verify your changes by checking users file (/usr/local/etc/raddb/users).]]></description>
+			<type>textarea</type>
+			<rows>10</rows>
+			<cols>75</cols>
+		</field>
 	</fields>
 	<custom_delete_php_command>
 		freeradius_users_resync();
@@ -276,6 +291,7 @@
 		freeradius_clients_resync();
 		freeradius_users_resync();
 		freeradius_eapconf_resync();
+		freeradius_sqlconf_resync();
 		exec("rm -f /usr/local/etc/raddb/sites-enabled/control-socket");
 		exec("rm -f /usr/local/etc/raddb/sites-enabled/inner-tunnel");
 	</custom_php_install_command>

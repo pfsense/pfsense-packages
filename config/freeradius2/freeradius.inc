@@ -46,33 +46,40 @@ function freeradius_settings_resync() {
 	global $config;
 	$conf = '';
 	
-	// Definition variables for freeradiussettings
 	$varsettings = $config['installedpackages']['freeradiussettings']['config'][0];
-	$varsettingsmaxrequesttime = $varsettings['varsettingsmaxrequesttime'];
-	$varsettingscleanupdelay = $varsettings['varsettingscleanupdelay'];
-	$varsettingsmaxrequests = $varsettings['varsettingsmaxrequests'];
-	$varsettingslogdir = $varsettings['varsettingslogdir'];
-	$varsettingsstrippednames = $varsettings['varsettingsstrippednames'];
-	$varsettingsauth = $varsettings['varsettingsauth'];
-	$varsettingsauthbadpass = $varsettings['varsettingsauthbadpass'];
-	$varsettingsauthgoodpass = $varsettings['varsettingsauthgoodpass'];
-	$varsettingshostnamelookups = $varsettings['varsettingshostnamelookups'];
-	$varsettingsallowcoredumps = $varsettings['varsettingsallowcoredumps'];
-	$varsettingsregularexpressions = $varsettings['varsettingsregularexpressions'];
-	$varsettingsextendedexpressions = $varsettings['varsettingsextendedexpressions'];
-	$varsettingsmaxattributes = $varsettings['varsettingsmaxattributes'];
-	$varsettingsrejectdelay = $varsettings['varsettingsrejectdelay'];
-	$varsettingsstartservers = $varsettings['varsettingsstartservers'];
-	$varsettingsmaxservers = $varsettings['varsettingsmaxservers'];
-	$varsettingsminspareservers = $varsettings['varsettingsminspareservers'];
-	$varsettingsmaxspareservers = $varsettings['varsettingsmaxspareservers'];
-	$varsettingsmaxqueuesize = $varsettings['varsettingsmaxqueuesize'];
-	$varsettingsmaxrequestsperserver = $varsettings['varsettingsmaxrequestsperserver'];
+	
+	// Variables: General configuration
+	$varsettingsmaxrequesttime = ($varsettings['varsettingsmaxrequesttime']?$varsettings['varsettingsmaxrequesttime']:'1024');
+	$varsettingscleanupdelay = ($varsettings['varsettingscleanupdelay']?$varsettings['varsettingscleanupdelay']:'30');
+	$varsettingsmaxrequests = ($varsettings['varsettingsmaxrequests']?$varsettings['varsettingsmaxrequests']:'5');
+	$varsettingslogdir = ($varsettings['varsettingslogdir']?$varsettings['varsettingslogdir']:'no');
+	$varsettingsstrippednames = ($varsettings['varsettingsstrippednames']?$varsettings['varsettingsstrippednames']:'no');
+	
+	// Variables: Logging options
+	$varsettingsauth = ($varsettings['varsettingsauth']?$varsettings['varsettingsauth']:'yes');
+	$varsettingsauthbadpass = ($varsettings['varsettingsauthbadpass']?$varsettings['varsettingsauthbadpass']:'yes');
+	$varsettingsauthgoodpass = ($varsettings['varsettingsauthgoodpass']?$varsettings['varsettingsauthgoodpass']:'files');
+	$varsettingshostnamelookups = ($varsettings['varsettingshostnamelookups']?$varsettings['varsettingshostnamelookups']:'no');
+	$varsettingsallowcoredumps = ($varsettings['varsettingsallowcoredumps']?$varsettings['varsettingsallowcoredumps']:'no');
+	$varsettingsregularexpressions = ($varsettings['varsettingsregularexpressions']?$varsettings['varsettingsregularexpressions']:'no');
+	$varsettingsextendedexpressions = ($varsettings['varsettingsextendedexpressions']?$varsettings['varsettingsextendedexpressions']:'no');
+	
+	// Variables: Security
+	$varsettingsmaxattributes = ($varsettings['varsettingsmaxattributes']?$varsettings['varsettingsmaxattributes']:'200');
+	$varsettingsrejectdelay = ($varsettings['varsettingsrejectdelay']?$varsettings['varsettingsrejectdelay']:'1');
+	
+	// Variables: Thread Pool
+	$varsettingsstartservers = ($varsettings['varsettingsstartservers']?$varsettings['varsettingsstartservers']:'5');
+	$varsettingsmaxservers = ($varsettings['varsettingsmaxservers']?$varsettings['varsettingsmaxservers']:'32');
+	$varsettingsminspareservers = ($varsettings['varsettingsminspareservers']?$varsettings['varsettingsminspareservers']:'3');
+	$varsettingsmaxspareservers = ($varsettings['varsettingsmaxspareservers']?$varsettings['varsettingsmaxspareservers']:'10');
+	$varsettingsmaxqueuesize = ($varsettings['varsettingsmaxqueuesize']?$varsettings['varsettingsmaxqueuesize']:'65536');
+	$varsettingsmaxrequestsperserver = ($varsettings['varsettingsmaxrequestsperserver']?$varsettings['varsettingsmaxrequestsperserver']:'0');
 	
 	// These lines are uncommented in fuction "freeradius_settings_resync" to INCLUDE / enable eap.conf
 	$sqlconf = $config['installedpackages']['freeradiussqlconf']['config'][0];
-	$varsqlconfenable = $sqlconf['varsqlconfenable'];
-	$varsqlconfenablecounter = $sqlconf['varsqlconfenablecounter'];
+	$varsqlconfenable = ($sqlconf['varsqlconfenable']?$sqlconf['varsqlconfenable']:'#\$INCLUDE sql.conf');
+	$varsqlconfenablecounter = ($sqlconf['varsqlconfenablecounter']?$sqlconf['varsqlconfenablecounter']:'#\$INCLUDE sql/mysql/counter.conf');
 	
 	
 
@@ -116,7 +123,7 @@ extended_expressions = $varsettingsextendedexpressions
 EOD;
 
 $arrinterfaces = $config['installedpackages']['freeradiusinterfaces']['config'];
-	if (is_array($arrinterfaces)) {
+	if (is_array($arrinterfaces)  && !empty($arrinterfaces)) {
 		foreach ($arrinterfaces as $item) {
 			$varinterfaceip = $item['varinterfaceip'];
 			$varinterfaceport = $item['varinterfaceport'];
@@ -218,6 +225,9 @@ global $config;
 
 $conf = '';
 $users = $config['installedpackages']['freeradius']['config'];
+
+$usersoutput = $config['installedpackages']['freeradius']['config'][0]['usersoutput']=base64_encode(file_get_contents('/usr/local/etc/raddb/users'));
+
 if (is_array($users)) {
 foreach ($users as $user) {
 $username = $user['username'];
@@ -353,32 +363,32 @@ function freeradius_eapconf_resync() {
 	$eapconf = $config['installedpackages']['freeradiuseapconf']['config'][0];
 	
 	// Variables: EAP
-	$vareapconfdefaulteaptype = $eapconf['vareapconfdefaulteaptype'];
-	$vareapconftimerexpire = $eapconf['vareapconftimerexpire'];
-	$vareapconfignoreunknowneaptypes = $eapconf['vareapconfignoreunknowneaptypes'];
-	$vareapconfciscoaccountingusernamebug = $eapconf['vareapconfciscoaccountingusernamebug'];
-	$vareapconfmaxsessions = $eapconf['vareapconfmaxsessions'];
+	$vareapconfdefaulteaptype = ($eapconf['vareapconfdefaulteaptype']?$eapconf['vareapconfdefaulteaptype']:'md5');
+	$vareapconftimerexpire = ($eapconf['vareapconftimerexpire']?$eapconf['vareapconftimerexpire']:'60');
+	$vareapconfignoreunknowneaptypes = ($eapconf['vareapconfignoreunknowneaptypes']?$eapconf['vareapconfignoreunknowneaptypes']:'no');
+	$vareapconfciscoaccountingusernamebug = ($eapconf['vareapconfciscoaccountingusernamebug']?$eapconf['vareapconfciscoaccountingusernamebug']:'no');
+	$vareapconfmaxsessions = ($eapconf['vareapconfmaxsessions']?$eapconf['vareapconfmaxsessions']:'4096');
 	
 	// Variables: EAP-TLS and EAP-TLS with OCSP support
-	$vareapconfprivatekeypassword = $eapconf['vareapconfprivatekeypassword'];
-	$vareapconfprivatekeyfile = $eapconf['vareapconfprivatekeyfile'];
-	$vareapconfcertificatefile = $eapconf['vareapconfcertificatefile'];
-	$vareapconfcafile = $eapconf['vareapconfcafile'];
-	$vareapconfdhfile = $eapconf['vareapconfdhfile'];
-	$vareapconfrandomfile = $eapconf['vareapconfrandomfile'];
-	$vareapconfocspenable = $eapconf['vareapconfocspenable'];
-	$vareapconfocspoverridecerturl = $eapconf['vareapconfocspoverridecerturl'];
-	$vareapconfocspurl = $eapconf['vareapconfocspurl'];
+	$vareapconfprivatekeypassword = ($eapconf['vareapconfprivatekeypassword']?$eapconf['vareapconfprivatekeypassword']:'whatever');
+	$vareapconfprivatekeyfile = ($eapconf['vareapconfprivatekeyfile']?$eapconf['vareapconfprivatekeyfile']:'server.pem');
+	$vareapconfcertificatefile = ($eapconf['vareapconfcertificatefile']?$eapconf['vareapconfcertificatefile']:'server.pem');
+	$vareapconfcafile = ($eapconf['vareapconfcafile']?$eapconf['vareapconfcafile']:'ca.pem');
+	$vareapconfdhfile = ($eapconf['vareapconfdhfile']?$eapconf['vareapconfdhfile']:'dh');
+	$vareapconfrandomfile = ($eapconf['vareapconfrandomfile']?$eapconf['vareapconfrandomfile']:'random');
+	$vareapconfocspenable = ($eapconf['vareapconfocspenable']?$eapconf['vareapconfocspenable']:'no');
+	$vareapconfocspoverridecerturl = ($eapconf['vareapconfocspoverridecerturl']?$eapconf['vareapconfocspoverridecerturl']:'no');
+	$vareapconfocspurl = ($eapconf['vareapconfocspurl']?$eapconf['vareapconfocspurl']:'http://127.0.0.1/ocsp/');
 	
 	// Variables: EAP-TTLS
-	$vareapconfttlsdefaulteaptype = $eapconf['vareapconfttlsdefaulteaptype'];
-	$vareapconfttlscopyrequesttotunnel = $eapconf['vareapconfttlscopyrequesttotunnel'];
-	$vareapconfttlsusetunneledreply = $eapconf['vareapconfttlsusetunneledreply'];
+	$vareapconfttlsdefaulteaptype = ($eapconf['vareapconfttlsdefaulteaptype']?$eapconf['vareapconfttlsdefaulteaptype']:'md5');
+	$vareapconfttlscopyrequesttotunnel = ($eapconf['vareapconfttlscopyrequesttotunnel']?$eapconf['vareapconfttlscopyrequesttotunnel']:'no');
+	$vareapconfttlsusetunneledreply = ($eapconf['vareapconfttlsusetunneledreply']?$eapconf['vareapconfttlsusetunneledreply']:'no');
 	
 	// Variables: EAP-PEAP with MSCHAPv2
-	$vareapconfpeapdefaulteaptype = $eapconf['vareapconfpeapdefaulteaptype'];
-	$vareapconfpeapcopyrequesttotunnel = $eapconf['vareapconfpeapcopyrequesttotunnel'];
-	$vareapconfpeapusetunneledreply = $eapconf['vareapconfpeapusetunneledreply'];
+	$vareapconfpeapdefaulteaptype = ($eapconf['vareapconfpeapdefaulteaptype']?$eapconf['vareapconfpeapdefaulteaptype']:'mschapv2');
+	$vareapconfpeapcopyrequesttotunnel = ($eapconf['vareapconfpeapcopyrequesttotunnel']?$eapconf['vareapconfpeapcopyrequesttotunnel']:'no');
+	$vareapconfpeapusetunneledreply = ($eapconf['vareapconfpeapusetunneledreply']?$eapconf['vareapconfpeapusetunneledreply']:'no');
 	
 	
 	$conf .= <<<EOD
@@ -481,34 +491,34 @@ function freeradius_sqlconf_resync() {
 	$sqlconf = $config['installedpackages']['freeradiussqlconf']['config'][0];
 	
 	// Variables: SQL
-	$varsqlconfdatabase = $sqlconf['varsqlconfdatabase'];
-	$varsqlconfserver = $sqlconf['varsqlconfserver'];
-	$varsqlconfport = $sqlconf['varsqlconfport'];
-	$varsqlconflogin = $sqlconf['varsqlconflogin'];
-	$varsqlconfpassword = $sqlconf['varsqlconfpassword'];
-	$varsqlconfradiusdb = $sqlconf['varsqlconfradiusdb'];
-	$varsqlconfaccttable1 = $sqlconf['varsqlconfaccttable1'];
-	$varsqlconfaccttable2 = $sqlconf['varsqlconfaccttable2'];
-	$varsqlconfpostauthtable = $sqlconf['varsqlconfpostauthtable'];
-	$varsqlconfauthchecktable = $sqlconf['varsqlconfauthchecktable'];
-	$varsqlconfauthreplytable = $sqlconf['varsqlconfauthreplytable'];
-	$varsqlconfgroupchecktable = $sqlconf['varsqlconfgroupchecktable'];
-	$varsqlconfgroupreplytable = $sqlconf['varsqlconfgroupreplytable'];
-	$varsqlconfusergrouptable = $sqlconf['varsqlconfusergrouptable'];
-	$varsqlconfreadgroups = $sqlconf['varsqlconfreadgroups'];
-	$varsqlconfdeletestalesessions = $sqlconf['varsqlconfdeletestalesessions'];
-	$varsqlconfsqltrace = $sqlconf['varsqlconfsqltrace'];
-	$varsqlconfnumsqlsocks = $sqlconf['varsqlconfnumsqlsocks'];
-	$varsqlconfconnectfailureretrydelay = $sqlconf['varsqlconfconnectfailureretrydelay'];
-	$varsqlconflifetime = $sqlconf['varsqlconflifetime'];
-	$varsqlconfmaxqueries = $sqlconf['varsqlconfmaxqueries'];
-	$varsqlconfreadclients = $sqlconf['varsqlconfreadclients'];
-	$varsqlconfnastable = $sqlconf['varsqlconfnastable'];
+	$varsqlconfdatabase = ($sqlconf['varsqlconfdatabase']?$sqlconf['varsqlconfdatabase']:'mysql');
+	$varsqlconfserver = ($sqlconf['varsqlconfserver']?$sqlconf['varsqlconfserver']:'localhost');
+	$varsqlconfport = ($sqlconf['varsqlconfport']?$sqlconf['varsqlconfport']:'3306');
+	$varsqlconflogin = ($sqlconf['varsqlconflogin']?$sqlconf['varsqlconflogin']:'radius');
+	$varsqlconfpassword = ($sqlconf['varsqlconfpassword']?$sqlconf['varsqlconfpassword']:'radpass');
+	$varsqlconfradiusdb = ($sqlconf['varsqlconfradiusdb']?$sqlconf['varsqlconfradiusdb']:'radius');
+	$varsqlconfaccttable1 = ($sqlconf['varsqlconfaccttable1']?$sqlconf['varsqlconfaccttable1']:'radacct');
+	$varsqlconfaccttable2 = ($sqlconf['varsqlconfaccttable2']?$sqlconf['varsqlconfaccttable2']:'radacct');
+	$varsqlconfpostauthtable = ($sqlconf['varsqlconfpostauthtable']?$sqlconf['varsqlconfpostauthtable']:'radpostauth');
+	$varsqlconfauthchecktable = ($sqlconf['varsqlconfauthchecktable']?$sqlconf['varsqlconfauthchecktable']:'radcheck');
+	$varsqlconfauthreplytable = ($sqlconf['varsqlconfauthreplytable']?$sqlconf['varsqlconfauthreplytable']:'radreply');
+	$varsqlconfgroupchecktable = ($sqlconf['varsqlconfgroupchecktable']?$sqlconf['varsqlconfgroupchecktable']:'radgroupcheck');
+	$varsqlconfgroupreplytable = ($sqlconf['varsqlconfgroupreplytable']?$sqlconf['varsqlconfgroupreplytable']:'radgroupreply');
+	$varsqlconfusergrouptable = ($sqlconf['varsqlconfusergrouptable']?$sqlconf['varsqlconfusergrouptable']:'radusergroup');
+	$varsqlconfreadgroups = ($sqlconf['varsqlconfreadgroups']?$sqlconf['varsqlconfreadgroups']:'yes');
+	$varsqlconfdeletestalesessions = ($sqlconf['varsqlconfdeletestalesessions']?$sqlconf['varsqlconfdeletestalesessions']:'yes');
+	$varsqlconfsqltrace = ($sqlconf['varsqlconfsqltrace']?$sqlconf['varsqlconfsqltrace']:'no');
+	$varsqlconfnumsqlsocks = ($sqlconf['varsqlconfnumsqlsocks']?$sqlconf['varsqlconfnumsqlsocks']:'5');
+	$varsqlconfconnectfailureretrydelay = ($sqlconf['varsqlconfconnectfailureretrydelay']?$sqlconf['varsqlconfconnectfailureretrydelay']:'60');
+	$varsqlconflifetime = ($sqlconf['varsqlconflifetime']?$sqlconf['varsqlconflifetime']:'0');
+	$varsqlconfmaxqueries = ($sqlconf['varsqlconfmaxqueries']?$sqlconf['varsqlconfmaxqueries']:'0');
+	$varsqlconfreadclients = ($sqlconf['varsqlconfreadclients']?$sqlconf['varsqlconfreadclients']:'yes');
+	$varsqlconfnastable = ($sqlconf['varsqlconfnastable']?$sqlconf['varsqlconfnastable']:'nas');
 	
 	// These lines are uncommented in fuction "freeradius_settings_resync" to INCLUDE / enable eap.conf
 	// $sqlconf = $config['installedpackages']['freeradiussqlconf']['config'][0];
-	// $varsqlconfenable = $sqlconf['varsqlconfenable'];
-	// $varsqlconfenablecounter = $sqlconf['varsqlconfenablecounter'];
+	// $varsqlconfenable = ($sqlconf['varsqlconfenable']?$sqlconf['varsqlconfenable']:'#\$INCLUDE sql.conf');
+	// $varsqlconfenablecounter = ($sqlconf['varsqlconfenablecounter']?$sqlconf['varsqlconfenablecounter']:'#\$INCLUDE sql/mysql/counter.conf');
 	
 
 	$conf .= <<<EOD
