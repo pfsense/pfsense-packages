@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <packagegui>
-	<title>Services: LCDproc 0.5.4 pkg v. 0.1</title>
+	<title>Services: LCDproc 0.5.4 pkg v. 0.3</title>
 	<name>lcdproc</name>
-	<version>0.5.4 pkg v. 0.2</version>
+	<version>0.5.4 pkg v. 0.3</version>
 	<savetext>Save</savetext>
 	<include_file>/usr/local/pkg/lcdproc.inc</include_file>
 	<tabs>

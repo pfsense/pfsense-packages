@@ -3,7 +3,7 @@
 <?xml-stylesheet type="text/xsl" href="./xsl/package.xsl"?>
 <packagegui>
 	<copyright>
-	<![CDATA[
+<![CDATA[	
 /* $Id$ */
 /* ========================================================================== */
 /*
@@ -40,9 +40,10 @@
 	POSSIBILITY OF SUCH DAMAGE.
 									      */
 /* ========================================================================== */
-	]]>
+]]>
+	
 	</copyright>
-	<description>Describe your package here</description>
+	<description><![CDATA[Describe your package here]]></description>
 	<requirements>Describe your package requirements here</requirements>
 	<faq>Currently there are no FAQ items provided.</faq>
 	<name>freeradius</name>
@@ -59,7 +60,7 @@
 		<name>FreeRADIUS</name>
 		<rcfile>radiusd.sh</rcfile>
 		<executable>radiusd</executable>
-		<description>The FreeRADIUS daemon.</description>
+		<description><![CDATA[The FreeRADIUS daemon.]]></description>
 	</service>
 
 	<tabs>
@@ -79,6 +80,10 @@
 		<tab>
 			<text>Settings</text>
 			<url>/pkg_edit.php?xml=freeradiussettings.xml&amp;id=0</url>
+		</tab>
+		<tab>
+			<text>EAP</text>
+			<url>/pkg_edit.php?xml=freeradiuseapconf.xml&amp;id=0</url>
 		</tab>
 	</tabs>
 
@@ -133,6 +138,11 @@
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0755</chmod>
+		<item>http://www.pfsense.org/packages/config/freeradius2/freeradiuseapconf.xml</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/pkg/</prefix>
+		<chmod>0755</chmod>
 		<item>http://www.pfsense.org/packages/config/freeradius2/freeradiusinterfaces.xml</item>
 	</additional_files_needed>	
 	<additional_files_needed>
@@ -148,21 +158,21 @@
 		<field>
 			<fielddescr>Username</fielddescr>
 			<fieldname>username</fieldname>
-			<description>Enter the username.</description>
+			<description><![CDATA[Enter the username.]]></description>
 			<type>input</type>
 			<required/>
 		</field>
 		<field>
 			<fielddescr>Password</fielddescr>
 			<fieldname>password</fieldname>
-			<description>Enter the password for this username.</description>
+			<description><![CDATA[Enter the password for this username.]]></description>
 			<type>password</type>
 			<required/>
 		</field>
 		<field>
 			<fielddescr>Number of simultaneous connections</fielddescr>
 			<fieldname>multiconnect</fieldname>
-			<description>The maximum of simultaneous connections with this username.</description>
+			<description><![CDATA[The maximum of simultaneous connections with this username.]]></description>
 			<required/>
 			<type>input</type>
 		</field>		
@@ -200,8 +210,7 @@
 	This setting can be used for a NAS that supports the following RADIUS parameters:<br><br>
 	  Tunnel-Type = VLAN<br>
 	  Tunnel-Medium-Type = IEEE-802<br>
-	  Tunnel-Private-Group-ID = "<b>THIS IS YOUR INPUT</b>"]]>
-			</description>
+	  Tunnel-Private-Group-ID = "<b>THIS IS YOUR INPUT</b>"]]></description>
 			<type>input</type>
 		</field>		
 		<field>
@@ -211,13 +220,13 @@
 		<field>
 			<fielddescr>Expiration Time</fielddescr>
 			<fieldname>expiration</fieldname>			
-			<description>Enter the date when this account should expire. Format is: Mmm dd yyyy (e.g. Jan 01 2012).</description>
+			<description><![CDATA[Enter the date when this account should expire. Format is: Mmm dd yyyy (e.g. Jan 01 2012).]]></description>
 			<type>input</type>
 		</field>
 		<field>
 			<fielddescr>Session Time</fielddescr>
 			<fieldname>sessiontime</fieldname>			
-			<description>Enter the time this user has until relogin in seconds.</description>
+			<description><![CDATA[Enter the time this user has until relogin in seconds.]]></description>
 			<type>input</type>
 		</field>
 		<field>
@@ -227,7 +236,6 @@
 							Every time string contains a day (Mo,Tu,We,Th,Fr,Sa,Su) or all weekdays which is from monday till friday (Wk).<br><br>
 							<b>Wk0855-2305,Sa,Su2230-0230</b><br><br>
 							This means weekdays after 8:55 AM and before 11:05 PM | any time on saturday | sunday after 10:30 PM and before 02:30 AM.]]></description>
-
 			<type>input</type>
 		</field>
 		<field>
@@ -237,7 +245,7 @@
 		<field>
 			<fielddescr>Description</fielddescr>
 			<fieldname>description</fieldname>			
-			<description>Enter any description for this user you like.</description>
+			<description><![CDATA[Enter any description for this user you like.]]></description>
 			<type>input</type>
 		</field>
 		<field>
@@ -246,8 +254,7 @@
 			<description><![CDATA[This is for experts only and should be treat with care!<br>
 								You may append (after all options from above) custom RADIUS options to this user account (separated by commas).<br>
 								<b>IMPORTANT:</b> If you don't format this field correctly freeRADIUS will not start because of syntax errors.<br>
-								Verify your changes by checking users file (/usr/local/etc/raddb/users).]]>
-			</description>
+								Verify your changes by checking users file (/usr/local/etc/raddb/users).]]></description>
 			<type>textarea</type>
 			<rows>10</rows>
 			<cols>75</cols>
@@ -264,9 +271,9 @@
 		freeradius_settings_resync();
 		freeradius_clients_resync();
 		freeradius_users_resync();
-		exec("chown -R root:wheel /usr/local/etc/raddb");
-		exec("chown -R root:wheel /usr/local/lib/freeradius-2.1.12");
+		freeradius_eapconf_resync();
 		exec("rm -f /usr/local/etc/raddb/sites-enabled/control-socket");
+		exec("rm -f /usr/local/etc/raddb/sites-enabled/inner-tunnel");
 	</custom_php_install_command>
 	<custom_php_deinstall_command>
 		freeradius_deinstall_command();

@@ -27,6 +27,9 @@ function freeradius_install_command() {
 		}
 	}
 	
+	exec("chown -R root:wheel /usr/local/etc/raddb");
+	exec("chown -R root:wheel /usr/local/lib/freeradius-2.1.12");
+	
 	closedir($handle);
 
 	$rcfile = array();
@@ -321,5 +324,135 @@ EOD;
 	file_put_contents(RADDB . '/clients.conf', $conf);
 	conf_mount_ro();
 	restart_service("freeradius");
+}
+
+
+
+function freeradius_eapconf_resync() {
+	global $config;
+	$conf = '';
+
+	$eapconf = $config['installedpackages']['freeradiuseapconf']['config'][0];
+	
+	// Variables: EAP
+	$vareapconfdefaulteaptype = $eapconf['vareapconfdefaulteaptype'];
+	$vareapconftimerexpire = $eapconf['vareapconftimerexpire'];
+	$vareapconfignoreunknowneaptypes = $eapconf['vareapconfignoreunknowneaptypes'];
+	$vareapconfciscoaccountingusernamebug = $eapconf['vareapconfciscoaccountingusernamebug'];
+	$vareapconfmaxsessions = $eapconf['vareapconfmaxsessions'];
+	
+	// Variables: EAP-TLS and EAP-TLS with OCSP support
+	$vareapconfprivatekeypassword = $eapconf['vareapconfprivatekeypassword'];
+	$vareapconfprivatekeyfile = $eapconf['vareapconfprivatekeyfile'];
+	$vareapconfcertificatefile = $eapconf['vareapconfcertificatefile'];
+	$vareapconfcafile = $eapconf['vareapconfcafile'];
+	$vareapconfdhfile = $eapconf['vareapconfdhfile'];
+	$vareapconfrandomfile = $eapconf['vareapconfrandomfile'];
+	$vareapconfocspenable = $eapconf['vareapconfocspenable'];
+	$vareapconfocspoverridecerturl = $eapconf['vareapconfocspoverridecerturl'];
+	$vareapconfocspurl = $eapconf['vareapconfocspurl'];
+	
+	// Variables: EAP-TTLS
+	$vareapconfttlsdefaulteaptype = $eapconf['vareapconfttlsdefaulteaptype'];
+	$vareapconfttlscopyrequesttotunnel = $eapconf['vareapconfttlscopyrequesttotunnel'];
+	$vareapconfttlsusetunneledreply = $eapconf['vareapconfttlsusetunneledreply'];
+	
+	// Variables: EAP-PEAP with MSCHAPv2
+	$vareapconfpeapdefaulteaptype = $eapconf['vareapconfpeapdefaulteaptype'];
+	$vareapconfpeapcopyrequesttotunnel = $eapconf['vareapconfpeapcopyrequesttotunnel'];
+	$vareapconfpeapusetunneledreply = $eapconf['vareapconfpeapusetunneledreply'];
+	
+	
+	$conf .= <<<EOD
+
+	### EAP
+	eap {
+		default_eap_type = $vareapconfdefaulteaptype
+		timer_expire     = $vareapconftimerexpire
+		ignore_unknown_eap_types = $vareapconfignoreunknowneaptypes
+		cisco_accounting_username_bug = $vareapconfciscoaccountingusernamebug
+		max_sessions = $vareapconfmaxsessions
+		
+		md5 {
+		}
+		leap {
+		}
+		gtc {
+			#challenge = "Password: "
+			auth_type = PAP
+		}
+		
+		
+	### EAP-TLS and EAP-TLS with OCSP support
+		tls {
+			certdir = \${confdir}/certs
+			cadir = \${confdir}/certs
+			private_key_password = $vareapconfprivatekeypassword
+			private_key_file = \${certdir}/$vareapconfprivatekeyfile
+			certificate_file = \${certdir}/$vareapconfcertificatefile
+			CA_file = \${cadir}/$vareapconfcafile
+			dh_file = \${certdir}/$vareapconfdhfile
+			random_file = \${certdir}/$vareapconfrandomfile
+		#	fragment_size = 1024
+		#	include_length = yes
+		#	check_crl = yes
+			CA_path = \${cadir}
+		#   check_cert_issuer = "/C=GB/ST=Berkshire/L=Newbury/O=My Company Ltd"
+		#	check_cert_cn = %{User-Name}
+			cipher_list = "DEFAULT"
+			make_cert_command = "\${certdir}/bootstrap"
+			ecdh_curve = "prime256v1"
+			cache {
+			      enable = no
+			      lifetime = 24 # hours
+			      max_entries = 255
+			}
+			verify {
+		#     		tmpdir = /tmp/radiusd
+		#    		client = "/path/to/openssl verify -CApath ${CA_path} %{TLS-Client-Cert-Filename}"
+			}
+			ocsp {
+			      enable = $vareapconfocspenable
+			      override_cert_url = $vareapconfocspoverridecerturl
+			      url = "$vareapconfocspurl"
+			}
+		}	### end tls
+	
+	### EAP-TTLS
+		ttls {
+			default_eap_type = $vareapconfttlsdefaulteaptype
+			copy_request_to_tunnel = $vareapconfttlscopyrequesttotunnel
+			use_tunneled_reply = $vareapconfttlsusetunneledreply
+		### if disabled this will be processed by the virtual server called "default"
+		#	virtual_server = "inner-tunnel"
+		#	include_length = yes
+		}	### end ttls	
+	
+	### EAP-PEAP with MSCHAPv2
+		peap {
+			default_eap_type = $vareapconfpeapdefaulteaptype
+			copy_request_to_tunnel = $vareapconfpeapcopyrequesttotunnel
+			use_tunneled_reply = $vareapconfpeapusetunneledreply
+		#	proxy_tunneled_request_as_eap = yes
+		### if disabled this will be processed by the virtual server called "default"
+		#	virtual_server = "inner-tunnel"
+		#	soh = yes
+		#	soh_virtual_server = "soh-server"
+		}
+		mschapv2 {
+		#	send_error = no
+		}	
+	}	### end eap
+
+
+EOD;
+
+	$filename = RADDB . '/eap.conf';
+	conf_mount_rw();
+	file_put_contents($filename, $conf);
+	chmod($filename, 0600);
+	conf_mount_ro();
+
+	restart_service('freeradius');
 }
 ?>
