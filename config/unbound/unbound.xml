@@ -40,7 +40,7 @@
 	<requirements/>
 	<faq/>
 	<name>unbound</name>
-	<version>1.4.8</version>
+	<version>1.4.14</version>
 	<title>Services: Unbound DNS Forwarder: Basic Settings</title>
 	<include_file>/usr/local/pkg/unbound.inc</include_file>
 	<menu>
