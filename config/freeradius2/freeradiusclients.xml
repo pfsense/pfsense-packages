@@ -42,7 +42,7 @@
 /* ========================================================================== */
 		]]>
 	</copyright>
-	<description>Describe your package here</description>
+	<description><![CDATA[Describe your package here]]></description>
 	<requirements>Describe your package requirements here</requirements>
 	<faq>Currently there are no FAQ items provided.</faq>
 	<name>freeradiusclients</name>
@@ -66,6 +66,10 @@
 		<tab>
 			<text>Settings</text>
 			<url>/pkg_edit.php?xml=freeradiussettings.xml&amp;id=0</url>
+		</tab>
+		<tab>
+			<text>EAP</text>
+			<url>/pkg_edit.php?xml=freeradiuseapconf.xml&amp;id=0</url>
 		</tab>
 	</tabs>
 	<adddeleteeditpagefields>
@@ -110,7 +114,7 @@
 		<field>
 			<fielddescr>Client IP Address</fielddescr>
 			<fieldname>varclientip</fieldname>
-			<description>Enter the IP address of the client. This is in general the IP of the NAS (switch,accesspoint).</description>
+			<description><![CDATA[Enter the IP address of the client. This is in general the IP of the NAS (switch,accesspoint).]]></description>
 			<type>input</type>
 			<required/>
 		</field>
@@ -128,14 +132,14 @@
 		<field>
 			<fielddescr>Client Shortname</fielddescr>
 			<fieldname>varclientshortname</fieldname>
-			<description>Enter shortname of the client. This is in general the IP of the NAS (switch,accesspoint).</description>
+			<description><![CDATA[Enter shortname of the client. This is in general the IP of the NAS (switch,accesspoint).]]></description>
 			<type>input</type>
 			<required/>
 		</field>
 		<field>
 			<fielddescr>Client Shared Secret</fielddescr>
 			<fieldname>varclientsharedsecret</fieldname>
-			<description>Enter the shared secret of the client here. This is the shared secret (password) which the NAS (switch or accesspoint) needs to communicate with the RADIUS server.</description>
+			<description><![CDATA[Enter the shared secret of the client here. This is the shared secret (password) which the NAS (switch or accesspoint) needs to communicate with the RADIUS server.]]></description>
 			<type>password</type>
 			<required/>
 		</field>
@@ -146,7 +150,7 @@
 		<field>
 			<fielddescr>Client Protocol</fielddescr>
 			<fieldname>varclientproto</fieldname>
-			<description>Enter the protocol the client uses. (Default: udp)</description>
+			<description><![CDATA[Enter the protocol the client uses. (Default: udp)]]></description>
 			<type>select</type>
 			<default_value>udp</default_value>
 					<options>
@@ -157,7 +161,7 @@
 		<field>
 			<fielddescr>Client Type</fielddescr>
 			<fieldname>varclientnastype</fieldname>
-			<description>Enter the NAS type of the client. This is used by checkrad.pl for simultaneous use checks. (Default: other)</description>
+			<description><![CDATA[Enter the NAS type of the client. This is used by checkrad.pl for simultaneous use checks. (Default: other)]]></description>
 			<type>select</type>
 			<default_value>other</default_value>
 					<options>
@@ -178,7 +182,7 @@
 		<field>
 			<fielddescr>Require Message Authenticator</fielddescr>
 			<fieldname>varrequiremessageauthenticator</fieldname>
-			<description>RFC5080 requires Message-Authenticator in Access-Request. But older NAS (switches or accesspoints) do not include that. (Default: no)</description>
+			<description><![CDATA[RFC5080 requires Message-Authenticator in Access-Request. But older NAS (switches or accesspoints) do not include that. (Default: no)]]></description>
 			<type>select</type>
 			<default_value>no</default_value>
 					<options>
@@ -189,14 +193,14 @@
 		<field>
 			<fielddescr>Max Connections</fielddescr>
 			<fieldname>varclientmaxconnections</fieldname>
-			<description>Takes only effect if you use TCP as protocol. This is the mirror of "Max Requests Server" from "Settings" tab. (Default 16)</description>
+			<description><![CDATA[Takes only effect if you use TCP as protocol. This is the mirror of "Max Requests Server" from "Settings" tab. (Default 16)]]></description>
 			<type>input</type>
 			<default_value>16</default_value>
 		</field>
 		<field>
 			<fielddescr>Description</fielddescr>
 			<fieldname>description</fieldname>
-			<description>Enter any description you like for this client.</description>
+			<description><![CDATA[Enter any description you like for this client.]]></description>
 			<type>input</type>
 		</field>
 	</fields>
