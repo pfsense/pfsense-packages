@@ -158,7 +158,7 @@
 			<fieldname>vlanid</fieldname>
 		</columnitem>
 	</adddeleteeditpagefields>
-		<fields>
+	<fields>
 		<field>
 			<name>GENERAL CONFIGURATION</name>
 			<type>listtopic</type>
