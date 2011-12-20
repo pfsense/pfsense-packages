@@ -121,10 +121,10 @@ regular_expressions = $varsettingsregularexpressions
 extended_expressions = $varsettingsextendedexpressions
 
 EOD;
-// This activates virtual-server coa.
-// A better way would be if this link would only be created if there is an interface type "coa"
-// and if deleted the link will be deleted, too
-exec("ln -s /usr/local/etc/raddb/sites-available/coa /usr/local/etc/raddb/sites-enabled/");
+
+// Deletes virtual-server coa by default. Will be re-enabled if there is an interface-type "coa"
+exec("rm -f /usr/local/etc/raddb/sites-enabled/coa");
+
 $arrinterfaces = $config['installedpackages']['freeradiusinterfaces']['config'];
 	if (is_array($arrinterfaces)  && !empty($arrinterfaces)) {
 		foreach ($arrinterfaces as $item) {
@@ -149,6 +149,8 @@ EOD;
 
 			// Begin "if" for interface-type = coa
 			if ($item['varinterfacetype'] == 'coa') {
+			// Enables virtual-server coa because interface-type is coa
+			exec("ln -s /usr/local/etc/raddb/sites-available/coa /usr/local/etc/raddb/sites-enabled/");
 			$conf .= <<<EOD
 listen {
 		type = $varinterfacetype
@@ -158,7 +160,7 @@ listen {
 }
 
 EOD;
-			}	// End "if" for interface-type = detail
+			}	// End "if" for interface-type = coa
 
 			// Begin "if" for interface-type = auth, acct, proxy, status
 			if (($item['varinterfacetype'] == 'auth') || ($item['varinterfacetype'] == 'acct') || ($item['varinterfacetype'] == 'proxy') || ($item['varinterfacetype'] == 'status')) {
@@ -257,7 +259,7 @@ global $config;
 
 $conf = '';
 $users = $config['installedpackages']['freeradius']['config'];
-if (is_array($users)) {
+if (is_array($users) && !empty($users)) {
 foreach ($users as $user) {
 $username = $user['username'];
 $password = $user['password'];
