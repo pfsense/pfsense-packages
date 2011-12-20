@@ -106,7 +106,6 @@ echo"</table></div>";
 ?>
 <script type="text/javascript">
 	function getstatus_varnish() {
-		#scroll(0,0);
 		var url = "/widgets/widgets/varnish.widget.php";
 		var pars = 'getupdatestatus=yes';
 		var myAjax = new Ajax.Request(
