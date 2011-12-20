@@ -121,7 +121,10 @@ regular_expressions = $varsettingsregularexpressions
 extended_expressions = $varsettingsextendedexpressions
 
 EOD;
-
+// This activates virtual-server coa.
+// A better way would be if this link would only be created if there is an interface type "coa"
+// and if deleted the link will be deleted, too
+exec("ln -s /usr/local/etc/raddb/sites-available/coa /usr/local/etc/raddb/sites-enabled/");
 $arrinterfaces = $config['installedpackages']['freeradiusinterfaces']['config'];
 	if (is_array($arrinterfaces)  && !empty($arrinterfaces)) {
 		foreach ($arrinterfaces as $item) {
@@ -129,22 +132,49 @@ $arrinterfaces = $config['installedpackages']['freeradiusinterfaces']['config'];
 			$varinterfaceport = $item['varinterfaceport'];
 			$varinterfacetype = $item['varinterfacetype'];
 			$varinterfaceipversion = $item['varinterfaceipversion'];
-			$conf .= <<<EOD
 
+			// Begin "if" for interface-type = detail
+			if ($item['varinterfacetype'] == 'detail') {
+			$conf .= <<<EOD
 listen {
 		type = $varinterfacetype
 		$varinterfaceipversion = $varinterfaceip
 		port = $varinterfaceport
-		### the following two lines are only neccessary for interface type detail
-		filename = ${radacctdir}/detail
+		filename = \${radacctdir}/detail-%Y%m%d:%H
 		load_factor = 10
 }
 
 EOD;
-		}	// end foreach
-	}		// end if
-$conf .= <<<EOD
+			}	// End "if" for interface-type = detail
 
+			// Begin "if" for interface-type = coa
+			if ($item['varinterfacetype'] == 'coa') {
+			$conf .= <<<EOD
+listen {
+		type = $varinterfacetype
+		$varinterfaceipversion = $varinterfaceip
+		port = $varinterfaceport
+		server = coa
+}
+
+EOD;
+			}	// End "if" for interface-type = detail
+
+			// Begin "if" for interface-type = auth, acct, proxy, status
+			if (($item['varinterfacetype'] == 'auth') || ($item['varinterfacetype'] == 'acct') || ($item['varinterfacetype'] == 'proxy') || ($item['varinterfacetype'] == 'status')) {
+			$conf .= <<<EOD
+listen {
+		type = $varinterfacetype
+		$varinterfaceipversion = $varinterfaceip
+		port = $varinterfaceport
+}
+
+EOD;
+			}	// End "if" for interface-type = auth, acct, proxy, status
+		}	// end foreach
+	}	// end if array
+
+$conf .= <<<EOD
 log {
 	destination = $varsettingslogdir
 	file = \${logdir}/radius.log
