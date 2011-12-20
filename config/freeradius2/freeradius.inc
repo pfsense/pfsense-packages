@@ -257,9 +257,6 @@ global $config;
 
 $conf = '';
 $users = $config['installedpackages']['freeradius']['config'];
-
-$usersoutput = $config['installedpackages']['freeradius']['config'][0]['usersoutput']=base64_encode(file_get_contents('/usr/local/etc/raddb/users'));
-
 if (is_array($users)) {
 foreach ($users as $user) {
 $username = $user['username'];
