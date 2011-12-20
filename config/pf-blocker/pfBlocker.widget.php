@@ -84,7 +84,7 @@ echo"</table></div>";
 ?>
 <script type="text/javascript">
 	function getstatus_pfblocker() {
-		scroll(0,0);
+		#scroll(0,0);
 		var url = "/widgets/widgets/pfBlocker.widget.php";
 		var pars = 'getupdatestatus=yes';
 		var myAjax = new Ajax.Request(

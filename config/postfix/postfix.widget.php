@@ -115,7 +115,7 @@ echo"</table></div>";
 ?>
 <script type="text/javascript">
 	function getstatus_postfix() {
-		scroll(0,0);
+		#scroll(0,0);
 		var url = "/widgets/widgets/postfix.widget.php";
 		var pars = 'getupdatestatus=yes';
 		var myAjax = new Ajax.Request(
