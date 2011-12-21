@@ -300,14 +300,13 @@ function sync_package_postfix() {
             $found_mail=0;
             foreach ($sys_log as $line){
             	$new_line=preg_replace('/mail.(.|crit);/',$mail_syslog,$line);
-            	#set syslog entry mail.* %/var/log/maillog when log_to = system
-            	if (preg_match ('/mail.(.|crit);/',$line) && $postfix_config['log_to'] =="maillog")
+            	if (preg_match('/mail.*system.log/',$line) && $postfix_config['log_to'] =="maillog"){
             		$new_sys_log .= 'mail.*'."\t\t\t\t\t\t".'/var/log/maillog'."\n";
-            	#remove syslog entry mail.* %/var/log/maillog when log_to != system
-            	if (preg_match ("/^mail/",$line))
-            		$new_sys_log .="";
-            	else	
-            		$new_sys_log .= $new_line;
+            	}
+            	if (preg_match('/maillog/',$line)){
+            		$new_line ="";
+            	}
+            	$new_sys_log .= $new_line;
             }
             if (!file_exists('/root/system.inc.backup')) {
             	copy ($sys_log_file,'/root/system.inc.backup');

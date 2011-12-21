@@ -366,8 +366,8 @@
 		<config_file>http://www.pfsense.com/packages/config/postfix/postfix.xml</config_file>
 		<pkginfolink>http://forum.pfsense.org/index.php/topic,40622.0.html</pkginfolink>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
-		<depends_on_package>postfix-2.8.5,1.tbz</depends_on_package>
-		<version>2.8.5,1 pkg v.2.3.2</version>
+		<depends_on_package>postfix-2.8.7,1.tbz</depends_on_package>
+		<version>2.8.7,1 pkg v.2.3.3</version>
 		<status>RC1</status>
 		<required_version>2.0</required_version>
 		<configurationfile>postfix.xml</configurationfile>
