@@ -77,6 +77,10 @@
 			<url>/pkg_edit.php?xml=freeradiussqlconf.xml&amp;id=0</url>
 		</tab>
 		<tab>
+			<text>Certificates</text>
+			<url>/pkg_edit.php?xml=freeradiuscerts.xml&amp;id=0</url>
+		</tab>		
+		<tab>
 			<text>View config</text>
 			<url>/freeradius_view_config.php</url>
 		</tab>

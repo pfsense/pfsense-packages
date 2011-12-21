@@ -77,6 +77,10 @@
 			<url>/pkg_edit.php?xml=freeradiussqlconf.xml&amp;id=0</url>
 		</tab>
 		<tab>
+			<text>Certificates</text>
+			<url>/pkg_edit.php?xml=freeradiuscerts.xml&amp;id=0</url>
+		</tab>		
+		<tab>
 			<text>View config</text>
 			<url>/freeradius_view_config.php</url>
 		</tab>
@@ -141,7 +145,8 @@
 		<field>
 			<fielddescr>Private Key Password</fielddescr>
 			<fieldname>vareapconfprivatekeypassword</fieldname>
-			<description><![CDATA[Enter the password of the private key. (Default: whatever)]]></description>
+			<description><![CDATA[Enter the password of the private key.<br>
+								This is the password which you chose in "Certificates" tab. (Default: whatever)]]></description>
 			<type>password</type>
 			<default_value>whatever</default_value>
 		</field>
