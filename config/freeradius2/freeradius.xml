@@ -89,7 +89,16 @@
 			<text>SQL</text>
 			<url>/pkg_edit.php?xml=freeradiussqlconf.xml&amp;id=0</url>
 		</tab>
+		<tab>
+			<text>View config</text>
+			<url>/freeradius_view_config.php</url>
+		</tab>
 	</tabs>
+	<additional_files_needed>
+		<prefix>/usr/local/www/</prefix>
+		<chmod>0755</chmod>
+		<item>http://www.pfsense.org/packages/config/freeradius2/freeradius_view_config.php</item>
+	</additional_files_needed>	
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0755</chmod>

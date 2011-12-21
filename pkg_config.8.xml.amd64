@@ -806,7 +806,7 @@
 				Do not use together with freeradius package. Both are using the same XML files.]]></descr>
 		<pkginfolink>http://forum.pfsense.org/index.php/topic,43675.0.html</pkginfolink>
 		<category>System</category>
-		<version>2.1.12 pkg v1.3.2</version>
+		<version>2.1.12 pkg v1.3.3</version>
 		<status>BETA</status>
 		<required_version>2.0</required_version>
 		<maintainer>Nachtfalke</maintainer>
