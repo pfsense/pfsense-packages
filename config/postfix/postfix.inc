@@ -295,6 +295,7 @@ function sync_package_postfix() {
 			}
             #update /etc/inc/system.inc
             $sys_log_file='/etc/inc/system.inc';
+            $pfsense_version=preg_replace("/\s/","",file_get_contents("/etc/version"));
             $sys_log = file($sys_log_file);
             $new_sys_log="";
             $found_mail=0;
@@ -308,8 +309,8 @@ function sync_package_postfix() {
             	}
             	$new_sys_log .= $new_line;
             }
-            if (!file_exists('/root/system.inc.backup')) {
-            	copy ($sys_log_file,'/root/system.inc.backup');
+            if (!file_exists('/root/'.$pfsense_version.'.system.inc.backup')) {
+            	copy ($sys_log_file,'/root/'.$pfsense_version.'.system.inc.backup');
             }
             file_put_contents($sys_log_file,$new_sys_log, LOCK_EX);
             #mwexec('/usr/local/bin/php -q /usr/local/www/postfix_syslog.php');
