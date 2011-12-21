@@ -459,7 +459,8 @@ function freeradius_eapconf_resync() {
 		#   check_cert_issuer = "/C=GB/ST=Berkshire/L=Newbury/O=My Company Ltd"
 		#	check_cert_cn = %{User-Name}
 			cipher_list = "DEFAULT"
-			make_cert_command = "\${certdir}/bootstrap"
+		###	we make this from Certificate tab on GUI at startup
+		#	make_cert_command = "\${certdir}/bootstrap"
 			ecdh_curve = "prime256v1"
 			cache {
 			      enable = no
@@ -1255,5 +1256,344 @@ EOD;
 	conf_mount_ro();
 
 	restart_service('freeradius');
+}
+
+function freeradius_cacertcnf_resync() {
+	global $config;
+	$conf = '';
+
+	$arrcerts = $config['installedpackages']['freeradiuscerts']['config'][0];
+	
+	// General variables: CA, Server, Client
+	$varcertsdefaultdays = ($arrcerts['varcertsdefaultdays']?$arrcerts['varcertsdefaultdays']:'3650');
+	$varcertsdefaultmd = ($arrcerts['varcertsdefaultmd']?$arrcerts['varcertsdefaultmd']:'md5');
+	$varcertsdefaultbits = ($arrcerts['varcertsdefaultbits']?$arrcerts['varcertsdefaultbits']:'2048');
+	$varcertspassword = ($arrcerts['varcertspassword']?$arrcerts['varcertspassword']:'whatever');
+	$varcertscountryname = ($arrcerts['varcertscountryname']?$arrcerts['varcertscountryname']:'US');
+	$varcertsstateorprovincename = ($arrcerts['varcertsstateorprovincename']?$arrcerts['varcertsstateorprovincename']:'Texas');
+	$varcertslocalityname = ($arrcerts['varcertslocalityname']?$arrcerts['varcertslocalityname']:'Austin');
+	$varcertsorganizationname = ($arrcerts['varcertsorganizationname']?$arrcerts['varcertsorganizationname']:'My Company Inc');
+
+	// Variables: Only for CA
+	$varcertscaemailaddress = ($arrcerts['varcertscaemailaddress']?$arrcerts['varcertscaemailaddress']:'admin@mycompany.com');
+	$varcertscacommonname = ($arrcerts['varcertscacommonname']?$arrcerts['varcertscacommonname']:'internal-ca');
+	
+	
+	
+
+	$conf .= <<<EOD
+[ ca ]
+default_ca		= CA_default
+
+[ CA_default ]
+dir			= ./
+certs			= \$dir
+crl_dir			= \$dir/crl
+database		= \$dir/index.txt
+new_certs_dir		= \$dir
+certificate		= \$dir/ca.pem
+serial			= \$dir/serial
+crl			= \$dir/crl.pem
+private_key		= \$dir/ca.key
+RANDFILE		= \$dir/.rand
+name_opt		= ca_default
+cert_opt		= ca_default
+default_days		= $varcertsdefaultdays
+default_crl_days	= 30
+default_md		= $varcertsdefaultmd
+preserve		= no
+policy			= policy_match
+
+[ policy_match ]
+countryName		= match
+stateOrProvinceName	= match
+organizationName	= match
+organizationalUnitName	= optional
+commonName		= supplied
+emailAddress		= optional
+
+[ policy_anything ]
+countryName		= optional
+stateOrProvinceName	= optional
+localityName		= optional
+organizationName	= optional
+organizationalUnitName	= optional
+commonName		= supplied
+emailAddress		= optional
+
+[ req ]
+prompt			= no
+distinguished_name	= certificate_authority
+default_bits		= $varcertsdefaultbits
+input_password		= $varcertspassword
+output_password		= $varcertspassword
+x509_extensions		= v3_ca
+
+[certificate_authority]
+countryName		= $varcertscountryname
+stateOrProvinceName	= $varcertsstateorprovincename
+localityName		= $varcertslocalityname
+organizationName	= $varcertsorganizationname
+emailAddress		= $varcertscaemailaddress
+commonName		= "$varcertscacommonname"
+
+[v3_ca]
+subjectKeyIdentifier	= hash
+authorityKeyIdentifier	= keyid:always,issuer:always
+basicConstraints	= CA:true
+
+EOD;
+
+	$filename = RADDB . '/certs/ca.cnf';
+	conf_mount_rw();
+	file_put_contents($filename, $conf);
+	chmod($filename, 0600);
+	conf_mount_ro();
+
+}
+
+function freeradius_servercertcnf_resync() {
+	global $config;
+	$conf = '';
+
+	$arrcerts = $config['installedpackages']['freeradiuscerts']['config'][0];
+	
+	// General variables: CA, Server, Client
+	$varcertsdefaultdays = ($arrcerts['varcertsdefaultdays']?$arrcerts['varcertsdefaultdays']:'3650');
+	$varcertsdefaultmd = ($arrcerts['varcertsdefaultmd']?$arrcerts['varcertsdefaultmd']:'md5');
+	$varcertsdefaultbits = ($arrcerts['varcertsdefaultbits']?$arrcerts['varcertsdefaultbits']:'2048');
+	$varcertspassword = ($arrcerts['varcertspassword']?$arrcerts['varcertspassword']:'whatever');
+	$varcertscountryname = ($arrcerts['varcertscountryname']?$arrcerts['varcertscountryname']:'US');
+	$varcertsstateorprovincename = ($arrcerts['varcertsstateorprovincename']?$arrcerts['varcertsstateorprovincename']:'Texas');
+	$varcertslocalityname = ($arrcerts['varcertslocalityname']?$arrcerts['varcertslocalityname']:'Austin');
+	$varcertsorganizationname = ($arrcerts['varcertsorganizationname']?$arrcerts['varcertsorganizationname']:'My Company Inc');
+
+	// Variables: Only for Server
+	$varcertsserveremailaddress = ($arrcerts['varcertsserveremailaddress']?$arrcerts['varcertsserveremailaddress']:'webadmin@mycompany.com');
+	$varcertsservercommonname = ($arrcerts['varcertsservercommonname']?$arrcerts['varcertsservercommonname']:'server-cert');
+	
+
+	$conf .= <<<EOD
+[ ca ]
+default_ca		= CA_default
+
+[ CA_default ]
+dir			= ./
+certs			= \$dir
+crl_dir			= \$dir/crl
+database		= \$dir/index.txt
+new_certs_dir		= \$dir
+certificate		= \$dir/server.pem
+serial			= \$dir/serial
+crl			= \$dir/crl.pem
+private_key		= \$dir/server.key
+RANDFILE		= \$dir/.rand
+name_opt		= ca_default
+cert_opt		= ca_default
+default_days		= $varcertsdefaultdays
+default_crl_days	= 30
+default_md		= $varcertsdefaultmd
+preserve		= no
+policy			= policy_match
+
+[ policy_match ]
+countryName		= match
+stateOrProvinceName	= match
+organizationName	= match
+organizationalUnitName	= optional
+commonName		= supplied
+emailAddress		= optional
+
+[ policy_anything ]
+countryName		= optional
+stateOrProvinceName	= optional
+localityName		= optional
+organizationName	= optional
+organizationalUnitName	= optional
+commonName		= supplied
+emailAddress		= optional
+
+[ req ]
+prompt			= no
+distinguished_name	= server
+default_bits		= $varcertsdefaultbits
+input_password		= $varcertspassword
+output_password		= $varcertspassword
+
+[server]
+countryName		= $varcertscountryname
+stateOrProvinceName	= $varcertsstateorprovincename
+localityName		= $varcertslocalityname
+organizationName	= $varcertsorganizationname
+emailAddress		= $varcertsserveremailaddress
+commonName		= "$varcertsservercommonname"
+
+EOD;
+
+	$filename = RADDB . '/certs/server.cnf';
+	conf_mount_rw();
+	file_put_contents($filename, $conf);
+	chmod($filename, 0600);
+	conf_mount_ro();
+
+}
+
+function freeradius_clientcertcnf_resync() {
+	global $config;
+	$conf = '';
+
+	$arrcerts = $config['installedpackages']['freeradiuscerts']['config'][0];
+	
+	// General variables: CA, Server, Client
+	$varcertsdefaultdays = ($arrcerts['varcertsdefaultdays']?$arrcerts['varcertsdefaultdays']:'3650');
+	$varcertsdefaultmd = ($arrcerts['varcertsdefaultmd']?$arrcerts['varcertsdefaultmd']:'md5');
+	$varcertsdefaultbits = ($arrcerts['varcertsdefaultbits']?$arrcerts['varcertsdefaultbits']:'2048');
+	$varcertspassword = ($arrcerts['varcertspassword']?$arrcerts['varcertspassword']:'whatever');
+	$varcertscountryname = ($arrcerts['varcertscountryname']?$arrcerts['varcertscountryname']:'US');
+	$varcertsstateorprovincename = ($arrcerts['varcertsstateorprovincename']?$arrcerts['varcertsstateorprovincename']:'Texas');
+	$varcertslocalityname = ($arrcerts['varcertslocalityname']?$arrcerts['varcertslocalityname']:'Austin');
+	$varcertsorganizationname = ($arrcerts['varcertsorganizationname']?$arrcerts['varcertsorganizationname']:'My Company Inc');
+
+	// Variables: Only for Client
+	$varcertsclientemailaddress = ($arrcerts['varcertsclientemailaddress']?$arrcerts['varcertsclientemailaddress']:'user@mycompany.com');
+	$varcertsclientcommonname = ($arrcerts['varcertsclientcommonname']?$arrcerts['varcertsclientcommonname']:'client-cert');
+	
+
+	$conf .= <<<EOD
+[ ca ]
+default_ca		= CA_default
+
+[ CA_default ]
+dir			= ./
+certs			= \$dir
+crl_dir			= \$dir/crl
+database		= \$dir/index.txt
+new_certs_dir		= \$dir
+certificate		= \$dir/server.pem
+serial			= \$dir/serial
+crl			= \$dir/crl.pem
+private_key		= \$dir/server.key
+RANDFILE		= \$dir/.rand
+name_opt		= ca_default
+cert_opt		= ca_default
+default_days		= $varcertsdefaultdays
+default_crl_days	= 30
+default_md		= $varcertsdefaultmd
+preserve		= no
+policy			= policy_match
+
+[ policy_match ]
+countryName		= match
+stateOrProvinceName	= match
+organizationName	= match
+organizationalUnitName	= optional
+commonName		= supplied
+emailAddress		= optional
+
+[ policy_anything ]
+countryName		= optional
+stateOrProvinceName	= optional
+localityName		= optional
+organizationName	= optional
+organizationalUnitName	= optional
+commonName		= supplied
+emailAddress		= optional
+
+[ req ]
+prompt			= no
+distinguished_name	= client
+default_bits		= $varcertsdefaultbits
+input_password		= $varcertspassword
+output_password		= $varcertspassword
+
+[client]
+countryName		= $varcertscountryname
+stateOrProvinceName	= $varcertsstateorprovincename
+localityName		= $varcertslocalityname
+organizationName	= $varcertsorganizationname
+emailAddress		= $varcertsclientemailaddress
+commonName		= "$varcertsclientcommonname"
+
+EOD;
+
+	$filename = RADDB . '/certs/client.cnf';
+	conf_mount_rw();
+	file_put_contents($filename, $conf);
+	chmod($filename, 0600);
+	conf_mount_ro();
+
+}
+
+function freeradius_allcertcnf_resync() {
+	global $config;
+
+	$arrcerts = $config['installedpackages']['freeradiuscerts']['config'][0];
+	
+	// General variable for deleting/further generation of Client-Cert
+	$varcertscreateclient = ($arrcerts['varcertscreateclient']?$arrcerts['varcertscreateclient']:'no');
+	
+	// General variables for deleting: CA, Server, Client
+	$varcertsdeleteall = ($arrcerts['varcertsdeleteall']?$arrcerts['varcertsdeleteall']:'yes');
+		
+	
+		if ($arrcerts['varcertscreateclient'] == 'yes') {
+		
+		// delete all old certificates and keys
+		exec("rm -f /usr/local/etc/raddb/certs/client.csr");
+		exec("rm -f /usr/local/etc/raddb/certs/client.crt");
+		exec("rm -f /usr/local/etc/raddb/certs/client.key");
+		exec("rm -f /usr/local/etc/raddb/certs/client.tar");
+	
+	
+		// run fuction to create ONLY new client.cnf files based on user input from freeradiuscert.xml
+		freeradius_clientcertcnf_resync();
+	
+	
+		// make bootstrap executable and run to create cert based on client.cnf files
+		exec("chmod 0770 /usr/local/etc/raddb/certs/bootstrap");
+		exec("/usr/local/etc/raddb/certs/bootstrap");
+	
+		// make bootstrap read-write only for root
+		exec("chmod 0600 /usr/local/etc/raddb/certs/bootstrap");
+		exec("cd /usr/local/etc/raddb/certs && tar -cf client.tar client.crt client.csr client.key ca.der");
+		exec("chmod 0600 /usr/local/etc/raddb/certs/client.tar");
+		}
+
+		
+		if ($arrcerts['varcertsdeleteall'] == 'yes') {
+	
+		// delete all old certificates and keys
+		exec("rm -f /usr/local/etc/raddb/certs/*.pem");
+		exec("rm -f /usr/local/etc/raddb/certs/*.der");
+		exec("rm -f /usr/local/etc/raddb/certs/*.csr");
+		exec("rm -f /usr/local/etc/raddb/certs/*.crt");
+		exec("rm -f /usr/local/etc/raddb/certs/*.key");
+		exec("rm -f /usr/local/etc/raddb/certs/*.p12");
+		exec("rm -f /usr/local/etc/raddb/certs/serial*");
+		exec("rm -f /usr/local/etc/raddb/certs/index.txt*");
+		exec("rm -f /usr/local/etc/raddb/certs/client.tar");
+	
+		// run fuctions to create new .cnf files based on user input from freeradiuscert.xml
+		freeradius_cacertcnf_resync();
+		freeradius_servercertcnf_resync();
+		freeradius_clientcertcnf_resync();
+		
+		// generate new DH and RANDOM file
+		exec("cd /usr/local/etc/raddb/certs && openssl dhparam -out dh 1024");
+		exec("cd /usr/local/etc/raddb/certs && dd if=/dev/urandom of=./random count=10");
+	
+	
+		// make bootstrap executable and run to create certs based on .cnf files
+		exec("chmod 0770 /usr/local/etc/raddb/certs/bootstrap");
+		exec("/usr/local/etc/raddb/certs/bootstrap");
+	
+		// make bootstrap read-write only for root
+		exec("chmod 0600 /usr/local/etc/raddb/certs/bootstrap");
+		exec("cd /usr/local/etc/raddb/certs && tar -cf client.tar client.crt client.csr client.key ca.der");
+		exec("chmod 0600 /usr/local/etc/raddb/certs/client.tar");
+	
+		// If there were changes on the certificates we need to restart freeradius
+		restart_service('freeradius');
+		}
 }
 ?>
