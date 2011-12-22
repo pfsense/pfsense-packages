@@ -145,36 +145,35 @@
 		<field>
 			<fielddescr>Private Key Password</fielddescr>
 			<fieldname>vareapconfprivatekeypassword</fieldname>
-			<description><![CDATA[Enter the password of the private key.<br>
-								This is the password which you chose in "Certificates" tab. (Default: whatever)]]></description>
+			<description><![CDATA[Enter the password of the private key. This is the password which you have to choose in "Certificates" tab.<br>
+							This field could be empty. (Default: whatever)]]></description>
 			<type>password</type>
 			<default_value>whatever</default_value>
 		</field>
 		<field>
-			<fielddescr>Private Key File</fielddescr>
+			<fielddescr>Server Private Key File</fielddescr>
 			<fieldname>vareapconfprivatekeyfile</fieldname>
-			<description><![CDATA[Enter the filename of the private key file. The file <b>must</b> be in /usr/local/etc/raddb/certs/ (Default: server.pem)]]></description>
-			<type>input</type>
-			<default_value>server.pem</default_value>
-		</field>
-		<field>
-			<fielddescr>Private Key File</fielddescr>
-			<fieldname>vareapconfprivatekeyfile</fieldname>
-			<description><![CDATA[Enter the filename of the private key file. The file <b>must</b> be in /usr/local/etc/raddb/certs/ (Default: server.pem)]]></description>
+			<description><![CDATA[Enter the filename of the private key file. The file <b>must</b> be in /usr/local/etc/raddb/certs/ (Default: server.pem)<br>
+									<b>TIP:</b> You could use "SYSTEM-> Cert Manager" instead of the freeradius Cert script.<br>
+									You just have to export it there and copy it in the freeradius certs folder.]]></description>
 			<type>input</type>
 			<default_value>server.pem</default_value>
 		</field>
 		<field>
 			<fielddescr>Server Certificate File</fielddescr>
 			<fieldname>vareapconfcertificatefile</fieldname>
-			<description><![CDATA[Enter the filename of the Certificate file. The file <b>must</b> be in /usr/local/etc/raddb/certs/ (Default: server.pem)]]></description>
+			<description><![CDATA[Enter the filename of the server certificate file. The file <b>must</b> be in /usr/local/etc/raddb/certs/ (Default: server.pem)<br>
+									<b>TIP:</b> You could use "SYSTEM-> Cert Manager" instead of the freeradius Cert script.<br>
+									You just have to export it there and copy it in the freeradius certs folder.]]></description>
 			<type>input</type>
 			<default_value>server.pem</default_value>
 		</field>
 		<field>
 			<fielddescr>CA File</fielddescr>
 			<fieldname>vareapconfcafile</fieldname>
-			<description><![CDATA[Enter the filename of the CA file. The file <b>must</b> be in /usr/local/etc/raddb/certs/ (Default: ca.pem)]]></description>
+			<description><![CDATA[Enter the filename of the CA file. The file <b>must</b> be in /usr/local/etc/raddb/certs/ (Default: server.pem)<br>
+									<b>TIP:</b> You could use "SYSTEM-> Cert Manager" instead of the freeradius Cert script.<br>
+									You just have to export it there and copy it in the freeradius certs folder.]]></description>
 			<type>input</type>
 			<default_value>ca.pem</default_value>
 		</field>

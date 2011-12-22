@@ -1533,7 +1533,7 @@ function freeradius_allcertcnf_resync() {
 	$varcertscreateclient = ($arrcerts['varcertscreateclient']?$arrcerts['varcertscreateclient']:'no');
 	
 	// General variables for deleting: CA, Server, Client
-	$varcertsdeleteall = ($arrcerts['varcertsdeleteall']?$arrcerts['varcertsdeleteall']:'yes');
+	$varcertsdeleteall = ($arrcerts['varcertsdeleteall']?$arrcerts['varcertsdeleteall']:'no');
 		
 	
 		if ($arrcerts['varcertscreateclient'] == 'yes') {
@@ -1543,8 +1543,8 @@ function freeradius_allcertcnf_resync() {
 		exec("rm -f /usr/local/etc/raddb/certs/client.crt");
 		exec("rm -f /usr/local/etc/raddb/certs/client.key");
 		exec("rm -f /usr/local/etc/raddb/certs/client.tar");
-	
-	
+				
+			
 		// run fuction to create ONLY new client.cnf files based on user input from freeradiuscert.xml
 		freeradius_clientcertcnf_resync();
 	
@@ -1552,11 +1552,18 @@ function freeradius_allcertcnf_resync() {
 		// make bootstrap executable and run to create cert based on client.cnf files
 		exec("chmod 0770 /usr/local/etc/raddb/certs/bootstrap");
 		exec("/usr/local/etc/raddb/certs/bootstrap");
-	
-		// make bootstrap read-write only for root
-		exec("chmod 0600 /usr/local/etc/raddb/certs/bootstrap");
-		exec("cd /usr/local/etc/raddb/certs && tar -cf client.tar client.crt client.csr client.key ca.der");
-		exec("chmod 0600 /usr/local/etc/raddb/certs/client.tar");
+			
+		// rename client generated XX.pem to client.pem // use regex to replace spaces and so on.
+		$varserial = preg_replace("/\s/","",file_get_contents('/usr/local/etc/raddb/certs/serial.old'));
+		if (file_exists("/usr/local/etc/raddb/certs/$varserial.pem"))
+		rename("/usr/local/etc/raddb/certs/$varserial.pem","/usr/local/etc/raddb/certs/client.pem");
+		
+		
+		// tar client-cert files
+		exec("cd /usr/local/etc/raddb/certs && tar -cf client.tar client.crt client.csr client.key ca.der client.pem");
+		
+		// Make all files in certs folder re-only for root
+		exec("chmod -R 0600 /usr/local/etc/raddb/certs/");
 		}
 
 		
@@ -1570,8 +1577,11 @@ function freeradius_allcertcnf_resync() {
 		exec("rm -f /usr/local/etc/raddb/certs/*.key");
 		exec("rm -f /usr/local/etc/raddb/certs/*.p12");
 		exec("rm -f /usr/local/etc/raddb/certs/serial*");
-		exec("rm -f /usr/local/etc/raddb/certs/index.txt*");
+		exec("rm -f /usr/local/etc/raddb/certs/index*");
+		exec("rm -f /usr/local/etc/raddb/certs/dh");
+		exec("rm -f /usr/local/etc/raddb/certs/random");
 		exec("rm -f /usr/local/etc/raddb/certs/client.tar");
+		
 	
 		// run fuctions to create new .cnf files based on user input from freeradiuscert.xml
 		freeradius_cacertcnf_resync();
@@ -1586,11 +1596,14 @@ function freeradius_allcertcnf_resync() {
 		// make bootstrap executable and run to create certs based on .cnf files
 		exec("chmod 0770 /usr/local/etc/raddb/certs/bootstrap");
 		exec("/usr/local/etc/raddb/certs/bootstrap");
-	
-		// make bootstrap read-write only for root
-		exec("chmod 0600 /usr/local/etc/raddb/certs/bootstrap");
-		exec("cd /usr/local/etc/raddb/certs && tar -cf client.tar client.crt client.csr client.key ca.der");
-		exec("chmod 0600 /usr/local/etc/raddb/certs/client.tar");
+		
+		// rename client generated 02.pem to client.pem
+		if (file_exists("/usr/local/etc/raddb/certs/02.pem"))
+		rename("/usr/local/etc/raddb/certs/02.pem","/usr/local/etc/raddb/certs/client.pem");
+		
+		// tar client-cert files
+		exec("cd /usr/local/etc/raddb/certs && tar -cf client.tar client.crt client.csr client.key ca.der client.pem");
+		exec("chmod -R 0600 /usr/local/etc/raddb/certs/");
 	
 		// If there were changes on the certificates we need to restart freeradius
 		restart_service('freeradius');
