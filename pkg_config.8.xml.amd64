@@ -806,10 +806,9 @@
 				Do not use together with freeradius package. Both are using the same XML files.]]></descr>
 		<pkginfolink>http://forum.pfsense.org/index.php/topic,43675.0.html</pkginfolink>
 		<category>System</category>
-		<version>2.1.12 pkg v1.3.4</version>
+		<version>2.1.12 pkg v1.3.5</version>
 		<status>BETA</status>
 		<required_version>2.0</required_version>
-		<maximum_version>2.0.1</maximum_version>
 		<maintainer>Nachtfalke</maintainer>
 		<depends_on_package_base_url>http://ftp.freebsd.org/pub/FreeBSD/ports/amd64/packages-8-stable/All/</depends_on_package_base_url>
 		<depends_on_package>freeradius-2.1.12.tbz</depends_on_package>
