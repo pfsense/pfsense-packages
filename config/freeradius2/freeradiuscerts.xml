@@ -94,7 +94,7 @@
 			<fielddescr>Delete ALL existing Certificates ?</fielddescr>
 			<fieldname>varcertsdeleteall</fieldname>
 			<description><![CDATA[This will delete <b>ALL</b> existing CAs, Server-Certs and Client-Certs in freeradius certs folder!<br>
-								You <b>must</b> delete all existing if you want to create new ones. (Default: Yes)<br>
+								You <b>must</b> delete all existing if you want to create new ones. (Default: No)<br>
 								<b>Important:</b><br>
 								If you like to use certs created on another PC just disable this and click save.]]></description>
 			<type>select</type>
@@ -103,6 +103,21 @@
 						<option><name>Yes</name><value>yes</value></option>
 						<option><name>No</name><value>no</value></option>
 					</options>
+		</field>
+		<field>
+			<fielddescr>READ BEFORE DOING ANYTHING HERE!</fielddescr>
+			<fieldname>varcertsREADBEFORE</fieldname>
+			<description><![CDATA[<b>This field is just to make sure you know what you are doing here!</b><br>
+									<b>If you enter anything the changes here will take effect after "save" - if it's empty - nothing will happen</b><br><br>
+									
+									This page uses the freeradius2 built-in script called "bootstrap" to create CA and certs. The disatvantage of this script is that nothing of your changes will be saved in the global config.xml file. So after a systemcrash or reinstallation of freeradius2 package
+									all your CA and certs will be lost. If you have a backup of all these files on an USB stick or another server than you can copy them back in the freeradius certs folder.<br><br>
+									
+									<b>The better way is to use the pfsense built-in Cert Manager (SYSTEM-> Cert Manager).</b> The CA-Cert and Server-Cert you created there you just have to copy to the freeradius certs folder and pointing to these certs in eap.
+									The advantage of this is that all your CA and certs will be saved in global config.xml and can be restored.]]></description>
+			<type>input</type>
+			<required/>
+			<default_value></default_value>
 		</field>
 		<field>
 			<name>Distinguished Name for CA, Server and Client</name>
@@ -171,8 +186,8 @@
 		<field>
 			<fielddescr>Certificate Password (CA, Server and Client)</fielddescr>
 			<fieldname>varcertspassword</fieldname>
-			<description><![CDATA[Enter the password for the CA, Server and Client.<br>
-								This is the password you need to enter in eap.conf so that freeradius can read the cert. (Default: whatever)]]></description>
+			<description><![CDATA[Enter the password for the CA, Server and Client.	This is the password you need to enter in eap.conf
+								so that freeradius can read the cert. This field could be empty. (Default: whatever)]]></description>
 			<type>password</type>
 			<default_value>whatever</default_value>
 		</field>
