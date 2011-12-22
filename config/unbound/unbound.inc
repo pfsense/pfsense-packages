@@ -403,16 +403,16 @@ function unbound_resync_config() {
 	foreach($unboundnetcfg as $netent) {
 		foreach($netent as $entry) {
 			# If virtual interface then skip
-			if (!$entry['network'] && !$entry['subnet'])
+			if (!$entry['network'] && !$entry['subnet'] && ($entry['ipaddr'] != "127.0.0.1" && $entry['ipaddr'] != "::1"))
 				continue;
 			$unbound_bind_interfaces .="interface: {$entry['ipaddr']}\n";
-			if($entry['ipaddr'] != "127.0.0.1" && $entry['ipaddr'] != "::1" )
+			if($entry['ipaddr'] != "127.0.0.1" && $entry['ipaddr'] != "::1")
 				$unbound_allowed_networks .= "access-control: {$entry['network']}/{$entry['subnet']} allow\n";
 		}
 	}
 	if($unboundquerycfg = unbound_get_query_interface_addresses()) {
+		$unbound_query_interfaces = "# Interfaces to query from\n";
 		foreach($unboundquerycfg as $qent) {
-			$unbound_query_interfaces = "# Interfaces to query from\n";
 			foreach($qent as $entry)
 				$unbound_query_interfaces .= "outgoing-interface: {$entry['ipaddr']}\n";
 		}
