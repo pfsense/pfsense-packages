@@ -35,6 +35,10 @@ function get_file($file){
 	$files['clients']="/usr/local/etc/raddb/clients.conf";
 	$files['users']="/usr/local/etc/raddb/users";
 	$files['virtual-server-default']="/usr/local/etc/raddb/sites-enabled/default";
+	$files['ca']="/usr/local/etc/raddb/certs/ca.cnf";
+	$files['server']="/usr/local/etc/raddb/certs/server.cnf";
+	$files['client']="/usr/local/etc/raddb/certs/client.cnf";
+	$files['index']="/usr/local/etc/raddb/certs/index.txt";
 
 
 	if ($files[$file]!="" && file_exists($files[$file])){
@@ -78,6 +82,7 @@ else{
 		$tab_array[] = array(gettext("Settings"), false, "/pkg_edit.php?xml=freeradiussettings.xml&id=0");
 		$tab_array[] = array(gettext("EAP"), false, "/pkg_edit.php?xml=freeradiuseapconf.xml&id=0");
 		$tab_array[] = array(gettext("SQL"), false, "/pkg_edit.php?xml=freeradiussqlconf.xml&id=0");
+		$tab_array[] = array(gettext("Certificates"), false, "/pkg_edit.php?xml=freeradiuscerts.xml&id=0");
 		$tab_array[] = array(gettext("View config"), true, "/freeradius_view_config.php");
 		display_top_tabs($tab_array);
 	?>
@@ -97,7 +102,11 @@ else{
 							<input type="button" onClick="get_freeradius_file('sql');" id='btn_sql' value="sql.conf">&nbsp;
 							<input type="button" onClick="get_freeradius_file('clients');" id='btn_clients' value="clients.conf">&nbsp;
 							<input type="button" onClick="get_freeradius_file('users');" id='btn_users' value="users">&nbsp;
-							<input type="button" onClick="get_freeradius_file('virtual-server-default');" id='btn_virtual-server-default' value="default">&nbsp;
+							<input type="button" onClick="get_freeradius_file('virtual-server-default');" id='btn_virtual-server-default' value="virtual-server-default">&nbsp;
+							<input type="button" onClick="get_freeradius_file('ca');" id='btn_ca' value="ca.cnf">&nbsp;
+							<input type="button" onClick="get_freeradius_file('server');" id='btn_server' value="server.cnf">&nbsp;
+							<input type="button" onClick="get_freeradius_file('client');" id='btn_client' value="client.cnf">&nbsp;
+							<input type="button" onClick="get_freeradius_file('index');" id='btn_index' value="index.txt">&nbsp;
 							</td>
 								</tr>
 								<tr>
@@ -132,7 +141,11 @@ else{
 			$('btn_sql').value="sql.conf";
 			$('btn_clients').value="clients.conf";
 			$('btn_users').value="users";
-			$('btn_virtual').value="default";
+			$('btn_virtual').value="virtual-server-default";
+			$('btn_ca').value="ca.cnf";
+			$('btn_server').value="server.cnf";
+			$('btn_client').value="client.cnf";
+			$('btn_index').value="index.txt";
 			scroll(0,0);
 		}
 	</script>

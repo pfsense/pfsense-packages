@@ -90,6 +90,10 @@
 			<url>/pkg_edit.php?xml=freeradiussqlconf.xml&amp;id=0</url>
 		</tab>
 		<tab>
+			<text>Certificates</text>
+			<url>/pkg_edit.php?xml=freeradiuscerts.xml&amp;id=0</url>
+		</tab>		
+		<tab>
 			<text>View config</text>
 			<url>/freeradius_view_config.php</url>
 		</tab>
@@ -123,7 +127,12 @@
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0755</chmod>
 		<item>http://www.pfsense.org/packages/config/freeradius2/freeradiusinterfaces.xml</item>
-	</additional_files_needed>	
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/pkg/</prefix>
+		<chmod>0755</chmod>
+		<item>http://www.pfsense.org/packages/config/freeradius2/freeradiuscerts.xml</item>
+	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0755</chmod>
@@ -302,6 +311,10 @@
 		freeradius_eapconf_resync();
 		freeradius_sqlconf_resync();
 		freeradius_serverdefault_resync();
+		freeradius_clientcertcnf_resync();
+		freeradius_servercertcnf_resync();
+		freeradius_cacertcnf_resync();
+		freeradius_allcertcnf_resync();
 		exec("rm -f /usr/local/etc/raddb/sites-enabled/control-socket");
 		exec("rm -f /usr/local/etc/raddb/sites-enabled/inner-tunnel");
 	</custom_php_install_command>
