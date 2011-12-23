@@ -143,53 +143,44 @@
 			<type>listtopic</type>
 		</field>
 		<field>
+			<fielddescr>Choose your Cert Manager</fielddescr>
+			<fieldname>vareapconfchoosecertmanager</fieldname>
+			<description><![CDATA[Choose your Cert manager. By default it is the freeradius cert manager because the server needs some default certs to start service. For more information take al look at "Certificates"-Tab.<br>
+									To use the pfsense Cert Manager you have to create a CA and an Server Certificate first. (SYSTEM -> Cert Manager). (Default: freeRADIUS)]]></description>
+			<type>select</type>
+			<default_value>radiuscertmgr</default_value>
+					<options>
+						<option><name>freeRADIUS Cert Manager (not recommended)</name><value>radiuscertmgr</value></option>
+						<option><name>pfSense Cert Manager (recommended)</name><value>pfsensecertmgr</value></option>
+					</options>
+		</field>
+		<field>
+			<fielddescr>SSL CA Certificate</fielddescr>
+			<fieldname>ssl_ca_cert</fieldname>
+			<description><![CDATA[Choose the SSL CA Certficate here which you created with the pfSense Cert Manager.<br>
+									Choose "none" if you do not use any kind of certificates or the freeradius Cert Manager. (Default: none)]]></description>
+			<type>select_source</type>
+			<source><![CDATA[freeradius_get_ca_certs()]]></source>
+			<source_name>descr</source_name>
+			<source_value>refid</source_value>
+		</field>
+		<field>
+			<fielddescr>SSL Server Certificate</fielddescr>
+			<fieldname>ssl_server_cert</fieldname>
+			<description><![CDATA[Choose the SSL Server Certficate here which you created with the pfSense Cert Manager.<br>
+									Choose "none" if you do not use any kind of certificates or the freeradius Cert Manager. (Default: none)]]></description>
+			<type>select_source</type>
+			<source><![CDATA[freeradius_get_server_certs()]]></source>
+			<source_name>descr</source_name>
+			<source_value>refid</source_value>
+		</field>
+		<field>
 			<fielddescr>Private Key Password</fielddescr>
 			<fieldname>vareapconfprivatekeypassword</fieldname>
-			<description><![CDATA[Enter the password of the private key. This is the password which you have to choose in "Certificates" tab.<br>
-							This field could be empty. (Default: whatever)]]></description>
+			<description><![CDATA[By default the certificates created by freeradius are protected with an "input/ouput" password from reaading the certificate.<b>
+								The certificates created by pfSense Cert Manager are not protected so you must leave this field empty. (Default: whatever)]]></description>
 			<type>password</type>
 			<default_value>whatever</default_value>
-		</field>
-		<field>
-			<fielddescr>Server Private Key File</fielddescr>
-			<fieldname>vareapconfprivatekeyfile</fieldname>
-			<description><![CDATA[Enter the filename of the private key file. The file <b>must</b> be in /usr/local/etc/raddb/certs/ (Default: server.pem)<br>
-									<b>TIP:</b> You could use "SYSTEM-> Cert Manager" instead of the freeradius Cert script.<br>
-									You just have to export it there and copy it in the freeradius certs folder.]]></description>
-			<type>input</type>
-			<default_value>server.pem</default_value>
-		</field>
-		<field>
-			<fielddescr>Server Certificate File</fielddescr>
-			<fieldname>vareapconfcertificatefile</fieldname>
-			<description><![CDATA[Enter the filename of the server certificate file. The file <b>must</b> be in /usr/local/etc/raddb/certs/ (Default: server.pem)<br>
-									<b>TIP:</b> You could use "SYSTEM-> Cert Manager" instead of the freeradius Cert script.<br>
-									You just have to export it there and copy it in the freeradius certs folder.]]></description>
-			<type>input</type>
-			<default_value>server.pem</default_value>
-		</field>
-		<field>
-			<fielddescr>CA File</fielddescr>
-			<fieldname>vareapconfcafile</fieldname>
-			<description><![CDATA[Enter the filename of the CA file. The file <b>must</b> be in /usr/local/etc/raddb/certs/ (Default: server.pem)<br>
-									<b>TIP:</b> You could use "SYSTEM-> Cert Manager" instead of the freeradius Cert script.<br>
-									You just have to export it there and copy it in the freeradius certs folder.]]></description>
-			<type>input</type>
-			<default_value>ca.pem</default_value>
-		</field>
-		<field>
-			<fielddescr>DH File</fielddescr>
-			<fieldname>vareapconfdhfile</fieldname>
-			<description><![CDATA[Enter the filename of the DH file. The file <b>must</b> be in /usr/local/etc/raddb/certs/ (Default: dh)]]></description>
-			<type>input</type>
-			<default_value>dh</default_value>
-		</field>
-		<field>
-			<fielddescr>Random File</fielddescr>
-			<fieldname>vareapconfrandomfile</fieldname>
-			<description><![CDATA[Enter the filename of the random file. The file <b>must</b> be in /usr/local/etc/raddb/certs/ (Default: random)]]></description>
-			<type>input</type>
-			<default_value>random</default_value>
 		</field>
 		<field>
 			<name>EAP-TLS with OCSP support</name>
