@@ -393,6 +393,9 @@ function freeradius_eapconf_resync() {
 
 	$eapconf = $config['installedpackages']['freeradiuseapconf']['config'][0];
 	
+	// Choose pfsense Cert-Manager or freeradius Cert-Manager
+	$vareapconfchoosecertmanager = ($eapconf['vareapconfchoosecertmanager']?$eapconf['vareapconfchoosecertmanager']:'radiuscertmgr');
+	
 	// Variables: EAP
 	$vareapconfdefaulteaptype = ($eapconf['vareapconfdefaulteaptype']?$eapconf['vareapconfdefaulteaptype']:'md5');
 	$vareapconftimerexpire = ($eapconf['vareapconftimerexpire']?$eapconf['vareapconftimerexpire']:'60');
@@ -401,12 +404,7 @@ function freeradius_eapconf_resync() {
 	$vareapconfmaxsessions = ($eapconf['vareapconfmaxsessions']?$eapconf['vareapconfmaxsessions']:'4096');
 	
 	// Variables: EAP-TLS and EAP-TLS with OCSP support
-	$vareapconfprivatekeypassword = ($eapconf['vareapconfprivatekeypassword']?$eapconf['vareapconfprivatekeypassword']:'whatever');
-	$vareapconfprivatekeyfile = ($eapconf['vareapconfprivatekeyfile']?$eapconf['vareapconfprivatekeyfile']:'server.pem');
-	$vareapconfcertificatefile = ($eapconf['vareapconfcertificatefile']?$eapconf['vareapconfcertificatefile']:'server.pem');
-	$vareapconfcafile = ($eapconf['vareapconfcafile']?$eapconf['vareapconfcafile']:'ca.pem');
-	$vareapconfdhfile = ($eapconf['vareapconfdhfile']?$eapconf['vareapconfdhfile']:'dh');
-	$vareapconfrandomfile = ($eapconf['vareapconfrandomfile']?$eapconf['vareapconfrandomfile']:'random');
+	$vareapconfprivatekeypassword = ($eapconf['vareapconfprivatekeypassword']?$eapconf['vareapconfprivatekeypassword']:'');
 	$vareapconfocspenable = ($eapconf['vareapconfocspenable']?$eapconf['vareapconfocspenable']:'no');
 	$vareapconfocspoverridecerturl = ($eapconf['vareapconfocspoverridecerturl']?$eapconf['vareapconfocspoverridecerturl']:'no');
 	$vareapconfocspurl = ($eapconf['vareapconfocspurl']?$eapconf['vareapconfocspurl']:'http://127.0.0.1/ocsp/');
@@ -420,8 +418,62 @@ function freeradius_eapconf_resync() {
 	$vareapconfpeapdefaulteaptype = ($eapconf['vareapconfpeapdefaulteaptype']?$eapconf['vareapconfpeapdefaulteaptype']:'mschapv2');
 	$vareapconfpeapcopyrequesttotunnel = ($eapconf['vareapconfpeapcopyrequesttotunnel']?$eapconf['vareapconfpeapcopyrequesttotunnel']:'no');
 	$vareapconfpeapusetunneledreply = ($eapconf['vareapconfpeapusetunneledreply']?$eapconf['vareapconfpeapusetunneledreply']:'no');
-	
-	
+
+
+// The filenames of pfsense cert manager are different from freeradius cert manager so it is possible to store both in the same folder at any time.
+// This is for the pfsense cert manager	
+if ($vareapconfchoosecertmanager == 'pfsensecertmgr') {
+		
+		$ca_cert = lookup_ca($eapconf["ssl_ca_cert"]);
+		if ($ca_cert != false) {
+			if(base64_decode($ca_cert['prv'])) {
+				file_put_contents(RADDB . "/certs/ca_key.pem", 
+					base64_decode($ca_cert['prv']));
+				$conf['ssl_ca_key'] = RADDB . '/certs/ca_key.pem';
+			}
+
+
+			if(base64_decode($ca_cert['crt'])) {
+				file_put_contents(RADDB . "/certs/ca_cert.pem", 
+					base64_decode($ca_cert['crt']));
+				$conf['ssl_ca_cert'] = RADDB . "/certs/ca_cert.pem";
+			}
+
+
+			$svr_cert = lookup_cert($eapconf["ssl_server_cert"]);
+			if ($svr_cert != false) {
+				if(base64_decode($svr_cert['prv'])) {
+					file_put_contents(RADDB . "/certs/server_key.pem", 
+						base64_decode($svr_cert['prv']));
+					$conf['ssl_key'] = RADDB . '/certs/server_key.pem';
+				}
+			}
+
+
+			if(base64_decode($svr_cert['crt'])) {
+				file_put_contents(RADDB . "/certs/server_cert.pem", 
+					base64_decode($svr_cert['crt']));
+				$conf['ssl_server_cert'] = RADDB . "/certs/server_cert.pem";
+			}
+
+
+			$conf['ssl_cert_dir'] = RADDB . '/certs';
+		}
+
+	$vareapconfprivatekeyfile = 'server_key.pem';
+	$vareapconfcertificatefile = 'server_cert.pem';
+	$vareapconfcafile = 'ca_cert.pem';
+}
+
+// This is for freeradius cert manager
+if ($vareapconfchoosecertmanager == 'radiuscertmgr') {
+
+	$vareapconfprivatekeyfile = 'server.pem';
+	$vareapconfcertificatefile = 'server.pem';
+	$vareapconfcafile = 'ca.pem';
+
+}
+
 	$conf .= <<<EOD
 
 	### EAP
@@ -450,8 +502,8 @@ function freeradius_eapconf_resync() {
 			private_key_file = \${certdir}/$vareapconfprivatekeyfile
 			certificate_file = \${certdir}/$vareapconfcertificatefile
 			CA_file = \${cadir}/$vareapconfcafile
-			dh_file = \${certdir}/$vareapconfdhfile
-			random_file = \${certdir}/$vareapconfrandomfile
+			dh_file = \${certdir}/dh
+			random_file = \${certdir}/random
 		#	fragment_size = 1024
 		#	include_length = yes
 		#	check_crl = yes
@@ -515,6 +567,31 @@ EOD;
 
 	restart_service('freeradius');
 }
+
+
+function freeradius_get_ca_certs() {
+	global $config;
+	$ca_arr = array();
+	$ca_arr[] = array('refid' => 'none', 'descr' => 'none');
+
+	foreach ($config['ca'] as $ca) {
+		$ca_arr[] = array('refid' => $ca['refid'], 'descr' => $ca['descr']);
+	}
+	return $ca_arr;
+}
+
+function freeradius_get_server_certs() {
+	global $config;
+	$cert_arr = array();
+	$cert_arr[] = array('refid' => 'none', 'descr' => 'none');
+
+	foreach ($config['cert'] as $cert) {
+		$cert_arr[] = array('refid' => $cert['refid'], 'descr' => $cert['descr']);
+	}
+	return $cert_arr;
+}
+
+
 
 function freeradius_sqlconf_resync() {
 	global $config;
