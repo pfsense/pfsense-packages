@@ -1,6 +1,6 @@
 <?php
 $pgtitle = "Firewall: Countryblock";
-	//	TomSchaefer.org countryblock package 2010
+	//	TomSchaefer.org countryblock package 2012
 	//
 	//	Notes: Find: ^(.*)$
 	//		Replace: ob_start();\n$results = exec("cat countries.txt | grep XX");\nob_end_clean();\n\tif ($results == 'XX')\n\t\techo "\1";\n\telse\n\t\techo "\1";\n
