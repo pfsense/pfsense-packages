@@ -1,1 +1,1 @@
-http://iblocklist.whitacrecomputers.com/files/bt_level1.gz
+http://tomschaefer.org/temp/pfsense/tbg_primarythreats.txt
