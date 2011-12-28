@@ -49,20 +49,20 @@ function freeradius_settings_resync() {
 	$varsettings = $config['installedpackages']['freeradiussettings']['config'][0];
 	
 	// Variables: General configuration
-	$varsettingsmaxrequesttime = ($varsettings['varsettingsmaxrequesttime']?$varsettings['varsettingsmaxrequesttime']:'1024');
-	$varsettingscleanupdelay = ($varsettings['varsettingscleanupdelay']?$varsettings['varsettingscleanupdelay']:'30');
-	$varsettingsmaxrequests = ($varsettings['varsettingsmaxrequests']?$varsettings['varsettingsmaxrequests']:'5');
-	$varsettingslogdir = ($varsettings['varsettingslogdir']?$varsettings['varsettingslogdir']:'no');
-	$varsettingsstrippednames = ($varsettings['varsettingsstrippednames']?$varsettings['varsettingsstrippednames']:'no');
-	
-	// Variables: Logging options
-	$varsettingsauth = ($varsettings['varsettingsauth']?$varsettings['varsettingsauth']:'yes');
-	$varsettingsauthbadpass = ($varsettings['varsettingsauthbadpass']?$varsettings['varsettingsauthbadpass']:'yes');
-	$varsettingsauthgoodpass = ($varsettings['varsettingsauthgoodpass']?$varsettings['varsettingsauthgoodpass']:'files');
+	$varsettingsmaxrequests = ($varsettings['varsettingsmaxrequests']?$varsettings['varsettingsmaxrequests']:'1024');
+	$varsettingsmaxrequesttime = ($varsettings['varsettingsmaxrequesttime']?$varsettings['varsettingsmaxrequesttime']:'30');
+	$varsettingscleanupdelay = ($varsettings['varsettingscleanupdelay']?$varsettings['varsettingscleanupdelay']:'5');
 	$varsettingshostnamelookups = ($varsettings['varsettingshostnamelookups']?$varsettings['varsettingshostnamelookups']:'no');
 	$varsettingsallowcoredumps = ($varsettings['varsettingsallowcoredumps']?$varsettings['varsettingsallowcoredumps']:'no');
-	$varsettingsregularexpressions = ($varsettings['varsettingsregularexpressions']?$varsettings['varsettingsregularexpressions']:'no');
-	$varsettingsextendedexpressions = ($varsettings['varsettingsextendedexpressions']?$varsettings['varsettingsextendedexpressions']:'no');
+	$varsettingsregularexpressions = ($varsettings['varsettingsregularexpressions']?$varsettings['varsettingsregularexpressions']:'yes');
+	$varsettingsextendedexpressions = ($varsettings['varsettingsextendedexpressions']?$varsettings['varsettingsextendedexpressions']:'yes');
+	
+	// Variables: Logging options
+	$varsettingslogdir = ($varsettings['varsettingslogdir']?$varsettings['varsettingslogdir']:'syslog');
+	$varsettingsauth = ($varsettings['varsettingsauth']?$varsettings['varsettingsauth']:'yes');
+	$varsettingsauthbadpass = ($varsettings['varsettingsauthbadpass']?$varsettings['varsettingsauthbadpass']:'no');
+	$varsettingsauthgoodpass = ($varsettings['varsettingsauthgoodpass']?$varsettings['varsettingsauthgoodpass']:'no');
+	$varsettingsstrippednames = ($varsettings['varsettingsstrippednames']?$varsettings['varsettingsstrippednames']:'no');
 	
 	// Variables: Security
 	$varsettingsmaxattributes = ($varsettings['varsettingsmaxattributes']?$varsettings['varsettingsmaxattributes']:'200');
@@ -76,12 +76,24 @@ function freeradius_settings_resync() {
 	$varsettingsmaxqueuesize = ($varsettings['varsettingsmaxqueuesize']?$varsettings['varsettingsmaxqueuesize']:'65536');
 	$varsettingsmaxrequestsperserver = ($varsettings['varsettingsmaxrequestsperserver']?$varsettings['varsettingsmaxrequestsperserver']:'0');
 	
-	// These lines are uncommented in fuction "freeradius_settings_resync" to INCLUDE / enable eap.conf
+	// For more details look at "freeradius_sqlconf_resync"
 	$sqlconf = $config['installedpackages']['freeradiussqlconf']['config'][0];
-	$varsqlconfenable = ($sqlconf['varsqlconfenable']?$sqlconf['varsqlconfenable']:'#\$INCLUDE sql.conf');
-	$varsqlconfenablecounter = ($sqlconf['varsqlconfenablecounter']?$sqlconf['varsqlconfenablecounter']:'#\$INCLUDE sql/mysql/counter.conf');
+	$varsqlconfincludeenable = ($sqlconf['varsqlconfincludeenable']?$sqlconf['varsqlconfincludeenable']:'Disable');
+		
 	
-	
+	// Dis-/Enable SQL in "instatiate" section in "freeradius_settings_resync" and radiusd.conf
+	if ($sqlconf['varsqlconfincludeenable'] == 'Enable') {
+		$varsqlconfinclude = '\$INCLUDE sql.conf';
+		$varsqlconfincludecounter = '\$INCLUDE sql/mysql/counter.conf';
+		$varsqlconfinstantiate = 'sql';
+	}
+
+	if ($sqlconf['varsqlconfincludeenable'] == 'Disable') {
+		$varsqlconfinclude = '#\$INCLUDE sql.conf';
+		$varsqlconfincludecounter = '#\$INCLUDE sql/mysql/counter.conf';
+		$varsqlconfinstantiate = '#sql';
+	}
+
 
 	$conf = <<<EOD
 prefix = /usr/local
@@ -214,19 +226,12 @@ thread pool {
 modules {
 	\$INCLUDE \${confdir}/modules/
 	\$INCLUDE eap.conf
+	### Dis-/Enable sql.conf INCLUDE
+	$varsqlconfinclude
 	
-	### Original line
-	### Enable sql.conf INCLUDE
-	###\$INCLUDE sql.conf
-	$varsqlconfenable
-	
-	
-	### Original line
-	### Enable sql/mysql/counter.conf INCLUDE
-	#\$INCLUDE sql/mysql/counter.conf
-	$varsqlconfenablecounter
-	
-	
+	### Dis-/Enable sql/mysql/counter.conf INCLUDE
+	$varsqlconfincludecounter
+		
 	#\$INCLUDE sqlippool.conf
 }
 
@@ -237,10 +242,8 @@ instantiate {
 	#daily
 	expiration
 	logintime
-	#redundant redundant_sql {
-	#	sql1
-	#	sql2
-	#}
+	### Dis-/Enable sql instatiate
+	$varsqlconfinstantiate
 }
 \$INCLUDE policy.conf
 \$INCLUDE sites-enabled/
@@ -258,61 +261,96 @@ function freeradius_users_resync() {
 global $config;
 
 $conf = '';
-$users = $config['installedpackages']['freeradius']['config'];
-if (is_array($users) && !empty($users)) {
-foreach ($users as $user) {
-$username = $user['username'];
-$password = $user['password'];
-$multiconnect = $user['multiconnect'];
-$ip = $user['ip'];
-$subnetmask = $user['subnetmask'];
-$gateway = $user['gateway'];
-$userexpiration=$user['expiration'];
-$sessiontime=$user['sessiontime'];
-$onlinetime=$user['onlinetime'];
-$vlanid=$user['vlanid'];
-$additionaloptions=$user['additionaloptions'];
-$atrib='';
-$head="$username Cleartext-Password := ".'"'.$password.'"';
-      if ($multiconnect <> '') {
-        $head .=", Simultaneous-Use := $multiconnect";
-       }
-      if ($userexpiration <> '') {
-        $head .=", Expiration := ".'"'.$userexpiration.'"';
-       }
-      if ($subnetmask<> '') {
-        $head .=", Framed-IP-Netmask = $subnetmask";
-       }
-      if ($gateway<> '') {
-        $head .=", Framed-Route = $gateway";
-       }
-      if ($onlinetime <> '') {
-        $head .=", Login-Time := ". '"' . $onlinetime .'"';
-       }
-      if ($ip <> '') {
-        if ($atrib <> '') { $atrib .=","; }
-        $atrib .="\r\n\tFramed-IP-Address = $ip";
-       }
-      if ($sessiontime <> '') {
-        if ($atrib <> '') { $atrib .=","; }
-        $atrib .="\r\n\tSession-Timeout := $sessiontime";
-       }
-      if ($vlanid <> '') {
-        if ($atrib <> '') { $atrib .=","; }
-        $atrib .="\r\n\tTunnel-Type = VLAN,\r\n\tTunnel-Medium-Type = IEEE-802,\r\n\tTunnel-Private-Group-ID = \"$vlanid\"";
-       }
-      if ($additionaloptions <> '') {
-        if ($atrib <> '') { $atrib .=","; }
-        $atrib .="\r\n\t$additionaloptions";
-       }
-       
-      $conf .= <<<EOD
-$head
-$atrib
 
+// Empty variables
+
+$arrusers = $config['installedpackages']['freeradius']['config'];
+
+if (is_array($arrusers) && !empty($arrusers)) {
+	foreach ($arrusers as $users) {
+	
+	// Variables for users file defined parameters
+	$varusersusername = $users['varusersusername'];
+	$varuserspassword = $users['varuserspassword'];
+	$varuserssimultaneousconnect = ($users['varuserssimultaneousconnect']?$users['varuserssimultaneousconnect']:'1');
+	$varusersframedipaddress = $users['varusersframedipaddress'];
+	$varusersframedipnetmask = $users['varusersframedipnetmask'];
+	$varusersframedroute = $users['varusersframedroute'];
+	$varusersexpiration=$users['varusersexpiration'];
+	$varuserssessiontimeout=$users['varuserssessiontimeout'];
+	$varuserslogintime=$users['varuserslogintime'];
+	$varusersvlanid=$users['varusersvlanid'];
+
+	// Clear variables for next user foreach additional options
+	$varuserstopadditionaloptions = '';
+	$varusersadditionaloptionstop = '';
+	
+	
+	if(!empty($users['varuserstopadditionaloptions'])) {
+		$varuserstopadditionaloptions = explode("|", ($users['varuserstopadditionaloptions']));
+		foreach ($varuserstopadditionaloptions as $toptmp) {
+			$varusersadditionaloptionstop .= $toptmp . "\n";
+		}
+	}
+	
+	// Clear variables for next user foreach additional options
+	$varusersbottomadditionaloptions = '';
+	$varusersadditionaloptionsbottom = '';
+	
+	if(!empty($users['varusersbottomadditionaloptions'])) {
+		$varusersbottomadditionaloptions = explode("|", ($users['varusersbottomadditionaloptions']));
+		$varusersadditionaloptionsbottom .= '';
+		foreach ($varusersbottomadditionaloptions as $bottomtmp) {
+			$varusersadditionaloptionsbottom .= $bottomtmp . "\n\t";
+		}
+	}
+	
+	
+
+	// Empty variable
+	$varusersmainoptions = '';
+	
+	// Add the user attributes to each user.
+	$varusersmainoptions = '"' . $varusersusername . '"' . " Cleartext-Password := " . '"' . $varuserspassword .'"';
+	
+	if ($varuserssimultaneousconnect != '') {
+	$varusersmainoptions .= "\n\tSimultaneous-Use := $varuserssimultaneousconnect";
+	}
+	if ($varusersexpiration != '') {
+	$varusersmainoptions .= ",\n\tExpiration := " . '"' . $varusersexpiration . '"';
+	}
+	if ($varuserslogintime != '') {
+	$varusersmainoptions .= ",\n\tLogin-Time := " . '"' . $varuserslogintime . '"';
+	}
+	if ($varuserssessiontimeout != '') {
+	$varusersmainoptions .= ",\n\tSession-Timeout := $varuserssessiontimeout";
+	}	
+	if ($varusersframedipaddress != '') {
+	$varusersmainoptions .= ",\n\tFramed-IP-Address = $varusersframedipaddress";
+	}
+	if ($varusersframedipnetmask != '') {
+	$varusersmainoptions .= ",\n\tFramed-IP-Netmask = $varusersframedipnetmask";
+	}
+	if ($varusersframedroute != '') {
+	$varusersmainoptions .= ",\n\tFramed-Route = " . '"' . $varusersframedroute . '"';
+	}
+	if ($varusersvlanid != '') {
+	$varusersmainoptions .= ",\n\tTunnel-Type = VLAN,\n\tTunnel-Medium-Type = IEEE-802,\n\tTunnel-Private-Group-ID = " . '"' . $varusersvlanid . '"';
+	}
+	if ($varusersadditionaloptionsbottom != '') {
+	$varusersmainoptions .= ",\n\t$varusersadditionaloptionsbottom";
+	}
+	// Cosmetic fix - This is just to make a blank new line after each user entry
+	$varusersmainoptions .= "\n\n";
+	
+	
+	$conf .= <<<EOD
+$varusersadditionaloptionstop
+$varusersmainoptions
 EOD;
-}
-}
+	} //end foreach
+} // end if
+
 	$filename = RADDB . '/users';
 	conf_mount_rw();
 	file_put_contents($filename, $conf);
@@ -463,6 +501,9 @@ if ($vareapconfchoosecertmanager == 'pfsensecertmgr') {
 	$vareapconfprivatekeyfile = 'server_key.pem';
 	$vareapconfcertificatefile = 'server_cert.pem';
 	$vareapconfcafile = 'ca_cert.pem';
+	// generate new DH and RANDOM file
+	exec("cd /usr/local/etc/raddb/certs && openssl dhparam -out dh 1024");
+	exec("cd /usr/local/etc/raddb/certs && dd if=/dev/urandom of=./random count=10");
 }
 
 // This is for freeradius cert manager
@@ -624,11 +665,7 @@ function freeradius_sqlconf_resync() {
 	$varsqlconfreadclients = ($sqlconf['varsqlconfreadclients']?$sqlconf['varsqlconfreadclients']:'yes');
 	$varsqlconfnastable = ($sqlconf['varsqlconfnastable']?$sqlconf['varsqlconfnastable']:'nas');
 	
-	// These lines are uncommented in fuction "freeradius_settings_resync" to INCLUDE / enable eap.conf
-	// $sqlconf = $config['installedpackages']['freeradiussqlconf']['config'][0];
-	// $varsqlconfenable = ($sqlconf['varsqlconfenable']?$sqlconf['varsqlconfenable']:'#\$INCLUDE sql.conf');
-	// $varsqlconfenablecounter = ($sqlconf['varsqlconfenablecounter']?$sqlconf['varsqlconfenablecounter']:'#\$INCLUDE sql/mysql/counter.conf');
-	
+	// For more information look at "freeradius_settings_resync"
 
 	$conf .= <<<EOD
 
@@ -675,6 +712,55 @@ EOD;
 function freeradius_serverdefault_resync() {
 	global $config;
 	$conf = '';
+	
+	// Get Variables from freeradiussqlconf.xml
+	$sqlconf = $config['installedpackages']['freeradiussqlconf']['config'][0];
+	$varsqlconfenableauthorize = ($sqlconf['varsqlconfenableauthorize']?$sqlconf['varsqlconfenableauthorize']:'Disable');
+	$varsqlconfenableaccounting = ($sqlconf['varsqlconfenableaccounting']?$sqlconf['varsqlconfenableaccounting']:'Disable');
+	$varsqlconfenablesession = ($sqlconf['varsqlconfenablesession']?$sqlconf['varsqlconfenablesession']:'Disable');
+	$varsqlconfenablepostauth = ($sqlconf['varsqlconfenablepostauth']?$sqlconf['varsqlconfenablepostauth']:'Disable');	
+	
+	
+	// Disable all sql sections if sql is global disabled
+	// if ($sqlconf['varsqlconfincludeenable'] == 'Disable') {
+	// $varsqlconfauthorize = '#sql';
+	// $varsqlconfaccounting = '#sql';
+	// $varsqlconfsession = 'radutmp';
+	// $varsqlconfpostauth = '#sql';
+	// }
+	
+	// authorize section
+	if (($sqlconf['varsqlconfincludeenable'] == 'Enable') && ($sqlconf['varsqlconfenableauthorize'] == 'Enable')) {
+	$varsqlconfauthorize = 'sql';
+	}
+	else {
+	$varsqlconfauthorize = '#sql';
+	}
+	
+	// accounting section
+	if (($sqlconf['varsqlconfincludeenable'] == 'Enable') && ($sqlconf['varsqlconfenableaccounting'] == 'Enable')) {
+	$varsqlconfaccounting = 'sql';
+	}
+	else {
+	$varsqlconfaccounting = '#sql';
+	}
+	
+	// session section
+	if (($sqlconf['varsqlconfincludeenable'] == 'Enable') && ($sqlconf['varsqlconfenablesession'] == 'Enable')) {
+	$varsqlconfsession = 'sql';
+	}
+	else {
+	$varsqlconfsession = 'radutmp';
+	}
+
+	// post-auth section
+	if (($sqlconf['varsqlconfincludeenable'] == 'Enable') && ($sqlconf['varsqlconfenablepostauth'] == 'Enable')) {
+	$varsqlconfpostauth = 'sql';
+	}
+	else {
+	$varsqlconfpostauth = '#sql';
+	}
+	
 	
 	$conf .= <<<EOD
 
@@ -854,7 +940,7 @@ authorize {
 	#  is meant to mirror the "users" file.
 	#
 	#  See "Authorization Queries" in sql.conf
-#	sql
+	$varsqlconfauthorize
 
 	#
 	#  If you are using /etc/smbpasswd, and are also doing
@@ -1083,7 +1169,7 @@ accounting {
 	#  Log traffic to an SQL database.
 	#
 	#  See "Accounting queries" in sql.conf
-#	sql
+	$varsqlconfaccounting
 
 	#
 	#  If you receive stop packets with zero session length,
@@ -1127,11 +1213,8 @@ accounting {
 #  or rlm_sql module can handle this.
 #  The rlm_sql module is *much* faster
 session {
-	radutmp
-
-	#
-	#  See "Simultaneous Use Checking Queries" in sql.conf
-#	sql
+	### choose radutmp or sql
+	$varsqlconfsession
 }
 
 
@@ -1152,7 +1235,7 @@ post-auth {
 	#  After authenticating the user, do another SQL query.
 	#
 	#  See "Authentication Logging Queries" in sql.conf
-#	sql
+	$varsqlconfpostauth
 
 	#
 	#  Instead of sending the query to the SQL server,
