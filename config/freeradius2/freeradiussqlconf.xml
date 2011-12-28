@@ -2,46 +2,45 @@
 <!DOCTYPE packagegui SYSTEM "./schema/packages.dtd">
 <?xml-stylesheet type="text/xsl" href="./xsl/package.xsl"?>
 <packagegui>
-		<copyright>
-		<![CDATA[
+	<copyright>
+<![CDATA[	
 /* $Id$ */
 /* ========================================================================== */
 /*
-    authng.xml
-    part of pfSense (http://www.pfSense.com)
-    Copyright (C) 2007 to whom it may belong
-    All rights reserved.
+	freeradiussqlconf.xml
+	part of pfSense (http://www.pfSense.com)
+	Copyright (C) 2011 - 2012 to Alexander Wilke <nachtfalkeaw@web.de>
+	All rights reserved.
 
-    Based on m0n0wall (http://m0n0.ch/wall)
-    Copyright (C) 2003-2006 Manuel Kasper <mk@neon1.net>.
-    All rights reserved.
-                                                                              */
+	Based on m0n0wall (http://m0n0.ch/wall)
+	Copyright (C) 2003-2006 Manuel Kasper <mk@neon1.net>.
+	All rights reserved.
+									      */
 /* ========================================================================== */
 /*
-    Redistribution and use in source and binary forms, with or without
-    modification, are permitted provided that the following conditions are met:
+	Redistribution and use in source and binary forms, with or without
+	modification, are permitted provided that the following conditions are met:
 
-     1. Redistributions of source code must retain the above copyright notice,
-        this list of conditions and the following disclaimer.
+	1. Redistributions of source code must retain the above copyright notice,
+	   this list of conditions and the following disclaimer.
 
-     2. Redistributions in binary form must reproduce the above copyright
-        notice, this list of conditions and the following disclaimer in the
-        documentation and/or other materials provided with the distribution.
+	2. Redistributions in binary form must reproduce the above copyright
+	   notice, this list of conditions and the following disclaimer in the
+	   documentation and/or other materials provided with the distribution.
 
-    THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
-    INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
-    AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
-    AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
-    OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-    INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-    POSSIBILITY OF SUCH DAMAGE.
-                                                                              */
+	THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
+	INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+	AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+	AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+	OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+	SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+	INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+	POSSIBILITY OF SUCH DAMAGE.
+									      */
 /* ========================================================================== */
-		]]>
-	</copyright>
+]]>	</copyright>
 	<description><![CDATA[Describe your package here]]></description>
 	<requirements>Describe your package requirements here</requirements>
 	<faq>Currently there are no FAQ items provided.</faq>
@@ -91,27 +90,63 @@
 			<type>listtopic</type>
 		</field>
 		<field>
-			<fielddescr>Enable SQL Configuration</fielddescr>
-			<fieldname>varsqlconfenable</fieldname>
-			<description><![CDATA[You need to enable this so that eap.conf will be included in radiusd.conf. (Default: Disable)<br>
-									$INCLUDE sql.conf]]></description>
+			<fielddescr>Enable SQL Support</fielddescr>
+			<fieldname>varsqlconfincludeenable</fieldname>
+			<description><![CDATA[Enable this if you like to connect freeRADIUS to a SQL database. (Default: Disable)<br>
+								You <b>must enable at least</b> one of the following options: Authorization, Accounting, Session, Post-Auth.]]></description>
 			<type>select</type>
-			<default_value>#\$INCLUDE sql.conf</default_value>
+			<default_value>Disable</default_value>
 					<options>
-						<option><name>Disbale</name><value>#\$INCLUDE sql.conf</value></option>
-						<option><name>Enable</name><value>$INCLUDE sql.conf</value></option>
+						<option><name>Disbale</name><value>Disable</value></option>
+						<option><name>Enable</name><value>Enable</value></option>
 					</options>
 		</field>
 		<field>
-			<fielddescr>Enable MySQL Counter</fielddescr>
-			<fieldname>varsqlconfenablecounter</fieldname>
-			<description><![CDATA[You need to enable this so that eap.conf will be included in radiusd.conf. (Default: Disable)<br>
-									$INCLUDE sql/mysql/counter.conf]]></description>
+			<fielddescr>Enable SQL Authorization</fielddescr>
+			<fieldname>varsqlconfenableauthorize</fieldname>
+			<description><![CDATA[Enable this if usernames and passwords are stored on a SQL database.<br>
+								SQL support must be enabled for this to work. (Default: Disable)]]></description>
 			<type>select</type>
-			<default_value>#\$INCLUDE sql/mysql/counter.conf</default_value>
+			<default_value>Disable</default_value>
 					<options>
-						<option><name>Disbale</name><value>#\$INCLUDE sql/mysql/counter.conf</value></option>
-						<option><name>Enable</name><value>$INCLUDE sql/mysql/counter.conf</value></option>
+						<option><name>Disbale</name><value>Disable</value></option>
+						<option><name>Enable</name><value>Enable</value></option>
+					</options>
+		</field>
+		<field>
+			<fielddescr>Enable SQL Accounting</fielddescr>
+			<fieldname>varsqlconfenableaccounting</fieldname>
+			<description><![CDATA[Enable this if accounting packets should be logged to a SQL database.<br>
+								SQL support must be enabled for this to work. (Default: Disable)]]></description>
+			<type>select</type>
+			<default_value>Disable</default_value>
+					<options>
+						<option><name>Disbale</name><value>Disable</value></option>
+						<option><name>Enable</name><value>Enable</value></option>
+					</options>
+		</field>
+		<field>
+			<fielddescr>Enable SQL Session</fielddescr>
+			<fieldname>varsqlconfenablesession</fieldname>
+			<description><![CDATA[Enable this to use the "rlm_sql" module (fast) to check for simultaneous connections instead of "radutmp" (slow).<br>
+								SQL support must be enabled for this to work. (Default: Disable)]]></description>
+			<type>select</type>
+			<default_value>Disable</default_value>
+					<options>
+						<option><name>Disbale</name><value>Disable</value></option>
+						<option><name>Enable</name><value>Enable</value></option>
+					</options>
+		</field>
+		<field>
+			<fielddescr>Enable SQL Post-Auth</fielddescr>
+			<fieldname>varsqlconfenablepostauth</fieldname>
+			<description><![CDATA[Enable this if you like to store post-authentication data on a SQL database.<br>
+								SQL support must be enabled for this to work. (Default: Disable)]]></description>
+			<type>select</type>
+			<default_value>Disable</default_value>
+					<options>
+						<option><name>Disbale</name><value>Disable</value></option>
+						<option><name>Enable</name><value>Enable</value></option>
 					</options>
 		</field>
 		<field>
