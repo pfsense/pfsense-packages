@@ -98,7 +98,7 @@
 								<b>Important:</b><br>
 								If you like to use certs created on another PC just disable this and click save.]]></description>
 			<type>select</type>
-			<default_value>yes</default_value>
+			<default_value>no</default_value>
 					<options>
 						<option><name>Yes</name><value>yes</value></option>
 						<option><name>No</name><value>no</value></option>
@@ -113,7 +113,7 @@
 									This page uses the freeradius2 built-in script called "bootstrap" to create CA and certs. The disatvantage of this script is that nothing of your changes will be saved in the global config.xml file. So after a systemcrash or reinstallation of freeradius2 package
 									all your CA and certs will be lost. If you have a backup of all these files on an USB stick or another server than you can copy them back in the freeradius certs folder.<br><br>
 									
-									<b>The better way is to use the pfsense built-in Cert Manager (SYSTEM-> Cert Manager).</b> The CA-Cert and Server-Cert you created there you just have to copy to the freeradius certs folder and pointing to these certs in eap.
+									<b>The better way is to use the pfsense built-in Cert Manager (SYSTEM-> Cert Manager).</b> The CA-Cert and Server-Cert you created there you just have to choose in EAP.
 									The advantage of this is that all your CA and certs will be saved in global config.xml and can be restored.]]></description>
 			<type>input</type>
 			<required/>
@@ -247,7 +247,7 @@
 								
 								
 								<b>Limitations:</b><br>
-								There is no CRL at the moment. Deleting of existing certs from the database (../certs/index.txt) isn't possible from GUI.<br>
+								There is no CRL. Deleting of existing certs from the database (../certs/index.txt) isn't possible from GUI.<br>
 								If you choose a Common Name which already exists in the database (check view config) the .crt will be zero bytes.<br>
 								Choose other Common Name and create a new Client-Cert.
 								]]></description>
@@ -275,8 +275,10 @@
 	</fields>
 	<custom_delete_php_command>
 	freeradius_allcertcnf_resync();
+	freeradius_eapconf_resync();
 	</custom_delete_php_command>
 	<custom_php_resync_config_command>
 	freeradius_allcertcnf_resync();
+	freeradius_eapconf_resync();
 	</custom_php_resync_config_command>
 </packagegui>
