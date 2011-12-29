@@ -1,4 +1,41 @@
 <?php
+/* copyright */
+/* ========================================================================== */
+/*
+	freeradius.inc
+	part of pfSense (http://www.pfSense.com)
+	Copyright (C) 2011 - 2012 Alexander Wilke <nachtfalkeaw@web.de>
+	All rights reserved.
+
+	Based on m0n0wall (http://m0n0.ch/wall)
+	Copyright (C) 2003-2006 Manuel Kasper <mk@neon1.net>.
+	All rights reserved.
+									      */
+/* ========================================================================== */
+/*
+	Redistribution and use in source and binary forms, with or without
+	modification, are permitted provided that the following conditions are met:
+
+	1. Redistributions of source code must retain the above copyright notice,
+	   this list of conditions and the following disclaimer.
+
+	2. Redistributions in binary form must reproduce the above copyright
+	   notice, this list of conditions and the following disclaimer in the
+	   documentation and/or other materials provided with the distribution.
+
+	THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
+	INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+	AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+	AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+	OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+	SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+	INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+	POSSIBILITY OF SUCH DAMAGE.
+									      */
+/* ========================================================================== */
+
 require_once('config.inc');
 require_once('service-utils.inc');
 
@@ -83,14 +120,14 @@ function freeradius_settings_resync() {
 	
 	// Dis-/Enable SQL in "instatiate" section in "freeradius_settings_resync" and radiusd.conf
 	if ($sqlconf['varsqlconfincludeenable'] == 'Enable') {
-		$varsqlconfinclude = '\$INCLUDE sql.conf';
-		$varsqlconfincludecounter = '\$INCLUDE sql/mysql/counter.conf';
+		$varsqlconfinclude = '$INCLUDE sql.conf';
+		$varsqlconfincludecounter = '$INCLUDE sql/mysql/counter.conf';
 		$varsqlconfinstantiate = 'sql';
 	}
 
 	if ($sqlconf['varsqlconfincludeenable'] == 'Disable') {
-		$varsqlconfinclude = '#\$INCLUDE sql.conf';
-		$varsqlconfincludecounter = '#\$INCLUDE sql/mysql/counter.conf';
+		$varsqlconfinclude = '#$INCLUDE sql.conf';
+		$varsqlconfincludecounter = '#$INCLUDE sql/mysql/counter.conf';
 		$varsqlconfinstantiate = '#sql';
 	}
 
@@ -262,8 +299,6 @@ global $config;
 
 $conf = '';
 
-// Empty variables
-
 $arrusers = $config['installedpackages']['freeradius']['config'];
 
 if (is_array($arrusers) && !empty($arrusers)) {
@@ -285,7 +320,6 @@ if (is_array($arrusers) && !empty($arrusers)) {
 	$varuserstopadditionaloptions = '';
 	$varusersadditionaloptionstop = '';
 	
-	
 	if(!empty($users['varuserstopadditionaloptions'])) {
 		$varuserstopadditionaloptions = explode("|", ($users['varuserstopadditionaloptions']));
 		foreach ($varuserstopadditionaloptions as $toptmp) {
@@ -304,8 +338,6 @@ if (is_array($arrusers) && !empty($arrusers)) {
 			$varusersadditionaloptionsbottom .= $bottomtmp . "\n\t";
 		}
 	}
-	
-	
 
 	// Empty variable
 	$varusersmainoptions = '';
@@ -442,7 +474,7 @@ function freeradius_eapconf_resync() {
 	$vareapconfmaxsessions = ($eapconf['vareapconfmaxsessions']?$eapconf['vareapconfmaxsessions']:'4096');
 	
 	// Variables: EAP-TLS and EAP-TLS with OCSP support
-	$vareapconfprivatekeypassword = ($eapconf['vareapconfprivatekeypassword']?$eapconf['vareapconfprivatekeypassword']:'');
+	$vareapconfprivatekeypassword = ($eapconf['vareapconfprivatekeypassword']?$eapconf['vareapconfprivatekeypassword']:'whatever');
 	$vareapconfocspenable = ($eapconf['vareapconfocspenable']?$eapconf['vareapconfocspenable']:'no');
 	$vareapconfocspoverridecerturl = ($eapconf['vareapconfocspoverridecerturl']?$eapconf['vareapconfocspoverridecerturl']:'no');
 	$vareapconfocspurl = ($eapconf['vareapconfocspurl']?$eapconf['vareapconfocspurl']:'http://127.0.0.1/ocsp/');
@@ -665,7 +697,7 @@ function freeradius_sqlconf_resync() {
 	$varsqlconfreadclients = ($sqlconf['varsqlconfreadclients']?$sqlconf['varsqlconfreadclients']:'yes');
 	$varsqlconfnastable = ($sqlconf['varsqlconfnastable']?$sqlconf['varsqlconfnastable']:'nas');
 	
-	// For more information look at "freeradius_settings_resync"
+	// Additional changes were made in "freeradius_settings_resync"
 
 	$conf .= <<<EOD
 
@@ -719,16 +751,7 @@ function freeradius_serverdefault_resync() {
 	$varsqlconfenableaccounting = ($sqlconf['varsqlconfenableaccounting']?$sqlconf['varsqlconfenableaccounting']:'Disable');
 	$varsqlconfenablesession = ($sqlconf['varsqlconfenablesession']?$sqlconf['varsqlconfenablesession']:'Disable');
 	$varsqlconfenablepostauth = ($sqlconf['varsqlconfenablepostauth']?$sqlconf['varsqlconfenablepostauth']:'Disable');	
-	
-	
-	// Disable all sql sections if sql is global disabled
-	// if ($sqlconf['varsqlconfincludeenable'] == 'Disable') {
-	// $varsqlconfauthorize = '#sql';
-	// $varsqlconfaccounting = '#sql';
-	// $varsqlconfsession = 'radutmp';
-	// $varsqlconfpostauth = '#sql';
-	// }
-	
+
 	// authorize section
 	if (($sqlconf['varsqlconfincludeenable'] == 'Enable') && ($sqlconf['varsqlconfenableauthorize'] == 'Enable')) {
 	$varsqlconfauthorize = 'sql';
@@ -1689,7 +1712,7 @@ function freeradius_allcertcnf_resync() {
 
 	$arrcerts = $config['installedpackages']['freeradiuscerts']['config'][0];
 	
-	// General variable for deleting/further generation of Client-Cert
+	// General variable for deleting and generation of further Client-Cert
 	$varcertscreateclient = ($arrcerts['varcertscreateclient']?$arrcerts['varcertscreateclient']:'no');
 	
 	// General variables for deleting: CA, Server, Client
@@ -1722,14 +1745,14 @@ function freeradius_allcertcnf_resync() {
 		// tar client-cert files
 		exec("cd /usr/local/etc/raddb/certs && tar -cf client.tar client.crt client.csr client.key ca.der client.pem");
 		
-		// Make all files in certs folder re-only for root
+		// Make all files in certs folder read/write only for root
 		exec("chmod -R 0600 /usr/local/etc/raddb/certs/");
 		}
 
 		
 		if ($arrcerts['varcertsdeleteall'] == 'yes') {
 	
-		// delete all old certificates and keys
+		// delete all old certificates and keys - deletes certs from pfsense cert-manager IN THIS FOLDER, too.
 		exec("rm -f /usr/local/etc/raddb/certs/*.pem");
 		exec("rm -f /usr/local/etc/raddb/certs/*.der");
 		exec("rm -f /usr/local/etc/raddb/certs/*.csr");
