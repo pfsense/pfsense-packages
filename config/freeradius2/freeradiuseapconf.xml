@@ -9,7 +9,7 @@
 /*
 	freeradiuseapconf.xml
 	part of pfSense (http://www.pfSense.com)
-	Copyright (C) 2011 - 2012 to Alexander Wilke <nachtfalkeaw@web.de>
+	Copyright (C) 2011 - 2012 Alexander Wilke <nachtfalkeaw@web.de>
 	All rights reserved.
 
 	Based on m0n0wall (http://m0n0.ch/wall)
@@ -176,7 +176,7 @@
 		<field>
 			<fielddescr>Private Key Password</fielddescr>
 			<fieldname>vareapconfprivatekeypassword</fieldname>
-			<description><![CDATA[By default the certificates created by freeradius are protected with an "input/ouput" password from reaading the certificate.<b>
+			<description><![CDATA[By default the certificates created by freeradius are protected with an "input/ouput" password from reading the certificate.<br>
 								The certificates created by pfSense Cert Manager are not protected so you must leave this field empty. (Default: whatever)]]></description>
 			<type>password</type>
 			<default_value>whatever</default_value>

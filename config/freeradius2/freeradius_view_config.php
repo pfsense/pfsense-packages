@@ -1,8 +1,10 @@
 <?php
 /*
-	postfix_view_config.php
+	freeradius_view_config.php
 	part of pfSense (http://www.pfsense.com/)
+	Copyright (C) 2011 - 2012 Alexander Wilke <nachtfalkeaw@web.de>
 	Copyright (C) 2011 Marcello Coutinho <marcellocoutinho@gmail.com>
+	based on postfix_view_config.php
 	based on varnish_view_config.
 	All rights reserved.
 
@@ -30,6 +32,7 @@
 
 require("guiconfig.inc");
 function get_file($file){
+	$files['radiusd']="/usr/local/etc/raddb/radiusd.conf";
 	$files['eap']="/usr/local/etc/raddb/eap.conf";
 	$files['sql']="/usr/local/etc/raddb/sql.conf";
 	$files['clients']="/usr/local/etc/raddb/clients.conf";
@@ -98,6 +101,7 @@ else{
 						</tr>
 							<tr>
 							<td class="tabcont" >
+							<input type="button" onClick="get_freeradius_file('radiusd');" id='btn_radiusd' value="radiusd.conf">&nbsp;
 							<input type="button" onClick="get_freeradius_file('eap');" id='btn_eap' value="eap.conf">&nbsp;
 							<input type="button" onClick="get_freeradius_file('sql');" id='btn_sql' value="sql.conf">&nbsp;
 							<input type="button" onClick="get_freeradius_file('clients');" id='btn_clients' value="clients.conf">&nbsp;
@@ -137,6 +141,7 @@ else{
 			}
 		function activitycallback_postfix_file(transport) {
 			$('file_div').innerHTML = transport.responseText;
+			$('btn_radiusd').value="radiusd.conf";
 			$('btn_eap').value="eap.conf";
 			$('btn_sql').value="sql.conf";
 			$('btn_clients').value="clients.conf";
