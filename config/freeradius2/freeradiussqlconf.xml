@@ -347,12 +347,8 @@
 	</fields>
 	<custom_delete_php_command>
 		freeradius_sqlconf_resync();
-		freeradius_serverdefault_resync();
-		freeradius_settings_resync();
 	</custom_delete_php_command>
 	<custom_php_resync_config_command>
 		freeradius_sqlconf_resync();
-		freeradius_serverdefault_resync();
-		freeradius_settings_resync();
 	</custom_php_resync_config_command>
 </packagegui>
