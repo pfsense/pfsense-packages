@@ -65,7 +65,7 @@
 		<tab>
 			<text>Users</text>
 			<url>/pkg.php?xml=freeradius.xml</url>
-			<active/>
+		<active/>
 		</tab>
 		<tab>
 			<text>NAS / Clients</text>
@@ -94,6 +94,10 @@
 		<tab>
 			<text>View config</text>
 			<url>/freeradius_view_config.php</url>
+		</tab>
+		<tab>
+			<text>XMLRPC Sync</text>
+			<url>/pkg_edit.php?xml=freeradiussync.xml&amp;id=0</url>
 		</tab>
 	</tabs>
 	<additional_files_needed>
@@ -134,6 +138,11 @@
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0755</chmod>
+		<item>http://www.pfsense.org/packages/config/freeradius2/freeradiussync.xml</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/pkg/</prefix>
+		<chmod>0755</chmod>
 		<item>http://www.pfsense.org/packages/config/freeradius2/freeradius.inc</item>
 	</additional_files_needed>
 	<adddeleteeditpagefields>
@@ -142,16 +151,12 @@
 			<fieldname>varusersusername</fieldname>
 		</columnitem>
 		<columnitem>
-			<fielddescr>Description</fielddescr>
-			<fieldname>description</fieldname>
+			<fielddescr>Simult. Connections</fielddescr>
+			<fieldname>varuserssimultaneousconnect</fieldname>
 		</columnitem>
 		<columnitem>
 			<fielddescr>IP Address</fielddescr>
 			<fieldname>varusersframedipaddress</fieldname>
-		</columnitem>
-		<columnitem>
-			<fielddescr>Simultaneous Connections</fielddescr>
-			<fieldname>varuserssimultaneousconnect</fieldname>
 		</columnitem>
 		<columnitem>
 			<fielddescr>Expiration Date</fielddescr>
@@ -168,6 +173,10 @@
 		<columnitem>
 			<fielddescr>VLAN ID</fielddescr>
 			<fieldname>varusersvlanid</fieldname>
+		</columnitem>
+		<columnitem>
+			<fielddescr>Description</fielddescr>
+			<fieldname>description</fieldname>
 		</columnitem>
 	</adddeleteeditpagefields>
 	<fields>
@@ -310,10 +319,6 @@
 		freeradius_sqlconf_resync();
 		freeradius_settings_resync();
 		freeradius_serverdefault_resync();
-		freeradius_clientcertcnf_resync();
-		freeradius_servercertcnf_resync();
-		freeradius_cacertcnf_resync();
-		freeradius_allcertcnf_resync();
 		exec("rm -f /usr/local/etc/raddb/sites-enabled/control-socket");
 		exec("rm -f /usr/local/etc/raddb/sites-enabled/inner-tunnel");
 	</custom_php_install_command>
