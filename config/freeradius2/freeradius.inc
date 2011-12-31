@@ -82,7 +82,7 @@ function freeradius_install_command() {
         conf_mount_rw();
 	write_rcfile($rcfile);
         conf_mount_ro();
-	start_service("freeradius");
+	restart_service("freeradius");
 }
 
 function freeradius_settings_resync() {
@@ -297,6 +297,8 @@ EOD;
 	file_put_contents(RADDB . '/radiusd.conf', $conf);
 	conf_mount_ro();
 	
+	// "freeradius_sqlconf_resync" is pointing to this function because we need to run "freeradius_serverdefault_resync" and after that restart freeradius.
+	freeradius_serverdefault_resync();
 	restart_service("freeradius");
 }
 
@@ -488,7 +490,8 @@ function freeradius_eapconf_resync() {
 
 
 // The filenames of pfsense cert manager are different from freeradius cert manager so it is possible to store both in the same folder at any time.
-// This is for the pfsense cert manager	
+// This is for the pfsense cert manager
+// Depends on "freeradius_get_server_certs" and "freeradius_get_ca_certs"
 if ($vareapconfchoosecertmanager == 'pfsensecertmgr') {
 		
 		$ca_cert = lookup_ca($eapconf["ssl_ca_cert"]);
@@ -530,7 +533,9 @@ if ($vareapconfchoosecertmanager == 'pfsensecertmgr') {
 	$vareapconfprivatekeyfile = 'server_key.pem';
 	$vareapconfcertificatefile = 'server_cert.pem';
 	$vareapconfcafile = 'ca_cert.pem';
+	
 	// generate new DH and RANDOM file
+	log_error("freeRADIUS: Switched to pfSense Cert-Manager. Creating new DH and random file in /usr/local/etc/raddb/certs");
 	exec("cd /usr/local/etc/raddb/certs && openssl dhparam -out dh 1024");
 	exec("cd /usr/local/etc/raddb/certs && dd if=/dev/urandom of=./random count=10");
 }
@@ -638,7 +643,7 @@ EOD;
 	restart_service('freeradius');
 }
 
-
+// Gets started from freeradiuseapconf.xml
 function freeradius_get_ca_certs() {
 	global $config;
 	$ca_arr = array();
@@ -650,6 +655,7 @@ function freeradius_get_ca_certs() {
 	return $ca_arr;
 }
 
+// Gets started from freeradiuseapconf.xml
 function freeradius_get_server_certs() {
 	global $config;
 	$cert_arr = array();
@@ -734,8 +740,11 @@ EOD;
 	file_put_contents($filename, $conf);
 	chmod($filename, 0600);
 	conf_mount_ro();
-
-	restart_service('freeradius');
+	
+	// We don't need a restart at this time because there are additional changes needed in:
+	// "freeradius_settings_resync" and "freeradius_serverdefault_resync".
+	// restart_service('freeradius');
+	freeradius_settings_resync();
 }
 
 function freeradius_serverdefault_resync() {
@@ -1434,8 +1443,9 @@ EOD;
 	file_put_contents($filename, $conf);
 	chmod($filename, 0600);
 	conf_mount_ro();
-
-	restart_service('freeradius');
+	
+	// No need to restart here because the restart of the service will be done in "freeradius_settings_resync"
+	// restart_service('freeradius');
 }
 
 function freeradius_cacertcnf_resync() {
@@ -1719,9 +1729,11 @@ function freeradius_allcertcnf_resync() {
 		if ($arrcerts['varcertscreateclient'] == 'yes') {
 		
 		// delete all old certificates and keys
+		log_error("freeRADIUS: deleting all client.csr .crt .key .pem .tar in /usr/local/etc/raddb/certs");
 		exec("rm -f /usr/local/etc/raddb/certs/client.csr");
 		exec("rm -f /usr/local/etc/raddb/certs/client.crt");
 		exec("rm -f /usr/local/etc/raddb/certs/client.key");
+		exec("rm -f /usr/local/etc/raddb/certs/client.pem");
 		exec("rm -f /usr/local/etc/raddb/certs/client.tar");
 				
 			
@@ -1744,12 +1756,14 @@ function freeradius_allcertcnf_resync() {
 		
 		// Make all files in certs folder read/write only for root
 		exec("chmod -R 0600 /usr/local/etc/raddb/certs/");
+		log_error("freeRADIUS: Created new client.csr .crt .key .pem and added them together with ca.der in /usr/local/etc/raddb/certs/client.tar");
 		}
 
 		
 		if ($arrcerts['varcertsdeleteall'] == 'yes') {
 	
 		// delete all old certificates and keys - deletes certs from pfsense cert-manager IN THIS FOLDER, too.
+		log_error("freeRADIUS: deleting all CA, Server and Client certs, DH, random and database files in /usr/local/etc/raddb/certs");
 		exec("rm -f /usr/local/etc/raddb/certs/*.pem");
 		exec("rm -f /usr/local/etc/raddb/certs/*.der");
 		exec("rm -f /usr/local/etc/raddb/certs/*.csr");
@@ -1769,10 +1783,11 @@ function freeradius_allcertcnf_resync() {
 		freeradius_clientcertcnf_resync();
 		
 		// generate new DH and RANDOM file
+		log_error("freeRADIUS: Creating new DH and random file in /usr/local/etc/raddb/certs");
 		exec("cd /usr/local/etc/raddb/certs && openssl dhparam -out dh 1024");
 		exec("cd /usr/local/etc/raddb/certs && dd if=/dev/urandom of=./random count=10");
 	
-	
+		log_error("freeRADIUS: Creating new CA, Server and Client certs in /usr/local/etc/raddb/certs");
 		// make bootstrap executable and run to create certs based on .cnf files
 		exec("chmod 0770 /usr/local/etc/raddb/certs/bootstrap");
 		exec("/usr/local/etc/raddb/certs/bootstrap");
@@ -1784,7 +1799,8 @@ function freeradius_allcertcnf_resync() {
 		// tar client-cert files
 		exec("cd /usr/local/etc/raddb/certs && tar -cf client.tar client.crt client.csr client.key ca.der client.pem");
 		exec("chmod -R 0600 /usr/local/etc/raddb/certs/");
-	
+		log_error("freeRADIUS: Added client.csr .crt .key .pem together with ca.der in /usr/local/etc/raddb/certs/client.tar");
+		
 		// If there were changes on the certificates we need to restart freeradius
 		restart_service('freeradius');
 		}
