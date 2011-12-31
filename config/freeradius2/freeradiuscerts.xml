@@ -78,10 +78,14 @@
 			<text>Certificates</text>
 			<url>/pkg_edit.php?xml=freeradiuscerts.xml&amp;id=0</url>
 			<active/>
-		</tab>
+		</tab>		
 		<tab>
 			<text>View config</text>
 			<url>/freeradius_view_config.php</url>
+		</tab>
+		<tab>
+			<text>XMLRPC Sync</text>
+			<url>/pkg_edit.php?xml=freeradiussync.xml&amp;id=0</url>
 		</tab>
 	</tabs>
 	<fields>
@@ -174,7 +178,7 @@
 			<fielddescr>Key Creation Algorithm</fielddescr>
 			<fieldname>varcertsdefaultmd</fieldname>
 			<description><![CDATA[Choose the algotithem which should be used to create the key.<br>
-								There seems to be some OS do not support all algorithms. (Default: md5)]]></description>
+								There seems to be some OS which do not support all algorithms. (Default: md5)]]></description>
 			<type>select</type>
 			<default_value>md5</default_value>
 					<options>
@@ -273,11 +277,9 @@
 		</field>
 	</fields>
 	<custom_delete_php_command>
-	freeradius_allcertcnf_resync();
-	freeradius_eapconf_resync();
+		freeradius_allcertcnf_resync();
 	</custom_delete_php_command>
 	<custom_php_resync_config_command>
-	freeradius_allcertcnf_resync();
-	freeradius_eapconf_resync();
+		freeradius_allcertcnf_resync();
 	</custom_php_resync_config_command>
 </packagegui>

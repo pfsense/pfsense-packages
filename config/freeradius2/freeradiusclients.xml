@@ -82,7 +82,11 @@
 			<text>View config</text>
 			<url>/freeradius_view_config.php</url>
 		</tab>
-	</tabs>
+		<tab>
+			<text>XMLRPC Sync</text>
+			<url>/pkg_edit.php?xml=freeradiussync.xml&amp;id=0</url>
+		</tab>
+</tabs>
 	<adddeleteeditpagefields>
 		<columnitem>
 			<fielddescr>Client IP Address</fielddescr>
