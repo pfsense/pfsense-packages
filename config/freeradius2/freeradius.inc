@@ -38,6 +38,12 @@
 
 require_once('config.inc');
 require_once('service-utils.inc');
+require_once("util.inc");
+require_once("functions.inc");
+require_once("pkg-utils.inc");
+require_once("globals.inc");
+require_once("filter.inc");
+require_once("services.inc");
 
 define('RADDB', '/usr/local/etc/raddb');
 
@@ -124,8 +130,7 @@ function freeradius_settings_resync() {
 		$varsqlconfincludecounter = '$INCLUDE sql/mysql/counter.conf';
 		$varsqlconfinstantiate = 'sql';
 	}
-
-	if ($sqlconf['varsqlconfincludeenable'] == 'Disable') {
+	else {
 		$varsqlconfinclude = '#$INCLUDE sql.conf';
 		$varsqlconfincludecounter = '#$INCLUDE sql/mysql/counter.conf';
 		$varsqlconfinstantiate = '#sql';
@@ -291,6 +296,7 @@ EOD;
 	conf_mount_rw();
 	file_put_contents(RADDB . '/radiusd.conf', $conf);
 	conf_mount_ro();
+	
 	restart_service("freeradius");
 }
 
@@ -388,7 +394,8 @@ EOD;
 	file_put_contents($filename, $conf);
 	chmod($filename, 0600);
 	conf_mount_ro();
-
+	
+	freeradius_sync_on_changes();
 	restart_service('freeradius');
 }
 
@@ -411,26 +418,14 @@ function freeradius_clients_resync() {
 
 client $varclientshortname {
 	$varclientipversion = $varclientip
-
-		### udp or tcp - udp is default
 	proto = $varclientproto
 	secret = $varclientsharedsecret
-
-		### RFC5080: User Message-Authenticator in Access-Request. But older sqitches, accesspoints, NAS do not include that. Default: no
 	require_message_authenticator = $varrequiremessageauthenticator
-
-		### Takes only effect if you use TCP as protocol. This is the mirror of "max_requests" from "Settings" tab. Default 16
 	max_connections = $varclientmaxconnections
 	shortname = $varclientshortname
-
-		### Optional: Used by checkrad.pl for simultaneous use checks. Default: other
 	nastype = $varclientnastype
-
-		### Optional: will be used in future releases
 	#login = !root
 	#password = someadminpas
-							
-		### Additional configuration needed. See: raddb/sites-available/originate-coa
 	#virtual_server = home1
 	#coa_server = coa
 }
@@ -452,6 +447,8 @@ EOD;
 	conf_mount_rw();
 	file_put_contents(RADDB . '/clients.conf', $conf);
 	conf_mount_ro();
+	
+	freeradius_sync_on_changes();
 	restart_service("freeradius");
 }
 
@@ -1792,4 +1789,140 @@ function freeradius_allcertcnf_resync() {
 		restart_service('freeradius');
 		}
 }
+
+// ##### The following part is based on the code of pfblocker #####
+
+/* Uses XMLRPC to synchronize the changes to a remote node */
+function freeradius_sync_on_changes() {
+	global $config, $g;
+	$varsyncenablexmlrpc = $config['installedpackages']['freeradiussync']['config'][0]['varsyncenablexmlrpc'];	
+	
+	// if checkbox is NOT checked do nothing
+	if(!$varsyncenablexmlrpc) {
+		return;
+	}
+	
+	log_error("freeRADIUS is starting XMLRPC process (freeradius_do_xmlrpc_sync).");	
+	
+	// if checkbox is checked get IP and password of the destination hosts
+	foreach ($config['installedpackages']['freeradiussync']['config'] as $rs ){
+		foreach($rs['row'] as $sh){
+		$sync_to_ip = $sh['varsyncipaddress'];
+		$password   = $sh['varsyncpassword'];
+		if($password && $sync_to_ip)
+			freeradius_do_xmlrpc_sync($sync_to_ip, $password);
+		}
+	}
+	log_error("freeRADIUS has finished XMLRPC process (freeradius_do_xmlrpc_sync).");
+}
+
+/* Do the actual XMLRPC sync */
+function freeradius_do_xmlrpc_sync($sync_to_ip, $password) {
+	global $config, $g;
+
+	if(!$password)
+		return;
+
+	if(!$sync_to_ip)
+		return;
+	
+	// Check and choose correct protocol type, port number and IP address
+	$xmlrpc_sync_neighbor = $sync_to_ip;
+    if($config['system']['webgui']['protocol'] != "") {
+		$synchronizetoip = $config['system']['webgui']['protocol'];
+		$synchronizetoip .= "://";
+    }
+    $port = $config['system']['webgui']['port'];
+    /* if port is empty lets rely on the protocol selection */
+    if($port == "") {
+		if($config['system']['webgui']['protocol'] == "http") 
+			$port = "80";
+		else 
+			$port = "443";
+    }
+	$synchronizetoip .= $sync_to_ip;
+
+	/* xml will hold the sections to sync */
+	$xml = array();
+	$xml['freeradius'] = $config['installedpackages']['freeradius'];
+	$xml['freeradiusclients'] = $config['installedpackages']['freeradiusclients'];
+	
+	/* assemble xmlrpc payload */
+	$params = array(
+		XML_RPC_encode($password),
+		XML_RPC_encode($xml)
+	);
+
+	/* set a few variables needed for sync code borrowed from filter.inc */
+	$url = $synchronizetoip;
+	log_error("Beginning freeRADIUS XMLRPC sync with {$url}:{$port}.");
+	$method = 'pfsense.merge_installedpackages_section_xmlrpc';
+	$msg = new XML_RPC_Message($method, $params);
+	$cli = new XML_RPC_Client('/xmlrpc.php', $url, $port);
+	$cli->setCredentials('admin', $password);
+		if($g['debug'])
+			$cli->setDebug(1);
+		/* send our XMLRPC message and timeout after 250 seconds */
+		$resp = $cli->send($msg, "250");
+		if(!$resp) {
+			$error = "A communications error occurred while freeRADIUS was attempting XMLRPC sync with {$url}:{$port}.";
+			log_error($error);
+			file_notice("sync_settings", $error, "freeradius Settings Sync", "");
+		} elseif($resp->faultCode()) {
+			$cli->setDebug(1);
+			$resp = $cli->send($msg, "250");
+			$error = "An error code was received while freeRADIUS XMLRPC was attempting to sync with {$url}:{$port} - Code " . $resp->faultCode() . ": " . $resp->faultString();
+			log_error($error);
+			file_notice("sync_settings", $error, "freeradius Settings Sync", "");
+		} else {
+			log_error("freeRADIUS XMLRPC has synced data successfully with {$url}:{$port}.");
+		}
+	
+	/* tell freeradius to reload our settings on the destionation sync host. */
+	$method = 'pfsense.exec_php';
+	$execcmd  = "require_once('/usr/local/pkg/freeradius.inc');\n";
+	// pfblocker just needed one fuction to reload after XMLRPC. freeRADIUS needs more so we point to a fuction below which contains all fuctions
+	$execcmd .= "freeradius_all_after_XMLRPC_resync();";
+	
+	/* assemble xmlrpc payload */
+	$params = array(
+		XML_RPC_encode($password),
+		XML_RPC_encode($execcmd)
+	);
+
+	log_error("freeRADIUS XMLRPC is reloading data on {$url}:{$port}.");
+	$msg = new XML_RPC_Message($method, $params);
+	$cli = new XML_RPC_Client('/xmlrpc.php', $url, $port);
+	$cli->setCredentials('admin', $password);
+		$resp = $cli->send($msg, "250");
+		if(!$resp) {
+			$error = "A communications error occurred while freeRADIUS was attempting XMLRPC sync with {$url}:{$port} (pfsense.exec_php).";
+			log_error($error);
+			file_notice("sync_settings", $error, "freeradius Settings Sync", "");
+		} elseif($resp->faultCode()) {
+			$cli->setDebug(1);
+			$resp = $cli->send($msg, "250");
+			$error = "An error code was received while freeRADIUS XMLRPC was attempting to sync with {$url}:{$port} - Code " . $resp->faultCode() . ": " . $resp->faultString();
+			log_error($error);
+			file_notice("sync_settings", $error, "freeradius Settings Sync", "");
+		} else {
+			log_error("freeRADIUS XMLRPC has reloaded data successfully on {$url}:{$port} (pfsense.exec_php).");
+		}
+
+}
+
+// ##### The part above is based on the code of pfblocker #####
+
+// This function restarts all other needed functions after XMLRPC so that the content of .XML + .INC will be written in the files (clients.conf, users)
+// Adding more functions will increase the to sync
+function freeradius_all_after_XMLRPC_resync() {
+	
+	freeradius_users_resync();
+	freeradius_clients_resync();
+	
+	log_error("freeRADIUS has finished XMLRPC process. It should be OK. For more information look at the host which started sync.");
+	
+	exec("/usr/local/etc/rc.d/radiusd onerestart");
+}
+
 ?>
