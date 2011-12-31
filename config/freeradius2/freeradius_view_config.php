@@ -59,7 +59,7 @@ else{
 	if(strstr($pfSversion, "1.2"))
 		$one_two = true;
 	
-	$pgtitle = "Services: freeRADIUS View Configuration";
+	$pgtitle = "FreeRADIUS: View Configuration";
 	include("head.inc");
 	
 	?>
@@ -87,6 +87,7 @@ else{
 		$tab_array[] = array(gettext("SQL"), false, "/pkg_edit.php?xml=freeradiussqlconf.xml&id=0");
 		$tab_array[] = array(gettext("Certificates"), false, "/pkg_edit.php?xml=freeradiuscerts.xml&id=0");
 		$tab_array[] = array(gettext("View config"), true, "/freeradius_view_config.php");
+		$tab_array[] = array(gettext("XMLRPC Sync"), false, "/pkg_edit.php?xml=freeradiussync.xml&amp;id=0");
 		display_top_tabs($tab_array);
 	?>
 			</td></tr>
