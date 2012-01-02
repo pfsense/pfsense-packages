@@ -140,14 +140,27 @@ function nrpe2_custom_php_deinstall_command() {
 function nrpe2_custom_php_write_config() {
 	global $g, $config;
 	$nagios_check_path = "/usr/local/libexec/nagios";
+	$szSudoersFile = "/usr/local/etc/sudoers";
 
 	conf_mount_rw();
 	$cmds = array();
+	$szSudoerCmds = array();
+	$nSudoCnt = 0;
 	foreach ($config['installedpackages']['nrpe2']['config'][0]['row'] as $cmd) {
 		if (is_executable("{$nagios_check_path}/{$cmd['command']}"))
-			$cmds[] = "command[{$cmd['name']}]={$nagios_check_path}/{$cmd['command']} -w {$cmd['warning']} -c {$cmd['critical']} {$cmd['extra']}\n";
+			$cmds[] = "command[{$cmd['name']}]=";
+			if($cmd['sudo'])
+			{
+				// Prepend sudo
+				$cmds[] .= "sudo ";
+				$szSudoerCmds[$nSudoCnt++] = "{$nagios_check_path}/{$cmd['command']}";
+			}
+			
+			$cmds[] .= "{$nagios_check_path}/{$cmd['command']} -w {$cmd['warning']} -c {$cmd['critical']} {$cmd['extra']}\n";
 	}
 	$commands = implode($cmds);
+	
+
 
 	$server_port = $config['installedpackages']['nrpe2']['config'][0]['server_port'];
 	$server_address = $config['installedpackages']['nrpe2']['config'][0]['server_address'];
@@ -168,6 +181,45 @@ command_timeout=60
 connection_timeout=300
 {$commands}
 EOD;
+
+	// Read sudoers file and remove all nagios lines
+	$cFile = fopen($szSudoersFile, "r");
+	if($cFile)
+	{
+		fseek($cFile, 0, SEEK_SET);
+		$vszSudoers = explode("\n", fread($cFile, 0xFFFFFFFF));
+		
+		// Remove all nagios entries
+		$nNumSudoers = count($vszSudoers);
+		for($i = 0; $i < $NumSudoers; $i++)
+		{
+			// If we are a nagios entry
+			if(substr(trim($vszSudoers[$i]), 0, 6) == "nagios") { $vszSudoers[$i] = ""; }
+			if(substr(trim($vszSudoers[$i]), 0, 23)== "Defaults:nagios !syslog") { $vszSudoers[$i] = ""; }
+		}
+	}
+	fclose($cFile);
+	
+	// Write sudoers file with all new nagios lines
+	$cFile = fopen($szSudoersFile, "w");
+	if($cFile)
+	{
+		fseek($cFile, 0, SEEK_SET);
+		
+		// Add required entries
+		$nNextEntry = count(vszSudoers);
+		$vszSudoers[$nNextEntry++] = "Defaults:nagios !syslog\n";
+		foreach($szSudoerCmds as $szSudoer)
+		{
+			$vszSudoers[$nNextEntry++] = "nagios ALL=(ALL) NOPASSWD:" . $szSudoer . "\n";
+		}
+		
+		fwrite($cFile, implode($vszSudoers));
+		fclose($cFile);
+	}
+	fclose($cFile);
+
+	// Write config and exit
 	fwrite($fd, $nrpe_cfg);
 	fclose($fd);
 	conf_mount_ro();
