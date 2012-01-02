@@ -319,6 +319,7 @@
 		freeradius_sqlconf_resync();
 		exec("rm -f /usr/local/etc/raddb/sites-enabled/control-socket");
 		exec("rm -f /usr/local/etc/raddb/sites-enabled/inner-tunnel");
+		exec("ln -s /usr/local/etc/raddb/sites-available/soh /usr/local/etc/raddb/sites-enabled/");
 	</custom_php_install_command>
 	<custom_php_deinstall_command>
 		freeradius_deinstall_command();

@@ -281,7 +281,10 @@ instantiate {
 
 	exec
 	expr
-	#daily
+	daily
+	weekly
+	monthly
+	forever
 	expiration
 	logintime
 	### Dis-/Enable sql instatiate
@@ -299,6 +302,9 @@ EOD;
 	
 	// "freeradius_sqlconf_resync" is pointing to this function because we need to run "freeradius_serverdefault_resync" and after that restart freeradius.
 	freeradius_serverdefault_resync();
+	freeradius_modulescounter_resync();
+	freeradius_modulesmschap_resync();
+	freeradius_modulesrealm_resync();
 	restart_service("freeradius");
 }
 
@@ -348,45 +354,57 @@ if (is_array($arrusers) && !empty($arrusers)) {
 	}
 
 	// Empty variable
-	$varusersmainoptions = '';
+	$varuserscheckitem = '';
+	$varusersreplyitem = '';
 	
 	// Add the user attributes to each user.
-	$varusersmainoptions = '"' . $varusersusername . '"' . " Cleartext-Password := " . '"' . $varuserspassword .'"';
+	$varuserscheckitem = '"' . $varusersusername . '"' . " Cleartext-Password := " . '"' . $varuserspassword .'"';
 	
+	// Add additional CHECK-ITEMS here. Different formatting in "users" file needed.
 	if ($varuserssimultaneousconnect != '') {
-	$varusersmainoptions .= "\n\tSimultaneous-Use := $varuserssimultaneousconnect";
+	$varuserscheckitem .= ", Simultaneous-Use := " . '"' . $varuserssimultaneousconnect . '"';
 	}
 	if ($varusersexpiration != '') {
-	$varusersmainoptions .= ",\n\tExpiration := " . '"' . $varusersexpiration . '"';
+	$varuserscheckitem .= ", Expiration := " . '"' . $varusersexpiration . '"';
 	}
 	if ($varuserslogintime != '') {
-	$varusersmainoptions .= ",\n\tLogin-Time := " . '"' . $varuserslogintime . '"';
+	$varuserscheckitem .= ", Login-Time := " . '"' . $varuserslogintime . '"';
 	}
-	if ($varuserssessiontimeout != '') {
-	$varusersmainoptions .= ",\n\tSession-Timeout := $varuserssessiontimeout";
-	}	
+		
+	// Add additional REPLY-ITEMS here. Different formatting in "users" file needed.
 	if ($varusersframedipaddress != '') {
-	$varusersmainoptions .= ",\n\tFramed-IP-Address = $varusersframedipaddress";
+		if ($varusersreplyitem != '') { $varusersreplyitem .=","; }
+		$varusersreplyitem .= "\n\tFramed-IP-Address = $varusersframedipaddress";
 	}
 	if ($varusersframedipnetmask != '') {
-	$varusersmainoptions .= ",\n\tFramed-IP-Netmask = $varusersframedipnetmask";
+		if ($varusersreplyitem != '') { $varusersreplyitem .=","; }
+		$varusersreplyitem .= "\n\tFramed-IP-Netmask = $varusersframedipnetmask";
 	}
 	if ($varusersframedroute != '') {
-	$varusersmainoptions .= ",\n\tFramed-Route = " . '"' . $varusersframedroute . '"';
+		if ($varusersreplyitem != '') { $varusersreplyitem .=","; }
+		$varusersreplyitem .= "\n\tFramed-Route = " . '"' . $varusersframedroute . '"';
+	}
+	if ($varuserssessiontimeout != '') {
+		if ($varusersreplyitem != '') { $varusersreplyitem .=","; }
+		$varusersreplyitem .= "\n\tSession-Timeout := $varuserssessiontimeout";
 	}
 	if ($varusersvlanid != '') {
-	$varusersmainoptions .= ",\n\tTunnel-Type = VLAN,\n\tTunnel-Medium-Type = IEEE-802,\n\tTunnel-Private-Group-ID = " . '"' . $varusersvlanid . '"';
+		if ($varusersreplyitem != '') { $varusersreplyitem .=","; }
+		$varusersreplyitem .= "\n\tTunnel-Type = VLAN,\n\tTunnel-Medium-Type = IEEE-802,\n\tTunnel-Private-Group-ID = " . '"' . $varusersvlanid . '"';
 	}
 	if ($varusersadditionaloptionsbottom != '') {
-	$varusersmainoptions .= ",\n\t$varusersadditionaloptionsbottom";
+		if ($varusersreplyitem != '') { $varusersreplyitem .=","; }
+		$varusersreplyitem .= "\n\t$varusersadditionaloptionsbottom";
 	}
-	// Cosmetic fix - This is just to make a blank new line after each user entry
-	$varusersmainoptions .= "\n\n";
+	
+		// Cosmetic fix - This is just to make a blank new line after each user entry
+	$varusersreplyitem .= "\n\n";
 	
 	
 	$conf .= <<<EOD
 $varusersadditionaloptionstop
-$varusersmainoptions
+$varuserscheckitem
+	$varusersreplyitem
 EOD;
 	} //end foreach
 } // end if
@@ -610,8 +628,6 @@ if ($vareapconfchoosecertmanager == 'radiuscertmgr') {
 			default_eap_type = $vareapconfttlsdefaulteaptype
 			copy_request_to_tunnel = $vareapconfttlscopyrequesttotunnel
 			use_tunneled_reply = $vareapconfttlsusetunneledreply
-		### if disabled this will be processed by the virtual server called "default"
-		#	virtual_server = "inner-tunnel"
 		#	include_length = yes
 		}	### end ttls	
 	
@@ -621,10 +637,8 @@ if ($vareapconfchoosecertmanager == 'radiuscertmgr') {
 			copy_request_to_tunnel = $vareapconfpeapcopyrequesttotunnel
 			use_tunneled_reply = $vareapconfpeapusetunneledreply
 		#	proxy_tunneled_request_as_eap = yes
-		### if disabled this will be processed by the virtual server called "default"
-		#	virtual_server = "inner-tunnel"
-		#	soh = yes
-		#	soh_virtual_server = "soh-server"
+			soh = yes
+			soh_virtual_server = "soh"
 		}
 		mschapv2 {
 		#	send_error = no
@@ -929,7 +943,7 @@ authorize {
 	#  the other styles won't be checked.
 	#
 	suffix
-#	ntdomain
+	ntdomain
 
 	#
 	#  This module takes care of EAP-MD5, EAP-TLS, and EAP-LEAP
@@ -984,11 +998,14 @@ authorize {
 
 	#
 	#  Enforce daily limits on time spent logged in.
-#	daily
+	daily
+	weekly
+	monthly
+	forever
 
 	#
 	# Use the checkval module
-#	checkval
+	checkval
 
 	expiration
 	logintime
@@ -1160,7 +1177,7 @@ preacct {
 	#  home server as authentication requests.
 #	IPASS
 	suffix
-#	ntdomain
+	ntdomain
 
 	#
 	#  Read the 'acct_users' file
@@ -1176,7 +1193,10 @@ accounting {
 	#  Note that accounting requests which are proxied
 	#  are also logged in the detail file.
 	detail
-#	daily
+	daily
+	weekly
+	monthly
+	forever
 
 	#  Update the wtmp file
 	#
@@ -1375,7 +1395,7 @@ pre-proxy {
 	#  Uncomment the following line if you want to filter requests
 	#  sent to remote servers based on the rules defined in the
 	#  'attrs.pre-proxy' file.
-#	attr_filter.pre-proxy
+	attr_filter.pre-proxy
 
 	#  If you want to have a log of packets proxied to a home
 	#  server, un-comment the following line, and the
@@ -1399,7 +1419,7 @@ post-proxy {
 
 	#  Uncomment the following line if you want to filter replies from
 	#  remote proxies based on the rules defined in the 'attrs' file.
-#	attr_filter.post-proxy
+	attr_filter.post-proxy
 
 	#
 	#  If you are proxying LEAP, you MUST configure the EAP
@@ -1939,6 +1959,275 @@ function freeradius_all_after_XMLRPC_resync() {
 	log_error("freeRADIUS has finished XMLRPC process. It should be OK. For more information look at the host which started sync.");
 	
 	exec("/usr/local/etc/rc.d/radiusd onerestart");
+}
+
+function freeradius_modulescounter_resync() {
+	global $config;
+	$conf = '';
+
+	$conf .= <<<EOD
+# -*- text -*-
+#
+#  $Id$
+
+#  counter module:
+#  This module takes an attribute (count-attribute).
+#  It also takes a key, and creates a counter for each unique
+#  key.  The count is incremented when accounting packets are
+#  received by the server.  The value of the increment depends
+#  on the attribute type.
+#  If the attribute is Acct-Session-Time or of an integer type we add
+#  the value of the attribute. If it is anything else we increase the
+#  counter by one.
+#
+#  The 'reset' parameter defines when the counters are all reset to
+#  zero.  It can be hourly, daily, weekly, monthly or never.
+#
+#  hourly: Reset on 00:00 of every hour
+#  daily: Reset on 00:00:00 every day
+#  weekly: Reset on 00:00:00 on sunday
+#  monthly: Reset on 00:00:00 of the first day of each month
+#
+#  It can also be user defined. It should be of the form:
+#  num[hdwm] where:
+#  h: hours, d: days, w: weeks, m: months
+#  If the letter is ommited days will be assumed. In example:
+#  reset = 10h (reset every 10 hours)
+#  reset = 12  (reset every 12 days)
+#
+#
+#  The check-name attribute defines an attribute which will be
+#  registered by the counter module and can be used to set the
+#  maximum allowed value for the counter after which the user
+#  is rejected.
+#  Something like:
+#
+#  DEFAULT Max-Daily-Session := 36000
+#          Fall-Through = 1
+#
+#  You should add the counter module in the instantiate
+#  section so that it registers check-name before the files
+#  module reads the users file.
+#
+#  If check-name is set and the user is to be rejected then we
+#  send back a Reply-Message and we log a Failure-Message in
+#  the radius.log
+#
+#  If the count attribute is Acct-Session-Time then on each
+#  login we send back the remaining online time as a
+#  Session-Timeout attribute ELSE and if the reply-name is
+#  set, we send back that attribute.  The reply-name attribute
+#  MUST be of an integer type.
+#
+#  The counter-name can also be used instead of using the check-name
+#  like below:
+#
+#  DEFAULT  Daily-Session-Time > 3600, Auth-Type = Reject
+#      Reply-Message = "You've used up more than one hour today"
+#
+#  The allowed-servicetype attribute can be used to only take
+#  into account specific sessions. For example if a user first
+#  logs in through a login menu and then selects ppp there will
+#  be two sessions. One for Login-User and one for Framed-User
+#  service type. We only need to take into account the second one.
+#
+#  The module should be added in the instantiate, authorize and
+#  accounting sections.  Make sure that in the authorize
+#  section it comes after any module which sets the
+#  'check-name' attribute.
+#
+counter daily {
+	filename = \${raddbdir}/db.daily
+	key = User-Name
+	count-attribute = Acct-Session-Time
+	reset = daily
+	counter-name = Daily-Session-Time
+	check-name = Max-Daily-Session
+	reply-name = Session-Timeout
+	cache-size = 5000
+}
+
+counter weekly {
+	filename = \${raddbdir}/db.weekly
+	key = User-Name
+	count-attribute = Acct-Session-Time
+	reset = weekly
+	counter-name = Weekly-Session-Time
+	check-name = Max-Weekly-Session
+	reply-name = Session-Timeout
+	cache-size = 5000
+}
+
+counter monthly {
+	filename = \${raddbdir}/db.monthly
+	key = User-Name
+	count-attribute = Acct-Session-Time
+	reset = monthly
+	counter-name = Monthly-Session-Time
+	check-name = Max-Monthly-Session
+	reply-name = Session-Timeout
+	cache-size = 5000
+}
+
+counter forever {
+	filename = \${raddbdir}/db.forever
+	key = User-Name
+	count-attribute = Acct-Session-Time
+	reset = never
+	counter-name = Forever-Session-Time
+	check-name = Max-Forever-Session
+	reply-name = Session-Timeout
+	cache-size = 5000
+}
+
+EOD;
+
+	$filename = RADDB . '/modules/counter';
+	conf_mount_rw();
+	file_put_contents($filename, $conf);
+	chmod($filename, 0600);
+	conf_mount_ro();
+
+}
+
+function freeradius_modulesmschap_resync() {
+	global $config;
+	$conf = '';
+
+	$conf .= <<<EOD
+# -*- text -*-
+#
+#  $Id$
+
+# Microsoft CHAP authentication
+#
+#  This module supports MS-CHAP and MS-CHAPv2 authentication.
+#  It also enforces the SMB-Account-Ctrl attribute.
+#
+mschap {
+        #
+        #  If you are using /etc/smbpasswd, see the 'passwd'
+        #  module for an example of how to use /etc/smbpasswd
+
+        # if use_mppe is not set to no mschap will
+        # add MS-CHAP-MPPE-Keys for MS-CHAPv1 and
+        # MS-MPPE-Recv-Key/MS-MPPE-Send-Key for MS-CHAPv2
+        #
+#       use_mppe = no
+
+        # if mppe is enabled require_encryption makes
+        # encryption moderate
+        #
+#       require_encryption = yes
+
+        # require_strong always requires 128 bit key
+        # encryption
+        #
+#       require_strong = yes
+
+        # Windows sends us a username in the form of
+        # DOMAIN\user, but sends the challenge response
+        # based on only the user portion.  This hack
+        # corrects for that incorrect behavior.
+        #
+		with_ntdomain_hack = yes
+
+        # The module can perform authentication itself, OR
+        # use a Windows Domain Controller.  This configuration
+        # directive tells the module to call the ntlm_auth
+        # program, which will do the authentication, and return
+        # the NT-Key.  Note that you MUST have "winbindd" and
+        # "nmbd" running on the local machine for ntlm_auth
+        # to work.  See the ntlm_auth program documentation
+        # for details.
+        #
+        # If ntlm_auth is configured below, then the mschap
+        # module will call ntlm_auth for every MS-CHAP
+        # authentication request.  If there is a cleartext
+        # or NT hashed password available, you can set
+        # "MS-CHAP-Use-NTLM-Auth := No" in the control items,
+        # and the mschap module will do the authentication itself,
+        # without calling ntlm_auth.
+        #
+        # Be VERY careful when editing the following line!
+        #
+        # You can also try setting the user name as:
+        #
+        #       ... --username=%{mschap:User-Name} ...
+        #
+        # In that case, the mschap module will look at the User-Name
+        # attribute, and do prefix/suffix checks in order to obtain
+        # the "best" user name for the request.
+        #
+#       ntlm_auth = "/path/to/ntlm_auth --request-nt-key --username=%{%{Stripped-User-Name}:-%{%{User-Name}:-None}} --challenge=%{%{mschap:Challenge}:-00} --
+nt-response=%{%{mschap:NT-Response}:-00}"
+
+        # For Apple Server, when running on the same machine as
+        # Open Directory.  It has no effect on other systems.
+        #
+#       use_open_directory = yes
+
+        # On failure, set (or not) the MS-CHAP error code saying
+        # "retries allowed".
+#       allow_retry = yes
+
+        # An optional retry message.
+#       retry_msg = "Re-enter (or reset) the password"
+}
+
+EOD;
+
+	$filename = RADDB . '/modules/mschap';
+	conf_mount_rw();
+	file_put_contents($filename, $conf);
+	chmod($filename, 0600);
+	conf_mount_ro();
+
+}
+
+function freeradius_modulesrealm_resync() {
+	global $config;
+	$conf = '';
+
+	$conf .= <<<EOD
+#  'realm/username'
+#  Using this entry, IPASS users have their realm set to "IPASS".
+realm IPASS {
+		format = prefix
+		delimiter = "/"
+		ignore_null = yes
+		ignore_default = no
+}
+#  'username@realm'
+realm suffix {
+		format = suffix
+		delimiter = "@"
+		ignore_null = yes
+		ignore_default = no
+}
+#  'username%realm'
+realm realmpercent {
+		format = suffix
+		delimiter = "%"
+		ignore_null = yes
+		ignore_default = no
+}
+#  'domain\user'
+realm ntdomain {
+		format = prefix
+		### 3 backslash in .inc will be 2 backslash in file and after starting radiusd just only one
+		delimiter = "\\\"
+		ignore_null = yes
+		ignore_default = no
+}
+EOD;
+
+	$filename = RADDB . '/modules/realm';
+	conf_mount_rw();
+	file_put_contents($filename, $conf);
+	chmod($filename, 0600);
+	conf_mount_ro();
+
 }
 
 ?>
