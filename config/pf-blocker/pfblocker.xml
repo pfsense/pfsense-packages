@@ -50,7 +50,7 @@
 		<name>pfBlocker</name>
 		<tooltiptext>Configure pfblocker</tooltiptext>
 		<section>Firewall</section>
-		<url>pkg_edit.php?xml=pfblocker.xml</url>
+		<url>/pkg_edit.php?xml=pfblocker.xml</url>
 	</menu>
 	<additional_files_needed>
 		<item>http://www.pfsense.org/packages/config/pf-blocker/pfblocker.inc</item>

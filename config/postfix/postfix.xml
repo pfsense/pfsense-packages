@@ -51,7 +51,7 @@
 		<name>Postfix Forwarder</name>
 		<tooltiptext>Configure Postfix Forwarder</tooltiptext>
 		<section>Services</section>
-		<url>pkg_edit.php?xml=postfix.xml&amp;id=0</url>
+		<url>/pkg_edit.php?xml=postfix.xml&amp;id=0</url>
 	</menu>
 	<menu>
 		<name>Search Mail</name>
