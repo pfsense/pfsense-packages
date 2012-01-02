@@ -137,7 +137,7 @@ function freeradius_settings_resync() {
 	}
 
 
-	$conf = <<<EOD
+	$conf .= <<<EOD
 prefix = /usr/local
 exec_prefix = \${prefix}
 sysconfdir = \${prefix}/etc
@@ -330,7 +330,7 @@ if (is_array($arrusers) && !empty($arrusers)) {
 	$varuserslogintime=$users['varuserslogintime'];
 	$varusersvlanid=$users['varusersvlanid'];
 
-	// Clear variables for next user foreach additional options
+	// Clear variables for next user foreach additional options TOP
 	$varuserstopadditionaloptions = '';
 	$varusersadditionaloptionstop = '';
 	
@@ -341,15 +341,27 @@ if (is_array($arrusers) && !empty($arrusers)) {
 		}
 	}
 	
-	// Clear variables for next user foreach additional options
-	$varusersbottomadditionaloptions = '';
-	$varusersadditionaloptionsbottom = '';
+	// Clear variables for next user foreach additional options: CHECK-ITEMS
+	$varuserscheckitemsadditionaloptions = '';
+	$varusersadditionaloptionscheckitems = '';
 	
-	if(!empty($users['varusersbottomadditionaloptions'])) {
-		$varusersbottomadditionaloptions = explode("|", ($users['varusersbottomadditionaloptions']));
-		$varusersadditionaloptionsbottom .= '';
-		foreach ($varusersbottomadditionaloptions as $bottomtmp) {
-			$varusersadditionaloptionsbottom .= $bottomtmp . "\n\t";
+	if(!empty($users['varuserscheckitemsadditionaloptions'])) {
+		$varuserscheckitemsadditionaloptions = explode("|", ($users['varuserscheckitemsadditionaloptions']));
+		$varusersadditionaloptionscheckitems .= '';
+		foreach ($varuserscheckitemsadditionaloptions as $checkitemtmp) {
+			$varusersadditionaloptionscheckitems .= $checkitemtmp;
+		}
+	}
+		
+	// Clear variables for next user foreach additional options: REPLY-ITEMS
+	$varusersreplyitemsadditionaloptions = '';
+	$varusersadditionaloptionsreplyitems = '';
+	
+	if(!empty($users['varusersreplyitemsadditionaloptions'])) {
+		$varusersreplyitemsadditionaloptions = explode("|", ($users['varusersreplyitemsadditionaloptions']));
+		$varusersadditionaloptionsreplyitems .= '';
+		foreach ($varusersreplyitemsadditionaloptions as $replyitemtmp) {
+			$varusersadditionaloptionsreplyitems .= $replyitemtmp . "\n\t";
 		}
 	}
 
@@ -370,6 +382,10 @@ if (is_array($arrusers) && !empty($arrusers)) {
 	if ($varuserslogintime != '') {
 	$varuserscheckitem .= ", Login-Time := " . '"' . $varuserslogintime . '"';
 	}
+	if ($varusersadditionaloptionscheckitems != '') {
+	$varuserscheckitem .= ", $varusersadditionaloptionscheckitems";
+	}
+	
 		
 	// Add additional REPLY-ITEMS here. Different formatting in "users" file needed.
 	if ($varusersframedipaddress != '') {
@@ -392,12 +408,12 @@ if (is_array($arrusers) && !empty($arrusers)) {
 		if ($varusersreplyitem != '') { $varusersreplyitem .=","; }
 		$varusersreplyitem .= "\n\tTunnel-Type = VLAN,\n\tTunnel-Medium-Type = IEEE-802,\n\tTunnel-Private-Group-ID = " . '"' . $varusersvlanid . '"';
 	}
-	if ($varusersadditionaloptionsbottom != '') {
+	if ($varusersadditionaloptionsreplyitems != '') {
 		if ($varusersreplyitem != '') { $varusersreplyitem .=","; }
-		$varusersreplyitem .= "\n\t$varusersadditionaloptionsbottom";
+		$varusersreplyitem .= "\n\t$varusersadditionaloptionsreplyitems";
 	}
 	
-		// Cosmetic fix - This is just to make a blank new line after each user entry
+	// Cosmetic fix - This is just to make a blank new line after each user entry
 	$varusersreplyitem .= "\n\n";
 	
 	

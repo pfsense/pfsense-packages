@@ -115,17 +115,6 @@
 			<default_value>5</default_value>
 		</field>
 		<field>
-			<fielddescr>NAS Hostname Lookup</fielddescr>
-			<fieldname>varsettingshostnamelookups</fieldname>
-			<description><![CDATA[Log the names of NAS instead of IP addresses. Turning this on can result in lock ups of the RADIUS Server. (Default: no)]]></description>
-			<type>select</type>
-			<default_value>no</default_value>
-					<options>
-						<option><name>Disable</name><value>no</value></option>
-						<option><name>Enable</name><value>yes</value></option>
-					</options>
-		</field>
-		<field>
 			<fielddescr>Allow Core Dumps</fielddescr>
 			<fieldname>varsettingsallowcoredumps</fieldname>
 			<description><![CDATA[Only turn this on if you need to debug the RADIUS server! (Default: no)]]></description>
@@ -217,6 +206,17 @@
 					<options>
 						<option><name>no</name><value>no</value></option>
 						<option><name>Log</name><value>yes</value></option>
+					</options>
+		</field>
+		<field>
+			<fielddescr>NAS Hostname Lookup</fielddescr>
+			<fieldname>varsettingshostnamelookups</fieldname>
+			<description><![CDATA[Log the names of NAS instead of IP addresses. Turning this on can result in lock ups of the RADIUS Server. (Default: no)]]></description>
+			<type>select</type>
+			<default_value>no</default_value>
+					<options>
+						<option><name>Disable</name><value>no</value></option>
+						<option><name>Enable</name><value>yes</value></option>
 					</options>
 		</field>
 		<field>
