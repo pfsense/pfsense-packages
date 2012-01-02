@@ -147,7 +147,7 @@
 		<field>
 			<fielddescr>Client Shortname</fielddescr>
 			<fieldname>varclientshortname</fieldname>
-			<description><![CDATA[Enter shortname of the client. This is in general the IP of the NAS (switch,accesspoint).]]></description>
+			<description><![CDATA[Enter shortname of the client. This is in general the hostname of the NAS (switch,accesspoint).]]></description>
 			<type>input</type>
 			<required/>
 		</field>
@@ -165,7 +165,7 @@
 		<field>
 			<fielddescr>Client Protocol</fielddescr>
 			<fieldname>varclientproto</fieldname>
-			<description><![CDATA[Enter the protocol the client uses. (Default: udp)]]></description>
+			<description><![CDATA[Enter the protocol the client uses. (Default: UDP)]]></description>
 			<type>select</type>
 			<default_value>udp</default_value>
 					<options>
