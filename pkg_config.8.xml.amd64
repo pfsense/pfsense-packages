@@ -989,7 +989,7 @@
 		<descr>LCD display driver - Development version</descr>
 		<website>http://www.lcdproc.org/</website>
 		<category>Utility</category>
-		<version>lcdproc-0.5.4 pkg v. 0.3</version>
+		<version>lcdproc-0.5.4 pkg v. 0.4</version>
 		<status>BETA</status>
 		<required_version>2.0</required_version>
 		<maintainer>michele@nt2.it</maintainer>

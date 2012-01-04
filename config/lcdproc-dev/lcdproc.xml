@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <packagegui>
-	<title>Services: LCDproc 0.5.4 pkg v. 0.3</title>
+	<title>Services: LCDproc 0.5.4 pkg v. 0.4</title>
 	<name>lcdproc</name>
-	<version>0.5.4 pkg v. 0.3</version>
+	<version>0.5.4 pkg v. 0.4</version>
 	<savetext>Save</savetext>
 	<include_file>/usr/local/pkg/lcdproc.inc</include_file>
 	<tabs>
@@ -70,11 +70,11 @@
 				</option>
 				<option>
 					<value>ucom1</value>
-					<name>USB Com port 1 (/dev/cuau0)</name>
+					<name>USB Com port 1 (/dev/cuaU0)</name>
 				</option>
 				<option>
 					<value>ucom2</value>
-					<name>USB Com port 2 (/dev/cuau1)</name>
+					<name>USB Com port 2 (/dev/cuaU1)</name>
 				</option>
 				<option>
 					<value>lpt1</value>
@@ -186,6 +186,10 @@
 					<value>hd44780</value>
 					<name>hd44780</name>
 				</option>
+				<option>
+					<value>hd44780 fast</value>
+					<name>hd44780 fast</name>
+				</option>				
 				<option>
 					<value>icp_a106</value>
 					<name>icp_a106</name>
