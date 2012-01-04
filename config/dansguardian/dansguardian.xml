@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE packagegui SYSTEM "./schema/packages.dtd">
+<?xml-stylesheet type="text/xsl" href="./xsl/package.xsl"?>
+<packagegui>
+	<copyright>
+	<![CDATA[
+/* $Id$ */
+/* ========================================================================== */
+/*
+    pfblocker.xml
+    part of the dansguardian for pfSense
+    Copyright (C) 2012 Marcello Coutinho
+
+    All rights reserved.            
+			                                                                  */
+/* ========================================================================== */
+/*
+    Redistribution and use in source and binary forms, with or without
+    modification, are permitted provided that the following conditions are met:
+
+     1. Redistributions of source code must retain the above copyright notice,
+        this list of conditions and the following disclaimer.
+
+     2. Redistributions in binary form must reproduce the above copyright
+        notice, this list of conditions and the following disclaimer in the
+        documentation and/or other materials provided with the distribution.
+
+    THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
+    INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+    AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+    AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+    OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+    INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+    POSSIBILITY OF SUCH DAMAGE.
+                                                                              */
+/* ========================================================================== */
+	]]>
+	</copyright>
+	<description>Describe your package here</description>
+	<requirements>Describe your package requirements here</requirements>
+	<faq>Currently there are no FAQ items provided.</faq>
+	<name>dansguardian</name>
+	<version>1.0</version>
+	<title>Services: Sansguardian</title>
+	<include_file>/usr/local/pkg/dansguardian.inc</include_file>
+	<menu>
+		<name>dansguardian</name>
+		<tooltiptext>Configure dansguardian</tooltiptext>
+		<section>Firewall</section>
+		<url>pkg_edit.php?xml=dansguardian.xml</url>
+	</menu>
+	<additional_files_needed>
+		<item>http:/www.pfsense.org/packages/config/pf-blocker/dansguardian.inc</item>
+		<prefix>/usr/local/pkg/</prefix>
+		<chmod>0755</chmod>
+	</additional_files_needed>
+	<additional_files_needed>
+		<item>http://www.pfsense.org/packages/config/pf-blocker/dansguardian.php</item>
+		<prefix>/usr/local/www/</prefix>
+		<chmod>0755</chmod>
+	</additional_files_needed>
+	<additional_files_needed>
+		<item>http://www.pfsense.org/packages/config/pf-blocker/dansguardian.widget.php</item>
+		<prefix>/usr/local/www/widgets/widgets/</prefix>
+		<chmod>0755</chmod>
+	</additional_files_needed>
+	<additional_files_needed>
+		<item>http://www.pfsense.org/packages/config/dansguardian/dansguardian_limits.xml</item>
+		<prefix>/usr/local/pkg/</prefix>
+		<chmod>0755</chmod>
+	</additional_files_needed>
+	<additional_files_needed>
+		<item>http://www.pfsense.org/packages/config/dansguardian/dansguardian_lists.xml</item>
+		<prefix>/usr/local/pkg/</prefix>
+		<chmod>0755</chmod>
+	</additional_files_needed>
+	<additional_files_needed>
+		<item>http://www.pfsense.org/packages/config/dansguardian/dansguardian_config.xml</item>
+		<prefix>/usr/local/pkg/</prefix>
+		<chmod>0755</chmod>
+	</additional_files_needed>
+	<additional_files_needed>
+		<item>http://www.pfsense.org/packages/config/dansguardian/dansguardian_sync.xml</item>
+		<prefix>/usr/local/pkg/</prefix>
+		<chmod>0755</chmod>
+	</additional_files_needed>
+	<tabs>
+		<tab>
+			<text>Daemon</text>
+			<url>/pkg_edit.php?xml=dansguardian.xml&amp;id=0</url>
+			<active/>
+		</tab>
+		<tab>
+			<text>General</text>
+			<url>/pkg_edit.php?xml=dansguardian_config.xml&amp;id=0</url>
+		</tab>
+		<tab>
+			<text>Limits</text>
+			<url>/pkg_edit.php?xml=dansguardian_limits.xml&amp;id=0</url>
+		</tab>
+		<tab>
+			<text>Filter Groups</text>
+			<url>/pkg.php?xml=dansguardian_lists.xml</url>
+		</tab>
+		<tab>
+			<text>Report and Log</text>
+			<url>/pkg_edit.php?xml=dansguardian_log.xml&amp;id=0</url>
+		</tab>
+		<tab>
+			<text>XMLRPC Sync</text>
+			<url>/pkg_edit.php?xml=dansguardian_sync.xml&amp;id=0</url>
+		</tab>
+		<tab>
+			<text>About</text>
+			<url>/pkg_edit.php?xml=dansguardian.php&amp;id=0</url>
+		</tab>
+</tabs>
+	<fields>
+		<field>
+			<name>Listening Settings</name>
+			<type>listtopic</type>
+		</field>
+		<field>
+			<fielddescr>Enable dansguardian</fielddescr>
+			<fieldname>enable_cb</fieldname>
+			<type>checkbox</type>
+			<description></description>
+		</field>
+		<field>
+			<fielddescr>Listen Interface(s)</fielddescr>
+			<fieldname>inbound_interface</fieldname>
+			<description><![CDATA[Default: <strong>WAN</strong><br>Select interface(s) that you want to block incoming traffic.]]></description>
+			<type>interfaces_selection</type>
+			<required/>
+			<multiple/>
+		</field>
+		<field>
+			<fielddescr>Listen port</fielddescr>
+			<fieldname>filterports</fieldname>
+			<type>input</type>
+			<size>10</size>
+			<description><![CDATA[Default: <strong>8080</strong><br>The port(s) that DansGuardian listens to.]]></description>
+		</field>
+		<field>
+			<fielddescr>Daemon Options</fielddescr>
+			<fieldname>daemon_options</fieldname>
+			<description><![CDATA[Daemon Options. Default values are in ( )]]></description>
+	    	<type>select</type>
+ 				<options>
+ 				<option><name>nodaemon (off)</name><value>nodaemon</value></option>
+ 				<option><name>softrestart (on)</name><value>softrestart</value></option>
+ 				</options>
+ 				<multiple/>
+ 				<size>3</size>
+		</field>
+		<field>
+			<fielddescr>Min/Max Children</fielddescr>
+			<fieldname>children</fieldname>
+			<type>input</type>
+			<size>10</size>
+			<description><![CDATA[Default: <strong>8/120</strong><br>
+			 				Sets the minimun and maximum number of processes to spawn to handle the incoming connections.<br>
+			 				Max value usually 250 depending on OS.<br>
+							On large sites you might want to try 32/180.]]></description>
+		</field>
+			<field>
+			<fielddescr>Min/Max Spare Children</fielddescr>
+			<fieldname>minsparechildren</fieldname>
+			<type>input</type>
+			<size>10</size>
+			<description><![CDATA[Default: <strong>4/32</strong><br>
+			 				 Sets the minimum and maximun number of processes to be kept ready to handle connections.<br>
+							 On large sites you might want to try 8/64.]]></description>
+		</field>
+		<field>
+			<fielddescr>Max Age Children</fielddescr>
+			<fieldname>maxagechildren</fieldname>
+			<type>input</type>
+			<size>10</size>
+			<description><![CDATA[Default: <strong>500</strong><br>
+			 				Sets the maximum age of a child process before it croaks it.<br>
+							This is the number of connections they handle before exiting.<br>
+							On large sites you might want to try 10000.]]></description>
+		</field>
+		<field>
+			<fielddescr>Max Ips</fielddescr>
+			<fieldname>maxips</fieldname>
+			<type>input</type>
+			<size>10</size>
+			<description><![CDATA[Default: <strong>0</strong><br>
+			 				Sets the maximum number client IP addresses allowed to connect at once.<br>
+							Use this to set a hard limit on the number of users allowed to concurrently<br>
+							browse the web. Set to 0 for no limit, and to disable the IP cache process.]]></description>
+		</field>
+	</fields>
+	<custom_php_install_command>
+		dansguardian_php_install_command();
+	</custom_php_install_command>
+	<custom_php_deinstall_command>
+		dansguardian_php_deinstall_command();
+	</custom_php_deinstall_command>
+	<custom_php_validation_command>
+		dansguardian_validate_input($_POST, &amp;$input_errors);
+	</custom_php_validation_command>	
+	<custom_php_resync_config_command>
+		sync_package_dansguardian();
+	</custom_php_resync_config_command>
+</packagegui>

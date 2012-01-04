@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE packagegui SYSTEM "./schema/packages.dtd">
+<?xml-stylesheet type="text/xsl" href="./xsl/package.xsl"?>
+<packagegui>
+	<copyright>
+	<![CDATA[
+/* $Id$ */
+/* ========================================================================== */
+/*
+    dansguardian_config.xml
+    part of the dansguardian for pfSense
+    Copyright (C) 2012 Marcello Coutinho
+
+    All rights reserved.            
+			                                                                  */
+/* ========================================================================== */
+/*
+    Redistribution and use in source and binary forms, with or without
+    modification, are permitted provided that the following conditions are met:
+
+     1. Redistributions of source code must retain the above copyright notice,
+        this list of conditions and the following disclaimer.
+
+     2. Redistributions in binary form must reproduce the above copyright
+        notice, this list of conditions and the following disclaimer in the
+        documentation and/or other materials provided with the distribution.
+
+    THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
+    INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+    AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+    AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+    OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+    INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+    POSSIBILITY OF SUCH DAMAGE.
+                                                                              */
+/* ========================================================================== */
+	]]>
+	</copyright>
+	<description>Describe your package here</description>
+	<requirements>Describe your package requirements here</requirements>
+	<faq>Currently there are no FAQ items provided.</faq>
+	<name>dansguardianlimits</name>
+	<version>1.0</version>
+	<title>Services: Dansguardian</title>
+	<include_file>/usr/local/pkg/dansguardian.inc</include_file>
+	<tabs>
+		<tab>
+			<text>Daemon</text>
+			<url>/pkg_edit.php?xml=dansguardian.xml&amp;id=0</url>
+		</tab>
+		<tab>
+			<text>General</text>
+			<url>/pkg_edit.php?xml=dansguardian_config.xml&amp;id=0</url>
+		</tab>
+		<tab>
+			<text>Limits</text>
+			<url>/pkg_edit.php?xml=dansguardian_limits.xml&amp;id=0</url>
+			<active/>
+		</tab>
+		<tab>
+			<text>Filter Groups</text>
+			<url>/pkg.php?xml=dansguardian_lists.xml</url>
+		</tab>
+		<tab>
+			<text>Report and Log</text>
+			<url>/pkg_edit.php?xml=dansguardian_log.xml&amp;id=0</url>
+		</tab>
+		<tab>
+			<text>XMLRPC Sync</text>
+			<url>/pkg_edit.php?xml=dansguardian_sync.xml&amp;id=0</url>
+		</tab>
+		<tab>
+			<text>About</text>
+			<url>/pkg_edit.php?xml=dansguardian.php&amp;id=0</url>
+		</tab>
+</tabs>
+	<fields>
+		<field>
+			<name>Limits</name>
+			<type>listtopic</type>
+		</field>
+		<field>
+			<fielddescr>Max upload size</fielddescr>
+			<fieldname>maxuploadsize</fieldname>
+			<type>input</type>
+			<size>10</size>
+			<description><![CDATA[POST protection (web upload and forms) does not block forms without any file upload, i.e. this is just for blocking or limiting uploads measured in kibibytes after MIME encoding and header bumph<br>
+					use 0 for a complete block<br>
+					use higher (e.g. 512 = 512Kbytes) for limiting<br>
+					use -1 for no blocking(default)]]></description>
+		</field>
+		<field>
+			<fielddescr>Max content filter size</fielddescr>
+			<fieldname>maxcontentfiltersize</fieldname>
+			<type>input</type>
+			<size>10</size>
+			<description><![CDATA[<strong>Default is 256</strong><br>Sometimes web servers label binary files as text which can be very large which causes a huge drain on memory and cpu resources.<br>
+								To counter this, you can limit the size of the document to be filtered and get it to just pass it straight through.<br>
+								This setting also applies to content regular expression modification.<br>
+								The value must not be higher than maxcontentramcachescansize<br>
+								The size is in Kibibytes - eg 2048 = 2Mb<br>
+								use 0 to set it to maxcontentramcachescansize]]></description>
+		</field>
+		<field>
+			<fielddescr>Max content ram cache scan size</fielddescr>
+			<fieldname>maxcontentramcachescansize</fieldname>
+			<type>input</type>
+			<size>10</size>
+			<description><![CDATA[<strong>Default is 2000</strong><br>
+						This is only used if you use a content scanner plugin such as AV. This is the max size of file that DG will download and cache in RAM.<br>
+						After this limit is reached it will cache to disk. This value must be less than or equal to maxcontentfilecachescansize.<br>
+						The size is in Kibibytes - eg 10240 = 10Mb<br>
+						use 0 to set it to maxcontentfilecachescansize<br>
+						This option may be ignored by the configured download manager.]]></description>
+		</field>
+		<field>
+			<fielddescr>Max content file cache scan size</fielddescr>
+			<fieldname>maxcontentfilecachescansize</fieldname>
+			<type>input</type>
+			<size>10</size>
+			<description><![CDATA[<strong>Default is 2000</strong><br>
+						 This is only used if you use a content scanner plugin such as AV. This is the max size file that DG will download so that it can be scanned or virus checked.<br>
+						 This value must be greater or equal to maxcontentramcachescansize.<br>
+						 The size is in Kibibytes - eg 10240 = 10Mb]]></description>
+		</field>
+		<field>
+			<fielddescr>Initial Trickle delay</fielddescr>
+			<fieldname>initialtrickledelay</fieldname>
+			<type>input</type>
+			<size>10</size>
+			<description><![CDATA[<strong>Default is 20</strong><br>
+						 This is the number of seconds a browser connection is left waiting before first being sent *something* to keep it alive.<br>
+						 Do not choose a value too low or normal web pages will be affected. A value between 20 and 110 would be sensible<br>
+						 This may be ignored by the configured download manager.]]></description>
+		</field>
+			<field>
+			<fielddescr>Trickle delay</fielddescr>
+			<fieldname>trickledelay</fieldname>
+			<type>input</type>
+			<size>10</size>
+			<description><![CDATA[<strong>Default is 20</strong><br>
+						  This is the number of seconds a browser connection is left waiting before being sent more *something* to keep it alive.<br>
+							This may be ignored by the configured download manager.]]></description>
+		</field>
+	</fields>
+	<custom_php_install_command>
+		dansguardian_php_install_command();
+	</custom_php_install_command>
+	<custom_php_deinstall_command>
+		dansguardian_php_deinstall_command();
+	</custom_php_deinstall_command>
+	<custom_php_validation_command>
+		dansguardian_validate_input($_POST, &amp;$input_errors);
+	</custom_php_validation_command>	
+	<custom_php_resync_config_command>
+		sync_package_dansguardian();
+	</custom_php_resync_config_command>
+</packagegui>
