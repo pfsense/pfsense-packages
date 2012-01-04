@@ -708,7 +708,7 @@ EOD;
 // Rotating also ensures that swap.state is rewritten, so is useful even if the logs
 //  are not being rotated.
 $rotate = empty($settings['log_rotate']) ? 0 : $settings['log_rotate'];
-$conf .= "logfile_rotate {$settings['log_rotate']}\n";
+$conf .= "logfile_rotate {$rotate}\n";
 squid_install_cron(true);
 
 	$conf .= <<<EOD
