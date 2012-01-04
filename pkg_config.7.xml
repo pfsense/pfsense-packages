@@ -2,6 +2,19 @@
 <!-- pfSense packages -->
 <pfsensepkgs>
   <packages>
+	<package>
+		<name>Filer</name>
+		<website/>
+		<descr>Allows you to create and overwrite files from the GUI.</descr>
+		<category>File Management</category>
+		<pkginfolink>http://doc.pfsense.org/index.php/Filer_package</pkginfolink>
+		<config_file>http://www.pfsense.com/packages/config/filer/filer.xml</config_file>
+		<version>0.50</version>
+		<status>Beta</status>
+		<required_version>1.2.3</required_version>
+		<maintainer>bscholer@cshl.edu</maintainer>
+		<configurationfile>filer.xml</configurationfile>
+	</package>
       <package>
 		<name>File Manager</name>
 		<website/>
