@@ -289,7 +289,18 @@
 						<option><name>No</name><value>no</value></option>
 						<option><name>Yes</name><value>yes</value></option>
 					</options>
-		</field>		
+		</field>
+		<field>
+			<fielddescr>Microsoft Statement of Health (SoH) Support</fielddescr>
+			<fieldname>vareapconfpeapsohenable</fieldname>
+			<description><![CDATA[You can accept/reject clients if they have not actual windows updates and more. You need to change server-file for your needs. It cannot be changed from GUI and will be deleted after package (re)installation. (/usr/local/etc/raddb/sites-available/soh). (Default: no)]]></description>
+			<type>select</type>
+			<default_value>Disable</default_value>
+					<options>
+						<option><name>Disable</name><value>Disable</value></option>
+						<option><name>Enable</name><value>Enable</value></option>
+					</options>
+		</field>
 	</fields>
 	<custom_delete_php_command>
 		freeradius_eapconf_resync();
