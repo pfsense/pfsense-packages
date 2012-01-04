@@ -936,6 +936,7 @@
 	<package>
 		<name>squid-reverse</name>
 		<descr>High performance web proxy cache with HTTP / HTTPS reverse proxy and Exchange-Web-Access Assistant.</descr>
+		<pkginfolink>http://forum.pfsense.org/index.php/topic,44735.0.html</pkginfolink>
 		<website>http://www.squid-cache.org/</website>
 		<category>Network</category>
 		<version>2.7.9_2</version>
