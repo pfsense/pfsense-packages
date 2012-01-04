@@ -299,6 +299,21 @@
 					$config_text .= "DelayBus=true\n";
 					$config_text .= "Size={$lcdproc_config['size']}\n";
 					break;
+				case "hd44780 fast":
+					$config_text .= "[{$lcdproc_config['driver']}]\n";
+					$config_text .= "ConnectionType=lcd2usb\n";
+					$config_text .= "Speed=19200\n";
+					$config_text .= "Charmap=hd44780_default\n";					
+					$config_text .= "Keypad=yes\n";
+					$config_text .= "Contrast=850\n";
+					$config_text .= "Brightness=800\n";
+					$config_text .= "OffBrightness=0\n";
+					$config_text .= "Backlight=yes\n";
+					$config_text .= "OutputPort=no\n";
+					$config_text .= "DelayMult=1\n";
+					$config_text .= "DelayBus=no\n";
+					$config_text .= "Size={$lcdproc_config['size']}\n";
+					break;					
 				case "icp_a106":
 					$config_text .= "[{$lcdproc_config['driver']}]\n";
 					$config_text .= "Device={$realport}\n";
