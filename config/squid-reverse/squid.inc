@@ -595,6 +595,7 @@ function squid_install_cron($should_install) {
 	switch($should_install) {
 		case true:
 			if(!$is_installed) {
+				$cachedir =($settings['harddisk_cache_location'] ? $settings['harddisk_cache_location'] : '/var/squid/cache');
 				$cron_item = array();
 				$cron_item['task_name'] = "squid_rotate_logs";
 				$cron_item['minute'] = "0";
@@ -603,7 +604,7 @@ function squid_install_cron($should_install) {
 				$cron_item['month'] = "*";
 				$cron_item['wday'] = "*";
 				$cron_item['who'] = "root";
-				$cron_item['command'] = "/usr/local/sbin/squid -k rotate";		
+				$cron_item['command'] = "/bin/rm {$cachedir}/swap.state; /usr/local/sbin/squid -k rotate";		
 				$config['cron']['item'][] = $cron_item;
 				parse_config(true);
 				write_config("Squid Log Rotation");
