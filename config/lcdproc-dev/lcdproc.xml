@@ -70,11 +70,11 @@
 				</option>
 				<option>
 					<value>ucom1</value>
-					<name>USB Com port 1 (/dev/cuaU0)</name>
+					<name>USB Com port 1 (/dev/cuau0)</name>
 				</option>
 				<option>
 					<value>ucom2</value>
-					<name>USB Com port 2 (/dev/cuaU1)</name>
+					<name>USB Com port 2 (/dev/cuau1)</name>
 				</option>
 				<option>
 					<value>lpt1</value>
