@@ -521,7 +521,20 @@ function freeradius_eapconf_resync() {
 	$vareapconfpeapdefaulteaptype = ($eapconf['vareapconfpeapdefaulteaptype']?$eapconf['vareapconfpeapdefaulteaptype']:'mschapv2');
 	$vareapconfpeapcopyrequesttotunnel = ($eapconf['vareapconfpeapcopyrequesttotunnel']?$eapconf['vareapconfpeapcopyrequesttotunnel']:'no');
 	$vareapconfpeapusetunneledreply = ($eapconf['vareapconfpeapusetunneledreply']?$eapconf['vareapconfpeapusetunneledreply']:'no');
-
+	$vareapconfpeapsohenable = ($eapconf['vareapconfpeapsohenable']?$eapconf['vareapconfpeapsohenable']:'Disable');
+	
+	// This is for enable/disbable MS SoH in EAP-PEAP and the virtuial-server "soh-server"
+	if ($eapconf['vareapconfpeapsohenable'] == 'Enable') {
+		$vareapconfpeapsoh = 'soh = yes' . "\n\t\t\tsoh_virtual_server = " . '"' . "soh-server" . '"';
+		exec("ln -s /usr/local/etc/raddb/sites-available/soh /usr/local/etc/raddb/sites-enabled/");
+	}
+	else {
+		$vareapconfpeapsoh = '### MS SoH Server is disabled ###';
+			if (file_exists("/usr/local/etc/raddb/sites-enabled/soh")) {
+			exec("rm -f /usr/local/etc/raddb/sites-enabled/soh");
+			}
+	}
+		
 
 // The filenames of pfsense cert manager are different from freeradius cert manager so it is possible to store both in the same folder at any time.
 // This is for the pfsense cert manager
@@ -653,8 +666,7 @@ if ($vareapconfchoosecertmanager == 'radiuscertmgr') {
 			copy_request_to_tunnel = $vareapconfpeapcopyrequesttotunnel
 			use_tunneled_reply = $vareapconfpeapusetunneledreply
 		#	proxy_tunneled_request_as_eap = yes
-			soh = yes
-			soh_virtual_server = "soh"
+			$vareapconfpeapsoh
 		}
 		mschapv2 {
 		#	send_error = no
