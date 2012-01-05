@@ -1,0 +1,345 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE packagegui SYSTEM "./schema/packages.dtd">
+<?xml-stylesheet type="text/xsl" href="./xsl/package.xsl"?>
+<packagegui>
+	<copyright>
+<![CDATA[	
+/* $Id$ */
+/* ========================================================================== */
+/*
+	freeradiusmodulesldap.xml
+	part of pfSense (http://www.pfSense.com)
+	Copyright (C) 2011 - 2012 Alexander Wilke <nachtfalkeaw@web.de>
+	All rights reserved.
+
+	Based on m0n0wall (http://m0n0.ch/wall)
+	Copyright (C) 2003-2006 Manuel Kasper <mk@neon1.net>.
+	All rights reserved.
+									      */
+/* ========================================================================== */
+/*
+	Redistribution and use in source and binary forms, with or without
+	modification, are permitted provided that the following conditions are met:
+
+	1. Redistributions of source code must retain the above copyright notice,
+	   this list of conditions and the following disclaimer.
+
+	2. Redistributions in binary form must reproduce the above copyright
+	   notice, this list of conditions and the following disclaimer in the
+	   documentation and/or other materials provided with the distribution.
+
+	THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
+	INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+	AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+	AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+	OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+	SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+	INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+	POSSIBILITY OF SUCH DAMAGE.
+									      */
+/* ========================================================================== */
+]]>	</copyright>
+	<description><![CDATA[Describe your package here]]></description>
+	<requirements>Describe your package requirements here</requirements>
+	<faq>Currently there are no FAQ items provided.</faq>
+	<name>freeradiusmodulesldap</name>
+	<version>none</version>
+	<title>FreeRADIUS: LDAP</title>
+	<aftersaveredirect>pkg_edit.php?xml=freeradiusmodulesldap.xml&amp;id=0</aftersaveredirect>
+	<include_file>/usr/local/pkg/freeradius.inc</include_file>
+	<tabs>
+		<tab>
+			<text>Users</text>
+			<url>/pkg.php?xml=freeradius.xml</url>
+		</tab>
+		<tab>
+			<text>NAS / Clients</text>
+			<url>/pkg.php?xml=freeradiusclients.xml</url>
+		</tab>
+		<tab>
+			<text>Interfaces</text>
+			<url>/pkg.php?xml=freeradiusinterfaces.xml</url>
+		</tab>
+		<tab>
+			<text>Settings</text>
+			<url>/pkg_edit.php?xml=freeradiussettings.xml&amp;id=0</url>
+		</tab>
+		<tab>
+			<text>EAP</text>
+			<url>/pkg_edit.php?xml=freeradiuseapconf.xml&amp;id=0</url>
+		</tab>
+		<tab>
+			<text>SQL</text>
+			<url>/pkg_edit.php?xml=freeradiussqlconf.xml&amp;id=0</url>
+		</tab>
+		<tab>
+			<text>Certificates</text>
+			<url>/pkg_edit.php?xml=freeradiuscerts.xml&amp;id=0</url>
+		</tab>
+		<tab>
+			<text>LDAP</text>
+			<url>/pkg_edit.php?xml=freeradiusmodulesldap.xml&amp;id=0</url>
+			<active/>
+		</tab>
+		<tab>
+			<text>View config</text>
+			<url>/freeradius_view_config.php</url>
+		</tab>
+		<tab>
+			<text>XMLRPC Sync</text>
+			<url>/pkg_edit.php?xml=freeradiussync.xml&amp;id=0</url>
+		</tab>
+	</tabs>
+	<fields>
+		<field>
+			<name>ENABLE LDAP SUPPORT</name>
+			<type>listtopic</type>
+		</field>		
+		<field>
+			<fielddescr>Enable LDAP For Authorization</fielddescr>
+			<fieldname>varmodulesldapenableauthorize</fieldname>
+			<description><![CDATA[This enables LDAP in authorize section. The ldap module will set Auth-Type to LDAP if it has not already been set. (Default: unchecked)]]></description>
+			<type>checkbox</type>
+		</field>
+		<field>
+			<fielddescr>Enable LDAP For Authentication</fielddescr>
+			<fieldname>varmodulesldapenableauthenticate</fieldname>
+			<description><![CDATA[This enables LDAP in authenticate section. Note that this means "check plain-text password against the ldap database", which means that EAP won't work, as it does not supply a plain-text password.]]></description>
+			<type>checkbox</type>
+		</field>
+		<field>
+			<name>GENERAL CONFIGURATION</name>
+			<type>listtopic</type>
+		</field>
+		<field>
+			<fielddescr>Server</fielddescr>
+			<fieldname>varmodulesldapserver</fieldname>
+			<description><![CDATA[No description. (Default: ldap.your.domain )]]></description>
+			<type>input</type>
+			<size>80</size>
+			<default_value>ldap.your.domain</default_value>
+		</field>
+		<field>
+			<fielddescr>Identity</fielddescr>
+			<fieldname>varmodulesldapidentity</fieldname>
+			<description><![CDATA[No description. (Default: cn=admin,o=My Org,c=UA )]]></description>
+			<type>input</type>
+			<size>80</size>
+			<default_value><![CDATA[cn=admin,o=My Org,c=UA]]></default_value>
+		</field>
+		<field>
+			<fielddescr>Password</fielddescr>
+			<fieldname>varmodulesldappassword</fieldname>
+			<description><![CDATA[No description. (Default: mypass)]]></description>
+			<type>password</type>
+			<size>80</size>
+			<default_value>mypass</default_value>
+		</field>
+		<field>
+			<fielddescr>Basedn</fielddescr>
+			<fieldname>varmodulesldapbasedn</fieldname>
+			<description><![CDATA[No description (Default: o=My Org,c=UA )]]></description>
+			<type>input</type>
+			<size>80</size>
+			<default_value><![CDATA[o=My Org,c=UA]]></default_value>
+		</field>
+		<field>
+			<fielddescr>Filter</fielddescr>
+			<fieldname>varmodulesldapfilter</fieldname>
+			<description><![CDATA[No description. (Default:   (uid=%{%{Stripped-User-Name}:-%{User-Name}})   )]]></description>
+			<type>input</type>
+			<size>80</size>
+			<default_value><![CDATA[(uid=%{%{Stripped-User-Name}:-%{User-Name}})]]></default_value>
+		</field>
+		<field>
+			<fielddescr>Base Filter</fielddescr>
+			<fieldname>varmodulesldapbasefilter</fieldname>
+			<description><![CDATA[No description. (Default:   (objectclass=radiusprofile)   )]]></description>
+			<type>input</type>
+			<size>80</size>
+			<default_value><![CDATA[(objectclass=radiusprofile)]]></default_value>
+		</field>
+		<field>
+			<fielddescr>LDAP Connections Number</fielddescr>
+			<fieldname>varmodulesldapldapconnectionsnumber</fieldname>
+			<description><![CDATA[How many connections to keep open to the LDAP server. This saves time over opening a new LDAP socket for every authentication request. (Default: 5)]]></description>
+			<type>input</type>
+			<size>80</size>
+			<default_value>5</default_value>
+		</field>
+		<field>
+			<fielddescr>Timeout</fielddescr>
+			<fieldname>varmodulesldaptimeout</fieldname>
+			<description><![CDATA[Seconds to wait for LDAP query to finish. (Default: 4)]]></description>
+			<type>input</type>
+			<size>80</size>
+			<default_value>4</default_value>
+		</field>
+		<field>
+			<fielddescr>Timelimit</fielddescr>
+			<fieldname>varmodulesldaptimelimit</fieldname>
+			<description><![CDATA[Seconds the LDAP server has to process the query (server-side time limit). (Default: 3)]]></description>
+			<type>input</type>
+			<size>80</size>
+			<default_value>3</default_value>
+		</field>
+		<field>
+			<fielddescr>Net Timeout</fielddescr>
+			<fieldname>varmodulesldapnettimeout</fieldname>
+			<description><![CDATA[Seconds to wait for response of the server because of network failures. (Default: 1)]]></description>
+			<type>input</type>
+			<size>80</size>
+			<default_value>1</default_value>
+		</field>
+		<field>
+			<name>MISCELLANEOUS CONFIGURATION</name>
+			<type>listtopic</type>
+		</field>
+		<field>
+			<fielddescr>Active Directory Compatibility</fielddescr>
+			<fieldname>varmodulesldapmsadcompatibilityenable</fieldname>
+			<description><![CDATA[If you see the helpful "operations error" being returned to the LDAP module enable this. (Default: Disable)]]></description>
+			<type>select</type>
+			<default_value>Disable</default_value>
+					<options>
+						<option><name>Disable</name><value>Disable</value></option>
+						<option><name>Enable</name><value>Enable</value></option>
+					</options>
+		</field>
+		<field>
+			<fielddescr>Enable Misc Configuration</fielddescr>
+			<fieldname>varmodulesldapdmiscenable</fieldname>
+			<description><![CDATA[By default the below options are not active in the configuration. (Default: unchecked)]]></description>
+			<type>checkbox</type>
+			<enablefields>varmodulesldapdefaultprofile,varmodulesldapprofileattribute,varmodulesldapaccessattr</enablefields>
+		</field>
+		<field>
+			<fielddescr>Default Profile</fielddescr>
+			<fieldname>varmodulesldapdefaultprofile</fieldname>
+			<description><![CDATA[No description. (Default: cn=radprofile,ou=dialup,o=My Org,c=UA )]]></description>
+			<type>input</type>
+			<size>80</size>
+			<default_value><![CDATA[cn=radprofile,ou=dialup,o=My Org,c=UA]]></default_value>
+		</field>
+		<field>
+			<fielddescr>Profile Attribute</fielddescr>
+			<fieldname>varmodulesldapprofileattribute</fieldname>
+			<description><![CDATA[No description. (Default: radiusProfileDn)]]></description>
+			<type>input</type>
+			<size>80</size>
+			<default_value>radiusProfileDn</default_value>
+		</field>
+		<field>
+			<fielddescr>Access Attribute</fielddescr>
+			<fieldname>varmodulesldapaccessattr</fieldname>
+			<description><![CDATA[No description. (Default: dialupAccess)]]></description>
+			<type>input</type>
+			<size>80</size>
+			<default_value>dialupAccess</default_value>
+		</field>
+		<field>
+			<name>Group Membership Options</name>
+			<type>listtopic</type>
+		</field>
+		<field>
+			<fielddescr>Enable Group Membership Options</fielddescr>
+			<fieldname>varmodulesldapgroupenable</fieldname>
+			<description><![CDATA[By default the below options are not active in the configuration. (Default: unchecked)]]></description>
+			<type>checkbox</type>
+			<enablefields>varmodulesldapaccessattrusedforallow,varmodulesldapdoxlat,varmodulesldapcomparecheckitems,varmodulesldapgroupmembershipattribute,varmodulesldapgroupmembershipfilter,varmodulesldapgroupnameattribute</enablefields>
+		</field>
+		<field>
+			<fielddescr>Groupname Attribute</fielddescr>
+			<fieldname>varmodulesldapgroupnameattribute</fieldname>
+			<description><![CDATA[No description. (Default: cn)]]></description>
+			<type>input</type>
+			<size>80</size>
+			<default_value>cn</default_value>
+		</field>
+		<field>
+			<fielddescr>Groupmembership Filter</fielddescr>
+			<fieldname>varmodulesldapgroupmembershipfilter</fieldname>
+			<description><![CDATA[No description. (Default: (|(&(objectClass=GroupOfNames)(member=%{control:Ldap-UserDn}))(&(objectClass=GroupOfUniqueNames)(uniquemember=%{control:Ldap-UserDn})))  )]]></description>
+			<type>input</type>
+			<size>80</size>
+			<default_value><![CDATA[(|(&(objectClass=GroupOfNames)(member=%{control:Ldap-UserDn}))(&(objectClass=GroupOfUniqueNames)(uniquemember=%{control:Ldap-UserDn})))]]></default_value>
+		</field>
+		<field>
+			<fielddescr>Groupmembership Attribute</fielddescr>
+			<fieldname>varmodulesldapgroupmembershipattribute</fieldname>
+			<description><![CDATA[No description. (Default: radiusGroupName)]]></description>
+			<type>input</type>
+			<size>80</size>
+			<default_value>radiusGroupName</default_value>
+		</field>
+		<field>
+			<fielddescr>Compare Check Items</fielddescr>
+			<fieldname>varmodulesldapcomparecheckitems</fieldname>
+			<description><![CDATA[No description. (Default: Yes)]]></description>
+			<type>select</type>
+			<default_value>Yes</default_value>
+					<options>
+						<option><name>Yes</name><value>yes</value></option>
+						<option><name>No</name><value>no</value></option>
+					</options>
+		</field>
+		<field>
+			<fielddescr>Do XLAT</fielddescr>
+			<fieldname>varmodulesldapdoxlat</fieldname>
+			<description><![CDATA[No description. (Default: Yes)]]></description>
+			<type>select</type>
+			<default_value>Yes</default_value>
+					<options>
+						<option><name>Yes</name><value>yes</value></option>
+						<option><name>No</name><value>no</value></option>
+					</options>
+		</field>
+		<field>
+			<fielddescr>Access Attribute Used For Allow</fielddescr>
+			<fieldname>varmodulesldapaccessattrusedforallow</fieldname>
+			<description><![CDATA[No description. (Default: Yes)]]></description>
+			<type>select</type>
+			<default_value>Yes</default_value>
+					<options>
+						<option><name>Yes</name><value>yes</value></option>
+						<option><name>No</name><value>no</value></option>
+					</options>
+		</field>
+		<field>
+			<name>KEEPALIVE CONFIGURATION</name>
+			<type>listtopic</type>
+		</field>
+		<field>
+			<fielddescr>LDAP OPT X KEEPALIVE IDLE</fielddescr>
+			<fieldname>varmodulesldapkeepaliveidle</fieldname>
+			<description><![CDATA[No description. (Default: 60)]]></description>
+			<type>input</type>
+			<size>80</size>
+			<default_value>60</default_value>
+		</field>
+		<field>
+			<fielddescr>LDAP OPT X KEEPALIVE PROBES</fielddescr>
+			<fieldname>varmodulesldapkeepaliveprobes</fieldname>
+			<description><![CDATA[No description. (Default: 3)]]></description>
+			<type>input</type>
+			<size>80</size>
+			<default_value>3</default_value>
+		</field>
+		<field>
+			<fielddescr>LDAP OPT X KEEPALIVE INTERVAL</fielddescr>
+			<fieldname>varmodulesldapkeepaliveinterval</fieldname>
+			<description><![CDATA[No description. (Default: 3)]]></description>
+			<type>input</type>
+			<size>80</size>
+			<default_value>3</default_value>
+		</field>
+	</fields>
+	<custom_delete_php_command>
+		freeradius_modulesldap_resync();
+	</custom_delete_php_command>
+	<custom_php_resync_config_command>
+		freeradius_modulesldap_resync();
+	</custom_php_resync_config_command>
+</packagegui>
