@@ -158,20 +158,18 @@
 		<field>
 			<fielddescr>Logging Destination of RADIUS</fielddescr>
 			<fieldname>varsettingslogdir</fieldname>
-			<description><![CDATA[Choose the destination where freeRADIUS should log. Logging must be enabled.(Default: radius.log)]]></description>
+			<description><![CDATA[Choose the destination where freeRADIUS should log. This will log if service started or failed but no authentication information. (Default: radius.log)]]></description>
 			<type>select</type>
 			<default_value>syslog</default_value>
 					<options>
 						<option><name>/var/log/radius.log</name><value>files</value></option>
 						<option><name>System Logs -> System</name><value>syslog</value></option>
-						<option><name>stdout</name><value>stdout</value></option>
-						<option><name>stderr</name><value>stderr</value></option>
 					</options>
 		</field>
 		<field>
 			<fielddescr>RADIUS Logging</fielddescr>
 			<fieldname>varsettingsauth</fieldname>
-			<description><![CDATA[Choose if you want to enable logging. (Default: Disabled)]]></description>
+			<description><![CDATA[This enables logging if an authentication is accepted or rejected. (Default: Disabled)]]></description>
 			<type>select</type>
 			<default_value>yes</default_value>
 					<options>
@@ -182,7 +180,7 @@
 		<field>
 			<fielddescr>Log Bad Authentication Attempts</fielddescr>
 			<fieldname>varsettingsauthbadpass</fieldname>
-			<description><![CDATA[Choose if you want to log bad authentication attempts. Logging must be enabled. (Default: no)]]></description>
+			<description><![CDATA[If an authentication fails then it will log the username and <b>wrong</b> password visible in syslog. Logging must be enabled. (Default: no)]]></description>
 			<type>select</type>
 			<default_value>no</default_value>
 					<options>
@@ -193,7 +191,7 @@
 		<field>
 			<fielddescr>Log good authentication attempts?</fielddescr>
 			<fieldname>varsettingsauthgoodpass</fieldname>
-			<description><![CDATA[Choose if you want to log good authentication attempts. Logging must be enabled. (Default: no)]]></description>
+			<description><![CDATA[If an authentication succeeds then it will log the username and <b>correct</b> password visible in syslog. Logging must be enabled. (Default: no)]]></description>
 			<type>select</type>
 			<default_value>no</default_value>
 					<options>
@@ -204,7 +202,7 @@
 		<field>
 			<fielddescr>Log Stripped Names</fielddescr>
 			<fieldname>varsettingsstrippednames</fieldname>
-			<description><![CDATA[Choose if you want to log the full User-Name attribute as it was found in the request. Logging must be enabled. (Default: no)]]></description>
+			<description><![CDATA[Choose this if you want to log the full User-Name attribute as it was found in the request. Logging must be enabled. (Default: no)]]></description>
 			<type>select</type>
 			<default_value>no</default_value>
 					<options>
