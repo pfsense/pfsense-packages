@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <packagegui>
-	<title>Services: LCDproc 0.5.4 pkg v. 0.4</title>
+	<title>Services: LCDproc 0.5.4 pkg v. 0.5</title>
 	<name>lcdproc</name>
-	<version>0.5.4 pkg v. 0.4</version>
+	<version>0.5.4 pkg v. 0.5</version>
 	<savetext>Save</savetext>
 	<include_file>/usr/local/pkg/lcdproc.inc</include_file>
 	<tabs>
@@ -65,9 +65,21 @@
 					<name>none</name>
 				</option>
 				<option>
+					<value>com1</value>
+					<name>Serial Com port 1 (/dev/cua0)</name>
+				</option>				
+				<option>
 					<value>com2</value>
 					<name>Serial Com port 2 (/dev/cua1)</name>
 				</option>
+				<option>
+					<value>com1a</value>
+					<name>Serial Com port 1 alternate (/dev/cuau0)</name>
+				</option>
+				<option>
+					<value>com2a</value>
+					<name>Serial Com port 2 alternate (/dev/cuau1)</name>
+				</option>				
 				<option>
 					<value>ucom1</value>
 					<name>USB Com port 1 (/dev/cuaU0)</name>
@@ -317,6 +329,214 @@
 				</option>
 			</options>
 			<default_value>5</default_value>
+		</field>	
+		<field>
+			<fieldname>port_speed</fieldname>
+			<fielddescr>Port speed</fielddescr>
+			<description>Set the port speed. Caution: not all the driver or panels support all the speeds, leave "default" if unsure.</description>
+			<type>select</type>
+			<options>
+				<option>
+					<value>0</value>
+					<name>Default</name>
+				</option>
+				<option>
+					<value>1200</value>
+					<name>1200 bps</name>
+				</option>
+				<option>
+					<value>2400</value>
+					<name>2400 bps</name>
+				</option>
+				<option>
+					<value>9600</value>
+					<name>9600 bps</name>
+				</option>
+				<option>
+					<value>19200</value>
+					<name>19200 bps</name>
+				</option>
+				<option>
+					<value>57600</value>
+					<name>57600 bps</name>
+				</option>
+				<option>
+					<value>115200</value>
+					<name>115200 bps</name>
+				</option>				
+			</options>
+			<default_value>0</default_value>
+		</field>
+		<field>
+			<fieldname>brightness</fieldname>
+			<fielddescr>Brightness</fielddescr>
+			<description>Set the brightness of the LCD panel. This option is not supported by all the LCD panels, leave "default" if unsure.</description>
+			<type>select</type>
+			<options>
+				<option>
+					<value>-1</value>
+					<name>Default</name>
+				</option>
+				<option>
+					<value>0</value>
+					<name>0%</name>
+				</option>
+				<option>
+					<value>10</value>
+					<name>10%</name>
+				</option>
+				<option>
+					<value>20</value>
+					<name>20%</name>
+				</option>	
+				<option>
+					<value>30</value>
+					<name>30%</name>
+				</option>	
+				<option>
+					<value>40</value>
+					<name>40%</name>
+				</option>
+				<option>
+					<value>50</value>
+					<name>50%</name>
+				</option>
+				<option>
+					<value>60</value>
+					<name>60%</name>
+				</option>
+				<option>
+					<value>70</value>
+					<name>70%</name>
+				</option>
+				<option>
+					<value>80</value>
+					<name>80%</name>
+				</option>
+				<option>
+					<value>90</value>
+					<name>90%</name>
+				</option>	
+				<option>
+					<value>100</value>
+					<name>100%</name>
+				</option>
+			</options>			
+			<default_value>-1</default_value>
+		</field>
+		<field>
+			<fieldname>offbrightness</fieldname>
+			<fielddescr>Offrightness</fielddescr>
+			<description>Set the off-brightness of the LCD panel. This value is used when the display is normally switched off in case LCDd is inactive. This option is not supported by all the LCD panels, leave "default" if unsure.</description>
+			<type>select</type>
+			<options>
+				<option>
+					<value>-1</value>
+					<name>Default</name>
+				</option>
+				<option>
+					<value>0</value>
+					<name>0%</name>
+				</option>
+				<option>
+					<value>10</value>
+					<name>10%</name>
+				</option>
+				<option>
+					<value>20</value>
+					<name>20%</name>
+				</option>	
+				<option>
+					<value>30</value>
+					<name>30%</name>
+				</option>	
+				<option>
+					<value>40</value>
+					<name>40%</name>
+				</option>
+				<option>
+					<value>50</value>
+					<name>50%</name>
+				</option>
+				<option>
+					<value>60</value>
+					<name>60%</name>
+				</option>
+				<option>
+					<value>70</value>
+					<name>70%</name>
+				</option>
+				<option>
+					<value>80</value>
+					<name>80%</name>
+				</option>
+				<option>
+					<value>90</value>
+					<name>90%</name>
+				</option>	
+				<option>
+					<value>100</value>
+					<name>100%</name>
+				</option>
+			</options>			
+			<default_value>-1</default_value>
+		</field>		
+		<field>
+			<fieldname>contrast</fieldname>
+			<fielddescr>Contrast</fielddescr>
+			<description>Set the contrast of the LCD panel. This option is not supported by all the LCD panels, leave "default" if unsure.</description>
+			<type>select</type>
+			<options>
+				<option>
+					<value>-1</value>
+					<name>Default</name>
+				</option>
+				<option>
+					<value>0</value>
+					<name>0%</name>
+				</option>
+				<option>
+					<value>10</value>
+					<name>10%</name>
+				</option>
+				<option>
+					<value>20</value>
+					<name>20%</name>
+				</option>	
+				<option>
+					<value>30</value>
+					<name>30%</name>
+				</option>	
+				<option>
+					<value>40</value>
+					<name>40%</name>
+				</option>
+				<option>
+					<value>50</value>
+					<name>50%</name>
+				</option>
+				<option>
+					<value>60</value>
+					<name>60%</name>
+				</option>
+				<option>
+					<value>70</value>
+					<name>70%</name>
+				</option>
+				<option>
+					<value>80</value>
+					<name>80%</name>
+				</option>
+				<option>
+					<value>90</value>
+					<name>90%</name>
+				</option>	
+				<option>
+					<value>100</value>
+					<name>100%</name>
+				</option>
+			</options>			
+			<default_value>-1</default_value>
 		</field>		
 	</fields>
 	<custom_php_command_before_form>
