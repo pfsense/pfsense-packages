@@ -49,12 +49,12 @@
 		<name>Mailscanner</name>
 		<tooltiptext>Configure MailScanner service</tooltiptext>
 		<section>Services</section>
-		<url>/pkg_edit.php?xml=mailscanner.xml&amp;id=0</url>
+		<url>pkg_edit.php?xml=mailscanner.xml&amp;id=0</url>
 	</menu>
 	<service>
 		<name>mailscanner</name>
 		<rcfile>mailscanner</rcfile>
-		<executable>MailScanner</executable>
+		<executable>perl5.12.4</executable>
 		<description>MailScanner</description>
 	</service>
 	<additional_files_needed>

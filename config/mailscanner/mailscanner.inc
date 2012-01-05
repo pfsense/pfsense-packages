@@ -938,9 +938,12 @@ EOF;
 			unlink_if_exists($libexec_dir.'clamav-wrapper');
 		}
 		else{
-			chown('/var/run/clamav/', 'postfix');
-			chown('/var/log/clamav/', 'postfix');
-			chown('/var/db/clamav/', 'postfix');
+			if (file_exists('/var/run/clamav/'))
+				chown('/var/run/clamav/', 'postfix');
+			if (file_exists('/var/log/clamav/'))
+				chown('/var/log/clamav/', 'postfix');
+			if (file_exists('/var/db/clamav/'))
+				chown('/var/db/clamav/', 'postfix');
 			if (file_exists('/var/db/clamav/bytecode.cld'))
 				chown('/var/db/clamav/bytecode.cld', 'postfix');
 			if (file_exists('/var/db/clamav/daily.cld'))
@@ -987,14 +990,21 @@ EOF;
 				}
 			#clamd script file
 			$script='/usr/local/etc/rc.d/clamav-clamd';
-			$script_file=file_get_contents($script);
-			if (preg_match('/NO/',$script_file)){
-				$script_file=preg_replace("/NO/","YES",$script_file);
-				file_put_contents($script, $script_file, LOCK_EX);
-				chmod ($script,0755);
+			$script_file=file($script);
+			foreach ($script_file as $script_line){
+				if(preg_match("/command=/",$script_line)){
+					$new_clamav_startup.= "/bin/mkdir /var/run/clamav\n";
+					$new_clamav_startup.= "chown postfix /var/run/clamav\n";
+					$new_clamav_startup.=$script_line;
+					}
+				elseif(!preg_match("/(mkdir|chown|sleep|mailscanner)/",$script_line)) {
+					$new_clamav_startup.=preg_replace("/NO/","YES",$script_line);
+					}
 				}
-			mwexec_bg("$script fastrestart");
-				
+			file_put_contents($script, $new_clamav_startup, LOCK_EX);
+			chmod ($script,0755);
+			mwexec("$script stop");
+			mwexec_bg("$script start");
 		}
 	}
 	else{
@@ -1010,7 +1020,6 @@ EOF;
 				file_put_contents($script, $script_file, LOCK_EX);
 				chmod ($script,0755);
 				}
-			mwexec_bg("$script fastrestart");
 	#check dcc config file
 			$script='/usr/local/dcc/dcc_conf';
 			$script_file=file_get_contents($script);
@@ -1018,7 +1027,9 @@ EOF;
 				$script_file=preg_replace("/DCCIFD_ENABLE=off/","DCCIFD_ENABLE=on",$script_file);
 				file_put_contents($script, $script_file, LOCK_EX);
 				}
-			
+			mwexec("$script stop");
+			mwexec_bg("$script start");
+				
 	$script='/usr/local/etc/rc.d/mailscanner';
 
 	#fix MIME::ToolUtils deprecated function and usecure dependency calls in /usr/local/sbin/mailscanner
@@ -1037,13 +1048,16 @@ EOF;
 	
 	$script_file=file_get_contents($script);
 	if (preg_match('/NO/',$script_file)){
-		$script_file=preg_replace("/NO/","YES",$script_file);
-		file_put_contents($script, $script_file, LOCK_EX);
-	}
+				$script_file=preg_replace("/NO/","YES",$script_file);
+				file_put_contents($script, $script_file, LOCK_EX);
+				chmod ($script,0755);
+				}
 	if($config['installedpackages']['mailscanner']['config'][0]['enable']){
 		log_error("Reload mailscanner");
 		chmod ($script,0755);
-		mwexec_bg("$script fastrestart");
+		mwexec("$script stop");
+        sleep(2);
+        mwexec_bg("$script start");
 	}
 	else{
 		log_error("Stopping mailscanner if running");
