@@ -95,7 +95,11 @@
 	</package>
 	<package>
 		<name>squid-reverse</name>
-		<descr>High performance web proxy cache with HTTP / HTTPS reverse proxy and Exchange-Web-Access Assistant.</descr>
+		<descr><![CDATA[High performance web proxy cache.<br>
+					   It combines squid as a proxy server with it's capabilities of actinge as a.<br>
+					   HTTP / HTTPS reverse proxy.<br>
+					   It includes an Exchange-Web-Access (OWA) Assistant.<br>
+					   squid-reverse replaces the squid-package (squid config is maintained).]]></descr>
 		<pkginfolink>http://forum.pfsense.org/index.php/topic,44735.0.html</pkginfolink>
 		<website>http://www.squid-cache.org/</website>
 		<category>Network</category>
@@ -517,7 +521,7 @@
 		<depends_on_package>pyzor-0.5.0_1.tbz</depends_on_package>
 		<depends_on_package>p5-Mail-SPF-2.007.tbz</depends_on_package>
 		<depends_on_package>p5-IP-Country-2.27.tbz</depends_on_package>
-		<version>4.83.5 pkg v.0.2</version>
+		<version>4.83.5 pkg v.0.2.1</version>
 		<status>beta</status>
 		<required_version>2.0</required_version>
 		<configurationfile>mailscanner.xml</configurationfile>
@@ -846,9 +850,9 @@
 		<website>http://www.freeradius.org/</website>
 		<descr><![CDATA[A free implementation of the RADIUS protocol.<br>
 				Do not use together with freeradius package. Both are using the same XML files.]]></descr>
-		<pkginfolink>http://forum.pfsense.org/index.php/topic,43675.0.html</pkginfolink>
+		<pkginfolink>http://doc.pfsense.org/index.php/FreeRADIUS_2.x_package</pkginfolink>
 		<category>System</category>
-		<version>2.1.12 pkg v1.4.3</version>
+		<version>2.1.12 pkg v1.4.4</version>
 		<status>BETA</status>
 		<required_version>2.0</required_version>
 		<maintainer>nachtfalkeaw@web.de</maintainer>
@@ -989,7 +993,7 @@
 		<descr>LCD display driver - Development version</descr>
 		<website>http://www.lcdproc.org/</website>
 		<category>Utility</category>
-		<version>lcdproc-0.5.4 pkg v. 0.4</version>
+		<version>lcdproc-0.5.4 pkg v. 0.5</version>
 		<status>BETA</status>
 		<required_version>2.0</required_version>
 		<maintainer>michele@nt2.it</maintainer>
