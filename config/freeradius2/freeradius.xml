@@ -65,7 +65,7 @@
 		<tab>
 			<text>Users</text>
 			<url>/pkg.php?xml=freeradius.xml</url>
-		<active/>
+			<active/>
 		</tab>
 		<tab>
 			<text>NAS / Clients</text>
@@ -90,7 +90,11 @@
 		<tab>
 			<text>Certificates</text>
 			<url>/pkg_edit.php?xml=freeradiuscerts.xml&amp;id=0</url>
-		</tab>		
+		</tab>
+		<tab>
+			<text>LDAP</text>
+			<url>/pkg_edit.php?xml=freeradiusmodulesldap.xml&amp;id=0</url>
+		</tab>
 		<tab>
 			<text>View config</text>
 			<url>/freeradius_view_config.php</url>
@@ -100,6 +104,11 @@
 			<url>/pkg_edit.php?xml=freeradiussync.xml&amp;id=0</url>
 		</tab>
 	</tabs>
+	<additional_files_needed>
+		<prefix>/usr/local/pkg/</prefix>
+		<chmod>0755</chmod>
+		<item>http://www.pfsense.org/packages/config/freeradius2/freeradius.inc</item>
+	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/www/</prefix>
 		<chmod>0755</chmod>
@@ -143,7 +152,7 @@
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0755</chmod>
-		<item>http://www.pfsense.org/packages/config/freeradius2/freeradius.inc</item>
+		<item>http://www.pfsense.org/packages/config/freeradius2/freeradiusmodulesldap.xml</item>
 	</additional_files_needed>
 	<adddeleteeditpagefields>
 		<columnitem>

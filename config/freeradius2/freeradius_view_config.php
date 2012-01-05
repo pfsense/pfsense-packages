@@ -42,6 +42,7 @@ function get_file($file){
 	$files['server']="/usr/local/etc/raddb/certs/server.cnf";
 	$files['client']="/usr/local/etc/raddb/certs/client.cnf";
 	$files['index']="/usr/local/etc/raddb/certs/index.txt";
+	$files['ldap']="/usr/local/etc/raddb/modules/ldap";
 
 
 	if ($files[$file]!="" && file_exists($files[$file])){
@@ -86,6 +87,7 @@ else{
 		$tab_array[] = array(gettext("EAP"), false, "/pkg_edit.php?xml=freeradiuseapconf.xml&id=0");
 		$tab_array[] = array(gettext("SQL"), false, "/pkg_edit.php?xml=freeradiussqlconf.xml&id=0");
 		$tab_array[] = array(gettext("Certificates"), false, "/pkg_edit.php?xml=freeradiuscerts.xml&id=0");
+		$tab_array[] = array(gettext("LDAP"), false, "/pkg_edit.php?xml=freeradiusmodulesldap.xml&id=0");
 		$tab_array[] = array(gettext("View config"), true, "/freeradius_view_config.php");
 		$tab_array[] = array(gettext("XMLRPC Sync"), false, "/pkg_edit.php?xml=freeradiussync.xml&amp;id=0");
 		display_top_tabs($tab_array);
@@ -112,6 +114,7 @@ else{
 							<input type="button" onClick="get_freeradius_file('server');" id='btn_server' value="server.cnf">&nbsp;
 							<input type="button" onClick="get_freeradius_file('client');" id='btn_client' value="client.cnf">&nbsp;
 							<input type="button" onClick="get_freeradius_file('index');" id='btn_index' value="index.txt">&nbsp;
+							<input type="button" onClick="get_freeradius_file('ldap');" id='btn_ldap' value="ldap">&nbsp;
 							</td>
 								</tr>
 								<tr>
@@ -152,6 +155,7 @@ else{
 			$('btn_server').value="server.cnf";
 			$('btn_client').value="client.cnf";
 			$('btn_index').value="index.txt";
+			$('btn_ldap').value="ldap";
 			scroll(0,0);
 		}
 	</script>
