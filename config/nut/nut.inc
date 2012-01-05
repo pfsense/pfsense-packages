@@ -94,18 +94,26 @@
 	
 	function before_form_nut($pkg) {
 		/* return available serial ports */
-		$handle = popen('dmesg | grep \'^sio[0-9]: type\'','r');
-		$read = fread($handle, 2096);
-		pclose($handle);
 		
-		/* explode at the newlines */
-		$read = explode("\n",$read);
+		$serial_types = array("sio", "cua", "tty");
+		$ignore_files = array(".lock", ".init");
 
-		/* parse resulting text */
-		foreach($read as $line) {
-			if($line!= '') {
-				$names[] = 'ttyd'.$line{3}.' (COM'.($line{3}+1).')';
-				$values[] = '/dev/ttyd'.$line{3};
+		foreach($serial_types as $st) {
+			$devices = glob("/dev/{$st}*");
+			foreach($devices as $line) {
+				if($line != '') {
+					$ignore = false;
+					foreach($ignore_files as $if) {
+						if(strstr($line, $if)) {
+							$ignore = true;
+							continue;
+						}
+					}
+					if($ignore == false) {
+						$names[] = str_replace("/dev/", "", $line);
+						$values[] = $line;
+					}
+				}
 			}
 		}
 
