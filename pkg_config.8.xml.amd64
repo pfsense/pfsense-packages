@@ -96,7 +96,7 @@
 	<package>
 		<name>squid-reverse</name>
 		<descr><![CDATA[High performance web proxy cache.<br>
-					   It combines squid as a proxy server with it's capabilities of actinge as a.<br>
+					   It combines squid as a proxy server with it's capabilities of acting as a<br>
 					   HTTP / HTTPS reverse proxy.<br>
 					   It includes an Exchange-Web-Access (OWA) Assistant.<br>
 					   squid-reverse replaces the squid-package (squid config is maintained).]]></descr>
