@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <packagegui>
-	<title>Services: LCDproc 0.5.4 pkg v. 0.5</title>
+	<title>Services: LCDproc 0.5.4 pkg v. 0.6</title>
 	<name>lcdproc</name>
-	<version>0.5.4 pkg v. 0.5</version>
+	<version>0.5.4 pkg v. 0.6</version>
 	<savetext>Save</savetext>
 	<include_file>/usr/local/pkg/lcdproc.inc</include_file>
 	<tabs>
@@ -42,6 +42,11 @@
 	    <prefix>/usr/local/lib/lcdproc/</prefix>
 	    <chmod>0755</chmod>
 	</additional_files_needed>
+	<additional_files_needed>
+		<item>http://files.pfsense.org/misc/sdeclcd.so</item>
+	    <prefix>/usr/local/lib/lcdproc/</prefix>
+	    <chmod>0755</chmod>
+	</additional_files_needed>	
 	<service>
 		<name>lcdproc</name>
 		<rcfile>lcdproc.sh</rcfile>
@@ -253,7 +258,11 @@
 				<option>
 					<value>pyramid</value>
 					<name>pyramid</name>
-				</option>
+				</option>				
+				<option>
+					<value>sdeclcd</value>
+					<name>sdeclcd (x86 only)</name>
+				</option>				
 				<option>
 					<value>sed1330</value>
 					<name>sed1330</name>
