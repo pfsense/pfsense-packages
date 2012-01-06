@@ -82,7 +82,7 @@ function freeradius_install_command() {
         conf_mount_rw();
 	write_rcfile($rcfile);
         conf_mount_ro();
-	restart_service("freeradius");
+	start_service("radiusd");
 }
 
 function freeradius_settings_resync() {
@@ -305,7 +305,7 @@ EOD;
 	freeradius_modulescounter_resync();
 	freeradius_modulesmschap_resync();
 	freeradius_modulesrealm_resync();
-	restart_service("freeradius");
+	restart_service("radiusd");
 }
 
 function freeradius_users_resync() {
@@ -485,7 +485,7 @@ EOD;
 	conf_mount_ro();
 	
 	freeradius_sync_on_changes();
-	restart_service("freeradius");
+	restart_service("radiusd");
 }
 
 
