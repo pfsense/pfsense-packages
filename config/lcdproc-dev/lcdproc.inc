@@ -442,6 +442,9 @@
 					$config_text .= "Device={$realport}\n";
 					$config_text .= "Size={$lcdproc_config['size']}\n";
 					break;
+				case "sdeclcd":
+					$config_text .= "[{$lcdproc_config['driver']}]\n";
+					break;				
 				case "sed1330":
 					$config_text .= "[{$lcdproc_config['driver']}]\n";
 					break;
