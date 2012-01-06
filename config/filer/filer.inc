@@ -54,7 +54,7 @@ function sync_package_filer() {
 	if($config['installedpackages']['filer']['config']!="") {
 		foreach($config['installedpackages']['filer']['config'] as $file) {
 			$fname = $file['fullfile'];
-			$fdata = base64_decode($file['filedata']);
+			$fdata = str_replace("\r", "", base64_decode($file['filedata']));
 			if($file['mod']) {
 				if(!preg_match("/0?[0-7]{3}/", $file['mod'])) 
 					$mod = 0700;
@@ -62,9 +62,7 @@ function sync_package_filer() {
 					$mod = octdec($file['mod']);
 			}
 			conf_mount_rw();
-			$fhnd = fopen($fname, 'w');
-			fwrite($fhnd, $fdata);
-			fclose($fhnd);
+			file_put_contents($fname, $fdata);
 			if($mod)
 				chmod($fname, $mod);
 			conf_mount_ro();
