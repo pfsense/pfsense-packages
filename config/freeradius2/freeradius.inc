@@ -249,7 +249,7 @@ checkrad = \${sbindir}/checkrad
 security {
 	max_attributes = $varsettingsmaxattributes
 	reject_delay = $varsettingsrejectdelay
-	status_server = yes
+	status_server = no
 }
 
 ### disbale proxy module. In most environments we do not need to proxy requests to another RADIUS PROXY server
