@@ -48,7 +48,7 @@
 	<name>squidusers</name>
 	<version>none</version>
 	<title>Proxy server: Local users</title>
-	<include_file>squid.inc</include_file>
+	<include_file>/usr/local/pkg/squid.inc</include_file>
 	<delete_string>A proxy server user has been deleted.</delete_string>
 	<addedit_string>A proxy server user has been created/modified.</addedit_string>
 	<tabs>
