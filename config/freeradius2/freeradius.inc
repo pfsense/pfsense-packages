@@ -70,10 +70,22 @@ function freeradius_install_command() {
 		}
 	}
 	
+	closedir($handle);
+	
 	exec("chown -R root:wheel /usr/local/etc/raddb");
 	exec("chown -R root:wheel /usr/local/lib/freeradius-2.1.12");
 	
-	closedir($handle);
+	// creating a backup file of the original policy.conf no matter if user checked this or not
+	if (!file_exists("/usr/local/etc/raddb/policy.conf.backup")) {
+		log_error("FreeRADIUS: Creating backup of the original file to {$filepolicyconfbackup}");
+		copy("/usr/local/etc/raddb/policy.conf", "/usr/local/etc/raddb/policy.conf.backup");
+	}
+	
+	// creating a backup file of the original /modules/files no matter if user checked this or not
+	if (!file_exists("/usr/local/etc/raddb/files.backup")) {
+		log_error("FreeRADIUS: Creating backup of the original file to {$filemodulesfilesbackup}");
+		copy("/usr/local/etc/raddb/modules/files", "/usr/local/etc/raddb/files.backup");
+	}
 
 	$rcfile = array();
 	$rcfile['file'] = 'radiusd.sh';
@@ -82,7 +94,7 @@ function freeradius_install_command() {
         conf_mount_rw();
 	write_rcfile($rcfile);
         conf_mount_ro();
-	start_service("radiusd");
+	restart_service("radiusd");
 }
 
 function freeradius_settings_resync() {
@@ -123,7 +135,6 @@ function freeradius_settings_resync() {
 	$sqlconf = $config['installedpackages']['freeradiussqlconf']['config'][0];
 	$varsqlconfincludeenable = ($sqlconf['varsqlconfincludeenable']?$sqlconf['varsqlconfincludeenable']:'Disable');
 		
-	
 	// Dis-/Enable SQL in "instatiate" section in "freeradius_settings_resync" and radiusd.conf
 	if ($sqlconf['varsqlconfincludeenable'] == 'Enable') {
 		$varsqlconfinclude = '$INCLUDE sql.conf';
@@ -301,6 +312,7 @@ EOD;
 	conf_mount_ro();
 	
 	// "freeradius_sqlconf_resync" is pointing to this function because we need to run "freeradius_serverdefault_resync" and after that restart freeradius.
+	freeradius_plainmacauth_resync();
 	freeradius_serverdefault_resync();
 	freeradius_modulescounter_resync();
 	freeradius_modulesmschap_resync();
@@ -434,6 +446,39 @@ EOD;
 	freeradius_sync_on_changes();
 	restart_service('freeradius');
 }
+
+
+function freeradius_authorizedmacs_resync() {
+global $config;
+
+$conf = '';
+
+$arrmacs = $config['installedpackages']['freeradiusauthorizedmacs']['config'];
+
+if (is_array($arrmacs) && !empty($arrmacs)) {
+	foreach ($arrmacs as $macs) {
+	
+	// Variables for macs file defined parameters
+	$varmacaddress = $macs['varmacaddress'];
+	$varmacaddress = "\n$varmacaddress";
+	
+	$conf .= <<<EOD
+$varmacaddress
+EOD;
+	} //end foreach
+} // end if
+
+	$filename = RADDB . '/authorized_macs';
+	conf_mount_rw();
+	file_put_contents($filename, $conf);
+	chmod($filename, 0600);
+	conf_mount_ro();
+	
+	freeradius_sync_on_changes();
+	restart_service('freeradius');
+}
+
+
 
 function freeradius_clients_resync() {
 	global $config;
@@ -852,6 +897,48 @@ function freeradius_serverdefault_resync() {
 	$varsqlconfpostauth = '#sql';
 	}
 	
+	// Changing authorize section for plain mac auth
+	// Variables: If not using 802.1x, mac address must be known
+	$varsettings = $config['installedpackages']['freeradiussettings']['config'][0];
+	
+	// If unchecked we need the normal EAP section.
+	If (!$varsettings['varsettingsenablemacauth']) {
+		$varplainmacauthenable = '';
+		$varplainmacauthenable .= "eap {";
+		$varplainmacauthenable .= "\n\tok = return";
+		$varplainmacauthenable .= "\n\t}";
+		
+		$varplainmacpreacctenable = '';
+		$varplainmacpreacctenable .= '##### ACCOUNTING FOR PLAIN MAC-AUTH DISABLED #####';
+	}
+	// If checked we need to check if it is plain mac or eap
+	else {
+		$varplainmacauthenable = '';
+		$varplainmacauthenable .= "# if cleaning up the Calling-Station-Id...";
+		$varplainmacauthenable .= "\n\trewrite_calling_station_id";
+		$varplainmacauthenable .= "\n\t# If this is NOT 802.1x, assume mac-auth";
+		$varplainmacauthenable .= "\n\tif (!EAP-Message) {";
+		$varplainmacauthenable .= "\n\t\t# now check against the authorized_macs file";
+		$varplainmacauthenable .= "\n\t\tauthorized_macs";
+		$varplainmacauthenable .= "\n\t\tif (!ok) {";
+		$varplainmacauthenable .= "\n\t\t\treject";
+		$varplainmacauthenable .= "\n\t\t}";
+		$varplainmacauthenable .= "\n\t\telse {";
+		$varplainmacauthenable .= "\n\t\t\t# accept";
+		$varplainmacauthenable .= "\n\t\t\tupdate control {";
+		$varplainmacauthenable .= "\n\t\t\t\tAuth-Type := Accept";
+		$varplainmacauthenable .= "\n\t\t\t}";
+		$varplainmacauthenable .= "\n\t\t}";
+		$varplainmacauthenable .= "\n\t}";
+		$varplainmacauthenable .= "\n\telse {";
+		$varplainmacauthenable .= "\n\t\t# normal FreeRadius virtual server config goes here e.g.";
+		$varplainmacauthenable .= "\n\t\teap";
+		$varplainmacauthenable .= "\n\t}";
+		
+		$varplainmacpreacctenable = '';
+		$varplainmacpreacctenable .= '##### ACCOUNTING FOR PLAIN MAC-AUTH #####';
+		$varplainmacpreacctenable .= "\n\trewrite_calling_station_id";
+	}
 	
 	$conf .= <<<EOD
 
@@ -943,7 +1030,28 @@ authorize {
 	#  It takes care of processing the 'raddb/hints' and the
 	#  'raddb/huntgroups' files.
 	preprocess
-
+	
+	#
+	#  This module takes care of EAP-MD5, EAP-TLS, and EAP-LEAP
+	#  authentication.
+	#
+	#  It also sets the EAP-Type attribute in the request
+	#  attribute list to the EAP type from the packet.
+	#
+	#  As of 2.0, the EAP module returns "ok" in the authorize stage
+	#  for TTLS and PEAP.  In 1.x, it never returned "ok" here, so
+	#  this change is compatible with older configurations.
+	#
+	#  The example below uses module failover to avoid querying all
+	#  of the following modules if the EAP module returns "ok".
+	#  Therefore, your LDAP and/or SQL servers will not be queried
+	#  for the many packets that go back and forth to set up TTLS
+	#  or PEAP.  The load on those servers will therefore be reduced.
+	#
+	
+	$varplainmacauthenable
+	
+		
 	#
 	#  If you want to have a log of authentication requests,
 	#  un-comment the following line, and the 'detail auth_log'
@@ -992,27 +1100,6 @@ authorize {
 	#
 	suffix
 	ntdomain
-
-	#
-	#  This module takes care of EAP-MD5, EAP-TLS, and EAP-LEAP
-	#  authentication.
-	#
-	#  It also sets the EAP-Type attribute in the request
-	#  attribute list to the EAP type from the packet.
-	#
-	#  As of 2.0, the EAP module returns "ok" in the authorize stage
-	#  for TTLS and PEAP.  In 1.x, it never returned "ok" here, so
-	#  this change is compatible with older configurations.
-	#
-	#  The example below uses module failover to avoid querying all
-	#  of the following modules if the EAP module returns "ok".
-	#  Therefore, your LDAP and/or SQL servers will not be queried
-	#  for the many packets that go back and forth to set up TTLS
-	#  or PEAP.  The load on those servers will therefore be reduced.
-	#
-	eap {
-		ok = return
-	}
 
 	#
 	#  Pull crypt'd passwords from /etc/passwd or /etc/shadow,
@@ -1190,7 +1277,9 @@ authenticate {
 #
 preacct {
 	preprocess
-
+	
+	$varplainmacpreacctenable
+	
 	#
 	#  Session start times are *implied* in RADIUS.
 	#  The NAS never sends a "start time".  Instead, it sends
@@ -2000,6 +2089,7 @@ function freeradius_do_xmlrpc_sync($sync_to_ip, $password) {
 function freeradius_all_after_XMLRPC_resync() {
 	
 	freeradius_users_resync();
+	freeradius_sync_on_changes();
 	freeradius_clients_resync();
 	
 	log_error("freeRADIUS has finished XMLRPC process. It should be OK. For more information look at the host which started sync.");
@@ -2558,6 +2648,322 @@ EOD;
 	// "freeradius_serverdefault_resync" needs to restart other dependencies so we are pointing directly to "freeradius_settings_resync()"
 	freeradius_settings_resync();
 	
+}
+
+function freeradius_plainmacauth_resync() {
+	global $config;
+	$conf = '';
+	
+	// Variables: If not using 802.1x, mac address must be known
+	$varsettings = $config['installedpackages']['freeradiussettings']['config'][0];
+	
+	// defining variables with filename path
+	$filepolicyconf = '/usr/local/etc/raddb/policy.conf';
+	$filepolicyconfbackup = '/usr/local/etc/raddb/policy.conf.backup';
+	$filemodulesfiles = '/usr/local/etc/raddb/modules/files';
+	$filemodulesfilesbackup = '/usr/local/etc/raddb/files.backup';
+	
+	// If unchecked then plain mac auth is disabled and backups of the original files will be restored
+	if (!$varsettings['varsettingsenablemacauth']) {
+		log_error("FreeRADIUS: Restoring the original file from {$filepolicyconfbackup} and {$filemodulesfilesbackup}");
+		copy($filepolicyconfbackup, $filepolicyconf);
+		copy($filemodulesfilesbackup, $filemodulesfiles);
+	}
+	// If checked then plain mac auth is enabled
+	else {
+		freeradius_modulesfiles_resync();
+		freeradius_policyconf_resync();
+	}
+}
+
+function freeradius_modulesfiles_resync() {
+	global $config;
+	$conf = '';
+
+	$conf .= <<<EOD
+# -*- text -*-
+#
+#  \$Id\$
+
+# Livingston-style 'users' file
+#
+files {
+	# The default key attribute to use for matches.  The content
+	# of this attribute is used to match the "name" of the
+	# entry.
+	#key = "%{Stripped-User-Name:-%{User-Name}}"
+
+	usersfile = \${confdir}/users
+	acctusersfile = \${confdir}/acct_users
+	preproxy_usersfile = \${confdir}/preproxy_users
+
+	#  If you want to use the old Cistron 'users' file
+	#  with FreeRADIUS, you should change the next line
+	#  to 'compat = cistron'.  You can the copy your 'users'
+	#  file from Cistron.
+	compat = no
+}
+
+#  An example which defines a second instance of the "files" module.
+#  This instance is named "second_files".  In order for it to be used
+#  in a virtual server, it needs to be listed as "second_files"
+#  inside of the "authorize" section (or other section).  If you just
+#  list "files", that will refer to the configuration defined above.
+#
+
+#  The two names here mean:
+#	"files" - this is a configuration for the "rlm_files" module
+#	"second_files" - this is a named configuration, which isn't
+#			the default configuration.
+files authorized_macs {
+        # The default key attribute to use for matches.  The content
+        # of this attribute is used to match the "name" of the
+        # entry.
+        key = "%{Calling-Station-ID}"
+
+        usersfile = \${confdir}/authorized_macs
+
+        #  If you want to use the old Cistron 'users' file
+        #  with FreeRADIUS, you should change the next line
+        #  to 'compat = cistron'.  You can the copy your 'users'
+        #  file from Cistron.
+        compat = no
+}
+EOD;
+
+	$filename = RADDB . '/modules/files';
+	conf_mount_rw();
+	file_put_contents($filename, $conf);
+	chmod($filename, 0600);
+	conf_mount_ro();
+
+}
+
+function freeradius_policyconf_resync() {
+	global $config;
+	$conf = '';
+
+	$conf .= <<<EOD
+# -*- text -*-
+##
+## policy.conf	-- FreeRADIUS server configuration file.
+##
+##	http://www.freeradius.org/
+##	\$Id\$
+##
+
+#
+#  Policies are virtual modules, similar to those defined in the
+#  "instantate" section of radiusd.conf.
+#
+#  Defining a policy here means that it can be referenced in multiple
+#  places as a *name*, rather than as a series of conditions to match,
+#  and actions to take.
+#
+#  Policies are something like subroutines in a normal language, but
+#  they cannot be called recursively.  They MUST be defined in order.
+#  If policy A calls policy B, then B MUST be defined before A.
+#
+policy {
+	#
+	#	Forbid all EAP types.
+	#
+	forbid_eap {
+		if (EAP-Message) {
+			reject
+		}
+	}
+
+	#
+	#	Forbid all non-EAP types outside of an EAP tunnel.
+	#
+	permit_only_eap {
+		if (!EAP-Message) {
+			#  We MAY be inside of a TTLS tunnel.
+			#  PEAP and EAP-FAST require EAP inside of
+			#  the tunnel, so this check is OK.
+			#  If so, then there MUST be an outer EAP message.
+			if (!"%{outer.request:EAP-Message}") {
+				reject
+			}
+		}
+	}
+
+	#
+	#	Forbid all attempts to login via realms.
+	#
+	deny_realms {
+		if (User-Name =~ /@|\\\\/) {
+			reject
+		}
+	}
+
+	#
+	#	If you want the server to pretend that it is dead,
+	#	then use the "do_not_respond" policy.
+	#
+	do_not_respond {
+		update control {
+			Response-Packet-Type := Do-Not-Respond
+		}
+
+		handled
+	}
+
+	#
+	#  Force some sanity on User-Name.  This helps to avoid issues
+	#  issues where the back-end database is "forgiving" about
+	#  what constitutes a user name.
+	#
+	filter_username {
+		# spaces at the start: reject
+		if (User-Name =~ /^ /) {
+			reject
+		}
+
+		# spaces at the end: reject
+		if (User-Name =~ / \$\$/) {
+			reject
+		}
+
+		# Mixed case: reject
+		if (User-Name != "%{tolower:%{User-Name}}") {
+			reject
+		}
+	}
+
+
+	#	
+	#  The following policies are for the Chargeable-User-Identity
+	#  (CUI) configuration.
+	#
+
+	#
+	#  The client indicates it can do CUI by sending a CUI attribute	
+	#  containing one zero byte
+	#
+	cui_authorize {
+		update request {
+			Chargeable-User-Identity:='\\\\000'
+		}
+	}
+
+	#
+	#  Add a CUI attribute based on the User-Name, and a secret key
+	#  known only to this server.
+	#
+	cui_postauth {
+		if (FreeRadius-Proxied-To == 127.0.0.1) {
+			if (outer.request:Chargeable-User-Identity) {
+				update outer.reply {
+					Chargeable-User-Identity:="%{md5:%{config:cui_hash_key}%{User-Name}}"
+				}
+			}
+		}
+		else {
+			if (Chargeable-User-Identity) {
+				update reply {
+					Chargeable-User-Identity="%{md5:%{config:cui_hash_key}%{User-Name}}"
+				}
+			}
+		}
+	}
+
+	#
+	#  If there is a CUI attribute in the reply, add it to the DB.
+	#
+	cui_updatedb {
+		if (reply:Chargeable-User-Identity) {
+			cui
+		}
+	}
+
+	#
+	#  If we had stored a CUI for the User, add it to the request.
+	#
+	cui_accounting {
+		#
+		#  If the CUI isn't in the packet, see if we can find it
+		#  in the DB.
+		#
+		if (!Chargeable-User-Identity) {
+			update control {
+				Chargable-User-Identity := "%{cui: SELECT cui FROM cui WHERE clientipaddress = '%{Client-IP-Address}' AND callingstationid = '%{Calling-Station-Id}' AND username = '%{User-Name}'}"
+			}
+		}
+
+		#
+		#  If it exists now, then write out when we last saw
+		#  this CUI.
+		#
+		if (Chargeable-User-Identity && (Chargeable-User-Identity != "")) {
+			cui
+		}
+	}
+
+	#
+	#  Normalize the MAC Addresses in the Calling/Called-Station-Id
+	#
+	mac-addr = ([0-9a-f]{2})[^0-9a-f]?([0-9a-f]{2})[^0-9a-f]?([0-9a-f]{2})[^0-9a-f]?([0-9a-f]{2})[^0-9a-f]?([0-9a-f]{2})[^0-9a-f]?([0-9a-f]{2})
+
+	#  Add "rewrite.called_station_id" in the "authorize" and "preacct"
+	#  sections.
+	rewrite.called_station_id {
+		if((Called-Station-Id) && "%{Called-Station-Id}" =~ /^%{config:policy.mac-addr}(:(.+))?\$/i) {
+			update request {
+				Called-Station-Id := "%{tolower:%{1}-%{2}-%{3}-%{4}-%{5}-%{6}}"
+			}
+
+			# SSID component?
+			if ("%{8}") {
+				update request {
+					Called-Station-Id := "%{Called-Station-Id}:%{8}"
+				}
+			}
+			updated
+		}
+		else {
+			noop
+		}
+	}
+
+	#  Add "rewrite.calling_station_id" in the "authorize" and "preacct"
+	#  sections.
+	rewrite.calling_station_id {
+		if((Calling-Station-Id) && "%{Calling-Station-Id}" =~ /^%{config:policy.mac-addr}\$/i) {
+			update request {
+				Calling-Station-Id := "%{tolower:%{1}-%{2}-%{3}-%{4}-%{5}-%{6}}"
+			}
+			updated
+		}
+		else {
+			noop
+		}
+	}
+	
+	#####  MODIFIED FOR http://wiki.freeradius.org/Mac-Auth#Mac-Auth+or+802.1x #####
+	#  Add "rewrite_calling_station_id" in the "authorize" and "preacct"
+	#  sections.
+	rewrite_calling_station_id {
+        if (Calling-Station-Id =~ /([0-9a-f]{2})[-:]?([0-9a-f]{2})[-:]?([0-9a-f]{2})[-:]?([0-9a-f]{2})[-:]?([0-9a-f]{2})[-:]?([0-9a-f]{2})/i){
+                update request {
+                        Calling-Station-Id := "%{tolower:%{1}-%{2}-%{3}-%{4}-%{5}-%{6}}"
+                }
+        }
+        else {
+                noop
+		}
+	}
+}
+	
+EOD;
+
+	$filename = RADDB . '/policy.conf';
+	conf_mount_rw();
+	file_put_contents($filename, $conf);
+	chmod($filename, 0600);
+	conf_mount_ro();
+
 }
 
 ?>

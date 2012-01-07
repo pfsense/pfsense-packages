@@ -68,6 +68,10 @@ POSSIBILITY OF SUCH DAMAGE.
 			<url>/pkg.php?xml=freeradius.xml</url>
 		</tab>
 		<tab>
+			<text>MACs</text>
+			<url>/pkg.php?xml=freeradiusauthorizedmacs.xml</url>
+		</tab>
+		<tab>
 			<text>NAS / Clients</text>
 			<url>/pkg.php?xml=freeradiusclients.xml</url>
 		</tab>
@@ -114,7 +118,7 @@ POSSIBILITY OF SUCH DAMAGE.
 			<fielddescr>Automatically sync freeRADIUS configuration changes?</fielddescr>
 			<fieldname>varsyncenablexmlrpc</fieldname>
 			<description><![CDATA[All changes will be synced immediately to the IPs listed below if this option is checked.<br>
-						<b>Important:</b> Only <b>Users</b> and <b>NAS / Clients</b> will be synced.]]></description>
+						<b>Important:</b> Only <b>Users</b>, <b>MACs</b> and <b>NAS / Clients</b> will be synced.]]></description>
 			<type>checkbox</type>
 		</field>
 		<field>

@@ -7,7 +7,7 @@
 /* $Id$ */
 /* ========================================================================== */
 /*
-	freeradiusinterfaces.xml
+	freeradius.xml
 	part of pfSense (http://www.pfSense.com)
 	Copyright (C) 2011 - 2012 Alexander Wilke <nachtfalkeaw@web.de>
 	All rights reserved.
@@ -44,10 +44,23 @@
 	<description><![CDATA[Describe your package here]]></description>
 	<requirements>Describe your package requirements here</requirements>
 	<faq>Currently there are no FAQ items provided.</faq>
-	<name>freeradiusinterfaces</name>
-	<version>none</version>
-	<title>FreeRADIUS: Interfaces</title>
+	<name>freeradiusauthorizedmacs</name>
+	<version>2.1.12</version>
+	<title>FreeRADIUS: MACs</title>
 	<include_file>/usr/local/pkg/freeradius.inc</include_file>
+	<menu>
+		<name>FreeRADIUS</name>
+		<tooltiptext>Modify FreeRADIUS macs, clients, and settings.</tooltiptext>
+		<section>Services</section>
+		<url>/pkg.php?xml=freeradiusauthorizedmacs.xml</url>
+	</menu>
+	<service>
+		<name>radiusd</name>
+		<rcfile>radiusd.sh</rcfile>
+		<executable>radiusd</executable>
+		<description><![CDATA[FreeRADIUS Server]]></description>
+	</service>
+
 	<tabs>
 		<tab>
 			<text>Users</text>
@@ -56,6 +69,7 @@
 		<tab>
 			<text>MACs</text>
 			<url>/pkg.php?xml=freeradiusauthorizedmacs.xml</url>
+			<active/>
 		</tab>
 		<tab>
 			<text>NAS / Clients</text>
@@ -64,7 +78,6 @@
 		<tab>
 			<text>Interfaces</text>
 			<url>/pkg.php?xml=freeradiusinterfaces.xml</url>
-			<active/>
 		</tab>
 		<tab>
 			<text>Settings</text>
@@ -95,22 +108,65 @@
 			<url>/pkg_edit.php?xml=freeradiussync.xml&amp;id=0</url>
 		</tab>
 	</tabs>
+	<additional_files_needed>
+		<prefix>/usr/local/pkg/</prefix>
+		<chmod>0755</chmod>
+		<item>http://www.pfsense.org/packages/config/freeradius2/freeradius.inc</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/www/</prefix>
+		<chmod>0755</chmod>
+		<item>http://www.pfsense.org/packages/config/freeradius2/freeradius_view_config.php</item>
+	</additional_files_needed>	
+	<additional_files_needed>
+		<prefix>/usr/local/pkg/</prefix>
+		<chmod>0755</chmod>
+		<item>http://www.pfsense.org/packages/config/freeradius2/freeradiusclients.xml</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/pkg/</prefix>
+		<chmod>0755</chmod>
+		<item>http://www.pfsense.org/packages/config/freeradius2/freeradiussettings.xml</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/pkg/</prefix>
+		<chmod>0755</chmod>
+		<item>http://www.pfsense.org/packages/config/freeradius2/freeradiuseapconf.xml</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/pkg/</prefix>
+		<chmod>0755</chmod>
+		<item>http://www.pfsense.org/packages/config/freeradius2/freeradiussqlconf.xml</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/pkg/</prefix>
+		<chmod>0755</chmod>
+		<item>http://www.pfsense.org/packages/config/freeradius2/freeradiusinterfaces.xml</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/pkg/</prefix>
+		<chmod>0755</chmod>
+		<item>http://www.pfsense.org/packages/config/freeradius2/freeradiuscerts.xml</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/pkg/</prefix>
+		<chmod>0755</chmod>
+		<item>http://www.pfsense.org/packages/config/freeradius2/freeradiussync.xml</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/pkg/</prefix>
+		<chmod>0755</chmod>
+		<item>http://www.pfsense.org/packages/config/freeradius2/freeradiusmodulesldap.xml</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/pkg/</prefix>
+		<chmod>0755</chmod>
+		<item>http://www.pfsense.org/packages/config/freeradius2/freeradiusauthorizedmacs.xml</item>
+	</additional_files_needed>
 	<adddeleteeditpagefields>
 		<columnitem>
-			<fielddescr>Interface IP Address</fielddescr>
-			<fieldname>varinterfaceip</fieldname>
-		</columnitem>
-		<columnitem>
-			<fielddescr>Port</fielddescr>
-			<fieldname>varinterfaceport</fieldname>
-		</columnitem>
-		<columnitem>
-			<fielddescr>Interface Type</fielddescr>
-			<fieldname>varinterfacetype</fieldname>
-		</columnitem>
-		<columnitem>
-			<fielddescr>IP Version</fielddescr>
-			<fieldname>varinterfaceipversion</fieldname>
+			<fielddescr>MAC Address</fielddescr>
+			<fieldname>varmacaddress</fieldname>
 		</columnitem>
 		<columnitem>
 			<fielddescr>Description</fielddescr>
@@ -123,65 +179,23 @@
 			<type>listtopic</type>
 		</field>	
 		<field>
-			<fielddescr>Interface IP Address</fielddescr>
-			<fieldname>varinterfaceip</fieldname>
-			<description><![CDATA[Enter the IP address of the listening interface. e.g. 192.168.100.1 (Default: *)]]></description>
+			<fielddescr>MAC Address</fielddescr>
+			<fieldname>varmacaddress</fieldname>
+			<description><![CDATA[Enther the MAC Address of the host. Format is:  00-11-22-33-44-55]]></description>
 			<type>input</type>
-			<default_value>*</default_value>
-			<required/>
-		</field>
-		<field>
-			<fielddescr>Port</fielddescr>
-			<fieldname>varinterfaceport</fieldname>
-			<description><![CDATA[Enter the port number of the listening interface. Different interface types need different ports.<br>
-							You could use this as an example:<br>
-							auth  = 1812<br>
-							acct  = 1813<br>
-							proxy = 1814<br>
-							<b>IMPORTANT:</b> For <b>every interface type</b> listening on the <b>same IP address</b> you need <b>different ports</b>.]]></description>
-			<type>input</type>
-			<default_value>1812</default_value>
-			<required/>
-		</field>
-		<field>
-			<fielddescr>Interface Type</fielddescr>
-			<fieldname>varinterfacetype</fieldname>
-			<description><![CDATA[Enter the type of the listening interface. (Default: auth)]]></description>
-			<type>select</type>
-			<default_value>auth</default_value>
-					<options>
-						<option><name>Auth</name><value>auth</value></option>
-						<option><name>Acct</name><value>acct</value></option>
-						<option><name>Proxy</name><value>proxy</value></option>
-						<option><name>Detail</name><value>detail</value></option>
-						<option><name>Status</name><value>status</value></option>
-						<option><name>CoA</name><value>coa</value></option>
-					</options>
-			<required/>
-		</field>
-		<field>
-			<fielddescr>IP Version</fielddescr>
-			<fieldname>varinterfaceipversion</fieldname>
-			<description><![CDATA[Enter the IP version of the listening interface. (Default: IPv4)]]></description>
-			<type>select</type>
-			<default_value>ipaddr</default_value>
-					<options>
-						<option><name>IPv4</name><value>ipaddr</value></option>
-						<option><name>IPv6</name><value>ipv6addr</value></option>
-					</options>
 			<required/>
 		</field>
 		<field>
 			<fielddescr>Description</fielddescr>
-			<fieldname>description</fieldname>
-			<description><![CDATA[Enter any description you like for this interface.]]></description>
+			<fieldname>description</fieldname>			
+			<description><![CDATA[Enter any description for this MAC you like.]]></description>
 			<type>input</type>
 		</field>
 	</fields>
 	<custom_delete_php_command>
-		freeradius_settings_resync();
+		freeradius_authorizedmacs_resync();
 	</custom_delete_php_command>
 	<custom_php_resync_config_command>
-		freeradius_settings_resync();
+		freeradius_authorizedmacs_resync();
 	</custom_php_resync_config_command>
 </packagegui>
