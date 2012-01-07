@@ -104,8 +104,7 @@
 		<field>
 			<fielddescr>Enable Plain MAC Auth</fielddescr>
 			<fieldname>varsettingsenablemacauth</fieldname>
-			<description><![CDATA[This enables plain MAC auth. If the request contains not 802.1X like credentials than it will be checked against the MAC.<br>
-								Some NAS are not able to convert the MAC in a 802.1X format then you could enable this. If you doo not need this leave this disabled. It could have unknown side-effects. (Default: unchecked)]]></description>
+			<description><![CDATA[This enables plain MAC auth. The Calling-Station-Id in an Access-Request is first checked against an authorized_macs list before all other authorization methods.	If your NAS is not able to convert the MAC in a 802.1X format then you could enable this. If you do not need this leave this disabled. (Default: unchecked)]]></description>
 			<type>checkbox</type>
 		</field>
 		<field>

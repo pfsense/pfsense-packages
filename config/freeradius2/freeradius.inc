@@ -86,6 +86,10 @@ function freeradius_install_command() {
 		log_error("FreeRADIUS: Creating backup of the original file to {$filemodulesfilesbackup}");
 		copy("/usr/local/etc/raddb/modules/files", "/usr/local/etc/raddb/files.backup");
 	}
+	
+	// Disable virtual-server we do not need by default
+	unlink("/usr/local/etc/raddb/sites-enabled/control-socket");
+	unlink("/usr/local/etc/raddb/sites-enabled/inner-tunnel");
 
 	$rcfile = array();
 	$rcfile['file'] = 'radiusd.sh';
@@ -902,41 +906,32 @@ function freeradius_serverdefault_resync() {
 	$varsettings = $config['installedpackages']['freeradiussettings']['config'][0];
 	
 	// If unchecked we need the normal EAP section.
-	If (!$varsettings['varsettingsenablemacauth']) {
+	if (!$varsettings['varsettingsenablemacauth']) {
 		$varplainmacauthenable = '';
 		$varplainmacauthenable .= "eap {";
 		$varplainmacauthenable .= "\n\tok = return";
 		$varplainmacauthenable .= "\n\t}";
-		
+
 		$varplainmacpreacctenable = '';
 		$varplainmacpreacctenable .= '##### ACCOUNTING FOR PLAIN MAC-AUTH DISABLED #####';
 	}
 	// If checked we need to check if it is plain mac or eap
 	else {
 		$varplainmacauthenable = '';
-		$varplainmacauthenable .= "# if cleaning up the Calling-Station-Id...";
+		$varplainmacauthenable .= "\t### FIRST check MAC address in authorized_macs and if that fails proceed with other checks below in else-section ###";
+		$varplainmacauthenable .= "\n\t# if cleaning up the Calling-Station-Id...";
 		$varplainmacauthenable .= "\n\trewrite_calling_station_id";
-		$varplainmacauthenable .= "\n\t# If this is NOT 802.1x, assume mac-auth";
-		$varplainmacauthenable .= "\n\tif (!EAP-Message) {";
-		$varplainmacauthenable .= "\n\t\t# now check against the authorized_macs file";
-		$varplainmacauthenable .= "\n\t\tauthorized_macs";
-		$varplainmacauthenable .= "\n\t\tif (!ok) {";
-		$varplainmacauthenable .= "\n\t\t\treject";
-		$varplainmacauthenable .= "\n\t\t}";
-		$varplainmacauthenable .= "\n\t\telse {";
-		$varplainmacauthenable .= "\n\t\t\t# accept";
+		$varplainmacauthenable .= "\n\t# now check against the authorized_macs file";
+		$varplainmacauthenable .= "\n\tauthorized_macs";
+		$varplainmacauthenable .= "\n\tif (ok) {";
 		$varplainmacauthenable .= "\n\t\t\tupdate control {";
-		$varplainmacauthenable .= "\n\t\t\t\tAuth-Type := Accept";
-		$varplainmacauthenable .= "\n\t\t\t}";
+		$varplainmacauthenable .= "\n\t\t\tAuth-Type := Accept";
 		$varplainmacauthenable .= "\n\t\t}";
 		$varplainmacauthenable .= "\n\t}";
-		$varplainmacauthenable .= "\n\telse {";
-		$varplainmacauthenable .= "\n\t\t# normal FreeRadius virtual server config goes here e.g.";
-		$varplainmacauthenable .= "\n\t\teap";
-		$varplainmacauthenable .= "\n\t}";
-		
+		$varplainmacauthenable .= "\n\t### Here we have to place all other authorize modules which should be check when MAC fails ###";
+
 		$varplainmacpreacctenable = '';
-		$varplainmacpreacctenable .= '##### ACCOUNTING FOR PLAIN MAC-AUTH #####';
+		$varplainmacpreacctenable .= '##### ACCOUNTING FOR PLAIN MAC-AUTH ENABLED #####';
 		$varplainmacpreacctenable .= "\n\trewrite_calling_station_id";
 	}
 	
@@ -1032,27 +1027,6 @@ authorize {
 	preprocess
 	
 	#
-	#  This module takes care of EAP-MD5, EAP-TLS, and EAP-LEAP
-	#  authentication.
-	#
-	#  It also sets the EAP-Type attribute in the request
-	#  attribute list to the EAP type from the packet.
-	#
-	#  As of 2.0, the EAP module returns "ok" in the authorize stage
-	#  for TTLS and PEAP.  In 1.x, it never returned "ok" here, so
-	#  this change is compatible with older configurations.
-	#
-	#  The example below uses module failover to avoid querying all
-	#  of the following modules if the EAP module returns "ok".
-	#  Therefore, your LDAP and/or SQL servers will not be queried
-	#  for the many packets that go back and forth to set up TTLS
-	#  or PEAP.  The load on those servers will therefore be reduced.
-	#
-	
-	$varplainmacauthenable
-	
-		
-	#
 	#  If you want to have a log of authentication requests,
 	#  un-comment the following line, and the 'detail auth_log'
 	#  section, above.
@@ -1098,9 +1072,30 @@ authorize {
 	#  Otherwise, when the first style of realm doesn't match,
 	#  the other styles won't be checked.
 	#
+	
 	suffix
 	ntdomain
-
+	
+	#
+	#  This module takes care of EAP-MD5, EAP-TLS, and EAP-LEAP
+	#  authentication.
+	#
+	#  It also sets the EAP-Type attribute in the request
+	#  attribute list to the EAP type from the packet.
+	#
+	#  As of 2.0, the EAP module returns "ok" in the authorize stage
+	#  for TTLS and PEAP.  In 1.x, it never returned "ok" here, so
+	#  this change is compatible with older configurations.
+	#
+	#  The example below uses module failover to avoid querying all
+	#  of the following modules if the EAP module returns "ok".
+	#  Therefore, your LDAP and/or SQL servers will not be queried
+	#  for the many packets that go back and forth to set up TTLS
+	#  or PEAP.  The load on those servers will therefore be reduced.
+	#
+	
+	$varplainmacauthenable
+	
 	#
 	#  Pull crypt'd passwords from /etc/passwd or /etc/shadow,
 	#  using the system API's to get the password.  If you want
@@ -1157,7 +1152,7 @@ authorize {
 	#  get a chance to set Auth-Type for themselves.
 	#
 	pap
-
+	
 	#
 	#  If "status_server = yes", then Status-Server messages are passed
 	#  through the following section, and ONLY the following section.
@@ -2951,7 +2946,7 @@ policy {
                 }
         }
         else {
-                noop
+            noop
 		}
 	}
 }
