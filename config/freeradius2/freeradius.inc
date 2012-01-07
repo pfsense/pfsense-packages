@@ -94,7 +94,7 @@ function freeradius_install_command() {
         conf_mount_rw();
 	write_rcfile($rcfile);
         conf_mount_ro();
-	restart_service("radiusd");
+	start_service("radiusd");
 }
 
 function freeradius_settings_resync() {
@@ -444,7 +444,7 @@ EOD;
 	conf_mount_ro();
 	
 	freeradius_sync_on_changes();
-	restart_service('freeradius');
+	restart_service('radiusd');
 }
 
 
@@ -460,7 +460,7 @@ if (is_array($arrmacs) && !empty($arrmacs)) {
 	
 	// Variables for macs file defined parameters
 	$varmacaddress = $macs['varmacaddress'];
-	$varmacaddress = "\n$varmacaddress";
+	$varmacaddress = "$varmacaddress" . "\n";
 	
 	$conf .= <<<EOD
 $varmacaddress
@@ -475,7 +475,7 @@ EOD;
 	conf_mount_ro();
 	
 	freeradius_sync_on_changes();
-	restart_service('freeradius');
+	restart_service('radiusd');
 }
 
 
@@ -727,7 +727,7 @@ EOD;
 	chmod($filename, 0600);
 	conf_mount_ro();
 
-	restart_service('freeradius');
+	restart_service('radiusd');
 }
 
 // Gets started from freeradiuseapconf.xml
@@ -830,7 +830,7 @@ EOD;
 	
 	// We don't need a restart at this time because there are additional changes needed in:
 	// "freeradius_settings_resync" and "freeradius_serverdefault_resync".
-	// restart_service('freeradius');
+	// restart_service('radiusd');
 	freeradius_settings_resync();
 }
 
@@ -1600,7 +1600,7 @@ EOD;
 	conf_mount_ro();
 	
 	// No need to restart here because the restart of the service will be done in "freeradius_settings_resync"
-	// restart_service('freeradius');
+	// restart_service('radiusd');
 }
 
 function freeradius_cacertcnf_resync() {
@@ -1957,7 +1957,7 @@ function freeradius_allcertcnf_resync() {
 		log_error("freeRADIUS: Added client.csr .crt .key .pem together with ca.der in /usr/local/etc/raddb/certs/client.tar");
 		
 		// If there were changes on the certificates we need to restart freeradius
-		restart_service('freeradius');
+		restart_service('radiusd');
 		}
 }
 
@@ -2929,17 +2929,17 @@ policy {
 
 	#  Add "rewrite.calling_station_id" in the "authorize" and "preacct"
 	#  sections.
-	rewrite.calling_station_id {
-		if((Calling-Station-Id) && "%{Calling-Station-Id}" =~ /^%{config:policy.mac-addr}\$/i) {
-			update request {
-				Calling-Station-Id := "%{tolower:%{1}-%{2}-%{3}-%{4}-%{5}-%{6}}"
-			}
-			updated
-		}
-		else {
-			noop
-		}
-	}
+	#rewrite.calling_station_id {
+	#	if((Calling-Station-Id) && "%{Calling-Station-Id}" =~ /^%{config:policy.mac-addr}\$/i) {
+	#		update request {
+	#			Calling-Station-Id := "%{tolower:%{1}-%{2}-%{3}-%{4}-%{5}-%{6}}"
+	#		}
+	#		updated
+	#	}
+	#	else {
+	#		noop
+	#	}
+	#}
 	
 	#####  MODIFIED FOR http://wiki.freeradius.org/Mac-Auth#Mac-Auth+or+802.1x #####
 	#  Add "rewrite_calling_station_id" in the "authorize" and "preacct"
