@@ -55,6 +55,10 @@
 			<url>/pkg.php?xml=freeradius.xml</url>
 		</tab>
 		<tab>
+			<text>MACs</text>
+			<url>/pkg.php?xml=freeradiusauthorizedmacs.xml</url>
+		</tab>
+		<tab>
 			<text>NAS / Clients</text>
 			<url>/pkg.php?xml=freeradiusclients.xml</url>
 		</tab>
@@ -93,6 +97,17 @@
 		</tab>
 	</tabs>
 	<fields>
+		<field>
+			<name>PLAIN MAC AUTHORIZATION</name>
+			<type>listtopic</type>
+		</field>
+		<field>
+			<fielddescr>Enable Plain MAC Auth</fielddescr>
+			<fieldname>varsettingsenablemacauth</fieldname>
+			<description><![CDATA[This enables plain MAC auth. If the request contains not 802.1X like credentials than it will be checked against the MAC.<br>
+								Some NAS are not able to convert the MAC in a 802.1X format then you could enable this. If you doo not need this leave this disabled. It could have unknown side-effects. (Default: unchecked)]]></description>
+			<type>checkbox</type>
+		</field>
 		<field>
 			<name>GENERAL CONFIGURATION</name>
 			<type>listtopic</type>
@@ -284,7 +299,7 @@
 			<description><![CDATA[You should only change this if you encounter memory leaks while running RADIUS. (Default: 0)]]></description>
 			<type>input</type>
 			<default_value>0</default_value>
-		</field>		
+		</field>
 	</fields>
 	<custom_delete_php_command>
 		freeradius_settings_resync();

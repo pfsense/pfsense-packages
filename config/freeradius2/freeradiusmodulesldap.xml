@@ -55,6 +55,10 @@
 			<url>/pkg.php?xml=freeradius.xml</url>
 		</tab>
 		<tab>
+			<text>MACs</text>
+			<url>/pkg.php?xml=freeradiusauthorizedmacs.xml</url>
+		</tab>
+		<tab>
 			<text>NAS / Clients</text>
 			<url>/pkg.php?xml=freeradiusclients.xml</url>
 		</tab>
