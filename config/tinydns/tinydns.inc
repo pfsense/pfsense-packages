@@ -235,9 +235,6 @@ function tinydns_custom_php_changeip_command() {
 
 	if(!empty($config['installedpackages']['tinydns']['config'][0]['enableforwarding'])) {
 		$interfaces = explode(",", $config['installedpackages']['tinydns']['config'][0]['interface']);
-		exec("/bin/cp {$g['varetc_path']}/resolv.conf {$g['varetc_path']}/resolv.conf.original");
-		exec("/bin/cp {$g['varetc_path']}/resolv.conf {$g['varetc_path']}/resolv.conf.dnscache");
-		exec("echo domain {$config['system']['domain']} > {$g['varetc_path']}/resolv.conf");
 		exec("rm -rf {$g['varetc_path']}/dnscache* {$g['varrun_path']}/service/dnscache*");
 		foreach ($interfaces as $dnsidx => $dnsif) {
 			$dnscacheif = convert_friendly_interface_to_real_interface_name($dnsif);
@@ -269,12 +266,9 @@ function tinydns_custom_php_changeip_command() {
 				exec("/bin/mkdir -p {$g['varetc_path']}/dnscache{$dnsidx}/root/ip");
 			exec("/usr/bin/touch {$g['varetc_path']}/dnscache{$dnsidx}/root/ip/{$dnsuserip}");
 			tinydns_create_soa_domain_list($dnsserverip, $dnsidx);
-			exec("echo nameserver {$dnscacheip} >> {$g['varetc_path']}/resolv.conf");
 		}
 		exec("/usr/bin/killall -9 dnscache");
 	} else {
-		if(file_exists("{$g['varetc_path']}/resolv.conf.original"))
-			exec("/bin/cp {$g['varetc_path']}/resolv.conf.original {$g['varetc_path']}/resolv.conf");
 		$interfaces = explode(",", $$config['installedpackages']['tinydns']['config'][0]['interface']);
 		foreach ($interfaces as $dnsidx => $dnsif) {
 			if(is_dir("{$g['varetc_path']}/dnscache{$dnsidx}"))
@@ -1186,42 +1180,6 @@ function tinydns_create_soa_domain_list($dnsserverip, $index = 0) {
 			}
 		}	
 	}	
-}
-
-/* This function is not called */
-/* At the moment there is no tagging of DNSroute to a WAN port. It needs to be added  */
-function tinydns_register_forwarding_servers() {
-	global $g;
-
-	$fr = fopen("{$g['varetc_path']}/resolv.conf", "r");
-	if (! $fr) {
-		printf("Error: cannot open resolv.conf in tinydns_register_forwarding_servers().\n");
-		return 1;
-	}
-	$lip = strlen("nameserver") + 1;
-	$j = 0;
-	$nsrecords = "";
-	$arecords = "";
-	while (!feof($fr)) {
-		$routers = fgets($fr, 4096);
-		$discard = ($routers[0] == "\n"); 
-		if(!$discard) {
-			if ($routerip = strstr($routers,"nameserver")) {
-				$routerip = substr($routerip,$lip);
-				if($routerip) {
-					$j += 1;
-					$routerfqdn = "DNSroute-{$j}.wan{$j}";
-					$routerns = "&::{$routerfqdn}";
-					$routera = "={$routerfqdn}:{$routerip}";
-					$nsrecords .= $routerns . "\n";
-					$arecords .= $routera;
-				}	
-			}
-		}	
-	}
-	fclose($fr);
-	$dnsroutes ="{$nsrecords}{$arecords}";
-	return $dnsroutes;
 }
 
 function tinydns_register_root_servers() {
