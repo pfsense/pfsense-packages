@@ -2545,7 +2545,7 @@ ldap {
 
 	# Mapping of RADIUS dictionary attributes to LDAP
 	# directory attributes.
-	dictionary_mapping = ${confdir}/ldap.attrmap
+	dictionary_mapping = \${confdir}/ldap.attrmap
 	################## THE BELOW IS NOT COMPILED WITH FREERADIUS #################################
 	#  Set password_attribute = nspmPassword to get the
 	#  user's password from a Novell eDirectory
