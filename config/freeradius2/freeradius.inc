@@ -77,13 +77,13 @@ function freeradius_install_command() {
 	
 	// creating a backup file of the original policy.conf no matter if user checked this or not
 	if (!file_exists("/usr/local/etc/raddb/policy.conf.backup")) {
-		log_error("FreeRADIUS: Creating backup of the original file to {$filepolicyconfbackup}");
+		log_error("FreeRADIUS: Creating backup of the original file to /usr/local/etc/raddb/policy.conf.backup");
 		copy("/usr/local/etc/raddb/policy.conf", "/usr/local/etc/raddb/policy.conf.backup");
 	}
 	
 	// creating a backup file of the original /modules/files no matter if user checked this or not
 	if (!file_exists("/usr/local/etc/raddb/files.backup")) {
-		log_error("FreeRADIUS: Creating backup of the original file to {$filemodulesfilesbackup}");
+		log_error("FreeRADIUS: Creating backup of the original file to /usr/local/etc/raddb/files.backup");
 		copy("/usr/local/etc/raddb/modules/files", "/usr/local/etc/raddb/files.backup");
 	}
 	
@@ -907,20 +907,17 @@ function freeradius_serverdefault_resync() {
 	
 	// If unchecked we need the normal EAP section.
 	if (!$varsettings['varsettingsenablemacauth']) {
-		$varplainmacauthenable = '';
-		$varplainmacauthenable .= "eap {";
-		$varplainmacauthenable .= "\n\tok = return";
-		$varplainmacauthenable .= "\n\t}";
+		$varplainmacauthenable = '##### AUTHORIZE FOR PLAIN MAC-AUTH IS DISABLED #####';
 
-		$varplainmacpreacctenable = '';
-		$varplainmacpreacctenable .= '##### ACCOUNTING FOR PLAIN MAC-AUTH DISABLED #####';
+		$varplainmacpreacctenable = '##### ACCOUNTING FOR PLAIN MAC-AUTH DISABLED #####';
 	}
 	// If checked we need to check if it is plain mac or eap
 	else {
 		$varplainmacauthenable = '';
-		$varplainmacauthenable .= "\t### FIRST check MAC address in authorized_macs and if that fails proceed with other checks below in else-section ###";
-		$varplainmacauthenable .= "\n\t# if cleaning up the Calling-Station-Id...";
+		$varplainmacauthenable .= "### FIRST check MAC address in authorized_macs and if that fails proceed with other checks below in else-section ###";
+		$varplainmacauthenable .= "\n\t### if cleaning up the Calling-Station-Id...###";
 		$varplainmacauthenable .= "\n\trewrite_calling_station_id";
+		$varplainmacauthenable .= "\n\t";
 		$varplainmacauthenable .= "\n\t# now check against the authorized_macs file";
 		$varplainmacauthenable .= "\n\tauthorized_macs";
 		$varplainmacauthenable .= "\n\tif (ok) {";
@@ -1027,6 +1024,10 @@ authorize {
 	preprocess
 	
 	#
+	#
+	$varplainmacauthenable
+	
+	#
 	#  If you want to have a log of authentication requests,
 	#  un-comment the following line, and the 'detail auth_log'
 	#  section, above.
@@ -1093,8 +1094,11 @@ authorize {
 	#  for the many packets that go back and forth to set up TTLS
 	#  or PEAP.  The load on those servers will therefore be reduced.
 	#
+	#
 	
-	$varplainmacauthenable
+	eap {
+		ok = return
+	}
 	
 	#
 	#  Pull crypt'd passwords from /etc/passwd or /etc/shadow,
@@ -1288,10 +1292,9 @@ preacct {
 	#  The start time is: NOW - delay - session_length
 	#
 
-#	  update request {
-#	  	FreeRADIUS-Acct-Session-Start-Time = "%{expr: %l - %{%{Acct-Session-Time}:-0} - %{%{Acct-Delay-Time}:-0}}"
-#	}
-
+	update request {
+		FreeRADIUS-Acct-Session-Start-Time = "%{expr: %l - %{%{Acct-Session-Time}:-0} - %{%{Acct-Delay-Time}:-0}}"
+	}
 
 	#
 	#  Ensure that we have a semi-unique identifier for every
