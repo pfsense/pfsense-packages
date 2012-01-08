@@ -455,6 +455,71 @@
 		}
 	}
 	
+	function outputled_enabled_CFontz633(){
+		global $config;
+		$lcdproc_config = $config['installedpackages']['lcdproc']['config'][0];
+		$value = $lcdproc_config['outputleds'];
+		if (is_null($value)) 
+			{return false;}	
+		else
+		{			
+			if ($value && $lcdproc_config['driver'] == "CFontz633")
+				{return true;}
+			else
+				{return false;}
+		}
+	}
+	
+	function outputled_carp () {
+		/* Returns the status of CARP for the box. 
+		Assumes ALL CARP status are the same for all the intefaces.
+			-1 = CARP Disabled
+			0  = CARP on Backup 
+			1  = CARP on Master */
+		global $g;
+		global $config;
+
+		if(is_array($config['virtualip']['vip'])) {
+		  	$carpint = 0;
+			foreach($config['virtualip']['vip'] as $carp) {
+				if ($carp['mode'] != "carp") {
+					 continue;
+				}
+				$carp_int = find_carp_interface($carp['subnet']);
+				$status = get_carp_interface_status($carp_int);
+				switch($status) {
+					case "MASTER":
+						return 1;
+						break;
+					case "BACKUP":
+						return 0;
+						break;
+				}
+			}			
+		} else {
+			return -1;
+		}		
+	}	
+	
+	function outputled_gateway() {
+		/* Returns the status of the gateways. 
+			-1 = No gateway defined
+			0  = At least 1 gateway down or with issues
+			1  = All gateway up  */
+		global $g;
+		global $config;
+		$gateways_status = array();
+		$gateways_status = return_gateways_status(true);
+		foreach ($a_gateways as $gname => $gateway)
+		{
+			if ($gateways_status[$gname]['status'] != "none")
+			{
+				return 0;
+			}
+		}
+		return 1;
+	}
+	
 	function get_traffic_stats(&$in_data, &$out_data){
 		global $config;
 		global $traffic_last_ugmt, $traffic_last_ifin, $traffic_last_ifout;
@@ -673,7 +738,7 @@
 				$lcd_summary_data = sprintf("%02d%% %02d%% %6d", cpu_usage(),  mem_usage(), $summary_states[0]);
 				if ($lcdpanel_width > "16") {
 					$lcd_summary_data = $lcd_summary_data . sprintf(" %3d%%", get_cpufrequency_perc());
-				}
+				}				
 			}
 			else {	
 				$lcd_summary_data = "";}
@@ -682,6 +747,42 @@
 			
 			/* initializes the widget counter */
 			$widget_counter = 0;
+
+			/* controls the output leds */
+			if (outputled_enabled_CFontz633())
+			{
+				$led_output_value = 0;
+				/* LED 1: Interface status */
+				if (substr_count(get_interfaces_stats(), "Down") > 0 )
+					{$led_output_value = $led_output_value + pow(2, 0);}
+				else
+					{$led_output_value = $led_output_value + pow(2, 4);}
+				/* LED 2: CARP status */
+				switch (outputled_carp())
+				{
+					case -1:/* CARP disabled */
+					case 0: /* CARP on Backup */
+						{$led_output_value = $led_output_value + pow(2, 1);}
+					case 1: /* CARP on Master */
+						{$led_output_value = $led_output_value + pow(2, 5);}
+				}
+				/* LED 3: CPU Usage */
+				if (cpu_usage() > 50)
+					{$led_output_value = $led_output_value + pow(2, 2);}
+				else
+					{$led_output_value = $led_output_value + pow(2, 6);}
+				/* LED 4: Gateway status */
+				switch (outputled_gateway())
+				{
+					case -1:/* Gateways not configured */
+					case 0: /* Gateway down or with issues */
+						{$led_output_value = $led_output_value + 2 ^ 3;}
+					case 1: /* All Gateways up */
+						{$led_output_value = $led_output_value + 2 ^ 7;}
+				}				
+				/* Sends the command to the panel */
+				$lcd_cmds[] = "output {$led_output_value}";
+			}
 			
 			/* process screens to display */
 			foreach((array) $lcdproc_screens_config as $name => $screen) {
@@ -767,7 +868,6 @@
 						$lcd_cmds[] = "widget_set $name text_wdgt 1 2 \"{$out_data}\"";
 						break;					
 				}
-				add_summary_values($lcd_cmds, $name, $lcd_summary_data, $lcdpanel_width);
 				if ($name != "scr_traffic_interface") {
 					$widget_counter++;
 					add_summary_values($lcd_cmds, $name, $lcd_summary_data, $lcdpanel_width);
