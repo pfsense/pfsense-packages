@@ -802,27 +802,21 @@
 		<name>freeradius2</name>
 		<website>http://www.freeradius.org/</website>
 		<descr><![CDATA[A free implementation of the RADIUS protocol.<br>
-				Do not use together with freeradius package. Both are using the same XML files.]]></descr>
+					Support: MySQL, PostgreSQL, LDAP, Kerberos<br>
+					FreeRADIUS and FreeRADIUS2 settings are not compatible so don't use them together or try to update<br>
+					On pfSense docs there is a how-to which could help you on porting users.]]></descr>
 		<pkginfolink>http://doc.pfsense.org/index.php/FreeRADIUS_2.x_package</pkginfolink>
 		<category>System</category>
-		<version>2.1.12 pkg v1.4.6</version>
+		<version>2.1.12 pkg v1.4.7</version>
 		<status>BETA</status>
 		<required_version>2.0</required_version>
 		<maintainer>nachtfalkeaw@web.de</maintainer>
-		<depends_on_package_base_url>http://ftp.freebsd.org/pub/FreeBSD/ports/i386/packages-8-stable/All/</depends_on_package_base_url>
+		<depends_on_package_base_url>http://e-sac.siteseguro.ws/packages/8/All/</depends_on_package_base_url>
 		<depends_on_package>freeradius-2.1.12.tbz</depends_on_package>
-		<depends_on_package>python27-2.7.2_3.tbz</depends_on_package>
-		<depends_on_package>perl-5.12.4_3.tbz</depends_on_package>
-		<depends_on_package>libltdl-2.4_1.tbz</depends_on_package>
-		<depends_on_package>gdbm-1.9.1.tbz</depends_on_package>
+		<depends_on_package>openldap-sasl-client-2.4.26.tbz</depends_on_package>
 		<config_file>http://www.pfsense.org/packages/config/freeradius2/freeradius.xml</config_file>
 		<configurationfile>freeradius.xml</configurationfile>
-		<build_port_path>/usr/ports/net/freeradius2</build_port_path>
-		<build_port_path>/usr/ports/lang/python27</build_port_path>
-		<build_port_path>/usr/ports/lang/perl5.12</build_port_path>
-		<build_port_path>/usr/ports/devel/libltdl</build_port_path>
-		<build_port_path>/usr/ports/databases/gdbm</build_port_path>
-		<after_install_info>Please visit Services: freeRADIUS</after_install_info>
+		<after_install_info>Please visit Services: FreeRADIUS</after_install_info>
 	</package>	
 	<package>
 		<name>bandwidthd</name>
