@@ -96,7 +96,7 @@
 	<package>
 		<name>squid-reverse</name>
 		<descr><![CDATA[High performance web proxy cache.<br>
-					   It combines squid as a proxy server with it's capabilities of actinge as a.<br>
+					   It combines squid as a proxy server with it's capabilities of acting as a<br>
 					   HTTP / HTTPS reverse proxy.<br>
 					   It includes an Exchange-Web-Access (OWA) Assistant.<br>
 					   squid-reverse replaces the squid-package (squid config is maintained).]]></descr>
@@ -634,7 +634,7 @@
 		<descr>pfSense version of TinyDNS which features failover host support</descr>
 		<website>http://cr.yp.to/djbdns.html</website>
 		<category>Services</category>
-		<version>1.0.6.16</version>
+		<version>1.0.6.17</version>
 		<status>Beta</status>
 		<pkginfolink>http://doc.pfsense.org/index.php/Tinydns_package</pkginfolink>
 		<required_version>2.0</required_version>
@@ -852,7 +852,7 @@
 				Do not use together with freeradius package. Both are using the same XML files.]]></descr>
 		<pkginfolink>http://doc.pfsense.org/index.php/FreeRADIUS_2.x_package</pkginfolink>
 		<category>System</category>
-		<version>2.1.12 pkg v1.4.4</version>
+		<version>2.1.12 pkg v1.4.6</version>
 		<status>BETA</status>
 		<required_version>2.0</required_version>
 		<maintainer>nachtfalkeaw@web.de</maintainer>
