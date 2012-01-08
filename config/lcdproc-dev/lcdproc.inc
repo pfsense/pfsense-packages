@@ -240,18 +240,38 @@
 			$config_text .= "DriverPath=/usr/local/lib/lcdproc/\n";
 			$config_text .= "GoodBye=\"Thanks for using\"\n";
 			$config_text .= "GoodBye=\"    {$g['product_name']}     \"\n";
-			/* FIXME: Specific to the pyramid project */
-			$config_text .= "ToggleRotateKey=Enter\n";
-			$config_text .= "PrevScreenKey=Left\n";
-			$config_text .= "NextScreenKey=Right\n";
-			$config_text .= "ScrollUpKey=Up\n";
-			$config_text .= "ScrollDownKey=Down\n";
-			/* FIXME: pyramid test menu */
-			$config_text .= "[menu]\n";
-			$config_text .= "MenuKey=Escape\n";
-			$config_text .= "EnterKey=Enter\n";
-			$config_text .= "UpKey=Up\n";
-			$config_text .= "DownKey=Down\n";
+			if ($lcdproc_config[backlight] != "" && $lcdproc_config[backlight] != "default")
+			{
+				/* Backlight setting */
+				$config_text .= "Backlight={$lcdproc_config[backlight]}\n";				
+			}
+			if ($lcdproc_config[driver] == "sdeclcd")
+			{
+				/* Sdeclcd Keys settings */
+				$config_text .= "PrevScreenKey=Down\n";
+				$config_text .= "NextScreenKey=Up\n";
+				/* Sdeclcd Menu settings */
+				$config_text .= "[menu]\n";
+				$config_text .= "MenuKey=Left\n";
+				$config_text .= "EnterKey=Right\n";
+				$config_text .= "UpKey=Up\n";
+				$config_text .= "DownKey=Down\n";			
+			}
+			else
+			{
+				/* Generic Keys settings */
+				$config_text .= "ToggleRotateKey=Enter\n";
+				$config_text .= "PrevScreenKey=Left\n";
+				$config_text .= "NextScreenKey=Right\n";
+				$config_text .= "ScrollUpKey=Up\n";
+				$config_text .= "ScrollDownKey=Down\n";
+				/* Generic Menu settings */
+				$config_text .= "[menu]\n";
+				$config_text .= "MenuKey=Escape\n";
+				$config_text .= "EnterKey=Enter\n";
+				$config_text .= "UpKey=Up\n";
+				$config_text .= "DownKey=Down\n";
+			}
 			/* lcdproc default driver definitions */
 			switch($lcdproc_config[driver]) {
 				case "bayrad":
@@ -338,20 +358,6 @@
 					$config_text .= "DelayBus=true\n";
 					$config_text .= "Size={$lcdproc_config['size']}\n";
 					break;
-				case "hd44780 fast":
-					$config_text .= "[{$lcdproc_config['driver']}]\n";
-					$config_text .= "ConnectionType=lcd2usb\n";
-					$config_text .= "Charmap=hd44780_default\n";					
-					$config_text .= "Keypad=yes\n";
-					$config_text .= set_lcd_value("contrast", 1000, 850);
-					$config_text .= set_lcd_value("brightness", 1000, 800);
-					$config_text .= set_lcd_value("offbrightness", 1000, 0);
-					$config_text .= "Backlight=yes\n";
-					$config_text .= "OutputPort=no\n";
-					$config_text .= "DelayMult=1\n";
-					$config_text .= "DelayBus=no\n";
-					$config_text .= "Size={$lcdproc_config['size']}\n";
-					break;					
 				case "icp_a106":
 					$config_text .= "[{$lcdproc_config['driver']}]\n";
 					$config_text .= "Device={$realport}\n";

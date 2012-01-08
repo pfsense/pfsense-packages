@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <packagegui>
-	<title>Services: LCDproc 0.5.4 pkg v. 0.6</title>
+	<title>Services: LCDproc 0.5.4 pkg v. 0.7</title>
 	<name>lcdproc</name>
-	<version>0.5.4 pkg v. 0.6</version>
+	<version>0.5.4 pkg v. 0.7</version>
 	<savetext>Save</savetext>
 	<include_file>/usr/local/pkg/lcdproc.inc</include_file>
 	<tabs>
@@ -203,10 +203,6 @@
 					<value>hd44780</value>
 					<name>hd44780</name>
 				</option>
-				<option>
-					<value>hd44780 fast</value>
-					<name>hd44780 fast</name>
-				</option>				
 				<option>
 					<value>icp_a106</value>
 					<name>icp_a106</name>
@@ -546,6 +542,39 @@
 				</option>
 			</options>			
 			<default_value>-1</default_value>
+		</field>	
+		<field>
+			<fieldname>backlight</fieldname>
+			<fielddescr>Backlight</fielddescr>
+			<description>Set the backlight setting. If set to the default value, then the backlight setting of the display can be influenced by the clients. This option is not supported by all the LCD panels, leave "default" if unsure.</description>
+			<type>select</type>
+			<options>
+				<option>
+					<value>default</value>
+					<name>Default</name>
+				</option>
+				<option>
+					<value>on</value>
+					<name>On</name>
+				</option>
+				<option>
+					<value>off</value>
+					<name>Off</name>
+				</option>
+			</options>
+			<default_value>default</default_value>
+		</field>
+		<field>
+			<fieldname>outputleds</fieldname>
+			<fielddescr>Enable Output LEDs</fielddescr>
+			<description>Enable the Output LEDs present on some LCD panels. This feature is currently supported by the CFontz633 driver only. &lt;br&gt;
+				Each LED can be off or show two colors: RED (alarm) or GREEN (everything ok) and shows: &lt;br&gt;
+				LED1: NICs status (green: ok, red: at least one nic down);&lt;br&gt;
+				LED2: CARP status (green: master, red: backup, off: CARP not implemented);&lt;br&gt;
+				LED3: CPU status (green &lt; 50, red &gt; 50%);&lt;br&gt;
+				LED4: Gateway status (green: ok, red: at least one gateway not responding, off: no gateway configured).</description>
+			<type>checkbox</type>
+			<default_value>default</default_value>
 		</field>		
 	</fields>
 	<custom_php_command_before_form>
