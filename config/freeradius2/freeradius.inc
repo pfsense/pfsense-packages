@@ -90,7 +90,40 @@ function freeradius_install_command() {
 	// Disable virtual-server we do not need by default
 	unlink("/usr/local/etc/raddb/sites-enabled/control-socket");
 	unlink("/usr/local/etc/raddb/sites-enabled/inner-tunnel");
-
+	
+	// We need some additional files in /usr/local/lib for the LDAP module. We fetch these files dependent on the architecture.
+	// For i386 systems
+	if (exec("uname -m") == "i386") {
+		exec("cd /usr/local/lib/ && fetch http://e-sac.siteseguro.ws/pfsense/8/All/ldd/libasn1.so.10");
+		exec("cd /usr/local/lib/ && fetch http://e-sac.siteseguro.ws/pfsense/8/All/ldd/libgssapi.so.10");
+		exec("cd /usr/local/lib/ && fetch http://e-sac.siteseguro.ws/pfsense/8/All/ldd/libheimntlm.so.10");
+		exec("cd /usr/local/lib/ && fetch http://e-sac.siteseguro.ws/pfsense/8/All/ldd/libhx509.so.10");
+		exec("cd /usr/local/lib/ && fetch http://e-sac.siteseguro.ws/pfsense/8/All/ldd/libkrb5.so.10");
+		exec("cd /usr/local/lib/ && fetch http://e-sac.siteseguro.ws/pfsense/8/All/ldd/libroken.so.10");
+		exec("chmod 0755 /usr/local/lib/libasn1.so.10");
+		exec("chmod 0755 /usr/local/lib/libgssapi.so.10");
+		exec("chmod 0755 /usr/local/lib/libheimntlm.so.10");
+		exec("chmod 0755 /usr/local/lib/libhx509.so.10");
+		exec("chmod 0755 /usr/local/lib/ldd/libkrb5.so.10");
+		exec("chmod 0755 /usr/local/lib/libroken.so.10");
+	}
+	// For amd64 systems
+	else {
+		exec("cd /usr/local/lib/ && fetch http://e-sac.siteseguro.ws/pfsense/8/amd64/All/ldd/libasn1.so.10");
+		exec("cd /usr/local/lib/ && fetch http://e-sac.siteseguro.ws/pfsense/8/amd64/All/ldd/libgssapi.so.10");
+		exec("cd /usr/local/lib/ && fetch http://e-sac.siteseguro.ws/pfsense/8/amd64/All/ldd/libheimntlm.so.10");
+		exec("cd /usr/local/lib/ && fetch http://e-sac.siteseguro.ws/pfsense/8/amd64/All/ldd/libhx509.so.10");
+		exec("cd /usr/local/lib/ && fetch http://e-sac.siteseguro.ws/pfsense/8/amd64/All/ldd/libkrb5.so.10");
+		exec("cd /usr/local/lib/ && fetch http://e-sac.siteseguro.ws/pfsense/8/amd64/All/ldd/libroken.so.10");
+		exec("chmod 0755 /usr/local/lib/libasn1.so.10");
+		exec("chmod 0755 /usr/local/lib/libgssapi.so.10");
+		exec("chmod 0755 /usr/local/lib/libheimntlm.so.10");
+		exec("chmod 0755 /usr/local/lib/libhx509.so.10");
+		exec("chmod 0755 /usr/local/lib/ldd/libkrb5.so.10");
+		exec("chmod 0755 /usr/local/lib/libroken.so.10");
+	}
+	
+	
 	$rcfile = array();
 	$rcfile['file'] = 'radiusd.sh';
 	$rcfile['start'] = '/usr/local/etc/rc.d/radiusd onestart';
