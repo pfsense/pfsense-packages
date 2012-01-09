@@ -878,23 +878,48 @@ function freeradius_serverdefault_resync() {
 	
 	// Get Variables from freeradiusmodulesldap.xml
 	$arrmodulesldap = $config['installedpackages']['freeradiusmodulesldap']['config'][0];
+	// failover/loadbalancing mode
+	$varmodulesldap2failover = ($arrmodulesldap['varmodulesldap2failover']?$arrmodulesldap['varmodulesldap2failover']:'redundant');
 	
-	// If unchecked then disable authorize
+	// If unchecked then disable authorize ldap2
+	if (!$arrmodulesldap['varmodulesldap2enableauthorize']) {
+	$varmodulesldap2enableauthorize = '### ldap2 disabled ###';
+	}
+	else {
+	$varmodulesldap2enableauthorize = 'ldap2';
+	}
+	
+	// If unchecked then disable authorize ldap1
 	if (!$arrmodulesldap['varmodulesldapenableauthorize']) {
 	$varmodulesldapenableauthorize = '### ldap ###';
 	}
 	else {
-	$varmodulesldapenableauthorize = 'ldap';
+	$varmodulesldapenableauthorize = '';
+	$varmodulesldapenableauthorize .= "$varmodulesldap2failover {";
+	$varmodulesldapenableauthorize .= "\n\t\tldap";
+		// this line adds ldap2 when activated
+	$varmodulesldapenableauthorize .= "\n\t\t$varmodulesldap2enableauthorize";
+	$varmodulesldapenableauthorize .= "\n\t}";
 	}
 	
-	// If unchecked then disable authenticate
-	if (!$arrmodulesldap['varmodulesldapenableauthenticate']) {
-	$varmodulesldapenableauthenticate = "#Auth-Type LDAP {" . "\n\t\t\t#ldap" . "\n\t#}";
+	// If unchecked then disable authenticate for ldap1
+	if (!$arrmodulesldap['varmodulesldap2enableauthenticate']) {
+	$varmodulesldap2enableauthenticate = "### ldap2 disabled ###";
 	}
 	else {
-	$varmodulesldapenableauthenticate = "Auth-Type LDAP {" . "\n\t\t\tldap" . "\n\t}";
+	$varmodulesldap2enableauthenticate = "ldap2";
 	}
-		
+	
+	// If unchecked then disable authenticate ldap2
+	if (!$arrmodulesldap['varmodulesldapenableauthenticate']) {
+	$varmodulesldapenableauthenticate = "#Auth-Type LDAP {" . "\n\t\t\t#ldap" . "\n\t\t\t$varmodulesldap2enableauthenticate" . "\n\t#}";
+	}
+	else {
+	$varmodulesldapenableauthenticate = "Auth-Type LDAP {" . "\n\t\t\tldap" . "\n\t\t\t$varmodulesldap2enableauthenticate" . "\n\t}";
+	}
+	
+
+	
 	// Get Variables from freeradiussqlconf.xml
 	$sqlconf = $config['installedpackages']['freeradiussqlconf']['config'][0];
 	$varsqlconfenableauthorize = ($sqlconf['varsqlconfenableauthorize']?$sqlconf['varsqlconfenableauthorize']:'Disable');
@@ -1161,6 +1186,7 @@ authorize {
 	#
 	#  The ldap module will set Auth-Type to LDAP if it has not
 	#  already been set
+	
 	$varmodulesldapenableauthorize
 
 	#
@@ -2404,9 +2430,10 @@ function freeradius_modulesldap_resync() {
 	$arrmodulesldap = $config['installedpackages']['freeradiusmodulesldap']['config'][0];
 	
 	// Enable and Disable LDAP for "authorize" and "authenticate" will be done in "freeradius_serverdefault_resync"
+	// redundatnt-load-balancing will there be done, too
 	
 	
-	// Variables for General Configuration
+	// Variables for General Configuration ldap1
 	$varmodulesldapserver = ($arrmodulesldap['varmodulesldapserver']?$arrmodulesldap['varmodulesldapserver']:'ldap.your.domain');
 	$varmodulesldapidentity = ($arrmodulesldap['varmodulesldapidentity']?$arrmodulesldap['varmodulesldapidentity']:'cn=admin,o=My Org,c=UA');
 	$varmodulesldappassword = ($arrmodulesldap['varmodulesldappassword']?$arrmodulesldap['varmodulesldappassword']:'mypass');
@@ -2418,10 +2445,22 @@ function freeradius_modulesldap_resync() {
 	$varmodulesldaptimelimit = ($arrmodulesldap['varmodulesldaptimelimit']?$arrmodulesldap['varmodulesldaptimelimit']:'3');
 	$varmodulesldapnettimeout = ($arrmodulesldap['varmodulesldapnettimeout']?$arrmodulesldap['varmodulesldapnettimeout']:'1');
 	
+	// Variables for General Configuration ldap2
+	$varmodulesldap2server = ($arrmodulesldap['varmodulesldap2server']?$arrmodulesldap['varmodulesldap2server']:'ldap.your.domain');
+	$varmodulesldap2identity = ($arrmodulesldap['varmodulesldap2identity']?$arrmodulesldap['varmodulesldap2identity']:'cn=admin,o=My Org,c=UA');
+	$varmodulesldap2password = ($arrmodulesldap['varmodulesldap2password']?$arrmodulesldap['varmodulesldap2password']:'mypass');
+	$varmodulesldap2basedn = ($arrmodulesldap['varmodulesldap2basedn']?$arrmodulesldap['varmodulesldap2basedn']:'o=My Org,c=UA');
+	$varmodulesldap2filter = ($arrmodulesldap['varmodulesldap2filter']?$arrmodulesldap['varmodulesldap2filter']:'(uid=%{%{Stripped-User-Name}:-%{User-Name}})');
+	$varmodulesldap2basefilter = ($arrmodulesldap['varmodulesldap2basefilter']?$arrmodulesldap['varmodulesldap2basefilter']:'(objectclass=radiusprofile)');
+	$varmodulesldap2ldapconnectionsnumber = ($arrmodulesldap['varmodulesldap2ldapconnectionsnumber']?$arrmodulesldap['varmodulesldap2ldapconnectionsnumber']:'5');
+	$varmodulesldap2timeout = ($arrmodulesldap['varmodulesldap2timeout']?$arrmodulesldap['varmodulesldap2timeout']:'4');
+	$varmodulesldap2timelimit = ($arrmodulesldap['varmodulesldap2timelimit']?$arrmodulesldap['varmodulesldap2timelimit']:'3');
+	$varmodulesldap2nettimeout = ($arrmodulesldap['varmodulesldap2nettimeout']?$arrmodulesldap['varmodulesldap2nettimeout']:'1');	
+	
 	// Variables for TLS / Certificates - will be added later
 
 
-	// Miscellaneous Configuration + MS Active Directory Compatibility
+	// Miscellaneous Configuration + MS Active Directory Compatibility ldap1
 	$varmodulesldapmsadcompatibilityenable = ($arrmodulesldap['varmodulesldapmsadcompatibilityenable']?$arrmodulesldap['varmodulesldapmsadcompatibilityenable']:'Disable');
 	if ($arrmodulesldap['varmodulesldapmsadcompatibilityenable'] == 'Disable') {
 		$varmodulesldapmsadcompatibility = '### MS Active Directory Compatibility is disabled ###';
@@ -2429,8 +2468,17 @@ function freeradius_modulesldap_resync() {
 	else {
 		$varmodulesldapmsadcompatibility = 'chase_referrals = yes' . "\n\trebind = yes";
 	}
+	
+	// Miscellaneous Configuration + MS Active Directory Compatibility ldap2
+	$varmodulesldap2msadcompatibilityenable = ($arrmodulesldap['varmodulesldap2msadcompatibilityenable']?$arrmodulesldap['varmodulesldap2msadcompatibilityenable']:'Disable');
+	if ($arrmodulesldap['varmodulesldap2msadcompatibilityenable'] == 'Disable') {
+		$varmodulesldap2msadcompatibility = '### MS Active Directory Compatibility is disabled ###';
+	}
+	else {
+		$varmodulesldap2msadcompatibility = 'chase_referrals = yes' . "\n\trebind = yes";
+	}
 
-	// When disabled we put this in the file but commented (#) like in the default installation
+	// When disabled we put this in the file but commented (#) like in the default installation ldap1
 	if (!$arrmodulesldap['varmodulesldapdmiscenable']) {
 		$varmodulesldapdefaultprofile = '### default_profile = "cn=radprofile,ou=dialup,o=My Org,c=UA" ###';
 		$varmodulesldapprofileattribute = '### profile_attribute = "radiusProfileDn" ###';
@@ -2446,8 +2494,24 @@ function freeradius_modulesldap_resync() {
 		$varmodulesldapaccessattr = "access_attr = " . '"' . "$varmodulesldapaccessattr" . '"';
 	}
 
+	// When disabled we put this in the file but commented (#) like in the default installation ldap2
+	if (!$arrmodulesldap['varmodulesldap2dmiscenable']) {
+		$varmodulesldap2defaultprofile = '### default_profile = "cn=radprofile,ou=dialup,o=My Org,c=UA" ###';
+		$varmodulesldap2profileattribute = '### profile_attribute = "radiusProfileDn" ###';
+		$varmodulesldap2accessattr = '### access_attr = "dialupAccess" ###';
+	}
+	// When enabled we put in the default values so there is no empty entry if there is not input from GUI
+	else {
+		$varmodulesldap2defaultprofile = ($arrmodulesldap['varmodulesldap2defaultprofile']?$arrmodulesldap['varmodulesldap2defaultprofile']:'cn=radprofile,ou=dialup,o=My Org,c=UA');
+		$varmodulesldap2defaultprofile = "default_profile = " . '"' . "$varmodulesldap2defaultprofile" . '"';
+		$varmodulesldap2profileattribute = ($arrmodulesldap['varmodulesldap2profileattribute']?$arrmodulesldap['varmodulesldap2profileattribute']:'radiusProfileDn');
+		$varmodulesldap2profileattribute = "profile_attribute = " . '"' . "$varmodulesldap2profileattribute" . '"';
+		$varmodulesldap2accessattr = ($arrmodulesldap['varmodulesldap2accessattr']?$arrmodulesldap['varmodulesldap2accessattr']:'dialupAccess');
+		$varmodulesldap2accessattr = "access_attr = " . '"' . "$varmodulesldap2accessattr" . '"';
+	}	
+	
 	// Group membership checking
-	// When disabled we put this in the file but commented (#) like in the default installation
+	// When disabled we put this in the file but commented (#) like in the default installation ldap1
 	if (!$arrmodulesldap['varmodulesldapgroupenable']) {
 		$varmodulesldapgroupnameattribute = '### groupname_attribute = cn ###';
 		$varmodulesldapgroupmembershipfilter = '### groupmembership_filter = "(|(&(objectClass=GroupOfNames)(member=%{control:Ldap-UserDn}))(&(objectClass=GroupOfUniqueNames)(uniquemember=%{control:Ldap-UserDn})))" ###';
@@ -2473,12 +2537,45 @@ function freeradius_modulesldap_resync() {
 		$varmodulesldapaccessattrusedforallow = ($arrmodulesldap['varmodulesldapaccessattrusedforallow']?$arrmodulesldap['varmodulesldapaccessattrusedforallow']:'yes');	
 		$varmodulesldapaccessattrusedforallow = "access_attr_used_for_allow = $varmodulesldapaccessattrusedforallow";
 	}
+	
+	// Group membership checking
+	// When disabled we put this in the file but commented (#) like in the default installation ldap2
+	if (!$arrmodulesldap['varmodulesldap2groupenable']) {
+		$varmodulesldap2groupnameattribute = '### groupname_attribute = cn ###';
+		$varmodulesldap2groupmembershipfilter = '### groupmembership_filter = "(|(&(objectClass=GroupOfNames)(member=%{control:Ldap-UserDn}))(&(objectClass=GroupOfUniqueNames)(uniquemember=%{control:Ldap-UserDn})))" ###';
+		$varmodulesldap2groupmembershipattribute = '### groupmembership_attribute = radiusGroupName ###';
+		$varmodulesldap2comparecheckitems = '### compare_check_items = yes ###';
+		$varmodulesldap2doxlat = '### do_xlat = yes ###';
+		$varmodulesldap2accessattrusedforallow = '### access_attr_used_for_allow = yes ###';
+	}
 
-	// Keepalive variables
+	// When enabled we put in the default values so there is no empty entry if there is not input from GUI
+	else {
+		$varmodulesldap2groupnameattribute = ($arrmodulesldap['varmodulesldap2groupnameattribute']?$arrmodulesldap['varmodulesldap2groupnameattribute']:'cn');
+		$varmodulesldap2groupnameattribute = "groupname_attribute = $varmodulesldap2groupnameattribute";
+		$varmodulesldap2groupmembershipfilter = ($arrmodulesldap['varmodulesldap2groupmembershipfilter']?$arrmodulesldap['varmodulesldap2groupmembershipfilter']:'(|(&(objectClass=GroupOfNames)(member=%{control:Ldap-UserDn}))(&(objectClass=GroupOfUniqueNames)(uniquemember=%{control:Ldap-UserDn})))');
+		$varmodulesldap2groupmembershipfilter = "groupmembership_filter = " . '"' . "$varmodulesldap2groupmembershipfilter" . '"';
+		$varmodulesldap2groupmembershipattribute = ($arrmodulesldap['varmodulesldap2groupmembershipattribute']?$arrmodulesldap['varmodulesldap2groupmembershipattribute']:'radiusGroupName');
+		$varmodulesldap2groupmembershipattribute = "groupmembership_attribute = $varmodulesldap2groupmembershipattribute";
+		
+		$varmodulesldap2comparecheckitems = ($arrmodulesldap['varmodulesldap2comparecheckitems']?$arrmodulesldap['varmodulesldap2comparecheckitems']:'yes');
+		$varmodulesldap2comparecheckitems = "compare_check_items = $varmodulesldap2comparecheckitems";
+		$varmodulesldap2doxlat = ($arrmodulesldap['varmodulesldap2doxlat']?$arrmodulesldap['varmodulesldap2doxlat']:'yes');
+		$varmodulesldap2doxlat = "do_xlat = $varmodulesldap2doxlat";
+		$varmodulesldap2accessattrusedforallow = ($arrmodulesldap['varmodulesldap2accessattrusedforallow']?$arrmodulesldap['varmodulesldap2accessattrusedforallow']:'yes');	
+		$varmodulesldap2accessattrusedforallow = "access_attr_used_for_allow = $varmodulesldap2accessattrusedforallow";
+	}	
+
+	// Keepalive variables ldap1
 	$varmodulesldapkeepaliveidle = ($arrmodulesldap['varmodulesldapkeepaliveidle']?$arrmodulesldap['varmodulesldapkeepaliveidle']:'60');
 	$varmodulesldapkeepaliveprobes = ($arrmodulesldap['varmodulesldapkeepaliveprobes']?$arrmodulesldap['varmodulesldapkeepaliveprobes']:'3');
 	$varmodulesldapkeepaliveinterval = ($arrmodulesldap['varmodulesldapkeepaliveinterval']?$arrmodulesldap['varmodulesldapkeepaliveinterval']:'3');
 
+	// Keepalive variables ldap2
+	$varmodulesldap2keepaliveidle = ($arrmodulesldap['varmodulesldap2keepaliveidle']?$arrmodulesldap['varmodulesldap2keepaliveidle']:'60');
+	$varmodulesldap2keepaliveprobes = ($arrmodulesldap['varmodulesldap2keepaliveprobes']?$arrmodulesldap['varmodulesldap2keepaliveprobes']:'3');
+	$varmodulesldap2keepaliveinterval = ($arrmodulesldap['varmodulesldap2keepaliveinterval']?$arrmodulesldap['varmodulesldap2keepaliveinterval']:'3');
+	
 $conf .= <<<EOD
 
 # -*- text -*-
@@ -2665,6 +2762,165 @@ ldap {
 
 		# LDAP_OPT_X_KEEPALIVE_INTERVAL
 		interval = $varmodulesldapkeepaliveinterval
+	}
+}
+
+ldap ldap2{
+	#
+	#  Note that this needs to match the name in the LDAP
+	#  server certificate, if you're using ldaps.
+	server = "$varmodulesldap2server"
+	identity = "$varmodulesldap2identity"
+	password = $varmodulesldap2password
+	basedn = "$varmodulesldap2basedn"
+	filter = "$varmodulesldap2filter"
+	base_filter = "$varmodulesldap2basefilter"
+
+	#  How many connections to keep open to the LDAP server.
+	#  This saves time over opening a new LDAP socket for
+	#  every authentication request.
+	ldap_connections_number = $varmodulesldap2ldapconnectionsnumber
+
+	# seconds to wait for LDAP query to finish. default: 20
+	timeout = $varmodulesldap2timeout
+
+	#  seconds LDAP server has to process the query (server-side
+	#  time limit). default: 20
+	#
+	#  LDAP_OPT_TIMELIMIT is set to this value.
+	timelimit = $varmodulesldap2timelimit
+
+	#
+	#  seconds to wait for response of the server. (network
+	#   failures) default: 10
+	#
+	#  LDAP_OPT_NETWORK_TIMEOUT is set to this value.
+	net_timeout = $varmodulesldap2nettimeout
+
+	#
+	#  This subsection configures the tls related items
+	#  that control how FreeRADIUS connects to an LDAP
+	#  server.  It contains all of the "tls_*" configuration
+	#  entries used in older versions of FreeRADIUS.  Those
+	#  configuration entries can still be used, but we recommend
+	#  using these.
+	#
+	tls {
+		# Set this to 'yes' to use TLS encrypted connections
+		# to the LDAP database by using the StartTLS extended
+		# operation.
+		#			
+		# The StartTLS operation is supposed to be
+		# used with normal ldap connections instead of
+		# using ldaps (port 689) connections
+		start_tls = no
+
+		# cacertfile	= /path/to/cacert.pem
+		# cacertdir		= /path/to/ca/dir/
+		# certfile		= /path/to/radius.crt
+		# keyfile		= /path/to/radius.key
+		# randfile		= /path/to/rnd
+
+		#  Certificate Verification requirements.  Can be:
+		#    "never" (don't even bother trying)
+		#    "allow" (try, but don't fail if the cerificate
+		#		can't be verified)
+		#    "demand" (fail if the certificate doesn't verify.)
+		#
+		#	The default is "allow"
+		# require_cert	= "demand"
+	}
+
+	$varmodulesldap2defaultprofile
+	$varmodulesldap2profileattribute
+	$varmodulesldap2accessattr
+
+	# Mapping of RADIUS dictionary attributes to LDAP
+	# directory attributes.
+	dictionary_mapping = \${confdir}/ldap.attrmap
+	################## THE BELOW IS NOT COMPILED WITH FREERADIUS #################################
+	#  Set password_attribute = nspmPassword to get the
+	#  user's password from a Novell eDirectory
+	#  backend. This will work ONLY IF FreeRADIUS has been
+	#  built with the --with-edir configure option.
+	#
+	#  See also the following links:
+	#
+	#  http://www.novell.com/coolsolutions/appnote/16745.html
+	#  https://secure-support.novell.com/KanisaPlatform/Publishing/558/3009668_f.SAL_Public.html
+	#
+	#  Novell may require TLS encrypted sessions before returning
+	#  the user's password.
+	#
+	# password_attribute = userPassword
+
+	#  Un-comment the following to disable Novell
+	#  eDirectory account policy check and intruder
+	#  detection. This will work *only if* FreeRADIUS is
+	#  configured to build with --with-edir option.
+	#
+	edir_account_policy_check = no
+	################## THE ABOVE IS NOT COMPILED WITH FREERADIUS #################################
+	#
+	#  Group membership checking.  Disabled by default.
+	#
+	$varmodulesldap2groupnameattribute
+	$varmodulesldap2groupmembershipfilter
+	$varmodulesldap2groupmembershipattribute
+
+	$varmodulesldap2comparecheckitems
+	$varmodulesldap2doxlat
+	$varmodulesldap2accessattrusedforallow
+
+	#
+	#  The following two configuration items are for Active Directory
+	#  compatibility.  If you see the helpful "operations error"
+	#  being returned to the LDAP module, uncomment the next
+	#  two lines.
+	#
+
+	$varmodulesldap2msadcompatibility
+
+	#
+	#  By default, if the packet contains a User-Password,
+	#  and no other module is configured to handle the
+	#  authentication, the LDAP module sets itself to do
+	#  LDAP bind for authentication.
+	#
+	#  THIS WILL ONLY WORK FOR PAP AUTHENTICATION.
+	#
+	#  THIS WILL NOT WORK FOR CHAP, MS-CHAP, or 802.1x (EAP). 
+	#
+	#  You can disable this behavior by setting the following
+	#  configuration entry to "no".
+	#
+	#  allowed values: {no, yes}
+	# set_auth_type = yes
+
+	#  ldap_debug: debug flag for LDAP SDK
+	#  (see OpenLDAP documentation).  Set this to enable
+	#  huge amounts of LDAP debugging on the screen.
+	#  You should only use this if you are an LDAP expert.
+	#
+	#	default: 0x0000 (no debugging messages)
+	#	Example:(LDAP_DEBUG_FILTER+LDAP_DEBUG_CONNS)
+	#ldap_debug = 0x0028 
+
+	#
+	#  Keepalive configuration.  This MAY NOT be supported by your
+	#  LDAP library.  If these configuration entries appear in the
+	#  output of "radiusd -X", then they are supported.  Otherwise,
+	#  they are unsupported, and changing them will do nothing.
+	#
+	keepalive {
+		# LDAP_OPT_X_KEEPALIVE_IDLE
+		idle = $varmodulesldap2keepaliveidle
+
+		# LDAP_OPT_X_KEEPALIVE_PROBES
+		probes = $varmodulesldap2keepaliveprobes
+
+		# LDAP_OPT_X_KEEPALIVE_INTERVAL
+		interval = $varmodulesldap2keepaliveinterval
 	}
 }
 EOD;
