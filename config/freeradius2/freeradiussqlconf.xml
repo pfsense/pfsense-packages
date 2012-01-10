@@ -98,20 +98,16 @@
 	</tabs>
 	<fields>
 		<field>
-			<name>Enable SQL Database</name>
+			<name>ENABLE SQL DATABASE - SERVER 1</name>
 			<type>listtopic</type>
 		</field>
 		<field>
 			<fielddescr>Enable SQL Support</fielddescr>
 			<fieldname>varsqlconfincludeenable</fieldname>
-			<description><![CDATA[Enable this if you like to connect freeRADIUS to a SQL database. (Default: Disable)<br>
+			<description><![CDATA[Enable this if you like to connect freeRADIUS to a SQL database. (Default: unchecked)<br>
 								You <b>must enable at least</b> one of the following options: Authorization, Accounting, Session, Post-Auth.]]></description>
-			<type>select</type>
-			<default_value>Disable</default_value>
-					<options>
-						<option><name>Disbale</name><value>Disable</value></option>
-						<option><name>Enable</name><value>Enable</value></option>
-					</options>
+			<type>checkbox</type>
+			<enablefields>varsqlconf2failover,varsqlconf2includeenable,varsqlconfenableauthorize,varsqlconfenableaccounting,varsqlconfenablesession,varsqlconfenablepostauth,varsqlconfdatabase,varsqlconfserver,varsqlconfport,varsqlconflogin,varsqlconfpassword,varsqlconfradiusdb,varsqlconfaccttable1,varsqlconfaccttable2,varsqlconfpostauthtable,varsqlconfauthchecktable,varsqlconfauthreplytable,varsqlconfgroupchecktable,varsqlconfgroupreplytable,varsqlconfusergrouptable,varsqlconfreadgroups,varsqlconfdeletestalesessions,varsqlconfsqltrace,varsqlconfnumsqlsocks,varsqlconfconnectfailureretrydelay,varsqlconflifetime,varsqlconfmaxqueries,varsqlconfreadclients,varsqlconfnastable</enablefields>
 		</field>
 		<field>
 			<fielddescr>Enable SQL Authorization</fielddescr>
@@ -162,7 +158,7 @@
 					</options>
 		</field>
 		<field>
-			<name>SQL Database Configuration</name>
+			<name>SQL DATABASE CONFIGURATION - SERVER 1</name>
 			<type>listtopic</type>
 		</field>
 		<field>
@@ -173,8 +169,6 @@
 			<default_value>mysql</default_value>
 					<options>
 						<option><name>MySQL</name><value>mysql</value></option>
-						<option><name>MsSQL</name><value>mssql</value></option>
-						<option><name>Oracle</name><value>oracle</value></option>
 						<option><name>PostgreSQL</name><value>postgresql</value></option>
 					</options>
 		</field>
@@ -348,6 +342,274 @@
 		<field>
 			<fielddescr>RADIUS Client Table</fielddescr>
 			<fieldname>varsqlconfnastable</fieldname>
+			<description><![CDATA[Choose the table to keep RADIUS client info. (Default: nas)]]></description>
+			<type>input</type>
+			<default_value>nas</default_value>
+		</field>
+		<field>
+			<name>ENABLE REDUNDANT SQL DATABASE SUPPORT</name>
+			<type>listtopic</type>
+		</field>
+		<field>
+			<fielddescr>Choose Failover/Loadbalancing Mode</fielddescr>
+			<fieldname>varsqlconf2failover</fieldname>
+			<description><![CDATA[Choose the interaction of the two SQL databases: (Default: redundant)<br><br>
+								<b>redundant:</b> If server 1 fails failover to server 2<br>
+								<b>load-balance:</b> The load is balanced 50:50 to both databases<br>
+								<b>redundant-load-balance:</b> The load is balanced 50:50 to both databases. If one is down the other does 100%.]]></description>
+			<type>select</type>
+			<default_value>redundant</default_value>
+					<options>
+						<option><name>Redundant</name><value>redundant</value></option>
+						<option><name>Load-Balance</name><value>load-balance</value></option>
+						<option><name>Redundant-Load-Balance</name><value>redundant-load-balance</value></option>
+					</options>
+		</field>
+		<field>
+			<name>ENABLE SQL DATABASE - SERVER 2</name>
+			<type>listtopic</type>
+		</field>
+		<field>
+			<fielddescr>Enable SQL Support</fielddescr>
+			<fieldname>varsqlconf2includeenable</fieldname>
+			<description><![CDATA[Enable this if you like to connect freeRADIUS to a SQL database. (Default: unchecked)<br>
+								You <b>must enable at least</b> one of the following options: Authorization, Accounting, Session, Post-Auth.]]></description>
+			<type>checkbox</type>
+			<enablefields>varsqlconf2enableauthorize,varsqlconf2enableaccounting,varsqlconf2enablesession,varsqlconf2enablepostauth,varsqlconf2database,varsqlconf2server,varsqlconf2port,varsqlconf2login,varsqlconf2password,varsqlconf2radiusdb,varsqlconf2accttable1,varsqlconf2accttable2,varsqlconf2postauthtable,varsqlconf2authchecktable,varsqlconf2authreplytable,varsqlconf2groupchecktable,varsqlconf2groupreplytable,varsqlconf2usergrouptable,varsqlconf2readgroups,varsqlconf2deletestalesessions,varsqlconf2sqltrace,varsqlconf2numsqlsocks,varsqlconf2connectfailureretrydelay,varsqlconf2lifetime,varsqlconf2maxqueries,varsqlconf2readclients,varsqlconf2nastable</enablefields>
+		</field>
+		<field>
+			<fielddescr>Enable SQL Authorization</fielddescr>
+			<fieldname>varsqlconf2enableauthorize</fieldname>
+			<description><![CDATA[Enable this if usernames and passwords are stored on a SQL database.<br>
+								SQL support must be enabled for this to work. (Default: Disable)]]></description>
+			<type>select</type>
+			<default_value>Disable</default_value>
+					<options>
+						<option><name>Disbale</name><value>Disable</value></option>
+						<option><name>Enable</name><value>Enable</value></option>
+					</options>
+		</field>
+		<field>
+			<fielddescr>Enable SQL Accounting</fielddescr>
+			<fieldname>varsqlconf2enableaccounting</fieldname>
+			<description><![CDATA[Enable this if accounting packets should be logged to a SQL database.<br>
+								SQL support must be enabled for this to work. (Default: Disable)]]></description>
+			<type>select</type>
+			<default_value>Disable</default_value>
+					<options>
+						<option><name>Disbale</name><value>Disable</value></option>
+						<option><name>Enable</name><value>Enable</value></option>
+					</options>
+		</field>
+		<field>
+			<fielddescr>Enable SQL Session</fielddescr>
+			<fieldname>varsqlconf2enablesession</fieldname>
+			<description><![CDATA[Enable this to use the "rlm_sql" module (fast) to check for simultaneous connections instead of "radutmp" (slow).<br>
+								SQL support must be enabled for this to work. (Default: Disable)]]></description>
+			<type>select</type>
+			<default_value>Disable</default_value>
+					<options>
+						<option><name>Disbale</name><value>Disable</value></option>
+						<option><name>Enable</name><value>Enable</value></option>
+					</options>
+		</field>
+		<field>
+			<fielddescr>Enable SQL Post-Auth</fielddescr>
+			<fieldname>varsqlconf2enablepostauth</fieldname>
+			<description><![CDATA[Enable this if you like to store post-authentication data on a SQL database.<br>
+								SQL support must be enabled for this to work. (Default: Disable)]]></description>
+			<type>select</type>
+			<default_value>Disable</default_value>
+					<options>
+						<option><name>Disbale</name><value>Disable</value></option>
+						<option><name>Enable</name><value>Enable</value></option>
+					</options>
+		</field>
+		<field>
+			<name>SQL DATABASE CONFIGURATION - SERVER 2</name>
+			<type>listtopic</type>
+		</field>
+		<field>
+			<fielddescr>Database Type</fielddescr>
+			<fieldname>varsqlconf2database</fieldname>
+			<description><![CDATA[Choose the database type. (Default: mysql)]]></description>
+			<type>select</type>
+			<default_value>mysql</default_value>
+					<options>
+						<option><name>MySQL</name><value>mysql</value></option>
+						<option><name>PostgreSQL</name><value>postgresql</value></option>
+					</options>
+		</field>
+		<field>
+			<fielddescr>Server IP Address</fielddescr>
+			<fieldname>varsqlconf2server</fieldname>
+			<description><![CDATA[Enter the IP address of the database server (Default: localhost)]]></description>
+			<type>input</type>
+			<default_value>localhost</default_value>
+		</field>
+		<field>
+			<fielddescr>Server Port Address</fielddescr>
+			<fieldname>varsqlconf2port</fieldname>
+			<description><![CDATA[Enter the port address of the database server (Default: 3306)]]></description>
+			<type>input</type>
+			<default_value>3306</default_value>
+		</field>
+		<field>
+			<fielddescr>Database Username</fielddescr>
+			<fieldname>varsqlconf2login</fieldname>
+			<description><![CDATA[Enter the username of the database server (Default: radius)]]></description>
+			<type>input</type>
+			<default_value>radius</default_value>
+		</field>
+		<field>
+			<fielddescr>Database Password</fielddescr>
+			<fieldname>varsqlconf2password</fieldname>
+			<description><![CDATA[Enter the password of the database server (Default: radpass)]]></description>
+			<type>password</type>
+			<default_value>radpass</default_value>
+		</field>
+		<field>
+			<fielddescr>Database Table Configuration</fielddescr>
+			<fieldname>varsqlconf2radiusdb</fieldname>
+			<description><![CDATA[Choose database table configuration: (Default: radius) <br>
+									For all <b>except</b> Oracle choose:  <b>radius</b> <br>
+									For Oracle change and paste the following line according your environment:<br>
+									<b>(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=localhost)(PORT=1521))(CONNECT_DATA=(SID=your_sid)))</b>]]></description>
+			<type>input</type>
+			<default_value>radius</default_value>
+		</field>
+		<field>
+			<fielddescr>Accounting Table 1 (Start)</fielddescr>
+			<fieldname>varsqlconf2accttable1</fieldname>
+			<description><![CDATA[This is the accounting "Start" table. If you want to log "Start" and "Stop" to the same table choose the same name for both. (Default: radacct)]]></description>
+			<type>input</type>
+			<default_value>radacct</default_value>
+		</field>
+		<field>
+			<fielddescr>Accounting Table 2 (Stop)</fielddescr>
+			<fieldname>varsqlconf2accttable2</fieldname>
+			<description><![CDATA[This is the accounting "Stop" table. If you want to log "Stop" and "Stop" to the same table choose the same name for both. (Default: radacct)]]></description>
+			<type>input</type>
+			<default_value>radacct</default_value>
+		</field>
+		<field>
+			<fielddescr>Post Auth Table</fielddescr>
+			<fieldname>varsqlconf2postauthtable</fieldname>
+			<description><![CDATA[Choose Post Auth Table. (Default: radpostauth)]]></description>
+			<type>input</type>
+			<default_value>radpostauth</default_value>
+		</field>
+		<field>
+			<fielddescr>Auth Check Table</fielddescr>
+			<fieldname>varsqlconf2authchecktable</fieldname>
+			<description><![CDATA[Choose Auth Check Table. (Default: radcheck)]]></description>
+			<type>input</type>
+			<default_value>radcheck</default_value>
+		</field>
+		<field>
+			<fielddescr>Auth Reply Table</fielddescr>
+			<fieldname>varsqlconf2authreplytable</fieldname>
+			<description><![CDATA[Choose Auth Reply Table. (Default: radreply)]]></description>
+			<type>input</type>
+			<default_value>radreply</default_value>
+		</field>
+		<field>
+			<fielddescr>Group Check Table</fielddescr>
+			<fieldname>varsqlconf2groupchecktable</fieldname>
+			<description><![CDATA[Choose Group Check Table. (Default: radgroupcheck)]]></description>
+			<type>input</type>
+			<default_value>radgroupcheck</default_value>
+		</field>
+		<field>
+			<fielddescr>Group Reply Table</fielddescr>
+			<fieldname>varsqlconf2groupreplytable</fieldname>
+			<description><![CDATA[Choose Group Check Table. (Default: radgroupreply)]]></description>
+			<type>input</type>
+			<default_value>radgroupreply</default_value>
+		</field>
+		<field>
+			<fielddescr>User Group Table</fielddescr>
+			<fieldname>varsqlconf2usergrouptable</fieldname>
+			<description><![CDATA[Choose Group Check Table. (Default: radusergroup)]]></description>
+			<type>input</type>
+			<default_value>radusergroup</default_value>
+		</field>
+		<field>
+			<fielddescr>Read the Group Tables</fielddescr>
+			<fieldname>varsqlconf2readgroups</fieldname>
+			<description><![CDATA[If set to <b>yes</b> (default) we read the group tables.<br>
+								If set to <b>no</b> the user <b>must</b> have Fall-Through = Yes in the radreply table]]></description>
+			<type>select</type>
+			<default_value>yes</default_value>
+					<options>
+						<option><name>Yes</name><value>yes</value></option>
+						<option><name>No</name><value>no</value></option>
+					</options>
+		</field>
+		<field>
+			<fielddescr>Delete Stale Sessions</fielddescr>
+			<fieldname>varsqlconf2deletestalesessions</fieldname>
+			<description><![CDATA[Remove stale session if checkrad does not see a double login. (Default: yes)]]></description>
+			<type>select</type>
+			<default_value>yes</default_value>
+					<options>
+						<option><name>Yes</name><value>yes</value></option>
+						<option><name>No</name><value>no</value></option>
+					</options>
+		</field>
+		<field>
+			<fielddescr>Print all SQL Statements</fielddescr>
+			<fieldname>varsqlconf2sqltrace</fieldname>
+			<description><![CDATA[Print all SQL statements when in debug mode. (Default: no)]]></description>
+			<type>select</type>
+			<default_value>no</default_value>
+					<options>
+						<option><name>Yes</name><value>yes</value></option>
+						<option><name>No</name><value>no</value></option>
+					</options>
+		</field>
+		<field>
+			<fielddescr>Number of SQL Connections</fielddescr>
+			<fieldname>varsqlconf2numsqlsocks</fieldname>
+			<description><![CDATA[Number of SQL connections to make to the server. (Default: 5)]]></description>
+			<type>input</type>
+			<default_value>5</default_value>
+		</field>
+		<field>
+			<fielddescr>Failed Database Connection Delay</fielddescr>
+			<fieldname>varsqlconf2connectfailureretrydelay</fieldname>
+			<description><![CDATA[Number of seconds btween a retry after a failed database connection. (Default: 60)]]></description>
+			<type>input</type>
+			<default_value>60</default_value>
+		</field>
+		<field>
+			<fielddescr>SQL Socket Lifetime</fielddescr>
+			<fieldname>varsqlconf2lifetime</fieldname>
+			<description><![CDATA[If you are having network issues such as TCP sessions expiring, you may need to set the socket lifetime.  If set to non-zero, any open connections will be closed X seconds after they were first opened. (Default: 0)]]></description>
+			<type>input</type>
+			<default_value>0</default_value>
+		</field>
+		<field>
+			<fielddescr>SQL Socket Maximum Queries</fielddescr>
+			<fieldname>varsqlconf2maxqueries</fieldname>
+			<description><![CDATA[If you have issues with SQL sockets lasting too long, you can limit the number of queries performed over one socket. After X queries, the socket will be closed. Use 0 for no limit. (Default: 0)]]></description>
+			<type>input</type>
+			<default_value>0</default_value>
+		</field>
+		<field>
+			<fielddescr>Read Clients from Database</fielddescr>
+			<fieldname>varsqlconf2readclients</fieldname>
+			<description><![CDATA[Set to <b>yes</b> to read radius clients from the database ('nas' table). Clients will only be read on server startup. (Default: yes)]]></description>
+			<type>select</type>
+			<default_value>yes</default_value>
+					<options>
+						<option><name>Yes</name><value>yes</value></option>
+						<option><name>No</name><value>no</value></option>
+					</options>
+		</field>
+		<field>
+			<fielddescr>RADIUS Client Table</fielddescr>
+			<fieldname>varsqlconf2nastable</fieldname>
 			<description><![CDATA[Choose the table to keep RADIUS client info. (Default: nas)]]></description>
 			<type>input</type>
 			<default_value>nas</default_value>
