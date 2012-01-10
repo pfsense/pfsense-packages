@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <packagegui>
-	<title>Services: LCDproc 0.5.4 pkg v. 0.7</title>
+	<title>Services: LCDproc 0.5.5 pkg v. 0.8</title>
 	<name>lcdproc</name>
-	<version>0.5.4 pkg v. 0.7</version>
+	<version>0.5.5 pkg v. 0.8</version>
 	<savetext>Save</savetext>
 	<include_file>/usr/local/pkg/lcdproc.inc</include_file>
 	<tabs>
@@ -257,7 +257,7 @@
 				</option>				
 				<option>
 					<value>sdeclcd</value>
-					<name>sdeclcd (x86 only)</name>
+					<name>Watchguard Firebox with SDEC (x86 only)</name>
 				</option>				
 				<option>
 					<value>sed1330</value>
