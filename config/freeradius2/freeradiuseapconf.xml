@@ -157,13 +157,12 @@
 			<fielddescr>Choose your Cert Manager</fielddescr>
 			<fieldname>vareapconfchoosecertmanager</fieldname>
 			<description><![CDATA[Choose your Cert manager. By default it is the freeradius cert manager because the server needs some default certs to start service. For more information take al look at "Certificates"-Tab.<br>
-									To use the pfsense Cert Manager you have to create a CA and an Server Certificate first. (SYSTEM -> Cert Manager). (Default: freeRADIUS)]]></description>
-			<type>select</type>
+									To use the pfsense Cert Manager you have to create a CA and an Server Certificate first. (SYSTEM -> Cert Manager).<br><br>
+									<b>uncheked</b>: FreeRADIUS Cert-Manager (not recommended) (Default: unchecked)<br>
+									<b>cheked</b>: pfSense Cert-Manager (recommended)]]></description>
+			<type>checkbox</type>
 			<default_value>radiuscertmgr</default_value>
-					<options>
-						<option><name>freeRADIUS Cert Manager (not recommended)</name><value>radiuscertmgr</value></option>
-						<option><name>pfSense Cert Manager (recommended)</name><value>pfsensecertmgr</value></option>
-					</options>
+			<enablefields>ssl_ca_cert,ssl_server_cert</enablefields>
 		</field>
 		<field>
 			<fielddescr>SSL CA Certificate</fielddescr>
@@ -188,8 +187,7 @@
 		<field>
 			<fielddescr>Private Key Password</fielddescr>
 			<fieldname>vareapconfprivatekeypassword</fieldname>
-			<description><![CDATA[By default the certificates created by freeradius are protected with an "input/ouput" password from reading the certificate.<br>
-								The certificates created by pfSense Cert Manager are not protected so you must leave this field empty. (Default: whatever)]]></description>
+			<description><![CDATA[By default the certificates created by freeradius are protected with an "input/ouput" password from reading the certificate. The certificates created by pfSense Cert Manager are not protected so you must leave this field empty. (Default: whatever)]]></description>
 			<type>password</type>
 			<default_value>whatever</default_value>
 		</field>
