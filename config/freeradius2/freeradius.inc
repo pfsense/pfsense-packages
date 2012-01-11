@@ -50,12 +50,7 @@ define('RADDB', '/usr/local/etc/raddb');
 function freeradius_deinstall_command() {
 	exec("cd /var/db/pkg && pkg_delete `ls | grep freeradius`");
 	exec("rm -rf /usr/local/etc/raddb/");
-	exec("rm -rf /var/log/raddb/");
-	exec("rm -rf /var/log/radacct/");
 	exec("rm -rf /var/run/radiusd/");
-	exec("rm -f /var/log/radius.log");
-	exec("rm -f /var/log/radutmp");
-	exec("rm -f /var/log/radwtmp");
 }
 
 function freeradius_install_command() {
@@ -74,6 +69,9 @@ function freeradius_install_command() {
 	
 	exec("chown -R root:wheel /usr/local/etc/raddb");
 	exec("chown -R root:wheel /usr/local/lib/freeradius-2.1.12");
+	exec("touch /var/log/radutmp && touch /var/log/radwtmp");
+	exec("chown -R root:wheel /var/log");
+	
 	
 	// creating a backup file of the original policy.conf no matter if user checked this or not
 	if (!file_exists("/usr/local/etc/raddb/policy.conf.backup")) {
@@ -343,6 +341,7 @@ instantiate {
 	weekly
 	monthly
 	forever
+	
 	expiration
 	logintime
 	### Dis-/Enable sql instatiate
@@ -359,11 +358,14 @@ EOD;
 	conf_mount_ro();
 	
 	// "freeradius_sqlconf_resync" is pointing to this function because we need to run "freeradius_serverdefault_resync" and after that restart freeradius.
-	freeradius_plainmacauth_resync();
 	freeradius_serverdefault_resync();
 	freeradius_modulescounter_resync();
 	freeradius_modulesmschap_resync();
 	freeradius_modulesrealm_resync();
+	// This is to fix the mysqlclient.so which gets lost after reboot
+	exec("ldconfig -m /usr/local/lib/mysql");
+	// Change owner of freeradius created files
+	exec("chown -R root:wheel /var/log");
 	restart_service("radiusd");
 }
 
@@ -1300,6 +1302,7 @@ authorize {
 	weekly
 	monthly
 	forever
+	
 
 	#
 	# Use the checkval module
@@ -1494,6 +1497,7 @@ accounting {
 	weekly
 	monthly
 	forever
+	
 
 	#  Update the wtmp file
 	#
@@ -2178,6 +2182,7 @@ function freeradius_do_xmlrpc_sync($sync_to_ip, $password) {
 	/* xml will hold the sections to sync */
 	$xml = array();
 	$xml['freeradius'] = $config['installedpackages']['freeradius'];
+	$xml['freeradiusauthorizedmacs'] = $config['installedpackages']['freeradiusauthorizedmacs'];
 	$xml['freeradiusclients'] = $config['installedpackages']['freeradiusclients'];
 	
 	/* assemble xmlrpc payload */
@@ -2251,7 +2256,7 @@ function freeradius_do_xmlrpc_sync($sync_to_ip, $password) {
 function freeradius_all_after_XMLRPC_resync() {
 	
 	freeradius_users_resync();
-	freeradius_sync_on_changes();
+	freeradius_authorizedmacs_resync();
 	freeradius_clients_resync();
 	
 	log_error("freeRADIUS has finished XMLRPC process. It should be OK. For more information look at the host which started sync.");
