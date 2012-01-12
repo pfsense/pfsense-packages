@@ -590,9 +590,6 @@ function freeradius_eapconf_resync() {
 
 	$eapconf = $config['installedpackages']['freeradiuseapconf']['config'][0];
 	
-	// Choose pfsense Cert-Manager or freeradius Cert-Manager
-	$vareapconfchoosecertmanager = ($eapconf['vareapconfchoosecertmanager']?$eapconf['vareapconfchoosecertmanager']:'radiuscertmgr');
-	
 	// Variables: EAP
 	$vareapconfdefaulteaptype = ($eapconf['vareapconfdefaulteaptype']?$eapconf['vareapconfdefaulteaptype']:'md5');
 	$vareapconftimerexpire = ($eapconf['vareapconftimerexpire']?$eapconf['vareapconftimerexpire']:'60');
@@ -633,7 +630,7 @@ function freeradius_eapconf_resync() {
 // The filenames of pfsense cert manager are different from freeradius cert manager so it is possible to store both in the same folder at any time.
 // This is for the pfsense cert manager
 // Depends on "freeradius_get_server_certs" and "freeradius_get_ca_certs"
-if ($vareapconfchoosecertmanager == 'pfsensecertmgr') {
+if ($eapconf['vareapconfchoosecertmanager'] == 'on') {
 		
 		$ca_cert = lookup_ca($eapconf["ssl_ca_cert"]);
 		if ($ca_cert != false) {
@@ -682,12 +679,10 @@ if ($vareapconfchoosecertmanager == 'pfsensecertmgr') {
 }
 
 // This is for freeradius cert manager
-if ($vareapconfchoosecertmanager == 'radiuscertmgr') {
-
+else {
 	$vareapconfprivatekeyfile = 'server.pem';
 	$vareapconfcertificatefile = 'server.pem';
 	$vareapconfcafile = 'ca.pem';
-
 }
 
 	$conf .= <<<EOD
