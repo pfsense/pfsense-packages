@@ -590,9 +590,6 @@ function freeradius_eapconf_resync() {
 
 	$eapconf = $config['installedpackages']['freeradiuseapconf']['config'][0];
 	
-	// Choose pfsense Cert-Manager or freeradius Cert-Manager
-	$vareapconfchoosecertmanager = ($eapconf['vareapconfchoosecertmanager']?$eapconf['vareapconfchoosecertmanager']:'radiuscertmgr');
-	
 	// Variables: EAP
 	$vareapconfdefaulteaptype = ($eapconf['vareapconfdefaulteaptype']?$eapconf['vareapconfdefaulteaptype']:'md5');
 	$vareapconftimerexpire = ($eapconf['vareapconftimerexpire']?$eapconf['vareapconftimerexpire']:'60');
@@ -600,8 +597,17 @@ function freeradius_eapconf_resync() {
 	$vareapconfciscoaccountingusernamebug = ($eapconf['vareapconfciscoaccountingusernamebug']?$eapconf['vareapconfciscoaccountingusernamebug']:'no');
 	$vareapconfmaxsessions = ($eapconf['vareapconfmaxsessions']?$eapconf['vareapconfmaxsessions']:'4096');
 	
-	// Variables: EAP-TLS and EAP-TLS with OCSP support
+	// Variables: EAP-TLS
 	$vareapconfprivatekeypassword = ($eapconf['vareapconfprivatekeypassword']?$eapconf['vareapconfprivatekeypassword']:'whatever');
+	$vareapconffragmentsize = ($eapconf['vareapconffragmentsize']?$eapconf['vareapconffragmentsize']:'1024');
+	$vareapconfincludelength = ($eapconf['vareapconfincludelength']?$eapconf['vareapconfincludelength']:'yes');
+	
+	// Variables: Cache
+	$vareapconfcacheenablecache = ($eapconf['vareapconfcacheenablecache']?$eapconf['vareapconfcacheenablecache']:'no');
+	$vareapconfcachelifetime = ($eapconf['vareapconfcachelifetime']?$eapconf['vareapconfcachelifetime']:'24');
+	$vareapconfcachemaxentries = ($eapconf['vareapconfcachemaxentries']?$eapconf['vareapconfcachemaxentries']:'255');
+	
+	// Variables OSCP	
 	$vareapconfocspenable = ($eapconf['vareapconfocspenable']?$eapconf['vareapconfocspenable']:'no');
 	$vareapconfocspoverridecerturl = ($eapconf['vareapconfocspoverridecerturl']?$eapconf['vareapconfocspoverridecerturl']:'no');
 	$vareapconfocspurl = ($eapconf['vareapconfocspurl']?$eapconf['vareapconfocspurl']:'http://127.0.0.1/ocsp/');
@@ -610,6 +616,7 @@ function freeradius_eapconf_resync() {
 	$vareapconfttlsdefaulteaptype = ($eapconf['vareapconfttlsdefaulteaptype']?$eapconf['vareapconfttlsdefaulteaptype']:'md5');
 	$vareapconfttlscopyrequesttotunnel = ($eapconf['vareapconfttlscopyrequesttotunnel']?$eapconf['vareapconfttlscopyrequesttotunnel']:'no');
 	$vareapconfttlsusetunneledreply = ($eapconf['vareapconfttlsusetunneledreply']?$eapconf['vareapconfttlsusetunneledreply']:'no');
+	$vareapconfttlsincludelength = ($eapconf['vareapconfttlsincludelength']?$eapconf['vareapconfttlsincludelength']:'yes');
 	
 	// Variables: EAP-PEAP with MSCHAPv2
 	$vareapconfpeapdefaulteaptype = ($eapconf['vareapconfpeapdefaulteaptype']?$eapconf['vareapconfpeapdefaulteaptype']:'mschapv2');
@@ -633,7 +640,7 @@ function freeradius_eapconf_resync() {
 // The filenames of pfsense cert manager are different from freeradius cert manager so it is possible to store both in the same folder at any time.
 // This is for the pfsense cert manager
 // Depends on "freeradius_get_server_certs" and "freeradius_get_ca_certs"
-if ($vareapconfchoosecertmanager == 'pfsensecertmgr') {
+if ($eapconf['vareapconfchoosecertmanager'] == 'on') {
 		
 		$ca_cert = lookup_ca($eapconf["ssl_ca_cert"]);
 		if ($ca_cert != false) {
@@ -682,12 +689,10 @@ if ($vareapconfchoosecertmanager == 'pfsensecertmgr') {
 }
 
 // This is for freeradius cert manager
-if ($vareapconfchoosecertmanager == 'radiuscertmgr') {
-
+else {
 	$vareapconfprivatekeyfile = 'server.pem';
 	$vareapconfcertificatefile = 'server.pem';
 	$vareapconfcafile = 'ca.pem';
-
 }
 
 	$conf .= <<<EOD
@@ -710,7 +715,7 @@ if ($vareapconfchoosecertmanager == 'radiuscertmgr') {
 		}
 		
 		
-	### EAP-TLS and EAP-TLS with OCSP support
+		### EAP-TLS and EAP-TLS with OCSP support
 		tls {
 			certdir = \${confdir}/certs
 			cadir = \${confdir}/certs
@@ -720,20 +725,18 @@ if ($vareapconfchoosecertmanager == 'radiuscertmgr') {
 			CA_file = \${cadir}/$vareapconfcafile
 			dh_file = \${certdir}/dh
 			random_file = \${certdir}/random
-		#	fragment_size = 1024
-		#	include_length = yes
+			fragment_size = $vareapconffragmentsize
+			include_length = $vareapconfincludelength
 		#	check_crl = yes
 			CA_path = \${cadir}
-		#   check_cert_issuer = "/C=GB/ST=Berkshire/L=Newbury/O=My Company Ltd"
+		#	check_cert_issuer = "/C=GB/ST=Berkshire/L=Newbury/O=My Company Ltd"
 		#	check_cert_cn = %{User-Name}
 			cipher_list = "DEFAULT"
-		###	we make this from Certificate tab on GUI at startup
-		#	make_cert_command = "\${certdir}/bootstrap"
 			ecdh_curve = "prime256v1"
 			cache {
-			      enable = no
-			      lifetime = 24 # hours
-			      max_entries = 255
+			      enable = $vareapconfcacheenablecache
+			      lifetime = $vareapconfcachelifetime
+			      max_entries = $vareapconfcachemaxentries
 			}
 			verify {
 		#     		tmpdir = /tmp/radiusd
@@ -744,17 +747,17 @@ if ($vareapconfchoosecertmanager == 'radiuscertmgr') {
 			      override_cert_url = $vareapconfocspoverridecerturl
 			      url = "$vareapconfocspurl"
 			}
-		}	### end tls
+		}
 	
-	### EAP-TTLS
+		### EAP-TTLS
 		ttls {
 			default_eap_type = $vareapconfttlsdefaulteaptype
 			copy_request_to_tunnel = $vareapconfttlscopyrequesttotunnel
 			use_tunneled_reply = $vareapconfttlsusetunneledreply
-		#	include_length = yes
+			include_length = $vareapconfttlsincludelength
 		}	### end ttls	
 	
-	### EAP-PEAP with MSCHAPv2
+		### EAP-PEAP
 		peap {
 			default_eap_type = $vareapconfpeapdefaulteaptype
 			copy_request_to_tunnel = $vareapconfpeapcopyrequesttotunnel
@@ -765,7 +768,7 @@ if ($vareapconfchoosecertmanager == 'radiuscertmgr') {
 		mschapv2 {
 		#	send_error = no
 		}	
-	}	### end eap
+	}
 
 
 EOD;
