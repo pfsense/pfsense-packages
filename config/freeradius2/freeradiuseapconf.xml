@@ -109,12 +109,17 @@
 			<default_value>md5</default_value>
 					<options>
 						<option><name>MD5</name><value>md5</value></option>
-						<option><name>LEAP</name><value>leap</value></option>
 						<option><name>GTC</name><value>gtc</value></option>
+						<option><name>LEAP</name><value>leap</value></option>
+						<option><name>TLS</name><value>tls</value></option>
+						<option><name>TTLS</name><value>ttls</value></option>
+						<option><name>PEAP</name><value>peap</value></option>
+						<option><name>MSCHAP</name><value>mschap</value></option>
+						<option><name>MSCHAPv2</name><value>mschapv2</value></option>
 					</options>
 		</field>
 		<field>
-			<fielddescr>Expiration of EAP-Response/Request List</fielddescr>
+			<fielddescr>Expiration of EAP-Response / EAP-Request List</fielddescr>
 			<fieldname>vareapconftimerexpire</fieldname>
 			<description><![CDATA[A list is maintained to correlate EAP-Response packets with EAP-Request packets. Define the expire time of the list. (Default: 60)]]></description>
 			<type>input</type>
@@ -150,20 +155,19 @@
 			<default_value>4096</default_value>
 		</field>
 		<field>
-			<name>EAP-TLS</name>
+			<name>CERTIFICATES FOR TLS</name>
 			<type>listtopic</type>
 		</field>
 		<field>
 			<fielddescr>Choose your Cert Manager</fielddescr>
 			<fieldname>vareapconfchoosecertmanager</fieldname>
 			<description><![CDATA[Choose your Cert manager. By default it is the freeradius cert manager because the server needs some default certs to start service. For more information take al look at "Certificates"-Tab.<br>
-									To use the pfsense Cert Manager you have to create a CA and an Server Certificate first. (SYSTEM -> Cert Manager). (Default: freeRADIUS)]]></description>
-			<type>select</type>
+									To use the pfsense Cert Manager you have to create a CA and an Server Certificate first. (SYSTEM -> Cert Manager).<br><br>
+									<b>uncheked</b>: FreeRADIUS Cert-Manager (not recommended) (Default: unchecked)<br>
+									<b>cheked</b>: pfSense Cert-Manager (recommended)]]></description>
+			<type>checkbox</type>
 			<default_value>radiuscertmgr</default_value>
-					<options>
-						<option><name>freeRADIUS Cert Manager (not recommended)</name><value>radiuscertmgr</value></option>
-						<option><name>pfSense Cert Manager (recommended)</name><value>pfsensecertmgr</value></option>
-					</options>
+			<enablefields>ssl_ca_cert,ssl_server_cert</enablefields>
 		</field>
 		<field>
 			<fielddescr>SSL CA Certificate</fielddescr>
@@ -188,11 +192,70 @@
 		<field>
 			<fielddescr>Private Key Password</fielddescr>
 			<fieldname>vareapconfprivatekeypassword</fieldname>
-			<description><![CDATA[By default the certificates created by freeradius are protected with an "input/ouput" password from reading the certificate.<br>
-								The certificates created by pfSense Cert Manager are not protected so you must leave this field empty. (Default: whatever)]]></description>
+			<description><![CDATA[By default the certificates created by freeradius are protected with an "input/ouput" password from reading the certificate. The certificates created by pfSense Cert Manager are not protected so you must leave this field empty. (Default: whatever)]]></description>
 			<type>password</type>
 			<default_value>whatever</default_value>
 		</field>
+		<field>
+			<name>EAP-TLS</name>
+			<type>listtopic</type>
+		</field>
+		<field>
+			<fielddescr>Include Length</fielddescr>
+			<fieldname>vareapconfincludelength</fieldname>
+			<description><![CDATA[include_length is a flag which is by default set to yes If set to yes, Total Length of the message is included in EVERY packet we send. If set to no, Total Length of the message is included ONLY in the first packet of a fragment series. (Default: Yes)]]></description>
+			<type>select</type>
+			<default_value>yes</default_value>
+					<options>
+						<option><name>Yes</name><value>yes</value></option>
+						<option><name>No</name><value>no</value></option>
+					</options>
+		</field>
+		<field>
+			<fielddescr>Fragment Size</fielddescr>
+			<fieldname>vareapconffragmentsize</fieldname>
+			<description><![CDATA[This can never exceed the size of a RADIUS packet (4096 bytes), and is preferably half that, to accomodate other attributes in RADIUS packet.  On most APs the MAX packet length is configured between 1500 - 1600 In these cases, fragment size should be 1024 or less. (Default: 1024)]]></description>
+			<type>input</type>
+			<default_value>1024</default_value>
+		</field>
+		
+		
+		<field>
+			<name>EAP-TLS - ENABLE CACHE</name>
+			<type>listtopic</type>
+		</field>
+		<field>
+			<fielddescr>Enable cache</fielddescr>
+			<fieldname>vareapconfcacheenablecache</fieldname>
+			<description><![CDATA[Session resumption / fast reauthentication cache.<br>
+								The cache contains the following information:<br><br>
+								session Id - unique identifier, managed by SSL User-Name - from the Access-Accept Stripped-User-Name - from the Access-Request Cached-Session-Policy - from the Access-Accept<br><br>
+								The "Cached-Session-Policy" is the name of a policy which should be applied to the cached session.  This policy can be used to assign VLANs, IP addresses, etc. It serves as a useful way to re-apply the policy from the original Access-Accept to the subsequent Access-Accept for the cached session.<br><br>
+								On session resumption, these attributes are copied from the cache, and placed into the reply list. You probably also want "use_tunneled_reply = yes" when using fast session resumption. (Default: Disable)]]></description>
+			<type>select</type>
+			<default_value>no</default_value>
+					<options>
+						<option><name>Enable</name><value>yes</value></option>
+						<option><name>Disable</name><value>no</value></option>
+					</options>
+		</field>
+		<field>
+			<fielddescr>Lifetime</fielddescr>
+			<fieldname>vareapconfcachelifetime</fieldname>
+			<description><![CDATA[Lifetime of the cached entries, in hours. The sessions will be deleted after this time. (Default: 24)]]></description>
+			<type>input</type>
+			<default_value>24</default_value>
+		</field>
+		<field>
+			<fielddescr>Max Entries</fielddescr>
+			<fieldname>vareapconfcachemaxentries</fieldname>
+			<description><![CDATA[The maximum number of entries in the cache.  Set to "0" for "infinite". This could be set to the number of users who are logged in... which can be a LOT. (Default: 255)]]></description>
+			<type>input</type>
+			<default_value>255</default_value>
+		</field>
+		
+		
+		
 		<field>
 			<name>EAP-TLS with OCSP support</name>
 			<type>listtopic</type>
@@ -233,17 +296,25 @@
 		<field>
 			<fielddescr>Default EAP Type</fielddescr>
 			<fieldname>vareapconfttlsdefaulteaptype</fieldname>
-			<description><![CDATA[The tunneled EAP session needs a default EAP type which is separate from the one for the non-tunneled EAP module. (Default: MD5)]]></description>
+			<description><![CDATA[The tunneled EAP session needs a default EAP type which is separate from the one for the non-tunneled EAP module.  Inside of the TTLS tunnel, we recommend using EAP-MD5. If the request does not contain an EAP conversation, then this configuration entry is ignored. (Default: MD5)]]></description>
 			<type>select</type>
 			<default_value>md5</default_value>
 					<options>
 						<option><name>MD5</name><value>md5</value></option>
+						<option><name>GTC</name><value>gtc</value></option>
+						<option><name>OTP</name><value>otp</value></option>
+						<option><name>TLS</name><value>tls</value></option>
+						<option><name>PAP</name><value>pap</value></option>
+						<option><name>CHAP</name><value>chap</value></option>
+						<option><name>MSCHAP</name><value>mschap</value></option>
+						<option><name>MSCHAPv2</name><value>mschapv2</value></option>
 					</options>
 		</field>
 		<field>
 			<fielddescr>Copy Request to Tunnel</fielddescr>
 			<fieldname>vareapconfttlscopyrequesttotunnel</fieldname>
-			<description><![CDATA[By setting this configuration entry to "yes", any attribute which is <b>not</b> in the tunneled authentication request, but which <b>is</b> available outside of the tunnel, is copied to the tunneled request. (Default: no)]]></description>
+			<description><![CDATA[The tunneled authentication request does not usually contain useful attributes like 'Calling-Station-Id', etc.  These attributes are outside of the tunnel, and normally unavailable to the tunneled authentication request.<br>
+								By setting this configuration entry to 'yes', any attribute which NOT in the tunneled authentication request, but which IS available outside of the tunnel, is copied to the tunneled request. (Default: no)]]></description>
 			<type>select</type>
 			<default_value>no</default_value>
 					<options>
@@ -254,7 +325,7 @@
 		<field>
 			<fielddescr>Use Tunneled Reply</fielddescr>
 			<fieldname>vareapconfttlsusetunneledreply</fieldname>
-			<description><![CDATA[By setting this configuration entry to 'yes', any attribute which NOT in the tunneled authentication request, but which IS available outside of the tunnel, is copied to the tunneled request. (Default: no)]]></description>
+			<description><![CDATA[The reply attributes sent to the NAS are usually based on the name of the user 'outside' of the tunnel (usually 'anonymous').  If you want to send the reply attributes based on the user name inside of the tunnel, then set this configuration entry to 'yes', and the reply to the NAS will be taken from the reply to the tunneled request. (Default: no)]]></description>
 			<type>select</type>
 			<default_value>no</default_value>
 					<options>
@@ -263,23 +334,42 @@
 					</options>
 		</field>
 		<field>
-			<name>EAP-PEAP with MSCHAPv2</name>
+			<fielddescr>Include Length</fielddescr>
+			<fieldname>vareapconfttlsincludelength</fieldname>
+			<description><![CDATA[include_length is a flag which is by default set to yes If set to yes, Total Length of the message is included in EVERY packet we send. If set to no, Total Length of the message is included ONLY in the first packet of a fragment series. (Default: Yes)]]></description>
+			<type>select</type>
+			<default_value>yes</default_value>
+					<options>
+						<option><name>Yes</name><value>yes</value></option>
+						<option><name>No</name><value>no</value></option>
+					</options>
+		</field>
+		<field>
+			<name>EAP-PEAP</name>
 			<type>listtopic</type>
 		</field>
 		<field>
 			<fielddescr>Default EAP Type</fielddescr>
 			<fieldname>vareapconfpeapdefaulteaptype</fieldname>
-			<description><![CDATA[The tunneled EAP session needs a default EAP type which is separate from the one for the non-tunneled EAP module. (Default: MSCHAPv2)]]></description>
+			<description><![CDATA[The tunneled EAP session needs a default EAP type which is separate from the one for the non-tunneled EAP module.  Inside of the PEAP tunnel, we recommend using MS-CHAPv2, as that is the default type supported by Windows clients. (Default: MSCHAPv2)]]></description>
 			<type>select</type>
 			<default_value>mschapv2</default_value>
 					<options>
+						<option><name>MD5</name><value>md5</value></option>
+						<option><name>GTC</name><value>gtc</value></option>
+						<option><name>OTP</name><value>otp</value></option>
+						<option><name>TLS</name><value>tls</value></option>
+						<option><name>PAP</name><value>pap</value></option>
+						<option><name>CHAP</name><value>chap</value></option>
+						<option><name>MSCHAP</name><value>mschap</value></option>
 						<option><name>MSCHAPv2</name><value>mschapv2</value></option>
 					</options>
 		</field>
 		<field>
 			<fielddescr>Copy Request to Tunnel</fielddescr>
 			<fieldname>vareapconfpeapcopyrequesttotunnel</fieldname>
-			<description><![CDATA[By setting this configuration entry to "yes", any attribute which is <b>not</b> in the tunneled authentication request, but which <b>is</b> available outside of the tunnel, is copied to the tunneled request. (Default: no)]]></description>
+			<description><![CDATA[The tunneled authentication request does not usually contain useful attributes like 'Calling-Station-Id', etc.  These attributes are outside of the tunnel, and normally unavailable to the tunneled authentication request.<br>
+								By setting this configuration entry to 'yes', any attribute which NOT in the tunneled authentication request, but which IS available outside of the tunnel, is copied to the tunneled request. (Default: no)]]></description>
 			<type>select</type>
 			<default_value>no</default_value>
 					<options>
@@ -290,7 +380,7 @@
 		<field>
 			<fielddescr>Use Tunneled Reply</fielddescr>
 			<fieldname>vareapconfpeapusetunneledreply</fieldname>
-			<description><![CDATA[By setting this configuration entry to 'yes', any attribute which NOT in the tunneled authentication request, but which IS available outside of the tunnel, is copied to the tunneled request. (Default: no)]]></description>
+			<description><![CDATA[The reply attributes sent to the NAS are usually based on the name of the user 'outside' of the tunnel (usually 'anonymous').  If you want to send the reply attributes based on the user name inside of the tunnel, then set this configuration entry to 'yes', and the reply to the NAS will be taken from the reply to the tunneled request. (Default: no)]]></description>
 			<type>select</type>
 			<default_value>no</default_value>
 					<options>
