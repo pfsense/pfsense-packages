@@ -191,12 +191,14 @@ function mail_report_send($headertext, $attachments) {
 	$address = $config['notifications']['smtp']['notifyemailaddress'];
 	$mail->AddAddress($address, "Report Recipient");
 	$mail->Subject = "{$config['system']['hostname']}.{$config['system']['domain']} Graph Report: {$headertext}";
+	$mail->Body .= "This is a periodic graph report from your firewall, {$config['system']['hostname']}.{$config['system']['domain']}.<br/><br/>Current report: {$headertext}\n";
 	if(is_array($attachments)) {
 		foreach($attachments as $filename) {
-			$mail->AddAttachment("$filename", basename($filename));
+			$shortname = basename($filename);
+			$mail->AddEmbeddedImage("$filename", $shortname, "$filename");
+			$mail->Body .= "<br/><br/>{$shortname}<br/><img src=\"cid:{$shortname}\" />\n";
 		}
 	}
-	$mail->Body .= "This is a periodic graph report from your firewall, {$config['system']['hostname']}.{$config['system']['domain']}.<br/><br/>Current report: {$headertext}";
 
 	if(!$mail->Send()) {
 		echo "Mailer Error: " . $mail->ErrorInfo;
