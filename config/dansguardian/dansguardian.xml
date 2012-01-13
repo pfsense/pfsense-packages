@@ -7,7 +7,7 @@
 /* $Id$ */
 /* ========================================================================== */
 /*
-    pfblocker.xml
+    dansguardian.xml
     part of the dansguardian for pfSense
     Copyright (C) 2012 Marcello Coutinho
 
@@ -49,7 +49,7 @@
 	<menu>
 		<name>dansguardian</name>
 		<tooltiptext>Configure dansguardian</tooltiptext>
-		<section>Firewall</section>
+		<section>Services</section>
 		<url>pkg_edit.php?xml=dansguardian.xml</url>
 	</menu>
 	<additional_files_needed>
@@ -125,7 +125,7 @@
 		</field>
 		<field>
 			<fielddescr>Enable dansguardian</fielddescr>
-			<fieldname>enable_cb</fieldname>
+			<fieldname>enable_dg</fieldname>
 			<type>checkbox</type>
 			<description></description>
 		</field>
@@ -168,7 +168,7 @@
 		</field>
 			<field>
 			<fielddescr>Min/Max Spare Children</fielddescr>
-			<fieldname>minsparechildren</fieldname>
+			<fieldname>sparechildren</fieldname>
 			<type>input</type>
 			<size>10</size>
 			<description><![CDATA[Default: <strong>4/32</strong><br>

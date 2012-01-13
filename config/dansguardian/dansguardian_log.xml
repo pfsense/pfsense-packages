@@ -42,7 +42,7 @@
 	<description>Describe your package here</description>
 	<requirements>Describe your package requirements here</requirements>
 	<faq>Currently there are no FAQ items provided.</faq>
-	<name>dansguardianlimits</name>
+	<name>dansguardianlog</name>
 	<version>1.0</version>
 	<title>Services: Dansguardian</title>
 	<include_file>/usr/local/pkg/dansguardian.inc</include_file>
@@ -150,7 +150,7 @@
 		</field>
 		<field>
 			<fielddescr>Logging Options</fielddescr>
-			<fieldname>report_options</fieldname>
+			<fieldname>logging_options</fieldname>
 			<description><![CDATA[Logging options. Default values are in ( )]]></description>
 	    	<type>select</type>
  				<options>
