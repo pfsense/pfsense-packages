@@ -932,7 +932,7 @@
 		<descr><![CDATA[High performance web proxy cache.<br>
 					   It combines squid as a proxy server with it's capabilities of acting as a HTTP / HTTPS reverse proxy.<br>
 					   It includes an Exchange-Web-Access (OWA) Assistant.<br>
-					   squid-reverse replaces the squid-package (squid config is maintained).]]></descr>
+					   <i>squid-reverse replaces the squid-package (squid config is maintained)</i>.]]></descr>
 		<pkginfolink>http://forum.pfsense.org/index.php/topic,44735.0.html</pkginfolink>
 		<website>http://www.squid-cache.org/</website>
 		<category>Network</category>
