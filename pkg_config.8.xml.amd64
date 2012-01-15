@@ -80,7 +80,7 @@
 		<version>2.7.9 pkg v.4.3.1</version>
 		<status>Stable</status>
 		<required_version>2</required_version>
-		<maintainer>fernando@netfilter.com.br seth.mos@xs4all.nl mfuchs77@googlemail.com jimp@pfsense.org</maintainer>
+		<maintainer>fernando@netfilter.com.br seth.mos@dds.nl mfuchs77@googlemail.com jimp@pfsense.org</maintainer>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
 		<depends_on_package>squid-2.7.9_1.tbz</depends_on_package>
 		<depends_on_package_pbi>squid-2.7.9_1-amd64.pbi squid_radius_auth-1.10-amd64.pbi libwww-5.4.0_4-amd64.pbi</depends_on_package_pbi>		
@@ -105,7 +105,7 @@
 		<version>2.7.9_2</version>
 		<status>Stable</status>
 		<required_version>2.0</required_version>
-		<maintainer>fernando@netfilter.com.br seth.mos@xs4all.nl mfuchs77@googlemail.com jimp@pfsense.org</maintainer>
+		<maintainer>fernando@netfilter.com.br seth.mos@dds.nl mfuchs77@googlemail.com jimp@pfsense.org</maintainer>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
 		<depends_on_package_pbi>squid-2.7.9_1-amd64.pbi squid_radius_auth-1.10-amd64.pbi libwww-5.4.0_4-amd64.pbi</depends_on_package_pbi>
 		<depends_on_package>squid-2.7.9_1.tbz</depends_on_package>
@@ -955,7 +955,7 @@
 		<version>3.1.9_0.1</version>
 		<status>ALPHA</status>
 		<required_version>2.0</required_version>
-		<maintainer>fernando@netfilter.com.br seth.mos@xs4all.nl mfuchs77@googlemail.com</maintainer>
+		<maintainer>fernando@netfilter.com.br seth.mos@dds.nl mfuchs77@googlemail.com</maintainer>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
 		<depends_on_package>squid-3.1.9.tbz</depends_on_package>
 		<depends_on_package>squid_radius_auth-1.10.tbz</depends_on_package>
@@ -974,7 +974,7 @@
 		<version>lcdproc-0.5.3_1</version>
 		<status>BETA</status>
 		<required_version>1.2.1</required_version>
-		<maintainer>seth.mos@xs4all.nl</maintainer>
+		<maintainer>seth.mos@dds.nl</maintainer>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
 		<depends_on_package>lcdproc-0.5.3_1.tbz</depends_on_package>
 		<depends_on_package_pbi>lcdproc-0.5.4-amd64.pbi</depends_on_package_pbi>
