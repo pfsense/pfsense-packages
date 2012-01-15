@@ -341,7 +341,14 @@ instantiate {
 	weekly
 	monthly
 	forever
-	
+	maxdailyupload
+	maxdailydownload
+	maxweeklyupload
+	maxweeklydownload
+	maxmonthlyupload
+	maxmonthlydownload
+	maxupload
+	maxdownload
 	expiration
 	logintime
 	### Dis-/Enable sql instatiate
@@ -386,11 +393,17 @@ if (is_array($arrusers) && !empty($arrusers)) {
 	$varusersframedipaddress = $users['varusersframedipaddress'];
 	$varusersframedipnetmask = $users['varusersframedipnetmask'];
 	$varusersframedroute = $users['varusersframedroute'];
-	$varusersexpiration=$users['varusersexpiration'];
-	$varuserssessiontimeout=$users['varuserssessiontimeout'];
-	$varuserslogintime=$users['varuserslogintime'];
-	$varusersvlanid=$users['varusersvlanid'];
-
+	$varusersexpiration = $users['varusersexpiration'];
+	$varuserssessiontimeout = $users['varuserssessiontimeout'];
+	$varuserslogintime = $users['varuserslogintime'];
+	$varusersvlanid = $users['varusersvlanid'];
+	$varusersamountoftime = ($users['varusersamountoftime']?$users['varusersamountoftime']:'');
+	$varuserspointoftime = $users['varuserspointoftime'];
+	$varusersamountofbytesinput = ($users['varusersamountofbytesinput']?$users['varusersamountofbytesinput']:'');
+	$varuserspointoftimebytesinput = $users['varuserspointoftimebytesinput'];
+	$varusersamountofbytesoutput = ($users['varusersamountofbytesoutput']?$users['varusersamountofbytesoutput']:'');
+	$varuserspointoftimebytesoutput = $users['varuserspointoftimebytesoutput'];
+	
 	// Clear variables for next user foreach additional options TOP
 	$varuserstopadditionaloptions = '';
 	$varusersadditionaloptionstop = '';
@@ -442,12 +455,20 @@ if (is_array($arrusers) && !empty($arrusers)) {
 	}
 	if ($varuserslogintime != '') {
 	$varuserscheckitem .= ", Login-Time := " . '"' . $varuserslogintime . '"';
+	}	
+	if ($varusersamountoftime != '') {
+	$varuserscheckitem .= ", Max-" . "$varuserspointoftime" . "-Session := " . "$varusersamountoftime";
 	}
+	if ($varusersamountofbytesinput != '') {
+	$varuserscheckitem .= ", Max-" . "$varuserspointoftimebytesinput" . "-Input := " . "$varusersamountofbytesinput";
+	}
+	if ($varusersamountofbytesoutput != '') {
+	$varuserscheckitem .= ", Max-" . "$varuserspointoftimebytesoutput" . "-Output := " . "$varusersamountofbytesoutput";
+	}	
 	if ($varusersadditionaloptionscheckitems != '') {
 	$varuserscheckitem .= ", $varusersadditionaloptionscheckitems";
 	}
-	
-		
+
 	// Add additional REPLY-ITEMS here. Different formatting in "users" file needed.
 	if ($varusersframedipaddress != '') {
 		if ($varusersreplyitem != '') { $varusersreplyitem .=","; }
@@ -640,6 +661,7 @@ function freeradius_eapconf_resync() {
 // The filenames of pfsense cert manager are different from freeradius cert manager so it is possible to store both in the same folder at any time.
 // This is for the pfsense cert manager
 // Depends on "freeradius_get_server_certs" and "freeradius_get_ca_certs"
+
 if ($eapconf['vareapconfchoosecertmanager'] == 'on') {
 		
 		$ca_cert = lookup_ca($eapconf["ssl_ca_cert"]);
@@ -1305,8 +1327,14 @@ authorize {
 	weekly
 	monthly
 	forever
-	
-
+	maxdailyupload
+	maxdailydownload
+	maxweeklyupload
+	maxweeklydownload
+	maxmonthlyupload
+	maxmonthlydownload
+	maxupload
+	maxdownload
 	#
 	# Use the checkval module
 	checkval
@@ -1500,8 +1528,15 @@ accounting {
 	weekly
 	monthly
 	forever
+	maxdailyupload
+	maxdailydownload
+	maxweeklyupload
+	maxweeklydownload
+	maxmonthlyupload
+	maxmonthlydownload
+	maxupload
+	maxdownload
 	
-
 	#  Update the wtmp file
 	#
 	#  If you don't use "radlast", you can delete this line.
@@ -1675,12 +1710,12 @@ post-auth {
 	#  'edir_account_policy_check = yes' in the ldap module configuration
 	#
 	Post-Auth-Type REJECT {
+
 		# log failed authentications in SQL, too.
-#		sql
+		# sql
 		attr_filter.access_reject
 	}
 }
-
 #
 #  When the server decides to proxy a request to a home server,
 #  the proxied request is first passed through the pre-proxy
@@ -2383,6 +2418,94 @@ counter forever {
 	counter-name = Forever-Session-Time
 	check-name = Max-Forever-Session
 	reply-name = Session-Timeout
+	cache-size = 5000
+}
+
+counter maxdailyupload {
+	filename = \${raddbdir}/db.maxdailyupload
+	key = User-Name
+	count-attribute = Acct-Input-Octets
+	reset = daily
+	counter-name = Daily-Input-Octets
+	check-name = Max-Daily-Input
+	reply-name = ChilliSpot-Max-Input-Octets
+	cache-size = 5000
+}
+
+counter maxdailydownload {
+	filename = \${raddbdir}/db.maxdailydownload
+	key = User-Name
+	count-attribute = Acct-Output-Octets
+	reset = daily
+	counter-name = Daily-Output-Octets
+	check-name = Max-Daily-Output
+	reply-name = ChilliSpot-Max-Output-Octets
+	cache-size = 5000
+}
+
+counter maxweeklyupload {
+	filename = \${raddbdir}/db.maxweeklyupload
+	key = User-Name
+	count-attribute = Acct-Input-Octets
+	reset = weekly
+	counter-name = Weekly-Input-Octets
+	check-name = Max-Weekly-Input
+	reply-name = ChilliSpot-Max-Input-Octets
+	cache-size = 5000
+}
+
+counter maxweeklydownload {
+	filename = \${raddbdir}/db.maxweeklydownload
+	key = User-Name
+	count-attribute = Acct-Output-Octets
+	reset = weekly
+	counter-name = Weekly-Output-Octets
+	check-name = Max-Weekly-Output
+	reply-name = ChilliSpot-Max-Output-Octets
+	cache-size = 5000
+}
+
+counter maxmonthlyupload {
+	filename = \${raddbdir}/db.maxmonthlyupload
+	key = User-Name
+	count-attribute = Acct-Input-Octets
+	reset = monthly
+	counter-name = Monthly-Input-Octets
+	check-name = Max-Monthly-Input
+	reply-name = ChilliSpot-Max-Input-Octets
+	cache-size = 5000
+}
+
+counter maxmonthlydownload {
+	filename = \${raddbdir}/db.maxmonthlydownload
+	key = User-Name
+	count-attribute = Acct-Output-Octets
+	reset = monthly
+	counter-name = Monthly-Output-Octets
+	check-name = Max-Monthly-Output
+	reply-name = ChilliSpot-Max-Output-Octets
+	cache-size = 5000
+}
+
+counter maxupload {
+	filename = \${raddbdir}/db.maxforeverupload
+	key = User-Name
+	count-attribute = Acct-Input-Octets
+	reset = never
+	counter-name = Forever-Input-Octets
+	check-name = Max-Forever-Input
+	reply-name = ChilliSpot-Max-Input-Octets
+	cache-size = 5000
+}
+
+counter maxdownload {
+	filename = \${raddbdir}/db.maxforeverdownload
+	key = User-Name
+	count-attribute = Acct-Output-Octets
+	reset = never
+	counter-name = Forever-Output-Octets
+	check-name = Max-Forever-Output
+	reply-name = ChilliSpot-Max-Output-Octets
 	cache-size = 5000
 }
 
