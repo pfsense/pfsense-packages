@@ -287,6 +287,67 @@
 			<type>input</type>
 		</field>
 		<field>
+			<name>AMOUNT OF TIME AND TRAFFIC</name>
+			<type>listtopic</type>
+		</field>
+		<field>
+			<fielddescr>Amount of Time</fielddescr>
+			<fieldname>varusersamountoftime</fieldname>			
+			<description><![CDATA[Enter the amount of time for this user in seconds.]]></description>
+			<type>input</type>
+		</field>
+		<field>
+			<fielddescr>Time Period</fielddescr>
+			<fieldname>varuserspointoftime</fieldname>			
+			<description><![CDATA[Select the time period for the amount of time.]]></description>
+			<type>select</type>
+			<default_value>daily</default_value>
+				<options>
+					<option><name>Daily</name><value>Daily</value></option>
+					<option><name>Weekly</name><value>Weekly</value></option>
+					<option><name>Monthly</name><value>Monthly</value></option>
+					<option><name>Forever</name><value>Forever</value></option>
+				</options>
+		</field>
+		<field>
+			<fielddescr>Amount of Upload Traffic</fielddescr>
+			<fieldname>varusersamountofbytesinput</fieldname>			
+			<description><![CDATA[Enter the amount of upload traffic for this user in bytes. There is a bug in CaptivePortal which counts the traffic six times faster than in reality. So if a user should have 1MB of traffic you must calculate 6+1MB and enter here: 6000000.]]></description>
+			<type>input</type>
+		</field>
+		<field>
+			<fielddescr>Time Period</fielddescr>
+			<fieldname>varuserspointoftimebytesinput</fieldname>			
+			<description><![CDATA[Select the time period for the amount of upload traffic.]]></description>
+			<type>select</type>
+			<default_value>daily</default_value>
+				<options>
+					<option><name>Daily</name><value>Daily</value></option>
+					<option><name>Weekly</name><value>Weekly</value></option>
+					<option><name>Monthly</name><value>Monthly</value></option>
+					<option><name>Forever</name><value>Forever</value></option>
+				</options>
+		</field>
+		<field>
+			<fielddescr>Amount of Download Traffic</fielddescr>
+			<fieldname>varusersamountofbytesoutput</fieldname>			
+			<description><![CDATA[Enter the amount of download traffic for this user in bytes. There is a bug in CaptivePortal which counts the traffic six times faster than in reality. So if a user should have 1MB of traffic you must calculate 6+1MB and enter here: 6000000.]]></description>
+			<type>input</type>
+		</field>
+		<field>
+			<fielddescr>Time Period</fielddescr>
+			<fieldname>varuserspointoftimebytesoutput</fieldname>			
+			<description><![CDATA[Select the time period for the amount of download limit.]]></description>
+			<type>select</type>
+			<default_value>daily</default_value>
+				<options>
+					<option><name>Daily</name><value>Daily</value></option>
+					<option><name>Weekly</name><value>Weekly</value></option>
+					<option><name>Monthly</name><value>Monthly</value></option>
+					<option><name>Forever</name><value>Forever</value></option>
+				</options>
+		</field>
+		<field>
 			<name>MISCELLANEOUS CONFIGURATION</name>
 			<type>listtopic</type>
 		</field>		
