@@ -369,6 +369,7 @@ EOD;
 	freeradius_modulescounter_resync();
 	freeradius_modulesmschap_resync();
 	freeradius_modulesrealm_resync();
+	freeradius_plainmacauth_resync();
 	// This is to fix the mysqlclient.so which gets lost after reboot
 	exec("ldconfig -m /usr/local/lib/mysql");
 	// Change owner of freeradius created files
