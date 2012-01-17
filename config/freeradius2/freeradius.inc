@@ -390,7 +390,7 @@ if (is_array($arrusers) && !empty($arrusers)) {
 	// Variables for users file defined parameters
 	$varusersusername = $users['varusersusername'];
 	$varuserspassword = $users['varuserspassword'];
-	$varuserssimultaneousconnect = ($users['varuserssimultaneousconnect']?$users['varuserssimultaneousconnect']:'1');
+	$varuserssimultaneousconnect = ($users['varuserssimultaneousconnect']?$users['varuserssimultaneousconnect']:'');
 	$varusersframedipaddress = $users['varusersframedipaddress'];
 	$varusersframedipnetmask = $users['varusersframedipnetmask'];
 	$varusersframedroute = $users['varusersframedroute'];
@@ -404,6 +404,8 @@ if (is_array($arrusers) && !empty($arrusers)) {
 	$varuserspointoftimebytesinput = $users['varuserspointoftimebytesinput'];
 	$varusersamountofbytesoutput = ($users['varusersamountofbytesoutput']?$users['varusersamountofbytesoutput']:'');
 	$varuserspointoftimebytesoutput = $users['varuserspointoftimebytesoutput'];
+	$varusersmaxbandwidthup = ($users['varusersmaxbandwidthup']?$users['varusersmaxbandwidthup']:'');
+	$varusersmaxbandwidthdown = ($users['varusersmaxbandwidthdown']?$users['varusersmaxbandwidthdown']:'');
 	
 	// Clear variables for next user foreach additional options TOP
 	$varuserstopadditionaloptions = '';
@@ -491,6 +493,14 @@ if (is_array($arrusers) && !empty($arrusers)) {
 		if ($varusersreplyitem != '') { $varusersreplyitem .=","; }
 		$varusersreplyitem .= "\n\tTunnel-Type = VLAN,\n\tTunnel-Medium-Type = IEEE-802,\n\tTunnel-Private-Group-ID = " . '"' . $varusersvlanid . '"';
 	}
+	if ($varusersmaxbandwidthup != '') {
+		if ($varusersreplyitem != '') { $varusersreplyitem .=","; }
+		$varusersreplyitem .= "\n\tWISPr-Bandwidth-Max-Up := $varusersmaxbandwidthup";
+	}
+	if ($varusersmaxbandwidthdown != '') {
+		if ($varusersreplyitem != '') { $varusersreplyitem .=","; }
+		$varusersreplyitem .= "\n\tWISPr-Bandwidth-Max-Down := $varusersmaxbandwidthdown";
+	}
 	if ($varusersadditionaloptionsreplyitems != '') {
 		if ($varusersreplyitem != '') { $varusersreplyitem .=","; }
 		$varusersreplyitem .= "\n\t$varusersadditionaloptionsreplyitems";
@@ -523,18 +533,140 @@ function freeradius_authorizedmacs_resync() {
 global $config;
 
 $conf = '';
-
 $arrmacs = $config['installedpackages']['freeradiusauthorizedmacs']['config'];
 
 if (is_array($arrmacs) && !empty($arrmacs)) {
 	foreach ($arrmacs as $macs) {
 	
-	// Variables for macs file defined parameters
-	$varmacaddress = $macs['varmacaddress'];
-	$varmacaddress = "$varmacaddress" . "\n";
+	// Variables for authorized_macs file defined parameters
+	$varmacsaddress = $macs['varmacsaddress'];
+	// We don't need a password but we need this field to make syntac correct for CHECK-ITEMS
+	$varmacspassword = $macs['varmacsaddress'];
+	
+	$varmacssimultaneousconnect = ($macs['varmacssimultaneousconnect']?$macs['varmacssimultaneousconnect']:'');
+	$varmacsframedipaddress = $macs['varmacsframedipaddress'];
+	$varmacsframedipnetmask = $macs['varmacsframedipnetmask'];
+	$varmacsframedroute = $macs['varmacsframedroute'];
+	$varmacsexpiration = $macs['varmacsexpiration'];
+	$varmacssessiontimeout = $macs['varmacssessiontimeout'];
+	$varmacslogintime = $macs['varmacslogintime'];
+	$varmacsvlanid = $macs['varmacsvlanid'];
+	$varmacsamountoftime = ($macs['varmacsamountoftime']?$macs['varmacsamountoftime']:'');
+	$varmacspointoftime = $macs['varmacspointoftime'];
+	$varmacsamountofbytesinput = ($macs['varmacsamountofbytesinput']?$macs['varmacsamountofbytesinput']:'');
+	$varmacspointoftimebytesinput = $macs['varmacspointoftimebytesinput'];
+	$varmacsamountofbytesoutput = ($macs['varmacsamountofbytesoutput']?$macs['varmacsamountofbytesoutput']:'');
+	$varmacspointoftimebytesoutput = $macs['varmacspointoftimebytesoutput'];
+	$varmacsmaxbandwidthup = ($macs['varmacsmaxbandwidthup']?$macs['varmacsmaxbandwidthup']:'');
+	$varmacsmaxbandwidthdown = ($macs['varmacsmaxbandwidthdown']?$macs['varmacsmaxbandwidthdown']:'');
+	
+	// Clear variables for next mac foreach additional options TOP
+	$varmacstopadditionaloptions = '';
+	$varmacsadditionaloptionstop = '';
+	
+	if(!empty($macs['varmacstopadditionaloptions'])) {
+		$varmacstopadditionaloptions = explode("|", ($macs['varmacstopadditionaloptions']));
+		foreach ($varmacstopadditionaloptions as $toptmp) {
+			$varmacsadditionaloptionstop .= $toptmp . "\n";
+		}
+	}
+	
+	// Clear variables for next mac foreach additional options: CHECK-ITEMS
+	$varmacscheckitemsadditionaloptions = '';
+	$varmacsadditionaloptionscheckitems = '';
+	
+	if(!empty($macs['varmacscheckitemsadditionaloptions'])) {
+		$varmacscheckitemsadditionaloptions = explode("|", ($macs['varmacscheckitemsadditionaloptions']));
+		$varmacsadditionaloptionscheckitems .= '';
+		foreach ($varmacscheckitemsadditionaloptions as $checkitemtmp) {
+			$varmacsadditionaloptionscheckitems .= $checkitemtmp;
+		}
+	}
+		
+	// Clear variables for next mac foreach additional options: REPLY-ITEMS
+	$varmacsreplyitemsadditionaloptions = '';
+	$varmacsadditionaloptionsreplyitems = '';
+	
+	if(!empty($macs['varmacsreplyitemsadditionaloptions'])) {
+		$varmacsreplyitemsadditionaloptions = explode("|", ($macs['varmacsreplyitemsadditionaloptions']));
+		$varmacsadditionaloptionsreplyitems .= '';
+		foreach ($varmacsreplyitemsadditionaloptions as $replyitemtmp) {
+			$varmacsadditionaloptionsreplyitems .= $replyitemtmp . "\n\t";
+		}
+	}
+
+	// Empty variable
+	$varmacscheckitem = '';
+	$varmacsreplyitem = '';
+	
+	// Add the mac attributes to each mac address.
+	$varmacscheckitem = "$varmacsaddress" . " Cleartext-Password := " . '"' . $varmacspassword .'"';
+	
+	// Add additional CHECK-ITEMS here. Different formatting in "authorized_macs" file needed.
+	if ($varmacssimultaneousconnect != '') {
+	$varmacscheckitem .= ", Simultaneous-Use := " . '"' . $varmacssimultaneousconnect . '"';
+	}
+	if ($varmacsexpiration != '') {
+	$varmacscheckitem .= ", Expiration := " . '"' . $varmacsexpiration . '"';
+	}
+	if ($varmacslogintime != '') {
+	$varmacscheckitem .= ", Login-Time := " . '"' . $varmacslogintime . '"';
+	}	
+	if ($varmacsamountoftime != '') {
+	$varmacscheckitem .= ", Max-" . "$varmacspointoftime" . "-Session := " . "$varmacsamountoftime";
+	}
+	if ($varmacsamountofbytesinput != '') {
+	$varmacscheckitem .= ", Max-" . "$varmacspointoftimebytesinput" . "-Input := " . "$varmacsamountofbytesinput";
+	}
+	if ($varmacsamountofbytesoutput != '') {
+	$varmacscheckitem .= ", Max-" . "$varmacspointoftimebytesoutput" . "-Output := " . "$varmacsamountofbytesoutput";
+	}	
+	if ($varmacsadditionaloptionscheckitems != '') {
+	$varmacscheckitem .= ", $varmacsadditionaloptionscheckitems";
+	}
+
+	// Add additional REPLY-ITEMS here. Different formatting in "authorized_macs" file needed.
+	if ($varmacsframedipaddress != '') {
+		if ($varmacsreplyitem != '') { $varmacsreplyitem .=","; }
+		$varmacsreplyitem .= "\n\tFramed-IP-Address = $varmacsframedipaddress";
+	}
+	if ($varmacsframedipnetmask != '') {
+		if ($varmacsreplyitem != '') { $varmacsreplyitem .=","; }
+		$varmacsreplyitem .= "\n\tFramed-IP-Netmask = $varmacsframedipnetmask";
+	}
+	if ($varmacsframedroute != '') {
+		if ($varmacsreplyitem != '') { $varmacsreplyitem .=","; }
+		$varmacsreplyitem .= "\n\tFramed-Route = " . '"' . $varmacsframedroute . '"';
+	}
+	if ($varmacssessiontimeout != '') {
+		if ($varmacsreplyitem != '') { $varmacsreplyitem .=","; }
+		$varmacsreplyitem .= "\n\tSession-Timeout := $varmacssessiontimeout";
+	}
+	if ($varmacsvlanid != '') {
+		if ($varmacsreplyitem != '') { $varmacsreplyitem .=","; }
+		$varmacsreplyitem .= "\n\tTunnel-Type = VLAN,\n\tTunnel-Medium-Type = IEEE-802,\n\tTunnel-Private-Group-ID = " . '"' . $varmacsvlanid . '"';
+	}
+	if ($varmacsmaxbandwidthup != '') {
+		if ($varmacsreplyitem != '') { $varmacsreplyitem .=","; }
+		$varmacsreplyitem .= "\n\tWISPr-Bandwidth-Max-Up := $varmacsmaxbandwidthup";
+	}
+	if ($varmacsmaxbandwidthdown != '') {
+		if ($varmacsreplyitem != '') { $varmacsreplyitem .=","; }
+		$varmacsreplyitem .= "\n\tWISPr-Bandwidth-Max-Down := $varmacsmaxbandwidthdown";
+	}
+	if ($varmacsadditionaloptionsreplyitems != '') {
+		if ($varmacsreplyitem != '') { $varmacsreplyitem .=","; }
+		$varmacsreplyitem .= "\n\t$varmacsadditionaloptionsreplyitems";
+	}
+	
+	// Cosmetic fix - This is just to make a blank new line after each macs entry
+	$varmacsreplyitem .= "\n\n";
+	
 	
 	$conf .= <<<EOD
-$varmacaddress
+$varmacsadditionaloptionstop
+$varmacscheckitem
+	$varmacsreplyitem
 EOD;
 	} //end foreach
 } // end if
@@ -2429,7 +2561,7 @@ counter maxdailyupload {
 	reset = daily
 	counter-name = Daily-Input-Octets
 	check-name = Max-Daily-Input
-	reply-name = ChilliSpot-Max-Input-Octets
+	reply-name = Acct-Input-Octets
 	cache-size = 5000
 }
 
@@ -2440,7 +2572,7 @@ counter maxdailydownload {
 	reset = daily
 	counter-name = Daily-Output-Octets
 	check-name = Max-Daily-Output
-	reply-name = ChilliSpot-Max-Output-Octets
+	reply-name = Acct-Output-Octets
 	cache-size = 5000
 }
 
@@ -2451,7 +2583,7 @@ counter maxweeklyupload {
 	reset = weekly
 	counter-name = Weekly-Input-Octets
 	check-name = Max-Weekly-Input
-	reply-name = ChilliSpot-Max-Input-Octets
+	reply-name = Acct-Input-Octets
 	cache-size = 5000
 }
 
@@ -2462,7 +2594,7 @@ counter maxweeklydownload {
 	reset = weekly
 	counter-name = Weekly-Output-Octets
 	check-name = Max-Weekly-Output
-	reply-name = ChilliSpot-Max-Output-Octets
+	reply-name = Acct-Output-Octets
 	cache-size = 5000
 }
 
@@ -2473,7 +2605,7 @@ counter maxmonthlyupload {
 	reset = monthly
 	counter-name = Monthly-Input-Octets
 	check-name = Max-Monthly-Input
-	reply-name = ChilliSpot-Max-Input-Octets
+	reply-name = Acct-Input-Octets
 	cache-size = 5000
 }
 
@@ -2484,7 +2616,7 @@ counter maxmonthlydownload {
 	reset = monthly
 	counter-name = Monthly-Output-Octets
 	check-name = Max-Monthly-Output
-	reply-name = ChilliSpot-Max-Output-Octets
+	reply-name = Acct-Output-Octets
 	cache-size = 5000
 }
 
@@ -2495,7 +2627,7 @@ counter maxupload {
 	reset = never
 	counter-name = Forever-Input-Octets
 	check-name = Max-Forever-Input
-	reply-name = ChilliSpot-Max-Input-Octets
+	reply-name = Acct-Input-Octets
 	cache-size = 5000
 }
 
@@ -2506,7 +2638,7 @@ counter maxdownload {
 	reset = never
 	counter-name = Forever-Output-Octets
 	check-name = Max-Forever-Output
-	reply-name = ChilliSpot-Max-Output-Octets
+	reply-name = Acct-Output-Octets
 	cache-size = 5000
 }
 

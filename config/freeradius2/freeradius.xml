@@ -220,8 +220,7 @@
 			<fielddescr>Number of simultaneous connections</fielddescr>
 			<fieldname>varuserssimultaneousconnect</fieldname>
 			<description><![CDATA[The maximum of simultaneous connections with this username. (Default: 1)]]></description>
-			<default_value>1</default_value>
-			<required/>
+			<default_value></default_value>
 			<type>input</type>
 		</field>		
 		<field>
@@ -287,10 +286,6 @@
 			<type>input</type>
 		</field>
 		<field>
-			<name>AMOUNT OF TIME AND TRAFFIC</name>
-			<type>listtopic</type>
-		</field>
-		<field>
 			<fielddescr>Amount of Time</fielddescr>
 			<fieldname>varusersamountoftime</fieldname>			
 			<description><![CDATA[Enter the amount of time for this user in seconds.]]></description>
@@ -310,9 +305,13 @@
 				</options>
 		</field>
 		<field>
+			<name>TRAFFIC AND BANDWIDTH</name>
+			<type>listtopic</type>
+		</field>
+		<field>
 			<fielddescr>Amount of Upload Traffic</fielddescr>
 			<fieldname>varusersamountofbytesinput</fieldname>			
-			<description><![CDATA[Enter the amount of upload traffic for this user in bytes. There is a bug in CaptivePortal which counts the traffic six times faster than in reality. So if a user should have 1MB of traffic you must calculate 6+1MB and enter here: 6000000.]]></description>
+			<description><![CDATA[Enter the amount of upload traffic for this user in <b>bytes</b>. There is a bug in CaptivePortal which counts the traffic six times faster than in reality. So if a user should have 1MB of traffic you must calculate 6+1MB and enter here: 6000000.]]></description>
 			<type>input</type>
 		</field>
 		<field>
@@ -331,7 +330,7 @@
 		<field>
 			<fielddescr>Amount of Download Traffic</fielddescr>
 			<fieldname>varusersamountofbytesoutput</fieldname>			
-			<description><![CDATA[Enter the amount of download traffic for this user in bytes. There is a bug in CaptivePortal which counts the traffic six times faster than in reality. So if a user should have 1MB of traffic you must calculate 6+1MB and enter here: 6000000.]]></description>
+			<description><![CDATA[Enter the amount of download traffic for this user in <b>bytes</b>. There is a bug in CaptivePortal which counts the traffic six times faster than in reality. So if a user should have 1MB of traffic you must calculate 6+1MB and enter here: 6000000.]]></description>
 			<type>input</type>
 		</field>
 		<field>
@@ -346,6 +345,18 @@
 					<option><name>Monthly</name><value>Monthly</value></option>
 					<option><name>Forever</name><value>Forever</value></option>
 				</options>
+		</field>
+		<field>
+			<fielddescr>Maximum Download Bandwidth</fielddescr>
+			<fieldname>varusersmaxbandwidthdown</fieldname>			
+			<description><![CDATA[Enter the maximum bandwidth for download in bps (<b>bits</b> per second).]]></description>
+			<type>input</type>
+		</field>
+		<field>
+			<fielddescr>Maximum Upload Bandwidth</fielddescr>
+			<fieldname>varusersmaxbandwidthup</fieldname>			
+			<description><![CDATA[Enter the maximum bandwidth for upload in bps (<b>bits</b> per second).]]></description>
+			<type>input</type>
 		</field>
 		<field>
 			<name>MISCELLANEOUS CONFIGURATION</name>
