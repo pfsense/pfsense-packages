@@ -365,11 +365,11 @@ EOD;
 	conf_mount_ro();
 	
 	// "freeradius_sqlconf_resync" is pointing to this function because we need to run "freeradius_serverdefault_resync" and after that restart freeradius.
-	freeradius_serverdefault_resync();
 	freeradius_modulescounter_resync();
 	freeradius_modulesmschap_resync();
 	freeradius_modulesrealm_resync();
 	freeradius_plainmacauth_resync();
+	
 	// This is to fix the mysqlclient.so which gets lost after reboot
 	exec("ldconfig -m /usr/local/lib/mysql");
 	// Change owner of freeradius created files
@@ -1095,6 +1095,7 @@ EOD;
 	// We don't need a restart at this time because there are additional changes needed in:
 	// "freeradius_settings_resync" and "freeradius_serverdefault_resync".
 	// restart_service('radiusd');
+	freeradius_serverdefault_resync();
 	freeradius_settings_resync();
 }
 
@@ -2208,6 +2209,12 @@ EOD;
 
 function freeradius_allcertcnf_resync() {
 	global $config;
+	
+	
+// Only proceed these steps if freeRADIUS Cert-Manager is activated. if pfSense cert manager is used skip this.
+$eapconf = $config['installedpackages']['freeradiuseapconf']['config'][0];
+if ($eapconf['vareapconfchoosecertmanager'] == '') {
+	
 
 	$arrcerts = $config['installedpackages']['freeradiuscerts']['config'][0];
 	
@@ -2217,7 +2224,9 @@ function freeradius_allcertcnf_resync() {
 	// General variables for deleting: CA, Server, Client
 	$varcertsdeleteall = ($arrcerts['varcertsdeleteall']?$arrcerts['varcertsdeleteall']:'no');
 		
-	
+	// If all certs should be deleted, we do not need to delete and recreate client-certs first.
+	if ($arrcerts['varcertsdeleteall'] == 'no') {
+
 		if ($arrcerts['varcertscreateclient'] == 'yes') {
 		
 		// delete all old certificates and keys
@@ -2250,18 +2259,19 @@ function freeradius_allcertcnf_resync() {
 		exec("chmod -R 0600 /usr/local/etc/raddb/certs/");
 		log_error("freeRADIUS: Created new client.csr .crt .key .pem and added them together with ca.der in /usr/local/etc/raddb/certs/client.tar");
 		}
-
+	}
+	else {
 		
 		if ($arrcerts['varcertsdeleteall'] == 'yes') {
 	
 		// delete all old certificates and keys - deletes certs from pfsense cert-manager IN THIS FOLDER, too.
 		log_error("freeRADIUS: deleting all CA, Server and Client certs, DH, random and database files in /usr/local/etc/raddb/certs");
-		exec("rm -f /usr/local/etc/raddb/certs/*.pem");
-		exec("rm -f /usr/local/etc/raddb/certs/*.der");
-		exec("rm -f /usr/local/etc/raddb/certs/*.csr");
-		exec("rm -f /usr/local/etc/raddb/certs/*.crt");
-		exec("rm -f /usr/local/etc/raddb/certs/*.key");
-		exec("rm -f /usr/local/etc/raddb/certs/*.p12");
+		exec("rm -f /usr/local/etc/raddb/certs/ca.pem && rm -f /usr/local/etc/raddb/certs/server.pem && rm -f /usr/local/etc/raddb/certs/client.pem");
+		exec("rm -f /usr/local/etc/raddb/certs/ca.der && rm -f /usr/local/etc/raddb/certs/server.der && rm -f /usr/local/etc/raddb/certs/client.der");
+		exec("rm -f /usr/local/etc/raddb/certs/ca.csr && rm -f /usr/local/etc/raddb/certs/server.csr && rm -f /usr/local/etc/raddb/certs/client.csr");
+		exec("rm -f /usr/local/etc/raddb/certs/ca.crt && rm -f /usr/local/etc/raddb/certs/server.crt && rm -f /usr/local/etc/raddb/certs/client.crt");
+		exec("rm -f /usr/local/etc/raddb/certs/ca.key && rm -f /usr/local/etc/raddb/certs/server.key && rm -f /usr/local/etc/raddb/certs/client.key");
+		exec("rm -f /usr/local/etc/raddb/certs/ca.p12 && rm -f /usr/local/etc/raddb/certs/server.p12 && rm -f /usr/local/etc/raddb/certs/client.p12");
 		exec("rm -f /usr/local/etc/raddb/certs/serial*");
 		exec("rm -f /usr/local/etc/raddb/certs/index*");
 		exec("rm -f /usr/local/etc/raddb/certs/dh");
@@ -2296,7 +2306,12 @@ function freeradius_allcertcnf_resync() {
 		// If there were changes on the certificates we need to restart freeradius
 		restart_service('radiusd');
 		}
+	}
+} //end choose pfSense cert-manager
+else {
+	return;
 }
+} //end of function
 
 // ##### The following part is based on the code of pfblocker #####
 
@@ -3302,7 +3317,8 @@ EOD;
 	
 	// We need to rebuild "freeradius_serverdefault_resync" before restart service
 	// "freeradius_serverdefault_resync" needs to restart other dependencies so we are pointing directly to "freeradius_settings_resync()"
-	freeradius_settings_resync();
+	freeradius_serverdefault_resync();
+	restart_service("radiusd");
 	
 }
 
@@ -3330,6 +3346,8 @@ function freeradius_plainmacauth_resync() {
 		freeradius_modulesfiles_resync();
 		freeradius_policyconf_resync();
 	}
+	
+	freeradius_serverdefault_resync();
 }
 
 function freeradius_modulesfiles_resync() {
