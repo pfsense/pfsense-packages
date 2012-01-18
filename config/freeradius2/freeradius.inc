@@ -121,6 +121,8 @@ function freeradius_install_command() {
 		exec("chmod 0755 /usr/local/lib/libroken.so.10");
 	}
 	
+	// We run this here just to suppress some warnings on syslog if file doesn't exist
+	freeradius_authorizedmacs_resync();
 	
 	$rcfile = array();
 	$rcfile['file'] = 'radiusd.sh';
