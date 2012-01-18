@@ -124,6 +124,10 @@ function freeradius_install_command() {
 	// We run this here just to suppress some warnings on syslog if file doesn't exist
 	freeradius_authorizedmacs_resync();
 	
+	// Initialize some config files - the functions below call other functions
+	freeradius_sqlconf_resync();
+	freeradius_eapconf_resync();
+	
 	$rcfile = array();
 	$rcfile['file'] = 'radiusd.sh';
 	$rcfile['start'] = '/usr/local/etc/rc.d/radiusd onestart';
