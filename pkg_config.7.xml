@@ -588,6 +588,7 @@
       <status>BETA</status>
       <depends_on_package_base_url>http://files.pfsense.org/packages/7/All/</depends_on_package_base_url>
       <depends_on_package>openospfd-4.6.tbz</depends_on_package>
+      <depends_on_package>libevent-1.4.14b_2.tbz</depends_on_package>
       <config_file>http://www.pfsense.com/packages/config/openospfd/openospfd.xml</config_file>
       <pkginfolink></pkginfolink>
       <required_version>1.2.1</required_version>
