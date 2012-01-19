@@ -1262,6 +1262,16 @@ function freeradius_serverdefault_resync() {
 		$varplainmacpreacctenable .= "\n\trewrite_calling_station_id";
 	}
 	
+	// Disable acct_unique in preacct section
+	$varsettings = $config['installedpackages']['freeradiussettings']['config'][0];
+	
+	if ($varsettings['varsettingsenableacctunique'] == 'on') {
+		$varsettingsacctuniqueenabled = '##### DISABLE acct_unique DISABLE #####';
+	}
+	else {
+		$varsettingsacctuniqueenabled = 'acct_unique';
+	}
+	
 	$conf .= <<<EOD
 
 ######################################################################
@@ -1637,7 +1647,7 @@ preacct {
 	#
 	#  Ensure that we have a semi-unique identifier for every
 	#  request, and many NAS boxes are broken.
-	acct_unique
+	$varsettingsacctuniqueenabled
 
 	#
 	#  Look for IPASS-style 'realm/', and if not found, look for
