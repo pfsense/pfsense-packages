@@ -562,7 +562,7 @@
 		<name>OpenOSPFD</name>
 		<descr>OSPF routing protocol</descr>
 		<maintainer>cmb@pfsense.org</maintainer>
-		<version>0.5.1</version>
+		<version>0.5.2</version>
 		<category>Routing</category>
 		<status>BETA</status>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
