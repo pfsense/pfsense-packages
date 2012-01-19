@@ -98,16 +98,6 @@
 	</tabs>
 	<fields>
 		<field>
-			<name>PLAIN MAC AUTHORIZATION</name>
-			<type>listtopic</type>
-		</field>
-		<field>
-			<fielddescr>Enable Plain MAC Auth</fielddescr>
-			<fieldname>varsettingsenablemacauth</fieldname>
-			<description><![CDATA[This enables plain MAC auth. The Calling-Station-Id in an Access-Request is first checked against an authorized_macs list before all other authorization methods.	If your NAS is not able to convert the MAC in a 802.1X format then you could enable this. If you do not need this leave this disabled. (Default: unchecked)]]></description>
-			<type>checkbox</type>
-		</field>
-		<field>
 			<name>GENERAL CONFIGURATION</name>
 			<type>listtopic</type>
 		</field>		
@@ -298,6 +288,22 @@
 			<description><![CDATA[You should only change this if you encounter memory leaks while running RADIUS. (Default: 0)]]></description>
 			<type>input</type>
 			<default_value>0</default_value>
+		</field>
+		<field>
+			<name>MISCELLANEOUS CONFIGURATION</name>
+			<type>listtopic</type>
+		</field>
+		<field>
+			<fielddescr>Enable Plain MAC Auth</fielddescr>
+			<fieldname>varsettingsenablemacauth</fieldname>
+			<description><![CDATA[This enables plain MAC auth. The Calling-Station-Id in an Access-Request is first checked against an authorized_macs list before all other authorization methods.	If your NAS is not able to convert the MAC in a 802.1X format then you could enable this. If you do not need this leave this disabled. (Default: unchecked)]]></description>
+			<type>checkbox</type>
+		</field>
+		<field>
+			<fielddescr>Disable Acct_Unique</fielddescr>
+			<fieldname>varsettingsenableacctunique</fieldname>
+			<description><![CDATA[This disables the "rlm_acct_unique" module in FreeRADIUS "preacct" section. By default this is enabled but it causes some problems with CP if a user should be disconnected when its amount of time/data is reached. So if you use "Amount of Download/Upload/Time" then disable this. (Default: unchecked)]]></description>
+			<type>checkbox</type>
 		</field>
 	</fields>
 	<custom_delete_php_command>
