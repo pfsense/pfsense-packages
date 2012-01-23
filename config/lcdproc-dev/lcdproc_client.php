@@ -2,7 +2,7 @@
 /* $Id$ */
 /*
         lcdproc_client.php
-        Copyright (C) 2007 Seth Mos <seth.mos@dds.nl>
+        Copyright (C) 2007 Seth Mos <seth.mos@xs4all.nl>
         All rights reserved.
 
         Redistribution and use in source and binary forms, with or without
@@ -97,13 +97,14 @@
 
 	function get_uptime_stats() {
 		exec("/usr/bin/uptime", $output, $ret);
+		$temp = explode(",", $output[0]);
 		if(stristr($output[0], "day")) {
-			$temp = explode(" ", $output[0]);
-			$status = "$temp[2] $temp[3] $temp[4] $temp[5] $temp[6] $temp[7] ". substr($temp[8], 0, -1);
+			$status = "$temp[0] $temp[1]";
 		} else {
-			$temp = explode(" ", $output[0]);
-			$status = "$temp[2] $temp[3] $temp[4] $temp[5] $temp[6] ". substr($temp[7], 0, -1);
+			$status = "$temp[0] ";
 		}
+		$status = trim(str_replace("  ", " ", $status));
+		$status = substr($status, strpos($status, "up ") + 3);		
 		return($status);
 	}
 
