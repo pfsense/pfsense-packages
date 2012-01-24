@@ -106,7 +106,7 @@
 			<fieldname>varmodulesldapenableauthorize</fieldname>
 			<description><![CDATA[This enables LDAP in authorize section. The ldap module will set Auth-Type to LDAP if it has not already been set. (Default: unchecked)]]></description>
 			<type>checkbox</type>
-			<enablefields>varmodulesldap2enableauthenticate,varmodulesldapkeepaliveinterval,varmodulesldapkeepaliveprobes,varmodulesldapkeepaliveidle,varmodulesldapmsadcompatibilityenable,varmodulesldapnettimeout,varmodulesldaptimelimit,varmodulesldaptimeout,varmodulesldapldapconnectionsnumber,varmodulesldapbasefilter,varmodulesldapfilter,varmodulesldapbasedn,varmodulesldappassword,varmodulesldapidentity,varmodulesldapserver,varmodulesldap2enableauthorize,varmodulesldap2enableauthenticate,varmodulesldap2server,varmodulesldap2identity,varmodulesldap2password,varmodulesldap2basedn,varmodulesldap2filter,varmodulesldap2basefilter,varmodulesldap2ldapconnectionsnumber,varmodulesldap2timeout,varmodulesldap2timelimit,varmodulesldap2nettimeout,varmodulesldap2msadcompatibilityenable,varmodulesldap2dmiscenable,varmodulesldap2groupenable,varmodulesldap2keepaliveidle,varmodulesldap2keepaliveprobes,varmodulesldap2keepaliveinterval</enablefields>
+			<enablefields>varmodulesldapenabletlssupport,varmodulesldap2failover,varmodulesldap2enableauthenticate,varmodulesldapkeepaliveinterval,varmodulesldapkeepaliveprobes,varmodulesldapkeepaliveidle,varmodulesldapmsadcompatibilityenable,varmodulesldapnettimeout,varmodulesldaptimelimit,varmodulesldaptimeout,varmodulesldapldapconnectionsnumber,varmodulesldapbasefilter,varmodulesldapfilter,varmodulesldapbasedn,varmodulesldappassword,varmodulesldapidentity,varmodulesldapserver,varmodulesldap2enableauthorize,varmodulesldap2enableauthenticate,varmodulesldap2server,varmodulesldap2identity,varmodulesldap2password,varmodulesldap2basedn,varmodulesldap2filter,varmodulesldap2basefilter,varmodulesldap2ldapconnectionsnumber,varmodulesldap2timeout,varmodulesldap2timelimit,varmodulesldap2nettimeout,varmodulesldap2msadcompatibilityenable,varmodulesldap2dmiscenable,varmodulesldap2groupenable,varmodulesldap2keepaliveidle,varmodulesldap2keepaliveprobes,varmodulesldap2keepaliveinterval</enablefields>
 		</field>
 		<field>
 			<fielddescr>Enable LDAP For Authentication</fielddescr>
@@ -340,6 +340,53 @@
 			<size>80</size>
 			<default_value>3</default_value>
 		</field>
+		<field>
+			<name>LDAP TLS SUPPORT - SERVER 1</name>
+			<type>listtopic</type>
+		</field>
+		<field>
+			<fielddescr>Enable TSL support</fielddescr>
+			<fieldname>varmodulesldapenabletlssupport</fieldname>
+			<description><![CDATA[Enable TLS support for LDAP server 1. If enabled then certs in ../raddb/certs/ will be checked against the certs on LDAP.]]></description>
+			<type>checkbox</type>
+			<enablefields>ssl_ca_cert1,ssl_server_cert1,varmodulesldaprequirecert</enablefields>
+		</field>
+		<field>
+			<fielddescr>SSL CA Certificate</fielddescr>
+			<fieldname>ssl_ca_cert1</fieldname>
+			<description><![CDATA[Choose the SSL CA Certficate here which you created with the pfSense Cert Manager.<br>
+									Choose "none" if you do not use any kind of certificates or the freeradius Cert Manager. (Default: none)]]></description>
+			<type>select_source</type>
+			<source><![CDATA[freeradius_get_ca_certs()]]></source>
+			<source_name>descr</source_name>
+			<source_value>refid</source_value>
+		</field>
+		<field>
+			<fielddescr>SSL Server Certificate</fielddescr>
+			<fieldname>ssl_server_cert1</fieldname>
+			<description><![CDATA[Choose the SSL Server Certficate here which you created with the pfSense Cert Manager.<br>
+									Choose "none" if you do not use any kind of certificates or the freeradius Cert Manager. (Default: none)]]></description>
+			<type>select_source</type>
+			<source><![CDATA[freeradius_get_server_certs()]]></source>
+			<source_name>descr</source_name>
+			<source_value>refid</source_value>
+		</field>
+		<field>
+			<fielddescr>Choose certificate verification method</fielddescr>
+			<fieldname>varmodulesldaprequirecert</fieldname>
+			<description><![CDATA[Choose how the certs should be checked:<br><br>
+			
+									<b>never: </b>don't even bother trying<br>
+									<b>allow: </b>try but don't fail if the cerificate can't be verified<br>
+									<b>demand: </b>fail if the certificate doesn't verify]]></description>
+			<type>select</type>
+			<default_value>never</default_value>
+					<options>
+						<option><name>Never</name><value>never</value></option>
+						<option><name>Allow</name><value>allow</value></option>
+						<option><name>Demand</name><value>demand</value></option>
+					</options>
+		</field>
 		
 		
 		<field>
@@ -370,7 +417,7 @@
 			<fieldname>varmodulesldap2enableauthorize</fieldname>
 			<description><![CDATA[This enables LDAP in authorize section. The ldap module will set Auth-Type to LDAP if it has not already been set. (Default: unchecked)]]></description>
 			<type>checkbox</type>
-			<enablefields>varmodulesldap2enableauthenticate,varmodulesldap2server,varmodulesldap2identity,varmodulesldap2password,varmodulesldap2basedn,varmodulesldap2filter,varmodulesldap2basefilter,varmodulesldap2ldapconnectionsnumber,varmodulesldap2timeout,varmodulesldap2timelimit,varmodulesldap2nettimeout,varmodulesldap2msadcompatibilityenable,varmodulesldap2dmiscenable,varmodulesldap2groupenable,varmodulesldap2keepaliveidle,varmodulesldap2keepaliveprobes,varmodulesldap2keepaliveinterval</enablefields>
+			<enablefields>varmodulesldap2enabletlssupport,varmodulesldap2enableauthenticate,varmodulesldap2server,varmodulesldap2identity,varmodulesldap2password,varmodulesldap2basedn,varmodulesldap2filter,varmodulesldap2basefilter,varmodulesldap2ldapconnectionsnumber,varmodulesldap2timeout,varmodulesldap2timelimit,varmodulesldap2nettimeout,varmodulesldap2msadcompatibilityenable,varmodulesldap2dmiscenable,varmodulesldap2groupenable,varmodulesldap2keepaliveidle,varmodulesldap2keepaliveprobes,varmodulesldap2keepaliveinterval</enablefields>
 		</field>
 		<field>
 			<fielddescr>Enable LDAP For Authentication</fielddescr>
@@ -603,6 +650,53 @@
 			<type>input</type>
 			<size>80</size>
 			<default_value>3</default_value>
+		</field>
+		<field>
+			<name>LDAP TLS SUPPORT - SERVER 2</name>
+			<type>listtopic</type>
+		</field>
+		<field>
+			<fielddescr>Enable TSL support</fielddescr>
+			<fieldname>varmodulesldap2enabletlssupport</fieldname>
+			<description><![CDATA[Enable TLS support for LDAP server 1. If enabled then certs in ../raddb/certs/ will be checked against the certs on LDAP.]]></description>
+			<type>checkbox</type>
+			<enablefields>ssl_ca_cert2,ssl_server_cert2,varmodulesldap2requirecert</enablefields>
+		</field>
+		<field>
+			<fielddescr>SSL CA Certificate</fielddescr>
+			<fieldname>ssl_ca_cert2</fieldname>
+			<description><![CDATA[Choose the SSL CA Certficate here which you created with the pfSense Cert Manager.<br>
+									Choose "none" if you do not use any kind of certificates or the freeradius Cert Manager. (Default: none)]]></description>
+			<type>select_source</type>
+			<source><![CDATA[freeradius_get_ca_certs()]]></source>
+			<source_name>descr</source_name>
+			<source_value>refid</source_value>
+		</field>
+		<field>
+			<fielddescr>SSL Server Certificate</fielddescr>
+			<fieldname>ssl_server_cert2</fieldname>
+			<description><![CDATA[Choose the SSL Server Certficate here which you created with the pfSense Cert Manager.<br>
+									Choose "none" if you do not use any kind of certificates or the freeradius Cert Manager. (Default: none)]]></description>
+			<type>select_source</type>
+			<source><![CDATA[freeradius_get_server_certs()]]></source>
+			<source_name>descr</source_name>
+			<source_value>refid</source_value>
+		</field>
+		<field>
+			<fielddescr>Choose certificate verification method</fielddescr>
+			<fieldname>varmodulesldap2requirecert</fieldname>
+			<description><![CDATA[Choose how the certs should be checked:<br><br>
+			
+									<b>never: </b>don't even bother trying<br>
+									<b>allow: </b>try but don't fail if the cerificate can't be verified<br>
+									<b>demand: </b>fail if the certificate doesn't verify]]></description>
+			<type>select</type>
+			<default_value>never</default_value>
+					<options>
+						<option><name>Never</name><value>never</value></option>
+						<option><name>Allow</name><value>allow</value></option>
+						<option><name>Demand</name><value>demand</value></option>
+					</options>
 		</field>
 	</fields>
 	<custom_delete_php_command>

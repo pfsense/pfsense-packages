@@ -125,7 +125,7 @@
 		<field>
 			<fielddescr>Interface IP Address</fielddescr>
 			<fieldname>varinterfaceip</fieldname>
-			<description><![CDATA[Enter the IP address of the listening interface. e.g. 192.168.100.1 (Default: *)]]></description>
+			<description><![CDATA[Enter the IP address (e.g. 192.168.100.1) of the listening interface. If you choose <b>*</b> then it means all interfaces. (Default: *)]]></description>
 			<type>input</type>
 			<default_value>*</default_value>
 			<required/>
@@ -135,9 +135,9 @@
 			<fieldname>varinterfaceport</fieldname>
 			<description><![CDATA[Enter the port number of the listening interface. Different interface types need different ports.<br>
 							You could use this as an example:<br>
-							auth  = 1812<br>
-							acct  = 1813<br>
-							proxy = 1814<br>
+							Authentication  = 1812<br>
+							Accounting  = 1813<br>
+							Status = 1816<br>
 							<b>IMPORTANT:</b> For <b>every interface type</b> listening on the <b>same IP address</b> you need <b>different ports</b>.]]></description>
 			<type>input</type>
 			<default_value>1812</default_value>
@@ -150,8 +150,8 @@
 			<type>select</type>
 			<default_value>auth</default_value>
 					<options>
-						<option><name>Auth</name><value>auth</value></option>
-						<option><name>Acct</name><value>acct</value></option>
+						<option><name>Authentication</name><value>auth</value></option>
+						<option><name>Accounting</name><value>acct</value></option>
 						<option><name>Proxy</name><value>proxy</value></option>
 						<option><name>Detail</name><value>detail</value></option>
 						<option><name>Status</name><value>status</value></option>
