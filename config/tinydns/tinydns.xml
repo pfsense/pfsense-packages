@@ -184,6 +184,12 @@
 			<required>on</required>
 		</field>
 		<field>
+			<fielddescr>Respond to IP</fielddescr>
+			<fieldname>dnscache_listen</fieldname>
+			<description>IP Addresses allowed to query against dnscache. Leave blank to set as the IP address of the interface where dnscache is running. To answer quieries from 192.168.1.0/24 enter 192.168.1, to answer queries from 10.0.0.0/8 enter 10, Separate entries with a space, do not enter a trailing period.</description>
+			<type>input</type>
+		</field>
+		<field>
 		 	<fielddescr>Register DHCP static mappings with server</fielddescr>
 			<fieldname>regdhcpstatic</fieldname>
 			<description>Register static DHCP leases with TinyDNS server using the Fully Qualified Domain Name specified in System: General.</description>
