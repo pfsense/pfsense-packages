@@ -71,7 +71,7 @@ function freeradius_install_command() {
 	exec("chown -R root:wheel /usr/local/lib/freeradius-2.1.12");
 	exec("touch /var/log/radutmp && touch /var/log/radwtmp");
 	exec("chown -R root:wheel /var/log");
-	
+		
 	
 	// creating a backup file of the original policy.conf no matter if user checked this or not
 	if (!file_exists("/usr/local/etc/raddb/policy.conf.backup")) {
@@ -432,7 +432,7 @@ if (is_array($arrusers) && !empty($arrusers)) {
 		$varuserscheckitemsadditionaloptions = explode("|", ($users['varuserscheckitemsadditionaloptions']));
 		$varusersadditionaloptionscheckitems .= '';
 		foreach ($varuserscheckitemsadditionaloptions as $checkitemtmp) {
-			$varusersadditionaloptionscheckitems .= $checkitemtmp;
+			$varusersadditionaloptionscheckitems .= "$checkitemtmp" . " ";
 		}
 	}
 		
@@ -585,7 +585,7 @@ if (is_array($arrmacs) && !empty($arrmacs)) {
 		$varmacscheckitemsadditionaloptions = explode("|", ($macs['varmacscheckitemsadditionaloptions']));
 		$varmacsadditionaloptionscheckitems .= '';
 		foreach ($varmacscheckitemsadditionaloptions as $checkitemtmp) {
-			$varmacsadditionaloptionscheckitems .= $checkitemtmp;
+			$varmacsadditionaloptionscheckitems .= "$checkitemtmp" . " ";
 		}
 	}
 		
@@ -2857,8 +2857,99 @@ function freeradius_modulesldap_resync() {
 	$varmodulesldap2timelimit = ($arrmodulesldap['varmodulesldap2timelimit']?$arrmodulesldap['varmodulesldap2timelimit']:'3');
 	$varmodulesldap2nettimeout = ($arrmodulesldap['varmodulesldap2nettimeout']?$arrmodulesldap['varmodulesldap2nettimeout']:'1');	
 	
-	// Variables for TLS / Certificates - will be added later
+	// Variables for TLS / Certificates - ldap1
+	$varmodulesldaprequirecert = ($arrmodulesldap['varmodulesldaprequirecert']?$arrmodulesldap['varmodulesldaprequirecert']:'never');
 
+// if enabled then create the certs in ../raddb/certs/ and enable "Start_tls" in ldap1 module
+if($arrmodulesldap['varmodulesldapenabletlssupport'] == 'on') {
+		
+		$ca_cert = lookup_ca($arrmodulesldap["ssl_ca_cert1"]);
+		if ($ca_cert != false) {
+			if(base64_decode($ca_cert['prv'])) {
+				file_put_contents(RADDB . "/certs/ca_ldap1_key.pem", 
+					base64_decode($ca_cert['prv']));
+				$conf['ssl_ca_key'] = RADDB . '/certs/ca_ldap1_key.pem';
+			}
+
+
+			if(base64_decode($ca_cert['crt'])) {
+				file_put_contents(RADDB . "/certs/ca_ldap1_cert.pem", 
+					base64_decode($ca_cert['crt']));
+				$conf['ssl_ca_cert1'] = RADDB . "/certs/ca_ldap1_cert.pem";
+			}
+
+
+			$svr_cert = lookup_cert($arrmodulesldap["ssl_server_cert1"]);
+			if ($svr_cert != false) {
+				if(base64_decode($svr_cert['prv'])) {
+					file_put_contents(RADDB . "/certs/radius_ldap1_cert.key", 
+						base64_decode($svr_cert['prv']));
+					$conf['ssl_key'] = RADDB . '/certs/radius_ldap1_cert.key';
+				}
+			}
+
+
+			if(base64_decode($svr_cert['crt'])) {
+				file_put_contents(RADDB . "/certs/radius_ldap1_cert.crt", 
+					base64_decode($svr_cert['crt']));
+				$conf['ssl_server_cert1'] = RADDB . "/certs/radius_ldap1_cert.crt";
+			}
+
+
+			$conf['ssl_cert_dir'] = RADDB . '/certs';
+		}
+	$varmodulesldapstarttls = "yes";
+}
+else {
+	$varmodulesldapstarttls = "no";
+}
+	
+	// Variables for TLS / Certificates - ldap2
+	$varmodulesldap2requirecert = ($arrmodulesldap['varmodulesldap2requirecert']?$arrmodulesldap['varmodulesldap2requirecert']:'never');
+
+// if enabled then create the certs in ../raddb/certs/ and enable "Start_tls" in ldap2 module
+if($arrmodulesldap['varmodulesldap2enabletlssupport'] == 'on') {	
+		
+		$ca_cert = lookup_ca($arrmodulesldap["ssl_ca_cert2"]);
+		if ($ca_cert != false) {
+			if(base64_decode($ca_cert['prv'])) {
+				file_put_contents(RADDB . "/certs/ca_ldap2_key.pem", 
+					base64_decode($ca_cert['prv']));
+				$conf['ssl_ca_key'] = RADDB . '/certs/ca_ldap2_key.pem';
+			}
+
+
+			if(base64_decode($ca_cert['crt'])) {
+				file_put_contents(RADDB . "/certs/ca_ldap2_cert.pem", 
+					base64_decode($ca_cert['crt']));
+				$conf['ssl_ca_cert2'] = RADDB . "/certs/ca_ldap2_cert.pem";
+			}
+
+
+			$svr_cert = lookup_cert($arrmodulesldap["ssl_server_cert2"]);
+			if ($svr_cert != false) {
+				if(base64_decode($svr_cert['prv'])) {
+					file_put_contents(RADDB . "/certs/radius_ldap2_cert.key", 
+						base64_decode($svr_cert['prv']));
+					$conf['ssl_key'] = RADDB . '/certs/radius_ldap2_cert.key';
+				}
+			}
+
+
+			if(base64_decode($svr_cert['crt'])) {
+				file_put_contents(RADDB . "/certs/radius_ldap2_cert.crt", 
+					base64_decode($svr_cert['crt']));
+				$conf['ssl_server_cert2'] = RADDB . "/certs/radius_ldap2_cert.crt";
+			}
+
+
+			$conf['ssl_cert_dir'] = RADDB . '/certs';
+		}
+	$varmodulesldap2starttls = "yes";
+}
+else {
+	$varmodulesldap2starttls = "no";
+}	
 
 	// Miscellaneous Configuration + MS Active Directory Compatibility ldap1
 	$varmodulesldapmsadcompatibilityenable = ($arrmodulesldap['varmodulesldapmsadcompatibilityenable']?$arrmodulesldap['varmodulesldapmsadcompatibilityenable']:'Disable');
@@ -3054,13 +3145,13 @@ ldap {
 		# The StartTLS operation is supposed to be
 		# used with normal ldap connections instead of
 		# using ldaps (port 689) connections
-		start_tls = no
+		start_tls = $varmodulesldapstarttls
 
-		# cacertfile	= /path/to/cacert.pem
-		# cacertdir		= /path/to/ca/dir/
-		# certfile		= /path/to/radius.crt
-		# keyfile		= /path/to/radius.key
-		# randfile		= /path/to/rnd
+		cacertfile = /usr/local/etc/raddb/certs/ca_ldap1_cert.pem
+		cacertdir = /usr/local/etc/raddb/certs/
+		certfile = /usr/local/etc/raddb/certs/radius_ldap1_cert.crt
+		keyfile = /usr/local/etc/raddb/certs/radius_ldap1_cert.key
+		randfile = /usr/local/etc/raddb/certs/random
 
 		#  Certificate Verification requirements.  Can be:
 		#    "never" (don't even bother trying)
@@ -3069,7 +3160,7 @@ ldap {
 		#    "demand" (fail if the certificate doesn't verify.)
 		#
 		#	The default is "allow"
-		# require_cert	= "demand"
+		require_cert = "$varmodulesldaprequirecert"
 	}
 
 	$varmodulesldapdefaultprofile
@@ -3213,13 +3304,13 @@ ldap ldap2{
 		# The StartTLS operation is supposed to be
 		# used with normal ldap connections instead of
 		# using ldaps (port 689) connections
-		start_tls = no
+		start_tls = $varmodulesldap2starttls
 
-		# cacertfile	= /path/to/cacert.pem
-		# cacertdir		= /path/to/ca/dir/
-		# certfile		= /path/to/radius.crt
-		# keyfile		= /path/to/radius.key
-		# randfile		= /path/to/rnd
+		cacertfile = /usr/local/etc/raddb/certs/ca_ldap2_cert.pem
+		cacertdir = /usr/local/etc/raddb/certs/
+		certfile = /usr/local/etc/raddb/certs/radius_ldap2_cert.crt
+		keyfile = /usr/local/etc/raddb/certs/radius_ldap2_cert.key
+		randfile = /usr/local/etc/raddb/certs/random
 
 		#  Certificate Verification requirements.  Can be:
 		#    "never" (don't even bother trying)
@@ -3228,7 +3319,7 @@ ldap ldap2{
 		#    "demand" (fail if the certificate doesn't verify.)
 		#
 		#	The default is "allow"
-		# require_cert	= "demand"
+		require_cert = "$varmodulesldap2requirecert"
 	}
 
 	$varmodulesldap2defaultprofile
