@@ -7,7 +7,7 @@
 /* $Id$ */
 /* ========================================================================== */
 /*
-	freeradius.xml
+	freeradiusauthorizedmacs.xml
 	part of pfSense (http://www.pfSense.com)
 	Copyright (C) 2011 - 2012 Alexander Wilke <nachtfalkeaw@web.de>
 	All rights reserved.
@@ -212,7 +212,7 @@
 		<field>
 			<fielddescr>Number of simultaneous connections</fielddescr>
 			<fieldname>varmacssimultaneousconnect</fieldname>
-			<description><![CDATA[The maximum of simultaneous connections with this MAC address.]]></description>
+			<description><![CDATA[The maximum of simultaneous connections with this MAC address. If you leave this field empty than there is no limit. If you are using FreeRADIUS with CaptivePortal you should leave this empty.]]></description>
 			<default_value></default_value>
 			<type>input</type>
 		</field>		
