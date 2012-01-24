@@ -169,10 +169,11 @@ function tinydns_custom_php_deinstall_command() {
 
 	conf_mount_rw();
 	/* destroy all daemontools items */
+	exec("/usr/local/bin/svc -xk {$g['varetc_path']}/tinydns*");
+	exec("/usr/local/bin/svc -xk {$g['varetc_path']}/dnscache*");
 	exec("/usr/local/etc/rc.d/tinydns.sh stop");
 	exec("/usr/local/etc/rc.d/svscan.sh stop");
 	exec("/usr/bin/killall supervise");
-	exec("/usr/bin/killall tinydns");	
 	exec("/usr/sbin/pw groupdel Gtinydns");
 	exec("/usr/sbin/pw groupdel Gdnscache");
 	exec("/usr/sbin/pw groupdel Gdnslog");
@@ -231,7 +232,8 @@ function tinydns_custom_php_changeip_command() {
 	}
 
 	exec("echo {$dnsserverip} > {$g['varetc_path']}/tinydns/env/IP");
-	exec("/usr/bin/killall -9 tinydns");
+	exec("/usr/local/bin/svc -xk {$g['varrun_path']}/service/tinydns");
+		
 
 	if(!empty($config['installedpackages']['tinydns']['config'][0]['enableforwarding'])) {
 		$interfaces = explode(",", $config['installedpackages']['tinydns']['config'][0]['interface']);
@@ -257,25 +259,47 @@ function tinydns_custom_php_changeip_command() {
 			$dnsuserip = $arr[0];
 			//exec("/bin/mkdir -p {$g['varetc_path']}/dnscache{$dnsidx}");
 			exec("/usr/local/bin/dnscache-conf Gdnscache Gdnslog {$g['varetc_path']}/dnscache{$dnsidx} {$dnscacheip}");
-			exec("/bin/ln -s {$g['varetc_path']}/dnscache{$dnsidx} {$g['varrun_path']}/service/");
+
 			if (!is_dir("{$g['varetc_path']}/dnscache{$dnsidx}/env"))
 				exec("/bin/mkdir -p {$g['varetc_path']}/dnscache{$dnsidx}/env");
 			exec("echo {$dnscacheip} > {$g['varetc_path']}/dnscache{$dnsidx}/env/IP");
 			tinydns_dnscache_forwarding_servers($dnsidx);
 			if (!is_dir("{$g['varetc_path']}/dnscache{$dnsidx}/root/ip"))
 				exec("/bin/mkdir -p {$g['varetc_path']}/dnscache{$dnsidx}/root/ip");
-			exec("/usr/bin/touch {$g['varetc_path']}/dnscache{$dnsidx}/root/ip/{$dnsuserip}");
+
+			/* tell dnscache to answer queries */
+			if ( $config['installedpackages']['tinydns']['config'][0]['dnscache_listen'] != "" ) {
+				$dnscache_listen_ips = explode (" ", $config['installedpackages']['tinydns']['config'][0]['dnscache_listen']);
+
+				foreach ($dnscache_listen_ips as $dnscache_listen_ip) {
+					exec("/usr/bin/touch {$g['varetc_path']}/dnscache{$dnsidx}/root/ip/{$dnscache_listen_ip}");
+				}
+
+			} else {
+				exec("/usr/bin/touch {$g['varetc_path']}/dnscache{$dnsidx}/root/ip/{$dnscacheip}");
+			}
+
 			tinydns_create_soa_domain_list($dnsserverip, $dnsidx);
+
+			/* setup symlink to start dnscache */
+			exec("/bin/ln -s {$g['varetc_path']}/dnscache{$dnsidx} {$g['varrun_path']}/service/");
+			
+			exec("/usr/local/bin/svc -xk {$g['varetc_path']}/dnscache{$dnsidx}");
 		}
-		exec("/usr/bin/killall -9 dnscache");
 	} else {
 		$interfaces = explode(",", $$config['installedpackages']['tinydns']['config'][0]['interface']);
 		foreach ($interfaces as $dnsidx => $dnsif) {
 			if(is_dir("{$g['varetc_path']}/dnscache{$dnsidx}"))
 				dnscache_use_root_servers($dnsidx);
 		}
-		exec("/usr/bin/killall -9 dnscache");
+		exec("/usr/local/bin/svc -xk {$g['varetc_path']}/dnscache*");
 	}
+
+	/* a wee bit of magic - something seems to start up a broken dnscache, the below kills it, and svc restarts it correctly. */ 
+	exec ("ps aux | grep multilog |  awk '{print $2}' | xargs -n1 kill -9");
+	exec ("ps aux | grep dnscache |  awk '{print $2}' | xargs -n1 kill -9");
+	exec ("ps aux | grep tinydns |  awk '{print $2}' | xargs -n1 kill -9");
+
 	conf_mount_ro();
 	filter_configure();
 }
