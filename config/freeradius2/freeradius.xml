@@ -219,7 +219,7 @@
 		<field>
 			<fielddescr>Number of simultaneous connections</fielddescr>
 			<fieldname>varuserssimultaneousconnect</fieldname>
-			<description><![CDATA[The maximum of simultaneous connections with this username. (Default: 1)]]></description>
+			<description><![CDATA[The maximum of simultaneous connections with this username. If you leave this field empty than there is no limit. If you are using FreeRADIUS with CaptivePortal you should leave this empty.]]></description>
 			<default_value></default_value>
 			<type>input</type>
 		</field>		
