@@ -1383,7 +1383,11 @@ function generate_snort_conf($id, $if_real, $snort_uuid)
 		else if (file_exists("/usr/local/etc/snort/whitelist/{$snortcfg['whitelistname']}"))
 			$spoink_whitelist_name = $snortcfg['whitelistname'];
 
-		$spoink_type = "output alert_pf: /usr/local/etc/snort/whitelist/{$spoink_whitelist_name},snort2c";
+		$pfkill = "";
+		if ($snortcfg['blockoffenderskill'] == "on")
+			$pfkill = "kill";
+		
+		$spoink_type = "output alert_pf: /usr/local/etc/snort/whitelist/{$spoink_whitelist_name},snort2c,{$snortcfg['blockoffendersip']},{$pfkill}";
 	}
 
 	/* define threshold file */

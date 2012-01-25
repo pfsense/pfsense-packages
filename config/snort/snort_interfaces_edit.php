@@ -128,6 +128,8 @@ if (isset($id) && $a_nat[$id]) {
 		$pconfig['descr'] = $a_nat[$id]['descr'];
 		$pconfig['performance'] = $a_nat[$id]['performance'];
 		$pconfig['blockoffenders7'] = $a_nat[$id]['blockoffenders7'];
+		$pconfig['blockoffenderskill'] = $a_nat[$id]['blockoffenderskill'];
+		$pconfig['blockoffendersip'] = $a_nat[$id]['blockoffendersip'];
 		$pconfig['whitelistname'] = $a_nat[$id]['whitelistname'];
 		$pconfig['homelistname'] = $a_nat[$id]['homelistname'];
 		$pconfig['externallistname'] = $a_nat[$id]['externallistname'];
@@ -204,6 +206,11 @@ if (isset($_GET['dup']))
 				$natent['blockoffenders7'] = 'on';
 			else
 				$natent['blockoffenders7'] = 'off';
+			if ($_POST['blockoffenderskill'] == "on")
+				$natent['blockoffenderskill'] = 'on';
+			if ($_POST['blockoffendersip'])
+				$natent['blockoffendersip'] = $_POST['blockoffendersip'];
+
 			$natent['whitelistname'] = $_POST['whitelistname'] ? $_POST['whitelistname'] : $pconfig['whitelistname'];
 			$natent['homelistname'] = $_POST['homelistname'] ? $_POST['homelistname'] : $pconfig['homelistname'];
 			$natent['externallistname'] = $_POST['externallistname'] ? $_POST['externallistname'] : $pconfig['externallistname'];
@@ -339,6 +346,12 @@ enable JavaScript to view this content</strong></div>
 </noscript>
 <script language="JavaScript">
 <!--
+
+function enable_blockoffenders() {
+	var endis = !(document.iform.blockoffenders7.checked);
+	document.iform.blockoffenderskill.disabled=endis;
+	document.iform.blockoffendersip.disabled=endis;
+}
 
 function enable_change(enable_change) {
 	endis = !(document.iform.enable.checked || enable_change);
@@ -562,12 +575,38 @@ function enable_change(enable_change) {
 			</tr>
 			<tr>
 				<td width="22%" valign="top" class="vncell2">Block offenders</td>
-				<td width="78%" class="vtable"><input name="blockoffenders7"
-					type="checkbox" value="on"
+				<td width="78%" class="vtable">
+					<input name="blockoffenders7" id="blockoffenders7" type="checkbox" value="on"
 					<?php if ($pconfig['blockoffenders7'] == "on") echo "checked"; ?>
-					onClick="enable_change(false)"><br>
+					onClick="enable_blockoffenders()"><br>
 				Checking this option will automatically block hosts that generate a
 				Snort alert.</td>
+			</tr>
+			<tr>
+				<td width="22%" valign="top" class="vncell2">Kill states</td>
+				<td width="78%" class="vtable">
+					<input name="blockoffenderskill" id="blockoffenderskill" type="checkbox" value="on" <?php if ($pconfig['blockoffenderskill'] == "on") echo "checked"; ?>>
+					<br/>Should firewall states be killed for the blocked ip
+				</td>
+			</tr>
+			<tr>
+				<td width="22%" valign="top" class="vncell2">Which ip to block</td>
+				<td width="78%" class="vtable">
+					<select name="blockoffendersip" class="formfld" id="blockoffendersip">
+				<?php
+					foreach (array("src", "dst", "both") as $btype) {
+						if ($value['snortlisttype'] == 'whitelist') {
+							if ($btype == $pconfig['blockoffendersip'])
+								echo "<option value='{$btype}' selected>";
+							else
+								echo "<option value='{$btype}'>";
+							echo htmlspecialchars($btype) . '</option>';
+						}
+					}
+				?>
+					</select>
+				<br/> Which ip extracted from the packet you want to block
+				</td>
 			</tr>
 			<tr>
 				<td width="22%" valign="top" class="vncell2">Whitelist</td>
@@ -687,6 +726,7 @@ function enable_change(enable_change) {
 <script language="JavaScript">
 <!--
 enable_change(false);
+enable_blockoffenders();
 //-->
 </script>
 
