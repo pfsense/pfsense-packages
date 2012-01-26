@@ -156,6 +156,52 @@ EOD;
 	fclose($fd);
 	exec("/etc/rc.d/devd restart");
 
+	/* Do XML upgrade from haproxy 0.31 to haproxy-dev */
+	if (is_array($config['installedpackages']['haproxy']['ha_servers'])) {
+		/* We have an old config */
+		$config['installedpackages']['haproxy']['ha_pools']['item'] = array();
+		$a_global = &$config['installedpackages']['haproxy'];
+		$a_backends = &$config['installedpackages']['haproxy']['ha_backends']['item'];
+		$a_oldservers = &$config['installedpackages']['haproxy']['ha_servers']['item'];
+		$a_pools = &$config['installedpackages']['haproxy']['ha_pools']['item'];
+
+		foreach ($a_backends as $id => $be) {
+			$a_backends[$id]['status'] = 'active';
+		}
+		$id = 0;
+		foreach ($a_oldservers as $oldserver) {
+			$pool=$oldserver;
+			/* make server sub array */
+			$server=array();
+			$server['name'] = $oldserver['name'];
+			$server['address'] = $oldserver['address'];
+			$server['port'] = $oldserver['port'];
+			$server['weight'] = $oldserver['weight'];
+			$a_servers=array();
+			$a_servers[]=$server;
+			/* set new pool */
+			$pool['name'] = "pool$id";
+			$id++;
+			$pool['ha_servers']['item']=$a_servers;
+			/* link to frontend */
+			foreach ($a_backends as $id => $be) {
+				if ($a_backends[$id]['name'] == $oldserver['backend']) {
+					$a_backends[$id]['pool'] = $pool['name'];
+					$pool['monitor_uri'] = $be['monitor_uri'];
+					unset($a_backends[$id]['monitor_uri']);
+					break;
+				}
+			}
+			unset($pool['backend']);
+			unset($pool['address']);
+			unset($pool['port']);
+			unset($pool['weight']);
+			$a_pools[] = $pool;
+		}
+		unset($config['installedpackages']['haproxy']['ha_servers']);
+		write_config();
+	}
+
 	conf_mount_ro();
 
 	exec("/usr/local/etc/rc.d/haproxy.sh start");
