@@ -1993,6 +1993,7 @@ var AIM_SERVERS \
 ########################
 
 portvar HTTP_PORTS [{$def_http_ports_type}]
+portvar FILE_DATA_PORTS [$HTTP_PORTS,110,143] 
 portvar SHELLCODE_PORTS !80
 portvar ORACLE_PORTS [{$def_oracle_ports_type}]
 portvar AUTH_PORTS [{$def_auth_ports_type}]
