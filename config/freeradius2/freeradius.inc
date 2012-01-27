@@ -706,7 +706,7 @@ function freeradius_clients_resync() {
 			$varclientmaxconnections = $item['varclientmaxconnections'];
 			$conf .= <<<EOD
 
-client $varclientshortname {
+client "$varclientshortname" {
 	$varclientipversion = $varclientip
 	proto = $varclientproto
 	secret = $varclientsharedsecret
