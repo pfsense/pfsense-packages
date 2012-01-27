@@ -525,6 +525,7 @@ function sync_package_dansguardian() {
 	if (!is_array($config['installedpackages']['dansguardianantivirusacl']['config']))
 		$config['installedpackages']['dansguardianantivirusacl']['config'][0]=array();
 	
+	$dansguardian_antivirus=$config['installedpackages']['dansguardianantivirusacl']['config'][0];
 	#exceptionvirusmimetypelist
 	if($dansguardian_antivirus['mime_list'] == "" && file_exists ($dansguardian_dir.'/lists/contentscanners/exceptionvirusmimetypelist.sample')){
 		$config['installedpackages']['dansguardianantivirusacl']['config'][0]['mime_list']=base64_encode(file_get_contents($dansguardian_dir.'/lists/contentscanners/exceptionvirusmimetypelist.sample'));

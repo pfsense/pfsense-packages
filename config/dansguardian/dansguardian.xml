@@ -291,7 +291,7 @@
 							browse the web. Set to 0 for no limit, and to disable the IP cache process.]]></description>
 		</field>
 		<field>
-			<name>Listening Settings</name>
+			<name>Parent proxy Settings</name>
 			<type>listtopic</type>
 		</field>
 		<field>

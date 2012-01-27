@@ -94,7 +94,7 @@
 			<type>listtopic</type>
 		</field>
 		<field>
-			<fielddescr>Automatically sync mailscanner configuration changes</fielddescr>
+			<fielddescr>Automatically sync dansguardian configuration changes</fielddescr>
 			<fieldname>synconchanges</fieldname>
 			<description>pfSense will automatically sync changes to the hosts defined below.</description>
 			<type>checkbox</type>
@@ -122,15 +122,15 @@
 		</field>
 	</fields>
 	<custom_php_install_command>
-		mailscanner_php_install_command();
+		dansguardian_php_install_command();
 	</custom_php_install_command>
 	<custom_php_deinstall_command>
-		mailscanner_php_deinstall_command();
+		dansguardian_php_deinstall_command();
 	</custom_php_deinstall_command>
 	<custom_php_validation_command>
-		mailscanner_validate_input($_POST, &amp;$input_errors);
+		dansguardian_validate_input($_POST, &amp;$input_errors);
 	</custom_php_validation_command>	
 	<custom_php_resync_config_command>
-		sync_package_mailscanner();
+		sync_package_dansguardian();
 	</custom_php_resync_config_command>
 </packagegui>
