@@ -595,13 +595,11 @@ function enable_change(enable_change) {
 					<select name="blockoffendersip" class="formfld" id="blockoffendersip">
 				<?php
 					foreach (array("src", "dst", "both") as $btype) {
-						if ($value['snortlisttype'] == 'whitelist') {
-							if ($btype == $pconfig['blockoffendersip'])
-								echo "<option value='{$btype}' selected>";
-							else
-								echo "<option value='{$btype}'>";
-							echo htmlspecialchars($btype) . '</option>';
-						}
+						if ($btype == $pconfig['blockoffendersip'])
+							echo "<option value='{$btype}' selected>";
+						else
+							echo "<option value='{$btype}'>";
+						echo htmlspecialchars($btype) . '</option>';
 					}
 				?>
 					</select>
