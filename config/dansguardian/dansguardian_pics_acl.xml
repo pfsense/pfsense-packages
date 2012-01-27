@@ -7,11 +7,12 @@
 /* $Id$ */
 /* ========================================================================== */
 /*
-    dansguardian_sync.xml
-    part of the Dansguardian package for pfSense
+    dansguardian_limits.xml
+    part of the dansguardian for pfSense
     Copyright (C) 2012 Marcello Coutinho
+
     All rights reserved.            
-                                                                  */
+			                                                                  */
 /* ========================================================================== */
 /*
     Redistribution and use in source and binary forms, with or without
@@ -41,30 +42,51 @@
 	<description>Describe your package here</description>
 	<requirements>Describe your package requirements here</requirements>
 	<faq>Currently there are no FAQ items provided.</faq>
-	<name>dansguardiansync</name>
+	<name>dansguardianpicsacl</name>
 	<version>1.0</version>
-	<title>Services: Dansguardian</title>
+	<title>Services: Dansguardian - Access Lists</title>
 	<include_file>/usr/local/pkg/dansguardian.inc</include_file>
-<tabs>
+	<tabs>
 		<tab>
-			<text>Daemon</text>
+			<text>Back to Config</text>
 			<url>/pkg_edit.php?xml=dansguardian.xml&amp;id=0</url>
 		</tab>
 		<tab>
-			<text>General</text>
-			<url>/pkg_edit.php?xml=dansguardian_config.xml&amp;id=0</url>
-		</tab>
-		<tab>
-			<text>Limits</text>
-			<url>/pkg_edit.php?xml=dansguardian_limits.xml&amp;id=0</url>
-		</tab>
-		<tab>
-			<text>Blacklist</text>
-			<url>/pkg_edit.php?xml=dansguardian_blacklist.xml&amp;id=0</url>
-		</tab>
-		<tab>
-			<text>Access Lists</text>
+			<text>Antivirus</text>
 			<url>/pkg_edit.php?xml=dansguardian_antivirus_acl.xml&amp;id=0</url>
+		</tab>
+		<tab>
+			<text>Pics</text>
+			<url>/pkg.php?xml=dansguardian_pics_acl.xml&amp;id=0</url>
+			<active/>
+		</tab>
+		<tab>
+			<text>Phase</text>
+			<url>/pkg.php?xml=dansguardian_phrase_acl.xml</url>
+		</tab>
+		<tab>
+			<text>Site</text>
+			<url>/pkg.php?xml=dansguardian_site_acl.xml</url>
+		</tab>
+		<tab>
+			<text>URL</text>
+			<url>/pkg.php?xml=dansguardian_url_acl.xml</url>
+		</tab>
+		<tab>
+			<text>Extension</text>
+			<url>/pkg.php?xml=dansguardian_file_acl.xml</url>
+		</tab>
+		<tab>
+			<text>Content</text>
+			<url>/pkg.php?xml=dansguardian_content_acl.xml</url>
+		</tab>
+		<tab>
+			<text>Header</text>
+			<url>/pkg.php?xml=dansguardian_header_acl.xml</url>
+		</tab>
+		<tab>
+			<text>Searche Engine</text>
+			<url>/pkg.php?xml=dansguardian_search_acl.xml</url>
 		</tab>
 		<tab>
 			<text>Groups</text>
@@ -74,63 +96,62 @@
 			<text>Users</text>
 			<url>/pkg_edit.php?xml=dansguardian_users.xml</url>
 		</tab>
-		<tab>
-			<text>Report and Log</text>
-			<url>/pkg_edit.php?xml=dansguardian_log.xml&amp;id=0</url>
-		</tab>
-		<tab>
-			<text>XMLRPC Sync</text>
-			<url>/pkg_edit.php?xml=dansguardian_sync.xml&amp;id=0</url>
-			<active/>
-		</tab>
-		<tab>
-			<text>Help</text>
-			<url>/dansguardian_about.php</url>
-		</tab>
 </tabs>
+<adddeleteeditpagefields>
+		<columnitem>
+			<fielddescr>Access List Name</fielddescr>
+			<fieldname>name</fieldname>
+		</columnitem>	
+		<columnitem>
+			<fielddescr>Access List Description</fielddescr>
+			<fieldname>description</fieldname>
+		</columnitem>	
+</adddeleteeditpagefields>
 	<fields>
-		<field>
-			<name>Dansguardian XMLRPC Sync</name>
+			<field>
+			<name>Pics</name>
 			<type>listtopic</type>
 		</field>
+			<field>
+			<fielddescr>Name</fielddescr>
+			<fieldname>name</fieldname>
+			<description></description>
+			<type>input</type>
+			<size>25</size>
+		</field>
+			<field>
+			<fielddescr>description</fielddescr>
+			<fieldname>description</fieldname>
+			<type>input</type>
+			<size>80</size>
+		</field>
 		<field>
-			<fielddescr>Automatically sync mailscanner configuration changes</fielddescr>
-			<fieldname>synconchanges</fieldname>
-			<description>pfSense will automatically sync changes to the hosts defined below.</description>
+			<fielddescr>Enable</fielddescr>
+			<fieldname>pics_enabled</fieldname>
 			<type>checkbox</type>
+			<description></description>
 		</field>
 		<field>
-			<fielddescr>Remote Server</fielddescr>
-			<fieldname>none</fieldname>
-			<type>rowhelper</type>
-			<rowhelper>
-			<rowhelperfield>
-				<fielddescr>IP Address</fielddescr>
-				<fieldname>ipaddress</fieldname>
-				<description>IP Address of remote server</description>
-				<type>input</type>
-				<size>20</size>
-			</rowhelperfield>
-			<rowhelperfield>
-				<fielddescr>Password</fielddescr>
-				<fieldname>password</fieldname>
-				<description>Password for remote server.</description>
-				<type>password</type>
-				<size>20</size>
-			</rowhelperfield>
-			</rowhelper>
+			<fielddescr>config</fielddescr>
+			<fieldname>pics</fieldname>
+			<description><![CDATA[Enter pics config for this group.<br>	
+								  Leave empty to load dansguardian defaults]]></description>
+			<type>textarea</type>
+			<cols>80</cols>
+			<rows>70</rows>
+			<encoding>base64</encoding>
 		</field>
-	</fields>
+ </fields>
 	<custom_php_install_command>
-		mailscanner_php_install_command();
+		dansguardian_php_install_command();
 	</custom_php_install_command>
 	<custom_php_deinstall_command>
-		mailscanner_php_deinstall_command();
+		dansguardian_php_deinstall_command();
 	</custom_php_deinstall_command>
 	<custom_php_validation_command>
-		mailscanner_validate_input($_POST, &amp;$input_errors);
+		dansguardian_validate_input($_POST, &amp;$input_errors);
 	</custom_php_validation_command>	
 	<custom_php_resync_config_command>
-		sync_package_mailscanner();
+		sync_package_dansguardian();
 	</custom_php_resync_config_command>
 </packagegui>

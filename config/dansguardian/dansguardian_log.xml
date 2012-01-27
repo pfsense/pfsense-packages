@@ -60,11 +60,23 @@
 			<url>/pkg_edit.php?xml=dansguardian_limits.xml&amp;id=0</url>
 		</tab>
 		<tab>
-			<text>Filter Groups</text>
-			<url>/pkg.php?xml=dansguardian_lists.xml</url>
+			<text>Blacklist</text>
+			<url>/pkg_edit.php?xml=dansguardian_blacklist.xml&amp;id=0</url>
 		</tab>
 		<tab>
-			<text>Report and Log</text>
+			<text>Access Lists</text>
+			<url>/pkg_edit.php?xml=dansguardian_antivirus_acl.xml&amp;id=0</url>
+		</tab>
+		<tab>
+			<text>Groups</text>
+			<url>/pkg.php?xml=dansguardian_groups.xml</url>
+		</tab>
+		<tab>
+			<text>Users</text>
+			<url>/pkg_edit.php?xml=dansguardian_users.xml</url>
+		</tab>
+		<tab>
+			<text>Report and log</text>
 			<url>/pkg_edit.php?xml=dansguardian_log.xml&amp;id=0</url>
 			<active/>
 		</tab>
@@ -73,8 +85,8 @@
 			<url>/pkg_edit.php?xml=dansguardian_sync.xml&amp;id=0</url>
 		</tab>
 		<tab>
-			<text>About</text>
-			<url>/pkg_edit.php?xml=dansguardian.php&amp;id=0</url>
+			<text>Help</text>
+			<url>/dansguardian_about.php</url>
 		</tab>
 </tabs>
 	<fields>

@@ -527,6 +527,27 @@
 		<build_port_path>/usr/ports/mail/mailscanner</build_port_path>
 		<build_options></build_options>
 	</package>
+		<package>
+		<name>Dansguardian</name>
+		<website>http://www.dansguardian.org/</website>
+		<descr><![CDATA[DansGuardian is an award winning Open Source web content filter.<br>
+						It filters the actual content of pages based on many methods including phrase matching, PICS filtering and URL filtering.<br>
+						It does not purely filter based on a banned list of sites like lesser totally commercial filters.<br>
+						For all non-commercial it's free, without cost.<br>
+						For all commercial use visit dansguardian website to get a licence.]]></descr>
+		<category>Services</category>
+		<config_file>http://www.pfsense.com/packages/config/dansguardian/dansguardian.xml</config_file>
+		<pkginfolink>http://forum.pfsense.org/index.php/topic,43786.0.html</pkginfolink>
+		<depends_on_package_base_url>http://e-sac.siteseguro.ws/packages/amd64/8/All/</depends_on_package_base_url>
+		<depends_on_package>dansguardian-2.12.0.0_1.tbz</depends_on_package>
+		<depends_on_package>clamav-0.97.3_1.tbz</depends_on_package>
+		<version>2.12.0.0 pkg v.0.1</version>
+		<status>beta</status>
+		<required_version>2.0</required_version>
+		<configurationfile>dansguardian.xml</configurationfile>
+		<build_port_path>/usr/ports/www/dansguardian-devel</build_port_path>
+		<build_options>WITHOUT_APACHE=true WITHOUT_TRICKLE=false WITH_CLAMD=true WITH_ICAP=true WITH_NTLM=true</build_options>
+	</package>
 	<package>
 		<name>siproxd</name>
 		<website>http://siproxd.sourceforge.net/</website>

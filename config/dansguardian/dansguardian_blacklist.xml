@@ -7,11 +7,12 @@
 /* $Id$ */
 /* ========================================================================== */
 /*
-    dansguardian_sync.xml
-    part of the Dansguardian package for pfSense
+    dansguardian_limits.xml
+    part of the dansguardian for pfSense
     Copyright (C) 2012 Marcello Coutinho
+
     All rights reserved.            
-                                                                  */
+			                                                                  */
 /* ========================================================================== */
 /*
     Redistribution and use in source and binary forms, with or without
@@ -41,11 +42,11 @@
 	<description>Describe your package here</description>
 	<requirements>Describe your package requirements here</requirements>
 	<faq>Currently there are no FAQ items provided.</faq>
-	<name>dansguardiansync</name>
+	<name>dansguardianblacklist</name>
 	<version>1.0</version>
 	<title>Services: Dansguardian</title>
 	<include_file>/usr/local/pkg/dansguardian.inc</include_file>
-<tabs>
+	<tabs>
 		<tab>
 			<text>Daemon</text>
 			<url>/pkg_edit.php?xml=dansguardian.xml&amp;id=0</url>
@@ -61,6 +62,7 @@
 		<tab>
 			<text>Blacklist</text>
 			<url>/pkg_edit.php?xml=dansguardian_blacklist.xml&amp;id=0</url>
+			<active/>
 		</tab>
 		<tab>
 			<text>Access Lists</text>
@@ -75,13 +77,12 @@
 			<url>/pkg_edit.php?xml=dansguardian_users.xml</url>
 		</tab>
 		<tab>
-			<text>Report and Log</text>
+			<text>Report and log</text>
 			<url>/pkg_edit.php?xml=dansguardian_log.xml&amp;id=0</url>
 		</tab>
 		<tab>
 			<text>XMLRPC Sync</text>
 			<url>/pkg_edit.php?xml=dansguardian_sync.xml&amp;id=0</url>
-			<active/>
 		</tab>
 		<tab>
 			<text>Help</text>
@@ -90,47 +91,66 @@
 </tabs>
 	<fields>
 		<field>
-			<name>Dansguardian XMLRPC Sync</name>
+			<name>Blacklist options</name>
 			<type>listtopic</type>
 		</field>
 		<field>
-			<fielddescr>Automatically sync mailscanner configuration changes</fielddescr>
-			<fieldname>synconchanges</fieldname>
-			<description>pfSense will automatically sync changes to the hosts defined below.</description>
+			<fielddescr>Enable</fielddescr>
+			<fieldname>blacklist</fieldname>
 			<type>checkbox</type>
 		</field>
 		<field>
-			<fielddescr>Remote Server</fielddescr>
-			<fieldname>none</fieldname>
-			<type>rowhelper</type>
-			<rowhelper>
-			<rowhelperfield>
-				<fielddescr>IP Address</fielddescr>
-				<fieldname>ipaddress</fieldname>
-				<description>IP Address of remote server</description>
-				<type>input</type>
-				<size>20</size>
-			</rowhelperfield>
-			<rowhelperfield>
-				<fielddescr>Password</fielddescr>
-				<fieldname>password</fieldname>
-				<description>Password for remote server.</description>
-				<type>password</type>
-				<size>20</size>
-			</rowhelperfield>
-			</rowhelper>
+			<fielddescr>Update frequency</fielddescr>
+			<fieldname>cron</fieldname>
+			<description><![CDATA[Default:<strong>Never</strong><br>
+							Select how often pfsense will re download Blacklist files]]></description>
+	    	<type>select</type>
+ 				<options>
+ 				<option><name>Never</name><value>never</value></option>
+ 				<option><name>Now</name><value>now</value></option>
+ 				<option><name>Every day</name><value>day</value></option>
+				<option><name>Every 2 days</name><value>02days</value></option>
+				<option><name>Once a week</name><value>week</value></option>
+				</options>
+		</field>
+		<field>
+			<fielddescr>Blacklist URL</fielddescr>
+			<fieldname>url</fieldname>
+			<description><![CDATA[Enter FTP, HTTP or LOCAL (pfSense) URL blacklist archive.<br>
+							File must be in tar.gz or tgz format.]]></description>
+			<type>input</type>
+			<size>80</size>
+		</field>
+		<field>
+			<name>Custom update script</name>
+			<type>listtopic</type>
+		</field>
+		<field>
+			<fielddescr>Enable</fielddescr>
+			<fieldname>enable_custom_script</fieldname>
+			<type>checkbox</type>
+		</field>
+		<field>
+			<fielddescr>script</fielddescr>
+			<fieldname>update_script</fieldname>
+			<description><![CDATA[Enter custom script to update Blacklists<br>
+								This script will be called by update frequency schedule.]]></description>
+			<type>textarea</type>
+			<cols>80</cols>
+			<rows>15</rows>
+			<encoding>base64</encoding>
 		</field>
 	</fields>
 	<custom_php_install_command>
-		mailscanner_php_install_command();
+		dansguardian_php_install_command();
 	</custom_php_install_command>
 	<custom_php_deinstall_command>
-		mailscanner_php_deinstall_command();
+		dansguardian_php_deinstall_command();
 	</custom_php_deinstall_command>
 	<custom_php_validation_command>
-		mailscanner_validate_input($_POST, &amp;$input_errors);
+		dansguardian_validate_input($_POST, &amp;$input_errors);
 	</custom_php_validation_command>	
 	<custom_php_resync_config_command>
-		sync_package_mailscanner();
+		sync_package_dansguardian();
 	</custom_php_resync_config_command>
 </packagegui>

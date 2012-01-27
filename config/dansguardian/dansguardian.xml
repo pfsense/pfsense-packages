@@ -44,7 +44,7 @@
 	<faq>Currently there are no FAQ items provided.</faq>
 	<name>dansguardian</name>
 	<version>1.0</version>
-	<title>Services: Sansguardian</title>
+	<title>Services: Dansguardian</title>
 	<include_file>/usr/local/pkg/dansguardian.inc</include_file>
 	<menu>
 		<name>dansguardian</name>
@@ -53,18 +53,13 @@
 		<url>pkg_edit.php?xml=dansguardian.xml</url>
 	</menu>
 	<additional_files_needed>
-		<item>http:/www.pfsense.org/packages/config/pf-blocker/dansguardian.inc</item>
+		<item>http:/www.pfsense.org/packages/config/dansguardian/dansguardian.inc</item>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0755</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
-		<item>http://www.pfsense.org/packages/config/pf-blocker/dansguardian.php</item>
+		<item>http://www.pfsense.org/packages/config/dansguardian/dansguardian.php</item>
 		<prefix>/usr/local/www/</prefix>
-		<chmod>0755</chmod>
-	</additional_files_needed>
-	<additional_files_needed>
-		<item>http://www.pfsense.org/packages/config/pf-blocker/dansguardian.widget.php</item>
-		<prefix>/usr/local/www/widgets/widgets/</prefix>
 		<chmod>0755</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
@@ -73,8 +68,18 @@
 		<chmod>0755</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
-		<item>http://www.pfsense.org/packages/config/dansguardian/dansguardian_lists.xml</item>
+		<item>http://www.pfsense.org/packages/config/dansguardian/dansguardian_users_header.xml</item>
 		<prefix>/usr/local/pkg/</prefix>
+		<chmod>0755</chmod>
+	</additional_files_needed>
+	<additional_files_needed>
+		<item>http://www.pfsense.org/packages/config/dansguardian/dansguardian_users_footer.xml</item>
+		<prefix>/usr/local/pkg/</prefix>
+		<chmod>0755</chmod>
+	</additional_files_needed>
+	<additional_files_needed>
+		<item>http://www.pfsense.org/packages/config/dansguardian/dansguardian_about.php</item>
+		<prefix>/usr/local/www/</prefix>
 		<chmod>0755</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
@@ -84,6 +89,76 @@
 	</additional_files_needed>
 	<additional_files_needed>
 		<item>http://www.pfsense.org/packages/config/dansguardian/dansguardian_sync.xml</item>
+		<prefix>/usr/local/pkg/</prefix>
+		<chmod>0755</chmod>
+	</additional_files_needed>
+	<additional_files_needed>
+		<item>http://www.pfsense.org/packages/config/dansguardian/dansguardianfx.conf.template</item>
+		<prefix>/usr/local/pkg/</prefix>
+		<chmod>0755</chmod>
+	</additional_files_needed>
+	<additional_files_needed>
+		<item>http://www.pfsense.org/packages/config/dansguardian/dansguardian_url_acl.xml</item>
+		<prefix>/usr/local/pkg/</prefix>
+		<chmod>0755</chmod>
+	</additional_files_needed>
+	<additional_files_needed>
+		<item>http://www.pfsense.org/packages/config/dansguardian/dansguardian_site_acl.xml</item>
+		<prefix>/usr/local/pkg/</prefix>
+		<chmod>0755</chmod>
+	</additional_files_needed>
+	<additional_files_needed>
+		<item>http://www.pfsense.org/packages/config/dansguardian/dansguardian_search_acl.xml</item>
+		<prefix>/usr/local/pkg/</prefix>
+		<chmod>0755</chmod>
+	</additional_files_needed>
+	<additional_files_needed>
+		<item>http://www.pfsense.org/packages/config/dansguardian/dansguardian_pics_acl.xml</item>
+		<prefix>/usr/local/pkg/</prefix>
+		<chmod>0755</chmod>
+	</additional_files_needed>
+	<additional_files_needed>
+		<item>http://www.pfsense.org/packages/config/dansguardian/dansguardian_phrase_acl.xml</item>
+		<prefix>/usr/local/pkg/</prefix>
+		<chmod>0755</chmod>
+	</additional_files_needed>
+	<additional_files_needed>
+		<item>http://www.pfsense.org/packages/config/dansguardian/dansguardian_log.xml</item>
+		<prefix>/usr/local/pkg/</prefix>
+		<chmod>0755</chmod>
+	</additional_files_needed>
+	<additional_files_needed>
+		<item>http://www.pfsense.org/packages/config/dansguardian/dansguardian_header_acl.xml</item>
+		<prefix>/usr/local/pkg/</prefix>
+		<chmod>0755</chmod>
+	</additional_files_needed>
+	<additional_files_needed>
+		<item>http://www.pfsense.org/packages/config/dansguardian/dansguardian_groups.xml</item>
+		<prefix>/usr/local/pkg/</prefix>
+		<chmod>0755</chmod>
+	</additional_files_needed>
+	<additional_files_needed>
+		<item>http://www.pfsense.org/packages/config/dansguardian/dansguardian_file_acl.xml</item>
+		<prefix>/usr/local/pkg/</prefix>
+		<chmod>0755</chmod>
+	</additional_files_needed>
+	<additional_files_needed>
+		<item>http://www.pfsense.org/packages/config/dansguardian/dansguardian_content_acl.xml</item>
+		<prefix>/usr/local/pkg/</prefix>
+		<chmod>0755</chmod>
+	</additional_files_needed>
+	<additional_files_needed>
+		<item>http://www.pfsense.org/packages/config/dansguardian/dansguardian_blacklist.xml</item>
+		<prefix>/usr/local/pkg/</prefix>
+		<chmod>0755</chmod>
+	</additional_files_needed>
+	<additional_files_needed>
+		<item>http://www.pfsense.org/packages/config/dansguardian/dansguardian_antivirus_acl.xml</item>
+		<prefix>/usr/local/pkg/</prefix>
+		<chmod>0755</chmod>
+	</additional_files_needed>
+	<additional_files_needed>
+		<item>http://www.pfsense.org/packages/config/dansguardian/dansguardian.conf.template</item>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0755</chmod>
 	</additional_files_needed>
@@ -102,11 +177,23 @@
 			<url>/pkg_edit.php?xml=dansguardian_limits.xml&amp;id=0</url>
 		</tab>
 		<tab>
-			<text>Filter Groups</text>
-			<url>/pkg.php?xml=dansguardian_lists.xml</url>
+			<text>Blacklist</text>
+			<url>/pkg_edit.php?xml=dansguardian_blacklist.xml&amp;id=0</url>
 		</tab>
 		<tab>
-			<text>Report and Log</text>
+			<text>Access Lists</text>
+			<url>/pkg_edit.php?xml=dansguardian_antivirus_acl.xml&amp;id=0</url>
+		</tab>
+		<tab>
+			<text>Groups</text>
+			<url>/pkg.php?xml=dansguardian_groups.xml</url>
+		</tab>
+		<tab>
+			<text>Users</text>
+			<url>/pkg_edit.php?xml=dansguardian_users.xml</url>
+		</tab>
+		<tab>
+			<text>Report and log</text>
 			<url>/pkg_edit.php?xml=dansguardian_log.xml&amp;id=0</url>
 		</tab>
 		<tab>
@@ -114,8 +201,8 @@
 			<url>/pkg_edit.php?xml=dansguardian_sync.xml&amp;id=0</url>
 		</tab>
 		<tab>
-			<text>About</text>
-			<url>/pkg_edit.php?xml=dansguardian.php&amp;id=0</url>
+			<text>Help</text>
+			<url>/dansguardian_about.php</url>
 		</tab>
 </tabs>
 	<fields>
@@ -125,13 +212,13 @@
 		</field>
 		<field>
 			<fielddescr>Enable dansguardian</fielddescr>
-			<fieldname>enable_dg</fieldname>
+			<fieldname>enable</fieldname>
 			<type>checkbox</type>
-			<description></description>
+			<description><![CDATA[<a target=_new href='http://dansguardian.org/?page=copyright2'>I agree with dansguardian terms and licence.</a>]]></description>
 		</field>
 		<field>
 			<fielddescr>Listen Interface(s)</fielddescr>
-			<fieldname>inbound_interface</fieldname>
+			<fieldname>interface</fieldname>
 			<description><![CDATA[Default: <strong>WAN</strong><br>Select interface(s) that you want to block incoming traffic.]]></description>
 			<type>interfaces_selection</type>
 			<required/>
@@ -174,6 +261,14 @@
 			<description><![CDATA[Default: <strong>4/32</strong><br>
 			 				 Sets the minimum and maximun number of processes to be kept ready to handle connections.<br>
 							 On large sites you might want to try 8/64.]]></description>
+		</field>
+		<field>
+			<fielddescr>Prefork Children</fielddescr>
+			<fieldname>preforkchildren</fieldname>
+			<type>input</type>
+			<size>10</size>
+			<description><![CDATA[sets the minimum number of processes to spawn when it runs out<br>
+						On large sites you might want to try 10]]></description>
 		</field>
 		<field>
 			<fielddescr>Max Age Children</fielddescr>

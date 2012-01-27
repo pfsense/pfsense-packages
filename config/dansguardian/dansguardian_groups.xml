@@ -6,7 +6,7 @@
         <![CDATA[
 /* ========================================================================== */
 /*
-    dansguardian_lists.xml
+    dansguardian_groups.xml
     part of pfSense (http://www.pfSense.com)
     Copyright (C) 2012 Marcello Coutinho
     
@@ -41,7 +41,7 @@
     <description>Describe your package here</description>
     <requirements>Describe your package requirements here</requirements>
     <faq>Currently there are no FAQ items provided.</faq>
-	<name>dansguardianlists</name>
+	<name>dansguardiangroups</name>
 	<version>1.0</version>
 	<title>Services: Dansguardian</title>
 	<include_file>/usr/local/pkg/dansguardian.inc</include_file>
@@ -59,12 +59,24 @@
 			<url>/pkg_edit.php?xml=dansguardian_limits.xml&amp;id=0</url>
 		</tab>
 		<tab>
-			<text>Filter Groups</text>
-			<url>/pkg.php?xml=dansguardian_lists.xml</url>
+			<text>Blacklist</text>
+			<url>/pkg_edit.php?xml=dansguardian_blacklist.xml&amp;id=0</url>
+		</tab>
+		<tab>
+			<text>Access Lists</text>
+			<url>/pkg_edit.php?xml=dansguardian_antivirus_acl.xml&amp;id=0</url>
+		</tab>
+		<tab>
+			<text>Groups</text>
+			<url>/pkg.php?xml=dansguardian_groups.xml</url>
 			<active/>
 		</tab>
 		<tab>
-			<text>Report and Log</text>
+			<text>Users</text>
+			<url>/pkg_edit.php?xml=dansguardian_users.xml</url>
+		</tab>
+		<tab>
+			<text>Report and log</text>
 			<url>/pkg_edit.php?xml=dansguardian_log.xml&amp;id=0</url>
 		</tab>
 		<tab>
@@ -72,8 +84,8 @@
 			<url>/pkg_edit.php?xml=dansguardian_sync.xml&amp;id=0</url>
 		</tab>
 		<tab>
-			<text>About</text>
-			<url>/pkg_edit.php?xml=dansguardian.php&amp;id=0</url>
+			<text>Help</text>
+			<url>/dansguardian_about.php</url>
 		</tab>
 </tabs>
 <adddeleteeditpagefields>
@@ -90,15 +102,6 @@
 			<fielddescr>Description</fielddescr>
 			<fieldname>description</fieldname>
 		</columnitem>	
-
-		<columnitem>
-			<fielddescr>Action</fielddescr>
-			<fieldname>action</fieldname>
-		</columnitem>
-				<columnitem>
-			<fielddescr>Update Frequency</fielddescr>
-			<fieldname>cron</fieldname>
-		</columnitem>
 	</adddeleteeditpagefields>
 	<fields>
 		<field>
@@ -107,17 +110,120 @@
 	</field>
 			<field>
 			<fielddescr>Filter Group Name</fielddescr>
-			<fieldname>groupname</fieldname>
-			<description><![CDATA[Enter lists Alias Names.<br>	
-								  Example: Badguys<br>
-								  Do not include pfBlocker name, it's done by package.<br>
-								  <strong>International, special or space caracters will be ignored in pfsense alias name.</strong><br>]]></description>
+			<fieldname>name</fieldname>
+			<description><![CDATA[Enter Group Names.]]></description>
 			<type>input</type>
 			<size>20</size>
 		</field>
+			<field>
+			<fielddescr>List Description</fielddescr>
+			<fieldname>description</fieldname>
+			<type>input</type>
+			<size>60</size>
+		</field>
+		<field>
+			<name>Acess Lists</name>
+			<type>listtopic</type>
+		</field>
+		<field>
+			<fielddescr>Group Options</fielddescr>
+			<fieldname>group_options</fieldname>
+			<description><![CDATA[Select options to apply on this group. Default values are in ( )]]></description>
+	    	<type>select</type>
+ 				<options>
+ 				<option><name>Scan clean cache (on)</name><value>scancleancache</value></option>
+ 				<option><name>Hex decode content (off)</name><value>hexdecodecontent</value></option>
+ 				<option><name>Block Download not in Exception Lists (off)</name><value>blockdownloads</value></option>
+ 				<option><name>Enable PICS rating support (off)</name><value>enablepics</value></option>
+ 				<option><name>Enable Deep URL Analysis (off)</name><value>deepurlanalysis</value></option>
+ 				<option><name>Infection/Scan Error Bypass on Scan Errors Only (on)</name><value>infectionbypasserrorsonly</value></option>
+ 				<option><name>Disable content scanning (off)</name><value>disablecontentscan</value></option>
+ 				<option><name>Check servers ssl certificates (off)</name><value>sslcertcheck</value></option>
+ 				<option><name>Filter ssl sites forging SSL Certificates (off)</name><value>sslmitm</value></option>
+ 				</options>
+ 				<multiple/>
+ 				<size>10</size>
+		</field>
+		
+		<field>
+			<fielddescr>Pics</fielddescr>
+			<fieldname>picsacl</fieldname>
+			<description><![CDATA[Select Pics Access List to apply on this group.]]></description>
+	    	<type>select_source</type>
+			<source><![CDATA[$config['installedpackages']['dansguardianpicsacl']['config']]]></source>
+			<source_name>name</source_name>
+			<source_value>name</source_value>
+		</field>
+		<field>
+			<fielddescr>Phrase</fielddescr>
+			<fieldname>phraseacl</fieldname>
+			<description><![CDATA[Select Phrase ACL to apply on this group.]]></description>
+	    	<type>select_source</type>
+			<source><![CDATA[$config['installedpackages']['dansguardianphraseacl']['config']]]></source>
+			<source_name>name</source_name>
+			<source_value>name</source_value>
+		</field>
+		<field>
+			<fielddescr>Site</fielddescr>
+			<fieldname>siteacl</fieldname>
+			<description><![CDATA[Select Site Access List to apply on this group.]]></description>
+	    	<type>select_source</type>
+			<source><![CDATA[$config['installedpackages']['dansguardiansiteacl']['config']]]></source>
+			<source_name>name</source_name>
+			<source_value>name</source_value>
+		</field>
+		<field>
+			<fielddescr>URL</fielddescr>
+			<fieldname>urlacl</fieldname>
+			<description><![CDATA[Select URL Access List to apply on this group.]]></description>
+	    	<type>select_source</type>
+			<source><![CDATA[$config['installedpackages']['dansguardianurlacl']['config']]]></source>
+			<source_name>name</source_name>
+			<source_value>name</source_value>
+		</field>
+		<field>
+			<fielddescr>Extension</fielddescr>
+			<fieldname>extensionacl</fieldname>
+			<description><![CDATA[Select Extension Access List to apply on this group.]]></description>
+	    	<type>select_source</type>
+			<source><![CDATA[$config['installedpackages']['dansguardianfileacl']['config']]]></source>
+			<source_name>name</source_name>
+			<source_value>name</source_value>
+		</field>
+		<field>
+			<fielddescr>Header</fielddescr>
+			<fieldname>headeracl</fieldname>
+			<description><![CDATA[Select Header Access List to apply on this group.]]></description>
+	    	<type>select_source</type>
+			<source><![CDATA[$config['installedpackages']['dansguardianheaderacl']['config']]]></source>
+			<source_name>name</source_name>
+			<source_value>name</source_value>
+		</field>
+		<field>
+			<fielddescr>Content</fielddescr>
+			<fieldname>contentacl</fieldname>
+			<description><![CDATA[Select Content Access List to apply on this group.]]></description>
+	    	<type>select_source</type>
+			<source><![CDATA[$config['installedpackages']['dansguardiancontentacl']['config']]]></source>
+			<source_name>name</source_name>
+			<source_value>name</source_value>
+		</field>
+		<field>
+			<fielddescr>Search</fielddescr>
+			<fieldname>searchacl</fieldname>
+			<description><![CDATA[Select Search Access list to apply on this group.]]></description>
+	    	<type>select_source</type>
+			<source><![CDATA[$config['installedpackages']['dansguardiansearchacl']['config']]]></source>
+			<source_name>name</source_name>
+			<source_value>name</source_value>
+		</field>
+		<field>
+			<name>Values</name>
+			<type>listtopic</type>
+		</field>
 		<field>
 			<fielddescr>Filter Group Mode</fielddescr>
-			<fieldname>groupmode</fieldname>
+			<fieldname>mode</fieldname>
 			<description><![CDATA[ This option determines whether members of this group have their web access unfiltered, filtered, or banned.<br>
 			This mechanism replaces the "banneduserlist"]]></description>
 	    	<type>select</type>
@@ -127,19 +233,9 @@
  				<option><name>banned</name><value>0</value></option>
  				</options>
 		</field>
-			<field>
-			<fielddescr>List Description</fielddescr>
-			<fieldname>description</fieldname>
-			<type>input</type>
-			<size>90</size>
-		</field>
-		<field>
-			<name>Values</name>
-			<type>listtopic</type>
-		</field>
 		<field>
 			<fielddescr>Reporting Level</fielddescr>
-			<fieldname>report_level</fieldname>
+			<fieldname>reportinglevel</fieldname>
 			<description><![CDATA[Web Access Denied Reporting (does not affect logging)<br>
 								If defined, this overrides the global setting in dansguardian.conf for members of this filter group.]]></description>
 	    	<type>select</type>
@@ -154,10 +250,15 @@
 		<field>
 			<fielddescr>Weighted phrase mode</fielddescr>
 			<fieldname>weightedphrasemode</fieldname>
-			<description><![CDATA[Optional; overrides the weightedphrasemode option in dansguardian.conf for this particular group.<br>
-			 			See documentation for supported values in that file.]]></description>
-			<type>input</type>
-			<size>10</size>
+			<description><![CDATA[IMPORTANT: Note that setting this to "0" turns off all features which extract phrases from page content, 
+			including banned & exception phrases (not just weighted), search term filtering, and scanning for links to banned URLs.]]></description>
+	    	<type>select</type>
+ 				<options>
+ 				<option><name>Use Weighted phrase mode value from general config</name><value>default</value></option>
+ 				<option><name>Singular = each weighted phrase found only counts once on a page.</name><value>2</value></option>
+ 				<option><name>Normal = normal weighted phrase operation.</name><value>1</value></option>
+ 				<option><name>Off = do not use the weighted phrase feature.</name><value>0</value></option>
+ 				</options>
 		</field>
 		<field>
 			<fielddescr>Naughtiness limite</fielddescr>
@@ -223,107 +324,17 @@
 			<type>input</type>
 			<size>10</size>
 		</field>
-		<field>
-			<name>Lists</name>
-			<type>listtopic</type>
-		</field>
-		<field>
-			<fielddescr>Group Options</fielddescr>
-			<fieldname>group_options</fieldname>
-			<description><![CDATA[Select options to apply on this group. Default values are in ( )]]></description>
-	    	<type>select</type>
- 				<options>
- 				<option><name>Scan clean cache (on)</name><value>scancleancache</value></option>
- 				<option><name>Hex decode content (off)</name><value>hexdecodecontent</value></option>
- 				<option><name>Block Download not in Exception Lists (off)</name><value>blockdownloads</value></option>
- 				<option><name>Enable PICS rating support (off)</name><value>enablepics</value></option>
- 				<option><name>Enable Deep URL Analysis (off)</name><value>deepurlanalysis</value></option>
- 				<option><name>Infection/Scan Error Bypass on Scan Errors Only (on)</name><value>infectionbypasserrorsonly</value></option>
- 				<option><name>Disable content scanning (off)</name><value>disablecontentscan</value></option>
- 				<option><name>Check servers ssl certificates (off)</name><value>sslcertcheck</value></option>
- 				<option><name>Filter ssl sites forging SSL Certificates (off)</name><value>sslmitm</value></option>
- 				</options>
- 				<multiple/>
- 				<size>10</size>
-		</field>
-		<field>
-			<fielddescr>Content filtering</fielddescr>
-			<fieldname>group_options</fieldname>
-			<description><![CDATA[Select List you want to apply on this group.]]></description>
-	    	<type>select</type>
- 				<options>
- 				<option><name>Banned Phrase List</name><value>bannedphraselist</value></option>
- 				<option><name>Weighted Phrase List</name><value>weightedphraselist</value></option>
- 				<option><name>Exception Phrase List</name><value>exceptionphraselist</value></option>
- 				<option><name>Banned Site List</name><value>bannedsitelist</value></option>
- 				<option><name>Grey Site List</name><value>greysitelist</value></option>
- 				<option><name>Exception Site List</name><value>exceptionsitelist</value></option>
- 				<option><name>Grey Url List</name><value>greyurllist</value></option>
- 				<option><name>Exception Url List</name><value>exceptionurllist</value></option>
- 				<option><name>Exception Regexp Url List</name><value>exceptionregexpurllist</value></option>
- 				<option><name>Banned Regexp Url List</name><value>bannedregexpurllist</value></option>
- 				<option><name>Content Regexp List</name><value>contentregexplist</value></option>
- 				<option><name>Pics File</name><value>picsfile</value></option>
- 				<option><name>Url Regexp List</name><value>urlregexplist</value></option>
- 				</options>
- 				<multiple/>
- 				<size>14</size>
-		</field>
-		<field>
-			<fielddescr>File type filtering</fielddescr>
-			<fieldname>file_options</fieldname>
-			<description><![CDATA[Select List you want to apply on this group.]]></description>
-	    	<type>select</type>
- 				<options>
- 				<option><name>Exception Extension List</name><value>exceptionextensionlist</value></option>
- 				<option><name>Exception Mime Type List</name><value>exceptionmimetypelist</value></option>
- 				<option><name>Exception Phrase List</name><value>exceptionphraselist</value></option>
- 				<option><name>Banned Extension List</name><value>bannedextensionlist</value></option>
- 				<option><name>Banned Mime Type List</name><value>bannedmimetypelist</value></option>
- 				<option><name>Exception File Site ist</name><value>exceptionfileurllist</value></option>
-				</options>
- 				<multiple/>
- 				<size>7</size>
-		</field>	
-		<field>
-			<fielddescr>search engine filtering</fielddescr>
-			<fieldname>file_options</fieldname>
-			<description><![CDATA[Select search engine filtering you want to apply on this group.]]></description>
-	    	<type>select</type>
- 				<options>
- 				<option><name>Search Engine Regexp List</name><value>searchengineregexplist</value></option>
- 				<option><name>Banned Search Termlist</name><value>exceptionmimetypelist</value></option>
- 				<option><name>Weightd Search Term List</name><value>weightedsearchtermlist</value></option>
- 				<option><name>Exception Search Term List</name><value>exceptionsearchtermlist</value></option>
-				</options>
- 				<multiple/>
- 				<size>5</size>
-		</field>	
-			<field>
-			<name>Custom list</name>
-			<type>listtopic</type>
-		</field>
-		<field>
-			<fielddescr>CIDR</fielddescr>
-			<fieldname>custom</fieldname>
-			<description><![CDATA[Enter networks you want to include in this alias. One network per line in CIDR format.<br>	
-								  Example: 192.168.1.0/24]]></description>
-			<type>textarea</type>
-			<cols>50</cols>
-			<rows>10</rows>
-			<encoding>base64</encoding>
-		</field>
 		</fields>
 	<custom_php_install_command>
-		pfblocker_php_install_command();
+		dansguardian_php_install_command();
 	</custom_php_install_command>
 	<custom_php_deinstall_command>
-		pfblocker_php_deinstall_command();
+		dansguardian_php_deinstall_command();
 	</custom_php_deinstall_command>
 	<custom_php_validation_command>
-		pfblocker_validate_input($_POST, &amp;$input_errors);
+		dansguardian_validate_input($_POST, &amp;$input_errors);
 	</custom_php_validation_command>	
 	<custom_php_resync_config_command>
-		sync_package_pfblocker();
+		sync_package_dansguardian();
 	</custom_php_resync_config_command>	
 </packagegui>

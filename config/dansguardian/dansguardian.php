@@ -1,0 +1,114 @@
+<?php
+/* $Id$ */
+/* ========================================================================== */
+/*
+    dansguardian.php
+    part of pfSense (http://www.pfSense.com)
+    Copyright (C) 2012 Marcello Coutinho
+    
+    All rights reserved.                                                      
+*/
+/* ========================================================================== */
+/*
+    Redistribution and use in source and binary forms, with or without
+    modification, are permitted provided that the following conditions are met:
+
+     1. Redistributions of source code must retain the above copyright notice,
+        this list of conditions and the following disclaimer.
+
+     2. Redistributions in binary form must reproduce the above copyright
+        notice, this list of conditions and the following disclaimer in the
+        documentation and/or other materials provided with the distribution.
+
+    THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
+    INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+    AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+    AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+    OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+    INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+    POSSIBILITY OF SUCH DAMAGE.
+                                                                              */
+/* ========================================================================== */
+
+require_once("/etc/inc/util.inc");
+require_once("/etc/inc/functions.inc");
+require_once("/etc/inc/pkg-utils.inc");
+require_once("/etc/inc/globals.inc");
+require_once("/usr/local/pkg/dansguardian.inc");
+
+function fetch_blacklist(){
+	global $config,$g;
+	$url=$config['installedpackages']['dansguardianblacklist']['config'][0]['url'];
+	if (is_url($url)){
+		conf_mount_rw();
+		print "file download start..";
+		exec("/usr/bin/fetch -o /usr/local/etc/dansguardian/lists/blacklist.tgz ".escapeshellarg($url));
+		chdir ("/usr/local/etc/dansguardian/lists");
+		if (is_dir ("blacklists.old"))
+			exec ('rm -rf /usr/local/etc/dansguardian/lists/blacklists.old');
+		rename("blacklists","blacklists.old");
+		exec('/usr/bin/tar -xvzf /usr/local/etc/dansguardian/lists/blacklist.tgz 2>&1',$output,$return);
+		if (preg_match("/x (\w+)/",$output[0],$matches)){
+			if ($matches[1] != "blacklists")
+				rename("./".$matches[1],"blacklists");
+			read_lists();
+			file_notice("Dansguardian - Blacklist applied, check site and URL access lists for categories","");
+			}
+		else
+			file_notice("Dansguardian - Could not determine Blacklist extract dir. Categories not updated","");
+	   }
+	else{
+		file_notice("Dansguardian - Blacklist url is invalid.","");
+	}
+}
+function read_lists(){
+	global $config,$g;
+	$group_type=array();
+	$dir="/usr/local/etc/dansguardian/lists";
+	#read dansguardian lists dirs
+	$groups= array("phraselists", "blacklists", "whitelists");
+	#assigns know list files
+	$types=array('domains','urls','banned','weighted','exception','expression');
+	#clean previous xml config for dansguardian lists
+	foreach ($groups as $group)
+		foreach ($types as $clean)
+			$config['installedpackages']['dansguardian'.$group.$clean]['config']=array();
+	
+	#clean previous xml config for dansguardian lists
+	foreach ($groups as $group)
+		if (is_dir("$dir/$group/")){
+			#read dir content and find lists
+			$lists= scandir("$dir/$group/");
+			foreach ($lists as $list)
+				if (!preg_match ("/^\./",$list)){
+					$category= scandir("$dir/$group/$list/"); 
+					foreach ($category as $file)
+						if (!preg_match ("/^\./",$file)){
+							#assign list to array
+							$type=split("_",$file);
+							print $type[0]." --- $list --- $file\n";
+							if (!in_array($type[0],$group_type))
+								$list_type[]=$type[0];
+							$xml_group=($list=="whitelist"?"whitelists":$group);
+							$xml_type=($type[0]=="domains.processed"?"domains":$type[0]);
+							$config['installedpackages']['dansguardian'.$xml_group.$xml_type]['config'][]=array("descr"=> "$list $file","list" => $list,"file" => "$dir/$group/$list/$file");
+						}
+				}
+		}
+	
+	#var_dump($config['installedpackages']['dansguardian']['config']);
+	#foreach ($types as $clean)
+	#var_dump($config['installedpackages']['dansguardianfiles'.$clean]['config']);
+	write_config();
+}
+
+if ($argv[1]=="update_lists")
+	read_lists();
+
+if ($argv[1]=="fetch_blacklist")
+	fetch_blacklist();
+	
+?>

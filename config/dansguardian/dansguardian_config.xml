@@ -61,11 +61,23 @@
 			<url>/pkg_edit.php?xml=dansguardian_limits.xml&amp;id=0</url>
 		</tab>
 		<tab>
-			<text>Filter Groups</text>
-			<url>/pkg.php?xml=dansguardian_lists.xml</url>
+			<text>Blacklist</text>
+			<url>/pkg_edit.php?xml=dansguardian_blacklist.xml&amp;id=0</url>
 		</tab>
 		<tab>
-			<text>Report and Log</text>
+			<text>Access Lists</text>
+			<url>/pkg_edit.php?xml=dansguardian_antivirus_acl.xml&amp;id=0</url>
+		</tab>
+		<tab>
+			<text>Groups</text>
+			<url>/pkg.php?xml=dansguardian_groups.xml</url>
+		</tab>
+		<tab>
+			<text>Users</text>
+			<url>/pkg_edit.php?xml=dansguardian_users.xml</url>
+		</tab>
+		<tab>
+			<text>Report and log</text>
 			<url>/pkg_edit.php?xml=dansguardian_log.xml&amp;id=0</url>
 		</tab>
 		<tab>
@@ -73,8 +85,8 @@
 			<url>/pkg_edit.php?xml=dansguardian_sync.xml&amp;id=0</url>
 		</tab>
 		<tab>
-			<text>About</text>
-			<url>/pkg_edit.php?xml=dansguardian.php&amp;id=0</url>
+			<text>Help</text>
+			<url>/dansguardian_about.php</url>
 		</tab>
 </tabs>
 	<fields>
@@ -83,24 +95,19 @@
 			<type>listtopic</type>
 		</field>
 		<field>
-			<fielddescr>Url cache number</fielddescr>
-			<fieldname>urlcachenumber</fieldname>
-			<type>input</type>
-			<size>10</size>
-			<description><![CDATA[Positive (clean) result caching for URLs Caches good pages so they don't need to be scanned again.It also works with AV plugins.<br>
-			0 = off (recommended for ISPs with users with disimilar browsing)<br>
-			<strong>1000 = recommended for most user</strong><br>
-			5000 = suggested max upper limit<br>
-			If you're using an AV plugin then use at least 5000.]]></description>
-		</field>
-		<field>
-			<fielddescr>Url cache age</fielddescr>
-			<fieldname>urlcacheage</fieldname>
-			<type>input</type>
-			<size>10</size>
-			<description><![CDATA[Age before cache are stale and should be ignored in seconds<br>
-			<strong>900 = 15 mins(recommended)</strong><br>
-			0 = never]]></description>
+			<fielddescr>Auth Plugin</fielddescr>
+			<fieldname>auth_plugin</fieldname>
+			<description><![CDATA[This option handle the extraction of client usernames from various sources, such as Proxy-Authorisation headers and ident servers, 
+								enabling requests to be handled according to the settings of the user's filter group.]]></description>
+	    	<type>select</type>
+ 				<options>
+ 				<option><name>Proxy-Basic</name><value>/usr/local/etc/dansguardian/authplugins/proxy-basic.conf</value></option>
+ 				<option><name>Proxy-Digest</name><value>/usr/local/etc/dansguardian/authplugins/proxy-digest.conf</value></option>
+ 				<option><name>Proxy-Ntlm</name><value>/usr/local/etc/dansguardian/authplugins/proxy-ntlm.conf</value></option>
+ 				<option><name>Ident</name><value>/usr/local/etc/dansguardian/authplugins/ident.conf</value></option>
+ 				<option><name>Ip Address</name><value>/usr/local/etc/dansguardian/authplugins/ip.conf</value></option>
+ 				<option><name>none</name><value></value></option>
+ 				</options>
 		</field>
 		<field>
 			<fielddescr>Scan Options</fielddescr>
@@ -134,6 +141,18 @@
  				</options>
 		</field>
 		<field>
+			<fielddescr>Lower casing options</fielddescr>
+			<fieldname>preservecase</fieldname>
+			<description><![CDATA[When a document is scanned the uppercase letters are converted to lower case in order to compare them with the phrases.<br>
+			However this can break Big5 and other 16-bit texts.  If needed preserve the case.]]></description>
+	    	<type>select</type>
+ 				<options>
+ 				<option><name>Force lower case (default)</name><value>0</value></option>
+ 				<option><name>Do not change case</name><value>1</value></option>
+ 				<option><name>Scan first in lower case, then in original case</name><value>2</value></option>
+ 				</options>
+		</field>
+		<field>
 			<fielddescr>Phrase filter mode</fielddescr>
 			<fieldname>phrasefiltermode</fieldname>
 			<description><![CDATA[Smart, Raw and Meta/Title phrase content filtering options<br>
@@ -149,30 +168,62 @@
  				<option><name>raw only</name><value>0</value></option>
  				</options>
 		</field>
-		<field>
-			<fielddescr>Lower casing options</fielddescr>
-			<fieldname>preservecase</fieldname>
-			<description><![CDATA[When a document is scanned the uppercase letters are converted to lower case in order to compare them with the phrases.<br>
-			However this can break Big5 and other 16-bit texts.  If needed preserve the case.]]></description>
-	    	<type>select</type>
- 				<options>
- 				<option><name>Force lower case (default)</name><value>0</value></option>
- 				<option><name>Do not change case</name><value>1</value></option>
- 				<option><name>Scan first in lower case, then in original case</name><value>2</value></option>
- 				</options>
+			<field>
+			<fielddescr>Url cache number</fielddescr>
+			<fieldname>urlcachenumber</fieldname>
+			<type>input</type>
+			<size>10</size>
+			<description><![CDATA[Positive (clean) result caching for URLs Caches good pages so they don't need to be scanned again.It also works with AV plugins.<br>
+			0 = off (recommended for ISPs with users with disimilar browsing)<br>
+			<strong>1000 = recommended for most user</strong><br>
+			5000 = suggested max upper limit<br>
+			If you're using an AV plugin then use at least 5000.]]></description>
 		</field>
-				<field>
+		<field>
+			<fielddescr>Url cache age</fielddescr>
+			<fieldname>urlcacheage</fieldname>
+			<type>input</type>
+			<size>10</size>
+			<description><![CDATA[Age before cache are stale and should be ignored in seconds<br>
+			<strong>900 = 15 mins(recommended)</strong><br>
+			0 = never]]></description>
+		</field>
+		<field>
+			<name>SSL man in the middle Filtering</name>
+			<type>listtopic</type>
+		</field>
+		<field>
+			<fielddescr>CA</fielddescr>
+			<fieldname>ca</fieldname>
+			<description><![CDATA[Select Certificate Authority to use when SSL filtering is enabled on Group options<br>
+								To create a CA on pfsense, go to <strong>system -> Cert Manager<strong>]]></description>
+	    	<type>select_source</type>
+			<source><![CDATA[$config['ca']]]></source>
+			<source_name>descr</source_name>
+			<source_value>refid</source_value>
+		</field>
+		<field>
+			<fielddescr>Cert</fielddescr>
+			<fieldname>cert</fieldname>
+			<description><![CDATA[Select Certificate pair to use when SSL filtering is enabled on Group options<br>
+								To create a Certificate on pfsense, go to <strong>system -> Cert Manager<strong>]]></description>
+	    	<type>select_source</type>
+			<source><![CDATA[$config['cert']]]></source>
+			<source_name>descr</source_name>
+			<source_value>refid</source_value>
+		</field>
+		<field>
 			<name>Content Scanner</name>
 			<type>listtopic</type>
 		</field>
 		<field>
-			<fielddescr>Content Scanners</fielddescr>
+			<fielddescr>Content Scanners (antivirus)</fielddescr>
 			<fieldname>content_scanners</fieldname>
 			<description><![CDATA[Content Scanners options. Default values are in ( )]]></description>
 	    	<type>select</type>
  				<options>
- 				<option><name>clamdscan (on)</name><value>clamdscan</value></option>
- 				<option><name>icapscan (on)</name><value>icapscan</value></option>
+ 				<option><name>clamdscan (off)</name><value>/usr/local/etc/dansguardian/contentscanners/clamdscan.conf</value></option>
+ 				<option><name>icapscan (off)</name><value>/usr/local/etc/dansguardian/contentscanners/icapscan.conf</value></option>
  				</options>
  				<multiple/>
  				<size>3</size>
@@ -195,6 +246,15 @@
 			This is probably not desirable behavour as exceptions are supposed to be trusted and will increase load.<br>
 			Correct use of grey lists are a better idea.]]></description>
 		</field>
+		<field>
+			<fielddescr>ICAP URL</fielddescr>
+			<fieldname>contentscannertimeout</fieldname>
+			<type>input</type>
+			<size>40</size>
+			<description><![CDATA[Enter ICAP URL in <strong>icap://icapserver:1344/avscan</strong> format<br>
+						  Use hostname rather than IP address and Always specify the port]]></description>
+		</field>
+	
 		<field>
 			<name>Misc settings</name>
 			<type>listtopic</type>

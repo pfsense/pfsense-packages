@@ -7,11 +7,12 @@
 /* $Id$ */
 /* ========================================================================== */
 /*
-    dansguardian_sync.xml
-    part of the Dansguardian package for pfSense
+    dansguardian_users.xml
+    part of the dansguardian for pfSense
     Copyright (C) 2012 Marcello Coutinho
+
     All rights reserved.            
-                                                                  */
+			                                                                  */
 /* ========================================================================== */
 /*
     Redistribution and use in source and binary forms, with or without
@@ -41,12 +42,11 @@
 	<description>Describe your package here</description>
 	<requirements>Describe your package requirements here</requirements>
 	<faq>Currently there are no FAQ items provided.</faq>
-	<name>dansguardiansync</name>
+	<name>dansguardianusers</name>
 	<version>1.0</version>
 	<title>Services: Dansguardian</title>
 	<include_file>/usr/local/pkg/dansguardian.inc</include_file>
-<tabs>
-		<tab>
+	<tabs><tab>
 			<text>Daemon</text>
 			<url>/pkg_edit.php?xml=dansguardian.xml&amp;id=0</url>
 		</tab>
@@ -73,15 +73,15 @@
 		<tab>
 			<text>Users</text>
 			<url>/pkg_edit.php?xml=dansguardian_users.xml</url>
+			<active/>
 		</tab>
 		<tab>
-			<text>Report and Log</text>
+			<text>Report and log</text>
 			<url>/pkg_edit.php?xml=dansguardian_log.xml&amp;id=0</url>
 		</tab>
 		<tab>
 			<text>XMLRPC Sync</text>
 			<url>/pkg_edit.php?xml=dansguardian_sync.xml&amp;id=0</url>
-			<active/>
 		</tab>
 		<tab>
 			<text>Help</text>
@@ -89,48 +89,3 @@
 		</tab>
 </tabs>
 	<fields>
-		<field>
-			<name>Dansguardian XMLRPC Sync</name>
-			<type>listtopic</type>
-		</field>
-		<field>
-			<fielddescr>Automatically sync mailscanner configuration changes</fielddescr>
-			<fieldname>synconchanges</fieldname>
-			<description>pfSense will automatically sync changes to the hosts defined below.</description>
-			<type>checkbox</type>
-		</field>
-		<field>
-			<fielddescr>Remote Server</fielddescr>
-			<fieldname>none</fieldname>
-			<type>rowhelper</type>
-			<rowhelper>
-			<rowhelperfield>
-				<fielddescr>IP Address</fielddescr>
-				<fieldname>ipaddress</fieldname>
-				<description>IP Address of remote server</description>
-				<type>input</type>
-				<size>20</size>
-			</rowhelperfield>
-			<rowhelperfield>
-				<fielddescr>Password</fielddescr>
-				<fieldname>password</fieldname>
-				<description>Password for remote server.</description>
-				<type>password</type>
-				<size>20</size>
-			</rowhelperfield>
-			</rowhelper>
-		</field>
-	</fields>
-	<custom_php_install_command>
-		mailscanner_php_install_command();
-	</custom_php_install_command>
-	<custom_php_deinstall_command>
-		mailscanner_php_deinstall_command();
-	</custom_php_deinstall_command>
-	<custom_php_validation_command>
-		mailscanner_validate_input($_POST, &amp;$input_errors);
-	</custom_php_validation_command>	
-	<custom_php_resync_config_command>
-		sync_package_mailscanner();
-	</custom_php_resync_config_command>
-</packagegui>
