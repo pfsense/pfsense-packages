@@ -79,6 +79,8 @@ function sync_package_dansguardian() {
 	$maxagechildren=($dansguardian['maxagechildren']?$dansguardian['maxagechildren']:"500");
 	$maxips=($dansguardian['maxips']?$dansguardian['maxips']:"0");
 	$preforkchildren=($dansguardian['preforkchildren']?$dansguardian['preforkchildren']:"10");
+	$proxyip=($dansguardian['proxyip']?$dansguardian['proxyip']:"127.0.0.1");
+	$proxyport=($dansguardian['proxyport']?$dansguardian['proxyport']:"127.0.0.1");
 	
 	#general options
 	$urlcachenumber=($dansguardian_config['urlcachenumber']?$dansguardian_config['urlcachenumber']:"1000");
@@ -118,6 +120,8 @@ function sync_package_dansguardian() {
 	$reportlanguage=($dansguardian_log['report_language']?$dansguardian_log['report_language']:"ukenglish");
 	$showweightedfound=(preg_match('/showweightedfound/',$dansguardian_log['report_options'])?"on":"off");
 	$usecustombannedflash=(preg_match('/usecustombannedflash/',$dansguardian_log['report_options'])?"on":"off");
+	if (file_exists('/usr/local/share/dansguardian/blockedflash.swf'))
+		$custombannedflashfile="custombannedflashfile = '/usr/local/share/dansguardian/blockedflash.swf'";
 	$usecustombannedimage=(preg_match('/usecustombannedimage/',$dansguardian_log['report_options'])?"on":"off");
 	$nonstandarddelimiter=(preg_match('/nonstandarddelimiter/',$dansguardian_log['report_options'])?"on":"off");
 	
@@ -621,6 +625,20 @@ EOF;
 			
 		$count++;
 	}
+	if ($user_xml==""){
+		$user_xml .=<<<EOF
+		<field>
+			<name>Users</name>
+			<type>listtopic</type>
+		</field>
+		<field>
+			<fielddescr>Users</fielddescr>
+			<fieldname>info_checkbox</fieldname>
+			<type>checkbox</type>
+			<description><![CDATA[Dansguardian users are required only when you have more then one group.<br>All unauthenticated users or unlisted uses will match first filter group.]]></description>
+		</field>
+EOF;
+	}
 	#Create/update filtergroupslist
 	file_put_contents($dansguardian_dir."/lists/filtergroupslist",$filtergroupslist,LOCK_EX);
 	#Create/update userlist xml file
@@ -671,8 +689,16 @@ EOF;
 	conf_mount_rw();
 
 	write_config();
+	
+	$dirs=array('/usr/local/etc/dansguardian/lists/bannedrooms/',
+				'/var/log/dansguardian');
+
+	foreach ($dirs as $dir)
+		if (!is_dir($dir))
+			mkdir ($dir,0755,true);
+	
 	#update file owner
-	mwexec("chown -R $daemonuser:$daemongroup /usr/loca/etc/dansguardian");
+	mwexec("chown -R $daemonuser:$daemongroup /usr/local/etc/dansguardian");
 	mwexec("chown -R $daemonuser:$daemongroup /var/log/dansguardian");
 	
 	#create config files
@@ -695,8 +721,9 @@ EOF;
 			#clamdscan.conf dansguardian file	
 			$cconf="/usr/local/etc/dansguardian/contentscanners/clamdscan.conf";
 			$cconf_file=file_get_contents($cconf);
-			if (!preg_match('/clamav/',$cconf_file)){
-				file_put_contents($cconf, $cconf_file."\nclamdudsfile = '/var/run/clamav/clamd.sock'", LOCK_EX);
+			if (preg_match('/#clamdudsfile/',$cconf_file)){
+				$cconf_file=preg_replace('/#clamdudsfile/','clamdudsfile',$cconf_file);
+				file_put_contents($cconf, $cconf_file, LOCK_EX);
 				}
 			
 			#clamd conf file
@@ -725,12 +752,7 @@ EOF;
 			}	
 	}
 
-	$dirs=array('/usr/local/etc/dansguardian/lists/bannedrooms/',
-				'/var/log/dansguardian');
-	foreach ($dirs as $dir)
-		if (!is_dir($dir))
-			mkdir ($dir,0755,true);
-		
+
 	$script='/usr/local/etc/rc.d/dansguardian';
 	if($config['installedpackages']['dansguardian']['config'][0]['enable']){
 		$script_file=file_get_contents($script);

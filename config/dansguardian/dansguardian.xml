@@ -290,6 +290,27 @@
 							Use this to set a hard limit on the number of users allowed to concurrently<br>
 							browse the web. Set to 0 for no limit, and to disable the IP cache process.]]></description>
 		</field>
+		<field>
+			<name>Listening Settings</name>
+			<type>listtopic</type>
+		</field>
+		<field>
+			<fielddescr>Proxy IP</fielddescr>
+			<fieldname>proxyip</fieldname>
+			<type>input</type>
+			<size>20</size>
+			<description><![CDATA[Default: <strong>127.0.0.1</strong><br>
+			 				Sets ip address for proxy server(usually squid).]]></description>
+		</field>
+		<field>
+			<fielddescr>Proxy Port</fielddescr>
+			<fieldname>proxyport</fieldname>
+			<type>input</type>
+			<size>10</size>
+			<description><![CDATA[Default: <strong>3128</strong><br>
+			 				Sets port number fro proxy server.]]></description>
+		</field>
+
 	</fields>
 	<custom_php_install_command>
 		dansguardian_php_install_command();

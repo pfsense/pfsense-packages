@@ -149,7 +149,7 @@
 	    	<type>select</type>
  				<options>
  				<option><name>Show weighted found (on)</name><value>showweightedfound</value></option>
- 				<option><name>Use custom banned flash (on)</name><value>usecustombannedflash</value></option>
+ 				<option><name>Use custom banned flash (off)</name><value>usecustombannedflash</value></option>
  				<option><name>Use custom banned image (on)</name><value>usecustombannedimage</value></option>
  				<option><name>Non standard delimiter (on)</name><value>nonstandarddelimiter</value></option>
  				</options>

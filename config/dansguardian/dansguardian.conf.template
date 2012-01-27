@@ -126,10 +126,10 @@ statlocation = '/var/log/dansguardian/stats'
 {$filterports}
 
 # the ip of the proxy (default is the loopback - i.e. this server)
-proxyip = 127.0.0.1
+proxyip = {$proxyip}
 
 # the port DansGuardian connects to proxy on
-proxyport = 3128
+proxyport = {$proxyport}
 
 # Whether to retrieve the original destination IP in transparent proxy
 # setups and check it against the domain pulled from the HTTP headers.
@@ -182,9 +182,7 @@ custombannedimagefile = '/usr/local/share/dansguardian/transparent1x1.gif'
 
 #Banned flash replacement
 usecustombannedflash = {$usecustombannedflash}
-custombannedflashfile = '/usr/local/share/dansguardian/blockedflash.swf'
-
-
+{$custombannedflashfile}
 
 # Filter groups options
 # filtergroups sets the number of filter groups. A filter group is a set of content
