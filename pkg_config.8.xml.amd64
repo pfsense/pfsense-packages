@@ -443,7 +443,7 @@
 		<build_port_path>/usr/home/pfsense/tools/pfPorts/snort</build_port_path>
 		<build_options>WITH_THREADS=yes WITH_IPV6=true WITH_MPLS=true WITH_GRE=true WITHOUT_TARGETBASED=true WITH_DECODERPRE=true WITH_ZLIB=true WITH_NORMALIZER=true WITH_REACT=true WITH_PERFPROFILE=true WITH_FLEXRESP3=true WITHOUT_MYSQL=true WITHOUT_ODBC=true WITHOUT_POSTGRESQL=true WITHOUT_PRELUDE=true WITH_SNORTSAM=true WITHOUT_PFSENSE=true</build_options>
 		<config_file>http://www.pfsense.com/packages/config/snort/snort.xml</config_file>
-		<version>2.9.1 pkg v. 2.1</version>
+		<version>2.9.1 pkg v. 2.1.1</version>
 		<required_version>2.0</required_version>
 		<status>Stable</status>
 		<configurationfile>/snort.xml</configurationfile>
