@@ -1,6 +1,6 @@
 <?php
-require("guiconfig.inc");
-
+require_once("globals.inc");
+require_once("guiconfig.inc");
 require_once("includes/snort_alerts.inc.php");
 
 $snort_alerts_logfile = "{$g['varlog_path']}/snort/alert";
