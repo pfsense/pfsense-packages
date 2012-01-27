@@ -37,7 +37,7 @@ require_once("functions.inc");
 require_once("filter.inc");
 
 /* package version */
-$snort_package_version = 'Snort 2.9.1 pkg v. 2.0.2';
+$snort_package_version = 'Snort 2.9.1 pkg v. 2.1.1';
 
 /* Allow additional execution time 0 = no limit. */
 ini_set('max_execution_time', '9999');
