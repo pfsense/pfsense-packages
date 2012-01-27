@@ -53,7 +53,7 @@
 		<url>pkg_edit.php?xml=dansguardian.xml</url>
 	</menu>
 	<additional_files_needed>
-		<item>http:/www.pfsense.org/packages/config/dansguardian/dansguardian.inc</item>
+		<item>http://www.pfsense.org/packages/config/dansguardian/dansguardian.inc</item>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0755</chmod>
 	</additional_files_needed>
