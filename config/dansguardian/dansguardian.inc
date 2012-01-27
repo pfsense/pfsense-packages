@@ -656,9 +656,13 @@ EOF;
 			mwexec_bg("/root/dansguardian_custom.script");
 		else
 			mwexec_bg("/usr/local/bin/php /usr/local/www/dansguardian.php fetch_blacklist");
-		mwexec_bg("/usr/local/bin/php /usr/local/www/dansguardian.php udpate_lists");
+		mwexec_bg("/usr/local/bin/php /usr/local/www/dansguardian.php update_lists");
 	}
 	
+	#Import default blacklists 
+	if (!is_array($config['installedpackages']['dansguardianblacklistsurls']['config']))
+		mwexec_bg("/usr/local/bin/php /usr/local/www/dansguardian.php update_lists");
+
 	#get clamav user
 	$cconf="/usr/local/etc/clamd.conf";
 	$cconf_file=file_get_contents($cconf);
