@@ -167,7 +167,14 @@
 									<b>cheked</b>: pfSense Cert-Manager (recommended)]]></description>
 			<type>checkbox</type>
 			<default_value>radiuscertmgr</default_value>
-			<enablefields>ssl_ca_cert,ssl_server_cert</enablefields>
+			<enablefields>ssl_ca_cert,ssl_server_cert,vareapconfenableclientp12</enablefields>
+		</field>
+		<field>
+			<fielddescr>Private Key Password</fielddescr>
+			<fieldname>vareapconfprivatekeypassword</fieldname>
+			<description><![CDATA[By default the certificates created by freeradius are protected with an "input/ouput" password from reading the certificate. The certificates created by pfSense Cert Manager are not protected so you must leave this field empty. (Default: whatever)]]></description>
+			<type>password</type>
+			<default_value>whatever</default_value>
 		</field>
 		<field>
 			<fielddescr>SSL CA Certificate</fielddescr>
@@ -190,11 +197,21 @@
 			<source_value>refid</source_value>
 		</field>
 		<field>
-			<fielddescr>Private Key Password</fielddescr>
-			<fieldname>vareapconfprivatekeypassword</fieldname>
-			<description><![CDATA[By default the certificates created by freeradius are protected with an "input/ouput" password from reading the certificate. The certificates created by pfSense Cert Manager are not protected so you must leave this field empty. (Default: whatever)]]></description>
-			<type>password</type>
-			<default_value>whatever</default_value>
+			<fielddescr>Create client.p12 for export</fielddescr>
+			<fieldname>vareapconfenableclientp12</fieldname>
+			<description><![CDATA[Choose if you would like to create a client.p12 to export it to a windows client. You need this file if you use EAP-TLS.]]></description>
+			<type>checkbox</type>
+			<enablefields>ssl_client_cert</enablefields>
+		</field>
+		<field>
+			<fielddescr>SSL Client Certificate</fielddescr>
+			<fieldname>ssl_client_cert</fieldname>
+			<description><![CDATA[Choose the SSL Client Certficate here which you created with the pfSense Cert Manager.<br>
+									Choose "none" if you do not use any kind of certificates or the freeradius Cert Manager. (Default: none)]]></description>
+			<type>select_source</type>
+			<source><![CDATA[freeradius_get_server_certs()]]></source>
+			<source_name>descr</source_name>
+			<source_value>refid</source_value>
 		</field>
 		<field>
 			<name>EAP-TLS</name>
@@ -217,6 +234,43 @@
 			<description><![CDATA[This can never exceed the size of a RADIUS packet (4096 bytes), and is preferably half that, to accomodate other attributes in RADIUS packet.  On most APs the MAX packet length is configured between 1500 - 1600 In these cases, fragment size should be 1024 or less. (Default: 1024)]]></description>
 			<type>input</type>
 			<default_value>1024</default_value>
+		</field>
+		<field>
+			<fielddescr>Check Cert Issuer</fielddescr>
+			<fieldname>vareapconfenablecheckcertissuer</fieldname>
+			<description><![CDATA[If this is enabled then the server/client certificate must match the CA issuer. (Default: unchecked)]]></description>
+			<type>checkbox</type>
+			<enablefields>vareapconfcountry,vareapconfstate,vareapconfcity,vareapconforganization</enablefields>
+		</field>
+		<field>
+			<fielddescr>Country</fielddescr>
+			<fieldname>vareapconfcountry</fieldname>
+			<description><![CDATA[Enter the country of your CA. <b>Must</b> match the value you set in <b>SYSTEM => Cert Manager => CAs</b>. (e.g: US)]]></description>
+			<type>input</type>
+		</field>
+		<field>
+			<fielddescr>State or Province</fielddescr>
+			<fieldname>vareapconfstate</fieldname>
+			<description><![CDATA[Enter the state or province of your CA. <b>Must</b> match the value you set in <b>SYSTEM => Cert Manager => CAs</b>. (e.g: Texas)]]></description>
+			<type>input</type>
+		</field>
+		<field>
+			<fielddescr>City</fielddescr>
+			<fieldname>vareapconfcity</fieldname>
+			<description><![CDATA[Enter the city of your CA. <b>Must</b> match the value you set in <b>SYSTEM => Cert Manager => CAs</b>. (e.g: Austin)]]></description>
+			<type>input</type>
+		</field>
+		<field>
+			<fielddescr>Organization</fielddescr>
+			<fieldname>vareapconforganization</fieldname>
+			<description><![CDATA[Enter the organization of your CA. <b>Must</b> match the value you set in <b>SYSTEM => Cert Manager => CAs</b>. (e.g: My Company Ltd)]]></description>
+			<type>input</type>
+		</field>
+		<field>
+			<fielddescr>Check Client Certificate CN</fielddescr>
+			<fieldname>vareapconfenablecheckcertcn</fieldname>
+			<description><![CDATA[If this is enabled then the common name of the client certificate must match the username you set in <b>FreeRADIUS => Users</b>. (Default: unchecked)]]></description>
+			<type>checkbox</type>
 		</field>
 		
 		
