@@ -240,7 +240,7 @@
 			<fieldname>vareapconfenablecheckcertissuer</fieldname>
 			<description><![CDATA[If this is enabled then the server/client certificate must match the CA issuer. (Default: unchecked)]]></description>
 			<type>checkbox</type>
-			<enablefields>vareapconfcountry,vareapconfstate,vareapconfcity,vareapconforganization</enablefields>
+			<enablefields>vareapconfcountry,vareapconfstate,vareapconfcity,vareapconforganization,vareapconfemail,vareapconfcommonname</enablefields>
 		</field>
 		<field>
 			<fielddescr>Country</fielddescr>
@@ -264,6 +264,18 @@
 			<fielddescr>Organization</fielddescr>
 			<fieldname>vareapconforganization</fieldname>
 			<description><![CDATA[Enter the organization of your CA. <b>Must</b> match the value you set in <b>SYSTEM => Cert Manager => CAs</b>. (e.g: My Company Ltd)]]></description>
+			<type>input</type>
+		</field>
+		<field>
+			<fielddescr>E-Mail Address</fielddescr>
+			<fieldname>vareapconfemail</fieldname>
+			<description><![CDATA[Enter the e-mail address of your CA. <b>Must</b> match the value you set in <b>SYSTEM => Cert Manager => CAs</b>. (e.g: My Company Ltd)]]></description>
+			<type>input</type>
+		</field>
+		<field>
+			<fielddescr>Common Name</fielddescr>
+			<fieldname>vareapconfcommonname</fieldname>
+			<description><![CDATA[Enter the common name of your CA. <b>Must</b> match the value you set in <b>SYSTEM => Cert Manager => CAs</b>. (e.g: My Company Ltd)]]></description>
 			<type>input</type>
 		</field>
 		<field>
