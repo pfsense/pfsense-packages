@@ -766,6 +766,8 @@ function freeradius_eapconf_resync() {
 	$vareapconfstate = ($eapconf['vareapconfstate']?$eapconf['vareapconfstate']:'Texas');
 	$vareapconfcity = ($eapconf['vareapconfcity']?$eapconf['vareapconfcity']:'Austin');
 	$vareapconforganization = ($eapconf['vareapconforganization']?$eapconf['vareapconforganization']:'My Company Ltd');
+	$vareapconfemail = ($eapconf['vareapconfemail']?$eapconf['vareapconfemail']:'admin@mycompany.com');
+	$vareapconfcommonname = ($eapconf['vareapconfcommonname']?$eapconf['vareapconfcommonname']:'internal-ca');
 		
 	// Variables: Cache
 	$vareapconfcacheenablecache = ($eapconf['vareapconfcacheenablecache']?$eapconf['vareapconfcacheenablecache']:'no');
@@ -891,10 +893,10 @@ else {
 
 // check if cert issuer of CA and certs match
 if($eapconf['vareapconfenablecheckcertissuer'] == 'on') {
-	$vareapconfcheckcertissuer = "check_cert_issuer = " . '"' . "/C=$vareapconfcountry/ST=$vareapconfstate/L=$vareapconfcity/O=$vareapconforganization" . '"';
+	$vareapconfcheckcertissuer = "check_cert_issuer = " . '"' . "/C=$vareapconfcountry/ST=$vareapconfstate/L=$vareapconfcity/O=$vareapconforganization/emailAddress=$vareapconfemail/CN=$vareapconfcommonname" . '"';
 }
 else {
-	$vareapconfcheckcertissuer = '### check_cert_issuer = "/C=GB/ST=Berkshire/L=Newbury/O=My Company Ltd" ###';
+	$vareapconfcheckcertissuer = '### check_cert_issuer = "/C=GB/ST=Berkshire/L=Newbury/O=My Company Ltd/emailAddress=test@mycomp.com/CN=myca" ###';
 }
 
 	$conf .= <<<EOD
