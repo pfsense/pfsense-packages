@@ -127,6 +127,7 @@ function freeradius_install_command() {
 	// Initialize some config files - the functions below call other functions
 	freeradius_sqlconf_resync();
 	freeradius_eapconf_resync();
+	freeradius_clients_resync();
 	
 	$rcfile = array();
 	$rcfile['file'] = 'radiusd.sh';
