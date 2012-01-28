@@ -761,7 +761,11 @@ function freeradius_eapconf_resync() {
 	$vareapconfprivatekeypassword = ($eapconf['vareapconfprivatekeypassword']?$eapconf['vareapconfprivatekeypassword']:'whatever');
 	$vareapconffragmentsize = ($eapconf['vareapconffragmentsize']?$eapconf['vareapconffragmentsize']:'1024');
 	$vareapconfincludelength = ($eapconf['vareapconfincludelength']?$eapconf['vareapconfincludelength']:'yes');
-	
+	$vareapconfcountry = ($eapconf['vareapconfcountry']?$eapconf['vareapconfcountry']:'US');
+	$vareapconfstate = ($eapconf['vareapconfstate']?$eapconf['vareapconfstate']:'Texas');
+	$vareapconfcity = ($eapconf['vareapconfcity']?$eapconf['vareapconfcity']:'Austin');
+	$vareapconforganization = ($eapconf['vareapconforganization']?$eapconf['vareapconforganization']:'My Company Ltd');
+		
 	// Variables: Cache
 	$vareapconfcacheenablecache = ($eapconf['vareapconfcacheenablecache']?$eapconf['vareapconfcacheenablecache']:'no');
 	$vareapconfcachelifetime = ($eapconf['vareapconfcachelifetime']?$eapconf['vareapconfcachelifetime']:'24');
@@ -834,8 +838,28 @@ if ($eapconf['vareapconfchoosecertmanager'] == 'on') {
 					base64_decode($svr_cert['crt']));
 				$conf['ssl_server_cert'] = RADDB . "/certs/server_cert.pem";
 			}
+			
+			
+			if ($eapconf['vareapconfenableclientp12'] == 'on') {
+				$svr_cert = lookup_cert($eapconf["ssl_client_cert"]);
+				if ($svr_cert != false) {
+					if(base64_decode($svr_cert['prv'])) {
+						file_put_contents(RADDB . "/certs/client_key.pem", 
+							base64_decode($svr_cert['prv']));
+						$conf['ssl_key'] = RADDB . '/certs/client_key.pem';
+					}
+				}
 
 
+				if(base64_decode($svr_cert['crt'])) {
+					file_put_contents(RADDB . "/certs/client_cert.pem", 
+						base64_decode($svr_cert['crt']));
+					$conf['ssl_client_cert'] = RADDB . "/certs/client_cert.pem";
+				}
+			
+			exec("openssl pkcs12 -export -in /usr/local/etc/raddb/certs/client_cert.pem -inkey /usr/local/etc/raddb/certs/client_key.pem -out /usr/local/etc/raddb/certs/client_cert.p12 -passout pass\:");	
+			}
+			
 			$conf['ssl_cert_dir'] = RADDB . '/certs';
 		}
 
@@ -854,6 +878,22 @@ else {
 	$vareapconfprivatekeyfile = 'server.pem';
 	$vareapconfcertificatefile = 'server.pem';
 	$vareapconfcafile = 'ca.pem';
+}
+
+// check if the common name of the certificate must match the username
+if($eapconf['vareapconfenablecheckcertcn'] == 'on') {
+	$vareapconfcheckcertcn = 'check_cert_cn = %{User-Name}';
+}
+else {
+	$vareapconfcheckcertcn = '### check_cert_cn = %{User-Name} ###';
+}
+
+// check if cert issuer of CA and certs match
+if($eapconf['vareapconfenablecheckcertissuer'] == 'on') {
+	$vareapconfcheckcertissuer = "check_cert_issuer = " . '"' . "/C=$vareapconfcountry/ST=$vareapconfstate/L=$vareapconfcity/O=$vareapconforganization" . '"';
+}
+else {
+	$vareapconfcheckcertissuer = '### check_cert_issuer = "/C=GB/ST=Berkshire/L=Newbury/O=My Company Ltd" ###';
 }
 
 	$conf .= <<<EOD
@@ -890,8 +930,8 @@ else {
 			include_length = $vareapconfincludelength
 		#	check_crl = yes
 			CA_path = \${cadir}
-		#	check_cert_issuer = "/C=GB/ST=Berkshire/L=Newbury/O=My Company Ltd"
-		#	check_cert_cn = %{User-Name}
+			$vareapconfcheckcertissuer
+			$vareapconfcheckcertcn
 			cipher_list = "DEFAULT"
 			ecdh_curve = "prime256v1"
 			cache {
