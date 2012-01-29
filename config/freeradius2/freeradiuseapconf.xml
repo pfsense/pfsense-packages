@@ -102,9 +102,15 @@
 			<type>listtopic</type>
 		</field>
 		<field>
+			<fielddescr>Disable weak EAP types</fielddescr>
+			<fieldname>vareapconfdisableweakeaptypes</fieldname>
+			<description><![CDATA[Here you disable the weak EAP types MD5, GTC and LEAP. You should do this if you want that only stronger EAP types like TLS, TTLS, PEAP, MSCHAPv2 should be allowed. This option does not affect the "tunneled EAP sessions".]]></description>
+			<type>checkbox</type>
+		</field>
+		<field>
 			<fielddescr>Default EAP Type</fielddescr>
 			<fieldname>vareapconfdefaulteaptype</fieldname>
-			<description><![CDATA[Invoke the default supported EAP type when EAP-Identity response is received. (Default: md5)]]></description>
+			<description><![CDATA[Invoke the default supported EAP type when EAP-Identity response is received. If you disabled the weak EAP types you must not select here MD5. Try PEAP. (Default: md5)]]></description>
 			<type>select</type>
 			<default_value>md5</default_value>
 					<options>
@@ -114,7 +120,6 @@
 						<option><name>TLS</name><value>tls</value></option>
 						<option><name>TTLS</name><value>ttls</value></option>
 						<option><name>PEAP</name><value>peap</value></option>
-						<option><name>MSCHAP</name><value>mschap</value></option>
 						<option><name>MSCHAPv2</name><value>mschapv2</value></option>
 					</options>
 		</field>
@@ -159,14 +164,13 @@
 			<type>listtopic</type>
 		</field>
 		<field>
-			<fielddescr>Choose your Cert Manager</fielddescr>
+			<fielddescr>Choose pfSense Cert-Manager</fielddescr>
 			<fieldname>vareapconfchoosecertmanager</fieldname>
 			<description><![CDATA[Choose your Cert manager. By default it is the freeradius cert manager because the server needs some default certs to start service. For more information take al look at "Certificates"-Tab.<br>
 									To use the pfsense Cert Manager you have to create a CA and an Server Certificate first. (SYSTEM -> Cert Manager).<br><br>
 									<b>uncheked</b>: FreeRADIUS Cert-Manager (not recommended) (Default: unchecked)<br>
 									<b>cheked</b>: pfSense Cert-Manager (recommended)]]></description>
 			<type>checkbox</type>
-			<default_value>radiuscertmgr</default_value>
 			<enablefields>ssl_ca_cert,ssl_server_cert,vareapconfenableclientp12</enablefields>
 		</field>
 		<field>
@@ -370,9 +374,6 @@
 						<option><name>GTC</name><value>gtc</value></option>
 						<option><name>OTP</name><value>otp</value></option>
 						<option><name>TLS</name><value>tls</value></option>
-						<option><name>PAP</name><value>pap</value></option>
-						<option><name>CHAP</name><value>chap</value></option>
-						<option><name>MSCHAP</name><value>mschap</value></option>
 						<option><name>MSCHAPv2</name><value>mschapv2</value></option>
 					</options>
 		</field>
@@ -425,9 +426,6 @@
 						<option><name>GTC</name><value>gtc</value></option>
 						<option><name>OTP</name><value>otp</value></option>
 						<option><name>TLS</name><value>tls</value></option>
-						<option><name>PAP</name><value>pap</value></option>
-						<option><name>CHAP</name><value>chap</value></option>
-						<option><name>MSCHAP</name><value>mschap</value></option>
 						<option><name>MSCHAPv2</name><value>mschapv2</value></option>
 					</options>
 		</field>
