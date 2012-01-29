@@ -751,6 +751,14 @@ function freeradius_eapconf_resync() {
 
 	$eapconf = $config['installedpackages']['freeradiuseapconf']['config'][0];
 	
+	// Disable weak EAP types like MD5, GTC, LEAP
+	if ($eapconf['vareapconfdisableweakeaptypes'] == '') {
+		$vareapconfweakeaptypes = "md5 {" . "\n\t\t}" . "\n\t\tleap {" . "\n\t\t}" . "\n\t\tgtc {" . "\n\t\t\t#challenge = " . '"Password: "' . "\n\t\t\tauth_type = PAP" . "\n\t\t}";
+	}
+	else {
+		$vareapconfweakeaptypes = '### DISABLED WEAK EAP TYPES MD5, GTC, LEAP ###';
+	}
+	
 	// Variables: EAP
 	$vareapconfdefaulteaptype = ($eapconf['vareapconfdefaulteaptype']?$eapconf['vareapconfdefaulteaptype']:'md5');
 	$vareapconftimerexpire = ($eapconf['vareapconftimerexpire']?$eapconf['vareapconftimerexpire']:'60');
@@ -871,9 +879,13 @@ if ($eapconf['vareapconfchoosecertmanager'] == 'on') {
 	$vareapconfcafile = 'ca_cert.pem';
 	
 	// generate new DH and RANDOM file
-	log_error("freeRADIUS: Switched to pfSense Cert-Manager. Creating new DH and random file in /usr/local/etc/raddb/certs");
-	exec("cd /usr/local/etc/raddb/certs && openssl dhparam -out dh 1024");
-	exec("cd /usr/local/etc/raddb/certs && dd if=/dev/urandom of=./random count=10");
+	// We create a single empty file just to check if there is really a change from one to another cert manager to avoid building ne DH and random files
+	if (!file_exists("/usr/local/etc/raddb/certs/pfsense_cert_mgr")) {
+		log_error("freeRADIUS: Switched to pfSense Cert-Manager. Creating new DH and random file in /usr/local/etc/raddb/certs");
+		exec("cd /usr/local/etc/raddb/certs && openssl dhparam -out dh 1024");
+		exec("cd /usr/local/etc/raddb/certs && dd if=/dev/urandom of=./random count=10");
+		exec("touch /usr/local/etc/raddb/certs/pfsense_cert_mgr");
+	}
 }
 
 // This is for freeradius cert manager
@@ -909,16 +921,9 @@ else {
 		cisco_accounting_username_bug = $vareapconfciscoaccountingusernamebug
 		max_sessions = $vareapconfmaxsessions
 		
-		md5 {
-		}
-		leap {
-		}
-		gtc {
-			#challenge = "Password: "
-			auth_type = PAP
-		}
-		
-		
+		$vareapconfweakeaptypes
+
+
 		### EAP-TLS and EAP-TLS with OCSP support
 		tls {
 			certdir = \${confdir}/certs
@@ -2343,11 +2348,16 @@ if ($eapconf['vareapconfchoosecertmanager'] == '') {
 		freeradius_servercertcnf_resync();
 		freeradius_clientcertcnf_resync();
 		
+		// this command deletes the pfsense_cert_mgr checkfile so when we change back to pfsense cert manager a new DH + random file will be created
+		if (file_exists("/usr/local/etc/raddb/certs/pfsense_cert_mgr")) {
+			unlink("/usr/local/etc/raddb/certs/pfsense_cert_mgr");
+		}
+		
 		// generate new DH and RANDOM file
 		log_error("freeRADIUS: Creating new DH and random file in /usr/local/etc/raddb/certs");
 		exec("cd /usr/local/etc/raddb/certs && openssl dhparam -out dh 1024");
 		exec("cd /usr/local/etc/raddb/certs && dd if=/dev/urandom of=./random count=10");
-	
+		
 		log_error("freeRADIUS: Creating new CA, Server and Client certs in /usr/local/etc/raddb/certs");
 		// make bootstrap executable and run to create certs based on .cnf files
 		exec("chmod 0770 /usr/local/etc/raddb/certs/bootstrap");
