@@ -51,11 +51,9 @@ function fetch_blacklist(){
 			exec ('rm -rf /usr/local/etc/dansguardian/lists/blacklists.old');
 		rename("blacklists","blacklists.old");
 		exec('/usr/bin/tar -xvzf /usr/local/etc/dansguardian/lists/blacklist.tgz 2>&1',$output,$return);
-		if (preg_match("/x (\w+)/",$output[0],$matches)){
+		if (preg_match("/x\W+(\w+)/",$output[0],$matches)){
 			if ($matches[1] != "blacklists")
 				rename("./".$matches[1],"blacklists");
-			read_lists();
-			file_notice("Dansguardian - Blacklist applied, check site and URL access lists for categories","");
 			}
 		else
 			file_notice("Dansguardian - Could not determine Blacklist extract dir. Categories not updated","");
@@ -72,36 +70,52 @@ function read_lists(){
 	$groups= array("phraselists", "blacklists", "whitelists");
 	#assigns know list files
 	$types=array('domains','urls','banned','weighted','exception','expression');
+
 	#clean previous xml config for dansguardian lists
-	foreach ($groups as $group)
-		foreach ($types as $clean)
-			$config['installedpackages']['dansguardian'.$group.$clean]['config']=array();
+	foreach($config['installedpackages'] as $key => $values)
+		if (preg_match("/dansguardian(phrase|black|white)lists/",$key))
+			unset ($config['installedpackages'][$key]);
 	
-	#clean previous xml config for dansguardian lists
+	#find lists
 	foreach ($groups as $group)
 		if (is_dir("$dir/$group/")){
 			#read dir content and find lists
 			$lists= scandir("$dir/$group/");
 			foreach ($lists as $list)
-				if (!preg_match ("/^\./",$list)){
+				if (!preg_match ("/^\./",$list) && is_dir("$dir/$group/$list/")){
 					$category= scandir("$dir/$group/$list/"); 
 					foreach ($category as $file)
 						if (!preg_match ("/^\./",$file)){
 							#assign list to array
 							$type=split("_",$file);
-							print $type[0]." --- $list --- $file\n";
-							if (!in_array($type[0],$group_type))
-								$list_type[]=$type[0];
-							$xml_group=($list=="whitelist"?"whitelists":$group);
-							$xml_type=($type[0]=="domains.processed"?"domains":$type[0]);
-							$config['installedpackages']['dansguardian'.$xml_group.$xml_type]['config'][]=array("descr"=> "$list $file","list" => $list,"file" => "$dir/$group/$list/$file");
+							if (preg_match("/(\w+)/",$type[0],$matches));
+								$xml_type=$matches[1];
+							if ($config['installedpackages']['dansguardianblacklist']['config'][0]["liston"]=="both" && $group=="blacklists")
+								$config['installedpackages']['dansguardianwhitelists'.$xml_type]['config'][]=array("descr"=> "$list $file","list" => $list,"file" => "$dir/$group/$list/$file");
+							$config['installedpackages']['dansguardian'.$group.$xml_type]['config'][]=array("descr"=> "$list $file","list" => $list,"file" => "$dir/$group/$list/$file");
 						}
 				}
 		}
-	
-	#var_dump($config['installedpackages']['dansguardian']['config']);
-	#foreach ($types as $clean)
-	#var_dump($config['installedpackages']['dansguardianfiles'.$clean]['config']);
+	conf_mount_rw();
+	$files=array("site","url");
+	foreach ($files as $edit_xml){
+		$edit_file=file_get_contents("/usr/local/pkg/dansguardian_".$edit_xml."_acl.xml");
+		if(count($config['installedpackages']['dansguardianblacklistsdomains']['config']) > 18){
+			$edit_file=preg_replace('/size.6/','size>20',$edit_file);
+			if ($config['installedpackages']['dansguardianblacklist']['config'][0]["liston"]=="both")
+				$edit_file=preg_replace('/size.5/','size>19',$edit_file);
+			}
+		else{
+			$edit_file=preg_replace('/size.20/','size>6',$edit_file);
+			}
+		if ($config['installedpackages']['dansguardianblacklist']['config'][0]["liston"]!="both")
+			$edit_file=preg_replace('/size.19/','size>5',$edit_file);
+		file_put_contents("/usr/local/pkg/dansguardian_".$edit_xml."_acl.xml",$edit_file,LOCK_EX);
+		}
+	file_notice("Dansguardian - Blacklist applied, check site and URL access lists for categories","");
+	#foreach($config['installedpackages'] as $key => $values)
+	#	if (preg_match("/dansguardian(phrase|black|white)lists/",$key))
+	#		print "$key\n";
 	write_config();
 }
 

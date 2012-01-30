@@ -95,9 +95,15 @@
 			<type>listtopic</type>
 		</field>
 		<field>
-			<fielddescr>Enable</fielddescr>
-			<fieldname>blacklist</fieldname>
-			<type>checkbox</type>
+			<fielddescr>List on</fielddescr>
+			<fieldname>liston</fieldname>
+			<description><![CDATA[Select where to list categories dowloaded form file<br>
+							List on Banned and Exception is usefull if you want to whitelist any category downloaded from url.]]></description>
+	    	<type>select</type>
+ 				<options>
+ 				<option><name>Banned only</name><value>banned</value></option>
+ 				<option><name>Banned and Exception</name><value>both</value></option>
+				</options>
 		</field>
 		<field>
 			<fielddescr>Update frequency</fielddescr>
@@ -107,10 +113,11 @@
 	    	<type>select</type>
  				<options>
  				<option><name>Never</name><value>never</value></option>
- 				<option><name>Now</name><value>now</value></option>
  				<option><name>Every day</name><value>day</value></option>
 				<option><name>Every 2 days</name><value>02days</value></option>
 				<option><name>Once a week</name><value>week</value></option>
+				<option><name>Download and update Now</name><value>force_download</value></option>
+				<option><name>Reapply downloaded list Now</name><value>force_update</value></option>
 				</options>
 		</field>
 		<field>

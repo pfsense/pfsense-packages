@@ -47,17 +47,41 @@ function dg_get_real_interface_address($iface) {
 }
 
 function sync_package_dansguardian() {
-	global $config;
+	global $config,$g;
 
+	#check if its booting
+	if ($g['booting']){
+		if (is_array($config['installedpackages']['dansguardian']))
+			if (!$config['installedpackages']['dansguardian']['config'][0]['enable'])
+				return;
+		if (file_exists("/var/run/dansguardian.pid"))
+			exec("/bin/ps -p `cat /var/run/dansguardian.pid` 2>&1",$return);
+			if ($return == "0")
+				return;
+	}
 	#assign xml arrays
-	if (is_array($config['installedpackages']['dansguardian']))
-		$dansguardian=$config['installedpackages']['dansguardian']['config'][0];
-	if (is_array($config['installedpackages']['dansguardianconfig']))
-		$dansguardian_config=$config['installedpackages']['dansguardianconfig']['config'][0];
+	if (!is_array($config['installedpackages']['dansguardian']))
+		$config['installedpackages']['dansguardian']['config'][0]=array('interface'=>'lo0',
+																		'daemon_options'=>'softrestart');
+	$dansguardian=$config['installedpackages']['dansguardian']['config'][0];
+	if (!is_array($config['installedpackages']['dansguardianconfig']))
+		$config['installedpackages']['dansguardianconfig']['config'][0]=array('auth_plugin'=>'',
+																		'scan_options'=>'scancleancache,createlistcachefiles,deletedownloadedtempfiles',
+																		'weightedphrasemode'=>'2',
+																		'preservecase'=>'0',
+																		'phrasefiltermode'=>'2');
+	$dansguardian_config=$config['installedpackages']['dansguardianconfig']['config'][0];
+	if (!is_array($config['installedpackages']['dansguardianlog']))
+		$config['installedpackages']['dansguardianlog']['config'][0]=array('report_level'=>'3',
+																		'report_language'=>'ukenglish',
+																		'report_options'=>'showweightedfound,usecustombannedimage,nonstandarddelimiter',
+																		'logging_options'=>'logconnectionhandlingerrors',
+																		'loglevel'=>'2',
+																		'logexceptionhits'=>'2',
+																		'logfileformat'=>'1');
+	$dansguardian_log=$config['installedpackages']['dansguardianlog']['config'][0];
 	if (is_array($config['installedpackages']['dansguardianlimits']))
 		$dansguardian_limits=$config['installedpackages']['dansguardianlimits']['config'][0];
-	if (is_array($config['installedpackages']['dansguardianlog']))
-		$dansguardian_log=$config['installedpackages']['dansguardianlog']['config'][0];
 	if (is_array($config['installedpackages']['dansguardianusers']))
 		$dansguardian_users=$config['installedpackages']['dansguardianusers']['config'][0];
 	if (is_array($config['installedpackages']['dansguardianblacklist']['config']))
@@ -330,7 +354,7 @@ function sync_package_dansguardian() {
 			$config['installedpackages']['dansguardianurlacl']['config'][$count]['bannedregexp_urllist']=base64_encode(file_get_contents($dansguardian_dir.'/lists/bannedregexpurllist.sample'));
 			$load_samples++;
 		}
-		file_put_contents($dansguardian_dir."/lists/bannedregexpurllist.".$dansguardian_url['name'],($dansguardian_url['bannedurl_enabled']?dg_text_area_decode($config['installedpackages']['dansguardianurlacl']['config'][$count]['bannedregexp_urllist']).$includes:""),LOCK_EX);
+		file_put_contents($dansguardian_dir."/lists/bannedregexpurllist.".$dansguardian_url['name'],($dansguardian_url['bannedurl_enabled']?dg_text_area_decode($config['installedpackages']['dansguardianurlacl']['config'][$count]['bannedregexp_urllist']):""),LOCK_EX);
 			
 		#greyurllist
 		if($dansguardian_url['grey_urllist'] == "" && file_exists ($dansguardian_dir.'/lists/greyurllist.sample')){
@@ -340,11 +364,11 @@ function sync_package_dansguardian() {
 		file_put_contents($dansguardian_dir."/lists/greyurllist.".$dansguardian_url['name'],($dansguardian_url['greyurl_enabled']?dg_text_area_decode($config['installedpackages']['dansguardianurlacl']['config'][$count]['grey_urllist']):""),LOCK_EX);
 			
 		#exceptionfileurllist
-		if($dansguardian_url['exception_urllist'] == "" && file_exists ($dansguardian_dir.'/lists/exceptionfileurllist.sample')){
-			$config['installedpackages']['dansguardianurlacl']['config'][$count]['exception_urllist']=base64_encode(file_get_contents($dansguardian_dir.'/lists/exceptionfileurllist.sample'));
+		if($dansguardian_url['exceptionfile_urllist'] == "" && file_exists ($dansguardian_dir.'/lists/exceptionfileurllist.sample')){
+			$config['installedpackages']['dansguardianurlacl']['config'][$count]['exceptionfile_urllist']=base64_encode(file_get_contents($dansguardian_dir.'/lists/exceptionfileurllist.sample'));
 			$load_samples++;
 		}
-		file_put_contents($dansguardian_dir."/lists/exceptionfileurllist.".$dansguardian_url['name'],($dansguardian_url['exceptionurl_enabled']?dg_text_area_decode($config['installedpackages']['dansguardianurlacl']['config'][$count]['exception_urllist']):""),LOCK_EX);
+		file_put_contents($dansguardian_dir."/lists/exceptionfileurllist.".$dansguardian_url['name'],($dansguardian_url['exceptionurl_enabled']?dg_text_area_decode($config['installedpackages']['dansguardianurlacl']['config'][$count]['exceptionfile_urllist']):""),LOCK_EX);
 		
 		#exceptionregexpurllist
 		if($dansguardian_url['exceptionregexp_urllist'] == "" && file_exists ($dansguardian_dir.'/lists/exceptionregexpurllist.sample')){
@@ -358,7 +382,8 @@ function sync_package_dansguardian() {
 			$config['installedpackages']['dansguardianurlacl']['config'][$count]['exception_urllist']=base64_encode(file_get_contents($dansguardian_dir.'/lists/exceptionurllist.sample'));
 			$load_samples++;
 		}
-		file_put_contents($dansguardian_dir."/lists/exceptionurllist.".$dansguardian_url['name'],($dansguardian_url['exceptionurl_enabled']?dg_text_area_decode($config['installedpackages']['dansguardianurlacl']['config'][$count]['exception_urllist']):""),LOCK_EX);
+		$includes=preg_replace($match,$replace,$dansguardian_url['exception_includes']);
+		file_put_contents($dansguardian_dir."/lists/exceptionurllist.".$dansguardian_url['name'],($dansguardian_url['exceptionurl_enabled']?dg_text_area_decode($config['installedpackages']['dansguardianurlacl']['config'][$count]['exception_urllist']).$includes:""),LOCK_EX);
 			
 		#urlregexplist
 		if($dansguardian_url['modify_urllist'] == "" && file_exists ($dansguardian_dir.'/lists/urlregexplist.sample')){
@@ -648,8 +673,7 @@ EOF;
 	file_put_contents("/usr/local/pkg/dansguardian_users.xml",$user_xml_header.$user_xml.$user_xml_footer,LOCK_EX);
 	
 	#check blacklist download files
-	if ($dansguardian_blacklist['cron']=="now" && $dansguardian_blacklist['blacklist']){
-		$config['installedpackages']['dansguardianblacklist']['config'][0]['cron']="never";
+	if ($dansguardian_blacklist['cron']=="force_download"){
 		log_error("Blacklist udpate process started");
 		file_notice("Dansguardian - Blacklist udpate process started","");
 		file_put_contents("/root/dansguardian_custom.script",base64_decode($dansguardian_blacklist['custom_script']),LOCK_EX);
@@ -657,6 +681,10 @@ EOF;
 			mwexec_bg("/root/dansguardian_custom.script");
 		else
 			mwexec_bg("/usr/local/bin/php /usr/local/www/dansguardian.php fetch_blacklist");
+		}
+	#update xml categories from downloaded file
+	if (preg_match("/force/",$dansguardian_blacklist['cron'])){
+		$config['installedpackages']['dansguardianblacklist']['config'][0]['cron']="never";
 		mwexec_bg("/usr/local/bin/php /usr/local/www/dansguardian.php update_lists");
 	}
 	
@@ -809,7 +837,7 @@ function dansguardian_php_install_command() {
 }
 
 function dansguardian_php_deinstall_command() {
-	mwexec("/usr/local/etc/rc.d/dansguardian.sh stop");
+	mwexec("/usr/local/etc/rc.d/dansguardian stop");
 	sleep(1);
 	conf_mount_rw();
 	unlink_if_exists("/usr/local/etc/rc.d/dansguardian");

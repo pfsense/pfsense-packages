@@ -47,11 +47,17 @@
 	<title>Services: Dansguardian</title>
 	<include_file>/usr/local/pkg/dansguardian.inc</include_file>
 	<menu>
-		<name>dansguardian</name>
+		<name>Dansguardian</name>
 		<tooltiptext>Configure dansguardian</tooltiptext>
 		<section>Services</section>
 		<url>pkg_edit.php?xml=dansguardian.xml</url>
 	</menu>
+	<service>
+		<name>dansguardian</name>
+		<rcfile>dansguardian</rcfile>
+		<executable>dansguardian</executable>
+		<description><![CDATA[Award winning Open Source web content filter]]></description>
+	</service>
 	<additional_files_needed>
 		<item>http://www.pfsense.org/packages/config/dansguardian/dansguardian.inc</item>
 		<prefix>/usr/local/pkg/</prefix>
