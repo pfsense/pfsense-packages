@@ -205,16 +205,14 @@
 		<field>
 			<fielddescr>Username</fielddescr>
 			<fieldname>varusersusername</fieldname>
-			<description><![CDATA[Enter the username. Whitespace is possible.]]></description>
+			<description><![CDATA[Enter the username. Whitespace is possible. If you do not username/password but custom options then leave this empty.]]></description>
 			<type>input</type>
-			<required/>
 		</field>
 		<field>
 			<fielddescr>Password</fielddescr>
 			<fieldname>varuserspassword</fieldname>
-			<description><![CDATA[Enter the password for this username.]]></description>
+			<description><![CDATA[Enter the password for this username. If you do not username/password but custom options then leave this empty.]]></description>
 			<type>password</type>
-			<required/>
 		</field>
 		<field>
 			<fielddescr>Number of simultaneous connections</fielddescr>
