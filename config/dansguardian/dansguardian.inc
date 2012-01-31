@@ -54,10 +54,11 @@ function sync_package_dansguardian() {
 		if (is_array($config['installedpackages']['dansguardian']))
 			if (!$config['installedpackages']['dansguardian']['config'][0]['enable'])
 				return;
-		if (file_exists("/var/run/dansguardian.pid"))
+		if (file_exists("/var/run/dansguardian.pid")){
 			exec("/bin/ps -p `cat /var/run/dansguardian.pid` 2>&1",$return);
-			if ($return == "0")
+			if (preg_match("/dansguardian/",$return[1]))
 				return;
+		}
 	}
 	#assign xml arrays
 	if (!is_array($config['installedpackages']['dansguardian']))
@@ -69,7 +70,8 @@ function sync_package_dansguardian() {
 																		'scan_options'=>'scancleancache,createlistcachefiles,deletedownloadedtempfiles',
 																		'weightedphrasemode'=>'2',
 																		'preservecase'=>'0',
-																		'phrasefiltermode'=>'2');
+																		'phrasefiltermode'=>'2',
+																		'cron'=>'day');
 	$dansguardian_config=$config['installedpackages']['dansguardianconfig']['config'][0];
 	if (!is_array($config['installedpackages']['dansguardianlog']))
 		$config['installedpackages']['dansguardianlog']['config'][0]=array('report_level'=>'3',
@@ -579,6 +581,15 @@ function sync_package_dansguardian() {
 	}	
 	file_put_contents($dansguardian_dir."/lists/contentscanners/exceptionvirusextensionlist",($dansguardian_antivirus['extension_enabled']?dg_text_area_decode($config['installedpackages']['dansguardianantivirusacl']['config'][0]['extension_list']):""),LOCK_EX);
 		
+	#log report
+	if ($dansguardian_log['report_file']=="" && file_exists("/usr/local/share/dansguardian/languages/".$reportlanguage."/template.html")){
+		$report_file=file_get_contents("/usr/local/share/dansguardian/languages/".$reportlanguage."/template.html");
+		$report_file=preg_replace('/<.*(html|head)>/','',$report_file);
+		$config['installedpackages']['dansguardianlog']['config'][0]['report_file']=base64_encode($report_file);
+		$dansguardian_log['report_file']=base64_encode($report_file);
+		$load_samples++;
+	}	
+
 	if($load_samples > 0)
 		write_config();
 
@@ -672,6 +683,10 @@ EOF;
 	$user_xml_footer=file_get_contents("/usr/local/pkg/dansguardian_users_footer.xml");
 	file_put_contents("/usr/local/pkg/dansguardian_users.xml",$user_xml_header.$user_xml.$user_xml_footer,LOCK_EX);
 	
+	#Create report template
+	if (is_dir("/usr/local/share/dansguardian/languages/".$reportlanguage)) 
+		file_put_contents("/usr/local/share/dansguardian/languages/".$reportlanguage."/template.html",dg_text_area_decode($dansguardian_log['report_file']),LOCK_EX);
+	
 	#check blacklist download files
 	if ($dansguardian_blacklist['cron']=="force_download"){
 		log_error("Blacklist udpate process started");
@@ -683,7 +698,7 @@ EOF;
 			mwexec_bg("/usr/local/bin/php /usr/local/www/dansguardian.php fetch_blacklist");
 		}
 	#update xml categories from downloaded file
-	if (preg_match("/force/",$dansguardian_blacklist['cron'])){
+	if ($dansguardian_blacklist['cron']=="force_update"){
 		$config['installedpackages']['dansguardianblacklist']['config'][0]['cron']="never";
 		mwexec_bg("/usr/local/bin/php /usr/local/www/dansguardian.php update_lists");
 	}
@@ -717,11 +732,101 @@ EOF;
 	$filterports=($filterports==""?"filterports = $filterport":$filterports);
 	include("/usr/local/pkg/dansguardian.conf.template");	
 
-	
+	#check cron_tab
+	$new_cron=array();
+	$cron_found=0;
+	if (is_array($config['cron']['item']))
+		foreach($config['cron']['item'] as $cron)
+			if (!preg_match("/usr.local.(bin.freshclam|www.dansguardian.php)/",$cron["command"])){
+				$cron_found++;
+				$new_cron['item'][]=$cron;
+			}
+	$cron_cmd="/usr/local/bin/freshclam";
+	if($dansguardian_config['cron'] && preg_match("/clamd/",$dansguardian_config['content_scanners']))
+		switch ($dansguardian_config['cron']){
+			case "day":
+				$new_cron['item'][]=array(	"minute" =>	"0",
+											"hour"	 =>	"0",
+											"mday" 	 =>	"*",
+											"month"  =>	"*",
+											"wday"	 =>	"*",
+											"who"	 =>	"root",
+											"command"=>	$cron_cmd);
+				$config['cron']=$new_cron;
+				$cron_found++;
+				break;
+			case "02days":
+				$new_cron['item'][]=array(	"minute" =>	"0",
+											"hour"	 =>	"0",
+											"mday" 	 =>	"*/2",
+											"month"  =>	"*",
+											"wday"	 =>	"*",
+											"who"	 =>	"root",
+											"command"=>	$cron_cmd);
+				$config['cron']=$new_cron;
+				$cron_found++;
+				break;
+			case "week":
+				$new_cron['item'][]=array(	"minute" =>	"0",
+											"hour"	 =>	"0",
+											"mday" 	 =>	"*/7",
+											"month"  =>	"*",
+											"wday"	 =>	"*",
+											"who"	 =>	"root",
+											"command"=>	$cron_cmd);
+				$config['cron']=$new_cron;
+				$cron_found++;
+				break;
+		}
+	$cron_cmd="/usr/local/bin/php /usr/local/www/dansguardian.php fetch_blacklist";
+	if($dansguardian_blacklist['cron'])
+		switch ($dansguardian_blacklist['cron']){
+			case "day":
+				$new_cron['item'][]=array(	"minute" =>	"0",
+											"hour"	 =>	"0",
+											"mday" 	 =>	"*",
+											"month"  =>	"*",
+											"wday"	 =>	"*",
+											"who"	 =>	"root",
+											"command"=>	$cron_cmd);
+				$config['cron']=$new_cron;
+				$cron_found++;
+				break;
+			case "02days":
+				$new_cron['item'][]=array(	"minute" =>	"0",
+											"hour"	 =>	"0",
+											"mday" 	 =>	"*/2",
+											"month"  =>	"*",
+											"wday"	 =>	"*",
+											"who"	 =>	"root",
+											"command"=>	$cron_cmd);
+				$config['cron']=$new_cron;
+				$cron_found++;
+				break;
+			case "week":
+				$new_cron['item'][]=array(	"minute" =>	"0",
+											"hour"	 =>	"0",
+											"mday" 	 =>	"*/7",
+											"month"  =>	"*",
+											"wday"	 =>	"*",
+											"who"	 =>	"root",
+											"command"=>	$cron_cmd);
+				$config['cron']=$new_cron;
+				$cron_found++;
+				break;
+		}
+
+		
 	#write files
 	conf_mount_rw();
 
 	write_config();
+	
+	#update cron
+	if ($cron_found > 0){
+		$config['cron']=$new_cron;
+		configure_cron();
+	}
 	
 	$dirs=array('/usr/local/etc/dansguardian/lists/bannedrooms/',
 				'/var/log/dansguardian');
@@ -742,7 +847,8 @@ EOF;
 	if (preg_match("/clamd/",$dansguardian_config['content_scanners'])){
 			
 		if (!file_exists('/var/db/clamav/main.cvd')){
-			log_error('No clamav database found for dansguardian, running freshclam in background.');
+			file_notice("Dansguardian - No antivirus database found for clamav, running freshclam in background.","");
+			log_error('No antivirus database found for clamav, running freshclam in background.');
 			mwexec_bg('/usr/local/bin/freshclam');
 			}
 				
@@ -778,7 +884,8 @@ EOF;
 					}
 				file_put_contents($script, $new_clamav_startup, LOCK_EX);
 				chmod ($script,0755);
-				mwexec("$script stop");
+				if (file_exists('/var/run/dansguardian.pid'))
+					mwexec("$script stop");
 				unlink_if_exists("/tmp/.dguardianipc");
 				unlink_if_exists("/tmp/.dguardianurlipc");
 				mwexec_bg("$script start");
@@ -840,7 +947,7 @@ function dansguardian_php_deinstall_command() {
 	mwexec("/usr/local/etc/rc.d/dansguardian stop");
 	sleep(1);
 	conf_mount_rw();
-	unlink_if_exists("/usr/local/etc/rc.d/dansguardian");
+	chmod ("/usr/local/etc/rc.d/dansguardian",0444);
 	conf_mount_ro();
 }
 

@@ -229,6 +229,19 @@
  				<size>3</size>
 		</field>
 		<field>
+			<fielddescr>freshclam frequency</fielddescr>
+			<fieldname>cron</fieldname>
+			<description><![CDATA[Default:<strong>Every day</strong><br>
+							Select how often pfsense will update clamd virus database]]></description>
+	    	<type>select</type>
+ 				<options>
+ 				<option><name>Every day</name><value>day</value></option>
+				<option><name>Every 2 days</name><value>02days</value></option>
+				<option><name>Once a week</name><value>week</value></option>
+				<option><name>Never</name><value>never</value></option>
+				</options>
+		</field>
+		<field>
 			<fielddescr>Content scanner timeout</fielddescr>
 			<fieldname>contentscannertimeout</fieldname>
 			<type>input</type>

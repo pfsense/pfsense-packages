@@ -50,7 +50,7 @@
 		<name>Dansguardian</name>
 		<tooltiptext>Configure dansguardian</tooltiptext>
 		<section>Services</section>
-		<url>pkg_edit.php?xml=dansguardian.xml</url>
+		<url>/pkg_edit.php?xml=dansguardian.xml</url>
 	</menu>
 	<service>
 		<name>dansguardian</name>
@@ -314,7 +314,7 @@
 			<type>input</type>
 			<size>10</size>
 			<description><![CDATA[Default: <strong>3128</strong><br>
-			 				Sets port number fro proxy server.]]></description>
+			 				Sets port number for proxy server.]]></description>
 		</field>
 
 	</fields>

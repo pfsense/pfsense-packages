@@ -45,6 +45,7 @@ function fetch_blacklist(){
 	if (is_url($url)){
 		conf_mount_rw();
 		print "file download start..";
+		unlink_if_exists("/usr/local/etc/dansguardian/lists/blacklist.tgz");
 		exec("/usr/bin/fetch -o /usr/local/etc/dansguardian/lists/blacklist.tgz ".escapeshellarg($url));
 		chdir ("/usr/local/etc/dansguardian/lists");
 		if (is_dir ("blacklists.old"))
@@ -54,6 +55,7 @@ function fetch_blacklist(){
 		if (preg_match("/x\W+(\w+)/",$output[0],$matches)){
 			if ($matches[1] != "blacklists")
 				rename("./".$matches[1],"blacklists");
+			read_lists();
 			}
 		else
 			file_notice("Dansguardian - Could not determine Blacklist extract dir. Categories not updated","");

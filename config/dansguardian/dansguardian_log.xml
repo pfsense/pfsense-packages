@@ -157,6 +157,16 @@
  				<size>5</size>
 		</field>
 		<field>
+			<fielddescr>Report file</fielddescr>
+			<fieldname>report_file</fieldname>
+			<description><![CDATA[Dansguardian template.html error page whithout head or html tags<br>	
+								  Leave empty to load dansguardian default report file]]></description>
+			<type>textarea</type>
+			<cols>75</cols>
+			<rows>15</rows>
+			<encoding>base64</encoding>
+		</field>
+		<field>
 			<name>Logging</name>
 			<type>listtopic</type>
 		</field>
