@@ -453,8 +453,14 @@ if (is_array($arrusers) && !empty($arrusers)) {
 	$varuserscheckitem = '';
 	$varusersreplyitem = '';
 	
-	// Add the user attributes to each user.
-	$varuserscheckitem = '"' . $varusersusername . '"' . " Cleartext-Password := " . '"' . $varuserspassword .'"';
+	// If someone does not want to use username/password but entry "DEFAULT" instead then we can disable this
+	if (($users['varusersusername'] == '') && ($users['varuserspassword'] == '')) {
+		$varuserscheckitem = '';
+	}
+	else {
+		// Add the user attributes to each user.
+		$varuserscheckitem = '"' . $varusersusername . '"' . " Cleartext-Password := " . '"' . $varuserspassword .'"';
+	}
 	
 	// Add additional CHECK-ITEMS here. Different formatting in "users" file needed.
 	if ($varuserssimultaneousconnect != '') {
@@ -549,7 +555,7 @@ if (is_array($arrmacs) && !empty($arrmacs)) {
 	$varmacsaddress = $macs['varmacsaddress'];
 	// We don't need a password but we need this field to make syntac correct for CHECK-ITEMS
 	$varmacspassword = $macs['varmacsaddress'];
-	
+		
 	$varmacssimultaneousconnect = ($macs['varmacssimultaneousconnect']?$macs['varmacssimultaneousconnect']:'');
 	$varmacsframedipaddress = $macs['varmacsframedipaddress'];
 	$varmacsframedipnetmask = $macs['varmacsframedipnetmask'];
@@ -606,8 +612,14 @@ if (is_array($arrmacs) && !empty($arrmacs)) {
 	$varmacscheckitem = '';
 	$varmacsreplyitem = '';
 	
-	// Add the mac attributes to each mac address.
-	$varmacscheckitem = "$varmacsaddress" . " Cleartext-Password := " . '"' . $varmacspassword .'"';
+	// If someone does not want to use MAC address but entry "DEFAULT" instead then we can disable this
+	if ($macs['varmacsaddress'] == '') {
+			$varmacscheckitem = '';
+	}
+	else {
+		// Add the user attributes to each user.
+		$varmacscheckitem = "$varmacsaddress" . " Cleartext-Password := " . '"' . $varmacspassword . '"';
+	}
 	
 	// Add additional CHECK-ITEMS here. Different formatting in "authorized_macs" file needed.
 	if ($varmacssimultaneousconnect != '') {
