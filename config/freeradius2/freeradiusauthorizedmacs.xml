@@ -205,9 +205,8 @@
 		<field>
 			<fielddescr>MAC Address</fielddescr>
 			<fieldname>varmacsaddress</fieldname>
-			<description><![CDATA[Enter the MAC address. Format must be: 0a-1b-2c-4d-5f-fa]]></description>
+			<description><![CDATA[Enter the MAC address.Format must be: 0a-1b-2c-4d-5f-fa<br>If you do not want MAC address but custom options then leave this empty.]]></description>
 			<type>input</type>
-			<required/>
 		</field>
 		<field>
 			<fielddescr>Number of simultaneous connections</fielddescr>
