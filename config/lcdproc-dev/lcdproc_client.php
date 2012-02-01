@@ -399,6 +399,7 @@
 	
 	/* Define functions */
 	function send_lcd_commands($lcd, $lcd_cmds) {
+		global $lcdproc_connect_errors;
 		if(!is_array($lcd_cmds) || (empty($lcd_cmds))) {
 			lcdproc_warn("Failed to interpret lcd commands");
 			return;
@@ -407,13 +408,16 @@
 			$cmd_output = "";
 			if(! fwrite($lcd, "$lcd_cmd\n")) {
 				lcdproc_warn("Connection to LCDd process lost $errstr ($errno)");
-				die();
+				$lcdproc_connect_errors++;
+				return;
 			}
+			usleep(20);  // waits 20ms
 			$cmd_output = fgets($lcd, 256);
 			// FIXME: add support for interpreting menu commands here.
 			if(preg_match("/^huh?/", $cmd_output)) {
 				lcdproc_notice("LCDd output: \"$cmd_output\". Executed \"$lcd_cmd\"");
 			}
+			$lcdproc_connect_errors = 0; // Reset the error counter
 		}
 	}
 
@@ -722,6 +726,7 @@
 	function loop_status($lcd) {
 		global $g;
 		global $config;
+		global $lcdproc_connect_errors;
 		$lcdproc_screens_config = $config['installedpackages']['lcdprocscreens']['config'][0];
 		$lcdpanel_width = get_lcdpanel_width();
 		$lcdpanel_height = get_lcdpanel_height();
@@ -874,7 +879,12 @@
 					add_summary_values($lcd_cmds, $name, $lcd_summary_data, $lcdpanel_width);
 				}
 			}
+			$temp_lcdproc_connect_errors = $lcdproc_connect_errors;
 			send_lcd_commands($lcd, $lcd_cmds);
+			if ($temp_lcdproc_connect_errors != $lcdproc_connect_errors)
+			{	//an error occurred
+				return;
+			}
 			sleep($refresh_frequency * $widget_counter);
 			$i++;
 		}
@@ -883,14 +893,25 @@
 	$traffic_last_ugmt = 0;
 	$traffic_last_ifin = 0;
 	$traffic_last_ifout = 0;
+	/* Initialize the global error counter */
+	$lcdproc_connect_errors = 0;
+	$lcdproc_max_connect_errors = 2;
 	/* Connect to the LCDd port and interface with the LCD */
-	$lcd = fsockopen(LCDPROC_HOST, LCDPROC_PORT, $errno, $errstr, 10);
-	if (!$lcd) {
-		lcdproc_warn("Failed to connect to LCDd process $errstr ($errno)");
-	} else {
-		build_interface($lcd);
-		loop_status($lcd);
-		/* loop exited? Close fd and wait for the script to kick in again */
-		fclose($lcd);
+	while ($lcdproc_connect_errors <= $lcdproc_max_connect_errors)
+	{
+		lcdproc_warn("Start client procedure. Error counter: ($lcdproc_connect_errors)");
+		$lcd = fsockopen(LCDPROC_HOST, LCDPROC_PORT, $errno, $errstr, 10);
+		if (!$lcd) {
+			lcdproc_warn("Failed to connect to LCDd process $errstr ($errno)");
+			$lcdproc_connect_errors++;
+		} else {
+			build_interface($lcd);
+			loop_status($lcd);
+			fclose($lcd);
+		}
+	}
+	if ($lcdproc_connect_errors >= $lcdproc_max_connect_errors)
+	{
+		lcdproc_warn("Too many errors, the client ends.");
 	}
 ?>
