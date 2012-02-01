@@ -124,7 +124,7 @@ include("head.inc");
 			 $textss = "<span class=\"gray\">";
 			 $textse = "</span>";
 		 }
-		 if (is_array($pool['ha_servers']['item']))
+		 if (is_array($pool['ha_servers']))
 			 $count = count($pool['ha_servers']['item']);
 		 else
 			 $count = 0;
