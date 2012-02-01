@@ -512,6 +512,10 @@ if [ `ps auxw |awk '/lcdclient.s[h]/ {print $2}'| wc -l` != 0  ]; then
 	ps auxw |awk '/lcdclient.s[h]/ {print $2}'|xargs kill -9
 	sleep 1
 fi
+if [ `ps auxw |awk '/lcdproc_client.ph[p]/ {print $2}'| wc -l` != 0  ]; then
+	ps auxw |awk '/lcdproc_client.ph[p]/ {print $2}'|xargs kill -9
+	sleep 1
+fi
 if [ `ps auxw |awk '/LCD[d]/ {print $2}'| wc -l` != 0  ]; then
 	ps auxw |awk '/LCD[d]/ {print $2}'|xargs kill -9
 	sleep 1
