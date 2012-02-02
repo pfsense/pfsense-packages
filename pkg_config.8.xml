@@ -350,7 +350,7 @@
 		<category>Security</category>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
 		<depends_on_package>mysql-client-5.1.53.tbz</depends_on_package>
-		<depends_on_package>snort-2.9.0.5.tbz</depends_on_package>
+		<depends_on_package>snort-2.9.0.5_1.tbz</depends_on_package>
 		<depends_on_package>perl-threaded-5.10.1_3.tbz</depends_on_package>
 		<build_port_path>/usr/ports/devel/pcre</build_port_path>
 		<build_port_path>/usr/ports/net/daq</build_port_path>
