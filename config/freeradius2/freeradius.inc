@@ -398,6 +398,7 @@ if (is_array($arrusers) && !empty($arrusers)) {
 	$varusersusername = $users['varusersusername'];
 	$varuserspassword = $users['varuserspassword'];
 	$varuserssimultaneousconnect = ($users['varuserssimultaneousconnect']?$users['varuserssimultaneousconnect']:'');
+	$varuserswisprredirectionurl = $users['varuserswisprredirectionurl'];
 	$varusersframedipaddress = $users['varusersframedipaddress'];
 	$varusersframedipnetmask = $users['varusersframedipnetmask'];
 	$varusersframedroute = $users['varusersframedroute'];
@@ -514,6 +515,10 @@ if (is_array($arrusers) && !empty($arrusers)) {
 		if ($varusersreplyitem != '') { $varusersreplyitem .=","; }
 		$varusersreplyitem .= "\n\tWISPr-Bandwidth-Max-Down := $varusersmaxbandwidthdown";
 	}
+	if ($varuserswisprredirectionurl != '') {
+		if ($varusersreplyitem != '') { $varusersreplyitem .=","; }
+		$varusersreplyitem .= "\n\tWISPr-Redirection-URL := $varuserswisprredirectionurl";
+	}
 	if ($varusersadditionaloptionsreplyitems != '') {
 		if ($varusersreplyitem != '') { $varusersreplyitem .=","; }
 		$varusersreplyitem .= "\n\t$varusersadditionaloptionsreplyitems";
@@ -555,8 +560,9 @@ if (is_array($arrmacs) && !empty($arrmacs)) {
 	$varmacsaddress = $macs['varmacsaddress'];
 	// We don't need a password but we need this field to make syntac correct for CHECK-ITEMS
 	$varmacspassword = $macs['varmacsaddress'];
-		
+
 	$varmacssimultaneousconnect = ($macs['varmacssimultaneousconnect']?$macs['varmacssimultaneousconnect']:'');
+	$varmacsswisprredirectionurl = $macs['varmacsswisprredirectionurl'];
 	$varmacsframedipaddress = $macs['varmacsframedipaddress'];
 	$varmacsframedipnetmask = $macs['varmacsframedipnetmask'];
 	$varmacsframedroute = $macs['varmacsframedroute'];
@@ -673,6 +679,10 @@ if (is_array($arrmacs) && !empty($arrmacs)) {
 		if ($varmacsreplyitem != '') { $varmacsreplyitem .=","; }
 		$varmacsreplyitem .= "\n\tWISPr-Bandwidth-Max-Down := $varmacsmaxbandwidthdown";
 	}
+	if ($varmacsswisprredirectionurl != '') {
+		if ($varmacsreplyitem != '') { $varmacsreplyitem .=","; }
+		$varmacsreplyitem .= "\n\tWISPr-Redirection-URL := $varmacsswisprredirectionurl";
+	}	
 	if ($varmacsadditionaloptionsreplyitems != '') {
 		if ($varmacsreplyitem != '') { $varmacsreplyitem .=","; }
 		$varmacsreplyitem .= "\n\t$varmacsadditionaloptionsreplyitems";
@@ -1324,7 +1334,7 @@ function freeradius_serverdefault_resync() {
 	
 	// Disable acct_unique in preacct section
 	$varsettings = $config['installedpackages']['freeradiussettings']['config'][0];
-	
+
 	if ($varsettings['varsettingsenableacctunique'] == 'on') {
 		$varsettingsacctuniqueenabled = '##### DISABLE acct_unique DISABLE #####';
 	}
