@@ -209,12 +209,28 @@
 			<type>input</type>
 		</field>
 		<field>
+			<name>MISCELLANEOUS CONFIGURATION</name>
+			<type>listtopic</type>
+		</field>		
+		<field>
+			<fielddescr>Redirection URL</fielddescr>
+			<fieldname>varmacsswisprredirectionurl</fieldname>			
+			<description><![CDATA[Enter the URL the MAC should be redirected to after successfull login. (e.g.: http://www.pfsense.org)]]></description>
+			<type>input</type>
+		</field>
+		<field>
 			<fielddescr>Number of simultaneous connections</fielddescr>
 			<fieldname>varmacssimultaneousconnect</fieldname>
 			<description><![CDATA[The maximum of simultaneous connections with this MAC address. If you leave this field empty than there is no limit. If you are using FreeRADIUS with CaptivePortal you should leave this empty.]]></description>
 			<default_value></default_value>
 			<type>input</type>
-		</field>		
+		</field>
+		<field>
+			<fielddescr>Description</fielddescr>
+			<fieldname>description</fieldname>			
+			<description><![CDATA[Enter any description for this MAC address you like.]]></description>
+			<type>input</type>
+		</field>
 		<field>
 			<name>NETWORK CONFIGURATION</name>
 			<type>listtopic</type>
@@ -351,15 +367,9 @@
 			<type>input</type>
 		</field>
 		<field>
-			<name>MISCELLANEOUS CONFIGURATION</name>
+			<name>ADVANCED CONFIGURATION</name>
 			<type>listtopic</type>
 		</field>		
-		<field>
-			<fielddescr>Description</fielddescr>
-			<fieldname>description</fieldname>			
-			<description><![CDATA[Enter any description for this MAC address you like.]]></description>
-			<type>input</type>
-		</field>
 		<field>
 			<fielddescr>Additional RADIUS Attributes on the TOP of this entry</fielddescr>
 			<fieldname>varmacstopadditionaloptions</fieldname>			
