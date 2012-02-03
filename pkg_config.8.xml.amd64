@@ -433,7 +433,7 @@
 		<depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
 		<depends_on_package_pbi>snort-2.9.1-amd64.pbi</depends_on_package_pbi>
 		<depends_on_package>mysql-client-5.1.53.tbz</depends_on_package>
-		<depends_on_package>snort-2.9.0.5.tbz</depends_on_package>
+		<depends_on_package>snort-2.9.0.5_1.tbz</depends_on_package>
 		<depends_on_package>perl-threaded-5.10.1_3.tbz</depends_on_package>
 		<build_port_path>/usr/ports/devel/pcre</build_port_path>
 		<build_port_path>/usr/ports/net/daq</build_port_path>
@@ -989,7 +989,7 @@
 		<descr>LCD display driver - Development version</descr>
 		<website>http://www.lcdproc.org/</website>
 		<category>Utility</category>
-		<version>lcdproc-0.5.5 pkg v. 0.9</version>
+		<version>lcdproc-0.5.5 pkg v. 0.9.2</version>
 		<status>BETA</status>
 		<required_version>2.0</required_version>
 		<maintainer>michele@nt2.it</maintainer>

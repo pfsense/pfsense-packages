@@ -237,7 +237,7 @@
 			$config_text .= "User=nobody\n";
 			$config_text .= "ServerScreen=no\n";
 			$config_text .= "Foreground=no\n";
-			$config_text .= "TitleSpeed=10\n";
+			$config_text .= "TitleSpeed=5\n";
 			$config_text .= "DriverPath=/usr/local/lib/lcdproc/\n";
 			$config_text .= "GoodBye=\"Thanks for using\"\n";
 			$config_text .= "GoodBye=\"    {$g['product_name']}     \"\n";
@@ -502,20 +502,18 @@
 			/* generate rc file start and stop */
 			$client_script = <<<EOD
 #!/bin/sh
-# script starts a lcd client and always keeps it active for 3 attemps
-counter=1
-while [ \$counter -le 3 ]
-do
-	# loop the client to drive the display
-	/usr/local/bin/php -f /usr/local/pkg/lcdproc_client.php	
-	counter=\$(( \$counter + 1 ))
-	sleep 1
+/usr/local/bin/php -f /usr/local/pkg/lcdproc_client.php	
+sleep 1
 done
 EOD;
 			/* generate rc file start and stop */
 			$stop = <<<EOD
 if [ `ps auxw |awk '/lcdclient.s[h]/ {print $2}'| wc -l` != 0  ]; then
 	ps auxw |awk '/lcdclient.s[h]/ {print $2}'|xargs kill -9
+	sleep 1
+fi
+if [ `ps auxw |awk '/lcdproc_client.ph[p]/ {print $2}'| wc -l` != 0  ]; then
+	ps auxw |awk '/lcdproc_client.ph[p]/ {print $2}'|xargs kill -9
 	sleep 1
 fi
 if [ `ps auxw |awk '/LCD[d]/ {print $2}'| wc -l` != 0  ]; then
