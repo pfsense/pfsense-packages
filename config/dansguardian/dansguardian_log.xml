@@ -76,6 +76,10 @@
 			<url>/pkg_edit.php?xml=dansguardian_users.xml</url>
 		</tab>
 		<tab>
+			<text>IPs</text>
+			<url>/pkg_edit.php?xml=dansguardian_ips.xml</url>
+		</tab>
+		<tab>
 			<text>Report and log</text>
 			<url>/pkg_edit.php?xml=dansguardian_log.xml&amp;id=0</url>
 			<active/>

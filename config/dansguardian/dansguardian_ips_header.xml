@@ -7,7 +7,7 @@
 /* $Id$ */
 /* ========================================================================== */
 /*
-    dansguardian_users.xml
+    dansguardian_ips.xml
     part of the dansguardian for pfSense
     Copyright (C) 2012 Marcello Coutinho
 
@@ -42,7 +42,7 @@
 	<description>Describe your package here</description>
 	<requirements>Describe your package requirements here</requirements>
 	<faq>Currently there are no FAQ items provided.</faq>
-	<name>dansguardianusers</name>
+	<name>dansguardianips</name>
 	<version>1.0</version>
 	<title>Services: Dansguardian</title>
 	<include_file>/usr/local/pkg/dansguardian.inc</include_file>
@@ -73,11 +73,11 @@
 		<tab>
 			<text>Users</text>
 			<url>/pkg_edit.php?xml=dansguardian_users.xml</url>
-			<active/>
 		</tab>
 		<tab>
 			<text>IPs</text>
 			<url>/pkg_edit.php?xml=dansguardian_ips.xml</url>
+			<active/>
 		</tab>
 		<tab>
 			<text>Report and log</text>
@@ -92,4 +92,5 @@
 			<url>/dansguardian_about.php</url>
 		</tab>
 </tabs>
-	<fields>
+	<fields>		
+	

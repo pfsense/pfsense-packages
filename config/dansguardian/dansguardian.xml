@@ -74,6 +74,11 @@
 		<chmod>0755</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
+		<item>http://www.pfsense.org/packages/config/dansguardian/dansguardian_ips_header.xml</item>
+		<prefix>/usr/local/pkg/</prefix>
+		<chmod>0755</chmod>
+	</additional_files_needed>
+	<additional_files_needed>
 		<item>http://www.pfsense.org/packages/config/dansguardian/dansguardian_users_header.xml</item>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0755</chmod>
@@ -168,6 +173,11 @@
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0755</chmod>
 	</additional_files_needed>
+	<additional_files_needed>
+		<item>http://www.pfsense.org/packages/config/dansguardian/blockedflash.swf</item>
+		<prefix>/usr/local/share/dansguardian/</prefix>
+		<chmod>0755</chmod>
+	</additional_files_needed>
 	<tabs>
 		<tab>
 			<text>Daemon</text>
@@ -197,6 +207,10 @@
 		<tab>
 			<text>Users</text>
 			<url>/pkg_edit.php?xml=dansguardian_users.xml</url>
+		</tab>
+		<tab>
+			<text>IPs</text>
+			<url>/pkg_edit.php?xml=dansguardian_ips.xml</url>
 		</tab>
 		<tab>
 			<text>Report and log</text>

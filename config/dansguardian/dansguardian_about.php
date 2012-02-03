@@ -59,6 +59,7 @@ include("head.inc");
 	$tab_array[] = array(gettext("Access Lists"), false, "/pkg_edit.php?xml=dansguardian_antivirus.xml&id=0");
 	$tab_array[] = array(gettext("Groups"), false, "/pkg.php?xml=dansguardian_groups.xml&id=0");
 	$tab_array[] = array(gettext("Users"), false, "/pkg.php?xml=dansguardian_users.xml&id=0");
+	$tab_array[] = array(gettext("IPs"), false, "/pkg.php?xml=dansguardian_ips.xml&id=0");
 	$tab_array[] = array(gettext("Report and Log"), false, "/pkg_edit.php?xml=dansguardian_log.xml&id=0");
 	$tab_array[] = array(gettext("XMLRPC Sync"), false, "/pkg_edit.php?xml=dansguardian_sync.xml&id=0");
 	$tab_array[] = array(gettext("Help"), true, "/dansguardian_about.php");

@@ -193,6 +193,7 @@ function sync_package_dansguardian() {
 					"/lists/bannedmimetypelist",
 					"/lists/headerregexplist",
 					"/lists/bannedregexpheaderlist",
+					"/lists/authplugins/ipgroups",
 					"/lists/contentscanners/exceptionvirusextensionlist",
 					"/lists/contentscanners/exceptionvirusmimetypelist",
 					"/lists/contentscanners/exceptionvirussitelist",
@@ -641,7 +642,19 @@ function sync_package_dansguardian() {
 					$filtergroupslist.=$matches[1]."=filter".$count."\n";
 				}
 			}
+		if ($config['installedpackages']['dansguardianips']['config'][0][$dansguardian_group_name]!=""){
+			$import_ips = explode("\n", base64_decode($config['installedpackages']['dansguardianips']['config'][0][$dansguardian_group_name]));
+			asort($import_ips);
+			$config['installedpackages']['dansguardianips']['config'][0][$dansguardian_group_name]=base64_encode(implode("\n", $import_ips));
+			foreach ($import_ips as $new_ip){
+				if (preg_match("/(\S+)\s+(.*)/",$new_ip,$matches))
+				 $filtergroupsiplist.=$matches[1]." = filter".$count." #".$matches[2]."\n";
+				elseif (preg_match("/(\S+)/",$new_ip,$matches))
+					$filtergroupsiplist.=$matches[1]." = filter".$count."\n";
+				}
+			}
 		$filtergroup_count=count($import_users);
+		$filtergroupip_count=count($import_ips);
 		#Default group catch all unauth groups as well non listed users
 		if($count > 1)
 		$user_xml .=<<<EOF
@@ -659,7 +672,22 @@ function sync_package_dansguardian() {
 			<encoding>base64</encoding>
 		</field>		
 EOF;
+		$ips_xml .=<<<EOF
+		<field>
+			<name>{$dansguardian_groups['description']} ({$filtergroupip_count})</name>
+			<type>listtopic</type>
+		</field>
+		<field>
+			<fieldname>{$dansguardian_group_name}</fieldname>
+			<fielddescr>{$dansguardian_groups['name']}</fielddescr>
+			<description><![CDATA[Include ip addresses and or ipadresses/netmask for this group one per line<br>Hint:192.168.1.0/255.255.255.0<br>192.168.1.5]]></description>
+			<type>textarea</type>
 			
+			<cols>80</cols><rows>12</rows>
+			<encoding>base64</encoding>
+		</field>		
+EOF;
+		
 		$count++;
 	}
 	if ($user_xml==""){
@@ -678,10 +706,14 @@ EOF;
 	}
 	#Create/update filtergroupslist
 	file_put_contents($dansguardian_dir."/lists/filtergroupslist",$filtergroupslist,LOCK_EX);
+	#Create/update filtergroupsiplist
+	file_put_contents($dansguardian_dir."/lists/authplugins/ipgroups",$filtergroupsiplist,LOCK_EX);
 	#Create/update userlist xml file
+	$ips_xml_header=file_get_contents("/usr/local/pkg/dansguardian_ips_header.xml");
 	$user_xml_header=file_get_contents("/usr/local/pkg/dansguardian_users_header.xml");
 	$user_xml_footer=file_get_contents("/usr/local/pkg/dansguardian_users_footer.xml");
 	file_put_contents("/usr/local/pkg/dansguardian_users.xml",$user_xml_header.$user_xml.$user_xml_footer,LOCK_EX);
+	file_put_contents("/usr/local/pkg/dansguardian_ips.xml",$ips_xml_header.$ips_xml.$user_xml_footer,LOCK_EX);
 	
 	#Create report template
 	if (is_dir("/usr/local/share/dansguardian/languages/".$reportlanguage)) 
@@ -846,7 +878,7 @@ EOF;
 	$libexec_dir="/usr/local/libexec/dansguardian/";
 	if (preg_match("/clamd/",$dansguardian_config['content_scanners'])){
 			
-		if (!file_exists('/var/db/clamav/main.cvd')){
+		if (!(file_exists('/var/db/clamav/main.cvd')||file_exists('/var/db/clamav/main.cld'))){
 			file_notice("Dansguardian - No antivirus database found for clamav, running freshclam in background.","");
 			log_error('No antivirus database found for clamav, running freshclam in background.');
 			mwexec_bg('/usr/local/bin/freshclam');
