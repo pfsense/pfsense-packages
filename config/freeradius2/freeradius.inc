@@ -160,7 +160,7 @@ function freeradius_settings_resync() {
 	$varsettingsauthbadpass = ($varsettings['varsettingsauthbadpass']?$varsettings['varsettingsauthbadpass']:'no');
 	$varsettingsauthbadpassmessage = ($varsettings['varsettingsauthbadpassmessage']?$varsettings['varsettingsauthbadpassmessage']:'');
 	$varsettingsauthgoodpass = ($varsettings['varsettingsauthgoodpass']?$varsettings['varsettingsauthgoodpass']:'no');
-	$varsettingsauthgoodpassmessage = ($varsettings['varsettingsauthgoodpassmessage']?$varsettings['varsettingsauthgoodpassmessage']:'no');
+	$varsettingsauthgoodpassmessage = ($varsettings['varsettingsauthgoodpassmessage']?$varsettings['varsettingsauthgoodpassmessage']:'');
 	$varsettingsstrippednames = ($varsettings['varsettingsstrippednames']?$varsettings['varsettingsstrippednames']:'no');
 	
 	// Variables: Security
