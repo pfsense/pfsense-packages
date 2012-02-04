@@ -193,6 +193,16 @@
 					</options>
 		</field>
 		<field>
+			<fielddescr>Additional information for bad attempts</fielddescr>
+			<fieldname>varsettingsauthbadpassmessage</fieldname>
+			<description><![CDATA[You can add additional information to the syslog output if a user connects. You can use variables for any attributes.<br><br>
+			
+									%{User-Name} - shows the username<br>
+									%{reply:Acct-Output-Octets} - shows the remaining output octets]]></description>
+			<type>input</type>
+			<size>80</size>
+		</field>
+		<field>
 			<fielddescr>Log good authentication attempts?</fielddescr>
 			<fieldname>varsettingsauthgoodpass</fieldname>
 			<description><![CDATA[If an authentication succeeds then it will log the username and <b>correct</b> password visible in syslog. Logging must be enabled. (Default: no)]]></description>
@@ -202,6 +212,16 @@
 						<option><name>no</name><value>no</value></option>
 						<option><name>Log</name><value>yes</value></option>
 					</options>
+		</field>
+		<field>
+			<fielddescr>Additional information for good attempts</fielddescr>
+			<fieldname>varsettingsauthgoodpassmessage</fieldname>
+			<description><![CDATA[You can add additional information to the syslog output if a user is rejected. You can use variables for any attributes.<br><br>
+			
+									%{User-Name} - shows the username<br>
+									%{reply:Acct-Output-Octets} - shows the remaining output octets]]></description>
+			<type>input</type>
+			<size>80</size>
 		</field>
 		<field>
 			<fielddescr>Log Stripped Names</fielddescr>
@@ -302,7 +322,7 @@
 		<field>
 			<fielddescr>Disable Acct_Unique</fielddescr>
 			<fieldname>varsettingsenableacctunique</fieldname>
-			<description><![CDATA[This disables the "rlm_acct_unique" module in FreeRADIUS "preacct" section. By default this module is enabled but it causes some problems with counters. So if you use "Amount of Download/Upload/Time" then leave this checked. (Default: check)]]></description>
+			<description><![CDATA[This disables the "rlm_acct_unique" module in FreeRADIUS "preacct" section. By default this module is enabled but it causes some problems with counters. So if you use "Amount of Download/Upload/Time" then leave this checked. (Default: uncheck)]]></description>
 			<type>checkbox</type>
 		</field>
 	</fields>
