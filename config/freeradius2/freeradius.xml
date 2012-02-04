@@ -205,13 +205,13 @@
 		<field>
 			<fielddescr>Username</fielddescr>
 			<fieldname>varusersusername</fieldname>
-			<description><![CDATA[Enter the username. Whitespace is possible. If you do not username/password but custom options then leave this empty.]]></description>
+			<description><![CDATA[Enter the username. Whitespace is possible. If you do not want to use username/password but custom options then leave this empty.]]></description>
 			<type>input</type>
 		</field>
 		<field>
 			<fielddescr>Password</fielddescr>
 			<fieldname>varuserspassword</fieldname>
-			<description><![CDATA[Enter the password for this username. If you do not username/password but custom options then leave this empty.]]></description>
+			<description><![CDATA[Enter the password for this username. If you do not  want to use username/password but custom options then leave this empty.]]></description>
 			<type>password</type>
 		</field>
 		<field>
