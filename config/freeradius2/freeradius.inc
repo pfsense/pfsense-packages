@@ -158,7 +158,9 @@ function freeradius_settings_resync() {
 	$varsettingslogdir = ($varsettings['varsettingslogdir']?$varsettings['varsettingslogdir']:'syslog');
 	$varsettingsauth = ($varsettings['varsettingsauth']?$varsettings['varsettingsauth']:'yes');
 	$varsettingsauthbadpass = ($varsettings['varsettingsauthbadpass']?$varsettings['varsettingsauthbadpass']:'no');
+	$varsettingsauthbadpassmessage = ($varsettings['varsettingsauthbadpassmessage']?$varsettings['varsettingsauthbadpassmessage']:'');
 	$varsettingsauthgoodpass = ($varsettings['varsettingsauthgoodpass']?$varsettings['varsettingsauthgoodpass']:'no');
+	$varsettingsauthgoodpassmessage = ($varsettings['varsettingsauthgoodpassmessage']?$varsettings['varsettingsauthgoodpassmessage']:'no');
 	$varsettingsstrippednames = ($varsettings['varsettingsstrippednames']?$varsettings['varsettingsstrippednames']:'no');
 	
 	// Variables: Security
@@ -304,8 +306,8 @@ log {
 	auth = $varsettingsauth
 	auth_badpass = $varsettingsauthbadpass
 	auth_goodpass = $varsettingsauthgoodpass
-	###msg_goodpass = ""
-	###msg_badpass = ""
+	msg_goodpass = "$varsettingsauthgoodpassmessage"
+	msg_badpass = "$varsettingsauthbadpassmessage"
 }
 
 checkrad = \${sbindir}/checkrad
