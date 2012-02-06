@@ -294,7 +294,7 @@
 			<fielddescr>Possible Login Times</fielddescr>
 			<fieldname>varuserslogintime</fieldname>			
 			<description><![CDATA[Enter the time when this user should have access. If no time is entered it means "always".<br>
-							Every time string contains a day (Mo,Tu,We,Th,Fr,Sa,Su) or all weekdays which is from monday till friday (Wk).<br><br>
+							Every time string contains a day (Mo,Tu,We,Th,Fr,Sa,Su) or all weekdays which is from monday till friday (Wk). All weekdays plus the weekend is (Al).<br><br>
 							<b>Wk0855-2305,Sa,Su2230-0230</b><br><br>
 							This means weekdays after 8:55 AM and before 11:05 PM | any time on saturday | sunday after 10:30 PM and before 02:30 AM.]]></description>
 			<type>input</type>
