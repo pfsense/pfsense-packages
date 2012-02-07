@@ -234,12 +234,12 @@
 			<fielddescr>Enable dansguardian</fielddescr>
 			<fieldname>enable</fieldname>
 			<type>checkbox</type>
-			<description><![CDATA[<a target=_new href='http://dansguardian.org/?page=copyright2'>I agree with dansguardian terms and licence.</a>]]></description>
+			<description><![CDATA[<a target=_new href='http://dansguardian.org/?page=copyright2'>I agree with dansguardian Terms and Conditions.</a>]]></description>
 		</field>
 		<field>
 			<fielddescr>Listen Interface(s)</fielddescr>
 			<fieldname>interface</fieldname>
-			<description><![CDATA[Default: <strong>WAN</strong><br>Select interface(s) that you want to block incoming traffic.]]></description>
+			<description><![CDATA[Default: <strong>LAN/loopback</strong><br>Select interface(s) that you want to dansguardian listen on.]]></description>
 			<type>interfaces_selection</type>
 			<required/>
 			<multiple/>
