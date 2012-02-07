@@ -201,7 +201,7 @@
 		<field>
 			<name>GENERAL CONFIGURATION</name>
 			<type>listtopic</type>
-		</field>	
+		</field>
 		<field>
 			<fielddescr>Username</fielddescr>
 			<fieldname>varusersusername</fieldname>
@@ -215,6 +215,36 @@
 			<type>password</type>
 		</field>
 		<field>
+			<fielddescr>Enable Mobile-One-Time-Password For This User</fielddescr>
+			<fieldname>varusersmotpenable</fieldname>
+			<description><![CDATA[This enables the possibility to authenticate against username and a one-time-password. The client to generate OTP can be installed on various mobile device plattforms like Android and more. If you enable this the first time we need to download and install bash so the process will need some time. (Default: uncheck)]]></description>
+			<type>checkbox</type>
+			<enablefields>varusersmotpinitsecret,varusersmotppin,varusersmotpoffset</enablefields>
+		</field>
+		<field>
+			<fielddescr>Init-Secret</fielddescr>
+			<fieldname>varusersmotpinitsecret</fieldname>
+			<description><![CDATA[This is the generated init secret you get when you initialize the toke the first time on a client (mobile device).]]></description>
+			<type>password</type>
+		</field>
+		<field>
+			<fielddescr>PIN</fielddescr>
+			<fieldname>varusersmotppin</fieldname>
+			<description><![CDATA[This is the PIN the user has to enter on his mobile device to generate a one-time-password.]]></description>
+			<type>password</type>
+		</field>
+		<field>
+			<fielddescr>Time Offset</fielddescr>
+			<fieldname>varusersmotpoffset</fieldname>
+			<description><![CDATA[If the client is not in the correct time zone or is not changing time zone automatically than you have to calculate the offset and enter it here. To calculate it do the following:<br><br>
+			
+									1. Write down the first 9 digits of the Epoch-Time on the client.<br>
+									2. Check with <b>date +%s</b> the Epoch-Time on your FreeRADIUS server and write down the first 9 digits.<br>
+									3. Subtract both values, multiply the result with 10 and enter the value in this field. (Default: 0)]]></description>
+			<type>input</type>
+			<default_value>0</default_value>
+		</field>
+		<field>
 			<name>MISCELLANEOUS CONFIGURATION</name>
 			<type>listtopic</type>
 		</field>
@@ -222,7 +252,6 @@
 			<fielddescr>Number of simultaneous connections</fielddescr>
 			<fieldname>varuserssimultaneousconnect</fieldname>
 			<description><![CDATA[The maximum of simultaneous connections with this username. If you leave this field empty than there is no limit. If you are using FreeRADIUS with CaptivePortal you should leave this empty.]]></description>
-			<default_value></default_value>
 			<type>input</type>
 		</field>
 		<field>
@@ -294,7 +323,8 @@
 			<fielddescr>Possible Login Times</fielddescr>
 			<fieldname>varuserslogintime</fieldname>			
 			<description><![CDATA[Enter the time when this user should have access. If no time is entered it means "always".<br>
-							Every time string contains a day (Mo,Tu,We,Th,Fr,Sa,Su) or all weekdays which is from monday till friday (Wk). All weekdays plus the weekend is (Al).<br><br>
+							Every time string contains a day (Mo,Tu,We,Th,Fr,Sa,Su) or all weekdays which is from monday till friday (Wk).<br>
+							All weekdays plus weekend which means all days from monday till sunday is (Al).<br><br>
 							<b>Wk0855-2305,Sa,Su2230-0230</b><br><br>
 							This means weekdays after 8:55 AM and before 11:05 PM | any time on saturday | sunday after 10:30 PM and before 02:30 AM.]]></description>
 			<type>input</type>
