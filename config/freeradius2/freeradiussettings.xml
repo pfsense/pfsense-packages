@@ -325,6 +325,12 @@
 			<description><![CDATA[This disables the "rlm_acct_unique" module in FreeRADIUS "preacct" section. By default this module is enabled but it causes some problems with counters. So if you use "Amount of Download/Upload/Time" then leave this checked. (Default: uncheck)]]></description>
 			<type>checkbox</type>
 		</field>
+		<field>
+			<fielddescr>Enable Mobile-One-Time-Password</fielddescr>
+			<fieldname>varsettingsmotpenable</fieldname>
+			<description><![CDATA[This enables the possibility to authenticate against username and a one-time-password. The client to generate OTP can be installed on various mobile device plattforms like Android and more. If you enable this the first time we need to download and install bash so the process will need some time. (Default: uncheck)]]></description>
+			<type>checkbox</type>
+		</field>
 	</fields>
 	<custom_delete_php_command>
 		freeradius_settings_resync();
