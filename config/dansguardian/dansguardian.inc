@@ -964,10 +964,13 @@ EOF;
 
 function dansguardian_validate_input($post, &$input_errors) {
 	foreach ($post as $key => $value) {
-		if ($key == "name" && $value == "")
+		if (preg_match("/^(name|description)$/",$key) && $value == "")
 				$input_errors[] = "{$key} could not be empty.";
-		else if ($key == "name" && $value=="sample") 
+		else if ($key == "name" && $value=="sample")
 				$input_errors[] = "{$value} cannot be used as name.";
+		else if ($key == "name" && preg_match("/\W/",$value)) 
+				$input_errors[] = "{$value} cannot be used as name. Use only a-z 0-9 characters";
+				
 	}
 }
 
