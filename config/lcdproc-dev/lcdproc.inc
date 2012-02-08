@@ -2,7 +2,8 @@
 /* $Id$ */
 /*
         lcdproc.inc
-        Copyright (C) 2007 Seth Mos <seth.mos@xs4all.nl>
+        Copyright (C) 2007 Seth Mos <seth.mos@xs4all.nl>, 
+		Copyright (C) 2012 Michele Di Maria <michele@nt2.it>
         All rights reserved.
 
         Redistribution and use in source and binary forms, with or without
@@ -31,7 +32,6 @@
 	require_once("service-utils.inc");
 	/* LCDproc */
 	define('LCDPROC_RCFILE', '/usr/local/etc/rc.d/lcdproc.sh');
-	define('LCDPROC_CLIENT', '/tmp/lcdclient.sh');
 	define('LCDPROC_CONFIG','/usr/local/etc/LCDd.conf');
 	define('LCDPROC_HOST','localhost');
 	define('LCDPROC_PORT','13666');
@@ -228,24 +228,26 @@
 					return;
 			}
 			$config_text = "[server]\n";
+			$config_text .= "DriverPath=/usr/local/lib/lcdproc/\n";			
 			$config_text .= "Driver={$lcdproc_config[driver]}\n";
 			$config_text .= "Bind=127.0.0.1\n";
 			$config_text .= "Port=13666\n";
 			$config_text .= "ReportLevel=3\n";
 			$config_text .= "ReportToSyslog=yes\n";
-			$config_text .= "WaitTime={$lcdproc_config[refresh_frequency]}\n";
 			$config_text .= "User=nobody\n";
+			$config_text .= "Foreground=no\n";			
+			$config_text .= "Hello=\"LCDproc is\"\n";
+			$config_text .= "Hello=\"  starting...\"\n";			
 			$config_text .= "ServerScreen=no\n";
-			$config_text .= "Foreground=no\n";
-			$config_text .= "TitleSpeed=5\n";
-			$config_text .= "DriverPath=/usr/local/lib/lcdproc/\n";
 			$config_text .= "GoodBye=\"Thanks for using\"\n";
 			$config_text .= "GoodBye=\"    {$g['product_name']}     \"\n";
+			$config_text .= "WaitTime={$lcdproc_config[refresh_frequency]}\n";
 			if ($lcdproc_config[backlight] != "" && $lcdproc_config[backlight] != "default")
 			{
 				/* Backlight setting */
 				$config_text .= "Backlight={$lcdproc_config[backlight]}\n";				
 			}
+			$config_text .= "Heartbeat=off\n";
 			if ($lcdproc_config[driver] == "sdeclcd")
 			{
 				/* Sdeclcd Keys settings */
@@ -500,33 +502,22 @@
 				$config_text .= "Speed={$port_speed}\n";
 			}			
 			/* generate rc file start and stop */
-			$client_script = <<<EOD
-#!/bin/sh
-/usr/local/bin/php -f /usr/local/pkg/lcdproc_client.php	
-sleep 1
+			$stop = <<<EOD
+if [ `ps auxw |awk '/lcdproc_client.ph[p]/ {print $2}'| wc -l` != 0  ]; then
+	ps auxw |awk '/lcdproc_client.ph[p]/ {print $2}'|xargs kill -9 
+	sleep 2
+fi
+while [ `ps auxw |awk '/LCD[d]/ {print $2}'| wc -l` != 0  ]; 
+do
+	ps auxw |awk '/LCD[d]/ {print $2}'|xargs kill -9 
+	sleep 1
 done
 EOD;
-			/* generate rc file start and stop */
-			$stop = <<<EOD
-if [ `ps auxw |awk '/lcdclient.s[h]/ {print $2}'| wc -l` != 0  ]; then
-	ps auxw |awk '/lcdclient.s[h]/ {print $2}'|xargs kill -9
-	sleep 1
-fi
-if [ `ps auxw |awk '/lcdproc_client.ph[p]/ {print $2}'| wc -l` != 0  ]; then
-	ps auxw |awk '/lcdproc_client.ph[p]/ {print $2}'|xargs kill -9
-	sleep 1
-fi
-if [ `ps auxw |awk '/LCD[d]/ {print $2}'| wc -l` != 0  ]; then
-	ps auxw |awk '/LCD[d]/ {print $2}'|xargs kill -9
-	sleep 1
-fi
-EOD;
 			$start = $stop ."\n";
-			$start .= "\t/usr/local/sbin/LCDd -c ". LCDPROC_CONFIG ."\n";
-			$start .= "\t". LCDPROC_CLIENT ." &\n";
+			$start .= "\t/usr/bin/nice -20 /usr/local/sbin/LCDd -c ". LCDPROC_CONFIG ."\n";
+			$start .= "\t/usr/bin/nice -20 /usr/local/bin/php -f /usr/local/pkg/lcdproc_client.php\n";
 			/* write out the configuration */
 			conf_mount_rw();
-			lcdproc_write_script(LCDPROC_CLIENT, $client_script);
 			lcdproc_write_config(LCDPROC_CONFIG, $config_text);
 			write_rcfile(array(
 					'file' => 'lcdproc.sh',
@@ -552,7 +543,6 @@ EOD;
 				stop_service(LCDPROC_SERVICE_NAME);
 				conf_mount_rw();
 				unlink(LCDPROC_RCFILE);
-				unlink(LCDPROC_CLIENT);
 				unlink(LCDPROC_CONFIG);
 				conf_mount_ro();
 			}

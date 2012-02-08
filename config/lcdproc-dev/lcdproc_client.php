@@ -3,6 +3,7 @@
 /*
         lcdproc_client.php
         Copyright (C) 2007 Seth Mos <seth.mos@xs4all.nl>
+		Copyright (C) 2012 Michele Di Maria <michele@nt2.it>
         All rights reserved.
 
         Redistribution and use in source and binary forms, with or without
@@ -399,26 +400,23 @@
 	
 	/* Define functions */
 	function send_lcd_commands($lcd, $lcd_cmds) {
-		global $lcdproc_connect_errors;
 		if(!is_array($lcd_cmds) || (empty($lcd_cmds))) {
 			lcdproc_warn("Failed to interpret lcd commands");
 			return;
 		}
-		foreach($lcd_cmds as $lcd_cmd) {
-			$cmd_output = "";
-			if(! fwrite($lcd, "$lcd_cmd\n")) {
-				lcdproc_warn("Connection to LCDd process lost $errstr ($errno)");
-				$lcdproc_connect_errors++;
-				return;
-			}
-			usleep(20);  // waits 20ms
-			$cmd_output = fgets($lcd, 256);
-			// FIXME: add support for interpreting menu commands here.
+		while (($cmd_output = fgets($lcd, 8000)) !== false) {
 			if(preg_match("/^huh?/", $cmd_output)) {
 				lcdproc_notice("LCDd output: \"$cmd_output\". Executed \"$lcd_cmd\"");
 			}
-			$lcdproc_connect_errors = 0; // Reset the error counter
 		}
+		foreach($lcd_cmds as $lcd_cmd) {
+			if(! fwrite($lcd, "$lcd_cmd\n")) {
+				lcdproc_warn("Connection to LCDd process lost $errstr ($errno)");
+				$lcdproc_connect_errors++;
+				return false;
+			}
+		}
+		return true;
 	}
 
 	function get_lcdpanel_width(){
@@ -562,21 +560,22 @@
 	
 	function add_summary_declaration(&$lcd_cmds, $name) {
 		$lcdpanel_height = get_lcdpanel_height();
+		$lcdpanel_width = get_lcdpanel_width();
 		if ($lcdpanel_height >= "4")
 		{
-			$lcd_cmds[] = "widget_add $name title_summary scroller";					
-			$lcd_cmds[] = "widget_add $name text_summary scroller";
+			$lcd_cmds[] = "widget_add $name title_summary string";					
+			$lcd_cmds[] = "widget_add $name text_summary string";
+			if ($lcdpanel_width > "16")
+				{$lcd_cmds[] = "widget_set $name title_summary 1 3 \"CPU MEM STATES FREQ\"";}
+			else
+				{$lcd_cmds[] = "widget_set $name title_summary 1 3 \"CPU MEM STATES\"";}			
 		}				
 	}
 	
-	function add_summary_values(&$lcd_cmds, $name, $lcd_summary_data, $lcdpanel_width) {
+	function add_summary_values(&$lcd_cmds, $name, $lcd_summary_data) {
 		if ($lcd_summary_data != "")
 		{
-			if ($lcdpanel_width > "16")
-				{$lcd_cmds[] = "widget_set $name title_summary 1 3 $lcdpanel_width 3 h 2 \"CPU MEM STATES FREQ\"";}
-			else
-				{$lcd_cmds[] = "widget_set $name title_summary 1 3 $lcdpanel_width 3 h 2 \"CPU MEM STATES\"";}
-			$lcd_cmds[] = "widget_set $name text_summary 1 4 $lcdpanel_width 4 h 2 \"{$lcd_summary_data}\"";
+			$lcd_cmds[] = "widget_set $name text_summary 1 4 \"{$lcd_summary_data}\"";
 		}
 	}
 	
@@ -584,7 +583,7 @@
 		global $g;
 		global $config;
 		$lcdproc_screens_config = $config['installedpackages']['lcdprocscreens']['config'][0];		
-		$refresh_frequency = get_lcdpanel_refresh_frequency() * 10;
+		$refresh_frequency = get_lcdpanel_refresh_frequency() * 8;
 		
 		$lcd_cmds = array();
 		$lcd_cmds[] = "hello";
@@ -602,6 +601,7 @@
 							$lcd_cmds[] = "screen_set $name duration $refresh_frequency";
 							$lcd_cmds[] = "widget_add $name title_wdgt string";
 							$lcd_cmds[] = "widget_add $name text_wdgt scroller";
+							$lcd_cmds[] = "widget_set $name title_wdgt 1 1 \"Welcome to\"";							
 							break;					
 						case "scr_time":
 							$lcd_cmds[] = "screen_add $name";
@@ -610,6 +610,7 @@
 							$lcd_cmds[] = "screen_set $name duration $refresh_frequency";
 							$lcd_cmds[] = "widget_add $name title_wdgt string";
 							$lcd_cmds[] = "widget_add $name text_wdgt scroller";
+							$lcd_cmds[] = "widget_set $name title_wdgt 1 1 \"+ System Time\"";							
 							break;
 						case "scr_uptime":
 							$lcd_cmds[] = "screen_add $name";
@@ -618,6 +619,7 @@
 							$lcd_cmds[] = "screen_set $name duration $refresh_frequency";
 							$lcd_cmds[] = "widget_add $name title_wdgt string";
 							$lcd_cmds[] = "widget_add $name text_wdgt scroller";
+							$lcd_cmds[] = "widget_set $name title_wdgt 1 1 \"+ System Uptime\"";
 							break;
 						case "scr_hostname":
 							$lcd_cmds[] = "screen_add $name";
@@ -626,6 +628,7 @@
 							$lcd_cmds[] = "screen_set $name duration $refresh_frequency";
 							$lcd_cmds[] = "widget_add $name title_wdgt string";
 							$lcd_cmds[] = "widget_add $name text_wdgt scroller";
+							$lcd_cmds[] = "widget_set $name title_wdgt 1 1 \"+ System Name\"";
 							break;
 						case "scr_system":
 							$lcd_cmds[] = "screen_add $name";
@@ -634,6 +637,7 @@
 							$lcd_cmds[] = "screen_set $name duration $refresh_frequency";
 							$lcd_cmds[] = "widget_add $name title_wdgt string";
 							$lcd_cmds[] = "widget_add $name text_wdgt scroller";
+							$lcd_cmds[] = "widget_set $name title_wdgt 1 1 \"+ System Stats\"";
 							break;
 						case "scr_disk":
 							$lcd_cmds[] = "screen_add $name";
@@ -642,6 +646,7 @@
 							$lcd_cmds[] = "screen_set $name duration $refresh_frequency";
 							$lcd_cmds[] = "widget_add $name title_wdgt string";
 							$lcd_cmds[] = "widget_add $name text_wdgt scroller";
+							$lcd_cmds[] = "widget_set $name title_wdgt 1 1 \"+ Disk Use\"";
 							break;
 						case "scr_load":
 							$lcd_cmds[] = "screen_add $name";
@@ -650,14 +655,16 @@
 							$lcd_cmds[] = "screen_set $name duration $refresh_frequency";
 							$lcd_cmds[] = "widget_add $name title_wdgt string";
 							$lcd_cmds[] = "widget_add $name text_wdgt scroller";
+							$lcd_cmds[] = "widget_set $name title_wdgt 1 1 \"+ Load Averages\"";
 							break;
 						case "scr_states":
 							$lcd_cmds[] = "screen_add $name";
 							$lcd_cmds[] = "screen_set $name heartbeat off";
-							$lcd_cmds[] = "screen_set $name name $name";
+							$lcd_cmds[] = "screen_set $name name $name"; 
 							$lcd_cmds[] = "screen_set $name duration $refresh_frequency";
 							$lcd_cmds[] = "widget_add $name title_wdgt string";
 							$lcd_cmds[] = "widget_add $name text_wdgt scroller";
+							$lcd_cmds[] = "widget_set $name title_wdgt 1 1 \"+ Traffic States\"";
 							break;
 						case "scr_carp":
 							$lcd_cmds[] = "screen_add $name";
@@ -666,6 +673,7 @@
 							$lcd_cmds[] = "screen_set $name duration $refresh_frequency";
 							$lcd_cmds[] = "widget_add $name title_wdgt string";
 							$lcd_cmds[] = "widget_add $name text_wdgt scroller";
+							$lcd_cmds[] = "widget_set $name title_wdgt 1 1 \"+ CARP State\"";
 							break;
 						case "scr_ipsec":
 							$lcd_cmds[] = "screen_add $name";
@@ -674,6 +682,7 @@
 							$lcd_cmds[] = "screen_set $name duration $refresh_frequency";
 							$lcd_cmds[] = "widget_add $name title_wdgt string";
 							$lcd_cmds[] = "widget_add $name text_wdgt scroller";
+							$lcd_cmds[] = "widget_set $name title_wdgt 1 1 \"+ IPsec Tunnels\"";							
 							break;
 						case "scr_slbd":
 							$lcd_cmds[] = "screen_add $name";
@@ -682,6 +691,7 @@
 							$lcd_cmds[] = "screen_set $name duration $refresh_frequency";
 							$lcd_cmds[] = "widget_add $name title_wdgt string";
 							$lcd_cmds[] = "widget_add $name text_wdgt scroller";
+							$lcd_cmds[] = "widget_set $name title_wdgt 1 1 \"+ Load Balancer\"";
 							break;
 						case "scr_interfaces":
 							$lcd_cmds[] = "screen_add $name";
@@ -690,6 +700,7 @@
 							$lcd_cmds[] = "screen_set $name duration $refresh_frequency";
 							$lcd_cmds[] = "widget_add $name title_wdgt string";
 							$lcd_cmds[] = "widget_add $name text_wdgt scroller";
+							$lcd_cmds[] = "widget_set $name title_wdgt 1 1 \"+ Interfaces\"";
 							break;
 						case "scr_mbuf":
 							$lcd_cmds[] = "screen_add $name";
@@ -698,6 +709,7 @@
 							$lcd_cmds[] = "screen_set $name duration $refresh_frequency";
 							$lcd_cmds[] = "widget_add $name title_wdgt string";
 							$lcd_cmds[] = "widget_add $name text_wdgt scroller";
+							$lcd_cmds[] = "widget_set $name title_wdgt 1 1 \"+ MBuf Usage\"";
 							break;
 						case "scr_cpufrequency":
 							$lcd_cmds[] = "screen_add $name";
@@ -706,6 +718,7 @@
 							$lcd_cmds[] = "screen_set $name duration $refresh_frequency";
 							$lcd_cmds[] = "widget_add $name title_wdgt string";
 							$lcd_cmds[] = "widget_add $name text_wdgt scroller";
+							$lcd_cmds[] = "widget_set $name title_wdgt 1 1 \"+ CPU Frequency\"";
 							break;
 						case "scr_traffic":
 							$lcd_cmds[] = "screen_add $name";
@@ -798,75 +811,61 @@
 				switch($name) {
 					case "scr_version":
 						$version = get_version();
-						$lcd_cmds[] = "widget_set $name title_wdgt 1 1 \"Welcome to\"";
-						$lcd_cmds[] = "widget_set $name text_wdgt 1 2 $lcdpanel_width 2 h 2 \"{$version}\"";
+						$lcd_cmds[] = "widget_set $name text_wdgt 1 2 $lcdpanel_width 2 h 4 \"{$version}\"";
 						break;				
 					case "scr_time":
 						$time = date("n/j/Y H:i");
-						$lcd_cmds[] = "widget_set $name title_wdgt 1 1 \"+ System Time\"";
-						$lcd_cmds[] = "widget_set $name text_wdgt 1 2 $lcdpanel_width 2 h 2 \"{$time}\"";
+						$lcd_cmds[] = "widget_set $name text_wdgt 1 2 $lcdpanel_width 2 h 4 \"{$time}\"";
 						break;
 					case "scr_uptime":
 						$uptime = get_uptime_stats();
-						$lcd_cmds[] = "widget_set $name title_wdgt 1 1 \"+ System Uptime\"";
-						$lcd_cmds[] = "widget_set $name text_wdgt 1 2 $lcdpanel_width 2 h 2 \"{$uptime}\"";
+						$lcd_cmds[] = "widget_set $name text_wdgt 1 2 $lcdpanel_width 2 h 4 \"{$uptime}\"";
 						break;
 					case "scr_hostname":
 						exec("/bin/hostname", $output, $ret);
 						$hostname = $output[0];
-						$lcd_cmds[] = "widget_set $name title_wdgt 1 1 \"+ System Name\"";
-						$lcd_cmds[] = "widget_set $name text_wdgt 1 2 $lcdpanel_width 2 h 2 \"{$hostname}\"";
+						$lcd_cmds[] = "widget_set $name text_wdgt 1 2 $lcdpanel_width 2 h 4 \"{$hostname}\"";
 						break;
 					case "scr_system":
 						$processor = cpu_usage();
 						$memory = mem_usage();
-						$lcd_cmds[] = "widget_set $name title_wdgt 1 1 \"+ System Stats\"";
-						$lcd_cmds[] = "widget_set $name text_wdgt 1 2 $lcdpanel_width 2 h 2 \"CPU {$processor}%, Mem {$memory}%\"";
+						$lcd_cmds[] = "widget_set $name text_wdgt 1 2 $lcdpanel_width 2 h 4 \"CPU {$processor}%, Mem {$memory}%\"";
 						break;
 					case "scr_disk":
 						$disk = disk_usage();
-						$lcd_cmds[] = "widget_set $name title_wdgt 1 1 \"+ Disk Use\"";
-						$lcd_cmds[] = "widget_set $name text_wdgt 1 2 $lcdpanel_width 2 h 2 \"Disk {$disk}%\"";
+						$lcd_cmds[] = "widget_set $name text_wdgt 1 2 $lcdpanel_width 2 h 4 \"Disk {$disk}%\"";
 						break;
 					case "scr_load":
 						$loadavg = get_loadavg_stats();
-						$lcd_cmds[] = "widget_set $name title_wdgt 1 1 \"+ Load Averages\"";
-						$lcd_cmds[] = "widget_set $name text_wdgt 1 2 $lcdpanel_width 2 h 2 \"{$loadavg}\"";
+						$lcd_cmds[] = "widget_set $name text_wdgt 1 2 $lcdpanel_width 2 h 4 \"{$loadavg}\"";
 						break;
 					case "scr_states":
 						$states = get_pfstate();
-						$lcd_cmds[] = "widget_set $name title_wdgt 1 1 \"+ Traffic States\"";
-						$lcd_cmds[] = "widget_set $name text_wdgt 1 2 $lcdpanel_width 2 h 2 \"Curr/Max {$states}\"";
+						$lcd_cmds[] = "widget_set $name text_wdgt 1 2 $lcdpanel_width 2 h 4 \"Cur/Max {$states}\"";
 						break;
 					case "scr_carp":
 						$carp = get_carp_stats();
-						$lcd_cmds[] = "widget_set $name title_wdgt 1 1 \"+ CARP State\"";
-						$lcd_cmds[] = "widget_set $name text_wdgt 1 2 $lcdpanel_width 2 h 2 \"{$carp}\"";
+						$lcd_cmds[] = "widget_set $name text_wdgt 1 2 $lcdpanel_width 2 h 4 \"{$carp}\"";
 						break;
 					case "scr_ipsec":
 						$ipsec = get_ipsec_stats();
-						$lcd_cmds[] = "widget_set $name title_wdgt 1 1 \"+ IPsec Tunnels\"";
-						$lcd_cmds[] = "widget_set $name text_wdgt 1 2 $lcdpanel_width 2 h 2 \"{$ipsec}\"";
+						$lcd_cmds[] = "widget_set $name text_wdgt 1 2 $lcdpanel_width 2 h 4 \"{$ipsec}\"";
 						break;
 					case "scr_slbd":
 						$slbd = get_slbd_stats();
-						$lcd_cmds[] = "widget_set $name title_wdgt 1 1 \"+ Load Balancer\"";
-						$lcd_cmds[] = "widget_set $name text_wdgt 1 2 $lcdpanel_width 2 h 2 \"{$slbd}\"";
+						$lcd_cmds[] = "widget_set $name text_wdgt 1 2 $lcdpanel_width 2 h 4 \"{$slbd}\"";
 						break;
 					case "scr_interfaces":
 						$interfaces = get_interfaces_stats();
-						$lcd_cmds[] = "widget_set $name title_wdgt 1 1 \"+ Interfaces\"";
-						$lcd_cmds[] = "widget_set $name text_wdgt 1 2 $lcdpanel_width 2 h 2 \"{$interfaces}\"";
+						$lcd_cmds[] = "widget_set $name text_wdgt 1 2 $lcdpanel_width 2 h 4 \"{$interfaces}\"";
 						break;
 					case "scr_mbuf":
 						$mbufstats = get_mbuf_stats();
-						$lcd_cmds[] = "widget_set $name title_wdgt 1 1 \"+ MBuf Usage\"";
-						$lcd_cmds[] = "widget_set $name text_wdgt 1 2 $lcdpanel_width 2 h 2 \"{$mbufstats}\"";
+						$lcd_cmds[] = "widget_set $name text_wdgt 1 2 $lcdpanel_width 2 h 4 \"{$mbufstats}\"";
 						break;
 					case "scr_cpufrequency":
 						$cpufreq = get_cpufrequency();
-						$lcd_cmds[] = "widget_set $name title_wdgt 1 1 \"+ CPU Frequency\"";
-						$lcd_cmds[] = "widget_set $name text_wdgt 1 2 $lcdpanel_width 2 h 2 \"{$cpufreq}\"";
+						$lcd_cmds[] = "widget_set $name text_wdgt 1 2 $lcdpanel_width 2 h 4 \"{$cpufreq}\"";
 						break;
 					case "scr_traffic":
 						get_traffic_stats($in_data, $out_data);
@@ -876,16 +875,21 @@
 				}
 				if ($name != "scr_traffic_interface") {
 					$widget_counter++;
-					add_summary_values($lcd_cmds, $name, $lcd_summary_data, $lcdpanel_width);
+					add_summary_values($lcd_cmds, $name, $lcd_summary_data);
 				}
+			}			
+			if (send_lcd_commands($lcd, $lcd_cmds)) {
+				$lcdproc_connect_errors = 0; // Reset the error counter
 			}
-			$temp_lcdproc_connect_errors = $lcdproc_connect_errors;
-			send_lcd_commands($lcd, $lcd_cmds);
-			if ($temp_lcdproc_connect_errors != $lcdproc_connect_errors)
-			{	//an error occurred
+			else {	//an error occurred
 				return;
 			}
-			sleep($refresh_frequency * $widget_counter);
+			if ($refresh_frequency * $widget_counter > 5) {
+				sleep($refresh_frequency * $widget_counter);
+			}
+			else {
+				sleep(5);
+			}
 			$i++;
 		}
 	}
@@ -895,16 +899,17 @@
 	$traffic_last_ifout = 0;
 	/* Initialize the global error counter */
 	$lcdproc_connect_errors = 0;
-	$lcdproc_max_connect_errors = 2;
+	$lcdproc_max_connect_errors = 3;
 	/* Connect to the LCDd port and interface with the LCD */
 	while ($lcdproc_connect_errors <= $lcdproc_max_connect_errors)
 	{
 		lcdproc_warn("Start client procedure. Error counter: ($lcdproc_connect_errors)");
 		$lcd = fsockopen(LCDPROC_HOST, LCDPROC_PORT, $errno, $errstr, 10);
+		stream_set_timeout($lcd, 0 , 25000); // Sets the socket timeout as 25ms
 		if (!$lcd) {
 			lcdproc_warn("Failed to connect to LCDd process $errstr ($errno)");
 			$lcdproc_connect_errors++;
-		} else {
+		} else {			
 			build_interface($lcd);
 			loop_status($lcd);
 			fclose($lcd);
