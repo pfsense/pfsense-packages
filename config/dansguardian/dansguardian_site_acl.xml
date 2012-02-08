@@ -59,7 +59,7 @@
 			<url>/pkg.php?xml=dansguardian_pics_acl.xml&amp;id=0</url>
 		</tab>
 		<tab>
-			<text>Phase</text>
+			<text>Phrase</text>
 			<url>/pkg.php?xml=dansguardian_phrase_acl.xml</url>
 		</tab>
 		<tab>

@@ -61,7 +61,7 @@
 			<active/>
 		</tab>
 		<tab>
-			<text>Phase</text>
+			<text>Phrase</text>
 			<url>/pkg.php?xml=dansguardian_phrase_acl.xml</url>
 		</tab>
 		<tab>
