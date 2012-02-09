@@ -31,52 +31,56 @@ function nrpe2_custom_php_install_command() {
 
 	$ip = $config['interfaces']['lan']['ipaddr'];
 
-	$config['installedpackages']['nrpe2']['config'][0]['enabled'] = "on";
-	$config['installedpackages']['nrpe2']['config'][0]['server_address'] = $ip;
-	$config['installedpackages']['nrpe2']['config'][0]['server_port'] = 5666;
-	$config['installedpackages']['nrpe2']['config'][0]['allowed_hosts'] = "127.0.0.1";
+	if (!is_array($config['installedpackages']['nrpe2'])) {
+		$config['installedpackages']['nrpe2']['config'][0]['enabled'] = "on";
+		$config['installedpackages']['nrpe2']['config'][0]['server_address'] = $ip;
+		$config['installedpackages']['nrpe2']['config'][0]['server_port'] = 5666;
+		$config['installedpackages']['nrpe2']['config'][0]['allowed_hosts'] = "127.0.0.1";
+	}
 
-	$config['installedpackages']['nrpe2']['config'][0]['row'] = array(
-		0 => array(
-			'name' => 'check_users',
-			'command' => 'check_users',
-			'warning' => '5',
-			'critical' => '10'
-		),
-		1 => array(
-			'name' => 'check_load',
-			'command' => 'check_load',
-			'warning' => '15,10,5',
-			'critical' => '30,25,20',
-		),
-		2 => array(
-			'name' => 'check_root',
-			'command' => 'check_disk',
-			'warning' => '20%',
-			'critical' => '10%',
-			'extra' => '-p /'
-		),
-		3 => array(
-			'name' => 'check_var',
-			'command' => 'check_disk',
-			'warning' => '20%',
-			'critical' => '10%',
-			'extra' => '-p /var/run'
-		),
-		4 => array(
-			'name' => 'check_zombie_procs',
-			'command' => 'check_procs',
-			'warning' => '5',
-			'critical' => '10',
-			'extra' => '-s Z'
-		),
-		5 => array(
-			'name' => 'check_total_procs',
-			'command' => 'check_procs',
-			'warning' => '150',
-			'critical' => '200'
-		)
-	);
+	if (!is_array($config['installedpackages']['nrpe2']['config'][0]['row'])) {
+		$config['installedpackages']['nrpe2']['config'][0]['row'] = array(
+			0 => array(
+				'name' => 'check_users',
+				'command' => 'check_users',
+				'warning' => '5',
+				'critical' => '10'
+			),
+			1 => array(
+				'name' => 'check_load',
+				'command' => 'check_load',
+				'warning' => '15,10,5',
+				'critical' => '30,25,20',
+			),
+			2 => array(
+				'name' => 'check_root',
+				'command' => 'check_disk',
+				'warning' => '20%',
+				'critical' => '10%',
+				'extra' => '-p /'
+			),
+			3 => array(
+				'name' => 'check_var',
+				'command' => 'check_disk',
+				'warning' => '20%',
+				'critical' => '10%',
+				'extra' => '-p /var/run'
+			),
+			4 => array(
+				'name' => 'check_zombie_procs',
+				'command' => 'check_procs',
+				'warning' => '5',
+				'critical' => '10',
+				'extra' => '-s Z'
+			),
+			5 => array(
+				'name' => 'check_total_procs',
+				'command' => 'check_procs',
+				'warning' => '150',
+				'critical' => '200'
+			)
+		);
+	}
 	unlink_if_exists('/usr/local/etc/rc.d/nrpe2');
 	$fd = fopen('/usr/local/etc/rc.d/nrpe2.sh', 'w');
 	$rc_file = <<<EOD
