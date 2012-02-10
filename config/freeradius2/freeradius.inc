@@ -3855,9 +3855,13 @@ function freeradius_motp_resync() {
 	
 	// check if disabled then we delete bash und otpverify.sh script
 	if ($varsettings['varsettingsmotpenable'] == '') {
-		unlink("/usr/local/bin/otpverify.sh");
-		exec("cd /var/db/pkg && pkg_delete `ls | grep bash`");
-		log_error('FreeRADIUS: Uninstalling package "bash-4.1.7" which comes with Mobile-One-Time-Password (motp) if not already done.');
+		if (file_exists("/usr/local/bin/otpverify.sh")) {
+			unlink("/usr/local/bin/otpverify.sh");
+		}
+		if (exec("cd /var/db/pkg && ls | grep bash") == "bash-4.1.7") {
+			exec("cd /var/db/pkg && pkg_delete `ls | grep bash`");
+			log_error('FreeRADIUS: Uninstalling package "bash-4.1.7" which comes with Mobile-One-Time-Password (motp).');
+		}
 	}
 	
 	// check if enabled then we need to download "bash"
