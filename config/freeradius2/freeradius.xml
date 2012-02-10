@@ -169,6 +169,10 @@
 			<fieldname>varusersusername</fieldname>
 		</columnitem>
 		<columnitem>
+			<fielddescr>Use One Time Password</fielddescr>
+			<fieldname>varusersmotpenable</fieldname>
+		</columnitem>
+		<columnitem>
 			<fielddescr>Simult. Connections</fielddescr>
 			<fieldname>varuserssimultaneousconnect</fieldname>
 		</columnitem>
@@ -215,9 +219,10 @@
 			<type>password</type>
 		</field>
 		<field>
-			<fielddescr>Enable Mobile-One-Time-Password For This User</fielddescr>
+			<fielddescr>Enable One-Time-Password for this user</fielddescr>
 			<fieldname>varusersmotpenable</fieldname>
-			<description><![CDATA[This enables the possibility to authenticate against username and a one-time-password. The client to generate OTP can be installed on various mobile device plattforms like Android and more. If you enable this the first time we need to download and install bash so the process will need some time. (Default: uncheck)]]></description>
+			<description><![CDATA[This enables the possibility to authenticate against an username and an one-time-password. The client to generate OTP can be installed on various mobile device plattforms like Android and more.<br><br>
+								<b>IMPORTANT:</b> You need to enabled mOTP first in FreeRADIUS => Settings (Default: unchecked)]]></description>
 			<type>checkbox</type>
 			<enablefields>varusersmotpinitsecret,varusersmotppin,varusersmotpoffset</enablefields>
 		</field>
