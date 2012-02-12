@@ -384,6 +384,7 @@ EOD;
 	// "freeradius_sqlconf_resync" is pointing to this function because we need to run "freeradius_serverdefault_resync" and after that restart freeradius.
 	freeradius_plainmacauth_resync();
 	freeradius_motp_resync();
+	freeradius_serverdefault_resync();
 	
 	// This is to fix the mysqlclient.so which gets lost after reboot
 	exec("ldconfig -m /usr/local/lib/mysql");
@@ -1201,7 +1202,6 @@ EOD;
 	// We don't need a restart at this time because there are additional changes needed in:
 	// "freeradius_settings_resync" and "freeradius_serverdefault_resync".
 	// restart_service('radiusd');
-	freeradius_serverdefault_resync();
 	freeradius_settings_resync();
 }
 
