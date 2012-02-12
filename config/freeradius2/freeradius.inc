@@ -124,9 +124,13 @@ function freeradius_install_command() {
 	// We run this here just to suppress some warnings on syslog if file doesn't exist
 	freeradius_authorizedmacs_resync();
 	
-	// These two functions create the module and the dictionary entry for Mobile-One-Time-Password
-	freeradius_dictionary_resync();
-	freeradius_modulesmotp_resync();
+	// These functions create files which we only need to do one time after installing freeradius2 package
+		// These two functions create the module and the dictionary entry for Mobile-One-Time-Password
+		freeradius_dictionary_resync();
+		freeradius_modulesmotp_resync();
+	freeradius_modulescounter_resync();
+	freeradius_modulesmschap_resync();
+	freeradius_modulesrealm_resync();
 	
 	// Initialize some config files - the functions below call other functions
 	freeradius_sqlconf_resync();
@@ -378,9 +382,6 @@ EOD;
 	conf_mount_ro();
 	
 	// "freeradius_sqlconf_resync" is pointing to this function because we need to run "freeradius_serverdefault_resync" and after that restart freeradius.
-	freeradius_modulescounter_resync();
-	freeradius_modulesmschap_resync();
-	freeradius_modulesrealm_resync();
 	freeradius_plainmacauth_resync();
 	freeradius_motp_resync();
 	
@@ -568,7 +569,7 @@ EOD;
 	$filename = RADDB . '/users';
 	conf_mount_rw();
 	file_put_contents($filename, $conf);
-	chmod($filename, 0600);
+	chmod($filename, 0640);
 	conf_mount_ro();
 	
 	freeradius_sync_on_changes();
@@ -732,7 +733,7 @@ EOD;
 	$filename = RADDB . '/authorized_macs';
 	conf_mount_rw();
 	file_put_contents($filename, $conf);
-	chmod($filename, 0600);
+	chmod($filename, 0640);
 	conf_mount_ro();
 	
 	freeradius_sync_on_changes();
@@ -1036,7 +1037,7 @@ EOD;
 	$filename = RADDB . '/eap.conf';
 	conf_mount_rw();
 	file_put_contents($filename, $conf);
-	chmod($filename, 0600);
+	chmod($filename, 0640);
 	conf_mount_ro();
 
 	restart_service('radiusd');
@@ -1194,7 +1195,7 @@ EOD;
 	$filename = RADDB . '/sql.conf';
 	conf_mount_rw();
 	file_put_contents($filename, $conf);
-	chmod($filename, 0600);
+	chmod($filename, 0640);
 	conf_mount_ro();
 	
 	// We don't need a restart at this time because there are additional changes needed in:
@@ -2055,7 +2056,7 @@ EOD;
 	$filename = RADDB . '/sites-available/default';
 	conf_mount_rw();
 	file_put_contents($filename, $conf);
-	chmod($filename, 0600);
+	chmod($filename, 0640);
 	conf_mount_ro();
 	
 	// No need to restart here because the restart of the service will be done in "freeradius_settings_resync"
@@ -2151,7 +2152,7 @@ EOD;
 	$filename = RADDB . '/certs/ca.cnf';
 	conf_mount_rw();
 	file_put_contents($filename, $conf);
-	chmod($filename, 0600);
+	chmod($filename, 0640);
 	conf_mount_ro();
 
 }
@@ -2237,7 +2238,7 @@ EOD;
 	$filename = RADDB . '/certs/server.cnf';
 	conf_mount_rw();
 	file_put_contents($filename, $conf);
-	chmod($filename, 0600);
+	chmod($filename, 0640);
 	conf_mount_ro();
 
 }
@@ -2323,7 +2324,7 @@ EOD;
 	$filename = RADDB . '/certs/client.cnf';
 	conf_mount_rw();
 	file_put_contents($filename, $conf);
-	chmod($filename, 0600);
+	chmod($filename, 0640);
 	conf_mount_ro();
 
 }
@@ -2788,7 +2789,7 @@ EOD;
 	$filename = RADDB . '/modules/counter';
 	conf_mount_rw();
 	file_put_contents($filename, $conf);
-	chmod($filename, 0600);
+	chmod($filename, 0640);
 	conf_mount_ro();
 
 }
@@ -2883,7 +2884,7 @@ EOD;
 	$filename = RADDB . '/modules/mschap';
 	conf_mount_rw();
 	file_put_contents($filename, $conf);
-	chmod($filename, 0600);
+	chmod($filename, 0640);
 	conf_mount_ro();
 
 }
@@ -2928,7 +2929,7 @@ EOD;
 	$filename = RADDB . '/modules/realm';
 	conf_mount_rw();
 	file_put_contents($filename, $conf);
-	chmod($filename, 0600);
+	chmod($filename, 0640);
 	conf_mount_ro();
 
 }
@@ -3529,7 +3530,7 @@ EOD;
 	$filename = RADDB . '/modules/ldap';
 	conf_mount_rw();
 	file_put_contents($filename, $conf);
-	chmod($filename, 0600);
+	chmod($filename, 0640);
 	conf_mount_ro();
 	
 	// We need to rebuild "freeradius_serverdefault_resync" before restart service
@@ -3553,18 +3554,27 @@ function freeradius_plainmacauth_resync() {
 	$filemodulesfilesbackup = '/usr/local/etc/raddb/files.backup';
 	
 	// If unchecked then plain mac auth is disabled and backups of the original files will be restored
-	if (!$varsettings['varsettingsenablemacauth']) {
-		log_error("FreeRADIUS: Restoring the original file from {$filepolicyconfbackup} and {$filemodulesfilesbackup}");
-		copy($filepolicyconfbackup, $filepolicyconf);
-		copy($filemodulesfilesbackup, $filemodulesfiles);
+	if ($varsettings['varsettingsenablemacauth'] == '') {
+		// This is a check - only restore files if they aren't already
+		if (file_exists("/usr/local/etc/raddb/plain_macauth_enabled")) {
+			log_error("FreeRADIUS: Plain-MAC-Auth disabled. Restoring the original file from {$filepolicyconfbackup} and {$filemodulesfilesbackup}");
+			copy($filepolicyconfbackup, $filepolicyconf);
+			copy($filemodulesfilesbackup, $filemodulesfiles);
+			unlink("/usr/local/etc/raddb/plain_macauth_enabled");
+			freeradius_serverdefault_resync();
+		}
 	}
 	// If checked then plain mac auth is enabled
 	else {
-		freeradius_modulesfiles_resync();
-		freeradius_policyconf_resync();
+		// This is a check - only modify files if they aren't already
+		if (!file_exists("/usr/local/etc/raddb/plain_macauth_enabled")) {
+			freeradius_modulesfiles_resync();
+			freeradius_policyconf_resync();
+			exec("cd /usr/local/etc/raddb/ && touch /usr/local/etc/raddb/plain_macauth_enabled");
+			log_error("FreeRADIUS: Plain-MAC-Auth enabled. Modified {$filepolicyconf} and {$filemodulesfiles}");
+			freeradius_serverdefault_resync();
+		}
 	}
-	
-	freeradius_serverdefault_resync();
 }
 
 function freeradius_modulesfiles_resync() {
@@ -3625,7 +3635,7 @@ EOD;
 	$filename = RADDB . '/modules/files';
 	conf_mount_rw();
 	file_put_contents($filename, $conf);
-	chmod($filename, 0600);
+	chmod($filename, 0640);
 	conf_mount_ro();
 
 }
@@ -3852,7 +3862,7 @@ EOD;
 	$filename = RADDB . '/policy.conf';
 	conf_mount_rw();
 	file_put_contents($filename, $conf);
-	chmod($filename, 0600);
+	chmod($filename, 0640);
 	conf_mount_ro();
 
 }
@@ -4103,7 +4113,7 @@ function freeradius_dictionary_resync() {
 
 ### Attributes for mobile-One-Time-Password
 ATTRIBUTE 		MOTP-Init-Secret 		900 	string
-ATTRIBUTE 		MOTP-PIN 				901 	string
+ATTRIBUTE 		MOTP-PIN 			901 	string
 ATTRIBUTE 		MOTP-Offset 			902 	string	
 	
 EOD;
