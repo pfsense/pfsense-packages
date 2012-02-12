@@ -124,6 +124,10 @@ function freeradius_install_command() {
 	// We run this here just to suppress some warnings on syslog if file doesn't exist
 	freeradius_authorizedmacs_resync();
 	
+	// These two functions create the module and the dictionary entry for Mobile-One-Time-Password
+	freeradius_dictionary_resync();
+	freeradius_modulesmotp_resync();
+	
 	// Initialize some config files - the functions below call other functions
 	freeradius_sqlconf_resync();
 	freeradius_eapconf_resync();
@@ -477,7 +481,7 @@ if (is_array($arrusers) && !empty($arrusers)) {
 	
 		// if otp is enabled we need to set Auth-Type to accept because password will be checked when the otp script gets executed in reply-item list
 		else {
-			$varuserscheckitem = '"' . $varusersusername . '"' . " Auth-Type = Accept";
+			$varuserscheckitem = '"' . $varusersusername . '"' . " Auth-Type = motp";
 		}
 	
 	// Add additional CHECK-ITEMS here. Different formatting in "users" file needed.
@@ -505,7 +509,7 @@ if (is_array($arrusers) && !empty($arrusers)) {
 
 		// this is the part for mobile otp
 		if ($users['varusersmotpenable'] == 'on') {
-			$varusersreplyitem .= 'Exec-Program-Wait = "/usr/local/bin/bash /usr/local/bin/otpverify.sh %{User-Name} %{User-Password} ' . "$varusersmotpinitsecret " . "$varusersmotppin " . "$varusersmotpoffset" . '"';
+			$varusersreplyitem .= "MOTP-Init-Secret = $varusersmotpinitsecret," . "\n\tMOTP-PIN = $varusersmotppin," . "\n\tMOTP-Offset = $varusersmotpoffset";
 		}
 		else {
 			$varusersreplyitem .= '';
@@ -1662,6 +1666,12 @@ authenticate {
 		mschap
 	}
 
+	#
+	#  Mobile-One-Time-Password (MOTP) authentication.
+	Auth-Type MOTP {
+		motp
+	}
+	
 	#
 	#  If you have a Cisco SIP server authenticating against
 	#  FreeRADIUS, uncomment the following line, and the 'digest'
@@ -3973,14 +3983,14 @@ fi
 # account locked?
 if [ "`cat /var/log/motp/users/\$USERNAME 2>/dev/null`" == "8" ]; then
 	echo "FAIL"
-	logger -f /var/log/system.log "FreeRADIUS: Authentication failed! Mobile-One-Time-Password incorrect or expired!"
+	logger -f /var/log/system.log "FreeRADIUS: Authentication failed! Too many wrong password attempts. User is locked! To unlock delete /var/log/motp/users/\$USERNAME"
 	exit 13
 fi
 
 I=0
-EPOCHTIME=`expr \$EPOCHTIME - 18`
+EPOCHTIME=`expr \$EPOCHTIME - 2`
 EPOCHTIME=`expr \$EPOCHTIME + \$OFFSET`
-while [ \$I -lt 36 ] ; do # 3 minutes before and after
+while [ \$I -lt 4 ] ; do # 20 seconds before and after
 	OTP=`printf \$EPOCHTIME\$SECRET\$PIN|checksum|cut -b 1-6`
 	if [ "\$OTP" = "\$PASSWD" ] ; then
 		touch /var/log/motp/cache/\$OTP || { echo "FAIL! Need write-access to /var/log/motp";logger -f /var/log/system.log "FreeRADIUS: Mobile-One-Time-Password - need write-access to /var/log/motp/cache"; exit 17; }
@@ -4014,6 +4024,95 @@ EOD;
 	
 	// end of above 'check if enabled then we need to download "bash"'
 	}
+
+}
+
+function freeradius_modulesmotp_resync() {
+	global $config;
+	$conf = '';
+
+	$conf .= <<<EOD
+exec motp {
+		wait = yes
+		program = "/usr/local/bin/bash /usr/local/bin/otpverify.sh %{User-Name} %{User-Password} %{reply:MOTP-Init-Secret} %{reply:MOTP-PIN} %{reply:MOTP-Offset}"
+		input_pairs = reply
+		#output_pairs = config
+	}
+
+	
+EOD;
+
+	$filename = RADDB . '/modules/motp';
+	conf_mount_rw();
+	file_put_contents($filename, $conf);
+	chmod($filename, 0640);
+	conf_mount_ro();
+
+}
+
+function freeradius_dictionary_resync() {
+	global $config;
+	$conf = '';
+
+	$conf .= <<<EOD
+
+#
+#       This is the master dictionary file, which references the
+#       pre-defined dictionary files included with the server.
+#
+#       Any new/changed attributes MUST be placed in this file, as
+#       the pre-defined dictionaries SHOULD NOT be edited.
+#
+#       \$Id\$
+#
+
+#
+#  The DHCP dictionary is used only when the server is built with
+#  "configure --with-dhcp".  It is not (and should not) be used in
+#  other situations.  If you are running just a RADIUS server, this
+#  line can be deleted.  If you are using DHCP, the following line
+#  should be uncommented.
+#
+#  Ideally, the "configure" process should automatically enable this
+#  dictionary, but we don't yet do that.
+#
+#\$INCLUDE       /usr/local/dictionary.dhcp
+
+#
+#       The filename given here should be an absolute path.
+#
+\$INCLUDE        /usr/local/share/freeradius/dictionary
+
+#
+#       Place additional attributes or \$INCLUDEs here.  They will
+#       over-ride the definitions in the pre-defined dictionaries.
+#
+#       See the 'man' page for 'dictionary' for information on
+#       the format of the dictionary files.
+
+#
+#       If you want to add entries to the dictionary file,
+#       which are NOT going to be placed in a RADIUS packet,
+#       add them here.  The numbers you pick should be between
+#       3000 and 4000.
+#
+
+#ATTRIBUTE      My-Local-String         3000    string
+#ATTRIBUTE      My-Local-IPAddr         3001    ipaddr
+#ATTRIBUTE      My-Local-Integer        3002    integer
+
+### Attributes for mobile-One-Time-Password
+ATTRIBUTE 		MOTP-Init-Secret 		900 	string
+ATTRIBUTE 		MOTP-PIN 				901 	string
+ATTRIBUTE 		MOTP-Offset 			902 	string	
+	
+EOD;
+
+	$filename = RADDB . '/dictionary';
+	conf_mount_rw();
+	file_put_contents($filename, $conf);
+	chmod($filename, 0640);
+	conf_mount_ro();
 
 }
 
