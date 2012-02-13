@@ -3873,6 +3873,11 @@ function freeradius_motp_resync() {
 
 	$varsettings = $config['installedpackages']['freeradiussettings']['config'][0];
 	
+	$varsettingsmotptimespan = ($varsettings['varsettingsmotptimespan']?$varsettings['varsettingsmotptimespan']:'2');
+	$varsettingsmotptimespanbeforeafter = $varsettingsmotptimespan + $varsettingsmotptimespan;
+	$varsettingsmotpdeleteoldpasswords = $varsettingsmotptimespanbeforeafter + 1;
+	$varsettingsmotppasswordattempts = ($varsettings['varsettingsmotppasswordattempts']?$varsettings['varsettingsmotppasswordattempts']:'5');
+	
 	// check if disabled then we delete bash und otpverify.sh script
 	if ($varsettings['varsettingsmotpenable'] == '') {
 		if (file_exists("/usr/local/bin/otpverify.sh")) {
@@ -3937,22 +3942,22 @@ PATH=\$PATH:/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin
 # ensure aliases are expanded by bash
 shopt -s expand_aliases
 
-if [ -e "`which md5 2>/dev/null`" ]
-then
-	alias checksum=md5
-	have_md5="true"
-fi
-if [ -e "`which md5sum 2>/dev/null`" ]
-then
-	alias checksum=md5sum
-	have_md5="true"
-fi
-
-if [ \$have_md5 != "true" ]
-then
-	echo "No md5 or md5sum available on server!"
-	exit 16
-fi
+#if [ -e "`which md5 2>/dev/null`" ]
+#then
+#	alias checksum=md5
+#	have_md5="true"
+#fi
+#if [ -e "`which md5sum 2>/dev/null`" ]
+#then
+#	alias checksum=md5sum
+#	have_md5="true"
+#fi
+#
+#if [ \$have_md5 != "true" ]
+#then
+#	echo "No md5 or md5sum available on server!"
+#	exit 16
+#fi
 
 function chop
 {
@@ -3982,30 +3987,30 @@ OFFSET=`echo -n "\$5" | sed 's/[^0-9]/0/g' `
 EPOCHTIME=`date +%s` ; EPOCHTIME=`chop \$EPOCHTIME`
 
 # delete old logins
-find /var/log/motp/cache -type f -cmin +5 | xargs rm 2>/dev/null
+find /var/log/motp/cache -type f -cmin +$varsettingsmotpdeleteoldpasswords | xargs rm 2>/dev/null
 
 if [ -e "/var/log/motp/cache/\$PASSWD" ]; then
 	echo "FAIL"
-	logger -f /var/log/system.log "FreeRADIUS: Authentication failed! Mobile-One-Time-Password incorrect or expired!"
+	logger -f /var/log/system.log "FreeRADIUS: Authentication failed! Mobile-One-Time-Password \$PASSWD is already used!"
 	exit 15
 fi
 
 # account locked?
-if [ "`cat /var/log/motp/users/\$USERNAME 2>/dev/null`" == "8" ]; then
+if [ "`cat /var/log/motp/users/\$USERNAME 2>/dev/null`" == "$varsettingsmotppasswordattempts" ]; then
 	echo "FAIL"
 	logger -f /var/log/system.log "FreeRADIUS: Authentication failed! Too many wrong password attempts. User is locked! To unlock delete /var/log/motp/users/\$USERNAME"
 	exit 13
 fi
 
 I=0
-EPOCHTIME=`expr \$EPOCHTIME - 2`
+EPOCHTIME=`expr \$EPOCHTIME - $varsettingsmotptimespan`
 EPOCHTIME=`expr \$EPOCHTIME + \$OFFSET`
-while [ \$I -lt 4 ] ; do # 20 seconds before and after
+while [ \$I -lt $varsettingsmotptimespanbeforeafter ] ; do # `$varsettingsmotptimespan * 10` seconds before and after
 	OTP=`printf \$EPOCHTIME\$SECRET\$PIN|checksum|cut -b 1-6`
 	if [ "\$OTP" = "\$PASSWD" ] ; then
 		touch /var/log/motp/cache/\$OTP || { echo "FAIL! Need write-access to /var/log/motp";logger -f /var/log/system.log "FreeRADIUS: Mobile-One-Time-Password - need write-access to /var/log/motp/cache"; exit 17; }
 		echo "ACCEPT"
-		logger -f /var/log/system.log "FreeRADIUS: Authentication success! Mobile-One-Time-Password is correct!"
+		logger -f /var/log/system.log "FreeRADIUS: Authentication success! Mobile-One-Time-Password \$PASSWD for user \$USERNAME is correct!"
 		rm "/var/log/motp/users/\$USERNAME" 2>/dev/null
 		exit 0
 	fi
@@ -4020,7 +4025,8 @@ if [ "\$NUMFAILS" = "" ]; then
 fi
 NUMFAILS=`expr \$NUMFAILS + 1`
 echo \$NUMFAILS > "/var/log/motp/users/\$USERNAME"
-logger -f /var/log/system.log "FreeRADIUS: Authentication failed! Mobile-One-Time-Password incorrect or expired!"
+NUMFAILSLEFT=`expr $varsettingsmotppasswordattempts - \$NUMFAILS`
+logger -f /var/log/system.log "FreeRADIUS: Authentication failed! Mobile-One-Time-Password incorrect. \$NUMFAILSLEFT attempts left. "
 exit 11
 
 
