@@ -1310,19 +1310,22 @@
 	<package>
 		<name>NRPE v2</name>
 		<website>http://wiki.nagios.org/index.php/Howtos:nrpe_nsca</website>
-		<descr>NRPE is an addon for Nagios that allows you to execute plugins on remote Linux/Unix hosts. This is useful if you need to monitor local resources/attributes like disk usage, CPU load, memory usage, etc. on a remote host.</descr>
+		<descr>NRPE is an addon for Nagios that allows you to execute plugins on remote Linux/Unix hosts. This is useful if you need to monitor local resources/attributes like disk usage, CPU load, memory usage, etc. on a remote host. This version also includes scripts for monitoring various aspects of a PFSense system</descr>
 		<category>Services</category>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
 		<depends_on_package>nrpe-2.12_3.tbz</depends_on_package>
+		<depends_on_package>sudo.tbz</depends_on_package>
 		<depends_on_package>nagios-plugins-1.4.15_1,1.tbz</depends_on_package>
+		<depends_on_package>nagios-pfsense-specific-0.1.tbz</depends_on_package>
 		<depends_on_package_pbi>
 			nrpe-2.12_3-i386.pbi
 		</depends_on_package_pbi>
 		<build_port_path>/usr/ports/net-mgmt/nrpe2</build_port_path>
 		<build_port_path>/usr/ports/net-mgmt/nagios-plugins</build_port_path>
 		<build_options>WITH_SSL=true WITHOUT_ARGS=true</build_options>
+		<build_port_path>/usr/ports/security/sudo</build_port_path>
 		<config_file>http://www.pfsense.com/packages/config/nrpe2/nrpe2.xml</config_file>
-		<version>2.12_3 v2.1</version>
+		<version>2.12_3 v2</version>
 		<status>Beta</status>
 		<required_version>1.2</required_version>
 		<maintainer>erik@erikkristensen.com</maintainer>
