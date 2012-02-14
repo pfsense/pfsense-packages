@@ -3877,6 +3877,8 @@ function freeradius_motp_resync() {
 	$varsettingsmotptimespanbeforeafter = $varsettingsmotptimespan + $varsettingsmotptimespan;
 	$varsettingsmotpdeleteoldpasswords = $varsettingsmotptimespanbeforeafter + 1;
 	$varsettingsmotppasswordattempts = ($varsettings['varsettingsmotppasswordattempts']?$varsettings['varsettingsmotppasswordattempts']:'5');
+	$varsettingsmotpchecksumtype = ($varsettings['varsettingsmotpchecksumtype']?$varsettings['varsettingsmotpchecksumtype']:'md5');
+	$varsettingsmotptokenlength = ($varsettings['varsettingsmotptokenlength']?$varsettings['varsettingsmotptokenlength']:'1-6');
 	
 	// check if disabled then we delete bash und otpverify.sh script
 	if ($varsettings['varsettingsmotpenable'] == '') {
@@ -3936,28 +3938,11 @@ function freeradius_motp_resync() {
 
 PATH=\$PATH:/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin
 
-    alias checksum=md5
+    alias checksum=$varsettingsmotpchecksumtype
     have_md5="true"
 
 # ensure aliases are expanded by bash
 shopt -s expand_aliases
-
-#if [ -e "`which md5 2>/dev/null`" ]
-#then
-#	alias checksum=md5
-#	have_md5="true"
-#fi
-#if [ -e "`which md5sum 2>/dev/null`" ]
-#then
-#	alias checksum=md5sum
-#	have_md5="true"
-#fi
-#
-#if [ \$have_md5 != "true" ]
-#then
-#	echo "No md5 or md5sum available on server!"
-#	exit 16
-#fi
 
 function chop
 {
@@ -4006,7 +3991,7 @@ I=0
 EPOCHTIME=`expr \$EPOCHTIME - $varsettingsmotptimespan`
 EPOCHTIME=`expr \$EPOCHTIME + \$OFFSET`
 while [ \$I -lt $varsettingsmotptimespanbeforeafter ] ; do # `$varsettingsmotptimespan * 10` seconds before and after
-	OTP=`printf \$EPOCHTIME\$SECRET\$PIN|checksum|cut -b 1-6`
+	OTP=`printf \$EPOCHTIME\$SECRET\$PIN|checksum|cut -b $varsettingsmotptokenlength`
 	if [ "\$OTP" = "\$PASSWD" ] ; then
 		touch /var/log/motp/cache/\$OTP || { echo "FAIL! Need write-access to /var/log/motp";logger -f /var/log/system.log "FreeRADIUS: Mobile-One-Time-Password - need write-access to /var/log/motp/cache"; exit 17; }
 		echo "ACCEPT"
