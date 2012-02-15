@@ -104,7 +104,7 @@ function avahi_write_config() {
 [server]
 host-name={$hostname}
 domain-name={$domain}
-browse-domains={$browsedomains}
+browse-domains="{$browsedomains}"
 deny-interfaces={$denyinterfaces}
 use-ipv4=yes
 use-ipv6=no
