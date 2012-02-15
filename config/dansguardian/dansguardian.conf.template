@@ -680,7 +680,7 @@ softrestart = {$softrestart}
 
 #SSL certificate checking path
 #Path to CA certificates used to validate the certificates of https sites.
-#sslcertificatepath = '/etc/ssl/certs/'
+sslcertificatepath = '/etc/ssl/certs/'
 
 #SSL man in the middle
 #CA certificate path
@@ -703,11 +703,12 @@ softrestart = {$softrestart}
 #The location where generated certificates will be saved for future use.
 #(must be writable by the dg user)
 #generatedcertpath = '/home/stephen/dginstall/generatedcerts/'
-
+{$generatedcertpath}
 #Generated link path = ''
 #The location where symlinks to certificates will be created.
 #(must be writable by the dg user)
 #generatedlinkpath = '/home/stephen/dginstall/generatedlinks/'
-	
+{$generatedlinkpath}
+
 EOF;
 ?>

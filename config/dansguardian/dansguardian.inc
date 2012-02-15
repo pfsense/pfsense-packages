@@ -214,6 +214,32 @@ function sync_package_dansguardian() {
 		
 	$load_samples=0;
 	
+	#ssl men-in-the-middle feature
+	$dirs=array($dansguardian_dir."/ssl",$dansguardian_dir."/ssl/generatedcerts",$dansguardian_dir."/ssl/generatedlinks");
+	foreach ($dirs as $dir)
+		if (!is_dir($dir))
+			mkdir ($dir,0700,true);
+	$ca_cert = lookup_ca($dansguardian_config["ca"][0]);
+	if ($ca_cert != false) {
+		if(base64_decode($ca_cert['prv'])) {
+			file_put_contents($dansguardian_dir. "/ssl/ssl_ca_key.pem",base64_decode($ca_cert['prv']));
+			$ca_pk = "caprivatekeypath = ".$dansguardian_dir . "/ssl/ssl_ca_key.pem";
+			}
+		if(base64_decode($ca_cert['crt'])) {
+			file_put_contents($dansguardian_dir . "/ssl/ssl_ca_cert.pem",base64_decode($ca_cert['crt']));
+			$ca_pem = "cacertificatepath = ".$dansguardian_dir . "/ssl/ssl_ca_cert.pem";
+		$generatedcertpath= "generatedcertpath = ".$dansguardian_dir . "/ssl/generatedcerts";
+		$generatedlinkpath= "generatedlinkpath = ".$dansguardian_dir . "/ssl/generatedlinks";
+			}
+		$svr_cert = lookup_cert($dansguardian_config["cert"][0]);
+		if ($svr_cert != false) {
+			if(base64_decode($svr_cert['prv'])) {
+				file_put_contents($dansguardian_dir . "/ssl/ssl_server_key.pem",base64_decode($svr_cert['prv'])."\n".base64_decode($svr_cert['crt']));
+				$cert_key = "certprivatekeypath = ".$dansguardian_dir . '/ssl/ssl_server_key.pem';
+			}
+		}
+	}
+	
 	#contentscanners preg_replace patterns
 	$match[0]="/(conf)/";
 	$match[1]="/(\/usr.local)/";
@@ -626,6 +652,7 @@ function sync_package_dansguardian() {
 		$dansguardian_groups['embeddedurlweight']=($dansguardian_groups['embeddedurlweight']?$dansguardian_groups['embeddedurlweight']:"0");
 		$dansguardian_groups['bypass']=($dansguardian_groups['bypass']?$dansguardian_groups['bypass']:"0");
 		$dansguardian_groups['infectionbypass']=($dansguardian_groups['infectionbypass']?$dansguardian_groups['infectionbypass']:"0");
+		$dansguardian_groups['mitmkey']=($dansguardian_groups['mitmkey']?$dansguardian_groups['mitmkey']:"dgs3dD3da");
 		foreach ($groups as $group)
 			$dansguardian_groups[$group]=(preg_match("/$group/",$dansguardian_groups['group_options'])?"on":"off");
 		include("/usr/local/pkg/dansguardianfx.conf.template");

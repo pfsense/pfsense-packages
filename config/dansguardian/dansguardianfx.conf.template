@@ -376,6 +376,7 @@ sslcertcheck = {$dansguardian_groups['sslcertcheck']}
 # Forge ssl certificates for all sites, decrypt the data then re encrypt it
 # using a different private key. Used to filter ssl sites
 sslmitm = {$dansguardian_groups['sslmitm']}
+mitmkey = '{$dansguardian_groups['mitmkey']}'
 
 EOF;
 
