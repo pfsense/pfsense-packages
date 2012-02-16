@@ -56,14 +56,17 @@ function sync_relay_recipients($via_cron="cron"){
 		$ad_export="/usr/local/etc/postfix/adexport.pl";
 		$postfix_enabled=$config['installedpackages']['postfix']['config'][0]['enable_postfix'];
 		if (is_array($config['installedpackages']['postfixrecipients']['config'])) {
-			$postfix_recipients_config=$config['installedpackages']['postfixrecipients']['config'][0]; 
-			if($postfix_recipients_config['location'] && file_exists($postfix_recipients_config['location']))
-				$relay_recipients .= file_get_contents($postfix_recipients_config['location']);
+			$relay_ldap_recipients="";
+			$postfix_recipients_config=$config['installedpackages']['postfixrecipients']['config'][0];
+			 if($postfix_recipients_config['enable_url'] && is_URL($postfix_recipients_config['custom_url'])){
+				print "extracting from ".$postfix_recipients_config['custom_url']."...";
+				$relay_recipients .= file_get_contents($postfix_recipients_config['custom_url']);
+				print "(". count(file($postfix_recipients_config['custom_url'])).")\n";
+			}
 			if($postfix_recipients_config['custom_recipients'])
 				$relay_recipients .= px_text_area_decode($postfix_recipients_config['custom_recipients']);
 			if($postfix_recipients_config['enable_ldap']){
 				#validate cront job
-				$relay_ldap_recipients="";
 				if ($via_cron == "gui"){
 					#running via pfsense gui, not time for ldap fetch.
 					$ldap_recipients='/usr/local/etc/postfix/relay_ldap_recipients.txt';
