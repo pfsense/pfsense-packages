@@ -133,7 +133,7 @@ function freeradius_install_command() {
 	freeradius_modulesmotp_resync();
 
 	// Here we create the modules and scripts for the datacounter
-	freeradius_modules_resync();
+	freeradius_modulesdatacounter_resync();
 	freeradius_datacounter_acct_resync();
 	freeradius_datacounter_auth_resync();
 
