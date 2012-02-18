@@ -296,7 +296,7 @@
 		<field>
 			<fielddescr>Amount of Time</fielddescr>
 			<fieldname>varmacsamountoftime</fieldname>			
-			<description><![CDATA[Enter the amount of time for this MAC address in seconds.]]></description>
+			<description><![CDATA[Enter the amount of time for this MAC address in minutes.]]></description>
 			<type>input</type>
 		</field>
 		<field>
@@ -317,53 +317,34 @@
 			<type>listtopic</type>
 		</field>
 		<field>
-			<fielddescr>Amount of Upload Traffic</fielddescr>
-			<fieldname>varmacsamountofbytesinput</fieldname>			
-			<description><![CDATA[Enter the amount of upload traffic for this MAC address in <b>bytes</b>. There is a bug in CaptivePortal which counts the traffic six times faster than in reality. So if a MAC address should have 1MB of traffic you must calculate 6+1MB and enter here: 6000000.]]></description>
+			<fielddescr>Amount of Download and Upload Traffic</fielddescr>
+			<fieldname>varmacsmaxtotaloctets</fieldname>			
+			<description><![CDATA[Enter the amount of download and upload traffic (summarized) for this MAC in <b>MegaByte (MB)</b>. There is a bug in CaptivePortal which counts the traffic six times faster than in reality. So if a user should have 1MB of traffic you must calculate 6*1MB.]]></description>
 			<type>input</type>
 		</field>
 		<field>
 			<fielddescr>Time Period</fielddescr>
-			<fieldname>varmacspointoftimebytesinput</fieldname>			
-			<description><![CDATA[Select the time period for the amount of upload traffic.]]></description>
+			<fieldname>varmacsmaxtotaloctetstimerange</fieldname>			
+			<description><![CDATA[Select the time period for the amount of download and upload traffic.]]></description>
 			<type>select</type>
 			<default_value>daily</default_value>
 				<options>
-					<option><name>Daily</name><value>Daily</value></option>
-					<option><name>Weekly</name><value>Weekly</value></option>
-					<option><name>Monthly</name><value>Monthly</value></option>
-					<option><name>Forever</name><value>Forever</value></option>
+					<option><name>Daily</name><value>daily</value></option>
+					<option><name>Weekly</name><value>weekly</value></option>
+					<option><name>Monthly</name><value>monthly</value></option>
+					<option><name>Forever</name><value>forever</value></option>
 				</options>
 		</field>
 		<field>
-			<fielddescr>Amount of Download Traffic</fielddescr>
-			<fieldname>varmacsamountofbytesoutput</fieldname>			
-			<description><![CDATA[Enter the amount of download traffic for this MAC address in <b>bytes</b>. There is a bug in CaptivePortal which counts the traffic six times faster than in reality. So if a MAC address should have 1MB of traffic you must calculate 6+1MB and enter here: 6000000.]]></description>
-			<type>input</type>
-		</field>
-		<field>
-			<fielddescr>Time Period</fielddescr>
-			<fieldname>varmacspointoftimebytesoutput</fieldname>			
-			<description><![CDATA[Select the time period for the amount of download limit.]]></description>
-			<type>select</type>
-			<default_value>daily</default_value>
-				<options>
-					<option><name>Daily</name><value>Daily</value></option>
-					<option><name>Weekly</name><value>Weekly</value></option>
-					<option><name>Monthly</name><value>Monthly</value></option>
-					<option><name>Forever</name><value>Forever</value></option>
-				</options>
-		</field>
-		<field>
-			<fielddescr>Maximum Download Bandwidth</fielddescr>
+			<fielddescr>Maximum Bandwidth Down</fielddescr>
 			<fieldname>varmacsmaxbandwidthdown</fieldname>			
-			<description><![CDATA[Enter the maximum bandwidth for download in bps (<b>bits</b> per second).]]></description>
+			<description><![CDATA[Enter the maximum bandwidth for download in <b>KiloBits</b> per second.]]></description>
 			<type>input</type>
 		</field>
 		<field>
-			<fielddescr>Maximum Upload Bandwidth</fielddescr>
+			<fielddescr>Maximum Bandwidth Up</fielddescr>
 			<fieldname>varmacsmaxbandwidthup</fieldname>			
-			<description><![CDATA[Enter the maximum bandwidth for upload in bps (<b>bits</b> per second).]]></description>
+			<description><![CDATA[Enter the maximum bandwidth for upload in <b>KiloBits</b> per second.]]></description>
 			<type>input</type>
 		</field>
 		<field>
