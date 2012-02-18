@@ -55,7 +55,8 @@ function freeradius_deinstall_command() {
 
 function freeradius_install_command() {
 	global $config;
-        conf_mount_rw();
+	conf_mount_rw();
+	/*
 	$handle = opendir(RADDB);
 	while (false != ($file = readdir($handle))) {
 		if (false != ($pos = strpos($file, '.sample'))) {
@@ -64,31 +65,34 @@ function freeradius_install_command() {
 				unlink(RADDB . "/$file");
 		}
 	}
-	
 	closedir($handle);
-	
+	*/
+
+	// We create here different folders for different counters.
 	exec("chown -R root:wheel /usr/local/etc/raddb");
+	exec("mkdir /usr/local/etc/raddb/scripts");
 	exec("chown -R root:wheel /usr/local/lib/freeradius-2.1.12");
 	exec("touch /var/log/radutmp && touch /var/log/radwtmp");
+	exec("mkdir /var/log/radacct/datacounter/daily" && "mkdir /var/log/radacct/datacounter/weekly" && "mkdir /var/log/radacct/datacounter/monthly" && "mkdir /var/log/radacct/datacounter/forever");
+	exec("mkdir /var/log/radacct/timecounter");
 	exec("chown -R root:wheel /var/log");
-		
-	
+
 	// creating a backup file of the original policy.conf no matter if user checked this or not
 	if (!file_exists("/usr/local/etc/raddb/policy.conf.backup")) {
 		log_error("FreeRADIUS: Creating backup of the original file to /usr/local/etc/raddb/policy.conf.backup");
 		copy("/usr/local/etc/raddb/policy.conf", "/usr/local/etc/raddb/policy.conf.backup");
 	}
-	
+
 	// creating a backup file of the original /modules/files no matter if user checked this or not
 	if (!file_exists("/usr/local/etc/raddb/files.backup")) {
 		log_error("FreeRADIUS: Creating backup of the original file to /usr/local/etc/raddb/files.backup");
 		copy("/usr/local/etc/raddb/modules/files", "/usr/local/etc/raddb/files.backup");
 	}
-	
+
 	// Disable virtual-server we do not need by default
-	unlink("/usr/local/etc/raddb/sites-enabled/control-socket");
-	unlink("/usr/local/etc/raddb/sites-enabled/inner-tunnel");
-	
+	if (file_exists("/usr/local/etc/raddb/sites-enabled/control-socket")) { unlink("/usr/local/etc/raddb/sites-enabled/control-socket"); }
+	if (file_exists("/usr/local/etc/raddb/sites-enabled/inner-tunnel")) { unlink("/usr/local/etc/raddb/sites-enabled/inner-tunnel"); }
+
 	// We need some additional files in /usr/local/lib for the LDAP module. We fetch these files dependent on the architecture.
 	// For i386 systems
 	if (exec("uname -m") == "i386") {
@@ -120,30 +124,35 @@ function freeradius_install_command() {
 		exec("chmod 0755 /usr/local/lib/ldd/libkrb5.so.10");
 		exec("chmod 0755 /usr/local/lib/libroken.so.10");
 	}
-	
+
 	// We run this here just to suppress some warnings on syslog if file doesn't exist
 	freeradius_authorizedmacs_resync();
-	
-	// These functions create files which we only need to do one time after installing freeradius2 package
-		// These two functions create the module and the dictionary entry for Mobile-One-Time-Password
-		freeradius_dictionary_resync();
-		freeradius_modulesmotp_resync();
-	freeradius_modulescounter_resync();
+
+	// These two functions create the module and the dictionary entry for Mobile-One-Time-Password
+	freeradius_dictionary_resync();
+	freeradius_modulesmotp_resync();
+
+	// Here we create the modules and scripts for the datacounter
+	freeradius_modules_resync();
+	freeradius_datacounter_acct_resync();
+	freeradius_datacounter_auth_resync();
+
+	// Some initial module configuration
 	freeradius_modulesmschap_resync();
 	freeradius_modulesrealm_resync();
-	
+	freeradius_modulescounter_resync();
+
 	// Initialize some config files - the functions below call other functions
 	freeradius_sqlconf_resync();
 	freeradius_eapconf_resync();
 	freeradius_clients_resync();
-	
+
 	$rcfile = array();
 	$rcfile['file'] = 'radiusd.sh';
 	$rcfile['start'] = '/usr/local/etc/rc.d/radiusd onestart';
 	$rcfile['stop'] = '/usr/local/etc/rc.d/radiusd onestop';
-        conf_mount_rw();
 	write_rcfile($rcfile);
-        conf_mount_ro();
+		conf_mount_ro();
 	start_service("radiusd");
 }
 
@@ -358,14 +367,6 @@ instantiate {
 	weekly
 	monthly
 	forever
-	maxdailyupload
-	maxdailydownload
-	maxweeklyupload
-	maxweeklydownload
-	maxmonthlyupload
-	maxmonthlydownload
-	maxupload
-	maxdownload
 	expiration
 	logintime
 	### Dis-/Enable sql instatiate
@@ -373,8 +374,6 @@ instantiate {
 }
 \$INCLUDE policy.conf
 \$INCLUDE sites-enabled/
-
-
 EOD;
 
 	conf_mount_rw();
@@ -421,14 +420,22 @@ if (is_array($arrusers) && !empty($arrusers)) {
 	$varuserssessiontimeout = $users['varuserssessiontimeout'];
 	$varuserslogintime = $users['varuserslogintime'];
 	$varusersvlanid = $users['varusersvlanid'];
+	
+	// GUI uses minutes but RADIUS needs seconds so we do a multiplication
 	$varusersamountoftime = ($users['varusersamountoftime']?$users['varusersamountoftime']:'');
+	$varusersamountoftime = $varusersamountoftime * 60;
 	$varuserspointoftime = $users['varuserspointoftime'];
-	$varusersamountofbytesinput = ($users['varusersamountofbytesinput']?$users['varusersamountofbytesinput']:'');
-	$varuserspointoftimebytesinput = $users['varuserspointoftimebytesinput'];
-	$varusersamountofbytesoutput = ($users['varusersamountofbytesoutput']?$users['varusersamountofbytesoutput']:'');
-	$varuserspointoftimebytesoutput = $users['varuserspointoftimebytesoutput'];
+	
+	// GUI uses MB but RADIUS needs Bytes so we do a multiplication
+	$varusersmaxtotaloctets = ($users['varusersmaxtotaloctets']?$users['varusersmaxtotaloctets']:'');
+	$varusersmaxtotaloctets = $varusersmaxtotaloctets * 1024 * 1024;
+	$varusersmaxtotaloctetstimerange = $users['varusersmaxtotaloctetstimerange'];
+	
+	// GUI uses KiloBit but RADIUS needs Bits so we do a multiplication
 	$varusersmaxbandwidthup = ($users['varusersmaxbandwidthup']?$users['varusersmaxbandwidthup']:'');
+	$varusersmaxbandwidthup = $varusersmaxbandwidthup * 1024;
 	$varusersmaxbandwidthdown = ($users['varusersmaxbandwidthdown']?$users['varusersmaxbandwidthdown']:'');
+	$varusersmaxbandwidthdown = $varusersmaxbandwidthdown * 1024;
 	
 	// Clear variables for next user foreach additional options TOP
 	$varuserstopadditionaloptions = '';
@@ -499,12 +506,6 @@ if (is_array($arrusers) && !empty($arrusers)) {
 	if ($varusersamountoftime != '') {
 	$varuserscheckitem .= ", Max-" . "$varuserspointoftime" . "-Session := " . "$varusersamountoftime";
 	}
-	if ($varusersamountofbytesinput != '') {
-	$varuserscheckitem .= ", Max-" . "$varuserspointoftimebytesinput" . "-Input := " . "$varusersamountofbytesinput";
-	}
-	if ($varusersamountofbytesoutput != '') {
-	$varuserscheckitem .= ", Max-" . "$varuserspointoftimebytesoutput" . "-Output := " . "$varusersamountofbytesoutput";
-	}	
 	if ($varusersadditionaloptionscheckitems != '') {
 	$varuserscheckitem .= ", $varusersadditionaloptionscheckitems";
 	}
@@ -549,6 +550,21 @@ if (is_array($arrusers) && !empty($arrusers)) {
 	if ($varuserswisprredirectionurl != '') {
 		if ($varusersreplyitem != '') { $varusersreplyitem .=","; }
 		$varusersreplyitem .= "\n\tWISPr-Redirection-URL := $varuserswisprredirectionurl";
+	}
+	// If an octet limit is set we create the files for the limit and the counter. Further we call an exec script which checks if the limit is reached or not
+	if ($varusersmaxtotaloctets != '') {
+		if ($varusersreplyitem != '') { $varusersreplyitem .=","; }
+		//create exec script
+		$varusersreplyitem .= "\n\tExec-Program-Wait = " . '"/bin/sh /usr/local/etc/raddb/scripts/datacounter_auth.sh ' . "$varusersusername $varusersmaxtotaloctetstimerange" . '"';
+		// create limit file - will be always overwritten so we can increase limit from GUI
+		exec("`echo $varusersmaxtotaloctets > /var/log/radacct/datacounter/$varusersmaxtotaloctetstimerange/max-octets-$varusersusername`");
+		// if used-octets file exist we do NOT overwrite this file!!!
+		if (!file_exists("/var/log/radacct/datacounter/$varusersmaxtotaloctetstimerange/used-octets-$varusersusername")) { exec("echo 0 > /var/log/radacct/datacounter/$varusersmaxtotaloctetstimerange/used-octets-$varusersusername"); }
+	}
+	// If an octet limit is NOT set we delete the files for the limit and the counter.
+	else {
+		if (file_exists("/var/log/radacct/datacounter/$varusersmaxtotaloctetstimerange/max-octets-$varusersusername")) { unlink("/var/log/radacct/datacounter/$varusersmaxtotaloctetstimerange/max-octets-$varusersusername"); }
+		if (file_exists("/var/log/radacct/datacounter/$varusersmaxtotaloctetstimerange/used-octets-$varusersusername")) { unlink("/var/log/radacct/datacounter/$varusersmaxtotaloctetstimerange/used-octets-$varusersusername"); }
 	}
 	if ($varusersadditionaloptionsreplyitems != '') {
 		if ($varusersreplyitem != '') { $varusersreplyitem .=","; }
@@ -601,14 +617,22 @@ if (is_array($arrmacs) && !empty($arrmacs)) {
 	$varmacssessiontimeout = $macs['varmacssessiontimeout'];
 	$varmacslogintime = $macs['varmacslogintime'];
 	$varmacsvlanid = $macs['varmacsvlanid'];
+	
+	// GUI uses minutes but RADIUS needs seconds so we do a multiplication
 	$varmacsamountoftime = ($macs['varmacsamountoftime']?$macs['varmacsamountoftime']:'');
+	$varmacsamountoftime = $varmacsamountoftime * 60;
 	$varmacspointoftime = $macs['varmacspointoftime'];
-	$varmacsamountofbytesinput = ($macs['varmacsamountofbytesinput']?$macs['varmacsamountofbytesinput']:'');
-	$varmacspointoftimebytesinput = $macs['varmacspointoftimebytesinput'];
-	$varmacsamountofbytesoutput = ($macs['varmacsamountofbytesoutput']?$macs['varmacsamountofbytesoutput']:'');
-	$varmacspointoftimebytesoutput = $macs['varmacspointoftimebytesoutput'];
+	
+	// GUI uses MB but RADIUS needs Bytes so we do a multiplication
+	$varmacsmaxtotaloctets = ($macs['varmacsmaxtotaloctets']?$macs['varmacsmaxtotaloctets']:'');
+	$varmacsmaxtotaloctets = $varmacsmaxtotaloctets * 1024 * 1024;
+	$varmacsmaxtotaloctetstimerange = $macs['varmacsmaxtotaloctetstimerange'];
+	
+	// GUI uses KiloBit but RADIUS needs Bits so we do a multiplication
 	$varmacsmaxbandwidthup = ($macs['varmacsmaxbandwidthup']?$macs['varmacsmaxbandwidthup']:'');
+	$varmacsmaxbandwidthup = $varmacsmaxbandwidthup * 1024;
 	$varmacsmaxbandwidthdown = ($macs['varmacsmaxbandwidthdown']?$macs['varmacsmaxbandwidthdown']:'');
+	$varmacsmaxbandwidthdown = $varmacsmaxbandwidthdown * 1024;
 	
 	// Clear variables for next mac foreach additional options TOP
 	$varmacstopadditionaloptions = '';
@@ -671,12 +695,6 @@ if (is_array($arrmacs) && !empty($arrmacs)) {
 	if ($varmacsamountoftime != '') {
 	$varmacscheckitem .= ", Max-" . "$varmacspointoftime" . "-Session := " . "$varmacsamountoftime";
 	}
-	if ($varmacsamountofbytesinput != '') {
-	$varmacscheckitem .= ", Max-" . "$varmacspointoftimebytesinput" . "-Input := " . "$varmacsamountofbytesinput";
-	}
-	if ($varmacsamountofbytesoutput != '') {
-	$varmacscheckitem .= ", Max-" . "$varmacspointoftimebytesoutput" . "-Output := " . "$varmacsamountofbytesoutput";
-	}	
 	if ($varmacsadditionaloptionscheckitems != '') {
 	$varmacscheckitem .= ", $varmacsadditionaloptionscheckitems";
 	}
@@ -710,10 +728,25 @@ if (is_array($arrmacs) && !empty($arrmacs)) {
 		if ($varmacsreplyitem != '') { $varmacsreplyitem .=","; }
 		$varmacsreplyitem .= "\n\tWISPr-Bandwidth-Max-Down := $varmacsmaxbandwidthdown";
 	}
-	if ($varmacsswisprredirectionurl != '') {
+	if ($varmacswisprredirectionurl != '') {
 		if ($varmacsreplyitem != '') { $varmacsreplyitem .=","; }
 		$varmacsreplyitem .= "\n\tWISPr-Redirection-URL := $varmacsswisprredirectionurl";
-	}	
+	}
+	// If an octet limit is set we create the files for the limit and the counter. Further we call an exec script which checks if the limit is reached or not
+	if ($varmacsmaxtotaloctets != '') {
+		if ($varmacsreplyitem != '') { $varmacsreplyitem .=","; }
+		//create exec script
+		$varmacsreplyitem .= "\n\tExec-Program-Wait = " . '"/bin/sh /usr/local/etc/raddb/scripts/datacounter_auth.sh ' . "$varmacsaddress $varmacsmaxtotaloctetstimerange" . '"';
+		// create limit file - will be always overwritten so we can increase limit from GUI
+		exec("`echo $varmacsmaxtotaloctets > /var/log/radacct/datacounter/$varmacsmaxtotaloctetstimerange/max-octets-$varmacsaddress`");
+		// if used-octets file exist we do NOT overwrite this file!!!
+		if (!file_exists("/var/log/radacct/datacounter/$varmacsmaxtotaloctetstimerange/used-octets-$varmacsaddress")) { exec("echo 0 > /var/log/radacct/datacounter/$varmacsmaxtotaloctetstimerange/used-octets-$varmacsaddress"); }
+	}
+	// If an octet limit is NOT set we delete the files for the limit and the counter.
+	else {
+		if (file_exists("/var/log/radacct/datacounter/$varmacsmaxtotaloctetstimerange/max-octets-$varmacsaddress")) { unlink("/var/log/radacct/datacounter/$varmacsmaxtotaloctetstimerange/max-octets-$varmacsaddress"); }
+		if (file_exists("/var/log/radacct/datacounter/$varmacsmaxtotaloctetstimerange/used-octets-$varmacsaddress")) { unlink("/var/log/radacct/datacounter/$varmacsmaxtotaloctetstimerange/used-octets-$varmacsaddress"); }
+	}
 	if ($varmacsadditionaloptionsreplyitems != '') {
 		if ($varmacsreplyitem != '') { $varmacsreplyitem .=","; }
 		$varmacsreplyitem .= "\n\t$varmacsadditionaloptionsreplyitems";
@@ -740,8 +773,6 @@ EOD;
 	freeradius_sync_on_changes();
 	restart_service('radiusd');
 }
-
-
 
 function freeradius_clients_resync() {
 	global $config;
@@ -965,7 +996,6 @@ else {
 }
 
 	$conf .= <<<EOD
-
 	### EAP
 	eap {
 		default_eap_type = $vareapconfdefaulteaptype
@@ -1031,8 +1061,6 @@ else {
 		#	send_error = no
 		}	
 	}
-
-
 EOD;
 
 	$filename = RADDB . '/eap.conf';
@@ -1067,8 +1095,6 @@ function freeradius_get_server_certs() {
 	}
 	return $cert_arr;
 }
-
-
 
 function freeradius_sqlconf_resync() {
 	global $config;
@@ -1190,7 +1216,6 @@ sql sql2 {
 	nas_table = "$varsqlconf2nastable"
 	\$INCLUDE sql/\${database}/dialup.conf
 }
-
 EOD;
 
 	$filename = RADDB . '/sql.conf';
@@ -1208,8 +1233,7 @@ EOD;
 function freeradius_serverdefault_resync() {
 	global $config;
 	$conf = '';
-	
-	
+		
 	// Get Variables from freeradiusmodulesldap.xml
 	$arrmodulesldap = $config['installedpackages']['freeradiusmodulesldap']['config'][0];
 	// failover/loadbalancing mode
@@ -1217,42 +1241,40 @@ function freeradius_serverdefault_resync() {
 	
 	// If unchecked then disable authorize ldap2
 	if (!$arrmodulesldap['varmodulesldap2enableauthorize']) {
-	$varmodulesldap2enableauthorize = '### ldap2 disabled ###';
+		$varmodulesldap2enableauthorize = '### ldap2 disabled ###';
 	}
 	else {
-	$varmodulesldap2enableauthorize = 'ldap2';
+		$varmodulesldap2enableauthorize = 'ldap2';
 	}
 	
 	// If unchecked then disable authorize ldap1
 	if (!$arrmodulesldap['varmodulesldapenableauthorize']) {
-	$varmodulesldapenableauthorize = '### ldap ###';
+		$varmodulesldapenableauthorize = '### ldap ###';
 	}
 	else {
-	$varmodulesldapenableauthorize = '';
-	$varmodulesldapenableauthorize .= "$varmodulesldap2failover {";
-	$varmodulesldapenableauthorize .= "\n\t\tldap";
+		$varmodulesldapenableauthorize = '';
+		$varmodulesldapenableauthorize .= "$varmodulesldap2failover {";
+		$varmodulesldapenableauthorize .= "\n\t\tldap";
 		// this line adds ldap2 when activated
-	$varmodulesldapenableauthorize .= "\n\t\t$varmodulesldap2enableauthorize";
-	$varmodulesldapenableauthorize .= "\n\t}";
+		$varmodulesldapenableauthorize .= "\n\t\t$varmodulesldap2enableauthorize";
+		$varmodulesldapenableauthorize .= "\n\t}";
 	}
 	
 	// If unchecked then disable authenticate for ldap1
 	if (!$arrmodulesldap['varmodulesldap2enableauthenticate']) {
-	$varmodulesldap2enableauthenticate = "### ldap2 disabled ###";
+		$varmodulesldap2enableauthenticate = "### ldap2 disabled ###";
 	}
 	else {
-	$varmodulesldap2enableauthenticate = "ldap2";
+		$varmodulesldap2enableauthenticate = "ldap2";
 	}
 	
 	// If unchecked then disable authenticate ldap2
 	if (!$arrmodulesldap['varmodulesldapenableauthenticate']) {
-	$varmodulesldapenableauthenticate = "#Auth-Type LDAP {" . "\n\t\t\t#ldap" . "\n\t\t\t$varmodulesldap2enableauthenticate" . "\n\t#}";
+		$varmodulesldapenableauthenticate = "#Auth-Type LDAP {" . "\n\t\t\t#ldap" . "\n\t\t\t$varmodulesldap2enableauthenticate" . "\n\t#}";
 	}
 	else {
-	$varmodulesldapenableauthenticate = "Auth-Type LDAP {" . "\n\t\t\tldap" . "\n\t\t\t$varmodulesldap2enableauthenticate" . "\n\t}";
+		$varmodulesldapenableauthenticate = "Auth-Type LDAP {" . "\n\t\t\tldap" . "\n\t\t\t$varmodulesldap2enableauthenticate" . "\n\t}";
 	}
-	
-
 	
 	// Get Variables from freeradiussqlconf.xml for DATABASE 1
 	$sqlconf = $config['installedpackages']['freeradiussqlconf']['config'][0];
@@ -1373,7 +1395,6 @@ function freeradius_serverdefault_resync() {
 	}
 	
 	$conf .= <<<EOD
-
 ######################################################################
 #
 #	As of 2.0.0, FreeRADIUS supports virtual hosts using the
@@ -1577,14 +1598,7 @@ authorize {
 	weekly
 	monthly
 	forever
-	maxdailyupload
-	maxdailydownload
-	maxweeklyupload
-	maxweeklydownload
-	maxmonthlyupload
-	maxmonthlydownload
-	maxupload
-	maxdownload
+
 	#
 	# Use the checkval module
 	checkval
@@ -1784,14 +1798,14 @@ accounting {
 	weekly
 	monthly
 	forever
-	maxdailyupload
-	maxdailydownload
-	maxweeklyupload
-	maxweeklydownload
-	maxmonthlyupload
-	maxmonthlydownload
-	maxupload
-	maxdownload
+
+	### This makes it possible to run the datacounter_acct module only on accounting-stop and interim-updates
+	if ((request:Acct-Status-Type == Stop) || (request:Acct-Status-Type == Interim-Update)) {
+		datacounterdaily
+		datacounterweekly
+		datacountermonthly
+		datacounterforever
+	}
 	
 	#  Update the wtmp file
 	#
@@ -2050,7 +2064,6 @@ post-proxy {
 #			detail
 #	}
 }
-
 EOD;
 
 	$filename = RADDB . '/sites-available/default';
@@ -2146,7 +2159,6 @@ commonName		= "$varcertscacommonname"
 subjectKeyIdentifier	= hash
 authorityKeyIdentifier	= keyid:always,issuer:always
 basicConstraints	= CA:true
-
 EOD;
 
 	$filename = RADDB . '/certs/ca.cnf';
@@ -2232,7 +2244,6 @@ localityName		= $varcertslocalityname
 organizationName	= $varcertsorganizationname
 emailAddress		= $varcertsserveremailaddress
 commonName		= "$varcertsservercommonname"
-
 EOD;
 
 	$filename = RADDB . '/certs/server.cnf';
@@ -2318,7 +2329,6 @@ localityName		= $varcertslocalityname
 organizationName	= $varcertsorganizationname
 emailAddress		= $varcertsclientemailaddress
 commonName		= "$varcertsclientcommonname"
-
 EOD;
 
 	$filename = RADDB . '/certs/client.cnf';
@@ -2653,7 +2663,7 @@ function freeradius_modulescounter_resync() {
 #  'check-name' attribute.
 #
 counter daily {
-	filename = \${raddbdir}/db.daily
+	filename = /var/log/radacct/timecounter/db.daily
 	key = User-Name
 	count-attribute = Acct-Session-Time
 	reset = daily
@@ -2664,7 +2674,7 @@ counter daily {
 }
 
 counter weekly {
-	filename = \${raddbdir}/db.weekly
+	filename = /var/log/radacct/timecounter/db.weekly
 	key = User-Name
 	count-attribute = Acct-Session-Time
 	reset = weekly
@@ -2675,7 +2685,7 @@ counter weekly {
 }
 
 counter monthly {
-	filename = \${raddbdir}/db.monthly
+	filename = /var/log/radacct/timecounter/db.monthly
 	key = User-Name
 	count-attribute = Acct-Session-Time
 	reset = monthly
@@ -2686,7 +2696,7 @@ counter monthly {
 }
 
 counter forever {
-	filename = \${raddbdir}/db.forever
+	filename = /var/log/radacct/timecounter/db.forever
 	key = User-Name
 	count-attribute = Acct-Session-Time
 	reset = never
@@ -2695,95 +2705,6 @@ counter forever {
 	reply-name = Session-Timeout
 	cache-size = 5000
 }
-
-counter maxdailyupload {
-	filename = \${raddbdir}/db.maxdailyupload
-	key = User-Name
-	count-attribute = Acct-Input-Octets
-	reset = daily
-	counter-name = Daily-Input-Octets
-	check-name = Max-Daily-Input
-	reply-name = Acct-Input-Octets
-	cache-size = 5000
-}
-
-counter maxdailydownload {
-	filename = \${raddbdir}/db.maxdailydownload
-	key = User-Name
-	count-attribute = Acct-Output-Octets
-	reset = daily
-	counter-name = Daily-Output-Octets
-	check-name = Max-Daily-Output
-	reply-name = Acct-Output-Octets
-	cache-size = 5000
-}
-
-counter maxweeklyupload {
-	filename = \${raddbdir}/db.maxweeklyupload
-	key = User-Name
-	count-attribute = Acct-Input-Octets
-	reset = weekly
-	counter-name = Weekly-Input-Octets
-	check-name = Max-Weekly-Input
-	reply-name = Acct-Input-Octets
-	cache-size = 5000
-}
-
-counter maxweeklydownload {
-	filename = \${raddbdir}/db.maxweeklydownload
-	key = User-Name
-	count-attribute = Acct-Output-Octets
-	reset = weekly
-	counter-name = Weekly-Output-Octets
-	check-name = Max-Weekly-Output
-	reply-name = Acct-Output-Octets
-	cache-size = 5000
-}
-
-counter maxmonthlyupload {
-	filename = \${raddbdir}/db.maxmonthlyupload
-	key = User-Name
-	count-attribute = Acct-Input-Octets
-	reset = monthly
-	counter-name = Monthly-Input-Octets
-	check-name = Max-Monthly-Input
-	reply-name = Acct-Input-Octets
-	cache-size = 5000
-}
-
-counter maxmonthlydownload {
-	filename = \${raddbdir}/db.maxmonthlydownload
-	key = User-Name
-	count-attribute = Acct-Output-Octets
-	reset = monthly
-	counter-name = Monthly-Output-Octets
-	check-name = Max-Monthly-Output
-	reply-name = Acct-Output-Octets
-	cache-size = 5000
-}
-
-counter maxupload {
-	filename = \${raddbdir}/db.maxforeverupload
-	key = User-Name
-	count-attribute = Acct-Input-Octets
-	reset = never
-	counter-name = Forever-Input-Octets
-	check-name = Max-Forever-Input
-	reply-name = Acct-Input-Octets
-	cache-size = 5000
-}
-
-counter maxdownload {
-	filename = \${raddbdir}/db.maxforeverdownload
-	key = User-Name
-	count-attribute = Acct-Output-Octets
-	reset = never
-	counter-name = Forever-Output-Octets
-	check-name = Max-Forever-Output
-	reply-name = Acct-Output-Octets
-	cache-size = 5000
-}
-
 EOD;
 
 	$filename = RADDB . '/modules/counter';
@@ -2878,7 +2799,6 @@ nt-response=%{%{mschap:NT-Response}:-00}"
         # An optional retry message.
 #       retry_msg = "Re-enter (or reset) the password"
 }
-
 EOD;
 
 	$filename = RADDB . '/modules/mschap';
@@ -3179,7 +3099,6 @@ else {
 	$varmodulesldap2keepaliveinterval = ($arrmodulesldap['varmodulesldap2keepaliveinterval']?$arrmodulesldap['varmodulesldap2keepaliveinterval']:'3');
 	
 $conf .= <<<EOD
-
 # -*- text -*-
 #
 #  $Id$
@@ -3856,7 +3775,6 @@ policy {
 		}
 	}
 }
-	
 EOD;
 
 	$filename = RADDB . '/policy.conf';
@@ -3882,8 +3800,8 @@ function freeradius_motp_resync() {
 	
 	// check if disabled then we delete bash und otpverify.sh script
 	if ($varsettings['varsettingsmotpenable'] == '') {
-		if (file_exists("/usr/local/bin/otpverify.sh")) {
-			unlink("/usr/local/bin/otpverify.sh");
+		if (file_exists("/usr/local/etc/raddb/scripts/otpverify.sh")) {
+			unlink("/usr/local/etc/raddb/scripts/otpverify.sh");
 		}
 		if (exec("cd /var/db/pkg && ls | grep bash") == "bash-4.1.7") {
 			exec("cd /var/db/pkg && pkg_delete `ls | grep bash`");
@@ -4016,11 +3934,10 @@ exit 11
 
 
 EOD;
-
-	$filename = '/usr/local/bin/otpverify.sh';
+	$filename = RADDB . '/scripts/otpverify.sh';
 	conf_mount_rw();
 	file_put_contents($filename, $conf);
-	chmod($filename, 0775);
+	chmod($filename, 0750);
 	conf_mount_ro();
 	
 	// end of above 'check if enabled then we need to download "bash"'
@@ -4035,7 +3952,7 @@ function freeradius_modulesmotp_resync() {
 	$conf .= <<<EOD
 exec motp {
 		wait = yes
-		program = "/usr/local/bin/bash /usr/local/bin/otpverify.sh %{User-Name} %{User-Password} %{reply:MOTP-Init-Secret} %{reply:MOTP-PIN} %{reply:MOTP-Offset}"
+		program = "/usr/local/bin/bash /usr/local/etc/raddb/scripts/otpverify.sh %{User-Name} %{User-Password} %{reply:MOTP-Init-Secret} %{reply:MOTP-PIN} %{reply:MOTP-Offset}"
 		input_pairs = reply
 		#output_pairs = config
 	}
@@ -4047,6 +3964,107 @@ EOD;
 	conf_mount_rw();
 	file_put_contents($filename, $conf);
 	chmod($filename, 0640);
+	conf_mount_ro();
+
+}
+
+function freeradius_modulesdatacounter_resync() {
+	global $config;
+	$conf = '';
+
+	$conf .= <<<EOD
+exec datacounterdaily {
+		wait = yes
+		program = "/bin/sh /usr/local/etc/raddb/scripts/datacounter_acct.sh %{request:User-Name} daily %{request:Acct-Input-Octets} %{request:Acct-Output-Octets}"
+	}
+exec datacounterweekly {
+		wait = yes
+		program = "/bin/sh /usr/local/etc/raddb/scripts/datacounter_acct.sh %{request:User-Name} weekly %{request:Acct-Input-Octets} %{request:Acct-Output-Octets}"
+	}
+exec datacountermonthly {
+		wait = yes
+		program = "/bin/sh /usr/local/etc/raddb/scripts/datacounter_acct.sh %{request:User-Name} monthly %{request:Acct-Input-Octets} %{request:Acct-Output-Octets}"
+	}
+exec datacounterforever {
+		wait = yes
+		program = "/bin/sh /usr/local/etc/raddb/scripts/datacounter_acct.sh %{request:User-Name} forever %{request:Acct-Input-Octets} %{request:Acct-Output-Octets}"
+	}	
+EOD;
+
+	$filename = RADDB . '/modules/datacounter_acct';
+	conf_mount_rw();
+	file_put_contents($filename, $conf);
+	chmod($filename, 0640);
+	conf_mount_ro();
+
+}
+
+function freeradius_datacounter_auth_resync() {
+	global $config;
+	$conf = '';
+
+	$conf .= <<<EOD
+#!/bin/sh
+### USAGE: datacounter_auth.sh USERNAME TIMERANGE
+### We need this parameters from freeradius users file and ../raddb/modules/datacounter_acct
+USERNAME=`echo -n "\\$1" | sed 's/[^0-9a-zA-Z._-]/X/g' `
+TIMERANGE=`echo -n "\\$2" | sed 's/[^a-z]//g' `
+
+### We check if MAX-OCTETS-USERNAME is greater than USED-OCTETS-USERNAME and accept or reject the user
+if [ `cat "/var/log/radacct/datacounter/\$TIMERANGE/max-octets-\$USERNAME"` -gt `cat "/var/log/radacct/datacounter/\$TIMERANGE/used-octets-\$USERNAME"` ]; then
+	exit 0
+else
+	MAXOCTETSUSERNAMEMB=$((`cat "/var/log/radacct/datacounter/\$TIMERANGE/max-octets-\$USERNAME"`/1024/1024))
+	logger -f /var/log/system.log "FreeRADIUS: Credentials are probably correct but the user \$USERNAME has reached the \$TIMERANGE Amount of Upload and Download Traffic which is \$MAXOCTETSUSERNAMEMB MB! The user was rejected!!!"
+	exit 99
+fi
+EOD;
+
+	$filename = RADDB . '/scripts/datacounter_auth.sh';
+	conf_mount_rw();
+	file_put_contents($filename, $conf);
+	chmod($filename, 0750);
+	conf_mount_ro();
+
+}
+
+function freeradius_datacounter_acct_resync() {
+	global $config;
+	$conf = '';
+
+	$conf .= <<<EOD
+#!/bin/sh
+### USAGE: datacounter_acct.sh USERNAME TIMERANGE ACCTINPUTOCTETS ACCTOUTPUTOCTETS
+### We need this from an Accounting-Request packet to count the octets
+USERNAME=`echo -n "\\$1" | sed 's/[^0-9a-zA-Z._-]/X/g' `
+TIMERANGE=`echo -n "\\$2" | sed 's/[^a-z]//g' `
+ACCTINPUTOCTETS=`echo -n "\\$3" | sed 's/[^0-9]/0/g' `
+ACCTOUTPUTOCTETS=`echo -n "\\$4" | sed 's/[^0-9]/0/g' `
+
+### If we do not get Octets we set some default values
+if [ ! \$ACCTINPUTOCTETS ]; then
+	ACCTINPUTOCTETS=0
+fi
+if [ ! \$ACCTOUTPUTOCTETS ]; then
+	ACCTOUTPUTOCTETS=0
+fi
+
+### We only write this to file if username exists
+### If all counters are activated (daily, weekly, monthly, forever) we need to check which is active for the user
+if [ ! -e "/var/log/radacct/datacounter/\$TIMERANGE/max-octets-\$USERNAME" ]; then
+	exit 0
+else
+	USEDOCTETS=\$((\$ACCTINPUTOCTETS+\$ACCTOUTPUTOCTETS+`cat "/var/log/radacct/datacounter/\$TIMERANGE/used-octets-\$USERNAME"`))
+	echo "\$USEDOCTETS" > "/var/log/radacct/datacounter/\$TIMERANGE/used-octets-\$USERNAME"
+	exit 0
+fi
+
+EOD;
+
+	$filename = RADDB . '/scripts/datacounter_acct.sh';
+	conf_mount_rw();
+	file_put_contents($filename, $conf);
+	chmod($filename, 0750);
 	conf_mount_ro();
 
 }
@@ -4105,8 +4123,10 @@ function freeradius_dictionary_resync() {
 ### Attributes for mobile-One-Time-Password
 ATTRIBUTE 		MOTP-Init-Secret 		900 	string
 ATTRIBUTE 		MOTP-PIN 			901 	string
-ATTRIBUTE 		MOTP-Offset 			902 	string	
-	
+ATTRIBUTE 		MOTP-Offset 			902 	string
+
+
+
 EOD;
 
 	$filename = RADDB . '/dictionary';
