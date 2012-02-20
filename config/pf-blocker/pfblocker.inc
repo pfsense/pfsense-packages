@@ -36,6 +36,10 @@ require_once("globals.inc");
 require_once("filter.inc");
 require_once("services.inc");
 
+$uname=posix_uname();
+if ($uname['machine']=='amd64')
+        ini_set('memory_limit', '250M');
+
 function pfb_text_area_decode($text){
 	return preg_replace('/\r\n/', "\n",base64_decode($text));	
 }

@@ -1,4 +1,8 @@
 <?php 
+$uname=posix_uname();
+if ($uname['machine']=='amd64')
+        ini_set('memory_limit', '250M');
+
 function get_networks($pfb){
 	$file='/usr/local/pkg/pfblocker_aliases/'.$pfb.'.txt';
 	if (file_exists($file))
