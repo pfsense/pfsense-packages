@@ -789,6 +789,23 @@ function freeradius_clients_resync() {
 			$varrequiremessageauthenticator = $item['varrequiremessageauthenticator'];
 			$varclientnastype = $item['varclientnastype'];
 			$varclientmaxconnections = $item['varclientmaxconnections'];
+			$varclientlogininput = ($item['varclientlogininput']?$item['varclientlogininput']:'### login = !root ###');
+			$varclientpasswordinput = ($item['varclientpasswordinput']?$item['varclientpasswordinput']:'### password = someadminpass ###');
+			
+			if ($item['varclientlogininput'] == '') {
+				$varclientlogin = '### login = !root ###';
+			}
+			else {
+				$varclientlogin = "login = $varclientlogininput";
+			}
+			if ($item['varclientpasswordinput'] == '') {
+				$varclientpassword = '### password = someadminpass ###';
+			}
+			else {
+				$varclientpassword = "password = $varclientpasswordinput";
+			}
+			
+			
 			$conf .= <<<EOD
 
 client "$varclientshortname" {
@@ -799,10 +816,8 @@ client "$varclientshortname" {
 	max_connections = $varclientmaxconnections
 	shortname = $varclientshortname
 	nastype = $varclientnastype
-	#login = !root
-	#password = someadminpas
-	#virtual_server = home1
-	#coa_server = coa
+	$varclientlogin
+	$varclientpassword
 }
 
 EOD;
@@ -3952,12 +3967,8 @@ function freeradius_modulesmotp_resync() {
 	$conf .= <<<EOD
 exec motp {
 		wait = yes
-		program = "/usr/local/bin/bash /usr/local/etc/raddb/scripts/otpverify.sh %{User-Name} %{User-Password} %{reply:MOTP-Init-Secret} %{reply:MOTP-PIN} %{reply:MOTP-Offset}"
-		input_pairs = reply
-		#output_pairs = config
-	}
-
-	
+		program = "/usr/local/bin/bash /usr/local/etc/raddb/scripts/otpverify.sh %{request:User-Name} %{request:User-Password} %{reply:MOTP-Init-Secret} %{reply:MOTP-PIN} %{reply:MOTP-Offset}"
+	}	
 EOD;
 
 	$filename = RADDB . '/modules/motp';
