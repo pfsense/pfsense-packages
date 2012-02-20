@@ -221,6 +221,18 @@
 			<default_value>16</default_value>
 		</field>
 		<field>
+			<fielddescr>NAS Login</fielddescr>
+			<fieldname>varclientlogininput</fieldname>
+			<description><![CDATA[If your NAS supports it you can use SNMP or finger for simultaneous-use checks instead of (s)radutmp file and accounting. Leave empty to choose (s)radutmp. (Default: empty)]]></description>
+			<type>input</type>
+		</field>
+		<field>
+			<fielddescr>NAS Password</fielddescr>
+			<fieldname>varclientpasswordinput</fieldname>
+			<description><![CDATA[If your NAS supports it you can use SNMP or finger for simultaneous-use checks instead of (s)radutmp file and accounting. Leave empty to choose (s)radutmp. (Default: empty)]]></description>
+			<type>input</type>
+		</field>
+		<field>
 			<fielddescr>Description</fielddescr>
 			<fieldname>description</fieldname>
 			<description><![CDATA[Enter any description you like for this client.]]></description>
