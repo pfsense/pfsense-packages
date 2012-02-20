@@ -364,7 +364,8 @@ function sync_package_pfblocker() {
 			}
 		}
 		#update pfsense alias table
-		$aliases=$config['aliases']['alias'];
+		if (is_array($config['aliases']['alias']))
+			$aliases=$config['aliases']['alias'];
 		foreach($aliases as $cbalias){
 			if (preg_match("/pfBlocker/",$cbalias['name'])){
 				#mark pfctl aliastable for cleaning
@@ -398,22 +399,21 @@ function sync_package_pfblocker() {
 	#var_dump($deny_outbound);			
 	#var_dump($pfblocker_config['inbound_interface']);
 	#print count($deny_inbound) .count($deny_inbound);
-	
 	# Inbound filter options
-	$inbound_interface = $pfblocker_config['inbound_interface'];
+	$inbound_interfaces = explode(",",$pfblocker_config['inbound_interface']);
 	if (count($deny_inbound) > 0 || count($permit_inbound) > 0){
-		if($inbound_interface == "")
+		if($pfblocker_config['inbound_interface'] == "")
 			$message="Unable to apply rules.Inbound Interface option not configured.";
-		 if ($inbound_interface == "lo0")
+		 if (in_array("lo0",$inbound_interfaces))
 			$message="Floating rules are not implemented in pfBlocker yet, choose Inbound Interface other than loopback or change action to Alias only.";
 		}
 		
 	# Outbound filter options
-	$outbound_interface = $pfblocker_config['outbound_interface'];
+	$outbound_interfaces = explode(",",$pfblocker_config['outbound_interface']);
 	if (count($deny_outbound) > 0 || count($permit_outbound) > 0){
-		if($outbound_interface == "")
+		if($pfblocker_config['outbound_interface'] == "")
 			$message="Unable to apply rules.Outbound Interface option not configured.";
-		 if ($outbound_interface == "lo0")
+		 if (in_array("lo0",$outbound_interfaces))
 			$message="Floating rules are not implemented in pfBlocker yet, choose Outbound Interface other than loopback or change action to Alias only.";
 		}
 		
@@ -428,35 +428,37 @@ function sync_package_pfblocker() {
 				#apply pfblocker rules if enabled
 				
 				#Inbound
-				if (preg_match("/$last_iface/",$inbound_interface)){
-					#permit rules
-					if (is_array($permit_inbound))
-						foreach ($permit_inbound as $cb_rules){
-							$cb_rules['interface']=$rule['interface'];
-							$new_rules[]=$cb_rules;	
-						}
-					#deny rules
-					if (is_array($deny_inbound))
-						foreach ($deny_inbound as $cb_rules){
-							$cb_rules['interface']=$rule['interface'];
-							$new_rules[]=$cb_rules;	
-						}
-				}
+				foreach ($inbound_interfaces as $inbound_interface)
+					if ($inbound_interface==$last_iface){
+						#permit rules
+						if (is_array($permit_inbound))
+							foreach ($permit_inbound as $cb_rules){
+								$cb_rules['interface']=$rule['interface'];
+								$new_rules[]=$cb_rules;	
+							}
+						#deny rules
+						if (is_array($deny_inbound))
+							foreach ($deny_inbound as $cb_rules){
+								$cb_rules['interface']=$rule['interface'];
+								$new_rules[]=$cb_rules;	
+							}
+					}
 				#Outbound
-				if (preg_match("/$last_iface/",$outbound_interface)){
-					#permit rules
-					if (is_array($permit_outbound))
-						foreach ($permit_outbound as $cb_rules){
-							$cb_rules['interface']=$rule['interface'];
-							$new_rules[]=$cb_rules;	
-						}
-					#deny rules
-					if (is_array($deny_outbound))
-						foreach ($deny_outbound as $cb_rules){
-							$cb_rules['interface']=$rule['interface'];
-							$new_rules[]=$cb_rules;	
-						}
-				}
+				foreach ($outbound_interfaces as $outbound_interface)
+					if ($outbound_interface==$last_iface){
+						#permit rules
+						if (is_array($permit_outbound))
+							foreach ($permit_outbound as $cb_rules){
+								$cb_rules['interface']=$rule['interface'];
+								$new_rules[]=$cb_rules;	
+							}
+						#deny rules
+						if (is_array($deny_outbound))
+							foreach ($deny_outbound as $cb_rules){
+								$cb_rules['interface']=$rule['interface'];
+								$new_rules[]=$cb_rules;	
+							}
+					}
 			}
 		  #include all rules that is not from pfBlocker
 		  if (!preg_match("/pfBlocker.*rule/",$rule['descr']) && ($rule['interface'] != "" || $rule['floating']=="yes"))
