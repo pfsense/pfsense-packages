@@ -56,26 +56,15 @@ function freeradius_deinstall_command() {
 function freeradius_install_command() {
 	global $config;
 	conf_mount_rw();
-	/*
-	$handle = opendir(RADDB);
-	while (false != ($file = readdir($handle))) {
-		if (false != ($pos = strpos($file, '.sample'))) {
-			$newfile = substr($file, 0, $pos);
-			if (copy(RADDB . "/$file", RADDB . "/$newfile"))
-				unlink(RADDB . "/$file");
-		}
-	}
-	closedir($handle);
-	*/
 
 	// We create here different folders for different counters.
-	exec("chown -R root:wheel /usr/local/etc/raddb");
+	if (!file_exists("/var/log/radacct/datacounter/")) { exec("mkdir /var/log/radacct/datacounter && mkdir /var/log/radacct/datacounter/daily && mkdir /var/log/radacct/datacounter/weekly && mkdir /var/log/radacct/datacounter/monthly && mkdir /var/log/radacct/datacounter/forever"); }
+	if (!file_exists("/var/log/radacct/timecounter/")) { exec("mkdir /var/log/radacct/timecounter");	}
+	
 	exec("mkdir /usr/local/etc/raddb/scripts");
-	exec("chown -R root:wheel /usr/local/lib/freeradius-2.1.12");
-	exec("touch /var/log/radutmp && touch /var/log/radwtmp");
-	exec("mkdir /var/log/radacct/datacounter/daily" && "mkdir /var/log/radacct/datacounter/weekly" && "mkdir /var/log/radacct/datacounter/monthly" && "mkdir /var/log/radacct/datacounter/forever");
-	exec("mkdir /var/log/radacct/timecounter");
-	exec("chown -R root:wheel /var/log");
+	if (!file_exists("/var/log/radutmp")) { exec("touch /var/log/radutmp");	}
+	if (!file_exists("/var/log/radwtmp")) {	exec("touch /var/log/radwtmp");	}
+	exec("chown -R root:wheel /usr/local/etc/raddb && chown -R root:wheel /usr/local/lib/freeradius-2.1.12 && chown -R root:wheel /var/log/radacct");
 
 	// creating a backup file of the original policy.conf no matter if user checked this or not
 	if (!file_exists("/usr/local/etc/raddb/policy.conf.backup")) {
@@ -94,37 +83,38 @@ function freeradius_install_command() {
 	if (file_exists("/usr/local/etc/raddb/sites-enabled/inner-tunnel")) { unlink("/usr/local/etc/raddb/sites-enabled/inner-tunnel"); }
 
 	// We need some additional files in /usr/local/lib for the LDAP module. We fetch these files dependent on the architecture.
-	// For i386 systems
-	if (exec("uname -m") == "i386") {
-		exec("cd /usr/local/lib/ && fetch http://e-sac.siteseguro.ws/pfsense/8/All/ldd/libasn1.so.10");
-		exec("cd /usr/local/lib/ && fetch http://e-sac.siteseguro.ws/pfsense/8/All/ldd/libgssapi.so.10");
-		exec("cd /usr/local/lib/ && fetch http://e-sac.siteseguro.ws/pfsense/8/All/ldd/libheimntlm.so.10");
-		exec("cd /usr/local/lib/ && fetch http://e-sac.siteseguro.ws/pfsense/8/All/ldd/libhx509.so.10");
-		exec("cd /usr/local/lib/ && fetch http://e-sac.siteseguro.ws/pfsense/8/All/ldd/libkrb5.so.10");
-		exec("cd /usr/local/lib/ && fetch http://e-sac.siteseguro.ws/pfsense/8/All/ldd/libroken.so.10");
-		exec("chmod 0755 /usr/local/lib/libasn1.so.10");
-		exec("chmod 0755 /usr/local/lib/libgssapi.so.10");
-		exec("chmod 0755 /usr/local/lib/libheimntlm.so.10");
-		exec("chmod 0755 /usr/local/lib/libhx509.so.10");
-		exec("chmod 0755 /usr/local/lib/ldd/libkrb5.so.10");
-		exec("chmod 0755 /usr/local/lib/libroken.so.10");
+	if (!file_exists("/usr/local/lib/libasn1.so.10") || !file_exists("/usr/local/lib/libgssapi.so.10") || !file_exists("/usr/local/lib/libheimntlm.so.10") || !file_exists("/usr/local/lib/libhx509.so.10") || !file_exists("/usr/local/lib/ldd/libkrb5.so.10") || !file_exists("/usr/local/lib/libroken.so.10")) {
+		// For i386 systems
+		if (exec("uname -m") == "i386") {
+			exec("cd /usr/local/lib/ && fetch http://e-sac.siteseguro.ws/pfsense/8/All/ldd/libasn1.so.10");
+			exec("cd /usr/local/lib/ && fetch http://e-sac.siteseguro.ws/pfsense/8/All/ldd/libgssapi.so.10");
+			exec("cd /usr/local/lib/ && fetch http://e-sac.siteseguro.ws/pfsense/8/All/ldd/libheimntlm.so.10");
+			exec("cd /usr/local/lib/ && fetch http://e-sac.siteseguro.ws/pfsense/8/All/ldd/libhx509.so.10");
+			exec("cd /usr/local/lib/ && fetch http://e-sac.siteseguro.ws/pfsense/8/All/ldd/libkrb5.so.10");
+			exec("cd /usr/local/lib/ && fetch http://e-sac.siteseguro.ws/pfsense/8/All/ldd/libroken.so.10");
+			exec("chmod 0755 /usr/local/lib/libasn1.so.10");
+			exec("chmod 0755 /usr/local/lib/libgssapi.so.10");
+			exec("chmod 0755 /usr/local/lib/libheimntlm.so.10");
+			exec("chmod 0755 /usr/local/lib/libhx509.so.10");
+			exec("chmod 0755 /usr/local/lib/ldd/libkrb5.so.10");
+			exec("chmod 0755 /usr/local/lib/libroken.so.10");
+		}
+		// For amd64 systems
+		else {
+			exec("cd /usr/local/lib/ && fetch http://e-sac.siteseguro.ws/pfsense/8/amd64/All/ldd/libasn1.so.10");
+			exec("cd /usr/local/lib/ && fetch http://e-sac.siteseguro.ws/pfsense/8/amd64/All/ldd/libgssapi.so.10");
+			exec("cd /usr/local/lib/ && fetch http://e-sac.siteseguro.ws/pfsense/8/amd64/All/ldd/libheimntlm.so.10");
+			exec("cd /usr/local/lib/ && fetch http://e-sac.siteseguro.ws/pfsense/8/amd64/All/ldd/libhx509.so.10");
+			exec("cd /usr/local/lib/ && fetch http://e-sac.siteseguro.ws/pfsense/8/amd64/All/ldd/libkrb5.so.10");
+			exec("cd /usr/local/lib/ && fetch http://e-sac.siteseguro.ws/pfsense/8/amd64/All/ldd/libroken.so.10");
+			exec("chmod 0755 /usr/local/lib/libasn1.so.10");
+			exec("chmod 0755 /usr/local/lib/libgssapi.so.10");
+			exec("chmod 0755 /usr/local/lib/libheimntlm.so.10");
+			exec("chmod 0755 /usr/local/lib/libhx509.so.10");
+			exec("chmod 0755 /usr/local/lib/ldd/libkrb5.so.10");
+			exec("chmod 0755 /usr/local/lib/libroken.so.10");
+		}
 	}
-	// For amd64 systems
-	else {
-		exec("cd /usr/local/lib/ && fetch http://e-sac.siteseguro.ws/pfsense/8/amd64/All/ldd/libasn1.so.10");
-		exec("cd /usr/local/lib/ && fetch http://e-sac.siteseguro.ws/pfsense/8/amd64/All/ldd/libgssapi.so.10");
-		exec("cd /usr/local/lib/ && fetch http://e-sac.siteseguro.ws/pfsense/8/amd64/All/ldd/libheimntlm.so.10");
-		exec("cd /usr/local/lib/ && fetch http://e-sac.siteseguro.ws/pfsense/8/amd64/All/ldd/libhx509.so.10");
-		exec("cd /usr/local/lib/ && fetch http://e-sac.siteseguro.ws/pfsense/8/amd64/All/ldd/libkrb5.so.10");
-		exec("cd /usr/local/lib/ && fetch http://e-sac.siteseguro.ws/pfsense/8/amd64/All/ldd/libroken.so.10");
-		exec("chmod 0755 /usr/local/lib/libasn1.so.10");
-		exec("chmod 0755 /usr/local/lib/libgssapi.so.10");
-		exec("chmod 0755 /usr/local/lib/libheimntlm.so.10");
-		exec("chmod 0755 /usr/local/lib/libhx509.so.10");
-		exec("chmod 0755 /usr/local/lib/ldd/libkrb5.so.10");
-		exec("chmod 0755 /usr/local/lib/libroken.so.10");
-	}
-
 	// We run this here just to suppress some warnings on syslog if file doesn't exist
 	freeradius_authorizedmacs_resync();
 
@@ -846,6 +836,8 @@ EOD;
 
 function freeradius_eapconf_resync() {
 	global $config;
+		// We make this write enabled here because embedded systems need to write certs in ../raddb/certs/ folder
+		conf_mount_rw();
 	$conf = '';
 
 	$eapconf = $config['installedpackages']['freeradiuseapconf']['config'][0];
@@ -1079,7 +1071,6 @@ else {
 EOD;
 
 	$filename = RADDB . '/eap.conf';
-	conf_mount_rw();
 	file_put_contents($filename, $conf);
 	chmod($filename, 0640);
 	conf_mount_ro();
@@ -2356,6 +2347,8 @@ EOD;
 
 function freeradius_allcertcnf_resync() {
 	global $config;
+		// We need to make this write enabled for embedded systems to write certs
+		conf_mount_rw();
 	
 	
 // Only proceed these steps if freeRADIUS Cert-Manager is activated. if pfSense cert manager is used skip this.
@@ -2463,6 +2456,8 @@ if ($eapconf['vareapconfchoosecertmanager'] == '') {
 else {
 	return;
 }
+// Read-only because of embedded systems
+conf_mount_r0();
 } //end of function
 
 // ##### The following part is based on the code of pfblocker #####
