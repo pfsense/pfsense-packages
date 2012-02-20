@@ -195,7 +195,7 @@ function mail_report_send($headertext, $attachments) {
 	if(is_array($attachments)) {
 		foreach($attachments as $filename) {
 			$shortname = basename($filename);
-			$mail->AddEmbeddedImage("$filename", $shortname, "$filename");
+			$mail->AddEmbeddedImage($filename, $shortname, $shortname);
 			$mail->Body .= "<br/><br/>{$shortname}<br/><img src=\"cid:{$shortname}\" />\n";
 		}
 	}
