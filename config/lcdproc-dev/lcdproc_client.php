@@ -42,15 +42,15 @@
 		if (isset($config['system']['maximumstates']) and $config['system']['maximumstates'] > 0)
 			$maxstates="/{$config['system']['maximumstates']}";
 		else
-			$maxstates="/10000";
-
+			$maxstates="/". pfsense_default_state_size();
+			
 		$curentries = `/sbin/pfctl -si |grep current`;
 		if (preg_match("/([0-9]+)/", $curentries, $matches)) {
 			$curentries = $matches[1];
 		}
 		return $curentries . $maxstates;
 	}
-
+		
 	function disk_usage() {
 		$dfout = "";
 		exec("/bin/df -h | /usr/bin/grep -w '/' | /usr/bin/awk '{ print $5 }' | /usr/bin/cut -d '%' -f 1", $dfout);
