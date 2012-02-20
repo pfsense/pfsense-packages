@@ -503,17 +503,15 @@
 while [ `ps auxw |awk '/lcdproc_client.ph[p]/ {print $2}'| wc -l` != 0  ];
 do
 	ps auxw |awk '/lcdproc_client.ph[p]/ {print $2}'|xargs kill
-	sleep 2
 done
 while [ `ps auxw |awk '/LCD[d]/ {print $2}'| wc -l` != 0  ]; 
 do
 	ps auxw |awk '/LCD[d]/ {print $2}'|xargs kill
-	sleep 2
 done
 EOD;
 			$start = $stop ."\n";
 			$start .= "\t/usr/bin/nice -20 /usr/local/sbin/LCDd -c ". LCDPROC_CONFIG ."\n";
-			$start .= "\t/usr/bin/nice -20 /usr/local/bin/php -f /usr/local/pkg/lcdproc_client.php\n";
+			$start .= "\t/usr/bin/nice -20 /usr/local/bin/php -f /usr/local/pkg/lcdproc_client.php &\n";
 			/* write out the configuration */
 			conf_mount_rw();
 			lcdproc_write_config(LCDPROC_CONFIG, $config_text);
