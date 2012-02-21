@@ -289,7 +289,7 @@ function enable_change(enable_change) {
 					foreach($config['virtualip']['vip'] as $carp):
 						if ($carp['mode'] != "carp") continue;
 						$ipaddress = $carp['subnet'];
-						$carp_int = find_carp_interface($ipaddress);
+						$carp_int = trim(find_carp_interface($ipaddress));
 				?>
 					<option value="<?=$carp_int;?>"
 					 <?php if (isset($pconfig['carpdev']) && $carp_int == $pconfig['carpdev']) echo "selected"; ?>>
