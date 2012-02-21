@@ -87,8 +87,8 @@ if(strstr($pfSversion, "1.2"))
 
 <?php
 $pingdir = return_dir_as_array("/var/db/pingstatus");
-if(file_exists("/service/tinydns/root/data"))
-	$tinydns_data = file_get_contents("/service/tinydns/root/data");
+if(file_exists("/var/run/service/tinydns/root/data"))
+	$tinydns_data = file_get_contents("/var/run/service/tinydns/root/data");
 else
 	$tinydns_data = "";
 if($config['installedpackages']['tinydnsdomains'])
@@ -146,7 +146,7 @@ foreach($config['installedpackages']['tinydnsdomains']['config'] as $ping) {
 		echo $ipaddress;
 		if($row['loadbalance'])
 			echo " (LB)";
-		if(stristr($tinydns_data, "+{$hostname}:{$row['monitorip']}"))
+		if(stristr($tinydns_data, "+{$hostname}:{$row['failoverip']}"))
 			$inservice = "<FONT COLOR='GREEN'>YES</FONT>";
 		else
 			$inservice = "<FONT COLOR='BLUE'>NO</FONT>";
