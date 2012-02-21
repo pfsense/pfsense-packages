@@ -59,7 +59,7 @@ $a_acltypes[] = array('name' => 'source_ip', 'descr' => 'Source IP',
 				'mode' => '', 'syntax' => 'src');
 
 function haproxy_custom_php_deinstall_command() {
-	exec("rm /usr/local/sbin/haproxy");
+	exec("cd /var/db/pkg && pkg_delete `ls | grep haproxy`");
 	exec("rm /usr/local/pkg/haproxy.inc");
 	exec("rm /usr/local/www/haproxy*");
 	exec("rm /usr/local/etc/rc.d/haproxy.sh");
