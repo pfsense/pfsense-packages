@@ -500,14 +500,14 @@
 			}			
 			/* generate rc file start and stop */
 			$stop = <<<EOD
-while [ `ps auxw |awk '/lcdproc_client.ph[p]/ {print $2}'| wc -l` != 0  ];
-do
-	ps auxw |awk '/lcdproc_client.ph[p]/ {print $2}'|xargs kill
-done
-while [ `ps auxw |awk '/LCD[d]/ {print $2}'| wc -l` != 0  ]; 
-do
-	ps auxw |awk '/LCD[d]/ {print $2}'|xargs kill
-done
+if [ `ps auxw |awk '/lcdproc_client.ph[p]/ {print $2}'| wc -l` != 0  ]; then
+	ps auxw |awk '/lcdproc_client.ph[p]/ {print $2}'|xargs /bin/kill 
+	sleep 1
+fi
+if  [ `ps auxw |awk '/LCD[d]/ {print $2}'| wc -l` != 0  ]; then
+	ps auxw |awk '/LCD[d]/ {print $2}'|xargs /bin/kill 
+	sleep 1
+fi
 EOD;
 			$start = $stop ."\n";
 			$start .= "\t/usr/bin/nice -20 /usr/local/sbin/LCDd -c ". LCDPROC_CONFIG ."\n";
