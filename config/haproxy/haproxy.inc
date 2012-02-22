@@ -156,6 +156,17 @@ EOD;
 	fclose($fd);
 	exec("/etc/rc.d/devd restart");
 
+	/* Workaround for the old package deleting the binary on unload instead of the package */
+	if (!file_exists("/usr/local/sbin/haproxy")) {
+		if (substr(trim(`uname -r`), 0, 1) == "8") {
+			exec("cd /var/db/pkg && pkg_delete `ls | grep haproxy`");
+			if (trim(`uname -m`) == 'i386')
+				exec("pkg_add -r http://e-sac.siteseguro.ws/pfsense/8/All/haproxy-1.4.18.tbz");
+			else
+				exec("pkg_add -r http://e-sac.siteseguro.ws/pfsense/8/amd64/All/haproxy-1.4.18.tbz");
+		}
+	}
+
 	/* Do XML upgrade from haproxy 0.31 to haproxy-dev */
 	if (is_array($config['installedpackages']['haproxy']['ha_servers'])) {
 		/* We have an old config */
