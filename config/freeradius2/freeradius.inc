@@ -2457,7 +2457,7 @@ else {
 	return;
 }
 // Read-only because of embedded systems
-conf_mount_r0();
+conf_mount_ro();
 } //end of function
 
 // ##### The following part is based on the code of pfblocker #####
