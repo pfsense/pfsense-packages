@@ -344,8 +344,8 @@ function havp_resync()
     havp_reconfigure_freshclam();
     havp_reconfigure_cron();
 
-    # configure system filter
-    if (pfsense_version_() == '1') filter_configure();
+    # configure system filter for 2.xx
+    if (pfsense_version_() !== '1') filter_configure();
 
 }
 # ------------------------------------------------------------------------------
@@ -1140,6 +1140,11 @@ function havp_generate_rules($type = 'filter')
     global $config, $havp_config;
     $rules = array();
 
+    # no rules if havp disabled
+    if ($havp_config[F_ENABLE] !== 'true') {
+        return '';
+    }
+
     $proxymode = $havp_config[F_PROXYMODE];
     # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     # =-= HAVP always listen 127.0.0.1:port =-=
@@ -1295,7 +1300,10 @@ function havp_startup_script()
     $rc = array();
     $rc['file'] = basename(HVDEF_HAVP_STARTUP_SCRIPT);
 
-    $s[] = "# start";
+    $s[] = "\t# init";
+    $s[] = "\techo 'Starting ..' > " . HVDEF_HAVP_STATUS_FILE;
+
+    $s[] = "\t# start";
     $s[] = "\tif [ -z \"`{$havpchk}`\" ];then";
     if (HV_USE_CLAMD === 'true') {
         $clampid_dir = HVDEF_CLAM_RUNDIR;
@@ -1319,8 +1327,15 @@ function havp_startup_script()
     }
     $s[] = "\t\t/usr/local/sbin/havp -c " . HVDEF_HAVP_CONFIG . " 2>/dev/null";
     $s[] = "\t\twait";
+    $s[] = "\tfi";
+
+    $s[] = "\t# Status";
+    $s[] = "\tif [ -z \"`{$havpchk}`\" ];then";
+    $s[] = "\t\techo 'Stopped' > " . HVDEF_HAVP_STATUS_FILE;
+    $s[] = "\telse";
     $s[] = "\t\techo 'Started' > " . HVDEF_HAVP_STATUS_FILE;
     $s[] = "\tfi";
+
     $s[] = "";
     $rc['start'] = implode("\n", $s);
     unset($s);
