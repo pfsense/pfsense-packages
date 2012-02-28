@@ -130,6 +130,20 @@
 		<build_port_path>/usr/ports/net/haproxy</build_port_path>
 	</package>
 	<package>
+		<name>haproxy-legacy</name>
+		<pkginfolink>http://doc.pfsense.org/index.php/haproxy_package</pkginfolink>
+		<descr>The Reliable, High Performance TCP/HTTP Load Balancer package version 1.0</descr>
+		<website>http://haproxy.1wt.eu/</website>
+		<category>Services</category>
+		<version>1.4.18 pkg v 1.0</version>
+		<status>Release</status>
+		<required_version>2.0</required_version>
+		<config_file>http://www.pfsense.com/packages/config/haproxy-legacy/haproxy.xml</config_file>
+		<depends_on_package_base_url>http://e-sac.siteseguro.ws/pfsense/8/All/</depends_on_package_base_url>
+		<depends_on_package>haproxy-1.4.18.tbz</depends_on_package>
+		<configurationfile>haproxy.xml</configurationfile>
+	</package>
+	<package>
 		<name>Proxy Server with mod_security</name>
 		<pkginfolink>http://doc.pfsense.org/index.php/ProxyServerModSecurity_package</pkginfolink>
 		<website>http://www.modsecurity.org/</website>
