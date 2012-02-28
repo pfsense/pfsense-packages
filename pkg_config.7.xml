@@ -9,7 +9,7 @@
 		<category>File Management</category>
 		<pkginfolink>http://doc.pfsense.org/index.php/Filer_package</pkginfolink>
 		<config_file>http://www.pfsense.com/packages/config/filer/filer.xml</config_file>
-		<version>0.50</version>
+		<version>0.60</version>
 		<status>Beta</status>
 		<required_version>1.2.3</required_version>
 		<maintainer>bscholer@cshl.edu</maintainer>

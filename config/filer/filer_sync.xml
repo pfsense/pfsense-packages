@@ -9,8 +9,8 @@
     filer_sync.xml
     part of pfSense (http://www.pfSense.com)
     Copyright (C) 2008 Scott Ullrich <sullrich@gmail.com>
-    Copyright (C) 2011 Marcello Coutinho
     Copyright (C) 2011 Brian Scholer
+    Copyright (C) 2012 Marcello Coutinho
     All rights reserved.
                                                                               */
 /* ========================================================================== */
@@ -50,7 +50,6 @@
 		<tab>
 			<text>Files</text>
 			<url>/pkg.php?xml=filer.xml</url>
-			<active/>
 		</tab>
 		<tab>
 			<text>XMLRPC Sync</text>

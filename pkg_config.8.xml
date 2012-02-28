@@ -12,9 +12,9 @@
 		<category>File Management</category>
 		<pkginfolink>http://doc.pfsense.org/index.php/Filer_package</pkginfolink>
 		<config_file>http://www.pfsense.com/packages/config/filer/filer.xml</config_file>
-		<version>0.50</version>
+		<version>0.60</version>
 		<status>Beta</status>
-		<required_version>1.2.3</required_version>
+		<required_version>2.0</required_version>
 		<maintainer>bscholer@cshl.edu</maintainer>
 		<configurationfile>filer.xml</configurationfile>
 	</package>
@@ -120,12 +120,12 @@
 		<descr>The Reliable, High Performance TCP/HTTP Load Balancer</descr>
 		<website>http://haproxy.1wt.eu/</website>
 		<category>Services</category>
-		<version>1.4.18 pkg v 1.2</version>
+		<version>1.4.19 pkg v 1.2</version>
 		<status>Release</status>
 		<required_version>2.0</required_version>
 		<config_file>http://www.pfsense.com/packages/config/haproxy/haproxy.xml</config_file>
 		<depends_on_package_base_url>http://e-sac.siteseguro.ws/pfsense/8/All/</depends_on_package_base_url>
-		<depends_on_package>haproxy-1.4.18.tbz</depends_on_package>
+		<depends_on_package>haproxy-1.4.19.tbz</depends_on_package>
 		<configurationfile>haproxy.xml</configurationfile>
 		<build_port_path>/usr/ports/net/haproxy</build_port_path>
 	</package>
@@ -135,12 +135,12 @@
 		<descr>The Reliable, High Performance TCP/HTTP Load Balancer package version 1.0</descr>
 		<website>http://haproxy.1wt.eu/</website>
 		<category>Services</category>
-		<version>1.4.18 pkg v 1.0</version>
+		<version>1.4.19 pkg v 1.0</version>
 		<status>Release</status>
 		<required_version>2.0</required_version>
 		<config_file>http://www.pfsense.com/packages/config/haproxy-legacy/haproxy.xml</config_file>
 		<depends_on_package_base_url>http://e-sac.siteseguro.ws/pfsense/8/All/</depends_on_package_base_url>
-		<depends_on_package>haproxy-1.4.18.tbz</depends_on_package>
+		<depends_on_package>haproxy-1.4.19.tbz</depends_on_package>
 		<configurationfile>haproxy.xml</configurationfile>
 	</package>
 	<package>

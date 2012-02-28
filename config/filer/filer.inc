@@ -4,8 +4,8 @@
 	filerinc
     part of pfSense (http://www.pfSense.com)
     Copyright (C) 2010 Scott Ullrich <sullrich@gmail.com>
-    Copyright (C) 2011 Marcello Coutinho
-    Copyright (C) 2011 Brian Scholer
+    Copyright (C) 2012 Marcello Coutinho
+    Copyright (C) 2012 Brian Scholer
     All rights reserved.
                                                                               */
 /* ========================================================================== */
@@ -48,28 +48,69 @@ function filer_start() {
 	// reserved
 }
 
+function filer_text_area_decode($text){
+	return preg_replace('/\r\n/', "\n",base64_decode($text));	
+}
 function sync_package_filer() {
 	global $config, $g;
+	$update_conf=0;
+	#mount filesystem writeable
+	conf_mount_rw();
 	
+	#loop on configured files
 	if($config['installedpackages']['filer']['config']!="") {
+		$count=0;
 		foreach($config['installedpackages']['filer']['config'] as $file) {
-			$fname = $file['fullfile'];
-			$fdata = str_replace("\r", "", base64_decode($file['filedata']));
-			if($file['mod']) {
-				if(!preg_match("/0?[0-7]{3}/", $file['mod'])) 
-					$mod = 0700;
-				else
-					$mod = octdec($file['mod']);
-			}
-			conf_mount_rw();
-			file_put_contents($fname, $fdata);
-			if($mod)
-				chmod($fname, $mod);
-			conf_mount_ro();
+			if ($file['filedata']=="" && file_exists($file['fullfile'])){
+				$config['installedpackages']['filer']['config'][$count]['filedata']=base64_encode(file_get_contents($file['fullfile']));
+				$file['filedata']=base64_encode(file_get_contents($file['fullfile']));
+				$update_conf++;
+				}
+			$count++;
+			if(preg_match("/0?[0-7]{3}/", $file['mod'])) 
+				$mod = octdec($file['mod']);
+			else
+				$mod = 0700;
+			
+			#write file
+			file_put_contents($file['fullfile'], filer_text_area_decode($file['filedata']),LOCK_EX);
+			chmod($file['fullfile'], $mod);
+			
+			#check if there is a script to run after file save
+			if($file['cmd']!= "")
+				switch ($file['background']){
+					case "background":
+						mwexec_bg($file['cmd']);
+					break;
+					case "foreground":
+						mwexec($file['cmd']);
+					break;	
+				}
+			
 		}
+
+	#Write config if any file from filesystem was loaded
+	if ($update_conf > 0)
+		write_config();
 	}
+	#mount filesystem readonly
+	conf_mount_ro();
 	
 	filer_sync_on_changes();
+}
+
+function filer_validate_input($post, &$input_errors) {
+	foreach ($post as $key => $value) {
+		if (empty($value))
+			continue;
+		if (substr($key, 0, 3) == "mod" && !preg_match("/^0?[0-7]{3}$/", $value))
+				$input_errors[] = "{$value} is valid permission number";
+		if (substr($key, 0, 11) == "description" && !preg_match("@^[a-zA-Z0-9 _/.-]+$@", $value))
+				$input_errors[] = "Do not use special characters on description";
+		if (substr($key, 0, 8) == "fullfile" && !preg_match("@^[a-zA-Z0-9_/.-]+$@", $value))
+				$input_errors[] = "Do not use special characters on filename";
+				
+	}
 }
 
 /* Uses XMLRPC to synchronize the changes to a remote node */

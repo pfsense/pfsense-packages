@@ -10,6 +10,7 @@
     part of pfSense (http://www.pfSense.com)
     Copyright (C) 2010 Scott Ullrich <sullrich@gmail.com>
     Copyright (C) 2011 Brian Scholer
+    Copyright (C) 2012 Marcello Coutinho
     All rights reserved.                                                      
 */
 /* ========================================================================== */
@@ -70,7 +71,6 @@
 		<tab>
 			<text>XMLRPC Sync</text>
 			<url>/pkg_edit.php?xml=filer_sync.xml</url>
-			<active/>
 		</tab>
 	</tabs>
 	
@@ -90,32 +90,64 @@
 	</adddeleteeditpagefields>
 	<fields>
 		<field>
-			<fielddescr>Full path to the file</fielddescr>
+			<type>listtopic</type>
+			<fieldname>temp</fieldname>
+			<name>File configuration</name>
+		</field>	
+		<field>
+			<fielddescr>File</fielddescr>
 			<fieldname>fullfile</fieldname>
 			<type>input</type>
+			<size>60</size>
+			<description>Enter Full file path</description>
 			<required/>
-		</field>
-		<field>
-			<fielddescr>Permissions</fielddescr>
-			<fieldname>mod</fieldname>
-			<type>input</type>
-			<description>Blank leaves the permissions alone.</description>
 		</field>
 		<field>
 			<fielddescr>Description</fielddescr>
 			<fieldname>description</fieldname>
 			<description>Enter a description for this file.</description>
 			<type>input</type>
+			<size>60</size>
+		</field>
+		<field>
+			<fielddescr>Permissions</fielddescr>
+			<fieldname>mod</fieldname>
+			<type>input</type>
+			<size>10</size>
+			<description><![CDATA[Enter file permission you want on this file<br>Blank leaves the permissions alone.]]></description>
 		</field>
 		<field>
 			<fielddescr>File Contents</fielddescr>
 			<fieldname>filedata</fieldname>
-			<description>Paste the files contents here.</description>
+			<description>Leave blank to load an existing file from file system or paste the file content you want to save.</description>
 			<type>textarea</type>
 			<encoding>base64</encoding>
-			<cols>60</cols>
-			<rows>30</rows>
+			<cols>75</cols>
+			<rows>25</rows>
 			<required/>
+		</field>
+		<field>
+			<type>listtopic</type>
+			<fieldname>temp</fieldname>
+			<name>cmd to run after file save/sync</name>
+		</field>	
+		<field>
+			<fielddescr>script</fielddescr>
+			<fieldname>cmd</fieldname>
+			<description>Enter script or cmd to run after file save/sync</description>
+			<type>input</type>
+			<size>60</size>
+		</field>
+		<field>
+			<fielddescr>execute mode</fielddescr>
+			<fieldname>background</fieldname>
+			<type>select</type>
+ 				<options>
+ 				<option><name>Background (default)</name><value>background</value></option>
+				<option><name>Foreground</name><value>foreground</value></option>
+				<option><name>Do not run this script</name><value>disabled</value></option>
+				</options>
+			<description>Choose the way script will run.</description>
 		</field>
 	</fields>
 	<custom_php_install_command>
@@ -123,6 +155,9 @@
 	</custom_php_install_command>
 	<custom_php_command_before_form>
 	</custom_php_command_before_form>
+	<custom_php_validation_command>
+		filer_validate_input($_POST, &amp;$input_errors);
+	</custom_php_validation_command>
 	<custom_delete_php_command>
 		sync_package_filer();
 	</custom_delete_php_command>	
