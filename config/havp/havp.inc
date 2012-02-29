@@ -1293,7 +1293,7 @@ function havp_startup_script()
 {
     global $havp_config;
     $pid = HVDEF_PID_FILE;
-    $havpchk  = "ps auxw | grep \"[h]avp  -c\"|awk '{print $2}'";
+    $havpchk  = "ps auxw | grep \"[h]avp -c\"|awk '{print $2}'";
     $clamdchk = "ps auxw | grep \"[c]lamd -c\"|awk '{print $2}'";
 
     # rc script
