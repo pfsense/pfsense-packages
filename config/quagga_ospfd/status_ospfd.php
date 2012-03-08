@@ -32,7 +32,7 @@ require("guiconfig.inc");
 $pgtitle = "Quagga OSPF: Status";
 include("head.inc");
 
-$control_script = "/root/quaggactl.sh";
+$control_script = "/usr/local/bin/quaggactl";
 
 /* List all of the commands as an index. */
 function listCmds() {
