@@ -1323,5 +1323,20 @@
 		<required_version>2.0</required_version>
 		<maximum_version>2.1</maximum_version>
 	</package>
+	<package>
+		<name>Quagga OSPF</name>
+		<descr>OSPF routing protocol using Quagga -- WARNING! Installs files to the same place as OpenOSPFD. Installing both will break things.</descr>
+		<maintainer>jimp@pfsense.org</maintainer>
+		<version>0.99.20_3</version>
+		<category>Routing</category>
+		<status>BETA</status>
+		<depends_on_package_base_url>http://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
+		<depends_on_package>quagga-0.99.20_3.tbz</depends_on_package>
+		<config_file>http://www.pfsense.com/packages/config/quagga_ospfd/quagga_ospfd.xml</config_file>
+		<build_port_path>/usr/ports/net/quagga</build_port_path>
+		<pkginfolink></pkginfolink>
+		<required_version>2.0</required_version>
+		<configurationfile>quagga_ospfd.xml</configurationfile>
+	</package>
 </packages>
 </pfsensepkgs>
