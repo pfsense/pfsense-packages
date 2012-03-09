@@ -323,7 +323,7 @@
 		<field>
 			<fielddescr>OTP Lifetime</fielddescr>
 			<fieldname>varsettingsmotptimespan</fieldname>
-			<description><![CDATA[Enter the lifetime of the OTP. 1=10, 2=20s, 3=30s (Default: 2)]]></description>
+			<description><![CDATA[Enter the lifetime of the OTP. 1=10s, 2=20s, 3=30s (Default: 2)]]></description>
 			<type>input</type>
 			<default_value>2</default_value>
 		</field>
