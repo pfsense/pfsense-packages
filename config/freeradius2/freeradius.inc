@@ -149,7 +149,15 @@ function freeradius_install_command() {
 function freeradius_settings_resync() {
 	global $config;
 	$conf = '';
-	
+
+	// We do some checks of some folders which will be deleted after reboot on nanobsd systems
+	if (!file_exists("/var/log/radacct/")) { exec("mkdir /var/log/radacct"); }
+	if (!file_exists("/var/log/radacct/datacounter/")) { exec("mkdir /var/log/radacct/datacounter && mkdir /var/log/radacct/datacounter/daily && mkdir /var/log/radacct/datacounter/weekly && mkdir /var/log/radacct/datacounter/monthly && mkdir /var/log/radacct/datacounter/forever"); }
+	if (!file_exists("/var/log/radacct/timecounter/")) { exec("mkdir /var/log/radacct/timecounter"); }
+	if (!file_exists("/var/log/radutmp")) { exec("touch /var/log/radutmp");	}
+	if (!file_exists("/var/log/radwtmp")) {	exec("touch /var/log/radwtmp");	}
+	if (!file_exists("/var/log/radacct/")) { exec("chown -R root:wheel /var/log/radacct"); }
+
 	$varsettings = $config['installedpackages']['freeradiussettings']['config'][0];
 	
 	// Variables: General configuration
