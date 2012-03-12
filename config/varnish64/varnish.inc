@@ -468,10 +468,10 @@ function sync_package_varnish() {
 			#set static content var
 			$vcl_recv_static_sufix=($vcl['staticache']=='no'?"pass":"lookup");
 			$vcl_recv_static ="\t#Enable static cache\n";
-			$vcl_recv_static.="\t".'if (req.request=="GET" && req.url ~ "\.(css|js|txt|zip|pdf|rtf|flv|swf|html|htm)$") {'.$vcl_recv_static_prefix."\n\t\treturn($vcl_recv_static_sufix);\n\t\t}\n";
+			$vcl_recv_static.="\t".'if (req.request=="GET" && req.url ~ "\.(css|js|txt|zip|rtf|flv|swf|html|htm)$") {'.$vcl_recv_static_prefix."\n\t\treturn($vcl_recv_static_sufix);\n\t\t}\n";
 			$vcl_recv_static.="\t".'if (req.request=="GET" && req.url ~ "\.(gif|jpg|jpeg|bmp|png|ico|img|tga|wmf|mp3|ogg)$") {'.$vcl_recv_static_prefix."\n\t\treturn($vcl_recv_static_sufix);\n\t\t}\n";
 			$vcl_fetch_static ="#Enable static cache\n";
-			$vcl_fetch_static.='if (req.url ~ "\.(css|js|txt|zip|pdf|rtf|flv|swf|html|htm)$") {'."\n\tunset beresp.http.set-cookie;\n\t}\n";
+			$vcl_fetch_static.='if (req.url ~ "\.(css|js|txt|zip|rtf|flv|swf|html|htm)$") {'."\n\tunset beresp.http.set-cookie;\n\t}\n";
 			$vcl_fetch_static.='if (req.url ~ "\.(gif|jpg|jpeg|bmp|png|ico|img|tga|wmf|mp3|ogg)$") {'."\n\tunset beresp.http.set-cookie;\n\t}\n";
 			
 			switch ($vcl['staticache']){
