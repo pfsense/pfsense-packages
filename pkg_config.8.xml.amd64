@@ -6,6 +6,23 @@
 <copy_packages_to_folder_ssh>/usr/local/www/files/packages/amd64/8/All/</copy_packages_to_folder_ssh>
 <packages>
 	<package>
+		<name>Asterisk</name>
+		<pkginfolink>http://forum.pfsense.org/index.php/topic,47210.0.html</pkginfolink>
+		<descr><![CDATA[Asterisk is an open source framework for building communications applications.<br>Asterisk turns an ordinary computer into a communications server.]]></descr>
+		<website>http://www.asterisk.org/</website>
+		<category>Services</category>
+		<version>1.8.8.1 pkg v 0.1</version>
+		<status>Beta</status>
+		<required_version>2.0</required_version>
+		<config_file>http://www.pfsense.com/packages/config/asterisk/asterisk.xml</config_file>
+		<depends_on_package_base_url>http://e-sac.siteseguro.ws/packages/amd64/8/All/</depends_on_package_base_url>
+		<depends_on_package>asterisk18-1.8.8.1.tbz</depends_on_package>
+		<depends_on_package>openldap-sasl-client-2.4.26.tbz</depends_on_package>
+		<maintainer>marcellocoutinho@gmail.com robreg@zsurob.hu</maintainer>
+		<configurationfile>asterisk.xml</configurationfile>
+		<after_install_info>Please visit the Asterisk tab on status menu.</after_install_info>
+	</package>
+	<package>
 		<name>Filer</name>
 		<website/>
 		<descr>Allows you to create and overwrite files from the GUI.</descr>
@@ -214,7 +231,7 @@
 		<build_port_path>/usr/ports/net/haproxy</build_port_path>
 	</package>
 	<package>
-		<name>haproxy-legacy</name>
+		<name>haproxy-full</name>
 		<pkginfolink>http://doc.pfsense.org/index.php/haproxy_package</pkginfolink>
 		<descr><![CDATA[The Reliable, High Performance TCP/HTTP Load Balancer package<br>
 				This package implements both TCP and HTTP balance features from Haproxy.]]></descr>
