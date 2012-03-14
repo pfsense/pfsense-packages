@@ -57,7 +57,7 @@
 	<additional_files_needed>
 		<prefix>/usr/local/www/</prefix>
 		<chmod>0755</chmod>
-		<item>http://www.pfsense.com/packages/config/asterisk/asterisk_file_edit.php</item>
+		<item>http://www.pfsense.com/packages/config/asterisk/asterisk_edit_file.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/www/</prefix>
