@@ -368,25 +368,26 @@ function sync_package_pfblocker() {
 			}
 		}
 		#update pfsense alias table
-		if (is_array($config['aliases']['alias']))
+		if (is_array($config['aliases']['alias'])){
 			$aliases=$config['aliases']['alias'];
-		foreach($aliases as $cbalias){
-			if (preg_match("/pfBlocker/",$cbalias['name'])){
-				#mark pfctl aliastable for cleaning
-				if (!in_array($cbalias['name'], $aliases_list)) 
-						$aliases_list[]=$cbalias['name']; #mark aliastable for cleaning
-				#remove previous aliastable file if alias is not defined any more
-				if (!in_array($cbalias['name'], $new_aliases_list))
-					unlink_if_exists("/var/db/aliastables/".$cbalias['name'].".txt");
-			}
-			else{
-				$new_aliases[]=	$cbalias;
-				if (file_exists($pfb_alias_dir.'/'.$alias.'.txt') && $message ==""){
-				preg_match("/(\d+)/",exec("/usr/bin/wc -l ".$pfb_alias_dir.'/'.$alias.'.txt'),$matches);
+			foreach($aliases as $cbalias){
+				if (preg_match("/pfBlocker/",$cbalias['name'])){
+					#mark pfctl aliastable for cleaning
+					if (!in_array($cbalias['name'], $aliases_list)) 
+							$aliases_list[]=$cbalias['name']; #mark aliastable for cleaning
+					#remove previous aliastable file if alias is not defined any more
+					if (!in_array($cbalias['name'], $new_aliases_list))
+						unlink_if_exists("/var/db/aliastables/".$cbalias['name'].".txt");
 				}
-				if (($matches[1] * 2.1)>= $table_limit )
-					#alias table too large
-    				$message= $alias .' alias table is too large. Reduce networks in list or increase "Firewall Maximum Table Entries" value to at least '. (int)($matches[1] * 2.1) .' in "system - advanced - Firewall/NAT".';
+				else{
+					$new_aliases[]=	$cbalias;
+					if (file_exists($pfb_alias_dir.'/'.$alias.'.txt') && $message ==""){
+					preg_match("/(\d+)/",exec("/usr/bin/wc -l ".$pfb_alias_dir.'/'.$alias.'.txt'),$matches);
+					}
+					if (($matches[1] * 2.1)>= $table_limit )
+						#alias table too large
+	    				$message= $alias .' alias table is too large. Reduce networks in list or increase "Firewall Maximum Table Entries" value to at least '. (int)($matches[1] * 2.1) .' in "system - advanced - Firewall/NAT".';
+				}
 			}
 		}
 		#apply new alias table to xml
