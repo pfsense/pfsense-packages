@@ -23,6 +23,7 @@ if ($argv[1]=='cron'){
 	require_once("/etc/inc/pkg-utils.inc");
 	require_once("/etc/inc/globals.inc");
 	require_once("/etc/inc/filter.inc");
+	require_once("/etc/inc/config.inc");
 	$hour=date('H');
 	$pfbdir='/usr/local/pkg/pfblocker';
 	$updates=0;
