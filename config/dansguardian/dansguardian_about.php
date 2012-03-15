@@ -57,6 +57,7 @@ include("head.inc");
 	$tab_array[] = array(gettext("Limits"), false, "/pkg_edit.php?xml=dansguardian_limits.xml&id=0");
 	$tab_array[] = array(gettext("Blacklist"), false, "/pkg_edit.php?xml=dansguardian_blacklist.xml&id=0");
 	$tab_array[] = array(gettext("Access Lists"), false, "/pkg_edit.php?xml=dansguardian_antivirus.xml&id=0");
+	$tab_array[] = array(gettext("LDAP"), false, "/pkg.php?xml=dansguardian_ldap.xml&id=0");
 	$tab_array[] = array(gettext("Groups"), false, "/pkg.php?xml=dansguardian_groups.xml&id=0");
 	$tab_array[] = array(gettext("Users"), false, "/pkg.php?xml=dansguardian_users.xml&id=0");
 	$tab_array[] = array(gettext("IPs"), false, "/pkg.php?xml=dansguardian_ips.xml&id=0");

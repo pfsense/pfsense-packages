@@ -2,17 +2,16 @@
 <!DOCTYPE packagegui SYSTEM "./schema/packages.dtd">
 <?xml-stylesheet type="text/xsl" href="./xsl/package.xsl"?>
 <packagegui>
-	<copyright>
-	<![CDATA[
-/* $Id$ */
+        <copyright>
+        <![CDATA[
 /* ========================================================================== */
 /*
-    dansguardian_users.xml
-    part of the dansguardian for pfSense
+    dansguardian_ldap.xml
+    part of pfSense (http://www.pfSense.com)
     Copyright (C) 2012 Marcello Coutinho
-
-    All rights reserved.            
-			                                                                  */
+    
+    All rights reserved.                                                      
+*/
 /* ========================================================================== */
 /*
     Redistribution and use in source and binary forms, with or without
@@ -37,16 +36,17 @@
     POSSIBILITY OF SUCH DAMAGE.
                                                                               */
 /* ========================================================================== */
-	]]>
-	</copyright>
-	<description>Describe your package here</description>
-	<requirements>Describe your package requirements here</requirements>
-	<faq>Currently there are no FAQ items provided.</faq>
-	<name>dansguardianusers</name>
+        ]]>
+        </copyright>
+    <description>Describe your package here</description>
+    <requirements>Describe your package requirements here</requirements>
+    <faq>Currently there are no FAQ items provided.</faq>
+	<name>dansguardianldap</name>
 	<version>1.0</version>
 	<title>Services: Dansguardian</title>
 	<include_file>/usr/local/pkg/dansguardian.inc</include_file>
-	<tabs><tab>
+	<tabs>
+		<tab>
 			<text>Daemon</text>
 			<url>/pkg_edit.php?xml=dansguardian.xml&amp;id=0</url>
 		</tab>
@@ -69,6 +69,7 @@
 		<tab>
 			<text>LDAP</text>
 			<url>/pkg.php?xml=dansguardian_ldap.xml</url>
+			<active/>
 		</tab>
 		<tab>
 			<text>Groups</text>
@@ -77,7 +78,6 @@
 		<tab>
 			<text>Users</text>
 			<url>/pkg_edit.php?xml=dansguardian_users.xml</url>
-			<active/>
 		</tab>
 		<tab>
 			<text>IPs</text>
@@ -96,4 +96,76 @@
 			<url>/dansguardian_about.php</url>
 		</tab>
 </tabs>
+<adddeleteeditpagefields>
+		<columnitem>
+			<fielddescr>hostname</fielddescr>
+			<fieldname>dc</fieldname>
+		</columnitem>	
+		<columnitem>
+			<fielddescr>domain</fielddescr>
+			<fieldname>dn</fieldname>
+		</columnitem>	
+
+		<columnitem>
+			<fielddescr>username</fielddescr>
+			<fieldname>username</fieldname>
+		</columnitem>	
+	</adddeleteeditpagefields>
 	<fields>
+	<field>
+		<name>Ldap configuration</name>
+		<type>listtopic</type>
+	</field>
+	<field>
+		<fielddescr>Hostname</fielddescr>
+		<description><![CDATA[LDAP hostname example:<strong>dc1.mysite.com</strong>]]></description>
+		<fieldname>dc</fieldname>
+		<type>input</type>
+		<size>25</size>
+	</field>
+	<field>
+		<fielddescr>Domain</fielddescr>
+		<description><![CDATA[LDAP Domain example:<strong> dc=mysite,dc=com</strong>]]></description>
+		<fieldname>dn</fieldname>
+		<type>input</type>
+		<size>25</size>
+	</field>
+	<field>
+		<fielddescr>Username</fielddescr>
+		<description><![CDATA[Username Example:<strong>cn=antispam,cn=Users</strong>]]></description>
+		<fieldname>username</fieldname>
+		<type>input</type>
+		<size>25</size>
+	</field>
+	<field>
+		<fielddescr>Password</fielddescr>
+		<description><![CDATA[User password]]></description>
+		<fieldname>password</fieldname>
+		<type>password</type>
+		<size>10</size>
+	</field>
+	<field>
+		<fielddescr>mask</fielddescr>
+		<description><![CDATA[Default: USER<br>Apply prefix or sufix any info to username extracted.<br>
+								use "," if you need more than one mask for each user<br>
+								<strong>domain\USER #NAME,USER@MYDOMAIN.COM</strong><br>
+								NAME shows user name<br>
+								USER shows user login<br>]]></description>
+		<fieldname>mask</fieldname>
+		<type>input</type>
+		<size>50</size>
+	</field>
+	</fields>
+	<custom_php_install_command>
+		dansguardian_php_install_command();
+	</custom_php_install_command>
+	<custom_php_deinstall_command>
+		dansguardian_php_deinstall_command();
+	</custom_php_deinstall_command>
+	<custom_php_validation_command>
+		dansguardian_validate_input($_POST, &amp;$input_errors);
+	</custom_php_validation_command>	
+	<custom_php_resync_config_command>
+		sync_package_dansguardian();
+	</custom_php_resync_config_command>	
+</packagegui>

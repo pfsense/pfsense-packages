@@ -215,27 +215,30 @@ function sync_package_dansguardian() {
 	$load_samples=0;
 	
 	#ssl men-in-the-middle feature
-	$dirs=array($dansguardian_dir."/ssl",$dansguardian_dir."/ssl/generatedcerts",$dansguardian_dir."/ssl/generatedlinks");
+	$dirs=array("/var/log/dansguardian/stats","/etc/ssl/demoCA","/etc/ssl/demoCA/private","/etc/ssl/demoCA/crl","/etc/ssl/demoCA/certs",$dansguardian_dir."/ssl/generatedcerts",$dansguardian_dir."/ssl/generatedlinks");
 	foreach ($dirs as $dir)
 		if (!is_dir($dir))
-			mkdir ($dir,0700,true);
-	$ca_cert = lookup_ca($dansguardian_config["ca"][0]);
+			mkdir ($dir,0755,true);
+	$ca_cert = lookup_ca($dansguardian_config["dca"]);
 	if ($ca_cert != false) {
 		if(base64_decode($ca_cert['prv'])) {
-			file_put_contents($dansguardian_dir. "/ssl/ssl_ca_key.pem",base64_decode($ca_cert['prv']));
-			$ca_pk = "caprivatekeypath = ".$dansguardian_dir . "/ssl/ssl_ca_key.pem";
+			file_put_contents("/etc/ssl/demoCA/private/cakey.pem",base64_decode($ca_cert['prv']));
+			$ca_pk = "caprivatekeypath = '/etc/ssl/demoCA/private/cakey.pem'";
 			}
 		if(base64_decode($ca_cert['crt'])) {
-			file_put_contents($dansguardian_dir . "/ssl/ssl_ca_cert.pem",base64_decode($ca_cert['crt']));
-			$ca_pem = "cacertificatepath = ".$dansguardian_dir . "/ssl/ssl_ca_cert.pem";
-		$generatedcertpath= "generatedcertpath = ".$dansguardian_dir . "/ssl/generatedcerts";
-		$generatedlinkpath= "generatedlinkpath = ".$dansguardian_dir . "/ssl/generatedlinks";
+			file_put_contents("/etc/ssl/demoCA/cacert.pem",base64_decode($ca_cert['crt']));
+			exec("/usr/bin/openssl x509 -hash -noout -in /etc/ssl/demoCA/cacert.pem",$cert_hash);
+			file_put_contents("/usr/local/share/certs/".$cert_hash[0].".0",base64_decode($ca_cert['crt']));
+			$ca_pem = "cacertificatepath = '/etc/ssl/demoCA/cacert.pem'";
+		$generatedcertpath= "generatedcertpath = '/etc/ssl/demoCA/certs/'";
+		#generatedcertpath = ".$dansguardian_dir . "/ssl/generatedcerts";
+		$generatedlinkpath= "generatedlinkpath = '".$dansguardian_dir . "/ssl/generatedlinks'";
 			}
-		$svr_cert = lookup_cert($dansguardian_config["cert"][0]);
+		$svr_cert = lookup_cert($dansguardian_config["dcert"]);
 		if ($svr_cert != false) {
 			if(base64_decode($svr_cert['prv'])) {
-				file_put_contents($dansguardian_dir . "/ssl/ssl_server_key.pem",base64_decode($svr_cert['prv'])."\n".base64_decode($svr_cert['crt']));
-				$cert_key = "certprivatekeypath = ".$dansguardian_dir . '/ssl/ssl_server_key.pem';
+				file_put_contents("/etc/ssl/demoCA/private/serverkey.pem",base64_decode($svr_cert['prv']));
+				$cert_key = "certprivatekeypath = '/etc/ssl/demoCA/private/serverkey.pem' ";
 			}
 		}
 	}
@@ -796,7 +799,7 @@ EOF;
 	$cron_found=0;
 	if (is_array($config['cron']['item']))
 		foreach($config['cron']['item'] as $cron)
-			if (!preg_match("/usr.local.(bin.freshclam|www.dansguardian.php)/",$cron["command"])){
+			if (!preg_match("/usr.local.(bin.freshclam|www.dansguardian)/",$cron["command"])){
 				$cron_found++;
 				$new_cron['item'][]=$cron;
 			}
@@ -875,7 +878,32 @@ EOF;
 				break;
 		}
 
-		
+	$cron_cmd="/usr/local/bin/php /usr/local/www/dansguardian_ldap.php";
+	if (is_array($config['installedpackages']['dansguardiangroups']['config']))
+	 foreach ($config['installedpackages']['dansguardiangroups']['config'] as $dansguardian_groups){
+	  if(preg_match('/(\d+)m/',$dansguardian_groups['freq'],$matches)){
+				$new_cron['item'][]=array(	"minute" =>	"*/".$matches[1],
+											"hour"	 =>	"*",
+											"mday" 	 =>	"*",
+											"month"  =>	"*",
+											"wday"	 =>	"*",
+											"who"	 =>	"root",
+											"command"=>	$cron_cmd." ".$dansguardian_groups['name']);
+				$config['cron']=$new_cron;
+				$cron_found++;
+		}
+	  if(preg_match('/(\d+)h/',$dansguardian_groups['freq'],$matches)){
+				$new_cron['item'][]=array(	"minute" =>	"0",
+											"hour"	 =>	"*/".$matches[1],
+											"mday" 	 =>	"*",
+											"month"  =>	"*",
+											"wday"	 =>	"*",
+											"who"	 =>	"root",
+											"command"=>	$cron_cmd." ".$dansguardian_groups['name']);
+				$config['cron']=$new_cron;
+				$cron_found++;
+		}
+	}
 	#write files
 	conf_mount_rw();
 
@@ -997,7 +1025,10 @@ function dansguardian_validate_input($post, &$input_errors) {
 				$input_errors[] = "{$value} cannot be used as name.";
 		else if ($key == "name" && preg_match("/\W/",$value)) 
 				$input_errors[] = "{$value} cannot be used as name. Use only a-z 0-9 characters";
-				
+		else if (empty($value))
+				continue;
+		else if($key == "freq" && (!preg_match("/^\d+(h|m|d)$/",$value) || $value == 0))
+				$input_errors[] = "A valid number with a time reference is required for the field 'Update Frequency'";
 	}
 }
 
@@ -1045,6 +1076,8 @@ function dansguardian_do_xmlrpc_sync($sync_to_ip, $password,$sync_type) {
 		$xml['dansguardian'] = $config['installedpackages']['dansguardian'];
 		$xml['dansguardianantivirusacl'] = $config['installedpackages']['dansguardianantivirusacl'];
 		$xml['dansguardianconfig'] = $config['installedpackages']['dansguardianconfig'];
+		$xml['dansguardianblacklist'] = $config['installedpackages']['dansguardianblacklist'];
+		$xml['dansguardianldap'] = $config['installedpackages']['dansguardianldap'];
 		$xml['dansguardiancontentacl'] = $config['installedpackages']['dansguardiancontentacl'];
 		$xml['dansguardianfileacl'] = $config['installedpackages']['dansguardianfileacl'];
 		$xml['dansguardiangroups'] = $config['installedpackages']['dansguardiangroups'];

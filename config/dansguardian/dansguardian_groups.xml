@@ -67,6 +67,10 @@
 			<url>/pkg_edit.php?xml=dansguardian_antivirus_acl.xml&amp;id=0</url>
 		</tab>
 		<tab>
+			<text>LDAP</text>
+			<url>/pkg.php?xml=dansguardian_ldap.xml</url>
+		</tab>
+		<tab>
 			<text>Groups</text>
 			<url>/pkg.php?xml=dansguardian_groups.xml</url>
 			<active/>
@@ -148,7 +152,6 @@
  				<multiple/>
  				<size>10</size>
 		</field>
-		
 		<field>
 			<fielddescr>Pics</fielddescr>
 			<fieldname>picsacl</fieldname>
@@ -327,6 +330,32 @@
 			<strong>0 = disable ( defaults to 0 )</strong>]]></description>
 			<type>input</type>
 			<size>10</size>
+		</field>
+		<field>
+			<name>LDAP</name>
+			<type>listtopic</type>
+		</field>
+		<field>
+			<fielddescr>LDAP</fielddescr>
+			<fieldname>ldap</fieldname>
+			<description><![CDATA[Select Active directory servers to extract users from<br>
+								 The group must has the same name in dansguardian and on active directory<br>
+								 <strong>This is not aplicable for default group</strong>]]></description>
+	    	<type>select_source</type>
+	    	<size>05</size>
+	    	<multiple/>
+			<source><![CDATA[$config['installedpackages']['dansguardianldap']['config']]]></source>
+			<source_name>dc</source_name>
+			<source_value>dc</source_value>
+		</field>
+		<field>
+			<fielddescr>Update frequency</fielddescr>
+			<fieldname>freq</fieldname>
+			<description><![CDATA[How often extract users from active directory and verify changes<br>
+								Valid options are minutes(m), hours(h)<br>
+								Sample: To update every two minute, use 2m]]></description>
+	    	<type>input</type>
+	    	<size>05</size>
 		</field>
 		</fields>
 	<custom_php_install_command>

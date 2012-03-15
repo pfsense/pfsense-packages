@@ -69,6 +69,10 @@
 			<url>/pkg_edit.php?xml=dansguardian_antivirus_acl.xml&amp;id=0</url>
 		</tab>
 		<tab>
+			<text>LDAP</text>
+			<url>/pkg.php?xml=dansguardian_ldap.xml</url>
+		</tab>
+		<tab>
 			<text>Groups</text>
 			<url>/pkg.php?xml=dansguardian_groups.xml</url>
 		</tab>

@@ -680,7 +680,7 @@ softrestart = {$softrestart}
 
 #SSL certificate checking path
 #Path to CA certificates used to validate the certificates of https sites.
-sslcertificatepath = '/etc/ssl/certs/'
+sslcertificatepath = '/usr/local/share/certs/'
 
 #SSL man in the middle
 #CA certificate path

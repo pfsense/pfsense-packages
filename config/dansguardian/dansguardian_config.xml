@@ -69,6 +69,10 @@
 			<url>/pkg_edit.php?xml=dansguardian_antivirus_acl.xml&amp;id=0</url>
 		</tab>
 		<tab>
+			<text>LDAP</text>
+			<url>/pkg.php?xml=dansguardian_ldap.xml</url>
+		</tab>
+		<tab>
 			<text>Groups</text>
 			<url>/pkg.php?xml=dansguardian_groups.xml</url>
 		</tab>
@@ -198,7 +202,7 @@
 		</field>
 		<field>
 			<fielddescr>CA</fielddescr>
-			<fieldname>ca</fieldname>
+			<fieldname>dca</fieldname>
 			<description><![CDATA[Select Certificate Authority to use when SSL filtering is enabled on Group options<br>
 								To create a CA on pfsense, go to <strong>system -> Cert Manager<strong>]]></description>
 	    	<type>select_source</type>
@@ -208,7 +212,7 @@
 		</field>
 		<field>
 			<fielddescr>Cert</fielddescr>
-			<fieldname>cert</fieldname>
+			<fieldname>dcert</fieldname>
 			<description><![CDATA[Select Certificate pair to use when SSL filtering is enabled on Group options<br>
 								To create a Certificate on pfsense, go to <strong>system -> Cert Manager<strong>]]></description>
 	    	<type>select_source</type>
