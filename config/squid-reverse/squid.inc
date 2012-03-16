@@ -1063,7 +1063,7 @@ function squid_resync_reverse() {
       foreach ($defs as $def) {
         $cfg = explode(";",($def));
         if (($cfg[0]) != '' && ($cfg[1]) != '' && ($cfg[2]) != ''){
-          $conf .= "cache_peer {$cfg[1]} parent {$cfg[2]} 0 proxy-only no-query originserver ";
+          $conf .= "cache_peer {$cfg[1]} parent {$cfg[2]} 0 proxy-only no-query login=PASS originserver ";
           if($cfg[3] == 'HTTPS')
             $conf .= "login=PASS ssl sslflags=DONT_VERIFY_PEER front-end-https=auto ";
           $conf .= "name={$cfg[0]}\n";
