@@ -70,10 +70,10 @@
 		<item>http://www.pfsense.com/packages/config/asterisk/asterisk_cmd.php</item>
 	</additional_files_needed>
 	<menu>
-		<name>asterisk</name>
+		<name>Asterisk</name>
 		<tooltiptext>Asterisk</tooltiptext>
-		<section>status</section>
-		<configfile>asterisk_cmd.php</configfile>
+		<section>Status</section>
+		<url>/asterisk_cmd.php</url>
 	</menu>
 	<service>
 		<name>asterisk</name>

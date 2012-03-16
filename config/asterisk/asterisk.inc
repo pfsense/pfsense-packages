@@ -64,9 +64,9 @@ function sync_package_asterisk() {
 		$script='/usr/local/etc/asterisk/asterisk.conf';
 		if (file_exists($script)){
 			$script_file=file_get_contents($script);
-			$pattern[0]='@astdbdir => [a-z,A-Z,/]@';
+			$pattern[0]='@astdbdir => [a-z,A-Z,/]+@';
 			$replace[0]='astdbdir => /tmp';
-			$pattern[1]='@astspooldir => [a-z,A-Z,/]@';
+			$pattern[1]='@astspooldir => [a-z,A-Z,/]+@';
 			$replace[1]='astspooldir => /tmp';
 			$script_file=preg_replace($pattern,$replace,$script_file);
 			file_put_contents($script, $script_file, LOCK_EX);
