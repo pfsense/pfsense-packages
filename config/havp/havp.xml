@@ -267,6 +267,13 @@
                         <type>checkbox</type>
                 </field>
                 <field>
+                        <fielddescr>Scan Broken Executables</fielddescr>
+                        <fieldname>scanbrokenexe</fieldname>
+                        <description>Check this to enable the Heuristic Broken Executable scan.</description>
+                        <type>checkbox</type>
+						<default_value>on</default_value>
+                </field>				
+                <field>
                         <fielddescr>Log</fielddescr>
                         <fieldname>log</fieldname>
                         <description>Check this for enable log.</description>
