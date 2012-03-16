@@ -96,7 +96,7 @@ $apply_config=0;
 if (is_array($config['installedpackages']['dansguardiangroups']['config']))
 	foreach($config['installedpackages']['dansguardiangroups']['config'] as $group) {
 		#ignore default group
-		if ($id > 1)
+		if ($id > 0)
 			if ($argv[1] == "" || $argv[1] == $group['name']){
 	   		$members="";
 	   		$ldap_servers= explode (',',$group['ldap']);
@@ -106,6 +106,7 @@ if (is_array($config['installedpackages']['dansguardiangroups']['config']))
 		   			if (in_array($server['dc'],$ldap_servers)){
 		   				$ldap_dn = $server['dn'];
 		   				$ldap_host=$server['dc'];
+		   				$mask=(empty($server['mask'])?"USER":$server['mask']);
 				   		$result = get_ldap_members($group['name'],$server['username'].','.$server['dn'],$server['password']);
 		   				foreach($result as $key => $value) {
 			    			if (preg_match ("/\w+/",$value[0])){
@@ -117,7 +118,7 @@ if (is_array($config['installedpackages']['dansguardiangroups']['config']))
 			    				$replace[0]=$value[0];
 			    				$replace[1]="\n";
 			    				$replace[2]="$name";
-		    	  				$members .= preg_replace($pattern,$replace,$server['mask'])."\n";
+		    	  				$members .= preg_replace($pattern,$replace,$mask)."\n";
 			    				}
 		   					}
 		   			}
