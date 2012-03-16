@@ -160,6 +160,7 @@ define('F_SCANIMG',             'scanimg');
 define('F_SCANARC',             'scanarc');
 define('F_SCANSTREAM',          'scanstream');
 define('F_SCANARCMAXSIZE',      'scanarcmaxsize');
+define('F_SCANBROKENEXE',       'scanbrokenexe');
 # antivirus options
 define('F_HAVPUPDATE',        'havpavupdate');
 define('F_DBREGION',          'dbregion');
@@ -539,6 +540,7 @@ function havp_convert_pfxml_xml()
     $havp_config[F_SCANIMG]         = ( $pfconf[F_SCANIMG]    === 'on' ? 'true' : 'false' );
     $havp_config[F_SCANARC]         = ( $pfconf[F_SCANARC]    === 'on' ? 'true' : 'false' );
     $havp_config[F_SCANSTREAM]      = ( $pfconf[F_SCANSTREAM] === 'on' ? 'true' : 'false' );
+	$havp_config[F_SCANBROKENEXE]   = ( $pfconf[F_SCANBROKENEXE] === 'on' ? 'true' : 'false' );
     $havp_config[F_SCANARCMAXSIZE]  = ( is_numeric($pfconf[F_SCANARCMAXSIZE]) ? $pfconf[F_SCANARCMAXSIZE] : HVDEF_MAXARCSCANSIZE );
     # log
     $havp_config[F_SYSLOG]          = ( $pfconf[F_SYSLOG]      === 'on' ? 'true' : 'false' );
@@ -751,9 +753,13 @@ function havp_config_clam()
     $conf[] = "DetectPUA                 no";    # possible unwanted applications
     $conf[] = "AlgorithmicDetection      yes";
     $conf[] = "# executable";
+	if ($havp_config[F_SCANBROKENEXE] === 'true')
+	{$conf[] = "DetectBrokenExecutables   yes";}
+	else
+	{$conf[] = "DetectBrokenExecutables   no";}	
+	#
     $conf[] = "ScanPE                    yes";
     $conf[] = "ScanELF                   yes";
-    $conf[] = "DetectBrokenExecutables   yes";
     $conf[] = "# documents";
     $conf[] = "ScanOLE2                  yes";
     $conf[] = "ScanPDF                   yes";
