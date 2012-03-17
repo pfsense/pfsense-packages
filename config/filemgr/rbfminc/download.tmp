@@ -1,36 +1,42 @@
 <?php
-include "config.php";
-include "session.php";
-require_once('config.inc');
-require("guiconfig.inc");
-include("head.inc");
+include_once("auth.inc");
 include "functions.php";
-	
+//Set the cache policy
+ob_end_clean();
+header("Expires: Sat, 26 Jul 1997 05:00:00 GMT");
+header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
+header("Cache-Control: post-check=0, pre-check=0", false);
+header("Pragma: no-cache");	
+//Gets the parameters
 $_GET['file_name'] = urldecode($_GET['file_name']);
 $_GET['p'] = urldecode($_GET['p']);
-
-if($_GET['file_name'] and $_GET['p']){
-	$filepath = $_GET['p'].$_GET['file_name'];
-	if(file_exists($filepath)){
-		$type = wp_check_filetype($_GET['file_name']);
-		header('Expires: 0');
-		header('Cache-Control: must-revalidate');
-		header('Pragma: public');			
-		header('Content-type: {$type[type]}');
-		header('Content-Disposition: attachment; filename="'.$_GET['file_name'].'"');
-		header('Content-Length: ' . filesize($filepath));
-		ob_clean();
-		flush();
-		readfile($filepath);
-		exit;
+//Check Authentication
+if (session_auth())
+{
+	if($_GET['file_name'] and $_GET['p']){
+		$filepath = $_GET['p'].$_GET['file_name'];
+		if(file_exists($filepath)){
+			$type = wp_check_filetype($_GET['file_name']);	
+			header('Content-type: ' . $type[$_GET['file_name']]);
+			header('Content-Disposition: attachment; filename="'.$_GET['file_name'].'"');
+			header('Content-Length: ' . filesize($filepath));
+			header('Last-Modified: '.gmdate('D, d M Y H:i:s', filemtime($filepath)).' GMT', true, 200);
+			flush();
+			readfile($filepath);
+			exit;
+		}
+		else
+		{
+			echo("File not found");
+		}
 	}
 	else
 	{
-		echo("file not found");
+		echo("File Unknown");
 	}
 }
 else
 {
-	echo("file unknown");
+	echo("Session Expired");
 }
 ?>
