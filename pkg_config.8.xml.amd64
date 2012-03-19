@@ -999,7 +999,9 @@
 	</package>
 	<package>
 		<name>squid3</name>
-		<descr>EXPERIMENTAL! Not all directives are ported yet! High performance web proxy cache.</descr>
+		<descr><![CDATA[This package is superseded by the <b>squid-reverse</b> package.<br>
+					   It's no longer supported nor maintained.<br>
+					   <i>squid-reverse replaces the squid-packages (squid is to be deinstalled, config is maintained)</i>.]]></descr>
 		<website>http://www.squid-cache.org/</website>
 		<category>Network</category>
 		<version>3.1.9_0.1</version>
