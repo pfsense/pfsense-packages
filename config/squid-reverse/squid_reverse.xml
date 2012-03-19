@@ -100,6 +100,13 @@
 			<multiple/>
 		</field>
 		<field>
+			<fielddescr>User-defined reverse-proxy IPs</fielddescr>
+			<fieldname>reverse_ip</fieldname>
+			<description>Squid will additionally bind to this user-defined IPs for reverse-proxy operation. Useful for virtual IPs such as CARP. Separate by semi-colons (;).</description>
+			<type>input</type>
+			<size>80</size>
+		</field>			
+		<field>
 			<fielddescr>external FQDN</fielddescr>
 			<fieldname>reverse_external_fqdn</fieldname>
 			<description>The external full-qualified-domain-name of the WAN address.</description>
@@ -131,15 +138,15 @@
 			<type>input</type>
 			<size>60</size>
 		</field>
-  	<field>
+		<field>
 			<fielddescr>Enable HTTPS reverse proxy</fielddescr>
 			<fieldname>reverse_https</fieldname>
-			<description>If this field is checked, squid will act as an accelerator/SSL offload for Outlook Web Access.</description>
+			<description>If this field is checked, the proxy-server will act in HTTPS reverse mode. &lt;br&gt;(You have to add a rule with destination "WAN-address")</description>
 			<type>checkbox</type>
 			<enablefields>reverse_https_port,reverse_https_defsite,reverse_ssl_cert,reverse_ignore_ssl_valid,reverse_ssl_chain</enablefields>
 			<required/>
 			<default_value>off</default_value>
-    </field> 
+		</field> 
 		<field>
 			<fielddescr>reverse HTTPS port</fielddescr>
 			<fieldname>reverse_https_port</fieldname>
@@ -164,7 +171,7 @@
 			<source_name>descr</source_name>
 			<source_value>refid</source_value>
 		</field>
-    <field>
+		<field>
 			<fielddescr>intermediate CA certificate (if needed)</fielddescr>
 			<fieldname>reverse_int_ca</fieldname>
 			<description>Paste a signed certificate in X.509 PEM format here.</description>
@@ -187,35 +194,44 @@
 			<type>checkbox</type>  
 			<default_value>on</default_value>
 		</field>
-  	<field>
+		<field>
 			<fielddescr>Enable OWA reverse proxy</fielddescr>
 			<fieldname>reverse_owa</fieldname>
-			<description>If this field is checked, squid will act as an accelerator/SSL offload for Outlook Web Access.</description>
+			<description>If this field is checked, squid will act as an accelerator/ SSL offloader for Outlook Web App.</description>
 			<type>checkbox</type>
-			<enablefields>reverse_owa_ip,reverse_owa_activesync,reverse_owa_rpchttp</enablefields>		
-    </field>
+			<enablefields>reverse_owa_ip,reverse_owa_activesync,reverse_owa_rpchttp,reverse_owa_webservice,reverse_owa_autodiscover</enablefields>		
+		</field>
 		<field>
 			<fielddescr>OWA frontend IP address</fielddescr>
 			<fieldname>reverse_owa_ip</fieldname>
 			<description>This is the internal IP Address of the OWA frontend server.</description>
 			<type>input</type>
 			<size>15</size>
-			<default_value>localhost</default_value>
 		</field>		
 		<field>
 			<fielddescr>Enable ActiveSync</fielddescr>
 			<fieldname>reverse_owa_activesync</fieldname>
-			<description>If this field is checked, ActiveSync support will be enabled.</description>
+			<description>If this field is checked, ActiveSync will be enabled.</description>
 			<type>checkbox</type>
 		</field>
 		<field>
 			<fielddescr>Enable Outlook Anywhere</fielddescr>
 			<fieldname>reverse_owa_rpchttp</fieldname>
-			<description>If this field is checked, RPC over HTTP support will be enabled.</description>
+			<description>If this field is checked, RPC over HTTP will be enabled.</description>
 			<type>checkbox</type>
-			<enablefields>extension_methods</enablefields>			
 		</field>
-
+		<field>
+			<fielddescr>Enable Exchange WebServices</fielddescr>
+			<fieldname>reverse_owa_webservice</fieldname>
+			<description>If this field is checked, Exchange WebServices will be enabled.</description>
+			<type>checkbox</type>
+		</field>
+		<field>
+			<fielddescr>Enable AutoDiscover</fielddescr>
+			<fieldname>reverse_owa_autodiscover</fieldname>
+			<description>If this field is checked, AutoDiscover will be enabled.</description>
+			<type>checkbox</type>
+		</field>
 		<field>
 			<fielddescr>&lt;b&gt;peer definitions&lt;/b&gt; &lt;br&gt;publishing hosts</fielddescr>
 			<fieldname>reverse_cache_peer</fieldname>
