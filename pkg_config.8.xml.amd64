@@ -115,21 +115,21 @@
 		<descr><![CDATA[High performance web proxy cache.<br>
 					   It combines squid as a proxy server with it's capabilities of acting as a HTTP / HTTPS reverse proxy.<br>
 					   It includes an Exchange-Web-Access (OWA) Assistant.<br>
-					   <i>squid-reverse replaces the squid-package (squid config is maintained)</i>.]]></descr>
+					   <i>squid-reverse replaces the squid-packages (squid is to be deinstalled, config is maintained)</i>.]]></descr>
 		<pkginfolink>http://forum.pfsense.org/index.php/topic,44735.0.html</pkginfolink>
 		<website>http://www.squid-cache.org/</website>
 		<category>Network</category>
-		<version>2.7.9_2</version>
+		<version>3.1.19_2</version>
 		<status>Stable</status>
 		<required_version>2.0</required_version>
 		<maintainer>fernando@netfilter.com.br seth.mos@dds.nl mfuchs77@googlemail.com jimp@pfsense.org</maintainer>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
-		<depends_on_package_pbi>squid-2.7.9_1-amd64.pbi squid_radius_auth-1.10-amd64.pbi libwww-5.4.0_4-amd64.pbi</depends_on_package_pbi>
-		<depends_on_package>squid-2.7.9_1.tbz</depends_on_package>
+		<depends_on_package_pbi>squid-3.1.19-amd64.pbi squid_radius_auth-1.10-amd64.pbi libwww-5.4.0_4-amd64.pbi</depends_on_package_pbi>
+		<depends_on_package>squid-3.1.19.tbz</depends_on_package>
 		<depends_on_package>squid_radius_auth-1.10.tbz</depends_on_package>
 		<depends_on_package>libwww-5.4.0_4.tbz</depends_on_package>
 		<!-- use build ports from squid 2.0 -->
-    <build_options>WITH_SQUID_KERB_AUTH=true WITH_SQUID_LDAP_AUTH=true WITH_SQUID_NIS_AUTH=true WITH_SQUID_SASL_AUTH=true WITH_SQUID_DELAY_POOLS=true WITH_SQUID_SNMP=true WITH_SQUID_CARP=true WITH_SQUID_SSL=true WITHOUT_SQUID_PINGER=true WITHOUT_SQUID_DNS_HELPER=true WITH_SQUID_HTCP=true WITH_SQUID_VIA_DB=true WITH_SQUID_CACHE_DIGESTS=true WITH_SQUID_WCCP=true WITHOUT_SQUID_WCCPV2=true WITHOUT_SQUID_STRICT_HTTP=true WITH_SQUID_IDENT=true WITH_SQUID_REFERER_LOG=true WITHOUT_SQUID_USERAGENT_LOG=true WITH_SQUID_ARP_ACL=true WITH_SQUID_PF=true WITHOUT_SQUID_IPFILTER=true WITH_SQUID_FOLLOW_XFF=true WITH_SQUID_AUFS=true WITH_SQUID_COSS=true WITH_SQUID_KQUEUE=true WITH_SQUID_LARGEFILE=true WITHOUT_SQUID_STACKTRACES=true</build_options>
+		<build_options>WITH_SQUID_KERB_AUTH=true WITH_SQUID_LDAP_AUTH=true WITH_SQUID_NIS_AUTH=true WITH_SQUID_SASL_AUTH=true WITH_SQUID_DELAY_POOLS=true WITH_SQUID_SNMP=true WITH_SQUID_CARP=true WITH_SQUID_SSL=true WITHOUT_SQUID_PINGER=true WITHOUT_SQUID_DNS_HELPER=true WITH_SQUID_HTCP=true WITH_SQUID_VIA_DB=true WITH_SQUID_CACHE_DIGESTS=true WITH_SQUID_WCCP=true WITHOUT_SQUID_WCCPV2=true WITHOUT_SQUID_STRICT_HTTP=true WITH_SQUID_IDENT=true WITH_SQUID_REFERER_LOG=true WITHOUT_SQUID_USERAGENT_LOG=true WITH_SQUID_ARP_ACL=true WITH_SQUID_PF=true WITHOUT_SQUID_IPFILTER=true WITH_SQUID_FOLLOW_XFF=true WITH_SQUID_AUFS=true WITH_SQUID_COSS=true WITH_SQUID_KQUEUE=true WITH_SQUID_LARGEFILE=true WITHOUT_SQUID_STACKTRACES=true</build_options>
 		<config_file>http://www.pfsense.org/packages/config/squid-reverse/squid.xml</config_file>
 		<configurationfile>squid.xml</configurationfile>
 	</package>	
