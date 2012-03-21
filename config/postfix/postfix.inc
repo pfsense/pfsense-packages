@@ -3,7 +3,7 @@
 	postfix.inc
 	part of the Postfix package for pfSense
 	Copyright (C) 2010 Erik Fonnesbeck
-	Copyright (C) 2011 Marcello Coutinho
+	Copyright (C) 2012 Marcello Coutinho
 
 	All rights reserved.
 
@@ -658,9 +658,19 @@ MASTEREOF2;
 		{
 		mwexec("/usr/local/sbin/postmap /usr/local/etc/postfix/".$file);
 		}
-
-	if (!is_dir("/etc/mail"))
-		mkdir("/etc/mail", 0755);
+	
+	#check postix dirs
+	$dirs=array("/var/spool/postfix","/etc/mail","/var/db/postfix","/var/mail/postfix");
+	foreach ($dirs as $dir)
+		if (!is_dir($dir))
+			mkdir($dir, 0755);
+	
+	#check postfix owners
+	$dirs=array("/var/db/postfix","/var/mail/postfix");
+	foreach ($dirs as $dir){
+			chown($dir, 'postfix');
+			chgrp($dir, 'postfix');
+			}
 	if (!file_exists("/etc/mail/aliases"))
 		touch("/etc/mail/aliases");
 	exec("/usr/local/bin/newaliases");
