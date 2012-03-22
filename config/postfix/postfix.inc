@@ -663,7 +663,7 @@ MASTEREOF2;
 	$dirs=array("/var/spool/postfix","/etc/mail","/var/db/postfix","/var/mail/postfix");
 	foreach ($dirs as $dir)
 		if (!is_dir($dir))
-			mkdir($dir, 0755);
+			mkdir($dir, 0755,TRUE);
 	
 	#check postfix owners
 	$dirs=array("/var/db/postfix","/var/mail/postfix");
