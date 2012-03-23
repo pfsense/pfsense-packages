@@ -226,6 +226,7 @@ function sync_package_dansguardian() {
 			$ca_pk = "caprivatekeypath = '/etc/ssl/demoCA/private/cakey.pem'";
 			}
 		if(base64_decode($ca_cert['crt'])) {
+			$cert_hash=array();
 			file_put_contents("/etc/ssl/demoCA/cacert.pem",base64_decode($ca_cert['crt']));
 			exec("/usr/bin/openssl x509 -hash -noout -in /etc/ssl/demoCA/cacert.pem",$cert_hash);
 			file_put_contents("/usr/local/share/certs/".$cert_hash[0].".0",base64_decode($ca_cert['crt']));
@@ -1033,6 +1034,25 @@ function dansguardian_validate_input($post, &$input_errors) {
 }
 
 function dansguardian_php_install_command() {
+	conf_mount_rw();
+	#create ca-root hashes from ca-root-nss package
+	print "Creating root certificate bundle hashes from the Mozilla Project\n";
+	$cas=file('/usr/local/share/certs/ca-root-nss.crt');
+	$cert=0;
+	foreach ($cas as $ca){
+    	if (preg_match("/--BEGIN CERTIFICATE--/",$ca))
+			$cert=1;
+		if ($cert == 1)
+			$crt.=$ca;
+		if (preg_match("/-END CERTIFICATE-/",$ca)){
+			file_put_contents("/tmp/cert.pem",$crt, LOCK_EX);
+			$cert_hash=array();
+			exec("/usr/bin/openssl x509 -hash -noout -in /tmp/cert.pem",$cert_hash);
+			file_put_contents("/usr/local/share/certs/".$cert_hash[0].".0",$crt,LOCK_EX);
+			$crt="";
+			$cert=0;
+			}
+		}
 	sync_package_dansguardian();
 }
 
