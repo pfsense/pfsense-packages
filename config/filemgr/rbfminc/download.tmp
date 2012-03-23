@@ -11,7 +11,14 @@ header("Pragma: no-cache");
 $_GET['file_name'] = urldecode($_GET['file_name']);
 $_GET['p'] = urldecode($_GET['p']);
 //Check Authentication
-if (session_auth())
+$candownload = false;
+if (function_exists("session_auth"))
+	{//pfSense 2.X
+	$candownload = session_auth();}
+else
+	{//pfSense 1.2.3
+	$candownload = htpasswd_backed_basic_auth();}
+if ($candownload)
 {
 	if($_GET['file_name'] and $_GET['p']){
 		$filepath = $_GET['p'].$_GET['file_name'];
