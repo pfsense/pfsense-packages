@@ -4,7 +4,7 @@
 	status_asterisk_calls.php
 	part of pfSense
 	Copyright (C) 2009 Scott Ullrich <sullrich@gmail.com>.
-	Copyright (C) 2012 robreg@zsurob.hu
+	Copyright (C) 2012 robi <robreg@zsurob.hu>
 	All rights reserved.
 
 	originally part of m0n0wall (http://m0n0.ch/wall)
@@ -54,7 +54,6 @@ $callog = "/var/log/asterisk/cdr-csv/Master.csv";
 
 /* Data input processing */
 $cmd =  $_GET['cmd'];
-//$cmd  = str_replace("+", " ", $cmd);
 
 $file = $_SERVER["SCRIPT_NAME"];
 $break = Explode('/', $file);
@@ -73,7 +72,7 @@ if (file_exists($callog))
 		case "download":
 		// session_cache_limiter('none'); //*Use before session_start()
 		// session_start();
-		
+
 			header('Content-Description: File Transfer');
 			header('Content-Type: application/octet-stream');
 			header('Content-Disposition: attachment; filename='.basename($callog));
@@ -160,6 +159,13 @@ if (file_exists($callog))
 	<?=gettext("Listed in reverse order (latest on top).");?> <br>
 	<?=gettext("Duration includes ringing time.");?> <br>
 	<?=gettext("Trim keeps the last 50 entries.");?>
+
+<?
+if ($g['platform'] == "nanobsd")
+        echo "<br>This log is lost when rebooting the system.";
+?>
+
+
 </span>
 
 

@@ -2,7 +2,7 @@
 /*
 	edit.php
 	Copyright (C) 2004, 2005 Scott Ullrich
-	Copyright (C) 2012 robreg@zsurob.hu
+        Copyright (C) 2012 robi <robreg@zsurob.hu>
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without

@@ -4,7 +4,7 @@
 	status_asterisk_log.php
 	part of pfSense
 	Copyright (C) 2009 Scott Ullrich <sullrich@gmail.com>.
-	Copyright (C) 2012 robreg@zsurob.hu
+        Copyright (C) 2012 robi <robreg@zsurob.hu>
 	Copyright (C) 2012 Marcello Coutinho
 	All rights reserved.
 
@@ -51,7 +51,7 @@ include("head.inc");
 
 /* Path to Asterisk log file */
 if ($g['platform'] == "nanobsd")
-	$log = "/tmp/log_asterisk";
+	$log = "/tmp/asterisk.log";
 else
 	$log = "/var/log/asterisk/messages";
 
@@ -98,9 +98,9 @@ if ($cmd == "clear") {
 				<tr>
 					<td colspan="2" class="listtopic">Last 50 Asterisk log entries</td>
 				</tr>
-				
+
 				<tr valign="top"><td class="listlr" nowrap>
-				
+
 				<?php
 					$showlog_command=shell_exec("tail -50 '$log'");
 					echo nl2br($showlog_command);
@@ -123,6 +123,12 @@ if ($cmd == "clear") {
 		<strong><?=gettext("Note:");?><br /></strong>
 	</span>
 	<?=gettext("Trim keeps the last 50 lines of the log.");?>
+<?
+if ($g['platform'] == "nanobsd")
+        echo "<br>This log is lost when rebooting the system.";
+?>
+
+
 </span>
 
 <?php include("fend.inc"); ?>

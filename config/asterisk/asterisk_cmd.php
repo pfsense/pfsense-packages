@@ -4,7 +4,7 @@
 	status_asterisk.php
 	part of pfSense
 	Copyright (C) 2009 Scott Ullrich <sullrich@gmail.com>.
-	Copyright (C) 2012 robreg@zsurob.hu
+	Copyright (C) 2012 robi <robreg@zsurob.hu>
 	All rights reserved.
 
 	originally part of m0n0wall (http://m0n0.ch/wall)
@@ -95,9 +95,13 @@ $pfile = $break[count($break) - 1];
 						echo "<a href='$pfile?cmd=core+show+codecs+audio'><input type='button' name='command' value='Codecs' class='formbtns'></a>";
 						echo "<a href='$pfile?cmd=core+show+translation+recalc+10'><input type='button' name='command' value='Translation' class='formbtns'></a>";
 						echo "<a href='$pfile?cmd=sip+show+settings'><input type='button' name='command' value='SIP Settings' class='formbtns'></a>";
-						echo "<a href='$pfile?cmd=sip+reload'><input type='button' name='command' value='!Reload SIP' class='formbtns'></a>";
-						echo "<a href='$pfile?cmd=core+reload'><input type='button' name='command' value='!Reload Core' class='formbtns'></a>";
+						echo "<br>";
+						echo "<a href='$pfile?cmd=sip+reload'><input type='button' name='command' value='Reload SIP' class='formbtns'></a>";
+                                                echo "<a href='$pfile?cmd=dialplan+reload'><input type='button' name='command' value='Reload Extensions' class='formbtns'></a>";
+						echo "<a href='$pfile?cmd=core+reload'><input type='button' name='command' value='Reload Core' class='formbtns'></a>";
 						echo "<a href='$pfile?cmd=core+show+uptime'><input type='button' name='command' value='Uptime' class='formbtns'></a>";
+						echo "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+                                                echo "<a href='$pfile?cmd=core+restart+now'><input type='button' name='command' value='Restart Asterisk' class='formbtns'></a>";
 						?>
 						</td>
 					</tr>
