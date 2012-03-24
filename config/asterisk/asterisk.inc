@@ -51,6 +51,9 @@ function sync_package_asterisk() {
 	conf_mount_rw();
 	
 	//fix asterisk options for nanobsd: logging, db and calls log in /tmp
+
+	mkdir("/var/log/asterisk");
+
 	if ($g['platform'] == "nanobsd"){
 		$script='/usr/local/etc/asterisk/logger.conf';
 		if (file_exists($script)){
@@ -72,7 +75,6 @@ function sync_package_asterisk() {
 			file_put_contents($script, $script_file, LOCK_EX);
 		}
 
-		mkdir("/var/log/asterisk");
 		symlink("/tmp","/var/log/asterisk/cdr-csv");		
 	}
 
@@ -296,8 +298,7 @@ function sync_package_asterisk() {
 	//replace general SIP settings as a newbie hint to start configuration
         $script='/usr/local/etc/asterisk/sip.conf';
         if (file_exists($script)){
-		$add_sip_general_settings = "\n";
-		$add_sip_general_settings .= "[general]\n";
+		$add_sip_general_settings = "[general]\n";
 		$add_sip_general_settings .= ";The following general settings usually work on pfSense boxes.\n";
 		$add_sip_general_settings .= ";Adjust them as needed, and further SIP account settings are required.\n";
 		$add_sip_general_settings .= ";For more information check asterisk's online documentation or see the sip.conf-dist file.\n";
