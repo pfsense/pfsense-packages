@@ -129,7 +129,7 @@
 			<description><![CDATA[Enter lists Alias Names.<br>	
 								  Example: Badguys<br>
 								  Do not include pfBlocker name, it's done by package.<br>
-								  <strong>International, special or space caracters will be ignored in pfsense alias name.</strong><br>]]></description>
+								  <strong>International, special or space caracters will be ignored in firewall alias names.</strong><br>]]></description>
 			<type>input</type>
 			<size>20</size>
 		</field>	
@@ -201,7 +201,7 @@
 			<fielddescr>Update frequency</fielddescr>
 			<fieldname>cron</fieldname>
 			<description><![CDATA[Default:<strong>Never</strong><br>
-							Select how often pfsense will download List files]]></description>
+							Select how often List files will be downloaded]]></description>
 	    	<type>select</type>
  				<options>
  				<option><name>Never</name><value>Never</value></option>
