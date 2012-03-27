@@ -170,7 +170,7 @@
                         <fieldname>whitelist</fieldname>
                         <description>
                             Enter each destination url on a new line that will be accessable to the users without scanning.
-                            Use '*' symbol for mask. Example: *.pfsense.com/*, *sourceforge.net/*clamav-*, */*.xml, */*.inc
+                            Use '*' symbol for mask. Example: *.github.com/*, *sourceforge.net/*clamav-*, */*.xml, */*.inc
                         </description>
                         <type>textarea</type>
                         <cols>60</cols>
