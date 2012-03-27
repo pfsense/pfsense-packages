@@ -723,7 +723,7 @@ function varnish_do_xmlrpc_sync($sync_to_ip, $password) {
 	$cli->setCredentials('admin', $password);
 	$resp = $cli->send($msg, "250");
 	if(!$resp) {
-		$error = "A communications error occurred while attempting varnish XMLRPC sync with {$url}:{$port} (pfsense.exec_php).";
+		$error = "A communications error occurred while attempting varnish XMLRPC sync with {$url}:{$port} (exec_php).";
 		log_error($error);
 		file_notice("sync_settings", $error, "varnish Settings Sync", "");
 	} elseif($resp->faultCode()) {
@@ -733,7 +733,7 @@ function varnish_do_xmlrpc_sync($sync_to_ip, $password) {
 		log_error($error);
 		file_notice("sync_settings", $error, "varnish Settings Sync", "");
 	} else {
-		log_error("varnish XMLRPC reload data success with {$url}:{$port} (pfsense.exec_php).");
+		log_error("varnish XMLRPC reload data success with {$url}:{$port} (exec_php).");
 	}
 	
 }
