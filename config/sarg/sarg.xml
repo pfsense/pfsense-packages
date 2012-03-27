@@ -1,0 +1,243 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE packagegui SYSTEM "./schema/packages.dtd">
+<?xml-stylesheet type="text/xsl" href="./xsl/package.xsl"?>
+<packagegui>
+	<copyright>
+	<![CDATA[
+/* $Id$ */
+/* ========================================================================== */
+/*
+    sarg.xml
+    part of the sarg for pfSense
+    Copyright (C) 2012 Marcello Coutinho
+
+    All rights reserved.            
+			                                                                  */
+/* ========================================================================== */
+/*
+    Redistribution and use in source and binary forms, with or without
+    modification, are permitted provided that the following conditions are met:
+
+     1. Redistributions of source code must retain the above copyright notice,
+        this list of conditions and the following disclaimer.
+
+     2. Redistributions in binary form must reproduce the above copyright
+        notice, this list of conditions and the following disclaimer in the
+        documentation and/or other materials provided with the distribution.
+
+    THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
+    INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+    AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+    AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+    OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+    INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+    POSSIBILITY OF SUCH DAMAGE.
+                                                                              */
+/* ========================================================================== */
+	]]>
+	</copyright>
+	<description>Describe your package here</description>
+	<requirements>Describe your package requirements here</requirements>
+	<faq>Currently there are no FAQ items provided.</faq>
+	<name>sarg</name>
+	<version>1.0</version>
+	<title>Services: sarg</title>
+	<include_file>/usr/local/pkg/sarg.inc</include_file>
+	<menu>
+		<name>Sarg Reports</name>
+		<tooltiptext>Configure sarg</tooltiptext>
+		<section>Status</section>
+		<url>/pkg_edit.php?xml=sarg.xml</url>
+	</menu>
+	<service>
+		<name>sarg</name>
+		<rcfile>sarg</rcfile>
+		<executable>sarg</executable>
+		<description><![CDATA[Squid Analysis Report Generator is a tool that allow you to view "where" your users are going to on the Internet.]]></description>
+	</service>
+	<additional_files_needed>
+		<item>http://www.pfsense.org/packages/config/sarg/sarg.inc</item>
+		<prefix>/usr/local/pkg/</prefix>
+		<chmod>0755</chmod>
+	</additional_files_needed>
+	<additional_files_needed>
+		<item>http://www.pfsense.org/packages/config/sarg/sarg_schedule.inc</item>
+		<prefix>/usr/local/pkg/</prefix>
+		<chmod>0755</chmod>
+	</additional_files_needed>
+	<additional_files_needed>
+		<item>http://www.pfsense.org/packages/config/sarg/sarg_sync.xml</item>
+		<prefix>/usr/local/pkg/</prefix>
+		<chmod>0755</chmod>
+	</additional_files_needed>
+	<additional_files_needed>
+		<item>http://www.pfsense.org/packages/config/sarg/sarg_realtime.php</item>
+		<prefix>/usr/local/www/</prefix>
+		<chmod>0755</chmod>
+	</additional_files_needed>
+	<additional_files_needed>
+		<item>http://www.pfsense.org/packages/config/sarg/sarg_about.php</item>
+		<prefix>/usr/local/www/</prefix>
+		<chmod>0755</chmod>
+	</additional_files_needed>
+	<additional_files_needed>
+		<item>http://www.pfsense.org/packages/config/sarg/sarg.php</item>
+		<prefix>/usr/local/www/</prefix>
+		<chmod>0755</chmod>
+	</additional_files_needed>
+	<tabs>
+		<tab>
+			<text>Settings</text>
+			<url>/pkg_edit.php?xml=sarg.xml&amp;id=0</url>
+			<active/>
+		</tab>
+		<tab>
+			<text>Schedule</text>
+			<url>/pkg.php?xml=sarg_schedule.xml&amp;id=0</url>
+		</tab>
+		<tab>
+			<text>View Report</text>
+			<url>/sarg-reports/</url>
+		</tab>
+		<tab>
+			<text>Realtime</text>
+			<url>/sarg_realtime.php</url>
+		</tab>
+		<tab>
+			<text>XMLRPC Sync</text>
+			<url>/pkg_edit.php?xml=sarg_sync.xml&amp;id=0</url>
+		</tab>
+		<tab>
+			<text>Help</text>
+			<url>/sarg_about.php</url>
+		</tab>
+</tabs>
+	<fields>
+		<field>
+			<name>Log Settings</name>
+			<type>listtopic</type>
+		</field>
+		<field>
+			<fielddescr>Proxy server</fielddescr>
+			<fieldname>proxy_server</fieldname>
+			<description><![CDATA[Select proxy server to read logs from]]></description>
+	    	<type>select</type>
+ 				<options>
+ 				<option><name>Dansguardian</name><value>dansguardian</value></option>
+ 				<option><name>Squidguard</name><value>squidguard</value></option>
+ 				<option><name>Squid</name><value>squid</value></option>
+ 				</options>
+		</field>
+		<field>
+			<fielddescr>Report Options</fielddescr>
+			<fieldname>report_options</fieldname>
+			<description><![CDATA[Sarg report options. Default values are in ( )<br>
+			If you select any option, it will be enabled on conf file.<br>
+			Use CTRL + click on this field]]></description>
+	    	<type>select</type>
+ 				<options>
+ 				<option><name>Use graphics where is possible. (yes)</name><value>use_graphs</value></option>
+ 				<option><name>Use anonymous file and directory names in the report. (no)</name><value>anonymous_output_files </value></option>
+ 				<option><name>Convert ip address to dns name (no)</name><value>resolve_ip</value></option>
+ 				<option><name>Use Ip Address instead userid in reports. (no)</name><value>user_ip</value></option>
+ 				<option><name>Sort Fields in Reverse order (no)</name><value>user_sort_field_order</value></option>
+ 				<option><name>Remove temporary files from root report directory  (yes)</name><value>remove_temp_files</value></option>
+ 				<option><name>Generate the main index.html (yes)</name><value>main_index</value></option>
+ 				<option><name>Generate the index tree by file (on)</name><value>index_tree</value></option>
+ 				<option><name>Overwrite report (yes)</name><value>overwrite_report</value></option>
+ 				<option><name>Use comma instead point in reports (yes)</name><value>use_comma</value></option>
+ 				<option><name>Show full url in report (no)</name><value>long_url</value></option>
+ 				<option><name>Privacy (no)</name><value>privacy</value></option>
+ 				</options>
+ 				<multiple/>
+ 				<size>13</size>
+		</field>
+		<field>
+			<fielddescr>Report to generate</fielddescr>
+			<fieldname>report_type</fieldname>
+			<description><![CDATA[Sarg report type. All are enabled by default<br>
+			Use CTRL + click on this field]]></description>
+	    	<type>select</type>
+ 				<options>
+ 				<option><name>topusers            - users, sites, times, bytes, connects, links to accessed sites, etc</name><value>topusers</value></option>
+ 				<option><name>topsites		   - site, connect and bytes report</name><value>topsites</value></option>
+ 				<option><name>sites_users	   - users and sites report</name><value>sites_users</value></option>
+ 				<option><name>users_sites	   - accessed sites by the user report</name><value>users_sites</value></option>
+ 				<option><name>date_time	   - bytes used per day and hour report</name><value>date_time</value></option>
+ 				<option><name>denied		   - denied sites with full URL report</name><value>denied</value></option>
+ 				<option><name>auth_failures       - autentication failures report</name><value>auth_failures</value></option>
+ 				<option><name>site_user_time_date - sites, dates, times and bytes report</name><value>site_user_time_date</value></option>
+ 				<option><name>downloads           - downloads per user report</name><value>downloads</value></option>
+ 				</options>
+ 				<multiple/>
+ 				<size>10</size>
+		</field>
+		<field>
+			<name>User Settings</name>
+			<type>listtopic</type>
+		</field>
+		<field>
+			<fielddescr>User Sort Field</fielddescr>
+			<fieldname>user_sort_field</fieldname>
+			<description><![CDATA[Sort field for the User Report.]]></description>
+	    	<type>select</type>
+ 				<options>
+ 				<option><name>BYTES(default)</name><value>BYTES</value></option>
+ 				<option><name>SITE normal</name><value>SITE</value></option>
+ 				<option><name>CONNECT</name><value>CONNECT</value></option>
+ 				<option><name>TIME</name><value>TIME</value></option>
+ 				</options>
+		</field>
+		<field>
+			<fielddescr>Exclude users</fielddescr>
+			<fieldname>exclude_userlist</fieldname>
+			<description><![CDATA[Users within the file will be excluded from reports.<br>
+									You can use indexonly to have only index.html file.<br>
+									<strong>Format: one user per line.</strong>]]></description>
+			<type>textarea</type>
+			<cols>70</cols>
+			<rows>10</rows>
+			<encoding>base64</encoding>
+		</field>
+		<field>
+			<fielddescr>Include users</fielddescr>
+			<fieldname>include_userlist</fieldname>
+			<description><![CDATA[Reports will be generated only for listed users.<br> 
+								<strong>Format: user1:user2:...:usern</strong>]]></description>
+			<type>input</type>
+			<size>70</size>
+		</field>
+		<field>
+			<fielddescr>Users association</fielddescr>
+			<fieldname>usertab</fieldname>
+			<description><![CDATA[You can change the "userid" or the "ip address" to be a real user name on the reports.<br>
+									If resolve_ip is active, the ip address is resolved before being looked up into this file.<br>
+									That is, if you want to map the ip address, be sure to set resolv_ip to no or the resolved name will be looked into the file instead of the ip address.<br>
+									Note that it can be used to resolve any ip address known to the dns and then map the unresolved ip addresses to a name found in the usertab file.<br>
+									<strong>Table syntax: userid name   or   ip address name</strong><br>
+									Eg:<br>SirIsaac Isaac Newton<br>
+									vinci Leonardo da Vinci<br>
+									192.168.10.1 Karol Wojtyla]]></description>
+			<type>textarea</type>
+			<cols>70</cols>
+			<rows>10</rows>
+			<encoding>base64</encoding>
+		</field>
+
+	</fields>
+	<custom_php_install_command>
+		sarg_php_install_command();
+	</custom_php_install_command>
+	<custom_php_deinstall_command>
+		sarg_php_deinstall_command();
+	</custom_php_deinstall_command>
+	<custom_php_validation_command>
+		sarg_validate_input($_POST, &amp;$input_errors);
+	</custom_php_validation_command>	
+	<custom_php_resync_config_command>
+		sync_package_sarg();
+	</custom_php_resync_config_command>
+</packagegui>

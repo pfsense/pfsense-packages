@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE packagegui SYSTEM "./schema/packages.dtd">
+<?xml-stylesheet type="text/xsl" href="./xsl/package.xsl"?>
+<packagegui>
+        <copyright>
+        <![CDATA[
+/* ========================================================================== */
+/*
+    sarg_schedule.xml
+    part of pfSense (http://www.pfSense.com)
+    Copyright (C) 2012 Marcello Coutinho
+    All rights reserved.                                                      
+*/
+/* ========================================================================== */
+/*
+    Redistribution and use in source and binary forms, with or without
+    modification, are permitted provided that the following conditions are met:
+
+     1. Redistributions of source code must retain the above copyright notice,
+        this list of conditions and the following disclaimer.
+
+     2. Redistributions in binary form must reproduce the above copyright
+        notice, this list of conditions and the following disclaimer in the
+        documentation and/or other materials provided with the distribution.
+
+    THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
+    INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+    AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+    AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+    OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+    INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+    POSSIBILITY OF SUCH DAMAGE.
+                                                                              */
+/* ========================================================================== */
+        ]]>
+        </copyright>
+    <description>Describe your package here</description>
+    <requirements>Describe your package requirements here</requirements>
+    <faq>Currently there are no FAQ items provided.</faq>
+	<name>sargschedule</name>
+	<version>0.5</version>
+	<title>sarg</title>
+	<include_file>/usr/local/pkg/sarg.inc</include_file>
+	<additional_files_needed>
+		<prefix>/usr/local/pkg/</prefix>
+		<chmod>0755</chmod>
+		<item>http://www.pfsense.com/packages/config/sarg/sarg.inc</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/pkg/</prefix>
+		<chmod>0755</chmod>
+		<item>http://www.pfsense.com/packages/config/sarg/sarg_sync.xml</item>
+	</additional_files_needed>
+	<menu>
+		<name>sarg</name>
+		<tooltiptext>sarg</tooltiptext>
+		<section>Diagnostics</section>
+		<configfile>sarg.xml</configfile>
+	</menu>
+	<tabs>
+		<tab>
+			<text>Settings</text>
+			<url>/pkg_edit.php?xml=sarg.xml&amp;id=0</url>
+		</tab>
+		<tab>
+			<text>Schedule</text>
+			<url>/pkg.php?xml=sarg_schedule.xml&amp;id=0</url>
+			<active/>
+		</tab>
+		<tab>
+			<text>View Report</text>
+			<url>/sarg-reports/</url>
+		</tab>
+		<tab>
+			<text>Realtime</text>
+			<url>/sarg_realtime.php</url>
+		</tab>
+		<tab>
+			<text>XMLRPC Sync</text>
+			<url>/pkg_edit.php?xml=sarg_sync.xml&amp;id=0</url>
+		</tab>
+		<tab>
+			<text>Help</text>
+			<url>/sarg_about.php</url>
+		</tab>
+	</tabs>
+	<adddeleteeditpagefields>
+		<columnitem>
+			<fielddescr>Status</fielddescr>
+			<fieldname>enable</fieldname>
+		</columnitem>
+		<columnitem>
+			<fielddescr>Update Frequency</fielddescr>
+			<fieldname>frequency</fieldname>
+		</columnitem>
+		<columnitem>
+			<fielddescr>args</fielddescr>
+			<fieldname>mod</fieldname>
+		</columnitem>
+		<columnitem>
+			<fielddescr>Description</fielddescr>
+			<fieldname>description</fieldname>
+		</columnitem>	
+	</adddeleteeditpagefields>
+	<fields>
+		<field>
+			<type>listtopic</type>
+			<fieldname>temp</fieldname>
+			<name>Schedule Options</name>
+		</field>
+		<field>
+			<fielddescr>Enable</fielddescr>
+			<fieldname>enable</fieldname>
+			<type>checkbox</type>
+			<description>Enable this schedule</description>
+		</field>	
+		<field>
+			<fielddescr>Description</fielddescr>
+			<fieldname>description</fieldname>
+			<description>Enter a description for this file.</description>
+			<type>input</type>
+			<size>60</size>
+		</field>
+		<field>
+			<fielddescr>Sarg args</fielddescr>
+			<fieldname>args</fieldname>
+			<description>Enter sarg extra args to run on this schedule.</description>
+			<type>input</type>
+			<size>25</size>
+		</field>
+		<field>
+			<fielddescr>frequency</fielddescr>
+			<fieldname>frequency</fieldname>
+			<type>input</type>
+			<size>10</size>
+			<description><![CDATA[How often extract users from active directory and verify changes<br>
+							Valid options are minutes(m), hours(h), days(d)<br>
+							Sample: To update every hour, use 1h<br><br>]]>&lt;input type=&quot;submit&quot; name=&quot;Submit&quot; value=&quot;Force udpate now&quot;&gt;&lt;br&gt;</description>
+			<required/>
+		</field>
+		<field>
+			<fielddescr>Action after sarg</fielddescr>
+			<fieldname>action</fieldname>
+			<type>select</type>
+ 				<options>
+ 				<option><name>None(default)</name><value>none</value></option>
+				<option><name>rotate logs</name><value>rotate</value></option>
+				<option><name>Restart proxy daemon</name><value>restart</value></option>
+				<option><name>Rotate log and restart proxy daemon</name><value>both</value></option>
+				</options>
+			<description>Choose an action after sarg finishes</description>
+		</field>
+	</fields>
+	<custom_php_install_command>
+		sarg_install();
+	</custom_php_install_command>
+	<custom_php_command_before_form>
+	</custom_php_command_before_form>
+	<custom_php_validation_command>
+		sarg_validate_input($_POST, &amp;$input_errors);
+	</custom_php_validation_command>
+	<custom_delete_php_command>
+		sync_package_sarg();
+	</custom_delete_php_command>	
+	<custom_php_resync_config_command>
+		sarg_resync();
+	</custom_php_resync_config_command>
+</packagegui>
