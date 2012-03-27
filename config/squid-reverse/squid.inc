@@ -271,10 +271,12 @@ function squid_deinstall_command() {
 }
 
 function squid_before_form_general($pkg) {
-	$values_raw = get_dir(SQUID_CONFBASE . '/errors/');
-	// Get rid of '..' and '.' and ...
-	$values = array_diff ($values_raw, array('.','..','COPYRIGHT','TRANSLATORS'));
-	sort($values);
+	$values = get_dir(SQUID_CONFBASE . '/errors/');
+	// Get rid of '..' and '.'
+	array_shift($values);
+	array_shift($values);
+	array_shift($values);
+	array_shift($values);
 	
 	$name = array();
 	foreach ($values as $value)
