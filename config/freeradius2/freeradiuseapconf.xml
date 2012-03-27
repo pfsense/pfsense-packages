@@ -164,26 +164,26 @@
 			<type>listtopic</type>
 		</field>
 		<field>
-			<fielddescr>Choose pfSense Cert-Manager</fielddescr>
+			<fielddescr>Choose Cert-Manager</fielddescr>
 			<fieldname>vareapconfchoosecertmanager</fieldname>
 			<description><![CDATA[Choose your Cert manager. By default it is the freeradius cert manager because the server needs some default certs to start service. For more information take al look at "Certificates"-Tab.<br>
-									To use the pfsense Cert Manager you have to create a CA and an Server Certificate first. (SYSTEM -> Cert Manager).<br><br>
+									To use the firewall's built-in Cert Manager you have to create a CA and an Server Certificate first. (SYSTEM -> Cert Manager).<br><br>
 									<b>uncheked</b>: FreeRADIUS Cert-Manager (not recommended) (Default: unchecked)<br>
-									<b>cheked</b>: pfSense Cert-Manager (recommended)]]></description>
+									<b>cheked</b>: Firewall Cert-Manager (recommended)]]></description>
 			<type>checkbox</type>
 			<enablefields>ssl_ca_cert,ssl_server_cert,vareapconfenableclientp12</enablefields>
 		</field>
 		<field>
 			<fielddescr>Private Key Password</fielddescr>
 			<fieldname>vareapconfprivatekeypassword</fieldname>
-			<description><![CDATA[By default the certificates created by freeradius are protected with an "input/ouput" password from reading the certificate. The certificates created by pfSense Cert Manager are not protected so you must leave this field empty. (Default: whatever)]]></description>
+			<description><![CDATA[By default the certificates created by freeradius are protected with an "input/ouput" password from reading the certificate. The certificates created by the firewall's built-in Cert Manager are not protected so you must leave this field empty. (Default: whatever)]]></description>
 			<type>password</type>
 			<default_value>whatever</default_value>
 		</field>
 		<field>
 			<fielddescr>SSL CA Certificate</fielddescr>
 			<fieldname>ssl_ca_cert</fieldname>
-			<description><![CDATA[Choose the SSL CA Certficate here which you created with the pfSense Cert Manager.<br>
+			<description><![CDATA[Choose the SSL CA Certficate here which you created with the firewall's Cert Manager.<br>
 									Choose "none" if you do not use any kind of certificates or the freeradius Cert Manager. (Default: none)]]></description>
 			<type>select_source</type>
 			<source><![CDATA[freeradius_get_ca_certs()]]></source>
@@ -193,7 +193,7 @@
 		<field>
 			<fielddescr>SSL Server Certificate</fielddescr>
 			<fieldname>ssl_server_cert</fieldname>
-			<description><![CDATA[Choose the SSL Server Certficate here which you created with the pfSense Cert Manager.<br>
+			<description><![CDATA[Choose the SSL Server Certficate here which you created with the firewall's Cert Manager.<br>
 									Choose "none" if you do not use any kind of certificates or the freeradius Cert Manager. (Default: none)]]></description>
 			<type>select_source</type>
 			<source><![CDATA[freeradius_get_server_certs()]]></source>
@@ -210,7 +210,7 @@
 		<field>
 			<fielddescr>SSL Client Certificate</fielddescr>
 			<fieldname>ssl_client_cert</fieldname>
-			<description><![CDATA[Choose the SSL Client Certficate here which you created with the pfSense Cert Manager.<br>
+			<description><![CDATA[Choose the SSL Client Certficate here which you created with the firewall's Cert Manager.<br>
 									Choose "none" if you do not use any kind of certificates or the freeradius Cert Manager. (Default: none)]]></description>
 			<type>select_source</type>
 			<source><![CDATA[freeradius_get_server_certs()]]></source>

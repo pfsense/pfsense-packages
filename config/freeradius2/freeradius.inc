@@ -2573,7 +2573,7 @@ function freeradius_do_xmlrpc_sync($sync_to_ip, $password, $varsyncport, $varsyn
 	$cli->setCredentials('admin', $password);
 		$resp = $cli->send($msg, "150");
 		if(!$resp) {
-			$error = "A communications error occurred while FreeRADIUS was attempting XMLRPC sync with {$url}:{$port} (pfsense.exec_php).";
+			$error = "A communications error occurred while FreeRADIUS was attempting XMLRPC sync with {$url}:{$port} (exec_php).";
 			log_error($error);
 			file_notice("sync_settings", $error, "freeradius Settings Sync", "");
 		} elseif($resp->faultCode()) {
@@ -2583,7 +2583,7 @@ function freeradius_do_xmlrpc_sync($sync_to_ip, $password, $varsyncport, $varsyn
 			log_error($error);
 			file_notice("sync_settings", $error, "freeradius Settings Sync", "");
 		} else {
-			log_error("FreeRADIUS: XMLRPC has reloaded data successfully on {$url}:{$port} (pfsense.exec_php).");
+			log_error("FreeRADIUS: XMLRPC has reloaded data successfully on {$url}:{$port} (exec_php).");
 		}
 
 }

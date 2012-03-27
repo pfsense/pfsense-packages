@@ -215,7 +215,7 @@
 		<field>
 			<fielddescr>Redirection URL</fielddescr>
 			<fieldname>varmacsswisprredirectionurl</fieldname>			
-			<description><![CDATA[Enter the URL the MAC should be redirected to after successfull login. (e.g.: http://www.pfsense.org)]]></description>
+			<description><![CDATA[Enter the URL the MAC should be redirected to after successfull login. (e.g.: http://www.google.com)]]></description>
 			<type>input</type>
 		</field>
 		<field>

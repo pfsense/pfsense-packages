@@ -124,7 +124,7 @@
 									This page uses the freeradius2 built-in script called "bootstrap" to create CA and certs. The disatvantage of this script is that nothing of your changes will be saved in the global config.xml file. So after a systemcrash or reinstallation of freeradius2 package
 									all your CA and certs will be lost. If you have a backup of all these files on an USB stick or another server than you can copy them back in the freeradius certs folder.<br><br>
 									
-									<b>The better way is to use the pfsense built-in Cert Manager (SYSTEM-> Cert Manager).</b> The CA-Cert and Server-Cert you created there you just have to choose in EAP.
+									<b>The better way is to use the firewall's built-in Cert Manager (SYSTEM-> Cert Manager).</b> The CA-Cert and Server-Cert you created there you just have to choose in EAP.
 									The advantage of this is that all your CA and certs will be saved in global config.xml and can be restored.]]></description>
 			<type>input</type>
 			<required/>

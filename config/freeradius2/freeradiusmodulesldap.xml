@@ -354,7 +354,7 @@
 		<field>
 			<fielddescr>SSL CA Certificate</fielddescr>
 			<fieldname>ssl_ca_cert1</fieldname>
-			<description><![CDATA[Choose the SSL CA Certficate here which you created with the pfSense Cert Manager.<br>
+			<description><![CDATA[Choose the SSL CA Certficate here which you created with the firewall's Cert Manager.<br>
 									Choose "none" if you do not use any kind of certificates or the freeradius Cert Manager. (Default: none)]]></description>
 			<type>select_source</type>
 			<source><![CDATA[freeradius_get_ca_certs()]]></source>
@@ -364,7 +364,7 @@
 		<field>
 			<fielddescr>SSL Server Certificate</fielddescr>
 			<fieldname>ssl_server_cert1</fieldname>
-			<description><![CDATA[Choose the SSL Server Certficate here which you created with the pfSense Cert Manager.<br>
+			<description><![CDATA[Choose the SSL Server Certficate here which you created with the firewall's Cert Manager.<br>
 									Choose "none" if you do not use any kind of certificates or the freeradius Cert Manager. (Default: none)]]></description>
 			<type>select_source</type>
 			<source><![CDATA[freeradius_get_server_certs()]]></source>
@@ -665,7 +665,7 @@
 		<field>
 			<fielddescr>SSL CA Certificate</fielddescr>
 			<fieldname>ssl_ca_cert2</fieldname>
-			<description><![CDATA[Choose the SSL CA Certficate here which you created with the pfSense Cert Manager.<br>
+			<description><![CDATA[Choose the SSL CA Certficate here which you created with the firewall's Cert Manager.<br>
 									Choose "none" if you do not use any kind of certificates or the freeradius Cert Manager. (Default: none)]]></description>
 			<type>select_source</type>
 			<source><![CDATA[freeradius_get_ca_certs()]]></source>
@@ -675,7 +675,7 @@
 		<field>
 			<fielddescr>SSL Server Certificate</fielddescr>
 			<fieldname>ssl_server_cert2</fieldname>
-			<description><![CDATA[Choose the SSL Server Certficate here which you created with the pfSense Cert Manager.<br>
+			<description><![CDATA[Choose the SSL Server Certficate here which you created with the firewall's Cert Manager.<br>
 									Choose "none" if you do not use any kind of certificates or the freeradius Cert Manager. (Default: none)]]></description>
 			<type>select_source</type>
 			<source><![CDATA[freeradius_get_server_certs()]]></source>
