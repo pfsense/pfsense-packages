@@ -427,8 +427,14 @@ function sync_package_pfblocker() {
 		$last_iface="";
 		$rules=$config['filter']['rule'];
 		$new_rules=array();
+		# The assumption is that the rules in the config come in groups by interface then priority.
+		# e.g. all rules for WAN (highest priority first), then for LAN then for OPT1 etc.
+		# Note that floating rules (interface is "") can appear mixed in the list.
 		foreach ($rules as $rule){
-			if ($rule['interface'] <> $last_iface){
+			# If this next rule is for a non-blank interface, different to the previous interface,
+			# then add any needed pfblocker rules to the interface. This puts pfblocker rules at the
+			# top of the list for each interface, after any built-in rules (e.g. anti-lockout)
+			if (($rule['interface'] != "") && ($rule['interface'] <> $last_iface)){
 				$last_iface = $rule['interface'];
 				#apply pfblocker rules if enabled
 				
@@ -465,7 +471,7 @@ function sync_package_pfblocker() {
 							}
 					}
 			}
-		  #include all rules that is not from pfBlocker
+		  #include all rules that are not from pfBlocker
 		  if (!preg_match("/pfBlocker.*rule/",$rule['descr']) && ($rule['interface'] != "" || $rule['floating']=="yes"))
 					$new_rules[]=$rule;
 		}
