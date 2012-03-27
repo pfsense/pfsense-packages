@@ -83,7 +83,7 @@
 		<field>
 			<fielddescr>Automatically sync Zebedee configuration changes</fielddescr>
 			<fieldname>synconchanges</fieldname>
-			<description>pfSense will automatically sync changes to the hosts defined below.</description>
+			<description>Automatically sync changes to the hosts defined below.</description>
 			<type>checkbox</type>
 		</field>
 		<field>

@@ -163,7 +163,7 @@
 			<type>input</type>
 			<size>60</size>
 			<description>
-				This specifies the external name are put in client.zbd file in field serverhost. Ex: 200.111.111.22 or zebedee.pfsense.org   
+				This specifies the external name are put in client.zbd file in field serverhost. Ex: 200.111.111.22 or zebedee.example.com   
 			</description>
 		</field>
 		<field>
