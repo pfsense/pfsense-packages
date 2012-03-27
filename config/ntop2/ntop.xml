@@ -135,7 +135,7 @@
 			$first = 1;
 		}
 		}
-		$start = "/usr/local/bin/ntop -i {$ifaces_final} -u root -d {$alltraffic} {$mergeifs} -x 8102 -X 8192 &";
+		$start = "/usr/local/bin/ntop -i {$ifaces_final} -u root -4 -6 -d {$alltraffic} {$mergeifs} -x 8102 -X 8192 &";
 		write_rcfile(array(
 					"file" => "ntop.sh",
 					"start" => $start,
