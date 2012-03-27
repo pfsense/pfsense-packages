@@ -668,7 +668,7 @@ function enable_change(enable_change) {
 					type="checkbox" value="on"
 					<?php if ($pconfig['alertsystemlog'] == "on") echo "checked"; ?>
 					onClick="enable_change(false)"><br>
-				Snort will send Alerts to the Pfsense system logs.</td>
+				Snort will send Alerts to the firewall's system logs.</td>
 			</tr>
 			<tr>
 				<td width="22%" valign="top" class="vncell2">Log to a Tcpdump file</td>

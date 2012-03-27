@@ -389,7 +389,7 @@ echo "{$snort_general_css}\n";
 					type="text" class="formfld" id="def_ssh_ports" size="40"
 					value="<?=htmlspecialchars($pconfig['def_ssh_ports']);?>"> <br>
 				<span class="vexpl">Example: Specific ports "25,443" or All ports
-				betwen "5060:5090 . Default is Pfsense SSH port.</span></td>
+				betwen "5060:5090 . Default is the firewall's SSH port.</span></td>
 			</tr>
 			<tr>
 				<td width="22%" valign="top" class="vncell2">Define POP_SERVERS</td>

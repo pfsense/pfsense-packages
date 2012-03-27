@@ -340,7 +340,7 @@ enable JavaScript to view this content
 			<?php if($pconfig['snortloglimit']=='off') echo 'checked'; ?>> <strong>Disable</strong>
 						directory size limit<br>
 						<br>
-						<span class="red"><strong>Warning</span>:</strong> Pfsense Nanobsd
+						<span class="red"><strong>Warning</span>:</strong> Nanobsd
 						should use no more than 10MB of space.</td>
 					</tr>
 					<tr>
