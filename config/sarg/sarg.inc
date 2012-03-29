@@ -33,14 +33,6 @@
 /* ========================================================================== */
 
 
-function sarg_php_install_command() {
-	// reserved
-}
-
-function sarg_php_deinstall_command() {
-	// reserved
-}
-
 function sarg_start() {
 	global $g, $config;
 	
@@ -398,6 +390,14 @@ function sarg_do_xmlrpc_sync($sync_to_ip, $username, $password) {
 		log_error("sarg XMLRPC reload data success with {$url}:{$port} (pfsense.exec_php).");
 	}
 	
+}
+
+function sarg_php_install_command() {
+	sync_package_sarg();
+}
+
+function sarg_php_deinstall_command() {
+	// reserved
 }
 
 ?>
