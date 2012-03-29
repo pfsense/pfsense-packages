@@ -71,16 +71,8 @@ include("head.inc");
 						<td colspan="2" valign="top" class="listtopic"><?=gettext("Help docs"); ?></td>
 						</tr>
 						<tr>
-                        <td width="22%" valign="top" class="vncell"><?=gettext("Copyright");?></td>
-						<td width="78%" class="vtable"><?=gettext("<a target=_new href='http://dansguardian.org/?page=copyright2'>Copyright and licensing for Dansguardian 2</a><br><br>");?>
-                        </tr>
-						<tr>
-                        <td width="22%" valign="top" class="vncell"><?=gettext("Blacklists");?></td>
-						<td width="78%" class="vtable"><?=gettext("<a target=_new href='http://www.squidguard.org/blacklists.html'>Dansguardian Blacklists</a><br><br>");?>
-                        </tr>
-						<tr>
-                        <td width="22%" valign="top" class="vncell"><?=gettext("Whatis");?></td>
-						<td width="78%" class="vtable"><?=gettext("<a target=_new href='http://dansguardian.org/?page=whatisdg'>What is Dansguardian</a><br><br>");?>
+                        <td width="22%" valign="top" class="vncell"><?=gettext("Sarg Site");?></td>
+						<td width="78%" class="vtable"><?=gettext("<a target=_new href='http://sarg.sourceforge.net/welcome.php'>Squid Analysis Report Generator</a><br><br>");?>
                         </tr>
                         <tr>
 						<td colspan="2" valign="top" class="listtopic"><?=gettext("About sarg package"); ?></td>

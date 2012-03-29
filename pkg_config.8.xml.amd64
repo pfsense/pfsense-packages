@@ -633,6 +633,24 @@
 		<noembedded>true</noembedded>
 	</package>
 	<package>
+		<name>Sarg</name>
+		<website>http://www.dansguardian.org/</website>
+		<descr><![CDATA[Sarg - Squid Analysis Report Generator is a tool that allow you to view "where" your users are going to on the Internet.<br>
+						Sarg provides many informations about Proxy(squid,squidguard or dansguardian) users activities: times, bytes, sites, etc...]]></descr>
+		<category>Network Report</category>
+		<config_file>http://www.pfsense.com/packages/config/sarg/sarg.xml</config_file>
+		<pkginfolink>http://forum.pfsense.org/index.php/topic,47765.0.html</pkginfolink>
+		<depends_on_package_base_url>http://e-sac.siteseguro.ws/packages/amd64/8/All/</depends_on_package_base_url>
+		<depends_on_package>sarg-2.3.2.tbz</depends_on_package>
+		<version>2.3.2 pkg v.0.1</version>
+		<status>beta</status>
+		<required_version>2.0</required_version>
+		<configurationfile>sarg.xml</configurationfile>
+		<build_port_path>/usr/ports/www/sarg</build_port_path>
+		<build_options>WITHOUT_GD=false WITHOUT_PHP=true</build_options>
+		<after_install_info>Please visit sarg settings on Status Menu to configure sarg.</after_install_info>
+	</package>
+	<package>
 		<name>vnstat2</name>
 		<website>http://humdi.net/vnstat/</website>
 		<descr>A console-based network traffic monitor + vnstat PHP frontend</descr>
