@@ -33,11 +33,11 @@
 /* ========================================================================== */
 
 
-function sarg_install() {
+function sarg_php_install_command() {
 	// reserved
 }
 
-function sarg_deinstall() {
+function sarg_php_deinstall_command() {
 	// reserved
 }
 

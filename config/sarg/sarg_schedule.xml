@@ -155,7 +155,7 @@
 		</field>
 	</fields>
 	<custom_php_install_command>
-		sarg_install();
+		sarg_php_install_command();
 	</custom_php_install_command>
 	<custom_php_command_before_form>
 	</custom_php_command_before_form>
