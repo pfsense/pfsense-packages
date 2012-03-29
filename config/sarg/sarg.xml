@@ -89,13 +89,13 @@
 		<chmod>0755</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
-		<item>http://www.pfsense.org/packages/config/sarg/sarg.php</item>
+		<item>http://www.pfsense.org/packages/config/sarg/sarg_queue.php</item>
 		<prefix>/usr/local/www/</prefix>
 		<chmod>0755</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
-		<item>http://www.pfsense.org/packages/config/sarg/sarg_queue.php</item>
-		<prefix>/usr/local/www/</prefix>
+		<item>http://www.pfsense.org/packages/config/sarg/sarg.template</item>
+		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0755</chmod>
 	</additional_files_needed>
 	<tabs>
