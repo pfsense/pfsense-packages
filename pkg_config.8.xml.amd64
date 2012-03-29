@@ -221,13 +221,13 @@
 				This package implements HTTP balance features from Haproxy.]]></descr>
 		<website>http://haproxy.1wt.eu/</website>
 		<category>Services</category>
-		<version>1.4.19 pkg v 1.2</version>
+		<version>1.4.20 pkg v 1.2</version>
 		<status>Release</status>
 		<required_version>2.0</required_version>
 		<config_file>http://www.pfsense.com/packages/config/haproxy/haproxy.xml</config_file>
 		<configurationfile>haproxy.xml</configurationfile>
 		<depends_on_package_base_url>http://e-sac.siteseguro.ws/packages/amd64/8/All/</depends_on_package_base_url>
-		<depends_on_package>haproxy-1.4.19.tbz</depends_on_package>
+		<depends_on_package>haproxy-1.4.20.tbz</depends_on_package>
 		<build_port_path>/usr/ports/net/haproxy</build_port_path>
 	</package>
 	<package>
@@ -237,13 +237,13 @@
 				This package implements both TCP and HTTP balance features from Haproxy.]]></descr>
 		<website>http://haproxy.1wt.eu/</website>
 		<category>Services</category>
-		<version>1.4.19 pkg v 1.0</version>
+		<version>1.4.20 pkg v 1.0</version>
 		<status>Release</status>
 		<required_version>2.0</required_version>
 		<config_file>http://www.pfsense.com/packages/config/haproxy-legacy/haproxy.xml</config_file>
 		<configurationfile>haproxy.xml</configurationfile>
 		<depends_on_package_base_url>http://e-sac.siteseguro.ws/packages/amd64/8/All/</depends_on_package_base_url>
-		<depends_on_package>haproxy-1.4.19.tbz</depends_on_package>
+		<depends_on_package>haproxy-1.4.20.tbz</depends_on_package>
 	</package>
 
 	<package>
@@ -556,7 +556,7 @@
 		<depends_on_package>dansguardian-2.12.0.0.tbz</depends_on_package>
 		<depends_on_package>clamav-0.97.3_1.tbz</depends_on_package>
 		<depends_on_package>ca_root_nss-3.13.3.tbz</depends_on_package>
-		<version>2.12.0.0 pkg v.0.1.5.1</version>
+		<version>2.12.0.0 pkg v.0.1.5.2</version>
 		<status>beta</status>
 		<required_version>2.0</required_version>
 		<configurationfile>dansguardian.xml</configurationfile>
