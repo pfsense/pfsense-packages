@@ -46,6 +46,41 @@ function dg_get_real_interface_address($iface) {
 	return array($ip, long2ip(hexdec($netmask)));
 }
 
+function check_ca_hashes(){
+	global $config,$g;
+	
+	#check certificates
+	$cert_count=0;
+	if (is_dir('/usr/local/share/certs'))	
+		if ($handle = opendir('/usr/local/share/certs')) {
+    		while (false !== ($file = readdir($handle)))
+        		if (preg_match ("/\d+.0/",$file))
+            		$cert_count++;
+        	}
+    closedir($handle);
+	if ($cert_count < 10){
+		conf_mount_rw();
+		#create ca-root hashes from ca-root-nss package
+		log_error("Creating root certificate bundle hashes from the Mozilla Project");
+		$cas=file('/usr/local/share/certs/ca-root-nss.crt');
+		$cert=0;
+		foreach ($cas as $ca){
+	    	if (preg_match("/--BEGIN CERTIFICATE--/",$ca))
+				$cert=1;
+			if ($cert == 1)
+				$crt.=$ca;
+			if (preg_match("/-END CERTIFICATE-/",$ca)){
+				file_put_contents("/tmp/cert.pem",$crt, LOCK_EX);
+				$cert_hash=array();
+				exec("/usr/bin/openssl x509 -hash -noout -in /tmp/cert.pem",$cert_hash);
+				file_put_contents("/usr/local/share/certs/".$cert_hash[0].".0",$crt,LOCK_EX);
+				$crt="";
+				$cert=0;
+				}
+			}
+		}
+}
+
 function sync_package_dansguardian() {
 	global $config,$g;
 
@@ -132,7 +167,13 @@ function sync_package_dansguardian() {
 	$recheckreplacedurls=(preg_match('/icapscan/',$dansguardian_config['misc_options'])?"on":"off");
 	$usexforwardedfor=(preg_match('/usexforwardedfor/',$dansguardian_config['misc_options'])?"on":"off");
 	$authplugin=(preg_match('/usr/',$dansguardian_config['auth_plugin'])?"authplugin = '".$dansguardian_config['auth_plugin']."'":"");
-	
+	/*if ($dansguardian_config['auth_plugin']!=""){
+		$auth_plugins=explode(",",$dansguardian_config['auth_plugin']);
+		$authplugin="";
+		foreach ($auth_plugins as $auth_selected)
+			$authplugin.="authplugin = '".$auth_selected."'\n";
+	}
+	*/
 	#limits
 	$maxuploadsize=($dansguardian_limits['maxuploadsize']?$dansguardian_limits['maxuploadsize']:"-1");
 	$maxcontentfiltersize=($dansguardian_limits['maxcontentfiltersize']?$dansguardian_limits['maxcontentfiltersize']:"256");
@@ -800,10 +841,11 @@ EOF;
 	$cron_found=0;
 	if (is_array($config['cron']['item']))
 		foreach($config['cron']['item'] as $cron)
-			if (!preg_match("/usr.local.(bin.freshclam|www.dansguardian)/",$cron["command"])){
+			if (preg_match("/usr.local.(bin.freshclam|www.dansguardian)/",$cron["command"]))
 				$cron_found++;
+			else
 				$new_cron['item'][]=$cron;
-			}
+				
 	$cron_cmd="/usr/local/bin/freshclam";
 	if($dansguardian_config['cron'] && preg_match("/clamd/",$dansguardian_config['content_scanners']))
 		switch ($dansguardian_config['cron']){
@@ -913,6 +955,7 @@ EOF;
 	#update cron
 	if ($cron_found > 0){
 		$config['cron']=$new_cron;
+		write_config();
 		configure_cron();
 	}
 	
@@ -980,28 +1023,38 @@ EOF;
 			}	
 	}
 
-
+	#check certificate hashed
+	
 	$script='/usr/local/etc/rc.d/dansguardian';
+	
 	if($config['installedpackages']['dansguardian']['config'][0]['enable']){
-		$script_file=file_get_contents($script);
-		if (preg_match('/NO/',$script_file)){
-			$script_file=preg_replace("/NO/","YES",$script_file);
-			file_put_contents($script, $script_file, LOCK_EX);
-			}
+		copy('/usr/local/pkg/dansguardian_rc.template','/usr/local/etc/rc.d/dansguardian');
 		chmod ($script,0755);
-		mwexec("$script stop");			
+		if (is_service_running('dansguardian')){
+		log_error('Reloading Dansguardian');
+		exec("/usr/local/sbin/dansguardian -r");			
+		}
+		else{
+		log_error('Starting Dansguardian');
 		mwexec_bg("$script start");
+		}
 	}
 	else{
+		log_error('Stopping Dansguardian');
 		mwexec("$script stop");
 		chmod ($script,0444);	
 	}
 	
 	if (!file_exists('/usr/local/etc/dansguardian/lists/phraselists/pornography/weighted_russian_utf8'))
 		file_put_contents('/usr/local/etc/dansguardian/lists/phraselists/pornography/weighted_russian_utf8',"",LOCK_EX);
-		
-	conf_mount_ro();
-	$synconchanges = $config['installedpackages']['dansguardiansync']['config'][0]['synconchanges'];
+	
+	#check ca certs hashes	
+	check_ca_hashes();
+
+	#mount read only
+    conf_mount_ro();
+
+    $synconchanges = $config['installedpackages']['dansguardiansync']['config'][0]['synconchanges'];
 	if(!$synconchanges && !$syncondbchanges) 
 		return;
 	log_error("[dansguardian] dansguardian_xmlrpc_sync.php is starting.");
@@ -1034,29 +1087,11 @@ function dansguardian_validate_input($post, &$input_errors) {
 }
 
 function dansguardian_php_install_command() {
-	conf_mount_rw();
-	#create ca-root hashes from ca-root-nss package
-	print "Creating root certificate bundle hashes from the Mozilla Project\n";
-	$cas=file('/usr/local/share/certs/ca-root-nss.crt');
-	$cert=0;
-	foreach ($cas as $ca){
-    	if (preg_match("/--BEGIN CERTIFICATE--/",$ca))
-			$cert=1;
-		if ($cert == 1)
-			$crt.=$ca;
-		if (preg_match("/-END CERTIFICATE-/",$ca)){
-			file_put_contents("/tmp/cert.pem",$crt, LOCK_EX);
-			$cert_hash=array();
-			exec("/usr/bin/openssl x509 -hash -noout -in /tmp/cert.pem",$cert_hash);
-			file_put_contents("/usr/local/share/certs/".$cert_hash[0].".0",$crt,LOCK_EX);
-			$crt="";
-			$cert=0;
-			}
-		}
-	sync_package_dansguardian();
+		sync_package_dansguardian();
 }
 
 function dansguardian_php_deinstall_command() {
+	global $config,$g;
 	mwexec("/usr/local/etc/rc.d/dansguardian stop");
 	sleep(1);
 	conf_mount_rw();

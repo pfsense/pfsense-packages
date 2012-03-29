@@ -103,10 +103,10 @@
 			<type>listtopic</type>
 		</field>
 		<field>
-			<fielddescr>Auth Plugin</fielddescr>
+			<fielddescr>Auth Plugins</fielddescr>
 			<fieldname>auth_plugin</fieldname>
 			<description><![CDATA[This option handle the extraction of client usernames from various sources, such as Proxy-Authorisation headers and ident servers, 
-								enabling requests to be handled according to the settings of the user's filter group.]]></description>
+								enabling requests to be handled according to the settings of the user's filter group]]></description>
 	    	<type>select</type>
  				<options>
  				<option><name>Proxy-Basic</name><value>/usr/local/etc/dansguardian/authplugins/proxy-basic.conf</value></option>
@@ -114,7 +114,7 @@
  				<option><name>Proxy-Ntlm</name><value>/usr/local/etc/dansguardian/authplugins/proxy-ntlm.conf</value></option>
  				<option><name>Ident</name><value>/usr/local/etc/dansguardian/authplugins/ident.conf</value></option>
  				<option><name>Ip Address</name><value>/usr/local/etc/dansguardian/authplugins/ip.conf</value></option>
- 				<option><name>none</name><value></value></option>
+ 				<option><name>none</name><value>none</value></option>
  				</options>
 		</field>
 		<field>
