@@ -273,6 +273,9 @@ define('F_ENABLELOG',           'enablelog');
 define('F_ENABLEGUILOG',        'enableguilog');
 define('F_LOGROTATION',         'logrotation');
 
+#Clean adversiting
+define('F_ADV_BLANKIMG',	'adv_blankimg');
+
 # transparent mode
 define('F_SQUID_TRANSPARENT_MODE',   'squid_transparent_mode');
 define('F_CURRENT_LAN_IP',           'current_lan_ip');
@@ -910,6 +913,13 @@ function sg_create_config()
                 if ($ent_state[F_DOMAINS])     $sg_tag->items[] = "domainlist $ent/domains";
                 if ($ent_state[F_EXPRESSIONS]) $sg_tag->items[] = "expressionlist $ent/expressions";
                 if ($ent_state[F_URLS])        $sg_tag->items[] = "urllist $ent/urls";
+
+		# Check if $ent contains adv or ads, and F_ADV_BLANKIMG is on then add a custom redirect
+		  $adv_pos = strpos($ent,'_adv');
+		  $ads_pos = strpos($ent, '_ads');
+		  if ( ($ads_pos > 0 || $adv_pos > 0) && $squidguard_config[F_ADV_BLANKIMG] == 'on')
+			     $sg_tag->items[] = "redirect " . sg_redirector_base_url($dst[F_REDIRECT], RMOD_INT_BLANKIMG);
+			
                 if ($squidguard_config[F_ENABLELOG] == 'on' ) {
                     $sg_tag->items[] = "log ". SQUIDGUARD_LOGFILE;
                 }
