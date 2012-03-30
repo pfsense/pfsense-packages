@@ -132,6 +132,12 @@
                         <type>checkbox</type>
                 </field>
                 <field>
+                        <fielddescr>Clean Advertising</fielddescr>
+                        <fieldname>adv_blankimg</fieldname>
+                        <description>Check this to display a blank gif image instead the default block page. With this option you get a cleaner 			page.</description>
+                        <type>checkbox</type>
+                </field>
+                <field>
                         <name>Blacklist options</name>
                         <type>listtopic</type>
                 </field>
