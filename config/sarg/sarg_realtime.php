@@ -92,7 +92,7 @@ else{
 	if(strstr($pfSversion, "1.2"))
 		$one_two = true;
 	
-	$pgtitle = "Status: Postfix Mail Queue";
+	$pgtitle = "Status: Sarg Realtime";
 	include("head.inc");
 	
 	?>
@@ -114,7 +114,7 @@ else{
 	$tab_array = array();
 	$tab_array[] = array(gettext("Settings"), false, "/pkg_edit.php?xml=sarg.xml&id=0");
 	$tab_array[] = array(gettext("Schedule"), false, "/pkg.php?xml=sarg_schedule.xml");
-	$tab_array[] = array(gettext("View Report"), false, "/sarg-reports/");
+	$tab_array[] = array(gettext("View Report"), false, "/sarg_reports.php");
 	$tab_array[] = array(gettext("Realtime"), true, "/sarg_realtime.php");
 	$tab_array[] = array(gettext("XMLRPC Sync"), false, "/pkg_edit.php?xml=sarg_sync.xml&id=0");
 	$tab_array[] = array(gettext("Help"), false, "/sarg_about.php");
@@ -127,7 +127,7 @@ else{
 						<table class="tabcont" width="100%" border="0" cellpadding="8" cellspacing="0">
 						<tr><td></td></tr>
 						<tr>
-						<td colspan="2" valign="top" class="listtopic"><?=gettext("Postfix Queue"); ?></td></tr>
+						<td colspan="2" valign="top" class="listtopic"><?=gettext("Sarg Realtime"); ?></td></tr>
 					<tr>
                         <td width="22%" valign="top" class="vncell"><?=gettext("Log command: ");?></td>
                         <td width="78%" class="vtable">

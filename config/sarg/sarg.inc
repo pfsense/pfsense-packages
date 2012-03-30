@@ -55,15 +55,17 @@ function log_rotate($log_file){
 	global $config, $g;
 	
 	#remove .10 rotate log file
-	unlink_if_exists($log_file.".10");
-	
-	#rotate logs from 0 to 9
-	for ($i = 9; $i < 0; $i--)
-		if (file_exists($log_file.".$i"))
-			rename ($log_file,$log_file.".".($i+1));
-			
+	unlink_if_exists("$log_file".".10");
+	#rotate logs from 9 to 0
+	$i=9;
+	while ($i>=0){
+		if (file_exists($log_file.".".$i))
+			rename ($log_file.".".$i,$log_file.".".($i+1));
+		$i=$i-1;
+	}
 	#rotate current log
-	rename ($log_file,$log_file.".0");	
+	if (file_exists("$log_file"))
+		rename ($log_file,$log_file.".0");	
 }
 function run_sarg($id=-1) {
 	global $config, $g;
@@ -76,9 +78,9 @@ function run_sarg($id=-1) {
 		}
 	else{
 		$args=$_POST['args'];
-		$action=$post['action'];
+		$action=$_POST['action'];
 		}
-	log_error("Sarg: force refresh now with '".$args."' args.");
+	log_error("Sarg: force refresh now with '".$args."' args and ".$action." action after sarg finish.");
 
 	mwexec($cmd. " ".$args);
 	#check if there is a script to run after file save
@@ -91,9 +93,11 @@ function run_sarg($id=-1) {
 					mwexec_bg('/usr/local/etc/rc.d/squid restart');
 			break;
 			case "dansguardian":
-				if ($action !="none"){
+				if (preg_match('/\w+/',$action) && $action !="none"){
 					log_rotate('/var/log/dansguardian/access.log');
-					mwexec('/usr/local/sbin/dansguardian -r');
+					log_error('restarting dansguardian after sarg and log rotate.');
+					#mwexec('/usr/local/etc/rc.d/dansguardian restart');
+					mwexec('/usr/bin/killall -HUP dansguardian');
 					}
 			break;
 			/*case "squidguard":
@@ -147,7 +151,6 @@ function sync_package_sarg() {
 	$use_comma=(preg_match('/use_comma/',$sarg['report_options'])?"yes":"no");
 	$long_url=(preg_match('/long_url/',$sarg['report_options'])?"yes":"no");
 	$privacy=(preg_match('/privacy/',$sarg['report_options'])?"yes":"no");
-		
 	$report_type=preg_replace('/,/',' ',$sarg['report_type']);
 	if(!empty($sarg['include_userlist']))
 		$include_users="$include_users ".$sarg['include_userlist'];
@@ -156,6 +159,9 @@ function sync_package_sarg() {
 	file_put_contents("/usr/local/etc/sarg/sarg.conf", $sg, LOCK_EX);
 	
 	file_put_contents('/usr/local/etc/sarg/exclude_users.conf', sarg_text_area_decode($sarg['exclude_userlist']),LOCK_EX);
+	file_put_contents('/usr/local/etc/sarg/exclude_hosts.conf', sarg_text_area_decode($sarg['exclude_hostlist']),LOCK_EX);
+	file_put_contents('/usr/local/etc/sarg/exclude_codes.conf', sarg_text_area_decode($sarg['exclude_codelist']),LOCK_EX);
+	$exclude_string=(empty($sarg['exclude_string'])?"":'exclude_string"'.$sarg['exclude_string']."'");
 	if(empty($sarg['include_userlist'])){
 		$usertab="none";
 		}

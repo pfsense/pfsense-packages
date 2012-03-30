@@ -44,7 +44,7 @@
 	<faq>Currently there are no FAQ items provided.</faq>
 	<name>sarg</name>
 	<version>1.0</version>
-	<title>Services: sarg</title>
+	<title>Status: Sarg Settings</title>
 	<include_file>/usr/local/pkg/sarg.inc</include_file>
 	<menu>
 		<name>Sarg Reports</name>
@@ -94,6 +94,11 @@
 		<chmod>0755</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
+		<item>http://www.pfsense.org/packages/config/sarg/sarg_reports.php</item>
+		<prefix>/usr/local/www/</prefix>
+		<chmod>0755</chmod>
+	</additional_files_needed>
+	<additional_files_needed>
 		<item>http://www.pfsense.org/packages/config/sarg/sarg.template</item>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0755</chmod>
@@ -110,7 +115,7 @@
 		</tab>
 		<tab>
 			<text>View Report</text>
-			<url>/sarg-reports/</url>
+			<url>/sarg_reports.php</url>
 		</tab>
 		<tab>
 			<text>Realtime</text>
@@ -236,7 +241,42 @@
 			<rows>10</rows>
 			<encoding>base64</encoding>
 		</field>
-
+		<field>
+			<name>Exclude Settings</name>
+			<type>listtopic</type>
+		</field>
+				<field>
+			<fielddescr>Exclude string</fielddescr>
+			<fieldname>exclude_string</fieldname>
+			<description><![CDATA[Records from access.log file that contain one of listed strings will be ignored.<br> 
+								<strong>Format: string1:string2:...:stringn</strong>]]></description>
+			<type>input</type>
+			<size>70</size>
+		</field>
+		<field>
+			<fielddescr>Exclude hosts</fielddescr>
+			<fieldname>exclude_hostlist</fieldname>
+			<description><![CDATA[Hosts, domains or subnets will be excluded from reports.<br>
+									Eg.: 192.168.10.10   - exclude ip address only<br>
+									192.168.10.0/24 - exclude full C class<br>
+									s1.acme.foo     - exclude hostname only<br>
+									*.acme.foo      - exclude full domain name]]></description>
+			<type>textarea</type>
+			<cols>70</cols>
+			<rows>10</rows>
+			<encoding>base64</encoding>
+		</field>
+		<field>
+			<fielddescr>Exclude codes</fielddescr>
+			<fieldname>exclude_codelist</fieldname>
+			<description><![CDATA[Ignore records with these codes. Eg.: NONE/400<br>
+									Write one code per line. Lines starting with a # are ignored.<br>
+									Only codes matching exactly one of the line is rejected. The comparison is not case sensitive.]]></description>
+			<type>textarea</type>
+			<cols>70</cols>
+			<rows>10</rows>
+			<encoding>base64</encoding>
+		</field>
 	</fields>
 	<custom_php_install_command>
 		sarg_php_install_command();

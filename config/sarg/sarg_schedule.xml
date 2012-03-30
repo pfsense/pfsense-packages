@@ -42,7 +42,7 @@
     <faq>Currently there are no FAQ items provided.</faq>
 	<name>sargschedule</name>
 	<version>0.5</version>
-	<title>sarg</title>
+	<title>Status: Sarg Schedules</title>
 	<include_file>/usr/local/pkg/sarg.inc</include_file>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
@@ -72,7 +72,7 @@
 		</tab>
 		<tab>
 			<text>View Report</text>
-			<url>/sarg-reports/</url>
+			<url>/sarg_reports.php</url>
 		</tab>
 		<tab>
 			<text>Realtime</text>

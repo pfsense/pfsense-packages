@@ -43,7 +43,7 @@
 	<faq>Currently there are no FAQ items provided.</faq>
 	<name>sargsync</name>
 	<version>1.0</version>
-	<title>Services: sarg</title>
+	<title>Status: Sarg Sync</title>
 	<include_file>/usr/local/pkg/sarg.inc</include_file>
 	<tabs>
 		<tab>
@@ -56,7 +56,7 @@
 		</tab>
 		<tab>
 			<text>View Report</text>
-			<url>/sarg-reports/</url>
+			<url>/sarg_reports.php</url>
 		</tab>
 		<tab>
 			<text>Realtime</text>

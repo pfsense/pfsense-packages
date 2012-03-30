@@ -54,7 +54,7 @@ include("head.inc");
 	$tab_array = array();
 	$tab_array[] = array(gettext("Settings"), false, "/pkg_edit.php?xml=sarg.xml&id=0");
 	$tab_array[] = array(gettext("Schedule"), false, "/pkg.php?xml=sarg_schedule.xml");
-	$tab_array[] = array(gettext("View Report"), false, "/sarg-reports/");
+	$tab_array[] = array(gettext("View Report"), false, "/sarg_reports.php");
 	$tab_array[] = array(gettext("Realtime"), false, "/sarg_realtime.php");
 	$tab_array[] = array(gettext("XMLRPC Sync"), false, "/pkg_edit.php?xml=sarg_sync.xml&id=0");
 	$tab_array[] = array(gettext("Help"), true, "/sarg_about.php");

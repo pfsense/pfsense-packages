@@ -91,7 +91,7 @@ else{
 	if(strstr($pfSversion, "1.2"))
 		$one_two = true;
 	
-	$pgtitle = "Status: Postfix Mail Queue";
+	$pgtitle = "Status: Sarg Reports";
 	include("head.inc");
 	
 	?>
@@ -104,7 +104,7 @@ else{
 	
 	<?php if ($savemsg) print_info_box($savemsg); ?>
 	
-	<form action="sarg_realtimex.php" method="post">
+	<form action="postfix_view_config.php" method="post">
 		
 	<div id="mainlevel">
 		<table width="100%" border="0" cellpadding="0" cellspacing="0">
@@ -112,8 +112,9 @@ else{
 	<?php
 	$tab_array = array();
 	$tab_array[] = array(gettext("Settings"), false, "/pkg_edit.php?xml=sarg.xml&id=0");
-	$tab_array[] = array(gettext("View Report"), false, "/sarg-reports/");
-	$tab_array[] = array(gettext("Realtime"), true, "/sarg_real_time.php");
+	$tab_array[] = array(gettext("Schedule"), false, "/pkg.php?xml=sarg_schedule.xml");
+	$tab_array[] = array(gettext("View Report"), true, "/sarg_reports.php");
+	$tab_array[] = array(gettext("Realtime"), false, "/sarg_realtime.php");
 	$tab_array[] = array(gettext("XMLRPC Sync"), false, "/pkg_edit.php?xml=sarg_sync.xml&id=0");
 	$tab_array[] = array(gettext("Help"), false, "/pkg_edit.php?xml=sarg_about.php");
 	display_top_tabs($tab_array);
@@ -125,115 +126,18 @@ else{
 						<table class="tabcont" width="100%" border="0" cellpadding="8" cellspacing="0">
 						<tr><td></td></tr>
 						<tr>
-						<td colspan="2" valign="top" class="listtopic"><?=gettext("Sarg Realtime"); ?></td></tr>
-					<tr>
-                        <td width="22%" valign="top" class="vncell"><?=gettext("Log command: ");?></td>
-                        <td width="78%" class="vtable">
-                        <select name="drop3" id="cmd">
-                        	<option value="sarg" selected="selected">Sarg Realtime</option>
-						</select><br><?=gettext("Select queue command to run.");?></td>
-					</tr>
-					<tr>
-                        <td width="22%" valign="top" class="vncell"><?=gettext("update frequency: ");?></td>
-                        <td width="78%" class="vtable">
-                        <select name="drop3" id="updatef">
-                        	<option value="1">01 second</option>
-                            <option value="3" selected="selected">03 seconds</option>
-                        	<option value="5">05 seconds</option>
-                        	<option value="15">15 Seconds</option>
-							<option value="30">30 Seconds</option>
-							<option value="60">One minute</option>
-							<option value="1">Never</option>
-						</select><br><?=gettext("Select how often queue cmd will run.");?></td>
-					</tr>
-					<tr>					
-                        <td width="22%" valign="top" class="vncell"><?=gettext("Report Types: ");?></td>
-                        <td width="78%" class="vtable">
-                        <select name="drop3" id="qshape" multiple="multiple" size="5">
-                        	<option value="GET" selected="selected">GET</option>
-							<option value="PUT" selected="selected">PUT</option>
-							<option value="CONNECT" selected="selected">CONNECT</option>
-							<option value="ICP_QUERY">ICP_QUERY</option>
-							<option value="POST">POST</option>
-						</select><br><?=gettext("Which records must be in realtime report.");?></td>
-					</tr>
-					<tr>					
-                        <td width="22%" valign="top" class="vncell"><?=gettext("unauthenticated_records: ");?></td>
-                        <td width="78%" class="vtable">
-                        <select name="drop3" id="qtype">
-							<option value="show" selected>show</option>
-							<option value="hide">hide</option>
-						</select><br><?=gettext("What to do with unauthenticated records in realtime report.");?></td>
-					</tr>
-
-					<tr>
-							<td width="22%" valign="top"></td>
-                        <td width="78%"><input name="Submit" type="button" class="formbtn" id="run" value="<?=gettext("show log");?>" onclick="get_queue('mailq')"><div id="search_help"></div></td>
+						<td colspan="2" valign="top" class="listtopic"><?=gettext("Sarg Reports"); ?></td></tr>
 				</table>
 				</div>
+				<br>
+				<iframe src="/sarg-reports/" frameborder=0 width="100%" height="600"></iframe>
+				<div id="file_div"></div>
+				
 				</td>
 			</tr>
 			</table>
-			<br>
-				<div>
-				<table class="tabcont" width="100%" border="0" cellpadding="8" cellspacing="0">
-								<tr>
-	     						<td class="tabcont" >
-	     						<div id="file_div"></div>
-									
-								</td>
-							</tr>
-						</table>
-					</div>
 	</div>
 	</form>
-	<script type="text/javascript">
-	function loopSelected(id)
-	{
-	  var selectedArray = new Array();
-	  var selObj = document.getElementById(id);
-	  var i;
-	  var count = 0;
-	  for (i=0; i<selObj.options.length; i++) {
-	    if (selObj.options[i].selected) {
-	      selectedArray[count] = selObj.options[i].value;
-	      count++;
-	    }
-	  }
-	  return(selectedArray);
-	}
-		
-	function get_queue(loop) {
-			//prevent multiple instances
-			if ($('run').value=="show log" || loop== 'running'){
-				$('run').value="running...";
-				$('search_help').innerHTML ="<br><strong>You can change options while running.<br>To Stop seach, change update frequency to Never.</strong>";
-				var q_args=loopSelected('qshape');
-				var pars = 'cmd='+$('cmd').options[$('cmd').selectedIndex].value;
-				var pars = pars + '&qshape='+q_args;
-				var pars = pars + '&type='+$('qtype').options[$('qtype').selectedIndex].value;
-				var url = "/sarg_queue.php";
-				var myAjax = new Ajax.Request(
-					url,
-					{
-						method: 'post',
-						parameters: pars,
-						onComplete: activitycallback_queue_file
-					});
-				}
-			}
-		function activitycallback_queue_file(transport) {
-			$('file_div').innerHTML = transport.responseText;
-			var update=$('updatef').options[$('updatef').selectedIndex].value * 1000;
-			if (update > 1000){
-				setTimeout('get_queue("running")', update);
-				}
-			else{
-				$('run').value="show log";
-				$('search_help').innerHTML ="";
-			}
-		}
-	</script>
 	<?php 
 	include("fend.inc");
 	}
