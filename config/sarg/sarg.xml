@@ -99,6 +99,11 @@
 		<chmod>0755</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
+		<item>http://www.pfsense.org/packages/config/sarg/sarg_frame.php</item>
+		<prefix>/usr/local/www/</prefix>
+		<chmod>0755</chmod>
+	</additional_files_needed>
+	<additional_files_needed>
 		<item>http://www.pfsense.org/packages/config/sarg/sarg.template</item>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0755</chmod>
@@ -162,7 +167,7 @@
  				<option><name>Remove temporary files from root report directory  (yes)</name><value>remove_temp_files</value></option>
  				<option><name>Generate the main index.html (yes)</name><value>main_index</value></option>
  				<option><name>Generate the index tree by file (on)</name><value>index_tree</value></option>
- 				<option><name>Overwrite report (yes)</name><value>overwrite_report</value></option>
+ 				<option><name>Overwrite report (no)</name><value>overwrite_report</value></option>
  				<option><name>Use comma instead point in reports (yes)</name><value>use_comma</value></option>
  				<option><name>Show full url in report (no)</name><value>long_url</value></option>
  				<option><name>Privacy (no)</name><value>privacy</value></option>

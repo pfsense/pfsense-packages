@@ -119,7 +119,7 @@ function sync_package_sarg() {
 	#mount filesystem writeable
 	conf_mount_rw();
 	if (!is_array($config['installedpackages']['sarg']['config']))
-		$config['installedpackages']['sarg']['config'][0]=array('report_options'=>'use_graphs,remove_temp_files,main_index,use_comma,overwrite_report',
+		$config['installedpackages']['sarg']['config'][0]=array('report_options'=>'use_graphs,remove_temp_files,main_index,use_comma',
 																'user_sort_field'=>'BYTES',
 																'report_type'=>'topusers,topsites,sites_users,users_sites,date_time,denied,auth_failures,site_user_time_date,downloads');
 	$sarg=$config['installedpackages']['sarg']['config'][0];
@@ -157,7 +157,6 @@ function sync_package_sarg() {
 		
 	include("/usr/local/pkg/sarg.template");
 	file_put_contents("/usr/local/etc/sarg/sarg.conf", $sg, LOCK_EX);
-	
 	file_put_contents('/usr/local/etc/sarg/exclude_users.conf', sarg_text_area_decode($sarg['exclude_userlist']),LOCK_EX);
 	file_put_contents('/usr/local/etc/sarg/exclude_hosts.conf', sarg_text_area_decode($sarg['exclude_hostlist']),LOCK_EX);
 	file_put_contents('/usr/local/etc/sarg/exclude_codes.conf', sarg_text_area_decode($sarg['exclude_codelist']),LOCK_EX);

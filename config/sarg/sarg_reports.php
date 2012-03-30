@@ -1,9 +1,8 @@
 <?php
 /*
-	postfix_view_config.php
+	sarg_reports.php
 	part of pfSense (http://www.pfsense.com/)
-	Copyright (C) 2011 Marcello Coutinho <marcellocoutinho@gmail.com>
-	based on varnish_view_config.
+	Copyright (C) 2012 Marcello Coutinho <marcellocoutinho@gmail.com>
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
@@ -130,7 +129,7 @@ else{
 				</table>
 				</div>
 				<br>
-				<iframe src="/sarg-reports/" frameborder=0 width="100%" height="600"></iframe>
+				<iframe src="/sarg_frame.php/" frameborder=0 width="100%" height="600"></iframe>
 				<div id="file_div"></div>
 				
 				</td>

@@ -1,6 +1,6 @@
 <?php
 /*
-	sag.conf.template
+	sag.template
 	part of the Dansguardian package for pfSense
 	Copyright (C) 2012 Marcello Coutinho
 	All rights reserved.
@@ -683,7 +683,6 @@ www_document_root /usr/local/www
 #     it to your liking.
 #
 #external_css_file none
-
 # TAG: user_authentication yes|no
 #     Allow user authentication in User Reports using .htaccess
 #     Parameters:

@@ -1,9 +1,8 @@
 <?php
 /*
-	postfix_view_config.php
+	sarg_realtime.php
 	part of pfSense (http://www.pfsense.com/)
-	Copyright (C) 2011 Marcello Coutinho <marcellocoutinho@gmail.com>
-	based on varnish_view_config.
+	Copyright (C) 2012 Marcello Coutinho <marcellocoutinho@gmail.com>
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
@@ -133,7 +132,7 @@ else{
                         <td width="78%" class="vtable">
                         <select name="drop3" id="cmd">
                         	<option value="sarg" selected="selected">Sarg Realtime</option>
-						</select><br><?=gettext("Select queue command to run.");?></td>
+						</select><br><?=gettext("Select report command to run.");?></td>
 					</tr>
 					<tr>
                         <td width="22%" valign="top" class="vncell"><?=gettext("update frequency: ");?></td>
@@ -146,7 +145,7 @@ else{
 							<option value="30">30 Seconds</option>
 							<option value="60">One minute</option>
 							<option value="1">Never</option>
-						</select><br><?=gettext("Select how often queue cmd will run.");?></td>
+						</select><br><?=gettext("Select how often report will run.");?></td>
 					</tr>
 					<tr>					
                         <td width="22%" valign="top" class="vncell"><?=gettext("Report Types: ");?></td>

@@ -1,9 +1,8 @@
 <?php
 /*
-	postfix_view_config.php
+	sarg_queue.php
 	part of pfSense (http://www.pfsense.com/)
-	Copyright (C) 2011 Marcello Coutinho <marcellocoutinho@gmail.com>
-	based on varnish_view_config.
+	Copyright (C) 2012 Marcello Coutinho <marcellocoutinho@gmail.com>
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
