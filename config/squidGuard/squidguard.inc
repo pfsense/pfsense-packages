@@ -326,7 +326,7 @@ function squidguard_resync() {
     # apply changes
     //if ($submit == APPLY_BTN) {
 #           write_config('Update squidGuard options.'); # store, if not 'Save' button
-# перенести в validate для детектирования ошибок?
+
 
         sg_reconfigure();
     //}
@@ -817,7 +817,7 @@ function squidguard_install_command() {
 #        conf_mount_rw();
         $blklist_file = SQUIDGUARD_BLK_FILELISTPATH;
 
-      	# рассмотреть вариант слияния examples базы и существующей в системе
+     
         if (!file_exists($blklist_file)) {
         	# if blacklist not exists, then copy default db from samples
 #            $entries = array("ads", "aggressive", "audio-video", "drugs", "gambling", "hacking", "mail", "porn", "proxy", "violence", "warez");
@@ -933,6 +933,10 @@ function convert_pfxml_to_sgxml() {
     $sgxml[F_ENABLELOG]    = $pfxml['enable_log']    == 'on' ? 'on' : 'off';
     $sgxml[F_ENABLEGUILOG] = $pfxml['enable_guilog'] == 'on' ? 'on' : 'off';
     $sgxml[F_LOGROTATION]  = $pfxml['log_rotation']  == 'on' ? 'on' : 'off';
+
+    #Clean adversiting
+    $sgxml[F_ADV_BLANKIMG] = $pfxml['adv_blankimg']  == 'on' ? 'on' : 'off';
+	
 
     # other
     $lanip = $config['interfaces']['lan']['ipaddr'];
