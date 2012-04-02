@@ -49,7 +49,7 @@ define('LS_WWWPATH',			'/usr/local/www/lightsquid');
 define('LS_TEMPLATEPATH',		'/usr/local/www/lightsquid/tpl');
 define('LS_LANGPATH',			'/usr/local/share/lightsquid/lang');
 define('LS_REPORTPATH',			'/var/lightsquid/report');
-define('LS_SQUIDLOGPATH',		'/var/squid/log');
+define('LS_SQUIDLOGPATH',		'/var/squid/logs');
 define('LS_SQUIDLOG',			'access.log');
 define('LS_IP2NAMEPATH',		'/usr/local/libexec/lightsquid');
 
