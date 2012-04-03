@@ -133,12 +133,20 @@ function sync_package_sarg() {
 		break;
 		case 'squid':
 			$access_log='/var/squid/logs/access.log';
+			if (is_array($config['installedpackages']['squid']['config']))
+				if (file_exists($config['installedpackages']['squid']['config'][0]['log_dir']. '/access.log'))
+					$access_log = $config['installedpackages']['squid']['config'][0]['log_dir']. '/access.log';
 		break;
 		case 'squidguard':
 			$access_log='/var/squid/logs/access.log';
 		break;
 	}
-	
+	if (!file_exists($access_log)){
+		$error="Sarg config error: ".$sarg['proxy_server']." log file ($access_log) does not exists";
+		log_error($error);
+		file_notice("Sarg", $error, "Sarg Settings", "");
+	}
+		
 	$graphs=(preg_match('/use_graphs/',$sarg['report_options'])?"yes":"no");
 	$anonymous_output_files=(preg_match('/anonymous_output_files/',$sarg['report_options'])?"yes":"no");
 	$resolve_ip=(preg_match('/resolve_ip/',$sarg['report_options'])?"yes":"no");

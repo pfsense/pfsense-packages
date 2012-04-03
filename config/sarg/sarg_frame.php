@@ -38,22 +38,19 @@ else{
 	$prefix="";
 	}
 $url=($_REQUEST['file'] == ""?"index.html":$_REQUEST['file']);
-$report=file_get_contents("/usr/local/www/sarg-reports/".$url);
-/*$pattern[0]="/header_\w/";
-$replace[0]="listtopic";
-$pattern[1]="/class=.data./";
-$replace[1]='class="listlr"';
-$pattern[2]="/cellpadding=.\d./";
-$replace[2]='cellpadding="0"';
-$pattern[3]="/cellspacing=.\d./";
-$replace[3]='cellspacing="0"';
-$pattern[4]="/sarg/";
-$replace[4]='cellspacing="0"';
-*/
-$pattern[0]="/href=\W(\S+html)\W/";
-$replace[0]="href=/sarg_frame.php?file=$prefix/$1";
-$pattern[1]='/img src="(\w+\.\w+)/';
-$replace[1]='img src="/sarg-reports'.$prefix.'/$1';
-				
-print preg_replace($pattern,$replace,$report);
+if (file_exists("/usr/local/www/sarg-reports/".$url))
+	{
+	$report=file_get_contents("/usr/local/www/sarg-reports/".$url);
+	$pattern[0]="/href=\W(\S+html)\W/";
+	$replace[0]="href=/sarg_frame.php?file=$prefix/$1";
+	$pattern[1]='/img src="(\w+\.\w+)/';
+	$replace[1]='img src="/sarg-reports'.$prefix.'/$1';
+	$pattern[2]='@img src="([.a-z/]+)/(\w+\.\w+)@';
+	$replace[2]='img src="/sarg-reports'.$prefix.'/$1/$2';
+	print preg_replace($pattern,$replace,$report);
+	}
+else{
+	print "<pre>Error: Could not find report index file.<br>Check sarg settings and try to force sarg schedule.";
+	}		
+
 ?>

@@ -28,64 +28,7 @@
 */
 
 require("guiconfig.inc");
-function get_cmd(){
-	global $config,$g;
-	if ($_REQUEST['cmd'] =='sarg'){
-		
-		#Check report xml info
-		if (!is_array($config['installedpackages']['sargrealtime'])){
-			$config['installedpackages']['sargrealtime']['config'][0]['realtime_types']= "";
-			$config['installedpackages']['sargrealtime']['config'][0]['realtime_users']= "";
-		}
-		#Check report http actions to show
-		if	($config['installedpackages']['sargrealtime']['config'][0]['realtime_types'] != $_REQUEST['qshape']){
-			$config['installedpackages']['sargrealtime']['config'][0]['realtime_types']= $_REQUEST['qshape'];
-			$update_config++;
-			}
 
-		#Check report users show
-		if	($config['installedpackages']['sargrealtime']['config'][0]['realtime_users'] != $_REQUEST['qtype']){
-			$config['installedpackages']['sargrealtime']['config'][0]['realtime_users']= $_REQUEST['qtype'];
-			$update_config++;
-			}
-			
-		if($update_config > 0){
-			write_config;
-			#write changes to sarg_file
-			$sarg_config=file_get_contents('/usr/local/etc/sarg/sarg.conf');
-			$pattern[0]='/realtime_types\s+[A-Z,,]+/';
-			$pattern[1]='/realtime_unauthenticated_records\s+\w+/';
-			$replace[0]="realtime_types ".$_REQUEST['qshape'];
-			$replace[1]="realtime_unauthenticated_records ".$_REQUEST['qtype'];
-			file_put_contents('/usr/local/etc/sarg/sarg.conf', preg_replace($pattern,$replace,$sarg_config),LOCK_EX);
-			}
-		exec("/usr/local/bin/sarg -r", $sarg);
-		$patern[0]="/<?(html|head|style)>/";
-		$replace[0]="";
-		$patern[1]="/header_\w/";
-		$replace[1]="listtopic";
-		$patern[2]="/class=.data./";
-		$replace[2]='class="listlr"';
-		$patern[3]="/cellpadding=.\d./";
-		$replace[3]='cellpadding="0"';
-		$patern[4]="/cellspacing=.\d./";
-		$replace[4]='cellspacing="0"';
-		$patern[5]="/sarg/";
-		$replace[5]='cellspacing="0"';
-		
-		foreach ($sarg as $line){
-			if (preg_match("/<.head>/",$line))
-				$print ="ok";
-			if ($print =="ok" && !preg_match("/(sarg realtime|Auto Refresh)/i",$line))
-				print preg_replace($patern,$replace,$line);
-		}
-	}
-}
-
-if ($_REQUEST['cmd']!=""){
-	get_cmd();
-	}
-else{
 	$pfSversion = str_replace("\n", "", file_get_contents("/etc/version"));
 	if(strstr($pfSversion, "1.2"))
 		$one_two = true;
@@ -103,7 +46,7 @@ else{
 	
 	<?php if ($savemsg) print_info_box($savemsg); ?>
 	
-	<form action="postfix_view_config.php" method="post">
+	<form>
 		
 	<div id="mainlevel">
 		<table width="100%" border="0" cellpadding="0" cellspacing="0">
@@ -139,7 +82,6 @@ else{
 	</form>
 	<?php 
 	include("fend.inc");
-	}
 	?>
 	</body>
 	</html>
