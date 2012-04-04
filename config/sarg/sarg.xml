@@ -52,12 +52,6 @@
 		<section>Status</section>
 		<url>/pkg_edit.php?xml=sarg.xml</url>
 	</menu>
-	<service>
-		<name>sarg</name>
-		<rcfile>sarg</rcfile>
-		<executable>sarg</executable>
-		<description><![CDATA[Squid Analysis Report Generator is a tool that allow you to view "where" your users are going to on the Internet.]]></description>
-	</service>
 	<additional_files_needed>
 		<item>http://www.pfsense.org/packages/config/sarg/sarg.inc</item>
 		<prefix>/usr/local/pkg/</prefix>

@@ -100,14 +100,19 @@ function run_sarg($id=-1) {
 					mwexec('/usr/bin/killall -HUP dansguardian');
 					}
 			break;
-			/*case "squidguard":
-				#todo
-				if ($action !="xnonex"){
-					log_rotate('/var/log/dansguardian/access.log');
-					mwexec('/usr/local/sbin/dansguardian -r');
+			case "squidguard":
+				if ($action =="both" || $action=="rotate") {
+						mwexec('squid -k rotate');
+						if (file_exists('/usr/local/etc/rc.d/squidGuard_logrotate')){
+							mwexec('/usr/local/etc/rc.d/squidGuard_logrotate');
+							}
+					}
+				if ($action =="both" || $action=="restart") {
+					if (file_exists('/usr/local/etc/rc.d/squid')){
+						mwexec_bg('/usr/local/etc/rc.d/squid restart');
+						}
 					}
 			break;
-			*/
 		}
 	#mount filesystem readonly
 	conf_mount_ro();
@@ -123,22 +128,22 @@ function sync_package_sarg() {
 																'user_sort_field'=>'BYTES',
 																'report_type'=>'topusers,topsites,sites_users,users_sites,date_time,denied,auth_failures,site_user_time_date,downloads');
 	$sarg=$config['installedpackages']['sarg']['config'][0];
-	
 	switch ($sarg['proxy_server']){
 		case 'dansguardian':
 			$access_log='/var/log/dansguardian/access.log';
 			$dansguardian_conf='/usr/local/etc/dansguardian/dansguardian.conf';
 			$dansguardian_filter_out_date="dansguardian_filter_out_date on";
-			$squidguard_conf='none';
+			$squidguard_conf='squidguard_conf none';
 		break;
+		case 'squidguard':
+			$squidguard_conf='squidguard_conf /usr/local/etc/squidGuard/squidGuard.conf';
+			$redirector_log_format='redirector_log_format #year#-#mon#-#day# #hour# #tmp#/#list#/#tmp#/#tmp#/#url#/#tmp# #ip#/#tmp# #user# #end#';
+			#Leve this case without break to include squid log file on squidguard option
 		case 'squid':
 			$access_log='/var/squid/logs/access.log';
 			if (is_array($config['installedpackages']['squid']['config']))
 				if (file_exists($config['installedpackages']['squid']['config'][0]['log_dir']. '/access.log'))
 					$access_log = $config['installedpackages']['squid']['config'][0]['log_dir']. '/access.log';
-		break;
-		case 'squidguard':
-			$access_log='/var/squid/logs/access.log';
 		break;
 	}
 	if (!file_exists($access_log)){

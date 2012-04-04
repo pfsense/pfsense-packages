@@ -543,7 +543,7 @@ dansguardian_conf {$dansguardian_conf}
 #      'off' use the record even if its date is outside of the range found in the input log file.
 #      'on'  use the record only if its date is in the range found in the input log file.
 #
-${dansguardian_filter_out_date}
+{$dansguardian_filter_out_date}
 
 # TAG: squidguard_conf file
 #      path to squidGuard.conf file
@@ -552,7 +552,7 @@ ${dansguardian_filter_out_date}
 #      You can use sarg -L filename to use an alternate squidGuard log.
 #      squidguard_conf /usr/local/squidGuard/squidGuard.conf
 #
-squidguard_conf {$squidguard_conf}
+{$squidguard_conf}
 
 # TAG: redirector_log file
 #      the location of the web proxy redirector log such as one created by squidGuard or Rejik. The option
@@ -577,7 +577,7 @@ squidguard_conf {$squidguard_conf}
 #      REJIK       #year#-#mon#-#day# #hour# #list#:#tmp# #ip# #user# #tmp#/#tmp#/#url#/#end#
 #      SQUIDGUARD  #year#-#mon#-#day# #hour# #tmp#/#list#/#tmp#/#tmp#/#url#/#tmp# #ip#/#tmp# #user# #end#
 #redirector_log_format #year#-#mon#-#day# #hour# #tmp#/#list#/#tmp#/#tmp#/#url#/#tmp# #ip#/#tmp# #user# #end#
-
+{$redirector_log_format}
 # TAG: show_sarg_info yes|no
 #      shows sarg information and site path on each report bottom
 #
