@@ -200,8 +200,8 @@
 		 	<description><![CDATA[Date format to use in reports.]]></description>
 			<type>select</type>
 			<options>
-			<option><name>American mm/dd/yy (default)</name><value>e</value></option>
-			<option><name>European dd/mm/yy</name><value>a</value></option>
+			<option><name>American mm/dd/yy (default)</name><value>u</value></option>
+			<option><name>European dd/mm/yy</name><value>e</value></option>
 			<option><name>Weekly yy.ww</name><value>w</value></option>
 			</options>
 		</field>
