@@ -215,7 +215,7 @@ exclude_hosts /usr/local/etc/sarg/exclude_hosts.conf
 #       Date format in reports: e (European=dd/mm/yy), u (American=mm/dd/yy), w (Weekly=yy.ww)
 #
 #date_format u
-
+date_format {$date_format}
 # TAG:  per_user_limit file MB
 #       Saves userid on file if download exceed n MB.
 #       This option allow you to disable user access if user exceed a download limit.
@@ -764,7 +764,7 @@ realtime_unauthenticated_records show
 #      You may have a look at http://www.kryogenix.org/code/browser/sorttable/
 #      for the implementation on which sarg is based.
 #
-# sorttable /sorttable.js
+sorttable /sarg_sorttable.js
 
 # TAG: hostalias
 #      The name of a text file containing the host names one per line and the

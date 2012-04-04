@@ -98,6 +98,11 @@
 		<chmod>0755</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
+		<item>http://www.pfsense.org/packages/config/sarg/sarg_sorttable.js</item>
+		<prefix>/usr/local/www/</prefix>
+		<chmod>0755</chmod>
+	</additional_files_needed>
+	<additional_files_needed>
 		<item>http://www.pfsense.org/packages/config/sarg/sarg.template</item>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0755</chmod>
@@ -188,6 +193,17 @@
  				</options>
  				<multiple/>
  				<size>10</size>
+		</field>
+		 <field>
+		 	<fielddescr>Date Format</fielddescr>
+			<fieldname>report_date_format</fieldname>
+		 	<description><![CDATA[Date format to use in reports.]]></description>
+			<type>select</type>
+			<options>
+			<option><name>American mm/dd/yy (default)</name><value>e</value></option>
+			<option><name>European dd/mm/yy</name><value>a</value></option>
+			<option><name>Weekly yy.ww</name><value>w</value></option>
+			</options>
 		</field>
 		<field>
 			<name>User Settings</name>

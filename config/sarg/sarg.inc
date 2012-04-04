@@ -32,6 +32,15 @@
                                                                               */
 /* ========================================================================== */
 
+// STATIC VARS
+$sarg_proxy=array(	'squid_rc'=>'/usr/local/etc/rc.d/squid.sh',
+					'squid_config'=>'/var/squid/logs/access.log',
+					'squidguard_config'=>'/usr/local/etc/squidGuard/squidGuard.conf',
+					'squidguard_block_log'=>'/var/squidGuard/log/block.log',
+					'dansguardian_config'=>'/usr/local/etc/dansguardian/dansguardian.conf',
+					'dansguardian_log'=>'/var/log/dansguardian/access.log');
+
+// END STATIC VARS
 
 function sarg_start() {
 	global $g, $config;
@@ -68,7 +77,7 @@ function log_rotate($log_file){
 		rename ($log_file,$log_file.".0");	
 }
 function run_sarg($id=-1) {
-	global $config, $g;
+	global $config, $g,$sarg_proxy;
 	#mount filesystem writeable
 	conf_mount_rw();
 	$cmd = "/usr/local/bin/sarg";
@@ -86,31 +95,27 @@ function run_sarg($id=-1) {
 	#check if there is a script to run after file save
 	if (is_array($config['installedpackages']['sarg']))
 		switch ($config['installedpackages']['sarg']['config'][0]['proxy_server']){
+			case "squidguard":
+				if ($action =="both" || $action=="rotate"){
+					log_error('executing squidguard log rotate after sarg.');
+					log_rotate($sarg_proxy['squidguard_block_log']);
+					}
+			#Leve this case without break to include squid log file on squidguard option
 			case "squid":
-				if ($action =="both" || $action=="rotate")
+				if ($action =="both" || $action=="rotate"){
+					log_error('executing squid log rotate after sarg.');
 					mwexec('squid -k rotate');
-				if ($action =="both" || $action=="restart")
-					mwexec_bg('/usr/local/etc/rc.d/squid restart');
+					}
+				if ($action =="both" || $action=="restart"){
+					if (file_exists($sarg_proxy['squid_rc']))
+						mwexec_bg($sarg_proxy['squid_rc'].' restart');
+					}
 			break;
 			case "dansguardian":
 				if (preg_match('/\w+/',$action) && $action !="none"){
-					log_rotate('/var/log/dansguardian/access.log');
+					log_rotate($sarg_proxy['dansguardian_log']);
 					log_error('restarting dansguardian after sarg and log rotate.');
-					#mwexec('/usr/local/etc/rc.d/dansguardian restart');
 					mwexec('/usr/bin/killall -HUP dansguardian');
-					}
-			break;
-			case "squidguard":
-				if ($action =="both" || $action=="rotate") {
-						mwexec('squid -k rotate');
-						if (file_exists('/usr/local/etc/rc.d/squidGuard_logrotate')){
-							mwexec('/usr/local/etc/rc.d/squidGuard_logrotate');
-							}
-					}
-				if ($action =="both" || $action=="restart") {
-					if (file_exists('/usr/local/etc/rc.d/squid')){
-						mwexec_bg('/usr/local/etc/rc.d/squid restart');
-						}
 					}
 			break;
 		}
@@ -119,28 +124,29 @@ function run_sarg($id=-1) {
 }
 
 function sync_package_sarg() {
-	global $config, $g;
+	global $config, $g,$sarg_proxy;
 	$update_conf=0;
 	#mount filesystem writeable
 	conf_mount_rw();
 	if (!is_array($config['installedpackages']['sarg']['config']))
 		$config['installedpackages']['sarg']['config'][0]=array('report_options'=>'use_graphs,remove_temp_files,main_index,use_comma',
 																'user_sort_field'=>'BYTES',
-																'report_type'=>'topusers,topsites,sites_users,users_sites,date_time,denied,auth_failures,site_user_time_date,downloads');
+																'report_type'=>'topusers,topsites,sites_users,users_sites,date_time,denied,auth_failures,site_user_time_date,downloads',
+																'report_type'=>'u');
 	$sarg=$config['installedpackages']['sarg']['config'][0];
 	switch ($sarg['proxy_server']){
 		case 'dansguardian':
-			$access_log='/var/log/dansguardian/access.log';
-			$dansguardian_conf='/usr/local/etc/dansguardian/dansguardian.conf';
+			$access_log= $sarg_proxy['dansguardian_log'];
+			$dansguardian_conf=$sarg_proxy['dansguardian_config'];
 			$dansguardian_filter_out_date="dansguardian_filter_out_date on";
 			$squidguard_conf='squidguard_conf none';
 		break;
 		case 'squidguard':
-			$squidguard_conf='squidguard_conf /usr/local/etc/squidGuard/squidGuard.conf';
+			$squidguard_conf='squidguard_conf '.$sarg_proxy['squidguard_config'];
 			$redirector_log_format='redirector_log_format #year#-#mon#-#day# #hour# #tmp#/#list#/#tmp#/#tmp#/#url#/#tmp# #ip#/#tmp# #user# #end#';
 			#Leve this case without break to include squid log file on squidguard option
 		case 'squid':
-			$access_log='/var/squid/logs/access.log';
+			$access_log= $sarg_proxy['squid_config'];
 			if (is_array($config['installedpackages']['squid']['config']))
 				if (file_exists($config['installedpackages']['squid']['config'][0]['log_dir']. '/access.log'))
 					$access_log = $config['installedpackages']['squid']['config'][0]['log_dir']. '/access.log';
@@ -164,6 +170,7 @@ function sync_package_sarg() {
 	$use_comma=(preg_match('/use_comma/',$sarg['report_options'])?"yes":"no");
 	$long_url=(preg_match('/long_url/',$sarg['report_options'])?"yes":"no");
 	$privacy=(preg_match('/privacy/',$sarg['report_options'])?"yes":"no");
+	$date_format=(empty($sarg['report_date_format'])?"u":$sarg['report_date_format']);
 	$report_type=preg_replace('/,/',' ',$sarg['report_type']);
 	if(!empty($sarg['include_userlist']))
 		$include_users="$include_users ".$sarg['include_userlist'];
