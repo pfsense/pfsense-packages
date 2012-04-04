@@ -250,6 +250,13 @@
 			<size>35</size>
 		</field>
 		<field>
+			<fielddescr>Interface</fielddescr>
+			<description>interface to ping via</description>
+			<fieldname>interface</fieldname>
+			<type>interfaces_selection</type>
+			<size>1</size>
+		</field>
+		<field>
 			<fielddescr>Failover hold time</fielddescr>
 			<description>Time in minutes before DNS switches to backup host</description>
 			<fieldname>threshhold</fieldname>
@@ -266,7 +273,7 @@
 				    <fieldname>failoverip</fieldname>
 				    <description>Failover IP when host is not responding to ICMP/PING traffic</description>
 				    <type>input</type>
-				    <size>25</size>
+				    <size>13</size>
 				</rowhelperfield>
 				<rowhelperfield>
 				    <fielddescr>Load balance</fielddescr>
@@ -279,21 +286,28 @@
 				    <fieldname>pingthreshold</fieldname>
 				    <description>When the MS time is surpassed, item will failover to next host</description>
 				    <type>input</type>
-				    <size>7</size>
+				    <size>3</size>
 				</rowhelperfield>
 				<rowhelperfield>
 				    <fielddescr>Wan ping threshold</fielddescr>
 				    <fieldname>wanpingthreshold</fieldname>
 				    <description>When the WAN MS ping time is surpassed, item will failover to next host</description>
 				    <type>input</type>
-				    <size>7</size>
+				    <size>5</size>
 				</rowhelperfield>
 				<rowhelperfield>
 				    <fielddescr>IP to ping to ensure service is up</fielddescr>
 				    <fieldname>monitorip</fieldname>
 				    <description>When the WAN MS ping time is surpassed, item will failover to next host</description>
 				    <type>input</type>
-				    <size>15</size>
+				    <size>13</size>
+				</rowhelperfield>
+				<rowhelperfield>
+				    <fielddescr>interface</fielddescr>
+				    <fieldname>interface</fieldname>
+				    <description>interface to ping via</description>
+				    <type>interfaces_selection</type>
+				    <size>1</size>
 				</rowhelperfield>
 		    </rowhelper>
 		</field>
@@ -326,3 +340,4 @@
 		unset($_POST['temp']);
 	</custom_php_command_before_form>
 </packagegui>
+
