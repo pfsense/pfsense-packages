@@ -159,7 +159,8 @@ function quagga_ospfd_install_conf() {
 
 		if (is_array($interface_networks))
 			foreach ($interface_networks as $ifn)
-				$conffile .= "  network {$ifn} area {$ospfd_conf['area']}\n";
+				if (is_subnet($ifn))
+					$conffile .= "  network {$ifn} area {$ospfd_conf['area']}\n";
 
 		if (is_array($ospfd_conf['row'])) {
 			foreach ($ospfd_conf['row'] as $redistr) {
