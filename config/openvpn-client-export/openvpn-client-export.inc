@@ -71,7 +71,7 @@ function openvpn_client_export_prefix($srvid) {
 	if ($settings['disable'])
 		return false;
 
-	$host = $config['system']['hostname'];
+	$host = empty($config['system']['hostname']) ? "openvpn" : $config['system']['hostname'];
 	$prot = ($settings['protocol'] == 'UDP' ? 'udp' : $settings['protocol']);
 	$port = $settings['local_port'];
 
@@ -161,7 +161,8 @@ function openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $usetoke
 			$server_host = get_interface_ip($interface);
 		}
 	} else if ($useaddr == "serverhostname" || empty($useaddr)) {
-		$server_host = "{$config['system']['hostname']}.{$config['system']['domain']}";
+		$server_host = empty($config['system']['hostname']) "" : "{$config['system']['hostname']}.";
+		$server_host .= "{{$config['system']['domain']}";
 	} else
 		$server_host = $useaddr;
 
@@ -600,7 +601,8 @@ function openvpn_client_export_sharedkey_config($srvid, $useaddr, $proxy, $zipco
 			$server_host = get_interface_ip($interface);
 		}
 	} else if ($useaddr == "serverhostname" || empty($useaddr)) {
-		$server_host = "{$config['system']['hostname']}.{$config['system']['domain']}";
+		$server_host = empty($config['system']['hostname']) "" : "{$config['system']['hostname']}.";
+		$server_host .= "{{$config['system']['domain']}";
 	} else
 		$server_host = $useaddr;
 
