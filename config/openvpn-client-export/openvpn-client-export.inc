@@ -161,7 +161,7 @@ function openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $usetoke
 			$server_host = get_interface_ip($interface);
 		}
 	} else if ($useaddr == "serverhostname" || empty($useaddr)) {
-		$server_host = empty($config['system']['hostname']) "" : "{$config['system']['hostname']}.";
+		$server_host = empty($config['system']['hostname']) ? "" : "{$config['system']['hostname']}.";
 		$server_host .= "{{$config['system']['domain']}";
 	} else
 		$server_host = $useaddr;
@@ -601,7 +601,7 @@ function openvpn_client_export_sharedkey_config($srvid, $useaddr, $proxy, $zipco
 			$server_host = get_interface_ip($interface);
 		}
 	} else if ($useaddr == "serverhostname" || empty($useaddr)) {
-		$server_host = empty($config['system']['hostname']) "" : "{$config['system']['hostname']}.";
+		$server_host = empty($config['system']['hostname']) ? "" : "{$config['system']['hostname']}.";
 		$server_host .= "{{$config['system']['domain']}";
 	} else
 		$server_host = $useaddr;
