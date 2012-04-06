@@ -83,6 +83,10 @@
 			<fieldname>recordtype</fieldname>
 		</columnitem>
 		<columnitem>
+			<fielddescr>Prio</fielddescr>
+			<fieldname>dist</fieldname>
+		</columnitem>
+		<columnitem>
 			<fielddescr>rDNS</fielddescr>
 			<fieldname>rdns</fieldname>
 		</columnitem>
@@ -93,6 +97,10 @@
 		<columnitem>
 			<fielddescr>TTL</fielddescr>
 			<fieldname>ttl</fieldname>
+		</columnitem>
+		<columnitem>
+			<fielddescr>monitoring</fielddescr>
+			<fieldname>monitorip</fieldname>
 		</columnitem>
 	</adddeleteeditpagefields>
 	<fields>
