@@ -194,7 +194,7 @@ function tinydns_custom_php_changeip_command() {
 	global $g, $config;
 	conf_mount_rw();
 
-	/* For now force $dnsserverip to to 127.0.0.1 unless a separate IP is specified */
+	/* For now force $dnsserverip to 127.0.0.1 unless a separate IP is specified */
 	$localhost = "127.0.0.1";
 	$dnsserverip = $localhost;
 	if($config['installedpackages']['tinydns']['config'][0]['ipaddress'] != $localhost AND $config['installedpackages']['tinydns']['config'][0]['ipaddress'] != "")
@@ -372,10 +372,10 @@ function tinydns_get_backup_record($record) {
 	global $g, $config;
 	if($config['installedpackages']['tinydnsdomains']) {
 		foreach($config['installedpackages']['tinydnsdomains']['config'] as $domain) {
-			if($domain['ipaddress'] == $record) {
-				/* if no failover host exists, simply return original record */
+			if($domain['hostname'] == $record) {
+				/* if no failover host exists, simply return original ipaddress */
 				if(!$domain['row'])
-					return $record;
+					return $row['ipaddress'];
 				foreach($domain['row'] as $row) {
 					$status = tinydns_get_record_status($row['failoverip']);
 					if($status == "UP")
@@ -558,7 +558,7 @@ function tinydns_create_zone_file() {
 				if($status == "DOWN") {
 					if($debug)
 						log_error("$ipaddress monitor ip $monitorip is offline.");
-					$ipaddress = tinydns_get_backup_record($ipaddress);
+					$ipaddress = tinydns_get_backup_record($hostname);
 					if($debug)
 						log_error("tinydns_get_backup_record returned $ipaddress ");
 				}
