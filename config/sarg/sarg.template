@@ -414,6 +414,7 @@ long_url {$long_url}
 #      Date/Time reports show the downloaded volume or the elapsed time or both.
 #
 #date_time_by bytes
+date_time_by {$date_time_by}
 
 # TAG: charset name
 #      ISO 8859 is a full series of 10 standardized multilingual single-byte coded (8bit)
@@ -435,7 +436,8 @@ long_url {$long_url}
 #		UTF-8
 #
 #charset Latin1
-charset UTF-8
+charset {$report_charset}
+
 # TAG: user_invalid_char "&/"
 #      Records that contain invalid characters in userid will be ignored by Sarg.
 #
@@ -487,6 +489,7 @@ privacy {$privacy}
 #      Bytes field must be in Site & Users Report ?
 #
 #bytes_in_sites_users_report no
+bytes_in_sites_users_report {$bytes_in_sites_users_report}
 
 # TAG: topuser_num n
 #      How many users in topsites report. 0 = no limit
@@ -610,6 +613,7 @@ show_sarg_logo no
 #          abbreviation -  210K
 #
 #displayed_values bytes
+displayed_values {$displayed_values}
 
 # Report limits
 # TAG: authfail_report_limit n

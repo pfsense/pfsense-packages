@@ -129,10 +129,11 @@ function sync_package_sarg() {
 	#mount filesystem writeable
 	conf_mount_rw();
 	if (!is_array($config['installedpackages']['sarg']['config']))
-		$config['installedpackages']['sarg']['config'][0]=array('report_options'=>'use_graphs,remove_temp_files,main_index,use_comma',
+		$config['installedpackages']['sarg']['config'][0]=array('report_options'=>'use_graphs,remove_temp_files,main_index,use_comma,date_time_by_bytes',
 																'user_sort_field'=>'BYTES',
 																'report_type'=>'topusers,topsites,sites_users,users_sites,date_time,denied,auth_failures,site_user_time_date,downloads',
-																'report_type'=>'u');
+																'report_type'=>'u',
+																'report_charset'=>'UTF-8');
 	$sarg=$config['installedpackages']['sarg']['config'][0];
 	switch ($sarg['proxy_server']){
 		case 'dansguardian':
@@ -170,18 +171,18 @@ function sync_package_sarg() {
 	$use_comma=(preg_match('/use_comma/',$sarg['report_options'])?"yes":"no");
 	$long_url=(preg_match('/long_url/',$sarg['report_options'])?"yes":"no");
 	$privacy=(preg_match('/privacy/',$sarg['report_options'])?"yes":"no");
+	$displayed_values=(preg_match('/displayed_values/',$sarg['report_options'])?"abbreviation":"bytes");
+	$bytes_in_sites_users_report=(preg_match('/bytes_in_sites_users_report/',$sarg['report_options'])?"yes":"no");
+	$date_time_by=(preg_match('/date_time_by_bytes/',$sarg['report_options'])?"bytes":"");
+	$date_time_by.=(preg_match('/date_time_by_elap/',$sarg['report_options'])?" elap":"");
 	$date_format=(empty($sarg['report_date_format'])?"u":$sarg['report_date_format']);
 	$report_type=preg_replace('/,/',' ',$sarg['report_type']);
+	$report_charset=(empty($sarg['report_charset'])?"UTF-8":$sarg['report_charset']);
 	if(!empty($sarg['include_userlist']))
 		$include_users="$include_users ".$sarg['include_userlist'];
 		
-	include("/usr/local/pkg/sarg.template");
-	file_put_contents("/usr/local/etc/sarg/sarg.conf", $sg, LOCK_EX);
-	file_put_contents('/usr/local/etc/sarg/exclude_users.conf', sarg_text_area_decode($sarg['exclude_userlist']),LOCK_EX);
-	file_put_contents('/usr/local/etc/sarg/exclude_hosts.conf', sarg_text_area_decode($sarg['exclude_hostlist']),LOCK_EX);
-	file_put_contents('/usr/local/etc/sarg/exclude_codes.conf', sarg_text_area_decode($sarg['exclude_codelist']),LOCK_EX);
 	$exclude_string=(empty($sarg['exclude_string'])?"":'exclude_string"'.$sarg['exclude_string']."'");
-	if(empty($sarg['include_userlist'])){
+	if(empty($sarg['usertab'])){
 		$usertab="none";
 		}
 	else{
@@ -192,7 +193,14 @@ function sync_package_sarg() {
 		foreach ($dirs as $dir)
 		if (!is_dir($dir))
 			mkdir ($dir,0755,true);
-
+	
+	#create sarg config files
+	include("/usr/local/pkg/sarg.template");
+	file_put_contents("/usr/local/etc/sarg/sarg.conf", $sg, LOCK_EX);
+	file_put_contents('/usr/local/etc/sarg/exclude_users.conf', sarg_text_area_decode($sarg['exclude_userlist']),LOCK_EX);
+	file_put_contents('/usr/local/etc/sarg/exclude_hosts.conf', sarg_text_area_decode($sarg['exclude_hostlist']),LOCK_EX);
+	file_put_contents('/usr/local/etc/sarg/exclude_codes.conf', sarg_text_area_decode($sarg['exclude_codelist']),LOCK_EX);
+	
 	#check cron_tab
 	$new_cron=array();
 	$cron_found=0;

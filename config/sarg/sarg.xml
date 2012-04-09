@@ -165,14 +165,18 @@
  				<option><name>Sort Fields in Reverse order (no)</name><value>user_sort_field_order</value></option>
  				<option><name>Remove temporary files from root report directory  (yes)</name><value>remove_temp_files</value></option>
  				<option><name>Generate the main index.html (yes)</name><value>main_index</value></option>
- 				<option><name>Generate the index tree by file (on)</name><value>index_tree</value></option>
+ 				<option><name>Generate the index tree by file (yes)</name><value>index_tree</value></option>
  				<option><name>Overwrite report (no)</name><value>overwrite_report</value></option>
  				<option><name>Use comma instead point in reports (yes)</name><value>use_comma</value></option>
  				<option><name>Show full url in report (no)</name><value>long_url</value></option>
  				<option><name>Privacy (no)</name><value>privacy</value></option>
+ 				<option><name>Show Bytes in sites users reports(no)</name><value>bytes_in_sites_users_report</value></option>
+ 				<option><name>Show values in reports using abbreviation (no)</name><value>displayed_values</value></option>
+ 				<option><name>Show the downloaded volume on Date/Time reports (yes)</name><value>date_time_by_bytes</value></option>
+ 				<option><name>Show the downloaded elapsed time on Date/Time reports (no)</name><value>date_time_by_elap</value></option>
  				</options>
  				<multiple/>
- 				<size>13</size>
+ 				<size>17</size>
 		</field>
 		<field>
 			<fielddescr>Report to generate</fielddescr>
@@ -203,6 +207,28 @@
 			<option><name>American mm/dd/yy (default)</name><value>u</value></option>
 			<option><name>European dd/mm/yy</name><value>e</value></option>
 			<option><name>Weekly yy.ww</name><value>w</value></option>
+			</options>
+		</field>
+		 <field>
+		 	<fielddescr>Report charset</fielddescr>
+			<fieldname>report_charset</fieldname>
+		 	<description><![CDATA[ISO 8859 is a full series of 10 standardized multilingual single-byte coded (8bit) graphic character sets for writing in alphabetic languages]]></description>
+			<type>select</type>
+			<options>
+			<option><name>UTF-8 (Default)</name><value>UTF-8</value></option>
+			<option><name>Latin1 		- West European</name><value>Latin1</value></option>
+			<option><name>Latin2 		- East European</name><value>Latin2</value></option>
+			<option><name>Latin3 		- South European</name><value>Latin3</value></option>
+			<option><name>Latin4 		- North European</name><value>Latin4</value></option>
+			<option><name>Latin5 		- Turkish</name><value>Latin5</value></option>
+			<option><name>Latin6</name><value>Latin6</value></option>
+			<option><name>Cyrillic</name><value>Cyrillic</value></option>
+			<option><name>Arabic</name><value>Arabic</value></option>
+			<option><name>Greek</name><value>Greek</value></option>
+			<option><name>Hebrew</name><value>Hebrew</value></option>
+			<option><name>Windows-1251</name><value>Windows-1251</value></option>
+			<option><name>Japan</name><value>Japan</value></option>
+			<option><name>Koi8-r</name><value>Koi8-r</value></option>
 			</options>
 		</field>
 		<field>
