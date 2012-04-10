@@ -62,8 +62,12 @@
 	</menu>
 	<tabs>
 		<tab>
-			<text>Settings</text>
+			<text>General</text>
 			<url>/pkg_edit.php?xml=sarg.xml&amp;id=0</url>
+		</tab>
+		<tab>
+			<text>Users</text>
+			<url>/pkg_edit.php?xml=sarg_users.xml&amp;id=0</url>
 		</tab>
 		<tab>
 			<text>Schedule</text>
@@ -97,8 +101,12 @@
 			<fieldname>frequency</fieldname>
 		</columnitem>
 		<columnitem>
-			<fielddescr>args</fielddescr>
+			<fielddescr>Aditional Args</fielddescr>
 			<fieldname>mod</fieldname>
+		</columnitem>
+		<columnitem>
+			<fielddescr>Post Action</fielddescr>
+			<fieldname>action</fieldname>
 		</columnitem>
 		<columnitem>
 			<fielddescr>Description</fielddescr>

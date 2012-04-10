@@ -47,8 +47,12 @@
 	<include_file>/usr/local/pkg/sarg.inc</include_file>
 	<tabs>
 		<tab>
-			<text>Settings</text>
+			<text>General</text>
 			<url>/pkg_edit.php?xml=sarg.xml&amp;id=0</url>
+		</tab>
+		<tab>
+			<text>Users</text>
+			<url>/pkg_edit.php?xml=sarg_users.xml&amp;id=0</url>
 		</tab>
 		<tab>
 			<text>Schedule</text>

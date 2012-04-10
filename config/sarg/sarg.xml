@@ -68,6 +68,11 @@
 		<chmod>0755</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
+		<item>http://www.pfsense.org/packages/config/sarg/sarg_users.xml</item>
+		<prefix>/usr/local/pkg/</prefix>
+		<chmod>0755</chmod>
+	</additional_files_needed>
+	<additional_files_needed>
 		<item>http://www.pfsense.org/packages/config/sarg/sarg_realtime.php</item>
 		<prefix>/usr/local/www/</prefix>
 		<chmod>0755</chmod>
@@ -109,9 +114,13 @@
 	</additional_files_needed>
 	<tabs>
 		<tab>
-			<text>Settings</text>
+			<text>General</text>
 			<url>/pkg_edit.php?xml=sarg.xml&amp;id=0</url>
 			<active/>
+		</tab>
+		<tab>
+			<text>Users</text>
+			<url>/pkg_edit.php?xml=sarg_users.xml&amp;id=0</url>
 		</tab>
 		<tab>
 			<text>Schedule</text>
@@ -136,7 +145,7 @@
 </tabs>
 	<fields>
 		<field>
-			<name>Log Settings</name>
+			<name>Report Settings</name>
 			<type>listtopic</type>
 		</field>
 		<field>
@@ -232,55 +241,74 @@
 			</options>
 		</field>
 		<field>
-			<name>User Settings</name>
+			<fielddescr>Host Aliases</fielddescr>
+			<fieldname>hostalias</fieldname>
+			<description><![CDATA[The name of a text file containing the host names one per line and the optional alias to use in the report instead of that host name.<br>
+							Host names may contain up to one wildcard denoted by a *. The wildcard must not end the host name.<br>
+							The host name may be followed by an optional alias but if no alias is provided, the host name, including the wildcard, replaces any matching host name found in the log.<br>
+							Host names replaced by identical aliases are grouped together in the reports.<br>
+							IP addresses are supported and accept the CIDR notation both for IPv4 and IPv6 addresses.<br>
+							Sample:<br>
+							*.gstatic.com<br>
+							mt*.google.com<br>
+							*.myphone.microsoft.com<br>
+							*.myphone.microsoft.com:443 *.myphone.microsoft.com:secure<br>
+							*.freeav.net antivirus:freeav<br>
+							*.mail.live.com<br>
+							65.52.00.00/14 *.mail.live.com]]></description>
+			<type>textarea</type>
+			<cols>70</cols>
+			<rows>10</rows>
+			<encoding>base64</encoding>
+		</field>
+		<field>
+			<name>Limit Settings</name>
 			<type>listtopic</type>
 		</field>
 		<field>
-			<fielddescr>User Sort Field</fielddescr>
-			<fieldname>user_sort_field</fieldname>
-			<description><![CDATA[Sort field for the User Report.]]></description>
-	    	<type>select</type>
- 				<options>
- 				<option><name>BYTES(default)</name><value>BYTES</value></option>
- 				<option><name>SITE normal</name><value>SITE</value></option>
- 				<option><name>CONNECT</name><value>CONNECT</value></option>
- 				<option><name>TIME</name><value>TIME</value></option>
- 				</options>
+			<fielddescr>Max Elapsed</fielddescr>
+			<fieldname>max_elapsed</fieldname>
+			<description><![CDATA[If elapsed time is recorded in log is greater than max_elapsed use 0 for elapsed time.<br>
+								  Samples: 0 means no checking<br>
+								   28800000 means 08 hours ]]></description>
+	    	<type>input</type>
+	    	<size>10</size>
 		</field>
 		<field>
-			<fielddescr>Exclude users</fielddescr>
-			<fieldname>exclude_userlist</fieldname>
-			<description><![CDATA[Users within the file will be excluded from reports.<br>
-									You can use indexonly to have only index.html file.<br>
-									<strong>Format: one user per line.</strong>]]></description>
-			<type>textarea</type>
-			<cols>70</cols>
-			<rows>10</rows>
-			<encoding>base64</encoding>
+			<fielddescr>Reports limits</fielddescr>
+			<fieldname>lastlog</fieldname>
+			<description><![CDATA[How many reports files must be keept in reports directory.<br>
+								 The oldest report file will be automatically removed.0 means no limit.]]></description>
+	    	<type>input</type>
+	    	<size>10</size>
 		</field>
 		<field>
-			<fielddescr>Include users</fielddescr>
-			<fieldname>include_userlist</fieldname>
-			<description><![CDATA[Reports will be generated only for listed users.<br> 
-								<strong>Format: user1:user2:...:usern</strong>]]></description>
-			<type>input</type>
-			<size>70</size>
+			<fielddescr>Top Users Limit</fielddescr>
+			<fieldname>topuser_num</fieldname>
+			<description><![CDATA[How many users in topsites report. 0 = no limit]]></description>
+	    	<type>input</type>
+	    	<size>10</size>
 		</field>
 		<field>
-			<fielddescr>Users association</fielddescr>
-			<fieldname>usertab</fieldname>
-			<description><![CDATA[You can change the "userid" or the "ip address" to be a real user name on the reports.<br>
-									If resolve_ip is active, the ip address is resolved before being looked up into this file.<br>
-									That is, if you want to map the ip address, be sure to set resolv_ip to no or the resolved name will be looked into the file instead of the ip address.<br>
-									Note that it can be used to resolve any ip address known to the dns and then map the unresolved ip addresses to a name found in the usertab file.<br>
-									<strong>Table syntax: userid name   or   ip address name</strong><br>
-									Eg:<br>SirIsaac Isaac Newton<br>
-									vinci Leonardo da Vinci<br>
-									192.168.10.1 Karol Wojtyla]]></description>
-			<type>textarea</type>
-			<cols>70</cols>
-			<rows>10</rows>
-			<encoding>base64</encoding>
+			<fielddescr>Denied Limit</fielddescr>
+			<fieldname>denied_report_limit</fieldname>
+			<description><![CDATA[0 means no limit.]]></description>
+	    	<type>input</type>
+	    	<size>10</size>
+		</field>
+		<field>
+			<fielddescr>AuthFail Limit</fielddescr>
+			<fieldname>authfail_report_limit</fieldname>
+			<description><![CDATA[0 means no limit.]]></description>
+	    	<type>input</type>
+	    	<size>10</size>
+		</field>
+		<field>
+			<fielddescr>User_report_limit</fielddescr>
+			<fieldname>user_report_limit</fieldname>
+			<description><![CDATA[0 means no limit.]]></description>
+	    	<type>input</type>
+	    	<size>10</size>
 		</field>
 		<field>
 			<name>Exclude Settings</name>

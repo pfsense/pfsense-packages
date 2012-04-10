@@ -53,7 +53,8 @@ require("guiconfig.inc");
 			<tr><td>
 	<?php
 	$tab_array = array();
-	$tab_array[] = array(gettext("Settings"), false, "/pkg_edit.php?xml=sarg.xml&id=0");
+	$tab_array[] = array(gettext("General"), false, "/pkg_edit.php?xml=sarg.xml&id=0");
+	$tab_array[] = array(gettext("Users"), false, "/pkg_edit.php?xml=sarg_users.xml&id=0");
 	$tab_array[] = array(gettext("Schedule"), false, "/pkg.php?xml=sarg_schedule.xml");
 	$tab_array[] = array(gettext("View Report"), true, "/sarg_reports.php");
 	$tab_array[] = array(gettext("Realtime"), false, "/sarg_realtime.php");

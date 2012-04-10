@@ -182,13 +182,13 @@ user_ip {$user_ip}
 #       Sort field for the Topuser Report.
 #       Allowed fields: USER CONNECT BYTES TIME
 #
-topuser_sort_field {$sarg['user_sort_field']} {$sort_order}
+topuser_sort_field {$sarguser['user_sort_field']} {$sort_order}
 
 # TAG:  user_sort_field field normal/reverse
 #       Sort field for the User Report.
 #       Allowed fields: SITE CONNECT BYTES TIME
 #
-user_sort_field {$sarg['user_sort_field']} {$sort_order}
+user_sort_field {$sarguser['user_sort_field']} {$sort_order}
 
 # TAG:  exclude_users file
 #       users within the file will be excluded from reports.
@@ -216,6 +216,7 @@ exclude_hosts /usr/local/etc/sarg/exclude_hosts.conf
 #
 #date_format u
 date_format {$date_format}
+
 # TAG:  per_user_limit file MB
 #       Saves userid on file if download exceed n MB.
 #       This option allow you to disable user access if user exceed a download limit.
@@ -228,6 +229,7 @@ date_format {$date_format}
 #      0 - no limit.
 #
 #lastlog 0
+lastlog {$lastlog}
 
 # TAG: remove_temp_files yes
 #      Remove temporary files: geral, usuarios, top, periodo from root report directory.
@@ -324,6 +326,7 @@ exclude_codes /usr/local/etc/sarg/exclude_codes
 #
 #max_elapsed 28800000
 # 8 Hours
+max_elapsed {$max_elapsed}
 
 # TAG: report_type type
 #      What kind of reports to generate.
@@ -368,26 +371,31 @@ usertab {$usertab}
 #	FQDN or IP address of host with LDAP service or AD DC
 #	default is '127.0.0.1'
 #LDAPHost 127.0.0.1
+{$LDAPHost}
 
 # TAG: LDAPPort port
 #       LDAP service port number
 #	default is '389'
 #LDAPPort 389
+{$LDAPPort}
 
 # TAG: LDAPBindDN CN=username,OU=group,DC=mydomain,DC=com
 #	DN of LDAP user, who is authorized to read user's names from LDAP base
 #	default is empty line
 #LDAPBindDN cn=proxy,dc=mydomain,dc=local
+{$LDAPBindDN}
 
 # TAG: LDAPBindPW secret
 #	Password of DN, who is authorized to read user's names from LDAP base
 #	default is empty line
 #LDAPBindPW secret
+{$LDAPBindPW}
 
 # TAG: LDAPBaseSearch OU=users,DC=mydomain,DC=com
 #	LDAP search base
 #	default is empty line
 #LDAPBaseSearch ou=users,dc=mydomain,dc=local
+{$LDAPBaseSearch}
 
 # TAG: LDAPFilterSearch (uid=%s)
 #	User search filter by user's logins in LDAP
@@ -396,11 +404,13 @@ usertab {$usertab}
 #       filter string can have up to 5 '%s' tags
 #	default value is '(uid=%s)'
 #LDAPFilterSearch (uid=%s)
+{$LDAPFilterSearch}
 
 # TAG: LDAPTargetAttr attributename
 #	Name of the attribute containing a name of the user
 #	default value is 'cn'
 #LDAPTargetAttr cn
+{$LDAPTargetAttr}
 
 # TAG: long_url yes|no
 #      If yes, the full url is showed in report.
@@ -495,6 +505,7 @@ bytes_in_sites_users_report {$bytes_in_sites_users_report}
 #      How many users in topsites report. 0 = no limit
 #
 #topuser_num 0
+topuser_num {$topuser_num}
 
 # TAG: datafile file
 #      Save the report results in a file to populate some database
@@ -627,12 +638,15 @@ displayed_values {$displayed_values}
 #      '0' no limit
 #
 #authfail_report_limit 10
+authfail_report_limit {$authfail_report_limit}
 #denied_report_limit 10
+denied_report_limit {$denied_report_limit}
 #siteusers_report_limit 0
 #squidguard_report_limit 10
 #dansguardian_report_limit 10
 #user_report_limit 10
 #user_report_limit 50
+{$user_report_limit}
 
 # TAG: www_document_root dir
 #     Where is your Web DocumentRoot
@@ -716,6 +730,7 @@ www_document_root /usr/local/www
 #      NTLM users format.
 #
 #ntlm_user_format domainname+username
+ntlm_user_format {$ntlm_user_format}
 
 # TAG: realtime_refresh_time num sec
 #      How many time to auto refresh the realtime report
@@ -791,6 +806,6 @@ sorttable /sarg_sorttable.js
 #      *.freeav.net antivirus:freeav
 #      *.mail.live.com
 #      65.52.00.00/14 *.mail.live.com
-#hostalias /usr/local/sarg/hostalias
+hostalias /usr/local/etc/sarg/hostalias
 EOF;
 ?>

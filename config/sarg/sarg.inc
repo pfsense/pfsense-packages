@@ -130,11 +130,26 @@ function sync_package_sarg() {
 	conf_mount_rw();
 	if (!is_array($config['installedpackages']['sarg']['config']))
 		$config['installedpackages']['sarg']['config'][0]=array('report_options'=>'use_graphs,remove_temp_files,main_index,use_comma,date_time_by_bytes',
-																'user_sort_field'=>'BYTES',
 																'report_type'=>'topusers,topsites,sites_users,users_sites,date_time,denied,auth_failures,site_user_time_date,downloads',
 																'report_type'=>'u',
-																'report_charset'=>'UTF-8');
+																'report_charset'=>'UTF-8',
+																'topuser_num'=>'0',
+																'authfail_report_limit'=>'0',
+																'denied_report_limit'=>'0',
+																'user_report_limit' =>'0',
+																'lastlog'=> '0',
+																'max_elapsed'=> '0');
 	$sarg=$config['installedpackages']['sarg']['config'][0];
+	if (!is_array($config['installedpackages']['sarguser']['config']))
+		$config['installedpackages']['sarguser']['config'][0]=array('user_sort_field'=>'BYTES',
+																	'exclude_userlist'=> $sarg['exclude_userlist'],
+																	'include_userlist'=> $sarg['include_userlist'],
+																	'usertab'=>$sarg['usertab'],
+																	'ldap_filter_search'=> '(uid=%s)',
+																	'ldap_target_attr'=> 'cn',
+																	'ldap_port'=> '389',
+																	'ntlm_user_format'=>'domainname+username');
+	$sarguser=$config['installedpackages']['sarguser']['config'][0];
 	switch ($sarg['proxy_server']){
 		case 'dansguardian':
 			$access_log= $sarg_proxy['dansguardian_log'];
@@ -158,7 +173,8 @@ function sync_package_sarg() {
 		log_error($error);
 		file_notice("Sarg", $error, "Sarg Settings", "");
 	}
-		
+	
+	#general tab	
 	$graphs=(preg_match('/use_graphs/',$sarg['report_options'])?"yes":"no");
 	$anonymous_output_files=(preg_match('/anonymous_output_files/',$sarg['report_options'])?"yes":"no");
 	$resolve_ip=(preg_match('/resolve_ip/',$sarg['report_options'])?"yes":"no");
@@ -178,17 +194,43 @@ function sync_package_sarg() {
 	$date_format=(empty($sarg['report_date_format'])?"u":$sarg['report_date_format']);
 	$report_type=preg_replace('/,/',' ',$sarg['report_type']);
 	$report_charset=(empty($sarg['report_charset'])?"UTF-8":$sarg['report_charset']);
-	if(!empty($sarg['include_userlist']))
-		$include_users="$include_users ".$sarg['include_userlist'];
-		
 	$exclude_string=(empty($sarg['exclude_string'])?"":'exclude_string"'.$sarg['exclude_string']."'");
-	if(empty($sarg['usertab'])){
+
+	#limits
+	$max_elapsed=(empty($sarg['max_elapsed'])?"0":$sarg['max_elapsed']);
+	$lastlog=(empty($sarg['lastlog'])?"0":$sarg['lastlog']);
+	$topuser_num=(empty($sarg['topuser_num'])?"0":$sarg['topuser_num']);
+	$authfail_report_limit=(empty($sarg['authfail_report_limit'])?"0":$sarg['authfail_report_limit']);
+	$denied_report_limit=(empty($sarg['denied_report_limit'])?"0":$sarg['denied_report_limit']);
+	$report_limit=(empty($sarg['user_report_limit'])?"0":$sarg['user_report_limit']);
+	$user_report_limit = "siteusers_report_limit ".$report_limit."\n";
+	$user_report_limit .= "user_report_limit ".$report_limit."\n";
+	if(preg_match("/(squidguard|dansguardian)/",$sarg['proxy_server'])){
+		$user_report_limit .= $sarg['proxy_server']."_report_limit ".$report_limit."\n";
+		}
+	
+	#user tab
+	$ntlm_user_format=(empty($sarguser['ntlm_user_format'])?'domainname+username':$sarguser['ntlm_user_format']);
+	if(!empty($sarguser['include_userlist']))
+		$include_users="$include_users ".$sarguser['include_userlist'];
+		
+	if(empty($sarguser['usertab'])){
 		$usertab="none";
 		}
 	else{
 		$usertab="/usr/local/etc/sarg/usertab.conf";
-		file_put_contents('/usr/local/etc/sarg/usertab.conf', sarg_text_area_decode($sarg['usertab']),LOCK_EX);
+		file_put_contents('/usr/local/etc/sarg/usertab.conf', sarg_text_area_decode($sarguser['usertab']),LOCK_EX);
 		}
+	if($sarguser['ldap_enable']){
+		$LDAPHost=(empty($sarguser['ldap_host'])?"":"LDAPHost ".$sarguser['ldap_host']);
+		$LDAPort=(empty($sarguser['ldap_port'])?"":"LDAPPort ".$sarguser['ldap_port']);
+		$LDAPBindDN=(empty($sarguser['ldap_bind_dn'])?"":"LDAPBindDN ".$sarguser['ldap_bind_dn']);
+		$LDAPBindPW=(empty($sarguser['ldap_bind_pw'])?"":"LDAPBindPW ".$sarguser['ldap_bind_pw']);
+		$LDAPBaseSearch=(empty($sarguser['ldap_base_search'])?"":"LDAPBaseSearch ".$sarguser['ldap_base_search']);
+		$LDAPTargetAttr=(empty($sarguser['ldap_target_Attr'])?"":"LDAPTargetAttr ".$sarguser['ldap_target_Attr']);
+		}
+		
+	#dirs
 	$dirs=array("/usr/local/www/sarg-reports");
 		foreach ($dirs as $dir)
 		if (!is_dir($dir))
@@ -197,9 +239,10 @@ function sync_package_sarg() {
 	#create sarg config files
 	include("/usr/local/pkg/sarg.template");
 	file_put_contents("/usr/local/etc/sarg/sarg.conf", $sg, LOCK_EX);
-	file_put_contents('/usr/local/etc/sarg/exclude_users.conf', sarg_text_area_decode($sarg['exclude_userlist']),LOCK_EX);
 	file_put_contents('/usr/local/etc/sarg/exclude_hosts.conf', sarg_text_area_decode($sarg['exclude_hostlist']),LOCK_EX);
 	file_put_contents('/usr/local/etc/sarg/exclude_codes.conf', sarg_text_area_decode($sarg['exclude_codelist']),LOCK_EX);
+	file_put_contents('/usr/local/etc/sarg/hostalias',sarg_text_area_decode($sarg['hostalias']),LOCK_EX);
+	file_put_contents('/usr/local/etc/sarg/exclude_users.conf', sarg_text_area_decode($sarguser['exclude_userlist']),LOCK_EX);
 	
 	#check cron_tab
 	$new_cron=array();
