@@ -47,6 +47,8 @@ if (file_exists("/usr/local/www/sarg-reports/".$url))
 	$replace[1]='img src="/sarg-reports'.$prefix.'/$1';
 	$pattern[2]='@img src="([.a-z/]+)/(\w+\.\w+)@';
 	$replace[2]='img src="/sarg-reports'.$prefix.'/$1/$2';
+	$pattern[3]='/<head>/';
+	$replace[3]='<head><META HTTP-EQUIV="CACHE-CONTROL" CONTENT="NO-CACHE"><META HTTP-EQUIV="PRAGMA" CONTENT="NO-CACHE">';
 	print preg_replace($pattern,$replace,$report);
 	}
 else{

@@ -73,7 +73,7 @@ require("guiconfig.inc");
 				</table>
 				</div>
 				<br>
-				<iframe src="/sarg_frame.php/" frameborder=0 width="100%" height="600"></iframe>
+				<iframe src="/sarg_frame.php" frameborder=0 width="100%" height="600"></iframe>
 				<div id="file_div"></div>
 				
 				</td>
