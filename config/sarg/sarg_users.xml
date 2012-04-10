@@ -101,7 +101,7 @@
 			<type>select</type>
 			<options>
 			<option><name>domainname+username (default)</name><value>domainname+username</value></option>
-			<option><name>username</name><value>username</value></option>
+			<option><name>username</name><value>user</value></option>
 			</options>
 		</field>
 		<field>
