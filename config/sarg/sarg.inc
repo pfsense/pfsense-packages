@@ -405,7 +405,7 @@ function sarg_do_xmlrpc_sync($sync_to_ip, $username, $password) {
 	/* xml will hold the sections to sync */
 	$xml = array();
 	$xml['sarg'] = $config['installedpackages']['sarg'];
-	
+	$xml['sarguser'] = $config['installedpackages']['sarguser'];
 	/* assemble xmlrpc payload */
 	$params = array(
 		XML_RPC_encode($password),

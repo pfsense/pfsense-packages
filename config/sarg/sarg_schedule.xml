@@ -102,7 +102,7 @@
 		</columnitem>
 		<columnitem>
 			<fielddescr>Aditional Args</fielddescr>
-			<fieldname>mod</fieldname>
+			<fieldname>args</fieldname>
 		</columnitem>
 		<columnitem>
 			<fielddescr>Post Action</fielddescr>
@@ -130,20 +130,22 @@
 			<fieldname>description</fieldname>
 			<description>Enter a description for this file.</description>
 			<type>input</type>
-			<size>60</size>
+			<size>50</size>
 		</field>
 		<field>
 			<fielddescr>Sarg args</fielddescr>
 			<fieldname>args</fieldname>
-			<description>Enter sarg extra args to run on this schedule.</description>
+			<description><![CDATA[Enter sarg extra args to run on this schedule.<br>
+						To force sarg to create a report only from current day, use:<br>
+						<strong>-d `date +%d/%m/%Y`-`date +%d/%m/%Y`</strong>]]></description>
 			<type>input</type>
-			<size>25</size>
+			<size>50</size>
 		</field>
 		<field>
 			<fielddescr>frequency</fielddescr>
 			<fieldname>frequency</fieldname>
 			<type>input</type>
-			<size>10</size>
+			<size>5</size>
 			<description><![CDATA[How often extract users from active directory and verify changes<br>
 							Valid options are minutes(m), hours(h), days(d)<br>
 							Sample: To update every hour, use 1h<br><br>]]>&lt;input type=&quot;submit&quot; name=&quot;Submit&quot; value=&quot;Force udpate now&quot;&gt;&lt;br&gt;</description>
