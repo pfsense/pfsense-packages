@@ -197,6 +197,7 @@ EOF;
 	$rc_file_start = <<<EOF
 /bin/mkdir -p /var/run/quagga
 /bin/mkdir -p /var/log/quagga
+/usr/sbin/chown -R quagga:quagga /usr/local/etc/quagga/
 /usr/sbin/chown -R quagga:quagga /var/run/quagga
 /usr/sbin/chown -R quagga:quagga /var/log/quagga
 /usr/local/sbin/zebra -d
