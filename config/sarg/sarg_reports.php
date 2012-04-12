@@ -73,7 +73,11 @@ require("guiconfig.inc");
 				</table>
 				</div>
 				<br>
-				<iframe src="/sarg_frame.php" frameborder=0 width="100%" height="600"></iframe>
+				<script language="JavaScript">
+					var axel = Math.random() + "";
+					var num = axel * 1000000000000000000;
+					document.writeln('<IFRAME SRC="/sarg_frame.php?prevent='+ num +'?"  frameborder=0 width="100%" height="600"></IFRAME>');
+				</script>
 				<div id="file_div"></div>
 				
 				</td>

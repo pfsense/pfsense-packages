@@ -81,7 +81,7 @@ function run_sarg($id=-1) {
 	#mount filesystem writeable
 	conf_mount_rw();
 	$cmd = "/usr/local/bin/sarg";
-	if ($id > 0 && is_array($config['installedpackages']['sargschedule']['config'])){
+	if ($id >= 0 && is_array($config['installedpackages']['sargschedule']['config'])){
 		$args=$config['installedpackages']['sargschedule']['config'][$id]['args'];
 		$action=$config['installedpackages']['sargschedule']['config'][$id]['action'];
 		}

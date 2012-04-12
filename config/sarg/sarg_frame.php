@@ -42,7 +42,7 @@ if (file_exists("/usr/local/www/sarg-reports/".$url))
 	{
 	$report=file_get_contents("/usr/local/www/sarg-reports/".$url);
 	$pattern[0]="/href=\W(\S+html)\W/";
-	$replace[0]="href=/sarg_frame.php?file=$prefix/$1";
+	$replace[0]="href=/sarg_frame.php?prevent=".rand(100000000000,999999999999)."&file=$prefix/$1";
 	$pattern[1]='/img src="(\w+\.\w+)/';
 	$replace[1]='img src="/sarg-reports'.$prefix.'/$1';
 	$pattern[2]='@img src="([.a-z/]+)/(\w+\.\w+)@';
