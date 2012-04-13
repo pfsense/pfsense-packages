@@ -4,7 +4,8 @@
 	squid.inc
 	Copyright (C) 2006-2009 Scott Ullrich
 	Copyright (C) 2006 Fernando Lemos
-	Copyright (C) 2008 Martin Fuchs	
+	Copyright (C) 2012 Martin Fuchs	
+	Copyright (C) 2012 Marcello Coutinho
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
@@ -43,8 +44,15 @@ define('SQUID_CONFBASE', '/usr/local/etc/squid');
 define('SQUID_BASE', '/var/squid/');
 define('SQUID_ACLDIR', '/var/squid/acl');
 define('SQUID_PASSWD', '/var/etc/squid.passwd');
+define('SQUID_LIB','/var/squid/lib');
+define('SQUID_SSL_DB','/var/squid/lib/ssl_db');
 
 $valid_acls = array();
+
+function sq_text_area_decode($text){
+	return preg_replace('/\r\n/', "\n",base64_decode($text));	
+}
+
 
 function squid_get_real_interface_address($iface) {
 	global $config;
@@ -120,11 +128,17 @@ function squid_is_valid_acl($acl) {
 function squid_install_command() {
 	global $config;
 	global $g;
+	update_status("Checking if there is configuration to migrate... One moment please...");
 	/* migrate existing csv config fields */
-	$settingsauth = $config['installedpackages']['squidauth']['config'][0];
-	$settingscache = $config['installedpackages']['squidcache']['config'][0];
-	$settingsnac = $config['installedpackages']['squidnac']['config'][0];
-
+	if (is_array($config['installedpackages']['squidauth']['config']))
+		$settingsauth = $config['installedpackages']['squidauth']['config'][0];
+	if (is_array($config['installedpackages']['squidcache']['config']))
+		$settingscache = $config['installedpackages']['squidcache']['config'][0];
+	if (is_array($config['installedpackages']['squidnac']['config']))
+		$settingsnac = $config['installedpackages']['squidnac']['config'][0];
+	if (is_array($config['installedpackages']['squid']['config']))
+		$settingsgen = $config['installedpackages']['squid']['config'][0];
+		
 	/* Set storage system */
 	if ($g['platform'] == "nanobsd") {
 		$config['installedpackages']['squidcache']['config'][0]['harddisk_cache_system'] = 'null';
@@ -153,7 +167,6 @@ function squid_install_command() {
 			$config['installedpackages']['squidnac']['config'][0]['allowed_subnets'] = $settingsnac['allowed_subnets'];
 		}
 	}
-
 	if(! empty($settingsnac['banned_hosts'])) {
 		if(strstr($settingsnac['banned_hosts'], ",")) {
 			$settingsnac['banned_hosts'] = base64_encode(implode("\n", explode(",", $settingsnac['banned_hosts'])));
@@ -195,7 +208,49 @@ function squid_install_command() {
 			$config['installedpackages']['squidnac']['config'][0]['blacklist'] = $settingsnac['blacklist'];
 		}
 	}
-	
+		
+	/*Migrate reverse settings*/
+	if (is_array($config['installedpackages']['squidreverse'])){
+		$old_reverse_settings=$config['installedpackages']['squidreverse']['config'][0];
+		
+		//Settings
+		if (!is_array($config['installedpackages']['squidreversegeneral'])){
+			$config['installedpackages']['squidreversegeneral']['config'][0]=$old_reverse_settings;
+			unset ($config['installedpackages']['squidreversegeneral']['config'][0]['reverse_cache_peer']);
+			unset ($config['installedpackages']['squidreversegeneral']['config'][0]['reverse_uri']);
+			unset ($config['installedpackages']['squidreversegeneral']['config'][0]['reverse_acl']);
+			}
+			
+		//PEERS
+		if (!is_array($config['installedpackages']['squidreversepeer'])){
+			foreach (explode("\n",sq_text_area_decode($old_reverse_settings['reverse_cache_peer'])) as $cache_peers)
+				foreach (explode(";",$cache_peers) as $cache_peer)
+					$config['installedpackages']['squidreversepeer']['config'][]=array('description'=>'migrated',
+																					'enable'=> 'on',
+									  												'name'=> $cache_peer[0],
+																					'port'=> $cache_peer[1],
+																					'protocol' => $cache_peer[2]);
+			}
+			
+		//MAPPINGS
+		if (!is_array($config['installedpackages']['squidreverseuri'])){
+			foreach (explode("\n",sq_text_area_decode($old_reverse_settings['reverse_acl'])) as $acls){
+				foreach (explode(";",$acls) as $acl)
+					array_push(${'peer_'.$acl[0]},$acl[1]);
+				}
+			foreach (explode("\n",sq_text_area_decode($old_reverse_settings['reverse_uri'])) as $uris)
+				foreach (explode(";",$uris) as $uri){
+					$peer_list=(is_array(${'peer_'.$uri[0]})?implode(",",${'peer_'.$uri[0]}):"");
+					$config['installedpackages']['squidreverseuri']['config'][]=array('description'=>'migrated',
+																					'enable'=> 'on',
+									  												'name'=> $uri[0],
+																					'uri'=> $uri[1],
+																					'vhost' => $uri[2],
+																					'peers'=>$peer_list);
+				}
+			}
+	}
+			
 	update_status("Writing configuration... One moment please...");
 	
 	write_config();
@@ -214,7 +269,9 @@ function squid_install_command() {
 
 	foreach (array(	SQUID_CONFBASE,
 			SQUID_ACLDIR,
-			SQUID_BASE ) as $dir) {
+			SQUID_BASE,
+			SQUID_LIB,
+			SQUID_SSL_DB ) as $dir) {
 		make_dirs($dir);
 		squid_chown_recursive($dir, 'proxy', 'proxy');
 	}
@@ -272,12 +329,12 @@ function squid_deinstall_command() {
 
 function squid_before_form_general($pkg) {
 	$values = get_dir(SQUID_CONFBASE . '/errors/');
-	// Get rid of '..' and '.'
+	// Get rid of '..' and '.' and ...
 	array_shift($values);
 	array_shift($values);
 	array_shift($values);
 	array_shift($values);
-	
+
 	$name = array();
 	foreach ($values as $value)
 		$names[] = implode(" ", explode("_", $value));
@@ -712,7 +769,6 @@ cache_mgr $email
 access_log $logdir_access
 cache_log $logdir_cache
 cache_store_log none
-
 sslcrtd_children 0
 
 EOD;
@@ -785,11 +841,9 @@ function squid_resync_cache() {
 	} else {
 		$disk_cache_system = $settings['harddisk_cache_system'];
 	}
-
-	if ($disk_cache_system == "null") {
-		$disk_cache_opts = "{$disk_cache_system} /tmp";
-	} else {
-		$disk_cache_opts = "{$disk_cache_system} {$cachedir} {$disk_cache_size} {$level1} 256";
+	#'null' storage type dropped. In-memory cache is always present. Remove all cache_dir options to prevent on-disk caching.
+	if ($disk_cache_system != "null") {
+		$disk_cache_opts =	"cache_dir {$disk_cache_system} {$cachedir} {$disk_cache_size} {$level1} 256";
 	}
 
 	$conf = <<<EOD
@@ -797,7 +851,7 @@ cache_mem $memory_cache_size MB
 maximum_object_size_in_memory $max_objsize_in_mem KB
 memory_replacement_policy $memory_policy
 cache_replacement_policy $cache_policy
-cache_dir $disk_cache_opts
+$disk_cache_opts
 minimum_object_size $min_objsize KB
 maximum_object_size $max_objsize KB
 offline_mode $offline_mode
@@ -807,7 +861,7 @@ EOD;
 	if (!empty($settings['cache_swap_low'])) $conf .= "cache_swap_low {$settings['cache_swap_low']}\n";
 	if (!empty($settings['cache_swap_high'])) $conf .= "cache_swap_high {$settings['cache_swap_high']}\n";
 
-	$donotcache = base64_decode($settings['donotcache']);
+	$donotcache = sq_text_area_decode($settings['donotcache']);
 	if (!empty($donotcache)) {
 		file_put_contents(SQUID_ACLDIR . '/donotcache.acl', $donotcache);
 		$conf .= 'acl donotcache dstdomain "' . SQUID_ACLDIR . "/donotcache.acl\"\n";
@@ -876,16 +930,16 @@ acl dynamic urlpath_regex cgi-bin \?
 
 EOD;
 
-	$allowed_subnets = explode("\n", base64_decode($settings['allowed_subnets']));
-	$allowed = "";
-	foreach ($allowed_subnets as $subnet) {
-		if(!empty($subnet)) {
-			$subnet = trim($subnet);
-			$allowed .= "$subnet ";
-		}
-	}
-	if (!empty($allowed)) {
-		$conf .= "acl allowed_subnets src $allowed\n";
+	$allowed_subnets = preg_replace("/\s+/"," ",sq_text_area_decode($settings['allowed_subnets']));
+	#$allowed = "";
+	#foreach ($allowed_subnets as $subnet) {
+	#	if(!empty($subnet)) {
+	#		$subnet = trim($subnet);
+	#		$allowed .= "$subnet ";
+	#	}
+	#}
+	if (!empty($allowed_subnets)) {
+		$conf .= "acl allowed_subnets src $allowed_subnets\n";
 		$valid_acls[] = 'allowed_subnets';
 	}
 
@@ -895,7 +949,7 @@ EOD;
 				'blacklist' => 'dstdom_regex -i',
 	);
 	foreach ($options as $option => $directive) {
-		$contents = base64_decode($settings[$option]);
+		$contents = sq_text_area_decode($settings[$option]);
 		if (!empty($contents)) {
 			file_put_contents(SQUID_ACLDIR . "/$option.acl", $contents);
 			$conf .= "acl $option $directive \"" . SQUID_ACLDIR . "/$option.acl\"\n";
@@ -911,7 +965,6 @@ cache deny dynamic
 http_access allow manager localhost
 
 EOD;
-
 	if(!empty($settings['ext_cachemanager'])) {
 	  $extmgr = explode(";", ($settings['ext_cachemanager']));
     $count = 1;
@@ -1030,174 +1083,26 @@ function squid_get_server_certs() {
 	return $cert_arr;
 }	
 
-function squid_resync_reverse() {
-	global $config, $valid_acls;
-	if(!is_array($valid_acls))
-		return;
-	$settings = $config['installedpackages']['squidreverse']['config'][0];
-	$conf = '';
-                                                                                         
-	$conf .= "# Reverse Proxy settings\n";
-
-	if(isset($settings["reverse_ssl_cert"]) && $settings["reverse_ssl_cert"] != "none") {
-    $svr_cert = lookup_cert($settings["reverse_ssl_cert"]);
-		  if ($svr_cert != false) {
-			 if(base64_decode($svr_cert['crt'])) {
-        file_put_contents(SQUID_CONFBASE . "/{$settings["reverse_ssl_cert"]}.crt",base64_decode($svr_cert['crt']));
-				$reverse_crt = SQUID_CONFBASE . "/{$settings["reverse_ssl_cert"]}.crt";
-				}
-			if(base64_decode($svr_cert['prv'])) {
-			 file_put_contents(SQUID_CONFBASE . "/{$settings["reverse_ssl_cert"]}.key",base64_decode($svr_cert['prv']));
-			 $reverse_key = SQUID_CONFBASE . "/{$settings["reverse_ssl_cert"]}.key";
-       }}}
-       
-	if (!empty($settings['reverse_int_ca'])) file_put_contents(SQUID_CONFBASE . "/{$settings["reverse_ssl_cert"]}.crt","\n" . base64_decode($settings['reverse_int_ca']),FILE_APPEND | LOCK_EX);
-
-	$ifaces = ($settings['reverse_interface'] ? $settings['reverse_interface'] : 'wan');
-	$real_ifaces = array();
-	foreach (explode(",", $ifaces) as $i => $iface) {
-		$real_ifaces[] = squid_get_real_interface_address($iface);
-		if($real_ifaces[$i][0]) {
-      //HTTP
-      if (!empty($settings['reverse_http']) && empty($settings['reverse_http_port']) && empty($settings['reverse_http_defsite'])) $conf .= "http_port {$real_ifaces[$i][0]}:80 accel defaultsite={$settings['reverse_external_fqdn']} vhost\n";
-      if (!empty($settings['reverse_http']) && (!empty($settings['reverse_http_port'])) && empty($settings['reverse_http_defsite'])) $conf .= "http_port {$real_ifaces[$i][0]}:{$settings['reverse_http_port']} accel defaultsite={$settings['reverse_external_fqdn']} vhost\n";
-      if (!empty($settings['reverse_http']) && empty($settings['reverse_http_port']) && (!empty($settings['reverse_http_defsite']))) $conf .= "http_port {$real_ifaces[$i][0]}:80 accel defaultsite={$settings['reverse_http_defsite']} vhost\n";
-      if (!empty($settings['reverse_http']) && (!empty($settings['reverse_http_port'])) && (!empty($settings['reverse_http_defsite']))) $conf .= "http_port {$real_ifaces[$i][0]}:{$settings['reverse_http_port']} accel defaultsite={$settings['reverse_http_defsite']} vhost\n";
-      //HTTPS
-      if (!empty($settings['reverse_https']) && empty($settings['reverse_https_port']) && empty($settings['reverse_https_defsite'])) $conf .= "https_port {$real_ifaces[$i][0]}:443 accel cert={$reverse_crt} key={$reverse_key} defaultsite={$settings['reverse_external_fqdn']}\n";
-      if (!empty($settings['reverse_https']) && (!empty($settings['reverse_https_port'])) && empty($settings['reverse_https_defsite'])) $conf .= "https_port {$real_ifaces[$i][0]}:{$settings['reverse_https_port']} accel cert={$reverse_crt} key={$reverse_key} defaultsite={$settings['reverse_external_fqdn']} vhost\n";
-      if (!empty($settings['reverse_https']) && empty($settings['reverse_https_port']) && (!empty($settings['reverse_https_defsite']))) $conf .= "https_port {$real_ifaces[$i][0]}:443 accel cert={$reverse_crt} key={$reverse_key} defaultsite={$settings['reverse_https_defsite']} vhost\n";
-      if (!empty($settings['reverse_https']) && (!empty($settings['reverse_https_port'])) && (!empty($settings['reverse_https_defsite']))) $conf .= "https_port {$real_ifaces[$i][0]}:{$settings['reverse_https_port']} accel cert={$reverse_crt} key={$reverse_key} defaultsite={$settings['reverse_https_defsite']} vhost\n";
-		}
-	}
-	 if(!empty($settings['reverse_ip'])) {
-		$reverse_ip = explode(";", ($settings['reverse_ip']));
-		foreach ($reverse_ip as $reip) {
-
-      //HTTP
-      if (!empty($settings['reverse_http']) && empty($settings['reverse_http_port']) && empty($settings['reverse_http_defsite'])) $conf .= "http_port {$reip}:80 accel defaultsite={$settings['reverse_external_fqdn']} vhost\n";
-      if (!empty($settings['reverse_http']) && (!empty($settings['reverse_http_port'])) && empty($settings['reverse_http_defsite'])) $conf .= "http_port {$reip}:{$settings['reverse_http_port']} accel defaultsite={$settings['reverse_external_fqdn']} vhost\n";
-      if (!empty($settings['reverse_http']) && empty($settings['reverse_http_port']) && (!empty($settings['reverse_http_defsite']))) $conf .= "http_port {$reip}:80 accel defaultsite={$settings['reverse_http_defsite']} vhost\n";
-      if (!empty($settings['reverse_http']) && (!empty($settings['reverse_http_port'])) && (!empty($settings['reverse_http_defsite']))) $conf .= "http_port {$reip}:{$settings['reverse_http_port']} accel defaultsite={$settings['reverse_http_defsite']} vhost\n";
-      //HTTPS
-      if (!empty($settings['reverse_https']) && empty($settings['reverse_https_port']) && empty($settings['reverse_https_defsite'])) $conf .= "https_port {$reip}:443 accel cert={$reverse_crt} key={$reverse_key} defaultsite={$settings['reverse_external_fqdn']}\n";
-      if (!empty($settings['reverse_https']) && (!empty($settings['reverse_https_port'])) && empty($settings['reverse_https_defsite'])) $conf .= "https_port {$reip}:{$settings['reverse_https_port']} accel cert={$reverse_crt} key={$reverse_key} defaultsite={$settings['reverse_external_fqdn']} vhost\n";
-      if (!empty($settings['reverse_https']) && empty($settings['reverse_https_port']) && (!empty($settings['reverse_https_defsite']))) $conf .= "https_port {$reip}:443 accel cert={$reverse_crt} key={$reverse_key} defaultsite={$settings['reverse_https_defsite']} vhost\n";
-      if (!empty($settings['reverse_https']) && (!empty($settings['reverse_https_port'])) && (!empty($settings['reverse_https_defsite']))) $conf .= "https_port {$reip}:{$settings['reverse_https_port']} accel cert={$reverse_crt} key={$reverse_key} defaultsite={$settings['reverse_https_defsite']} vhost\n";
-				
-	  }}
-
-  //PEERS	
-  if (($settings['reverse_owa'] == 'on') && (!empty($settings['reverse_owa_ip']))) $conf .= "cache_peer {$settings['reverse_owa_ip']} parent 443 0 proxy-only no-query originserver login=PASS connection-auth=on ssl sslflags=DONT_VERIFY_PEER front-end-https=on name=OWA_HOST_pfs\n";
-
-	$contents = base64_decode($settings['reverse_cache_peer']);
-	if(!empty($contents)) {
-    $defs = explode("\r\n", ($contents));
-      foreach ($defs as $def) {
-        $cfg = explode(";",($def));
-        if (($cfg[0]) != '' && ($cfg[1]) != '' && ($cfg[2]) != ''){
-          $conf .= "cache_peer {$cfg[1]} parent {$cfg[2]} 0 proxy-only no-query originserver login=PASS ";
-          if($cfg[3] == 'HTTPS')
-            $conf .= "ssl sslflags=DONT_VERIFY_PEER front-end-https=auto ";
-			$conf .= "name={$cfg[0]}\n";
-  }}}
-  	
-  //ACLs
-  if (($settings['reverse_owa'] == 'on') && (!empty($settings['reverse_owa_ip']))) {
-    $conf .= "acl OWA_URI_pfs url_regex -i ^https://{$settings['reverse_external_fqdn']}/owa.*$\n";
-    $conf .= "acl OWA_URI_pfs url_regex -i ^https://{$settings['reverse_external_fqdn']}/exchange.*$\n";
-    $conf .= "acl OWA_URI_pfs url_regex -i ^https://{$settings['reverse_external_fqdn']}/public.*$\n";
-    $conf .= "acl OWA_URI_pfs url_regex -i ^https://{$settings['reverse_external_fqdn']}/exchweb.*$\n";
-    $conf .= "acl OWA_URI_pfs url_regex -i ^https://{$settings['reverse_external_fqdn']}/ecp.*$\n";
-    $conf .= "acl OWA_URI_pfs url_regex -i ^https://{$settings['reverse_external_fqdn']}/OAB.*$\n";
-    }
-  if (($settings['reverse_owa'] == 'on') && (!empty($settings['reverse_owa_ip'])) && ($settings['reverse_owa_activesync'] == 'on')) {
-    $conf .= "acl OWA_URI_pfs url_regex -i ^https://{$settings['reverse_external_fqdn']}/Microsoft-Server-ActiveSync.*$\n";
-    }
-  if (($settings['reverse_owa'] == 'on') && (!empty($settings['reverse_owa_ip'])) && ($settings['reverse_owa_rpchttp'] == 'on')) {
-    $conf .= "acl OWA_URI_pfs url_regex -i ^https://{$settings['reverse_external_fqdn']}/rpc/rpcproxy.dll.*$\n";
-    $conf .= "acl OWA_URI_pfs url_regex -i ^https://{$settings['reverse_external_fqdn']}/rpcwithcert/rpcproxy.dll.*$\n";
-	}
-  if (($settings['reverse_owa'] == 'on') && (!empty($settings['reverse_owa_ip'])) && ($settings['reverse_owa_webservice'] == 'on')) {
-	$conf .= "ignore_expect_100 on\n";
-	$conf .= "acl OWA_URI_pfs url_regex -i ^https://{$settings['reverse_external_fqdn']}/EWS.*$\n";
-	}
-
-  if (($settings['reverse_owa'] == 'on') && (!empty($settings['reverse_owa_ip'])) && ($settings['reverse_owa_autodiscover'] == 'on')) {
-    $conf .= "acl OWA_URI_pfs url_regex -i ^https://{$settings['reverse_external_fqdn']}/autodiscover.*$\n";
-
-//	  $conf .= "ssl_unclean_shutdown on";
-
-    }    
-
-	$contents = base64_decode($settings['revrse_uri']);
-  if(!empty($contents)) {
-    $defs = explode("\r\n", ($contents));
-      foreach ($defs as $def) {
-        $cfg = explode(";",($def));
-        if (($cfg[0]) != '' && ($cfg[1]) != ''){
-        if($cfg[2] != '')
-          $conf .= "acl {$cfg[0]} url_regex -i {$cfg[2]}/{$cfg[1]}.*$\n";
-        if($cfg[2] == '')
-          $conf .= "acl {$cfg[0]} url_regex -i {$settings['reverse_external_fqdn']}/{$cfg[1]}.*$\n";          
-  }}}
-
-
-  //ACCESS
-  if (($settings['reverse_owa'] == 'on') && (!empty($settings['reverse_owa_ip']))) {
-    $conf .= "cache_peer_access OWA_HOST_pfs allow OWA_URI_pfs\n";
-    $conf .= "cache_peer_access OWA_HOST_pfs deny allsrc\n";
-    $conf .= "never_direct allow OWA_URI_pfs\n";
-    $conf .= "http_access allow OWA_URI_pfs\n";        
-	  }
-
-	$contents = base64_decode($settings['reverse_acl']);
-	if(!empty($contents)) {
-    $defs = explode("\r\n", ($contents));
-      foreach ($defs as $def) {
-        $cfg = explode(";",($def));
-        if (($cfg[0]) != '' && ($cfg[1]) != ''){
-          $conf .= "cache_peer_access {$cfg[0]} allow {$cfg[1]}\n";
-      }}
-      foreach ($defs as $def) {
-        $cfg = explode(";",($def));
-        if (($cfg[0]) != '' && ($cfg[1]) != ''){
-          $conf .= "cache_peer_access {$cfg[0]} deny allsrc\n";
-      }}
-      foreach ($defs as $def) {
-        $cfg = explode(";",($def));
-        if (($cfg[0]) != '' && ($cfg[1]) != ''){
-          $conf .= "never_direct allow {$cfg[1]}\n";
-      }}
-      foreach ($defs as $def) {
-        $cfg = explode(";",($def));
-        if (($cfg[0]) != '' && ($cfg[1]) != ''){
-          $conf .= "http_access allow {$cfg[1]}\n";
-      }}      
-  }
-
-  $conf .= "\n";
-
-  if (!empty($settings['deny_info_tcp_reset'])) $conf .= "deny_info TCP_RESET allsrc\n";                                                                                           
-	return $conf;
-}
+#squid reverse
+include('/usr/local/pkg/squid_reverse.inc');
 
 function squid_resync_auth() {
 	global $config, $valid_acls;
 
-	$settings = $config['installedpackages']['squidauth']['config'][0];
-	$settingsnac = $config['installedpackages']['squidnac']['config'][0];
-	$settingsconfig = $config['installedpackages']['squid']['config'][0];
+	if (is_array($config['installedpackages']['squidauth']['config']))
+		$settings = $config['installedpackages']['squidauth']['config'][0];
+	if (is_array($config['installedpackages']['squidnac']['config']))
+		$settingsnac = $config['installedpackages']['squidnac']['config'][0];
+	if (is_array($config['installedpackages']['squid']['config']))
+		$settingsconfig = $config['installedpackages']['squid']['config'][0];
 	$conf = '';
 
-	// Custom Options
-	if(!empty($config['installedpackages']['squid']['config'][0]['custom_options'])) {
-		$custopts = explode(";", ($config['installedpackages']['squid']['config'][0]['custom_options']));
-		$conf .= "# Custom options\n";
-		foreach ($custopts as $custopt) {
-			$conf .= $custopt."\n";
-		}
-	}
+	// Package integration
+	if(!empty($settingsconfig['custom_options']))
+		$conf.=preg_replace('/;/',"\n",$settingconfig['custom_options']);
+	
+	// Custom User Options
+	$conf .= "# Custom options\n".sq_text_area_decode($settingsconfig['custom_options_squid3'])."\n";
 
 	// Deny the banned guys before allowing the good guys
 	if(! empty($settingsnac['banned_hosts'])) {
@@ -1349,6 +1254,15 @@ function squid_resync_msnt() {
 function squid_resync() {
 	global $config;
 	conf_mount_rw();
+	foreach (array(	SQUID_CONFBASE,
+			SQUID_ACLDIR,
+			SQUID_BASE,
+			SQUID_LIB,
+			SQUID_SSL_DB ) as $dir) {
+		make_dirs($dir);
+		chown($dir, 'proxy');
+		chgrp($dir, 'proxy');
+	}
 	$conf = squid_resync_general() . "\n";
 	$conf .= squid_resync_cache() . "\n";
 	$conf .= squid_resync_redirector() . "\n";
@@ -1359,6 +1273,7 @@ function squid_resync() {
 	$conf .= squid_resync_auth();
 	squid_resync_users();
 	squid_write_rcfile();
+	squid_sync_on_changes();
 
 	/* make sure pinger is executable */
 	if(file_exists("/usr/local/libexec/squid/pinger"))
@@ -1666,8 +1581,8 @@ function squid_write_rcfile() {
 	$rc = array();
 	$rc['file'] = 'squid.sh';
 	$rc['start'] = <<<EOD
-if [ -z "`ps auxw | grep "[s]quid -D"|awk '{print $2}'`" ];then
-	/usr/local/sbin/squid -D
+if [ -z "`ps auxw | grep "[s]quid "|awk '{print $2}'`" ];then
+	/usr/local/sbin/squid
 fi
 
 EOD;
@@ -1680,8 +1595,8 @@ killall pinger 2>/dev/null
 
 EOD;
 	$rc['restart'] = <<<EOD
-if [ -z "`ps auxw | grep "[s]quid -D"|awk '{print $2}'`" ];then
-		/usr/local/sbin/squid -D
+if [ -z "`ps auxw | grep "[s]quid "|awk '{print $2}'`" ];then
+		/usr/local/sbin/squid
 	else
 		/usr/local/sbin/squid -k reconfigure
 	fi
@@ -1690,4 +1605,127 @@ EOD;
 	conf_mount_rw();
 	write_rcfile($rc);
 }
+
+/* Uses XMLRPC to synchronize the changes to a remote node */
+function squid_sync_on_changes() {
+	global $config, $g;
+	
+	log_error("[squid] xmlrpc sync is starting.");
+	$synconchanges = $config['installedpackages']['squidsync']['config'][0]['synconchanges'];	
+	if(!$synconchanges) 
+		return;
+	foreach ($config['installedpackages']['squidsync']['config'] as $rs ){
+		foreach($rs['row'] as $sh){
+			$sync_to_ip = $sh['ipaddress'];
+			$password = $sh['password'];
+			if($sh['username'])
+				$username = $sh['username'];
+			else
+				$username = 'admin';
+			if($password && $sync_to_ip)
+				squid_do_xmlrpc_sync($sync_to_ip, $username, $password);
+			}
+	}
+	log_error("[squid] xmlrpc sync is ending.");
+}
+/* Do the actual XMLRPC sync */
+function squid_do_xmlrpc_sync($sync_to_ip, $username, $password) {
+	global $config, $g;
+
+	if(!$username)
+		return;
+		
+	if(!$password)
+		return;
+
+	if(!$sync_to_ip)
+		return;
+
+	$xmlrpc_sync_neighbor = $sync_to_ip;
+    if($config['system']['webgui']['protocol'] != "") {
+		$synchronizetoip = $config['system']['webgui']['protocol'];
+		$synchronizetoip .= "://";
+    }
+    $port = $config['system']['webgui']['port'];
+    /* if port is empty lets rely on the protocol selection */
+    if($port == "") {
+		if($config['system']['webgui']['protocol'] == "http") 
+			$port = "80";
+		else 
+			$port = "443";
+    }
+	$synchronizetoip .= $sync_to_ip;
+
+	/* xml will hold the sections to sync */
+	$xml = array();
+	$xml['squid'] = $config['installedpackages']['squid'];
+	$xml['squidupstream'] = $config['installedpackages']['squidupstream'];
+	$xml['squidcache'] = $config['installedpackages']['squidcache'];
+	$xml['squidnac'] = $config['installedpackages']['squidnac'];
+	$xml['squidtraffic'] = $config['installedpackages']['squidtraffic'];
+	$xml['squidreverse'] = $config['installedpackages']['squidreverse'];
+	$xml['squidauth'] = $config['installedpackages']['squidauth'];
+	$xml['squidusers'] = $config['installedpackages']['squidusers'];
+	/* assemble xmlrpc payload */
+	$params = array(
+		XML_RPC_encode($password),
+		XML_RPC_encode($xml)
+	);
+
+	/* set a few variables needed for sync code borrowed from filter.inc */
+	$url = $synchronizetoip;
+	log_error("Beginning squid XMLRPC sync to {$url}:{$port}.");
+	$method = 'pfsense.merge_installedpackages_section_xmlrpc';
+	$msg = new XML_RPC_Message($method, $params);
+	$cli = new XML_RPC_Client('/xmlrpc.php', $url, $port);
+	$cli->setCredentials($username, $password);
+	if($g['debug'])
+		$cli->setDebug(1);
+	/* send our XMLRPC message and timeout after 250 seconds */
+	$resp = $cli->send($msg, "250");
+	if(!$resp) {
+		$error = "A communications error occurred while attempting squid XMLRPC sync with {$url}:{$port}.";
+		log_error($error);
+		file_notice("sync_settings", $error, "squid Settings Sync", "");
+	} elseif($resp->faultCode()) {
+		$cli->setDebug(1);
+		$resp = $cli->send($msg, "250");
+		$error = "An error code was received while attempting squid XMLRPC sync with {$url}:{$port} - Code " . $resp->faultCode() . ": " . $resp->faultString();
+		log_error($error);
+		file_notice("sync_settings", $error, "squid Settings Sync", "");
+	} else {
+		log_error("squid XMLRPC sync successfully completed with {$url}:{$port}.");
+	}
+	
+	/* tell squid to reload our settings on the destionation sync host. */
+	$method = 'pfsense.exec_php';
+	$execcmd  = "require_once('/usr/local/pkg/squid.inc');\n";
+	$execcmd .= "sync_package_squid();";
+	/* assemble xmlrpc payload */
+	$params = array(
+		XML_RPC_encode($password),
+		XML_RPC_encode($execcmd)
+	);
+	
+	log_error("squid XMLRPC reload data {$url}:{$port}.");
+	$msg = new XML_RPC_Message($method, $params);
+	$cli = new XML_RPC_Client('/xmlrpc.php', $url, $port);
+	$cli->setCredentials($username, $password);
+	$resp = $cli->send($msg, "250");
+	if(!$resp) {
+		$error = "A communications error occurred while attempting squid XMLRPC sync with {$url}:{$port} (pfsense.exec_php).";
+		log_error($error);
+		file_notice("sync_settings", $error, "squid Settings Sync", "");
+	} elseif($resp->faultCode()) {
+		$cli->setDebug(1);
+		$resp = $cli->send($msg, "250");
+		$error = "An error code was received while attempting squid XMLRPC sync with {$url}:{$port} - Code " . $resp->faultCode() . ": " . $resp->faultString();
+		log_error($error);
+		file_notice("sync_settings", $error, "squid Settings Sync", "");
+	} else {
+		log_error("squid XMLRPC reload data success with {$url}:{$port} (pfsense.exec_php).");
+	}
+	
+}
+
 ?>

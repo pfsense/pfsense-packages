@@ -50,20 +50,20 @@
 	<title>Proxy server: Access control</title>
 	<include_file>squid.inc</include_file>
 	<tabs>
-		<tab>
-			<text>General</text>
+	<tab>
+		<text>General</text>
 			<url>/pkg_edit.php?xml=squid.xml&amp;id=0</url>
 		</tab>
 		<tab>
-			<text>Upstream Proxy</text>
+			<text>Upstream</text>
 			<url>/pkg_edit.php?xml=squid_upstream.xml&amp;id=0</url>
 		</tab>
 		<tab>
-			<text>Cache Mgmt</text>
+			<text>Cache</text>
 			<url>/pkg_edit.php?xml=squid_cache.xml&amp;id=0</url>
 		</tab>
 		<tab>
-			<text>Access Control</text>
+			<text>ACLs</text>
 			<url>/pkg_edit.php?xml=squid_nac.xml&amp;id=0</url>
 			<active/>
 		</tab>
@@ -72,19 +72,23 @@
 			<url>/pkg_edit.php?xml=squid_traffic.xml&amp;id=0</url>
 		</tab>
 		<tab>
-			<text>Reverse Settings</text>
-			<url>/pkg_edit.php?xml=squid_reverse.xml&amp;id=0</url>
-		</tab>
-		<tab>
-			<text>Auth Settings</text>
+			<text>Authentication</text>
 			<url>/pkg_edit.php?xml=squid_auth.xml&amp;id=0</url>
 		</tab>
 		<tab>
-			<text>Local Users</text>
+			<text>Users</text>
 			<url>/pkg.php?xml=squid_users.xml</url>
+		</tab>
+		<tab>
+			<text>Sync</text>
+			<url>/pkg_edit.php?xml=squid_sync.xml</url>
 		</tab>
 	</tabs>
 	<fields>
+		<field>
+			<name>Squid Access Control Lists</name>
+			<type>listtopic</type>
+		</field>
 		<field>
 			<fielddescr>Allowed subnets</fielddescr>
 			<fieldname>allowed_subnets</fieldname>
@@ -131,12 +135,9 @@
 			<encoding>base64</encoding>
 		</field>
 		<field>
-			<fielddescr>External Cache-Managers</fielddescr>
-			<fieldname>ext_cachemanager</fieldname>
-			<description>Enter the IPs for the external Cache Managers to be allowed here, separated by semi-colons (;).</description>
-			<type>input</type>
-			<size>60</size>
-		</field>	
+			<name>Squid Allowed ports</name>
+			<type>listtopic</type>
+		</field>
 		<field>
 			<fielddescr>acl safeports</fielddescr>
 			<fieldname>addtl_ports</fieldname>

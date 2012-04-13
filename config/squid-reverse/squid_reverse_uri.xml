@@ -7,9 +7,9 @@
 /* $Id$ */
 /* ========================================================================== */
 /*
-    authng.xml
+    squid_reverse_general.xml
     part of pfSense (http://www.pfSense.com)
-    Copyright (C) 2007 to whom it may belong
+    Copyright (C) 2012 Marcello Coutinho
     All rights reserved.
 
     Based on m0n0wall (http://m0n0.ch/wall)
@@ -45,95 +45,109 @@
     <description>Describe your package here</description>
     <requirements>Describe your package requirements here</requirements>
     <faq>Currently there are no FAQ items provided.</faq>
-	<name>squidupstream</name>
+	<name>squidreverseuri</name>
 	<version>none</version>
-	<title>Proxy server: Upstream proxy settings</title>		
-	<include_file>squid.inc</include_file>
+	<title>Reverse Proxy server: Mappings</title>
+	<include_file>/usr/local/pkg/squid.inc</include_file>
 	<tabs>
-<tab>
-			<text>General</text>
-			<url>/pkg_edit.php?xml=squid.xml&amp;id=0</url>
+	<tab>
+		<text>General</text>
+			<url>/pkg_edit.php?xml=squid_reverse_general.xml&amp;id=0</url>
 		</tab>
 		<tab>
-			<text>Upstream</text>
-			<url>/pkg_edit.php?xml=squid_upstream.xml&amp;id=0</url>
+			<text>Web Servers</text>
+			<url>/pkg.php?xml=squid_reverse_peer.xml&amp;id=0</url>
+		</tab>
+		<tab>
+			<text>Mappings</text>
+			<url>/pkg.php?xml=squid_reverse_uri.xml&amp;id=0</url>
 			<active/>
 		</tab>
 		<tab>
-			<text>Cache</text>
-			<url>/pkg_edit.php?xml=squid_cache.xml&amp;id=0</url>
-		</tab>
-		<tab>
-			<text>ACLs</text>
-			<url>/pkg_edit.php?xml=squid_nac.xml&amp;id=0</url>
-		</tab>
-		<tab>
-			<text>Traffic Mgmt</text>
-			<url>/pkg_edit.php?xml=squid_traffic.xml&amp;id=0</url>
-		</tab>
-		<tab>
-			<text>Authentication</text>
-			<url>/pkg_edit.php?xml=squid_auth.xml&amp;id=0</url>
-		</tab>
-		<tab>
-			<text>Users</text>
-			<url>/pkg.php?xml=squid_users.xml</url>
-		</tab>
-		<tab>
 			<text>Sync</text>
-			<url>/pkg_edit.php?xml=squid_sync.xml</url>
+			<url>/pkg_edit.php?xml=squid_reverse_sync.xml</url>
 		</tab>
 	</tabs>
+	<adddeleteeditpagefields>
+		<columnitem>
+			<fielddescr>Status</fielddescr>
+			<fieldname>enable</fieldname>
+		</columnitem>
+		<columnitem>
+			<fielddescr>Group Name</fielddescr>
+			<fieldname>name</fieldname>
+		</columnitem>
+		<columnitem>
+			<fielddescr>Peers</fielddescr>
+			<fieldname>peers</fieldname>
+		</columnitem>
+		<columnitem>
+			<fielddescr>Description</fielddescr>
+			<fieldname>description</fieldname>
+		</columnitem>	
+	</adddeleteeditpagefields>
 	<fields>
-		<field>
-			<name>Upstream proxy settings</name>
+			<field>
+			<name>Squid Reverse Peer Mappings</name>
 			<type>listtopic</type>
 		</field>
-		<field>
-			<fielddescr>Enable forwarding</fielddescr>
-			<fieldname>proxy_forwarding</fieldname>
-			<description>This option enables the proxy server to forward requests to an upstream server.</description>
+			<field>
+			<fielddescr>Enable this URI</fielddescr>
+			<fieldname>enable</fieldname>
+			<description><![CDATA[If this field is checked, then this URI(Uniform Resource Name) will be available for reverse config.]]></description>
 			<type>checkbox</type>
-			<enablefields>proxy_addr,proxy_port,icp_port,username,password</enablefields>
-			<required/>
 		</field>
 		<field>
-			<fielddescr>Hostname</fielddescr>
-			<fieldname>proxy_addr</fieldname>
-			<description>Enter here the IP address or host name of the upstream proxy.</description>
+			<fielddescr>Group name</fielddescr>
+			<fieldname>name</fieldname>
+			<description><![CDATA[Name to identify this URI on squid reverse conf<br>
+						example: URI1]]></description>
 			<type>input</type>
+			<size>20</size>
 		</field>
 		<field>
-			<fielddescr>TCP port</fielddescr>
-			<fieldname>proxy_port</fieldname>
-			<description>Enter the port to use to connect to the upstream proxy.</description>
+			<fielddescr>Group Description</fielddescr>
+			<fieldname>description</fieldname>
+			<description><![CDATA[URI Group Description (optional)]]></description>
 			<type>input</type>
-			<size>5</size>
-			<default_value>3128</default_value>
+			<size>60</size>
 		</field>
 		<field>
-			<fielddescr>ICP port</fielddescr>
-			<fieldname>icp_port</fieldname>
-			<description>Enter the port to connect to the upstream proxy for the ICP protocol. Use port number 7 to disable ICP communication between the proxies.</description>
-			<type>input</type>
-			<size>5</size>
-			<default_value>7</default_value>
+			<fielddescr>Peers</fielddescr>
+			<fieldname>peers</fieldname>
+			<description><![CDATA[Apply this Group Mappings to selected Peers<br>
+							Use CTRL + click to select.]]></description>
+	    	<type>select_source</type>
+			<source><![CDATA[$config['installedpackages']['squidreversepeer']['config']]]></source>
+			<source_name>name</source_name>
+			<source_value>name</source_value>
+			<multiple/>
+			<size>05</size>
 		</field>
-		<field>
-			<fielddescr>Username</fielddescr>
-			<fieldname>username</fieldname>
-			<description>If the upstream proxy requires a username, specify it here.</description>
-			<type>input</type>
-		</field>
-		<field>
-			<fielddescr>Password</fielddescr>
-			<fieldname>password</fieldname>
-			<description>If the upstream proxy requires a password, specify it here.</description>
-			<type>password</type>
-		</field>
+	<field>
+			<fielddescr><![CDATA[URIs]]></fielddescr>
+			<fieldname>none</fieldname>
+			<description><![CDATA[URI to publish]]></description>
+			<type>rowhelper</type>
+			<rowhelper>
+				<rowhelperfield>
+				<fielddescr>URI</fielddescr>
+				<fieldname>uri</fieldname>
+				<type>input</type>
+				<size>25</size>
+			</rowhelperfield>
+			<rowhelperfield>
+				<fielddescr>[http://|https://]vhost fqdn(optional)</fielddescr>
+				<fieldname>vhost</fieldname>
+				<type>input</type>
+				<size>40</size>
+			</rowhelperfield>
+			</rowhelper>
+		</field>		
 	</fields>
+	<custom_php_command_before_form>
+	</custom_php_command_before_form>
 	<custom_php_validation_command>
-		squid_validate_upstream($_POST, &amp;$input_errors);
 	</custom_php_validation_command>
 	<custom_php_resync_config_command>
 		squid_resync();

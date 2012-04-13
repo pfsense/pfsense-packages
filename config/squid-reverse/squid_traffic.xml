@@ -50,20 +50,20 @@
 	<title>Proxy server: Traffic management</title>
 	<include_file>squid.inc</include_file>
 	<tabs>
-		<tab>
-			<text>General</text>
+	<tab>
+		<text>General</text>
 			<url>/pkg_edit.php?xml=squid.xml&amp;id=0</url>
 		</tab>
 		<tab>
-			<text>Upstream Proxy</text>
+			<text>Upstream</text>
 			<url>/pkg_edit.php?xml=squid_upstream.xml&amp;id=0</url>
 		</tab>
 		<tab>
-			<text>Cache Mgmt</text>
+			<text>Cache</text>
 			<url>/pkg_edit.php?xml=squid_cache.xml&amp;id=0</url>
 		</tab>
 		<tab>
-			<text>Access Control</text>
+			<text>ACLs</text>
 			<url>/pkg_edit.php?xml=squid_nac.xml&amp;id=0</url>
 		</tab>
 		<tab>
@@ -72,24 +72,29 @@
 			<active/>
 		</tab>
 		<tab>
-			<text>Reverse Settings</text>
-			<url>/pkg_edit.php?xml=squid_reverse.xml&amp;id=0</url>
-		</tab>
-		<tab>
-			<text>Auth Settings</text>
+			<text>Authentication</text>
 			<url>/pkg_edit.php?xml=squid_auth.xml&amp;id=0</url>
 		</tab>
 		<tab>
-			<text>Local Users</text>
+			<text>Users</text>
 			<url>/pkg.php?xml=squid_users.xml</url>
 		</tab>
-	</tabs>
+		<tab>
+			<text>Sync</text>
+			<url>/pkg_edit.php?xml=squid_sync.xml</url>
+		</tab>
+		</tabs>
 	<fields>
+		<field>
+			<name>Squid Traffic Managment Settings</name>
+			<type>listtopic</type>
+		</field>
 		<field>
 			<fielddescr>Maximum download size</fielddescr>
 			<fieldname>max_download_size</fieldname>
 			<description>Limit the maximum total download size to the size specified here (in kilobytes). Set to 0 to disable.</description>
 			<type>input</type>
+			<size>10</size> 
 			<required/>
 			<default_value>0</default_value>
 		</field>
@@ -98,6 +103,7 @@
 			<fieldname>max_upload_size</fieldname>
 			<description>Limit the maximum total upload size to the size specified here (in kilobytes). Set to 0 to disable.</description>
 			<type>input</type>
+			<size>10</size>
 			<required/>
 			<default_value>0</default_value>
 		</field>
@@ -106,6 +112,7 @@
 			<fieldname>overall_throttling</fieldname>
 			<description>This value specifies (in kilobytes per second) the bandwidth throttle for downloads. Users will gradually have their download speed increased according to this value. Set to 0 to disable bandwidth throttling.</description>
 			<type>input</type>
+			<size>10</size>
 			<required/>
 			<default_value>0</default_value>
 		</field>
@@ -114,8 +121,13 @@
 			<fieldname>perhost_throttling</fieldname>
 			<description>This value specifies the download throttling per host. Set to 0 to disable this.</description>
 			<type>input</type>
+			<size>10</size>
 			<required/>
 			<default_value>0</default_value>
+		</field>
+		<field>
+			<name>Squid Transfer Extension Settings</name>
+			<type>listtopic</type>
 		</field>
 		<field>
 			<fielddescr>Throttle only specific extensions</fielddescr>
@@ -151,10 +163,15 @@
 			<size>60</size>
 		</field>
 		<field>
+			<name>Squid Transfer Quick Abort Settings</name>
+			<type>listtopic</type>
+		</field>
+		<field>
 			<fielddescr>Finish transfer if less than x KB remaining</fielddescr>
 			<fieldname>quick_abort_min</fieldname>
 			<description>If the transfer has less than x KB remaining, it will finish the retrieval. Set to 0 to abort the transfer immediately.</description>
 			<type>input</type>
+			<size>10</size>
 			<default_value>0</default_value>
 		</field>
 		<field>
@@ -169,6 +186,7 @@
 			<fieldname>quick_abort_pct</fieldname>
 			<description>If more than x % of the transfer has completed, it will finish the retrieval.</description>
 			<type>input</type>
+			<size>10</size>
 			<default_value>0</default_value>
 		</field>        		
 	</fields>

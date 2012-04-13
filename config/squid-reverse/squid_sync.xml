@@ -1,21 +1,17 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<!DOCTYPE packagegui SYSTEM "../schema/packages.dtd">
-<?xml-stylesheet type="text/xsl" href="../xsl/package.xsl"?>
+<!DOCTYPE packagegui SYSTEM "./schema/packages.dtd">
+<?xml-stylesheet type="text/xsl" href="./xsl/package.xsl"?>
 <packagegui>
-        <copyright>
-        <![CDATA[
+	<copyright>
+	<![CDATA[
 /* $Id$ */
 /* ========================================================================== */
 /*
-    authng.xml
-    part of pfSense (http://www.pfSense.com)
-    Copyright (C) 2007 to whom it may belong
-    All rights reserved.
-
-    Based on m0n0wall (http://m0n0.ch/wall)
-    Copyright (C) 2003-2006 Manuel Kasper <mk@neon1.net>.
-    All rights reserved.
-                                                                              */
+    squid_sync.xml
+    part of the sarg package for pfSense
+    Copyright (C) 2012 Marcello Coutinho
+    All rights reserved.            
+                                                                  */
 /* ========================================================================== */
 /*
     Redistribution and use in source and binary forms, with or without
@@ -40,24 +36,23 @@
     POSSIBILITY OF SUCH DAMAGE.
                                                                               */
 /* ========================================================================== */
-        ]]>
-        </copyright>
-    <description>Describe your package here</description>
-    <requirements>Describe your package requirements here</requirements>
-    <faq>Currently there are no FAQ items provided.</faq>
-	<name>squidupstream</name>
-	<version>none</version>
-	<title>Proxy server: Upstream proxy settings</title>		
-	<include_file>squid.inc</include_file>
+	]]>
+	</copyright>
+	<description>Describe your package here</description>
+	<requirements>Describe your package requirements here</requirements>
+	<faq>Currently there are no FAQ items provided.</faq>
+	<name>squidsync</name>
+	<version>1.0</version>
+	<title>Proxy server: XMLRPC Sync</title>
+	<include_file>/usr/local/pkg/squid.inc</include_file>
 	<tabs>
-<tab>
+		<tab>
 			<text>General</text>
 			<url>/pkg_edit.php?xml=squid.xml&amp;id=0</url>
 		</tab>
 		<tab>
 			<text>Upstream</text>
 			<url>/pkg_edit.php?xml=squid_upstream.xml&amp;id=0</url>
-			<active/>
 		</tab>
 		<tab>
 			<text>Cache</text>
@@ -82,58 +77,43 @@
 		<tab>
 			<text>Sync</text>
 			<url>/pkg_edit.php?xml=squid_sync.xml</url>
+			<active/>
 		</tab>
 	</tabs>
 	<fields>
 		<field>
-			<name>Upstream proxy settings</name>
+			<name>XMLRPC Sync</name>
 			<type>listtopic</type>
 		</field>
 		<field>
-			<fielddescr>Enable forwarding</fielddescr>
-			<fieldname>proxy_forwarding</fieldname>
-			<description>This option enables the proxy server to forward requests to an upstream server.</description>
+			<fielddescr>Automatically sync squid configuration changes</fielddescr>
+			<fieldname>synconchanges</fieldname>
+			<description>Automatically sync squid(normal and reverse) changes to the hosts defined below.</description>
 			<type>checkbox</type>
-			<enablefields>proxy_addr,proxy_port,icp_port,username,password</enablefields>
-			<required/>
 		</field>
 		<field>
-			<fielddescr>Hostname</fielddescr>
-			<fieldname>proxy_addr</fieldname>
-			<description>Enter here the IP address or host name of the upstream proxy.</description>
-			<type>input</type>
-		</field>
-		<field>
-			<fielddescr>TCP port</fielddescr>
-			<fieldname>proxy_port</fieldname>
-			<description>Enter the port to use to connect to the upstream proxy.</description>
-			<type>input</type>
-			<size>5</size>
-			<default_value>3128</default_value>
-		</field>
-		<field>
-			<fielddescr>ICP port</fielddescr>
-			<fieldname>icp_port</fieldname>
-			<description>Enter the port to connect to the upstream proxy for the ICP protocol. Use port number 7 to disable ICP communication between the proxies.</description>
-			<type>input</type>
-			<size>5</size>
-			<default_value>7</default_value>
-		</field>
-		<field>
-			<fielddescr>Username</fielddescr>
-			<fieldname>username</fieldname>
-			<description>If the upstream proxy requires a username, specify it here.</description>
-			<type>input</type>
-		</field>
-		<field>
-			<fielddescr>Password</fielddescr>
-			<fieldname>password</fieldname>
-			<description>If the upstream proxy requires a password, specify it here.</description>
-			<type>password</type>
+			<fielddescr>Remote Server</fielddescr>
+			<fieldname>none</fieldname>
+			<type>rowhelper</type>
+			<rowhelper>
+			<rowhelperfield>
+				<fielddescr>IP Address</fielddescr>
+				<fieldname>ipaddress</fieldname>
+				<description>IP Address of remote server</description>
+				<type>input</type>
+				<size>20</size>
+			</rowhelperfield>
+			<rowhelperfield>
+				<fielddescr>Password</fielddescr>
+				<fieldname>password</fieldname>
+				<description>Password for remote server.</description>
+				<type>password</type>
+				<size>20</size>
+			</rowhelperfield>
+			</rowhelper>
 		</field>
 	</fields>
 	<custom_php_validation_command>
-		squid_validate_upstream($_POST, &amp;$input_errors);
 	</custom_php_validation_command>
 	<custom_php_resync_config_command>
 		squid_resync();

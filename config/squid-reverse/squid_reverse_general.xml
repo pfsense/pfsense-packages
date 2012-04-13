@@ -7,9 +7,9 @@
 /* $Id$ */
 /* ========================================================================== */
 /*
-    authng.xml
+    squid_reverse_general.xml
     part of pfSense (http://www.pfSense.com)
-    Copyright (C) 2007 to whom it may belong
+    Copyright (C) 2012 Marcello Coutinho
     All rights reserved.
 
     Based on m0n0wall (http://m0n0.ch/wall)
@@ -45,47 +45,27 @@
     <description>Describe your package here</description>
     <requirements>Describe your package requirements here</requirements>
     <faq>Currently there are no FAQ items provided.</faq>
-	<name>squidreverse</name>
+	<name>squidreversegeneral</name>
 	<version>none</version>
-	<title>Proxy server: Reverse Proxy</title>
-	<include_file>squid.inc</include_file>
+	<title>Reverse Proxy server: General</title>
+	<include_file>/usr/local/pkg/squid.inc</include_file>
 	<tabs>
-<tab>
-			<text>General</text>
-			<url>/pkg_edit.php?xml=squid.xml&amp;id=0</url>
-		</tab>
-		<tab>
-			<text>Upstream</text>
-			<url>/pkg_edit.php?xml=squid_upstream.xml&amp;id=0</url>
-		</tab>
-		<tab>
-			<text>Cache</text>
-			<url>/pkg_edit.php?xml=squid_cache.xml&amp;id=0</url>
-		</tab>
-		<tab>
-			<text>ACLs</text>
-			<url>/pkg_edit.php?xml=squid_nac.xml&amp;id=0</url>
-		</tab>
-		<tab>
-			<text>Traffic Mgmt</text>
-			<url>/pkg_edit.php?xml=squid_traffic.xml&amp;id=0</url>
-		</tab>
-		<tab>
-			<text>Reverse</text>
-			<url>/pkg_edit.php?xml=squid_reverse.xml&amp;id=0</url>
+	<tab>
+		<text>General</text>
+			<url>/pkg_edit.php?xml=squid_reverse_general.xml&amp;id=0</url>
 			<active/>
 		</tab>
 		<tab>
-			<text>Authentication</text>
-			<url>/pkg_edit.php?xml=squid_auth.xml&amp;id=0</url>
+			<text>Web Servers</text>
+			<url>/pkg.php?xml=squid_reverse_peer.xml&amp;id=0</url>
 		</tab>
 		<tab>
-			<text>Users</text>
-			<url>/pkg.php?xml=squid_users.xml</url>
+			<text>Mappings</text>
+			<url>/pkg.php?xml=squid_reverse_uri.xml&amp;id=0</url>
 		</tab>
 		<tab>
 			<text>Sync</text>
-			<url>/pkg_edit.php?xml=squid_sync.xml</url>
+			<url>/pkg_edit.php?xml=squid_reverse_sync.xml</url>
 		</tab>
 	</tabs>
 	<fields>
@@ -206,6 +186,10 @@
 			<default_value>on</default_value>
 		</field>
 		<field>
+			<name>OWA Reverse proxy General Settings</name>
+			<type>listtopic</type>
+		</field>
+		<field>
 			<fielddescr>Enable OWA reverse proxy</fielddescr>
 			<fieldname>reverse_owa</fieldname>
 			<description>If this field is checked, squid will act as an accelerator/ SSL offloader for Outlook Web App.</description>
@@ -244,102 +228,6 @@
 			<description>If this field is checked, AutoDiscover will be enabled.</description>
 			<type>checkbox</type>
 		</field>
-		<field>
-			<name>Squid Reverse Mappings</name>
-			<type>listtopic</type>
-		</field>
-		<field>
-			<fielddescr>&lt;b&gt;peer definitions&lt;/b&gt; &lt;br&gt;publishing hosts</fielddescr>
-			<fieldname>reverse_cache_peer</fieldname>
-			<description><![CDATA[Enter each peer definition on a new line. Directives have to be separated by a semicolon(;).<BR>
-								syntax: [peer alias];[internal ip address];[port];[HTTP / HTTPS]<br>
-								example: HOST1;192.168.0.1;80;HTTP<br>
-								<strong>WRONG SYNTAX USAGE WILL RESULT IN SQUID NOT STARTING</strong>]]></description>
-			<type>textarea</type>
-			<cols>60</cols>
-			<rows>10</rows>
-			<encoding>base64</encoding>
-		</field>
-		<field>
-			<fielddescr>&lt;b&gt;URI definitions&lt;/b&gt; &lt;br&gt;published URIs</fielddescr>
-			<fieldname>reverse_uri</fieldname>
-      <description><![CDATA[Enter each reverse acl definition on a new line. Directives have to be separated by a semicolon(;)<BR>
-      					syntax: [group the uri belongs to];[URI to publish](;[vhost fqdn]) <BR>
-      					(a group can contain multiple URIs, without vhost fqdn the external fqdn is used, you also can specity http:// or https://)<BR>
-      					example: URI1;public;server.pfsense.org.<BR>
-      					<STRONG>WRONG SYNTAX USAGE WILL RESULT IN SQUID NOT STARTING</STRONG>]]></description>
-			<type>textarea</type>
-			<cols>60</cols>
-			<rows>10</rows>
-			<encoding>base64</encoding>
-		</field>		
-		<field>
-			<fielddescr>&lt;b&gt;ACL definitions&lt;/b&gt; &lt;br&gt;published URIs</fielddescr>
-			<fieldname>reverse_acl</fieldname>
-      <description><![CDATA[Enter each reverse acl definition on a new line. Directives have to be separated by a semicolon(;). <br>
-      						syntax: [peer alias];[uri group alias] <br>example: HOST1;URI1 <br>
-      						<strong>WRONG SYNTAX USAGE WILL RESULT IN SQUID NOT STARTING</strong>]]></description>
-			<type>textarea</type>
-			<cols>60</cols>
-			<rows>10</rows>
-			<encoding>base64</encoding>
-		</field>	
-
-<!--
-		<field>
-			<fielddescr>internal hosts</fielddescr>
-			<type>rowhelper</type>
-			<rowhelper>
-				<rowhelperfield>
-					<fielddescr>IP address</fielddescr>
-					<fieldname>reverse_cache_peer_ip</fieldname>
-					<type>input</type>
-					<size>15</size>
-				</rowhelperfield>
-				<rowhelperfield>
-					<fielddescr>Protocol</fielddescr>
-					<fieldname>reverse_cache_peer_proto</fieldname>
-					<type>select</type>
-            <options>
-              <option> <name>HTTP</name> <value>HTTP</value> </option>
-              <option> <name>HTTPS</name> <value>HTTPS</value> </option>
-            </options>
-				</rowhelperfield>
-				<rowhelperfield>
-					<fielddescr>port</fielddescr>
-					<fieldname>reverse_cache_peer_port</fieldname>
-					<type>input</type>
-					<size>5</size>
-				</rowhelperfield>
-				<rowhelperfield>
-					<fielddescr>peer name</fielddescr>
-					<fieldname>reverse_cache_peer_name</fieldname>
-					<type>input</type>
-					<size>25</size>
-				</rowhelperfield>
-			</rowhelper>
-		</field>
-
-		<field>
-			<fielddescr>published URI</fielddescr>
-			<type>rowhelper</type>
-			<rowhelper>
-				<rowhelperfield>
-					<fielddescr>URI</fielddescr>
-					<fieldname>reverse_cache_peer_uri</fieldname>
-					<type>input</type>
-					<size>50</size>
-				</rowhelperfield>
-				<rowhelperfield>
-					<fielddescr>peer name</fielddescr>
-					<fieldname>reverse_cache_peer</fieldname>
-					<type>input</type>
-					<size>25</size>
-				</rowhelperfield>
-			</rowhelper>
-		</field>
--->
-
 	</fields>
 	<custom_php_command_before_form>
 		squid_before_form_general(&amp;$pkg);
