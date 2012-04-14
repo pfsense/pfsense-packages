@@ -116,17 +116,22 @@
 	<additional_files_needed>
 	    <prefix>/usr/local/pkg/</prefix>
 	    <chmod>0755</chmod>
-		<item>http://www.pfsense.org/packages/config/squid-reverse/squid_reverse_general_peer.xml</item>
+		<item>http://www.pfsense.org/packages/config/squid-reverse/squid_reverse_peer.xml</item>
 	</additional_files_needed>
 	<additional_files_needed>
 	    <prefix>/usr/local/pkg/</prefix>
 	    <chmod>0755</chmod>
-		<item>http://www.pfsense.org/packages/config/squid-reverse/squid_reverse_general_uri.xml</item>
+		<item>http://www.pfsense.org/packages/config/squid-reverse/squid_reverse_uri.xml</item>
 	</additional_files_needed>
 	<additional_files_needed>
 	    <prefix>/usr/local/pkg/</prefix>
 	    <chmod>0755</chmod>
 		<item>http://www.pfsense.org/packages/config/squid-reverse/squid_reverse_sync.xml</item>
+	</additional_files_needed>
+	<additional_files_needed>
+	    <prefix>/usr/local/pkg/</prefix>
+	    <chmod>0755</chmod>
+		<item>http://www.pfsense.org/packages/config/squid-reverse/squid_sync.xml</item>
 	</additional_files_needed>
 	<additional_files_needed>
 	    <prefix>/usr/local/pkg/</prefix>
@@ -146,6 +151,11 @@
 	<additional_files_needed>
 	    <prefix>/usr/local/pkg/</prefix>
 	    <chmod>0755</chmod>
+		<item>http://www.pfsense.org/packages/config/squid-reverse/squid_ng.inc</item>
+	</additional_files_needed>
+	<additional_files_needed>
+	    <prefix>/usr/local/pkg/</prefix>
+	    <chmod>0755</chmod>
 		<item>http://www.pfsense.org/packages/config/squid-reverse/squid_traffic.xml</item>
 	</additional_files_needed>
 	<additional_files_needed>
@@ -161,6 +171,11 @@
 	<additional_files_needed>
 	    <prefix>/usr/local/pkg/</prefix>
 	    <chmod>0755</chmod>
+		<item>http://www.pfsense.org/packages/config/squid-reverse/squid_reverse.inc</item>
+	</additional_files_needed>
+	<additional_files_needed>
+	    <prefix>/usr/local/pkg/</prefix>
+	    <chmod>0755</chmod>
 		<item>http://www.pfsense.org/packages/config/squid-reverse/squid_auth.xml</item>
 	</additional_files_needed>
 	<additional_files_needed>
@@ -172,11 +187,6 @@
 	    <prefix>/usr/local/etc/rc.d/</prefix>
 	    <chmod>0755</chmod>
 		<item>http://www.pfsense.org/packages/config/squid-reverse/proxy_monitor.sh</item>
-	</additional_files_needed>
-	<additional_files_needed>
-	    <prefix>/usr/local/pkg/</prefix>
-	    <chmod>0755</chmod>
-		<item>http://www.pfsense.org/packages/config/squid-reverse/squid_cache.xml</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
