@@ -1095,14 +1095,15 @@ function squid_resync_auth() {
 		$settingsnac = $config['installedpackages']['squidnac']['config'][0];
 	if (is_array($config['installedpackages']['squid']['config']))
 		$settingsconfig = $config['installedpackages']['squid']['config'][0];
+	
 	$conf = '';
 
 	// Package integration
 	if(!empty($settingsconfig['custom_options']))
-		$conf.=preg_replace('/;/',"\n",$settingconfig['custom_options']);
+		$conf.="# Package Integration\n".preg_replace('/;/',"\n",$settingsconfig['custom_options'])."\n\n";
 	
 	// Custom User Options
-	$conf .= "# Custom options\n".sq_text_area_decode($settingsconfig['custom_options_squid3'])."\n";
+	$conf .= "# Custom options\n".sq_text_area_decode($settingsconfig['custom_options_squid3'])."\n\n";
 
 	// Deny the banned guys before allowing the good guys
 	if(! empty($settingsnac['banned_hosts'])) {

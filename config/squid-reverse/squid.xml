@@ -373,7 +373,6 @@
 			<fieldname>custom_options</fieldname>
 			<description><![CDATA[Squid options added from packages like squidguard or havp for squid integration.]]></description>
 			<type>textarea</type>
-			<encoding>base64</encoding>
 			<cols>78</cols>
 			<rows>5</rows>
 		</field>
