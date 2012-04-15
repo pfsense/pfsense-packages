@@ -100,7 +100,8 @@ function squid_resync_reverse() {
  		$conf .= "cache_peer {$settings['reverse_owa_ip']} parent 443 0 proxy-only no-query originserver login=PASS connection-auth=on ssl sslflags=DONT_VERIFY_PEER front-end-https=on name=OWA_HOST_pfs\n";
 
  	$active_peers=array();
- 	foreach ($reverse_peers as $rp){
+ 	if (is_array($reverse_peers))
+ 	 foreach ($reverse_peers as $rp){
  		if ($rp['enable'] =="on" && $rp['name'] !="" && $rp['ip'] !="" && $rp['port'] !=""){
  			$conf_peer = "#{$rp['description']}\n";
  			$conf_peer .= "cache_peer {$rp['ip']} parent {$rp['port']} 0 proxy-only no-query originserver login=PASS ";
@@ -139,12 +140,15 @@ function squid_resync_reverse() {
 					$conf .= "ignore_expect_100 on\n";
 					}
 			}
-		foreach ($owa_dirs as $owa_dir)
+		if (is_array($owa_dirs))
+		  foreach ($owa_dirs as $owa_dir)
 			$conf .= "acl OWA_URI_pfs url_regex -i ^https://{$settings['reverse_external_fqdn']}/$owa_dir.*$\n";
 		}	
 	//$conf .= "ssl_unclean_shutdown on";
-	foreach ($reverse_maps as $rm){
-		if ($rm['enable'] == "on" && $rm['name']!="" && $rm['peers']!="")
+	if (is_array($reverse_maps))
+	 foreach ($reverse_maps as $rm){
+		if ($rm['enable'] == "on" && $rm['name']!="" && $rm['peers']!=""){
+		    if (is_array($rm['row']))
 				foreach ($rm['row'] as $uri){
 					$url_regex=($uri['vhost'] == ''?$settings['reverse_external_fqdn']:$uri['vhost']);
 					$conf .= "acl {$rm['name']} url_regex -i {$url_regex}/{$uri['uri']}.*$\n";
@@ -156,6 +160,7 @@ function squid_resync_reverse() {
 							$cache_peer_deny_conf .= "cache_peer_access {$map_peer} deny allsrc\n";
 						}
 				}
+	 	}
 	}
 
 	//ACCESS
