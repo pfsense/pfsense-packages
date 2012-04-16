@@ -852,7 +852,7 @@ if(empty($settings['cache_dynamic_content'])){
 	$conf.="cache deny dynamic\n";
 }
 else{
-	if(preg_match('/youtube/',$settings['refresh_patters'])){
+	if(preg_match('/youtube/',$settings['refresh_patterns'])){
 		$conf.=<<<EOC
 # Break HTTP standard for flash videos. Keep them in cache even if asked not to.
 refresh_pattern -i \.flv$ 10080 90% 999999 ignore-no-cache override-expire ignore-private
@@ -863,7 +863,7 @@ cache allow youtube
 
 EOC;
 	}
-	if(preg_match('/windows/',$settings['refresh_patters'])){
+	if(preg_match('/windows/',$settings['refresh_patterns'])){
 		$conf.=<<<EOC
 range_offset_limit -1
 refresh_pattern -i microsoft.com/.*\.(cab|exe|ms[i|u|f]|asf|wm[v|a]|dat|zip) 4320 80% 43200 reload-into-ims
@@ -872,20 +872,20 @@ refresh_pattern -i my.windowsupdate.website.com/.*\.(cab|exe|ms[i|u|f]|asf|wm[v|
 EOC;
 		}
 
-if(preg_match('/symantec/',$settings['refresh_patters'])){
+if(preg_match('/symantec/',$settings['refresh_patterns'])){
 		$conf.=<<<EOC
 range_offset_limit -1
 refresh_pattern liveupdate.symantecliveupdate.com/.*\.(cab|exe|dll|msi) 10080 100% 43200 reload-into-ims
 refresh_pattern symantecliveupdate.com/.*\.(cab|exe|dll|msi) 10080 100% 43200 reload-into-ims
 EOC;
 		}
-if(preg_match('/avast/',$settings['refresh_patters'])){
+if(preg_match('/avast/',$settings['refresh_patterns'])){
 		$conf.=<<<EOC
 range_offset_limit -1
 refresh_pattern avast.com/.*\.(vpu|cab|stamp|exe) 10080 100% 43200 reload-into-ims
 EOC;
 		}
-if(preg_match('/avira/',$settings['refresh_patters'])){
+if(preg_match('/avira/',$settings['refresh_patterns'])){
 		$conf.=<<<EOC
 range_offset_limit -1
 refresh_pattern personal.avira-update.com/.*\.(cab|exe|dll|msi|gz) 10080 100% 43200 reload-into-ims
