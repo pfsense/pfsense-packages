@@ -825,13 +825,14 @@ function squid_resync_cache() {
 	$disk_cache_size = ($settings['harddisk_cache_size'] ? $settings['harddisk_cache_size'] : 100);
 	$level1 = ($settings['level1_subdirs'] ? $settings['level1_subdirs'] : 16);
 	$memory_cache_size = ($settings['memory_cache_size'] ? $settings['memory_cache_size'] : 8);
-	$max_objsize = ($settings['maximum_object_size'] ? $settings['maximum_object_size'] : 10);
+	$max_objsize = ($settings['maximum_object_size'] ? $settings['maximum_object_size']." KB" : "10 KB");
 	$min_objsize = ($settings['minimum_object_size'] ? $settings['minimum_object_size'] : 0);
 	$max_objsize_in_mem = ($settings['maximum_objsize_in_mem'] ? $settings['maximum_objsize_in_mem'] : 32);
 	$cache_policy = ($settings['cache_replacement_policy'] ? $settings['cache_replacement_policy'] : 'heap LFUDA');
 	$memory_policy = ($settings['memory_replacement_policy'] ? $settings['memory_replacement_policy'] : 'heap GDSF');
 	$offline_mode = ($settings['enable_offline'] == 'on' ? 'on' : 'off');
-
+	$conf = '';
+	
 	if (!isset($settings['harddisk_cache_system'])) {
 		if ($g['platform'] == "nanobsd") {
 			$disk_cache_system = 'null';
@@ -845,17 +846,71 @@ function squid_resync_cache() {
 	if ($disk_cache_system != "null") {
 		$disk_cache_opts =	"cache_dir {$disk_cache_system} {$cachedir} {$disk_cache_size} {$level1} 256";
 	}
+//check dynamic content
+if(empty($settings['cache_dynamic_content'])){
+	$conf.='acl dynamic urlpath_regex cgi-bin \?'."\n";
+	$conf.="cache deny dynamic\n";
+}
+else{
+	if(preg_match('/youtube/',$settings['refresh_patters'])){
+		$conf.=<<<EOC
+# Break HTTP standard for flash videos. Keep them in cache even if asked not to.
+refresh_pattern -i \.flv$ 10080 90% 999999 ignore-no-cache override-expire ignore-private
 
-	$conf = <<<EOD
+# Let the clients favorite video site through with full caching
+acl youtube dstdomain .youtube.com
+cache allow youtube
+
+EOC;
+	}
+	if(preg_match('/windows/',$settings['refresh_patters'])){
+		$conf.=<<<EOC
+range_offset_limit -1
+refresh_pattern -i microsoft.com/.*\.(cab|exe|ms[i|u|f]|asf|wm[v|a]|dat|zip) 4320 80% 43200 reload-into-ims
+refresh_pattern -i windowsupdate.com/.*\.(cab|exe|ms[i|u|f]|asf|wm[v|a]|dat|zip) 4320 80% 43200 reload-into-ims
+refresh_pattern -i my.windowsupdate.website.com/.*\.(cab|exe|ms[i|u|f]|asf|wm[v|a]|dat|zip) 4320 80% 43200 reload-into-ims
+EOC;
+		}
+
+if(preg_match('/symantec/',$settings['refresh_patters'])){
+		$conf.=<<<EOC
+range_offset_limit -1
+refresh_pattern liveupdate.symantecliveupdate.com/.*\.(cab|exe|dll|msi) 10080 100% 43200 reload-into-ims
+refresh_pattern symantecliveupdate.com/.*\.(cab|exe|dll|msi) 10080 100% 43200 reload-into-ims
+EOC;
+		}
+if(preg_match('/avast/',$settings['refresh_patters'])){
+		$conf.=<<<EOC
+range_offset_limit -1
+refresh_pattern avast.com/.*\.(vpu|cab|stamp|exe) 10080 100% 43200 reload-into-ims
+EOC;
+		}
+if(preg_match('/avira/',$settings['refresh_patters'])){
+		$conf.=<<<EOC
+range_offset_limit -1
+refresh_pattern personal.avira-update.com/.*\.(cab|exe|dll|msi|gz) 10080 100% 43200 reload-into-ims
+EOC;
+		}		
+		
+	$refresh_conf=<<<EOC
+# Add any of your own refresh_pattern entries above these.
+refresh_pattern ^ftp:		1440	20%	10080
+refresh_pattern ^gopher:	1440	0%	1440
+refresh_pattern -i (/cgi-bin/|\?) 0	0%	0
+refresh_pattern .		0	20%	4320
+EOC;
+	
+	}
+	
+	$conf .= <<<EOD
 cache_mem $memory_cache_size MB
-maximum_object_size_in_memory $max_objsize_in_mem KB
-memory_replacement_policy $memory_policy
-cache_replacement_policy $cache_policy
+maximum_object_size_in_memory {$max_objsize_in_mem} KB
+memory_replacement_policy {$memory_policy}
+cache_replacement_policy {$cache_policy}
 $disk_cache_opts
-minimum_object_size $min_objsize KB
-maximum_object_size $max_objsize KB
-offline_mode $offline_mode
-
+minimum_object_size {$min_objsize} KB
+maximum_object_size {$max_objsize}
+offline_mode {$offline_mode}
 EOD;
 
 	if (!empty($settings['cache_swap_low'])) $conf .= "cache_swap_low {$settings['cache_swap_low']}\n";
@@ -870,8 +925,7 @@ EOD;
 	elseif (file_exists(SQUID_ACLDIR . '/donotcache.acl')) {
      unlink(SQUID_ACLDIR . '/donotcache.acl');
     }
-  
-	return $conf;
+	return $conf.$refresh_conf;
 }
 
 function squid_resync_upstream() {
@@ -926,7 +980,7 @@ acl sslports port 443 563 $webgui_port $addtl_sslports
 acl manager proto cache_object
 acl purge method PURGE
 acl connect method CONNECT
-acl dynamic urlpath_regex cgi-bin \?
+
 
 EOD;
 
@@ -961,7 +1015,6 @@ EOD;
 	}
 
 	$conf .= <<<EOD
-cache deny dynamic
 http_access allow manager localhost
 
 EOD;

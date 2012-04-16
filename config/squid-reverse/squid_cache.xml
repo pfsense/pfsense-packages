@@ -245,6 +245,37 @@
 				<option><name>Heap LRU</name><value>heap LRU</value></option>
 			</options>
 		</field>
+		<field>
+			<name>Dynamic and Update Content</name>
+			<type>listtopic</type>
+		</field>
+		<field>
+			<fielddescr>Cache Dynamic Content</fielddescr>
+			<fieldname>cache_dynamic_content</fieldname>
+			<description><![CDATA[Select this option to <a target=_new href='http://wiki.squid-cache.org/ConfigExamples/DynamicContent'>enable caching of dynamic content.</a><br>
+								 ]]></description>
+			<type>checkbox</type>
+			<size>10</size>
+		</field>
+		<field>
+			<fielddescr>Refresh Patters</fielddescr>
+			<fieldname>refresh_patters</fieldname>
+			<description><![CDATA[Once enabling dynamic cache, also apply squid wiki refresh_patters to sites like <a target=_new href='http://wiki.squid-cache.org/ConfigExamples/DynamicContent/YouTube'>Youtube</a> and <a target=_new href='http://wiki.squid-cache.org/SquidFaq/WindowsUpdate'>windowsupdate</a><br>
+			<br><strong>Notes:</strong><br>
+			set 'Finish transfer if less than x KB remaining' on 'traffic mgmt' squid tab to -1 when applying these patters.<br><br>
+			set Maximum download size on 'traffic mgmt' squid tab to a value that fits patters your are applying.<br>Microsoft may need 200Mb and youtube 4GB.]]></description>
+			<type>select</type>
+			<default_value>none</default_value>
+			<options>
+				<option><name>Youtube</name><value>youtube</value></option>
+				<option><name>Windows Update</name><value>windows</value></option>
+				<option><name>Symantec Antivirus</name><value>symantec</value></option>
+				<option><name>Avira</name><value>avira</value></option>
+				<option><name>Avast</name><value>avast</value></option>
+			</options>
+			<multiple/>
+			<size>06</size>
+		</field>		
 	</fields>
 	<custom_php_command_before_form>
 		if($_POST['harddisk_cache_size'] != $config['installedpackages']['squidcache']['config'][0]['harddisk_cache_size']) {
