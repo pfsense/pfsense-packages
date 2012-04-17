@@ -4019,7 +4019,7 @@ function freeradius_datacounter_auth_resync() {
 #!/bin/sh
 ### USAGE: datacounter_auth.sh USERNAME TIMERANGE
 ### We need this parameters from freeradius users file and ../raddb/modules/datacounter_acct
-USERNAME=`echo -n "\\$1" | sed 's/[^0-9a-zA-Z._-]/X/g' `
+USERNAME=`echo -n "\\$1" | sed 's/[^0-9a-zA-Z._:-]/X/g' `
 TIMERANGE=`echo -n "\\$2" | sed 's/[^a-z]//g' `
 
 ### We check if MAX-OCTETS-USERNAME is greater than USED-OCTETS-USERNAME and accept or reject the user
@@ -4048,7 +4048,7 @@ function freeradius_datacounter_acct_resync() {
 #!/bin/sh
 ### USAGE: datacounter_acct.sh USERNAME TIMERANGE ACCTINPUTOCTETS ACCTOUTPUTOCTETS
 ### We need this from an Accounting-Request packet to count the octets
-USERNAME=`echo -n "\\$1" | sed 's/[^0-9a-zA-Z._-]/X/g' `
+USERNAME=`echo -n "\\$1" | sed 's/[^0-9a-zA-Z.:_-]/X/g' `
 TIMERANGE=`echo -n "\\$2" | sed 's/[^a-z]//g' `
 ACCTINPUTOCTETS=`echo -n "\\$3" | sed 's/[^0-9]/0/g' `
 ACCTOUTPUTOCTETS=`echo -n "\\$4" | sed 's/[^0-9]/0/g' `
