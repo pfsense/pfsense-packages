@@ -108,15 +108,18 @@ function sync_relay_recipients($via_cron="cron"){
 						$ldap_unique=array_unique($ldap_all);
 						print "Total ldap recipients:".count($ldap_all)."\tunique:".count($ldap_unique)."\n";
 						foreach($ldap_unique as $recipient)
-							$relay_ldap_recipients.=($recipient != ""?$recipient." OK\n":"");
+							$relay_ldap_recipients.=($recipient != ""?preg_replace("/\s+/","",$recipient)." OK\n":"");
 						
 					#save ldap relay recipients
 					file_put_contents("/usr/local/etc/postfix/relay_ldap_recipients.txt",$relay_ldap_recipients, LOCK_EX);
 					}
 				}
 		}
-	#save all relay recipients and reload postfix
-	file_put_contents("/usr/local/etc/postfix/relay_recipients",$relay_ldap_recipients."\n".$relay_recipients, LOCK_EX);
+	#save all relay recipients, remove duplicates and reload postfix
+	$recipients_file="/usr/local/etc/postfix/relay_recipients";
+	file_put_contents($recipients_file.".unsort",$relay_ldap_recipients."\n".$relay_recipients, LOCK_EX);
+	exec('/usr/bin/sort -u '.$recipients_file.'.unsort > '.$recipients_file);
+	unlink_if_exists($recipients_file.'.unsort');
 	exec("/usr/local/sbin/postmap /usr/local/etc/postfix/relay_recipients");
 	mwexec("/usr/local/sbin/postfix reload");
 	}
@@ -662,7 +665,7 @@ MASTEREOF2;
 	#check postix dirs
 	$dirs=array("/var/spool/postfix","/etc/mail","/var/db/postfix","/var/mail/postfix");
 	foreach ($dirs as $dir)
-		if (!is_dir($dir))
+		if (!is_dir($dir) && !file_exists($dir))
 			mkdir($dir, 0755,TRUE);
 	
 	#check postfix owners
