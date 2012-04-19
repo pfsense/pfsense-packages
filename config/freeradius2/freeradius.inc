@@ -4022,12 +4022,22 @@ function freeradius_datacounter_auth_resync() {
 USERNAME=`echo -n "\\$1" | sed 's/[^0-9a-zA-Z._:-]/X/g' `
 TIMERANGE=`echo -n "\\$2" | sed 's/[^a-z]//g' `
 
+
+### This is to make sure there is a used-octets file after the cronjob resetted the counter
+if [ -e "/var/log/radacct/datacounter/\$TIMERANGE/max-octets-\$USERNAME" ] && [ ! -e "/var/log/radacct/datacounter/\$TIMERANGE/used-octets-\$USERNAME" ]; then
+	echo 0 > "/var/log/radacct/datacounter/\$TIMERANGE/used-octets-\$USERNAME"
+fi
+
+### The next two lines are just for getting values for logging output
+MAXOCTETSUSERNAMEMB=$((`cat "/var/log/radacct/datacounter/\$TIMERANGE/max-octets-\$USERNAME"`/1024/1024))
+USEDOCTETSUSERNAMEMB=$((`cat "/var/log/radacct/datacounter/\$TIMERANGE/used-octets-\$USERNAME"`/1024/1024))
+	
 ### We check if MAX-OCTETS-USERNAME is greater than USED-OCTETS-USERNAME and accept or reject the user
 if [ `cat "/var/log/radacct/datacounter/\$TIMERANGE/max-octets-\$USERNAME"` -gt `cat "/var/log/radacct/datacounter/\$TIMERANGE/used-octets-\$USERNAME"` ]; then
+	logger -f /var/log/system.log "FreeRADIUS: Used amount of \$TIMERANGE traffic by \$USERNAME is \$USEDOCTETSUSERNAMEMB of \$MAXOCTETSUSERNAMEMB MB! The user was accepted!!!"
 	exit 0
 else
-	MAXOCTETSUSERNAMEMB=$((`cat "/var/log/radacct/datacounter/\$TIMERANGE/max-octets-\$USERNAME"`/1024/1024))
-	logger -f /var/log/system.log "FreeRADIUS: Credentials are probably correct but the user \$USERNAME has reached the \$TIMERANGE Amount of Upload and Download Traffic which is \$MAXOCTETSUSERNAMEMB MB! The user was rejected!!!"
+	logger -f /var/log/system.log "FreeRADIUS: Credentials are probably correct but the user \$USERNAME has reached the \$TIMERANGE Amount of Upload and Download Traffic which is \$USEDOCTETSUSERNAMEMB of \$MAXOCTETSUSERNAMEMB MB! The user was rejected!!!"
 	exit 99
 fi
 EOD;
@@ -4061,12 +4071,19 @@ if [ ! \$ACCTOUTPUTOCTETS ]; then
 	ACCTOUTPUTOCTETS=0
 fi
 
-### We only write this to file if username exists
+### We only write this to the file if username exists
 ### If all counters are activated (daily, weekly, monthly, forever) we need to check which is active for the user
 if [ ! -e "/var/log/radacct/datacounter/\$TIMERANGE/max-octets-\$USERNAME" ]; then
 	exit 0
 else
+	### If no used-octets file exist then we assume that it was deleted by cron job and we need to create a new file starting from zero
+	if [ ! -e "/var/log/radacct/datacounter/\$TIMERANGE/used-octets-\$USERNAME" ]; then
+		echo 0 > "/var/log/radacct/datacounter/\$TIMERANGE/used-octets-\$USERNAME"
+	fi
+### The following two lines (chose the one or the other) are a bad workaround to make accounting accurate with stop/start accounting on pfsense 2.0.1 - it only works if the session will not be interrupted (host disconnects)
+###	USEDOCTETS=\$((\$ACCTINPUTOCTETS+\$ACCTOUTPUTOCTETS))
 	USEDOCTETS=\$((\$ACCTINPUTOCTETS+\$ACCTOUTPUTOCTETS+`cat "/var/log/radacct/datacounter/\$TIMERANGE/used-octets-\$USERNAME"`))
+	
 	echo "\$USEDOCTETS" > "/var/log/radacct/datacounter/\$TIMERANGE/used-octets-\$USERNAME"
 	exit 0
 fi
