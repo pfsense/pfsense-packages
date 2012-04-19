@@ -209,13 +209,13 @@
 		<field>
 			<fielddescr>Username</fielddescr>
 			<fieldname>varusersusername</fieldname>
-			<description><![CDATA[Enter the username. Whitespace is possible. If you do not want to use username/password but custom options then leave this empty.]]></description>
+			<description><![CDATA[Enter the username. Whitespace is possible. If you do not want to use username/password but custom options then leave this field empty.]]></description>
 			<type>input</type>
 		</field>
 		<field>
 			<fielddescr>Password</fielddescr>
 			<fieldname>varuserspassword</fieldname>
-			<description><![CDATA[Enter the password for this username. If you do not  want to use username/password but custom options then leave this empty.]]></description>
+			<description><![CDATA[Enter the password for this username. If you do not  want to use username/password but custom options then leave this field empty.]]></description>
 			<type>password</type>
 		</field>
 		<field>
@@ -256,7 +256,7 @@
 		<field>
 			<fielddescr>Number of simultaneous connections</fielddescr>
 			<fieldname>varuserssimultaneousconnect</fieldname>
-			<description><![CDATA[The maximum of simultaneous connections with this username. If you leave this field empty than there is no limit. If you are using FreeRADIUS with CaptivePortal you should leave this empty.]]></description>
+			<description><![CDATA[The maximum of simultaneous connections with this username. If you leave this field empty than there is no limit. If you are using FreeRADIUS with CaptivePortal you should leave this empty. Read the documentation!]]></description>
 			<type>input</type>
 		</field>
 		<field>
@@ -360,13 +360,13 @@
 		<field>
 			<fielddescr>Amount of Download and Upload Traffic</fielddescr>
 			<fieldname>varusersmaxtotaloctets</fieldname>			
-			<description><![CDATA[Enter the amount of download and upload traffic (summarized) for this user in <b>MegaByte (MB)</b>. There is a bug in CaptivePortal which counts the traffic six times faster than in reality. So if a user should have 1MB of traffic you must calculate 6*1MB.]]></description>
+			<description><![CDATA[Enter the amount of download and upload traffic (summarized) for this user in <b>MegaByte (MB)</b>. There is a bug in CP which counts the real traffic six times faster. To set a real limit of 100MB you have to enter 600MB here.]]></description>
 			<type>input</type>
 		</field>
 		<field>
 			<fielddescr>Time Period</fielddescr>
 			<fieldname>varusersmaxtotaloctetstimerange</fieldname>			
-			<description><![CDATA[Select the time period for the amount of download and upload traffic.]]></description>
+			<description><![CDATA[Select the time period for the amount of download and upload traffic. This does not automatically reset the counter. You need to setup a cronjob (with cron package) which will reset the counter. Read the documentation!]]></description>
 			<type>select</type>
 			<default_value>daily</default_value>
 				<options>
