@@ -875,7 +875,7 @@ refresh_pattern -i my.windowsupdate.website.com/.*\.(cab|exe|ms[i|u|f]|asf|wm[v|
 EOC;
 		}
 
-if(preg_match('/symantec/',$settings['refresh_patters'])){
+if(preg_match('/symantec/',$settings['refresh_patterns'])){
 		$conf.=<<<EOC
 
 # Symantec refresh_pattern
@@ -885,7 +885,7 @@ refresh_pattern symantecliveupdate.com/.*\.(cab|exe|dll|msi) 10080 100% 43200 re
 
 EOC;
 		}
-if(preg_match('/avast/',$settings['refresh_patters'])){
+if(preg_match('/avast/',$settings['refresh_patterns'])){
 		$conf.=<<<EOC
 
 # Avast refresh_pattern
@@ -894,7 +894,7 @@ refresh_pattern avast.com/.*\.(vpu|cab|stamp|exe) 10080 100% 43200 reload-into-i
 
 EOC;
 		}
-if(preg_match('/avira/',$settings['refresh_patters'])){
+if(preg_match('/avira/',$settings['refresh_patterns'])){
 		$conf.=<<<EOC
 
 # Avira refresh_pattern
@@ -903,6 +903,15 @@ refresh_pattern personal.avira-update.com/.*\.(cab|exe|dll|msi|gz) 10080 100% 43
 
 EOC;
 	}
+	$refresh_conf=<<<EOC
+	
+# Add any of your own refresh_pattern entries above these.
+refresh_pattern ^ftp:    1440  20%  10080
+refresh_pattern ^gopher:  1440  0%  1440
+refresh_pattern -i (/cgi-bin/|\?) 0  0%  0
+refresh_pattern .    0  20%  4320
+EOC;
+  
 }
 	
 	$conf .= <<<EOD
