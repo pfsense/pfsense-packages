@@ -742,7 +742,7 @@ function squid_resync_general() {
 	if (($settings['transparent_proxy'] == 'on')) {
 		$conf .= "http_port 127.0.0.1:" . $settings['proxy_port'] . " intercept\n";
 	}
-	$icp_port = ($settings['icp_port'] ? $settings['icp_port'] : 0);
+	$icp_port = ($settings['icp_port'] ? $settings['icp_port'] : 7);
 
 	$pidfile = "{$g['varrun_path']}/squid.pid";
 	$language = ($settings['error_language'] ? $settings['error_language'] : 'English');
