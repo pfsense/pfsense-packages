@@ -58,7 +58,7 @@ function squid_resync_reverse() {
 		}
        
 	if (!empty($settings['reverse_int_ca']))
-		file_put_contents(SQUID_CONFBASE . "/{$settings["reverse_ssl_cert"]}.crt","\n" . sq_text_area_decodedecode($settings['reverse_int_ca']),FILE_APPEND | LOCK_EX);
+		file_put_contents(SQUID_CONFBASE . "/{$settings["reverse_ssl_cert"]}.crt","\n" . sq_text_area_decode($settings['reverse_int_ca']),FILE_APPEND | LOCK_EX);
 
 	$ifaces = ($settings['reverse_interface'] ? $settings['reverse_interface'] : 'wan');
 	$real_ifaces = array();

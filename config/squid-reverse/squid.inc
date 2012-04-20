@@ -411,8 +411,8 @@ function squid_validate_general($post, $input_errors) {
 }
 
 function squid_validate_upstream($post, $input_errors) {
-	if ($post['proxy_forwarding'] == 'on') {
-		$addr = trim($post['proxy_addr']);
+	if ($post['enabled'] == 'on') {
+		$addr = trim($post['proxyaddr']);
 		if (empty($addr))
 			$input_errors[] = 'The field \'Hostname\' is required';
 		else {
@@ -420,7 +420,7 @@ function squid_validate_upstream($post, $input_errors) {
 				$input_errors[] = 'You must enter a valid IP address or host name in the \'Proxy hostname\' field';
 		}
 
-		foreach (array('proxy_port' => 'TCP port', 'icp_port' => 'ICP port') as $field => $name) {
+		foreach (array('proxyport' => 'TCP port', 'icpport' => 'ICP port') as $field => $name) {
 			$port = trim($post[$field]);
 			if (empty($port))
 				$input_errors[] = "The field '$name' is required";
@@ -865,42 +865,45 @@ EOC;
 	}
 	if(preg_match('/windows/',$settings['refresh_patterns'])){
 		$conf.=<<<EOC
+
+# Windows Update refresh_pattern
 range_offset_limit -1
 refresh_pattern -i microsoft.com/.*\.(cab|exe|ms[i|u|f]|asf|wm[v|a]|dat|zip) 4320 80% 43200 reload-into-ims
 refresh_pattern -i windowsupdate.com/.*\.(cab|exe|ms[i|u|f]|asf|wm[v|a]|dat|zip) 4320 80% 43200 reload-into-ims
 refresh_pattern -i my.windowsupdate.website.com/.*\.(cab|exe|ms[i|u|f]|asf|wm[v|a]|dat|zip) 4320 80% 43200 reload-into-ims
+
 EOC;
 		}
 
-if(preg_match('/symantec/',$settings['refresh_patterns'])){
+if(preg_match('/symantec/',$settings['refresh_patters'])){
 		$conf.=<<<EOC
+
+# Symantec refresh_pattern
 range_offset_limit -1
 refresh_pattern liveupdate.symantecliveupdate.com/.*\.(cab|exe|dll|msi) 10080 100% 43200 reload-into-ims
 refresh_pattern symantecliveupdate.com/.*\.(cab|exe|dll|msi) 10080 100% 43200 reload-into-ims
+
 EOC;
 		}
-if(preg_match('/avast/',$settings['refresh_patterns'])){
+if(preg_match('/avast/',$settings['refresh_patters'])){
 		$conf.=<<<EOC
+
+# Avast refresh_pattern
 range_offset_limit -1
 refresh_pattern avast.com/.*\.(vpu|cab|stamp|exe) 10080 100% 43200 reload-into-ims
+
 EOC;
 		}
-if(preg_match('/avira/',$settings['refresh_patterns'])){
+if(preg_match('/avira/',$settings['refresh_patters'])){
 		$conf.=<<<EOC
+
+# Avira refresh_pattern
 range_offset_limit -1
 refresh_pattern personal.avira-update.com/.*\.(cab|exe|dll|msi|gz) 10080 100% 43200 reload-into-ims
+
 EOC;
-		}		
-		
-	$refresh_conf=<<<EOC
-# Add any of your own refresh_pattern entries above these.
-refresh_pattern ^ftp:		1440	20%	10080
-refresh_pattern ^gopher:	1440	0%	1440
-refresh_pattern -i (/cgi-bin/|\?) 0	0%	0
-refresh_pattern .		0	20%	4320
-EOC;
-	
 	}
+}
 	
 	$conf .= <<<EOD
 cache_mem $memory_cache_size MB
@@ -930,22 +933,33 @@ EOD;
 
 function squid_resync_upstream() {
 	global $config;
-	$settings = $config['installedpackages']['squidupstream']['config'][0];
-
-	$conf = '';
-	if ($settings['proxy_forwarding'] == 'on') {
-		$conf .= "cache_peer {$settings['proxy_addr']} parent {$settings['proxy_port']} ";
-		if ($settings['icp_port'] == '7')
-		  $conf .= "{$settings['icp_port']} no-query";
-    else
-      $conf .= "{$settings['icp_port']}"; 
-
-		if (!empty($settings['username']))
-			$conf .= " login={$settings['username']}";
-		if (!empty($settings['password']))
-			$conf .= ":{$settings['password']}";
-	}
-
+	$conf = "\n#Remote proxies\n";
+	foreach ($config['installedpackages']['squidremote']['config'] as $settings){
+		if ($settings['enable'] == 'on') {
+			$conf .= "cache_peer {$settings['proxyaddr']} {$settings['hierarchy']} {$settings['proxyport']} ";
+			if ($settings['icpport'] == '7')
+			  	$conf .= "{$settings['icpport']} {$settings['icpoptions']} {$settings['peermethod']} {$settings['allowmiss']} ";
+	    	else
+	      		$conf .= "{$settings['icpport']} ";
+	      	#auth settings
+			if (!empty($settings['username']) && !empty($settings['password'])){
+				$conf .= " login={$settings['username']}:{$settings['password']}";
+				}
+			else{
+				$conf .= "{$settings['authoption']} ";
+			}
+			#other options settings
+			if (!empty($settings['weight']))
+				$conf .= "weight={$settings['weight']} ";
+			if (!empty($settings['basetime']))
+				$conf .= "basetime={$settings['basetime']} ";
+			if (!empty($settings['ttl']))
+				$conf .= "ttl={$settings['ttl']} ";
+			if (!empty($settings['nodelay']))
+				$conf .= "no-delay";
+		}
+		$conf .= "\n";
+	 }
 	return $conf;
 }
 
@@ -1316,6 +1330,7 @@ function squid_resync() {
 		make_dirs($dir);
 		chown($dir, 'proxy');
 		chgrp($dir, 'proxy');
+		squid_chown_recursive($dir, 'proxy', 'proxy');
 	}
 	$conf = squid_resync_general() . "\n";
 	$conf .= squid_resync_cache() . "\n";
@@ -1332,13 +1347,6 @@ function squid_resync() {
 	/* make sure pinger is executable */
 	if(file_exists("/usr/local/libexec/squid/pinger"))
 		exec("chmod a+x /usr/local/libexec/squid/pinger");
-
-	foreach (array(	SQUID_CONFBASE,
-			SQUID_ACLDIR,
-			SQUID_BASE ) as $dir) {
-		make_dirs($dir);
-		squid_chown_recursive($dir, 'proxy', 'proxy');
-	}
 
 	file_put_contents(SQUID_CONFBASE . '/squid.conf', $conf);
 

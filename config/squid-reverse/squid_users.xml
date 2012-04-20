@@ -48,7 +48,7 @@
 	<name>squidusers</name>
 	<version>none</version>
 	<title>Proxy server: Local users</title>
-	<include_file>squid.inc</include_file>
+	<include_file>/usr/local/pkg/squid.inc</include_file>
 	<delete_string>A proxy server user has been deleted.</delete_string>
 	<addedit_string>A proxy server user has been created/modified.</addedit_string>
 	<tabs>
@@ -57,11 +57,11 @@
 			<url>/pkg_edit.php?xml=squid.xml&amp;id=0</url>
 		</tab>
 		<tab>
-			<text>Upstream</text>
-			<url>/pkg_edit.php?xml=squid_upstream.xml&amp;id=0</url>
+			<text>Remote Cache</text>
+			<url>/pkg.php?xml=squid_upstream.xml</url>
 		</tab>
 		<tab>
-			<text>Cache</text>
+			<text>Local Cache</text>
 			<url>/pkg_edit.php?xml=squid_cache.xml&amp;id=0</url>
 		</tab>
 		<tab>

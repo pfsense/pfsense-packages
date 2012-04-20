@@ -56,16 +56,16 @@
 		</tab>
 		<tab>
 			<text>Web Servers</text>
-			<url>/pkg.php?xml=squid_reverse_peer.xml&amp;id=0</url>
+			<url>/pkg.php?xml=squid_reverse_peer.xml</url>
 			<active/>
 		</tab>
 		<tab>
 			<text>Mappings</text>
-			<url>/pkg.php?xml=squid_reverse_uri.xml&amp;id=0</url>
+			<url>/pkg.php?xml=squid_reverse_uri.xml</url>
 		</tab>
 		<tab>
 			<text>Sync</text>
-			<url>/pkg_edit.php?xml=squid_reverse_sync.xml</url>
+			<url>/pkg_edit.php?xml=squid_reverse_sync.xml&amp;id=0</url>
 		</tab>
 	</tabs>
 	<adddeleteeditpagefields>
