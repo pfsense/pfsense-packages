@@ -236,10 +236,19 @@
 		<field>
 			<fielddescr>Transparent proxy</fielddescr>
 			<fieldname>transparent_proxy</fieldname>
-			<description>If transparent mode is enabled, all requests for destination port 80 will be forwarded to the proxy server without any additional configuration necessary.</description>
+			<description><![CDATA[Enable transparent mode to forward all requests for destination port 80 to the proxy server without any additional configuration necessary.<br>
+						 <strong>NOTE:</strong> Transparent mode does not filter ssl(port 443) or any other http/https port.<br>
+						 To filter both http and https protocol without touching user config, enable WPAD/PAC options on your dns/dhcp.]]></description>
 			<type>checkbox</type>
 			<enablefields>private_subnet_proxy_off,defined_ip_proxy_off,defined_ip_proxy_off_dest</enablefields>			
 			<required/>
+		</field>
+		<field>
+			<fielddescr>Patch captive portal</fielddescr>
+			<fieldname>patch_cp</fieldname>
+			<description><![CDATA[Enable this option to force captive portal to non transparent proxy users.<br>
+						<strong>NOTE:</strong> You may need to reapply captive portal config after changing this option.]]></description>
+			<type>checkbox</type>
 		</field>
 		<field>
 			<fielddescr>Bypass proxy for Private Address Space (RFC 1918) destination</fielddescr>
