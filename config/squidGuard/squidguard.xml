@@ -161,7 +161,7 @@
                 <field>
                         <fielddescr>Blacklist URL</fielddescr>
                         <fieldname>blacklist_url</fieldname>
-                        <description>Enter FTP, HTTP or LOCAL (pfSense) URL blacklist archive, or leave blank.</description>
+                        <description>Enter FTP, HTTP or LOCAL (firewall) URL blacklist archive, or leave blank.</description>
                         <type>input</type>
                         <size>100</size>
                 </field>
