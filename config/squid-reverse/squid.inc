@@ -943,7 +943,8 @@ EOD;
 function squid_resync_upstream() {
 	global $config;
 	$conf = "\n#Remote proxies\n";
-	foreach ($config['installedpackages']['squidremote']['config'] as $settings){
+	if (is_array($config['installedpackages']['squidremote']['config']))
+	  foreach ($config['installedpackages']['squidremote']['config'] as $settings){
 		if ($settings['enable'] == 'on') {
 			$conf .= "cache_peer {$settings['proxyaddr']} {$settings['hierarchy']} {$settings['proxyport']} ";
 			if ($settings['icpport'] == '7')
