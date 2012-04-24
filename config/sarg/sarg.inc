@@ -228,6 +228,7 @@ function sync_package_sarg() {
 		$LDAPBindPW=(empty($sarguser['ldap_bind_pw'])?"":"LDAPBindPW ".$sarguser['ldap_bind_pw']);
 		$LDAPBaseSearch=(empty($sarguser['ldap_base_search'])?"":"LDAPBaseSearch ".$sarguser['ldap_base_search']);
 		$LDAPTargetAttr=(empty($sarguser['ldap_target_Attr'])?"":"LDAPTargetAttr ".$sarguser['ldap_target_Attr']);
+		$LDAPFilterSearch=(empty($sarguser['ldap_filter_search'])?"":"LDAPFilterSearch ".$sarguser['ldap_filter_search']);
 		}
 		
 	#dirs
