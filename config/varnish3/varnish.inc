@@ -378,7 +378,7 @@ EOFA;
 
 function sync_package_varnish() {
 	global $config, $g;
-	if($config['installedpackages']['varnishcustomvcl']['config'] != "") {
+	if(is_array($config['installedpackages']['varnishcustomvcl']['config'])) {
 		foreach($config['installedpackages']['varnishcustomvcl']['config'] as $vcl) {
 			if($vcl['vcl_recv_early']) 
 				$vcl_recv_early = text_area_decode($vcl['vcl_recv_early']);
@@ -397,7 +397,8 @@ function sync_package_varnish() {
 		$vcl_recv_set_basic='#BASIC VCL RULES SETTING'."\n";
 		$vcl_recv_action_basic='#BASIC VCL RULES ACTIONS'."\n";
 		#$plataform=posix_uname();
-		foreach($config['installedpackages']['varnishsettings']['config'] as $vcl) {
+		if (is_array($config['installedpackages']['varnishsettings']['config']))
+		  foreach($config['installedpackages']['varnishsettings']['config'] as $vcl) {
 			if($vcl['streaming']){
 				$vcl_fetch_stream="set beresp.do_stream = true;\n";
 				}
