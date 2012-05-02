@@ -84,17 +84,12 @@ function check_ca_hashes(){
 function sync_package_dansguardian() {
 	global $config,$g;
 
-	#check if its booting
-	if ($g['booting']){
-		if (is_array($config['installedpackages']['dansguardian']))
-			if (!$config['installedpackages']['dansguardian']['config'][0]['enable'])
-				return;
-		if (file_exists("/var/run/dansguardian.pid")){
-			exec("/bin/ps -p `cat /var/run/dansguardian.pid` 2>&1",$return);
-			if (preg_match("/dansguardian/",$return[1]))
-				return;
-		}
+	# detect boot process
+	if (is_array($_POST)){
+		if (preg_match("/\w+/",$_POST['__csrf_magic']))
+			$boot_process="on";
 	}
+
 	#assign xml arrays
 	if (!is_array($config['installedpackages']['dansguardian']))
 		$config['installedpackages']['dansguardian']['config'][0]=array('interface'=>'lo0',
@@ -1005,8 +1000,9 @@ EOF;
 				$script_file=file($script);
 				foreach ($script_file as $script_line){
 					if(preg_match("/command=/",$script_line)){
-						$new_clamav_startup.= "/bin/mkdir /var/run/clamav\n";
-						$new_clamav_startup.= "chown ".$matches[1]." /var/run/clamav\n";
+						$new_clamav_startup.= 'if [ ! -d /var/run/clamav ];then /bin/mkdir /var/run/clamav;fi'."\n";
+						$new_clamav_startup.= "chown -R ".$matches[1]." /var/run/clamav\n";
+						$new_clamav_startup.= "chown -R ".$matches[1]." /var/log/clamav\n";
 						$new_clamav_startup.=$script_line;
 						}
 					elseif(!preg_match("/(mkdir|chown|sleep|mailscanner)/",$script_line)) {
@@ -1015,11 +1011,16 @@ EOF;
 					}
 				file_put_contents($script, $new_clamav_startup, LOCK_EX);
 				chmod ($script,0755);
-				if (file_exists('/var/run/dansguardian.pid'))
+				if (file_exists('/var/run/dansguardian.pid') && is_process_running('clamd') && $botting){
+					log_error('Stopping clamav-clamd');
 					mwexec("$script stop");
+					}
 				unlink_if_exists("/tmp/.dguardianipc");
 				unlink_if_exists("/tmp/.dguardianurlipc");
-				mwexec_bg("$script start");
+				if (! is_process_running('clamd')){
+					log_error('Starting clamav-clamd');
+					mwexec_bg("$script start");
+				}
 			}	
 	}
 
@@ -1030,19 +1031,25 @@ EOF;
 	if($config['installedpackages']['dansguardian']['config'][0]['enable']){
 		copy('/usr/local/pkg/dansguardian_rc.template','/usr/local/etc/rc.d/dansguardian');
 		chmod ($script,0755);
-		if (is_service_running('dansguardian')){
-		log_error('Reloading Dansguardian');
-		exec("/usr/local/sbin/dansguardian -r");			
-		}
+		if (is_process_running('dansguardian')){
+			#prevent multiple reloads during boot process
+			if ($botting){
+				log_error('Reloading Dansguardian');
+				exec("/usr/local/sbin/dansguardian -r");
+				}			
+			}
 		else{
-		log_error('Starting Dansguardian');
-		mwexec_bg("$script start");
-		}
+			log_error('Starting Dansguardian');
+			mwexec("$script start");
+			}
 	}
 	else{
-		log_error('Stopping Dansguardian');
-		mwexec("$script stop");
-		chmod ($script,0444);	
+		if (is_process_running('dansguardian')){
+			log_error('Stopping Dansguardian');
+			mwexec("$script stop");
+			}
+		if (file_exists($script))
+			chmod ($script,444);	
 	}
 	
 	if (!file_exists('/usr/local/etc/dansguardian/lists/phraselists/pornography/weighted_russian_utf8'))
@@ -1053,22 +1060,24 @@ EOF;
 
 	#mount read only
     conf_mount_ro();
-
-    $synconchanges = $config['installedpackages']['dansguardiansync']['config'][0]['synconchanges'];
-	if(!$synconchanges && !$syncondbchanges) 
-		return;
-	log_error("[dansguardian] dansguardian_xmlrpc_sync.php is starting.");
-	foreach ($config['installedpackages']['dansguardiansync']['config'] as $rs ){
-		foreach($rs['row'] as $sh){
-		$sync_to_ip = $sh['ipaddress'];
-		$password   = $sh['password'];
-		$sync_type = $sh['sync_type'];
-		if($password && $sync_to_ip)
-			dansguardian_do_xmlrpc_sync($sync_to_ip, $password,$sync_type);
+    
+    #avoid sync during boot process
+	if ($botting){
+	    $synconchanges = $config['installedpackages']['dansguardiansync']['config'][0]['synconchanges'];
+		if(!$synconchanges && !$syncondbchanges) 
+			return;
+		log_error("[dansguardian] dansguardian_xmlrpc_sync.php is starting.");
+		foreach ($config['installedpackages']['dansguardiansync']['config'] as $rs ){
+			foreach($rs['row'] as $sh){
+				$sync_to_ip = $sh['ipaddress'];
+				$password   = $sh['password'];
+				$sync_type = $sh['sync_type'];
+				if($password && $sync_to_ip)
+					dansguardian_do_xmlrpc_sync($sync_to_ip, $password,$sync_type);
+				}
+			}
+		log_error("[dansguardian] dansguardian_xmlrpc_sync.php is ending.");
 		}
-	}
-	log_error("[dansguardian] dansguardian_xmlrpc_sync.php is ending.");
-
 }
 
 function dansguardian_validate_input($post, &$input_errors) {
