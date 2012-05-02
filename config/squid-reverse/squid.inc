@@ -1331,6 +1331,15 @@ function squid_resync_msnt() {
 
 function squid_resync() {
 	global $config;
+	
+	# detect boot process
+	if (is_array($_POST)){
+		if (preg_match("/\w+/",$_POST['__csrf_magic']))
+			unset($boot_process);
+		else
+			$boot_process="on";
+	}
+	
 	conf_mount_rw();
 	foreach (array(	SQUID_CONFBASE,
 			SQUID_ACLDIR,
@@ -1342,23 +1351,26 @@ function squid_resync() {
 		chgrp($dir, 'proxy');
 		squid_chown_recursive($dir, 'proxy', 'proxy');
 	}
-	$conf = squid_resync_general() . "\n";
-	$conf .= squid_resync_cache() . "\n";
-	$conf .= squid_resync_redirector() . "\n";
-	$conf .= squid_resync_upstream() . "\n";
-	$conf .= squid_resync_nac() . "\n";
-	$conf .= squid_resync_traffic() . "\n";
-	$conf .= squid_resync_reverse() . "\n";	
-	$conf .= squid_resync_auth();
-	squid_resync_users();
-	squid_write_rcfile();
-	squid_sync_on_changes();
+	if (!isset($boot_process)){
+		$conf = squid_resync_general() . "\n";
+		$conf .= squid_resync_cache() . "\n";
+		$conf .= squid_resync_redirector() . "\n";
+		$conf .= squid_resync_upstream() . "\n";
+		$conf .= squid_resync_nac() . "\n";
+		$conf .= squid_resync_traffic() . "\n";
+		$conf .= squid_resync_reverse() . "\n";	
+		$conf .= squid_resync_auth();
+		squid_resync_users();
+		squid_write_rcfile();
+		squid_sync_on_changes();
 
+		#write config file
+		file_put_contents(SQUID_CONFBASE . '/squid.conf', $conf);
+		}
+		
 	/* make sure pinger is executable */
 	if(file_exists("/usr/local/libexec/squid/pinger"))
 		exec("chmod a+x /usr/local/libexec/squid/pinger");
-
-	file_put_contents(SQUID_CONFBASE . '/squid.conf', $conf);
 
 	$log_dir = $config['installedpackages']['squid']['config'][0]['log_dir'].'/';
 
@@ -1370,12 +1382,16 @@ function squid_resync() {
 
 	squid_dash_z();
 
+	
 	if (!is_service_running('squid')) {
 		log_error("Starting Squid");
 		mwexec("/usr/local/sbin/squid");
-	} else {
-		log_error("Reloading Squid for configuration sync");
-		mwexec("/usr/local/sbin/squid -k reconfigure");
+		} 
+	else {
+		if (!isset($boot_process)){
+			log_error("Reloading Squid for configuration sync");
+			mwexec("/usr/local/sbin/squid -k reconfigure");
+			}
 	}
 
 	// Sleep for a couple seconds to give squid a chance to fire up fully.

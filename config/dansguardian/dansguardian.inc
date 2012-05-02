@@ -87,6 +87,8 @@ function sync_package_dansguardian() {
 	# detect boot process
 	if (is_array($_POST)){
 		if (preg_match("/\w+/",$_POST['__csrf_magic']))
+			unset($boot_process);
+		else
 			$boot_process="on";
 	}
 
@@ -1011,7 +1013,7 @@ EOF;
 					}
 				file_put_contents($script, $new_clamav_startup, LOCK_EX);
 				chmod ($script,0755);
-				if (file_exists('/var/run/dansguardian.pid') && is_process_running('clamd') && $botting){
+				if (file_exists('/var/run/dansguardian.pid') && is_process_running('clamd') && !isset($boot_process)){
 					log_error('Stopping clamav-clamd');
 					mwexec("$script stop");
 					}
@@ -1033,7 +1035,7 @@ EOF;
 		chmod ($script,0755);
 		if (is_process_running('dansguardian')){
 			#prevent multiple reloads during boot process
-			if ($botting){
+			if (!isset($boot_process)){
 				log_error('Reloading Dansguardian');
 				exec("/usr/local/sbin/dansguardian -r");
 				}			
@@ -1062,7 +1064,7 @@ EOF;
     conf_mount_ro();
     
     #avoid sync during boot process
-	if ($botting){
+	if (!isset($boot_process)){
 	    $synconchanges = $config['installedpackages']['dansguardiansync']['config'][0]['synconchanges'];
 		if(!$synconchanges && !$syncondbchanges) 
 			return;
