@@ -193,10 +193,14 @@ function quagga_ospfd_install_conf() {
 	$rc_file_stop = <<<EOF
 kill -9 `cat /var/run/quagga/zebra.pid`
 kill -9 `cat /var/run/quagga/ospfd.pid`
+rm -f /var/run/quagga/zebra.pid
+rm -f /var/run/quagga/ospfd.pid
 EOF;
 	$rc_file_start = <<<EOF
 /bin/mkdir -p /var/run/quagga
 /bin/mkdir -p /var/log/quagga
+rm -f /var/run/quagga/zebra.pid
+rm -f /var/run/quagga/ospfd.pid
 /usr/sbin/chown -R quagga:quagga /usr/local/etc/quagga/
 /usr/sbin/chown -R quagga:quagga /var/run/quagga
 /usr/sbin/chown -R quagga:quagga /var/log/quagga
