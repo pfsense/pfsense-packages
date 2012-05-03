@@ -181,6 +181,16 @@ function sync_package_dansguardian() {
 	
 	#report and log
 	$reportlevel=($dansguardian_log['report_level']?$dansguardian_log['report_level']:"3");
+	if ($reportlevel == 1 || $reportlevel== 2){
+		if (preg_match("@(\w+://[a-zA-Z0-9.:/\-]+)@",$dansguardian_log['reportingcgi'],$cgimatches)){
+			$accessdeniedaddress="accessdeniedaddress = '".$cgimatches[1]."'";
+			}
+		else{
+			log_error("dansguardian - " . $dansguardian_log['reportingcgi'] . " is not a valid access denied cgi url");
+			file_notice("dansguardian - " . $dansguardian_log['reportingcgi'] . " is not a valid access denied cgi url","");
+			}
+	}
+	$accessdenied=($dansguardian_log['reportingcgi']?$dansguardian_log['report_level']:"3");
 	$reportlanguage=($dansguardian_log['report_language']?$dansguardian_log['report_language']:"ukenglish");
 	$showweightedfound=(preg_match('/showweightedfound/',$dansguardian_log['report_options'])?"on":"off");
 	$usecustombannedflash=(preg_match('/usecustombannedflash/',$dansguardian_log['report_options'])?"on":"off");
@@ -657,7 +667,7 @@ function sync_package_dansguardian() {
 		$config['installedpackages']['dansguardianlog']['config'][0]['report_file']=base64_encode($report_file);
 		$dansguardian_log['report_file']=base64_encode($report_file);
 		$load_samples++;
-	}	
+	}
 
 	if($load_samples > 0)
 		write_config();
@@ -676,7 +686,8 @@ function sync_package_dansguardian() {
 																				'urlacl'=> "Default",
 																				'group_options' => "scancleancache,infectionbypasserrorsonly",
 																				'reportinglevel'=>'3',
-																				'mode'=> "1");
+																				'mode'=> "1",
+																				'report_level'=>"general");
 
 	$groups=array("scancleancache","hexdecodecontent","blockdownloads","enablepics","deepurlanalysis","infectionbypasserrorsonly","disablecontentscan","sslcertcheck","sslmitm");
 	#loop on array
@@ -695,6 +706,29 @@ function sync_package_dansguardian() {
 		$dansguardian_groups['bypass']=($dansguardian_groups['bypass']?$dansguardian_groups['bypass']:"0");
 		$dansguardian_groups['infectionbypass']=($dansguardian_groups['infectionbypass']?$dansguardian_groups['infectionbypass']:"0");
 		$dansguardian_groups['mitmkey']=($dansguardian_groups['mitmkey']?$dansguardian_groups['mitmkey']:"dgs3dD3da");
+		switch ($dansguardian_groups['reportinglevel']){
+			case "1":
+			case "2":
+				$groupreportinglevel="reportinglevel = ".$dansguardian_groups['reportinglevel'];
+				if (preg_match("@(\w+://[a-zA-Z0-9.:/\-]+)@",$dansguardian_groups['reportingcgi'],$cgimatches)){
+					$groupaccessdeniedaddress="accessdeniedaddress = '".$cgimatches[1]."'";
+					}
+				else{
+					log_error('Dansguardian - Group '.$dansguardian_groups['name']. ' does not has a valid access denied cgi url.');
+					file_notice('Dansguardian - Group '.$dansguardian_groups['name']. ' does not has a valid access denied cgi url.',"");
+					}
+			break;		
+			case "-1": 
+			case "0":
+			case "3":
+				$groupreportinglevel="reportinglevel = ".$dansguardian_groups['reportinglevel'];
+				$groupaccessdeniedaddress="";
+			break;
+			default:
+				$groupreportinglevel="";
+				$groupaccessdeniedaddress="";
+		}
+
 		foreach ($groups as $group)
 			$dansguardian_groups[$group]=(preg_match("/$group/",$dansguardian_groups['group_options'])?"on":"off");
 		include("/usr/local/pkg/dansguardianfx.conf.template");

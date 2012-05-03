@@ -114,6 +114,14 @@
  				<option><name>Just say 'Access Denied'</name><value>0</value></option>
  				<option><name>Log but do not block - Stealth mode</name><value>-1</value></option>
 				</options>
+		</field>
+		<field>
+			<fielddescr>Access Denied cgi</fielddescr>
+			<fieldname>reportingcgi</fieldname>
+			<description><![CDATA[While using Report Level (report fully) or (Report why but not what denied phrase), specify here the url link to your access denied cgi script
+								  ex:http://YOURSERVER.YOURDOMAIN/cgi-bin/dansguardian.pl]]></description>
+			<type>input</type>
+			<size>70</size>
 		</field>	
 		<field>
 			<fielddescr>Report Language</fielddescr>

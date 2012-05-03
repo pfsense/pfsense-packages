@@ -105,7 +105,10 @@
 			<fielddescr>Group mode</fielddescr>
 			<fieldname>mode</fieldname>
 		</columnitem>	
-
+		<columnitem>
+			<fielddescr>Reporting level</fielddescr>
+			<fieldname>reportinglevel</fieldname>
+		</columnitem>	
 		<columnitem>
 			<fielddescr>Description</fielddescr>
 			<fieldname>description</fieldname>
@@ -247,13 +250,23 @@
 								If defined, this overrides the global setting in dansguardian.conf for members of this filter group.]]></description>
 	    	<type>select</type>
  				<options>
- 				<option><name>Use HTML template file (accessdeniedaddress ignored) - recommended</name><value>3</value></option>
+ 				<option><name>Use General log option selected on Report and log - recommended</name><value>Global</value></option>
+ 				<option><name>Use HTML template file (accessdeniedaddress ignored)</name><value>3</value></option>
  				<option><name>Report fully</name><value>2</value></option>
  				<option><name>Report why but not what denied phrase</name><value>1</value></option>
  				<option><name>Just say 'Access Denied'</name><value>0</value></option>
  				<option><name>Log but do not block - Stealth mode</name><value>-1</value></option>
 				</options>
 		</field>
+		<field>
+			<fielddescr>Access Denied cgi</fielddescr>
+			<fieldname>reportingcgi</fieldname>
+			<description><![CDATA[While using Report Level (report fully) or (Report why but not what denied phrase), specify here the url link to your access denied cgi script
+								  ex:http://YOURSERVER.YOURDOMAIN/cgi-bin/dansguardian.pl]]></description>
+			<type>input</type>
+			<size>70</size>
+		</field>
+		
 		<field>
 			<fielddescr>Weighted phrase mode</fielddescr>
 			<fieldname>weightedphrasemode</fieldname>
@@ -320,6 +333,15 @@
 			<strong>0 = disable ( defaults to 0 )</strong>]]></description>
 			<type>input</type>
 			<size>10</size>
+		</field>
+		<field>
+			<fielddescr>Temporary Denied Page Bypass Secret Key</fielddescr>
+			<fieldname>bypasskey</fieldname>
+			<description><![CDATA[If not empty, rather than generating a random key you can specify one. It must be more than 8 chars.<br>
+									Ex1:Mary had a little lamb.<br>
+									Ex2:76b42abc1cd0fdcaf6e943dcbc93b826]]></description>
+			<type>input</type>
+			<size>70</size>
 		</field>
 			<field>
 			<fielddescr>Infection/Scan Error Bypass</fielddescr>
