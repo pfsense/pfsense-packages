@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<packagegui>
+	<name>sshdcond</name>
+	<version>1.0</version>
+	<title>SSH Conditional</title>
+	<description>SSH Conditional blocks</description>
+	<savetext>Save</savetext>
+	<include_file>/usr/local/pkg/sshdcond.inc</include_file>
+
+	<menu>
+		<name>SSH Conditions</name>
+		<tooltiptext>Configure SSH conditional exceptions</tooltiptext>
+		<section>Services</section>
+		<url>/pkg_edit.php?xml=sshdcond.xml&amp;id=0</url>
+	</menu>
+	<configpath>installedpackages->package->sshdcond</configpath>
+	
+	<additional_files_needed>
+		<prefix>/usr/local/pkg/</prefix>
+		<chmod>755</chmod>
+		<!--<item>http://www.pfsense.com/packages/config/sshdcond/sshdcond.inc</item>-->
+		<item>http://192.168.16.22/packages/config/sshdcond/sshdcond.inc</item>
+	</additional_files_needed>
+	<fields>
+		<field>
+			<type>listtopic</type>
+			<name>Conditional SSH Options</name>
+			<fieldname>temp</fieldname>
+		</field>
+		<field>
+			<fielddescr>Extra Match Command blocks for sshd_config.</fielddescr>
+			<fieldname>none</fieldname>
+			<type>rowhelper</type>
+			<rowhelper>
+				<rowhelperfield>
+					<fielddescr>Match Type</fielddescr>
+					<fieldname>matchtype</fieldname>
+					<type>select</type>
+					<options>
+						<option>
+							<name>User</name>
+							<value>User</value>
+						</option>
+						<option>
+							<name>Group</name>
+							<value>Group</value>
+						</option>
+						<option>
+							<name>Host</name>
+							<value>Host</value>
+						</option>
+						<option>
+							<name>IP Address</name>
+							<value>Address</value>
+						</option>
+					</options>
+					<required/>
+				</rowhelperfield>
+				
+				<rowhelperfield>
+					<fielddescr>Match Value (Allowed Characters: a-zA-Z_)</fielddescr>
+					<fieldname>matchvalue</fieldname>
+					<type>input</type>
+					<size>20</size>
+					<required/>
+				</rowhelperfield>
+
+				<rowhelperfield>
+					<fielddescr>Restrictions (separated by semicolon) (See Match keyword at http://www.manpagez.com/man/5/sshd_config/ for options)</fielddescr>
+					<fieldname>restrictions</fieldname>
+					<type>input</type>
+					<size>40</size>
+					<required/>
+				</rowhelperfield>
+
+			</rowhelper>
+		</field>
+	</fields>
+	
+	<custom_delete_php_command>
+		sshdcond_custom_php_write_config();
+	</custom_delete_php_command>
+	<custom_add_php_command>
+		sshdcond_custom_php_write_config();
+	</custom_add_php_command>
+	<custom_php_install_command>
+		sshdcond_custom_php_install_command();
+	</custom_php_install_command>
+	<custom_php_deinstall_command>
+		sshdcond_custom_php_deinstall_command();
+	</custom_php_deinstall_command>
+	<custom_php_resync_config_command>
+		sshdcond_custom_php_write_config();
+	</custom_php_resync_config_command>
+	<custom_php_command_before_form>
+		unset($_POST['temp']);
+	</custom_php_command_before_form>
+	
+</packagegui>
