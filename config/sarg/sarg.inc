@@ -32,6 +32,10 @@
                                                                               */
 /* ========================================================================== */
 
+$uname=posix_uname();
+if ($uname['machine']=='amd64')
+        ini_set('memory_limit', '250M');
+
 // STATIC VARS
 $sarg_proxy=array(	'squid_rc'=>'/usr/local/etc/rc.d/squid.sh',
 					'squid_config'=>'/var/squid/logs/access.log',
@@ -99,8 +103,13 @@ function run_sarg($id=-1) {
 				if ($action =="both" || $action=="rotate"){
 					log_error('executing squidguard log rotate after sarg.');
 					log_rotate($sarg_proxy['squidguard_block_log']);
+					log_error('executing squid log rotate after sarg.');
+					file_put_contents($sarg_proxy['squidguard_block_log'],"",LOCK_EX);
+					chown($sarg_proxy['squidguard_block_log'],'proxy');
+					chgrp($sarg_proxy['squidguard_block_log'],'proxy');
+					mwexec('squid -k reconfigure');
 					}
-			#Leve this case without break to include squid log file on squidguard option
+			break;
 			case "squid":
 				if ($action =="both" || $action=="rotate"){
 					log_error('executing squid log rotate after sarg.');
@@ -125,6 +134,13 @@ function run_sarg($id=-1) {
 
 function sync_package_sarg() {
 	global $config, $g,$sarg_proxy;
+	
+	# detect boot process
+	if (is_array($_POST)){
+		if (!preg_match("/\w+/",$_POST['__csrf_magic']))
+			return;
+	}
+	
 	$update_conf=0;
 	#mount filesystem writeable
 	conf_mount_rw();
@@ -168,7 +184,7 @@ function sync_package_sarg() {
 					$access_log = $config['installedpackages']['squid']['config'][0]['log_dir']. '/access.log';
 		break;
 	}
-	if (!file_exists($access_log)){
+	if (!file_exists($access_log) && $access_log !=""){
 		$error="Sarg config error: ".$sarg['proxy_server']." log file ($access_log) does not exists";
 		log_error($error);
 		file_notice("Sarg", $error, "Sarg Settings", "");
