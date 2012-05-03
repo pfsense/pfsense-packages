@@ -32,6 +32,9 @@ require_once("util.inc");
 require("globals.inc");
 #require("guiconfig.inc");
 
+$uname=posix_uname();
+if ($uname['machine']=='amd64')
+        ini_set('memory_limit', '250M');
 
 function dg_text_area_decode($text){
 	return preg_replace('/\r\n/', "\n",base64_decode($text));	
@@ -92,6 +95,9 @@ function sync_package_dansguardian() {
 			$boot_process="on";
 	}
 
+	if (is_process_running('dansguardian') && isset($boot_process))
+		return;
+		
 	#assign xml arrays
 	if (!is_array($config['installedpackages']['dansguardian']))
 		$config['installedpackages']['dansguardian']['config'][0]=array('interface'=>'lo0',
@@ -687,7 +693,7 @@ function sync_package_dansguardian() {
 																				'group_options' => "scancleancache,infectionbypasserrorsonly",
 																				'reportinglevel'=>'3',
 																				'mode'=> "1",
-																				'report_level'=>"general");
+																				'report_level'=>"global");
 
 	$groups=array("scancleancache","hexdecodecontent","blockdownloads","enablepics","deepurlanalysis","infectionbypasserrorsonly","disablecontentscan","sslcertcheck","sslmitm");
 	#loop on array

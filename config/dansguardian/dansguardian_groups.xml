@@ -250,7 +250,7 @@
 								If defined, this overrides the global setting in dansguardian.conf for members of this filter group.]]></description>
 	    	<type>select</type>
  				<options>
- 				<option><name>Use General log option selected on Report and log - recommended</name><value>Global</value></option>
+ 				<option><name>Use General log option selected on Report and log - recommended</name><value>global</value></option>
  				<option><name>Use HTML template file (accessdeniedaddress ignored)</name><value>3</value></option>
  				<option><name>Report fully</name><value>2</value></option>
  				<option><name>Report why but not what denied phrase</name><value>1</value></option>

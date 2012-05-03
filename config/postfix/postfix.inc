@@ -34,6 +34,10 @@ require_once("functions.inc");
 require_once("pkg-utils.inc");
 require_once("globals.inc");
 
+$uname=posix_uname();
+if ($uname['machine']=='amd64')
+        ini_set('memory_limit', '250M');
+
 function px_text_area_decode($text){
 	return preg_replace('/\r\n/', "\n",base64_decode($text));	
 }
@@ -268,6 +272,17 @@ function check_cron(){
 function sync_package_postfix() {
 	global $config;
 	
+	# detect boot process
+	if (is_array($_POST)){
+		if (preg_match("/\w+/",$_POST['__csrf_magic']))
+			unset($boot_process);
+		else
+			$boot_process="on";
+	}
+		
+	if(is_process_running("master") && isset($boot_process))
+		return;
+		
 	#check patch in /etc/inc/config.
 	$relay_domains = "";
 	$transport = "";
@@ -678,7 +693,11 @@ MASTEREOF2;
 		touch("/etc/mail/aliases");
 	exec("/usr/local/bin/newaliases");
 	postfix_start();
-	postfix_sync_on_changes();
+	
+	#Do not sync during boot
+	if(!isset($boot_process))
+		postfix_sync_on_changes();
+		
 }
 function postfix_start(){
 	global $config;
