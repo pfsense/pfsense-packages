@@ -269,7 +269,7 @@ deepurlanalysis = {$dansguardian_groups['deepurlanalysis']}
 # If defined, this overrides the global setting in dansguardian.conf for
 # members of this filter group.
 #
-#reportinglevel = {$dansguardian_groups['reportinglevel']}
+reportinglevel = {$dansguardian_groups['reportinglevel']}
 
 # accessdeniedaddress is the address of your web server to which the cgi
 # dansguardian reporting script was copied. Only used in reporting levels
@@ -285,7 +285,7 @@ deepurlanalysis = {$dansguardian_groups['deepurlanalysis']}
 # If defined, this overrides the global setting in dansguardian.conf for
 # members of this filter group.
 #
-#accessdeniedaddress = 'http://YOURSERVER.YOURDOMAIN/cgi-bin/dansguardian.pl'
+accessdeniedaddress = '{$dansguardian_groups['accessdeniedaddress']}'
 
 # HTML Template override
 # If defined, this specifies a custom HTML template file for members of this
