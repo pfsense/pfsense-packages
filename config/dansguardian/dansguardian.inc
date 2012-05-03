@@ -1053,7 +1053,7 @@ EOF;
 					}
 				file_put_contents($script, $new_clamav_startup, LOCK_EX);
 				chmod ($script,0755);
-				if (file_exists('/var/run/dansguardian.pid') && is_process_running('clamd') && !isset($boot_process)){
+				if (file_exists('/var/run/dansguardian.pid') && is_process_running('clamd')){
 					log_error('Stopping clamav-clamd');
 					mwexec("$script stop");
 					}
@@ -1068,26 +1068,26 @@ EOF;
 
 	#check certificate hashed
 	
-	$script='/usr/local/etc/rc.d/dansguardian';
-	
-	if($config['installedpackages']['dansguardian']['config'][0]['enable']){
-		copy('/usr/local/pkg/dansguardian_rc.template','/usr/local/etc/rc.d/dansguardian');
+	$script='/usr/local/etc/rc.d/dansguardian.sh';
+	unlink_if_exists('/usr/local/etc/rc.d/dansguardian');
+	if($config['installedpackages']['dansguardian']['config'][0]['enable']=="on"){
+		copy('/usr/local/pkg/dansguardian_rc.template',$script);
 		chmod ($script,0755);
 		if (is_process_running('dansguardian')){
-			#prevent multiple reloads during boot process
-			if (!isset($boot_process)){
-				log_error('Reloading Dansguardian');
-				exec("/usr/local/sbin/dansguardian -r");
-				}			
+			log_error('Reloading Dansguardian');
+			exec("/usr/local/sbin/dansguardian -r");
 			}
 		else{
-			log_error('Starting Dansguardian');
-			mwexec("$script start");
+			# dansguardian is started by rc.d script during boot time
+			if(!isset($boot_process)){
+				log_error('Starting Dansguardian');
+				mwexec("$script start");
+				}
 			}
 	}
 	else{
 		if (is_process_running('dansguardian')){
-			log_error('Stopping Dansguardian');
+			log_error('Dansguardian is disabled, stopping process...');
 			mwexec("$script stop");
 			}
 		if (file_exists($script))
@@ -1143,11 +1143,17 @@ function dansguardian_php_install_command() {
 
 function dansguardian_php_deinstall_command() {
 	global $config,$g;
-	mwexec("/usr/local/etc/rc.d/dansguardian stop");
-	sleep(1);
-	conf_mount_rw();
-	chmod ("/usr/local/etc/rc.d/dansguardian",0444);
-	conf_mount_ro();
+	if(is_process_running('dansguardian')){
+		log_error("stopping dansguardian..");
+		mwexec("/usr/local/etc/rc.d/dansguardian.sh stop");
+		sleep(1);
+		}
+	
+	if (file_exists("/usr/local/etc/rc.d/dansguardian.sh")){
+		conf_mount_rw();
+		chmod ("/usr/local/etc/rc.d/dansguardian.sh",0444);
+		conf_mount_ro();
+	}
 }
 
 function dansguardian_do_xmlrpc_sync($sync_to_ip, $password,$sync_type) {
