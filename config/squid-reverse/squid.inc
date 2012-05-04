@@ -1340,6 +1340,9 @@ function squid_resync() {
 			$boot_process="on";
 	}
 	
+	if (is_process_running('squid') && isset($boot_process))
+		return;
+	
 	conf_mount_rw();
 	foreach (array(	SQUID_CONFBASE,
 			SQUID_ACLDIR,
@@ -1351,22 +1354,22 @@ function squid_resync() {
 		chgrp($dir, 'proxy');
 		squid_chown_recursive($dir, 'proxy', 'proxy');
 	}
-	if (!isset($boot_process)){
-		$conf = squid_resync_general() . "\n";
-		$conf .= squid_resync_cache() . "\n";
-		$conf .= squid_resync_redirector() . "\n";
-		$conf .= squid_resync_upstream() . "\n";
-		$conf .= squid_resync_nac() . "\n";
-		$conf .= squid_resync_traffic() . "\n";
-		$conf .= squid_resync_reverse() . "\n";	
-		$conf .= squid_resync_auth();
-		squid_resync_users();
-		squid_write_rcfile();
+	$conf = squid_resync_general() . "\n";
+	$conf .= squid_resync_cache() . "\n";
+	$conf .= squid_resync_redirector() . "\n";
+	$conf .= squid_resync_upstream() . "\n";
+	$conf .= squid_resync_nac() . "\n";
+	$conf .= squid_resync_traffic() . "\n";
+	$conf .= squid_resync_reverse() . "\n";	
+	$conf .= squid_resync_auth();
+	squid_resync_users();
+	squid_write_rcfile();
+		
+	if(!isset($boot_process))
 		squid_sync_on_changes();
-
-		#write config file
-		file_put_contents(SQUID_CONFBASE . '/squid.conf', $conf);
-		}
+	
+	#write config file
+	file_put_contents(SQUID_CONFBASE . '/squid.conf', $conf);
 		
 	/* make sure pinger is executable */
 	if(file_exists("/usr/local/libexec/squid/pinger"))

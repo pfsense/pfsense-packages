@@ -1078,11 +1078,8 @@ EOF;
 			exec("/usr/local/sbin/dansguardian -r");
 			}
 		else{
-			# dansguardian is started by rc.d script during boot time
-			if(!isset($boot_process)){
-				log_error('Starting Dansguardian');
-				mwexec("$script start");
-				}
+			log_error('Starting Dansguardian');
+			mwexec("$script start");
 			}
 	}
 	else{
