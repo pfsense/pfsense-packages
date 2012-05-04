@@ -1400,5 +1400,17 @@
 		<required_version>2.0</required_version>
 		<configurationfile>quagga_ospfd.xml</configurationfile>
 	</package>
+	<package>
+		<name>System Patches</name>
+		<descr>A package to apply and maintain custom system patches.</descr>
+		<maintainer>jimp@pfsense.org</maintainer>
+		<version>0.5</version>
+		<category>System</category>
+		<status>BETA</status>
+		<config_file>http://www.pfsense.com/packages/config/systempatches/systempatches.xml</config_file>
+		<pkginfolink></pkginfolink>
+		<required_version>2.0</required_version>
+		<configurationfile>systempatches.xml</configurationfile>
+	</package>
 </packages>
 </pfsensepkgs>
