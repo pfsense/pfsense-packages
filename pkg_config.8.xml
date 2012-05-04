@@ -1349,6 +1349,16 @@
 		<maintainer>erik@erikkristensen.com</maintainer>
 		<configurationfile>nrpe2.xml</configurationfile>
 	</package>
+		<package>
+		<name>SSHDCond</name>
+		<descr>Allows to define SSH overrides with Match in a convenient way</descr>
+		<category>Enhancements</category>
+		<version>1.0</version>
+		<status>Beta</status>
+		<required_version>2.0</required_version>
+		<config_file>http://www.pfsense.com/packages/config/sshdcond/sshdcond.xml</config_file>
+		<configurationfile>sshdcond.xml</configurationfile>
+	</package>
 	<package>
 		<name>mailreport</name>
 		<descr>Allows you to setup periodic e-mail reports containing RRD graphs.</descr>
