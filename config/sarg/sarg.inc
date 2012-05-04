@@ -103,17 +103,16 @@ function run_sarg($id=-1) {
 				if ($action =="both" || $action=="rotate"){
 					log_error('executing squidguard log rotate after sarg.');
 					log_rotate($sarg_proxy['squidguard_block_log']);
-					log_error('executing squid log rotate after sarg.');
 					file_put_contents($sarg_proxy['squidguard_block_log'],"",LOCK_EX);
 					chown($sarg_proxy['squidguard_block_log'],'proxy');
 					chgrp($sarg_proxy['squidguard_block_log'],'proxy');
-					mwexec('squid -k reconfigure');
+					mwexec('/usr/local/sbin/squid -k reconfigure');
 					}
-			break;
+			#leave this case without break to run squid rotate too.
 			case "squid":
 				if ($action =="both" || $action=="rotate"){
 					log_error('executing squid log rotate after sarg.');
-					mwexec('squid -k rotate');
+					mwexec('/usr/local/sbin/squid -k rotate');
 					}
 				if ($action =="both" || $action=="restart"){
 					if (file_exists($sarg_proxy['squid_rc']))
@@ -140,7 +139,6 @@ function sync_package_sarg() {
 		if (!preg_match("/\w+/",$_POST['__csrf_magic']))
 			return;
 	}
-	
 	$update_conf=0;
 	#mount filesystem writeable
 	conf_mount_rw();
@@ -166,6 +164,7 @@ function sync_package_sarg() {
 																	'ldap_port'=> '389',
 																	'ntlm_user_format'=>'domainname+username');
 	$sarguser=$config['installedpackages']['sarguser']['config'][0];
+	$access_log=$sarg['proxy_server'];
 	switch ($sarg['proxy_server']){
 		case 'dansguardian':
 			$access_log= $sarg_proxy['dansguardian_log'];
@@ -253,6 +252,7 @@ function sync_package_sarg() {
 		if (!is_dir($dir))
 			mkdir ($dir,0755,true);
 	
+	//log_error($_POST['__csrf_magic']." sarg log:". $access_log);
 	#create sarg config files
 	include("/usr/local/pkg/sarg.template");
 	file_put_contents("/usr/local/etc/sarg/sarg.conf", $sg, LOCK_EX);

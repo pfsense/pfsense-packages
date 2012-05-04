@@ -42,7 +42,7 @@ access_log {$access_log}
 #	Use graphics where is possible.
 #           graph_days_bytes_bar_color blue|green|yellow|orange|brown|red
 #
-graphs ${graphs}
+graphs {$graphs}
 #graph_days_bytes_bar_color orange
 
 # TAG:  graph_font

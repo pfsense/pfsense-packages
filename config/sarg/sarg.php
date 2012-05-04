@@ -39,6 +39,10 @@ require_once("/etc/inc/pkg-utils.inc");
 require_once("/etc/inc/globals.inc");
 require_once("/usr/local/pkg/sarg.inc");
 
+$uname=posix_uname();
+if ($uname['machine']=='amd64')
+        ini_set('memory_limit', '250M');
+
 if (preg_match ("/(\d+)/",$argv[1],$matches))
 	run_sarg($matches[1]);
 
