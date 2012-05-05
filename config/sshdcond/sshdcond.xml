@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<packagegui>
+<copyright>
+        <![CDATA[
+/* $Id$ */
+/* ========================================================================== */
+/*
+    sshdcond.xml
+    part of pfSense (http://www.pfSense.com)
+    Copyright (C) 2012 Marcello Coutinho
+    Copyright (C) 2012 Han Van (namezero@afim.info)
+    All rights reserved.
+
+    Based on m0n0wall (http://m0n0.ch/wall)
+    Copyright (C) 2003-2006 Manuel Kasper <mk@neon1.net>.
+    All rights reserved.
+                                                                              */
+/* ========================================================================== */
+/*
+    Redistribution and use in source and binary forms, with or without
+    modification, are permitted provided that the following conditions are met:
+
+     1. Redistributions of source code must retain the above copyright notice,
+        this list of conditions and the following disclaimer.
+
+     2. Redistributions in binary form must reproduce the above copyright
+        notice, this list of conditions and the following disclaimer in the
+        documentation and/or other materials provided with the distribution.
+
+    THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
+    INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+    AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+    AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+    OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+    INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+    POSSIBILITY OF SUCH DAMAGE.
+                                                                              */
+/* ========================================================================== */
+        ]]>
+        </copyright>
+
+	<name>sshdcond</name>
+	<version>1.0</version>
+	<title>SSH Conditional</title>
+	<description>SSH Conditional blocks</description>
+	<savetext>Save</savetext>
+	<include_file>/usr/local/pkg/sshdcond.inc</include_file>
+
+	<menu>
+		<name>SSH Conditions</name>
+		<tooltiptext>Configure SSH conditional exceptions</tooltiptext>
+		<section>Services</section>
+		<url>/pkg.php?xml=sshdcond.xml</url>
+	</menu>
+	<configpath>installedpackages->package->sshdcond</configpath>
+
+	<additional_files_needed>
+		<prefix>/usr/local/pkg/</prefix>
+		<chmod>755</chmod>
+		<item>http://www.pfsense.com/packages/config/sshdcond/sshdcond.inc</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/pkg/</prefix>
+		<chmod>755</chmod>
+		<item>http://www.pfsense.com/packages/config/sshdcond/sshdcond_sync.xml</item>
+	</additional_files_needed>
+	<tabs>
+		<tab>
+			<text>General</text>
+			<url>/pkg.php?xml=sshdcond.xml</url>
+			<active/>
+		</tab>
+		<tab>
+			<text>Sync</text>
+			<url>/pkg_edit.php?xml=sshdcond_sync.xml</url>
+		</tab>
+	</tabs>
+	<adddeleteeditpagefields>
+		<columnitem>
+			<fielddescr>Status</fielddescr>
+			<fieldname>enable</fieldname>
+		</columnitem>
+		<columnitem>
+			<fielddescr>Match Type</fielddescr>
+			<fieldname>matchtype</fieldname>
+		</columnitem>
+		<columnitem>
+			<fielddescr>Match Value</fielddescr>
+			<fieldname>matchvalue</fieldname>
+		</columnitem>
+	</adddeleteeditpagefields>
+	<fields>
+		<field>
+			<type>listtopic</type>
+			<name>Conditional SSH Options</name>
+			<fieldname>temp</fieldname>
+		</field>
+		<field>
+		<fielddescr>Enable</fielddescr>
+			<fieldname>enable</fieldname>
+			<type>checkbox</type>
+		<description>Enable this ssh conditional option for specified options.</description>
+		</field>
+		<field>
+			<fielddescr>Match Type</fielddescr>
+			<fieldname>matchtype</fieldname>
+			<description>See Match keyword at http://www.manpagez.com/man/5/sshd_config/ for options</description>
+			<type>select</type>
+			<options>
+				<option><name>User</name><value>User</value></option>
+				<option><name>Group</name><value>Group</value></option>
+				<option><name>Host</name><value>Host</value></option>
+				<option><name>Address</name><value>Address</value></option>
+			</options>
+			<required/>
+		</field>
+		<field>
+			<fielddescr>Match Value</fielddescr>
+			<fieldname>matchvalue</fieldname>
+			<description>Insert Match Value. Do not use spaces or special characters.</description>
+			<type>input</type>
+			<size>40</size>
+			<required/>
+		</field>
+		<field>
+			<fielddescr>Match Config</fielddescr>
+			<fieldname>none</fieldname>
+			<type>rowhelper</type>
+			<rowhelper>
+			<rowhelperfield>
+					<fielddescr>sshd option</fielddescr>
+					<fieldname>sshdoption</fieldname>
+					<type>select</type>
+					<options>
+						<option><name>AllowAgentForwarding</name><value>AllowAgentForwarding</value></option>
+						<option><name>AllowTcpForwarding</name><value>AllowTcpForwarding</value></option>
+						<option><name>AuthorizedKeysFile</name><value>AuthorizedKeysFile</value></option>
+						<option><name>AuthorizedPrincipalsFile</name><value>AuthorizedPrincipalsFile</value></option>
+						<option><name>Banner</name><value>Banner</value></option>
+						<option><name>ChrootDirectory</name><value>ChrootDirectory</value></option>
+						<option><name>ForceCommand</name><value>ForceCommand</value></option>
+						<option><name>GatewayPorts</name><value>GatewayPorts</value></option>
+						<option><name>GSSAPIAuthentication</name><value>GSSAPIAuthentication</value></option>
+						<option><name>HostbasedAuthentication</name><value>HostbasedAuthentication</value></option>
+						<option><name>HostbasedUsesNameFromPacketOnly</name><value>HostbasedUsesNameFromPacketOnly</value></option>
+						<option><name>KbdInteractiveAuthentication</name><value>KbdInteractiveAuthentication</value></option>
+						<option><name>KerberosAuthentication</name><value>KerberosAuthentication</value></option>
+						<option><name>MaxAuthTries</name><value>MaxAuthTries</value></option>
+						<option><name>MaxSessions</name><value>MaxSessions</value></option>
+						<option><name>PasswordAuthentication</name><value>PasswordAuthentication</value></option>
+						<option><name>PermitEmptyPasswords</name><value>PermitEmptyPasswords</value></option>
+						<option><name>PermitOpen</name><value>PermitOpen</value></option>
+						<option><name>PermitRootLogin</name><value>PermitRootLogin</value></option>
+						<option><name>PermitTunnel</name><value>PermitTunnel</value></option>
+						<option><name>PubkeyAuthentication</name><value>PubkeyAuthentication</value></option>
+						<option><name>RhostsRSAAuthentication</name><value>RhostsRSAAuthentication</value></option>
+						<option><name>RSAAuthentication</name><value>RSAAuthentication</value></option>
+						<option><name>X11DisplayOffset</name><value>X11DisplayOffset</value></option>
+						<option><name>X11Forwarding</name><value>X11Forwarding</value></option>
+						<option><name>X11UseLocalHost</name><value>X11UseLocalHost</value></option>
+				</options>
+				<required/>
+			</rowhelperfield>
+			<rowhelperfield>
+					<fielddescr>sshd value</fielddescr>
+					<fieldname>sshdvalue</fieldname>
+					<type>input</type>
+					<size>60</size>
+					<required/>
+				</rowhelperfield>
+			</rowhelper>
+		</field>
+	</fields>
+
+	<custom_delete_php_command>
+		sshdcond_custom_php_write_config();
+	</custom_delete_php_command>
+	<custom_add_php_command>
+		sshdcond_custom_php_write_config();
+	</custom_add_php_command>
+	<custom_php_install_command>
+		sshdcond_custom_php_install_command();
+	</custom_php_install_command>
+	<custom_php_deinstall_command>
+		sshdcond_custom_php_deinstall_command();
+	</custom_php_deinstall_command>
+	<custom_php_resync_config_command>
+		sshdcond_custom_php_write_config();
+	</custom_php_resync_config_command>
+	<custom_php_command_before_form>
+		unset($_POST['temp']);
+	</custom_php_command_before_form>
+
+</packagegui>
