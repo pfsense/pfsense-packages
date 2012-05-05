@@ -44,7 +44,7 @@ function patch_commit($patch, $action, $test=false) {
 	$patchlevel = '-p' . $patch['patchlevel'];
 	patch_write($patch);
 	$status = mwexec("{$patch_cmd} {$force} {$patchlevel} {$filename} {$check} {$direction} {$whitespace}", false);
-	//patch_erase($patch);
+	patch_erase($patch);
 	if ($status == 0)
 		return true;
 	else
