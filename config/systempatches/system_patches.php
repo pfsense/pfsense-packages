@@ -259,7 +259,7 @@ foreach ($a_patches as $thispatch):
 	</td>
 	</tr>
 	<tr><td></td><td colspan="6">
-	<?php echo gettext("NOTE: Each patch is tested, and the appropriate action is shown. If neither 'Apply' or 'Revert' shows up, the patch cannot be used (check the patchlevel and whitespace options)."); ?>
+	<?php echo gettext("NOTE: Each patch is tested, and the appropriate action is shown. If neither 'Apply' or 'Revert' shows up, the patch cannot be used (check the pathstrip and whitespace options)."); ?>
 	<br/><br/>
 	<?php echo gettext("Use the 'Test' link to see if a patch can be applied or reverted. You can reorder patches so that higher patches apply later than lower patches."); ?>
 	</td><td></td></tr>

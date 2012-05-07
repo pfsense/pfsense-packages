@@ -58,7 +58,7 @@ if (isset($id) && $a_patches[$id]) {
 	$pconfig['descr'] = $a_patches[$id]['descr'];
 	$pconfig['location'] = $a_patches[$id]['location'];
 	$pconfig['patch'] = $a_patches[$id]['patch'];
-	$pconfig['patchlevel'] = $a_patches[$id]['patchlevel'];
+	$pconfig['pathstrip'] = $a_patches[$id]['pathstrip'];
 	$pconfig['ignorewhitespace'] = isset($a_patches[$id]['ignorewhitespace']);
 	$pconfig['autoapply'] = isset($a_patches[$id]['autoapply']);
 	$pconfig['uniqid'] = $a_patches[$id]['uniqid'];
@@ -86,8 +86,8 @@ if ($_POST) {
 	if (!empty($_POST['location']) && !is_commit_id($_POST['location']) && !is_URL($_POST['location'])) {
 		$input_errors[] = gettext("The supplied commit ID/URL appears to be invalid.");
 	}
-	if (!is_numeric($_POST['patchlevel'])) {
-		$input_errors[] = gettext("Patch level must be numeric!");
+	if (!is_numeric($_POST['pathstrip'])) {
+		$input_errors[] = gettext("Path Strip Count must be numeric!");
 	}
 
 	if (!$input_errors) {
@@ -98,10 +98,10 @@ if ($_POST) {
 		if (!empty($_POST['patch'])) {
 			$thispatch['patch'] = base64_encode($_POST['patch']);
 		}
-		if (is_github_url($thispatch['location']) && ($_POST['patchlevel'] == 0))
-			$thispatch['patchlevel'] = 1;
+		if (is_github_url($thispatch['location']) && ($_POST['pathstrip'] == 0))
+			$thispatch['pathstrip'] = 1;
 		else
-			$thispatch['patchlevel'] = $_POST['patchlevel'];
+			$thispatch['pathstrip'] = $_POST['pathstrip'];
 		$thispatch['ignorewhitespace'] = isset($_POST['ignorewhitespace']);
 		$thispatch['autoapply'] = isset($_POST['autoapply']);
 		if (empty($_POST['uniqid'])) {
@@ -163,11 +163,11 @@ include("fbegin.inc"); ?>
 		<br> <span class="vexpl"><?=gettext("The contents of the patch. You can paste a patch here, or enter a URL/commit ID above, it can then be fetched into here automatically."); ?></span></td>
 </tr>
 <tr>
-	<td width="22%" valign="top" class="vncell"><?=gettext("Patch Level:"); ?></td>
+	<td width="22%" valign="top" class="vncell"><?=gettext("Path Strip Count:"); ?></td>
 	<td width="78%" class="vtable">
-		<select name="patchlevel" class="formselect" id="patchlevel">
+		<select name="pathstrip" class="formselect" id="pathstrip">
 <?php		for ($i = 0; $i < 20; $i++): ?>
-			<option value="<?=$i;?>" <?php if ($i == $pconfig['patchlevel']) echo "selected"; ?>><?=$i;?></option>
+			<option value="<?=$i;?>" <?php if ($i == $pconfig['pathstrip']) echo "selected"; ?>><?=$i;?></option>
 <?php 		endfor; ?>
 		</select>
 	</td>

@@ -41,9 +41,9 @@ function patch_commit($patch, $action, $test=false) {
 	$force = ($action == "revert") ? "-f" : "-t";
 	$direction = ($action == "revert") ? "--reverse" : "--forward";
 	$whitespace = $patch['ignorewhitespace'] ? "--ignore-whitespace" : "";
-	$patchlevel = '-p' . $patch['patchlevel'];
+	$pathstrip = '-p' . $patch['pathstrip'];
 	patch_write($patch);
-	$status = mwexec("{$patch_cmd} {$force} {$patchlevel} {$filename} {$check} {$direction} {$whitespace}", false);
+	$status = mwexec("{$patch_cmd} {$force} {$pathstrip} {$filename} {$check} {$direction} {$whitespace}", false);
 	patch_erase($patch);
 	if ($status == 0)
 		return true;
