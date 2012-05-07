@@ -100,7 +100,8 @@ if ($_POST) {
 		$thispatch['descr'] = $_POST['descr'];
 		$thispatch['location'] = patch_fixup_url($_POST['location']);
 		if (!empty($_POST['patch'])) {
-			$thispatch['patch'] = base64_encode($_POST['patch']);
+			/* Strip DOS style carriage returns from textarea input */
+			$thispatch['patch'] = base64_encode(str_replace("\r", "", $_POST['patch']));
 		}
 		if (is_github_url($thispatch['location']) && ($_POST['pathstrip'] == 0))
 			$thispatch['pathstrip'] = 1;
