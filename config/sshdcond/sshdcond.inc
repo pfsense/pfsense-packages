@@ -146,38 +146,33 @@ function sshdcond_custom_php_write_config(){
 function sshdcond_sync_on_changes() {
 	global $config, $g;
 	
+	if (is_array($config['installedpackages']['sshdcondsync']))
+		if (!$config['installedpackages']['sshdcondsync']['config'][0]['synconchanges'])	
+			return;
+
 	log_error("[sshdcond] xmlrpc sync is starting.");
-	$synconchanges = $config['installedpackages']['sshdcondsync']['config'][0]['synconchanges'];	
-	if(!$synconchanges) 
-		return;
 	foreach ($config['installedpackages']['sshdcondsync']['config'] as $rs ){
 		foreach($rs['row'] as $sh){
 			$sync_to_ip = $sh['ipaddress'];
 			$password = $sh['password'];
-			if($sh['username'])
-				$username = $sh['username'];
-			else
-				$username = 'admin';
 			if($password && $sync_to_ip)
-				sshdcond_do_xmlrpc_sync($sync_to_ip, $username, $password);
+				sshdcond_do_xmlrpc_sync($sync_to_ip, $password);
 			}
 	}
 	log_error("[sshdcond] xmlrpc sync is ending.");
 }
 
 /* Do the actual XMLRPC sync */
-function sshdcond_do_xmlrpc_sync($sync_to_ip, $username, $password) {
+function sshdcond_do_xmlrpc_sync($sync_to_ip, $password) {
 	global $config, $g;
 
-	if(!$username)
-		return;
-		
 	if(!$password)
 		return;
 
 	if(!$sync_to_ip)
 		return;
 
+	$username='admin';
 	$xmlrpc_sync_neighbor = $sync_to_ip;
     if($config['system']['webgui']['protocol'] != "") {
 		$synchronizetoip = $config['system']['webgui']['protocol'];
@@ -230,7 +225,7 @@ function sshdcond_do_xmlrpc_sync($sync_to_ip, $username, $password) {
 	/* tell sshdcond to reload our settings on the destionation sync host. */
 	$method = 'pfsense.exec_php';
 	$execcmd  = "require_once('/usr/local/pkg/sshdcond.inc');\n";
-	$execcmd .= "sync_package_sshdcond();";
+	$execcmd .= "sshdcond_custom_php_write_config();";
 	/* assemble xmlrpc payload */
 	$params = array(
 		XML_RPC_encode($password),
