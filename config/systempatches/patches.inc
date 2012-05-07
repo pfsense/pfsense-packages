@@ -32,10 +32,11 @@ require_once("util.inc");
 $git_root_url = "http://github.com/bsdperimeter/pfsense/commit/";
 $patch_suffix = ".patch";
 $patch_dir = "/var/patches";
-$patch_cmd = "/usr/bin/patch --directory=/ ";
+$patch_cmd = "/usr/bin/patch";
 
-function patch_commit($patch, $action, $test=false) {
+function patch_commit($patch, $action, $test=false, $fulldetail=false) {
 	global $patch_dir, $patch_cmd, $patch_suffix;
+	$directory = empty($patch['basedir']) ? "/" : $patch['basedir'];
 	$filename = '-i ' . $patch_dir . '/' . $patch['uniqid'] . $patch_suffix;
 	$check = ($test) ? "--check" : "";
 	$force = ($action == "revert") ? "-f" : "-t";
@@ -43,8 +44,8 @@ function patch_commit($patch, $action, $test=false) {
 	$whitespace = $patch['ignorewhitespace'] ? "--ignore-whitespace" : "";
 	$pathstrip = '-p' . $patch['pathstrip'];
 	patch_write($patch);
-	$status = mwexec("{$patch_cmd} {$force} {$pathstrip} {$filename} {$check} {$direction} {$whitespace}", false);
-	patch_erase($patch);
+	$status = mwexec("{$patch_cmd} --directory={$directory} {$force} {$pathstrip} {$filename} {$check} {$direction} {$whitespace}", true);
+	//patch_erase($patch);
 	if ($status == 0)
 		return true;
 	else

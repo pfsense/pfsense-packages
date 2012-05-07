@@ -59,6 +59,7 @@ if (isset($id) && $a_patches[$id]) {
 	$pconfig['location'] = $a_patches[$id]['location'];
 	$pconfig['patch'] = $a_patches[$id]['patch'];
 	$pconfig['pathstrip'] = $a_patches[$id]['pathstrip'];
+	$pconfig['basedir'] = $a_patches[$id]['basedir'];
 	$pconfig['ignorewhitespace'] = isset($a_patches[$id]['ignorewhitespace']);
 	$pconfig['autoapply'] = isset($a_patches[$id]['autoapply']);
 	$pconfig['uniqid'] = $a_patches[$id]['uniqid'];
@@ -89,6 +90,9 @@ if ($_POST) {
 	if (!is_numeric($_POST['pathstrip'])) {
 		$input_errors[] = gettext("Path Strip Count must be numeric!");
 	}
+	if (!empty($_POST['basedir']) && (!file_exists($_POST['basedir']) || !is_dir($_POST['basedir']))) {
+		$input_errors[] = gettext("Base Directory must exist and be a directory!");
+	}
 
 	if (!$input_errors) {
 		$thispatch = array();
@@ -102,6 +106,7 @@ if ($_POST) {
 			$thispatch['pathstrip'] = 1;
 		else
 			$thispatch['pathstrip'] = $_POST['pathstrip'];
+		$thispatch['basedir'] = empty($_POST['basedir']) ? "/" : $_POST['basedir'];
 		$thispatch['ignorewhitespace'] = isset($_POST['ignorewhitespace']);
 		$thispatch['autoapply'] = isset($_POST['autoapply']);
 		if (empty($_POST['uniqid'])) {
@@ -171,6 +176,12 @@ include("fbegin.inc"); ?>
 <?php 		endfor; ?>
 		</select>
 	</td>
+</tr>
+<tr>
+	<td width="22%" valign="top" class="vncell"><?=gettext("Base Directory"); ?></td>
+	<td width="78%" class="vtable">
+		<input name="basedir" type="text" class="formfld unknown" id="basedir" size="40" value="<?=htmlspecialchars($pconfig['basedir']);?>">
+		<br> <span class="vexpl"><?=gettext("Enter the base directory for the patch, default is /. Patches from github are all based in /. Custom patches may need a full path here such as /usr/local/www/"); ?></span></td>
 </tr>
 <tr>
 	<td width="22%" valign="top" class="vncell"><?=gettext("Ignore Whitespace"); ?></td>
