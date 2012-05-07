@@ -2,7 +2,7 @@
 /* $Id$ */
 /* ========================================================================== */
 /*
-    squid_monitor_data.php
+    squid_monitor.php
     part of pfSense (http://www.pfSense.com)
     Copyright (C) 2012 ccesario @ pfsense forum
     All rights reserved.
@@ -31,7 +31,17 @@
     POSSIBILITY OF SUCH DAMAGE.
                                                                               */
 /* ========================================================================== */
+
+# ------------------------------------------------------------------------------
+# Defines 
+# ------------------------------------------------------------------------------
+require_once("guiconfig.inc");
+
+# ------------------------------------------------------------------------------
+# Requests
+# ------------------------------------------------------------------------------
 if ($_POST) {
+	# Actions
     switch (strtolower($_POST['program'])) {
        case 'squid':
             showSquid();            
@@ -42,93 +52,136 @@ if ($_POST) {
     }
 }
 
+# ------------------------------------------------------------------------------
+# Functions
+# ------------------------------------------------------------------------------
+
+// From SquidGuard Package
+function html_autowrap($cont)
+{
+	# split strings
+	$p     = 0;
+	$pstep = 25;
+	$str   = $cont;
+	$cont = '';
+	for ( $p = 0; $p < strlen($str); $p += $pstep ) {
+		$s = substr( $str, $p, $pstep );
+		if ( !$s ) break;
+			$cont .= $s . "<wbr/>";
+	}
+	return $cont;
+}
 
 
 // Show Squid Logs
 function showSquid() {
-    echo "<tr>";
-    echo "<td class=\"listhdrr\">Date</td>";
-    echo "<td class=\"listhdrr\">IP</td>";
-    echo "<td class=\"listhdrr\">Status</td>";
-    echo "<td class=\"listhdrr\">Address</td>";
-    echo "<td class=\"listhdrr\">User</td>";
-    echo "<td class=\"listhdrr\">Destination</td>";
-    echo "</tr>";
-    
+    // Define log file
+    $squid_log='/var/squid/logs/access.log';
+
+	echo "<tr valign=\"top\">\n";    
+	echo "<td class=\"listhdrr\">".gettext("Date")."</td>\n";
+	echo "<td class=\"listhdrr\">".gettext("IP")."</td>\n";
+	echo "<td class=\"listhdrr\">".gettext("Status")."</td>\n";
+	echo "<td class=\"listhdrr\">".gettext("Address")."</td>\n";
+	echo "<td class=\"listhdrr\">".gettext("User")."</td>\n";
+	echo "<td class=\"listhdrr\">".gettext("Destination")."</td>\n";
+	echo "</tr>\n";
+
     // Get Data from form post
     $lines = $_POST['maxlines'];
     $filter = $_POST['strfilter'];
 
-    if ($filter != "") {
-        $exprfilter = "| grep -i $filter";
-    } else {
-        $exprfilter = "";
+
+    // Get logs based in filter expression 
+    if($filter != "") {
+        exec("tail -r -n $lines $squid_log | php -q parser_squid_log.php | grep -i ". escapeshellarg(htmlspecialchars($filter)), $logarr); 
+    }
+    else {
+        exec("tail -r -n $lines $squid_log | php -q parser_squid_log.php", $logarr);
     }
 
-    // TODO FIX:
-    // Remove the hard link (maybe, get from config)
-    //
-    exec("tail -r -n $lines /var/squid/logs/access.log $exprfilter",$logarr);
-
+    // Print lines
     foreach ($logarr as $logent) { 
-        $logline  = preg_split("/\s+/", $logent);
+        // Split line by space delimiter
+		$logline  = preg_split("/\s+/", $logent);
 
-        if ($filter != "")
-            $logline = preg_replace("/$filter/","<spam style='color:red'>$filter</spam>",$logline);
+        // Apply date format to first line
+        //$logline[0] = date("d.m.Y H:i:s",$logline[0]);
 
-        echo "<tr>\n";
-        echo "<td class=\"listr\">".date("d/m/y H:i:s",$logline[0])."</td>\n";
-        echo "<td class=\"listr\">".$logline[2]."</td>\n";
-        echo "<td class=\"listr\">".$logline[3]."</td>\n";
-        echo "<td class=\"listr\" nowrap>".$logline[6]."</td>\n";
-        echo "<td class=\"listr\">".$logline[7]."</td>\n";
-        echo "<td class=\"listr\">".$logline[8]."</td>\n";
-        echo "</tr>\n";
+        // Word wrap the URL 
+        $logline[7] = htmlentities($logline[7]);
+        $logline[7] = html_autowrap($logline[7]);
+
+        // Remove /(slash) in destination row
+		$logline_dest =  preg_split("/\//", $logline[9]);
+
+        // Apply filter and color
+		// Need validate special chars
+		if ($filter != "")
+            $logline = preg_replace("/$filter/i","<spam><font color='red'>$filter</font></span>",$logline);
+
+
+		echo "<tr valign=\"top\">\n";
+		echo "<td class=\"listlr\" nowrap>{$logline[0]} {$logline[1]}</td>\n";
+		echo "<td class=\"listr\">{$logline[3]}</td>\n";
+		echo "<td class=\"listr\">{$logline[4]}</td>\n";
+        echo "<td class=\"listr\" width=\"*\">{$logline[7]}</td>\n";
+		echo "<td class=\"listr\">{$logline[8]}</td>\n";
+		echo "<td class=\"listr\">{$logline_dest[1]}</td>\n";
+		echo "</tr>\n";
     }
 }
 
 // Show SquidGuard Logs
 function showSGuard() {
+    // Define log file
+    $sguard_log='/var/squidGuard/log/block.log';
 
-
-	echo "<tr>";
-	echo "<td class=\"listhdrr\">Date</td>";
-	echo "<td class=\"listhdrr\">Hour</td>";
-	echo "<td class=\"listhdrr\">ACL</td>";
-	echo "<td class=\"listhdrr\">Address</td>";
-	echo "<td class=\"listhdrr\">Host</td>";
-	echo "<td class=\"listhdrr\">User</td>";
-	echo "</tr>";
-
+	echo "<tr valign=\"top\">\n";
+	echo "<td class=\"listhdrr\">".gettext("Date-Time")."</td>\n";
+	echo "<td class=\"listhdrr\">".gettext("ACL")."</td>\n";
+	echo "<td class=\"listhdrr\">".gettext("Address")."</td>\n";
+	echo "<td class=\"listhdrr\">".gettext("Host")."</td>\n";
+	echo "<td class=\"listhdrr\">".gettext("User")."</td>\n";
+	echo "</tr>\n";
 
     // Get Data from form post
     $lines = $_POST['maxlines'];
     $filter = $_POST['strfilter'];
 
-    if ($filter != "") {
-        $exprfilter = "| grep -i $filter";
-    } else {
-        $exprfilter = "";
+    // Get logs based in filter expression
+    if($filter != "") {
+        exec("tail -r -n $lines $sguard_log | grep -i ". escapeshellarg(htmlspecialchars($filter)), $logarr);
+    }
+    else {
+        exec("tail -r -n $lines $sguard_log", $logarr);
     }
 
-    // TODO FIX:
-    // Remove the hard link (maybe, get from config)
-    //
-    exec("tail -r -n $lines /var/squidGuard/log/block.log $exprfilter",$logarr);
 
+    // Print lines
     foreach ($logarr as $logent) { 
-        $logline  = preg_split("/\s+/", $logent);
+        // Split line by space delimiter
+	    $logline  = preg_split("/\s+/", $logent);
 
+        // Apply time format
+        $logline[0] = date("d.m.Y", strtotime($logline[0]));   
+
+    	// Word wrap the URL 
+        $logline[4] = htmlentities($logline[4]);
+        $logline[4] = html_autowrap($logline[4]);
+
+
+        // Apply filter color
+		// Need validate special chars
         if ($filter != "")
-            $logline = preg_replace("/$filter/","<spam style='color:red'>$filter</spam>",$logline);
+            $logline = preg_replace("/$filter/","<spam><font color='red'>$filter</font></span>",$logline);
 
         echo "<tr>\n";
-        echo "<td class=\"listr\">".$logline[0]."</td>\n";
-        echo "<td class=\"listr\">".$logline[1]."</td>\n";
-        echo "<td class=\"listr\">".$logline[3]."</td>\n";
-        echo "<td class=\"listr\">".$logline[4]."</td>\n";
-        echo "<td class=\"listr\">".$logline[5]."</td>\n";
-        echo "<td class=\"listr\">".$logline[6]."</td>\n";
+        echo "<td class=\"listlr\" nowrap>{$logline[0]} {$logline[1]}</td>\n";
+        echo "<td class=\"listr\">{$logline[3]}</td>\n";
+		echo "<td class=\"listr\" width=\"*\">{$logline[4]}</td>\n";
+        echo "<td class=\"listr\">{$logline[5]}</td>\n";
+        echo "<td class=\"listr\">{$logline[6]}</td>\n";
         echo "</tr>\n";
     }
 }

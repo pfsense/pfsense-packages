@@ -32,131 +32,127 @@
                                                                               */
 /* ========================================================================== */
 
-
 require_once("/etc/inc/util.inc");
 require_once("/etc/inc/functions.inc");
 require_once("/etc/inc/pkg-utils.inc");
 require_once("/etc/inc/globals.inc");
-
 require_once("guiconfig.inc");
-
-
 
 $pfSversion = str_replace("\n", "", file_get_contents("/etc/version"));
 if(strstr($pfSversion, "1.2"))
-	$one_two = true;
+        $one_two = true;
 
 $pgtitle = "Status: Proxy Monitor";
 include("head.inc");
 ?>
 
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">
+
 <?php include("fbegin.inc"); ?>
 
 <?php if($one_two): ?>
-<p class="pgtitle"><?=$pgtitle?></font></p>
+
+	<p class="pgtitle"><?=$pgtitle?></font></p>
+
 <?php endif; ?>
 
 <?php if ($savemsg) print_info_box($savemsg); ?>
 
-<!-- Function to call squid logs -->
+<!-- Function to call programs logs -->
 <script language="JavaScript">
-    function ShowLog(content,url,program)
+	function showLog(content,url,program)
     {
-        var v_maxlines  = $('maxlines').getValue();
-        var v_strfilter = $('strfilter').getValue();
-        var pars = 'maxlines='+escape(v_maxlines) + '&strfilter=' + escape(v_strfilter) + '&program=' + escape(program);
-    	new Ajax.Updater(content,url, {
-	    				method: 'post',
-                        parameters: pars,
-			    		onSuccess: function() {
-				    	    window.setTimeout( ShowLog(content,url,program), 100 );
-                        }
-        });
-    }
-
-
+		new PeriodicalExecuter(function(pe) {
+			new Ajax.Updater(content, url, { 
+									method: 'post', 
+									asynchronous: true, 
+									evalScripts: true, 
+									parameters: { 	maxlines: $('maxlines').getValue(), 
+			   										strfilter: $('strfilter').getValue(), 
+													program: program } 
+			}) 
+		}, 1)
+	}
 </script>
 
 
-<table width="100%" border="0" cellpadding="0" cellspacing="0">
-	<tr>
-		<td id="mainarea">
-			<div class="tabcont">
-				<div id="param">
-					<form id="paramsForm" name="paramsForm" method="post">
-						<table width="100%" border="0" cellpadding=5" cellspacing="0">
-							<tr>
-								<td width="15%" valign="top" class="vncell"><?php echo "Max lines:"; ?></td>
-								<td width="85%" class="vtable">
-                                    <select name="maxlines" id="maxlines">
-                                        <option value="5">5 lines</option>
-                                        <option value="10" selected="selected">10 lines</option>
-                                        <option value="15">15 lines</option>
-                                        <option value="20">20 lines</option>
-                                        <option value="25">25 lines</option>
-                                        <option value="30">30 lines</option>
-                                    </select>
-                                    <br/>
-									<span class="vexpl">
-									   <?php echo "Max. lines to be displayed."; ?>
-									</span>
-								</td>
-							</tr>
-							<tr>
-								<td width="15%" valign="top" class="vncell"><?php echo "String filter:"; ?></td>
-								<td width="85%" class="vtable">
-									<input name="strfilter" type="text" class="formfld unknown" id="strfilter" size="50" value="">
-									<br/>
-									<span class="vexpl">
-									   <?php echo "Enter the string filter: eg. username or ip addr or url."; ?>
-									</span>
-								</td>
-							</tr>
-						</table>
-					</form>
-				</div>
+<div id="mainarea" style="padding-top: 0px; padding-bottom: 0px; ">
+	<form id="paramsForm" name="paramsForm" method="post">
+		<table class="tabcont" width="100%" border="0" cellspacing="0" cellpadding="6">
+			<tbody>
+				<tr>
+					<td width="22%" valign="top" class="vncellreq">Max lines:</td>
+					<td width="78%" class="vtable">
+						<select name="maxlines" id="maxlines">
+							<option value="5">5 lines</option>
+							<option value="10" selected="selected">10 lines</option>
+							<option value="15">15 lines</option>
+							<option value="20">20 lines</option>
+							<option value="25">25 lines</option>
+							<option value="30">30 lines</option>
+						</select>
+						<br/>
+						<span class="vexpl">
+						   Max. lines to be displayed.
+						</span>
+					</td>
+				</tr>
+				<tr>
+					<td width="22%" valign="top" class="vncellreq">String filter:</td>
+					<td width="78%" class="vtable">
+						<input name="strfilter" type="text" class="formfld search" id="strfilter" size="50" value="">
+						<br/>
+						<span class="vexpl">
+						   Enter the string filter: eg. username or ip addr or url.	
+						</span>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+	</form>
 
-				<form>
-					<table width="100%" border="0" cellpadding="0" cellspacing="0">
+	<!-- Squid Table --> 
+	<table width="100%" border="0" cellpadding="0" cellspacing="0">
+		<tbody>
+			<tr>
+				<td>
+					<table class="tabcont" width="100%" border="0" cellspacing="0" cellpadding="0">
 						<tr>
-							<td colspan="2" valign="top" class="listtopic">
-								<center>
-									Squid Proxy
-								</center>
-							</td>
+							<td colspan="6" class="listtopic"><center><?=gettext("Squid Logs"); ?><center></td>
 						</tr>
-						<tr>
-							<td>
-								<table iD="squidView" width="100%" border="0" cellpadding="0" cellspacing="0">
-									<script language="JavaScript">
-                                        ShowLog('squidView', 'squid_monitor_data.php','squid');
-									</script>
-								</table>
-							</td>
-						</tr>
-						<tr>
-							<td colspan="2" valign="top" class="listtopic">
-								<center>
-									SquidGuard
-								</center>
-							</td>
-						</tr>
-						<tr>
-							<td>
-								<table id="sguardView" width="100%" border="0" cellpadding="5" cellspacing="0">
-									<script language="JavaScript">
-										ShowLog('sguardView', 'squid_monitor_data.php','sguard');
-									</script>
-								</table>
-							</td>
-						</tr>
+						<tbody id="squidView">
+							<script language="JavaScript">
+								// Call function to show squid log
+								showLog('squidView', 'squid_monitor_data.php','squid');
+							</script>
+						</tbody>
 					</table>
-				</form>
-			</div>
-		</td>
-	</tr>
-</table>
+				</td>
+			</tr>
+		</tbody>
+	</table>
+
+	<!-- SquidGuard Table --> 
+	<table width="100%" border="0" cellpadding="0" cellspacing="0">
+		<tbody>
+			<tr>
+				<td>
+					<table class="tabcont" width="100%" border="0" cellspacing="0" cellpadding="0">
+						<tr>
+							<td colspan="5" class="listtopic"><center><?=gettext("SquidGuard Logs"); ?><center></td>
+						</tr>
+						<tbody id="sguardView">
+							<script language="JavaScript">
+								// Call function to show squidGuard log
+								showLog('sguardView', 'squid_monitor_data.php','sguard');
+							</script>
+						</tbody>
+					</table>
+				</td>
+			</tr>
+		</tbody>
+	</table>
+</div>
 
 <?php
 include("fend.inc");
@@ -164,4 +160,3 @@ include("fend.inc");
 
 </body>
 </html>
-

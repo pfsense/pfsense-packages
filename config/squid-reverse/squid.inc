@@ -1826,7 +1826,7 @@ function squid_do_xmlrpc_sync($sync_to_ip, $username, $password) {
 	/* tell squid to reload our settings on the destionation sync host. */
 	$method = 'pfsense.exec_php';
 	$execcmd  = "require_once('/usr/local/pkg/squid.inc');\n";
-	$execcmd .= "sync_package_squid();";
+	$execcmd .= "squid_resync();";
 	/* assemble xmlrpc payload */
 	$params = array(
 		XML_RPC_encode($password),
