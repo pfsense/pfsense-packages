@@ -118,13 +118,14 @@
 			<fielddescr>Sender</fielddescr>
 			<fieldname>sender_access</fieldname>
 			<description><![CDATA[<strong>HASH filters</strong> that implements whitelisting and blacklisting of full or partial email addresses and domains as specified in the MAIL FROM field :<br>
-									myfriend@example.com    OK<br>
+									myfriend@example.com    DUNNO<br>
 									junk@spam.com           REJECT<br>
 									marketing@              REJECT<br>
-									theboss@                OK<br>
+									theboss@                DUNNO<br>
 									deals.marketing.com     REJECT<br>
-									somedomain.com          OK<br>
-								See http://www.postfix.org/postconf.5.html#smtpd_sender_restrictions for more help]]>
+									somedomain.com          DUNNO<br><br>
+								See http://www.postfix.org/postconf.5.html#smtpd_sender_restrictions for more help<br>
+								<strong>Note: a result of "OK" in this field is not allowed/wanted for safety reasons(it may accept forged senders as it will not do other spam checks). Instead, use DUNNO in order to exclude specific hosts from blacklists.</strong>]]>
 			</description>
 			<type>textarea</type>
 			<cols>83</cols>

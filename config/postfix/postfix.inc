@@ -471,16 +471,16 @@ smtpd_client_restrictions = check_client_access pcre:/usr/local/etc/postfix/cal_
 				permit							
 
 smtpd_recipient_restrictions = permit_mynetworks,
-				check_client_access pcre:/usr/local/etc/postfix/cal_pcre,
-				check_client_access cidr:/usr/local/etc/postfix/cal_cidr,
-				reject_invalid_helo_hostname,
-				reject_unknown_recipient_domain,
-				reject_non_fqdn_helo_hostname,
-				reject_non_fqdn_recipient,
 				reject_unauth_destination,
 				reject_unauth_pipelining,
-				reject_multi_recipient_bounce,
+				check_client_access pcre:/usr/local/etc/postfix/cal_pcre,
+				check_client_access cidr:/usr/local/etc/postfix/cal_cidr,
 				check_sender_access hash:/usr/local/etc/postfix/sender_access,
+				reject_invalid_helo_hostname,
+				reject_non_fqdn_helo_hostname,
+				reject_unknown_recipient_domain,
+				reject_non_fqdn_recipient,
+				reject_multi_recipient_bounce,
 				SPFSPFSPFRBLRBLRBL
 
 EOF;
@@ -500,14 +500,19 @@ smtpd_sender_restrictions = reject_unknown_sender_domain,
 				RBLRBLRBL							
 
 # Allow connections from specified local clients and rbl check everybody else if rbl check are set.
-smtpd_client_restrictions = check_client_access pcre:/usr/local/etc/postfix/cal_pcre,
-				check_client_access cidr:/usr/local/etc/postfix/cal_cidr,
+smtpd_client_restrictions = reject_unauth_destination,
+				check_sender_access hash:/usr/local/etc/postfix/sender_access,
+				check_client_access pcre:/usr/local/etc/postfix/cal_pcre,
+				check_client_access cidr:/usr/local/etc/postfix/cal_cidr
 				RBLRBLRBL
 
 # Whitelisting: local clients may specify any destination domain.
 #,
 smtpd_recipient_restrictions = permit_mynetworks, 
 				reject_unauth_destination,
+				check_sender_access hash:/usr/local/etc/postfix/sender_access,
+				check_client_access pcre:/usr/local/etc/postfix/cal_pcre,
+				check_client_access cidr:/usr/local/etc/postfix/cal_cidr,
 				SPFSPFSPFRBLRBLRBL
 
 EOF;
