@@ -71,8 +71,17 @@ if (($_GET['act'] == "fetch") && ($a_patches[$_GET['id']])) {
 }
 if (($_GET['act'] == "test") && ($a_patches[$_GET['id']])) {
 	$savemsg = patch_test_apply($a_patches[$_GET['id']]) ? gettext("Patch can be applied cleanly") : gettext("Patch can NOT be applied cleanly");
+	$savemsg .= " (<a href=\"system_patches.php?id={$_GET['id']}&fulltest=apply\">" . gettext("detail") . "</a>)";
 	$savemsg .= empty($savemsg) ? "" : "<br/>";
 	$savemsg .= patch_test_revert($a_patches[$_GET['id']]) ? gettext("Patch can be reverted cleanly") : gettext("Patch can NOT be reverted cleanly");
+	$savemsg .= " (<a href=\"system_patches.php?id={$_GET['id']}&fulltest=revert\">" . gettext("detail") . "</a>)";
+}
+if (($_GET['fulltest']) && ($a_patches[$_GET['id']])) {
+	if ($_GET['fulltest'] == "apply") {
+		$fulldetail = patch_test_apply($a_patches[$_GET['id']], true);
+	} elseif ($_GET['fulltest'] == "revert") {
+		$fulldetail = patch_test_revert($a_patches[$_GET['id']], true);
+	}
 }
 if (($_GET['act'] == "apply") && ($a_patches[$_GET['id']])) {
 	$savemsg = patch_apply($a_patches[$_GET['id']]) ? gettext("Patch applied successfully") : gettext("Patch could NOT be applied!");
@@ -158,6 +167,12 @@ echo "<script type=\"text/javascript\" language=\"javascript\" src=\"/javascript
 <br/><br/>
 <strong><?php echo gettext("Use with caution!"); ?></strong>
 <br/><br/>
+<?php if (!empty($fulldetail)): ?>
+</td></tr>
+<tr><td></td><td colspan="7" align="left">Output of full patch <?php echo $_GET['fulltest']; ?> test:
+<pre><?php echo $fulldetail; ?></pre>
+<a href="system_patches.php">Close</a><br/><br/>
+<?php endif; ?>
 </td></tr>
 <tr id="frheader">
 <td width="5%" class="list">&nbsp;</td>
