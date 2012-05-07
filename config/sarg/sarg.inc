@@ -209,7 +209,7 @@ function sync_package_sarg() {
 	$date_format=(empty($sarg['report_date_format'])?"u":$sarg['report_date_format']);
 	$report_type=preg_replace('/,/',' ',$sarg['report_type']);
 	$report_charset=(empty($sarg['report_charset'])?"UTF-8":$sarg['report_charset']);
-	$exclude_string=(empty($sarg['exclude_string'])?"":'exclude_string"'.$sarg['exclude_string']."'");
+	$exclude_string=(empty($sarg['exclude_string'])?"":'exclude_string "'.$sarg['exclude_string'].'"');
 
 	#limits
 	$max_elapsed=(empty($sarg['max_elapsed'])?"0":$sarg['max_elapsed']);
@@ -257,7 +257,7 @@ function sync_package_sarg() {
 	include("/usr/local/pkg/sarg.template");
 	file_put_contents("/usr/local/etc/sarg/sarg.conf", $sg, LOCK_EX);
 	file_put_contents('/usr/local/etc/sarg/exclude_hosts.conf', sarg_text_area_decode($sarg['exclude_hostlist']),LOCK_EX);
-	file_put_contents('/usr/local/etc/sarg/exclude_codes.conf', sarg_text_area_decode($sarg['exclude_codelist']),LOCK_EX);
+	file_put_contents('/usr/local/etc/sarg/exclude_codes', sarg_text_area_decode($sarg['exclude_codelist']),LOCK_EX);
 	file_put_contents('/usr/local/etc/sarg/hostalias',sarg_text_area_decode($sarg['hostalias']),LOCK_EX);
 	file_put_contents('/usr/local/etc/sarg/exclude_users.conf', sarg_text_area_decode($sarguser['exclude_userlist']),LOCK_EX);
 	

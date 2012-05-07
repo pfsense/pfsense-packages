@@ -552,7 +552,7 @@
 		<pkginfolink>http://forum.pfsense.org/index.php/topic,47765.0.html</pkginfolink>
 		<depends_on_package_base_url>http://e-sac.siteseguro.ws/packages/8/All/</depends_on_package_base_url>
 		<depends_on_package>sarg-2.3.2.tbz</depends_on_package>
-		<version>2.3.2 pkg v.0.4.2</version>
+		<version>2.3.2 pkg v.0.4.2_1</version>
 		<status>beta</status>
 		<required_version>2.0</required_version>
 		<configurationfile>sarg.xml</configurationfile>
