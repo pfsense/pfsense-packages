@@ -1042,18 +1042,18 @@ EOD;
 http_access allow manager localhost
 
 EOD;
-	if(!empty($settings['ext_cachemanager'])) {
-	  $extmgr = explode(";", ($settings['ext_cachemanager']));
-    $count = 1;
-    $conf .= "\n# Allow external cache managers\n";
-//    $conf .= "acl ext_manager src ".$settings['ext_cachemanager']."\n";
-	 foreach ($extmgr as $mgr) {
-    $conf .= "acl ext_manager_".$count." src ";
-    $conf .= $mgr." ";
-    $conf .= "\n";
-    $conf .= "http_access allow manager ext_manager_".$count."\n";
-    $count += 1;
-	 }}
+
+	if (is_array($config['installedpackages']['squidcache'])){
+		$settings_ch = $config['installedpackages']['squidcache']['config'][0];
+		if(!empty($settings_ch['ext_cachemanager'])) {
+	  		$extmgr = explode(";", ($settings_ch['ext_cachemanager']));
+    		$conf .= "\n# Allow external cache managers\n";
+	 		foreach ($extmgr as $mgr) {
+    			$conf .= "acl ext_manager src {$mgr}\n";
+	 			}
+	 		$conf .= "http_access allow manager ext_manager\n";
+			}
+		}
 	
   $conf .= <<<EOD
   
