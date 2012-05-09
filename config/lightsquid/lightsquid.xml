@@ -47,7 +47,7 @@
 	<faq>Currently there are no FAQ items provided.</faq>
 	<name>lightsquid</name>
 	<version>1.7.1</version>
-	<title>Services: Proxy server Report(LightSquid) -> Settings</title>
+	<title>Services: Proxy Reports (LightSquid, SQStat) -> Settings</title>
 	<category>Status</category>
 	<include_file>/usr/local/pkg/lightsquid.inc</include_file>
 	<menu>
@@ -66,6 +66,10 @@
                         <text>Lightsquid Report</text>
                         <url>/lightsquid/index.cgi</url>
                 </tab>
+                <tab>
+                        <text>Proxy State</text>
+                        <url>/sqstat/sqstat.php</url>
+                </tab>
         </tabs>
         <additional_files_needed>
                <prefix>/usr/local/pkg/</prefix>
@@ -76,6 +80,26 @@
                <prefix>/var/tmp/</prefix>
                <chmod>0755</chmod>
                <item>http://files.pfsense.org/packages/All/lightsquid_tpl.tbz</item>
+        </additional_files_needed>
+        <additional_files_needed>
+               <prefix>/usr/local/www/sqstat/</prefix>
+               <chmod>0644</chmod>
+               <item>http://www.pfsense.org/packages/config/lightsquid/sqstat.class.php</item>
+        </additional_files_needed>
+        <additional_files_needed>
+               <prefix>/usr/local/www/sqstat/</prefix>
+               <chmod>0644</chmod>
+               <item>http://www.pfsense.org/packages/config/lightsquid/sqstat.php</item>
+        </additional_files_needed>
+        <additional_files_needed>
+               <prefix>/usr/local/www/sqstat/</prefix>
+               <chmod>0644</chmod>
+               <item>http://www.pfsense.org/packages/config/lightsquid/sqstat.css</item>
+        </additional_files_needed>
+        <additional_files_needed>
+               <prefix>/usr/local/www/sqstat/</prefix>
+               <chmod>0644</chmod>
+               <item>http://www.pfsense.org/packages/config/lightsquid/zhabascript.js</item>
         </additional_files_needed>
         <fields>
                 <field>
