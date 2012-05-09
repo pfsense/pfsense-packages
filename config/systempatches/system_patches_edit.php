@@ -75,8 +75,8 @@ if ($_POST) {
 
 	/* input validation */
 	if(empty($_POST['location'])) {
-		$reqdfields = explode(" ", " patch");
-		$reqdfieldsn = array(gettext("Description"),gettext("Patch Contents"));
+		$reqdfields = explode(" ", "patch");
+		$reqdfieldsn = array(gettext("Patch Contents"));
 	} else {
 		$reqdfields = explode(" ", "descr location");
 		$reqdfieldsn = array(gettext("Description"),gettext("URL/Commit ID"));

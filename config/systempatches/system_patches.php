@@ -221,7 +221,7 @@ foreach ($a_patches as $thispatch):
 	<td class="listr" onClick="fr_toggle(<?=$npatches;?>)" id="frd<?=$npatches;?>" ondblclick="document.location='system_patches_edit.php?id=<?=$npatches;?>';">
 	<?php if (empty($thispatch['patch'])): ?>
 		<a href="system_patches.php?id=<?=$i;?>&act=fetch"><?php echo gettext("Fetch"); ?></a>
-	<?php else: ?>
+	<?php elseif (!empty($thispatch['location'])): ?>
 		<a href="system_patches.php?id=<?=$i;?>&act=fetch"><?php echo gettext("Re-Fetch"); ?></a>
 	<?php endif; ?>
 	</td>
