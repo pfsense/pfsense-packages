@@ -820,7 +820,7 @@
 		<website>http://www.imspector.org/</website>
 		<category>Network Management</category>
 		<maintainer>marcellocoutinho@gmail.com</maintainer>
-		<version>20111108 pkg v 0.2</version>
+		<version>20111108 pkg v 0.2_1</version>
 		<required_version>2.0</required_version>
 		<status>BETA</status>
 		<pkginfolink>http://doc.pfsense.org/index.php/IMSpector_package</pkginfolink>

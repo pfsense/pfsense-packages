@@ -173,7 +173,7 @@
 			<fieldname>badwords_list</fieldname>
 			<description>
 				Place one word or phrase to match per line.&lt;br /&gt;
-				If left blank the default list in /usr/local/etc/imspector/badwords.txt will be used.
+				Leave blank to load default list.
 			</description>
 			<type>textarea</type>
 			<encoding>base64</encoding>

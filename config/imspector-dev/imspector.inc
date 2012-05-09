@@ -145,23 +145,41 @@
 			else
 				$boot_process="on";
 			}
-	
+				
 		if (is_process_running('imspector') && isset($boot_process))
 			return;
 
-		/*continue sync process*/
-		config_lock();
+		/* check default options and sample files*/
+		$load_samples=0;
 
+		#bannedphraselist
+		if (!is_array($config['installedpackages']['imspectoracls'])){
+				$config['installedpackages']['imspectoracls']['config'][]=array('enable'=> 'on',
+																				'action' => 'allow',
+																				'localid' => 'all',
+																				'remoteid' => base64_encode('all'));
+				$load_samples++;
+			}
+		$ims_acls = $config['installedpackages']['imspectoracls']['config'];
+			
+		if (is_array($config['installedpackages']['imspectorreplacements'])){
+			if ($config['installedpackages']['imspectorreplacements']['config'][0]['badwords_list'] == "" && file_exists(IMSPECTOR_ETC . '/badwords.txt')){
+				$config['installedpackages']['imspectorreplacements']['config'][0]['badwords_list'] = base64_encode(file_get_contents(IMSPECTOR_ETC . '/badwords.txt'));
+				$load_samples++;
+				}
+			$ims_replacements = $config['installedpackages']['imspectorreplacements']['config'][0];
+		}
+					
 		if (is_array($config['installedpackages']['imspector']))
 			$ims_config = $config['installedpackages']['imspector']['config'][0];
-		
-		if (is_array($config['installedpackages']['imspectorreplacements']))
-			$ims_replacements = $config['installedpackages']['imspectorreplacements']['config'][0];
 
-		if (is_array($config['installedpackages']['imspectoracls']))
-			$ims_acls = $config['installedpackages']['imspectoracls']['config'];
-
-			/* remove existing rules */
+		if($load_samples > 0)
+			write_config();
+			
+		/*continue sync process*/
+		config_lock();
+			
+		/* remove existing rules */
 		exec('/sbin/pfctl -a imspector -Fr');
 		exec('/sbin/pfctl -a imspector -Fn');	
 
@@ -225,12 +243,9 @@
 				}
 
 				if($ims_replacements['filter_badwords']) {
-					if(!empty($ims_replacements["badwords_list"])) {
-						$conf['badwords_filename'] = IMSPECTOR_ETC . '/badwords_custom.txt';
-						write_imspector_config(IMSPECTOR_ETC . '/badwords_custom.txt', ims_text_area_decode($ims_config["badwords_list"]));
-					} else
-						$conf['badwords_filename'] = IMSPECTOR_ETC . '/badwords.txt'; 
-				}
+					write_imspector_config(IMSPECTOR_ETC . '/badwords_custom.txt', ims_text_area_decode($ims_replacements["badwords_list"]));
+					$conf['badwords_filename'] = IMSPECTOR_ETC . '/badwords_custom.txt'; 
+					}
 
 				if($ims_replacements['block_files'])
 					$conf['block_files'] = 'on';
@@ -286,14 +301,14 @@
 				if (isset($ims_replacements['responder']) && $ims_replacements['responder'] == 'on') {
 					$conf['responder_filename'] = IMSPECTOR_ETC . "/responder.db";
 					if (isset($ims_replacements['prefix_message']) && $ims_replacements['prefix_message'] != '' ) {
-						$conf['response_prefix'] = "-={$ims_replacements['prefix_message']}=-";
+						$conf['response_prefix'] = " .={$ims_replacements['prefix_message']}=.";
 					}
 					else{
-						$conf['response_prefix'] = "-=Your activities are being logged=-";
+						$conf['response_prefix'] = " .=Your activities are being logged=.";
 					}
 					if (isset($ims_replacements['notice_days']) && is_numeric($ims_replacements['notice_days'])) {
 						if ($ims_replacements['notice_days'] != 0) {
-							$conf['notice_days'] = $matches[1];
+							$conf['notice_days'] = $ims_replacements['notice_days'];
 						}
 					} else {
 							$conf['notice_days'] = 1;
@@ -301,7 +316,7 @@
 					
 					/*Custom recorded message response*/
 					if(isset($ims_replacements['recorded_message']) && $ims_replacements['recorded_message'] != '' ){
-						$conf['recorded_message'] = ims_text_area_decode($ims_replacements['recorded_message']);
+						$conf['notice_response'] = ims_text_area_decode($ims_replacements['recorded_message']);
 						}
 					else{
 						$conf['notice_response'] = "Your activities are being logged";
