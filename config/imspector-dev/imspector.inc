@@ -32,6 +32,7 @@
 
 	require_once("config.inc");
 	require_once("functions.inc");
+	require_once("service-utils.inc");
 
 	/* IMSpector */
 
@@ -39,7 +40,6 @@
 	define('IMSPECTOR_ETC', '/usr/local/etc/imspector');
 	define('IMSPECTOR_CONFIG', IMSPECTOR_ETC . '/imspector.conf');
 
-	function imspector_notice ($msg) { syslog(LOG_NOTICE, "imspector: {$msg}"); }
 	function imspector_warn ($msg) { syslog(LOG_WARNING, "imspector: {$msg}"); }
 
 	function ims_text_area_decode($text){
@@ -50,12 +50,6 @@
 		if (file_exists(IMSPECTOR_RCFILE))
 			mwexec(IMSPECTOR_RCFILE.' '.$action);
 	}	
-
-	function imspector_running () {
-		if((int)exec('pgrep imspector | wc -l') > 0)
-			return true;
-		return false;
-	}
 
 	function write_imspector_config($file, $text) {
 		$conf = fopen($file, 'w');
@@ -177,11 +171,12 @@
 			write_config();
 			
 		/*continue sync process*/
+		log_error("Imspector: Saving changes.");
 		config_lock();
 			
 		/* remove existing rules */
-		exec('/sbin/pfctl -a imspector -Fr');
-		exec('/sbin/pfctl -a imspector -Fn');	
+		exec('/sbin/pfctl -a imspector -Fr > /dev/null');
+		exec('/sbin/pfctl -a imspector -Fn > /dev/null');	
 
 		$ifaces_active = '';		
 
@@ -217,8 +212,11 @@
 					imspector_warn("Could not resolve real interface for {$iface}");
 				}
 			}
-
+			
+			
+			/*reload rules*/
 			if($pf_rules) {
+				log_error("Imspector: Reloading rules.");
 				exec("echo \"{$pf_rules}\" | /sbin/pfctl -a imspector -f -");
 
 				conf_mount_rw();
@@ -348,7 +346,7 @@
 				/* generate rc file start and stop */
 				$stop = <<<EOD
 /bin/pkill -x imspector
-
+/bin/sleep 1
 EOD;
 				$start = $stop."\n\tldconfig -m /usr/local/lib/mysql\n";
 				$start .= "\t/usr/local/sbin/imspector -c \"".IMSPECTOR_CONFIG."\"";
@@ -360,18 +358,7 @@ EOD;
 				    )
 				);
 
-				conf_mount_ro();
-
-				/* if imspector not running start it */
-				if(!imspector_running()) {
-					imspector_notice("Starting service on interface: {$ifaces_active}");
-					imspector_action('start');
-				}
-				/* or restart imspector if settings were changed */
-				elseif($_POST['iface_array']) {
-					imspector_notice("Restarting service on interface: {$ifaces_active}");
-					imspector_action('restart');
-				}				
+				conf_mount_ro();			
 			}
 		}
 
@@ -381,9 +368,9 @@ EOD;
 
 			if(file_exists(IMSPECTOR_RCFILE)) {
 				if(!$ims_config['enable'])
-					imspector_notice('Stopping service: imspector disabled');
+					log_error('Impsector: Stopping service: imspector disabled');
 				else
-					imspector_notice('Stopping service: no interfaces and/or protocols selected');
+					log_error('Impsector: Stopping service: no interfaces and/or protocols selected');
 					
 				imspector_action('stop');
 
@@ -395,9 +382,23 @@ EOD;
 				@unlink(IMSPECTOR_ETC . '/acl_whitelist.txt');
 				conf_mount_ro();
 			}			
+		}
+		else{
+			/* if imspector not running start it */
+			if(!is_process_running('imspector')) {
+				log_error("Impsector: Starting service on interface: {$ifaces_active}");
+				imspector_action('start');
+				}
+			/* or restart imspector if settings were changed */
+			else{
+				log_error("Impsector: Restarting service on interface: {$ifaces_active}");
+				imspector_action('restart');
+				}	
 		}	
-
-		config_unlock();		
+		config_unlock();
+		
+		/*check xmlrpc sync*/
+		imspector_sync_on_changes();		
 	}
 
 	function imspector_get_ca_certs() {
@@ -421,4 +422,115 @@ EOD;
 		}
 		return $cert_arr;
 	}
+	
+/* Uses XMLRPC to synchronize the changes to a remote node */
+function imspector_sync_on_changes() {
+	global $config, $g;
+	
+	$synconchanges = $config['installedpackages']['imspectorsync']['config'][0]['synconchanges'];	
+	if(!$synconchanges) 
+		return;
+	log_error("Imspector: xmlrpc sync is starting.");
+	foreach ($config['installedpackages']['imspectorsync']['config'] as $rs ){
+		foreach($rs['row'] as $sh){
+			$sync_to_ip = $sh['ipaddress'];
+			$password = $sh['password'];
+			if($password && $sync_to_ip)
+				imspector_do_xmlrpc_sync($sync_to_ip, $password);
+			}
+	}
+	log_error("Imspector: xmlrpc sync is ending.");
+}
+/* Do the actual XMLRPC sync */
+function imspector_do_xmlrpc_sync($sync_to_ip, $password) {
+	global $config, $g;
+
+	if(!$password)
+		return;
+
+	if(!$sync_to_ip)
+		return;
+	$username="admin";
+	
+	$xmlrpc_sync_neighbor = $sync_to_ip;
+    if($config['system']['webgui']['protocol'] != "") {
+		$synchronizetoip = $config['system']['webgui']['protocol'];
+		$synchronizetoip .= "://";
+    }
+    $port = $config['system']['webgui']['port'];
+    /* if port is empty lets rely on the protocol selection */
+    if($port == "") {
+		if($config['system']['webgui']['protocol'] == "http") 
+			$port = "80";
+		else 
+			$port = "443";
+    }
+	$synchronizetoip .= $sync_to_ip;
+
+	/* xml will hold the sections to sync */
+	$xml = array();
+	$xml['imspector'] = $config['installedpackages']['imspector'];
+	$xml['imspectorreplacements'] = $config['installedpackages']['imspectorreplacements'];
+	$xml['imspectoracls'] = $config['installedpackages']['imspectoracls'];
+	/* assemble xmlrpc payload */
+	$params = array(
+		XML_RPC_encode($password),
+		XML_RPC_encode($xml)
+	);
+
+	/* set a few variables needed for sync code borrowed from filter.inc */
+	$url = $synchronizetoip;
+	log_error("Imspector: Beginning XMLRPC sync to {$url}:{$port}.");
+	$method = 'pfsense.merge_installedpackages_section_xmlrpc';
+	$msg = new XML_RPC_Message($method, $params);
+	$cli = new XML_RPC_Client('/xmlrpc.php', $url, $port);
+	$cli->setCredentials($username, $password);
+	if($g['debug'])
+		$cli->setDebug(1);
+	/* send our XMLRPC message and timeout after 250 seconds */
+	$resp = $cli->send($msg, "250");
+	if(!$resp) {
+		$error = "A communications error occurred while attempting imspector XMLRPC sync with {$url}:{$port}.";
+		log_error($error);
+		file_notice("sync_settings", $error, "imspector Settings Sync", "");
+	} elseif($resp->faultCode()) {
+		$cli->setDebug(1);
+		$resp = $cli->send($msg, "250");
+		$error = "An error code was received while attempting imspector XMLRPC sync with {$url}:{$port} - Code " . $resp->faultCode() . ": " . $resp->faultString();
+		log_error($error);
+		file_notice("sync_settings", $error, "imspector Settings Sync", "");
+	} else {
+		log_error("imspector XMLRPC sync successfully completed with {$url}:{$port}.");
+	}
+	
+	/* tell imspector to reload our settings on the destionation sync host. */
+	$method = 'pfsense.exec_php';
+	$execcmd  = "require_once('/usr/local/pkg/imspector.inc');\n";
+	$execcmd .= "sync_package_imspector();";
+	/* assemble xmlrpc payload */
+	$params = array(
+		XML_RPC_encode($password),
+		XML_RPC_encode($execcmd)
+	);
+	
+	log_error("imspector XMLRPC reload data {$url}:{$port}.");
+	$msg = new XML_RPC_Message($method, $params);
+	$cli = new XML_RPC_Client('/xmlrpc.php', $url, $port);
+	$cli->setCredentials($username, $password);
+	$resp = $cli->send($msg, "250");
+	if(!$resp) {
+		$error = "A communications error occurred while attempting imspector XMLRPC sync with {$url}:{$port} (pfsense.exec_php).";
+		log_error($error);
+		file_notice("sync_settings", $error, "imspector Settings Sync", "");
+	} elseif($resp->faultCode()) {
+		$cli->setDebug(1);
+		$resp = $cli->send($msg, "250");
+		$error = "An error code was received while attempting imspector XMLRPC sync with {$url}:{$port} - Code " . $resp->faultCode() . ": " . $resp->faultString();
+		log_error($error);
+		file_notice("sync_settings", $error, "imspector Settings Sync", "");
+	} else {
+		log_error("imspector XMLRPC reload data success with {$url}:{$port} (pfsense.exec_php).");
+	}
+	
+}
 ?>

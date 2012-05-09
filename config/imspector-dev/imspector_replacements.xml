@@ -46,7 +46,6 @@
 	<version>20111108</version>
 	<title>Services: IMSpector</title>
 	<savetext>Save</savetext>
-	<aftersaveredirect>/services_imspector_logs.php</aftersaveredirect>
 	<include_file>/usr/local/pkg/imspector.inc</include_file>
 	<menu>
 		<name>IMSpector</name>
@@ -191,4 +190,5 @@
 		deinstall_package_imspector();
 	</custom_php_deinstall_command>
 	<filter_rules_needed>imspector_generate_rules</filter_rules_needed>
+
 </packagegui>

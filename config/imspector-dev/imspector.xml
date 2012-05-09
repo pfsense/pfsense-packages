@@ -46,7 +46,6 @@
 	<version>20111108</version>
 	<title>Services: IMSpector</title>
 	<savetext>Save</savetext>
-	<aftersaveredirect>/services_imspector_logs.php</aftersaveredirect>
 	<include_file>/usr/local/pkg/imspector.inc</include_file>
 	<menu>
 		<name>IMSpector</name>
@@ -58,6 +57,7 @@
 		<name>imspector</name>
 		<rcfile>imspector.sh</rcfile>
 		<executable>imspector</executable>
+		<description><![CDATA[Instant Messenger transparent proxy]]></description>
 	</service>
 	<tabs>
 		<tab>
