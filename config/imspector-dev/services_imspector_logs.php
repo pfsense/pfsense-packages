@@ -159,6 +159,7 @@ include("head.inc");
 	$tab_array = array();
 	$tab_array[] = array(gettext("Settings "), false, "/pkg_edit.php?xml=imspector.xml&id=0");
 	$tab_array[] = array(gettext("Replacements "), false, "/pkg_edit.php?xml=imspector_replacements.xml&id=0");
+	$tab_array[] = array(gettext("Access Lists "), true, "/pkg.php?xml=imspector_acl.xml");
 	$tab_array[] = array(gettext("Log "), true, "/services_imspector_logs.php");
 	$tab_array[] = array(gettext("Sync "), false, "/pkg_edit.php?xml=imspector_sync.xml&id=0");
 	

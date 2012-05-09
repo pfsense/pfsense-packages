@@ -815,7 +815,7 @@
 		<build_port_path>/usr/home/pfsense/tools/pfPorts/imspector</build_port_path>
 	</package>
 	<package>
-		<name>imspector</name>
+		<name>imspector-dev</name>
 		<descr>IMSpector is an Instant Messenger transparent proxy with logging capabilities. Currently it supports MSN, AIM, ICQ, Yahoo and IRC to different degrees.</descr>
 		<website>http://www.imspector.org/</website>
 		<category>Network Management</category>

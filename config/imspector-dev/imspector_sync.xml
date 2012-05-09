@@ -55,6 +55,10 @@
 			<url>/pkg_edit.php?xml=imspector_replacements.xml&amp;id=0</url>
 		</tab>
 		<tab>
+			<text>Access Lists</text>
+			<url>/pkg.php?xml=imspector_acls.xml</url>
+		</tab>
+		<tab>
 			<text>Log</text>
 			<url>/services_imspector_logs.php</url>
 		</tab>
