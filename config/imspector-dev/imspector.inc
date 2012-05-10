@@ -121,7 +121,7 @@
 			break;
 		case 'rule':
 			$rules = "# IMSpector \n";
-			$rules .= "anchor \"miniupnpd\"\n";
+			$rules .= "anchor \"imspector\"\n";
 			break;
 		}
 
