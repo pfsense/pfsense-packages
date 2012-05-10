@@ -258,8 +258,22 @@ function lightsquid_resync() {
 
 		// update squid conf
 		if (isset($config['installedpackages']['squid']['config'][0])) {
-			$config['installedpackages']['squid']['config'][0]['log_enabled'] = 'on';
-			$config['installedpackages']['squid']['config'][0]['log_dir'] = LS_SQUIDLOGPATH;
+			$squid_settings = $config['installedpackages']['squid']['config'][0];
+			$squid_settings['log_enabled'] = 'on';
+			$squid_settings['log_dir'] = LS_SQUIDLOGPATH;
+			
+			# sqstat
+                     $ifmgr = "127.0.0.1;";
+			$iface = ($squid_settings['active_interface'] ? $squid_settings['active_interface'] : 'lan');
+			$iface = explode(",", $iface);
+			foreach ($iface as $i => $if) {
+				$realif = ls_get_real_interface_address($if);
+                            if ($realif[0]) 
+					$ifmgr = $ifmgr . $realif[0] . ";";
+			}
+
+			$config['installedpackages']['squidcache']['config'][0]['ext_cachemanager'] = $ifmgr;
+
 			write_config();
 			squid_resync();
 		}
@@ -382,6 +396,17 @@ function refresh_full() {
 			break;
 	}
 	update_log("refresh_full: stop");
+}
+
+function ls_get_real_interface_address($iface)
+{
+	global $config;
+
+	$iface = convert_friendly_interface_to_real_interface_name($iface);
+	$line = trim(shell_exec("ifconfig $iface | grep inet | grep -v inet6"));
+	list($dummy, $ip, $dummy2, $netmask) = explode(" ", $line);
+
+	return array($ip, long2ip(hexdec($netmask)));
 }
 
 ?>
