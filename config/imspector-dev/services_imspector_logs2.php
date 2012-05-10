@@ -6,6 +6,7 @@
 	JavaScript Code is GPL Licensed from SmoothWall Express.
 
 	Copyright (C) 2007 Ryan Wagoner <rswagoner@gmail.com>.
+	Copyright (C) 2012 0guzcan at pfsense forum.
 	Copyright (C) 2012 Marcello Coutinho
 	All rights reserved.
 
@@ -30,7 +31,6 @@
 	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 	POSSIBILITY OF SUCH DAMAGE.
 */
-
 require("guiconfig.inc");
 
 /* variables */
@@ -41,12 +41,12 @@ $border_color			= '#c0c0c0';
 $default_bgcolor		= '#eeeeee';
 
 $list_protocol_color	= '#000000';
-$list_local_color 		= '#000000';
-$list_remote_color 		= '#000000';
-$list_convo_color		= '#000000';
+$list_local_color 		= '#ffffff';
+$list_remote_color 		= '#666666';
+$list_convo_color		= '#888888';
 
 $list_protocol_bgcolor	= '#cccccc';
-$list_local_bgcolor		= '#dddddd';
+$list_local_bgcolor		= '#850000';
 $list_remote_bgcolor	= '#eeeeee';
 $list_end_bgcolor		= '#bbbbbb';
 
@@ -57,6 +57,7 @@ $convo_remote_color		= 'red';
 $convo_title_bgcolor	= '#cccccc';
 $convo_local_bgcolor	= '#dddddd';
 $convo_remote_bgcolor	= '#eeeeee';
+
 
 /* functions */
 
@@ -101,7 +102,10 @@ if ($_POST['mode'] == "render") {
 		/* conversation content */
 		$filename = $log_dir.'/'.implode('/', $section);
 		if($fd = fopen($filename, 'r')) {
-			print("<table width='100%' border='0' cellpadding='2' cellspacing='0'>\n");
+		$satir_oku = fgets($fd);
+		$ipsinibulduk = explode(':',$satir_oku);
+		
+			print("<table width='100%' border='0' cellpadding='2' cellspacing='1'><tr><td style='color:#fff;' colspan='4' align='center'  width='100%' bgcolor='#850000'>kullanilan [<span style='font-weight:bold;'>$localuser</span>] adresine ait local ip: [<span style='font-weight:bold;'>$ipsinibulduk[0]</span>]</td></tr>\n");
 			while (!feof($fd)) {
 				$line = fgets($fd);
 				if(feof($fd)) continue;
@@ -109,6 +113,8 @@ if ($_POST['mode'] == "render") {
 				$old_format = '([^,]*),([^,]*),([^,]*),([^,]*),([^,]*),(.*)';
 				preg_match("/${new_format}|${old_format}/", $line, $matches);
 				$address = $matches[1];
+				$addresbul = explode(':',$address);
+				$addressnew =$addresbul[0] ;
 				$timestamp = $matches[2];
 				$direction = $matches[3];
 				$type = $matches[4];
@@ -123,19 +129,21 @@ if ($_POST['mode'] == "render") {
 
 				if($direction == '0') {
 					$bgcolor = $convo_remote_bgcolor;
-					$user = "&lt;<span style='color: $convo_remote_color;'>$remoteuser</span>&gt;";
+					$user = "<span style='color: $convo_remote_color;'>$remoteuser</span>";
 				}
 				if($direction == '1') {
 					$bgcolor = $convo_local_bgcolor;	
-					$user = "&lt;<span style='color: $convo_local_color;'>$localuser</span>&gt;";
+					$user = "<span style='color: $convo_local_color;'>$localuser</span>";
 				}
 
-				$time = strftime("%H:%M:%S", $timestamp);
+				 $time = strftime("%H:%M", $timestamp);
+				 
 
-				print("<tr bgcolor='$bgcolor'><td style='width: 30px; vertical-align: top;'>[$time]</td>\n
-						<td style=' width: 60px; vertical-align: top;'>$user</td>\n
-						<td style=' width: 60px; vertical-align: top;'>$category</td>\n
-						<td style='vertical-align: top;'>$data</td></tr>\n");
+				print("<tr bgcolor='$bgcolor'>
+						<td style='width: 5%; vertical-align: top;border-bottom:1px solid #ccc;'>[$time]</td>\n
+						<td style='border-bottom:1px solid #ccc; width: 13%; vertical-align: top;'>$user</td>\n
+						<td style='border-bottom:1px solid #ccc; width: 1%; vertical-align: top;'>$category</td>\n
+						<td style='border-bottom:1px solid #ccc; width: 82%; vertical-align: top;'>$data</td></tr>\n");
 			}
 			print("</table>\n");
 			fclose($fd);
@@ -154,6 +162,7 @@ include("head.inc");
 //$pfSenseHead->addMeta("<meta http-equiv=\"refresh\" content=\"120;url={$_SERVER['SCRIPT_NAME']}\" />");
 //echo $pfSenseHead->getHTML();
 ?>
+
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">
 <?php include("fbegin.inc"); ?>
 <?php if ($savemsg) print_info_box($savemsg); ?>
@@ -166,7 +175,6 @@ include("head.inc");
 	$tab_array[] = array(gettext("Access Lists "), false, "/pkg.php?xml=imspector_acls.xml");
 	$tab_array[] = array(gettext("Log "), true, "/imspector_logs.php");
 	$tab_array[] = array(gettext("Sync "), false, "/pkg_edit.php?xml=imspector_sync.xml&id=0");
-	
 	display_top_tabs($tab_array);
 ?>
 </table>
@@ -239,8 +247,7 @@ function updatepage(str)
 
 	/* determine the title of this conversation */
 	var details = parts[1].split(",");
-	var title = details[0] + " conversation between <span style='color: $convo_local_color;'>" + details[ 1 ] +
-		"</span> and <span style='color: $convo_remote_color;'>" + details[2] + "</span>";
+	var title = "<table border='1' width='100%'><tr><td style='color:#666;' align='center' bgcolor='#eee' valign='top'>"+ details[3]+ " tarihli " + "[<span style='font-weight:bold;'>" + details[1]+ "</span> ]"+ " ile " + "[ <span style='font-weight:bold;'>" + details[2] + " </span> ] " + details[0] + " görüsme kaydi</td></tr></table>";
 	if (!details[1]) title = "&nbsp;";
 	if (!parts[2]) parts[2] = "&nbsp;";
 
@@ -278,7 +285,7 @@ print($zz);
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
   <tr>
     <td class="tabcont">
-      <div style='width: 100%; text-align: right;'><span id='im_status' style='display: none;'>Updating</span>&nbsp;</div>
+      <div style='width: 100%; text-align: right;'><span id='im_status' style='display: none;'>Yenileniyor...</span>&nbsp;</div>
       <table width="100%">
         <tr>
 		<td width="15%" bgcolor="<?=$default_bgcolor?>" style="overflow: auto; border: solid 1px <?=$border_color?>;">

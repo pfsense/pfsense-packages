@@ -149,6 +149,7 @@
 		#bannedphraselist
 		if (!is_array($config['installedpackages']['imspectoracls'])){
 				$config['installedpackages']['imspectoracls']['config'][]=array('enable'=> 'on',
+																				'description' => 'allow access to all ids',
 																				'action' => 'allow',
 																				'localid' => 'all',
 																				'remoteid' => base64_encode('all'));
@@ -250,9 +251,6 @@
 					
 				if($ims_replacements['block_webcams'])
 					$conf['block_webcams'] = 'on';
-					
-				if($ims_replacements['block_unlisted'])
-					$conf['block_unlisted'] = 'on';
  
 				$acls="";
 				$conf['acl_filename'] = IMSPECTOR_ETC . '/acls.txt';
@@ -342,7 +340,17 @@
 				foreach($conf as $var => $key)
 					$conftext .= "{$var}={$key}\n";
 				write_imspector_config(IMSPECTOR_CONFIG, $conftext);
-
+				
+				/*Check template settings*/
+				if ($ims_config['template'] == "")
+					$template="services_imspector_logs.php";
+				else
+					$template=$ims_config['template'];
+					
+				if (file_exists("/usr/local/www/{$template}"))
+					$log_file=file_get_contents("/usr/local/www/{$template}");
+				file_put_contents("/usr/local/www/imspector_logs.php",$log_file,LOCK_EX);
+					
 				/* generate rc file start and stop */
 				$stop = <<<EOD
 /bin/pkill -x imspector

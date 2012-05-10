@@ -74,7 +74,7 @@
 		</tab>
 		<tab>
 			<text>Log</text>
-			<url>/services_imspector_logs.php</url>
+			<url>/imspector_logs.php</url>
 		</tab>
 		<tab>
 			<text>Sync</text>
@@ -153,12 +153,6 @@
 			<fielddescr>Block web cameras</fielddescr>
 			<fieldname>block_webcams</fieldname>
 			<description>This option will block all webcam sessions. Currently IMSpector can only spot webcam sessions on Yahoo.</description>
-			<type>checkbox</type>
-		</field>
-		<field>
-			<fielddescr>Block non ACL defined</fielddescr>
-			<fieldname>block_unlisted</fieldname>
-			<description>Overide the default of allowing user's not defined the whitelist or blacklist ACLs.</description>
 			<type>checkbox</type>
 		</field>
 		<field>

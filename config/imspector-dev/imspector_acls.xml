@@ -82,7 +82,7 @@
 		</tab>
 		<tab>
 			<text>Log</text>
-			<url>/services_imspector_logs.php</url>
+			<url>/imspector_logs.php</url>
 		</tab>
 		<tab>
 			<text>Sync</text>
@@ -101,6 +101,10 @@
 		<columnitem>
 			<fielddescr>local ID</fielddescr>
 			<fieldname>localid</fieldname>
+		</columnitem>
+		<columnitem>
+			<fielddescr>Description</fielddescr>
+			<fieldname>description</fieldname>
 		</columnitem>
 	</adddeleteeditpagefields>
 	<fields>
@@ -125,6 +129,14 @@
 				<option><name>allow</name><value>allow</value></option>
 				<option><name>deny</name><value>deny</value></option>
 			</options>
+			<required/>
+		</field>
+		<field>
+			<fielddescr>Description</fielddescr>
+			<fieldname>description</fieldname>
+			<description><![CDATA[Specify a description for this rule.]]></description>
+			<type>input</type>
+			<size>50</size>
 			<required/>
 		</field>
 		<field>

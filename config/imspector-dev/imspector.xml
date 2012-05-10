@@ -75,7 +75,7 @@
 		</tab>
 		<tab>
 			<text>Log</text>
-			<url>/services_imspector_logs.php</url>
+			<url>/imspector_logs.php</url>
 		</tab>
 		<tab>
 			<text>Sync</text>
@@ -106,6 +106,11 @@
 	    <prefix>/usr/local/www/</prefix>
 		<chmod>0755</chmod>
 		<item>http://www.pfsense.org/packages/config/imspector-dev/services_imspector_logs.php</item>
+	</additional_files_needed>
+	<additional_files_needed>
+	    <prefix>/usr/local/www/</prefix>
+		<chmod>0755</chmod>
+		<item>http://www.pfsense.org/packages/config/imspector-dev/services_imspector_logs2.php</item>
 	</additional_files_needed>
 	<fields>
 		<field>
@@ -180,6 +185,25 @@
 			<type>checkbox</type>
 		</field>
 		<field>
+			<fielddescr>Report limit</fielddescr>
+			<fieldname>limit</fieldname>
+			<description>Max entries to fetch from log dir. Default is 1000</description>
+			<type>input</type>
+			<size>10</size>
+		</field>
+		<field>
+			<fielddescr>Report template</fielddescr>
+			<fieldname>template</fieldname>
+			<description>Template to use on reports</description>
+			<type>select</type>
+			<required/>
+ 			<options>
+ 				<option><name>Default Template</name><value>services_imspector_logs.php</value></option>
+ 				<option><name>0guzcan Template</name><value>services_imspector_logs2.php</value></option>
+ 				<option><name>Mysql template (working in progress...)</name><value>services_imspector_mysql.php</value></option>
+			</options>
+		</field>
+		<field>
 			<fielddescr>Enable mySQL logging</fielddescr>
 			<fieldname>log_mysql</fieldname>
 			<description>Make sure to specify your MySQL credentials below.</description>
@@ -189,21 +213,25 @@
 			<fielddescr>mySQL server</fielddescr>
 			<fieldname>mysql_server</fieldname>
 			<type>input</type>
+			<size>35</size>
 		</field>
 		<field>
 			<fielddescr>mySQL database</fielddescr>
 			<fieldname>mysql_database</fieldname>
 			<type>input</type>
+			<size>35</size>
 		</field>
 		<field>
 			<fielddescr>mySQL username</fielddescr>
 			<fieldname>mysql_username</fieldname>
 			<type>input</type>
+			<size>35</size>
 		</field>
 		<field>
 			<fielddescr>mySQL password</fielddescr>
 			<fieldname>mysql_password</fieldname>
 			<type>password</type>
+			<size>35</size>
 		</field>
 	</fields>
 	<custom_php_validation_command>

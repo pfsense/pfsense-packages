@@ -60,7 +60,7 @@
 		</tab>
 		<tab>
 			<text>Log</text>
-			<url>/services_imspector_logs.php</url>
+			<url>/imspector_logs.php</url>
 		</tab>
 		<tab>
 			<text>Sync</text>
