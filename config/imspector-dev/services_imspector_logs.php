@@ -61,23 +61,31 @@ $convo_remote_bgcolor	= '#eeeeee';
 /* functions */
 
 function convert_dir_list ($topdir) {
-	if (!is_dir($topdir)) return;
+	global $config;
+	if (!is_dir($topdir)) 
+		return;
+	$imspector_config = $config['installedpackages']['imspector']['config'][0];
+	$limit=(preg_match("/\d+/",$imspector_config['reportlimit'])?$imspector_config['reportlimit']:"50");
+	file_put_contents("/tmp/teste.txt",$limit." teste",LOCK_EX);
+	$count=0;
 	if ($dh = opendir($topdir)) {
-		$limit=(is_numericint($imspector_config['limit'])?$imspector_config['limit']:"1000");
-		$count=0;
-		while (($file = readdir($dh)) !== false && $count < $limit) {
-			if(!preg_match('/^\./', $file) == 0) continue;
-			if (is_dir("$topdir/$file")) {
+		while (($file = readdir($dh)) !== false) {
+			if(!preg_match('/^\./', $file) == 0)
+				continue;
+			if (is_dir("$topdir/$file"))
 				$list .= convert_dir_list("$topdir/$file");
-			} else {
+			else
 				$list .= "$topdir/$file\n";
+			$count ++;
+		 	if($count >= $limit){
+		 		closedir($dh);
+		 		return $list;
+		 		}
 			}
-		$count ++;
-		}
 		closedir($dh);
-	}
+		}
 	return $list;
-}
+	}
 
 /* ajax response */
 if ($_POST['mode'] == "render") {
@@ -188,7 +196,7 @@ function xmlhttpPost()
 	else if (window.ActiveXObject)
 		self.xmlHttpReq = new ActiveXObject("Microsoft.XMLHTTP");
 
-	self.xmlHttpReq.open('POST', 'services_imspector_logs.php', true);
+	self.xmlHttpReq.open('POST', 'imspector_logs.php', true);
 	self.xmlHttpReq.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
 
 	self.xmlHttpReq.onreadystatechange = function() {

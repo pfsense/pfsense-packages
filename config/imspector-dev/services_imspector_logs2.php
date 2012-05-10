@@ -62,23 +62,31 @@ $convo_remote_bgcolor	= '#eeeeee';
 /* functions */
 
 function convert_dir_list ($topdir) {
-	if (!is_dir($topdir)) return;
+	global $config;
+	if (!is_dir($topdir)) 
+		return;
+	$imspector_config = $config['installedpackages']['imspector']['config'][0];
+	$limit=(preg_match("/\d+/",$imspector_config['reportlimit'])?$imspector_config['reportlimit']:"50");
+	file_put_contents("/tmp/teste.txt",$limit." teste",LOCK_EX);
+	$count=0;
 	if ($dh = opendir($topdir)) {
-		$limit=(is_numericint($imspector_config['limit'])?$imspector_config['limit']:"1000");
-		$count=0;
-		while (($file = readdir($dh)) !== false && $count < $limit) {
-			if(!preg_match('/^\./', $file) == 0) continue;
-			if (is_dir("$topdir/$file")) {
+		while (($file = readdir($dh)) !== false) {
+			if(!preg_match('/^\./', $file) == 0)
+				continue;
+			if (is_dir("$topdir/$file"))
 				$list .= convert_dir_list("$topdir/$file");
-			} else {
+			else
 				$list .= "$topdir/$file\n";
+			$count ++;
+		 	if($count >= $limit){
+		 		closedir($dh);
+		 		return $list;
+		 		}
 			}
-		$count ++;
-		}
 		closedir($dh);
-	}
+		}
 	return $list;
-}
+	}
 
 /* ajax response */
 if ($_POST['mode'] == "render") {
@@ -105,7 +113,7 @@ if ($_POST['mode'] == "render") {
 		$satir_oku = fgets($fd);
 		$ipsinibulduk = explode(':',$satir_oku);
 		
-			print("<table width='100%' border='0' cellpadding='2' cellspacing='1'><tr><td style='color:#fff;' colspan='4' align='center'  width='100%' bgcolor='#850000'>kullanilan [<span style='font-weight:bold;'>$localuser</span>] adresine ait local ip: [<span style='font-weight:bold;'>$ipsinibulduk[0]</span>]</td></tr>\n");
+			print("<table width='100%' border='0' cellpadding='2' cellspacing='1'><tr><td style='color:#fff;' colspan='4' align='center'  width='100%' bgcolor='#850000'>user [<span style='font-weight:bold;'>$localuser</span>] at local ip: [<span style='font-weight:bold;'>$ipsinibulduk[0]</span>]</td></tr>\n");
 			while (!feof($fd)) {
 				$line = fgets($fd);
 				if(feof($fd)) continue;
@@ -196,7 +204,7 @@ function xmlhttpPost()
 	else if (window.ActiveXObject)
 		self.xmlHttpReq = new ActiveXObject("Microsoft.XMLHTTP");
 
-	self.xmlHttpReq.open('POST', 'services_imspector_logs.php', true);
+	self.xmlHttpReq.open('POST', 'imspector_logs.php', true);
 	self.xmlHttpReq.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
 
 	self.xmlHttpReq.onreadystatechange = function() {
@@ -247,7 +255,7 @@ function updatepage(str)
 
 	/* determine the title of this conversation */
 	var details = parts[1].split(",");
-	var title = "<table border='1' width='100%'><tr><td style='color:#666;' align='center' bgcolor='#eee' valign='top'>"+ details[3]+ " tarihli " + "[<span style='font-weight:bold;'>" + details[1]+ "</span> ]"+ " ile " + "[ <span style='font-weight:bold;'>" + details[2] + " </span> ] " + details[0] + " görüsme kaydi</td></tr></table>";
+	var title = "<table border='1' width='100%'><tr><td style='color:#666;' align='center' bgcolor='#eee' valign='top'>"+ details[3]+ " dated " + "[<span style='font-weight:bold;'>" + details[1]+ "</span> ]"+ " with " + "[ <span style='font-weight:bold;'>" + details[2] + " </span> ] " + details[0] + " records</td></tr></table>";
 	if (!details[1]) title = "&nbsp;";
 	if (!parts[2]) parts[2] = "&nbsp;";
 
@@ -285,7 +293,7 @@ print($zz);
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
   <tr>
     <td class="tabcont">
-      <div style='width: 100%; text-align: right;'><span id='im_status' style='display: none;'>Yenileniyor...</span>&nbsp;</div>
+      <div style='width: 100%; text-align: right;'><span id='im_status' style='display: none;'>Updating...</span>&nbsp;</div>
       <table width="100%">
         <tr>
 		<td width="15%" bgcolor="<?=$default_bgcolor?>" style="overflow: auto; border: solid 1px <?=$border_color?>;">
