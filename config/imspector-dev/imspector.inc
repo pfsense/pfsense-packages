@@ -101,11 +101,12 @@
 	function deinstall_package_imspector() {
 		imspector_action('stop');
 
-		@unlink(IMSPECTOR_RCFILE);
-		@unlink(IMSPECTOR_CONFIG);
-		@unlink(IMSPECTOR_ETC . '/badwords_custom.txt');
-		@unlink(IMSPECTOR_ETC . '/acl_blacklist.txt');
-		@unlink(IMSPECTOR_ETC . '/acl_whitelist.txt');
+		unlink_if_exists(IMSPECTOR_RCFILE);
+		unlink_if_exists(IMSPECTOR_CONFIG);
+		unlink_if_exists(IMSPECTOR_ETC . '/badwords_custom.txt');
+		unlink_if_exists(IMSPECTOR_ETC . '/acl_blacklist.txt');
+		unlink_if_exists(IMSPECTOR_ETC . '/acl_whitelist.txt');
+		unlink_if_exists('/usr/local/www/imspector_logs.php');
 
 		//exec('pkg_delete imspector-0.4');
 	}
@@ -346,10 +347,11 @@
 					$template="services_imspector_logs.php";
 				else
 					$template=$ims_config['template'];
-					
-				if (file_exists("/usr/local/www/{$template}"))
-					$log_file=file_get_contents("/usr/local/www/{$template}");
-				file_put_contents("/usr/local/www/imspector_logs.php",$log_file,LOCK_EX);
+
+				/*link template file*/
+				$link="/usr/local/www/imspector_logs.php";
+				unlink_if_exists($link);
+				symlink("/usr/local/www/{$template}", $link);
 					
 				/* generate rc file start and stop */
 				$stop = <<<EOD

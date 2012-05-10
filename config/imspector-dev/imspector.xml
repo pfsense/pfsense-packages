@@ -105,6 +105,11 @@
 	<additional_files_needed>
 	    <prefix>/usr/local/www/</prefix>
 		<chmod>0755</chmod>
+		<item>http://www.pfsense.org/packages/config/imspector-dev/imspector_logs.php</item>
+	</additional_files_needed>
+	<additional_files_needed>
+	    <prefix>/usr/local/www/</prefix>
+		<chmod>0755</chmod>
 		<item>http://www.pfsense.org/packages/config/imspector-dev/services_imspector_logs.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
@@ -186,8 +191,8 @@
 		</field>
 		<field>
 			<fielddescr>Report limit</fielddescr>
-			<fieldname>limit</fieldname>
-			<description>Max entries to fetch from log dir. Default is 1000</description>
+			<fieldname>reportlimit</fieldname>
+			<description>Max entries to fetch from log dir(s). Default is 50</description>
 			<type>input</type>
 			<size>10</size>
 		</field>
@@ -200,7 +205,6 @@
  			<options>
  				<option><name>Default Template</name><value>services_imspector_logs.php</value></option>
  				<option><name>0guzcan Template</name><value>services_imspector_logs2.php</value></option>
- 				<option><name>Mysql template (working in progress...)</name><value>services_imspector_mysql.php</value></option>
 			</options>
 		</field>
 		<field>
