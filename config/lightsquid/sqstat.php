@@ -1,708 +1,423 @@
-
-
-
-<!DOCTYPE html>
-<html>
-  <head prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb# githubog: http://ogp.me/ns/fb/githubog#">
-    <meta charset='utf-8'>
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <title>Downloads · dvserg/pfsense-packages · GitHub</title>
-    <link rel="search" type="application/opensearchdescription+xml" href="/opensearch.xml" title="GitHub" />
-    <link rel="fluid-icon" href="https://github.com/fluidicon.png" title="GitHub" />
-    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
-
-    
-    
-
-    <meta content="authenticity_token" name="csrf-param" />
-<meta content="rlcIZF8cFflFaPGmH0boqMS+zpmj873lM5XyQm6T/pM=" name="csrf-token" />
-
-    <link href="https://a248.e.akamai.net/assets.github.com/stylesheets/bundles/github-61ae1d367be26efd3260c8a23fc81353611bfa47.css" media="screen" rel="stylesheet" type="text/css" />
-    <link href="https://a248.e.akamai.net/assets.github.com/stylesheets/bundles/github2-c1921b914a1a5c9fd63f1f197c5742bcc5500740.css" media="screen" rel="stylesheet" type="text/css" />
-    
-    
-    
-
-    <script src="https://a248.e.akamai.net/assets.github.com/javascripts/bundles/frameworks-31b6b84bca1e7d3f3907f63a4dd7f9bbda3a0eda.js" type="text/javascript"></script>
-    
-    <script defer="defer" src="https://a248.e.akamai.net/assets.github.com/javascripts/bundles/github-88c09a33a6ebba4abecc6d3381fddeeb6b55fb13.js" type="text/javascript"></script>
-    
-    
-
-      
-    <meta property="og:title" content="pfsense-packages"/>
-    <meta property="og:type" content="githubog:gitrepository"/>
-    <meta property="og:url" content="https://github.com/dvserg/pfsense-packages"/>
-    <meta property="og:image" content="https://a248.e.akamai.net/assets.github.com/images/gravatars/gravatar-140.png?1329275856"/>
-    <meta property="og:site_name" content="GitHub"/>
-    <meta property="og:description" content="pfsense-packages - pfSense packages repository"/>
-
-    <meta name="description" content="pfsense-packages - pfSense packages repository" />
-
-  <link href="https://github.com/dvserg/pfsense-packages/commits/master.atom" rel="alternate" title="Recent Commits to pfsense-packages:master" type="application/atom+xml" />
-
-  </head>
-
-
-  <body class="logged_out page-downloads  vis-public fork env-production " data-blob-contribs-enabled="yes">
-    <div id="wrapper">
-
-    
-    
-    
-
-      <div id="header" class="true clearfix">
-        <div class="container clearfix">
-          <a class="site-logo" href="https://github.com">
-            <!--[if IE]>
-            <img alt="GitHub" class="github-logo" src="https://a248.e.akamai.net/assets.github.com/images/modules/header/logov7.png?1323882717" />
-            <img alt="GitHub" class="github-logo-hover" src="https://a248.e.akamai.net/assets.github.com/images/modules/header/logov7-hover.png?1324325359" />
-            <![endif]-->
-            <img alt="GitHub" class="github-logo-4x" height="30" src="https://a248.e.akamai.net/assets.github.com/images/modules/header/logov7@4x.png?1323882717" />
-            <img alt="GitHub" class="github-logo-4x-hover" height="30" src="https://a248.e.akamai.net/assets.github.com/images/modules/header/logov7@4x-hover.png?1324325359" />
-          </a>
-
-                  <!--
-      make sure to use fully qualified URLs here since this nav
-      is used on error pages on other domains
-    -->
-    <ul class="top-nav logged_out">
-        <li class="pricing"><a href="https://github.com/plans">Signup and Pricing</a></li>
-        <li class="explore"><a href="https://github.com/explore">Explore GitHub</a></li>
-      <li class="features"><a href="https://github.com/features">Features</a></li>
-        <li class="blog"><a href="https://github.com/blog">Blog</a></li>
-      <li class="login"><a href="https://github.com/login?return_to=%2Fdvserg%2Fpfsense-packages%2Fdownloads">Login</a></li>
-    </ul>
-
-
-
-          
-        </div>
-      </div>
-
-      
-
-            <div class="site hfeed" itemscope itemtype="http://schema.org/WebPage">
-      <div class="container hentry">
-        <div class="pagehead repohead instapaper_ignore readability-menu">
-        <div class="title-actions-bar">
-          
-
-
-
-              <ul class="pagehead-actions">
-
-
-
-          <li>
-            <a href="/login?return_to=%2Fdvserg%2Fpfsense-packages" class="minibutton btn-i-type-i-switcher switcher count btn-watches js-toggler-target watch-button entice tooltipped leftwards" title="You must be logged in to use this feature" rel="nofollow"><span><span class="icon"></span><i>1</i> Watch</span></a>
-          </li>
-          <li>
-            <a href="/login?return_to=%2Fdvserg%2Fpfsense-packages" class="minibutton btn-i-type-i-switcher switcher count btn-forks js-toggler-target fork-button entice tooltipped leftwards"  title="You must be logged in to use this feature" rel="nofollow"><span><span class="icon"></span><i>20</i> Fork</span></a>
-          </li>
-
-    </ul>
-
-          <h1 itemscope itemtype="http://data-vocabulary.org/Breadcrumb" class="entry-title">
-            <span class="repo-label"><span class="public">public</span></span>
-            <span class="mega-icon public-repo"></span>
-            <span class="author vcard">
-<a href="/dvserg" class="url fn" itemprop="url" rel="author">              <span itemprop="title">dvserg</span>
-              </a></span> /
-            <strong><a href="/dvserg/pfsense-packages" class="js-current-repository">pfsense-packages</a></strong>
-              <span class="fork-flag">
-                <span class="text">forked from <a href="/bsdperimeter/pfsense-packages">bsdperimeter/pfsense-packages</a></span>
-              </span>
-          </h1>
-        </div>
-
-          
-
-  <ul class="tabs">
-    <li><a href="/dvserg/pfsense-packages" class="selected" highlight="repo_sourcerepo_downloadsrepo_commitsrepo_tagsrepo_branches">Code</a></li>
-    <li><a href="/dvserg/pfsense-packages/network" highlight="repo_network">Network</a>
-    <li><a href="/dvserg/pfsense-packages/pulls" highlight="repo_pulls">Pull Requests <span class='counter'>0</span></a></li>
-
-
-
-    <li><a href="/dvserg/pfsense-packages/graphs" highlight="repo_graphsrepo_contributors">Graphs</a></li>
-
-  </ul>
- 
-<div class="frame frame-center tree-finder" style="display:none"
-      data-tree-list-url="/dvserg/pfsense-packages/tree-list/49d604126f311966c2e61e125064191142bd98e8"
-      data-blob-url-prefix="/dvserg/pfsense-packages/blob/49d604126f311966c2e61e125064191142bd98e8"
-    >
-
-  <div class="breadcrumb">
-    <span class="bold"><a href="/dvserg/pfsense-packages">pfsense-packages</a></span> /
-    <input class="tree-finder-input js-navigation-enable" type="text" name="query" autocomplete="off" spellcheck="false">
-  </div>
-
-    <div class="octotip">
-      <p>
-        <a href="/dvserg/pfsense-packages/dismiss-tree-finder-help" class="dismiss js-dismiss-tree-list-help" title="Hide this notice forever" rel="nofollow">Dismiss</a>
-        <span class="bold">Octotip:</span> You've activated the <em>file finder</em>
-        by pressing <span class="kbd">t</span> Start typing to filter the
-        file list. Use <span class="kbd badmono">↑</span> and
-        <span class="kbd badmono">↓</span> to navigate,
-        <span class="kbd">enter</span> to view files.
-      </p>
-    </div>
-
-  <table class="tree-browser" cellpadding="0" cellspacing="0">
-    <tr class="js-header"><th>&nbsp;</th><th>name</th></tr>
-    <tr class="js-no-results no-results" style="display: none">
-      <th colspan="2">No matching files</th>
-    </tr>
-    <tbody class="js-results-list js-navigation-container">
-    </tbody>
-  </table>
-</div>
-
-<div id="jump-to-line" style="display:none">
-  <h2>Jump to Line</h2>
-  <form accept-charset="UTF-8">
-    <input class="textfield" type="text">
-    <div class="full-button">
-      <button type="submit" class="classy">
-        <span>Go</span>
-      </button>
-    </div>
-  </form>
-</div>
-
-
-<div class="subnav-bar">
-
-  <ul class="actions subnav">
-    <li><a href="/dvserg/pfsense-packages/tags" class="blank" highlight="repo_tags">Tags <span class="counter">0</span></a></li>
-    <li><a href="/dvserg/pfsense-packages/downloads" class="selected " highlight="repo_downloads">Downloads <span class="counter">4</span></a></li>
-    
-  </ul>
-
-
-  <ul class="subnav">
-
-    <li><a href="/dvserg/pfsense-packages" highlight="repo_source">Files</a></li>
-    <li><a href="/dvserg/pfsense-packages/commits/master" highlight="repo_commits">Commits</a></li>
-    <li><a href="/dvserg/pfsense-packages/branches" class="" highlight="repo_branches" rel="nofollow">Branches <span class="counter">1</span></a></li>
-  </ul>
-
-</div>
-
-  
-  
-  
-
-
-          
-
-        </div><!-- /.repohead -->
-
-        
-
-
-
-
-<p>
-  <a href="/dvserg/pfsense-packages/zipball/master" class="button classy first-in-line" rel="nofollow">
-    <span>Download as zip</span>
-  </a>
-  <a href="/dvserg/pfsense-packages/tarball/master" class="button classy" rel="nofollow">
-    <span>Download as tar.gz</span>
-  </a>
-</p>
-
-
-<div id="uploaded_downloads">
-    
-<h3>Download Packages</h3>
-
-<ol class="download-list" id="manual_downloads">
-    <li class="ctype-unknown">
-      <span class="mini-icon download-unknown"></span>
-      <span class="download-stats">
-        <strong>1</strong> download
-      </span>
-      <h4>
-          <a href="/downloads/dvserg/pfsense-packages/zhabascript.js">zhabascript.js</a>
-        — SQStat mon &gt; to Lightsquid folder
-      </h4>
-      <p><strong>4KB</strong> · Uploaded <time class="js-relative-date" datetime="2012-05-09T12:32:44-07:00" title="2012-05-09 12:32:44">May 09, 2012</time></p>
-    </li>
-    <li class="ctype-unknown">
-      <span class="mini-icon download-unknown"></span>
-      <span class="download-stats">
-        <strong>0</strong> downloads
-      </span>
-      <h4>
-          <a href="/downloads/dvserg/pfsense-packages/sqstat.php">sqstat.php</a>
-        — SQStat mon &gt; to Lightsquid folder
-      </h4>
-      <p><strong>12KB</strong> · Uploaded <time class="js-relative-date" datetime="2012-05-09T12:32:34-07:00" title="2012-05-09 12:32:34">May 09, 2012</time></p>
-    </li>
-    <li class="ctype-unknown">
-      <span class="mini-icon download-unknown"></span>
-      <span class="download-stats">
-        <strong>0</strong> downloads
-      </span>
-      <h4>
-          <a href="/downloads/dvserg/pfsense-packages/sqstat.css">sqstat.css</a>
-        — SQStat mon &gt; to Lightsquid folder
-      </h4>
-      <p><strong>1KB</strong> · Uploaded <time class="js-relative-date" datetime="2012-05-09T12:32:22-07:00" title="2012-05-09 12:32:22">May 09, 2012</time></p>
-    </li>
-    <li class="ctype-unknown">
-      <span class="mini-icon download-unknown"></span>
-      <span class="download-stats">
-        <strong>0</strong> downloads
-      </span>
-      <h4>
-          <a href="/downloads/dvserg/pfsense-packages/sqstat.class.php">sqstat.class.php</a>
-        — SQStat mon &gt; to Lightsquid folder
-      </h4>
-      <p><strong>20KB</strong> · Uploaded <time class="js-relative-date" datetime="2012-05-09T12:32:14-07:00" title="2012-05-09 12:32:14">May 09, 2012</time></p>
-    </li>
-</ol>
-
-</div>
-
-
-      </div>
-      <div class="context-overlay"></div>
-    </div>
-
-      <div id="footer-push"></div><!-- hack for sticky footer -->
-    </div><!-- end of wrapper - hack for sticky footer -->
-
-      <!-- footer -->
-      <div id="footer" >
-        
-  <div class="upper_footer">
-     <div class="container clearfix">
-
-       <!--[if IE]><h4 id="blacktocat_ie">GitHub Links</h4><![endif]-->
-       <![if !IE]><h4 id="blacktocat">GitHub Links</h4><![endif]>
-
-       <ul class="footer_nav">
-         <h4>GitHub</h4>
-         <li><a href="https://github.com/about">About</a></li>
-         <li><a href="https://github.com/blog">Blog</a></li>
-         <li><a href="https://github.com/features">Features</a></li>
-         <li><a href="https://github.com/contact">Contact &amp; Support</a></li>
-         <li><a href="https://github.com/training">Training</a></li>
-         <li><a href="http://enterprise.github.com/">GitHub Enterprise</a></li>
-         <li><a href="http://status.github.com/">Site Status</a></li>
-       </ul>
-
-       <ul class="footer_nav">
-         <h4>Tools</h4>
-         <li><a href="http://get.gaug.es/">Gauges: Analyze web traffic</a></li>
-         <li><a href="http://speakerdeck.com">Speaker Deck: Presentations</a></li>
-         <li><a href="https://gist.github.com">Gist: Code snippets</a></li>
-         <li><a href="http://mac.github.com/">GitHub for Mac</a></li>
-         <li><a href="http://mobile.github.com/">Issues for iPhone</a></li>
-         <li><a href="http://jobs.github.com/">Job Board</a></li>
-       </ul>
-
-       <ul class="footer_nav">
-         <h4>Extras</h4>
-         <li><a href="http://shop.github.com/">GitHub Shop</a></li>
-         <li><a href="http://octodex.github.com/">The Octodex</a></li>
-       </ul>
-
-       <ul class="footer_nav">
-         <h4>Documentation</h4>
-         <li><a href="http://help.github.com/">GitHub Help</a></li>
-         <li><a href="http://developer.github.com/">Developer API</a></li>
-         <li><a href="http://github.github.com/github-flavored-markdown/">GitHub Flavored Markdown</a></li>
-         <li><a href="http://pages.github.com/">GitHub Pages</a></li>
-       </ul>
-
-     </div><!-- /.site -->
-  </div><!-- /.upper_footer -->
-
-<div class="lower_footer">
-  <div class="container clearfix">
-    <!--[if IE]><div id="legal_ie"><![endif]-->
-    <![if !IE]><div id="legal"><![endif]>
-      <ul>
-          <li><a href="https://github.com/site/terms">Terms of Service</a></li>
-          <li><a href="https://github.com/site/privacy">Privacy</a></li>
-          <li><a href="https://github.com/security">Security</a></li>
-      </ul>
-
-      <p>&copy; 2012 <span title="0.06650s from fe10.rs.github.com">GitHub</span> Inc. All rights reserved.</p>
-    </div><!-- /#legal or /#legal_ie-->
-
-      <div class="sponsor">
-        <a href="http://www.rackspace.com" class="logo">
-          <img alt="Dedicated Server" height="36" src="https://a248.e.akamai.net/assets.github.com/images/modules/footer/rackspaces_logo.png?1329521039" width="38" />
-        </a>
-        Powered by the <a href="http://www.rackspace.com ">Dedicated
-        Servers</a> and<br/> <a href="http://www.rackspacecloud.com">Cloud
-        Computing</a> of Rackspace Hosting<span>&reg;</span>
-      </div>
-  </div><!-- /.site -->
-</div><!-- /.lower_footer -->
-
-      </div><!-- /#footer -->
-
-    
-
-<div id="keyboard_shortcuts_pane" class="instapaper_ignore readability-extra" style="display:none">
-  <h2>Keyboard Shortcuts <small><a href="#" class="js-see-all-keyboard-shortcuts">(see all)</a></small></h2>
-
-  <div class="columns threecols">
-    <div class="column first">
-      <h3>Site wide shortcuts</h3>
-      <dl class="keyboard-mappings">
-        <dt>s</dt>
-        <dd>Focus site search</dd>
-      </dl>
-      <dl class="keyboard-mappings">
-        <dt>?</dt>
-        <dd>Bring up this help dialog</dd>
-      </dl>
-    </div><!-- /.column.first -->
-
-    <div class="column middle" style='display:none'>
-      <h3>Commit list</h3>
-      <dl class="keyboard-mappings">
-        <dt>j</dt>
-        <dd>Move selection down</dd>
-      </dl>
-      <dl class="keyboard-mappings">
-        <dt>k</dt>
-        <dd>Move selection up</dd>
-      </dl>
-      <dl class="keyboard-mappings">
-        <dt>c <em>or</em> o <em>or</em> enter</dt>
-        <dd>Open commit</dd>
-      </dl>
-      <dl class="keyboard-mappings">
-        <dt>y</dt>
-        <dd>Expand URL to its canonical form</dd>
-      </dl>
-    </div><!-- /.column.first -->
-
-    <div class="column last" style='display:none'>
-      <h3>Pull request list</h3>
-      <dl class="keyboard-mappings">
-        <dt>j</dt>
-        <dd>Move selection down</dd>
-      </dl>
-      <dl class="keyboard-mappings">
-        <dt>k</dt>
-        <dd>Move selection up</dd>
-      </dl>
-      <dl class="keyboard-mappings">
-        <dt>o <em>or</em> enter</dt>
-        <dd>Open issue</dd>
-      </dl>
-      <dl class="keyboard-mappings">
-        <dt><span class="platform-mac">⌘</span><span class="platform-other">ctrl</span> <em>+</em> enter</dt>
-        <dd>Submit comment</dd>
-      </dl>
-    </div><!-- /.columns.last -->
-
-  </div><!-- /.columns.equacols -->
-
-  <div style='display:none'>
-    <div class="rule"></div>
-
-    <h3>Issues</h3>
-
-    <div class="columns threecols">
-      <div class="column first">
-        <dl class="keyboard-mappings">
-          <dt>j</dt>
-          <dd>Move selection down</dd>
-        </dl>
-        <dl class="keyboard-mappings">
-          <dt>k</dt>
-          <dd>Move selection up</dd>
-        </dl>
-        <dl class="keyboard-mappings">
-          <dt>x</dt>
-          <dd>Toggle selection</dd>
-        </dl>
-        <dl class="keyboard-mappings">
-          <dt>o <em>or</em> enter</dt>
-          <dd>Open issue</dd>
-        </dl>
-        <dl class="keyboard-mappings">
-          <dt><span class="platform-mac">⌘</span><span class="platform-other">ctrl</span> <em>+</em> enter</dt>
-          <dd>Submit comment</dd>
-        </dl>
-      </div><!-- /.column.first -->
-      <div class="column last">
-        <dl class="keyboard-mappings">
-          <dt>c</dt>
-          <dd>Create issue</dd>
-        </dl>
-        <dl class="keyboard-mappings">
-          <dt>l</dt>
-          <dd>Create label</dd>
-        </dl>
-        <dl class="keyboard-mappings">
-          <dt>i</dt>
-          <dd>Back to inbox</dd>
-        </dl>
-        <dl class="keyboard-mappings">
-          <dt>u</dt>
-          <dd>Back to issues</dd>
-        </dl>
-        <dl class="keyboard-mappings">
-          <dt>/</dt>
-          <dd>Focus issues search</dd>
-        </dl>
-      </div>
-    </div>
-  </div>
-
-  <div style='display:none'>
-    <div class="rule"></div>
-
-    <h3>Issues Dashboard</h3>
-
-    <div class="columns threecols">
-      <div class="column first">
-        <dl class="keyboard-mappings">
-          <dt>j</dt>
-          <dd>Move selection down</dd>
-        </dl>
-        <dl class="keyboard-mappings">
-          <dt>k</dt>
-          <dd>Move selection up</dd>
-        </dl>
-        <dl class="keyboard-mappings">
-          <dt>o <em>or</em> enter</dt>
-          <dd>Open issue</dd>
-        </dl>
-      </div><!-- /.column.first -->
-    </div>
-  </div>
-
-  <div style='display:none'>
-    <div class="rule"></div>
-
-    <h3>Network Graph</h3>
-    <div class="columns equacols">
-      <div class="column first">
-        <dl class="keyboard-mappings">
-          <dt><span class="badmono">←</span> <em>or</em> h</dt>
-          <dd>Scroll left</dd>
-        </dl>
-        <dl class="keyboard-mappings">
-          <dt><span class="badmono">→</span> <em>or</em> l</dt>
-          <dd>Scroll right</dd>
-        </dl>
-        <dl class="keyboard-mappings">
-          <dt><span class="badmono">↑</span> <em>or</em> k</dt>
-          <dd>Scroll up</dd>
-        </dl>
-        <dl class="keyboard-mappings">
-          <dt><span class="badmono">↓</span> <em>or</em> j</dt>
-          <dd>Scroll down</dd>
-        </dl>
-        <dl class="keyboard-mappings">
-          <dt>t</dt>
-          <dd>Toggle visibility of head labels</dd>
-        </dl>
-      </div><!-- /.column.first -->
-      <div class="column last">
-        <dl class="keyboard-mappings">
-          <dt>shift <span class="badmono">←</span> <em>or</em> shift h</dt>
-          <dd>Scroll all the way left</dd>
-        </dl>
-        <dl class="keyboard-mappings">
-          <dt>shift <span class="badmono">→</span> <em>or</em> shift l</dt>
-          <dd>Scroll all the way right</dd>
-        </dl>
-        <dl class="keyboard-mappings">
-          <dt>shift <span class="badmono">↑</span> <em>or</em> shift k</dt>
-          <dd>Scroll all the way up</dd>
-        </dl>
-        <dl class="keyboard-mappings">
-          <dt>shift <span class="badmono">↓</span> <em>or</em> shift j</dt>
-          <dd>Scroll all the way down</dd>
-        </dl>
-      </div><!-- /.column.last -->
-    </div>
-  </div>
-
-  <div style='display:none'>
-    <div class="rule"></div>
-    <div class="columns threecols">
-      <div class="column first" style='display:none'>
-        <h3>Source Code Browsing</h3>
-        <dl class="keyboard-mappings">
-          <dt>t</dt>
-          <dd>Activates the file finder</dd>
-        </dl>
-        <dl class="keyboard-mappings">
-          <dt>l</dt>
-          <dd>Jump to line</dd>
-        </dl>
-        <dl class="keyboard-mappings">
-          <dt>w</dt>
-          <dd>Switch branch/tag</dd>
-        </dl>
-        <dl class="keyboard-mappings">
-          <dt>y</dt>
-          <dd>Expand URL to its canonical form</dd>
-        </dl>
-      </div>
-    </div>
-  </div>
-
-  <div style='display:none'>
-    <div class="rule"></div>
-    <div class="columns threecols">
-      <div class="column first">
-        <h3>Browsing Commits</h3>
-        <dl class="keyboard-mappings">
-          <dt><span class="platform-mac">⌘</span><span class="platform-other">ctrl</span> <em>+</em> enter</dt>
-          <dd>Submit comment</dd>
-        </dl>
-        <dl class="keyboard-mappings">
-          <dt>escape</dt>
-          <dd>Close form</dd>
-        </dl>
-        <dl class="keyboard-mappings">
-          <dt>p</dt>
-          <dd>Parent commit</dd>
-        </dl>
-        <dl class="keyboard-mappings">
-          <dt>o</dt>
-          <dd>Other parent commit</dd>
-        </dl>
-      </div>
-    </div>
-  </div>
-</div>
-
-    <div id="markdown-help" class="instapaper_ignore readability-extra">
-  <h2>Markdown Cheat Sheet</h2>
-
-  <div class="cheatsheet-content">
-
-  <div class="mod">
-    <div class="col">
-      <h3>Format Text</h3>
-      <p>Headers</p>
-      <pre>
-# This is an &lt;h1&gt; tag
-## This is an &lt;h2&gt; tag
-###### This is an &lt;h6&gt; tag</pre>
-     <p>Text styles</p>
-     <pre>
-*This text will be italic*
-_This will also be italic_
-**This text will be bold**
-__This will also be bold__
-
-*You **can** combine them*
-</pre>
-    </div>
-    <div class="col">
-      <h3>Lists</h3>
-      <p>Unordered</p>
-      <pre>
-* Item 1
-* Item 2
-  * Item 2a
-  * Item 2b</pre>
-     <p>Ordered</p>
-     <pre>
-1. Item 1
-2. Item 2
-3. Item 3
-   * Item 3a
-   * Item 3b</pre>
-    </div>
-    <div class="col">
-      <h3>Miscellaneous</h3>
-      <p>Images</p>
-      <pre>
-![GitHub Logo](/images/logo.png)
-Format: ![Alt Text](url)
-</pre>
-     <p>Links</p>
-     <pre>
-http://github.com - automatic!
-[GitHub](http://github.com)</pre>
-<p>Blockquotes</p>
-     <pre>
-As Kanye West said:
-
-> We're living the future so
-> the present is our past.
-</pre>
-    </div>
-  </div>
-  <div class="rule"></div>
-
-  <h3>Code Examples in Markdown</h3>
-  <div class="col">
-      <p>Syntax highlighting with <a href="http://github.github.com/github-flavored-markdown/" title="GitHub Flavored Markdown" target="_blank">GFM</a></p>
-      <pre>
-```javascript
-function fancyAlert(arg) {
-  if(arg) {
-    $.facebox({div:'#foo'})
-  }
+<?php
+/* $Id$ */
+/*
+    sqstat.php
+    Squid Proxy Server realtime stat
+
+    (c) Alex Samorukov, samm@os2.kiev.ua
+    modification by 2011 Serg Dvoriancev, dv_serg@mail.ru
+
+    part of pfSense (www.pfSense.com)
+
+    Redistribution and use in source and binary forms, with or without
+    modification, are permitted provided that the following conditions are met:
+
+    1. Redistributions of source code must retain the above copyright notice,
+       this list of conditions and the following disclaimer.
+
+    2. Redistributions in binary form must reproduce the above copyright
+       notice, this list of conditions and the following disclaimer in the
+       documentation and/or other materials provided with the distribution.
+
+    THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
+    INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+    AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+    AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+    OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+    INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+    POSSIBILITY OF SUCH DAMAGE.
+*/
+
+/*
+*** sqstat - Squid Proxy Server realtime stat ***
+(c) Alex Samorukov, samm@os2.kiev.ua
+*/
+
+require_once('guiconfig.inc');
+require_once('sqstat.class.php');
+
+# init
+$squidclass = new squidstat();
+
+# ------------------------------------------------------------------------------
+# Requests
+# ------------------------------------------------------------------------------
+
+# AJAX responce
+if ($_REQUEST['getactivity'])
+{
+    header("Content-type: text/javascript");
+    echo sqstat_AJAX_response( $_REQUEST );
+    exit;
 }
-```</pre>
-    </div>
-    <div class="col">
-      <p>Or, indent your code 4 spaces</p>
-      <pre>
-Here is a Python code example
-without syntax highlighting:
 
-    def foo:
-      if not bar:
-        return true</pre>
-    </div>
-    <div class="col">
-      <p>Inline code for comments</p>
-      <pre>
-I think you should use an
-`&lt;addr&gt;` element here instead.</pre>
-    </div>
-  </div>
+# ------------------------------------------------------------------------------
+# HTML Page
+# ------------------------------------------------------------------------------
 
-  </div>
+$pgtitle = "Proxy Squid: Realtime stat (sqstat)";
+
+require_once("head.inc");
+
+?>
+
+<link   href="sqstat.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="/javascript/scriptaculous/prototype.js"></script>
+<script type="text/javascript" src="zhabascript.js"></script>
+
+<!-- Ajax Script -->
+<script type="text/javascript">
+
+var intervalID = 0;
+
+function el(id) {
+    return document.getElementById(id);
+}
+
+function getactivity(action) {
+    var url  = "<?php echo ($_SERVER["PHP_SELF"]); ?>";
+    var pars = "getactivity=yes";
+
+    var myAjax = new Ajax.Request( url,
+            {
+                 method:    'post',
+                 parameters: pars,
+                 onComplete: activitycallback
+            });
+}
+
+function activitycallback(transport) {
+
+    if (200 == transport.status) {
+        result = transport.responseText;
+    }
+}
+
+function update_start() {
+    var cmax = parseInt(el('refresh').value);
+
+    update_stop();
+
+    if (cmax > 0) {
+        intervalID = window.setInterval('getactivity();', cmax * 1000);
+    }
+}
+
+function update_stop() {
+     window.clearInterval(intervalID);
+   	intervalID = 0;
+}
+
+// pre-call
+window.setTimeout('update_start()', 150);
+
+</script>
+
+<!-- HTML -->
+
+<!-- begin -->
+<body link="#0000CC" vlink="#0000CC" alink="#0000CC">
+<?php include("fbegin.inc"); ?>
+
+<?php
+    # prepare page data
+    $data = '';
+    sqstat_loadconfig();
+    if (sqstat_loadconfig() == 0) {
+        $data = $squidclass->query_exec();
+    }
+
+    if ($squidclass->errno == 0) {
+        $data = sqstat_resultHTML($data);
+    }
+    else {
+       # error    	
+	$data = sqstat_errorHTML();    
+    }
+?>
+
+<!-- form -->
+<div id="sqstat_header" class="header" >
+    <?php echo ( sqstat_headerHTML() ); ?>
 </div>
 
+<!-- result table -->
+<div id="sqstat_result" class="result">
+    <?php echo ($data); ?>
+</div>
 
-    <div class="ajax-error-message">
-      <p><span class="mini-icon exclamation"></span> Something went wrong with that request. Please try again. <a href="javascript:;" class="ajax-error-dismiss">Dismiss</a></p>
-    </div>
-
-    <div id="logo-popup">
-      <h2>Looking for the GitHub logo?</h2>
-      <ul>
-        <li>
-          <h4>GitHub Logo</h4>
-          <a href="http://github-media-downloads.s3.amazonaws.com/GitHub_Logos.zip"><img alt="Github_logo" src="https://a248.e.akamai.net/assets.github.com/images/modules/about_page/github_logo.png?1315937507" /></a>
-          <a href="http://github-media-downloads.s3.amazonaws.com/GitHub_Logos.zip" class="minibutton btn-download download"><span><span class="icon"></span>Download</span></a>
-        </li>
-        <li>
-          <h4>The Octocat</h4>
-          <a href="http://github-media-downloads.s3.amazonaws.com/Octocats.zip"><img alt="Octocat" src="https://a248.e.akamai.net/assets.github.com/images/modules/about_page/octocat.png?1315937507" /></a>
-          <a href="http://github-media-downloads.s3.amazonaws.com/Octocats.zip" class="minibutton btn-download download"><span><span class="icon"></span>Download</span></a>
-        </li>
-      </ul>
-    </div>
-
-    
-    
-    
-    <span id='server_response_time' data-time='0.07518' data-host='fe10'></span>
-  </body>
+<!-- end -->
+<?php include("fend.inc"); ?>
+</body>
 </html>
 
+<?php
+
+# ------------------------------------------------------------------------------
+# Functions
+# ------------------------------------------------------------------------------
+
+function sqstat_AJAX_response( $request )
+{
+    global $squidclass, $data;
+    $res = '';
+
+    if (sqstat_loadconfig() != 0) {
+        return sqstat_AJAX_error(sqstat_errorHTML());
+    }
+
+    # Actions
+    $data = $squidclass->query_exec();
+
+    $ver  = sqstat_serverInfoHTML();
+    $res .= "el('sqstat_serverver').innerHTML = '$ver';";
+
+    $time = date("h:i:s d/m/Y");
+    $res .= "el('sqstat_updtime').innerHTML = '$time';";
+
+    $data = sqstat_resultHTML( $data );
+    if ($squidclass->errno == 0) {
+        $data = sqstat_AJAX_prep($data);
+        $res .= "el('sqstat_result').innerHTML = '$data';";
+    }
+    else {
+        # error
+        $res .= sqstat_AJAX_error(sqstat_errorHTML());
+    }
+
+    return $res;
+}
+
+function sqstat_AJAX_prep($text)
+{
+    $text = str_replace("'", "\'", $text);
+    $text = str_replace("\n", "\\r\\n", $text);
+    return $text;
+}
+
+function sqstat_AJAX_error($err)
+{
+    $err = sqstat_AJAX_prep($err);
+    $t .= "el('sqstat_result').innerHTML = '$err';";
+    return $t;
+}
+
+# ------------------------------------------------------------------------------
+# Reports
+# ------------------------------------------------------------------------------
+
+function sqstat_headerHTML()
+{
+    global $squidclass;
+
+    $date = date("h:i:s d/m/Y");
+    $squidinfo = sqstat_serverInfoHTML();
+
+	if (empty($squidclass->autorefresh)) $squidclass->autorefresh = 0;
+
+	return
+<<<EOD
+ 	<form method="get" action="{$_SERVER["PHP_SELF"]}">
+		<input id="counter" name="counter" type="hidden" value=0/>
+		Squid RealTime stat {$squidclass->sqstat_version} for the {$servers} proxy server <a id='sqstat_serverver'>{$squidinfo}</a>.<br/>
+		Auto refresh:
+		<input id="refresh" name="refresh" type="text" size="4" value="{$squidclass->autorefresh}"/> sec.
+		<input type="button" value="Update" onclick="update_start();"/>
+		<input type="button" value="Stop"   onclick="update_stop();"/> Created at: <tt id='sqstat_updtime'>{$date}</tt><br/>
+	</form>
+EOD;
+}
+
+function sqstat_serverInfoHTML()
+{
+    global $squidclass;
+    return $squidclass->server_version . " ({$squidclass->squidhost}:{$squidclass->squidport})";
+}
+
+function sqstat_resultHTML($data)
+{
+    global $squidclass;
+
+    $group_by_name = $squidclass->group_by_name;
+    $use_js        = true;
+
+    $t = array();
+
+    # table header
+    $t[] = "<table class='result' align='center' width='100%' border='0'>";
+    $t[] = "<tr>";
+    $t[] = "<th>{$group_by_name}</th><th>URI</th>";
+    if ($squidclass->use_sessions)
+        $t[] = "<th>Curr. Speed</th><th>Avg. Speed</th>";
+    $t[] = "<th>Size</th><th>Time</th>";
+    $t[] = "</tr>";
+
+    # table body
+    if (is_array($data['users'])) {
+        $tbl = array();
+
+        $con_color = 0;
+        foreach($data['users'] as $key => $v) {
+            # skeep total info
+            if ($key == 'total') continue;
+            # group row
+            $tbl[] = "<tr>";
+            $tbl[] = "<td style='border-right:0;' colspan='2'><b>" . (is_int($key) ? long2ip($key) : $key) . "</b></td>";
+            $tbl[] = "<td style='border-left:0;'  colspan='5'>&nbsp;</td>";
+            $tbl[] = "</tr>";
+
+            # connections row
+            foreach ($v['con'] as $con) {
+                if ($use_js)
+                    $js = "onMouseout='hideddrivetip()' onMouseover='ddrivetip(\"" . $squidclass->implode_with_keys($con,"<br/>") . "\")'";
+                else $js='';
+
+                # begin new row
+                $class = (++$con_color % 2 == 0) ? " class='odd'" : "";
+                $tbl[] = "<tr ($class)>";
+
+                # URL
+                $uri   = "<a target='_blank' href='" . htmlspecialchars($con["uri"]) ."'>{$con['uritext']}</a>";
+                $tbl[] = "<td id='white'></td>";
+                $tbl[] = "<td nowrap {$js} width='80%'>{$uri}</td>";
+
+                # speed
+                if ($squidclass->use_sessions) {
+                    $cur_s = round($con['cur_speed'], 2) > 0 ? sprintf("%01.2f KB/s", $con['cur_speed']) : '';
+                    $avg_s = round($con['avg_speed'], 2) > 0 ? sprintf("%01.2f KB/s", $con['avg_speed']) : '';
+                    $tbl[] = "<td nowrap align='right'>{$cur_s}</td>";
+                    $tbl[] = "<td nowrap align='right'>{$avg_s}</td>";
+                }
+
+                # file size
+                $filesize = $squidclass->filesize_format($con["bytes"]);
+                $duration = $squidclass->duration($con["seconds"], "short");
+                $tbl[] = "<td nowrap align='right'>{$filesize}</td>";
+                $tbl[] = "<td nowrap align='right'>{$duration}</td>";
+
+                # end row
+                $tbl[] = "</tr>";
+            }
+
+            # total user speed
+            if ($squidclass->use_sessions) {
+                $user_curr = sprintf("%01.2f KB/s", $v['user_curr']);
+                $user_avg  = sprintf("%01.2f KB/s", $v['user_avg']);
+                $tbl[] ="<tr>";
+                $tbl[] ="<td colspan='2'></td>";
+                $tbl[] ="<td align='right' id='highlight'>{$user_curr}</td>";
+                $tbl[] ="<td align='right' id='highlight'>{$user_avg}</td>";
+                $tbl[] ="<td colspan='2'></td>";
+            }
+        }
+
+
+        # status row
+        $stat = array();
+        $ausers = sprintf("%d", $data['ausers']);
+        $acon   = sprintf("%d", $data['acon']);
+        $stat[] = "<tr class='total'><td><b>Total:</b></td>";
+        if ($squidclass->use_sessions) {
+            $total_curr = sprintf("%01.2f", $data['total_curr']);
+            $total_avg  = sprintf("%01.2f", $data['total_avg']);
+            $stat[] = "<td align='right' colspan='5'><b>{$ausers}</b> users and <b>{$acon}</b> connections @ <b>{$total_curr}/{$total_avg}</b> KB/s (CURR/AVG)</td>";
+        }
+        else {
+            $stat[] = "<td align='right' colspan='5'><b>{$ausers}</b> users and <b>{$acon}</b> connections</td>";
+        }
+        $t[] = "</tr>";
+    }
+
+    if ($ausers == 0) {
+        $t[] = "<tr><td colspan=6><b>No active connections</b></td></tr>";
+    }
+    else {
+        $stat = implode("\n", $stat);
+        $tbl  = implode("\n", $tbl);
+        $t[]  = $stat . $tbl . $stat;
+    }
+
+    $t[] = "</table>";
+    $t[] = "<p class='copyleft'>Report based on SQStat &copy; <a href='mailto:samm@os2.kiev.ua?subject=SqStat '" . SQSTAT_VERSION . "'>Alex Samorukov</a>, 2006</p>";
+
+    return implode("\n", $t);
+}
+
+function sqstat_errorHTML()
+{
+    global $squidclass;
+    $t = array();
+
+    # table header
+    $t[] = "<table class='result' align='center' width='100%' border='0'>";
+    $t[] = "<tr><th align='left'>SqStat error</th></tr>";
+    $t[] = "<tr><td>";
+    $t[] = '<p style="color:red">Error (' . $squidclass->errno . '): ' . $squidclass->errstr . '</p>';
+    $t[] = "</td></tr>";
+    $t[] = "</table>";
+
+    return implode ("\n", $t);
+}
+
+function sqstat_loadconfig()
+{
+    global $squidclass, $config;
+
+    $squidclass->errno = 0;
+    $squidclass->errstr = '';
+
+    $squidclass->sqstat_version = SQSTAT_VERSION;
+
+    # === load config from pfSense ===
+    $iface = '127.0.0.1';
+    $iport = 3128;
+    $squid_settings = $config['installedpackages']['squid']['config'][0];
+    if (!empty($squid_settings)) {
+        # squid interface IP & port
+        if ($squid_settings['transparent_proxy'] == 'on') {
+            $iface = '127.0.0.1';
+            $iport = 80;
+        }
+        else {
+            $realif = array();
+            $iface = ($squid_settings['active_interface'] ? $squid_settings['active_interface'] : 'lan');
+            $iface = explode(",", $iface);
+            foreach ($iface as $i => $if) {
+                $realif[] = sqstat_get_real_interface_address($if);
+                $iface    = $realif[$i][0] ? $realif[$i][0] : '127.0.0.1';
+            }
+            $iport = $squid_settings['proxy_port'] ? $squid_settings['proxy_port'] : 3128;
+        }
+    }
+    $squidclass->squidhost = $iface;
+    $squidclass->squidport = $iport;
+
+    $squidclass->group_by        = "host";
+    $squidclass->resolveip       = true;
+    $squidclass->hosts_file      = '';    # hosts file not used
+    $squidclass->autorefresh     = 3;     # refresh 3 sec by default
+    $squidclass->cachemgr_passwd = '';
+
+    # load hosts file, if defined
+    if (!empty($squidclass->hosts_file)) {
+        $squidclass->load_hosts();
+    }
+
+    return $squidclass->errno;
+}
+
+function sqstat_get_real_interface_address($iface)
+{
+	global $config;
+
+	$iface = convert_friendly_interface_to_real_interface_name($iface);
+	$line = trim(shell_exec("ifconfig $iface | grep inet | grep -v inet6"));
+	list($dummy, $ip, $dummy2, $netmask) = explode(" ", $line);
+
+	return array($ip, long2ip(hexdec($netmask)));
+}
+
+?>
