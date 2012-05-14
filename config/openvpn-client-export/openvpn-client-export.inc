@@ -602,7 +602,7 @@ function openvpn_client_export_sharedkey_config($srvid, $useaddr, $proxy, $zipco
 		}
 	} else if ($useaddr == "serverhostname" || empty($useaddr)) {
 		$server_host = empty($config['system']['hostname']) ? "" : "{$config['system']['hostname']}.";
-		$server_host .= "{{$config['system']['domain']}";
+		$server_host .= "{$config['system']['domain']}";
 	} else
 		$server_host = $useaddr;
 
