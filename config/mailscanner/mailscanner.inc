@@ -32,7 +32,10 @@ require_once("util.inc");
 require("globals.inc");
 #require("guiconfig.inc");
 
-
+$uname=posix_uname();
+if ($uname['machine']=='amd64')
+        ini_set('memory_limit', '250M');
+        
 function ms_text_area_decode($text){
 	return preg_replace('/\r\n/', "\n",base64_decode($text));	
 }
@@ -40,19 +43,84 @@ function ms_text_area_decode($text){
 function sync_package_mailscanner() {
 	global $config;
 
+	# detect boot process
+	if (is_array($_POST)){
+		if (preg_match("/\w+/",$_POST['__csrf_magic']))
+			unset($boot_process);
+		else
+			$boot_process="on";
+	}
+	exec('/bin/pgrep -f MailScanner',$pgrep_out);
+	if (count($pgrep_out) > 0 && isset($boot_process))
+		return;
+
+	#check default config
+	$load_samples=0;
+	
 	#assign xml arrays
-	if (is_array($config['installedpackages']['mailscanner']))
-		$mailscanner=$config['installedpackages']['mailscanner']['config'][0];
-	if (is_array($config['installedpackages']['msattachments']))
-		$attachments=$config['installedpackages']['msattachments']['config'][0];
-	if (is_array($config['installedpackages']['msantivirus']))
-		$antivirus=$config['installedpackages']['msantivirus']['config'][0];
-	if (is_array($config['installedpackages']['mscontent']))
-		$content=$config['installedpackages']['mscontent']['config'][0];
-	if (is_array($config['installedpackages']['msreport']))
-		$report=$config['installedpackages']['msreport']['config'][0];
-	if (is_array($config['installedpackages']['msantispam']))
-		$antispam=$config['installedpackages']['msantispam']['config'][0];
+	if (!is_array($config['installedpackages']['mailscanner'])){
+		$config['installedpackages']['mailscanner']['config'][0]=array(	'max_children'=> '5',
+																		'pim'=> 'ScanMessages',
+																		'syslog_facility'=> 'mail',
+																		'syslog'=>'LogSpamAssassinRuleActions',
+																		'advanced'=> 'DeliverInBackground,AutomaticSyntaxCheck',
+																		'deliver_method'=>'batch',
+																		'minimum_code'=>'batch',
+																		'spam_score_format'=>'%d',
+																		'cache_timings'=> '1800,300,10800,172800,600' );
+		$load_samples++;
+	}
+	$mailscanner=$config['installedpackages']['mailscanner']['config'][0];
+	if (!is_array($config['installedpackages']['msattachments'])){
+		$config['installedpackages']['msattachments']['config'][0]=array('features'=>'ExpandTNEF,FindArchiveByContent,UnpackMicrosoftDocuments',
+																		'tnef_contents'=>'replace',
+																		'max_sizes'=>'-1',
+																		'archive_depth'=>'8',
+																		'attachment_filename'=>'MessageAttachments.zip',
+																		'attachment_extension_exclude'=>'0',
+																		'attachment_max_per_archive'=>'0',
+																		'attachment_max'=>'50k');
+		$load_samples++;
+	}
+	$attachments=$config['installedpackages']['msattachments']['config'][0];
+	if (!is_array($config['installedpackages']['msantivirus'])){
+		$config['installedpackages']['msantivirus']['config'][0]=array(	'features'=>'VirusScanning,CheckFilenamesInPassword-ProtectedArchives',
+																		'virus_scanner'=>'auto',
+																		'timeout'=>'300',
+																		'silent_virus'=>'HTML-Iframe,All-viruses');
+		$load_samples++;
+	}
+	$antivirus=$config['installedpackages']['msantivirus']['config'][0];
+	if (!is_array($config['installedpackages']['mscontent'])){
+		$config['installedpackages']['mscontent']['config'][0]=array('checks'=>'DangerousContentScanning,UseStricterPhishingNet,HighlightPhishingFraud',
+																	'iframe_tags'=>'disarm',
+																	'form_tags'=>'disarm',
+																	'web_bugs'=>'disarm',
+																	'codebase_tags'=>'disarm');
+		$load_samples++;
+	}
+	$content=$config['installedpackages']['mscontent']['config'][0];
+	if (!is_array($config['installedpackages']['msreport'])){
+		$config['installedpackages']['msreport']['config'][0]=array('features'=>'HideIncomingWorkDir,IncludeScannerNameInReports',
+																	'notification'=>'NotifySendersofBlockedFilenamesorFiletypes',
+																	'system'=>'NoticesIncludeFullHeaders',
+																	'language'=>'en');
+		$load_samples++;
+	}
+	$report=$config['installedpackages']['msreport']['config'][0];
+	if (!is_array($config['installedpackages']['msantispam'])){
+		$config['installedpackages']['msantispam']['config'][0]=array(	'rblfeatures'=>'spam_checks',
+																		'safeatures'=>'use_sa,sa_auto_whitelist,check_sa_if_on_spam_list,spam_score,cache_spamassassin_results,use_pyzor,use_razor,use_dcc,use_bayes,use_auto_learn_bayes',
+																		'sa_score'=>'6',
+																		'spam_actions'=>'deliver',
+																		'hi_score'=>'20',
+																		'hispam_actions'=>'deliver',
+																		'rebuild_bayes'=>'86400',
+																		'mcp_features'=>'detailled_mcp_report',
+																		'mcp_score'=>'1');
+		$load_samples++;
+	}
+	$antispam=$config['installedpackages']['msantispam']['config'][0];
 	if (is_array($config['installedpackages']['msalerts']))
 		$alert=$config['installedpackages']['msalerts']['config'][0];
 		
@@ -186,7 +254,6 @@ function sync_package_mailscanner() {
 Language Strings = %report-dir%/languages.conf
 */
 	#check files
-	$load_samples=0;
 	$mailscanner_dir="/usr/local/etc/MailScanner";
 	
 	if($attachments['filename_rules'] == ""){
@@ -263,9 +330,11 @@ Language Strings = %report-dir%/languages.conf
 	foreach ($report_files as $key_r => $file_r){
 		if ($report[$key_r] == ""){
 			#$input_errors[]= $key;
-			$config['installedpackages']['msreport']['config'][0][$key_r]=base64_encode(file_get_contents($report_dir.'/'.$file_r.'.sample'));
-			file_put_contents($report_dir.'/'.$file_r,ms_text_area_decode($config['installedpackages']['msreport']['config'][0][$key_r]),LOCK_EX);
-			$load_samples++;
+			if (file_exists($report_dir.'/'.$file_r.'.sample')){
+				$config['installedpackages']['msreport']['config'][0][$key_r]=base64_encode(file_get_contents($report_dir.'/'.$file_r.'.sample'));
+				file_put_contents($report_dir.'/'.$file_r,ms_text_area_decode($config['installedpackages']['msreport']['config'][0][$key_r]),LOCK_EX);
+				$load_samples++;
+				}
 			}
 		#print $key_r ."X $file_r X". base64_encode(file_get_contents($report_dir.'/'.$file_r.'.sample')) ."<br>";
 		
@@ -296,503 +365,15 @@ Language Strings = %report-dir%/languages.conf
 	#exit;
 	if($load_samples > 0)
 		write_config();
-	/*
+
+/*
 Phishing Safe Sites File = %etc-dir%/phishing.safe.sites.conf
 Phishing Bad Sites File = %etc-dir%/phishing.bad.sites.conf
 Country Sub-Domains List = %etc-dir%/country.domains.conf
 */
 	
-	#create MailScanner.conf$deliver_silent
-	$mc=<<<EOF
-{$info}
-# Configuration directory containing this file
-%etc-dir% = /usr/local/etc/MailScanner
-
-# Set the directory containing all the reports in the required language
-%report-dir% = /usr/local/share/MailScanner/reports/{$report_language}
-
-# Rulesets directory containing your ".rules" files
-%rules-dir% = /usr/local/etc/MailScanner/rules
-
-# Configuration directory containing files related to MCP
-# (Message Content Protection)
-%mcp-dir% = /usr/local/etc/MailScanner/mcp
-
-#
-# System settings
-# ---------------
-#
-Max Children = {$max_children}	
-Run As User = postfix
-Run As Group = postfix
-Queue Scan Interval = 6
-Incoming Queue Dir = /var/spool/postfix/hold
-Outgoing Queue Dir = /var/spool/postfix/incoming
-Incoming Work Dir = /var/spool/MailScanner/incoming
-Quarantine Dir = /var/spool/MailScanner/quarantine
-PID file = /var/run/MailScanner.pid
-Restart Every = 14400
-MTA = postfix
-Sendmail = /usr/local/sbin/sendmail
-
-#
-# Incoming Work Dir Settings
-# --------------------------
-#
-Incoming Work User = postix
-Incoming Work Group = postix
-Incoming Work Permissions = 0600
-
-#
-# Quarantine and Archive Settings
-# -------------------------------
-#
-Quarantine User = postifx
-Quarantine Group = postfix
-Quarantine Permissions = 0600
-
-#
-# Processing Incoming Mail
-# ------------------------
-#
-Max Unscanned Bytes Per Scan = 100m
-Max Unsafe Bytes Per Scan = 50m
-Max Unscanned Messages Per Scan = 30
-Max Unsafe Messages Per Scan = 30
-Max Normal Queue Size = 800
-Scan Messages =	{$scan_messages}
-Reject Message = {$reject_message}
-Maximum Processing Attempts = 10
-Processing Attempts Database = /var/spool/MailScanner/incoming/Processing.db
-Maximum Attachments Per Message = 200
-Expand TNEF = {$expand_tnef}
-Deliver Unparsable TNEF = {$deliver_tnef}
-Use TNEF Contents = {$attachments['tnef_contents']}
-TNEF Expander = /usr/local/bin/tnef --maxsize=100000000
-TNEF Timeout = 120
-File Command = /usr/bin/file
-File Timeout = 20
-Gunzip Command = /usr/bin/gunzip
-Gunzip Timeout = 50
-Unrar Command = /usr/local/bin/unrar
-Unrar Timeout = 50
-Find UU-Encoded Files = no
-Maximum Message Size = %rules-dir%/max.message.size.rules
-Maximum Attachment Size ={$max_size}
-Minimum Attachment Size = -1
-Maximum Archive Depth = {$archive_depth}
-Find Archives By Content ={$find_archive}
-Unpack Microsoft Documents = {$microsoft}
-Zip Attachments = {$zip_attachments}
-Attachments Zip Filename = {$zip_file} 
-Attachments Min Total Size To Zip = 100k
-Attachment Extensions Not To Zip = {$zip_exclude}
-Add Text Of Doc = no
-Antiword = /usr/bin/antiword -f
-Antiword Timeout = 50
-Unzip Maximum Files Per Archive = {$unzip_max_per_archive}
-Unzip Maximum File Size = {$unzip_max}
-Unzip Filenames = *.txt *.ini *.log *.csv
-Unzip MimeType = text/plain
-
-#
-# Virus Scanning and Vulnerability Testing
-# ----------------------------------------
-#
-Virus Scanning = {$virus_scanning}
-Virus Scanners = {$antivirus['virus_scanner']}
-Virus Scanner Timeout = {$antivirus_timeout}
-Deliver Disinfected Files = {$deliver_disinfected}
-Silent Viruses = {$silent_viruses}
-Still Deliver Silent Viruses = {$deliver_silent}
-Non-Forging Viruses = Joke/ OF97/ WM97/ W97M/ eicar
-Spam-Virus Header = {$spam_virus_header}
-Virus Names Which Are Spam = Sane*UNOFFICIAL HTML/* *Phish*
-Block Encrypted Messages = {$block_encrypted}
-Block Unencrypted Messages = {$block_unencrypted}
-Allow Password-Protected Archives = {$allow_password}
-Check Filenames In Password-Protected Archives = {$check_filenames}
-Monitors for ClamAV Updates = /var/db/clamav/*.cvd
-ClamAVmodule Maximum Recursion Level = 8
-ClamAVmodule Maximum Files = 1000
-ClamAVmodule Maximum File Size = 10000000 # (10 Mbytes)
-ClamAVmodule Maximum Compression Ratio = 25
-Allowed Sophos Error Messages =
-Sophos IDE Dir = /opt/sophos-av/lib/sav
-Sophos Lib Dir = /opt/sophos-av/lib
-Monitors For Sophos Updates = /opt/sophos-av/lib/sav/*.ide
-Clamd Port = 3310
-Clamd Socket = /var/run/clamav/clamd.sock
-Clamd Lock File = # /var/lock/subsys/clamd
-Clamd Use Threads = no
-ClamAV Full Message Scan = yes
-Fpscand Port = 10200
-{$custom_antivirus_options}
-
-#
-# Removing/Logging dangerous or potentially offensive content
-# -----------------------------------------------------------
-#
-Dangerous Content Scanning = {$dangerous_content}
-Allow Partial Messages = {$partial_messages}
-Allow External Message Bodies = {$external_bodies}
-Find Phishing Fraud = {$phishing_fraud}
-Also Find Numeric Phishing = {$numeric_phishig}
-Use Stricter Phishing Net = ${stricter_phishing_net}
-Highlight Phishing Fraud = ${highlight_phishing}
-Phishing Safe Sites File = %etc-dir%/phishing.safe.sites.conf
-Phishing Bad Sites File = %etc-dir%/phishing.bad.sites.conf
-Country Sub-Domains List = %etc-dir%/country.domains.conf
-Allow IFrame Tags = {$content['iframe_tags']}
-Allow Form Tags = {$content['form_tags']}
-Allow Script Tags = {$content['script_tags']}
-Allow WebBugs = {$content['web_bugs']}
-Ignored Web Bug Filenames = spacer pixel.gif pixel.png gap shim
-Known Web Bug Servers = msgtag.com
-Web Bug Replacement = http://www.mailscanner.tv/1x1spacer.gif
-Allow Object Codebase Tags = {$content['codebase_tags']}
-Convert Dangerous HTML To Text = {$dangerous_html}
-Convert HTML To Text = {$html_to_text}
-
-#
-# Attachment Filename Checking
-# ----------------------------
-#
-Archives Are = zip rar ole
-Allow Filenames =
-Deny Filenames =
-Filename Rules = %etc-dir%/filename.rules.conf
-Allow Filetypes =
-Allow File MIME Types =
-Deny Filetypes =
-Deny File MIME Types =
-Filetype Rules = %etc-dir%/filetype.rules.conf
-Archives: Allow Filenames =
-Archives: Deny Filenames =
-Archives: Filename Rules = %etc-dir%/archives.filename.rules.conf
-Archives: Allow Filetypes =
-Archives: Allow File MIME Types =
-Archives: Deny Filetypes =
-Archives: Deny File MIME Types =
-Archives: Filetype Rules = %etc-dir%/archives.filetype.rules.conf
-Default Rename Pattern = __FILENAME__.disarmed
-
-#
-# Reports and Responses
-# ---------------------
-#
-Quarantine Infections = {$quarantine_infections}
-Quarantine Silent Viruses = {$quarantine_silent_virus}
-Quarantine Modified Body = {$quarantine_modified_body}
-Quarantine Whole Message = {$quarantine_whole_message}
-Quarantine Whole Messages As Queue Files = {$quarantine_whole_message_as_queue}
-Keep Spam And MCP Archive Clean = {$keep_spam_and_mcp}
-Language Strings = %report-dir%/languages.conf
-Rejection Report = %report-dir%/rejection.report.txt
-Deleted Bad Content Message Report  = %report-dir%/deleted.content.message.txt
-Deleted Bad Filename Message Report = %report-dir%/deleted.filename.message.txt
-Deleted Virus Message Report        = %report-dir%/deleted.virus.message.txt
-Deleted Size Message Report        = %report-dir%/deleted.size.message.txt
-Stored Bad Content Message Report  = %report-dir%/stored.content.message.txt
-Stored Bad Filename Message Report = %report-dir%/stored.filename.message.txt
-Stored Virus Message Report        = %report-dir%/stored.virus.message.txt
-Stored Size Message Report        = %report-dir%/stored.size.message.txt
-Disinfected Report = %report-dir%/disinfected.report.txt
-Inline HTML Signature = %report-dir%/inline.sig.html
-Inline Text Signature = %report-dir%/inline.sig.txt
-Signature Image Filename = %report-dir%/sig.jpg
-Signature Image <img> Filename = signature.jpg
-Inline HTML Warning = %report-dir%/inline.warning.html
-Inline Text Warning = %report-dir%/inline.warning.txt
-Sender Content Report        = %report-dir%/sender.content.report.txt
-Sender Error Report        = %report-dir%/sender.error.report.txt
-Sender Bad Filename Report = %report-dir%/sender.filename.report.txt
-Sender Virus Report        = %report-dir%/sender.virus.report.txt
-Sender Size Report         = %report-dir%/sender.size.report.txt
-Hide Incoming Work Dir = {$hide_incoming_work_dir}
-Include Scanner Name In Reports = {$include_scanner_name}
-#
-# Changes to Message Headers
-# --------------------------
-#
-Mail Header = X-%org-name%-MailScanner:
-Spam Header = X-%org-name%-MailScanner-SpamCheck:
-Spam Score Header = X-%org-name%-MailScanner-SpamScore:
-Information Header = X-%org-name%-MailScanner-Information:
-Add Envelope From Header = yes
-Add Envelope To Header = no
-Envelope From Header = X-%org-name%-MailScanner-From:
-Envelope To Header = X-%org-name%-MailScanner-To:
-ID Header = X-%org-name%-MailScanner-ID:
-IP Protocol Version Header = # X-%org-name%-MailScanner-IP-Protocol:
-Spam Score Character = s
-SpamScore Number Instead Of Stars = no
-Minimum Stars If On Spam List = 0
-Clean Header Value       = Found to be clean
-Infected Header Value    = Found to be infected
-Disinfected Header Value = Disinfected
-Information Header Value = Please contact the ISP for more information
-Detailed Spam Report = yes
-Include Scores In SpamAssassin Report = yes
-Always Include SpamAssassin Report = no
-Multiple Headers = append
-Place New Headers At Top Of Message = no
-Hostname = the %org-name% ($HOSTNAME) MailScanner
-Sign Messages Already Processed = no
-Sign Clean Messages = yes
-Attach Image To Signature = no
-Attach Image To HTML Message Only = yes
-Allow Multiple HTML Signatures = no
-Dont Sign HTML If Headers Exist = # In-Reply-To: References:
-Mark Infected Messages = yes
-Mark Unscanned Messages = yes
-Unscanned Header Value = Not scanned: please contact your Internet E-Mail Service Provider for details
-Remove These Headers = X-Mozilla-Status: X-Mozilla-Status2:
-Deliver Cleaned Messages = yes
-
-#
-# Notifications back to the senders of blocked messages
-# -----------------------------------------------------
-#
-Notify Senders = {$notify_sender}
-Notify Senders Of Viruses = {$notify_sender_viruses}
-Notify Senders Of Blocked Filenames Or Filetypes = {$notify_sender_fileytypes}
-Notify Senders Of Blocked Size Attachments = {$notify_sender_attachments}
-Notify Senders Of Other Blocked Content = {$notify_sender_contents}
-Never Notify Senders Of Precedence = list bulk
-
-#
-# Changes to the Subject: line
-# ----------------------------
-#
-Scanned Modify Subject = no # end
-Scanned Subject Text = [Scanned]
-Virus Modify Subject = start
-Virus Subject Text = [Virus?]
-Filename Modify Subject = start
-Filename Subject Text = [Filename?]
-Content Modify Subject = start
-Content Subject Text = [Dangerous Content?]
-Size Modify Subject = start
-Size Subject Text = [Size]
-Disarmed Modify Subject = start
-Disarmed Subject Text = [Disarmed]
-Phishing Modify Subject = no
-Phishing Subject Text = [Fraude?]
-Spam Modify Subject = start
-Spam Subject Text = [Spam?]
-High Scoring Spam Modify Subject = start
-High Scoring Spam Subject Text = [Spam?]
-
-#
-# Changes to the Message Body
-# ---------------------------
-#
-Warning Is Attachment = yes
-Attachment Warning Filename = %org-name%-Attachment-Warning.txt
-Attachment Encoding Charset = ISO-8859-1
-
-#
-# Mail Archiving and Monitoring
-# -----------------------------
-#
-Archive Mail =
-Missing Mail Archive Is = directory
-
-#
-# Notices to System Administrators
-# --------------------------------
-#
-Send Notices = {$send_notices}
-Notices Include Full Headers = {$notices_include_header}
-Hide Incoming Work Dir in Notices = {$hide_incoming_work_dir_notices}
-Notice Signature = {$notice_signature}
-Notices From = ${$notice_from}
-Notices To = ${$notice_to}
-Local Postmaster = postmaster
-
-#
-# Spam Detection and Virus Scanner Definitions
-# --------------------------------------------
-#
-Spam List Definitions = %etc-dir%/spam.lists.conf
-Virus Scanner Definitions = %etc-dir%/virus.scanners.conf
-
-#
-# Spam Detection and Spam Lists (DNS blocklists)
-# ----------------------------------------------
-#
-
-Spam Checks = yes
-Spam List = # spamhaus-ZEN # You can un-comment this to enable them
-Spam Domain List =
-Spam Lists To Be Spam = 1
-Spam Lists To Reach High Score = 3
-Spam List Timeout = 10
-Max Spam List Timeouts = 7
-Spam List Timeouts History = 10
-Is Definitely Not Spam = %rules-dir%/spam.whitelist.rules
-Is Definitely Spam = no
-Definite Spam Is High Scoring = no
-Ignore Spam Whitelist If Recipients Exceed = 20
-Max Spam Check Size = 200k
-
-#
-# Watermarking
-# ------------
-#
-Use Watermarking = no
-Add Watermark = yes
-Check Watermarks With No Sender = yes
-Treat Invalid Watermarks With No Sender as Spam = nothing
-Check Watermarks To Skip Spam Checks = yes
-Watermark Secret = %org-name%-Secret
-Watermark Lifetime = 604800
-Watermark Header = X-%org-name%-MailScanner-Watermark:
-
-#
-# SpamAssassin
-# ------------
-#
-
-Use SpamAssassin = {$use_sa}
-Max SpamAssassin Size = {$sa_max}
-Required SpamAssassin Score = {$sa_score}
-High SpamAssassin Score = {$hi_score}
-SpamAssassin Auto Whitelist = {$sa_auto_whitelist}
-SpamAssassin Timeout = 75
-Max SpamAssassin Timeouts = 10
-SpamAssassin Timeouts History = 30
-Check SpamAssassin If On Spam List = {$check_sa_if_on_spam_list}
-Include Binary Attachments In SpamAssassin = {$include_sa_bin_attachments}
-Spam Score = {$spam_score}
-Cache SpamAssassin Results = {$cache_spamassassin_results}
-SpamAssassin Cache Database File = /var/spool/MailScanner/incoming/SpamAssassin.cache.db
-Rebuild Bayes Every = {$rebuild_bayes}
-Wait During Bayes Rebuild = {$wait_during_bayes_rebuild}
-
-#
-# Custom Spam Scanner Plugin
-# --------------------------
-#
-Use Custom Spam Scanner = no
-Max Custom Spam Scanner Size = 20k
-Custom Spam Scanner Timeout = 20
-Max Custom Spam Scanner Timeouts = 10
-Custom Spam Scanner Timeout History = 20
-
-#
-# What to do with spam
-# --------------------
-#
-
-Spam Actions = {$spam_actions} header "X-Spam-Status: Yes"
-High Scoring Spam Actions = {$hispam_actions} header "X-Spam-Status: Yes"
-Non Spam Actions = deliver header "X-Spam-Status: No"
-SpamAssassin Rule Actions =
-Sender Spam Report         = %report-dir%/sender.spam.report.txt
-Sender Spam List Report    = %report-dir%/sender.spam.rbl.report.txt
-Sender SpamAssassin Report = %report-dir%/sender.spam.sa.report.txt
-Inline Spam Warning = %report-dir%/inline.spam.warning.txt
-Recipient Spam Report = %report-dir%/recipient.spam.report.txt
-Enable Spam Bounce = %rules-dir%/bounce.rules
-Bounce Spam As Attachment = no
-#
-# Logging
-# -------
-#
-Syslog Facility = {$syslog_facility}
-Log Speed = {$log_speed}
-Log Spam = {$log_spam}
-Log Non Spam = {$log_non_spam}
-Log Delivery And Non-Delivery = {$log_delivery}
-Log Permitted Filenames = {$log_filenames}
-Log Permitted Filetypes = {$log_filetypes}
-Log Permitted File MIME Types = {$log_mime}
-Log Silent Viruses = {$log_silent}
-Log Dangerous HTML Tags = {$log_dangerous}
-Log SpamAssassin Rule Actions = {$log_sa_rule_action}
-
-#
-# Advanced SpamAssassin Settings
-# ------------------------------
-#
-SpamAssassin Temporary Dir = /var/spool/MailScanner/incoming/SpamAssassin-Temp
-SpamAssassin User State Dir =
-SpamAssassin Install Prefix =
-SpamAssassin Site Rules Dir = /usr/local/etc/mail/spamassassin
-SpamAssassin Local Rules Dir =
-SpamAssassin Local State Dir = # /var/lib/spamassassin
-SpamAssassin Default Rules Dir =
-
-#
-# MCP (Message Content Protection)
-# -----------------------------
-#
-
-MCP Checks = {$mcp_checks}
-First Check = spam
-MCP Required SpamAssassin Score = {$mcp_score}
-MCP High SpamAssassin Score = {$hi_mcp_score}
-MCP Error Score = 1
-MCP Header = X-%org-name%-MailScanner-MCPCheck:
-Non MCP Actions = deliver
-MCP Actions = {$mcp_action}
-High Scoring MCP Actions = {$mcp_hi_action}
-Bounce MCP As Attachment = {$bounce_mcp}
-MCP Modify Subject = start
-MCP Subject Text = [MCP?]
-High Scoring MCP Modify Subject = start
-High Scoring MCP Subject Text = [MCP?]
-
-Is Definitely MCP = {$is_mcp}
-Is Definitely Not MCP = {$is_not_mcp}
-Definite MCP Is High Scoring = {$mcp_is_high_score}
-Always Include MCP Report = {$include_mcp_report}
-Detailed MCP Report = {$detailled_mcp_report}
-Include Scores In MCP Report = {$score_mcp_report}
-Log MCP = {$log_mcp}
-
-MCP Max SpamAssassin Timeouts = 20
-MCP Max SpamAssassin Size = {$mcp_max}
-MCP SpamAssassin Timeout = 10
-
-MCP SpamAssassin Prefs File = %mcp-dir%/mcp.spam.assassin.prefs.conf
-MCP SpamAssassin User State Dir =
-MCP SpamAssassin Local Rules Dir = %mcp-dir%
-MCP SpamAssassin Default Rules Dir = %mcp-dir%
-MCP SpamAssassin Install Prefix = %mcp-dir%
-Recipient MCP Report = %report-dir%/recipient.mcp.report.txt
-Sender MCP Report = %report-dir%/sender.mcp.report.txt
-
-#
-# Advanced Settings
-# -----------------
-#
-Use Default Rules With Multiple Recipients = {$default_rule_multiple}
-Read IP Address From Received Header = {$read_ipaddress}
-Spam Score Number Format = {$spam_score_format}
-MailScanner Version Number = 4.83.5
-SpamAssassin Cache Timings = {$cache_timings}
-Debug = {$debug}
-Debug SpamAssassin = {$debug_spam}
-Run In Foreground = {$foreground}
-Always Looked Up Last = {$look_up_last}
-Always Looked Up Last After Batch = {$look_up_last_batch}
-Deliver In Background = {$deliver_background}
-Delivery Method = {$mailscanner['deliver_method']}
-Split Exim Spool = {$split_exim_spool}
-Lockfile Dir = /var/spool/MailScanner/incoming/Locks
-Custom Functions Dir = /usr/local/lib/MailScanner/MailScanner/CustomFunctions
-Lock Type =
-Syslog Socket Type =
-Automatic Syntax Check = {$syntax_check}
-Minimum Code Status = {$mailscanner['minimum_code']}
-include /usr/local/etc/MailScanner/conf.d/*
-
-
-
-EOF;
+	#create MailScanner.conf
+	include("mailscanner.conf.template");
 	#write files
 	conf_mount_rw();
 	if (!is_dir("/var/spool/MailScanner/incoming")){
@@ -811,7 +392,7 @@ EOF;
 	$mfiles[]="/usr/local/share/MailScanner/reports/{$mlang}/languages.conf";
 	
 	foreach ($mfiles as $mfile)
-		if (! file_exists ($mfile))
+		if (! file_exists ($mfile) && file_exists($mfile.".sample"))
 			copy($mfile.".sample",$mfile);
 			
 
@@ -965,46 +546,70 @@ EOF;
 				log_error('No clamav database found, running freshclam in background.');
 				mwexec_bg('/usr/local/bin/freshclam');
 				}
+				
 			#clamav-wrapper file
 			$cconf=$libexec_dir."clamav-wrapper";
-			$cconf_file=file_get_contents($cconf);
-			if (preg_match('/"clamav"/',$cconf_file)){
-				$cconf_file=preg_replace('/"clamav"/','"postfix"',$cconf_file);
-				file_put_contents($cconf, $cconf_file, LOCK_EX);
+			if (file_exists($cconf)){
+				$cconf_file=file_get_contents($cconf);
+				if (preg_match('/"clamav"/',$cconf_file)){
+					$cconf_file=preg_replace('/"clamav"/','"postfix"',$cconf_file);
+					file_put_contents($cconf, $cconf_file, LOCK_EX);
+					}
 				}
 				
 			#freshclam conf file
 			$cconf="/usr/local/etc/freshclam.conf";
-			$cconf_file=file_get_contents($cconf);
-			if (preg_match('/DatabaseOwner clamav/',$cconf_file)){
-				$cconf_file=preg_replace("/DatabaseOwner clamav/","DatabaseOwner postfix",$cconf_file);
-				file_put_contents($cconf, $cconf_file, LOCK_EX);
+			if (file_exists($conf)){
+				$cconf_file=file_get_contents($cconf);
+				if (preg_match('/DatabaseOwner clamav/',$cconf_file)){
+					$cconf_file=preg_replace("/DatabaseOwner clamav/","DatabaseOwner postfix",$cconf_file);
+					file_put_contents($cconf, $cconf_file, LOCK_EX);
+					}
 				}
 				
 			#clamd conf file
 			$cconf="/usr/local/etc/clamd.conf";
-			$cconf_file=file_get_contents($cconf);
-			if (preg_match('/User clamav/',$cconf_file)){
-				$cconf_file=preg_replace("/User clamav/","User postfix",$cconf_file);
-				file_put_contents($cconf, $cconf_file, LOCK_EX);
+			if (file_exists($conf)){
+				$cconf_file=file_get_contents($cconf);
+				if (preg_match('/User clamav/',$cconf_file)){
+					$cconf_file=preg_replace("/User clamav/","User postfix",$cconf_file);
+					file_put_contents($cconf, $cconf_file, LOCK_EX);
+					}
 				}
 			#clamd script file
 			$script='/usr/local/etc/rc.d/clamav-clamd';
-			$script_file=file($script);
-			foreach ($script_file as $script_line){
-				if(preg_match("/command=/",$script_line)){
-					$new_clamav_startup.= "/bin/mkdir /var/run/clamav\n";
-					$new_clamav_startup.= "chown postfix /var/run/clamav\n";
-					$new_clamav_startup.=$script_line;
+			if (file_exists($script)){
+				$script_file=file($script);
+				foreach ($script_file as $script_line){
+					if(preg_match("/command=/",$script_line)){
+						$new_clamav_startup.= "/bin/mkdir -p /var/run/clamav\n";
+						$new_clamav_startup.= "chown postfix /var/run/clamav\n";
+						$new_clamav_startup.=$script_line;
+						}
+					elseif(!preg_match("/(mkdir|chown|sleep|mailscanner)/",$script_line)) {
+						$new_clamav_startup.=preg_replace("/NO/","YES",$script_line);
+						}
 					}
-				elseif(!preg_match("/(mkdir|chown|sleep|mailscanner)/",$script_line)) {
-					$new_clamav_startup.=preg_replace("/NO/","YES",$script_line);
+				file_put_contents($script, $new_clamav_startup, LOCK_EX);
+				
+				chmod ($script,0755);
+				if($config['installedpackages']['mailscanner']['config'][0]['enable']){
+					if (is_process_running('clamd')){
+						log_error("Restarting clamav-clamd daemon");
+						mwexec("$script restart");
+						}
+					else{
+						log_error("Starting clamav-clamd daemon");
+						mwexec_bg("$script start");
+						}	
+				}
+				else{
+					if (is_process_running('clamd')){
+						log_error("Restarting clamav-clamd daemon");
+						mwexec("$script start");
+						}
 					}
 				}
-			file_put_contents($script, $new_clamav_startup, LOCK_EX);
-			chmod ($script,0755);
-			mwexec("$script stop");
-			mwexec_bg("$script start");
 		}
 	}
 	else{
@@ -1012,63 +617,105 @@ EOF;
 		unlink_if_exists($libexec_dir.'clamav-wrapper');
 	}
 	
-	#check dcc startup script
-			$script='/usr/local/etc/rc.d/dccifd';
-			$script_file=file_get_contents($script);
-			if (preg_match('/NO/',$script_file)){
-				$script_file=preg_replace("/NO/","YES",$script_file);
-				file_put_contents($script, $script_file, LOCK_EX);
-				chmod ($script,0755);
-				}
 	#check dcc config file
 			$script='/usr/local/dcc/dcc_conf';
-			$script_file=file_get_contents($script);
-			if (preg_match('/DCCIFD_ENABLE=off/',$script_file)){
-				$script_file=preg_replace("/DCCIFD_ENABLE=off/","DCCIFD_ENABLE=on",$script_file);
-				file_put_contents($script, $script_file, LOCK_EX);
+			if (file_exists($script)){
+				$script_file=file_get_contents($script);
+				if (preg_match('/DCCIFD_ENABLE=off/',$script_file)){
+					$script_file=preg_replace("/DCCIFD_ENABLE=off/","DCCIFD_ENABLE=on",$script_file);
+					file_put_contents($script, $script_file, LOCK_EX);
+					}
 				}
-			mwexec("$script stop");
-			mwexec_bg("$script start");
+	
+	#check dcc startup script
+			$script='/usr/local/etc/rc.d/dccifd';
+			if (file_exists($script)){
+				$script_file=file_get_contents($script);
+				if (preg_match('/NO/',$script_file)){
+					$script_file=preg_replace("/NO/","YES",$script_file);
+					file_put_contents($script, $script_file, LOCK_EX);
+					chmod ($script,0755);
+					}
+				
+				if($config['installedpackages']['mailscanner']['config'][0]['enable']){
+					if(is_process_running('dccifd')){
+						log_error("Restarting dccifd");
+						mwexec("$script restart");	
+						}
+					else{
+						log_error("Starting dccifd");
+						mwexec("$script start");
+						}	
+					}
+				else{
+					if(is_process_running('dccifd')){
+						log_error("Stopping dccifd");
+						mwexec("$script stop");	
+						}
+					}
+				}
 				
 	$script='/usr/local/etc/rc.d/mailscanner';
 
 	#fix MIME::ToolUtils deprecated function and usecure dependency calls in /usr/local/sbin/mailscanner
 	$cconf="/usr/local/sbin/mailscanner";
-	$cconf_file=file_get_contents($cconf);
-	$pattern2[0]='/perl\W+I/';
-	$pattern2[1]='/\smy .current = config MIME::ToolUtils/';
-	$replacement2[0]='perl -U -I';
-	$replacement2[1]=' #my $current = config MIME::ToolUtils';
-	if (preg_match('/perl\W+I/',$cconf_file)){
-		$cconf_file=preg_replace($pattern2,$replacement2,$cconf_file);
-		file_put_contents($cconf, $cconf_file, LOCK_EX);
-		#force old process stop	
-		mwexec("$script stop");
-		}	
-	
-	$script_file=file_get_contents($script);
-	if (preg_match('/NO/',$script_file)){
-				$script_file=preg_replace("/NO/","YES",$script_file);
-				file_put_contents($script, $script_file, LOCK_EX);
-				chmod ($script,0755);
+	if (file_exists($cconf)){
+		#check perl's version
+		exec('find /usr/local/lib/perl5/site_perl -name Df.pm',$find_out);
+		$perl_bin="perl"; 
+		foreach($find_out as $perl_dir){
+			if (preg_match ('@usr/local/lib/perl5/site_perl/([.0-9]+)/mach/Filesys/Df.pm@',$perl_dir,$perl_match))
+				$perl_bin.=$perl_match[1];
+		}
+		
+		$cconf_file=file_get_contents($cconf);
+		$pattern2[0]='@#!/usr.*bin/perl.*I@';
+		$pattern2[1]='/\smy .current = config MIME::ToolUtils/';
+		$replacement2[0]='#!/usr/local/bin/'.$perl_bin.' -U -I';
+		$replacement2[1]=' #my $current = config MIME::ToolUtils';
+		if (preg_match('@#!/usr.*bin/perl.*I@',$cconf_file)){
+			$cconf_file=preg_replace($pattern2,$replacement2,$cconf_file);
+			file_put_contents($cconf, $cconf_file, LOCK_EX);
+			}	
+	}
+	if (file_exists($script)){
+		$script_file=file_get_contents($script);
+		if (preg_match('/NO/',$script_file)){
+			$script_file=preg_replace("/NO/","YES",$script_file);
+			file_put_contents($script, $script_file, LOCK_EX);
+			chmod ($script,0755);
+			}
+		exec('/bin/pgrep -f MailScanner', $pgrep_out);
+		if($config['installedpackages']['mailscanner']['config'][0]['enable']){
+			chmod ($script,0755);
+			if (count($pgrep_out) >  0 && file_exists($script)){
+				log_error("Restarting MailScanner");
+				mwexec_bg("$script restart");
 				}
-	if($config['installedpackages']['mailscanner']['config'][0]['enable']){
-		log_error("Reload mailscanner");
-		chmod ($script,0755);
-		mwexec("$script stop");
-        sleep(2);
-        mwexec_bg("$script start");
-	}
-	else{
-		log_error("Stopping mailscanner if running");
-		mwexec("$script stop");
-		chmod ($script,0444);
-	}
+			else{
+				log_error("Starting MailScanner");
+				mwexec("$script start");
+				}
+			}
+		else{
+			if (count($pgrep_out) >  0 && file_exists($script)){
+				log_error("Stopping MailScanner");
+				mwexec("$script stop");
+				chmod ($script,0444);
+				}
+			}
+		}
 	conf_mount_ro();
+
+	#does not sync during boot process
+	if (isset($boot_process))
+		return;
+
 	$synconchanges = $config['installedpackages']['mailscannersync']['config'][0]['synconchanges'];
 	if(!$synconchanges && !$syncondbchanges) 
 		return;
-	log_error("[mailscanner] mailscanner_xmlrpc_sync.php is starting.");
+
+	log_error("[MailScanner] mailscanner_xmlrpc_sync.php is starting.");
 	foreach ($config['installedpackages']['mailscannersync']['config'] as $rs ){
 		foreach($rs['row'] as $sh){
 		$sync_to_ip = $sh['ipaddress'];
@@ -1103,11 +750,14 @@ function mailscanner_php_install_command() {
 }
 
 function mailscanner_php_deinstall_command() {
-	mwexec("/usr/local/etc/rc.d/mailscanner.sh stop");
-	sleep(1);
-	conf_mount_rw();
-	unlink_if_exists("/usr/local/etc/rc.d/mailscanner.sh");
-	conf_mount_ro();
+	exec('/bin/pgrep -f MailScanner',$pgrep_out);
+	if (count($pgreg_out) > 0){
+		mwexec("/usr/local/etc/rc.d/mailscanner stop");
+		sleep(1);
+		conf_mount_rw();
+		unlink_if_exists("/usr/local/etc/rc.d/mailscanner");
+		conf_mount_ro();
+		}
 }
 
 function mailscanner_do_xmlrpc_sync($sync_to_ip, $password,$sync_type) {

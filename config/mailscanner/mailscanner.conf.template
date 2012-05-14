@@ -1,0 +1,493 @@
+<?php
+#create MailScanner.conf
+$mc=<<<EOF
+{$info}
+# Configuration directory containing this file
+%etc-dir% = /usr/local/etc/MailScanner
+
+# Set the directory containing all the reports in the required language
+%report-dir% = /usr/local/share/MailScanner/reports/{$report_language}
+
+# Rulesets directory containing your ".rules" files
+%rules-dir% = /usr/local/etc/MailScanner/rules
+
+# Configuration directory containing files related to MCP
+# (Message Content Protection)
+%mcp-dir% = /usr/local/etc/MailScanner/mcp
+
+#
+# System settings
+# ---------------
+#
+Max Children = {$max_children}	
+Run As User = postfix
+Run As Group = postfix
+Queue Scan Interval = 6
+Incoming Queue Dir = /var/spool/postfix/hold
+Outgoing Queue Dir = /var/spool/postfix/incoming
+Incoming Work Dir = /var/spool/MailScanner/incoming
+Quarantine Dir = /var/spool/MailScanner/quarantine
+PID file = /var/run/MailScanner.pid
+Restart Every = 14400
+MTA = postfix
+Sendmail = /usr/local/sbin/sendmail
+
+#
+# Incoming Work Dir Settings
+# --------------------------
+#
+Incoming Work User = postix
+Incoming Work Group = postix
+Incoming Work Permissions = 0600
+
+#
+# Quarantine and Archive Settings
+# -------------------------------
+#
+Quarantine User = postifx
+Quarantine Group = postfix
+Quarantine Permissions = 0600
+
+#
+# Processing Incoming Mail
+# ------------------------
+#
+Max Unscanned Bytes Per Scan = 100m
+Max Unsafe Bytes Per Scan = 50m
+Max Unscanned Messages Per Scan = 30
+Max Unsafe Messages Per Scan = 30
+Max Normal Queue Size = 800
+Scan Messages =	{$scan_messages}
+Reject Message = {$reject_message}
+Maximum Processing Attempts = 10
+Processing Attempts Database = /var/spool/MailScanner/incoming/Processing.db
+Maximum Attachments Per Message = 200
+Expand TNEF = {$expand_tnef}
+Deliver Unparsable TNEF = {$deliver_tnef}
+Use TNEF Contents = {$attachments['tnef_contents']}
+TNEF Expander = /usr/local/bin/tnef --maxsize=100000000
+TNEF Timeout = 120
+File Command = /usr/bin/file
+File Timeout = 20
+Gunzip Command = /usr/bin/gunzip
+Gunzip Timeout = 50
+Unrar Command = /usr/local/bin/unrar
+Unrar Timeout = 50
+Find UU-Encoded Files = no
+Maximum Message Size = %rules-dir%/max.message.size.rules
+Maximum Attachment Size ={$max_size}
+Minimum Attachment Size = -1
+Maximum Archive Depth = {$archive_depth}
+Find Archives By Content ={$find_archive}
+Unpack Microsoft Documents = {$microsoft}
+Zip Attachments = {$zip_attachments}
+Attachments Zip Filename = {$zip_file} 
+Attachments Min Total Size To Zip = 100k
+Attachment Extensions Not To Zip = {$zip_exclude}
+Add Text Of Doc = no
+Antiword = /usr/bin/antiword -f
+Antiword Timeout = 50
+Unzip Maximum Files Per Archive = {$unzip_max_per_archive}
+Unzip Maximum File Size = {$unzip_max}
+Unzip Filenames = *.txt *.ini *.log *.csv
+Unzip MimeType = text/plain
+
+#
+# Virus Scanning and Vulnerability Testing
+# ----------------------------------------
+#
+Virus Scanning = {$virus_scanning}
+Virus Scanners = {$antivirus['virus_scanner']}
+Virus Scanner Timeout = {$antivirus_timeout}
+Deliver Disinfected Files = {$deliver_disinfected}
+Silent Viruses = {$silent_viruses}
+Still Deliver Silent Viruses = {$deliver_silent}
+Non-Forging Viruses = Joke/ OF97/ WM97/ W97M/ eicar
+Spam-Virus Header = {$spam_virus_header}
+Virus Names Which Are Spam = Sane*UNOFFICIAL HTML/* *Phish*
+Block Encrypted Messages = {$block_encrypted}
+Block Unencrypted Messages = {$block_unencrypted}
+Allow Password-Protected Archives = {$allow_password}
+Check Filenames In Password-Protected Archives = {$check_filenames}
+Monitors for ClamAV Updates = /var/db/clamav/*.cvd
+ClamAVmodule Maximum Recursion Level = 8
+ClamAVmodule Maximum Files = 1000
+ClamAVmodule Maximum File Size = 10000000 # (10 Mbytes)
+ClamAVmodule Maximum Compression Ratio = 25
+Allowed Sophos Error Messages =
+Sophos IDE Dir = /opt/sophos-av/lib/sav
+Sophos Lib Dir = /opt/sophos-av/lib
+Monitors For Sophos Updates = /opt/sophos-av/lib/sav/*.ide
+Clamd Port = 3310
+Clamd Socket = /var/run/clamav/clamd.sock
+Clamd Lock File = # /var/lock/subsys/clamd
+Clamd Use Threads = no
+ClamAV Full Message Scan = yes
+Fpscand Port = 10200
+{$custom_antivirus_options}
+
+#
+# Removing/Logging dangerous or potentially offensive content
+# -----------------------------------------------------------
+#
+Dangerous Content Scanning = {$dangerous_content}
+Allow Partial Messages = {$partial_messages}
+Allow External Message Bodies = {$external_bodies}
+Find Phishing Fraud = {$phishing_fraud}
+Also Find Numeric Phishing = {$numeric_phishig}
+Use Stricter Phishing Net = ${stricter_phishing_net}
+Highlight Phishing Fraud = ${highlight_phishing}
+Phishing Safe Sites File = %etc-dir%/phishing.safe.sites.conf
+Phishing Bad Sites File = %etc-dir%/phishing.bad.sites.conf
+Country Sub-Domains List = %etc-dir%/country.domains.conf
+Allow IFrame Tags = {$content['iframe_tags']}
+Allow Form Tags = {$content['form_tags']}
+Allow Script Tags = {$content['script_tags']}
+Allow WebBugs = {$content['web_bugs']}
+Ignored Web Bug Filenames = spacer pixel.gif pixel.png gap shim
+Known Web Bug Servers = msgtag.com
+Web Bug Replacement = http://www.mailscanner.tv/1x1spacer.gif
+Allow Object Codebase Tags = {$content['codebase_tags']}
+Convert Dangerous HTML To Text = {$dangerous_html}
+Convert HTML To Text = {$html_to_text}
+
+#
+# Attachment Filename Checking
+# ----------------------------
+#
+Archives Are = zip rar ole
+Allow Filenames =
+Deny Filenames =
+Filename Rules = %etc-dir%/filename.rules.conf
+Allow Filetypes =
+Allow File MIME Types =
+Deny Filetypes =
+Deny File MIME Types =
+Filetype Rules = %etc-dir%/filetype.rules.conf
+Archives: Allow Filenames =
+Archives: Deny Filenames =
+Archives: Filename Rules = %etc-dir%/archives.filename.rules.conf
+Archives: Allow Filetypes =
+Archives: Allow File MIME Types =
+Archives: Deny Filetypes =
+Archives: Deny File MIME Types =
+Archives: Filetype Rules = %etc-dir%/archives.filetype.rules.conf
+Default Rename Pattern = __FILENAME__.disarmed
+
+#
+# Reports and Responses
+# ---------------------
+#
+Quarantine Infections = {$quarantine_infections}
+Quarantine Silent Viruses = {$quarantine_silent_virus}
+Quarantine Modified Body = {$quarantine_modified_body}
+Quarantine Whole Message = {$quarantine_whole_message}
+Quarantine Whole Messages As Queue Files = {$quarantine_whole_message_as_queue}
+Keep Spam And MCP Archive Clean = {$keep_spam_and_mcp}
+Language Strings = %report-dir%/languages.conf
+Rejection Report = %report-dir%/rejection.report.txt
+Deleted Bad Content Message Report  = %report-dir%/deleted.content.message.txt
+Deleted Bad Filename Message Report = %report-dir%/deleted.filename.message.txt
+Deleted Virus Message Report        = %report-dir%/deleted.virus.message.txt
+Deleted Size Message Report        = %report-dir%/deleted.size.message.txt
+Stored Bad Content Message Report  = %report-dir%/stored.content.message.txt
+Stored Bad Filename Message Report = %report-dir%/stored.filename.message.txt
+Stored Virus Message Report        = %report-dir%/stored.virus.message.txt
+Stored Size Message Report        = %report-dir%/stored.size.message.txt
+Disinfected Report = %report-dir%/disinfected.report.txt
+Inline HTML Signature = %report-dir%/inline.sig.html
+Inline Text Signature = %report-dir%/inline.sig.txt
+Signature Image Filename = %report-dir%/sig.jpg
+Signature Image <img> Filename = signature.jpg
+Inline HTML Warning = %report-dir%/inline.warning.html
+Inline Text Warning = %report-dir%/inline.warning.txt
+Sender Content Report        = %report-dir%/sender.content.report.txt
+Sender Error Report        = %report-dir%/sender.error.report.txt
+Sender Bad Filename Report = %report-dir%/sender.filename.report.txt
+Sender Virus Report        = %report-dir%/sender.virus.report.txt
+Sender Size Report         = %report-dir%/sender.size.report.txt
+Hide Incoming Work Dir = {$hide_incoming_work_dir}
+Include Scanner Name In Reports = {$include_scanner_name}
+#
+# Changes to Message Headers
+# --------------------------
+#
+Mail Header = X-%org-name%-MailScanner:
+Spam Header = X-%org-name%-MailScanner-SpamCheck:
+Spam Score Header = X-%org-name%-MailScanner-SpamScore:
+Information Header = X-%org-name%-MailScanner-Information:
+Add Envelope From Header = yes
+Add Envelope To Header = no
+Envelope From Header = X-%org-name%-MailScanner-From:
+Envelope To Header = X-%org-name%-MailScanner-To:
+ID Header = X-%org-name%-MailScanner-ID:
+IP Protocol Version Header = # X-%org-name%-MailScanner-IP-Protocol:
+Spam Score Character = s
+SpamScore Number Instead Of Stars = no
+Minimum Stars If On Spam List = 0
+Clean Header Value       = Found to be clean
+Infected Header Value    = Found to be infected
+Disinfected Header Value = Disinfected
+Information Header Value = Please contact the ISP for more information
+Detailed Spam Report = yes
+Include Scores In SpamAssassin Report = yes
+Always Include SpamAssassin Report = no
+Multiple Headers = append
+Place New Headers At Top Of Message = no
+Hostname = the %org-name% ($HOSTNAME) MailScanner
+Sign Messages Already Processed = no
+Sign Clean Messages = yes
+Attach Image To Signature = no
+Attach Image To HTML Message Only = yes
+Allow Multiple HTML Signatures = no
+Dont Sign HTML If Headers Exist = # In-Reply-To: References:
+Mark Infected Messages = yes
+Mark Unscanned Messages = yes
+Unscanned Header Value = Not scanned: please contact your Internet E-Mail Service Provider for details
+Remove These Headers = X-Mozilla-Status: X-Mozilla-Status2:
+Deliver Cleaned Messages = yes
+
+#
+# Notifications back to the senders of blocked messages
+# -----------------------------------------------------
+#
+Notify Senders = {$notify_sender}
+Notify Senders Of Viruses = {$notify_sender_viruses}
+Notify Senders Of Blocked Filenames Or Filetypes = {$notify_sender_fileytypes}
+Notify Senders Of Blocked Size Attachments = {$notify_sender_attachments}
+Notify Senders Of Other Blocked Content = {$notify_sender_contents}
+Never Notify Senders Of Precedence = list bulk
+
+#
+# Changes to the Subject: line
+# ----------------------------
+#
+Scanned Modify Subject = no # end
+Scanned Subject Text = [Scanned]
+Virus Modify Subject = start
+Virus Subject Text = [Virus?]
+Filename Modify Subject = start
+Filename Subject Text = [Filename?]
+Content Modify Subject = start
+Content Subject Text = [Dangerous Content?]
+Size Modify Subject = start
+Size Subject Text = [Size]
+Disarmed Modify Subject = start
+Disarmed Subject Text = [Disarmed]
+Phishing Modify Subject = no
+Phishing Subject Text = [Fraude?]
+Spam Modify Subject = start
+Spam Subject Text = [Spam?]
+High Scoring Spam Modify Subject = start
+High Scoring Spam Subject Text = [Spam?]
+
+#
+# Changes to the Message Body
+# ---------------------------
+#
+Warning Is Attachment = yes
+Attachment Warning Filename = %org-name%-Attachment-Warning.txt
+Attachment Encoding Charset = ISO-8859-1
+
+#
+# Mail Archiving and Monitoring
+# -----------------------------
+#
+Archive Mail =
+Missing Mail Archive Is = directory
+
+#
+# Notices to System Administrators
+# --------------------------------
+#
+Send Notices = {$send_notices}
+Notices Include Full Headers = {$notices_include_header}
+Hide Incoming Work Dir in Notices = {$hide_incoming_work_dir_notices}
+Notice Signature = {$notice_signature}
+Notices From = ${$notice_from}
+Notices To = ${$notice_to}
+Local Postmaster = postmaster
+
+#
+# Spam Detection and Virus Scanner Definitions
+# --------------------------------------------
+#
+Spam List Definitions = %etc-dir%/spam.lists.conf
+Virus Scanner Definitions = %etc-dir%/virus.scanners.conf
+
+#
+# Spam Detection and Spam Lists (DNS blocklists)
+# ----------------------------------------------
+#
+
+Spam Checks = yes
+Spam List = # spamhaus-ZEN # You can un-comment this to enable them
+Spam Domain List =
+Spam Lists To Be Spam = 1
+Spam Lists To Reach High Score = 3
+Spam List Timeout = 10
+Max Spam List Timeouts = 7
+Spam List Timeouts History = 10
+Is Definitely Not Spam = %rules-dir%/spam.whitelist.rules
+Is Definitely Spam = no
+Definite Spam Is High Scoring = no
+Ignore Spam Whitelist If Recipients Exceed = 20
+Max Spam Check Size = 200k
+
+#
+# Watermarking
+# ------------
+#
+Use Watermarking = no
+Add Watermark = yes
+Check Watermarks With No Sender = yes
+Treat Invalid Watermarks With No Sender as Spam = nothing
+Check Watermarks To Skip Spam Checks = yes
+Watermark Secret = %org-name%-Secret
+Watermark Lifetime = 604800
+Watermark Header = X-%org-name%-MailScanner-Watermark:
+
+#
+# SpamAssassin
+# ------------
+#
+
+Use SpamAssassin = {$use_sa}
+Max SpamAssassin Size = {$sa_max}
+Required SpamAssassin Score = {$sa_score}
+High SpamAssassin Score = {$hi_score}
+SpamAssassin Auto Whitelist = {$sa_auto_whitelist}
+SpamAssassin Timeout = 75
+Max SpamAssassin Timeouts = 10
+SpamAssassin Timeouts History = 30
+Check SpamAssassin If On Spam List = {$check_sa_if_on_spam_list}
+Include Binary Attachments In SpamAssassin = {$include_sa_bin_attachments}
+Spam Score = {$spam_score}
+Cache SpamAssassin Results = {$cache_spamassassin_results}
+SpamAssassin Cache Database File = /var/spool/MailScanner/incoming/SpamAssassin.cache.db
+Rebuild Bayes Every = {$rebuild_bayes}
+Wait During Bayes Rebuild = {$wait_during_bayes_rebuild}
+
+#
+# Custom Spam Scanner Plugin
+# --------------------------
+#
+Use Custom Spam Scanner = no
+Max Custom Spam Scanner Size = 20k
+Custom Spam Scanner Timeout = 20
+Max Custom Spam Scanner Timeouts = 10
+Custom Spam Scanner Timeout History = 20
+
+#
+# What to do with spam
+# --------------------
+#
+
+Spam Actions = {$spam_actions} header "X-Spam-Status: Yes"
+High Scoring Spam Actions = {$hispam_actions} header "X-Spam-Status: Yes"
+Non Spam Actions = deliver header "X-Spam-Status: No"
+SpamAssassin Rule Actions =
+Sender Spam Report         = %report-dir%/sender.spam.report.txt
+Sender Spam List Report    = %report-dir%/sender.spam.rbl.report.txt
+Sender SpamAssassin Report = %report-dir%/sender.spam.sa.report.txt
+Inline Spam Warning = %report-dir%/inline.spam.warning.txt
+Recipient Spam Report = %report-dir%/recipient.spam.report.txt
+Enable Spam Bounce = %rules-dir%/bounce.rules
+Bounce Spam As Attachment = no
+#
+# Logging
+# -------
+#
+Syslog Facility = {$syslog_facility}
+Log Speed = {$log_speed}
+Log Spam = {$log_spam}
+Log Non Spam = {$log_non_spam}
+Log Delivery And Non-Delivery = {$log_delivery}
+Log Permitted Filenames = {$log_filenames}
+Log Permitted Filetypes = {$log_filetypes}
+Log Permitted File MIME Types = {$log_mime}
+Log Silent Viruses = {$log_silent}
+Log Dangerous HTML Tags = {$log_dangerous}
+Log SpamAssassin Rule Actions = {$log_sa_rule_action}
+
+#
+# Advanced SpamAssassin Settings
+# ------------------------------
+#
+SpamAssassin Temporary Dir = /var/spool/MailScanner/incoming/SpamAssassin-Temp
+SpamAssassin User State Dir =
+SpamAssassin Install Prefix =
+SpamAssassin Site Rules Dir = /usr/local/etc/mail/spamassassin
+SpamAssassin Local Rules Dir =
+SpamAssassin Local State Dir = # /var/lib/spamassassin
+SpamAssassin Default Rules Dir =
+
+#
+# MCP (Message Content Protection)
+# -----------------------------
+#
+
+MCP Checks = {$mcp_checks}
+First Check = spam
+MCP Required SpamAssassin Score = {$mcp_score}
+MCP High SpamAssassin Score = {$hi_mcp_score}
+MCP Error Score = 1
+MCP Header = X-%org-name%-MailScanner-MCPCheck:
+Non MCP Actions = deliver
+MCP Actions = {$mcp_action}
+High Scoring MCP Actions = {$mcp_hi_action}
+Bounce MCP As Attachment = {$bounce_mcp}
+MCP Modify Subject = start
+MCP Subject Text = [MCP?]
+High Scoring MCP Modify Subject = start
+High Scoring MCP Subject Text = [MCP?]
+
+Is Definitely MCP = {$is_mcp}
+Is Definitely Not MCP = {$is_not_mcp}
+Definite MCP Is High Scoring = {$mcp_is_high_score}
+Always Include MCP Report = {$include_mcp_report}
+Detailed MCP Report = {$detailled_mcp_report}
+Include Scores In MCP Report = {$score_mcp_report}
+Log MCP = {$log_mcp}
+
+MCP Max SpamAssassin Timeouts = 20
+MCP Max SpamAssassin Size = {$mcp_max}
+MCP SpamAssassin Timeout = 10
+
+MCP SpamAssassin Prefs File = %mcp-dir%/mcp.spam.assassin.prefs.conf
+MCP SpamAssassin User State Dir =
+MCP SpamAssassin Local Rules Dir = %mcp-dir%
+MCP SpamAssassin Default Rules Dir = %mcp-dir%
+MCP SpamAssassin Install Prefix = %mcp-dir%
+Recipient MCP Report = %report-dir%/recipient.mcp.report.txt
+Sender MCP Report = %report-dir%/sender.mcp.report.txt
+
+#
+# Advanced Settings
+# -----------------
+#
+Use Default Rules With Multiple Recipients = {$default_rule_multiple}
+Read IP Address From Received Header = {$read_ipaddress}
+Spam Score Number Format = {$spam_score_format}
+MailScanner Version Number = 4.83.5
+SpamAssassin Cache Timings = {$cache_timings}
+Debug = {$debug}
+Debug SpamAssassin = {$debug_spam}
+Run In Foreground = {$foreground}
+Always Looked Up Last = {$look_up_last}
+Always Looked Up Last After Batch = {$look_up_last_batch}
+Deliver In Background = {$deliver_background}
+Delivery Method = {$mailscanner['deliver_method']}
+Split Exim Spool = {$split_exim_spool}
+Lockfile Dir = /var/spool/MailScanner/incoming/Locks
+Custom Functions Dir = /usr/local/lib/MailScanner/MailScanner/CustomFunctions
+Lock Type =
+Syslog Socket Type =
+Automatic Syntax Check = {$syntax_check}
+Minimum Code Status = {$mailscanner['minimum_code']}
+include /usr/local/etc/MailScanner/conf.d/*
+
+
+
+EOF;
+?>
