@@ -152,7 +152,7 @@ function check_cron(){
 										"command"=>	$cron_cmd);
 					switch ($matches[2]){
 						case m:
-							$cron_postfix["month"]="*/".$matches[1];
+							$cron_postfix["minute"]="*/".$matches[1];
 							break;
 						case h:
 							$cron_postfix["minute"]="0";
@@ -208,11 +208,13 @@ function check_cron(){
 					#check valid_recipients cron
 					if ($cron["command"] == $cron_cmd){
 						#postfix cron cmd found
-						if($postfix_enabled=="on")
+						if($postfix_enabled=="on"){
 							$cron_found=$cron;
-						if($postfix_recipients_config['enable_ldap'] && $postfix_enabled=="on")
-							#update cron schedule
-							$new_cron['item'][]=$cron_postfix;
+							if($postfix_recipients_config['enable_ldap'] || $postfix_recipients_config['enable_url']){
+								#update cron schedule
+								$new_cron['item'][]=$cron_postfix;
+								}
+							}
 						}
 					#check sqlite update queue	
 					else if(!preg_match("/.usr.local.www.postfix.php/",$cron["command"])){
@@ -223,7 +225,7 @@ function check_cron(){
 					}
 			$write_cron=1;
 			# Check if crontab must be changed to valid recipients cmd
-			if ($postfix_recipients_config['enable_ldap']){
+			if ($postfix_recipients_config['enable_ldap'] || $postfix_recipients_config['enable_url']){
 				if ($cron_found!=$cron_postfix){
 					#update postfix cron schedule	
 					if (! is_array($cron_found) && $postfix_enabled=="on")
@@ -463,7 +465,9 @@ smtpd_sender_restrictions = reject_non_fqdn_sender,
 				permit
 
 # Allow connections from specified local clients and strong check everybody else.								
-smtpd_client_restrictions = check_client_access pcre:/usr/local/etc/postfix/cal_pcre,
+smtpd_client_restrictions = permit_mynetworks,
+				reject_unauth_destination,
+				check_client_access pcre:/usr/local/etc/postfix/cal_pcre,
 				check_client_access cidr:/usr/local/etc/postfix/cal_cidr,
 				reject_unknown_client_hostname,
 				reject_unauth_pipelining,
@@ -487,7 +491,6 @@ EOF;
 	}
 else
 	{
-	#erro nas listas de bloqueio
 	$postfix_main .= <<<EOF
 #Just reject after helo,sender,client,recipient tests
 smtpd_delay_reject = yes
@@ -500,7 +503,8 @@ smtpd_sender_restrictions = reject_unknown_sender_domain,
 				RBLRBLRBL							
 
 # Allow connections from specified local clients and rbl check everybody else if rbl check are set.
-smtpd_client_restrictions = reject_unauth_destination,
+smtpd_client_restrictions = permit_mynetworks,
+				reject_unauth_destination,
 				check_sender_access hash:/usr/local/etc/postfix/sender_access,
 				check_client_access pcre:/usr/local/etc/postfix/cal_pcre,
 				check_client_access cidr:/usr/local/etc/postfix/cal_cidr

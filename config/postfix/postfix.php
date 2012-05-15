@@ -33,6 +33,10 @@ require_once("/etc/inc/pkg-utils.inc");
 require_once("/etc/inc/globals.inc");
 require_once("/usr/local/pkg/postfix.inc");
 
+$uname=posix_uname();
+if ($uname['machine']=='amd64')
+        ini_set('memory_limit', '250M');
+
 function get_remote_log(){
 	global $config,$g,$postfix_dir;
 	$curr_time = time();

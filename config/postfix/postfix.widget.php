@@ -27,6 +27,11 @@
 @require_once("guiconfig.inc");
 @require_once("pfsense-utils.inc");
 @require_once("functions.inc");
+
+$uname=posix_uname();
+if ($uname['machine']=='amd64')
+        ini_set('memory_limit', '250M');
+        
 function open_table(){
 	echo "<table style=\"padding-top:0px; padding-bottom:0px; padding-left:0px; padding-right:0px\" width=\"100%\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\">";
 	echo"  <tr>";

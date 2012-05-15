@@ -29,6 +29,11 @@
 */
 
 require("guiconfig.inc");
+
+$uname=posix_uname();
+if ($uname['machine']=='amd64')
+        ini_set('memory_limit', '250M');
+        
 function get_cmd(){
 	if ($_REQUEST['cmd'] =='mailq'){
 		#exec("/usr/local/bin/mailq" . escapeshellarg('^'.$m.$j." ".$hour.".*".$grep)." /var/log/maillog", $lists);
