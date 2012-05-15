@@ -72,35 +72,15 @@
 		if($post['comport']) {
 			switch($post['comport']) {
 				case "none":
-					continue;
-					break;
 				case "com1":
-					continue;
-					break;					
 				case "com2":
-					continue;
-					break;
 				case "com1a":
-					continue;
-					break;					
 				case "com2a":
-					continue;
-					break;					
 				case "ucom1":
-					continue;
-					break;
 				case "ucom2":
-					continue;
-					break;
 				case "lpt1":
-					continue;
-					break;
 				case "ugen0.2":
-					continue;
-					break;
 				case "ugen1.2":
-					continue;
-					break;
 				case "ugen2.2":
 					continue;
 					break;
@@ -112,32 +92,14 @@
 		if($post['size']) {
 			switch($post['size']) {
 				case "12x1":
-					continue;
-					break;
 				case "12x2":
-					continue;
-					break;
 				case "12x4":
-					continue;
-					break;
 				case "16x1":
-					continue;
-					break;
 				case "16x2":
-					continue;
-					break;
 				case "16x4":
-					continue;
-					break;
 				case "20x1":
-					continue;
-					break;
 				case "20x2":
-					continue;
-					break;
 				case "20x4":
-					continue;
-					break;
 				case "40x2":
 					continue;
 					break;
@@ -149,23 +111,11 @@
 		if($post['port_speed']) {
 			switch($post['port_speed']) {
 				case "0":
-					continue;
-					break;
 				case "1200":
-					continue;
-					break;
 				case "2400":
-					continue;
-					break;
 				case "9600":
-					continue;
-					break;
 				case "19200":
-					continue;
-					break;
 				case "57600":
-					continue;
-					break;
 				case "115200":
 					continue;
 					break;
@@ -185,6 +135,14 @@
 		global $g;
 		global $config;
 		global $input_errors;		
+
+		# detect boot process
+		if (is_array($_POST)){
+			if (! preg_match("/\w+/",$_POST['__csrf_magic']))
+				return;
+			}
+
+		#continue sync package 
 		lcdproc_notice("Sync: Begin package sync");
 		config_lock();
 		$lcdproc_config = $config['installedpackages']['lcdproc']['config'][0];
@@ -500,17 +458,18 @@
 			}			
 			/* generate rc file start and stop */
 			$stop = <<<EOD
-if [ `ps auxw |awk '/lcdproc_client.ph[p]/ {print $2}'| wc -l` != 0  ]; then
-	ps auxw |awk '/lcdproc_client.ph[p]/ {print $2}'|xargs /bin/kill 
+if [ `pgrep -f lcdproc_client.ph` ];then
+		pkill -f lcdproc_client.ph
+		sleep 1
+fi
+if  [ `pgrep -anx LCDd` ]; then
+	pkill -anx LCDd 
 	sleep 1
 fi
-if  [ `ps auxw |awk '/LCD[d]/ {print $2}'| wc -l` != 0  ]; then
-	ps auxw |awk '/LCD[d]/ {print $2}'|xargs /bin/kill 
-	sleep 1
-fi
+
 EOD;
 			$start = $stop ."\n";
-			$start .= "\t/usr/bin/nice -20 /usr/local/sbin/LCDd -c ". LCDPROC_CONFIG ."\n";
+			$start .= "\t/usr/bin/nice -20 /usr/local/sbin/LCDd -c ". LCDPROC_CONFIG ." -u nobody\n";
 			$start .= "\t/usr/bin/nice -20 /usr/local/bin/php -f /usr/local/pkg/lcdproc_client.php &\n";
 			/* write out the configuration */
 			conf_mount_rw();
