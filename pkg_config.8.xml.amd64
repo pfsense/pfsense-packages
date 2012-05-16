@@ -609,10 +609,10 @@
 	</package>
 	<package>
 		<name>Lightsquid</name>
-		<descr>High perfomance web proxy report. Requires squid HTTP proxy.</descr>
+		<descr>High perfomance web proxy report (LightSquid). Proxy realtime stat (SQStat). Requires squid HTTP proxy.</descr>
 		<website>http://lightsquid.sf.net/</website>
 		<category>Network Report</category>
-		<version>1.8.2 pkg v.1.5</version>
+		<version>1.8.2 pkg v.2.3</version>
 		<maintainer>dv_serg@mail.ru</maintainer>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
 		<depends_on_package>lightsquid-1.8_2.tbz</depends_on_package>
@@ -622,7 +622,7 @@
 		<build_port_path>/usr/ports/lang/perl5.12</build_port_path>
 		<build_options>WITHOUT_DEBUGGING=true WITHOUT_GDBM=true WITHOUT_PERL_MALLOC=true WITH_PERL_64BITINT=true WITHOUT_THREADS=true WITHOUT_MULTIPLICITY=true WITHOUT_SUIDPERL=true WITHOUT_SITECUSTOMIZE=true WITH_USE_PERL=true</build_options>
 		<status>Beta</status>
-		<required_version>2</required_version>
+		<required_version>2.0</required_version>
 		<config_file>http://www.pfsense.com/packages/config/lightsquid/lightsquid.xml</config_file>
 		<pkginfolink></pkginfolink>
 		<configurationfile>lightsquid.xml</configurationfile>
