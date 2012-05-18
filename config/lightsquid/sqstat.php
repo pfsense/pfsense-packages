@@ -377,20 +377,14 @@ function sqstat_loadconfig()
     $squid_settings = $config['installedpackages']['squid']['config'][0];
     if (!empty($squid_settings)) {
         # squid interface IP & port
-        if ($squid_settings['transparent_proxy'] == 'on') {
-            $iface = '127.0.0.1';
-            $iport = 80;
+        $realif = array();
+        $iface = ($squid_settings['active_interface'] ? $squid_settings['active_interface'] : 'lan');
+        $iface = explode(",", $iface);
+        foreach ($iface as $i => $if) {
+            $realif[] = sqstat_get_real_interface_address($if);
+            $iface    = $realif[$i][0] ? $realif[$i][0] : '127.0.0.1';
         }
-        else {
-            $realif = array();
-            $iface = ($squid_settings['active_interface'] ? $squid_settings['active_interface'] : 'lan');
-            $iface = explode(",", $iface);
-            foreach ($iface as $i => $if) {
-                $realif[] = sqstat_get_real_interface_address($if);
-                $iface    = $realif[$i][0] ? $realif[$i][0] : '127.0.0.1';
-            }
-            $iport = $squid_settings['proxy_port'] ? $squid_settings['proxy_port'] : 3128;
-        }
+        $iport = $squid_settings['proxy_port'] ? $squid_settings['proxy_port'] : 3128;
     }
     $squidclass->squidhost = $iface;
     $squidclass->squidport = $iport;
