@@ -119,8 +119,8 @@ function sshdcond_custom_php_write_config(){
 
 					//apply file permission if option is ChrootDirectory
 					if ($sshd['sshdoption']=="ChrootDirectory" && file_exists($sshd['sshdvalue'])){
-						chown('root',$sshd['sshdvalue']);
-						chgrp('operator',$sshd['sshdvalue']);
+						chown($sshd['sshdvalue'], 'root');
+						chgrp($sshd['sshdvalue'], 'operator');
 					}
 				}
 			}
