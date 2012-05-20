@@ -275,7 +275,7 @@ function lightsquid_resync() {
 			# ? delete ?
 			$config['installedpackages']['squidcache']['config'][0]['ext_cachemanager'] = $ifmgr;
 			# now right
-			$config['installedpackages']['squidnace']['config'][0]['ext_cachemanager'] = $ifmgr;
+			$config['installedpackages']['squidnac']['config'][0]['ext_cachemanager'] = $ifmgr;
 
 			write_config();
 			squid_resync();
