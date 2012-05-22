@@ -204,6 +204,10 @@ rm -f /var/run/quagga/ospfd.pid
 /usr/sbin/chown -R quagga:quagga /usr/local/etc/quagga/
 /usr/sbin/chown -R quagga:quagga /var/run/quagga
 /usr/sbin/chown -R quagga:quagga /var/log/quagga
+# Ensure no other copies of the daemons are running or it breaks.
+killall -9 zebra
+killall -9 ospfd
+sleep 1
 /usr/local/sbin/zebra -d
 /usr/local/sbin/ospfd -d
 EOF;
