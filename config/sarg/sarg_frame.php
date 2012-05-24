@@ -38,21 +38,32 @@ else{
 	$prefix="";
 	}
 $url=($_REQUEST['file'] == ""?"index.html":$_REQUEST['file']);
-if (file_exists("/usr/local/www/sarg-reports/".$url))
+$dir="/usr/local/sarg-reports";
+$rand=rand(100000000000,999999999999);
+if (file_exists("{$dir}/{$url}"))
 	{
-	$report=file_get_contents("/usr/local/www/sarg-reports/".$url);
+	$report=file_get_contents("{$dir}/{$url}");
 	$pattern[0]="/href=\W(\S+html)\W/";
-	$replace[0]="href=/sarg_frame.php?prevent=".rand(100000000000,999999999999)."&file=$prefix/$1";
-	$pattern[1]='/img src="(\w+\.\w+)/';
-	$replace[1]='img src="/sarg-reports'.$prefix.'/$1';
+	$replace[0]="href=/sarg_frame.php?prevent=".$rand."&file=$prefix/$1";
+	$pattern[1]='/img src="\S+\W([a-zA-Z0-9.-]+.png)/';
+	$replace[1]='img src="/sarg-images/$1';
 	$pattern[2]='@img src="([.a-z/]+)/(\w+\.\w+)@';
-	$replace[2]='img src="/sarg-reports'.$prefix.'/$1/$2';
-	$pattern[3]='/<head>/';
-	$replace[3]='<head><META HTTP-EQUIV="CACHE-CONTROL" CONTENT="NO-CACHE"><META HTTP-EQUIV="PRAGMA" CONTENT="NO-CACHE">';
+	$replace[2]='img src="/sarg-images'.$prefix.'/$1/$2';
+	$pattern[3]='/img src="([a-zA-Z0-9.-_]+).png/';
+	$replace[3]='img src="/sarg-images/temp/$1.'.$rand.'.png';
+	$pattern[4]='/<head>/';
+	$replace[4]='<head><META HTTP-EQUIV="CACHE-CONTROL" CONTENT="NO-CACHE"><META HTTP-EQUIV="PRAGMA" CONTENT="NO-CACHE">';
+
+	#look for graph files inside reports. 
+	if (preg_match_all('/img src="([a-zA-Z0-9._-]+).png/',$report,$images)){
+		for ($x=0;$x<count($images[1]);$x++){
+			copy("{$dir}/{$prefix}/{$images[1][$x]}.png","/usr/local/www/sarg-images/temp/{$images[1][$x]}.{$rand}.png");
+			}
+		}
 	print preg_replace($pattern,$replace,$report);
 	}
 else{
-	print "<pre>Error: Could not find report index file.<br>Check sarg settings and try to force sarg schedule.";
+	print "<pre>Error: Could not find report index file.<br>Check and save sarg settings and try to force sarg schedule.";
 	}		
 
 ?>

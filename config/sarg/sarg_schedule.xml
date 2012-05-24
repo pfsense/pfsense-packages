@@ -111,7 +111,8 @@
 		<columnitem>
 			<fielddescr>Description</fielddescr>
 			<fieldname>description</fieldname>
-		</columnitem>	
+		</columnitem>
+		<movable>arrow</movable>	
 	</adddeleteeditpagefields>
 	<fields>
 		<field>

@@ -149,7 +149,7 @@ graphs {$graphs}
 #       The reports will be saved in that directory
 #       sarg -o dir
 #
-output_dir /usr/local/www/sarg-reports
+output_dir /usr/local/sarg-reports
 
 # TAG:  anonymous_output_files yes/no
 #       Use anonymous file and directory names in the report. If it is set to

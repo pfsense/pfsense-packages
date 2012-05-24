@@ -550,10 +550,10 @@
 		<category>Network Report</category>
 		<config_file>http://www.pfsense.com/packages/config/sarg/sarg.xml</config_file>
 		<pkginfolink>http://forum.pfsense.org/index.php/topic,47765.0.html</pkginfolink>
-		<depends_on_package_base_url>http://e-sac.siteseguro.ws/packages/8/All/</depends_on_package_base_url>
-		<depends_on_package>sarg-2.3.2.tbz</depends_on_package>
-		<version>2.3.2 pkg v.0.4.2_1</version>
-		<status>beta</status>
+		<depends_on_package_base_url>http://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
+		<depends_on_package>sarg-2.3.2_2.tbz</depends_on_package>
+		<version>2.3.2 pkg v.0.5</version>
+		<status>RC1</status>
 		<required_version>2.0</required_version>
 		<configurationfile>sarg.xml</configurationfile>
 		<build_port_path>/usr/ports/www/sarg</build_port_path>

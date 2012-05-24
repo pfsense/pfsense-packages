@@ -112,6 +112,11 @@
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0755</chmod>
 	</additional_files_needed>
+	<additional_files_needed>
+		<item>http://www.pfsense.org/packages/config/sarg/sarg.priv.inc</item>
+		<prefix>/etc/inc/priv/</prefix>
+		<chmod>0755</chmod>
+	</additional_files_needed>
 	<tabs>
 		<tab>
 			<text>General</text>

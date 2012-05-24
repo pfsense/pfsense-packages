@@ -61,6 +61,7 @@ require("guiconfig.inc");
 	$tab_array[] = array(gettext("XMLRPC Sync"), false, "/pkg_edit.php?xml=sarg_sync.xml&id=0");
 	$tab_array[] = array(gettext("Help"), false, "/pkg_edit.php?xml=sarg_about.php");
 	display_top_tabs($tab_array);
+	exec('rm -f /usr/local/www/sarg-images/temp/*');
 	?>
 			</td></tr>
 	 		<tr>

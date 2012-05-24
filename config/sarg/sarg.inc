@@ -139,6 +139,9 @@ function sync_package_sarg() {
 		if (!preg_match("/\w+/",$_POST['__csrf_magic']))
 			return;
 	}
+	#check pkg.php sent a sync request
+	
+	
 	$update_conf=0;
 	#mount filesystem writeable
 	conf_mount_rw();
@@ -246,12 +249,26 @@ function sync_package_sarg() {
 		$LDAPFilterSearch=(empty($sarguser['ldap_filter_search'])?"":"LDAPFilterSearch ".$sarguser['ldap_filter_search']);
 		}
 		
-	#dirs
-	$dirs=array("/usr/local/www/sarg-reports");
+		
+	#move old reports
+	if (is_dir("/usr/local/www/sarg-reports") && !is_dir("/usr/local/sarg-reports"))
+		rename("/usr/local/www/sarg-reports","/usr/local/sarg-reports");
+
+	#check dirs
+	$dirs=array("/usr/local/sarg-reports","/usr/local/www/sarg-images","/usr/local/www/sarg-images/temp");
 		foreach ($dirs as $dir)
 		if (!is_dir($dir))
 			mkdir ($dir,0755,true);
-	
+			
+	#images
+	$simages=array("datetime.png","graph.png","sarg-squidguard-block.png","sarg.png");
+	$simgdir1="/usr/local/www/sarg-images";
+	$simgdir2="/usr/local/etc/sarg/images";
+	foreach ($simages as $simage){
+		if (!file_exists("{$simgdir1}/{$simage}"))
+			copy("{$simgdir2}/{$simage}","{$simgdir1}/{$simage}");
+	}
+			
 	//log_error($_POST['__csrf_magic']." sarg log:". $access_log);
 	#create sarg config files
 	include("/usr/local/pkg/sarg.template");
