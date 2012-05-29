@@ -82,6 +82,7 @@ function quagga_ospfd_install_conf() {
 		/* Interface Settings */
 		$passive_interfaces = array();
 		$interface_networks = array();
+
 		if ($config['installedpackages']['quaggaospfdinterfaces']['config']) {
 			foreach ($config['installedpackages']['quaggaospfdinterfaces']['config'] as $conf) {
 				$realif = get_real_interface($conf['interface']);
@@ -116,9 +117,18 @@ function quagga_ospfd_install_conf() {
 				if ($interface_subnet == 32)
 					$interface_subnet = 30;
 				$subnet = gen_subnet($interface_ip, $interface_subnet);
-				$interface_networks[] = "{$subnet}/{$interface_subnet}";
-			}
+				if (!empty($conf['interfacearea'])) {
+					$interface_networks[] = array( "subnet" => "{$subnet}/{$interface_subnet}", "area" => $conf['interfacearea']);
+				}
+				else {
+					$interface_networks[] = array( "subnet" => "{$subnet}/{$interface_subnet}", "area" => $ospfd_conf['area']);
+				}
+				
+
+
+ 			}
 		}
+		
 
 		/* OSPF Settings */
 
@@ -139,6 +149,10 @@ function quagga_ospfd_install_conf() {
 
 		if ($ospfd_conf['redistributestatic'])
 			$conffile .= "  redistribute static\n";
+		
+		if ($ospfd_conf['redistributekernel'])
+			$conffile .= "  redistribute kernel\n";
+		
 
 		if ($ospfd_conf['redistributedefaultroute'])
 			$conffile .= "  default-information originate\n";
@@ -153,24 +167,37 @@ function quagga_ospfd_install_conf() {
 		if ($ospfd_conf['rfc1583'])
 			$conffile .= "  ospf rfc1583compatibility\n";
 
-		if (is_array($passive_interfaces))
+		if (is_array($passive_interfaces)) {
 			foreach ($passive_interfaces as $pint)
 				$conffile .= "  passive-interface {$pint}\n";
+		}
 
-		if (is_array($interface_networks))
-			foreach ($interface_networks as $ifn)
-				if (is_subnet($ifn))
-					$conffile .= "  network {$ifn} area {$ospfd_conf['area']}\n";
+
+		if (is_array($interface_networks)) {
+			foreach ($interface_networks as $ifn) {
+
+				if (is_subnet($ifn['subnet'])) {
+						$conffile .= "  network {$ifn['subnet']} area {$ifn['area']}\n";
+					}
+
+			}
+		}
 
 		if (is_array($ospfd_conf['row'])) {
 			foreach ($ospfd_conf['row'] as $redistr) {
-				if (isset($redistr['redistribute']))
+				
+				if (isset($redistr['redistribute'])) {
 					$conffile .= "  no ";
-				$conffile .= "  network {$redistr['routevalue']} area {$ospfd_conf['area']}\n";
+				}
+				if ($redistr['routearea'] == "") {
+					$conffile .= "  network {$redistr['routevalue']} area {$ospfd_conf['area']}\n";	
+				}
+				else {
+					$conffile .= "  network {$redistr['routevalue']} area {$redistr['routearea']}\n";
+				}
 			}
 		}
 	}
-
 	$fd = fopen("/usr/local/etc/quagga/ospfd.conf", "w");
 
 	// Write out the configuration file

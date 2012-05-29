@@ -122,9 +122,16 @@
 		<field>
 			<fielddescr>Redistribute static</fielddescr>
 			<fieldname>redistributestatic</fieldname>
-			<description>Enables the redistribution of static routes</description>
+			<description>Enables the redistribution of static routes (only works if you are using quagga static routes)</description>
 			<type>checkbox</type>
 		</field>
+		<field>
+			<fielddescr>Redistribute Kernel</fielddescr>
+			<fieldname>redistributekernel</fieldname>
+			<description>Enables the redistribution of kernel routing table (this is required if using pfsense static routes)</description>
+			<type>checkbox</type>
+		</field>
+			
 		<field>
 			<fielddescr>SPF Hold Time</fielddescr>
 			<fieldname>spfholdtime</fieldname>
@@ -160,6 +167,12 @@
 					<fieldname>routevalue</fieldname>
 					<type>input</type>
 					<size>25</size>
+				</rowhelperfield>
+				<rowhelperfield>
+					<fielddescr>Area ID</fielddescr>
+					<fieldname>routearea</fieldname>
+					<type>input</type>
+					<size>10</size>
 				</rowhelperfield>
 			</rowhelper>
 		</field>
