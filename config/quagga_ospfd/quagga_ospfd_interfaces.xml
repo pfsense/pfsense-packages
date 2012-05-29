@@ -69,6 +69,12 @@
 			<type>input</type>
 		</field>
 		<field>
+			<fielddescr>Area</fielddescr>
+			<fieldname>interfacearea</fieldname>
+			<description>The area for this interface (leave blank for default).</description>
+			<type>input</type>
+		</field>
+		<field>
 			<fielddescr>Description</fielddescr>
 			<fieldname>descr</fieldname>
 			<size>30</size>

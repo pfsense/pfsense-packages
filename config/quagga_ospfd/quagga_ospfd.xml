@@ -161,6 +161,12 @@
 					<type>input</type>
 					<size>25</size>
 				</rowhelperfield>
+				<rowhelperfield>
+					<fielddescr>Area ID</fielddescr>
+					<fieldname>routearea</fieldname>
+					<type>input</type>
+					<size>10</size>
+				</rowhelperfield>
 			</rowhelper>
 		</field>
 	</fields>
