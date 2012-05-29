@@ -568,7 +568,7 @@
 						This will prevent not permitted host to work properly in local ethernet segment.]]></descr>
 		<category>Security</category>
 		<config_file>http://www.pfsense.com/packages/config/ipguard/ipguard.xml</config_file>
-		<pkginfolink></pkginfolink>
+		<pkginfolink>http://forum.pfsense.org/index.php/topic,49917.msg263664.html#msg263664</pkginfolink>
 		<depends_on_package_base_url>http://ftp.freebsd.org/pub/FreeBSD/ports/i386/packages-8.3-release/All/</depends_on_package_base_url>
 		<depends_on_package>ipguard-1.04.tbz</depends_on_package>
 		<version>1.0.4 pkg v.0.1</version>
