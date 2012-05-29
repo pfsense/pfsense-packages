@@ -1375,35 +1375,37 @@ function squid_resync() {
 	if(file_exists("/usr/local/libexec/squid/pinger"))
 		exec("chmod a+x /usr/local/libexec/squid/pinger");
 
-	$log_dir = $config['installedpackages']['squid']['config'][0]['log_dir'].'/';
-
-	if(!is_dir($log_dir)) {
-		log_error("Creating squid log dir $log_dir");
-		make_dirs($log_dir);
-		squid_chown_recursive($log_dir, 'proxy', 'proxy');
-	}
-
-	squid_dash_z();
-
+	if (is_array($config['installedpackages']['squid']['config'][0])){
+		$log_dir = $config['installedpackages']['squid']['config'][0]['log_dir'].'/';
 	
-	if (!is_service_running('squid')) {
-		log_error("Starting Squid");
-		mwexec("/usr/local/sbin/squid");
-		} 
-	else {
-		if (!isset($boot_process)){
-			log_error("Reloading Squid for configuration sync");
-			mwexec("/usr/local/sbin/squid -k reconfigure");
-			}
+		if(!is_dir($log_dir)) {
+			log_error("Creating squid log dir $log_dir");
+			make_dirs($log_dir);
+			squid_chown_recursive($log_dir, 'proxy', 'proxy');
+		}
+	
+		squid_dash_z();
+	
+		
+		if (!is_service_running('squid')) {
+			log_error("Starting Squid");
+			mwexec("/usr/local/sbin/squid");
+			} 
+		else {
+			if (!isset($boot_process)){
+				log_error("Reloading Squid for configuration sync");
+				mwexec("/usr/local/sbin/squid -k reconfigure");
+				}
+		}
+	
+		// Sleep for a couple seconds to give squid a chance to fire up fully.
+		for ($i=0; $i < 10; $i++) {
+			if (!is_service_running('squid'))
+				sleep(1);
+		}
+		filter_configure();
+		conf_mount_ro();
 	}
-
-	// Sleep for a couple seconds to give squid a chance to fire up fully.
-	for ($i=0; $i < 10; $i++) {
-		if (!is_service_running('squid'))
-			sleep(1);
-	}
-	filter_configure();
-	conf_mount_ro();
 }
 
 function squid_print_javascript_auth() {
