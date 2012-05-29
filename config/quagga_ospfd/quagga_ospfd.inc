@@ -149,6 +149,10 @@ function quagga_ospfd_install_conf() {
 
 		if ($ospfd_conf['redistributestatic'])
 			$conffile .= "  redistribute static\n";
+		
+		if ($ospfd_conf['redistributekernel'])
+			$conffile .= "  redistribute kernel\n";
+		
 
 		if ($ospfd_conf['redistributedefaultroute'])
 			$conffile .= "  default-information originate\n";
