@@ -104,7 +104,7 @@
 			<fieldname>description</fieldname>
 		</columnitem>
 		<movable>on</movable>
-		<description><![CDATA[All permitted MAC/IP pairs listed here.<br>When enabled, If firewall recieves one with MAC/IP pair not listed here, it will send ARP reply with configured fake address.<br>This will prevent not permitted host to work properly in the specified ethernet segment.]]></description>
+		<description><![CDATA[If firewall receives traffic with MAC/IP pair not listed here, it will send ARP reply with configured fake address.<br>This will prevent not permitted host to work properly in the specified ethernet segment.]]></description>
 	</adddeleteeditpagefields>
 	<fields>
 		<field>
