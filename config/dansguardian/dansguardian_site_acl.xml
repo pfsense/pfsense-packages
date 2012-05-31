@@ -161,7 +161,7 @@
 		</field>
 		<field>
 			<fielddescr>Enable</fielddescr>
-			<fieldname>greysite_enable</fieldname>
+			<fieldname>greysite_enabled</fieldname>
 			<type>checkbox</type>
 			<description></description>
 		</field>
