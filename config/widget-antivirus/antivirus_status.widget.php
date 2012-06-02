@@ -36,7 +36,7 @@ require_once("pfsense-utils.inc");
 require_once("functions.inc");
 
 define('PATH_CLAMDB',   '/var/db/clamav');
-define('PATH_HAVPLOG',  '/var/log/havp/access.log');
+define('PATH_HAVPLOG',  '/var/log/access.log');
 define('PATH_AVSTATUS', '/var/tmp/havp.status');
 
 
