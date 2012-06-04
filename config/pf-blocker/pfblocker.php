@@ -10,11 +10,11 @@ function get_networks($pfb){
 	print $return;
 }
 
-# to be uncomented when this packages gets stable state
-#if($_SERVER['REMOTE_ADDR']== '127.0.0.1'){
-if (preg_match("/(\w+)/",$_REQUEST['pfb'],$matches))
-	get_networks($matches[1]);
-#}
+if($_SERVER['REMOTE_ADDR']== '127.0.0.1'){
+	if (preg_match("/(\w+)/",$_REQUEST['pfb'],$matches)){
+		get_networks($matches[1]);
+		}
+	}
 if ($argv[1]=='uc')
 	pfblocker_get_countries();
 if ($argv[1]=='cron'){
@@ -50,7 +50,7 @@ if ($argv[1]=='cron'){
 	
 	if ($updates > 0){
         include "/usr/local/pkg/pfblocker.inc";
-        sync_package_pfblocker();
+        sync_package_pfblocker("cron");
 		}
 	}
 	
