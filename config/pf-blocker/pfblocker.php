@@ -50,7 +50,7 @@ if ($argv[1]=='cron'){
 	
 	if ($updates > 0){
         include "/usr/local/pkg/pfblocker.inc";
-        sync_package_pfblocker();
+        sync_package_pfblocker("cron");
 		}
 	}
 	
