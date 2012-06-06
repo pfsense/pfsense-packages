@@ -80,6 +80,10 @@
 			<url>/pkg.php?xml=squid_users.xml</url>
 		</tab>
 		<tab>
+			<text>Real time</text>
+			<url>/squid_monitor.php</url>
+		</tab>
+		<tab>
 			<text>Sync</text>
 			<url>/pkg_edit.php?xml=squid_sync.xml</url>
 		</tab>

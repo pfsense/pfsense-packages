@@ -64,6 +64,10 @@
 			<active/>
 		</tab>
 		<tab>
+			<text>Real time</text>
+			<url>/squid_monitor.php?menu=reverse</url>
+		</tab>
+		<tab>
 			<text>Sync</text>
 			<url>/pkg_edit.php?xml=squid_reverse_sync.xml&amp;id=0</url>
 		</tab>
