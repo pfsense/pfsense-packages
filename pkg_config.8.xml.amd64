@@ -162,7 +162,7 @@
 		<config_file>http://www.pfsense.com/packages/config/varnish3/varnish_backends.xml</config_file>
 		<configurationfile>varnish_backends.xml</configurationfile>
 		<depends_on_package_base_url>http://e-sac.siteseguro.ws/pfsense/8/amd64/All/</depends_on_package_base_url>
-		<depends_on_package_pbi>varnish-3.0.1_2-amd64.pbi gcc-4.2.5.20090325_5-amd64.pbi</depends_on_package_pbi>
+		<depends_on_package_pbi>gcc-4.2.5.20090325_5-amd64.pbi varnish-3.0.2_1-amd64.pbi</depends_on_package_pbi>
 		<depends_on_package>varnish-3.0.2.tbz</depends_on_package>
 		<depends_on_package>pcre-8.20.tbz</depends_on_package>
 		<build_port_path>/usr/ports/www/varnish</build_port_path>
@@ -259,6 +259,7 @@
 		<depends_on_package>ap22-mod_memcache-0.1.0_4.tbz</depends_on_package>
 		<depends_on_package>apache-2.2.17_1.tbz</depends_on_package>
 		<depends_on_package>ap22-mod_security-2.5.12.tbz</depends_on_package>
+		<depends_on_package_pbi>apache-2.2.22_5-amd64.pbi mod_memcache-0.1.0_4-amd64.pbi mod_security-2.6.5_1-amd64.pbi apr-1.4.5.1.3.12_1-amd64.pbi gdbm-1.9.1-amd64.pbi db42-4.2.52_5-amd64.pbi gettext-0.18.1.1-amd64.pbi help2man-1.40.10-amd64.pbi</depends_on_package_pbi>
 		<configurationfile>apache_mod_security.xml</configurationfile>
 		<build_port_path>/usr/ports/devel/gettext</build_port_path>
 		<build_port_path>/usr/ports/misc/help2man</build_port_path>
@@ -279,6 +280,7 @@
 		<config_file>http://www.pfsense.com/packages/config/pure-ftpd.xml</config_file>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
 		<depends_on_package>pure-ftpd-1.0.29_1.tbz</depends_on_package>
+		<depends_on_package_pbi>pure-ftpd-1.0.36-amd64.pbi</depends_on_package_pbi>
 		<build_port_path>/usr/ports/ftp/pure-ftpd</build_port_path>
 		<version>1.0.29_1</version>
 		<status>Stable</status>
@@ -301,7 +303,7 @@
 		<build_port_path>/usr/ports/net/avahi</build_port_path>
 		<build_port_path>/usr/ports/net/avahi-app</build_port_path>
 		<depends_on_package>avahi-0.6.28.tbz</depends_on_package>
-		<depends_on_package_pbi>avahi-0.6.29-amd64.pbi</depends_on_package_pbi>
+		<depends_on_package_pbi>avahi-0.6.29_3-amd64.pbi</depends_on_package_pbi>
 		<version>0.6.25_2</version>
 		<status>ALPHA</status>
 		<required_version>1.2.3</required_version>
@@ -315,7 +317,7 @@
 		<descr>ntop is a network probe that shows network usage in a way similar to what top does for processes. In interactive mode, it displays the network status on the user's terminal. In Web mode it acts as a Web server, creating an HTML dump of the network status. It sports a NetFlow/sFlow emitter/collector, an HTTP-based client interface for creating ntop-centric monitoring applications, and RRD for persistently storing traffic statistics.</descr>
 		<category>Network Management</category>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
-		<depends_on_package_pbi>rrdtool-1.2.30_1-amd64.pbi gdbm-1.9.1-amd64.pbi perl-5.12.4_2-amd64.pbi libpcap-1.1.1_1-amd64.pbi geoip-1.4.8_1-amd64.pbi font-util-1.2.0-amd64.pbi webfonts-0.30_6-amd64.pbi ntop-4.1.0_1-amd64.pbi</depends_on_package_pbi>
+		<depends_on_package_pbi>rrdtool-1.2.30_2-amd64.pbi gdbm-1.9.1-amd64.pbi perl-5.12.4_4-amd64.pbi libpcap-1.2.1-amd64.pbi geoip-1.4.8_2-amd64.pbi webfonts-0.30_6-amd64.pbi ntop-4.1.0_5-amd64.pbi font-util-1.2.0-amd64.pbi graphviz-2.28.0_1-amd64.pbi</depends_on_package_pbi>
 		<depends_on_package>rrdtool-1.2.26_1.tbz</depends_on_package>
 		<depends_on_package>gdbm-1.9.1.tbz</depends_on_package>
 		<depends_on_package>perl-5.12.4_4.tbz</depends_on_package>
@@ -347,6 +349,7 @@
 		<pkginfolink>http://doc.pfsense.org/index.php/FreeSWITCH</pkginfolink>
 		<config_file>http://www.pfsense.com/packages/config/freeswitch/freeswitch.xml</config_file>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
++		<depends_on_package_pbi>freeswitch-1.0.6_1-amd64.pbi</depends_on_package_pbi>
 		<build_port_path>/usr/ports/net/freeswitch</build_port_path>
 		<version>0.8.3.6</version>
 		<status>Beta</status>
@@ -500,6 +503,7 @@
 		<config_file>http://www.pfsense.com/packages/config/spamd/spamd.xml</config_file>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
 		<depends_on_package>spamd-4.8.0.tbz</depends_on_package>
+		<depends_on_package_pbi>spamd-4.9.1-amd64.pbi</depends_on_package_pbi>
 		<version>4.8.0</version>
 		<status>Beta</status>
 		<required_version>1.2.1</required_version>
@@ -522,7 +526,7 @@
 		<depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
 		<depends_on_package>postfix-2.8.7,1.tbz</depends_on_package>
 		<depends_on_package>perl-5.12.4_3.tbz</depends_on_package>
-		<depends_on_package_pbi>postfix-2.8.5-amd64.pbi</depends_on_package_pbi>
+		<depends_on_package_pbi>postfix-2.9.3-amd64.pbi</depends_on_package_pbi>
 		<version>2.8.7,1 pkg v.2.3.4_1</version>
 		<status>RC1</status>
 		<required_version>2.0</required_version>
@@ -630,7 +634,7 @@
 		<depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
 		<depends_on_package>lightsquid-1.8_2.tbz</depends_on_package>
 		<depends_on_package>perl-5.12.4_3.tbz</depends_on_package>
-		<depends_on_package_pbi>lightsquid-1.8_2-amd64.pbi</depends_on_package_pbi>
+		<depends_on_package_pbi>lightsquid-1.8_2-amd64.pbi perl-5.12.4_4-amd64.pbi</depends_on_package_pbi>
 		<build_port_path>/usr/ports/www/lightsquid</build_port_path>
 		<build_port_path>/usr/ports/lang/perl5.12</build_port_path>
 		<build_options>WITHOUT_DEBUGGING=true WITHOUT_GDBM=true WITHOUT_PERL_MALLOC=true WITH_PERL_64BITINT=true WITHOUT_THREADS=true WITHOUT_MULTIPLICITY=true WITHOUT_SUIDPERL=true WITHOUT_SITECUSTOMIZE=true WITH_USE_PERL=true</build_options>
@@ -652,6 +656,7 @@
 		<depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
 		<depends_on_package>sarg-2.3.2_2.tbz</depends_on_package>
 		<depends_on_package>gd-2.0.35_7,1.tbz</depends_on_package>
+		<depends_on_package_pbi>sarg-2.3.2_5-amd64.pbi</depends_on_package_pbi>
 		<version>2.3.2 pkg v.0.5</version>
 		<status>RC1</status>
 		<required_version>2.0</required_version>
@@ -669,8 +674,9 @@
 		<category>Security</category>
 		<config_file>http://www.pfsense.com/packages/config/ipguard/ipguard.xml</config_file>
 		<pkginfolink>http://forum.pfsense.org/index.php/topic,49917.msg263664.html#msg263664</pkginfolink>
-		<depends_on_package_base_url>http://ftp.freebsd.org/pub/FreeBSD/ports/amd64/packages-8.3-release/All/</depends_on_package_base_url>
-		<depends_on_package>ipguard-1.04.tbz</depends_on_package>
+		<depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
+ 		<depends_on_package>ipguard-1.04.tbz</depends_on_package>
+		<depends_on_package_pbi>ipguard-1.04-amd64.pbi</depends_on_package_pbi>
 		<version>1.0.4 pkg v.0.1</version>
 		<status>beta</status>
 		<required_version>2.0</required_version>
@@ -686,6 +692,7 @@
 		<category>Network Management</category>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
 		<depends_on_package>vnstat-1.10_2.tbz</depends_on_package>
+		<depends_on_package_pbi>vnstat-1.11_1-amd64.pbi</depends_on_package_pbi>
 		<build_port_path>/usr/ports/net/vnstat</build_port_path>
 		<version>1.10_2</version>
 		<status>test</status>
@@ -808,7 +815,7 @@
 		<configurationfile>arping.xml</configurationfile>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
 		<depends_on_package>arping-2.09.tbz</depends_on_package>
-		<depends_on_paclage_pbi>arping-2.09_1-amd64.pbi</depends_on_paclage_pbi>
+		<depends_on_package_pbi>arping-2.09_1-amd64.pbi</depends_on_package_pbi>
 		<build_port_path>/usr/ports/net/arping</build_port_path>
 		<pkginfolink>http://doc.pfsense.org/index.php/Arping</pkginfolink>
 	</package>
@@ -819,7 +826,7 @@
 		<category>Security</category>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
 		<depends_on_package>nmap-5.61.t4.tbz</depends_on_package>
-		<depends_on_package_pbi>nmap-5.61TEST1-amd64.pbi</depends_on_package_pbi>
+		<depends_on_package_pbi>nmap-6.00-amd64.pbi</depends_on_package_pbi>
 		<config_file>http://www.pfsense.com/packages/config/nmap/nmap.xml</config_file>
 		<version>nmap-5.61.t4</version>
 		<status>Stable</status>
@@ -898,7 +905,7 @@
 		<category>Network Management</category>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
 		<depends_on_package>darkstat-3.0.713.tbz</depends_on_package>
-		<depends_on_package_pbi>darkstat-3.0.714-amd64.pbi</depends_on_package_pbi>
+		<depends_on_package_pbi>darkstat-3.0.715-amd64.pbi</depends_on_package_pbi>
 		<version>3.0.713</version>
 		<status>Stable</status>
 		<required_version>1.2.1</required_version>
@@ -951,7 +958,7 @@
 		<depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
 		<depends_on_package>freeradius-1.1.8_2.tbz</depends_on_package>
 		<depends_on_package>libltdl-2.2.10.tbz</depends_on_package>
-		<depends_on_package_pbi>freeradius-1.1.8_4-amd64.pbi</depends_on_package_pbi>
+		<depends_on_package_pbi>freeradius-1.1.8_5-amd64.pbi libltdl-2.4.2-amd64.pbi</depends_on_package_pbi>
 		<config_file>http://www.pfsense.org/packages/config/freeradius.xml</config_file>
 		<configurationfile>freeradius.xml</configurationfile>
 		<build_port_path>/usr/ports/net/freeradius</build_port_path>
@@ -991,7 +998,7 @@
 		<depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
 		<depends_on_package>bandwidthd-2.0.1_4.tbz</depends_on_package>
 		<depends_on_package>libpcap-1.1.1.tbz</depends_on_package>
-		<depends_on_package_pbi>bandwidthd-2.0.1_4-amd64.pbi</depends_on_package_pbi>
+		<depends_on_package_pbi>bandwidthd-2.0.1_5-amd64.pbi</depends_on_package_pbi>
 		<config_file>http://www.pfsense.org/packages/config/bandwidthd/bandwidthd.xml</config_file>
 		<configurationfile>bandwidthd.xml</configurationfile>
 		<build_port_path>/usr/ports/net-mgmt/bandwidthd</build_port_path>
@@ -1004,7 +1011,7 @@
 		<category>Network Management</category>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
 		<depends_on_package>stunnel-4.34_1.tbz</depends_on_package>
-		<depends_on_package_pbi>stunnel-4.43-amd64.pbi</depends_on_package_pbi>
+		<depends_on_package_pbi>stunnel-4.53-amd64.pbi</depends_on_package_pbi>
 		<version>4.34</version>
 		<status>Stable</status>
 		<pkginfolink>http://doc.pfsense.org/index.php/Stunnel_package</pkginfolink>
@@ -1053,7 +1060,7 @@
 		<category>Network Management</category>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
 		<depends_on_package>mtr-nox11-0.80.tbz</depends_on_package>
-		<depends_on_package_pbi>mtr-0.80_2-amd64.pbi</depends_on_package_pbi>
+		<depends_on_package_pbi>mtr-0.82_1-amd64.pbi</depends_on_package_pbi>
 		<version>0.80</version>
 		<status>Stable</status>
 		<required_version>2.0</required_version>
@@ -1072,7 +1079,7 @@
 		<maintainer>seth.mos@dds.nl</maintainer>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
 		<depends_on_package>lcdproc-0.5.3_1.tbz</depends_on_package>
-		<depends_on_package_pbi>lcdproc-0.5.4-amd64.pbi</depends_on_package_pbi>
+		<depends_on_package_pbi>lcdproc-0.5.5-amd64.pbi</depends_on_package_pbi>
 		<config_file>http://www.pfsense.org/packages/config/lcdproc/lcdproc.xml</config_file>
 		<configurationfile>lcdproc.xml</configurationfile>
 		<build_port_path>/usr/ports/sysutils/lcdproc</build_port_path>
@@ -1150,6 +1157,7 @@
 		<build_port_path>/usr/ports/net-mgmt/zabbix-agent</build_port_path>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
 		<depends_on_package>zabbix-agent-1.8.5,2.tbz</depends_on_package>
+		<depends_on_package_pbi>zabbix-1.8.13-amd64.pbi</depends_on_package_pbi>
 	</package>
 	<package>
 		<name>Zabbix Proxy</name>
@@ -1165,6 +1173,7 @@
 		<build_options>WITHOUT_CARES=true WITHOUT_CURL_DEBUG=true WITHOUT_DEBUGGING=true WITHOUT_DMALLOC=true WITHOUT_ETCSYMLINK=true WITHOUT_EXTRA_PATCHES=true WITHOUT_GDBM=true WITHOUT_GNUTLS=true WITHOUT_IODBC=true WITHOUT_IPMI=true WITHOUT_KERBEROS4=true WITHOUT_LDAP=true WITHOUT_LDAPS=true WITHOUT_LIBIDN=true WITHOUT_LIBSIGSEGV=true WITHOUT_LIBSSH2=true WITHOUT_MFD_REWRITES=true WITHOUT_MULTIPLICITY=true WITHOUT_MYSQL=true WITHOUT_NTLM=true WITHOUT_PERL_MALLOC=true WITHOUT_PGSQL=true WITHOUT_RTMP=true WITHOUT_SITECUSTOMIZE=true WITHOUT_SSH=true WITHOUT_SUIDPERL=true WITHOUT_THREADS=true WITHOUT_TKMIB=true WITHOUT_TRACKMEMORY=true WITHOUT_UNIXODBC=true WITH_CA_BUNDLE=true WITH_CURL=true WITH_DUMMY=true WITH_EXTRA_ENCODINGS=true WITH_FETCH=true WITH_FPING=true WITH_IPV6=true WITH_JABBER=true WITH_LDAP=true WITH_OPENSSL=true WITH_PERL=true WITH_PERL_64BITINT=true WITH_PERL_EMBEDDED=true WITH_PROXY=true WITH_SASL=true WITH_SQLITE=true WITH_USE_PERL=true WITH_WERROR=true</build_options>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
 		<depends_on_package>zabbix-proxy-1.8.8,2.tbz</depends_on_package>
+		<depends_on_package_pbi>zabbix-1.8.13-amd64.pbi</depends_on_package_pbi>
 	</package>
 	<package>
 		<name>OpenVPN Client Export Utility</name>
@@ -1407,6 +1416,7 @@
 		<status>BETA</status>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
 		<depends_on_package>quagga-0.99.20.1.tbz</depends_on_package>
++		<depends_on_package_pbi>quagga-0.99.20.1-amd64.pbi</depends_on_package_pbi>
 		<config_file>http://www.pfsense.com/packages/config/quagga_ospfd/quagga_ospfd.xml</config_file>
 		<build_port_path>/usr/ports/net/quagga</build_port_path>
 		<pkginfolink></pkginfolink>
