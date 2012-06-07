@@ -235,8 +235,8 @@ rm -f /var/run/quagga/ospfd.pid
 killall -9 zebra
 killall -9 ospfd
 sleep 1
-/usr/local/sbin/zebra -d
-/usr/local/sbin/ospfd -d
+/usr/local/sbin/zebra -d -f /usr/local/etc/quagga/zebra.conf
+/usr/local/sbin/ospfd -d -f /usr/local/etc/quagga/ospfd.conf
 EOF;
 	write_rcfile(array(
 			"file" => "quagga.sh",
