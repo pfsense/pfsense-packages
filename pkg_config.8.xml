@@ -176,10 +176,10 @@
 		<depends_on_package_base_url>http://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
 		<depends_on_package>db42-4.2.52_5.tbz</depends_on_package>
 		<depends_on_package>gdbm-1.8.3_3.tbz</depends_on_package>
-		<depends_on_package>apr-gdbm-db42-1.3.5.1.3.7_3.tbz</depends_on_package>
+		<depends_on_package>apr-ipv6-devrandom-gdbm-db42-1.4.5.1.3.12_1.tbz</depends_on_package>
 		<depends_on_package>ap22-mod_memcache-0.1.0_4.tbz</depends_on_package>
-		<depends_on_package>apache-2.2.16.tbz</depends_on_package>
-		<depends_on_package>ap22-mod_security-2.5.12.tbz</depends_on_package>
+		<depends_on_package>apache-2.2.21.tbz</depends_on_package>
+		<depends_on_package>ap22-mod_security-2.5.13_1.tbz</depends_on_package>
 		<depends_on_package_pbi>apache-2.2.22_5-i386.pbi mod_memcache-0.1.0_4-i386.pbi mod_security-2.6.5_1-i386.pbi apr-1.4.5.1.3.12_1-i386.pbi gdbm-1.9.1-i386.pbi db42-4.2.52_5-i386.pbi gettext-0.18.1.1-i386.pbi help2man-1.40.10-i386.pbi</depends_on_package_pbi>
 		<configurationfile>apache_mod_security.xml</configurationfile>
 		<build_port_path>/usr/ports/devel/gettext</build_port_path>
@@ -200,10 +200,10 @@
 		<category>FTP</category>
 		<config_file>http://www.pfsense.com/packages/config/pure-ftpd.xml</config_file>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
-		<depends_on_package>pure-ftpd-1.0.29_1.tbz</depends_on_package>
+		<depends_on_package>pure-ftpd-1.0.35.tbz</depends_on_package>
 		<depends_on_package_pbi>pure-ftpd-1.0.36-i386.pbi</depends_on_package_pbi>
 		<build_port_path>/usr/ports/ftp/pure-ftpd</build_port_path>
-		<version>1.0.21</version>
+		<version>1.0.35</version>
 		<status>Stable</status>
 		<configurationfile>pure-ftpd.xml</configurationfile>
 		<required_version>1.0</required_version>
@@ -223,6 +223,7 @@
 		<depends_on_package_base_url>http://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
 		<build_port_path>/usr/ports/net/avahi</build_port_path>
 		<build_port_path>/usr/ports/net/avahi-app</build_port_path>
+		<depends_on_package>avahi-app-0.6.29_1.tbz</depends_on_package>
 		<depends_on_package_pbi>avahi-0.6.29_3-i386.pbi</depends_on_package_pbi>
 		<version>0.6.25_2</version>
 		<status>ALPHA</status>
@@ -238,7 +239,7 @@
 		<category>Network Management</category>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
 		<depends_on_package_pbi>rrdtool-1.2.30_2-i386.pbi gdbm-1.9.1-i386.pbi perl-5.12.4_4-i386.pbi libpcap-1.2.1-i386.pbi geoip-1.4.8_2-i386.pbi webfonts-0.30_6-i386.pbi ntop-4.1.0_5-i386.pbi font-util-1.2.0-i386.pbi graphviz-2.28.0_1-i386.pbi</depends_on_package_pbi>
-		<depends_on_package>rrdtool-1.2.26_1.tbz</depends_on_package>
+		<depends_on_package>rrdtool-1.2.30_1.tbz</depends_on_package>
 		<depends_on_package>gdbm-1.9.1.tbz</depends_on_package>
 		<depends_on_package>perl-5.12.4_4.tbz</depends_on_package>
 		<depends_on_package>libpcap-1.1.1_1.tbz</depends_on_package>
@@ -421,9 +422,9 @@
 		<category>Services</category>
 		<config_file>http://www.pfsense.com/packages/config/spamd/spamd.xml</config_file>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
-		<depends_on_package>spamd-4.5.0_4.tbz</depends_on_package>
+		<depends_on_package>spamd-4.9.1.tbz</depends_on_package>
 		<depends_on_package_pbi>spamd-4.9.1-i386.pbi</depends_on_package_pbi>
-		<version>4.5.0_4</version>
+		<version>4.9.1</version>
 		<status>Beta</status>
 		<required_version>1.2.1</required_version>
 		<configurationfile>spamd.xml</configurationfile>
@@ -516,13 +517,13 @@
 		<category>NET</category>
 		<config_file>http://www.pfsense.com/packages/config/openbgpd/openbgpd.xml</config_file>
 		<build_port_path>/usr/ports/net/openbgpd</build_port_path>
-		<version>0.5.2</version>
+		<version>0.5.3</version>
 		<status>STABLE</status>
 		<pkginfolink>http://doc.pfsense.org/index.php/OpenBGPD_package</pkginfolink>
 		<required_version>1.3</required_version>
 		<configurationfile>openbgpd.xml</configurationfile>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
-		<depends_on_package>openbgpd-4.7.20100410.tbz</depends_on_package>
+		<depends_on_package>openbgpd-4.9.20110612_1.tbz</depends_on_package>
 		<depends_on_package_pbi>openbgpd-4.9.20110612_1-i386.pbi</depends_on_package_pbi>
 	</package>
 	<package>
@@ -635,7 +636,7 @@
 		<depends_on_package_base_url>http://e-sac.siteseguro.ws/pfsense/8/All/</depends_on_package_base_url>
 		<depends_on_package_pbi>gcc-4.2.5.20090325_5-i386.pbi varnish-3.0.2_1-i386.pbi</depends_on_package_pbi>
 		<depends_on_package>varnish-3.0.2.tbz</depends_on_package>
-		<depends_on_package>pcre-8.20.tbz</depends_on_package>
+		<depends_on_package>pcre-8.21_1.tbz</depends_on_package>
 		<build_port_path>/usr/ports/www/varnish</build_port_path>
 		<build_port_path>/usr/ports/lang/gcc42</build_port_path>
 	</package>
@@ -646,7 +647,7 @@
 		<pkginfolink>http://forum.pfsense.org/index.php/topic,14179.0.html</pkginfolink>
 		<category>Network Management</category>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
-		<depends_on_package>vnstat-1.10_2.tbz</depends_on_package>
+		<depends_on_package>vnstat-1.11.tbz</depends_on_package>
 		<depends_on_package_pbi>vnstat-1.11_1-i386.pbi</depends_on_package_pbi>
 		<build_port_path>/usr/ports/net/vnstat</build_port_path>
 		<version>1.10_2</version>
@@ -710,25 +711,25 @@
 		<depends_on_package_base_url>http://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
 		<build_port_path>/usr/ports/emulators/open-vm-tools-nox11/</build_port_path>
 		<depends_on_package>open-vm-tools-nox11-313025_2.tbz</depends_on_package>
-		<depends_on_package>icu-4.6.1.tbz</depends_on_package>
+		<depends_on_package>icu-4.8.1.1_1.tbz</depends_on_package>
 		<build_port_path>/usr/ports/devel/icu</build_port_path>
 		<depends_on_package>fusefs-kmod-0.3.9.p1.20080208_7.tbz</depends_on_package>
 		<build_port_path>/usr/ports/sysutils/fusefs-kmod</build_port_path>
 		<depends_on_package>fusefs-libs-2.7.4.tbz</depends_on_package>
 		<build_port_path>/usr/ports/sysutils/fusefs-libs</build_port_path>
-		<depends_on_package>glib-2.28.8.tbz</depends_on_package>
+		<depends_on_package>glib-2.28.8_3.tbz</depends_on_package>
 		<build_port_path>/usr/ports/devel/glib2</build_port_path>
 		<depends_on_package>libdnet-1.11_3.tbz</depends_on_package>
 		<build_port_path>/usr/ports/net/libdnet</build_port_path>
 		<depends_on_package>libiconv-1.13.1_1.tbz</depends_on_package>
 		<build_port_path>/usr/ports/converters/libiconv</build_port_path>
-		<depends_on_package>pcre-8.12.tbz</depends_on_package>
+		<depends_on_package>pcre-8.21_1.tbz</depends_on_package>
 		<build_port_path>/usr/ports/devel/pcre</build_port_path>
 		<depends_on_package>perl-5.12.3.tbz</depends_on_package>
 		<build_port_path>/usr/ports/lang/perl5.12</build_port_path>
 		<depends_on_package>pkg-config-0.25_1.tbz</depends_on_package>
 		<build_port_path>/usr/ports/devel/pkg-config</build_port_path>		
-		<depends_on_package>python27-2.7.2_1.tbz</depends_on_package>
+		<depends_on_package>python27-2.7.2_3.tbz</depends_on_package>
 		<build_port_path>/usr/ports/lang/python27</build_port_path>
 		<depends_on_package_pbi>
 			open-vm-tools-425873_1-i386.pbi
@@ -781,7 +782,7 @@
 		<config_file>http://www.pfsense.com/packages/config/arping/arping.xml</config_file>
 		<configurationfile>arping.xml</configurationfile>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
-		<depends_on_package>arping-2.09.tbz</depends_on_package>
+		<depends_on_package>arping-2.09_1.tbz</depends_on_package>
 		<depends_on_package_pbi>arping-2.09_1-i386.pbi</depends_on_package_pbi>
 		<build_port_path>/usr/ports/net/arping</build_port_path>
 		<pkginfolink>http://doc.pfsense.org/index.php/Arping</pkginfolink>
@@ -841,14 +842,14 @@
 		<descr>Network UPS Tools</descr>
 		<website>http://www.networkupstools.org/</website>
 		<category>Network Management</category>
-		<version>2.2.2_5 pkg 1.4</version>
+		<version>2.2.2_6 pkg 1.4</version>
 		<status>BETA</status>
 		<required_version>2.0</required_version>
 		<maintainer>rswagoner@gmail.com</maintainer>
 		<config_file>http://www.pfsense.com/packages/config/nut/nut.xml</config_file>
 		<configurationfile>nut.xml</configurationfile>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
-		<depends_on_package>nut-2.2.2_5.tbz</depends_on_package>
+		<depends_on_package>nut-2.2.2_6.tbz</depends_on_package>
 		<depends_on_package_pbi>nut-2.2.2_6-i386.pbi</depends_on_package_pbi>
 		<build_port_path>/usr/ports/sysutils/nut22</build_port_path>
 		<pkginfolink>http://doc.pfsense.org/index.php/Nut_package</pkginfolink>
@@ -871,9 +872,9 @@
 		<descr>darkstat is a network statistics gatherer. It's a packet sniffer that runs as a background process on a cable/DSL router, gathers all sorts of statistics about network usage, and serves them over HTTP.</descr>
 		<category>Network Management</category>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
-		<depends_on_package>darkstat-3.0.712.tbz</depends_on_package>
+		<depends_on_package>darkstat-3.0.714.tbz</depends_on_package>
 		<depends_on_package_pbi>darkstat-3.0.715-i386.pbi</depends_on_package_pbi>
-		<version>3.0.712</version>
+		<version>3.0.714</version>
 		<status>Stable</status>
 		<required_version>1.2.1</required_version>
 		<maintainer>sullrich+pfsp@gmail.com</maintainer>
@@ -923,8 +924,8 @@
 		<required_version>2.0</required_version>
 		<maintainer>none</maintainer>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
-		<depends_on_package>freeradius-1.1.8_2.tbz</depends_on_package>
-		<depends_on_package>libltdl-2.2.10.tbz</depends_on_package>
+		<depends_on_package>freeradius-1.1.8_4.tbz</depends_on_package>
+		<depends_on_package>libltdl-2.4_1.tbz</depends_on_package>
 		<depends_on_package_pbi>freeradius-1.1.8_5-i386.pbi libltdl-2.4.2-i386.pbi</depends_on_package_pbi>
 		<config_file>http://www.pfsense.org/packages/config/freeradius.xml</config_file>
 		<configurationfile>freeradius.xml</configurationfile>
@@ -977,9 +978,9 @@
 		<descr>An SSL encryption wrapper between remote client and local or remote servers. </descr>
 		<category>Network Management</category>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
-		<depends_on_package>stunnel-4.33.tbz</depends_on_package>
+		<depends_on_package>stunnel-4.43.tbz</depends_on_package>
 		<depends_on_package_pbi>stunnel-4.53-i386.pbi</depends_on_package_pbi>
-		<version>4.33.0</version>
+		<version>4.43.0</version>
 		<status>Stable</status>
 		<pkginfolink>http://doc.pfsense.org/index.php/Stunnel_package</pkginfolink>
 		<required_version>1.2.1</required_version>
@@ -995,9 +996,9 @@
 		<category>Network Management</category>
 		<config_file>http://www.pfsense.com/packages/config/iperf.xml</config_file>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
-		<depends_on_package>iperf-2.0.4.tbz</depends_on_package>
+		<depends_on_package>iperf-2.0.5.tbz</depends_on_package>
 		<depends_on_package_pbi>iperf-2.0.5-i386.pbi</depends_on_package_pbi>
-		<version>2.0.2_1</version>
+		<version>2.0.5</version>
 		<status>Beta</status>
 		<pkginfolink>http://doc.pfsense.org/index.php/Iperf_package</pkginfolink>
 		<required_version>1.2.1</required_version>
@@ -1026,7 +1027,7 @@
 		<website>http://www.bitwizard.nl/mtr/</website>
 		<category>Network Management</category>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
-		<depends_on_package>mtr-nox11-0.80.tbz</depends_on_package>
+		<depends_on_package>mtr-nox11-0.82.tbz</depends_on_package>
 		<depends_on_package_pbi>mtr-0.82_1-i386.pbi</depends_on_package_pbi>
 		<version>0.65_2</version>
 		<status>Stable</status>
@@ -1120,10 +1121,10 @@
 		<website>http://www-nrg.ee.lbl.gov/</website>
 		<category>Security</category>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
-		<depends_on_package>arpwatch-2.1.a15_4.tbz</depends_on_package>
+		<depends_on_package>arpwatch-2.1.a15_6.tbz</depends_on_package>
 		<depends_on_package_pbi>arpwatch-2.1.a15_6-i386.pbi</depends_on_package_pbi>
 		<build_port_path>/usr/ports/net-mgmt/arpwatch</build_port_path>
-		<version>2.1.a14_4</version>
+		<version>2.1.a15_6</version>
 		<status>ALPHA</status>
 		<required_version>2.0</required_version>
 		<config_file>http://www.pfsense.com/packages/config/arpwatch.xml</config_file>
@@ -1172,7 +1173,7 @@
 		<maintainer>remco.verhoef@redfive.biz</maintainer>
 		<build_port_path>/usr/ports/net-mgmt/zabbix-agent</build_port_path>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
-		<depends_on_package>zabbix-agent-1.8.5,2.tbz</depends_on_package>
+		<depends_on_package>zabbix-agent-1.8.10,2.tbz</depends_on_package>
 		<depends_on_package_pbi>zabbix-1.8.13-i386.pbi</depends_on_package_pbi>
 	</package>
 	<package>
@@ -1196,7 +1197,7 @@
 		<descr>Allows a pre-configured OpenVPN Windows Client or  or Mac OSX's Viscosity configuration bundle to be exported directly from pfSense.</descr>
 		<category>Security</category>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
-		<depends_on_package>p7zip-9.13.tbz</depends_on_package>
+		<depends_on_package>p7zip-9.20.1.tbz</depends_on_package>
 		<depends_on_package>zip-3.0.tbz</depends_on_package>
 		<depends_on_package_pbi>
 			zip-3.0-i386.pbi
