@@ -386,7 +386,7 @@
 		<category>Security</category>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
 		<depends_on_package>mysql-client-5.1.53.tbz</depends_on_package>
-		<depends_on_package>snort-2.9.0.5_1.tbz</depends_on_package>
+		<depends_on_package>snort-2.9.2.3.tbz</depends_on_package>
 		<depends_on_package>perl-threaded-5.10.1_3.tbz</depends_on_package>
 		<build_port_path>/usr/ports/devel/pcre</build_port_path>
 		<build_port_path>/usr/ports/net/daq</build_port_path>
@@ -394,9 +394,9 @@
 		<build_port_path>/usr/ports/lang/perl5.10</build_port_path>
 		<build_port_path>/usr/ports/databases/mysql51-client</build_port_path>
 		<build_port_path>/usr/home/pfsense/tools/pfPorts/snort</build_port_path>
-		<build_options>WITH_THREADS=yes WITH_IPV6=true WITH_MPLS=true WITH_GRE=true WITHOUT_TARGETBASED=true WITH_DECODERPRE=true WITH_ZLIB=true WITH_NORMALIZER=true WITH_REACT=true WITH_PERFPROFILE=true WITH_FLEXRESP3=true WITHOUT_MYSQL=true WITHOUT_ODBC=true WITHOUT_POSTGRESQL=true WITHOUT_PRELUDE=true WITH_SNORTSAM=true WITHOUT_PFSENSE=true</build_options>
+		<build_options>WITH_THREADS=yes WITH_IPV6=true WITH_MPLS=true WITH_GRE=true WITHOUT_TARGETBASED=true WITH_DECODERPRE=true WITH_ZLIB=true WITH_NORMALIZER=true WITH_REACT=true WITH_PERFPROFILE=true WITH_FLEXRESP3=true WITHOUT_MYSQL=true WITHOUT_ODBC=true WITHOUT_POSTGRESQL=true WITHOUT_PRELUDE=true WITH_SNORTSAM=true -DNOPORTDOCS</build_options>
 		<config_file>http://www.pfsense.com/packages/config/snort/snort.xml</config_file>
-		<version>2.9.1 pkg v. 2.1.1</version>
+		<version>2.9.2.3 pkg v. 2.1.1</version>
 		<required_version>2.0</required_version>
 		<status>Stable</status>
 		<configurationfile>/snort.xml</configurationfile>
