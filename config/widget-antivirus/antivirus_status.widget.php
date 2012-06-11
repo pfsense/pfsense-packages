@@ -36,7 +36,12 @@ require_once("pfsense-utils.inc");
 require_once("functions.inc");
 
 define('PATH_CLAMDB',   '/var/db/clamav');
-define('PATH_HAVPLOG',  '/var/log/access.log');
+$pfSversion = str_replace("\s", "", file_get_contents("/etc/version"));
+if(preg_match("/^2.0/",$pfSversion))
+	define('PATH_HAVPLOG',  '/var/log/havp/access.log');
+else
+	define('PATH_HAVPLOG',  '/var/log/access.log');
+
 define('PATH_AVSTATUS', '/var/tmp/havp.status');
 
 

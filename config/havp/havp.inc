@@ -77,7 +77,13 @@ define('HVDEF_MAXSCANSIZE',             '5000000'); # [bytes] ! do not enter 0 o
 define('HVDEF_MAXARCSCANSIZE',          '5000000'); # [bytes] ! do not enter 0 or big size !
 define('HVDEF_PID_FILE',                '/var/run/havp.pid');
 define('HVDEF_WORK_DIR',                '/usr/local/etc/havp');
-define('HVDEF_LOG_DIR',                 '/var/log');
+
+$pfSversion = str_replace("\s", "", file_get_contents("/etc/version"));
+if(preg_match("/^2.0/",$pfSversion))
+	define('HVDEF_LOG_DIR',			'/var/log/havp');
+else
+	define('HVDEF_LOG_DIR',			'/var/log');
+
 define('HVDEF_TEMP_DIR',                '/var/tmp');
 define('HVDEF_HAVPTEMP_DIR',            HVDEF_TEMP_DIR.'/havp');
 define('HVDEF_RAMTEMP_DIR',             HVDEF_TEMP_DIR.'/havpRAM');
@@ -97,7 +103,11 @@ define('HVDEF_HAVP_MAXSRV',             '100');
 # Clam
 #define('HVDEF_CLAM_RUNDIR',             '/var/run/clamav');
 define('HVDEF_CLAM_RUNDIR',             '/var/run');
-define('HVDEF_AVLOG_DIR',               '/var/log');
+if(preg_match("/^2.0/",$pfSversion))
+	define('HVDEF_AVLOG_DIR',               '/var/log/clamav');
+else
+	define('HVDEF_AVLOG_DIR',               '/var/log');
+
 define('HVDEF_CLAM_SOCKET',             HVDEF_CLAM_RUNDIR.'/clamd.sock');
 define('HVDEF_CLAM_PID',                HVDEF_CLAM_RUNDIR.'/clamd.pid');
 define('HVDEF_CLAM_LOG',                HVDEF_AVLOG_DIR . '/clamd.log');
