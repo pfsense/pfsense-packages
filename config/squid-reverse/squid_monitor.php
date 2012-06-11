@@ -119,7 +119,7 @@ include("head.inc");
 						</select>
 						<br/>
 						<span class="vexpl">
-						   Max. lines to be displayed.
+						   <?=gettext("Max. lines to be displayed.");?>
 						</span>
 					</td>
 				</tr>
@@ -129,9 +129,9 @@ include("head.inc");
 						<input name="strfilter" type="text" class="formfld search" id="strfilter" size="50" value="">
 						<br/>
 						<span class="vexpl">
-						   Enter a grep like string/pattern to filterlog.<br>
-						   eg. username, ip addr, url.<br>
-						   Use <b>!</b> to invert the sense of matching, to select non-matching lines.	
+						   <?=gettext("Enter a grep like string/pattern to filterlog.");?><br>
+						   <?=gettext("eg. username, ip addr, url.");?><br>
+						   <?=gettext("Use <b>!</b> to invert the sense of matching, to select non-matching lines.");?>
 						</span>
 					</td>
 				</tr>
