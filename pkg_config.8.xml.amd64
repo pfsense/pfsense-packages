@@ -349,7 +349,7 @@
 		<pkginfolink>http://doc.pfsense.org/index.php/FreeSWITCH</pkginfolink>
 		<config_file>http://www.pfsense.com/packages/config/freeswitch/freeswitch.xml</config_file>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
-+		<depends_on_package_pbi>freeswitch-1.0.6_1-amd64.pbi</depends_on_package_pbi>
+		<depends_on_package_pbi>freeswitch-1.0.6_1-amd64.pbi</depends_on_package_pbi>
 		<build_port_path>/usr/ports/net/freeswitch</build_port_path>
 		<version>0.8.3.6</version>
 		<status>Beta</status>
@@ -1416,7 +1416,7 @@
 		<status>BETA</status>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
 		<depends_on_package>quagga-0.99.20.1.tbz</depends_on_package>
-+		<depends_on_package_pbi>quagga-0.99.20.1-amd64.pbi</depends_on_package_pbi>
+		<depends_on_package_pbi>quagga-0.99.20.1-amd64.pbi</depends_on_package_pbi>
 		<config_file>http://www.pfsense.com/packages/config/quagga_ospfd/quagga_ospfd.xml</config_file>
 		<build_port_path>/usr/ports/net/quagga</build_port_path>
 		<pkginfolink></pkginfolink>
