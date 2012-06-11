@@ -42,7 +42,8 @@ require_once("guiconfig.inc");
 if ($_POST) {
 	# Actions
 	$filter = preg_replace('/(@|!|>|<)/',"",htmlspecialchars($_POST['strfilter']));
-    switch (strtolower($_POST['program'])) {
+	$program = strtolower($_POST['program']);
+    switch ($program) {
        case 'squid':
 			// Define log file
 			$log='/var/squid/logs/access.log';
@@ -138,19 +139,26 @@ function html_autowrap($cont)
 
 // Show Squid Logs
 function fetch_log($log){
-	global $filter;
+	global $filter,$program;
 	// Get Data from form post
     $lines = $_POST['maxlines'];
     if (preg_match("/!/",htmlspecialchars($_POST['strfilter'])))
     	$grep_arg="-iv";
     else
     	$grep_arg="-i";
+    
+    //Check program to execute or no the parser
+	if($program == "squid")
+		$parser = "| php -q squid_log_parser.php";
+	else
+		$parser = "";
+		
     // Get logs based in filter expression
     if($filter != "") {
-        exec("tail -2000 {$log} | /usr/bin/grep {$grep_arg} " . escapeshellarg($filter). " | tail -r -n $lines | php -q squid_log_parser.php " , $logarr); 
+        exec("tail -2000 {$log} | /usr/bin/grep {$grep_arg} " . escapeshellarg($filter). " | tail -r -n {$lines} {$parser} " , $logarr);     
     }
     else {
-        exec("tail -r -n {$lines} {$log} | php -q squid_log_parser.php", $logarr);
+        exec("tail -r -n {$lines} {$log} {$parser}", $logarr);
     }
     // return logs
     return $logarr;
