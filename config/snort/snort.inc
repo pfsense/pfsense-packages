@@ -1728,6 +1728,7 @@ preprocessor http_inspect_server: server default \
 			extended_response_inspection \
 			inspect_gzip \
 			normalize_utf \
+			normalize_javascript \
 			unlimited_decompress \
                         ascii no \
                         chunk_length 500000 \
