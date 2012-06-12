@@ -1278,7 +1278,7 @@ function snort_deinstall() {
 	mwexec('/usr/sbin/pw userdel snort; /usr/sbin/pw groupdel snort', true);
 	mwexec('/bin/rm -rf /usr/local/etc/snort*; /bin/rm -rf /usr/local/pkg/snort*', true);
 	mwexec('/bin/rm -r /usr/local/bin/barnyard2', true);
-	mwexec('/bin/rm -rf /usr/local/www/snort; /bin/rm -rf /var/log/snort', true);
+	mwexec('/bin/rm -rf /usr/local/www/snort; /bin/rm -rf /var/log/snort; /bin/rm -rf /usr/local/lib/snort', true);
 
 	/* Remove snort cron entries Ugly code needs smoothness*/
 	if (!function_exists('snort_deinstall_cron')) {
