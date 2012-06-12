@@ -514,10 +514,6 @@ function snort_postinstall()
 	if (!file_exists('/var/db/whitelist'))
 		touch('/var/db/whitelist');
 
-	/* rm barnyard2 important */
-	if (file_exists('/usr/local/bin/barnyard2'))
-		@unlink('/usr/local/bin/barnyard2');
-
 	/* XXX: These are needed if you run snort as snort user
 	mwexec('/usr/sbin/chown -R snort:snort /var/log/snort', true);
 	mwexec('/usr/sbin/chown -R snort:snort /usr/local/etc/snort', true);
@@ -560,47 +556,6 @@ function snort_postinstall()
 	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort/images/awesome-overlay-sprite.png');
 	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort/images/logo22.png');
 	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort/images/page_white_text.png');
-
-	/* install barnyard2 for 2.0 x86 x64 and 1.2.3 x86 */
-	update_status(gettext("Installing Barnyard2 for $snort_arch..."));
-	update_output_window(gettext("Please wait..."));
-	if ($snort_pfsense_basever == 'yes')
-		exec('/usr/bin/fetch -o /usr/local/bin/barnyard2 http://www.pfsense.com/packages/config/snort/bin/7.3.x86/barnyard2');
-	else if ($snort_pfsense_basever == 'no') {
-		if ($snort_arch == 'x64')
-			exec("/usr/bin/fetch -o /usr/local/bin/barnyard2 http://files.pfsense.org/packages/amd64/8/All/barnyard2");
-		else
-			exec("/usr/bin/fetch -o /usr/local/bin/barnyard2 http://files.pfsense.org/packages/8/All/barnyard2");
-		exec('/bin/chmod 0755 /usr/local/bin/barnyard2');
-	}
-	update_output_window(gettext("Finnished Installing Barnyard2..."));
-
-	/* XXX: remove compeletely? */
-	if ($snort_pfsense_basever == 'yes') {
-		if (!is_dir('/tmp/pkg_s'))
-			exec('/bin/mkdir -p /tmp/pkg_s');
-
-		$snort_tmp_pkg_dir = "{$g['tmp_path']}/pkg_s";
-		chdir('$snort_tmp_pkg_dir');
-
-		/* install perl-threaded */
-		update_status(gettext("Installing perl-threaded for {$snort_arch}..."));
-		update_output_window(gettext("Please wait downloading..."));
-		exec("/usr/bin/fetch http://files.pfsense.org/packages/snort/7.3x86/perl-threaded-5.12.1_1.tbz");
-
-		update_output_window(gettext("Please wait Installing..."));
-		if (file_exists("{$snort_tmp_pkg_dir}/perl-threaded-5.12.1_1.tbz"))
-			exec("/usr/sbin/pkg_add -f {$snort_tmp_pkg_dir}/perl-threaded-5.12.1_1.tbz");
-
-		update_output_window(gettext("Finnished Installing perl-threaded..."));
-
-		update_output_window(gettext("Please wait Cleaning Up..."));
-		if (is_dir($snort_tmp_pkg_dir))
-			exec("/bin/rm -r {$snort_tmp_pkg_dir}");
-
-		/* back to default */
-		chdir('/root/');
-	}
 
 	/* remake saved settings */
 	if ($config['installedpackages']['snortglobal']['forcekeepsettings'] == 'on') {
