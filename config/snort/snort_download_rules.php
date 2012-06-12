@@ -29,26 +29,25 @@
  */
 
 /* Setup enviroment */
-
-/* TODO: review if include files are needed */
 require_once("guiconfig.inc");
 require_once("functions.inc");
 require_once("service-utils.inc");
 require_once("/usr/local/pkg/snort/snort.inc");
 
+if ($_GET['return']) {
+	header("Location: /snort/snort_download_updates.php");
+	exit;
+}
+
 $tmpfname = "/usr/local/etc/snort/tmp/snort_rules_up";
 $snortdir = "/usr/local/etc/snort";
 $snortdir_wan = "/usr/local/etc/snort";
-$snort_filename_md5 = "snortrules-snapshot-2905.tar.gz.md5";
-$snort_filename = "snortrules-snapshot-2905.tar.gz";
+$snort_filename_md5 = "{$snort_rules_file}.md5";
+$snort_filename = "{$snort_rules_file}";
 $emergingthreats_filename_md5 = "emerging.rules.tar.gz.md5";
 $emergingthreats_filename = "emerging.rules.tar.gz";
 $pfsense_rules_filename_md5 = "pfsense_rules.tar.gz.md5";
 $pfsense_rules_filename = "pfsense_rules.tar.gz";
-
-$id = $_GET['id'];
-if (isset($_POST['id']))
-	$id = $_POST['id'];
 
 /*  Time stamps define */
 $last_md5_download = $config['installedpackages']['snortglobal']['last_md5_download'];
@@ -60,29 +59,21 @@ $snortdownload = $config['installedpackages']['snortglobal']['snortdownload'];
 $emergingthreats = $config['installedpackages']['snortglobal']['emergingthreats'];
 
 if ($snortdownload == 'off' && $emergingthreats != 'on')
-{
 	$snort_emrging_info = 'stop';
-}
 
 if ($oinkid == "" && $snortdownload != 'off')
-{
 	$snort_oinkid_info = 'stop';
-}
-
 
 /* check if main rule directory is empty */
 $if_mrule_dir = "/usr/local/etc/snort/rules";
 $mfolder_chk = (count(glob("$if_mrule_dir/*")) === 0) ? 'empty' : 'full';
 
-
-if (file_exists('/var/run/snort.conf.dirty')) {
+if (file_exists('/var/run/snort.conf.dirty'))
 	$snort_dirty_d = 'stop';
-}
 
 $pgtitle = "Services: Snort: Update Rules";
 
 include("head.inc");
-
 ?>
 
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">
@@ -90,7 +81,7 @@ include("head.inc");
 <?php include("fbegin.inc"); ?>
 <?if($pfsense_stable == 'yes'){echo '<p class="pgtitle">' . $pgtitle . '</p>';}?>
 
-<form action="/snort/snort_testing.php" method="post">
+<form action="/snort/snort_download_updates.php" method="GET">
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
 <tr>
 	<td>
@@ -121,10 +112,9 @@ include("head.inc");
 	</div>
 	</td>
 </tr>
-<tr><td><a href="/snort/snort_download_updates.php"><input type="button" Value="Return"></a></td></tr>
+<tr><td><input type="submit" Value="Return"></td></tr>
 </table>
 </form>
-
 <?php include("fend.inc");?>
 </body>
 </html>
@@ -133,9 +123,8 @@ include("head.inc");
 /* Start of code */
 conf_mount_rw();
 
-if (!is_dir('/usr/local/etc/snort/tmp')) {
+if (!is_dir('/usr/local/etc/snort/tmp'))
 	exec('/bin/mkdir -p /usr/local/etc/snort/tmp');
-}
 
 $snort_md5_check_ok = 'off';
 $emerg_md5_check_ok = 'off';

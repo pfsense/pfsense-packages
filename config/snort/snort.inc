@@ -38,6 +38,7 @@ require_once("filter.inc");
 
 /* package version */
 $snort_package_version = 'Snort 2.9.1 pkg v. 2.1.1';
+$snort_rules_file = "snortrules-snapshot-2922.tar.gz";
 
 /* Allow additional execution time 0 = no limit. */
 ini_set('max_execution_time', '9999');

@@ -44,26 +44,17 @@ $snort_load_jquery_colorbox = 'yes';
 
 
 /* quick md5s chk */
-if(file_exists('/usr/local/etc/snort/snortrules-snapshot-2905.tar.gz.md5'))
-{
-	$snort_org_sig_chk_local = exec('/bin/cat /usr/local/etc/snort/snortrules-snapshot-2905.tar.gz.md5');
-}else{
-	$snort_org_sig_chk_local = 'N/A';
-}
+$snort_org_sig_chk_local = 'N/A';
+if (file_exists("/usr/local/etc/snort/{$snort_rules_file}.md5"))
+	$snort_org_sig_chk_local = exec("/bin/cat /usr/local/etc/snort/{$snort_rules_file}.md5");
 
+$emergingt_net_sig_chk_local = 'N/A';
 if(file_exists('/usr/local/etc/snort/emerging.rules.tar.gz.md5'))
-{
 	$emergingt_net_sig_chk_local = exec('/bin/cat /usr/local/etc/snort/emerging.rules.tar.gz.md5');
-}else{
-	$emergingt_net_sig_chk_local = 'N/A';
-}
 
+$pfsense_org_sig_chk_local = 'N/A';
 if(file_exists('/usr/local/etc/snort/pfsense_rules.tar.gz.md5'))
-{
 	$pfsense_org_sig_chk_local = exec('/bin/cat /usr/local/etc/snort/pfsense_rules.tar.gz.md5');
-}else{
-	$pfsense_org_sig_chk_local = 'N/A';
-}
 
 /* define checks */
 $oinkid = $config['installedpackages']['snortglobal']['oinkmastercode'];
@@ -71,31 +62,22 @@ $snortdownload = $config['installedpackages']['snortglobal']['snortdownload'];
 $emergingthreats = $config['installedpackages']['snortglobal']['emergingthreats'];
 
 if ($snortdownload != 'on' && $emergingthreats != 'on')
-{
 	$snort_emrging_info = 'stop';
-}
 
 if ($oinkid == '' && $snortdownload != 'off')
-{
 	$snort_oinkid_info = 'stop';
-}
 
-if ($snort_emrging_info == 'stop' || $snort_oinkid_info == 'stop') {
+if ($snort_emrging_info == 'stop' || $snort_oinkid_info == 'stop')
 	$error_stop = 'true';
-}
-
 
 /* check if main rule directory is empty */
 $if_mrule_dir = "/usr/local/etc/snort/rules";
 $mfolder_chk = (count(glob("$if_mrule_dir/*")) === 0) ? 'empty' : 'full';
 
 /* check for logfile */
-if(file_exists('/usr/local/etc/snort/snort_update.log'))
-{
+$update_logfile_chk = 'no';
+if (file_exists('/usr/local/etc/snort/snort_update.log'))
 	$update_logfile_chk = 'yes';
-}else{
-	$update_logfile_chk = 'no';
-}
 
 header("snort_help_info.php");
 header( "Expires: Mon, 20 Dec 1998 01:00:00 GMT" );
