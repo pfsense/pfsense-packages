@@ -49,7 +49,14 @@ define('LS_WWWPATH',			'/usr/local/www/lightsquid');
 define('LS_TEMPLATEPATH',		'/usr/local/www/lightsquid/tpl');
 define('LS_LANGPATH',			'/usr/local/share/lightsquid/lang');
 define('LS_REPORTPATH',			'/var/lightsquid/report');
-define('LS_SQUIDLOGPATH',		'/var/squid/logs');
+
+global $config;
+if (isset($config['installedpackages']['squid']['config'][0])) {
+	if (!empty($config['installedpackages']['squid']['config'][0]['log_dir']))
+		define('LS_SQUIDLOGPATH', $config['installedpackages']['squid']['config'][0]['log_dir']);
+	else
+		define('LS_SQUIDLOGPATH', '/var/squid/logs');
+}
 define('LS_SQUIDLOG',			'access.log');
 define('LS_IP2NAMEPATH',		'/usr/local/libexec/lightsquid');
 
@@ -260,7 +267,8 @@ function lightsquid_resync() {
 		if (isset($config['installedpackages']['squid']['config'][0])) {
 			$squid_settings = $config['installedpackages']['squid']['config'][0];
 			$squid_settings['log_enabled'] = 'on';
-			$squid_settings['log_dir'] = LS_SQUIDLOGPATH;
+			if (empty($squid_settings['log_dir']))
+				$squid_settings['log_dir'] = LS_SQUIDLOGPATH;
 			
 			# sqstat
                      $ifmgr = "127.0.0.1;";
