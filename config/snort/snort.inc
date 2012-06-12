@@ -489,13 +489,6 @@ function snort_postinstall()
 	if (file_exists('/usr/local/lib/snort/dynamicpreprocessor/lib_sfdynamic_preprocessor_example.so'))
 		exec('/bin/rm /usr/local/lib/snort/dynamicpreprocessor/lib_sfdynamic_preprocessor_example*');
 
-	/* XXX: In pfSense this really does not add much!
-	 * add snort user and group note: 920 keep the numbers < 2000, above this is reserved in pfSense 2.0
-	exec('/usr/sbin/pw groupadd snort -g 920');
-	exec('/usr/sbin/pw useradd snort -u 920 -c "Snort User" -d /nonexistent -g snort -s /sbin/nologin');
-	 */
-
-
 	/* create a few directories and ensure the sample files are in place */
 	if (!is_dir('/usr/local/etc/snort'))
 		exec('/bin/mkdir -p /usr/local/etc/snort/custom_rules');
