@@ -262,10 +262,10 @@ function Running_Ck_b($snort_uuid, $if_real, $id) {
 }
 
 function Running_Stop($snort_uuid, $if_real, $id) {
-	global $config;
+	global $config, $g;
 
 	/* if snort.sh crashed this will remove the pid */
-	@unlink('/tmp/snort.sh.pid');
+	@unlink("{$g['tmp_path']}/snort.sh.pid");
 	
 	$start_up = exec("/bin/ps -ax | /usr/bin/grep \"R {$snort_uuid}\" | /usr/bin/grep -v grep | /usr/bin/awk '{ print \$1; }'");
 	$start_upb = exec("/bin/ps -ax | /usr/bin/grep \"snort_{$snort_uuid}_{$if_real}.u2\" | /usr/bin/grep -v grep | /usr/bin/awk '{ print \$1; }'");
@@ -274,6 +274,7 @@ function Running_Stop($snort_uuid, $if_real, $id) {
 		exec("/bin/kill {$start_up}");
 		exec("/bin/rm /var/log/snort/run/snort_{$if_real}{$snort_uuid}*");
 		exec("/bin/rm /var/log/snort/snort_{$snort_uuid}_{$if_real}*");
+		@unlink("/var/log/snort/alert_{$snort_uuid}");
 		exec("/bin/rm -r /usr/local/etc/snort/snort_{$snort_uuid}_{$if_real}");
 	}
 
@@ -292,7 +293,7 @@ function Running_Start($snort_uuid, $if_real, $id) {
 	global $config;
 
 	/* if snort.sh crashed this will remove the pid */
-	@unlink('/tmp/snort.sh.pid');
+	@unlink("{$g['tmp_path']}/snort.sh.pid");
 
 	$snort_info_chk = $config['installedpackages']['snortglobal']['rule'][$id]['enable'];
 	if ($snort_info_chk == 'on')
@@ -311,6 +312,26 @@ function Running_Start($snort_uuid, $if_real, $id) {
 	/* Log Iface stop */
 	exec("/usr/bin/logger -p daemon.info -i -t SnortStartup 'Interface Rule START for {$id}_{$snort_uuid}_{$if_real}...'");
 	sleep(2); // Give time so GUI displays correctly
+}
+
+function snort_get_friendly_interface($interface) {
+
+	if (function_exists('convert_friendly_interface_to_friendly_descr'))
+		$iface = convert_friendly_interface_to_friendly_descr($interface);
+	else {
+		if (!$interface || ($interface == "wan"))
+			$iface = "WAN";
+		else if(strtolower($interface) == "lan")
+			$iface = "LAN";
+		else if(strtolower($interface) == "pppoe")
+			$iface = "PPPoE";
+		else if(strtolower($interface) == "pptp")
+			$iface = "PPTP";
+		else
+			$iface = strtoupper($interface);
+	}
+
+	return $iface;
 }
 
 /* get the real iface name of wan */
@@ -478,29 +499,20 @@ function snort_postinstall()
 	/* create a few directories and ensure the sample files are in place */
 	if (!is_dir('/usr/local/etc/snort'))
 		exec('/bin/mkdir -p /usr/local/etc/snort/custom_rules');
-
 	if (!is_dir('/usr/local/etc/snort/whitelist'))
 		exec('/bin/mkdir -p /usr/local/etc/snort/whitelist/');
-
-	if (!is_dir('/var/log/snort/run'))
+	/* NOTE: the diff between the if check and the exec() extra run is by design */
+	if (!is_dir('/var/log/snort'))
 		exec('/bin/mkdir -p /var/log/snort/run');
+	else
+		exec('/bin/rm -r /var/log/snort/*; /bin/mkdir -p /var/log/snort/run');
 
 	if (!is_dir('/var/log/snort/barnyard2'))
 		exec('/bin/mkdir -p /var/log/snort/barnyard2');
-
 	if (!is_dir('/usr/local/lib/snort/dynamicrules/'))
 		exec('/bin/mkdir -p /usr/local/lib/snort/dynamicrules/');
-
 	if (!file_exists('/var/db/whitelist'))
 		touch('/var/db/whitelist');
-
-	/* if users have old log files delete them */
-	if(!file_exists('/var/log/snort/alert'))
-		touch('/var/log/snort/alert');
-	else {
-		exec('/bin/rm -rf /var/log/snort/*');
-		touch('/var/log/snort/alert');
-	}
 
 	/* rm barnyard2 important */
 	if (file_exists('/usr/local/bin/barnyard2'))
@@ -514,7 +526,6 @@ function snort_postinstall()
 	mwexec('/usr/sbin/chown snort:snort /var/db/whitelist', true);
 	*/
 	/* important  */
-	mwexec('/bin/chmod 660 /var/log/snort/alert', true);
 	mwexec('/bin/chmod 660 /var/db/whitelist', true);
 	mwexec('/bin/chmod -R 660  /usr/local/etc/snort/*', true);
 	mwexec('/bin/chmod -R 660  /tmp/snort*', true);
@@ -890,10 +901,6 @@ function sync_snort_package_config()
 
 	if (!is_dir('/var/log/snort/barnyard2'))
 		exec('/bin/mkdir -p /var/log/snort/barnyard2');
-
-	/* all new files are for the user snort nologin */
-	if (!file_exists('/var/log/snort/alert'))
-		exec('/usr/bin/touch /var/log/snort/alert');
 
 	/* XXX: These are needed if snort is run as snort user
 	mwexec('/usr/sbin/chown -R snort:snort /var/log/snort', true);
@@ -1357,9 +1364,9 @@ function generate_snort_conf($id, $if_real, $snort_uuid)
 
 	/* define snortalertlogtype */
 	if ($config['installedpackages']['snortglobal']['snortalertlogtype'] == "fast")
-		$snortalertlogtype_type = "output alert_fast: alert";
+		$snortalertlogtype_type = "output alert_fast: alert_{$snort_uuid}";
 	else
-		$snortalertlogtype_type = "output alert_full: alert";
+		$snortalertlogtype_type = "output alert_full: alert_{$snort_uuid}";
 
 	/* define alertsystemlog */
 	$alertsystemlog_type = "";

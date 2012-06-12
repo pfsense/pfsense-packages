@@ -43,7 +43,13 @@ $snort_load_sortabletable = 'yes';
 $snort_load_mootools = 'yes';
 
 $snortalertlogt = $config['installedpackages']['snortglobal']['snortalertlogtype'];
-$snort_logfile = '/var/log/snort/alert';
+
+if (!is_array($config['installedpackages']['snortglobal']['rule']))
+        $config['installedpackages']['snortglobal']['rule'] = array();
+$a_instance = &$config['installedpackages']['snortglobal']['rule'];
+$snort_uuid = $a_instance[0]['uuid'];
+if ($_POST['instance'])
+	$snort_uuid = $a_instance[$_POST['instance']]['uuid'];
 
 if (is_array($config['installedpackages']['snortglobal']['alertsblocks'])) {
 	$pconfig['arefresh'] = $config['installedpackages']['snortglobal']['alertsblocks']['arefresh'];
@@ -87,10 +93,10 @@ if ($_POST['save'])
 
 if ($_GET['action'] == "clear" || $_POST['clear'])
 {
-	if(file_exists('/var/log/snort/alert'))
+	if (file_exists("/var/log/snort/alert_{$snort_uuid}"))
 	{
 		conf_mount_rw();
-		@file_put_contents("/var/log/snort/alert", "");
+		@file_put_contents("/var/log/snort/alert_{$snort_uuid}", "");
 		post_delete_logs();
 		/* XXX: This is needed is snort is run as snort user */
 		//mwexec('/usr/sbin/chown snort:snort /var/log/snort/*', true);
@@ -291,40 +297,45 @@ if ($pconfig['arefresh'] == 'on')
 <tr>
 	<td>
 		<div id="mainarea2">
-		<table class="tabcont" width="100%" border="1" cellspacing="0"
-			cellpadding="0">
+		<table class="tabcont" width="100%" border="1" cellspacing="0" cellpadding="0">
+			<form action="/snort/snort_alerts.php" method="post" id="formalert">
 			<tr>
-				<td width="22%" colspan="0" class="listtopic">Last <?=$anentries;?>
-				Alert Entries.</td>
-				<td width="78%" class="listtopic">Latest Alert Entries Are Listed
-				First.</td>
+				<td width="22%" colspan="0" class="listtopic">Last <?=$anentries;?> Alert Entries.</td>
+				<td width="78%" class="listtopic">Latest Alert Entries Are Listed First.</td>
 			</tr>
+			<tr>
+				<td width="22%" class="vncell">Instance to inspect</td>
+				<td width="78%" class="vtable">
+					<br/>   <select name="instance" id="instance" class="formfld unkown" onChange="document.getElementById('formalert').submit()">
+			<?php
+				foreach ($a_instance as $id => $instance) {
+					echo "<option value='{$id}'> (" . snort_get_friendly_interface($instance['interface']) . "){$instance['descr']}</option>\n";
+				}
+			?>
+					</select><br/>   Choose which instance alerts you want to inspect.
+				</td>
 			<tr>
 				<td width="22%" class="vncell">Save or Remove Logs</td>
 				<td width="78%" class="vtable">
-				<form action="/snort/snort_alerts.php" method="post"><input
-					name="download" type="submit" class="formbtn" value="Download"> All
-				log files will be saved. <a href="/snort/snort_alerts.php?action=clear"><input name="delete" type="button"
-					class="formbtn" value="Clear"
-					onclick="return confirm('Do you really want to remove all your logs ? All snort rule interfces may have to be restarted.')"></a>
-				<span class="red"><strong>Warning:</strong></span> all log files
-				will be deleted.</form>
+					<input name="download" type="submit" class="formbtn" value="Download"> All
+						log files will be saved. <a href="/snort/snort_alerts.php?action=clear">
+					<input name="delete" type="button" class="formbtn" value="Clear"
+					onclick="return confirm('Do you really want to remove all instance logs?')"></a>
+					<span class="red"><strong>Warning:</strong></span> all log files will be deleted.
 				</td>
 			</tr>
 			<tr>
 				<td width="22%" class="vncell">Auto Refresh and Log View</td>
 				<td width="78%" class="vtable">
-				<form action="/snort/snort_alerts.php" method="post"><input
-					name="save" type="submit" class="formbtn" value="Save"> Refresh <input
-					name="arefresh" type="checkbox" value="on"
+					<input name="save" type="submit" class="formbtn" value="Save">
+					Refresh <input name="arefresh" type="checkbox" value="on"
 					<?php if ($config['installedpackages']['snortglobal']['alertsblocks']['arefresh']=="on") echo "checked"; ?>>
-				<strong>Default</strong> is <strong>ON</strong>. <input
-					name="alertnumber" type="text" class="formfld" id="alertnumber"
-					size="5" value="<?=htmlspecialchars($anentries);?>"> Enter the
-				number of log entries to view. <strong>Default</strong> is <strong>250</strong>.
-				</form>
+						<strong>Default</strong> is <strong>ON</strong>.
+					<input name="alertnumber" type="text" class="formfld" id="alertnumber" size="5" value="<?=htmlspecialchars($anentries);?>">
+					Enter the number of log entries to view. <strong>Default</strong> is <strong>250</strong>.
 				</td>
 			</tr>
+			</form>
 		</table>
 		</div>
 		</td>
@@ -370,16 +381,16 @@ if ($pconfig['arefresh'] == 'on')
 		<?php
 
 		/* make sure alert file exists */
-		if(!file_exists('/var/log/snort/alert'))
-			exec('/usr/bin/touch /var/log/snort/alert');
+		if (!file_exists("/var/log/snort/alert_{$snort_uuid}"))
+			exec("/usr/bin/touch /var/log/snort/alert_{$snort_uuid}");
 
 		$logent = $anentries;
 
 		/* detect the alert file type */
 		if ($snortalertlogt == 'full')
-			$alerts_array = array_reverse(array_filter(explode("\n\n", file_get_contents('/var/log/snort/alert'))));
+			$alerts_array = array_reverse(array_filter(explode("\n\n", file_get_contents("/var/log/snort/alert_{$snort_uuid}"))));
 		else
-			$alerts_array = array_reverse(array_filter(split("\n", file_get_contents('/var/log/snort/alert'))));
+			$alerts_array = array_reverse(array_filter(split("\n", file_get_contents("/var/log/snort/alert_{$snort_uuid}"))));
 
 
 

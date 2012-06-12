@@ -295,8 +295,9 @@ if ($pconfig['brefresh'] == 'on')
 
 				/* set the arrays */
 				exec('/sbin/pfctl -t snort2c -T show > /tmp/snort_block.cache');
-				$alerts_array = array_reverse(array_filter(explode("\n\n", file_get_contents('/var/log/snort/alert'))));
 				$blocked_ips_array = str_replace('   ', '', array_filter(explode("\n", file_get_contents('/tmp/snort_block.cache'))));
+			foreach (glob("/var/log/snort/alert_*") as $alert) {
+				$alerts_array = array_reverse(explode("\n\n", file_get_contents("{$alert}")));
 
 				$logent = $bnentries;
 
@@ -395,6 +396,7 @@ if ($pconfig['brefresh'] == 'on')
 			</tr>\n";		
 					}
 				}
+			}
 
 				echo '</table>' . "\n";
 

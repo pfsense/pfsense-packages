@@ -30,7 +30,6 @@ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 */
 
-/* TODO: redo check if snort is up */
 $nocsrf = true;
 require_once("guiconfig.inc");
 require_once("/usr/local/pkg/snort/snort_gui.inc");
@@ -243,20 +242,7 @@ enable JavaScript to view this content
 					id="frd<?=$nnats;?>"
 					ondblclick="document.location='snort_interfaces_edit.php?id=<?=$nnats;?>';">
 					<?php
-					if (function_exists('convert_friendly_interface_to_friendly_descr'))
-						echo convert_friendly_interface_to_friendly_descr($natent['interface']);
-					else {
-						if (!$natent['interface'] || ($natent['interface'] == "wan"))
-						echo "WAN";
-						else if(strtolower($natent['interface']) == "lan")
-						echo "LAN";
-						else if(strtolower($natent['interface']) == "pppoe")
-						echo "PPPoE";
-						else if(strtolower($natent['interface']) == "pptp")
-						echo "PPTP";
-						else
-						echo strtoupper($natent['interface']);
-					}
+						echo snort_get_friendly_interface($natent['interface']);
 					?></td>
 				<td class="listr" onClick="fr_toggle(<?=$nnats;?>)"
 					id="frd<?=$nnats;?>"
