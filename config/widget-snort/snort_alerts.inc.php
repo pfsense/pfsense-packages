@@ -87,7 +87,6 @@ function handle_snort_ajax($snort_alerts_logfile, $nentries = 5, $tail = 50) {
 			}
 		}
 		echo $new_rules;
-		exit;
 	}
 }
 ?>
