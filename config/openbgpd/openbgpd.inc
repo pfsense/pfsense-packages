@@ -29,8 +29,18 @@
 	POSSIBILITY OF SUCH DAMAGE.
 */
 
+$bgpd_config_base = "/var/etc/openbgpd";
+$pkg_login	= "_bgpd";
+$pkg_uid	= "130";
+$pkg_group	= "_bgpd";
+$pkg_gid	= "130";
+$pkg_gecos	= "BGP Daemon";
+$pkg_homedir	= "/var/empty";
+$pkg_shell	= "/usr/sbin/nologin";
+
+
 function openbgpd_install_conf() {
-	global $config, $g;
+	global $config, $g, $bgpd_config_base, $pkg_login, $pkg_uid, $pkg_group, $pkg_gid, $pkg_gecos, $pkg_homedir, $pkg_shell;
 	
 	conf_mount_rw();
 	
@@ -49,7 +59,7 @@ function openbgpd_install_conf() {
     if($config['installedpackages']['openbgpdneighbors']['config'])
       $openbgpd_neighbors = &$config['installedpackages']['openbgpdneighbors']['config'];
     
-    $conffile = "# This file was created by the pfSense package manager.  Do not edit!\n\n";
+    $conffile = "# This file was created by the package manager.  Do not edit!\n\n";
     $setkeycf = "";
     
     // Setup AS #
@@ -143,8 +153,8 @@ function openbgpd_install_conf() {
       }
     }
   }
-
-  $fd = fopen("/usr/local/etc/bgpd.conf", "w");
+	safe_mkdir($bgpd_config_base);
+	$fd = fopen("{$bgpd_config_base}/bgpd.conf", "w");
 	
   // Write out the configuration file
 	fwrite($fd, $conffile);
@@ -153,18 +163,33 @@ function openbgpd_install_conf() {
 	fclose($fd);
 	
 	// Create rc.d file
-	$fd = fopen("/usr/local/etc/rc.d/bgpd.sh","w");
-	fwrite($fd, "#!/bin/sh\n\n");
-	fwrite($fd, "# This file was created by the pfSense package manager.  Do not edit!\n\n");	
-	fwrite($fd, "NUMBGPD=`ps auxw | grep bgpd | grep parent | grep -v grep | wc -l | awk '{print \$1}'`\n");
-	fwrite($fd, "# echo \$NUMBGPD\n");
-	fwrite($fd, "if [ \$NUMBGPD -lt 1 ] ; then\n");
-	fwrite($fd, "  /usr/local/sbin/bgpd -f /usr/local/etc/bgpd.conf\n");
-	fwrite($fd, "fi\n");
-	fclose($fd);
-	exec("chmod a+rx /usr/local/etc/rc.d/bgpd.sh");
-	exec("chmod a-rw /usr/local/etc/bgpd.conf");
-	exec("chmod u+rw /usr/local/etc/bgpd.conf");
+	$rc_file_stop = <<<EOF
+killall -9 bgpd
+EOF;
+	$rc_file_start = <<<EOF
+
+if [ `pw groupshow {$pkg_group} 2>&1 | grep -c "pw: unknown group"` -gt 0 ]; then
+	/usr/sbin/pw groupadd {$pkg_group} -g {$pkg_gid}
+fi
+if [ `pw usershow {$pkg_login} 2>&1 | grep -c "pw: no such user"` -gt 0 ]; then
+	/usr/sbin/pw useradd {$pkg_login} -u {$pkg_uid} -g {$pkg_gid} -c "{$pkg_gecos}" -d {$pkg_homedir} -s {$pkg_shell}
+fi
+
+/bin/mkdir -p {$bgpd_config_base}
+chmod u+rw,go-rw {$bgpd_config_base}/bgpd.conf
+/usr/sbin/chown -R {$pkg_login}:{$pkg_login} {$bgpd_config_base}/
+
+NUMBGPD=`ps auxw | grep -c '[b]gpd.*parent'`
+if [ \${NUMBGPD} -lt 1 ] ; then
+	/usr/local/sbin/bgpd -f {$bgpd_config_base}/bgpd.conf
+fi
+EOF;
+	write_rcfile(array(
+			"file" => "bgpd.sh",
+			"start" => $rc_file_start,
+			"stop" =>  $rc_file_stop
+		)
+	);
 	
 	// TCP-MD5 support on freebsd. See tcp(5) for more
 	$fd = fopen("{$g['tmp_path']}/bgpdsetkey.conf", "w");
@@ -184,7 +209,12 @@ function openbgpd_install_conf() {
 
 // get the raw openbgpd confi file for manual inspection/editing
 function openbgpd_get_raw_config() {
-  return file_get_contents("/usr/local/etc/bgpd.conf");
+	global $bgpd_config_base;
+	$conf = "{$bgpd_config_base}/bgpd.conf";
+	if (file_exists($conf))
+		return file_get_contents($conf);
+	else
+		return "";
 }
 
 // serialize the raw openbgpd config file to config.xml
@@ -314,7 +344,7 @@ EOF;
 }
 
 function is_openbgpd_running() {
-	$status = `ps awux | grep bgpd | grep "parent" | grep -v grep | wc -l | awk '{ print \$1 }'`;
+	$status = `ps auxw | grep -c '[b]gpd.*parent'`;
 	if(intval($status) > 0) 
 		return true;
 	else 
