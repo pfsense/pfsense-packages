@@ -1,11 +1,12 @@
 #!/bin/sh
 RC_SCRIPT=/usr/local/etc/rc.d/quagga.sh
+QUAGGA_CONFIG_BASE=/var/etc/quagga
 
-ZEBRA_CONFIG=/usr/local/etc/quagga/zebra.conf
+ZEBRA_CONFIG=${QUAGGA_CONFIG_BASE}/zebra.conf
 ZEBRA_PORT=2601
 ZEBRA_PASSWORD=`/usr/bin/grep '^password ' ${ZEBRA_CONFIG} | /usr/bin/awk '{print $2};'`
 
-OSPF_CONFIG=/usr/local/etc/quagga/ospfd.conf
+OSPF_CONFIG=${QUAGGA_CONFIG_BASE}/ospfd.conf
 OSPF_PORT=2604
 OSPF_PASSWORD=`/usr/bin/grep '^password ' ${OSPF_CONFIG} | /usr/bin/awk '{print $2};'`
 

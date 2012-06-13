@@ -28,6 +28,15 @@
 	POSSIBILITY OF SUCH DAMAGE.
 */
 
+$quagga_config_base = "/var/etc/quagga";
+$pkg_login	= "quagga";
+$pkg_uid	= "101";
+$pkg_group	= "quagga";
+$pkg_gid	= "101";
+$pkg_gecos	= "Quagga route daemon pseudo user";
+$pkg_homedir	= "/var/etc/quagga";
+$pkg_shell	= "/usr/sbin/nologin";
+
 function quagga_ospfd_get_interfaces() {
 	global $config;
 	$interfaces = get_configured_interface_with_descr();
@@ -54,7 +63,7 @@ function quagga_ospfd_get_interfaces() {
 }
 
 function quagga_ospfd_install_conf() {
-	global $config, $g, $input_errors;
+	global $config, $g, $input_errors, $quagga_config_base, $pkg_login, $pkg_uid, $pkg_group, $pkg_gid, $pkg_gecos, $pkg_homedir, $pkg_shell;
 
 	conf_mount_rw();
 
@@ -175,17 +184,16 @@ function quagga_ospfd_install_conf() {
 
 		if (is_array($interface_networks)) {
 			foreach ($interface_networks as $ifn) {
-
 				if (is_subnet($ifn['subnet'])) {
 						$conffile .= "  network {$ifn['subnet']} area {$ifn['area']}\n";
 					}
-
 			}
 		}
 
 		if (is_array($ospfd_conf['row'])) {
 			foreach ($ospfd_conf['row'] as $redistr) {
-				
+				if (empty($redistr['routevalue']))
+					continue;
 				if (isset($redistr['redistribute'])) {
 					$conffile .= "  no ";
 				}
@@ -198,7 +206,8 @@ function quagga_ospfd_install_conf() {
 			}
 		}
 	}
-	$fd = fopen("/usr/local/etc/quagga/ospfd.conf", "w");
+	safe_mkdir($quagga_config_base);
+	$fd = fopen("{$quagga_config_base}/ospfd.conf", "w");
 
 	// Write out the configuration file
 	fwrite($fd, $conffile);
@@ -212,31 +221,43 @@ function quagga_ospfd_install_conf() {
 		$zebraconffile .= "password {$ospfd_conf['password']}\n";
 	if ($ospfd_conf['logging'])
 		$zebraconffile .= "log syslog\n";
-	$fd = fopen("/usr/local/etc/quagga/zebra.conf", "w");
+	$fd = fopen("{$quagga_config_base}/zebra.conf", "w");
 	fwrite($fd, $zebraconffile);
 	fclose($fd);
 
 	// Create rc.d file
 	$rc_file_stop = <<<EOF
-kill -9 `cat /var/run/quagga/zebra.pid`
-kill -9 `cat /var/run/quagga/ospfd.pid`
-rm -f /var/run/quagga/zebra.pid
-rm -f /var/run/quagga/ospfd.pid
+if [ -e /var/run/quagga/zebra.pid ]; then
+	kill -9 `cat /var/run/quagga/zebra.pid`
+	rm -f /var/run/quagga/zebra.pid
+fi
+if [ -e /var/run/quagga/ospfd.pid ]; then
+	kill -9 `cat /var/run/quagga/ospfd.pid`
+	rm -f /var/run/quagga/ospfd.pid
+fi
 EOF;
 	$rc_file_start = <<<EOF
 /bin/mkdir -p /var/run/quagga
 /bin/mkdir -p /var/log/quagga
 rm -f /var/run/quagga/zebra.pid
 rm -f /var/run/quagga/ospfd.pid
-/usr/sbin/chown -R quagga:quagga /usr/local/etc/quagga/
+
+if [ `pw groupshow quagga 2>&1 | grep -c "pw: unknown group"` -gt 0 ]; then
+	/usr/sbin/pw groupadd {$pkg_group} -g {$pkg_gid}
+fi
+if [ `pw usershow quagga 2>&1 | grep -c "pw: no such user"` -gt 0 ]; then
+	/usr/sbin/pw useradd {$pkg_login} -u {$pkg_uid} -g {$pkg_gid} -c "{$pkg_gecos}" -d {$pkg_homedir} -s {$pkg_shell}
+fi
+
+/usr/sbin/chown -R quagga:quagga {$quagga_config_base}/
 /usr/sbin/chown -R quagga:quagga /var/run/quagga
 /usr/sbin/chown -R quagga:quagga /var/log/quagga
 # Ensure no other copies of the daemons are running or it breaks.
-killall -9 zebra
-killall -9 ospfd
+killall -9 zebra 2>/dev/null
+killall -9 ospfd 2>/dev/null
 sleep 1
-/usr/local/sbin/zebra -d -f /usr/local/etc/quagga/zebra.conf
-/usr/local/sbin/ospfd -d -f /usr/local/etc/quagga/ospfd.conf
+/usr/local/sbin/zebra -d -f {$quagga_config_base}/zebra.conf
+/usr/local/sbin/ospfd -d -f {$quagga_config_base}/ospfd.conf
 EOF;
 	write_rcfile(array(
 			"file" => "quagga.sh",
@@ -247,8 +268,8 @@ EOF;
 
 	// Ensure files have correct permissions
 	exec("chmod a+rx /usr/local/etc/rc.d/quagga.sh");
-	exec("chmod u+rw,go-rw /usr/local/etc/quagga/ospfd.conf");
-	exec("chmod u+rw,go-rw /usr/local/etc/quagga/zebra.conf");
+	exec("chmod u+rw,go-rw {$quagga_config_base}/ospfd.conf");
+	exec("chmod u+rw,go-rw {$quagga_config_base}/zebra.conf");
 
 	// Kick off newly created rc.d script
 	exec("/usr/local/etc/rc.d/quagga.sh restart");
@@ -289,7 +310,7 @@ function quagga_ospfd_validate_input() {
 
 // get the raw ospfd confi file for manual inspection/editing
 function quagga_ospfd_get_raw_config() {
-	return file_get_contents("/usr/local/etc/quagga/ospfd.conf");
+	return file_get_contents("{$quagga_config_base}/ospfd.conf");
 }
 
 // serialize the raw ospfd confi file to config.xml
