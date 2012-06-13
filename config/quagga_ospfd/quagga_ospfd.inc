@@ -242,10 +242,10 @@ EOF;
 rm -f /var/run/quagga/zebra.pid
 rm -f /var/run/quagga/ospfd.pid
 
-if [ `pw groupshow quagga 2>&1 | grep -c "pw: unknown group"` -gt 0 ]; then
+if [ `pw groupshow {$pkg_group} 2>&1 | grep -c "pw: unknown group"` -gt 0 ]; then
 	/usr/sbin/pw groupadd {$pkg_group} -g {$pkg_gid}
 fi
-if [ `pw usershow quagga 2>&1 | grep -c "pw: no such user"` -gt 0 ]; then
+if [ `pw usershow {$pkg_login} 2>&1 | grep -c "pw: no such user"` -gt 0 ]; then
 	/usr/sbin/pw useradd {$pkg_login} -u {$pkg_uid} -g {$pkg_gid} -c "{$pkg_gecos}" -d {$pkg_homedir} -s {$pkg_shell}
 fi
 
