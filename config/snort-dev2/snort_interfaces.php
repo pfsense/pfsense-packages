@@ -97,12 +97,12 @@ if ($_GET['act'] == 'toggle' && is_numeric($id)) {
 	/* Log Iface stop */
 	exec("/usr/bin/logger -p daemon.info -i -t SnortStartup 'Toggle for {$snort_uuid}_{$if_real}...'");
 
-	// sync_snort_package_config();
+	sync_snort_package_config();
 
 	$tester2 = Running_Ck($snort_uuid, $if_real, $id);
 
 	if ($tester2 == 'yes') {
-		Running_Stop($snort_uuid, $if_real, $id); // causeing snort to delete the ifcae rule dir
+		Running_Stop($snort_uuid, $if_real, $id);
 
 		header( 'Expires: Sat, 26 Jul 1997 05:00:00 GMT' );
 		header( 'Last-Modified: ' . gmdate( 'D, d M Y H:i:s' ) . ' GMT' );
