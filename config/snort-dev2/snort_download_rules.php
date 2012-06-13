@@ -383,120 +383,109 @@ if ($pfsensedownload == 'on' && $pfsense_md5_check_ok != 'on') {
 //}
 
 /* Untar snort rules file individually to help people with low system specs */
-if ($snortdownload == 'on')
-{
-	if ($snort_md5_check_ok != 'on') {
-		if (file_exists("{$tmpfname}/{$snort_filename}")) {
-			
-			// find out if were in 1.2.3-RELEASE
-			$pfsense_ver_chk = exec('/bin/cat /etc/version');
-			if ($pfsense_ver_chk === '1.2.3-RELEASE') {
-				$pfsense_stable = 'yes';
-			}else{
-				$pfsense_stable = 'no';
-			}
+if ($snortdownload == 'on' && $snort_md5_check_ok != 'on') {
+	if (file_exists("{$tmpfname}/{$snort_filename}")) {
 
-			// get the system arch
-			$snort_arch_ck = exec('/usr/bin/uname -m');
-			if ($snort_arch_ck === 'i386') {
-				$snort_arch = 'i386';
-			}else{
-				$snort_arch = 'x86-64'; // amd64
-			}			
-
-			if ($pfsense_stable === 'yes') {
-				$freebsd_version_so = 'FreeBSD-7-3';
-			}else{
-				$freebsd_version_so = 'FreeBSD-8-1';
-			}
-
-			update_status(gettext("Extracting Snort.org rules..."));
-			update_output_window(gettext("May take a while..."));
-			/* extract snort.org rules and  add prefix to all snort.org files*/
-			exec("/bin/rm -r {$snortdir}/rules");
-			sleep(2);
-			exec("/usr/bin/tar xzf {$tmpfname}/{$snort_filename} -C {$snortdir} rules/");
-			chdir ("/usr/local/etc/snort/rules");
-			sleep(2);
-			
-			$snort_dirList = scandir("{$snortdir_rules}/rules"); // Waning: only in php 5
-			$snortrules_filterList = snortscandirfilter($snort_dirList, '/.*\.rules/', '/\.rules/', '');
-			
-			if (!empty($snortrules_filterList)) {
-				foreach ($snortrules_filterList as $snort_rule_move)
-				{
-					exec("/bin/mv -f {$snortdir}/rules/{$snort_rule_move}.rules {$snortdir}/rules/snort_{$snort_rule_move}.rules");
-				}
-			}
-			
-			/* extract so rules */
-			exec('/bin/mkdir -p /usr/local/lib/snort/dynamicrules/');
-			exec("/usr/bin/tar xzf {$tmpfname}/{$snort_filename} -C {$snortdir} so_rules/precompiled/$freebsd_version_so/{$snort_arch}/2.9.2.2/");
-			exec("/bin/mv -f {$snortdir}/so_rules/precompiled/$freebsd_version_so/{$snort_arch}/2.9.2.2/* /usr/local/lib/snort/dynamicrules/");		
-			
-			/* extract so rules none bin and rename */
-			exec("/usr/bin/tar xzf {$tmpfname}/{$snort_filename} -C {$snortdir} so_rules/bad-traffic.rules/" .
-			" so_rules/chat.rules/" .
-			" so_rules/dos.rules/" .
-			" so_rules/exploit.rules/" .
-			" so_rules/icmp.rules/" .
-			" so_rules/imap.rules/" .
-			" so_rules/misc.rules/" .
-			" so_rules/multimedia.rules/" .
-			" so_rules/netbios.rules/" .
-			" so_rules/nntp.rules/" .
-			" so_rules/p2p.rules/" .
-			" so_rules/smtp.rules/" .
-			" so_rules/sql.rules/" .
-			" so_rules/web-activex.rules/" .
-			" so_rules/web-client.rules/" .
-			" so_rules/web-iis.rules/" .
-			" so_rules/web-misc.rules/");
-
-				exec("/bin/mv -f {$snortdir}/so_rules/bad-traffic.rules {$snortdir}/rules/snort_bad-traffic.so.rules");
-				exec("/bin/mv -f {$snortdir}/so_rules/chat.rules {$snortdir}/rules/snort_chat.so.rules");
-				exec("/bin/mv -f {$snortdir}/so_rules/dos.rules {$snortdir}/rules/snort_dos.so.rules");
-				exec("/bin/mv -f {$snortdir}/so_rules/exploit.rules {$snortdir}/rules/snort_exploit.so.rules");
-				exec("/bin/mv -f {$snortdir}/so_rules/icmp.rules {$snortdir}/rules/snort_icmp.so.rules");
-				exec("/bin/mv -f {$snortdir}/so_rules/imap.rules {$snortdir}/rules/snort_imap.so.rules");
-				exec("/bin/mv -f {$snortdir}/so_rules/misc.rules {$snortdir}/rules/snort_misc.so.rules");
-				exec("/bin/mv -f {$snortdir}/so_rules/multimedia.rules {$snortdir}/rules/snort_multimedia.so.rules");
-				exec("/bin/mv -f {$snortdir}/so_rules/netbios.rules {$snortdir}/rules/snort_netbios.so.rules");
-				exec("/bin/mv -f {$snortdir}/so_rules/nntp.rules {$snortdir}/rules/snort_nntp.so.rules");
-				exec("/bin/mv -f {$snortdir}/so_rules/p2p.rules {$snortdir}/rules/snort_p2p.so.rules");
-				exec("/bin/mv -f {$snortdir}/so_rules/smtp.rules {$snortdir}/rules/snort_smtp.so.rules");
-				exec("/bin/mv -f {$snortdir}/so_rules/sql.rules {$snortdir}/rules/snort_sql.so.rules");
-				exec("/bin/mv -f {$snortdir}/so_rules/web-activex.rules {$snortdir}/rules/snort_web-activex.so.rules");
-				exec("/bin/mv -f {$snortdir}/so_rules/web-client.rules {$snortdir}/rules/snort_web-client.so.rules");
-				exec("/bin/mv -f {$snortdir}/so_rules/web-iis.rules {$snortdir}/rules/snort_web-iis.so.rules");
-				exec("/bin/mv -f {$snortdir}/so_rules/web-misc.rules {$snortdir}/rules/snort_web-misc.so.rules");
-				exec("/bin/rm -r {$snortdir}/so_rules");
-			}
-			
-			//// rob
-			
-			// list so_rules and exclude dir
-			exec("/usr/bin/tar --exclude='precompiled' --exclude='src' -tf {$tmpfname}/{$snort_filename} so_rules", $so_rules_list);
-
-			$so_rulesPattr = array('/\//', '/\.rules/');
-			$so_rulesPattw = array('', '');
-				
-			// build list of so rules
-			$so_rules_filterList = snortscandirfilter($so_rules_list, '/\/.*\.rules/', $so_rulesPattr, $so_rulesPattw);			
-			
-			//// end
-
-			/* extract base etc files */
-			exec("/usr/bin/tar xzf {$tmpfname}/{$snort_filename} -C {$snortdir} etc/");
-			exec("/bin/mv -f {$snortdir}/etc/* {$snortdir}");
-			exec("/bin/rm -r {$snortdir}/etc");
-
-			update_status(gettext("Done extracting Snort.org Rules."));
+		// find out if were in 1.2.3-RELEASE
+		$pfsense_ver_chk = exec('/bin/cat /etc/version');
+		if ($pfsense_ver_chk === '1.2.3-RELEASE') {
+			$pfsense_stable = 'yes';
 		}else{
-			update_status(gettext("Error extracting Snort.org Rules..."));
-			update_output_window(gettext("Error Line 755"));
-			$snortdownload = 'off';
+			$pfsense_stable = 'no';
 		}
+
+		// get the system arch
+		$snort_arch_ck = exec('/usr/bin/uname -m');
+		if ($snort_arch_ck === 'i386') {
+			$snort_arch = 'i386';
+		}else{
+			$snort_arch = 'x86-64'; // amd64
+		}
+
+		if ($pfsense_stable === 'yes') {
+			$freebsd_version_so = 'FreeBSD-7-3';
+		}else{
+			$freebsd_version_so = 'FreeBSD-8-1';
+		}
+
+		update_status(gettext("Extracting Snort.org rules..."));
+		update_output_window(gettext("May take a while..."));
+		/* extract snort.org rules and  add prefix to all snort.org files*/
+		exec("/bin/rm -r {$snortdir}/rules");
+		sleep(2);
+		exec("/usr/bin/tar xzf {$tmpfname}/{$snort_filename} -C {$snortdir} rules/");
+		chdir ("/usr/local/etc/snort/rules");
+		sleep(2);
+
+		$snort_dirList = scandir("{$snortdir}/rules"); // Waning: only in php 5
+		$snortrules_filterList = snortscandirfilter($snort_dirList, '/.*\.rules/', '/\.rules/', '');
+
+		if (!empty($snortrules_filterList)) {
+			foreach ($snortrules_filterList as $snort_rule_move)
+			{
+				exec("/bin/mv -f {$snortdir}/rules/{$snort_rule_move}.rules {$snortdir}/rules/snort_{$snort_rule_move}.rules");
+			}
+		}
+
+		/* extract so_rules */
+
+		// list so_rules and exclude dir
+		exec("/usr/bin/tar --exclude='precompiled' --exclude='src' -tf {$tmpfname}/{$snort_filename} so_rules", $so_rules_list);
+
+		$so_rulesPattr = array('/\//', '/\.rules/');
+		$so_rulesPattw = array('', '');
+
+		// build list of so_rules
+		$so_rules_filterList = snortscandirfilter($so_rules_list, '/\/.*\.rules/', $so_rulesPattr, $so_rulesPattw);
+
+		if (!empty($so_rules_filterList)) {
+			// cp rule to so tmp dir
+			foreach ($so_rules_filterList as $so_rule)
+			{
+
+				exec("/usr/bin/tar xzf {$tmpfname}/{$snort_filename} -C {$snortdir} so_rules/{$so_rule}.rules");
+
+			}
+			// mv and rename so rules
+			foreach ($so_rules_filterList as $so_rule_move)
+			{
+				exec("/bin/mv -f {$snortdir}/so_rules/{$so_rule_move}.rules {$snortdir}/rules/snort_{$so_rule_move}.so.rules");
+			}
+		}
+
+		/* extract preproc_rules */
+
+		// list so_rules and exclude dir
+		exec("/usr/bin/tar --exclude='precompiled' --exclude='src' -tf {$tmpfname}/{$snort_filename} preproc_rules", $preproc_rules_list);
+
+		$preproc_rules_filterList = snortscandirfilter($preproc_rules_list, '/\/.*\.rules/', $so_rulesPattr, $so_rulesPattw);
+
+		if (!empty($preproc_rules_filterList)) {
+			// cp rule to so tmp dir
+			foreach ($preproc_rules_filterList as $preproc_rule)
+			{
+
+				exec("/usr/bin/tar xzf {$tmpfname}/{$snort_filename} -C {$snortdir} preproc_rules/{$preproc_rule}.rules");
+
+			}
+			// mv and rename preproc_rules
+			foreach ($preproc_rules_filterList as $preproc_rule_move)
+			{
+				exec("/bin/mv -f {$snortdir}/preproc_rules/{$preproc_rule_move}.rules {$snortdir}/rules/snort_{$preproc_rule_move}.preproc.rules");
+			}
+		}
+
+		/* extract base etc files */
+		exec("/usr/bin/tar xzf {$tmpfname}/{$snort_filename} -C {$snortdir} etc/");
+		exec("/bin/mv -f {$snortdir}/etc/* {$snortdir}");
+		exec("/bin/rm -r {$snortdir}/etc");
+
+		update_status(gettext("Done extracting Snort.org Rules."));
+	}else{
+		update_status(gettext("Error extracting Snort.org Rules..."));
+		update_output_window(gettext("Error Line 755"));
+		$snortdownload = 'off';
+	}
 }
 
 /* Untar emergingthreats rules to tmp */
@@ -620,9 +609,10 @@ if (file_exists("/usr/local/lib/snort/dynamicrules/lib_sfdynamic_example_rule.so
 }
 
 /* make shure default rules are in the right format */
-exec("/usr/local/bin/perl -pi -e 's/#alert/# alert/g' /usr/local/etc/snort/rules/*.rules");
-exec("/usr/local/bin/perl -pi -e 's/##alert/# alert/g' /usr/local/etc/snort/rules/*.rules");
-exec("/usr/local/bin/perl -pi -e 's/## alert/# alert/g' /usr/local/etc/snort/rules/*.rules");
+exec("/usr/bin/sed -i '' 's/^[ \t]*//' /usr/local/etc/snort/rules/*.rules"); // remove white spaces from begining of line
+exec("/usr/bin/sed -i '' 's/^#alert*/\# alert/' /usr/local/etc/snort/rules/*.rules");
+exec("/usr/bin/sed -i '' 's/^##alert*/\# alert/' /usr/local/etc/snort/rules/*.rules");
+exec("/usr/bin/sed -i '' 's/^## alert*/\# alert/' /usr/local/etc/snort/rules/*.rules");
 
 /* create a msg-map for snort  */
 update_status(gettext("Updating Alert Messages..."));
