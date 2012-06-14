@@ -874,8 +874,6 @@ function create_snort_sh() {
 #### Fake start only used on bootup and Pfsense IP changes
 #### Only try to restart if snort is running on Iface
 if [ "`/bin/pgrep -nF {$g['varrun_path']}/snort_{$if_real}{$snort_uuid}.pid`" = "0" ]; then
-	/usr/bin/logger -p daemon.info -i -t SnortStartup "Snort already running, soft restart"
-
 	#### Restart Iface
 	/bin/pkill -HUP -F {$g['varrun_path']}/snort_{$if_real}{$snort_uuid}.pid -a
 	/usr/bin/logger -p daemon.info -i -t SnortStartup "Snort Soft Reload For {$snort_uuid}_{$if_real}..."
@@ -900,6 +898,7 @@ if [ "`/bin/pgrep -nF {$g['varrun_path']}/snort_{$if_real}{$snort_uuid}.pid`" = 
 	sleep 1
 	if [ -f {$g['varrun_path']}/barnyard2_{$if_real}{$snort_uuid}.pid ]; then
 		/bin/pkill -F {$g['varrun_path']}/barnyard2_{$if_real}{$snort_uuid}.pid -a
+		/bin/rm /var/run/barnyard2_{$snort_uuid}_{$if_real}.pid
 	fi
 
 	/bin/rm /var/run/snort_{$snort_uuid}_{$if_real}.pid
