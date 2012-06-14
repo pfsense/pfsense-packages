@@ -483,7 +483,7 @@
 		<build_port_path>/usr/ports/lang/perl5.12</build_port_path>
 		<build_port_path>/usr/ports/security/barnyard2</build_port_path>
 		<build_port_path>/usr/ports/databases/mysql51-client</build_port_path>
-		<build_port_path>/usr/home/pfsense/tools/pfPorts/snort</build_port_path>
+		<build_port_path>/usr/ports/security/snort</build_port_path>
 		<build_options>WITH_THREADS=yes WITH_IPV6=true WITH_MPLS=true WITH_GRE=true WITHOUT_TARGETBASED=true WITH_DECODERPRE=true WITH_ZLIB=true WITH_NORMALIZER=true WITH_REACT=true WITH_PERFPROFILE=true WITH_FLEXRESP3=true WITHOUT_ODBC=true WITHOUT_POSTGRESQL=true WITHOUT_PRELUDE=true WITH_SNORTSAM=true -DNOPORTDOCS</build_options>
 		<config_file>http://www.pfsense.com/packages/config/snort/snort.xml</config_file>
 		<version>2.9.2.3 pkg v. 2.2</version>
@@ -630,7 +630,7 @@
 		<depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
 		<depends_on_package>openospfd-4.6.tbz</depends_on_package>
 		<config_file>http://www.pfsense.com/packages/config/openospfd/openospfd.xml</config_file>
-		<build_port_path>/usr/home/pfsense/tools/pfPorts/openospfd</build_port_path>
+		<build_port_path>/usr/ports/net/openospfd</build_port_path>
 		<build_port_path>/usr/ports/devel/libevent</build_port_path>
 		<pkginfolink></pkginfolink>
 		<required_version>1.2.1</required_version>
@@ -751,7 +751,7 @@
 		<supportedbybsdperimeter>YES</supportedbybsdperimeter>
 		<build_port_path>/usr/ports/sysutils/ucspi-tcp</build_port_path>
 		<build_port_path>/usr/ports/sysutils/daemontools</build_port_path>
-		<build_port_path>/home/pfsense/tools/pfPorts/djbdns</build_port_path>
+		<build_port_path>/usr/ports/dns/djbdns</build_port_path>
 		<build_options>WITHOUT_MAN=true WITH_SRV=true</build_options>
 	</package>
 	<package>
@@ -868,7 +868,7 @@
 		<depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
 		<depends_on_package>sqlite3-3.7.9.tbz</depends_on_package>
 		<depends_on_package>imspector-0.9.tbz</depends_on_package>
-		<build_port_path>/usr/home/pfsense/tools/pfPorts/imspector</build_port_path>
+		<build_port_path>/usr/ports/net-im/imspector</build_port_path>
 		<!-- Fix me once a PBI is available! -->
 		<maximum_version>2.1</maximum_version>
 	</package>
