@@ -285,7 +285,7 @@ if (isset($_GET['dup']))
 			if (isset($id) && $a_nat[$id]) {
 				if ($natent['interface'] != $a_nat[$id]['interface'])
 					Running_Stop($snort_uuid, $if_real, $id);
-				$a_nat[$id] = $natent;
+				$a_nat[$id] = array_merge($a_nat[$id], $natent);
 			} else {
 				if (is_numeric($after))
 				array_splice($a_nat, $after+1, 0, array($natent));
