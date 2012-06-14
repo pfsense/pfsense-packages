@@ -705,7 +705,7 @@
 		<build_port_path>/usr/ports/sysutils/ucspi-tcp</build_port_path>
 		<build_port_path>/usr/ports/sysutils/daemontools</build_port_path>
 		<build_port_path>/usr/ports/dns/djbdns</build_port_path>
-		<build_options>WITHOUT_MAN=true WITH_SRV=true</build_options>
+		<build_options>WITH_IPV6=true WITH_SRV=true WITHOUT_DUMPCACHE=true WITHOUT_IGNOREIP=true WITHOUT_JUMBO=true WITHOUT_MAN=true WITHOUT_PERSISTENT_MMAP=true</build_options>
 		<supportedbybsdperimeter>YES</supportedbybsdperimeter>
 	</package>
 	<package>
