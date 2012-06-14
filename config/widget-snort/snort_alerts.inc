@@ -6,7 +6,7 @@ require_once("includes/snort_alerts.inc.php");
 $snort_alerts_title = "Snort Alerts";
 $snort_alerts_title_link = "snort/snort_alerts.php";
 
-foreach (glob("{$g['varlog_path']}/snort/alert_*") as $alert) {
+foreach (glob("{$g['varlog_path']}/snort/*/alert") as $alert) {
 	$snort_alerts_logfile = $alert;
 	$nentries = 10;
 	$snort_alerts = get_snort_alerts($snort_alerts_logfile, $nentries);

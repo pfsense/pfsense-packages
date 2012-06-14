@@ -3,7 +3,7 @@ require_once("globals.inc");
 require_once("guiconfig.inc");
 require_once("includes/snort_alerts.inc.php");
 
-foreach (glob("{$g['varlog_path']}/snort/alert_*") as $alert) {
+foreach (glob("{$g['varlog_path']}/snort/*/alert") as $alert) {
         $snort_alerts_logfile = $alert;
         $nentries = 5;
         $snort_alerts = get_snort_alerts($snort_alerts_logfile, $nentries);
