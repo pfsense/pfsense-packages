@@ -57,6 +57,8 @@ if (isset($_POST['del_x'])) {
 			$snort_uuid = $a_nat[$rulei]['uuid'];
 
 			Running_Stop($snort_uuid,$if_real, $rulei);
+			exec("/bin/rm -r /var/log/snort/snort_{$if_real}{$snort_uuid}");
+			exec("/bin/rm -r /usr/local/etc/snort/snort_{$snort_uuid}_{$if_real}");
 
 			unset($a_nat[$rulei]);
 		}

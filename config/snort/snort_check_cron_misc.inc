@@ -50,27 +50,31 @@ if ($g['booting']==true)
 if ($snortloglimit == 'off')
 	return;
 
+if (!is_array($config['installedpackages']['snortglobal']['rule']))
+	return;
+
 $snortloglimitDSKsize = exec('/bin/df -k /var | grep -v "Filesystem" | awk \'{print $4}\'');
 
-$snortlogAlertsizeKB = snort_Getdirsize('/var/log/snort/alert');
-$snortloglimitAlertsizeKB = round($snortlogAlertsizeKB * .70);
-$snortloglimitsizeKB = round($snortloglimitsize * 1024);
+foreach ($config['installedpackages']['snortglobal']['rule'] as $value) {
+	$if_real = snort_get_real_interface($value['interface']);
+	$snort_uuid = $value['uuid'];
+	$snort_log_dir = "/var/log/snort/snort_{$if_real}{$snort_uuid}";
 
-/* do I need HUP kill ? */
-if (snort_Getdirsize('/var/log/snort/') >= $snortloglimitsizeKB ) {
+	if (file_exists("{$snort_log_dir}/alert")) {
+		$snortlogAlertsizeKB = snort_Getdirsize("{$snort_log_dir}/alert");
+		$snortloglimitAlertsizeKB = round($snortlogAlertsizeKB * .70);
+		$snortloglimitsizeKB = round($snortloglimitsize * 1024);
 
-	conf_mount_rw();
-	if(file_exists('/var/log/snort/alert')) {
-		if ($snortlogAlertsizeKB >= $snortloglimitAlertsizeKB) {
-			exec('/bin/echo "" > /var/log/snort/alert');
+		/* do I need HUP kill ? */
+		if (snort_Getdirsize($snort_log_dir) >= $snortloglimitsizeKB ) {
+			conf_mount_rw();
+			if ($snortlogAlertsizeKB >= $snortloglimitAlertsizeKB)
+				@file_put_contents("{$snort_log_dir}/alert", "");
+			post_delete_logs();
+			conf_mount_ro();
 		}
-		post_delete_logs();
-		/* XXX: This is needed if snort is run as snort user */
-		//mwexec('/usr/sbin/chown snort:snort /var/log/snort/*', true);
-		mwexec('/bin/chmod 660 /var/log/snort/*', true);
-	}
-	conf_mount_ro();
 
+	}
 }
 
 ?>

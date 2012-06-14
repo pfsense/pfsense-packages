@@ -262,15 +262,11 @@ function Running_Stop($snort_uuid, $if_real, $id) {
 	if (isvalidpid("{$g['varrun_path']}/snort_{$if_real}{$snort_uuid}.pid")) {
 		killbypid("{$g['varrun_path']}/snort_{$if_real}{$snort_uuid}");
 		exec("/bin/rm {$g['varrun_path']}/snort_{$if_real}{$snort_uuid}.pid");
-		exec("/bin/rm /var/log/snort/snort_{$snort_uuid}_{$if_real}*");
-		@unlink("/var/log/snort/alert_{$snort_uuid}");
-		exec("/bin/rm -r /usr/local/etc/snort/snort_{$snort_uuid}_{$if_real}");
 	}
 
 	if (isvalidpid("{$g['varrun_path']}/barnyard2_{$if_real}{$snort_uuid}.pid")) {
 		killbypid("{$g['varrun_path']}/barnyard2_{$if_real}{$snort_uuid}.pid");
 		exec("/bin/rm {$g['varrun_path']}/barnyard2_{$snort_uuid}_{$if_real}*");
-		exec("/bin/rm /var/log/snort/snort.u2_{$snort_uuid}_{$if_real}*");
 	}
 
 	/* Log Iface stop */
@@ -283,7 +279,7 @@ function Running_Start($snort_uuid, $if_real, $id) {
 
 	$snort_info_chk = $config['installedpackages']['snortglobal']['rule'][$id]['enable'];
 	if ($snort_info_chk == 'on')
-		exec("/usr/local/bin/snort -R {$snort_uuid} -D -q -l /var/log/snort --pid-path {$g['varrun_path']} --nolock-pidfile -G {$snort_uuid} -c /usr/local/etc/snort/snort_{$snort_uuid}_{$if_real}/snort.conf -i {$if_real}");
+		exec("/usr/local/bin/snort -R {$snort_uuid} -D -q -l /var/log/snort/snort_{$if_real}{$snort_uuid} --pid-path {$g['varrun_path']} --nolock-pidfile -G {$snort_uuid} -c /usr/local/etc/snort/snort_{$snort_uuid}_{$if_real}/snort.conf -i {$if_real}");
 	else
 		return;
 
@@ -291,9 +287,8 @@ function Running_Start($snort_uuid, $if_real, $id) {
 	/* top will have trouble if the uuid is to far back */
 	$snortbarnyardlog_info_chk = $config['installedpackages']['snortglobal']['rule'][$id]['barnyard_enable'];
 	$snortbarnyardlog_mysql_info_chk = $config['installedpackages']['snortglobal']['rule'][$id]['barnyard_mysql'];
-	if ($snortbarnyardlog_info_chk == 'on' && $snortbarnyardlog_mysql_info_chk != '') {
-		exec("/usr/local/bin/barnyard2 -r {$snort_uuid} -f \"snort_{$snort_uuid}_{$if_real}.u2\" --pid-path {$g['varrun_path']} --nolock-pidfile -c /usr/local/etc/snort/snort_{$snort_uuid}_{$if_real}/barnyard2.conf -d /var/log/snort -D -q");
-	}
+	if ($snortbarnyardlog_info_chk == 'on' && $snortbarnyardlog_mysql_info_chk != '')
+		exec("/usr/local/bin/barnyard2 -r {$snort_uuid} -f \"snort_{$snort_uuid}_{$if_real}.u2\" --pid-path {$g['varrun_path']} --nolock-pidfile -c /usr/local/etc/snort/snort_{$snort_uuid}_{$if_real}/barnyard2.conf -d /var/log/snort/snort_{$if_real}{$snort_uuid} -D -q");
 
 	/* Log Iface stop */
 	exec("/usr/bin/logger -p daemon.info -i -t SnortStartup 'Interface Rule START for {$id}_{$snort_uuid}_{$if_real}...'");
@@ -353,49 +348,7 @@ function snort_get_real_interface($interface) {
  snort is linked to these files while running, do not take the easy way out
  by touch and rm, snort will lose sync and not log.
 
- this code needs to be watched.
  */
-
-/* list dir files */
-function snort_file_list($snort_log_dir, $snort_log_file)
-{
-	$dir = opendir ("$snort_log_dir");
-	while (false !== ($file = readdir($dir))) {
-		if (strpos($file, "$snort_log_file",1) )
-			$file_list[] = basename($file);
-	}
-	return $file_list;
-}
-
-/* snort dir files */
-function snort_file_sort($snort_file1, $snort_file2)
-{
-	if ($snort_file1 == $snort_file2)
-		return 0;
-
-	return ($snort_file1 < $snort_file2); // ? -1 : 1; // this flips the array
-}
-
-/* build files newest first array */
-function snort_build_order($snort_list)
-{
-	foreach ($snort_list as $value_list)
-		$list_order[] = $value_list;
-
-	return $list_order;
-}
-
-/* keep the newest remove the rest */
-function snort_remove_files($snort_list_rm, $snort_file_safe)
-{
-	foreach ($snort_list_rm as $value_list) {
-		if ($value_list != $snort_file_safe)
-			@unlink("/var/log/snort/$value_list");
-		else
-			file_put_contents("/var/log/snort/$snort_file_safe", "");
-	}
-}
-
 function post_delete_logs()
 {
 	global $config, $g;
@@ -404,41 +357,27 @@ function post_delete_logs()
 	if (!is_array($config['installedpackages']['snortglobal']['rule']))
 		return;
 
-	$snort_log_dir = '/var/log/snort';
-
 	foreach ($config['installedpackages']['snortglobal']['rule'] as $value) {
 		$if_real = snort_get_real_interface($value['interface']);
 		$snort_uuid = $value['uuid'];
+		$snort_log_dir = "/var/log/snort/snort_{$if_real}{$snort_uuid}";
 
 		if ($if_real != '' && $snort_uuid != '') {
-			if ($value['snortunifiedlog'] == 'on') {
-				$snort_log_file_u2 = "{$snort_uuid}_{$if_real}.u2.";
-				$snort_list_u2 = snort_file_list($snort_log_dir, $snort_log_file_u2);
-				if (is_array($snort_list_u2)) {
-					usort($snort_list_u2, "snort_file_sort");
-					$snort_u2_rm_list = snort_build_order($snort_list_u2);
-					snort_remove_files($snort_u2_rm_list, $snort_u2_rm_list[0]);
-				}
-			} else
-				exec("/bin/rm $snort_log_dir/snort_{$snort_uuid}_{$if_real}.u2*");
-
-			if ($value['tcpdumplog'] == 'on') {
-				$snort_log_file_tcpd = "{$snort_uuid}_{$if_real}.tcpdump.";
-				$snort_list_tcpd = snort_file_list($snort_log_dir, $snort_log_file_tcpd);
-				if (is_array($snort_list_tcpd)) {
-					usort($snort_list_tcpd, "snort_file_sort");
-					$snort_tcpd_rm_list = snort_build_order($snort_list_tcpd);
-					snort_remove_files($snort_tcpd_rm_list, $snort_tcpd_rm_list[0]);
-				}
-			} else
-				exec("/bin/rm $snort_log_dir/snort_{$snort_uuid}_{$if_real}.tcpdump*");
+			$filelist = glob("{$snort_log_dir}/*{$snort_uuid}_{$if_real}.u2.*");
+			unset($filelist[count($filelist) - 1]);
+			foreach ($filelist as $file)
+				@unlink($file);
+			$filelist = glob("{$snort_log_dir}/*{$snort_uuid}_{$if_real}.tcpdump.*");
+			unset($filelist[count($filelist) - 1]);
+			foreach ($filelist as $file)
+				@unlink($file);
 
 			/* create barnyard2 configuration file */
 			//if ($value['barnyard_enable'] == 'on')
 			//create_barnyard2_conf($id, $if_real, $snort_uuid);
 
 			if ($value['perform_stat'] == 'on')
-				@file_put_contents("/var/log/snort/snort_{$snort_uuid}_{$if_real}.stats", "");
+				@file_put_contents("{$snort_log_dir}/{$if_real}.stats", "");
 		}
 	}
 }
@@ -465,7 +404,7 @@ function snort_postinstall()
 	@rename('/usr/local/etc/snort/gen-msg.map-sample', '/usr/local/etc/snort/gen-msg.map');
 	@unlink('/usr/local/etc/snort/sid');
 	@unlink('/usr/local/etc/rc.d/snort');
-	@unlink('/usr/local/etc/rc.d/bardyard2');
+	@unlink('/usr/local/etc/rc.d/barnyard2');
 
 	/* remove example files */
 	if (file_exists('/usr/local/lib/snort/dynamicrules/lib_sfdynamic_example_rule.so.0'))
@@ -474,40 +413,11 @@ function snort_postinstall()
 	if (file_exists('/usr/local/lib/snort/dynamicpreprocessor/lib_sfdynamic_preprocessor_example.so'))
 		exec('/bin/rm /usr/local/lib/snort/dynamicpreprocessor/lib_sfdynamic_preprocessor_example*');
 
-	/* create a few directories and ensure the sample files are in place */
-	if (!is_dir('/usr/local/etc/snort'))
-		exec('/bin/mkdir -p /usr/local/etc/snort/custom_rules');
-	if (!is_dir('/usr/local/etc/snort/whitelist'))
-		exec('/bin/mkdir -p /usr/local/etc/snort/whitelist/');
-	if (!is_dir('/var/log/snort'))
-		exec('/bin/mkdir -p /var/log/snort');
-	else
-		exec('/bin/rm -r /var/log/snort/*');
-
-	if (!is_dir('/var/log/snort/barnyard2'))
-		exec('/bin/mkdir -p /var/log/snort/barnyard2');
-	if (!is_dir('/usr/local/lib/snort/dynamicrules/'))
-		exec('/bin/mkdir -p /usr/local/lib/snort/dynamicrules/');
-	if (!file_exists('/var/db/whitelist'))
-		touch('/var/db/whitelist');
-
-	/* XXX: These are needed if you run snort as snort user
 	mwexec('/usr/sbin/chown -R snort:snort /var/log/snort', true);
 	mwexec('/usr/sbin/chown -R snort:snort /usr/local/etc/snort', true);
 	mwexec('/usr/sbin/chown -R snort:snort /usr/local/lib/snort', true);
 	mwexec('/usr/sbin/chown snort:snort /tmp/snort*', true);
 	mwexec('/usr/sbin/chown snort:snort /var/db/whitelist', true);
-	*/
-	/* important  */
-	mwexec('/bin/chmod 660 /var/db/whitelist', true);
-	mwexec('/bin/chmod -R 660  /usr/local/etc/snort/*', true);
-	mwexec('/bin/chmod -R 660  /tmp/snort*', true);
-	mwexec('/bin/chmod -R 660  /var/run/snort*', true);
-	mwexec('/bin/chmod 770 /usr/local/lib/snort', true);
-	mwexec('/bin/chmod 770 /usr/local/etc/snort', true);
-	mwexec('/bin/chmod 770 /usr/local/etc/whitelist', true);
-	mwexec('/bin/chmod 770 /var/log/snort', true);
-	mwexec('/bin/chmod 770 /var/log/snort/barnyard2', true);
 
 	/* move files around, make it look clean */
 	mwexec('/bin/mkdir -p /usr/local/www/snort/css');
@@ -826,28 +736,6 @@ function sync_snort_package_config()
 	if (!is_dir('/var/log/snort'))
 		exec('/bin/mkdir -p /var/log/snort');
 
-	if (!is_dir('/var/log/snort'))
-		exec('/bin/mkdir -p /var/log/snort');
-
-	if (!is_dir('/var/log/snort/barnyard2'))
-		exec('/bin/mkdir -p /var/log/snort/barnyard2');
-
-	/* XXX: These are needed if snort is run as snort user
-	mwexec('/usr/sbin/chown -R snort:snort /var/log/snort', true);
-	mwexec('/usr/sbin/chown -R snort:snort /usr/local/etc/snort', true);
-	mwexec('/usr/sbin/chown -R snort:snort /usr/local/lib/snort', true);
-	mwexec('/usr/sbin/chown snort:snort /tmp/snort*', true);
-	mwexec('/usr/sbin/chown snort:snort /var/db/whitelist', true);
-	*/
-
-	/* important  */
-	mwexec('/bin/chmod 770 /var/db/whitelist', true);
-	mwexec('/bin/chmod 770 /var/run/snort*', true);
-	mwexec('/bin/chmod 770 /tmp/snort*', true);
-	mwexec('/bin/chmod -R 770 /var/log/snort', true);
-	mwexec('/bin/chmod -R 770 /usr/local/lib/snort', true);
-	mwexec('/bin/chmod -R 770 /usr/local/etc/snort/', true);
-
 	conf_mount_ro();
 }
 
@@ -975,7 +863,7 @@ function create_snort_sh() {
 		$snortbarnyardlog_mysql_info_chk = $value['barnyard_mysql'];
 
 		if ($snortbarnyardlog_info_chk == 'on' && $snortbarnyardlog_mysql_info_chk != '')
-			$start_barnyard2 = "sleep 4;/usr/local/bin/barnyard2 -r {$snort_uuid} -f snort_{$snort_uuid}_{$if_real}.u2 --pid-path {$g['varrun_path']} --nolock-pidfile -c /usr/local/etc/snort/snort_{$snort_uuid}_{$if_real}/barnyard2.conf -d /var/log/snort -D -q";
+			$start_barnyard2 = "sleep 4;/usr/local/bin/barnyard2 -r {$snort_uuid} -f snort_{$snort_uuid}_{$if_real}.u2 --pid-path {$g['varrun_path']} --nolock-pidfile -c /usr/local/etc/snort/snort_{$snort_uuid}_{$if_real}/barnyard2.conf -d /var/log/snort/snort_{$if_real}{$snort_uuid} -D -q";
 		else
 			$start_barnyard2 = "";
 
@@ -995,7 +883,7 @@ else
 	# Start snort and barnyard2
 	/bin/rm {$g['varrun_path']}/snort_{$if_real}{$snort_uuid}.pid
 
-	/usr/local/bin/snort -R {$snort_uuid} -D -q -l /var/log/snort --pid-path {$g['varrun_path']} --nolock-pidfile -G {$snort_uuid} -c /usr/local/etc/snort/snort_{$snort_uuid}_{$if_real}/snort.conf -i {$if_real}
+	/usr/local/bin/snort -R {$snort_uuid} -D -q -l /var/log/snort/snort_{$if_real}{$snort_uuid} --pid-path {$g['varrun_path']} --nolock-pidfile -G {$snort_uuid} -c /usr/local/etc/snort/snort_{$snort_uuid}_{$if_real}/snort.conf -i {$if_real}
 	$start_barnyard2
 
 	/usr/bin/logger -p daemon.info -i -t SnortStartup "Snort HARD START For {$snort_uuid}_{$if_real}..."
@@ -1071,7 +959,7 @@ function create_rules_iface($id, $if_real, $snort_uuid)
 
 	if ($folder_chk == "empty") {
 		if (!is_dir("/usr/local/etc/snort/snort_{$snort_uuid}_{$if_real}/rules"))
-                        exec("/bin/mkdir -p /usr/local/etc/snort/snort_{$snort_uuid}_{$if_real}/rules");
+                        exec("/bin/mkdir -p {$if_rule_dir}/rules");
 		exec("/bin/cp /usr/local/etc/snort/rules/* {$if_rule_dir}/rules");
 		if (file_exists("/usr/local/etc/snort/custom_rules/local_{$snort_uuid}_{$if_real}.rules"))
 			exec("/bin/cp /usr/local/etc/snort/custom_rules/local_{$snort_uuid}_{$if_real}.rules {$if_rule_dir}/local_{$snort_uuid}_{$if_real}.rules");
@@ -1085,23 +973,15 @@ function create_barnyard2_conf($id, $if_real, $snort_uuid) {
 	if (!file_exists("/usr/local/etc/snort/snort_{$snort_uuid}_{$if_real}/barnyard2.conf"))
 		exec("/usr/bin/touch /usr/local/etc/snort/snort_{$snort_uuid}_{$if_real}/barnyard2.conf");
 
-	if (!file_exists("/var/log/snort/barnyard2/{$snort_uuid}_{$if_real}.waldo")) {
-		mwexec("/usr/bin/touch /var/log/snort/barnyard2/{$snort_uuid}_{$if_real}.waldo", true);
-		/* XXX: This is needed if snort is run as snort user */
-		//mwexec("/usr/sbin/chown snort:snort /var/log/snort/barnyard2/{$snort_uuid}_{$if_real}.waldo", true);
+	if (!file_exists("/var/log/snort/snort_{$if_real}{$snort_uuid}/barnyard2/{$snort_uuid}_{$if_real}.waldo")) {
+		@touch("/var/log/snort/snort_{$if_real}{$snort_uuid}/barnyard2/{$snort_uuid}_{$if_real}.waldo");
 		mwexec("/bin/chmod 770 /var/log/snort/barnyard2/{$snort_uuid}_{$if_real}.waldo", true);
 	}
 
 	$barnyard2_conf_text = generate_barnyard2_conf($id, $if_real, $snort_uuid);
 
 	/* write out barnyard2_conf */
-	$bconf = fopen("/usr/local/etc/snort/snort_{$snort_uuid}_{$if_real}/barnyard2.conf", "w");
-	if(!$bconf) {
-		log_error("Could not open /usr/local/etc/snort/snort_{$snort_uuid}_{$if_real}/barnyard2.conf for writing.");
-		return;
-	}
-	fwrite($bconf, $barnyard2_conf_text);
-	fclose($bconf);
+	@file_put_contents("/usr/local/etc/snort/snort_{$snort_uuid}_{$if_real}/barnyard2.conf", $barnyard2_conf_text);
 }
 
 /* open barnyard2.conf for writing" */
@@ -1131,7 +1011,7 @@ config sid_file:	        /usr/local/etc/snort/snort_{$snort_uuid}_{$if_real}/sid
 config hostname:       $snortbarnyardlog_hostname_info_chk
 config interface:      {$snort_uuid}_{$if_real}
 config decode_data_link
-config waldo_file: /var/log/snort/barnyard2/{$snort_uuid}_{$if_real}.waldo
+config waldo_file: /var/log/snort/snort_{$if_real}{$snort_uuid}/barnyard2/{$snort_uuid}_{$if_real}.waldo
 
 ## START user pass through ##
 
@@ -1142,7 +1022,7 @@ config waldo_file: /var/log/snort/barnyard2/{$snort_uuid}_{$if_real}.waldo
 # Step 2: setup the input plugins
 input unified2
 
-config logdir: /var/log/snort
+config logdir: /var/log/snort/snort_{$if_real}{$snort_uuid}
 
 # database: log to a variety of databases
 # output database: log, mysql, user=xxxx password=xxxxxx dbname=xxxx host=xxx.xxx.xxx.xxxx
@@ -1158,7 +1038,7 @@ function create_snort_conf($id, $if_real, $snort_uuid)
 {
 	global $config, $g;
 
-	if (!empty($if_real)&& !empty($snort_uuid)) {
+	if (!empty($if_real) && !empty($snort_uuid)) {
 		if (!is_dir("/usr/local/etc/snort/snort_{$snort_uuid}_{$if_real}")) {
 			exec("/bin/mkdir -p /usr/local/etc/snort/snort_{$snort_uuid}_{$if_real}");
 			@touch("/usr/local/etc/snort/snort_{$snort_uuid}_{$if_real}/snort.conf");
@@ -1251,35 +1131,49 @@ function generate_snort_conf($id, $if_real, $snort_uuid)
 		$external_net = create_snort_externalnet($id, $if_real);
 
 	/* obtain external interface */
-	/* XXX: make multi wan friendly */
 	$snort_ext_int = $snortcfg['interface'];
 
 	/* user added arguments */
 	$snort_config_pass_thru = str_replace("\r", "", base64_decode($snortcfg['configpassthru']));
 
-	/* create basic files */
+	/* create a few directories and ensure the sample files are in place */
+	if (!is_dir('/usr/local/etc/snort'))
+		exec('/bin/mkdir -p /usr/local/etc/snort/custom_rules');
 	if (!is_dir("/usr/local/etc/snort/snort/snort_{$snort_uuid}_{$if_real}"))
 		exec("/bin/mkdir -p /usr/local/etc/snort/snort_{$snort_uuid}_{$if_real}");
-
-	exec("/bin/cp /usr/local/etc/snort/gen-msg.map /usr/local/etc/snort/snort_{$snort_uuid}_{$if_real}/gen-msg.map");
-	exec("/bin/cp /usr/local/etc/snort/classification.config /usr/local/etc/snort/snort_{$snort_uuid}_{$if_real}/classification.config");
-	exec("/bin/cp /usr/local/etc/snort/reference.config /usr/local/etc/snort/snort_{$snort_uuid}_{$if_real}/reference.config");
-	exec("/bin/cp /usr/local/etc/snort/sid-msg.map /usr/local/etc/snort/snort_{$snort_uuid}_{$if_real}/sid-msg.map");
-	exec("/bin/cp /usr/local/etc/snort/unicode.map /usr/local/etc/snort/snort_{$snort_uuid}_{$if_real}/unicode.map");
-	exec("/bin/cp /usr/local/etc/snort/threshold.conf /usr/local/etc/snort/snort_{$snort_uuid}_{$if_real}/threshold.conf");
-	exec("/usr/bin/touch /usr/local/etc/snort/snort_{$snort_uuid}_{$if_real}/barnyard2.conf");
-
 	if (!is_dir("/usr/local/etc/snort/snort_{$snort_uuid}_{$if_real}/rules"))
 		exec("/bin/mkdir -p /usr/local/etc/snort/snort_{$snort_uuid}_{$if_real}/rules");
+	if (!is_dir('/usr/local/etc/snort/whitelist'))
+		exec('/bin/mkdir -p /usr/local/etc/snort/whitelist/');
+	if (!is_dir("/var/log/snort/snort_{$if_real}{$snort_uuid}"))
+		exec("/bin/mkdir -p /var/log/snort/snort_{$if_real}{$snort_uuid}");
+	if (!is_dir("/var/log/snort/snort_{$if_real}{$snort_uuid}/barnyard2"))
+		exec("/bin/mkdir -p /var/log/snort/snort_{$if_real}{$snort_uuid}/barnyard2");
+	if (!is_dir('/usr/local/lib/snort/dynamicrules'))
+		exec('/bin/mkdir -p /usr/local/lib/snort/dynamicrules');
+	if (!is_dir('/usr/local/lib/snort/dynamicengine'))
+		exec('/bin/mkdir -p /usr/local/lib/snort/dynamicengine');
+	if (!is_dir('/usr/local/lib/snort/dynamicpreprocessor'))
+		exec('/bin/mkdir -p /usr/local/lib/snort/dynamicpreprocessor');
+	if (!file_exists('/var/db/whitelist'))
+		@touch('/var/db/whitelist');
+
+	@copy("/usr/local/etc/snort/gen-msg.map", "/usr/local/etc/snort/snort_{$snort_uuid}_{$if_real}/gen-msg.map");
+	@copy("/usr/local/etc/snort/classification.config", "/usr/local/etc/snort/snort_{$snort_uuid}_{$if_real}/classification.config");
+	@copy("/usr/local/etc/snort/reference.config", "/usr/local/etc/snort/snort_{$snort_uuid}_{$if_real}/reference.config");
+	@copy("/usr/local/etc/snort/sid-msg.map", "/usr/local/etc/snort/snort_{$snort_uuid}_{$if_real}/sid-msg.map");
+	@copy("/usr/local/etc/snort/unicode.map", "/usr/local/etc/snort/snort_{$snort_uuid}_{$if_real}/unicode.map");
+	@copy("/usr/local/etc/snort/threshold.conf", "/usr/local/etc/snort/snort_{$snort_uuid}_{$if_real}/threshold.conf");
+	@touch("/usr/local/etc/snort/snort_{$snort_uuid}_{$if_real}/barnyard2.conf");
 
 	/* define basic log filename */
 	$snortunifiedlogbasic_type = "output unified: filename snort_{$snort_uuid}_{$if_real}.log, limit 128";
 
 	/* define snortalertlogtype */
 	if ($config['installedpackages']['snortglobal']['snortalertlogtype'] == "fast")
-		$snortalertlogtype_type = "output alert_fast: alert_{$snort_uuid}";
+		$snortalertlogtype_type = "output alert_fast: alert";
 	else
-		$snortalertlogtype_type = "output alert_full: alert_{$snort_uuid}";
+		$snortalertlogtype_type = "output alert_full: alert";
 
 	/* define alertsystemlog */
 	$alertsystemlog_type = "";
@@ -1603,7 +1497,7 @@ function generate_snort_conf($id, $if_real, $snort_uuid)
                          #
 ##########################
 
-preprocessor perfmonitor: time 300 file /var/log/snort/snort_{$snort_uuid}_{$if_real}.stats pktcnt 10000
+preprocessor perfmonitor: time 300 file /var/log/snort/snort_{$if_real}{$snort_uuid}/{$if_real}.stats pktcnt 10000
 	
 EOD;
 
@@ -1986,7 +1880,7 @@ config event_queue: max_queue 8 log 3 order_events content_length
 
 #Configure dynamic loaded libraries
 dynamicpreprocessor directory /usr/local/lib/snort/dynamicpreprocessor
-dynamicengine /usr/local/lib/snort/dynamicengine/libsf_engine.so
+dynamicengine directory /usr/local/lib/snort/dynamicengine
 dynamicdetection directory /usr/local/lib/snort/dynamicrules
 
 ###################

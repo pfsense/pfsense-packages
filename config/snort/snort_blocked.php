@@ -41,11 +41,9 @@ $pconfig['brefresh'] = $config['installedpackages']['snortglobal']['alertsblocks
 $pconfig['blertnumber'] = $config['installedpackages']['snortglobal']['alertsblocks']['blertnumber'];
 
 if ($pconfig['blertnumber'] == '' || $pconfig['blertnumber'] == '0')
-{
 	$bnentries = '500';
-}else{
+else
 	$bnentries = $pconfig['blertnumber'];
-}
 
 if($_POST['todelete'] or $_GET['todelete']) {
 	if($_POST['todelete'])
@@ -57,10 +55,8 @@ if($_POST['todelete'] or $_GET['todelete']) {
 
 if ($_POST['remove']) {
 	exec("/sbin/pfctl -t snort2c -T flush");
-	sleep(1);
 	header("Location: /snort/snort_blocked.php");
 	exit;
-
 }
 
 /* TODO: build a file with block ip and disc */
@@ -73,31 +69,30 @@ if ($_POST['download'])
 	exec('/bin/mkdir /tmp/snort_blocked');
 	exec('/sbin/pfctl -t snort2c -T show > /tmp/snort_block.pf');
 
-	$blocked_ips_array_save = str_replace('   ', '', array_filter(explode("\n", file_get_contents('/tmp/snort_block.pf'))));
+	$blocked_ips_array_save = str_replace('   ', '', explode("\n", file_get_contents('/tmp/snort_block.pf')));
 
 	if ($blocked_ips_array_save[0] != '') {
 		/* build the list */
 		file_put_contents("/tmp/snort_blocked/snort_block.pf", "");
-		foreach($blocked_ips_array_save as $counter => $fileline3)
-			file_put_contents("/tmp/snort_blocked/snort_block.pf", "{$fileline3}\n", FILE_APPEND);
+		foreach($blocked_ips_array_save as $counter => $fileline)
+			file_put_contents("/tmp/snort_blocked/snort_block.pf", "{$fileline}\n", FILE_APPEND);
 	}
 
 	exec("/usr/bin/tar cfz /tmp/snort_blocked_{$save_date}.tar.gz /tmp/snort_blocked");
 
 	if(file_exists("/tmp/snort_blocked_{$save_date}.tar.gz")) {
-		$file = "/tmp/snort_blocked_{$save_date}.tar.gz";
 		header("Expires: Mon, 26 Jul 1997 05:00:00 GMT\n");
 		header("Pragma: private"); // needed for IE
 		header("Cache-Control: private, must-revalidate"); // needed for IE
 		header('Content-type: application/force-download');
 		header('Content-Transfer-Encoding: Binary');
-		header("Content-length: ".filesize($file));
+		header("Content-length: " . filesize("/tmp/snort_blocked_{$save_date}.tar.gz"));
 		header("Content-disposition: attachment; filename = {$file_name}");
 		readfile("$file");
-		exec("/bin/rm /tmp/snort_blocked_{$save_date}.tar.gz");
-		exec("/bin/rm /tmp/snort_block.pf");
-		exec("/bin/rm /tmp/snort_blocked/snort_block.pf");
 		od_end_clean(); //importanr or other post will fail
+		@unlink("/tmp/snort_blocked_{$save_date}.tar.gz");
+		@unlink("/tmp/snort_block.pf");
+		@unlink("/tmp/snort_blocked/snort_block.pf");
 	} else
 		echo 'Error no saved file.';
 
@@ -105,13 +100,6 @@ if ($_POST['download'])
 
 if ($_POST['save'])
 {
-
-	/* input validation */
-	if ($_POST['save'])
-	{
-
-
-	}
 
 	/* no errors */
 	if (!$input_errors)
@@ -122,7 +110,7 @@ if ($_POST['save'])
 		write_config();
 
 		header("Location: /snort/snort_blocked.php");
-
+		exit;
 	}
 
 }
@@ -295,74 +283,66 @@ if ($pconfig['brefresh'] == 'on')
 
 				/* set the arrays */
 				exec('/sbin/pfctl -t snort2c -T show > /tmp/snort_block.cache');
-				$blocked_ips_array = str_replace('   ', '', array_filter(explode("\n", file_get_contents('/tmp/snort_block.cache'))));
-			foreach (glob("/var/log/snort/alert_*") as $alert) {
-				$alerts_array = array_reverse(explode("\n\n", file_get_contents("{$alert}")));
+				$blocked_ips_array = explode("\n", str_replace('   ', '', file_get_contents('/tmp/snort_block.cache')));
+			if (!empty($blocked_ips_array)) {
+				$input = array();
+				$alert_ip_src_array = array();
+				foreach (glob("/var/log/snort/*/alert") as $alert) {
+					$alerts_array = array_reverse(explode("\n\n", file_get_contents($alert)));
+					if (!empty($alerts_array[0])) {
+						/* build the list and compare blocks to alerts */
+						$counter = 0;
+						foreach($alerts_array as $fileline) {
 
+							$counter++;
+
+							$alert_ip_src =  get_snort_alert_ip_src($fileline);
+							$alert_ip_disc = get_snort_alert_disc($fileline);
+							$alert_ip_src_array[] = get_snort_alert_ip_src($fileline);
+
+							if (in_array("$alert_ip_src", $blocked_ips_array))
+								$input[] = "[$alert_ip_src] " . "[$alert_ip_disc]\n";
+						}
+
+					}
+				}
+
+				foreach($blocked_ips_array as $alert_block_ip) {
+					if (is_ipaddr($alert_block_ip) && !in_array($alert_block_ip, $alert_ip_src_array))
+						$input[] = "[$alert_block_ip] " . "[N\A]\n";
+				}
+
+				/* reduce double occurrences */
+				$result = array_unique($input);
+
+				/* buil final list, preg_match, buld html */
+				$counter2 = 0;
 				$logent = $bnentries;
 
-				if ($blocked_ips_array[0] != '' && $alerts_array[0] != '')
-				{
-
-					/* build the list and compare blocks to alerts */
-					$counter = 0;
-					foreach($alerts_array as $fileline)
-					{
-
-						$counter++;
-
-						$alert_ip_src =  get_snort_alert_ip_src($fileline);
-						$alert_ip_disc = get_snort_alert_disc($fileline);
-						$alert_ip_src_array[] = get_snort_alert_ip_src($fileline);
-
-						if (in_array("$alert_ip_src", $blocked_ips_array))
-							$input[] = "[$alert_ip_src] " . "[$alert_ip_disc]\n";
-					}
-
-					foreach($blocked_ips_array as $alert_block_ip)
-					{
-
-						if (!in_array($alert_block_ip, $alert_ip_src_array))
-						{
-							$input[] = "[$alert_block_ip] " . "[N\A]\n";
-						}
-					}
-
-					/* reduce double occurrences */
-					$result = array_unique($input);
-
-					/* buil final list, preg_match, buld html */
-					$counter2 = 0;
-
-					foreach($result as $fileline2)
-					{
-						if($logent <= $counter2)
+				foreach($result as $fileline) {
+					if($logent <= $counter2)
 						continue;
 
-						$counter2++;
+					$counter2++;
 
-						$alert_block_ip_str =  get_snort_block_ip($fileline2);
+					$alert_block_ip_str =  get_snort_block_ip($fileline);
 
-						if($alert_block_ip_str != '')
-						{
-							$alert_block_ip_match = array('[',']');
-							$alert_block_ip = str_replace($alert_block_ip_match, '', "$alert_block_ip_str");
-						}else{
-							$alert_block_ip = 'empty';
-						}
+					if($alert_block_ip_str != '') {
+						$alert_block_ip_match = array('[',']');
+						$alert_block_ip = str_replace($alert_block_ip_match, '', "$alert_block_ip_str");
+					} else
+						$alert_block_ip = 'empty';
 
-						$alert_block_disc_str = get_snort_block_disc($fileline2);
+					$alert_block_disc_str = get_snort_block_disc($fileline);
 
-						if($alert_block_disc_str != '')
-						{
-							$alert_block_disc_match = array('] [',']');
-							$alert_block_disc = str_replace($alert_block_disc_match, '', "$alert_block_disc_str");
-						}else{
-							$alert_block_disc = 'empty';
-						}
+					if($alert_block_disc_str != '') {
+						$alert_block_disc_match = array('] [',']');
+						$alert_block_disc = str_replace($alert_block_disc_match, '', "$alert_block_disc_str");
+					}else
+						$alert_block_disc = 'empty';
 
-						/* use one echo to do the magic*/
-						echo "<tr>
+					/* use one echo to do the magic*/
+					echo "<tr>
 			<td align=\"center\" valign=\"top\"'><a href='snort_blocked.php?todelete=" . trim(urlencode($alert_block_ip)) . "'>
 			<img title=\"Delete\" border=\"0\" name='todelete' id='todelete' alt=\"Delete\" src=\"../themes/{$g['theme']}/images/icons/icon_x.gif\"></a></td>
 			<td>&nbsp;{$counter2}</td>
@@ -370,40 +350,12 @@ if ($pconfig['brefresh'] == 'on')
 			<td>&nbsp;{$alert_block_disc}</td>
 			</tr>\n";
 
-					}
-
-				}else{
-
-					/* if alerts file is empty and blocked table is not empty */
-					$counter2 = 0;
-
-					foreach($blocked_ips_array as $alert_block_ip)
-					{
-						if($logent <= $counter2)
-							continue;
-
-						$counter2++;
-
-						$alert_block_disc = 'N/A';
-
-						/* use one echo to do the magic*/
-						echo "<tr>
-			<td align=\"center\" valign=\"top\"'><a href='snort_blocked.php?todelete=" . trim(urlencode($alert_block_ip)) . "'>
-			<img title=\"Delete\" border=\"0\" name='todelete' id='todelete' alt=\"Delete\" src=\"../themes/{$g['theme']}/images/icons/icon_x.gif\"></a></td>
-			<td>&nbsp;{$counter2}</td>
-			<td>&nbsp;{$alert_block_ip}</td>
-			<td>&nbsp;{$alert_block_disc}</td>
-			</tr>\n";		
-					}
 				}
-			}
 
 				echo '</table>' . "\n";
-
-				if (empty($blocked_ips_array[0]))
-					echo "\n<tr><td colspan='3' align=\"center\" valign=\"top\"><br><strong>There are currently no items being blocked by snort.</strong></td></tr>";
-				else
-					echo "\n<tr><td colspan='3' align=\"center\" valign=\"top\">{$counter2} items listed.</td></tr>";
+				echo "\n<tr><td colspan='3' align=\"center\" valign=\"top\">{$counter2} items listed.</td></tr>";
+			} else
+				echo "\n<tr><td colspan='3' align=\"center\" valign=\"top\"><br><strong>There are currently no items being blocked by snort.</strong></td></tr>";
 
 				?>
 				</td>

@@ -48,8 +48,11 @@ if (!is_array($config['installedpackages']['snortglobal']['rule']))
         $config['installedpackages']['snortglobal']['rule'] = array();
 $a_instance = &$config['installedpackages']['snortglobal']['rule'];
 $snort_uuid = $a_instance[0]['uuid'];
-if ($_POST['instance'])
+$if_real = snort_get_real_interface($a_instance[0]['interface']);
+if ($_POST['instance']) {
 	$snort_uuid = $a_instance[$_POST['instance']]['uuid'];
+	$if_real = snort_get_real_interface($a_instance[$_POST['instance']]['interface']);
+}
 
 if (is_array($config['installedpackages']['snortglobal']['alertsblocks'])) {
 	$pconfig['arefresh'] = $config['installedpackages']['snortglobal']['alertsblocks']['arefresh'];
@@ -63,57 +66,36 @@ if (is_array($config['installedpackages']['snortglobal']['alertsblocks'])) {
 
 if ($_POST['save'])
 {
-	//unset($input_errors);
-	//$pconfig = $_POST;
+	if (!is_array($config['installedpackages']['snortglobal']['alertsblocks']))
+		$config['installedpackages']['snortglobal']['alertsblocks'] = array();
+	$config['installedpackages']['snortglobal']['alertsblocks']['arefresh'] = $_POST['arefresh'] ? 'on' : 'off';
+	$config['installedpackages']['snortglobal']['alertsblocks']['alertnumber'] = $_POST['alertnumber'];
 
-	/* input validation */
-	if ($_POST['save'])
-	{
+	write_config();
 
-		//	if (($_POST['radiusacctport'] && !is_port($_POST['radiusacctport']))) {
-		//		$input_errors[] = "A valid port number must be specified. [".$_POST['radiusacctport']."]";
-		//	}
-
-	}
-
-	/* no errors */
-	if (!$input_errors) {
-		if (!is_array($config['installedpackages']['snortglobal']['alertsblocks']))
-			$config['installedpackages']['snortglobal']['alertsblocks'] = array();
-		$config['installedpackages']['snortglobal']['alertsblocks']['arefresh'] = $_POST['arefresh'] ? 'on' : 'off';
-		$config['installedpackages']['snortglobal']['alertsblocks']['alertnumber'] = $_POST['alertnumber'];
-
-		write_config();
-
-		header("Location: /snort/snort_alerts.php");
-		exit;
-	}
-
+	header("Location: /snort/snort_alerts.php");
+	exit;
 }
 
-if ($_GET['action'] == "clear" || $_POST['clear'])
-{
-	if (file_exists("/var/log/snort/alert_{$snort_uuid}"))
-	{
+if ($_GET['action'] == "clear" || $_POST['clear']) {
+	if (file_exists("/var/log/snort/snort_{$if_real}{$snort_uuid}/alert")) {
 		conf_mount_rw();
-		@file_put_contents("/var/log/snort/alert_{$snort_uuid}", "");
+		@file_put_contents("/var/log/snort/snort_{$if_real}{$snort_uuid}/alert", "");
 		post_delete_logs();
 		/* XXX: This is needed is snort is run as snort user */
 		//mwexec('/usr/sbin/chown snort:snort /var/log/snort/*', true);
 		mwexec('/bin/chmod 660 /var/log/snort/*', true);
-		mwexec('/usr/bin/killall -HUP snort', true);
+		mwexec("/bin/pkill -HUP -F {$g['varrun_path']}/snort_{$if_real}{$snort_uuid}.pid -a");
 		conf_mount_ro();
 	}
 	header("Location: /snort/snort_alerts.php");
 	exit;
 }
 
-if ($_POST['download'])
-{
-
+if ($_POST['download']) {
 	$save_date = exec('/bin/date "+%Y-%m-%d-%H-%M-%S"');
-	$file_name = "snort_logs_{$save_date}.tar.gz";
-	exec("/usr/bin/tar cfz /tmp/{$file_name} /var/log/snort");
+	$file_name = "snort_logs_{$save_date}_{$if_real}.tar.gz";
+	exec("/usr/bin/tar cfz /tmp/{$file_name} /var/log/snort/snort_{$if_real}{$snort_uuid}");
 
 	if (file_exists("/tmp/{$file_name}")) {
 		$file = "/tmp/snort_logs_{$save_date}.tar.gz";
@@ -131,7 +113,6 @@ if ($_POST['download'])
 	header("Location: /snort/snort_alerts.php");
 	exit;
 }
-
 
 /* WARNING: took me forever to figure reg expression, dont lose */
 // $fileline = '12/09-18:12:02.086733  [**] [122:6:0] (portscan) TCP Filtered Decoy Portscan [**] [Priority: 3] {PROTO:255} 125.135.214.166 -> 70.61.243.50';
@@ -381,16 +362,16 @@ if ($pconfig['arefresh'] == 'on')
 		<?php
 
 		/* make sure alert file exists */
-		if (!file_exists("/var/log/snort/alert_{$snort_uuid}"))
-			exec("/usr/bin/touch /var/log/snort/alert_{$snort_uuid}");
+		if (!file_exists("/var/log/snort/snort_{$if_real}{$snort_uuid}/alert"))
+			@touch("/var/log/snort/snort_{$if_real}{$snort_uuid}/alert");
 
 		$logent = $anentries;
 
 		/* detect the alert file type */
 		if ($snortalertlogt == 'full')
-			$alerts_array = array_reverse(array_filter(explode("\n\n", file_get_contents("/var/log/snort/alert_{$snort_uuid}"))));
+			$alerts_array = array_reverse(explode("\n\n", file_get_contents("/var/log/snort/snort_{$if_real}{$snort_uuid}/alert")));
 		else
-			$alerts_array = array_reverse(array_filter(split("\n", file_get_contents("/var/log/snort/alert_{$snort_uuid}"))));
+			$alerts_array = array_reverse(explode("\n", file_get_contents("/var/log/snort/snort_{$if_real}{$snort_uuid}/alert")));
 
 
 
