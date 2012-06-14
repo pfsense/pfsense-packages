@@ -628,6 +628,7 @@
 		<depends_on_package_base_url>http://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
 		<depends_on_package>varnish-2.1.5.tbz</depends_on_package>
 		<depends_on_package>gcc-4.2.5.20090325_5.tbz</depends_on_package>
+		<depends_on_package_pbi>varnish-2.1.5_1-i386.pbi gcc-4.2.5.20090325_5-i386.pbi</depends_on_package_pbi>
 		<build_port_path>/usr/ports/www/varnish2</build_port_path>
 		<build_port_path>/usr/ports/lang/gcc42</build_port_path>
 	</package>
