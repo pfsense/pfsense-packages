@@ -93,9 +93,10 @@ if ($_POST) {
 
 	/* if no errors write to conf */
 	if (!$input_errors) {
-		$natent = array();
-		/* repost the options already in conf */
-		$natent = $pconfig;
+		if (isset($id) && $a_nat[$id])
+			$natent = $a_nat[$id];
+		else
+			$natent = array();
 
 		$natent['barnyard_enable'] = $_POST['barnyard_enable'] ? 'on' : 'off';
 		$natent['barnyard_mysql'] = $_POST['barnyard_mysql'] ? $_POST['barnyard_mysql'] : $pconfig['barnyard_mysql'];
