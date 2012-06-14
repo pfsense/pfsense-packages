@@ -145,7 +145,7 @@
 		<depends_on_package_pbi>varnish-3.0.1_2-amd64.pbi gcc-4.2.5.20090325_5-amd64.pbi</depends_on_package_pbi>
 		<depends_on_package>varnish-2.1.5.tbz</depends_on_package>
 		<depends_on_package>gcc-4.2.5.20090325_5.tbz</depends_on_package>
-		<build_port_path>/usr/ports/www/varnish</build_port_path>
+		<build_port_path>/usr/ports/www/varnish2</build_port_path>
 		<build_port_path>/usr/ports/lang/gcc42</build_port_path>
 	</package>
 	<package>
