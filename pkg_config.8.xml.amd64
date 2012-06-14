@@ -21,6 +21,8 @@
 		<maintainer>marcellocoutinho@gmail.com robreg@zsurob.hu</maintainer>
 		<configurationfile>asterisk.xml</configurationfile>
 		<after_install_info>Please visit the Asterisk tab on status menu.</after_install_info>
+		<!-- Fix me once a PBI is available! -->
+		<maximum_version>2.1</maximum_version>
 	</package>
 	<package>
 		<name>Filer</name>
@@ -129,7 +131,9 @@
 		<build_options>WITH_SQUID_KERB_AUTH=true WITH_SQUID_LDAP_AUTH=true WITH_SQUID_NIS_AUTH=true WITH_SQUID_SASL_AUTH=true WITH_SQUID_DELAY_POOLS=true WITH_SQUID_SNMP=true WITH_SQUID_CARP=true WITH_SQUID_SSL=true WITHOUT_SQUID_PINGER=true WITHOUT_SQUID_DNS_HELPER=true WITH_SQUID_HTCP=true WITH_SQUID_VIA_DB=true WITH_SQUID_CACHE_DIGESTS=true WITH_SQUID_WCCP=true WITHOUT_SQUID_WCCPV2=true WITHOUT_SQUID_STRICT_HTTP=true WITH_SQUID_IDENT=true WITH_SQUID_REFERER_LOG=true WITHOUT_SQUID_USERAGENT_LOG=true WITH_SQUID_ARP_ACL=true WITH_SQUID_PF=true WITHOUT_SQUID_IPFILTER=true WITH_SQUID_FOLLOW_XFF=true WITH_SQUID_AUFS=true WITH_SQUID_COSS=true WITH_SQUID_KQUEUE=true WITH_SQUID_LARGEFILE=true WITHOUT_SQUID_STACKTRACES=true</build_options>
 		<config_file>http://www.pfsense.org/packages/config/squid-reverse/squid.xml</config_file>
 		<configurationfile>squid.xml</configurationfile>
-	</package>	
+		<!-- Fix me once a PBI is available! -->
+		<maximum_version>2.1</maximum_version>
+	</package>
 	<package>
 		<name>Varnish</name>
 		<descr><![CDATA[Varnish is a state-of-the-art, high-performance HTTP accelerator.<br>
@@ -226,6 +230,8 @@
 		<depends_on_package_base_url>http://e-sac.siteseguro.ws/packages/amd64/8/All/</depends_on_package_base_url>
 		<depends_on_package>haproxy-1.4.20.tbz</depends_on_package>
 		<build_port_path>/usr/ports/net/haproxy</build_port_path>
+		<!-- Fix me once a PBI is available! -->
+		<maximum_version>2.1</maximum_version>
 	</package>
 	<package>
 		<name>haproxy-full</name>
@@ -241,8 +247,9 @@
 		<configurationfile>haproxy.xml</configurationfile>
 		<depends_on_package_base_url>http://e-sac.siteseguro.ws/packages/amd64/8/All/</depends_on_package_base_url>
 		<depends_on_package>haproxy-1.4.20.tbz</depends_on_package>
+		<!-- Fix me once a PBI is available! -->
+		<maximum_version>2.1</maximum_version>
 	</package>
-
 	<package>
 		<name>Proxy Server with mod_security</name>
 		<pkginfolink>http://doc.pfsense.org/index.php/ProxyServerModSecurity_package</pkginfolink>
@@ -493,6 +500,7 @@
 		<config_file>http://www.pfsense.com/packages/config/olsrd.xml</config_file>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/All/</depends_on_package_base_url>
 		<depends_on_package>olsrd-0.6.2.tbz</depends_on_package>
+		<build_port_path>/usr/ports/net/olsrd</build_port_path>
 		<version>1.0</version>
 		<status>Stable</status>
 		<required_version>2.1</required_version>
@@ -557,7 +565,7 @@
 		<build_port_path>/usr/ports/mail/mailscanner</build_port_path>
 		<build_options></build_options>
 	</package>
-		<package>
+	<package>
 		<name>Dansguardian</name>
 		<website>http://www.dansguardian.org/</website>
 		<descr><![CDATA[DansGuardian is an award winning Open Source web content filter.<br>
@@ -578,6 +586,8 @@
 		<configurationfile>dansguardian.xml</configurationfile>
 		<build_port_path>/usr/ports/www/dansguardian-devel</build_port_path>
 		<build_options>WITHOUT_APACHE=true WITH_TRICKLE=true WITH_CLAMD=true WITH_ICAP=true WITH_NTLM=true WITH_SSL=true</build_options>
+		<!-- Fix me once a PBI is available! -->
+		<maximum_version>2.1</maximum_version>
 	</package>
 	<package>
 		<name>siproxd</name>
@@ -626,6 +636,8 @@
 		<required_version>1.2.1</required_version>
 		<configurationfile>openospfd.xml</configurationfile>
 		<depends_on_package>libevent-1.4.14b_1.tbz</depends_on_package>
+		<!-- Fix me once a PBI is available! -->
+		<maximum_version>2.1</maximum_version>
 	</package>
 	<package>
 		<name>Lightsquid</name>
@@ -778,7 +790,7 @@
 		<build_port_path>/usr/ports/lang/python27</build_port_path>
 		<depends_on_package_pbi>open-vm-tools-313025_4-amd64.pbi</depends_on_package_pbi>
 	</package>
-		<package>
+	<package>
 		<name>Open-VM-Tools-8.8.1</name>
 		<descr>VMware Tools</descr>
 		<website>http://open-vm-tools.sourceforge.net/</website>
@@ -792,6 +804,8 @@
 		<depends_on_package_base_url>http://e-sac.siteseguro.ws/packages/amd64/8/All/</depends_on_package_base_url>
 		<depends_on_package>open-vm-tools-nox11-528969,1.tbz</depends_on_package>
 		<depends_on_package>pcre-8.30_1.tbz</depends_on_package>
+		<!-- Fix me once a PBI is available! -->
+		<maximum_version>2.1</maximum_version>
 	</package>
 	<package>
 		<name>AutoConfigBackup</name>
@@ -855,6 +869,8 @@
 		<depends_on_package>sqlite3-3.7.9.tbz</depends_on_package>
 		<depends_on_package>imspector-0.9.tbz</depends_on_package>
 		<build_port_path>/usr/home/pfsense/tools/pfPorts/imspector</build_port_path>
+		<!-- Fix me once a PBI is available! -->
+		<maximum_version>2.1</maximum_version>
 	</package>
 	<package>
 		<name>imspector-dev</name>
@@ -871,6 +887,8 @@
 		<depends_on_package_base_url>http://e-sac.siteseguro.ws/packages/amd64/8/All/</depends_on_package_base_url>
 		<depends_on_package>mysql-client-5.5.19.tbz</depends_on_package>
 		<depends_on_package>imspector-20111108.tbz</depends_on_package>
+		<!-- Fix me once a PBI is available! -->
+		<maximum_version>2.1</maximum_version>
 	</package>
 	<package>
 		<name>nut</name>
@@ -989,6 +1007,8 @@
 		<config_file>http://www.pfsense.org/packages/config/freeradius2/freeradius.xml</config_file>
 		<configurationfile>freeradius.xml</configurationfile>
 		<after_install_info>Please visit Services: FreeRADIUS</after_install_info>
+		<!-- Fix me once a PBI is available! -->
+		<maximum_version>2.1</maximum_version>
 	</package>
 	<package>
 		<name>bandwidthd</name>
@@ -1100,6 +1120,7 @@
 		<pkginfolink>http://forum.pfsense.org/index.php/topic,44034.0.html</pkginfolink>		
 		<depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
 		<depends_on_package>lcdproc-0.5.5.tbz</depends_on_package>
+		<depends_on_package_pbi>lcdproc-0.5.5-amd64.pbi</depends_on_package_pbi>
 		<config_file>http://www.pfsense.org/packages/config/lcdproc-dev/lcdproc.xml</config_file>
 		<configurationfile>lcdproc.xml</configurationfile>
 		<build_port_path>/usr/ports/sysutils/lcdproc</build_port_path>
@@ -1113,6 +1134,7 @@
 		<category>Security</category>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
 		<depends_on_package>arpwatch-2.1.a15_6.tbz</depends_on_package>
+		<depends_on_package_pbi>arpwatch-2.1.a15_6-amd64.pbi</depends_on_package_pbi>
 		<build_port_path>/usr/ports/net-mgmt/arpwatch</build_port_path>
 		<version>2.1.a15_5</version>
 		<status>ALPHA</status>
@@ -1354,7 +1376,9 @@
 		<depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
 		<depends_on_package>nrpe-2.12_3.tbz</depends_on_package>
 		<depends_on_package>nagios-plugins-1.4.15_1,1.tbz</depends_on_package>
+		<depends_on_package_pbi>nrpe-2.13-amd64.pbi</depends_on_package_pbi>
 		<build_port_path>/usr/ports/net-mgmt/nrpe2</build_port_path>
+		<build_port_path>/usr/ports/net-mgmt/nagios-plugins</build_port_path>
 		<build_options>WITH_SSL=true WITHOUT_ARGS=true</build_options>
 		<config_file>http://www.pfsense.com/packages/config/nrpe2/nrpe2.xml</config_file>
 		<version>2.12_3 v2.1</version>
@@ -1399,6 +1423,8 @@
 		<depends_on_package>zebedee.tbz</depends_on_package>
 		<config_file>http://www.pfsense.com/packages/config/zebedee/zebedee.xml</config_file>
 		<configurationfile>zebedee.xml</configurationfile>
+		<!-- Fix me once a PBI is available! -->
+		<maximum_version>2.1</maximum_version>
 	</package>
 	<package>
 		<name>OpenVPN tap Bridging Fix</name>

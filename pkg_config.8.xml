@@ -21,6 +21,8 @@
 		<maintainer>marcellocoutinho@gmail.com robreg@zsurob.hu</maintainer>
 		<configurationfile>asterisk.xml</configurationfile>
 		<after_install_info>Please visit the Asterisk tab on status menu.</after_install_info>
+		<!-- Fix me once a PBI is available! -->
+		<maximum_version>2.1</maximum_version>
 	</package>
 	<package>
 		<name>Filer</name>
@@ -147,6 +149,8 @@
 		<depends_on_package_pbi>haproxy-1.4.21-i386.pbi</depends_on_package_pbi>
 		<configurationfile>haproxy.xml</configurationfile>
 		<build_port_path>/usr/ports/net/haproxy</build_port_path>
+		<!-- Fix me once a PBI is available! -->
+		<maximum_version>2.1</maximum_version>
 	</package>
 	<package>
 		<name>haproxy-full</name>
@@ -162,6 +166,8 @@
 		<depends_on_package_base_url>http://e-sac.siteseguro.ws/packages/8/All/</depends_on_package_base_url>
 		<depends_on_package>haproxy-1.4.20.tbz</depends_on_package>
 		<configurationfile>haproxy.xml</configurationfile>
+		<!-- Fix me once a PBI is available! -->
+		<maximum_version>2.1</maximum_version>
 	</package>
 	<package>
 		<name>Proxy Server with mod_security</name>
@@ -279,7 +285,7 @@
 		<configurationfile>freeswitch.xml</configurationfile>
 		<noembedded>true</noembedded>
 	</package>
-		<package>
+	<package>
 		<name>FreeSWITCH Dev</name>
 		<website>http://www.freeswitch.org/</website>
 		<descr>FreeSWITCH package development version.</descr>
@@ -412,6 +418,7 @@
 		<config_file>http://www.pfsense.com/packages/config/olsrd.xml</config_file>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/All/</depends_on_package_base_url>
 		<depends_on_package>olsrd-0.6.2.tbz</depends_on_package>
+		<build_port_path>/usr/ports/net/olsrd</build_port_path>
 		<version>1.0</version>
 		<status>Stable</status>
 		<required_version>2.1</required_version>
@@ -476,8 +483,10 @@
 		<configurationfile>dansguardian.xml</configurationfile>
 		<build_port_path>/usr/ports/www/dansguardian-devel</build_port_path>
 		<build_options>WITHOUT_APACHE=true WITH_TRICKLE=true WITH_CLAMD=true WITH_ICAP=true WITH_NTLM=true WITH_SSL=true</build_options>
+		<!-- Fix me once a PBI is available! -->
+		<maximum_version>2.1</maximum_version>
 	</package>
-		<package>
+	<package>
 		<name>mailscanner-dev</name>
 		<website>www.mailscanner.info</website>
 		<descr><![CDATA[MailScanner is an e-mail security and anti-spam package for e-mail gateway systems.<br>
@@ -759,6 +768,8 @@
 		<depends_on_package_base_url>http://e-sac.siteseguro.ws/packages/8/All/</depends_on_package_base_url>
 		<depends_on_package>open-vm-tools-nox11-528969,1.tbz</depends_on_package>
 		<depends_on_package>pcre-8.30_1.tbz</depends_on_package>
+		<!-- Fix me once a PBI is available! -->
+		<maximum_version>2.1</maximum_version>
 	</package>
 	<package>
 		<name>AutoConfigBackup</name>
@@ -822,6 +833,8 @@
 		<depends_on_package>sqlite3-3.7.9.tbz</depends_on_package>
 		<depends_on_package>imspector-0.9.tbz</depends_on_package>
 		<build_port_path>/usr/home/pfsense/tools/pfPorts/imspector</build_port_path>
+		<!-- Fix me once a PBI is available! -->
+		<maximum_version>2.1</maximum_version>
 	</package>
 	<package>
 		<name>imspector-dev</name>
@@ -838,6 +851,8 @@
 		<depends_on_package_base_url>http://e-sac.siteseguro.ws/packages/8/All/</depends_on_package_base_url>
 		<depends_on_package>mysql-client-5.5.19.tbz</depends_on_package>
 		<depends_on_package>imspector-20111108.tbz</depends_on_package>
+		<!-- Fix me once a PBI is available! -->
+		<maximum_version>2.1</maximum_version>
 	</package>
 	<package>
 		<name>nut</name>
@@ -953,7 +968,9 @@
 		<config_file>http://www.pfsense.org/packages/config/freeradius2/freeradius.xml</config_file>
 		<configurationfile>freeradius.xml</configurationfile>
 		<after_install_info>Please visit Services: FreeRADIUS</after_install_info>
-	</package>	
+		<!-- Fix me once a PBI is available! -->
+		<maximum_version>2.1</maximum_version>
+	</package>
 	<package>
 		<name>bandwidthd</name>
 		<website>http://bandwidthd.sourceforge.net/</website>
@@ -1082,18 +1099,20 @@
 		<build_options>WITH_SQUID_KERB_AUTH=true WITH_SQUID_LDAP_AUTH=true WITH_SQUID_NIS_AUTH=true WITH_SQUID_SASL_AUTH=true WITH_SQUID_DELAY_POOLS=true WITH_SQUID_SNMP=true WITH_SQUID_CARP=true WITH_SQUID_SSL=true WITHOUT_SQUID_PINGER=true WITHOUT_SQUID_DNS_HELPER=true WITH_SQUID_HTCP=true WITH_SQUID_VIA_DB=true WITH_SQUID_CACHE_DIGESTS=true WITH_SQUID_WCCP=true WITHOUT_SQUID_WCCPV2=true WITHOUT_SQUID_STRICT_HTTP=true WITH_SQUID_IDENT=true WITH_SQUID_REFERER_LOG=true WITHOUT_SQUID_USERAGENT_LOG=true WITH_SQUID_ARP_ACL=true WITH_SQUID_PF=true WITHOUT_SQUID_IPFILTER=true WITH_SQUID_FOLLOW_XFF=true WITH_SQUID_AUFS=true WITH_SQUID_COSS=true WITH_SQUID_KQUEUE=true WITH_SQUID_LARGEFILE=true WITHOUT_SQUID_STACKTRACES=true</build_options>
 		<config_file>http://www.pfsense.org/packages/config/squid-reverse/squid.xml</config_file>
 		<configurationfile>squid.xml</configurationfile>
+		<!-- Fix me once a PBI is available! -->
+		<maximum_version>2.1</maximum_version>
 	</package>
 	<package>
 		<name>LCDproc</name>
 		<descr>LCD display driver</descr>
 		<website>http://www.lcdproc.org/</website>
 		<category>Utility</category>
-		<version>lcdproc-0.5.3_1</version>
+		<version>lcdproc-0.5.5</version>
 		<status>BETA</status>
 		<required_version>1.2.1</required_version>
 		<maintainer>seth.mos@dds.nl</maintainer>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
-		<depends_on_package>lcdproc-0.5.3_1.tbz</depends_on_package>
+		<depends_on_package>lcdproc-0.5.5.tbz</depends_on_package>
 		<depends_on_package_pbi>lcdproc-0.5.5-i386.pbi</depends_on_package_pbi>
 		<config_file>http://www.pfsense.org/packages/config/lcdproc/lcdproc.xml</config_file>
 		<configurationfile>lcdproc.xml</configurationfile>
@@ -1112,6 +1131,7 @@
 		<pkginfolink>http://forum.pfsense.org/index.php/topic,44034.0.html</pkginfolink>		
 		<depends_on_package_base_url>http://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
 		<depends_on_package>lcdproc-0.5.5.tbz</depends_on_package>
+		<depends_on_package_pbi>lcdproc-0.5.5-i386.pbi</depends_on_package_pbi>
 		<config_file>http://www.pfsense.org/packages/config/lcdproc-dev/lcdproc.xml</config_file>
 		<configurationfile>lcdproc.xml</configurationfile>
 		<build_port_path>/usr/ports/sysutils/lcdproc</build_port_path>
@@ -1449,6 +1469,8 @@
 		<depends_on_package>zebedee.tbz</depends_on_package>
 		<config_file>http://www.pfsense.com/packages/config/zebedee/zebedee.xml</config_file>
 		<configurationfile>zebedee.xml</configurationfile>
+		<!-- Fix me once a PBI is available! -->
+		<maximum_version>2.1</maximum_version>
 	</package>
 	<package>
 		<name>OpenVPN tap Bridging Fix</name>
