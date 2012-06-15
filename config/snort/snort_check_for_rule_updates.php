@@ -96,31 +96,20 @@ $config['installedpackages']['snortglobal']['last_md5_download'] = date("Y-M-jS-
 /* send current buffer */
 ob_flush();
 
-/* send current buffer */
-ob_flush();
-
 /*  remove old $tmpfname files */
 if (is_dir("{$tmpfname}")) {
 	update_status(gettext("Removing old tmp files..."));
 	exec("/bin/rm -r {$tmpfname}");
-	apc_clear_cache();
 }
 
 /*  Make shure snortdir exits */
-exec("/bin/mkdir -p {$snortdir}");
 exec("/bin/mkdir -p {$snortdir}/rules");
 exec("/bin/mkdir -p {$snortdir}/signatures");
 exec("/bin/mkdir -p {$tmpfname}");
-exec("/bin/mkdir -p /usr/local/lib/snort/dynamicrules/");
-
-/* send current buffer */
-ob_flush();
-
-$pfsensedownload = 'on';
+exec("/bin/mkdir -p /usr/local/lib/snort/dynamicrules");
 
 /*  download md5 sig from snort.org */
-if ($snortdownload == 'on')
-{
+if ($snortdownload == 'on') {
 	if (file_exists("{$tmpfname}/{$snort_filename_md5}") &&
 	filesize("{$tmpfname}/{$snort_filename_md5}") > 0) {
 		update_status(gettext("snort.org md5 temp file exists..."));
@@ -136,8 +125,7 @@ if ($snortdownload == 'on')
 }
 
 /*  download md5 sig from emergingthreats.net */
-if ($emergingthreats == 'on')
-{
+if ($emergingthreats == 'on') {
 	update_status(gettext("Downloading emergingthreats md5 file..."));
 	ini_set('user_agent','Mozilla/4.0 (compatible; MSIE 6.0)');
 	// $image = @file_get_contents("http://www.mtest.local/pub-bin/oinkmaster.cgi/{$oinkid}/version.txt");
@@ -261,7 +249,8 @@ if ($snortdownload == 'on')
 				update_status(gettext("Error with the snort rules download..."));
 				update_output_window(gettext("Snort rules file downloaded failed..."));
 				$snortdownload = 'off';
-			}
+			} else
+				log_error("Snort rules file update downloaded succsesfully");
 		}
 	}
 }
@@ -279,6 +268,7 @@ if ($emergingthreats == "on")
 			update_output_window(gettext("May take 4 to 10 min..."));
 			download_file_with_progress_bar('http://rules.emergingthreats.net/open/snort-2.9.0/emerging.rules.tar.gz', "{$tmpfname}/{$emergingthreats_filename}");
 			update_status(gettext('Done downloading Emergingthreats rules file.'));
+			log_error("Emergingthreats rules file update downloaded succsesfully");
 		}
 	}
 }
@@ -293,6 +283,7 @@ if ($pfsensedownload == 'on' && $pfsense_md5_check_ok != 'on') {
 		download_file_with_progress_bar("http://www.pfsense.com/packages/config/snort/pfsense_rules/pfsense_rules.tar.gz", $tmpfname . "/{$pfsense_rules_filename}");
 		update_all_status($static_output);
 		update_status(gettext("Done downloading rules file."));
+		log_error("pfSense rules file update downloaded succsesfully");
 	}
 }
 
@@ -339,10 +330,8 @@ if ($snortdownload == 'on')
 			update_output_window(gettext("May take a while..."));
 			/* extract snort.org rules and  add prefix to all snort.org files*/
 			exec("/bin/rm -r {$snortdir}/rules");
-			sleep(2);
 			exec("/usr/bin/tar xzf {$tmpfname}/{$snort_filename} -C {$snortdir} rules/");
 			chdir ("/usr/local/etc/snort/rules");
-			sleep(2);
 			exec('/usr/local/bin/perl /usr/local/bin/snort_rename.pl s/^/snort_/ *.rules');
 
 			/* extract so rules */
@@ -511,7 +500,6 @@ if ($snortdownload == 'on')
 
 /* double make shure cleanup emerg rules that dont belong */
 if (file_exists("/usr/local/etc/snort/rules/emerging-botcc-BLOCK.rules")) {
-	apc_clear_cache();
 	@unlink("/usr/local/etc/snort/rules/emerging-botcc-BLOCK.rules");
 	@unlink("/usr/local/etc/snort/rules/emerging-botcc.rules");
 	@unlink("/usr/local/etc/snort/rules/emerging-compromised-BLOCK.rules");
@@ -657,7 +645,6 @@ $config['installedpackages']['snortglobal']['last_rules_install'] = date("Y-M-jS
 if (is_dir('/usr/local/etc/snort/tmp')) {
 	update_status(gettext("Cleaning up..."));
 	exec("/bin/rm -r /usr/local/etc/snort/tmp/snort_rules_up");
-	sleep(2);
 	exec("/bin/rm -r /usr/local/etc/snort/tmp/rules_bk");
 }
 
@@ -673,10 +660,10 @@ else if ($snort_md5_check_ok == 'on' && $emerg_md5_check_ok == 'on' && $pfsense_
 else {
 	/* You are Not Up to date, always stop snort when updating rules for low end machines */;
 	update_status(gettext("You are NOT up to date..."));
-	exec("/bin/sh /usr/local/etc/rc.d/snort.sh start");
+	exec("/bin/sh /usr/local/etc/rc.d/snort.sh restart");
 	update_status(gettext("The Rules update finished..."));
 	update_output_window(gettext("Snort has restarted with your new set of rules..."));
-	exec("/bin/rm /tmp/snort_download_halt.pid");
+	log_error(gettext("Snort has restarted with your new set of rules..."));
 }
 
 update_status(gettext("The Rules update finished..."));

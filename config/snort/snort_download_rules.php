@@ -740,7 +740,6 @@ else {
 	exec("/bin/sh /usr/local/etc/rc.d/snort.sh start");
 	update_status(gettext("The Rules update finished..."));
 	update_output_window(gettext("Snort has restarted with your new set of rules..."));
-	exec("/bin/rm /tmp/snort_download_halt.pid");
 }
 
 update_status(gettext("The Rules update finished..."));
