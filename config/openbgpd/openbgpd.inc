@@ -177,7 +177,7 @@ fi
 
 /bin/mkdir -p {$bgpd_config_base}
 chmod u+rw,go-rw {$bgpd_config_base}/bgpd.conf
-/usr/sbin/chown -R {$pkg_login}:{$pkg_login} {$bgpd_config_base}/
+/usr/sbin/chown -R {$pkg_login}:{$pkg_login} {$bgpd_config_base}
 
 NUMBGPD=`ps auxw | grep -c '[b]gpd.*parent'`
 if [ \${NUMBGPD} -lt 1 ] ; then
