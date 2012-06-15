@@ -543,23 +543,23 @@ function snort_postinstall()
 	mwexec('/bin/mkdir -p /usr/local/www/snort/images');
 
 	chdir ("/usr/local/www/snort/css/");
-	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort/css/style.css');
-	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort/css/sexybuttons.css');
+	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort-dev/css/style.css');
+	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort-dev/css/sexybuttons.css');
 	chdir("/usr/local/www/snort/images/");
-	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort/images/alert.jpg');
-	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort/images/down.gif');
-	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort/images/down2.gif');
-	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort/images/icon-table-sort.png');
-	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort/images/icon-table-sort-asc.png');
-	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort/images/icon-table-sort-desc.png');
-	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort/images/up.gif');
-	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort/images/up2.gif');
-	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort/images/logo.jpg');
-	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort/images/icon_excli.png');
-	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort/images/arrow_down.png');
-	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort/images/awesome-overlay-sprite.png');
-	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort/images/logo22.png');
-	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort/images/page_white_text.png');
+	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort-dev/images/alert.jpg');
+	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort-dev/images/down.gif');
+	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort-dev/images/down2.gif');
+	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort-dev/images/icon-table-sort.png');
+	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort-dev/images/icon-table-sort-asc.png');
+	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort-dev/images/icon-table-sort-desc.png');
+	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort-dev/images/up.gif');
+	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort-dev/images/up2.gif');
+	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort-dev/images/logo.jpg');
+	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort-dev/images/icon_excli.png');
+	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort-dev/images/arrow_down.png');
+	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort-dev/images/awesome-overlay-sprite.png');
+	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort-dev/images/logo22.png');
+	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort-dev/images/page_white_text.png');
 
 	/* remake saved settings */
 	if ($config['installedpackages']['snortglobal']['forcekeepsettings'] == 'on') {
