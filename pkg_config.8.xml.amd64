@@ -500,10 +500,9 @@
 		<name>snort-dev</name>
 		<pkginfolink>http://forum.pfsense.org/index.php/topic,16847.0.html</pkginfolink>
 		<website>http://www.snort.org</website>
-		<descr>Snort is an open source network intrusion prevention and detection system (IDS/IPS). Combining the benefits of signature, protocol, and anomaly-based inspection.</descr>
+		<descr>Snort-dev is a testing branch for new features.</descr>
 		<category>Security</category>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
-		<depends_on_package_pbi>snort-2.9.1-amd64.pbi</depends_on_package_pbi>
 		<depends_on_package>mysql-client-5.1.53.tbz</depends_on_package>
 		<depends_on_package>barnyard2-1.9_2.tbz</depends_on_package>
 		<depends_on_package>libnet11-1.1.2.1_3,1.tbz</depends_on_package>
