@@ -28,7 +28,8 @@
 	POSSIBILITY OF SUCH DAMAGE.
 */
 
-$quagga_config_base = "/var/etc/quagga";
+define('PKG_QUAGGA_CONFIG_BASE', '/var/etc/quagga');
+
 $pkg_login	= "quagga";
 $pkg_uid	= "101";
 $pkg_group	= "quagga";
@@ -63,9 +64,11 @@ function quagga_ospfd_get_interfaces() {
 }
 
 function quagga_ospfd_install_conf() {
-	global $config, $g, $input_errors, $quagga_config_base, $pkg_login, $pkg_uid, $pkg_group, $pkg_gid, $pkg_gecos, $pkg_homedir, $pkg_shell;
+	global $config, $g, $input_errors, $pkg_login, $pkg_uid, $pkg_group, $pkg_gid, $pkg_gecos, $pkg_homedir, $pkg_shell;
 
 	conf_mount_rw();
+	// Since we need to embed this in a string, copy to a var. Can't embed constnats.
+	$quagga_config_base = PKG_QUAGGA_CONFIG_BASE;
 
 	if ($config['installedpackages']['quaggaospfd']['rawconfig'] && $config['installedpackages']['quaggaospfd']['rawconfig']['item']) {
 		// if there is a raw config specifyed in tthe config.xml use that instead of the assisted config
@@ -310,7 +313,7 @@ function quagga_ospfd_validate_input() {
 
 // get the raw ospfd confi file for manual inspection/editing
 function quagga_ospfd_get_raw_config() {
-	return file_get_contents("{$quagga_config_base}/ospfd.conf");
+	return file_get_contents(PKG_QUAGGA_CONFIG_BASE . "/ospfd.conf");
 }
 
 // serialize the raw ospfd confi file to config.xml

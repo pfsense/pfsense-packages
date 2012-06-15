@@ -29,7 +29,8 @@
 	POSSIBILITY OF SUCH DAMAGE.
 */
 
-$bgpd_config_base = "/var/etc/openbgpd";
+define('PKG_BGPD_CONFIG_BASE', '/var/etc/openbgpd');
+
 $pkg_login	= "_bgpd";
 $pkg_uid	= "130";
 $pkg_group	= "_bgpd";
@@ -40,10 +41,12 @@ $pkg_shell	= "/usr/sbin/nologin";
 
 
 function openbgpd_install_conf() {
-	global $config, $g, $bgpd_config_base, $pkg_login, $pkg_uid, $pkg_group, $pkg_gid, $pkg_gecos, $pkg_homedir, $pkg_shell;
+	global $config, $g, $pkg_login, $pkg_uid, $pkg_group, $pkg_gid, $pkg_gecos, $pkg_homedir, $pkg_shell;
 	
 	conf_mount_rw();
 	
+	// Since we need to embed this in a string, copy to a var. Can't embed constnats.
+	$bgpd_config_base = PKG_BGPD_CONFIG_BASE;
   if ($config['installedpackages']['openbgpd']['rawconfig'] && $config['installedpackages']['openbgpd']['rawconfig']['item']) {
     // if there is a raw config specified in the config.xml use that instead of the assisted config
     $conffile = implode("\n",$config['installedpackages']['openbgpd']['rawconfig']['item']);
@@ -209,8 +212,7 @@ EOF;
 
 // get the raw openbgpd confi file for manual inspection/editing
 function openbgpd_get_raw_config() {
-	global $bgpd_config_base;
-	$conf = "{$bgpd_config_base}/bgpd.conf";
+	$conf = PKG_BGPD_CONFIG_BASE . "/bgpd.conf";
 	if (file_exists($conf))
 		return file_get_contents($conf);
 	else
