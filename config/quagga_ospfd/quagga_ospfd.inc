@@ -249,7 +249,7 @@ if [ `pw usershow {$pkg_login} 2>&1 | grep -c "pw: no such user"` -gt 0 ]; then
 	/usr/sbin/pw useradd {$pkg_login} -u {$pkg_uid} -g {$pkg_gid} -c "{$pkg_gecos}" -d {$pkg_homedir} -s {$pkg_shell}
 fi
 
-/usr/sbin/chown -R quagga:quagga {$quagga_config_base}/
+/usr/sbin/chown -R quagga:quagga {$quagga_config_base}
 /usr/sbin/chown -R quagga:quagga /var/run/quagga
 /usr/sbin/chown -R quagga:quagga /var/log/quagga
 # Ensure no other copies of the daemons are running or it breaks.
