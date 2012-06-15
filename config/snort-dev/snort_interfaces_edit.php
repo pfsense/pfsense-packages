@@ -30,7 +30,7 @@
  POSSIBILITY OF SUCH DAMAGE.
  */
 
-require_once("guiconfig.inc");
+require_once("/usr/local/www/guiconfig.inc");
 require_once("/usr/local/pkg/snort/snort_gui.inc");
 require_once("/usr/local/pkg/snort/snort.inc");
 
@@ -138,6 +138,8 @@ if (isset($id) && $a_nat[$id]) {
 		$pconfig['alertsystemlog'] = $a_nat[$id]['alertsystemlog'];
 		$pconfig['tcpdumplog'] = $a_nat[$id]['tcpdumplog'];
 		$pconfig['snortunifiedlog'] = $a_nat[$id]['snortunifiedlog'];
+		$pconfig['snortalertcvs'] = $a_nat[$id]['snortalertcvs'];
+		$pconfig['snortunifiedlogbasic'] = $a_nat[$id]['snortunifiedlogbasic'];
 		$pconfig['configpassthru'] = base64_decode($a_nat[$id]['configpassthru']);
 		$pconfig['barnconfigpassthru'] = $a_nat[$id]['barnconfigpassthru'];
 		$pconfig['rulesets'] = $a_nat[$id]['rulesets'];
@@ -220,6 +222,8 @@ if (isset($_GET['dup']))
 			if ($_POST['enable']) { $natent['enable'] = 'on'; } else unset($natent['enable']);
 			if ($_POST['tcpdumplog'] == "on") { $natent['tcpdumplog'] = 'on'; }else{ $natent['tcpdumplog'] = 'off'; }
 			if ($_POST['snortunifiedlog'] == "on") { $natent['snortunifiedlog'] = 'on'; }else{ $natent['snortunifiedlog'] = 'off'; }
+			if ($_POST['snortalertcvs'] == "on") { $natent['snortalertcvs'] = 'on'; }else{ $natent['snortalertcvs'] = 'off'; }
+			if ($_POST['snortunifiedlogbasic'] == "on") { $natent['snortunifiedlogbasic'] = 'on'; }else{ $natent['snortunifiedlogbasic'] = 'off'; }
 			$natent['configpassthru'] = $_POST['configpassthru'] ? base64_encode($_POST['configpassthru']) : $pconfig['configpassthru'];
 			/* if optiion = 0 then the old descr way will not work */
 
@@ -365,6 +369,8 @@ function enable_change(enable_change) {
 	document.iform.suppresslistname.disabled = endis;
 	document.iform.tcpdumplog.disabled = endis;
 	document.iform.snortunifiedlog.disabled = endis;
+	document.iform.snortalertcvs.disabled = endis;
+	document.iform.snortunifiedlogbasic.disabled = endis;
 	document.iform.configpassthru.disabled = endis;
 }
 //-->
@@ -682,6 +688,14 @@ function enable_change(enable_change) {
 				File may become large.</td>
 			</tr>
 			<tr>
+				<td width="22%" valign="top" class="vncell2">Log Alerts to a snort unified file</td>
+				<td width="78%" class="vtable">
+				<input name="snortunifiedlogbasic" type="checkbox" value="on" <?php if ($pconfig['snortunifiedlogbasic'] == "on") echo "checked"; ?> onClick="enable_change(false)">
+				<br>
+				Snort will log Alerts to a file in the UNIFIED format.
+				</td>
+			</tr>			
+			<tr>
 				<td width="22%" valign="top" class="vncell2">Log Alerts to a snort
 				unified2 file</td>
 				<td width="78%" class="vtable"><input name="snortunifiedlog"
@@ -691,6 +705,14 @@ function enable_change(enable_change) {
 				Snort will log Alerts to a file in the UNIFIED2 format. This is a
 				requirement for barnyard2.</td>
 			</tr>
+			<tr>
+				<td width="22%" valign="top" class="vncell2">Log Alerts to a snort cvs file</td>
+				<td width="78%" class="vtable">
+				<input name="snortalertcvs" type="checkbox" value="on" <?php if ($pconfig['snortalertcvs'] == "on") echo "checked"; ?> onClick="enable_change(false)">
+				<br>
+				Snort will log Alerts to a file in the CVS format.
+				</td>
+			</tr>			
 			<tr>
 				<td colspan="2" valign="top" class="listtopic">Arguments here will
 				be automatically inserted into the snort configuration.</td>

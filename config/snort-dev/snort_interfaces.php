@@ -31,7 +31,7 @@ POSSIBILITY OF SUCH DAMAGE.
 */
 
 $nocsrf = true;
-require_once("guiconfig.inc");
+require_once("/usr/local/www/guiconfig.inc");
 require_once("/usr/local/pkg/snort/snort_gui.inc");
 require_once("/usr/local/pkg/snort/snort.inc");
 
@@ -57,6 +57,17 @@ if (isset($_POST['del_x'])) {
 			$snort_uuid = $a_nat[$rulei]['uuid'];
 
 			Running_Stop($snort_uuid,$if_real, $rulei);
+			
+			/* delete iface rule dirs */		
+			if (file_exists("/usr/local/etc/snort/snort_{$snort_uuid}_{$if_real}")) {
+				exec("/bin/rm -r /usr/local/etc/snort/snort_{$snort_uuid}_{$if_real}");				
+			}
+			if (file_exists("/var/log/snort/{$snort_uuid}_{$if_real}")) {
+				exec("/bin/rm -r /var/log/snort/{$snort_uuid}_{$if_real}");				
+			}
+			if (file_exists("/var/log/snort/barnyard2/{$snort_uuid}_{$if_real}")) {
+				exec("/bin/rm -r /var/log/snort/barnyard2/{$snort_uuid}_{$if_real}");				
+			}			
 
 			unset($a_nat[$rulei]);
 		}
