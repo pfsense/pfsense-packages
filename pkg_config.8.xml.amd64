@@ -64,7 +64,7 @@
 		<required_version>1.2.2</required_version>
 		<maintainer>tom@tomschaefer.org</maintainer>
 		<configurationfile>countryblock.xml</configurationfile>
-        </package>
+	</package>
 	<package>
 		<name>MAC-to-Vendor</name>
 		<descr>The package make pfSense show NIC Vendor names instead of MAC addresses in the form Asustek:xx:xx:xx, full info about MAC and vendor is available in tooltip. Applies to pages Status->Interfaces, Status->DHCP leases, Status->Wireless, Diagnostics->ARP table. Vendor names are stored in the file /usr/local/pkg/mactovendor/mac-prefixes</descr>
@@ -102,7 +102,7 @@
 		<maintainer>fernando@netfilter.com.br seth.mos@dds.nl mfuchs77@googlemail.com jimp@pfsense.org</maintainer>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
 		<depends_on_package>squid-2.7.9_1.tbz</depends_on_package>
-		<depends_on_package_pbi>squid-2.7.9_1-amd64.pbi squid_radius_auth-1.10-amd64.pbi libwww-5.4.0_4-amd64.pbi</depends_on_package_pbi>		
+		<depends_on_package_pbi>squid-2.7.9_1-amd64.pbi squid_radius_auth-1.10-amd64.pbi libwww-5.4.0_4-amd64.pbi</depends_on_package_pbi>
 		<depends_on_package>squid_radius_auth-1.10.tbz</depends_on_package>
 		<depends_on_package>libwww-5.4.0_4.tbz</depends_on_package>
 		<build_port_path>/usr/ports/www/squid</build_port_path>
@@ -115,8 +115,8 @@
 	<package>
 		<name>squid3</name>
 		<descr><![CDATA[High performance web proxy cache.<br>
-					   It combines squid as a proxy server with it's capabilities of acting as a HTTP / HTTPS reverse proxy.<br>
-					   It includes an Exchange-Web-Access (OWA) Assistant.]]></descr>
+			It combines squid as a proxy server with it's capabilities of acting as a HTTP / HTTPS reverse proxy.<br>
+			It includes an Exchange-Web-Access (OWA) Assistant.]]></descr>
 		<pkginfolink>http://forum.pfsense.org/index.php/topic,48347.0.html</pkginfolink>
 		<website>http://www.squid-cache.org/</website>
 		<category>Network</category>
@@ -190,9 +190,9 @@
 		<name>pfBlocker</name>
 		<website/>
 		<descr><![CDATA[Introduce Enhanced Aliastable Feature to pfsense.<br>
-					   Assign many IP urls lists from sites like I-blocklist to a single alias and then choose rule action to take.<br>
-					   This package also Block countries and IP ranges.<br>
-					   pfBlocker replaces Countryblock and IPblocklist]]></descr>
+			Assign many IP urls lists from sites like I-blocklist to a single alias and then choose rule action to take.<br>
+			This package also Block countries and IP ranges.<br>
+			pfBlocker replaces Countryblock and IPblocklist]]></descr>
 		<category>Firewall</category>
 		<pkginfolink>http://forum.pfsense.org/index.php/topic,42543.0.html</pkginfolink>
 		<config_file>http://pfsense.org/packages/config/pf-blocker/pfblocker.xml</config_file>
@@ -621,7 +621,7 @@
 		<required_version>1.3</required_version>
 		<configurationfile>openbgpd.xml</configurationfile>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
-		<depends_on_package>openbgpd-4.9.20110612_1.tbz</depends_on_package>		
+		<depends_on_package>openbgpd-4.9.20110612_1.tbz</depends_on_package>
 		<depends_on_package_pbi>openbgpd-4.9.20110612_1-amd64.pbi</depends_on_package_pbi>
 	</package>
 	<package>
@@ -1121,7 +1121,7 @@
 		<status>BETA</status>
 		<required_version>2.0</required_version>
 		<maintainer>michele@nt2.it</maintainer>
-		<pkginfolink>http://forum.pfsense.org/index.php/topic,44034.0.html</pkginfolink>		
+		<pkginfolink>http://forum.pfsense.org/index.php/topic,44034.0.html</pkginfolink>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
 		<depends_on_package>lcdproc-0.5.5.tbz</depends_on_package>
 		<depends_on_package_pbi>lcdproc-0.5.5-amd64.pbi</depends_on_package_pbi>
@@ -1130,7 +1130,7 @@
 		<build_port_path>/usr/ports/sysutils/lcdproc</build_port_path>
 		<build_options>WITH_USB=true</build_options>
 		<after_install_info>Please set the service options in Services-LCDproc before running the service.</after_install_info>
-	</package>		
+	</package>
 	<package>
 		<name>arpwatch</name>
 		<descr>Arpwatch monitors ethernet/ip address pairings. It also logs certain changes to syslog.</descr>
