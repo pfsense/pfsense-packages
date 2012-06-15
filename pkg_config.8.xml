@@ -515,6 +515,7 @@
 		<config_file>http://www.pfsense.com/packages/config/siproxd.xml</config_file>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
 		<depends_on_package>siproxd-0.8.0.tbz</depends_on_package>
+		<depends_on_package_pbi>siproxd-0.8.0-i386.pbi</depends_on_package_pbi>
 		<pkginfolink>http://doc.pfsense.org/index.php/Siproxd_package</pkginfolink>
 		<build_port_path>/usr/ports/net/siproxd</build_port_path>
 		<version>0.8.0_2</version>
