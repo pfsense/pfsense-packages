@@ -422,8 +422,6 @@
 		<category>Security</category>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
 		<depends_on_package_pbi>snort-2.9.2.3-i386.pbi</depends_on_package_pbi>
-		<depends_on_package_pbi>barnyard2-1.9_2-i386.pbi</depends_on_package_pbi>
-		<depends_on_package_pbi>perl-5.12.4_4-i386.pbi</depends_on_package_pbi>
 		<depends_on_package>mysql-client-5.1.53.tbz</depends_on_package>
 		<depends_on_package>barnyard2-1.9_2.tbz</depends_on_package>
 		<depends_on_package>libnet11-1.1.2.1_3,1.tbz</depends_on_package>
