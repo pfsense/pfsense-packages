@@ -165,7 +165,7 @@
 		<required_version>2.0</required_version>
 		<config_file>http://www.pfsense.com/packages/config/varnish3/varnish_backends.xml</config_file>
 		<configurationfile>varnish_backends.xml</configurationfile>
-		<depends_on_package_base_url>http://e-sac.siteseguro.ws/pfsense/8/amd64/All/</depends_on_package_base_url>
+		<depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
 		<depends_on_package_pbi>gcc-4.2.5.20090325_5-amd64.pbi varnish-3.0.2_1-amd64.pbi</depends_on_package_pbi>
 		<depends_on_package>varnish-3.0.2.tbz</depends_on_package>
 		<depends_on_package>pcre-8.21_1.tbz</depends_on_package>
