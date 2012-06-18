@@ -1459,12 +1459,11 @@
 		<website>www.winton.org.uk/zebedee/</website>
 		<maintainer>jorgelustosa@gmail.com marcellocoutinho@gmail.com</maintainer>
 		<required_version>2.0</required_version>
-		<depends_on_package_base_url>http://ftp-archive.freebsd.org/pub/FreeBSD-Archive/ports/amd64/packages-8.1-release/Latest/</depends_on_package_base_url>
-		<depends_on_package>zebedee.tbz</depends_on_package>
+		<depends_on_package_base_url>http://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
+		<depends_on_package>zebedee-2.5.3.tbz</depends_on_package>
+		<depends_on_package_pbi>zebedee-2.5.3-amd64.pbi</depends_on_package_pbi>
 		<config_file>http://www.pfsense.com/packages/config/zebedee/zebedee.xml</config_file>
 		<configurationfile>zebedee.xml</configurationfile>
-		<!-- Fix me once a PBI is available! -->
-		<maximum_version>2.1</maximum_version>
 		<build_port_path>/usr/ports/security/zebedee</build_port_path>
 	</package>
 	<package>
