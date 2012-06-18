@@ -761,7 +761,7 @@
 		<version>2.5.4</version>
 		<status>Beta</status>
 		<required_version>1.0</required_version>
-		<depends_on_package_base_url>http://www.pfsense.com/packages/config/phpsysinfo/bin/</depends_on_package_base_url>
+		<depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
 		<depends_on_package>mbmon-205_5.tbz</depends_on_package>
 		<depends_on_package_pbi>mbmon-205_5-amd64.pbi</depends_on_package_pbi>
 		<build_port_path>/usr/ports/sysutils/mbmon</build_port_path>
