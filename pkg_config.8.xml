@@ -1511,6 +1511,7 @@
 		<depends_on_package>zebedee.tbz</depends_on_package>
 		<config_file>http://www.pfsense.com/packages/config/zebedee/zebedee.xml</config_file>
 		<configurationfile>zebedee.xml</configurationfile>
+		<build_port_path>/usr/ports/security/zebedee</build_port_path>
 		<!-- Fix me once a PBI is available! -->
 		<maximum_version>2.1</maximum_version>
 	</package>

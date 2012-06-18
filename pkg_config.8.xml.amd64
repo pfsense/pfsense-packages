@@ -1463,6 +1463,7 @@
 		<configurationfile>zebedee.xml</configurationfile>
 		<!-- Fix me once a PBI is available! -->
 		<maximum_version>2.1</maximum_version>
+		<build_port_path>/usr/ports/security/zebedee</build_port_path>
 	</package>
 	<package>
 		<name>OpenVPN tap Bridging Fix</name>
