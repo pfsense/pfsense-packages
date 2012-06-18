@@ -1013,8 +1013,6 @@
 		<after_install_info>Please visit Services: FreeRADIUS</after_install_info>
 		<build_port_path>/usr/ports/net/freeradius2</build_port_path>
 		<build_options>WITH_KERBEROS=yes WITH_MYSQL=yes WITH_PGSQL=yes WITH_PERL=yes WITH_PYTHON=yes WITH_LDAP=yes</build_options>
-		<!-- Fix me once a PBI is available! -->
-		<maximum_version>2.1</maximum_version>
 	</package>
 	<package>
 		<name>bandwidthd</name>
