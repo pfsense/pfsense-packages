@@ -1006,6 +1006,7 @@
 		<maintainer>nachtfalkeaw@web.de</maintainer>
 		<depends_on_package_base_url>http://e-sac.siteseguro.ws/packages/8/All/</depends_on_package_base_url>
 		<depends_on_package>freeradius-2.1.12.tbz</depends_on_package>
+		<depends_on_package_pbi>freeradius-2.1.12_1-i386.pbi</depends_on_package_pbi>
 		<depends_on_package>openldap-sasl-client-2.4.26.tbz</depends_on_package>
 		<config_file>http://www.pfsense.org/packages/config/freeradius2/freeradius.xml</config_file>
 		<configurationfile>freeradius.xml</configurationfile>
