@@ -274,21 +274,23 @@ function Running_Stop($snort_uuid, $if_real, $id) {
 	/*
 	 * TODO: Add a GUI option that lets the user keep full logs
 	 */
-	/*
-	if ($start_up != '') {
+	if (!empty($start_up)) {
 		@exec("/bin/kill {$start_up}");
+		/*
 		@exec("/bin/rm /var/log/snort/run/snort_{$if_real}{$snort_uuid}*");
 		@exec("/bin/rm /var/log/snort/{$snort_uuid}_{$if_real}/snort.u1*");
 		@exec("/bin/rm /var/log/snort/{$snort_uuid}_{$if_real}/snort.u2*");
+		*/
 	}
 
-	if ($start_upb != '') {
+	if (!empty($start_upb)) {
 		@exec("/bin/kill {$start_upb}");
+		/*
 		@exec("/bin/rm /var/log/snort/run/barnyard2_{$snort_uuid}_{$if_real}*");
 		@exec("/bin/rm /var/log/snort/barnyard2/{$snort_uuid}_{$if_real}/snort.u1*");
 		@exec("/bin/rm /var/log/snort/barnyard2/{$snort_uuid}_{$if_real}/snort.u2*");
+		*/
 	}
-	*/
 
 	/* Log Iface stop */
 	exec("/usr/bin/logger -p daemon.info -i -t SnortStartup 'Interface Rule STOP for {$snort_uuid}_{$if_real}...'");
