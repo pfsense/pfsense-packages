@@ -1543,11 +1543,10 @@ if(!function_exists("is_url")) {
 	function is_url($url)
 	{
 	    if (empty($url))                return false;
-	    if (eregi("^http://", $url))    return true;
-	    if (eregi("^https://", $url))   return true;
+	    if (preg_match("/^(http|https):\/\//i", $url))    return true;
 	    if (strstr("blank", $url))      return true;
 	    if (strstr("blank_img", $url))  return true;
-	    if (eregi("^((30[1235]{1})|(40[0-9]{1})|(41[0-7]{1})|(50[0-5]{1}))", $url)) return true; # http error code 30x, 4xx, 50x.
+	    if (preg_match("/^((30[1235]{1})|(40[0-9]{1})|(41[0-7]{1})|(50[0-5]{1}))/i", $url)) return true; # http error code 30x, 4xx, 50x.
 	    return false;
 	}
 }
@@ -1558,7 +1557,7 @@ function is_dest_url($url)
     $fmt  = "[a-zA-Z0-9_-]";
 
     if (empty($url)) return false;
-    if (eregi("^(($fmt){1,}\.){1,}($fmt){2,}(/(.[^\*][^ ])*)", $url)) return true;
+    if (preg_match("/^(($fmt){1,}\.){1,}($fmt){2,}(/(.[^\*][^ ])*)/i", $url)) return true;
     return false;
 }
 # ------------------------------------------------------------------------------
@@ -1603,8 +1602,8 @@ function is_ipaddr_valid($val)
 function is_domain_valid($domain)
 {
     $dm_fmt = "([a-z0-9\-]{1,})";
-    $dm_fmt = "^(($dm_fmt{1,}\.){1,}$dm_fmt{2,})+$"; # example: (my.)(super.)(domain.)com
-    return is_string($domain) && eregi($dm_fmt, trim($domain));
+    $dm_fmt = "/^(($dm_fmt{1,}\.){1,}$dm_fmt{2,})+$/i"; # example: (my.)(super.)(domain.)com
+    return is_string($domain) && preg_match($dm_fmt, trim($domain));
 }
 
 # ------------------------------------------------------------------------------
@@ -1612,8 +1611,8 @@ function is_domain_valid($domain)
 # ------------------------------------------------------------------------------
 function is_username($username)
 {
-    $unm_fmt = "^\'[a-zA-Z_0-9\.\-]{1,}\'$";
-    return is_string($username) && eregi($unm_fmt, trim($username));
+    $unm_fmt = "/^\'[a-zA-Z_0-9\.\-]{1,}\'$/i";
+    return is_string($username) && preg_match($unm_fmt, trim($username));
 }
 # ------------------------------------------------------------------------------
 # check name
@@ -1627,7 +1626,7 @@ function check_name_format ($name, $input_errors)
         $elog[] = " Size of name '$val' must be between [2..16].";
 
     # All symbols must be [a-zA-Z_0-9\-] First symbol = letter.
-    if (!eregi("^([a-zA-Z]{1})([a-zA-Z_0-9\-]+)$", $val))
+    if (!preg_match("/^([a-zA-Z]{1})([a-zA-Z_0-9\-]+)$/i", $val))
         $elog[] = " Invalid name $name. Valid name symbols: ['a-Z', '_', '0-9', '-']. First symbol must be a letter.";
 
     # update log
@@ -1784,15 +1783,15 @@ function check_date($date)
 {
     $err = '';
     $val = trim($date);
-    $dtfmt = "([0-9]{4})\.([0-9]{2})\.([0-9]{2})";
+    $dtfmt = "/^([0-9]{4})\.([0-9]{2})\.([0-9]{2})/i";
 
     # check date range
-    if (eregi("^{$dtfmt}-{$dtfmt}$", $val)) {
+    if (preg_match("{$dtfmt}-{$dtfmt}$", $val)) {
         $val = explode("-", str_replace(".", '', $val));
         if (intval($val[0]) >= intval($val[1]))
             $err .= "Invalid date range, begin range must be less than the end. {$val[0]} - {$val[1]}";
     }
-    elseif (!eregi("^(([0-9]{4})|[*])\.(([0-9]{2})|[*])\.(([0-9]{2})|[*])$", $val)) {
+    elseif (!preg_match("/^(([0-9]{4})|[*])\.(([0-9]{2})|[*])\.(([0-9]{2})|[*])$/i", $val)) {
         $err .= "Bad date format.";
     }
 
@@ -1815,7 +1814,7 @@ function check_time($time)
     if (empty($time)) return '';
 
     # time range format: 'HH:MM-HH:MM'
-    if (!eregi("^([0-2][0-9])\:([0-5][0-9])-([0-2][0-9])\:([0-5][0-9])$", $time))
+    if (!preg_match("/^([0-2][0-9])\:([0-5][0-9])-([0-2][0-9])\:([0-5][0-9])$/i", $time))
         $err = "Invalid time range '$time'. You must use 'HH:MM-HH:MM' time range format. ";
     else {
         $tms = str_replace("-", "\n", $time);
