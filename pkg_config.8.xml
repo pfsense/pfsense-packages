@@ -453,6 +453,7 @@
 		<config_file>http://www.pfsense.com/packages/config/olsrd.xml</config_file>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/All/</depends_on_package_base_url>
 		<depends_on_package>olsrd-0.6.2.tbz</depends_on_package>
+		<depends_on_package_pbi>olsrd-0.5.6-r7-i386.pbi</depends_on_package_pbi>
 		<build_port_path>/usr/ports/net/olsrd</build_port_path>
 		<version>1.0</version>
 		<status>Stable</status>
@@ -535,6 +536,7 @@
 		<depends_on_package>pyzor-0.5.0_1.tbz</depends_on_package>
 		<depends_on_package>p5-Mail-SPF-2.007.tbz</depends_on_package>
 		<depends_on_package>p5-IP-Country-2.27.tbz</depends_on_package>
+		<depends_on_package_pbi>mailscanner-4.84.5_3-i386.pbi</depends_on_package_pbi>
 		<version>4.83.5 pkg v.0.2.1</version>
 		<status>beta</status>
 		<required_version>2.0</required_version>
@@ -1131,15 +1133,14 @@
 		<status>beta</status>
 		<required_version>2.0</required_version>
 		<maintainer>marcellocoutinho@gmail.com fernando@netfilter.com.br seth.mos@dds.nl mfuchs77@googlemail.com jimp@pfsense.org</maintainer>
-		<depends_on_package_base_url>http://e-sac.siteseguro.ws/packages/8/All/</depends_on_package_base_url>
+		<depends_on_package_base_url>http://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
 		<depends_on_package>squid-3.1.19.tbz</depends_on_package>
 		<!-- use build ports from squid 2.0 -->
 		<build_port_path>/usr/ports/www/squid31</build_port_path>
 		<build_options>WITH_SQUID_KERB_AUTH=true WITH_SQUID_LDAP_AUTH=true WITH_SQUID_NIS_AUTH=true WITH_SQUID_SASL_AUTH=true WITH_SQUID_DELAY_POOLS=true WITH_SQUID_SNMP=true WITH_SQUID_CARP=true WITH_SQUID_SSL=true WITHOUT_SQUID_PINGER=true WITHOUT_SQUID_DNS_HELPER=true WITH_SQUID_HTCP=true WITH_SQUID_VIA_DB=true WITH_SQUID_CACHE_DIGESTS=true WITH_SQUID_WCCP=true WITHOUT_SQUID_WCCPV2=true WITHOUT_SQUID_STRICT_HTTP=true WITH_SQUID_IDENT=true WITH_SQUID_REFERER_LOG=true WITHOUT_SQUID_USERAGENT_LOG=true WITH_SQUID_ARP_ACL=true WITH_SQUID_PF=true WITHOUT_SQUID_IPFILTER=true WITH_SQUID_FOLLOW_XFF=true WITH_SQUID_AUFS=true WITH_SQUID_COSS=true WITH_SQUID_KQUEUE=true WITH_SQUID_LARGEFILE=true WITHOUT_SQUID_STACKTRACES=true</build_options>
 		<config_file>http://www.pfsense.org/packages/config/squid-reverse/squid.xml</config_file>
 		<configurationfile>squid.xml</configurationfile>
-		<!-- Fix me once a PBI is available! -->
-		<maximum_version>2.1</maximum_version>
+		<depends_on_package_pbi>squid-3.1.19-i386.pbi</depends_on_package_pbi>
 	</package>
 	<package>
 		<name>LCDproc</name>
@@ -1530,7 +1531,7 @@
 		<status>BETA</status>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
 		<depends_on_package>quagga-0.99.20.1.tbz</depends_on_package>
-		<depends_on_package_pbi>quagga-0.99.20.1-i386.pbi</depends_on_package_pbi>
+		<depends_on_package_pbi>quagga-0.99.21-i386.pbi</depends_on_package_pbi>
 		<config_file>http://www.pfsense.com/packages/config/quagga_ospfd/quagga_ospfd.xml</config_file>
 		<build_port_path>/usr/ports/net/quagga</build_port_path>
 		<pkginfolink></pkginfolink>
