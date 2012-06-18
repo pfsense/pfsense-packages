@@ -274,6 +274,7 @@ function Running_Stop($snort_uuid, $if_real, $id) {
 	/*
 	 * TODO: Add a GUI option that lets the user keep full logs
 	 */
+	/*
 	if ($start_up != '') {
 		@exec("/bin/kill {$start_up}");
 		@exec("/bin/rm /var/log/snort/run/snort_{$if_real}{$snort_uuid}*");
@@ -287,6 +288,7 @@ function Running_Stop($snort_uuid, $if_real, $id) {
 		@exec("/bin/rm /var/log/snort/barnyard2/{$snort_uuid}_{$if_real}/snort.u1*");
 		@exec("/bin/rm /var/log/snort/barnyard2/{$snort_uuid}_{$if_real}/snort.u2*");
 	}
+	*/
 
 	/* Log Iface stop */
 	exec("/usr/bin/logger -p daemon.info -i -t SnortStartup 'Interface Rule STOP for {$snort_uuid}_{$if_real}...'");
@@ -1330,7 +1332,7 @@ function generate_snort_conf($id, $if_real, $snort_uuid)
 	 */
 	$snortalertcvs_type = "";
 	if ($snortcfg['snortalertcvs'] == "on")	
-		$snortalertcvs_type = "output alert_csv: /var/log/alert.csv default 128";
+		$snortalertcvs_type = "output alert_csv: /var/log/snort/{$snort_uuid}_{$if_real}/alert.csv default 128";
 
 	/* define snortalertlogtype */
 	if ($config['installedpackages']['snortglobal']['snortalertlogtype'] == "fast")
@@ -1642,7 +1644,7 @@ function generate_snort_conf($id, $if_real, $snort_uuid)
 	$enabled_rulesets = $snortcfg['rulesets'];
 	$selected_rules_sections = "";
 	if (!empty($enabled_rulesets)) {
-		$enabled_rulesets_array = split("\|\|", $enabled_rulesets);
+		$enabled_rulesets_array = explode("\|\|", $enabled_rulesets);
 		foreach($enabled_rulesets_array as $enabled_item)
 			$selected_rules_sections  .= "include \$RULE_PATH/{$enabled_item}\n";
 	}
@@ -2246,7 +2248,7 @@ dynamicdetection directory /usr/local/lib/snort/dynamicrules
 
 # TODO: gui needed for pfsense
 # GTP Control Channle Preprocessor, README.GTP
-preprocessor gtp: ports { 2123 3386 2152 }
+# preprocessor gtp: ports { 2123 3386 2152 }
 
 ####################################################
 # Inline packet normalization, README.normalize
