@@ -1641,15 +1641,12 @@ function generate_snort_conf($id, $if_real, $snort_uuid)
 
 
 	/* generate rule sections to load */
-	$enabled_rulesets = $snortcfg['rulesets'];
 	$selected_rules_sections = "";
-	if (!empty($enabled_rulesets)) {
-		$enabled_rulesets_array = explode("\|\|", $enabled_rulesets);
+	if (!empty($snortcfg['rulesets'])) {
+		$enabled_rulesets_array = explode('||', $snortcfg['rulesets']);
 		foreach($enabled_rulesets_array as $enabled_item)
 			$selected_rules_sections  .= "include \$RULE_PATH/{$enabled_item}\n";
 	}
-
-	/////////////////////////////
 
 	/* preprocessor code */
 
