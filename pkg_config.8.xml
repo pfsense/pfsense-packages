@@ -1005,7 +1005,7 @@
 		<depends_on_package>freeradius-2.1.12_1.tbz</depends_on_package>
 		<depends_on_package_pbi>freeradius-2.1.12_1-i386.pbi</depends_on_package_pbi>
 		<depends_on_package>mysql-client-5.1.63.tbz</depends_on_package>
-		<depends_on_package>postgresql-client-9.0.8.tbz</depends_on_package>
+		<depends_on_package>postgresql-client-8.4.12.tbz</depends_on_package>
 		<depends_on_package>openldap-sasl-client-2.4.31_1.tbz</depends_on_package>
 		<config_file>http://www.pfsense.org/packages/config/freeradius2/freeradius.xml</config_file>
 		<configurationfile>freeradius.xml</configurationfile>
