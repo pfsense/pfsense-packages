@@ -145,13 +145,11 @@
 		<status>Release</status>
 		<required_version>2.0</required_version>
 		<config_file>http://www.pfsense.com/packages/config/haproxy/haproxy.xml</config_file>
-		<depends_on_package_base_url>http://e-sac.siteseguro.ws/packages/8/All/</depends_on_package_base_url>
+		<depends_on_package_base_url>http://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
 		<depends_on_package>haproxy-1.4.20.tbz</depends_on_package>
 		<depends_on_package_pbi>haproxy-1.4.21-i386.pbi</depends_on_package_pbi>
 		<configurationfile>haproxy.xml</configurationfile>
 		<build_port_path>/usr/ports/net/haproxy</build_port_path>
-		<!-- Fix me once a PBI is available! -->
-		<maximum_version>2.1</maximum_version>
 	</package>
 	<package>
 		<name>haproxy-full</name>
@@ -164,11 +162,10 @@
 		<status>Release</status>
 		<required_version>2.0</required_version>
 		<config_file>http://www.pfsense.com/packages/config/haproxy-legacy/haproxy.xml</config_file>
-		<depends_on_package_base_url>http://e-sac.siteseguro.ws/packages/8/All/</depends_on_package_base_url>
-		<depends_on_package>haproxy-1.4.20.tbz</depends_on_package>
+		<depends_on_package_base_url>http://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
+		<depends_on_package>haproxy-1.4.21.tbz</depends_on_package>
+		<depends_on_package_pbi>haproxy-1.4.21-i386.pbi</depends_on_package_pbi>
 		<configurationfile>haproxy.xml</configurationfile>
-		<!-- Fix me once a PBI is available! -->
-		<maximum_version>2.1</maximum_version>
 	</package>
 	<package>
 		<name>Proxy Server with mod_security</name>
