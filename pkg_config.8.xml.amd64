@@ -1032,15 +1032,16 @@
 					On pfSense docs there is a how-to which could help you on porting users.]]></descr>
 		<pkginfolink>http://doc.pfsense.org/index.php/FreeRADIUS_2.x_package</pkginfolink>
 		<category>System</category>
-		<version>2.1.12 pkg v1.6.6_3</version>
+		<version>2.1.12_1 pkg v1.6.6_3</version>
 		<status>RC1</status>
 		<required_version>2.0</required_version>
 		<maintainer>nachtfalkeaw@web.de</maintainer>
-		<depends_on_package_base_url>http://e-sac.siteseguro.ws/packages/amd64/8/All/</depends_on_package_base_url>
-		<depends_on_package>freeradius-2.1.12.tbz</depends_on_package>
-		<depends_on_package>mysql-client-5.5.19.tbz</depends_on_package>
-		<depends_on_package>postgresql-client-9.1.2.tbz</depends_on_package>
-		<depends_on_package>openldap-sasl-client-2.4.26.tbz</depends_on_package>
+		<depends_on_package_base_url>http://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
+		<depends_on_package>freeradius-2.1.12_1.tbz</depends_on_package>
+		<depends_on_package_pbi>freeradius-2.1.12_1-amd64.pbi</depends_on_package_pbi>
+		<depends_on_package>mysql-client-5.1.63.tbz</depends_on_package>
+		<depends_on_package>postgresql-client-9.0.8.tbz</depends_on_package>
+		<depends_on_package>openldap-sasl-client-2.4.31_1.tbz</depends_on_package>
 		<config_file>http://www.pfsense.org/packages/config/freeradius2/freeradius.xml</config_file>
 		<configurationfile>freeradius.xml</configurationfile>
 		<after_install_info>Please visit Services: FreeRADIUS</after_install_info>
@@ -1055,8 +1056,6 @@
 		<build_port_path>/usr/ports/databases/postgresql91-client</build_port_path>
 		<build_port_path>/usr/ports/net/freeradius2</build_port_path>
 		<build_options>WITH_KERBEROS=yes WITH_MYSQL=yes WITH_PGSQL=yes WITH_PERL=yes WITH_PYTHON=yes WITH_LDAP=yes</build_options>
-		<!-- Fix me once a PBI is available! -->
-		<maximum_version>2.1</maximum_version>
 	</package>
 	<package>
 		<name>bandwidthd</name>
