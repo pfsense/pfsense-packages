@@ -215,10 +215,10 @@ function lightsquid_resync() {
 			foreach ($lsconf_var as $key => $val) {
 				for($i = 0; $i < count($lsconf); $i++) {
 					$s = trim($lsconf[$i]);
-					$e_key = "^[$]" . $key . "[ ]*[=]+";
-#					update_log("Regular: eregi(\"$e_key," . "'$s')"); // debug regular template
-					if (eregi($e_key, $s)) {
-#					update_log("Regular PASSED: eregi(\"$e_key," . "'$s')"); // debug regular template
+					$e_key = "/^[$]" . $key . "[ ]*[=]+/i";
+#					update_log("Regular: preg_match(\"$e_key," . "'$s')"); // debug regular template
+					if (preg_match($e_key, $s)) {
+#					update_log("Regular PASSED: preg_match(\"$e_key," . "'$s')"); // debug regular template
 						$lsconf[$i] = '$' . "$key = $val;";
 						update_log("Update config: $key=$val");
 					}
