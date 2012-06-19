@@ -49,7 +49,7 @@ define('RADDB', '/usr/local/etc/raddb');
 
 function freeradius_deinstall_command() {
 	exec("cd /var/db/pkg && pkg_delete `ls | grep freeradius`");
-	exec("rm -rf /usr/local/etc/raddb/");
+	exec("rm -rf " . RADDB);
 	exec("rm -rf /var/run/radiusd/");
 }
 
@@ -61,26 +61,26 @@ function freeradius_install_command() {
 	if (!file_exists("/var/log/radacct/datacounter/")) { exec("mkdir /var/log/radacct/datacounter && mkdir /var/log/radacct/datacounter/daily && mkdir /var/log/radacct/datacounter/weekly && mkdir /var/log/radacct/datacounter/monthly && mkdir /var/log/radacct/datacounter/forever"); }
 	if (!file_exists("/var/log/radacct/timecounter/")) { exec("mkdir /var/log/radacct/timecounter");	}
 	
-	exec("mkdir /usr/local/etc/raddb/scripts");
+	exec("mkdir " . RADDB . "/scripts");
 	if (!file_exists("/var/log/radutmp")) { exec("touch /var/log/radutmp");	}
 	if (!file_exists("/var/log/radwtmp")) {	exec("touch /var/log/radwtmp");	}
-	exec("chown -R root:wheel /usr/local/etc/raddb && chown -R root:wheel /usr/local/lib/freeradius-2.1.12 && chown -R root:wheel /var/log/radacct");
+	exec("chown -R root:wheel " . RADDB . " && chown -R root:wheel /usr/local/lib/freeradius-2.1.12 && chown -R root:wheel /var/log/radacct");
 
 	// creating a backup file of the original policy.conf no matter if user checked this or not
-	if (!file_exists("/usr/local/etc/raddb/policy.conf.backup")) {
-		log_error("FreeRADIUS: Creating backup of the original file to /usr/local/etc/raddb/policy.conf.backup");
-		copy("/usr/local/etc/raddb/policy.conf", "/usr/local/etc/raddb/policy.conf.backup");
+	if (!file_exists(RADDB . "/policy.conf.backup")) {
+		log_error("FreeRADIUS: Creating backup of the original file to " . RADDB . "/policy.conf.backup");
+		copy(RADDB . "/policy.conf", RADDB . "/policy.conf.backup");
 	}
 
 	// creating a backup file of the original /modules/files no matter if user checked this or not
-	if (!file_exists("/usr/local/etc/raddb/files.backup")) {
-		log_error("FreeRADIUS: Creating backup of the original file to /usr/local/etc/raddb/files.backup");
-		copy("/usr/local/etc/raddb/modules/files", "/usr/local/etc/raddb/files.backup");
+	if (!file_exists(RADDB . "/files.backup")) {
+		log_error("FreeRADIUS: Creating backup of the original file to " . RADDB . "/files.backup");
+		copy(RADDB . "/modules/files", RADDB . "/files.backup");
 	}
 
 	// Disable virtual-server we do not need by default
-	if (file_exists("/usr/local/etc/raddb/sites-enabled/control-socket")) { unlink("/usr/local/etc/raddb/sites-enabled/control-socket"); }
-	if (file_exists("/usr/local/etc/raddb/sites-enabled/inner-tunnel")) { unlink("/usr/local/etc/raddb/sites-enabled/inner-tunnel"); }
+	if (file_exists(RADDB . "/sites-enabled/control-socket")) { unlink(RADDB . "/sites-enabled/control-socket"); }
+	if (file_exists(RADDB . "/sites-enabled/inner-tunnel")) { unlink(RADDB . "/sites-enabled/inner-tunnel"); }
 
 	// We need some additional files in /usr/local/lib for the LDAP module. We fetch these files dependent on the architecture.
 	if (!file_exists("/usr/local/lib/libasn1.so.10") || !file_exists("/usr/local/lib/libgssapi.so.10") || !file_exists("/usr/local/lib/libheimntlm.so.10") || !file_exists("/usr/local/lib/libhx509.so.10") || !file_exists("/usr/local/lib/ldd/libkrb5.so.10") || !file_exists("/usr/local/lib/libroken.so.10")) {
@@ -257,7 +257,7 @@ extended_expressions = $varsettingsextendedexpressions
 EOD;
 
 // Deletes virtual-server coa by default. Will be re-enabled if there is an interface-type "coa"
-exec("rm -f /usr/local/etc/raddb/sites-enabled/coa");
+exec("rm -f " . RADDB . "/sites-enabled/coa");
 
 $arrinterfaces = $config['installedpackages']['freeradiusinterfaces']['config'];
 	if (is_array($arrinterfaces)  && !empty($arrinterfaces)) {
@@ -284,7 +284,7 @@ EOD;
 			// Begin "if" for interface-type = coa
 			if ($item['varinterfacetype'] == 'coa') {
 			// Enables virtual-server coa because interface-type is coa
-			exec("ln -s /usr/local/etc/raddb/sites-available/coa /usr/local/etc/raddb/sites-enabled/");
+			exec("ln -s " . RADDB . "/sites-available/coa " . RADDB . "/sites-enabled/");
 			$conf .= <<<EOD
 listen {
 		type = $varinterfacetype
@@ -553,7 +553,7 @@ if (is_array($arrusers) && !empty($arrusers)) {
 	if ($varusersmaxtotaloctets != '') {
 		if ($varusersreplyitem != '') { $varusersreplyitem .=","; }
 		//create exec script
-		$varusersreplyitem .= "\n\tExec-Program-Wait = " . '"/bin/sh /usr/local/etc/raddb/scripts/datacounter_auth.sh ' . "$varusersusername $varusersmaxtotaloctetstimerange" . '"';
+		$varusersreplyitem .= "\n\tExec-Program-Wait = " . '"/bin/sh ' . RADDB . '/scripts/datacounter_auth.sh ' . "$varusersusername $varusersmaxtotaloctetstimerange" . '"';
 		// create limit file - will be always overwritten so we can increase limit from GUI
 		exec("`echo $varusersmaxtotaloctets > /var/log/radacct/datacounter/$varusersmaxtotaloctetstimerange/max-octets-$varusersusername`");
 		// if used-octets file exist we do NOT overwrite this file!!!
@@ -734,7 +734,7 @@ if (is_array($arrmacs) && !empty($arrmacs)) {
 	if ($varmacsmaxtotaloctets != '') {
 		if ($varmacsreplyitem != '') { $varmacsreplyitem .=","; }
 		//create exec script
-		$varmacsreplyitem .= "\n\tExec-Program-Wait = " . '"/bin/sh /usr/local/etc/raddb/scripts/datacounter_auth.sh ' . "$varmacsaddress $varmacsmaxtotaloctetstimerange" . '"';
+		$varmacsreplyitem .= "\n\tExec-Program-Wait = " . '"/bin/sh ' . RADDB . '/scripts/datacounter_auth.sh ' . "$varmacsaddress $varmacsmaxtotaloctetstimerange" . '"';
 		// create limit file - will be always overwritten so we can increase limit from GUI
 		exec("`echo $varmacsmaxtotaloctets > /var/log/radacct/datacounter/$varmacsmaxtotaloctetstimerange/max-octets-$varmacsaddress`");
 		// if used-octets file exist we do NOT overwrite this file!!!
@@ -901,12 +901,12 @@ function freeradius_eapconf_resync() {
 	// This is for enable/disbable MS SoH in EAP-PEAP and the virtuial-server "soh-server"
 	if ($eapconf['vareapconfpeapsohenable'] == 'Enable') {
 		$vareapconfpeapsoh = 'soh = yes' . "\n\t\t\tsoh_virtual_server = " . '"' . "soh-server" . '"';
-		exec("ln -s /usr/local/etc/raddb/sites-available/soh /usr/local/etc/raddb/sites-enabled/");
+		exec("ln -s " . RADDB . "/sites-available/soh " . RADDB . "/sites-enabled/");
 	}
 	else {
 		$vareapconfpeapsoh = '### MS SoH Server is disabled ###';
-			if (file_exists("/usr/local/etc/raddb/sites-enabled/soh")) {
-			exec("rm -f /usr/local/etc/raddb/sites-enabled/soh");
+			if (file_exists(RADDB . "/sites-enabled/soh")) {
+			exec("rm -f " . RADDB . "/sites-enabled/soh");
 			}
 	}
 		
@@ -967,7 +967,7 @@ if ($eapconf['vareapconfchoosecertmanager'] == 'on') {
 					$conf['ssl_client_cert'] = RADDB . "/certs/client_cert.pem";
 				}
 			
-			exec("openssl pkcs12 -export -in /usr/local/etc/raddb/certs/client_cert.pem -inkey /usr/local/etc/raddb/certs/client_key.pem -out /usr/local/etc/raddb/certs/client_cert.p12 -passout pass\:");	
+			exec("openssl pkcs12 -export -in " . RADDB . "/certs/client_cert.pem -inkey " . RADDB . "/certs/client_key.pem -out " . RADDB . "/certs/client_cert.p12 -passout pass\:");	
 			}
 			
 			$conf['ssl_cert_dir'] = RADDB . '/certs';
@@ -979,11 +979,11 @@ if ($eapconf['vareapconfchoosecertmanager'] == 'on') {
 	
 	// generate new DH and RANDOM file
 	// We create a single empty file just to check if there is really a change from one to another cert manager to avoid building ne DH and random files
-	if (!file_exists("/usr/local/etc/raddb/certs/pfsense_cert_mgr")) {
-		log_error("freeRADIUS: Switched to pfSense Cert-Manager. Creating new DH and random file in /usr/local/etc/raddb/certs");
-		exec("cd /usr/local/etc/raddb/certs && openssl dhparam -out dh 1024");
-		exec("cd /usr/local/etc/raddb/certs && dd if=/dev/urandom of=./random count=10");
-		exec("touch /usr/local/etc/raddb/certs/pfsense_cert_mgr");
+	if (!file_exists(RADDB . "/certs/pfsense_cert_mgr")) {
+		log_error("freeRADIUS: Switched to pfSense Cert-Manager. Creating new DH and random file in " . RADDB . "/certs");
+		exec("cd " . RADDB . "/certs && openssl dhparam -out dh 1024");
+		exec("cd " . RADDB . "/certs && dd if=/dev/urandom of=./random count=10");
+		exec("touch " . RADDB . "/certs/pfsense_cert_mgr");
 	}
 }
 
@@ -2378,12 +2378,12 @@ if ($eapconf['vareapconfchoosecertmanager'] == '') {
 		if ($arrcerts['varcertscreateclient'] == 'yes') {
 		
 		// delete all old certificates and keys
-		log_error("freeRADIUS: deleting all client.csr .crt .key .pem .tar in /usr/local/etc/raddb/certs");
-		exec("rm -f /usr/local/etc/raddb/certs/client.csr");
-		exec("rm -f /usr/local/etc/raddb/certs/client.crt");
-		exec("rm -f /usr/local/etc/raddb/certs/client.key");
-		exec("rm -f /usr/local/etc/raddb/certs/client.pem");
-		exec("rm -f /usr/local/etc/raddb/certs/client.tar");
+		log_error("freeRADIUS: deleting all client.csr .crt .key .pem .tar in " . RADDB . "/certs");
+		exec("rm -f " . RADDB . "/certs/client.csr");
+		exec("rm -f " . RADDB . "/certs/client.crt");
+		exec("rm -f " . RADDB . "/certs/client.key");
+		exec("rm -f " . RADDB . "/certs/client.pem");
+		exec("rm -f " . RADDB . "/certs/client.tar");
 				
 			
 		// run fuction to create ONLY new client.cnf files based on user input from freeradiuscert.xml
@@ -2391,21 +2391,21 @@ if ($eapconf['vareapconfchoosecertmanager'] == '') {
 	
 	
 		// make bootstrap executable and run to create cert based on client.cnf files
-		exec("chmod 0770 /usr/local/etc/raddb/certs/bootstrap");
-		exec("/usr/local/etc/raddb/certs/bootstrap");
+		exec("chmod 0770 " . RADDB . "/certs/bootstrap");
+		exec(RADDB . "/certs/bootstrap");
 			
 		// rename client generated XX.pem to client.pem // use regex to replace spaces and so on.
-		$varserial = preg_replace("/\s/","",file_get_contents('/usr/local/etc/raddb/certs/serial.old'));
-		if (file_exists("/usr/local/etc/raddb/certs/$varserial.pem"))
-		rename("/usr/local/etc/raddb/certs/$varserial.pem","/usr/local/etc/raddb/certs/client.pem");
+		$varserial = preg_replace("/\s/","",file_get_contents(RADDB . '/certs/serial.old'));
+		if (file_exists(RADDB . "/certs/$varserial.pem"))
+		rename(RADDB . "/certs/$varserial.pem",RADDB . "/certs/client.pem");
 		
 		
 		// tar client-cert files
-		exec("cd /usr/local/etc/raddb/certs && tar -cf client.tar client.crt client.csr client.key ca.der client.pem");
+		exec("cd " . RADDB . "/certs && tar -cf client.tar client.crt client.csr client.key ca.der client.pem");
 		
 		// Make all files in certs folder read/write only for root
-		exec("chmod -R 0600 /usr/local/etc/raddb/certs/");
-		log_error("freeRADIUS: Created new client.csr .crt .key .pem and added them together with ca.der in /usr/local/etc/raddb/certs/client.tar");
+		exec("chmod -R 0600 " . RADDB . "/certs/");
+		log_error("freeRADIUS: Created new client.csr .crt .key .pem and added them together with ca.der in " . RADDB . "/certs/client.tar");
 		}
 	}
 	else {
@@ -2413,18 +2413,18 @@ if ($eapconf['vareapconfchoosecertmanager'] == '') {
 		if ($arrcerts['varcertsdeleteall'] == 'yes') {
 	
 		// delete all old certificates and keys - deletes certs from pfsense cert-manager IN THIS FOLDER, too.
-		log_error("freeRADIUS: deleting all CA, Server and Client certs, DH, random and database files in /usr/local/etc/raddb/certs");
-		exec("rm -f /usr/local/etc/raddb/certs/ca.pem && rm -f /usr/local/etc/raddb/certs/server.pem && rm -f /usr/local/etc/raddb/certs/client.pem");
-		exec("rm -f /usr/local/etc/raddb/certs/ca.der && rm -f /usr/local/etc/raddb/certs/server.der && rm -f /usr/local/etc/raddb/certs/client.der");
-		exec("rm -f /usr/local/etc/raddb/certs/ca.csr && rm -f /usr/local/etc/raddb/certs/server.csr && rm -f /usr/local/etc/raddb/certs/client.csr");
-		exec("rm -f /usr/local/etc/raddb/certs/ca.crt && rm -f /usr/local/etc/raddb/certs/server.crt && rm -f /usr/local/etc/raddb/certs/client.crt");
-		exec("rm -f /usr/local/etc/raddb/certs/ca.key && rm -f /usr/local/etc/raddb/certs/server.key && rm -f /usr/local/etc/raddb/certs/client.key");
-		exec("rm -f /usr/local/etc/raddb/certs/ca.p12 && rm -f /usr/local/etc/raddb/certs/server.p12 && rm -f /usr/local/etc/raddb/certs/client.p12");
-		exec("rm -f /usr/local/etc/raddb/certs/serial*");
-		exec("rm -f /usr/local/etc/raddb/certs/index*");
-		exec("rm -f /usr/local/etc/raddb/certs/dh");
-		exec("rm -f /usr/local/etc/raddb/certs/random");
-		exec("rm -f /usr/local/etc/raddb/certs/client.tar");
+		log_error("freeRADIUS: deleting all CA, Server and Client certs, DH, random and database files in " . RADDB . "/certs");
+		exec("rm -f " . RADDB . "/certs/ca.pem && rm -f " . RADDB . "/certs/server.pem && rm -f " . RADDB . "/certs/client.pem");
+		exec("rm -f " . RADDB . "/certs/ca.der && rm -f " . RADDB . "/certs/server.der && rm -f " . RADDB . "/certs/client.der");
+		exec("rm -f " . RADDB . "/certs/ca.csr && rm -f " . RADDB . "/certs/server.csr && rm -f " . RADDB . "/certs/client.csr");
+		exec("rm -f " . RADDB . "/certs/ca.crt && rm -f " . RADDB . "/certs/server.crt && rm -f " . RADDB . "/certs/client.crt");
+		exec("rm -f " . RADDB . "/certs/ca.key && rm -f " . RADDB . "/certs/server.key && rm -f " . RADDB . "/certs/client.key");
+		exec("rm -f " . RADDB . "/certs/ca.p12 && rm -f " . RADDB . "/certs/server.p12 && rm -f " . RADDB . "/certs/client.p12");
+		exec("rm -f " . RADDB . "/certs/serial*");
+		exec("rm -f " . RADDB . "/certs/index*");
+		exec("rm -f " . RADDB . "/certs/dh");
+		exec("rm -f " . RADDB . "/certs/random");
+		exec("rm -f " . RADDB . "/certs/client.tar");
 		
 	
 		// run fuctions to create new .cnf files based on user input from freeradiuscert.xml
@@ -2433,28 +2433,28 @@ if ($eapconf['vareapconfchoosecertmanager'] == '') {
 		freeradius_clientcertcnf_resync();
 		
 		// this command deletes the pfsense_cert_mgr checkfile so when we change back to pfsense cert manager a new DH + random file will be created
-		if (file_exists("/usr/local/etc/raddb/certs/pfsense_cert_mgr")) {
-			unlink("/usr/local/etc/raddb/certs/pfsense_cert_mgr");
+		if (file_exists(RADDB . "/certs/pfsense_cert_mgr")) {
+			unlink(RADDB . "/certs/pfsense_cert_mgr");
 		}
 		
 		// generate new DH and RANDOM file
-		log_error("freeRADIUS: Creating new DH and random file in /usr/local/etc/raddb/certs");
-		exec("cd /usr/local/etc/raddb/certs && openssl dhparam -out dh 1024");
-		exec("cd /usr/local/etc/raddb/certs && dd if=/dev/urandom of=./random count=10");
+		log_error("freeRADIUS: Creating new DH and random file in " . RADDB . "/certs");
+		exec("cd " . RADDB . "/certs && openssl dhparam -out dh 1024");
+		exec("cd " . RADDB . "/certs && dd if=/dev/urandom of=./random count=10");
 		
-		log_error("freeRADIUS: Creating new CA, Server and Client certs in /usr/local/etc/raddb/certs");
+		log_error("freeRADIUS: Creating new CA, Server and Client certs in " . RADDB . "/certs");
 		// make bootstrap executable and run to create certs based on .cnf files
-		exec("chmod 0770 /usr/local/etc/raddb/certs/bootstrap");
-		exec("/usr/local/etc/raddb/certs/bootstrap");
+		exec("chmod 0770 " . RADDB . "/certs/bootstrap");
+		exec(RADDB . "/certs/bootstrap");
 		
 		// rename client generated 02.pem to client.pem
-		if (file_exists("/usr/local/etc/raddb/certs/02.pem"))
-		rename("/usr/local/etc/raddb/certs/02.pem","/usr/local/etc/raddb/certs/client.pem");
+		if (file_exists(RADDB . "/certs/02.pem"))
+		rename(RADDB . "/certs/02.pem",RADDB . "/certs/client.pem");
 		
 		// tar client-cert files
-		exec("cd /usr/local/etc/raddb/certs && tar -cf client.tar client.crt client.csr client.key ca.der client.pem");
-		exec("chmod -R 0600 /usr/local/etc/raddb/certs/");
-		log_error("freeRADIUS: Added client.csr .crt .key .pem together with ca.der in /usr/local/etc/raddb/certs/client.tar");
+		exec("cd " . RADDB . "/certs && tar -cf client.tar client.crt client.csr client.key ca.der client.pem");
+		exec("chmod -R 0600 " . RADDB . "/certs/");
+		log_error("freeRADIUS: Added client.csr .crt .key .pem together with ca.der in " . RADDB . "/certs/client.tar");
 		
 		// If there were changes on the certificates we need to restart freeradius
 		restart_service('radiusd');
@@ -3113,7 +3113,7 @@ else {
 	$varmodulesldap2keepaliveidle = ($arrmodulesldap['varmodulesldap2keepaliveidle']?$arrmodulesldap['varmodulesldap2keepaliveidle']:'60');
 	$varmodulesldap2keepaliveprobes = ($arrmodulesldap['varmodulesldap2keepaliveprobes']?$arrmodulesldap['varmodulesldap2keepaliveprobes']:'3');
 	$varmodulesldap2keepaliveinterval = ($arrmodulesldap['varmodulesldap2keepaliveinterval']?$arrmodulesldap['varmodulesldap2keepaliveinterval']:'3');
-	
+$raddb = RADDB;
 $conf .= <<<EOD
 # -*- text -*-
 #
@@ -3193,11 +3193,11 @@ ldap {
 		# using ldaps (port 689) connections
 		start_tls = $varmodulesldapstarttls
 
-		cacertfile = /usr/local/etc/raddb/certs/ca_ldap1_cert.pem
-		cacertdir = /usr/local/etc/raddb/certs/
-		certfile = /usr/local/etc/raddb/certs/radius_ldap1_cert.crt
-		keyfile = /usr/local/etc/raddb/certs/radius_ldap1_cert.key
-		randfile = /usr/local/etc/raddb/certs/random
+		cacertfile = {$raddb}/certs/ca_ldap1_cert.pem
+		cacertdir = {$raddb}/certs/
+		certfile = {$raddb}/certs/radius_ldap1_cert.crt
+		keyfile = {$raddb}/certs/radius_ldap1_cert.key
+		randfile = {$raddb}/certs/random
 
 		#  Certificate Verification requirements.  Can be:
 		#    "never" (don't even bother trying)
@@ -3352,11 +3352,11 @@ ldap ldap2{
 		# using ldaps (port 689) connections
 		start_tls = $varmodulesldap2starttls
 
-		cacertfile = /usr/local/etc/raddb/certs/ca_ldap2_cert.pem
-		cacertdir = /usr/local/etc/raddb/certs/
-		certfile = /usr/local/etc/raddb/certs/radius_ldap2_cert.crt
-		keyfile = /usr/local/etc/raddb/certs/radius_ldap2_cert.key
-		randfile = /usr/local/etc/raddb/certs/random
+		cacertfile = {$raddb}/certs/ca_ldap2_cert.pem
+		cacertdir = {$raddb}/certs/
+		certfile = {$raddb}/certs/radius_ldap2_cert.crt
+		keyfile = {$raddb}/certs/radius_ldap2_cert.key
+		randfile = {$raddb}/certs/random
 
 		#  Certificate Verification requirements.  Can be:
 		#    "never" (don't even bother trying)
@@ -3483,29 +3483,29 @@ function freeradius_plainmacauth_resync() {
 	$varsettings = $config['installedpackages']['freeradiussettings']['config'][0];
 	
 	// defining variables with filename path
-	$filepolicyconf = '/usr/local/etc/raddb/policy.conf';
-	$filepolicyconfbackup = '/usr/local/etc/raddb/policy.conf.backup';
-	$filemodulesfiles = '/usr/local/etc/raddb/modules/files';
-	$filemodulesfilesbackup = '/usr/local/etc/raddb/files.backup';
+	$filepolicyconf = RADDB . '/policy.conf';
+	$filepolicyconfbackup = RADDB . '/policy.conf.backup';
+	$filemodulesfiles = RADDB . '/modules/files';
+	$filemodulesfilesbackup = RADDB . '/files.backup';
 	
 	// If unchecked then plain mac auth is disabled and backups of the original files will be restored
 	if ($varsettings['varsettingsenablemacauth'] == '') {
 		// This is a check - only restore files if they aren't already
-		if (file_exists("/usr/local/etc/raddb/plain_macauth_enabled")) {
+		if (file_exists(RADDB . "/plain_macauth_enabled")) {
 			log_error("FreeRADIUS: Plain-MAC-Auth disabled. Restoring the original file from {$filepolicyconfbackup} and {$filemodulesfilesbackup}");
 			copy($filepolicyconfbackup, $filepolicyconf);
 			copy($filemodulesfilesbackup, $filemodulesfiles);
-			unlink("/usr/local/etc/raddb/plain_macauth_enabled");
+			unlink(RADDB . "/plain_macauth_enabled");
 			freeradius_serverdefault_resync();
 		}
 	}
 	// If checked then plain mac auth is enabled
 	else {
 		// This is a check - only modify files if they aren't already
-		if (!file_exists("/usr/local/etc/raddb/plain_macauth_enabled")) {
+		if (!file_exists(RADDB . "/plain_macauth_enabled")) {
 			freeradius_modulesfiles_resync();
 			freeradius_policyconf_resync();
-			exec("cd /usr/local/etc/raddb/ && touch /usr/local/etc/raddb/plain_macauth_enabled");
+			exec("cd " . RADDB . " && touch " . RADDB . "/plain_macauth_enabled");
 			log_error("FreeRADIUS: Plain-MAC-Auth enabled. Modified {$filepolicyconf} and {$filemodulesfiles}");
 			freeradius_serverdefault_resync();
 		}
@@ -3816,8 +3816,8 @@ function freeradius_motp_resync() {
 	
 	// check if disabled then we delete bash und otpverify.sh script
 	if ($varsettings['varsettingsmotpenable'] == '') {
-		if (file_exists("/usr/local/etc/raddb/scripts/otpverify.sh")) {
-			unlink("/usr/local/etc/raddb/scripts/otpverify.sh");
+		if (file_exists(RADDB . "/scripts/otpverify.sh")) {
+			unlink(RADDB . "/scripts/otpverify.sh");
 		}
 		if (exec("cd /var/db/pkg && ls | grep bash") == "bash-4.1.7") {
 			exec("cd /var/db/pkg && pkg_delete `ls | grep bash`");
@@ -3968,7 +3968,7 @@ function freeradius_modulesmotp_resync() {
 	$conf .= <<<EOD
 exec motp {
 		wait = yes
-		program = "/usr/local/bin/bash /usr/local/etc/raddb/scripts/otpverify.sh %{request:User-Name} %{request:User-Password} %{reply:MOTP-Init-Secret} %{reply:MOTP-PIN} %{reply:MOTP-Offset}"
+		program = "/usr/local/bin/bash " . RADDB . "/scripts/otpverify.sh %{request:User-Name} %{request:User-Password} %{reply:MOTP-Init-Secret} %{reply:MOTP-PIN} %{reply:MOTP-Offset}"
 	}	
 EOD;
 
@@ -3987,19 +3987,19 @@ function freeradius_modulesdatacounter_resync() {
 	$conf .= <<<EOD
 exec datacounterdaily {
 		wait = yes
-		program = "/bin/sh /usr/local/etc/raddb/scripts/datacounter_acct.sh %{request:User-Name} daily %{request:Acct-Input-Octets} %{request:Acct-Output-Octets}"
+		program = "/bin/sh " . RADDB . "/scripts/datacounter_acct.sh %{request:User-Name} daily %{request:Acct-Input-Octets} %{request:Acct-Output-Octets}"
 	}
 exec datacounterweekly {
 		wait = yes
-		program = "/bin/sh /usr/local/etc/raddb/scripts/datacounter_acct.sh %{request:User-Name} weekly %{request:Acct-Input-Octets} %{request:Acct-Output-Octets}"
+		program = "/bin/sh " . RADDB . "/scripts/datacounter_acct.sh %{request:User-Name} weekly %{request:Acct-Input-Octets} %{request:Acct-Output-Octets}"
 	}
 exec datacountermonthly {
 		wait = yes
-		program = "/bin/sh /usr/local/etc/raddb/scripts/datacounter_acct.sh %{request:User-Name} monthly %{request:Acct-Input-Octets} %{request:Acct-Output-Octets}"
+		program = "/bin/sh " . RADDB . "/scripts/datacounter_acct.sh %{request:User-Name} monthly %{request:Acct-Input-Octets} %{request:Acct-Output-Octets}"
 	}
 exec datacounterforever {
 		wait = yes
-		program = "/bin/sh /usr/local/etc/raddb/scripts/datacounter_acct.sh %{request:User-Name} forever %{request:Acct-Input-Octets} %{request:Acct-Output-Octets}"
+		program = "/bin/sh " . RADDB . "/scripts/datacounter_acct.sh %{request:User-Name} forever %{request:Acct-Input-Octets} %{request:Acct-Output-Octets}"
 	}	
 EOD;
 
