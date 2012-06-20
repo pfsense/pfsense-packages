@@ -31,19 +31,35 @@
 */
 
 require("guiconfig.inc");
+
+// Check to find out on which system the package is running
+if (exec("uname -r | cut -c 1-3") == '8.3') {
+	if (exec("uname -m") == "i386") {
+		define('RADDB', '/usr/pbi/freeradius-i386/etc/raddb');
+	}
+	else {
+		define('RADDB', '/usr/pbi/freeradius-amd64/etc/raddb');
+	}
+}
+else {
+	define('RADDB', '/usr/local/etc/raddb');
+}
+// End of system check
+
+
 function get_file($file){
-	$files['radiusd']="/usr/local/etc/raddb/radiusd.conf";
-	$files['eap']="/usr/local/etc/raddb/eap.conf";
-	$files['sql']="/usr/local/etc/raddb/sql.conf";
-	$files['clients']="/usr/local/etc/raddb/clients.conf";
-	$files['users']="/usr/local/etc/raddb/users";
-	$files['macs']="/usr/local/etc/raddb/authorized_macs";
-	$files['virtual-server-default']="/usr/local/etc/raddb/sites-enabled/default";
-	$files['ca']="/usr/local/etc/raddb/certs/ca.cnf";
-	$files['server']="/usr/local/etc/raddb/certs/server.cnf";
-	$files['client']="/usr/local/etc/raddb/certs/client.cnf";
-	$files['index']="/usr/local/etc/raddb/certs/index.txt";
-	$files['ldap']="/usr/local/etc/raddb/modules/ldap";
+	$files['radiusd']=RADDB . "/radiusd.conf";
+	$files['eap']=RADDB . "/eap.conf";
+	$files['sql']=RADDB . "/sql.conf";
+	$files['clients']=RADDB . "/clients.conf";
+	$files['users']=RADDB . "/users";
+	$files['macs']=RADDB . "/authorized_macs";
+	$files['virtual-server-default']=RADDB . "/sites-enabled/default";
+	$files['ca']=RADDB . "/certs/ca.cnf";
+	$files['server']=RADDB . "/certs/server.cnf";
+	$files['client']=RADDB . "/certs/client.cnf";
+	$files['index']=RADDB . "/certs/index.txt";
+	$files['ldap']=RADDB . "/modules/ldap";
 
 
 	if ($files[$file]!="" && file_exists($files[$file])){
