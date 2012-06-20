@@ -82,6 +82,7 @@ function freeradius_install_command() {
 	if (file_exists(RADDB . "/sites-enabled/control-socket")) { unlink(RADDB . "/sites-enabled/control-socket"); }
 	if (file_exists(RADDB . "/sites-enabled/inner-tunnel")) { unlink(RADDB . "/sites-enabled/inner-tunnel"); }
 
+/* freeradius2: additionald downloaded files temp disabled to check if we need them with the ne built packages
 	// We need some additional files in /usr/local/lib for the LDAP module. We fetch these files dependent on the architecture.
 	if (!file_exists("/usr/local/lib/libasn1.so.10") || !file_exists("/usr/local/lib/libgssapi.so.10") || !file_exists("/usr/local/lib/libheimntlm.so.10") || !file_exists("/usr/local/lib/libhx509.so.10") || !file_exists("/usr/local/lib/ldd/libkrb5.so.10") || !file_exists("/usr/local/lib/libroken.so.10")) {
 		// For i386 systems
@@ -115,6 +116,7 @@ function freeradius_install_command() {
 			exec("chmod 0755 /usr/local/lib/libroken.so.10");
 		}
 	}
+*/
 	// We run this here just to suppress some warnings on syslog if file doesn't exist
 	freeradius_authorizedmacs_resync();
 
