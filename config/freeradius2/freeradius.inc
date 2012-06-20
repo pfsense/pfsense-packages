@@ -45,7 +45,24 @@ require_once("globals.inc");
 require_once("filter.inc");
 require_once("services.inc");
 
-define('RADDB', '/usr/local/etc/raddb');
+// Check to find out on which system the package is running
+if (exec("uname -r | cut -c 1-3") == '8.3') {
+	if (exec("uname -m") == "i386") {
+		define('RADDB', '/usr/pbi/freeradius-i386/etc/raddb');
+		define('USRLOCAL', '/usr/pbi/freeradius-i386');
+	}
+	else {
+		define('RADDB', '/usr/pbi/freeradius-amd64/etc/raddb');
+		define('USRLOCAL', '/usr/pbi/freeradius-amd64');
+	}
+}
+else {
+	define('RADDB', '/usr/local/etc/raddb');
+}
+// End of system check
+
+
+// define('RADDB', '/usr/local/etc/raddb');
 
 function freeradius_deinstall_command() {
 	exec("cd /var/db/pkg && pkg_delete `ls | grep freeradius`");
@@ -64,7 +81,7 @@ function freeradius_install_command() {
 	exec("mkdir " . RADDB . "/scripts");
 	if (!file_exists("/var/log/radutmp")) { exec("touch /var/log/radutmp");	}
 	if (!file_exists("/var/log/radwtmp")) {	exec("touch /var/log/radwtmp");	}
-	exec("chown -R root:wheel " . RADDB . " && chown -R root:wheel /usr/local/lib/freeradius-2.1.12 && chown -R root:wheel /var/log/radacct");
+	exec("chown -R root:wheel " . RADDB . " && chown -R root:wheel " . USRLOCAL . "/lib/freeradius-2.1.12 && chown -R root:wheel /var/log/radacct");
 
 	// creating a backup file of the original policy.conf no matter if user checked this or not
 	if (!file_exists(RADDB . "/policy.conf.backup")) {
@@ -141,8 +158,8 @@ function freeradius_install_command() {
 
 	$rcfile = array();
 	$rcfile['file'] = 'radiusd.sh';
-	$rcfile['start'] = '/usr/local/etc/rc.d/radiusd onestart';
-	$rcfile['stop'] = '/usr/local/etc/rc.d/radiusd onestop';
+	$rcfile['start'] = USRLOCAL . '/etc/rc.d/radiusd onestart';
+	$rcfile['stop'] = USRLOCAL . '/etc/rc.d/radiusd onestop';
 	write_rcfile($rcfile);
 		conf_mount_ro();
 	start_service("radiusd");
@@ -220,7 +237,7 @@ function freeradius_settings_resync() {
 
 
 	$conf .= <<<EOD
-prefix = /usr/local
+prefix = USRLOCAL
 exec_prefix = \${prefix}
 sysconfdir = \${prefix}/etc
 localstatedir = /var
@@ -2602,7 +2619,7 @@ function freeradius_all_after_XMLRPC_resync() {
 	
 	log_error("FreeRADIUS: Finished XMLRPC process. It should be OK. For more information look at the host which started sync.");
 	
-	exec("/usr/local/etc/rc.d/radiusd onerestart");
+	exec(USRLOCAL . "/etc/rc.d/radiusd onerestart");
 }
 
 function freeradius_modulescounter_resync() {
