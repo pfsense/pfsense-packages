@@ -99,41 +99,6 @@ function freeradius_install_command() {
 	if (file_exists(RADDB . "/sites-enabled/control-socket")) { unlink(RADDB . "/sites-enabled/control-socket"); }
 	if (file_exists(RADDB . "/sites-enabled/inner-tunnel")) { unlink(RADDB . "/sites-enabled/inner-tunnel"); }
 
-/* freeradius2: additionald downloaded files temp disabled to check if we need them with the ne built packages
-	// We need some additional files in /usr/local/lib for the LDAP module. We fetch these files dependent on the architecture.
-	if (!file_exists("/usr/local/lib/libasn1.so.10") || !file_exists("/usr/local/lib/libgssapi.so.10") || !file_exists("/usr/local/lib/libheimntlm.so.10") || !file_exists("/usr/local/lib/libhx509.so.10") || !file_exists("/usr/local/lib/ldd/libkrb5.so.10") || !file_exists("/usr/local/lib/libroken.so.10")) {
-		// For i386 systems
-		if (exec("uname -m") == "i386") {
-			exec("cd /usr/local/lib/ && fetch http://e-sac.siteseguro.ws/pfsense/8/All/ldd/libasn1.so.10");
-			exec("cd /usr/local/lib/ && fetch http://e-sac.siteseguro.ws/pfsense/8/All/ldd/libgssapi.so.10");
-			exec("cd /usr/local/lib/ && fetch http://e-sac.siteseguro.ws/pfsense/8/All/ldd/libheimntlm.so.10");
-			exec("cd /usr/local/lib/ && fetch http://e-sac.siteseguro.ws/pfsense/8/All/ldd/libhx509.so.10");
-			exec("cd /usr/local/lib/ && fetch http://e-sac.siteseguro.ws/pfsense/8/All/ldd/libkrb5.so.10");
-			exec("cd /usr/local/lib/ && fetch http://e-sac.siteseguro.ws/pfsense/8/All/ldd/libroken.so.10");
-			exec("chmod 0755 /usr/local/lib/libasn1.so.10");
-			exec("chmod 0755 /usr/local/lib/libgssapi.so.10");
-			exec("chmod 0755 /usr/local/lib/libheimntlm.so.10");
-			exec("chmod 0755 /usr/local/lib/libhx509.so.10");
-			exec("chmod 0755 /usr/local/lib/ldd/libkrb5.so.10");
-			exec("chmod 0755 /usr/local/lib/libroken.so.10");
-		}
-		// For amd64 systems
-		else {
-			exec("cd /usr/local/lib/ && fetch http://e-sac.siteseguro.ws/pfsense/8/amd64/All/ldd/libasn1.so.10");
-			exec("cd /usr/local/lib/ && fetch http://e-sac.siteseguro.ws/pfsense/8/amd64/All/ldd/libgssapi.so.10");
-			exec("cd /usr/local/lib/ && fetch http://e-sac.siteseguro.ws/pfsense/8/amd64/All/ldd/libheimntlm.so.10");
-			exec("cd /usr/local/lib/ && fetch http://e-sac.siteseguro.ws/pfsense/8/amd64/All/ldd/libhx509.so.10");
-			exec("cd /usr/local/lib/ && fetch http://e-sac.siteseguro.ws/pfsense/8/amd64/All/ldd/libkrb5.so.10");
-			exec("cd /usr/local/lib/ && fetch http://e-sac.siteseguro.ws/pfsense/8/amd64/All/ldd/libroken.so.10");
-			exec("chmod 0755 /usr/local/lib/libasn1.so.10");
-			exec("chmod 0755 /usr/local/lib/libgssapi.so.10");
-			exec("chmod 0755 /usr/local/lib/libheimntlm.so.10");
-			exec("chmod 0755 /usr/local/lib/libhx509.so.10");
-			exec("chmod 0755 /usr/local/lib/ldd/libkrb5.so.10");
-			exec("chmod 0755 /usr/local/lib/libroken.so.10");
-		}
-	}
-*/
 	// We run this here just to suppress some warnings on syslog if file doesn't exist
 	freeradius_authorizedmacs_resync();
 
