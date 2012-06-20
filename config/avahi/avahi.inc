@@ -42,7 +42,7 @@ function avahi_install() {
 	conf_mount_rw();
 
 	if (php_uname("m") == "i386")
-		$archive = (substr(trim(file_get_contents("/etc/version")),0,1) == "2") ? "avahi8.tar.gz" : "avahi.tar.gz";
+		$archive = (substr(trim(file_get_contents("/etc/version")),0,1) == "2") ? "" : "avahi.tar.gz";
 
 	// Extract out libraries and avahi-daemon
 	if(!empty($archive) && file_exists("/root/{$archive}")) {
