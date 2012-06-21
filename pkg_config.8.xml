@@ -521,6 +521,7 @@
 		<build_options>WITHOUT_APACHE=true WITH_TRICKLE=true WITH_CLAMD=true WITH_ICAP=true WITH_NTLM=true WITH_SSL=true</build_options>
 		<!-- Fix me once a PBI is available! -->
 		<maximum_version>2.1</maximum_version>
+		<!-- NOTE: Distfile must be fetched manually from http://dansguardian.org/downloads/2/Alpha/dansguardian-2.12.0.0.tar.gz -->
 	</package>
 	<package>
 		<name>mailscanner-dev</name>
