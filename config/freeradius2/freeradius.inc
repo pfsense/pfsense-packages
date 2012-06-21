@@ -58,6 +58,7 @@ if (exec("uname -r | cut -c 1-3") == '8.3') {
 }
 else {
 	define('RADDB', '/usr/local/etc/raddb');
+	define('USRLOCAL', '/usr/local');
 }
 // End of system check
 
