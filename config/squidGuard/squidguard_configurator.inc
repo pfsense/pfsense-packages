@@ -1557,7 +1557,7 @@ function is_dest_url($url)
     $fmt  = "[a-zA-Z0-9_-]";
 
     if (empty($url)) return false;
-    if (preg_match("/^(($fmt){1,}\.){1,}($fmt){2,}(/(.[^\*][^ ])*)/i", $url)) return true;
+    if (preg_match("/^(($fmt){1,}\.){1,}($fmt){2,}(\/(.[^\*][^ ])*)/i", $url)) return true;
     return false;
 }
 # ------------------------------------------------------------------------------
