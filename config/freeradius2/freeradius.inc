@@ -45,7 +45,25 @@ require_once("globals.inc");
 require_once("filter.inc");
 require_once("services.inc");
 
-define('RADDB', '/usr/local/etc/raddb');
+// Check to find out on which system the package is running
+if (exec("uname -r | cut -c 1-3") == '8.3') {
+	if (exec("uname -m") == "i386") {
+		define('RADDB', '/usr/pbi/freeradius-i386/etc/raddb');
+		define('USRLOCAL', '/usr/pbi/freeradius-i386');
+	}
+	else {
+		define('RADDB', '/usr/pbi/freeradius-amd64/etc/raddb');
+		define('USRLOCAL', '/usr/pbi/freeradius-amd64');
+	}
+}
+else {
+	define('RADDB', '/usr/local/etc/raddb');
+	define('USRLOCAL', '/usr/local');
+}
+// End of system check
+
+
+// define('RADDB', '/usr/local/etc/raddb');
 
 function freeradius_deinstall_command() {
 	exec("cd /var/db/pkg && pkg_delete `ls | grep freeradius`");
@@ -64,7 +82,7 @@ function freeradius_install_command() {
 	exec("mkdir " . RADDB . "/scripts");
 	if (!file_exists("/var/log/radutmp")) { exec("touch /var/log/radutmp");	}
 	if (!file_exists("/var/log/radwtmp")) {	exec("touch /var/log/radwtmp");	}
-	exec("chown -R root:wheel " . RADDB . " && chown -R root:wheel /usr/local/lib/freeradius-2.1.12 && chown -R root:wheel /var/log/radacct");
+	exec("chown -R root:wheel " . RADDB . " && chown -R root:wheel " . USRLOCAL . "/lib/freeradius-2.1.12 && chown -R root:wheel /var/log/radacct");
 
 	// creating a backup file of the original policy.conf no matter if user checked this or not
 	if (!file_exists(RADDB . "/policy.conf.backup")) {
@@ -82,39 +100,6 @@ function freeradius_install_command() {
 	if (file_exists(RADDB . "/sites-enabled/control-socket")) { unlink(RADDB . "/sites-enabled/control-socket"); }
 	if (file_exists(RADDB . "/sites-enabled/inner-tunnel")) { unlink(RADDB . "/sites-enabled/inner-tunnel"); }
 
-	// We need some additional files in /usr/local/lib for the LDAP module. We fetch these files dependent on the architecture.
-	if (!file_exists("/usr/local/lib/libasn1.so.10") || !file_exists("/usr/local/lib/libgssapi.so.10") || !file_exists("/usr/local/lib/libheimntlm.so.10") || !file_exists("/usr/local/lib/libhx509.so.10") || !file_exists("/usr/local/lib/ldd/libkrb5.so.10") || !file_exists("/usr/local/lib/libroken.so.10")) {
-		// For i386 systems
-		if (exec("uname -m") == "i386") {
-			exec("cd /usr/local/lib/ && fetch http://e-sac.siteseguro.ws/pfsense/8/All/ldd/libasn1.so.10");
-			exec("cd /usr/local/lib/ && fetch http://e-sac.siteseguro.ws/pfsense/8/All/ldd/libgssapi.so.10");
-			exec("cd /usr/local/lib/ && fetch http://e-sac.siteseguro.ws/pfsense/8/All/ldd/libheimntlm.so.10");
-			exec("cd /usr/local/lib/ && fetch http://e-sac.siteseguro.ws/pfsense/8/All/ldd/libhx509.so.10");
-			exec("cd /usr/local/lib/ && fetch http://e-sac.siteseguro.ws/pfsense/8/All/ldd/libkrb5.so.10");
-			exec("cd /usr/local/lib/ && fetch http://e-sac.siteseguro.ws/pfsense/8/All/ldd/libroken.so.10");
-			exec("chmod 0755 /usr/local/lib/libasn1.so.10");
-			exec("chmod 0755 /usr/local/lib/libgssapi.so.10");
-			exec("chmod 0755 /usr/local/lib/libheimntlm.so.10");
-			exec("chmod 0755 /usr/local/lib/libhx509.so.10");
-			exec("chmod 0755 /usr/local/lib/ldd/libkrb5.so.10");
-			exec("chmod 0755 /usr/local/lib/libroken.so.10");
-		}
-		// For amd64 systems
-		else {
-			exec("cd /usr/local/lib/ && fetch http://e-sac.siteseguro.ws/pfsense/8/amd64/All/ldd/libasn1.so.10");
-			exec("cd /usr/local/lib/ && fetch http://e-sac.siteseguro.ws/pfsense/8/amd64/All/ldd/libgssapi.so.10");
-			exec("cd /usr/local/lib/ && fetch http://e-sac.siteseguro.ws/pfsense/8/amd64/All/ldd/libheimntlm.so.10");
-			exec("cd /usr/local/lib/ && fetch http://e-sac.siteseguro.ws/pfsense/8/amd64/All/ldd/libhx509.so.10");
-			exec("cd /usr/local/lib/ && fetch http://e-sac.siteseguro.ws/pfsense/8/amd64/All/ldd/libkrb5.so.10");
-			exec("cd /usr/local/lib/ && fetch http://e-sac.siteseguro.ws/pfsense/8/amd64/All/ldd/libroken.so.10");
-			exec("chmod 0755 /usr/local/lib/libasn1.so.10");
-			exec("chmod 0755 /usr/local/lib/libgssapi.so.10");
-			exec("chmod 0755 /usr/local/lib/libheimntlm.so.10");
-			exec("chmod 0755 /usr/local/lib/libhx509.so.10");
-			exec("chmod 0755 /usr/local/lib/ldd/libkrb5.so.10");
-			exec("chmod 0755 /usr/local/lib/libroken.so.10");
-		}
-	}
 	// We run this here just to suppress some warnings on syslog if file doesn't exist
 	freeradius_authorizedmacs_resync();
 
@@ -139,8 +124,8 @@ function freeradius_install_command() {
 
 	$rcfile = array();
 	$rcfile['file'] = 'radiusd.sh';
-	$rcfile['start'] = '/usr/local/etc/rc.d/radiusd onestart';
-	$rcfile['stop'] = '/usr/local/etc/rc.d/radiusd onestop';
+	$rcfile['start'] = USRLOCAL . '/etc/rc.d/radiusd onestart';
+	$rcfile['stop'] = USRLOCAL . '/etc/rc.d/radiusd onestop';
 	write_rcfile($rcfile);
 		conf_mount_ro();
 	start_service("radiusd");
@@ -218,7 +203,7 @@ function freeradius_settings_resync() {
 
 
 	$conf .= <<<EOD
-prefix = /usr/local
+prefix = USRLOCAL
 exec_prefix = \${prefix}
 sysconfdir = \${prefix}/etc
 localstatedir = /var
@@ -2600,7 +2585,7 @@ function freeradius_all_after_XMLRPC_resync() {
 	
 	log_error("FreeRADIUS: Finished XMLRPC process. It should be OK. For more information look at the host which started sync.");
 	
-	exec("/usr/local/etc/rc.d/radiusd onerestart");
+	exec(USRLOCAL . "/etc/rc.d/radiusd onerestart");
 }
 
 function freeradius_modulescounter_resync() {
