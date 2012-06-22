@@ -781,17 +781,7 @@
 		<build_port_path>/usr/ports/devel/pkg-config</build_port_path>
 		<depends_on_package>python27-2.7.2_3.tbz</depends_on_package>
 		<build_port_path>/usr/ports/lang/python27</build_port_path>
-		<depends_on_package_pbi>
-			open-vm-tools-425873_1-i386.pbi
-			icu-4.8.1.1_1-i386.pbi
-			fusefs-2.7.4-i386.pbi
-			libdnet-1.11_3-i386.pbi
-			libiconv-1.14-i386.pbi
-			pcre-8.30_2-i386.pbi
-			perl-5.12.4_4-i386.pbi
-			pkg-config-0.25_1-i386.pbi
-			python27-2.7.3_2-i386.pbi
-		</depends_on_package_pbi>
+		<depends_on_package_pbi>open-vm-tools-nox11-425873_1-i386.pbi</depends_on_package_pbi>
 	</package>
 	<package>
 		<name>Open-VM-Tools-8.8.1</name>
