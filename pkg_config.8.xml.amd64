@@ -18,12 +18,11 @@
 		<depends_on_package_base_url>http://e-sac.siteseguro.ws/packages/amd64/8/All/</depends_on_package_base_url>
 		<depends_on_package>asterisk18-1.8.8.1.tbz</depends_on_package>
 		<depends_on_package>openldap-sasl-client-2.4.26.tbz</depends_on_package>
+		<depends_on_package_pbi>asterisk-1.8.13.0-i386.pbi</depends_on_package_pbi>
 		<build_port_path>/usr/ports/net/asterisk</build_port_path>
 		<maintainer>marcellocoutinho@gmail.com robreg@zsurob.hu</maintainer>
 		<configurationfile>asterisk.xml</configurationfile>
 		<after_install_info>Please visit the Asterisk tab on status menu.</after_install_info>
-		<!-- Fix me once a PBI is available! -->
-		<maximum_version>2.1</maximum_version>
 	</package>
 	<package>
 		<name>Filer</name>
