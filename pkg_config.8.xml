@@ -144,16 +144,16 @@
 		<status>Release</status>
 		<required_version>2.0</required_version>
 		<config_file>http://www.pfsense.com/packages/config/haproxy/haproxy.xml</config_file>
+		<configurationfile>haproxy.xml</configurationfile>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
 		<depends_on_package>haproxy-1.4.21.tbz</depends_on_package>
 		<depends_on_package_pbi>haproxy-1.4.21-i386.pbi</depends_on_package_pbi>
-		<configurationfile>haproxy.xml</configurationfile>
 		<build_port_path>/usr/ports/net/haproxy</build_port_path>
 	</package>
 	<package>
 		<name>haproxy-full</name>
 		<pkginfolink>http://doc.pfsense.org/index.php/haproxy_package</pkginfolink>
-				<descr><![CDATA[The Reliable, High Performance TCP/HTTP Load Balancer<br>
+		<descr><![CDATA[The Reliable, High Performance TCP/HTTP Load Balancer<br>
 				This package implements both TCP and HTTP balance features from Haproxy.]]></descr>
 		<website>http://haproxy.1wt.eu/</website>
 		<category>Services</category>
@@ -161,10 +161,10 @@
 		<status>Release</status>
 		<required_version>2.0</required_version>
 		<config_file>http://www.pfsense.com/packages/config/haproxy-legacy/haproxy.xml</config_file>
+		<configurationfile>haproxy.xml</configurationfile>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
 		<depends_on_package>haproxy-1.4.21.tbz</depends_on_package>
 		<depends_on_package_pbi>haproxy-1.4.21-i386.pbi</depends_on_package_pbi>
-		<configurationfile>haproxy.xml</configurationfile>
 	</package>
 	<package>
 		<name>Proxy Server with mod_security</name>
@@ -485,10 +485,11 @@
 				It can do first and second line antispam combat before sending incoming mail to local mail servers.<br>
 				Postfix can also detect zombies, check RBLS, SPF, seach ldap for valid recipients and use third part antispam engines like policyd and mailscanner for better antispam solution.]]></descr>
 		<category>Services</category>
-		<config_file>http://www.pfsense.com/packages/config/postfix/postfix.xml</config_file>
 		<pkginfolink>http://forum.pfsense.org/index.php/topic,40622.0.html</pkginfolink>
+		<config_file>http://www.pfsense.com/packages/config/postfix/postfix.xml</config_file>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
 		<depends_on_package>postfix-2.8.7,1.tbz</depends_on_package>
+		<depends_on_package>perl-5.12.4_3.tbz</depends_on_package>
 		<depends_on_package_pbi>postfix-2.9.3-i386.pbi</depends_on_package_pbi>
 		<version>2.8.7,1 pkg v.2.3.4_1</version>
 		<status>RC1</status>
@@ -605,6 +606,7 @@
 		<depends_on_package_pbi>lightsquid-1.8_2-i386.pbi perl-5.12.4_4-i386.pbi</depends_on_package_pbi>
 		<build_port_path>/usr/ports/www/lightsquid</build_port_path>
 		<build_port_path>/usr/ports/lang/perl5.12</build_port_path>
+		<build_options>WITHOUT_DEBUGGING=true WITHOUT_GDBM=true WITHOUT_PERL_MALLOC=true WITH_PERL_64BITINT=true WITHOUT_THREADS=true WITHOUT_MULTIPLICITY=true WITHOUT_SUIDPERL=true WITHOUT_SITECUSTOMIZE=true WITH_USE_PERL=true</build_options>
 		<status>RC1</status>
 		<required_version>2.0</required_version>
 		<config_file>http://www.pfsense.com/packages/config/lightsquid/lightsquid.xml</config_file>
@@ -622,8 +624,8 @@
 		<pkginfolink>http://forum.pfsense.org/index.php/topic,47765.0.html</pkginfolink>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
 		<depends_on_package>sarg-2.3.2_2.tbz</depends_on_package>
-		<depends_on_package_pbi>sarg-2.3.2_5-i386.pbi</depends_on_package_pbi>
 		<depends_on_package>gd-2.0.35_7,1.tbz</depends_on_package>
+		<depends_on_package_pbi>sarg-2.3.2_5-i386.pbi</depends_on_package_pbi>
 		<version>2.3.2 pkg v.0.5</version>
 		<status>RC1</status>
 		<required_version>2.0</required_version>
@@ -664,9 +666,9 @@
 		<config_file>http://www.pfsense.com/packages/config/varnish64/varnish_backends.xml</config_file>
 		<configurationfile>varnish_backends.xml</configurationfile>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
+		<depends_on_package_pbi>varnish-2.1.5_1-i386.pbi gcc-4.2.5.20090325_5-i386.pbi</depends_on_package_pbi>
 		<depends_on_package>varnish-2.1.5.tbz</depends_on_package>
 		<depends_on_package>gcc-4.2.5.20090325_5.tbz</depends_on_package>
-		<depends_on_package_pbi>varnish-2.1.5_1-i386.pbi gcc-4.2.5.20090325_5-i386.pbi</depends_on_package_pbi>
 		<build_port_path>/usr/ports/www/varnish2</build_port_path>
 		<build_port_path>/usr/ports/lang/gcc42</build_port_path>
 	</package>
@@ -716,7 +718,6 @@
 		<version>2.5.4</version>
 		<status>Beta</status>
 		<required_version>1.0</required_version>
-		<maximum_version>1.2.3</maximum_version>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
 		<depends_on_package>mbmon-205_5.tbz</depends_on_package>
 		<depends_on_package_pbi>mbmon-205_5-i386.pbi</depends_on_package_pbi>
@@ -976,6 +977,7 @@
 		<configurationfile>freeradius.xml</configurationfile>
 		<build_port_path>/usr/ports/net/freeradius</build_port_path>
 		<build_port_path>/usr/ports/devel/libltdl</build_port_path>
+		<after_install_info>Please visit Services: freeRADIUS</after_install_info>
 	</package>
 	<package>
 		<name>freeradius2</name>
@@ -1093,7 +1095,7 @@
 		<depends_on_package_base_url>http://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
 		<depends_on_package>mtr-nox11-0.82.tbz</depends_on_package>
 		<depends_on_package_pbi>mtr-0.82_1-i386.pbi</depends_on_package_pbi>
-		<version>0.65_2</version>
+		<version>0.82</version>
 		<status>Stable</status>
 		<required_version>2.0</required_version>
 		<config_file>http://www.pfsense.com/packages/config/mtr-nox11.xml</config_file>
@@ -1115,8 +1117,8 @@
 		<depends_on_package>libwww-5.4.0_4.tbz</depends_on_package>
 		<depends_on_package_pbi>
 			libwww-5.4.0_4-i386.pbi
-			squid_radius_auth-1.10-i386.pbi
 			squid-2.7.9_1-i386.pbi
+			squid_radius_auth-1.10-i386.pbi
 		</depends_on_package_pbi>
 		<build_port_path>/usr/ports/www/squid</build_port_path>
 		<build_port_path>/usr/ports/www/squid_radius_auth</build_port_path>
@@ -1215,11 +1217,7 @@
 		<depends_on_package>db41-4.1.25_4.tbz</depends_on_package>
 		<depends_on_package>db3-3.3.11_3,1.tbz</depends_on_package>
 		<depends_on_package>cyrus-sasl-2.1.25_1.tbz</depends_on_package>
-		<depends_on_package_pbi>
-			cyrus-sasl-2.1.25_1-i386.pbi
-			db41-4.1.25_4-i386.pbi
-			squidguard-1.4_4-i386.pbi
-		</depends_on_package_pbi>
+		<depends_on_package_pbi>squidguard-1.4_4-i386.pbi</depends_on_package_pbi>
 		<build_port_path>/usr/ports/www/squidguard</build_port_path>
 		<build_port_path>/usr/ports/databases/db41</build_port_path>
 		<build_port_path>/usr/ports/databases/db3</build_port_path>
@@ -1233,7 +1231,7 @@
 		<descr>Monitoring agent.</descr>
 		<category>Services</category>
 		<config_file>http://www.pfsense.com/packages/config/zabbix-agent/zabbix-agent.xml</config_file>
-		<version>1.8.5,2</version>
+		<version>1.8.10,2</version>
 		<status>FINAL</status>
 		<required_version>1.2.3</required_version>
 		<configurationfile>zabbix-agent.xml</configurationfile>
@@ -1266,10 +1264,7 @@
 		<depends_on_package_base_url>http://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
 		<depends_on_package>p7zip-9.20.1.tbz</depends_on_package>
 		<depends_on_package>zip-3.0.tbz</depends_on_package>
-		<depends_on_package_pbi>
-			zip-3.0-i386.pbi
-			p7zip-9.20.1-i386.pbi
-		</depends_on_package_pbi>
+		<depends_on_package_pbi>zip-3.0-i386.pbi p7zip-9.20.1-i386.pbi</depends_on_package_pbi>
 		<build_port_path>/usr/ports/archivers/p7zip</build_port_path>
 		<build_port_path>/usr/ports/archivers/zip</build_port_path>
 		<version>0.9.9</version>
@@ -1464,10 +1459,7 @@
 		<depends_on_package_base_url>http://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
 		<depends_on_package>nrpe-2.12_3.tbz</depends_on_package>
 		<depends_on_package>nagios-plugins-1.4.15_1,1.tbz</depends_on_package>
-		<depends_on_package_pbi>
-			nrpe-2.13-i386.pbi
-			nagios-plugins-1.4.15_1-i386.pbi
-		</depends_on_package_pbi>
+		<depends_on_package_pbi>nrpe-2.13-i386.pbi nagios-plugins-1.4.15_1-i386.pbi</depends_on_package_pbi>
 		<build_port_path>/usr/ports/net-mgmt/nrpe2</build_port_path>
 		<build_port_path>/usr/ports/net-mgmt/nagios-plugins</build_port_path>
 		<build_options>WITH_SSL=true WITHOUT_ARGS=true</build_options>

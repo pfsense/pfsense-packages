@@ -79,102 +79,6 @@
 		<configurationfile>mactovendor.xml</configurationfile>
 	</package>
 	<package>
-		<name>widescreen</name>
-		<descr>The package makes pfSense adapt to browser's current width. It is particularly convenient for Status->Dashboard page that allocates columns for widgets according to browser's current width. ATTENTION: the package heavily modifies pfsense_ng theme and affects other's themes appearance. Please REFRESH your browser's window after installing/uninstalling this package.</descr>
-		<website></website>
-		<pkginfolink></pkginfolink>
-		<category>Enhancements</category>
-		<version>0.2</version>
-		<status>BETA</status>
-		<required_version>2.0</required_version>
-		<maintainer>ey@tm-k.com</maintainer>
-		<config_file>http://www.pfsense.org/packages/config/widescreen/widescreen.xml</config_file>
-		<configurationfile>widescreen.xml</configurationfile>
-		<!-- Disabling on 2.1 since it overwrites the menu -->
-		<maximum_version>2.1</maximum_version>
-	</package>
-	<package>
-		<name>squid</name>
-		<descr>High performance web proxy cache.</descr>
-		<website>http://www.squid-cache.org/</website>
-		<category>Network</category>
-		<version>2.7.9 pkg v.4.3.1</version>
-		<status>Stable</status>
-		<required_version>2</required_version>
-		<maintainer>fernando@netfilter.com.br seth.mos@dds.nl mfuchs77@googlemail.com jimp@pfsense.org</maintainer>
-		<depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
-		<depends_on_package>squid-2.7.9_1.tbz</depends_on_package>
-		<depends_on_package_pbi>squid-2.7.9_1-amd64.pbi squid_radius_auth-1.10-amd64.pbi libwww-5.4.0_4-amd64.pbi</depends_on_package_pbi>
-		<depends_on_package>squid_radius_auth-1.10.tbz</depends_on_package>
-		<depends_on_package>libwww-5.4.0_4.tbz</depends_on_package>
-		<build_port_path>/usr/ports/www/squid</build_port_path>
-		<build_port_path>/usr/ports/www/squid_radius_auth</build_port_path>
-		<build_port_path>/usr/ports/www/libwww</build_port_path>
-		<build_options>WITH_SQUID_KERB_AUTH=true WITH_SQUID_LDAP_AUTH=true WITH_SQUID_NIS_AUTH=true WITH_SQUID_SASL_AUTH=true WITH_SQUID_DELAY_POOLS=true WITH_SQUID_SNMP=true WITH_SQUID_CARP=true WITH_SQUID_SSL=true WITHOUT_SQUID_PINGER=true WITHOUT_SQUID_DNS_HELPER=true WITH_SQUID_HTCP=true WITH_SQUID_VIA_DB=true WITH_SQUID_CACHE_DIGESTS=true WITH_SQUID_WCCP=true WITHOUT_SQUID_WCCPV2=true WITHOUT_SQUID_STRICT_HTTP=true WITH_SQUID_IDENT=true WITH_SQUID_REFERER_LOG=true WITHOUT_SQUID_USERAGENT_LOG=true WITH_SQUID_ARP_ACL=true WITH_SQUID_PF=true WITHOUT_SQUID_IPFILTER=true WITH_SQUID_FOLLOW_XFF=true WITH_SQUID_AUFS=true WITH_SQUID_COSS=true WITH_SQUID_KQUEUE=true WITH_SQUID_LARGEFILE=true WITHOUT_SQUID_STACKTRACES=true WITHOUT_DEBUGGING=true WITHOUT_GDBM=true WITHOUT_PERL_MALLOC=true WITH_PERL_64BITINT=true WITHOUT_THREADS=true WITHOUT_MULTIPLICITY=true WITHOUT_SUIDPERL=true WITHOUT_SITECUSTOMIZE=true WITH_USE_PERL=true</build_options>
-		<config_file>http://www.pfsense.org/packages/config/squid/squid.xml</config_file>
-		<configurationfile>squid.xml</configurationfile>
-	</package>
-	<package>
-		<name>squid3</name>
-		<descr><![CDATA[High performance web proxy cache.<br>
-			It combines squid as a proxy server with it's capabilities of acting as a HTTP / HTTPS reverse proxy.<br>
-			It includes an Exchange-Web-Access (OWA) Assistant.]]></descr>
-		<pkginfolink>http://forum.pfsense.org/index.php/topic,48347.0.html</pkginfolink>
-		<website>http://www.squid-cache.org/</website>
-		<category>Network</category>
-		<version>3.1.20 pkg 2.0.5_2</version>
-		<status>beta</status>
-		<required_version>2.0</required_version>
-		<maintainer>fernando@netfilter.com.br seth.mos@dds.nl mfuchs77@googlemail.com jimp@pfsense.org</maintainer>
-		<depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
-		<depends_on_package>squid-3.1.20.tbz</depends_on_package>
-		<depends_on_package>libwww-5.4.0_4.tbz</depends_on_package>
-		<build_port_path>/usr/ports/www/squid31</build_port_path>
-		<build_options>WITH_SQUID_KERB_AUTH=true WITH_SQUID_LDAP_AUTH=true WITH_SQUID_NIS_AUTH=true WITH_SQUID_SASL_AUTH=true WITH_SQUID_IPV6=true WITH_SQUID_DELAY_POOLS=true WITH_SQUID_SNMP=true WITH_SQUID_SSL=true WITH_SQUID_SSL_CRTD=true WITH_SQUID_PINGER=true WITHOUT_SQUID_DNS_HELPER=true WITH_SQUID_HTCP=true WITH_SQUID_VIA_DB=true WITH_SQUID_CACHE_DIGESTS=true WITHOUT_SQUID_WCCP=true WITH_SQUID_WCCPV2=true WITHOUT_SQUID_STRICT_HTTP=true WITH_SQUID_IDENT=true WITH_SQUID_REFERER_LOG=true WITH_SQUID_USERAGENT_LOG=true WITH_SQUID_ARP_ACL=true WITH_SQUID_IPFW=true WITH_SQUID_PF=true WITHOUT_SQUID_IPFILTER=true WITH_SQUID_FOLLOW_XFF=true WITHOUT_SQUID_ECAP=true WITHOUT_SQUID_ICAP=true WITHOUT_SQUID_ESI=true WITH_SQUID_AUFS=true WITHOUT_SQUID_COSS=true WITHOUT_SQUID_KQUEUE=true WITH_SQUID_LARGEFILE=true WITHOUT_SQUID_STACKTRACES=true WITHOUT_SQUID_DEBUG=true</build_options>
-		<depends_on_package_pbi>squid-3.1.20-amd64.pbi</depends_on_package_pbi>
-		<config_file>http://www.pfsense.org/packages/config/squid-reverse/squid.xml</config_file>
-		<configurationfile>squid.xml</configurationfile>
-	</package>
-	<package>
-		<name>Varnish</name>
-		<descr><![CDATA[Varnish is a state-of-the-art, high-performance HTTP accelerator.<br>
-						It uses the advanced features in FreeBSD 6/7/8 to achieve its high performance.]]></descr>
-		<website>http://varnish-cache.org</website>
-		<pkginfolink>http://doc.pfsense.org/index.php/Varnish_package</pkginfolink>
-		<category>Services</category>
-		<version>2.1.5 pkg v.1.0</version>
-		<status>Release</status>
-		<required_version>2.0</required_version>
-		<config_file>http://www.pfsense.com/packages/config/varnish64/varnish_backends.xml</config_file>
-		<configurationfile>varnish_backends.xml</configurationfile>
-		<depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
-		<depends_on_package_pbi>varnish-2.1.5_1-amd64.pbi gcc-4.2.5.20090325_5-amd64.pbi</depends_on_package_pbi>
-		<depends_on_package>varnish-2.1.5.tbz</depends_on_package>
-		<depends_on_package>gcc-4.2.5.20090325_5.tbz</depends_on_package>
-		<build_port_path>/usr/ports/www/varnish2</build_port_path>
-		<build_port_path>/usr/ports/lang/gcc42</build_port_path>
-	</package>
-	<package>
-		<name>Varnish3</name>
-		<descr><![CDATA[Varnish is a state-of-the-art, high-performance HTTP accelerator.<br>
-						It uses the advanced features in FreeBSD 6/7/8 to achieve its high performance.<br>
-						Version 3.0.2 includes streaming support]]></descr>
-		<website>http://varnish-cache.org</website>
-		<pkginfolink>http://doc.pfsense.org/index.php/Varnish_package</pkginfolink>
-		<category>Services</category>
-		<version>3.0.2 pkg v.0.1</version>
-		<status>BETA</status>
-		<required_version>2.0</required_version>
-		<config_file>http://www.pfsense.com/packages/config/varnish3/varnish_backends.xml</config_file>
-		<configurationfile>varnish_backends.xml</configurationfile>
-		<depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
-		<depends_on_package_pbi>gcc-4.2.5.20090325_5-amd64.pbi varnish-3.0.2_1-amd64.pbi</depends_on_package_pbi>
-		<depends_on_package>varnish-3.0.2.tbz</depends_on_package>
-		<depends_on_package>pcre-8.21_1.tbz</depends_on_package>
-		<build_port_path>/usr/ports/www/varnish</build_port_path>
-		<build_port_path>/usr/ports/lang/gcc42</build_port_path>
-	</package>
-	<package>
 		<name>File Manager</name>
 		<website/>
 		<descr>PHP File Manager</descr>
@@ -582,27 +486,6 @@
 		<build_options>WITH_PCRE=true WITH_SPF=true WITH_SASL2=true WITH_TLS=true</build_options>
 	</package>
 	<package>
-		<name>mailscanner-dev</name>
-		<website>www.mailscanner.info</website>
-		<descr><![CDATA[MailScanner is an e-mail security and anti-spam package for e-mail gateway systems.<br>
-						This is a level3 mail scanning tool with high CPU load.]]></descr>
-		<category>Services</category>
-		<config_file>http://www.pfsense.com/packages/config/mailscanner/mailscanner.xml</config_file>
-		<pkginfolink>http://forum.pfsense.org/index.php/topic,43687.0.html</pkginfolink>
-		<depends_on_package_base_url>http://e-sac.siteseguro.ws/pfsense/8/amd64/All/</depends_on_package_base_url>
-		<depends_on_package>MailScanner-4.83.5.tbz</depends_on_package>
-		<depends_on_package>pyzor-0.5.0_1.tbz</depends_on_package>
-		<depends_on_package>p5-Mail-SPF-2.007.tbz</depends_on_package>
-		<depends_on_package>p5-IP-Country-2.27.tbz</depends_on_package>
-		<depends_on_package_pbi>mailscanner-4.84.5_3-amd64.pbi</depends_on_package_pbi>
-		<version>4.83.5 pkg v.0.2.1</version>
-		<status>beta</status>
-		<required_version>2.0</required_version>
-		<configurationfile>mailscanner.xml</configurationfile>
-		<build_port_path>/usr/ports/mail/mailscanner</build_port_path>
-		<build_options></build_options>
-	</package>
-	<package>
 		<name>Dansguardian</name>
 		<website>http://www.dansguardian.org/</website>
 		<descr><![CDATA[DansGuardian is an award winning Open Source web content filter.<br>
@@ -625,6 +508,28 @@
 		<build_port_path>/usr/ports/www/dansguardian-devel</build_port_path>
 		<build_options>WITHOUT_APACHE=true WITH_TRICKLE=true WITH_CLAMD=true WITH_ICAP=true WITH_NTLM=true WITH_SSL=true</build_options>
 		<!-- NOTE: Distfile must be fetched manually from http://dansguardian.org/downloads/2/Alpha/dansguardian-2.12.0.0.tar.gz -->
+	</package>
+	<package>
+		<name>mailscanner-dev</name>
+		<website>www.mailscanner.info</website>
+		<descr><![CDATA[MailScanner is an e-mail security and anti-spam package for e-mail gateway systems.<br>
+						This is a level3 mail scanning tool with high CPU load.]]></descr>
+		<category>Services</category>
+		<config_file>http://www.pfsense.com/packages/config/mailscanner/mailscanner.xml</config_file>
+		<pkginfolink>http://forum.pfsense.org/index.php/topic,43687.0.html</pkginfolink>
+		<depends_on_package_base_url>http://e-sac.siteseguro.ws/pfsense/8/amd64/All/</depends_on_package_base_url>
+		<depends_on_package>MailScanner-4.83.5.tbz</depends_on_package>
+		<depends_on_package>perl-5.12.4_3.tbz</depends_on_package>
+		<depends_on_package>pyzor-0.5.0_1.tbz</depends_on_package>
+		<depends_on_package>p5-Mail-SPF-2.007.tbz</depends_on_package>
+		<depends_on_package>p5-IP-Country-2.27.tbz</depends_on_package>
+		<depends_on_package_pbi>mailscanner-4.84.5_3-amd64.pbi</depends_on_package_pbi>
+		<version>4.83.5 pkg v.0.2.1</version>
+		<status>beta</status>
+		<required_version>2.0</required_version>
+		<configurationfile>mailscanner.xml</configurationfile>
+		<build_port_path>/usr/ports/mail/mailscanner</build_port_path>
+		<build_options></build_options>
 	</package>
 	<package>
 		<name>siproxd</name>
@@ -674,8 +579,6 @@
 		<required_version>1.2.1</required_version>
 		<configurationfile>openospfd.xml</configurationfile>
 		<depends_on_package>libevent-1.4.14b_1.tbz</depends_on_package>
-		<!-- Fix me once a PBI is available! -->
-		<maximum_version>2.1</maximum_version>
 	</package>
 	<package>
 		<name>Lightsquid</name>
@@ -738,9 +641,48 @@
 		<after_install_info>Please visit ipguard settings on Services Menu to configure.</after_install_info>
 	</package>
 	<package>
+		<name>Varnish</name>
+		<descr><![CDATA[Varnish is a state-of-the-art, high-performance HTTP accelerator.<br>
+						It uses the advanced features in FreeBSD 6/7/8 to achieve its high performance.]]></descr>
+		<website>http://varnish-cache.org</website>
+		<pkginfolink>http://doc.pfsense.org/index.php/Varnish_package</pkginfolink>
+		<category>Services</category>
+		<version>2.1.5 pkg v.1.0</version>
+		<status>Release</status>
+		<required_version>2.0</required_version>
+		<config_file>http://www.pfsense.com/packages/config/varnish64/varnish_backends.xml</config_file>
+		<configurationfile>varnish_backends.xml</configurationfile>
+		<depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
+		<depends_on_package_pbi>varnish-2.1.5_1-amd64.pbi gcc-4.2.5.20090325_5-amd64.pbi</depends_on_package_pbi>
+		<depends_on_package>varnish-2.1.5.tbz</depends_on_package>
+		<depends_on_package>gcc-4.2.5.20090325_5.tbz</depends_on_package>
+		<build_port_path>/usr/ports/www/varnish2</build_port_path>
+		<build_port_path>/usr/ports/lang/gcc42</build_port_path>
+	</package>
+	<package>
+		<name>Varnish3</name>
+		<descr><![CDATA[Varnish is a state-of-the-art, high-performance HTTP accelerator.<br>
+						It uses the advanced features in FreeBSD 6/7/8 to achieve its high performance.<br>
+						Version 3.0.2 includes streaming support]]></descr>
+		<website>http://varnish-cache.org</website>
+		<pkginfolink>http://doc.pfsense.org/index.php/Varnish_package</pkginfolink>
+		<category>Services</category>
+		<version>3.0.2 pkg v.0.1</version>
+		<status>BETA</status>
+		<required_version>2.0</required_version>
+		<config_file>http://www.pfsense.com/packages/config/varnish3/varnish_backends.xml</config_file>
+		<configurationfile>varnish_backends.xml</configurationfile>
+		<depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
+		<depends_on_package_pbi>gcc-4.2.5.20090325_5-amd64.pbi varnish-3.0.2_1-amd64.pbi</depends_on_package_pbi>
+		<depends_on_package>varnish-3.0.2.tbz</depends_on_package>
+		<depends_on_package>pcre-8.21_1.tbz</depends_on_package>
+		<build_port_path>/usr/ports/www/varnish</build_port_path>
+		<build_port_path>/usr/ports/lang/gcc42</build_port_path>
+	</package>
+	<package>
 		<name>vnstat2</name>
 		<website>http://humdi.net/vnstat/</website>
-		<descr>A console-based network traffic monitor + vnstat PHP frontend</descr>
+		<descr>Vnstat is a console-based network traffic monitor&lt;br /&gt;The vnstat PHP frontend and vnstati adds a more user friendly way of displaying traffic usage.</descr>
 		<pkginfolink>http://forum.pfsense.org/index.php/topic,14179.0.html</pkginfolink>
 		<category>Network Management</category>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
@@ -769,6 +711,7 @@
 		<build_port_path>/usr/ports/sysutils/mbmon</build_port_path>
 		<config_file>http://www.pfsense.com/packages/config/phpsysinfo/phpsysinfo.xml</config_file>
 		<configurationfile>phpsysinfo.xml</configurationfile>
+		<noembedded>true</noembedded>
 	</package>
 	<package>
 		<name>dns-server</name>
@@ -786,11 +729,11 @@
 		<depends_on_package>daemontools-0.76_16.tbz</depends_on_package>
 		<depends_on_package>djbdns-ipv6-1.05.b23_13.tbz</depends_on_package>
 		<depends_on_package_pbi>ucspi-tcp-0.88_2-amd64.pbi daemontools-0.76_16-amd64.pbi djbdns-1.05_14-amd64.pbi</depends_on_package_pbi>
-		<supportedbybsdperimeter>YES</supportedbybsdperimeter>
 		<build_port_path>/usr/ports/sysutils/ucspi-tcp</build_port_path>
 		<build_port_path>/usr/ports/sysutils/daemontools</build_port_path>
 		<build_port_path>/usr/ports/dns/djbdns</build_port_path>
 		<build_options>WITH_IPV6=true WITH_SRV=true WITHOUT_DUMPCACHE=true WITHOUT_IGNOREIP=true WITHOUT_JUMBO=true WITHOUT_MAN=true WITHOUT_PERSISTENT_MMAP=true</build_options>
+		<supportedbybsdperimeter>YES</supportedbybsdperimeter>
 	</package>
 	<package>
 		<name>Open-VM-Tools</name>
@@ -804,8 +747,8 @@
 		<config_file>http://www.pfsense.org/packages/config/open-vm-tools_2/open-vm-tools.xml</config_file>
 		<configurationfile>open-vm-tools.xml</configurationfile>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
-		<depends_on_package>open-vm-tools-nox11-313025_2.tbz</depends_on_package>
 		<build_port_path>/usr/ports/emulators/open-vm-tools-nox11/</build_port_path>
+		<depends_on_package>open-vm-tools-nox11-313025_2.tbz</depends_on_package>
 		<depends_on_package>icu-4.8.1.1_1.tbz</depends_on_package>
 		<build_port_path>/usr/ports/devel/icu</build_port_path>
 		<depends_on_package>fusefs-kmod-0.3.9.p1.20080208_7.tbz</depends_on_package>
@@ -1073,11 +1016,14 @@
 		<depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
 		<depends_on_package>bandwidthd-2.0.1_4.tbz</depends_on_package>
 		<depends_on_package>libpcap-1.1.1.tbz</depends_on_package>
+		<depends_on_package>postgresql-client-8.4.7.tbz</depends_on_package>
 		<depends_on_package_pbi>bandwidthd-2.0.1_5-amd64.pbi</depends_on_package_pbi>
 		<config_file>http://www.pfsense.org/packages/config/bandwidthd/bandwidthd.xml</config_file>
 		<configurationfile>bandwidthd.xml</configurationfile>
-		<build_port_path>/usr/ports/net-mgmt/bandwidthd</build_port_path>
 		<build_port_path>/usr/ports/net/libpcap</build_port_path>
+		<build_port_path>/usr/ports/databases/postgresql84-client</build_port_path>
+		<build_port_path>/usr/ports/net-mgmt/bandwidthd</build_port_path>
+		<build_options>WITH_NLS=true WITHOUT_PAM=true WITHOUT_LDAP=true WITHOUT_MIT_KRB5=true WITHOUT_HEIMDAL_KRB5=true WITHOUT_OPTIMIZED_CFLAGS=true WITHOUT_XML=true WITHOUT_TZDATA=true WITHOUT_DEBUG=true WITHOUT_GSSAPI=true WITHOUT_ICU=true WITH_INTDATE=true</build_options>
 	</package>
 	<package>
 		<name>stunnel</name>
@@ -1105,7 +1051,7 @@
 		<depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
 		<depends_on_package>iperf-2.0.5.tbz</depends_on_package>
 		<depends_on_package_pbi>iperf-2.0.5-amd64.pbi</depends_on_package_pbi>
-		<version>2.0.2_1</version>
+		<version>2.0.5</version>
 		<status>Beta</status>
 		<pkginfolink>http://doc.pfsense.org/index.php/Iperf_package</pkginfolink>
 		<required_version>1.2.1</required_version>
@@ -1144,16 +1090,62 @@
 		<build_port_path>/usr/ports/net/mtr</build_port_path>
 	</package>
 	<package>
+		<name>squid</name>
+		<descr>High performance web proxy cache.</descr>
+		<website>http://www.squid-cache.org/</website>
+		<category>Network</category>
+		<version>2.7.9 pkg v.4.3.1</version>
+		<status>Stable</status>
+		<required_version>2</required_version>
+		<maintainer>fernando@netfilter.com.br seth.mos@dds.nl mfuchs77@googlemail.com jimp@pfsense.org</maintainer>
+		<depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
+		<depends_on_package>squid-2.7.9_1.tbz</depends_on_package>
+		<depends_on_package>squid_radius_auth-1.10.tbz</depends_on_package>
+		<depends_on_package>libwww-5.4.0_4.tbz</depends_on_package>
+		<depends_on_package_pbi>
+			libwww-5.4.0_4-amd64.pbi
+			squid-2.7.9_1-amd64.pbi
+			squid_radius_auth-1.10-amd64.pbi
+		</depends_on_package_pbi>
+		<build_port_path>/usr/ports/www/squid</build_port_path>
+		<build_port_path>/usr/ports/www/squid_radius_auth</build_port_path>
+		<build_port_path>/usr/ports/www/libwww</build_port_path>
+		<build_options>WITH_SQUID_KERB_AUTH=true WITH_SQUID_LDAP_AUTH=true WITH_SQUID_NIS_AUTH=true WITH_SQUID_SASL_AUTH=true WITH_SQUID_DELAY_POOLS=true WITH_SQUID_SNMP=true WITH_SQUID_CARP=true WITH_SQUID_SSL=true WITHOUT_SQUID_PINGER=true WITHOUT_SQUID_DNS_HELPER=true WITH_SQUID_HTCP=true WITH_SQUID_VIA_DB=true WITH_SQUID_CACHE_DIGESTS=true WITH_SQUID_WCCP=true WITHOUT_SQUID_WCCPV2=true WITHOUT_SQUID_STRICT_HTTP=true WITH_SQUID_IDENT=true WITH_SQUID_REFERER_LOG=true WITHOUT_SQUID_USERAGENT_LOG=true WITH_SQUID_ARP_ACL=true WITH_SQUID_PF=true WITHOUT_SQUID_IPFILTER=true WITH_SQUID_FOLLOW_XFF=true WITH_SQUID_AUFS=true WITH_SQUID_COSS=true WITH_SQUID_KQUEUE=true WITH_SQUID_LARGEFILE=true WITHOUT_SQUID_STACKTRACES=true WITHOUT_DEBUGGING=true WITHOUT_GDBM=true WITHOUT_PERL_MALLOC=true WITH_PERL_64BITINT=true WITHOUT_THREADS=true WITHOUT_MULTIPLICITY=true WITHOUT_SUIDPERL=true WITHOUT_SITECUSTOMIZE=true WITH_USE_PERL=true</build_options>
+		<config_file>http://www.pfsense.org/packages/config/squid/squid.xml</config_file>
+		<configurationfile>squid.xml</configurationfile>
+	</package>
+	<package>
+		<name>squid3</name>
+		<descr><![CDATA[High performance web proxy cache.<br>
+			It combines squid as a proxy server with it's capabilities of acting as a HTTP / HTTPS reverse proxy.<br>
+			It includes an Exchange-Web-Access (OWA) Assistant.]]></descr>
+		<pkginfolink>http://forum.pfsense.org/index.php/topic,48347.0.html</pkginfolink>
+		<website>http://www.squid-cache.org/</website>
+		<category>Network</category>
+		<version>3.1.20 pkg 2.0.5_2</version>
+		<status>beta</status>
+		<required_version>2.0</required_version>
+		<maintainer>marcellocoutinho@gmail.com fernando@netfilter.com.br seth.mos@dds.nl mfuchs77@googlemail.com jimp@pfsense.org</maintainer>
+		<depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
+		<depends_on_package>squid-3.1.20.tbz</depends_on_package>
+		<depends_on_package>libwww-5.4.0_4.tbz</depends_on_package>
+		<build_port_path>/usr/ports/www/squid31</build_port_path>
+		<build_options>WITH_SQUID_KERB_AUTH=true WITH_SQUID_LDAP_AUTH=true WITH_SQUID_NIS_AUTH=true WITH_SQUID_SASL_AUTH=true WITH_SQUID_IPV6=true WITH_SQUID_DELAY_POOLS=true WITH_SQUID_SNMP=true WITH_SQUID_SSL=true WITH_SQUID_SSL_CRTD=true WITH_SQUID_PINGER=true WITHOUT_SQUID_DNS_HELPER=true WITH_SQUID_HTCP=true WITH_SQUID_VIA_DB=true WITH_SQUID_CACHE_DIGESTS=true WITHOUT_SQUID_WCCP=true WITH_SQUID_WCCPV2=true WITHOUT_SQUID_STRICT_HTTP=true WITH_SQUID_IDENT=true WITH_SQUID_REFERER_LOG=true WITH_SQUID_USERAGENT_LOG=true WITH_SQUID_ARP_ACL=true WITH_SQUID_IPFW=true WITH_SQUID_PF=true WITHOUT_SQUID_IPFILTER=true WITH_SQUID_FOLLOW_XFF=true WITHOUT_SQUID_ECAP=true WITHOUT_SQUID_ICAP=true WITHOUT_SQUID_ESI=true WITH_SQUID_AUFS=true WITHOUT_SQUID_COSS=true WITHOUT_SQUID_KQUEUE=true WITH_SQUID_LARGEFILE=true WITHOUT_SQUID_STACKTRACES=true WITHOUT_SQUID_DEBUG=true</build_options>
+		<config_file>http://www.pfsense.org/packages/config/squid-reverse/squid.xml</config_file>
+		<configurationfile>squid.xml</configurationfile>
+		<depends_on_package_pbi>squid-3.1.20-amd64.pbi</depends_on_package_pbi>
+	</package>
+	<package>
 		<name>LCDproc</name>
 		<descr>LCD display driver</descr>
 		<website>http://www.lcdproc.org/</website>
 		<category>Utility</category>
-		<version>lcdproc-0.5.3_1</version>
+		<version>lcdproc-0.5.5</version>
 		<status>BETA</status>
 		<required_version>1.2.1</required_version>
 		<maintainer>seth.mos@dds.nl</maintainer>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
-		<depends_on_package>lcdproc-0.5.3_1.tbz</depends_on_package>
+		<depends_on_package>lcdproc-0.5.5.tbz</depends_on_package>
 		<depends_on_package_pbi>lcdproc-0.5.5-amd64.pbi</depends_on_package_pbi>
 		<config_file>http://www.pfsense.org/packages/config/lcdproc/lcdproc.xml</config_file>
 		<configurationfile>lcdproc.xml</configurationfile>
@@ -1257,9 +1249,9 @@
 		<descr>Allows a pre-configured OpenVPN Windows Client or  or Mac OSX's Viscosity configuration bundle to be exported directly from pfSense.</descr>
 		<category>Security</category>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
-		<depends_on_package_pbi>p7zip-9.20.1-amd64.pbi zip-3.0-amd64.pbi</depends_on_package_pbi>
 		<depends_on_package>p7zip-9.20.1.tbz</depends_on_package>
 		<depends_on_package>zip-3.0.tbz</depends_on_package>
+		<depends_on_package_pbi>p7zip-9.20.1-amd64.pbi zip-3.0-amd64.pbi</depends_on_package_pbi>
 		<build_port_path>/usr/ports/archivers/p7zip</build_port_path>
 		<build_port_path>/usr/ports/archivers/zip</build_port_path>
 		<version>0.9.9</version>
@@ -1278,7 +1270,7 @@
 		<depends_on_package>havp-0.91_1.tbz</depends_on_package>
 		<depends_on_package_pbi>havp-0.91_1-amd64.pbi</depends_on_package_pbi>
 		<build_port_path>/usr/ports/www/havp</build_port_path>
-		<version>0.91</version>
+		<version>0.91_1</version>
 		<status>BETA</status>
 		<required_version>1.2.2</required_version>
 		<config_file>http://www.pfsense.com/packages/config/havp/havp.xml</config_file>
@@ -1421,6 +1413,21 @@
 		<configurationfile>shellcmd.xml</configurationfile>
 	</package>
 	<package>
+		<name>widescreen</name>
+		<descr>The package makes pfSense adapt to browser's current width. It is particularly convenient for Status->Dashboard page that allocates columns for widgets according to browser's current width. ATTENTION: the package heavily modifies pfsense_ng theme and affects other's themes appearance. Please REFRESH your browser's window after installing/uninstalling this package.</descr>
+		<website></website>
+		<pkginfolink></pkginfolink>
+		<category>Enhancements</category>
+		<version>0.2</version>
+		<status>BETA</status>
+		<required_version>2.0</required_version>
+		<maintainer>ey@tm-k.com</maintainer>
+		<config_file>http://www.pfsense.org/packages/config/widescreen/widescreen.xml</config_file>
+		<configurationfile>widescreen.xml</configurationfile>
+		<!-- Disabling on 2.1 since it overwrites the menu -->
+		<maximum_version>2.1</maximum_version>
+	</package>
+	<package>
 		<name>NRPE v2</name>
 		<website>http://wiki.nagios.org/index.php/Howtos:nrpe_nsca</website>
 		<descr>NRPE is an addon for Nagios that allows you to execute plugins on remote Linux/Unix hosts. This is useful if you need to monitor local resources/attributes like disk usage, CPU load, memory usage, etc. on a remote host.</descr>
@@ -1428,7 +1435,7 @@
 		<depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
 		<depends_on_package>nrpe-2.12_3.tbz</depends_on_package>
 		<depends_on_package>nagios-plugins-1.4.15_1,1.tbz</depends_on_package>
-		<depends_on_package_pbi>nrpe-2.13-amd64.pbi</depends_on_package_pbi>
+		<depends_on_package_pbi>nrpe-2.13-amd64.pbi nagios-plugins-1.4.15_1-amd64.pbi</depends_on_package_pbi>
 		<build_port_path>/usr/ports/net-mgmt/nrpe2</build_port_path>
 		<build_port_path>/usr/ports/net-mgmt/nagios-plugins</build_port_path>
 		<build_options>WITH_SSL=true WITHOUT_ARGS=true</build_options>
@@ -1464,7 +1471,8 @@
 	<package>
 		<name>zebedee</name>
 		<descr><![CDATA[Zebedee is a simple program to establish an encrypted, compressed "tunnel" for TCP/IP or UDP data transfer between two systems.<br>
-					This allows traffic such as telnet, ftp and X to be protected from snooping as well as potentially gaining performance over low-bandwidth networks from compression.]]></descr>
+				This allows traffic such as telnet, ftp and X to be protected from snooping as well as potentially gaining performance over low-bandwidth networks from compression.]]>
+		</descr>
 		<category>Services</category>
 		<version>1.0</version>
 		<status>BETA</status>
