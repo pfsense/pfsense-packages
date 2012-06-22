@@ -746,7 +746,7 @@ function squid_resync_general() {
 	$icp_port = ($settings['icp_port'] ? $settings['icp_port'] : 7);
 
 	$pidfile = "{$g['varrun_path']}/squid.pid";
-	$language = ($settings['error_language'] ? $settings['error_language'] : 'English');
+	$language = ($settings['error_language'] ? $settings['error_language'] : 'en');
 	$errordir = SQUID_CONFBASE . '/errors/' . $language;
 	$icondir = SQUID_CONFBASE . '/icons';
 	$hostname = ($settings['visible_hostname'] ? $settings['visible_hostname'] : 'localhost');
@@ -763,7 +763,7 @@ icp_port $icp_port
 pid_filename $pidfile
 cache_effective_user proxy
 cache_effective_group proxy
-error_directory $errordir
+error_default_language $errordir
 icon_directory $icondir
 visible_hostname $hostname
 cache_mgr $email
@@ -1376,7 +1376,7 @@ function squid_resync() {
 	if(file_exists("/usr/local/libexec/squid/pinger"))
 		exec("chmod a+x /usr/local/libexec/squid/pinger");
 
-	if (is_array($config['installedpackages']['squid']['config'][0])){
+	if (is_array($config['installedpackages']['squid']['config'])){
 		$log_dir = $config['installedpackages']['squid']['config'][0]['log_dir'].'/';
 	
 		if(!is_dir($log_dir)) {
