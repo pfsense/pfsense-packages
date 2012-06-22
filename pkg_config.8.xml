@@ -1013,7 +1013,7 @@
 		<build_port_path>/usr/ports/net/freeradius2</build_port_path>
 		<!-- Try to use the new PBI build syntax here, it may help it pick up the right libs inside the single PBI rather than using multiple. -->
 		<build_pbi>
-			<ports_before>security/heimdal net/openldap24-sasl-client</ports_before>
+			<ports_before>security/heimdal</ports_before>
 			<port>net/freeradius2</port>
 		</build_pbi>
 		<build_options>WITH_KERBEROS=yes WITH_MYSQL=yes WITH_PGSQL=yes WITH_PERL=yes WITH_PYTHON=yes WITH_LDAP=yes</build_options>
