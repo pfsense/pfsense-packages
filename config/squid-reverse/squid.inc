@@ -373,7 +373,7 @@ function squid_validate_general($post, $input_errors) {
 	$log_rotate = trim($post['log_rotate']);
 	if (!empty($log_rotate) && (!is_numeric($log_rotate) or ($log_rotate < 1)))
 
-		$input_errors[] = 'You must enter a valid number of days \'Log rotate\' field';
+		$input_errors[] = 'You must enter a valid number of days in the \'Log rotate\' field';
 
 	$webgui_port = $config['system']['webgui']['port'];
 	if(($config['system']['webgui']['port'] == "") && ($config['system']['webgui']['protocol'] == "http")) {
@@ -537,7 +537,7 @@ function squid_validate_traffic($post, $input_errors) {
   if (!empty($post['quick_abort_pct'])) {		
 	 $value = trim($post['quick_abort_pct']);
      if (!is_numeric($value) || ($value > 100))
-	   $input_errors[] = "The field 'Finish when remaining %' must contain a percentaged value";	
+	   $input_errors[] = "The field 'Finish when remaining %' must contain a percentage";	
   }	
 }
 
@@ -1197,7 +1197,7 @@ function squid_resync_auth() {
 		}
 	}
 
-	// Unrestricted hosts take precendence over blacklist
+	// Unrestricted hosts take precedence over blacklist
 	if(! empty($settingsnac['unrestricted_hosts'])) {
 		if (squid_is_valid_acl('unrestricted_hosts')) {
 			$conf .= "# These hosts do not have any restrictions\n";
@@ -1211,7 +1211,7 @@ function squid_resync_auth() {
 		}
 	}
 
-	// Whitelist and blacklist also take precendence over other allow rules
+	// Whitelist and blacklist also take precedence over other allow rules
 	if(! empty($settingsnac['whitelist'])) {
 		if (squid_is_valid_acl('whitelist')) {
 			$conf .= "# Always allow access to whitelist domains\n";
