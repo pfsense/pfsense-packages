@@ -373,7 +373,7 @@ function squid_validate_general($post, $input_errors) {
 	$log_rotate = trim($post['log_rotate']);
 	if (!empty($log_rotate) && (!is_numeric($log_rotate) or ($log_rotate < 1)))
 
-		$input_errors[] = 'You must enter a valid number of days \'Log rotate\' field';
+		$input_errors[] = 'You must enter a valid number of days in the \'Log rotate\' field';
 
 	$webgui_port = $config['system']['webgui']['port'];
 	if(($config['system']['webgui']['port'] == "") && ($config['system']['webgui']['protocol'] == "http")) {
@@ -537,7 +537,7 @@ function squid_validate_traffic($post, $input_errors) {
   if (!empty($post['quick_abort_pct'])) {		
 	 $value = trim($post['quick_abort_pct']);
      if (!is_numeric($value) || ($value > 100))
-	   $input_errors[] = "The field 'Finish when remaining %' must contain a percentaged value";	
+	   $input_errors[] = "The field 'Finish when remaining %' must contain a percentage";	
   }	
 }
 
@@ -663,18 +663,17 @@ function squid_install_cron($should_install) {
 	$swapstate_job_id=-1;
 	foreach($config['cron']['item'] as $item) {
 		if(strstr($item['task_name'], "squid_rotate_logs")) {
-	
-	  $rotate_job_id = $x;
-	} elseif(strstr($item['task_name'], "squid_check_swapstate")) {
-	  $swapstate_job_id = $x;
+			$rotate_job_id = $x;
+		} elseif(strstr($item['task_name'], "squid_check_swapstate")) {
+	  		$swapstate_job_id = $x;
 		}
 		$x++;
 	}
 	$need_write = false;
 	switch($should_install) {
 		case true:
-		$cachedir =($settings['harddisk_cache_location'] ? $settings['harddisk_cache_location'] : '/var/squid/cache');
-		if($rotate_job_id < 0) {
+			$cachedir =($settings['harddisk_cache_location'] ? $settings['harddisk_cache_location'] : '/var/squid/cache');
+			if($rotate_job_id < 0) {
 				$cron_item = array();
 				$cron_item['task_name'] = "squid_rotate_logs";
 				$cron_item['minute'] = "0";
@@ -684,10 +683,11 @@ function squid_install_cron($should_install) {
 				$cron_item['wday'] = "*";
 				$cron_item['who'] = "root";
 				$cron_item['command'] = "/bin/rm {$cachedir}/swap.state; /usr/local/sbin/squid -k rotate -f " . SQUID_CONFFILE;
+				/* Add this cron_item as a new entry at the end of the item array. */
 				$config['cron']['item'][] = $cron_item;
 				$need_write = true;
-				}
-				if($swapstate_job_id < 0) {
+			}
+			if($swapstate_job_id < 0) {
 				$cron_item = array();
 				$cron_item['task_name'] = "squid_check_swapstate";
 				$cron_item['minute'] = "*/15";
@@ -697,32 +697,32 @@ function squid_install_cron($should_install) {
 				$cron_item['wday'] = "*";
 				$cron_item['who'] = "root";
 				$cron_item['command'] = "/usr/local/pkg/swapstate_check.php";
+				/* Add this cron_item as a new entry at the end of the item array. */
 				$config['cron']['item'][] = $cron_item;
 				$need_write = true;
-				}
-				if ($need_write) {		
-				$config['cron']['item'][] = $cron_item;
+			}
+			if ($need_write) {		
 				parse_config(true);
 				write_config("Adding Squid Cron Jobs");
 			}
-		break;
+			break;
 		case false:
-		if($rotate_job_id >= 0) {
-			unset($config['cron']['item'][$rotate_job_id]);
-			$need_write = true;
-		}
-		if($swapstate_job_id >= 0) {
-			unset($config['cron']['item'][$swapstate_job_id]);
-			$need_write = true;
-		}
-		if ($need_write) {
-			parse_config(true);
-			write_config("Removing Squid Cron Jobs");
-		}
-		break;
+			if($rotate_job_id >= 0) {
+				unset($config['cron']['item'][$rotate_job_id]);
+				$need_write = true;
+			}
+			if($swapstate_job_id >= 0) {
+				unset($config['cron']['item'][$swapstate_job_id]);
+				$need_write = true;
+			}
+			if ($need_write) {
+				parse_config(true);
+				write_config("Removing Squid Cron Jobs");
+			}
+			break;
 	}
 	configure_cron();
-	}
+}
 
 function squid_resync_general() {
 	global $g, $config, $valid_acls;
@@ -1197,7 +1197,7 @@ function squid_resync_auth() {
 		}
 	}
 
-	// Unrestricted hosts take precendence over blacklist
+	// Unrestricted hosts take precedence over blacklist
 	if(! empty($settingsnac['unrestricted_hosts'])) {
 		if (squid_is_valid_acl('unrestricted_hosts')) {
 			$conf .= "# These hosts do not have any restrictions\n";
@@ -1211,7 +1211,7 @@ function squid_resync_auth() {
 		}
 	}
 
-	// Whitelist and blacklist also take precendence over other allow rules
+	// Whitelist and blacklist also take precedence over other allow rules
 	if(! empty($settingsnac['whitelist'])) {
 		if (squid_is_valid_acl('whitelist')) {
 			$conf .= "# Always allow access to whitelist domains\n";
@@ -1829,7 +1829,7 @@ function squid_do_xmlrpc_sync($sync_to_ip, $username, $password) {
 		log_error("squid XMLRPC sync successfully completed with {$url}:{$port}.");
 	}
 	
-	/* tell squid to reload our settings on the destionation sync host. */
+	/* tell squid to reload our settings on the destination sync host. */
 	$method = 'pfsense.exec_php';
 	$execcmd  = "require_once('/usr/local/pkg/squid.inc');\n";
 	$execcmd .= "squid_resync();";
