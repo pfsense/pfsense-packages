@@ -1139,7 +1139,17 @@ function tinydns_dnscache_forwarding_servers($index) {
 		exec("rm -R {$g['varetc_path']}/dnscache/root/servers/");
 	exec("/bin/mkdir -p {$g['varetc_path']}/dnscache{$index}/root/servers/");
 	if (intval($config['version']) >= 6)
-		exec("/bin/cat {$g['varetc_path']}/nameserver_* > {$g['varetc_path']}/dnscache{$index}/root/servers/@");
+		if (file_exists("{$g['varetc_path']}/nameserver_*")) {
+			exec("/bin/cat {$g['varetc_path']}/nameserver_* > {$g['varetc_path']}/dnscache{$index}/root/servers/@");
+		} else {
+			$fw = fopen("{$g['varetc_path']}/dnscache{$index}/root/servers/@", "w");
+			if (! $fw) {
+				printf("Error: cannot open dnscache/root/servers/@ in tinydns_register_forwarding_servers().\n");
+				return 1;
+			}
+			fwrite($fw, $config['system']['dnsserver'][0]);
+			fclose($fw);
+		}
 	else {
 		$fr = fopen("{$g['varetc_path']}/resolv.conf.dnscache", "r");
 		if (! $fr) {
