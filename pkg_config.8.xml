@@ -5,6 +5,28 @@
 <copy_packages_to_host_ssh>packagecopy@files.pfsense.org</copy_packages_to_host_ssh>
 <copy_packages_to_folder_ssh>/usr/local/www/files/packages/8/All/</copy_packages_to_folder_ssh>
 <packages>
+<!--
+	<package>
+		<name>someprogram</name>
+		<pkginfolink>http://forum.pfsense.org/</pkginfolink>
+		<descr><![CDATA[Some cool program]]></descr>
+		<website>http://www.example.org/someprogram</website>
+		<category>Services</category>
+		<version>0.99</version>
+		<status>Beta</status>
+		<required_version>2.1</required_version>
+		<config_file>http://www.pfsense.com/packages/config/someprogram/someprogram.xml</config_file>
+		<maintainer>me@example.com</maintainer>
+		<configurationfile>someprogram.xml</configurationfile>
+		<build_pbi>
+			<ports_before>db/somethingextraineed</ports_before>
+			<port>net/someprogram</port>
+			<ports_after>www/somethingelsetoputinthepbi www/somethingelse</ports_after>
+		</build_pbi>
+		<depends_on_package_base_url>http://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
+		<depends_on_package_pbi>someprogram-0.99-i386.pbi</depends_on_package_pbi>
+	</package>
+-->
 	<package>
 		<name>Asterisk</name>
 		<pkginfolink>http://forum.pfsense.org/index.php/topic,47210.0.html</pkginfolink>
@@ -20,6 +42,11 @@
 		<depends_on_package>openldap-sasl-client-2.4.26.tbz</depends_on_package>
 		<depends_on_package_pbi>asterisk-1.8.13.0-i386.pbi</depends_on_package_pbi>
 		<build_port_path>/usr/ports/net/asterisk</build_port_path>
+		<build_pbi>
+			<ports_before></ports_before>
+			<port></port>
+			<ports_after></ports_after>
+		</build_pbi>
 		<maintainer>marcellocoutinho@gmail.com robreg@zsurob.hu</maintainer>
 		<configurationfile>asterisk.xml</configurationfile>
 		<after_install_info>Please visit the Asterisk tab on status menu.</after_install_info>
