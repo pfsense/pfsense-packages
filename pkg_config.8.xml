@@ -255,6 +255,9 @@
 		<depends_on_package_base_url>http://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
 		<build_port_path>/usr/ports/net/avahi</build_port_path>
 		<build_port_path>/usr/ports/net/avahi-app</build_port_path>
+		<build_pbi>
+			<port>net/avahi</port>
+		</build_pbi>
 		<depends_on_package>avahi-app-0.6.29_1.tbz</depends_on_package>
 		<depends_on_package_pbi>avahi-0.6.29_3-i386.pbi</depends_on_package_pbi>
 		<version>0.6.25_2</version>
@@ -286,6 +289,10 @@
 		<build_port_path>/usr/ports/graphics/graphviz</build_port_path>
 		<build_port_path>/usr/ports/x11-fonts/webfonts</build_port_path>
 		<build_port_path>/usr/ports/net/ntop</build_port_path>
+		<build_pbi>
+			<ports_before>databases/gdbm net/GeoIP x11-fonts/font-util x11-fonts/webfonts graphics/graphviz</ports_before>
+			<port>net/ntop</port>
+		</build_pbi>
 		<build_options>WITHOUT_APNG=true WITHOUT_COLLATION_FIX=true WITHOUT_DEBUGGING=true WITHOUT_DEJAVU=true WITHOUT_DEVIL=true WITHOUT_DIGCOLA=true WITHOUT_EXTRA_PATCHES=true WITHOUT_FONTCONFIG=true WITHOUT_FPECTL=true WITHOUT_GAM_POLLER=true WITHOUT_GDBM=true WITHOUT_GDK_PIXBUF=true WITHOUT_GHOSTSCRIPT=true WITHOUT_GLITZ=true WITHOUT_GNOMEUI=true WITHOUT_GTK=true WITHOUT_GUILE=true WITHOUT_HUGE_STACK_SIZE=true WITHOUT_ICONV=true WITHOUT_IPSEPCOLA=true WITHOUT_LIBSIGSEGV=true WITHOUT_LOCALE=true WITHOUT_LUA=true WITHOUT_MING=true WITHOUT_MMAP=true WITHOUT_MULTIPLICITY=true WITHOUT_PANGOCAIRO=true WITHOUT_PCAP_PORT=true WITHOUT_PERL=true WITHOUT_PERL_MALLOC=true WITHOUT_PERL_MODULE=true WITHOUT_PHP=true WITHOUT_PTH=true WITHOUT_PYTHON=true WITHOUT_PYTHON_MODULE=true WITHOUT_RSVG=true WITHOUT_RUBY=true WITHOUT_RUBY_MODULE=true WITHOUT_SEM=true WITHOUT_SIMD=true WITHOUT_SITECUSTOMIZE=true WITHOUT_SMYRNA=true WITHOUT_SUIDPERL=true WITHOUT_TCL=true WITHOUT_THREADS=true WITHOUT_TK=true WITHOUT_X11=true WITHOUT_XCB=true WITHOUT_XMLDUMP=true WITHOUT_XPM=true WITHOUT_ZSH=true WITH_BASH=true WITH_EXTRA_ENCODINGS=true WITH_ICONV=true WITH_IPV6=true WITH_NLS=true WITH_PERL_64BITINT=true WITH_PYMALLOC=true WITH_TCPWRAPPER=true WITH_THREADS=true WITH_UCS4=true WITH_USE_PERL=true</build_options>
 		<version>4.1.0_3 v2.3</version>
 		<status>BETA</status>
@@ -469,6 +476,12 @@
 		<build_port_path>/usr/ports/security/barnyard2</build_port_path>
 		<build_port_path>/usr/ports/databases/mysql51-client</build_port_path>
 		<build_port_path>/usr/ports/security/snort</build_port_path>
+		<build_pbi>
+			<custom_name>snort-dev</custom_name>
+			<ports_before>lang/perl5.12 devel/pcre net/daq net/libnet databases/mysql51-client</ports_before>
+			<port>security/snort</port>
+			<ports_after>security/barnyard2</ports_after>
+		</build_pbi>
 		<build_options>WITH_THREADS=yes WITH_IPV6=true WITH_MPLS=true WITH_GRE=true WITHOUT_TARGETBASED=true WITH_DECODERPRE=true WITH_ZLIB=true WITH_NORMALIZER=true WITH_REACT=true WITH_PERFPROFILE=true WITH_FLEXRESP3=true WITHOUT_MYSQL=true WITHOUT_ODBC=true WITHOUT_POSTGRESQL=true WITHOUT_PRELUDE=true WITH_SNORTSAM=true NOPORTDOCS=true</build_options>
 		<config_file>http://www.pfsense.com/packages/config/snort-dev/snort.xml</config_file>
 		<version>2.9.2.3 pkg v. 2.2.1</version>
@@ -621,6 +634,10 @@
 		<config_file>http://www.pfsense.com/packages/config/openospfd/openospfd.xml</config_file>
 		<build_port_path>/usr/ports/net/openospfd</build_port_path>
 		<build_port_path>/usr/ports/devel/libevent</build_port_path>
+		<build_pbi>
+			<ports_before>devel/libevent</ports_before>
+			<port>net/openospfd</port>
+		</build_pbi>
 		<pkginfolink></pkginfolink>
 		<required_version>1.2.1</required_version>
 		<configurationfile>openospfd.xml</configurationfile>
@@ -639,6 +656,10 @@
 		<depends_on_package_pbi>lightsquid-1.8_2-i386.pbi perl-5.12.4_4-i386.pbi</depends_on_package_pbi>
 		<build_port_path>/usr/ports/www/lightsquid</build_port_path>
 		<build_port_path>/usr/ports/lang/perl5.12</build_port_path>
+		<build_pbi>
+			<ports_before>lang/perl5.12</ports_before>
+			<port>www/lightsquid</port>
+		</build_pbi>
 		<build_options>WITHOUT_DEBUGGING=true WITHOUT_GDBM=true WITHOUT_PERL_MALLOC=true WITH_PERL_64BITINT=true WITHOUT_THREADS=true WITHOUT_MULTIPLICITY=true WITHOUT_SUIDPERL=true WITHOUT_SITECUSTOMIZE=true WITH_USE_PERL=true</build_options>
 		<status>RC1</status>
 		<required_version>2.0</required_version>
@@ -778,6 +799,10 @@
 		<build_port_path>/usr/ports/sysutils/ucspi-tcp</build_port_path>
 		<build_port_path>/usr/ports/sysutils/daemontools</build_port_path>
 		<build_port_path>/usr/ports/dns/djbdns</build_port_path>
+		<build_pbi>
+			<ports_before>sysutils/ucspi-tcp sysutils/daemontools</ports_before>
+			<port>dns/djbdns</port>
+		</build_pbi>
 		<build_options>WITH_IPV6=true WITH_SRV=true WITHOUT_DUMPCACHE=true WITHOUT_IGNOREIP=true WITHOUT_JUMBO=true WITHOUT_MAN=true WITHOUT_PERSISTENT_MMAP=true</build_options>
 		<supportedbybsdperimeter>YES</supportedbybsdperimeter>
 	</package>
@@ -802,7 +827,7 @@
 		<depends_on_package>fusefs-libs-2.7.4.tbz</depends_on_package>
 		<build_port_path>/usr/ports/sysutils/fusefs-libs</build_port_path>
 		<depends_on_package>glib-2.28.8_3.tbz</depends_on_package>
-		<build_port_path>/usr/ports/devel/glib2</build_port_path>
+		<build_port_path>/usr/ports/devel/glib20</build_port_path>
 		<depends_on_package>libdnet-1.11_3.tbz</depends_on_package>
 		<build_port_path>/usr/ports/net/libdnet</build_port_path>
 		<depends_on_package>libiconv-1.13.1_1.tbz</depends_on_package>
@@ -815,6 +840,9 @@
 		<build_port_path>/usr/ports/devel/pkg-config</build_port_path>
 		<depends_on_package>python27-2.7.2_3.tbz</depends_on_package>
 		<build_port_path>/usr/ports/lang/python27</build_port_path>
+		<build_pbi>
+			<port>emulators/open-vm-tools-nox11</port>
+		</build_pbi>
 		<depends_on_package_pbi>open-vm-tools-nox11-425873_1-i386.pbi</depends_on_package_pbi>
 	</package>
 	<package>
@@ -1010,6 +1038,10 @@
 		<configurationfile>freeradius.xml</configurationfile>
 		<build_port_path>/usr/ports/net/freeradius</build_port_path>
 		<build_port_path>/usr/ports/devel/libltdl</build_port_path>
+		<build_pbi>
+			<ports_before>devel/libltdl</ports_before>
+			<port>net/freeradius</port>
+		</build_pbi>
 		<after_install_info>Please visit Services: freeRADIUS</after_install_info>
 	</package>
 	<package>
@@ -1258,8 +1290,11 @@
 		<depends_on_package_pbi>squidguard-1.4_4-i386.pbi</depends_on_package_pbi>
 		<build_port_path>/usr/ports/www/squidguard</build_port_path>
 		<build_port_path>/usr/ports/databases/db41</build_port_path>
-		<build_port_path>/usr/ports/databases/db3</build_port_path>
 		<build_port_path>/usr/ports/security/cyrus-sasl2</build_port_path>
+		<build_pbi>
+			<ports_before>databases/db41 security/cyrus-sasl2</ports_before>
+			<port>www/squidguard</port>
+		</build_pbi>
 		<build_options>WITH_SQUID_KERB_AUTH=true WITH_SQUID_LDAP_AUTH=true WITH_SQUID_NIS_AUTH=true WITH_SQUID_SASL_AUTH=true WITH_SQUID_DELAY_POOLS=true WITH_SQUID_SNMP=true WITH_SQUID_CARP=true WITH_SQUID_SSL=true WITHOUT_SQUID_PINGER=true WITHOUT_SQUID_DNS_HELPER=true WITH_SQUID_HTCP=true WITH_SQUID_VIA_DB=true WITH_SQUID_CACHE_DIGESTS=true WITH_SQUID_WCCP=true WITHOUT_SQUID_WCCPV2=true WITHOUT_SQUID_STRICT_HTTP=true WITH_SQUID_IDENT=true WITH_SQUID_REFERER_LOG=true WITHOUT_SQUID_USERAGENT_LOG=true WITH_SQUID_ARP_ACL=true WITH_SQUID_PF=true WITHOUT_SQUID_IPFILTER=true WITH_SQUID_FOLLOW_XFF=true WITH_SQUID_AUFS=true WITH_SQUID_COSS=true WITH_SQUID_KQUEUE=true WITH_SQUID_LARGEFILE=true WITHOUT_SQUID_STACKTRACES=true WITH_SAMPLE_BL=true WITH_LDAP=true WITH_SASL=true WITH_FETCH=true</build_options>
 		<config_file>http://www.pfsense.org/packages/config/squidGuard/squidguard.xml</config_file>
 		<configurationfile>squidguard.xml</configurationfile>
@@ -1275,6 +1310,11 @@
 		<configurationfile>zabbix-agent.xml</configurationfile>
 		<maintainer>remco.verhoef@redfive.biz</maintainer>
 		<build_port_path>/usr/ports/net-mgmt/zabbix-agent</build_port_path>
+		<build_pbi>
+			<custom_name>zabbix-agent</custom_name>
+			<port>net-mgmt/zabbix-agent</port>
+		</build_pbi>
+		<build_options>WITHOUT_CARES=true WITHOUT_CURL_DEBUG=true WITHOUT_DEBUGGING=true WITHOUT_DMALLOC=true WITHOUT_ETCSYMLINK=true WITHOUT_EXTRA_PATCHES=true WITHOUT_GDBM=true WITHOUT_GNUTLS=true WITHOUT_IODBC=true WITHOUT_IPMI=true WITHOUT_KERBEROS4=true WITHOUT_LDAP=true WITHOUT_LDAPS=true WITHOUT_LIBIDN=true WITHOUT_LIBSIGSEGV=true WITHOUT_LIBSSH2=true WITHOUT_MFD_REWRITES=true WITHOUT_MULTIPLICITY=true WITHOUT_MYSQL=true WITHOUT_NTLM=true WITHOUT_PERL_MALLOC=true WITHOUT_PGSQL=true WITHOUT_RTMP=true WITHOUT_SITECUSTOMIZE=true WITHOUT_SSH=true WITHOUT_SUIDPERL=true WITHOUT_THREADS=true WITHOUT_TKMIB=true WITHOUT_TRACKMEMORY=true WITHOUT_UNIXODBC=true WITH_CA_BUNDLE=true WITH_CURL=true WITH_DUMMY=true WITH_EXTRA_ENCODINGS=true WITH_FETCH=true WITH_FPING=true WITH_IPV6=true WITH_JABBER=true WITH_LDAP=true WITH_OPENSSL=true WITH_PERL=true WITH_PERL_64BITINT=true WITH_PERL_EMBEDDED=true WITH_PROXY=true WITH_SASL=true WITH_SQLITE=true WITH_USE_PERL=true WITH_WERROR=true</build_options>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
 		<depends_on_package>zabbix-agent-1.8.10,2.tbz</depends_on_package>
 		<depends_on_package_pbi>zabbix-1.8.13-i386.pbi</depends_on_package_pbi>
@@ -1290,6 +1330,10 @@
 		<configurationfile>zabbix-proxy.xml</configurationfile>
 		<maintainer>cmb@pfsense.org</maintainer>
 		<build_port_path>/usr/ports/net-mgmt/zabbix-proxy</build_port_path>
+		<build_pbi>
+			<custom_name>zabbix-proxy</custom_name>
+			<port>net-mgmt/zabbix-proxy</port>
+		</build_pbi>
 		<build_options>WITHOUT_CARES=true WITHOUT_CURL_DEBUG=true WITHOUT_DEBUGGING=true WITHOUT_DMALLOC=true WITHOUT_ETCSYMLINK=true WITHOUT_EXTRA_PATCHES=true WITHOUT_GDBM=true WITHOUT_GNUTLS=true WITHOUT_IODBC=true WITHOUT_IPMI=true WITHOUT_KERBEROS4=true WITHOUT_LDAP=true WITHOUT_LDAPS=true WITHOUT_LIBIDN=true WITHOUT_LIBSIGSEGV=true WITHOUT_LIBSSH2=true WITHOUT_MFD_REWRITES=true WITHOUT_MULTIPLICITY=true WITHOUT_MYSQL=true WITHOUT_NTLM=true WITHOUT_PERL_MALLOC=true WITHOUT_PGSQL=true WITHOUT_RTMP=true WITHOUT_SITECUSTOMIZE=true WITHOUT_SSH=true WITHOUT_SUIDPERL=true WITHOUT_THREADS=true WITHOUT_TKMIB=true WITHOUT_TRACKMEMORY=true WITHOUT_UNIXODBC=true WITH_CA_BUNDLE=true WITH_CURL=true WITH_DUMMY=true WITH_EXTRA_ENCODINGS=true WITH_FETCH=true WITH_FPING=true WITH_IPV6=true WITH_JABBER=true WITH_LDAP=true WITH_OPENSSL=true WITH_PERL=true WITH_PERL_64BITINT=true WITH_PERL_EMBEDDED=true WITH_PROXY=true WITH_SASL=true WITH_SQLITE=true WITH_USE_PERL=true WITH_WERROR=true</build_options>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
 		<depends_on_package>zabbix-proxy-1.8.8,2.tbz</depends_on_package>
@@ -1453,6 +1497,10 @@
 		<build_port_path>/usr/ports/dns/ldns</build_port_path>
 		<build_port_path>/usr/ports/textproc/expat2</build_port_path>
 		<build_port_path>/usr/ports/devel/libevent2</build_port_path>
+		<build_pbi>
+			<ports_before>dns/ldns textproc/expat2 devel/libevent2</ports_before>
+			<port>dns/unbound</port>
+		</build_pbi>
 		<build_options>WITH_LIBEVENT=true WITH_THREADS=true WITHOUT_GOST=true WITHOUT_MAN=true</build_options>
 		<logging>
 			<facilityname>unbound</facilityname>
@@ -1500,6 +1548,10 @@
 		<depends_on_package_pbi>nrpe-2.13-i386.pbi nagios-plugins-1.4.15_1-i386.pbi</depends_on_package_pbi>
 		<build_port_path>/usr/ports/net-mgmt/nrpe2</build_port_path>
 		<build_port_path>/usr/ports/net-mgmt/nagios-plugins</build_port_path>
+		<build_pbi>
+			<ports_before>net-mgmt/nagios-plugins</ports_before>
+			<port>net-mgmt/nrpe2</port>
+		</build_pbi>
 		<build_options>WITH_SSL=true WITHOUT_ARGS=true</build_options>
 		<config_file>http://www.pfsense.com/packages/config/nrpe2/nrpe2.xml</config_file>
 		<version>2.12_3 v2.1</version>
