@@ -640,7 +640,7 @@
 		<depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
 		<depends_on_package>lightsquid-1.8_2.tbz</depends_on_package>
 		<depends_on_package>perl-5.12.4_3.tbz</depends_on_package>
-		<depends_on_package_pbi>lightsquid-1.8_2-amd64.pbi perl-5.12.4_4-amd64.pbi</depends_on_package_pbi>
+		<depends_on_package_pbi>lightsquid-1.8_2-amd64.pbi</depends_on_package_pbi>
 		<build_port_path>/usr/ports/www/lightsquid</build_port_path>
 		<build_port_path>/usr/ports/lang/perl5.12</build_port_path>
 		<build_pbi>
