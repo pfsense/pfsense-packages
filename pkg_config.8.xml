@@ -1036,6 +1036,10 @@
 		<build_port_path>/usr/ports/net/libpcap</build_port_path>
 		<build_port_path>/usr/ports/databases/postgresql84-client</build_port_path>
 		<build_port_path>/usr/ports/net-mgmt/bandwidthd</build_port_path>
+		<build_pbi>
+			<ports_before>net/libpcap databases/postgresql91-client graphics/gd</ports_before>
+			<port>net-mgmt/bandwidthd</port>
+		</build_pbi>
 		<build_options>WITH_NLS=true WITHOUT_PAM=true WITHOUT_LDAP=true WITHOUT_MIT_KRB5=true WITHOUT_HEIMDAL_KRB5=true WITHOUT_OPTIMIZED_CFLAGS=true WITHOUT_XML=true WITHOUT_TZDATA=true WITHOUT_DEBUG=true WITHOUT_GSSAPI=true WITHOUT_ICU=true WITH_INTDATE=true</build_options>
 	</package>
 	<package>
@@ -1115,11 +1119,7 @@
 		<depends_on_package>squid-2.7.9_1.tbz</depends_on_package>
 		<depends_on_package>squid_radius_auth-1.10.tbz</depends_on_package>
 		<depends_on_package>libwww-5.4.0_4.tbz</depends_on_package>
-		<depends_on_package_pbi>
-			libwww-5.4.0_4-i386.pbi
-			squid-2.7.9_1-i386.pbi
-			squid_radius_auth-1.10-i386.pbi
-		</depends_on_package_pbi>
+		<depends_on_package_pbi>squid-2.7.9_1-i386.pbi</depends_on_package_pbi>
 		<build_port_path>/usr/ports/www/squid</build_port_path>
 		<build_port_path>/usr/ports/www/squid_radius_auth</build_port_path>
 		<build_port_path>/usr/ports/www/libwww</build_port_path>
