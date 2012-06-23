@@ -1829,7 +1829,7 @@ function squid_do_xmlrpc_sync($sync_to_ip, $username, $password) {
 		log_error("squid XMLRPC sync successfully completed with {$url}:{$port}.");
 	}
 	
-	/* tell squid to reload our settings on the destionation sync host. */
+	/* tell squid to reload our settings on the destination sync host. */
 	$method = 'pfsense.exec_php';
 	$execcmd  = "require_once('/usr/local/pkg/squid.inc');\n";
 	$execcmd .= "squid_resync();";
