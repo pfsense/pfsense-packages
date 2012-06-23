@@ -249,7 +249,7 @@
 			<fieldname>error_language</fieldname>
 			<description>Select the language in which the proxy server will display error messages to users.</description>
 			<type>select</type>
-			<default_value>English</default_value>
+			<default_value>en</default_value>
 		</field>
 		<field>
 			<fielddescr>Disable X-Forward</fielddescr>
