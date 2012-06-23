@@ -1545,7 +1545,7 @@
 		<depends_on_package_base_url>http://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
 		<depends_on_package>nrpe-2.12_3.tbz</depends_on_package>
 		<depends_on_package>nagios-plugins-1.4.15_1,1.tbz</depends_on_package>
-		<depends_on_package_pbi>nrpe-2.13-i386.pbi nagios-plugins-1.4.15_1-i386.pbi</depends_on_package_pbi>
+		<depends_on_package_pbi>nrpe-2.13-i386.pbi</depends_on_package_pbi>
 		<build_port_path>/usr/ports/net-mgmt/nrpe2</build_port_path>
 		<build_port_path>/usr/ports/net-mgmt/nagios-plugins</build_port_path>
 		<build_pbi>
