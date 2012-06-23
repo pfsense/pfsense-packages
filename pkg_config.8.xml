@@ -42,11 +42,6 @@
 		<depends_on_package>openldap-sasl-client-2.4.26.tbz</depends_on_package>
 		<depends_on_package_pbi>asterisk-1.8.13.0-i386.pbi</depends_on_package_pbi>
 		<build_port_path>/usr/ports/net/asterisk</build_port_path>
-		<build_pbi>
-			<ports_before></ports_before>
-			<port></port>
-			<ports_after></ports_after>
-		</build_pbi>
 		<maintainer>marcellocoutinho@gmail.com robreg@zsurob.hu</maintainer>
 		<configurationfile>asterisk.xml</configurationfile>
 		<after_install_info>Please visit the Asterisk tab on status menu.</after_install_info>
@@ -221,6 +216,12 @@
 		<build_port_path>/usr/ports/www/apache22</build_port_path>
 		<build_port_path>/usr/ports/www/mod_security</build_port_path>
 		<build_port_path>/usr/ports/www/mod_memcache</build_port_path>
+		<build_pbi>
+			<custom_name>proxy_mod_security</custom_name>
+			<ports_before>devel/gettext misc/help2man databases/db42 databases/gdbm devel/apr1</ports_before>
+			<port>www/apache22</port>
+			<ports_after>www/mod_security www/mod_memcache</ports_after>
+		</build_pbi>
 		<build_options>WITHOUT_THREADS=yes WITHOUT_MYSQL=yes WITHOUT_PGSQL=yes WITHOUT_SQLITE=yes WITH_IPV6=yes WITHOUT_BDB=yes WITH_AUTH_BASIC=yes WITH_AUTH_DIGEST=yes WITH_AUTHN_FILE=yes WITHOUT_AUTHN_DBD=yes WITH_AUTHN_DBM=yes WITH_AUTHN_ANON=yes WITH_AUTHN_DEFAULT=yes WITH_AUTHN_ALIAS=yes WITH_AUTHZ_HOST=yes WITH_AUTHZ_GROUPFILE=yes WITH_AUTHZ_USER=yes WITH_AUTHZ_DBM=yes WITH_AUTHZ_OWNER=yes WITH_AUTHZ_DEFAULT=yes WITH_CACHE=yes WITH_DISK_CACHE=yes WITH_FILE_CACHE=yes WITHOUT_MEM_CACHE=yes WITH_DAV=yes WITH_DAV_FS=yes WITHOUT_BUCKETEER=yes WITHOUT_CASE_FILTER=yes WITHOUT_CASE_FILTER_IN=yes WITHOUT_EXT_FILTER=yes WITHOUT_LOG_FORENSIC=yes WITHOUT_OPTIONAL_HOOK_EXPORT=yes WITHOUT_OPTIONAL_HOOK_IMPORT=yes WITHOUT_OPTIONAL_FN_IMPORT=yes WITHOUT_OPTIONAL_FN_EXPORT=yes WITHOUT_LDAP=yes WITHOUT_AUTHNZ_LDAP=yes WITH_ACTIONS=yes WITH_ALIAS=yes WITH_ASIS=yes WITH_AUTOINDEX=yes WITH_CERN_META=yes WITH_CGI=yes WITH_CHARSET_LITE=yes WITHOUT_DBD=yes WITH_DEFLATE=yes WITH_DIR=yes WITH_DUMPIO=yes WITH_ENV=yes WITH_EXPIRES=yes WITH_HEADERS=yes WITH_IMAGEMAP=yes WITH_INCLUDE=yes WITH_INFO=yes WITH_LOG_CONFIG=yes WITH_LOGIO=yes WITH_MIME=yes WITH_MIME_MAGIC=yes WITH_NEGOTIATION=yes WITH_REWRITE=yes WITH_SETENVIF=yes WITH_SPELING=yes WITH_STATUS=yes WITH_UNIQUE_ID=yes WITH_USERDIR=yes WITH_USERTRACK=yes WITH_VHOST_ALIAS=yes WITH_FILTER=yes WITHOUT_SUBSTITUTE=yes WITH_VERSION=yes WITH_PROXY=yes WITH_PROXY_CONNECT=yes WITH_PROXY_FTP=yes WITH_PROXY_HTTP=yes WITH_PROXY_AJP=yes WITH_PROXY_BALANCER=yes WITH_PROXY_SCGI=yes WITH_SSL=yes WITHOUT_SUEXEC=yes WITHOUT_SUEXEC_RSRCLIMIT=yes WITH_REQTIMEOUT=yes WITHOUT_CGID=yes</build_options>
 		<after_install_info>Please visit the ProxyServer settings tab and set the service up so that it may be started.</after_install_info>
 	</package>
