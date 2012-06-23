@@ -28,18 +28,27 @@
 	POSSIBILITY OF SUCH DAMAGE.
 */
 
+if (substr(trim(file_get_contents("/etc/version")),0,3) == "2.1") {
+	define('PKG_BANDWIDTHD_BASE', '/usr/pbi/bandwidthd-amd64/bandwidthd');
+} else {
+	define('PKG_BANDWIDTHD_BASE', '/usr/local/bandwidthd');
+}
+
 function bandwidthd_install_deinstall() {
 	conf_mount_rw();
 	config_lock();
-	exec("rm /usr/local/etc/rc.d/bandwidthd*");
-	exec("rm -rf /usr/local/bandwidthd*");
-	exec("rm /usr/local/www/bandwidthd");
+	exec("rm -f /usr/local/etc/rc.d/bandwidthd*");
+	exec("rm -rf " . PKG_BANDWIDTHD_BASE . "/htdocs");
+	exec("rm -f /usr/local/www/bandwidthd");
 	conf_mount_ro();
 	config_unlock();
 }
 
 function bandwidthd_install_config() {
 	global $config, $g;
+
+	/* bandwidthd doesn't have a way to pass a custom config path, unfortunately */
+	$bandwidthd_config_dir = PKG_BANDWIDTHD_BASE . "/etc";
 
 	conf_mount_rw();
 	config_lock();
@@ -177,9 +186,9 @@ $meta_refresh
 
 EOF;
 
-	$fd = fopen("/usr/local/bandwidthd/etc/bandwidthd.conf","w");
+	$fd = fopen("{$bandwidthd_config_dir}/bandwidthd.conf","w");
 	if(!$fd) {
-		log_error("could not open /usr/local/bandwidthd/etc/bandwidthd.conf for writing");
+		log_error("could not open {$bandwidthd_config_dir}/bandwidthd.conf for writing");
 		exit;
 	}
 	fwrite($fd, $config_file);
@@ -188,15 +197,15 @@ EOF;
 	/* write out rc.d start/stop file */
 	write_rcfile(array(
 			"file" => "bandwidthd.sh",
-			"start" => "/usr/local/bandwidthd/bandwidthd /usr/local/bandwidthd/etc/bandwidthd.conf",
+			"start" => "/usr/local/bandwidthd/bandwidthd {$bandwidthd_config_dir}/bandwidthd.conf",
 			"stop" => "/usr/bin/killall bandwidthd"
 		)
 	);
 
 	exec("rm /usr/local/www/bandwidthd");
-	exec("/bin/ln -s /usr/local/bandwidthd/htdocs /usr/local/www/bandwidthd");
+	exec("/bin/ln -s " . PKG_BANDWIDTHD_BASE . "/htdocs /usr/local/www/bandwidthd");
 
-	exec("echo \"Please start bandwidthd to populate this directory.\" > /usr/local/bandwidthd/htdocs/index.html");
+	exec("echo \"Please start bandwidthd to populate this directory.\" > " . PKG_BANDWIDTHD_BASE . "/htdocs/index.html");
 
 	conf_mount_ro();
 	config_unlock();
