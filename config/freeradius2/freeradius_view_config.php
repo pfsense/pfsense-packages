@@ -33,15 +33,9 @@
 require("guiconfig.inc");
 
 // Check to find out on which system the package is running
-if (exec("uname -r | cut -c 1-3") == '8.3') {
-	if (exec("uname -m") == "i386") {
-		define('RADDB', '/usr/pbi/freeradius-i386/etc/raddb');
-	}
-	else {
-		define('RADDB', '/usr/pbi/freeradius-amd64/etc/raddb');
-	}
-}
-else {
+if (substr(trim(file_get_contents("/etc/version")),0,3) == "2.1") {
+	define('RADDB', '/usr/pbi/freeradius-' . php_uname("m") . '/etc/raddb');
+} else {
 	define('RADDB', '/usr/local/etc/raddb');
 }
 // End of system check
