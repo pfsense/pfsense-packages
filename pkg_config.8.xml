@@ -782,7 +782,7 @@
 		<depends_on_package>ucspi-tcp-0.88_2.tbz</depends_on_package>
 		<depends_on_package>daemontools-0.76_16.tbz</depends_on_package>
 		<depends_on_package>djbdns-ipv6-1.05.b23_13.tbz</depends_on_package>
-		<depends_on_package_pbi>ucspi-tcp-0.88_2-i386.pbi daemontools-0.76_16-i386.pbi djbdns-1.05_14-i386.pbi</depends_on_package_pbi>
+		<depends_on_package_pbi>djbdns-1.05_14-i386.pbi</depends_on_package_pbi>
 		<build_port_path>/usr/ports/sysutils/ucspi-tcp</build_port_path>
 		<build_port_path>/usr/ports/sysutils/daemontools</build_port_path>
 		<build_port_path>/usr/ports/dns/djbdns</build_port_path>
