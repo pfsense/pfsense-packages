@@ -906,7 +906,7 @@
 		<config_file>http://www.pfsense.com/packages/config/imspector/imspector.xml</config_file>
 		<configurationfile>imspector.xml</configurationfile>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
-		<depends_on_package>sqlite3-3.7.9.tbz</depends_on_package>
+		<depends_on_package>sqlite3-3.7.12.1.tbz</depends_on_package>
 		<depends_on_package>imspector-0.9.tbz</depends_on_package>
 		<depends_on_package_pbi>imspector-0.9-i386.pbi</depends_on_package_pbi>
 		<build_port_path>/usr/ports/net-im/imspector</build_port_path>
