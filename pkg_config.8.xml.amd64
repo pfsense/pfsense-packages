@@ -1005,7 +1005,7 @@
 		<depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
 		<depends_on_package>freeradius-1.1.8_4.tbz</depends_on_package>
 		<depends_on_package>libltdl-2.4_1.tbz</depends_on_package>
-		<depends_on_package_pbi>freeradius-1.1.8_5-amd64.pbi libltdl-2.4.2-amd64.pbi</depends_on_package_pbi>
+		<depends_on_package_pbi>freeradius-1.1.8_5-amd64.pbi</depends_on_package_pbi>
 		<config_file>http://www.pfsense.org/packages/config/freeradius.xml</config_file>
 		<configurationfile>freeradius.xml</configurationfile>
 		<build_port_path>/usr/ports/net/freeradius</build_port_path>
