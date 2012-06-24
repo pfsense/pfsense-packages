@@ -406,7 +406,7 @@
 		<depends_on_package>daq-0.6.2.tbz</depends_on_package>
 		<depends_on_package>snort-2.9.2.3.tbz</depends_on_package>
 		<depends_on_package>perl-threaded-5.12.4_4.tbz</depends_on_package>
-		<depends_on_package_pbi>snort-2.9.2.3-amd64.pbi barnyard2-1.9_2-amd64.pbi perl-5.12.4_4-amd64.pbi</depends_on_package_pbi>
+		<depends_on_package_pbi>snort-2.9.2.3-amd64.pbi</depends_on_package_pbi>
 		<build_port_path>/usr/ports/devel/pcre</build_port_path>
 		<build_port_path>/usr/ports/net/daq</build_port_path>
 		<build_port_path>/usr/ports/net/libnet</build_port_path>
