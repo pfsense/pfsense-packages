@@ -428,7 +428,6 @@
 		<build_port_path>/usr/ports/databases/mysql51-client</build_port_path>
 		<build_port_path>/usr/ports/security/snort</build_port_path>
 		<build_pbi>
-			<ports_before>lang/perl5.12 devel/pcre net/daq net/libnet databases/mysql51-client</ports_before>
 			<port>security/snort</port>
 			<ports_after>security/barnyard2</ports_after>
 		</build_pbi>
@@ -465,7 +464,6 @@
 		<build_port_path>/usr/ports/security/snort</build_port_path>
 		<build_pbi>
 			<custom_name>snort-dev</custom_name>
-			<ports_before>lang/perl5.12 devel/pcre net/daq net/libnet databases/mysql51-client</ports_before>
 			<port>security/snort</port>
 			<ports_after>security/barnyard2</ports_after>
 		</build_pbi>
