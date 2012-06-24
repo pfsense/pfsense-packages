@@ -46,24 +46,14 @@ require_once("filter.inc");
 require_once("services.inc");
 
 // Check to find out on which system the package is running
-if (exec("uname -r | cut -c 1-3") == '8.3') {
-	if (exec("uname -m") == "i386") {
-		define('RADDB', '/usr/pbi/freeradius-i386/etc/raddb');
-		define('USRLOCAL', '/usr/pbi/freeradius-i386');
-	}
-	else {
-		define('RADDB', '/usr/pbi/freeradius-amd64/etc/raddb');
-		define('USRLOCAL', '/usr/pbi/freeradius-amd64');
-	}
-}
-else {
+if (substr(trim(file_get_contents("/etc/version")),0,3) == "2.1") {
+	define('RADDB', '/usr/pbi/freeradius-' . php_uname("m") . '/etc/raddb');
+	define('USRLOCAL', '/usr/pbi/freeradius-' . php_uname("m"));
+} else {
 	define('RADDB', '/usr/local/etc/raddb');
 	define('USRLOCAL', '/usr/local');
 }
 // End of system check
-
-
-// define('RADDB', '/usr/local/etc/raddb');
 
 function freeradius_deinstall_command() {
 	exec("cd /var/db/pkg && pkg_delete `ls | grep freeradius`");
@@ -74,6 +64,10 @@ function freeradius_deinstall_command() {
 function freeradius_install_command() {
 	global $config;
 	conf_mount_rw();
+
+	// put the constant to a variable
+	$varRADDB = RADDB;
+	$varUSRLOCAL = USRLOCAL;
 
 	// We create here different folders for different counters.
 	if (!file_exists("/var/log/radacct/datacounter/")) { exec("mkdir /var/log/radacct/datacounter && mkdir /var/log/radacct/datacounter/daily && mkdir /var/log/radacct/datacounter/weekly && mkdir /var/log/radacct/datacounter/monthly && mkdir /var/log/radacct/datacounter/forever"); }
@@ -124,8 +118,8 @@ function freeradius_install_command() {
 
 	$rcfile = array();
 	$rcfile['file'] = 'radiusd.sh';
-	$rcfile['start'] = USRLOCAL . '/etc/rc.d/radiusd onestart';
-	$rcfile['stop'] = USRLOCAL . '/etc/rc.d/radiusd onestop';
+	$rcfile['start'] = "$varUSRLOCAL" . '/etc/rc.d/radiusd onestart';
+	$rcfile['stop'] = "$varUSRLOCAL" . '/etc/rc.d/radiusd onestop';
 	write_rcfile($rcfile);
 		conf_mount_ro();
 	start_service("radiusd");
@@ -134,6 +128,10 @@ function freeradius_install_command() {
 function freeradius_settings_resync() {
 	global $config;
 	$conf = '';
+
+	// put the constant to a variable
+	$varRADDB = RADDB;
+	$varUSRLOCAL = USRLOCAL;
 
 	// We do some checks of some folders which will be deleted after reboot on nanobsd systems
 	if (!file_exists("/var/log/radacct/")) { exec("mkdir /var/log/radacct"); }
@@ -203,7 +201,7 @@ function freeradius_settings_resync() {
 
 
 	$conf .= <<<EOD
-prefix = USRLOCAL
+prefix = $varUSRLOCAL
 exec_prefix = \${prefix}
 sysconfdir = \${prefix}/etc
 localstatedir = /var
@@ -3950,10 +3948,14 @@ function freeradius_modulesmotp_resync() {
 	global $config;
 	$conf = '';
 
+	// put the constant to a variable
+	$varRADDB = RADDB;
+	$varUSRLOCAL = USRLOCAL;
+
 	$conf .= <<<EOD
 exec motp {
 		wait = yes
-		program = "/usr/local/bin/bash " . RADDB . "/scripts/otpverify.sh %{request:User-Name} %{request:User-Password} %{reply:MOTP-Init-Secret} %{reply:MOTP-PIN} %{reply:MOTP-Offset}"
+		program = "/usr/local/bin/bash $varRADDB/scripts/otpverify.sh %{request:User-Name} %{request:User-Password} %{reply:MOTP-Init-Secret} %{reply:MOTP-PIN} %{reply:MOTP-Offset}"
 	}	
 EOD;
 
@@ -3969,22 +3971,26 @@ function freeradius_modulesdatacounter_resync() {
 	global $config;
 	$conf = '';
 
+	// put the constant to a variable
+	$varRADDB = RADDB;
+	$varUSRLOCAL = USRLOCAL;
+
 	$conf .= <<<EOD
 exec datacounterdaily {
 		wait = yes
-		program = "/bin/sh " . RADDB . "/scripts/datacounter_acct.sh %{request:User-Name} daily %{request:Acct-Input-Octets} %{request:Acct-Output-Octets}"
+		program = "/bin/sh $varRADDB/scripts/datacounter_acct.sh %{request:User-Name} daily %{request:Acct-Input-Octets} %{request:Acct-Output-Octets}"
 	}
 exec datacounterweekly {
 		wait = yes
-		program = "/bin/sh " . RADDB . "/scripts/datacounter_acct.sh %{request:User-Name} weekly %{request:Acct-Input-Octets} %{request:Acct-Output-Octets}"
+		program = "/bin/sh $varRADDB/scripts/datacounter_acct.sh %{request:User-Name} weekly %{request:Acct-Input-Octets} %{request:Acct-Output-Octets}"
 	}
 exec datacountermonthly {
 		wait = yes
-		program = "/bin/sh " . RADDB . "/scripts/datacounter_acct.sh %{request:User-Name} monthly %{request:Acct-Input-Octets} %{request:Acct-Output-Octets}"
+		program = "/bin/sh $varRADDB/scripts/datacounter_acct.sh %{request:User-Name} monthly %{request:Acct-Input-Octets} %{request:Acct-Output-Octets}"
 	}
 exec datacounterforever {
 		wait = yes
-		program = "/bin/sh " . RADDB . "/scripts/datacounter_acct.sh %{request:User-Name} forever %{request:Acct-Input-Octets} %{request:Acct-Output-Octets}"
+		program = "/bin/sh $varRADDB/scripts/datacounter_acct.sh %{request:User-Name} forever %{request:Acct-Input-Octets} %{request:Acct-Output-Octets}"
 	}	
 EOD;
 
