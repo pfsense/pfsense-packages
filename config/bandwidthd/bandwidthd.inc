@@ -29,7 +29,7 @@
 */
 
 if (substr(trim(file_get_contents("/etc/version")),0,3) == "2.1") {
-	define('PKG_BANDWIDTHD_BASE', '/usr/pbi/bandwidthd-amd64/bandwidthd');
+	define('PKG_BANDWIDTHD_BASE', '/usr/pbi/bandwidthd-' . php_uname("m") . '/bandwidthd');
 } else {
 	define('PKG_BANDWIDTHD_BASE', '/usr/local/bandwidthd');
 }
