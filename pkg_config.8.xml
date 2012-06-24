@@ -246,7 +246,7 @@
 			<port>net/avahi</port>
 		</build_pbi>
 		<depends_on_package>avahi-app-0.6.29_1.tbz</depends_on_package>
-		<depends_on_package_pbi>avahi-0.6.29_3-i386.pbi</depends_on_package_pbi>
+		<depends_on_package_pbi>avahi-0.6.29-i386.pbi</depends_on_package_pbi>
 		<version>0.6.25_2</version>
 		<status>ALPHA</status>
 		<required_version>1.2.3</required_version>

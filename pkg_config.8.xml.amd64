@@ -233,7 +233,7 @@
 			<port>net/avahi</port>
 		</build_pbi>
 		<depends_on_package>avahi-0.6.29.tbz</depends_on_package>
-		<depends_on_package_pbi>avahi-0.6.29_3-amd64.pbi</depends_on_package_pbi>
+		<depends_on_package_pbi>avahi-0.6.29-amd64.pbi</depends_on_package_pbi>
 		<version>0.6.25_2</version>
 		<status>ALPHA</status>
 		<required_version>1.2.3</required_version>
