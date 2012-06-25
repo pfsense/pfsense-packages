@@ -196,13 +196,30 @@
 			<fielddescr>Description</fielddescr>
 			<fieldname>description</fieldname>
 		</columnitem>
-		<movable>text</movable>
+		<movable>on</movable>
 	</adddeleteeditpagefields>
 	<fields>
 		<field>
 			<name>GENERAL CONFIGURATION</name>
 			<type>listtopic</type>
-		</field>	
+		</field>
+		<field>
+			<fielddescr>sortable</fielddescr>
+			<fieldname>sortable</fieldname>
+			<display_maximum_rows>20</display_maximum_rows>
+			<type>sorting</type>
+			<include_filtering_inputbox/>
+			<sortablefields>
+				<item><name>MAC Address</name><fieldname>varmacsaddress</fieldname><regex>/%FILTERTEXT%/i</regex></item>
+				<item><name>Simultaneous Connections</name><fieldname>varmacssimultaneousconnect</fieldname><regex>/%FILTERTEXT%/i</regex></item>
+				<item><name>IP Address</name><fieldname>varmacsframedipaddress</fieldname><regex>/%FILTERTEXT%/i</regex></item>
+				<item><name>Expiration Date</name><fieldname>varmacsexpiration</fieldname><regex>/%FILTERTEXT%/i</regex></item>
+				<item><name>Session Timeout</name><fieldname>varmacssessiontimeout</fieldname><regex>/%FILTERTEXT%/i</regex></item>
+				<item><name>Possible Login Times</name><fieldname>varmacslogintime</fieldname><regex>/%FILTERTEXT%/i</regex></item>
+				<item><name>VLAN ID</name><fieldname>varmacsvlanid</fieldname><regex>/%FILTERTEXT%/i</regex></item>
+				<item><name>Description</name><fieldname>description</fieldname><regex>/%FILTERTEXT%/i</regex></item>
+			</sortablefields>
+		</field>
 		<field>
 			<fielddescr>MAC Address</fielddescr>
 			<fieldname>varmacsaddress</fieldname>
