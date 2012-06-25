@@ -56,9 +56,11 @@ if (substr(trim(file_get_contents("/etc/version")),0,3) == "2.0") {
 // End of system check
 
 function freeradius_deinstall_command() {
-	exec("cd /var/db/pkg && pkg_delete `ls | grep freeradius`");
-	exec("rm -rf " . RADDB);
-	exec("rm -rf /var/run/radiusd/");
+	if (substr(trim(file_get_contents("/etc/version")),0,3) == "2.0") {
+		exec("cd /var/db/pkg && pkg_delete `ls | grep freeradius`");
+		exec("rm -rf " . RADDB);
+		exec("rm -rf /var/run/radiusd/");
+	}
 }
 
 function freeradius_install_command() {
