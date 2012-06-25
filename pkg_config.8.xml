@@ -260,7 +260,7 @@
 		<descr>ntop is a network probe that shows network usage in a way similar to what top does for processes. In interactive mode, it displays the network status on the user's terminal. In Web mode it acts as a Web server, creating an HTML dump of the network status. It sports a NetFlow/sFlow emitter/collector, an HTTP-based client interface for creating ntop-centric monitoring applications, and RRD for persistently storing traffic statistics.</descr>
 		<category>Network Management</category>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
-		<depends_on_package_pbi>rrdtool-1.2.30_2-i386.pbi gdbm-1.9.1-i386.pbi perl-5.12.4_4-i386.pbi libpcap-1.2.1-i386.pbi geoip-1.4.8_2-i386.pbi webfonts-0.30_6-i386.pbi ntop-4.1.0_5-i386.pbi font-util-1.2.0-i386.pbi graphviz-2.28.0_1-i386.pbi</depends_on_package_pbi>
+		<depends_on_package_pbi>ntop-4.1.0_5-i386.pbi</depends_on_package_pbi>
 		<depends_on_package>rrdtool-1.2.30_1.tbz</depends_on_package>
 		<depends_on_package>gdbm-1.9.1.tbz</depends_on_package>
 		<depends_on_package>perl-5.12.4_4.tbz</depends_on_package>
