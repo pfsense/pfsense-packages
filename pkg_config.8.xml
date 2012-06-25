@@ -1069,7 +1069,7 @@
 		<depends_on_package_base_url>http://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
 		<depends_on_package>bandwidthd-2.0.1_4.tbz</depends_on_package>
 		<depends_on_package>libpcap-1.1.1.tbz</depends_on_package>
-		<depends_on_package>postgresql-client-8.4.7.tbz</depends_on_package>
+		<depends_on_package>postgresql-client-8.4.12.tbz</depends_on_package>
 		<depends_on_package_pbi>bandwidthd-2.0.1_5-i386.pbi</depends_on_package_pbi>
 		<config_file>http://www.pfsense.org/packages/config/bandwidthd/bandwidthd.xml</config_file>
 		<configurationfile>bandwidthd.xml</configurationfile>
