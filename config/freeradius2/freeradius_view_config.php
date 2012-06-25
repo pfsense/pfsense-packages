@@ -33,10 +33,10 @@
 require("guiconfig.inc");
 
 // Check to find out on which system the package is running
-if (substr(trim(file_get_contents("/etc/version")),0,3) == "2.1") {
-	define('RADDB', '/usr/pbi/freeradius-' . php_uname("m") . '/etc/raddb');
-} else {
+if (substr(trim(file_get_contents("/etc/version")),0,3) == "2.0") {
 	define('RADDB', '/usr/local/etc/raddb');
+} else {
+	define('RADDB', '/usr/pbi/freeradius-' . php_uname("m") . '/etc/raddb');
 }
 // End of system check
 
