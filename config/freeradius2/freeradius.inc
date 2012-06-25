@@ -3806,14 +3806,26 @@ function freeradius_motp_resync() {
 			exec("cd /var/db/pkg && pkg_delete `ls | grep bash`");
 			log_error('FreeRADIUS: Uninstalling package "bash-4.1.7" which comes with Mobile-One-Time-Password (motp).');
 		}
+		if (exec("cd /var/db/pkg && ls | grep bash") == "bash-4.2.20") {
+			exec("cd /var/db/pkg && pkg_delete `ls | grep bash`");
+			log_error('FreeRADIUS: Uninstalling package "bash-4.2.20" which comes with Mobile-One-Time-Password (motp).');
+		}
 	}
 	
 	// check if enabled then we need to download "bash"
 	else {
-		if (exec("cd /var/db/pkg && ls | grep bash") != "bash-4.1.7") {
-			log_error('FreeRADIUS: Downloading and installing package "bash-4.1.7" to use Mobile-One-Time-Password (motp).');
-			exec("pkg_add -r http://ftp-archive.freebsd.org/pub/FreeBSD-Archive/ports/`uname -m`/packages-8.1-release/All/bash-4.1.7.tbz");
+		if (substr(trim(file_get_contents("/etc/version")),0,3) == "2.0") {
+			if (exec("cd /var/db/pkg && ls | grep bash") != "bash-4.1.7") {
+				log_error('FreeRADIUS: Downloading and installing package "bash-4.1.7" to use Mobile-One-Time-Password (motp).');
+				exec("pkg_add -r http://ftp-archive.freebsd.org/pub/FreeBSD-Archive/ports/`uname -m`/packages-8.1-release/All/bash-4.1.7.tbz");
+			}
+		} else {
+			if (exec("cd /var/db/pkg && ls | grep bash") != "bash-4.2.20") {
+				log_error('FreeRADIUS: Downloading and installing package "bash-4.2.20" to use Mobile-One-Time-Password (motp).');
+				exec("pkg_add -r http://ftp-archive.freebsd.org/pub/FreeBSD/ports/`uname -m`/packages-8.3-release/All/bash-4.2.20.tbz");
+			}
 		}
+		
 	
 	$conf .= <<<EOD
 #!/bin/bash
