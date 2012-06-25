@@ -1051,16 +1051,6 @@
 		<config_file>http://www.pfsense.org/packages/config/freeradius2/freeradius.xml</config_file>
 		<configurationfile>freeradius.xml</configurationfile>
 		<after_install_info>Please visit Services: FreeRADIUS</after_install_info>
-		<build_port_path>/usr/ports/converters/libiconv</build_port_path>
-		<build_port_path>/usr/ports/databases/db41</build_port_path>
-		<build_port_path>/usr/ports/security/cyrus-sasl2</build_port_path>
-		<build_port_path>/usr/ports/security/krb5</build_port_path>
-		<build_port_path>/usr/ports/lang/perl5.12</build_port_path>
-		<build_port_path>/usr/ports/devel/libltdl</build_port_path>
-		<build_port_path>/usr/ports/net/openldap24-sasl-client</build_port_path>
-		<build_port_path>/usr/ports/databases/mysql55-client</build_port_path>
-		<build_port_path>/usr/ports/databases/postgresql91-client</build_port_path>
-		<build_port_path>/usr/ports/net/freeradius2</build_port_path>
 		<!-- Try to use the new PBI build syntax here, it may help it pick up the right libs inside the single PBI rather than using multiple. -->
 		<build_pbi>
 			<ports_before>security/krb5</ports_before>
