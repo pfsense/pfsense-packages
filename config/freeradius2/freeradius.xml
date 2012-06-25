@@ -200,12 +200,30 @@
 			<fielddescr>Description</fielddescr>
 			<fieldname>description</fieldname>
 		</columnitem>
-		<movable>text</movable>
+		<movable>on</movable>
 	</adddeleteeditpagefields>
 	<fields>
 		<field>
 			<name>GENERAL CONFIGURATION</name>
 			<type>listtopic</type>
+		</field>
+		<field>
+			<fielddescr>sortable</fielddescr>
+			<fieldname>sortable</fieldname>
+			<display_maximum_rows>20</display_maximum_rows>
+			<type>sorting</type>
+			<include_filtering_inputbox/>
+			<sortablefields>
+				<item><name>Username</name><fieldname>varusersusername</fieldname><regex>/%FILTERTEXT%/i</regex></item>
+				<item><name>One-Time-Password</name><fieldname>varusersmotpenable</fieldname><regex>/%FILTERTEXT%/i</regex></item>
+				<item><name>Simultaneous Connections</name><fieldname>varuserssimultaneousconnect</fieldname><regex>/%FILTERTEXT%/i</regex></item>
+				<item><name>IP Address</name><fieldname>varusersframedipaddress</fieldname><regex>/%FILTERTEXT%/i</regex></item>
+				<item><name>Expiration Date</name><fieldname>varusersexpiration</fieldname><regex>/%FILTERTEXT%/i</regex></item>
+				<item><name>Session Timeout</name><fieldname>varuserssessiontimeout</fieldname><regex>/%FILTERTEXT%/i</regex></item>
+				<item><name>Possible Login Times</name><fieldname>varuserslogintime</fieldname><regex>/%FILTERTEXT%/i</regex></item>
+				<item><name>VLAN ID</name><fieldname>varusersvlanid</fieldname><regex>/%FILTERTEXT%/i</regex></item>
+				<item><name>Description</name><fieldname>description</fieldname><regex>/%FILTERTEXT%/i</regex></item>
+			</sortablefields>
 		</field>
 		<field>
 			<fielddescr>Username</fielddescr>
