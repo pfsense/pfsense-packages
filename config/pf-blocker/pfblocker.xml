@@ -230,8 +230,8 @@
 			<fielddescr>Donation</fielddescr>
 			<fieldname>donation</fieldname>
 			<type>checkbox</type>
-			<description><![CDATA[If you like this package, please <a target=_new href='http://www.pfsense.org/index.php?option=com_content&task=view&id=47&Itemid=77'>donate to pfSense project</a>.<br>
-								 If you want that your donation goes to these package developers, make a note on donation forwarding it to us.<br>]]></description>
+			<description><![CDATA[If you like this package, please <a target=_new href='http://www.pfsense.org/index.php?option=com_content&task=view&id=47&Itemid=77'>donate to the pfSense project</a>.<br>
+								 If you want your donation to go to these package developers, make a note on the donation forwarding it to us.<br>]]></description>
 		</field>
 	</fields>
 	<custom_php_install_command>

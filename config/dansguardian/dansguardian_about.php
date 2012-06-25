@@ -1,6 +1,6 @@
 <?php
 /*
-	mailscanner_about.php
+	dansguardian_about.php
 	part of pfSense (http://www.pfsense.com/)
 	Copyright (C) 2011 Marcello Coutinho <marcellocoutinho@gmail.com>
 	All rights reserved.
@@ -96,9 +96,9 @@ include("head.inc");
                         <td width="78%" class="vtable"><?=gettext("Package Created by <a target=_new href='http://forum.pfsense.org/index.php?action=profile;u=4710'>Marcello Coutinho</a><br><br>");?></td>
                         </tr>
 						<tr>
-                        <td width="22%" valign="top" class="vncell"><?=gettext("Donatios ");?></td>
-                        <td width="78%" class="vtable"><?=gettext("If you like this package, please <a target=_new href='http://www.pfsense.org/index.php?option=com_content&task=view&id=47&Itemid=77'>donate to pfSense project</a>.<br><br>
-								 If you want that your donation goes to this package developer, make a note on donation forwarding it to me.<br><br>");?></td>
+                        <td width="22%" valign="top" class="vncell"><?=gettext("Donations ");?></td>
+                        <td width="78%" class="vtable"><?=gettext("If you like this package, please <a target=_new href='http://www.pfsense.org/index.php?option=com_content&task=view&id=47&Itemid=77'>donate to the pfSense project</a>.<br><br>
+								 If you want your donation to go to this package developer, make a note on the donation forwarding it to me.<br><br>");?></td>
                         </tr>
 						</table>
 						
