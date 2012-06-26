@@ -30,6 +30,11 @@
 
 function nmap_custom_add_php_command() {
 	$nmap_options = "";
+
+	if (function_exists("is_ipaddrv6") && function_exists("is_subnetv6"))
+		if (is_ipaddrv6($_POST['hostname']) || is_subnetv6($_POST['hostname']))
+			$nmap_options .= " -6";
+
 	switch($_POST['scanmethod']) {
 		case 'syn':
 			$nmap_options .= " -sS";
@@ -48,7 +53,8 @@ function nmap_custom_add_php_command() {
 	if($_POST['noping']) $nmap_options .= " -P0";
 	if($_POST['servicever']) $nmap_options .= " -sV";
 	if($_POST['osdetect']) $nmap_options .= " -O";
-	$nmap_options .= " " . $_POST['hostname'];
+
+	$nmap_options .= " " . escapeshellarg($_POST['hostname']);
 	system("/usr/local/bin/nmap" . $nmap_options);
 }
 
