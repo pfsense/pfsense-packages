@@ -151,8 +151,16 @@ function varnish_get_url_mappings_txt() {
 				else {
 				        $urlmappings .= "if (req.http.host $fieldtype ".'"'.$url['directorurl'].'"'." && req.url $fieldtype ".'"^'.$url['directorurl2'].'") {'."\n";
 				}
-				#check failover
+				
 				$urlbackend = "\t\t\tset req.backend = ".$url['directorname'].";";
+				#check rewrite options
+				$url['rewritehost']) {
+                                        $urlmappings .= "\t\t\tset req.http.host = regsub(req.http.host, ".'"'.$url['directorurl'].'",'.'"'.$url['rewritehost'].'")'.";\n";
+                                }
+                                if ($url['rewriteurl']) {
+                                        $urlmappings .= "\t\t\tset req.url = regsub(req.url, ".'"'.$url['directorurl2'].'",'.'"^'.$url['rewriteurl'].'")'.";\n";
+                                }
+				#check failover
 				if ($url['failover'] && $url['failover'] != $url['directorname']){
 					$tabs=($url['grace']?"\n\t\t\t":"");
 					$urlfailover = "\t\t\tset req.backend = ".$url['failover'].";";
