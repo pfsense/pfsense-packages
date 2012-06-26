@@ -5,6 +5,7 @@
     part of pfSense (http://www.pfSense.com)
     Copyright (C) 2010 Scott Ullrich <sullrich@gmail.com>
     Copyright (C) 2011 Marcello Coutinho
+    Copyright (C) 2012 Márcio Carlos Antão
     All rights reserved.
                                                                               */
 /* ========================================================================== */
@@ -129,8 +130,7 @@ function varnish_get_url_mappings_txt() {
 			if($url['grace'])
   			$directo_grace_time.=($url['grace']=="0s"?"return(pass);":"set req.grace=".$url['grace'].";");
   			$fieldtype = ($url['fieldtype']?$url['fieldtype']:"==");
-  			$req=($url['directorurl2']?"url":"http.host");
-			$director_prefix=($url['directorurl'] && $url['directorurl2']?"^http://":"");
+  			$director_prefix=($url['directorurl'] && $url['directorurl2']?"^http://":"");
 			#check url
   			if ( $url['directorurl'] || $url['directorurl2'] || $catch_all == "unset" ){
 				if ( $url['directorurl']== "" && $url['directorurl2']== "" ){
@@ -142,7 +142,15 @@ function varnish_get_url_mappings_txt() {
 			else{
 				if(!$isfirst) 
 					$urlmappings .= "\telse ";
-				$urlmappings .= "if (req.$req $fieldtype ".'"'.$url['directorurl'].$url['directorurl2'].'") {'."\n";
+				if(!$url['directorurl']) {
+					$urlmappings .= "if (req.url $fieldtype ".'"^'.$url['directorurl2'].'") {'."\n";
+				}
+				else if (!$url['directorurl2']) {
+					$urlmappings .= "if (req.http.host $fieldtype ".'"'.$url['directorurl'].'") {'."\n";
+				}
+				else {
+				        $urlmappings .= "if (req.http.host $fieldtype ".'"'.$url['directorurl'].'"'." && req.url $fieldtype ".'"^'.$url['directorurl2'].'") {'."\n";
+				}
 				#check failover
 				$urlbackend = "\t\t\tset req.backend = ".$url['directorname'].";";
 				if ($url['failover'] && $url['failover'] != $url['directorname']){
