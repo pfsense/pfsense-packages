@@ -28,6 +28,23 @@
 	</package>
 -->
 	<package>
+		<name>bacula-client</name>
+		<pkginfolink>Client for Bacula 5</pkginfolink>
+		<descr><![CDATA[Bacula is a set of Open Source, computer programs that permit you (or the system administrator) to manage backup, recovery, and verification of computer data across a network of computers of different kinds.]]></descr>
+		<website>http://www.bacula.org/</website>
+		<category>Services</category>
+		<version>5.2.6 pkg v 0.1</version>
+		<status>Beta</status>
+		<required_version>2.0</required_version>
+		<config_file>http://www.pfsense.com/packages/config/bacula-client/bacula-client.xml</config_file>
+		<depends_on_package_base_url>http://ftp.freebsd.org/pub/FreeBSD/ports/i386/packages-8-stable/All/</depends_on_package_base_url>
+		<depends_on_package>bacula-client-5.2.6.tbz</depends_on_package>
+		<build_port_path>/usr/ports/sysutils/bacula-client</build_port_path>
+		<maintainer>marcioc.antao@gmail.com</maintainer>
+		<configurationfile>bacula-client.xml</configurationfile>
+		<after_install_info>Please visit the bacula client tab on services menu.</after_install_info>
+	</package>
+	<package>
 		<name>Asterisk</name>
 		<pkginfolink>http://forum.pfsense.org/index.php/topic,47210.0.html</pkginfolink>
 		<descr><![CDATA[Asterisk is an open source framework for building communications applications.<br>Asterisk turns an ordinary computer into a communications server.]]></descr>
