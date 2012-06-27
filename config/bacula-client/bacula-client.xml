@@ -8,9 +8,7 @@
 /*
     bacula-client.xml
     part of pfSense (http://www.pfSense.com)
-    Copyright (C) 2010 Scott Ullrich <sullrich@gmail.com>
-    Copyright (C) 2011 Brian Scholer
-    Copyright (C) 2012 Márcio Carlos Braga Antão
+    Copyright (C) 2012 Marcio Carlos Braga Antao
     All rights reserved.                                                      
 */
 /* ========================================================================== */
@@ -39,9 +37,9 @@
 /* ========================================================================== */
         ]]>
     </copyright>
-    <description>Client Install for Bacula 5.2.6 Backup</description>
-    <requirements>Bacula Server Installed in or network</requirements>
-    <faq>Currently there are no FAQ items provided.</faq>
+    	<description>Client Install for Bacula 5.2.6 Backup</description>
+    	<requirements>Bacula Server Installed in or network</requirements>
+    	<faq>Currently there are no FAQ items provided.</faq>
 	<name>bacula-client</name>
 	<version>5.2.6</version>
 	<title>Bacula-Client Setting</title>
@@ -53,10 +51,10 @@
 		<item>http://www.pfsense.com/packages/config/bacula-client/bacula-client.inc</item>
 	</additional_files_needed>
 	<menu>
-		<name>bacula-client</name>
-		<tooltiptext>bacula backup client</tooltiptext>
-		<section>sysutils</section>
-		<configfile>bacula-client.xml</configfile>
+		<name>Bacula-Client</name>
+		<tooltiptext></tooltiptext>
+		<section>Services</section>
+		<configfile>/pkg_edit.php?xml=bacula-client.xml&amp;id=0</configfile>
 	</menu>
 	<tabs>
 		<tab>
