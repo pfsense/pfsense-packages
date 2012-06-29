@@ -96,7 +96,6 @@ function baculaclient_custom_php_write_config(){
 		if (is_array($config['installedpackages']['baculaclientfd']['config'])){
 			$port = $config['installedpackages']['baculaclientfd']['config'][0]['port'];
 			$jobs = $config['installedpackages']['baculaclientfd']['config'][0]['jobs'];
-			$filedaemon = $config['installedpackages']['baculaclientfd']['config'][0]['name'];
 			}
 		else{
 			$port="9102";
