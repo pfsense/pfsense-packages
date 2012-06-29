@@ -83,14 +83,14 @@ function baculaclient_custom_php_write_config(){
 				$baculaclient_conf .= "Director { \n\t Name = {$bc['director']}-mon #{$bc['description']}\n\t Password = \"{$bc['password']}\"\n\t Monitor = yes\n\t}\n";
 				break;
 			case "Monitor":
-				$baculaclient_conf .= "Director { \n\t Name = {$bc['director']}-dir #{$bc['description']}\n\t Password = \"{$bc['password']}\"\n\t}\n"; 
-				$baculaclient_conf .= "Director { \n\t Name = {$bc['director']}-mon #{$bc['description']}\n\t Password = \"{$bc['password']}\"\n\t Monitor = yes\n\t}\n"; 
+				$baculaclient_conf .= "Director { \n\t Name = {$bc['director']}-dir #{$bc['description']}\n\t Password = \"{$bc['password']}\"\n\t}\n";
+				$baculaclient_conf .= "Director { \n\t Name = {$bc['director']}-mon #{$bc['description']}\n\t Password = \"{$bc['password']}\"\n\t Monitor = yes\n\t}\n";
 				}
 				$LocalDirector = $bc['director'];
 			}
 		
 		// create Messages
-		$baculaclient_conf .= "Messages { \n\t Name = Standard \n\t director  = {$LocalDirector}-dir = all, !skipped, !restored\n\t \n}\n";
+		$baculaclient_conf .= "Messages { \n\t Name = Standard \n\t director  = {$LocalDirector}-dir = all, !skipped, !restored\n\t}\n";
 		// create FielDaemon
 			
 		if (is_array($config['installedpackages']['baculaclientfd']['config'])){
@@ -103,7 +103,8 @@ function baculaclient_custom_php_write_config(){
 			$port="9102";
 			$jobs="20";	
 			}
-		$baculaclient_conf .= "FileDaemon { \n\t Name = {$filedaemon}-fd #\n\t FDport = {$port}\n\t WorkingDirectory = /var/db/bacula\n\t Pid Directory = /var/run\n\t Maximun Concurrent Jobs = {$jobs}\n \n}\n";
+		//$baculaclient_conf .= "FileDaemon { \n\t Name = {$filedaemon}-fd #\n\t FDport = {$port}\n\t WorkingDirectory = /var/db/bacula\n\t Pid Directory = /var/run\n\t Maximun Concurrent Jobs = {$jobs}\n \n}\n";
+		$baculaclient_conf .= "FileDaemon { \n\t Name = {$filedaemon}-fd #\n\t FDport = {$port}\n\t WorkingDirectory = /var/db/bacula\n\t Pid Directory = /var/run\n\t}\n";
 		file_put_contents("/usr/local/etc/bacula-fd.conf",$baculaclient_conf,LOCK_EX);
 		exec("/usr/local/etc/rc.d/bacula-fd.sh restart");
 		// Mount Read-only

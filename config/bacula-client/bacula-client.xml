@@ -71,12 +71,12 @@
 		<section>Services</section>
 		<configfile>bacula-client.xml</configfile>
 	</menu>
-	<services>
+	<service>
 		<rcfile>bacula-fd.sh</rcfile>
 		<name>Bacula-client</name>
 		<executable>bacula-fd</executable>
 		<description>bacula backup client</description>
-	</services>
+	</service>
 	<tabs>
 		<tab>
 			<text>Directors</text>

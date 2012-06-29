@@ -1624,12 +1624,12 @@
 		<descr><![CDATA[Bacula is a set of Open Source, computer programs that permit you (or the system administrator) to manage backup, recovery, and verification of computer data across a network of computers of different kinds.]]></descr>
 		<website>http://www.bacula.org/</website>
 		<category>Services</category>
-		<version>5.2.6 pkg v 0.2</version>
+		<version>5.2.6 pkg v 0.2.1</version>
 		<status>Beta</status>
 		<required_version>2.0</required_version>
 		<config_file>http://www.pfsense.com/packages/config/bacula-client/bacula-client.xml</config_file>
-		<depends_on_package_base_url>http://ftp-archive.freebsd.org/pub/FreeBSD-Archive/ports/i386/packages-8.1-release/All/</depends_on_package_base_url>
-		<depends_on_package>bacula-client-5.0.0_1.tbz</depends_on_package>
+		<depends_on_package_base_url>http://ftp.freebsd.org/pub/FreeBSD/ports/i386/packages-8-stable/All/</depends_on_package_base_url>
+		<depends_on_package>bacula-client-5.2.6.tbz</depends_on_package>
 		<build_port_path>/usr/ports/sysutils/bacula-client</build_port_path>
 		<build_pbi>
 			<port>sysutils/bacula-client</port>
