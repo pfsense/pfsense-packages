@@ -104,10 +104,10 @@ function squid_resync_reverse() {
  	 foreach ($reverse_peers as $rp){
  		if ($rp['enable'] =="on" && $rp['name'] !="" && $rp['ip'] !="" && $rp['port'] !=""){
  			$conf_peer = "#{$rp['description']}\n";
- 			$conf_peer .= "cache_peer {$rp['ip']} parent {$rp['port']} 0 proxy-only no-query originserver login=PASS ";
+ 			$conf_peer .= "cache_peer {$rp['ip']} parent {$rp['port']} 0 proxy-only no-query no-digest originserver login=PASS ";
  			if($rp['protocol'] == 'HTTPS')
 	            	$conf_peer .= "ssl sslflags=DONT_VERIFY_PEER front-end-https=auto ";
-			$conf_peer .= "name={$rp['name']}\n\n";
+			$conf_peer .= "name=rvp_{$rp['name']}\n\n";
 			
 			// add peer only if reverse proxy is enabled for http
 			if($rp['protocol'] == 'HTTP' && $settings['reverse_http'] =="on"){
@@ -116,8 +116,10 @@ function squid_resync_reverse() {
 				}
 			// add peer only if if reverse proxy is enabled for https
 			if($rp['protocol'] == 'HTTPS' && $settings['reverse_https'] =="on"){
-				$conf .= $conf_peer;
- 				array_push($active_peers,$rp['name']);
+				if (!in_array($rp['name'],$active_peers)){
+					$conf .= $conf_peer;
+ 					array_push($active_peers,$rp['name']);
+					}
 				}
  			}
  	}
@@ -150,14 +152,18 @@ function squid_resync_reverse() {
 		if ($rm['enable'] == "on" && $rm['name']!="" && $rm['peers']!=""){
 		    if (is_array($rm['row']))
 				foreach ($rm['row'] as $uri){
-					$url_regex=($uri['vhost'] == ''?$settings['reverse_external_fqdn']:$uri['vhost']);
-					$conf .= "acl {$rm['name']} url_regex -i {$url_regex}/{$uri['uri']}.*$\n";
-					$cache_peer_never_direct_conf .= "never_direct allow {$rm['name']}\n";
-					$http_access_conf .= "http_access allow {$rm['name']}\n";
-					foreach (explode(',',$rm['peers']) as $map_peer)
-						if (in_array($map_peer,$active_peers)){
-							$cache_peer_allow_conf .= "cache_peer_access {$map_peer} allow {$rm['name']}\n";
-							$cache_peer_deny_conf .= "cache_peer_access {$map_peer} deny allsrc\n";
+					$url_regex=($uri['uri'] == '' ? $settings['reverse_external_fqdn'] : $uri['uri'] );
+					//$conf .= "acl rvm_{$rm['name']} url_regex -i {$uri['uri']}{$url_regex}.*$\n";
+					$conf .= "acl rvm_{$rm['name']} url_regex -i {$url_regex}\n";
+					if($rm['name'] != $last_rm_name){
+						$cache_peer_never_direct_conf .= "never_direct allow rvm_{$rm['name']}\n";
+						$http_access_conf .= "http_access allow rvm_{$rm['name']}\n";
+						foreach (explode(',',$rm['peers']) as $map_peer)
+							if (in_array($map_peer,$active_peers)){
+								$cache_peer_allow_conf .= "cache_peer_access rvp_{$map_peer} allow rvm_{$rm['name']}\n";
+								$cache_peer_deny_conf .= "cache_peer_access rvp_{$map_peer} deny allsrc\n";
+							}
+						$last_rm_name=$rm['name'];
 						}
 				}
 	 	}

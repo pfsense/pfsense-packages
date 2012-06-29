@@ -135,16 +135,12 @@
 			<type>rowhelper</type>
 			<rowhelper>
 				<rowhelperfield>
-				<fielddescr>URI</fielddescr>
+				<fielddescr><![CDATA[<strong>Url regex to match</strong><br><br>
+									Samples: .mydomain.com .mydomain.com/test<br>
+									www.mydomain.com http://www.mydomain.com/ ^http://www.mydomain.com/.*$]]></fielddescr>
 				<fieldname>uri</fieldname>
 				<type>input</type>
-				<size>25</size>
-			</rowhelperfield>
-			<rowhelperfield>
-				<fielddescr>[http://|https://]vhost fqdn(optional)</fielddescr>
-				<fieldname>vhost</fieldname>
-				<type>input</type>
-				<size>40</size>
+				<size>70</size>
 			</rowhelperfield>
 			</rowhelper>
 		</field>		

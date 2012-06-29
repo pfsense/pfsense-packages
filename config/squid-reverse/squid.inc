@@ -86,6 +86,11 @@ function squid_chown_recursive($dir, $user, $group) {
 /* setup cache */
 function squid_dash_z() {
 	global $config;
+
+	//Do nothing if there is no cache config
+	if (!is_array($config['installedpackages']['squidcache']['config']))
+		return;
+		
 	$settings = $config['installedpackages']['squidcache']['config'][0];
 
 	// If the cache system is null, there is no need to initialize the (irrelevant) cache dir.
@@ -752,7 +757,10 @@ function squid_resync_general() {
 	$email = ($settings['admin_email'] ? $settings['admin_email'] : 'admin@localhost');
 
 	$logdir = ($settings['log_dir'] ? $settings['log_dir'] : '/var/squid/logs');
-
+	if (! is_dir($logdir)){
+		make_dirs($logdir);
+		squid_chown_recursive($logdir, 'proxy', 'proxy');
+		}
 	$logdir_cache = $logdir . '/cache.log';
 	$logdir_access = ($settings['log_enabled'] == 'on' ? $logdir . '/access.log' : '/dev/null');
 
@@ -818,9 +826,11 @@ EOD;
 
 function squid_resync_cache() {
 	global $config, $g;
-
-	$settings = $config['installedpackages']['squidcache']['config'][0];
-
+	if (is_array($config['installedpackages']['squidcache']))
+		$settings = $config['installedpackages']['squidcache']['config'][0];
+	else
+		$settings = array();
+	//apply cache settings
 	$cachedir =($settings['harddisk_cache_location'] ? $settings['harddisk_cache_location'] : '/var/squid/cache');
 	$disk_cache_size = ($settings['harddisk_cache_size'] ? $settings['harddisk_cache_size'] : 100);
 	$level1 = ($settings['level1_subdirs'] ? $settings['level1_subdirs'] : 16);
@@ -832,16 +842,15 @@ function squid_resync_cache() {
 	$memory_policy = ($settings['memory_replacement_policy'] ? $settings['memory_replacement_policy'] : 'heap GDSF');
 	$offline_mode = ($settings['enable_offline'] == 'on' ? 'on' : 'off');
 	$conf = '';
-	
 	if (!isset($settings['harddisk_cache_system'])) {
-		if ($g['platform'] == "nanobsd") {
+		if ($g['platform'] == "nanobsd" || !is_array ($config['installedpackages']['squidcache']['config']))
 			$disk_cache_system = 'null';
-		} else {
+		else
 			$disk_cache_system = 'ufs';
 		}
-	} else {
+	else{
 		$disk_cache_system = $settings['harddisk_cache_system'];
-	}
+		}
 	#'null' storage type dropped. In-memory cache is always present. Remove all cache_dir options to prevent on-disk caching.
 	if ($disk_cache_system != "null") {
 		$disk_cache_opts =	"cache_dir {$disk_cache_system} {$cachedir} {$disk_cache_size} {$level1} 256";
@@ -1374,18 +1383,27 @@ function squid_resync() {
 	/* make sure pinger is executable */
 	if(file_exists("/usr/local/libexec/squid/pinger"))
 		exec("chmod a+x /usr/local/libexec/squid/pinger");
-
-	if (is_array($config['installedpackages']['squid']['config'])){
-		$log_dir = $config['installedpackages']['squid']['config'][0]['log_dir'].'/';
 	
+	$log_dir="";
+	#check if squid is enabled
+	if (is_array($config['installedpackages']['squid']['config'])){
+		if ($config['installedpackages']['squid']['config'][0]['active_interface']!= "")
+		$log_dir = $config['installedpackages']['squid']['config'][0]['log_dir'].'/';
+		}
+	#check if squidreverse is enabled
+	else if (is_array($config['installedpackages']['squidreversegeneral']['config'])){
+		if ($config['installedpackages']['squidreversegeneral']['config'][0]['reverse_interface'] != "")
+			$log_dir="/var/squid/logs/";
+		}
+	#do not start squid if there is no log dir
+	if ($log_dir != ""){
 		if(!is_dir($log_dir)) {
 			log_error("Creating squid log dir $log_dir");
 			make_dirs($log_dir);
 			squid_chown_recursive($log_dir, 'proxy', 'proxy');
-		}
+			}
 	
 		squid_dash_z();
-	
 		
 		if (!is_service_running('squid')) {
 			log_error("Starting Squid");
