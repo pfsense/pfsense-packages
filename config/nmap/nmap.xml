@@ -97,7 +97,7 @@
 		<field>
 			<fielddescr>-P0</fielddescr>
 			<fieldname>noping</fieldname>
-			<description>This allows the scanning of networks that don't allow ICMP echo requests (or responses) through their firewall.  microsoft.com is an example of such a network, and thus you should always use -P0 or -PT80 when port scanning microsoft.com.  Note the "ping" in this contecx may involve more than the traditional ICMP echo request packet.  Nmap supports many such probes, including arbitrary combinations of TCP, UDP, and ICMP probes.  By default, Nmap sends an ICMP echo request and a TCP ACK packet to port 80.</description>
+			<description>This allows the scanning of networks that don't allow ICMP echo requests (or responses) through their firewall.  microsoft.com is an example of such a network, and thus you should always use -P0 or -PT80 when port scanning microsoft.com.  Note the "ping" in this context may involve more than the traditional ICMP echo request packet.  Nmap supports many such probes, including arbitrary combinations of TCP, UDP, and ICMP probes.  By default, Nmap sends an ICMP echo request and a TCP ACK packet to port 80.</description>
 			<type>checkbox</type>
 			<typehint>Do not try to ping hosts at all before scanning them.</typehint>
 		</field>
