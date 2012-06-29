@@ -3,7 +3,7 @@
 	bacula-client_view_config.php
 	part of pfSense (http://www.pfsense.com/)
 	Copyright (C) 2010 Scott Ullrich <sullrich@gmail.com>
-	Copyright (C) 2012 Márcio Carlos Antão
+	Copyright (C) 2012 Mï¿½rcio Carlos Antï¿½o
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
@@ -54,7 +54,8 @@ include("head.inc");
 		<tr><td>
 <?php
 	$tab_array = array();
-	$tab_array[] = array(gettext("Settings"), false, "/pkg_edit.php?xml=varnish_settings.xml&id=0");
+	$tab_array[] = array(gettext("Directors"), false, "/pkg.php?xml=bacula-client.xml");
+	$tab_array[] = array(gettext("FileDaemon"), false, "/pkg_edit.php?xml=bacula-client_fd.xml");
 	$tab_array[] = array(gettext("View Configuration"), true, "/bacula-client_view_config.php");
 	display_top_tabs($tab_array);
 ?>
@@ -65,7 +66,7 @@ include("head.inc");
 					<table class="tabcont" width="100%" border="0" cellpadding="0" cellspacing="0">
 						<tr>
      						<td class="tabcont" >
-									<textarea id="varnishlogs" rows="50" cols="100%">
+									<textarea id="varnishlogs" rows="50" cols="87%">
 <?php 
 	$config_file = file_get_contents("/usr/local/etc/bacula-fd.conf");
 	echo $config_file;
