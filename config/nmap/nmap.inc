@@ -28,6 +28,24 @@
 	POSSIBILITY OF SUCH DAMAGE.
 */
 
+function nmap_custom_php_validation_command($post, $input_errors) {
+	global $_POST, $savemsg, $config;
+	if (empty($_POST['hostname'])) {
+		$input_errors[] = gettext("You must enter an IP address to scan.");
+	} elseif (!(is_ipaddr($_POST['hostname']) ||
+			is_subnet($_POST['hostname']) ||
+			is_hostname($_POST['hostname']))) {
+		$input_errors[] = gettext("You must enter a valid IP address to scan.");
+	}
+
+	if(!empty($_POST['interface'])) {
+		$interfaces = get_configured_interface_with_descr();
+		if (!array_key_exists($_POST['interface'], $interfaces)) {
+			$input_errors[] = gettext("Invalid interface.");
+		}
+	}
+}
+
 function nmap_custom_add_php_command() {
 	$nmap_options = "";
 
@@ -48,14 +66,44 @@ function nmap_custom_add_php_command() {
 		case 'udp':
 			$nmap_options .= " -sU";
 			break;
+		case 'arp':
+			$nmap_options .= " -sP -PR";
+			break;
 	}
-	
+
 	if($_POST['noping']) $nmap_options .= " -P0";
 	if($_POST['servicever']) $nmap_options .= " -sV";
 	if($_POST['osdetect']) $nmap_options .= " -O";
+	if(!empty($_POST['interface'])) $nmap_options .= " -e " . get_real_interface($_POST['interface']);
 
 	$nmap_options .= " " . escapeshellarg($_POST['hostname']);
+	echo "Running: /usr/local/bin/nmap {$nmap_options}</br>";
 	system("/usr/local/bin/nmap" . $nmap_options);
+}
+
+function nmap_get_interfaces() {
+	global $config;
+	$interfaces = get_configured_interface_with_descr();
+	$nmap_ifs = array(array("name" => "Any", "value" => ""));
+	foreach ($interfaces as $iface => $ifacename) {
+		$tmp["name"]  = $ifacename;
+		$tmp["value"] = $iface;
+		$nmap_ifs[] = $tmp;
+	}
+
+	foreach (array('server', 'client') as $mode) {
+		if (is_array($config['openvpn']["openvpn-{$mode}"])) {
+			foreach ($config['openvpn']["openvpn-{$mode}"] as $id => $setting) {
+				if (!isset($setting['disable'])) {
+					$tmp["name"]  = gettext("OpenVPN") . " ".$mode.": ".htmlspecialchars($setting['description']);
+					$tmp["value"] = 'ovpn' . substr($mode, 0, 1) . $setting['vpnid'];
+					$nmap_ifs[] = $tmp;
+				}
+			}
+		}
+	}
+
+	return $nmap_ifs;
 }
 
 ?>
