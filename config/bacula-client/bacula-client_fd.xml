@@ -1,70 +1,44 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<!DOCTYPE packagegui SYSTEM "./schema/packages.dtd">
-<?xml-stylesheet type="text/xsl" href="./xsl/package.xsl"?>
 <packagegui>
-        <copyright>
-        <![CDATA[
-/* ========================================================================== */
-/*
-    bacula-client.xml
-    part of pfSense (http://www.pfSense.com)
-    Copyright (C) 2012 Márcio Carlos Braga Antão
-    All rights reserved.                                                      
-*/
-/* ========================================================================== */
-/*
-    Redistribution and use in source and binary forms, with or without
-    modification, are permitted provided that the following conditions are met:
-
-     1. Redistributions of source code must retain the above copyright notice,
-        this list of conditions and the following disclaimer.
-
-     2. Redistributions in binary form must reproduce the above copyright
-        notice, this list of conditions and the following disclaimer in the
-        documentation and/or other materials provided with the distribution.
-
-    THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
-    INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
-    AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
-    AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
-    OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-    INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-    POSSIBILITY OF SUCH DAMAGE.
-                                                                              */
-/* ========================================================================== */
-        ]]>
-        </copyright>
+    <copyright>Copyright (C) 2012 Marcio Carlos Braga Antao</copyright>
     <description>Client Install for Bacula 5.2.6 Backup</description>
     <requirements>Bacula Server Installed in or network</requirements>
     <faq>Currently there are no FAQ items provided.</faq>
-	<name>bacula-client</name>
+	<name>bacula-client_fd</name>
 	<version>5.2.6</version>
-	<title>Bacula-Client Setting</title>
-        <aftersaveredirect>pkg_edit.php?xml=bacula-client.xml&amp;id=0</aftersaveredirect>
+	<title>Bacula-Client: FileDaemon Setting</title>
+    <aftersaveredirect>/pkg_edit.php?xml=bacula-client_fd.xml&amp;id=0</aftersaveredirect>
 	<include_file>/usr/local/pkg/bacula-client.inc</include_file>
+	<configpath>installedpackages->package->baculaclient</configpath>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0755</chmod>
-		<item>http://www.pfsense.com/packages/config/bacula-client/bacula-client.inc</item>
+		<item>http://10.197.93.13/packages/config/bacula-client/bacula-client.inc</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/pkg/</prefix>
+		<chmod>0755</chmod>
+		<item>http://10.197.93.13/packages/config/bacula-client/bacula-client_fd.xml</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/www/</prefix>
+		<chmod>0755</chmod>
+		<item>http://10.197.93.13/packages/config/bacula-client/bacula-client_view_config.php</item>
 	</additional_files_needed>
 	<menu>
-		<name>bacula-client</name>
+		<name>Bacula-client</name>
 		<tooltiptext>bacula backup client</tooltiptext>
-		<section>sysutils</section>
-		<configfile>bacula-client.xml</configfile>
+		<section>Services</section>
+		<configfile>bacula-client_fd.xml</configfile>
 	</menu>
 	<tabs>
 		<tab>
 			<text>Directors</text>
 			<url>/pkg.php?xml=bacula-client.xml</url>
-			<active/>
 		</tab>
 		<tab>
 			<text>FileDaemon</text>
-			<url>/pkg.php?xml=bacula-client_fd.xml</url>
+			<url>/pkg_edit.php?xml=bacula-client_fd.xml&amp;id=0</url>
 			<active/>
 		</tab>
 		<tab>
@@ -74,47 +48,35 @@
 	</tabs>
 	<fields>
 		<field>
-			<type>listtopic</type>
-			<fieldname>temp</fieldname>
-			<name>File configuration</name>
-		</field>	
-		<field>
 			<fielddescr>File Daemon Port</fielddescr>
 			<fieldname>port</fieldname>
 			<type>input</type>
 			<size>4</size>
-			<description>Port for a File Daemon</description>
+			<description>Port for a File Daemon. Default : 9102 </description>
 			<required/>
-		</field>
-		<field>
-			<fielddescr>WorkingDirectory</fielddescr>
-			<fieldname>dir</fieldname>
-			<description>Working Directory</description>
-			<type>input</type>
-			<size>60</size>
 		</field>
 		<field>
 			<fielddescr>Maximun Concurrent Jobs</fielddescr>
 			<fieldname>jobs</fieldname>
 			<type>input</type>
 			<size>3</size>
-			<description>Maximun Concurrent Jobs</description>
+			<description>Maximun Concurrent Jobs. Default : 20</description>
 		</field>
 
 	</fields>
+	
 	<custom_php_install_command>
-		bacula-client_custom_php_install_command();
+		baculaclient_custom_php_install_command();
 	</custom_php_install_command>
 	<custom_php_command_before_form>
 	</custom_php_command_before_form>
 	<custom_php_validation_command>
 	</custom_php_validation_command>
 	<custom_delete_php_command>
-		bacula-client_custom_php_write_config()
 	</custom_delete_php_command>	
 	<custom_add_php_command>
-		bacula-client_custom_php_write_config()
 	</custom_add_php_command>	
 	<custom_php_resync_config_command>
+			baculaclient_custom_php_write_config();
 	</custom_php_resync_config_command>
 </packagegui>
