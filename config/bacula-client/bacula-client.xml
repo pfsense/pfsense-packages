@@ -144,7 +144,7 @@
 					<option><name>Local</name><value>Local</value></option>
 					<option><name>Monitor</name><value>Monitor</value></option>
 				</options>
-			<description>Type Director? You need at least one local director. </description>
+			<description>Type Director. You need at least one local director. </description>
 			
 		</field>
 	</fields>
