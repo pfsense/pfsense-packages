@@ -934,6 +934,7 @@ case $1 in
 		rc_stop
 		;;
 	restart)
+		rc_stop
 		rc_start
 		;;
 esac
