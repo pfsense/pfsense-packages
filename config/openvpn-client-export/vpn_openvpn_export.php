@@ -1,21 +1,21 @@
-<?php 
+<?php
 /*
 	vpn_openvpn_export.php
 
 	Copyright (C) 2008 Shrew Soft Inc.
 	Copyright (C) 2010 Ermal Lu�i
-	All rights reserved. 
+	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
 	modification, are permitted provided that the following conditions are met:
-	
+
 	1. Redistributions of source code must retain the above copyright notice,
 	   this list of conditions and the following disclaimer.
-	
+
 	2. Redistributions in binary form must reproduce the above copyright
 	   notice, this list of conditions and the following disclaimer in the
 	   documentation and/or other materials provided with the distribution.
-	
+
 	THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
 	INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
 	AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
@@ -67,7 +67,7 @@ foreach($a_server as $sindex => $server) {
 				// If $cert is not an array, it's a certref not a cert.
 				if (!is_array($cert))
 					$cert = lookup_cert($cert);
-	
+
 				if ($cert['caref'] != $server['caref'])
 					continue;
 				$ras_userent = array();
@@ -112,8 +112,8 @@ $act = $_GET['act'];
 if (isset($_POST['act']))
 	$act = $_POST['act'];
 
-$error = false;
-if($act == "conf" || $act == "confall") {
+if (!empty($act)) {
+
 	$srvid = $_GET['srvid'];
 	$usrid = $_GET['usrid'];
 	$crtid = $_GET['crtid'];
@@ -132,11 +132,9 @@ if($act == "conf" || $act == "confall") {
 		$nokeys = false;
 
 	if (empty($_GET['useaddr'])) {
-		$error = true;
 		$input_errors[] = "You need to specify an IP or hostname.";
 	} else
 		$useaddr = $_GET['useaddr'];
-		
 	$advancedoptions = $_GET['advancedoptions'];
 
 	$usetoken = $_GET['usetoken'];
@@ -148,24 +146,20 @@ if($act == "conf" || $act == "confall") {
 	if (!empty($_GET['proxy_addr']) || !empty($_GET['proxy_port'])) {
 		$proxy = array();
 		if (empty($_GET['proxy_addr'])) {
-			$error = true;
 			$input_errors[] = "You need to specify an address for the proxy port.";
 		} else
 			$proxy['ip'] = $_GET['proxy_addr'];
 		if (empty($_GET['proxy_port'])) {
-			$error = true;
 			$input_errors[] = "You need to specify a port for the proxy ip.";
 		} else
 			$proxy['port'] = $_GET['proxy_port'];
 		$proxy['proxy_authtype'] = $_GET['proxy_authtype'];
 		if ($_GET['proxy_authtype'] != "none") {
 			if (empty($_GET['proxy_user'])) {
-				$error = true;
 				$input_errors[] = "You need to specify a username with the proxy config.";
 			} else
 				$proxy['user'] = $_GET['proxy_user'];
 			if (!empty($_GET['proxy_user']) && empty($_GET['proxy_password'])) {
-				$error = true;
 				$input_errors[] = "You need to specify a password with the proxy user.";
 			} else
 				$proxy['password'] = $_GET['proxy_password'];
@@ -173,181 +167,48 @@ if($act == "conf" || $act == "confall") {
 	}
 
 	$exp_name = openvpn_client_export_prefix($srvid);
-	if ($act == "confall")
-		$zipconf = true;
-	$exp_data = openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $usetoken, $nokeys, $proxy, $zipconf, $password, false, false, $advancedoptions);
-	if (!$exp_data) {
-		$input_errors[] = "Failed to export config files!";
-		$error = true;
-	}
-	if (!$error) {
+
+	if($act == "conf" || $act == "confall") {
 		if ($act == "confall") {
-			$exp_name = urlencode($exp_data);
-			$exp_size = filesize("{$g['tmp_path']}/{$exp_data}");
+			$exp_name = urlencode($exp_name."-config.zip");
+			$zipconf = true;
 		} else {
 			$exp_name = urlencode($exp_name."-config.ovpn");
-			$exp_size = strlen($exp_data);
 		}
-
-		header('Pragma: ');
-		header('Cache-Control: ');
-		header("Content-Type: application/octet-stream");
-		header("Content-Disposition: attachment; filename={$exp_name}");
-		header("Content-Length: $exp_size");
-		if ($act == "confall")
-			readfile("{$g['tmp_path']}/{$exp_data}");
-		else
-			echo $exp_data;
-
-		@unlink($exp_data);
-		exit;
-	}
-}
-
-if($act == "visc") {
-	$srvid = $_GET['srvid'];
-	$usrid = $_GET['usrid'];
-	$crtid = $_GET['crtid'];
-	if ($srvid === false) {
-		pfSenseHeader("vpn_openvpn_export.php");
-		exit;
-	} else if (($config['openvpn']['openvpn-server'][$srvid]['mode'] != "server_user") &&
-		(($usrid === false) || ($crtid === false))) {
-		pfSenseHeader("vpn_openvpn_export.php");
-		exit;
-	}
-	if (empty($_GET['useaddr'])) {
-		$error = true;
-		$input_errors[] = "You need to specify an IP or hostname.";
-	} else
-		$useaddr = $_GET['useaddr'];
-
-	$advancedoptions = $_GET['advancedoptions'];
-		
-	$usetoken = $_GET['usetoken'];
-	$password = "";
-	if ($_GET['password'])
-		$password = $_GET['password'];
-
-	$proxy = "";
-	if (!empty($_GET['proxy_addr']) || !empty($_GET['proxy_port'])) {
-		$proxy = array();
-		if (empty($_GET['proxy_addr'])) {
-			$error = true;
-			$input_errors[] = "You need to specify an address for the proxy port.";
-		} else
-			$proxy['ip'] = $_GET['proxy_addr'];
-		if (empty($_GET['proxy_port'])) {
-			$error = true;
-			$input_errors[] = "You need to specify a port for the proxy ip.";
-		} else
-			$proxy['port'] = $_GET['proxy_port'];
-		$proxy['proxy_authtype'] = $_GET['proxy_authtype'];
-		if ($_GET['proxy_authtype'] != "none") {
-			if (empty($_GET['proxy_user'])) {
-				$error = true;
-				$input_errors[] = "You need to specify a username with the proxy config.";
-			} else
-				$proxy['user'] = $_GET['proxy_user'];
-			if (!empty($_GET['proxy_user']) && empty($_GET['proxy_password'])) {
-				$error = true;
-				$input_errors[] = "You need to specify a password with the proxy user.";
-			} else
-				$proxy['password'] = $_GET['proxy_password'];
-		}
+		$exp_path = openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $usetoken, $nokeys, $proxy, $zipconf, $password, false, false, $advancedoptions);
 	}
 
-	$exp_name = openvpn_client_export_prefix($srvid);
-	$exp_name = urlencode($exp_name."-Viscosity.visc.zip");
-	$exp_path = viscosity_openvpn_client_config_exporter($srvid, $usrid, $crtid, $useaddr, $usetoken, $password, $proxy,  $advancedoptions);
+	if($act == "visc") {
+		$exp_name = urlencode($exp_name."-Viscosity.visc.zip");
+		$exp_path = viscosity_openvpn_client_config_exporter($srvid, $usrid, $crtid, $useaddr, $usetoken, $password, $proxy,  $advancedoptions);
+	}
+
+	if($act == "inst") {
+		$exp_name = urlencode($exp_name."-install.exe");
+		$exp_path = openvpn_client_export_installer($srvid, $usrid, $crtid, $useaddr, $usetoken, $password, $proxy, $advancedoptions);
+	}
+
 	if (!$exp_path) {
 		$input_errors[] = "Failed to export config files!";
-		$error = true;
 	}
-	if (!$error) {
-		$exp_size = filesize($exp_path);
 
-		header('Pragma: ');
-		header('Cache-Control: ');
-		header("Content-Type: application/octet-stream");
-		header("Content-Disposition: attachment; filename={$exp_name}");
-		header("Content-Length: $exp_size");
-		readfile($exp_path);
-		//unlink($exp_path);
-		exit;
-	}
-}
-
-if($act == "inst") {
-	$srvid = $_GET['srvid'];
-	$usrid = $_GET['usrid'];
-	$crtid = $_GET['crtid'];
-	if ($srvid === false) {
-		pfSenseHeader("vpn_openvpn_export.php");
-		exit;
-	} else if (($config['openvpn']['openvpn-server'][$srvid]['mode'] != "server_user") &&
-		(($usrid === false) || ($crtid === false))) {
-		pfSenseHeader("vpn_openvpn_export.php");
-		exit;
-	}
-	if (empty($_GET['useaddr'])) {
-		$error = true;
-		$input_errors[] = "You need to specify an IP or hostname.";
-	} else
-		$useaddr = $_GET['useaddr'];
-
-	$advancedoptions = $_GET['advancedoptions'];
-	
-	$usetoken = $_GET['usetoken'];
-	$password = "";
-	if ($_GET['password'])
-		$password = $_GET['password'];
-
-	$proxy = "";
-	if (!empty($_GET['proxy_addr']) || !empty($_GET['proxy_port'])) {
-		$proxy = array();
-		if (empty($_GET['proxy_addr'])) {
-			$error = true;
-			$input_errors[] = "You need to specify an address for the proxy port.";
-		} else
-			$proxy['ip'] = $_GET['proxy_addr'];
-		if (empty($_GET['proxy_port'])) {
-			$error = true;
-			$input_errors[] = "You need to specify a port for the proxy ip.";
-		} else
-			$proxy['port'] = $_GET['proxy_port'];
-		$proxy['proxy_authtype'] = $_GET['proxy_authtype'];
-		if ($_GET['proxy_authtype'] != "none") {
-			if (empty($_GET['proxy_user'])) {
-				$error = true;
-				$input_errors[] = "You need to specify a username with the proxy config.";
-			} else
-				$proxy['user'] = $_GET['proxy_user'];
-			if (!empty($_GET['proxy_user']) && empty($_GET['proxy_password'])) {
-				$error = true;
-				$input_errors[] = "You need to specify a password with the proxy user.";
-			} else
-				$proxy['password'] = $_GET['proxy_password'];
+	if (empty($input_errors)) {
+		if ($act == "conf") {
+			$exp_size = strlen($exp_path);
+		} else {
+			$exp_size = filesize($exp_path);
 		}
-	}
-
-	$exp_name = openvpn_client_export_prefix($srvid);
-	$exp_name = urlencode($exp_name."-install.exe");
-	$exp_path = openvpn_client_export_installer($srvid, $usrid, $crtid, $useaddr, $usetoken, $password, $proxy, $advancedoptions);
-	if (!$exp_path) {
-		$input_errors[] = "Failed to export config files!";
-		$error = true;
-	}
-	if (!$error) {
-		$exp_size = filesize($exp_path);
-
 		header('Pragma: ');
 		header('Cache-Control: ');
 		header("Content-Type: application/octet-stream");
 		header("Content-Disposition: attachment; filename={$exp_name}");
 		header("Content-Length: $exp_size");
-		readfile($exp_path);
-		unlink($exp_path);
+		if ($act == "conf") {
+			echo $exp_path;
+		} else {
+			readfile($exp_path);
+			@unlink($exp_path);
+		}
 		exit;
 	}
 }
@@ -391,7 +252,7 @@ function download_begin(act, i, j) {
 	var users = servers[index][1];
 	var certs = servers[index][3];
 	var useaddr;
-	
+
 	var advancedoptions;
 
 	if (document.getElementById("useaddr").value == "other") {
@@ -402,7 +263,7 @@ function download_begin(act, i, j) {
 		useaddr = document.getElementById("useaddr_hostname").value;
 	} else
 		useaddr = document.getElementById("useaddr").value;
-		
+
 	advancedoptions = document.getElementById("advancedoptions").value;
 
 	var usetoken = 0;
@@ -485,7 +346,7 @@ function download_begin(act, i, j) {
 			dlurl += "&proxy_password=" + escape(proxypass);
 		}
 	}
-	
+
 	dlurl += "&advancedoptions=" + escape(advancedoptions);
 
 	window.open(dlurl,"_self");
@@ -566,7 +427,7 @@ function useaddr_changed(obj) {
 		$('HostName').show();
 	else
 		$('HostName').hide();
-	
+
 }
 
 function usepass_changed() {
@@ -597,7 +458,7 @@ function useproxy_changed(obj) {
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
  	<tr>
 		<td>
-			<?php 
+			<?php
 				$tab_array = array();
 				$tab_array[] = array(gettext("Server"), false, "vpn_openvpn_server.php");
 				$tab_array[] = array(gettext("Client"), false, "vpn_openvpn_client.php");

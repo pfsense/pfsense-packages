@@ -284,7 +284,7 @@ function openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $usetoke
 
 		// Remove temporary directory
 		exec("rm -rf {$tempdir}");
-		return "{$prefix}-config.zip";
+		return $g['tmp_path'] . "/{$prefix}-config.zip";
 	} else
 		return $conf;
 }
