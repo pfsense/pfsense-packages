@@ -138,6 +138,8 @@ if (!empty($act)) {
 	$advancedoptions = $_GET['advancedoptions'];
 
 	$usetoken = $_GET['usetoken'];
+	if ($usetoken && ($act == "confinline"))
+		$input_errors[] = "You cannot use Microsoft Certificate Storage with an Inline configuration.";
 	$password = "";
 	if ($_GET['password'])
 		$password = $_GET['password'];
@@ -168,13 +170,19 @@ if (!empty($act)) {
 
 	$exp_name = openvpn_client_export_prefix($srvid);
 
-	if($act == "conf" || $act == "confzip") {
-		if ($act == "confzip") {
-			$exp_name = urlencode($exp_name."-config.zip");
-			$expformat = "zip";
-		} else {
-			$exp_name = urlencode($exp_name."-config.ovpn");
-			$expformat = "baseconf";
+	if(substr($act, 0, 4) == "conf") {
+		switch ($act) {
+			case "confzip":
+				$exp_name = urlencode($exp_name."-config.zip");
+				$expformat = "zip";
+				break;
+			case "confinline":
+				$exp_name = urlencode($exp_name."-config.ovpn");
+				$expformat = "inline";
+				break;
+			default:
+				$exp_name = urlencode($exp_name."-config.ovpn");
+				$expformat = "baseconf";
 		}
 		$exp_path = openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $usetoken, $nokeys, $proxy, $expformat, $password, false, false, $advancedoptions);
 	}
@@ -194,7 +202,7 @@ if (!empty($act)) {
 	}
 
 	if (empty($input_errors)) {
-		if ($act == "conf") {
+		if (($act == "conf") || ($act == "confinline")) {
 			$exp_size = strlen($exp_path);
 		} else {
 			$exp_size = filesize($exp_path);
@@ -204,7 +212,7 @@ if (!empty($act)) {
 		header("Content-Type: application/octet-stream");
 		header("Content-Disposition: attachment; filename={$exp_name}");
 		header("Content-Length: $exp_size");
-		if ($act == "conf") {
+		if (($act == "conf") || ($act == "confinline")) {
 			echo $exp_path;
 		} else {
 			readfile($exp_path);
@@ -374,6 +382,8 @@ function server_changed() {
 		cell2.className = "listr";
 		cell2.innerHTML = "<a href='javascript:download_begin(\"conf\"," + i + ", -1)'>Configuration</a>";
 		cell2.innerHTML += "<br/>";
+		cell2.innerHTML += "<a href='javascript:download_begin(\"confinline\"," + i + ", -1)'>Inline Configuration</a>";
+		cell2.innerHTML += "<br/>";
 		cell2.innerHTML += "<a href='javascript:download_begin(\"confzip\"," + i + ", -1)'>Configuration archive</a>";
 		cell2.innerHTML += "<br/>";
 		cell2.innerHTML += "<a href='javascript:download_begin(\"inst\"," + i + ", -1)'>Windows Installer</a>";
@@ -396,6 +406,8 @@ function server_changed() {
 		cell2.className = "listr";
 		cell2.innerHTML = "<a href='javascript:download_begin(\"conf\", -1," + j + ")'>Configuration</a>";
 		cell2.innerHTML += "<br/>";
+		cell2.innerHTML += "<a href='javascript:download_begin(\"confinline\", -1," + j + ")'>Inline Configuration</a>";
+		cell2.innerHTML += "<br/>";
 		cell2.innerHTML += "<a href='javascript:download_begin(\"confzip\", -1," + j + ")'>Configuration archive</a>";
 		cell2.innerHTML += "<br/>";
 		cell2.innerHTML += "<a href='javascript:download_begin(\"inst\", -1," + j + ")'>Windows Installer</a>";
@@ -413,6 +425,8 @@ function server_changed() {
 		cell1.innerHTML = "none";
 		cell2.className = "listr";
 		cell2.innerHTML = "<a href='javascript:download_begin(\"conf\"," + i + ")'>Configuration</a>";
+		cell2.innerHTML += "<br/>";
+		cell2.innerHTML += "<a href='javascript:download_begin(\"confinline\"," + i + ")'>Inline Configuration</a>";
 		cell2.innerHTML += "<br/>";
 		cell2.innerHTML += "<a href='javascript:download_begin(\"confzip\"," + i + ")'>Configuration archive</a>";
 		cell2.innerHTML += "<br/>";

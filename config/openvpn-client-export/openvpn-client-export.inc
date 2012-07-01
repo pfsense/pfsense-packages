@@ -227,17 +227,28 @@ function openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $usetoke
 	$prefix = openvpn_client_export_prefix($srvid);
 	$cafile = "{$prefix}-ca.crt";
 	if($nokeys == false) {
-		if ($usetoken) {
+		if ($expformat == "inline") {
+			$conf .= "ca [inline]{$nl}";
+			$conf .= "cert [inline]{$nl}";
+			$conf .= "key [inline]{$nl}";
+		} elseif ($usetoken) {
 			$conf .= "ca {$cafile}{$nl}";
 			$conf .= "cryptoapicert \"SUBJ:{$user['name']}\"{$nl}";
 		} else {
 			$conf .= "pkcs12 {$prefix}.p12{$nl}";
 		}
-	} else if ($settings['mode'] == "server_user")
-		$conf .= "ca {$cafile}{$nl}";
+	} else if ($settings['mode'] == "server_user") {
+		if ($expformat == "inline")
+			$conf .= "ca [inline]{$nl}";
+		else
+			$conf .= "ca {$cafile}{$nl}";
+	}
 
 	if ($settings['tls'] && !$skiptls) {
-		$conf .= "tls-auth {$prefix}-tls.key 1{$nl}";
+		if ($expformat == "inline")
+			$conf .= "tls-auth [inline] 1{$nl}";
+		else
+			$conf .= "tls-auth {$prefix}-tls.key 1{$nl}";
 	}
 
 	// Prevent MITM attacks by verifying the server certificate.
@@ -264,42 +275,56 @@ function openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $usetoke
 	$conf .= $advancedoptions;
 	$conf .= $nl;
 
-	if ($expformat == "zip") {
-		// create template directory
-		$tempdir = "{$g['tmp_path']}/{$prefix}";
-		mkdir($tempdir, 0700, true);
+	switch ($expformat) {
+		case "zip":
+			// create template directory
+			$tempdir = "{$g['tmp_path']}/{$prefix}";
+			mkdir($tempdir, 0700, true);
 
-		file_put_contents("{$tempdir}/{$prefix}.ovpn", $conf);
+			file_put_contents("{$tempdir}/{$prefix}.ovpn", $conf);
 
-		$cafile = "{$tempdir}/{$cafile}";
-		file_put_contents("{$cafile}", base64_decode($server_ca['crt']));
-		if ($settings['tls']) {
-			$tlsfile = "{$tempdir}/{$prefix}-tls.key";
-			file_put_contents($tlsfile, base64_decode($settings['tls']));
-		}
+			$cafile = "{$tempdir}/{$cafile}";
+			file_put_contents("{$cafile}", base64_decode($server_ca['crt']));
+			if ($settings['tls']) {
+				$tlsfile = "{$tempdir}/{$prefix}-tls.key";
+				file_put_contents($tlsfile, base64_decode($settings['tls']));
+			}
 
-		// write key files
-		if ($settings['mode'] != "server_user") {
-			$crtfile = "{$tempdir}/{$prefix}-cert.crt";
-			file_put_contents($crtfile, base64_decode($cert['crt']));
-			$keyfile = "{$tempdir}/{$prefix}.key";
-			file_put_contents($keyfile, base64_decode($cert['prv']));
+			// write key files
+			if ($settings['mode'] != "server_user") {
+				$crtfile = "{$tempdir}/{$prefix}-cert.crt";
+				file_put_contents($crtfile, base64_decode($cert['crt']));
+				$keyfile = "{$tempdir}/{$prefix}.key";
+				file_put_contents($keyfile, base64_decode($cert['prv']));
 
-			// convert to pkcs12 format
-			$p12file = "{$tempdir}/{$prefix}.p12";
-			if ($usetoken)
-				openvpn_client_pem_to_pk12($p12file, $outpass, $crtfile, $keyfile);
-			else
-				openvpn_client_pem_to_pk12($p12file, $outpass, $crtfile, $keyfile, $cafile);
-
-		}
-		exec("cd {$tempdir}/.. && /usr/local/bin/zip -r {$g['tmp_path']}/{$prefix}-config.zip {$prefix}");
-
-		// Remove temporary directory
-		exec("rm -rf {$tempdir}");
-		return $g['tmp_path'] . "/{$prefix}-config.zip";
-	} else
-		return $conf;
+				// convert to pkcs12 format
+				$p12file = "{$tempdir}/{$prefix}.p12";
+				if ($usetoken)
+					openvpn_client_pem_to_pk12($p12file, $outpass, $crtfile, $keyfile);
+				else
+					openvpn_client_pem_to_pk12($p12file, $outpass, $crtfile, $keyfile, $cafile);
+			}
+			exec("cd {$tempdir}/.. && /usr/local/bin/zip -r {$g['tmp_path']}/{$prefix}-config.zip {$prefix}");
+			// Remove temporary directory
+			exec("rm -rf {$tempdir}");
+			return $g['tmp_path'] . "/{$prefix}-config.zip";
+			break;
+		case "inline":
+			// Inline CA
+			$conf .= "<ca>{$nl}" . base64_decode($server_ca['crt']) . "</ca>{$nl}";
+			if ($settings['mode'] != "server_user") {
+				// Inline Cert
+				$conf .= "<cert>{$nl}" . base64_decode($cert['crt']) . "</cert>{$nl}";
+				// Inline Key
+				$conf .= "<key>{$nl}" . base64_decode($cert['prv']) . "</key>{$nl}";
+			}
+			// Inline TLS
+			if ($settings['tls']) {
+				$conf .= "<tls-auth>{$nl}" . base64_decode($settings['tls']) . "</tls-auth>{$nl} key-direction 1{$nl}";
+			}
+		default:
+			return $conf;
+	}
 }
 
 function openvpn_client_export_installer($srvid, $usrid, $crtid, $useaddr, $usetoken, $outpass, $proxy, $advancedoptions) {
