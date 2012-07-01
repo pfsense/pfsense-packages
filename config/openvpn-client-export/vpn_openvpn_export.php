@@ -168,14 +168,15 @@ if (!empty($act)) {
 
 	$exp_name = openvpn_client_export_prefix($srvid);
 
-	if($act == "conf" || $act == "confall") {
-		if ($act == "confall") {
+	if($act == "conf" || $act == "confzip") {
+		if ($act == "confzip") {
 			$exp_name = urlencode($exp_name."-config.zip");
-			$zipconf = true;
+			$expformat = "zip";
 		} else {
 			$exp_name = urlencode($exp_name."-config.ovpn");
+			$expformat = "baseconf";
 		}
-		$exp_path = openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $usetoken, $nokeys, $proxy, $zipconf, $password, false, false, $advancedoptions);
+		$exp_path = openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $usetoken, $nokeys, $proxy, $expformat, $password, false, false, $advancedoptions);
 	}
 
 	if($act == "visc") {
@@ -373,7 +374,7 @@ function server_changed() {
 		cell2.className = "listr";
 		cell2.innerHTML = "<a href='javascript:download_begin(\"conf\"," + i + ", -1)'>Configuration</a>";
 		cell2.innerHTML += "<br/>";
-		cell2.innerHTML += "<a href='javascript:download_begin(\"confall\"," + i + ", -1)'>Configuration archive</a>";
+		cell2.innerHTML += "<a href='javascript:download_begin(\"confzip\"," + i + ", -1)'>Configuration archive</a>";
 		cell2.innerHTML += "<br/>";
 		cell2.innerHTML += "<a href='javascript:download_begin(\"inst\"," + i + ", -1)'>Windows Installer</a>";
 		cell2.innerHTML += "<br/>";
@@ -395,7 +396,7 @@ function server_changed() {
 		cell2.className = "listr";
 		cell2.innerHTML = "<a href='javascript:download_begin(\"conf\", -1," + j + ")'>Configuration</a>";
 		cell2.innerHTML += "<br/>";
-		cell2.innerHTML += "<a href='javascript:download_begin(\"confall\", -1," + j + ")'>Configuration archive</a>";
+		cell2.innerHTML += "<a href='javascript:download_begin(\"confzip\", -1," + j + ")'>Configuration archive</a>";
 		cell2.innerHTML += "<br/>";
 		cell2.innerHTML += "<a href='javascript:download_begin(\"inst\", -1," + j + ")'>Windows Installer</a>";
 		cell2.innerHTML += "<br/>";
@@ -413,7 +414,7 @@ function server_changed() {
 		cell2.className = "listr";
 		cell2.innerHTML = "<a href='javascript:download_begin(\"conf\"," + i + ")'>Configuration</a>";
 		cell2.innerHTML += "<br/>";
-		cell2.innerHTML += "<a href='javascript:download_begin(\"confall\"," + i + ")'>Configuration archive</a>";
+		cell2.innerHTML += "<a href='javascript:download_begin(\"confzip\"," + i + ")'>Configuration archive</a>";
 		cell2.innerHTML += "<br/>";
 		cell2.innerHTML += "<a href='javascript:download_begin(\"inst\"," + i + ")'>Windows Installer</a>";
 		cell2.innerHTML += "<br/>";

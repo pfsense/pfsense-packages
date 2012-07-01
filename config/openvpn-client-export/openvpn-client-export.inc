@@ -151,7 +151,7 @@ function openvpn_client_export_validate_config($srvid, $usrid, $crtid) {
 	return array($settings, $server_cert, $server_ca, $servercn, $user, $cert, $nokeys);
 }
 
-function openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $usetoken, $nokeys = false, $proxy, $zipconf = false, $outpass = "", $skiptls=false, $doslines=false, $advancedoptions = "") {
+function openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $usetoken, $nokeys = false, $proxy, $expformat = "baseconf", $outpass = "", $skiptls=false, $doslines=false, $advancedoptions = "") {
 	global $config, $input_errors, $g;
 
 	$nl = ($doslines) ? "\r\n" : "\n";
@@ -264,7 +264,7 @@ function openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $usetoke
 	$conf .= $advancedoptions;
 	$conf .= $nl;
 
-	if ($zipconf == true) {
+	if ($expformat == "zip") {
 		// create template directory
 		$tempdir = "{$g['tmp_path']}/{$prefix}";
 		mkdir($tempdir, 0700, true);
@@ -339,7 +339,7 @@ function openvpn_client_export_installer($srvid, $usrid, $crtid, $useaddr, $uset
 		$pwdfle .= "{$proxy['password']}\r\n";
 		file_put_contents("{$confdir}/{$proxy['passwdfile']}", $pwdfle);
 	}
-	$conf = openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $usetoken, $nokeys, $proxy, false, "", false, true, $advancedoptions);
+	$conf = openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $usetoken, $nokeys, $proxy, "", "baseconf", false, true, $advancedoptions);
 	if (!$conf) {
 		$input_errors[] = "Could not create a config to export.";
 		return false;
@@ -433,7 +433,7 @@ function viscosity_openvpn_client_config_exporter($srvid, $usrid, $crtid, $usead
 		file_put_contents("{$tempdir}/{$proxy['passwdfile']}", $pwdfle);
 	}
 
-	$conf = openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $usetoken, true, $proxy, false, "", true, $advancedoptions);
+	$conf = openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $usetoken, true, $proxy, "baseconf", "", true, $advancedoptions);
 	if (!$conf)
 		return false;
 
