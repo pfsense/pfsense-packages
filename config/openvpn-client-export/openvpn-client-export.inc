@@ -95,10 +95,8 @@ function openvpn_client_pem_to_pk12($outpath, $outpass, $crtpath, $keypath, $cap
 		unlink($capath);
 }
 
-function openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $usetoken, $nokeys = false, $proxy, $zipconf = false, $outpass = "", $skiptls=false, $doslines=false, $advancedoptions = "") {
-	global $config, $input_errors, $g;
-
-	$nl = ($doslines) ? "\r\n" : "\n";
+function openvpn_client_export_validate_config($srvid, $usrid, $crtid) {
+	global $config, $g, $input_errors;
 
 	// lookup server settings
 	$settings = $config['openvpn']['openvpn-server'][$srvid];
@@ -149,6 +147,21 @@ function openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $usetoke
 			return false;
 	} else
 		$nokeys = true;
+
+	return array($settings, $server_cert, $server_ca, $servercn, $user, $cert, $nokeys);
+}
+
+function openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $usetoken, $nokeys = false, $proxy, $zipconf = false, $outpass = "", $skiptls=false, $doslines=false, $advancedoptions = "") {
+	global $config, $input_errors, $g;
+
+	$nl = ($doslines) ? "\r\n" : "\n";
+
+	$validconfig = openvpn_client_export_validate_config($srvid, $usrid, $crtid);
+	if ($validconfig) {
+		list($settings, $server_cert, $server_ca, $servercn, $user, $cert, $nokeys) = $validconfig;
+	} else {
+		return false;
+	}
 
 	// determine basic variables
 	if ($useaddr == "serveraddr") {
@@ -298,54 +311,12 @@ function openvpn_client_export_installer($srvid, $usrid, $crtid, $useaddr, $uset
 	if (!file_exists($workdir . "/template/openvpn-install.exe"))
 		openvpn_client_export_install();
 
-	// lookup server settings
-	$settings = $config['openvpn']['openvpn-server'][$srvid];
-	if (empty($settings)) {
-		$input_errors[] = "Could not find a valid server config for id: {$srvid}";
+	$validconfig = openvpn_client_export_validate_config($srvid, $usrid, $crtid);
+	if ($validconfig) {
+		list($settings, $server_cert, $server_ca, $servercn, $user, $cert, $nokeys) = $validconfig;
+	} else {
 		return false;
 	}
-	if ($settings['disable']) {
-		$input_errors[] = "This server is disabled.";
-		return false;
-	}
-
-	$nokeys = false;
-
-	// lookup server certificate info
-	$server_cert = lookup_cert($settings['certref']);
-	$server_ca = lookup_ca($server_cert['caref']);
-	if (!$server_cert || !$server_ca) {
-		$input_errors[] = "Could not find a valid certificate.";
-		return false;
-	}
-
-	// lookup user info
-	if ($usrid) {
-		$user = $config['system']['user'][$usrid];
-		if (!$user) {
-			$input_errors[] = "Could not find the details about userid: {$usrid}";
-			return false;
-		}
-	}
-
-	// lookup user certificate info
-	if ($settings['mode'] == "server_tls_user") {
-		if ($settings['authmode'] == "Local Database") {
-			$cert = $user['cert'][$crtid];
-		} else {
-			$cert = $config['cert'][$crtid];
-		}
-		if (!$cert)
-			return false;
-		// If $cert is not an array, it's a certref not a cert.
-		if (!is_array($cert))
-			$cert = lookup_cert($cert);
-	} elseif (($settings['mode'] == "server_tls") || (($settings['mode'] == "server_tls_user") && ($settings['authmode'] != "Local Database"))) {
-		$cert = $config['cert'][$crtid];
-		if (!$cert)
-			return false;
-	} else
-		$nokeys = true;
 
 	// create template directory
 	$tempdir = $g['tmp_path'] . "/openvpn-export-".uniqid();
@@ -439,44 +410,12 @@ function viscosity_openvpn_client_config_exporter($srvid, $usrid, $crtid, $usead
 	$tempdir = $g['tmp_path'] . "/openvpn-export-" . $uniq;
 	$zipfile = $g['tmp_path'] . "/{$uniq}-Viscosity.visc.zip";
 
-	// lookup server settings
-	$settings = $config['openvpn']['openvpn-server'][$srvid];
-	if (empty($settings))
+	$validconfig = openvpn_client_export_validate_config($srvid, $usrid, $crtid);
+	if ($validconfig) {
+		list($settings, $server_cert, $server_ca, $servercn, $user, $cert, $nokeys) = $validconfig;
+	} else {
 		return false;
-	if ($settings['disable'])
-		return false;
-
-	// lookup server certificate info
-	$server_cert = lookup_cert($settings['certref']);
-	$server_ca = lookup_ca($server_cert['caref']);
-	if (!$server_cert || !$server_ca)
-		return false;
-
-	// lookup user info
-	if ($usrid) {
-		$user = $config['system']['user'][$usrid];
-		if (!$user)
-			return false;
 	}
-
-	// lookup user certificate info
-	if ($settings['mode'] == "server_tls_user") {
-		if ($settings['authmode'] == "Local Database") {
-			$cert = $user['cert'][$crtid];
-		} else {
-			$cert = $config['cert'][$crtid];
-		}
-		if (!$cert)
-			return false;
-		// If $cert is not an array, it's a certref not a cert.
-		if (!is_array($cert))
-			$cert = lookup_cert($cert);
-	} elseif (($settings['mode'] == "server_tls") || (($settings['mode'] == "server_tls_user") && ($settings['authmode'] != "Local Database"))) {
-		$cert = $config['cert'][$crtid];
-		if (!$cert)
-			return false;
-	} else
-		$nokeys = true;
 
 	// create template directory
 	mkdir($tempdir, 0700, true);
