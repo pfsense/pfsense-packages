@@ -255,13 +255,13 @@
 		start_service("squid");		
 	</custom_add_php_command_late>
 	<custom_php_install_command>
-		custom_php_install_command();
+		squid3_custom_php_install_command();
 		write_static_squid_config();
 		mwexec("/usr/local/sbin/squid -k reconfigure");
 		start_service("squid");
 	</custom_php_install_command>
 	<custom_php_deinstall_command>
-		custom_php_deinstall_command();
+		squid3_custom_php_deinstall_command();
 		stop_service("squid");
 	</custom_php_deinstall_command>
 </packagegui>

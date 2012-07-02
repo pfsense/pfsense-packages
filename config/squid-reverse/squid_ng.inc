@@ -796,11 +796,11 @@ function global_write_squid_config()
 	touch($squidconfig);
 } /* end function write_squid_config */
 
-function custom_php_install_command() {
+function squid3_custom_php_install_command() {
 		/* write initial static config for transparent proxy */
 		write_static_squid_config();
 
-		touch("/tmp/custom_php_install_command");
+		touch("/tmp/squid3_custom_php_install_command");
 
 		/*    make sure this all exists, see:
 		 *    http://forum.pfsense.org/index.php?topic=23.msg2391#msg2391
@@ -903,7 +903,7 @@ function custom_php_install_command() {
 		start_service("squid");
 }
 
-function custom_php_deinstall_command() {
+function squid3_custom_php_deinstall_command() {
 	update_output_window("Stopping proxy service...");
 	stop_service("squid");
 	sleep(1);
