@@ -94,7 +94,7 @@ function sync_package_dansguardian() {
 		else
 			$boot_process="on";
 	}
-unset($boot_process);
+
 	if (is_process_running('dansguardian') && isset($boot_process))
 		return;
 		
