@@ -260,7 +260,7 @@ function Running_Stop($snort_uuid, $if_real, $id) {
 	global $config, $g;
 
 	if (isvalidpid("{$g['varrun_path']}/snort_{$if_real}{$snort_uuid}.pid")) {
-		killbypid("{$g['varrun_path']}/snort_{$if_real}{$snort_uuid}");
+		killbypid("{$g['varrun_path']}/snort_{$if_real}{$snort_uuid}.pid");
 		exec("/bin/rm {$g['varrun_path']}/snort_{$if_real}{$snort_uuid}.pid");
 	}
 
@@ -898,10 +898,10 @@ if [ "`/bin/pgrep -nF {$g['varrun_path']}/snort_{$if_real}{$snort_uuid}.pid`" !=
 	sleep 1
 	if [ -f {$g['varrun_path']}/barnyard2_{$if_real}{$snort_uuid}.pid ]; then
 		/bin/pkill -F {$g['varrun_path']}/barnyard2_{$if_real}{$snort_uuid}.pid -a
-		/bin/rm /var/run/barnyard2_{$snort_uuid}_{$if_real}.pid
+		/bin/rm /var/run/barnyard2_{$if_real}{$snort_uuid}.pid
 	fi
 
-	/bin/rm /var/run/snort_{$snort_uuid}_{$if_real}.pid
+	/bin/rm /var/run/snort_{$if_real}{$snort_uuid}.pid
 fi
 
 EOF;
