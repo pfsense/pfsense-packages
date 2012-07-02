@@ -72,14 +72,6 @@
 			<name>daemon</name>
 		</field>
 		<field>
-			<fielddescr>Daemon name</fielddescr>
-			<fieldname>name</fieldname>
-			<type>input</type>
-			<size>25</size>
-			<description>Name for File Daemon. Default : default </description>
-			<required/>
-		</field>
-		<field>
 			<fielddescr>File Daemon Port</fielddescr>
 			<fieldname>port</fieldname>
 			<type>input</type>

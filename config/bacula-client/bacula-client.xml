@@ -135,7 +135,7 @@
 			<description><![CDATA[Enter password for Diector use to Access.]]></description>
 		</field>
 		<field>
-			<fielddescr>Director tyoe</fielddescr>
+			<fielddescr>Director type</fielddescr>
 			<fieldname>type</fieldname>
 			<type>select</type>
  				<options>
@@ -143,7 +143,7 @@
 					<option><name>Local</name><value>Local</value></option>
 					<option><name>Monitor</name><value>Monitor</value></option>
 				</options>
-			<description>This is a Local Director?</description>
+			<description>Director Type. You need at least one local director.</description>
 		</field>
 	</fields>
 	<custom_php_install_command>

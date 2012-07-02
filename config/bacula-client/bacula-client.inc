@@ -96,15 +96,12 @@ function baculaclient_custom_php_write_config(){
 		if (is_array($config['installedpackages']['baculaclientfd']['config'])){
 			$port = $config['installedpackages']['baculaclientfd']['config'][0]['port'];
 			$jobs = $config['installedpackages']['baculaclientfd']['config'][0]['jobs'];
-			$filedaemon = $config['installedpackages']['baculaclientfd']['config'][0]['name'];
 			}
 		else{
-			$filedaemon="default";
 			$port="9102";
 			$jobs="20";	
 			}
-		//$baculaclient_conf .= "FileDaemon { \n\t Name = {$filedaemon}-fd #\n\t FDport = {$port}\n\t WorkingDirectory = /var/db/bacula\n\t Pid Directory = /var/run\n\t Maximun Concurrent Jobs = {$jobs}\n \n}\n";
-		$baculaclient_conf .= "FileDaemon { \n\t Name = {$filedaemon}-fd #\n\t FDport = {$port}\n\t WorkingDirectory = /var/db/bacula\n\t Pid Directory = /var/run\n\t}\n";
+		$baculaclient_conf .= "FileDaemon { \n\t Name = {$filedaemon}-fd #\n\t FDport = {$port}\n\t WorkingDirectory = /var/db/bacula\n\t Pid Directory = /var/run\n\tMaximum Concurrent Jobs = {$jobs}\n\t}\n";
 		file_put_contents("/usr/local/etc/bacula-fd.conf",$baculaclient_conf,LOCK_EX);
 		exec("/usr/local/etc/rc.d/bacula-fd.sh restart");
 		// Mount Read-only
