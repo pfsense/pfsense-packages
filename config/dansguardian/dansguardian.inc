@@ -94,7 +94,7 @@ function sync_package_dansguardian() {
 		else
 			$boot_process="on";
 	}
-
+unset($boot_process);
 	if (is_process_running('dansguardian') && isset($boot_process))
 		return;
 		
@@ -132,14 +132,22 @@ function sync_package_dansguardian() {
 	$filterport=($dansguardian['filterports']?$dansguardian['filterports']:"8080");
 	$softrestart=(preg_match('/softrestart/',$dansguardian['daemon_options'])?"yes":"no");
 	$nodaemon=(preg_match('/nodaemon/',$dansguardian['daemon_options'])?"yes":"off");
-	if (preg_match("/\d+\/\d+/",$dansguardian['children']))
-		list($minchildren,$maxchildren) = split ("/", $dansguardian['children'], 2);
-	else
-		list($minchildren,$maxchildren) = split ("/", "8/120", 2);
-	if (preg_match("/\d+\/\d+/",$dansguardian['sparechildren']))
-		list($minsparechildren,$maxsparechildren) = split ("/", $dansguardian['sparechildren'], 2);
-	else
-		list($minsparechildren,$maxsparechildren) = split ("/", "8/64", 2);	
+	if (preg_match("/(\d+)\/(\d+)/",$dansguardian['children'],$matches)){
+		$minchildren=$matches[1];
+		$maxchildren=$matches[2];
+		}
+	else{
+		$minchildren=8;
+		$maxchildren=120;
+		}
+	if (preg_match("/(\d+)\/(\d+)/",$dansguardian['sparechildren'],$matches)){
+		$minsparechildren=$matches[1];
+		$maxsparechildren=$matches[2];
+		}
+	else{
+		$minsparechildren=8;
+		$maxsparechildren=64;
+		}
 	$maxagechildren=($dansguardian['maxagechildren']?$dansguardian['maxagechildren']:"500");
 	$maxips=($dansguardian['maxips']?$dansguardian['maxips']:"0");
 	$preforkchildren=($dansguardian['preforkchildren']?$dansguardian['preforkchildren']:"10");
