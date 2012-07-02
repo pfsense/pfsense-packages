@@ -299,6 +299,8 @@ function quagga_ospfd_validate_interface() {
 function quagga_ospfd_validate_input() {
 	global $config, $g, $input_errors;
 
+	if ($_POST['password'] <> "" && (strpos($_POST['password'], "'") !== false))
+		$input_errors[] = "Password cannot contain a single quote (')";
 	if (!empty($_POST['routerid']) && !is_ipaddr($_POST['routerid']))
 		$input_errors[] = "Router ID must be an address.";
 	if (!is_ipaddr($_POST['area']))

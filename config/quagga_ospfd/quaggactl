@@ -28,6 +28,10 @@ restart)
 	$RC_SCRIPT restart
 	;;
 zebra)
+	if [ "`pgrep zebra`" = "" ]; then
+		echo "zebra does not appear to be running"
+		exit 1
+	fi
 	case $2 in
 	cpu*)
 		daemon_command ${ZEBRA_PORT} ${ZEBRA_PASSWORD} "show thread cpu"
@@ -43,7 +47,11 @@ zebra)
 		daemon_command ${ZEBRA_PORT} ${ZEBRA_PASSWORD} "show ip route"
 		;;
 	esac ;;
-ospf)
+ospf*)
+	if [ "`pgrep ospfd`" = "" ]; then
+		echo "ospfd does not appear to be running"
+		exit 1
+	fi
 	case $2 in
 	cpu*)
 		daemon_command ${OSPF_PORT} ${OSPF_PASSWORD} "show thread cpu"
