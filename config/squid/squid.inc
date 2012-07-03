@@ -39,7 +39,13 @@ require_once('service-utils.inc');
 if(!function_exists("filter_configure")) 
 	require_once("filter.inc");
 
-define('SQUID_CONFBASE', '/usr/local/etc/squid');
+if (substr(trim(file_get_contents("/etc/version")),0,3) == "2.0") {
+	define('SQUID_LOCALBASE','/usr/local');
+} else {
+	define('SQUID_LOCALBASE', '/usr/pbi/squid-' . php_uname("m"));
+}
+
+define('SQUID_CONFBASE',SQUID_LOCALBASE . '/etc/squid');
 define('SQUID_BASE', '/var/squid/');
 define('SQUID_ACLDIR', '/var/squid/acl');
 define('SQUID_PASSWD', '/var/etc/squid.passwd');
@@ -94,12 +100,12 @@ function squid_dash_z() {
 
 	if(!is_dir($cachedir.'/00/')) {
 		log_error("Creating squid cache subdirs in $cachedir");
-		mwexec("/usr/local/sbin/squid -k shutdown");
+		mwexec(SQUID_LOCALBASE . "/sbin/squid -k shutdown");
 		sleep(5);
-		mwexec("/usr/local/sbin/squid -k kill");
+		mwexec(SQUID_LOCALBASE . "/sbin/squid -k kill");
 		// Double check permissions here, should be safe to recurse cache dir if it's small here.
 		mwexec("/usr/sbin/chown -R proxy:proxy $cachedir");
-		mwexec("/usr/local/sbin/squid -z");
+		mwexec(SQUID_LOCALBASE . "/sbin/squid -z");
 	}
 
 	if(file_exists("/var/squid/cache/swap.state")) {
@@ -204,12 +210,12 @@ function squid_install_command() {
 	update_status("Creating squid cache pools... One moment please...");
 	squid_dash_z();
 	/* make sure pinger is executable */
-	if(file_exists("/usr/local/libexec/squid/pinger"))
-		exec("/bin/chmod a+x /usr/local/libexec/squid/pinger");
-	if(file_exists("/usr/local/etc/rc.d/squid"))
-		exec("/bin/rm /usr/local/etc/rc.d/squid");
+	if(file_exists(SQUID_LOCALBASE . "/libexec/squid/pinger"))
+		exec("/bin/chmod a+x " . SQUID_LOCALBASE . "/libexec/squid/pinger");
+	if(file_exists(SQUID_LOCALBASE . "/etc/rc.d/squid"))
+		exec("/bin/rm " . SQUID_LOCALBASE . "/etc/rc.d/squid");
 	squid_write_rcfile();
-	exec("chmod a+rx /usr/local/libexec/squid/dnsserver");
+	exec("chmod a+rx " . SQUID_LOCALBASE . "/libexec/squid/dnsserver");
 	if(file_exists("/usr/local/pkg/swapstate_check.php"))
 		exec("/bin/chmod a+x /usr/local/pkg/swapstate_check.php");
 
@@ -235,11 +241,11 @@ function squid_install_command() {
 	if (!is_service_running('squid')) {
 		update_status("Starting... One moment please...");
 		log_error("Starting Squid");
-		mwexec_bg("/usr/local/sbin/squid -D");
+		mwexec_bg(SQUID_LOCALBASE . "/sbin/squid -D");
 	} else {
 		update_status("Reloading Squid for configuration sync... One moment please...");
 		log_error("Reloading Squid for configuration sync");
-		mwexec("/usr/local/sbin/squid -k reconfigure");
+		mwexec(SQUID_LOCALBASE . "/sbin/squid -k reconfigure");
 	}
 
 	/* restart proxy alarm scripts */
@@ -567,7 +573,7 @@ function squid_install_cron($should_install) {
 				$cron_item['month'] = "*";
 				$cron_item['wday'] = "*";
 				$cron_item['who'] = "root";
-				$cron_item['command'] = "/bin/rm {$cachedir}/swap.state; /usr/local/sbin/squid -k rotate";
+				$cron_item['command'] = "/bin/rm {$cachedir}/swap.state; " . SQUID_LOCALBASE . "/sbin/squid -k rotate";
 				$config['cron']['item'][] = $cron_item;
 				$need_write = true;
 			}
@@ -1042,19 +1048,19 @@ function squid_resync_auth() {
 		$prompt = ($settings['auth_prompt'] ? $settings['auth_prompt'] : 'Please enter your credentials to access the proxy');
 		switch ($auth_method) {
 			case 'local':
-				$conf .= 'auth_param basic program /usr/local/libexec/squid/ncsa_auth ' . SQUID_PASSWD . "\n";
+				$conf .= 'auth_param basic program ' . SQUID_LOCALBASE . '/libexec/squid/ncsa_auth ' . SQUID_PASSWD . "\n";
 				break;
 			case 'ldap':
 				$port = (isset($settings['auth_server_port']) ? ":{$settings['auth_server_port']}" : '');
 				$password = (isset($settings['ldap_pass']) ? "-w {$settings['ldap_pass']}" : '');
-				$conf .= "auth_param basic program /usr/local/libexec/squid/squid_ldap_auth -v {$settings['ldap_version']} -b {$settings['ldap_basedomain']} -D {$settings['ldap_user']} $password -f \"{$settings['ldap_filter']}\" -u {$settings['ldap_userattribute']} -P {$settings['auth_server']}$port\n";
+				$conf .= "auth_param basic program " . SQUID_LOCALBASE . "/libexec/squid/squid_ldap_auth -v {$settings['ldap_version']} -b {$settings['ldap_basedomain']} -D {$settings['ldap_user']} $password -f \"{$settings['ldap_filter']}\" -u {$settings['ldap_userattribute']} -P {$settings['auth_server']}$port\n";
 				break;
 			case 'radius':
 				$port = (isset($settings['auth_server_port']) ? "-p {$settings['auth_server_port']}" : '');
-				$conf .= "auth_param basic program /usr/local/libexec/squid/squid_radius_auth -w {$settings['radius_secret']} -h {$settings['auth_server']} $port\n";
+				$conf .= "auth_param basic program " . SQUID_LOCALBASE . "/libexec/squid/squid_radius_auth -w {$settings['radius_secret']} -h {$settings['auth_server']} $port\n";
 				break;
 			case 'msnt':
-				$conf .= "auth_param basic program /usr/local/libexec/squid/msnt_auth\n";
+				$conf .= "auth_param basic program " . SQUID_LOCALBASE . "/libexec/squid/msnt_auth\n";
 				squid_resync_msnt();
 				break;
 		}
@@ -1134,8 +1140,8 @@ function squid_resync() {
 	squid_write_rcfile();
 
 	/* make sure pinger is executable */
-	if(file_exists("/usr/local/libexec/squid/pinger"))
-		exec("chmod a+x /usr/local/libexec/squid/pinger");
+	if(file_exists(SQUID_LOCALBASE . "/libexec/squid/pinger"))
+		exec("chmod a+x " . SQUID_LOCALBASE . "/libexec/squid/pinger");
 
 	foreach (array(	SQUID_CONFBASE,
 			SQUID_ACLDIR,
@@ -1158,10 +1164,10 @@ function squid_resync() {
 
 	if (!is_service_running('squid')) {
 		log_error("Starting Squid");
-		mwexec("/usr/local/sbin/squid -D");
+		mwexec(SQUID_LOCALBASE . "/sbin/squid -D");
 	} else {
 		log_error("Reloading Squid for configuration sync");
-		mwexec("/usr/local/sbin/squid -k reconfigure");
+		mwexec(SQUID_LOCALBASE . "/sbin/squid -k reconfigure");
 	}
 
 	// Sleep for a couple seconds to give squid a chance to fire up fully.
@@ -1437,15 +1443,16 @@ function squid_generate_rules($type) {
 
 function squid_write_rcfile() {
 	$rc = array();
+	$SQUID_LOCALBASE = SQUID_LOCALBASE;
 	$rc['file'] = 'squid.sh';
 	$rc['start'] = <<<EOD
 if [ -z "`ps auxw | grep "[s]quid -D"|awk '{print $2}'`" ];then
-	/usr/local/sbin/squid -D
+	{$SQUID_LOCALBASE}/sbin/squid -D
 fi
 
 EOD;
 	$rc['stop'] = <<<EOD
-/usr/local/sbin/squid -k shutdown
+{$SQUID_LOCALBASE}/sbin/squid -k shutdown
 # Just to be sure...
 sleep 5
 killall -9 squid 2>/dev/null
@@ -1454,9 +1461,9 @@ killall pinger 2>/dev/null
 EOD;
 	$rc['restart'] = <<<EOD
 if [ -z "`ps auxw | grep "[s]quid -D"|awk '{print $2}'`" ];then
-		/usr/local/sbin/squid -D
+		{$SQUID_LOCALBASE}/sbin/squid -D
 	else
-		/usr/local/sbin/squid -k reconfigure
+		{$SQUID_LOCALBASE}/sbin/squid -k reconfigure
 	fi
 
 EOD;
