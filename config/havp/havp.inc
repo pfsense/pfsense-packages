@@ -104,7 +104,7 @@ define('HVDEF_HAVP_MAXSRV',             '100');
 #define('HVDEF_CLAM_RUNDIR',             '/var/run/clamav');
 define('HVDEF_CLAM_RUNDIR',             '/var/run');
 define('HVDEF_CLAM_DBDIR',              '/var/db/clamav');
-if(preg_match("/^2.0/",$pfSversion))
+if(preg_match("/^2./",$pfSversion))
 	define('HVDEF_AVLOG_DIR',               '/var/log/clamav');
 else
 	define('HVDEF_AVLOG_DIR',               '/var/log');
@@ -431,6 +431,8 @@ function havp_check_system()
     if (!file_exists(HVDEF_CLAM_LOG))      file_put_contents(HVDEF_CLAM_LOG, '');
     if (!file_exists(HVDEF_FRESHCLAM_LOG)) file_put_contents(HVDEF_FRESHCLAM_LOG, '');
     # log dir permissions
+    if (!file_exists(HVDEF_AVLOG_DIR))
+        mwexec("mkdir -p " . HVDEF_AVLOG_DIR);
     havp_set_file_access(HVDEF_AVLOG_DIR, HVDEF_USER, '0777');
 
     # =-= ClamAV =-=
