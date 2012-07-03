@@ -34,7 +34,12 @@
 	/* Nut */
 
 	define('NUT_RCFILE', '/usr/local/etc/rc.d/nut.sh');
-	define('NUT_DIR','/usr/local/etc/nut');
+
+	if (substr(trim(file_get_contents("/etc/version")),0,3) == "2.0") {
+		define('NUT_DIR','/usr/local/etc/nut');
+	} else {
+		define('NUT_DIR', '/usr/pbi/nut-' . php_uname("m") . '/etc/nut');
+	}
 
 	function nut_notice ($msg) { syslog(LOG_NOTICE, "nut: {$msg}"); return; }
 	function nut_warn ($msg) { syslog(LOG_WARNING, "nut: {$msg}"); return; }
