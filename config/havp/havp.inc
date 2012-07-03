@@ -380,7 +380,12 @@ function havp_check_system()
     $grp = exec('pw group show ' . HVDEF_GROUP);
     if (strpos($grp, HVDEF_GROUP) !== 0) {
         exec('pw group add ' . HVDEF_GROUP);
-    	 log_error("Antivirus: Username '" . HVDEF_GROUP . "' was added.");
+    	 log_error("Antivirus: Group '" . HVDEF_GROUP . "' was added.");
+    }
+    $usr = exec('pw usershow -n ' . HVDEF_USER);
+    if (strpos($usr, HVDEF_USER) !== 0) {
+        exec('pw useradd ' . HVDEF_USER . ' -g ' . HVDEF_GROUP . ' -h - -s "/sbin/nologin" -d "/nonexistent" -c "havp daemon"');
+    	 log_error("Antivirus: User '" . HVDEF_USER . "' was added.");
     }
 
     # workdir permissions
