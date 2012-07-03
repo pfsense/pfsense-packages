@@ -891,7 +891,7 @@ EOE;
 
 		$start_snort_iface_stop[] = <<<EOF
 
-if [ "`/bin/pgrep -nF {$g['varrun_path']}/snort_{$if_real}{$snort_uuid}.pid`" = "0" ]; then
+if [ "`/bin/pgrep -nF {$g['varrun_path']}/snort_{$if_real}{$snort_uuid}.pid`" != "0" ]; then
 	/usr/bin/logger -p daemon.info -i -t SnortStartup "Snort HARD STOP For {$snort_uuid}_{$if_real}..."
 
 	/bin/pkill -F {$g['varrun_path']}/snort_{$if_real}{$snort_uuid}.pid -a
@@ -934,6 +934,7 @@ case $1 in
 		rc_stop
 		;;
 	restart)
+		rc_stop
 		rc_start
 		;;
 esac
