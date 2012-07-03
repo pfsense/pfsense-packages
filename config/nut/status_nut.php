@@ -34,6 +34,13 @@ $nut_config = $config['installedpackages']['nut']['config'][0];
 
 /* functions */
 
+function secs2hms($secs) {
+	if ($secs<0) return false;
+	$m = (int)($secs / 60); $s = $secs % 60;
+	$h = (int)($m / 60); $m = $m % 60;
+	return "{$h}h {$m}m {$s}s";
+}
+
 function tblopen () {
 	print('<table width="100%" class="tabcont" cellspacing="0" cellpadding="6">'."\n");
 }
@@ -224,7 +231,7 @@ include("head.inc");
 		tblclose();
 		tblopen();
 
-		tblrow('Runtime Remaining:', $ups['battery.runtime'], ' seconds');
+		tblrow('Runtime Remaining:', secs2hms($ups['battery.runtime']), '');
 		tblrow('Battery Voltage:', $ups['battery.voltage'], 'V');
 		tblrow('Input Voltage:', $ups['input.voltage'], 'V');
 		tblrow('Input Frequency:', $ups['input.frequency'], 'Hz');
