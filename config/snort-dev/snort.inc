@@ -100,141 +100,275 @@ function find_suppress_key($find_slist_number) {
 	}
 }
 
+function snort_find_interface_ipv6($interface, $flush = false)
+{
+	global $interface_ipv6_arr_cache;
+	global $interface_snv6_arr_cache;
+	global $config;
+	
+	$interface = trim($interface);
+	$interface = get_real_interface($interface);
+	
+	if (!does_interface_exist($interface))
+		return;
+
+	/* Setup IP cache */
+	if (!isset($interface_ipv6_arr_cache[$interface]) or $flush) {
+		$ifinfo = pfSense_get_interface_addresses($interface);
+		// FIXME: Add IPv6 support to the pfSense module
+		exec("/sbin/ifconfig {$interface} inet6", $output);
+		foreach($output as $line) {
+			if(preg_match("/inet6/", $line)) {
+				$parts = explode(" ", $line);
+				if(preg_match("/fe80::/", $parts[1])) {
+					$ifinfo['ipaddrv6'] = $parts[1];
+					if($parts[2] == "-->") {
+						$parts[5] = "126";
+						$ifinfo['subnetbitsv6'] = $parts[5];
+					} else {
+						$ifinfo['subnetbitsv6'] = $parts[3];
+					}
+				}
+			}
+		}
+		$interface_ipv6_arr_cache[$interface] = $ifinfo['ipaddrv6'];
+		$interface_snv6_arr_cache[$interface] = $ifinfo['subnetbitsv6'];
+	}
+
+	return $interface_ipv6_arr_cache[$interface];
+}
+
+function snort_get_interface_ipv6($interface = "wan")
+{
+	global $config;
+	$realif = get_failover_interface($interface);
+	switch($config['interfaces'][$interface]['ipaddrv6']) {
+		case "6rd":
+		case "6to4":
+			$realif = "stf0";
+			break;
+	}
+	if (!$realif) {
+		if (preg_match("/^carp/i", $interface))
+			$realif = $interface;
+		else if (preg_match("/^[a-z0-9]+_vip/i", $interface))
+			$realif = $interface;
+		else
+			return null;
+	}
+
+	$curip = snort_find_interface_ipv6($realif);
+	
+	if (strstr($curip, '%', TRUE)) {
+			$curip = strstr($curip, '%', TRUE);
+	}else if (is_ipaddrv6($curip)){
+			$curip = $curip;
+	}	
+	
+	if ($curip && is_ipaddrv6($curip) && ($curip != "::"))
+		return $curip;
+	else
+		return null;
+}
+
 /* func builds custom whitelests */
 function build_base_whitelist($build_netlist, $wanip, $wangw, $wandns, $vips, $vpns, $userwips) {
 	global $config, $g, $snort_pfsense_basever;
 
-	/* build an interface array list */
-	if (function_exists('get_configured_interface_list'))
-		$int_array = get_configured_interface_list();
-	else {
-		$int_array = array('lan');
-		for ($j = 1; isset ($config['interfaces']['opt' . $j]); $j++)
-		if(isset($config['interfaces']['opt' . $j]['enable']))
-		if(isset($config['interfaces']['opt' . $j]['gateway']))
-			$int_array[] = "opt{$j}";
-	}
+	// build an interface array list
+	$int_array = get_configured_interface_list();
 
-	$home_net = "";
-
-	/*  iterate through interface list and write out whitelist items
-	 *  and also compile a home_net list for snort.
-	 */
-	foreach ($int_array as $int) {
-		/* calculate interface subnet information */
-		if (function_exists('get_interface_ip')) {
-			$subnet = get_interface_ip($int);
-			if (is_ipaddr($subnet)) {
-				$sn = get_interface_subnet($int);
-				$home_net .= "{$subnet}/{$sn} ";
-			}
-		} else {
-			$ifcfg = $config['interfaces'][$int];
-			switch ($ifcfg['ipaddr']) {
-			case "pppoe":
-			case "pptp":
-			case "l2tp":
-				if (function_exists('get_interface_ip'))
-					$subnet = get_interface_ip($int);
-				else
-					$subnet = find_interface_ip("ng0");
-
-				if (is_ipaddr($subnet))
-					$home_net .= "{$subnet} ";
-				break;
-			case "dhcp":
-				$subnet = find_interface_ip(snort_get_real_interface($int));
-				if (is_ipaddr($subnet))
-					$home_net .= "{$subnet} ";
-				break;
-			default:
-				if (is_ipaddr($ifcfg['ipaddr'])) {
-					$subnet = gen_subnet($ifcfg['ipaddr'], $ifcfg['subnet']);
-					if ($ifcfg['subnet'])
-						$home_net .= "{$subnet}/{$ifcfg['subnet']} ";
-				}
-				break;
-			}
+	/* calculate ipv4 interface subnet information */
+	$home_net = '';
+	$snort_calc_iface_subnet_list = function($int) use(&$home_net) {
+		
+		$subnet = get_interface_ip($int);
+		$sn =  get_interface_subnet($int);
+		$subnet_v6 = snort_get_interface_ipv6($int);
+		$sn_v6 = get_interface_subnetv6($int);
+		
+		if (is_ipaddr($subnet) && !empty($subnet)) {
+			$home_net .= "{$subnet}/{$sn},";
 		}
+
+		if (is_ipaddr($subnet_v6) && !empty($subnet_v6)) {
+			$home_net .= "{$subnet_v6}/{$sn_v6},";
+		}
+		
+	};
+	
+	/* Add Gateway on WAN interface to whitelist (For RRD graphs) */
+	$snort_calc_gateway_list = function($int) use (&$home_net) {
+
+		$gw = get_interface_gateway($int);
+		$sn = get_interface_subnet($int);
+		$gw_v6 = get_interface_gateway_v6($int);
+		$sn_v6 = get_interface_subnetv6($int);
+		
+		
+		if(!empty($gw) && is_ipaddr($gw)) {
+			$home_net .= "{$gw}/{$sn},";
+		}
+		
+		if(!empty($gw_v6) && is_ipaddr($gw_v6)) {			
+			$home_net .= "{$gw_v6}/{$sn_v6},";
+		}
+		
+	};	
+	
+	// iterate through interface list and write out whitelist items and also compile a home_net list for snort.
+	foreach ($int_array as $int) {
+		
+		if (!empty($int)) {
+			$snort_calc_iface_subnet_list($int);
+	
+			if ($wangw == 'yes')
+				$snort_calc_gateway_list($int);
+			
+		}
+		
 	}
 
-	if ($snort_pfsense_basever == 'yes' && $wanip == 'yes') {
-		/* add all WAN ips to the whitelist */
-		$wan_if = get_real_wan_interface();
-		$ip = find_interface_ip($wan_if);
-		if (is_ipaddr($ip))
-			$home_net .= "{$ip} ";
-	}
-
-	if ($wangw == 'yes') {
-		/* Add Gateway on WAN interface to whitelist (For RRD graphs) */
-		$gw = get_interface_gateway('wan');
-		if($gw)
-			$home_net .= "{$gw} ";
-	}
-
-	if($wandns == 'yes') {
-		/* Add DNS server for WAN interface to whitelist */
+	/* 
+	 * Add DNS server for WAN interface to whitelist
+	 * 
+	 * NOTE: does this get ipv6 ips 
+	 */
+	$snort_dns_list = function() use(&$home_net) {
+		
 		$dns_servers = get_dns_servers();
 		foreach ($dns_servers as $dns) {
-			if($dns)
-				$home_net .= "{$dns} ";
-		}
-	}
-
-	if($vips == 'yes') {
-		/* iterate all vips and add to whitelist */
+			if(!empty($dns) && is_ipaddr($dns)) {
+				$home_net .= "{$dns},";
+			}
+		}		
+		
+	};
+	
+	if($wandns == 'yes') {
+		$snort_dns_list();
+	}	
+	
+	/* 
+	 * iterate all vips and add to whitelist 
+	 * NOTE: does this get ipv6 ips
+	 * 
+	 */
+	$snort_vips_list = function() use(&$home_net, &$config) {
+		
 		if (is_array($config['virtualip']) && is_array($config['virtualip']['vip'])) {
 			foreach($config['virtualip']['vip'] as $vip)
-				if($vip['subnet'])
-					$home_net .= "{$vip['subnet']} ";
-		}
+				if(!empty($vip['subnet']))
+					$home_net .= "{$vip['subnet']},";
+		}	
+		
+	};
+	
+	if($vips == 'yes') {
+		$snort_vips_list();
 	}
 
-	/* Add loopback to whitelist (ftphelper) */
-	$home_net .= "127.0.0.1 ";
-
-	/* grab a list of vpns and whitelist if user desires added by nestorfish 954 */
-	if ($vpns == 'yes') {
-		if ($snort_pfsense_basever == 'yes') // chk what pfsense version were on
-			$vpns_list = get_vpns_list();
-		else if ($snort_pfsense_basever == 'no') // chk what pfsense version were on
-			$vpns_list = filter_get_vpns_list();
-
+	/* 
+	 * grab a list of vpns and whitelist if user desires added by nestorfish 954 
+	 * 
+	 * NOTE: does this get ipv6 ips
+	 */
+	$snort_vpns_list = function() use(&$home_net, &$config) {
+		$vpns_list = filter_get_vpns_list();
+		
 		if (!empty($vpns_list))
-			$home_net .= "{$vpns_list} ";
-	}
-
-	/* never ever compair numbers to words */
-	if ($userwips > -1) {
+			$home_net .= "{$vpns_list},";		
+	};
+	
+	if ($vpns == 'yes') {
+		$snort_vpns_list();
+	}	
+	
+	$snort_userwips_list = function() use(&$home_net, &$userwips, &$config) {
+		
 		if (!is_array($config['installedpackages']['snortglobal']['whitelist']['item']))
 			$config['installedpackages']['snortglobal']['whitelist']['item'] = array();
-
-		$home_net .= $config['installedpackages']['snortglobal']['whitelist']['item'][$userwips]['address'];
+		
+		$home_net .= $config['installedpackages']['snortglobal']['whitelist']['item'][$userwips]['address'] . ',';
+		
+	};	
+	
+	if ($userwips > -1) {
+		$snort_userwips_list();
 	}
 
-	$home_net = trim($home_net);
-
-	/* this foe whitelistfile, convert spaces to carriage returns */
-	if ($build_netlist == 'whitelist') {
-		$whitelist_home_net = str_replace("  ", "\n", $home_net);
-		$whitelist_home_net = str_replace(" ", "\n", $home_net);
-		return $whitelist_home_net;
-	}
-
-	/* this is for snort.conf */
-	$validator = explode(" ", $home_net);
-	$valresult = array();
-	foreach ($validator as $vald) { 
-		if (empty($vald))
-			continue;
-		$valresult[] = $vald;
-	}
-	$home_net = implode(",", $valresult);
-	$home_net = "[{$home_net}]";
-
+	// add loopback iface
+	$home_net .= '127.0.0.1,';
+	$home_net .= '::1,';
+	
+	/*
+	 *  makes sure there is no duplicates
+	 *  splits $home_net to (ipv6 ip), (ipv6 cidr), (ipv4 ip), (ipv4 cidr)
+	 */
+	$snort_clean_home_net = function() use(&$home_net) {
+		
+		$home_net = trim($home_net);
+		$home_net = explode(',', $home_net);
+		$net_ipv4_cidr = array();
+		$net_ipv4 = array();
+		$net_ipv6_cidr = array();
+		$net_ipv6 = array();
+		
+		// split into 4 arrays
+		foreach ($home_net as $net_ip) {
+	
+			if (preg_match("/\./", $net_ip)) {
+				if (preg_match("/\//", $net_ip)) {
+					if (!in_array($net_ip, $net_ipv4_cidr))
+						array_push($net_ipv4_cidr, $net_ip);
+				}else{
+					if (!in_array($net_ip, $net_ipv4))
+						array_push($net_ipv4, $net_ip);
+				}
+			}
+			
+			if (preg_match("/:/", $net_ip)) {
+				if (preg_match("/\//", $net_ip)) {
+					if (!in_array($net_ip, $net_ipv6_cidr))
+						array_push($net_ipv6_cidr, $net_ip);
+				}else{
+					if (!in_array($net_ip, $net_ipv6))
+						array_push($net_ipv6, $net_ip);
+				}
+			}
+		} // end foreach
+		
+		// TODO: make sure that ips are not in cidr
+		
+		$home_net = '';
+		foreach ($net_ipv4_cidr as $net_ipv4_cidr_ip) {
+			if (!empty($net_ipv4_cidr_ip))
+				$home_net .= $net_ipv4_cidr_ip . ',';
+		}
+		foreach ($net_ipv4 as $net_ipv4_ip) {
+			if (!empty($net_ipv4_ip))
+				$home_net .= $net_ipv4_ip . ',';
+		}
+		foreach ($net_ipv6_cidr as $net_ipv6_cidr_ip) {
+			if (!empty($net_ipv6_cidr_ip))
+				$home_net .= $net_ipv6_cidr_ip . ',';
+		}
+		foreach ($net_ipv6 as $net_ipv6_ip) {
+			if (!empty($net_ipv6_ip))
+				$home_net .= $net_ipv6_ip . ',';
+		}
+		
+		// remove , if its the last char
+		if($home_net[strlen($home_net)-1] === ',') {
+			$home_net = substr_replace($home_net, '', -1);
+		}		
+		
+	};	
+	$snort_clean_home_net();
+	
 	return $home_net;
-}
+	
+} // end func builds custom whitelests
 
 
 /* checks to see if snort is running yes/no and stop/start */
@@ -460,17 +594,14 @@ function post_delete_logs()
 					$snort_tcpd_rm_list = snort_build_order($snort_list_tcpd);
 					snort_remove_files($snort_tcpd_rm_list, $snort_tcpd_rm_list[0]);
 				}
-			} else
+			} else {
 				exec("/bin/rm $snort_log_dir/{$snort_uuid}_{$if_real}/snort.tcpdump*");
-
-			/* create barnyard2 configuration file */
-			//if ($value['barnyard_enable'] == 'on')
-			//create_barnyard2_conf($id, $if_real, $snort_uuid);
-
-			if ($value['perform_stat'] == 'on')
-				@file_put_contents("$snort_log_dirt/{$snort_uuid}_{$if_real}/snort.stats", "");
+				
+				if ($value['perform_stat'] == 'on')
+					@file_put_contents("$snort_log_dirt/{$snort_uuid}_{$if_real}/snort.stats", "");
+			}
 		}
-	}
+	} // end foreach
 }
 
 function snort_postinstall()
@@ -832,23 +963,26 @@ function sync_snort_package_config()
 
 		if ($if_real != '' && $snort_uuid != '') {
 
-			/* only build whitelist when needed */
-			if ($value['blockoffenders7'] == 'on')
+			// only build whitelist when needed
+			if ($value['blockoffenders7'] === 'on') {
 				create_snort_whitelist($id, $if_real);
+			}
 
-			/* only build threshold when needed */
-			if ($value['suppresslistname'] != 'default')
+			// only build threshold when needed
+			if ($value['suppresslistname'] !== 'default'){
 				create_snort_suppress($id, $if_real);
+			}
 
-			/* create snort configuration file */
+			// create snort configuration file
 			create_snort_conf($id, $if_real, $snort_uuid);
 
-			/* if rules exist cp rules to each iface */
+			// if rules exist cp rules to each iface
 			create_rules_iface($id, $if_real, $snort_uuid);
 
-			/* create barnyard2 configuration file */
-			if ($value['barnyard_enable'] == 'on')
+			// create barnyard2 configuration file
+			if ($value['barnyard_enable'] == 'on') {
 				create_barnyard2_conf($id, $if_real, $snort_uuid);
+			}
 		}
 	}
 
@@ -931,12 +1065,16 @@ function create_snort_whitelist($id, $if_real) {
 	} else if (!empty($config['installedpackages']['snortglobal']['rule'][$id]['whitelistname'])) {
 		$whitelist_key_w = find_whitelist_key($config['installedpackages']['snortglobal']['rule'][$id]['whitelistname']);
 
-		if (!is_array($config['installedpackages']['snortglobal']['whitelist']['item']))
+		if (!is_array($config['installedpackages']['snortglobal']['whitelist']['item'])) {
 			return;
+		}
 
 		$whitelist = $config['installedpackages']['snortglobal']['whitelist']['item'][$whitelist_key_w];
-		$w_data = build_base_whitelist($whitelist['snortlisttype'], $whitelist['wanips'], $whitelist['wangateips'],
-				$whitelist['wandnsips'], $whitelist['vips'], $whitelist['vpnips'], $whitelist_key_w);
+		$w_data = build_base_whitelist($whitelist['snortlisttype'], $whitelist['wanips'], $whitelist['wangateips'], $whitelist['wandnsips'], $whitelist['vips'], $whitelist['vpnips'], $whitelist_key_w);
+		
+		// this foe whitelistfile, convert spaces to carriage returns
+		$w_data = str_replace(',', "\n", $w_data);
+		$w_data = str_replace(',,', "\n", $w_data);
 
 		/* open snort's whitelist for writing */
 		@file_put_contents("/usr/local/etc/snort/whitelist/" . $config['installedpackages']['snortglobal']['rule'][$id]['whitelistname'], $w_data);
@@ -1961,19 +2099,13 @@ EOD;
 	else
 		$def_max_queued_segs_type = ' max_queued_segs ' . $snortcfg['max_queued_segs'] . ',';
 
-	$snort_preprocessor_decoder_rules = "";
-	if (file_exists("/usr/local/etc/snort/preproc_rules/preprocessor.rules"))
-		$snort_preprocessor_decoder_rules .= "include \$PREPROC_RULE_PATH/preprocessor.rules\n";
-	if (file_exists("/usr/local/etc/snort/preproc_rules/decoder.rules"))
-		$snort_preprocessor_decoder_rules .= "include \$PREPROC_RULE_PATH/decoder.rules\n";
-
 	/* build snort configuration file */
 	$snort_conf_text = <<<EOD
 
 ##############################################################################
 #                                                                            #
 # snort configuration file generated by the pfSense package manager system   #
-# see /usr/local/pkg/snort.inc                                               #                                                          #
+# see /usr/local/pkg/snort.inc                                               #
 # for snort ver. 2.9.2.3                                                     #
 # more information Snort can be found at http://www.snort.org/               #
 #                                                                            #
@@ -1985,9 +2117,8 @@ EOD;
                         #
 #########################
 
-# TODO: bug, auto gen is adding extra 127.0.0.1
-ipvar HOME_NET {$home_net}
-ipvar EXTERNAL_NET {$external_net}
+ipvar HOME_NET [{$home_net}]
+ipvar EXTERNAL_NET [{$external_net}]
 
 ###################
                   #
@@ -2454,8 +2585,6 @@ $spoink_type
 
 include /usr/local/etc/snort/snort_{$snort_uuid}_{$if_real}/reference.config
 include /usr/local/etc/snort/snort_{$snort_uuid}_{$if_real}/classification.config
-{$snort_preprocessor_decoder_rules}
-
 $threshold_file_name
 
 # Snort user pass through configuration
@@ -2467,7 +2596,9 @@ $threshold_file_name
                   #
 ###################
 
-	{$selected_rules_sections}
+
+{$selected_rules_sections}
+
 
 EOD;
 

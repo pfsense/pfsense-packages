@@ -67,16 +67,21 @@ if ($config['installedpackages']['snortglobal']['whitelist']['item'][$id]['uuid'
 $d_snort_whitelist_dirty_path = '/var/run/snort_whitelist.dirty';
 
 /* returns true if $name is a valid name for a whitelist file name or ip */
-function is_validwhitelistname($name) {
+function is_validwhitelistname($name, $type) {
 	if (!is_string($name))
-	return false;
+		return false;
 
-	if (!preg_match("/[^a-zA-Z0-9\.\/]/", $name))
-	return true;
+	if ($type === 'name' && !preg_match("/[^a-zA-Z0-9\_]/", $name))
+		return true;
+	
+	if ($type === 'ip' && !preg_match("/[^a-zA-Z0-9\:\,\.\/]/", $name))
+		return true;
+	
+	if ($type === 'detail' && !preg_match("/[^a-zA-Z0-9\:\,\.\+\s]/", $name))
+		return true;	
 
 	return false;
 }
-
 
 if (isset($id) && $a_whitelist[$id]) {
 
@@ -85,6 +90,7 @@ if (isset($id) && $a_whitelist[$id]) {
 	$pconfig['name'] = $a_whitelist[$id]['name'];
 	$pconfig['uuid'] = $a_whitelist[$id]['uuid'];
 	$pconfig['detail'] = $a_whitelist[$id]['detail'];
+	$pconfig['addressuuid'] = $a_whitelist[$id]['addressuuid'];
 	$pconfig['snortlisttype'] = $a_whitelist[$id]['snortlisttype'];
 	$pconfig['address'] = $a_whitelist[$id]['address'];
 	$pconfig['descr'] = html_entity_decode($a_whitelist[$id]['descr']);
@@ -104,24 +110,23 @@ if ($_POST['submit']) {
 	unset($input_errors);
 	$pconfig = $_POST;
 
-	/* input validation */
-	$reqdfields = explode(" ", "name");
-	$reqdfieldsn = explode(",", "Name");
+	//input validation
+	$reqdfields = explode(" ", "name"); // post name required
+	$reqdfieldsn = explode(",", "Name"); // error msg name
 
 	do_input_validation($_POST, $reqdfields, $reqdfieldsn, &$input_errors);
 
 	if(strtolower($_POST['name']) == "defaultwhitelist")
 		$input_errors[] = "Whitelist file names may not be named defaultwhitelist.";
 
-	$x = is_validwhitelistname($_POST['name']);
-	if (!isset($x)) {
-		$input_errors[] = "Reserved word used for whitelist file name.";
-	} else {
-		if (is_validwhitelistname($_POST['name']) == false)
-			$input_errors[] = "Whitelist file name may only consist of the characters a-z, A-Z and 0-9 _. Note: No Spaces. Press Cancel to reset.";
-	}
+	
+	if (is_validwhitelistname($_POST['name'], 'name') == false)
+		$input_errors[] = "Whitelist name may only consist of the characters a-z, A-Z and 0-9. Note: No Spaces.";
+	
+	if (is_validwhitelistname($_POST['descr'], 'detail') == false)
+		$input_errors[] = "Whitelist description name may only consist of the characters [a-z, A-Z 0-9 + , :]. Note: No Spaces.";	
 
-	/* check for name conflicts */
+	// check for name conflicts
 	foreach ($a_whitelist as $w_list) {
 		if (isset($id) && ($a_whitelist[$id]) && ($a_whitelist[$id] === $w_list))
 			continue;
@@ -132,50 +137,64 @@ if ($_POST['submit']) {
 		}
 	}
 
-	$isfirst = 0;
-	$address = "";
-	$final_address_details .= "";
-	/* add another entry code */
-	for($x=0; $x<499; $x++) {
-		if (!empty($_POST["address{$x}"])) {
-			if ($is_first > 0)
-				$address .= " ";
-			$address .= $_POST["address{$x}"];
-			if ($_POST["address_subnet{$x}"] <> "")
-				$address .= "" . $_POST["address_subnet{$x}"];
-
-			/* Compress in details to a single key, data separated by pipes.
-			 Pulling details here lets us only pull in details for valid
-			 address entries, saving us from having to track which ones to
-			 process later. */
-			$final_address_detail = mb_convert_encoding($_POST["detail{$x}"],'HTML-ENTITIES','auto');
-			if ($final_address_detail <> "")
-				$final_address_details .= $final_address_detail;
-			else {
-				$final_address_details .= "Entry added" . " ";
-				$final_address_details .= date('r');
+	// build string lists
+	if (!empty($pconfig[addresses])) {
+		$countArray = count($pconfig[addresses]);
+		$i = 0;
+		
+		foreach ($pconfig[addresses] as $address) {
+	
+			$i++;
+						
+			if (is_validwhitelistname($address[address], 'ip') == false) {
+					$input_errors[] = "List of IPs may only consist of the characters [. : 0-9]. Note: No Spaces.";
 			}
-			$final_address_details .= "||";
-			$is_first++;
-		}
+		
+			if (is_validwhitelistname($address[detail], 'detail') == false) {
+				$input_errors[] = "List of IP descriptions may only consist of the characters [a-z, A-Z 0-9 + , :].";
+			}				
+					
+			if (!empty($address[address]) && !empty($address[uuid])) {
+			
+				$final_address_ip .= $address[address];
+				
+				$final_address_uuid .= $address[uuid];
+				
+				if (empty($address[detail])) {
+					$final_address_details .= "Entry added " . date('r');
+				}else{
+					$final_address_details .= $address[detail];
+				}
+				
+				if($i < $countArray){
+					$final_address_ip .= ',';
+					$final_address_details .= '||';
+					$final_address_uuid .= '||';
+				}
+			}		
+		}		
 	}
-
+	
+	$w_list = array();
+	// post user input
+	$w_list['name'] = $_POST['name'];
+	$w_list['descr']  =  mb_convert_encoding($_POST['descr'],"HTML-ENTITIES","auto");		
+	$w_list['uuid'] = $whitelist_uuid;
+	$w_list['snortlisttype'] = $_POST['snortlisttype'];
+	$w_list['wanips'] = $_POST['wanips']? 'yes' : 'no';
+	$w_list['wangateips'] = $_POST['wangateips']? 'yes' : 'no';
+	$w_list['wandnsips'] = $_POST['wandnsips']? 'yes' : 'no';
+	$w_list['vips'] = $_POST['vips']? 'yes' : 'no';
+	$w_list['vpnips'] = $_POST['vpnips']? 'yes' : 'no';
+	
+	$w_list['addressuuid'] = $final_address_uuid;
+	$w_list['address'] = $final_address_ip;
+	$w_list['detail'] = $final_address_details;	
+	
+	if (empty($final_address_ip) && $w_list['wanips'] === 'no' && $w_list['wangateips'] === 'no' && $w_list['wandnsips'] === 'no' && $w_list['vips'] === 'no' && $w_list['vpnips'] === 'no')
+		$input_errors[] = "You must add a \"auto generated ip\" or a \"custom ip\"! ";
+		
 	if (!$input_errors) {
-		$w_list = array();
-		/* post user input */
-		$w_list['name'] = $_POST['name'];
-		$w_list['uuid'] = $whitelist_uuid;
-		$w_list['snortlisttype'] = $_POST['snortlisttype'];
-		$w_list['wanips'] = $_POST['wanips']? 'yes' : 'no';
-		$w_list['wangateips'] = $_POST['wangateips']? 'yes' : 'no';
-		$w_list['wandnsips'] = $_POST['wandnsips']? 'yes' : 'no';
-		$w_list['vips'] = $_POST['vips']? 'yes' : 'no';
-		$w_list['vpnips'] = $_POST['vpnips']? 'yes' : 'no';
-
-		$w_list['address'] = $address;
-		$w_list['descr']  =  mb_convert_encoding($_POST['descr'],"HTML-ENTITIES","auto");
-		$w_list['detail'] = $final_address_details;
-
 		if (isset($id) && $a_whitelist[$id])
 			$a_whitelist[$id] = $w_list;
 		else
@@ -183,15 +202,25 @@ if ($_POST['submit']) {
 
 		write_config();
 
-		/* create whitelist and homenet file  then sync files */
+		// create whitelist and homenet file  then sync files
 		sync_snort_package_config();
 
 		header("Location: /snort/snort_interfaces_whitelist.php");
 		exit;
 	} else {
+		
+		$pconfig['wanips'] = $a_whitelist[$id]['wanips'];
+		$pconfig['wangateips'] = $a_whitelist[$id]['wangateips'];
+		$pconfig['wandnsips'] = $a_whitelist[$id]['wandnsips'];
+		$pconfig['vips'] = $a_whitelist[$id]['vips'];
+		$pconfig['vpnips'] = $a_whitelist[$id]['vpnips'];
+		
 		$pconfig['descr']  =  mb_convert_encoding($_POST['descr'],"HTML-ENTITIES","auto");
-		$pconfig['address'] = $address;
+		$pconfig['address'] = $final_address_ip;
 		$pconfig['detail'] = $final_address_details;
+		$pconfig['addressuuid'] = $final_address_uuid;
+
+		$input_errors[] = 'Press Cancel to reset.';
 	}
 
 }
@@ -207,36 +236,36 @@ include_once("head.inc");
 include("fbegin.inc");
 echo $snort_general_css;
 ?>
-<script type="text/javascript" src="/javascript/row_helper.js"></script>
-	<input type='hidden' name='address_type' value='textbox' />
-	<script type="text/javascript">
-	
-	rowname[0] = "address";
-	rowtype[0] = "textbox";
-	rowsize[0] = "20";
 
-	rowname[1] = "detail";
-	rowtype[1] = "textbox";
-	rowsize[1] = "30";
-</script>
-
-<?if($pfsense_stable == 'yes'){echo '<p class="pgtitle">' . $pgtitle . '</p>';}?>
-
-<?php if ($input_errors) print_input_errors($input_errors); ?>
-<div id="inputerrors"></div>
-
-<form action="snort_interfaces_whitelist_edit.php" method="post" name="iform" id="iform">
 <?php
 	/* Display Alert message */
 	if ($input_errors)
 		print_input_errors($input_errors); // TODO: add checks
 
 	if ($savemsg)
-		print_info_box2($savemsg);
+		print_info_box($savemsg);
 
 ?>
+<div id="inputerrors"></div>
+
+<form action="snort_interfaces_whitelist_edit.php?id=<?=$id?>" method="post" name="iform" id="iform">
 
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
+<tr><td>
+<?php
+        $tab_array = array();
+        $tab_array[0] = array(gettext("Snort Interfaces"), false, "/snort/snort_interfaces.php");
+        $tab_array[1] = array(gettext("Global Settings"), false, "/snort/snort_interfaces_global.php");
+        $tab_array[2] = array(gettext("Updates"), false, "/snort/snort_download_updates.php");
+        $tab_array[3] = array(gettext("Alerts"), false, "/snort/snort_alerts.php");
+        $tab_array[4] = array(gettext("Blocked"), false, "/snort/snort_blocked.php");
+        $tab_array[5] = array(gettext("Whitelists"), true, "/snort/snort_interfaces_whitelist.php");
+        $tab_array[6] = array(gettext("Suppress"), false, "/snort/snort_interfaces_suppress.php");
+        $tab_array[7] = array(gettext("Help"), false, "/snort/help_and_info.php");
+        display_top_tabs($tab_array);
+?>
+		</td>
+</tr>
 	<tr>
 		<td class="tabcont">
 
@@ -358,32 +387,33 @@ echo $snort_general_css;
 					<?php
 						/* cleanup code */
 						$counter = 0;
-						$address = $pconfig['address'];
-						if ($address <> ""):
-						$item = explode(" ", $address);
-						$item3 = explode("||", $pconfig['detail']);
-						foreach($item as $ww):
-							$address = $item[$counter];
-							$item4 = $item3[$counter];
+						if (!empty($pconfig['address'])):
+						
+						$addressArray = explode(',', $pconfig['address']);
+						$detailArray = explode('||', $pconfig['detail']);
+						$RowUUIDArray = explode('||', $pconfig['addressuuid']);
+
+						foreach($addressArray as $address):
+							if (!empty($address)):
+							$detail = $detailArray[$counter];
+							$rowaddressuuid= $RowUUIDArray[$counter];
 					?>
-						<tr>
-							<td><input name="address<?php echo $counter; ?>" class="formfld unknown" type="text" id="address<?php echo $counter; ?>" size="30" value="<?=htmlspecialchars($address);?>" /></td>
-							<td><input name="detail<?php echo $counter; ?>" class="formfld unknown" type="text" id="address<?php echo $counter; ?>" size="50" value="<?=$item4;?>" /></td>
-							<td>
-								<?php echo "<input type=\"image\" src=\"/themes/".$g['theme']."/images/icons/icon_x.gif\" onclick=\"removeRow(this); return false;\" value=\"Delete\" />"; ?>
-							</td>
-						</tr>
+					<tr id="<?=$rowaddressuuid?>">
+						<td><input autocomplete="off" name="addresses[<?=$rowaddressuuid;?>][address]" class="formfld unknown" size="30" value="<?=$address;?>" type="text"></td>
+						<td><input autocomplete="off" name="addresses[<?=$rowaddressuuid;?>][detail]" class="formfld unknown" size="50" value="<?=$detail;?>" type="text"></td>
+						<td><img id="<?=$rowaddressuuid;?>" class="icon_x removeRow" src="/themes/<?= $g['theme']; ?>/images/icons/icon_x.gif" alt="" title="remove entry" border="0"></td>
+						<td><input name="addresses[<?=$rowaddressuuid;?>][uuid]" value="<?=$rowaddressuuid;?>" type="hidden"></td>
+					</tr>				
+												
 					<?php
 						$counter++;
-
-						endforeach; endif;
+						endif;
+						endforeach; 
+						endif;
 					?>
 					</tbody>
 				</table>
-				<a onclick="javascript:addRowTo('maintable'); return false;"
-					href="#"><img border="0"
-					src="/themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif" alt=""
-					title="add another entry" /> </a></td>
+				<img id="addNewRow" class="icon_x" border="0" src="/themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif" alt="" title="add another entry" /></td>
 			</tr>
 			<tr>
 				<td width="22%" valign="top">&nbsp;</td>
@@ -400,12 +430,62 @@ echo $snort_general_css;
 </form>
 
 <script type="text/javascript">
-	/* row and col adjust when you add extra entries */
+
+
+/*! Needs to be watched not my code <- IMPORTANT
+* JavaScript UUID Generator, v0.0.1
+*
+* Copyright (c) 2009 Massimo Lombardo.
+* Dual licensed under the MIT and the GNU GPL licenses.
+*/			
+
+function genUUID() {
+    var uuid = (function () {
+        var i,
+            c = "89ab",
+            u = [];
+        for (i = 0; i < 36; i += 1) {
+            u[i] = (Math.random() * 16 | 0).toString(16);
+        }
+        u[8] = u[13] = u[18] = u[23] = "";
+        u[14] = "4";
+        u[19] = c.charAt(Math.random() * 4 | 0);
+        return u.join("");
+    })();
+    return {
+        toString: function () {
+            return uuid;
+        },
+        valueOf: function () {
+            return uuid;
+        }
+    }
+};
+
+					
+	jQuery(".icon_x").live('mouseover', function() {
+		jQuery(this).css('cursor', 'pointer');
+	});
+
 	
-	field_counter_js = 3;
-	rows = 1;
-	totalrows = <?php echo $counter; ?>;
-	loaded = <?php echo $counter; ?>;
+	jQuery('#addNewRow').live("click", function(){
+		
+		var addRowCount = genUUID();
+			
+		jQuery('#maintable > tbody').append(
+				"\n" + '<tr id="' + addRowCount + '">' + "\n" +
+				'<td><input autocomplete="off" name="addresses[' + addRowCount + '][address]" class="formfld unknown" size="30" value="" type="text"></td>' + "\n" +
+				'<td><input autocomplete="off" name="addresses[' + addRowCount + '][detail]" class="formfld unknown" size="50" value="" type="text"></td>' + "\n" +
+				'<td><img id="' + addRowCount + '" class="icon_x removeRow" border="0" src="/themes/<?= $g['theme']; ?>/images/icons/icon_x.gif" alt="" title="remove entry" /></td>' + "\n" +
+				'<td><input name="addresses[' + addRowCount + '][uuid]" type="hidden" value="' + addRowCount + '" /></td>' + "\n" +
+				'</tr>' + "\n"						
+			);
+	});
+
+
+    jQuery(".removeRow").live('click', function(){
+    	jQuery("#" + this.id).remove();
+    });	
 	
 </script>
 

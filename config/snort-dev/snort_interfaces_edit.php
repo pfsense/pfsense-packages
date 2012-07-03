@@ -30,7 +30,7 @@
  POSSIBILITY OF SUCH DAMAGE.
  */
 
-require_once("/usr/local/www/guiconfig.inc");
+require_once("guiconfig.inc");
 require_once("/usr/local/pkg/snort/snort_gui.inc");
 require_once("/usr/local/pkg/snort/snort.inc");
 
@@ -38,6 +38,7 @@ global $g;
 
 if (!is_array($config['installedpackages']['snortglobal']['rule']))
 	$config['installedpackages']['snortglobal']['rule'] = array();
+
 $a_nat = &$config['installedpackages']['snortglobal']['rule'];
 
 $id = $_GET['id'];
@@ -375,11 +376,10 @@ function enable_change(enable_change) {
 }
 //-->
 </script>
-<?if($pfsense_stable == 'yes'){echo '<p class="pgtitle">' . $pgtitle . '</p>';}?>
 
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">
 
-<form action="snort_interfaces_edit.php<?php echo "?id=$id";?>" method="post" enctype="multipart/form-data" name="iform" id="iform">
+<form method="post" enctype="multipart/form-data" name="iform" id="iform">
 <?php
 	/* Display Alert message */
 	if ($input_errors) {
