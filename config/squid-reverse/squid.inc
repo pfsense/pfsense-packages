@@ -1239,7 +1239,7 @@ function squid_resync_auth() {
 
 	// Unrestricted hosts take precedence over blacklist
 	if(! empty($settingsnac['unrestricted_hosts'])) {
-		if (squid_is_valid_acl('unrestricted_hosts')) {
+		if (squid_is_valid_acl('unrestricted_hosts') && $settings['unrestricted_auth']!= "on") {
 			$conf .= "# These hosts do not have any restrictions\n";
 			$conf .= "http_access allow unrestricted_hosts\n";
 		}
