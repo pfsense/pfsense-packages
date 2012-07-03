@@ -25,9 +25,20 @@
 
 require_once('filter.inc');
 
+if (substr(trim(file_get_contents("/etc/version")),0,3) == "2.0") {
+	define('NRPE_BASE', '/usr/local');
+} else {
+	define('NRPE_BASE', '/usr/pbi/nrpe-' . php_uname("m"));
+}
+define('NRPE_CONFIG_DIR', NRPE_BASE . '/etc');
+define('NRPE_RCFILE', '/usr/local/etc/rc.d/nrpe2.sh');
+
+
 function nrpe2_custom_php_install_command() {
 	global $g, $config;
 	conf_mount_rw();
+	$NRPE_BASE = NRPE_BASE;
+	$NRPE_CONFIG_DIR = NRPE_CONFIG_DIR;
 
 	$ip = $config['interfaces']['lan']['ipaddr'];
 
@@ -81,8 +92,8 @@ function nrpe2_custom_php_install_command() {
 			)
 		);
 	}
-	unlink_if_exists('/usr/local/etc/rc.d/nrpe2');
-	$fd = fopen('/usr/local/etc/rc.d/nrpe2.sh', 'w');
+	unlink_if_exists(NRPE_CONFIG_DIR . '/rc.d/nrpe2');
+	$fd = fopen(NRPE_RCFILE, 'w');
 	$rc_file = <<<EOD
 #!/bin/sh
 #
@@ -98,7 +109,7 @@ function nrpe2_custom_php_install_command() {
 # nrpe2_enable (bool):    Set to "NO" by default.
 #                         Set it to "YES" to enable nrpe2.
 # nrpe2_flags (str):      Set to "" by default.
-# nrpe2_configfile (str): Set to "/usr/local/etc/nrpe.cfg" by default.
+# nrpe2_configfile (str): Set to "{$NRPE_CONFIG_DIR}/nrpe.cfg" by default.
 # nrpe2_pidfile (str):    Set to "/var/spool/nagios/nrpe2.pid" by default.
 #
 
@@ -108,14 +119,14 @@ nrpe2_enable=\${nrpe2_enable-"YES"}
 name="nrpe2"
 rcvar=`set_rcvar`
 
-command="/usr/local/sbin/nrpe2"
+command="{$NRPE_BASE}/sbin/nrpe2"
 command_args="-d"
 extra_commands="reload"
 
 sig_reload=HUP
 
 [ -z "\${nrpe2_flags}" ] && nrpe2_flags=""
-[ -z "\${nrpe2_configfile}" ] && nrpe2_configfile="/usr/local/etc/nrpe.cfg"
+[ -z "\${nrpe2_configfile}" ] && nrpe2_configfile="{$NRPE_CONFIG_DIR}/nrpe.cfg"
 [ -z "\${nrpe2_pidfile}" ] && nrpe2_pidfile="/var/run/nrpe2.pid"
 
 load_rc_config "\${name}"
@@ -129,7 +140,7 @@ run_rc_command "$1"
 EOD;
 	fwrite($fd, $rc_file);
 	fclose($fd);
-	chmod('/usr/local/etc/rc.d/nrpe2.sh', 0755);
+	chmod(NRPE_RCFILE, 0755);
 
 	conf_mount_ro();
 }
@@ -143,7 +154,7 @@ function nrpe2_custom_php_deinstall_command() {
 
 function nrpe2_custom_php_write_config() {
 	global $g, $config;
-	$nagios_check_path = "/usr/local/libexec/nagios";
+	$nagios_check_path = NRPE_BASE . "/libexec/nagios";
 
 	conf_mount_rw();
 	$cmds = array();
@@ -157,7 +168,7 @@ function nrpe2_custom_php_write_config() {
 	$server_address = $config['installedpackages']['nrpe2']['config'][0]['server_address'];
 	$allowed_hosts = $config['installedpackages']['nrpe2']['config'][0]['allowed_hosts'];
 
-	$fd = fopen('/usr/local/etc/nrpe.cfg', 'w');
+	$fd = fopen(NRPE_CONFIG_DIR . '/nrpe.cfg', 'w');
 	$nrpe_cfg = <<<EOD
 log_facility=daemon
 pid_file=/var/run/nrpe2.pid
@@ -181,15 +192,15 @@ function nrpe2_custom_php_service() {
 	global $g, $config;
 
 	if ($config['installedpackages']['nrpe2']['config'][0]['enabled'] == "on") {
-		exec("/usr/local/etc/rc.d/nrpe2.sh restart");
+		exec(NRPE_RCFILE . " restart");
 	}
 	else {
-		exec("/usr/local/etc/rc.d/nrpe2.sh stop");
+		exec(NRPE_RCFILE . " stop");
 	}
 }
 
 function nrpe2_get_commands() {
-	$nagios_check_path = "/usr/local/libexec/nagios";
+	$nagios_check_path = NRPE_BASE . "/libexec/nagios";
 	$commands = glob("{$nagios_check_path}/check_*");
 	$cmdarr = array();
 	foreach ($commands as $cmd)

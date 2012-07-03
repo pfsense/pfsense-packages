@@ -15,7 +15,7 @@
 	</menu>
 	<service>
 		<name>nrpe2</name>
-		<rcfile>nrpe2</rcfile>
+		<rcfile>nrpe2.sh</rcfile>
 		<executable>nrpe2</executable>
 		<description>Nagios NRPE Daemon</description>
 	</service>
