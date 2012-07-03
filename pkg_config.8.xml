@@ -1345,6 +1345,7 @@
 		<depends_on_package>havp-0.91_1.tbz</depends_on_package>
 		<depends_on_package_pbi>havp-0.91_1-i386.pbi</depends_on_package_pbi>
 		<build_port_path>/usr/ports/www/havp</build_port_path>
+		<build_options>CLAMAVUSER=havp CLAMAVGROUP=havp</build_options>
 		<version>0.91_1</version>
 		<status>BETA</status>
 		<required_version>1.2.2</required_version>
