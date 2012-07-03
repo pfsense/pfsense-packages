@@ -1587,7 +1587,7 @@ function havp_fscan_html()
 <hr>
 <span onClick="document.getElementById('scanfilepath').value = '/var/squid';" style="cursor: pointer;">
     <img src='./themes/{$g['theme']}/images/icons/icon_pass.gif' title='Click here'>
-        <font size='-1'><u>&nbsp;Squid cache path (scan you squid cache now).</u></font>
+        <font size='-1'><u>&nbsp;Squid cache path (scan your squid cache now).</u></font>
     </img>
 </span>
 <br>
