@@ -103,6 +103,7 @@ define('HVDEF_HAVP_MAXSRV',             '100');
 # Clam
 #define('HVDEF_CLAM_RUNDIR',             '/var/run/clamav');
 define('HVDEF_CLAM_RUNDIR',             '/var/run');
+define('HVDEF_CLAM_DBDIR',              '/var/db/clamav');
 if(preg_match("/^2.0/",$pfSversion))
 	define('HVDEF_AVLOG_DIR',               '/var/log/clamav');
 else
@@ -395,6 +396,11 @@ function havp_check_system()
     if (!file_exists(HVDEF_HAVPTEMP_DIR))
     	mwexec("mkdir -p " . HVDEF_HAVPTEMP_DIR);
     havp_set_file_access(HVDEF_HAVPTEMP_DIR, HVDEF_USER, '');
+
+    # clamav dbdir
+    if (!file_exists(HVDEF_CLAM_DBDIR))
+	mwexec("mkdir -p " . HVDEF_CLAM_DBDIR);
+    havp_set_file_access(HVDEF_CLAM_DBDIR, HVDEF_AVUSER, '');
 
     # RAM tempdir
     if (!file_exists(HVDEF_RAMTEMP_DIR))
