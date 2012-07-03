@@ -77,7 +77,7 @@ function is_validwhitelistname($name, $type) {
 	if ($type === 'ip' && !preg_match("/[^a-zA-Z0-9\:\,\.\/]/", $name))
 		return true;
 	
-	if ($type === 'detail' && !preg_match("/[^a-zA-Z0-9\:\,\.\+\s]/", $name))
+	if ($type === 'detail' && !preg_match("/[^a-zA-Z0-9\:\,\.\+\s\-\']/", $name))
 		return true;	
 
 	return false;
@@ -151,7 +151,7 @@ if ($_POST['submit']) {
 			}
 		
 			if (is_validwhitelistname($address[detail], 'detail') == false) {
-				$input_errors[] = "List of IP descriptions may only consist of the characters [a-z, A-Z 0-9 + , :].";
+				$input_errors[] = "List of IP descriptions may only consist of the characters [a-z, A-Z 0-9 + , : ' -].";
 			}				
 					
 			if (!empty($address[address]) && !empty($address[uuid])) {

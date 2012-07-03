@@ -276,8 +276,14 @@ function build_base_whitelist($build_netlist, $wanip, $wangw, $wandns, $vips, $v
 	$snort_vpns_list = function() use(&$home_net, &$config) {
 		$vpns_list = filter_get_vpns_list();
 		
-		if (!empty($vpns_list))
-			$home_net .= "{$vpns_list},";		
+		if (!empty($vpns_list)) {
+			// convert spaces to , returns
+			$vpns_list = str_replace(' ', ",", $vpns_list);	
+			$vpns_list = str_replace('  ', ",", $vpns_list);		
+			
+			$home_net .= "{$vpns_list},";
+		}
+
 	};
 	
 	if ($vpns == 'yes') {
@@ -1072,7 +1078,7 @@ function create_snort_whitelist($id, $if_real) {
 		$whitelist = $config['installedpackages']['snortglobal']['whitelist']['item'][$whitelist_key_w];
 		$w_data = build_base_whitelist($whitelist['snortlisttype'], $whitelist['wanips'], $whitelist['wangateips'], $whitelist['wandnsips'], $whitelist['vips'], $whitelist['vpnips'], $whitelist_key_w);
 		
-		// this foe whitelistfile, convert spaces to carriage returns
+		// convert spaces to carriage returns
 		$w_data = str_replace(',', "\n", $w_data);
 		$w_data = str_replace(',,', "\n", $w_data);
 
