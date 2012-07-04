@@ -184,7 +184,6 @@ enable JavaScript to view this content
         $tab_array[4] = array(gettext("Blocked"), false, "/snort/snort_blocked.php");
         $tab_array[5] = array(gettext("Whitelists"), false, "/snort/snort_interfaces_whitelist.php");
         $tab_array[6] = array(gettext("Suppress"), false, "/snort/snort_interfaces_suppress.php");
-        $tab_array[7] = array(gettext("Help"), false, "/snort/help_and_info.php");
         display_top_tabs($tab_array);
 ?>
 </td></tr>
@@ -386,54 +385,10 @@ enable JavaScript to view this content
 	</tr>
 	</td>
 </table>
-
-			<?php
-			if ($pkg['tabs'] <> "") {
-				echo "</td></tr></table>";
-			}
-			?></form>
-</div>
-
-<br>
-<br>
-<br>
-
-<style type="text/css">
-#footer2 {
-	position: relative;
-	background-color: transparent;
-	background-image: url("./images/logo22.png");
-	background-repeat: no-repeat;
-	background-attachment: scroll;
-	background-position: 0% 0%;
-	top: 10px;
-	left: 0px;
-	width: 770px;
-	height: 60px;
-	color: #000000;
-	text-align: center;
-	font-size: 0.8em;
-	padding-top: 40px;
-	margin-bottom: -35px;
-	clear: both;
-}
-</style>
-
-<div id="footer2">SNORT registered � by Sourcefire, Inc, Barnyard2
-registered � by securixlive.com, Orion registered � by Robert Zelaya,
-Emergingthreats registered � by emergingthreats.net, Mysql registered �
-by Mysql.com</div>
-<!-- Footer DIV -->
-
-			<?php
-
-			include("fend.inc");
-
-			echo $snort_custom_rnd_box;
-
-			?>
-
-
-
+</form>
+<?php
+include("fend.inc");
+echo $snort_custom_rnd_box;
+?>
 </body>
 </html>

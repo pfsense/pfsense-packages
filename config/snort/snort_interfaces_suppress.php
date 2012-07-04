@@ -91,7 +91,6 @@ echo $snort_general_css;
         $tab_array[4] = array(gettext("Blocked"), false, "/snort/snort_blocked.php");
         $tab_array[5] = array(gettext("Whitelists"), false, "/snort/snort_interfaces_whitelist.php");
         $tab_array[6] = array(gettext("Suppress"), true, "/snort/snort_interfaces_suppress.php");
-        $tab_array[7] = array(gettext("Help"), false, "/snort/help_and_info.php");
         display_top_tabs($tab_array);
 ?>
                 </td>

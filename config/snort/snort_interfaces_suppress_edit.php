@@ -199,7 +199,6 @@ echo $snort_general_css;
 			<li><a href="/snort/snort_interfaces_whitelist.php"><span>Whitelists</span></a></li>
 			<li class="newtabmenu_active"><a
 				href="/snort/snort_interfaces_suppress.php"><span>Suppress</span></a></li>
-			<li><a class="example8" href="/snort/help_and_info.php"><span>Help</span></a></li>
 		</ul>
 		</div>
 
