@@ -80,9 +80,9 @@
 	</additional_files_needed>
 	<fields>
 		<field>
-			<fielddescr>interface</fielddescr>
+			<fielddescr>Interface</fielddescr>
 			<fieldname>active_interface</fieldname>
-			<description>The interface that bandwidthd will bind to.</description>
+			<description>The interface that bandwidthd will bind to. The interface subnet will be reported on by default.</description>
 			<type>interfaces_selection</type>
 			<required/>
 			<default_value>lan</default_value>
@@ -90,7 +90,7 @@
 		<field>
                         <fielddescr>Subnet</fielddescr>
                         <fieldname>subnets_custom</fieldname>
-                        <description>The subnet(s) on which bandwidthd will report. (separate with ';' for multiple subnets, e.g. 192.168.1.0/24;10.0.0.0/24)</description>
+                        <description>Extra subnet(s) on which bandwidthd will report. (separate with ';' for multiple subnets, e.g. 192.168.1.0/24;10.0.0.0/24)</description>
                         <type>input</type>
 		</field>
 		<field>
@@ -108,25 +108,25 @@
 			<value>1024</value>
 		</field>
 		<field>
-			<fielddescr>promiscuous</fielddescr>
+			<fielddescr>Promiscuous</fielddescr>
 			<fieldname>promiscuous</fieldname>
 			<description>Put interface in promiscuous mode to score to traffic that may not be routing through the host machine.</description>
 			<type>checkbox</type>
 		</field>
 		<field>
-			<fielddescr>output_cdf</fielddescr>
+			<fielddescr>Output cdf</fielddescr>
 			<fieldname>outputcdf</fieldname>
 			<description>Log data to cdf file htdocs/log.cdf</description>
 			<type>checkbox</type>
 		</field>
 		<field>
-			<fielddescr>recover_cdf</fielddescr>
+			<fielddescr>Recover cdf</fielddescr>
 			<fieldname>recovercdf</fieldname>
 			<description>Read back the cdf file on startup</description>
 			<type>checkbox</type>
 		</field>
 		<field>
-			<fielddescr>filter</fielddescr>
+			<fielddescr>Filter</fielddescr>
 			<fieldname>filter</fieldname>
 			<description>Libpcap format filter string used to control what bandwidthd sees.  Please always include "ip" in the string to avoid strange problems.</description>
 			<type>input</type>
