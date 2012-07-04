@@ -895,14 +895,14 @@ EOE;
 	fi
 	/bin/pgrep -nF {$g['varrun_path']}/snort_{$if_real}{$snort_uuid}.pid
 	if [ $? = 0 ]; then
-		/bin/pkill -HUP -F {$g['varrun_path']}/snort_{$if_real}{$snort_uuid}.pid -a
+		/bin/pkill -F {$g['varrun_path']}/snort_{$if_real}{$snort_uuid}.pid -a
 		/usr/bin/logger -p daemon.info -i -t SnortStartup "Snort SOFT START For {$value['descr']}({$snort_uuid}_{$if_real})..."
-	else
-		# Start snort and barnyard2
-		/bin/rm {$g['varrun_path']}/snort_{$if_real}{$snort_uuid}.pid
-		/usr/local/bin/snort -R {$snort_uuid} -D -q -l /var/log/snort/snort_{$if_real}{$snort_uuid} --pid-path {$g['varrun_path']} --nolock-pidfile -G {$snort_uuid} -c /usr/local/etc/snort/snort_{$snort_uuid}_{$if_real}/snort.conf -i {$if_real}
-		/usr/bin/logger -p daemon.info -i -t SnortStartup "Snort START For {$value['descr']}({$snort_uuid}_{$if_real})..."
 	fi
+
+	# Start snort and barnyard2
+	/bin/rm {$g['varrun_path']}/snort_{$if_real}{$snort_uuid}.pid
+	/usr/local/bin/snort -R {$snort_uuid} -D -q -l /var/log/snort/snort_{$if_real}{$snort_uuid} --pid-path {$g['varrun_path']} --nolock-pidfile -G {$snort_uuid} -c /usr/local/etc/snort/snort_{$snort_uuid}_{$if_real}/snort.conf -i {$if_real}
+	/usr/bin/logger -p daemon.info -i -t SnortStartup "Snort START For {$value['descr']}({$snort_uuid}_{$if_real})..."
 
 	sleep 2
 	{$start_barnyard2}
