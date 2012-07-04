@@ -30,8 +30,8 @@ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 */
 
-$nocsrf = true;
-require_once("/usr/local/www/guiconfig.inc");
+//$nocsrf = true;
+require_once("guiconfig.inc");
 require_once("/usr/local/pkg/snort/snort_gui.inc");
 require_once("/usr/local/pkg/snort/snort.inc");
 
@@ -110,9 +110,9 @@ if ($_GET['act'] == 'toggle' && is_numeric($id)) {
 
 	sync_snort_package_config();
 
-	$tester2 = Running_Ck($snort_uuid, $if_real, $id);
+	$snort_pgrep_chk_toggle = snortRunningChk('snort', $snort_uuid, $if_real);
 
-	if ($tester2 == 'yes') {
+	if (!empty($snort_pgrep_chk_toggle)) {
 		Running_Stop($snort_uuid, $if_real, $id);
 
 		header( 'Expires: Sat, 26 Jul 1997 05:00:00 GMT' );
@@ -231,9 +231,9 @@ enable JavaScript to view this content
 			$if_real = snort_get_real_interface($natent['interface']);
 			$snort_uuid = $natent['uuid'];
 			
-			$tester2 = Running_Ck($snort_uuid, $if_real, $id);
+			$snort_pgrep_chk = snortRunningChk('snort', $snort_uuid, $if_real);
 
-			if ($tester2 == 'no') {
+			if (empty($snort_pgrep_chk)) {
 				$iconfn = 'pass';
 				$class_color_up = 'listbg';
 			}else{
@@ -292,9 +292,9 @@ enable JavaScript to view this content
 					?> <?=strtoupper($check_blockoffenders);?></td>
 					<?php
 
-					$color2_upb = Running_Ck_b($snort_uuid, $if_real, $id);
+					$snort_pgrep_chkb = snortRunningChk('barnyard2', $snort_uuid, $if_real);
 
-					if ($color2_upb == 'yes') {
+					if (!empty($snort_pgrep_chkb)) {
 						$class_color_upb = 'listbg2';
 					}else{
 						$class_color_upb = 'listbg';

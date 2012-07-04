@@ -1,7 +1,7 @@
 <?php
 /*
  snort.inc
- Copyright (C) 2006 Scott Ullrich
+ Copyright (C) 2006 Scott UllrichRunning_Ck
  Copyright (C) 2009-2010 Robert Zelaya
  Copyright (C) 2011 Ermal Luci
  part of pfSense
@@ -369,7 +369,8 @@ function build_base_whitelist($build_netlist, $wanip, $wangw, $wandns, $vips, $v
 			$home_net = substr_replace($home_net, '', -1);
 		}		
 		
-	};	
+	};
+	
 	$snort_clean_home_net();
 	
 	return $home_net;
@@ -378,87 +379,159 @@ function build_base_whitelist($build_netlist, $wanip, $wangw, $wandns, $vips, $v
 
 
 /* checks to see if snort is running yes/no and stop/start */
-function Running_Ck($snort_uuid, $if_real, $id) {
+function snortRunningChk($type, $snort_uuid, $if_real) {
 	global $config;
+	
+	if ($type === 'snort') { 
+		$snort_pgrep_chk = exec("/bin/pgrep -f 'snort.*R {$snort_uuid}'"); 
+	}
+	
+	if ($type === 'barnyard2') { 
+		$snort_pgrep_chk = exec("/bin/pgrep -f 'barnyard2.*{$snort_uuid}_{$if_real}'");
+	}
+	
+	if (!empty($snort_pgrep_chk)) {
+		return $snort_pgrep_chk;
+	}
+	
+	return NULL;
 
-	$snort_uph = 'no';
-	$snort_up_prell = exec("/bin/pgrep -f 'snort.*R {$snort_uuid}'");
-	if ($snort_up_prell != '')
-		$snort_uph = 'yes';
-
-	return $snort_uph;
-}
-
-/* checks to see if barnyard2 is running yes/no */
-function Running_Ck_b($snort_uuid, $if_real, $id) {
-	global $config;
-
-	$snort_up_b = 'no';
-	$snort_up_pre_b = exec("/bin/pgrep -f 'barnyard2.*{$snort_uuid}_{$if_real}'");
-	if ($snort_up_pre_b != '')
-		$snort_up_b = 'yes';
-
-	return $snort_up_b;
 }
 
 function Running_Stop($snort_uuid, $if_real, $id) {
 	global $config, $g;
 
-	/* if snort.sh crashed this will remove the pid */
-	@unlink("{$g['tmp_path']}/snort.sh.pid");
+	// if snort.sh crashed this will remove the pid
+	@unlink("{$g['tmp_path']}/snort.sh.pid");	
 	
-	$start_up = exec("/bin/pgrep -f 'snort.*R {$snort_uuid}'");
-	$start_upb = exec("/bin/pgrep -f 'barnyard2.*{$snort_uuid}_{$if_real}'");
+	// wait until snort stops
+	$snort_WaitForStop = function ($type) use (&$snort_uuid, &$if_real) {		
+		
+		$snort_pgrep_chk = snortRunningChk($type, $snort_uuid, $if_real);
+		
+		if (!empty($snort_pgrep_chk)){
+			exec("/usr/bin/touch /tmp/snort_{$if_real}{$snort_uuid}.stoplck");
+		}
+		
+		$i = 0;
+		while(file_exists("/tmp/snort_{$if_real}{$snort_uuid}.stoplck") || file_exists("/var/log/snort/run/{$type}_{$if_real}{$snort_uuid}.pid")) {			
+			$i++;			
+			exec("/usr/bin/logger -p daemon.info -i -t SnortStop '{$type} Stop count...{$i}'");
+			
+			$snort_pgrep_chk = snortRunningChk($type, $snort_uuid, $if_real);
+			
+			if (empty($snort_pgrep_chk)){
+				@exec("/bin/rm /tmp/snort_{$if_real}{$snort_uuid}.stoplck");
+			}
+			
+			sleep(2);
+		
+		}
+	};	
 
+	if (isvalidpid("/var/log/snort/run/snort_{$if_real}{$snort_uuid}.pid")) {
+		
+		// send kill cmd
+		killbypid("/var/log/snort/run/snort_{$if_real}{$snort_uuid}.pid");
+		exec("/bin/rm /var/log/snort/run/snort_{$if_real}{$snort_uuid}.pid.lck");
+				
+		// wait until snort stops
+		$snort_WaitForStop('snort');
+		
+	}	
 
-	/*
-	 * TODO: Add a GUI option that lets the user keep full logs
-	 */
-	if (!empty($start_up)) {
-		@exec("/bin/kill {$start_up}");
+	if (isvalidpid("/var/log/snort/run/barnyard2_{$if_real}{$snort_uuid}.pid")) {
+		
+		// send kill cmd
+		killbypid("/var/log/snort/run/barnyard2_{$if_real}{$snort_uuid}.pid");
+		exec("/bin/rm /var/log/snort/run/barnyard2_{$snort_uuid}_{$if_real}.pid.lck");	
+	
+		// wait until barnyard2 stops
+		$snort_WaitForStop('barnyard2');
+	
+	}
+	
+		// TODO: Add a GUI option that lets the user keep full logs
 		/*
 		@exec("/bin/rm /var/log/snort/run/snort_{$if_real}{$snort_uuid}*");
 		@exec("/bin/rm /var/log/snort/{$snort_uuid}_{$if_real}/snort.u1*");
 		@exec("/bin/rm /var/log/snort/{$snort_uuid}_{$if_real}/snort.u2*");
-		*/
-	}
-
-	if (!empty($start_upb)) {
-		@exec("/bin/kill {$start_upb}");
-		/*
+		
 		@exec("/bin/rm /var/log/snort/run/barnyard2_{$snort_uuid}_{$if_real}*");
 		@exec("/bin/rm /var/log/snort/barnyard2/{$snort_uuid}_{$if_real}/snort.u1*");
 		@exec("/bin/rm /var/log/snort/barnyard2/{$snort_uuid}_{$if_real}/snort.u2*");
 		*/
-	}
 
-	/* Log Iface stop */
+	// Log Iface stop
 	exec("/usr/bin/logger -p daemon.info -i -t SnortStartup 'Interface Rule STOP for {$snort_uuid}_{$if_real}...'");
-	sleep(2); // Give time so GUI displays correctly
 }
 
 function Running_Start($snort_uuid, $if_real, $id) {
 	global $config;
 
 	/* if snort.sh crashed this will remove the pid */
-	@unlink("{$g['tmp_path']}/snort.sh.pid");
+	@unlink("{$g['tmp_path']}/snort.sh.pid");	
+	
+	// wait until snort starts
+	$snort_WaitForStart = function ($type) use (&$snort_uuid, &$if_real) {
+		
+		// calls to see if snort or barnyard is running
+		$snort_pgrep_chk = snortRunningChk($type, $snort_uuid, $if_real);
+		
+		if (empty($snort_pgrep_chk)){
+			exec("/usr/bin/touch /tmp/snort_{$if_real}{$snort_uuid}.startlck");
+		}
+		
+		$i = 0;			
+		while(file_exists("/tmp/snort_{$if_real}{$snort_uuid}.startlck") || !file_exists("/var/log/snort/run/{$type}_{$if_real}{$snort_uuid}.pid")) {	
+			
+			$i++;
+			exec("/usr/bin/logger -p daemon.info -i -t SnortStart 'Snort Start count...{$i}'");
+			
+			$snort_pgrep_chk = snortRunningChk($type, $snort_uuid, $if_real);
+			
+			// stop if snort error is in syslogd
+			$snort_error_chk = exec("/usr/bin/grep -e 'snort.*{$snort_pgrep_chk}.*FATAL.*ERROR.*' /var/log/system.log");			
+			if(!empty($snort_error_chk)) {
+				break;
+			}
+			
+			if (!empty($snort_pgrep_chk)){
+				@exec("/bin/rm /tmp/snort_{$if_real}{$snort_uuid}.startlck");
+			}
+			sleep(2);
+		}
+	};	
 
+	// only start if iface is on or iface is not running
 	$snort_info_chk = $config['installedpackages']['snortglobal']['rule'][$id]['enable'];
-	if ($snort_info_chk == 'on')
+	$snortRunningChkPreStart = snortRunningChk($id, $snort_uuid, $if_real);
+	if ($snort_info_chk === 'on' && empty($snortRunningChkPreStart)) {
+		
+		// start snort cmd
 		exec("/usr/local/bin/snort -R \"{$snort_uuid}\" -D -q -l /var/log/snort/{$snort_uuid}_{$if_real} --pid-path /var/log/snort/run -G {$snort_uuid} -c /usr/local/etc/snort/snort_{$snort_uuid}_{$if_real}/snort.conf -i {$if_real}");
-	else
+		
+		// wait until snort starts
+		$snort_WaitForStart('snort');	
+	
+	}else{
 		return;
+	}
 
-	/* define snortbarnyardlog_chk */
-	/* top will have trouble if the uuid is to far back */
+	// define snortbarnyardlog_chk
 	$snortbarnyardlog_info_chk = $config['installedpackages']['snortglobal']['rule'][$id]['barnyard_enable'];
 	if ($snortbarnyardlog_info_chk == 'on') {
+		
+		// start barnyard2 cmd
 		exec("/usr/local/bin/barnyard2 -f \"snort.u2\" --pid-path /var/log/snort/run -c /usr/local/etc/snort/snort_{$snort_uuid}_{$if_real}/barnyard2.conf -d /var/log/snort/{$snort_uuid}_{$if_real} -D -q");
+
+		// wait until snort starts
+		$snort_WaitForStart('barnyard2');
+		
 	}
 
 	/* Log Iface stop */
 	exec("/usr/bin/logger -p daemon.info -i -t SnortStartup 'Interface Rule START for {$id}_{$snort_uuid}_{$if_real}...'");
-	sleep(2); // Give time so GUI displays correctly
 }
 
 function snort_get_friendly_interface($interface) {
@@ -1129,84 +1202,38 @@ function create_snort_externalnet($id, $if_real) {
 	}
 }
 
-/* open snort.sh for writing" */
+// open snort.sh for writing
 function create_snort_sh()
 {
 	global $config, $g;
 
-	if (!is_array($config['installedpackages']['snortglobal']['rule']))
-		return;
-
 	$snortconf =& $config['installedpackages']['snortglobal']['rule'];
-
-	$snort_sh_text3 = array();
-	$snort_sh_text4 = array();
-
-	/* do not start config build if rules is empty */
-	if (!empty($snortconf)) {
-		foreach ($snortconf as $value) {
-			$snort_uuid = $value['uuid'];
-			$result_lan = $value['interface'];
-			$if_real = snort_get_real_interface($result_lan);
-
-			/* define snortbarnyardlog_chk */
-			$snortbarnyardlog_info_chk = $value['barnyard_enable'];
-
-			if ($snortbarnyardlog_info_chk == 'on')
-				$start_barnyard2 = "sleep 4;/usr/local/bin/barnyard2 -f snort.u2 --pid-path /var/log/snort/run -c /usr/local/etc/snort/snort_{$snort_uuid}_{$if_real}/barnyard2.conf -d /var/log/snort/{$snort_uuid}_{$if_real} -D -q";
-
-			$snort_sh_text3[] = <<<EOE
-
-###### For Each Iface
-
-#### Fake start only used on bootup and Pfsense IP changes
-#### Only try to restart if snort is running on Iface
-if [ "`/bin/pgrep -f 'snort.*R {$snort_uuid}'`" != "" ]; then
-	snort_pid=`/bin/pgrep -f 'snort.*R {$snort_uuid}'`
-	/usr/bin/logger -p daemon.info -i -t SnortStartup "Snort already running, soft restart"
-
-	#### Restart Iface
-	/bin/kill -HUP \${snort_pid}
-	/usr/bin/logger -p daemon.info -i -t SnortStartup "Snort Soft Reload For {$snort_uuid}_{$if_real}..."
-else
-	# Start snort and barnyard2
-	/bin/echo "snort.sh run" > /tmp/snort.sh.pid
-	/bin/rm /var/run/snort_{$snort_uuid}_{$if_real}.pid
-
-	/usr/local/bin/snort -R {$snort_uuid} -D -q -l /var/log/snort/{$snort_uuid}_{$if_real} --pid-path /var/log/snort/run -G {$snort_uuid} -c /usr/local/etc/snort/snort_{$snort_uuid}_{$if_real}/snort.conf -i {$if_real}
-	$start_barnyard2
-
-	/usr/bin/logger -p daemon.info -i -t SnortStartup "Snort HARD START For {$snort_uuid}_{$if_real}..."
-fi
-
-EOE;
-
-			$snort_sh_text4[] = <<<EOF
-
-pid_s=`/bin/pgrep -f 'snort.*R {$snort_uuid}'`
-sleep 3
-pid_b=`/bin/pgrep -f 'barnyard2.*{$snort_uuid}_{$if_real}'`
-if [ \${pid_s} ] ; then
+	
+	// do not start config build if rules is empty
+	if (!is_array($snortconf) || empty($snortconf)) {
+		return;
+	}
+	
+	$i = 0;
+	foreach ($snortconf as $value) {
+		$snort_uuid = $value['uuid'];
+		$result_lan = $value['interface'];
+		$if_real = snort_get_real_interface($result_lan);
 		
-	/bin/echo "snort.sh run" > /tmp/snort.sh.pid
-	/usr/bin/logger -p daemon.info -i -t SnortStartup "Snort HARD STOP For {$snort_uuid}_{$if_real}..."
-
-	/bin/kill \${pid_s}
-	sleep 3
-	/bin/kill \${pid_b}
-
-	/bin/rm /var/run/snort_{$snort_uuid}_{$if_real}.pid
-fi
-
-EOF;
-		}
+		$snortstart_list .= "{$snort_uuid}_{$if_real}_{$i}" . ',';
+		
+		$i++;
+		
+	} // end foreach
+	
+	// remove , if its the last char
+	if($snortstart_list[strlen($snortstart_list)-1] === ',') {
+		$snortstart_list = substr_replace($snortstart_list, '', -1);
 	}
 
 
-	$start_snort_iface_start = implode("\n\n", $snort_sh_text3);
-	$start_snort_iface_stop = implode("\n\n", $snort_sh_text4);
+$snort_sh_text = <<<EOD
 
-	$snort_sh_text = <<<EOD
 #!/bin/sh
 ########
 # This file was automatically generated
@@ -1216,16 +1243,33 @@ EOF;
 
 rc_start() {
 
-	/bin/echo "snort.sh run" > /tmp/snort.sh.pid
-	$start_snort_iface_start
-	/bin/rm /tmp/snort.sh.pid
+if [ -f /tmp/snort.sh.pid ]; then
+        exit;
+fi
+
+/bin/echo "snort.sh run" > /tmp/snort.sh.pid
+
+
+/usr/local/bin/php -f /usr/local/pkg/snort/snort_startstop.php snortstart={$snortstart_list} &
+
+
+/bin/rm /tmp/snort.sh.pid
+
 }
 
 rc_stop() {
 
-	$start_snort_iface_stop
-	/bin/rm /tmp/snort.sh.pid
-	/bin/rm /var/run/snort*
+if [ -f /tmp/snort.sh.pid ]; then
+        exit;
+fi
+
+/bin/echo "snort.sh run" > /tmp/snort.sh.pid
+
+
+/usr/local/bin/php -f /usr/local/pkg/snort/snort_startstop.php snortstop={$snortstart_list} &
+
+
+/bin/rm /tmp/snort.sh.pid	
 
 }
 
@@ -1243,7 +1287,7 @@ esac
 
 EOD;
 
-	/* write out snort.sh */
+	// write out snort.sh
 	$bconf = fopen("/usr/local/etc/rc.d/snort.sh", "w");
 	if(!$bconf) {
 		log_error("Could not open /usr/local/etc/rc.d/snort.sh for writing.");
