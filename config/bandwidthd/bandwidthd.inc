@@ -28,10 +28,13 @@
 	POSSIBILITY OF SUCH DAMAGE.
 */
 
-if (substr(trim(file_get_contents("/etc/version")),0,3) == "2.1") {
-	define('PKG_BANDWIDTHD_BASE', '/usr/pbi/bandwidthd-' . php_uname("m") . '/bandwidthd');
-} else {
+$pfsense_version = trim(file_get_contents("/etc/version"));
+
+if ((substr($pfsense_version,0,3) == "2.0") || (substr($pfsense_version,0,1) == "1")){
 	define('PKG_BANDWIDTHD_BASE', '/usr/local/bandwidthd');
+} else {
+	/* the default case for versions from 2.1 onwards */
+	define('PKG_BANDWIDTHD_BASE', '/usr/pbi/bandwidthd-' . php_uname("m") . '/bandwidthd');
 }
 
 function bandwidthd_install_deinstall() {
@@ -82,7 +85,7 @@ function bandwidthd_install_config() {
 	if($config['installedpackages']['bandwidthd']['config'][0]['active_interface']){
 		$ifdescrs = array($config['installedpackages']['bandwidthd']['config'][0]['active_interface']);
 	} else {
-		log_error("You should specify a interface for bandwidthd to listen on.  exiting.");
+		log_error("You should specify an interface for bandwidthd to listen on. Exiting.");
 	}
 
 	$subnets_custom = split(';',str_replace(' ','',$config['installedpackages']['bandwidthd']['config'][0]['subnets_custom']));
