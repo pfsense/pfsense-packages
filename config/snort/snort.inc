@@ -871,37 +871,31 @@ function create_snort_sh() {
 
 ###### For Each Iface
 
-#### Fake start only used on bootup and Pfsense IP changes
-#### Only try to restart if snort is running on Iface
-if [ "`/bin/pgrep -nF {$g['varrun_path']}/snort_{$if_real}{$snort_uuid}.pid`" = "0" ]; then
-	#### Restart Iface
-	/bin/pkill -HUP -F {$g['varrun_path']}/snort_{$if_real}{$snort_uuid}.pid -a
-	/usr/bin/logger -p daemon.info -i -t SnortStartup "Snort Soft Reload For {$snort_uuid}_{$if_real}..."
-else
-	# Start snort and barnyard2
-	/bin/rm {$g['varrun_path']}/snort_{$if_real}{$snort_uuid}.pid
+# Start snort and barnyard2
+/usr/local/bin/snort -R {$snort_uuid} -D -q -l /var/log/snort/snort_{$if_real}{$snort_uuid} --pid-path {$g['varrun_path']} --nolock-pidfile -G {$snort_uuid} -c /usr/local/etc/snort/snort_{$snort_uuid}_{$if_real}/snort.conf -i {$if_real}
+$start_barnyard2
 
-	/usr/local/bin/snort -R {$snort_uuid} -D -q -l /var/log/snort/snort_{$if_real}{$snort_uuid} --pid-path {$g['varrun_path']} --nolock-pidfile -G {$snort_uuid} -c /usr/local/etc/snort/snort_{$snort_uuid}_{$if_real}/snort.conf -i {$if_real}
-	$start_barnyard2
-
-	/usr/bin/logger -p daemon.info -i -t SnortStartup "Snort HARD START For {$snort_uuid}_{$if_real}..."
-fi
+/usr/bin/logger -p daemon.info -i -t SnortStartup "Snort HARD START For {$snort_uuid}_{$if_real}..."
 
 EOE;
-
 		$start_snort_iface_stop[] = <<<EOF
 
-if [ "`/bin/pgrep -nF {$g['varrun_path']}/snort_{$if_real}{$snort_uuid}.pid`" = "0" ]; then
-	/usr/bin/logger -p daemon.info -i -t SnortStartup "Snort HARD STOP For {$snort_uuid}_{$if_real}..."
+if [ -e {$g['varrun_path']}/snort_{$if_real}{$snort_uuid}.pid ]; then
+	if [ `/bin/pgrep -nF {$g['varrun_path']}/snort_{$if_real}{$snort_uuid}.pid` -gt 3 ]; then
+		/usr/bin/logger -p daemon.info -i -t SnortStartup "Snort HARD STOP For {$snort_uuid}_{$if_real}..."
 
-	/bin/pkill -F {$g['varrun_path']}/snort_{$if_real}{$snort_uuid}.pid -a
-	sleep 1
-	if [ -f {$g['varrun_path']}/barnyard2_{$if_real}{$snort_uuid}.pid ]; then
-		/bin/pkill -F {$g['varrun_path']}/barnyard2_{$if_real}{$snort_uuid}.pid -a
-		/bin/rm /var/run/barnyard2_{$if_real}{$snort_uuid}.pid
+		/bin/pkill -F {$g['varrun_path']}/snort_{$if_real}{$snort_uuid}.pid -a
+		sleep 1
+		if [ -f {$g['varrun_path']}/barnyard2_{$if_real}{$snort_uuid}.pid ]; then
+			/bin/pkill -F {$g['varrun_path']}/barnyard2_{$if_real}{$snort_uuid}.pid -a
+			/bin/rm /var/run/barnyard2_{$if_real}{$snort_uuid}.pid
+		fi
+
+		# Delete pid file, just in case pkill didn't do the job.
+		if [ -e {$g['varrun_path']}/snort_{$if_real}{$snort_uuid}.pid ]; then
+			/bin/rm /var/run/snort_{$if_real}{$snort_uuid}.pid
+		fi
 	fi
-
-	/bin/rm /var/run/snort_{$if_real}{$snort_uuid}.pid
 fi
 
 EOF;
@@ -919,6 +913,9 @@ EOF;
 ######## Begining of Main snort.sh
 
 rc_start() {
+# Kill running instances before restarting them or, if system startup,
+# handle the issue with snort starting an instance twice.
+rc_stop
 	{$rc_start}
 }
 
@@ -934,6 +931,7 @@ case $1 in
 		rc_stop
 		;;
 	restart)
+		# rc_start handles both stopping and starting of snort.
 		rc_start
 		;;
 esac
