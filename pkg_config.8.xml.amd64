@@ -1271,7 +1271,7 @@
 		<descr>Monitoring agent.</descr>
 		<category>Services</category>
 		<config_file>http://www.pfsense.com/packages/config/zabbix-agent/zabbix-agent.xml</config_file>
-		<version>1.8.10,2</version>
+		<version>1.8.10,2 pkg v1.1</version>
 		<status>FINAL</status>
 		<required_version>1.2.3</required_version>
 		<configurationfile>zabbix-agent.xml</configurationfile>
