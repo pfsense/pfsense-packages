@@ -1388,6 +1388,17 @@
 		<depends_on_package_pbi>blinkled-0.1-amd64.pbi</depends_on_package_pbi>
 	</package>
 	<package>
+		<name>gwled</name>
+		<descr>Allows you to use LEDs for gateway status on supported platforms (ALIX, WRAP, Soekris, etc)</descr>
+		<category>System</category>
+		<version>0.2</version>
+		<status>Beta</status>
+		<maintainer>jimp@pfsense.org</maintainer>
+		<required_version>2.0</required_version>
+		<config_file>http://www.pfsense.org/packages/config/gwled/gwled.xml</config_file>
+		<configurationfile>gwled.xml</configurationfile>
+	</package>
+	<package>
 		<name>Dashboard Widget: Snort</name>
 		<descr>Dashboard widget for Snort.</descr>
 		<category>System</category>
