@@ -75,6 +75,16 @@
 	<![CDATA[
 	global $config, $g;
 
+	$pfs_version = substr(trim(file_get_contents("/etc/version")),0,3);
+	switch ($pfs_version) {
+		case "1.2":
+		case "2.0":
+			define('ZABBIX_PROXY_BASE', '/usr/local');
+			break;
+		default:
+			define('ZABBIX_PROXY_BASE', '/usr/pbi/zabbix-proxy-' . php_uname("m"));
+	}
+
 	mwexec("mkdir -p /var/log/zabbix/");
 	mwexec("mkdir -p /var/run/zabbix/");
 	mwexec("mkdir -p /var/db/zabbix/");
@@ -82,12 +92,12 @@
 	conf_mount_rw();
 
 	/* create a few directories and ensure the sample files are in place */
-	exec("/bin/mkdir -p /usr/local/etc/zabbix");
+	exec("/bin/mkdir -p " . ZABBIX_PROXY_BASE . "/etc/zabbix");
 	exec("/bin/mkdir -p /var/log/zabbix");
 	exec("/bin/mkdir -p /var/run/zabbix");
 	exec("/bin/mkdir -p /var/db/zabbix");
 
-	exec("/bin/rm -f /usr/local/etc/rc.d/zabbix_proxy");
+	exec("/bin/rm -f " . ZABBIX_PROXY_BASE . "/etc/rc.d/zabbix_proxy");
 
 	$start  = "/bin/mkdir -p /var/log/zabbix\n";
 	$start .= "/usr/sbin/chown -R zabbix:zabbix /var/log/zabbix\n";
@@ -101,7 +111,7 @@
 	$start .= "echo \"Starting Zabbix Proxy\"...\n";
 
 	/* start zabbix proxy */
-	$start .= "/usr/local/sbin/zabbix_proxy\n";
+	$start .= ZABBIX_PROXY_BASE . "/sbin/zabbix_proxy\n";
 
 	$stop  = "echo \"Stopping Zabbix Proxy\"\n";
 	$stop .= "kill `cat /var/run/zabbix/zabbix_proxy.pid`\n";
@@ -139,8 +149,18 @@
 	<custom_php_resync_config_command>
 	<![CDATA[
 	conf_mount_rw();
-	global $config;
-	global $g;
+	global $config, $g;
+
+	$pfs_version = substr(trim(file_get_contents("/etc/version")),0,3);
+	switch ($pfs_version) {
+		case "1.2":
+		case "2.0":
+			define('ZABBIX_PROXY_BASE', '/usr/local');
+			break;
+		default:
+			define('ZABBIX_PROXY_BASE', '/usr/pbi/zabbix-proxy-' . php_uname("m"));
+	}
+
 	$zabbixproxy_config = $config['installedpackages']['zabbixproxy']['config'][0];
 
 	$Server=$zabbixproxy_config['server'];
@@ -166,7 +186,7 @@
 	$conf .= "Fping6Location=/usr/local/sbin/fping6\n";
 	$conf .= "ProxyMode=$Mode\n";
 
-	file_put_contents("/usr/local/etc/zabbix/zabbix_proxy.conf", $conf);
+	file_put_contents(ZABBIX_PROXY_BASE . "/etc/zabbix/zabbix_proxy.conf", $conf);
 
 	$want_sysctls = array(
 		'kern.ipc.shmall' => '2097152',
@@ -219,7 +239,7 @@
 	<![CDATA[
 	exec("kill `cat /var/run/zabbix/zabbix_proxy.pid`");
 
-	exec("/bin/rm /usr/local/etc/rc.d/zabbix_proxy.sh");
+	exec("/bin/rm " . ZABBIX_PROXY_BASE . "/etc/rc.d/zabbix_proxy.sh");
 
 	exec("/bin/rm -r /var/log/zabbix/");
 	exec("/bin/rm -r /var/run/zabbix/");
