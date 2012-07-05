@@ -86,7 +86,7 @@ function avahi_write_config() {
 
 	// Process interfaces defined by user to deny.
 	if($denyif) {
-		$if = split(",", $denyif);
+		$if = explode(",", $denyif);
 		foreach($if as $i) {
 			$ifreal = convert_friendly_interface_to_real_interface_name($i);
 			if($ifreal)
