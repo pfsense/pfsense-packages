@@ -35,6 +35,16 @@ require_once('filter.inc');
 require_once('service-utils.inc');
 require_once('squid.inc');
 
+$pfs_version = substr(trim(file_get_contents("/etc/version")),0,3);
+switch ($pfs_version) {
+	case "1.2":
+	case "2.0":
+		define('LIGHTSQUID_BASE','/usr/local');
+		break;
+	default:
+		define('LIGHTSQUID_BASE', '/usr/pbi/lightsquid-' . php_uname("m"));
+}
+
 define ('CMD_PKGDELETE', 'pkg_delete lightsquid-1.7.1');
 
 // enable GUI debug
@@ -42,12 +52,12 @@ define('LS_GUI_DEBUG', 'on');
 define('LS_LOG_FILE',  '/tmp/lightsquid_gui.log');
 
 // configuration settings !-- CHECK THIS --!
-define('LS_CONFIGPATH',			'/usr/local/etc/lightsquid');
+define('LS_CONFIGPATH',			LIGHTSQUID_BASE . '/etc/lightsquid');
 define('LS_CONFIGFILE',			'lightsquid.cfg');
 define('LS_CONFIGFILE_DIST',		'lightsquid.cfg.dist');
-define('LS_WWWPATH',			'/usr/local/www/lightsquid');
-define('LS_TEMPLATEPATH',		'/usr/local/www/lightsquid/tpl');
-define('LS_LANGPATH',			'/usr/local/share/lightsquid/lang');
+define('LS_WWWPATH',			LIGHTSQUID_BASE . '/www/lightsquid');
+define('LS_TEMPLATEPATH',		LIGHTSQUID_BASE . '/www/lightsquid/tpl');
+define('LS_LANGPATH',			LIGHTSQUID_BASE . '/share/lightsquid/lang');
 define('LS_REPORTPATH',			'/var/lightsquid/report');
 
 global $config;
@@ -58,10 +68,10 @@ if (isset($config['installedpackages']['squid']['config'][0])) {
 		define('LS_SQUIDLOGPATH', '/var/squid/logs');
 }
 define('LS_SQUIDLOG',			'access.log');
-define('LS_IP2NAMEPATH',		'/usr/local/libexec/lightsquid');
+define('LS_IP2NAMEPATH',		LIGHTSQUID_BASE . '/libexec/lightsquid');
 
 define('CRONTAB_FILE',			'/var/cron/tabs/root');
-define('CRONTAB_LS_TEMPLATE',		'/usr/bin/perl /usr/local/www/lightsquid/lightparser.pl');
+define('CRONTAB_LS_TEMPLATE',		'/usr/bin/perl ' . LIGHTSQUID_BASE . '/www/lightsquid/lightparser.pl');
 define('CRONTAB_LS_JOBKEY',		'/lightparser.pl');
 define('CRONTAB_SQUID_TEMPLATE',	'/usr/local/sbin/squid -k rotate > /dev/null');
 define('CRONTAB_SQUID_JOBKEY',		'/squid -k rotate');
@@ -145,7 +155,7 @@ function lightsquid_resync() {
 		mwexec("mkdir -p " . LS_REPORTPATH);
 	}
 
-	mwexec("/bin/chmod -R u+w /usr/local/etc/lightsquid");
+	mwexec("/bin/chmod -R u+w " . LIGHTSQUID_BASE . "/etc/lightsquid");
 
 	// debug
 	$light_test = array();
