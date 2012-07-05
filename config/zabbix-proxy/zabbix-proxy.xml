@@ -3,7 +3,7 @@
 	<name>zabbixproxy</name>
 	<title>Services: Zabbix Proxy</title>
 	<category>Monitoring</category>
-	<version>1.01</version>
+	<version>1.1</version>
 	<addedit_string>Zabbix Proxy has been created/modified.</addedit_string>
 	<delete_string>Zabbix Proxy has been deleted.</delete_string>
 	<restart_command>/usr/local/etc/rc.d/zabbix_proxy.sh restart</restart_command>
