@@ -34,7 +34,7 @@
 	</copyright>
 	<title>Services: Avahi</title>
 	<name>avahi</name>
-	<version>1.0</version>
+	<version>0.6.29</version>
 	<savetext>Save</savetext>
 	<include_file>/usr/local/pkg/avahi.inc</include_file>
 	<menu>
@@ -102,6 +102,7 @@
 	</custom_php_install_command>
 	<custom_php_deinstall_command>
 		unlink_if_exists("/usr/local/etc/rc.d/avahi-daemon.sh");
-		exec("killall avahi-daemon");
+		exec("killall -9 avahi-daemon");
+		exec("killall -9 dbus-daemon");
 	</custom_php_deinstall_command>
 </packagegui>
