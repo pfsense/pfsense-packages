@@ -1379,6 +1379,7 @@
 		<configurationfile>blinkled.xml</configurationfile>
 		<pkginfolink>http://doc.pfsense.org/index.php/BlinkLED_Package</pkginfolink>
 		<website>http://doc.pfsense.org/index.php/BlinkLED_Package</website>
+		<build_port_path>/usr/ports/sysutils/blinkled</build_port_path>
 	</package>
 	<package>
 		<name>Dashboard Widget: Snort</name>
