@@ -1384,7 +1384,7 @@
 		<name>blinkled</name>
 		<descr>Allows you to use LEDs for network activity on supported platforms (ALIX, WRAP, Soekris, etc)</descr>
 		<category>System</category>
-		<version>0.2</version>
+		<version>0.3</version>
 		<status>Beta</status>
 		<maintainer>jimp@pfsense.org</maintainer>
 		<required_version>1.2.3</required_version>
@@ -1396,6 +1396,9 @@
 		<build_pbi>
 			<port>sysutils/blinkled</port>
 		</build_pbi>
+		<depends_on_package_base_url>http://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
+		<depends_on_package>blinkled-0.1.tbz</depends_on_package>
+		<depends_on_package_pbi>blinkled-0.1-i386.pbi</depends_on_package_pbi>
 	</package>
 	<package>
 		<name>gwled</name>
