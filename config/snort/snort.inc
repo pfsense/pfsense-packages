@@ -37,8 +37,11 @@ require_once("functions.inc");
 require_once("filter.inc");
 
 /* package version */
-$snort_package_version = 'Snort 2.9.2.3 pkg v. 2.2.2';
-$snort_rules_file = "snortrules-snapshot-2922.tar.gz";
+$snort_version = "2.9.2.3";
+$pfSense_snort_version = "2.2.2";
+$snort_package_version = "Snort {$snort_version} pkg v. {$pfSense_snort_version}";
+$snort_rules_file = "snortrules-snapshot-2923.tar.gz";
+$emerging_threats_version = "2.9.0";
 
 /* Allow additional execution time 0 = no limit. */
 ini_set('max_execution_time', '9999');

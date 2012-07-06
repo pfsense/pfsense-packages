@@ -46,8 +46,8 @@
 	<requirements>Describe your package requirements here</requirements>
 	<faq>Currently there are no FAQ items provided.</faq>
 	<name>Snort</name>
-	<version>2.9.0.5</version>
-	<title>Services:2.9.0.5 pkg v. 2.0</title>
+	<version>2.9.2.3</version>
+	<title>Services:2.9.2.3 pkg v. 2.2.2</title>
 	<include_file>/usr/local/pkg/snort/snort.inc</include_file>
 	<menu>
 		<name>Snort</name>
