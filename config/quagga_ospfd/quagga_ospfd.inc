@@ -142,6 +142,21 @@ function quagga_ospfd_install_conf() {
 		}
 		
 
+		$redist = "";
+		$noredist = "";
+		if (is_array($ospfd_conf['row'])) {
+			foreach ($ospfd_conf['row'] as $redistr) {
+				if (empty($redistr['routevalue']))
+					continue;
+				if (isset($redistr['redistribute'])) {
+					$noredist .= "  access-list dnr-list deny {$redistr['routevalue']}\n";
+				} else {
+					$area = ($redistr['routearea'] == "") ? $ospfd_conf['area'] : $redistr['routearea'];
+					$redist .= "  network {$redistr['routevalue']} area {$area}\n";
+				}
+			}
+		}
+
 		/* OSPF Settings */
 
 		$conffile .= "\n\nrouter ospf\n";
@@ -193,21 +208,18 @@ function quagga_ospfd_install_conf() {
 			}
 		}
 
-		if (is_array($ospfd_conf['row'])) {
-			foreach ($ospfd_conf['row'] as $redistr) {
-				if (empty($redistr['routevalue']))
-					continue;
-				if (isset($redistr['redistribute'])) {
-					$conffile .= "  no ";
-				}
-				if ($redistr['routearea'] == "") {
-					$conffile .= "  network {$redistr['routevalue']} area {$ospfd_conf['area']}\n";	
-				}
-				else {
-					$conffile .= "  network {$redistr['routevalue']} area {$redistr['routearea']}\n";
-				}
-			}
+		if (!empty($redist))
+			$conffile .= $redist;
+
+		if (!empty($noredist)) {
+			$conffile .= "  distribute-list dnr-list out connected\n";
+			$conffile .= "  distribute-list dnr-list out kernel\n";
+			$conffile .= "  distribute-list dnr-list out static\n";
+			//$conffile .= "  distribute-list dnr-list out ospf\n";
+			$conffile .= $noredist;
+			$conffile .= "  access-list dnr-list permit any\n";
 		}
+
 	}
 	safe_mkdir($quagga_config_base);
 	$fd = fopen("{$quagga_config_base}/ospfd.conf", "w");
