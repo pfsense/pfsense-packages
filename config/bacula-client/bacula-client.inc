@@ -79,10 +79,10 @@ function baculaclient_custom_php_write_config(){
 			case "Director":
 				$baculaclient_conf .= "Director { \n\t Name = {$bc['director']}-dir #{$bc['description']}\n\t Password = \"{$bc['password']}\"\n\t}\n"; 
 				Break;
-			case "Local":
+			case "Monitor":
 				$baculaclient_conf .= "Director { \n\t Name = {$bc['director']}-mon #{$bc['description']}\n\t Password = \"{$bc['password']}\"\n\t Monitor = yes\n\t}\n";
 				break;
-			case "Monitor":
+			case "Local":
 				$baculaclient_conf .= "Director { \n\t Name = {$bc['director']}-dir #{$bc['description']}\n\t Password = \"{$bc['password']}\"\n\t}\n";
 				$baculaclient_conf .= "Director { \n\t Name = {$bc['director']}-mon #{$bc['description']}\n\t Password = \"{$bc['password']}\"\n\t Monitor = yes\n\t}\n";
 				}
