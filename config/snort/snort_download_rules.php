@@ -399,10 +399,10 @@ if ($snortdownload == 'on')
 			/* extract so rules */
 			exec('/bin/mkdir -p /usr/local/lib/snort/dynamicrules/');
 			if($snort_arch == 'x86') {
-				exec("/usr/bin/tar xzf {$tmpfname}/{$snort_filename} -C {$snortdir} so_rules/precompiled/$freebsd_version_so/i386/{$snort_version}/");
+				exec("/usr/bin/tar xzf {$tmpfname}/{$snort_filename} -C {$snortdir} so_rules/precompiled/{$freebsd_version_so}/i386/{$snort_version}/");
 				exec("/bin/mv -f {$snortdir}/so_rules/precompiled/$freebsd_version_so/i386/{$snort_version}/* /usr/local/lib/snort/dynamicrules/");
 			} else if ($snort_arch == 'x64') {
-				exec("/usr/bin/tar xzf {$tmpfname}/{$snort_filename} -C {$snortdir} so_rules/precompiled/$freebsd_version_so/x86-64/{$snort_version}/");
+				exec("/usr/bin/tar xzf {$tmpfname}/{$snort_filename} -C {$snortdir} so_rules/precompiled/{$freebsd_version_so}/x86-64/{$snort_version}/");
 				exec("/bin/mv -f {$snortdir}/so_rules/precompiled/$freebsd_version_so/x86-64/{$snort_version}/* /usr/local/lib/snort/dynamicrules/");
 			}
 			/* extract so rules none bin and rename */
