@@ -28,14 +28,17 @@
 	POSSIBILITY OF SUCH DAMAGE.
 */
 
-$pfsense_version = trim(file_get_contents("/etc/version"));
-
-if ((substr($pfsense_version,0,3) == "2.0") || (substr($pfsense_version,0,1) == "1")){
-	define('PKG_BANDWIDTHD_BASE', '/usr/local/bandwidthd');
-} else {
-	/* the default case for versions from 2.1 onwards */
-	define('PKG_BANDWIDTHD_BASE', '/usr/pbi/bandwidthd-' . php_uname("m") . '/bandwidthd');
-}
+// Check pfSense version
+$pfs_version = substr(trim(file_get_contents("/etc/version")),0,3);
+switch ($pfs_version) {
+  case "1.2":
+  case "2.0":
+    define('PKG_BANDWIDTHD_BASE', '/usr/local/bandwidthd');
+    break;
+  default:
+    define('PKG_BANDWIDTHD_BASE', '/usr/pbi/bandwidthd-' . php_uname("m") . '/bandwidthd');
+ }
+// End: Check pfSense version
 
 function bandwidthd_install_deinstall() {
 	conf_mount_rw();
