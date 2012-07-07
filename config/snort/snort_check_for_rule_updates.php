@@ -172,23 +172,24 @@ if ($snortdownload == 'on') {
 			exec("/bin/mv -f {$snortdir}/so_rules/precompiled/$freebsd_version_so/x86-64/{$snort_version}/* /usr/local/lib/snort/dynamicrules/");
 		}
 		/* extract so rules none bin and rename */
-		exec("/usr/bin/tar xzf {$tmpfname}/{$snort_filename} -C {$snortdir} so_rules/bad-traffic.rules/" .
-		" so_rules/chat.rules/" .
-		" so_rules/dos.rules/" .
-		" so_rules/exploit.rules/" .
-		" so_rules/icmp.rules/" .
-		" so_rules/imap.rules/" .
-		" so_rules/misc.rules/" .
-		" so_rules/multimedia.rules/" .
-		" so_rules/netbios.rules/" .
-		" so_rules/nntp.rules/" .
-		" so_rules/p2p.rules/" .
-		" so_rules/smtp.rules/" .
-		" so_rules/sql.rules/" .
-		" so_rules/web-activex.rules/" .
-		" so_rules/web-client.rules/" .
-		" so_rules/web-iis.rules/" .
-		" so_rules/web-misc.rules/");
+		exec("/usr/bin/tar xzf {$tmpfname}/{$snort_filename} -C {$snortdir} so_rules/bad-traffic.rules" .
+		" so_rules/chat.rules" .
+		" so_rules/dos.rules" .
+		" so_rules/exploit.rules" .
+		" so_rules/icmp.rules" .
+		" so_rules/imap.rules" .
+		" so_rules/misc.rules" .
+		" so_rules/multimedia.rules" .
+		" so_rules/netbios.rules" .
+		" so_rules/nntp.rules" .
+		" so_rules/p2p.rules" .
+		" so_rules/smtp.rules" .
+		" so_rules/snmp.rules" .
+		" so_rules/specific-threats.rules" .
+		" so_rules/web-activex.rules" .
+		" so_rules/web-client.rules" .
+		" so_rules/web-iis.rules" .
+		" so_rules/web-misc.rules");
 
 		exec("/bin/mv -f {$snortdir}/so_rules/bad-traffic.rules {$snortdir}/rules/snort_bad-traffic.so.rules");
 		exec("/bin/mv -f {$snortdir}/so_rules/chat.rules {$snortdir}/rules/snort_chat.so.rules");
@@ -202,7 +203,8 @@ if ($snortdownload == 'on') {
 		exec("/bin/mv -f {$snortdir}/so_rules/nntp.rules {$snortdir}/rules/snort_nntp.so.rules");
 		exec("/bin/mv -f {$snortdir}/so_rules/p2p.rules {$snortdir}/rules/snort_p2p.so.rules");
 		exec("/bin/mv -f {$snortdir}/so_rules/smtp.rules {$snortdir}/rules/snort_smtp.so.rules");
-		exec("/bin/mv -f {$snortdir}/so_rules/sql.rules {$snortdir}/rules/snort_sql.so.rules");
+		exec("/bin/mv -f {$snortdir}/so_rules/snmp.rules {$snortdir}/rules/snort_snmp.so.rules");
+		exec("/bin/mv -f {$snortdir}/so_rules/specific-threats.rules {$snortdir}/rules/snort_specific-threats.so.rules");
 		exec("/bin/mv -f {$snortdir}/so_rules/web-activex.rules {$snortdir}/rules/snort_web-activex.so.rules");
 		exec("/bin/mv -f {$snortdir}/so_rules/web-client.rules {$snortdir}/rules/snort_web-client.so.rules");
 		exec("/bin/mv -f {$snortdir}/so_rules/web-iis.rules {$snortdir}/rules/snort_web-iis.so.rules");
