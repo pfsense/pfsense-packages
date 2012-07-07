@@ -41,74 +41,31 @@ global $g;
 /* load only javascript that is needed */
 $snort_load_jquery = 'yes';
 $snort_load_jquery_colorbox = 'yes';
-
+$snortdownload = $config['installedpackages']['snortglobal']['snortdownload'];
+$emergingthreats = $config['installedpackages']['snortglobal']['emergingthreats'];
 
 /* quick md5s chk */
 $snort_org_sig_chk_local = 'N/A';
 if (file_exists("/usr/local/etc/snort/{$snort_rules_file}.md5"))
-	$snort_org_sig_chk_local = exec("/bin/cat /usr/local/etc/snort/{$snort_rules_file}.md5");
+	$snort_org_sig_chk_local = file_get_contents("/usr/local/etc/snort/{$snort_rules_file}.md5");
 
 $emergingt_net_sig_chk_local = 'N/A';
-if(file_exists('/usr/local/etc/snort/emerging.rules.tar.gz.md5'))
-	$emergingt_net_sig_chk_local = exec('/bin/cat /usr/local/etc/snort/emerging.rules.tar.gz.md5');
-
-$pfsense_org_sig_chk_local = 'N/A';
-if(file_exists('/usr/local/etc/snort/pfsense_rules.tar.gz.md5'))
-	$pfsense_org_sig_chk_local = exec('/bin/cat /usr/local/etc/snort/pfsense_rules.tar.gz.md5');
-
-/* define checks */
-$oinkid = $config['installedpackages']['snortglobal']['oinkmastercode'];
-$snortdownload = $config['installedpackages']['snortglobal']['snortdownload'];
-$emergingthreats = $config['installedpackages']['snortglobal']['emergingthreats'];
-
-if ($snortdownload != 'on' && $emergingthreats != 'on')
-	$snort_emrging_info = 'stop';
-
-if ($oinkid == '' && $snortdownload != 'off')
-	$snort_oinkid_info = 'stop';
-
-if ($snort_emrging_info == 'stop' || $snort_oinkid_info == 'stop')
-	$error_stop = 'true';
-
-/* check if main rule directory is empty */
-$if_mrule_dir = "/usr/local/etc/snort/rules";
-$mfolder_chk = (count(glob("$if_mrule_dir/*")) === 0) ? 'empty' : 'full';
+if (file_exists('/usr/local/etc/snort/emerging.rules.tar.gz.md5'))
+	$emergingt_net_sig_chk_local = file_get_contents("/usr/local/etc/snort/emerging.rules.tar.gz.md5");
 
 /* check for logfile */
 $update_logfile_chk = 'no';
 if (file_exists('/usr/local/etc/snort/snort_update.log'))
 	$update_logfile_chk = 'yes';
 
-header("snort_help_info.php");
-header( "Expires: Mon, 20 Dec 1998 01:00:00 GMT" );
-header( "Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT" );
-header( "Cache-Control: no-cache, must-revalidate" );
-header( "Pragma: no-cache" );
-
-
 $pgtitle = "Services: Snort: Updates";
 include_once("head.inc");
-
 ?>
 
 <body link="#000000" vlink="#000000" alink="#000000">
 
-<?php
-echo "{$snort_general_css}\n";
-echo "$snort_interfaces_css\n";
-?>
-
 <?php include("fbegin.inc"); ?>
-
 <?if($pfsense_stable == 'yes'){echo '<p class="pgtitle">' . $pgtitle . '</p>';}?>
-
-<noscript>
-<div class="alert" ALIGN=CENTER><img
-	src="../themes/<?php echo $g['theme']; ?>/images/icons/icon_alert.gif" /><strong>Please
-enable JavaScript to view this content
-</CENTER></div>
-</noscript>
-
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
 <tr><td>
 <?php
@@ -128,118 +85,73 @@ enable JavaScript to view this content
 		<div id="mainarea3">
 		<table id="maintable4" class="tabcont" width="100%" border="0"
 			cellpadding="0" cellspacing="0">
-			<tr>
-				<td><!-- grey line -->
-				<table height="12px" width="725px" border="0" cellpadding="5px"
-					cellspacing="0">
-					<tr>
-						<td style='background-color: #eeeeee'>
-						<div height="12px" width="725px" style='background-color: #dddddd'>
-						</div>
-						</td>
-					</tr>
-				</table>
-
-				<br>
-
+			<tr align="center">
+				<td>
+				<br/>
 				<table id="download_rules" height="32px" width="725px" border="0"
 					cellpadding="5px" cellspacing="0">
 					<tr>
 						<td id="download_rules_td" style="background-color: #eeeeee">
 						<div height="32" width="725px" style="background-color: #eeeeee">
 
-						<font color="#777777" size="1.5px"><b>INSTALLED SIGNATURE RULESET</b></font><br>
-						<br>
-						<p style="text-align: left; margin-left: 225px;"><font
-							color="#FF850A" size="1px"><b>SNORT.ORG >>></b></font><font
-							size="1px" color="#000000">&nbsp;&nbsp;<? echo $snort_org_sig_chk_local; ?></font><br>
-						<font color="#FF850A" size="1px"><b>EMERGINGTHREATS.NET >>></b></font><font
-							size="1px" color="#000000">&nbsp;&nbsp;<? echo $emergingt_net_sig_chk_local; ?></font><br>
-						<font color="#FF850A" size="1px"><b>PFSENSE.ORG >>></b></font><font
-							size="1px" color="#000000">&nbsp;&nbsp;<? echo $pfsense_org_sig_chk_local; ?></font><br>
+						<font color="#777777" size="1.5px">
+						<p style="text-align: left; margin-left: 225px;">
+							<b>INSTALLED SIGNATURE RULESET</b></font><br>
+							<br>
+							<font color="#FF850A" size="1px"><b>SNORT.ORG >>></b></font>
+							<font size="1px" color="#000000">&nbsp;&nbsp;<? echo $snort_org_sig_chk_local; ?></font><br>
+							<font color="#FF850A" size="1px"><b>EMERGINGTHREATS.NET >>></b></font>
+							<font size="1px" color="#000000">&nbsp;&nbsp;<? echo $emergingt_net_sig_chk_local; ?></font><br>
 						</p>
-
 						</div>
 						</td>
 					</tr>
 				</table>
-
-				<br>
-
-				<!-- grey line -->
-				<table height="12px" width="725px" border="0" cellpadding="5px"
-					cellspacing="0">
-					<tr>
-						<td style='background-color: #eeeeee'>
-						<div height="12px" width="725px" style='background-color: #eeeeee'>
-						</div>
-						</td>
-					</tr>
-				</table>
-
-				<br>
-
+				<br/>
 				<table id="download_rules" height="32px" width="725px" border="0"
 					cellpadding="5px" cellspacing="0">
 					<tr>
 						<td id="download_rules_td" style='background-color: #eeeeee'>
 						<div height="32" width="725px" style='background-color: #eeeeee'>
 
+						<p style="text-align: left; margin-left: 225px;">
 						<font color='#777777' size='1.5px'><b>UPDATE YOUR RULES</b></font><br>
-						<br>
+						<br/>
 
 			<?php
 
-						if ($error_stop == 'true') {
+						if ($snortdownload != 'on' && $emergingthreats != 'on') {
 							echo '
-		
 			<button class="sexybutton disabled" disabled="disabled"><span class="download">Update Rules&nbsp;&nbsp;&nbsp;&nbsp;</span></button><br/>
 			<p style="text-align:left; margin-left:150px;">
 			<font color="#fc3608" size="2px"><b>WARNING:</b></font><font size="1px" color="#000000">&nbsp;&nbsp;No rule types have been selected for download. "Global Settings Tab"</font><br>';
 
-							if ($mfolder_chk == 'empty') {
-
-								echo '
-			<font color="#fc3608" size="2px"><b>WARNING:</b></font><font size="1px" color="#000000">&nbsp;&nbsp;The main rules directory is empty. /usr/local/etc/snort/rules</font>' ."\n";
-							}
-
 							echo '</p>' . "\n";
-
-						}else{
+						} else {
 
 							echo '
-		
 			<a href="/snort/snort_download_rules.php"><button class="sexybutton disabled"><span class="download">Update Rules&nbsp;&nbsp;&nbsp;&nbsp;</span></button></a><br/>' . "\n";
-
-							if ($mfolder_chk == 'empty') {
-
-								echo '
-			<p style="text-align:left; margin-left:150px;">
-			<font color="#fc3608" size="2px"><b>WARNING:</b></font><font size="1px" color="#000000">&nbsp;&nbsp;The main rules directory is empty. /usr/local/etc/snort/rules</font>
-			</p>';
-							}
 
 						}
 
-						?> <br>
-
+			?> <br/>
+						</p>
 						</div>
 						</td>
 					</tr>
 				</table>
-
-				<br>
-
+				<br/>
 				<table id="download_rules" height="32px" width="725px" border="0"
 					cellpadding="5px" cellspacing="0">
 					<tr>
 						<td id="download_rules_td" style='background-color: #eeeeee'>
 						<div height="32" width="725px" style='background-color: #eeeeee'>
 
+						<p style="text-align: left; margin-left: 225px;">
 						<font color='#777777' size='1.5px'><b>VIEW UPDATE LOG</b></font><br>
 						<br>
 
-						<?php
+				<?php
 
 						if ($update_logfile_chk == 'yes') {
 							echo '
@@ -249,27 +161,15 @@ enable JavaScript to view this content
 				<button class="sexybutton disabled" disabled="disabled" href="/snort/snort_rules_edit.php?openruleset=/usr/local/etc/snort/snort_update.log"><span class="pwhitetxt">Update Log&nbsp;&nbsp;&nbsp;&nbsp;</span></button>' . "\n";
 						}
 							
-						?> <br>
-						<br>
-
+				?>
+						<br/>
+						</p>
 						</div>
 						</td>
 					</tr>
 				</table>
 
-				<br>
-
-				<table height="12px" width="725px" border="0" cellpadding="5px"
-					cellspacing="0">
-					<tr>
-						<td style='background-color: #eeeeee'>
-						<div height="12px" width="725px" style='background-color: #eeeeee'>
-						</div>
-						</td>
-					</tr>
-				</table>
-
-				<br>
+				<br/>
 
 				<table id="download_rules" height="32px" width="725px" border="0"
 					cellpadding="5px" cellspacing="0">
@@ -282,18 +182,6 @@ enable JavaScript to view this content
 							color='#FF850A' size='1px'><b>NOTE:</b></font><font size='1px'
 							color='#000000'>&nbsp;&nbsp;Snort.org and Emergingthreats.net
 						will go down from time to time. Please be patient.</font></div>
-						</td>
-					</tr>
-				</table>
-
-				<br>
-
-				<table height="12px" width="725px" border="0" cellpadding="5px"
-					cellspacing="0">
-					<tr>
-						<td style='background-color: #eeeeee'>
-						<div height="12px" width="725px" style='background-color: #eeeeee'>
-						</div>
 						</td>
 					</tr>
 				</table>
@@ -312,10 +200,6 @@ enable JavaScript to view this content
 	</tr>
 </table>
 <!-- end of final table --></div>
-
 <?php include("fend.inc"); ?>
-
-<?php echo "$snort_custom_rnd_box\n"; ?>
-
 </body>
 </html>
