@@ -4037,10 +4037,10 @@ USEDOCTETSUSERNAMEMB=$((`cat "/var/log/radacct/datacounter/\$TIMERANGE/used-octe
 	
 ### We check if MAX-OCTETS-USERNAME is greater than USED-OCTETS-USERNAME and accept or reject the user
 if [ `cat "/var/log/radacct/datacounter/\$TIMERANGE/max-octets-\$USERNAME"` -gt `cat "/var/log/radacct/datacounter/\$TIMERANGE/used-octets-\$USERNAME"` ]; then
-	logger -f /var/log/system.log "FreeRADIUS: Used amount of \$TIMERANGE traffic by \$USERNAME is \$USEDOCTETSUSERNAMEMB of \$MAXOCTETSUSERNAMEMB MB! The user was accepted!!!"
+	logger -f /var/log/system.log "FreeRADIUS: Used amount of \$TIMERANGE traffic by \$USERNAME is \$USEDOCTETSUSERNAMEMB MB of \$MAXOCTETSUSERNAMEMB MB! The user was accepted!!!"
 	exit 0
 else
-	logger -f /var/log/system.log "FreeRADIUS: Credentials are probably correct but the user \$USERNAME has reached the \$TIMERANGE Amount of Upload and Download Traffic which is \$USEDOCTETSUSERNAMEMB of \$MAXOCTETSUSERNAMEMB MB! The user was rejected!!!"
+	logger -f /var/log/system.log "FreeRADIUS: Credentials are probably correct but the user \$USERNAME has reached the \$TIMERANGE Amount of Upload and Download Traffic which is \$USEDOCTETSUSERNAMEMB MB of \$MAXOCTETSUSERNAMEMB MB! The user was rejected!!!"
 	exit 99
 fi
 EOD;
