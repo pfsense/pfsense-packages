@@ -77,7 +77,7 @@
 		</tab>
 		<tab>
 			<text>Content</text>
-			<url>/pkg.php?xml=dansguardian_file_acl.xml</url>
+			<url>/pkg.php?xml=dansguardian_content_acl.xml</url>
 		</tab>
 		<tab>
 			<text>Header</text>
