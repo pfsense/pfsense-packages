@@ -33,7 +33,7 @@ require_once("guiconfig.inc");
 require_once("/usr/local/pkg/snort/snort_gui.inc");
 require_once("/usr/local/pkg/snort/snort.inc");
 
-global $g;
+global $g, $snortdir;
 
 if (!is_array($config['installedpackages']['snortglobal']['rule']))
 	$config['installedpackages']['snortglobal']['rule'] = array();
@@ -59,12 +59,12 @@ $iface_uuid = $a_nat[$id]['uuid'];
 
 /* Check if the rules dir is empy if so warn the user */
 /* TODO give the user the option to delete the installed rules rules */
-if (!is_dir("/usr/local/etc/snort/snort_{$iface_uuid}_{$if_real}/rules"))
-	exec("/bin/mkdir -p /usr/local/etc/snort/snort_{$iface_uuid}_{$if_real}/rules");
+if (!is_dir("{$snortdir}/snort_{$iface_uuid}_{$if_real}/rules"))
+	exec("/bin/mkdir -p {$snortdir}/snort_{$iface_uuid}_{$if_real}/rules");
 
-$isrulesfolderempty = exec("ls -A /usr/local/etc/snort/snort_{$iface_uuid}_{$if_real}/rules/*.rules");
+$isrulesfolderempty = exec("ls -A {$snortdir}/snort_{$iface_uuid}_{$if_real}/rules/*.rules");
 if ($isrulesfolderempty == "") {
-	$isrulesfolderempty = exec("ls -A /usr/local/etc/snort/rules/*.rules");
+	$isrulesfolderempty = exec("ls -A {$snortdir}/rules/*.rules");
 	if ($isrulesfolderempty == "") {
 		include_once("head.inc");
 		include_once("fbegin.inc");
@@ -123,7 +123,7 @@ if ($isrulesfolderempty == "") {
 		exit(0);
 	} else {
 		/* Make sure that we have the rules */
-		mwexec("/bin/cp /usr/local/etc/snort/rules/*.rules /usr/local/etc/snort/snort_{$iface_uuid}_{$if_real}/rules", true);
+		mwexec("/bin/cp {$snortdir}/rules/*.rules {$snortdir}/snort_{$iface_uuid}_{$if_real}/rules", true);
 	}
 }
 
@@ -149,8 +149,7 @@ function load_rule_file($incoming_file)
 	return explode("\n", $contents);
 }
 
-$ruledir = "/usr/local/etc/snort/snort_{$iface_uuid}_{$if_real}/rules/";
-//$ruledir = "/usr/local/etc/snort/rules/";
+$ruledir = "{$snortdir}/snort_{$iface_uuid}_{$if_real}/rules/";
 $dh  = opendir($ruledir);
 while (false !== ($filename = readdir($dh)))
 {

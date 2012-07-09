@@ -32,13 +32,12 @@ require_once("functions.inc");
 require_once("service-utils.inc");
 require_once("/usr/local/pkg/snort/snort.inc");
 
-global $snort_gui_include;
+global $snort_gui_include, $snortdir;
 
 if (!isset($snort_gui_include))
 	$pkg_interface = "console";
 
-$tmpfname = "/usr/local/etc/snort/tmp/snort_rules_up";
-$snortdir = "/usr/local/etc/snort";
+$tmpfname = "{$snortdir}/tmp/snort_rules_up";
 $snort_filename_md5 = "{$snort_rules_file}.md5";
 $snort_filename = "{$snort_rules_file}";
 $emergingthreats_filename_md5 = "emerging.rules.tar.gz.md5";
@@ -52,8 +51,8 @@ $emergingthreats = $config['installedpackages']['snortglobal']['emergingthreats'
 /* Start of code */
 conf_mount_rw();
 
-if (!is_dir('/usr/local/etc/snort/tmp'))
-	exec('/bin/mkdir -p /usr/local/etc/snort/tmp');
+if (!is_dir($tmpfname))
+	exec("/bin/mkdir -p {$tmpfname}");
 
 /* Set user agent to Mozilla */
 ini_set('user_agent','Mozilla/4.0 (compatible; MSIE 6.0)');
@@ -159,7 +158,7 @@ if ($snortdownload == 'on') {
 		/* extract snort.org rules and  add prefix to all snort.org files*/
 		exec("/bin/rm -r {$snortdir}/rules/*");
 		exec("/usr/bin/tar xzf {$tmpfname}/{$snort_filename} -C {$snortdir} rules/");
-		chdir ("/usr/local/etc/snort/rules");
+		chdir ("{$snortdir}/rules");
 		exec('/usr/local/bin/perl /usr/local/bin/snort_rename.pl s/^/snort_/ *.rules');
 
 		/* extract so rules */
@@ -241,15 +240,15 @@ if ($snortdownload == 'on') {
 
 		/* XXX: Convert this to sed? */
 		/* make shure default rules are in the right format */
-		exec("/usr/local/bin/perl -pi -e 's/#alert/# alert/g' /usr/local/etc/snort/rules/*.rules");
-		exec("/usr/local/bin/perl -pi -e 's/##alert/# alert/g' /usr/local/etc/snort/rules/*.rules");
-		exec("/usr/local/bin/perl -pi -e 's/## alert/# alert/g' /usr/local/etc/snort/rules/*.rules");
+		exec("/usr/local/bin/perl -pi -e 's/#alert/# alert/g' {$snortdir}/rules/*.rules");
+		exec("/usr/local/bin/perl -pi -e 's/##alert/# alert/g' {$snortdir}/rules/*.rules");
+		exec("/usr/local/bin/perl -pi -e 's/## alert/# alert/g' {$snortdir}/rules/*.rules");
 
 		/* create a msg-map for snort  */
 		update_status(gettext("Updating Alert Messages..."));
 		exec("/usr/local/bin/perl /usr/local/bin/create-sidmap.pl {$snortdir}/rules > {$snortdir}/sid-msg.map");
 
-		if (file_exists("{$tmpfname}/$snort_filename_md5")) {
+		if (file_exists("{$tmpfname}/{$snort_filename_md5}")) {
 			update_status(gettext("Copying md5 sig to snort directory..."));
 			exec("/bin/cp {$tmpfname}/$snort_filename_md5 {$snortdir}/$snort_filename_md5");
 		}
@@ -314,7 +313,7 @@ path = /bin:/usr/bin:/usr/local/bin
 
 update_files = \.rules$|\.config$|\.conf$|\.txt$|\.map$
 
-url = dir:///usr/local/etc/snort/rules
+url = dir://{$snortdir}/rules
 
 {$selected_sid_on_sections}
 
