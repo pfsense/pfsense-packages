@@ -80,7 +80,7 @@ if ($_POST['download'])
 			file_put_contents("/tmp/snort_blocked/snort_block.pf", "{$fileline}\n", FILE_APPEND);
 		}
 
-		exec("/usr/bin/tar cfz /tmp/snort_blocked_{$save_date}.tar.gz /tmp/snort_blocked");
+		exec("/usr/bin/tar cf /tmp/{$file_name} /tmp/snort_blocked");
 
 		if(file_exists("/tmp/{$file_name}")) {
 			header("Expires: Mon, 26 Jul 1997 05:00:00 GMT\n");
@@ -92,8 +92,8 @@ if ($_POST['download'])
 			header("Content-disposition: attachment; filename = {$file_name}");
 			readfile("/tmp/{$file_name}");
 			ob_end_clean(); //importanr or other post will fail
-			@unlink("/tmp/snort_blocked_{$save_date}.tar.gz");
-			@unlink("/tmp/snort_blocked/snort_block.pf");
+			@unlink("/tmp/{$file_name}");
+			exec("/bin/rm -fr /tmp/snort_blocked");
 		} else
 			$savemsg = "An error occurred while createing archive";
 	} else
