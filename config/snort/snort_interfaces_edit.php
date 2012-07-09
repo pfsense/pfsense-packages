@@ -31,7 +31,6 @@
  */
 
 require_once("guiconfig.inc");
-require_once("/usr/local/pkg/snort/snort_gui.inc");
 require_once("/usr/local/pkg/snort/snort.inc");
 
 global $g;
@@ -327,20 +326,12 @@ if (isset($_GET['dup']))
 
 $pgtitle = "Snort: Interface Edit: $id $snort_uuid $if_real";
 include_once("head.inc");
-
 ?>
 
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">
-<?php
-	include("fbegin.inc");
-	echo "{$snort_general_css}\n";
-?>
 
-<noscript>
-<div class="alert" ALIGN=CENTER><img
-	src="/themes/<?php echo $g['theme']; ?>/images/icons/icon_alert.gif" /><strong>Please
-enable JavaScript to view this content</strong></div>
-</noscript>
+<?php include("fbegin.inc"); ?>
+
 <script language="JavaScript">
 <!--
 
@@ -368,9 +359,6 @@ function enable_change(enable_change) {
 </script>
 <?if($pfsense_stable == 'yes'){echo '<p class="pgtitle">' . $pgtitle . '</p>';}?>
 
-<body link="#0000CC" vlink="#0000CC" alink="#0000CC">
-
-<form action="snort_interfaces_edit.php<?php echo "?id=$id";?>" method="post" enctype="multipart/form-data" name="iform" id="iform">
 <?php
 	/* Display Alert message */
 	if ($input_errors) {
@@ -378,123 +366,75 @@ function enable_change(enable_change) {
 	}
 
 	if ($savemsg) {
-		print_info_box2($savemsg);
-	}
-
-	//if (file_exists($d_snortconfdirty_path)) {
-	if (file_exists($d_snortconfdirty_path) || file_exists("/var/run/snort_conf_{$snort_uuid}_.dirty")) {
-		echo '<p>';
-
-		if($savemsg)
-			print_info_box_np2("{$savemsg}");
-		else {
-			print_info_box_np2('
-			The Snort configuration has changed and snort needs to be restarted on this interface.<br>
-			You must apply the changes in order for them to take effect.<br>
-			');
-		}
+		print_info_box($savemsg);
 	}
 ?>
 
+<form action="snort_interfaces_edit.php<?php echo "?id=$id";?>" method="post" name="iform" id="iform">
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
-<tr><td>
+<tr><td class="tabnavtbl">
 <?php
         $tab_array = array();
-	$tabid = 0;
-	$tab_array[$tabid] = array(gettext("Snort Interfaces"), false, "/snort/snort_interfaces.php");
-	$tabid++;
-        $tab_array[$tabid] = array(gettext("If Settings"), true, "/snort/snort_interfaces_edit.php?id={$id}");
-	$tabid++;
-	$tab_array[$tabid] = array(gettext("Categories"), false, "/snort/snort_rulesets.php?id={$id}");
-	$tabid++;
-	$tab_array[$tabid] = array(gettext("Rules"), false, "/snort/snort_rules.php?id={$id}");
-	$tabid++;
-	$tab_array[$tabid] = array(gettext("Servers"), false, "/snort/snort_define_servers.php?id={$id}");
-	$tabid++;
-	$tab_array[$tabid] = array(gettext("Preprocessors"), false, "/snort/snort_preprocessors.php?id={$id}");
-	$tabid++;
-	$tab_array[$tabid] = array(gettext("Barnyard2"), false, "/snort/snort_barnyard.php?id={$id}");
+	$tab_array[] = array(gettext("Snort Interfaces"), false, "/snort/snort_interfaces.php");
+        $tab_array[] = array(gettext("If Settings"), true, "/snort/snort_interfaces_edit.php?id={$id}");
+	$tab_array[] = array(gettext("Categories"), false, "/snort/snort_rulesets.php?id={$id}");
+	$tab_array[] = array(gettext("Rules"), false, "/snort/snort_rules.php?id={$id}");
+	$tab_array[] = array(gettext("Servers"), false, "/snort/snort_define_servers.php?id={$id}");
+	$tab_array[] = array(gettext("Preprocessors"), false, "/snort/snort_preprocessors.php?id={$id}");
+	$tab_array[] = array(gettext("Barnyard2"), false, "/snort/snort_barnyard.php?id={$id}");
         display_top_tabs($tab_array);
 ?>
 </td></tr>
+</table>
+<table width="100%" border="0" cellpadding="6" cellspacing="0">
 	<tr>
-		<td class="tabnavtbl">
+		<td colspan="2" valign="top" class="listtopic">General Settings</td>
+	</tr>
+	<tr>
+		<td width="22%" valign="top" class="vncellreq">Enable</td>
+		<td width="78%" valign="top" class="vtable">&nbsp;
 	<?php
-		if ($a_nat[$id]['interface'] != '') {
-			/* get the interface name */
-			$snortInterfaces = array(); /* -gtm  */
-
-			$if_list = $config['installedpackages']['snortglobal']['rule'][$id]['interface'];
-			$if_array = explode(',', $if_list);
-			if($if_array) {
-				foreach($if_array as $iface2) {
-					/* build a list of user specified interfaces -gtm */
-					$if2 = snort_get_real_interface($iface2);
-					if ($if2)
-						array_push($snortInterfaces, $if2);
-				}
-
-				if (count($snortInterfaces) < 1)
-					log_error("Snort will not start.  You must select an interface for it to listen on.");
-			}
-
-		}
+		if ($pconfig['enable'] == "on")
+			$checked = "checked";
+		echo "
+			<input name=\"enable\" type=\"checkbox\" value=\"on\" $checked onClick=\"enable_change(false)\">
+			&nbsp;&nbsp;Enable or Disable\n";
 	?>
+		<br/>
 		</td>
 	</tr>
 	<tr>
-		<td class="tabcont">
-		<table width="100%" border="0" cellpadding="6" cellspacing="0">
-			<tr>
-				<td colspan="2" valign="top" class="listtopic">General Settings</td>
-			</tr>
-			<tr>
-				<td width="22%" valign="top" class="vncellreq2">Enable</td>
-				<td width="22%" valign="top" class="vtable">&nbsp; <?php
-				// <input name="enable" type="checkbox" value="yes" checked onClick="enable_change(false)">
-				// care with spaces
-				if ($pconfig['enable'] == "on")
-					$checked = checked;
-
-				$onclick_enable = "onClick=\"enable_change(false)\">";
-					
-				echo "
-					<input name=\"enable\" type=\"checkbox\" value=\"on\" $checked $onclick_enable
-					&nbsp;&nbsp;Enable or Disable</td>\n\n";
-				?></td>
-			</tr>
-			<tr>
-				<td width="22%" valign="top" class="vncellreq2">Interface</td>
-				<td width="78%" class="vtable">
-					<select name="interface" class="formselect">
-				<?php
-					if (function_exists('get_configured_interface_with_descr'))
-						$interfaces = get_configured_interface_with_descr();
-					else {
-						$interfaces = array('wan' => 'WAN', 'lan' => 'LAN');
-						for ($i = 1; isset($config['interfaces']['opt' . $i]); $i++) {
-							$interfaces['opt' . $i] = $config['interfaces']['opt' . $i]['descr'];
-						}
-					}
-					foreach ($interfaces as $iface => $ifacename): ?>
-						<option value="<?=$iface;?>"
-					<?php if ($iface == $pconfig['interface']) echo "selected"; ?>><?=htmlspecialchars($ifacename);?>
-					</option>
-				<?php 	endforeach; ?>
-				</select><br>
-				<span class="vexpl">Choose which interface this rule applies to.<br>
-				Hint: in most cases, you'll want to use WAN here.</span></td>
-			</tr>
-			<tr>
-				<td width="22%" valign="top" class="vncellreq2">Description</td>
+		<td width="22%" valign="top" class="vncellreq">Interface</td>
+		<td width="78%" class="vtable">
+			<select name="interface" class="formselect">
+		<?php
+			if (function_exists('get_configured_interface_with_descr'))
+				$interfaces = get_configured_interface_with_descr();
+			else {
+				$interfaces = array('wan' => 'WAN', 'lan' => 'LAN');
+				for ($i = 1; isset($config['interfaces']['opt' . $i]); $i++) {
+					$interfaces['opt' . $i] = $config['interfaces']['opt' . $i]['descr'];
+				}
+			}
+			foreach ($interfaces as $iface => $ifacename): ?>
+				<option value="<?=$iface;?>"
+			<?php if ($iface == $pconfig['interface']) echo "selected"; ?>><?=htmlspecialchars($ifacename);?>
+				</option>
+			<?php 	endforeach; ?>
+			</select><br>
+			<span class="vexpl">Choose which interface this rule applies to.<br/>
+				<b>Hint: </b>in most cases, you'll want to use WAN here.</span><br/><br/></td>
+	</tr>
+	<tr>
+				<td width="22%" valign="top" class="vncellreq">Description</td>
 				<td width="78%" class="vtable"><input name="descr" type="text"
 					class="formfld" id="descr" size="40"
-					value="<?=htmlspecialchars($pconfig['descr']);?>"> <br>
+					value="<?=htmlspecialchars($pconfig['descr']);?>"> <br/>
 				<span class="vexpl">You may enter a description here for your
-				reference (not parsed).</span></td>
-			</tr>
-			<tr>
-				<td width="22%" valign="top" class="vncell2">Memory Performance</td>
+				reference (not parsed).</span><br/><br/></td>
+	</tr>
+	<tr>
+				<td width="22%" valign="top" class="vncell">Memory Performance</td>
 				<td width="78%" class="vtable">
 					<select name="performance" class="formselect" id="performance">
 					<?php
@@ -509,15 +449,15 @@ function enable_change(enable_change) {
 				systems, Ac: high memory, best performance, ac-std: moderate
 				memory,high performance, acs: small memory, moderateperformance,
 				ac-banded: small memory,moderate performance, ac-sparsebands: small
-				memory, high performance.<br>
-				</span></td>
-			</tr>
-			<tr>
+				memory, high performance.
+				</span><br/></td>
+	</tr>
+	<tr>
 				<td colspan="2" valign="top" class="listtopic">Choose the networks
 				snort should inspect and whitelist.</td>
-			</tr>
-			<tr>
-				<td width="22%" valign="top" class="vncell2">Home net</td>
+	</tr>
+	<tr>
+				<td width="22%" valign="top" class="vncell">Home net</td>
 				<td width="78%" class="vtable">
 					<select name="homelistname" class="formselect" id="homelistname">
 				<?php
@@ -536,15 +476,15 @@ function enable_change(enable_change) {
 						}
 					}
 				?>
-				</select><br>
+				</select><br/>
 				<span class="vexpl">Choose the home net you will like this rule to
-				use. </span>&nbsp;<br/><span class="red">Note:</span>&nbsp;Default home
+				use. </span><br/>&nbsp;<br/><span class="red">Note:</span>&nbsp;Default home
 				net adds only local networks.<br>
 				<span class="red">Hint:</span>&nbsp;Most users add a list of
-				friendly ips that the firewall cant see.</td>
-			</tr>
-			<tr>
-				<td width="22%" valign="top" class="vncell2">External net</td>
+				friendly ips that the firewall cant see.<br/></td>
+	</tr>
+	<tr>
+				<td width="22%" valign="top" class="vncell">External net</td>
 				<td width="78%" class="vtable">
 					<select name="externallistname" class="formselect" id="externallistname">
 				<?php
@@ -566,28 +506,28 @@ function enable_change(enable_change) {
 				</select><br/>
 				<span class="vexpl">Choose the external net you will like this rule
 				to use. </span>&nbsp;<br/><span class="red">Note:</span>&nbsp;Default
-				external net, networks that are not home net.<br>
+				external net, networks that are not home net.<br/>
 				<span class="red">Hint:</span>&nbsp;Most users should leave this
-				setting at default.</td>
-			</tr>
-			<tr>
-				<td width="22%" valign="top" class="vncell2">Block offenders</td>
+				setting at default.<br/></td>
+	</tr>
+	<tr>
+				<td width="22%" valign="top" class="vncell">Block offenders</td>
 				<td width="78%" class="vtable">
 					<input name="blockoffenders7" id="blockoffenders7" type="checkbox" value="on"
 					<?php if ($pconfig['blockoffenders7'] == "on") echo "checked"; ?>
 					onClick="enable_blockoffenders()"><br>
 				Checking this option will automatically block hosts that generate a
 				Snort alert.</td>
-			</tr>
-			<tr>
-				<td width="22%" valign="top" class="vncell2">Kill states</td>
+	</tr>
+	<tr>
+				<td width="22%" valign="top" class="vncell">Kill states</td>
 				<td width="78%" class="vtable">
 					<input name="blockoffenderskill" id="blockoffenderskill" type="checkbox" value="on" <?php if ($pconfig['blockoffenderskill'] == "on") echo "checked"; ?>>
 					<br/>Should firewall states be killed for the blocked ip
 				</td>
-			</tr>
-			<tr>
-				<td width="22%" valign="top" class="vncell2">Which ip to block</td>
+	</tr>
+	<tr>
+				<td width="22%" valign="top" class="vncell">Which ip to block</td>
 				<td width="78%" class="vtable">
 					<select name="blockoffendersip" class="formselect" id="blockoffendersip">
 				<?php
@@ -602,9 +542,9 @@ function enable_change(enable_change) {
 					</select>
 				<br/> Which ip extracted from the packet you want to block
 				</td>
-			</tr>
-			<tr>
-				<td width="22%" valign="top" class="vncell2">Whitelist</td>
+	</tr>
+	<tr>
+				<td width="22%" valign="top" class="vncell">Whitelist</td>
 				<td width="78%" class="vtable">
 					<select name="whitelistname" class="formselect" id="whitelistname">
 				<?php
@@ -624,13 +564,13 @@ function enable_change(enable_change) {
 				?>
 				</select><br>
 				<span class="vexpl">Choose the whitelist you will like this rule to
-				use. </span>&nbsp;<br/><span class="red">Note:</span>&nbsp;Default
+				use. </span><br/>&nbsp;<br/><span class="red">Note:</span><br/>&nbsp;Default
 				whitelist adds only local networks.<br/>
-				<span class="red">Note:</span>&nbsp;This option will only be used when block offenders is on.
+				<span class="red">Note:</span><br/>&nbsp;This option will only be used when block offenders is on.
 				</td>
 			</tr>
 			<tr>
-				<td width="22%" valign="top" class="vncell2">Suppression and
+				<td width="22%" valign="top" class="vncell">Suppression and
 				filtering</td>
 				<td width="78%" class="vtable">
 					<select name="suppresslistname" class="formselect" id="suppresslistname">
@@ -650,7 +590,7 @@ function enable_change(enable_change) {
 				?>
 				</select><br>
 				<span class="vexpl">Choose the suppression or filtering file you
-				will like this rule to use. </span>&nbsp;<br/><span class="red">Note:</span>&nbsp;Default
+				will like this rule to use. </span><br/>&nbsp;<br/><span class="red">Note:</span><br/>&nbsp;Default
 				option disables suppression and filtering.</td>
 			</tr>
 
@@ -659,7 +599,7 @@ function enable_change(enable_change) {
 				logs snort should create.</td>
 			</tr>
 			<tr>
-				<td width="22%" valign="top" class="vncell2">Send alerts to main
+				<td width="22%" valign="top" class="vncell">Send alerts to main
 				System logs</td>
 				<td width="78%" class="vtable"><input name="alertsystemlog"
 					type="checkbox" value="on"
@@ -668,63 +608,58 @@ function enable_change(enable_change) {
 				Snort will send Alerts to the firewall's system logs.</td>
 			</tr>
 			<tr>
-				<td width="22%" valign="top" class="vncell2">Log to a Tcpdump file</td>
+				<td width="22%" valign="top" class="vncell">Log to a Tcpdump file</td>
 				<td width="78%" class="vtable"><input name="tcpdumplog"
 					type="checkbox" value="on"
 					<?php if ($pconfig['tcpdumplog'] == "on") echo "checked"; ?>
 					onClick="enable_change(false)"><br>
 				Snort will log packets to a tcpdump-formatted file. The file then
 				can be analyzed by an application such as Wireshark which
-				understands pcap file formats. <span class="red"><strong>WARNING:</strong></span>
+				understands pcap file formats. <span class="red"><strong>WARNING:</strong></span><br/>
 				File may become large.</td>
 			</tr>
 			<tr>
-				<td width="22%" valign="top" class="vncell2">Log Alerts to a snort
+				<td width="22%" valign="top" class="vncell">Log Alerts to a snort
 				unified2 file</td>
 				<td width="78%" class="vtable"><input name="snortunifiedlog"
 					type="checkbox" value="on"
 					<?php if ($pconfig['snortunifiedlog'] == "on") echo "checked"; ?>
 					onClick="enable_change(false)"><br>
-				Snort will log Alerts to a file in the UNIFIED2 format. This is a
-				requirement for barnyard2.</td>
-			</tr>
-			<tr>
-				<td colspan="2" valign="top" class="listtopic">Arguments here will
-				be automatically inserted into the snort configuration.</td>
-			</tr>
-			<tr>
-				<td width="22%" valign="top" class="vncell2">Advanced configuration
-				pass through</td>
-				<td width="78%" class="vtable"><textarea wrap="off"
-					name="configpassthru" cols="75" rows="12" id="configpassthru"
-					class="formpre2"><?=htmlspecialchars($pconfig['configpassthru']);?></textarea>
-				</td>
-			</tr>
-			<tr>
-				<td width="22%" valign="top"></td>
-				<td width="78%"><input name="Submit" type="submit" class="formbtn" value="Save">
-				<?php if (isset($id) && $a_nat[$id]): ?>
-					<input name="id" type="hidden" value="<?=$id;?>">
-				<?php endif; ?></td>
-			</tr>
-			<tr>
-				<td width="22%" valign="top">&nbsp;</td>
-				<td width="78%"><span class="vexpl"><span class="red"><strong>Note:</strong></span>
-				<br>
-				Please save your settings before you click start. </td>
-			</tr>
-		</table>
-
+			Snort will log Alerts to a file in the UNIFIED2 format. This is a
+			requirement for barnyard2.</td>
+		</tr>
+		<tr>
+			<td colspan="2" valign="top" class="listtopic">Arguments here will
+			be automatically inserted into the snort configuration.</td>
+		</tr>
+		<tr>
+			<td width="22%" valign="top" class="vncell">Advanced configuration pass through</td>
+			<td width="78%" class="vtable">
+				<textarea wrap="off" name="configpassthru" cols="65" rows="12" id="configpassthru"
+				class="formpre"><?=htmlspecialchars($pconfig['configpassthru']);?></textarea>
+			</td>
+		</tr>
+		<tr>
+			<td width="22%" valign="top"></td>
+			<td width="78%"><input name="Submit" type="submit" class="formbtn" value="Save">
+			<?php if (isset($id) && $a_nat[$id]): ?>
+				<input name="id" type="hidden" value="<?=$id;?>">
+			<?php endif; ?></td>
+		</tr>
+		<tr>
+			<td width="22%" valign="top">&nbsp;</td>
+			<td width="78%"><span class="vexpl"><span class="red"><strong>Note:</strong></span><br/>
+			<br>
+			Please save your settings before you click start. </td>
+		</tr>
 </table>
 </form>
-
 <script language="JavaScript">
 <!--
 enable_change(false);
 enable_blockoffenders();
 //-->
 </script>
-
 <?php include("fend.inc"); ?>
 </body>
 </html>

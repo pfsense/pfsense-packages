@@ -35,7 +35,6 @@
  */
 
 require_once("guiconfig.inc");
-require_once("/usr/local/pkg/snort/snort_gui.inc");
 require_once("/usr/local/pkg/snort/snort.inc");
 
 /* load only javascript that is needed */

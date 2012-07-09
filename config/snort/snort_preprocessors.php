@@ -33,7 +33,6 @@
 
 
 require_once("guiconfig.inc");
-require_once("/usr/local/pkg/snort/snort_gui.inc");
 require_once("/usr/local/pkg/snort/snort.inc");
 
 global $g;
@@ -128,30 +127,12 @@ if ($_POST) {
 
 $pgtitle = "Snort: Interface $id$if_real Preprocessors and Flow";
 include_once("head.inc");
-
 ?>
-<body
-	link="#0000CC" vlink="#0000CC" alink="#0000CC">
+<body link="#0000CC" vlink="#0000CC" alink="#0000CC">
 
 <?php include("fbegin.inc"); ?>
-<?if($pfsense_stable == 'yes'){echo '<p class="pgtitle">' . $pgtitle . '</p>';}?>
+<?php if($pfsense_stable == 'yes'){echo '<p class="pgtitle">' . $pgtitle . '</p>';}?>
 
-<?php
-echo "{$snort_general_css}\n";
-?>
-
-<div class="body2">
-
-<noscript>
-<div class="alert" ALIGN=CENTER><img
-	src="../themes/<?php echo $g['theme']; ?>/images/icons/icon_alert.gif" /><strong>Please
-enable JavaScript to view this content
-</CENTER></div>
-</noscript>
-
-
-<form action="snort_preprocessors.php" method="post"
-	enctype="multipart/form-data" name="iform" id="iform"><?php
 
 	/* Display Alert message */
 
@@ -160,215 +141,187 @@ enable JavaScript to view this content
 	}
 
 	if ($savemsg) {
-		print_info_box2($savemsg);
+		print_info_box($savemsg);
 	}
 
-	?>
+?>
 
+<form action="snort_preprocessors.php" method="post"
+	enctype="multipart/form-data" name="iform" id="iform">
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
 <tr><td>
 <?php
         $tab_array = array();
-        $tabid = 0;
-        $tab_array[$tabid] = array(gettext("Snort Interfaces"), false, "/snort/snort_interfaces.php");
-        $tabid++;
-        $tab_array[$tabid] = array(gettext("If Settings"), false, "/snort/snort_interfaces_edit.php?id={$id}");
-        $tabid++;
-        $tab_array[$tabid] = array(gettext("Categories"), false, "/snort/snort_rulesets.php?id={$id}");
-        $tabid++;
-        $tab_array[$tabid] = array(gettext("Rules"), false, "/snort/snort_rules.php?id={$id}");
-        $tabid++;
-        $tab_array[$tabid] = array(gettext("Servers"), false, "/snort/snort_define_servers.php?id={$id}");
-        $tabid++;
-        $tab_array[$tabid] = array(gettext("Preprocessors"), true, "/snort/snort_preprocessors.php?id={$id}");
-        $tabid++;
-        $tab_array[$tabid] = array(gettext("Barnyard2"), false, "/snort/snort_barnyard.php?id={$id}");
+        $tab_array[] = array(gettext("Snort Interfaces"), false, "/snort/snort_interfaces.php");
+        $tab_array[] = array(gettext("If Settings"), false, "/snort/snort_interfaces_edit.php?id={$id}");
+        $tab_array[] = array(gettext("Categories"), false, "/snort/snort_rulesets.php?id={$id}");
+        $tab_array[] = array(gettext("Rules"), false, "/snort/snort_rules.php?id={$id}");
+        $tab_array[] = array(gettext("Servers"), false, "/snort/snort_define_servers.php?id={$id}");
+        $tab_array[] = array(gettext("Preprocessors"), true, "/snort/snort_preprocessors.php?id={$id}");
+        $tab_array[] = array(gettext("Barnyard2"), false, "/snort/snort_barnyard.php?id={$id}");
         display_top_tabs($tab_array);
 ?>
 </td></tr>
+</table>
+<table width="100%" border="0" cellpadding="6" cellspacing="0">
 	<tr>
-		<td class="tabcont">
-		<table width="100%" border="0" cellpadding="6" cellspacing="0">
-		<?php
-		/* display error code if there is no id */
-		if($id == "")
-		{
-			echo "
-				<style type=\"text/css\">
-				.noid {
-				position:absolute;
-				top:10px;
-				left:0px;
-				width:94%;
-				background:#FCE9C0;
-				background-position: 15px; 
-				border-top:2px solid #DBAC48;
-				border-bottom:2px solid #DBAC48;
-				padding: 15px 10px 85% 50px;
-				}
-				</style> 
-				<div class=\"alert\" ALIGN=CENTER><img src=\"../themes/{$g['theme']}/images/icons/icon_alert.gif\"/><strong>You can not edit options without an interface ID.</CENTER></div>\n";
-
-		}
-		?>
+		<td width="22%" valign="top">&nbsp;</td>
+		<td width="78%"><span class="vexpl"><span class="red"><strong>Note:
+		</strong></span><br>
+		Rules may be dependent on preprocessors!<br>
+		Defaults will be used when there is no user input.<br></td>
+	</tr>
+	<tr>
+		<td colspan="2" valign="top" class="listtopic">Performance
+		Statistics</td>
+	</tr>
+	<tr>
+		<td width="22%" valign="top" class="vncell">Enable</td>
+		<td width="78%" class="vtable"><input name="perform_stat"
+			type="checkbox" value="on"
+			<?php if ($pconfig['perform_stat']=="on") echo "checked"; ?>
+			onClick="enable_change(false)"> Performance Statistics for this
+		interface.</td>
+	</tr>
+	<tr>
+		<td colspan="2" valign="top" class="listtopic">HTTP Inspect Settings</td>
+	</tr>
+	<tr>
+		<td width="22%" valign="top" class="vncell">Enable</td>
+		<td width="78%" class="vtable"><input name="http_inspect"
+			type="checkbox" value="on"
+			<?php if ($pconfig['http_inspect']=="on") echo "checked"; ?>
+			onClick="enable_change(false)"> Use HTTP Inspect to
+		Normalize/Decode and detect HTTP traffic and protocol anomalies.</td>
+	</tr>
+	<tr>
+		<td valign="top" class="vncell">HTTP server flow depth</td>
+		<td class="vtable">
+		<table cellpadding="0" cellspacing="0">
 			<tr>
-				<td width="22%" valign="top">&nbsp;</td>
-				<td width="78%"><span class="vexpl"><span class="red"><strong>Note:
-				</strong></span><br>
-				Rules may be dependent on preprocessors!<br>
-				Defaults will be used when there is no user input.<br></td>
+				<td><input name="flow_depth" type="text" class="formfld"
+					id="flow_depth" size="5"
+					value="<?=htmlspecialchars($pconfig['flow_depth']);?>"> <strong>-1</strong>
+				to <strong>1460</strong> (<strong>-1</strong> disables HTTP
+				inspect, <strong>0</strong> enables all HTTP inspect)</td>
 			</tr>
+		</table>
+		Amount of HTTP server response payload to inspect. Snort's
+		performance may increase by adjusting this value.<br>
+		Setting this value too low may cause false negatives. Values above 0
+		are specified in bytes. Default value is <strong>0</strong><br>
+		</td>
+	</tr>
+	<tr>
+		<td colspan="2" valign="top" class="listtopic">Stream5 Settings</td>
+	</tr>
+	<tr>
+		<td valign="top" class="vncell">Max Queued Bytes</td>
+		<td class="vtable">
+		<table cellpadding="0" cellspacing="0">
 			<tr>
-				<td colspan="2" valign="top" class="listtopic">Performance
-				Statistics</td>
+				<td><input name="max_queued_bytes" type="text" class="formfld"
+					id="max_queued_bytes" size="5"
+					value="<?=htmlspecialchars($pconfig['max_queued_bytes']);?>">
+				Minimum is <strong>1024</strong>, Maximum is <strong>1073741824</strong>
+				( default value is <strong>1048576</strong>, <strong>0</strong>
+				means Maximum )</td>
 			</tr>
+		</table>
+		The number of bytes to be queued for reassembly for TCP sessions in
+		memory. Default value is <strong>1048576</strong><br>
+		</td>
+	</tr>
+	<tr>
+		<td valign="top" class="vncell">Max Queued Segs</td>
+		<td class="vtable">
+		<table cellpadding="0" cellspacing="0">
 			<tr>
-				<td width="22%" valign="top" class="vncell2">Enable</td>
-				<td width="78%" class="vtable"><input name="perform_stat"
-					type="checkbox" value="on"
-					<?php if ($pconfig['perform_stat']=="on") echo "checked"; ?>
-					onClick="enable_change(false)"> Performance Statistics for this
-				interface.</td>
+				<td><input name="max_queued_segs" type="text" class="formfld"
+					id="max_queued_segs" size="5"
+					value="<?=htmlspecialchars($pconfig['max_queued_segs']);?>">
+				Minimum is <strong>2</strong>, Maximum is <strong>1073741824</strong>
+				( default value is <strong>2621</strong>, <strong>0</strong> means
+				Maximum )</td>
 			</tr>
-			<tr>
-				<td colspan="2" valign="top" class="listtopic">HTTP Inspect Settings</td>
-			</tr>
-			<tr>
-				<td width="22%" valign="top" class="vncell2">Enable</td>
-				<td width="78%" class="vtable"><input name="http_inspect"
-					type="checkbox" value="on"
-					<?php if ($pconfig['http_inspect']=="on") echo "checked"; ?>
-					onClick="enable_change(false)"> Use HTTP Inspect to
-				Normalize/Decode and detect HTTP traffic and protocol anomalies.</td>
-			</tr>
-			<tr>
-				<td valign="top" class="vncell2">HTTP server flow depth</td>
-				<td class="vtable">
-				<table cellpadding="0" cellspacing="0">
-					<tr>
-						<td><input name="flow_depth" type="text" class="formfld"
-							id="flow_depth" size="5"
-							value="<?=htmlspecialchars($pconfig['flow_depth']);?>"> <strong>-1</strong>
-						to <strong>1460</strong> (<strong>-1</strong> disables HTTP
-						inspect, <strong>0</strong> enables all HTTP inspect)</td>
-					</tr>
-				</table>
-				Amount of HTTP server response payload to inspect. Snort's
-				performance may increase by adjusting this value.<br>
-				Setting this value too low may cause false negatives. Values above 0
-				are specified in bytes. Default value is <strong>0</strong><br>
-				</td>
-			</tr>
-			<tr>
-				<td colspan="2" valign="top" class="listtopic">Stream5 Settings</td>
-			</tr>
-			<tr>
-				<td valign="top" class="vncell2">Max Queued Bytes</td>
-				<td class="vtable">
-				<table cellpadding="0" cellspacing="0">
-					<tr>
-						<td><input name="max_queued_bytes" type="text" class="formfld"
-							id="max_queued_bytes" size="5"
-							value="<?=htmlspecialchars($pconfig['max_queued_bytes']);?>">
-						Minimum is <strong>1024</strong>, Maximum is <strong>1073741824</strong>
-						( default value is <strong>1048576</strong>, <strong>0</strong>
-						means Maximum )</td>
-					</tr>
-				</table>
-				The number of bytes to be queued for reassembly for TCP sessions in
-				memory. Default value is <strong>1048576</strong><br>
-				</td>
-			</tr>
-			<tr>
-				<td valign="top" class="vncell2">Max Queued Segs</td>
-				<td class="vtable">
-				<table cellpadding="0" cellspacing="0">
-					<tr>
-						<td><input name="max_queued_segs" type="text" class="formfld"
-							id="max_queued_segs" size="5"
-							value="<?=htmlspecialchars($pconfig['max_queued_segs']);?>">
-						Minimum is <strong>2</strong>, Maximum is <strong>1073741824</strong>
-						( default value is <strong>2621</strong>, <strong>0</strong> means
-						Maximum )</td>
-					</tr>
-				</table>
-				The number of segments to be queued for reassembly for TCP sessions
-				in memory. Default value is <strong>2621</strong><br>
-				</td>
-			</tr>
-			<tr>
-				<td colspan="2" valign="top" class="listtopic">General Preprocessor
-				Settings</td>
-			</tr>
-			<tr>
-				<td width="22%" valign="top" class="vncell2">Enable <br>
-				RPC Decode and Back Orifice detector</td>
-				<td width="78%" class="vtable"><input name="other_preprocs"
-					type="checkbox" value="on"
-					<?php if ($pconfig['other_preprocs']=="on") echo "checked"; ?>
-					onClick="enable_change(false)"><br>
-				Normalize/Decode RPC traffic and detects Back Orifice traffic on the
-				network.</td>
-			</tr>
-			<tr>
-				<td width="22%" valign="top" class="vncell2">Enable <br>
-				FTP and Telnet Normalizer</td>
-				<td width="78%" class="vtable"><input name="ftp_preprocessor"
-					type="checkbox" value="on"
-					<?php if ($pconfig['ftp_preprocessor']=="on") echo "checked"; ?>
-					onClick="enable_change(false)"><br>
-				Normalize/Decode FTP and Telnet traffic and protocol anomalies.</td>
-			</tr>
-			<tr>
-				<td width="22%" valign="top" class="vncell2">Enable <br>
-				SMTP Normalizer</td>
-				<td width="78%" class="vtable"><input name="smtp_preprocessor"
-					type="checkbox" value="on"
-					<?php if ($pconfig['smtp_preprocessor']=="on") echo "checked"; ?>
-					onClick="enable_change(false)"><br>
-				Normalize/Decode SMTP protocol for enforcement and buffer overflows.</td>
-			</tr>
-			<tr>
-				<td width="22%" valign="top" class="vncell2">Enable <br>
-				Portscan Detection</td>
-				<td width="78%" class="vtable"><input name="sf_portscan"
-					type="checkbox" value="on"
-					<?php if ($pconfig['sf_portscan']=="on") echo "checked"; ?>
-					onClick="enable_change(false)"><br>
-				Detects various types of portscans and portsweeps.</td>
-			</tr>
-			<tr>
-				<td width="22%" valign="top" class="vncell2">Enable <br>
-				DCE/RPC2 Detection</td>
-				<td width="78%" class="vtable"><input name="dce_rpc_2"
-					type="checkbox" value="on"
-					<?php if ($pconfig['dce_rpc_2']=="on") echo "checked"; ?>
-					onClick="enable_change(false)"><br>
-				The DCE/RPC preprocessor detects and decodes SMB and DCE/RPC
-				traffic.</td>
-			</tr>
-			<tr>
-				<td width="22%" valign="top" class="vncell2">Enable <br>
-				DNS Detection</td>
-				<td width="78%" class="vtable"><input name="dns_preprocessor"
-					type="checkbox" value="on"
-					<?php if ($pconfig['dns_preprocessor']=="on") echo "checked"; ?>
-					onClick="enable_change(false)"><br>
-				The DNS preprocessor decodes DNS Response traffic and detects some
-				vulnerabilities.</td>
-			</tr>
-			<tr>
-				<td width="22%" valign="top" class="vncell2">Define SSL_IGNORE</td>
-				<td width="78%" class="vtable"><input name="def_ssl_ports_ignore"
-					type="text" class="formfld" id="def_ssl_ports_ignore" size="40"
-					value="<?=htmlspecialchars($pconfig['def_ssl_ports_ignore']);?>"> <br>
-				<span class="vexpl"> Encrypted traffic should be ignored by Snort
-				for both performance reasons and to reduce false positives.<br>
-				Default: "443 465 563 636 989 990 992 993 994 995".</span> <strong>Please
-				use spaces and not commas.</strong></td>
-			</tr>
-			<tr>
-				<td width="22%" valign="top">&nbsp;</td>
+		</table>
+		The number of segments to be queued for reassembly for TCP sessions
+		in memory. Default value is <strong>2621</strong><br>
+		</td>
+	</tr>
+	<tr>
+		<td colspan="2" valign="top" class="listtopic">General Preprocessor
+		Settings</td>
+	</tr>
+	<tr>
+		<td width="22%" valign="top" class="vncell">Enable <br>
+		RPC Decode and Back Orifice detector</td>
+		<td width="78%" class="vtable"><input name="other_preprocs"
+			type="checkbox" value="on"
+			<?php if ($pconfig['other_preprocs']=="on") echo "checked"; ?>
+			onClick="enable_change(false)"><br>
+		Normalize/Decode RPC traffic and detects Back Orifice traffic on the
+		network.</td>
+	</tr>
+	<tr>
+		<td width="22%" valign="top" class="vncell">Enable <br>
+		FTP and Telnet Normalizer</td>
+		<td width="78%" class="vtable"><input name="ftp_preprocessor"
+			type="checkbox" value="on"
+			<?php if ($pconfig['ftp_preprocessor']=="on") echo "checked"; ?>
+			onClick="enable_change(false)"><br>
+		Normalize/Decode FTP and Telnet traffic and protocol anomalies.</td>
+	</tr>
+	<tr>
+		<td width="22%" valign="top" class="vncell">Enable <br>
+		SMTP Normalizer</td>
+		<td width="78%" class="vtable"><input name="smtp_preprocessor"
+			type="checkbox" value="on"
+			<?php if ($pconfig['smtp_preprocessor']=="on") echo "checked"; ?>
+			onClick="enable_change(false)"><br>
+		Normalize/Decode SMTP protocol for enforcement and buffer overflows.</td>
+	</tr>
+	<tr>
+		<td width="22%" valign="top" class="vncell">Enable <br>
+		Portscan Detection</td>
+		<td width="78%" class="vtable"><input name="sf_portscan"
+			type="checkbox" value="on"
+			<?php if ($pconfig['sf_portscan']=="on") echo "checked"; ?>
+			onClick="enable_change(false)"><br>
+		Detects various types of portscans and portsweeps.</td>
+	</tr>
+	<tr>
+		<td width="22%" valign="top" class="vncell">Enable <br>
+		DCE/RPC2 Detection</td>
+		<td width="78%" class="vtable"><input name="dce_rpc_2"
+			type="checkbox" value="on"
+			<?php if ($pconfig['dce_rpc_2']=="on") echo "checked"; ?>
+			onClick="enable_change(false)"><br>
+		The DCE/RPC preprocessor detects and decodes SMB and DCE/RPC
+		traffic.</td>
+	</tr>
+	<tr>
+		<td width="22%" valign="top" class="vncell">Enable <br>
+		DNS Detection</td>
+		<td width="78%" class="vtable"><input name="dns_preprocessor"
+			type="checkbox" value="on"
+			<?php if ($pconfig['dns_preprocessor']=="on") echo "checked"; ?>
+			onClick="enable_change(false)"><br>
+		The DNS preprocessor decodes DNS Response traffic and detects some
+		vulnerabilities.</td>
+	</tr>
+	<tr>
+		<td width="22%" valign="top" class="vncell">Define SSL_IGNORE</td>
+		<td width="78%" class="vtable"><input name="def_ssl_ports_ignore"
+			type="text" class="formfld" id="def_ssl_ports_ignore" size="40"
+			value="<?=htmlspecialchars($pconfig['def_ssl_ports_ignore']);?>"> <br>
+		<span class="vexpl"> Encrypted traffic should be ignored by Snort
+		for both performance reasons and to reduce false positives.<br>
+		Default: "443 465 563 636 989 990 992 993 994 995".</span> <strong>Please
+		use spaces and not commas.</strong></td>
+	</tr>
+	<tr>
+		<td width="22%" valign="top">&nbsp;</td>
 				<td width="78%">
 					<input name="Submit" type="submit" class="formbtn" value="Save">
 					<input name="id" type="hidden" value="<?=$id;?>"></td>
@@ -379,13 +332,8 @@ enable JavaScript to view this content
 				<br>
 				Please save your settings before you click Start. </td>
 			</tr>
-		</table>
-
 </table>
 </form>
-
-</div>
-
-					<?php include("fend.inc"); ?>
+<?php include("fend.inc"); ?>
 </body>
 </html>

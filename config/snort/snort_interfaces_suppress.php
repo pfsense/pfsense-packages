@@ -36,9 +36,7 @@
  */
 
 require_once("guiconfig.inc");
-require_once("/usr/local/pkg/snort/snort_gui.inc");
 require_once("/usr/local/pkg/snort/snort.inc");
-
 
 if (!is_array($config['installedpackages']['snortglobal']['suppress']))
 	$config['installedpackages']['snortglobal']['suppress'] = array();
@@ -70,10 +68,9 @@ include_once("head.inc");
 
 <?php
 include_once("fbegin.inc");
-echo $snort_general_css;
 ?>
 
-<div class="body2"><?if($pfsense_stable == 'yes'){echo '<p class="pgtitle">' . $pgtitle . '</p>';}?>
+<?if($pfsense_stable == 'yes'){echo '<p class="pgtitle">' . $pgtitle . '</p>';}?>
 
 <form action="/snort/snort_interfaces_suppress.php" method="post"><?php if ($savemsg) print_info_box($savemsg); ?>
 <?php if (file_exists($d_suppresslistdirty_path)): ?>
@@ -93,78 +90,67 @@ echo $snort_general_css;
         $tab_array[6] = array(gettext("Suppress"), true, "/snort/snort_interfaces_suppress.php");
         display_top_tabs($tab_array);
 ?>
-                </td>
-        </tr>
-	<tr>
-		<td class="tabcont">
+</td>
+</tr>
+<tr><td class="tabcont">
+<table width="100%" border="0" cellpadding="6" cellspacing="0">
+<tr>
+	<td width="30%" class="listhdrr">File Name</td>
+	<td width="60%" class="listhdr">Description</td>
+	<td width="10%" class="list"></td>
+</tr>
+<?php $i = 0; foreach ($a_suppress as $list): ?>
+<tr>
+	<td class="listlr"
+		ondblclick="document.location='snort_interfaces_suppress_edit.php?id=<?=$i;?>';">
+		<?=htmlspecialchars($list['name']);?></td>
+	<td class="listbg"
+		ondblclick="document.location='snort_interfaces_suppress_edit.php?id=<?=$i;?>';">
+	<font color="#FFFFFF"> <?=htmlspecialchars($list['descr']);?>&nbsp;
+	</td>
 
-		<table width="100%" border="0" cellpadding="0" cellspacing="0">
-
-			<tr>
-				<td width="30%" class="listhdrr">File Name</td>
-				<td width="70%" class="listhdr">Description</td>
-
-				<td width="10%" class="list"></td>
-			</tr>
-			<?php $i = 0; foreach ($a_suppress as $list): ?>
-			<tr>
-				<td class="listlr"
-					ondblclick="document.location='snort_interfaces_suppress_edit.php?id=<?=$i;?>';">
-					<?=htmlspecialchars($list['name']);?></td>
-				<td class="listbg"
-					ondblclick="document.location='snort_interfaces_suppress_edit.php?id=<?=$i;?>';">
-				<font color="#FFFFFF"> <?=htmlspecialchars($list['descr']);?>&nbsp;
-				</td>
-
-				<td valign="middle" nowrap class="list">
-				<table border="0" cellspacing="0" cellpadding="1">
-					<tr>
-						<td valign="middle"><a
-							href="snort_interfaces_suppress_edit.php?id=<?=$i;?>"><img
-							src="/themes/<?= $g['theme']; ?>/images/icons/icon_e.gif"
-							width="17" height="17" border="0" title="edit whitelist"></a></td>
-						<td><a
-							href="/snort/snort_interfaces_suppress.php?act=del&id=<?=$i;?>"
-							onclick="return confirm('Do you really want to delete this whitelist? All elements that still use it will become invalid (e.g. snort rules will fall back to the default whitelist)!')"><img
-							src="/themes/<?= $g['theme']; ?>/images/icons/icon_x.gif"
-							width="17" height="17" border="0" title="delete whitelist"></a></td>
-					</tr>
-				</table>
-				</td>
-			</tr>
-			<?php $i++; endforeach; ?>
-			<tr>
-				<td class="list" colspan="2"></td>
-				<td class="list">
-				<table border="0" cellspacing="0" cellpadding="1">
-					<tr>
-						<td valign="middle" width="17">&nbsp;</td>
-						<td valign="middle"><a
-							href="snort_interfaces_suppress_edit.php?id=<?php echo $id_gen;?> "><img
-							src="/themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif"
-							width="17" height="17" border="0" title="add a new list"></a></td>
-					</tr>
-				</table>
-				</td>
-			</tr>
-		</table>
-		</td>
-	</tr>
+	<td valign="middle" nowrap class="list">
+	<table border="0" cellspacing="0" cellpadding="1">
+		<tr>
+			<td valign="middle"><a
+				href="snort_interfaces_suppress_edit.php?id=<?=$i;?>"><img
+				src="/themes/<?= $g['theme']; ?>/images/icons/icon_e.gif"
+				width="17" height="17" border="0" title="edit whitelist"></a></td>
+			<td><a
+				href="/snort/snort_interfaces_suppress.php?act=del&id=<?=$i;?>"
+				onclick="return confirm('Do you really want to delete this whitelist? All elements that still use it will become invalid (e.g. snort rules will fall back to the default whitelist)!')"><img
+				src="/themes/<?= $g['theme']; ?>/images/icons/icon_x.gif"
+				width="17" height="17" border="0" title="delete whitelist"></a></td>
+		</tr>
+	</table>
+	</td>
+</tr>
+<?php $i++; endforeach; ?>
+<tr>
+	<td class="list" colspan="2"></td>
+	<td  class="list">
+	<table border="0" cellspacing="0" cellpadding="1">
+		<tr>
+			<td valign="middle" width="17">&nbsp;</td>
+			<td valign="middle"><a
+				href="snort_interfaces_suppress_edit.php?id=<?php echo $id_gen;?> "><img
+				src="/themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif"
+				width="17" height="17" border="0" title="add a new list"></a></td>
+		</tr>
+	</table>
+	</td>
+</tr>
 </table>
-<br>
-<table class="tabcont" width="100%" border="0" cellpadding="0"
-	cellspacing="0">
-	<td width="100%"><span class="vexpl"><span class="red"><strong>Note:</strong></span>
+</td></tr>
+<tr>
+	<td colspan="3" width="100%"><span class="vexpl"><span class="red"><strong>Note:</strong></span>
 	<p><span class="vexpl">Here you can create event filtering and
 	suppression for your snort package rules.<br>
 	Please note that you must restart a running rule so that changes can
 	take effect.</span></p></td>
+</tr>
 </table>
-
 </form>
-
-</div>
-
 <?php include("fend.inc"); ?>
 </body>
 </html>

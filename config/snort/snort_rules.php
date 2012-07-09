@@ -30,7 +30,6 @@
 
 
 require_once("guiconfig.inc");
-require_once("/usr/local/pkg/snort/snort_gui.inc");
 require_once("/usr/local/pkg/snort/snort.inc");
 
 global $g;
@@ -78,20 +77,13 @@ if ($isrulesfolderempty == "") {
 			<td>\n";
 
 		$tab_array = array();
-		$tabid = 0;
-		$tab_array[$tabid] = array(gettext("Snort Interfaces"), false, "/snort/snort_interfaces.php");
-		$tabid++;
-		$tab_array[$tabid] = array(gettext("If Settings"), false, "/snort/snort_interfaces_edit.php?id={$id}");
-		$tabid++;
-		$tab_array[$tabid] = array(gettext("Categories"), false, "/snort/snort_rulesets.php?id={$id}");
-		$tabid++;
-		$tab_array[$tabid] = array(gettext("Rules"), true, "/snort/snort_rules.php?id={$id}");
-		$tabid++;
-		$tab_array[$tabid] = array(gettext("Servers"), false, "/snort/snort_define_servers.php?id={$id}");
-		$tabid++;
-		$tab_array[$tabid] = array(gettext("Preprocessors"), false, "/snort/snort_preprocessors.php?id={$id}");
-		$tabid++;
-		$tab_array[$tabid] = array(gettext("Barnyard2"), false, "/snort/snort_barnyard.php?id={$id}");
+		$tab_array[] = array(gettext("Snort Interfaces"), false, "/snort/snort_interfaces.php");
+		$tab_array[] = array(gettext("If Settings"), false, "/snort/snort_interfaces_edit.php?id={$id}");
+		$tab_array[] = array(gettext("Categories"), false, "/snort/snort_rulesets.php?id={$id}");
+		$tab_array[] = array(gettext("Rules"), true, "/snort/snort_rules.php?id={$id}");
+		$tab_array[] = array(gettext("Servers"), false, "/snort/snort_define_servers.php?id={$id}");
+		$tab_array[] = array(gettext("Preprocessors"), false, "/snort/snort_preprocessors.php?id={$id}");
+		$tab_array[] = array(gettext("Barnyard2"), false, "/snort/snort_barnyard.php?id={$id}");
 		display_top_tabs($tab_array);
 		echo  		"</td>\n
 		  </tr>\n
@@ -229,8 +221,6 @@ $pgtitle = "Snort: $id $iface_uuid $if_real Category: $currentruleset";
 <?php
 include("fbegin.inc");
 if ($pfsense_stable == 'yes'){echo '<p class="pgtitle">' . $pgtitle . '</p>';}
-
-echo "{$snort_general_css}\n";
 ?>
 <form action="snort_rules.php" method="post" name="iform" id="iform">
 
@@ -259,30 +249,23 @@ function popup(url)
 <tr><td>
 <?php
         $tab_array = array();
-        $tabid = 0;
-        $tab_array[$tabid] = array(gettext("Snort Interfaces"), false, "/snort/snort_interfaces.php");
-        $tabid++;
-        $tab_array[$tabid] = array(gettext("If Settings"), false, "/snort/snort_interfaces_edit.php?id={$id}");
-        $tabid++;
-        $tab_array[$tabid] = array(gettext("Categories"), false, "/snort/snort_rulesets.php?id={$id}");
-        $tabid++;
-        $tab_array[$tabid] = array(gettext("Rules"), true, "/snort/snort_rules.php?id={$id}");
-        $tabid++;
-        $tab_array[$tabid] = array(gettext("Servers"), false, "/snort/snort_define_servers.php?id={$id}");
-        $tabid++;
-        $tab_array[$tabid] = array(gettext("Preprocessors"), false, "/snort/snort_preprocessors.php?id={$id}");
-        $tabid++;
-        $tab_array[$tabid] = array(gettext("Barnyard2"), false, "/snort/snort_barnyard.php?id={$id}");
+        $tab_array[] = array(gettext("Snort Interfaces"), false, "/snort/snort_interfaces.php");
+        $tab_array[] = array(gettext("If Settings"), false, "/snort/snort_interfaces_edit.php?id={$id}");
+        $tab_array[] = array(gettext("Categories"), false, "/snort/snort_rulesets.php?id={$id}");
+        $tab_array[] = array(gettext("Rules"), true, "/snort/snort_rules.php?id={$id}");
+        $tab_array[] = array(gettext("Servers"), false, "/snort/snort_define_servers.php?id={$id}");
+        $tab_array[] = array(gettext("Preprocessors"), false, "/snort/snort_preprocessors.php?id={$id}");
+        $tab_array[] = array(gettext("Barnyard2"), false, "/snort/snort_barnyard.php?id={$id}");
         display_top_tabs($tab_array);
 ?>
 </td></tr>
 <tr>
 	<td>
-	<div id="mainarea2">
-	<table id="maintable" class="tabcont" width="100%" border="0" cellpadding="0" cellspacing="0">
+	<table class="tabcont" width="100%" border="0" cellpadding="0" cellspacing="0">
 		<tr>
-			<td class="listt" colspan="8">
-			<br>Category: 
+			<td width="3%" class="list">&nbsp;</td>
+			<td class="listhdr" colspan="7">
+			<br/>Category:  
 			<select id="selectbox" name="selectbox" class="formselect" onChange="go()">
 			<?php
 				foreach ($files as $value) {
@@ -293,17 +276,20 @@ function popup(url)
 				}
 			?>
 			</select>
+			<br/>
 			</td>
+			<td width="5%" class="list">&nbsp;</td>
 		</tr>
 		<tr id="frheader">
 			<td width="3%" class="list">&nbsp;</td>
-			<td width="5%" class="listhdr">SID</td>
-			<td width="6%" class="listhdrr">Proto</td>
+			<td width="7%" class="listhdr">SID</td>
+			<td width="4%" class="listhdrr">Proto</td>
 			<td width="15%" class="listhdrr">Source</td>
 			<td width="10%" class="listhdrr">Port</td>
 			<td width="15%" class="listhdrr">Destination</td>
 			<td width="10%" class="listhdrr">Port</td>
-			<td width="32%" class="listhdrr">Message</td>
+			<td width="30%" class="listhdrr">Message</td>
+			<td width="5%" class="list">&nbsp;</td>
 		</tr>
 		<?php
 			foreach ( $splitcontents as $counter => $value )
@@ -351,54 +337,36 @@ function popup(url)
 				else if (strstr($value, 'msg:"'))
 					$message = get_middle($value, 'msg:"', '";', 0);
 
-                                       echo "<tr><td class=\"listt\"> $textss\n";
-		?>
-				<a href="?id=<?=$id;?>&openruleset=<?=$rulefile;?>&act=toggle&ids=<?=$counter;?>"><img
-					src="../themes/<?= $g['theme']; ?>/images/icons/<?=$iconb;?>"
-					width="10" height="10" border="0"
-					title="click to toggle enabled/disabled status"></a>
-				<!-- <input name="enable" type="checkbox" value="yes" <?= $ischecked; ?> onClick="enable_change(false)"> -->
-				<!-- TODO: add checkbox and save so that that disabling is nicer -->
-		<?php
-				echo "$textse
-                                       </td>
-                                       <td width='5%' class=\"listlr\">
-					$textss
-					$sid
+                                echo "<tr><td width='3%' class='listt'> $textss
+					<a href='?id={$id}&openruleset={$rulefile}&act=toggle&ids={$counter}'>
+					<img src='../themes/{$g['theme']}/images/icons/{$iconb}'
+					width='10' height='10' border='0'
+					title='click to toggle enabled/disabled status'></a>
 					$textse
                                        </td>
-                                       <td width='6%' class=\"listlr\">
-					$textss
-					$protocol";
-					echo "$textse
+                                       <td width='7%' class=\"listlr\">
+						$textss $sid $textse
                                        </td>
-                                       <td width='20%' class=\"listlr\">
-					$textss
-					$source
-					$textse
+                                       <td width='4%' class=\"listlr\">
+						$textss $protocol $textse
                                        </td>
-                                       <td width='5%' class=\"listlr\">
-					$textss
-					$source_port
-					$textse
+                                       <td width='15%' class=\"listlr\">
+						$textss $source $textse
                                        </td>
-                                       <td width='20%' class=\"listlr\">
-					$textss
-					$destination
-					$textse
+                                       <td width='10%' class=\"listlr\">
+						$textss $source_port $textse
                                        </td>
-                                       <td width='5%' class=\"listlr\">
-                                       $textss
-                                       $destination_port
-                                       $textse
+                                       <td width='15%' class=\"listlr\">
+						$textss $destination $textse
                                        </td>
-				<td width='30%' class=\"listbg\"><font color=\"white\"> 
-					$textss
-					$message
-					$textse
+                                       <td width='10%' class=\"listlr\">
+					       $textss $destination_port $textse
+                                       </td>
+					<td width='30%' class=\"listbg\"><font color=\"white\"> 
+						$textss $message $textse
                                        </td>";
-		?>
-				<td valign="middle" nowrap class="list">
+			?>
+					<td width='5%' valign="middle" nowrap class="list">
 					<table border="0" cellspacing="0" cellpadding="1">
 					<tr>
 						<td><a href="javascript: void(0)"
@@ -408,7 +376,8 @@ function popup(url)
 							<!-- Codes by Quackit.com -->
 					</tr>
 					</table>
-				</td>
+					</td>
+				</tr>
 		<?php
 			}
 		?>
@@ -417,12 +386,12 @@ function popup(url)
 			</td>
 		</tr>
 		<tr>
-			<td class="listlr">
+			<td colspan="9" class="listlr">
 			<?php echo "  <strong><span class='red'>There are {$counter} rules in this category. <br/><br/></span></strong>"; ?>
 			</td>
 		</tr>
 		<tr>
-			<td>
+			<td colspan="9">
 			<table class="tabcont" width="100%" border="0" cellspacing="0" cellpadding="0">
 				<tr>
 					<td width="16"><img

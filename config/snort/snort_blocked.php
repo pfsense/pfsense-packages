@@ -31,7 +31,6 @@
  */
 
 require_once("guiconfig.inc");
-require_once("/usr/local/pkg/snort/snort_gui.inc");
 require_once("/usr/local/pkg/snort/snort.inc");
 
 if (!is_array($config['installedpackages']['snortglobal']['alertsblocks']))
@@ -181,7 +180,6 @@ include_once("head.inc");
 <?php
 
 include_once("fbegin.inc");
-echo $snort_general_css;
 
 /* refresh every 60 secs */
 if ($pconfig['brefresh'] == 'on')

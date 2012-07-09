@@ -30,16 +30,7 @@
  POSSIBILITY OF SUCH DAMAGE.
  */
 
-/*
-
-TODO: Nov 12 09
-Clean this code up its ugly
-Important add error checking
-
-*/
-
 require_once("guiconfig.inc");
-require_once("/usr/local/pkg/snort/snort_gui.inc");
 require_once("/usr/local/pkg/snort/snort.inc");
 
 global $g;
@@ -139,19 +130,9 @@ include_once("head.inc");
 <?php include("fbegin.inc"); ?>
 <?if($pfsense_stable == 'yes'){echo '<p class="pgtitle">' . $pgtitle . '</p>';}?>
 
-<?php
-echo "{$snort_general_css}\n";
+<body link="#0000CC" vlink="#0000CC" alink="#0000CC">
+<?php include_once("fbegin.inc");
 ?>
-
-<div class="body2">
-
-<noscript>
-<div class="alert" ALIGN=CENTER><img
-	src="../themes/<?php echo $g['theme']; ?>/images/icons/icon_alert.gif" /><strong>Please
-enable JavaScript to view this content
-</CENTER></div>
-</noscript>
-
 <script language="JavaScript">
 <!--
 
@@ -165,39 +146,33 @@ function enable_change(enable_change) {
 }
 //-->
 </script>
-<body link="#0000CC" vlink="#0000CC" alink="#0000CC">
-<form action="snort_barnyard.php" method="post"
-	enctype="multipart/form-data" name="iform" id="iform"><?php
 
+
+<?php
 	/* Display Alert message */
 	if ($input_errors) {
 		print_input_errors($input_errors); // TODO: add checks
 	}
 
 	if ($savemsg) {
-		print_info_box2($savemsg);
+		print_info_box($savemsg);
 	}
 
 	?>
 
+<form action="snort_barnyard.php" method="post"
+	enctype="multipart/form-data" name="iform" id="iform">
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
 <tr><td>
 <?php
         $tab_array = array();
-        $tabid = 0;
-        $tab_array[$tabid] = array(gettext("Snort Interfaces"), false, "/snort/snort_interfaces.php");
-        $tabid++;
-        $tab_array[$tabid] = array(gettext("If Settings"), false, "/snort/snort_interfaces_edit.php?id={$id}");
-        $tabid++;
-        $tab_array[$tabid] = array(gettext("Categories"), false, "/snort/snort_rulesets.php?id={$id}");
-        $tabid++;
-        $tab_array[$tabid] = array(gettext("Rules"), false, "/snort/snort_rules.php?id={$id}");
-        $tabid++;
-        $tab_array[$tabid] = array(gettext("Servers"), false, "/snort/snort_define_servers.php?id={$id}");
-        $tabid++;
-        $tab_array[$tabid] = array(gettext("Preprocessors"), false, "/snort/snort_preprocessors.php?id={$id}");
-        $tabid++;
-        $tab_array[$tabid] = array(gettext("Barnyard2"), true, "/snort/snort_barnyard.php?id={$id}");
+        $tab_array[] = array(gettext("Snort Interfaces"), false, "/snort/snort_interfaces.php");
+        $tab_array[] = array(gettext("If Settings"), false, "/snort/snort_interfaces_edit.php?id={$id}");
+        $tab_array[] = array(gettext("Categories"), false, "/snort/snort_rulesets.php?id={$id}");
+        $tab_array[] = array(gettext("Rules"), false, "/snort/snort_rules.php?id={$id}");
+        $tab_array[] = array(gettext("Servers"), false, "/snort/snort_define_servers.php?id={$id}");
+        $tab_array[] = array(gettext("Preprocessors"), false, "/snort/snort_preprocessors.php?id={$id}");
+        $tab_array[] = array(gettext("Barnyard2"), true, "/snort/snort_barnyard.php?id={$id}");
         display_top_tabs($tab_array);
 ?>
 </td></tr>
@@ -209,7 +184,7 @@ function enable_change(enable_change) {
 				Settings</td>
 			</tr>
 			<tr>
-				<td width="22%" valign="top" class="vncellreq2">Enable</td>
+				<td width="22%" valign="top" class="vncellreq">Enable</td>
 				<td width="78%" class="vtable">
 					<input name="barnyard_enable" type="checkbox" value="on" <?php if ($pconfig['barnyard_enable'] == "on") echo "checked"; ?>  onClick="enable_change(false)">
 					<strong>Enable Barnyard2 </strong><br>
@@ -219,7 +194,7 @@ function enable_change(enable_change) {
 				<td colspan="2" valign="top" class="listtopic">Mysql Settings</td>
 			</tr>
 			<tr>
-				<td width="22%" valign="top" class="vncell2">Log to a Mysql Database</td>
+				<td width="22%" valign="top" class="vncell">Log to a Mysql Database</td>
 				<td width="78%" class="vtable"><input name="barnyard_mysql"
 					type="text" class="formfld" id="barnyard_mysql" size="100"
 					value="<?=htmlspecialchars($pconfig['barnyard_mysql']);?>"> <br>
@@ -232,7 +207,7 @@ function enable_change(enable_change) {
 				<td colspan="2" valign="top" class="listtopic">Advanced Settings</td>
 			</tr>
 			<tr>
-				<td width="22%" valign="top" class="vncell2">Advanced configuration
+				<td width="22%" valign="top" class="vncell">Advanced configuration
 				pass through</td>
 				<td width="78%" class="vtable"><textarea name="barnconfigpassthru"
 					cols="100" rows="7" id="barnconfigpassthru" class="formpre"><?=htmlspecialchars($pconfig['barnconfigpassthru']);?></textarea>
@@ -256,9 +231,6 @@ function enable_change(enable_change) {
 
 </table>
 </form>
-
-</div>
-
 <script language="JavaScript">
 <!--
 enable_change(false);

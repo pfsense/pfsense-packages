@@ -30,7 +30,6 @@
  */
 
 require_once("guiconfig.inc");
-require_once("/usr/local/pkg/snort/snort_gui.inc");
 require_once("/usr/local/pkg/snort/snort.inc");
 
 global $g;
@@ -193,16 +192,16 @@ if ($input_errors) {
 }
 
 if ($savemsg) {
-	print_info_box2($savemsg);
+	print_info_box($savemsg);
 }
 
 if (file_exists($d_snortconfdirty_path)) {
 	echo '<p>';
 
 	if($savemsg) {
-		print_info_box_np2("{$savemsg}");
+		print_info_box_np("{$savemsg}");
 	}else{
-		print_info_box_np2('
+		print_info_box_np('
 			The Snort configuration has changed and snort needs to be restarted on this interface.<br>
 			You must apply the changes in order for them to take effect.<br>
 			');

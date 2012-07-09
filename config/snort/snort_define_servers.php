@@ -30,17 +30,8 @@
  POSSIBILITY OF SUCH DAMAGE.
  */
 
-/*
-
-TODO: Nov 12 09
-Clean this code up its ugly
-Important add error checking
-
-*/
-
 //require_once("globals.inc");
 require_once("guiconfig.inc");
-require_once("/usr/local/pkg/snort/snort_gui.inc");
 require_once("/usr/local/pkg/snort/snort.inc");
 
 global $g;
@@ -186,13 +177,10 @@ include_once("head.inc");
 <?php 
 include("fbegin.inc"); 
 if($pfsense_stable == 'yes'){echo '<p class="pgtitle">' . $pgtitle . '</p>';}
-
-echo "{$snort_general_css}\n";
 ?>
 
-<form action="snort_define_servers.php" method="post"
-	enctype="multipart/form-data" name="iform" id="iform"><?php
 
+<?php
 	/* Display Alert message */
 
 	if ($input_errors) {
@@ -200,29 +188,24 @@ echo "{$snort_general_css}\n";
 	}
 
 	if ($savemsg) {
-		print_info_box2($savemsg);
+		print_info_box($savemsg);
 	}
 
 	?>
 
+<form action="snort_define_servers.php" method="post"
+	enctype="multipart/form-data" name="iform" id="iform">
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
 <tr><td>
 <?php
         $tab_array = array();
-        $tabid = 0;
-        $tab_array[$tabid] = array(gettext("Snort Interfaces"), false, "/snort/snort_interfaces.php");
-        $tabid++;
-        $tab_array[$tabid] = array(gettext("If Settings"), false, "/snort/snort_interfaces_edit.php?id={$id}");
-        $tabid++;
-        $tab_array[$tabid] = array(gettext("Categories"), false, "/snort/snort_rulesets.php?id={$id}");
-        $tabid++;
-        $tab_array[$tabid] = array(gettext("Rules"), false, "/snort/snort_rules.php?id={$id}");
-        $tabid++;
-        $tab_array[$tabid] = array(gettext("Servers"), true, "/snort/snort_define_servers.php?id={$id}");
-        $tabid++;
-        $tab_array[$tabid] = array(gettext("Preprocessors"), false, "/snort/snort_preprocessors.php?id={$id}");
-        $tabid++;
-        $tab_array[$tabid] = array(gettext("Barnyard2"), false, "/snort/snort_barnyard.php?id={$id}");
+        $tab_array[] = array(gettext("Snort Interfaces"), false, "/snort/snort_interfaces.php");
+        $tab_array[] = array(gettext("If Settings"), false, "/snort/snort_interfaces_edit.php?id={$id}");
+        $tab_array[] = array(gettext("Categories"), false, "/snort/snort_rulesets.php?id={$id}");
+        $tab_array[] = array(gettext("Rules"), false, "/snort/snort_rules.php?id={$id}");
+        $tab_array[] = array(gettext("Servers"), true, "/snort/snort_define_servers.php?id={$id}");
+        $tab_array[] = array(gettext("Preprocessors"), false, "/snort/snort_preprocessors.php?id={$id}");
+        $tab_array[] = array(gettext("Barnyard2"), false, "/snort/snort_barnyard.php?id={$id}");
         display_top_tabs($tab_array);
 ?>
 </td></tr>
@@ -240,7 +223,7 @@ echo "{$snort_general_css}\n";
 				<td colspan="2" valign="top" class="listtopic">Define Servers</td>
 			</tr>
 			<tr>
-				<td width="22%" valign="top" class="vncell2">Define DNS_SERVERS</td>
+				<td width="22%" valign="top" class="vncell">Define DNS_SERVERS</td>
 				<td width="78%" class="vtable"><input name="def_dns_servers"
 					type="text" class="formfld" id="def_dns_servers" size="40"
 					value="<?=htmlspecialchars($pconfig['def_dns_servers']);?>"> <br>
@@ -248,7 +231,7 @@ echo "{$snort_general_css}\n";
 				blank to scan all networks.</span></td>
 			</tr>
 			<tr>
-				<td width="22%" valign="top" class="vncell2">Define DNS_PORTS</td>
+				<td width="22%" valign="top" class="vncell">Define DNS_PORTS</td>
 				<td width="78%" class="vtable"><input name="def_dns_ports"
 					type="text" class="formfld" id="def_dns_ports" size="40"
 					value="<?=htmlspecialchars($pconfig['def_dns_ports']);?>"> <br>
@@ -256,7 +239,7 @@ echo "{$snort_general_css}\n";
 				betwen "5060:5090 . Default is 53.</span></td>
 			</tr>
 			<tr>
-				<td width="22%" valign="top" class="vncell2">Define SMTP_SERVERS</td>
+				<td width="22%" valign="top" class="vncell">Define SMTP_SERVERS</td>
 				<td width="78%" class="vtable"><input name="def_smtp_servers"
 					type="text" class="formfld" id="def_smtp_servers" size="40"
 					value="<?=htmlspecialchars($pconfig['def_smtp_servers']);?>"> <br>
@@ -264,7 +247,7 @@ echo "{$snort_general_css}\n";
 				blank to scan all networks.</span></td>
 			</tr>
 			<tr>
-				<td width="22%" valign="top" class="vncell2">Define SMTP_PORTS</td>
+				<td width="22%" valign="top" class="vncell">Define SMTP_PORTS</td>
 				<td width="78%" class="vtable"><input name="def_smtp_ports"
 					type="text" class="formfld" id="def_smtp_ports" size="40"
 					value="<?=htmlspecialchars($pconfig['def_smtp_ports']);?>"> <br>
@@ -272,7 +255,7 @@ echo "{$snort_general_css}\n";
 				betwen "5060:5090 . Default is 25.</span></td>
 			</tr>
 			<tr>
-				<td width="22%" valign="top" class="vncell2">Define Mail_Ports</td>
+				<td width="22%" valign="top" class="vncell">Define Mail_Ports</td>
 				<td width="78%" class="vtable"><input name="def_mail_ports"
 					type="text" class="formfld" id="def_mail_ports" size="40"
 					value="<?=htmlspecialchars($pconfig['def_mail_ports']);?>"> <br>
@@ -280,7 +263,7 @@ echo "{$snort_general_css}\n";
 				betwen "5060:5090 . Default is 25,143,465,691.</span></td>
 			</tr>
 			<tr>
-				<td width="22%" valign="top" class="vncell2">Define HTTP_SERVERS</td>
+				<td width="22%" valign="top" class="vncell">Define HTTP_SERVERS</td>
 				<td width="78%" class="vtable"><input name="def_http_servers"
 					type="text" class="formfld" id="def_http_servers" size="40"
 					value="<?=htmlspecialchars($pconfig['def_http_servers']);?>"> <br>
@@ -288,7 +271,7 @@ echo "{$snort_general_css}\n";
 				blank to scan all networks.</span></td>
 			</tr>
 			<tr>
-				<td width="22%" valign="top" class="vncell2">Define WWW_SERVERS</td>
+				<td width="22%" valign="top" class="vncell">Define WWW_SERVERS</td>
 				<td width="78%" class="vtable"><input name="def_www_servers"
 					type="text" class="formfld" id="def_www_servers" size="40"
 					value="<?=htmlspecialchars($pconfig['def_www_servers']);?>"> <br>
@@ -296,7 +279,7 @@ echo "{$snort_general_css}\n";
 				blank to scan all networks.</span></td>
 			</tr>
 			<tr>
-				<td width="22%" valign="top" class="vncell2">Define HTTP_PORTS</td>
+				<td width="22%" valign="top" class="vncell">Define HTTP_PORTS</td>
 				<td width="78%" class="vtable"><input name="def_http_ports"
 					type="text" class="formfld" id="def_http_ports" size="40"
 					value="<?=htmlspecialchars($pconfig['def_http_ports']);?>"> <br>
@@ -304,7 +287,7 @@ echo "{$snort_general_css}\n";
 				betwen "5060:5090 . Default is 80.</span></td>
 			</tr>
 			<tr>
-				<td width="22%" valign="top" class="vncell2">Define SQL_SERVERS</td>
+				<td width="22%" valign="top" class="vncell">Define SQL_SERVERS</td>
 				<td width="78%" class="vtable"><input name="def_sql_servers"
 					type="text" class="formfld" id="def_sql_servers" size="40"
 					value="<?=htmlspecialchars($pconfig['def_sql_servers']);?>"> <br>
@@ -312,7 +295,7 @@ echo "{$snort_general_css}\n";
 				blank to scan all networks.</span></td>
 			</tr>
 			<tr>
-				<td width="22%" valign="top" class="vncell2">Define ORACLE_PORTS</td>
+				<td width="22%" valign="top" class="vncell">Define ORACLE_PORTS</td>
 				<td width="78%" class="vtable"><input name="def_oracle_ports"
 					type="text" class="formfld" id="def_oracle_ports" size="40"
 					value="<?=htmlspecialchars($pconfig['def_oracle_ports']);?>"> <br>
@@ -320,7 +303,7 @@ echo "{$snort_general_css}\n";
 				betwen "5060:5090 . Default is 1521.</span></td>
 			</tr>
 			<tr>
-				<td width="22%" valign="top" class="vncell2">Define MSSQL_PORTS</td>
+				<td width="22%" valign="top" class="vncell">Define MSSQL_PORTS</td>
 				<td width="78%" class="vtable"><input name="def_mssql_ports"
 					type="text" class="formfld" id="def_mssql_ports" size="40"
 					value="<?=htmlspecialchars($pconfig['def_mssql_ports']);?>"> <br>
@@ -328,7 +311,7 @@ echo "{$snort_general_css}\n";
 				betwen "5060:5090 . Default is 1433.</span></td>
 			</tr>
 			<tr>
-				<td width="22%" valign="top" class="vncell2">Define TELNET_SERVERS</td>
+				<td width="22%" valign="top" class="vncell">Define TELNET_SERVERS</td>
 				<td width="78%" class="vtable"><input name="def_telnet_servers"
 					type="text" class="formfld" id="def_telnet_servers" size="40"
 					value="<?=htmlspecialchars($pconfig['def_telnet_servers']);?>"> <br>
@@ -336,7 +319,7 @@ echo "{$snort_general_css}\n";
 				blank to scan all networks.</span></td>
 			</tr>
 			<tr>
-				<td width="22%" valign="top" class="vncell2">Define TELNET_PORTS</td>
+				<td width="22%" valign="top" class="vncell">Define TELNET_PORTS</td>
 				<td width="78%" class="vtable"><input name="def_telnet_ports"
 					type="text" class="formfld" id="def_telnet_ports" size="40"
 					value="<?=htmlspecialchars($pconfig['def_telnet_ports']);?>"> <br>
@@ -344,7 +327,7 @@ echo "{$snort_general_css}\n";
 				betwen "5060:5090 . Default is 23.</span></td>
 			</tr>
 			<tr>
-				<td width="22%" valign="top" class="vncell2">Define SNMP_SERVERS</td>
+				<td width="22%" valign="top" class="vncell">Define SNMP_SERVERS</td>
 				<td width="78%" class="vtable"><input name="def_snmp_servers"
 					type="text" class="formfld" id="def_snmp_servers" size="40"
 					value="<?=htmlspecialchars($pconfig['def_snmp_servers']);?>"> <br>
@@ -352,7 +335,7 @@ echo "{$snort_general_css}\n";
 				blank to scan all networks.</span></td>
 			</tr>
 			<tr>
-				<td width="22%" valign="top" class="vncell2">Define SNMP_PORTS</td>
+				<td width="22%" valign="top" class="vncell">Define SNMP_PORTS</td>
 				<td width="78%" class="vtable"><input name="def_snmp_ports"
 					type="text" class="formfld" id="def_snmp_ports" size="40"
 					value="<?=htmlspecialchars($pconfig['def_snmp_ports']);?>"> <br>
@@ -360,7 +343,7 @@ echo "{$snort_general_css}\n";
 				betwen "5060:5090 . Default is 161.</span></td>
 			</tr>
 			<tr>
-				<td width="22%" valign="top" class="vncell2">Define FTP_SERVERS</td>
+				<td width="22%" valign="top" class="vncell">Define FTP_SERVERS</td>
 				<td width="78%" class="vtable"><input name="def_ftp_servers"
 					type="text" class="formfld" id="def_ftp_servers" size="40"
 					value="<?=htmlspecialchars($pconfig['def_ftp_servers']);?>"> <br>
@@ -368,7 +351,7 @@ echo "{$snort_general_css}\n";
 				blank to scan all networks.</span></td>
 			</tr>
 			<tr>
-				<td width="22%" valign="top" class="vncell2">Define FTP_PORTS</td>
+				<td width="22%" valign="top" class="vncell">Define FTP_PORTS</td>
 				<td width="78%" class="vtable"><input name="def_ftp_ports"
 					type="text" class="formfld" id="def_ftp_ports" size="40"
 					value="<?=htmlspecialchars($pconfig['def_ftp_ports']);?>"> <br>
@@ -376,7 +359,7 @@ echo "{$snort_general_css}\n";
 				betwen "5060:5090 . Default is 21.</span></td>
 			</tr>
 			<tr>
-				<td width="22%" valign="top" class="vncell2">Define SSH_SERVERS</td>
+				<td width="22%" valign="top" class="vncell">Define SSH_SERVERS</td>
 				<td width="78%" class="vtable"><input name="def_ssh_servers"
 					type="text" class="formfld" id="def_ssh_servers" size="40"
 					value="<?=htmlspecialchars($pconfig['def_ssh_servers']);?>"> <br>
@@ -384,7 +367,7 @@ echo "{$snort_general_css}\n";
 				blank to scan all networks.</span></td>
 			</tr>
 			<tr>
-				<td width="22%" valign="top" class="vncell2">Define SSH_PORTS</td>
+				<td width="22%" valign="top" class="vncell">Define SSH_PORTS</td>
 				<td width="78%" class="vtable"><input name="def_ssh_ports"
 					type="text" class="formfld" id="def_ssh_ports" size="40"
 					value="<?=htmlspecialchars($pconfig['def_ssh_ports']);?>"> <br>
@@ -392,7 +375,7 @@ echo "{$snort_general_css}\n";
 				betwen "5060:5090 . Default is the firewall's SSH port.</span></td>
 			</tr>
 			<tr>
-				<td width="22%" valign="top" class="vncell2">Define POP_SERVERS</td>
+				<td width="22%" valign="top" class="vncell">Define POP_SERVERS</td>
 				<td width="78%" class="vtable"><input name="def_pop_servers"
 					type="text" class="formfld" id="def_pop_servers" size="40"
 					value="<?=htmlspecialchars($pconfig['def_pop_servers']);?>"> <br>
@@ -400,7 +383,7 @@ echo "{$snort_general_css}\n";
 				blank to scan all networks.</span></td>
 			</tr>
 			<tr>
-				<td width="22%" valign="top" class="vncell2">Define POP2_PORTS</td>
+				<td width="22%" valign="top" class="vncell">Define POP2_PORTS</td>
 				<td width="78%" class="vtable"><input name="def_pop2_ports"
 					type="text" class="formfld" id="def_pop2_ports" size="40"
 					value="<?=htmlspecialchars($pconfig['def_pop2_ports']);?>"> <br>
@@ -408,7 +391,7 @@ echo "{$snort_general_css}\n";
 				betwen "5060:5090 . Default is 109.</span></td>
 			</tr>
 			<tr>
-				<td width="22%" valign="top" class="vncell2">Define POP3_PORTS</td>
+				<td width="22%" valign="top" class="vncell">Define POP3_PORTS</td>
 				<td width="78%" class="vtable"><input name="def_pop3_ports"
 					type="text" class="formfld" id="def_pop3_ports" size="40"
 					value="<?=htmlspecialchars($pconfig['def_pop3_ports']);?>"> <br>
@@ -416,7 +399,7 @@ echo "{$snort_general_css}\n";
 				betwen "5060:5090 . Default is 110.</span></td>
 			</tr>
 			<tr>
-				<td width="22%" valign="top" class="vncell2">Define IMAP_SERVERS</td>
+				<td width="22%" valign="top" class="vncell">Define IMAP_SERVERS</td>
 				<td width="78%" class="vtable"><input name="def_imap_servers"
 					type="text" class="formfld" id="def_imap_servers" size="40"
 					value="<?=htmlspecialchars($pconfig['def_imap_servers']);?>"> <br>
@@ -424,7 +407,7 @@ echo "{$snort_general_css}\n";
 				blank to scan all networks.</span></td>
 			</tr>
 			<tr>
-				<td width="22%" valign="top" class="vncell2">Define IMAP_PORTS</td>
+				<td width="22%" valign="top" class="vncell">Define IMAP_PORTS</td>
 				<td width="78%" class="vtable"><input name="def_imap_ports"
 					type="text" class="formfld" id="def_imap_ports" size="40"
 					value="<?=htmlspecialchars($pconfig['def_imap_ports']);?>"> <br>
@@ -432,7 +415,7 @@ echo "{$snort_general_css}\n";
 				betwen "5060:5090 . Default is 143.</span></td>
 			</tr>
 			<tr>
-				<td width="22%" valign="top" class="vncell2">Define SIP_PROXY_IP</td>
+				<td width="22%" valign="top" class="vncell">Define SIP_PROXY_IP</td>
 				<td width="78%" class="vtable"><input name="def_sip_proxy_ip"
 					type="text" class="formfld" id="def_sip_proxy_ip" size="40"
 					value="<?=htmlspecialchars($pconfig['def_sip_proxy_ip']);?>"> <br>
@@ -440,7 +423,7 @@ echo "{$snort_general_css}\n";
 				blank to scan all networks.</span></td>
 			</tr>
 			<tr>
-				<td width="22%" valign="top" class="vncell2">Define SIP_PROXY_PORTS</td>
+				<td width="22%" valign="top" class="vncell">Define SIP_PROXY_PORTS</td>
 				<td width="78%" class="vtable"><input name="def_sip_proxy_ports"
 					type="text" class="formfld" id="def_sip_proxy_ports" size="40"
 					value="<?=htmlspecialchars($pconfig['def_sip_proxy_ports']);?>"> <br>
@@ -448,7 +431,7 @@ echo "{$snort_general_css}\n";
 				betwen "5060:5090 . Default is 5060:5090,16384:32768.</span></td>
 			</tr>			
 			<tr>
-				<td width="22%" valign="top" class="vncell2">Define SIP_SERVERS</td>
+				<td width="22%" valign="top" class="vncell">Define SIP_SERVERS</td>
 				<td width="78%" class="vtable"><input name="def_sip_servers"
 					type="text" class="formfld" id="def_sip_servers" size="40"
 					value="<?=htmlspecialchars($pconfig['def_sip_servers']);?>"> <br>
@@ -456,7 +439,7 @@ echo "{$snort_general_css}\n";
 				blank to scan all networks.</span></td>
 			</tr>
 			<tr>
-				<td width="22%" valign="top" class="vncell2">Define SIP_PORTS</td>
+				<td width="22%" valign="top" class="vncell">Define SIP_PORTS</td>
 				<td width="78%" class="vtable"><input name="def_sip_ports"
 					type="text" class="formfld" id="def_sip_ports" size="40"
 					value="<?=htmlspecialchars($pconfig['def_sip_ports']);?>"> <br>
@@ -464,7 +447,7 @@ echo "{$snort_general_css}\n";
 				betwen "5060:5090 . Default is 5060:5090,16384:32768.</span></td>
 			</tr>						
 			<tr>
-				<td width="22%" valign="top" class="vncell2">Define AUTH_PORTS</td>
+				<td width="22%" valign="top" class="vncell">Define AUTH_PORTS</td>
 				<td width="78%" class="vtable"><input name="def_auth_ports"
 					type="text" class="formfld" id="def_auth_ports" size="40"
 					value="<?=htmlspecialchars($pconfig['def_auth_ports']);?>"> <br>
@@ -472,7 +455,7 @@ echo "{$snort_general_css}\n";
 				betwen "5060:5090 . Default is 113.</span></td>
 			</tr>
 			<tr>
-				<td width="22%" valign="top" class="vncell2">Define FINGER_PORTS</td>
+				<td width="22%" valign="top" class="vncell">Define FINGER_PORTS</td>
 				<td width="78%" class="vtable"><input name="def_finger_ports"
 					type="text" class="formfld" id="def_finger_ports" size="40"
 					value="<?=htmlspecialchars($pconfig['def_finger_ports']);?>"> <br>
@@ -480,7 +463,7 @@ echo "{$snort_general_css}\n";
 				betwen "5060:5090 . Default is 79.</span></td>
 			</tr>
 			<tr>
-				<td width="22%" valign="top" class="vncell2">Define IRC_PORTS</td>
+				<td width="22%" valign="top" class="vncell">Define IRC_PORTS</td>
 				<td width="78%" class="vtable"><input name="def_irc_ports"
 					type="text" class="formfld" id="def_irc_ports" size="40"
 					value="<?=htmlspecialchars($pconfig['def_irc_ports']);?>"> <br>
@@ -488,7 +471,7 @@ echo "{$snort_general_css}\n";
 				betwen "5060:5090 . Default is 6665,6666,6667,6668,6669,7000.</span></td>
 			</tr>
 			<tr>
-				<td width="22%" valign="top" class="vncell2">Define NNTP_PORTS</td>
+				<td width="22%" valign="top" class="vncell">Define NNTP_PORTS</td>
 				<td width="78%" class="vtable"><input name="def_nntp_ports"
 					type="text" class="formfld" id="def_nntp_ports" size="40"
 					value="<?=htmlspecialchars($pconfig['def_nntp_ports']);?>"> <br>
@@ -496,7 +479,7 @@ echo "{$snort_general_css}\n";
 				betwen "5060:5090 . Default is 119.</span></td>
 			</tr>
 			<tr>
-				<td width="22%" valign="top" class="vncell2">Define RLOGIN_PORTS</td>
+				<td width="22%" valign="top" class="vncell">Define RLOGIN_PORTS</td>
 				<td width="78%" class="vtable"><input name="def_rlogin_ports"
 					type="text" class="formfld" id="def_rlogin_ports" size="40"
 					value="<?=htmlspecialchars($pconfig['def_rlogin_ports']);?>"> <br>
@@ -504,7 +487,7 @@ echo "{$snort_general_css}\n";
 				betwen "5060:5090 . Default is 513.</span></td>
 			</tr>
 			<tr>
-				<td width="22%" valign="top" class="vncell2">Define RSH_PORTS</td>
+				<td width="22%" valign="top" class="vncell">Define RSH_PORTS</td>
 				<td width="78%" class="vtable"><input name="def_rsh_ports"
 					type="text" class="formfld" id="def_rsh_ports" size="40"
 					value="<?=htmlspecialchars($pconfig['def_rsh_ports']);?>"> <br>
@@ -512,7 +495,7 @@ echo "{$snort_general_css}\n";
 				betwen "5060:5090 . Default is 514.</span></td>
 			</tr>
 			<tr>
-				<td width="22%" valign="top" class="vncell2">Define SSL_PORTS</td>
+				<td width="22%" valign="top" class="vncell">Define SSL_PORTS</td>
 				<td width="78%" class="vtable"><input name="def_ssl_ports"
 					type="text" class="formfld" id="def_ssl_ports" size="40"
 					value="<?=htmlspecialchars($pconfig['def_ssl_ports']);?>"> <br>
@@ -533,7 +516,7 @@ echo "{$snort_general_css}\n";
 				Please save your settings before you click start. </td>
 			</tr>
 		</table>
-
+</td></tr>
 </table>
 </form>
 <?php include("fend.inc"); ?>

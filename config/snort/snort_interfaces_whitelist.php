@@ -37,7 +37,6 @@
  */
 
 require_once("guiconfig.inc");
-require_once("/usr/local/pkg/snort/snort_gui.inc");
 require_once("/usr/local/pkg/snort/snort.inc");
 
 
@@ -76,16 +75,14 @@ include_once("head.inc");
 
 <?php
 include_once("fbegin.inc");
-echo $snort_general_css;
 ?>
 
-<div class="body2"><?if($pfsense_stable == 'yes'){echo '<p class="pgtitle">' . $pgtitle . '</p>';}?>
+<?if($pfsense_stable == 'yes'){echo '<p class="pgtitle">' . $pgtitle . '</p>';}?>
 
-<form action="/snort/snort_interfaces_whitelist.php" method="post"><?php if ($savemsg) print_info_box($savemsg); ?>
 <?php if (file_exists($d_whitelistdirty_path)): ?>
 <p><?php print_info_box_np("The white list has been changed.<br>You must apply the changes in order for them to take effect.");?>
 <?php endif; ?>
-
+<form action="/snort/snort_interfaces_whitelist.php" method="post"><?php if ($savemsg) print_info_box($savemsg); ?>
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
 <tr><td>
 <?php
@@ -104,7 +101,7 @@ echo $snort_general_css;
 	<tr>
 		<td class="tabcont">
 
-		<table width="100%" border="0" cellpadding="0" cellspacing="0">
+		<table width="100%" border="0" cellpadding="6" cellspacing="0">
 
 			<tr>
 				<td width="20%" class="listhdrr">File Name</td>
@@ -168,7 +165,7 @@ echo $snort_general_css;
 	</tr>
 </table>
 <br>
-<table class="tabcont" width="100%" border="0" cellpadding="0"
+<table width="100%" border="0" cellpadding="0"
 	cellspacing="0">
 	<td width="100%"><span class="vexpl"><span class="red"><strong>Note:</strong></span>
 	<p><span class="vexpl">Here you can create whitelist files for your
@@ -178,11 +175,7 @@ echo $snort_general_css;
 	Remember that the default whitelist only includes local networks.<br>
 	Be careful, it is very easy to get locked out of you system.</span></p></td>
 </table>
-
 </form>
-
-</div>
-
 <?php include("fend.inc"); ?>
 </body>
 </html>

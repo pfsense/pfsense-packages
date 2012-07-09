@@ -32,7 +32,6 @@ POSSIBILITY OF SUCH DAMAGE.
 
 $nocsrf = true;
 require_once("guiconfig.inc");
-require_once("/usr/local/pkg/snort/snort_gui.inc");
 require_once("/usr/local/pkg/snort/snort.inc");
 
 global $g;
@@ -134,9 +133,6 @@ include_once("head.inc");
 <body link="#000000" vlink="#000000" alink="#000000">
 
 <?php
-echo "{$snort_general_css}\n";
-echo "$snort_interfaces_css\n";
-
 include_once("fbegin.inc");
 if ($pfsense_stable == 'yes')
 	echo '<p class="pgtitle">' . $pgtitle . '</p>';
@@ -156,16 +152,16 @@ enable JavaScript to view this content
 		print_input_errors($input_errors); // TODO: add checks
 
 	if ($savemsg)
-		print_info_box2($savemsg);
+		print_info_box($savemsg);
 
 	//if (file_exists($d_snortconfdirty_path)) {
 	if ($d_snortconfdirty_path_ls != '') {
 		echo '<p>';
 
 		if($savemsg)
-			print_info_box_np2("{$savemsg}");
+			print_info_box_np("{$savemsg}");
 		else {
-			print_info_box_np2('
+			print_info_box_np('
 			The Snort configuration has changed for one or more interfaces.<br>
 			You must apply the changes in order for them to take effect.<br>
 			');
@@ -239,7 +235,7 @@ enable JavaScript to view this content
 						title="click to toggle start/stop snort"></a>
 					<input type="checkbox" id="frc<?=$nnats;?>" name="rule[]" value="<?=$i;?>" onClick="fr_bgcolor('<?=$nnats;?>')" style="margin: 0; padding: 0;"></td>
 				<td class="listt" align="center"></td>
-				<td class="<?=$class_color_up;?>" onClick="fr_toggle(<?=$nnats;?>)"
+				<td class="listr" onClick="fr_toggle(<?=$nnats;?>)"
 					id="frd<?=$nnats;?>"
 					ondblclick="document.location='snort_interfaces_edit.php?id=<?=$nnats;?>';">
 					<?php
@@ -291,7 +287,7 @@ enable JavaScript to view this content
 					}
 
 					?>
-				<td class="<?=$class_color_upb;?>" onClick="fr_toggle(<?=$nnats;?>)"
+				<td class="listr" onClick="fr_toggle(<?=$nnats;?>)"
 					id="frd<?=$nnats;?>"
 					ondblclick="document.location='snort_interfaces_edit.php?id=<?=$nnats;?>';">
 					<?php
@@ -303,7 +299,7 @@ enable JavaScript to view this content
 						$check_snortbarnyardlog = strtoupper(disabled);
 					}
 					?> <?php echo "$check_snortbarnyardlog";?></td>
-				<td class="listbg3" onClick="fr_toggle(<?=$nnats;?>)"
+				<td class="listbg" onClick="fr_toggle(<?=$nnats;?>)"
 					ondblclick="document.location='snort_interfaces_edit.php?id=<?=$nnats;?>';">
 				<font color="#ffffff"> <?=htmlspecialchars($natent['descr']);?>&nbsp;
 				</td>
@@ -388,7 +384,6 @@ enable JavaScript to view this content
 </form>
 <?php
 include("fend.inc");
-echo $snort_custom_rnd_box;
 ?>
 </body>
 </html>

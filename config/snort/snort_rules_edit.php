@@ -39,7 +39,6 @@
 
 require_once("guiconfig.inc");
 require_once("/usr/local/pkg/snort/snort.inc");
-require_once("/usr/local/pkg/snort/snort_gui.inc");
 
 if (!is_array($config['installedpackages']['snortglobal']['rule'])) {
 	$config['installedpackages']['snortglobal']['rule'] = array();
@@ -136,20 +135,20 @@ $pgtitle = array(gettext("Advanced"), gettext("File Editor"));
 <?php include("head.inc");?>
 
 <body link="#000000" vlink="#000000" alink="#000000">
-<form action="snort_rules_edit.php" method="post">
 	<?php if ($savemsg) print_info_box($savemsg); ?>
+<?php include("fbegin.inc");?>
+
+<form action="snort_rules_edit.php" method="post">
+<input type='hidden' name='id' value='<?=$id;?>' />
+<input type='hidden' name='ids' value='<?=$ids;?>' />
+<input type='hidden' name='openruleset' value='<?=$file;?>' />
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
 <tr>
 	<td class="tabcont">
-
-
-		<table width="100%" cellpadding="9" cellspacing="9" bgcolor="#eeeeee">
+		<table width="100%" cellpadding="0" cellspacing="6" bgcolor="#eeeeee">
 		<tr>
 			<td>
 				<input name="save" type="submit" class="formbtn" id="save" value="save" />
-				<input type='hidden' name='id' value='<?=$id;?>' />
-				<input type='hidden' name='ids' value='<?=$ids;?>' />
-				<input type='hidden' name='openruleset' value='<?=$file;?>' />
 				<input type="button" class="formbtn" value="Cancel" onclick="window.close()">
 				<hr noshade="noshade" />
 				Disable original rule :<br/>
@@ -162,19 +161,13 @@ $pgtitle = array(gettext("Advanced"), gettext("File Editor"));
 		</tr>
 		<tr> 
 			<td valign="top" class="label"> 
-			<textarea wrap="off" style="width: 98%; margin: 7px;" 
-			class="<?php echo $language; ?>:showcolumns" rows="3" 
-			cols="66" name="code"><?=$splitcontents[$lineid];?></textarea>
-			</div> 
+			<textarea wrap="off" cols="90" rows="3" name="code"><?=$splitcontents[$lineid];?></textarea>
 			</td> 
 		</tr> 
 		<tr>
 			<td valign="top" class="label">
 			<div style="background: #eeeeee;" id="textareaitem"><!-- NOTE: The opening *and* the closing textarea tag must be on the same line. -->
-			<textarea disabled
-				wrap="off" style="width: 98%; margin: 7px;"
-				class="<?php echo $language; ?>:showcolumns" rows="33"
-				cols="66" name="code2"><?=$contents;?></textarea>
+			<textarea disabled wrap="off" rows="33" cols="90" name="code2"><?=$contents;?></textarea>
 			</div>
 			</td>
 		</tr>
