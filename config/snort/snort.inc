@@ -252,18 +252,19 @@ function Running_Ck_b($snort_uuid, $if_real, $id) {
 function Running_Stop($snort_uuid, $if_real, $id) {
 	global $config, $g;
 
-	if (isvalidpid("{$g['varrun_path']}/snort_{$if_real}{$snort_uuid}.pid")) {
+	if (file_exists("{$g['varrun_path']}/snort_{$if_real}{$snort_uuid}.pid") && isvalidpid("{$g['varrun_path']}/snort_{$if_real}{$snort_uuid}.pid")) {
 		killbypid("{$g['varrun_path']}/snort_{$if_real}{$snort_uuid}.pid");
 		exec("/bin/rm {$g['varrun_path']}/snort_{$if_real}{$snort_uuid}.pid");
 	}
 
-	if (isvalidpid("{$g['varrun_path']}/barnyard2_{$if_real}{$snort_uuid}.pid")) {
+	if (file_exists("{$g['varrun_path']}/barnyard2_{$if_real}{$snort_uuid}.pid") && isvalidpid("{$g['varrun_path']}/barnyard2_{$if_real}{$snort_uuid}.pid")) {
 		killbypid("{$g['varrun_path']}/barnyard2_{$if_real}{$snort_uuid}.pid");
 		exec("/bin/rm {$g['varrun_path']}/barnyard2_{$snort_uuid}_{$if_real}*");
 	}
 
+	$snortconf = $config['installedpackages']['snortglobal']['rule'][$id];
 	/* Log Iface stop */
-	exec("/usr/bin/logger -p daemon.info -i -t SnortStartup 'Interface Rule STOP for {$snort_uuid}_{$if_real}...'");
+	exec("/usr/bin/logger -p daemon.info -i -t SnortStartup 'Interface Rule STOP for {$snortconf['descr']}({$snort_uuid}_{$if_real})...'");
 	sleep(2); // Give time so GUI displays correctly
 }
 
@@ -272,21 +273,20 @@ function Running_Start($snort_uuid, $if_real, $id) {
 
 	$snortdir = SNORTDIR;
 
-	$snort_info_chk = $config['installedpackages']['snortglobal']['rule'][$id]['enable'];
-	if ($snort_info_chk == 'on')
+	$snortconf = $config['installedpackages']['snortglobal']['rule'][$id];
+
+	if ($snortconf['enable'] == 'on')
 		exec("/usr/local/bin/snort -R {$snort_uuid} -D -q -l /var/log/snort/snort_{$if_real}{$snort_uuid} --pid-path {$g['varrun_path']} --nolock-pidfile -G {$snort_uuid} -c {$snortdir}/snort_{$snort_uuid}_{$if_real}/snort.conf -i {$if_real}");
 	else
 		return;
 
 	/* define snortbarnyardlog_chk */
 	/* top will have trouble if the uuid is to far back */
-	$snortbarnyardlog_info_chk = $config['installedpackages']['snortglobal']['rule'][$id]['barnyard_enable'];
-	$snortbarnyardlog_mysql_info_chk = $config['installedpackages']['snortglobal']['rule'][$id]['barnyard_mysql'];
-	if ($snortbarnyardlog_info_chk == 'on' && $snortbarnyardlog_mysql_info_chk != '')
+	if ($snortconf['barnyard_enable'] == 'on' && !empty($snortconf['barnyard_mysql']))
 		exec("/usr/local/bin/barnyard2 -r {$snort_uuid} -f \"snort_{$snort_uuid}_{$if_real}.u2\" --pid-path {$g['varrun_path']} --nolock-pidfile -c {$snortdir}/snort_{$snort_uuid}_{$if_real}/barnyard2.conf -d /var/log/snort/snort_{$if_real}{$snort_uuid} -D -q");
 
 	/* Log Iface stop */
-	exec("/usr/bin/logger -p daemon.info -i -t SnortStartup 'Interface Rule START for {$id}_{$snort_uuid}_{$if_real}...'");
+	exec("/usr/bin/logger -p daemon.info -i -t SnortStartup 'Interface Rule START for {$snortconf['descr']}({$snort_uuid}_{$if_real})...'");
 	sleep(2); // Give time so GUI displays correctly
 }
 
@@ -692,7 +692,7 @@ function sync_snort_package_config()
 				create_snort_suppress($id, $if_real);
 
 			/* create snort configuration file */
-			create_snort_conf($id, $if_real, $snort_uuid);
+			snort_create_conf($id, $if_real, $snort_uuid);
 
 			/* if rules exist cp rules to each iface */
 			create_rules_iface($id, $if_real, $snort_uuid);
@@ -1036,18 +1036,20 @@ EOD;
 	return $barnyard2_conf_text;
 }
 
-function create_snort_conf($id, $if_real, $snort_uuid) {
+function snort_create_conf($id, $if_real, $snort_uuid) {
 	global $config, $g;
 
 	$snortdir = SNORTDIR;
 
 	if (!empty($if_real) && !empty($snort_uuid)) {
 		if (!is_dir("{$snortdir}/snort_{$snort_uuid}_{$if_real}")) {
+			if (file_exists("{$snortdir}/snort_{$snort_uuid}_{$if_real}"))
+				@unlink("{$snortdir}/snort_{$snort_uuid}_{$if_real}");
 			exec("/bin/mkdir -p {$snortdir}/snort_{$snort_uuid}_{$if_real}");
 			@touch("{$snortdir}/snort_{$snort_uuid}_{$if_real}/snort.conf");
 		}
 
-		$snort_conf_text = generate_snort_conf($id, $if_real, $snort_uuid);
+		$snort_conf_text = snort_generate_conf($id, $if_real, $snort_uuid);
 		if (empty($snort_conf_text))
 			return;
 
@@ -1116,7 +1118,7 @@ function snort_deinstall() {
 		unset($config['installedpackages']['snortglobal']);
 }
 
-function generate_snort_conf($id, $if_real, $snort_uuid) {
+function snort_generate_conf($id, $if_real, $snort_uuid) {
 	global $config, $g, $snort_pfsense_basever;
 
 	$snortdir = SNORTDIR;
@@ -1895,10 +1897,10 @@ dynamicdetection directory /usr/local/lib/snort/dynamicrules
                   #
 ###################
 
-preprocessor frag3_global {$snortdir}: max_frags 8192
+preprocessor frag3_global: max_frags 8192
 preprocessor frag3_engine: policy bsd detect_anomalies
 
-preprocessor stream5_global {$snortdir}: track_tcp yes, track_udp yes, track_icmp yes
+preprocessor stream5_global: track_tcp yes, track_udp yes, track_icmp yes
 
 preprocessor stream5_tcp: policy BSD, ports both all, {$def_max_queued_bytes_type}{$def_max_queued_segs_type}
 preprocessor stream5_udp:

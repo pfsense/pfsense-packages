@@ -156,10 +156,10 @@ include_once("head.inc");
 
 						if ($update_logfile_chk == 'yes') {
 							echo "
-				<button href="/snort/snort_rules_edit.php?openruleset={$snortdir}/snort_update.log"><span class="pwhitetxt">Update Log&nbsp;&nbsp;&nbsp;&nbsp;</span></button>\n";
+				<button href='/snort/snort_rules_edit.php?openruleset={$snortdir}/snort_update.log'><span class='pwhitetxt'>Update Log&nbsp;&nbsp;&nbsp;&nbsp;</span></button>\n";
 						}else{
 							echo "
-				<button disabled="disabled" href="/snort/snort_rules_edit.php?openruleset={$snortdir}/snort_update.log"><span class="pwhitetxt">Update Log&nbsp;&nbsp;&nbsp;&nbsp;</span></button>\n";
+				<button disabled='disabled' href='/snort/snort_rules_edit.php?openruleset={$snortdir}/snort_update.log'><span class='pwhitetxt'>Update Log&nbsp;&nbsp;&nbsp;&nbsp;</span></button>\n";
 						}
 							
 				?>
