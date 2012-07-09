@@ -35,7 +35,7 @@
 require_once("guiconfig.inc");
 require_once("/usr/local/pkg/snort/snort.inc");
 
-global $g;
+global $g, $snortdir;
 
 /* load only javascript that is needed */
 $snort_load_jquery = 'yes';
@@ -45,16 +45,16 @@ $emergingthreats = $config['installedpackages']['snortglobal']['emergingthreats'
 
 /* quick md5s chk */
 $snort_org_sig_chk_local = 'N/A';
-if (file_exists("/usr/local/etc/snort/{$snort_rules_file}.md5"))
-	$snort_org_sig_chk_local = file_get_contents("/usr/local/etc/snort/{$snort_rules_file}.md5");
+if (file_exists("{$snortdir}/{$snort_rules_file}.md5"))
+	$snort_org_sig_chk_local = file_get_contents("{$snortdir}/{$snort_rules_file}.md5");
 
 $emergingt_net_sig_chk_local = 'N/A';
-if (file_exists('/usr/local/etc/snort/emerging.rules.tar.gz.md5'))
-	$emergingt_net_sig_chk_local = file_get_contents("/usr/local/etc/snort/emerging.rules.tar.gz.md5");
+if (file_exists("{$snortdir}/emerging.rules.tar.gz.md5"))
+	$emergingt_net_sig_chk_local = file_get_contents("{$snortdir}/emerging.rules.tar.gz.md5");
 
 /* check for logfile */
 $update_logfile_chk = 'no';
-if (file_exists('/usr/local/etc/snort/snort_update.log'))
+if (file_exists("{$snortdir}/snort_update.log"))
 	$update_logfile_chk = 'yes';
 
 $pgtitle = "Services: Snort: Updates";
@@ -153,11 +153,11 @@ include_once("head.inc");
 				<?php
 
 						if ($update_logfile_chk == 'yes') {
-							echo '
-				<button href="/snort/snort_rules_edit.php?openruleset=/usr/local/etc/snort/snort_update.log"><span class="pwhitetxt">Update Log&nbsp;&nbsp;&nbsp;&nbsp;</span></button>' . "\n";
+							echo "
+				<button href="/snort/snort_rules_edit.php?openruleset={$snortdir}/snort_update.log"><span class="pwhitetxt">Update Log&nbsp;&nbsp;&nbsp;&nbsp;</span></button>\n";
 						}else{
-							echo '
-				<button disabled="disabled" href="/snort/snort_rules_edit.php?openruleset=/usr/local/etc/snort/snort_update.log"><span class="pwhitetxt">Update Log&nbsp;&nbsp;&nbsp;&nbsp;</span></button>' . "\n";
+							echo "
+				<button disabled="disabled" href="/snort/snort_rules_edit.php?openruleset={$snortdir}/snort_update.log"><span class="pwhitetxt">Update Log&nbsp;&nbsp;&nbsp;&nbsp;</span></button>\n";
 						}
 							
 				?>

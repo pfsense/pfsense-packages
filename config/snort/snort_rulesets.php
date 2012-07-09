@@ -32,7 +32,7 @@
 require_once("guiconfig.inc");
 require_once("/usr/local/pkg/snort/snort.inc");
 
-global $g;
+global $g, $snortdir;
 
 if (!is_array($config['installedpackages']['snortglobal']['rule'])) {
 	$config['installedpackages']['snortglobal']['rule'] = array();
@@ -63,9 +63,9 @@ $pgtitle = "Snort: Interface $id $iface_uuid $if_real Categories";
 
 /* Check if the rules dir is empy if so warn the user */
 /* TODO give the user the option to delete the installed rules rules */
-$isrulesfolderempty = exec("ls -A /usr/local/etc/snort/snort_{$iface_uuid}_{$if_real}/rules/*.rules");
+$isrulesfolderempty = exec("ls -A {$snortdir}/snort_{$iface_uuid}_{$if_real}/rules/*.rules");
 if ($isrulesfolderempty == "") {
-	$isrulesfolderempty = exec("ls -A /usr/local/etc/snort/rules/*.rules");
+	$isrulesfolderempty = exec("ls -A {$snortdir}/rules/*.rules");
 	if ($isrulesfolderempty == "") {
 		include_once("head.inc");
 		include("fbegin.inc");
@@ -104,7 +104,7 @@ if ($isrulesfolderempty == "") {
 					<table id=\"maintable\" class=\"tabcont\" width=\"100%\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\">\n
 						<tr>\n
 							<td>\n
-		# The rules directory is empty. /usr/local/etc/snort/snort_{$iface_uuid}_{$if_real}/rules \n
+		# The rules directory is empty. {$snortdir}/snort_{$iface_uuid}_{$if_real}/rules \n
 						</td>\n
 						</tr>\n
 					</table>\n
@@ -126,7 +126,7 @@ if ($isrulesfolderempty == "") {
 		exit(0);
 	} else {
 		/* Make sure that we have the rules */
-		mwexec("/bin/cp /usr/local/etc/snort/rules/*.rules /usr/local/etc/snort/snort_{$iface_uuid}_{$if_real}/rules", true);
+		mwexec("/bin/cp {$snortdir}/rules/*.rules {$snortdir}/snort_{$iface_uuid}_{$if_real}/rules", true);
 	}
 }
 
@@ -232,9 +232,8 @@ if (file_exists($d_snortconfdirty_path)) {
 						<td class="listhdrr"><?php if($snort_arch == 'x86'){echo 'Ruleset: Rules that end with "so.rules" are shared object rules.';}else{echo 'Shared object rules are "so.rules" and not available on 64 bit architectures.';}?></td>
 						<!-- <td class="listhdrr">Description</td> -->
 					</tr>
-					<?php
-					$dir = "/usr/local/etc/snort/snort_{$iface_uuid}_{$if_real}/rules/";
-					$dh  = opendir($dir);
+				<?php
+					$dh  = opendir("{$snortdir}/snort_{$iface_uuid}_{$if_real}/rules/");
 					while (false !== ($filename = readdir($dh))) {
 						$files[] = basename($filename);
 					}
@@ -255,14 +254,10 @@ if (file_exists($d_snortconfdirty_path)) {
 						echo "	\n<input type='checkbox' name='toenable[]' value='$file' {$CHECKED} />\n";
 						echo "</td>\n";
 						echo "<td>\n";
-						echo "<a href='snort_rules.php?id={$id}&openruleset=/usr/local/etc/snort/snort_{$iface_uuid}_{$if_real}/rules/" . urlencode($file) . "'>{$file}</a>\n";
+						echo "<a href='snort_rules.php?id={$id}&openruleset={$snortdir}/snort_{$iface_uuid}_{$if_real}/rules/" . urlencode($file) . "'>{$file}</a>\n";
 						echo "</td>\n</tr>\n\n";
-						//echo "<td>";
-						//echo "description";
-						//echo "</td>";
 					}
-
-					?>
+				?>
 				</table>
 				</td>
 			</tr>
@@ -284,7 +279,6 @@ if (file_exists($d_snortconfdirty_path)) {
 	</tr>
 </table>
 </form>
-<p><b>NOTE:</b> You can click on a ruleset name to edit the ruleset.</p>
 <?php
 include("fend.inc");
 ?>

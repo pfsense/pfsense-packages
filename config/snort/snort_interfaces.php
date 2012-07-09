@@ -34,7 +34,7 @@ $nocsrf = true;
 require_once("guiconfig.inc");
 require_once("/usr/local/pkg/snort/snort.inc");
 
-global $g;
+global $g, $snortdir;
 
 $id = $_GET['id'];
 if (isset($_POST['id']))
@@ -57,7 +57,7 @@ if (isset($_POST['del_x'])) {
 
 			Running_Stop($snort_uuid,$if_real, $rulei);
 			exec("/bin/rm -r /var/log/snort/snort_{$if_real}{$snort_uuid}");
-			exec("/bin/rm -r /usr/local/etc/snort/snort_{$snort_uuid}_{$if_real}");
+			exec("/bin/rm -r {$snortdir}/snort_{$snort_uuid}_{$if_real}");
 
 			unset($a_nat[$rulei]);
 		}

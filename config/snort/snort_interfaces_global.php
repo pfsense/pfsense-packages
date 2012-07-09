@@ -37,7 +37,7 @@
 require_once("guiconfig.inc");
 require_once("/usr/local/pkg/snort/snort.inc");
 
-global $g;
+global $g, $snortdir;
 
 $d_snort_global_dirty_path = '/var/run/snort_global.dirty';
 
@@ -119,7 +119,7 @@ if (!$input_errors) {
 if ($_POST["Reset"]) {
 
 	function snort_deinstall_settings() {
-		global $config, $g, $id, $if_real;
+		global $config, $g, $id, $if_real, $snortdir;
 
 		exec("/usr/usr/bin/killall snort");
 		sleep(2);
@@ -164,7 +164,7 @@ if ($_POST["Reset"]) {
 		unset($config['installedpackages']['snortglobal']);
 
 		/* remove all snort iface dir */
-		exec('rm -r /usr/local/etc/snort/snort_*');
+		exec("rm -r {$snortdir}/snort_*");
 		exec('rm /var/log/snort/*');
 	}
 
