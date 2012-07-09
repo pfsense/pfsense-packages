@@ -425,7 +425,7 @@ function enable_change(enable_change) {
 			$snortInterfaces = array(); /* -gtm  */
 
 			$if_list = $config['installedpackages']['snortglobal']['rule'][$id]['interface'];
-			$if_array = split(',', $if_list);
+			$if_array = explode(',', $if_list);
 			if($if_array) {
 				foreach($if_array as $iface2) {
 					/* build a list of user specified interfaces -gtm */

@@ -156,7 +156,7 @@ if ($_POST["Submit"]) {
 
 $enabled_rulesets = $a_nat[$id]['rulesets'];
 if($enabled_rulesets)
-	$enabled_rulesets_array = split("\|\|", $enabled_rulesets);
+	$enabled_rulesets_array = explode("||", $enabled_rulesets);
 
 include_once("head.inc");
 
