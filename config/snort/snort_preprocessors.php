@@ -131,7 +131,7 @@ include_once("head.inc");
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">
 
 <?php include("fbegin.inc"); ?>
-<?php if($pfsense_stable == 'yes'){echo '<p class="pgtitle">' . $pgtitle . '</p>';}?>
+<?php if($pfsense_stable == 'yes'){echo '<p class="pgtitle">' . $pgtitle . '</p>';}
 
 
 	/* Display Alert message */
@@ -162,7 +162,7 @@ include_once("head.inc");
         display_top_tabs($tab_array);
 ?>
 </td></tr>
-</table>
+<tr><td class="tabcont">
 <table width="100%" border="0" cellpadding="6" cellspacing="0">
 	<tr>
 		<td width="22%" valign="top">&nbsp;</td>
@@ -333,6 +333,7 @@ include_once("head.inc");
 				Please save your settings before you click Start. </td>
 			</tr>
 </table>
+</td></tr></table>
 </form>
 <?php include("fend.inc"); ?>
 </body>
