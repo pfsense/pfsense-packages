@@ -32,7 +32,13 @@ require_once("util.inc");
 require("globals.inc");
 #require("guiconfig.inc");
 
-$uname=posix_uname();
+$pf_version=substr(trim(file_get_contents("/etc/version")),0,3);
+if ($pf_version > 2.0)
+        define('DANSGUARDIAN_DIR', '/usr/pbi/dansguardian-' . php_uname("m"));
+else
+  define('DANSGUARDIAN_DIR', '/usr/local');
+
+  $uname=posix_uname();
 if ($uname['machine']=='amd64')
         ini_set('memory_limit', '250M');
 
@@ -423,7 +429,7 @@ function sync_package_dansguardian() {
 		file_put_contents($dansguardian_dir."/lists/logsitelist.".$dansguardian_site['name'],($dansguardian_site['urlsite_enabled']?dg_text_area_decode($config['installedpackages']['dansguardiansiteacl']['config'][$count]['log_sitelist']):""),LOCK_EX);	
 		$count++;
 	}	
-	
+
 	#URL ACL
 	#create a default setup if not exists
 	if (!is_array($config['installedpackages']['dansguardianurlacl']['config']))
@@ -682,11 +688,12 @@ function sync_package_dansguardian() {
 		$dansguardian_log['report_file']=base64_encode($report_file);
 		$load_samples++;
 	}
+	
 	#exception ip list
 	#create a default setup if not exists
 	if (!is_array($config['installedpackages']['dansguardianips']['config']))
-		$config['installedpackages']['dansguardianips']['config'][0]=array();
-	if($config['installedpackages']['dansguardianips']['config'][0]['exceptioniplist']){
+		$config['installedpackages']['dansguardianips']['config'][0]=array("exceptioniplist" => "");
+	if($config['installedpackages']['dansguardianips']['config'][0]['exceptioniplist'] == "" && file_exists ($dansguardian_dir.'/lists/exceptioniplist.sample')){
 		$config['installedpackages']['dansguardianips']['config'][0]['exceptioniplist']=base64_encode(file_get_contents($dansguardian_dir.'/lists/exceptioniplist.sample'));
 		$load_samples++;
 	}
