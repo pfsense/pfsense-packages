@@ -70,10 +70,10 @@ if (isset($_POST['del_x'])) {
 	  
 		/* if there are no ifaces do not create snort.sh */
 		if (!empty($config['installedpackages']['snortglobal']['rule']))
-			create_snort_sh();
+			snort_create_rc();
 		else {
 			conf_mount_rw();
-			exec('/bin/rm /usr/local/etc/rc.d/snort.sh');
+			@unlink('/usr/local/etc/rc.d/snort.sh');
 			conf_mount_ro();
 		}
 	  
@@ -275,24 +275,21 @@ if ($pfsense_stable == 'yes')
 
 					$color2_upb = Running_Ck_b($snort_uuid, $if_real, $id);
 
-					if ($color2_upb == 'yes') {
-						$class_color_upb = 'listbg2';
-					}else{
-						$class_color_upb = 'listbg';
-					}
+					if ($color2_upb == 'yes')
+						$color_status = 'listr';
+					else
+						$color_status = 'listbg';
 
 					?>
-				<td class="listr" onClick="fr_toggle(<?=$nnats;?>)"
+				<td class="<?=$color_status;?>" onClick="fr_toggle(<?=$nnats;?>)"
 					id="frd<?=$nnats;?>"
 					ondblclick="document.location='snort_interfaces_edit.php?id=<?=$nnats;?>';">
 					<?php
 					$check_snortbarnyardlog_info = $config['installedpackages']['snortglobal']['rule'][$nnats]['barnyard_enable'];
 					if ($check_snortbarnyardlog_info == "on")
-					{
 						$check_snortbarnyardlog = strtoupper(enabled);
-					}else{
+					else
 						$check_snortbarnyardlog = strtoupper(disabled);
-					}
 					?> <?php echo "$check_snortbarnyardlog";?></td>
 				<td class="listbg" onClick="fr_toggle(<?=$nnats;?>)"
 					ondblclick="document.location='snort_interfaces_edit.php?id=<?=$nnats;?>';">

@@ -656,8 +656,7 @@ function snort_rules_up_install_cron($should_install) {
 }
 
 /* Only run when all ifaces needed to sync. Expects filesystem rw */
-function sync_snort_package_config()
-{
+function sync_snort_package_config() {
 	global $config, $g;
 
 	/* RedDevil suggested code */
@@ -704,7 +703,31 @@ function sync_snort_package_config()
 	}
 
 	/* create snort bootup file snort.sh only create once */
-	create_snort_sh();
+	snort_create_rc();
+
+	if (is_array($config['installedpackages']['snortglobal'])) {
+		$snort_snortloglimit_info_ck = $config['installedpackages']['snortglobal']['snortloglimit'];
+		snort_snortloglimit_install_cron($snort_snortloglimit_info_ck == 'ok' ? true : false);
+ 
+                /* set the snort block hosts time IMPORTANT */
+                $snort_rm_blocked_info_ck = $config['installedpackages']['snortglobal']['rm_blocked'];
+                if ($snort_rm_blocked_info_ck == "never_b")
+                        $snort_rm_blocked_false = false;
+                else
+                        $snort_rm_blocked_false = true;
+ 
+                snort_rm_blocked_install_cron($snort_rm_blocked_false);
+ 
+                /* set the snort rules update time */
+                $snort_rules_up_info_ck = $config['installedpackages']['snortglobal']['autorulesupdate7'];
+                if ($snort_rules_up_info_ck == "never_up")
+                        $snort_rules_up_false = false;
+                else
+                        $snort_rules_up_false = true;
+ 
+                snort_rules_up_install_cron($snort_rules_up_false);
+		configure_cron();
+	}
 
 	/* all new files are for the user snort nologin */
 	if (!is_dir('/var/log/snort'))
@@ -819,7 +842,7 @@ function create_snort_externalnet($id, $if_real) {
 }
 
 /* open snort.sh for writing" */
-function create_snort_sh() {
+function snort_create_rc() {
 	global $config, $g;
 
 	$snortdir = SNORTDIR;
@@ -861,8 +884,8 @@ EOE;
         fi
 
 EOE;
-		if ($value['barnyard_enable'] == 'on' && $value['barnyard_mysql'] != '')
-			$start_barnyard2 = $start_barnyard2;
+		if ($value['barnyard_enable'] == 'on' && !empty($value['barnyard_mysql']))
+			$start_barnyard2 = $start_barnyard;
 		else
 			$start_barnyard2 = $stop_barnyard2;
 
@@ -992,11 +1015,11 @@ function generate_barnyard2_conf($id, $if_real, $snort_uuid) {
 
 	/* define snortbarnyardlog */
 	/* TODO: add support for the other 5 output plugins */
-
-	$snortbarnyardlog_database_info_chk = $config['installedpackages']['snortglobal']['rule'][$id]['barnyard_mysql'];
+	$snortconf = $config['installedpackages']['snortglobal']['rule'][$id];
+	$snortbarnyardlog_database_info_chk = $snortconf['barnyard_mysql'];
 	$snortbarnyardlog_hostname_info_chk = exec("/bin/hostname");
 	/* user add arguments */
-	$snortbarnyardlog_config_pass_thru = str_replace("\r", "", base64_decode($config['installedpackages']['snortglobal']['rule'][$id]['barnconfigpassthru']));
+	$snortbarnyardlog_config_pass_thru = str_replace("\r", "", base64_decode($snortconf['barnconfigpassthru']));
 
 	$barnyard2_conf_text = <<<EOD
 

@@ -47,8 +47,6 @@ $a_suppress = &$config['installedpackages']['snortglobal']['suppress']['item'];
 $id = $_GET['id'];
 if (isset($_POST['id']))
 	$id = $_POST['id'];
-if (!is_numeric($id))
-	$id = 0; // XXX: safety belt
 
 
 /* gen uuid for each iface */
@@ -158,7 +156,9 @@ include("fbegin.inc");
 	}
 
 ?>
-<form action="/snort/snort_interfaces_suppress_edit.php?id=<?=$id?>" name="iform" id="iform">
+<form action="/snort/snort_interfaces_suppress_edit.php" name="iform" id="iform" method="post">
+<table width="100%" border="0" cellpadding="0" cellspacing="0">
+<tr><td class="tabcont">
 <table width="100%" border="0" cellpadding="6" cellspacing="0">
 <tr>
 	<td colspan="2" class="listtopic">Add the name and description of the file.</td>
@@ -207,9 +207,9 @@ include("fbegin.inc");
 		count 100, seconds 1, new_action log, timeout 10</td>
 </tr>
 <tr>
-	<td colspan="2" width="100%" class="vtable"><textarea wrap="off"
-		name="suppresspassthru" cols="90" rows="28" id="suppresspassthru">
-		<?=htmlspecialchars($pconfig['suppresspassthru']);?></textarea>
+	<td width="10%" class="vncell">&nbsp;Advanced pass through</td>
+	<td width="100%" class="vtable"><textarea wrap="off"
+		name="suppresspassthru" cols="90" rows="28" id="suppresspassthru" class="formpre"> <?=htmlspecialchars($pconfig['suppresspassthru']);?></textarea>
 	</td>
 </tr>
 <tr>
@@ -221,6 +221,8 @@ include("fbegin.inc");
 					<input name="id" type="hidden" value="<?=$id;?>" /> <?php endif; ?>
 	</td>
 </tr>
+</table>
+</td></tr>
 </table>
 </form>
 <?php include("fend.inc"); ?>

@@ -385,7 +385,7 @@ function enable_change(enable_change) {
         display_top_tabs($tab_array);
 ?>
 </td></tr>
-</table>
+<tr><td class="tabcont">
 <table width="100%" border="0" cellpadding="6" cellspacing="0">
 	<tr>
 		<td colspan="2" valign="top" class="listtopic">General Settings</td>
@@ -652,6 +652,8 @@ function enable_change(enable_change) {
 			<br>
 			Please save your settings before you click start. </td>
 		</tr>
+</table>
+</td></tr>
 </table>
 </form>
 <script language="JavaScript">

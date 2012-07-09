@@ -79,28 +79,6 @@ if (!$input_errors) {
 
 		$retval = 0;
 
-		$snort_snortloglimit_info_ck = $config['installedpackages']['snortglobal']['snortloglimit'];
-		snort_snortloglimit_install_cron($snort_snortloglimit_info_ck == 'ok' ? true : false);
-
-		/* set the snort block hosts time IMPORTANT */
-		$snort_rm_blocked_info_ck = $config['installedpackages']['snortglobal']['rm_blocked'];
-		if ($snort_rm_blocked_info_ck == "never_b")
-			$snort_rm_blocked_false = false;
-		else
-			$snort_rm_blocked_false = true;
-
-		snort_rm_blocked_install_cron($snort_rm_blocked_false);
-
-		/* set the snort rules update time */
-		$snort_rules_up_info_ck = $config['installedpackages']['snortglobal']['autorulesupdate7'];
-		if ($snort_rules_up_info_ck == "never_up")
-			$snort_rules_up_false = false;
-		else
-			$snort_rules_up_false = true;
-
-		snort_rules_up_install_cron($snort_rules_up_false);
-
-		configure_cron();
 		write_config();
 
 		/* create whitelist and homenet file  then sync files */
