@@ -1961,33 +1961,4 @@ EOD;
 	return $snort_conf_text;
 }
 
-/* hide progress bar */
-function hide_progress_bar_status() {
-	global $snort_filename, $snort_filename_md5, $console_mode;
-
-	ob_flush();
-	if(!$console_mode)
-		echo "\n<script type=\"text/javascript\">document.progressbar.style.visibility='hidden';\n</script>";
-}
-
-/* unhide progress bar */
-function unhide_progress_bar_status() {
-	global $snort_filename, $snort_filename_md5, $console_mode;
-
-	ob_flush();
-	if(!$console_mode)
-		echo "\n<script type=\"text/javascript\">document.progressbar.style.visibility='visible';\n</script>";
-}
-
-/* update both top and bottom text box during an operation */
-function update_all_status($status) {
-	global $snort_filename, $snort_filename_md5, $console_mode;
-
-	ob_flush();
-	if(!$console_mode) {
-		update_status($status);
-		update_output_window($status);
-	}
-}
-
 ?>
