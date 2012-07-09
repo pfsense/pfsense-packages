@@ -297,7 +297,7 @@ if ($pconfig['brefresh'] == 'on')
 
 			foreach($blocked_ips_array as $blocked_ip) {
 				if (is_ipaddr($blocked_ip) && !isset($input[$blocked_ip]))
-					$input[] = "N\A\n";
+					$input[$blocked_ip] = "N\A\n";
 			}
 
 			/* buil final list, preg_match, buld html */
