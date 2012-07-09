@@ -210,7 +210,7 @@ function enable_change(enable_change) {
 				<td width="22%" valign="top" class="vncell">Advanced configuration
 				pass through</td>
 				<td width="78%" class="vtable"><textarea name="barnconfigpassthru"
-					cols="100" rows="7" id="barnconfigpassthru" class="formpre"><?=htmlspecialchars($pconfig['barnconfigpassthru']);?></textarea>
+					cols="100" rows="7" id="barnconfigpassthru" ><?=htmlspecialchars($pconfig['barnconfigpassthru']);?></textarea>
 				<br>
 				Arguments here will be automatically inserted into the running
 				barnyard2 configuration.</td>

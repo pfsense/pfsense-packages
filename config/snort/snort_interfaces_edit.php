@@ -635,8 +635,8 @@ function enable_change(enable_change) {
 		<tr>
 			<td width="22%" valign="top" class="vncell">Advanced configuration pass through</td>
 			<td width="78%" class="vtable">
-				<textarea wrap="off" name="configpassthru" cols="65" rows="12" id="configpassthru"
-				class="formpre"><?=htmlspecialchars($pconfig['configpassthru']);?></textarea>
+				<textarea wrap="off" name="configpassthru" cols="65" rows="12" id="configpassthru">
+				<?=htmlspecialchars($pconfig['configpassthru']);?></textarea>
 			</td>
 		</tr>
 		<tr>

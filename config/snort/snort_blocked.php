@@ -186,7 +186,7 @@ if ($pconfig['brefresh'] == 'on')
 	echo "<meta http-equiv=\"refresh\" content=\"60;url=/snort/snort_blocked.php\" />\n";
 ?>
 
-<div class="body2"><?if($pfsense_stable == 'yes'){echo '<p class="pgtitle">' . $pgtitle . '</p>';}?>
+<?if($pfsense_stable == 'yes'){echo '<p class="pgtitle">' . $pgtitle . '</p>';}?>
 
 <?php if ($savemsg) print_info_box($savemsg); ?>
 <table width="99%" border="0" cellpadding="0" cellspacing="0">
@@ -329,7 +329,6 @@ if ($pconfig['brefresh'] == 'on')
 		</td>
 	</tr>
 </table>
-</div>
 <?php
 include("fend.inc");
 ?>

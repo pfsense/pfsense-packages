@@ -208,8 +208,8 @@ include("fbegin.inc");
 </tr>
 <tr>
 	<td colspan="2" width="100%" class="vtable"><textarea wrap="off"
-		name="suppresspassthru" cols="100" rows="28" id="suppresspassthru"
-		class="formpre"><?=htmlspecialchars($pconfig['suppresspassthru']);?></textarea>
+		name="suppresspassthru" cols="100" rows="28" id="suppresspassthru">
+		<?=htmlspecialchars($pconfig['suppresspassthru']);?></textarea>
 	</td>
 </tr>
 <tr>

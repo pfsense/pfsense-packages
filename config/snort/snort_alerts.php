@@ -258,7 +258,7 @@ if ($pconfig['arefresh'] == 'on')
 	echo "<meta http-equiv=\"refresh\" content=\"60;url=/snort/snort_alerts.php\" />\n";
 ?>
 
-<div class="body2"><?if($pfsense_stable == 'yes'){echo '<p class="pgtitle">' . $pgtitle . '</p>';}?>
+<?if($pfsense_stable == 'yes'){echo '<p class="pgtitle">' . $pgtitle . '</p>';}?>
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
 <tr><td>
 <?php
@@ -518,7 +518,6 @@ if ($pconfig['arefresh'] == 'on')
 	</table>
 	</td>
 </table>
-</div>
 <?php
 include("fend.inc");
 ?>
