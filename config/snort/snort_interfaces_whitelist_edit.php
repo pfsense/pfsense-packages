@@ -272,7 +272,7 @@ echo $snort_general_css;
 				<strong>NETLIST:</strong>&nbsp;&nbsp;&nbsp;This list is for defining
 				addresses as $HOME_NET or $EXTERNAL_NET in the snort.conf file.</div>
 
-				<select name="snortlisttype" class="formfld" id="snortlisttype">
+				<select name="snortlisttype" class="formselect" id="snortlisttype">
 				<?php
 				$interfaces4 = array('whitelist' => 'WHITELIST', 'netlist' => 'NETLIST');
 				foreach ($interfaces4 as $iface4 => $ifacename4): ?>

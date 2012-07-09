@@ -70,7 +70,7 @@ foreach ($config['installedpackages']['snortglobal']['rule'] as $value) {
 			conf_mount_rw();
 			if ($snortlogAlertsizeKB >= $snortloglimitAlertsizeKB)
 				@file_put_contents("{$snort_log_dir}/alert", "");
-			post_delete_logs();
+			snort_post_delete_logs($snort_uuid);
 			conf_mount_ro();
 		}
 

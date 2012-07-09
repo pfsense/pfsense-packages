@@ -282,7 +282,7 @@ function popup(url)
 		<tr>
 			<td class="listt" colspan="8">
 			<br>Category: 
-			<select id="selectbox" name="selectbox" class="formfld" onChange="go()">
+			<select id="selectbox" name="selectbox" class="formselect" onChange="go()">
 			<?php
 				foreach ($files as $value) {
 					echo "<option value='?id={$id}&openruleset={$ruledir}{$value}' ";

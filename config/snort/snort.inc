@@ -353,7 +353,7 @@ function snort_get_real_interface($interface) {
  by touch and rm, snort will lose sync and not log.
 
  */
-function post_delete_logs()
+function snort_post_delete_logs($snort_uuid = 0)
 {
 	global $config, $g;
 
@@ -362,11 +362,12 @@ function post_delete_logs()
 		return;
 
 	foreach ($config['installedpackages']['snortglobal']['rule'] as $value) {
+		if ($value['uuid'] != $snort_uuid)
+			continue;
 		$if_real = snort_get_real_interface($value['interface']);
-		$snort_uuid = $value['uuid'];
 		$snort_log_dir = "/var/log/snort/snort_{$if_real}{$snort_uuid}";
 
-		if ($if_real != '' && $snort_uuid != '') {
+		if ($if_real != '') {
 			$filelist = glob("{$snort_log_dir}/*{$snort_uuid}_{$if_real}.u2.*");
 			unset($filelist[count($filelist) - 1]);
 			foreach ($filelist as $file)

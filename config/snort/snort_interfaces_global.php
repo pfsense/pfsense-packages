@@ -297,8 +297,8 @@ enable JavaScript to view this content
 			<tr>
 				<td width="22%" valign="top" class="vncell2">Update rules
 				automatically</td>
-				<td width="78%" class="vtable"><select name="autorulesupdate7"
-					class="formfld" id="autorulesupdate7">
+				<td width="78%" class="vtable">
+					<select name="autorulesupdate7" class="formselect" id="autorulesupdate7">
 					<?php
 					$interfaces3 = array('never_up' => 'NEVER', '6h_up' => '6 HOURS', '12h_up' => '12 HOURS', '1d_up' => '1 DAY', '4d_up' => '4 DAYS', '7d_up' => '7 DAYS', '28d_up' => '28 DAYS');
 					foreach ($interfaces3 as $iface3 => $ifacename3): ?>
@@ -361,8 +361,8 @@ enable JavaScript to view this content
 			<tr>
 				<td width="22%" valign="top" class="vncell2">Remove blocked hosts
 				every</td>
-				<td width="78%" class="vtable"><select name="rm_blocked"
-					class="formfld" id="rm_blocked">
+				<td width="78%" class="vtable">
+					<select name="rm_blocked" class="formselect" id="rm_blocked">
 					<?php
 					$interfaces3 = array('never_b' => 'NEVER', '1h_b' => '1 HOUR', '3h_b' => '3 HOURS', '6h_b' => '6 HOURS', '12h_b' => '12 HOURS', '1d_b' => '1 DAY', '4d_b' => '4 DAYS', '7d_b' => '7 DAYS', '28d_b' => '28 DAYS');
 					foreach ($interfaces3 as $iface3 => $ifacename3): ?>
@@ -378,8 +378,8 @@ enable JavaScript to view this content
 			<tr>
 				<td width="22%" valign="top" class="vncell2">Alerts file description
 				type</td>
-				<td width="78%" class="vtable"><select name="snortalertlogtype"
-					class="formfld" id="snortalertlogtype">
+				<td width="78%" class="vtable">
+					<select name="snortalertlogtype" class="formselect" id="snortalertlogtype">
 					<?php
 					$interfaces4 = array('full' => 'FULL', 'fast' => 'SHORT');
 					foreach ($interfaces4 as $iface4 => $ifacename4): ?>

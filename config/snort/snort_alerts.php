@@ -44,15 +44,18 @@ $snort_load_mootools = 'yes';
 
 $snortalertlogt = $config['installedpackages']['snortglobal']['snortalertlogtype'];
 
+if ($_GET['instance'])
+	$instanceid = $_GET['instance'];
+if ($_POST['instance'])
+	$instanceid = $_POST['instance'];
+if (empty($instanceid))
+	$instanceid = 0;
+
 if (!is_array($config['installedpackages']['snortglobal']['rule']))
         $config['installedpackages']['snortglobal']['rule'] = array();
 $a_instance = &$config['installedpackages']['snortglobal']['rule'];
-$snort_uuid = $a_instance[0]['uuid'];
-$if_real = snort_get_real_interface($a_instance[0]['interface']);
-if ($_POST['instance']) {
-	$snort_uuid = $a_instance[$_POST['instance']]['uuid'];
-	$if_real = snort_get_real_interface($a_instance[$_POST['instance']]['interface']);
-}
+$snort_uuid = $a_instance[$instanceid]['uuid'];
+$if_real = snort_get_real_interface($a_instance[$instanceid]['interface']);
 
 if (is_array($config['installedpackages']['snortglobal']['alertsblocks'])) {
 	$pconfig['arefresh'] = $config['installedpackages']['snortglobal']['alertsblocks']['arefresh'];
@@ -73,22 +76,22 @@ if ($_POST['save'])
 
 	write_config();
 
-	header("Location: /snort/snort_alerts.php");
+	header("Location: /snort/snort_alerts.php?instance={$instanceid}");
 	exit;
 }
 
 if ($_GET['action'] == "clear" || $_POST['clear']) {
 	if (file_exists("/var/log/snort/snort_{$if_real}{$snort_uuid}/alert")) {
 		conf_mount_rw();
+		snort_post_delete_logs($snort_uuid);
 		@file_put_contents("/var/log/snort/snort_{$if_real}{$snort_uuid}/alert", "");
-		post_delete_logs();
 		/* XXX: This is needed is snort is run as snort user */
 		//mwexec('/usr/sbin/chown snort:snort /var/log/snort/*', true);
 		mwexec('/bin/chmod 660 /var/log/snort/*', true);
 		mwexec("/bin/pkill -HUP -F {$g['varrun_path']}/snort_{$if_real}{$snort_uuid}.pid -a");
 		conf_mount_ro();
 	}
-	header("Location: /snort/snort_alerts.php");
+	header("Location: /snort/snort_alerts.php?instance={$instanceid}");
 	exit;
 }
 
@@ -110,7 +113,7 @@ if ($_POST['download']) {
 		exec("/bin/rm /tmp/{$file_name}");
 	}
 
-	header("Location: /snort/snort_alerts.php");
+	header("Location: /snort/snort_alerts.php?instance={$instanceid}");
 	exit;
 }
 
@@ -249,9 +252,7 @@ include_once("head.inc");
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">
 
 <?php
-
 include_once("fbegin.inc");
-echo $snort_general_css;
 
 /* refresh every 60 secs */
 if ($pconfig['arefresh'] == 'on')
@@ -259,7 +260,6 @@ if ($pconfig['arefresh'] == 'on')
 ?>
 
 <div class="body2"><?if($pfsense_stable == 'yes'){echo '<p class="pgtitle">' . $pgtitle . '</p>';}?>
-
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
 <tr><td>
 <?php
@@ -286,10 +286,13 @@ if ($pconfig['arefresh'] == 'on')
 			<tr>
 				<td width="22%" class="vncell">Instance to inspect</td>
 				<td width="78%" class="vtable">
-					<br/>   <select name="instance" id="instance" class="formfld unkown" onChange="document.getElementById('formalert').submit()">
+					<br/>   <select name="instance" id="instance" class="formselect" onChange="document.getElementById('formalert').submit()">
 			<?php
 				foreach ($a_instance as $id => $instance) {
-					echo "<option value='{$id}'> (" . snort_get_friendly_interface($instance['interface']) . "){$instance['descr']}</option>\n";
+					$selected = "";
+					if ($id == $instanceid)
+						$selected = "selected";
+					echo "<option value='{$id}' {$selected}> (" . snort_get_friendly_interface($instance['interface']) . "){$instance['descr']}</option>\n";
 				}
 			?>
 					</select><br/>   Choose which instance alerts you want to inspect.
@@ -364,53 +367,37 @@ if ($pconfig['arefresh'] == 'on')
 		if (!file_exists("/var/log/snort/snort_{$if_real}{$snort_uuid}/alert"))
 			@touch("/var/log/snort/snort_{$if_real}{$snort_uuid}/alert");
 
-		$logent = $anentries;
-
 		/* detect the alert file type */
 		if ($snortalertlogt == 'full')
 			$alerts_array = array_reverse(explode("\n\n", file_get_contents("/var/log/snort/snort_{$if_real}{$snort_uuid}/alert")));
 		else
 			$alerts_array = array_reverse(explode("\n", file_get_contents("/var/log/snort/snort_{$if_real}{$snort_uuid}/alert")));
 
-
-
 		if (is_array($alerts_array)) {
-
-			$counter = 0;
-			foreach($alerts_array as $fileline)
-			{
-
-				if($logent <= $counter)
-				continue;
-
-				$counter++;
+			foreach($alerts_array as $counter => $fileline) {
+				if (empty($fileline))
+					continue;
+				if ($counter > $anentries)
+					break;
 
 				/* Date */
 				$alert_date_str = get_snort_alert_date($fileline);
-
 				if($alert_date_str != '')
-				{
 					$alert_date = $alert_date_str;
-				}else{
+				else
 					$alert_date = 'empty';
-				}
 
 				/* Discription */
 				$alert_disc_str = get_snort_alert_disc($fileline);
-
-				if($alert_disc_str != '')
-				{
-					$alert_disc = $alert_disc_str;
-				}else{
+				if(empty($alert_disc_str))
 					$alert_disc = 'empty';
-				}
+				else
+					$alert_disc = $alert_disc_str;
 
 				/* Classification */
 				$alert_class_str = get_snort_alert_class($fileline);
-
 				if($alert_class_str != '')
 				{
-
 					$alert_class_match = array('[Classification:',']');
 					$alert_class = str_replace($alert_class_match, '', "$alert_class_str");
 				}else{
@@ -419,7 +406,6 @@ if ($pconfig['arefresh'] == 'on')
 					
 				/* Priority */
 				$alert_priority_str = get_snort_alert_priority($fileline);
-
 				if($alert_priority_str != '')
 				{
 					$alert_priority_match = array('Priority: ',']');
@@ -447,7 +433,6 @@ if ($pconfig['arefresh'] == 'on')
 					
 				/* IP SRC */
 				$alert_ip_src_str = get_snort_alert_ip_src($fileline);
-
 				if($alert_ip_src_str != '')
 				{
 					$alert_ip_src = $alert_ip_src_str;
@@ -457,7 +442,6 @@ if ($pconfig['arefresh'] == 'on')
 					
 				/* IP SRC Port */
 				$alert_src_p_str = get_snort_alert_src_p($fileline);
-					
 				if($alert_src_p_str != '')
 				{
 					$alert_src_p_match = array(' -',':');
@@ -468,7 +452,6 @@ if ($pconfig['arefresh'] == 'on')
 
 				/* Flow */
 				$alert_flow_str = get_snort_alert_flow($fileline);
-
 				if($alert_flow_str != '')
 				{
 					$alert_flow = $alert_flow_str;
@@ -478,7 +461,6 @@ if ($pconfig['arefresh'] == 'on')
 
 				/* IP Destination */
 				$alert_ip_dst_str = get_snort_alert_ip_dst($fileline);
-
 				if($alert_ip_dst_str != '')
 				{
 					$alert_ip_dst = $alert_ip_dst_str;
@@ -516,8 +498,6 @@ if ($pconfig['arefresh'] == 'on')
 				}
 
 				/* NOTE: using one echo improves performance by 2x */
-				if ($alert_disc != 'empty')
-				{
 					echo "<tr id=\"{$counter}\">
 				<td class=\"centerAlign\">{$counter}</td>
 				<td class=\"centerAlign\">{$alert_priority}</td>
@@ -532,31 +512,16 @@ if ($pconfig['arefresh'] == 'on')
 				<td class=\"centerAlign\">{$alert_sid}</td>
 				<td>{$alert_date}</td>
 				</tr>\n";
-				}
-
-				//		<script type="text/javascript">
-				//			var myTable = {};
-				//			window.addEvent('domready', function(){
-				//				myTable = new sortableTable('myTable', {overCls: 'over', onClick: function(){alert(this.id)}});
-				//			});
-				//		</script>
-
 			}
 		}
-
 		?>
 		</tbody>
 	</table>
 	</td>
 </table>
-
 </div>
-
 <?php
 include("fend.inc");
-
-echo $snort_custom_rnd_box;
-
 ?>
 </body>
 </html>

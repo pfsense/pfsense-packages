@@ -466,7 +466,7 @@ function enable_change(enable_change) {
 			<tr>
 				<td width="22%" valign="top" class="vncellreq2">Interface</td>
 				<td width="78%" class="vtable">
-					<select name="interface" class="formfld">
+					<select name="interface" class="formselect">
 				<?php
 					if (function_exists('get_configured_interface_with_descr'))
 						$interfaces = get_configured_interface_with_descr();
@@ -495,8 +495,8 @@ function enable_change(enable_change) {
 			</tr>
 			<tr>
 				<td width="22%" valign="top" class="vncell2">Memory Performance</td>
-				<td width="78%" class="vtable"><select name="performance"
-					class="formfld" id="performance">
+				<td width="78%" class="vtable">
+					<select name="performance" class="formselect" id="performance">
 					<?php
 					$interfaces2 = array('ac-bnfa' => 'AC-BNFA', 'lowmem' => 'LOWMEM', 'ac-std' => 'AC-STD', 'ac' => 'AC', 'ac-banded' => 'AC-BANDED', 'ac-sparsebands' => 'AC-SPARSEBANDS', 'acs' => 'ACS');
 					foreach ($interfaces2 as $iface2 => $ifacename2): ?>
@@ -518,8 +518,8 @@ function enable_change(enable_change) {
 			</tr>
 			<tr>
 				<td width="22%" valign="top" class="vncell2">Home net</td>
-				<td width="78%" class="vtable"><select name="homelistname"
-					class="formfld" id="homelistname">
+				<td width="78%" class="vtable">
+					<select name="homelistname" class="formselect" id="homelistname">
 				<?php
 					echo "<option value='default' >default</option>";
 					/* find whitelist names and filter by type */
@@ -545,8 +545,8 @@ function enable_change(enable_change) {
 			</tr>
 			<tr>
 				<td width="22%" valign="top" class="vncell2">External net</td>
-				<td width="78%" class="vtable"><select name="externallistname"
-					class="formfld" id="externallistname">
+				<td width="78%" class="vtable">
+					<select name="externallistname" class="formselect" id="externallistname">
 				<?php
 					echo "<option value='default' >default</option>";
 					/* find whitelist names and filter by type */
@@ -589,7 +589,7 @@ function enable_change(enable_change) {
 			<tr>
 				<td width="22%" valign="top" class="vncell2">Which ip to block</td>
 				<td width="78%" class="vtable">
-					<select name="blockoffendersip" class="formfld" id="blockoffendersip">
+					<select name="blockoffendersip" class="formselect" id="blockoffendersip">
 				<?php
 					foreach (array("src", "dst", "both") as $btype) {
 						if ($btype == $pconfig['blockoffendersip'])
@@ -606,7 +606,7 @@ function enable_change(enable_change) {
 			<tr>
 				<td width="22%" valign="top" class="vncell2">Whitelist</td>
 				<td width="78%" class="vtable">
-					<select name="whitelistname" class="formfld" id="whitelistname">
+					<select name="whitelistname" class="formselect" id="whitelistname">
 				<?php
 					/* find whitelist names and filter by type, make sure to track by uuid */
 					echo "<option value='default' >default</option>\n";
@@ -633,7 +633,7 @@ function enable_change(enable_change) {
 				<td width="22%" valign="top" class="vncell2">Suppression and
 				filtering</td>
 				<td width="78%" class="vtable">
-					<select name="suppresslistname" class="formfld" id="suppresslistname">
+					<select name="suppresslistname" class="formselect" id="suppresslistname">
 				<?php
 					echo "<option value='default' >default</option>\n";
 					if (is_array($config['installedpackages']['snortglobal']['suppress']['item'])) {
