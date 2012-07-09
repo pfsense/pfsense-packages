@@ -97,4 +97,18 @@
 		</tab>
 </tabs>
 	<fields>		
-	
+	<field>
+			<name>Exception IP list</name>
+			<type>listtopic</type>
+		</field>
+		<field>
+			<fieldname>exceptioniplist</fieldname>
+			<fielddescr>Exception Ip List</fielddescr>
+			<description><![CDATA[Include ip addresses and or ipadresses/netmask of computers from which web access should not be filtered.<br>
+								  Leave empty to load dansguardian defaults.]]></description>
+			<type>textarea</type>
+			<cols>80</cols>
+			<rows>12</rows>
+			<encoding>base64</encoding>
+		</field>
+		

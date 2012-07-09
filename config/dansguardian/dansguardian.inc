@@ -260,8 +260,8 @@ function sync_package_dansguardian() {
 					"/lists/contentscanners/exceptionvirusmimetypelist",
 					"/lists/contentscanners/exceptionvirussitelist",
 					"/lists/contentscanners/exceptionvirusurllist",
+					"/lists/exceptioniplist",
 					"/lists/pics");
-	
 	
 	$dansguardian_dir="/usr/local/etc/dansguardian";
 	foreach ($files as $file)
@@ -671,7 +671,7 @@ function sync_package_dansguardian() {
 	if($dansguardian_antivirus['extension_list'] == "" && file_exists ($dansguardian_dir.'/lists/contentscanners/exceptionvirusextensionlist.sample')){
 		$config['installedpackages']['dansguardianantivirusacl']['config'][0]['extension_list']=base64_encode(file_get_contents($dansguardian_dir.'/lists/contentscanners/exceptionvirusextensionlist.sample'));
 		$load_samples++;
-	}	
+	}
 	file_put_contents($dansguardian_dir."/lists/contentscanners/exceptionvirusextensionlist",($dansguardian_antivirus['extension_enabled']?dg_text_area_decode($config['installedpackages']['dansguardianantivirusacl']['config'][0]['extension_list']):""),LOCK_EX);
 		
 	#log report
@@ -682,6 +682,15 @@ function sync_package_dansguardian() {
 		$dansguardian_log['report_file']=base64_encode($report_file);
 		$load_samples++;
 	}
+	#exception ip list
+	#create a default setup if not exists
+	if (!is_array($config['installedpackages']['dansguardianips']['config']))
+		$config['installedpackages']['dansguardianips']['config'][0]=array();
+	if($config['installedpackages']['dansguardianips']['config'][0]['exceptioniplist']){
+		$config['installedpackages']['dansguardianips']['config'][0]['exceptioniplist']=base64_encode(file_get_contents($dansguardian_dir.'/lists/exceptioniplist.sample'));
+		$load_samples++;
+	}
+	file_put_contents($dansguardian_dir."/lists/exceptioniplist",dg_text_area_decode($config['installedpackages']['dansguardianips']['config'][0]['exceptioniplist']),LOCK_EX);
 
 	if($load_samples > 0)
 		write_config();
