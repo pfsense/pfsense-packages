@@ -37,7 +37,9 @@
 require_once("guiconfig.inc");
 require_once("/usr/local/pkg/snort/snort.inc");
 
-global $g, $snortdir;
+global $g;
+
+$snortdir = SNORTDIR;
 
 $d_snort_global_dirty_path = '/var/run/snort_global.dirty';
 

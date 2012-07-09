@@ -35,7 +35,9 @@
 require_once("guiconfig.inc");
 require_once("/usr/local/pkg/snort/snort.inc");
 
-global $g, $snortdir;
+global $g;
+
+$snortdir = SNORTDIR;
 
 /* load only javascript that is needed */
 $snort_load_jquery = 'yes';

@@ -42,7 +42,7 @@ $pfSense_snort_version = "2.3.0";
 $snort_package_version = "Snort {$snort_version} pkg v. {$pfSense_snort_version}";
 $snort_rules_file = "snortrules-snapshot-2923.tar.gz";
 $emerging_threats_version = "2.9.0";
-$snortdir = "/usr/local/etc/snort";
+define("SNORTDIR", "/usr/local/etc/snort");
 
 /* Allow additional execution time 0 = no limit. */
 ini_set('max_execution_time', '9999');
@@ -56,17 +56,6 @@ if (intval($config['version']) > 6)
 	$snort_pfsense_basever = 'no';
 else
 	$snort_pfsense_basever = 'yes';
-
-/* find out what arch where in x86 , x64 */
-global $snortdir, $snort_arch;
-$snort_arch  = 'x86';
-$snort_arch_ck = php_uname("m");
-if ($snort_arch_ck == 'i386')
-	$snort_arch = 'x86';
-else if ($snort_arch_ck == "amd64")
-	$snort_arch = 'x64';
-else
-	$snort_arch = "Unknown";
 
 /* tell me my theme */
 $pfsense_theme_is = $config['theme'];
@@ -279,7 +268,9 @@ function Running_Stop($snort_uuid, $if_real, $id) {
 }
 
 function Running_Start($snort_uuid, $if_real, $id) {
-	global $snortdir, $config, $g;
+	global $config, $g;
+
+	$snortdir = SNORTDIR;
 
 	$snort_info_chk = $config['installedpackages']['snortglobal']['rule'][$id]['enable'];
 	if ($snort_info_chk == 'on')
@@ -388,7 +379,9 @@ function snort_post_delete_logs($snort_uuid = 0)
 }
 
 function snort_postinstall() {
-	global $snortdir, $config, $g, $snort_pfsense_basever, $snort_arch;
+	global $config, $g, $snort_pfsense_basever;
+
+	$snortdir = SNORTDIR;
 
 	/* snort -> advanced features */
 	if (is_array($config['installedpackages']['snortglobal'])) {
@@ -724,7 +717,9 @@ function sync_snort_package_config()
 
 /* create threshold file */
 function create_snort_suppress($id, $if_real) {
-	global $snortdir, $config, $g;
+	global $config, $g;
+
+	$snortdir = SNORTDIR;
 
 	/* make sure dir is there */
 	if (!is_dir("{$snortdir}/suppress"))
@@ -751,7 +746,9 @@ function create_snort_suppress($id, $if_real) {
 }
 
 function create_snort_whitelist($id, $if_real) {
-	global $snortdir, $config, $g;
+	global $config, $g;
+
+	$snortdir = SNORTDIR;
 
 	/* make sure dir is there */
 	if (!is_dir("{$snortdir}/whitelist"))
@@ -823,7 +820,9 @@ function create_snort_externalnet($id, $if_real) {
 
 /* open snort.sh for writing" */
 function create_snort_sh() {
-	global $snortdir, $config, $g;
+	global $config, $g;
+
+	$snortdir = SNORTDIR;
 
 	if (!is_array($config['installedpackages']['snortglobal']['rule']))
 		return;
@@ -949,7 +948,9 @@ EOD;
 
 /* if rules exist copy to new interfaces */
 function create_rules_iface($id, $if_real, $snort_uuid) {
-	global $snortdir, $config, $g;
+	global $config, $g;
+
+	$snortdir = SNORTDIR;
 
 	$if_rule_dir = "{$snortdir}/snort_{$snort_uuid}_{$if_real}";
 	$folder_chk = (count(glob("{$if_rule_dir}/rules/*")) === 0) ? 'empty' : 'full';
@@ -965,7 +966,9 @@ function create_rules_iface($id, $if_real, $snort_uuid) {
 
 /* open barnyard2.conf for writing */
 function create_barnyard2_conf($id, $if_real, $snort_uuid) {
-	global $snortdir, $config, $g;
+	global $config, $g;
+
+	$snortdir = SNORTDIR;
 
 	if (!file_exists("{$snortdir}/snort_{$snort_uuid}_{$if_real}/barnyard2.conf"))
 		exec("/usr/bin/touch {$snortdir}/snort_{$snort_uuid}_{$if_real}/barnyard2.conf");
@@ -983,7 +986,9 @@ function create_barnyard2_conf($id, $if_real, $snort_uuid) {
 
 /* open barnyard2.conf for writing" */
 function generate_barnyard2_conf($id, $if_real, $snort_uuid) {
-	global $snortdir, $config, $g;
+	global $config, $g;
+
+	$snortdir = SNORTDIR;
 
 	/* define snortbarnyardlog */
 	/* TODO: add support for the other 5 output plugins */
@@ -1032,7 +1037,9 @@ EOD;
 }
 
 function create_snort_conf($id, $if_real, $snort_uuid) {
-	global $snortdir, $config, $g;
+	global $config, $g;
+
+	$snortdir = SNORTDIR;
 
 	if (!empty($if_real) && !empty($snort_uuid)) {
 		if (!is_dir("{$snortdir}/snort_{$snort_uuid}_{$if_real}")) {
@@ -1056,7 +1063,9 @@ function create_snort_conf($id, $if_real, $snort_uuid) {
 }
 
 function snort_deinstall() {
-	global $snortdir, $config, $g;
+	global $config, $g;
+
+	$snortdir = SNORTDIR;
 
 	/* remove custom sysctl */
 	remove_text_from_file("/etc/sysctl.conf", "sysctl net.bpf.bufsize=20480");
@@ -1108,7 +1117,9 @@ function snort_deinstall() {
 }
 
 function generate_snort_conf($id, $if_real, $snort_uuid) {
-	global $snortdir, $config, $g, $snort_pfsense_basever;
+	global $config, $g, $snort_pfsense_basever;
+
+	$snortdir = SNORTDIR;
 
 	if (!is_array($config['installedpackages']['snortglobal']['rule']))
 		return;

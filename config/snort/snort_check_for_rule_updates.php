@@ -32,7 +32,9 @@ require_once("functions.inc");
 require_once("service-utils.inc");
 require_once("/usr/local/pkg/snort/snort.inc");
 
-global $snort_gui_include, $snortdir;
+global $snort_gui_include;
+
+$snortdir = SNORTDIR;
 
 if (!isset($snort_gui_include))
 	$pkg_interface = "console";
@@ -163,94 +165,99 @@ if ($snortdownload == 'on') {
 
 		/* extract so rules */
 		exec('/bin/mkdir -p /usr/local/lib/snort/dynamicrules/');
-		if($snort_arch == 'x86'){
+		$snort_arch = php_uname("m");
+		if ($snort_arch  == 'i386'){
 			exec("/usr/bin/tar xzf {$tmpfname}/{$snort_filename} -C {$snortdir} so_rules/precompiled/$freebsd_version_so/i386/{$snort_version}/");
 			exec("/bin/mv -f {$snortdir}/so_rules/precompiled/$freebsd_version_so/i386/{$snort_version}/* /usr/local/lib/snort/dynamicrules/");
-		} else if ($snort_arch == 'x64') {
+		} else if ($snort_arch == 'amd64') {
 			exec("/usr/bin/tar xzf {$tmpfname}/{$snort_filename} -C {$snortdir} so_rules/precompiled/$freebsd_version_so/x86-64/{$snort_version}/");
 			exec("/bin/mv -f {$snortdir}/so_rules/precompiled/$freebsd_version_so/x86-64/{$snort_version}/* /usr/local/lib/snort/dynamicrules/");
-		}
-		/* extract so rules none bin and rename */
-		exec("/usr/bin/tar xzf {$tmpfname}/{$snort_filename} -C {$snortdir} so_rules/bad-traffic.rules" .
-		" so_rules/chat.rules" .
-		" so_rules/dos.rules" .
-		" so_rules/exploit.rules" .
-		" so_rules/icmp.rules" .
-		" so_rules/imap.rules" .
-		" so_rules/misc.rules" .
-		" so_rules/multimedia.rules" .
-		" so_rules/netbios.rules" .
-		" so_rules/nntp.rules" .
-		" so_rules/p2p.rules" .
-		" so_rules/smtp.rules" .
-		" so_rules/snmp.rules" .
-		" so_rules/specific-threats.rules" .
-		" so_rules/web-activex.rules" .
-		" so_rules/web-client.rules" .
-		" so_rules/web-iis.rules" .
-		" so_rules/web-misc.rules");
+		} else
+			$snortdownload = 'off';
 
-		exec("/bin/mv -f {$snortdir}/so_rules/bad-traffic.rules {$snortdir}/rules/snort_bad-traffic.so.rules");
-		exec("/bin/mv -f {$snortdir}/so_rules/chat.rules {$snortdir}/rules/snort_chat.so.rules");
-		exec("/bin/mv -f {$snortdir}/so_rules/dos.rules {$snortdir}/rules/snort_dos.so.rules");
-		exec("/bin/mv -f {$snortdir}/so_rules/exploit.rules {$snortdir}/rules/snort_exploit.so.rules");
-		exec("/bin/mv -f {$snortdir}/so_rules/icmp.rules {$snortdir}/rules/snort_icmp.so.rules");
-		exec("/bin/mv -f {$snortdir}/so_rules/imap.rules {$snortdir}/rules/snort_imap.so.rules");
-		exec("/bin/mv -f {$snortdir}/so_rules/misc.rules {$snortdir}/rules/snort_misc.so.rules");
-		exec("/bin/mv -f {$snortdir}/so_rules/multimedia.rules {$snortdir}/rules/snort_multimedia.so.rules");
-		exec("/bin/mv -f {$snortdir}/so_rules/netbios.rules {$snortdir}/rules/snort_netbios.so.rules");
-		exec("/bin/mv -f {$snortdir}/so_rules/nntp.rules {$snortdir}/rules/snort_nntp.so.rules");
-		exec("/bin/mv -f {$snortdir}/so_rules/p2p.rules {$snortdir}/rules/snort_p2p.so.rules");
-		exec("/bin/mv -f {$snortdir}/so_rules/smtp.rules {$snortdir}/rules/snort_smtp.so.rules");
-		exec("/bin/mv -f {$snortdir}/so_rules/snmp.rules {$snortdir}/rules/snort_snmp.so.rules");
-		exec("/bin/mv -f {$snortdir}/so_rules/specific-threats.rules {$snortdir}/rules/snort_specific-threats.so.rules");
-		exec("/bin/mv -f {$snortdir}/so_rules/web-activex.rules {$snortdir}/rules/snort_web-activex.so.rules");
-		exec("/bin/mv -f {$snortdir}/so_rules/web-client.rules {$snortdir}/rules/snort_web-client.so.rules");
-		exec("/bin/mv -f {$snortdir}/so_rules/web-iis.rules {$snortdir}/rules/snort_web-iis.so.rules");
-		exec("/bin/mv -f {$snortdir}/so_rules/web-misc.rules {$snortdir}/rules/snort_web-misc.so.rules");
-		exec("/bin/rm -r {$snortdir}/so_rules");
+		if ($snortdownload == 'on') {
+			/* extract so rules none bin and rename */
+			exec("/usr/bin/tar xzf {$tmpfname}/{$snort_filename} -C {$snortdir} so_rules/bad-traffic.rules" .
+			" so_rules/chat.rules" .
+			" so_rules/dos.rules" .
+			" so_rules/exploit.rules" .
+			" so_rules/icmp.rules" .
+			" so_rules/imap.rules" .
+			" so_rules/misc.rules" .
+			" so_rules/multimedia.rules" .
+			" so_rules/netbios.rules" .
+			" so_rules/nntp.rules" .
+			" so_rules/p2p.rules" .
+			" so_rules/smtp.rules" .
+			" so_rules/snmp.rules" .
+			" so_rules/specific-threats.rules" .
+			" so_rules/web-activex.rules" .
+			" so_rules/web-client.rules" .
+			" so_rules/web-iis.rules" .
+			" so_rules/web-misc.rules");
 
-		/* extract base etc files */
-		exec("/usr/bin/tar xzf {$tmpfname}/{$snort_filename} -C {$snortdir} etc/");
-		exec("/bin/mv -f {$snortdir}/etc/* {$snortdir}");
-		exec("/bin/rm -r {$snortdir}/etc");
+			exec("/bin/mv -f {$snortdir}/so_rules/bad-traffic.rules {$snortdir}/rules/snort_bad-traffic.so.rules");
+			exec("/bin/mv -f {$snortdir}/so_rules/chat.rules {$snortdir}/rules/snort_chat.so.rules");
+			exec("/bin/mv -f {$snortdir}/so_rules/dos.rules {$snortdir}/rules/snort_dos.so.rules");
+			exec("/bin/mv -f {$snortdir}/so_rules/exploit.rules {$snortdir}/rules/snort_exploit.so.rules");
+			exec("/bin/mv -f {$snortdir}/so_rules/icmp.rules {$snortdir}/rules/snort_icmp.so.rules");
+			exec("/bin/mv -f {$snortdir}/so_rules/imap.rules {$snortdir}/rules/snort_imap.so.rules");
+			exec("/bin/mv -f {$snortdir}/so_rules/misc.rules {$snortdir}/rules/snort_misc.so.rules");
+			exec("/bin/mv -f {$snortdir}/so_rules/multimedia.rules {$snortdir}/rules/snort_multimedia.so.rules");
+			exec("/bin/mv -f {$snortdir}/so_rules/netbios.rules {$snortdir}/rules/snort_netbios.so.rules");
+			exec("/bin/mv -f {$snortdir}/so_rules/nntp.rules {$snortdir}/rules/snort_nntp.so.rules");
+			exec("/bin/mv -f {$snortdir}/so_rules/p2p.rules {$snortdir}/rules/snort_p2p.so.rules");
+			exec("/bin/mv -f {$snortdir}/so_rules/smtp.rules {$snortdir}/rules/snort_smtp.so.rules");
+			exec("/bin/mv -f {$snortdir}/so_rules/snmp.rules {$snortdir}/rules/snort_snmp.so.rules");
+			exec("/bin/mv -f {$snortdir}/so_rules/specific-threats.rules {$snortdir}/rules/snort_specific-threats.so.rules");
+			exec("/bin/mv -f {$snortdir}/so_rules/web-activex.rules {$snortdir}/rules/snort_web-activex.so.rules");
+			exec("/bin/mv -f {$snortdir}/so_rules/web-client.rules {$snortdir}/rules/snort_web-client.so.rules");
+			exec("/bin/mv -f {$snortdir}/so_rules/web-iis.rules {$snortdir}/rules/snort_web-iis.so.rules");
+			exec("/bin/mv -f {$snortdir}/so_rules/web-misc.rules {$snortdir}/rules/snort_web-misc.so.rules");
+			exec("/bin/rm -r {$snortdir}/so_rules");
 
-		/* Untar snort signatures */
-		$signature_info_chk = $config['installedpackages']['snortglobal']['signatureinfo'];
-		if ($premium_url_chk == 'on') {
-			update_status(gettext("Extracting Signatures..."));
-			exec("/usr/bin/tar xzf {$tmpfname}/{$snort_filename} -C {$snortdir} doc/signatures/");
-			update_status(gettext("Done extracting Signatures."));
+			/* extract base etc files */
+			exec("/usr/bin/tar xzf {$tmpfname}/{$snort_filename} -C {$snortdir} etc/");
+			exec("/bin/mv -f {$snortdir}/etc/* {$snortdir}");
+			exec("/bin/rm -r {$snortdir}/etc");
 
-			if (file_exists("{$snortdir}/doc/signatures")) {
-				update_status(gettext("Copying signatures..."));
-				exec("/bin/mv -f {$snortdir}/doc/signatures {$snortdir}/signatures");
-				update_status(gettext("Done copying signatures."));
-			} else {
-				update_status(gettext("Directory signatures exist..."));
-				update_output_window(gettext("Error copying signature..."));
-				$snortdownload = 'off';
+			/* Untar snort signatures */
+			$signature_info_chk = $config['installedpackages']['snortglobal']['signatureinfo'];
+			if ($premium_url_chk == 'on') {
+				update_status(gettext("Extracting Signatures..."));
+				exec("/usr/bin/tar xzf {$tmpfname}/{$snort_filename} -C {$snortdir} doc/signatures/");
+				update_status(gettext("Done extracting Signatures."));
+
+				if (file_exists("{$snortdir}/doc/signatures")) {
+					update_status(gettext("Copying signatures..."));
+					exec("/bin/mv -f {$snortdir}/doc/signatures {$snortdir}/signatures");
+					update_status(gettext("Done copying signatures."));
+				} else {
+					update_status(gettext("Directory signatures exist..."));
+					update_output_window(gettext("Error copying signature..."));
+					$snortdownload = 'off';
+				}
 			}
-		}
 
-		if (file_exists("/usr/local/lib/snort/dynamicrules/lib_sfdynamic_example_rule.so")) {
-			exec("/bin/rm /usr/local/lib/snort/dynamicrules/lib_sfdynamic_example_rule.so");
-			exec("/bin/rm /usr/local/lib/snort/dynamicrules/lib_sfdynamic_example\*");
-		}
+			if (file_exists("/usr/local/lib/snort/dynamicrules/lib_sfdynamic_example_rule.so")) {
+				exec("/bin/rm /usr/local/lib/snort/dynamicrules/lib_sfdynamic_example_rule.so");
+				exec("/bin/rm /usr/local/lib/snort/dynamicrules/lib_sfdynamic_example\*");
+			}
 
-		/* XXX: Convert this to sed? */
-		/* make shure default rules are in the right format */
-		exec("/usr/local/bin/perl -pi -e 's/#alert/# alert/g' {$snortdir}/rules/*.rules");
-		exec("/usr/local/bin/perl -pi -e 's/##alert/# alert/g' {$snortdir}/rules/*.rules");
-		exec("/usr/local/bin/perl -pi -e 's/## alert/# alert/g' {$snortdir}/rules/*.rules");
+			/* XXX: Convert this to sed? */
+			/* make shure default rules are in the right format */
+			exec("/usr/local/bin/perl -pi -e 's/#alert/# alert/g' {$snortdir}/rules/*.rules");
+			exec("/usr/local/bin/perl -pi -e 's/##alert/# alert/g' {$snortdir}/rules/*.rules");
+			exec("/usr/local/bin/perl -pi -e 's/## alert/# alert/g' {$snortdir}/rules/*.rules");
 
-		/* create a msg-map for snort  */
-		update_status(gettext("Updating Alert Messages..."));
-		exec("/usr/local/bin/perl /usr/local/bin/create-sidmap.pl {$snortdir}/rules > {$snortdir}/sid-msg.map");
+			/* create a msg-map for snort  */
+			update_status(gettext("Updating Alert Messages..."));
+			exec("/usr/local/bin/perl /usr/local/bin/create-sidmap.pl {$snortdir}/rules > {$snortdir}/sid-msg.map");
 
-		if (file_exists("{$tmpfname}/{$snort_filename_md5}")) {
-			update_status(gettext("Copying md5 sig to snort directory..."));
-			exec("/bin/cp {$tmpfname}/$snort_filename_md5 {$snortdir}/$snort_filename_md5");
+			if (file_exists("{$tmpfname}/{$snort_filename_md5}")) {
+				update_status(gettext("Copying md5 sig to snort directory..."));
+				exec("/bin/cp {$tmpfname}/$snort_filename_md5 {$snortdir}/$snort_filename_md5");
+			}
 		}
 	}
 }
