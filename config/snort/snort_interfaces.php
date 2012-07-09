@@ -138,13 +138,6 @@ if ($pfsense_stable == 'yes')
 	echo '<p class="pgtitle">' . $pgtitle . '</p>';
 ?>
 
-<noscript>
-<div class="alert" ALIGN=CENTER><img
-	src="../themes/<?php echo $g['theme']; ?>/images/icons/icon_alert.gif" /><strong>Please
-enable JavaScript to view this content
-</CENTER></div>
-</noscript>
-
 <form action="snort_interfaces.php" method="post" enctype="multipart/form-data" name="iform" id="iform">
 <?php
 	/* Display Alert message */

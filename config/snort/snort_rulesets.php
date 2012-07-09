@@ -167,19 +167,6 @@ include_once("head.inc");
 <?if($pfsense_stable == 'yes'){echo '<p class="pgtitle">' . $pgtitle . '</p>';}?>
 
 <?php
-echo "{$snort_general_css}\n";
-?>
-
-<div class="body2">
-
-<noscript>
-<div class="alert" ALIGN=CENTER><img
-	src="../themes/<?php echo $g['theme']; ?>/images/icons/icon_alert.gif" /><strong>Please
-enable JavaScript to view this content
-</CENTER></div>
-</noscript>
-
-<?php
 
 echo "<form action=\"snort_rulesets.php?id={$id}\" method=\"post\" name=\"iform\" id=\"iform\">";
 
@@ -296,17 +283,10 @@ if (file_exists($d_snortconfdirty_path)) {
 		</td>
 	</tr>
 </table>
-
 </form>
-
 <p><b>NOTE:</b> You can click on a ruleset name to edit the ruleset.</p>
-
-</div>
-
 <?php
 include("fend.inc");
-echo $snort_custom_rnd_box;
 ?>
-
 </body>
 </html>

@@ -121,7 +121,7 @@ include_once("head.inc");
 
 						if ($snortdownload != 'on' && $emergingthreats != 'on') {
 							echo '
-			<button class="sexybutton disabled" disabled="disabled"><span class="download">Update Rules&nbsp;&nbsp;&nbsp;&nbsp;</span></button><br/>
+			<button disabled="disabled"><span class="download">Update Rules&nbsp;&nbsp;&nbsp;&nbsp;</span></button><br/>
 			<p style="text-align:left; margin-left:150px;">
 			<font color="#fc3608" size="2px"><b>WARNING:</b></font><font size="1px" color="#000000">&nbsp;&nbsp;No rule types have been selected for download. "Global Settings Tab"</font><br>';
 
@@ -129,7 +129,7 @@ include_once("head.inc");
 						} else {
 
 							echo '
-			<a href="/snort/snort_download_rules.php"><button class="sexybutton disabled"><span class="download">Update Rules&nbsp;&nbsp;&nbsp;&nbsp;</span></button></a><br/>' . "\n";
+			<a href="/snort/snort_download_rules.php"><button ><span class="download">Update Rules&nbsp;&nbsp;&nbsp;&nbsp;</span></button></a><br/>' . "\n";
 
 						}
 
@@ -154,10 +154,10 @@ include_once("head.inc");
 
 						if ($update_logfile_chk == 'yes') {
 							echo '
-				<button class="sexybutton sexysimple example9" href="/snort/snort_rules_edit.php?openruleset=/usr/local/etc/snort/snort_update.log"><span class="pwhitetxt">Update Log&nbsp;&nbsp;&nbsp;&nbsp;</span></button>' . "\n";
+				<button href="/snort/snort_rules_edit.php?openruleset=/usr/local/etc/snort/snort_update.log"><span class="pwhitetxt">Update Log&nbsp;&nbsp;&nbsp;&nbsp;</span></button>' . "\n";
 						}else{
 							echo '
-				<button class="sexybutton disabled" disabled="disabled" href="/snort/snort_rules_edit.php?openruleset=/usr/local/etc/snort/snort_update.log"><span class="pwhitetxt">Update Log&nbsp;&nbsp;&nbsp;&nbsp;</span></button>' . "\n";
+				<button disabled="disabled" href="/snort/snort_rules_edit.php?openruleset=/usr/local/etc/snort/snort_update.log"><span class="pwhitetxt">Update Log&nbsp;&nbsp;&nbsp;&nbsp;</span></button>' . "\n";
 						}
 							
 				?>
