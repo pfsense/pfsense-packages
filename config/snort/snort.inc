@@ -344,8 +344,7 @@ function snort_get_real_interface($interface) {
  by touch and rm, snort will lose sync and not log.
 
  */
-function snort_post_delete_logs($snort_uuid = 0)
-{
+function snort_post_delete_logs($snort_uuid = 0) {
 	global $config, $g;
 
 	/* do not start config build if rules is empty */
@@ -1552,7 +1551,7 @@ EOD;
                 #
 #################
 
-preprocessor http_inspect: global {$snortdir}, iis_unicode_map unicode.map 1252 compress_depth 65535 decompress_depth 65535
+preprocessor http_inspect: global iis_unicode_map unicode.map 1252 compress_depth 65535 decompress_depth 65535
 
 preprocessor http_inspect_server: server default \
                         ports  { 80 8080 }  \
@@ -1611,7 +1610,7 @@ EOD;
                     #
 #####################
 
-preprocessor ftp_telnet: global {$snortdir}, \
+preprocessor ftp_telnet: global \
 inspection_type stateless
 
 preprocessor ftp_telnet_protocol: telnet \
