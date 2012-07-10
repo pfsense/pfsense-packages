@@ -56,7 +56,7 @@ groupmode = {$dansguardian_groups['mode']}
 groupname = '{$dansguardian_groups['name']}'
 
 # Content filtering files location
-bannedphraselist = '/usr/local/etc/dansguardian/lists/weightedphraselist.{$dansguardian_groups['phraseacl']}'
+bannedphraselist = '/usr/local/etc/dansguardian/lists/bannedphraselist.{$dansguardian_groups['phraseacl']}'
 weightedphraselist = '/usr/local/etc/dansguardian/lists/weightedphraselist.{$dansguardian_groups['phraseacl']}'
 exceptionphraselist = '/usr/local/etc/dansguardian/lists/exceptionphraselist.{$dansguardian_groups['phraseacl']}'
 bannedsitelist = '/usr/local/etc/dansguardian/lists/bannedsitelist.{$dansguardian_groups['siteacl']}'
