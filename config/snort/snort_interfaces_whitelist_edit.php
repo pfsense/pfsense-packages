@@ -374,6 +374,8 @@ if ($savemsg)
 		</td>
 	</tr>
 </table>
+</td></tr>
+</table>
 </form>
 
 <script type="text/javascript">
