@@ -1762,13 +1762,13 @@ EOD;
 	if ($def_max_queued_bytes_info_chk == '')
 		$def_max_queued_bytes_type = '';
 	else
-		$def_max_queued_bytes_type = ' max_queued_bytes ' . $snortcfg['max_queued_bytes'] . ',';
+		$def_max_queued_bytes_type = ', max_queued_bytes ' . $snortcfg['max_queued_bytes'] . ',';
 
 	$def_max_queued_segs_info_chk = $snortcfg['max_queued_segs'];
 	if ($def_max_queued_segs_info_chk == '')
 		$def_max_queued_segs_type = '';
 	else
-		$def_max_queued_segs_type = ' max_queued_segs ' . $snortcfg['max_queued_segs'] . ',';
+		$def_max_queued_segs_type = ', max_queued_segs ' . $snortcfg['max_queued_segs'] . ',';
 
 	$snort_preprocessor_decoder_rules = "";
 	if (file_exists("{$snortdir}/preproc_rules/preprocessor.rules"))
@@ -1911,7 +1911,7 @@ preprocessor frag3_engine: policy bsd detect_anomalies
 
 preprocessor stream5_global: track_tcp yes, track_udp yes, track_icmp yes
 
-preprocessor stream5_tcp: policy BSD, ports both all, {$def_max_queued_bytes_type}{$def_max_queued_segs_type}
+preprocessor stream5_tcp: policy BSD, ports both all{$def_max_queued_bytes_type}{$def_max_queued_segs_type}
 preprocessor stream5_udp:
 preprocessor stream5_icmp:
 
