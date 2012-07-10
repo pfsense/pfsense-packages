@@ -39,9 +39,10 @@
 require_once("guiconfig.inc");
 require_once("/usr/local/pkg/snort/snort.inc");
 
+if (!is_array($config['installedpackages']['snortglobal']['whitelist']))
+	$config['installedpackages']['snortglobal']['whitelist'] = array();
 if (!is_array($config['installedpackages']['snortglobal']['whitelist']['item']))
 	$config['installedpackages']['snortglobal']['whitelist']['item'] = array();
-
 $a_whitelist = &$config['installedpackages']['snortglobal']['whitelist']['item'];
 
 $id = $_GET['id'];
@@ -52,33 +53,27 @@ if (is_null($id)) {
 	exit;
 }
 
-/* gen uuid for each iface !inportant */
-if ($config['installedpackages']['snortglobal']['whitelist']['item'][$id]['uuid'] == '') {
+if (empty($config['installedpackages']['snortglobal']['whitelist']['item'][$id]['uuid'])) {
 	$whitelist_uuid = 0;
 	while ($whitelist_uuid > 65535 || $whitelist_uuid == 0) {
 		$whitelist_uuid = mt_rand(1, 65535);
 		$pconfig['uuid'] = $whitelist_uuid;
 	}
-} else if ($config['installedpackages']['snortglobal']['whitelist']['item'][$id]['uuid'] != '') {
+} else
 	$whitelist_uuid = $config['installedpackages']['snortglobal']['whitelist']['item'][$id]['uuid'];
-}
-
-$d_snort_whitelist_dirty_path = '/var/run/snort_whitelist.dirty';
 
 /* returns true if $name is a valid name for a whitelist file name or ip */
 function is_validwhitelistname($name) {
 	if (!is_string($name))
-	return false;
+		return false;
 
 	if (!preg_match("/[^a-zA-Z0-9\.\/]/", $name))
-	return true;
+		return true;
 
 	return false;
 }
 
-
 if (isset($id) && $a_whitelist[$id]) {
-
 	/* old settings */
 	$pconfig = array();
 	$pconfig['name'] = $a_whitelist[$id]['name'];
@@ -97,7 +92,6 @@ if (isset($id) && $a_whitelist[$id]) {
 }
 
 if ($_POST['submit']) {
-
 	conf_mount_rw();
 
 	unset($input_errors);
@@ -106,7 +100,6 @@ if ($_POST['submit']) {
 	/* input validation */
 	$reqdfields = explode(" ", "name");
 	$reqdfieldsn = explode(",", "Name");
-
 	do_input_validation($_POST, $reqdfields, $reqdfieldsn, &$input_errors);
 
 	if(strtolower($_POST['name']) == "defaultwhitelist")
@@ -197,7 +190,6 @@ if ($_POST['submit']) {
 
 $pgtitle = "Services: Snort: Whitelist: Edit $whitelist_uuid";
 include_once("head.inc");
-
 ?>
 
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC" >
@@ -218,17 +210,16 @@ include("fbegin.inc");
 	rowsize[1] = "30";
 </script>
 
-<?if($pfsense_stable == 'yes'){echo '<p class="pgtitle">' . $pgtitle . '</p>';}?>
-
-<?php if ($input_errors) print_input_errors($input_errors); ?>
-
 <?php
-	if ($savemsg)
-		print_info_box($savemsg);
-
+if($pfsense_stable == 'yes'){echo '<p class="pgtitle">' . $pgtitle . '</p>';}
+if ($input_errors) print_input_errors($input_errors);
+if ($savemsg)
+	print_info_box($savemsg);
 ?>
 
 <form action="snort_interfaces_whitelist_edit.php" method="post" name="iform" id="iform">
+<table width="100%" border="0" cellpadding="0" cellspacing="0">
+<tr><td class="tabcont">
 <table width="100%" border="0" cellpadding="6" cellspacing="0">
 	<tr>
 		<td colspan="2" valign="top" class="listtopic">Add the name and

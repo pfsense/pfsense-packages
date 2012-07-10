@@ -45,8 +45,6 @@ if (!is_array($config['installedpackages']['snortglobal']['suppress']['item']))
 $a_suppress = &$config['installedpackages']['snortglobal']['suppress']['item'];
 $id_gen = count($config['installedpackages']['snortglobal']['suppress']['item']);
 
-$d_suppresslistdirty_path = '/var/run/snort_suppress.dirty';
-
 if ($_GET['act'] == "del") {
 	if ($a_suppress[$_GET['id']]) {
 		/* make sure rule is not being referenced by any nat or filter rules */
@@ -68,15 +66,10 @@ include_once("head.inc");
 
 <?php
 include_once("fbegin.inc");
+if($pfsense_stable == 'yes'){echo '<p class="pgtitle">' . $pgtitle . '</p>';}
 ?>
 
-<?if($pfsense_stable == 'yes'){echo '<p class="pgtitle">' . $pgtitle . '</p>';}?>
-
 <form action="/snort/snort_interfaces_suppress.php" method="post"><?php if ($savemsg) print_info_box($savemsg); ?>
-<?php if (file_exists($d_suppresslistdirty_path)): ?>
-<p><?php print_info_box_np("The white list has been changed.<br>You must apply the changes in order for them to take effect.");?>
-<?php endif; ?>
-
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
 <tr><td>
 <?php
@@ -93,7 +86,7 @@ include_once("fbegin.inc");
 </td>
 </tr>
 <tr><td class="tabcont">
-<table width="100%" border="0" cellpadding="6" cellspacing="0">
+<table width="100%" border="0" cellpadding="0" cellspacing="0">
 <tr>
 	<td width="30%" class="listhdrr">File Name</td>
 	<td width="60%" class="listhdr">Description</td>

@@ -88,6 +88,8 @@ if ($_POST['submit']) {
 	unset($input_errors);
 	$pconfig = $_POST;
 
+	$reqdfields = explode(" ", "name");
+	$reqdfieldsn = array("Name");
 	do_input_validation($_POST, $reqdfields, $reqdfieldsn, &$input_errors);
 
 	if(strtolower($_POST['name']) == "defaultwhitelist")
@@ -129,11 +131,9 @@ if ($_POST['submit']) {
 		write_config();
 
 		sync_snort_package_config();
-
 		header("Location: /snort/snort_interfaces_suppress.php");
 		exit;
 	}
-
 }
 
 $pgtitle = "Services: Snort: Suppression: Edit $suppress_uuid";
@@ -145,15 +145,11 @@ include_once("head.inc");
 
 <?php
 include("fbegin.inc");
-?>
+if($pfsense_stable == 'yes'){echo '<p class="pgtitle">' . $pgtitle . '</p>';}
 
-<?if($pfsense_stable == 'yes'){echo '<p class="pgtitle">' . $pgtitle . '</p>';}?>
-
-<?php if ($input_errors) print_input_errors($input_errors); ?>
-<?php
-	if ($savemsg) {
-		print_info_box($savemsg);
-	}
+if ($input_errors) print_input_errors($input_errors);
+if ($savemsg)
+	print_info_box($savemsg);
 
 ?>
 <form action="/snort/snort_interfaces_suppress_edit.php" name="iform" id="iform" method="post">
@@ -166,7 +162,7 @@ include("fbegin.inc");
 <tr>
 	<td width="22%" valign="top" class="vncellreq">Name</td>
 	<td width="78%" class="vtable"><input name="name" type="text" id="name"
-		size="40" value="<?=htmlspecialchars($pconfig['name']);?>" /> <br />
+		class="formfld unkown" size="40" value="<?=htmlspecialchars($pconfig['name']);?>" /> <br />
 	<span class="vexpl"> The list name may only consist of the
 	characters a-z, A-Z and 0-9. <span class="red">Note: </span> No
 	Spaces. </span></td>
@@ -174,7 +170,7 @@ include("fbegin.inc");
 <tr>
 	<td width="22%" valign="top" class="vncell">Description</td>
 	<td width="78%" class="vtable"><input name="descr" type="text"
-		id="descr" size="40" value="<?=$pconfig['descr'];?>" /> <br />
+		class="formfld unkown" id="descr" size="40" value="<?=$pconfig['descr'];?>" /> <br />
 	<span class="vexpl"> You may enter a description here for your
 	reference (not parsed). </span></td>
 </tr>
@@ -185,7 +181,7 @@ include("fbegin.inc");
 			<tr>
 				<td width='8%'>&nbsp;&nbsp;&nbsp;</td>
 				<td width='70%'><font size="2" color='#FF850A'><b>NOTE:</b></font>
-				<font size="2" color='#000000'>&nbsp;&nbsp;The threshold keyword
+				<font color='#000000'>&nbsp;&nbsp;The threshold keyword
 				is deprecated as of version 2.8.5. Use the event_filter keyword
 				instead.</font></td>
 			</tr>
@@ -228,7 +224,6 @@ include("fbegin.inc");
 <?php include("fend.inc"); ?>
 <script type="text/javascript">
 Rounded("div#redbox","all","#FFF","#E0E0E0","smooth");
-Rounded("td#blackbox","all","#FFF","#000000","smooth");
 </script>
 </body>
 </html>
