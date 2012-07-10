@@ -44,21 +44,8 @@ $snort_rules_file = "snortrules-snapshot-2923.tar.gz";
 $emerging_threats_version = "2.9.0";
 define("SNORTDIR", "/usr/local/etc/snort");
 
-/* Allow additional execution time 0 = no limit. */
-ini_set('max_execution_time', '9999');
-ini_set('max_input_time', '9999');
-
 if (!is_array($config['installedpackages']['snortglobal']))
 	$config['installedpackages']['snortglobal'] = array();
-
-/* find out if were in 1.2.3-RELEASE */
-if (intval($config['version']) > 6)
-	$snort_pfsense_basever = 'no';
-else
-	$snort_pfsense_basever = 'yes';
-
-/* tell me my theme */
-$pfsense_theme_is = $config['theme'];
 
 /* func builds custom white lists */
 function find_whitelist_key($find_wlist_number) {
@@ -92,7 +79,7 @@ function find_suppress_key($find_slist_number) {
 
 /* func builds custom whitelests */
 function build_base_whitelist($build_netlist, $wanip, $wangw, $wandns, $vips, $vpns, $userwips) {
-	global $config, $g, $snort_pfsense_basever;
+	global $config, $g;
 
 	/* build an interface array list */
 	if (function_exists('get_configured_interface_list'))
@@ -148,7 +135,7 @@ function build_base_whitelist($build_netlist, $wanip, $wangw, $wandns, $vips, $v
 		}
 	}
 
-	if ($snort_pfsense_basever == 'yes' && $wanip == 'yes') {
+	if ($config['version'] <= 6 && $wanip == 'yes') {
 		/* add all WAN ips to the whitelist */
 		$wan_if = get_real_wan_interface();
 		$ip = find_interface_ip($wan_if);
@@ -186,9 +173,9 @@ function build_base_whitelist($build_netlist, $wanip, $wangw, $wandns, $vips, $v
 
 	/* grab a list of vpns and whitelist if user desires added by nestorfish 954 */
 	if ($vpns == 'yes') {
-		if ($snort_pfsense_basever == 'yes') // chk what pfsense version were on
+		if ($config['version'] <= 6) // chk what pfsense version were on
 			$vpns_list = get_vpns_list();
-		else if ($snort_pfsense_basever == 'no') // chk what pfsense version were on
+		else
 			$vpns_list = filter_get_vpns_list();
 
 		if (!empty($vpns_list))
@@ -378,7 +365,7 @@ function snort_post_delete_logs($snort_uuid = 0) {
 }
 
 function snort_postinstall() {
-	global $config, $g, $snort_pfsense_basever;
+	global $config, $g;
 
 	$snortdir = SNORTDIR;
 
@@ -1141,7 +1128,7 @@ function snort_deinstall() {
 }
 
 function snort_generate_conf($id, $if_real, $snort_uuid) {
-	global $config, $g, $snort_pfsense_basever;
+	global $config, $g;
 
 	$snortdir = SNORTDIR;
 
@@ -1493,7 +1480,7 @@ function snort_generate_conf($id, $if_real, $snort_uuid) {
 		$def_ssl_ports_type = "$def_ssl_ports_info_chk";
 
 	/* if user is on pppoe, we really want to use ng0 interface */
-	if ($snort_pfsense_basever == 'yes' && $snort_ext_int == "wan")
+	if ($config['version'] <= 6 && $snort_ext_int == "wan")
 		$snort_ext_int = get_real_wan_interface();
 
 	/* set the snort performance model */
