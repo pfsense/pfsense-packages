@@ -121,8 +121,8 @@ if ($_POST['download']) {
 function get_snort_alert_date($fileline)
 {
 	/* date full date \d+\/\d+-\d+:\d+:\d+\.\d+\s */
-	if (preg_match("/\d+\/\d+-\d+:\d+:\d\d/", $fileline, $matches1))
-		$alert_date =  "$matches1[0]";
+	if (preg_match("/\d+\/\d+-\d+:\d+:\d\d/", $fileline, $matches))
+		$alert_date =  "$matches[0]";
 
 	return $alert_date;
 }
@@ -139,8 +139,8 @@ function get_snort_alert_disc($fileline)
 function get_snort_alert_class($fileline)
 {
 	/* class */
-	if (preg_match('/\[Classification:\s.+[^\d]\]/', $fileline, $matches2))
-		$alert_class = "$matches2[0]";
+	if (preg_match('/\[Classification:\s.+[^\d]\]/', $fileline, $matches))
+		$alert_class = "$matches[0]";
 
 	return $alert_class;
 }
@@ -148,8 +148,8 @@ function get_snort_alert_class($fileline)
 function get_snort_alert_priority($fileline)
 {
 	/* Priority */
-	if (preg_match('/Priority:\s\d/', $fileline, $matches3))
-		$alert_priority = "$matches3[0]";
+	if (preg_match('/Priority:\s\d/', $fileline, $matches))
+		$alert_priority = "$matches[0]";
 
 	return $alert_priority;
 }
@@ -157,8 +157,8 @@ function get_snort_alert_priority($fileline)
 function get_snort_alert_proto($fileline)
 {
 	/* Priority */
-	if (preg_match('/\{.+\}/', $fileline, $matches3))
-		$alert_proto = "$matches3[0]";
+	if (preg_match('/\{.+\}/', $fileline, $matches))
+		$alert_proto = "$matches[0]";
 
 	return $alert_proto;
 }
@@ -166,8 +166,8 @@ function get_snort_alert_proto($fileline)
 function get_snort_alert_proto_full($fileline)
 {
 	/* Protocal full */
-	if (preg_match('/.+\sTTL/', $fileline, $matches2))
-		$alert_proto_full = "$matches2[0]";
+	if (preg_match('/.+\sTTL/', $fileline, $matches))
+		$alert_proto_full = "$matches[0]";
 
 	return $alert_proto_full;
 }
@@ -178,8 +178,8 @@ function get_snort_alert_ip_src($fileline)
 	$re1='.*?';   # Non-greedy match on filler
 	$re2='((?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?))(?![\\d])'; # IPv4 IP Address 1
 
-	if ($c=preg_match_all ("/".$re1.$re2."/is", $fileline, $matches4))
-		$alert_ip_src = $matches4[1][0];
+	if (preg_match_all ("/".$re1.$re2."/is", $fileline, $matches))
+		$alert_ip_src = $matches[1][0];
 
 	return $alert_ip_src;
 }
@@ -187,8 +187,8 @@ function get_snort_alert_ip_src($fileline)
 function get_snort_alert_src_p($fileline)
 {
 	/* source port */
-	if (preg_match('/:\d+\s-/', $fileline, $matches5))
-		$alert_src_p = "$matches5[0]";
+	if (preg_match('/:\d+\s-/', $fileline, $matches))
+		$alert_src_p = "$matches[0]";
 
 	return $alert_src_p;
 }
@@ -196,8 +196,8 @@ function get_snort_alert_src_p($fileline)
 function get_snort_alert_flow($fileline)
 {
 	/* source port */
-	if (preg_match('/(->|<-)/', $fileline, $matches5))
-		$alert_flow = "$matches5[0]";
+	if (preg_match('/(->|<-)/', $fileline, $matches))
+		$alert_flow = "$matches[0]";
 
 	return $alert_flow;
 }
@@ -210,8 +210,8 @@ function get_snort_alert_ip_dst($fileline)
 	$re3dp='.*?';   # Non-greedy match on filler
 	$re4dp='((?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?))(?![\\d])'; # IPv4 IP Address 1
 
-	if ($c=preg_match_all ("/".$re1dp.$re2dp.$re3dp.$re4dp."/is", $fileline, $matches6))
-		$alert_ip_dst = $matches6[1][0];
+	if (preg_match_all("/".$re1dp.$re2dp.$re3dp.$re4dp."/is", $fileline, $matches))
+		$alert_ip_dst = $matches[1][0];
 
 	return $alert_ip_dst;
 }
@@ -219,8 +219,8 @@ function get_snort_alert_ip_dst($fileline)
 function get_snort_alert_dst_p($fileline)
 {
 	/* dst port */
-	if (preg_match('/:\d+$/', $fileline, $matches7))
-		$alert_dst_p = "$matches7[0]";
+	if (preg_match('/:\d+$/', $fileline, $matches))
+		$alert_dst_p = "$matches[0]";
 
 	return $alert_dst_p;
 }
@@ -228,8 +228,8 @@ function get_snort_alert_dst_p($fileline)
 function get_snort_alert_dst_p_full($fileline)
 {
 	/* dst port full */
-	if (preg_match('/:\d+\n[A-Z]+\sTTL/', $fileline, $matches7))
-		$alert_dst_p = "$matches7[0]";
+	if (preg_match('/:\d+\n[A-Z]+\sTTL/', $fileline, $matches))
+		$alert_dst_p = "$matches[0]";
 
 	return $alert_dst_p;
 }
@@ -237,8 +237,8 @@ function get_snort_alert_dst_p_full($fileline)
 function get_snort_alert_sid($fileline)
 {
 	/* SID */
-	if (preg_match('/\[\d+:\d+:\d+\]/', $fileline, $matches8))
-		$alert_sid = "$matches8[0]";
+	if (preg_match('/\[\d+:\d+:\d+\]/', $fileline, $matches))
+		$alert_sid = "$matches[0]";
 
 	return $alert_sid;
 }

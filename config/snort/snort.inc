@@ -246,7 +246,7 @@ function Running_Stop($snort_uuid, $if_real, $id) {
 
 	if (file_exists("{$g['varrun_path']}/barnyard2_{$if_real}{$snort_uuid}.pid") && isvalidpid("{$g['varrun_path']}/barnyard2_{$if_real}{$snort_uuid}.pid")) {
 		killbypid("{$g['varrun_path']}/barnyard2_{$if_real}{$snort_uuid}.pid");
-		exec("/bin/rm {$g['varrun_path']}/barnyard2_{$snort_uuid}_{$if_real}*");
+		@unlink("{$g['varrun_path']}/barnyard2_{$if_real}{$snort_uuid}.pid");
 	}
 
 	$snortconf = $config['installedpackages']['snortglobal']['rule'][$id];
@@ -1003,7 +1003,7 @@ function generate_barnyard2_conf($id, $if_real, $snort_uuid) {
 	/* TODO: add support for the other 5 output plugins */
 	$snortconf = $config['installedpackages']['snortglobal']['rule'][$id];
 	$snortbarnyardlog_database_info_chk = $snortconf['barnyard_mysql'];
-	$snortbarnyardlog_hostname_info_chk = exec("/bin/hostname");
+	$snortbarnyardlog_hostname_info_chk = php_uname("n");
 	/* user add arguments */
 	$snortbarnyardlog_config_pass_thru = str_replace("\r", "", base64_decode($snortconf['barnconfigpassthru']));
 
@@ -1020,7 +1020,7 @@ config gen_file:            {$snortdir}/snort_{$snort_uuid}_{$if_real}/gen-msg.m
 config sid_file:	        {$snortdir}/snort_{$snort_uuid}_{$if_real}/sid-msg.map
 
 config hostname:       $snortbarnyardlog_hostname_info_chk
-config interface:      {$snort_uuid}_{$if_real}
+config interface:      {$if_real}
 config decode_data_link
 config waldo_file: /var/log/snort/snort_{$if_real}{$snort_uuid}/barnyard2/{$snort_uuid}_{$if_real}.waldo
 

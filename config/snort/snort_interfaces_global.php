@@ -41,8 +41,6 @@ global $g;
 
 $snortdir = SNORTDIR;
 
-$d_snort_global_dirty_path = '/var/run/snort_global.dirty';
-
 /* make things short  */
 $pconfig['snortdownload'] = $config['installedpackages']['snortglobal']['snortdownload'];
 $pconfig['oinkmastercode'] = $config['installedpackages']['snortglobal']['oinkmastercode'];
@@ -172,21 +170,11 @@ include_once("fbegin.inc");
 
 if($pfsense_stable == 'yes')
 	echo '<p class="pgtitle">' . $pgtitle . '</p>';
-?>
 
-<?php
-	/* Display Alert message, under form tag or no refresh */
-	if ($input_errors)
-		print_input_errors($input_errors); // TODO: add checks
+/* Display Alert message, under form tag or no refresh */
+if ($input_errors)
+	print_input_errors($input_errors); // TODO: add checks
 
-	if (!$input_errors) {
-		if (file_exists($d_snort_global_dirty_path)) {
-			print_info_box_np('
-			The Snort configuration has changed and snort needs to be restarted on this interface.<br>
-			You must apply the changes in order for them to take effect.<br>
-			');
-		}
-	}
 ?>
 
 <form action="snort_interfaces_global.php" method="post" enctype="multipart/form-data" name="iform" id="iform">
@@ -345,12 +333,12 @@ if($pfsense_stable == 'yes')
 	<td width="78%" class="vtable">
 		<select name="snortalertlogtype" class="formselect" id="snortalertlogtype">
 		<?php
-		$interfaces4 = array('full' => 'FULL', 'fast' => 'SHORT');
-		foreach ($interfaces4 as $iface4 => $ifacename4): ?>
-		<option value="<?=$iface4;?>"
-		<?php if ($iface4 == $pconfig['snortalertlogtype']) echo "selected"; ?>>
-			<?=htmlspecialchars($ifacename4);?></option>
-			<?php endforeach; ?>
+		$logtype = array('full' => 'FULL', 'fast' => 'SHORT');
+		foreach ($logtype as $logt => $logdescr): ?>
+		<option value="<?=$logt;?>"
+		<?php if ($logt == $pconfig['snortalertlogtype']) echo "selected"; ?>>
+			<?=htmlspecialchars($logdescr);?></option>
+		<?php endforeach; ?>
 	</select><br>
 	<span class="vexpl">Please choose the type of Alert logging you will
 	like see in your alert file.<br>
