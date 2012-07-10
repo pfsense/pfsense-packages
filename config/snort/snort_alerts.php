@@ -79,7 +79,7 @@ if ($_POST['save'])
 	exit;
 }
 
-if ($_GET['action'] == "clear" || $_POST['clear']) {
+if ($_GET['action'] == "clear" || $_POST['delete']) {
 	if (file_exists("/var/log/snort/snort_{$if_real}{$snort_uuid}/alert")) {
 		conf_mount_rw();
 		snort_post_delete_logs($snort_uuid);
@@ -266,7 +266,7 @@ if ($pconfig['arefresh'] == 'on')
         $tab_array[0] = array(gettext("Snort Interfaces"), false, "/snort/snort_interfaces.php");
         $tab_array[1] = array(gettext("Global Settings"), false, "/snort/snort_interfaces_global.php");
         $tab_array[2] = array(gettext("Updates"), false, "/snort/snort_download_updates.php");
-        $tab_array[3] = array(gettext("Alerts"), true, "/snort/snort_alerts.php");
+        $tab_array[3] = array(gettext("Alerts"), true, "/snort/snort_alerts.php?instance={$instanceid}");
         $tab_array[4] = array(gettext("Blocked"), false, "/snort/snort_blocked.php");
         $tab_array[5] = array(gettext("Whitelists"), false, "/snort/snort_interfaces_whitelist.php");
         $tab_array[6] = array(gettext("Suppress"), false, "/snort/snort_interfaces_suppress.php");
