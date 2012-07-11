@@ -177,11 +177,11 @@ include_once("head.inc");
 					<tr>
 						<td id="download_rules_td" style='background-color: #eeeeee'>
 						<div height="32" width="725px" style='background-color: #eeeeee'>
-
-							<font
-							color='#FF850A' size='1px'><b>NOTE:</b></font><font size='1px'
-							color='#000000'>&nbsp;&nbsp;Snort.org and Emergingthreats.net
-						will go down from time to time. Please be patient.</font></div>
+							<font color='#FF850A' size='1px'><b>NOTE:</b></font><font size='1px'
+								color='#000000'>&nbsp;&nbsp;Snort.org and Emergingthreats.net
+								will go down from time to time. Please be patient.
+							</font>
+						</div>
 						</td>
 					</tr>
 				</table>

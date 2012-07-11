@@ -56,31 +56,20 @@ $pconfig = array();
 if (isset($id) && $a_nat[$id]) {
 	/* old options */
 	$pconfig = $a_nat[$id];
-	$pconfig['barnyard_enable'] = $a_nat[$id]['barnyard_enable'];
-	$pconfig['barnyard_mysql'] = $a_nat[$id]['barnyard_mysql'];
 	$pconfig['barnconfigpassthru'] = base64_decode($a_nat[$id]['barnconfigpassthru']);
 }
 
 if (isset($_GET['dup']))
 	unset($id);
 
-$if_real = snort_get_real_interface($pconfig['interface']);
-$snort_uuid = $pconfig['uuid'];
-
-/* alert file */
-$d_snortconfdirty_path = "/var/run/snort_conf_{$snort_uuid}_{$if_real}.dirty";
-
 if ($_POST) {
 
-	/* XXX: Mising error reporting?! 
-	 * check for overlaps 
 	foreach ($a_nat as $natent) {
 		if (isset($id) && ($a_nat[$id]) && ($a_nat[$id] === $natent))
 			continue;
 		if ($natent['interface'] != $_POST['interface'])
-			continue;
+			$input_error[] = "This interface has already an instance defined";
 	}
-	*/
 
 	/* if no errors write to conf */
 	if (!$input_errors) {
@@ -89,8 +78,8 @@ if ($_POST) {
 		$natent = $pconfig;
 
 		$natent['barnyard_enable'] = $_POST['barnyard_enable'] ? 'on' : 'off';
-		$natent['barnyard_mysql'] = $_POST['barnyard_mysql'] ? $_POST['barnyard_mysql'] : $pconfig['barnyard_mysql'];
-		$natent['barnconfigpassthru'] = $_POST['barnconfigpassthru'] ? base64_encode($_POST['barnconfigpassthru']) : $pconfig['barnconfigpassthru'];
+		if ($_POST['barnyard_mysql']) $natent['barnyard_mysql'] = $_POST['barnyard_mysql']; unset($natent['barnyard_mysql']);
+		if ($_POST['barnconfigpassthru']) $natent['barnconfigpassthru'] = base64_encode($_POST['barnconfigpassthru']); unset($natent['barnconfigpassthru']);
 		if ($_POST['barnyard_enable'] == "on")
 			$natent['snortunifiedlog'] = 'on';
 		else
@@ -119,7 +108,8 @@ if ($_POST) {
 	}
 }
 
-$pgtitle = "Snort: Interface: $id$if_real Barnyard2 Edit";
+$if_friendly = snort_get_friendly_interface($pconfig['interface']);
+$pgtitle = "Snort: Interface: {$if_friendly} Barnyard2 Edit";
 include_once("head.inc");
 
 ?>

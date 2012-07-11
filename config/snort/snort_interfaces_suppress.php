@@ -51,7 +51,6 @@ if ($_GET['act'] == "del") {
 
 		unset($a_suppress[$_GET['id']]);
 		write_config();
-		filter_configure();
 		header("Location: /snort/snort_interfaces_suppress.php");
 		exit;
 	}

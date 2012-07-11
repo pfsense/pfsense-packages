@@ -60,7 +60,8 @@ if (isset($id) && $a_nat[$id]) {
 	$iface_uuid = $a_nat[$id]['uuid'];
 }
 
-$pgtitle = "Snort: Interface $id $iface_uuid $if_real Categories";
+$if_friendly = snort_get_friendly_interface($pconfig['interface']);
+$pgtitle = "Snort: Interface {$if_friendly} Categories";
 
 
 /* Check if the rules dir is empy if so warn the user */
@@ -83,20 +84,13 @@ if ($isrulesfolderempty == "") {
 		<tr><td>\n";
 
 		$tab_array = array();
-		$tabid = 0;
-		$tab_array[$tabid] = array(gettext("Snort Interfaces"), false, "/snort/snort_interfaces.php");
-		$tabid++;
-		$tab_array[$tabid] = array(gettext("If Settings"), false, "/snort/snort_interfaces_edit.php?id={$id}");
-		$tabid++;
-		$tab_array[$tabid] = array(gettext("Categories"), true, "/snort/snort_rulesets.php?id={$id}");
-		$tabid++;
-		$tab_array[$tabid] = array(gettext("Rules"), false, "/snort/snort_rules.php?id={$id}");
-		$tabid++;
-		$tab_array[$tabid] = array(gettext("Servers"), false, "/snort/snort_define_servers.php?id={$id}");
-		$tabid++;
-		$tab_array[$tabid] = array(gettext("Preprocessors"), false, "/snort/snort_preprocessors.php?id={$id}");
-		$tabid++;
-		$tab_array[$tabid] = array(gettext("Barnyard2"), false, "/snort/snort_barnyard.php?id={$id}");
+		$tab_array[] = array(gettext("Snort Interfaces"), false, "/snort/snort_interfaces.php");
+		$tab_array[] = array(gettext("If Settings"), false, "/snort/snort_interfaces_edit.php?id={$id}");
+		$tab_array[] = array(gettext("Categories"), true, "/snort/snort_rulesets.php?id={$id}");
+		$tab_array[] = array(gettext("Rules"), false, "/snort/snort_rules.php?id={$id}");
+		$tab_array[] = array(gettext("Servers"), false, "/snort/snort_define_servers.php?id={$id}");
+		$tab_array[] = array(gettext("Preprocessors"), false, "/snort/snort_preprocessors.php?id={$id}");
+		$tab_array[] = array(gettext("Barnyard2"), false, "/snort/snort_barnyard.php?id={$id}");
 		display_top_tabs($tab_array);
 		echo " 
 		</td></tr>
@@ -133,7 +127,6 @@ if ($isrulesfolderempty == "") {
 }
 
 /* alert file */
-$d_snortconfdirty_path = "/var/run/snort_conf_{$iface_uuid}_{$if_real}.dirty";
 if ($_POST["Submit"]) {
 	$enabled_items = "";
 	$isfirst = true;
@@ -184,39 +177,19 @@ if ($savemsg) {
 	print_info_box($savemsg);
 }
 
-if (file_exists($d_snortconfdirty_path)) {
-	echo '<p>';
-
-	if($savemsg) {
-		print_info_box_np("{$savemsg}");
-	}else{
-		print_info_box_np('
-			The Snort configuration has changed and snort needs to be restarted on this interface.<br>
-			You must apply the changes in order for them to take effect.<br>
-			');
-	}
-}
-
 ?>
 
 <table width="99%" border="0" cellpadding="0" cellspacing="0">
 <tr><td>
 <?php
         $tab_array = array();
-        $tabid = 0;
-        $tab_array[$tabid] = array(gettext("Snort Interfaces"), false, "/snort/snort_interfaces.php");
-        $tabid++;
-        $tab_array[$tabid] = array(gettext("If Settings"), false, "/snort/snort_interfaces_edit.php?id={$id}");
-        $tabid++;
-        $tab_array[$tabid] = array(gettext("Categories"), true, "/snort/snort_rulesets.php?id={$id}");
-        $tabid++;
-        $tab_array[$tabid] = array(gettext("Rules"), false, "/snort/snort_rules.php?id={$id}");
-        $tabid++;
-        $tab_array[$tabid] = array(gettext("Servers"), false, "/snort/snort_define_servers.php?id={$id}");
-        $tabid++;
-        $tab_array[$tabid] = array(gettext("Preprocessors"), false, "/snort/snort_preprocessors.php?id={$id}");
-        $tabid++;
-        $tab_array[$tabid] = array(gettext("Barnyard2"), false, "/snort/snort_barnyard.php?id={$id}");
+        $tab_array[] = array(gettext("Snort Interfaces"), false, "/snort/snort_interfaces.php");
+        $tab_array[] = array(gettext("If Settings"), false, "/snort/snort_interfaces_edit.php?id={$id}");
+        $tab_array[] = array(gettext("Categories"), true, "/snort/snort_rulesets.php?id={$id}");
+        $tab_array[] = array(gettext("Rules"), false, "/snort/snort_rules.php?id={$id}");
+        $tab_array[] = array(gettext("Servers"), false, "/snort/snort_define_servers.php?id={$id}");
+        $tab_array[] = array(gettext("Preprocessors"), false, "/snort/snort_preprocessors.php?id={$id}");
+        $tab_array[] = array(gettext("Barnyard2"), false, "/snort/snort_barnyard.php?id={$id}");
         display_top_tabs($tab_array);
 ?>
 </td></tr>

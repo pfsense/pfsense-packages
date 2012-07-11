@@ -56,11 +56,10 @@ if (isset($id) && $a_nat[$id]) {
 
 	/* new options */
 	$pconfig['perform_stat'] = $a_nat[$id]['perform_stat'];
-	$pconfig['def_ssl_ports_ignore'] = $a_nat[$id]['def_ssl_ports_ignore'];
+	$pconfig['ssl_ports_ignore'] = $a_nat[$id]['def_ssl_ports_ignore'];
 	$pconfig['flow_depth'] = $a_nat[$id]['flow_depth'];
 	$pconfig['max_queued_bytes'] = $a_nat[$id]['max_queued_bytes'];
 	$pconfig['max_queued_segs'] = $a_nat[$id]['max_queued_segs'];
-	$pconfig['perform_stat'] = $a_nat[$id]['perform_stat'];
 	$pconfig['http_inspect'] = $a_nat[$id]['http_inspect'];
 	$pconfig['other_preprocs'] = $a_nat[$id]['other_preprocs'];
 	$pconfig['ftp_preprocessor'] = $a_nat[$id]['ftp_preprocessor'];
@@ -70,23 +69,14 @@ if (isset($id) && $a_nat[$id]) {
 	$pconfig['dns_preprocessor'] = $a_nat[$id]['dns_preprocessor'];
 }
 
-/* convert fake interfaces to real */
-$if_real = snort_get_real_interface($pconfig['interface']);
-$snort_uuid = $pconfig['uuid'];
-
-/* alert file */
-$d_snortconfdirty_path = "/var/run/snort_conf_{$snort_uuid}_{$if_real}.dirty";
-
 if ($_POST) {
-
 	$natent = array();
 	$natent = $pconfig;
 
 	/* if no errors write to conf */
 	if (!$input_errors) {
 		/* post new options */
-		$natent['perform_stat'] = $_POST['perform_stat'];
-		if ($_POST['def_ssl_ports_ignore'] != "") { $natent['def_ssl_ports_ignore'] = $_POST['def_ssl_ports_ignore']; }else{ $natent['def_ssl_ports_ignore'] = ""; }
+		if ($_POST['ssl_ports_ignore'] != "") { $natent['def_ssl_ports_ignore'] = $_POST['ssl_ports_ignore']; }else{ $natent['def_ssl_ports_ignore'] = ""; }
 		if ($_POST['flow_depth'] != "") { $natent['flow_depth'] = $_POST['flow_depth']; }else{ $natent['flow_depth'] = ""; }
 		if ($_POST['max_queued_bytes'] != "") { $natent['max_queued_bytes'] = $_POST['max_queued_bytes']; }else{ $natent['max_queued_bytes'] = ""; }
 		if ($_POST['max_queued_segs'] != "") { $natent['max_queued_segs'] = $_POST['max_queued_segs']; }else{ $natent['max_queued_segs'] = ""; }
@@ -125,7 +115,8 @@ if ($_POST) {
 	}
 }
 
-$pgtitle = "Snort: Interface $id$if_real Preprocessors and Flow";
+$if_friendly = snort_get_friendly_interface($pconfig['interface']);
+$pgtitle = "Snort: Interface {$if_real} Preprocessors and Flow";
 include_once("head.inc");
 ?>
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">
@@ -312,9 +303,9 @@ include_once("head.inc");
 	</tr>
 	<tr>
 		<td width="22%" valign="top" class="vncell">Define SSL_IGNORE</td>
-		<td width="78%" class="vtable"><input name="def_ssl_ports_ignore"
-			type="text" class="formfld" id="def_ssl_ports_ignore" size="40"
-			value="<?=htmlspecialchars($pconfig['def_ssl_ports_ignore']);?>"> <br>
+		<td width="78%" class="vtable"><input name="ssl_ports_ignore"
+			type="text" class="formfld" id="ssl_ports_ignore" size="40"
+			value="<?=htmlspecialchars($pconfig['ssl_ports_ignore']);?>"> <br>
 		<span class="vexpl"> Encrypted traffic should be ignored by Snort
 		for both performance reasons and to reduce false positives.<br>
 		Default: "443 465 563 636 989 990 992 993 994 995".</span> <strong>Please

@@ -43,43 +43,66 @@ $snort_package_version = "Snort {$snort_version} pkg v. {$pfSense_snort_version}
 $snort_rules_file = "snortrules-snapshot-2923.tar.gz";
 $emerging_threats_version = "2.9.0";
 define("SNORTDIR", "/usr/local/etc/snort");
+define("SNORTLOGDIR", "/var/log/snort");
 
 if (!is_array($config['installedpackages']['snortglobal']))
 	$config['installedpackages']['snortglobal'] = array();
 
-/* func builds custom white lists */
-function find_whitelist_key($find_wlist_number) {
-	global $config, $g;
+function snort_generate_id() {
+	global $config;
 
-	if (!is_array($config['installedpackages']['snortglobal']['whitelist']))
-		$config['installedpackages']['snortglobal']['whitelist'] = array();
-	if (!is_array($config['installedpackages']['snortglobal']['whitelist']['item']))
-		return 0; /* XXX */
-
-	foreach ($config['installedpackages']['snortglobal']['whitelist']['item'] as $w_key => $value) {
-		if ($value['name'] == $find_wlist_number)
-			return $w_key;
+	$snortglob = $config['installedpackages']['snortglobal']['rule'];
+	while (true) {
+		$snort_uuid = mt_rand(1, 65535);
+		foreach ($snortglob as $value) {
+			if ($value['uuid'] == $snort_uuid)
+				continue 2;
+		}
+		break;
 	}
+
+	return $snort_uuid;
 }
 
-/* func builds custom suppress lists */
-function find_suppress_key($find_slist_number) {
-	global $config, $g;
+/* func builds custom white lists */
+function snort_find_list($find_name, $type = 'whitelist') {
+	global $config;
 
-	if (!is_array($config['installedpackages']['snortglobal']['suppress']))
-		$config['installedpackages']['snortglobal']['suppress'] = array();
-	if (!is_array($config['installedpackages']['snortglobal']['suppress']['item']))
-		return 0; /* XXX */
+	$snortglob = $config['installedpackages']['snortglobal'];
+	if (!is_array($snortglob[$type]))
+		return "";
+	if (!is_array($snortglob[$type]['item']))
+		return "";
 
-	foreach ($config['installedpackages']['snortglobal']['suppress']['item'] as $s_key => $value) {
-		if ($value['name'] == $find_slist_number)
-			return $s_key;
+	foreach ($snortglob[$type]['item'] as $value) {
+		if ($value['name'] == $find_name)
+			return $value;
 	}
+
+	return array();
 }
 
 /* func builds custom whitelests */
-function build_base_whitelist($build_netlist, $wanip, $wangw, $wandns, $vips, $vpns, $userwips) {
+function snort_build_list($listname = "") {
 	global $config, $g;
+
+	/* Add loopback to whitelist (ftphelper) */
+	$home_net = "127.0.0.1 ";
+
+	if ($listname == 'default' || empty($listname)) {
+		$wanip = 'yes'; $wangw = 'yes'; $wandns = 'yes'; $vips = 'yes'; $vpns = 'yes';
+	} else {
+                $whitelist = snort_find_list($listname);
+                if (empty($whitelist))
+                        return $whitelist;
+		$wanip = $whitelist['wanips'];
+		$wangw = $whitelist['wangateips'];
+		$wandns = $whitelist['wandnsips'];
+		$vips = $whitelist['vips'];
+		$vpns = $whitelist['vpnips'];
+		if (!empty($whitelist['address']))
+			$home_net .= trim($whitelist['address']);
+	}
 
 	/* build an interface array list */
 	if (function_exists('get_configured_interface_list'))
@@ -87,12 +110,9 @@ function build_base_whitelist($build_netlist, $wanip, $wangw, $wandns, $vips, $v
 	else {
 		$int_array = array('lan');
 		for ($j = 1; isset ($config['interfaces']['opt' . $j]); $j++)
-		if(isset($config['interfaces']['opt' . $j]['enable']))
-		if(isset($config['interfaces']['opt' . $j]['gateway']))
-			$int_array[] = "opt{$j}";
+			if(isset($config['interfaces']['opt' . $j]['enable']))
+				$int_array[] = "opt{$j}";
 	}
-
-	$home_net = "";
 
 	/*  iterate through interface list and write out whitelist items
 	 *  and also compile a home_net list for snort.
@@ -103,7 +123,7 @@ function build_base_whitelist($build_netlist, $wanip, $wangw, $wandns, $vips, $v
 			$subnet = get_interface_ip($int);
 			if (is_ipaddr($subnet)) {
 				$sn = get_interface_subnet($int);
-				$home_net .= "{$subnet}/{$sn} ";
+				$home_net = "{$subnet}/{$sn} ";
 			}
 		} else {
 			$ifcfg = $config['interfaces'][$int];
@@ -117,37 +137,29 @@ function build_base_whitelist($build_netlist, $wanip, $wangw, $wandns, $vips, $v
 					$subnet = find_interface_ip("ng0");
 
 				if (is_ipaddr($subnet))
-					$home_net .= "{$subnet} ";
+					$home_net = "{$subnet} ";
 				break;
 			case "dhcp":
 				$subnet = find_interface_ip(snort_get_real_interface($int));
 				if (is_ipaddr($subnet))
-					$home_net .= "{$subnet} ";
+					$home_net = "{$subnet} ";
 				break;
 			default:
 				if (is_ipaddr($ifcfg['ipaddr'])) {
 					$subnet = gen_subnet($ifcfg['ipaddr'], $ifcfg['subnet']);
 					if ($ifcfg['subnet'])
-						$home_net .= "{$subnet}/{$ifcfg['subnet']} ";
+						$home_net = "{$subnet}/{$ifcfg['subnet']} ";
 				}
 				break;
 			}
 		}
 	}
 
-	if ($config['version'] <= 6 && $wanip == 'yes') {
-		/* add all WAN ips to the whitelist */
-		$wan_if = get_real_wan_interface();
-		$ip = find_interface_ip($wan_if);
-		if (is_ipaddr($ip))
-			$home_net .= "{$ip} ";
-	}
-
 	if ($wangw == 'yes') {
 		/* Add Gateway on WAN interface to whitelist (For RRD graphs) */
 		$gw = get_interface_gateway('wan');
-		if($gw)
-			$home_net .= "{$gw} ";
+		if (is_ipaddr($gw))
+			$home_net = "{$gw} ";
 	}
 
 	if($wandns == 'yes') {
@@ -155,7 +167,7 @@ function build_base_whitelist($build_netlist, $wanip, $wangw, $wandns, $vips, $v
 		$dns_servers = get_dns_servers();
 		foreach ($dns_servers as $dns) {
 			if($dns)
-				$home_net .= "{$dns} ";
+				$home_net = "{$dns} ";
 		}
 	}
 
@@ -163,13 +175,10 @@ function build_base_whitelist($build_netlist, $wanip, $wangw, $wandns, $vips, $v
 		/* iterate all vips and add to whitelist */
 		if (is_array($config['virtualip']) && is_array($config['virtualip']['vip'])) {
 			foreach($config['virtualip']['vip'] as $vip)
-				if($vip['subnet'])
+				if ($vip['subnet'] && $vip['mode'] != 'proxyarp')
 					$home_net .= "{$vip['subnet']} ";
 		}
 	}
-
-	/* Add loopback to whitelist (ftphelper) */
-	$home_net .= "127.0.0.1 ";
 
 	/* grab a list of vpns and whitelist if user desires added by nestorfish 954 */
 	if ($vpns == 'yes') {
@@ -182,63 +191,32 @@ function build_base_whitelist($build_netlist, $wanip, $wangw, $wandns, $vips, $v
 			$home_net .= "{$vpns_list} ";
 	}
 
-	/* never ever compair numbers to words */
-	if ($userwips > -1) {
-		if (!is_array($config['installedpackages']['snortglobal']['whitelist']['item']))
-			$config['installedpackages']['snortglobal']['whitelist']['item'] = array();
-
-		$home_net .= $config['installedpackages']['snortglobal']['whitelist']['item'][$userwips]['address'];
-	}
-
 	$home_net = trim($home_net);
-
-	/* this foe whitelistfile, convert spaces to carriage returns */
-	if ($build_netlist == 'whitelist') {
-		$whitelist_home_net = str_replace("  ", "\n", $home_net);
-		$whitelist_home_net = str_replace(" ", "\n", $home_net);
-		return $whitelist_home_net;
-	}
-
-	/* this is for snort.conf */
 	$validator = explode(" ", $home_net);
 	$valresult = array();
 	foreach ($validator as $vald) { 
 		if (empty($vald))
 			continue;
-		$valresult[] = $vald;
+		$valresult[] = trim($vald);
 	}
-	$home_net = implode(",", $valresult);
-	$home_net = "[{$home_net}]";
 
-	return $home_net;
+	return $valresult;
 }
 
-
-/* checks to see if snort is running yes/no and stop/start */
-function Running_Ck($snort_uuid, $if_real, $id) {
+/* checks to see if service is running yes/no and stop/start */
+function snort_is_running($snort_uuid, $if_real, $type = 'snort') {
 	global $config, $g;
 
-	$snort_uph = 'no';
-	if (file_exists("{$g['varrun_path']}/snort_{$if_real}{$snort_uuid}.pid") && isvalidpid("{$g['varrun_path']}/snort_{$if_real}{$snort_uuid}.pid"))
-		$snort_uph = 'yes';
+	if (file_exists("{$g['varrun_path']}/{$type}_{$if_real}{$snort_uuid}.pid") && isvalidpid("{$g['varrun_path']}/snort_{$if_real}{$snort_uuid}.pid"))
+		return 'yes';
 
-	return $snort_uph;
+	return 'no';
 }
 
-/* checks to see if barnyard2 is running yes/no */
-function Running_Ck_b($snort_uuid, $if_real, $id) {
+function snort_stop($snortcfg, $if_real) {
 	global $config, $g;
 
-	$snort_up_b = 'no';
-	if (file_exists("{$g['varrun_path']}/barnyard2_{$if_real}{$snort_uuid}.pid") && isvalidpid("{$g['varrun_path']}/barnyard2_{$if_real}{$snort_uuid}.pid"))
-		$snort_up_b = 'yes';
-
-	return $snort_up_b;
-}
-
-function Running_Stop($snort_uuid, $if_real, $id) {
-	global $config, $g;
-
+	$snort_uuid = $snortcfg['uuid'];
 	if (file_exists("{$g['varrun_path']}/snort_{$if_real}{$snort_uuid}.pid") && isvalidpid("{$g['varrun_path']}/snort_{$if_real}{$snort_uuid}.pid")) {
 		killbypid("{$g['varrun_path']}/snort_{$if_real}{$snort_uuid}.pid");
 		exec("/bin/rm {$g['varrun_path']}/snort_{$if_real}{$snort_uuid}.pid");
@@ -249,31 +227,29 @@ function Running_Stop($snort_uuid, $if_real, $id) {
 		@unlink("{$g['varrun_path']}/barnyard2_{$if_real}{$snort_uuid}.pid");
 	}
 
-	$snortconf = $config['installedpackages']['snortglobal']['rule'][$id];
 	/* Log Iface stop */
-	exec("/usr/bin/logger -p daemon.info -i -t SnortStartup 'Interface Rule STOP for {$snortconf['descr']}({$snort_uuid}_{$if_real})...'");
+	exec("/usr/bin/logger -p daemon.info -i -t SnortStartup 'Interface Rule STOP for {$snortcfg['descr']}({$snort_uuid}_{$if_real})...'");
 	sleep(2); // Give time so GUI displays correctly
 }
 
-function Running_Start($snort_uuid, $if_real, $id) {
+function snort_start($snortcfg, $if_real) {
 	global $config, $g;
 
 	$snortdir = SNORTDIR;
+	$snort_uuid = $snortcfg['uuid'];
 
-	$snortconf = $config['installedpackages']['snortglobal']['rule'][$id];
-
-	if ($snortconf['enable'] == 'on')
+	if ($snortcfg['enable'] == 'on')
 		exec("/usr/local/bin/snort -R {$snort_uuid} -D -q -l /var/log/snort/snort_{$if_real}{$snort_uuid} --pid-path {$g['varrun_path']} --nolock-pidfile -G {$snort_uuid} -c {$snortdir}/snort_{$snort_uuid}_{$if_real}/snort.conf -i {$if_real}");
 	else
 		return;
 
 	/* define snortbarnyardlog_chk */
 	/* top will have trouble if the uuid is to far back */
-	if ($snortconf['barnyard_enable'] == 'on' && !empty($snortconf['barnyard_mysql']))
+	if ($snortcfg['barnyard_enable'] == 'on' && !empty($snortcfg['barnyard_mysql']))
 		exec("/usr/local/bin/barnyard2 -r {$snort_uuid} -f \"snort_{$snort_uuid}_{$if_real}.u2\" --pid-path {$g['varrun_path']} --nolock-pidfile -c {$snortdir}/snort_{$snort_uuid}_{$if_real}/barnyard2.conf -d /var/log/snort/snort_{$if_real}{$snort_uuid} -D -q");
 
 	/* Log Iface stop */
-	exec("/usr/bin/logger -p daemon.info -i -t SnortStartup 'Interface Rule START for {$snortconf['descr']}({$snort_uuid}_{$if_real})...'");
+	exec("/usr/bin/logger -p daemon.info -i -t SnortStartup 'Interface Rule START for {$snortcfg['descr']}({$snort_uuid}_{$if_real})...'");
 	sleep(2); // Give time so GUI displays correctly
 }
 
@@ -354,10 +330,6 @@ function snort_post_delete_logs($snort_uuid = 0) {
 			foreach ($filelist as $file)
 				@unlink($file);
 
-			/* create barnyard2 configuration file */
-			//if ($value['barnyard_enable'] == 'on')
-			//create_barnyard2_conf($id, $if_real, $snort_uuid);
-
 			if ($value['perform_stat'] == 'on')
 				@file_put_contents("{$snort_log_dir}/{$if_real}.stats", "");
 		}
@@ -400,7 +372,6 @@ function snort_postinstall() {
 	mwexec("/usr/sbin/chown -R snort:snort {$snortdir}", true);
 	mwexec('/usr/sbin/chown -R snort:snort /usr/local/lib/snort', true);
 	mwexec('/usr/sbin/chown snort:snort /tmp/snort*', true);
-	mwexec('/usr/sbin/chown snort:snort /var/db/whitelist', true);
 
 	/* remake saved settings */
 	if ($config['installedpackages']['snortglobal']['forcekeepsettings'] == 'on') {
@@ -654,7 +625,6 @@ function sync_snort_package_config() {
 	//exec("/sbin/sysctl net.inet.tcp.rfc1323=1");
 
 	conf_mount_rw();
-
 	/* do not start config build if rules is empty */
 	if (!is_array($config['installedpackages']['snortglobal']['rule'])) {
 		exec('/bin/rm /usr/local/etc/rc.d/snort.sh');
@@ -662,171 +632,42 @@ function sync_snort_package_config() {
 		return;
 	}
 
-	foreach ($config['installedpackages']['snortglobal']['rule'] as $id => $value) {
+	$snortconf = $config['installedpackages']['snortglobal']['rule'];
+	foreach ($snortconf as $value) {
 		$if_real = snort_get_real_interface($value['interface']);
-		$snort_uuid = $value['uuid'];
 
-		if ($if_real != '' && $snort_uuid != '') {
+		/* create snort configuration file */
+		snort_generate_conf($value);
 
-			/* only build whitelist when needed */
-			if ($value['blockoffenders7'] == 'on')
-				create_snort_whitelist($id, $if_real);
+		/* populate rules */
+		snort_create_rules_iface($if_real, $value['uuid']);
 
-			/* only build threshold when needed */
-			if ($value['suppresslistname'] != 'default')
-				create_snort_suppress($id, $if_real);
-
-			/* create snort configuration file */
-			snort_create_conf($id, $if_real, $snort_uuid);
-
-			/* if rules exist cp rules to each iface */
-			create_rules_iface($id, $if_real, $snort_uuid);
-
-			/* create barnyard2 configuration file */
-			if ($value['barnyard_enable'] == 'on')
-				create_barnyard2_conf($id, $if_real, $snort_uuid);
-		}
+		/* create barnyard2 configuration file */
+		if ($value['barnyard_enable'] == 'on')
+			snort_create_barnyard2_conf($value, $if_real);
 	}
 
 	/* create snort bootup file snort.sh only create once */
 	snort_create_rc();
 
 	if (is_array($config['installedpackages']['snortglobal'])) {
-		$snort_snortloglimit_info_ck = $config['installedpackages']['snortglobal']['snortloglimit'];
-		snort_snortloglimit_install_cron($snort_snortloglimit_info_ck == 'ok' ? true : false);
+		$snortglob = $config['installedpackages']['snortglobal'];
+
+		snort_snortloglimit_install_cron($snortglob['snortloglimit'] == 'ok' ? true : false);
  
                 /* set the snort block hosts time IMPORTANT */
-                $snort_rm_blocked_info_ck = $config['installedpackages']['snortglobal']['rm_blocked'];
-                if ($snort_rm_blocked_info_ck == "never_b")
-                        $snort_rm_blocked_false = false;
-                else
-                        $snort_rm_blocked_false = true;
- 
-                snort_rm_blocked_install_cron($snort_rm_blocked_false);
+                snort_rm_blocked_install_cron($snortglob['rm_blocked'] == "never_b" ? true : false);
  
                 /* set the snort rules update time */
-                $snort_rules_up_info_ck = $config['installedpackages']['snortglobal']['autorulesupdate7'];
-                if ($snort_rules_up_info_ck == "never_up")
-                        $snort_rules_up_false = false;
-                else
-                        $snort_rules_up_false = true;
- 
-                snort_rules_up_install_cron($snort_rules_up_false);
+                snort_rules_up_install_cron($snortglob['autorulesupdate7'] == "never_up" ? true : false);
+
 		configure_cron();
 	}
-
-	/* all new files are for the user snort nologin */
-	if (!is_dir('/var/log/snort'))
-		exec('/bin/mkdir -p /var/log/snort');
 
 	conf_mount_ro();
 }
 
 /* Start of main config files */
-
-/* create threshold file */
-function create_snort_suppress($id, $if_real) {
-	global $config, $g;
-
-	$snortdir = SNORTDIR;
-
-	/* make sure dir is there */
-	if (!is_dir("{$snortdir}/suppress"))
-		exec("/bin/mkdir -p {$snortdir}/suppress");
-
-	if (!is_array($config['installedpackages']['snortglobal']['rule']))
-		return;
-
-	if ($config['installedpackages']['snortglobal']['rule'][$id]['suppresslistname'] != 'default') {
-		$whitelist_key_s = find_suppress_key($config['installedpackages']['snortglobal']['rule'][$id]['suppresslistname']);
-
-		/* file name */
-		$suppress_file_name = $config['installedpackages']['snortglobal']['suppress']['item'][$whitelist_key_s]['name'];
-
-		/* Message */
-		$s_data = '# This file is auto generated by the snort package. Please do not edit this file by hand.' . "\n\n";
-
-		/* user added arguments */
-		$s_data .= str_replace("\r", "", base64_decode($config['installedpackages']['snortglobal']['suppress']['item'][$whitelist_key_s]['suppresspassthru']));
-
-		/* open snort's whitelist for writing */
-		@file_put_contents("{$snortdir}/suppress/$suppress_file_name", $s_data);
-	}
-}
-
-function create_snort_whitelist($id, $if_real) {
-	global $config, $g;
-
-	$snortdir = SNORTDIR;
-
-	/* make sure dir is there */
-	if (!is_dir("{$snortdir}/whitelist"))
-		exec("/bin/mkdir -p {$snortdir}/whitelist");
-
-	if ($config['installedpackages']['snortglobal']['rule'][$id]['whitelistname'] == 'default') {
-
-		$w_data = build_base_whitelist('whitelist', 'yes', 'yes', 'yes', 'yes', 'yes', 'no');
-
-		/* open snort's whitelist for writing */
-		@file_put_contents("{$snortdir}/whitelist/defaultwlist", $w_data);
-
-	} else if (!empty($config['installedpackages']['snortglobal']['rule'][$id]['whitelistname'])) {
-		$whitelist_key_w = find_whitelist_key($config['installedpackages']['snortglobal']['rule'][$id]['whitelistname']);
-
-		if (!is_array($config['installedpackages']['snortglobal']['whitelist']['item']))
-			return;
-
-		$whitelist = $config['installedpackages']['snortglobal']['whitelist']['item'][$whitelist_key_w];
-		$w_data = build_base_whitelist($whitelist['snortlisttype'], $whitelist['wanips'], $whitelist['wangateips'],
-				$whitelist['wandnsips'], $whitelist['vips'], $whitelist['vpnips'], $whitelist_key_w);
-
-		/* open snort's whitelist for writing */
-		@file_put_contents("{$snortdir}/whitelist/" . $config['installedpackages']['snortglobal']['rule'][$id]['whitelistname'], $w_data);
-	}
-}
-
-function create_snort_homenet($id, $if_real) {
-	global $config, $g;
-
-	if ($config['installedpackages']['snortglobal']['rule'][$id]['homelistname'] == 'default' || $config['installedpackages']['snortglobal']['rule'][$id]['homelistname'] == '')
-		return build_base_whitelist('netlist', 'yes', 'yes', 'yes', 'yes', 'yes', 'no');
-	else if (!empty($config['installedpackages']['snortglobal']['rule'][$id]['homelistname'])) {
-		$whitelist_key_h = find_whitelist_key($config['installedpackages']['snortglobal']['rule'][$id]['homelistname']);
-
-		if (!is_array($config['installedpackages']['snortglobal']['whitelist']['item']))
-			return;
-
-		$build_netlist_h = $config['installedpackages']['snortglobal']['whitelist']['item'][$whitelist_key_h]['snortlisttype'];
-		$wanip_h = $config['installedpackages']['snortglobal']['whitelist']['item'][$whitelist_key_h]['wanips'];
-		$wangw_h = $config['installedpackages']['snortglobal']['whitelist']['item'][$whitelist_key_h]['wangateips'];
-		$wandns_h = $config['installedpackages']['snortglobal']['whitelist']['item'][$whitelist_key_h]['wandnsips'];
-		$vips_h = $config['installedpackages']['snortglobal']['whitelist']['item'][$whitelist_key_h]['vips'];
-		$vpns_h = $config['installedpackages']['snortglobal']['whitelist']['item'][$whitelist_key_h]['vpnips'];
-
-		return build_base_whitelist($build_netlist_h, $wanip_h, $wangw_h, $wandns_h, $vips_h, $vpns_h, $whitelist_key_h);
-	}
-}
-
-function create_snort_externalnet($id, $if_real) {
-	global $config, $g;
-
-	if (!empty($config['installedpackages']['snortglobal']['rule'][$id]['externallistname'])) {
-		$whitelist_key_ex = find_whitelist_key($config['installedpackages']['snortglobal']['rule'][$id]['externallistname']);
-
-		if (!is_array($config['installedpackages']['snortglobal']['whitelist']['item']))
-			return;
-
-		$build_netlist_ex = $config['installedpackages']['snortglobal']['whitelist']['item'][$whitelist_key_ex]['snortlisttype'];
-		$wanip_ex = $config['installedpackages']['snortglobal']['whitelist']['item'][$whitelist_key_ex]['wanips'];
-		$wangw_ex = $config['installedpackages']['snortglobal']['whitelist']['item'][$whitelist_key_ex]['wangateips'];
-		$wandns_ex = $config['installedpackages']['snortglobal']['whitelist']['item'][$whitelist_key_ex]['wandnsips'];
-		$vips_ex = $config['installedpackages']['snortglobal']['whitelist']['item'][$whitelist_key_ex]['vips'];
-		$vpns_ex = $config['installedpackages']['snortglobal']['whitelist']['item'][$whitelist_key_ex]['vpnips'];
-
-		return build_base_whitelist($build_netlist_ex, $wanip_ex, $wangw_ex, $wandns_ex, $vips_ex, $vpns_ex, $whitelist_key_ex);
-	}
-}
-
 /* open snort.sh for writing" */
 function snort_create_rc() {
 	global $config, $g;
@@ -956,7 +797,7 @@ EOD;
 }
 
 /* if rules exist copy to new interfaces */
-function create_rules_iface($id, $if_real, $snort_uuid) {
+function snort_create_rules_iface($if_real, $snort_uuid) {
 	global $config, $g;
 
 	$snortdir = SNORTDIR;
@@ -974,10 +815,11 @@ function create_rules_iface($id, $if_real, $snort_uuid) {
 }
 
 /* open barnyard2.conf for writing */
-function create_barnyard2_conf($id, $if_real, $snort_uuid) {
+function snort_create_barnyard2_conf($snortcfg, $if_real) {
 	global $config, $g;
 
 	$snortdir = SNORTDIR;
+	$snort_uuid = $snortcfg['uuid'];
 
 	if (!file_exists("{$snortdir}/snort_{$snort_uuid}_{$if_real}/barnyard2.conf"))
 		exec("/usr/bin/touch {$snortdir}/snort_{$snort_uuid}_{$if_real}/barnyard2.conf");
@@ -987,25 +829,24 @@ function create_barnyard2_conf($id, $if_real, $snort_uuid) {
 		mwexec("/bin/chmod 770 /var/log/snort/barnyard2/{$snort_uuid}_{$if_real}.waldo", true);
 	}
 
-	$barnyard2_conf_text = generate_barnyard2_conf($id, $if_real, $snort_uuid);
+	$barnyard2_conf_text = snort_generate_barnyard2_conf($snortcfg, $if_real);
 
 	/* write out barnyard2_conf */
 	@file_put_contents("{$snortdir}/snort_{$snort_uuid}_{$if_real}/barnyard2.conf", $barnyard2_conf_text);
 }
 
 /* open barnyard2.conf for writing" */
-function generate_barnyard2_conf($id, $if_real, $snort_uuid) {
+function snort_generate_barnyard2_conf($snortcfg, $if_real) {
 	global $config, $g;
 
 	$snortdir = SNORTDIR;
+	$snort_uuid = $snortcfg['uuid'];
 
-	/* define snortbarnyardlog */
 	/* TODO: add support for the other 5 output plugins */
-	$snortconf = $config['installedpackages']['snortglobal']['rule'][$id];
-	$snortbarnyardlog_database_info_chk = $snortconf['barnyard_mysql'];
+	$snortbarnyardlog_database_info_chk = $snortcfg['barnyard_mysql'];
 	$snortbarnyardlog_hostname_info_chk = php_uname("n");
 	/* user add arguments */
-	$snortbarnyardlog_config_pass_thru = str_replace("\r", "", base64_decode($snortconf['barnconfigpassthru']));
+	$snortbarnyardlog_config_pass_thru = str_replace("\r", "", base64_decode($snortcfg['barnconfigpassthru']));
 
 	$barnyard2_conf_text = <<<EOD
 
@@ -1043,34 +884,6 @@ config logdir: /var/log/snort/snort_{$if_real}{$snort_uuid}
 EOD;
 
 	return $barnyard2_conf_text;
-}
-
-function snort_create_conf($id, $if_real, $snort_uuid) {
-	global $config, $g;
-
-	$snortdir = SNORTDIR;
-
-	if (!empty($if_real) && !empty($snort_uuid)) {
-		if (!is_dir("{$snortdir}/snort_{$snort_uuid}_{$if_real}")) {
-			if (file_exists("{$snortdir}/snort_{$snort_uuid}_{$if_real}"))
-				@unlink("{$snortdir}/snort_{$snort_uuid}_{$if_real}");
-			exec("/bin/mkdir -p {$snortdir}/snort_{$snort_uuid}_{$if_real}");
-			@touch("{$snortdir}/snort_{$snort_uuid}_{$if_real}/snort.conf");
-		}
-
-		$snort_conf_text = snort_generate_conf($id, $if_real, $snort_uuid);
-		if (empty($snort_conf_text))
-			return;
-
-		/* write out snort.conf */
-		$conf = fopen("{$snortdir}/snort_{$snort_uuid}_{$if_real}/snort.conf", "w");
-		if(!$conf) {
-			log_error("Could not open {$snortdir}/snort_{$snort_uuid}_{$if_real}/snort.conf for writing.");
-			return -1;
-		}
-		fwrite($conf, $snort_conf_text);
-		fclose($conf);
-	}
 }
 
 function snort_deinstall() {
@@ -1127,68 +940,59 @@ function snort_deinstall() {
 		unset($config['installedpackages']['snortglobal']);
 }
 
-function snort_generate_conf($id, $if_real, $snort_uuid) {
+function snort_generate_conf($snortcfg) {
 	global $config, $g;
 
 	$snortdir = SNORTDIR;
+	$snortlogdir = SNORTLOGDIR;
 
 	if (!is_array($config['installedpackages']['snortglobal']['rule']))
 		return;
 
-	$snortcfg =& $config['installedpackages']['snortglobal']['rule'][$id];
+	$if_real = snort_get_real_interface($snortcfg['interface']);
+	$snort_uuid = $snortcfg['uuid'];
+	$snortcfgdir = "{$snortdir}/snort_{$snort_uuid}_{$if_real}";
 
 	/* custom home nets */
-	$home_net = create_snort_homenet($id, $if_real);
+	$home_net_list = snort_build_list($snortcfg['homelistname']);
+	$home_net = implode(",", $home_net_list);
 
-	if ($snortcfg['externallistname'] == 'default')
-		$external_net = '!$HOME_NET';
-	else
-		$external_net = create_snort_externalnet($id, $if_real);
-
-	/* obtain external interface */
-	$snort_ext_int = $snortcfg['interface'];
+	$external_net = '!$HOME_NET';
+	if (!empty($snortcfg['externallistname']) && $snortcfg['externallistname'] != 'default') {
+		$external_net_list = snort_build_list($snortcfg['externallistname']);
+		$external_net = implode(",", $external_net_list);
+	}
 
 	/* user added arguments */
 	$snort_config_pass_thru = str_replace("\r", "", base64_decode($snortcfg['configpassthru']));
 
 	/* create a few directories and ensure the sample files are in place */
-	if (!is_dir("{$snortdir}"))
-		exec("/bin/mkdir -p {$snortdir}/custom_rules");
-	if (!is_dir("{$snortdir}/snort/snort_{$snort_uuid}_{$if_real}"))
-		exec("/bin/mkdir -p {$snortdir}/snort_{$snort_uuid}_{$if_real}");
-	if (!is_dir("{$snortdir}/snort_{$snort_uuid}_{$if_real}/rules"))
-		exec("/bin/mkdir -p {$snortdir}/snort_{$snort_uuid}_{$if_real}/rules");
-	if (!is_dir("{$snortdir}/whitelist"))
-		exec("/bin/mkdir -p {$snortdir}/whitelist/");
-	if (!is_dir("/var/log/snort/snort_{$if_real}{$snort_uuid}"))
-		exec("/bin/mkdir -p /var/log/snort/snort_{$if_real}{$snort_uuid}");
-	if (!is_dir("/var/log/snort/snort_{$if_real}{$snort_uuid}/barnyard2"))
-		exec("/bin/mkdir -p /var/log/snort/snort_{$if_real}{$snort_uuid}/barnyard2");
-	if (!is_dir('/usr/local/lib/snort/dynamicrules'))
-		exec('/bin/mkdir -p /usr/local/lib/snort/dynamicrules');
-	if (!is_dir('/usr/local/lib/snort/dynamicengine'))
-		exec('/bin/mkdir -p /usr/local/lib/snort/dynamicengine');
-	if (!is_dir('/usr/local/lib/snort/dynamicpreprocessor'))
-		exec('/bin/mkdir -p /usr/local/lib/snort/dynamicpreprocessor');
-	if (!file_exists('/var/db/whitelist'))
-		@touch('/var/db/whitelist');
+	$snort_dirs = array( $snortdir, "{$snortdir}/custom_rules", $snortcfgdir, "{$snortcfgdir}/rules",
+		"{$snortlogdir}/snort_{$if_real}{$snort_uuid}",
+		"{$snortlogdir}/snort_{$if_real}{$snort_uuid}/barnyard2", 
+		"/usr/local/lib/snort/dynamicrules", "/usr/local/lib/snort/dynamicengine",
+		"/usr/local/lib/snort/dynamicpreprocessor"
+	    );
+	foreach ($snort_dirs as $dir) {
+		if (!is_dir($dir))
+			safe_mkdir($dir);
+	}
 
-	@copy("{$snortdir}/gen-msg.map", "{$snortdir}/snort_{$snort_uuid}_{$if_real}/gen-msg.map");
-	@copy("{$snortdir}/classification.config", "{$snortdir}/snort_{$snort_uuid}_{$if_real}/classification.config");
-	@copy("{$snortdir}/reference.config", "{$snortdir}/snort_{$snort_uuid}_{$if_real}/reference.config");
-	@copy("{$snortdir}/sid-msg.map", "{$snortdir}/snort_{$snort_uuid}_{$if_real}/sid-msg.map");
-	@copy("{$snortdir}/unicode.map", "{$snortdir}/snort_{$snort_uuid}_{$if_real}/unicode.map");
-	@copy("{$snortdir}/threshold.conf", "{$snortdir}/snort_{$snort_uuid}_{$if_real}/threshold.conf");
-	@touch("{$snortdir}/snort_{$snort_uuid}_{$if_real}/barnyard2.conf");
+	$snort_files = array("gen-msg.map", "classification.config", "reference.config",
+			"sid-msg.map", "unicode.map", "threshold.conf"
+		);
+	foreach ($snort_files as $file) {
+		if (file_exists("{$snortdir}/{$file}"))
+			@copy("{$snortdir}/{$file}", "{$snortcfgdir}/{$file}");
+	}
 
 	/* define basic log filename */
 	$snortunifiedlogbasic_type = "output unified: filename snort_{$snort_uuid}_{$if_real}.log, limit 128";
 
 	/* define snortalertlogtype */
+	$snortalertlogtype_type = "output alert_full: alert";
 	if ($config['installedpackages']['snortglobal']['snortalertlogtype'] == "fast")
 		$snortalertlogtype_type = "output alert_fast: alert";
-	else
-		$snortalertlogtype_type = "output alert_full: alert";
 
 	/* define alertsystemlog */
 	$alertsystemlog_type = "";
@@ -1208,287 +1012,25 @@ function snort_generate_conf($id, $if_real, $snort_uuid) {
 	/* define spoink */
 	$spoink_type = "";
 	if ($snortcfg['blockoffenders7'] == "on") {
-		if ($snortcfg['whitelistname'] == "default")
-			$spoink_whitelist_name = 'defaultwlist';
-		else if (file_exists("{$snortdir}/whitelist/{$snortcfg['whitelistname']}"))
-			$spoink_whitelist_name = $snortcfg['whitelistname'];
-
 		$pfkill = "";
 		if ($snortcfg['blockoffenderskill'] == "on")
 			$pfkill = "kill";
-		
-		$spoink_type = "output alert_pf: {$snortdir}/whitelist/{$spoink_whitelist_name},snort2c,{$snortcfg['blockoffendersip']},{$pfkill}";
+		$spoink_wlist = snort_build_list($snortcfg['whitelistname']);
+		/* write whitelist */
+		@file_put_contents("{$snortcfgdir}/{$snortcfg['whitelistname']}", implode("\n", $spoink_wlist));
+		$spoink_type = "output alert_pf: {$snortcfgdir}/{$snortcfg['whitelistname']},snort2c,{$snortcfg['blockoffendersip']},{$pfkill}";
 	}
 
-	/* define threshold file */
-	$threshold_file_name = "";
-	if ($snortcfg['suppresslistname'] != 'default') {
-		if (file_exists("{$snortdir}/suppress/{$snortcfg['suppresslistname']}"))
-			$threshold_file_name = "include {$snortdir}/suppress/{$snortcfg['suppresslistname']}";
-	}
-
-	/* define servers and ports snortdefservers */
-	/* def DNS_SERVSERS */
-	$def_dns_servers_info_chk = $snortcfg['def_dns_servers'];
-	if ($def_dns_servers_info_chk == "")
-		$def_dns_servers_type = "\$HOME_NET";
-	else
-		$def_dns_servers_type = "$def_dns_servers_info_chk";
-
-	/* def DNS_PORTS */
-	$def_dns_ports_info_chk = $snortcfg['def_dns_ports'];
-	if ($def_dns_ports_info_chk == "")
-		$def_dns_ports_type = "53";
-	else
-		$def_dns_ports_type = "$def_dns_ports_info_chk";
-
-	/* def SMTP_SERVSERS */
-	$def_smtp_servers_info_chk = $snortcfg['def_smtp_servers'];
-	if ($def_smtp_servers_info_chk == "")
-		$def_smtp_servers_type = "\$HOME_NET";
-	else
-		$def_smtp_servers_type = "$def_smtp_servers_info_chk";
-
-	/* def SMTP_PORTS */
-	$def_smtp_ports_info_chk = $snortcfg['def_smtp_ports'];
-	if ($def_smtp_ports_info_chk == "")
-		$def_smtp_ports_type = "25";
-	else
-		$def_smtp_ports_type = "$def_smtp_ports_info_chk";
-
-	/* def MAIL_PORTS */
-	$def_mail_ports_info_chk = $snortcfg['def_mail_ports'];
-	if ($def_mail_ports_info_chk == "")
-		$def_mail_ports_type = "25,143,465,691";
-	else
-		$def_mail_ports_type = "$def_mail_ports_info_chk";
-
-	/* def HTTP_SERVSERS */
-	$def_http_servers_info_chk = $snortcfg['def_http_servers'];
-	if ($def_http_servers_info_chk == "")
-		$def_http_servers_type = "\$HOME_NET";
-	else
-		$def_http_servers_type = "$def_http_servers_info_chk";
-
-	/* def WWW_SERVSERS */
-	$def_www_servers_info_chk = $snortcfg['def_www_servers'];
-	if ($def_www_servers_info_chk == "")
-		$def_www_servers_type = "\$HOME_NET";
-	else
-		$def_www_servers_type = "$def_www_servers_info_chk";
-
-	/* def HTTP_PORTS */
-	$def_http_ports_info_chk = $snortcfg['def_http_ports'];
-	if ($def_http_ports_info_chk == "")
-		$def_http_ports_type = "80";
-	else
-		$def_http_ports_type = "$def_http_ports_info_chk";
-
-	/* def SQL_SERVSERS */
-	$def_sql_servers_info_chk = $snortcfg['def_sql_servers'];
-	if ($def_sql_servers_info_chk == "")
-		$def_sql_servers_type = "\$HOME_NET";
-	else
-		$def_sql_servers_type = "$def_sql_servers_info_chk";
-
-	/* def ORACLE_PORTS */
-	$def_oracle_ports_info_chk = $snortcfg['def_oracle_ports'];
-	if ($def_oracle_ports_info_chk == "")
-		$def_oracle_ports_type = "1521";
-	else
-		$def_oracle_ports_type = "$def_oracle_ports_info_chk";
-
-	/* def MSSQL_PORTS */
-	$def_mssql_ports_info_chk = $snortcfg['def_mssql_ports'];
-	if ($def_mssql_ports_info_chk == "")
-		$def_mssql_ports_type = "1433";
-	else
-		$def_mssql_ports_type = "$def_mssql_ports_info_chk";
-
-	/* def TELNET_SERVSERS */
-	$def_telnet_servers_info_chk = $snortcfg['def_telnet_servers'];
-	if ($def_telnet_servers_info_chk == "")
-		$def_telnet_servers_type = "\$HOME_NET";
-	else
-		$def_telnet_servers_type = "$def_telnet_servers_info_chk";
-
-	/* def TELNET_PORTS */
-	$def_telnet_ports_info_chk = $snortcfg['def_telnet_ports'];
-	if ($def_telnet_ports_info_chk == "")
-		$def_telnet_ports_type = "23";
-	else
-		$def_telnet_ports_type = "$def_telnet_ports_info_chk";
-
-	/* def SNMP_SERVSERS */
-	$def_snmp_servers_info_chk = $snortcfg['def_snmp_servers'];
-	if ($def_snmp_servers_info_chk == "")
-		$def_snmp_servers_type = "\$HOME_NET";
-	else
-		$def_snmp_servers_type = "$def_snmp_servers_info_chk";
-
-	/* def SNMP_PORTS */
-	$def_snmp_ports_info_chk = $snortcfg['def_snmp_ports'];
-	if ($def_snmp_ports_info_chk == "")
-		$def_snmp_ports_type = "161";
-	else
-		$def_snmp_ports_type = "$def_snmp_ports_info_chk";
-
-	/* def FTP_SERVSERS */
-	$def_ftp_servers_info_chk = $snortcfg['def_ftp_servers'];
-	if ($def_ftp_servers_info_chk == "")
-		$def_ftp_servers_type = "\$HOME_NET";
-	else
-		$def_ftp_servers_type = "$def_ftp_servers_info_chk";
-
-	/* def FTP_PORTS */
-	$def_ftp_ports_info_chk = $snortcfg['def_ftp_ports'];
-	if ($def_ftp_ports_info_chk == "")
-		$def_ftp_ports_type = "21";
-	else
-		$def_ftp_ports_type = "$def_ftp_ports_info_chk";
-
-	/* def SSH_SERVSERS */
-	$def_ssh_servers_info_chk = $snortcfg['def_ssh_servers'];
-	if ($def_ssh_servers_info_chk == "")
-		$def_ssh_servers_type = "\$HOME_NET";
-	else
-		$def_ssh_servers_type = "$def_ssh_servers_info_chk";
-
-	/* if user has defined a custom ssh port, use it */
-	if(isset($config['system']['ssh']['port']))
-		$ssh_port = $config['system']['ssh']['port'];
-	else
-		$ssh_port = "22";
-
-	/* def SSH_PORTS */
-	$def_ssh_ports_info_chk = $snortcfg['def_ssh_ports'];
-	if ($def_ssh_ports_info_chk == "")
-		$def_ssh_ports_type = "{$ssh_port}";
-	else
-		$def_ssh_ports_type = "$def_ssh_ports_info_chk";
-
-	/* def POP_SERVSERS */
-	$def_pop_servers_info_chk = $snortcfg['def_pop_servers'];
-	if ($def_pop_servers_info_chk == "")
-		$def_pop_servers_type = "\$HOME_NET";
-	else
-		$def_pop_servers_type = "$def_pop_servers_info_chk";
-
-	/* def POP2_PORTS */
-	$def_pop2_ports_info_chk = $snortcfg['def_pop2_ports'];
-	if ($def_pop2_ports_info_chk == "")
-		$def_pop2_ports_type = "109";
-	else
-		$def_pop2_ports_type = "$def_pop2_ports_info_chk";
-
-	/* def POP3_PORTS */
-	$def_pop3_ports_info_chk = $snortcfg['def_pop3_ports'];
-	if ($def_pop3_ports_info_chk == "")
-		$def_pop3_ports_type = "110";
-	else
-		$def_pop3_ports_type = "$def_pop3_ports_info_chk";
-
-	/* def IMAP_SERVSERS */
-	$def_imap_servers_info_chk = $snortcfg['def_imap_servers'];
-	if ($def_imap_servers_info_chk == "")
-		$def_imap_servers_type = "\$HOME_NET";
-	else
-		$def_imap_servers_type = "$def_imap_servers_info_chk";
-
-	/* def IMAP_PORTS */
-	$def_imap_ports_info_chk = $snortcfg['def_imap_ports'];
-	if ($def_imap_ports_info_chk == "")
-		$def_imap_ports_type = "143";
-	else
-		$def_imap_ports_type = "$def_imap_ports_info_chk";
-
-	/* def SIP_PROXY_IP */
-	$def_sip_proxy_ip_info_chk = $snortcfg['def_sip_proxy_ip'];
-	if ($def_sip_proxy_ip_info_chk == "")
-		$def_sip_proxy_ip_type = "\$HOME_NET";
-	else
-		$def_sip_proxy_ip_type = "$def_sip_proxy_ip_info_chk";
-
-	/* def SIP_PROXY_PORTS */
-	$def_sip_proxy_ports_info_chk = $snortcfg['def_sip_proxy_ports'];
-	if ($def_sip_proxy_ports_info_chk == "")
-		$def_sip_proxy_ports_type = "5060:5090,16384:32768";
-	else
-		$def_sip_proxy_ports_type = "$def_sip_proxy_ports_info_chk";
-		
-	/* def SIP_SERVERS */
-	$def_sip_servers_info_chk = $snortcfg['def_sip_servers'];
-	if ($def_sip_servers_info_chk == "")
-		$def_sip_servers_type = "\$HOME_NET";
-	else
-		$def_sip_servers_type = "$def_sip_servers_info_chk";
-
-	/* def SIP_PORTS */
-	$def_sip_ports_info_chk = $snortcfg['def_sip_ports'];
-	if ($def_sip_ports_info_chk == "")
-		$def_sip_ports_type = "5060:5090,16384:32768";
-	else
-		$def_sip_ports_type = "$def_sip_ports_info_chk";
-
-	/* def AUTH_PORTS */
-	$def_auth_ports_info_chk = $snortcfg['def_auth_ports'];
-	if ($def_auth_ports_info_chk == "")
-		$def_auth_ports_type = "113";
-	else
-		$def_auth_ports_type = "$def_auth_ports_info_chk";
-
-	/* def FINGER_PORTS */
-	$def_finger_ports_info_chk = $snortcfg['def_finger_ports'];
-	if ($def_finger_ports_info_chk == "")
-		$def_finger_ports_type = "79";
-	else
-		$def_finger_ports_type = "$def_finger_ports_info_chk";
-
-	/* def IRC_PORTS */
-	$def_irc_ports_info_chk = $snortcfg['def_irc_ports'];
-	if ($def_irc_ports_info_chk == "")
-		$def_irc_ports_type = "6665,6666,6667,6668,6669,7000";
-	else
-		$def_irc_ports_type = "$def_irc_ports_info_chk";
-
-	/* def NNTP_PORTS */
-	$def_nntp_ports_info_chk = $snortcfg['def_nntp_ports'];
-	if ($def_nntp_ports_info_chk == "")
-		$def_nntp_ports_type = "119";
-	else
-		$def_nntp_ports_type = "$def_nntp_ports_info_chk";
-
-	/* def RLOGIN_PORTS */
-	$def_rlogin_ports_info_chk = $snortcfg['def_rlogin_ports'];
-	if ($def_rlogin_ports_info_chk == "")
-		$def_rlogin_ports_type = "513";
-	else
-		$def_rlogin_ports_type = "$def_rlogin_ports_info_chk";
-
-	/* def RSH_PORTS */
-	$def_rsh_ports_info_chk = $snortcfg['def_rsh_ports'];
-	if ($def_rsh_ports_info_chk == "")
-		$def_rsh_ports_type = "514";
-	else
-		$def_rsh_ports_type = "$def_rsh_ports_info_chk";
-
-	/* def SSL_PORTS */
-	$def_ssl_ports_info_chk = $snortcfg['def_ssl_ports'];
-	if ($def_ssl_ports_info_chk == "")
-		$def_ssl_ports_type = "443,465,563,636,989,990,992,993,994,995";
-	else
-		$def_ssl_ports_type = "$def_ssl_ports_info_chk";
-
-	/* if user is on pppoe, we really want to use ng0 interface */
-	if ($config['version'] <= 6 && $snort_ext_int == "wan")
-		$snort_ext_int = get_real_wan_interface();
+	/* define suppress file */
+	$suppress = snort_find_list($snortcfg['suppresslistname'], 'suppress');
+	$suppress_data = str_replace("\r", "", base64_decode($suppress['suppresspassthru']));
+	@file_put_contents("{$snortcfgdir}/{$snortcfg['suppresslistname']}", $suppress_data);
+	$suppress_file_name = "include {$snortcfgdir}/{$snortcfg['suppresslistname']}";
 
 	/* set the snort performance model */
-	if($snortcfg['performance'])
+	$snort_performance = "ac-bnfa";
+	if(!empty($snortcfg['performance']))
 		$snort_performance = $snortcfg['performance'];
-	else
-		$snort_performance = "ac-bnfa";
-
 
 	/* generate rule sections to load */
 	$enabled_rulesets = $snortcfg['rulesets'];
@@ -1496,48 +1038,27 @@ function snort_generate_conf($id, $if_real, $snort_uuid) {
 	if (!empty($enabled_rulesets)) {
 		$enabled_rulesets_array = explode("||", $enabled_rulesets);
 		foreach($enabled_rulesets_array as $enabled_item) {
-			if (file_exists("{$snortdir}/snort_{$snort_uuid}_{$if_real}/rules/{$enabled_item}"))
+			if (file_exists("{$snortcfgdir}/rules/{$enabled_item}"))
 				$selected_rules_sections  .= "include \$RULE_PATH/{$enabled_item}\n";
 		}
 	}
 
 	/////////////////////////////
-
 	/* preprocessor code */
-
 	/* def perform_stat */
-	$snort_perform_stat = <<<EOD
-##########################
-                         #
-# NEW                    #
+	$perform_stat = <<<EOD
 # Performance Statistics #
-                         #
-##########################
-
-preprocessor perfmonitor: time 300 file /var/log/snort/snort_{$if_real}{$snort_uuid}/{$if_real}.stats pktcnt 10000
+preprocessor perfmonitor: time 300 file {$snortlogdir}/snort_{$if_real}{$snort_uuid}/{$if_real}.stats pktcnt 10000
 	
 EOD;
 
-	$def_perform_stat_info_chk = $snortcfg['perform_stat'];
-	if ($def_perform_stat_info_chk == "on")
-		$def_perform_stat_type = "$snort_perform_stat";
-	else
-		$def_perform_stat_type = "";
-
-	$def_flow_depth_info_chk = $snortcfg['flow_depth'];
-	if (empty($def_flow_depth_info_chk))
-		$def_flow_depth_type = '0';
-	else
+	$def_flow_depth_type = '0';
+	if (!empty($snortcfg['flow_depth']))
 		$def_flow_depth_type = $snortcfg['flow_depth'];
 
 	/* def http_inspect */
-	$snort_http_inspect = <<<EOD
-#################
-                #
+	$http_inspect = <<<EOD
 # HTTP Inspect  #
-                #
-#################
-
 preprocessor http_inspect: global iis_unicode_map unicode.map 1252 compress_depth 65535 decompress_depth 65535
 
 preprocessor http_inspect_server: server default \
@@ -1564,39 +1085,9 @@ preprocessor http_inspect_server: server default \
 	
 EOD;
 
-	$def_http_inspect_info_chk = $snortcfg['http_inspect'];
-	if ($def_http_inspect_info_chk == "on")
-		$def_http_inspect_type = "$snort_http_inspect";
-	else
-		$def_http_inspect_type = "";
-
-	/* def other_preprocs */
-	$snort_other_preprocs = <<<EOD
-##################
-                 #
-# Other preprocs #
-                 #
-##################
-
-preprocessor rpc_decode: 111 32770 32771 32772 32773 32774 32775 32776 32777 32778 32779
-preprocessor bo
-	
-EOD;
-
-	$def_other_preprocs_info_chk = $snortcfg['other_preprocs'];
-	if ($def_other_preprocs_info_chk == "on")
-		$def_other_preprocs_type = "$snort_other_preprocs";
-	else
-		$def_other_preprocs_type = "";
-
 	/* def ftp_preprocessor */
-	$snort_ftp_preprocessor = <<<EOD
-#####################
-                    #
+	$ftp_preprocessor = <<<EOD
 # ftp preprocessor  #
-                    #
-#####################
-
 preprocessor ftp_telnet: global \
 inspection_type stateless
 
@@ -1642,20 +1133,9 @@ preprocessor ftp_telnet_protocol: ftp client default \
 	
 EOD;
 
-	$def_ftp_preprocessor_info_chk = $snortcfg['ftp_preprocessor'];
-	if ($def_ftp_preprocessor_info_chk == "on")
-	$def_ftp_preprocessor_type = "$snort_ftp_preprocessor";
-	else
-	$def_ftp_preprocessor_type = "";
-
 	/* def smtp_preprocessor */
-	$snort_smtp_preprocessor = <<<EOD
-#####################
-                    #
+	$smtp_preprocessor = <<<EOD
 # SMTP preprocessor #
-                    #
-#####################
-
 preprocessor SMTP: \
     ports { 25 465 691 } \
     inspection_type stateful \
@@ -1677,20 +1157,9 @@ PIPELINING CHUNKING DATA DSN RSET QUIT ONEX QUEU STARTTLS TICK TIME TURNME VERB 
 	
 EOD;
 
-	$def_smtp_preprocessor_info_chk = $snortcfg['smtp_preprocessor'];
-	if ($def_smtp_preprocessor_info_chk == "on")
-		$def_smtp_preprocessor_type = "$snort_smtp_preprocessor";
-	else
-		$def_smtp_preprocessor_type = "";
-
 	/* def sf_portscan */
-	$snort_sf_portscan = <<<EOD
-################
-               #
+	$sf_portscan = <<<EOD
 # sf Portscan  #
-               #
-################
-
 preprocessor sfportscan: scan_type { all } \
                          proto  { all } \
                          memcap { 10000000 } \
@@ -1699,21 +1168,17 @@ preprocessor sfportscan: scan_type { all } \
 	
 EOD;
 
-	$def_sf_portscan_info_chk = $snortcfg['sf_portscan'];
-	if ($def_sf_portscan_info_chk == "on")
-		$def_sf_portscan_type = "$snort_sf_portscan";
-	else
-		$def_sf_portscan_type = "";
+	/* def other_preprocs */
+	$other_preprocs = <<<EOD
+# Other preprocs #
+preprocessor rpc_decode: 111 32770 32771 32772 32773 32774 32775 32776 32777 32778 32779
+preprocessor bo
+	
+EOD;
 
 	/* def dce_rpc_2 */
-	$snort_dce_rpc_2 = <<<EOD
-###############
-              #
-# NEW         #
+	$dce_rpc_2 = <<<EOD
 # DCE/RPC 2   #
-              #
-###############
-
 preprocessor dcerpc2: memcap 102400, events [smb, co, cl]
 preprocessor dcerpc2_server: default, policy WinXP, \
     detect [smb [139,445], tcp 135, udp 135, rpc-over-http-server 593], \
@@ -1722,160 +1187,114 @@ preprocessor dcerpc2_server: default, policy WinXP, \
 	
 EOD;
 
-	$def_dce_rpc_2_info_chk = $snortcfg['dce_rpc_2'];
-	if ($def_dce_rpc_2_info_chk == "on")
-		$def_dce_rpc_2_type = "$snort_dce_rpc_2";
-	else
-		$def_dce_rpc_2_type = "";
-
 	/* def dns_preprocessor */
-	$snort_dns_preprocessor = <<<EOD
-####################
-                   #
+	$dns_preprocessor = <<<EOD
 # DNS preprocessor #
-                   #
-####################
-
 preprocessor dns: \
     ports { 53 } \
     enable_rdata_overflow
 	
 EOD;
 
-	$def_dns_preprocessor_info_chk = $snortcfg['dns_preprocessor'];
-	if ($def_dns_preprocessor_info_chk == "on")
-		$def_dns_preprocessor_type = "$snort_dns_preprocessor";
-	else
-		$def_dns_preprocessor_type = "";
-
-	/* def SSL_PORTS IGNORE */
-	$def_ssl_ports_ignore_info_chk = $snortcfg['def_ssl_ports_ignore'];
-	if ($def_ssl_ports_ignore_info_chk == "")
-		$def_ssl_ports_ignore_type = "443 465 563 636 989 990 992 993 994 995";
-	else
-		$def_ssl_ports_ignore_type = "$def_ssl_ports_ignore_info_chk";
-
 	/* stream5 queued settings */
+	$def_max_queued_bytes_type = '';
+	if (!empty($snortcfg['max_queued_bytes']))
+		$def_max_queued_bytes_type = ", max_queued_bytes {$snortcfg['max_queued_bytes']}";
 
+	$def_max_queued_segs_type = '';
+	if (!empty($snortcfg['max_queued_segs']))
+		$def_max_queued_segs_type = ", max_queued_segs {$snortcfg['max_queued_segs']}";
 
-	$def_max_queued_bytes_info_chk = $snortcfg['max_queued_bytes'];
-	if ($def_max_queued_bytes_info_chk == '')
-		$def_max_queued_bytes_type = '';
+	/* define servers and ports snortdefservers */
+	$servers = array (
+		"dns_servers" => "\$HOME_NET", "smtp_servers" => "\$HOME_NET", "http_servers" => "\$HOME_NET",
+		"www_servers" => "\$HOME_NET", "sql_servers" => "\$HOME_NET", "telnet_servers" => "\$HOME_NET",
+		"snmp_servers" => "\$HOME_NET", "ftp_servers" => "\$HOME_NET", "ssh_servers" => "\$HOME_NET",
+		"pop_servers" => "\$HOME_NET", "imap_servers" => "\$HOME_NET", "sip_proxy_ip" => "\$HOME_NET",
+		"sip_servers" => "\$HOME_NET", "rpc_servers" => "\$HOME_NET",
+		"aim_servers" => "64.12.24.0/23,64.12.28.0/23,64.12.161.0/24,64.12.163.0/24,64.12.200.0/24,205.188.3.0/24,205.188.5.0/24,205.188.7.0/24,205.188.9.0/24,205.188.153.0/24,205.188.179.0/24,205.188.248.0/24"
+	    );
+
+	/* if user has defined a custom ssh port, use it */
+	if(is_array($config['system']['ssh']) && isset($config['system']['ssh']['port']))
+		$ssh_port = $config['system']['ssh']['port'];
 	else
-		$def_max_queued_bytes_type = ', max_queued_bytes ' . $snortcfg['max_queued_bytes'] . ',';
+		$ssh_port = "22";
+	$ports = array(
+		"dns_ports" => "53", "smtp_ports" => "25", "mail_ports" => "25,143,465,691",
+		"http_ports" => "80", "oracle_ports" => "1521", "mssql_ports" => "1433",
+		"telnet_ports" => "23","snmp_ports" => "161", "ftp_ports" => "21",
+		"ssh_ports" => $ssh_port, "pop2_ports" => "109", "pop3_ports" => "110", 
+		"imap_ports" => "143", "sip_proxy_ports" => "5060:5090,16384:32768",
+		"sip_ports" => "5060:5090,16384:32768", "auth_ports" => "113", "finger_ports" => "79", 
+		"irc_ports" => "6665,6666,6667,6668,6669,7000",
+		"nntp_ports" => "119", "rlogin_ports" => "513", "rsh_ports" => "514",
+		"ssl_ports" => "443,465,563,636,989,990,992,993,994,995",
+		"ssl_ports_ignore" => "443,465,563,636,989,990,992,993,994,995",
+		"DCERPC_NCACN_IP_TCP" => "139,445", "DCERPC_NCADG_IP_UDP" => "138,1024:",
+		"DCERPC_NCACN_IP_LONG" => "135,139,445,593,1024:", "DCERPC_NCACN_UDP_LONG" => "135,1024:",
+		"DCERPC_NCACN_UDP_SHORT" => "135,593,1024:", "DCERPC_NCACN_TCP" => "2103,2105,2107",
+		"DCERPC_BRIGHTSTORE" => "6503,6504"
+	);
 
-	$def_max_queued_segs_info_chk = $snortcfg['max_queued_segs'];
-	if ($def_max_queued_segs_info_chk == '')
-		$def_max_queued_segs_type = '';
-	else
-		$def_max_queued_segs_type = ', max_queued_segs ' . $snortcfg['max_queued_segs'] . ',';
+	$vardef = "";
+	foreach ($servers as $alias => $avalue) {
+		if (!empty($snortcfg[$alias]))
+			$avalue = $snortcfg[$alias];
+		$vardef .= "var " . strtoupper($alias) . " [{$avalue}]\n";
+	}
 
-	$snort_preprocessor_decoder_rules = "";
+	$portvardef = "";
+	foreach ($ports as $alias => $avalue) {
+		if (!empty($snortcfg["def_{$alias}"]))
+			$ports[$alias] = $snortcfg["def_{$alias}"];
+		$portvardef .= "portvar " . strtoupper($alias) . " [" . $ports[$alias] . "]\n";
+	}
+
+	$snort_preproc = array (
+		"perform_stat", "http_inspect", "other_preprocs", "ftp_preprocessor", "smtp_preprocessor", 
+		"sf_portscan", "dce_rpc_2", "dns_preprocessor"
+	);
+	$snort_preprocessors = "";
+	foreach ($snort_preproc as $preproc) {
+		if ($snortcfg[$preproc] == 'on') {
+			/* NOTE: The $$ is not a bug. Its a advanced feature of php */
+			$snort_preprocessors .= $$preproc;
+			$snort_preprocessors .= "\n";
+		}
+	}
+
+	$snort_misc_include_rules = "";
+	if (file_exists("{$snortcfgdir}/reference.config"))
+		$snort_misc_include_rules .= "include {$snortcfgdir}/reference.config\n";
+	if (file_exists("{$snortcfgdir}/classification.config"))
+		$snort_misc_include_rules .= "include {$snortcfgdir}/classification.config\n";
 	if (file_exists("{$snortdir}/preproc_rules/preprocessor.rules"))
-		$snort_preprocessor_decoder_rules .= "include \$PREPROC_RULE_PATH/preprocessor.rules\n";
+		$snort_misc_include_rules .= "include \$PREPROC_RULE_PATH/preprocessor.rules\n";
 	if (file_exists("{$snortdir}/preproc_rules/decoder.rules"))
-		$snort_preprocessor_decoder_rules .= "include \$PREPROC_RULE_PATH/decoder.rules\n";
+		$snort_misc_include_rules .= "include \$PREPROC_RULE_PATH/decoder.rules\n";
 
 	/* build snort configuration file */
 	$snort_conf_text = <<<EOD
 
 # snort configuration file
-# generated by the pfSense
-# package manager system
-# see /usr/local/pkg/snort.inc
-# for more information
-#	snort.conf
-#   Snort can be found at http://www.snort.org/
+# generated automatically by the pfSense subsystems do not modify manually
 
-#########################
-                        #
 # Define Local Network  #
-                        #
-#########################
+var HOME_NET [{$home_net}]
+var EXTERNAL_NET [{$external_net}]
 
-var HOME_NET {$home_net}
-var EXTERNAL_NET {$external_net}
-
-###################
-                  #
-# Define Servers  #
-                  #
-###################
-
-var DNS_SERVERS [{$def_dns_servers_type}]
-var SMTP_SERVERS [{$def_smtp_servers_type}]
-var HTTP_SERVERS [{$def_http_servers_type}]
-var SQL_SERVERS [{$def_sql_servers_type}]
-var TELNET_SERVERS [{$def_telnet_servers_type}]
-var SNMP_SERVERS [{$def_snmp_servers_type}]
-var FTP_SERVERS [{$def_ftp_servers_type}]
-var SSH_SERVERS [{$def_ssh_servers_type}]
-var POP_SERVERS [{$def_pop_servers_type}]
-var IMAP_SERVERS [{$def_imap_servers_type}]
-var RPC_SERVERS \$HOME_NET
-var WWW_SERVERS [{$def_www_servers_type}]
-var SIP_PROXY_IP [{$def_sip_proxy_ip_type}]
-var SIP_SERVERS [{$def_sip_servers_type}]
-var AIM_SERVERS \
-[64.12.24.0/23,64.12.28.0/23,64.12.161.0/24,64.12.163.0/24,64.12.200.0/24,205.188.3.0/24,205.188.5.0/24,205.188.7.0/24,205.188.9.0/24,205.188.153.0/24,205.188.179.0/24,205.188.248.0/24]
-
-########################
-                       #
-# Define Server Ports  #
-                       #
-########################
-
-portvar HTTP_PORTS [{$def_http_ports_type}]
-portvar FILE_DATA_PORTS [\$HTTP_PORTS,110,143] 
-portvar SHELLCODE_PORTS !80
-portvar ORACLE_PORTS [{$def_oracle_ports_type}]
-portvar AUTH_PORTS [{$def_auth_ports_type}]
-portvar DNS_PORTS [{$def_dns_ports_type}]
-portvar FINGER_PORTS [{$def_finger_ports_type}]
-portvar FTP_PORTS [{$def_ftp_ports_type}]
-portvar IMAP_PORTS [{$def_imap_ports_type}]
-portvar IRC_PORTS [{$def_irc_ports_type}]
-portvar MSSQL_PORTS [{$def_mssql_ports_type}]
-portvar NNTP_PORTS [{$def_nntp_ports_type}]
-portvar POP2_PORTS [{$def_pop2_ports_type}]
-portvar POP3_PORTS [{$def_pop3_ports_type}]
-portvar SUNRPC_PORTS [111,32770,32771,32772,32773,32774,32775,32776,32777,32778,32779]
-portvar RLOGIN_PORTS [{$def_rlogin_ports_type}]
-portvar RSH_PORTS [{$def_rsh_ports_type}]
-portvar SMB_PORTS [139,445]
-portvar SMTP_PORTS [{$def_smtp_ports_type}]
-portvar SNMP_PORTS [{$def_snmp_ports_type}]
-portvar SSH_PORTS [{$def_ssh_ports_type}]
-portvar TELNET_PORTS [{$def_telnet_ports_type}]
-portvar MAIL_PORTS [{$def_mail_ports_type}]
-portvar SSL_PORTS [{$def_ssl_ports_type}]
-portvar SIP_PROXY_PORTS [{$def_sip_proxy_ports_type}]
-portvar SIP_PORTS [{$def_sip_ports_type}]
-
-# DCERPC NCACN-IP-TCP
-portvar DCERPC_NCACN_IP_TCP [139,445]
-portvar DCERPC_NCADG_IP_UDP [138,1024:]
-portvar DCERPC_NCACN_IP_LONG [135,139,445,593,1024:]
-portvar DCERPC_NCACN_UDP_LONG [135,1024:]
-portvar DCERPC_NCACN_UDP_SHORT [135,593,1024:]
-portvar DCERPC_NCACN_TCP [2103,2105,2107]
-portvar DCERPC_BRIGHTSTORE [6503,6504]
-
-#####################
-                    #
 # Define Rule Paths #
-                    #
-#####################
-
-var RULE_PATH {$snortdir}/snort_{$snort_uuid}_{$if_real}/rules
+var RULE_PATH {$snortcfgdir}/rules
 var PREPROC_RULE_PATH {$snortdir}/preproc_rules
 
-################################
-                               #
-# Configure the snort decoder  #
-                               #
-################################
+# Define Servers  #
+{$vardef}
 
+# Define Server Ports  #
+{$portvardef}
+
+# Configure the snort decoder  #
 config checksum_mode: all
 config disable_decode_alerts
 config disable_tcpopt_experimental_alerts
@@ -1885,13 +1304,7 @@ config disable_tcpopt_alerts
 config disable_ipopt_alerts
 config disable_decode_drops
 
-###################################
-                                  #
 # Configure the detection engine  #
-# Use lower memory models         #
-                                  #
-###################################
-
 config detection: search-method {$snort_performance} max_queue_events 5
 config event_queue: max_queue 8 log 3 order_events content_length
 
@@ -1900,86 +1313,50 @@ dynamicpreprocessor directory /usr/local/lib/snort/dynamicpreprocessor
 dynamicengine directory /usr/local/lib/snort/dynamicengine
 dynamicdetection directory /usr/local/lib/snort/dynamicrules
 
-###################
-                  #
 # Flow and stream #
-                  #
-###################
-
 preprocessor frag3_global: max_frags 8192
 preprocessor frag3_engine: policy bsd detect_anomalies
 
 preprocessor stream5_global: track_tcp yes, track_udp yes, track_icmp yes
-
 preprocessor stream5_tcp: policy BSD, ports both all{$def_max_queued_bytes_type}{$def_max_queued_segs_type}
 preprocessor stream5_udp:
 preprocessor stream5_icmp:
 
-	{$def_perform_stat_type}
+{$snort_preprocessors}
 
-	{$def_http_inspect_type}
-
-	{$def_other_preprocs_type}
-
-	{$def_ftp_preprocessor_type}
-
-	{$def_smtp_preprocessor_type}
-
-	{$def_sf_portscan_type}
-
-	{$def_dce_rpc_2_type}
-
-	{$def_dns_preprocessor_type}
-
-##############################
-                             #
-# NEW                        #
 # Ignore SSL and Encryption  #
-                             #
-##############################
+preprocessor ssl: ports { {$ports['ssl_ports_ignore']} }, trustservers, noinspect_encrypted
 
-preprocessor ssl: ports { {$def_ssl_ports_ignore_type} }, trustservers, noinspect_encrypted
-
-#####################
-                    #
 # Snort Output Logs #
-                    #
-#####################
-
-	$snortunifiedlogbasic_type
-	$snortalertlogtype_type
-	$alertsystemlog_type
-	$tcpdumplog_type
-	$snortmysqllog_info_chk
-	$snortunifiedlog_type
-	$spoink_type
+{$snortunifiedlogbasic_type}
+{$snortalertlogtype_type}
+{$alertsystemlog_type}
+{$tcpdumplog_type}
+{$snortmysqllog_info_chk}
+{$snortunifiedlog_type}
+{$spoink_type}
 						
-#################
-                #
 # Misc Includes #
-                #
-#################
+{$snort_misc_include_rules}
 
-include {$snortdir}/snort_{$snort_uuid}_{$if_real}/reference.config
-include {$snortdir}/snort_{$snort_uuid}_{$if_real}/classification.config
-{$snort_preprocessor_decoder_rules}
-
-$threshold_file_name
+{$suppress_file_name}
 
 # Snort user pass through configuration
 {$snort_config_pass_thru}
 
-###################
-                  #
 # Rules Selection #
-                  #
-###################
-
-	{$selected_rules_sections}
+{$selected_rules_sections}
 
 EOD;
 
-	return $snort_conf_text;
+	/* write out snort.conf */
+	$conf = fopen("{$snortcfgdir}/snort.conf", "w");
+	if(!$conf) {
+		log_error("Could not open {$snortcfgdir}/snort.conf for writing.");
+		return -1;
+	}
+	fwrite($conf, $snort_conf_text);
+	fclose($conf);
 }
 
 ?>

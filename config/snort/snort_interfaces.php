@@ -52,12 +52,10 @@ if (isset($_POST['del_x'])) {
 	if (is_array($_POST['rule'])) {
 		conf_mount_rw();
 		foreach ($_POST['rule'] as $rulei) {
-				
 			/* convert fake interfaces to real */
 			$if_real = snort_get_real_interface($a_nat[$rulei]['interface']);
 			$snort_uuid = $a_nat[$rulei]['uuid'];
-
-			Running_Stop($snort_uuid,$if_real, $rulei);
+			snort_stop($a_nat[$rulei], $if_real);
 			exec("/bin/rm -r /var/log/snort/snort_{$if_real}{$snort_uuid}");
 			exec("/bin/rm -r {$snortdir}/snort_{$snort_uuid}_{$if_real}");
 
@@ -95,17 +93,15 @@ if (isset($_POST['del_x'])) {
 if ($_GET['act'] == 'toggle' && is_numeric($id)) {
 
 	$if_real = snort_get_real_interface($config['installedpackages']['snortglobal']['rule'][$id]['interface']);
-	$snort_uuid = $config['installedpackages']['snortglobal']['rule'][$id]['uuid'];
+	$snortcfg = $config['installedpackages']['snortglobal']['rule'][$id];
 
 	/* Log Iface stop */
 	exec("/usr/bin/logger -p daemon.info -i -t SnortStartup 'Toggle for {$snort_uuid}_{$if_real}...'");
 
 	sync_snort_package_config();
 
-	$tester2 = Running_Ck($snort_uuid, $if_real, $id);
-
-	if ($tester2 == 'yes') {
-		Running_Stop($snort_uuid, $if_real, $id);
+	if (snort_is_running($snortcfg['uuid'], $if_real) == 'yes') {
+		snort_stop($snortcfg, $if_real);
 
 		header( 'Expires: Sat, 26 Jul 1997 05:00:00 GMT' );
 		header( 'Last-Modified: ' . gmdate( 'D, d M Y H:i:s' ) . ' GMT' );
@@ -114,7 +110,7 @@ if ($_GET['act'] == 'toggle' && is_numeric($id)) {
 		header( 'Pragma: no-cache' );
 
 	} else {
-		Running_Start($snort_uuid, $if_real, $id);
+		snort_start($snortcfg, $if_real);
 
 		header( 'Expires: Sat, 26 Jul 1997 05:00:00 GMT' );
 		header( 'Last-Modified: ' . gmdate( 'D, d M Y H:i:s' ) . ' GMT' );
@@ -203,7 +199,7 @@ if ($pfsense_stable == 'yes')
 				</table>
 				</td>
 			</tr>
-			<?php $nnats = $i = 0; foreach ($a_nat as $natent): ?>
+		<?php $nnats = $i = 0; foreach ($a_nat as $natent): ?>
 			<tr valign="top" id="fr<?=$nnats;?>">
 			<?php
 
@@ -211,10 +207,7 @@ if ($pfsense_stable == 'yes')
 			/* There has to be a smarter way to do this */
 			$if_real = snort_get_real_interface($natent['interface']);
 			$snort_uuid = $natent['uuid'];
-			
-			$tester2 = Running_Ck($snort_uuid, $if_real, $id);
-
-			if ($tester2 == 'no') {
+			if (snort_is_running($snort_uuid, $if_real) == 'no') {
 				$iconfn = 'pass';
 				$class_color_up = 'listbg';
 			}else{
@@ -273,7 +266,7 @@ if ($pfsense_stable == 'yes')
 					?> <?=strtoupper($check_blockoffenders);?></td>
 					<?php
 
-					$color2_upb = Running_Ck_b($snort_uuid, $if_real, $id);
+					$color2_upb = snort_is_running($snort_uuid, $if_real, 'barnyard2');
 
 					if ($color2_upb == 'yes')
 						$color_status = 'listr';
@@ -305,7 +298,7 @@ if ($pfsense_stable == 'yes')
 				</table>
 			
 			</tr>
-			<?php $i++; $nnats++; endforeach; ?>
+		<?php $i++; $nnats++; endforeach; ?>
 			<tr>
 				<td class="list" colspan="8"></td>
 				<td class="list" valign="middle" nowrap>

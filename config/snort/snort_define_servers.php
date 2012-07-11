@@ -167,7 +167,8 @@ if ($_POST) {
 	}
 }
 
-$pgtitle = "Snort: Interface $id$if_real Define Servers";
+$if_friendly = snort_get_friendly_interface($pconfig['interface']);
+$pgtitle = "Snort: Interface {$if_friendly} Define Servers";
 include_once("head.inc");
 
 ?>

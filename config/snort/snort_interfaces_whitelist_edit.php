@@ -79,7 +79,6 @@ if (isset($id) && $a_whitelist[$id]) {
 	$pconfig['name'] = $a_whitelist[$id]['name'];
 	$pconfig['uuid'] = $a_whitelist[$id]['uuid'];
 	$pconfig['detail'] = $a_whitelist[$id]['detail'];
-	$pconfig['snortlisttype'] = $a_whitelist[$id]['snortlisttype'];
 	$pconfig['address'] = $a_whitelist[$id]['address'];
 	$pconfig['descr'] = html_entity_decode($a_whitelist[$id]['descr']);
 	$pconfig['wanips'] = $a_whitelist[$id]['wanips'];
@@ -157,7 +156,6 @@ if ($_POST['submit']) {
 		/* post user input */
 		$w_list['name'] = $_POST['name'];
 		$w_list['uuid'] = $whitelist_uuid;
-		$w_list['snortlisttype'] = $_POST['snortlisttype'];
 		$w_list['wanips'] = $_POST['wanips']? 'yes' : 'no';
 		$w_list['wangateips'] = $_POST['wangateips']? 'yes' : 'no';
 		$w_list['wandnsips'] = $_POST['wandnsips']? 'yes' : 'no';
@@ -239,30 +237,6 @@ if ($savemsg)
 			id="descr" size="40" value="<?=$pconfig['descr'];?>" /> <br />
 		<span class="vexpl"> You may enter a description here for your
 		reference (not parsed). </span></td>
-	</tr>
-	<tr>
-		<td width="22%" valign="top" class="vncell">List Type</td>
-		<td width="78%" class="vtable">
-
-		<div
-			style="padding: 5px; margin-top: 16px; margin-bottom: 16px; border: 1px dashed #ff3333; background-color: #eee; color: #000; font-size: 8pt;"
-			id="itemhelp"><strong>WHITELIST:</strong>&nbsp;&nbsp;&nbsp;This
-		list specifies addresses that Snort Package should not block.<br>
-		<br>
-		<strong>NETLIST:</strong>&nbsp;&nbsp;&nbsp;This list is for defining
-		addresses as $HOME_NET or $EXTERNAL_NET in the snort.conf file.</div>
-
-		<select name="snortlisttype" class="formselect" id="snortlisttype">
-		<?php
-		$interfaces4 = array('whitelist' => 'WHITELIST', 'netlist' => 'NETLIST');
-		foreach ($interfaces4 as $iface4 => $ifacename4): ?>
-			<option value="<?=$iface4;?>"
-			<?php if ($iface4 == $pconfig['snortlisttype']) echo "selected"; ?>>
-				<?=htmlspecialchars($ifacename4);?></option>
-				<?php endforeach; ?>
-		</select> <span class="vexpl"> &nbsp;&nbsp;&nbsp;Choose the type of
-		list you will like see in your <span class="red">Interface Edit Tab</span>.
-		</span></td>
 	</tr>
 	<tr>
 		<td colspan="2" valign="top" class="listtopic">Add auto generated

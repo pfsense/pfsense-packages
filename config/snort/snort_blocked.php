@@ -38,6 +38,7 @@ if (!is_array($config['installedpackages']['snortglobal']['alertsblocks']))
 
 $pconfig['brefresh'] = $config['installedpackages']['snortglobal']['alertsblocks']['brefresh'];
 $pconfig['blertnumber'] = $config['installedpackages']['snortglobal']['alertsblocks']['blertnumber'];
+$pconfig['snortalertlogtype'] = $config['installedpackages']['snortglobal']['alertsblocks']['blertnumber'];
 
 if (empty($pconfig['blertnumber']))
 	$bnentries = '500';

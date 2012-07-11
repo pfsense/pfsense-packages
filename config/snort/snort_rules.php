@@ -215,7 +215,8 @@ $ifname = strtoupper($pconfig['interface']);
 require_once("guiconfig.inc");
 include_once("head.inc");
 
-$pgtitle = "Snort: $id $iface_uuid $if_real Category: $currentruleset";
+$if_friendly = snort_get_friendly_interface($pconfig['interface']);
+$pgtitle = "Snort: $id $iface_uuid {$if_friendly} Category: $currentruleset";
 ?>
 
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">
