@@ -77,6 +77,7 @@ if ($snortdownload == 'on') {
 	@file_put_contents("{$tmpfname}/{$snort_filename_md5}", $image);
 	if (0 == filesize("{$tmpfname}/{$snort_filename_md5}")) {
 		update_status(gettext("Please wait... You may only check for New Rules every 15 minutes..."));
+		log_error(gettext("Please wait... You may only check for New Rules every 15 minutes..."));
 		update_output_window(gettext("Rules are released every month from snort.org. You may download the Rules at any time."));
 		$snortdownload = 'off';
 	} else
@@ -90,6 +91,7 @@ if ($snortdownload == 'on') {
 		$md5_check_old = file_get_contents("{$snortdir}/{$snort_filename_md5}");
 		if ($md5_check_new == $md5_check_old) {
 			update_status(gettext("Snort rules are up to date..."));
+			log_error("Snort rules are up to date...");
 			$snortdownload = 'off';
 		}
 	}
@@ -98,10 +100,12 @@ if ($snortdownload == 'on') {
 /* download snortrules file */
 if ($snortdownload == 'on') {
 	update_status(gettext("There is a new set of Snort.org rules posted. Downloading..."));
+	log_error(gettext("There is a new set of Snort.org rules posted. Downloading..."));
 	download_file_with_progress_bar("http://www.snort.org/pub-bin/oinkmaster.cgi/{$oinkid}/{$snort_filename}", "{$tmpfname}/{$snort_filename}");
 	update_status(gettext("Done downloading rules file."));
 	if (300000 > filesize("{$tmpfname}/$snort_filename")){
 		update_output_window(gettext("Snort rules file downloaded failed..."));
+		log_error(gettext("Snort rules file downloaded failed..."));
 		$snortdownload = 'off';
 	}
 }
@@ -120,6 +124,7 @@ if ($emergingthreats == 'on') {
 		$emerg_md5_check_old = file_get_contents("{$snortdir}/{$emergingthreats_filename_md5}");
 		if ($emerg_md5_check_new == $emerg_md5_check_old) {
 			update_status(gettext("Emerging threat rules are up to date..."));
+			log_error(gettext("Emerging threat rules are up to date..."));
 			$emergingthreats = 'off';
 		}
 	}
@@ -128,6 +133,7 @@ if ($emergingthreats == 'on') {
 /* download emergingthreats rules file */
 if ($emergingthreats == "on") {
 	update_status(gettext("There is a new set of Emergingthreats rules posted. Downloading..."));
+	log_error(gettext("There is a new set of Emergingthreats rules posted. Downloading..."));
 	download_file_with_progress_bar("http://rules.emergingthreats.net/open/snort-{$emerging_threats_version}/emerging.rules.tar.gz", "{$tmpfname}/{$emergingthreats_filename}");
 	update_status(gettext('Done downloading Emergingthreats rules file.'));
 	log_error("Emergingthreats rules file update downloaded succsesfully");
