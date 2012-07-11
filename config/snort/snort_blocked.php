@@ -131,7 +131,7 @@ function get_snort_alert_ip_src($fileline)
 function get_snort_alert_disc($fileline)
 {
 	/* disc */
-	if (preg_match("/\[\*\*\]\s+(\[[0-9:]+\])\s+(.+)\s+(\[\*\*\])/", $fileline, $matches))
+	if (preg_match("/\[\*\*\] (\[.*\]) (.*) (\[\*\*\])/", $fileline, $matches))
 		return "{$matches[2]}";
 
 	return "";
