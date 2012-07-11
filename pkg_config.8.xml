@@ -1638,6 +1638,7 @@
 		<config_file>http://www.pfsense.com/packages/config/bacula-client/bacula-client.xml</config_file>
 		<depends_on_package_base_url>http://ftp.freebsd.org/pub/FreeBSD/ports/i386/packages-8-stable/All/</depends_on_package_base_url>
 		<depends_on_package>bacula-client-5.2.6.tbz</depends_on_package>
+		<depends_on_package_pbi>bacula-5.2.6-i386.pbi</depends_on_package>
 		<build_port_path>/usr/ports/sysutils/bacula-client</build_port_path>
 		<build_pbi>
 			<port>sysutils/bacula-client</port>
