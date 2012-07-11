@@ -92,15 +92,14 @@ if (isset($_POST['del_x'])) {
 /* start/stop snort */
 if ($_GET['act'] == 'toggle' && is_numeric($id)) {
 
-	$if_real = snort_get_real_interface($config['installedpackages']['snortglobal']['rule'][$id]['interface']);
 	$snortcfg = $config['installedpackages']['snortglobal']['rule'][$id];
-
-	/* Log Iface stop */
-	exec("/usr/bin/logger -p daemon.info -i -t SnortStartup 'Toggle for {$snort_uuid}_{$if_real}...'");
+	$if_real = snort_get_real_interface($snortcfg['interface']);
+	$if_friendly = snort_get_friendly_interface($snortcfg['interface']);
 
 	sync_snort_package_config();
 
 	if (snort_is_running($snortcfg['uuid'], $if_real) == 'yes') {
+		log_error("Toggle(stopping) for {$if_friendly}({$snortcfg['descr']}}...");
 		snort_stop($snortcfg, $if_real);
 
 		header( 'Expires: Sat, 26 Jul 1997 05:00:00 GMT' );
@@ -110,6 +109,7 @@ if ($_GET['act'] == 'toggle' && is_numeric($id)) {
 		header( 'Pragma: no-cache' );
 
 	} else {
+		log_error("Toggle(starting) for {$if_friendly}({$snortcfg['descr']}}...");
 		snort_start($snortcfg, $if_real);
 
 		header( 'Expires: Sat, 26 Jul 1997 05:00:00 GMT' );

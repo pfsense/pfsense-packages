@@ -228,7 +228,7 @@ function snort_stop($snortcfg, $if_real) {
 	}
 
 	/* Log Iface stop */
-	exec("/usr/bin/logger -p daemon.info -i -t SnortStartup 'Interface Rule STOP for {$snortcfg['descr']}({$snort_uuid}_{$if_real})...'");
+	log_error("Interface Rule STOP for {$snortcfg['descr']}({$snort_uuid}_{$if_real})...");
 	sleep(2); // Give time so GUI displays correctly
 }
 
@@ -249,7 +249,7 @@ function snort_start($snortcfg, $if_real) {
 		exec("/usr/local/bin/barnyard2 -r {$snort_uuid} -f \"snort_{$snort_uuid}_{$if_real}.u2\" --pid-path {$g['varrun_path']} --nolock-pidfile -c {$snortdir}/snort_{$snort_uuid}_{$if_real}/barnyard2.conf -d /var/log/snort/snort_{$if_real}{$snort_uuid} -D -q");
 
 	/* Log Iface stop */
-	exec("/usr/bin/logger -p daemon.info -i -t SnortStartup 'Interface Rule START for {$snortcfg['descr']}({$snort_uuid}_{$if_real})...'");
+	log_error("Interface Rule START for {$snortcfg['descr']}({$snort_uuid}_{$if_real})...");
 	sleep(2); // Give time so GUI displays correctly
 }
 
