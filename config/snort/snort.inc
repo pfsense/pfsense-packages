@@ -1033,17 +1033,6 @@ function snort_generate_conf($snortcfg) {
 	if(!empty($snortcfg['performance']))
 		$snort_performance = $snortcfg['performance'];
 
-	/* generate rule sections to load */
-	$enabled_rulesets = $snortcfg['rulesets'];
-	$selected_rules_sections = "";
-	if (!empty($enabled_rulesets)) {
-		$enabled_rulesets_array = explode("||", $enabled_rulesets);
-		foreach($enabled_rulesets_array as $enabled_item) {
-			if (file_exists("{$snortcfgdir}/rules/{$enabled_item}"))
-				$selected_rules_sections  .= "include \$RULE_PATH/{$enabled_item}\n";
-		}
-	}
-
 	/////////////////////////////
 	/* preprocessor code */
 	/* def perform_stat */
@@ -1274,6 +1263,16 @@ EOD;
 		$snort_misc_include_rules .= "include \$PREPROC_RULE_PATH/preprocessor.rules\n";
 	if (file_exists("{$snortdir}/preproc_rules/decoder.rules"))
 		$snort_misc_include_rules .= "include \$PREPROC_RULE_PATH/decoder.rules\n";
+
+	/* generate rule sections to load */
+	$selected_rules_sections = "";
+	if (!empty($snortcfg['rulesets'])) {
+		$enabled_rulesets_array = explode("||", $snortcfg['rulesets']);
+		foreach($enabled_rulesets_array as $enabled_item) {
+			if (file_exists("{$snortcfgdir}/rules/{$enabled_item}"))
+				$selected_rules_sections  .= "include \$RULE_PATH/{$enabled_item}\n";
+		}
+	}
 
 	/* build snort configuration file */
 	$snort_conf_text = <<<EOD

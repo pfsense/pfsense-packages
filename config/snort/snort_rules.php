@@ -65,9 +65,9 @@ if (!is_dir("{$snortdir}/snort_{$iface_uuid}_{$if_real}/rules"))
 	exec("/bin/mkdir -p {$snortdir}/snort_{$iface_uuid}_{$if_real}/rules");
 
 $isrulesfolderempty = exec("ls -A {$snortdir}/snort_{$iface_uuid}_{$if_real}/rules/*.rules");
-if ($isrulesfolderempty == "") {
+if ($isrulesfolderempty == "" || empty($pconfig['rulesets'])) {
 	$isrulesfolderempty = exec("ls -A {$snortdir}/rules/*.rules");
-	if ($isrulesfolderempty == "") {
+	if ($isrulesfolderempty == "" || empty($pconfig['rulesets'])) {
 		include_once("head.inc");
 		include_once("fbegin.inc");
 
@@ -96,7 +96,7 @@ if ($isrulesfolderempty == "") {
 					<table id=\"maintable\" class=\"tabcont\" width=\"100%\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\">\n
 						<tr>\n
 							<td>\n
-		# The rules directory is empty.\n
+		# The rules directory is empty or you have not selected any rules in the Categories tab.\n
 						</td>\n
 						</tr>\n
 					</table>\n
@@ -153,11 +153,12 @@ while (false !== ($filename = readdir($dh)))
 		$files[] = basename($filename);
 }
 sort($files);
+$categories = explode("||", $pconfig['rulesets']);
 
 if ($_GET['openruleset'])
 	$rulefile = $_GET['openruleset'];
 else
-	$rulefile = $ruledir.$files[0];
+	$rulefile = $ruledir.$categories[0];
 
 //Load the rule file
 $splitcontents = load_rule_file($rulefile);
@@ -278,6 +279,8 @@ function popup(url)
 			<select id="selectbox" name="selectbox" class="formselect" onChange="go()">
 			<?php
 				foreach ($files as $value) {
+					if (!in_array($value, $categories)) 
+						continue;
 					echo "<option value='?id={$id}&openruleset={$ruledir}{$value}' ";
 					if ($value === $currentruleset)
 						echo "selected";
@@ -393,11 +396,6 @@ function popup(url)
 		?>
 				
 			</table>
-			</td>
-		</tr>
-		<tr>
-			<td colspan="9" class="listlr">
-			<?php echo "  <strong><span class='red'>There are {$counter} rules in this category. <br/><br/></span></strong>"; ?>
 			</td>
 		</tr>
 		<tr>
