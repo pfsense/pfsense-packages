@@ -210,7 +210,7 @@
 		<field>
 			<fielddescr>sortable</fielddescr>
 			<fieldname>sortable</fieldname>
-			<display_maximum_rows>20</display_maximum_rows>
+			<display_maximum_rows>0</display_maximum_rows>
 			<type>sorting</type>
 			<include_filtering_inputbox/>
 			<sortablefields>
