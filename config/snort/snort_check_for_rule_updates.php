@@ -155,6 +155,14 @@ if ($emergingthreats == "on") {
 //  }
 //}
 
+/* Normalize rulesets */
+$sedcmd = "s/^#alert/# alert/g\n";
+$sedcmd = "s/^##alert/# alert/g\n";
+$sedcmd = "s/^#  alert/# alert/g\n";
+$sedcmd = "s/^#\talert/# alert/g\n";
+$sedcmd = "s/^##\talert/# alert/g\n";
+@file_put_contents("{$snortdir}/tmp/sedcmd", $sedcmd);
+
 /* Untar snort rules file individually to help people with low system specs */
 if ($snortdownload == 'on') {
 	if (file_exists("{$tmpfname}/{$snort_filename}")) {
@@ -251,11 +259,8 @@ if ($snortdownload == 'on') {
 				exec("/bin/rm /usr/local/lib/snort/dynamicrules/lib_sfdynamic_example\*");
 			}
 
-			/* XXX: Convert this to sed? */
 			/* make shure default rules are in the right format */
-			exec("/usr/local/bin/perl -pi -e 's/#alert/# alert/g' {$snortdir}/rules/*.rules");
-			exec("/usr/local/bin/perl -pi -e 's/##alert/# alert/g' {$snortdir}/rules/*.rules");
-			exec("/usr/local/bin/perl -pi -e 's/## alert/# alert/g' {$snortdir}/rules/*.rules");
+			exec("/usr/bin/sed -I '' -f {$snortdir}/tmp/sedcmd {$snortdir}/rules/*.rules");
 
 			/* create a msg-map for snort  */
 			update_status(gettext("Updating Alert Messages..."));
@@ -275,6 +280,9 @@ if ($emergingthreats == 'on') {
 		update_status(gettext("Extracting rules..."));
 		exec("/usr/bin/tar xzf {$tmpfname}/{$emergingthreats_filename} -C {$snortdir} rules/");
 	}
+
+	/* make shure default rules are in the right format */
+	exec("/usr/bin/sed -I '' -f {$snortdir}/tmp/sedcmd {$snortdir}/rules/*.rules");
 
 	/*  Copy emergingthreats md5 sig to snort dir */
 	if (file_exists("{$tmpfname}/$emergingthreats_filename_md5")) {

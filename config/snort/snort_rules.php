@@ -39,7 +39,7 @@ $snortdir = SNORTDIR;
 
 if (!is_array($config['installedpackages']['snortglobal']['rule']))
 	$config['installedpackages']['snortglobal']['rule'] = array();
-$a_nat = &$config['installedpackages']['snortglobal']['rule'];
+$a_rule = &$config['installedpackages']['snortglobal']['rule'];
 
 $id = $_GET['id'];
 if (isset($_POST['id']))
@@ -49,15 +49,15 @@ if (is_null($id)) {
         exit;
 }
 
-if (isset($id) && $a_nat[$id]) {
-	$pconfig['enable'] = $a_nat[$id]['enable'];
-	$pconfig['interface'] = $a_nat[$id]['interface'];
-	$pconfig['rulesets'] = $a_nat[$id]['rulesets'];
+if (isset($id) && $a_rule[$id]) {
+	$pconfig['enable'] = $a_rule[$id]['enable'];
+	$pconfig['interface'] = $a_rule[$id]['interface'];
+	$pconfig['rulesets'] = $a_rule[$id]['rulesets'];
 }
 
 /* convert fake interfaces to real */
 $if_real = snort_get_real_interface($pconfig['interface']);
-$iface_uuid = $a_nat[$id]['uuid'];
+$iface_uuid = $a_rule[$id]['uuid'];
 
 /* Check if the rules dir is empy if so warn the user */
 /* TODO give the user the option to delete the installed rules rules */
@@ -124,15 +124,14 @@ if ($isrulesfolderempty == "") {
 
 function get_middle($source, $beginning, $ending, $init_pos) {
 	$beginning_pos = strpos($source, $beginning, $init_pos);
+	if (!$beginning_pos)
+		return false;
 	$middle_pos = $beginning_pos + strlen($beginning);
-	$ending_pos = strpos($source, $ending, $beginning_pos);
-	$middle = substr($source, $middle_pos, $ending_pos - $middle_pos);
-	return $middle;
-}
-
-function write_rule_file($content_changed, $received_file)
-{
-	@file_put_contents($received_file, implode("\n", $content_changed));
+	$source = substr($source, $middle_pos);
+	$ending_pos = strpos($source, $ending, 0);
+	if (!$ending_pos)
+		return false;
+	return substr($source, 0, $ending_pos);
 }
 
 function load_rule_file($incoming_file)
@@ -187,23 +186,30 @@ if ($_GET['act'] == "toggle" && $_GET['ids']) {
 	$splitcontents[$lineid] = $tempstring;
 
 	//write the new .rules file
-	write_rule_file($splitcontents, $rulefile);
+	@file_put_contents($rulefile, implode("\n", $splitcontents));
 
 	//write disable/enable sid to config.xml
-	$sid = get_middle($tempstring, 'sid:', ';', 0);
+	$sid = get_middle($tempstring, 'sid:', ";", 0);
 	if (is_numeric($sid)) {
 		// rule_sid_on registers
-		if (!empty($a_nat[$id]['rule_sid_on']))
-			$a_nat[$id]['rule_sid_on'] = str_replace("||enablesid $sid", "", $a_nat[$id]['rule_sid_on']);
-		if (!empty($a_nat[$id]['rule_sid_on']))
-			$a_nat[$id]['rule_sid_off'] = str_replace("||disablesid $sid", "", $a_nat[$id]['rule_sid_off']);
-		if ($disabled === false)
-			$a_nat[$id]['rule_sid_off'] = "||disablesid $sid_off" . $a_nat[$id]['rule_sid_off'];
-		else
-			$a_nat[$id]['rule_sid_on'] = "||enablesid $sid_on" . $a_nat[$id]['rule_sid_on'];
+		$sidon = explode("||", $a_rule[$id]['rule_sid_on']);
+		if (!empty($sidon))
+			$sidon = @array_flip($sidon);
+		$sidoff = explode("||", $a_rule[$id]['rule_sid_off']);
+		if (!empty($sidoff))
+			$sidoff = @array_flip($sidoff);
+		if ($disabled) {
+			unset($sidoff["disablesid {$sid}"]);
+			$sidon["enablesid {$sid}"] = count($sidon);
+		} else {
+			unset($sidon["enablesid {$sid}"]);
+			$sidoff["disablesid {$sid}"] = count($sidoff);
+		}
+				
+		$a_rule[$id]['rule_sid_on'] = implode("||", array_flip($sidon));
+		$a_rule[$id]['rule_sid_off'] = implode("||", array_flip($sidoff));
+		write_config();
 	}
-
-	write_config();
 
 	header("Location: /snort/snort_rules.php?id={$id}&openruleset={$rulefile}");
 	exit;
@@ -248,7 +254,7 @@ function popup(url)
 }
 </script>
 
-<table style="table-layout:fixed;" width="99%" border="0" cellpadding="0" cellspacing="0">
+<table width="100%" border="0" cellpadding="0" cellspacing="0">
 <tr><td>
 <?php
         $tab_array = array();
@@ -382,6 +388,7 @@ function popup(url)
 					</td>
 				</tr>
 		<?php
+
 			}
 		?>
 				
