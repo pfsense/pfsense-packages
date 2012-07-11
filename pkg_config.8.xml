@@ -1646,5 +1646,41 @@
 		<configurationfile>bacula-client.xml</configurationfile>
 		<after_install_info>Please visit the bacula client tab on services menu.</after_install_info>
 	</package>
+	<package>
+		<!-- This does not exist yet, this is here to trigger a PBI build -->
+		<name>urlsnarf</name>
+		<pkginfolink>http://forum.pfsense.org/</pkginfolink>
+		<descr><![CDATA[HTTP URL Sniffer]]></descr>
+		<category>Services</category>
+		<version>0.1</version>
+		<status>Beta</status>
+		<required_version>2.2</required_version>
+		<config_file>http://www.pfsense.com/packages/config/urlsnarf/urlsnarf.xml</config_file>
+		<maintainer>jimp@pfsense.org</maintainer>
+		<configurationfile>urlsnarf.xml</configurationfile>
+		<build_pbi>
+			<port>security/dsniff</port>
+		</build_pbi>
+		<depends_on_package_base_url>http://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
+		<depends_on_package_pbi>dsniff-2.3,4-i386.pbi</depends_on_package_pbi>
+	</package>
+	<package>
+		<!-- This does not exist yet, this is here to trigger a PBI build -->
+		<name>iftop</name>
+		<pkginfolink>http://forum.pfsense.org/</pkginfolink>
+		<descr><![CDATA[Realtime interface monitor (console only)]]></descr>
+		<category>Services</category>
+		<version>0.1</version>
+		<status>Beta</status>
+		<required_version>2.2</required_version>
+		<config_file>http://www.pfsense.com/packages/config/iftop/iftop.xml</config_file>
+		<maintainer>jimp@pfsense.org</maintainer>
+		<configurationfile>iftop.xml</configurationfile>
+		<build_pbi>
+			<port>net-mgmt/iftop</port>
+		</build_pbi>
+		<depends_on_package_base_url>http://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
+		<depends_on_package_pbi>iftop-0.17-i386.pbi</depends_on_package_pbi>
+	</package>
 </packages>
 </pfsensepkgs>
