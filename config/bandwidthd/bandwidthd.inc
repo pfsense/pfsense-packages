@@ -78,6 +78,9 @@ function bandwidthd_install_config() {
 	$promiscuous = $config['installedpackages']['bandwidthd']['config'][0]['promiscuous'];
 	if($promiscuous)
 		$promiscuous = "promiscuous true\n";
+	else
+		$promiscuous = "promiscuous false\n";
+
 	$graph_cutoff = $config['installedpackages']['bandwidthd']['config'][0]['graphcutoff'];
 	if($graph_cutoff)
 		$graph_cutoff = "graph_cutoff $graph_cutoff\n";
