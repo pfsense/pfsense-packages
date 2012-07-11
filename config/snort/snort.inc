@@ -1240,6 +1240,7 @@ EOD;
 			$ports[$alias] = $snortcfg["def_{$alias}"];
 		$portvardef .= "portvar " . strtoupper($alias) . " [" . $ports[$alias] . "]\n";
 	}
+	$def_ssl_ports_ignore = str_replace(",", " ", $ports['ssl_ports_ignore']);
 
 	$snort_preproc = array (
 		"perform_stat", "http_inspect", "other_preprocs", "ftp_preprocessor", "smtp_preprocessor", 
@@ -1325,7 +1326,7 @@ preprocessor stream5_icmp:
 {$snort_preprocessors}
 
 # Ignore SSL and Encryption  #
-preprocessor ssl: ports { {$ports['ssl_ports_ignore']} }, trustservers, noinspect_encrypted
+preprocessor ssl: ports { {$def_ssl_ports_ignore} }, trustservers, noinspect_encrypted
 
 # Snort Output Logs #
 {$snortunifiedlogbasic_type}
