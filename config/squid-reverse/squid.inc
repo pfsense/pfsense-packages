@@ -492,10 +492,18 @@ function squid_validate_nac($post, $input_errors) {
 	}
 
 	foreach (array(	'unrestricted_hosts', 'banned_hosts') as $hosts) {
-		foreach (explode("\n", $post[$hosts]) as $host) {
-			$host = trim($host);
-			if (!empty($host) && !is_ipaddr($host))
-				$input_errors[] = "The host '$host' is not a valid IP address";
+		
+		if (preg_match_all("@([0-9.]+)(/[0-9.]+|)@",$_POST[$hosts],$matches)){
+			for ($x=0;$x < count($matches[1]);$x++){
+				if ($matches[2][$x] == ""){
+					if (!is_ipaddr($matches[1][$x]))
+						$input_errors[] = "'{$matches[1][$x]}' is not a valid IP address";
+					}
+				else{
+					if (!is_subnet($matches[0][$x]))
+						$input_errors[] = "The subnet '{$matches[0][$x]}' is not a valid CIDR range";
+					}
+				}
 		}
 	}
 

@@ -105,7 +105,7 @@
 		<field>
 			<fielddescr>Unrestricted IPs</fielddescr>
 			<fieldname>unrestricted_hosts</fieldname>
-			<description>Enter each unrestricted IP address on a new line that is not to be filtered out by the other access control directives set in this page.</description>
+			<description>Enter unrestricted IP address / network(in CIDR format) on a new line that is not to be filtered out by the other access control directives set in this page.</description>
 			<type>textarea</type>
 			<cols>50</cols>
 			<rows>5</rows>
@@ -114,7 +114,7 @@
 		<field>
 			<fielddescr>Banned host addresses</fielddescr>
 			<fieldname>banned_hosts</fieldname>
-			<description>Enter each IP address on a new line that is not to be allowed to use the proxy.</description>
+			<description>Enter each IP address / network(in CIDR format) on a new line that is not to be allowed to use the proxy.</description>
 			<type>textarea</type>
 			<cols>50</cols>
 			<rows>5</rows>
