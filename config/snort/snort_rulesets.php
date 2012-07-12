@@ -227,6 +227,7 @@ if ($savemsg) {
 					<td colspan="2" valign="center"><br/><input value="Select All" type="submit" name="selectall" id="selectall" /><br/<br/></td>
 					<td colspan="2" valign="center"><br/><input value="Unselect All" type="submit" name="unselectall" id="selectall" /><br/<br/></td>
 				</tr>
+				<tr>    <td colspan="6">&nbsp;</td> </tr>
 				<tr id="frheader">
 						<td width="5%" class="listhdrr">Enabled</td>
 						<td width="25%" class="listhdrr"><?php echo 'Ruleset: Emerging Threats.';?></td>
@@ -277,7 +278,10 @@ if ($savemsg) {
 							echo "	\n<input type='checkbox' name='toenable[]' value='$file' {$CHECKED} />\n";
 							echo "</td>\n";
 							echo "<td class='listr' width='25%' >\n";
-							echo "<a href='snort_rules.php?id={$jd}&openruleset={$snortdir}/snort_{$jface_uuid}_{$jf_real}/rules/" . urlencode($file) . "'>{$file}</a>\n";
+							if (empty($CHECKED))
+								echo $file;
+							else
+								echo "<a href='snort_rules.php?id={$jd}&openruleset={$snortdir}/snort_{$jface_uuid}_{$jf_real}/rules/" . urlencode($file) . "'>{$file}</a>\n";
 							echo "</td>\n";
 						} else
 							echo "<td class='listbggrey' width='30%' colspan='2'><br/></td>\n";
@@ -294,7 +298,10 @@ if ($savemsg) {
 							echo "	\n<input type='checkbox' name='toenable[]' value='{$file}' {$CHECKED} />\n";
 							echo "</td>\n";
 							echo "<td class='listr' width='25%' >\n";
-							echo "<a href='snort_rules.php?id={$jd}&openruleset={$snortdir}/snort_{$jface_uuid}_{$jf_real}/rules/" . urlencode($file) . "'>{$file}</a>\n";
+							if (empty($CHECKED))
+								echo $file;
+							else
+								echo "<a href='snort_rules.php?id={$jd}&openruleset={$snortdir}/snort_{$jface_uuid}_{$jf_real}/rules/" . urlencode($file) . "'>{$file}</a>\n";
 							echo "</td>\n";
 						} else
 							echo "<td class='listbggrey' width='30%' colspan='2'><br/></td>\n";
@@ -311,7 +318,10 @@ if ($savemsg) {
 							echo "	\n<input type='checkbox' name='toenable[]' value='{$file}' {$CHECKED} />\n";
 							echo "</td>\n";
 							echo "<td class='listr' width='25%' >\n";
-							echo "<a href='snort_rules.php?id={$jd}&openruleset={$snortdir}/snort_{$jface_uuid}_{$jf_real}/rules/" . urlencode($file) . "'>{$file}</a>\n";
+							if (empty($CHECKED))
+								echo $file;
+							else
+								echo "<a href='snort_rules.php?id={$jd}&openruleset={$snortdir}/snort_{$jface_uuid}_{$jf_real}/rules/" . urlencode($file) . "'>{$file}</a>\n";
 							echo "</td>\n";
 						} else
 							echo "<td class='listbggrey' width='30%' colspan='2'><br/></td>\n";
