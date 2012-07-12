@@ -198,7 +198,9 @@ function snort_build_list($listname = "") {
 	foreach ($validator as $vald) { 
 		if (empty($vald))
 			continue;
-		$valresult[] = trim($vald);
+		$vald = trim($vald);
+		if (empty($valresult[$vald]))
+			$valresult[$vald] = $vald;
 	}
 
 	return $valresult;
