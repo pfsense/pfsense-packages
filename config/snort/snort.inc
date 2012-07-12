@@ -214,6 +214,16 @@ function snort_is_running($snort_uuid, $if_real, $type = 'snort') {
 	return 'no';
 }
 
+function snort_barnyard_stop($snortcfg, $if_real) {
+	global $config, $g;
+
+	$snort_uuid = $snortcfg['uuid'];
+	if (file_exists("{$g['varrun_path']}/barnyard2_{$if_real}{$snort_uuid}.pid") && isvalidpid("{$g['varrun_path']}/barnyard2_{$if_real}{$snort_uuid}.pid")) {
+		killbypid("{$g['varrun_path']}/barnyard2_{$if_real}{$snort_uuid}.pid");
+		@unlink("{$g['varrun_path']}/barnyard2_{$if_real}{$snort_uuid}.pid");
+	}
+}
+
 function snort_stop($snortcfg, $if_real) {
 	global $config, $g;
 
@@ -223,14 +233,21 @@ function snort_stop($snortcfg, $if_real) {
 		exec("/bin/rm {$g['varrun_path']}/snort_{$if_real}{$snort_uuid}.pid");
 	}
 
-	if (file_exists("{$g['varrun_path']}/barnyard2_{$if_real}{$snort_uuid}.pid") && isvalidpid("{$g['varrun_path']}/barnyard2_{$if_real}{$snort_uuid}.pid")) {
-		killbypid("{$g['varrun_path']}/barnyard2_{$if_real}{$snort_uuid}.pid");
-		@unlink("{$g['varrun_path']}/barnyard2_{$if_real}{$snort_uuid}.pid");
-	}
+	snort_barnyard_stop($snortcfg, $if_real);
 
-	/* Log Iface stop */
-	log_error("Interface Rule STOP for {$snortcfg['descr']}({$snort_uuid}_{$if_real})...");
-	sleep(2); // Give time so GUI displays correctly
+	log_error("Interface Rule STOP for {$snortcfg['descr']}({$if_real})...");
+}
+
+function snort_barnyard_start($snortcfg, $if_real) {
+	global $config, $g;
+
+	$snortdir = SNORTDIR;
+	$snort_uuid = $snortcfg['uuid'];
+
+	/* define snortbarnyardlog_chk */
+	if ($snortcfg['barnyard_enable'] == 'on' && !empty($snortcfg['barnyard_mysql']))
+		exec("/usr/local/bin/barnyard2 -r {$snort_uuid} -f \"snort_{$snort_uuid}_{$if_real}.u2\" --pid-path {$g['varrun_path']} --nolock-pidfile -c {$snortdir}/snort_{$snort_uuid}_{$if_real}/barnyard2.conf -d /var/log/snort/snort_{$if_real}{$snort_uuid} -D -q");
+
 }
 
 function snort_start($snortcfg, $if_real) {
@@ -244,14 +261,9 @@ function snort_start($snortcfg, $if_real) {
 	else
 		return;
 
-	/* define snortbarnyardlog_chk */
-	/* top will have trouble if the uuid is to far back */
-	if ($snortcfg['barnyard_enable'] == 'on' && !empty($snortcfg['barnyard_mysql']))
-		exec("/usr/local/bin/barnyard2 -r {$snort_uuid} -f \"snort_{$snort_uuid}_{$if_real}.u2\" --pid-path {$g['varrun_path']} --nolock-pidfile -c {$snortdir}/snort_{$snort_uuid}_{$if_real}/barnyard2.conf -d /var/log/snort/snort_{$if_real}{$snort_uuid} -D -q");
+	snort_barnyard_start($snortcfg, $if_real);
 
-	/* Log Iface stop */
-	log_error("Interface Rule START for {$snortcfg['descr']}({$snort_uuid}_{$if_real})...");
-	sleep(2); // Give time so GUI displays correctly
+	log_error("Interface Rule START for {$snortcfg['descr']}({$if_real})...");
 }
 
 function snort_get_friendly_interface($interface) {

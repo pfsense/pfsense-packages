@@ -86,18 +86,34 @@ if (isset($_POST['del_x'])) {
 
 }
 
-
 /* start/stop snort */
-if ($_GET['act'] == 'toggle' && is_numeric($id)) {
-
+if ($_GET['act'] == 'bartoggle' && is_numeric($id)) {
 	$snortcfg = $config['installedpackages']['snortglobal']['rule'][$id];
 	$if_real = snort_get_real_interface($snortcfg['interface']);
 	$if_friendly = snort_get_friendly_interface($snortcfg['interface']);
 
-	sync_snort_package_config();
+	if (snort_is_running($snortcfg['uuid'], $if_real, 'barnyard2') == 'no') {
+		log_error("Toggle(barnyard starting) for {$if_friendly}({$snortcfg['descr']}}...");
+		sync_snort_package_config();
+		snort_barnyard_start($snortcfg, $if_real);
+	} else {
+		log_error("Toggle(barnyard stopping) for {$if_friendly}({$snortcfg['descr']}}...");
+		snort_barnyard_stop($snortcfg, $if_real);
+	}
+
+	sleep(3); // So the GUI reports correctly
+	header("Location: /snort/snort_interfaces.php");
+	exit;
+}
+
+/* start/stop snort */
+if ($_GET['act'] == 'toggle' && is_numeric($id)) {
+	$snortcfg = $config['installedpackages']['snortglobal']['rule'][$id];
+	$if_real = snort_get_real_interface($snortcfg['interface']);
+	$if_friendly = snort_get_friendly_interface($snortcfg['interface']);
 
 	if (snort_is_running($snortcfg['uuid'], $if_real) == 'yes') {
-		log_error("Toggle(stopping) for {$if_friendly}({$snortcfg['descr']}}...");
+		log_error("Toggle(snort stopping) for {$if_friendly}({$snortcfg['descr']})...");
 		snort_stop($snortcfg, $if_real);
 
 		header( 'Expires: Sat, 26 Jul 1997 05:00:00 GMT' );
@@ -105,9 +121,9 @@ if ($_GET['act'] == 'toggle' && is_numeric($id)) {
 		header( 'Cache-Control: no-store, no-cache, must-revalidate' );
 		header( 'Cache-Control: post-check=0, pre-check=0', false );
 		header( 'Pragma: no-cache' );
-
 	} else {
-		log_error("Toggle(starting) for {$if_friendly}({$snortcfg['descr']}}...");
+		log_error("Toggle(snort starting) for {$if_friendly}({$snortcfg['descr']})...");
+		sync_snort_package_config();
 		snort_start($snortcfg, $if_real);
 
 		header( 'Expires: Sat, 26 Jul 1997 05:00:00 GMT' );
@@ -116,11 +132,10 @@ if ($_GET['act'] == 'toggle' && is_numeric($id)) {
 		header( 'Cache-Control: post-check=0, pre-check=0', false );
 		header( 'Pragma: no-cache' );
 	}
-	sleep(4); // So the GUI reports correctly
+	sleep(3); // So the GUI reports correctly
 	header("Location: /snort/snort_interfaces.php");
 	exit;
 }
-
 
 $pgtitle = "Services: $snort_package_version";
 include_once("head.inc");
@@ -174,127 +189,128 @@ if ($pfsense_stable == 'yes')
 </td></tr>
 <tr>
 	<td>
-		<div id="mainarea2">
-		<table class="tabcont" width="100%" border="0" cellpadding="0"
-			cellspacing="0">
-			<tr id="frheader">
-				<td width="5%" class="list">&nbsp;</td>
-				<td width="1%" class="list">&nbsp;</td>
-				<td width="10%" class="listhdrr">If</td>
-				<td width="10%" class="listhdrr">Snort</td>
-				<td width="10%" class="listhdrr">Performance</td>
-				<td width="10%" class="listhdrr">Block</td>
-				<td width="10%" class="listhdrr">Barnyard2</td>
-				<td width="50%" class="listhdr">Description</td>
-				<td width="3%" class="list">
-				<table border="0" cellspacing="0" cellpadding="1">
-					<tr>
-						<td width="17"></td>
-						<td><a href="snort_interfaces_edit.php?id=<?php echo $id_gen;?>"><img
-							src="../themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif"
-							width="17" height="17" border="0"></a></td>
-					</tr>
-				</table>
-				</td>
-			</tr>
-		<?php $nnats = $i = 0; foreach ($a_nat as $natent): ?>
-			<tr valign="top" id="fr<?=$nnats;?>">
+	<div id="mainarea2">
+	<table class="tabcont" width="100%" border="0" cellpadding="0"
+		cellspacing="0">
+		<tr id="frheader">
+			<td width="5%" class="list">&nbsp;</td>
+			<td width="1%" class="list">&nbsp;</td>
+			<td width="10%" class="listhdrr">If</td>
+			<td width="10%" class="listhdrr">Snort</td>
+			<td width="10%" class="listhdrr">Performance</td>
+			<td width="10%" class="listhdrr">Block</td>
+			<td width="10%" class="listhdrr">Barnyard2</td>
+			<td width="50%" class="listhdr">Description</td>
+			<td width="3%" class="list">
+			<table border="0" cellspacing="0" cellpadding="1">
+				<tr>
+					<td width="17"></td>
+					<td><a href="snort_interfaces_edit.php?id=<?php echo $id_gen;?>"><img
+						src="../themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif"
+						width="17" height="17" border="0"></a></td>
+				</tr>
+			</table>
+			</td>
+		</tr>
+<?php $nnats = $i = 0; foreach ($a_nat as $natent): ?>
+<tr valign="top" id="fr<?=$nnats;?>">
+<?php
+
+/* convert fake interfaces to real and check if iface is up */
+/* There has to be a smarter way to do this */
+	$if_real = snort_get_real_interface($natent['interface']);
+	$snort_uuid = $natent['uuid'];
+	if (snort_is_running($snort_uuid, $if_real) == 'no') {
+		$iconfn = 'pass';
+		$class_color_up = 'listbg';
+	}else{
+		$class_color_up = 'listbg2';
+		$iconfn = 'block';
+	}
+	if (snort_is_running($snort_uuid, $if_real, 'barnyard2') == 'no') {
+		$biconfn = 'pass';
+	} else {
+		$biconfn = 'block';
+	}
+
+	?>
+		<td class="listt">
+			<input type="checkbox" id="frc<?=$nnats;?>" name="rule[]" value="<?=$i;?>" onClick="fr_bgcolor('<?=$nnats;?>')" style="margin: 0; padding: 0;"></td>
+		<td class="listt" align="center"></td>
+		<td class="listr" onClick="fr_toggle(<?=$nnats;?>)"
+			id="frd<?=$nnats;?>"
+			ondblclick="document.location='snort_interfaces_edit.php?id=<?=$nnats;?>';">
 			<?php
-
-			/* convert fake interfaces to real and check if iface is up */
-			/* There has to be a smarter way to do this */
-			$if_real = snort_get_real_interface($natent['interface']);
-			$snort_uuid = $natent['uuid'];
-			if (snort_is_running($snort_uuid, $if_real) == 'no') {
-				$iconfn = 'pass';
-				$class_color_up = 'listbg';
-			}else{
-				$class_color_up = 'listbg2';
-				$iconfn = 'block';
-			}
-
+				echo snort_get_friendly_interface($natent['interface']);
 			?>
-				<td class="listt">
-					<a href="?act=toggle&id=<?=$i;?>">
-						<img src="../themes/<?= $g['theme']; ?>/images/icons/icon_<?=$iconfn;?>.gif"
-						width="13" height="13" border="0"
-						title="click to toggle start/stop snort"></a>
-					<input type="checkbox" id="frc<?=$nnats;?>" name="rule[]" value="<?=$i;?>" onClick="fr_bgcolor('<?=$nnats;?>')" style="margin: 0; padding: 0;"></td>
-				<td class="listt" align="center"></td>
-				<td class="listr" onClick="fr_toggle(<?=$nnats;?>)"
-					id="frd<?=$nnats;?>"
-					ondblclick="document.location='snort_interfaces_edit.php?id=<?=$nnats;?>';">
-					<?php
-						echo snort_get_friendly_interface($natent['interface']);
-					?></td>
-				<td class="listr" onClick="fr_toggle(<?=$nnats;?>)"
-					id="frd<?=$nnats;?>"
-					ondblclick="document.location='snort_interfaces_edit.php?id=<?=$nnats;?>';">
-					<?php
-					$check_snort_info = $config['installedpackages']['snortglobal']['rule'][$nnats]['enable'];
-					if ($check_snort_info == "on")
-					{
-						$check_snort = enabled;
-					} else {
-						$check_snort = disabled;
-					}
-					?> <?=strtoupper($check_snort);?></td>
-				<td class="listr" onClick="fr_toggle(<?=$nnats;?>)"
-					id="frd<?=$nnats;?>"
-					ondblclick="document.location='snort_interfaces_edit.php?id=<?=$nnats;?>';">
-					<?php
-					$check_performance_info = $config['installedpackages']['snortglobal']['rule'][$nnats]['performance'];
-					if ($check_performance_info != "") {
-						$check_performance = $check_performance_info;
-					}else{
-						$check_performance = "lowmem";
-					}
-					?> <?=strtoupper($check_performance);?></td>
-				<td class="listr" onClick="fr_toggle(<?=$nnats;?>)"
-					id="frd<?=$nnats;?>"
-					ondblclick="document.location='snort_interfaces_edit.php?id=<?=$nnats;?>';">
-					<?php
-					$check_blockoffenders_info = $config['installedpackages']['snortglobal']['rule'][$nnats]['blockoffenders7'];
-					if ($check_blockoffenders_info == "on")
-					{
-						$check_blockoffenders = enabled;
-					} else {
-						$check_blockoffenders = disabled;
-					}
-					?> <?=strtoupper($check_blockoffenders);?></td>
-					<?php
-
-					$color2_upb = snort_is_running($snort_uuid, $if_real, 'barnyard2');
-
-					if ($color2_upb == 'yes')
-						$color_status = 'listr';
-					else
-						$color_status = 'listbg';
-
-					?>
-				<td class="<?=$color_status;?>" onClick="fr_toggle(<?=$nnats;?>)"
-					id="frd<?=$nnats;?>"
-					ondblclick="document.location='snort_interfaces_edit.php?id=<?=$nnats;?>';">
-					<?php
-					$check_snortbarnyardlog_info = $config['installedpackages']['snortglobal']['rule'][$nnats]['barnyard_enable'];
-					if ($check_snortbarnyardlog_info == "on")
-						$check_snortbarnyardlog = strtoupper(enabled);
-					else
-						$check_snortbarnyardlog = strtoupper(disabled);
-					?> <?php echo "$check_snortbarnyardlog";?></td>
-				<td class="listbg" onClick="fr_toggle(<?=$nnats;?>)"
-					ondblclick="document.location='snort_interfaces_edit.php?id=<?=$nnats;?>';">
-				<font color="#ffffff"> <?=htmlspecialchars($natent['descr']);?>&nbsp;
-				</td>
-				<td valign="middle" class="list" nowrap>
-				<table border="0" cellspacing="0" cellpadding="1">
-					<tr>
-						<td><a href="snort_interfaces_edit.php?id=<?=$i;?>"><img
-							src="/themes/<?= $g['theme']; ?>/images/icons/icon_e.gif"
-							width="17" height="17" border="0" title="edit rule"></a></td>
-					</tr>
-				</table>
-			
+			<a href="?act=toggle&id=<?=$i;?>">
+				<img src="../themes/<?= $g['theme']; ?>/images/icons/icon_<?=$iconfn;?>.gif"
+				width="13" height="13" border="0"
+				title="click to toggle start/stop snort"></a>
+		</td>
+		<td class="listr" onClick="fr_toggle(<?=$nnats;?>)"
+			id="frd<?=$nnats;?>"
+			ondblclick="document.location='snort_interfaces_edit.php?id=<?=$nnats;?>';">
+			<?php
+			$check_snort_info = $config['installedpackages']['snortglobal']['rule'][$nnats]['enable'];
+			if ($check_snort_info == "on")
+			{
+				$check_snort = enabled;
+			} else {
+				$check_snort = disabled;
+			}
+			?> <?=strtoupper($check_snort);?></td>
+		<td class="listr" onClick="fr_toggle(<?=$nnats;?>)"
+			id="frd<?=$nnats;?>"
+			ondblclick="document.location='snort_interfaces_edit.php?id=<?=$nnats;?>';">
+			<?php
+			$check_performance_info = $config['installedpackages']['snortglobal']['rule'][$nnats]['performance'];
+			if ($check_performance_info != "") {
+				$check_performance = $check_performance_info;
+			}else{
+				$check_performance = "lowmem";
+			}
+			?> <?=strtoupper($check_performance);?></td>
+		<td class="listr" onClick="fr_toggle(<?=$nnats;?>)"
+			id="frd<?=$nnats;?>"
+			ondblclick="document.location='snort_interfaces_edit.php?id=<?=$nnats;?>';">
+			<?php
+			$check_blockoffenders_info = $config['installedpackages']['snortglobal']['rule'][$nnats]['blockoffenders7'];
+			if ($check_blockoffenders_info == "on")
+			{
+				$check_blockoffenders = enabled;
+			} else {
+				$check_blockoffenders = disabled;
+			}
+			?> <?=strtoupper($check_blockoffenders);?></td>
+		<td class="listr" onClick="fr_toggle(<?=$nnats;?>)"
+			id="frd<?=$nnats;?>"
+			ondblclick="document.location='snort_interfaces_edit.php?id=<?=$nnats;?>';">
+			<?php
+			$check_snortbarnyardlog_info = $config['installedpackages']['snortglobal']['rule'][$nnats]['barnyard_enable'];
+			if ($check_snortbarnyardlog_info == "on") {
+				echo strtoupper("enabled");
+				echo "<a href='?act=bartoggle&id={$i}'>
+					<img src='../themes/{$g['theme']}/images/icons/icon_{$biconfn}.gif'
+					width='13' height='13' border='0'
+					title='click to toggle start/stop snort'></a>";
+			} else
+				echo strtoupper("disabled");
+			?>
+		</td>
+		<td class="listbg" onClick="fr_toggle(<?=$nnats;?>)"
+			ondblclick="document.location='snort_interfaces_edit.php?id=<?=$nnats;?>';">
+		<font color="#ffffff"> <?=htmlspecialchars($natent['descr']);?>&nbsp;
+		</td>
+		<td valign="middle" class="list" nowrap>
+		<table border="0" cellspacing="0" cellpadding="1">
+			<tr>
+				<td><a href="snort_interfaces_edit.php?id=<?=$i;?>"><img
+					src="/themes/<?= $g['theme']; ?>/images/icons/icon_e.gif"
+					width="17" height="17" border="0" title="edit rule"></a></td>
+			</tr>
+		</table>
+	
 			</tr>
 		<?php $i++; $nnats++; endforeach; ?>
 			<tr>
