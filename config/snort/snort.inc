@@ -1221,6 +1221,7 @@ EOD;
 		"nntp_ports" => "119", "rlogin_ports" => "513", "rsh_ports" => "514",
 		"ssl_ports" => "443,465,563,636,989,990,992,993,994,995",
 		"ssl_ports_ignore" => "443,465,563,636,989,990,992,993,994,995",
+		"file_data_ports" => "\$HTTP_PORTS,110,143",
 		"DCERPC_NCACN_IP_TCP" => "139,445", "DCERPC_NCADG_IP_UDP" => "138,1024:",
 		"DCERPC_NCACN_IP_LONG" => "135,139,445,593,1024:", "DCERPC_NCACN_UDP_LONG" => "135,1024:",
 		"DCERPC_NCACN_UDP_SHORT" => "135,593,1024:", "DCERPC_NCACN_TCP" => "2103,2105,2107",
