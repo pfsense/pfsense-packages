@@ -1022,11 +1022,14 @@ function snort_generate_conf($snortcfg) {
 		$spoink_type = "output alert_pf: {$snortcfgdir}/{$snortcfg['whitelistname']},snort2c,{$snortcfg['blockoffendersip']},{$pfkill}";
 	}
 
-	/* define suppress file */
+	/* define selected suppress file */
+	$suppress_file_name = "";
 	$suppress = snort_find_list($snortcfg['suppresslistname'], 'suppress');
-	$suppress_data = str_replace("\r", "", base64_decode($suppress['suppresspassthru']));
-	@file_put_contents("{$snortcfgdir}/{$snortcfg['suppresslistname']}", $suppress_data);
-	$suppress_file_name = "include {$snortcfgdir}/{$snortcfg['suppresslistname']}";
+	if (!empty($suppress)) {
+		$suppress_data = str_replace("\r", "", base64_decode($suppress['suppresspassthru']));
+		@file_put_contents("{$snortcfgdir}/{$snortcfg['suppresslistname']}", $suppress_data);
+		$suppress_file_name = "include {$snortcfgdir}/{$snortcfg['suppresslistname']}";
+	}
 
 	/* set the snort performance model */
 	$snort_performance = "ac-bnfa";
