@@ -663,19 +663,17 @@ function sync_snort_package_config() {
 	/* create snort bootup file snort.sh only create once */
 	snort_create_rc();
 
-	if (is_array($config['installedpackages']['snortglobal'])) {
-		$snortglob = $config['installedpackages']['snortglobal'];
+	$snortglob = $config['installedpackages']['snortglobal'];
 
-		snort_snortloglimit_install_cron($snortglob['snortloglimit'] == 'ok' ? true : false);
- 
-                /* set the snort block hosts time IMPORTANT */
-                snort_rm_blocked_install_cron($snortglob['rm_blocked'] == "never_b" ? true : false);
- 
-                /* set the snort rules update time */
-                snort_rules_up_install_cron($snortglob['autorulesupdate7'] == "never_up" ? true : false);
+	snort_snortloglimit_install_cron($snortglob['snortloglimit'] == 'on' ? true : false);
 
-		configure_cron();
-	}
+	/* set the snort block hosts time IMPORTANT */
+	snort_rm_blocked_install_cron($snortglob['rm_blocked'] != "never_b" ? true : false);
+
+	/* set the snort rules update time */
+	snort_rules_up_install_cron($snortglob['autorulesupdate7'] != "never_up" ? true : false);
+
+	configure_cron();
 
 	conf_mount_ro();
 }
