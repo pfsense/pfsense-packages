@@ -124,7 +124,7 @@ function snort_build_list($listname = "") {
 			$subnet = get_interface_ip($int);
 			if (is_ipaddr($subnet)) {
 				$sn = get_interface_subnet($int);
-				$home_net = "{$subnet}/{$sn} ";
+				$home_net .= "{$subnet}/{$sn} ";
 			}
 		} else {
 			$ifcfg = $config['interfaces'][$int];
@@ -138,18 +138,18 @@ function snort_build_list($listname = "") {
 					$subnet = find_interface_ip("ng0");
 
 				if (is_ipaddr($subnet))
-					$home_net = "{$subnet} ";
+					$home_net .= "{$subnet} ";
 				break;
 			case "dhcp":
 				$subnet = find_interface_ip(snort_get_real_interface($int));
 				if (is_ipaddr($subnet))
-					$home_net = "{$subnet} ";
+					$home_net .= "{$subnet} ";
 				break;
 			default:
 				if (is_ipaddr($ifcfg['ipaddr'])) {
 					$subnet = gen_subnet($ifcfg['ipaddr'], $ifcfg['subnet']);
 					if ($ifcfg['subnet'])
-						$home_net = "{$subnet}/{$ifcfg['subnet']} ";
+						$home_net .= "{$subnet}/{$ifcfg['subnet']} ";
 				}
 				break;
 			}
@@ -160,15 +160,15 @@ function snort_build_list($listname = "") {
 		/* Add Gateway on WAN interface to whitelist (For RRD graphs) */
 		$gw = get_interface_gateway('wan');
 		if (is_ipaddr($gw))
-			$home_net = "{$gw} ";
+			$home_net .= "{$gw} ";
 	}
 
-	if($wandns == 'yes') {
+	if ($wandns == 'yes') {
 		/* Add DNS server for WAN interface to whitelist */
 		$dns_servers = get_dns_servers();
 		foreach ($dns_servers as $dns) {
-			if($dns)
-				$home_net = "{$dns} ";
+			if ($dns)
+				$home_net .= "{$dns} ";
 		}
 	}
 
