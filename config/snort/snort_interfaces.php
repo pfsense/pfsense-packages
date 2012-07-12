@@ -219,30 +219,26 @@ if ($pfsense_stable == 'yes')
 /* There has to be a smarter way to do this */
 	$if_real = snort_get_real_interface($natent['interface']);
 	$snort_uuid = $natent['uuid'];
-	if (snort_is_running($snort_uuid, $if_real) == 'no') {
+	if (snort_is_running($snort_uuid, $if_real) == 'no')
 		$iconfn = 'pass';
-		$class_color_up = 'listbg';
-	}else{
-		$class_color_up = 'listbg2';
+	else
 		$iconfn = 'block';
-	}
-	if (snort_is_running($snort_uuid, $if_real, 'barnyard2') == 'no') {
+	if (snort_is_running($snort_uuid, $if_real, 'barnyard2') == 'no')
 		$biconfn = 'pass';
-	} else {
+	else
 		$biconfn = 'block';
-	}
 
 	?>
 		<td class="listt">
 			<input type="checkbox" id="frc<?=$nnats;?>" name="rule[]" value="<?=$i;?>" onClick="fr_bgcolor('<?=$nnats;?>')" style="margin: 0; padding: 0;"></td>
-		<td class="listr" onClick="fr_toggle(<?=$nnats;?>)"
+		<td class="listr" 
 			id="frd<?=$nnats;?>"
 			ondblclick="document.location='snort_interfaces_edit.php?id=<?=$nnats;?>';">
 			<?php
 				echo snort_get_friendly_interface($natent['interface']);
 			?>
 		</td>
-		<td class="listr" onClick="fr_toggle(<?=$nnats;?>)"
+		<td class="listr" 
 			id="frd<?=$nnats;?>"
 			ondblclick="document.location='snort_interfaces_edit.php?id=<?=$nnats;?>';">
 			<?php
@@ -257,7 +253,7 @@ if ($pfsense_stable == 'yes')
 				echo strtoupper("disabled");
 			?>
 		</td>
-		<td class="listr" onClick="fr_toggle(<?=$nnats;?>)"
+		<td class="listr" 
 			id="frd<?=$nnats;?>"
 			ondblclick="document.location='snort_interfaces_edit.php?id=<?=$nnats;?>';">
 			<?php
@@ -268,7 +264,7 @@ if ($pfsense_stable == 'yes')
 				$check_performance = "lowmem";
 			}
 			?> <?=strtoupper($check_performance);?></td>
-		<td class="listr" onClick="fr_toggle(<?=$nnats;?>)"
+		<td class="listr" 
 			id="frd<?=$nnats;?>"
 			ondblclick="document.location='snort_interfaces_edit.php?id=<?=$nnats;?>';">
 			<?php
@@ -280,7 +276,7 @@ if ($pfsense_stable == 'yes')
 				$check_blockoffenders = disabled;
 			}
 			?> <?=strtoupper($check_blockoffenders);?></td>
-		<td class="listr" onClick="fr_toggle(<?=$nnats;?>)"
+		<td class="listr" 
 			id="frd<?=$nnats;?>"
 			ondblclick="document.location='snort_interfaces_edit.php?id=<?=$nnats;?>';">
 			<?php
@@ -290,12 +286,12 @@ if ($pfsense_stable == 'yes')
 				echo "<a href='?act=bartoggle&id={$i}'>
 					<img src='../themes/{$g['theme']}/images/icons/icon_{$biconfn}.gif'
 					width='13' height='13' border='0'
-					title='click to toggle start/stop snort'></a>";
+					title='click to toggle start/stop barnyard'></a>";
 			} else
 				echo strtoupper("disabled");
 			?>
 		</td>
-		<td class="listbg" onClick="fr_toggle(<?=$nnats;?>)"
+		<td class="listbg" 
 			ondblclick="document.location='snort_interfaces_edit.php?id=<?=$nnats;?>';">
 		<font color="#ffffff"> <?=htmlspecialchars($natent['descr']);?>&nbsp;
 		</td>

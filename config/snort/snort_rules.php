@@ -55,73 +55,6 @@ if (isset($id) && $a_rule[$id]) {
 	$pconfig['rulesets'] = $a_rule[$id]['rulesets'];
 }
 
-/* convert fake interfaces to real */
-$if_real = snort_get_real_interface($pconfig['interface']);
-$iface_uuid = $a_rule[$id]['uuid'];
-
-/* Check if the rules dir is empy if so warn the user */
-/* TODO give the user the option to delete the installed rules rules */
-if (!is_dir("{$snortdir}/snort_{$iface_uuid}_{$if_real}/rules"))
-	exec("/bin/mkdir -p {$snortdir}/snort_{$iface_uuid}_{$if_real}/rules");
-
-$isrulesfolderempty = exec("ls -A {$snortdir}/snort_{$iface_uuid}_{$if_real}/rules/*.rules");
-if ($isrulesfolderempty == "" || empty($pconfig['rulesets'])) {
-	$isrulesfolderempty = exec("ls -A {$snortdir}/rules/*.rules");
-	if ($isrulesfolderempty == "" || empty($pconfig['rulesets'])) {
-		include_once("head.inc");
-		include_once("fbegin.inc");
-
-		echo "<body link=\"#000000\" vlink=\"#000000\" alink=\"#000000\">";
-
-		if($pfsense_stable == 'yes'){echo '<p class="pgtitle">' . $pgtitle . '</p>';}
-
-		echo "<table width=\"99%\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\">\n
-		   <tr>\n
-			<td>\n";
-
-		$tab_array = array();
-		$tab_array[] = array(gettext("Snort Interfaces"), false, "/snort/snort_interfaces.php");
-		$tab_array[] = array(gettext("If Settings"), false, "/snort/snort_interfaces_edit.php?id={$id}");
-		$tab_array[] = array(gettext("Categories"), false, "/snort/snort_rulesets.php?id={$id}");
-		$tab_array[] = array(gettext("Rules"), true, "/snort/snort_rules.php?id={$id}");
-		$tab_array[] = array(gettext("Servers"), false, "/snort/snort_define_servers.php?id={$id}");
-		$tab_array[] = array(gettext("Preprocessors"), false, "/snort/snort_preprocessors.php?id={$id}");
-		$tab_array[] = array(gettext("Barnyard2"), false, "/snort/snort_barnyard.php?id={$id}");
-		display_top_tabs($tab_array);
-		echo  		"</td>\n
-		  </tr>\n
-		  <tr>\n
-		    <td>\n
-				<div id=\"mainarea\">\n
-					<table id=\"maintable\" class=\"tabcont\" width=\"100%\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\">\n
-						<tr>\n
-							<td>\n
-		# The rules directory is empty or you have not selected any rules in the Categories tab.\n
-						</td>\n
-						</tr>\n
-					</table>\n
-				</div>\n
-			</td>\n
-		  </tr>\n
-		</table>\n
-		\n
-		</form>\n
-		\n
-		<p>\n\n";
-
-		echo "Please click on the Update Rules tab to install your selected rule sets.";
-		include("fend.inc");
-
-		echo "</body>";
-		echo "</html>";
-
-		exit(0);
-	} else {
-		/* Make sure that we have the rules */
-		mwexec("/bin/cp {$snortdir}/rules/*.rules {$snortdir}/snort_{$iface_uuid}_{$if_real}/rules", true);
-	}
-}
-
 function get_middle($source, $beginning, $ending, $init_pos) {
 	$beginning_pos = strpos($source, $beginning, $init_pos);
 	if (!$beginning_pos)
@@ -143,27 +76,28 @@ function load_rule_file($incoming_file)
 	return explode("\n", $contents);
 }
 
-$ruledir = "{$snortdir}/snort_{$iface_uuid}_{$if_real}/rules/";
-$dh  = opendir($ruledir);
-while (false !== ($filename = readdir($dh)))
-{
-	//only populate this array if its a rule file
-	$isrulefile = strstr($filename, ".rules");
-	if ($isrulefile !== false)
-		$files[] = basename($filename);
-}
-sort($files);
+/* convert fake interfaces to real */
+$if_real = snort_get_real_interface($pconfig['interface']);
+$snort_uuid = $a_rule[$id]['uuid'];
+$snortdownload = $config['installedpackages']['snortglobal']['snortdownload'];
+$emergingdownload = $config['installedpackages']['snortglobal']['emergingthreats'];
 $categories = explode("||", $pconfig['rulesets']);
 
 if ($_GET['openruleset'])
-	$rulefile = $_GET['openruleset'];
+	$currentruleset = $_GET['openruleset'];
 else
-	$rulefile = $ruledir.$categories[0];
+	$currentruleset = $categories[0];
 
-//Load the rule file
-$splitcontents = load_rule_file($rulefile);
+$ruledir = "{$snortdir}/snort_{$snort_uuid}_{$if_real}/rules";
+$rulefile = "{$ruledir}/{$currentruleset}";
+if (!file_exists($rulefile)) {
+	$input_errors[] = "{$currentruleset} seems to be missing!!! Please go to the Category tab and save again the rule to regenerate it.";
+	$splitcontents = array();
+} else
+	//Load the rule file
+	$splitcontents = load_rule_file($rulefile);
 
-if ($_GET['act'] == "toggle" && $_GET['ids']) {
+if ($_GET['act'] == "toggle" && $_GET['ids'] && !empty($splitcontents)) {
 
 	$lineid= $_GET['ids'];
 
@@ -212,27 +146,32 @@ if ($_GET['act'] == "toggle" && $_GET['ids']) {
 		write_config();
 	}
 
-	header("Location: /snort/snort_rules.php?id={$id}&openruleset={$rulefile}");
+	header("Location: /snort/snort_rules.php?id={$id}&openruleset={$currentruleset}");
 	exit;
 }
-
-$currentruleset = basename($rulefile);
-
-$ifname = strtoupper($pconfig['interface']);
 
 require_once("guiconfig.inc");
 include_once("head.inc");
 
 $if_friendly = snort_get_friendly_interface($pconfig['interface']);
-$pgtitle = "Snort: $id $iface_uuid {$if_friendly} Category: $currentruleset";
+$pgtitle = "Snort: {$if_friendly} Category: $currentruleset";
 ?>
 
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">
 <?php
 include("fbegin.inc");
 if ($pfsense_stable == 'yes'){echo '<p class="pgtitle">' . $pgtitle . '</p>';}
+
+/* Display message */
+if ($input_errors) {
+        print_input_errors($input_errors); // TODO: add checks
+}
+
+if ($savemsg) {
+        print_info_box($savemsg);
+}
+
 ?>
-<form action="snort_rules.php" method="post" name="iform" id="iform">
 
 <script language="javascript" type="text/javascript">
 function go()
@@ -255,6 +194,7 @@ function popup(url)
 }
 </script>
 
+<form action="snort_rules.php" method="post" name="iform" id="iform">
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
 <tr><td>
 <?php
@@ -272,159 +212,177 @@ function popup(url)
 <tr>
 	<td>
 	<table class="tabcont" width="100%" border="0" cellpadding="0" cellspacing="0">
-		<tr>
-			<td width="3%" class="list">&nbsp;</td>
-			<td class="listhdr" colspan="7">
-			<br/>Category:  
-			<select id="selectbox" name="selectbox" class="formselect" onChange="go()">
-			<?php
-				foreach ($files as $value) {
-					if (!in_array($value, $categories)) 
-						continue;
-					echo "<option value='?id={$id}&openruleset={$ruledir}{$value}' ";
-					if ($value === $currentruleset)
-						echo "selected";
-					echo ">{$value}</option>\n";
-				}
-			?>
-			</select>
-			<br/>
-			</td>
-			<td width="5%" class="list">&nbsp;</td>
-		</tr>
-		<tr id="frheader">
-			<td width="3%" class="list">&nbsp;</td>
-			<td width="7%" class="listhdr">SID</td>
-			<td width="4%" class="listhdrr">Proto</td>
-			<td width="15%" class="listhdrr">Source</td>
-			<td width="10%" class="listhdrr">Port</td>
-			<td width="15%" class="listhdrr">Destination</td>
-			<td width="10%" class="listhdrr">Port</td>
-			<td width="30%" class="listhdrr">Message</td>
-			<td width="5%" class="list">&nbsp;</td>
-		</tr>
+<?php
+if (empty($pconfig['rulesets'])):
+?>
+	<tr>
+		<td>
+		# You have not selected any rules in the Categories tab.
+		</td>
+	</tr>
+<?php else: ?>
+	<tr>
+		<td width="3%" class="list">&nbsp;</td>
+		<td class="listhdr" colspan="7">
+		<br/>Category:  
+		<select id="selectbox" name="selectbox" class="formselect" onChange="go()">
 		<?php
-			foreach ( $splitcontents as $counter => $value )
-			{
-				$disabled = "False";
-				$comments = "False";
-				$findme = "# alert"; //find string for disabled alerts
-				$disabled_pos = strstr($value, $findme);
-
-				$counter2 = 1;
-				$sid = get_middle($value, 'sid:', ';', 0);
-				//check to see if the sid is numberical
-				if (!is_numeric($sid))
+			$files = explode("||", $pconfig['rulesets']);
+			foreach ($files as $value) {
+				if ($snortdownload != 'on' && strstr($value, "snort"))
 					continue;
-
-				//if find alert is false, then rule is disabled
-				if ($disabled_pos !== false){
-					$counter2 = $counter2+1;
-					$textss = "<span class=\"gray\">";
-					$textse = "</span>";
-					$iconb = "icon_block_d.gif";
-
-					$ischecked = "";
-				} else {
-					$textss = $textse = "";
-					$iconb = "icon_block.gif";
-
-					$ischecked = "checked";
-				}
-
-				$rule_content = explode(' ', $value);
-
-				$protocol = $rule_content[$counter2];//protocol location
-				$counter2++;
-				$source = substr($rule_content[$counter2], 0, 20) . "...";//source location
-				$counter2++;
-				$source_port = $rule_content[$counter2];//source port location
-				$counter2 = $counter2+2;
-				$destination = substr($rule_content[$counter2], 0, 20) . "...";//destination location
-				$counter2++;
-				$destination_port = $rule_content[$counter2];//destination port location
-
-				if (strstr($value, 'msg: "'))
-					$message = get_middle($value, 'msg: "', '";', 0);
-				else if (strstr($value, 'msg:"'))
-					$message = get_middle($value, 'msg:"', '";', 0);
-
-                                echo "<tr><td width='3%' class='listt'> $textss
-					<a href='?id={$id}&openruleset={$rulefile}&act=toggle&ids={$counter}'>
-					<img src='../themes/{$g['theme']}/images/icons/{$iconb}'
-					width='10' height='10' border='0'
-					title='click to toggle enabled/disabled status'></a>
-					$textse
-                                       </td>
-                                       <td width='7%' class=\"listlr\">
-						$textss $sid $textse
-                                       </td>
-                                       <td width='4%' class=\"listlr\">
-						$textss $protocol $textse
-                                       </td>
-                                       <td width='15%' class=\"listlr\">
-						$textss $source $textse
-                                       </td>
-                                       <td width='10%' class=\"listlr\">
-						$textss $source_port $textse
-                                       </td>
-                                       <td width='15%' class=\"listlr\">
-						$textss $destination $textse
-                                       </td>
-                                       <td width='10%' class=\"listlr\">
-					       $textss $destination_port $textse
-                                       </td>
-					<td width='30%' class=\"listbg\"><font color=\"white\"> 
-						$textss $message $textse
-                                       </td>";
-			?>
-					<td width='5%' valign="middle" nowrap class="list">
-					<table border="0" cellspacing="0" cellpadding="1">
-					<tr>
-						<td><a href="javascript: void(0)"
-							onclick="popup('snort_rules_edit.php?id=<?=$id;?>&openruleset=<?=$rulefile;?>&ids=<?=$counter;?>')"><img
-							src="../themes/<?= $g['theme']; ?>/images/icons/icon_e.gif"
-							title="edit rule" width="17" height="17" border="0"></a></td>
-							<!-- Codes by Quackit.com -->
-					</tr>
-					</table>
-					</td>
-				</tr>
-		<?php
-
+				if ($emergingdownload != 'on' && strstr($value, "emerging"))
+					continue;
+				echo "<option value='?id={$id}&openruleset={$value}' ";
+				if ($value === $currentruleset)
+					echo "selected";
+				echo ">{$value}</option>\n";
 			}
 		?>
-				
+		</select>
+		<br/>
+		</td>
+		<td width="5%" class="list">&nbsp;</td>
+	</tr>
+	<tr>
+		<td width="3%" class="list">&nbsp;</td>
+		<td colspan="7" class="listhdr" >&nbsp;</td><
+		<td width="5%" class="list">&nbsp;</td>
+	</tr>
+	<tr id="frheader">
+		<td width="3%" class="list">&nbsp;</td>
+		<td width="7%" class="listhdr">SID</td>
+		<td width="4%" class="listhdrr">Proto</td>
+		<td width="15%" class="listhdrr">Source</td>
+		<td width="10%" class="listhdrr">Port</td>
+		<td width="15%" class="listhdrr">Destination</td>
+		<td width="10%" class="listhdrr">Port</td>
+		<td width="30%" class="listhdrr">Message</td>
+		<td width="5%" class="list">&nbsp;</td>
+	</tr>
+<?php
+	foreach ( $splitcontents as $counter => $value )
+	{
+		$disabled = "False";
+		$comments = "False";
+		$findme = "# alert"; //find string for disabled alerts
+		$disabled_pos = strstr($value, $findme);
+
+		$counter2 = 1;
+		$sid = get_middle($value, 'sid:', ';', 0);
+		//check to see if the sid is numberical
+		if (!is_numeric($sid))
+			continue;
+
+		//if find alert is false, then rule is disabled
+		if ($disabled_pos !== false){
+			$counter2 = $counter2+1;
+			$textss = "<span class=\"gray\">";
+			$textse = "</span>";
+			$iconb = "icon_block_d.gif";
+
+			$ischecked = "";
+		} else {
+			$textss = $textse = "";
+			$iconb = "icon_block.gif";
+
+			$ischecked = "checked";
+		}
+
+		$rule_content = explode(' ', $value);
+
+		$protocol = $rule_content[$counter2];//protocol location
+		$counter2++;
+		$source = substr($rule_content[$counter2], 0, 20) . "...";//source location
+		$counter2++;
+		$source_port = $rule_content[$counter2];//source port location
+		$counter2 = $counter2+2;
+		$destination = substr($rule_content[$counter2], 0, 20) . "...";//destination location
+		$counter2++;
+		$destination_port = $rule_content[$counter2];//destination port location
+
+		if (strstr($value, 'msg: "'))
+			$message = get_middle($value, 'msg: "', '";', 0);
+		else if (strstr($value, 'msg:"'))
+			$message = get_middle($value, 'msg:"', '";', 0);
+
+		echo "<tr><td width='3%' class='listt'> $textss
+			<a href='?id={$id}&openruleset={$currentruleset}&act=toggle&ids={$counter}'>
+			<img src='../themes/{$g['theme']}/images/icons/{$iconb}'
+			width='10' height='10' border='0'
+			title='click to toggle enabled/disabled status'></a>
+			$textse
+		       </td>
+		       <td width='7%' class=\"listlr\">
+				$textss $sid $textse
+		       </td>
+		       <td width='4%' class=\"listlr\">
+				$textss $protocol $textse
+		       </td>
+		       <td width='15%' class=\"listlr\">
+				$textss $source $textse
+		       </td>
+		       <td width='10%' class=\"listlr\">
+				$textss $source_port $textse
+		       </td>
+		       <td width='15%' class=\"listlr\">
+				$textss $destination $textse
+		       </td>
+		       <td width='10%' class=\"listlr\">
+			       $textss $destination_port $textse
+		       </td>
+			<td width='30%' class=\"listbg\"><font color=\"white\"> 
+				$textss $message $textse
+		       </td>";
+	?>
+			<td width='5%' valign="middle" nowrap class="list">
+			<table border="0" cellspacing="0" cellpadding="1">
+			<tr>
+				<td><a href="javascript: void(0)"
+					onclick="popup('snort_rules_edit.php?id=<?=$id;?>&openruleset=<?=$currentruleset;?>&ids=<?=$counter;?>')"><img
+					src="../themes/<?= $g['theme']; ?>/images/icons/icon_e.gif"
+					title="edit rule" width="17" height="17" border="0"></a></td>
+					<!-- Codes by Quackit.com -->
+			</tr>
 			</table>
 			</td>
+		</tr>
+<?php
+
+	}
+?>
+		
+	</table>
+	</td>
+</tr>
+<tr>
+	<td colspan="9">
+	<table class="tabcont" width="100%" border="0" cellspacing="0" cellpadding="0">
+		<tr>
+			<td width="16"><img
+				src="../themes/<?= $g['theme']; ?>/images/icons/icon_block.gif"
+				width="11" height="11"></td>
+			<td>Rule Enabled</td>
 		</tr>
 		<tr>
-			<td colspan="9">
-			<table class="tabcont" width="100%" border="0" cellspacing="0" cellpadding="0">
-				<tr>
-					<td width="16"><img
-						src="../themes/<?= $g['theme']; ?>/images/icons/icon_block.gif"
-						width="11" height="11"></td>
-					<td>Rule Enabled</td>
-				</tr>
-				<tr>
-					<td><img
-						src="../themes/<?= $g['theme']; ?>/images/icons/icon_block_d.gif"
-						width="11" height="11"></td>
-					<td nowrap>Rule Disabled</td>
-				</tr>
-				<tr>
-						<!-- TODO: add save and cancel for checkbox options -->
-						<!-- <td><pre><input name="Submit" type="submit" class="formbtn" value="Save">	<input type="button" class="formbtn" value="Cancel" onclick="history.back()"><pre></td> -->
-				</tr>
-				<tr>
-					<td colspan="10">
-					<p><!--<strong><span class="red">Warning:<br/> </span></strong>Editing these r</p>-->
-					</td>
-				</tr>
-			</table>
+			<td><img
+				src="../themes/<?= $g['theme']; ?>/images/icons/icon_block_d.gif"
+				width="11" height="11"></td>
+			<td nowrap>Rule Disabled</td>
+		</tr>
+		<tr>
+				<!-- TODO: add save and cancel for checkbox options -->
+				<!-- <td><pre><input name="Submit" type="submit" class="formbtn" value="Save">	<input type="button" class="formbtn" value="Cancel" onclick="history.back()"><pre></td> -->
+		</tr>
+		<tr>
+			<td colspan="10">
+			<p><!--<strong><span class="red">Warning:<br/> </span></strong>Editing these r</p>-->
 			</td>
 		</tr>
+	</table>
+	</td>
+</tr>
+<?php endif; ?>
 	</table>
 	</td>
 </tr>

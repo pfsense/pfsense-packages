@@ -70,7 +70,8 @@ if (isset($id) && $a_suppress[$id]) {
 	$pconfig['name'] = $a_suppress[$id]['name'];
 	$pconfig['uuid'] = $a_suppress[$id]['uuid'];
 	$pconfig['descr'] = $a_suppress[$id]['descr'];
-	$pconfig['suppresspassthru'] = base64_decode($a_suppress[$id]['suppresspassthru']);
+	if (!empty($a_suppress[$id]['suppresspassthru']));
+		$pconfig['suppresspassthru'] = base64_decode($a_suppress[$id]['suppresspassthru']);
 	if (empty($a_suppress[$id]['uuid']))
 		$pconfig['uuid'] = uniqid();
 }
@@ -106,7 +107,8 @@ if ($_POST['submit']) {
 		$s_list['name'] = $_POST['name'];
 		$s_list['uuid'] = $suppress_uuid;
 		$s_list['descr']  =  mb_convert_encoding($_POST['descr'],"HTML-ENTITIES","auto");
-		$s_list['suppresspassthru'] = base64_encode($_POST['suppresspassthru']);
+		if ($_POST['suppresspassthru'])
+			$s_list['suppresspassthru'] = base64_encode($_POST['suppresspassthru']);
 
 		if (isset($id) && $a_suppress[$id])
 			$a_suppress[$id] = $s_list;
@@ -190,7 +192,7 @@ if ($savemsg)
 <tr>
 	<td width="10%" class="vncell">&nbsp;Advanced pass through</td>
 	<td width="100%" class="vtable"><textarea wrap="off"
-		name="suppresspassthru" cols="90" rows="28" id="suppresspassthru" class="formpre"> <?=htmlspecialchars($pconfig['suppresspassthru']);?></textarea>
+		name="suppresspassthru" cols="90" rows="28" id="suppresspassthru" class="formpre"><?=htmlspecialchars($pconfig['suppresspassthru']);?></textarea>
 	</td>
 </tr>
 <tr>
@@ -199,7 +201,7 @@ if ($savemsg)
 		class="formbtn" value="Save" /> <input id="cancelbutton"
 		name="cancelbutton" type="button" class="formbtn" value="Cancel"
 		onclick="history.back()" /> <?php if (isset($id) && $a_suppress[$id]): ?>
-					<input name="id" type="hidden" value="<?=$id;?>" /> <?php endif; ?>
+		<input name="id" type="hidden" value="<?=$id;?>" /> <?php endif; ?>
 	</td>
 </tr>
 </table>

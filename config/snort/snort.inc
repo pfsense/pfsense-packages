@@ -208,7 +208,7 @@ function snort_build_list($listname = "") {
 function snort_is_running($snort_uuid, $if_real, $type = 'snort') {
 	global $config, $g;
 
-	if (file_exists("{$g['varrun_path']}/{$type}_{$if_real}{$snort_uuid}.pid") && isvalidpid("{$g['varrun_path']}/snort_{$if_real}{$snort_uuid}.pid"))
+	if (file_exists("{$g['varrun_path']}/{$type}_{$if_real}{$snort_uuid}.pid") && isvalidpid("{$g['varrun_path']}/{$type}_{$if_real}{$snort_uuid}.pid"))
 		return 'yes';
 
 	return 'no';

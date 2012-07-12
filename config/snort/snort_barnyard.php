@@ -46,11 +46,6 @@ if (!is_array($config['installedpackages']['snortglobal']['rule']))
 	$config['installedpackages']['snortglobal']['rule'] = array();
 $a_nat = &$config['installedpackages']['snortglobal']['rule'];
 
-if (isset($_GET['dup'])) {
-	$id = $_GET['dup'];
-	$after = $_GET['dup'];
-}
-
 $pconfig = array();
 if (isset($id) && $a_nat[$id]) {
 	/* old options */
@@ -87,10 +82,7 @@ if ($_POST) {
 		if (isset($id) && $a_nat[$id])
 			$a_nat[$id] = $natent;
 		else {
-			if (is_numeric($after))
-				array_splice($a_nat, $after+1, 0, array($natent));
-			else
-				$a_nat[] = $natent;
+			$a_nat[] = $natent;
 		}
 
 		write_config();

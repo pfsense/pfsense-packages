@@ -49,92 +49,39 @@ if (is_null($id)) {
 	exit;
 }
 
+function snort_copy_rules($files, $snortdir, $snort_uuid, $if_real) {
+
+	if (empty($files))
+		return;
+
+	conf_mount_rw();
+	foreach ($files as $file) {
+		if (!file_exists("{$snortdir}/snort_{$snort_uuid}_{$if_real}/rules/{$file}"))
+			@copy("{$snortdir}/rules/{$file}", "{$snortdir}/snort_{$snort_uuid}_{$if_real}/rules/{$file}");
+	}
+	conf_mount_ro();
+}
+
 if (isset($id) && $a_nat[$id]) {
 	$pconfig['enable'] = $a_nat[$id]['enable'];
 	$pconfig['interface'] = $a_nat[$id]['interface'];
 	$pconfig['rulesets'] = $a_nat[$id]['rulesets'];
-
-	/* convert fake interfaces to real */
-	$if_real = snort_get_real_interface($pconfig['interface']);
-
-	$iface_uuid = $a_nat[$id]['uuid'];
 }
 
-$if_friendly = snort_get_friendly_interface($pconfig['interface']);
-$pgtitle = "Snort: Interface {$if_friendly} Categories";
-
-
-/* Check if the rules dir is empy if so warn the user */
-/* TODO give the user the option to delete the installed rules rules */
-$isrulesfolderempty = exec("ls -A {$snortdir}/snort_{$iface_uuid}_{$if_real}/rules/*.rules");
-if ($isrulesfolderempty == "") {
-	$isrulesfolderempty = exec("ls -A {$snortdir}/rules/*.rules");
-	if ($isrulesfolderempty == "") {
-		include_once("head.inc");
-		include("fbegin.inc");
-
-		echo "<p class=\"pgtitle\">";
-		if($pfsense_stable == 'yes'){echo $pgtitle;}
-		echo "</p>\n";
-
-		echo "<body link=\"#000000\" vlink=\"#000000\" alink=\"#000000\">";
-
-		echo "
-	<table width=\"99%\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\">\n
-		<tr><td>\n";
-
-		$tab_array = array();
-		$tab_array[] = array(gettext("Snort Interfaces"), false, "/snort/snort_interfaces.php");
-		$tab_array[] = array(gettext("If Settings"), false, "/snort/snort_interfaces_edit.php?id={$id}");
-		$tab_array[] = array(gettext("Categories"), true, "/snort/snort_rulesets.php?id={$id}");
-		$tab_array[] = array(gettext("Rules"), false, "/snort/snort_rules.php?id={$id}");
-		$tab_array[] = array(gettext("Servers"), false, "/snort/snort_define_servers.php?id={$id}");
-		$tab_array[] = array(gettext("Preprocessors"), false, "/snort/snort_preprocessors.php?id={$id}");
-		$tab_array[] = array(gettext("Barnyard2"), false, "/snort/snort_barnyard.php?id={$id}");
-		display_top_tabs($tab_array);
-		echo " 
-		</td></tr>
-		  <tr>\n
-		    <td>\n
-				<div id=\"mainarea\">\n
-					<table id=\"maintable\" class=\"tabcont\" width=\"100%\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\">\n
-						<tr>\n
-							<td>\n
-		# The rules directory is empty. {$snortdir}/snort_{$iface_uuid}_{$if_real}/rules \n
-						</td>\n
-						</tr>\n
-					</table>\n
-				</div>\n
-			</td>\n
-		  </tr>\n
-		</table>\n
-		\n
-		</form>\n
-		\n
-		<p>\n\n";
-
-		echo "Please click on the Update Rules tab to install your selected rule sets. $isrulesfolderempty";
-		include("fend.inc");
-
-		echo "</body>";
-		echo "</html>";
-
-		exit(0);
-	} else {
-		/* Make sure that we have the rules */
-		mwexec("/bin/cp {$snortdir}/rules/*.rules {$snortdir}/snort_{$iface_uuid}_{$if_real}/rules", true);
-	}
-}
+$if_real = snort_get_real_interface($pconfig['interface']);
+$snort_uuid = $a_nat[$id]['uuid'];
+$snortdownload = $config['installedpackages']['snortglobal']['snortdownload'];
+$emergingdownload = $config['installedpackages']['snortglobal']['emergingthreats'];
 
 /* alert file */
 if ($_POST["Submit"]) {
 	$enabled_items = "";
-	$isfirst = true;
 	if (is_array($_POST['toenable']))
 		$enabled_items = implode("||", $_POST['toenable']);
 	else
 		$enabled_items = $_POST['toenable'];
 	$a_nat[$id]['rulesets'] = $enabled_items;
+	snort_copy_rules(explode("||", $enabled_items), $snortdir, $snort_uuid, $if_real);
 
 	write_config();
 	sync_snort_package_config();
@@ -144,6 +91,13 @@ if ($_POST["Submit"]) {
 }
 
 if ($_POST['unselectall']) {
+	if (!empty($pconfig['rulesets'])) {
+		conf_mount_rw();
+		foreach (explode("||", $pconfig['rulesets']) as $file)
+			@unlink("{$snortdir}/snort_{$snort_uuid}_{$if_real}/rules/{$file}");
+		conf_mount_ro();
+	}
+
 	$a_nat[$id]['rulesets'] = "";
 
 	write_config();
@@ -154,10 +108,18 @@ if ($_POST['unselectall']) {
 }
 
 if ($_POST['selectall']) {
-	$files = glob("{$snortdir}/snort_{$iface_uuid}_{$if_real}/rules/*.rules");
 	$rulesets = array();
-	foreach ($files as $file)
-		$rulesets[] = basename($file);
+	if ($emergingdownload == 'on') {
+		$files = glob("{$snortdir}/rules/emerging*.rules");
+		foreach ($files as $file)
+			$rulesets[] = basename($file);
+	}
+	if ($snortdownload == 'on') {
+		$files = glob("{$snortdir}/rules/snort*.rules");
+		foreach ($files as $file)
+			$rulesets[] = basename($file);
+	}
+	snort_copy_rules($rulesets, $snortdir, $snort_uuid, $if_real);
 
 	$a_nat[$id]['rulesets'] = implode("||", $rulesets);
 
@@ -168,21 +130,18 @@ if ($_POST['selectall']) {
 	exit;
 }
 
-$enabled_rulesets = $a_nat[$id]['rulesets'];
-if($enabled_rulesets)
-	$enabled_rulesets_array = explode("||", $enabled_rulesets);
-
+$enabled_rulesets_array = explode("||", $a_nat[$id]['rulesets']);
 include_once("head.inc");
-
 ?>
 
 <body link="#000000" vlink="#000000" alink="#000000">
 
-<?php include("fbegin.inc"); ?>
-<?if($pfsense_stable == 'yes'){echo '<p class="pgtitle">' . $pgtitle . '</p>';}?>
+<?php
+include("fbegin.inc"); 
+$if_friendly = snort_get_friendly_interface($pconfig['interface']);
+$pgtitle = "Snort: Interface {$if_friendly} Categories";
 
-<form action="snort_rulesets.php" method="post" name="iform" id="iform">";
-<input type="hidden" name="id" id="id" value="<?=$id;?>" />
+if($pfsense_stable == 'yes'){echo '<p class="pgtitle">' . $pgtitle . '</p>';}?>
 
 <?php
 /* Display message */
@@ -196,6 +155,8 @@ if ($savemsg) {
 
 ?>
 
+<form action="snort_rulesets.php" method="post" name="iform" id="iform">
+<input type="hidden" name="id" id="id" value="<?=$id;?>" />
 <table width="99%" border="0" cellpadding="0" cellspacing="0">
 <tr><td>
 <?php
@@ -210,134 +171,161 @@ if ($savemsg) {
         display_top_tabs($tab_array);
 ?>
 </td></tr>
-	<tr>
-		<td>
-		<div id="mainarea2">
-		<table id="maintable" class="tabcont" width="100%" border="0"
-			cellpadding="0" cellspacing="0">
-			<tr>
-				<td>
-				<table id="sortabletable1" class="sortable" width="100%" border="0"
-					cellpadding="0" cellspacing="0">
-				<tr>
-					<td colspan="6" class="listtopic">Check the rulesets that you would like Snort to load at startup.<br/><br/></td>
-				</tr>
-				<tr>
-					<td colspan="2" valign="center"><br/><input value="Save" type="submit" name="Submit" id="Submit" /><br/<br/></td>
-					<td colspan="2" valign="center"><br/><input value="Select All" type="submit" name="selectall" id="selectall" /><br/<br/></td>
-					<td colspan="2" valign="center"><br/><input value="Unselect All" type="submit" name="unselectall" id="selectall" /><br/<br/></td>
-				</tr>
-				<tr>    <td colspan="6">&nbsp;</td> </tr>
-				<tr id="frheader">
-						<td width="5%" class="listhdrr">Enabled</td>
-						<td width="25%" class="listhdrr"><?php echo 'Ruleset: Emerging Threats.';?></td>
-						<td width="5%" class="listhdrr">Enabled</td>
-						<td width="25%" class="listhdrr"><?php echo 'Ruleset: Snort';?></td>
-						<td width="5%" class="listhdrr">Enabled</td>
-						<td width="25%" class="listhdrr"><?php echo 'Ruleset: Snort SO';?></td>
-					</tr>
-				<?php
-					$emergingrules = array();
-					$snortsorules = array();
-					$snortrules = array();
-					$dh  = opendir("{$snortdir}/snort_{$iface_uuid}_{$if_real}/rules/");
-					while (false !== ($filename = readdir($dh))) {
-						$filename = basename($filename);
-						if (substr($filename, -5) != "rules")
-							continue;
-						if (strstr($filename, "emerging"))
-							$emergingrules[] = $filename;
-						else if (strstr($filename, "snort")) {
-							if (strstr($filename, ".so.rules"))
-								$snortsorules[] = $filename;
-							else
-								$snortrules[] = $filename;
-						}
-					}
-					sort($emergingrules);
-					sort($snortsorules);
-					sort($snortrules);
-					$i = count($emergingrules);
-					if ($i < count($snortsorules))
-						$i = count(snortsorules);
-					if ($i < count($snortrules))
-						$i = count($snortrules);
+<tr>
+	<td>
+	<div id="mainarea">
+	<table id="maintable" class="tabcont" width="100%" border="0" cellpadding="0" cellspacing="0">
+<?php 
+	$isrulesfolderempty = glob("{$snortdir}/rules/*.rules");
+	if (empty($isrulesfolderempty)):
+?>
+		<tr>
+			<td>
+		# The rules directory is empty. <?=$snortdir;?>/rules <br/>
+		Please go to the updates page to download/fetch the rules configured.
+			</td>
+		</tr>
+<?php else: 
+	$colspan = 6;
+	if ($emergingdownload != 'on')
+		$colspan -= 2;
+	if ($snortdownload != 'on')
+		$colspan -= 4;
 
-					for ($j = 0; $j < $i; $j++) {
-						echo "<tr>\n";
-						if (!empty($emergingrules[$j])) {
-							$file = $emergingrules[$j];
-							echo "<td width='5%' class='listr' align=\"center\" valign=\"top\">";
-							if(is_array($enabled_rulesets_array)) {
-								if(in_array($file, $enabled_rulesets_array))
-									$CHECKED = " checked=\"checked\"";
-								else
-									$CHECKED = "";
-							} else
-								$CHECKED = "";
-							echo "	\n<input type='checkbox' name='toenable[]' value='$file' {$CHECKED} />\n";
-							echo "</td>\n";
-							echo "<td class='listr' width='25%' >\n";
-							if (empty($CHECKED))
-								echo $file;
-							else
-								echo "<a href='snort_rules.php?id={$jd}&openruleset={$snortdir}/snort_{$jface_uuid}_{$jf_real}/rules/" . urlencode($file) . "'>{$file}</a>\n";
-							echo "</td>\n";
-						} else
-							echo "<td class='listbggrey' width='30%' colspan='2'><br/></td>\n";
-						if (!empty($snortrules[$j])) {
-							$file = $snortrules[$j];
-							echo "<td class='listr' width='5%' align=\"center\" valign=\"top\">";
-							if(is_array($enabled_rulesets_array)) {
-								if(in_array($file, $enabled_rulesets_array))
-									$CHECKED = " checked=\"checked\"";
-								else
-									$CHECKED = "";
-							} else
-								$CHECKED = "";
-							echo "	\n<input type='checkbox' name='toenable[]' value='{$file}' {$CHECKED} />\n";
-							echo "</td>\n";
-							echo "<td class='listr' width='25%' >\n";
-							if (empty($CHECKED))
-								echo $file;
-							else
-								echo "<a href='snort_rules.php?id={$jd}&openruleset={$snortdir}/snort_{$jface_uuid}_{$jf_real}/rules/" . urlencode($file) . "'>{$file}</a>\n";
-							echo "</td>\n";
-						} else
-							echo "<td class='listbggrey' width='30%' colspan='2'><br/></td>\n";
-						if (!empty($snortsorules[$j])) {
-							$file = $snortsorules[$j];
-							echo "<td class='listr' width='5%' align=\"center\" valign=\"top\">";
-							if(is_array($enabled_rulesets_array)) {
-								if(in_array($file, $enabled_rulesets_array))
-									$CHECKED = " checked=\"checked\"";
-								else
-									$CHECKED = "";
-							} else
-								$CHECKED = "";
-							echo "	\n<input type='checkbox' name='toenable[]' value='{$file}' {$CHECKED} />\n";
-							echo "</td>\n";
-							echo "<td class='listr' width='25%' >\n";
-							if (empty($CHECKED))
-								echo $file;
-							else
-								echo "<a href='snort_rules.php?id={$jd}&openruleset={$snortdir}/snort_{$jface_uuid}_{$jf_real}/rules/" . urlencode($file) . "'>{$file}</a>\n";
-							echo "</td>\n";
-						} else
-							echo "<td class='listbggrey' width='30%' colspan='2'><br/></td>\n";
-						echo "</tr>\n";
-					}
-				?>
-				</table>
-				</td>
+?>
+		<tr>
+			<td>
+			<table id="sortabletable1" class="sortable" width="100%" border="0"
+				cellpadding="0" cellspacing="0">
+			<tr>
+				<td colspan="6" class="listtopic">Check the rulesets that you would like Snort to load at startup.<br/><br/></td>
 			</tr>
 			<tr>
-				<td colspan="6">&nbsp;</td>
+				<td colspan="2" valign="center"><br/><input value="Save" type="submit" name="Submit" id="Submit" /><br/<br/></td>
+				<td colspan="2" valign="center"><br/><input value="Select All" type="submit" name="selectall" id="selectall" /><br/<br/></td>
+				<td colspan="2" valign="center"><br/><input value="Unselect All" type="submit" name="unselectall" id="selectall" /><br/<br/></td>
 			</tr>
-		</table>
-		</div>
-		</td>
-	</tr>
+			<tr>    <td colspan="6">&nbsp;</td> </tr>
+			<tr id="frheader">
+				<?php if ($emergingdownload == 'on'): ?>
+					<td width="5%" class="listhdrr">Enabled</td>
+					<td width="25%" class="listhdrr"><?php echo 'Ruleset: Emerging Threats.';?></td>
+				<?php else: ?>
+					<td colspan="2" width="30%" class="listhdrr">Emerging rules have not been enabled</td>
+				<?php endif; ?>
+				<?php if ($snortdownload == 'on'): ?>
+					<td width="5%" class="listhdrr">Enabled</td>
+					<td width="25%" class="listhdrr"><?php echo 'Ruleset: Snort';?></td>
+					<td width="5%" class="listhdrr">Enabled</td>
+					<td width="25%" class="listhdrr"><?php echo 'Ruleset: Snort SO';?></td>
+				<?php else: ?>
+					<td colspan="2" width="60%" class="listhdrr">Snort rules have not been enabled</td>
+				<?php endif; ?>
+				</tr>
+			<?php
+				$emergingrules = array();
+				$snortsorules = array();
+				$snortrules = array();
+				$dh  = opendir("{$snortdir}/rules/");
+				while (false !== ($filename = readdir($dh))) {
+					$filename = basename($filename);
+					if (substr($filename, -5) != "rules")
+						continue;
+					if (strstr($filename, "emerging") && $emergingdownload == 'on')
+						$emergingrules[] = $filename;
+					else if (strstr($filename, "snort") && $snortdownload == 'on') {
+						if (strstr($filename, ".so.rules"))
+							$snortsorules[] = $filename;
+						else
+							$snortrules[] = $filename;
+					}
+				}
+				sort($emergingrules);
+				sort($snortsorules);
+				sort($snortrules);
+				$i = count($emergingrules);
+				if ($i < count($snortsorules))
+					$i = count(snortsorules);
+				if ($i < count($snortrules))
+					$i = count($snortrules);
+
+				for ($j = 0; $j < $i; $j++) {
+					echo "<tr>\n";
+					if (!empty($emergingrules[$j])) {
+						$file = $emergingrules[$j];
+						echo "<td width='5%' class='listr' align=\"center\" valign=\"top\">";
+						if(is_array($enabled_rulesets_array)) {
+							if(in_array($file, $enabled_rulesets_array))
+								$CHECKED = " checked=\"checked\"";
+							else
+								$CHECKED = "";
+						} else
+							$CHECKED = "";
+						echo "	\n<input type='checkbox' name='toenable[]' value='$file' {$CHECKED} />\n";
+						echo "</td>\n";
+						echo "<td class='listr' width='25%' >\n";
+						if (empty($CHECKED))
+							echo $file;
+						else
+							echo "<a href='snort_rules.php?id={$id}&openruleset=" . urlencode($file) . "'>{$file}</a>\n";
+						echo "</td>\n";
+					} else
+						echo "<td class='listbggrey' width='30%' colspan='2'><br/></td>\n";
+
+					if (!empty($snortrules[$j])) {
+						$file = $snortrules[$j];
+						echo "<td class='listr' width='5%' align=\"center\" valign=\"top\">";
+						if(is_array($enabled_rulesets_array)) {
+							if(in_array($file, $enabled_rulesets_array))
+								$CHECKED = " checked=\"checked\"";
+							else
+								$CHECKED = "";
+						} else
+							$CHECKED = "";
+						echo "	\n<input type='checkbox' name='toenable[]' value='{$file}' {$CHECKED} />\n";
+						echo "</td>\n";
+						echo "<td class='listr' width='25%' >\n";
+						if (empty($CHECKED))
+							echo $file;
+						else
+							echo "<a href='snort_rules.php?id={$id}&openruleset=" . urlencode($file) . "'>{$file}</a>\n";
+						echo "</td>\n";
+					} else
+						echo "<td class='listbggrey' width='30%' colspan='2'><br/></td>\n";
+					if (!empty($snortsorules[$j])) {
+						$file = $snortsorules[$j];
+						echo "<td class='listr' width='5%' align=\"center\" valign=\"top\">";
+						if(is_array($enabled_rulesets_array)) {
+							if(in_array($file, $enabled_rulesets_array))
+								$CHECKED = " checked=\"checked\"";
+							else
+								$CHECKED = "";
+						} else
+							$CHECKED = "";
+						echo "	\n<input type='checkbox' name='toenable[]' value='{$file}' {$CHECKED} />\n";
+						echo "</td>\n";
+						echo "<td class='listr' width='25%' >\n";
+						if (empty($CHECKED))
+							echo $file;
+						else
+							echo "<a href='snort_rules.php?id={$id}&openruleset=" . urlencode($file) . "'>{$file}</a>\n";
+						echo "</td>\n";
+					} else
+						echo "<td class='listbggrey' width='30%' colspan='2'><br/></td>\n";
+				echo "</tr>\n";
+			}
+		?>
+	</table>
+	</td>
+</tr>
+<tr>
+<td colspan="6">&nbsp;</td>
+</tr>
+<?php endif; ?>
+</table>
+</div>
+</td>
+</tr>
 </table>
 </form>
 <?php
