@@ -59,6 +59,8 @@ $snort_uuid = $pconfig['uuid'];
 if (isset($id) && $a_rule[$id]) {
 	/* old options */
 	$pconfig = $a_rule[$id];
+	if (!empty($pconfig['configpassthru']))
+		$pconfig['configpassthru'] = base64_decode($pconfig['configpassthru']);
 	if (empty($pconfig['uuid']))
 		$pconfig['uuid'] = $snort_uuid;
 	if (!$pconfig['interface'])
