@@ -983,8 +983,9 @@ function snort_generate_conf($snortcfg) {
 	$snort_dirs = array( $snortdir, "{$snortdir}/custom_rules", $snortcfgdir, "{$snortcfgdir}/rules",
 		"{$snortlogdir}/snort_{$if_real}{$snort_uuid}",
 		"{$snortlogdir}/snort_{$if_real}{$snort_uuid}/barnyard2", 
-		"/usr/local/lib/snort/dynamicrules", "/usr/local/lib/snort/dynamicengine",
-		"/usr/local/lib/snort/dynamicpreprocessor"
+		"dynamicrules" => "/usr/local/lib/snort/dynamicrules",
+		"dynamicengine" => "/usr/local/lib/snort/dynamicengine",
+		"dynamicpreprocessor" => "/usr/local/lib/snort/dynamicpreprocessor"
 	    );
 	foreach ($snort_dirs as $dir) {
 		if (!is_dir($dir))
@@ -1177,7 +1178,6 @@ EOD;
 	$other_preprocs = <<<EOD
 # Other preprocs #
 preprocessor rpc_decode: 111 32770 32771 32772 32773 32774 32775 32776 32777 32778 32779
-preprocessor bo
 	
 EOD;
 
@@ -1331,9 +1331,9 @@ config detection: search-method {$snort_performance} max_queue_events 5
 config event_queue: max_queue 8 log 3 order_events content_length
 
 #Configure dynamic loaded libraries
-dynamicpreprocessor directory /usr/local/lib/snort/dynamicpreprocessor
-dynamicengine directory /usr/local/lib/snort/dynamicengine
-dynamicdetection directory /usr/local/lib/snort/dynamicrules
+dynamicpreprocessor directory {$snort_dirs['dynamicpreprocessor']}
+dynamicengine directory {$snort_dirs['dynamicengine']}
+dynamicdetection directory {$snort_dirs['dynamicrules']}
 
 # Flow and stream #
 preprocessor frag3_global: max_frags 8192
