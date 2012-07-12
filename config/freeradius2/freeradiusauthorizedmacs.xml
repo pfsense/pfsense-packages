@@ -337,7 +337,7 @@
 		<field>
 			<fielddescr>Amount of Download and Upload Traffic</fielddescr>
 			<fieldname>varmacsmaxtotaloctets</fieldname>			
-			<description><![CDATA[Enter the amount of download and upload traffic (summarized) for this MAC in <b>MegaByte (MB)</b>. There is a bug in CP which counts the real traffic six times faster. To set a real limit of 100MB you have to enter 600MB here.]]></description>
+			<description><![CDATA[Enter the amount of download and upload traffic (summarized) for this MAC in <b>MegaByte (MB)</b>. There is a bug in CP (pfSense v2.0.x) which counts the real traffic many times faster and incorrect.]]></description>
 			<type>input</type>
 		</field>
 		<field>
