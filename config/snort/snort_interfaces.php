@@ -194,13 +194,12 @@ if ($pfsense_stable == 'yes')
 		cellspacing="0">
 		<tr id="frheader">
 			<td width="5%" class="list">&nbsp;</td>
-			<td width="1%" class="list">&nbsp;</td>
 			<td width="10%" class="listhdrr">If</td>
-			<td width="10%" class="listhdrr">Snort</td>
+			<td width="13%" class="listhdrr">Snort</td>
 			<td width="10%" class="listhdrr">Performance</td>
 			<td width="10%" class="listhdrr">Block</td>
-			<td width="10%" class="listhdrr">Barnyard2</td>
-			<td width="50%" class="listhdr">Description</td>
+			<td width="12%" class="listhdrr">Barnyard2</td>
+			<td width="30%" class="listhdr">Description</td>
 			<td width="3%" class="list">
 			<table border="0" cellspacing="0" cellpadding="1">
 				<tr>
@@ -236,30 +235,28 @@ if ($pfsense_stable == 'yes')
 	?>
 		<td class="listt">
 			<input type="checkbox" id="frc<?=$nnats;?>" name="rule[]" value="<?=$i;?>" onClick="fr_bgcolor('<?=$nnats;?>')" style="margin: 0; padding: 0;"></td>
-		<td class="listt" align="center"></td>
 		<td class="listr" onClick="fr_toggle(<?=$nnats;?>)"
 			id="frd<?=$nnats;?>"
 			ondblclick="document.location='snort_interfaces_edit.php?id=<?=$nnats;?>';">
 			<?php
 				echo snort_get_friendly_interface($natent['interface']);
 			?>
-			<a href="?act=toggle&id=<?=$i;?>">
-				<img src="../themes/<?= $g['theme']; ?>/images/icons/icon_<?=$iconfn;?>.gif"
-				width="13" height="13" border="0"
-				title="click to toggle start/stop snort"></a>
 		</td>
 		<td class="listr" onClick="fr_toggle(<?=$nnats;?>)"
 			id="frd<?=$nnats;?>"
 			ondblclick="document.location='snort_interfaces_edit.php?id=<?=$nnats;?>';">
 			<?php
 			$check_snort_info = $config['installedpackages']['snortglobal']['rule'][$nnats]['enable'];
-			if ($check_snort_info == "on")
-			{
-				$check_snort = enabled;
-			} else {
-				$check_snort = disabled;
-			}
-			?> <?=strtoupper($check_snort);?></td>
+			if ($check_snort_info == "on") {
+				echo strtoupper("enabled");
+				echo "<a href='?act=toggle&id={$i}'>
+					<img src='../themes/{$g['theme']}/images/icons/icon_{$iconfn}.gif'
+					width='13' height='13' border='0'
+					title='click to toggle start/stop snort'></a>";
+			} else
+				echo strtoupper("disabled");
+			?>
+		</td>
 		<td class="listr" onClick="fr_toggle(<?=$nnats;?>)"
 			id="frd<?=$nnats;?>"
 			ondblclick="document.location='snort_interfaces_edit.php?id=<?=$nnats;?>';">

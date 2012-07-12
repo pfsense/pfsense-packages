@@ -115,6 +115,8 @@ if ($_POST["Submit"]) {
 		} else
 			$a_rule[] = $natent;
 
+		if ($natent['enable'] != 'on')
+			snort_stop($natent, $if_real);
 		write_config();
 		sync_snort_package_config();
 
