@@ -1292,6 +1292,10 @@ EOD;
 		}
 	}
 
+	$cksumcheck = "all";
+	if ($snortcfg['cksumcheck'] == 'on')
+		$cksumcheck = "none";
+
 	/* build snort configuration file */
 	$snort_conf_text = <<<EOD
 
@@ -1313,7 +1317,7 @@ var PREPROC_RULE_PATH {$snortdir}/preproc_rules
 {$portvardef}
 
 # Configure the snort decoder  #
-config checksum_mode: all
+config checksum_mode: {$cksumcheck}
 config disable_decode_alerts
 config disable_tcpopt_experimental_alerts
 config disable_tcpopt_obsolete_alerts

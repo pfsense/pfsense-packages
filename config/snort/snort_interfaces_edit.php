@@ -106,6 +106,7 @@ if ($_POST["Submit"]) {
 		if ($_POST['tcpdumplog'] == "on") { $natent['tcpdumplog'] = 'on'; } else{ $natent['tcpdumplog'] = 'off'; }
 		if ($_POST['snortunifiedlog'] == "on") { $natent['snortunifiedlog'] = 'on'; }else{ $natent['snortunifiedlog'] = 'off'; }
 		if ($_POST['configpassthru']) $natent['configpassthru'] = base64_encode($_POST['configpassthru']); else unset($natent['configpassthru']);
+		if ($_POST['cksumcheck']) $natent['cksumcheck'] = 'on'; else $natent['cksumcheck'] = 'off';
 
 		$if_real = snort_get_real_interface($natent['interface']);
 		if (isset($id) && $a_rule[$id]) {
@@ -394,7 +395,14 @@ function enable_change(enable_change) {
 		will like this rule to use. </span><br/>&nbsp;<br/><span class="red">Note:</span><br/>&nbsp;Default
 		option disables suppression and filtering.</td>
 	</tr>
-
+	<tr>
+				<td width="22%" valign="top" class="vncell">Checksum checking</td>
+				<td width="78%" class="vtable">
+					<input name="cksumcheck" id="cksumcheck" type="checkbox" value="on" <?php if ($pconfig['cksumcheck'] == "on") echo "checked"; ?>>
+					<br/>If ticked checksum checking on snort will be disabled to improve performance.
+					<br/>Most of this is already done on the firewall/filter level
+				</td>
+	</tr>
 	<tr>
 		<td colspan="2" valign="top" class="listtopic">Choose the types of
 		logs snort should create.</td>
