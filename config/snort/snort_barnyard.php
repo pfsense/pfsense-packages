@@ -77,8 +77,8 @@ if ($_POST) {
 		$natent = $pconfig;
 
 		$natent['barnyard_enable'] = $_POST['barnyard_enable'] ? 'on' : 'off';
-		if ($_POST['barnyard_mysql']) $natent['barnyard_mysql'] = $_POST['barnyard_mysql']; unset($natent['barnyard_mysql']);
-		if ($_POST['barnconfigpassthru']) $natent['barnconfigpassthru'] = base64_encode($_POST['barnconfigpassthru']); unset($natent['barnconfigpassthru']);
+		if ($_POST['barnyard_mysql']) $natent['barnyard_mysql'] = $_POST['barnyard_mysql']; else unset($natent['barnyard_mysql']);
+		if ($_POST['barnconfigpassthru']) $natent['barnconfigpassthru'] = base64_encode($_POST['barnconfigpassthru']); else unset($natent['barnconfigpassthru']);
 		if ($_POST['barnyard_enable'] == "on")
 			$natent['snortunifiedlog'] = 'on';
 		else
