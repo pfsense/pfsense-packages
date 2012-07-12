@@ -1178,6 +1178,9 @@ EOD;
 	$other_preprocs = <<<EOD
 # Other preprocs #
 preprocessor rpc_decode: 111 32770 32771 32772 32773 32774 32775 32776 32777 32778 32779
+
+# Back Orifice
+preprocessor bo
 	
 EOD;
 
