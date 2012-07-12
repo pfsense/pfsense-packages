@@ -101,8 +101,10 @@ function snort_build_list($listname = "") {
 		$wandns = $whitelist['wandnsips'];
 		$vips = $whitelist['vips'];
 		$vpns = $whitelist['vpnips'];
-		if (!empty($whitelist['address']))
+		if (!empty($whitelist['address'])) {
 			$home_net .= trim($whitelist['address']);
+			$home_net .= " ";
+		}
 	}
 
 	/* build an interface array list */
