@@ -50,7 +50,8 @@ $pconfig = array();
 if (isset($id) && $a_nat[$id]) {
 	/* old options */
 	$pconfig = $a_nat[$id];
-	$pconfig['barnconfigpassthru'] = base64_decode($a_nat[$id]['barnconfigpassthru']);
+	if (!empty($a_nat[$id]['barnconfigpassthru']))
+		$pconfig['barnconfigpassthru'] = base64_decode($a_nat[$id]['barnconfigpassthru']);
 }
 
 if (isset($_GET['dup']))

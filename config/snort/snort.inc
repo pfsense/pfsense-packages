@@ -1003,23 +1003,10 @@ function snort_generate_conf($snortcfg) {
 			@copy("{$snortdir}/{$file}", "{$snortcfgdir}/{$file}");
 	}
 
-	/* define basic log filename */
-	$snortunifiedlogbasic_type = "output unified: filename snort_{$snort_uuid}_{$if_real}.log, limit 128";
-
-	/* define snortalertlogtype */
-	$snortalertlogtype_type = "output alert_full: alert";
-	if ($config['installedpackages']['snortglobal']['snortalertlogtype'] == "fast")
-		$snortalertlogtype_type = "output alert_fast: alert";
-
 	/* define alertsystemlog */
 	$alertsystemlog_type = "";
 	if ($snortcfg['alertsystemlog'] == "on")
 		$alertsystemlog_type = "output alert_syslog: log_alert";
-
-	/* define tcpdumplog */
-	$tcpdumplog_type = "";
-	if ($snortcfg['tcpdumplog'] == "on")
-		$tcpdumplog_type = "output log_tcpdump: snort_{$snort_uuid}_{$if_real}.tcpdump";
 
 	/* define snortunifiedlog */
 	$snortunifiedlog_type = "";
@@ -1362,11 +1349,9 @@ preprocessor stream5_icmp:
 preprocessor ssl: ports { {$def_ssl_ports_ignore} }, trustservers, noinspect_encrypted
 
 # Snort Output Logs #
-{$snortunifiedlogbasic_type}
 {$snortalertlogtype_type}
+output alert_csv: alert timestamp,sig_generator,sig_id,sig_rev,msg,proto,src,srcport,dst,dstport,id
 {$alertsystemlog_type}
-{$tcpdumplog_type}
-{$snortmysqllog_info_chk}
 {$snortunifiedlog_type}
 {$spoink_type}
 						
