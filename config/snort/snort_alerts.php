@@ -83,12 +83,17 @@ if ($_GET['action'] == "clear" || $_POST['delete']) {
 	if (file_exists("/var/log/snort/snort_{$if_real}{$snort_uuid}/alert")) {
 		conf_mount_rw();
 		snort_post_delete_logs($snort_uuid);
-		@file_put_contents("/var/log/snort/snort_{$if_real}{$snort_uuid}/alert", "");
+		$fd = fopen("/var/log/snort/snort_{$if_real}{$snort_uuid}/alert", "w");
+		if ($fd) {
+			@ftruncate($fd, 0);
+			fclose($fd);
+		}
+		conf_mount_ro();
 		/* XXX: This is needed is snort is run as snort user */
 		//mwexec('/usr/sbin/chown snort:snort /var/log/snort/*', true);
 		mwexec('/bin/chmod 660 /var/log/snort/*', true);
-		mwexec("/bin/pkill -HUP -F {$g['varrun_path']}/snort_{$if_real}{$snort_uuid}.pid -a");
-		conf_mount_ro();
+		if (file_exists("{$g['varrun_path']}/snort_{$if_real}{$snort_uuid}.pid"))
+			mwexec("/bin/pkill -HUP -F {$g['varrun_path']}/snort_{$if_real}{$snort_uuid}.pid -a");
 	}
 	header("Location: /snort/snort_alerts.php?instance={$instanceid}");
 	exit;

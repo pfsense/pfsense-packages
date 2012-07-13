@@ -342,13 +342,14 @@ function snort_post_delete_logs($snort_uuid = 0) {
 			unset($filelist[count($filelist) - 1]);
 			foreach ($filelist as $file)
 				@unlink($file);
-			$filelist = glob("{$snort_log_dir}/*{$snort_uuid}_{$if_real}.tcpdump.*");
-			unset($filelist[count($filelist) - 1]);
-			foreach ($filelist as $file)
-				@unlink($file);
 
-			if ($value['perform_stat'] == 'on')
-				@file_put_contents("{$snort_log_dir}/{$if_real}.stats", "");
+			if ($value['perform_stat'] == 'on') {
+				$fd = fopen("{$snort_log_dir}/{$if_real}.stats", "w");
+				if ($fd) {
+					ftruncate($fd, 0);
+					fclose($fd);
+				}
+			}
 		}
 	}
 }

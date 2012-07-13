@@ -356,7 +356,7 @@ function oinkmaster_run($if_real, $iface_uuid)
 	global $config, $g, $snortdir;
 
 	if (empty($config['installedpackages']['snortglobal']['rule'][$id]['rule_sid_on']) && empty($config['installedpackages']['snortglobal']['rule'][$id]['rule_sid_off'])) { 
-		update_status(gettext("Your first set of rules are being copied..."));
+		update_status(gettext("Your set of rules are being copied..."));
 		exec("/bin/cp {$snortdir}/rules/* {$snortdir}/snort_{$iface_uuid}_{$if_real}/rules/");
 		exec("/bin/cp {$snortdir}/classification.config {$snortdir}/snort_{$iface_uuid}_{$if_real}");
 		exec("/bin/cp {$snortdir}/gen-msg.map {$snortdir}/snort_{$iface_uuid}_{$if_real}");
