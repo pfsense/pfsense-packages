@@ -49,7 +49,6 @@ $pconfig['rm_blocked'] = $config['installedpackages']['snortglobal']['rm_blocked
 $pconfig['snortloglimit'] = $config['installedpackages']['snortglobal']['snortloglimit'];
 $pconfig['snortloglimitsize'] = $config['installedpackages']['snortglobal']['snortloglimitsize'];
 $pconfig['autorulesupdate7'] = $config['installedpackages']['snortglobal']['autorulesupdate7'];
-$pconfig['snortalertlogtype'] = $config['installedpackages']['snortglobal']['snortalertlogtype'];
 $pconfig['forcekeepsettings'] = $config['installedpackages']['snortglobal']['forcekeepsettings'];
 
 /* if no errors move foward */
@@ -72,7 +71,6 @@ if (!$input_errors) {
 			$config['installedpackages']['snortglobal']['snortloglimitsize'] = $snortloglimitDSKsize;
 		}
 		$config['installedpackages']['snortglobal']['autorulesupdate7'] = $_POST['autorulesupdate7'];
-		$config['installedpackages']['snortglobal']['snortalertlogtype'] = $_POST['snortalertlogtype'];
 		$config['installedpackages']['snortglobal']['forcekeepsettings'] = $_POST['forcekeepsettings'] ? 'on' : 'off';
 
 		$retval = 0;
@@ -326,25 +324,6 @@ if ($input_errors)
 	<span class="vexpl">Please select the amount of time you would like
 	hosts to be blocked for.<br>
 	Hint: in most cases, 1 hour is a good choice.</span></td>
-</tr>
-<tr>
-	<td width="22%" valign="top" class="vncell">Alerts file description
-	type</td>
-	<td width="78%" class="vtable">
-		<select name="snortalertlogtype" class="formselect" id="snortalertlogtype">
-		<?php
-		$logtype = array('full' => 'FULL', 'fast' => 'SHORT');
-		foreach ($logtype as $logt => $logdescr): ?>
-		<option value="<?=$logt;?>"
-		<?php if ($logt == $pconfig['snortalertlogtype']) echo "selected"; ?>>
-			<?=htmlspecialchars($logdescr);?></option>
-		<?php endforeach; ?>
-	</select><br>
-	<span class="vexpl">Please choose the type of Alert logging you will
-	like see in your alert file.<br>
-	Hint: Best pratice is to chose full logging.</span>&nbsp;<span
-		class="red"><strong>WARNING:</strong></span>&nbsp;<strong>On
-	change, alert file will be cleared.</strong></td>
 </tr>
 <tr>
 	<td width="22%" valign="top" class="vncell">Keep snort settings

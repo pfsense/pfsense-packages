@@ -100,11 +100,7 @@ if ($_POST["Submit"]) {
 		if ($_POST['homelistname']) $natent['homelistname'] =  $_POST['homelistname']; else unset($natent['homelistname']);
 		if ($_POST['externallistname']) $natent['externallistname'] =  $_POST['externallistname']; else unset($natent['externallistname']);
 		if ($_POST['suppresslistname']) $natent['suppresslistname'] =  $_POST['suppresslistname']; else unset($natent['suppresslistname']);
-		if ($_POST['snortalertlogtype']) $natent['snortalertlogtype'] = $_POST['snortalertlogtype']; else $pconfig['snortalertlogtype'];
 		if ($_POST['alertsystemlog'] == "on") { $natent['alertsystemlog'] = 'on'; }else{ $natent['alertsystemlog'] = 'off'; }
-		if ($_POST['enable']) { $natent['enable'] = 'on'; } else unset($natent['enable']);
-		if ($_POST['tcpdumplog'] == "on") { $natent['tcpdumplog'] = 'on'; } else{ $natent['tcpdumplog'] = 'off'; }
-		if ($_POST['snortunifiedlog'] == "on") { $natent['snortunifiedlog'] = 'on'; }else{ $natent['snortunifiedlog'] = 'off'; }
 		if ($_POST['configpassthru']) $natent['configpassthru'] = base64_encode($_POST['configpassthru']); else unset($natent['configpassthru']);
 		if ($_POST['cksumcheck']) $natent['cksumcheck'] = 'on'; else $natent['cksumcheck'] = 'off';
 
@@ -160,8 +156,6 @@ function enable_change(enable_change) {
 	document.iform.externallistname.disabled = endis;
 	document.iform.homelistname.disabled = endis;
 	document.iform.suppresslistname.disabled = endis;
-	document.iform.tcpdumplog.disabled = endis;
-	document.iform.snortunifiedlog.disabled = endis;
 	document.iform.configpassthru.disabled = endis;
 }
 //-->
@@ -404,10 +398,6 @@ function enable_change(enable_change) {
 				</td>
 	</tr>
 	<tr>
-		<td colspan="2" valign="top" class="listtopic">Choose the types of
-		logs snort should create.</td>
-	</tr>
-	<tr>
 		<td width="22%" valign="top" class="vncell">Send alerts to main
 		System logs</td>
 		<td width="78%" class="vtable"><input name="alertsystemlog"
@@ -416,27 +406,6 @@ function enable_change(enable_change) {
 			onClick="enable_change(false)"><br>
 		Snort will send Alerts to the firewall's system logs.</td>
 	</tr>
-	<tr>
-		<td width="22%" valign="top" class="vncell">Log to a Tcpdump file</td>
-		<td width="78%" class="vtable"><input name="tcpdumplog"
-			type="checkbox" value="on"
-			<?php if ($pconfig['tcpdumplog'] == "on") echo "checked"; ?>
-			onClick="enable_change(false)"><br>
-		Snort will log packets to a tcpdump-formatted file. The file then
-		can be analyzed by an application such as Wireshark which
-		understands pcap file formats. <span class="red"><strong>WARNING:</strong></span><br/>
-		File may become large.</td>
-	</tr>
-	<tr>
-		<td width="22%" valign="top" class="vncell">Log Alerts to a snort
-		unified2 file</td>
-		<td width="78%" class="vtable"><input name="snortunifiedlog"
-			type="checkbox" value="on"
-			<?php if ($pconfig['snortunifiedlog'] == "on") echo "checked"; ?>
-			onClick="enable_change(false)"><br>
-	Snort will log Alerts to a file in the UNIFIED2 format. This is a
-	requirement for barnyard2.</td>
-</tr>
 <tr>
 	<td colspan="2" valign="top" class="listtopic">Arguments here will
 	be automatically inserted into the snort configuration.</td>
