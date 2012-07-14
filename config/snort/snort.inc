@@ -1091,7 +1091,7 @@ EOD;
 preprocessor http_inspect: global iis_unicode_map unicode.map 1252 compress_depth 65535 decompress_depth 65535
 
 preprocessor http_inspect_server: server default \
-                        ports  { {$http_ports }  \
+                        ports  { {$http_ports} }  \
                         non_strict \
                         non_rfc_char  { 0x00 0x01 0x02 0x03 0x04 0x05 0x06 0x07 }  \
                         flow_depth {$def_flow_depth_type}  \
