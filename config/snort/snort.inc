@@ -1167,7 +1167,7 @@ EOD;
 	$smtp_preprocessor = <<<EOD
 # SMTP preprocessor #
 preprocessor SMTP: \
-    ports { {$mail_ports} } \
+    ports { {$smtp_ports} } \
     inspection_type stateful \
     normalize cmds \
     valid_cmds { MAIL RCPT HELP HELO ETRN EHLO EXPN VRFY ATRN SIZE BDAT DEBUG EMAL ESAM ESND ESOM EVFY IDENT NOOP RSET SEND SAML SOML AUTH TURN ETRN PIPELINING \
