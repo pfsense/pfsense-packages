@@ -368,13 +368,6 @@ function snort_postinstall() {
 
 	$snortdir = SNORTDIR;
 
-	/* snort -> advanced features */
-	if (is_array($config['installedpackages']['snortglobal'])) {
-		$bpfbufsize = $config['installedpackages']['snortglobal']['bpfbufsize'];
-		$bpfmaxbufsize = $config['installedpackages']['snortglobal']['bpfmaxbufsize'];
-		$bpfmaxinsns = $config['installedpackages']['snortglobal']['bpfmaxinsns'];
-	}
-
 	/* cleanup default files */
 	@rename("{$snortdir}/snort.conf-sample", "{$snortdir}/snort.conf");
 	@rename("{$snortdir}/threshold.conf-sample", "{$snortdir}/threshold.conf");
@@ -390,15 +383,17 @@ function snort_postinstall() {
 
 	/* remove example files */
 	if (file_exists('/usr/local/lib/snort/dynamicrules/lib_sfdynamic_example_rule.so.0'))
-		exec('/bin/rm /usr/local/lib/snort/dynamicrules/lib_sfdynamic_example*');
+		exec('rm /usr/local/lib/snort/dynamicrules/lib_sfdynamic_example*');
 
 	if (file_exists('/usr/local/lib/snort/dynamicpreprocessor/lib_sfdynamic_preprocessor_example.so'))
 		exec('/bin/rm /usr/local/lib/snort/dynamicpreprocessor/lib_sfdynamic_preprocessor_example*');
 
+	/*
 	mwexec("/usr/sbin/chown -R snort:snort /var/log/snort", true);
 	mwexec("/usr/sbin/chown -R snort:snort {$snortdir}", true);
 	mwexec('/usr/sbin/chown -R snort:snort /usr/local/lib/snort', true);
 	mwexec('/usr/sbin/chown snort:snort /tmp/snort*', true);
+	*/
 
 	/* remake saved settings */
 	if ($config['installedpackages']['snortglobal']['forcekeepsettings'] == 'on') {
@@ -917,7 +912,6 @@ function snort_deinstall() {
 	$snortdir = SNORTDIR;
 
 	/* decrease bpf buffers back to 4096, from 20480 */
-	exec('/sbin/sysctl net.bpf.bufsize=4096');
 	mwexec('/usr/bin/killall snort', true);
 	sleep(2);
 	mwexec('/usr/bin/killall -9 snort', true);
