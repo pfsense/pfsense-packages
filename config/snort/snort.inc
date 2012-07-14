@@ -1048,6 +1048,29 @@ function snort_generate_conf($snortcfg) {
 	if(!empty($snortcfg['performance']))
 		$snort_performance = $snortcfg['performance'];
 
+	/* if user has defined a custom ssh port, use it */
+	if(is_array($config['system']['ssh']) && isset($config['system']['ssh']['port']))
+		$ssh_port = $config['system']['ssh']['port'];
+	else
+		$ssh_port = "22";
+	$ports = array(
+		"dns_ports" => "53", "smtp_ports" => "25", "mail_ports" => "25,143,465,691",
+		"http_ports" => "80", "oracle_ports" => "1521", "mssql_ports" => "1433",
+		"telnet_ports" => "23","snmp_ports" => "161", "ftp_ports" => "21",
+		"ssh_ports" => $ssh_port, "pop2_ports" => "109", "pop3_ports" => "110", 
+		"imap_ports" => "143", "sip_proxy_ports" => "5060:5090,16384:32768",
+		"sip_ports" => "5060:5090,16384:32768", "auth_ports" => "113", "finger_ports" => "79", 
+		"irc_ports" => "6665,6666,6667,6668,6669,7000", "smb_ports" => "139,445",
+		"nntp_ports" => "119", "rlogin_ports" => "513", "rsh_ports" => "514",
+		"ssl_ports" => "443,465,563,636,989,990,992,993,994,995",
+		"file_data_ports" => "\$HTTP_PORTS,110,143", "shellcode_ports" => "!80", 
+		"sun_rpc_ports" => "111,32770,32771,32772,32773,32774,32775,32776,32777,32778,32779",
+		"DCERPC_NCACN_IP_TCP" => "139,445", "DCERPC_NCADG_IP_UDP" => "138,1024:",
+		"DCERPC_NCACN_IP_LONG" => "135,139,445,593,1024:", "DCERPC_NCACN_UDP_LONG" => "135,1024:",
+		"DCERPC_NCACN_UDP_SHORT" => "135,593,1024:", "DCERPC_NCACN_TCP" => "2103,2105,2107",
+		"DCERPC_BRIGHTSTORE" => "6503,6504"
+	);
+
 	/////////////////////////////
 	/* preprocessor code */
 	/* def perform_stat */
@@ -1061,13 +1084,14 @@ EOD;
 	if (!empty($snortcfg['flow_depth']))
 		$def_flow_depth_type = $snortcfg['flow_depth'];
 
+	$http_ports = str_replace(",", " ", $ports['http_ports']);
 	/* def http_inspect */
 	$http_inspect = <<<EOD
 # HTTP Inspect  #
 preprocessor http_inspect: global iis_unicode_map unicode.map 1252 compress_depth 65535 decompress_depth 65535
 
 preprocessor http_inspect_server: server default \
-                        ports  { 80 8080 }  \
+                        ports  { {$http_ports }  \
                         non_strict \
                         non_rfc_char  { 0x00 0x01 0x02 0x03 0x04 0x05 0x06 0x07 }  \
                         flow_depth {$def_flow_depth_type}  \
@@ -1138,11 +1162,12 @@ preprocessor ftp_telnet_protocol: ftp client default \
 	
 EOD;
 
+	$smtp_ports = str_replace(",", " ", $ports['mail_ports']);
 	/* def smtp_preprocessor */
 	$smtp_preprocessor = <<<EOD
 # SMTP preprocessor #
 preprocessor SMTP: \
-    ports { 25 465 691 } \
+    ports { {$mail_ports} } \
     inspection_type stateful \
     normalize cmds \
     valid_cmds { MAIL RCPT HELP HELO ETRN EHLO EXPN VRFY ATRN SIZE BDAT DEBUG EMAL ESAM ESND ESOM EVFY IDENT NOOP RSET SEND SAML SOML AUTH TURN ETRN PIPELINING \
@@ -1173,10 +1198,11 @@ preprocessor sfportscan: scan_type { all } \
 	
 EOD;
 
+	$sun_rpc_ports = str_replace(",", " ", $ports['sun_rpc_ports']);
 	/* def other_preprocs */
 	$other_preprocs = <<<EOD
 # Other preprocs #
-preprocessor rpc_decode: 111 32770 32771 32772 32773 32774 32775 32776 32777 32778 32779
+preprocessor rpc_decode: {$sun_rpc_ports}
 
 # Back Orifice
 preprocessor bo
@@ -1188,17 +1214,18 @@ EOD;
 # DCE/RPC 2   #
 preprocessor dcerpc2: memcap 102400, events [smb, co, cl]
 preprocessor dcerpc2_server: default, policy WinXP, \
-    detect [smb [139,445], tcp 135, udp 135, rpc-over-http-server 593], \
+    detect [smb [{$ports['smb_ports']}], tcp 135, udp 135, rpc-over-http-server 593], \
     autodetect [tcp 1025:, udp 1025:, rpc-over-http-server 1025:], \
     smb_max_chain 3
 	
 EOD;
 
+	$dns_ports = str_replace(",", " ", $ports['dns_ports']);
 	/* def dns_preprocessor */
 	$dns_preprocessor = <<<EOD
 # DNS preprocessor #
 preprocessor dns: \
-    ports { 53 } \
+    ports { {$dns_ports} } \
     enable_rdata_overflow
 	
 EOD;
@@ -1222,30 +1249,6 @@ EOD;
 		"aim_servers" => "64.12.24.0/23,64.12.28.0/23,64.12.161.0/24,64.12.163.0/24,64.12.200.0/24,205.188.3.0/24,205.188.5.0/24,205.188.7.0/24,205.188.9.0/24,205.188.153.0/24,205.188.179.0/24,205.188.248.0/24"
 	    );
 
-	/* if user has defined a custom ssh port, use it */
-	if(is_array($config['system']['ssh']) && isset($config['system']['ssh']['port']))
-		$ssh_port = $config['system']['ssh']['port'];
-	else
-		$ssh_port = "22";
-	$ports = array(
-		"dns_ports" => "53", "smtp_ports" => "25", "mail_ports" => "25,143,465,691",
-		"http_ports" => "80", "oracle_ports" => "1521", "mssql_ports" => "1433",
-		"telnet_ports" => "23","snmp_ports" => "161", "ftp_ports" => "21",
-		"ssh_ports" => $ssh_port, "pop2_ports" => "109", "pop3_ports" => "110", 
-		"imap_ports" => "143", "sip_proxy_ports" => "5060:5090,16384:32768",
-		"sip_ports" => "5060:5090,16384:32768", "auth_ports" => "113", "finger_ports" => "79", 
-		"irc_ports" => "6665,6666,6667,6668,6669,7000", "smb_ports" => "139,445",
-		"nntp_ports" => "119", "rlogin_ports" => "513", "rsh_ports" => "514",
-		"ssl_ports" => "443,465,563,636,989,990,992,993,994,995",
-		"ssl_ports_ignore" => "443,465,563,636,989,990,992,993,994,995",
-		"file_data_ports" => "\$HTTP_PORTS,110,143", "shellcode_ports" => "!80", 
-		"sun_rpc_ports" => "111,32770,32771,32772,32773,32774,32775,32776,32777,32778,32779",
-		"DCERPC_NCACN_IP_TCP" => "139,445", "DCERPC_NCADG_IP_UDP" => "138,1024:",
-		"DCERPC_NCACN_IP_LONG" => "135,139,445,593,1024:", "DCERPC_NCACN_UDP_LONG" => "135,1024:",
-		"DCERPC_NCACN_UDP_SHORT" => "135,593,1024:", "DCERPC_NCACN_TCP" => "2103,2105,2107",
-		"DCERPC_BRIGHTSTORE" => "6503,6504"
-	);
-
 	$vardef = "";
 	foreach ($servers as $alias => $avalue) {
 		if (!empty($snortcfg[$alias]))
@@ -1259,7 +1262,7 @@ EOD;
 			$ports[$alias] = $snortcfg["def_{$alias}"];
 		$portvardef .= "portvar " . strtoupper($alias) . " [" . $ports[$alias] . "]\n";
 	}
-	$def_ssl_ports_ignore = str_replace(",", " ", $ports['ssl_ports_ignore']);
+	$def_ssl_ports_ignore = str_replace(",", " ", $ports['ssl_ports']);
 
 	$snort_preproc = array (
 		"perform_stat", "http_inspect", "other_preprocs", "ftp_preprocessor", "smtp_preprocessor", 
@@ -1279,10 +1282,12 @@ EOD;
 		$snort_misc_include_rules .= "include {$snortcfgdir}/reference.config\n";
 	if (file_exists("{$snortcfgdir}/classification.config"))
 		$snort_misc_include_rules .= "include {$snortcfgdir}/classification.config\n";
-	if (file_exists("{$snortdir}/preproc_rules/preprocessor.rules"))
-		$snort_misc_include_rules .= "include \$PREPROC_RULE_PATH/preprocessor.rules\n";
-	if (file_exists("{$snortdir}/preproc_rules/decoder.rules"))
-		$snort_misc_include_rules .= "include \$PREPROC_RULE_PATH/decoder.rules\n";
+	if (is_dir("{$snortdir}/preproc_rules")) {
+		foreach (glob("{$snortdir}/preproc_rules/*.rules") as $file) {
+			$file = basename($file);
+			$snort_misc_include_rules .= "include \$PREPROC_RULE_PATH/{$file}\n";
+		}
+	}
 
 	/* generate rule sections to load */
 	$selected_rules_sections = "";

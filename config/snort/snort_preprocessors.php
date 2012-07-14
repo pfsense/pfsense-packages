@@ -55,7 +55,6 @@ if (isset($id) && $a_nat[$id]) {
 
 	/* new options */
 	$pconfig['perform_stat'] = $a_nat[$id]['perform_stat'];
-	$pconfig['ssl_ports_ignore'] = $a_nat[$id]['def_ssl_ports_ignore'];
 	$pconfig['flow_depth'] = $a_nat[$id]['flow_depth'];
 	$pconfig['max_queued_bytes'] = $a_nat[$id]['max_queued_bytes'];
 	$pconfig['max_queued_segs'] = $a_nat[$id]['max_queued_segs'];
@@ -75,7 +74,6 @@ if ($_POST) {
 	/* if no errors write to conf */
 	if (!$input_errors) {
 		/* post new options */
-		if ($_POST['ssl_ports_ignore'] != "") { $natent['def_ssl_ports_ignore'] = $_POST['ssl_ports_ignore']; }else{ $natent['def_ssl_ports_ignore'] = ""; }
 		if ($_POST['flow_depth'] != "") { $natent['flow_depth'] = $_POST['flow_depth']; }else{ $natent['flow_depth'] = ""; }
 		if ($_POST['max_queued_bytes'] != "") { $natent['max_queued_bytes'] = $_POST['max_queued_bytes']; }else{ $natent['max_queued_bytes'] = ""; }
 		if ($_POST['max_queued_segs'] != "") { $natent['max_queued_segs'] = $_POST['max_queued_segs']; }else{ $natent['max_queued_segs'] = ""; }
@@ -299,16 +297,6 @@ include_once("head.inc");
 			onClick="enable_change(false)"><br>
 		The DNS preprocessor decodes DNS Response traffic and detects some
 		vulnerabilities.</td>
-	</tr>
-	<tr>
-		<td width="22%" valign="top" class="vncell">Define SSL_IGNORE</td>
-		<td width="78%" class="vtable"><input name="ssl_ports_ignore"
-			type="text" class="formfld" id="ssl_ports_ignore" size="40"
-			value="<?=htmlspecialchars($pconfig['ssl_ports_ignore']);?>"> <br>
-		<span class="vexpl"> Encrypted traffic should be ignored by Snort
-		for both performance reasons and to reduce false positives.<br>
-		Default: "443 465 563 636 989 990 992 993 994 995".</span> <strong>Please
-		use spaces and not commas.</strong></td>
 	</tr>
 	<tr>
 		<td width="22%" valign="top">&nbsp;</td>
