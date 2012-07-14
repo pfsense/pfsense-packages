@@ -157,10 +157,13 @@ if ($emergingthreats == "on") {
 
 /* Normalize rulesets */
 $sedcmd = "s/^#alert/# alert/g\n";
-$sedcmd = "s/^##alert/# alert/g\n";
-$sedcmd = "s/^#  alert/# alert/g\n";
-$sedcmd = "s/^#\talert/# alert/g\n";
-$sedcmd = "s/^##\talert/# alert/g\n";
+$sedcmd .= "s/^##alert/# alert/g\n";
+$sedcmd .= "s/^#  alert/# alert/g\n";
+$sedcmd .= "s/^#\talert/# alert/g\n";
+$sedcmd .= "s/^##\talert/# alert/g\n";
+$sedcmd .= "s/^\talert/alert/g\n";
+$sedcmd .= "s/^ alert/alert/g\n";
+$sedcmd .= "s/^  alert/alert/g\n";
 @file_put_contents("{$snortdir}/tmp/sedcmd", $sedcmd);
 
 /* Untar snort rules file individually to help people with low system specs */
@@ -264,56 +267,9 @@ if (is_dir($tmpfname)) {
 	exec("/bin/rm -r {$tmpfname}");
 }
 
-//////////////////
-/* open oinkmaster_conf for writing" function */
-function oinkmaster_conf($snortcfg, $if_real) {
+function snort_apply_customizations($snortcfg, $if_real) {
 	global $config, $g, $snortdir;
 
-	$selected_sid_on_sections = "";
-	$selected_sid_off_sections = "";
-
-	if (!empty($snortcfg['rule_sid_on']) || !empty($snortcfg['rule_sid_off'])) {
-		if (!empty($snortcfg['rule_sid_on'])) {
-			$enabled_sid_on_array = explode("||", trim($snortcfg['rule_sid_on']));
-			foreach($enabled_sid_on_array as $enabled_item_on)
-				$selected_sid_on_sections .= "$enabled_item_on\n";
-		}
-
-		if (!empty($snortcfg['rule_sid_off'])) {
-			$enabled_sid_off_array = explode("||", trim($snortcfg['rule_sid_off']));
-			foreach($enabled_sid_off_array as $enabled_item_off)
-				$selected_sid_off_sections .= "$enabled_item_off\n";
-		}
-
-		$snort_sid_text = <<<EOD
-
-###########################################
-#                                         #
-# this is auto generated on snort updates #
-#                                         #
-###########################################
-
-path = /bin:/usr/bin:/usr/local/bin
-
-update_files = \.rules$|\.config$|\.conf$|\.txt$|\.map$
-
-url = dir://{$snortdir}/rules
-
-{$selected_sid_on_sections}
-
-{$selected_sid_off_sections}
-
-EOD;
-
-		/* open snort's oinkmaster.conf for writing */
-		@file_put_contents("{$snortdir}/tmp/oinkmaster_{$snortcfg['uuid']}.conf", $snort_sid_text);
-	}
-}
-
-function oinkmaster_run($snortcfg, $if_real) {
-	global $config, $g, $snortdir;
-
-	
 	if (empty($snortcfg['rulesets']))
 		return;
 	else {
@@ -322,21 +278,78 @@ function oinkmaster_run($snortcfg, $if_real) {
 		$files = explode("||", $snortcfg['rulesets']);
 		foreach ($files as $file)
 			@copy("{$snortdir}/rules/{$file}", "{$snortdir}/snort_{$snortcfg['uuid']}_{$if_real}/rules/{$file}");
+
+		@copy("{$snortdir}/classification.config", "{$snortdir}/snort_{$snortcfg['uuid']}_{$if_real}/classification.config");
+		@copy("{$snortdir}/gen-msg.map", "{$snortdir}/snort_{$snortcfg['uuid']}_{$if_real}/gen-msg.map");
+		exec("/bin/cp -r {$snortdir}/generators {$snortdir}/snort_{$snortcfg['uuid']}_{$if_real}");
+		@copy("{$snortdir}/reference.config", "{$snortdir}/snort_{$snortcfg['uuid']}_{$if_real}/reference.config");
+		@copy("{$snortdir}/sid", "{$snortdir}/snort_{$snortcfg['uuid']}_{$if_real}/sid");
+		@copy("{$snortdir}/sid-msg.map", "{$snortdir}/snort_{$snortcfg['uuid']}_{$if_real}/sid-msg.map");
+		@copy("{$snortdir}/unicode.map", "{$snortdir}/snort_{$snortcfg['uuid']}_{$if_real}/unicode.map");
 	}
-	if (!empty($snortcfg['rule_sid_on']) || !empty($snortcfg['rule_sid_off'])) { 
-		@unlink("{$snortdir}/oinkmaster.log");
-		log_error(gettext("Your enable and disable changes are being applied to your fresh set of rules..."));
-		exec("/usr/local/bin/perl /usr/local/bin/oinkmaster.pl -C {$snortdir}/tmp/oinkmaster_{$snortcfg['uuid']}.conf -o {$snortdir}/snort_{$snortcfg['uuid']}_{$if_real}/rules >> {$snortdir}/oinkmaster.log");
+
+	if (!empty($snortcfg['rule_sid_on']) || !empty($snortcfg['rule_sid_off'])) {
+		if (!empty($snortcfg['rule_sid_on'])) {
+			$enabled_sid_on_array = explode("||", trim($snortcfg['rule_sid_on']));
+			$enabled_sids = array_flip($enabled_sid_on_array);
+		}
+
+		if (!empty($snortcfg['rule_sid_off'])) {
+			$enabled_sid_off_array = explode("||", trim($snortcfg['rule_sid_off']));
+			$disabled_sids = array_flip($enabled_sid_off_array);
+		}
+
+		$files = glob("{$snortdir}/snort_{$snortcfg}_{$if_real}/rules");
+		foreach ($files as $file) {
+			$splitcontents = file($file);
+			$changed = false;
+			foreach ( $splitcontents as $counter => $value ) {
+				$disabled = "False";
+				$findme = "# alert"; //find string for disabled alerts
+				$counter2 = 1;
+				$sid = snort_get_rule_part($value, 'sid:', ';', 0);
+				if (!is_numeric($sid))
+					continue;
+				if (isset($enabled_sids[$sid])) {
+					if (substr($value, 0, 5) == "alert")
+						/* Rule is already enabled */
+						continue;
+					if (substr($value, 0, 7) == "# alert") {
+						/* Rule is disabled, change */
+						$splitcontents[$counter] = substr($value, 2);
+						$changed = true;
+					} else if (substr($splitcontents[$counter - 1], 0, 5) == "alert") {
+						/* Rule is already enabled */
+						continue;
+					} else if (substr($splitcontents[$counter - 1], 0, 7) == "# alert") { 
+						/* Rule is disabled, change */
+						$splitcontents[$counter - 1] = substr($value, 2);
+						$changed = true;
+					}
+				} else if (isset($disabled_sids[$sid])) {
+					if (substr($value, 0, 7) == "# alert")
+						/* Rule is already disabled */
+						continue;
+					if (substr($value, 0, 5) == "alert") {
+						/* Rule is enabled, change */
+						$splitcontents[$counter] = "# {$value}";
+						$changed = true;
+					} else if (substr($splitcontents[$counter - 1], 0, 7) == "# alert") {
+						/* Rule is already disabled */
+						continue;
+					} else if (substr($splitcontents[$counter - 1], 0, 5) == "alert") { 
+						/* Rule is enabled, change */
+						$splitcontents[$counter - 1] = "# {$value}";
+						$changed = true;
+					}
+
+				}
+				if ($changed == true)
+					@file_put_contents($file, implode("\n", $splitcontents));
+			}
+		}
 	}
-	@copy("{$snortdir}/classification.config", "{$snortdir}/snort_{$snortcfg['uuid']}_{$if_real}/classification.config");
-	@copy("{$snortdir}/gen-msg.map", "{$snortdir}/snort_{$snortcfg['uuid']}_{$if_real}/gen-msg.map");
-	exec("/bin/cp -r {$snortdir}/generators {$snortdir}/snort_{$snortcfg['uuid']}_{$if_real}");
-	@copy("{$snortdir}/reference.config", "{$snortdir}/snort_{$snortcfg['uuid']}_{$if_real}/reference.config");
-	@copy("{$snortdir}/sid", "{$snortdir}/snort_{$snortcfg['uuid']}_{$if_real}/sid");
-	@copy("{$snortdir}/sid-msg.map", "{$snortdir}/snort_{$snortcfg['uuid']}_{$if_real}/sid-msg.map");
-	@copy("{$snortdir}/unicode.map", "{$snortdir}/snort_{$snortcfg['uuid']}_{$if_real}/unicode.map");
 }
-//////////////
 
 if ($snortdownload == 'on' || $emergingthreats == 'on') {
 	/* You are Not Up to date, always stop snort when updating rules for low end machines */;
@@ -347,10 +360,7 @@ if ($snortdownload == 'on' || $emergingthreats == 'on') {
 			$if_real = snort_get_real_interface($value['interface']);
 
 			/* make oinkmaster.conf for each interface rule */
-			oinkmaster_conf($value, $if_real);
-
-			/* run oinkmaster for each interface rule */
-			oinkmaster_run($value, $if_real);
+			snort_apply_customizations($value, $if_real);
 		}
 	}
 

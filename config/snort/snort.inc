@@ -49,6 +49,19 @@ define("SNORTLOGDIR", "/var/log/snort");
 if (!is_array($config['installedpackages']['snortglobal']))
 	$config['installedpackages']['snortglobal'] = array();
 
+function snort_get_rule_part($source, $beginning, $ending, $start_pos) {
+
+	$beginning_pos = strpos($source, $beginning, $start_pos);
+	if (!$beginning_pos)
+		return false;
+	$middle_pos = $beginning_pos + strlen($beginning);
+	$source = substr($source, $middle_pos);
+	$ending_pos = strpos($source, $ending, 0);
+	if (!$ending_pos)
+		return false;
+	return substr($source, 0, $ending_pos);
+}
+
 function snort_generate_id() {
 	global $config;
 

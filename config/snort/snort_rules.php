@@ -55,18 +55,6 @@ if (isset($id) && $a_rule[$id]) {
 	$pconfig['rulesets'] = $a_rule[$id]['rulesets'];
 }
 
-function get_middle($source, $beginning, $ending, $init_pos) {
-	$beginning_pos = strpos($source, $beginning, $init_pos);
-	if (!$beginning_pos)
-		return false;
-	$middle_pos = $beginning_pos + strlen($beginning);
-	$source = substr($source, $middle_pos);
-	$ending_pos = strpos($source, $ending, 0);
-	if (!$ending_pos)
-		return false;
-	return substr($source, 0, $ending_pos);
-}
-
 function load_rule_file($incoming_file)
 {
 	//read file into string, and get filesize
@@ -124,7 +112,7 @@ if ($_GET['act'] == "toggle" && $_GET['ids'] && !empty($splitcontents)) {
 	@file_put_contents($rulefile, implode("\n", $splitcontents));
 
 	//write disable/enable sid to config.xml
-	$sid = get_middle($tempstring, 'sid:', ";", 0);
+	$sid = snort_get_rule_part($tempstring, 'sid:', ";", 0);
 	if (is_numeric($sid)) {
 		// rule_sid_on registers
 		$sidon = explode("||", $a_rule[$id]['rule_sid_on']);
@@ -269,7 +257,7 @@ if (empty($pconfig['rulesets'])):
 		$disabled_pos = strstr($value, $findme);
 
 		$counter2 = 1;
-		$sid = get_middle($value, 'sid:', ';', 0);
+		$sid = snort_get_rule_part($value, 'sid:', ';', 0);
 		//check to see if the sid is numberical
 		if (!is_numeric($sid))
 			continue;
@@ -302,9 +290,9 @@ if (empty($pconfig['rulesets'])):
 		$destination_port = $rule_content[$counter2];//destination port location
 
 		if (strstr($value, 'msg: "'))
-			$message = get_middle($value, 'msg: "', '";', 0);
+			$message = snort_get_rule_part($value, 'msg: "', '";', 0);
 		else if (strstr($value, 'msg:"'))
-			$message = get_middle($value, 'msg:"', '";', 0);
+			$message = snort_get_rule_part($value, 'msg:"', '";', 0);
 
 		echo "<tr><td width='3%' class='listt'> $textss
 			<a href='?id={$id}&openruleset={$currentruleset}&act=toggle&ids={$counter}'>
