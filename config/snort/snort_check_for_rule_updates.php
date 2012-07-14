@@ -281,7 +281,8 @@ function snort_apply_customizations($snortcfg, $if_real) {
 
 		@copy("{$snortdir}/classification.config", "{$snortdir}/snort_{$snortcfg['uuid']}_{$if_real}/classification.config");
 		@copy("{$snortdir}/gen-msg.map", "{$snortdir}/snort_{$snortcfg['uuid']}_{$if_real}/gen-msg.map");
-		exec("/bin/cp -r {$snortdir}/generators {$snortdir}/snort_{$snortcfg['uuid']}_{$if_real}");
+		if (is_dir("{$snortdir}/generators"))
+			exec("/bin/cp -r {$snortdir}/generators {$snortdir}/snort_{$snortcfg['uuid']}_{$if_real}");
 		@copy("{$snortdir}/reference.config", "{$snortdir}/snort_{$snortcfg['uuid']}_{$if_real}/reference.config");
 		@copy("{$snortdir}/sid", "{$snortdir}/snort_{$snortcfg['uuid']}_{$if_real}/sid");
 		@copy("{$snortdir}/sid-msg.map", "{$snortdir}/snort_{$snortcfg['uuid']}_{$if_real}/sid-msg.map");
@@ -299,18 +300,15 @@ function snort_apply_customizations($snortcfg, $if_real) {
 			$disabled_sids = array_flip($enabled_sid_off_array);
 		}
 
-		$files = glob("{$snortdir}/snort_{$snortcfg}_{$if_real}/rules");
+		$files = glob("{$snortdir}/snort_{$snortcfg}_{$if_real}/rules/*");
 		foreach ($files as $file) {
 			$splitcontents = file($file);
 			$changed = false;
 			foreach ( $splitcontents as $counter => $value ) {
-				$disabled = "False";
-				$findme = "# alert"; //find string for disabled alerts
-				$counter2 = 1;
 				$sid = snort_get_rule_part($value, 'sid:', ';', 0);
 				if (!is_numeric($sid))
 					continue;
-				if (isset($enabled_sids[$sid])) {
+				if (isset($enabled_sids["enablesid {$sid}"])) {
 					if (substr($value, 0, 5) == "alert")
 						/* Rule is already enabled */
 						continue;
@@ -326,7 +324,7 @@ function snort_apply_customizations($snortcfg, $if_real) {
 						$splitcontents[$counter - 1] = substr($value, 2);
 						$changed = true;
 					}
-				} else if (isset($disabled_sids[$sid])) {
+				} else if (isset($disabled_sids["disablesid {$sid}"])) {
 					if (substr($value, 0, 7) == "# alert")
 						/* Rule is already disabled */
 						continue;
@@ -344,9 +342,9 @@ function snort_apply_customizations($snortcfg, $if_real) {
 					}
 
 				}
-				if ($changed == true)
-					@file_put_contents($file, implode("\n", $splitcontents));
 			}
+			if ($changed == true)
+				@file_put_contents($file, implode("\n", $splitcontents));
 		}
 	}
 }
