@@ -253,17 +253,14 @@ if ($pconfig['arefresh'] == 'on')
 	<td colspan="2">
 	<table id="myTable" width="100%" border="1" cellpadding="0" cellspacing="0">
 	<thead>
-		<th class='listhdrr' width='5%' axis="number">#</th>
+		<th class='listhdr' width='10%' axis="date">Date</th>
 		<th class='listhdrr' width='5%' axis="number">PRI</th>
 		<th class='listhdrr' width='3%' axis="string">PROTO</th>
-		<th class='listhdrr' width='20%' axis="string">DESCRIPTION</th>
 		<th class='listhdrr' width='7%' axis="string">CLASS</th>
 		<th class='listhdrr' width='15%' axis="string">SRC</th>
-		<th class='listhdrr' width='5%' axis="string">SPORT</th>
 		<th class='listhdrr' width='15%' axis="string">DST</th>
-		<th class='listhdrr' width='5%' axis="string">DPORT</th>
 		<th class='listhdrr' width='5%' axis="string">SID</th>
-		<th class='listhdr' width='10%' axis="date">Date</th>
+		<th class='listhdrr' width='20%' axis="string">DESCRIPTION</th>
 	</thead>
 	<tbody>
 	<?php
@@ -283,7 +280,7 @@ if (file_exists("/var/log/snort/snort_{$if_real}{$snort_uuid}/alert")) {
 			$fields = explode(",", $fileline);
 
 			/* Date */
-			$alert_date = $fields[0];
+			$alert_date = substr($fields[0], 0, -8);
 			/* Description */
 			$alert_descr = $fields[4];
 			/* Priority */
@@ -303,15 +300,12 @@ if (file_exists("/var/log/snort/snort_{$if_real}{$snort_uuid}/alert")) {
 			$alert_class = $fields[10];
 
 			echo "<tr id=\"{$counter}\">
-				<td class='listr' width='5%' >{$counter}</td>
+				<td class='listr' width='10%'>{$alert_date}</td>
 				<td class='listr' width='5%' >{$alert_priority}</td>
 				<td class='listr' width='3%'>{$alert_proto}</td>
-				<td class='listr' width='20%'>{$alert_descr}</td>
 				<td class='listr' width='7%' >{$alert_class}</td>
-				<td class='listr' width='15%'>{$alert_ip_src}</td>
-				<td class='listr' width='5%' >{$alert_src_p}</td>
-				<td class='listr' width='15%'>{$alert_ip_dst}</td>
-				<td class='listr' width='5%' >{$alert_dst_p}</td>
+				<td class='listr' width='15%'>{$alert_ip_src}:{$alert_src_p}</td>
+				<td class='listr' width='15%'>{$alert_ip_dst}:{$alert_dst_p}</td>
 				<td class='listr' width='5%' >
 					{$alert_sid_str}
 					<a href='?instance={$instanceid}&act=addsuppress&sidid={$fields[2]}&gen_id={$fields[1]}'>
@@ -319,7 +313,7 @@ if (file_exists("/var/log/snort/snort_{$if_real}{$snort_uuid}/alert")) {
 						width='10' height='10' border='0'
 						title='click to add to suppress list'></a>	
 				</td>
-				<td class='listr' width='10%'>{$alert_date}</td>
+				<td class='listr' width='20%'>{$alert_descr}</td>
 				</tr>\n";
 
 			$counter++;

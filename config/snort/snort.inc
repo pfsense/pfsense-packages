@@ -1287,6 +1287,9 @@ EOD;
 			$file = basename($file);
 			$snort_misc_include_rules .= "include \$PREPROC_RULE_PATH/{$file}\n";
 		}
+	} else {
+		$snort_misc_include_rules .= "config autogenerate_preprocessor_decoder_rules\n";
+		log_error("Seems preprocessor/decoder rules are missing, enabling autogeneration of them");
 	}
 
 	/* generate rule sections to load */
