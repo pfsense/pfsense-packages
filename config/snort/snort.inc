@@ -138,8 +138,13 @@ function snort_build_list($listname = "") {
 		if (function_exists('get_interface_ip')) {
 			$subnet = get_interface_ip($int);
 			if (is_ipaddr($subnet)) {
-				$sn = get_interface_subnet($int);
-				$home_net .= "{$subnet}/{$sn} ";
+				$home_net .= "{$subnet} ";
+			}
+			if ($wangw == 'yes') {
+				/* Add Gateway on WAN interface to whitelist (For RRD graphs) */
+				$gw = get_interface_gateway($int);
+				if (is_ipaddr($gw))
+					$home_net .= "{$gw} ";
 			}
 		} else {
 			$ifcfg = $config['interfaces'][$int];
@@ -162,20 +167,11 @@ function snort_build_list($listname = "") {
 				break;
 			default:
 				if (is_ipaddr($ifcfg['ipaddr'])) {
-					$subnet = gen_subnet($ifcfg['ipaddr'], $ifcfg['subnet']);
-					if ($ifcfg['subnet'])
-						$home_net .= "{$subnet}/{$ifcfg['subnet']} ";
+					$home_net .= "{$ifcfg['ipaddr']} ";
 				}
 				break;
 			}
 		}
-	}
-
-	if ($wangw == 'yes') {
-		/* Add Gateway on WAN interface to whitelist (For RRD graphs) */
-		$gw = get_interface_gateway('wan');
-		if (is_ipaddr($gw))
-			$home_net .= "{$gw} ";
 	}
 
 	if ($wandns == 'yes') {
