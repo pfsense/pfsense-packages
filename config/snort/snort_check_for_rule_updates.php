@@ -176,41 +176,46 @@ if ($snortdownload == 'on') {
 
 		update_status(gettext("Extracting Snort.org rules..."));
 		/* extract snort.org rules and  add prefix to all snort.org files*/
-		safe_mkdir("{$snortdir}/snortrules");
-		exec("/usr/bin/tar xzf {$tmpfname}/{$snort_filename} -C {$snortdir}/snortrules rules/");
-		$files = glob("{$snortdir}/snortrules/*.rules");
+		safe_mkdir("{$snortdir}/tmp/snortrules");
+		exec("/usr/bin/tar xzf {$tmpfname}/{$snort_filename} -C {$snortdir}/tmp/snortrules rules/");
+		$files = glob("{$snortdir}/tmp/snortrules/rules/*.rules");
 		foreach ($files as $file) {
 			$newfile = basename($file);
-			@rename($file, "{$snortdir}/snortrules/snort_{$newfile}");
+			@copy($file, "{$snortdir}/rules/snort_{$newfile}");
 		}
-		exec("cp {$snortdir}/snortrules/* {$snortdir}/rules; rm -r {$snortdir}/snortrules");
+		@unlink("{$snortdir}/snortrules");
 
 		/* extract so rules */
 		exec('/bin/mkdir -p /usr/local/lib/snort/dynamicrules/');
 		$snort_arch = php_uname("m");
+		$nosorules = false;
 		if ($snort_arch  == 'i386'){
-			exec("/usr/bin/tar xzf {$tmpfname}/{$snort_filename} -C {$snortdir} so_rules/precompiled/$freebsd_version_so/i386/{$snort_version}/");
-			exec("/bin/mv -f {$snortdir}/so_rules/precompiled/$freebsd_version_so/i386/{$snort_version}/* /usr/local/lib/snort/dynamicrules/");
+			exec("/usr/bin/tar xzf {$tmpfname}/{$snort_filename} -C {$snortdir}/tmp so_rules/precompiled/$freebsd_version_so/i386/{$snort_version}/");
+			exec("/bin/cp {$snortdir}/tmp/so_rules/precompiled/$freebsd_version_so/i386/{$snort_version}/* /usr/local/lib/snort/dynamicrules/");
 		} else if ($snort_arch == 'amd64') {
-			exec("/usr/bin/tar xzf {$tmpfname}/{$snort_filename} -C {$snortdir} so_rules/precompiled/$freebsd_version_so/x86-64/{$snort_version}/");
-			exec("/bin/mv -f {$snortdir}/so_rules/precompiled/$freebsd_version_so/x86-64/{$snort_version}/* /usr/local/lib/snort/dynamicrules/");
+			exec("/usr/bin/tar xzf {$tmpfname}/{$snort_filename} -C {$snortdir}/tmp so_rules/precompiled/$freebsd_version_so/x86-64/{$snort_version}/");
+			exec("/bin/cp {$snortdir}/tmp/so_rules/precompiled/$freebsd_version_so/x86-64/{$snort_version}/* /usr/local/lib/snort/dynamicrules/");
 		} else
-			$snortdownload = 'off';
+			$nosorules = true;
+		unlink("{$snortdir}/tmp/so_rules/precompiled/$freebsd_version_so/x86-64/{$snort_version}");
 
-		if ($snortdownload == 'on') {
+		if ($nosorules == false) {
 			/* extract so rules none bin and rename */
-			exec("/usr/bin/tar xzf {$tmpfname}/{$snort_filename} -C {$snortdir} so_rules/");
-			$files = glob("{$snortdir}/so_rules/*.rules");
+			exec("/usr/bin/tar xzf {$tmpfname}/{$snort_filename} -C {$snortdir}/tmp so_rules/");
+			$files = glob("{$snortdir}/tmp/so_rules/*.rules");
 			foreach ($files as $file) {
 				$newfile = basename($file);
-				@rename($file, "{$snortdir}/so_rules/snort_{$newfile}");
+				@copy($file, "{$snortdir}/rules/snort_{$newfile}");
 			}
-			exec("cp {$snortdir}/so_rules/* {$snortdir}/rules; rm -r {$snortdir}/so_rules");
+			@unlink("{$snortdir}/tmp/so_rules");
 
 			/* extract base etc files */
-			exec("/usr/bin/tar xzf {$tmpfname}/{$snort_filename} -C {$snortdir} etc/");
-			exec("/bin/mv -f {$snortdir}/etc/* {$snortdir}");
-			exec("/bin/rm -r {$snortdir}/etc");
+			exec("/usr/bin/tar xzf {$tmpfname}/{$snort_filename} -C {$snortdir}/tmp etc/");
+			foreach (array("classification.config", "reference.config", "sid-msg.map", "unicode.map") as $file) {
+				if (file_exists("{$snortdir}/tmp/etc/{$file}"))
+					@copy("{$snortdir}/tmp/etc/{$file}", "{$snortdir}/{$file}");
+			}
+			@unlink("{$snortdir}/tmp/etc");
 
 			/* Untar snort signatures */
 			$signature_info_chk = $config['installedpackages']['snortglobal']['signatureinfo'];
@@ -219,32 +224,24 @@ if ($snortdownload == 'on') {
 				exec("/usr/bin/tar xzf {$tmpfname}/{$snort_filename} -C {$snortdir} doc/signatures/");
 				update_status(gettext("Done extracting Signatures."));
 
-				if (file_exists("{$snortdir}/doc/signatures")) {
+				if (is_dir("{$snortdir}/doc/signatures")) {
 					update_status(gettext("Copying signatures..."));
-					exec("/bin/mv -f {$snortdir}/doc/signatures {$snortdir}/signatures");
+					exec("/bin/cp -r {$snortdir}/doc/signatures {$snortdir}/signatures");
 					update_status(gettext("Done copying signatures."));
-				} else {
-					update_status(gettext("Directory signatures exist..."));
-					update_output_window(gettext("Error copying signature..."));
-					$snortdownload = 'off';
 				}
 			}
 
-			if (file_exists("/usr/local/lib/snort/dynamicrules/lib_sfdynamic_example_rule.so")) {
-				exec("/bin/rm /usr/local/lib/snort/dynamicrules/lib_sfdynamic_example_rule.so");
-				exec("/bin/rm /usr/local/lib/snort/dynamicrules/lib_sfdynamic_example\*");
-			}
+			foreach (glob("/usr/local/lib/snort/dynamicrules/*example*") as $file)
+				@unlink($file);
+
+			exec("/usr/bin/tar xzf {$tmpfname}/{$snort_filename} -C {$snortdir} preproc_rules/");
 
 			/* make shure default rules are in the right format */
 			exec("/usr/bin/sed -I '' -f {$snortdir}/tmp/sedcmd {$snortdir}/rules/*.rules");
 
-			/* create a msg-map for snort  */
-			update_status(gettext("Updating Alert Messages..."));
-			exec("/usr/local/bin/perl /usr/local/bin/create-sidmap.pl {$snortdir}/rules > {$snortdir}/sid-msg.map");
-
 			if (file_exists("{$tmpfname}/{$snort_filename_md5}")) {
 				update_status(gettext("Copying md5 sig to snort directory..."));
-				exec("/bin/cp {$tmpfname}/$snort_filename_md5 {$snortdir}/$snort_filename_md5");
+				@copy("{$tmpfname}/$snort_filename_md5", "{$snortdir}/$snort_filename_md5");
 			}
 		}
 	}
@@ -258,12 +255,19 @@ if ($emergingthreats == 'on') {
 	}
 
 	/* make shure default rules are in the right format */
-	exec("/usr/bin/sed -I '' -f {$snortdir}/tmp/sedcmd {$snortdir}/rules/*.rules");
+	exec("/usr/bin/sed -I '' -f {$snortdir}/tmp/sedcmd {$snortdir}/rules/emerging*.rules");
 
 	/*  Copy emergingthreats md5 sig to snort dir */
 	if (file_exists("{$tmpfname}/$emergingthreats_filename_md5")) {
 		update_status(gettext("Copying md5 sig to snort directory..."));
-		exec("/bin/cp {$tmpfname}/$emergingthreats_filename_md5 {$snortdir}/$emergingthreats_filename_md5");
+		@copy("{$tmpfname}/$emergingthreats_filename_md5", "{$snortdir}/$emergingthreats_filename_md5");
+	}
+
+	if ($snortdownload == 'off') {
+		foreach (array("classification.config", "reference.config", "sid-msg.map", "unicode.map") as $file) {
+			if (file_exists("{$snortdir}/rules/{$file}"))
+				@copy("{$snortdir}/rules/{$file}", "{$snortdir}/{$file}");
+		}
 	}
 }
 
