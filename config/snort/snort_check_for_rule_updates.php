@@ -159,9 +159,9 @@ if ($emergingthreats == "on") {
 $sedcmd = "s/^#alert/# alert/g\n";
 $sedcmd .= "s/^##alert/# alert/g\n";
 $sedcmd .= "s/^#  alert/# alert/g\n";
-$sedcmd .= "s/^#\talert/# alert/g\n";
-$sedcmd .= "s/^##\talert/# alert/g\n";
-$sedcmd .= "s/^\talert/alert/g\n";
+$sedcmd .= "s/^#\\talert/# alert/g\n";
+$sedcmd .= "s/^##i\talert/# alert/g\n";
+$sedcmd .= "s/^\\talert/alert/g\n";
 $sedcmd .= "s/^ alert/alert/g\n";
 $sedcmd .= "s/^  alert/alert/g\n";
 @file_put_contents("{$snortdir}/tmp/sedcmd", $sedcmd);
