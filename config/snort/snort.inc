@@ -1357,6 +1357,8 @@ preprocessor stream5_tcp: policy BSD, ports both all{$def_max_queued_bytes_type}
 preprocessor stream5_udp:
 preprocessor stream5_icmp:
 
+preprocessor sensitive_data:
+
 {$snort_preprocessors}
 
 # Ignore SSL and Encryption  #
