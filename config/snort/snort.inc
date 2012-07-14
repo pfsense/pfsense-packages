@@ -1043,8 +1043,8 @@ function snort_generate_conf($snortcfg) {
 	$suppress = snort_find_list($snortcfg['suppresslistname'], 'suppress');
 	if (!empty($suppress)) {
 		$suppress_data = str_replace("\r", "", base64_decode($suppress['suppresspassthru']));
-		@file_put_contents("{$snortcfgdir}/{$snortcfg['suppresslistname']}", $suppress_data);
-		$suppress_file_name = "include {$snortcfgdir}/{$snortcfg['suppresslistname']}";
+		@file_put_contents("{$snortcfgdir}/supp{$snortcfg['suppresslistname']}", $suppress_data);
+		$suppress_file_name = "include {$snortcfgdir}/supp{$snortcfg['suppresslistname']}";
 	}
 
 	/* set the snort performance model */
