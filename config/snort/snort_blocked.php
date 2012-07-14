@@ -38,7 +38,6 @@ if (!is_array($config['installedpackages']['snortglobal']['alertsblocks']))
 
 $pconfig['brefresh'] = $config['installedpackages']['snortglobal']['alertsblocks']['brefresh'];
 $pconfig['blertnumber'] = $config['installedpackages']['snortglobal']['alertsblocks']['blertnumber'];
-$pconfig['snortalertlogtype'] = $config['installedpackages']['snortglobal']['alertsblocks']['blertnumber'];
 
 if (empty($pconfig['blertnumber']))
 	$bnentries = '500';
@@ -113,62 +112,6 @@ if ($_POST['save'])
 		exit;
 	}
 
-}
-
-/* build filter funcs */
-function get_snort_alert_ip_src($fileline)
-{
-	/* SRC IP */
-	$re1='.*?';   # Non-greedy match on filler
-	$re2='((?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?))(?![\\d])'; # IPv4 IP Address 1
-
-	if ($c=preg_match_all ("/".$re1.$re2."/is", $fileline, $matches4))
-		return $matches4[1][0];
-
-	return "";
-}
-
-function get_snort_alert_disc($fileline)
-{
-	/* disc */
-	if (preg_match("/\[\*\*\] (\[.*\]) (.*) (\[\*\*\])/", $fileline, $matches))
-		return "{$matches[2]}";
-
-	return "";
-}
-
-/* tell the user what settings they have */
-$blockedtab_msg_chk = $config['installedpackages']['snortglobal']['rm_blocked'];
-if ($blockedtab_msg_chk == "1h_b") {
-	$blocked_msg = "hour";
-}
-if ($blockedtab_msg_chk == "3h_b") {
-	$blocked_msg = "3 hours";
-}
-if ($blockedtab_msg_chk == "6h_b") {
-	$blocked_msg = "6 hours";
-}
-if ($blockedtab_msg_chk == "12h_b") {
-	$blocked_msg = "12 hours";
-}
-if ($blockedtab_msg_chk == "1d_b") {
-	$blocked_msg = "day";
-}
-if ($blockedtab_msg_chk == "4d_b") {
-	$blocked_msg = "4 days";
-}
-if ($blockedtab_msg_chk == "7d_b") {
-	$blocked_msg = "7 days";
-}
-if ($blockedtab_msg_chk == "28d_b") {
-	$blocked_msg = "28 days";
-}
-
-if ($blockedtab_msg_chk != "never_b")
-{
-	$blocked_msg_txt = "Hosts are removed every <strong>$blocked_msg</strong>.";
-}else{
-	$blocked_msg_txt = "Settings are set to never <strong>remove</strong> hosts.";
 }
 
 $pgtitle = "Services: Snort Blocked Hosts";
@@ -272,26 +215,29 @@ if ($pconfig['brefresh'] == 'on')
 					$blocked_ips_array[] = trim($blocked_ip, " \n\t");
 				}
 			}
-			$input = array();
-			$alert_ip_src_array = array();
-			foreach (glob("/var/log/snort/*/alert") as $alert) {
-				if ($pconfig['snortalertlogtype'] == 'full')
-					$alerts_array = array_reverse(explode("\n\n", file_get_contents($alert)));
-				else
-					$alerts_array = array_reverse(file($alert));
-				/* build the list and compare blocks to alerts */
-				foreach($alerts_array as $counter => $fileline) {
-					if (empty($fileline))
-						continue;
-
-					$alert_ip_src =  get_snort_alert_ip_src($fileline);
-					$alert_ip_disc = get_snort_alert_disc($fileline);
-					$alert_ip_src_array[] = $alert_ip_src;
-					if (!empty($blocked_ips_array) && in_array("$alert_ip_src", $blocked_ips_array)) {
-						if (!isset($input[$alert_ip_src]))
-							$input[$alert_ip_src] = "{$alert_ip_disc}\n";
+			$src_ip_list = array();
+			/* make sure alert file exists */
+			if (file_exists("/var/log/snort/snort_{$if_real}{$snort_uuid}/alert")) {
+				$fd = fopen("/var/log/snort/snort_{$if_real}{$snort_uuid}/alert", "r");
+				if ($fd) {
+					/*                 0         1           2      3      4    5    6    7      8     9    10    11             12
+					/* File format timestamp,sig_generator,sig_id,sig_rev,msg,proto,src,srcport,dst,dstport,id,classification,priority */
+					while(($fileline = @fgets($fd))) {
+						if (empty($fileline))
+							continue;
+						$fields = explode(",", $fileline);
+					
+						$src_ip_list[$fields[6]] = "{$fields[4]} - {$fields[0]}";;
+						$src_ip_list[$fields[8]] = "{$fields[4]} - {$fields[0]}";;
 					}
+					fclose($fd);
 				}
+			}
+
+			$input = array();
+			foreach ($blocked_ips_array as $blocked_ip) {
+				if (isset($src_ip_list[$blocked_ip]))
+					$input[$blocked_ip] = $src_ip_list[$blocked_ip];
 			}
 
 			foreach($blocked_ips_array as $blocked_ip) {

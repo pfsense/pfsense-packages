@@ -1283,10 +1283,10 @@ EOD;
 		foreach($enabled_rulesets_array as $enabled_item) {
 			if (substr($enabled_item, 0, 5) == "snort" && substr($enabled_item, -9) == ".so.rules") {
 				$slib = substr($enabled_item, 6, -6);
-				if (file_exists("{$snort_dirs['dynamicrules']}/{$slib}"))
-					$dynamic_rules_sections	.= "dynamicdetection file {$snort_dirs['dynamicrules']}/{$slib}\n";
-			}
-			if (file_exists("{$snortcfgdir}/rules/{$enabled_item}"))
+				if (file_exists("{$snort_dirs['dynamicrules']}/{$slib}") && 
+				    file_exists("{$snortcfgdir}/rules/{$enabled_item}"))
+					$selected_rules_sections  .= "include \$RULE_PATH/{$enabled_item}\n";
+			} else if (file_exists("{$snortcfgdir}/rules/{$enabled_item}"))
 				$selected_rules_sections  .= "include \$RULE_PATH/{$enabled_item}\n";
 		}
 	}
@@ -1332,7 +1332,7 @@ config event_queue: max_queue 8 log 3 order_events content_length
 #Configure dynamic loaded libraries
 dynamicpreprocessor directory {$snort_dirs['dynamicpreprocessor']}
 dynamicengine directory {$snort_dirs['dynamicengine']}
-{$dynamic_rules_sections}
+dynamicdetection directory {$snort_dirs['dynamicrules']}
 
 # Flow and stream #
 preprocessor frag3_global: max_frags 8192

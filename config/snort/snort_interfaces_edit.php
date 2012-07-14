@@ -106,8 +106,10 @@ if ($_POST["Submit"]) {
 
 		$if_real = snort_get_real_interface($natent['interface']);
 		if (isset($id) && $a_rule[$id]) {
-			if ($natent['interface'] != $a_rule[$id]['interface'])
-				snort_stop($a_rule[$id], $if_real);
+			if ($natent['interface'] != $a_rule[$id]['interface']) {
+				$oif_real = snort_get_real_interface($a_rule[$id]['interface']);
+				snort_stop($a_rule[$id], $oif_real);
+			}
 			$a_rule[$id] = $natent;
 		} else
 			$a_rule[] = $natent;

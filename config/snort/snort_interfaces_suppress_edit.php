@@ -105,7 +105,7 @@ if ($_POST['submit']) {
 	if (!$input_errors) {
 		$s_list = array();
 		$s_list['name'] = $_POST['name'];
-		$s_list['uuid'] = $suppress_uuid;
+		$s_list['uuid'] = uniqid();
 		$s_list['descr']  =  mb_convert_encoding($_POST['descr'],"HTML-ENTITIES","auto");
 		if ($_POST['suppresspassthru'])
 			$s_list['suppresspassthru'] = base64_encode($_POST['suppresspassthru']);
@@ -123,7 +123,7 @@ if ($_POST['submit']) {
 	}
 }
 
-$pgtitle = "Services: Snort: Suppression: Edit $suppress_uuid";
+$pgtitle = "Services: Snort: Suppression: Edit";
 include_once("head.inc");
 
 ?>
