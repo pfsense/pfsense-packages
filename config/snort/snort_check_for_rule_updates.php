@@ -197,7 +197,7 @@ if ($snortdownload == 'on') {
 			exec("/bin/cp {$snortdir}/tmp/so_rules/precompiled/$freebsd_version_so/x86-64/{$snort_version}/* /usr/local/lib/snort/dynamicrules/");
 		} else
 			$nosorules = true;
-		unlink("{$snortdir}/tmp/so_rules/precompiled/$freebsd_version_so/x86-64/{$snort_version}");
+		unlink("{$snortdir}/tmp/so_rules");
 
 		if ($nosorules == false) {
 			/* extract so rules none bin and rename */
