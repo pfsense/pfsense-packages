@@ -1349,7 +1349,6 @@ preprocessor stream5_icmp:
 preprocessor ssl: ports { {$def_ssl_ports_ignore} }, trustservers, noinspect_encrypted
 
 # Snort Output Logs #
-{$snortalertlogtype_type}
 output alert_csv: alert timestamp,sig_generator,sig_id,sig_rev,msg,proto,src,srcport,dst,dstport,id
 {$alertsystemlog_type}
 {$snortunifiedlog_type}
