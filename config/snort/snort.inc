@@ -835,7 +835,7 @@ function snort_create_rules_iface($if_real, $snort_uuid) {
                         exec("/bin/mkdir -p {$if_rule_dir}/rules");
 		exec("/bin/cp {$snortdir}/rules/* {$if_rule_dir}/rules");
 		if (file_exists("{$snortdir}/custom_rules/local_{$snort_uuid}_{$if_real}.rules"))
-			exec("/bin/cp {$snortdir}/custom_rules/local_{$snort_uuid}_{$if_real}.rules {$if_rule_dir}/local_{$snort_uuid}_{$if_real}.rules");
+			@copy("{$snortdir}/custom_rules/local_{$snort_uuid}_{$if_real}.rules", "{$if_rule_dir}/local_{$snort_uuid}_{$if_real}.rules");
 	}
 }
 
@@ -915,9 +915,6 @@ function snort_deinstall() {
 	global $config, $g;
 
 	$snortdir = SNORTDIR;
-
-	/* remove custom sysctl */
-	remove_text_from_file("/etc/sysctl.conf", "sysctl net.bpf.bufsize=20480");
 
 	/* decrease bpf buffers back to 4096, from 20480 */
 	exec('/sbin/sysctl net.bpf.bufsize=4096');
