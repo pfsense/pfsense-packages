@@ -178,8 +178,11 @@ if ($snortdownload == 'on') {
 		/* extract snort.org rules and  add prefix to all snort.org files*/
 		safe_mkdir("{$snortdir}/snortrules");
 		exec("/usr/bin/tar xzf {$tmpfname}/{$snort_filename} -C {$snortdir}/snortrules rules/");
-		chdir("{$snortdir}/snortrules");
-		exec('/usr/local/bin/perl /usr/local/bin/snort_rename.pl s/^/snort_/ *.rules');
+		$files = glob("{$snortdir}/snortrules/*.rules");
+		foreach ($files as $file) {
+			$newfile = basename($file);
+			@rename($file, "{$snortdir}/snortrules/snort_{$newfile}");
+		}
 		exec("cp {$snortdir}/snortrules/* {$snortdir}/rules; rm -r {$snortdir}/snortrules");
 
 		/* extract so rules */
@@ -197,8 +200,11 @@ if ($snortdownload == 'on') {
 		if ($snortdownload == 'on') {
 			/* extract so rules none bin and rename */
 			exec("/usr/bin/tar xzf {$tmpfname}/{$snort_filename} -C {$snortdir} so_rules/");
-			chdir ("{$snortdir}/so_rules");
-			exec('/usr/local/bin/perl /usr/local/bin/snort_rename.pl s/^/snort_/ *.rules');
+			$files = glob("{$snortdir}/so_rules/*.rules");
+			foreach ($files as $file) {
+				$newfile = basename($file);
+				@rename($file, "{$snortdir}/so_rules/snort_{$newfile}");
+			}
 			exec("cp {$snortdir}/so_rules/* {$snortdir}/rules; rm -r {$snortdir}/so_rules");
 
 			/* extract base etc files */
@@ -300,7 +306,7 @@ function snort_apply_customizations($snortcfg, $if_real) {
 			$disabled_sids = array_flip($enabled_sid_off_array);
 		}
 
-		$files = glob("{$snortdir}/snort_{$snortcfg}_{$if_real}/rules/*");
+		$files = glob("{$snortdir}/snort_{$snortcfg}_{$if_real}/rules/*.rules");
 		foreach ($files as $file) {
 			$splitcontents = file($file);
 			$changed = false;
