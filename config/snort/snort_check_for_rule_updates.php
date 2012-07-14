@@ -211,7 +211,7 @@ if ($snortdownload == 'on') {
 
 			/* extract base etc files */
 			exec("/usr/bin/tar xzf {$tmpfname}/{$snort_filename} -C {$snortdir}/tmp etc/");
-			foreach (array("classification.config", "reference.config", "sid-msg.map", "unicode.map") as $file) {
+			foreach (array("classification.config", "reference.config", "gen-msg.map", "sid-msg.map", "unicode.map") as $file) {
 				if (file_exists("{$snortdir}/tmp/etc/{$file}"))
 					@copy("{$snortdir}/tmp/etc/{$file}", "{$snortdir}/{$file}");
 			}
