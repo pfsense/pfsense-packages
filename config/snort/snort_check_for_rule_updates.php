@@ -183,7 +183,7 @@ if ($snortdownload == 'on') {
 			$newfile = basename($file);
 			@copy($file, "{$snortdir}/rules/snort_{$newfile}");
 		}
-		@unlink("{$snortdir}/snortrules");
+		exec("rm -r {$snortdir}/snortrules");
 
 		/* extract so rules */
 		exec('/bin/mkdir -p /usr/local/lib/snort/dynamicrules/');
@@ -197,7 +197,7 @@ if ($snortdownload == 'on') {
 			exec("/bin/cp {$snortdir}/tmp/so_rules/precompiled/$freebsd_version_so/x86-64/{$snort_version}/* /usr/local/lib/snort/dynamicrules/");
 		} else
 			$nosorules = true;
-		@unlink("{$snortdir}/tmp/so_rules");
+		exec("rm -r {$snortdir}/tmp/so_rules");
 
 		if ($nosorules == false) {
 			/* extract so rules none bin and rename */
@@ -207,7 +207,7 @@ if ($snortdownload == 'on') {
 				$newfile = basename($file, ".rules");
 				@copy($file, "{$snortdir}/rules/snort_{$newfile}.so.rules");
 			}
-			@unlink("{$snortdir}/tmp/so_rules");
+			exec("rm -r {$snortdir}/tmp/so_rules");
 
 			/* extract base etc files */
 			exec("/usr/bin/tar xzf {$tmpfname}/{$snort_filename} -C {$snortdir}/tmp etc/");
@@ -215,7 +215,7 @@ if ($snortdownload == 'on') {
 				if (file_exists("{$snortdir}/tmp/etc/{$file}"))
 					@copy("{$snortdir}/tmp/etc/{$file}", "{$snortdir}/{$file}");
 			}
-			@unlink("{$snortdir}/tmp/etc");
+			exec("rm -r {$snortdir}/tmp/etc");
 
 			/* Untar snort signatures */
 			$signature_info_chk = $config['installedpackages']['snortglobal']['signatureinfo'];
