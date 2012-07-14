@@ -51,15 +51,15 @@ if (is_null($id)) {
 
 function snort_copy_rules($files, $snortdir, $snort_uuid, $if_real) {
 
-	if (empty($files))
-		return;
+        if (empty($files))
+                return;
 
-	conf_mount_rw();
-	foreach ($files as $file) {
-		if (!file_exists("{$snortdir}/snort_{$snort_uuid}_{$if_real}/rules/{$file}"))
-			@copy("{$snortdir}/rules/{$file}", "{$snortdir}/snort_{$snort_uuid}_{$if_real}/rules/{$file}");
-	}
-	conf_mount_ro();
+        conf_mount_rw();
+        foreach ($files as $file) {
+                if (!file_exists("{$snortdir}/snort_{$snort_uuid}_{$if_real}/rules/{$file}"))
+                        @copy("{$snortdir}/rules/{$file}", "{$snortdir}/snort_{$snort_uuid}_{$if_real}/rules/{$file}");
+        }
+        conf_mount_ro();
 }
 
 if (isset($id) && $a_nat[$id]) {

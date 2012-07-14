@@ -173,10 +173,11 @@ if ($snortdownload == 'on') {
 
 		update_status(gettext("Extracting Snort.org rules..."));
 		/* extract snort.org rules and  add prefix to all snort.org files*/
-		exec("/bin/rm -r {$snortdir}/rules/*");
-		exec("/usr/bin/tar xzf {$tmpfname}/{$snort_filename} -C {$snortdir} rules/");
-		chdir ("{$snortdir}/rules");
+		safe_mkdir("{$snortdir}/snortrules");
+		exec("/usr/bin/tar xzf {$tmpfname}/{$snort_filename} -C {$snortdir}/snortrules rules/");
+		chdir("{$snortdir}/snortrules");
 		exec('/usr/local/bin/perl /usr/local/bin/snort_rename.pl s/^/snort_/ *.rules');
+		exec("cp {$snortdir}/snortrules/* {$snortdir}/rules; rm -r {$snortdir}/snortrules");
 
 		/* extract so rules */
 		exec('/bin/mkdir -p /usr/local/lib/snort/dynamicrules/');
@@ -192,44 +193,10 @@ if ($snortdownload == 'on') {
 
 		if ($snortdownload == 'on') {
 			/* extract so rules none bin and rename */
-			exec("/usr/bin/tar xzf {$tmpfname}/{$snort_filename} -C {$snortdir} so_rules/bad-traffic.rules" .
-			" so_rules/chat.rules" .
-			" so_rules/dos.rules" .
-			" so_rules/exploit.rules" .
-			" so_rules/icmp.rules" .
-			" so_rules/imap.rules" .
-			" so_rules/misc.rules" .
-			" so_rules/multimedia.rules" .
-			" so_rules/netbios.rules" .
-			" so_rules/nntp.rules" .
-			" so_rules/p2p.rules" .
-			" so_rules/smtp.rules" .
-			" so_rules/snmp.rules" .
-			" so_rules/specific-threats.rules" .
-			" so_rules/web-activex.rules" .
-			" so_rules/web-client.rules" .
-			" so_rules/web-iis.rules" .
-			" so_rules/web-misc.rules");
-
-			exec("/bin/mv -f {$snortdir}/so_rules/bad-traffic.rules {$snortdir}/rules/snort_bad-traffic.so.rules");
-			exec("/bin/mv -f {$snortdir}/so_rules/chat.rules {$snortdir}/rules/snort_chat.so.rules");
-			exec("/bin/mv -f {$snortdir}/so_rules/dos.rules {$snortdir}/rules/snort_dos.so.rules");
-			exec("/bin/mv -f {$snortdir}/so_rules/exploit.rules {$snortdir}/rules/snort_exploit.so.rules");
-			exec("/bin/mv -f {$snortdir}/so_rules/icmp.rules {$snortdir}/rules/snort_icmp.so.rules");
-			exec("/bin/mv -f {$snortdir}/so_rules/imap.rules {$snortdir}/rules/snort_imap.so.rules");
-			exec("/bin/mv -f {$snortdir}/so_rules/misc.rules {$snortdir}/rules/snort_misc.so.rules");
-			exec("/bin/mv -f {$snortdir}/so_rules/multimedia.rules {$snortdir}/rules/snort_multimedia.so.rules");
-			exec("/bin/mv -f {$snortdir}/so_rules/netbios.rules {$snortdir}/rules/snort_netbios.so.rules");
-			exec("/bin/mv -f {$snortdir}/so_rules/nntp.rules {$snortdir}/rules/snort_nntp.so.rules");
-			exec("/bin/mv -f {$snortdir}/so_rules/p2p.rules {$snortdir}/rules/snort_p2p.so.rules");
-			exec("/bin/mv -f {$snortdir}/so_rules/smtp.rules {$snortdir}/rules/snort_smtp.so.rules");
-			exec("/bin/mv -f {$snortdir}/so_rules/snmp.rules {$snortdir}/rules/snort_snmp.so.rules");
-			exec("/bin/mv -f {$snortdir}/so_rules/specific-threats.rules {$snortdir}/rules/snort_specific-threats.so.rules");
-			exec("/bin/mv -f {$snortdir}/so_rules/web-activex.rules {$snortdir}/rules/snort_web-activex.so.rules");
-			exec("/bin/mv -f {$snortdir}/so_rules/web-client.rules {$snortdir}/rules/snort_web-client.so.rules");
-			exec("/bin/mv -f {$snortdir}/so_rules/web-iis.rules {$snortdir}/rules/snort_web-iis.so.rules");
-			exec("/bin/mv -f {$snortdir}/so_rules/web-misc.rules {$snortdir}/rules/snort_web-misc.so.rules");
-			exec("/bin/rm -r {$snortdir}/so_rules");
+			exec("/usr/bin/tar xzf {$tmpfname}/{$snort_filename} -C {$snortdir} so_rules/");
+			chdir ("{$snortdir}/so_rules");
+			exec('/usr/local/bin/perl /usr/local/bin/snort_rename.pl s/^/snort_/ *.rules');
+			exec("cp {$snortdir}/so_rules/* {$snortdir}/rules; rm -r {$snortdir}/so_rules");
 
 			/* extract base etc files */
 			exec("/usr/bin/tar xzf {$tmpfname}/{$snort_filename} -C {$snortdir} etc/");
@@ -299,30 +266,25 @@ if (is_dir($tmpfname)) {
 
 //////////////////
 /* open oinkmaster_conf for writing" function */
-function oinkmaster_conf($if_real, $iface_uuid)
-{
+function oinkmaster_conf($snortcfg, $if_real) {
 	global $config, $g, $snortdir;
 
-	@unlink("{$snortdir}/snort_{$iface_uuid}_{$if_real}/oinkmaster_{$iface_uuid}_{$if_real}.conf");
-
-	$selected_sid_on_section = "";
+	$selected_sid_on_sections = "";
 	$selected_sid_off_sections = "";
 
-	if (!empty($config['installedpackages']['snortglobal']['rule'][$id]['rule_sid_on'])) {
-		$enabled_sid_on = trim($config['installedpackages']['snortglobal']['rule'][$id]['rule_sid_on']);
-		$enabled_sid_on_array = explode("||", $enabled_sid_on);
-		foreach($enabled_sid_on_array as $enabled_item_on)
-			$selected_sid_on_sections .= "$enabled_item_on\n";
-	}
+	if (!empty($snortcfg['rule_sid_on']) || !empty($snortcfg['rule_sid_off'])) {
+		if (!empty($snortcfg['rule_sid_on'])) {
+			$enabled_sid_on_array = explode("||", trim($snortcfg['rule_sid_on']));
+			foreach($enabled_sid_on_array as $enabled_item_on)
+				$selected_sid_on_sections .= "$enabled_item_on\n";
+		}
 
-	if (!empty($config['installedpackages']['snortglobal']['rule'][$id]['rule_sid_off'])) {
-		$enabled_sid_off = trim($config['installedpackages']['snortglobal']['rule'][$id]['rule_sid_off']);
-		$enabled_sid_off_array = explode("||", $enabled_sid_off);
-		foreach($enabled_sid_off_array as $enabled_item_off)
-			$selected_sid_off_sections .= "$enabled_item_off\n";
-	}
+		if (!empty($snortcfg['rule_sid_off'])) {
+			$enabled_sid_off_array = explode("||", trim($snortcfg['rule_sid_off']));
+			foreach($enabled_sid_off_array as $enabled_item_off)
+				$selected_sid_off_sections .= "$enabled_item_off\n";
+		}
 
-	if (!empty($selected_sid_off_sections) || !empty($selected_sid_on_section)) {
 		$snort_sid_text = <<<EOD
 
 ###########################################
@@ -344,42 +306,35 @@ url = dir://{$snortdir}/rules
 EOD;
 
 		/* open snort's oinkmaster.conf for writing */
-		@file_put_contents("{$snortdir}/snort_{$iface_uuid}_{$if_real}/oinkmaster_{$iface_uuid}_{$if_real}.conf", $snort_sid_text);
+		@file_put_contents("{$snortdir}/tmp/oinkmaster_{$snortcfg['uuid']}.conf", $snort_sid_text);
 	}
 }
 
-/*  Run oinkmaster to snort_wan and cp configs */
-/*  If oinkmaster is not needed cp rules normally */
-/*  TODO add per interface settings here */
-function oinkmaster_run($if_real, $iface_uuid)
-{
+function oinkmaster_run($snortcfg, $if_real) {
 	global $config, $g, $snortdir;
 
-	if (empty($config['installedpackages']['snortglobal']['rule'][$id]['rule_sid_on']) && empty($config['installedpackages']['snortglobal']['rule'][$id]['rule_sid_off'])) { 
-		update_status(gettext("Your set of rules are being copied..."));
-		exec("/bin/cp {$snortdir}/rules/* {$snortdir}/snort_{$iface_uuid}_{$if_real}/rules/");
-		exec("/bin/cp {$snortdir}/classification.config {$snortdir}/snort_{$iface_uuid}_{$if_real}");
-		exec("/bin/cp {$snortdir}/gen-msg.map {$snortdir}/snort_{$iface_uuid}_{$if_real}");
-		exec("/bin/cp -r {$snortdir}/generators {$snortdir}/snort_{$iface_uuid}_{$if_real}");
-		exec("/bin/cp {$snortdir}/reference.config {$snortdir}/snort_{$iface_uuid}_{$if_real}");
-		exec("/bin/cp {$snortdir}/sid {$snortdir}/snort_{$iface_uuid}_{$if_real}");
-		exec("/bin/cp {$snortdir}/sid-msg.map {$snortdir}/snort_{$iface_uuid}_{$if_real}");
-		exec("/bin/cp {$snortdir}/unicode.map {$snortdir}/snort_{$iface_uuid}_{$if_real}");
-	} else {
-		@unlink("{$snortdir}/oinkmaster_{$iface_uuid}_{$if_real}.log");
-		update_status(gettext("Your enable and disable changes are being applied to your fresh set of rules..."));
-		exec("/bin/cp {$snortdir}/rules/* {$snortdir}/snort_{$iface_uuid}_{$if_real}/rules/");
-		exec("/bin/cp {$snortdir}/classification.config {$snortdir}/snort_{$iface_uuid}_{$if_real}");
-		exec("/bin/cp {$snortdir}/gen-msg.map {$snortdir}/snort_{$iface_uuid}_{$if_real}");
-		exec("/bin/cp -r {$snortdir}/generators {$snortdir}/snort_{$iface_uuid}_{$if_real}");
-		exec("/bin/cp {$snortdir}/reference.config {$snortdir}/snort_{$iface_uuid}_{$if_real}");
-		exec("/bin/cp {$snortdir}/sid {$snortdir}/snort_{$iface_uuid}_{$if_real}");
-		exec("/bin/cp {$snortdir}/sid-msg.map {$snortdir}/snort_{$iface_uuid}_{$if_real}");
-		exec("/bin/cp {$snortdir}/unicode.map {$snortdir}/snort_{$iface_uuid}_{$if_real}");
-
-		/*  might have to add a sleep for 3sec for flash drives or old drives */
-		exec("/usr/local/bin/perl /usr/local/bin/oinkmaster.pl -C {$snortdir}/snort_{$iface_uuid}_{$if_real}/oinkmaster_{$iface_uuid}_{$if_real}.conf -o {$snortdir}/snort_{$iface_uuid}_{$if_real}/rules > {$snortdir}/oinkmaster_{$iface_uuid}_{$if_real}.log");
+	
+	if (empty($snortcfg['rulesets']))
+		return;
+	else {
+		update_status(gettext("Your set of configured rules are being copied..."));
+		log_error(gettext("Your set of configured rules are being copied..."));
+		$files = explode("||", $snortcfg['rulesets']);
+		foreach ($files as $file)
+			@copy("{$snortdir}/rules/{$file}", "{$snortdir}/snort_{$snortcfg['uuid']}_{$if_real}/rules/{$file}");
 	}
+	if (!empty($snortcfg['rule_sid_on']) || !empty($snortcfg['rule_sid_off'])) { 
+		@unlink("{$snortdir}/oinkmaster.log");
+		log_error(gettext("Your enable and disable changes are being applied to your fresh set of rules..."));
+		exec("/usr/local/bin/perl /usr/local/bin/oinkmaster.pl -C {$snortdir}/tmp/oinkmaster_{$snortcfg['uuid']}.conf -o {$snortdir}/snort_{$snortcfg['uuid']}_{$if_real}/rules >> {$snortdir}/oinkmaster.log");
+	}
+	@copy("{$snortdir}/classification.config", "{$snortdir}/snort_{$snortcfg['uuid']}_{$if_real}");
+	copy("{$snortdir}/gen-msg.map", "{$snortdir}/snort_{$snortcfg['uuid']}_{$if_real}");
+	exec("/bin/cp -r {$snortdir}/generators {$snortdir}/snort_{$snortcfg['uuid']}_{$if_real}");
+	@copy("{$snortdir}/reference.config", "{$snortdir}/snort_{$snortcfg['uuid']}_{$if_real}");
+	@copy("{$snortdir}/sid", "{$snortdir}/snort_{$snortcfg['uuid']}_{$if_real}");
+	@copy("{$snortdir}/sid-msg.map", "{$snortdir}/snort_{$snortcfg['uuid']}_{$if_real}");
+	@copy("{$snortdir}/unicode.map", "{$snortdir}/snort_{$snortcfg['uuid']}_{$if_real}");
 }
 //////////////
 
@@ -392,10 +347,10 @@ if ($snortdownload == 'on' || $emergingthreats == 'on') {
 			$if_real = snort_get_real_interface($value['interface']);
 
 			/* make oinkmaster.conf for each interface rule */
-			oinkmaster_conf($if_real, $value['uuid']);
+			oinkmaster_conf($value, $if_real);
 
 			/* run oinkmaster for each interface rule */
-			oinkmaster_run($if_real, $value['uuid']);
+			oinkmaster_run($value, $if_real);
 		}
 	}
 
