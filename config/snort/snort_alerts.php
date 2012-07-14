@@ -297,7 +297,7 @@ if (file_exists("/var/log/snort/snort_{$if_real}{$snort_uuid}/alert")) {
 			$alert_dst_p = $fields[9];
 			/* SID */
 			$alert_sid_str = "{$fields[1]}:{$fields[2]}:{$fields[3]}";
-			$alert_class = $fields[10];
+			$alert_class = $fields[11];
 
 			echo "<tr id=\"{$counter}\">
 				<td class='listr' width='10%'>{$alert_date}</td>
