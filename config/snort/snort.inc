@@ -97,7 +97,7 @@ function snort_find_list($find_name, $type = 'whitelist') {
 }
 
 /* func builds custom whitelests */
-function snort_build_list($listname = "") {
+function snort_build_list($snortcfg, $listname = "") {
 	global $config, $g;
 
 	/* Add loopback to whitelist (ftphelper) */
@@ -140,12 +140,6 @@ function snort_build_list($listname = "") {
 			if (is_ipaddr($subnet)) {
 				$home_net .= "{$subnet} ";
 			}
-			if ($wangw == 'yes') {
-				/* Add Gateway on WAN interface to whitelist (For RRD graphs) */
-				$gw = get_interface_gateway($int);
-				if (is_ipaddr($gw))
-					$home_net .= "{$gw} ";
-			}
 		} else {
 			$ifcfg = $config['interfaces'][$int];
 			switch ($ifcfg['ipaddr']) {
@@ -172,6 +166,12 @@ function snort_build_list($listname = "") {
 				break;
 			}
 		}
+	}
+
+	if ($wangw == 'yes') {
+		$gw = get_interface_gateway($snortcfg['interface']);
+		if (is_ipaddr($gw))
+			$home_net .= "{$gw} ";
 	}
 
 	if ($wandns == 'yes') {
@@ -979,12 +979,12 @@ function snort_generate_conf($snortcfg) {
 	$snortcfgdir = "{$snortdir}/snort_{$snort_uuid}_{$if_real}";
 
 	/* custom home nets */
-	$home_net_list = snort_build_list($snortcfg['homelistname']);
+	$home_net_list = snort_build_list($snortcfg, $snortcfg['homelistname']);
 	$home_net = implode(",", $home_net_list);
 
 	$external_net = '!$HOME_NET';
 	if (!empty($snortcfg['externallistname']) && $snortcfg['externallistname'] != 'default') {
-		$external_net_list = snort_build_list($snortcfg['externallistname']);
+		$external_net_list = snort_build_list($snortcfg, $snortcfg['externallistname']);
 		$external_net = implode(",", $external_net_list);
 	}
 
@@ -1028,7 +1028,7 @@ function snort_generate_conf($snortcfg) {
 		$pfkill = "";
 		if ($snortcfg['blockoffenderskill'] == "on")
 			$pfkill = "kill";
-		$spoink_wlist = snort_build_list($snortcfg['whitelistname']);
+		$spoink_wlist = snort_build_list($snortcfg, $snortcfg['whitelistname']);
 		/* write whitelist */
 		@file_put_contents("{$snortcfgdir}/{$snortcfg['whitelistname']}", implode("\n", $spoink_wlist));
 		$spoink_type = "output alert_pf: {$snortcfgdir}/{$snortcfg['whitelistname']},snort2c,{$snortcfg['blockoffendersip']},{$pfkill}";
