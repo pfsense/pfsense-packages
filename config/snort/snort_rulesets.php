@@ -305,10 +305,7 @@ if ($savemsg) {
 						echo "	\n<input type='checkbox' name='toenable[]' value='{$file}' {$CHECKED} />\n";
 						echo "</td>\n";
 						echo "<td class='listr' width='25%' >\n";
-						if (empty($CHECKED))
 							echo $file;
-						else
-							echo "<a href='snort_rules.php?id={$id}&openruleset=" . urlencode($file) . "'>{$file}</a>\n";
 						echo "</td>\n";
 					} else
 						echo "<td class='listbggrey' width='30%' colspan='2'><br/></td>\n";
