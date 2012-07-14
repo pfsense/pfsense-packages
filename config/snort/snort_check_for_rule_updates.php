@@ -204,8 +204,8 @@ if ($snortdownload == 'on') {
 			exec("/usr/bin/tar xzf {$tmpfname}/{$snort_filename} -C {$snortdir}/tmp so_rules/");
 			$files = glob("{$snortdir}/tmp/so_rules/*.rules");
 			foreach ($files as $file) {
-				$newfile = basename($file);
-				@copy($file, "{$snortdir}/rules/snort_{$newfile}");
+				$newfile = basename($file, ".rules");
+				@copy($file, "{$snortdir}/rules/snort_{$newfile}.so.rules");
 			}
 			@unlink("{$snortdir}/tmp/so_rules");
 
