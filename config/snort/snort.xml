@@ -79,16 +79,6 @@
 		<item>http://www.pfsense.com/packages/config/snort/bin/oinkmaster_contrib/create-sidmap.pl</item>
 	</additional_files_needed>
 	<additional_files_needed>
-		<prefix>/usr/local/bin/</prefix>
-		<chmod>077</chmod>
-		<item>http://www.pfsense.com/packages/config/snort/bin/oinkmaster_contrib/oinkmaster.pl</item>
-	</additional_files_needed>
-	<additional_files_needed>
-		<prefix>/usr/local/bin/</prefix>
-		<chmod>077</chmod>
-		<item>http://www.pfsense.com/packages/config/snort/bin/oinkmaster_contrib/snort_rename.pl</item>
-	</additional_files_needed>
-	<additional_files_needed>
 		<prefix>/usr/local/www/snort/</prefix>
 		<chmod>077</chmod>
 		<item>http://www.pfsense.com/packages/config/snort/snort_alerts.php</item>
