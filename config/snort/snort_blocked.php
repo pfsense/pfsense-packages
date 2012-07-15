@@ -196,10 +196,10 @@ if ($pconfig['brefresh'] == 'on')
 			<table id="sortabletable1" class="sortable" width="100%" border="0"
 				cellpadding="0" cellspacing="0">
 				<tr id="frheader">
+					<td width="5%" class="listhdrr">#</td>
+					<td width="15%" class="listhdrr">IP</td>
+					<td width="70%" class="listhdrr">Alert Description</td>
 					<td width="5%" class="listhdrr">Remove</td>
-					<td class="listhdrr">#</td>
-					<td class="listhdrr">IP</td>
-					<td class="listhdrr">Alert Description</td>
 				</tr>
 		<?php
 			/* set the arrays */
@@ -215,10 +215,10 @@ if ($pconfig['brefresh'] == 'on')
 					$blocked_ips_array[] = trim($blocked_ip, " \n\t");
 				}
 			}
+			$tmpblocked = array_flip($blocked_ips_array);
 			$src_ip_list = array();
-			/* make sure alert file exists */
-			if (file_exists("/var/log/snort/snort_{$if_real}{$snort_uuid}/alert")) {
-				$fd = fopen("/var/log/snort/snort_{$if_real}{$snort_uuid}/alert", "r");
+			foreach (glob("/var/log/snort/*/alert") as $alertfile) {
+				$fd = fopen($alertfile, "r");
 				if ($fd) {
 					/*                 0         1           2      3      4    5    6    7      8     9    10    11             12
 					/* File format timestamp,sig_generator,sig_id,sig_rev,msg,proto,src,srcport,dst,dstport,id,classification,priority */
@@ -227,27 +227,30 @@ if ($pconfig['brefresh'] == 'on')
 							continue;
 						$fields = explode(",", $fileline);
 					
-						$src_ip_list[$fields[6]] = "{$fields[4]} - {$fields[0]}";;
-						$src_ip_list[$fields[8]] = "{$fields[4]} - {$fields[0]}";;
+						if (isset($tmpblocked[$fields[6]])) {
+							if (!is_array($src_ip_list[$fields[6]]))
+								$src_ip_list[$fields[6]] = array();
+							$src_ip_list[$fields[6]][] = "{$fields[4]} - {$fields[0]}";
+						}
+						if (isset($tmpblocked[$fields[8]])) {
+							if (!is_array($src_ip_list[$fields[8]]))
+								$src_ip_list[$fields[8]] = array();
+							$src_ip_list[$fields[8]][] = "{$fields[4]} - {$fields[0]}";
+						}
 					}
 					fclose($fd);
 				}
 			}
 
-			$input = array();
-			foreach ($blocked_ips_array as $blocked_ip) {
-				if (isset($src_ip_list[$blocked_ip]))
-					$input[$blocked_ip] = $src_ip_list[$blocked_ip];
-			}
-
 			foreach($blocked_ips_array as $blocked_ip) {
-				if (is_ipaddr($blocked_ip) && !isset($input[$blocked_ip]))
-					$input[$blocked_ip] = "N\A\n";
+				if (is_ipaddr($blocked_ip) && !isset($src_ip_list[$blocked_ip]))
+					$src_ip_list[$blocked_ip] = array("N\A\n");
 			}
 
 			/* buil final list, preg_match, buld html */
 			$counter = 0;
-			foreach($input as $blocked_ip => $blocked_desc) {
+			foreach($src_ip_list as $blocked_ip => $blocked_msg) {
+				$blocked_desc = "<br/>" . implode("<br/>", $blocked_msg);
 				if($counter > $bnentries)
 					break;
 				else
@@ -255,11 +258,11 @@ if ($pconfig['brefresh'] == 'on')
 
 				/* use one echo to do the magic*/
 				echo "<tr>
-			<td align=\"center\" valign=\"top\"'><a href='snort_blocked.php?todelete=" . trim(urlencode($blocked_ip)) . "'>
+			<td width='5%' >&nbsp;{$counter}</td>
+			<td width='15%' >&nbsp;{$blocked_ip}</td>
+			<td width='70%' >&nbsp;{$blocked_desc}</td>
+			<td width='5%' align=\"center\" valign=\"top\"'><a href='snort_blocked.php?todelete=" . trim(urlencode($blocked_ip)) . "'>
 			<img title=\"Delete\" border=\"0\" name='todelete' id='todelete' alt=\"Delete\" src=\"../themes/{$g['theme']}/images/icons/icon_x.gif\"></a></td>
-			<td>&nbsp;{$counter}</td>
-			<td>&nbsp;{$blocked_ip}</td>
-			<td>&nbsp;{$blocked_desc}</td>
 			</tr>\n";
 
 			}
