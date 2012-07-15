@@ -251,14 +251,16 @@ if ($pconfig['arefresh'] == 'on')
 </tr>
 <tr>
 	<td colspan="2">
-	<table id="myTable" width="100%" border="1" cellpadding="0" cellspacing="0">
+	<table id="myTable" width="100%" class="sortable" border="1" cellpadding="0" cellspacing="0">
 	<thead>
 		<th class='listhdr' width='10%' axis="date">Date</th>
 		<th class='listhdrr' width='5%' axis="number">PRI</th>
 		<th class='listhdrr' width='3%' axis="string">PROTO</th>
 		<th class='listhdrr' width='7%' axis="string">CLASS</th>
 		<th class='listhdrr' width='15%' axis="string">SRC</th>
+		<th class='listhdrr' width='5%' axis="string">SRCPORt</th>
 		<th class='listhdrr' width='15%' axis="string">DST</th>
+		<th class='listhdrr' width='5%' axis="string">DSTPORT</th>
 		<th class='listhdrr' width='5%' axis="string">SID</th>
 		<th class='listhdrr' width='20%' axis="string">DESCRIPTION</th>
 	</thead>
@@ -267,16 +269,15 @@ if ($pconfig['arefresh'] == 'on')
 
 /* make sure alert file exists */
 if (file_exists("/var/log/snort/snort_{$if_real}{$snort_uuid}/alert")) {
-	$fd = fopen("/var/log/snort/snort_{$if_real}{$snort_uuid}/alert", "r");
-	if ($fd) {
+	exec("tail -{$anentries} /var/log/snort/snort_{$if_real}{$snort_uuid}/alert > /tmp/alert_{$snort_uuid}");
+	if (file_exists("/tmp/alert_{$snort_uuid}")) {
 		$counter = 0;
 		/*                 0         1           2      3      4    5    6    7      8     9    10    11             12    */
 		/* File format timestamp,sig_generator,sig_id,sig_rev,msg,proto,src,srcport,dst,dstport,id,classification,priority */
+		$fd = fopen("/tmp/alert_{$snort_uuid}", "r");
 		while(($fileline = @fgets($fd))) {
 			if (empty($fileline))
 				continue;
-			if ($counter > $anentries)
-				break;
 			$fields = explode(",", $fileline);
 
 			/* Date */
@@ -305,7 +306,9 @@ if (file_exists("/var/log/snort/snort_{$if_real}{$snort_uuid}/alert")) {
 				<td class='listr' width='3%'>{$alert_proto}</td>
 				<td class='listr' width='7%' >{$alert_class}</td>
 				<td class='listr' width='15%'>{$alert_ip_src}:{$alert_src_p}</td>
-				<td class='listr' width='15%'>{$alert_ip_dst}:{$alert_dst_p}</td>
+				<td class='listr' width='5%'>{$alert_src_p}</td>
+				<td class='listr' width='15%'>{$alert_ip_dst}</td>
+				<td class='listr' width='5%'>{$alert_dst_p}</td>
 				<td class='listr' width='5%' >
 					{$alert_sid_str}
 					<a href='?instance={$instanceid}&act=addsuppress&sidid={$fields[2]}&gen_id={$fields[1]}'>
