@@ -334,6 +334,9 @@ if (file_exists("/var/log/snort/snort_{$if_real}{$snort_uuid}/alert")) {
 </table>
 </div>
 </td></tr></table>
+<script type="text/javascript">
+sortable.reverse("myTable");
+</script>
 <?php
 include("fend.inc");
 ?>

@@ -65,6 +65,7 @@ if (isset($id) && $a_nat[$id]) {
 	$pconfig['sf_portscan'] = $a_nat[$id]['sf_portscan'];
 	$pconfig['dce_rpc_2'] = $a_nat[$id]['dce_rpc_2'];
 	$pconfig['dns_preprocessor'] = $a_nat[$id]['dns_preprocessor'];
+	$pconfig['sensitive_data'] = $a_nat[$id]['sensitive_data'];
 }
 
 if ($_POST) {
@@ -86,6 +87,7 @@ if ($_POST) {
 		$natent['sf_portscan'] = $_POST['sf_portscan'] ? 'on' : 'off';
 		$natent['dce_rpc_2'] = $_POST['dce_rpc_2'] ? 'on' : 'off';
 		$natent['dns_preprocessor'] = $_POST['dns_preprocessor'] ? 'on' : 'off';
+		$natent['sensitive_data'] = $_POST['sensitive_data'] ? 'on' : 'off';
 
 		if (isset($id) && $a_nat[$id])
 			$a_nat[$id] = $natent;
@@ -297,6 +299,15 @@ include_once("head.inc");
 			onClick="enable_change(false)"><br>
 		The DNS preprocessor decodes DNS Response traffic and detects some
 		vulnerabilities.</td>
+	</tr>
+	<tr>
+		<td width="22%" valign="top" class="vncell">Enable <br> Sensitive Data</td>
+		<td width="78%" class="vtable">
+			<input name="sensitive_data" type="checkbox" value="on"
+			<?php if ($pconfig['dns_preprocessor']=="on") echo "checked"; ?>
+			onClick="enable_change(false)"><br>
+		Sensisitive data searches for CC or SS# in data
+		</td>
 	</tr>
 	<tr>
 		<td width="22%" valign="top">&nbsp;</td>

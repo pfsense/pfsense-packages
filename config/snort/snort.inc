@@ -1221,6 +1221,8 @@ preprocessor dns: \
 	
 EOD;
 
+	$sensitive_data = "preprocessor sensitive_data:\n";
+
 	/* stream5 queued settings */
 	$def_max_queued_bytes_type = '';
 	if (!empty($snortcfg['max_queued_bytes']))
@@ -1257,7 +1259,7 @@ EOD;
 
 	$snort_preproc = array (
 		"perform_stat", "http_inspect", "other_preprocs", "ftp_preprocessor", "smtp_preprocessor", 
-		"sf_portscan", "dce_rpc_2", "dns_preprocessor"
+		"sf_portscan", "dce_rpc_2", "dns_preprocessor", "sensitive_data"
 	);
 	$snort_preprocessors = "";
 	foreach ($snort_preproc as $preproc) {
@@ -1274,9 +1276,16 @@ EOD;
 	if (file_exists("{$snortcfgdir}/classification.config"))
 		$snort_misc_include_rules .= "include {$snortcfgdir}/classification.config\n";
 	if (is_dir("{$snortdir}/preproc_rules")) {
-		foreach (glob("{$snortdir}/preproc_rules/*.rules") as $file) {
-			$file = basename($file);
-			$snort_misc_include_rules .= "include \$PREPROC_RULE_PATH/{$file}\n";
+		if ($snortcfg['sensitive_data'] && file_exists("{$snortdir}/preproc_rules/sensitive-data.rules"))
+			$snort_misc_include_rules .= "include \$PREPROC_RULE_PATH/sensitive-data.rules/\n";
+			
+		if (file_exists("{$snortdir}/preproc_rules/decoder.rules") &&
+		    file_exists("{$snortdir}/preproc_rules/preprocessor.rules")) {
+			$snort_misc_include_rules .= "include \$PREPROC_RULE_PATH/decoder.rules\n";
+			$snort_misc_include_rules .= "include \$PREPROC_RULE_PATH/preprocessor.rules\n";
+		} else {
+			$snort_misc_include_rules .= "config autogenerate_preprocessor_decoder_rules\n";
+			log_error("Seems preprocessor/decoder rules are missing, enabling autogeneration of them");
 		}
 	} else {
 		$snort_misc_include_rules .= "config autogenerate_preprocessor_decoder_rules\n";
@@ -1350,8 +1359,6 @@ preprocessor stream5_global: track_tcp yes, track_udp yes, track_icmp yes
 preprocessor stream5_tcp: policy BSD, ports both all{$def_max_queued_bytes_type}{$def_max_queued_segs_type}
 preprocessor stream5_udp:
 preprocessor stream5_icmp:
-
-preprocessor sensitive_data:
 
 {$snort_preprocessors}
 
