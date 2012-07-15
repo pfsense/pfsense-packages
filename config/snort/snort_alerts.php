@@ -270,7 +270,7 @@ if ($pconfig['arefresh'] == 'on')
 
 /* make sure alert file exists */
 if (file_exists("/var/log/snort/snort_{$if_real}{$snort_uuid}/alert")) {
-	exec("tail -{$anentries} /var/log/snort/snort_{$if_real}{$snort_uuid}/alert > /tmp/alert_{$snort_uuid}");
+	exec("tail -{$anentries} /var/log/snort/snort_{$if_real}{$snort_uuid}/alert | sort -r > /tmp/alert_{$snort_uuid}");
 	if (file_exists("/tmp/alert_{$snort_uuid}")) {
 		$counter = 0;
 		/*                 0         1           2      3      4    5    6    7      8     9    10    11             12    */
