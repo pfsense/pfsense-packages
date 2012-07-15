@@ -183,6 +183,7 @@ if ($pconfig['arefresh'] == 'on')
 	<td>
 		<div id="mainarea">
 		<form action="/snort/snort_alerts.php" method="post" id="formalert">
+		<input type="hidden" name="instance" value="<?=$instanceid;?>">
 		<table class="tabcont" width="100%" border="0" cellspacing="0" cellpadding="0">
 			<tr>
 				<td width="22%" colspan="0" class="listtopic">Last <?=$anentries;?> Alert Entries.</td>
@@ -206,7 +207,7 @@ if ($pconfig['arefresh'] == 'on')
 				<td width="22%" class="vncell">Save or Remove Logs</td>
 				<td width="78%" class="vtable">
 					<input name="download" type="submit" class="formbtn" value="Download"> All
-						log files will be saved. <a href="/snort/snort_alerts.php?action=clear">
+						log files will be saved. <a href="/snort/snort_alerts.php?action=clear&instance=<?=$instanceid;?>">
 					<input name="delete" type="button" class="formbtn" value="Clear"
 					onclick="return confirm('Do you really want to remove all instance logs?')"></a>
 					<span class="red"><strong>Warning:</strong></span> all log files will be deleted.
