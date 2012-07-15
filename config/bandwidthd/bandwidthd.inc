@@ -28,11 +28,17 @@
 	POSSIBILITY OF SUCH DAMAGE.
 */
 
-if (substr(trim(file_get_contents("/etc/version")),0,3) == "2.1") {
-	define('PKG_BANDWIDTHD_BASE', '/usr/pbi/bandwidthd-' . php_uname("m") . '/bandwidthd');
-} else {
-	define('PKG_BANDWIDTHD_BASE', '/usr/local/bandwidthd');
-}
+// Check pfSense version
+$pfs_version = substr(trim(file_get_contents("/etc/version")),0,3);
+switch ($pfs_version) {
+  case "1.2":
+  case "2.0":
+    define('PKG_BANDWIDTHD_BASE', '/usr/local/bandwidthd');
+    break;
+  default:
+    define('PKG_BANDWIDTHD_BASE', '/usr/pbi/bandwidthd-' . php_uname("m") . '/bandwidthd');
+ }
+// End: Check pfSense version
 
 function bandwidthd_install_deinstall() {
 	conf_mount_rw();
@@ -72,6 +78,9 @@ function bandwidthd_install_config() {
 	$promiscuous = $config['installedpackages']['bandwidthd']['config'][0]['promiscuous'];
 	if($promiscuous)
 		$promiscuous = "promiscuous true\n";
+	else
+		$promiscuous = "promiscuous false\n";
+
 	$graph_cutoff = $config['installedpackages']['bandwidthd']['config'][0]['graphcutoff'];
 	if($graph_cutoff)
 		$graph_cutoff = "graph_cutoff $graph_cutoff\n";
@@ -82,7 +91,7 @@ function bandwidthd_install_config() {
 	if($config['installedpackages']['bandwidthd']['config'][0]['active_interface']){
 		$ifdescrs = array($config['installedpackages']['bandwidthd']['config'][0]['active_interface']);
 	} else {
-		log_error("You should specify a interface for bandwidthd to listen on.  exiting.");
+		log_error("You should specify an interface for bandwidthd to listen on. Exiting.");
 	}
 
 	$subnets_custom = split(';',str_replace(' ','',$config['installedpackages']['bandwidthd']['config'][0]['subnets_custom']));
