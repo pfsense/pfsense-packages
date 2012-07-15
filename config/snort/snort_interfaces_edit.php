@@ -109,6 +109,7 @@ if ($_POST["Submit"]) {
 			if ($natent['interface'] != $a_rule[$id]['interface']) {
 				$oif_real = snort_get_real_interface($a_rule[$id]['interface']);
 				snort_stop($a_rule[$id], $oif_real);
+				exec("rm -r /var/log/snort_{$oif_real}" . $a_rule[$id]['uuid']);
 			}
 			$a_rule[$id] = $natent;
 		} else
