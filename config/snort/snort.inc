@@ -155,8 +155,12 @@ function snort_build_list($snortcfg, $listname = "") {
 		/* calculate interface subnet information */
 		if (function_exists('get_interface_ip')) {
 			$subnet = get_interface_ip($int);
-			if (is_ipaddr($subnet)) {
+			if (is_ipaddr($subnet))
 				$home_net .= "{$subnet} ";
+			if (function_exists("get_interface_ipv6")) {
+				$subnet = get_interface_ipv6($int);
+				if (is_ipaddrv6($subnet))
+					$home_net .= "{$subnet} ";
 			}
 		} else {
 			$ifcfg = $config['interfaces'][$int];
@@ -190,6 +194,11 @@ function snort_build_list($snortcfg, $listname = "") {
 		$gw = get_interface_gateway($snortcfg['interface']);
 		if (is_ipaddr($gw))
 			$home_net .= "{$gw} ";
+		if (function_exists("get_interface_gatewayv6")) {
+			$gw = get_interface_gatewayv6($snortcfg['interface']);
+			if (is_ipaddrv6($gw))
+				$home_net .= "{$gw} ";
+		}
 	}
 
 	if ($wandns == 'yes') {
