@@ -96,6 +96,14 @@ if ($_POST) {
 	$natent = array();
 	$natent = $pconfig;
 
+	foreach ($snort_servers as $key => $server) {
+		if ($_POST["def_{$key}"] && !is_alias($_POST["def_{$key}"]))
+			$input_errors[] = "Only aliases are allowed";
+	}
+	foreach ($snort_ports as $key => $server) {
+		if ($_POST["def_{$key}"] && !is_alias($_POST["def_{$key}"]))
+			$input_errors[] = "Only aliases are allowed";
+	}
 	/* if no errors write to conf */
 	if (!$input_errors) {
 		/* post new options */
