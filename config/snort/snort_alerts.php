@@ -317,6 +317,7 @@ if (file_exists("/var/log/snort/snort_{$if_real}{$snort_uuid}/alert")) {
 			$counter++;
 		}
 		fclose($fd);
+		@unlink("/tmp/alert_{$snort_uuid}");
 	}
 }
 ?>
