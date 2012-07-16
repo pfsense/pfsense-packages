@@ -183,7 +183,7 @@ if ($savemsg)
 			<tr>
 				<td width='22%' valign='top' class='vncell'>Define <?=$label;?></td>
 				<td width="78%" class="vtable">
-					<input name="def_<?=$key;?>"
+					<input name="def_<?=$key;?>" size="40"
 					type="text" autocomplete="off" class="formfldalias" id="def_<?=$key;?>"
 					value="<?=$value;?>"> <br/>
 				<span class="vexpl">Default value: "<?=$server;?>" <br/>Leave
@@ -204,8 +204,8 @@ if ($savemsg)
 ?>
 			<tr>
 				<td width='22%' valign='top' class='vncell'>Define <?=$label;?></td>
-				<td width="78%" class="vtable"><input name="def_<?=$key;?>"
-					type="text" autocomplete="off"  class="formfldalias" id="def_<?=$key;?>"
+				<td width="78%" class="vtable">
+					<input name="def_<?=$key;?>" type="text" size="40" autocomplete="off"  class="formfldalias" id="def_<?=$key;?>"
 					value="<?=$value;?>"> <br/>
 				<span class="vexpl">Default value: "<?=$server;?>" <br/> Leave
 				blank for default value.</span>

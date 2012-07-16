@@ -144,7 +144,7 @@ if ($input_errors)
 		<tr>
 			<td colspan="2"><input name="snortdownload" type="radio"
 				id="snortdownload" value="on" 
-<?php if($pconfig['snortdownload']=='on') echo 'checked'; ?>> Install
+	<?php if($pconfig['snortdownload']=='on') echo 'checked'; ?>> Install
 			Basic Rules or Premium rules <br>
 			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a
 				href="https://www.snort.org/signup" target="_blank">Sign Up for a
