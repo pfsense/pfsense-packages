@@ -162,7 +162,7 @@ if ($_POST['customrules']) {
 		header("Location: /snort/snort_rules.php?id={$id}&openruleset={$currentruleset}");
 		exit;
 	}
-} else if ($_POST)
+} else if ($_POST) {
 	unset($a_rule[$id]['customrules']);
 	write_config();
 	header("Location: /snort/snort_rules.php?id={$id}&openruleset={$currentruleset}");
@@ -368,8 +368,8 @@ function popup(url)
 			<table border="0" cellspacing="0" cellpadding="1">
 			<tr>
 				<td><a href="javascript: void(0)"
-					onclick="popup('snort_rules_edit.php?id=<?=$id;?>&openruleset=<?=$currentruleset;?>&ids=<?=$counter;?>')"><img
-					src="../themes/<?= $g['theme']; ?>/images/icons/icon_e.gif"
+					onclick="popup('snort_rules_edit.php?id=<?=$id;?>&openruleset=<?=$currentruleset;?>')"><img
+					src="../themes/<?= $g['theme']; ?>/images/icons/icon_right.gif"
 					title="edit rule" width="17" height="17" border="0"></a></td>
 					<!-- Codes by Quackit.com -->
 			</tr>

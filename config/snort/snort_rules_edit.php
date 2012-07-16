@@ -37,83 +37,41 @@
 require_once("guiconfig.inc");
 require_once("/usr/local/pkg/snort/snort.inc");
 
+$snortdir = SNORTDIR;
+
 if (!is_array($config['installedpackages']['snortglobal']['rule'])) {
 	$config['installedpackages']['snortglobal']['rule'] = array();
 }
-$a_nat = &$config['installedpackages']['snortglobal']['rule'];
+$a_rule = &$config['installedpackages']['snortglobal']['rule'];
 
 $id = $_GET['id'];
-if (isset($_POST['id']))
-	$id = $_POST['id'];
-
-$ids = $_GET['ids'];
-if (isset($_POST['ids']))
-	$ids = $_POST['ids'];
-
-if (isset($id) && $a_nat[$id]) {
-	$pconfig['enable'] = $a_nat[$id]['enable'];
-	$pconfig['interface'] = $a_nat[$id]['interface'];
-	$pconfig['rulesets'] = $a_nat[$id]['rulesets'];
+if (is_null($id)) {
+	header("Location: /snort/snort_interfaces.php");
+	exit;
 }
 
-//get rule id
-$lineid = $_GET['ids'];
-if (isset($_POST['ids']))
-	$lineid = $_POST['ids'];
+if (isset($id) && $a_rule[$id]) {
+	$pconfig['enable'] = $a_rule[$id]['enable'];
+	$pconfig['interface'] = $a_rule[$id]['interface'];
+	$pconfig['rulesets'] = $a_rule[$id]['rulesets'];
+}
 
+/* convert fake interfaces to real */
+$if_real = snort_get_real_interface($pconfig['interface']);
+$snort_uuid = $a_rule[$id]['uuid'];
 $file = $_GET['openruleset'];
-if (isset($_POST['openruleset']))
-	$file = $_POST['openruleset'];
 
 //read file into string, and get filesize also chk for empty files
 $contents = '';
-if (filesize($file) > 0 )
-	$contents = file_get_contents($file);
-
-//delimiter for each new rule is a new line
-$delimiter = "\n";
+if (file_exists("{$snortdir}/snort_{$snort_uuid}_{$if_real}/rules/{$file}"))
+	$contents = file_get_contents("{$snortdir}/snort_{$snort_uuid}_{$if_real}/rules/{$file}");
+else {
+	header("Location: /snort/snort_rules.php?id={$id}&openruleset={$file}");
+	exit;
+}
 
 //split the contents of the string file into an array using the delimiter
-$splitcontents = explode($delimiter, $contents);
-$findme = "# alert"; //find string for disabled alerts
-$highlight = "yes";
-if (strstr($splitcontents[$lineid], $findme))
-	$highlight = "no";
-if ($highlight == "no")
-	$splitcontents[$lineid] = substr($splitcontents[$lineid], 2);
-
-if ($_POST) {
-	if ($_POST['save']) {
-
-		//copy string into file array for writing
-		if ($_POST['highlight'] == "yes")
-			$splitcontents[$lineid] = $_POST['code'];
-		else
-			$splitcontents[$lineid] = "# " . $_POST['code'];
-
-		//write disable/enable sid to config.xml
-		$sid = snort_get_rule_part($splitcontents[$lineid], 'sid:', ';', 0);
-		if (is_numeric($sid)) {
-			// rule_sid_on registers
-			if (!empty($a_nat[$id]['rule_sid_on']))
-				$a_nat[$id]['rule_sid_on'] = str_replace("||enablesid $sid", "", $a_nat[$id]['rule_sid_on']);
-			if (!empty($a_nat[$id]['rule_sid_on']))
-				$a_nat[$id]['rule_sid_off'] = str_replace("||disablesid $sid", "", $a_nat[$id]['rule_sid_off']);
-			if ($_POST['highlight'] == "yes")
-				$a_nat[$id]['rule_sid_on'] = "||enablesid $sid" . $a_nat[$id]['rule_sid_on'];
-			else
-				$a_nat[$id]['rule_sid_off'] = "||disablesid $sid" . $a_nat[$id]['rule_sid_off'];
-		}
-
-		//write the new .rules file
-		@file_put_contents($file, implode($delimiter, $splitcontents));
-
-		write_config();
-
-		echo "<script> opener.window.location.reload(); window.close(); </script>";
-		exit;
-	}
-}
+$splitcontents = explode("\n", $contents);
 
 $pgtitle = array(gettext("Advanced"), gettext("File Editor"));
 
@@ -126,35 +84,19 @@ $pgtitle = array(gettext("Advanced"), gettext("File Editor"));
 <?php include("fbegin.inc");?>
 
 <form action="snort_rules_edit.php" method="post">
-<input type='hidden' name='id' value='<?=$id;?>' />
-<input type='hidden' name='ids' value='<?=$ids;?>' />
-<input type='hidden' name='openruleset' value='<?=$file;?>' />
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
 <tr>
 	<td class="tabcont">
 		<table width="100%" cellpadding="0" cellspacing="6" bgcolor="#eeeeee">
 		<tr>
 			<td>
-				<input name="save" type="submit" class="formbtn" id="save" value="save" />
 				<input type="button" class="formbtn" value="Cancel" onclick="window.close()">
-				<hr noshade="noshade" />
-				Disable original rule :<br/>
-
-				<input id="highlighting_enabled" name="highlight2" type="radio" value="yes" <?php if($highlight == "yes") echo " checked=\"checked\""; ?> />
-				<label for="highlighting_enabled"><?=gettext("Enabled");?> </label>
-				<input id="highlighting_disabled" name="highlight2" type="radio" value="no" <?php if($highlight == "no") echo " checked=\"checked\""; ?> />
-				<label for="highlighting_disabled"> <?=gettext("Disabled");?></label>
 			</td>
 		</tr>
-		<tr> 
-			<td valign="top" class="label"> 
-			<textarea wrap="off" cols="90" rows="3" name="code"><?=$splitcontents[$lineid];?></textarea>
-			</td> 
-		</tr> 
 		<tr>
 			<td valign="top" class="label">
 			<div style="background: #eeeeee;" id="textareaitem"><!-- NOTE: The opening *and* the closing textarea tag must be on the same line. -->
-			<textarea disabled wrap="off" rows="33" cols="90" name="code2"><?=$contents;?></textarea>
+			<textarea wrap="off" rows="33" cols="90" name="code2"><?=$contents;?></textarea>
 			</div>
 			</td>
 		</tr>
