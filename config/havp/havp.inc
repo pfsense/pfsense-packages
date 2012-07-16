@@ -859,7 +859,7 @@ function havp_config_freshclam()
     $conf[] = "PidFile /var/run/clamav/freshclam.pid";
 
     $conf[] = "\n# db";
-    $conf[] = "DatabaseOwner            clamav";
+    $conf[] = "DatabaseOwner            havp";
     $conf[] = "AllowSupplementaryGroups yes";
     $conf[] = "DNSDatabaseInfo          current.cvd.clamav.net";
 
