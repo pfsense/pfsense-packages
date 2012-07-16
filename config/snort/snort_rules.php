@@ -53,6 +53,8 @@ if (isset($id) && $a_rule[$id]) {
 	$pconfig['enable'] = $a_rule[$id]['enable'];
 	$pconfig['interface'] = $a_rule[$id]['interface'];
 	$pconfig['rulesets'] = $a_rule[$id]['rulesets'];
+	if (!empty($a_rule[$id]['customrules']))
+		$pconfig['customrules'] = base64_decode($a_rule[$id]['customrules']);
 }
 
 function load_rule_file($incoming_file)
@@ -73,17 +75,21 @@ $categories = explode("||", $pconfig['rulesets']);
 
 if ($_GET['openruleset'])
 	$currentruleset = $_GET['openruleset'];
+else if ($_POST['openruleset'])
+	$currentruleset = $_POST['openruleset'];
 else
 	$currentruleset = $categories[0];
 
 $ruledir = "{$snortdir}/snort_{$snort_uuid}_{$if_real}/rules";
 $rulefile = "{$ruledir}/{$currentruleset}";
+if ($currentruleset != 'custom.rules') {
 if (!file_exists($rulefile)) {
 	$input_errors[] = "{$currentruleset} seems to be missing!!! Please go to the Category tab and save again the rule to regenerate it.";
 	$splitcontents = array();
 } else
 	//Load the rule file
 	$splitcontents = load_rule_file($rulefile);
+}
 
 if ($_GET['act'] == "toggle" && $_GET['ids'] && !empty($splitcontents)) {
 
@@ -138,6 +144,31 @@ if ($_GET['act'] == "toggle" && $_GET['ids'] && !empty($splitcontents)) {
 	exit;
 }
 
+if ($_POST['customrules']) {
+	$a_rule[$id]['customrules'] = base64_encode($_POST['customrules']);
+	write_config();
+	sync_snort_package_config();
+	$output = "";
+	$retcode = "";
+	exec("snort -c {$snortdir}/snort_{$snort_uuid}_{$if_real}/snort.conf -T 2>&1", $output, $retcode);
+	if (intval($retcode) != 0) {
+		$error = "";
+		$start = count($output);
+		$end = $start - 4;
+		for($i = $start; $i > $end; $i--)
+			$error .= $output[$i];
+		$input_errors[] = "Custom rules have errors:\n {$error}";
+	} else {
+		header("Location: /snort/snort_rules.php?id={$id}&openruleset={$currentruleset}");
+		exit;
+	}
+} else if ($_POST)
+	unset($a_rule[$id]['customrules']);
+	write_config();
+	header("Location: /snort/snort_rules.php?id={$id}&openruleset={$currentruleset}");
+	exit;
+}
+
 require_once("guiconfig.inc");
 include_once("head.inc");
 
@@ -182,7 +213,7 @@ function popup(url)
 }
 </script>
 
-<form action="snort_rules.php" method="post" name="iform" id="iform">
+<form action="/snort/snort_rules.php" method="post" name="iform" id="iform">
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
 <tr><td>
 <?php
@@ -200,20 +231,12 @@ function popup(url)
 <tr>
 	<td>
 	<table class="tabcont" width="100%" border="0" cellpadding="0" cellspacing="0">
-<?php
-if (empty($pconfig['rulesets'])):
-?>
-	<tr>
-		<td>
-		# You have not selected any rules in the Categories tab.
-		</td>
-	</tr>
-<?php else: ?>
 	<tr>
 		<td width="3%" class="list">&nbsp;</td>
 		<td class="listhdr" colspan="7">
 		<br/>Category:  
 		<select id="selectbox" name="selectbox" class="formselect" onChange="go()">
+			<option value='?id=<?=$id;?>&openruleset=custom.rules'>custom.rules</option>
 		<?php
 			$files = explode("||", $pconfig['rulesets']);
 			foreach ($files as $value) {
@@ -232,6 +255,24 @@ if (empty($pconfig['rulesets'])):
 		</td>
 		<td width="5%" class="list">&nbsp;</td>
 	</tr>
+<?php if ($currentruleset == 'custom.rules' || empty($pconfig['rulesets'])): ?>
+	<tr>
+		<td width="3%" class="list">&nbsp;</td>
+		<td valign="top" class="vtable">
+			<input type='hidden' name='openruleset' value='custom.rules'>
+			<input type='hidden' name='id' value='<?=$id;?>'>
+			
+			<textarea wrap="on" cols="90" rows="50" name="customrules"><?=$pconfig['customrules'];?></textarea>
+		</td>
+	</tr>
+	<tr>
+		<td width="3%" class="list">&nbsp;</td>
+		<td class="vtable">
+			<input name="Submit" type="submit" class="formbtn" value="Save">
+			<input type="button" class="formbtn" value="Cancel" onclick="history.back()">
+		</td>
+	</tr>
+<?php else: ?>
 	<tr>
 		<td width="3%" class="list">&nbsp;</td>
 		<td colspan="7" class="listhdr" >&nbsp;</td><
@@ -343,6 +384,7 @@ if (empty($pconfig['rulesets'])):
 	</table>
 	</td>
 </tr>
+<?php endif;?>
 <tr>
 	<td colspan="9">
 	<table class="tabcont" width="100%" border="0" cellspacing="0" cellpadding="0">
@@ -359,10 +401,6 @@ if (empty($pconfig['rulesets'])):
 			<td nowrap>Rule Disabled</td>
 		</tr>
 		<tr>
-				<!-- TODO: add save and cancel for checkbox options -->
-				<!-- <td><pre><input name="Submit" type="submit" class="formbtn" value="Save">	<input type="button" class="formbtn" value="Cancel" onclick="history.back()"><pre></td> -->
-		</tr>
-		<tr>
 			<td colspan="10">
 			<p><!--<strong><span class="red">Warning:<br/> </span></strong>Editing these r</p>-->
 			</td>
@@ -370,9 +408,8 @@ if (empty($pconfig['rulesets'])):
 	</table>
 	</td>
 </tr>
-<?php endif; ?>
-	</table>
-	</td>
+</table>
+</td>
 </tr>
 </table>
 </form>

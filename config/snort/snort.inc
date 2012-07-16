@@ -1329,6 +1329,12 @@ EOD;
 		}
 	}
 
+	if (!empty($snortcfg['customrules'])) {
+		@file_put_contents("{$snortcfgdir}/rules/custom.rules", base64_decode($snortcfg['customrules']));
+		$selected_rules_sections  .= "include \$RULE_PATH/custom.rules\n";
+	} else
+		@unlink("{$snortcfgdir}/rules/custom.rules");
+
 	$cksumcheck = "all";
 	if ($snortcfg['cksumcheck'] == 'on')
 		$cksumcheck = "none";
