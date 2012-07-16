@@ -91,71 +91,6 @@ if (!$input_errors) {
 	}
 }
 
-
-if ($_POST["Reset"]) {
-
-	function snort_deinstall_settings() {
-		global $config, $g, $id, $if_real, $snortdir;
-
-		exec("/usr/usr/bin/killall snort");
-		sleep(2);
-		exec("/usr/usr/bin/killall -9 snort");
-		sleep(2);
-		exec("/usr/usr/bin/killall barnyard2");
-		sleep(2);
-		exec("/usr/usr/bin/killall -9 barnyard2");
-		sleep(2);
-
-		/* Remove snort cron entries Ugly code needs smoothness*/
-		if (!function_exists('snort_deinstall_cron')) {
-			function snort_deinstall_cron($cronmatch) {
-				global $config, $g;
-
-
-				if(!$config['cron']['item'])
-					return;
-
-				$x=0;
-				$is_installed = false;
-				foreach($config['cron']['item'] as $item) {
-					if (strstr($item['command'], $cronmatch)) {
-						$is_installed = true;
-						break;
-					}
-					$x++;
-				}
-				if($is_installed == true)
-					unset($config['cron']['item'][$x]);
-
-				configure_cron();
-			}
-		}
-
-		snort_deinstall_cron("snort2c");
-		snort_deinstall_cron("snort_check_for_rule_updates.php");
-
-
-		/* Unset snort registers in conf.xml IMPORTANT snort will not start with out this */
-		/* Keep this as a last step */
-		unset($config['installedpackages']['snortglobal']);
-
-		/* remove all snort iface dir */
-		exec("rm -r {$snortdir}/snort_*");
-		exec('rm /var/log/snort/*');
-	}
-
-	snort_deinstall_settings();
-	write_config(); /* XXX */
-
-	header( 'Expires: Sat, 26 Jul 1997 05:00:00 GMT' );
-	header( 'Last-Modified: ' . gmdate( 'D, d M Y H:i:s' ) . ' GMT' );
-	header( 'Cache-Control: no-store, no-cache, must-revalidate' );
-	header( 'Cache-Control: post-check=0, pre-check=0', false );
-	header( 'Pragma: no-cache' );
-	header("Location: /snort/snort_interfaces_global.php");
-	exit;
-}
-
 $pgtitle = 'Services: Snort: Global Settings';
 include_once("head.inc");
 
@@ -202,13 +137,13 @@ if ($input_errors)
 		<table cellpadding="0" cellspacing="0">
 		<tr>
 			<td colspan="2"><input name="snortdownload" type="radio"
-				id="snortdownload" value="off" onClick="enable_change(false)"
+				id="snortdownload" value="off" 
 <?php if($pconfig['snortdownload']=='off' || $pconfig['snortdownload']=='') echo 'checked'; ?>>
 			Do <strong>NOT</strong> Install</td>
 		</tr>
 		<tr>
 			<td colspan="2"><input name="snortdownload" type="radio"
-				id="snortdownload" value="on" onClick="enable_change(false)"
+				id="snortdownload" value="on" 
 <?php if($pconfig['snortdownload']=='on') echo 'checked'; ?>> Install
 			Basic Rules or Premium rules <br>
 			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a
@@ -243,7 +178,7 @@ if ($input_errors)
 	<td width="78%" class="vtable"><input name="emergingthreats"
 		type="checkbox" value="yes"
 		<?php if ($config['installedpackages']['snortglobal']['emergingthreats']=="on") echo "checked"; ?>
-		onClick="enable_change(false)"><br>
+		><br>
 	Emerging Threats is an open source community that produces fastest
 	moving and diverse Snort Rules.</td>
 </tr>
@@ -279,13 +214,13 @@ if ($input_errors)
 	<table cellpadding="0" cellspacing="0">
 		<tr>
 			<td colspan="2"><input name="snortloglimit" type="radio"
-				id="snortloglimit" value="on" onClick="enable_change(false)"
+				id="snortloglimit" value="on" 
 <?php if($pconfig['snortloglimit']=='on') echo 'checked'; ?>>
 			<strong>Enable</strong> directory size limit (<strong>Default</strong>)</td>
 		</tr>
 		<tr>
 			<td colspan="2"><input name="snortloglimit" type="radio"
-				id="snortloglimit" value="off" onClick="enable_change(false)"
+				id="snortloglimit" value="off" 
 <?php if($pconfig['snortloglimit']=='off') echo 'checked'; ?>> <strong>Disable</strong>
 			directory size limit<br>
 			<br>
@@ -331,17 +266,13 @@ if ($input_errors)
 	<td width="78%" class="vtable"><input name="forcekeepsettings"
 		id="forcekeepsettings" type="checkbox" value="yes"
 		<?php if ($config['installedpackages']['snortglobal']['forcekeepsettings']=="on") echo "checked"; ?>
-		onClick="enable_change(false)"><br>
+		><br>
 	Settings will not be removed during deinstall.</td>
 </tr>
 <tr>
-	<td width="22%" valign="top"><input name="Reset" type="submit"
-		class="formbtn" value="Reset"
-		onclick="return confirm('Do you really want to delete all global and interface settings?')"><span
-		class="red"><strong>&nbsp;WARNING:</strong><br>
-	This will reset all global and interface settings.</span></td>
-	<td width="78%"><input name="Submit" type="submit" class="formbtn"
-		value="Save" onClick="enable_change(true)"> 
+	<td width="22%" valign="top">
+	<td width="78%">
+		<input name="Submit" type="submit" class="formbtn" value="Save" onClick="enable_change(true)">
 	</td>
 </tr>
 <tr>
