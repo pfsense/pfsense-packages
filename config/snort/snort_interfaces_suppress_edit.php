@@ -1,6 +1,6 @@
 <?php
 /*
- * firewall_aliases_edit.php
+ * snort_interfaces_suppress_edit.php
  * Copyright (C) 2004 Scott Ullrich
  * All rights reserved.
  *
