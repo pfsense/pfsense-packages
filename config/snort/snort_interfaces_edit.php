@@ -77,12 +77,14 @@ if ($_POST["Submit"]) {
 
 	if (!$_POST['interface'])
 		$input_errors[] = "Interface is mandatory";
+/*
 	foreach ($a_rule as $natent) {
 		if (isset($id) && ($a_rule[$id]) && ($a_rule[$id] === $natent))
 			continue;
 		if ($natent['interface'] == $_POST['interface'])
 			$input_errors[] = "This interface is already configured for another instance";
 	}
+*/
 
 	/* if no errors write to conf */
 	if (!$input_errors) {
