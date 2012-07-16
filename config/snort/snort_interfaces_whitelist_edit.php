@@ -85,8 +85,6 @@ if (isset($id) && $a_whitelist[$id]) {
 	$pconfig['wandnsips'] = $a_whitelist[$id]['wandnsips'];
 	$pconfig['vips'] = $a_whitelist[$id]['vips'];
 	$pconfig['vpnips'] = $a_whitelist[$id]['vpnips'];
-	$addresses = explode(' ', $pconfig['address']);
-	$address = explode(" ", $addresses[0]);
 }
 
 if ($_POST['submit']) {
@@ -103,13 +101,8 @@ if ($_POST['submit']) {
 	if(strtolower($_POST['name']) == "defaultwhitelist")
 		$input_errors[] = "Whitelist file names may not be named defaultwhitelist.";
 
-	$x = is_validwhitelistname($_POST['name']);
-	if (!isset($x)) {
-		$input_errors[] = "Reserved word used for whitelist file name.";
-	} else {
-		if (is_validwhitelistname($_POST['name']) == false)
-			$input_errors[] = "Whitelist file name may only consist of the characters a-z, A-Z and 0-9 _. Note: No Spaces. Press Cancel to reset.";
-	}
+	if (is_validwhitelistname($_POST['name']) == false)
+		$input_errors[] = "Whitelist file name may only consist of the characters a-z, A-Z and 0-9 _. Note: No Spaces. Press Cancel to reset.";
 
 	/* check for name conflicts */
 	foreach ($a_whitelist as $w_list) {
@@ -122,33 +115,9 @@ if ($_POST['submit']) {
 		}
 	}
 
-	$isfirst = 0;
-	$address = "";
-	$final_address_details .= "";
-	/* add another entry code */
-	for($x=0; $x<499; $x++) {
-		if (!empty($_POST["address{$x}"])) {
-			if ($is_first > 0)
-				$address .= " ";
-			$address .= $_POST["address{$x}"];
-			if ($_POST["address_subnet{$x}"] <> "")
-				$address .= "" . $_POST["address_subnet{$x}"];
-
-			/* Compress in details to a single key, data separated by pipes.
-			 Pulling details here lets us only pull in details for valid
-			 address entries, saving us from having to track which ones to
-			 process later. */
-			$final_address_detail = mb_convert_encoding($_POST["detail{$x}"],'HTML-ENTITIES','auto');
-			if ($final_address_detail <> "")
-				$final_address_details .= $final_address_detail;
-			else {
-				$final_address_details .= "Entry added" . " ";
-				$final_address_details .= date('r');
-			}
-			$final_address_details .= "||";
-			$is_first++;
-		}
-	}
+	if ($_POST['address'])
+		if (!is_alias($_POST['address']))
+			$input_errors[] = "A valid alias need to be provided";
 
 	if (!$input_errors) {
 		$w_list = array();
@@ -161,7 +130,7 @@ if ($_POST['submit']) {
 		$w_list['vips'] = $_POST['vips']? 'yes' : 'no';
 		$w_list['vpnips'] = $_POST['vpnips']? 'yes' : 'no';
 
-		$w_list['address'] = $address;
+		$w_list['address'] = $_POST['address'];
 		$w_list['descr']  =  mb_convert_encoding($_POST['descr'],"HTML-ENTITIES","auto");
 		$w_list['detail'] = $final_address_details;
 
@@ -177,12 +146,7 @@ if ($_POST['submit']) {
 
 		header("Location: /snort/snort_interfaces_whitelist.php");
 		exit;
-	} else {
-		$pconfig['descr']  =  mb_convert_encoding($_POST['descr'],"HTML-ENTITIES","auto");
-		$pconfig['address'] = $address;
-		$pconfig['detail'] = $final_address_details;
 	}
-
 }
 
 $pgtitle = "Services: Snort: Whitelist: Edit $whitelist_uuid";
@@ -193,27 +157,15 @@ include_once("head.inc");
 
 <?php
 include("fbegin.inc");
-?>
-<script type="text/javascript" src="/javascript/row_helper.js"></script>
-	<input type='hidden' name='address_type' value='textbox' />
-	<script type="text/javascript">
-	
-	rowname[0] = "address";
-	rowtype[0] = "textbox";
-	rowsize[0] = "20";
-
-	rowname[1] = "detail";
-	rowtype[1] = "textbox";
-	rowsize[1] = "30";
-</script>
-
-<?php
 if($pfsense_stable == 'yes'){echo '<p class="pgtitle">' . $pgtitle . '</p>';}
 if ($input_errors) print_input_errors($input_errors);
 if ($savemsg)
 	print_info_box($savemsg);
 ?>
-
+<script type="text/javascript" src="/javascript/autosuggest.js">
+</script>
+<script type="text/javascript" src="/javascript/suggestions.js">
+</script>
 <form action="snort_interfaces_whitelist_edit.php" method="post" name="iform" id="iform">
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
 <tr><td class="tabcont">
@@ -282,61 +234,11 @@ if ($savemsg)
 	</tr>
 	<tr>
 		<td width="22%" valign="top" class="vncellreq">
-		<div id="addressnetworkport">IP or CIDR items</div>
+		<div id="addressnetworkport">Alias of IP's</div>
 		</td>
 		<td width="78%" class="vtable">
-		<table id="maintable">
-			<tbody>
-				<tr>
-					<td colspan="4">
-					<div
-						style="padding: 5px; margin-top: 16px; margin-bottom: 16px; border: 1px dashed #ff3333; background-color: #eee; color: #000; font-size: 8pt;"
-						id="itemhelp">For <strong>WHITELIST's</strong> enter <strong>ONLY
-					IPs not CIDRs</strong>. Example: 192.168.4.1<br>
-					<br>
-					For <strong>NETLIST's</strong> you may enter <strong>IPs and
-					CIDRs</strong>. Example: 192.168.4.1 or 192.168.4.0/24</div>
-					</td>
-				</tr>
-				<tr>
-					<td>
-					<div id="onecolumn">IP or CIDR</div>
-					</td>
-					<td>
-					<div id="threecolumn">Add a Description or leave blank and a date
-					will be added.</div>
-					</td>
-				</tr>
-
-			<?php
-				/* cleanup code */
-				$counter = 0;
-				$address = $pconfig['address'];
-				if ($address <> ""):
-				$item = explode(" ", $address);
-				$item3 = explode("||", $pconfig['detail']);
-				foreach($item as $ww):
-					$address = $item[$counter];
-					$item4 = $item3[$counter];
-			?>
-				<tr>
-					<td><input name="address<?php echo $counter; ?>" class="formfld unknown" type="text" id="address<?php echo $counter; ?>" size="30" value="<?=htmlspecialchars($address);?>" /></td>
-					<td><input name="detail<?php echo $counter; ?>" class="formfld unknown" type="text" id="address<?php echo $counter; ?>" size="50" value="<?=$item4;?>" /></td>
-					<td>
-						<?php echo "<input type=\"image\" src=\"/themes/".$g['theme']."/images/icons/icon_x.gif\" onclick=\"removeRow(this); return false;\" value=\"Delete\" />"; ?>
-					</td>
-				</tr>
-			<?php
-				$counter++;
-
-				endforeach; endif;
-			?>
-			</tbody>
-		</table>
-		<a onclick="javascript:addRowTo('maintable'); return false;"
-			href="#"><img border="0"
-			src="/themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif" alt=""
-			title="add another entry" /> </a></td>
+		<input autocomplete="off" name="address" type="text" class="formfldalias" id="address" size="30" value="<?=htmlspecialchars($pconfig['address']);?>" />
+		</td>
 	</tr>
 	<tr>
 		<td width="22%" valign="top">&nbsp;</td>
@@ -350,17 +252,33 @@ if ($savemsg)
 </td></tr>
 </table>
 </form>
-
 <script type="text/javascript">
-/* row and col adjust when you add extra entries */
+<?php
+        $isfirst = 0;
+        $aliases = "";
+        $addrisfirst = 0;
+        $aliasesaddr = "";
+        if(isset($config['aliases']['alias']) && is_array($config['aliases']['alias']))
+                foreach($config['aliases']['alias'] as $alias_name) {
+			if ($alias_name['type'] != "host" && $alias_name['type'] != "network")
+				continue;
+                        if($addrisfirst == 1) $aliasesaddr .= ",";
+                        $aliasesaddr .= "'" . $alias_name['name'] . "'";
+                        $addrisfirst = 1;
+                }
+?>
 
-field_counter_js = 3;
-	rows = 1;
-	totalrows = <?php echo $counter; ?>;
-	loaded = <?php echo $counter; ?>;
-	
+        var addressarray=new Array(<?php echo $aliasesaddr; ?>);
+
+function createAutoSuggest() {
+<?php
+	echo "objAlias = new AutoSuggestControl(document.getElementById('address'), new StateSuggestions(addressarray));\n";
+?>
+}
+
+setTimeout("createAutoSuggest();", 500);
+
 </script>
-
 <?php include("fend.inc"); ?>
 </body>
 </html>

@@ -203,10 +203,6 @@ if ($pconfig['brefresh'] == 'on')
 				</tr>
 		<?php
 			/* set the arrays */
-			$blocked_ips = "";
-			exec('/sbin/pfctl -t snort2c -T show', $blocked_ips);
-			$blocked_ips_array = array();
-		if (!empty($blocked_ips)) {
 			$blocked_ips_array = array();
 			if (is_array($blocked_ips)) {
 				foreach ($blocked_ips as $blocked_ip) {
@@ -215,6 +211,8 @@ if ($pconfig['brefresh'] == 'on')
 					$blocked_ips_array[] = trim($blocked_ip, " \n\t");
 				}
 			}
+		$blocked_ips_array = snort_get_blocked_ips();
+		if (!empty($blocked_ips_array)) {
 			$tmpblocked = array_flip($blocked_ips_array);
 			$src_ip_list = array();
 			foreach (glob("/var/log/snort/*/alert") as $alertfile) {
@@ -230,12 +228,12 @@ if ($pconfig['brefresh'] == 'on')
 						if (isset($tmpblocked[$fields[6]])) {
 							if (!is_array($src_ip_list[$fields[6]]))
 								$src_ip_list[$fields[6]] = array();
-							$src_ip_list[$fields[6]][] = "{$fields[4]} - " . substr($fields[0], 0, -8);
+							$src_ip_list[$fields[6]][$fields[4]] = "{$fields[4]} - " . substr($fields[0], 0, -8);
 						}
 						if (isset($tmpblocked[$fields[8]])) {
 							if (!is_array($src_ip_list[$fields[8]]))
 								$src_ip_list[$fields[8]] = array();
-							$src_ip_list[$fields[8]][] = "{$fields[4]} - " . substr($fields[0], 0, -8);
+							$src_ip_list[$fields[8]][$fields[4]] = "{$fields[4]} - " . substr($fields[0], 0, -8);
 						}
 					}
 					fclose($fd);

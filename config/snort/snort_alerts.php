@@ -74,6 +74,16 @@ if ($_POST['save']) {
 	exit;
 }
 
+if ($_POST['todelete'] || $_GET['todelete']) {
+        $ip = "";
+        if($_POST['todelete'])
+                $ip = $_POST['todelete'];
+        else if($_GET['todelete'])
+                $ip = $_GET['todelete'];
+        if (is_ipaddr($ip))
+                exec("/sbin/pfctl -t snort2c -T delete {$ip}");
+}
+
 if ($_GET['act'] == "addsuppress" && is_numeric($_GET['sidid']) && is_numeric($_GET['gen_id'])) {
 	$suppress = "suppress gen_id {$_GET['gen_id']}, sig_id {$_GET['sidid']}\n";
 	if (!is_array($config['installedpackages']['snortglobal']['suppress']))
@@ -165,6 +175,7 @@ if ($pconfig['arefresh'] == 'on')
                 print_input_errors($input_errors); // TODO: add checks
         }
 ?>
+<form action="/snort/snort_alerts.php" method="post" id="formalert">
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
 <tr><td>
 <?php
@@ -181,12 +192,9 @@ if ($pconfig['arefresh'] == 'on')
 </td></tr>
 <tr>
 	<td>
-		<div id="mainarea">
-		<form action="/snort/snort_alerts.php" method="post" id="formalert">
-		<input type="hidden" name="instance" value="<?=$instanceid;?>">
 		<table class="tabcont" width="100%" border="0" cellspacing="0" cellpadding="0">
 			<tr>
-				<td width="22%" colspan="0" class="listtopic">Last <?=$anentries;?> Alert Entries.</td>
+				<td width="22%" class="listtopic">Last <?=$anentries;?> Alert Entries.</td>
 				<td width="78%" class="listtopic">Latest Alert Entries Are Listed First.</td>
 			</tr>
 			<tr>
@@ -224,34 +232,11 @@ if ($pconfig['arefresh'] == 'on')
 					Enter the number of log entries to view. <strong>Default</strong> is <strong>250</strong>.
 				</td>
 			</tr>
-		</table>
-			</form>
-		</td>
-	</tr>
+			<tr>
+				<td colspan="2" ><br/><br/></td>
+			</tr>
 	<tr>
-		<td width="100%" colspan="2">
-	<div class="tableFilter">
-	<form id="tableFilter" onsubmit="myTable.filter(this.id); return false;">
-	<br/>
-		Filter: <select id="column">
-			<option value="1">PRIORITY</option>
-			<option value="2">PROTO</option>
-		<option value="3">DESCRIPTION</option>
-		<option value="4">CLASS</option>
-		<option value="5">SRC</option>
-		<option value="6">SRC PORT</option>
-		<option value="8">DST</option>
-		<option value="9">DST PORT</option>
-		<option value="10">SID</option>
-		<option value="11">Date</option>
-	</select>
-	<input type="text" id="keyword" /> <input type="submit"
-		value="Submit" /> <input type="reset" value="Clear" /></form>
-		<br/>
-	</td>
-</tr>
-<tr>
-	<td colspan="2">
+	<td width="100%" colspan="2" class='vtable'>
 	<table id="myTable" width="100%" class="sortable" border="1" cellpadding="0" cellspacing="0">
 	<thead>
 		<th class='listhdr' width='10%' axis="date">Date</th>
@@ -259,7 +244,7 @@ if ($pconfig['arefresh'] == 'on')
 		<th class='listhdrr' width='3%' axis="string">PROTO</th>
 		<th class='listhdrr' width='7%' axis="string">CLASS</th>
 		<th class='listhdrr' width='15%' axis="string">SRC</th>
-		<th class='listhdrr' width='5%' axis="string">SRCPORt</th>
+		<th class='listhdrr' width='5%' axis="string">SRCPORT</th>
 		<th class='listhdrr' width='15%' axis="string">DST</th>
 		<th class='listhdrr' width='5%' axis="string">DSTPORT</th>
 		<th class='listhdrr' width='5%' axis="string">SID</th>
@@ -272,6 +257,7 @@ if ($pconfig['arefresh'] == 'on')
 if (file_exists("/var/log/snort/snort_{$if_real}{$snort_uuid}/alert")) {
 	exec("tail -{$anentries} /var/log/snort/snort_{$if_real}{$snort_uuid}/alert | sort -r > /tmp/alert_{$snort_uuid}");
 	if (file_exists("/tmp/alert_{$snort_uuid}")) {
+		$tmpblocked = array_flip(snort_get_blocked_ips());
 		$counter = 0;
 		/*                 0         1           2      3      4    5    6    7      8     9    10    11             12    */
 		/* File format timestamp,sig_generator,sig_id,sig_rev,msg,proto,src,srcport,dst,dstport,id,classification,priority */
@@ -291,17 +277,25 @@ if (file_exists("/var/log/snort/snort_{$if_real}{$snort_uuid}/alert")) {
 			$alert_proto = $fields[5];
 			/* IP SRC */
 			$alert_ip_src = $fields[6];
+			if (isset($tmpblocked[$fields[6]])) {
+				$alert_ip_src .= "<a href='?instance={$id}&todelete=" . trim(urlencode($fields[6])) . "'>
+			<img title=\"Remove from blocked ips\" border=\"0\" width='10' height='10' name='todelete' id='todelete' alt=\"Delete\" src=\"../themes/{$g['theme']}/images/icons/icon_x.gif\"></a>"; 
+			}
 			/* IP SRC Port */
 			$alert_src_p = $fields[7];
 			/* IP Destination */
 			$alert_ip_dst = $fields[8];
+			if (isset($tmpblocked[$fields[8]])) {
+				$alert_ip_dst .= "<a href='?instance={$id}&todelete=" . trim(urlencode($fields[8])) . "'>
+			<img title=\"Remove from blocked ips\" border=\"0\" width='10' height='10' name='todelete' id='todelete' alt=\"Delete\" src=\"../themes/{$g['theme']}/images/icons/icon_x.gif\"></a>"; 
+			}
 			/* IP DST Port */
 			$alert_dst_p = $fields[9];
 			/* SID */
 			$alert_sid_str = "{$fields[1]}:{$fields[2]}:{$fields[3]}";
 			$alert_class = $fields[11];
 
-			echo "<tr id=\"{$counter}\">
+			echo "<tr>
 				<td class='listr' width='10%'>{$alert_date}</td>
 				<td class='listr' width='5%' >{$alert_priority}</td>
 				<td class='listr' width='3%'>{$alert_proto}</td>
@@ -330,14 +324,10 @@ if (file_exists("/var/log/snort/snort_{$if_real}{$snort_uuid}/alert")) {
 	</table>
 	</td>
 </tr>
-	</form>
-	</div>
 </table>
-</div>
-</td></tr></table>
-<script type="text/javascript">
-sortable.reverse("myTable");
-</script>
+</td></tr>
+</table>
+</form>
 <?php
 include("fend.inc");
 ?>

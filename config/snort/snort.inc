@@ -49,6 +49,24 @@ define("SNORTLOGDIR", "/var/log/snort");
 if (!is_array($config['installedpackages']['snortglobal']))
 	$config['installedpackages']['snortglobal'] = array();
 
+function snort_get_blocked_ips() {
+	$blocked_ips = "";
+	exec('/sbin/pfctl -t snort2c -T show', $blocked_ips);
+	$blocked_ips_array = array();
+	if (!empty($blocked_ips)) {
+		$blocked_ips_array = array();
+		if (is_array($blocked_ips)) {
+			foreach ($blocked_ips as $blocked_ip) {
+				if (empty($blocked_ip))
+					continue;
+				$blocked_ips_array[] = trim($blocked_ip, " \n\t");
+			}
+		}
+	}
+
+	return $blocked_ips_array;
+}
+
 function snort_get_rule_part($source, $beginning, $ending, $start_pos) {
 
 	$beginning_pos = strpos($source, $beginning, $start_pos);
@@ -114,8 +132,8 @@ function snort_build_list($snortcfg, $listname = "") {
 		$wandns = $whitelist['wandnsips'];
 		$vips = $whitelist['vips'];
 		$vpns = $whitelist['vpnips'];
-		if (!empty($whitelist['address'])) {
-			$home_net .= trim($whitelist['address']);
+		if (!empty($whitelist['address']) && is_alias($whitelist['address'])) {
+			$home_net .= trim(filter_expand_alias($whitelist['address']));
 			$home_net .= " ";
 		}
 	}
@@ -1044,7 +1062,7 @@ function snort_generate_conf($snortcfg) {
 		$ssh_port = $config['system']['ssh']['port'];
 	else
 		$ssh_port = "22";
-	$ports = array(
+	$snort_ports = array(
 		"dns_ports" => "53", "smtp_ports" => "25", "mail_ports" => "25,143,465,691",
 		"http_ports" => "80", "oracle_ports" => "1521", "mssql_ports" => "1433",
 		"telnet_ports" => "23","snmp_ports" => "161", "ftp_ports" => "21",
@@ -1075,7 +1093,7 @@ EOD;
 	if (!empty($snortcfg['flow_depth']))
 		$def_flow_depth_type = $snortcfg['flow_depth'];
 
-	$http_ports = str_replace(",", " ", $ports['http_ports']);
+	$http_ports = str_replace(",", " ", $snort_ports['http_ports']);
 	/* def http_inspect */
 	$http_inspect = <<<EOD
 # HTTP Inspect  #
@@ -1153,7 +1171,7 @@ preprocessor ftp_telnet_protocol: ftp client default \
 	
 EOD;
 
-	$smtp_ports = str_replace(",", " ", $ports['mail_ports']);
+	$smtp_ports = str_replace(",", " ", $snort_ports['mail_ports']);
 	/* def smtp_preprocessor */
 	$smtp_preprocessor = <<<EOD
 # SMTP preprocessor #
@@ -1189,7 +1207,7 @@ preprocessor sfportscan: scan_type { all } \
 	
 EOD;
 
-	$sun_rpc_ports = str_replace(",", " ", $ports['sun_rpc_ports']);
+	$sun_rpc_ports = str_replace(",", " ", $snort_ports['sun_rpc_ports']);
 	/* def other_preprocs */
 	$other_preprocs = <<<EOD
 # Other preprocs #
@@ -1205,13 +1223,13 @@ EOD;
 # DCE/RPC 2   #
 preprocessor dcerpc2: memcap 102400, events [smb, co, cl]
 preprocessor dcerpc2_server: default, policy WinXP, \
-    detect [smb [{$ports['smb_ports']}], tcp 135, udp 135, rpc-over-http-server 593], \
+    detect [smb [{$snort_ports['smb_ports']}], tcp 135, udp 135, rpc-over-http-server 593], \
     autodetect [tcp 1025:, udp 1025:, rpc-over-http-server 1025:], \
     smb_max_chain 3
 	
 EOD;
 
-	$dns_ports = str_replace(",", " ", $ports['dns_ports']);
+	$dns_ports = str_replace(",", " ", $snort_ports['dns_ports']);
 	/* def dns_preprocessor */
 	$dns_preprocessor = <<<EOD
 # DNS preprocessor #
@@ -1233,7 +1251,7 @@ EOD;
 		$def_max_queued_segs_type = ", max_queued_segs {$snortcfg['max_queued_segs']}";
 
 	/* define servers and ports snortdefservers */
-	$servers = array (
+	$snort_servers = array (
 		"dns_servers" => "\$HOME_NET", "smtp_servers" => "\$HOME_NET", "http_servers" => "\$HOME_NET",
 		"www_servers" => "\$HOME_NET", "sql_servers" => "\$HOME_NET", "telnet_servers" => "\$HOME_NET",
 		"snmp_servers" => "\$HOME_NET", "ftp_servers" => "\$HOME_NET", "ssh_servers" => "\$HOME_NET",
@@ -1243,19 +1261,22 @@ EOD;
 	    );
 
 	$vardef = "";
-	foreach ($servers as $alias => $avalue) {
-		if (!empty($snortcfg[$alias]))
-			$avalue = $snortcfg[$alias];
+	foreach ($snort_servers as $alias => $avalue) {
+		if (!empty($snortcfg["def_{$alias}"]) && is_alias($snortcfg["def_{$alias}"])) {
+			$avalue = filter_expand_alias($snortcfg["def_{$alias}"]);
+			$avalue = str_replace(" ", ",", trim($avalue));
+		}
 		$vardef .= "var " . strtoupper($alias) . " [{$avalue}]\n";
 	}
 
 	$portvardef = "";
-	foreach ($ports as $alias => $avalue) {
-		if (!empty($snortcfg["def_{$alias}"]))
-			$ports[$alias] = $snortcfg["def_{$alias}"];
-		$portvardef .= "portvar " . strtoupper($alias) . " [" . $ports[$alias] . "]\n";
+	foreach ($snort_ports as $alias => $avalue) {
+		if (!empty($snortcfg["def_{$alias}"]) && is_alias($snortcfg["def_{$alias}"]))
+			$snort_ports[$alias] = filter_expand_alias($snortcfg["def_{$alias}"]);
+			$snort_ports[$alias] = str_replace(" ", ",", trim($snort_ports[$alias]));
+		$portvardef .= "portvar " . strtoupper($alias) . " [" . $snort_ports[$alias] . "]\n";
 	}
-	$def_ssl_ports_ignore = str_replace(",", " ", $ports['ssl_ports']);
+	$def_ssl_ports_ignore = str_replace(",", " ", $snort_ports['ssl_ports']);
 
 	$snort_preproc = array (
 		"perform_stat", "http_inspect", "other_preprocs", "ftp_preprocessor", "smtp_preprocessor", 
