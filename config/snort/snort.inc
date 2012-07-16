@@ -937,6 +937,7 @@ function snort_deinstall() {
 	global $config, $g;
 
 	$snortdir = SNORTDIR;
+	$snortlogdir = SNORTLOGDIR;
 
 	/* decrease bpf buffers back to 4096, from 20480 */
 	mwexec('/usr/bin/killall snort', true);
@@ -948,8 +949,17 @@ function snort_deinstall() {
 	mwexec('/usr/bin/killall -9 barnyard2', true);
 	sleep(2);
 	mwexec('/usr/sbin/pw userdel snort; /usr/sbin/pw groupdel snort', true);
-	mwexec("/bin/rm -rf {$snortdir}*; /bin/rm -rf /usr/local/pkg/snort*", true);
-	mwexec('/bin/rm -rf /usr/local/www/snort; /bin/rm -rf /var/log/snort', true);
+
+	/* create a few directories and ensure the sample files are in place */
+	$snort_dirs = array( $snortdir, $snortlogdir,
+		"dynamicrules" => "/usr/local/lib/snort/dynamicrules",
+		"dynamicengine" => "/usr/local/lib/snort/dynamicengine",
+		"dynamicpreprocessor" => "/usr/local/lib/snort/dynamicpreprocessor"
+	    );
+	foreach ($snort_dirs as $dir) {
+		if (is_dir($dir))
+			mwexec("/bin/rm -rf {$dir}", true);
+	}
 
 	/* Remove snort cron entries Ugly code needs smoothness*/
 	if (!function_exists('snort_deinstall_cron')) {
@@ -1010,7 +1020,7 @@ function snort_generate_conf($snortcfg) {
 	$snort_config_pass_thru = str_replace("\r", "", base64_decode($snortcfg['configpassthru']));
 
 	/* create a few directories and ensure the sample files are in place */
-	$snort_dirs = array( $snortdir, "{$snortdir}/custom_rules", $snortcfgdir, "{$snortcfgdir}/rules",
+	$snort_dirs = array( $snortdir, $snortcfgdir, "{$snortcfgdir}/rules",
 		"{$snortlogdir}/snort_{$if_real}{$snort_uuid}",
 		"{$snortlogdir}/snort_{$if_real}{$snort_uuid}/barnyard2", 
 		"dynamicrules" => "/usr/local/lib/snort/dynamicrules",
