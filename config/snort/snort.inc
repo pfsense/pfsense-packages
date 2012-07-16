@@ -39,7 +39,7 @@ require_once("filter.inc");
 
 /* package version */
 $snort_version = "2.9.2.3";
-$pfSense_snort_version = "2.4.2";
+$pfSense_snort_version = "2.5.0";
 $snort_package_version = "Snort {$snort_version} pkg v. {$pfSense_snort_version}";
 $snort_rules_file = "snortrules-snapshot-2923.tar.gz";
 $emerging_threats_version = "2.9.0";
