@@ -304,7 +304,7 @@ include_once("head.inc");
 		<td width="22%" valign="top" class="vncell">Enable <br> Sensitive Data</td>
 		<td width="78%" class="vtable">
 			<input name="sensitive_data" type="checkbox" value="on"
-			<?php if ($pconfig['dns_preprocessor']=="on") echo "checked"; ?>
+			<?php if ($pconfig['sensitive_data']=="on") echo "checked"; ?>
 			onClick="enable_change(false)"><br>
 		Sensisitive data searches for CC or SS# in data
 		</td>

@@ -1277,7 +1277,7 @@ EOD;
 		$snort_misc_include_rules .= "include {$snortcfgdir}/classification.config\n";
 	if (is_dir("{$snortdir}/preproc_rules")) {
 		if ($snortcfg['sensitive_data'] && file_exists("{$snortdir}/preproc_rules/sensitive-data.rules"))
-			$snort_misc_include_rules .= "include \$PREPROC_RULE_PATH/sensitive-data.rules/\n";
+			$snort_misc_include_rules .= "include \$PREPROC_RULE_PATH/sensitive-data.rules\n";
 			
 		if (file_exists("{$snortdir}/preproc_rules/decoder.rules") &&
 		    file_exists("{$snortdir}/preproc_rules/preprocessor.rules")) {
