@@ -155,12 +155,16 @@ function snort_build_list($snortcfg, $listname = "") {
 		/* calculate interface subnet information */
 		if (function_exists('get_interface_ip')) {
 			$subnet = get_interface_ip($int);
-			if (is_ipaddr($subnet))
-				$home_net .= "{$subnet} ";
+			if (is_ipaddr($subnet)) {
+				$sn = get_interface_subnet($int);
+				$home_net .= "{$subnet}/{$sn} ";
+			}
 			if (function_exists("get_interface_ipv6")) {
 				$subnet = get_interface_ipv6($int);
-				if (is_ipaddrv6($subnet))
-					$home_net .= "{$subnet} ";
+				if (is_ipaddrv6($subnet)) {
+					$sn = get_interface_subnetv6($int);
+					$home_net .= "{$subnet}/{$sn} ";
+				}
 			}
 		} else {
 			$ifcfg = $config['interfaces'][$int];
@@ -215,7 +219,7 @@ function snort_build_list($snortcfg, $listname = "") {
 		if (is_array($config['virtualip']) && is_array($config['virtualip']['vip'])) {
 			foreach($config['virtualip']['vip'] as $vip)
 				if ($vip['subnet'] && $vip['mode'] != 'proxyarp')
-					$home_net .= "{$vip['subnet']} ";
+					$home_net .= "{$vip['subnet']}/{$vip['subnet_bits']} ";
 		}
 	}
 
