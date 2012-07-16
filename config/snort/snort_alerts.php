@@ -306,7 +306,7 @@ if (file_exists("/var/log/snort/snort_{$if_real}{$snort_uuid}/alert")) {
 				<td class='listr' width='5%' >{$alert_priority}</td>
 				<td class='listr' width='3%'>{$alert_proto}</td>
 				<td class='listr' width='7%' >{$alert_class}</td>
-				<td class='listr' width='15%'>{$alert_ip_src}:{$alert_src_p}</td>
+				<td class='listr' width='15%'>{$alert_ip_src}</td>
 				<td class='listr' width='5%'>{$alert_src_p}</td>
 				<td class='listr' width='15%'>{$alert_ip_dst}</td>
 				<td class='listr' width='5%'>{$alert_dst_p}</td>

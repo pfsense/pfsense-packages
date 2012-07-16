@@ -230,12 +230,12 @@ if ($pconfig['brefresh'] == 'on')
 						if (isset($tmpblocked[$fields[6]])) {
 							if (!is_array($src_ip_list[$fields[6]]))
 								$src_ip_list[$fields[6]] = array();
-							$src_ip_list[$fields[6]][] = "{$fields[4]} - {$fields[0]}";
+							$src_ip_list[$fields[6]][] = "{$fields[4]} - " . substr($fields[0], 0, -8);
 						}
 						if (isset($tmpblocked[$fields[8]])) {
 							if (!is_array($src_ip_list[$fields[8]]))
 								$src_ip_list[$fields[8]] = array();
-							$src_ip_list[$fields[8]][] = "{$fields[4]} - {$fields[0]}";
+							$src_ip_list[$fields[8]][] = "{$fields[4]} - " . substr($fields[0], 0, -8);
 						}
 					}
 					fclose($fd);
