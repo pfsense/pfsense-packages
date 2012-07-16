@@ -110,6 +110,7 @@ if ($_POST["Submit"]) {
 				$oif_real = snort_get_real_interface($a_rule[$id]['interface']);
 				snort_stop($a_rule[$id], $oif_real);
 				exec("rm -r /var/log/snort_{$oif_real}" . $a_rule[$id]['uuid']);
+				exec("mv -f {$snortdir}/snort_" . $a_rule[$id]['uuid'] . "_{$oif_real} {$snortdir}/snort_" . $a_rule[$id]['uuid'] . "_{$if_real}");
 			}
 			$a_rule[$id] = $natent;
 		} else
