@@ -669,15 +669,8 @@ function snort_rules_up_install_cron($should_install) {
 function sync_snort_package_config() {
 	global $config, $g;
 
-	/* RedDevil suggested code */
-	/* TODO: more testing needs to be done */
-	/* may cause voip to fail */
-	//exec("/sbin/sysctl net.bpf.bufsize=8388608");
-	//exec("/sbin/sysctl net.bpf.maxbufsize=4194304");
-	//exec("/sbin/sysctl net.bpf.maxinsns=512");
-	//exec("/sbin/sysctl net.inet.tcp.rfc1323=1");
-
 	conf_mount_rw();
+
 	/* do not start config build if rules is empty */
 	if (!is_array($config['installedpackages']['snortglobal']['rule'])) {
 		exec('/bin/rm /usr/local/etc/rc.d/snort.sh');
@@ -693,7 +686,7 @@ function sync_snort_package_config() {
 		snort_generate_conf($value);
 
 		/* populate rules */
-		snort_create_rules_iface($if_real, $value['uuid']);
+		snort_create_rules_iface($value, $if_real);
 
 		/* create barnyard2 configuration file */
 		if ($value['barnyard_enable'] == 'on')
@@ -848,20 +841,20 @@ EOD;
 }
 
 /* if rules exist copy to new interfaces */
-function snort_create_rules_iface($if_real, $snort_uuid) {
+function snort_create_rules_iface($snortcfg, $if_real) {
 	global $config, $g;
 
 	$snortdir = SNORTDIR;
+	$snort_uuid = $snortcfg['uuid'];
 
-	$if_rule_dir = "{$snortdir}/snort_{$snort_uuid}_{$if_real}";
-	$folder_chk = (count(glob("{$if_rule_dir}/rules/*")) === 0) ? 'empty' : 'full';
+	if (empty($snortcfg['rulesets']))
+		return;
 
-	if ($folder_chk == "empty") {
-		if (!is_dir("{$if_rule_dir}/rules"))
-                        exec("/bin/mkdir -p {$if_rule_dir}/rules");
-		exec("/bin/cp {$snortdir}/rules/* {$if_rule_dir}/rules");
-		if (file_exists("{$snortdir}/custom_rules/local_{$snort_uuid}_{$if_real}.rules"))
-			@copy("{$snortdir}/custom_rules/local_{$snort_uuid}_{$if_real}.rules", "{$if_rule_dir}/local_{$snort_uuid}_{$if_real}.rules");
+	$rule_dir = "{$snortdir}/snort_{$snort_uuid}_{$if_real}";
+	$files = explode("||", $snortcfg['rulesets']);
+	foreach ($files as $file) {
+		if (!file_exists("{$rule_dir}}/rules/{$file}") && file_exists("{$snortdir}}/rules/{$file}"))
+			@copy("{$snortdir}/rules/{$file}", "{$rule_dir}/rules/{$file}");
 	}
 }
 
@@ -954,15 +947,17 @@ function snort_deinstall() {
 	sleep(2);
 	mwexec('/usr/sbin/pw userdel snort; /usr/sbin/pw groupdel snort', true);
 
-	/* create a few directories and ensure the sample files are in place */
-	$snort_dirs = array( $snortdir, $snortlogdir,
-		"dynamicrules" => "/usr/local/lib/snort/dynamicrules",
-		"dynamicengine" => "/usr/local/lib/snort/dynamicengine",
-		"dynamicpreprocessor" => "/usr/local/lib/snort/dynamicpreprocessor"
-	    );
-	foreach ($snort_dirs as $dir) {
-		if (is_dir($dir))
-			mwexec("/bin/rm -rf {$dir}", true);
+	if (!function_exists("get_interface_ipv6")) {
+		/* create a few directories and ensure the sample files are in place */
+		$snort_dirs = array( $snortdir, $snortlogdir,
+			"dynamicrules" => "/usr/local/lib/snort/dynamicrules",
+			"dynamicengine" => "/usr/local/lib/snort/dynamicengine",
+			"dynamicpreprocessor" => "/usr/local/lib/snort/dynamicpreprocessor"
+		    );
+		foreach ($snort_dirs as $dir) {
+			if (is_dir($dir))
+				mwexec("/bin/rm -rf {$dir}", true);
+		}
 	}
 
 	/* Remove snort cron entries Ugly code needs smoothness*/
