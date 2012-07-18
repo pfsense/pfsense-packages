@@ -275,7 +275,7 @@ function popup(url)
 <?php else: ?>
 	<tr>
 		<td width="3%" class="list">&nbsp;</td>
-		<td colspan="7" class="listhdr" >&nbsp;</td><
+		<td colspan="7" class="listhdr" >&nbsp;</td>
 		<td width="5%" class="list">&nbsp;</td>
 	</tr>
 	<tr id="frheader">
