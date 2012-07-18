@@ -85,7 +85,10 @@ if ($_POST['todelete'] || $_GET['todelete']) {
 }
 
 if ($_GET['act'] == "addsuppress" && is_numeric($_GET['sidid']) && is_numeric($_GET['gen_id'])) {
-	$suppress = "suppress gen_id {$_GET['gen_id']}, sig_id {$_GET['sidid']}\n";
+	if (empty($_GET['descr']))
+		$suppress = "suppress gen_id {$_GET['gen_id']}, sig_id {$_GET['sidid']}\n";
+	else
+		$suppress = "#{$_GET['descr']}\nsuppress gen_id {$_GET['gen_id']}, sig_id {$_GET['sidid']}";
 	if (!is_array($config['installedpackages']['snortglobal']['suppress']))
 		$config['installedpackages']['snortglobal']['suppress'] = array();
 	if (!is_array($config['installedpackages']['snortglobal']['suppress']['item']))
@@ -271,6 +274,7 @@ if (file_exists("/var/log/snort/snort_{$if_real}{$snort_uuid}/alert")) {
 			$alert_date = substr($fields[0], 0, -8);
 			/* Description */
 			$alert_descr = $fields[4];
+			$alert_descr_url = urlencode($fields[4]);
 			/* Priority */
 			$alert_priority = $fields[12];
 			/* Protocol */
@@ -306,7 +310,7 @@ if (file_exists("/var/log/snort/snort_{$if_real}{$snort_uuid}/alert")) {
 				<td class='listr' width='5%'>{$alert_dst_p}</td>
 				<td class='listr' width='5%' >
 					{$alert_sid_str}
-					<a href='?instance={$instanceid}&act=addsuppress&sidid={$fields[2]}&gen_id={$fields[1]}'>
+					<a href='?instance={$instanceid}&act=addsuppress&sidid={$fields[2]}&gen_id={$fields[1]}&descr={$alert_descr_url}'>
                                         <img src='../themes/{$g['theme']}/images/icons/icon_plus.gif'
 						width='10' height='10' border='0'
 						title='click to add to suppress list'></a>	
