@@ -685,9 +685,6 @@ function sync_snort_package_config() {
 		/* create snort configuration file */
 		snort_generate_conf($value);
 
-		/* populate rules */
-		snort_create_rules_iface($value, $if_real);
-
 		/* create barnyard2 configuration file */
 		if ($value['barnyard_enable'] == 'on')
 			snort_create_barnyard2_conf($value, $if_real);
@@ -838,24 +835,6 @@ EOD;
 		return;
 	}
 	@chmod("/usr/local/etc/rc.d/snort.sh", 0755);
-}
-
-/* if rules exist copy to new interfaces */
-function snort_create_rules_iface($snortcfg, $if_real) {
-	global $config, $g;
-
-	$snortdir = SNORTDIR;
-	$snort_uuid = $snortcfg['uuid'];
-
-	if (empty($snortcfg['rulesets']))
-		return;
-
-	$rule_dir = "{$snortdir}/snort_{$snort_uuid}_{$if_real}";
-	$files = explode("||", $snortcfg['rulesets']);
-	foreach ($files as $file) {
-		if (!file_exists("{$rule_dir}}/rules/{$file}") && file_exists("{$snortdir}}/rules/{$file}"))
-			@copy("{$snortdir}/rules/{$file}", "{$rule_dir}/rules/{$file}");
-	}
 }
 
 /* open barnyard2.conf for writing */
@@ -1022,6 +1001,7 @@ function snort_generate_conf($snortcfg) {
 	$snort_dirs = array( $snortdir, $snortcfgdir, "{$snortcfgdir}/rules",
 		"{$snortlogdir}/snort_{$if_real}{$snort_uuid}",
 		"{$snortlogdir}/snort_{$if_real}{$snort_uuid}/barnyard2", 
+		"{$snortcfgdir}/preproc_rules", 
 		"dynamicrules" => "/usr/local/lib/snort/dynamicrules",
 		"dynamicengine" => "/usr/local/lib/snort/dynamicengine",
 		"dynamicpreprocessor" => "/usr/local/lib/snort/dynamicpreprocessor"
@@ -1032,7 +1012,8 @@ function snort_generate_conf($snortcfg) {
 	}
 
 	$snort_files = array("gen-msg.map", "classification.config", "reference.config",
-			"sid-msg.map", "unicode.map", "threshold.conf"
+			"sid-msg.map", "unicode.map", "threshold.conf", "preproc_rules/preprocessor.rules",
+			"preproc_rules/decoder.rules", "preproc_rules/sensitive-data.rules"
 		);
 	foreach ($snort_files as $file) {
 		if (file_exists("{$snortdir}/{$file}"))
@@ -1314,12 +1295,21 @@ EOD;
 		$snort_misc_include_rules .= "include {$snortcfgdir}/reference.config\n";
 	if (file_exists("{$snortcfgdir}/classification.config"))
 		$snort_misc_include_rules .= "include {$snortcfgdir}/classification.config\n";
-	if (is_dir("{$snortdir}/preproc_rules")) {
-		if ($snortcfg['sensitive_data'] == 'on' && file_exists("{$snortdir}/preproc_rules/sensitive-data.rules"))
-			$snort_misc_include_rules .= "include \$PREPROC_RULE_PATH/sensitive-data.rules\n";
-			
+	if (is_dir("{$snortcfgdir}/preproc_rules")) {
+		if ($snortcfg['sensitive_data'] == 'on') {
+			$sedcmd = "s/^# alert\(.*\)classtype:sdf;\(.*\)/alert\1classtype:sdf\2/g";
+			if (file_exists("{$snortcfgdir}/preproc_rules/sensitive-data.rules"))
+				$snort_misc_include_rules .= "include \$PREPROC_RULE_PATH/sensitive-data.rules\n";
+		} else
+			$sedcmd = "s/^alert\(.*\)classtype:sdf;\(.*\)/# alert\1classtype:sdf\2/g";
 		if (file_exists("{$snortdir}/preproc_rules/decoder.rules") &&
 		    file_exists("{$snortdir}/preproc_rules/preprocessor.rules")) {
+			@file_put_contents("{$snortcfgdir}/tmp/sedcmd", $sedcmd);
+			if (file_exists("{$snortcfgdir}/preproc_rules/preprocessor.rules"))
+				mwexec("/usr/bin/sed -Ie -f '{$sedcmd}' {$snortcfgdir}/preproc_rules/preprocessor.rules");
+			if (file_exists("{$snortcfgdir}/preproc_rules/decoder.rules"))
+				mwexec("/usr/bin/sed -Ie -f '{$sedcmd}' {$snortcfgdir}/preproc_rules/decoder.rules");
+
 			$snort_misc_include_rules .= "include \$PREPROC_RULE_PATH/decoder.rules\n";
 			$snort_misc_include_rules .= "include \$PREPROC_RULE_PATH/preprocessor.rules\n";
 		} else {
@@ -1337,6 +1327,8 @@ EOD;
 	if (!empty($snortcfg['rulesets'])) {
 		$enabled_rulesets_array = explode("||", $snortcfg['rulesets']);
 		foreach($enabled_rulesets_array as $enabled_item) {
+			if (file_exists("{$snortdir}}/rules/{$enabled_item}") && !file_exists("{$snortcfgdir}}/rules/{$enabled_item}"))
+				@copy("{$snortdir}/rules/{$file}", "{$rule_dir}/rules/{$file}");
 			if (substr($enabled_item, 0, 5) == "snort" && substr($enabled_item, -9) == ".so.rules") {
 				$slib = substr($enabled_item, 6, -6);
 				if (file_exists("{$snort_dirs['dynamicrules']}/{$slib}") && 
@@ -1369,7 +1361,7 @@ var EXTERNAL_NET [{$external_net}]
 
 # Define Rule Paths #
 var RULE_PATH {$snortcfgdir}/rules
-var PREPROC_RULE_PATH {$snortdir}/preproc_rules
+var PREPROC_RULE_PATH {$snortcfgdir}/preproc_rules
 
 # Define Servers  #
 {$vardef}
