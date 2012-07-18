@@ -133,6 +133,7 @@ if ($pconfig['brefresh'] == 'on')
 <?if($pfsense_stable == 'yes'){echo '<p class="pgtitle">' . $pgtitle . '</p>';}?>
 
 <?php if ($savemsg) print_info_box($savemsg); ?>
+<form action="/snort/snort_blocked.php" method="post">
 <table width="99%" border="0" cellpadding="0" cellspacing="0">
 <tr><td>
 <?php
@@ -149,8 +150,6 @@ if ($pconfig['brefresh'] == 'on')
 </td></tr>
 	<tr>
 		<td>
-		<div id="mainarea2">
-
 		<table id="maintable" class="tabcont" width="100%" border="0"
 			cellpadding="0" cellspacing="0">
 			<tr>
@@ -162,8 +161,7 @@ if ($pconfig['brefresh'] == 'on')
 			<tr>
 				<td width="22%" class="vncell">Save or Remove Hosts</td>
 				<td width="78%" class="vtable">
-				<form action="/snort/snort_blocked.php" method="post"><input
-					name="download" type="submit" class="formbtn" value="Download"> All
+					<input name="download" type="submit" class="formbtn" value="Download"> All
 				blocked hosts will be saved. <input name="remove" type="submit"
 					class="formbtn" value="Clear"> <span class="red"><strong>Warning:</strong></span>
 				all hosts will be removed.</form>
@@ -172,22 +170,15 @@ if ($pconfig['brefresh'] == 'on')
 			<tr>
 				<td width="22%" class="vncell">Auto Refresh and Log View</td>
 				<td width="78%" class="vtable">
-				<form action="/snort/snort_blocked.php" method="post"><input
-					name="save" type="submit" class="formbtn" value="Save"> Refresh <input
+					<input name="save" type="submit" class="formbtn" value="Save"> Refresh <input
 					name="brefresh" type="checkbox" value="on"
 					<?php if ($config['installedpackages']['snortglobal']['alertsblocks']['brefresh']=="on" || $config['installedpackages']['snortglobal']['alertsblocks']['brefresh']=='') echo "checked"; ?>>
 				<strong>Default</strong> is <strong>ON</strong>. <input
 					name="blertnumber" type="text" class="formfld" id="blertnumber"
 					size="5" value="<?=htmlspecialchars($bnentries);?>"> Enter the
 				number of blocked entries to view. <strong>Default</strong> is <strong>500</strong>.
-				</form>
 				</td>
 			</tr>
-		</table>
-		</div>
-		<br>
-		</td>
-	</tr>
 	<tr>
 		<td colspan="2">
 			<table id="sortabletable1" class="sortable" width="100%" border="0"
@@ -262,18 +253,19 @@ if ($pconfig['brefresh'] == 'on')
 
 			}
 
-			echo '</table>' . "\n";
 			echo "\n<tr><td colspan='3' align=\"center\" valign=\"top\">{$counter} items listed.</td></tr>";
 		} else
 			echo "\n<tr><td colspan='3' align=\"center\" valign=\"top\"><br><strong>There are currently no items being blocked by snort.</strong></td></tr>";
 
 		?>
-			</td>
-			</tr>
 		</table>
 		</td>
 	</tr>
 </table>
+		</td>
+	</tr>
+</table>
+</form>
 <?php
 include("fend.inc");
 ?>
