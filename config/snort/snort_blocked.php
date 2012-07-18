@@ -188,11 +188,8 @@ if ($pconfig['brefresh'] == 'on')
 		<br>
 		</td>
 	</tr>
-
-	<table class="tabcont" width="100%" border="0" cellspacing="0"
-		cellpadding="0">
-		<tr>
-			<td>
+	<tr>
+		<td colspan="2">
 			<table id="sortabletable1" class="sortable" width="100%" border="0"
 				cellpadding="0" cellspacing="0">
 				<tr id="frheader">
