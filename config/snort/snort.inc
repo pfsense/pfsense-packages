@@ -1302,13 +1302,11 @@ EOD;
 				$snort_misc_include_rules .= "include \$PREPROC_RULE_PATH/sensitive-data.rules\n";
 		} else
 			$sedcmd = "s/^alert\(.*\)classtype:sdf;\(.*\)/# alert\1classtype:sdf\2/g";
-		if (file_exists("{$snortdir}/preproc_rules/decoder.rules") &&
-		    file_exists("{$snortdir}/preproc_rules/preprocessor.rules")) {
+		if (file_exists("{$snortcfgdir}/preproc_rules/decoder.rules") &&
+		    file_exists("{$snortcfgdir}/preproc_rules/preprocessor.rules")) {
 			@file_put_contents("{$g['tmp_path']}/sedcmd", $sedcmd);
-			if (file_exists("{$snortcfgdir}/preproc_rules/preprocessor.rules"))
-				mwexec("/usr/bin/sed -I '' -e -f {$g['tmp_path']}/sedcmd {$snortcfgdir}/preproc_rules/preprocessor.rules");
-			if (file_exists("{$snortcfgdir}/preproc_rules/decoder.rules"))
-				mwexec("/usr/bin/sed -I '' -e -f {$g['tmp_path']}/sedcmd {$snortcfgdir}/preproc_rules/decoder.rules");
+			mwexec("/usr/bin/sed -I '' -e -f {$g['tmp_path']}/sedcmd {$snortcfgdir}/preproc_rules/preprocessor.rules");
+			mwexec("/usr/bin/sed -I '' -e -f {$g['tmp_path']}/sedcmd {$snortcfgdir}/preproc_rules/decoder.rules");
 			@unlink("{$g['tmp_path']}/sedcmd");
 
 			$snort_misc_include_rules .= "include \$PREPROC_RULE_PATH/decoder.rules\n";
