@@ -158,12 +158,10 @@ if ($emergingthreats == "on") {
 /* Normalize rulesets */
 $sedcmd = "s/^#alert/# alert/g\n";
 $sedcmd .= "s/^##alert/# alert/g\n";
-$sedcmd .= "s/^#  alert/# alert/g\n";
-$sedcmd .= "s/^#\\talert/# alert/g\n";
-$sedcmd .= "s/^##i\talert/# alert/g\n";
+$sedcmd .= "s/^#[ \\t#]*alert/# alert/g\n";
+$sedcmd .= "s/^##\\talert/# alert/g\n";
 $sedcmd .= "s/^\\talert/alert/g\n";
-$sedcmd .= "s/^ alert/alert/g\n";
-$sedcmd .= "s/^  alert/alert/g\n";
+$sedcmd .= "s/^[ \\t]*alert/alert/g\n";
 @file_put_contents("{$snortdir}/tmp/sedcmd", $sedcmd);
 
 /* Untar snort rules file individually to help people with low system specs */
