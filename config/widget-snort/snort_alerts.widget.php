@@ -2,6 +2,7 @@
 /*
     snort_alerts.widget.php
     Copyright (C) 2009 Jim Pingle
+    mod 19-07-2012
 
     Redistribution and use in source and binary forms, with or without
     modification, are permitted provided that the following conditions are met:
@@ -26,43 +27,72 @@
 */
 global $config, $g;
 
+/* retrieve snort variables */
+require_once("/usr/local/pkg/snort/snort.inc");
+
+if (!is_array($config['installedpackages']['snortglobal']['rule']))
+	$config['installedpackages']['snortglobal']['rule'] = array();
+$a_instance = &$config['installedpackages']['snortglobal']['rule'];
+
+/* read log file(s) */
+$snort_alerts = array();
+$tmpblocked = array_flip(snort_get_blocked_ips());
+foreach ($a_instance as $instanceid => $instance) {
+	$snort_uuid = $a_instance[$instanceid]['uuid'];
+	$if_real = snort_get_real_interface($a_instance[$instanceid]['interface']);
+	$tmpfile = "{$g['tmp_path']}/.widget_alert_{$snort_uuid}";
+
+	/* make sure alert file exists */
+	if (file_exists("/var/log/snort/snort_{$if_real}{$snort_uuid}/alert")) {
+		if (isset($config['syslog']['reverse']))
+			exec("tail -10 /var/log/snort/snort_{$if_real}{$snort_uuid}/alert | sort -r > {$tmpfile}");
+		else
+			exec("tail -10 /var/log/snort/snort_{$if_real}{$snort_uuid}/alert > {$tmpfile}");
+		if (file_exists($tmpfile)) {
+			/*                 0         1           2      3      4    5    6    7      8     9    10    11             12    */
+			/* File format timestamp,sig_generator,sig_id,sig_rev,msg,proto,src,srcport,dst,dstport,id,classification,priority */
+			$fd = fopen($tmpfile, "r");
+			while (($fileline = @fgets($fd))) {
+				if (empty($fileline))
+					continue;
+				$fields = explode(",", $fileline);
+
+				$snort_alert = array();
+				$snort_alert[]['instanceid'] = snort_get_friendly_interface($a_instance[$instanceid]['interface']);
+				$snort_alert[]['timestamp'] = $fields[0];
+				$snort_alert[]['timeonly'] = substr($fields[0], 6, -8);
+				$snort_alert[]['dateonly'] = substr($fields[0], 0, -17);
+				$snort_alert[]['src'] = $fields[6];
+				$snort_alert[]['srcport'] = $fields[7];
+				$snort_alert[]['dst'] = $fields[8];
+				$snort_alert[]['dstport'] = $fields[9];
+				$snort_alert[]['priority'] = $fields[12];
+				$snort_alert[]['category'] = $fields[11];
+				$snort_alerts[] = $snort_alert;
+			};
+			fclose($fd);
+			@unlink($tmpfile);
+		};
+	};
+};
+
+/* display the result */
 ?>
 <table width="100%" border="0" cellspacing="0" cellpadding="0">
 	<tbody>
 		<tr class="snort-alert-header">
-		  <td width="30%" class="widgetsubheader" >Date</td>
+		  <td width="30%" class="widgetsubheader" >IF/Date</td>
 			<td width="40%" class="widgetsubheader">Src/Dst</td>
 			<td width="40%" class="widgetsubheader">Details</td>
 		</tr>
 <?php
-$counter=0;
-if (is_array($snort_alerts)) {
-	foreach ($snort_alerts as $alert) { ?>
-
-	<?php
-		if(isset($config['syslog']['reverse'])) {
-			/* honour reverse logging setting */
-			if($counter == 0)
-				$activerow = " id=\"snort-firstrow\"";
-			else
-				$activerow = "";
-
-		} else {
-			/* non-reverse logging */
-			if($counter == count($snort_alerts) - 1)
-				$activerow = " id=\"snort-firstrow\"";
-			else
-				$activerow = "";
-		}
-	?>
-
-		<tr class="snort-alert-entry" <?php echo $activerow; ?>>
-		  <td width="30%" class="listr"><?= $alert['timeonly'] . '<br>' . $alert['dateonly'] ?></td>		
-			<td width="40%" class="listr"><?= $alert["src"] . '<br>' . $alert["dst"] ?></td>
-			<td width="40%" class="listr"><?= 'Pri : ' . $alert["priority"] . '<br>' . 'Cat : ' . $alert['category'] ?></td>
-		</tr>
-<?php 		$counter++;
-	}
-} ?>
+foreach ($snort_alerts as $counter => $alert) {
+	echo("	<tr class='snort-alert-entry'" . $activerow . ">
+			<td width='30%' class='listr'>{$alert['instanceid']}<br/>{$alert['timeonly']} {$alert['dateonly']}</td>		
+			<td width='40%' class='listr'>{$alert['src']}:{$alert['srcport']}<br/>{$alert['dst']}:{$alert['dstport']}</td>
+			<td width='40%' class='listr'>Pri : {$alert['priority']}<br/>Cat : {$alert['category']}</td>
+		</tr>");
+}
+?>
 	</tbody>
 </table>
