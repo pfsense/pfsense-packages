@@ -164,6 +164,31 @@ $sedcmd .= "s/^\\talert/alert/g\n";
 $sedcmd .= "s/^[ \\t]*alert/alert/g\n";
 @file_put_contents("{$snortdir}/tmp/sedcmd", $sedcmd);
 
+
+/* Untar emergingthreats rules to tmp */
+if ($emergingthreats == 'on') {
+	if (file_exists("{$tmpfname}/{$emergingthreats_filename}")) {
+		update_status(gettext("Extracting rules..."));
+		exec("/usr/bin/tar xzf {$tmpfname}/{$emergingthreats_filename} -C {$snortdir} rules/");
+	}
+
+	/* make shure default rules are in the right format */
+	exec("/usr/bin/sed -I '' -f {$snortdir}/tmp/sedcmd {$snortdir}/rules/emerging*.rules");
+
+	/*  Copy emergingthreats md5 sig to snort dir */
+	if (file_exists("{$tmpfname}/$emergingthreats_filename_md5")) {
+		update_status(gettext("Copying md5 sig to snort directory..."));
+		@copy("{$tmpfname}/$emergingthreats_filename_md5", "{$snortdir}/$emergingthreats_filename_md5");
+	}
+
+	if ($snortdownload == 'off') {
+		foreach (array("classification.config", "reference.config", "sid-msg.map", "unicode.map") as $file) {
+			if (file_exists("{$snortdir}/rules/{$file}"))
+				@copy("{$snortdir}/rules/{$file}", "{$snortdir}/{$file}");
+		}
+	}
+}
+
 /* Untar snort rules file individually to help people with low system specs */
 if ($snortdownload == 'on') {
 	if (file_exists("{$tmpfname}/{$snort_filename}")) {
@@ -245,29 +270,6 @@ if ($snortdownload == 'on') {
 	}
 }
 
-/* Untar emergingthreats rules to tmp */
-if ($emergingthreats == 'on') {
-	if (file_exists("{$tmpfname}/{$emergingthreats_filename}")) {
-		update_status(gettext("Extracting rules..."));
-		exec("/usr/bin/tar xzf {$tmpfname}/{$emergingthreats_filename} -C {$snortdir} rules/");
-	}
-
-	/* make shure default rules are in the right format */
-	exec("/usr/bin/sed -I '' -f {$snortdir}/tmp/sedcmd {$snortdir}/rules/emerging*.rules");
-
-	/*  Copy emergingthreats md5 sig to snort dir */
-	if (file_exists("{$tmpfname}/$emergingthreats_filename_md5")) {
-		update_status(gettext("Copying md5 sig to snort directory..."));
-		@copy("{$tmpfname}/$emergingthreats_filename_md5", "{$snortdir}/$emergingthreats_filename_md5");
-	}
-
-	if ($snortdownload == 'off') {
-		foreach (array("classification.config", "reference.config", "sid-msg.map", "unicode.map") as $file) {
-			if (file_exists("{$snortdir}/rules/{$file}"))
-				@copy("{$snortdir}/rules/{$file}", "{$snortdir}/{$file}");
-		}
-	}
-}
 
 /*  remove old $tmpfname files */
 if (is_dir($tmpfname)) {
