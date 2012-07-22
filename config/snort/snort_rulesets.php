@@ -49,6 +49,22 @@ if (is_null($id)) {
 	exit;
 }
 
+function snort_remove_rules($files, $snortdir, $snort_uuid, $if_real) {
+
+        if (empty($files))
+                return;
+
+        conf_mount_rw();
+	foreach ($tormv as $file) {
+		@unlink("{$snortdir}/snort_{$snort_uuid}_{$if_real}/rules/{$file}");
+		if (substr($file, -9) == ".so.rules") {
+			$slib = substr($enabled_item, 6, -6);
+			@unlink("{$snortdir}/snort_{$snort_uuid}_{$if_real}/dynamicrules/{$slib}");
+		}
+	}
+        conf_mount_ro();
+}
+
 function snort_copy_rules($files, $snortdir, $snort_uuid, $if_real) {
 
         if (empty($files))
@@ -58,6 +74,11 @@ function snort_copy_rules($files, $snortdir, $snort_uuid, $if_real) {
         foreach ($files as $file) {
                 if (!file_exists("{$snortdir}/snort_{$snort_uuid}_{$if_real}/rules/{$file}"))
                         @copy("{$snortdir}/rules/{$file}", "{$snortdir}/snort_{$snort_uuid}_{$if_real}/rules/{$file}");
+		if (substr($file, -9) == ".so.rules") {
+			$slib = substr($enabled_item, 6, -6);
+			if (!file_exists("{$snortdir}/snort_{$snort_uuid}_{$if_real}/dynamicrules/{$slib}"))
+				@copy("/usr/local/lib/snort/dynamicrules/{$file}", "{$snortdir}/snort_{$snort_uuid}_{$if_real}/dynamicrules/{$slib}");
+		}
         }
         conf_mount_ro();
 }
@@ -80,6 +101,11 @@ if ($_POST["Submit"]) {
 		$enabled_items = implode("||", $_POST['toenable']);
 	else
 		$enabled_items = $_POST['toenable'];
+
+	$oenabled = explode("||", $a_nat[$id]['rulesets']);
+	$nenabled = explode("||", $enabled_items);
+	$tormv = arrad_diff($oenabled, $nenabled);
+	snort_remove_rules($tormv, $snortdir, $snort_uuid, $if_real);
 	$a_nat[$id]['rulesets'] = $enabled_items;
 	snort_copy_rules(explode("||", $enabled_items), $snortdir, $snort_uuid, $if_real);
 
@@ -91,12 +117,8 @@ if ($_POST["Submit"]) {
 }
 
 if ($_POST['unselectall']) {
-	if (!empty($pconfig['rulesets'])) {
-		conf_mount_rw();
-		foreach (explode("||", $pconfig['rulesets']) as $file)
-			@unlink("{$snortdir}/snort_{$snort_uuid}_{$if_real}/rules/{$file}");
-		conf_mount_ro();
-	}
+	if (!empty($pconfig['rulesets']))
+		snort_remove_rules(explode("||", $pconfig['rulesets']), $snortdir, $snort_uuid, $if_real);
 
 	$a_nat[$id]['rulesets'] = "";
 
