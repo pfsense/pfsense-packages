@@ -104,7 +104,7 @@ if ($_POST["Submit"]) {
 
 	$oenabled = explode("||", $a_nat[$id]['rulesets']);
 	$nenabled = explode("||", $enabled_items);
-	$tormv = arrad_diff($oenabled, $nenabled);
+	$tormv = array_diff($oenabled, $nenabled);
 	snort_remove_rules($tormv, $snortdir, $snort_uuid, $if_real);
 	$a_nat[$id]['rulesets'] = $enabled_items;
 	snort_copy_rules(explode("||", $enabled_items), $snortdir, $snort_uuid, $if_real);
