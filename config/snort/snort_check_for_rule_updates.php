@@ -181,7 +181,7 @@ if ($snortdownload == 'on') {
 			$newfile = basename($file);
 			@copy($file, "{$snortdir}/rules/snort_{$newfile}");
 		}
-		exec("rm -r {$snortdir}/snortrules");
+		exec("rm -r {$snortdir}/tmp/snortrules");
 
 		/* extract so rules */
 		exec('/bin/mkdir -p /usr/local/lib/snort/dynamicrules/');
@@ -235,7 +235,7 @@ if ($snortdownload == 'on') {
 			exec("/usr/bin/tar xzf {$tmpfname}/{$snort_filename} -C {$snortdir} preproc_rules/");
 
 			/* make shure default rules are in the right format */
-			exec("/usr/bin/sed -I '' -f {$snortdir}/tmp/sedcmd {$snortdir}/rules/*.rules");
+			exec("/usr/bin/sed -I '' -f {$snortdir}/tmp/sedcmd {$snortdir}/rules/snort_*.rules");
 
 			if (file_exists("{$tmpfname}/{$snort_filename_md5}")) {
 				update_status(gettext("Copying md5 sig to snort directory..."));
@@ -247,32 +247,38 @@ if ($snortdownload == 'on') {
 
 /* Untar emergingthreats rules to tmp */
 if ($emergingthreats == 'on') {
+	safe_mkdir("{$snortdir}/tmp/emerging");
 	if (file_exists("{$tmpfname}/{$emergingthreats_filename}")) {
 		update_status(gettext("Extracting rules..."));
-		exec("/usr/bin/tar xzf {$tmpfname}/{$emergingthreats_filename} -C {$snortdir} rules/");
-	}
+		exec("/usr/bin/tar xzf {$tmpfname}/{$emergingthreats_filename} -C {$snortdir}/tmp/emerging rules/");
 
-	/* make shure default rules are in the right format */
-	exec("/usr/bin/sed -I '' -f {$snortdir}/tmp/sedcmd {$snortdir}/rules/emerging*.rules");
+		$files = glob("{$snortdir}/tmp/emerging/rules/*.rules");
+		foreach ($files as $file) {
+			$newfile = basename($file);
+			@copy($file, "{$snortdir}/rules/{$newfile}");
+		}
+		if ($snortdownload == 'off') {
+			foreach (array("classification.config", "reference.config", "sid-msg.map", "unicode.map") as $file) {
+				if (file_exists("{$snortdir}/tmp/emerging/rules/{$file}"))
+					@copy("{$snortdir}/tmp/emerging/rules/{$file}", "{$snortdir}/{$file}");
+			}
+		}
 
-	/*  Copy emergingthreats md5 sig to snort dir */
-	if (file_exists("{$tmpfname}/$emergingthreats_filename_md5")) {
-		update_status(gettext("Copying md5 sig to snort directory..."));
-		@copy("{$tmpfname}/$emergingthreats_filename_md5", "{$snortdir}/$emergingthreats_filename_md5");
-	}
+		/* make shure default rules are in the right format */
+		exec("/usr/bin/sed -I '' -f {$snortdir}/tmp/sedcmd {$snortdir}/rules/emerging*.rules");
 
-	if ($snortdownload == 'off') {
-		foreach (array("classification.config", "reference.config", "sid-msg.map", "unicode.map") as $file) {
-			if (file_exists("{$snortdir}/rules/{$file}"))
-				@copy("{$snortdir}/rules/{$file}", "{$snortdir}/{$file}");
+		/*  Copy emergingthreats md5 sig to snort dir */
+		if (file_exists("{$tmpfname}/$emergingthreats_filename_md5")) {
+			update_status(gettext("Copying md5 sig to snort directory..."));
+			@copy("{$tmpfname}/$emergingthreats_filename_md5", "{$snortdir}/$emergingthreats_filename_md5");
 		}
 	}
 }
 
 /*  remove old $tmpfname files */
-if (is_dir($tmpfname)) {
+if (is_dir("{$snortdir}/tmp")) {
 	update_status(gettext("Cleaning up..."));
-	exec("/bin/rm -r {$tmpfname}");
+	exec("/bin/rm -r {$snortdir}/tmp");
 }
 
 function snort_apply_customizations($snortcfg, $if_real) {
