@@ -66,6 +66,9 @@ if (isset($id) && $a_nat[$id]) {
 	$pconfig['dce_rpc_2'] = $a_nat[$id]['dce_rpc_2'];
 	$pconfig['dns_preprocessor'] = $a_nat[$id]['dns_preprocessor'];
 	$pconfig['sensitive_data'] = $a_nat[$id]['sensitive_data'];
+	$pconfig['ssl_preproc'] = $a_nat[$id]['ssl_preproc'];
+	$pconfig['pop_preproc'] = $a_nat[$id]['pop_preproc'];
+	$pconfig['imap_preproc'] = $a_nat[$id]['imap_preproc'];
 }
 
 if ($_POST) {
@@ -88,6 +91,9 @@ if ($_POST) {
 		$natent['dce_rpc_2'] = $_POST['dce_rpc_2'] ? 'on' : 'off';
 		$natent['dns_preprocessor'] = $_POST['dns_preprocessor'] ? 'on' : 'off';
 		$natent['sensitive_data'] = $_POST['sensitive_data'] ? 'on' : 'off';
+		$natent['ssl_preproc'] = $_POST['ssl_preproc'] ? 'on' : 'off';
+		$natent['pop_preproc'] = $_POST['pop_preproc'] ? 'on' : 'off';
+		$natent['imap_preproc'] = $_POST['imap_preproc'] ? 'on' : 'off';
 
 		if (isset($id) && $a_nat[$id])
 			$a_nat[$id] = $natent;
@@ -265,6 +271,24 @@ include_once("head.inc");
 	<tr>
 		<td width="22%" valign="top" class="vncell">Enable <br>
 		SMTP Normalizer</td>
+		<td width="78%" class="vtable"><input name="pop_preproc"
+			type="checkbox" value="on"
+			<?php if ($pconfig['pop_preproc']=="on") echo "checked"; ?>
+			onClick="enable_change(false)"><br>
+		Normalize/Decode POP protocol for enforcement and buffer overflows.</td>
+	</tr>
+	<tr>
+		<td width="22%" valign="top" class="vncell">Enable <br>
+		SMTP Normalizer</td>
+		<td width="78%" class="vtable"><input name="imap_preproc"
+			type="checkbox" value="on"
+			<?php if ($pconfig['imap_preproc']=="on") echo "checked"; ?>
+			onClick="enable_change(false)"><br>
+		Normalize/Decode IMAP protocol for enforcement and buffer overflows.</td>
+	</tr>
+	<tr>
+		<td width="22%" valign="top" class="vncell">Enable <br>
+		SMTP Normalizer</td>
 		<td width="78%" class="vtable"><input name="smtp_preprocessor"
 			type="checkbox" value="on"
 			<?php if ($pconfig['smtp_preprocessor']=="on") echo "checked"; ?>
@@ -299,6 +323,15 @@ include_once("head.inc");
 			onClick="enable_change(false)"><br>
 		The DNS preprocessor decodes DNS Response traffic and detects some
 		vulnerabilities.</td>
+	</tr>
+	<tr>
+		<td width="22%" valign="top" class="vncell">Enable <br> SSL Data</td>
+		<td width="78%" class="vtable">
+			<input name="ssl_preproc" type="checkbox" value="on"
+			<?php if ($pconfig['ssl_preproc']=="on") echo "checked"; ?>
+			onClick="enable_change(false)"><br>
+		SSL data searches for irregularities during SSL protocol exchange
+		</td>
 	</tr>
 	<tr>
 		<td width="22%" valign="top" class="vncell">Enable <br> Sensitive Data</td>

@@ -301,9 +301,16 @@ function snort_apply_customizations($snortcfg, $if_real) {
 	else {
 		update_status(gettext("Your set of configured rules are being copied..."));
 		log_error(gettext("Your set of configured rules are being copied..."));
-		$files = explode("||", $snortcfg['rulesets']);
-		foreach ($files as $file)
-			@copy("{$snortdir}/rules/{$file}", "{$snortdir}/snort_{$snortcfg['uuid']}_{$if_real}/rules/{$file}");
+		$enabled_rulesets_array = explode("||", $snortcfg['rulesets']);
+		foreach($enabled_rulesets_array as $enabled_item) {
+			@copy("{$snortdir}/rules/{$file}", "{$rule_dir}/rules/{$file}");
+			if (substr($enabled_item, 0, 5) == "snort" && substr($enabled_item, -9) == ".so.rules") {
+				$slib = substr($enabled_item, 6, -6);
+				if (file_exists("/usr/local/lib/snort/dynamicrules/{$slib}"))
+					@copy("/usr/local/lib/snort/dynamicrules/{$slib}", "{$snort_dirs['dynamicrules']}/{$slib}");
+			
+			}
+		}
 
 		@copy("{$snortdir}/classification.config", "{$snortdir}/snort_{$snortcfg['uuid']}_{$if_real}/classification.config");
 		@copy("{$snortdir}/gen-msg.map", "{$snortdir}/snort_{$snortcfg['uuid']}_{$if_real}/gen-msg.map");

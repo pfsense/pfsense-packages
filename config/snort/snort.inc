@@ -1002,9 +1002,9 @@ function snort_generate_conf($snortcfg) {
 		"{$snortlogdir}/snort_{$if_real}{$snort_uuid}",
 		"{$snortlogdir}/snort_{$if_real}{$snort_uuid}/barnyard2", 
 		"{$snortcfgdir}/preproc_rules", 
-		"dynamicrules" => "/usr/local/lib/snort/dynamicrules",
+		"dynamicrules" => "{$snortcfgdir}/dynamicrules",
 		"dynamicengine" => "/usr/local/lib/snort/dynamicengine",
-		"dynamicpreprocessor" => "/usr/local/lib/snort/dynamicpreprocessor"
+		"dynamicpreprocessor" => "{$snortcfgdir}/dynamicpreprocessor"
 	    );
 	foreach ($snort_dirs as $dir) {
 		if (!is_dir($dir))
@@ -1078,6 +1078,15 @@ function snort_generate_conf($snortcfg) {
 		"DCERPC_NCACN_UDP_SHORT" => "135,593,1024:", "DCERPC_NCACN_TCP" => "2103,2105,2107",
 		"DCERPC_BRIGHTSTORE" => "6503,6504"
 	);
+
+	$portvardef = "";
+	foreach ($snort_ports as $alias => $avalue) {
+		if (!empty($snortcfg["def_{$alias}"]) && is_alias($snortcfg["def_{$alias}"]))
+			$snort_ports[$alias] = filter_expand_alias($snortcfg["def_{$alias}"]);
+			$snort_ports[$alias] = str_replace(" ", ",", trim($snort_ports[$alias]));
+		$portvardef .= "portvar " . strtoupper($alias) . " [" . $snort_ports[$alias] . "]\n";
+	}
+
 
 	/////////////////////////////
 	/* preprocessor code */
@@ -1170,6 +1179,24 @@ preprocessor ftp_telnet_protocol: ftp client default \
 	
 EOD;
 
+	$pop_ports = str_replace(",", " ", $snort_ports['pop3_ports']);
+	$pop_preproc = <<<EOD
+preprocessor pop: \
+	ports { {$pop_ports} } \
+	qp_decode_depth -1 \
+	b64_decode_depth 0 \
+	bitenc_decode_depth 100
+EOD;
+
+	$imap_ports = str_replace(",", " ", $snort_ports['imap_ports']);
+	$imap_preproc = <<<EOD
+preprocessor imap: \
+	ports { {$imap_ports} } \
+	qp_decode_depth -1 \
+	b64_decode_depth 0 \
+	bitenc_decode_depth 100
+EOD;
+
 	$smtp_ports = str_replace(",", " ", $snort_ports['mail_ports']);
 	/* def smtp_preprocessor */
 	$smtp_preprocessor = <<<EOD
@@ -1238,6 +1265,13 @@ preprocessor dns: \
 	
 EOD;
 
+	$def_ssl_ports_ignore = str_replace(",", " ", $snort_ports['ssl_ports']);
+	$ssl_preproc = <<<EOD
+# Ignore SSL and Encryption  #
+preprocessor ssl: ports { {$def_ssl_ports_ignore} }, trustservers, noinspect_encrypted
+
+EOD;
+
 	$sensitive_data = "preprocessor sensitive_data:\n";
 
 	/* stream5 queued settings */
@@ -1268,25 +1302,36 @@ EOD;
 		$vardef .= "var " . strtoupper($alias) . " [{$avalue}]\n";
 	}
 
-	$portvardef = "";
-	foreach ($snort_ports as $alias => $avalue) {
-		if (!empty($snortcfg["def_{$alias}"]) && is_alias($snortcfg["def_{$alias}"]))
-			$snort_ports[$alias] = filter_expand_alias($snortcfg["def_{$alias}"]);
-			$snort_ports[$alias] = str_replace(" ", ",", trim($snort_ports[$alias]));
-		$portvardef .= "portvar " . strtoupper($alias) . " [" . $snort_ports[$alias] . "]\n";
-	}
-	$def_ssl_ports_ignore = str_replace(",", " ", $snort_ports['ssl_ports']);
-
+	$snort_preproc_libs = array(
+		"dce_rpc_2" => "dce2_preproc", "dns_preprocessor" => "dns_preproc", "ftp_preprocessor" => "ftptelnet_preproc", "imap_preproc" => "imap_preproc",
+		"pop_preproc" => "pop_preproc", "reputation_preproc" => "reputation_preproc", "sensitive_data" => "sdf_preproc", 
+		"sip_preproc" => "sip_preproc", "smtp_preprocessor" => "smtp_preproc", "ssh_preproc" => "ssh_preproc", 
+		"ssl_preproc" => "ssl_preproc"
+	);
 	$snort_preproc = array (
-		"perform_stat", "http_inspect", "other_preprocs", "ftp_preprocessor", "smtp_preprocessor", 
-		"sf_portscan", "dce_rpc_2", "dns_preprocessor", "sensitive_data"
+		"perform_stat", "http_inspect", "other_preprocs", "ftp_preprocessor", "smtp_preprocessor", "ssl_preproc",
+		"sf_portscan", "dce_rpc_2", "dns_preprocessor", "sensitive_data", "pop_preproc", "imap_preproc"
 	);
 	$snort_preprocessors = "";
 	foreach ($snort_preproc as $preproc) {
 		if ($snortcfg[$preproc] == 'on') {
 			/* NOTE: The $$ is not a bug. Its a advanced feature of php */
-			$snort_preprocessors .= $$preproc;
-			$snort_preprocessors .= "\n";
+			if (!empty($snort_preproc_libs[$preproc])) {
+				$preproclib = "libsf_" . $snort_preproc_libs[$preproc];
+				if (!file_exists($snort_dirs['dynamicpreprocessor'] . "{$preproclib}.so")) {
+					if (file_exists("/usr/local/lib/dynamicpreprocessor/{$preproclib}.so")) {
+						@copy("/usr/local/lib/dynamicpreprocessor/{$preproclib}.so", $snort_dirs['dynamicpreprocessor'] . "{$preproclib}.so");
+						$snort_preprocessors .= $$preproc;
+						$snort_preprocessors .= "\n";
+					}
+				} else {
+					$snort_preprocessors .= $$preproc;
+					$snort_preprocessors .= "\n";
+				}
+			} else {
+				$snort_preprocessors .= $$preproc;
+				$snort_preprocessors .= "\n";
+			}
 		}
 	}
 
@@ -1330,6 +1375,8 @@ EOD;
 				@copy("{$snortdir}/rules/{$file}", "{$rule_dir}/rules/{$file}");
 			if (substr($enabled_item, 0, 5) == "snort" && substr($enabled_item, -9) == ".so.rules") {
 				$slib = substr($enabled_item, 6, -6);
+				if (!file_exists("{$snort_dirs['dynamicrules']}/{$slib}"))
+					@copy("/usr/local/lib/snort/dynamicrules/{$slib}", "{$snort_dirs['dynamicrules']}/{$slib}");
 				if (file_exists("{$snort_dirs['dynamicrules']}/{$slib}") && 
 				    file_exists("{$snortcfgdir}/rules/{$enabled_item}"))
 					$selected_rules_sections  .= "include \$RULE_PATH/{$enabled_item}\n";
@@ -1397,9 +1444,6 @@ preprocessor stream5_udp:
 preprocessor stream5_icmp:
 
 {$snort_preprocessors}
-
-# Ignore SSL and Encryption  #
-preprocessor ssl: ports { {$def_ssl_ports_ignore} }, trustservers, noinspect_encrypted
 
 # Snort Output Logs #
 output alert_csv: alert timestamp,sig_generator,sig_id,sig_rev,msg,proto,src,srcport,dst,dstport,id,classification,priority
