@@ -177,7 +177,8 @@ if ($savemsg) {
 	<table id="maintable" class="tabcont" width="100%" border="0" cellpadding="0" cellspacing="0">
 <?php 
 	$isrulesfolderempty = glob("{$snortdir}/rules/*.rules");
-	if (empty($isrulesfolderempty)):
+	$iscfgdirempty = glob("{$snortdir}/snort_{$snort_uuid}_{$if_real}/rules/*.rules");
+	if (empty($isrulesfolderempty) && empty($iscfgdirempty)):
 ?>
 		<tr>
 			<td>
@@ -226,7 +227,10 @@ if ($savemsg) {
 				$emergingrules = array();
 				$snortsorules = array();
 				$snortrules = array();
-				$dh  = opendir("{$snortdir}/rules/");
+				if (empty($isrulesfolderempty))
+					$dh  = opendir("{$snortdir}/snort_{$snort_uuid}_{$if_real}/rules/");
+				else
+					$dh  = opendir("{$snortdir}/rules/");
 				while (false !== ($filename = readdir($dh))) {
 					$filename = basename($filename);
 					if (substr($filename, -5) != "rules")
