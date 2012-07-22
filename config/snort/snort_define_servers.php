@@ -167,7 +167,7 @@ if ($savemsg)
         $tab_array[] = array(gettext("If Settings"), false, "/snort/snort_interfaces_edit.php?id={$id}");
         $tab_array[] = array(gettext("Categories"), false, "/snort/snort_rulesets.php?id={$id}");
         $tab_array[] = array(gettext("Rules"), false, "/snort/snort_rules.php?id={$id}");
-        $tab_array[] = array(gettext("Servers"), true, "/snort/snort_define_servers.php?id={$id}");
+        $tab_array[] = array(gettext("Variables"), true, "/snort/snort_define_servers.php?id={$id}");
         $tab_array[] = array(gettext("Preprocessors"), false, "/snort/snort_preprocessors.php?id={$id}");
         $tab_array[] = array(gettext("Barnyard2"), false, "/snort/snort_barnyard.php?id={$id}");
         display_top_tabs($tab_array);

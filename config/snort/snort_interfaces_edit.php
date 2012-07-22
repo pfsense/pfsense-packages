@@ -188,7 +188,7 @@ function enable_change(enable_change) {
         $tab_array[] = array(gettext("If Settings"), true, "/snort/snort_interfaces_edit.php?id={$id}");
 	$tab_array[] = array(gettext("Categories"), false, "/snort/snort_rulesets.php?id={$id}");
 	$tab_array[] = array(gettext("Rules"), false, "/snort/snort_rules.php?id={$id}");
-	$tab_array[] = array(gettext("Servers"), false, "/snort/snort_define_servers.php?id={$id}");
+	$tab_array[] = array(gettext("Variables"), false, "/snort/snort_define_servers.php?id={$id}");
 	$tab_array[] = array(gettext("Preprocessors"), false, "/snort/snort_preprocessors.php?id={$id}");
 	$tab_array[] = array(gettext("Barnyard2"), false, "/snort/snort_barnyard.php?id={$id}");
         display_top_tabs($tab_array);
