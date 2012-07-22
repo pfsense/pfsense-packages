@@ -55,10 +55,10 @@ function snort_remove_rules($files, $snortdir, $snort_uuid, $if_real) {
                 return;
 
         conf_mount_rw();
-	foreach ($tormv as $file) {
+	foreach ($files as $file) {
 		@unlink("{$snortdir}/snort_{$snort_uuid}_{$if_real}/rules/{$file}");
 		if (substr($file, -9) == ".so.rules") {
-			$slib = substr($enabled_item, 6, -6);
+			$slib = substr($file, 6, -6);
 			@unlink("{$snortdir}/snort_{$snort_uuid}_{$if_real}/dynamicrules/{$slib}");
 		}
 	}
