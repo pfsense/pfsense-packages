@@ -78,7 +78,7 @@ while (!feof($fp)) {
 }
 
 function decodeipaddress($text) {
-	preg_match('/(..)(..)(..)(..)/', $text, $hexitems);
+	preg_match('/(..)(..)(..)(..)$/', $text, $hexitems);
 	$ipaddr = "";
 	unset($hexitems[0]);
 	$isfirst = true;

@@ -209,7 +209,7 @@
 		<field>
 			<fielddescr>Refresh Interval</fielddescr>
 			<fieldname>refreshinterval</fieldname>
-			<description>Controls polling frequency of monitoring IP address</description>
+			<description>ControlS polling frequency of monitoring IP address (sec)</description>
 			<type>input</type>
 		</field>
 		<field>
