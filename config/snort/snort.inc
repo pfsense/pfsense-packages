@@ -1305,8 +1305,8 @@ EOD;
 		if (file_exists("{$snortcfgdir}/preproc_rules/decoder.rules") &&
 		    file_exists("{$snortcfgdir}/preproc_rules/preprocessor.rules")) {
 			@file_put_contents("{$g['tmp_path']}/sedcmd", $sedcmd);
-			mwexec("/usr/bin/sed -I '' -e -f {$g['tmp_path']}/sedcmd {$snortcfgdir}/preproc_rules/preprocessor.rules");
-			mwexec("/usr/bin/sed -I '' -e -f {$g['tmp_path']}/sedcmd {$snortcfgdir}/preproc_rules/decoder.rules");
+			mwexec("/usr/bin/sed -I '' -f {$g['tmp_path']}/sedcmd {$snortcfgdir}/preproc_rules/preprocessor.rules");
+			mwexec("/usr/bin/sed -I '' -f {$g['tmp_path']}/sedcmd {$snortcfgdir}/preproc_rules/decoder.rules");
 			@unlink("{$g['tmp_path']}/sedcmd");
 
 			$snort_misc_include_rules .= "include \$PREPROC_RULE_PATH/decoder.rules\n";
