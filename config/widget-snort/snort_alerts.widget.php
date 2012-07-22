@@ -26,6 +26,8 @@
     POSSIBILITY OF SUCH DAMAGE.
 */
 global $config, $g;
+$snort_alerts_title = "Snort Alerts";
+$snort_alerts_title_link = "snort/snort_alerts.php";
 
 /* retrieve snort variables */
 require_once("/usr/local/pkg/snort/snort.inc");
@@ -38,12 +40,14 @@ $a_instance = &$config['installedpackages']['snortglobal']['rule'];
 $snort_alerts = array();
 $tmpblocked = array_flip(snort_get_blocked_ips());
 foreach ($a_instance as $instanceid => $instance) {
-	$snort_uuid = $a_instance[$instanceid]['uuid'];
-	$if_real = snort_get_real_interface($a_instance[$instanceid]['interface']);
-	$tmpfile = "{$g['tmp_path']}/.widget_alert_{$snort_uuid}";
+	if ($instance['enable'] != 'on')
+		continue;
 
 	/* make sure alert file exists */
 	if (file_exists("/var/log/snort/snort_{$if_real}{$snort_uuid}/alert")) {
+		$snort_uuid = $instance['uuid'];
+		$if_real = snort_get_real_interface($instance['interface']);
+		$tmpfile = "{$g['tmp_path']}/.widget_alert_{$snort_uuid}";
 		if (isset($config['syslog']['reverse']))
 			exec("tail -10 /var/log/snort/snort_{$if_real}{$snort_uuid}/alert | sort -r > {$tmpfile}");
 		else
@@ -58,7 +62,7 @@ foreach ($a_instance as $instanceid => $instance) {
 				$fields = explode(",", $fileline);
 
 				$snort_alert = array();
-				$snort_alert[]['instanceid'] = snort_get_friendly_interface($a_instance[$instanceid]['interface']);
+				$snort_alert[]['instanceid'] = snort_get_friendly_interface($instance['interface']);
 				$snort_alert[]['timestamp'] = $fields[0];
 				$snort_alert[]['timeonly'] = substr($fields[0], 6, -8);
 				$snort_alert[]['dateonly'] = substr($fields[0], 0, -17);
@@ -69,13 +73,21 @@ foreach ($a_instance as $instanceid => $instance) {
 				$snort_alert[]['priority'] = $fields[12];
 				$snort_alert[]['category'] = $fields[11];
 				$snort_alerts[] = $snort_alert;
-			};
+			}
 			fclose($fd);
 			@unlink($tmpfile);
-		};
-	};
-};
+		}
+	}
+}
 
+if ($_GET['evalScripts']) {
+	/* AJAX specific handlers */
+        $new_rules = "";
+	foreach($snort_alerts as $log_row)
+		$new_rules .= "{$log_row['time']}||{$log_row['priority']}||{$log_row['category']}||{$log_row['src']}||{$log_row['dst']}||{$log_row['timestamp']}||{$log_row['timeonly']}||{$log_row['dateonly']}\n";
+
+	echo $new_rules;
+} else {
 /* display the result */
 ?>
 <table width="100%" border="0" cellspacing="0" cellpadding="0">
@@ -96,3 +108,4 @@ foreach ($snort_alerts as $counter => $alert) {
 ?>
 	</tbody>
 </table>
+<?php } ?>
