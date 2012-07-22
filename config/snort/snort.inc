@@ -1319,8 +1319,8 @@ EOD;
 			if (!empty($snort_preproc_libs[$preproc])) {
 				$preproclib = "libsf_" . $snort_preproc_libs[$preproc];
 				if (!file_exists($snort_dirs['dynamicpreprocessor'] . "{$preproclib}.so")) {
-					if (file_exists("/usr/local/lib/dynamicpreprocessor/{$preproclib}.so")) {
-						@copy("/usr/local/lib/dynamicpreprocessor/{$preproclib}.so", $snort_dirs['dynamicpreprocessor'] . "{$preproclib}.so");
+					if (file_exists("/usr/local/lib/snort/dynamicpreprocessor/{$preproclib}.so")) {
+						@copy("/usr/local/lib/snort/dynamicpreprocessor/{$preproclib}.so", "{$snort_dirs['dynamicpreprocessor']}/{$preproclib}.so");
 						$snort_preprocessors .= $$preproc;
 						$snort_preprocessors .= "\n";
 					}
@@ -1342,11 +1342,11 @@ EOD;
 		$snort_misc_include_rules .= "include {$snortcfgdir}/classification.config\n";
 	if (is_dir("{$snortcfgdir}/preproc_rules")) {
 		if ($snortcfg['sensitive_data'] == 'on') {
-			$sedcmd = "s/^# alert\(.*\)classtype:sdf;\(.*\)/alert\1classtype:sdf\2/g";
+			$sedcmd = '/^#alert.*classtype:sdf/s/^#//';
 			if (file_exists("{$snortcfgdir}/preproc_rules/sensitive-data.rules"))
 				$snort_misc_include_rules .= "include \$PREPROC_RULE_PATH/sensitive-data.rules\n";
 		} else
-			$sedcmd = "s/^alert\(.*\)classtype:sdf;\(.*\)/# alert\1classtype:sdf\2/g";
+			$sedcmd = '/^alert.*classtype:sdf/s/^/#/';
 		if (file_exists("{$snortcfgdir}/preproc_rules/decoder.rules") &&
 		    file_exists("{$snortcfgdir}/preproc_rules/preprocessor.rules")) {
 			@file_put_contents("{$g['tmp_path']}/sedcmd", $sedcmd);
@@ -1371,8 +1371,8 @@ EOD;
 	if (!empty($snortcfg['rulesets'])) {
 		$enabled_rulesets_array = explode("||", $snortcfg['rulesets']);
 		foreach($enabled_rulesets_array as $enabled_item) {
-			if (file_exists("{$snortdir}}/rules/{$enabled_item}") && !file_exists("{$snortcfgdir}}/rules/{$enabled_item}"))
-				@copy("{$snortdir}/rules/{$file}", "{$rule_dir}/rules/{$file}");
+			if (file_exists("{$snortdir}/rules/{$enabled_item}") && !file_exists("{$snortcfgdir}/rules/{$enabled_item}"))
+				@copy("{$snortdir}/rules/{$enabled_item}", "{$snortcfgdir}/rules/{$enabled_item}");
 			if (substr($enabled_item, 0, 5) == "snort" && substr($enabled_item, -9) == ".so.rules") {
 				$slib = substr($enabled_item, 6, -6);
 				if (!file_exists("{$snort_dirs['dynamicrules']}/{$slib}"))

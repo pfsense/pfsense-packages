@@ -303,11 +303,11 @@ function snort_apply_customizations($snortcfg, $if_real) {
 		log_error(gettext("Your set of configured rules are being copied..."));
 		$enabled_rulesets_array = explode("||", $snortcfg['rulesets']);
 		foreach($enabled_rulesets_array as $enabled_item) {
-			@copy("{$snortdir}/rules/{$file}", "{$rule_dir}/rules/{$file}");
+			@copy("{$snortdir}/rules/{$enabled_item}", "{$snortdir}/snort_{$snortcfg['uuid']}_{$if_real}/rules/{$enabled_item}");
 			if (substr($enabled_item, 0, 5) == "snort" && substr($enabled_item, -9) == ".so.rules") {
 				$slib = substr($enabled_item, 6, -6);
 				if (file_exists("/usr/local/lib/snort/dynamicrules/{$slib}"))
-					@copy("/usr/local/lib/snort/dynamicrules/{$slib}", "{$snort_dirs['dynamicrules']}/{$slib}");
+					@copy("/usr/local/lib/snort/dynamicrules/{$slib}", "{$snortdir}/snort_{$snortcfg['uuid']}_{$if_real}/dynamicrules/{$slib}");
 			
 			}
 		}
