@@ -115,7 +115,7 @@ function snort_find_list($find_name, $type = 'whitelist') {
 }
 
 /* func builds custom whitelests */
-function snort_build_list($snortcfg, $listname = "") {
+function snort_build_list($snortcfg, $listname = "", $whitelist = false) {
 	global $config, $g;
 
 	/* Add loopback to whitelist (ftphelper) */
@@ -156,14 +156,20 @@ function snort_build_list($snortcfg, $listname = "") {
 		if (function_exists('get_interface_ip')) {
 			$subnet = get_interface_ip($int);
 			if (is_ipaddr($subnet)) {
-				$sn = get_interface_subnet($int);
-				$home_net .= "{$subnet}/{$sn} ";
+				if ($whitelist == false) {
+					$sn = get_interface_subnet($int);
+					$home_net .= "{$subnet}/{$sn} ";
+				} else
+					$home_net .= "{$subnet} ";
 			}
 			if (function_exists("get_interface_ipv6")) {
 				$subnet = get_interface_ipv6($int);
 				if (is_ipaddrv6($subnet)) {
-					$sn = get_interface_subnetv6($int);
-					$home_net .= "{$subnet}/{$sn} ";
+					if ($whitelist == false) {
+						$sn = get_interface_subnetv6($int);
+						$home_net .= "{$subnet}/{$sn} ";
+					} else
+						$home_net .= "{$subnet} ";
 				}
 			}
 		} else {
@@ -217,9 +223,14 @@ function snort_build_list($snortcfg, $listname = "") {
 	if($vips == 'yes') {
 		/* iterate all vips and add to whitelist */
 		if (is_array($config['virtualip']) && is_array($config['virtualip']['vip'])) {
-			foreach($config['virtualip']['vip'] as $vip)
-				if ($vip['subnet'] && $vip['mode'] != 'proxyarp')
-					$home_net .= "{$vip['subnet']}/{$vip['subnet_bits']} ";
+			foreach($config['virtualip']['vip'] as $vip) {
+				if ($vip['subnet'] && $vip['mode'] != 'proxyarp') {
+					if ($whitelist == false)
+						$home_net .= "{$vip['subnet']}/{$vip['subnet_bits']} ";
+					else
+						$home_net .= "{$vip['subnet']} ";
+				}
+			}
 		}
 	}
 
@@ -1036,7 +1047,8 @@ function snort_generate_conf($snortcfg) {
 		$pfkill = "";
 		if ($snortcfg['blockoffenderskill'] == "on")
 			$pfkill = "kill";
-		$spoink_wlist = snort_build_list($snortcfg, $snortcfg['whitelistname']);
+		/* No subnets to default addresses */
+		$spoink_wlist = snort_build_list($snortcfg, $snortcfg['whitelistname'], true);
 		/* write whitelist */
 		@file_put_contents("{$snortcfgdir}/{$snortcfg['whitelistname']}", implode("\n", $spoink_wlist));
 		$spoink_type = "output alert_pf: {$snortcfgdir}/{$snortcfg['whitelistname']},snort2c,{$snortcfg['blockoffendersip']},{$pfkill}";
