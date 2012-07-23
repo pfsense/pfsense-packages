@@ -170,6 +170,19 @@ if ($emergingthreats == 'on') {
 	if (file_exists("{$tmpfname}/{$emergingthreats_filename}")) {
 		update_status(gettext("Extracting rules..."));
 		exec("/usr/bin/tar xzf {$tmpfname}/{$emergingthreats_filename} -C {$snortdir}/tmp/emerging rules/");
+		// begin patch
+		// ET rules currently don't know anything about the sensitive data preprocessor:
+		// add a proper type declaration to avoid runtime errors.
+		// The extra declaration is only needed when the sensitive data preproc is enabled and the Snort.org
+		// rules are not used.
+		$classif = "{$snortdir}/tmp/emerging/rules/classification.config";
+		$extra = "config classification: sdf,Sensitive Data was Transmitted Across the Network,2\n";
+		if (file_exists($classif)) {
+			@file_put_contents($classif, $extra, LOCK_EX | FILE_APPEND);
+		}
+		unset($extra);
+		unset($classif);
+		// end of patch
 
 		$files = glob("{$snortdir}/tmp/emerging/rules/*.rules");
 		foreach ($files as $file) {
