@@ -280,13 +280,13 @@ function popup(url)
 	</tr>
 	<tr id="frheader">
 		<td width="3%" class="list">&nbsp;</td>
-		<td width="7%" class="listhdr">SID</td>
-		<td width="4%" class="listhdrr">Proto</td>
-		<td width="15%" class="listhdrr">Source</td>
-		<td width="10%" class="listhdrr">Port</td>
-		<td width="15%" class="listhdrr">Destination</td>
-		<td width="10%" class="listhdrr">Port</td>
-		<td width="30%" class="listhdrr">Message</td>
+		<td width="7%" class="listhdr"><?php echo gettext("SID"); ?></td>
+		<td width="4%" class="listhdrr"><?php echo gettext("Proto"); ?></td>
+		<td width="15%" class="listhdrr"><?php echo gettext("Source"); ?></td>
+		<td width="10%" class="listhdrr"><?php echo gettext("Port"); ?></td>
+		<td width="15%" class="listhdrr"><?php echo gettext("Destination"); ?></td>
+		<td width="10%" class="listhdrr"><?php echo gettext("Port"); ?></td>
+		<td width="30%" class="listhdrr"><?php echo gettext("Message"); ?></td>
 		<td width="5%" class="list">&nbsp;</td>
 	</tr>
 <?php
@@ -339,7 +339,7 @@ function popup(url)
 			<a href='?id={$id}&openruleset={$currentruleset}&act=toggle&ids={$counter}'>
 			<img src='../themes/{$g['theme']}/images/icons/{$iconb}'
 			width='10' height='10' border='0'
-			title='click to toggle enabled/disabled status'></a>
+			title='" . gettext("click to toggle enabled/disabled status") . "'></a>
 			$textse
 		       </td>
 		       <td width='7%' class=\"listlr\">
@@ -370,7 +370,7 @@ function popup(url)
 				<td><a href="javascript: void(0)"
 					onclick="popup('snort_rules_edit.php?id=<?=$id;?>&openruleset=<?=$currentruleset;?>')"><img
 					src="../themes/<?= $g['theme']; ?>/images/icons/icon_right.gif"
-					title="edit rule" width="17" height="17" border="0"></a></td>
+					title="<?php echo gettext("edit rule"); ?>" width="17" height="17" border="0"></a></td>
 					<!-- Codes by Quackit.com -->
 			</tr>
 			</table>
@@ -392,13 +392,13 @@ function popup(url)
 			<td width="16"><img
 				src="../themes/<?= $g['theme']; ?>/images/icons/icon_block.gif"
 				width="11" height="11"></td>
-			<td>Rule Enabled</td>
+			<td><?php echo gettext("Rule Enabled"); ?></td>
 		</tr>
 		<tr>
 			<td><img
 				src="../themes/<?= $g['theme']; ?>/images/icons/icon_block_d.gif"
 				width="11" height="11"></td>
-			<td nowrap>Rule Disabled</td>
+			<td nowrap><?php echo gettext("Rule Disabled"); ?></td>
 		</tr>
 		<tr>
 			<td colspan="10">

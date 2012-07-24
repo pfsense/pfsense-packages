@@ -98,7 +98,7 @@ include_once("head.inc");
 
 						<font color="#777777" size="1.5px">
 						<p style="text-align: left; margin-left: 225px;">
-							<b>INSTALLED SIGNATURE RULESET</b></font><br>
+							<b><?php echo gettext("INSTALLED SIGNATURE RULESET"); ?></b></font><br>
 							<br>
 							<font color="#FF850A" size="1px"><b>SNORT.ORG >>></b></font>
 							<font size="1px" color="#000000">&nbsp;&nbsp;<? echo $snort_org_sig_chk_local; ?></font><br>
@@ -117,22 +117,22 @@ include_once("head.inc");
 						<div height="32" width="725px" style='background-color: #eeeeee'>
 
 						<p style="text-align: left; margin-left: 225px;">
-						<font color='#777777' size='1.5px'><b>UPDATE YOUR RULES</b></font><br>
+						<font color='#777777' size='1.5px'><b><?php echo gettext("UPDATE YOUR RULES"); ?></b></font><br>
 						<br/>
 
 			<?php
 
 						if ($snortdownload != 'on' && $emergingthreats != 'on') {
 							echo '
-			<button disabled="disabled"><span class="download">Update Rules&nbsp;&nbsp;&nbsp;&nbsp;</span></button><br/>
+			<button disabled="disabled"><span class="download">' . gettext("Update Rules") . '&nbsp;&nbsp;&nbsp;&nbsp;</span></button><br/>
 			<p style="text-align:left; margin-left:150px;">
-			<font color="#fc3608" size="2px"><b>WARNING:</b></font><font size="1px" color="#000000">&nbsp;&nbsp;No rule types have been selected for download. "Global Settings Tab"</font><br>';
+			<font color="#fc3608" size="2px"><b>' . gettext("WARNING:") . '</b></font><font size="1px" color="#000000">&nbsp;&nbsp;' . gettext('No rule types have been selected for download. "Global Settings Tab"') . '</font><br>';
 
 							echo '</p>' . "\n";
 						} else {
 
 							echo '
-			<a href="/snort/snort_download_rules.php"><button ><span class="download">Update Rules&nbsp;&nbsp;&nbsp;&nbsp;</span></button></a><br/>' . "\n";
+			<a href="/snort/snort_download_rules.php"><button ><span class="download">' . gettext("Update Rules") . '&nbsp;&nbsp;&nbsp;&nbsp;</span></button></a><br/>' . "\n";
 
 						}
 
@@ -150,17 +150,17 @@ include_once("head.inc");
 						<div height="32" width="725px" style='background-color: #eeeeee'>
 
 						<p style="text-align: left; margin-left: 225px;">
-						<font color='#777777' size='1.5px'><b>VIEW UPDATE LOG</b></font><br>
+						<font color='#777777' size='1.5px'><b><?php echo gettext("VIEW UPDATE LOG"); ?></b></font><br>
 						<br>
 
 				<?php
 
 						if ($update_logfile_chk == 'yes') {
 							echo "
-				<button href='/snort/snort_rules_edit.php?openruleset={$snortdir}/snort_update.log'><span class='pwhitetxt'>Update Log&nbsp;&nbsp;&nbsp;&nbsp;</span></button>\n";
+				<button href='/snort/snort_rules_edit.php?openruleset={$snortdir}/snort_update.log'><span class='pwhitetxt'>" . gettext("Update Log") . "&nbsp;&nbsp;&nbsp;&nbsp;</span></button>\n";
 						}else{
 							echo "
-				<button disabled='disabled' href='/snort/snort_rules_edit.php?openruleset={$snortdir}/snort_update.log'><span class='pwhitetxt'>Update Log&nbsp;&nbsp;&nbsp;&nbsp;</span></button>\n";
+				<button disabled='disabled' href='/snort/snort_rules_edit.php?openruleset={$snortdir}/snort_update.log'><span class='pwhitetxt'>" . gettext("Update Log") . "&nbsp;&nbsp;&nbsp;&nbsp;</span></button>\n";
 						}
 							
 				?>
@@ -178,9 +178,9 @@ include_once("head.inc");
 					<tr>
 						<td id="download_rules_td" style='background-color: #eeeeee'>
 						<div height="32" width="725px" style='background-color: #eeeeee'>
-							<font color='#FF850A' size='1px'><b>NOTE:</b></font><font size='1px'
-								color='#000000'>&nbsp;&nbsp;Snort.org and Emergingthreats.net
-								will go down from time to time. Please be patient.
+							<font color='#FF850A' size='1px'><b><?php echo gettext("NOTE:"); ?></b></font><font size='1px'
+								color='#000000'>&nbsp;&nbsp;<?php echo gettext("Snort.org and Emergingthreats.net " .
+								"will go down from time to time. Please be patient."); ?>
 							</font>
 						</div>
 						</td>

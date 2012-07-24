@@ -86,8 +86,8 @@ if($pfsense_stable == 'yes'){echo '<p class="pgtitle">' . $pgtitle . '</p>';}
 <tr><td class="tabcont">
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
 <tr>
-	<td width="30%" class="listhdrr">File Name</td>
-	<td width="60%" class="listhdr">Description</td>
+	<td width="30%" class="listhdrr"><?php echo gettext("File Name"); ?></td>
+	<td width="60%" class="listhdr"><?php echo gettext("Description"); ?></td>
 	<td width="10%" class="list"></td>
 </tr>
 <?php $i = 0; foreach ($a_suppress as $list): ?>
@@ -106,12 +106,12 @@ if($pfsense_stable == 'yes'){echo '<p class="pgtitle">' . $pgtitle . '</p>';}
 			<td valign="middle"><a
 				href="snort_interfaces_suppress_edit.php?id=<?=$i;?>"><img
 				src="/themes/<?= $g['theme']; ?>/images/icons/icon_e.gif"
-				width="17" height="17" border="0" title="edit whitelist"></a></td>
+				width="17" height="17" border="0" title="<?php echo gettext("edit whitelist"); ?>"></a></td>
 			<td><a
 				href="/snort/snort_interfaces_suppress.php?act=del&id=<?=$i;?>"
-				onclick="return confirm('Do you really want to delete this whitelist? All elements that still use it will become invalid (e.g. snort rules will fall back to the default whitelist)!')"><img
+				onclick="return confirm('<?php echo gettext("Do you really want to delete this whitelist? All elements that still use it will become invalid (e.g. snort rules will fall back to the default whitelist)!"); ?>')"><img
 				src="/themes/<?= $g['theme']; ?>/images/icons/icon_x.gif"
-				width="17" height="17" border="0" title="delete whitelist"></a></td>
+				width="17" height="17" border="0" title="<?php echo gettext("delete whitelist"); ?>"></a></td>
 		</tr>
 	</table>
 	</td>
@@ -126,7 +126,7 @@ if($pfsense_stable == 'yes'){echo '<p class="pgtitle">' . $pgtitle . '</p>';}
 			<td valign="middle"><a
 				href="snort_interfaces_suppress_edit.php?id=<?php echo $id_gen;?> "><img
 				src="/themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif"
-				width="17" height="17" border="0" title="add a new list"></a></td>
+				width="17" height="17" border="0" title="<?php echo gettext("add a new list"); ?>"></a></td>
 		</tr>
 	</table>
 	</td>
@@ -134,11 +134,11 @@ if($pfsense_stable == 'yes'){echo '<p class="pgtitle">' . $pgtitle . '</p>';}
 </table>
 </td></tr>
 <tr>
-	<td colspan="3" width="100%"><span class="vexpl"><span class="red"><strong>Note:</strong></span>
-	<p><span class="vexpl">Here you can create event filtering and
-	suppression for your snort package rules.<br>
-	Please note that you must restart a running rule so that changes can
-	take effect.</span></p></td>
+	<td colspan="3" width="100%"><span class="vexpl"><span class="red"><strong><?php echo gettext("Note:"); ?></strong></span>
+	<p><span class="vexpl"><?php echo gettext("Here you can create event filtering and " .
+	"suppression for your snort package rules."); ?><br>
+	<?php echo gettext("Please note that you must restart a running rule so that changes can " .
+	"take effect."); ?></span></p></td>
 </tr>
 </table>
 </form>

@@ -177,7 +177,7 @@ if ($savemsg)
 		<td class="tabcont">
 		<table width="100%" border="0" cellpadding="6" cellspacing="0">
 		<tr>
-			<td colspan="2" valign="top" class="listtopic">Define Servers</td>
+			<td colspan="2" valign="top" class="listtopic"><?php echo gettext("Define Servers"); ?></td>
 		</tr>
 <?php
 		foreach ($snort_servers as $key => $server):
@@ -189,18 +189,18 @@ if ($savemsg)
 				$value = htmlspecialchars($pconfig["def_{$key}"]);
 ?>
 			<tr>
-				<td width='22%' valign='top' class='vncell'>Define <?=$label;?></td>
+				<td width='22%' valign='top' class='vncell'><?php echo gettext("Define"); ?> <?=$label;?></td>
 				<td width="78%" class="vtable">
 					<input name="def_<?=$key;?>" size="40"
 					type="text" autocomplete="off" class="formfldalias" id="def_<?=$key;?>"
 					value="<?=$value;?>"> <br/>
-				<span class="vexpl">Default value: "<?=$server;?>" <br/>Leave
-				blank for default value.</span>
+				<span class="vexpl"><?php echo gettext("Default value:"); ?> "<?=$server;?>" <br/><?php echo gettext("Leave " .
+				"blank for default value."); ?></span>
 				</td>
 			</tr>
 <?php		endforeach; ?>
 		<tr>
-			<td colspan="2" valign="top" class="listtopic">Define Ports</td>
+			<td colspan="2" valign="top" class="listtopic"><?php echo gettext("Define Ports"); ?></td>
 		</tr>
 <?php
 		foreach ($snort_ports as $key => $server):
@@ -211,12 +211,12 @@ if ($savemsg)
 				$value = htmlspecialchars($pconfig["def_{$key}"]);
 ?>
 			<tr>
-				<td width='22%' valign='top' class='vncell'>Define <?=$label;?></td>
+				<td width='22%' valign='top' class='vncell'><?php echo gettext("Define"); ?> <?=$label;?></td>
 				<td width="78%" class="vtable">
 					<input name="def_<?=$key;?>" type="text" size="40" autocomplete="off"  class="formfldalias" id="def_<?=$key;?>"
 					value="<?=$value;?>"> <br/>
-				<span class="vexpl">Default value: "<?=$server;?>" <br/> Leave
-				blank for default value.</span>
+				<span class="vexpl"><?php echo gettext("Default value:"); ?> "<?=$server;?>" <br/> <?php echo gettext("Leave " .
+				"blank for default value."); ?></span>
 				</td>
 			</tr>
 <?php		endforeach; ?>
