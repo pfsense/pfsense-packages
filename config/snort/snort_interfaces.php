@@ -165,10 +165,10 @@ if ($pfsense_stable == 'yes')
 		if($savemsg)
 			print_info_box_np("{$savemsg}");
 		else {
-			print_info_box_np('
-			The Snort configuration has changed for one or more interfaces.<br>
-			You must apply the changes in order for them to take effect.<br>
-			');
+			print_info_box_np(gettext(
+			'The Snort configuration has changed for one or more interfaces.<br>' .
+			'You must apply the changes in order for them to take effect.<br>'
+			));
 		}
 	}
 ?>
@@ -194,12 +194,12 @@ if ($pfsense_stable == 'yes')
 		cellspacing="0">
 		<tr id="frheader">
 			<td width="5%" class="list">&nbsp;</td>
-			<td width="10%" class="listhdrr">If</td>
-			<td width="13%" class="listhdrr">Snort</td>
-			<td width="10%" class="listhdrr">Performance</td>
-			<td width="10%" class="listhdrr">Block</td>
-			<td width="12%" class="listhdrr">Barnyard2</td>
-			<td width="30%" class="listhdr">Description</td>
+			<td width="10%" class="listhdrr"><?php echo gettext("If"); ?></td>
+			<td width="13%" class="listhdrr"><?php echo gettext("Snort"); ?></td>
+			<td width="10%" class="listhdrr"><?php echo gettext("Performance"); ?></td>
+			<td width="10%" class="listhdrr"><?php echo gettext("Block"); ?></td>
+			<td width="12%" class="listhdrr"><?php echo gettext("Barnyard2"); ?></td>
+			<td width="30%" class="listhdr"><?php echo gettext("Description"); ?></td>
 			<td width="3%" class="list">
 			<table border="0" cellspacing="0" cellpadding="1">
 				<tr>
@@ -248,7 +248,7 @@ if ($pfsense_stable == 'yes')
 				echo "<a href='?act=toggle&id={$i}'>
 					<img src='../themes/{$g['theme']}/images/icons/icon_{$iconfn}.gif'
 					width='13' height='13' border='0'
-					title='click to toggle start/stop snort'></a>";
+					title='" . gettext('click to toggle start/stop snort') . "'></a>";
 			} else
 				echo strtoupper("disabled");
 			?>
@@ -286,7 +286,7 @@ if ($pfsense_stable == 'yes')
 				echo "<a href='?act=bartoggle&id={$i}'>
 					<img src='../themes/{$g['theme']}/images/icons/icon_{$biconfn}.gif'
 					width='13' height='13' border='0'
-					title='click to toggle start/stop barnyard'></a>";
+					title='" . gettext('click to toggle start/stop barnyard') . "'></a>";
 			} else
 				echo strtoupper("disabled");
 			?>
@@ -300,7 +300,7 @@ if ($pfsense_stable == 'yes')
 			<tr>
 				<td><a href="snort_interfaces_edit.php?id=<?=$i;?>"><img
 					src="/themes/<?= $g['theme']; ?>/images/icons/icon_e.gif"
-					width="17" height="17" border="0" title="edit rule"></a></td>
+					width="17" height="17" border="0" title="<?php echo gettext('edit rule'); ?>"></a></td>
 			</tr>
 		</table>
 	
@@ -313,10 +313,10 @@ if ($pfsense_stable == 'yes')
 					<tr>
 						<td><?php if ($nnats == 0): ?><img
 							src="../themes/<?= $g['theme']; ?>/images/icons/icon_x_d.gif"
-							width="17" height="17" title="delete selected rules" border="0"><?php else: ?><input
+							width="17" height="17" title="<?php echo gettext("delete selected rules"); ?>" border="0"><?php else: ?><input
 							name="del" type="image"
 							src="../themes/<?= $g['theme']; ?>/images/icons/icon_x.gif"
-							width="17" height="17" title="delete selected mappings"
+							width="17" height="17" title="<?php echo gettext("delete selected mappings"); ?>"
 							onclick="return confirm('Do you really want to delete the selected Snort Rule?')"><?php endif; ?></td>
 					</tr>
 				</table>
@@ -336,35 +336,35 @@ if ($pfsense_stable == 'yes')
 		<table class="tabcont" width="100%" border="0" cellpadding="0"
 			cellspacing="0">
 			<tr id="frheader">
-				<td width="100%"><span class="red"><strong>Note:</strong></span> <br>
-				This is the <strong>Snort Menu</strong> where you can see an over
-				view of all your interface settings. <br>
-				Please edit the <strong>Global Settings</strong> tab before adding
-				an interface. <br>
+				<td width="100%"><span class="red"><strong><?php echo gettext("Note:"); ?></strong></span> <br>
+				<?php echo gettext('This is the <strong>Snort Menu</strong> where you can see an over ' .
+				'view of all your interface settings. <br> ' .
+				'Please edit the <strong>Global Settings</strong> tab before adding ' .
+				'an interface.'); ?> <br>
 				<br>
-				<span class="red"><strong>Warning:</strong></span> <br>
-				<strong>New settings will not take effect until interface restart.</strong>
+				<span class="red"><strong><?php echo gettext("Warning:"); ?></strong></span> <br>
+				<strong><?php echo gettext("New settings will not take effect until interface restart."); ?></strong>
 				<br>
 				<br>
 				<strong>Click</strong> on the <img
 					src="../themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif"
-					width="17" height="17" border="0" title="Add Icon"> icon to add a
+					width="17" height="17" border="0" title="<?php echo gettext("Add Icon"); ?>"> icon to add a
 				interface.<strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Click</strong>
 				on the <img
 					src="../themes/<?= $g['theme']; ?>/images/icons/icon_pass.gif"
-					width="13" height="13" border="0" title="Start Icon"> icon to <strong>start</strong>
+					width="13" height="13" border="0" title="<?php echo gettext("Start Icon"); ?>"> icon to <strong>start</strong>
 				snort and barnyard2. <br>
 				<strong>Click</strong> on the <img
 					src="../themes/<?= $g['theme']; ?>/images/icons/icon_e.gif"
-					width="17" height="17" border="0" title="Edit Icon"> icon to edit a
+					width="17" height="17" border="0" title="<?php echo gettext("Edit Icon"); ?>"> icon to edit a
 				interface and settings.<strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Click</strong>
 				on the <img
 					src="../themes/<?= $g['theme']; ?>/images/icons/icon_block.gif"
-					width="13" height="13" border="0" title="Stop Icon"> icon to <strong>stop</strong>
+					width="13" height="13" border="0" title="<?php echo gettext("Stop Icon"); ?>"> icon to <strong>stop</strong>
 				snort and barnyard2. <br>
 				<strong> Click</strong> on the <img
 					src="../themes/<?= $g['theme']; ?>/images/icons/icon_x.gif"
-					width="17" height="17" border="0" title="Delete Icon"> icon to
+					width="17" height="17" border="0" title="<?php echo gettext("Delete Icon"); ?>"> icon to
 				delete a interface and settings.</td>
 			</tr>
 		</table>

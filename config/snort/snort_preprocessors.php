@@ -162,184 +162,178 @@ include_once("head.inc");
 <table width="100%" border="0" cellpadding="6" cellspacing="0">
 	<tr>
 		<td width="22%" valign="top">&nbsp;</td>
-		<td width="78%"><span class="vexpl"><span class="red"><strong>Note:
+		<td width="78%"><span class="vexpl"><span class="red"><strong<?php echo gettext("Note:"); ?>>
 		</strong></span><br>
-		Rules may be dependent on preprocessors!<br>
-		Defaults will be used when there is no user input.<br></td>
+		<?php echo gettext("Rules may be dependent on preprocessors!"); ?><br>
+		<?php echo gettext("Defaults will be used when there is no user input."); ?><br></td>
 	</tr>
 	<tr>
-		<td colspan="2" valign="top" class="listtopic">Performance
-		Statistics</td>
+		<td colspan="2" valign="top" class="listtopic"><?php echo gettext("Performance Statistics"); ?></td>
 	</tr>
 	<tr>
-		<td width="22%" valign="top" class="vncell">Enable</td>
+		<td width="22%" valign="top" class="vncell"><?php echo gettext("Enable"); ?></td>
 		<td width="78%" class="vtable"><input name="perform_stat"
 			type="checkbox" value="on"
 			<?php if ($pconfig['perform_stat']=="on") echo "checked"; ?>
-			onClick="enable_change(false)"> Performance Statistics for this
-		interface.</td>
+			onClick="enable_change(false)"> <?php echo gettext("Performance Statistics for this interface."); ?></td>
 	</tr>
 	<tr>
-		<td colspan="2" valign="top" class="listtopic">HTTP Inspect Settings</td>
+		<td colspan="2" valign="top" class="listtopic"><?php echo gettext("HTTP Inspect Settings"); ?></td>
 	</tr>
 	<tr>
-		<td width="22%" valign="top" class="vncell">Enable</td>
+		<td width="22%" valign="top" class="vncell"><?php echo gettext("Enable"); ?></td>
 		<td width="78%" class="vtable"><input name="http_inspect"
 			type="checkbox" value="on"
 			<?php if ($pconfig['http_inspect']=="on") echo "checked"; ?>
-			onClick="enable_change(false)"> Use HTTP Inspect to
-		Normalize/Decode and detect HTTP traffic and protocol anomalies.</td>
+			onClick="enable_change(false)"> <?php echo gettext("Use HTTP Inspect to " .
+				"Normalize/Decode and detect HTTP traffic and protocol anomalies."); ?></td>
 	</tr>
 	<tr>
-		<td valign="top" class="vncell">HTTP server flow depth</td>
+		<td valign="top" class="vncell"><?php echo gettext("HTTP server flow depth"); ?></td>
 		<td class="vtable">
 		<table cellpadding="0" cellspacing="0">
 			<tr>
 				<td><input name="flow_depth" type="text" class="formfld"
 					id="flow_depth" size="5"
-					value="<?=htmlspecialchars($pconfig['flow_depth']);?>"> <strong>-1</strong>
-				to <strong>1460</strong> (<strong>-1</strong> disables HTTP
-				inspect, <strong>0</strong> enables all HTTP inspect)</td>
+					value="<?=htmlspecialchars($pconfig['flow_depth']);?>"> <?php echo gettext("<strong>-1</strong> " .
+				"to <strong>1460</strong> (<strong>-1</strong> disables HTTP " .
+				"inspect, <strong>0</strong> enables all HTTP inspect)"); ?></td>
 			</tr>
 		</table>
-		Amount of HTTP server response payload to inspect. Snort's
-		performance may increase by adjusting this value.<br>
-		Setting this value too low may cause false negatives. Values above 0
-		are specified in bytes. Default value is <strong>0</strong><br>
+		<?php echo gettext("Amount of HTTP server response payload to inspect. Snort's " .
+		"performance may increase by adjusting this value."); ?><br>
+		<?php echo gettext("Setting this value too low may cause false negatives. Values above 0 " .
+		"are specified in bytes. Default value is <strong>0</strong>"); ?><br>
 		</td>
 	</tr>
 	<tr>
-		<td colspan="2" valign="top" class="listtopic">Stream5 Settings</td>
+		<td colspan="2" valign="top" class="listtopic"><?php echo gettext("Stream5 Settings"); ?></td>
 	</tr>
 	<tr>
-		<td valign="top" class="vncell">Max Queued Bytes</td>
+		<td valign="top" class="vncell"><?php echo gettext("Max Queued Bytes"); ?></td>
 		<td class="vtable">
 		<table cellpadding="0" cellspacing="0">
 			<tr>
 				<td><input name="max_queued_bytes" type="text" class="formfld"
 					id="max_queued_bytes" size="5"
 					value="<?=htmlspecialchars($pconfig['max_queued_bytes']);?>">
-				Minimum is <strong>1024</strong>, Maximum is <strong>1073741824</strong>
-				( default value is <strong>1048576</strong>, <strong>0</strong>
-				means Maximum )</td>
+				<?php echo gettext("Minimum is <strong>1024</strong>, Maximum is <strong>1073741824</strong> " .
+				"( default value is <strong>1048576</strong>, <strong>0</strong> " .
+				"means Maximum )"); ?></td>
 			</tr>
 		</table>
-		The number of bytes to be queued for reassembly for TCP sessions in
-		memory. Default value is <strong>1048576</strong><br>
+		<?php echo gettet("The number of bytes to be queued for reassembly for TCP sessions in " .
+		"memory. Default value is <strong>1048576</strong>"); ?><br>
 		</td>
 	</tr>
 	<tr>
-		<td valign="top" class="vncell">Max Queued Segs</td>
+		<td valign="top" class="vncell"><?php echo gettext("Max Queued Segs"); ?></td>
 		<td class="vtable">
 		<table cellpadding="0" cellspacing="0">
 			<tr>
 				<td><input name="max_queued_segs" type="text" class="formfld"
 					id="max_queued_segs" size="5"
 					value="<?=htmlspecialchars($pconfig['max_queued_segs']);?>">
-				Minimum is <strong>2</strong>, Maximum is <strong>1073741824</strong>
-				( default value is <strong>2621</strong>, <strong>0</strong> means
-				Maximum )</td>
+				<?php echo gettext("Minimum is <strong>2</strong>, Maximum is <strong>1073741824</strong> " .
+				"( default value is <strong>2621</strong>, <strong>0</strong> means " .
+				"Maximum )"); ?></td>
 			</tr>
 		</table>
-		The number of segments to be queued for reassembly for TCP sessions
-		in memory. Default value is <strong>2621</strong><br>
+		<?php echo gettext("The number of segments to be queued for reassembly for TCP sessions " .
+		"in memory. Default value is <strong>2621</strong>"); ?><br>
 		</td>
 	</tr>
 	<tr>
-		<td colspan="2" valign="top" class="listtopic">General Preprocessor
-		Settings</td>
+		<td colspan="2" valign="top" class="listtopic"><?php echo gettext("General Preprocessor Settings"); ?></td>
 	</tr>
 	<tr>
-		<td width="22%" valign="top" class="vncell">Enable <br>
-		RPC Decode and Back Orifice detector</td>
+		<td width="22%" valign="top" class="vncell"><?php echo gettext("Enable"); ?> <br>
+		<?php echo gettext("RPC Decode and Back Orifice detector"); ?></td>
 		<td width="78%" class="vtable"><input name="other_preprocs"
 			type="checkbox" value="on"
 			<?php if ($pconfig['other_preprocs']=="on") echo "checked"; ?>
 			onClick="enable_change(false)"><br>
-		Normalize/Decode RPC traffic and detects Back Orifice traffic on the
-		network.</td>
+		<?php echo gettext("Normalize/Decode RPC traffic and detects Back Orifice traffic on the network."); ?></td>
 	</tr>
 	<tr>
-		<td width="22%" valign="top" class="vncell">Enable <br>
-		FTP and Telnet Normalizer</td>
+		<td width="22%" valign="top" class="vncell"><?php echo gettext("Enable"); ?> <br>
+		<?php echo gettext("FTP and Telnet Normalizer"); ?></td>
 		<td width="78%" class="vtable"><input name="ftp_preprocessor"
 			type="checkbox" value="on"
 			<?php if ($pconfig['ftp_preprocessor']=="on") echo "checked"; ?>
 			onClick="enable_change(false)"><br>
-		Normalize/Decode FTP and Telnet traffic and protocol anomalies.</td>
+		<?php echo gettext("Normalize/Decode FTP and Telnet traffic and protocol anomalies."); ?></td>
 	</tr>
 	<tr>
-		<td width="22%" valign="top" class="vncell">Enable <br>
-		SMTP Normalizer</td>
+		<td width="22%" valign="top" class="vncell"><?php echo gettext("Enable"); ?> <br>
+		<?php echo gettext("SMTP Normalizer"); ?></td>
 		<td width="78%" class="vtable"><input name="pop_preproc"
 			type="checkbox" value="on"
 			<?php if ($pconfig['pop_preproc']=="on") echo "checked"; ?>
 			onClick="enable_change(false)"><br>
-		Normalize/Decode POP protocol for enforcement and buffer overflows.</td>
+		<?php echo gettext("Normalize/Decode POP protocol for enforcement and buffer overflows."); ?></td>
 	</tr>
 	<tr>
-		<td width="22%" valign="top" class="vncell">Enable <br>
-		SMTP Normalizer</td>
+		<td width="22%" valign="top" class="vncell"><?php echo gettext("Enable"); ?> <br>
+		<?php echo gettext("SMTP Normalizer"); ?></td>
 		<td width="78%" class="vtable"><input name="imap_preproc"
 			type="checkbox" value="on"
 			<?php if ($pconfig['imap_preproc']=="on") echo "checked"; ?>
 			onClick="enable_change(false)"><br>
-		Normalize/Decode IMAP protocol for enforcement and buffer overflows.</td>
+		<?php echo gettext("Normalize/Decode IMAP protocol for enforcement and buffer overflows."); ?></td>
 	</tr>
 	<tr>
-		<td width="22%" valign="top" class="vncell">Enable <br>
-		SMTP Normalizer</td>
+		<td width="22%" valign="top" class="vncell"><?php echo gettext("Enable"); ?> <br>
+		<?php echo gettext("SMTP Normalizer"); ?></td>
 		<td width="78%" class="vtable"><input name="smtp_preprocessor"
 			type="checkbox" value="on"
 			<?php if ($pconfig['smtp_preprocessor']=="on") echo "checked"; ?>
 			onClick="enable_change(false)"><br>
-		Normalize/Decode SMTP protocol for enforcement and buffer overflows.</td>
+		<?php echo gettext("Normalize/Decode SMTP protocol for enforcement and buffer overflows."); ?></td>
 	</tr>
 	<tr>
-		<td width="22%" valign="top" class="vncell">Enable <br>
-		Portscan Detection</td>
+		<td width="22%" valign="top" class="vncell"><?php echo gettext("Enable"); ?> <br>
+		<?php echo gettext("Portscan Detection"); ?></td>
 		<td width="78%" class="vtable"><input name="sf_portscan"
 			type="checkbox" value="on"
 			<?php if ($pconfig['sf_portscan']=="on") echo "checked"; ?>
 			onClick="enable_change(false)"><br>
-		Detects various types of portscans and portsweeps.</td>
+		<?php echo gettext("Detects various types of portscans and portsweeps."); ?></td>
 	</tr>
 	<tr>
-		<td width="22%" valign="top" class="vncell">Enable <br>
-		DCE/RPC2 Detection</td>
+		<td width="22%" valign="top" class="vncell"><?php echo gettext("Enable"); ?> <br>
+		<?php echo gettext("DCE/RPC2 Detection"); ?></td>
 		<td width="78%" class="vtable"><input name="dce_rpc_2"
 			type="checkbox" value="on"
 			<?php if ($pconfig['dce_rpc_2']=="on") echo "checked"; ?>
 			onClick="enable_change(false)"><br>
-		The DCE/RPC preprocessor detects and decodes SMB and DCE/RPC
-		traffic.</td>
+		<?php echo gettext("The DCE/RPC preprocessor detects and decodes SMB and DCE/RPC traffic."); ?></td>
 	</tr>
 	<tr>
-		<td width="22%" valign="top" class="vncell">Enable <br>
-		DNS Detection</td>
+		<td width="22%" valign="top" class="vncell"><?php echo gettext("Enable"); ?> <br>
+		<?php echo gettext("DNS Detection"); ?></td>
 		<td width="78%" class="vtable"><input name="dns_preprocessor"
 			type="checkbox" value="on"
 			<?php if ($pconfig['dns_preprocessor']=="on") echo "checked"; ?>
 			onClick="enable_change(false)"><br>
-		The DNS preprocessor decodes DNS Response traffic and detects some
-		vulnerabilities.</td>
+		<?php echo gettext("The DNS preprocessor decodes DNS Response traffic and detects some vulnerabilities."); ?></td>
 	</tr>
 	<tr>
-		<td width="22%" valign="top" class="vncell">Enable <br> SSL Data</td>
+		<td width="22%" valign="top" class="vncell"><?php echo gettext("Enable"); ?> <br> <?php echo gettext("SSL Data"); ?></td>
 		<td width="78%" class="vtable">
 			<input name="ssl_preproc" type="checkbox" value="on"
 			<?php if ($pconfig['ssl_preproc']=="on") echo "checked"; ?>
 			onClick="enable_change(false)"><br>
-		SSL data searches for irregularities during SSL protocol exchange
+		<?php echo gettext("SSL data searches for irregularities during SSL protocol exchange"); ?>	
 		</td>
 	</tr>
 	<tr>
-		<td width="22%" valign="top" class="vncell">Enable <br> Sensitive Data</td>
+		<td width="22%" valign="top" class="vncell"><?php echo gettext("Enable"); ?> <br> <?php echo gettext("Sensitive Data"); ?></td>
 		<td width="78%" class="vtable">
 			<input name="sensitive_data" type="checkbox" value="on"
 			<?php if ($pconfig['sensitive_data']=="on") echo "checked"; ?>
 			onClick="enable_change(false)"><br>
-		Sensisitive data searches for CC or SS# in data
+		<?php echo gettext("Sensisitive data searches for CC or SS# in data"); ?>	
 		</td>
 	</tr>
 	<tr>
@@ -350,9 +344,9 @@ include_once("head.inc");
 			</tr>
 			<tr>
 				<td width="22%" valign="top">&nbsp;</td>
-				<td width="78%"><span class="vexpl"><span class="red"><strong>Note:</strong></span>
+				<td width="78%"><span class="vexpl"><span class="red"><strong><?php echo gettext("Note:"); ?></strong></span>
 				<br>
-				Please save your settings before you click Start. </td>
+				<?php echo gettext("Please save your settings before you click Start."); ?> </td>
 			</tr>
 </table>
 </td></tr></table>

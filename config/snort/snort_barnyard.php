@@ -162,40 +162,40 @@ function enable_change(enable_change) {
 		<td class="tabcont">
 		<table width="100%" border="0" cellpadding="6" cellspacing="0">
 			<tr>
-				<td colspan="2" valign="top" class="listtopic">General Barnyard2
-				Settings</td>
+				<td colspan="2" valign="top" class="listtopic"><?php echo gettext("General Barnyard2 " .
+				"Settings"); ?></td>
 			</tr>
 			<tr>
-				<td width="22%" valign="top" class="vncellreq">Enable</td>
+				<td width="22%" valign="top" class="vncellreq"><?php echo gettext("Enable"); ?></td>
 				<td width="78%" class="vtable">
 					<input name="barnyard_enable" type="checkbox" value="on" <?php if ($pconfig['barnyard_enable'] == "on") echo "checked"; ?>  onClick="enable_change(false)">
-					<strong>Enable Barnyard2 </strong><br>
-					This will enable barnyard2 for this interface. You will also have to set the database credentials.</td>
+					<strong><?php echo gettext("Enable Barnyard2"); ?></strong><br>
+					<?php echo gettext("This will enable barnyard2 for this interface. You will also have to set the database credentials."); ?></td>
 			</tr>
 			<tr>
-				<td colspan="2" valign="top" class="listtopic">Mysql Settings</td>
+				<td colspan="2" valign="top" class="listtopic"><?php echo gettext("Mysql Settings"); ?></td>
 			</tr>
 			<tr>
-				<td width="22%" valign="top" class="vncell">Log to a Mysql Database</td>
+				<td width="22%" valign="top" class="vncell"><?php echo gettext("Log to a Mysql Database"); ?></td>
 				<td width="78%" class="vtable"><input name="barnyard_mysql"
 					type="text" class="formfld" id="barnyard_mysql" size="100"
 					value="<?=htmlspecialchars($pconfig['barnyard_mysql']);?>"> <br>
-				<span class="vexpl">Example: output database: alert, mysql,
-				dbname=snort user=snort host=localhost password=xyz<br>
-				Example: output database: log, mysql, dbname=snort user=snort
-				host=localhost password=xyz</span></td>
+				<span class="vexpl"><?php echo gettext("Example: output database: alert, mysql, " .
+				"dbname=snort user=snort host=localhost password=xyz"); ?><br>
+				<?php echo gettext("Example: output database: log, mysql, dbname=snort user=snort " .
+				"host=localhost password=xyz"); ?></span></td>
 			</tr>
 			<tr>
-				<td colspan="2" valign="top" class="listtopic">Advanced Settings</td>
+				<td colspan="2" valign="top" class="listtopic"><?php echo gettext("Advanced Settings"); ?></td>
 			</tr>
 			<tr>
-				<td width="22%" valign="top" class="vncell">Advanced configuration
-				pass through</td>
+				<td width="22%" valign="top" class="vncell"<?php echo gettext("Advanced configuration " .
+				"pass through"); ?></td>
 				<td width="78%" class="vtable"><textarea name="barnconfigpassthru"
 					cols="60" rows="7" id="barnconfigpassthru" ><?=htmlspecialchars($pconfig['barnconfigpassthru']);?></textarea>
 				<br>
-				Arguments here will be automatically inserted into the running
-				barnyard2 configuration.</td>
+				<?php echo gettext("Arguments here will be automatically inserted into the running " .
+				"barnyard2 configuration."); ?></td>
 			</tr>
 			<tr>
 				<td width="22%" valign="top">&nbsp;</td>
@@ -205,9 +205,9 @@ function enable_change(enable_change) {
 			</tr>
 			<tr>
 				<td width="22%" valign="top">&nbsp;</td>
-				<td width="78%"><span class="vexpl"><span class="red"><strong>Note:</strong></span>
+				<td width="78%"><span class="vexpl"><span class="red"><strong><?php echo gettext("Note:"); ?></strong></span>
 				<br>
-				Please save your settings befor you click start. </td>
+				<?php echo gettext("Please save your settings befor you click start."); ?> </td>
 			</tr>
 		</table>
 

@@ -147,19 +147,19 @@ if ($savemsg)
 	<td colspan="2" class="listtopic">Add the name and description of the file.</td>
 </tr>
 <tr>
-	<td width="22%" valign="top" class="vncellreq">Name</td>
+	<td width="22%" valign="top" class="vncellreq"><?php echo gettext("Name"); ?></td>
 	<td width="78%" class="vtable"><input name="name" type="text" id="name"
 		class="formfld unkown" size="40" value="<?=htmlspecialchars($pconfig['name']);?>" /> <br />
-	<span class="vexpl"> The list name may only consist of the
-	characters a-z, A-Z and 0-9. <span class="red">Note: </span> No
-	Spaces. </span></td>
+	<span class="vexpl"> <?php echo gettext("The list name may only consist of the " .
+	"characters a-z, A-Z and 0-9."); ?> <span class="red"><?php echo gettext("Note:"); ?> </span>
+	<?php echo gettext("No Spaces."); ?> </span></td>
 </tr>
 <tr>
-	<td width="22%" valign="top" class="vncell">Description</td>
+	<td width="22%" valign="top" class="vncell"><?php echo gettext("Description"); ?></td>
 	<td width="78%" class="vtable"><input name="descr" type="text"
 		class="formfld unkown" id="descr" size="40" value="<?=$pconfig['descr'];?>" /> <br />
-	<span class="vexpl"> You may enter a description here for your
-	reference (not parsed). </span></td>
+	<span class="vexpl"> <?php echo gettext("You may enter a description here for your " .
+	"reference (not parsed)."); ?> </span></td>
 </tr>
 <tr>
 	<td colspan="2">
@@ -167,30 +167,30 @@ if ($savemsg)
 		<table width='100%'>
 			<tr>
 				<td width='8%'>&nbsp;&nbsp;&nbsp;</td>
-				<td width='70%'><font size="2" color='#FF850A'><b>NOTE:</b></font>
-				<font color='#000000'>&nbsp;&nbsp;The threshold keyword
-				is deprecated as of version 2.8.5. Use the event_filter keyword
-				instead.</font></td>
+				<td width='70%'><font size="2" color='#FF850A'><b><?php echo gettext("NOTE:"); ?></b></font>
+				<font color='#000000'>&nbsp;&nbsp;<?php echo gettext("The threshold keyword " .
+				"is deprecated as of version 2.8.5. Use the event_filter keyword " .
+				"instead."); ?></font></td>
 			</tr>
 		</table>
 		</div>
 	</td>
 </tr>
 <tr>
-	<td colspan="2" valign="top" class="listtopic">Apply suppression or
-	filters to rules. Valid keywords are 'suppress', 'event_filter' and
-	'rate_filter'.</td>
+	<td colspan="2" valign="top" class="listtopic"><?php echo gettext("Apply suppression or " .
+	"filters to rules. Valid keywords are 'suppress', 'event_filter' and " .
+	"'rate_filter'."); ?></td>
 </tr>
 <tr>
-	<td colspan="2" valign="top" class="vncell"><b>Example 1;</b>
+<td colspan="2" valign="top" class="vncell"><b><?php echo gettext("Example 1;"); ?></b>
 		suppress gen_id 1, sig_id 1852, track by_src, ip 10.1.1.54<br>
-		<b>Example 2;</b> event_filter gen_id 1, sig_id 1851, type limit,
+		<b><?php echo gettext("Example 2;"); ?></b> event_filter gen_id 1, sig_id 1851, type limit,
 		track by_src, count 1, seconds 60<br>
-		<b>Example 3;</b> rate_filter gen_id 135, sig_id 1, track by_src,
+		<b><?php echo gettext("Example 3;"); ?></b> rate_filter gen_id 135, sig_id 1, track by_src,
 		count 100, seconds 1, new_action log, timeout 10</td>
 </tr>
 <tr>
-	<td width="10%" class="vncell">&nbsp;Advanced pass through</td>
+	<td width="10%" class="vncell">&nbsp;<?php echo gettext("Advanced pass through"); ?></td>
 	<td width="100%" class="vtable"><textarea wrap="off"
 		name="suppresspassthru" cols="90" rows="28" id="suppresspassthru" class="formpre"><?=htmlspecialchars($pconfig['suppresspassthru']);?></textarea>
 	</td>
