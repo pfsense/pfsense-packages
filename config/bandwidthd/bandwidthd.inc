@@ -164,7 +164,7 @@ $dev
 
 # An interval is 2.5 minutes, this is how many
 # intervals to skip before doing a graphing run
-$skip_inervals
+$skip_intervals
 
 # Graph cutoff is how many k must be transfered by an
 # ip before we bother to graph it
