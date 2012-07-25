@@ -137,15 +137,15 @@ if ($pconfig['brefresh'] == 'on')
 <table width="99%" border="0" cellpadding="0" cellspacing="0">
 <tr><td>
 <?php
-        $tab_array = array();
-        $tab_array[0] = array(gettext("Snort Interfaces"), false, "/snort/snort_interfaces.php");
-        $tab_array[1] = array(gettext("Global Settings"), false, "/snort/snort_interfaces_global.php");
-        $tab_array[2] = array(gettext("Updates"), false, "/snort/snort_download_updates.php");
-        $tab_array[3] = array(gettext("Alerts"), false, "/snort/snort_alerts.php");
-        $tab_array[4] = array(gettext("Blocked"), true, "/snort/snort_blocked.php");
-        $tab_array[5] = array(gettext("Whitelists"), false, "/snort/snort_interfaces_whitelist.php");
-        $tab_array[6] = array(gettext("Suppress"), false, "/snort/snort_interfaces_suppress.php");
-        display_top_tabs($tab_array);
+	$tab_array = array();
+	$tab_array[0] = array(gettext("Snort Interfaces"), false, "/snort/snort_interfaces.php");
+	$tab_array[1] = array(gettext("Global Settings"), false, "/snort/snort_interfaces_global.php");
+	$tab_array[2] = array(gettext("Updates"), false, "/snort/snort_download_updates.php");
+	$tab_array[3] = array(gettext("Alerts"), false, "/snort/snort_alerts.php");
+	$tab_array[4] = array(gettext("Blocked"), true, "/snort/snort_blocked.php");
+	$tab_array[5] = array(gettext("Whitelists"), false, "/snort/snort_interfaces_whitelist.php");
+	$tab_array[6] = array(gettext("Suppress"), false, "/snort/snort_interfaces_suppress.php");
+	display_top_tabs($tab_array);
 ?>
 </td></tr>
 	<tr>
@@ -208,10 +208,9 @@ if ($pconfig['brefresh'] == 'on')
 				if ($fd) {
 					/*                 0         1           2      3      4    5    6    7      8     9    10    11             12
 					/* File format timestamp,sig_generator,sig_id,sig_rev,msg,proto,src,srcport,dst,dstport,id,classification,priority */
-					while(($fileline = @fgets($fd))) {
-						if (empty($fileline))
+					while (($fields = fgetcsv($fd, 1000, ',', '"')) !== FALSE) {
+						if(count($fields) < 11)
 							continue;
-						$fields = explode(",", $fileline);
 					
 						if (isset($tmpblocked[$fields[6]])) {
 							if (!is_array($src_ip_list[$fields[6]]))
