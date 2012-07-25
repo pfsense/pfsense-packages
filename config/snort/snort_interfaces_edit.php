@@ -197,23 +197,23 @@ function enable_change(enable_change) {
 <tr><td class="tabcont">
 <table width="100%" border="0" cellpadding="6" cellspacing="0">
 	<tr>
-		<td colspan="2" valign="top" class="listtopic">General Settings</td>
+		<td colspan="2" valign="top" class="listtopic"><?php echo gettext("General Settings"); ?></td>
 	</tr>
 	<tr>
-		<td width="22%" valign="top" class="vncellreq">Enable</td>
+		<td width="22%" valign="top" class="vncellreq"><?php echo gettext("Enable"); ?></td>
 		<td width="78%" valign="top" class="vtable">&nbsp;
 	<?php
 		if ($pconfig['enable'] == "on")
 			$checked = "checked";
 		echo "
 			<input name=\"enable\" type=\"checkbox\" value=\"on\" $checked onClick=\"enable_change(false)\">
-			&nbsp;&nbsp;Enable or Disable\n";
+			&nbsp;&nbsp;" . gettext("Enable or Disable") . "\n";
 	?>
 		<br/>
 		</td>
 	</tr>
 	<tr>
-		<td width="22%" valign="top" class="vncellreq">Interface</td>
+		<td width="22%" valign="top" class="vncellreq"><?php echo gettext("Interface"); ?></td>
 		<td width="78%" class="vtable">
 			<select name="interface" class="formselect">
 		<?php
@@ -231,19 +231,19 @@ function enable_change(enable_change) {
 				</option>
 			<?php 	endforeach; ?>
 			</select><br>
-			<span class="vexpl">Choose which interface this rule applies to.<br/>
-				<b>Hint: </b>in most cases, you'll want to use WAN here.</span><br/><br/></td>
+			<span class="vexpl"><?php echo gettext("Choose which interface this rule applies to."); ?><br/>
+				<b><?php echo gettext("Hint:"); ?> </b><?php echo gettext("in most cases, you'll want to use WAN here."); ?></span><br/><br/></td>
 	</tr>
 	<tr>
-				<td width="22%" valign="top" class="vncellreq">Description</td>
+				<td width="22%" valign="top" class="vncellreq"><?php echo gettext("Description"); ?></td>
 				<td width="78%" class="vtable"><input name="descr" type="text"
 					class="formfld" id="descr" size="40"
 					value="<?=htmlspecialchars($pconfig['descr']);?>"> <br/>
-				<span class="vexpl">You may enter a description here for your
-				reference (not parsed).</span><br/><br/></td>
+				<span class="vexpl"><?php echo gettext("You may enter a description here for your " .
+				"reference (not parsed)."); ?></span><br/><br/></td>
 	</tr>
 	<tr>
-				<td width="22%" valign="top" class="vncell">Memory Performance</td>
+				<td width="22%" valign="top" class="vncell"><?php echo gettext("Memory Performance"); ?></td>
 				<td width="78%" class="vtable">
 					<select name="performance" class="formselect" id="performance">
 					<?php
@@ -254,19 +254,19 @@ function enable_change(enable_change) {
 						<?=htmlspecialchars($ifacename2);?></option>
 						<?php endforeach; ?>
 				</select><br>
-				<span class="vexpl">Lowmem and ac-bnfa are recommended for low end
-				systems, Ac: high memory, best performance, ac-std: moderate
-				memory,high performance, acs: small memory, moderateperformance,
-				ac-banded: small memory,moderate performance, ac-sparsebands: small
-				memory, high performance.
+				<span class="vexpl"><?php echo gettext("Lowmem and ac-bnfa are recommended for low end " .
+				"systems, Ac: high memory, best performance, ac-std: moderate " .
+				"memory,high performance, acs: small memory, moderateperformance, " .
+				"ac-banded: small memory,moderate performance, ac-sparsebands: small " .
+				"memory, high performance."); ?>
 				</span><br/></td>
 	</tr>
 	<tr>
-				<td colspan="2" valign="top" class="listtopic">Choose the networks
-				snort should inspect and whitelist.</td>
+				<td colspan="2" valign="top" class="listtopic"><?php echo gettext("Choose the networks " .
+				"snort should inspect and whitelist."); ?></td>
 	</tr>
 	<tr>
-				<td width="22%" valign="top" class="vncell">Home net</td>
+				<td width="22%" valign="top" class="vncell"><?php echo gettext("Home net"); ?></td>
 				<td width="78%" class="vtable">
 					<select name="homelistname" class="formselect" id="homelistname">
 				<?php
@@ -284,14 +284,14 @@ function enable_change(enable_change) {
 					}
 				?>
 				</select><br/>
-				<span class="vexpl">Choose the home net you will like this rule to
-				use. </span><br/>&nbsp;<br/><span class="red">Note:</span>&nbsp;Default home
-				net adds only local networks.<br>
-				<span class="red">Hint:</span>&nbsp;Most users add a list of
-				friendly ips that the firewall cant see.<br/></td>
+				<span class="vexpl"><?php echo gettext("Choose the home net you will like this rule to " .
+				"use."); ?> </span><br/>&nbsp;<br/><span class="red"><?php echo gettext("Note:"); ?></span>&nbsp;<?php echo gettext("Default home " .
+				"net adds only local networks."); ?><br>
+				<span class="red"><?php echo gettext("Hint:"); ?></span>&nbsp;<?php echo gettext("Most users add a list of " .
+				"friendly ips that the firewall cant see."); ?><br/></td>
 	</tr>
 	<tr>
-				<td width="22%" valign="top" class="vncell">External net</td>
+				<td width="22%" valign="top" class="vncell"><?php echo gettext("External net"); ?></td>
 				<td width="78%" class="vtable">
 					<select name="externallistname" class="formselect" id="externallistname">
 				<?php
@@ -309,30 +309,30 @@ function enable_change(enable_change) {
 					}
 				?>
 				</select><br/>
-				<span class="vexpl">Choose the external net you will like this rule
-				to use. </span>&nbsp;<br/><span class="red">Note:</span>&nbsp;Default
-				external net, networks that are not home net.<br/>
-				<span class="red">Hint:</span>&nbsp;Most users should leave this
-				setting at default.<br/></td>
+				<span class="vexpl"><?php echo gettext("Choose the external net you will like this rule " .
+				"to use."); ?> </span>&nbsp;<br/><span class="red"><?php echo gettext("Note:"); ?></span>&nbsp;<?php echo gettext("Default " .
+				"external net, networks that are not home net."); ?><br/>
+				<span class="red"><?php echo gettext("Hint:"); ?></span>&nbsp;<?php echo gettext("Most users should leave this " .
+				"setting at default."); ?><br/></td>
 	</tr>
 	<tr>
-				<td width="22%" valign="top" class="vncell">Block offenders</td>
+				<td width="22%" valign="top" class="vncell"><?php echo gettext("Block offenders"); ?></td>
 				<td width="78%" class="vtable">
 					<input name="blockoffenders7" id="blockoffenders7" type="checkbox" value="on"
 					<?php if ($pconfig['blockoffenders7'] == "on") echo "checked"; ?>
 					onClick="enable_blockoffenders()"><br>
-				Checking this option will automatically block hosts that generate a
-				Snort alert.</td>
+				<?php echo gettext("Checking this option will automatically block hosts that generate a " .
+				"Snort alert."); ?></td>
 	</tr>
 	<tr>
-				<td width="22%" valign="top" class="vncell">Kill states</td>
+				<td width="22%" valign="top" class="vncell"><?php echo gettext("Kill states"); ?></td>
 				<td width="78%" class="vtable">
 					<input name="blockoffenderskill" id="blockoffenderskill" type="checkbox" value="on" <?php if ($pconfig['blockoffenderskill'] == "on") echo "checked"; ?>>
-					<br/>Should firewall states be killed for the blocked ip
+					<br/<?php echo gettext("Should firewall states be killed for the blocked ip"); ?>>
 				</td>
 	</tr>
 	<tr>
-				<td width="22%" valign="top" class="vncell">Which ip to block</td>
+				<td width="22%" valign="top" class="vncell"><?php echo gettext("Which ip to block"); ?></td>
 				<td width="78%" class="vtable">
 					<select name="blockoffendersip" class="formselect" id="blockoffendersip">
 				<?php
@@ -345,11 +345,11 @@ function enable_change(enable_change) {
 					}
 				?>
 					</select>
-				<br/> Which ip extracted from the packet you want to block
+				<br/><?php echo gettext("Which ip extracted from the packet you want to block"); ?> 
 				</td>
 	</tr>
 	<tr>
-		<td width="22%" valign="top" class="vncell">Whitelist</td>
+		<td width="22%" valign="top" class="vncell"><?php echo gettext("Whitelist"); ?></td>
 		<td width="78%" class="vtable">
 			<select name="whitelistname" class="formselect" id="whitelistname">
 		<?php
@@ -366,14 +366,14 @@ function enable_change(enable_change) {
 			}
 		?>
 		</select><br>
-		<span class="vexpl">Choose the whitelist you will like this rule to
-		use. </span><br/>&nbsp;<br/><span class="red">Note:</span><br/>&nbsp;Default
-		whitelist adds only local networks.<br/>
-		<span class="red">Note:</span><br/>&nbsp;This option will only be used when block offenders is on.
+		<span class="vexpl"><?php echo gettext("Choose the whitelist you will like this rule to " .
+		"use."); ?> </span><br/>&nbsp;<br/><span class="red"><?php echo gettext("Note:"); ?></span><br/>&nbsp;<?php echo gettext("Default " .
+		"whitelist adds only local networks."); ?><br/>
+		<span class="red"><?php echo gettext("Note:"); ?></span><br/>&nbsp;<?php echo gettext("This option will only be used when block offenders is on."); ?>
 		</td>
 	</tr>
 	<tr>
-		<td width="22%" valign="top" class="vncell">Suppression and filtering</td>
+		<td width="22%" valign="top" class="vncell"><?php echo gettext("Suppression and filtering"); ?></td>
 		<td width="78%" class="vtable">
 			<select name="suppresslistname" class="formselect" id="suppresslistname">
 		<?php
@@ -391,33 +391,33 @@ function enable_change(enable_change) {
 			}
 		?>
 		</select><br>
-		<span class="vexpl">Choose the suppression or filtering file you
-		will like this rule to use. </span><br/>&nbsp;<br/><span class="red">Note:</span><br/>&nbsp;Default
-		option disables suppression and filtering.</td>
+		<span class="vexpl"><?php echo gettext("Choose the suppression or filtering file you " .
+		"will like this rule to use."); ?> </span><br/>&nbsp;<br/><span class="red"><?php echo gettext("Note:"); ?></span><br/>&nbsp;<?php echo gettext("Default " .
+		"option disables suppression and filtering."); ?></td>
 	</tr>
 	<tr>
-				<td width="22%" valign="top" class="vncell">Checksum checking</td>
+				<td width="22%" valign="top" class="vncell"><?php echo gettext("Checksum checking"); ?></td>
 				<td width="78%" class="vtable">
 					<input name="cksumcheck" id="cksumcheck" type="checkbox" value="on" <?php if ($pconfig['cksumcheck'] == "on") echo "checked"; ?>>
-					<br/>If ticked checksum checking on snort will be disabled to improve performance.
-					<br/>Most of this is already done on the firewall/filter level
+					<br/<?php echo gettext("If ticked checksum checking on snort will be disabled to improve performance."); ?>>
+					<br/<?php echo gettext("Most of this is already done on the firewall/filter level"); ?>>
 				</td>
 	</tr>
 	<tr>
-		<td width="22%" valign="top" class="vncell">Send alerts to main
-		System logs</td>
+		<td width="22%" valign="top" class="vncell"><?php echo gettext("Send alerts to main " .
+		"lSystem logs"); ?></td>
 		<td width="78%" class="vtable"><input name="alertsystemlog"
 			type="checkbox" value="on"
 			<?php if ($pconfig['alertsystemlog'] == "on") echo "checked"; ?>
 			onClick="enable_change(false)"><br>
-		Snort will send Alerts to the firewall's system logs.</td>
+		<?php echo gettext("Snort will send Alerts to the firewall's system logs."); ?></td>
 	</tr>
 <tr>
-	<td colspan="2" valign="top" class="listtopic">Arguments here will
-	be automatically inserted into the snort configuration.</td>
+	<td colspan="2" valign="top" class="listtopic"><?php echo gettext("Arguments here will " .
+	"be automatically inserted into the snort configuration."); ?></td>
 </tr>
 <tr>
-	<td width="22%" valign="top" class="vncell">Advanced configuration pass through</td>
+	<td width="22%" valign="top" class="vncell"><?php echo gettext("Advanced configuration pass through"); ?></td>
 	<td width="78%" class="vtable">
 		<textarea wrap="off" name="configpassthru" cols="65" rows="12" id="configpassthru"><?=htmlspecialchars($pconfig['configpassthru']);?></textarea>
 		
@@ -431,9 +431,9 @@ function enable_change(enable_change) {
 </tr>
 <tr>
 	<td width="22%" valign="top">&nbsp;</td>
-	<td width="78%"><span class="vexpl"><span class="red"><strong>Note:</strong></span><br/>
+	<td width="78%"><span class="vexpl"><span class="red"><strong><?php echo gettext("Note:"); ?></strong></span><br/>
 		<br>
-		Please save your settings before you click start.
+		<?php echo gettext("Please save your settings before you click start."); ?>	
 	</td>
 </tr>
 </table>

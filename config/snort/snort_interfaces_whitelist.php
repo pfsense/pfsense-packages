@@ -124,12 +124,12 @@ if ($savemsg) print_info_box($savemsg);
 					<td valign="middle"><a
 						href="snort_interfaces_whitelist_edit.php?id=<?=$i;?>"><img
 						src="/themes/<?= $g['theme']; ?>/images/icons/icon_e.gif"
-						width="17" height="17" border="0" title="edit whitelist"></a></td>
+						width="17" height="17" border="0" title="<?php echo gettext("edit whitelist"); ?>"></a></td>
 					<td><a
 						href="/snort/snort_interfaces_whitelist.php?act=del&id=<?=$i;?>"
-						onclick="return confirm('Do you really want to delete this whitelist? All elements that still use it will become invalid (e.g. snort rules will fall back to the default whitelist)!')"><img
+						onclick="return confirm('<?php echo gettext("Do you really want to delete this whitelist? All elements that still use it will become invalid (e.g. snort rules will fall back to the default whitelist)!"); ?>')"><img
 						src="/themes/<?= $g['theme']; ?>/images/icons/icon_x.gif"
-						width="17" height="17" border="0" title="delete whitelist"></a></td>
+						width="17" height="17" border="0" title="<?php echo gettext("delete whitelist"); ?>"></a></td>
 				</tr>
 			</table>
 			</td>
@@ -144,7 +144,7 @@ if ($savemsg) print_info_box($savemsg);
 					<td valign="middle"><a
 						href="snort_interfaces_whitelist_edit.php?id=<?php echo $id_gen;?> "><img
 						src="/themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif"
-						width="17" height="17" border="0" title="add a new list"></a></td>
+						width="17" height="17" border="0" title="<?php echo gettext("add a new list"); ?>"></a></td>
 				</tr>
 			</table>
 				</td>
@@ -156,13 +156,13 @@ if ($savemsg) print_info_box($savemsg);
 <br>
 <table width="100%" border="0" cellpadding="0"
 	cellspacing="0">
-	<td width="100%"><span class="vexpl"><span class="red"><strong>Note:</strong></span>
-	<p><span class="vexpl">Here you can create whitelist files for your
-	snort package rules.<br>
-	Please add all the ips or networks you want to protect against snort
-	block decisions.<br>
-	Remember that the default whitelist only includes local networks.<br>
-	Be careful, it is very easy to get locked out of you system.</span></p></td>
+	<td width="100%"><span class="vexpl"><span class="red"><strong><?php echo gettext("Note:"); ?></strong></span>
+	<p><span class="vexpl"><?php echo gettext("Here you can create whitelist files for your " .
+	"snort package rules."); ?><br>
+	<?php echo gettext("Please add all the ips or networks you want to protect against snort " .
+	"block decisions."); ?><br>
+	<?php echo gettext("Remember that the default whitelist only includes local networks."); ?><br>
+	<?php echo gettext("Be careful, it is very easy to get locked out of you system."); ?></span></p></td>
 </table>
 </form>
 <?php include("fend.inc"); ?>

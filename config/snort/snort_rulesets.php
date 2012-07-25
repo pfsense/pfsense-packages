@@ -204,8 +204,8 @@ if ($savemsg) {
 ?>
 		<tr>
 			<td>
-		# The rules directory is empty. <?=$snortdir;?>/rules <br/>
-		Please go to the updates page to download/fetch the rules configured.
+		<?php printf(gettext("# The rules directory is empty. %s/rules"), $snortdir); ?> <br/>
+		<?php echo gettext("Please go to the updates page to download/fetch the rules configured."); ?>	
 			</td>
 		</tr>
 <?php else: 
@@ -221,7 +221,7 @@ if ($savemsg) {
 			<table id="sortabletable1" class="sortable" width="100%" border="0"
 				cellpadding="0" cellspacing="0">
 			<tr>
-				<td colspan="6" class="listtopic">Check the rulesets that you would like Snort to load at startup.<br/><br/></td>
+				<td colspan="6" class="listtopic"><?php echo gettext("Check the rulesets that you would like Snort to load at startup."); ?><br/><br/></td>
 			</tr>
 			<tr>
 				<td colspan="2" valign="center"><br/><input value="Save" type="submit" name="Submit" id="Submit" /><br/<br/></td>
@@ -231,18 +231,18 @@ if ($savemsg) {
 			<tr>    <td colspan="6">&nbsp;</td> </tr>
 			<tr id="frheader">
 				<?php if ($emergingdownload == 'on'): ?>
-					<td width="5%" class="listhdrr">Enabled</td>
-					<td width="25%" class="listhdrr"><?php echo 'Ruleset: Emerging Threats.';?></td>
+					<td width="5%" class="listhdrr"><?php echo gettext("Enabled"); ?></td>
+					<td width="25%" class="listhdrr"><?php echo gettext('Ruleset: Emerging Threats.');?></td>
 				<?php else: ?>
-					<td colspan="2" width="30%" class="listhdrr">Emerging rules have not been enabled</td>
+					<td colspan="2" width="30%" class="listhdrr"><?php echo gettext("Emerging rules have not been enabled"); ?></td>
 				<?php endif; ?>
 				<?php if ($snortdownload == 'on'): ?>
-					<td width="5%" class="listhdrr">Enabled</td>
-					<td width="25%" class="listhdrr"><?php echo 'Ruleset: Snort';?></td>
-					<td width="5%" class="listhdrr">Enabled</td>
-					<td width="25%" class="listhdrr"><?php echo 'Ruleset: Snort SO';?></td>
+					<td width="5%" class="listhdrr"><?php echo gettext("Enabled"); ?></td>
+					<td width="25%" class="listhdrr"><?php echo gettext('Ruleset: Snort');?></td>
+					<td width="5%" class="listhdrr"><?php echo gettext("Enabled"); ?></td>
+					<td width="25%" class="listhdrr"><?php echo gettext('Ruleset: Snort SO');?></td>
 				<?php else: ?>
-					<td colspan="2" width="60%" class="listhdrr">Snort rules have not been enabled</td>
+					<td colspan="2" width="60%" class="listhdrr"><?php echo gettext("Snort rules have not been enabled"); ?></td>
 				<?php endif; ?>
 				</tr>
 			<?php

@@ -153,30 +153,30 @@ if ($pconfig['brefresh'] == 'on')
 		<table id="maintable" class="tabcont" width="100%" border="0"
 			cellpadding="0" cellspacing="0">
 			<tr>
-				<td width="22%" colspan="0" class="listtopic">Last <?=$bnentries;?>
-				Blocked.</td>
-				<td width="78%" class="listtopic">This page lists hosts that have
-				been blocked by Snort.&nbsp;&nbsp;<?=$blocked_msg_txt;?></td>
+				<td width="22%" colspan="0" class="listtopic"><?php printf(gettext("Last %s " .
+				"Blocked."), $bnentries); ?></td>
+				<td width="78%" class="listtopic"><?php echo gettext("This page lists hosts that have " .
+				"been blocked by Snort."); ?>&nbsp;&nbsp;<?=$blocked_msg_txt;?></td>
 			</tr>
 			<tr>
-				<td width="22%" class="vncell">Save or Remove Hosts</td>
+				<td width="22%" class="vncell"><?php echo gettext("Save or Remove Hosts"); ?></td>
 				<td width="78%" class="vtable">
-					<input name="download" type="submit" class="formbtn" value="Download"> All
-				blocked hosts will be saved. <input name="remove" type="submit"
-					class="formbtn" value="Clear"> <span class="red"><strong>Warning:</strong></span>
-				all hosts will be removed.</form>
+					<input name="download" type="submit" class="formbtn" value="Download"> <?php echo gettext("All " .
+				"blocked hosts will be saved."); ?> <input name="remove" type="submit"
+					class="formbtn" value="Clear"> <span class="red"><strong><?php echo gettext("Warning:"); ?></strong></span>
+				<?php echo gettext("all hosts will be removed."); ?></form>
 				</td>
 			</tr>
 			<tr>
-				<td width="22%" class="vncell">Auto Refresh and Log View</td>
+				<td width="22%" class="vncell"><?php echo gettext("Auto Refresh and Log View"); ?></td>
 				<td width="78%" class="vtable">
-					<input name="save" type="submit" class="formbtn" value="Save"> Refresh <input
+					<input name="save" type="submit" class="formbtn" value="Save"> <?php echo gettext("Refresh"); ?> <input
 					name="brefresh" type="checkbox" value="on"
 					<?php if ($config['installedpackages']['snortglobal']['alertsblocks']['brefresh']=="on" || $config['installedpackages']['snortglobal']['alertsblocks']['brefresh']=='') echo "checked"; ?>>
-				<strong>Default</strong> is <strong>ON</strong>. <input
+				<?php printf(gettext("%sDefault%s is %sON%s."), '<strong>', '</strong>', '<strong>', '</strong>'); ?> <input
 					name="blertnumber" type="text" class="formfld" id="blertnumber"
-					size="5" value="<?=htmlspecialchars($bnentries);?>"> Enter the
-				number of blocked entries to view. <strong>Default</strong> is <strong>500</strong>.
+					size="5" value="<?=htmlspecialchars($bnentries);?>"> <?php printf(gettext("Enter the " .
+				"number of blocked entries to view. %sDefault%s is %s500%s."), '<strong>', '</strong>', '<strong>', '</strong>'); ?>
 				</td>
 			</tr>
 	<tr>
@@ -185,9 +185,9 @@ if ($pconfig['brefresh'] == 'on')
 				cellpadding="0" cellspacing="0">
 				<tr id="frheader">
 					<td width="5%" class="listhdrr">#</td>
-					<td width="15%" class="listhdrr">IP</td>
-					<td width="70%" class="listhdrr">Alert Description</td>
-					<td width="5%" class="listhdrr">Remove</td>
+					<td width="15%" class="listhdrr"><?php echo gettext("IP"); ?></td>
+					<td width="70%" class="listhdrr"><?php echo gettext("Alert Description"); ?></td>
+					<td width="5%" class="listhdrr"><?php echo gettext("Remove"); ?></td>
 				</tr>
 		<?php
 			/* set the arrays */
@@ -248,7 +248,7 @@ if ($pconfig['brefresh'] == 'on')
 			<td width='15%' >&nbsp;{$blocked_ip}</td>
 			<td width='70%' >&nbsp;{$blocked_desc}</td>
 			<td width='5%' align=\"center\" valign=\"top\"'><a href='snort_blocked.php?todelete=" . trim(urlencode($blocked_ip)) . "'>
-			<img title=\"Delete\" border=\"0\" name='todelete' id='todelete' alt=\"Delete\" src=\"../themes/{$g['theme']}/images/icons/icon_x.gif\"></a></td>
+			<img title=\"" . gettext("Delete") . "\" border=\"0\" name='todelete' id='todelete' alt=\"Delete\" src=\"../themes/{$g['theme']}/images/icons/icon_x.gif\"></a></td>
 			</tr>\n";
 
 			}

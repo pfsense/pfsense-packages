@@ -197,11 +197,11 @@ if ($pconfig['arefresh'] == 'on')
 	<td>
 		<table class="tabcont" width="100%" border="0" cellspacing="0" cellpadding="0">
 			<tr>
-				<td width="22%" class="listtopic">Last <?=$anentries;?> Alert Entries.</td>
-				<td width="78%" class="listtopic">Latest Alert Entries Are Listed First.</td>
+				<td width="22%" class="listtopic"><?php printf(gettext('Last %s Alert Entries.'),$anentries); ?></td>
+				<td width="78%" class="listtopic"><?php echo gettext('Latest Alert Entries Are Listed First.'); ?></td>
 			</tr>
 			<tr>
-				<td width="22%" class="vncell">Instance to inspect</td>
+				<td width="22%" class="vncell"><?php echo gettext('Instance to inspect'); ?></td>
 				<td width="78%" class="vtable">
 					<br/>   <select name="instance" id="instance" class="formselect" onChange="document.getElementById('formalert').submit()">
 			<?php
@@ -212,27 +212,27 @@ if ($pconfig['arefresh'] == 'on')
 					echo "<option value='{$id}' {$selected}> (" . snort_get_friendly_interface($instance['interface']) . "){$instance['descr']}</option>\n";
 				}
 			?>
-					</select><br/>   Choose which instance alerts you want to inspect.
+					</select><br/>   <?php echo gettext('Choose which instance alerts you want to inspect.'); ?>
 				</td>
 			<tr>
-				<td width="22%" class="vncell">Save or Remove Logs</td>
+				<td width="22%" class="vncell"><?php echo gettext('Save or Remove Logs'); ?></td>
 				<td width="78%" class="vtable">
-					<input name="download" type="submit" class="formbtn" value="Download"> All
-						log files will be saved. <a href="/snort/snort_alerts.php?action=clear&instance=<?=$instanceid;?>">
+					<input name="download" type="submit" class="formbtn" value="Download"> <?php echo gettext('All ' .
+						'log files will be saved.'); ?> <a href="/snort/snort_alerts.php?action=clear&instance=<?=$instanceid;?>">
 					<input name="delete" type="button" class="formbtn" value="Clear"
 					onclick="return confirm('Do you really want to remove all instance logs?')"></a>
-					<span class="red"><strong>Warning:</strong></span> all log files will be deleted.
+					<span class="red"><strong><?php echo gettext('Warning:'); ?></strong></span> <?php echo ' ' . gettext('all log files will be deleted.'); ?>
 				</td>
 			</tr>
 			<tr>
-				<td width="22%" class="vncell">Auto Refresh and Log View</td>
+				<td width="22%" class="vncell"><?php echo gettext('Auto Refresh and Log View'); ?></td>
 				<td width="78%" class="vtable">
 					<input name="save" type="submit" class="formbtn" value="Save">
-					Refresh <input name="arefresh" type="checkbox" value="on"
+					<?php echo gettext('Refresh'); ?> <input name="arefresh" type="checkbox" value="on"
 					<?php if ($config['installedpackages']['snortglobal']['alertsblocks']['arefresh']=="on") echo "checked"; ?>>
-						<strong>Default</strong> is <strong>ON</strong>.
+						<?php printf(gettext('%sDefault%s is %sON%s.'), '<strong>', '</strong>', '<strong>', '</strong>'); ?>
 					<input name="alertnumber" type="text" class="formfld" id="alertnumber" size="5" value="<?=htmlspecialchars($anentries);?>">
-					Enter the number of log entries to view. <strong>Default</strong> is <strong>250</strong>.
+					<?php printf(gettext('Enter the number of log entries to view. %sDefault%s is %s250%s.'), '<strong>', '</strong>', '<strong>', '</strong>'); ?>
 				</td>
 			</tr>
 			<tr>
@@ -242,16 +242,16 @@ if ($pconfig['arefresh'] == 'on')
 	<td width="100%" colspan="2" class='vtable'>
 	<table id="myTable" width="100%" class="sortable" border="1" cellpadding="0" cellspacing="0">
 	<thead>
-		<th class='listhdr' width='10%' axis="date">Date</th>
-		<th class='listhdrr' width='5%' axis="number">PRI</th>
-		<th class='listhdrr' width='3%' axis="string">PROTO</th>
-		<th class='listhdrr' width='7%' axis="string">CLASS</th>
-		<th class='listhdrr' width='15%' axis="string">SRC</th>
-		<th class='listhdrr' width='5%' axis="string">SRCPORT</th>
-		<th class='listhdrr' width='15%' axis="string">DST</th>
-		<th class='listhdrr' width='5%' axis="string">DSTPORT</th>
-		<th class='listhdrr' width='5%' axis="string">SID</th>
-		<th class='listhdrr' width='20%' axis="string">DESCRIPTION</th>
+		<th class='listhdr' width='10%' axis="date"><?php echo gettext("Date"); ?></th>
+		<th class='listhdrr' width='5%' axis="number"><?php echo gettext("PRI"); ?></th>
+		<th class='listhdrr' width='3%' axis="string"><?php echo gettext("PROTO"); ?></th>
+		<th class='listhdrr' width='7%' axis="string"><?php echo gettext("CLASS"); ?></th>
+		<th class='listhdrr' width='15%' axis="string"><?php echo gettext("SRC"); ?></th>
+		<th class='listhdrr' width='5%' axis="string"><?php echo gettext("SRCPORT"); ?></th>
+		<th class='listhdrr' width='15%' axis="string"><?php echo gettext("DST"); ?></th>
+		<th class='listhdrr' width='5%' axis="string"><?php echo gettext("DSTPORT"); ?></th>
+		<th class='listhdrr' width='5%' axis="string"><?php echo gettext("SID"); ?></th>
+		<th class='listhdrr' width='20%' axis="string"><?php echo gettext("DESCRIPTION"); ?></th>
 	</thead>
 	<tbody>
 	<?php
@@ -283,7 +283,7 @@ if (file_exists("/var/log/snort/snort_{$if_real}{$snort_uuid}/alert")) {
 			$alert_ip_src = $fields[6];
 			if (isset($tmpblocked[$fields[6]])) {
 				$alert_ip_src .= "<a href='?instance={$id}&todelete=" . trim(urlencode($fields[6])) . "'>
-			<img title=\"Remove from blocked ips\" border=\"0\" width='10' height='10' name='todelete' id='todelete' alt=\"Delete\" src=\"../themes/{$g['theme']}/images/icons/icon_x.gif\"></a>"; 
+			<img title=\"" . gettext("Remove from blocked ips") . "\" border=\"0\" width='10' height='10' name='todelete' id='todelete' alt=\"Delete\" src=\"../themes/{$g['theme']}/images/icons/icon_x.gif\"></a>"; 
 			}
 			/* IP SRC Port */
 			$alert_src_p = $fields[7];
@@ -291,7 +291,7 @@ if (file_exists("/var/log/snort/snort_{$if_real}{$snort_uuid}/alert")) {
 			$alert_ip_dst = $fields[8];
 			if (isset($tmpblocked[$fields[8]])) {
 				$alert_ip_dst .= "<a href='?instance={$id}&todelete=" . trim(urlencode($fields[8])) . "'>
-			<img title=\"Remove from blocked ips\" border=\"0\" width='10' height='10' name='todelete' id='todelete' alt=\"Delete\" src=\"../themes/{$g['theme']}/images/icons/icon_x.gif\"></a>"; 
+			<img title=\"" . gettext("Remove from blocked ips") . "\" border=\"0\" width='10' height='10' name='todelete' id='todelete' alt=\"Delete\" src=\"../themes/{$g['theme']}/images/icons/icon_x.gif\"></a>"; 
 			}
 			/* IP DST Port */
 			$alert_dst_p = $fields[9];
@@ -313,7 +313,7 @@ if (file_exists("/var/log/snort/snort_{$if_real}{$snort_uuid}/alert")) {
 					<a href='?instance={$instanceid}&act=addsuppress&sidid={$fields[2]}&gen_id={$fields[1]}&descr={$alert_descr_url}'>
                                         <img src='../themes/{$g['theme']}/images/icons/icon_plus.gif'
 						width='10' height='10' border='0'
-						title='click to add to suppress list'></a>	
+						title='" . gettext("click to add to suppress list") . "'></a>	
 				</td>
 				<td class='listr' width='20%'>{$alert_descr}</td>
 				</tr>\n";
