@@ -56,8 +56,6 @@ if (!isset($nentries)) $nentries = 5;
 
 /* retrieve snort variables */
 require_once("/usr/local/pkg/snort/snort.inc");
-
-$snortalertlogt = $config['installedpackages']['snortglobal']['snortalertlogtype'];
 if (!is_array($config['installedpackages']['snortglobal']['rule']))
 	$config['installedpackages']['snortglobal']['rule'] = array();
 $a_instance = &$config['installedpackages']['snortglobal']['rule'];
