@@ -222,7 +222,7 @@ include_once("head.inc");
 				"means Maximum )"); ?></td>
 			</tr>
 		</table>
-		<?php echo gettet("The number of bytes to be queued for reassembly for TCP sessions in " .
+		<?php echo gettext("The number of bytes to be queued for reassembly for TCP sessions in " .
 		"memory. Default value is <strong>1048576</strong>"); ?><br>
 		</td>
 	</tr>

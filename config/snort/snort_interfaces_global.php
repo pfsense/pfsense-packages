@@ -261,7 +261,7 @@ if ($input_errors)
 	<?php echo gettext("Hint: in most cases, 1 hour is a good choice."); ?></span></td>
 </tr>
 <tr>
-	<td width="22%" valign="top" class="vncell"><?php echo gettet("Keep snort settings " .
+	<td width="22%" valign="top" class="vncell"><?php echo gettext("Keep snort settings " .
 	"after deinstall"); ?></td>
 	<td width="78%" class="vtable"><input name="forcekeepsettings"
 		id="forcekeepsettings" type="checkbox" value="yes"
