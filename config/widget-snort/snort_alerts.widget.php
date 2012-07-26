@@ -2,7 +2,7 @@
 /*
     snort_alerts.widget.php
     Copyright (C) 2009 Jim Pingle
-    mod 19-07-2012
+    mod 24-07-2012
 
     Redistribution and use in source and binary forms, with or without
     modification, are permitted provided that the following conditions are met:
@@ -26,68 +26,86 @@
     POSSIBILITY OF SUCH DAMAGE.
 */
 global $config, $g;
-$snort_alerts_title = "Snort Alerts";
-$snort_alerts_title_link = "snort/snort_alerts.php";
+
+/* array sorting */
+function sksort(&$array, $subkey="id", $sort_ascending=false) {
+	if (count($array)) {
+		$temp_array[key($array)] = array_shift($array);
+	};
+
+	foreach ($array as $key => $val){
+		$offset = 0;
+		$found = false;
+		foreach ($temp_array as $tmp_key => $tmp_val) {
+			if (!$found and strtolower($val[$subkey]) > strtolower($tmp_val[$subkey])) {
+				$temp_array = array_merge((array)array_slice($temp_array,0,$offset), array($key => $val), array_slice($temp_array,$offset));
+				$found = true;
+			};
+			$offset++;
+		};
+		if (!$found) $temp_array = array_merge($temp_array, array($key => $val));
+	};
+
+	if ($sort_ascending) {
+		$array = array_reverse($temp_array);
+	} else $array = $temp_array;
+};
+
+/* check if firewall widget variable is set */
+if (!isset($nentries)) $nentries = 5;
 
 /* retrieve snort variables */
 require_once("/usr/local/pkg/snort/snort.inc");
 
+$snortalertlogt = $config['installedpackages']['snortglobal']['snortalertlogtype'];
 if (!is_array($config['installedpackages']['snortglobal']['rule']))
 	$config['installedpackages']['snortglobal']['rule'] = array();
 $a_instance = &$config['installedpackages']['snortglobal']['rule'];
 
 /* read log file(s) */
-$snort_alerts = array();
-$tmpblocked = array_flip(snort_get_blocked_ips());
+$counter=0;
 foreach ($a_instance as $instanceid => $instance) {
-	if ($instance['enable'] != 'on')
-		continue;
+	$snort_uuid = $a_instance[$instanceid]['uuid'];
+	$if_real = snort_get_real_interface($a_instance[$instanceid]['interface']);
 
 	/* make sure alert file exists */
 	if (file_exists("/var/log/snort/snort_{$if_real}{$snort_uuid}/alert")) {
-		$snort_uuid = $instance['uuid'];
-		$if_real = snort_get_real_interface($instance['interface']);
-		$tmpfile = "{$g['tmp_path']}/.widget_alert_{$snort_uuid}";
-		if (isset($config['syslog']['reverse']))
-			exec("tail -10 /var/log/snort/snort_{$if_real}{$snort_uuid}/alert | sort -r > {$tmpfile}");
-		else
-			exec("tail -10 /var/log/snort/snort_{$if_real}{$snort_uuid}/alert > {$tmpfile}");
-		if (file_exists($tmpfile)) {
+		exec("tail -n{$nentries} /var/log/snort/snort_{$if_real}{$snort_uuid}/alert > /tmp/alert_{$snort_uuid}");
+		if (file_exists("/tmp/alert_{$snort_uuid}")) {
+			$tmpblocked = array_flip(snort_get_blocked_ips());
+
 			/*                 0         1           2      3      4    5    6    7      8     9    10    11             12    */
 			/* File format timestamp,sig_generator,sig_id,sig_rev,msg,proto,src,srcport,dst,dstport,id,classification,priority */
-			$fd = fopen($tmpfile, "r");
-			while (($fileline = @fgets($fd))) {
-				if (empty($fileline))
+			$fd = fopen("/tmp/alert_{$snort_uuid}", "r");
+			while (($fields = fgetcsv($fd, 1000, ',', '"')) !== FALSE) {
+				if(count($fields) < 11)
 					continue;
-				$fields = explode(",", $fileline);
 
-				$snort_alert = array();
-				$snort_alert[]['instanceid'] = snort_get_friendly_interface($instance['interface']);
-				$snort_alert[]['timestamp'] = $fields[0];
-				$snort_alert[]['timeonly'] = substr($fields[0], 6, -8);
-				$snort_alert[]['dateonly'] = substr($fields[0], 0, -17);
-				$snort_alert[]['src'] = $fields[6];
-				$snort_alert[]['srcport'] = $fields[7];
-				$snort_alert[]['dst'] = $fields[8];
-				$snort_alert[]['dstport'] = $fields[9];
-				$snort_alert[]['priority'] = $fields[12];
-				$snort_alert[]['category'] = $fields[11];
-				$snort_alerts[] = $snort_alert;
-			}
+				$snort_alerts[$counter]['instanceid'] = $a_instance[$instanceid]['interface'];
+				$snort_alerts[$counter]['timestamp'] = $fields[0];
+				$snort_alerts[$counter]['timeonly'] = substr($fields[0], 6, -8);
+				$snort_alerts[$counter]['dateonly'] = substr($fields[0], 0, -17);
+				$snort_alerts[$counter]['src'] = $fields[6];
+				$snort_alerts[$counter]['srcport'] = $fields[7];
+				$snort_alerts[$counter]['dst'] = $fields[8];
+				$snort_alerts[$counter]['dstport'] = $fields[9];
+				$snort_alerts[$counter]['priority'] = $fields[12];
+				$snort_alerts[$counter]['category'] = $fields[11];
+				$counter++;
+			};
 			fclose($fd);
-			@unlink($tmpfile);
-		}
-	}
-}
+			@unlink("/tmp/alert_{$snort_uuid}");
+		};
+	};
+};
 
-if ($_GET['evalScripts']) {
-	/* AJAX specific handlers */
-        $new_rules = "";
-	foreach($snort_alerts as $log_row)
-		$new_rules .= "{$log_row['time']}||{$log_row['priority']}||{$log_row['category']}||{$log_row['src']}||{$log_row['dst']}||{$log_row['timestamp']}||{$log_row['timeonly']}||{$log_row['dateonly']}\n";
-
-	echo $new_rules;
+/* sort the array */
+if (isset($config['syslog']['reverse'])) {
+	sksort($snort_alerts, 'timestamp', false);
 } else {
+	sksort($snort_alerts, 'timestamp', true);
+};
+
 /* display the result */
 ?>
 <table width="100%" border="0" cellspacing="0" cellpadding="0">
@@ -98,14 +116,18 @@ if ($_GET['evalScripts']) {
 			<td width="40%" class="widgetsubheader">Details</td>
 		</tr>
 <?php
-foreach ($snort_alerts as $counter => $alert) {
-	echo("	<tr class='snort-alert-entry'" . $activerow . ">
-			<td width='30%' class='listr'>{$alert['instanceid']}<br/>{$alert['timeonly']} {$alert['dateonly']}</td>		
-			<td width='40%' class='listr'>{$alert['src']}:{$alert['srcport']}<br/>{$alert['dst']}:{$alert['dstport']}</td>
-			<td width='40%' class='listr'>Pri : {$alert['priority']}<br/>Cat : {$alert['category']}</td>
-		</tr>");
-}
+$counter=0;
+if (is_array($snort_alerts)) {
+	foreach ($snort_alerts as $alert) {
+		echo("	<tr class='snort-alert-entry'" . $activerow . ">
+				<td width='30%' class='listr'>" . $alert['instanceid'] . "<br>" . $alert['timeonly'] . " " . $alert['dateonly'] . "</td>		
+				<td width='40%' class='listr'>" . $alert['src'] . ":" . $alert['srcport'] . "<br>" . $alert['dst'] . ":" . $alert['dstport'] . "</td>
+				<td width='40%' class='listr'>Pri : " . $alert['priority'] . "<br>Cat : " . $alert['category'] . "</td>
+			</tr>");
+		$counter++;
+		if($counter >= $nentries) break;
+	}
+};
 ?>
 	</tbody>
 </table>
-<?php } ?>
