@@ -5,7 +5,7 @@
     part of pfSense (http://www.pfSense.com)
     Copyright (C) 2010 Scott Ullrich <sullrich@gmail.com>
     Copyright (C) 2011 Marcello Coutinho
-    Copyright (C) 2012 Márcio Carlos Antão
+    Copyright (C) 2012 Marcio Carlos Antao
     All rights reserved.
                                                                               */
 /* ========================================================================== */
@@ -154,7 +154,7 @@ function varnish_get_url_mappings_txt() {
 				
 				$urlbackend = "\t\t\tset req.backend = ".$url['directorname'].";";
 				#check rewrite options
-				$url['rewritehost']) {
+				if($url['rewritehost']) {
                                         $urlmappings .= "\t\t\tset req.http.host = regsub(req.http.host, ".'"'.$url['directorurl'].'",'.'"'.$url['rewritehost'].'")'.";\n";
                                 }
                                 if ($url['rewriteurl']) {
