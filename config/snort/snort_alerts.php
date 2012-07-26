@@ -265,10 +265,9 @@ if (file_exists("/var/log/snort/snort_{$if_real}{$snort_uuid}/alert")) {
 		/*                 0         1           2      3      4    5    6    7      8     9    10    11             12    */
 		/* File format timestamp,sig_generator,sig_id,sig_rev,msg,proto,src,srcport,dst,dstport,id,classification,priority */
 		$fd = fopen("/tmp/alert_{$snort_uuid}", "r");
-		while(($fileline = @fgets($fd))) {
-			if (empty($fileline))
-				continue;
-			$fields = explode(",", $fileline);
+			while (($fields = fgetcsv($fd, 1000, ',', '"')) !== FALSE) {
+				if(count($fields) < 11)
+					continue;
 
 			/* Date */
 			$alert_date = substr($fields[0], 0, -8);
