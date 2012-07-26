@@ -208,10 +208,9 @@ if ($pconfig['brefresh'] == 'on')
 				if ($fd) {
 					/*                 0         1           2      3      4    5    6    7      8     9    10    11             12
 					/* File format timestamp,sig_generator,sig_id,sig_rev,msg,proto,src,srcport,dst,dstport,id,classification,priority */
-					while(($fileline = @fgets($fd))) {
-						if (empty($fileline))
+					while (($fields = fgetcsv($fd, 1000, ',', '"')) !== FALSE) {
+						if(count($fields) < 11)
 							continue;
-						$fields = explode(",", $fileline);
 					
 						if (isset($tmpblocked[$fields[6]])) {
 							if (!is_array($src_ip_list[$fields[6]]))
