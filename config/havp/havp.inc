@@ -886,7 +886,7 @@ function havp_config_freshclam()
 			case 'sa': $conf[] = "DatabaseMirror clamav.dial-up.net"; break;      # south africa
 			case 'tw': $conf[] = "DatabaseMirror clamav.cs.pu.edu.tw"; break;     # taiwan
 			case 'uk': $conf[] = "DatabaseMirror clamav.oucs.ox.ac.uk"; break;    # united kingdom
-			case 'us': $conf[] = "DatabaseMirror clamav.catt.com "; break;        # united states
+			case 'us': $conf[] = "DatabaseMirror db.us.clamav.net "; break;        # united states
 			default: break;
 		}
 	}
