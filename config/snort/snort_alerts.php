@@ -47,7 +47,7 @@ if (empty($instanceid))
 	$instanceid = 0;
 
 if (!is_array($config['installedpackages']['snortglobal']['rule']))
-        $config['installedpackages']['snortglobal']['rule'] = array();
+	$config['installedpackages']['snortglobal']['rule'] = array();
 $a_instance = &$config['installedpackages']['snortglobal']['rule'];
 $snort_uuid = $a_instance[$instanceid]['uuid'];
 $if_real = snort_get_real_interface($a_instance[$instanceid]['interface']);
@@ -75,13 +75,13 @@ if ($_POST['save']) {
 }
 
 if ($_POST['todelete'] || $_GET['todelete']) {
-        $ip = "";
-        if($_POST['todelete'])
-                $ip = $_POST['todelete'];
-        else if($_GET['todelete'])
-                $ip = $_GET['todelete'];
-        if (is_ipaddr($ip))
-                exec("/sbin/pfctl -t snort2c -T delete {$ip}");
+	$ip = "";
+	if($_POST['todelete'])
+		$ip = $_POST['todelete'];
+	else if($_GET['todelete'])
+		$ip = $_GET['todelete'];
+	if (is_ipaddr($ip))
+		exec("/sbin/pfctl -t snort2c -T delete {$ip}");
 }
 
 if ($_GET['act'] == "addsuppress" && is_numeric($_GET['sidid']) && is_numeric($_GET['gen_id'])) {
@@ -174,23 +174,23 @@ if ($pconfig['arefresh'] == 'on')
 
 <?php if($pfsense_stable == 'yes'){echo '<p class="pgtitle">' . $pgtitle . '</p>';}
 	/* Display Alert message */
-        if ($input_errors) {
-                print_input_errors($input_errors); // TODO: add checks
-        }
+	if ($input_errors) {
+		print_input_errors($input_errors); // TODO: add checks
+	}
 ?>
 <form action="/snort/snort_alerts.php" method="post" id="formalert">
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
 <tr><td>
 <?php
-        $tab_array = array();
-        $tab_array[0] = array(gettext("Snort Interfaces"), false, "/snort/snort_interfaces.php");
-        $tab_array[1] = array(gettext("Global Settings"), false, "/snort/snort_interfaces_global.php");
-        $tab_array[2] = array(gettext("Updates"), false, "/snort/snort_download_updates.php");
-        $tab_array[3] = array(gettext("Alerts"), true, "/snort/snort_alerts.php?instance={$instanceid}");
-        $tab_array[4] = array(gettext("Blocked"), false, "/snort/snort_blocked.php");
-        $tab_array[5] = array(gettext("Whitelists"), false, "/snort/snort_interfaces_whitelist.php");
-        $tab_array[6] = array(gettext("Suppress"), false, "/snort/snort_interfaces_suppress.php");
-        display_top_tabs($tab_array);
+	$tab_array = array();
+	$tab_array[0] = array(gettext("Snort Interfaces"), false, "/snort/snort_interfaces.php");
+	$tab_array[1] = array(gettext("Global Settings"), false, "/snort/snort_interfaces_global.php");
+	$tab_array[2] = array(gettext("Updates"), false, "/snort/snort_download_updates.php");
+	$tab_array[3] = array(gettext("Alerts"), true, "/snort/snort_alerts.php?instance={$instanceid}");
+	$tab_array[4] = array(gettext("Blocked"), false, "/snort/snort_blocked.php");
+	$tab_array[5] = array(gettext("Whitelists"), false, "/snort/snort_interfaces_whitelist.php");
+	$tab_array[6] = array(gettext("Suppress"), false, "/snort/snort_interfaces_suppress.php");
+	display_top_tabs($tab_array);
 ?>
 </td></tr>
 <tr>
@@ -265,10 +265,9 @@ if (file_exists("/var/log/snort/snort_{$if_real}{$snort_uuid}/alert")) {
 		/*                 0         1           2      3      4    5    6    7      8     9    10    11             12    */
 		/* File format timestamp,sig_generator,sig_id,sig_rev,msg,proto,src,srcport,dst,dstport,id,classification,priority */
 		$fd = fopen("/tmp/alert_{$snort_uuid}", "r");
-		while(($fileline = @fgets($fd))) {
-			if (empty($fileline))
+		while (($fields = fgetcsv($fd, 1000, ',', '"')) !== FALSE) {
+			if(count($fields) < 11)
 				continue;
-			$fields = explode(",", $fileline);
 
 			/* Date */
 			$alert_date = substr($fields[0], 0, -8);
@@ -311,7 +310,7 @@ if (file_exists("/var/log/snort/snort_{$if_real}{$snort_uuid}/alert")) {
 				<td class='listr' width='5%' >
 					{$alert_sid_str}
 					<a href='?instance={$instanceid}&act=addsuppress&sidid={$fields[2]}&gen_id={$fields[1]}&descr={$alert_descr_url}'>
-                                        <img src='../themes/{$g['theme']}/images/icons/icon_plus.gif'
+					<img src='../themes/{$g['theme']}/images/icons/icon_plus.gif'
 						width='10' height='10' border='0'
 						title='" . gettext("click to add to suppress list") . "'></a>	
 				</td>
