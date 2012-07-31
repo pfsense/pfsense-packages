@@ -376,13 +376,12 @@ Country Sub-Domains List = %etc-dir%/country.domains.conf
 	include("mailscanner.conf.template");
 	#write files
 	conf_mount_rw();
-	if (!is_dir("/var/spool/MailScanner/incoming")){
-		mkdir("/var/spool/MailScanner/incoming", 0755,true);
-		chown ('/var/spool/MailScanner/incoming','postfix');
-		}
-	if (!is_dir("/var/spool/MailScanner/quarantine")){
-		mkdir("/var/spool/MailScanner/quarantine", 0755,true);
-		chown ('/var/spool/MailScanner/quarantine','postfix');
+	$msc_dirs=array("incoming", "incoming/Locks", "quarantine");
+	foreach ($msc_dirs as $msc_dir){
+		if (!is_dir("/var/spool/MailScanner/{$msc_dir}")){
+			mkdir("/var/spool/MailScanner/{$msc_dir}", 0755,true);
+			chown ("/var/spool/MailScanner/{$msc_dir}",'postfix');
+			}
 		}
 	chown ('/var/spool/postfix','postfix');
 	
