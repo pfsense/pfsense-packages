@@ -28,7 +28,7 @@
 #
 
 IS_RUNNING=`ps awx |grep -c "[p]roxy_monitor.sh"`
-if [ $IS_RUNNING -gt 0 ]; then
+if [ $IS_RUNNING -gt 1 ]; then
         exit 0
 fi
 
