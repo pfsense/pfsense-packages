@@ -27,8 +27,7 @@
 #	POSSIBILITY OF SUCH DAMAGE.
 #
 
-IS_RUNNING=`ps awx |grep -c "[p]roxy_monitor.sh"`
-if [ $IS_RUNNING -gt 1 ]; then
+if [ `ps awx |grep -c "[p]roxy_monitor.sh"` -gt 2 ]; then
         exit 0
 fi
 
