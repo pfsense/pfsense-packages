@@ -1469,5 +1469,6 @@ if [ -z "`ps auxw | grep "[s]quid -D"|awk '{print $2}'`" ];then
 EOD;
 	conf_mount_rw();
 	write_rcfile($rc);
+	conf_mount_ro();
 }
 ?>
