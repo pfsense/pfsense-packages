@@ -1465,8 +1465,8 @@ function squid_resync() {
 				sleep(1);
 		}
 		filter_configure();
-		conf_mount_ro();
 	}
+	conf_mount_ro();
 }
 
 function squid_print_javascript_auth() {
@@ -1796,6 +1796,7 @@ if [ -z "`ps auxw | grep "[s]quid "|awk '{print $2}'`" ];then
 EOD;
 	conf_mount_rw();
 	write_rcfile($rc);
+	conf_mount_ro();
 }
 
 /* Uses XMLRPC to synchronize the changes to a remote node */
