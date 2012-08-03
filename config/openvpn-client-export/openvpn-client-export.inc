@@ -231,6 +231,18 @@ function openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $usetoke
 			$conf .= "ca [inline]{$nl}";
 			$conf .= "cert [inline]{$nl}";
 			$conf .= "key [inline]{$nl}";
+		} elseif ($expformat == "yealink_t28") {
+			$conf .= "ca /yealink/config/openvpn/keys/ca.crt{$nl}";
+			$conf .= "cert /yealink/config/openvpn/keys/client1.crt{$nl}";
+			$conf .= "key /yealink/config/openvpn/keys/client1.key{$nl}";
+		} elseif ($expformat == "yealink_t38g") {
+			$conf .= "ca /phone/config/openvpn/keys/ca.crt{$nl}";
+			$conf .= "cert /phone/config/openvpn/keys/client1.crt{$nl}";
+			$conf .= "key /phone/config/openvpn/keys/client1.key{$nl}";
+		} elseif ($expformat == "snom") {
+			$conf .= "ca /openvpn/ca.crt{$nl}";
+			$conf .= "cert /openvpn/phone1.crt{$nl}";
+			$conf .= "key /openvpn/phone1.key{$nl}";
 		} elseif ($usetoken) {
 			$conf .= "ca {$cafile}{$nl}";
 			$conf .= "cryptoapicert \"SUBJ:{$user['name']}\"{$nl}";
@@ -247,6 +259,12 @@ function openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $usetoke
 	if ($settings['tls'] && !$skiptls) {
 		if ($expformat == "inline")
 			$conf .= "tls-auth [inline] 1{$nl}";
+		elseif ($expformat == "yealink_t28")
+			$conf .= "tls-auth /yealink/config/openvpn/keys/ta.key 1{$nl}";
+		elseif ($expformat == "yealink_t38g")
+			$conf .= "tls-auth /phone/config/openvpn/keys/ta.key 1{$nl}";
+		elseif ($expformat == "snom")
+			$conf .= "tls-auth /openvpn/ta.key 1{$nl}";
 		else
 			$conf .= "tls-auth {$prefix}-tls.key 1{$nl}";
 	}
@@ -322,6 +340,61 @@ function openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $usetoke
 			if ($settings['tls']) {
 				$conf .= "<tls-auth>{$nl}" . base64_decode($settings['tls']) . "</tls-auth>{$nl} key-direction 1{$nl}";
 			}
+		case "yealink_t28":
+		case "yealink_t38g":
+			// create template directory
+			$tempdir = "{$g['tmp_path']}/{$prefix}";
+			$keydir  = "{$tempdir}/keys";
+			mkdir($tempdir, 0700, true);
+			mkdir($keydir, 0700, true);
+
+			file_put_contents("{$tempdir}/vpn.cnf", $conf);
+
+			$cafile = "{$keydir}/ca.crt";
+			file_put_contents("{$cafile}", base64_decode($server_ca['crt']));
+			if ($settings['tls']) {
+				$tlsfile = "{$keydir}/ta.key";
+				file_put_contents($tlsfile, base64_decode($settings['tls']));
+			}
+
+			// write key files
+			if ($settings['mode'] != "server_user") {
+				$crtfile = "{$keydir}/client1.crt";
+				file_put_contents($crtfile, base64_decode($cert['crt']));
+				$keyfile = "{$keydir}/client1.key";
+				file_put_contents($keyfile, base64_decode($cert['prv']));
+			}
+			exec("tar -C {$tempdir} -cf {$g['tmp_path']}/client.tar ./keys ./vpn.cnf");
+			// Remove temporary directory
+			exec("rm -rf {$tempdir}");
+			return $g['tmp_path'] . "/client.tar";
+			break;
+		case "snom":
+			// create template directory
+			$tempdir = "{$g['tmp_path']}/{$prefix}";
+			mkdir($tempdir, 0700, true);
+
+			file_put_contents("{$tempdir}/vpn.cnf", $conf);
+
+			$cafile = "{$tempdir}/ca.crt";
+			file_put_contents("{$cafile}", base64_decode($server_ca['crt']));
+			if ($settings['tls']) {
+				$tlsfile = "{$tempdir}/ta.key";
+				file_put_contents($tlsfile, base64_decode($settings['tls']));
+			}
+
+			// write key files
+			if ($settings['mode'] != "server_user") {
+				$crtfile = "{$tempdir}/phone1.crt";
+				file_put_contents($crtfile, base64_decode($cert['crt']));
+				$keyfile = "{$tempdir}/phone1.key";
+				file_put_contents($keyfile, base64_decode($cert['prv']));
+			}
+			exec("cd {$tempdir}/ && tar -cf {$g['tmp_path']}/vpnclient.tar *");
+			// Remove temporary directory
+			exec("rm -rf {$tempdir}");
+			return $g['tmp_path'] . "/vpnclient.tar";
+			break;
 		default:
 			return $conf;
 	}

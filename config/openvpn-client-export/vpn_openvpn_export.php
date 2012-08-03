@@ -140,6 +140,8 @@ if (!empty($act)) {
 	$usetoken = $_GET['usetoken'];
 	if ($usetoken && ($act == "confinline"))
 		$input_errors[] = "You cannot use Microsoft Certificate Storage with an Inline configuration.";
+	if ($usetoken && (($act == "conf_yealink_t28") || ($act == "conf_yealink_t38g") || ($act == "conf_snom")))
+		$input_errors[] = "You cannot use Microsoft Certificate Storage with a Yealink or SNOM configuration.";
 	$password = "";
 	if ($_GET['password'])
 		$password = $_GET['password'];
@@ -175,6 +177,18 @@ if (!empty($act)) {
 			case "confzip":
 				$exp_name = urlencode($exp_name."-config.zip");
 				$expformat = "zip";
+				break;
+			case "conf_yealink_t28":
+				$exp_name = urlencode("client.tar");
+				$expformat = "yealink_t28";
+				break;
+			case "conf_yealink_t38g":
+				$exp_name = urlencode("client.tar");
+				$expformat = "yealink_t38g";
+				break;
+			case "conf_snom":
+				$exp_name = urlencode("vpnclient.tar");
+				$expformat = "snom";
 				break;
 			case "confinline":
 				$exp_name = urlencode($exp_name."-config.ovpn");
@@ -413,6 +427,14 @@ function server_changed() {
 		cell2.innerHTML += "<a href='javascript:download_begin(\"inst\", -1," + j + ")'>Windows Installer</a>";
 		cell2.innerHTML += "<br/>";
 		cell2.innerHTML += "<a href='javascript:download_begin(\"visc\", -1," + j + ")'>Viscosity Bundle</a>";
+		if (servers[index][2] == "server_tls") {
+			cell2.innerHTML += "<br/>Yealink SIP Handset: &nbsp;&nbsp;";
+			cell2.innerHTML += "<a href='javascript:download_begin(\"conf_yealink_t28\", -1," + j + ")'>T28</a>";
+			cell2.innerHTML += "&nbsp;&nbsp; ";
+			cell2.innerHTML += "<a href='javascript:download_begin(\"conf_yealink_t38g\", -1," + j + ")'>T38G</a>";
+			cell2.innerHTML += "<br/>";
+			cell2.innerHTML += "<a href='javascript:download_begin(\"conf_snom\", -1," + j + ")'>SNOM SIP Handset</a>";
+		}
 	}
 	if (servers[index][2] == 'server_user') {
 		var row = table.insertRow(table.rows.length);
