@@ -2,7 +2,7 @@
 /*
     snort_alerts.widget.php
     Copyright (C) 2009 Jim Pingle
-    mod 24-07-2012
+    mod 03-08-2012
 
     Redistribution and use in source and binary forms, with or without
     modification, are permitted provided that the following conditions are met:
@@ -97,13 +97,6 @@ foreach ($a_instance as $instanceid => $instance) {
 	};
 };
 
-/* sort the array */
-if (isset($config['syslog']['reverse'])) {
-	sksort($snort_alerts, 'timestamp', false);
-} else {
-	sksort($snort_alerts, 'timestamp', true);
-};
-
 /* display the result */
 ?>
 <table width="100%" border="0" cellspacing="0" cellpadding="0">
@@ -114,8 +107,15 @@ if (isset($config['syslog']['reverse'])) {
 			<td width="40%" class="widgetsubheader">Details</td>
 		</tr>
 <?php
-$counter=0;
 if (is_array($snort_alerts)) {
+	/* sort the array */
+	if (isset($config['syslog']['reverse'])) {
+		sksort($snort_alerts, 'timestamp', false);
+	} else {
+		sksort($snort_alerts, 'timestamp', true);
+	};
+
+	$counter=0;
 	foreach ($snort_alerts as $alert) {
 		echo("	<tr class='snort-alert-entry'" . $activerow . ">
 				<td width='30%' class='listr'>" . $alert['instanceid'] . "<br>" . $alert['timeonly'] . " " . $alert['dateonly'] . "</td>		
