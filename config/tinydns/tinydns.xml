@@ -249,46 +249,6 @@
 			</rowhelperfield>			
 		    </rowhelper>
 		</field>
-		<field>
-			<type>listtopic</type>
-			<name>Advanced tunables (OPTIONAL)</name>
-			<fieldname>temp</fieldname>						
-		</field>		
-		<field>
-			<fielddescr>Minimum segment size</fielddescr>
-			<fieldname>minsegment</fieldname>
-			<description>Recommended size: 10240 or larger.</description>
-			<type>input</type>
-			<value>10240</value>
-		</field>
-		<field>
-			<fielddescr>Maximum file size</fielddescr>
-			<fieldname>maxfilesize</fieldname>
-			<description>Recommended size: 10240 or larger.</description>
-			<type>input</type>
-			<value>10240</value>
-		</field>
-		<field>
-			<fielddescr>Max Segment size</fielddescr>
-			<fieldname>maxsegment</fieldname>
-			<description>Recommended size: 20480 or larger.</description>
-			<type>input</type>
-			<value>20480</value>
-		</field>
-		<field>
-			<fielddescr>Maximum file descriptors</fielddescr>
-			<fieldname>maxfd</fieldname>
-			<description>Recommended size: 100 or larger.</description>
-			<type>input</type>
-			<value>100</value>
-		</field>
-		<field>
-			<fielddescr>Maximum children processes</fielddescr>
-			<fieldname>maxchild</fieldname>
-			<description>Recommended size: 40 or larger.</description>
-			<type>input</type>
-			<value>40</value>
-		</field>
 	</fields>
 	<custom_delete_php_command>
 		tinydns_custom_php_changeip_command();

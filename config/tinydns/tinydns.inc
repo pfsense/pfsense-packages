@@ -59,27 +59,6 @@ function tinydns_custom_php_install_command() {
 	
 	$ipaddress = $config['installedpackages']['tinydns']['config'][0]['ipaddress'];
 
-	$minsegment = "10240";
-	$maxfilesize = "10240";
-	$maxsegment  = "20480";
-	$maxfd = "100";
-	$maxchild = "40";
-
-	if($config['installedpackages']['tinydns']['config'][0]['minsegment'])
-		$minsegment = $config['installedpackages']['tinydns']['config'][0]['minsegment'];
-
-	if($config['installedpackages']['tinydns']['config'][0]['maxfilesize'])
-		$maxfilesize = $config['installedpackages']['tinydns']['config'][0]['maxfilesize'];
-
-	if($config['installedpackages']['tinydns']['config'][0]['maxsegment'])
-		$maxsegment = $config['installedpackages']['tinydns']['config'][0]['maxsegment'];
-
-	if($config['installedpackages']['tinydns']['config'][0]['maxfd'])
-		$maxfd = $config['installedpackages']['tinydns']['config'][0]['maxfd'];
-
-	if($config['installedpackages']['tinydns']['config'][0]['maxchild'])
-		$maxchild = $config['installedpackages']['tinydns']['config'][0]['maxchild'];
-
 	if($config['installedpackages']['tinydns']['config'][0]['refreshinterval'])
 		$refreshinterval = $config['installedpackages']['tinydns']['config'][0]['refreshinterval'];
 
