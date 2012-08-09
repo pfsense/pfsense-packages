@@ -340,6 +340,8 @@ function openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $usetoke
 			if ($settings['tls']) {
 				$conf .= "<tls-auth>{$nl}" . base64_decode($settings['tls']) . "</tls-auth>{$nl} key-direction 1{$nl}";
 			}
+			return $conf;
+			break;
 		case "yealink_t28":
 		case "yealink_t38g":
 			// create template directory
