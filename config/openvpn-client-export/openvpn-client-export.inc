@@ -199,7 +199,7 @@ function openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $usetoke
 	$conf .= "resolv-retry infinite{$nl}";
 	$conf .= "remote {$server_host} {$server_port}{$nl}";
 	if (!empty($servercn))
-		$conf .= "tls-remote {$servercn}{$nl}";
+		$conf .= "tls-remote \"{$servercn}\"{$nl}";
 
 	if (!empty($proxy)) {
 		if ($proto == "udp") {
