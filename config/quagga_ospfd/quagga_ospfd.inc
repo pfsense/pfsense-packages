@@ -1,7 +1,7 @@
 <?php
 /*
 	quagga_ospfd.inc
-	Copyright (C) 2010 Ermal Luçi
+	Copyright (C) 2010 Ermal Luï¿½i
 	Copyright (C) 2012 Jim Pingle
 	part of pfSense
 	All rights reserved.
@@ -110,9 +110,9 @@ function quagga_ospfd_install_conf() {
 				}
 				if ($conf['md5password'] && !empty($conf['password'])) {
 					$conffile .= "  ip ospf authentication message-digest\n";
-					$conffile .= "  ip ospf message-digest-key 1 md5 \"" . substr($conf['password'], 0, 15) . "\"\n";
+					$conffile .= "  ip ospf message-digest-key 1 md5 " . substr($conf['password'], 0, 15) . "\n";
 				} else if (!empty($conf['password'])) {
-					$conffile .= "  ip ospf authentication-key \"" . substr($conf['password'], 0, 8) . "\"\n";
+					$conffile .= "  ip ospf authentication-key \" . substr($conf['password'], 0, 8) . "\n";
 				}
 				if (!empty($conf['routerpriorityelections'])) {
 					$conffile .= "  ip ospf priority {$conf['routerpriorityelections']}\n";
