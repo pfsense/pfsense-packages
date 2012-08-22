@@ -77,6 +77,8 @@ function ospfd_install_conf() {
 
 		if (is_array($ospfd_conf['row'])) {
 			foreach ($ospfd_conf['row'] as $redistr) {
+				if (empty($redistr['routevalue']))
+					continue;
 				if (isset($redistr['redistribute']))
 					$conffile .= "no ";
 				$conffile .= "redistribute {$redistr['routevalue']}\n";

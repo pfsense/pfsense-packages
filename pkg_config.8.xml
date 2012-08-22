@@ -615,11 +615,11 @@
 	</package>
 	<package>
 		<name>OpenOSPFD</name>
-		<descr>OSPF routing protocol</descr>
+		<descr>This package is now considered depreciated. Please use the Quagga OSPF instead. -- WARNING! Installs files to the same place as Quagga OSPF. Installing both will result in a broken state, remove this package before installing Quagga OSPF.</descr>
 		<maintainer>cmb@pfsense.org</maintainer>
 		<version>0.5.2</version>
 		<category>Routing</category>
-		<status>BETA</status>
+		<status>DEPRECIATED</status>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
 		<depends_on_package>openospfd-4.6.tbz</depends_on_package>
 		<depends_on_package_pbi>openospfd-4.6-i386.pbi</depends_on_package_pbi>
