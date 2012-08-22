@@ -49,7 +49,7 @@
 	<include_file>/usr/local/pkg/ipguard.inc</include_file>
 	<menu>
 		<name>Ipguard</name>
-		<tooltiptext>Tool designed to protect LAN IP adress space by ARP spoofing</tooltiptext>
+		<tooltiptext>Tool designed to protect LAN IP address space by ARP spoofing</tooltiptext>
 		<section>Firewall</section>
 		<url>/pkg.php?xml=ipguard.xml</url>
 	</menu>
@@ -57,7 +57,7 @@
 		<name>ipguard</name>
 		<rcfile>ipguard.sh</rcfile>
 		<executable>ipguard</executable>
-		<description>Tool designed to protect LAN IP adress space by ARP spoofing.</description>
+		<description>Tool designed to protect LAN IP address space by ARP spoofing.</description>
 	</service>
 	<configpath>installedpackages->package->ipguard</configpath>
 	<additional_files_needed>
@@ -100,11 +100,11 @@
 			<fieldname>ip</fieldname>
 		</columnitem>
 		<columnitem>
-			<fielddescr>description</fielddescr>
+			<fielddescr>Description</fielddescr>
 			<fieldname>description</fieldname>
 		</columnitem>
 		<movable>on</movable>
-		<description><![CDATA[If firewall receives traffic with MAC/IP pair not listed here, it will send ARP reply with configured fake address.<br>This will prevent not permitted host to work properly in the specified ethernet segment.]]></description>
+		<description><![CDATA[If firewall receives traffic with MAC/IP pair not listed here, it will send ARP reply with configured fake address.<br>This will prevent not permitted host from working properly in the specified ethernet segment.]]></description>
 	</adddeleteeditpagefields>
 	<fields>
 		<field>
@@ -125,7 +125,7 @@
 				<regex>/%FILTERTEXT%/i</regex>
 			</item>
 			<item>
-				<name>Ip Adress</name>
+				<name>Ip Address</name>
 				<fieldname>ip</fieldname>
 				<regex>/%FILTERTEXT%/i</regex>
 			</item>
@@ -135,12 +135,12 @@
 		<fielddescr>Enable</fielddescr>
 			<fieldname>enable</fieldname>
 			<type>checkbox</type>
-		<description><![CDATA[Enable this mac rule.<br><strong>Important Note:</strong> Always create rules to pfsense mac and ip address to avoid denying access to pfsense gui.]]></description>
+		<description><![CDATA[Enable this mac rule.<br><strong>Important Note:</strong> Always create rules for pfsense mac and ip address to avoid denying access to pfsense gui.]]></description>
 		</field>
 		<field>
 			<fielddescr>Interface</fielddescr>
 			<fieldname>interface</fieldname>
-			<description>The interface ipguard server will check this mac</description>
+			<description>The interface on which ipguard server will check this mac</description>
 			<type>interfaces_selection</type>
 			<required/>
 			<default_value>lan</default_value>
@@ -156,7 +156,7 @@
 		<field>
 			<fielddescr>Mac address</fielddescr>
 			<fieldname>mac</fieldname>
-			<description><![CDATA[Insert mac address you what to filter.<br>
+			<description><![CDATA[Insert mac address you want to filter.<br>
 				<strong>To include a permit rule, use mac=00:00:00:00:00:00</strong>]]></description>
 			<type>input</type>
 			<size>25</size>

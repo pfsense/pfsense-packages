@@ -44,7 +44,9 @@ function ipguard_custom_php_deinstall_command(){
 	conf_mount_rw();
 	
 	stop_service('ipguard');
-	chmod("/usr/local/etc/rc.d/ipguard.sh",0444);
+	$ipguard_sh_file = "/usr/local/etc/rc.d/ipguard.sh";
+	if (is_file($ipguard_sh_file))
+		chmod($ipguard_sh_file,0444);
 
 	conf_mount_ro();
 	}
@@ -60,9 +62,6 @@ function ipguard_custom_php_write_config(){
 
 		
 	if (is_array($config['installedpackages']['ipguard']['config'])){
-		// Mount Read-write
-		conf_mount_rw();
-		
 		// Read config
 		$new_config=array();
 		foreach ($config['installedpackages']['ipguard']['config'] as $ipguard){
@@ -96,7 +95,9 @@ function ipguard_custom_php_write_config(){
 	else{
 		#remove config files
 		stop_service('ipguard');
-		chmod("/usr/local/etc/rc.d/ipguard.sh",0444);
+		$ipguard_sh_file = "/usr/local/etc/rc.d/ipguard.sh";
+		if (is_file($ipguard_sh_file))
+			chmod($ipguard_sh_file,0444);
 	}
 	// Mount Read-only
 	conf_mount_ro();
@@ -109,20 +110,20 @@ function ipguard_custom_php_write_config(){
 function ipguard_sync_on_changes() {
 	global $config, $g;
 	
-	if (is_array($config['installedpackages']['ipguardsync']))
-		if (!$config['installedpackages']['ipguardsync']['config'][0]['synconchanges'])	
-			return;
-
-	log_error("[ipguard] xmlrpc sync is starting.");
-	foreach ($config['installedpackages']['ipguardsync']['config'] as $rs ){
-		foreach($rs['row'] as $sh){
-			$sync_to_ip = $sh['ipaddress'];
-			$password = $sh['password'];
-			if($password && $sync_to_ip)
-				ipguard_do_xmlrpc_sync($sync_to_ip, $password);
+	if (is_array($config['installedpackages']['ipguardsync'])) {
+		if ($config['installedpackages']['ipguardsync']['config'][0]['synconchanges'])	{
+			log_error("[ipguard] xmlrpc sync is starting.");
+			foreach ($config['installedpackages']['ipguardsync']['config'] as $rs ){
+				foreach($rs['row'] as $sh){
+					$sync_to_ip = $sh['ipaddress'];
+					$password = $sh['password'];
+					if($password && $sync_to_ip)
+						ipguard_do_xmlrpc_sync($sync_to_ip, $password);
+				}
 			}
+			log_error("[ipguard] xmlrpc sync is ending.");
+		}
 	}
-	log_error("[ipguard] xmlrpc sync is ending.");
 }
 
 /* Do the actual XMLRPC sync */
@@ -185,7 +186,7 @@ function ipguard_do_xmlrpc_sync($sync_to_ip, $password) {
 		log_error("ipguard XMLRPC sync successfully completed with {$url}:{$port}.");
 	}
 	
-	/* tell ipguard to reload our settings on the destionation sync host. */
+	/* tell ipguard to reload our settings on the destination sync host. */
 	$method = 'pfsense.exec_php';
 	$execcmd  = "require_once('/usr/local/pkg/ipguard.inc');\n";
 	$execcmd .= "ipguard_custom_php_write_config();";
