@@ -43,7 +43,7 @@
 	<faq>Currently there are no FAQ items provided.</faq>
 	<name>ipguardsync</name>
 	<version>1.0</version>
-	<title>SSH Conditional - Sync</title>
+	<title>Ipguard - Sync</title>
 	<include_file>/usr/local/pkg/ipguard.inc</include_file>
 	<tabs>
 		<tab>
