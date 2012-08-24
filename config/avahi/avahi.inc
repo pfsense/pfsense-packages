@@ -117,12 +117,12 @@ domain-name={$domain}
 browse-domains="{$browsedomains}"
 deny-interfaces={$denyinterfaces}
 use-ipv4=yes
-use-ipv6=no
+use-ipv6=yes
 enable-dbus=no
 #check-response-ttl=no
 #use-iff-running=no
 #disallow-other-stacks=no
-#allow-point-to-point=no
+allow-point-to-point=yes
 
 [wide-area]
 enable-wide-area=yes
