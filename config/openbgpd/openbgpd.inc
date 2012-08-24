@@ -34,13 +34,13 @@ require_once("service-utils.inc");
 
 define('PKG_BGPD_CONFIG_BASE', '/var/etc/openbgpd');
 
-define('PKG_BGPD_LOGIN',	= "_bgpd");
-define('PKG_BGPD_UID',		= "130");
-define('PKG_BGPD_GROUP',	= "_bgpd");
-define('PKG_BGPD_GID',		= "130");
-define('PKG_BGPD_GECOS',	= "BGP Daemon");
-define('PKG_BGPD_HOMEDIR',	= "/var/empty");
-define('PKG_BGPD_SHELL',	= "/usr/sbin/nologin");
+define('PKG_BGPD_LOGIN',	"_bgpd");
+define('PKG_BGPD_UID',		"130");
+define('PKG_BGPD_GROUP',	"_bgpd");
+define('PKG_BGPD_GID',		"130");
+define('PKG_BGPD_GECOS',	"BGP Daemon");
+define('PKG_BGPD_HOMEDIR',	"/var/empty");
+define('PKG_BGPD_SHELL',	"/usr/sbin/nologin");
 
 function openbgpd_install_conf() {
 	global $config, $g;
