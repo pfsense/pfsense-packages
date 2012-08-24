@@ -92,7 +92,11 @@
 		conf_mount_rw();
 		config_lock();
 		$log_file = "/var/log/arp.dat";
-		$int = $config['installedpackages']['arpwatch']['config'][0]['interface'];
+		if($_POST['interface'] != "") {
+			$int = $_POST['interface']; 
+		} else {
+			$int = $config['installedpackages']['arpwatch']['config'][0]['interface'];
+		}
 		$int = convert_friendly_interface_to_real_interface_name($int);
 		$start = "touch {$log_file}\n";
 		$start .= "/usr/local/sbin/arpwatch -d -f {$log_file} -i {$int} > /var/log/arpwatch.reports 2>&amp;1 &amp;";
