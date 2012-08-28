@@ -42,7 +42,7 @@
     <requirements></requirements>
     <faq>Currently there are no FAQ items provided.</faq>
 	<name>tinchosts</name>
-	<version>1.0.18</version>
+	<version>1.0.19</version>
 	<title>VPN: tinc - Hosts</title>
 	<!-- configpath gets expanded out automatically and config items will be
          stored in that location -->
