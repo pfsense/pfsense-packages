@@ -1689,5 +1689,28 @@
 		<depends_on_package_base_url>http://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
 		<depends_on_package_pbi>iftop-0.17-i386.pbi</depends_on_package_pbi>
 	</package>
+	<package>
+		<name>tinc</name>
+		<website>http://www.tinc-vpn.org/</website>
+		<descr>tinc is a Virtual Private Network (VPN) daemon that uses tunnelling and encryption to create a secure private mesh network between hosts on the Internet.</descr>
+		<category>Network Management</category>
+		<depends_on_package_base_url>http://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
+		<depends_on_package_pbi>tinc-1.0.18-i386.pbi</depends_on_package_pbi>
+		<build_pbi>
+			<port>security/tinc</port>
+		</build_pbi>
+		<build_options></build_options>
+		<version>1.0.18</version>
+		<status>ALPHA</status>
+		<pkginfolink>http://doc.pfsense.org/index.php/tinc_package</pkginfolink>
+		<required_version>2.1</required_version>
+		<config_file>http://www.pfsense.com/packages/config/tinc/tinc.xml</config_file>
+		<configurationfile>tinc.xml</configurationfile>
+		<logging>
+			<facilityname>tinc</facilityname>
+			<logfilename>tinc.log</logfilename>
+			<logtab>tinc</logtab>
+		</logging>
+	</package>
 </packages>
 </pfsensepkgs>
