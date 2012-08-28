@@ -39,7 +39,7 @@
         ]]>
         </copyright>
 	<name>tinc</name>
-	<version>1.0.18</version>
+	<version>1.0.19</version>
 	<title>VPN: tinc</title>
 
 	<!-- configpath gets expanded out automatically and config items will be
