@@ -42,7 +42,7 @@
     <requirements>Describe your package requirements here</requirements>
     <faq>Currently there are no FAQ items provided.</faq>
 	<name>tinc</name>
-	<version>1.0.18</version>
+	<version>1.0.19</version>
 	<title>VPN: tinc</title>
 	<!-- Menu is where this packages menu will appear -->
 	<menu>
