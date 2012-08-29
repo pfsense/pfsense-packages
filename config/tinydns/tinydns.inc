@@ -76,6 +76,7 @@ rcvar=`set_rcvar`
 command="/usr/local/bin/svscan"
 svscan_enable=\${svscan_enable-"YES"}
 svscan_servicedir=\${svscan_servicedir-"{$g['varrun_path']}/service"}
+logdir="/var/log/svscan"
 
 start_cmd="svscan_start"
 stop_postcmd="svscan_stop_post"
@@ -86,9 +87,10 @@ required_dirs="\${svscan_servicedir}"
 
 svscan_start () {
         echo "Starting svscan."
+        mkdir -p \$logdir
         /usr/bin/env \
         PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin \
-        /usr/sbin/daemon -f /bin/sh -c "\$command \$svscan_servicedir 2>&1 | /usr/local/bin/readproctitle service errors: ................................................................................................................................................................................................................................................................................................................................................................................................................ &" > /dev/null
+        /usr/sbin/daemon -f /bin/sh -c "\$command \$svscan_servicedir 2>&1 | /usr/local/bin/multilog t \$logdir" > /dev/null
         minicron {$refreshinterval} {$g['varrun_path']}/ping_hosts.pid "/etc/ping_hosts.sh; cd {$g['varetc_path']}/tinydns/root && /usr/local/bin/tinydns-data"
 }
 
