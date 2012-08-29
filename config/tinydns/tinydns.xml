@@ -194,7 +194,7 @@
 			<fieldname>regdhcpstatic</fieldname>
 			<description>Register static DHCP leases with TinyDNS server using the Fully Qualified Domain Name specified in System: General.</description>
 			<type>checkbox</type>
-		</field>		
+		</field>
 		<field>
 		 	<fielddescr>Register DHCP leases with server</fielddescr>
 			<fieldname>regdhcp</fieldname>
@@ -203,8 +203,14 @@
 		</field>
 		<field>
 			<type>listtopic</type>
-			<name>Monitoring IP refresh interval</name>
-			<fieldname>temp</fieldname>						
+			<name>IP Monitoring</name>
+			<fieldname>temp</fieldname>
+		</field>
+		<field>
+			<fielddescr>Enable IP monitoring</fielddescr>
+			<fieldname>enableipmonitoring</fieldname>
+			<description>Wheather or not to monitor IP address</description>
+			<type>checkbox</type>
 		</field>
 		<field>
 			<fielddescr>Refresh Interval</fielddescr>
@@ -215,7 +221,7 @@
 		<field>
 			<type>listtopic</type>
 			<name>Sync TinyDNS settings via XMLRPC</name>
-			<fieldname>temp</fieldname>						
+			<fieldname>temp</fieldname>
 		</field>
 		<field>
 			<fielddescr>XMLRPC Sync</fielddescr>
@@ -248,46 +254,6 @@
 			    <size>20</size>
 			</rowhelperfield>			
 		    </rowhelper>
-		</field>
-		<field>
-			<type>listtopic</type>
-			<name>Advanced tunables (OPTIONAL)</name>
-			<fieldname>temp</fieldname>						
-		</field>		
-		<field>
-			<fielddescr>Minimum segment size</fielddescr>
-			<fieldname>minsegment</fieldname>
-			<description>Recommended size: 10240 or larger.</description>
-			<type>input</type>
-			<value>10240</value>
-		</field>
-		<field>
-			<fielddescr>Maximum file size</fielddescr>
-			<fieldname>maxfilesize</fieldname>
-			<description>Recommended size: 10240 or larger.</description>
-			<type>input</type>
-			<value>10240</value>
-		</field>
-		<field>
-			<fielddescr>Max Segment size</fielddescr>
-			<fieldname>maxsegment</fieldname>
-			<description>Recommended size: 20480 or larger.</description>
-			<type>input</type>
-			<value>20480</value>
-		</field>
-		<field>
-			<fielddescr>Maximum file descriptors</fielddescr>
-			<fieldname>maxfd</fieldname>
-			<description>Recommended size: 100 or larger.</description>
-			<type>input</type>
-			<value>100</value>
-		</field>
-		<field>
-			<fielddescr>Maximum children processes</fielddescr>
-			<fieldname>maxchild</fieldname>
-			<description>Recommended size: 40 or larger.</description>
-			<type>input</type>
-			<value>40</value>
 		</field>
 	</fields>
 	<custom_delete_php_command>
