@@ -53,33 +53,13 @@ function tinydns_custom_php_install_command() {
 		log_error("Could not open /usr/local/etc/rc.d/svscan.sh for writing.");
 		return;
 	}
-	
+
 	// Ensure svscan.sh has a+rx
 	exec("chmod a+rx /usr/local/etc/rc.d/svscan.sh");
-	
+
 	$ipaddress = $config['installedpackages']['tinydns']['config'][0]['ipaddress'];
 
-	$minsegment = "10240";
-	$maxfilesize = "10240";
-	$maxsegment  = "20480";
-	$maxfd = "100";
-	$maxchild = "40";
-
-	if($config['installedpackages']['tinydns']['config'][0]['minsegment'])
-		$minsegment = $config['installedpackages']['tinydns']['config'][0]['minsegment'];
-
-	if($config['installedpackages']['tinydns']['config'][0]['maxfilesize'])
-		$maxfilesize = $config['installedpackages']['tinydns']['config'][0]['maxfilesize'];
-
-	if($config['installedpackages']['tinydns']['config'][0]['maxsegment'])
-		$maxsegment = $config['installedpackages']['tinydns']['config'][0]['maxsegment'];
-
-	if($config['installedpackages']['tinydns']['config'][0]['maxfd'])
-		$maxfd = $config['installedpackages']['tinydns']['config'][0]['maxfd'];
-
-	if($config['installedpackages']['tinydns']['config'][0]['maxchild'])
-		$maxchild = $config['installedpackages']['tinydns']['config'][0]['maxchild'];
-
+	$enableipmonitoring = $config['installedpackages']['tinydns']['config'][0]['enableipmonitoring'];
 	if($config['installedpackages']['tinydns']['config'][0]['refreshinterval'])
 		$refreshinterval = $config['installedpackages']['tinydns']['config'][0]['refreshinterval'];
 
@@ -97,6 +77,7 @@ rcvar=`set_rcvar`
 command="/usr/local/bin/svscan"
 svscan_enable=\${svscan_enable-"YES"}
 svscan_servicedir=\${svscan_servicedir-"{$g['varrun_path']}/service"}
+logdir="/var/log/svscan"
 
 start_cmd="svscan_start"
 stop_postcmd="svscan_stop_post"
@@ -107,10 +88,18 @@ required_dirs="\${svscan_servicedir}"
 
 svscan_start () {
         echo "Starting svscan."
+        mkdir -p \$logdir
         /usr/bin/env \
         PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin \
-        /usr/sbin/daemon -f /bin/sh -c "\$command \$svscan_servicedir 2>&1 | /usr/local/bin/readproctitle service errors: ................................................................................................................................................................................................................................................................................................................................................................................................................ &" > /dev/null
+        /usr/sbin/daemon -f /bin/sh -c "\$command \$svscan_servicedir 2>&1 | /usr/local/bin/multilog t \$logdir" > /dev/null
+EOD;
+if ($enableipmonitoring) {
+	$svscan .= <<<EOD
         minicron {$refreshinterval} {$g['varrun_path']}/ping_hosts.pid "/etc/ping_hosts.sh; cd {$g['varetc_path']}/tinydns/root && /usr/local/bin/tinydns-data"
+EOD;
+}
+$svscan .= <<<EOD
+
 }
 
 svscan_stop_post () {
@@ -130,9 +119,11 @@ EOD;
 <?php
 	require_once(\"/usr/local/pkg/tinydns.inc\");
 	tinydns_custom_php_changeip_command();
-	tinydns_create_zone_file();
-	tinydns_setup_ping_items();
-?>
+	tinydns_create_zone_file();\n";
+	if ($enableipmonitoring) {
+		$start .= "tinydns_setup_ping_items();\n";
+	}
+	$start .= "?>
 ENDPHP\n";
 
 	$stop = "";
@@ -636,7 +627,9 @@ function tinydns_sync_on_changes() {
 			tinydns_do_xmlrpc_sync($sync_to_ip, $password);
 	}
 	tinydns_create_zone_file();
-	tinydns_setup_ping_items();
+	if ($config['installedpackages']['tinydns']['config'][0]['enableipmonitoring']) {
+		tinydns_setup_ping_items();
+	}
 	log_error("[tinydns] tinydns_xmlrpc_sync.php is ending.");
 }
 
@@ -704,7 +697,9 @@ function tinydns_do_xmlrpc_sync($sync_to_ip, $password) {
 	$execcmd  = "require_once('/usr/local/pkg/tinydns.inc');\n";
 	$execcmd .= "tinydns_custom_php_changeip_command();\n";
 	$execcmd .= "tinydns_create_zone_file();\n";
-	$execcmd .= "tinydns_setup_ping_items();\n";
+	if ($config['installedpackages']['tinydns']['config'][0]['enableipmonitoring']) {
+		$execcmd .= "tinydns_setup_ping_items();\n";
+	}
 	
 	/* assemble xmlrpc payload */
 	$params = array(
