@@ -68,6 +68,18 @@
 			<type>interfaces_selection</type>
 			<multiple>true</multiple>
 		</field>
+		<field>
+			<fielddescr>Disable IPv6</fielddescr>
+			<fieldname>disable_ipv6</fieldname>
+			<description>Disable IPv6 support in Avahi</description>
+			<type>checkbox</type>
+		</field>
+		<field>
+			<fielddescr>Disable IPv4</fielddescr>
+			<fieldname>disable_ipv4</fieldname>
+			<description>Disable IPv4 support in Avahi</description>
+			<type>checkbox</type>
+		</field>
 	</fields>
 	<additional_files_needed>
 		<prefix>/root/</prefix>

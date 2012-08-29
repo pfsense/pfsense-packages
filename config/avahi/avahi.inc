@@ -86,6 +86,8 @@ function avahi_write_config() {
 	$enable = $config['installedpackages']['avahi']['config'][0]['enable'];
 	$browsedomains = $config['installedpackages']['avahi']['config'][0]['browsedomains'];
 	$denyif = $config['installedpackages']['avahi']['config'][0]['denyinterfaces'];
+	$useipv4 = ($config['installedpackages']['avahi']['config'][0]['disable_ipv4']) ? "no" : "yes";
+	$useipv6 = ($config['installedpackages']['avahi']['config'][0]['disable_ipv6']) ? "no" : "yes";
 
 	// No supplied domains?  Use the defaults.
 	if(!$browsedomains)
@@ -116,8 +118,8 @@ host-name={$hostname}
 domain-name={$domain}
 browse-domains="{$browsedomains}"
 deny-interfaces={$denyinterfaces}
-use-ipv4=yes
-use-ipv6=yes
+use-ipv4={$useipv4}
+use-ipv6={$useipv6}
 enable-dbus=no
 #check-response-ttl=no
 #use-iff-running=no
