@@ -194,7 +194,7 @@
 			<fieldname>regdhcpstatic</fieldname>
 			<description>Register static DHCP leases with TinyDNS server using the Fully Qualified Domain Name specified in System: General.</description>
 			<type>checkbox</type>
-		</field>		
+		</field>
 		<field>
 		 	<fielddescr>Register DHCP leases with server</fielddescr>
 			<fieldname>regdhcp</fieldname>
@@ -203,8 +203,14 @@
 		</field>
 		<field>
 			<type>listtopic</type>
-			<name>Monitoring IP refresh interval</name>
-			<fieldname>temp</fieldname>						
+			<name>IP Monitoring</name>
+			<fieldname>temp</fieldname>
+		</field>
+		<field>
+			<fielddescr>Enable IP monitoring</fielddescr>
+			<fieldname>enableipmonitoring</fieldname>
+			<description>Wheather or not to monitor IP address</description>
+			<type>checkbox</type>
 		</field>
 		<field>
 			<fielddescr>Refresh Interval</fielddescr>
@@ -215,7 +221,7 @@
 		<field>
 			<type>listtopic</type>
 			<name>Sync TinyDNS settings via XMLRPC</name>
-			<fieldname>temp</fieldname>						
+			<fieldname>temp</fieldname>
 		</field>
 		<field>
 			<fielddescr>XMLRPC Sync</fielddescr>
