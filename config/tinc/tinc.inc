@@ -137,6 +137,8 @@ function tinc_install() {
 	$_rcfile['stop'].="/usr/local/sbin/tincd --kill \n\t";
 	write_rcfile($_rcfile);
 	unlink_if_exists("/usr/local/etc/rc.d/tincd");
+        unlink_if_exists("/var/log/tinc.log");
+        exec("/usr/sbin/clog -i -s 512144 /var/log/tinc.log");
 	
 	conf_mount_rw();
 	config_lock();
