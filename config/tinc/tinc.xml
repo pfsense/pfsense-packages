@@ -76,14 +76,20 @@
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/www/</prefix>
-		<chmod>0644</chmod>
+		<chmod>0755</chmod>
 		<item>http://www.pfsense.com/packages/config/tinc/status_tinc.php</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/www/shortcuts/</prefix>
+		<chmod>0644</chmod>
+		<item>http://www.pfsense.com/packages/config/tinc/pkg_tinc.inc</item>
 	</additional_files_needed>
          
 	<service>
 	  <name>tinc</name>
 	  <rcfile>tinc.sh</rcfile>
 	  <executable>tincd</executable>
+	  <description>tinc mesh VPN</description>
 	</service>
 	<include_file>/usr/local/pkg/tinc.inc</include_file>
 
