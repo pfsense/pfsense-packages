@@ -68,6 +68,7 @@ function tinc_save() {
 	else
 	{
 		$_output = "ifconfig \$INTERFACE " . $tincconf['localip'] . " netmask " . $tincconf['vpnnetmask'] . "\n";
+		$_output .= "ifconfig \$INTERFACE group tinc\n";
 	}
 	file_put_contents('/usr/local/etc/tinc/tinc-up',$_output);
 	chmod("/usr/local/etc/tinc/tinc-up", 0744);
@@ -155,6 +156,17 @@ function tinc_install() {
         $GLOBALS['config']['interfaces'][$newifname]['if'] = "tun0";
 */
 
+        /* Create Interface Group */
+        if (!is_array($GLOBALS['config']['ifgroups']['ifgroupentry']))
+        $GLOBALS['config']['ifgroups']['ifgroupentry'] = array();
+
+        $a_ifgroups = &$GLOBALS['config']['ifgroups']['ifgroupentry'];
+        $ifgroupentry = array();
+        $ifgroupentry['members'] = '';
+        $ifgroupentry['descr'] = 'tinc mesh VPN interface group';
+        $ifgroupentry['ifname'] = 'tinc';
+        $a_ifgroups[] = $ifgroupentry;
+
         /* XXX: Do not remove this. */
         mwexec("/bin/rm -f /tmp/config.cache");
 
@@ -165,6 +177,40 @@ function tinc_install() {
 }
 
 function tinc_deinstall() {
+        /* Remove Interface Group */
+        conf_mount_rw();
+        config_lock();
+        if (!is_array($GLOBALS['config']['ifgroups']['ifgroupentry']))
+        $GLOBALS['config']['ifgroups']['ifgroupentry'] = array();
+
+        $a_ifgroups = &$GLOBALS['config']['ifgroups']['ifgroupentry'];
+
+        $myid=-1;
+        $i = 0;
+        foreach ($a_ifgroups as $ifgroupentry)
+        {
+                if($ifgroupentry['ifname']=='tinc')
+                {
+                        $myid=$i;
+                        break;
+                }
+                $i++;
+        }
+
+        if ($myid >= 0 && $a_ifgroups[$myid])
+        {
+                $members = explode(" ", $a_ifgroups[$_GET['id']]['members']);
+                foreach ($members as $ifs)
+                {
+                        $realif = get_real_interface($ifs);
+                        if ($realif)
+                                mwexec("/sbin/ifconfig  {$realif} -group " . $a_ifgroups[$_GET['id']]['ifname']);
+                }
+                unset($a_ifgroups[$myid]);
+                mwexec("/bin/rm -f /tmp/config.cache");
+                write_config();
+        }
+
 	rmdir_recursive("/var/tmp/tinc");
 	rmdir_recursive("/usr/local/etc/tinc*");
 	unlink_if_exists("/usr/local/etc/rc.d/tinc.sh");
