@@ -53,7 +53,7 @@
 		<url>/pkg_edit.php?xml=tinc_config.xml</url>
 	</menu>
 	<menu>
-		<name>tinc</name>
+		<name>tincd</name>
 		<tooltiptext>Status of tinc VPN Daemon</tooltiptext>
 		<section>Status</section>
 		<url>/status_tinc.php</url>
