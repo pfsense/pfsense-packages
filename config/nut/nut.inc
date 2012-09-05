@@ -163,8 +163,6 @@
 				$input_errors[] = 'You must select a driver in the \'Local UPS Driver\' field';
 			if(!$post['port'])
 				$input_errors[] = 'You must select a port in the \'Local UPS Port\' field';
-			if($post['allowaddr'] && !nut_validate_ip($post['allowaddr'],true))
-				$input_errors[] = 'You must specify a valid address \'Local Remote Access Address\' field';
 		}
 	}
 
@@ -229,7 +227,6 @@ EOD;
 		$port = nut_config('port');
 		$upstype = nut_config_sub('upstype', 3);
 		$cable = nut_config_sub('cable', 3);
-		$allowaddr = nut_config('allowaddr');
 		$allowuser = nut_config('allowuser');
 		$allowpass = nut_config('allowpass');
 		$shutdownflag  = (nut_config('powerdown') == 'on') ? '-p' : '-h';
@@ -267,30 +264,23 @@ EOD;
 			$ups_conf .= "upstype={$upstype}\n";
 
 		/* upsd.conf */
-		$upsd_conf = "ACL all 0.0.0.0/0\n";
-		$upsd_conf .= "ACL localhost 127.0.0.1/32\n";
-		if($allowaddr && $allowuser) {
-			$upsd_conf .= "ACL remote {$allowaddr}\n";
-			$upsd_conf .= "ACCEPT remote\n";
-		}
-		$upsd_conf .= "ACCEPT localhost\n";
-		$upsd_conf .= "REJECT all\n";
+		$upsd_conf = "LISTEN 127.0.0.1\n";
+		$upsd_conf .= "LISTEN ::1\n";
 
+		$password = uniqid("nut");
 		/* upsd.users */
 		$upsd_users = "[monuser]\n";
-		$upsd_users .= "password = mypass\n";
-		$upsd_users .= "allowfrom = localhost\n";
+		$upsd_users .= "password = {$password}\n";
 		$upsd_users .= "upsmon master\n";
 		if($allowaddr && $allowuser) {
 			$upsd_users .= "\n[$allowuser]\n";
 			$upsd_users .= "password = $allowpass\n";
-			$upsd_users .= "allowfrom = remote\n";
 			$upsd_users .= "upsmon master\n";
 		}
 
 		/* upsmon.conf */
 		$upsmon_conf = <<<EOD
-MONITOR {$name}@localhost 1 monuser mypass master
+MONITOR {$name}@localhost 1 monuser {$password} master
 MINSUPPLIES 1
 SHUTDOWNCMD "/sbin/shutdown {$shutdownflag} +0"
 POWERDOWNFLAG /etc/killpower
@@ -391,30 +381,23 @@ EOD;
 			$ups_conf .= "notransferoids=true\n";
 
 		/* upsd.conf */
-		$upsd_conf = "ACL all 0.0.0.0/0\n";
-		$upsd_conf .= "ACL localhost 127.0.0.1/32\n";
-		if($allowaddr && $allowuser) {
-			$upsd_conf .= "ACL remote {$allowaddr}\n";
-			$upsd_conf .= "ACCEPT remote\n";
-		}
-		$upsd_conf .= "ACCEPT localhost\n";
-		$upsd_conf .= "REJECT all\n";
+		$upsd_conf = "LISTEN 127.0.0.1\n";
+		$upsd_conf .= "LISTEN ::1\n";
 
+		$password = uniqid("nut");
 		/* upsd.users */
 		$upsd_users = "[monuser]\n";
-		$upsd_users .= "password = mypass\n";
-		$upsd_users .= "allowfrom = localhost\n";
+		$upsd_users .= "password = {$password}\n";
 		$upsd_users .= "upsmon master\n";
 		if($allowaddr && $allowuser) {
 			$upsd_users .= "\n[$allowuser]\n";
 			$upsd_users .= "password = $allowpass\n";
-			$upsd_users .= "allowfrom = remote\n";
 			$upsd_users .= "upsmon master\n";
 		}
 
 		/* upsmon.conf */
 		$upsmon_conf = <<<EOD
-MONITOR {$name}@localhost 1 monuser mypass master
+MONITOR {$name}@localhost 1 monuser {$password} master
 MINSUPPLIES 1
 SHUTDOWNCMD "/sbin/shutdown {$shutdownflag} +0"
 POWERDOWNFLAG /etc/killpower

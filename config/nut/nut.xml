@@ -7,7 +7,7 @@
 /* $Id$ */
 /* ========================================================================== */
 /*
-    authng.xml
+    nut.xml
     part of pfSense (http://www.pfSense.com)
     Copyright (C) 2007 to whom it may belong
     All rights reserved.
@@ -46,7 +46,7 @@
     <requirements>Describe your package requirements here</requirements>
     <faq>Currently there are no FAQ items provided.</faq>
 	<name>nut</name>
-	<version>2.0.4</version>
+	<version>2.6.4 pkg 2.0</version>
 	<title>Services: NUT</title>
 	<savetext>Change</savetext>
 	<aftersaveredirect>/status_nut.php</aftersaveredirect>
@@ -122,7 +122,8 @@
 			<type>listtopic</type>
 		</field>
 		<field>
-			<fielddescr>Remote Access Address &lt;br&gt;(ex: 192.168.1.0/24)</fielddescr>
+			<fielddescr>Remote Access Address</fielddescr>
+			<description>&lt;strong&gt;NOTE: Previous versions of NUT supported internal ACLs, these no longer work. The new default is to bind to localhost ONLY - you should add NAT rules for the NUT port (3493) to allow remote access. This field no longer has any effect, but was left intact for reference.&lt;/strong&gt;</description>
 			<fieldname>allowaddr</fieldname>
 			<type>input</type>
 		</field>
