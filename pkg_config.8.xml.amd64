@@ -928,15 +928,15 @@
 		<descr>Network UPS Tools</descr>
 		<website>http://www.networkupstools.org/</website>
 		<category>Network Management</category>
-		<version>2.2.2_5 pkg 1.4</version>
+		<version>2.6.4 pkg 1.4</version>
 		<status>BETA</status>
 		<required_version>2.0</required_version>
 		<maintainer>rswagoner@gmail.com</maintainer>
 		<config_file>http://www.pfsense.com/packages/config/nut/nut.xml</config_file>
 		<configurationfile>nut.xml</configurationfile>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
-		<depends_on_package>nut-2.2.2_6.tbz</depends_on_package>
-		<depends_on_package_pbi>nut-2.2.2_6-amd64.pbi</depends_on_package_pbi>
+		<depends_on_package>nut-2.6.4.tbz</depends_on_package>
+		<depends_on_package_pbi>nut-2.6.4-amd64.pbi</depends_on_package_pbi>
 		<build_port_path>/usr/ports/sysutils/nut</build_port_path>
 		<pkginfolink>http://doc.pfsense.org/index.php/Nut_package</pkginfolink>
 	</package>
