@@ -1,25 +1,6 @@
 <?php
 
-if(!isset($_GET['id']) and !isset($_POST['id'])) {
-	if($GLOBALS['config']['installedpackages']['tinchosts']['savemsg']) {
-		$savemsg=$GLOBALS['config']['installedpackages']['tinchosts']['savemsg'];
-		unset($GLOBALS['config']['installedpackages']['tinchosts']['savemsg']);
-		write_config();
-	}
-	
-}
-
-$hosts=$config['installedpackages']['tinchosts']['config'];
-is_array($hosts) ? $num_hosts=count($hosts) : $num_hosts=0;
-if(!isset($_GET['id']) and !isset($_POST['id']) and $num_hosts) {
-	for ($i=0;$i<$num_hosts;$i++) {
-		$host=$hosts[$i];
-	}
-}
-
-
 function tinc_save() {
-	$GLOBALS['config']['installedpackages']['tinchosts']['savemsg']='';
 	conf_mount_rw();
 	config_lock();
 	exec("/bin/mv -f /usr/local/etc/tinc /usr/local/etc/tinc.old");
