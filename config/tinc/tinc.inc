@@ -148,9 +148,11 @@ function tinc_deinstall() {
                                 mwexec("/sbin/ifconfig  {$realif} -group " . $a_ifgroups[$_GET['id']]['ifname']);
                 }
                 unset($a_ifgroups[$myid]);
-                mwexec("/bin/rm -f /tmp/config.cache");
-                write_config();
         }
+        mwexec("/bin/rm -f /tmp/config.cache");
+        write_config();
+	conf_mount_ro();
+	config_unlock();
 
 	rmdir_recursive("/var/tmp/tinc");
 	rmdir_recursive("/usr/local/etc/tinc*");
