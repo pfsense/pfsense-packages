@@ -144,7 +144,7 @@
                 <field>
                         <fielddescr>Interface Up Script</fielddescr>
                         <fieldname>tinc_up</fieldname>
-                        <description>This script is executed right after the tinc daemon has connected to the virtual network device.  By default a tinc-up file is created that brings up the tinc interface with the IP Address and Netmask specified above.  Entering a value here complely replaces the default script so be sure to bring up the interface in this script.</description>
+                        <description>This script is executed right after the tinc daemon has connected to the virtual network device.  By default a tinc-up file is created that brings up the tinc interface with the IP Address and Netmask specified above and adds it to the tinc interface group.  Entering a value here complely replaces the default script so be sure to bring up the interface in this script.</description>
                         <type>textarea</type>
                         <encoding>base64</encoding>
                         <rows>8</rows>
