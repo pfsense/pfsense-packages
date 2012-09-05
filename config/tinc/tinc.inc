@@ -130,8 +130,6 @@ function tinc_status_2() {
 function tinc_install() {
 	safe_mkdir("/usr/local/etc/tinc");
 	safe_mkdir("/usr/local/etc/tinc/hosts");
-#	make_dirs("/var/tmp/tinc/var/tmp/run/tinc");
-#	system("/usr/sbin/chown -R tinc:tinc /var/tmp/tinc");
 	$_rcfile['file']='tinc.sh';
 	$_rcfile['start'].="/usr/local/sbin/tincd --config=/usr/local/etc/tinc\n\t";
 	$_rcfile['stop'].="/usr/local/sbin/tincd --kill \n\t";
@@ -141,21 +139,6 @@ function tinc_install() {
 	
 	conf_mount_rw();
 	config_lock();
-/*
-       # find next free optional interface number 
-                for ($i = 1; $i <= count($GLOBALS['config']['interfaces']); $i++) {
-                        if (!$GLOBALS['config']['interfaces']["opt{$i}"])
-                                break;
-                }
-                $newifname = 'opt' . $i;
-                $descr = "TINC";
-                $GLOBALS['config']['interfaces'][$newifname] = array();
-                $GLOBALS['config']['interfaces'][$newifname]['descr'] = $descr;
-                                                
-        uksort($GLOBALS['config']['interfaces'], "compare_interface_friendly_names");
-                                         
-        $GLOBALS['config']['interfaces'][$newifname]['if'] = "tun0";
-*/
 
         /* Create Interface Group */
         if (!is_array($GLOBALS['config']['ifgroups']['ifgroupentry']))
