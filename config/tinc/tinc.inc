@@ -103,30 +103,6 @@ function tinc_save() {
 	config_unlock();
 }
 
-function tinc_status_1() {
-	list($dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$sizeb,$atime,$mtimeb,$ctime,$blksize,$blocks)=stat("/var/log/tinc.log");
-	exec("/usr/local/sbin/tincd --config=/usr/local/etc/tinc -kUSR1");
-	exec("tail -c +" . $sizeb . " /var/log/tinc.log | sed -e 's/.*tinc\[.*\]: //'",$result);
-	$output="";
-	foreach($result as $line)
-	{
-		$output .= $line . "\n";
-	}
-	return $output;
-}
-
-function tinc_status_2() {
-	list($dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$sizeb,$atime,$mtimeb,$ctime,$blksize,$blocks)=stat("/var/log/tinc.log");
-	exec("/usr/local/sbin/tincd --config=/usr/local/etc/tinc -kUSR2");
-	exec("tail -c +" . $sizeb . " /var/log/tinc.log | sed -e 's/.*tinc\[.*\]: //'",$result);
-	$output="";
-	foreach($result as $line)
-	{
-		$output .= $line . "\n";
-	}
-	return $output;
-}
-
 function tinc_install() {
 	safe_mkdir("/usr/local/etc/tinc");
 	safe_mkdir("/usr/local/etc/tinc/hosts");
