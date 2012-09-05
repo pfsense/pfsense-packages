@@ -271,7 +271,7 @@
 			<type>checkbox</type>
 		</field>
 		<field>
-			<fielddescr>Bypass proxy for Private Address Space (RFC 1918) destination</fielddescr>
+			<fielddescr>Bypass proxy for Private Address destination</fielddescr>
 			<fieldname>private_subnet_proxy_off</fieldname>
 			<description>Do not forward traffic to Private Address Space (RFC 1918) &lt;b&gt;destination&lt;/b&gt; through the proxy server but directly through the firewall.</description>
 			<type>checkbox</type>
@@ -289,6 +289,12 @@
 			<description>Do not proxy traffic going to these &lt;b&gt;destination&lt;/b&gt; IPs, CIDR nets, hostnames, or aliases, but let it pass directly through the firewall. Separate by semi-colons (;). [Applies only to transparent mode]</description>
 			<type>input</type>
 		<size>70</size>
+		</field>
+		<field>
+			<fielddescr>Resolv dns v4 first</fielddescr>
+			<fieldname>dns_v4_first</fieldname>
+			<description><![CDATA[Enable this option to force dns v4 lookup first. This option is very usefull if you have problems to access https sites.]]></description>
+			<type>checkbox</type>
 		</field>
 		<field>
 			<fielddescr>Use alternate DNS-servers for the proxy-server</fielddescr>

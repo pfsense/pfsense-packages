@@ -771,7 +771,7 @@ function squid_resync_general() {
 		$conf .= "http_port 127.0.0.1:" . $settings['proxy_port'] . " intercept\n";
 	}
 	$icp_port = ($settings['icp_port'] ? $settings['icp_port'] : 7);
-
+	$dns_v4_first= ($settings['dns_v4_first'] == "on" ? "on" : "off" );
 	$pidfile = "{$g['varrun_path']}/squid.pid";
 	$language = ($settings['error_language'] ? $settings['error_language'] : 'en');
 	$icondir = SQUID_CONFBASE . '/icons';
@@ -787,17 +787,17 @@ function squid_resync_general() {
 	$logdir_access = ($settings['log_enabled'] == 'on' ? $logdir . '/access.log' : '/dev/null');
 
 	$conf .= <<<EOD
-icp_port $icp_port
-
-pid_filename $pidfile
+icp_port {$icp_port}
+dns_v4_first {$dns_v4_first}
+pid_filename {$pidfile}
 cache_effective_user proxy
 cache_effective_group proxy
-error_default_language $language
-icon_directory $icondir
-visible_hostname $hostname
-cache_mgr $email
-access_log $logdir_access
-cache_log $logdir_cache
+error_default_language {$language}
+icon_directory {$icondir}
+visible_hostname {$hostname}
+cache_mgr {$email}
+access_log {$logdir_access}
+cache_log {$logdir_cache}
 cache_store_log none
 sslcrtd_children 0
 
