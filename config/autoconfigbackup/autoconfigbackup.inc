@@ -82,10 +82,11 @@ function test_connection($post) {
 	$hostname			= $config['system']['hostname'] . "." . $config['system']['domain'];
 
 	// URL to restore.php
-	$get_url			= "https://{$username}:{$password}@portal.pfsense.org/pfSconfigbackups/restore.php";
+	$get_url			= "https://portal.pfsense.org/pfSconfigbackups/restore.php";
 
 	// Populate available backups
 	$curl_session = curl_init();
+	curl_setopt($curl_session, CURLOPT_USERPWD, "{$username}:{$password}");
 	curl_setopt($curl_session, CURLOPT_URL, $get_url);
 	curl_setopt($curl_session, CURLOPT_SSL_VERIFYPEER, 0);
 	curl_setopt($curl_session, CURLOPT_POST, 1);
