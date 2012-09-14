@@ -40,9 +40,16 @@ else{
 $url=($_REQUEST['file'] == ""?"index.html":$_REQUEST['file']);
 $dir="/usr/local/sarg-reports";
 $rand=rand(100000000000,999999999999);
+$report="";
 if (file_exists("{$dir}/{$url}"))
-	{
 	$report=file_get_contents("{$dir}/{$url}");
+else if (file_exists("{$dir}/{$url}.gz")) {
+		$data = gzfile("{$dir}/{$url}.gz");
+		$report = implode($data);
+		unset ($data);
+		}
+if ($report != "" )
+	{
 	$pattern[0]="/href=\W(\S+html)\W/";
 	$replace[0]="href=/sarg_frame.php?prevent=".$rand."&file=$prefix/$1";
 	$pattern[1]='/img src="\S+\W([a-zA-Z0-9.-]+.png)/';

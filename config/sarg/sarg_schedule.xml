@@ -105,6 +105,10 @@
 			<fieldname>args</fieldname>
 		</columnitem>
 		<columnitem>
+			<fielddescr>Gzip</fielddescr>
+			<fieldname>gzip</fieldname>
+		</columnitem>
+		<columnitem>
 			<fielddescr>Post Action</fielddescr>
 			<fieldname>action</fieldname>
 		</columnitem>
@@ -163,6 +167,44 @@
 				<option><name>Rotate log and restart proxy daemon</name><value>both</value></option>
 				</options>
 			<description>Choose an action after sarg finishes</description>
+		</field>
+		<field>
+			<type>listtopic</type>
+			<fieldname>temp</fieldname>
+			<name>Compress Options</name>
+		</field>
+		<field>
+			<fielddescr>Enable Compression</fielddescr>
+			<fieldname>gzip</fieldname>
+			<description><![CDATA[Enable this option to compress sarg report html files using gzip and reduce 4 times sarg reports data.]]></description>
+			<type>checkbox</type>
+		</field>
+		<field>
+			<fielddescr>Compression level</fielddescr>
+			<fieldname>gziplevel</fieldname>
+			<type>select</type>
+ 				<options>
+ 				<option><name>Default gzip compression (Recommended)</name><value></value></option>
+				<option><name>1 (fast)</name><value>--fast</value></option>
+				<option><name>2</name><value>-2</value></option>
+				<option><name>3</name><value>-3</value></option>
+				<option><name>4</name><value>-4</value></option>
+				<option><name>5</name><value>-5</value></option>
+				<option><name>6</name><value>-6</value></option>
+				<option><name>7</name><value>-7</value></option>
+				<option><name>8</name><value>-8</value></option>
+				<option><name>9 (best)</name><value>--best</value></option>
+				</options>
+			<description>Choose gzip compression level.</description>
+		</field>
+		<field>
+			<fielddescr>Find Limit</fielddescr>
+			<fieldname>find</fieldname>
+			<type>input</type>
+			<default_value>60</default_value>
+			<size>5</size>
+			<description><![CDATA[To speed up find process, restrict find search to report files created/changed n minutes ago.<br>
+							Default is to 60 minutes. If your reports take longer to be created, increase this value.]]></description>
 		</field>
 	</fields>
 	<custom_php_install_command>

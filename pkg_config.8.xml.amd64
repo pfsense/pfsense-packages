@@ -659,7 +659,7 @@
 		<depends_on_package>sarg-2.3.2_2.tbz</depends_on_package>
 		<depends_on_package>gd-2.0.35_7,1.tbz</depends_on_package>
 		<depends_on_package_pbi>sarg-2.3.2_5-amd64.pbi</depends_on_package_pbi>
-		<version>2.3.2 pkg v.0.5</version>
+		<version>2.3.2 pkg v.0.6</version>
 		<status>RC1</status>
 		<required_version>2.0</required_version>
 		<configurationfile>sarg.xml</configurationfile>

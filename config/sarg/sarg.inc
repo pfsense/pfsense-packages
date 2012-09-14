@@ -88,13 +88,34 @@ function run_sarg($id=-1) {
 	if ($id >= 0 && is_array($config['installedpackages']['sargschedule']['config'])){
 		$args=$config['installedpackages']['sargschedule']['config'][$id]['args'];
 		$action=$config['installedpackages']['sargschedule']['config'][$id]['action'];
+		$gzip=$config['installedpackages']['sargschedule']['config'][$id]['gzip'];
+		$find=$config['installedpackages']['sargschedule']['config'][$id]['find'];
+		$gziplevel=$config['installedpackages']['sargschedule']['config'][$id]['gziplevel'];
 		}
 	else{
 		$args=$_POST['args'];
 		$action=$_POST['action'];
+		$gzip=$_POST['gzip'];
+		$find=$_POST['find'];
+		$gziplevel=$_POST['gziplevel'];
 		}
-	log_error("Sarg: force refresh now with '".$args."' args and ".$action." action after sarg finish.");
-
+	$find=(preg_match("/(\d+)/",$find,$find_matches) ? $find_matches[1] : "60");
+	log_error("Sarg: force refresh now with {$args} args, compress({$gzip}) and {$action} action after sarg finish.");
+	if ($gzip=="on"){
+		#remove old file if exists
+		unlink_if_exists("/root/sarg_run_{$id}.sh");
+		$gzip_script=<<<EOF
+#!/bin/sh
+for a in `/usr/bin/find /usr/local/sarg-reports -cmin -{$find} -type d -mindepth 1 -maxdepth 1`
+do
+echo \$a
+/usr/bin/find \$a -name "*html" | xargs gzip {$gziplevel}
+done
+		
+EOF;
+		#create a new file to speedup find search
+		file_put_contents("/root/sarg_run_{$id}.sh",$gzip_script,LOCK_EX);
+		}
 	mwexec($cmd. " ".$args);
 	#check if there is a script to run after file save
 	if (is_array($config['installedpackages']['sarg']))
@@ -127,6 +148,10 @@ function run_sarg($id=-1) {
 					}
 			break;
 		}
+	#check compress option
+	if ($gzip=="on")
+		mwexec_bg("/bin/sh /root/sarg_run_{$id}.sh");
+		
 	#mount filesystem readonly
 	conf_mount_ro();
 }
