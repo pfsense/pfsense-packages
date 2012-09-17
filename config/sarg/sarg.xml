@@ -286,7 +286,8 @@
 			<fielddescr>Reports days limits</fielddescr>
 			<fieldname>daylimit</fieldname>
 			<description><![CDATA[How many days reports files must be keept in reports directory.<br>
-								 Older report file will be automatically removed.0 means no limit.]]></description>
+								 Older report file will be automatically removed.<br>
+								 Leave empty to do not remove old reports.]]></description>
 	    	<type>input</type>
 	    	<size>10</size>
 		</field>
