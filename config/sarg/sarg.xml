@@ -18,7 +18,7 @@
     Redistribution and use in source and binary forms, with or without
     modification, are permitted provided that the following conditions are met:
 
-     1. Redistributions of source code must retain the above copyright notice,
+     1. Redistributions of source code MUST retain the above copyright notice,
         this list of conditions and the following disclaimer.
 
      2. Redistributions in binary form must reproduce the above copyright
@@ -84,11 +84,6 @@
 	</additional_files_needed>
 	<additional_files_needed>
 		<item>http://www.pfsense.org/packages/config/sarg/sarg.php</item>
-		<prefix>/usr/local/www/</prefix>
-		<chmod>0755</chmod>
-	</additional_files_needed>
-	<additional_files_needed>
-		<item>http://www.pfsense.org/packages/config/sarg/sarg_queue.php</item>
 		<prefix>/usr/local/www/</prefix>
 		<chmod>0755</chmod>
 	</additional_files_needed>
@@ -280,10 +275,18 @@
 	    	<size>10</size>
 		</field>
 		<field>
-			<fielddescr>Reports limits</fielddescr>
+			<fielddescr>Reports list limits</fielddescr>
 			<fieldname>lastlog</fieldname>
 			<description><![CDATA[How many reports files must be keept in reports directory.<br>
 								 The oldest report file will be automatically removed.0 means no limit.]]></description>
+	    	<type>input</type>
+	    	<size>10</size>
+		</field>
+		<field>
+			<fielddescr>Reports days limits</fielddescr>
+			<fieldname>daylimit</fieldname>
+			<description><![CDATA[How many days reports files must be keept in reports directory.<br>
+								 Older report file will be automatically removed.0 means no limit.]]></description>
 	    	<type>input</type>
 	    	<size>10</size>
 		</field>

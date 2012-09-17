@@ -27,7 +27,17 @@
 	POSSIBILITY OF SUCH DAMAGE.
 */
 
-require("guiconfig.inc");
+$pf_version=substr(trim(file_get_contents("/etc/version")),0,3);
+if ($pf_version > 2.0)
+        define('SARG_DIR', '/usr/pbi/sarg-' . php_uname("m"));
+else
+  define('SARG_DIR', '/usr/local');
+  
+$uname=posix_uname();
+if ($uname['machine']=='amd64')
+        ini_set('memory_limit', '250M');
+        
+
 function get_cmd(){
 	global $config,$g;
 	#print $_REQUEST['type'];
@@ -53,14 +63,14 @@ function get_cmd(){
 		if($update_config > 0){
 			write_config();
 			#write changes to sarg_file
-			$sarg_config=file_get_contents('/usr/local/etc/sarg/sarg.conf');
+			$sarg_config=file_get_contents(SARG_DIR . '/etc/sarg/sarg.conf');
 			$pattern[0]='/realtime_types\s+[A-Z,,]+/';
 			$replace[0]="realtime_types ".$_REQUEST['qshape'];
 			$pattern[1]='/realtime_unauthenticated_records\s+\w+/';
 			$replace[1]="realtime_unauthenticated_records ".$_REQUEST['type'];
-			file_put_contents('/usr/local/etc/sarg/sarg.conf', preg_replace($pattern,$replace,$sarg_config),LOCK_EX);
+			file_put_contents(SARG_DIR . '/etc/sarg/sarg.conf', preg_replace($pattern,$replace,$sarg_config),LOCK_EX);
 			}
-		exec("/usr/local/bin/sarg -r", $sarg);
+		exec(SARG_DIR ."/bin/sarg -r",$sarg);
 		$pattern[0]="/<?(html|head|style)>/";
 		$replace[0]="";
 		$pattern[1]="/header_\w/";
@@ -73,7 +83,6 @@ function get_cmd(){
 		$replace[4]='cellspacing="0"';
 		$pattern[5]="/sarg/";
 		$replace[5]='cellspacing="0"';
-		
 		foreach ($sarg as $line){
 			if (preg_match("/<.head>/",$line))
 				$print ="ok";
@@ -84,9 +93,12 @@ function get_cmd(){
 }
 
 if ($_REQUEST['cmd']!=""){
+	require_once("authgui.inc");
+	require_once("functions.inc");
 	get_cmd();
 	}
 else{
+	require("guiconfig.inc");
 	$pfSversion = str_replace("\n", "", file_get_contents("/etc/version"));
 	if(strstr($pfSversion, "1.2"))
 		$one_two = true;
@@ -104,7 +116,7 @@ else{
 	
 	<?php if ($savemsg) print_info_box($savemsg); ?>
 	
-	<form action="postfix_view_config.php" method="post">
+	<form action="sarg_realtime.php" method="post">
 		
 	<div id="mainlevel">
 		<table width="100%" border="0" cellpadding="0" cellspacing="0">
@@ -204,21 +216,23 @@ else{
 	  }
 	  return(selectedArray);
 	}
-		
 	function get_queue(loop) {
 			//prevent multiple instances
 			if ($('run').value=="show log" || loop== 'running'){
 				$('run').value="running...";
 				$('search_help').innerHTML ="<br><strong>You can change options while running.<br>To Stop seach, change update frequency to Never.</strong>";
+				var axel = Math.random() + "";
+				var num = axel * 1000000000000000000;
 				var q_args=loopSelected('qshape');
 				var pars = 'cmd='+$('cmd').options[$('cmd').selectedIndex].value;
 				var pars = pars + '&qshape='+q_args;
+				var pars = pars + '&prevent='+num;
 				var pars = pars + '&type='+$('qtype').options[$('qtype').selectedIndex].value;
-				var url = "/sarg_queue.php";
+				var url = "/sarg_realtime.php";
 				var myAjax = new Ajax.Request(
 					url,
 					{
-						method: 'post',
+						method: 'get',
 						parameters: pars,
 						onComplete: activitycallback_queue_file
 					});
