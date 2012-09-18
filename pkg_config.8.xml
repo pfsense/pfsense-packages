@@ -176,6 +176,52 @@
 		<depends_on_package_pbi>haproxy-1.4.21-i386.pbi</depends_on_package_pbi>
 	</package>
 	<package>
+		<name>Apache+mod_security-dev</name>
+		<pkginfolink>http://doc.pfsense.org/index.php/ProxyServerModSecurity_package</pkginfolink>
+		<website>http://www.modsecurity.org/</website>
+		<descr>ModSecurity is a web application firewall that can work either embedded or as a reverse proxy. It provides protection from a range of attacks against web applications and allows for HTTP traffic monitoring, logging and real-time analysis. In addition this package allows URL forwarding which can be convenient for hosting multiple websites behind pfSense using 1 IP address.</descr>
+		<category>Network Management</category>
+		<version>0.2</version>
+		<status>ALPHA</status>
+		<required_version>2.0</required_version>
+		<config_file>http://www.pfsense.com/packages/config/apache_mod_security-dev/apache_virtualhost.xml</config_file>
+		<depends_on_package_base_url>http://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
+		<depends_on_package>db42-4.2.52_5.tbz</depends_on_package>
+		<depends_on_package>gdbm-1.9.1.tbz</depends_on_package>
+		<depends_on_package>apr-ipv6-devrandom-gdbm-db42-1.4.5.1.3.12_1.tbz</depends_on_package>
+		<depends_on_package>ap22-mod_memcache-0.1.0_4.tbz</depends_on_package>
+		<depends_on_package>apache-2.2.22_5.tbz</depends_on_package>
+		<depends_on_package>ap22-mod_security-2.6.5_1.tbz</depends_on_package>
+		<depends_on_package_pbi>proxy_mod_security-2.2.22_6-i386.pbi</depends_on_package_pbi>
+		<configurationfile>apache_virtualhost.xml</configurationfile>
+		<build_port_path>/usr/ports/devel/gettext</build_port_path>
+		<build_port_path>/usr/ports/misc/help2man</build_port_path>
+		<build_port_path>/usr/ports/devel/apr1</build_port_path>
+		<build_port_path>/usr/ports/devel/pkg-config</build_port_path>
+		<build_port_path>/usr/ports/databases/db42</build_port_path>
+		<build_port_path>/usr/ports/databases/gdbm</build_port_path>
+		<build_port_path>/usr/ports/www/apache22-worker-mpm</build_port_path>
+		<build_port_path>/usr/ports/www/mod_security</build_port_path>
+		<build_port_path>/usr/ports/www/mod_memcache</build_port_path>
+		<build_port_path>/usr/ports/www/p5-LWP-Protocol-https</build_port_path>
+		<build_port_path>/usr/ports/www/p5-LWP-UserAgent-Determined</build_port_path>
+		<build_port_path>/usr/ports/security/gnupg</build_port_path>
+		<build_port_path>/user/ports/net/spread</build_port_path>
+		<build_port_path>/user/ports/textproc/p5-XML-Smart</build_port_path>
+		<build_port_path>/user/ports/lang/p5-Switch</build_port_path>
+		<build_port_path>/user/ports/www/p5-Data-Validate-URI</build_port_path>
+		<build_port_path>/user/ports/devel/p5-Data-Types</build_port_path>
+		<build_port_path>/user/ports/devel/p5-Acme-Comment</build_port_path>
+		<build_pbi>
+			<custom_name>proxy_mod_security</custom_name>
+			<ports_before>devel/gettext misc/help2man databases/db42 databases/gdbm devel/apr1 www/p5-LWP-UserAgent-Determined www/p5-LWP-Protocol-https security/gnupg security/p5-GnuPG net/spread textproc/p5-XML-Smart lang/p5-Switch www/p5-Data-Validate-URI devel/p5-Data-Types devel/p5-Acme-Comment</ports_before>
+			<port>www/apache22-worker-mpm</port>
+			<ports_after>www/mod_security www/mod_memcache</ports_after>
+		</build_pbi>
+		<build_options>WITH_MPM=worker WITH_THREADS=yes WITHOUT_MYSQL=yes WITHOUT_PGSQL=yes WITH_SQLITE=yes WITH_IPV6=yes WITHOUT_BDB=yes WITH_AUTH_BASIC=yes WITH_AUTH_DIGEST=yes WITH_AUTHN_FILE=yes WITHOUT_AUTHN_DBD=yes WITH_AUTHN_DBM=yes WITH_AUTHN_ANON=yes WITH_AUTHN_DEFAULT=yes WITH_AUTHN_ALIAS=yes WITH_AUTHZ_HOST=yes WITH_AUTHZ_GROUPFILE=yes WITH_AUTHZ_USER=yes WITH_AUTHZ_DBM=yes WITH_AUTHZ_OWNER=yes WITH_AUTHZ_DEFAULT=yes WITH_CACHE=yes WITH_DISK_CACHE=yes WITH_FILE_CACHE=yes WITH_MEM_CACHE=yes WITH_DAV=yes WITH_DAV_FS=yes WITHOUT_BUCKETEER=yes WITHOUT_CASE_FILTER=yes WITHOUT_CASE_FILTER_IN=yes WITHOUT_EXT_FILTER=yes WITHOUT_LOG_FORENSIC=yes WITHOUT_OPTIONAL_HOOK_EXPORT=yes WITHOUT_OPTIONAL_HOOK_IMPORT=yes WITHOUT_OPTIONAL_FN_IMPORT=yes WITHOUT_OPTIONAL_FN_EXPORT=yes WITHOUT_LDAP=yes WITHOUT_AUTHNZ_LDAP=yes WITH_ACTIONS=yes WITH_ALIAS=yes WITH_ASIS=yes WITH_AUTOINDEX=yes WITH_CERN_META=yes WITH_CGI=yes WITH_CHARSET_LITE=yes WITHOUT_DBD=yes WITH_DEFLATE=yes WITH_DIR=yes WITH_DUMPIO=yes WITH_ENV=yes WITH_EXPIRES=yes WITH_HEADERS=yes WITH_IMAGEMAP=yes WITH_INCLUDE=yes WITH_INFO=yes WITH_LOG_CONFIG=yes WITH_LOGIO=yes WITH_MIME=yes WITH_MIME_MAGIC=yes WITH_NEGOTIATION=yes WITH_REWRITE=yes WITH_SETENVIF=yes WITH_SPELING=yes WITH_STATUS=yes WITH_UNIQUE_ID=yes WITH_USERDIR=yes WITH_USERTRACK=yes WITH_VHOST_ALIAS=yes WITH_FILTER=yes WITHOUT_SUBSTITUTE=yes WITH_VERSION=yes WITH_PROXY=yes WITH_PROXY_CONNECT=yes WITH_PROXY_FTP=yes WITH_PROXY_HTTP=yes WITH_PROXY_AJP=yes WITH_PROXY_BALANCER=yes WITH_PROXY_SCGI=yes WITH_SSL=yes WITHOUT_SUEXEC=yes WITHOUT_SUEXEC_RSRCLIMIT=yes WITH_REQTIMEOUT=yes WITHOUT_CGID=yes</build_options>
+		<after_install_info>Please visit the ProxyServer settings tab and set the service up so that it may be started.</after_install_info>
+	</package>
+	<package>
 		<name>Proxy Server with mod_security</name>
 		<pkginfolink>http://doc.pfsense.org/index.php/ProxyServerModSecurity_package</pkginfolink>
 		<website>http://www.modsecurity.org/</website>
@@ -1187,7 +1233,7 @@
 		<pkginfolink>http://forum.pfsense.org/index.php/topic,48347.0.html</pkginfolink>
 		<website>http://www.squid-cache.org/</website>
 		<category>Network</category>
-		<version>3.1.20 pkg 2.0.5_4</version>
+		<version>3.1.20 pkg 2.0.5_5</version>
 		<status>beta</status>
 		<required_version>2.0</required_version>
 		<maintainer>marcellocoutinho@gmail.com fernando@netfilter.com.br seth.mos@dds.nl mfuchs77@googlemail.com jimp@pfsense.org</maintainer>

@@ -79,7 +79,7 @@ function squid_resync_reverse() {
 		      		$conf .= "http_port {$real_ifaces[$i][0]}:{$http_port} accel defaultsite={$http_defsite} vhost\n";
 		      //HTTPS
 		      if (!empty($settings['reverse_https']))
-		      		$conf .= "https_port {$real_ifaces[$i][0]}:{$https_port} accel cert={$reverse_crt} key={$reverse_key} defaultsite={$https_defsite}\n";
+		      		$conf .= "https_port {$real_ifaces[$i][0]}:{$https_port} accel cert={$reverse_crt} key={$reverse_key} defaultsite={$https_defsite} vhost\n";
 			}
 		}
 		
@@ -91,7 +91,7 @@ function squid_resync_reverse() {
 		      		$conf .= "http_port {$reip}:{$http_port} accel defaultsite={$http_defsite} vhost\n";
 		      //HTTPS
 		      if (!empty($settings['reverse_https']))
-		      		$conf .= "https_port {$reip}:{$https_port} accel cert={$reverse_crt} key={$reverse_key} defaultsite={$https_defsite}\n";
+		      		$conf .= "https_port {$reip}:{$https_port} accel cert={$reverse_crt} key={$reverse_key} defaultsite={$https_defsite} vhost\n";
 			}
 	 	}
 
