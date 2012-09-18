@@ -277,7 +277,7 @@
 		<field>
 			<fielddescr>Reports list limits</fielddescr>
 			<fieldname>lastlog</fieldname>
-			<description><![CDATA[How many reports files must be keept in reports directory.<br>
+			<description><![CDATA[How many reports files must be kept in reports directory.<br>
 								 The oldest report file will be automatically removed.0 means no limit.]]></description>
 	    	<type>input</type>
 	    	<size>10</size>
@@ -285,7 +285,7 @@
 		<field>
 			<fielddescr>Reports days limits</fielddescr>
 			<fieldname>daylimit</fieldname>
-			<description><![CDATA[How many days reports files must be keept in reports directory.<br>
+			<description><![CDATA[How many days reports files must be kept in reports directory.<br>
 								 Older report file will be automatically removed.<br>
 								 Leave empty to do not remove old reports.]]></description>
 	    	<type>input</type>

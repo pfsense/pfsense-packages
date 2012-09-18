@@ -33,7 +33,7 @@
 # sarg.conf
 #
 # TAG:  access_log file
-#       Where is the access.lo
+#       Where is the access.log
 #       sarg -l file
 #
 access_log {$access_log}
@@ -194,7 +194,7 @@ user_sort_field {$sarguser['user_sort_field']} {$sort_order}
 #       users within the file will be excluded from reports.
 #       you can use indexonly to have only index.html file.
 #
-exclude_users /usr/local/etc/sarg/exclude_users.conf
+exclude_users {$sarg_dir}/etc/sarg/exclude_users.conf
 
 # TAG:  exclude_hosts file
 #       Hosts, domains or subnets will be excluded from reports.
@@ -204,7 +204,7 @@ exclude_users /usr/local/etc/sarg/exclude_users.conf
 #            s1.acme.foo     - exclude hostname only
 #            *.acme.foo      - exclude full domain name
 #
-exclude_hosts /usr/local/etc/sarg/exclude_hosts.conf
+exclude_hosts {$sarg_dir}/etc/sarg/exclude_hosts.conf
 
 # TAG:  useragent_log file
 #       useragent.log file patch to generate useragent report.
@@ -224,7 +224,7 @@ date_format {$date_format}
 #per_user_limit none
 
 # TAG: lastlog n
-#      How many reports files must be keept in reports directory.
+#      How many reports files must be kept in reports directory.
 #      The oldest report file will be automatically removed.
 #      0 - no limit.
 #
@@ -312,7 +312,7 @@ use_comma {$use_comma}
 #      Only codes matching exactly one of the line is rejected. The
 #      comparison is not case sensitive.
 #
-exclude_codes /usr/local/etc/sarg/exclude_codes
+exclude_codes {$sarg_dir}/etc/sarg/exclude_codes
 
 # TAG: replace_index string
 #      Replace "index.html" in the main index file with this string
@@ -806,6 +806,6 @@ sorttable /sarg_sorttable.js
 #      *.freeav.net antivirus:freeav
 #      *.mail.live.com
 #      65.52.00.00/14 *.mail.live.com
-hostalias /usr/local/etc/sarg/hostalias
+hostalias {$sarg_dir}/etc/sarg/hostalias
 EOF;
 ?>
