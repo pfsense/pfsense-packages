@@ -96,7 +96,7 @@
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0644</chmod>
-		<item>http://www.pfsense.com/packages/config/apache_mod_security-dev/apache_mod_security_manipulator.xml</item>
+		<item>http://www.pfsense.com/packages/config/apache_mod_security-dev/apache_mod_security_manipulation.xml</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
