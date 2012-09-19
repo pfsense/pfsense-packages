@@ -232,7 +232,7 @@ else{
 				var myAjax = new Ajax.Request(
 					url,
 					{
-						method: 'get',
+						method: 'post',
 						parameters: pars,
 						onComplete: activitycallback_queue_file
 					});

@@ -27,7 +27,10 @@
 	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 	POSSIBILITY OF SUCH DAMAGE.
 */
-
+$uname=posix_uname();
+if ($uname['machine']=='amd64')
+        ini_set('memory_limit', '250M');
+        
 if(preg_match("/(\S+)\W(\w+.html)/",$_REQUEST['file'],$matches)){
 	#https://192.168.1.1/sarg_reports.php?file=2012Mar30-2012Mar30/index.html
 	$url=$matches[2];

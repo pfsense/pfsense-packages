@@ -31,17 +31,28 @@
     POSSIBILITY OF SUCH DAMAGE.
                                                                               */
 /* ========================================================================== */
-
+$pf_version=substr(trim(file_get_contents("/etc/version")),0,3);
+if ($pf_version > 2.0){
+        define('SARG_DIR', '/usr/pbi/sarg-' . php_uname("m"));
+        define('SQUID_DIR', '/usr/pbi/squid-' . php_uname("m"));
+        define('DANSG_DIR', '/usr/pbi/dansguardian-' . php_uname("m"));
+	}
+else{
+  define('SARG_DIR', '/usr/local');
+  define('SQUID_DIR', '/usr/local');
+  define('DANSG_DIR', '/usr/local');
+}
+  
 $uname=posix_uname();
 if ($uname['machine']=='amd64')
         ini_set('memory_limit', '250M');
 
 // STATIC VARS
-$sarg_proxy=array(	'squid_rc'=>'/usr/local/etc/rc.d/squid.sh',
-					'squid_config'=>'/var/squid/logs/access.log',
-					'squidguard_config'=>'/usr/local/etc/squidGuard/squidGuard.conf',
+$sarg_proxy=array(	'squid_rc'=> SQUID_DIR . '/etc/rc.d/squid.sh',
+					'squid_config'=> '/var/squid/logs/access.log',
+					'squidguard_config'=> SARG_DIR . '/etc/squidGuard/squidGuard.conf',
 					'squidguard_block_log'=>'/var/squidGuard/log/block.log',
-					'dansguardian_config'=>'/usr/local/etc/dansguardian/dansguardian.conf',
+					'dansguardian_config'=> DANSG_DIR . '/etc/dansguardian/dansguardian.conf',
 					'dansguardian_log'=>'/var/log/dansguardian/access.log');
 
 // END STATIC VARS
@@ -84,13 +95,14 @@ function run_sarg($id=-1) {
 	global $config, $g,$sarg_proxy;
 	#mount filesystem writeable
 	conf_mount_rw();
-	$cmd = "/usr/local/bin/sarg";
+	$cmd =  SARG_DIR . "/bin/sarg";
 	if ($id >= 0 && is_array($config['installedpackages']['sargschedule']['config'])){
 		$args=$config['installedpackages']['sargschedule']['config'][$id]['args'];
 		$action=$config['installedpackages']['sargschedule']['config'][$id]['action'];
 		$gzip=$config['installedpackages']['sargschedule']['config'][$id]['gzip'];
 		$find=$config['installedpackages']['sargschedule']['config'][$id]['find'];
 		$gziplevel=$config['installedpackages']['sargschedule']['config'][$id]['gziplevel'];
+		$daylimit=$config['installedpackages']['sargschedule']['config'][$id]['daylimit'];
 		}
 	else{
 		$args=$_POST['args'];
@@ -98,14 +110,15 @@ function run_sarg($id=-1) {
 		$gzip=$_POST['gzip'];
 		$find=$_POST['find'];
 		$gziplevel=$_POST['gziplevel'];
+		$daylimit="";
 		}
 	$find=(preg_match("/(\d+)/",$find,$find_matches) ? $find_matches[1] : "60");
 	log_error("Sarg: force refresh now with {$args} args, compress({$gzip}) and {$action} action after sarg finish.");
+	$gzip_script="#!/bin/sh\n";
 	if ($gzip=="on"){
 		#remove old file if exists
 		unlink_if_exists("/root/sarg_run_{$id}.sh");
-		$gzip_script=<<<EOF
-#!/bin/sh
+		$gzip_script.=<<<EOF
 for a in `/usr/bin/find /usr/local/sarg-reports -cmin -{$find} -type d -mindepth 1 -maxdepth 1`
 do
 echo \$a
@@ -113,9 +126,20 @@ echo \$a
 done
 		
 EOF;
-		#create a new file to speedup find search
-		file_put_contents("/root/sarg_run_{$id}.sh",$gzip_script,LOCK_EX);
+
 		}
+	if (preg_match("/(\d+)/",$daylimit,$day_matches)){
+		$gzip_script.=<<<EOF
+for a in `/usr/bin/find /usr/local/sarg-reports -ctime +{$find} -type d -mindepth 1 -maxdepth 1`
+do
+echo \$a
+rm -rf \$a
+done
+		
+EOF;
+	}
+	#create a new file to speedup find search
+	file_put_contents("/root/sarg_run_{$id}.sh",$gzip_script,LOCK_EX);
 	mwexec($cmd. " ".$args);
 	#check if there is a script to run after file save
 	if (is_array($config['installedpackages']['sarg']))
@@ -127,13 +151,13 @@ EOF;
 					file_put_contents($sarg_proxy['squidguard_block_log'],"",LOCK_EX);
 					chown($sarg_proxy['squidguard_block_log'],'proxy');
 					chgrp($sarg_proxy['squidguard_block_log'],'proxy');
-					mwexec('/usr/local/sbin/squid -k reconfigure');
+					mwexec(SQUID_DIR . '/sbin/squid -k reconfigure');
 					}
 			#leave this case without break to run squid rotate too.
 			case "squid":
 				if ($action =="both" || $action=="rotate"){
 					log_error('executing squid log rotate after sarg.');
-					mwexec('/usr/local/sbin/squid -k rotate');
+					mwexec(SQUID_DIR . '/sbin/squid -k rotate');
 					}
 				if ($action =="both" || $action=="restart"){
 					if (file_exists($sarg_proxy['squid_rc']))
@@ -261,8 +285,8 @@ function sync_package_sarg() {
 		$usertab="none";
 		}
 	else{
-		$usertab="/usr/local/etc/sarg/usertab.conf";
-		file_put_contents('/usr/local/etc/sarg/usertab.conf', sarg_text_area_decode($sarguser['usertab']),LOCK_EX);
+		$usertab=  SARG_DIR . "/etc/sarg/usertab.conf";
+		file_put_contents( SARG_DIR . '/etc/sarg/usertab.conf', sarg_text_area_decode($sarguser['usertab']),LOCK_EX);
 		}
 	if($sarguser['ldap_enable']){
 		$LDAPHost=(empty($sarguser['ldap_host'])?"":"LDAPHost ".$sarguser['ldap_host']);
@@ -288,7 +312,7 @@ function sync_package_sarg() {
 	#images
 	$simages=array("datetime.png","graph.png","sarg-squidguard-block.png","sarg.png");
 	$simgdir1="/usr/local/www/sarg-images";
-	$simgdir2="/usr/local/etc/sarg/images";
+	$simgdir2= SARG_DIR . "/etc/sarg/images";
 	foreach ($simages as $simage){
 		if (!file_exists("{$simgdir1}/{$simage}"))
 			copy("{$simgdir2}/{$simage}","{$simgdir1}/{$simage}");
@@ -296,13 +320,13 @@ function sync_package_sarg() {
 			
 	//log_error($_POST['__csrf_magic']." sarg log:". $access_log);
 	#create sarg config files
+	$sarg_dir= SARG_DIR;
 	include("/usr/local/pkg/sarg.template");
-	file_put_contents("/usr/local/etc/sarg/sarg.conf", $sg, LOCK_EX);
-	file_put_contents('/usr/local/etc/sarg/exclude_hosts.conf', sarg_text_area_decode($sarg['exclude_hostlist']),LOCK_EX);
-	file_put_contents('/usr/local/etc/sarg/exclude_codes', sarg_text_area_decode($sarg['exclude_codelist']),LOCK_EX);
-	file_put_contents('/usr/local/etc/sarg/hostalias',sarg_text_area_decode($sarg['hostalias']),LOCK_EX);
-	file_put_contents('/usr/local/etc/sarg/exclude_users.conf', sarg_text_area_decode($sarguser['exclude_userlist']),LOCK_EX);
-	
+	file_put_contents( SARG_DIR . "/etc/sarg/sarg.conf", $sg, LOCK_EX);
+	file_put_contents( SARG_DIR . '/etc/sarg/exclude_hosts.conf', sarg_text_area_decode($sarg['exclude_hostlist']),LOCK_EX);
+	file_put_contents( SARG_DIR . '/etc/sarg/exclude_codes', sarg_text_area_decode($sarg['exclude_codelist']),LOCK_EX);
+	file_put_contents( SARG_DIR . '/etc/sarg/hostalias',sarg_text_area_decode($sarg['hostalias']),LOCK_EX);
+	file_put_contents( SARG_DIR . '/etc/sarg/exclude_users.conf', sarg_text_area_decode($sarguser['exclude_userlist']),LOCK_EX);
 	#check cron_tab
 	$new_cron=array();
 	$cron_found=0;
