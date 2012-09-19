@@ -76,12 +76,12 @@
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0644</chmod>
-		<item>http://www.pfsense.com/packages/config/apache_mod_security-dev/apache.tempalte</item>
+		<item>http://www.pfsense.com/packages/config/apache_mod_security-dev/apache.template</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0644</chmod>
-		<item>http://www.pfsense.com/packages/config/apache_mod_security-dev/apache_balancer.tempalte</item>
+		<item>http://www.pfsense.com/packages/config/apache_mod_security-dev/apache_balancer.template</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
@@ -96,7 +96,7 @@
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0644</chmod>
-		<item>http://www.pfsense.com/packages/config/apache_mod_security-dev/apache_mod_security_manipulator.xml</item>
+		<item>http://www.pfsense.com/packages/config/apache_mod_security-dev/apache_mod_security_manipulation.xml</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>

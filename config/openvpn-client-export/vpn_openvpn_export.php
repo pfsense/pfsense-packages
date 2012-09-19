@@ -137,10 +137,11 @@ if (!empty($act)) {
 		$useaddr = $_GET['useaddr'];
 	$advancedoptions = $_GET['advancedoptions'];
 
+	$quoteservercn = $_GET['quoteservercn'];
 	$usetoken = $_GET['usetoken'];
 	if ($usetoken && ($act == "confinline"))
 		$input_errors[] = "You cannot use Microsoft Certificate Storage with an Inline configuration.";
-	if ($usetoken && (($act == "conf_yealink_t28") || ($act == "conf_yealink_t38g") || ($act == "conf_snom")))
+	if ($usetoken && (($act == "conf_yealink_t28") || ($act == "conf_yealink_t38g") || ($act == "conf_yealink_t38g2") || ($act == "conf_snom")))
 		$input_errors[] = "You cannot use Microsoft Certificate Storage with a Yealink or SNOM configuration.";
 	$password = "";
 	if ($_GET['password'])
@@ -186,6 +187,10 @@ if (!empty($act)) {
 				$exp_name = urlencode("client.tar");
 				$expformat = "yealink_t38g";
 				break;
+			case "conf_yealink_t38g2":
+				$exp_name = urlencode("client.tar");
+				$expformat = "yealink_t38g2";
+				break;
 			case "conf_snom":
 				$exp_name = urlencode("vpnclient.tar");
 				$expformat = "snom";
@@ -198,17 +203,17 @@ if (!empty($act)) {
 				$exp_name = urlencode($exp_name."-config.ovpn");
 				$expformat = "baseconf";
 		}
-		$exp_path = openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $usetoken, $nokeys, $proxy, $expformat, $password, false, false, $advancedoptions);
+		$exp_path = openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $quoteservercn, $usetoken, $nokeys, $proxy, $expformat, $password, false, false, $advancedoptions);
 	}
 
 	if($act == "visc") {
 		$exp_name = urlencode($exp_name."-Viscosity.visc.zip");
-		$exp_path = viscosity_openvpn_client_config_exporter($srvid, $usrid, $crtid, $useaddr, $usetoken, $password, $proxy,  $advancedoptions);
+		$exp_path = viscosity_openvpn_client_config_exporter($srvid, $usrid, $crtid, $useaddr, $quoteservercn, $usetoken, $password, $proxy,  $advancedoptions);
 	}
 
 	if($act == "inst") {
 		$exp_name = urlencode($exp_name."-install.exe");
-		$exp_path = openvpn_client_export_installer($srvid, $usrid, $crtid, $useaddr, $usetoken, $password, $proxy, $advancedoptions);
+		$exp_path = openvpn_client_export_installer($srvid, $usrid, $crtid, $useaddr, $quoteservercn, $usetoken, $password, $proxy, $advancedoptions);
 	}
 
 	if (!$exp_path) {
@@ -289,6 +294,9 @@ function download_begin(act, i, j) {
 
 	advancedoptions = document.getElementById("advancedoptions").value;
 
+	var quoteservercn = 0;
+	if (document.getElementById("quoteservercn").checked)
+		quoteservercn = 1;
 	var usetoken = 0;
 	if (document.getElementById("usetoken").checked)
 		usetoken = 1;
@@ -357,6 +365,7 @@ function download_begin(act, i, j) {
 		dlurl += "&crtid=" + escape(certs[j][0]);
 	}
 	dlurl += "&useaddr=" + escape(useaddr);
+	dlurl += "&quoteservercn=" + escape(quoteservercn);
 	dlurl += "&usetoken=" + escape(usetoken);
 	if (usepass)
 		dlurl += "&password=" + escape(pass);
@@ -428,10 +437,13 @@ function server_changed() {
 		cell2.innerHTML += "<br/>";
 		cell2.innerHTML += "<a href='javascript:download_begin(\"visc\", -1," + j + ")'>Viscosity Bundle</a>";
 		if (servers[index][2] == "server_tls") {
-			cell2.innerHTML += "<br/>Yealink SIP Handset: &nbsp;&nbsp;";
+			cell2.innerHTML += "<br/>Yealink SIP Handsets: <br/>";
+			cell2.innerHTML += "&nbsp;&nbsp; ";
 			cell2.innerHTML += "<a href='javascript:download_begin(\"conf_yealink_t28\", -1," + j + ")'>T28</a>";
 			cell2.innerHTML += "&nbsp;&nbsp; ";
-			cell2.innerHTML += "<a href='javascript:download_begin(\"conf_yealink_t38g\", -1," + j + ")'>T38G</a>";
+			cell2.innerHTML += "<a href='javascript:download_begin(\"conf_yealink_t38g\", -1," + j + ")'>T38G (1)</a>";
+			cell2.innerHTML += "&nbsp;&nbsp; ";
+			cell2.innerHTML += "<a href='javascript:download_begin(\"conf_yealink_t38g2\", -1," + j + ")'>T38G (2)</a>";
 			cell2.innerHTML += "<br/>";
 			cell2.innerHTML += "<a href='javascript:download_begin(\"conf_snom\", -1," + j + ")'>SNOM SIP Handset</a>";
 		}
@@ -544,6 +556,23 @@ function useproxy_changed(obj) {
 												Enter the hostname or IP address the client will use to connect to this server.
 											</span>
 										</div>
+									</td>
+								</tr>
+							</table>
+						</td>
+					</tr>
+					<tr>
+						<td width="22%" valign="top" class="vncell">Quote Server CN</td>
+						<td width="78%" class="vtable">
+							<table border="0" cellpadding="2" cellspacing="0">
+								<tr>
+									<td>
+										<input name="quoteservercn" id="quoteservercn" type="checkbox" value="yes">
+									</td>
+									<td>
+										<span class="vexpl">
+											 Enclose the server CN in quotes. Can help if your server CN contains spaces and certain clients cannot parse the server CN. Some clients have problems parsing the CN with quotes. Use only as needed.
+										</span>
 									</td>
 								</tr>
 							</table>

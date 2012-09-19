@@ -151,7 +151,7 @@ function openvpn_client_export_validate_config($srvid, $usrid, $crtid) {
 	return array($settings, $server_cert, $server_ca, $servercn, $user, $cert, $nokeys);
 }
 
-function openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $usetoken, $nokeys = false, $proxy, $expformat = "baseconf", $outpass = "", $skiptls=false, $doslines=false, $advancedoptions = "") {
+function openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $quoteservercn, $usetoken, $nokeys = false, $proxy, $expformat = "baseconf", $outpass = "", $skiptls=false, $doslines=false, $advancedoptions = "") {
 	global $config, $input_errors, $g;
 
 	$nl = ($doslines) ? "\r\n" : "\n";
@@ -198,8 +198,10 @@ function openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $usetoke
 	$conf .= "client{$nl}";
 	$conf .= "resolv-retry infinite{$nl}";
 	$conf .= "remote {$server_host} {$server_port}{$nl}";
-	if (!empty($servercn))
-		$conf .= "tls-remote \"{$servercn}\"{$nl}";
+	if (!empty($servercn)) {
+		$qw = ($quoteservercn) ? "\"" : "";
+		$conf .= "tls-remote {$qw}{$servercn}{$qw}{$nl}";
+	}
 
 	if (!empty($proxy)) {
 		if ($proto == "udp") {
@@ -239,6 +241,10 @@ function openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $usetoke
 			$conf .= "ca /phone/config/openvpn/keys/ca.crt{$nl}";
 			$conf .= "cert /phone/config/openvpn/keys/client1.crt{$nl}";
 			$conf .= "key /phone/config/openvpn/keys/client1.key{$nl}";
+		} elseif ($expformat == "yealink_t38g2") {
+			$conf .= "ca /config/openvpn/keys/ca.crt{$nl}";
+			$conf .= "cert /config/openvpn/keys/client1.crt{$nl}";
+			$conf .= "key /config/openvpn/keys/client1.key{$nl}";
 		} elseif ($expformat == "snom") {
 			$conf .= "ca /openvpn/ca.crt{$nl}";
 			$conf .= "cert /openvpn/phone1.crt{$nl}";
@@ -263,6 +269,8 @@ function openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $usetoke
 			$conf .= "tls-auth /yealink/config/openvpn/keys/ta.key 1{$nl}";
 		elseif ($expformat == "yealink_t38g")
 			$conf .= "tls-auth /phone/config/openvpn/keys/ta.key 1{$nl}";
+		elseif ($expformat == "yealink_t38g2")
+			$conf .= "tls-auth /config/openvpn/keys/ta.key 1{$nl}";
 		elseif ($expformat == "snom")
 			$conf .= "tls-auth /openvpn/ta.key 1{$nl}";
 		else
@@ -344,6 +352,7 @@ function openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $usetoke
 			break;
 		case "yealink_t28":
 		case "yealink_t38g":
+		case "yealink_t38g2":
 			// create template directory
 			$tempdir = "{$g['tmp_path']}/{$prefix}";
 			$keydir  = "{$tempdir}/keys";
@@ -402,7 +411,7 @@ function openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $usetoke
 	}
 }
 
-function openvpn_client_export_installer($srvid, $usrid, $crtid, $useaddr, $usetoken, $outpass, $proxy, $advancedoptions) {
+function openvpn_client_export_installer($srvid, $usrid, $crtid, $useaddr, $quoteservercn, $usetoken, $outpass, $proxy, $advancedoptions) {
 	global $config, $g, $input_errors;
 	$uname_p = trim(exec("uname -p"));
 
@@ -439,7 +448,7 @@ function openvpn_client_export_installer($srvid, $usrid, $crtid, $useaddr, $uset
 		$pwdfle .= "{$proxy['password']}\r\n";
 		file_put_contents("{$confdir}/{$proxy['passwdfile']}", $pwdfle);
 	}
-	$conf = openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $usetoken, $nokeys, $proxy, "", "baseconf", false, true, $advancedoptions);
+	$conf = openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $quoteservercn, $usetoken,  $nokeys, $proxy, "", "baseconf", false, true, $advancedoptions);
 	if (!$conf) {
 		$input_errors[] = "Could not create a config to export.";
 		return false;
@@ -498,7 +507,7 @@ function openvpn_client_export_installer($srvid, $usrid, $crtid, $useaddr, $uset
 	return $outfile;
 }
 
-function viscosity_openvpn_client_config_exporter($srvid, $usrid, $crtid, $useaddr, $usetoken, $outpass, $proxy, $advancedoptions) {
+function viscosity_openvpn_client_config_exporter($srvid, $usrid, $crtid, $useaddr, $quoteservercn, $usetoken, $outpass, $proxy, $advancedoptions) {
 	global $config, $g;
 	$uname_p = trim(exec("uname -p"));
 
@@ -533,7 +542,7 @@ function viscosity_openvpn_client_config_exporter($srvid, $usrid, $crtid, $usead
 		file_put_contents("{$tempdir}/{$proxy['passwdfile']}", $pwdfle);
 	}
 
-	$conf = openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $usetoken, true, $proxy, "baseconf", "", true, $advancedoptions);
+	$conf = openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $quoteservercn, $usetoken, true, $proxy, "baseconf", "", true, $advancedoptions);
 	if (!$conf)
 		return false;
 

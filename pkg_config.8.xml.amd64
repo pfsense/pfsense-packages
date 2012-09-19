@@ -163,7 +163,7 @@
 		<depends_on_package_pbi>haproxy-1.4.21-amd64.pbi</depends_on_package_pbi>
 	</package>
 	<package>
-		<name>apache+mod_security-dev</name>
+		<name>Apache with mod_security-dev</name>
 		<pkginfolink>http://doc.pfsense.org/index.php/ProxyServerModSecurity_package</pkginfolink>
 		<website>http://www.modsecurity.org/</website>
 		<descr>ModSecurity is a web application firewall that can work either embedded or as a reverse proxy. It provides protection from a range of attacks against web applications and allows for HTTP traffic monitoring, logging and real-time analysis. In addition this package allows URL forwarding which can be convenient for hosting multiple websites behind pfSense using 1 IP address.</descr>
@@ -1368,7 +1368,7 @@
 		<depends_on_package_pbi>p7zip-9.20.1-amd64.pbi zip-3.0-amd64.pbi</depends_on_package_pbi>
 		<build_port_path>/usr/ports/archivers/p7zip</build_port_path>
 		<build_port_path>/usr/ports/archivers/zip</build_port_path>
-		<version>0.22</version>
+		<version>0.24</version>
 		<status>BETA</status>
 		<required_version>2.0</required_version>
 		<config_file>http://www.pfsense.com/packages/config/openvpn-client-export/openvpn-client-export.xml</config_file>
