@@ -39,11 +39,12 @@ require_once('service-utils.inc');
 if(!function_exists("filter_configure")) 
 	require_once("filter.inc");
 
-if (substr(trim(file_get_contents("/etc/version")),0,3) == "2.0") {
-	define('SQUID_LOCALBASE','/usr/local');
-} else {
+$pf_version=substr(trim(file_get_contents("/etc/version")),0,3);
+if ($pf_version > 2.0)
 	define('SQUID_LOCALBASE', '/usr/pbi/squid-' . php_uname("m"));
-}
+else
+  define('SQUID_LOCALBASE','/usr/local');
+
 
 define('SQUID_CONFBASE',SQUID_LOCALBASE . '/etc/squid');
 define('SQUID_BASE', '/var/squid/');
