@@ -56,20 +56,20 @@ groupmode = {$dansguardian_groups['mode']}
 groupname = '{$dansguardian_groups['name']}'
 
 # Content filtering files location
-bannedphraselist = '/usr/local/etc/dansguardian/lists/bannedphraselist.{$dansguardian_groups['phraseacl']}'
-weightedphraselist = '/usr/local/etc/dansguardian/lists/weightedphraselist.{$dansguardian_groups['phraseacl']}'
-exceptionphraselist = '/usr/local/etc/dansguardian/lists/exceptionphraselist.{$dansguardian_groups['phraseacl']}'
-bannedsitelist = '/usr/local/etc/dansguardian/lists/bannedsitelist.{$dansguardian_groups['siteacl']}'
-greysitelist = '/usr/local/etc/dansguardian/lists/greysitelist.{$dansguardian_groups['siteacl']}'
-exceptionsitelist = '/usr/local/etc/dansguardian/lists/exceptionsitelist.{$dansguardian_groups['siteacl']}'
-bannedurllist = '/usr/local/etc/dansguardian/lists/bannedurllist.{$dansguardian_groups['urlacl']}'
-greyurllist = '/usr/local/etc/dansguardian/lists/greyurllist.{$dansguardian_groups['urlacl']}'
-exceptionurllist = '/usr/local/etc/dansguardian/lists/exceptionurllist.{$dansguardian_groups['urlacl']}'
-exceptionregexpurllist = '/usr/local/etc/dansguardian/lists/exceptionregexpurllist.{$dansguardian_groups['urlacl']}'
-bannedregexpurllist = '/usr/local/etc/dansguardian/lists/bannedregexpurllist.{$dansguardian_groups['urlacl']}'
-picsfile = '/usr/local/etc/dansguardian/lists/{$dansguardian_groups['picsacl']}'
-contentregexplist = '/usr/local/etc/dansguardian/lists/contentregexplist.{$dansguardian_groups['contentacl']}'
-urlregexplist = '/usr/local/etc/dansguardian/lists/urlregexplist.{$dansguardian_groups['urlacl']}'
+bannedphraselist = '{$dg_dir}/etc/dansguardian/lists/bannedphraselist.g_{$dansguardian_groups['name']}'
+weightedphraselist = '{$dg_dir}/etc/dansguardian/lists/weightedphraselist.g_{$dansguardian_groups['name']}'
+exceptionphraselist = '{$dg_dir}/etc/dansguardian/lists/exceptionphraselist.g_{$dansguardian_groups['name']}'
+bannedsitelist = '{$dg_dir}/etc/dansguardian/lists/bannedsitelist.g_{$dansguardian_groups['name']}'
+greysitelist = '{$dg_dir}/etc/dansguardian/lists/greysitelist.g_{$dansguardian_groups['name']}'
+exceptionsitelist = '{$dg_dir}/etc/dansguardian/lists/exceptionsitelist.g_{$dansguardian_groups['name']}'
+bannedurllist = '{$dg_dir}/etc/dansguardian/lists/bannedurllist.g_{$dansguardian_groups['name']}'
+greyurllist = '{$dg_dir}/etc/dansguardian/lists/greyurllist.g_{$dansguardian_groups['name']}'
+exceptionurllist = '{$dg_dir}/etc/dansguardian/lists/exceptionurllist.g_{$dansguardian_groups['name']}'
+exceptionregexpurllist = '{$dg_dir}/etc/dansguardian/lists/exceptionregexpurllist.g_{$dansguardian_groups['name']}'
+bannedregexpurllist = '{$dg_dir}/etc/dansguardian/lists/bannedregexpurllist.g_{$dansguardian_groups['name']}'
+picsfile = '{$dg_dir}/etc/dansguardian/lists/g_{$dansguardian_groups['name']}'
+contentregexplist = '{$dg_dir}/etc/dansguardian/lists/contentregexplist.g_{$dansguardian_groups['name']}'
+urlregexplist = '{$dg_dir}/etc/dansguardian/lists/urlregexplist.g_{$dansguardian_groups['name']}'
 
 # Filetype filtering
 #
@@ -83,28 +83,28 @@ urlregexplist = '/usr/local/etc/dansguardian/lists/urlregexplist.{$dansguardian_
 # (on | off)
 #
 blockdownloads = {$dansguardian_groups['blockdownloads']}
-exceptionextensionlist = '/usr/local/etc/dansguardian/lists/exceptionextensionlist.{$dansguardian_groups['extensionacl']}'
-exceptionmimetypelist = '/usr/local/etc/dansguardian/lists/exceptionmimetypelist.{$dansguardian_groups['extensionacl']}'
+exceptionextensionlist = '{$dg_dir}/etc/dansguardian/lists/exceptionextensionlist.g_{$dansguardian_groups['name']}'
+exceptionmimetypelist = '{$dg_dir}/etc/dansguardian/lists/exceptionmimetypelist.g_{$dansguardian_groups['name']}'
 #
 # Use the following lists to block specific kinds of file downloads.
 # The two exception lists above can be used to override these.
 #
-bannedextensionlist = '/usr/local/etc/dansguardian/lists/bannedextensionlist.{$dansguardian_groups['extensionacl']}'
-bannedmimetypelist = '/usr/local/etc/dansguardian/lists/bannedmimetypelist.{$dansguardian_groups['extensionacl']}'
+bannedextensionlist = '{$dg_dir}/etc/dansguardian/lists/bannedextensionlist.g_{$dansguardian_groups['name']}'
+bannedmimetypelist = '{$dg_dir}/etc/dansguardian/lists/bannedmimetypelist.g_{$dansguardian_groups['name']}'
 #
 # In either file filtering mode, the following list can be used to override
 # MIME type & extension blocks for particular domains & URLs (trusted download sites).
 #
-exceptionfilesitelist = '/usr/local/etc/dansguardian/lists/exceptionfilesitelist.{$dansguardian_groups['siteacl']}'
-exceptionfileurllist = '/usr/local/etc/dansguardian/lists/exceptionfileurllist.{$dansguardian_groups['urlacl']}'
+exceptionfilesitelist = '{$dg_dir}/etc/dansguardian/lists/exceptionfilesitelist.g_{$dansguardian_groups['name']}'
+exceptionfileurllist = '{$dg_dir}/etc/dansguardian/lists/exceptionfileurllist.g_{$dansguardian_groups['name']}'
 
 # Categorise without blocking:
 # Supply categorised lists here and the category string shall be logged against
 # matching requests, but matching these lists does not perform any filtering
 # action.
-logsitelist = '/usr/local/etc/dansguardian/lists/logsitelist.{$dansguardian_groups['siteacl']}'
-logurllist = '/usr/local/etc/dansguardian/lists/logurllist.{$dansguardian_groups['urlacl']}'
-logregexpurllist = '/usr/local/etc/dansguardian/lists/logregexpurllist.{$dansguardian_groups['urlacl']}'
+logsitelist = '{$dg_dir}/etc/dansguardian/lists/logsitelist.g_{$dansguardian_groups['name']}'
+logurllist = '{$dg_dir}/etc/dansguardian/lists/logurllist.g_{$dansguardian_groups['name']}'
+logregexpurllist = '{$dg_dir}/etc/dansguardian/lists/logregexpurllist.g_{$dansguardian_groups['name']}'
 
 # Outgoing HTTP header rules:
 # Optional lists for blocking based on, and modification of, outgoing HTTP
@@ -115,8 +115,8 @@ logregexpurllist = '/usr/local/etc/dansguardian/lists/logregexpurllist.{$dansgua
 # Headers are matched/replaced on a line-by-line basis, not as a contiguous
 # block.
 # Use for example, to remove cookies or prevent certain user-agents.
-headerregexplist = '/usr/local/etc/dansguardian/lists/headerregexplist.{$dansguardian_groups['headeracl']}'
-bannedregexpheaderlist = '/usr/local/etc/dansguardian/lists/bannedregexpheaderlist.{$dansguardian_groups['headeracl']}'
+headerregexplist = '{$dg_dir}/etc/dansguardian/lists/headerregexplist.g_{$dansguardian_groups['name']}'
+bannedregexpheaderlist = '{$dg_dir}/etc/dansguardian/lists/bannedregexpheaderlist.g_{$dansguardian_groups['name']}'
 
 # Weighted phrase mode
 # Optional; overrides the weightedphrasemode option in dansguardian.conf
@@ -143,7 +143,7 @@ naughtynesslimit = {$dansguardian_groups['naughtynesslimit']}
 # List of regular expressions for matching search engine URLs.  It is assumed
 # that the search terms themselves will be contained within the first submatch
 # of each expression.
-searchengineregexplist = '/usr/local/etc/dansguardian/lists/searchengineregexplist.{$dansguardian_groups['searchacl']}'
+searchengineregexplist = '{$dg_dir}/etc/dansguardian/lists/searchengineregexplist.g_{$dansguardian_groups['name']}'
 #
 # Search term limit
 # The limit over which requests will be blocked for containing search terms
@@ -165,9 +165,9 @@ searchtermlimit = {$dansguardian_groups['searchtermlimit']}
 # of text.
 # Please note that all or none of the below should be uncommented, not a
 # mixture.
-bannedsearchtermlist = '/usr/local/etc/dansguardian/lists/bannedsearchtermlist.{$dansguardian_groups['searchacl']}'
-weightedsearchtermlist = '/usr/local/etc/dansguardian/lists/weightedsearchtermlist.{$dansguardian_groups['searchacl']}'
-exceptionsearchtermlist = '/usr/local/etc/dansguardian/lists/exceptionsearchtermlist.{$dansguardian_groups['searchacl']}'
+bannedsearchtermlist = '{$dg_dir}/etc/dansguardian/lists/bannedsearchtermlist.g_{$dansguardian_groups['name']}'
+weightedsearchtermlist = '{$dg_dir}/etc/dansguardian/lists/weightedsearchtermlist.g_{$dansguardian_groups['name']}'
+exceptionsearchtermlist = '{$dg_dir}/etc/dansguardian/lists/exceptionsearchtermlist.g_{$dansguardian_groups['name']}'
 
 # Category display threshold
 # This option only applies to pages blocked by weighted phrase filtering.
@@ -293,12 +293,12 @@ deepurlanalysis = {$dansguardian_groups['deepurlanalysis']}
 # only used in reporting level 3.
 #
 # The default template file path is <languagedir>/<language>/template.html
-# e.g. /usr/local/share/dansguardian/languages/ukenglish/template.html when using 'ukenglish'
+# e.g. {$dg_dir}/share/dansguardian/languages/ukenglish/template.html when using 'ukenglish'
 # language.
 #
 # This option generates a file path of the form:
 # <languagedir>/<language>/<htmltemplate>
-# e.g. /usr/local/share/dansguardian/languages/ukenglish/custom.html
+# e.g. {$dg_dir}/share/dansguardian/languages/ukenglish/custom.html
 #
 #htmltemplate = 'custom.html'
 

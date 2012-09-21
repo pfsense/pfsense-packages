@@ -163,6 +163,8 @@
 			<source><![CDATA[$config['installedpackages']['dansguardianpicsacl']['config']]]></source>
 			<source_name>name</source_name>
 			<source_value>name</source_value>
+			<multiple/>
+			<size>5</size>
 		</field>
 		<field>
 			<fielddescr>Phrase</fielddescr>
@@ -172,60 +174,74 @@
 			<source><![CDATA[$config['installedpackages']['dansguardianphraseacl']['config']]]></source>
 			<source_name>name</source_name>
 			<source_value>name</source_value>
+			<multiple/>
+			<size>5</size>
 		</field>
 		<field>
 			<fielddescr>Site</fielddescr>
 			<fieldname>siteacl</fieldname>
-			<description><![CDATA[Select Site Access List to apply on this group.]]></description>
+			<description><![CDATA[Select Site Access Lists to apply on this group.]]></description>
 	    	<type>select_source</type>
 			<source><![CDATA[$config['installedpackages']['dansguardiansiteacl']['config']]]></source>
 			<source_name>name</source_name>
 			<source_value>name</source_value>
+			<multiple/>
+			<size>5</size>
 		</field>
 		<field>
 			<fielddescr>URL</fielddescr>
 			<fieldname>urlacl</fieldname>
-			<description><![CDATA[Select URL Access List to apply on this group.]]></description>
+			<description><![CDATA[Select URL Access Lists to apply on this group.]]></description>
 	    	<type>select_source</type>
 			<source><![CDATA[$config['installedpackages']['dansguardianurlacl']['config']]]></source>
 			<source_name>name</source_name>
 			<source_value>name</source_value>
+			<multiple/>
+			<size>5</size>
 		</field>
 		<field>
 			<fielddescr>Extension</fielddescr>
 			<fieldname>extensionacl</fieldname>
-			<description><![CDATA[Select Extension Access List to apply on this group.]]></description>
+			<description><![CDATA[Select Extension Access Lists to apply on this group.]]></description>
 	    	<type>select_source</type>
 			<source><![CDATA[$config['installedpackages']['dansguardianfileacl']['config']]]></source>
 			<source_name>name</source_name>
 			<source_value>name</source_value>
+			<multiple/>
+			<size>5</size>
 		</field>
 		<field>
 			<fielddescr>Header</fielddescr>
 			<fieldname>headeracl</fieldname>
-			<description><![CDATA[Select Header Access List to apply on this group.]]></description>
+			<description><![CDATA[Select Header Access Lists to apply on this group.]]></description>
 	    	<type>select_source</type>
 			<source><![CDATA[$config['installedpackages']['dansguardianheaderacl']['config']]]></source>
 			<source_name>name</source_name>
 			<source_value>name</source_value>
+			<multiple/>
+			<size>5</size>
 		</field>
 		<field>
 			<fielddescr>Content</fielddescr>
 			<fieldname>contentacl</fieldname>
-			<description><![CDATA[Select Content Access List to apply on this group.]]></description>
+			<description><![CDATA[Select Content Access Lists to apply on this group.]]></description>
 	    	<type>select_source</type>
 			<source><![CDATA[$config['installedpackages']['dansguardiancontentacl']['config']]]></source>
 			<source_name>name</source_name>
 			<source_value>name</source_value>
+			<multiple/>
+			<size>5</size>
 		</field>
 		<field>
 			<fielddescr>Search</fielddescr>
 			<fieldname>searchacl</fieldname>
-			<description><![CDATA[Select Search Access list to apply on this group.]]></description>
+			<description><![CDATA[Select Search Access lists to apply on this group.]]></description>
 	    	<type>select_source</type>
 			<source><![CDATA[$config['installedpackages']['dansguardiansearchacl']['config']]]></source>
 			<source_name>name</source_name>
 			<source_value>name</source_value>
+			<multiple/>
+			<size>5</size>
 		</field>
 		<field>
 			<name>Values</name>
