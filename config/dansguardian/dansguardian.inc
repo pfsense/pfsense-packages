@@ -90,7 +90,7 @@ function check_ca_hashes(){
 		}
 }
 
-function sync_package_dansguardian() {
+function sync_package_dansguardian($via_rpc=false) {
 	global $config,$g;
 
 	# detect boot process
@@ -101,7 +101,7 @@ function sync_package_dansguardian() {
 			$boot_process="on";
 	}
 
-	if (is_process_running('dansguardian') && isset($boot_process))
+	if (is_process_running('dansguardian') && isset($boot_process) && $via_rpc==false)
 		return;
 		
 	#assign xml arrays
@@ -1316,7 +1316,7 @@ function dansguardian_do_xmlrpc_sync($sync_to_ip, $password,$sync_type) {
 		/* tell dansguardian to reload our settings on the destionation sync host. */
 		$method = 'pfsense.exec_php';
 		$execcmd  = "require_once('/usr/local/pkg/dansguardian.inc');\n";
-		$execcmd .= "sync_package_dansguardian();";
+		$execcmd .= "sync_package_dansguardian(true);";
 		
 		/* assemble xmlrpc payload */
 		$params = array(
