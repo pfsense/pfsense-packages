@@ -1758,5 +1758,25 @@
 			<logtab>tinc</logtab>
 		</logging>
 	</package>
-</packages>
+	<package>
+		<name>syslog-ng</name>
+		<website>http://www.balabit.com/network-security/syslog-ng/</website>
+		<descr>Syslog-ng syslog server. This service is not intended to replace the default pfSense syslog server but rather acts as an independent syslog server.</descr>
+		<category>Services</category>
+		<version>3.3.4_1</version>
+		<status>ALPHA</status>
+		<required_version>2.1</required_version>
+		<depends_on_package_base_url>http://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
+		<depends_on_package_pbi>syslog-ng-3.3.4_1.pbi</depends_on_package_pbi>
+		<depends_on_package_pbi>logrotate-3.7.9.pbi</depends_on_package_pbi>
+		<build_pbi>
+			<port>sysutils/syslog-ng</port>
+			<port>sysutils/logrotate</port>
+		</build_pbi>
+		<build_options></build_options>
+		<maintainer>laleger@gmail.com</maintainer>
+		<config_file>http://www.pfsense.com/packages/config/syslog-ng/syslog-ng.xml</config_file>
+		<configurationfile>syslog-ng.xml</configurationfile>
+	</package>
+	</packages>
 </pfsensepkgs>
