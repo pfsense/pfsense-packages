@@ -1770,8 +1770,8 @@
 		<depends_on_package_pbi>syslog-ng-3.3.4_1.pbi</depends_on_package_pbi>
 		<depends_on_package_pbi>logrotate-3.7.9.pbi</depends_on_package_pbi>
 		<build_pbi>
+			<ports_before>sysutils/logrotate</ports_before>
 			<port>sysutils/syslog-ng</port>
-			<port>sysutils/logrotate</port>
 		</build_pbi>
 		<build_options></build_options>
 		<maintainer>laleger@gmail.com</maintainer>
