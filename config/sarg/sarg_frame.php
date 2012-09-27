@@ -27,6 +27,8 @@
 	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 	POSSIBILITY OF SUCH DAMAGE.
 */
+require_once("authgui.inc");
+
 $uname=posix_uname();
 if ($uname['machine']=='amd64')
         ini_set('memory_limit', '250M');
