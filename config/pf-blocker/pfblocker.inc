@@ -468,23 +468,32 @@ function sync_package_pfblocker($cron="") {
 		}
 		
 		if ($message == ""){
-			$last_iface="";
 			$rules=$config['filter']['rule'];
 			$new_rules=array();
-			# The assumption is that the rules in the config come in groups by interface then priority.
-			# e.g. all rules for WAN (highest priority first), then for LAN then for OPT1 etc.
-			# Note that floating rules (interface is "") can appear mixed in the list.
+			$interfaces_processed=array();
+			# The rules in the config come in priority order, 
+			# but the interface to which each rule applies can be all mixed up in the list.
+			# e.g. some WAN rules, then some LAN rules, then some floating rules, then more
+			# LAN rules, some OPT1 rules, some more LAN rules and so on.
+			# So we have to allow for this, and only add pfBlocker rules the first time an 
+			# interface is found in the rules list.
 			foreach ($rules as $rule){
-				# If this next rule is for a non-blank interface, different to the previous interface,
+				# If this next rule is for a non-blank interface, different from any interface already processed,
 				# then add any needed pfblocker rules to the interface. This puts pfblocker rules at the
 				# top of the list for each interface, after any built-in rules (e.g. anti-lockout)
-				if (($rule['interface'] != "") && ($rule['interface'] <> $last_iface)){
-					$last_iface = $rule['interface'];
+				$found_new_interface = TRUE;
+				foreach ($interfaces_processed as $processed_interface){
+					if ($processed_interface = $rule['interface']){
+						$found_new_interface = FALSE;
+					}
+				}
+				if (($rule['interface'] != "") && ($found_new_interface)){
+					$interfaces_processed[] = $rule['interface'];
 					#apply pfblocker rules if enabled
 				
 					#Inbound
 					foreach ($inbound_interfaces as $inbound_interface){
-						if ($inbound_interface==$last_iface){
+						if ($inbound_interface==$rule['interface']){
 							#permit rules
 							if (is_array($permit_inbound)){
 								foreach ($permit_inbound as $cb_rules){
@@ -503,7 +512,7 @@ function sync_package_pfblocker($cron="") {
 					}
 					#Outbound
 					foreach ($outbound_interfaces as $outbound_interface){
-						if ($outbound_interface==$last_iface){
+						if ($outbound_interface==$rule['interface']){
 							#permit rules
 							if (is_array($permit_outbound)){
 								foreach ($permit_outbound as $cb_rules){
