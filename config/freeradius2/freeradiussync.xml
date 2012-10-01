@@ -123,10 +123,23 @@ POSSIBILITY OF SUCH DAMAGE.
 			<type>checkbox</type>
 		</field>
 		<field>
+                        <fielddescr>XMLRPC timeout</fielddescr>
+			<fieldname>varsynctimeout</fieldname>
+			<description><![CDATA[Timeout in seconds for the XMLRPC timeout]]></description>
+			<type>input</type>
+                        <default_value>150</default_value>
+			<size>5</size>
+		</field>
+
+		<field>
 			<fielddescr>Destination Server</fielddescr>
 			<fieldname>none</fieldname>
 			<type>rowhelper</type>
 			<rowhelper>
+				<rowhelperfield>
+					<fieldname>varsyncdestinenable</fieldname>
+					<type>checkbox</type>
+				</rowhelperfield>
 				<rowhelperfield>
 					<fielddescr>GUI Protocol</fielddescr>
 					<fieldname>varsyncprotocol</fieldname>
@@ -152,7 +165,7 @@ POSSIBILITY OF SUCH DAMAGE.
 					<type>input</type>
 					<size>3</size>
 				</rowhelperfield>
-				<rowhelperfield>
+                                <rowhelperfield>
 					<fielddescr>GUI Admin Password</fielddescr>
 					<fieldname>varsyncpassword</fieldname>
 					<description><![CDATA[Password of the user "admin" on the destination host.]]></description>
