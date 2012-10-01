@@ -125,7 +125,7 @@ POSSIBILITY OF SUCH DAMAGE.
 		<field>
                         <fielddescr>XMLRPC timeout</fielddescr>
 			<fieldname>varsynctimeout</fieldname>
-			<description><![CDATA[Timeout in seconds for the XMLRPC timeout]]></description>
+			<description><![CDATA[Timeout in seconds for the XMLRPC timeout. Default: 150]]></description>
 			<type>input</type>
                         <default_value>150</default_value>
 			<size>5</size>
@@ -137,6 +137,7 @@ POSSIBILITY OF SUCH DAMAGE.
 			<type>rowhelper</type>
 			<rowhelper>
 				<rowhelperfield>
+					<fielddescr>Enable</fielddescr>
 					<fieldname>varsyncdestinenable</fieldname>
 					<type>checkbox</type>
 				</rowhelperfield>
