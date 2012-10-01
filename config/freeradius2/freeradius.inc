@@ -2465,25 +2465,24 @@ function freeradius_sync_on_changes() {
 		return;
 	}
  
-	log_error("FreeRADIUS: Starting XMLRPC process (freeradius_do_xmlrpc_sync).");
-	log_error("FreeRADIUS: Starting XMLRPC with time out: {$varsynctimeout}.");
+	log_error("FreeRADIUS: Starting XMLRPC process (freeradius_do_xmlrpc_sync) with timeout {$varsynctimeout} seconds.");
 	
 	// if checkbox is checked get IP and password of the destination hosts
 	foreach ($config['installedpackages']['freeradiussync']['config'] as $rs ){
 		foreach($rs['row'] as $sh){
 			// if checkbox is NOT checked do nothing
 			if($sh['varsyncdestinenable']) {
-			$varsyncprotocol 	= $sh['varsyncprotocol'];
-			$sync_to_ip 		= $sh['varsyncipaddress'];
-                        $password   		= $sh['varsyncpassword'];
-			$varsyncport 		= $sh['varsyncport'];
-			if($password && $sync_to_ip && $varsyncport && $varsyncprotocol)
+				$varsyncprotocol 	= $sh['varsyncprotocol'];
+				$sync_to_ip 		= $sh['varsyncipaddress'];
+                        	$password   		= $sh['varsyncpassword'];
+				$varsyncport 		= $sh['varsyncport'];
+				if($password && $sync_to_ip && $varsyncport && $varsyncprotocol)
 				freeradius_do_xmlrpc_sync($sync_to_ip, $password, $varsyncport, $varsyncprotocol);
-		    }
-                    else {
-                    log_error("FreeRADIUS: Sync with {$sh['varsyncipaddress']} is disable");
-                    }
-        }
+			}
+			else {
+				log_error("FreeRADIUS: XMLRPC Sync with {$sh['varsyncipaddress']} is disabled");
+			}
+	        }
 	}
 	log_error("FreeRADIUS: Finished XMLRPC process (freeradius_do_xmlrpc_sync).");
 }
