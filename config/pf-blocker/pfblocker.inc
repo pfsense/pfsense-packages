@@ -483,7 +483,7 @@ function sync_package_pfblocker($cron="") {
 				# top of the list for each interface, after any built-in rules (e.g. anti-lockout)
 				$found_new_interface = TRUE;
 				foreach ($interfaces_processed as $processed_interface){
-					if ($processed_interface = $rule['interface']){
+					if ($processed_interface == $rule['interface']){
 						$found_new_interface = FALSE;
 					}
 				}
