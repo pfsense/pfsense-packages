@@ -80,7 +80,7 @@
 	</additional_files_needed>
 	<fields>
 		<field>
-			<fielddescr>interface</fielddescr>
+			<fielddescr>Interface</fielddescr>
 			<fieldname>active_interface</fieldname>
 			<description>The interface that bandwidthd will bind to.</description>
 			<type>interfaces_selection</type>
@@ -88,27 +88,25 @@
 			<default_value>lan</default_value>
 		</field>	
 		<field>
-                        <fielddescr>Subnet</fielddescr>
-                        <fieldname>subnets_custom</fieldname>
-                        <description>The subnet(s) on which bandwidthd will report. (separate with ';' for multiple subnets, e.g. 192.168.1.0/24;10.0.0.0/24)</description>
-                        <type>input</type>
+			<fielddescr>Subnet</fielddescr>
+			<fieldname>subnets_custom</fieldname>
+			<description>The subnet(s) on which bandwidthd will report. (separate with ';' for multiple subnets, e.g. 192.168.1.0/24;10.0.0.0/24) The ordinary subnet for the selected interface/s is automatically put in the config, do not specify it here.</description>
+			<type>input</type>
 		</field>
 		<field>
 			<fielddescr>Skip intervals</fielddescr>
 			<fieldname>skipintervals</fieldname>
-			<description></description>
+			<description>Number of intervals (2.5 minute) to skip between graphing. Default 0.</description>
 			<type>input</type>
-			<value>1024</value>
 		</field>
 		<field>
 			<fielddescr>Graph cutoff</fielddescr>
 			<fieldname>graphcutoff</fieldname>
-			<description>Graph cutoff is how many KB must be transferred by an IP before it is graphed</description>
+			<description>Graph cutoff is how many KB must be transferred by an IP before it is graphed. Default 1024.</description>
 			<type>input</type>
-			<value>1024</value>
 		</field>
 		<field>
-			<fielddescr>promiscuous</fielddescr>
+			<fielddescr>Promiscuous</fielddescr>
 			<fieldname>promiscuous</fieldname>
 			<description>Put interface in promiscuous mode to score to traffic that may not be routing through the host machine.</description>
 			<type>checkbox</type>
@@ -126,25 +124,23 @@
 			<type>checkbox</type>
 		</field>
 		<field>
-			<fielddescr>filter</fielddescr>
+			<fielddescr>Filter</fielddescr>
 			<fieldname>filter</fieldname>
 			<description>Libpcap format filter string used to control what bandwidthd sees.  Please always include "ip" in the string to avoid strange problems.</description>
 			<type>input</type>
-			<value>ip</value>
 		</field>
 		<field>
 			<fielddescr>Draw Graphs</fielddescr>
 			<fieldname>drawgraphs</fieldname>
 			<description>This defaults to true to graph the traffic bandwidthd is recording. Set this to false if you only want cdf output or you are using the database output option. Bandwidthd will use very little RAM and CPU if this is set to false.</description>
 			<type>checkbox</type>
-			<value>checked</value>
+			<default_value>on</default_value>
 		</field>
 		<field>
 			<fielddescr>Meta Refresh</fielddescr>
 			<fieldname>meta_refresh</fieldname>
 			<description>Set META REFRESH seconds (default 150, use 0 to disable).</description>
 			<type>input</type>
-			<value>150</value>
 		</field>
 	</fields>
 	<custom_php_resync_config_command>
