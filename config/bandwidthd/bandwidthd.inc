@@ -60,12 +60,15 @@ function bandwidthd_install_config() {
 	config_lock();
 
 	/* user defined values */
-	$meta_refresh = $config['installedpackages']['bandwidthd']['config'][0]['metarefresh'];
+	$meta_refresh = $config['installedpackages']['bandwidthd']['config'][0]['meta_refresh'];
 	if($meta_refresh)
 		$meta_refresh = "meta_refresh $meta_refresh\n";
-	$graph = $config['installedpackages']['bandwidthd']['config'][0]['graph'];
+	$graph = $config['installedpackages']['bandwidthd']['config'][0]['drawgraphs'];
 	if($graph)
 		$graph = "graph true\n";
+	else
+		$graph = "graph false\n";
+
 	$filter_text = $config['installedpackages']['bandwidthd']['config'][0]['filter'];
 	if($filter_text)
 		$filter_text = "filter $filter_text\n";
