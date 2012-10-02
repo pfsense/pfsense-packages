@@ -411,14 +411,27 @@ function openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $quotese
 	}
 }
 
-function openvpn_client_export_installer($srvid, $usrid, $crtid, $useaddr, $quoteservercn, $usetoken, $outpass, $proxy, $advancedoptions) {
+function openvpn_client_export_installer($srvid, $usrid, $crtid, $useaddr, $quoteservercn, $usetoken, $outpass, $proxy, $advancedoptions, $openvpn_version = "2.1") {
 	global $config, $g, $input_errors;
 	$uname_p = trim(exec("uname -p"));
 
+	switch ($openvpn_version) {
+		case "2.3-x86":
+			$client_install_exe = "openvpn-install-2.3-i686.exe";
+			break;
+		case "2.3-x64":
+			$client_install_exe = "openvpn-install-2.3-x86_64.exe";
+			break;
+		default:
+			$client_install_exe = "openvpn-install-2.2.exe";
+	}
+
 	$ovpndir = "/usr/local/share/openvpn";
 	$workdir = "{$ovpndir}/client-export";
-	if (!file_exists($workdir . "/template/openvpn-install.exe"))
+	if (!file_exists($workdir . "/template/{$client_install_exe}"))
 		openvpn_client_export_install();
+
+	exec("/bin/cp {$workdir}/template/{$client_install_exe} {$workdir}/template/openvpn-install.exe");
 
 	$validconfig = openvpn_client_export_validate_config($srvid, $usrid, $crtid);
 	if ($validconfig) {

@@ -211,9 +211,9 @@ if (!empty($act)) {
 		$exp_path = viscosity_openvpn_client_config_exporter($srvid, $usrid, $crtid, $useaddr, $quoteservercn, $usetoken, $password, $proxy,  $advancedoptions);
 	}
 
-	if($act == "inst") {
+	if(substr($act, 0, 4) == "inst") {
 		$exp_name = urlencode($exp_name."-install.exe");
-		$exp_path = openvpn_client_export_installer($srvid, $usrid, $crtid, $useaddr, $quoteservercn, $usetoken, $password, $proxy, $advancedoptions);
+		$exp_path = openvpn_client_export_installer($srvid, $usrid, $crtid, $useaddr, $quoteservercn, $usetoken, $password, $proxy, $advancedoptions, substr($act, 5));
 	}
 
 	if (!$exp_path) {
@@ -306,7 +306,7 @@ function download_begin(act, i, j) {
 
 	var pass = document.getElementById("pass").value;
 	var conf = document.getElementById("conf").value;
-	if (usepass && (act == "inst")) {
+	if (usepass && (act.substring(0,4) == "inst")) {
 		if (!pass || !conf) {
 			alert("The password or confirm field is empty");
 			return;
@@ -408,8 +408,13 @@ function server_changed() {
 		cell2.innerHTML += "<a href='javascript:download_begin(\"confinline\"," + i + ", -1)'>Inline Configuration</a>";
 		cell2.innerHTML += "<br/>";
 		cell2.innerHTML += "<a href='javascript:download_begin(\"confzip\"," + i + ", -1)'>Configuration archive</a>";
-		cell2.innerHTML += "<br/>";
-		cell2.innerHTML += "<a href='javascript:download_begin(\"inst\"," + i + ", -1)'>Windows Installer</a>";
+		cell2.innerHTML += "<br/>Windows Installers:<br/>";
+		cell2.innerHTML += "&nbsp;&nbsp; ";
+		cell2.innerHTML += "<a href='javascript:download_begin(\"inst\"," + i + ", -1)'>2.2</a>";
+		cell2.innerHTML += "&nbsp;&nbsp; ";
+		cell2.innerHTML += "<a href='javascript:download_begin(\"inst-2.3-x86\"," + i + ", -1)'>2.3-x86 (Beta)</a>";
+//		cell2.innerHTML += "&nbsp;&nbsp; ";
+//		cell2.innerHTML += "<a href='javascript:download_begin(\"inst-2.3-x64\"," + i + ", -1)'>2.3-x64 (Beta)</a>";
 		cell2.innerHTML += "<br/>";
 		cell2.innerHTML += "<a href='javascript:download_begin(\"visc\"," + i + ", -1)'>Viscosity Bundle</a>";
 	}
@@ -432,8 +437,13 @@ function server_changed() {
 		cell2.innerHTML += "<a href='javascript:download_begin(\"confinline\", -1," + j + ")'>Inline Configuration</a>";
 		cell2.innerHTML += "<br/>";
 		cell2.innerHTML += "<a href='javascript:download_begin(\"confzip\", -1," + j + ")'>Configuration archive</a>";
-		cell2.innerHTML += "<br/>";
-		cell2.innerHTML += "<a href='javascript:download_begin(\"inst\", -1," + j + ")'>Windows Installer</a>";
+		cell2.innerHTML += "<br/>Windows Installers:<br/>";
+		cell2.innerHTML += "&nbsp;&nbsp; ";
+		cell2.innerHTML += "<a href='javascript:download_begin(\"inst\", -1," + j + ")'>2.2</a>";
+		cell2.innerHTML += "&nbsp;&nbsp; ";
+		cell2.innerHTML += "<a href='javascript:download_begin(\"inst-2.3-x86\", -1," + j + ")'>2.3-x86 (Beta)</a>";
+//		cell2.innerHTML += "&nbsp;&nbsp; ";
+//		cell2.innerHTML += "<a href='javascript:download_begin(\"inst-2.3-x64\", -1," + j + ")'>2.3-x64 (Beta)</a>";
 		cell2.innerHTML += "<br/>";
 		cell2.innerHTML += "<a href='javascript:download_begin(\"visc\", -1," + j + ")'>Viscosity Bundle</a>";
 		if (servers[index][2] == "server_tls") {
@@ -463,8 +473,13 @@ function server_changed() {
 		cell2.innerHTML += "<a href='javascript:download_begin(\"confinline\"," + i + ")'>Inline Configuration</a>";
 		cell2.innerHTML += "<br/>";
 		cell2.innerHTML += "<a href='javascript:download_begin(\"confzip\"," + i + ")'>Configuration archive</a>";
-		cell2.innerHTML += "<br/>";
-		cell2.innerHTML += "<a href='javascript:download_begin(\"inst\"," + i + ")'>Windows Installer</a>";
+		cell2.innerHTML += "<br/>Windows Installers:<br/>";
+		cell2.innerHTML += "&nbsp;&nbsp; ";
+		cell2.innerHTML += "<a href='javascript:download_begin(\"inst\"," + i + ")'>2.2</a>";
+		cell2.innerHTML += "&nbsp;&nbsp; ";
+		cell2.innerHTML += "<a href='javascript:download_begin(\"inst-2.3-x86\"," + i + ")'>2.3-x86 (Beta)</a>";
+//		cell2.innerHTML += "&nbsp;&nbsp; ";
+//		cell2.innerHTML += "<a href='javascript:download_begin(\"inst-2.3-x64\"," + i + ")'>2.3-x64 (Beta)</a>";
 		cell2.innerHTML += "<br/>";
 		cell2.innerHTML += "<a href='javascript:download_begin(\"visc\"," + i + ")'>Viscosity Bundle</a>";
 	}
