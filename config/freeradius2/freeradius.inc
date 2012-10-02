@@ -2458,7 +2458,8 @@ conf_mount_ro();
 /* Uses XMLRPC to synchronize the changes to a remote node */
 function freeradius_sync_on_changes() {
 	global $config, $g;
-	$varsyncenablexmlrpc = $config['installedpackages']['freeradiussync']['config'][0]['varsyncenablexmlrpc'];	
+	$varsyncenablexmlrpc = $config['installedpackages']['freeradiussync']['config'][0]['varsyncenablexmlrpc'];
+	$varsynctimeout = $config['installedpackages']['freeradiussync']['config'][0]['varsynctimeout'];	
 
 	// if checkbox is NOT checked do nothing
 	if(!$varsyncenablexmlrpc) {
@@ -2474,15 +2475,20 @@ function freeradius_sync_on_changes() {
 			if($sh['varsyncdestinenable']) {
 				$varsyncprotocol 	= $sh['varsyncprotocol'];
 				$sync_to_ip 		= $sh['varsyncipaddress'];
-                        	$password   		= $sh['varsyncpassword'];
+				$password   		= $sh['varsyncpassword'];
 				$varsyncport 		= $sh['varsyncport'];
-				if($password && $sync_to_ip && $varsyncport && $varsyncprotocol)
-				freeradius_do_xmlrpc_sync($sync_to_ip, $password, $varsyncport, $varsyncprotocol);
+				// check if all credentials are complete for this host
+				if($password && $sync_to_ip && $varsyncport && $varsyncprotocol) {
+					freeradius_do_xmlrpc_sync($sync_to_ip, $password, $varsyncport, $varsyncprotocol);
+				}
+				else {
+					log_error("FreeRADIUS: XMLRPC Sync with {$sh['varsyncipaddress']} has incomplete credentials. No XMLRPC Sync done!");
+				}
 			}
 			else {
 				log_error("FreeRADIUS: XMLRPC Sync with {$sh['varsyncipaddress']} is disabled");
 			}
-	        }
+		}
 	}
 	log_error("FreeRADIUS: Finished XMLRPC process (freeradius_do_xmlrpc_sync).");
 }
@@ -2493,11 +2499,11 @@ function freeradius_do_xmlrpc_sync($sync_to_ip, $password, $varsyncport, $varsyn
 
 	$varsynctimeout = $config['installedpackages']['freeradiussync']['config'][0]['varsynctimeout'];
 
-        if($varsynctimeout == '' || $varsynctimeout == 0) {
+	if($varsynctimeout == '' || $varsynctimeout == 0) {
 		$varsynctimeout = 150;
 	}
 
-	log_error("FreeRADIUS: Starting XMLRPC with time out: {$varsynctimeout}.");
+	// log_error("FreeRADIUS: Starting XMLRPC process (freeradius_do_xmlrpc_sync) with timeout {$varsynctimeout} seconds.");
 
 	if(!$password)
 		return;
