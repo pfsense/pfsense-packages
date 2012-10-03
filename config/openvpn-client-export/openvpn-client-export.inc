@@ -3,7 +3,7 @@
 	openvpn-client-export.inc
 	Copyright (C) 2009 Scott Ullrich <sullrich@gmail.com>
 	Copyright (C) 2008 Shrew Soft Inc
-	Copyright (C) 2010 Ermal Lu�i
+	Copyright (C) 2010 Ermal Luci
 	All rights reserved.
 
 	Parts of this code was originally based on vpn_ipsec_sad.php
@@ -431,8 +431,6 @@ function openvpn_client_export_installer($srvid, $usrid, $crtid, $useaddr, $quot
 	if (!file_exists($workdir . "/template/{$client_install_exe}"))
 		openvpn_client_export_install();
 
-	exec("/bin/cp {$workdir}/template/{$client_install_exe} {$workdir}/template/openvpn-install.exe");
-
 	$validconfig = openvpn_client_export_validate_config($srvid, $usrid, $crtid);
 	if ($validconfig) {
 		list($settings, $server_cert, $server_ca, $servercn, $user, $cert, $nokeys) = $validconfig;
@@ -451,8 +449,10 @@ function openvpn_client_export_installer($srvid, $usrid, $crtid, $useaddr, $quot
 
 	// copy the template directory
 	exec("cp -r {$workdir}/template/* {$tempdir}");
+	// and put the required installer exe in place
+	exec("/bin/cp {$tempdir}/{$client_install_exe} {$tempdir}/openvpn-install.exe");
 
-	// write cofiguration file
+	// write configuration file
 	$prefix = openvpn_client_export_prefix($srvid);
 	$cfgfile = "{$confdir}/{$prefix}-config.ovpn";
 	if (!empty($proxy) && $proxy['proxy_authtype'] != "none") {
