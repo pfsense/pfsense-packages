@@ -84,17 +84,33 @@ function read_lists(){
 			#read dir content and find lists
 			$lists= scandir("$dir/$group/");
 			foreach ($lists as $list)
-				if (!preg_match ("/^\./",$list) && is_dir("$dir/$group/$list/")){
+				if (!preg_match ("/^\./",$list) && is_dir("$dir/$group/$list/")) {
 					$category= scandir("$dir/$group/$list/"); 
 					foreach ($category as $file)
-						if (!preg_match ("/^\./",$file)){
-							#assign list to array
-							$type=split("_",$file);
-							if (preg_match("/(\w+)/",$type[0],$matches));
-								$xml_type=$matches[1];
-							if ($config['installedpackages']['dansguardianblacklist']['config'][0]["liston"]=="both" && $group=="blacklists")
-								$config['installedpackages']['dansguardianwhitelists'.$xml_type]['config'][]=array("descr"=> "$list $file","list" => $list,"file" => "$dir/$group/$list/$file");
-							$config['installedpackages']['dansguardian'.$group.$xml_type]['config'][]=array("descr"=> "$list $file","list" => $list,"file" => "$dir/$group/$list/$file");
+						if (!preg_match ("/^\./",$file)) {
+							if (is_dir("$dir/$group/$list/$file")) {
+								$subdir=$file;
+								$subcategory= scandir("$dir/$group/$list/$subdir/"); 
+								foreach ($subcategory as $file)
+									if (!preg_match ("/^\./",$file)){
+										#assign list to array
+										$type=split("_",$file);
+										if (preg_match("/(\w+)/",$type[0],$matches));
+											$xml_type=$matches[1];
+										if ($config['installedpackages']['dansguardianblacklist']['config'][0]["liston"]=="both" && $group=="blacklists")
+											$config['installedpackages']['dansguardianwhitelists'.$xml_type]['config'][]=array("descr"=> "{$list}_{$subdir} {$file}","list" => "{$list}_{$subdir}","file" => "$dir/$group/$list/$subdir/$file");
+										$config['installedpackages']['dansguardian'.$group.$xml_type]['config'][]=array("descr"=> "{$list}_{$subdir} {$file}","list" => "{$list}_{$subdir}","file" => "$dir/$group/$list/$subdir/$file");
+									}
+							}
+							else {
+								#assign list to array
+								$type=split("_",$file);
+								if (preg_match("/(\w+)/",$type[0],$matches));
+									$xml_type=$matches[1];
+								if ($config['installedpackages']['dansguardianblacklist']['config'][0]["liston"]=="both" && $group=="blacklists")
+									$config['installedpackages']['dansguardianwhitelists'.$xml_type]['config'][]=array("descr"=> "$list $file","list" => $list,"file" => "$dir/$group/$list/$file");
+								$config['installedpackages']['dansguardian'.$group.$xml_type]['config'][]=array("descr"=> "$list $file","list" => $list,"file" => "$dir/$group/$list/$file");
+							}
 						}
 				}
 		}
