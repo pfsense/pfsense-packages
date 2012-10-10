@@ -70,9 +70,9 @@ function pfblocker_Range2CIDR($ip_min, $ip_max) {
 	if ($bits < 0)
 		return "";
 	#identify first ip on range network
-	$network=long2ip(bindec(substr(decbin($ip_min_long),0,$bits).preg_replace("/\d/","0",substr(decbin($ip_min_long),0,(32-$bits)))));
+	$network=long2ip($ip_min_long & (2<<32)-(2<<(32-$bits)));
 	#print decbin($ip_min_long)."\n".$network."\n";
-	return $network . "/". (32 -strlen(decbin($ip_max_long - $ip_min_long)));
+	return $network . "/". $bits;
 }
 
 function sync_package_pfblocker($cron="") {
