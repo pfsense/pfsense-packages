@@ -105,15 +105,27 @@ define('REDIRECT_URL_ARGS', '&a=%a&n=%n&i=%i&s=%s&t=%t&u=%u');
 # ------------------------------------------------------------------------------
 # squidguard system constants
 # ------------------------------------------------------------------------------
-define('SQUID_CONFIGFILE',              '/usr/local/etc/squid/squid.conf');
+
+$pf_version=substr(trim(file_get_contents("/etc/version")),0,3);
+if ($pf_version > 2.0)
+	define('SQUIDGUARD_LOCALBASE', '/usr/pbi/squidguard-' . php_uname("m"));
+else
+	define('SQUIDGUARD_LOCALBASE','/usr/local');
+
+if (!defined('SQUID_LOCALBASE') && ($pf_version > 2.0))
+	define('SQUID_LOCALBASE', '/usr/pbi/squid-' . php_uname("m"));
+elseif (!defined('SQUID_LOCALBASE'))
+	define('SQUID_LOCALBASE','/usr/local');
+
+define('SQUID_CONFIGFILE',              SQUID_LOCALBASE . '/etc/squid/squid.conf');
 define('TMP_DIR',                       '/var/tmp');
 #
 define('SQUIDGUARD_CONFIGFILE',         '/squidGuard.conf');
 define('SQUIDGUARD_CONFLOGFILE',        '/sg_configurator.log');
 define('SQUIDGUARD_LOGFILE',            'block.log');
-define('SQUIDGUARD_CONFBASE',           '/usr/local/etc/squid');
-define('SQUIDGUARD_WORKDIR',            '/usr/local/etc/squidGuard');
-define('SQUIDGUARD_BINPATH',            '/usr/local/bin');
+define('SQUIDGUARD_CONFBASE',           SQUID_LOCALBASE . '/etc/squid');
+define('SQUIDGUARD_WORKDIR',            SQUIDGUARD_LOCALBASE . '/etc/squidGuard');
+define('SQUIDGUARD_BINPATH',            SQUIDGUARD_LOCALBASE . '/bin');
 define('SQUIDGUARD_TMP',                '/tmp/squidGuard');                             # SG temp
 define('SQUIDGUARD_VAR',                '/var/squidGuard');                             # SG variables
 define('SQUIDGUARD_STATE',              '/squidGuard.state');
@@ -126,7 +138,7 @@ define('SQUIDGUARD_LOGDIR',             '/var/squidGuard/log');
 define('SQUIDGUARD_WEBGUI_LOG',         '/squidguard_gui.log');
 define('SQUIDGUARD_WEBGUI_HISTORY_LOG', '/squidguard_gui_history.log');
 #
-define('SQUIDGUARD_SCR_LOGROTATE',      '/usr/local/etc/rc.d/squidGuard_logrotate');    # Logrotate script
+define('SQUIDGUARD_SCR_LOGROTATE',      SQUIDGUARD_LOCALBASE . '/etc/rc.d/squidGuard_logrotate');    # Logrotate script
 #
 # DB home catalog contains 'Blacklist' and 'User' sub-catalogs
 define('SQUIDGUARD_DB_BLACKLIST',       '/bl');
@@ -371,7 +383,7 @@ function sg_reconfigure()
         if ($squidguard_config[F_WORKDIR])
             $conf_file = $squidguard_config[F_WORKDIR] . SQUIDGUARD_CONFIGFILE;
         file_put_contents($conf_file, $conf);
-        file_put_contents('/usr/local/etc/squid' . SQUIDGUARD_CONFIGFILE, $conf); # << squidGuard want config '/usr/local/etc/squid' by default
+        file_put_contents(SQUID_LOCALBASE . '/etc/squid' . SQUIDGUARD_CONFIGFILE, $conf); # << squidGuard want config '/usr/local/etc/squid' by default
         set_file_access($squidguard_config[F_WORKDIR], OWNER_NAME, 0755);
         conf_mount_ro();
         sg_addlog("sg_reconfigure", "Save squidGuard config to '$conf_file'.", SQUIDGUARD_INFO);
@@ -659,7 +671,7 @@ function sg_rebuild_db($shtag, $rdb_dbhome, $rdb_itemslist)
     $sh_scr[] = "chown -R -v " . OWNER_NAME . " $dbhome";
 
     # restart squid for changes to take effects
-    $sh_scr[] = "/usr/local/sbin/squid -k reconfigure";
+    $sh_scr[] = SQUID_LOCALBASE . "/sbin/squid -k reconfigure";
 
     # store & exec sh
     $sh_scr = implode("\n", $sh_scr);
@@ -2186,7 +2198,7 @@ function sg_update_blacklist($from_file)
             set_file_access($dbhome, OWNER_NAME, 0755);
 
             squidguard_update_log("Reconfigure Squid proxy.");
-            mwexec("/usr/local/sbin/squid -k reconfigure");
+            mwexec(SQUID_LOCALBASE . "/sbin/squid -k reconfigure");
 
             squidguard_update_log("Blacklist update complete.");
 
@@ -2325,7 +2337,7 @@ function squidguard_blacklist_restore_arcdb()
         squidguard_rebuild_db("arc_", $dbhome, $files);
 
         squidguard_update_log("Reconfigure Squid proxy.");
-        mwexec("/usr/local/sbin/squid -k reconfigure");
+        mwexec(SQUID_LOCALBASE . "/sbin/squid -k reconfigure");
 
         conf_mount_ro();
         squidguard_update_log("Restore success.");
