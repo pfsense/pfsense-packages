@@ -70,9 +70,9 @@ function pfblocker_Range2CIDR($ip_min, $ip_max) {
 	if ($bits < 0)
 		return "";
 	#identify first ip on range network
-	$network=long2ip(bindec(substr(decbin($ip_min_long),0,$bits).preg_replace("/\d/","0",substr(decbin($ip_min_long),0,(32-$bits)))));
+	$network=long2ip( $ip_min_long & ((1<<32)-(1<<(32-$bits))-1) );
 	#print decbin($ip_min_long)."\n".$network."\n";
-	return $network . "/". (32 -strlen(decbin($ip_max_long - $ip_min_long)));
+	return $network . "/". $bits;
 }
 
 function sync_package_pfblocker($cron="") {
@@ -288,16 +288,6 @@ function sync_package_pfblocker($cron="") {
 									$new_file="";
 									if (is_array($url_list)){
 										foreach ($url_list as $line){
-											# CIDR format 192.168.0.0/16
-											if (preg_match("/(\d+\.\d+\.\d+\.\d+\/\d+)/",$line,$matches)){
-												${$alias}.= $matches[1]."\n";
-												$new_file.= $matches[1]."\n";
-											}
-											# Single ip addresses 
-											if (preg_match("/(\d+\.\d+\.\d+\.\d+)\s+/",$line,$matches)){
-												${$alias}.= $matches[1]."/32\n";
-												$new_file.= $matches[1]."/32\n";
-											}
 											# Network range 192.168.0.0-192.168.0.254
 											if (preg_match("/(\d+\.\d+\.\d+\.\d+)-(\d+\.\d+\.\d+\.\d+)/",$line,$matches)){
 												$cidr= pfblocker_Range2CIDR($matches[1],$matches[2]);
@@ -305,6 +295,16 @@ function sync_package_pfblocker($cron="") {
 													${$alias}.= $cidr."\n";
 													$new_file.= $cidr."\n";
 												}
+											}
+											# CIDR format 192.168.0.0/16
+											else if (preg_match("/(\d+\.\d+\.\d+\.\d+\/\d+)/",$line,$matches)){
+												${$alias}.= $matches[1]."\n";
+												$new_file.= $matches[1]."\n";
+											}
+											# Single ip addresses 
+											else if (preg_match("/(\d+\.\d+\.\d+\.\d+)\s+/",$line,$matches)){
+												${$alias}.= $matches[1]."/32\n";
+												$new_file.= $matches[1]."/32\n";
 											}
 										}
 									}
