@@ -89,8 +89,8 @@ define('CONFIG_SG_HEADER', "
 define('REDIRECTOR_OPTIONS_REM',   '# squidGuard options');
 define('REDIRECTOR_PROGRAM_OPT',   'redirect_program');
 define('REDIRECT_BYPASS_OPT',      'redirector_bypass');
-define('REDIRECT_CHILDREN_OPT',    'redirect_children');
-define('REDIRECTOR_PROCESS_COUNT', '3'); # redirector processes count will started
+define('REDIRECT_CHILDREN_OPT',    'url_rewrite_children');
+define('REDIRECTOR_PROCESS_COUNT', '5'); # redirector processes count will started
 
 # ------------------------------------------------------------------------------
 # squidguard config options
@@ -397,9 +397,9 @@ function sg_reconfigure()
 # ------------------------------------------------------------------------------
 # squid_reconfigure
 # Insert in '/usr/local/squid/etc/squid.conf' options:
-#     redirector_bypass on
+#     redirector_bypass off
 #     redirect_program /usr/local/squidGuard/bin/squidGuard -c /path_to_config_file
-#     redirect_children 1
+#     url_rewrite_children 5
 # ------------------------------------------------------------------------------
 
 function squid_reconfigure($remove_only = '')
@@ -428,7 +428,7 @@ function squid_reconfigure($remove_only = '')
         $redirector_conf = $squidguard_config[F_WORKDIR] . SQUIDGUARD_CONFIGFILE;
 
         $conf[] = REDIRECTOR_PROGRAM_OPT . " $redirector_path -c $redirector_conf";
-        $conf[] = REDIRECT_BYPASS_OPT    . " on";
+        $conf[] = REDIRECT_BYPASS_OPT    . " off";
         $conf[] = REDIRECT_CHILDREN_OPT  . " " . REDIRECTOR_PROCESS_COUNT;
 
         sg_addlog("squid_reconfigure", "Add new redirector options to Squid config.", SQUIDGUARD_INFO);
