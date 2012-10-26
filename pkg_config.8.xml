@@ -496,7 +496,7 @@
 		<name>snort-dev</name>
 		<pkginfolink>http://forum.pfsense.org/index.php/topic,16847.0.html</pkginfolink>
 		<website>http://www.snort.org</website>
-		<descr>Snort-dev is a develement branch.</descr>
+		<descr>Snort-dev is a development branch.</descr>
 		<category>Security</category>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
 		<depends_on_package_pbi>snort-2.9.2.3-i386.pbi</depends_on_package_pbi>
