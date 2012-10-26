@@ -911,6 +911,8 @@
 			lcdproc_warn("Failed to connect to LCDd process $errstr ($errno)");
 			$lcdproc_connect_errors++;
 		} else {			
+			/* Allow the script to run forever (0) */
+			set_time_limit(0);
 			build_interface($lcd);
 			loop_status($lcd);
 			fclose($lcd);
