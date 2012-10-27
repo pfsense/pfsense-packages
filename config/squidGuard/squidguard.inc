@@ -1264,7 +1264,7 @@ function squidguard_adt_safesrch_add($rewrite_item)
 # log dump
 function squidguard_logdump($filename, $lnoffset, $lncount, $reverse)
 {
-    define('LOGSHOW_BUFSIZE', '65536');
+    define('LOGSHOW_BUFSIZE', '262144');
     $cnt = '';
 
     if (file_exists($filename)) {
