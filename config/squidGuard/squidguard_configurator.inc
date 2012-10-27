@@ -123,6 +123,7 @@ define('TMP_DIR',                       '/var/tmp');
 define('SQUIDGUARD_CONFIGFILE',         '/squidGuard.conf');
 define('SQUIDGUARD_CONFLOGFILE',        '/sg_configurator.log');
 define('SQUIDGUARD_LOGFILE',            'block.log');
+define('SQUIDGUARD_GUILOGFILE',         'squidGuard.log');
 define('SQUIDGUARD_CONFBASE',           SQUID_LOCALBASE . '/etc/squid');
 define('SQUIDGUARD_WORKDIR',            SQUIDGUARD_LOCALBASE . '/etc/squidGuard');
 define('SQUIDGUARD_BINPATH',            SQUIDGUARD_LOCALBASE . '/bin');
@@ -1878,14 +1879,20 @@ function sg_script_logrotate()
 
     global $squidguard_config;
     $sglogname = $squidguard_config[F_LOGDIR] . "/" . SQUIDGUARD_LOGFILE;
+	$sgguilogname = $squidguard_config[F_LOGDIR] . "/" . SQUIDGUARD_GUILOGFILE;
     $res =
 <<<EOD
 #!/bin/sh
 #
 # This file generated automaticly with SquidGuard configurator
+# Rotates the block logile
 tail -{$lines} {$sglogname} > {$sglogname}.0
 tail -{$lines} {$sglogname}.0 > {$sglogname}
 rm -f {$sglogname}.0
+# Rotates the squidguard GUI logile
+tail -{$lines} {$sgguilogname} > {$sgguilogname}.0
+tail -{$lines} {$sgguilogname}.0 > {$sgguilogname}
+rm -f {$sgguilogname}.0
 EOD;
     return $res;
 }
