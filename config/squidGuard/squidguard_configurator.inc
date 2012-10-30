@@ -52,9 +52,9 @@ require_once('pkg-utils.inc');
 require_once('filter.inc');
 require_once('service-utils.inc');
 
-# if squid package exists
+# squid package must exists by default system path (for v.2.0/2.1)
 # todo: move include string to the squid-function call string position
-if (file_exists('/usr/local/pkg/squid.inc')) {
+if (file_exists('squid.inc')) {
     require_once('squid.inc');
 }
 
