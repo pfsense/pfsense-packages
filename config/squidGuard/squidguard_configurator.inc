@@ -51,7 +51,12 @@ require_once('pfsense-utils.inc');
 require_once('pkg-utils.inc');
 require_once('filter.inc');
 require_once('service-utils.inc');
-require_once('squid.inc');
+
+# if squid package exists
+# todo: move include string to the squid-function call string position
+if (file_exists('/usr/local/pkg/squid.inc')) {
+    require_once('squid.inc');
+}
 
 # ------------------------------------------------------------------------------
 # Allow additional execution time 0 = no limit
