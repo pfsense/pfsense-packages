@@ -446,7 +446,10 @@ function squid_reconfigure($remove_only = '')
     $config['installedpackages']['squid']['config'][0]['custom_options'] = $conf;
     write_config('Update redirector options to squid config.');
 
-    squid_resync();
+    # resync squid package, if installed
+    if (function_exists('squid_resync')) {
+        squid_resync();
+    }
 }
 
 # ------------------------------------------------------------------------------
