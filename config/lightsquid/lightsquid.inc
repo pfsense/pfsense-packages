@@ -37,6 +37,7 @@ require_once('service-utils.inc');
 if (file_exists('squid.inc')) {
   require_once('squid.inc');
 }
+else update_log("File 'squid.inc' not found.");
 
 $pfs_version = substr(trim(file_get_contents("/etc/version")),0,3);
 switch ($pfs_version) {
@@ -299,7 +300,10 @@ function lightsquid_resync() {
 			$config['installedpackages']['squidnac']['config'][0]['ext_cachemanager'] = $ifmgr;
 
 			write_config();
-			squid_resync();
+			if (function_exists('squid_resync')) {
+				squid_resync();
+			} 
+			else update_log("Function 'squid_resync' not found.");
 		}
 	}
 
