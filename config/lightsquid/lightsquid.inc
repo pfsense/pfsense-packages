@@ -33,7 +33,10 @@ require_once('pfsense-utils.inc');
 require_once('pkg-utils.inc');
 require_once('filter.inc');
 require_once('service-utils.inc');
-require_once('squid.inc');
+
+if (file_exists('squid.inc')) {
+  require_once('squid.inc');
+}
 
 $pfs_version = substr(trim(file_get_contents("/etc/version")),0,3);
 switch ($pfs_version) {
