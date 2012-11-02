@@ -395,12 +395,10 @@ if ($snortdownload == 'on' || $emergingthreats == 'on') {
 		}
 	}
 
-	if (is_process_running("snort")) {
-		exec("/bin/sh /usr/local/etc/rc.d/snort.sh restart");
-		update_output_window(gettext("Snort has restarted with your new set of rules..."));
-		log_error("Snort has restarted with your new set of rules...");
-	} else
-		log_error("Snort Rules update finished...");
+	exec("/bin/sh /usr/local/etc/rc.d/snort.sh restart");
+	update_output_window(gettext("Snort has restarted with your new set of rules..."));
+	log_error("Snort has restarted with your new set of rules...");
+
 }
 
 update_status(gettext("The Rules update finished..."));
