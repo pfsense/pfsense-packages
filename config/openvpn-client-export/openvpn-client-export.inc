@@ -61,7 +61,7 @@ function openvpn_client_export_deinstall() {
 	conf_mount_ro();
 }
 
-function openvpn_client_export_prefix($srvid) {
+function openvpn_client_export_prefix($srvid, $usrid = null) {
 	global $config;
 
 	// lookup server settings
@@ -74,8 +74,13 @@ function openvpn_client_export_prefix($srvid) {
 	$host = empty($config['system']['hostname']) ? "openvpn" : $config['system']['hostname'];
 	$prot = ($settings['protocol'] == 'UDP' ? 'udp' : $settings['protocol']);
 	$port = $settings['local_port'];
+	
+	$username = "";
+	//$config['openvpn']['openvpn-server'];
+	if ($usrid && is_numeric($usrid))
+		$username = "-".$config['system']['user'][$usrid]['name'];
 
-	return "{$host}-{$prot}-{$port}";
+	return "{$host}-{$prot}-{$port}{$username}";
 }
 
 function openvpn_client_pem_to_pk12($outpath, $outpass, $crtpath, $keypath, $capath = false) {
@@ -151,7 +156,7 @@ function openvpn_client_export_validate_config($srvid, $usrid, $crtid) {
 	return array($settings, $server_cert, $server_ca, $servercn, $user, $cert, $nokeys);
 }
 
-function openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $quoteservercn, $usetoken, $nokeys = false, $proxy, $expformat = "baseconf", $outpass = "", $skiptls=false, $doslines=false, $advancedoptions = "") {
+function openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $quoteservercn, $usetoken, $nokeys = false, $proxy, $expformat = "baseconf", $outpass = "", $skiptls=false, $doslines=false, $openvpnmanager, $advancedoptions = "") {
 	global $config, $input_errors, $g;
 
 	$nl = ($doslines) ? "\r\n" : "\n";
@@ -211,7 +216,7 @@ function openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $quotese
 		$conf .= "http-proxy {$proxy['ip']} {$proxy['port']} ";
 		if ($proxy['proxy_authtype'] != "none") {
 			if (!isset($proxy['passwdfile']))
-				$proxy['passwdfile'] = openvpn_client_export_prefix($srvid) . "-proxy";
+				$proxy['passwdfile'] = openvpn_client_export_prefix($srvid, $usrid) . "-proxy";
 			$conf .= " {$proxy['passwdfile']} {$proxy['proxy_authtype']}";
 		}
 		$conf .= "{$nl}";
@@ -226,7 +231,7 @@ function openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $quotese
 	}
 
 	// add key settings
-	$prefix = openvpn_client_export_prefix($srvid);
+	$prefix = openvpn_client_export_prefix($srvid, $usrid);
 	$cafile = "{$prefix}-ca.crt";
 	if($nokeys == false) {
 		if ($expformat == "inline") {
@@ -295,8 +300,28 @@ function openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $quotese
 		$conf .= "comp-lzo{$nl}";
 	if ($settings['passtos'])
 		$conf .= "passtos{$nl}";
+
+	if ($openvpnmanager)
+	{
+		$conf .= $nl;
+		$conf .= "# dont terminate service process on wrong password, ask again{$nl}";
+		$conf .= "auth-retry interact{$nl}";
+		$conf .= "# open management channel{$nl}";
+		$conf .= "management 127.0.0.1 166{$nl}";
+		$conf .= "# wait for management to explicitly start connection{$nl}";
+		$conf .= "management-hold{$nl}";
+		$conf .= "# query management channel for user/pass{$nl}";
+		$conf .= "management-query-passwords{$nl}";
+		$conf .= "# disconnect VPN when managment program connection is closed{$nl}";
+		$conf .= "management-signal{$nl}";
+		$conf .= "# forget password when management disconnects{$nl}";
+		$conf .= "management-forget-disconnect{$nl}";
+		$conf .= $nl;
+	};
 		
 	// add advanced options
+	$advancedoptions = str_replace("\r\n", "\n", $advancedoptions);
+	$advancedoptions = str_replace("\n", $nl, $advancedoptions);
 	$advancedoptions = str_replace(";", $nl, $advancedoptions);
 	$conf .= $advancedoptions;
 	$conf .= $nl;
@@ -411,7 +436,7 @@ function openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $quotese
 	}
 }
 
-function openvpn_client_export_installer($srvid, $usrid, $crtid, $useaddr, $quoteservercn, $usetoken, $outpass, $proxy, $advancedoptions, $openvpn_version = "2.1") {
+function openvpn_client_export_installer($srvid, $usrid, $crtid, $useaddr, $quoteservercn, $usetoken, $outpass, $proxy, $openvpnmanager, $advancedoptions, $openvpn_version = "2.1") {
 	global $config, $g, $input_errors;
 	$uname_p = trim(exec("uname -p"));
 
@@ -453,7 +478,7 @@ function openvpn_client_export_installer($srvid, $usrid, $crtid, $useaddr, $quot
 	exec("/bin/cp {$tempdir}/{$client_install_exe} {$tempdir}/openvpn-install.exe");
 
 	// write configuration file
-	$prefix = openvpn_client_export_prefix($srvid);
+	$prefix = openvpn_client_export_prefix($srvid, $usrid);
 	$cfgfile = "{$confdir}/{$prefix}-config.ovpn";
 	if (!empty($proxy) && $proxy['proxy_authtype'] != "none") {
 		$proxy['passwdfile'] = "{$prefix}-password";
@@ -461,7 +486,7 @@ function openvpn_client_export_installer($srvid, $usrid, $crtid, $useaddr, $quot
 		$pwdfle .= "{$proxy['password']}\r\n";
 		file_put_contents("{$confdir}/{$proxy['passwdfile']}", $pwdfle);
 	}
-	$conf = openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $quoteservercn, $usetoken,  $nokeys, $proxy, "", "baseconf", false, true, $advancedoptions);
+	$conf = openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $quoteservercn, $usetoken,  $nokeys, $proxy, "", "baseconf", false, true, $openvpnmanager, $advancedoptions);
 	if (!$conf) {
 		$input_errors[] = "Could not create a config to export.";
 		return false;
@@ -493,13 +518,24 @@ function openvpn_client_export_installer($srvid, $usrid, $crtid, $useaddr, $quot
 	// 7zip the configuration data
 	chdir($tempdir);
 	$files  = "config ";
-	$files .= "procchain.exe ";
+	if ($openvpnmanager)
+		$files .= "openvpnmanager ";
+
+	unlink("openvpn-postinstall.exe");
+	rename("openvpnmanager/openvpn-postinstall.exe","openvpn-postinstall.exe");
 	$files .= "openvpn-install.exe ";
 	$files .= "openvpn-postinstall.exe ";
 	if ($usetoken)
-		$files .= "procchain-import";
+		$procchain = 	';!@Install@!UTF-8!
+RunProgram="openvpn-postinstall.exe /Import"
+;!@InstallEnd@!'
+;
 	else
-		$files .= "procchain-standard";
+		$procchain = 	';!@Install@!UTF-8!
+RunProgram="openvpn-postinstall.exe"
+;!@InstallEnd@!'
+;
+	file_put_contents("{$tempdir}/7zipConfig",$procchain);
 
 	if(file_exists("/usr/pbi/p7zip-{$uname_p}/bin/7z"))
 		exec("/usr/pbi/p7zip-{$uname_p}/bin/7z -y a archive.7z {$files}");
@@ -509,10 +545,7 @@ function openvpn_client_export_installer($srvid, $usrid, $crtid, $useaddr, $quot
 	// create the final installer
 	$outfile = "{$tempdir}-install.exe";
 	chdir($g['tmp_path']);
-	if ($usetoken)
-		exec("/bin/cat {$tempdir}/7zS.sfx {$tempdir}/config-import {$tempdir}/archive.7z > {$outfile}");
-	else
-		exec("/bin/cat {$tempdir}/7zS.sfx {$tempdir}/config-standard {$tempdir}/archive.7z > {$outfile}");
+	exec("/bin/cat {$tempdir}/7zS.sfx {$tempdir}/7zipConfig {$tempdir}/archive.7z > {$outfile}");
 
 	// cleanup
 	exec("/bin/rm -r {$tempdir}");
@@ -520,7 +553,7 @@ function openvpn_client_export_installer($srvid, $usrid, $crtid, $useaddr, $quot
 	return $outfile;
 }
 
-function viscosity_openvpn_client_config_exporter($srvid, $usrid, $crtid, $useaddr, $quoteservercn, $usetoken, $outpass, $proxy, $advancedoptions) {
+function viscosity_openvpn_client_config_exporter($srvid, $usrid, $crtid, $useaddr, $quoteservercn, $usetoken, $outpass, $proxy, $openvpnmanager, $advancedoptions) {
 	global $config, $g;
 	$uname_p = trim(exec("uname -p"));
 
@@ -547,7 +580,7 @@ function viscosity_openvpn_client_config_exporter($srvid, $usrid, $crtid, $usead
 	$tempdir = $tempdir . "/Viscosity.visc/";
 
 	// write cofiguration file
-	$prefix = openvpn_client_export_prefix($srvid);
+	$prefix = openvpn_client_export_prefix($srvid, $usrid);
 	if (!empty($proxy) && $proxy['proxy_authtype'] != "none") {
 		$proxy['passwdfile'] = "config-password";
 		$pwdfle = "{$proxy['user']}\n";
@@ -555,7 +588,7 @@ function viscosity_openvpn_client_config_exporter($srvid, $usrid, $crtid, $usead
 		file_put_contents("{$tempdir}/{$proxy['passwdfile']}", $pwdfle);
 	}
 
-	$conf = openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $quoteservercn, $usetoken, true, $proxy, "baseconf", "", true, $advancedoptions);
+	$conf = openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $quoteservercn, $usetoken, true, $proxy, "baseconf", "", true, $openvpnmanager, $advancedoptions);
 	if (!$conf)
 		return false;
 
