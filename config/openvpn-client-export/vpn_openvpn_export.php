@@ -136,6 +136,7 @@ if (!empty($act)) {
 	} else
 		$useaddr = $_GET['useaddr'];
 	$advancedoptions = $_GET['advancedoptions'];
+	$openvpnmanager = $_GET['openvpnmanager'];
 
 	$quoteservercn = $_GET['quoteservercn'];
 	$usetoken = $_GET['usetoken'];
@@ -171,7 +172,7 @@ if (!empty($act)) {
 		}
 	}
 
-	$exp_name = openvpn_client_export_prefix($srvid);
+	$exp_name = openvpn_client_export_prefix($srvid, $usrid);
 
 	if(substr($act, 0, 4) == "conf") {
 		switch ($act) {
@@ -203,17 +204,17 @@ if (!empty($act)) {
 				$exp_name = urlencode($exp_name."-config.ovpn");
 				$expformat = "baseconf";
 		}
-		$exp_path = openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $quoteservercn, $usetoken, $nokeys, $proxy, $expformat, $password, false, false, $advancedoptions);
+		$exp_path = openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $quoteservercn, $usetoken, $nokeys, $proxy, $expformat, $password, false, false, $openvpnmanager, $advancedoptions);
 	}
 
 	if($act == "visc") {
 		$exp_name = urlencode($exp_name."-Viscosity.visc.zip");
-		$exp_path = viscosity_openvpn_client_config_exporter($srvid, $usrid, $crtid, $useaddr, $quoteservercn, $usetoken, $password, $proxy,  $advancedoptions);
+		$exp_path = viscosity_openvpn_client_config_exporter($srvid, $usrid, $crtid, $useaddr, $quoteservercn, $usetoken, $password, $proxy, $openvpnmanager, $advancedoptions);
 	}
 
 	if(substr($act, 0, 4) == "inst") {
 		$exp_name = urlencode($exp_name."-install.exe");
-		$exp_path = openvpn_client_export_installer($srvid, $usrid, $crtid, $useaddr, $quoteservercn, $usetoken, $password, $proxy, $advancedoptions, substr($act, 5));
+		$exp_path = openvpn_client_export_installer($srvid, $usrid, $crtid, $useaddr, $quoteservercn, $usetoken, $password, $proxy, $openvpnmanager, $advancedoptions, substr($act, 5));
 	}
 
 	if (!$exp_path) {
@@ -303,6 +304,9 @@ function download_begin(act, i, j) {
 	var usepass = 0;
 	if (document.getElementById("usepass").checked)
 		usepass = 1;
+	var openvpnmanager = 0;
+	if (document.getElementById("openvpnmanager").checked)
+		openvpnmanager = 1;
 
 	var pass = document.getElementById("pass").value;
 	var conf = document.getElementById("conf").value;
@@ -366,6 +370,7 @@ function download_begin(act, i, j) {
 	}
 	dlurl += "&useaddr=" + escape(useaddr);
 	dlurl += "&quoteservercn=" + escape(quoteservercn);
+	dlurl += "&openvpnmanager=" + escape(openvpnmanager);
 	dlurl += "&usetoken=" + escape(usetoken);
 	if (usepass)
 		dlurl += "&password=" + escape(pass);
@@ -726,6 +731,25 @@ function useproxy_changed(obj) {
 									</td>
 								</tr>
 							</table>
+									</td>
+								</tr>
+							</table>
+						</td>
+					</tr>
+					<tr>
+						<td width="22%" valign="top" class="vncell">Management&nbsp;Interface<br/>OpenVPNManager</td>
+						<td width="78%" class="vtable">
+							<table border="0" cellpadding="2" cellspacing="0">
+								<tr>
+									<td>
+										<input name="openvpnmanager" id="openvpnmanager" type="checkbox" value="yes">
+									</td>
+									<td>
+										<span class="vexpl">
+											 This will change the generated .ovpn configuration to allow for usage of the management interface.
+											 And include the OpenVPNManager program in the "Windows Installers". With this OpenVPN can be used also by non-administrator users.
+											 This is also usefull for Windows7/Vista systems where elevated permissions are needed to add routes to the system.
+										</span>
 									</td>
 								</tr>
 							</table>
