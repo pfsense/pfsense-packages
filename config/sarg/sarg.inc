@@ -71,7 +71,7 @@ function sarg_resync() {
         global $config;
         if (($_POST['Submit'] == 'Save') || !isset($_POST['Submit']))
         	sync_package_sarg();
-        if ($_POST['Submit'] == 'Force udpate now')
+        if ($_POST['Submit'] == 'Force update now')
         	run_sarg();
 
 }

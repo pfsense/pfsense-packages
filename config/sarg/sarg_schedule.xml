@@ -153,7 +153,7 @@
 			<size>5</size>
 			<description><![CDATA[How often extract users from active directory and verify changes<br>
 							Valid options are minutes(m), hours(h), days(d)<br>
-							Sample: To update every hour, use 1h<br><br>]]>&lt;input type=&quot;submit&quot; name=&quot;Submit&quot; value=&quot;Force udpate now&quot;&gt;&lt;br&gt;</description>
+							Sample: To update every hour, use 1h<br><br>]]>&lt;input type=&quot;submit&quot; name=&quot;Submit&quot; value=&quot;Force update now&quot;&gt;&lt;br&gt;</description>
 			<required/>
 		</field>
 		<field>
