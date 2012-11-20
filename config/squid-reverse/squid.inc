@@ -1868,7 +1868,9 @@ function squid_do_xmlrpc_sync($sync_to_ip, $username, $password) {
 	$xml['squidcache'] = $config['installedpackages']['squidcache'];
 	$xml['squidnac'] = $config['installedpackages']['squidnac'];
 	$xml['squidtraffic'] = $config['installedpackages']['squidtraffic'];
-	$xml['squidreverse'] = $config['installedpackages']['squidreverse'];
+	$xml['squidreversegeneral'] = $config['installedpackages']['squidreversegeneral'];
+	$xml['squidreversepeer'] = $config['installedpackages']['squidreversepeer'];
+	$xml['squidreverseuri'] = $config['installedpackages']['squidreverseuri'];
 	$xml['squidauth'] = $config['installedpackages']['squidauth'];
 	$xml['squidusers'] = $config['installedpackages']['squidusers'];
 	/* assemble xmlrpc payload */
