@@ -29,14 +29,14 @@ global $config, $g;
 
 /* array sorting */
 function sksort(&$array, $subkey="id", $sort_ascending=false) {
-	if (count($array)) {
-		$temp_array[key($array)] = array_shift($array);
-	};
         /* an empty array causes sksort to fail - this test alleviates the error */
 	if(empty($array))
         {
         return false;
         }
+	if (count($array)) {
+		$temp_array[key($array)] = array_shift($array);
+	};
 	foreach ($array as $key => $val){
 		$offset = 0;
 		$found = false;
