@@ -32,7 +32,11 @@ function sksort(&$array, $subkey="id", $sort_ascending=false) {
 	if (count($array)) {
 		$temp_array[key($array)] = array_shift($array);
 	};
-
+        /* an empty array causes sksort to fail - this test alleviates the error */
+	if(empty($array))
+        {
+        return false;
+        }
 	foreach ($array as $key => $val){
 		$offset = 0;
 		$found = false;
@@ -49,6 +53,8 @@ function sksort(&$array, $subkey="id", $sort_ascending=false) {
 	if ($sort_ascending) {
 		$array = array_reverse($temp_array);
 	} else $array = $temp_array;
+        /* below is the complement for empty array test */
+        return true; 
 };
 
 /* check if firewall widget variable is set */
