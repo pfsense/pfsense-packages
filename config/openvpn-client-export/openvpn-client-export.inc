@@ -120,12 +120,6 @@ function openvpn_client_export_validate_config($srvid, $usrid, $crtid) {
 	{
 		$input_errors[] = "Could not locate server certificate.";
 	} else {
-		$server_cert_purpose = cert_get_purpose($server_cert['crt']);
-		if ($server_cert_purpose['ca'] == 'Yes')
-			$input_errors[] = "Server sertificate is a CA certificate.";
-		if ($server_cert_purpose['server'] != 'Yes')
-			$input_errors[] = "Server sertificate does not have the purpose 'Server: Yes'";
-			
 		$server_ca = lookup_ca($server_cert['caref']);
 		if (!$server_ca) {
 			$input_errors[] = "Could not locate the CA reference for the server certificate.";
