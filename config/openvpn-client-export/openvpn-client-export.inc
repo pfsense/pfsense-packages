@@ -75,14 +75,13 @@ function openvpn_client_export_prefix($srvid, $usrid = null, $crtid = null) {
 	$prot = ($settings['protocol'] == 'UDP' ? 'udp' : $settings['protocol']);
 	$port = $settings['local_port'];
 	
-	$username = "";
-	//$config['openvpn']['openvpn-server'];
+	$filename_addition = "";
 	if ($usrid && is_numeric($usrid))
-		$username = "-".$config['system']['user'][$usrid]['name'];
-	if ($crtid && is_numeric($crtid))
-		$username = "-".$config['cert'][$crtid]['descr'];
+		$filename_addition = "-".$config['system']['user'][$usrid]['name'];
+	if ($crtid && is_numeric($crtid) && function_exists("cert_get_cn"))
+		$filename_addition = "-".cert_get_cn($config['cert'][$crtid]['crt']);
 
-	return "{$host}-{$prot}-{$port}{$username}";
+	return "{$host}-{$prot}-{$port}{$filename_addition}";
 }
 
 function openvpn_client_pem_to_pk12($outpath, $outpass, $crtpath, $keypath, $capath = false) {
