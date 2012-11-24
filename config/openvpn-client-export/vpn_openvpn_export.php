@@ -172,7 +172,7 @@ if (!empty($act)) {
 		}
 	}
 
-	$exp_name = openvpn_client_export_prefix($srvid, $usrid);
+	$exp_name = openvpn_client_export_prefix($srvid, $usrid, $crtid);
 
 	if(substr($act, 0, 4) == "conf") {
 		switch ($act) {
