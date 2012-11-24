@@ -117,13 +117,23 @@ function openvpn_client_export_validate_config($srvid, $usrid, $crtid) {
 
 	// lookup server certificate info
 	$server_cert = lookup_cert($settings['certref']);
-	$server_ca = lookup_ca($server_cert['caref']);
-	if (!$server_cert || !$server_ca) {
-		$input_errors[] = "Could not locate certificate.";
-		return false;
-	}
-	if (function_exists("cert_get_cn")) {
-		$servercn = cert_get_cn($server_cert['crt']);
+	if (!$server_cert) 
+	{
+		$input_errors[] = "Could not locate server certificate.";
+	} else {
+		$server_cert_purpose = cert_get_purpose($server_cert['crt']);
+		if ($server_cert_purpose['ca'] == 'Yes')
+			$input_errors[] = "Server sertificate is a CA certificate.";
+		if ($server_cert_purpose['server'] != 'Yes')
+			$input_errors[] = "Server sertificate does not have the purpose 'Server: Yes'";
+			
+		$server_ca = lookup_ca($server_cert['caref']);
+		if (!$server_ca) {
+			$input_errors[] = "Could not locate the CA reference for the server certificate.";
+		}
+		if (function_exists("cert_get_cn")) {
+			$servercn = cert_get_cn($server_cert['crt']);
+		}
 	}
 
 	// lookup user info
@@ -131,7 +141,6 @@ function openvpn_client_export_validate_config($srvid, $usrid, $crtid) {
 		$user = $config['system']['user'][$usrid];
 		if (!$user) {
 			$input_errors[] = "Could not find user settings.";
-			return false;
 		}
 	}
 
@@ -143,17 +152,23 @@ function openvpn_client_export_validate_config($srvid, $usrid, $crtid) {
 			$cert = $config['cert'][$crtid];
 		}
 		if (!$cert)
-			return false;
-		// If $cert is not an array, it's a certref not a cert.
-		if (!is_array($cert))
-			$cert = lookup_cert($cert);
+		{
+			$input_errors[] = "Could not find client certificate.";
+		} else {
+			// If $cert is not an array, it's a certref not a cert.
+			if (!is_array($cert))
+				$cert = lookup_cert($cert);
+		}
 	} elseif (($settings['mode'] == "server_tls") || (($settings['mode'] == "server_tls_user") && ($settings['authmode'] != "Local Database"))) {
 		$cert = $config['cert'][$crtid];
 		if (!$cert)
-			return false;
+			$input_errors[] = "Could not find client certifficate.";
 	} else
 		$nokeys = true;
 
+	if ($input_errors)
+		return false;
+		
 	return array($settings, $server_cert, $server_ca, $servercn, $user, $cert, $nokeys);
 }
 
