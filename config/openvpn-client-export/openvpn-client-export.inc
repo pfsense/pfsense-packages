@@ -61,7 +61,7 @@ function openvpn_client_export_deinstall() {
 	conf_mount_ro();
 }
 
-function openvpn_client_export_prefix($srvid, $usrid = null) {
+function openvpn_client_export_prefix($srvid, $usrid = null, $crtid = null) {
 	global $config;
 
 	// lookup server settings
@@ -75,12 +75,13 @@ function openvpn_client_export_prefix($srvid, $usrid = null) {
 	$prot = ($settings['protocol'] == 'UDP' ? 'udp' : $settings['protocol']);
 	$port = $settings['local_port'];
 	
-	$username = "";
-	//$config['openvpn']['openvpn-server'];
+	$filename_addition = "";
 	if ($usrid && is_numeric($usrid))
-		$username = "-".$config['system']['user'][$usrid]['name'];
+		$filename_addition = "-".$config['system']['user'][$usrid]['name'];
+	if ($crtid && is_numeric($crtid) && function_exists("cert_get_cn"))
+		$filename_addition = "-".cert_get_cn($config['cert'][$crtid]['crt']);
 
-	return "{$host}-{$prot}-{$port}{$username}";
+	return "{$host}-{$prot}-{$port}{$filename_addition}";
 }
 
 function openvpn_client_pem_to_pk12($outpath, $outpass, $crtpath, $keypath, $capath = false) {
@@ -216,7 +217,7 @@ function openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $quotese
 		$conf .= "http-proxy {$proxy['ip']} {$proxy['port']} ";
 		if ($proxy['proxy_authtype'] != "none") {
 			if (!isset($proxy['passwdfile']))
-				$proxy['passwdfile'] = openvpn_client_export_prefix($srvid, $usrid) . "-proxy";
+				$proxy['passwdfile'] = openvpn_client_export_prefix($srvid, $usrid, $crtid) . "-proxy";
 			$conf .= " {$proxy['passwdfile']} {$proxy['proxy_authtype']}";
 		}
 		$conf .= "{$nl}";
@@ -231,7 +232,7 @@ function openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $quotese
 	}
 
 	// add key settings
-	$prefix = openvpn_client_export_prefix($srvid, $usrid);
+	$prefix = openvpn_client_export_prefix($srvid, $usrid, $crtid);
 	$cafile = "{$prefix}-ca.crt";
 	if($nokeys == false) {
 		if ($expformat == "inline") {
@@ -478,7 +479,7 @@ function openvpn_client_export_installer($srvid, $usrid, $crtid, $useaddr, $quot
 	exec("/bin/cp {$tempdir}/{$client_install_exe} {$tempdir}/openvpn-install.exe");
 
 	// write configuration file
-	$prefix = openvpn_client_export_prefix($srvid, $usrid);
+	$prefix = openvpn_client_export_prefix($srvid, $usrid, $crtid);
 	$cfgfile = "{$confdir}/{$prefix}-config.ovpn";
 	if (!empty($proxy) && $proxy['proxy_authtype'] != "none") {
 		$proxy['passwdfile'] = "{$prefix}-password";
@@ -580,7 +581,7 @@ function viscosity_openvpn_client_config_exporter($srvid, $usrid, $crtid, $usead
 	$tempdir = $tempdir . "/Viscosity.visc/";
 
 	// write cofiguration file
-	$prefix = openvpn_client_export_prefix($srvid, $usrid);
+	$prefix = openvpn_client_export_prefix($srvid, $usrid, $crtid);
 	if (!empty($proxy) && $proxy['proxy_authtype'] != "none") {
 		$proxy['passwdfile'] = "config-password";
 		$pwdfle = "{$proxy['user']}\n";
