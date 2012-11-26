@@ -63,6 +63,7 @@ function doCmdT($title, $command) {
 		while (($line = fgets($fd)) !== FALSE) {
 			echo htmlspecialchars($line, ENT_NOQUOTES);
 		}
+		pclose($fd);
 	}
     echo "</pre></tr>\n";
     echo "</table>\n";
