@@ -34,6 +34,12 @@ require_once("service-utils.inc");
 
 define('PKG_BGPD_CONFIG_BASE', '/var/etc/openbgpd');
 
+$pf_version=substr(trim(file_get_contents("/etc/version")),0,3);
+if ($pf_version > 2.0)
+	define('PKG_BGPD_BIN', '/usr/pbi/openbgpd-' . php_uname("m") . '/sbin');
+else
+	define('PKG_BGPD_BIN','/usr/local/sbin');
+
 define('PKG_BGPD_LOGIN',	"_bgpd");
 define('PKG_BGPD_UID',		"130");
 define('PKG_BGPD_GROUP',	"_bgpd");
@@ -51,6 +57,7 @@ function openbgpd_install_conf() {
 	$pkg_gecos	= PKG_BGPD_GECOS;
 	$pkg_homedir	= PKG_BGPD_HOMEDIR;
 	$pkg_shell	= PKG_BGPD_SHELL;
+	$pkg_bin	= PKG_BGPD_BIN;
 
 	conf_mount_rw();
 
@@ -193,7 +200,7 @@ chmod u+rw,go-rw {$bgpd_config_base}/bgpd.conf
 
 NUMBGPD=`ps auxw | grep -c '[b]gpd.*parent'`
 if [ \${NUMBGPD} -lt 1 ] ; then
-	/usr/local/sbin/bgpd -f {$bgpd_config_base}/bgpd.conf
+	{$pkg_bin}/bgpd -f {$bgpd_config_base}/bgpd.conf
 fi
 EOF;
 	write_rcfile(array(
