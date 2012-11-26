@@ -133,7 +133,7 @@ function squid_resync_reverse() {
 			array_push($owa_dirs,'owa','exchange','public','exchweb','ecp','OAB');
 			if($settings['reverse_owa_activesync'])
 					array_push($owa_dirs,'Microsoft-Server-ActiveSync');
-			if($settngs['reverse_owa_rpchttp'])	
+			if($settings['reverse_owa_rpchttp'])	
 					array_push($owa_dirs,'rpc/rpcproxy.dll','rpcwithcert/rpcproxy.dll');
 			if($settings['reverse_owa_autodiscover'])
 					array_push($owa_dirs,'autodiscover');
