@@ -29,7 +29,8 @@
         POSSIBILITY OF SUCH DAMAGE.
 */
 
-require("guiconfig.inc");
+require_once("guiconfig.inc");
+require_once("service-utils.inc");
 
 $logfile = "/var/log/arp.dat";
 
