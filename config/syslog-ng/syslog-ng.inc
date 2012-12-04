@@ -109,6 +109,7 @@ function syslogng_validate_advanced($post, $input_errors) {
 		$input_errors[] = 'Creation or modification of \'_DEFAULT\' objects not permitted. Change default settings under \'General\' tab.';
 	}
 	
+	$post['objectparameters'] = base64_encode($post['objectparameters']);
 	$new_object[] = array("objecttype"=>$post['objecttype'], "objectname"=>$post['objectname'], "objectparameters"=>$post['objectparameters']);
 	
 	if(empty($objects)) {
@@ -192,8 +193,11 @@ function syslogng_build_default_objects($settings) {
 		}
 	}
 	$default_objects[0]['objectparameters'] .= "); };";
+	$default_objects[0]['objectparameters'] = base64_encode($default_objects[0]['objectparameters']);
 	$default_objects[1] = array("objecttype"=>"destination", "objectname"=>"_DEFAULT", "objectparameters"=>"{ file(\"$default_logdir/$default_logfile\"); };");
+	$default_objects[1]['objectparameters'] = base64_encode($default_objects[1]['objectparameters']);
 	$default_objects[2] = array("objecttype"=>"log", "objectname"=>"_DEFAULT", "objectparameters"=>"{ source(_DEFAULT); destination(_DEFAULT); };");
+	$default_objects[2]['objectparameters'] = base64_encode($default_objects[2]['objectparameters']);
 	
 	return $default_objects;
 }
@@ -231,7 +235,7 @@ function syslogng_get_log_files($objects) {
 	
 	foreach($objects as $object) {
 		if($object['objecttype'] == 'destination') {
-			preg_match("/file\(['\"]([^'\"]*)['\"]/", $object['objectparameters'], $match);
+			preg_match("/file\(['\"]([^'\"]*)['\"]/", base64_decode($object['objectparameters']), $match);
 			if($match) {
 				$log_file = $match[1];
 				array_push($log_files, $log_file);
@@ -249,9 +253,9 @@ function syslogng_build_conf($objects) {
 	
 	foreach($objects as $object) {
 		if($object['objecttype'] == 'log' || $object['objecttype'] == 'options') {
-			$conf .= $object['objecttype'] . " " . $object['objectparameters'] . "\n";
+			$conf .= $object['objecttype'] . " " . base64_decode($object['objectparameters']) . "\n";
 		} else {
-			$conf .= $object['objecttype'] . " " . $object['objectname'] . " " . $object['objectparameters'] . "\n";
+			$conf .= $object['objecttype'] . " " . $object['objectname'] . " " . base64_decode($object['objectparameters']) . "\n";
 		}
 	}
 	

@@ -112,6 +112,7 @@
 			<fieldname>objectparameters</fieldname>
 			<description>Enter the object parameters</description>
 			<type>textarea</type>
+			<encoding>base64</encoding>
 			<cols>65</cols>
 			<rows>5</rows>
 			<required/>
