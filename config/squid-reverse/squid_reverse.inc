@@ -68,7 +68,7 @@ function squid_resync_reverse() {
 	$http_defsite=(empty($settings['reverse_http_defsite'])?$settings['reverse_external_fqdn']:$settings['reverse_http_defsite']);
 	
 	#set HTTPS port and defsite
-	$https_port=(empty($settings['reverse_https_port'])?"80":$settings['reverse_https_port']);
+	$https_port=(empty($settings['reverse_https_port'])?"443":$settings['reverse_https_port']);
 	$https_defsite=(empty($settings['reverse_https_defsite'])?$settings['reverse_external_fqdn']:$settings['reverse_https_defsite']);
 	
 	foreach (explode(",", $ifaces) as $i => $iface) {
