@@ -29,7 +29,13 @@
 require_once('config.inc');
 require_once('util.inc');
 
-$settings = $config['installedpackages']['squidcache']['config'][0];
+$pf_version=substr(trim(file_get_contents("/etc/version")),0,3);
+if ($pf_version > 2.0)
+	define('SQUID_LOCALBASE', '/usr/pbi/squid-' . php_uname("m"));
+else
+  define('SQUID_LOCALBASE','/usr/local');
+
+  $settings = $config['installedpackages']['squidcache']['config'][0];
 // Only check the cache if Squid is actually caching.
 // If there is no cache then quietly do nothing.
 if ($settings['harddisk_cache_system'] != "null"){
@@ -45,7 +51,7 @@ if ($settings['harddisk_cache_system'] != "null"){
 	//	or the drive is 90% full and swap.state is larger than 1GB, 
 	//	kill it and initiate a rotate to write a fresh copy.
 	if (($swapstate_pct > 75) || (($diskusedpct > 90) && ($swapstate_size > 1024*1024*1024))) {
-		mwexec_bg("/bin/rm $swapstate; /usr/local/sbin/squid -k rotate");
+		mwexec_bg("/bin/rm $swapstate; ". SQUID_LOCALBASE . "/squid -k rotate");
 		log_error(gettext(sprintf("Squid swap.state file exceeded size limits. Removing and rotating. File was %d bytes, %d%% of total disk space.", $swapstate_size, $swapstate_pct)));
 	}
 }
