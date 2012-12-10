@@ -51,7 +51,7 @@ if ($settings['harddisk_cache_system'] != "null"){
 	//	or the drive is 90% full and swap.state is larger than 1GB, 
 	//	kill it and initiate a rotate to write a fresh copy.
 	if (($swapstate_pct > 75) || (($diskusedpct > 90) && ($swapstate_size > 1024*1024*1024))) {
-		mwexec_bg("/bin/rm $swapstate; ". SQUID_LOCALBASE . "/squid -k rotate");
+		mwexec_bg("/bin/rm $swapstate; ". SQUID_LOCALBASE . "/sbin/squid -k rotate");
 		log_error(gettext(sprintf("Squid swap.state file exceeded size limits. Removing and rotating. File was %d bytes, %d%% of total disk space.", $swapstate_size, $swapstate_pct)));
 	}
 }
