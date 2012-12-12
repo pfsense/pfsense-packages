@@ -1,0 +1,17 @@
+Before use:
+
+A)install socat on your Pfsense 2.0.1:
+
+setenv PACKAGESITE ftp://ftp-archive.freebsd.org/pub/FreeBSD-Archive/ports/i386/packages-8.1-release/Latest/
+or
+setenv PACKAGESITE ftp://ftp-archive.freebsd.org/pub/FreeBSD-Archive/ports/amd64/packages-8.1-release/Latest/
+
+pkg_add -r socat.tbz
+
+rehash
+
+B)add "stats socket /tmp/haproxy.socket level admin" in your Haproxy "Global Advanced pass thru" settings
+
+C)install .inc and .php files in respectively /usr/local/www/widgets/includes and /usr/local/www/widgets/widgets
+
+D)add widget via pfsense dashboard
