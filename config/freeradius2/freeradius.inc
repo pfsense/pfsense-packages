@@ -390,6 +390,18 @@ if (is_array($arrusers) && !empty($arrusers)) {
 	$varusersusername = $users['varusersusername'];
 	$varuserspassword = $users['varuserspassword'];
 	
+
+	// Check password encryption
+	$varuserspasswordencryption = ($users['varuserspasswordencryption']?$users['varuserspasswordencryption']:'Cleartext-Password');
+		switch ($varuserspasswordencryption) {
+			case "MD5-Password":
+				$varuserspassword = md5($varuserspassword);
+				break;
+			default:
+				$varuserspassword = $users['varuserspassword'];
+		}
+	
+		
 	$varusersmotpinitsecret = $users['varusersmotpinitsecret'];
 	$varusersmotppin = $users['varusersmotppin'];
 	$varusersmotpoffset = ($users['varusersmotpoffset']?$users['varusersmotpoffset']:'0');
@@ -467,7 +479,7 @@ if (is_array($arrusers) && !empty($arrusers)) {
 			}
 			else {
 				// Add the user attributes to each user.
-				$varuserscheckitem = '"' . $varusersusername . '"' . " Cleartext-Password := " . '"' . $varuserspassword .'"';
+				$varuserscheckitem = '"' . $varusersusername . '"' . " $varuserspasswordencryption := " . '"' . $varuserspassword .'"';
 			}
 		} // end of check if otp is enabled
 	
