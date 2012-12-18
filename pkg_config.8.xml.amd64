@@ -471,7 +471,8 @@
 			<port>security/snort</port>
 			<ports_after>security/barnyard2</ports_after>
 		</build_pbi>
-		<build_options>WITH_THREADS=yes;WITH_IPV6=true;WITH_MPLS=true;WITH_GRE=true;WITHOUT_TARGETBASED=true;WITH_DECODERPRE=true;WITH_ZLIB=true;WITH_NORMALIZER=true;WITH_REACT=true;WITH_PERFPROFILE=true;WITH_FLEXRESP3=true;WITH_MYSQL=true;WITHOUT_ODBC=true;WITHOUT_POSTGRESQL=true;WITHOUT_PRELUDE=true;WITH_SNORTSAM=true;NOPORTDOCS=true</build_options>
+		<!-- Use both styles for now, since our snort port isn't yet optionsng, but barnyard2 and others are. -->
+		<build_options>barnyard2_UNSET=ODBC PGSQL PRELUDE;barnyard2_SET=GRE IPV6 MPLS MYSQL;snort_UNSET=TARGETBASED;snort_SET=DECODERPRE FLEXRESP3 GRE IPV6 MPLS NORMALIZER PERFPROFILE REACT SNORTSAM ZLIB;perl_SET=THREADS;WITH_THREADS=yes;WITH_IPV6=true;WITH_MPLS=true;WITH_GRE=true;WITHOUT_TARGETBASED=true;WITH_DECODERPRE=true;WITH_ZLIB=true;WITH_NORMALIZER=true;WITH_REACT=true;WITH_PERFPROFILE=true;WITH_FLEXRESP3=true;WITH_MYSQL=true;WITHOUT_ODBC=true;WITHOUT_POSTGRESQL=true;WITHOUT_PRELUDE=true;WITH_SNORTSAM=true;NOPORTDOCS=true</build_options>
 		<config_file>http://www.pfsense.com/packages/config/snort/snort.xml</config_file>
 		<version>2.9.2.3 pkg v. 2.5.2</version>
 		<required_version>2.0</required_version>
@@ -590,7 +591,7 @@
 		<required_version>2.0</required_version>
 		<configurationfile>dansguardian.xml</configurationfile>
 		<build_port_path>/usr/ports/www/dansguardian-devel</build_port_path>
-		<build_options>WITHOUT_APACHE=true;WITH_TRICKLE=true;WITH_CLAMD=true;WITH_ICAP=true;WITH_NTLM=true;WITH_SSL=true</build_options>
+		<build_options>dansguardian_UNSET=APACHE;dansguardian_SET=TRICKLE CLAMD ICAP NTLM SSL</build_options>
 		<!-- NOTE: Distfile must be fetched manually from http://dansguardian.org/downloads/2/Alpha/dansguardian-2.12.0.0.tar.gz -->
 	</package>
 	<package>
@@ -710,7 +711,7 @@
 		<required_version>2.0</required_version>
 		<configurationfile>sarg.xml</configurationfile>
 		<build_port_path>/usr/ports/www/sarg</build_port_path>
-		<build_options>WITHOUT_GD=false;WITHOUT_PHP=true</build_options>
+		<build_options>sarg_UNSET=GD PHP</build_options>
 		<after_install_info>Please visit sarg settings on Status Menu to configure sarg.</after_install_info>
 	</package>
 	<package>
@@ -1096,7 +1097,7 @@
 			<ports_before>security/krb5</ports_before>
 			<port>net/freeradius2</port>
 		</build_pbi>
-		<build_options>WITH_KERBEROS=yes;WITH_MYSQL=yes;WITH_PGSQL=yes;WITH_PERL=yes;WITH_PYTHON=yes;WITH_LDAP=yes</build_options>
+		<build_options>freeradius_SET=KERBEROS MYSQL PGSQL PERL PYTHON LDAP</build_options>
 	</package>
 	<package>
 		<name>bandwidthd</name>
@@ -1185,6 +1186,7 @@
 		<config_file>http://www.pfsense.com/packages/config/mtr-nox11.xml</config_file>
 		<configurationfile>mtr-nox11.xml</configurationfile>
 		<build_port_path>/usr/ports/net/mtr</build_port_path>
+		<build_options>mtr_UNSET=X11</build_options>
 	</package>
 	<package>
 		<name>squid</name>
@@ -1252,7 +1254,7 @@
 		<config_file>http://www.pfsense.org/packages/config/lcdproc/lcdproc.xml</config_file>
 		<configurationfile>lcdproc.xml</configurationfile>
 		<build_port_path>/usr/ports/sysutils/lcdproc</build_port_path>
-		<build_options>WITH_USB=true</build_options>
+		<build_options>lcdproc_SET=USB</build_options>
 	</package>
 	<package>
 		<name>LCDproc-dev</name>
@@ -1314,7 +1316,8 @@
 			<ports_before>databases/db41 security/cyrus-sasl2</ports_before>
 			<port>www/squidguard</port>
 		</build_pbi>
-		<build_options>WITH_SQUID_KERB_AUTH=true;WITH_SQUID_LDAP_AUTH=true;WITH_SQUID_NIS_AUTH=true;WITH_SQUID_SASL_AUTH=true;WITH_SQUID_DELAY_POOLS=true;WITH_SQUID_SNMP=true;WITH_SQUID_CARP=true;WITH_SQUID_SSL=true;WITHOUT_SQUID_PINGER=true;WITHOUT_SQUID_DNS_HELPER=true;WITH_SQUID_HTCP=true;WITH_SQUID_VIA_DB=true;WITH_SQUID_CACHE_DIGESTS=true;WITH_SQUID_WCCP=true;WITHOUT_SQUID_WCCPV2=true;WITHOUT_SQUID_STRICT_HTTP=true;WITH_SQUID_IDENT=true;WITH_SQUID_REFERER_LOG=true;WITHOUT_SQUID_USERAGENT_LOG=true;WITH_SQUID_ARP_ACL=true;WITH_SQUID_PF=true;WITHOUT_SQUID_IPFILTER=true;WITH_SQUID_FOLLOW_XFF=true;WITH_SQUID_AUFS=true;WITH_SQUID_COSS=true;WITH_SQUID_KQUEUE=true;WITH_SQUID_LARGEFILE=true;WITHOUT_SQUID_STACKTRACES=true;WITH_SAMPLE_BL=true;WITH_LDAP=true;WITH_SASL=true;WITH_FETCH=true</build_options>
+		<!-- Squid ports have not yet been converted to optionsng, so we use both styles to be certain. -->
+		<build_options>WITH_SQUID_KERB_AUTH=true;WITH_SQUID_LDAP_AUTH=true;WITH_SQUID_NIS_AUTH=true;WITH_SQUID_SASL_AUTH=true;WITH_SQUID_DELAY_POOLS=true;WITH_SQUID_SNMP=true;WITH_SQUID_CARP=true;WITH_SQUID_SSL=true;WITHOUT_SQUID_PINGER=true;WITHOUT_SQUID_DNS_HELPER=true;WITH_SQUID_HTCP=true;WITH_SQUID_VIA_DB=true;WITH_SQUID_CACHE_DIGESTS=true;WITH_SQUID_WCCP=true;WITHOUT_SQUID_WCCPV2=true;WITHOUT_SQUID_STRICT_HTTP=true;WITH_SQUID_IDENT=true;WITH_SQUID_REFERER_LOG=true;WITHOUT_SQUID_USERAGENT_LOG=true;WITH_SQUID_ARP_ACL=true;WITH_SQUID_PF=true;WITHOUT_SQUID_IPFILTER=true;WITH_SQUID_FOLLOW_XFF=true;WITH_SQUID_AUFS=true;WITH_SQUID_COSS=true;WITH_SQUID_KQUEUE=true;WITH_SQUID_LARGEFILE=true;WITHOUT_SQUID_STACKTRACES=true;WITH_SAMPLE_BL=true;WITH_LDAP=true;WITH_SASL=true;WITH_FETCH=true;OPTIONS_SET=FETCH LDAP;squidGuard_SET=SAMPLE_BL SASL;squid_UNSET=SQUID_DNS_HELPER SQUID_IPFILTER SQUID_PINGER SQUID_STACKTRACES SQUID_STRICT_HTTP SQUID_USERAGENT_LOG SQUID_WCCPV2;squid_SET=SQUID_ARP_ACL SQUID_AUFS SQUID_CACHE_DIGESTS SQUID_CARP SQUID_COSS SQUID_DELAY_POOLS SQUID_FOLLOW_XFF SQUID_HTCP SQUID_IDENT SQUID_KERB_AUTH SQUID_KQUEUE SQUID_LARGEFILE SQUID_LDAP_AUTH SQUID_NIS_AUTH SQUID_PF SQUID_REFERER_LOG SQUID_SASL_AUTH SQUID_SNMP SQUID_SSL SQUID_VIA_DB SQUID_WCCP</build_options>
 		<config_file>http://www.pfsense.org/packages/config/squidGuard/squidguard.xml</config_file>
 		<configurationfile>squidguard.xml</configurationfile>
 	</package>
@@ -1528,7 +1531,7 @@
 			<ports_before>dns/ldns textproc/expat2 devel/libevent2</ports_before>
 			<port>dns/unbound</port>
 		</build_pbi>
-		<build_options>WITH_LIBEVENT=true;WITH_THREADS=true;WITHOUT_GOST=true;WITHOUT_MAN=true</build_options>
+		<build_options>unbound_UNSET=GOST;unbound_SET=LIBEVENT THREADS</build_options>
 		<logging>
 			<facilityname>unbound</facilityname>
 			<logfilename>unbound.log</logfilename>
@@ -1579,7 +1582,7 @@
 			<ports_before>net-mgmt/nagios-plugins</ports_before>
 			<port>net-mgmt/nrpe2</port>
 		</build_pbi>
-		<build_options>WITH_SSL=true;WITHOUT_ARGS=true</build_options>
+		<build_options>nrpe2_UNSET=SSL;nrpe2_SET=ARGS</build_options>
 		<config_file>http://www.pfsense.com/packages/config/nrpe2/nrpe2.xml</config_file>
 		<version>2.12_3 v2.1</version>
 		<status>Beta</status>
