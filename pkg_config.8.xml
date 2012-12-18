@@ -218,7 +218,7 @@
 			<port>www/apache22-worker-mpm</port>
 			<ports_after>www/mod_security www/mod_memcache</ports_after>
 		</build_pbi>
-		<build_options>WITH_MPM=worker WITH_THREADS=yes WITHOUT_MYSQL=yes WITHOUT_PGSQL=yes WITH_SQLITE=yes WITH_IPV6=yes WITHOUT_BDB=yes WITH_AUTH_BASIC=yes WITH_AUTH_DIGEST=yes WITH_AUTHN_FILE=yes WITHOUT_AUTHN_DBD=yes WITH_AUTHN_DBM=yes WITH_AUTHN_ANON=yes WITH_AUTHN_DEFAULT=yes WITH_AUTHN_ALIAS=yes WITH_AUTHZ_HOST=yes WITH_AUTHZ_GROUPFILE=yes WITH_AUTHZ_USER=yes WITH_AUTHZ_DBM=yes WITH_AUTHZ_OWNER=yes WITH_AUTHZ_DEFAULT=yes WITH_CACHE=yes WITH_DISK_CACHE=yes WITH_FILE_CACHE=yes WITH_MEM_CACHE=yes WITH_DAV=yes WITH_DAV_FS=yes WITHOUT_BUCKETEER=yes WITHOUT_CASE_FILTER=yes WITHOUT_CASE_FILTER_IN=yes WITHOUT_EXT_FILTER=yes WITHOUT_LOG_FORENSIC=yes WITHOUT_OPTIONAL_HOOK_EXPORT=yes WITHOUT_OPTIONAL_HOOK_IMPORT=yes WITHOUT_OPTIONAL_FN_IMPORT=yes WITHOUT_OPTIONAL_FN_EXPORT=yes WITHOUT_LDAP=yes WITHOUT_AUTHNZ_LDAP=yes WITH_ACTIONS=yes WITH_ALIAS=yes WITH_ASIS=yes WITH_AUTOINDEX=yes WITH_CERN_META=yes WITH_CGI=yes WITH_CHARSET_LITE=yes WITHOUT_DBD=yes WITH_DEFLATE=yes WITH_DIR=yes WITH_DUMPIO=yes WITH_ENV=yes WITH_EXPIRES=yes WITH_HEADERS=yes WITH_IMAGEMAP=yes WITH_INCLUDE=yes WITH_INFO=yes WITH_LOG_CONFIG=yes WITH_LOGIO=yes WITH_MIME=yes WITH_MIME_MAGIC=yes WITH_NEGOTIATION=yes WITH_REWRITE=yes WITH_SETENVIF=yes WITH_SPELING=yes WITH_STATUS=yes WITH_UNIQUE_ID=yes WITH_USERDIR=yes WITH_USERTRACK=yes WITH_VHOST_ALIAS=yes WITH_FILTER=yes WITHOUT_SUBSTITUTE=yes WITH_VERSION=yes WITH_PROXY=yes WITH_PROXY_CONNECT=yes WITH_PROXY_FTP=yes WITH_PROXY_HTTP=yes WITH_PROXY_AJP=yes WITH_PROXY_BALANCER=yes WITH_PROXY_SCGI=yes WITH_SSL=yes WITHOUT_SUEXEC=yes WITHOUT_SUEXEC_RSRCLIMIT=yes WITH_REQTIMEOUT=yes WITHOUT_CGID=yes</build_options>
+		<build_options>WITH_MPM=worker;WITH_THREADS=yes;WITHOUT_MYSQL=yes;WITHOUT_PGSQL=yes;WITH_SQLITE=yes;WITH_IPV6=yes;WITHOUT_BDB=yes;WITH_AUTH_BASIC=yes;WITH_AUTH_DIGEST=yes;WITH_AUTHN_FILE=yes;WITHOUT_AUTHN_DBD=yes;WITH_AUTHN_DBM=yes;WITH_AUTHN_ANON=yes;WITH_AUTHN_DEFAULT=yes;WITH_AUTHN_ALIAS=yes;WITH_AUTHZ_HOST=yes;WITH_AUTHZ_GROUPFILE=yes;WITH_AUTHZ_USER=yes;WITH_AUTHZ_DBM=yes;WITH_AUTHZ_OWNER=yes;WITH_AUTHZ_DEFAULT=yes;WITH_CACHE=yes;WITH_DISK_CACHE=yes;WITH_FILE_CACHE=yes;WITH_MEM_CACHE=yes;WITH_DAV=yes;WITH_DAV_FS=yes;WITHOUT_BUCKETEER=yes;WITHOUT_CASE_FILTER=yes;WITHOUT_CASE_FILTER_IN=yes;WITHOUT_EXT_FILTER=yes;WITHOUT_LOG_FORENSIC=yes;WITHOUT_OPTIONAL_HOOK_EXPORT=yes;WITHOUT_OPTIONAL_HOOK_IMPORT=yes;WITHOUT_OPTIONAL_FN_IMPORT=yes;WITHOUT_OPTIONAL_FN_EXPORT=yes;WITHOUT_LDAP=yes;WITHOUT_AUTHNZ_LDAP=yes;WITH_ACTIONS=yes;WITH_ALIAS=yes;WITH_ASIS=yes;WITH_AUTOINDEX=yes;WITH_CERN_META=yes;WITH_CGI=yes;WITH_CHARSET_LITE=yes;WITHOUT_DBD=yes;WITH_DEFLATE=yes;WITH_DIR=yes;WITH_DUMPIO=yes;WITH_ENV=yes;WITH_EXPIRES=yes;WITH_HEADERS=yes;WITH_IMAGEMAP=yes;WITH_INCLUDE=yes;WITH_INFO=yes;WITH_LOG_CONFIG=yes;WITH_LOGIO=yes;WITH_MIME=yes;WITH_MIME_MAGIC=yes;WITH_NEGOTIATION=yes;WITH_REWRITE=yes;WITH_SETENVIF=yes;WITH_SPELING=yes;WITH_STATUS=yes;WITH_UNIQUE_ID=yes;WITH_USERDIR=yes;WITH_USERTRACK=yes;WITH_VHOST_ALIAS=yes;WITH_FILTER=yes;WITHOUT_SUBSTITUTE=yes;WITH_VERSION=yes;WITH_PROXY=yes;WITH_PROXY_CONNECT=yes;WITH_PROXY_FTP=yes;WITH_PROXY_HTTP=yes;WITH_PROXY_AJP=yes;WITH_PROXY_BALANCER=yes;WITH_PROXY_SCGI=yes;WITH_SSL=yes;WITHOUT_SUEXEC=yes;WITHOUT_SUEXEC_RSRCLIMIT=yes;WITH_REQTIMEOUT=yes;WITHOUT_CGID=yes</build_options>
 		<after_install_info>Please visit the ProxyServer settings tab and set the service up so that it may be started.</after_install_info>
 	</package>
 	<package>
@@ -264,7 +264,7 @@
 			<port>www/apache22-worker-mpm</port>
 			<ports_after>www/mod_security www/mod_memcache</ports_after>
 		</build_pbi>
-		<build_options>WITH_MPM=worker WITH_THREADS=yes WITHOUT_MYSQL=yes WITHOUT_PGSQL=yes WITH_SQLITE=yes WITH_IPV6=yes WITHOUT_BDB=yes WITH_AUTH_BASIC=yes WITH_AUTH_DIGEST=yes WITH_AUTHN_FILE=yes WITHOUT_AUTHN_DBD=yes WITH_AUTHN_DBM=yes WITH_AUTHN_ANON=yes WITH_AUTHN_DEFAULT=yes WITH_AUTHN_ALIAS=yes WITH_AUTHZ_HOST=yes WITH_AUTHZ_GROUPFILE=yes WITH_AUTHZ_USER=yes WITH_AUTHZ_DBM=yes WITH_AUTHZ_OWNER=yes WITH_AUTHZ_DEFAULT=yes WITH_CACHE=yes WITH_DISK_CACHE=yes WITH_FILE_CACHE=yes WITH_MEM_CACHE=yes WITH_DAV=yes WITH_DAV_FS=yes WITHOUT_BUCKETEER=yes WITHOUT_CASE_FILTER=yes WITHOUT_CASE_FILTER_IN=yes WITHOUT_EXT_FILTER=yes WITHOUT_LOG_FORENSIC=yes WITHOUT_OPTIONAL_HOOK_EXPORT=yes WITHOUT_OPTIONAL_HOOK_IMPORT=yes WITHOUT_OPTIONAL_FN_IMPORT=yes WITHOUT_OPTIONAL_FN_EXPORT=yes WITHOUT_LDAP=yes WITHOUT_AUTHNZ_LDAP=yes WITH_ACTIONS=yes WITH_ALIAS=yes WITH_ASIS=yes WITH_AUTOINDEX=yes WITH_CERN_META=yes WITH_CGI=yes WITH_CHARSET_LITE=yes WITHOUT_DBD=yes WITH_DEFLATE=yes WITH_DIR=yes WITH_DUMPIO=yes WITH_ENV=yes WITH_EXPIRES=yes WITH_HEADERS=yes WITH_IMAGEMAP=yes WITH_INCLUDE=yes WITH_INFO=yes WITH_LOG_CONFIG=yes WITH_LOGIO=yes WITH_MIME=yes WITH_MIME_MAGIC=yes WITH_NEGOTIATION=yes WITH_REWRITE=yes WITH_SETENVIF=yes WITH_SPELING=yes WITH_STATUS=yes WITH_UNIQUE_ID=yes WITH_USERDIR=yes WITH_USERTRACK=yes WITH_VHOST_ALIAS=yes WITH_FILTER=yes WITHOUT_SUBSTITUTE=yes WITH_VERSION=yes WITH_PROXY=yes WITH_PROXY_CONNECT=yes WITH_PROXY_FTP=yes WITH_PROXY_HTTP=yes WITH_PROXY_AJP=yes WITH_PROXY_BALANCER=yes WITH_PROXY_SCGI=yes WITH_SSL=yes WITHOUT_SUEXEC=yes WITHOUT_SUEXEC_RSRCLIMIT=yes WITH_REQTIMEOUT=yes WITHOUT_CGID=yes</build_options>
+		<build_options>WITH_MPM=worker;WITH_THREADS=yes;WITHOUT_MYSQL=yes;WITHOUT_PGSQL=yes;WITH_SQLITE=yes;WITH_IPV6=yes;WITHOUT_BDB=yes;WITH_AUTH_BASIC=yes;WITH_AUTH_DIGEST=yes;WITH_AUTHN_FILE=yes;WITHOUT_AUTHN_DBD=yes;WITH_AUTHN_DBM=yes;WITH_AUTHN_ANON=yes;WITH_AUTHN_DEFAULT=yes;WITH_AUTHN_ALIAS=yes;WITH_AUTHZ_HOST=yes;WITH_AUTHZ_GROUPFILE=yes;WITH_AUTHZ_USER=yes;WITH_AUTHZ_DBM=yes;WITH_AUTHZ_OWNER=yes;WITH_AUTHZ_DEFAULT=yes;WITH_CACHE=yes;WITH_DISK_CACHE=yes;WITH_FILE_CACHE=yes;WITH_MEM_CACHE=yes;WITH_DAV=yes;WITH_DAV_FS=yes;WITHOUT_BUCKETEER=yes;WITHOUT_CASE_FILTER=yes;WITHOUT_CASE_FILTER_IN=yes;WITHOUT_EXT_FILTER=yes;WITHOUT_LOG_FORENSIC=yes;WITHOUT_OPTIONAL_HOOK_EXPORT=yes;WITHOUT_OPTIONAL_HOOK_IMPORT=yes;WITHOUT_OPTIONAL_FN_IMPORT=yes;WITHOUT_OPTIONAL_FN_EXPORT=yes;WITHOUT_LDAP=yes;WITHOUT_AUTHNZ_LDAP=yes;WITH_ACTIONS=yes;WITH_ALIAS=yes;WITH_ASIS=yes;WITH_AUTOINDEX=yes;WITH_CERN_META=yes;WITH_CGI=yes;WITH_CHARSET_LITE=yes;WITHOUT_DBD=yes;WITH_DEFLATE=yes;WITH_DIR=yes;WITH_DUMPIO=yes;WITH_ENV=yes;WITH_EXPIRES=yes;WITH_HEADERS=yes;WITH_IMAGEMAP=yes;WITH_INCLUDE=yes;WITH_INFO=yes;WITH_LOG_CONFIG=yes;WITH_LOGIO=yes;WITH_MIME=yes;WITH_MIME_MAGIC=yes;WITH_NEGOTIATION=yes;WITH_REWRITE=yes;WITH_SETENVIF=yes;WITH_SPELING=yes;WITH_STATUS=yes;WITH_UNIQUE_ID=yes;WITH_USERDIR=yes;WITH_USERTRACK=yes;WITH_VHOST_ALIAS=yes;WITH_FILTER=yes;WITHOUT_SUBSTITUTE=yes;WITH_VERSION=yes;WITH_PROXY=yes;WITH_PROXY_CONNECT=yes;WITH_PROXY_FTP=yes;WITH_PROXY_HTTP=yes;WITH_PROXY_AJP=yes;WITH_PROXY_BALANCER=yes;WITH_PROXY_SCGI=yes;WITH_SSL=yes;WITHOUT_SUEXEC=yes;WITHOUT_SUEXEC_RSRCLIMIT=yes;WITH_REQTIMEOUT=yes;WITHOUT_CGID=yes</build_options>
 		<after_install_info>Please visit the ProxyServer settings tab and set the service up so that it may be started.</after_install_info>
 	</package>
 	<package>
@@ -335,7 +335,7 @@
 			<ports_before>databases/gdbm net/GeoIP x11-fonts/font-util x11-fonts/webfonts graphics/graphviz</ports_before>
 			<port>net/ntop</port>
 		</build_pbi>
-		<build_options>WITH_PCAP_PORT=true WITH_XMLDUMP=true WITHOUT_JUMBO_FRAMES=true WITH_MAKO=true WITHOUT_DEJAVU=true WITH_JSON=true WITH_MMAP=true WITHOUT_PERL_MODULE=true WITHOUT_PYTHON_MODULE=true WITHOUT_RUBY_MODULE=true WITHOUT_EXAMPLES=true WITHOUT_FPECTL=true WITH_IPV6=true WITH_NLS=true WITHOUT_PTH=true WITH_PYMALLOC=true WITHOUT_SEM=true WITH_THREADS=true WITHOUT_UCS2=true WITH_UCS4=true WITH_FONTCONFIG=true WITH_ICONV=true WITHOUT_XPM=true WITHOUT_DAG=true WITHOUT_DIGCOLA=true WITHOUT_IPSEPCOLA=true WITHOUT_PANGOCAIRO=true WITHOUT_GTK=true WITHOUT_XCB=true</build_options>
+		<build_options>WITH_PCAP_PORT=true;WITH_XMLDUMP=true;WITHOUT_JUMBO_FRAMES=true;WITH_MAKO=true;WITHOUT_DEJAVU=true;WITH_JSON=true;WITH_MMAP=true;WITHOUT_PERL_MODULE=true;WITHOUT_PYTHON_MODULE=true;WITHOUT_RUBY_MODULE=true;WITHOUT_EXAMPLES=true;WITHOUT_FPECTL=true;WITH_IPV6=true;WITH_NLS=true;WITHOUT_PTH=true;WITH_PYMALLOC=true;WITHOUT_SEM=true;WITH_THREADS=true;WITHOUT_UCS2=true;WITH_UCS4=true;WITH_FONTCONFIG=true;WITH_ICONV=true;WITHOUT_XPM=true;WITHOUT_DAG=true;WITHOUT_DIGCOLA=true;WITHOUT_IPSEPCOLA=true;WITHOUT_PANGOCAIRO=true;WITHOUT_GTK=true;WITHOUT_XCB=true</build_options>
 		<version>4.1.0_3 v2.3</version>
 		<status>BETA</status>
 		<required_version>2.0</required_version>
@@ -484,7 +484,7 @@
 			<port>security/snort</port>
 			<ports_after>security/barnyard2</ports_after>
 		</build_pbi>
-		<build_options>WITH_THREADS=yes WITH_IPV6=true WITH_MPLS=true WITH_GRE=true WITHOUT_TARGETBASED=true WITH_DECODERPRE=true WITH_ZLIB=true WITH_NORMALIZER=true WITH_REACT=true WITH_PERFPROFILE=true WITH_FLEXRESP3=true WITH_MYSQL=true WITHOUT_ODBC=true WITHOUT_POSTGRESQL=true WITHOUT_PRELUDE=true WITH_SNORTSAM=true NOPORTDOCS=true</build_options>
+		<build_options>WITH_THREADS=yes;WITH_IPV6=true;WITH_MPLS=true;WITH_GRE=true;WITHOUT_TARGETBASED=true;WITH_DECODERPRE=true;WITH_ZLIB=true;WITH_NORMALIZER=true;WITH_REACT=true;WITH_PERFPROFILE=true;WITH_FLEXRESP3=true;WITH_MYSQL=true;WITHOUT_ODBC=true;WITHOUT_POSTGRESQL=true;WITHOUT_PRELUDE=true;WITH_SNORTSAM=true;NOPORTDOCS=true</build_options>
 		<config_file>http://www.pfsense.com/packages/config/snort/snort.xml</config_file>
 		<version>2.9.2.3 pkg v. 2.5.2</version>
 		<required_version>2.0</required_version>
@@ -520,7 +520,7 @@
 			<port>security/snort</port>
 			<ports_after>security/barnyard2</ports_after>
 		</build_pbi>
-		<build_options>WITH_THREADS=yes WITH_IPV6=true WITH_MPLS=true WITH_GRE=true WITHOUT_TARGETBASED=true WITH_DECODERPRE=true WITH_ZLIB=true WITH_NORMALIZER=true WITH_REACT=true WITH_PERFPROFILE=true WITH_FLEXRESP3=true WITH_MYSQL=true WITHOUT_ODBC=true WITHOUT_POSTGRESQL=true WITHOUT_PRELUDE=true WITH_SNORTSAM=true NOPORTDOCS=true</build_options>
+		<build_options>WITH_THREADS=yes;WITH_IPV6=true;WITH_MPLS=true;WITH_GRE=true;WITHOUT_TARGETBASED=true;WITH_DECODERPRE=true;WITH_ZLIB=true;WITH_NORMALIZER=true;WITH_REACT=true;WITH_PERFPROFILE=true;WITH_FLEXRESP3=true;WITH_MYSQL=true;WITHOUT_ODBC=true;WITHOUT_POSTGRESQL=true;WITHOUT_PRELUDE=true;WITH_SNORTSAM=true;NOPORTDOCS=true</build_options>
 		<config_file>http://www.pfsense.com/packages/config/snort-dev/snort.xml</config_file>
 		<version>2.9.2.3 pkg v. 3.0</version>
 		<required_version>2.0</required_version>
@@ -580,7 +580,7 @@
 		<required_version>2.0</required_version>
 		<configurationfile>postfix.xml</configurationfile>
 		<build_port_path>/usr/ports/mail/postfix</build_port_path>
-		<build_options>WITH_PCRE=true WITH_SPF=true WITH_SASL2=true WITH_TLS=true</build_options>
+		<build_options>WITH_PCRE=true;WITH_SPF=true;WITH_SASL2=true;WITH_TLS=true</build_options>
 	</package>
 	<package>
 		<name>Dansguardian</name>
@@ -603,7 +603,7 @@
 		<required_version>2.0</required_version>
 		<configurationfile>dansguardian.xml</configurationfile>
 		<build_port_path>/usr/ports/www/dansguardian-devel</build_port_path>
-		<build_options>WITHOUT_APACHE=true WITH_TRICKLE=true WITH_CLAMD=true WITH_ICAP=true WITH_NTLM=true WITH_SSL=true</build_options>
+		<build_options>WITHOUT_APACHE=true;WITH_TRICKLE=true;WITH_CLAMD=true;WITH_ICAP=true;WITH_NTLM=true;WITH_SSL=true</build_options>
 		<!-- NOTE: Distfile must be fetched manually from http://dansguardian.org/downloads/2/Alpha/dansguardian-2.12.0.0.tar.gz -->
 	</package>
 	<package>
@@ -698,7 +698,7 @@
 			<ports_before>lang/perl5.12</ports_before>
 			<port>www/lightsquid</port>
 		</build_pbi>
-		<build_options>WITHOUT_DEBUGGING=true WITHOUT_GDBM=true WITHOUT_PERL_MALLOC=true WITH_PERL_64BITINT=true WITHOUT_THREADS=true WITHOUT_MULTIPLICITY=true WITHOUT_SUIDPERL=true WITHOUT_SITECUSTOMIZE=true WITH_USE_PERL=true</build_options>
+		<build_options>WITHOUT_DEBUGGING=true;WITHOUT_GDBM=true;WITHOUT_PERL_MALLOC=true;WITH_PERL_64BITINT=true;WITHOUT_THREADS=true;WITHOUT_MULTIPLICITY=true;WITHOUT_SUIDPERL=true;WITHOUT_SITECUSTOMIZE=true;WITH_USE_PERL=true</build_options>
 		<status>RC1</status>
 		<required_version>2.0</required_version>
 		<config_file>http://www.pfsense.com/packages/config/lightsquid/lightsquid.xml</config_file>
@@ -723,7 +723,7 @@
 		<required_version>2.0</required_version>
 		<configurationfile>sarg.xml</configurationfile>
 		<build_port_path>/usr/ports/www/sarg</build_port_path>
-		<build_options>WITHOUT_GD=false WITHOUT_PHP=true</build_options>
+		<build_options>WITHOUT_GD=false;WITHOUT_PHP=true</build_options>
 		<after_install_info>Please visit sarg settings on Status Menu to configure sarg.</after_install_info>
 	</package>
 	<package>
@@ -841,7 +841,7 @@
 			<ports_before>sysutils/ucspi-tcp sysutils/daemontools</ports_before>
 			<port>dns/djbdns</port>
 		</build_pbi>
-		<build_options>WITH_IPV6=true WITH_SRV=true WITHOUT_DUMPCACHE=true WITHOUT_IGNOREIP=true WITHOUT_JUMBO=true WITHOUT_MAN=true WITHOUT_PERSISTENT_MMAP=true</build_options>
+		<build_options>WITH_IPV6=true;WITH_SRV=true;WITHOUT_DUMPCACHE=true;WITHOUT_IGNOREIP=true;WITHOUT_JUMBO=true;WITHOUT_MAN=true;WITHOUT_PERSISTENT_MMAP=true</build_options>
 		<supportedbybsdperimeter>YES</supportedbybsdperimeter>
 	</package>
 	<package>
@@ -1109,7 +1109,7 @@
 			<ports_before>security/krb5</ports_before>
 			<port>net/freeradius2</port>
 		</build_pbi>
-		<build_options>WITH_KERBEROS=yes WITH_MYSQL=yes WITH_PGSQL=yes WITH_PERL=yes WITH_PYTHON=yes WITH_LDAP=yes</build_options>
+		<build_options>WITH_KERBEROS=yes;WITH_MYSQL=yes;WITH_PGSQL=yes;WITH_PERL=yes;WITH_PYTHON=yes;WITH_LDAP=yes</build_options>
 	</package>
 	<package>
 		<name>bandwidthd</name>
@@ -1133,7 +1133,7 @@
 			<ports_before>net/libpcap databases/postgresql91-client graphics/gd</ports_before>
 			<port>net-mgmt/bandwidthd</port>
 		</build_pbi>
-		<build_options>WITH_NLS=true WITHOUT_PAM=true WITHOUT_LDAP=true WITHOUT_MIT_KRB5=true WITHOUT_HEIMDAL_KRB5=true WITHOUT_OPTIMIZED_CFLAGS=true WITHOUT_XML=true WITHOUT_TZDATA=true WITHOUT_DEBUG=true WITHOUT_GSSAPI=true WITHOUT_ICU=true WITH_INTDATE=true</build_options>
+		<build_options>WITH_NLS=true;WITHOUT_PAM=true;WITHOUT_LDAP=true;WITHOUT_MIT_KRB5=true;WITHOUT_HEIMDAL_KRB5=true;WITHOUT_OPTIMIZED_CFLAGS=true;WITHOUT_XML=true;WITHOUT_TZDATA=true;WITHOUT_DEBUG=true;WITHOUT_GSSAPI=true;WITHOUT_ICU=true;WITH_INTDATE=true</build_options>
 	</package>
 	<package>
 		<name>stunnel</name>
@@ -1150,7 +1150,7 @@
 		<config_file>http://www.pfsense.com/packages/config/stunnel.xml</config_file>
 		<configurationfile>stunnel.xml</configurationfile>
 		<build_port_path>/usr/ports/security/stunnel</build_port_path>
-		<build_options>WITHOUT_FORK=true WITH_PTHREAD=true WITHOUT_UCONTEXT=true WITHOUT_IPV6=true WITH_LIBWRAP=true WITHOUT_SSL_PORT=true</build_options>
+		<build_options>WITHOUT_FORK=true;WITH_PTHREAD=true;WITHOUT_UCONTEXT=true;WITHOUT_IPV6=true;WITH_LIBWRAP=true;WITHOUT_SSL_PORT=true</build_options>
 	</package>
 	<package>
 		<name>iperf</name>
@@ -1221,7 +1221,7 @@
 			<port>www/squid</port>
 			<ports_after>www/squid_radius_auth</ports_after>
 		</build_pbi>
-		<build_options>WITH_SQUID_KERB_AUTH=true WITH_SQUID_LDAP_AUTH=true WITH_SQUID_NIS_AUTH=true WITH_SQUID_SASL_AUTH=true WITH_SQUID_DELAY_POOLS=true WITH_SQUID_SNMP=true WITH_SQUID_CARP=true WITH_SQUID_SSL=true WITHOUT_SQUID_PINGER=true WITHOUT_SQUID_DNS_HELPER=true WITH_SQUID_HTCP=true WITH_SQUID_VIA_DB=true WITH_SQUID_CACHE_DIGESTS=true WITH_SQUID_WCCP=true WITHOUT_SQUID_WCCPV2=true WITHOUT_SQUID_STRICT_HTTP=true WITH_SQUID_IDENT=true WITH_SQUID_REFERER_LOG=true WITHOUT_SQUID_USERAGENT_LOG=true WITH_SQUID_ARP_ACL=true WITH_SQUID_PF=true WITHOUT_SQUID_IPFILTER=true WITH_SQUID_FOLLOW_XFF=true WITH_SQUID_AUFS=true WITH_SQUID_COSS=true WITH_SQUID_KQUEUE=true WITH_SQUID_LARGEFILE=true WITHOUT_SQUID_STACKTRACES=true SQUID_UID=proxy SQUID_GID=proxy</build_options>
+		<build_options>WITH_SQUID_KERB_AUTH=true;WITH_SQUID_LDAP_AUTH=true;WITH_SQUID_NIS_AUTH=true;WITH_SQUID_SASL_AUTH=true;WITH_SQUID_DELAY_POOLS=true;WITH_SQUID_SNMP=true;WITH_SQUID_CARP=true;WITH_SQUID_SSL=true;WITHOUT_SQUID_PINGER=true;WITHOUT_SQUID_DNS_HELPER=true;WITH_SQUID_HTCP=true;WITH_SQUID_VIA_DB=true;WITH_SQUID_CACHE_DIGESTS=true;WITH_SQUID_WCCP=true;WITHOUT_SQUID_WCCPV2=true;WITHOUT_SQUID_STRICT_HTTP=true;WITH_SQUID_IDENT=true;WITH_SQUID_REFERER_LOG=true;WITHOUT_SQUID_USERAGENT_LOG=true;WITH_SQUID_ARP_ACL=true;WITH_SQUID_PF=true;WITHOUT_SQUID_IPFILTER=true;WITH_SQUID_FOLLOW_XFF=true;WITH_SQUID_AUFS=true;WITH_SQUID_COSS=true;WITH_SQUID_KQUEUE=true;WITH_SQUID_LARGEFILE=true;WITHOUT_SQUID_STACKTRACES=true;SQUID_UID=proxy;SQUID_GID=proxy</build_options>
 		<config_file>http://www.pfsense.org/packages/config/squid/squid.xml</config_file>
 		<configurationfile>squid.xml</configurationfile>
 	</package>
@@ -1245,7 +1245,7 @@
 			<port>www/squid31</port>
 			<ports_after>www/squid_radius_auth</ports_after>
 		</build_pbi>
-		<build_options>WITH_SQUID_KERB_AUTH=true WITH_SQUID_LDAP_AUTH=true WITH_SQUID_NIS_AUTH=true WITH_SQUID_SASL_AUTH=true WITH_SQUID_IPV6=true WITH_SQUID_DELAY_POOLS=true WITH_SQUID_SNMP=true WITH_SQUID_SSL=true WITH_SQUID_SSL_CRTD=true WITH_SQUID_PINGER=true WITH_SQUID_DNS_HELPER=true WITH_SQUID_HTCP=true WITH_SQUID_VIA_DB=true WITH_SQUID_CACHE_DIGESTS=true WITHOUT_SQUID_WCCP=true WITH_SQUID_WCCPV2=true WITHOUT_SQUID_STRICT_HTTP=true WITH_SQUID_IDENT=true WITH_SQUID_REFERER_LOG=true WITH_SQUID_USERAGENT_LOG=true WITH_SQUID_ARP_ACL=true WITH_SQUID_IPFW=true WITH_SQUID_PF=true WITHOUT_SQUID_IPFILTER=true WITH_SQUID_FOLLOW_XFF=true WITHOUT_SQUID_ECAP=true WITHOUT_SQUID_ICAP=true WITHOUT_SQUID_ESI=true WITH_SQUID_AUFS=true WITHOUT_SQUID_COSS=true WITHOUT_SQUID_KQUEUE=true WITH_SQUID_LARGEFILE=true WITHOUT_SQUID_STACKTRACES=true WITHOUT_SQUID_DEBUG=true</build_options>
+		<build_options>WITH_SQUID_KERB_AUTH=true;WITH_SQUID_LDAP_AUTH=true;WITH_SQUID_NIS_AUTH=true;WITH_SQUID_SASL_AUTH=true;WITH_SQUID_IPV6=true;WITH_SQUID_DELAY_POOLS=true;WITH_SQUID_SNMP=true;WITH_SQUID_SSL=true;WITH_SQUID_SSL_CRTD=true;WITH_SQUID_PINGER=true;WITH_SQUID_DNS_HELPER=true;WITH_SQUID_HTCP=true;WITH_SQUID_VIA_DB=true;WITH_SQUID_CACHE_DIGESTS=true;WITHOUT_SQUID_WCCP=true;WITH_SQUID_WCCPV2=true;WITHOUT_SQUID_STRICT_HTTP=true;WITH_SQUID_IDENT=true;WITH_SQUID_REFERER_LOG=true;WITH_SQUID_USERAGENT_LOG=true;WITH_SQUID_ARP_ACL=true;WITH_SQUID_IPFW=true;WITH_SQUID_PF=true;WITHOUT_SQUID_IPFILTER=true;WITH_SQUID_FOLLOW_XFF=true;WITHOUT_SQUID_ECAP=true;WITHOUT_SQUID_ICAP=true;WITHOUT_SQUID_ESI=true;WITH_SQUID_AUFS=true;WITHOUT_SQUID_COSS=true;WITHOUT_SQUID_KQUEUE=true;WITH_SQUID_LARGEFILE=true;WITHOUT_SQUID_STACKTRACES=true;WITHOUT_SQUID_DEBUG=true</build_options>
 		<config_file>http://www.pfsense.org/packages/config/squid-reverse/squid.xml</config_file>
 		<configurationfile>squid.xml</configurationfile>
 		<depends_on_package_pbi>squid-3.1.20-i386.pbi</depends_on_package_pbi>
@@ -1327,7 +1327,7 @@
 			<ports_before>databases/db41 security/cyrus-sasl2</ports_before>
 			<port>www/squidguard</port>
 		</build_pbi>
-		<build_options>WITH_SQUID_KERB_AUTH=true WITH_SQUID_LDAP_AUTH=true WITH_SQUID_NIS_AUTH=true WITH_SQUID_SASL_AUTH=true WITH_SQUID_DELAY_POOLS=true WITH_SQUID_SNMP=true WITH_SQUID_CARP=true WITH_SQUID_SSL=true WITHOUT_SQUID_PINGER=true WITHOUT_SQUID_DNS_HELPER=true WITH_SQUID_HTCP=true WITH_SQUID_VIA_DB=true WITH_SQUID_CACHE_DIGESTS=true WITH_SQUID_WCCP=true WITHOUT_SQUID_WCCPV2=true WITHOUT_SQUID_STRICT_HTTP=true WITH_SQUID_IDENT=true WITH_SQUID_REFERER_LOG=true WITHOUT_SQUID_USERAGENT_LOG=true WITH_SQUID_ARP_ACL=true WITH_SQUID_PF=true WITHOUT_SQUID_IPFILTER=true WITH_SQUID_FOLLOW_XFF=true WITH_SQUID_AUFS=true WITH_SQUID_COSS=true WITH_SQUID_KQUEUE=true WITH_SQUID_LARGEFILE=true WITHOUT_SQUID_STACKTRACES=true WITH_SAMPLE_BL=true WITH_LDAP=true WITH_SASL=true WITH_FETCH=true</build_options>
+		<build_options>WITH_SQUID_KERB_AUTH=true;WITH_SQUID_LDAP_AUTH=true;WITH_SQUID_NIS_AUTH=true;WITH_SQUID_SASL_AUTH=true;WITH_SQUID_DELAY_POOLS=true;WITH_SQUID_SNMP=true;WITH_SQUID_CARP=true;WITH_SQUID_SSL=true;WITHOUT_SQUID_PINGER=true;WITHOUT_SQUID_DNS_HELPER=true;WITH_SQUID_HTCP=true;WITH_SQUID_VIA_DB=true;WITH_SQUID_CACHE_DIGESTS=true;WITH_SQUID_WCCP=true;WITHOUT_SQUID_WCCPV2=true;WITHOUT_SQUID_STRICT_HTTP=true;WITH_SQUID_IDENT=true;WITH_SQUID_REFERER_LOG=true;WITHOUT_SQUID_USERAGENT_LOG=true;WITH_SQUID_ARP_ACL=true;WITH_SQUID_PF=true;WITHOUT_SQUID_IPFILTER=true;WITH_SQUID_FOLLOW_XFF=true;WITH_SQUID_AUFS=true;WITH_SQUID_COSS=true;WITH_SQUID_KQUEUE=true;WITH_SQUID_LARGEFILE=true;WITHOUT_SQUID_STACKTRACES=true;WITH_SAMPLE_BL=true;WITH_LDAP=true;WITH_SASL=true;WITH_FETCH=true</build_options>
 		<config_file>http://www.pfsense.org/packages/config/squidGuard/squidguard.xml</config_file>
 		<configurationfile>squidguard.xml</configurationfile>
 	</package>
@@ -1346,7 +1346,7 @@
 			<custom_name>zabbix-agent</custom_name>
 			<port>net-mgmt/zabbix-agent</port>
 		</build_pbi>
-		<build_options>WITHOUT_CARES=true WITHOUT_CURL_DEBUG=true WITHOUT_DEBUGGING=true WITHOUT_DMALLOC=true WITHOUT_ETCSYMLINK=true WITHOUT_EXTRA_PATCHES=true WITHOUT_GDBM=true WITHOUT_GNUTLS=true WITHOUT_IODBC=true WITHOUT_IPMI=true WITHOUT_KERBEROS4=true WITHOUT_LDAP=true WITHOUT_LDAPS=true WITHOUT_LIBIDN=true WITHOUT_LIBSIGSEGV=true WITHOUT_LIBSSH2=true WITHOUT_MFD_REWRITES=true WITHOUT_MULTIPLICITY=true WITHOUT_MYSQL=true WITHOUT_NTLM=true WITHOUT_PERL_MALLOC=true WITHOUT_PGSQL=true WITHOUT_RTMP=true WITHOUT_SITECUSTOMIZE=true WITHOUT_SSH=true WITHOUT_SUIDPERL=true WITHOUT_THREADS=true WITHOUT_TKMIB=true WITHOUT_TRACKMEMORY=true WITHOUT_UNIXODBC=true WITH_CA_BUNDLE=true WITH_CURL=true WITH_DUMMY=true WITH_EXTRA_ENCODINGS=true WITH_FETCH=true WITH_FPING=true WITH_IPV6=true WITH_JABBER=true WITH_LDAP=true WITH_OPENSSL=true WITH_PERL=true WITH_PERL_64BITINT=true WITH_PERL_EMBEDDED=true WITH_PROXY=true WITH_SASL=true WITH_SQLITE=true WITH_USE_PERL=true WITH_WERROR=true</build_options>
+		<build_options>WITHOUT_CARES=true;WITHOUT_CURL_DEBUG=true;WITHOUT_DEBUGGING=true;WITHOUT_DMALLOC=true;WITHOUT_ETCSYMLINK=true;WITHOUT_EXTRA_PATCHES=true;WITHOUT_GDBM=true;WITHOUT_GNUTLS=true;WITHOUT_IODBC=true;WITHOUT_IPMI=true;WITHOUT_KERBEROS4=true;WITHOUT_LDAP=true;WITHOUT_LDAPS=true;WITHOUT_LIBIDN=true;WITHOUT_LIBSIGSEGV=true;WITHOUT_LIBSSH2=true;WITHOUT_MFD_REWRITES=true;WITHOUT_MULTIPLICITY=true;WITHOUT_MYSQL=true;WITHOUT_NTLM=true;WITHOUT_PERL_MALLOC=true;WITHOUT_PGSQL=true;WITHOUT_RTMP=true;WITHOUT_SITECUSTOMIZE=true;WITHOUT_SSH=true;WITHOUT_SUIDPERL=true;WITHOUT_THREADS=true;WITHOUT_TKMIB=true;WITHOUT_TRACKMEMORY=true;WITHOUT_UNIXODBC=true;WITH_CA_BUNDLE=true;WITH_CURL=true;WITH_DUMMY=true;WITH_EXTRA_ENCODINGS=true;WITH_FETCH=true;WITH_FPING=true;WITH_IPV6=true;WITH_JABBER=true;WITH_LDAP=true;WITH_OPENSSL=true;WITH_PERL=true;WITH_PERL_64BITINT=true;WITH_PERL_EMBEDDED=true;WITH_PROXY=true;WITH_SASL=true;WITH_SQLITE=true;WITH_USE_PERL=true;WITH_WERROR=true</build_options>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
 		<depends_on_package>zabbix-agent-1.8.10,2.tbz</depends_on_package>
 		<depends_on_package_pbi>zabbix-agent-1.8.13-i386.pbi</depends_on_package_pbi>
@@ -1366,7 +1366,7 @@
 			<custom_name>zabbix-proxy</custom_name>
 			<port>net-mgmt/zabbix-proxy</port>
 		</build_pbi>
-		<build_options>WITHOUT_CARES=true WITHOUT_CURL_DEBUG=true WITHOUT_DEBUGGING=true WITHOUT_DMALLOC=true WITHOUT_ETCSYMLINK=true WITHOUT_EXTRA_PATCHES=true WITHOUT_GDBM=true WITHOUT_GNUTLS=true WITHOUT_IODBC=true WITHOUT_IPMI=true WITHOUT_KERBEROS4=true WITHOUT_LDAP=true WITHOUT_LDAPS=true WITHOUT_LIBIDN=true WITHOUT_LIBSIGSEGV=true WITHOUT_LIBSSH2=true WITHOUT_MFD_REWRITES=true WITHOUT_MULTIPLICITY=true WITHOUT_MYSQL=true WITHOUT_NTLM=true WITHOUT_PERL_MALLOC=true WITHOUT_PGSQL=true WITHOUT_RTMP=true WITHOUT_SITECUSTOMIZE=true WITHOUT_SSH=true WITHOUT_SUIDPERL=true WITHOUT_THREADS=true WITHOUT_TKMIB=true WITHOUT_TRACKMEMORY=true WITHOUT_UNIXODBC=true WITH_CA_BUNDLE=true WITH_CURL=true WITH_DUMMY=true WITH_EXTRA_ENCODINGS=true WITH_FETCH=true WITH_FPING=true WITH_IPV6=true WITH_JABBER=true WITH_LDAP=true WITH_OPENSSL=true WITH_PERL=true WITH_PERL_64BITINT=true WITH_PERL_EMBEDDED=true WITH_PROXY=true WITH_SASL=true WITH_SQLITE=true WITH_USE_PERL=true WITH_WERROR=true</build_options>
+		<build_options>WITHOUT_CARES=true;WITHOUT_CURL_DEBUG=true;WITHOUT_DEBUGGING=true;WITHOUT_DMALLOC=true;WITHOUT_ETCSYMLINK=true;WITHOUT_EXTRA_PATCHES=true;WITHOUT_GDBM=true;WITHOUT_GNUTLS=true;WITHOUT_IODBC=true;WITHOUT_IPMI=true;WITHOUT_KERBEROS4=true;WITHOUT_LDAP=true;WITHOUT_LDAPS=true;WITHOUT_LIBIDN=true;WITHOUT_LIBSIGSEGV=true;WITHOUT_LIBSSH2=true;WITHOUT_MFD_REWRITES=true;WITHOUT_MULTIPLICITY=true;WITHOUT_MYSQL=true;WITHOUT_NTLM=true;WITHOUT_PERL_MALLOC=true;WITHOUT_PGSQL=true;WITHOUT_RTMP=true;WITHOUT_SITECUSTOMIZE=true;WITHOUT_SSH=true;WITHOUT_SUIDPERL=true;WITHOUT_THREADS=true;WITHOUT_TKMIB=true;WITHOUT_TRACKMEMORY=true;WITHOUT_UNIXODBC=true;WITH_CA_BUNDLE=true;WITH_CURL=true;WITH_DUMMY=true;WITH_EXTRA_ENCODINGS=true;WITH_FETCH=true;WITH_FPING=true;WITH_IPV6=true;WITH_JABBER=true;WITH_LDAP=true;WITH_OPENSSL=true;WITH_PERL=true;WITH_PERL_64BITINT=true;WITH_PERL_EMBEDDED=true;WITH_PROXY=true;WITH_SASL=true;WITH_SQLITE=true;WITH_USE_PERL=true;WITH_WERROR=true</build_options>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
 		<depends_on_package>zabbix-proxy-1.8.8,2.tbz</depends_on_package>
 		<depends_on_package_pbi>zabbix-proxy-1.8.13-i386.pbi</depends_on_package_pbi>
@@ -1397,7 +1397,7 @@
 		<depends_on_package>havp-0.91_1.tbz</depends_on_package>
 		<depends_on_package_pbi>havp-0.91_1-i386.pbi</depends_on_package_pbi>
 		<build_port_path>/usr/ports/www/havp</build_port_path>
-		<build_options>CLAMAVUSER=havp CLAMAVGROUP=havp</build_options>
+		<build_options>CLAMAVUSER=havp;CLAMAVGROUP=havp</build_options>
 		<version>0.91_1 pkg v1.01</version>
 		<status>BETA</status>
 		<required_version>1.2.2</required_version>
@@ -1541,7 +1541,7 @@
 			<ports_before>dns/ldns textproc/expat2 devel/libevent2</ports_before>
 			<port>dns/unbound</port>
 		</build_pbi>
-		<build_options>WITH_LIBEVENT=true WITH_THREADS=true WITHOUT_GOST=true WITHOUT_MAN=true</build_options>
+		<build_options>WITH_LIBEVENT=true;WITH_THREADS=true;WITHOUT_GOST=true;WITHOUT_MAN=true</build_options>
 		<logging>
 			<facilityname>unbound</facilityname>
 			<logfilename>unbound.log</logfilename>
@@ -1592,7 +1592,7 @@
 			<ports_before>net-mgmt/nagios-plugins</ports_before>
 			<port>net-mgmt/nrpe2</port>
 		</build_pbi>
-		<build_options>WITH_SSL=true WITHOUT_ARGS=true</build_options>
+		<build_options>WITH_SSL=true;WITHOUT_ARGS=true</build_options>
 		<config_file>http://www.pfsense.com/packages/config/nrpe2/nrpe2.xml</config_file>
 		<version>2.12_3 v2.1</version>
 		<status>Beta</status>
