@@ -28,7 +28,7 @@ rc.* text
 *.mk text
 
 # Files that will always have CRLF line endings on checkout. (Not sure we have any of these)
-# *.dos text eol=crlf
+*.nsh text eol=crlf
 
 # Denote all files that are truly binary and should not be modified.
 *.png binary
