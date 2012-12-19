@@ -40,7 +40,7 @@
 		<depends_on_package_base_url>http://e-sac.siteseguro.ws/packages/amd64/8/All/</depends_on_package_base_url>
 		<depends_on_package>asterisk18-1.8.8.1.tbz</depends_on_package>
 		<depends_on_package>openldap-sasl-client-2.4.26.tbz</depends_on_package>
-		<depends_on_package_pbi>asterisk-1.8.13.0-amd64.pbi</depends_on_package_pbi>
+		<depends_on_package_pbi>asterisk-1.8.19.0-amd64.pbi</depends_on_package_pbi>
 		<build_port_path>/usr/ports/net/asterisk</build_port_path>
 		<maintainer>marcellocoutinho@gmail.com robreg@zsurob.hu</maintainer>
 		<configurationfile>asterisk.xml</configurationfile>
@@ -585,7 +585,7 @@
 		<depends_on_package>dansguardian-2.12.0.0.tbz</depends_on_package>
 		<depends_on_package>clamav-0.97.3_1.tbz</depends_on_package>
 		<depends_on_package>ca_root_nss-3.13.3.tbz</depends_on_package>
-		<depends_on_package_pbi>dansguardian-2.12.0.0_1-amd64.pbi</depends_on_package_pbi>
+		<depends_on_package_pbi>dansguardian-2.12.0.0_2-amd64.pbi</depends_on_package_pbi>
 		<version>2.12.0.0 pkg v.0.1.6_1</version>
 		<status>beta</status>
 		<required_version>2.0</required_version>
