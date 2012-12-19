@@ -1096,7 +1096,7 @@
 		<maintainer>nachtfalkeaw@web.de</maintainer>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
 		<depends_on_package>freeradius-2.1.12_1.tbz</depends_on_package>
-		<depends_on_package_pbi>freeradius-2.1.12_1-i386.pbi</depends_on_package_pbi>
+		<depends_on_package_pbi>freeradius-2.2.0-i386.pbi</depends_on_package_pbi>
 		<depends_on_package>mysql-client-5.1.63.tbz</depends_on_package>
 		<depends_on_package>postgresql-client-8.4.12.tbz</depends_on_package>
 		<depends_on_package>openldap-sasl-client-2.4.23.tbz</depends_on_package>
@@ -1713,7 +1713,7 @@
 		<maintainer>jimp@pfsense.org</maintainer>
 		<configurationfile>urlsnarf.xml</configurationfile>
 		<build_pbi>
-			<ports_before>net/libnet</ports_before>
+			<ports_before>net/libnet10</ports_before>
 			<port>security/dsniff</port>
 		</build_pbi>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
