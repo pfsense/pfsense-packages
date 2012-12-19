@@ -238,7 +238,7 @@
 		<depends_on_package>ap22-mod_memcache-0.1.0_4.tbz</depends_on_package>
 		<depends_on_package>apache-2.2.22_5.tbz</depends_on_package>
 		<depends_on_package>ap22-mod_security-2.6.5_1.tbz</depends_on_package>
-		<depends_on_package_pbi>proxy_mod_security-2.2.22_6-i386.pbi</depends_on_package_pbi>
+		<depends_on_package_pbi>proxy_mod_security-2.2.23_3-i386.pbi</depends_on_package_pbi>
 		<configurationfile>apache_mod_security.xml</configurationfile>
 		<build_port_path>/usr/ports/devel/gettext</build_port_path>
 		<build_port_path>/usr/ports/misc/help2man</build_port_path>
