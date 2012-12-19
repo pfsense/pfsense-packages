@@ -156,7 +156,7 @@
 		<configurationfile>haproxy.xml</configurationfile>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
 		<depends_on_package>haproxy-1.4.21.tbz</depends_on_package>
-		<depends_on_package_pbi>haproxy-1.4.21-i386.pbi</depends_on_package_pbi>
+		<depends_on_package_pbi>haproxy-1.4.22_2-i386.pbi</depends_on_package_pbi>
 		<build_port_path>/usr/ports/net/haproxy</build_port_path>
 	</package>
 	<package>
@@ -173,7 +173,7 @@
 		<configurationfile>haproxy.xml</configurationfile>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
 		<depends_on_package>haproxy-1.4.21.tbz</depends_on_package>
-		<depends_on_package_pbi>haproxy-1.4.21-i386.pbi</depends_on_package_pbi>
+		<depends_on_package_pbi>haproxy-1.4.22_2-i386.pbi</depends_on_package_pbi>
 	</package>
 	<package>
 		<name>Apache with mod_security-dev</name>
@@ -575,7 +575,7 @@
 		<depends_on_package_base_url>http://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
 		<depends_on_package>postfix-2.8.7,1.tbz</depends_on_package>
 		<depends_on_package>perl-5.12.4_3.tbz</depends_on_package>
-		<depends_on_package_pbi>postfix-2.9.4-i386.pbi</depends_on_package_pbi>
+		<depends_on_package_pbi>postfix-2.9.4_2-i386.pbi</depends_on_package_pbi>
 		<version>2.8.7,1 pkg v.2.3.4_1</version>
 		<status>RC1</status>
 		<required_version>2.0</required_version>
@@ -757,7 +757,7 @@
 		<config_file>http://www.pfsense.com/packages/config/varnish64/varnish_backends.xml</config_file>
 		<configurationfile>varnish_backends.xml</configurationfile>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
-		<depends_on_package_pbi>varnish-2.1.5_1-i386.pbi gcc-4.2.5.20090325_5-i386.pbi</depends_on_package_pbi>
+		<depends_on_package_pbi>varnish-2.1.5_2-i386.pbi gcc-4.2.5.20090325_5-i386.pbi</depends_on_package_pbi>
 		<depends_on_package>varnish-2.1.5.tbz</depends_on_package>
 		<depends_on_package>gcc-4.2.5.20090325_5.tbz</depends_on_package>
 		<build_port_path>/usr/ports/www/varnish2</build_port_path>
@@ -777,7 +777,7 @@
 		<config_file>http://www.pfsense.com/packages/config/varnish3/varnish_backends.xml</config_file>
 		<configurationfile>varnish_backends.xml</configurationfile>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
-		<depends_on_package_pbi>gcc-4.2.5.20090325_5-i386.pbi varnish-3.0.2_1-i386.pbi</depends_on_package_pbi>
+		<depends_on_package_pbi>gcc-4.2.5.20090325_5-i386.pbi varnish-3.0.3_2-i386.pbi</depends_on_package_pbi>
 		<depends_on_package>varnish-3.0.2.tbz</depends_on_package>
 		<depends_on_package>pcre-8.21_1.tbz</depends_on_package>
 		<build_port_path>/usr/ports/www/varnish</build_port_path>
@@ -811,7 +811,7 @@
 		<required_version>1.0</required_version>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
 		<depends_on_package>mbmon-205_5.tbz</depends_on_package>
-		<depends_on_package_pbi>mbmon-205_5-i386.pbi</depends_on_package_pbi>
+		<depends_on_package_pbi>mbmon-205_6-i386.pbi</depends_on_package_pbi>
 		<build_port_path>/usr/ports/sysutils/mbmon</build_port_path>
 		<config_file>http://www.pfsense.com/packages/config/phpsysinfo/phpsysinfo.xml</config_file>
 		<configurationfile>phpsysinfo.xml</configurationfile>
@@ -936,7 +936,7 @@
 		<depends_on_package_base_url>http://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
 		<depends_on_package>lua-5.1.5_4.tbz</depends_on_package>
 		<depends_on_package>nmap-6.01.tbz</depends_on_package>
-		<depends_on_package_pbi>nmap-6.01-i386.pbi</depends_on_package_pbi>
+		<depends_on_package_pbi>nmap-6.01_1-i386.pbi</depends_on_package_pbi>
 		<config_file>http://www.pfsense.com/packages/config/nmap/nmap.xml</config_file>
 		<version>nmap-6.01 pkg v1.2</version>
 		<status>Stable</status>
@@ -994,7 +994,7 @@
 		<configurationfile>nut.xml</configurationfile>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
 		<depends_on_package>nut-2.6.4.tbz</depends_on_package>
-		<depends_on_package_pbi>nut-2.6.4-i386.pbi</depends_on_package_pbi>
+		<depends_on_package_pbi>nut-2.6.5_1-i386.pbi</depends_on_package_pbi>
 		<build_port_path>/usr/ports/sysutils/nut</build_port_path>
 		<pkginfolink>http://doc.pfsense.org/index.php/Nut_package</pkginfolink>
 	</package>
@@ -1141,7 +1141,7 @@
 		<category>Network Management</category>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
 		<depends_on_package>stunnel-4.43.tbz</depends_on_package>
-		<depends_on_package_pbi>stunnel-4.53-i386.pbi</depends_on_package_pbi>
+		<depends_on_package_pbi>stunnel-4.54-i386.pbi</depends_on_package_pbi>
 		<version>4.43.0</version>
 		<status>Stable</status>
 		<pkginfolink>http://doc.pfsense.org/index.php/Stunnel_package</pkginfolink>
@@ -1212,7 +1212,7 @@
 		<depends_on_package>squid-2.7.9_1.tbz</depends_on_package>
 		<depends_on_package>squid_radius_auth-1.10.tbz</depends_on_package>
 		<depends_on_package>libwww-5.4.0_4.tbz</depends_on_package>
-		<depends_on_package_pbi>squid-2.7.9_1-i386.pbi</depends_on_package_pbi>
+		<depends_on_package_pbi>squid-2.7.9_3-i386.pbi</depends_on_package_pbi>
 		<build_port_path>/usr/ports/www/squid</build_port_path>
 		<build_port_path>/usr/ports/www/squid_radius_auth</build_port_path>
 		<build_port_path>/usr/ports/www/libwww</build_port_path>
@@ -1248,7 +1248,7 @@
 		<build_options>WITH_SQUID_KERB_AUTH=true;WITH_SQUID_LDAP_AUTH=true;WITH_SQUID_NIS_AUTH=true;WITH_SQUID_SASL_AUTH=true;WITH_SQUID_IPV6=true;WITH_SQUID_DELAY_POOLS=true;WITH_SQUID_SNMP=true;WITH_SQUID_SSL=true;WITH_SQUID_SSL_CRTD=true;WITH_SQUID_PINGER=true;WITH_SQUID_DNS_HELPER=true;WITH_SQUID_HTCP=true;WITH_SQUID_VIA_DB=true;WITH_SQUID_CACHE_DIGESTS=true;WITHOUT_SQUID_WCCP=true;WITH_SQUID_WCCPV2=true;WITHOUT_SQUID_STRICT_HTTP=true;WITH_SQUID_IDENT=true;WITH_SQUID_REFERER_LOG=true;WITH_SQUID_USERAGENT_LOG=true;WITH_SQUID_ARP_ACL=true;WITH_SQUID_IPFW=true;WITH_SQUID_PF=true;WITHOUT_SQUID_IPFILTER=true;WITH_SQUID_FOLLOW_XFF=true;WITHOUT_SQUID_ECAP=true;WITHOUT_SQUID_ICAP=true;WITHOUT_SQUID_ESI=true;WITH_SQUID_AUFS=true;WITHOUT_SQUID_COSS=true;WITHOUT_SQUID_KQUEUE=true;WITH_SQUID_LARGEFILE=true;WITHOUT_SQUID_STACKTRACES=true;WITHOUT_SQUID_DEBUG=true</build_options>
 		<config_file>http://www.pfsense.org/packages/config/squid-reverse/squid.xml</config_file>
 		<configurationfile>squid.xml</configurationfile>
-		<depends_on_package_pbi>squid-3.1.20-i386.pbi</depends_on_package_pbi>
+		<depends_on_package_pbi>squid-3.1.22_1-i386.pbi</depends_on_package_pbi>
 	</package>
 	<package>
 		<name>LCDproc</name>
@@ -1261,7 +1261,7 @@
 		<maintainer>seth.mos@dds.nl</maintainer>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
 		<depends_on_package>lcdproc-0.5.5.tbz</depends_on_package>
-		<depends_on_package_pbi>lcdproc-0.5.5-i386.pbi</depends_on_package_pbi>
+		<depends_on_package_pbi>lcdproc-0.5.6-i386.pbi</depends_on_package_pbi>
 		<config_file>http://www.pfsense.org/packages/config/lcdproc/lcdproc.xml</config_file>
 		<configurationfile>lcdproc.xml</configurationfile>
 		<build_port_path>/usr/ports/sysutils/lcdproc</build_port_path>
@@ -1279,7 +1279,7 @@
 		<pkginfolink>http://forum.pfsense.org/index.php/topic,44034.0.html</pkginfolink>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
 		<depends_on_package>lcdproc-0.5.5.tbz</depends_on_package>
-		<depends_on_package_pbi>lcdproc-0.5.5-i386.pbi</depends_on_package_pbi>
+		<depends_on_package_pbi>lcdproc-0.5.6-i386.pbi</depends_on_package_pbi>
 		<config_file>http://www.pfsense.org/packages/config/lcdproc-dev/lcdproc.xml</config_file>
 		<configurationfile>lcdproc.xml</configurationfile>
 		<build_port_path>/usr/ports/sysutils/lcdproc</build_port_path>
@@ -1586,7 +1586,7 @@
 		<depends_on_package_base_url>http://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
 		<depends_on_package>nrpe-2.12_3.tbz</depends_on_package>
 		<depends_on_package>nagios-plugins-1.4.15_1,1.tbz</depends_on_package>
-		<depends_on_package_pbi>nrpe-2.13-i386.pbi</depends_on_package_pbi>
+		<depends_on_package_pbi>nrpe-2.13_2-i386.pbi</depends_on_package_pbi>
 		<build_port_path>/usr/ports/net-mgmt/nrpe2</build_port_path>
 		<build_port_path>/usr/ports/net-mgmt/nagios-plugins</build_port_path>
 		<build_pbi>
@@ -1691,7 +1691,7 @@
 		<config_file>http://www.pfsense.com/packages/config/bacula-client/bacula-client.xml</config_file>
 		<depends_on_package_base_url>http://ftp.freebsd.org/pub/FreeBSD/ports/i386/packages-8.3-release/All/</depends_on_package_base_url>
 		<depends_on_package>bacula-client-5.2.6.tbz</depends_on_package>
-		<depends_on_package_pbi>bacula-5.2.6-i386.pbi</depends_on_package_pbi>
+		<depends_on_package_pbi>bacula-5.2.12-i386.pbi</depends_on_package_pbi>
 		<build_port_path>/usr/ports/sysutils/bacula-client</build_port_path>
 		<build_pbi>
 			<port>sysutils/bacula-client</port>
@@ -1768,7 +1768,7 @@
 		<status>ALPHA</status>
 		<required_version>2.1</required_version>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
-		<depends_on_package_pbi>syslog-ng-3.3.6_2-i386.pbi</depends_on_package_pbi>
+		<depends_on_package_pbi>syslog-ng-3.3.7_4-i386.pbi</depends_on_package_pbi>
 		<build_pbi>
 			<ports_before>sysutils/logrotate</ports_before>
 			<port>sysutils/syslog-ng</port>
