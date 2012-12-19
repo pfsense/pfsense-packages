@@ -1700,6 +1700,7 @@
 		<maintainer>jimp@pfsense.org</maintainer>
 		<configurationfile>urlsnarf.xml</configurationfile>
 		<build_pbi>
+			<ports_before>net/libnet</ports_before>
 			<port>security/dsniff</port>
 		</build_pbi>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
