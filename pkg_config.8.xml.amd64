@@ -499,7 +499,7 @@
 		<build_port_path>/usr/ports/devel/pcre</build_port_path>
 		<build_port_path>/usr/ports/net/daq</build_port_path>
 		<build_port_path>/usr/ports/net/libnet</build_port_path>
-		<build_port_path>/usr/ports/lang/perl5.12</build_port_path>
+		<build_port_path>/usr/ports/lang/perl5.14</build_port_path>
 		<build_port_path>/usr/ports/security/barnyard2</build_port_path>
 		<build_port_path>/usr/ports/databases/mysql51-client</build_port_path>
 		<build_port_path>/usr/ports/security/snort</build_port_path>
@@ -681,9 +681,7 @@
 		<depends_on_package>perl-5.12.4_3.tbz</depends_on_package>
 		<depends_on_package_pbi>lightsquid-1.8_2-amd64.pbi</depends_on_package_pbi>
 		<build_port_path>/usr/ports/www/lightsquid</build_port_path>
-		<build_port_path>/usr/ports/lang/perl5.12</build_port_path>
 		<build_pbi>
-			<ports_before>lang/perl5.12</ports_before>
 			<port>www/lightsquid</port>
 		</build_pbi>
 		<build_options>WITHOUT_DEBUGGING=true;WITHOUT_GDBM=true;WITHOUT_PERL_MALLOC=true;WITH_PERL_64BITINT=true;WITHOUT_THREADS=true;WITHOUT_MULTIPLICITY=true;WITHOUT_SUIDPERL=true;WITHOUT_SITECUSTOMIZE=true;WITH_USE_PERL=true</build_options>
@@ -861,7 +859,7 @@
 		<depends_on_package>pcre-8.21_1.tbz</depends_on_package>
 		<build_port_path>/usr/ports/devel/pcre</build_port_path>
 		<depends_on_package>perl-5.12.3.tbz</depends_on_package>
-		<build_port_path>/usr/ports/lang/perl5.12</build_port_path>
+		<build_port_path>/usr/ports/lang/perl5.14</build_port_path>
 		<depends_on_package>pkg-config-0.25_1.tbz</depends_on_package>
 		<build_port_path>/usr/ports/devel/pkg-config</build_port_path>
 		<depends_on_package>python27-2.7.2_3.tbz</depends_on_package>
