@@ -482,35 +482,36 @@
 	</package>
 	<package>
 		<name>snort-dev</name>
-		<pkginfolink>http://forum.pfsense.org/index.php/topic,16847.0.html</pkginfolink>
+		<pkginfolink></pkginfolink>
 		<website>http://www.snort.org</website>
-		<descr>Snort-dev is a development branch.</descr>
+		<descr>Snort is an open source network intrusion prevention and detection system (IDS/IPS). Combining the benefits of signature, protocol, and anomaly-based inspection.</descr>
 		<category>Security</category>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
-		<depends_on_package_pbi>snort-2.9.2.3-amd64.pbi</depends_on_package_pbi>
-		<depends_on_package>mysql-client-5.1.53.tbz</depends_on_package>
-		<depends_on_package>barnyard2-1.9_2.tbz</depends_on_package>
-		<depends_on_package>libnet11-1.1.2.1_3,1.tbz</depends_on_package>
+		<depends_on_package>mysql-client-5.5.29.tbz</depends_on_package>
+		<depends_on_package>barnyard2-1.11.tbz</depends_on_package>
+		<depends_on_package>libnet11-1.1.2.1_4,1.tbz</depends_on_package>
 		<depends_on_package>libdnet-1.11_3.tbz</depends_on_package>
-		<depends_on_package>libpcap-1.1.1_1.tbz</depends_on_package>
-		<depends_on_package>daq-0.6.2.tbz</depends_on_package>
-		<depends_on_package>snort-2.9.2.3.tbz</depends_on_package>
-		<depends_on_package>perl-threaded-5.12.4_4.tbz</depends_on_package>
+		<depends_on_package>libpcap-1.3.0.tbz</depends_on_package>
+		<depends_on_package>daq-2.0.0.tbz</depends_on_package>
+		<depends_on_package>snort-2.9.4.tbz</depends_on_package>
+		<depends_on_package_pbi>snort-2.9.4-amd64.pbi</depends_on_package_pbi>
 		<build_port_path>/usr/ports/devel/pcre</build_port_path>
+                <build_port_path>/usr/ports/net/libpcap</build_port_path>
 		<build_port_path>/usr/ports/net/daq</build_port_path>
 		<build_port_path>/usr/ports/net/libnet</build_port_path>
-		<build_port_path>/usr/ports/lang/perl5.14</build_port_path>
+                <build_port_path>/usr/ports/net/libdnet</build_port_path>
 		<build_port_path>/usr/ports/security/barnyard2</build_port_path>
-		<build_port_path>/usr/ports/databases/mysql51-client</build_port_path>
+		<build_port_path>/usr/ports/databases/mysql55-client</build_port_path>
 		<build_port_path>/usr/ports/security/snort</build_port_path>
 		<build_pbi>
-			<custom_name>snort-dev</custom_name>
+                        <custom_name>snort-dev</custom_name>
 			<port>security/snort</port>
 			<ports_after>security/barnyard2</ports_after>
 		</build_pbi>
-		<build_options>WITH_THREADS=yes;WITH_IPV6=true;WITH_MPLS=true;WITH_GRE=true;WITHOUT_TARGETBASED=true;WITH_DECODERPRE=true;WITH_ZLIB=true;WITH_NORMALIZER=true;WITH_REACT=true;WITH_PERFPROFILE=true;WITH_FLEXRESP3=true;WITH_MYSQL=true;WITHOUT_ODBC=true;WITHOUT_POSTGRESQL=true;WITHOUT_PRELUDE=true;WITH_SNORTSAM=true;NOPORTDOCS=true</build_options>
+		<!-- Use both styles for now, since our snort port isn't yet optionsng, but barnyard2 and others are. -->
+		<build_options>barnyard2_UNSET=ODBC PGSQL PRELUDE;barnyard2_SET=GRE IPV6 MPLS MYSQL;snort_UNSET=TARGETBASED;snort_SET=FLEXRESP3 GRE IPV6 LRGPCAP MPLS NORMALIZER PERFPROFILE REACT SOURCEFIRE ZLIB;perl_SET=THREADS;WITH_THREADS=yes;WITH_SOURCEFIRE=yes;WITH_IPV6=true;WITH_LRGPCAP=true;WITH_MPLS=true;WITH_GRE=true;WITHOUT_TARGETBASED=true;WITH_DECODERPRE=true;WITH_ZLIB=true;WITH_NORMALIZER=true;WITH_REACT=true;WITH_PERFPROFILE=true;WITH_FLEXRESP3=true;WITH_MYSQL=true;WITHOUT_ODBC=true;WITHOUT_POSTGRESQL=true;WITHOUT_PRELUDE=true;NOPORTDOCS=true</build_options>
 		<config_file>http://www.pfsense.com/packages/config/snort-dev/snort.xml</config_file>
-		<version>2.9.2.3 pkg v. 3.0</version>
+		<version>2.9.4 pkg v. 2.5.2</version>
 		<required_version>2.0</required_version>
 		<status>Stable</status>
 		<configurationfile>/snort.xml</configurationfile>
