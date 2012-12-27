@@ -198,36 +198,6 @@ technique called multipoint relaying for message flooding.</descr>
       <configurationfile>clamav.xml</configurationfile>
     </package>
     <package>
-      <name>phpmrss</name>
-      <descr>mRss is a C library for parsing, writing and creating RSS files or streams.</descr>
-      <website>http://www2.autistici.org/bakunin//libmrss/doc/</website>
-      <category>Textproc</category>
-      <version>0.13</version>
-      <status>BETA</status>
-      <required_version>2.0</required_version>
-      <depends_on_package_base_url>http://files.pfsense.org/packages/All/</depends_on_package_base_url>
-      <depends_on_package>libmrss-0.13.tbz</depends_on_package>
-      <config_file>http://www.pfsense.org/packages/config/phpmrss.xml</config_file>
-      <configurationfile>phpmrss.xml</configurationfile>
-    </package>
-    <package>
-      <name>p3scan-pf</name>
-      <descr>
-        A transparent POP3-Proxy with virus-scanning- and
-        spam-scanning-capabilities.
-      </descr>
-      <website>http://www.undergroundsecurity.com/p3scan/</website>
-      <category>Security</category>
-      <version>0.1</version>
-      <status>ALPHA</status>
-      <required_version>2.0</required_version>
-      <maintainer>fernando@netfilter.com.br</maintainer>
-      <depends_on_package_base_url>http://files.pfsense.org/packages/All/</depends_on_package_base_url>
-      <depends_on_package>p3scan-pf-2.3.2.tbz</depends_on_package>
-      <config_file>http://www.pfsense.org/packages/config/p3scan-pf/p3scan-pf.xml</config_file>
-      <configurationfile>p3scan-pf.xml</configurationfile>
-    </package>
-    <package>
       <name>clamsmtp</name>
       <descr>SMTP virus scanner.</descr>
       <website>http://memberwebs.com/nielsen/software/clamsmtp/</website>
