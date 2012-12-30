@@ -8,6 +8,7 @@
 <!--
 	<package>
 		<name>someprogram</name>
+		<internal_name>someprogram</internal_name>
 		<pkginfolink>http://forum.pfsense.org/</pkginfolink>
 		<descr><![CDATA[Some cool program]]></descr>
 		<website>http://www.example.org/someprogram</website>
@@ -362,6 +363,7 @@
 	</package>
 	<package>
 		<name>FreeSWITCH Dev</name>
+		<internal_name>FreeSWITCH</internal_name>
 		<website>http://www.freeswitch.org/</website>
 		<descr>FreeSWITCH package development version.</descr>
 		<category>Services</category>
@@ -495,6 +497,7 @@
 	</package>
 	<package>
 		<name>snort-dev</name>
+		<internal_name>snort</internal_name>
 		<pkginfolink>http://forum.pfsense.org/index.php/topic,16847.0.html</pkginfolink>
 		<website>http://www.snort.org</website>
 		<descr>Snort-dev is a development branch.</descr>
@@ -609,6 +612,7 @@
 	</package>
 	<package>
 		<name>mailscanner-dev</name>
+		<internal_name>mailscanner</internal_name>
 		<website>www.mailscanner.info</website>
 		<descr><![CDATA[MailScanner is an e-mail security and anti-spam package for e-mail gateway systems.<br>
 						This is a level3 mail scanning tool with high CPU load.]]></descr>
@@ -727,9 +731,10 @@
 	</package>
 	<package>
 		<name>Ipguard-dev</name>
+		<internal_name>ipguard</internal_name>
 		<website>http://ipguard.deep.perm.ru/</website>
 		<descr><![CDATA[Ipguard listens network for ARP packets. All permitted MAC-IP pairs listed in config files.<br>
-						If it recieves one with MAC-IP pair, which is not listed in 'ethers' file, it will send ARP reply with configured fake address.<br>
+						If it receives one with MAC-IP pair, which is not listed in 'ethers' file, it will send ARP reply with configured fake address.<br>
 						This will prevent not permitted host to work properly in local ethernet segment.]]></descr>
 		<category>Security</category>
 		<config_file>http://www.pfsense.com/packages/config/ipguard/ipguard.xml</config_file>
@@ -765,6 +770,7 @@
 	</package>
 	<package>
 		<name>Varnish3</name>
+		<internal_name>varnish</internal_name>
 		<descr><![CDATA[Varnish is a state-of-the-art, high-performance HTTP accelerator.<br>
 						It uses the advanced features in FreeBSD 6/7/8 to achieve its high performance.<br>
 						Version 3.0.2 includes streaming support]]></descr>
@@ -966,6 +972,7 @@
 	</package>
 	<package>
 		<name>imspector-dev</name>
+		<internal_name>imspector</internal_name>
 		<descr>IMSpector is an Instant Messenger transparent proxy with logging capabilities. Currently it supports MSN, AIM, ICQ, Yahoo and IRC to different degrees.</descr>
 		<website>http://www.imspector.org/</website>
 		<category>Network Management</category>
@@ -1227,6 +1234,7 @@
 	</package>
 	<package>
 		<name>squid3</name>
+		<internal_name>squid</internal_name>
 		<descr><![CDATA[High performance web proxy cache.<br>
 			It combines squid as a proxy server with it's capabilities of acting as a HTTP / HTTPS reverse proxy.<br>
 			It includes an Exchange-Web-Access (OWA) Assistant.]]></descr>
@@ -1269,6 +1277,7 @@
 	</package>
 	<package>
 		<name>LCDproc-dev</name>
+		<internal_name>lcdproc</internal_name>
 		<descr>LCD display driver - Development version</descr>
 		<website>http://www.lcdproc.org/</website>
 		<category>Utility</category>
@@ -1374,7 +1383,7 @@
 	</package>
 	<package>
 		<name>OpenVPN Client Export Utility</name>
-		<descr>Allows a pre-configured OpenVPN Windows Client or  or Mac OSX's Viscosity configuration bundle to be exported directly from pfSense.</descr>
+		<descr>Allows a pre-configured OpenVPN Windows Client or Mac OSX's Viscosity configuration bundle to be exported directly from pfSense.</descr>
 		<category>Security</category>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
 		<depends_on_package>p7zip-9.20.1.tbz</depends_on_package>
