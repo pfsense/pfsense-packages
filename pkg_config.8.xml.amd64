@@ -734,7 +734,7 @@
 		<required_version>2.0</required_version>
 		<configurationfile>ipguard.xml</configurationfile>
 		<build_port_path>/usr/ports/security/ipguard</build_port_path>
-		<after_install_info>Please visit ipguard settings on Services Menu to configure.</after_install_info>
+		<after_install_info>Please visit ipguard settings on the Firewall Menu to configure.</after_install_info>
 	</package>
 	<package>
 		<name>Varnish</name>
