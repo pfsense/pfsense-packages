@@ -82,7 +82,7 @@ function cron_install_command()
 	write_rcfile(array(
 		"file" => "cron.sh",
 		"start" => "/usr/sbin/cron -s &",
-		"stop" => "kill -9 `cat /var/run/cron.pid`"
+		"stop" => "[ -f \"/var/run/cron.pid\" ] && kill -9 `cat /var/run/cron.pid`; rm -f /var/run/cron.pid;"
 		)
 	);
 
