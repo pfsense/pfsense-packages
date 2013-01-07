@@ -80,7 +80,7 @@ foreach($a_server as $sindex => $server) {
 		}
 	} elseif (($server['mode'] == "server_tls") || (($server['mode'] == "server_tls_user") && ($server['authmode'] != "Local Database"))) {
 		foreach($a_cert as $cindex => $cert) {
-			if ($cert['caref'] != $server['caref'])
+			if (($cert['caref'] != $server['caref']) || ($cert['refid'] == $server['certref']))
 				continue;
 			$ras_cert_entry['cindex'] = $cindex;
 			$ras_cert_entry['certname'] = $cert['descr'];
