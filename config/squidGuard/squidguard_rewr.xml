@@ -2,7 +2,7 @@
 <!DOCTYPE packagegui SYSTEM "../schema/packages.dtd">
 <?xml-stylesheet type="text/xsl" href="../xsl/package.xsl"?>
 <packagegui>
-    <description>Describe your package here</description>
+    <description><![CDATA[Describe your package here]]></description>
     <requirements>Describe your package requirements here</requirements>
     <faq>Currently there are no FAQ items provided.</faq>
 	<name>squidguardrewrite</name>
@@ -43,6 +43,10 @@
 			<text>Log</text>
 			<url>/squidGuard/squidguard_log.php</url>
 		</tab>
+		<tab>
+			<text>XMLRPC Sync</text>
+			<url>/pkg_edit.php?xml=squidguard_sync.xml</url>
+		</tab>
 	</tabs>
 	<adddeleteeditpagefields>
 		<columnitem>
@@ -58,11 +62,10 @@
 		<field>
 			<fielddescr>Name</fielddescr>
 			<fieldname>name</fieldname>
-			<description>
-                   Enter the unique name here.
-                   Name must consist of minimum 2 symbols, first from which letter. &lt;br&gt;
-                   All other symbols must be [a-Z_0-9].
-			</description>
+			<description><![CDATA[
+								Enter a unique name of this rule here.<br>
+								The name must consist between 2 and 15 symbols [a-Z_0-9]. The first one must be a letter.<br>
+			]]></description>
 			<type>input</type>
 			<required/>
 			<size>100</size>
@@ -89,13 +92,13 @@
 					<fielddescr>Opt.</fielddescr>
 					<fieldname>mode</fieldname>
 					<type>select</type>
-                                  <value>no</value>
-                                  <options>
-                                      <option> <name>---------</name> <value>no</value> </option>
-                                      <option> <name>no case  </name> <value>nocase</value> </option>
-                                      <option> <name>redirect </name> <value>redirect</value> </option>
-                                      <option> <name>no case + redirect</name> <value>nocase_redirect</value> </option>
-                                  </options>
+								  <value>no</value>
+								  <options>
+								      <option> <name>---------</name> <value>no</value> </option>
+								      <option> <name>no case  </name> <value>nocase</value> </option>
+								      <option> <name>redirect </name> <value>redirect</value> </option>
+								      <option> <name>no case + redirect</name> <value>nocase_redirect</value> </option>
+								  </options>
 				</rowhelperfield>
 <!--				<rowhelperfield>
 					<fielddescr>Http 301</fielddescr>
@@ -113,18 +116,18 @@
 		<field>
 			<fielddescr>Log</fielddescr>
 			<fieldname>enablelog</fieldname>
-			<description>Check this for log this item.</description>
+			<description><![CDATA[Check this option to enable logging for this ACL.]]></description>
 			<type>checkbox</type>
 		</field>
 		<field>
 			<fielddescr>Description</fielddescr>
 			<fieldname>description</fieldname>
-			<description>You may enter a description here for your reference (not parsed).&lt;br&gt;
-				&lt;b&gt; Note: &lt;/b&gt; &lt;br&gt;
-				&lt;b&gt;Rewrite rule&lt;/b&gt; - define how url will are replaced.&lt;br&gt;
-				&lt;b&gt;Target URL or regular expression&lt;/b&gt; - contains destination url or regular expression. Regular expression example: */cc32e46.exe &lt;br&gt;
-				&lt;b&gt;Replace to&lt;/b&gt; - contains replacing url.
-			</description>
+			<description><![CDATA[You may enter any description here for your reference.<br>
+								<b>Note:</b><br>
+								<b>Rewrite rule:</b> Define how the URL will be replaced.<br>
+								<b>Target URL or Regular Expression:</b> Contains destination URL or regular expression. This is the URL or RegEx the user wants to visit.<br>
+								<b>Replace to URL:</b> Contains the replacing URL. This is the URL the user will see instead the original one.
+			]]></description>
 			<type>input</type>
 			<size>100</size>
 		</field>
