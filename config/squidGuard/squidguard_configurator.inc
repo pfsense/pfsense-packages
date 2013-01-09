@@ -1883,17 +1883,18 @@ function acl_remove_blacklist_items($items)
 # -----------------------------------------------------------------------------
 function sg_script_logrotate()
 {
-    $lines = 1000; # SG logfile truncate lines count
 
-    global $squidguard_config;
-    $sglogname = $squidguard_config[F_LOGDIR] . "/" . SQUIDGUARD_LOGFILE;
+	global $squidguard_config;
+
+	$sglogname = $squidguard_config[F_LOGDIR] . "/" . SQUIDGUARD_LOGFILE;
 	$sgguilogname = $squidguard_config[F_LOGDIR] . "/" . SQUIDGUARD_GUILOGFILE;
+	$sgconflogname = $squidguard_config[F_LOGDIR] . "/" . SQUIDGUARD_CONFLOGFILE;
     $res =
 <<<EOD
 #!/bin/sh
 #
 # This file generated automaticly with SquidGuard configurator
-# Rotates the block logile
+# Rotates the block logfile
 tail -{$lines} {$sglogname} > {$sglogname}.0
 tail -{$lines} {$sglogname}.0 > {$sglogname}
 rm -f {$sglogname}.0
@@ -1901,6 +1902,10 @@ rm -f {$sglogname}.0
 tail -{$lines} {$sgguilogname} > {$sgguilogname}.0
 tail -{$lines} {$sgguilogname}.0 > {$sgguilogname}
 rm -f {$sgguilogname}.0
+# Rotates the squidguard conf logile
+tail -{$lines} {$sgconflogname} > {$sgconflogname}.0
+tail -{$lines} {$sgconflogname}.0 > {$sgconflogname}
+rm -f {$sgconflogname}.0
 EOD;
     return $res;
 }

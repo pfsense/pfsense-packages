@@ -2,7 +2,7 @@
 <!DOCTYPE packagegui SYSTEM "../schema/packages.dtd">
 <?xml-stylesheet type="text/xsl" href="../xsl/package.xsl"?>
 <packagegui>
-	<description>Describe your package here</description>
+	<description>[<![CDATA[Describe your package here]]></description>
 	<requirements>Describe your package requirements here</requirements>
 	<faq>Currently there are no FAQ items provided.</faq>
 	<name>squidguardgeneral</name>
@@ -50,10 +50,14 @@
 			<text>Log</text>
 			<url>/squidGuard/squidguard_log.php</url>
 		</tab>
+		<tab>
+			<text>XMLRPC Sync</text>
+			<url>/pkg_edit.php?xml=squidguard_sync.xml</url>
+		</tab>
 	</tabs>
 	<service>
                 <name>squidGuard</name>
-                <description>Proxy server filter Service</description>
+                <description><![CDATA[Proxy server filter Service]]></description>
                 <executable>squidGuard</executable>
 	</service>
 	<additional_files_needed>
@@ -110,31 +114,39 @@
                 <field>
                         <fielddescr>Enable</fielddescr>
                         <fieldname>squidguard_enable</fieldname>
-                        <description>Check this for enable squidGuard</description>
+                        <description><![CDATA[Check this option to enable squidGuard]]></description>
                         <type>checkbox</type>
+                </field>
+				<field>
+                        <name>Logging options</name>
+                        <type>listtopic</type>
                 </field>
                 <field>
                         <fielddescr>Enable GUI log</fielddescr>
                         <fieldname>enable_guilog</fieldname>
-                        <description>Check this for enable GUI log.</description>
+                        <description><![CDATA[Check this option to log the access to the Proxy Filter GUI.]]></description>
                         <type>checkbox</type>
                 </field>
                 <field>
                         <fielddescr>Enable log</fielddescr>
                         <fieldname>enable_log</fieldname>
-                        <description>Check this for enable log of the proxy filter. Usually log used for testing filter settings.</description>
+                        <description><![CDATA[Check this option to log the proxy filter settings like blocked websites in Common ACL, Group ACL and Target Categories. This option is usually used to check the filter settings.]]></description>
                         <type>checkbox</type>
                 </field>
                 <field>
                         <fielddescr>Enable log rotation</fielddescr>
                         <fieldname>log_rotation</fieldname>
-                        <description>Check this for enable daily rotate a log of the proxy filter. Use this option for limit log file size.</description>
+                        <description><![CDATA[Check this option to rotate the logs every day. This is recommended if you enable any kind of logging to limit file size and do not run out of disk space.]]></description>
                         <type>checkbox</type>
+                </field>
+				<field>
+                        <name>Miscellaneous</name>
+                        <type>listtopic</type>
                 </field>
                 <field>
                         <fielddescr>Clean Advertising</fielddescr>
                         <fieldname>adv_blankimg</fieldname>
-                        <description>Check this to display a blank gif image instead the default block page. With this option you get a cleaner 			page.</description>
+                        <description><![CDATA[Check this option to display a blank gif image instead of the default block page. With this option the user gets a cleaner webpage.]]></description>
                         <type>checkbox</type>
                 </field>
                 <field>
@@ -144,24 +156,24 @@
                 <field>
                         <fielddescr>Blacklist</fielddescr>
                         <fieldname>blacklist</fieldname>
-                        <description>Check this for enable blacklist</description>
+                        <description><![CDATA[Check this option to enable blacklist]]></description>
                         <type>checkbox</type>
                 </field>
                 <field>
                         <fielddescr>Blacklist proxy</fielddescr>
                         <fieldname>blacklist_proxy</fieldname>
-                        <description>
-                                Blacklist upload proxy - enter here, or leave blank.
-                                Format: host:[port login:pass] . Default proxy port 1080.
+                        <description><![CDATA[<br>
+                                Blacklist upload proxy - enter here, or leave blank.<br>
+                                Format: host:[port login:pass] . Default proxy port 1080.<br>
                                 Example: '192.168.0.1:8080 user:pass'
-                        </description>
+                        ]]></description>
                         <type>input</type>
                         <size>100</size>
                 </field>
                 <field>
                         <fielddescr>Blacklist URL</fielddescr>
                         <fieldname>blacklist_url</fieldname>
-                        <description>Enter FTP, HTTP or LOCAL (firewall) URL blacklist archive, or leave blank.</description>
+                        <description><![CDATA[Enter the path to the blacklist (blacklist.tar.gz) here. You can use FTP, HTTP or LOCAL URL blacklist archive or leave blank. The LOCAL path could be your pfsense (/tmp/blacklist.tar.gz).]]></description>
                         <type>input</type>
                         <size>100</size>
                 </field>

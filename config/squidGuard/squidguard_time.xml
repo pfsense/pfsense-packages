@@ -2,7 +2,7 @@
 <!DOCTYPE packagegui SYSTEM "../schema/packages.dtd">
 <?xml-stylesheet type="text/xsl" href="../xsl/package.xsl"?>
 <packagegui>
-    <description>Describe your package here</description>
+    <description><![CDATA[Describe your package here]]></description>
     <requirements>Describe your package requirements here</requirements>
     <faq>Currently there are no FAQ items provided.</faq>
 	<name>squidguardtime</name>
@@ -45,6 +45,10 @@
 			<text>Log</text>
 			<url>/squidGuard/squidguard_log.php</url>
 		</tab>
+		<tab>
+			<text>XMLRPC Sync</text>
+			<url>/pkg_edit.php?xml=squidguard_sync.xml</url>
+		</tab>
 	</tabs>
 	<adddeleteeditpagefields>
 		<columnitem>
@@ -60,11 +64,10 @@
 		<field>
 			<fielddescr>Name</fielddescr>
 			<fieldname>name</fieldname>
-			<description>
-			       Enter the unique name here.
-                   Name must consist of minimum 2 symbols, first from which letter. &lt;br&gt;
-                   All other symbols must be [a-Z_0-9].
-            </description>
+			<description><![CDATA[
+								Enter a unique name of this rule here.<br>
+								The name must consist between 2 and 15 symbols [a-Z_0-9]. The first one must be a letter.<br>
+            ]]></description>
 			<type>input</type>
 			<required/>
 			<size>100</size>
@@ -76,7 +79,7 @@
  				<rowhelperfield>
 					<fielddescr>Time type</fielddescr>
 					<fieldname>timetype</fieldname>
-					<description></description>
+					<description><![CDATA[]]></description>
 					<type>select</type>
 					<value>weekly</value>
 					<options>
@@ -87,7 +90,7 @@
  				<rowhelperfield>
 					<fielddescr>Days</fielddescr>
 					<fieldname>timedays</fieldname>
-					<description></description>
+					<description><![CDATA[]]></description>
 					<type>select</type>
 					<value>*</value>
 					<options>
@@ -110,7 +113,7 @@
  				<rowhelperfield>
   					<fielddescr>Time range</fielddescr>
   					<fieldname>sg_timerange</fieldname>
-  					<description>00:00-08:00</description>
+  					<description><![CDATA[00:00-08:00]]></description>
   					<type>input</type>
 					<size>20</size>
 					<value>00:00-23:59</value>
@@ -120,12 +123,11 @@
 		<field>
 			<fielddescr>Description</fielddescr>
 			<fieldname>description</fieldname>
-			<description>You may enter a description here for your reference (not parsed). &lt;br&gt;
-                &lt;b&gt; Note: &lt;/b&gt; &lt;br&gt;
-				Field &lt;b&gt;'Date or date range'&lt;/b&gt; have format 'yyyy.mm.dd'; 'yyyy.mm.dd-yyyy.mm.dd'; or use '*' in format. &lt;br&gt;
-				Example: '2007.05.01'; '2007.04.14-2007.04.17'; '*.12.24'; '2007.*.01'; &lt;br&gt;
-				Field &lt;b&gt;'Time range'&lt;/b&gt; have format 'hh:mm-hh:mm'. Example: '08:00-18:00';
-			</description>
+			<description><![CDATA[You may enter any description here for your reference.<br>
+				<b>Note:</b><br>
+				<b>Example for Date or Date Range:</b> 2007.12.31 <b>or</b> 2007.11.31-2007.12.31 <b>or</b> *.12.31 <b>or</b> 2007.*.31<br>
+				<b>Example for Time Range:</b> 08:00-18:00
+			]]></description>
 			<type>input</type>
 			<size>80</size>
 		</field>

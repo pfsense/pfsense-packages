@@ -236,6 +236,7 @@ window.setTimeout('getactivity()', 150);
         $tab_array[] = array(gettext("Rewrites"),         false, "/pkg.php?xml=squidguard_rewr.xml");
         $tab_array[] = array(gettext("Blacklist"),        true,  "/squidGuard/squidguard_blacklist.php");
         $tab_array[] = array(gettext("Log"),              false, "/squidGuard/squidguard_log.php");
+		$tab_array[] = array(gettext("XMLRPC Sync"),      false, "/pkg_edit.php?xml=squidguard_sync.xml&amp;id=0");
         display_top_tabs($tab_array);
 ?>
     </td>
