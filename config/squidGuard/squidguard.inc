@@ -332,6 +332,7 @@ function squidguard_resync() {
     //}
 
     squidguard_cron_install();
+	squidguard_sync_on_changes();
 }
 
 # -----------------------------------------------------------------------------
@@ -1399,4 +1400,160 @@ function squidguard_blacklist_list()
 
     return $res;
 }
+
+// ##### The following part is based on the code of pfblocker #####
+
+/* Uses XMLRPC to synchronize the changes to a remote node */
+function squidguard_sync_on_changes() {
+	global $config, $g;
+	$varsyncenablexmlrpc = $config['installedpackages']['squidguardsync']['config'][0]['varsyncenablexmlrpc'];
+	$varsynctimeout = $config['installedpackages']['squidguardsync']['config'][0]['varsynctimeout'];	
+
+	// if checkbox is NOT checked do nothing
+	if(!$varsyncenablexmlrpc) {
+		return;
+	}
+ 
+	log_error("SquidGuard: Starting XMLRPC process (squidguard_do_xmlrpc_sync) with timeout {$varsynctimeout} seconds.");
+	
+	// if checkbox is checked get IP and password of the destination hosts
+	foreach ($config['installedpackages']['squidguardsync']['config'] as $rs ){
+		foreach($rs['row'] as $sh){
+			// if checkbox is NOT checked do nothing
+			if($sh['varsyncdestinenable']) {
+				$varsyncprotocol 	= $sh['varsyncprotocol'];
+				$sync_to_ip 		= $sh['varsyncipaddress'];
+				$password   		= $sh['varsyncpassword'];
+				$varsyncport 		= $sh['varsyncport'];
+				// check if all credentials are complete for this host
+				if($password && $sync_to_ip && $varsyncport && $varsyncprotocol) {
+					squidguard_do_xmlrpc_sync($sync_to_ip, $password, $varsyncport, $varsyncprotocol);
+				}
+				else {
+					log_error("SquidGuard: XMLRPC Sync with {$sh['varsyncipaddress']} has incomplete credentials. No XMLRPC Sync done!");
+				}
+			}
+			else {
+				log_error("SquidGuard: XMLRPC Sync with {$sh['varsyncipaddress']} is disabled");
+			}
+		}
+	}
+	log_error("SquidGuard: Finished XMLRPC process (squidguard_do_xmlrpc_sync).");
+}
+
+/* Do the actual XMLRPC sync */
+function squidguard_do_xmlrpc_sync($sync_to_ip, $password, $varsyncport, $varsyncprotocol) {
+	global $config, $g;
+
+	$varsynctimeout = $config['installedpackages']['squidguardsync']['config'][0]['varsynctimeout'];
+
+	if($varsynctimeout == '' || $varsynctimeout == 0) {
+		$varsynctimeout = 150;
+	}
+
+	// log_error("SquidGuard: Starting XMLRPC process (squidguard_do_xmlrpc_sync) with timeout {$varsynctimeout} seconds.");
+
+	if(!$password)
+		return;
+
+	if(!$sync_to_ip)
+		return;
+	
+	if(!$varsyncport)
+		return;
+
+	if(!$varsyncprotocol)
+		return;
+	
+	// Check and choose correct protocol type, port number and IP address
+	$synchronizetoip .= "$varsyncprotocol" . '://';
+	$port = "$varsyncport";
+
+	$synchronizetoip .= $sync_to_ip;
+
+	/* xml will hold the sections to sync */
+	$xml = array();
+	$xml['squidguardgeneral'] = $config['installedpackages']['squidguardgeneral'];
+	$xml['squidguardacl'] = $config['installedpackages']['squidguardacl'];
+	$xml['squidguarddefault'] = $config['installedpackages']['squidguarddefault'];
+	$xml['squidguarddest'] = $config['installedpackages']['squidguarddest'];
+	$xml['squidguardrewrite'] = $config['installedpackages']['squidguardrewrite'];
+	$xml['squidguardtime'] = $config['installedpackages']['squidguardtime'];
+	
+	/* assemble xmlrpc payload */
+	$params = array(
+		XML_RPC_encode($password),
+		XML_RPC_encode($xml)
+	);
+
+	/* set a few variables needed for sync code borrowed from filter.inc */
+	$url = $synchronizetoip;
+	log_error("SquidGuard: Beginning squidguard XMLRPC sync with {$url}:{$port}.");
+	$method = 'pfsense.merge_installedpackages_section_xmlrpc';
+	$msg = new XML_RPC_Message($method, $params);
+	$cli = new XML_RPC_Client('/xmlrpc.php', $url, $port);
+	$cli->setCredentials('admin', $password);
+		if($g['debug'])
+			$cli->setDebug(1);
+		/* send our XMLRPC message and timeout after $varsynctimeout seconds */
+		$resp = $cli->send($msg, $varsynctimeout);
+		if(!$resp) {
+			$error = "A communications error occurred while squidguard was attempting XMLRPC sync with {$url}:{$port}.";
+			log_error("SquidGuard: $error");
+			file_notice("sync_settings", $error, "squidguard Settings Sync", "");
+		} elseif($resp->faultCode()) {
+			$cli->setDebug(1);
+			$resp = $cli->send($msg, $varsynctimeout);
+			$error = "An error code was received while squidguard XMLRPC was attempting to sync with {$url}:{$port} - Code " . $resp->faultCode() . ": " . $resp->faultString();
+			log_error("SquidGuard: $error");
+			file_notice("sync_settings", $error, "squidguard Settings Sync", "");
+		} else {
+			log_error("SquidGuard: XMLRPC has synced data successfully with {$url}:{$port}.");
+		}
+	
+	/* tell squidguard to reload our settings on the destionation sync host. */
+	$method = 'pfsense.exec_php';
+	$execcmd  = "require_once('/usr/local/pkg/squidguard.inc');\n";
+	// pfblocker just needed one fuction to reload after XMLRPC. squidguard needs more so we point to a fuction below which contains all fuctions
+	$execcmd .= "squidguard_all_after_XMLRPC_resync();";
+	
+	/* assemble xmlrpc payload */
+	$params = array(
+		XML_RPC_encode($password),
+		XML_RPC_encode($execcmd)
+	);
+
+	log_error("SquidGuard XMLRPC is reloading data on {$url}:{$port}.");
+	$msg = new XML_RPC_Message($method, $params);
+	$cli = new XML_RPC_Client('/xmlrpc.php', $url, $port);
+	$cli->setCredentials('admin', $password);
+		$resp = $cli->send($msg, $varsynctimeout);
+		if(!$resp) {
+			$error = "A communications error occurred while squidguard was attempting XMLRPC sync with {$url}:{$port} (exec_php).";
+			log_error($error);
+			file_notice("sync_settings", $error, "squidguard Settings Sync", "");
+		} elseif($resp->faultCode()) {
+			$cli->setDebug(1);
+			$resp = $cli->send($msg, $varsynctimeout);
+			$error = "An error code was received while squidguard XMLRPC was attempting to sync with {$url}:{$port} - Code " . $resp->faultCode() . ": " . $resp->faultString();
+			log_error($error);
+			file_notice("sync_settings", $error, "squidguard Settings Sync", "");
+		} else {
+			log_error("SquidGuard: XMLRPC has reloaded data successfully on {$url}:{$port} (exec_php).");
+		}
+
+}
+
+// ##### The part above is based on the code of pfblocker #####
+
+// This function restarts all other needed functions after XMLRPC so that the content of .XML + .INC will be written in the files
+// Adding more functions will increase the time to sync
+function squidguard_all_after_XMLRPC_resync() {
+	
+	squidguard_resync_acl();
+	squidguard_resync();
+	
+	log_error("SquidGuard: Finished XMLRPC process. It should be OK. For more information look at the host which started sync.");
+}
+
 ?>
