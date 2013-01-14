@@ -129,7 +129,7 @@
 			<description><![CDATA[Enter lists Alias Names.<br>	
 								  Example: Badguys<br>
 								  Do not include pfBlocker name, it's done by package.<br>
-								  <strong>International, special or space caracters will be ignored in firewall alias names.</strong><br>]]></description>
+								  <strong>International, special or space characters will be ignored in firewall alias names.</strong><br>]]></description>
 			<type>input</type>
 			<size>20</size>
 		</field>	
@@ -142,8 +142,8 @@
 		<field>
 			<fielddescr><![CDATA[Lists]]></fielddescr>
 			<fieldname>none</fieldname>
-			<description><![CDATA['Format' - Choose the file format that url will retrieve or local file format.<br>
-								  'Url or local file' - Add direct link to list (Example: <a target=_new href='http://list.iblocklist.com/?list=bt_ads&fileformat=p2p&archiveformat=gz'>Ads</a>,
+			<description><![CDATA['Format' - Choose the file format that URL will retrieve or local file format.<br>
+								  'URL or local file' - Add direct link to list (Example: <a target=_new href='http://list.iblocklist.com/?list=bt_ads&fileformat=p2p&archiveformat=gz'>Ads</a>,
 																	<a target=_new href='http://list.iblocklist.com/?list=bt_spyware&fileformat=p2p&archiveformat=gz'>Spyware</a>,
 																	<a target=_new href='http://list.iblocklist.com/?list=bt_proxy&fileformat=p2p&archiveformat=gz'>Proxies</a> )<br> 
 									<br><strong>Note: </strong><br>
@@ -165,7 +165,7 @@
 				</options>
 			</rowhelperfield>	
 			<rowhelperfield>
-				<fielddescr>Url or localfile</fielddescr>
+				<fielddescr>URL or localfile</fielddescr>
 				<fieldname>url</fieldname>
 				<type>input</type>
 				<size>75</size>
