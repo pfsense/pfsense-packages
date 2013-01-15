@@ -417,9 +417,9 @@ function server_changed() {
 		cell2.innerHTML += "&nbsp;&nbsp; ";
 		cell2.innerHTML += "<a href='javascript:download_begin(\"inst\"," + i + ", -1)'>2.2</a>";
 		cell2.innerHTML += "&nbsp;&nbsp; ";
-		cell2.innerHTML += "<a href='javascript:download_begin(\"inst-2.3-x86\"," + i + ", -1)'>2.3-x86 (Beta)</a>";
+		cell2.innerHTML += "<a href='javascript:download_begin(\"inst-2.3-x86\"," + i + ", -1)'>2.3-x86</a>";
 //		cell2.innerHTML += "&nbsp;&nbsp; ";
-//		cell2.innerHTML += "<a href='javascript:download_begin(\"inst-2.3-x64\"," + i + ", -1)'>2.3-x64 (Beta)</a>";
+//		cell2.innerHTML += "<a href='javascript:download_begin(\"inst-2.3-x64\"," + i + ", -1)'>2.3-x64</a>";
 		cell2.innerHTML += "<br/>";
 		cell2.innerHTML += "<a href='javascript:download_begin(\"visc\"," + i + ", -1)'>Viscosity Bundle</a>";
 	}
@@ -446,9 +446,9 @@ function server_changed() {
 		cell2.innerHTML += "&nbsp;&nbsp; ";
 		cell2.innerHTML += "<a href='javascript:download_begin(\"inst\", -1," + j + ")'>2.2</a>";
 		cell2.innerHTML += "&nbsp;&nbsp; ";
-		cell2.innerHTML += "<a href='javascript:download_begin(\"inst-2.3-x86\", -1," + j + ")'>2.3-x86 (Beta)</a>";
+		cell2.innerHTML += "<a href='javascript:download_begin(\"inst-2.3-x86\", -1," + j + ")'>2.3-x86</a>";
 //		cell2.innerHTML += "&nbsp;&nbsp; ";
-//		cell2.innerHTML += "<a href='javascript:download_begin(\"inst-2.3-x64\", -1," + j + ")'>2.3-x64 (Beta)</a>";
+//		cell2.innerHTML += "<a href='javascript:download_begin(\"inst-2.3-x64\", -1," + j + ")'>2.3-x64</a>";
 		cell2.innerHTML += "<br/>";
 		cell2.innerHTML += "<a href='javascript:download_begin(\"visc\", -1," + j + ")'>Viscosity Bundle</a>";
 		if (servers[index][2] == "server_tls") {
@@ -482,9 +482,9 @@ function server_changed() {
 		cell2.innerHTML += "&nbsp;&nbsp; ";
 		cell2.innerHTML += "<a href='javascript:download_begin(\"inst\"," + i + ")'>2.2</a>";
 		cell2.innerHTML += "&nbsp;&nbsp; ";
-		cell2.innerHTML += "<a href='javascript:download_begin(\"inst-2.3-x86\"," + i + ")'>2.3-x86 (Beta)</a>";
+		cell2.innerHTML += "<a href='javascript:download_begin(\"inst-2.3-x86\"," + i + ")'>2.3-x86</a>";
 //		cell2.innerHTML += "&nbsp;&nbsp; ";
-//		cell2.innerHTML += "<a href='javascript:download_begin(\"inst-2.3-x64\"," + i + ")'>2.3-x64 (Beta)</a>";
+//		cell2.innerHTML += "<a href='javascript:download_begin(\"inst-2.3-x64\"," + i + ")'>2.3-x64</a>";
 		cell2.innerHTML += "<br/>";
 		cell2.innerHTML += "<a href='javascript:download_begin(\"visc\"," + i + ")'>Viscosity Bundle</a>";
 	}
