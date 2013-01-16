@@ -143,6 +143,7 @@
 				</field>
 				<field>
 						<fielddescr>Redirect</fielddescr>
+						<fieldname>redirect</fieldname>
 						<description><![CDATA[Enter the external redirection URL, error message or size (bytes) here.]]></description>
 						<type>textarea</type>
 						<cols>60</cols>
