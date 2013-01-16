@@ -43,6 +43,7 @@ $pfSense_snort_version = "2.5.2";
 $snort_package_version = "Snort {$snort_version} pkg v. {$pfSense_snort_version}";
 $snort_rules_file = "snortrules-snapshot-2923.tar.gz";
 $emerging_threats_version = "2.9.3";
+$flowbit_rules_file = "flowbit-required.rules";
 define("SNORTDIR", "/usr/local/etc/snort");
 define("SNORTLOGDIR", "/var/log/snort");
 
@@ -719,6 +720,486 @@ function sync_snort_package_config() {
 	conf_mount_ro();
 }
 
+function build_sid_msg_map($rules_dir, $sid_file) {
+
+	/* This function reads all the rules file in the passed      */
+	/* directory and produces a properly formatted sid-msg.map   */
+	/* file for use by Snort and/or barnyard2.                   */
+
+        $sidMap = array();
+
+        /* Normalize the supplied rules path to have a trailing      */
+        /* slash in the directory name.                              */
+        $my_rules_dir = ((strrpos($rules_dir, '/') + 1) == strlen($rules_dir)) ? $rules_dir : $rules_dir . "/";
+
+        /* Read the rule files into an array, then iterate the list  */
+        foreach (glob($my_rules_dir . "*.rules") as $file) {
+
+             /* Don't process files with "deleted" in the filename   */
+             if (preg_match('/deleted/i', $file))
+                  continue;
+
+             /* Read the file into an array, skipping empty lines.   */
+             $rules_array = file($file, FILE_SKIP_EMPTY_LINES);
+             $record = "";
+             $b_Multiline = false;
+
+             /* Read and process each line from the rules in the     */
+             /* current file.                                        */
+             foreach ($rules_array as $rule) {
+
+                  /* Skip any non-rule lines unless we're in         */
+                  /* multiline mode.
+                  if (!preg_match('/^\s*#*\s*(alert|drop|pass)/i', $rule) && !$b_Multiline)
+                       continue;
+
+                  /* Skip comment lines.                             */
+                  if (preg_match('/^\s*#/', $rule) && !preg_match('/^\s*#*\s*(alert|drop|pass)/i', $rule))
+                       continue;
+
+                  /* Test for a multi-line rule, and reassemble the  */
+                  /* pieces back into a single line.                 */
+                  if (preg_match('/\\\\s*[\n]$/m', $rule)) {
+                       $rule = substr($rule, 0, strrpos($rule, '\\'));
+                       $record .= $rule;
+                       $b_Multiline = true;
+                       continue;
+                  }
+                  /* If the last segment of a multiline rule, then   */
+                  /* append it onto the previous parts to form a     */
+                  /* single-line rule for further processing below.  */
+                  elseif (!preg_match('/\\\\s*[\n]$/m', $rule) && $b_Multiline) {
+                       $record .= $rule;
+                       $rule = $record;
+                  }
+                  $b_Multiline = false;
+                  $record = "";
+
+                  /* Parse the rule to find sid and any references.  */
+                  $sid = '';
+                  $msg = '';
+                  $matches = '';
+                  $sidEntry = '';
+                  if (preg_match('/\bmsg\s*:\s*"(.+?)"\s*;/i', $rule, $matches))
+                       $msg = trim($matches[1]);
+                  if (preg_match('/\bsid\s*:\s*(\d+)\s*;/i', $rule, $matches))
+                       $sid = trim($matches[1]);
+                  if (!empty($sid) && !empty($msg)) {
+                       $sidEntry = $sid . ' || ' . $msg;
+                       preg_match_all('/\breference\s*:\s*([^\;]+)/i', $rule, $matches);
+                       foreach ($matches[1] as $ref)
+                            $sidEntry .= " || " . trim($ref);
+                       $sidEntry .= "\n";
+                       $sidMap[$sid] = $sidEntry;
+                  }
+             }
+        }
+        /* Sort the generated sid-msg map by sid */
+        ksort($sidMap);
+
+        /* Now print the result to the supplied file */
+        file_put_contents($sid_file, array_values($sidMap));
+}
+
+function snort_merge_reference_configs($cfg_in, $cfg_out) {
+
+	/* This function takes a list of "reference.config" files  */
+	/* in the $cfg_in array and merges them into a single      */
+	/* file specified by $cfg_out.  The merging is done so     */
+	/* no duplication of lines occurs in the output file.      */
+
+        $outMap = array();
+        foreach ($cfg_in as $file) {
+                $in = file($file, FILE_SKIP_EMPTY_LINES);
+                foreach ($in as $line) {
+                        /* Skip comment lines  */
+                        if (preg_match('/^\s*#/', $line))
+                                continue;
+                        if (preg_match('/(\:)\s*(\w+)\s*(.*)/', $line, $matches)) {
+                                if (!empty($matches[2]) && !empty($matches[3])) {
+                                        $matches[2] = trim($matches[2]);
+                                        if (!array_key_exists($matches[2], $outMap))
+                                                $outMap[$matches[2]] = trim($matches[3]);
+                                }
+                        }
+                }             
+        }
+        /* Sort the new reference map.  */
+        uksort($outMap,'strnatcasecmp');
+
+        /* Format and write it to the supplied output file.  */
+        $format = "config reference: %-12s %s\n";
+        foreach ($outMap as $key=>$value)
+                $outMap[$key] = sprintf($format, $key, $value);
+        file_put_contents($cfg_out, array_values($outMap));
+}
+
+function snort_merge_classification_configs($cfg_in, $cfg_out) {
+
+	/* This function takes a list of "classification.config"    */
+	/* files in the $cfg_in array and merges them into a        */
+	/* single file specified by $cfg_out.  The merging is done  */
+	/* so no duplication of lines occurs in the output file.    */
+
+        $outMap = array();
+        foreach ($cfg_in as $file) {
+                $in = file($file, FILE_SKIP_EMPTY_LINES);
+                foreach ($in as $line) {
+                        if (preg_match('/(.*:)(\s*.*),(.*),(.*)/', $line, $matches)) {
+                                /* Skip comment lines  */
+                                if (preg_match('/^\s*#/', $line))
+                                        continue;
+                                if (!empty($matches[2]) && !empty($matches[3]) && !empty($matches[4])) {
+                                        $matches[2] = trim($matches[2]);
+                                        if (!array_key_exists($matches[2], $outMap))
+                                                $outMap[$matches[2]] = trim($matches[3]) . "," . trim($matches[4]);
+                                }
+                        }
+                }             
+        }
+        /* Sort the new classification map.  */
+        uksort($outMap,'strnatcasecmp');
+
+        /* Format and write it to the supplied output file.  */
+        $format = "config classification: %s,%s\n";
+        foreach ($outMap as $key=>$value)
+                $outMap[$key] = sprintf($format, $key, $value);
+        file_put_contents($cfg_out, array_values($outMap));
+}
+
+function snort_load_rules_map($rules_path) {
+
+	/* This function loads and returns an array with all the rules */
+	/* found in the *.rules files in the passed rules path.        */
+
+	$map_ref = array();
+	$rule_files = array();
+
+	if (empty($rules_path))
+		return $map_ref;
+
+	/* Read all the rules into the map array.
+	 * The structure of the map is:
+	 *   map[gid][sid]['rule']['category']['disabled']['flowbits']
+	 *     where:
+	 *      gid      = Generator ID from rule, or 1 if general text rule
+	 *      sid      = Signature ID from rule
+         *      rule     = Rule text
+	 *      category = File name of file containing the rule
+	 *      disabled = 1 if rule is disabled (commented out), 0 if rule is active
+	 *      flowbits = Array of applicable flowbits if rule contains flowbits options
+	 */
+
+	/* First check if we were passed a directory or a single file */
+	/* to read.                                                   */
+	if (is_dir($rules_path))
+		$rule_files = glob($rules_path . "*.rules");
+	elseif (is_file($rules_path))
+		$rule_files = $rules_path;
+	else
+		return $map_ref;
+
+        /* Read the rule files into an array, then iterate the list   */
+	/* to process the rules from the files one-by-one.            */
+	foreach ($rule_files as $file) {
+
+		/* Don't process files with "deleted" in the filename. */
+		if (preg_match('/deleted/i', $file))
+			continue;
+
+		/* Read the file contents into an array, skipping   */
+		/* empty lines.                                     */
+		$rules_array = file($file, FILE_SKIP_EMPTY_LINES);
+		$record = "";
+		$b_Multiline = false;
+
+		/* Read and process each line from the rules in the */
+		/* current file into an array.                      */
+		foreach ($rules_array as $rule) {
+
+			/* Skip any non-rule lines unless we're in  */
+			/* multiline mode.			    */
+			if (!preg_match('/^\s*#*\s*(alert|drop|pass)/i', $rule) && !$b_Multiline)
+				continue;
+
+			/* Test for a multi-line rule; loop and reassemble */
+			/* the pieces back into a single line.             */
+			if (preg_match('/\\\\s*[\n]$/m', $rule)) {
+				$rule = substr($rule, 0, strrpos($rule, '\\'));
+				$record .= $rule;
+				$b_Multiline = true;
+				continue;
+			}
+			/* If the last segment of a multiline rule, then   */
+			/* append it onto the previous parts to form a     */
+			/* single-line rule for further processing below.  */
+			elseif (!preg_match('/\\\\s*[\n]$/m', $rule) && $b_Multiline) {
+				$record .= $rule;
+				$rule = $record;
+			}
+
+			/* We have an actual single-line rule, or else a   */
+			/* re-assembled multiline rule that is now a       */
+			/* single-line rule, so store it in our rules map. */
+			$sid = snort_get_sid($rule);
+			$gid = snort_get_gid($rule);
+			$map_ref[$gid][$sid]['rule'] = $rule;
+			$map_ref[$gid][$sid]['category'] = basename($file, ".rules");
+			if (preg_match('/^\s*\#+/', $rule))
+				$map_ref[$gid][$sid]['disabled'] = 1;
+			else
+				$map_ref[$gid][$sid]['disabled'] = 0;
+
+			/* Grab any associated flowbits from the rule.     */
+			$map_ref[$gid][$sid]['flowbits'] = snort_get_flowbits($rule);
+			
+			/* Reset our local flag and record variables       */
+			/* for the next rule in the set.                   */
+			$b_Multiline = false;
+			$record = "";
+		}
+
+		/* Zero out our processing array and get the next file.    */
+		unset($rules_array);
+	}
+	return $map_ref;
+}
+
+function snort_get_gid($rule) {
+
+	/* If a gid is defined, then return it, else default to "1" for */
+	/* general text rules match.                                    */
+
+	if (preg_match('/\bgid\s*:\s*(\d+)\s*;/i', $rule, $matches))
+		return trim($matches[1]);
+	else
+		return "1";
+}
+
+function snort_get_sid($rule) {
+	if (preg_match('/\bsid\s*:\s*(\d+)\s*;/i', $rule, $matches))
+		return trim($matches[1]);
+	else
+		/* Return a ridiculously large default if no sid     */
+		/* defined.  This should never happen.               */
+		return "999999999";
+}
+
+function snort_get_flowbits($rule) {
+
+	/* This will pull out "flowbits:set, unset or isset" entries */
+	/* from the rule text and return them in an array.           */
+
+	$flowbits = array();
+	if (preg_match_all('/flowbits\b:\s*(set|setx|unset|toggle|isset|isnotset)\s*,([^;]+)/i', $rule, $matches)) {
+		$i = -1;
+		while (++$i < count($matches[1])) {
+			$flowbits[] = trim($matches[1][$i]) ."," . trim($matches[2][$i]);
+		}
+	}
+	return $flowbits;
+}
+
+function snort_get_checked_flowbits(&$rules_map) {
+
+	/* This function checks all the currently enabled rules to   */
+	/* find any checked flowbits, and returns the checked        */
+	/* flowbit names in an array.                                */
+
+	$checked_flowbits = array();
+	foreach (array_keys($rules_map) as $k1) {
+		foreach (array_keys($rules_map[$k1]) as $k2) {
+			if ($rules_map[$k1][$k2]['disabled'] == 1)
+				continue;
+			if (empty($rules_map[$k1][$k2]['flowbits']))
+				continue;
+			foreach (array_values($rules_map[$k1][$k2]['flowbits']) as $flowbit) {
+				$action = substr($flowbit, 0, strpos($flowbit, ","));
+				if (preg_match('/is(not)?set/i', $action)) {
+					$tmp = substr($flowbit, strpos($flowbit, ",") +1 );
+					if (!in_array($tmp, $checked_flowbits))
+						$checked_flowbits[] = $tmp;
+				}
+			}
+		}
+	}
+	return $checked_flowbits;
+}
+
+function snort_get_set_flowbits(&$rules_map) {
+
+	/* This function checks all the currently enabled rules  */
+	/* to find any set flowbits, and returns the flowbit     */
+	/* names in an array.                                    */
+
+	$set_flowbits = array();
+	foreach (array_keys($rules_map) as $k1) {
+		foreach (array_keys($rules_map[$k1]) as $k2) {
+			if ($rules_map[$k1][$k2]['disabled'] == 1)
+				continue;
+			if (empty($rules_map[$k1][$k2]['flowbits']))
+				continue;
+			foreach (array_values($rules_map[$k1][$k2]['flowbits']) as $flowbit) {
+				$action = substr($flowbit, 0, strpos($flowbit, ","));
+				if (preg_match('/^set/i', $action)) {
+					$tmp = substr($flowbit, strpos($flowbit, ",") +1 );
+					if (!in_array($tmp, $set_flowbits))
+						$set_flowbits[] = $tmp;
+				}
+			}
+		}
+	}
+	return $set_flowbits;
+}
+
+function snort_find_flowbit_required_rules(&$all_rules, &$unchecked_flowbits) {
+
+	/* This function finds all rules that must be enabled   */
+	/* in order to satisfy the "checked flowbits" used by   */
+	/* the currently enabled rules.  It returns the list    */
+	/* of required rules in an array.                       */
+
+	$required_flowbits_rules = array();
+	foreach (array_keys($all_rules) as $k1) {
+		foreach (array_keys($all_rules[$k1]) as $k2) {
+			if (empty($all_rules[$k1][$k2]['flowbits']))
+				continue;
+			foreach (array_values($all_rules[$k1][$k2]['flowbits']) as $flowbit) {
+				$action = substr($flowbit, 0, strpos($flowbit, ","));
+				if (preg_match('/^set/i', $action)) {
+					$tmp = substr($flowbit, strpos($flowbit, ",") +1 );
+					if (in_array($tmp, $unchecked_flowbits)) {
+						$required_flowbits_rules[$k1][$k2]['category'] = $all_rules[$k1][$k2]['category'];
+						if ($all_rules[$k1][$k2]['disabled'] == 0)
+							/* If not disabled, just return the rule text "as is"   */
+							$required_flowbits_rules[$k1][$k2]['rule'] = ltrim($all_rules[$k1][$k2]['rule']);
+						else
+							/* If rule is disabled, remove leading '#' to enable it */
+							$required_flowbits_rules[$k1][$k2]['rule'] = ltrim(substr($all_rules[$k1][$k2]['rule'], strpos($all_rules[$k1][$k2]['rule'], "#") + 1));
+					}
+				}
+			}
+		}
+	}
+	return $required_flowbits_rules;
+}
+
+function snort_resolve_flowbits($rule_path) {
+
+	/* This function auto-resolves flowbit requirements   */
+	/* by finding all checked flowbits in the currently   */
+	/* enabled rules, and then making sure all the "set"  */
+	/* flowbit rules for those "checked" flowbits are     */
+	/* enabled.  For any that are not enabled, they are   */
+	/* copied to an array, enabled, and returned.         */
+	/*                                                    */
+	/* $rule_path --> rules directory of the interface    */
+	/*                to resolve flowbit dependencies     */
+	/*                for.                                */
+
+	$snortdir = SNORTDIR;
+
+	/* First, load up all the enabled rules.              */
+	$rules_map = snort_load_rules_map($rule_path);
+
+	/* Next, find all the "checked" and "set" flowbits.   */
+	$checked_flowbits = snort_get_checked_flowbits($rules_map);
+	$set_flowbits = snort_get_set_flowbits($rules_map);
+
+	/* We're done with the first rules array, so cleanup  */
+	/* to conserve memory.                                */
+	unset($rules_map);
+
+	/* Next find any "checked" flowbits without matching  */
+	/* "set" flowbit rules in the enabled rule set.       */
+	$delta_flowbits = array_diff($checked_flowbits, $set_flowbits);
+
+	/* Cleanup and release the memory we no longer need.  */
+	unset($checked_flowbits);
+	unset($set_flowbits);
+
+	/* Now find all the needed "set flowbit" rules from   */
+	/* the master list of all rules.                      */
+	$all_rules_map = snort_load_rules_map("{$snortdir}/rules/");
+	$required_rules = snort_find_flowbit_required_rules($all_rules_map, $delta_flowbits);
+
+	/* Cleanup and release memory we no longer need.      */
+	unset($all_rules_map);
+	unset($delta_flowbits);
+
+	return $required_rules;
+}
+
+function snort_write_flowbit_rules_file($flowbit_rules, $rule_file) {
+
+	/* This function takes an array of rules in the */
+	/* rules_map format and writes them to the file */
+	/* given.                                       */
+
+	file_put_contents($rule_file, "# These rules set flowbits checked by your other enabled rules.  If the\n");
+	file_put_contents($rule_file, "# the dependent flowbits are not set, then some of your chosen rules may\n", FILE_APPEND);
+	file_put_contents($rule_file, "# not fire.  Enabling all rules that set these dependent flowbits ensures\n", FILE_APPEND);
+	file_put_contents($rule_file, "# your chosen rules fire as intended.\n\n", FILE_APPEND); 
+	file_put_contents($rule_file, "# If you wish to prevent alerts from any of these rules, add the GID:SID\n", FILE_APPEND);
+	file_put_contents($rule_file, "# of the rule to the Suppression List for the interface.\n", FILE_APPEND);
+	foreach (array_keys($flowbit_rules) as $k1) {
+		foreach (array_keys($flowbit_rules[$k1]) as $k2) {
+			file_put_contents($rule_file, "#\n# Rule from category: " . $flowbit_rules[$k1][$k2]['category'], FILE_APPEND);
+			file_put_contents($rule_file, "   GID:" . $k1 . "  SID:" . $k2 . "\n", FILE_APPEND);
+			file_put_contents($rule_file, $flowbit_rules[$k1][$k2]['rule'], FILE_APPEND);
+		}
+	}
+}
+
+function snort_load_vrt_policy($policy) {
+
+	/* This function returns an array of all rules  */
+	/* marked with the passed in $policy metadata.  */
+	/*                                              */
+	/* $policy --> desired VRT security policy      */
+	/*              1.  connectivity                */
+	/*              2.  balanced                    */
+	/*              3.  security                    */
+
+	$snortdir = SNORTDIR;
+	$vrt_policy_rules = array();
+	$policy_pcre = "/policy\\s" . $policy . "/i";
+
+	/* First, load up all the rules we have.        */
+	$all_rules_map = snort_load_rules_map("{$snortdir}/rules/");
+
+	/* Now walk the rules list and find all those   */
+	/* that are defined as active for the chosen    */
+	/* security policy.                             */
+	foreach (array_keys($all_rules_map) as $k1) {
+		foreach (array_keys($all_rules_map[$k1]) as $k2) {
+			if (preg_match($policy_pcre, $all_rules_map[$k1][$k2]['rule'])) {
+				if (!preg_match('/flowbits\s*:\s*noalert/i', $all_rules_map[$k1][$k2]['rule'])) {
+					$vrt_policy_rules[$k1][$k2] = $all_rules_map[$k1][$k2];
+
+					/* Enable the policy rule if disabled  */
+					if ($all_rules_map[$k1][$k2]['disabled'] == 1)
+						$vrt_policy_rules[$k1][$k2]['rule'] = ltrim(substr($all_rules_map[$k1][$k2]['rule'], strpos($all_rules_map[$k1][$k2]['rule'], "#") + 1));
+				}
+			}
+		}
+	}
+
+	/* Release memory we no longer need.            */
+	unset($all_rules_map);
+	
+	/* Return all the rules that match the policy.  */
+	return $vrt_policy_rules;
+}
+
+function snort_write_enforcing_rules_file($rule_map, $rule_path) {
+
+	/* This function takes an array containing      */
+	/* the rules chosen for the active rule set,    */
+	/* writes them out to the passed path.          */ 
+
+}
+
 /* Start of main config files */
 /* open snort.sh for writing" */
 function snort_create_rc() {
@@ -983,7 +1464,7 @@ function snort_deinstall() {
 }
 
 function snort_generate_conf($snortcfg) {
-	global $config, $g;
+	global $config, $g, $flowbit_rules_file;
 
 	$snortdir = SNORTDIR;
 	$snortlogdir = SNORTLOGDIR;
@@ -1075,7 +1556,7 @@ function snort_generate_conf($snortcfg) {
 		$ssh_port = "22";
 	$snort_ports = array(
 		"dns_ports" => "53", "smtp_ports" => "25", "mail_ports" => "25,143,465,691",
-		"http_ports" => "80", "oracle_ports" => "1521", "mssql_ports" => "1433",
+		"http_ports" => "80,901,3128,8080,9000", "oracle_ports" => "1521", "mssql_ports" => "1433",
 		"telnet_ports" => "23","snmp_ports" => "161", "ftp_ports" => "21",
 		"ssh_ports" => $ssh_port, "pop2_ports" => "109", "pop3_ports" => "110", 
 		"imap_ports" => "143", "sip_proxy_ports" => "5060:5090,16384:32768",
@@ -1088,7 +1569,7 @@ function snort_generate_conf($snortcfg) {
 		"DCERPC_NCACN_IP_TCP" => "139,445", "DCERPC_NCADG_IP_UDP" => "138,1024:",
 		"DCERPC_NCACN_IP_LONG" => "135,139,445,593,1024:", "DCERPC_NCACN_UDP_LONG" => "135,1024:",
 		"DCERPC_NCACN_UDP_SHORT" => "135,593,1024:", "DCERPC_NCACN_TCP" => "2103,2105,2107",
-		"DCERPC_BRIGHTSTORE" => "6503,6504"
+		"DCERPC_BRIGHTSTORE" => "6503,6504", "DNP3_PORTS" => "20000", "MODBUS_PORTS" => "502"
 	);
 
 	$portvardef = "";
@@ -1109,9 +1590,18 @@ preprocessor perfmonitor: time 300 file {$snortlogdir}/snort_{$if_real}{$snort_u
 	
 EOD;
 
-	$def_flow_depth_type = '0';
-	if (!empty($snortcfg['flow_depth']))
-		$def_flow_depth_type = $snortcfg['flow_depth'];
+	$def_server_flow_depth_type = '300';
+	if ((!empty($snortcfg['server_flow_depth'])) || ($snortcfg['server_flow_depth'] == '0'))
+		$def_server_flow_depth_type = $snortcfg['server_flow_depth'];
+
+	$def_client_flow_depth_type = '300';
+	if ((!empty($snortcfg['client_flow_depth'])) || ($snortcfg['client_flow_depth'] == '0'))
+		$def_client_flow_depth_type = $snortcfg['client_flow_depth'];
+
+	if ($snortcfg['noalert_http_inspect'] == 'on')
+		$noalert_http_inspect = "no_alerts ";
+	else
+		$noalert_http_inspect = "";
 
 	$http_ports = str_replace(",", " ", $snort_ports['http_ports']);
 	/* def http_inspect */
@@ -1119,27 +1609,17 @@ EOD;
 # HTTP Inspect  #
 preprocessor http_inspect: global iis_unicode_map unicode.map 1252 compress_depth 65535 decompress_depth 65535
 
-preprocessor http_inspect_server: server default \
-                        ports  { {$http_ports} }  \
-                        non_strict \
-                        non_rfc_char  { 0x00 0x01 0x02 0x03 0x04 0x05 0x06 0x07 }  \
-                        flow_depth {$def_flow_depth_type}  \
-                        apache_whitespace no \
-                        directory no \
-                        iis_backslash no \
-                        u_encode yes \
-			extended_response_inspection \
-			inspect_gzip \
-			normalize_utf \
-			normalize_javascript \
-			unlimited_decompress \
-                        ascii no \
-                        chunk_length 500000 \
-                        bare_byte yes \
-                        double_decode yes \
-                        iis_unicode no \
-                        iis_delimiter no \
-                        multi_slash no
+preprocessor http_inspect_server: server default profile all {$noalert_http_inspect}\
+	ports  { {$http_ports} }  \
+	http_methods { GET POST PUT SEARCH MKCOL COPY MOVE LOCK UNLOCK NOTIFY POLL BCOPY BDELETE BMOVE LINK UNLINK OPTIONS HEAD DELETE TRACE TRACK CONNECT SOURCE SUBSCRIBE UNSUBSCRIBE PROPFIND PROPPATCH BPROPFIND BPROPPATCH RPC_CONNECT PROXY_SUCCESS BITS_POST CCM_POST SMS_POST RPC_IN_DATA RPC_OUT_DATA RPC_ECHO_DATA } \
+	server_flow_depth {$def_server_flow_depth_type} \
+	client_flow_depth {$def_client_flow_depth_type} \
+	enable_cookie \
+	extended_response_inspection \
+	inspect_gzip \
+	normalize_utf \
+	unlimited_decompress \
+	normalize_javascript
 	
 EOD;
 
@@ -1195,18 +1675,22 @@ EOD;
 	$pop_preproc = <<<EOD
 preprocessor pop: \
 	ports { {$pop_ports} } \
-	qp_decode_depth -1 \
+        memcap 1310700 \
+	qp_decode_depth 0 \
 	b64_decode_depth 0 \
-	bitenc_decode_depth 100
+	bitenc_decode_depth 0
+
 EOD;
 
 	$imap_ports = str_replace(",", " ", $snort_ports['imap_ports']);
 	$imap_preproc = <<<EOD
 preprocessor imap: \
 	ports { {$imap_ports} } \
-	qp_decode_depth -1 \
+        memcap 1310700 \
+	qp_decode_depth 0 \
 	b64_decode_depth 0 \
-	bitenc_decode_depth 100
+	bitenc_decode_depth 0
+
 EOD;
 
 	$smtp_ports = str_replace(",", " ", $snort_ports['mail_ports']);
@@ -1217,6 +1701,7 @@ preprocessor SMTP: \
     ports { {$smtp_ports} } \
     inspection_type stateful \
     normalize cmds \
+    ignore_tls_data \
     valid_cmds { MAIL RCPT HELP HELO ETRN EHLO EXPN VRFY ATRN SIZE BDAT DEBUG EMAL ESAM ESND ESOM EVFY IDENT NOOP RSET SEND SAML SOML AUTH TURN ETRN PIPELINING \
 CHUNKING DATA DSN RSET QUIT ONEX QUEU STARTTLS TICK TIME TURNME VERB X-EXPS X-LINK2STATE XADR XAUTH XCIR XEXCH50 XGEN XLICENSE XQUEU XSTA XTRN XUSR } \
     normalize_cmds { MAIL RCPT HELP HELO ETRN EHLO EXPN VRFY ATRN SIZE BDAT DEBUG EMAL ESAM ESND ESOM EVFY IDENT NOOP RSET SEND SAML SOML AUTH TURN ETRN \
@@ -1230,8 +1715,16 @@ PIPELINING CHUNKING DATA DSN RSET QUIT ONEX QUEU STARTTLS TICK TIME TURNME VERB 
     alt_max_command_line_len 246 { SEND SAML SOML AUTH TURN ETRN PIPELINING CHUNKING DATA DSN RSET QUIT ONEX } \
     alt_max_command_line_len 246 { QUEU STARTTLS TICK TIME TURNME VERB X-EXPS X-LINK2STATE XADR } \
     alt_max_command_line_len 246 { XAUTH XCIR XEXCH50 XGEN XLICENSE XQUEU XSTA XTRN XUSR } \
-    xlink2state { enable }
-	
+    xlink2state { enable } \
+    log_mailfrom \
+    log_rcptto \
+    log_email_hdrs \
+    email_hdrs_log_depth 1464 \
+    log_filename \
+    qp_decode_depth 0 \
+    b64_decode_depth 0 \
+    bitenc_decode_depth 0
+
 EOD;
 
 	/* def sf_portscan */
@@ -1248,8 +1741,9 @@ EOD;
 	$sun_rpc_ports = str_replace(",", " ", $snort_ports['sun_rpc_ports']);
 	/* def other_preprocs */
 	$other_preprocs = <<<EOD
+
 # Other preprocs #
-preprocessor rpc_decode: {$sun_rpc_ports}
+preprocessor rpc_decode: {$sun_rpc_ports} no_alert_multiple_requests no_alert_large_fragments no_alert_incomplete
 
 # Back Orifice
 preprocessor bo
@@ -1259,11 +1753,11 @@ EOD;
 	/* def dce_rpc_2 */
 	$dce_rpc_2 = <<<EOD
 # DCE/RPC 2   #
-preprocessor dcerpc2: memcap 102400, events [smb, co, cl]
+preprocessor dcerpc2: memcap 102400, events [co]
 preprocessor dcerpc2_server: default, policy WinXP, \
     detect [smb [{$snort_ports['smb_ports']}], tcp 135, udp 135, rpc-over-http-server 593], \
     autodetect [tcp 1025:, udp 1025:, rpc-over-http-server 1025:], \
-    smb_max_chain 3
+    smb_max_chain 3, smb_invalid_shares ["C$", "D$", "ADMIN$"]
 	
 EOD;
 
@@ -1274,6 +1768,26 @@ EOD;
 preprocessor dns: \
     ports { {$dns_ports} } \
     enable_rdata_overflow
+	
+EOD;
+
+	/* def dnp3_preprocessor */
+	$dnp3_ports = str_replace(",", " ", $snort_ports['DNP3_PORTS']);
+	$dnp3_preproc = <<<EOD
+# DNP3 preprocessor #
+preprocessor dnp3: \
+    ports { {$dnp3_ports} } \
+    memcap 262144 \
+    check_crc
+	
+EOD;
+
+	/* def modbus_preprocessor */
+	$modbus_ports = str_replace(",", " ", $snort_ports['MODBUS_PORTS']);
+	$modbus_preproc = <<<EOD
+# Modbus preprocessor #
+preprocessor modbus: \
+    ports { {$modbus_ports} }
 	
 EOD;
 
@@ -1288,12 +1802,16 @@ EOD;
 
 	/* stream5 queued settings */
 	$def_max_queued_bytes_type = '';
-	if (!empty($snortcfg['max_queued_bytes']))
+	if ((!empty($snortcfg['max_queued_bytes'])) || ($snortcfg['max_queued_bytes'] == '0'))
 		$def_max_queued_bytes_type = ", max_queued_bytes {$snortcfg['max_queued_bytes']}";
 
 	$def_max_queued_segs_type = '';
-	if (!empty($snortcfg['max_queued_segs']))
+	if ((!empty($snortcfg['max_queued_segs'])) || ($snortcfg['max_queued_segs'] == '0'))
 		$def_max_queued_segs_type = ", max_queued_segs {$snortcfg['max_queued_segs']}";
+
+	$def_stream5_mem_cap = '';
+	if (!empty($snortcfg['stream5_mem_cap']))
+		$def_stream5_mem_cap = ", memcap {$snortcfg['stream5_mem_cap']}";
 
 	/* define servers and ports snortdefservers */
 	$snort_servers = array (
@@ -1301,7 +1819,9 @@ EOD;
 		"www_servers" => "\$HOME_NET", "sql_servers" => "\$HOME_NET", "telnet_servers" => "\$HOME_NET",
 		"snmp_servers" => "\$HOME_NET", "ftp_servers" => "\$HOME_NET", "ssh_servers" => "\$HOME_NET",
 		"pop_servers" => "\$HOME_NET", "imap_servers" => "\$HOME_NET", "sip_proxy_ip" => "\$HOME_NET",
-		"sip_servers" => "\$HOME_NET", "rpc_servers" => "\$HOME_NET",
+		"sip_servers" => "\$HOME_NET", "rpc_servers" => "\$HOME_NET", "dnp3_server" => "\$HOME_NET",
+		"dnp3_client" => "\$HOME_NET", "modbus_server" => "\$HOME_NET", "modbus_client" => "\$HOME_NET",
+		"enip_server" => "\$HOME_NET", "enip_client" => "\$HOME_NET",
 		"aim_servers" => "64.12.24.0/23,64.12.28.0/23,64.12.161.0/24,64.12.163.0/24,64.12.200.0/24,205.188.3.0/24,205.188.5.0/24,205.188.7.0/24,205.188.9.0/24,205.188.153.0/24,205.188.179.0/24,205.188.248.0/24"
 	    );
 
@@ -1318,11 +1838,11 @@ EOD;
 		"dce_rpc_2" => "dce2_preproc", "dns_preprocessor" => "dns_preproc", "ftp_preprocessor" => "ftptelnet_preproc", "imap_preproc" => "imap_preproc",
 		"pop_preproc" => "pop_preproc", "reputation_preproc" => "reputation_preproc", "sensitive_data" => "sdf_preproc", 
 		"sip_preproc" => "sip_preproc", "smtp_preprocessor" => "smtp_preproc", "ssh_preproc" => "ssh_preproc", 
-		"ssl_preproc" => "ssl_preproc"
+		"ssl_preproc" => "ssl_preproc", "dnp3_preproc" => "dnp3_preproc", "modbus_preproc" => "modbus_preproc"
 	);
 	$snort_preproc = array (
 		"perform_stat", "http_inspect", "other_preprocs", "ftp_preprocessor", "smtp_preprocessor", "ssl_preproc",
-		"sf_portscan", "dce_rpc_2", "dns_preprocessor", "sensitive_data", "pop_preproc", "imap_preproc"
+		"sf_portscan", "dce_rpc_2", "dns_preprocessor", "sensitive_data", "pop_preproc", "imap_preproc", "dnp3_preproc", "modbus_preproc"
 	);
 	$snort_preprocessors = "";
 	foreach ($snort_preproc as $preproc) {
@@ -1395,6 +1915,10 @@ EOD;
 			} else if (file_exists("{$snortcfgdir}/rules/{$enabled_item}"))
 				$selected_rules_sections  .= "include \$RULE_PATH/{$enabled_item}\n";
 		}
+
+		/* If auto-flowbit resolution is enabled and the rules file is present, include it. */
+		if (($snortcfg['autoflowbitrules'] == "on") && (file_exists("{$snortcfgdir}/rules/{$flowbit_rules_file}")))
+			$selected_rules_sections  .= "include \$RULE_PATH/{$flowbit_rules_file}\n";
 	}
 
 	if (!empty($snortcfg['customrules'])) {
@@ -1439,21 +1963,29 @@ config disable_decode_drops
 
 # Configure the detection engine  #
 config detection: search-method {$snort_performance} max_queue_events 5
-config event_queue: max_queue 8 log 3 order_events content_length
+config event_queue: max_queue 8 log 5 order_events content_length
+
+# Configure protocol aware flushing  #
+# For more information see README.stream5  #
+config paf_max: 16000
 
 #Configure dynamic loaded libraries
 dynamicpreprocessor directory {$snort_dirs['dynamicpreprocessor']}
 dynamicengine directory {$snort_dirs['dynamicengine']}
 dynamicdetection directory {$snort_dirs['dynamicrules']}
 
-# Flow and stream #
-preprocessor frag3_global: max_frags 8192
-preprocessor frag3_engine: policy bsd detect_anomalies
+# Inline packet normalization. For more information, see README.normalize
+preprocessor normalize_ip4
+preprocessor normalize_tcp: ips ecn stream
+preprocessor normalize_icmp4
 
-preprocessor stream5_global: track_tcp yes, track_udp yes, track_icmp yes
-preprocessor stream5_tcp: policy BSD, ports both all{$def_max_queued_bytes_type}{$def_max_queued_segs_type}
-preprocessor stream5_udp:
-preprocessor stream5_icmp:
+# Flow and stream #
+preprocessor frag3_global: max_frags 65536
+preprocessor frag3_engine: policy bsd detect_anomalies overlap_limit 10 min_fragment_length 100 timeout 180
+
+preprocessor stream5_global: track_tcp yes, track_udp yes, track_icmp no, max_tcp 262144, max_udp 131072, max_active_responses 2, min_response_seconds 5{$def_stream5_mem_cap}
+preprocessor stream5_tcp: policy BSD, overlap_limit 10, timeout 180, require_3whs 180, ports both all{$def_max_queued_bytes_type}{$def_max_queued_segs_type}
+preprocessor stream5_udp: timeout 180
 
 {$snort_preprocessors}
 

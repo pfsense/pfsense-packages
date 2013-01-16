@@ -239,6 +239,7 @@ function popup(url)
 			<option value='?id=<?=$id;?>&openruleset=custom.rules'>custom.rules</option>
 		<?php
 			$files = explode("||", $pconfig['rulesets']);
+			natcasesort($files);
 			foreach ($files as $value) {
 				if ($snortdownload != 'on' && strstr($value, "snort"))
 					continue;
@@ -399,11 +400,6 @@ function popup(url)
 				src="../themes/<?= $g['theme']; ?>/images/icons/icon_block_d.gif"
 				width="11" height="11"></td>
 			<td nowrap><?php echo gettext("Rule Disabled"); ?></td>
-		</tr>
-		<tr>
-			<td colspan="10">
-			<p><!--<strong><span class="red">Warning:<br/> </span></strong>Editing these r</p>-->
-			</td>
 		</tr>
 	</table>
 	</td>

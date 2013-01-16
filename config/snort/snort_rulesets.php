@@ -87,12 +87,27 @@ if (isset($id) && $a_nat[$id]) {
 	$pconfig['enable'] = $a_nat[$id]['enable'];
 	$pconfig['interface'] = $a_nat[$id]['interface'];
 	$pconfig['rulesets'] = $a_nat[$id]['rulesets'];
+	$pconfig['autoflowbitrules'] = $a_nat[$id]['autoflowbitrules'];
+	$pconfig['ips_policy_enable'] = $a_nat[$id]['ips_policy_enable'];
+	$pconfig['ips_policy'] = $a_nat[$id]['ips_policy'];
 }
 
 $if_real = snort_get_real_interface($pconfig['interface']);
 $snort_uuid = $a_nat[$id]['uuid'];
 $snortdownload = $config['installedpackages']['snortglobal']['snortdownload'];
 $emergingdownload = $config['installedpackages']['snortglobal']['emergingthreats'];
+
+if (($snortdownload == 'off') || ($a_nat[$id]['ips_policy_enable'] != 'on'))
+	$policy_select_disable = "disabled";
+
+if ($a_nat[$id]['autoflowbitrules'] == 'on') {
+	if (file_exists("{$snortdir}/snort_{$snort_uuid}_{$if_real}/rules/{$flowbit_rules_file}"))
+		$btn_view_flowb_rules = "";
+	else
+		$btn_view_flowb_rules = " disabled";
+}
+else
+	$btn_view_flowb_rules = " disabled";
 
 /* alert file */
 if ($_POST["Submit"]) {
@@ -107,7 +122,29 @@ if ($_POST["Submit"]) {
 	$tormv = array_diff($oenabled, $nenabled);
 	snort_remove_rules($tormv, $snortdir, $snort_uuid, $if_real);
 	$a_nat[$id]['rulesets'] = $enabled_items;
+
+	/* Copy the new enabled rule category files to the rules directory. */
 	snort_copy_rules(explode("||", $enabled_items), $snortdir, $snort_uuid, $if_real);
+
+	/* Load our rules map in preparation for writing the enforcing rules file. */
+	$enabled_rules = snort_load_rules_map("{$snortdir}/snort_{$snort_uuid}_{$if_real}/rules/");
+
+	if ($_POST['autoflowbits'] == "on") {
+		$a_nat[$id]['autoflowbitrules'] = 'on';
+		snort_write_flowbit_rules_file(snort_resolve_flowbits("{$snortdir}/snort_{$snort_uuid}_{$if_real}/rules/"), "{$snortdir}/snort_{$snort_uuid}_{$if_real}/rules/{$flowbit_rules_file}");
+	}
+	else {
+		$a_nat[$id]['autoflowbitrules'] = 'off';
+		if (file_exists("{$snortdir}/snort_{$snort_uuid}_{$if_real}/rules/{$flowbit_rules_file}"))
+			@unlink("{$snortdir}/snort_{$snort_uuid}_{$if_real}/rules/{$flowbit_rules_file}");
+	}
+
+	if ($_POST['ips_policy_enable'] == "on")
+		$a_nat[$id]['ips_policy_enable'] = 'on';
+	else
+		$a_nat[$id]['ips_policy_enable'] = 'off';
+
+	$a_nat[$id]['ips_policy'] = $_POST['ips_policy'];
 
 	write_config();
 	sync_snort_package_config();
@@ -177,6 +214,26 @@ if ($savemsg) {
 
 ?>
 
+<script language="javascript" type="text/javascript">
+function popup(url) 
+{
+ params  = 'width='+screen.width;
+ params += ', height='+screen.height;
+ params += ', top=0, left=0'
+ params += ', fullscreen=yes';
+
+ newwin=window.open(url,'windowname4', params);
+ if (window.focus) {newwin.focus()}
+ return false;
+}
+
+function enable_change()
+{
+ var endis = !(document.iform.ips_policy_enable.checked);
+ document.iform.ips_policy.disabled=endis;
+}
+</script>
+
 <form action="snort_rulesets.php" method="post" name="iform" id="iform">
 <input type="hidden" name="id" id="id" value="<?=$id;?>" />
 <table width="99%" border="0" cellpadding="0" cellspacing="0">
@@ -221,18 +278,87 @@ if ($savemsg) {
 			<table id="sortabletable1" class="sortable" width="100%" border="0"
 				cellpadding="0" cellspacing="0">
 			<tr>
-				<td colspan="6" class="listtopic"><?php echo gettext("Check the rulesets that you would like Snort to load at startup."); ?><br/><br/></td>
+				<td colspan="6" class="listtopic"><?php echo gettext("Automatic flowbit resolution"); ?><br/></td>
 			</tr>
 			<tr>
-				<td colspan="2" valign="center"><br/><input value="Save" type="submit" name="Submit" id="Submit" /><br/<br/></td>
-				<td colspan="2" valign="center"><br/><input value="Select All" type="submit" name="selectall" id="selectall" /><br/<br/></td>
-				<td colspan="2" valign="center"><br/><input value="Unselect All" type="submit" name="unselectall" id="selectall" /><br/<br/></td>
+				<td colspan="6" valign="center" class="listn">
+					<table width="100%" border="0" cellpadding="0" cellspacing="0">
+					   <tr>
+						<td width="15%" class="listn"><?php echo gettext("Resolve Flowbits"); ?></td>
+						<td width="85%"><input name="autoflowbits" id="autoflowbitrules" type="checkbox" value="on" <?php if ($a_nat[$id]['autoflowbitrules'] == "on") echo "checked"; ?>/></td>
+					   </tr>
+					   <tr>
+						<td width="15%" class="vncell">&nbsp;</td>
+						<td width="85%" class="vtable">
+						<?php echo gettext("If ticked, Snort will examine the enabled rules in your chosen " .
+						"rule categories for checked flowbits.  Any rules that set these dependent flowbits will " .
+						"be automatically enabled and added to the list of files in the interface rules directory."); ?><br/><br/></td>
+					   </tr>
+					   <tr>
+						<td width="15%" class="listn"><?php echo gettext("Auto Flowbit Rules"); ?></td>
+						<td width="85%"><input type="button" class="formbtn" value="View" onclick="popup('snort_rules_edit.php?id=<?=$id;?>&openruleset=<?=$flowbit_rules_file;?>')" <?php echo $btn_view_flowb_rules; ?>/></td>
+					   </tr>
+					   <tr>
+						<td width="15%">&nbsp;</td>
+						<td width="85%">
+						<?php echo gettext("Click to view auto-enabled rules required to satisfy flowbit " .
+						"dependencies from the selected rule categories below.  Auto-enabled rules generating unwanted alerts " .
+						"should have their GID:SID added to the Suppression List for the interface."); ?><br/><br/></td>
+					   </tr>
+					</table>
+				</td>
+			</tr>
+			<tr>
+				<td colspan="6" class="listtopic"><?php echo gettext("Snort IPS Policy Selection"); ?><br/></td>
+			</tr>
+			<tr>
+				<td colspan="6" valign="center" class="listn">
+					<table width="100%" border="0" cellpadding="0" cellspacing="0">
+					   <tr>
+						<td width="15%" class="listn"><?php echo gettext("Use IPS Policy"); ?></td>
+						<td width="85%"><input name="ips_policy_enable" id="ips_policy_enable" type="checkbox" value="on" <?php if ($a_nat[$id]['ips_policy_enable'] == "on") echo "checked"; ?>
+						<?php if ($snortdownload == "off") echo "disabled" ?> onClick="enable_change()"/></td>
+					   </tr>
+					   <tr>
+						<td width="15%" class="vncell">&nbsp;</td>
+						<td width="85%" class="vtable">
+						<?php echo gettext("If ticked, Snort will use rules from the pre-defined IPS policy " .
+						"selected below.  You must be using the Snort VRT rules to use this option."); ?><br/><br/></td>
+					   </tr>
+					   <tr>
+						<td width="15%" class="listn"><?php echo gettext("IPS Policy"); ?></td>
+						<td width="85%"><select name="ips_policy" class="formselect" <?=$policy_select_disable?> >
+									<option value="connectivity" <?php if ($pconfig['ips_policy'] == "connected") echo "selected"; ?>><?php echo gettext("Connectivity"); ?></option>
+									<option value="balanced" <?php if ($pconfig['ips_policy'] == "balanced") echo "selected"; ?>><?php echo gettext("Balanced"); ?></option>
+									<option value="security" <?php if ($pconfig['ips_policy'] == "security") echo "selected"; ?>><?php echo gettext("Security"); ?></option>
+								</select>
+						</td>
+					   </tr>
+					   <tr>
+						<td width="15%">&nbsp;</td>
+						<td width="85%">
+						<?php echo gettext("Snort IPS policies are:  Connectivity, Balanced or Security.  " .
+						"Connectivity blocks most major threats with few or no false positives.  Balanced is a good starter policy.  It " .
+						"is speedy, has good base coverage level, and covers most threats of the day.  It includes all rules in Connectivity.  " .
+						"Security is a stringent policy.  It contains everything in the first two plus policy-type rules such as Flash in an Excel file."); ?><br/><br/></td>
+					   </tr>
+					</table>
+				</td>
+			</tr>
+			<tr>
+				<td colspan="6" class="listtopic"><?php echo gettext("Check the rulesets that you would like Snort to load at startup."); ?><br/></td>
+			</tr>
+			<tr>
+				<td colspan="1" align="middle" valign="center"><br/><input value="Select All" type="submit" name="selectall" id="selectall" /><br/></td>
+				<td colspan="1" align="middle" valign="center"><br/><input value="Unselect All" type="submit" name="unselectall" id="selectall" /><br/></td>
+				<td colspan="1" align="middle" valign="center"><br/><input value="Save" class="formbtn" type="submit" name="Submit" id="Submit" /></td>
+				<td colspan="3" valign="center"><?php echo gettext("Click to save changes and auto-resolve flowbit rules (if option is selected above)"); ?><br/></td>
 			</tr>
 			<tr>    <td colspan="6">&nbsp;</td> </tr>
 			<tr id="frheader">
 				<?php if ($emergingdownload == 'on'): ?>
 					<td width="5%" class="listhdrr"><?php echo gettext("Enabled"); ?></td>
-					<td width="25%" class="listhdrr"><?php echo gettext('Ruleset: Emerging Threats.');?></td>
+					<td width="25%" class="listhdrr"><?php echo gettext('Ruleset: Emerging Threats');?></td>
 				<?php else: ?>
 					<td colspan="2" width="30%" class="listhdrr"><?php echo gettext("Emerging rules have not been enabled"); ?></td>
 				<?php endif; ?>
@@ -342,8 +468,12 @@ if ($savemsg) {
 	</td>
 </tr>
 <tr>
-<td colspan="6">&nbsp;</td>
+<td colspan="6" class="vtable">&nbsp;<br/></td>
 </tr>
+			<tr>
+				<td colspan="2" align="middle" valign="center"><br/><input value="Save" type="submit" name="Submit" id="Submit" class="formbtn" /></td>
+				<td colspan="4" valign="center">&nbsp;<br><br/></td>
+			</tr>
 <?php endif; ?>
 </table>
 </div>
