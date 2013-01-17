@@ -213,7 +213,7 @@ function openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $quotese
 	$conf .= "client{$nl}";
 	$conf .= "resolv-retry infinite{$nl}";
 	$conf .= "remote {$server_host} {$server_port}{$nl}";
-	if (!empty($servercn)) {
+	if (!empty($servercn) && ($expformat != "inline")) {
 		$qw = ($quoteservercn) ? "\"" : "";
 		$conf .= "tls-remote {$qw}{$servercn}{$qw}{$nl}";
 	}
@@ -244,11 +244,7 @@ function openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $quotese
 	$prefix = openvpn_client_export_prefix($srvid, $usrid, $crtid);
 	$cafile = "{$prefix}-ca.crt";
 	if($nokeys == false) {
-		if ($expformat == "inline") {
-			$conf .= "ca [inline]{$nl}";
-			$conf .= "cert [inline]{$nl}";
-			$conf .= "key [inline]{$nl}";
-		} elseif ($expformat == "yealink_t28") {
+		if ($expformat == "yealink_t28") {
 			$conf .= "ca /yealink/config/openvpn/keys/ca.crt{$nl}";
 			$conf .= "cert /yealink/config/openvpn/keys/client1.crt{$nl}";
 			$conf .= "key /yealink/config/openvpn/keys/client1.key{$nl}";
@@ -267,20 +263,16 @@ function openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $quotese
 		} elseif ($usetoken) {
 			$conf .= "ca {$cafile}{$nl}";
 			$conf .= "cryptoapicert \"SUBJ:{$user['name']}\"{$nl}";
-		} else {
+		} elseif ($expformat != "inline") {
 			$conf .= "pkcs12 {$prefix}.p12{$nl}";
 		}
 	} else if ($settings['mode'] == "server_user") {
-		if ($expformat == "inline")
-			$conf .= "ca [inline]{$nl}";
-		else
+		if ($expformat != "inline")
 			$conf .= "ca {$cafile}{$nl}";
 	}
 
 	if ($settings['tls'] && !$skiptls) {
-		if ($expformat == "inline")
-			$conf .= "tls-auth [inline] 1{$nl}";
-		elseif ($expformat == "yealink_t28")
+		if ($expformat == "yealink_t28")
 			$conf .= "tls-auth /yealink/config/openvpn/keys/ta.key 1{$nl}";
 		elseif ($expformat == "yealink_t38g")
 			$conf .= "tls-auth /phone/config/openvpn/keys/ta.key 1{$nl}";
@@ -288,7 +280,7 @@ function openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $quotese
 			$conf .= "tls-auth /config/openvpn/keys/ta.key 1{$nl}";
 		elseif ($expformat == "snom")
 			$conf .= "tls-auth /openvpn/ta.key 1{$nl}";
-		else
+		elseif ($expformat != "inline")
 			$conf .= "tls-auth {$prefix}-tls.key 1{$nl}";
 	}
 
@@ -716,7 +708,8 @@ function openvpn_client_export_sharedkey_config($srvid, $useaddr, $proxy, $zipco
 	$cipher = $settings['crypto'];
 
 	// add basic settings
-	$conf  = "dev tun\n";
+	if ($expformat != "inline")
+		$conf  = "dev tun\n";
 	if(! empty($settings['tunnel_networkv6'])) {
 		$conf .= "tun-ipv6\n";
 	}
@@ -725,7 +718,8 @@ function openvpn_client_export_sharedkey_config($srvid, $useaddr, $proxy, $zipco
 	$conf .= "proto {$proto}\n";
 	$conf .= "cipher {$cipher}\n";
 	$conf .= "client\n";
-	$conf .= "resolv-retry infinite\n";
+	if ($expformat != "inline")
+		$conf .= "resolv-retry infinite\n";
 	$conf .= "remote {$server_host} {$server_port}\n";
 	if ($settings['local_network']) {
 		list($ip, $mask) = explode('/', $settings['local_network']);
