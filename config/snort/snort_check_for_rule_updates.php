@@ -210,8 +210,8 @@ if ($emergingthreats == 'on') {
 				@copy("{$snortdir}/tmp/emerging/rules/{$file}", "{$snortdir}/ET_{$file}");
 		}
 
-		/* make sure default rules are in the right format */
-		exec("/usr/bin/sed -I '' -f {$snortdir}/tmp/sedcmd {$snortdir}/rules/emerging*.rules");
+//		/* make sure default rules are in the right format */
+//		exec("/usr/bin/sed -I '' -f {$snortdir}/tmp/sedcmd {$snortdir}/rules/emerging*.rules");
 
 		/*  Copy emergingthreats md5 sig to snort dir */
 		if (file_exists("{$tmpfname}/$emergingthreats_filename_md5")) {
@@ -301,8 +301,8 @@ if ($snortdownload == 'on') {
 
 			exec("/usr/bin/tar xzf {$tmpfname}/{$snort_filename} -C {$snortdir} preproc_rules/");
 
-			/* make sure default rules are in the right format */
-			exec("/usr/bin/sed -I '' -f {$snortdir}/tmp/sedcmd {$snortdir}/rules/snort_*.rules");
+//			/* make sure default rules are in the right format */
+//			exec("/usr/bin/sed -I '' -f {$snortdir}/tmp/sedcmd {$snortdir}/rules/snort_*.rules");
 
 			if (file_exists("{$tmpfname}/{$snort_filename_md5}")) {
 				update_status(gettext("Copying md5 sig to snort directory..."));
@@ -320,104 +320,69 @@ if (is_dir("{$snortdir}/tmp")) {
 }
 
 function snort_apply_customizations($snortcfg, $if_real) {
-	global $snortdir;
+	global $snortdir, $snort_enforcing_rules_file, $flowbit_rules_file;
 
-	if (empty($snortcfg['rulesets']))
-		return;
-	else {
-		$enabled_rulesets_array = explode("||", $snortcfg['rulesets']);
-		foreach($enabled_rulesets_array as $enabled_item) {
-			@copy("{$snortdir}/rules/{$enabled_item}", "{$snortdir}/snort_{$snortcfg['uuid']}_{$if_real}/rules/{$enabled_item}");
-			if (substr($enabled_item, 0, 5) == "snort" && substr($enabled_item, -9) == ".so.rules") {
-				$slib = substr($enabled_item, 6, -6);
-				if (file_exists("/usr/local/lib/snort/dynamicrules/{$slib}"))
-					@copy("/usr/local/lib/snort/dynamicrules/{$slib}", "{$snortdir}/snort_{$snortcfg['uuid']}_{$if_real}/dynamicrules/{$slib}");
-			}
+	if (!empty($snortcfg['rulesets']) || $snortcfg['ips_policy_enable'] == 'on') {
+		$enabled_rules = array();
+		$enabled_files = array();
+
+		/* Remove any existing rules files (except custom rules) prior to building a new set. */
+		foreach (glob("{$snortdir}/snort_{$snortcfg['uuid']}_{$if_real}/rules/*.rules") as $file) {
+			if (basename($file, ".rules") != "custom")
+				@unlink($file);
 		}
 
-		@copy("{$snortdir}/classification.config", "{$snortdir}/snort_{$snortcfg['uuid']}_{$if_real}/classification.config");
-		@copy("{$snortdir}/gen-msg.map", "{$snortdir}/snort_{$snortcfg['uuid']}_{$if_real}/gen-msg.map");
-		if (is_dir("{$snortdir}/generators"))
-			exec("/bin/cp -r {$snortdir}/generators {$snortdir}/snort_{$snortcfg['uuid']}_{$if_real}");
-		@copy("{$snortdir}/reference.config", "{$snortdir}/snort_{$snortcfg['uuid']}_{$if_real}/reference.config");
-		@copy("{$snortdir}/sid", "{$snortdir}/snort_{$snortcfg['uuid']}_{$if_real}/sid");
-		@copy("{$snortdir}/sid-msg.map", "{$snortdir}/snort_{$snortcfg['uuid']}_{$if_real}/sid-msg.map");
-		@copy("{$snortdir}/unicode.map", "{$snortdir}/snort_{$snortcfg['uuid']}_{$if_real}/unicode.map");
-	}
+		/* Create an array with the full path filenames of the enabled  */
+		/* rule category files if we have any.                          */
+		if (!empty($snortcfg['rulesets'])) {
+			foreach (explode("||", $snortcfg['rulesets']) as $file)
+				$enabled_files[] = "{$snortdir}/rules/" . $file;
 
-	if (!empty($snortcfg['rule_sid_on']) || !empty($snortcfg['rule_sid_off'])) {
-		if (!empty($snortcfg['rule_sid_on'])) {
-			$enabled_sid_on_array = explode("||", trim($snortcfg['rule_sid_on']));
-			$enabled_sids = array_flip($enabled_sid_on_array);
+			/* Load our rules map in preparation for writing the enforcing rules file. */
+			$enabled_rules = snort_load_rules_map($enabled_files);
 		}
 
-		if (!empty($snortcfg['rule_sid_off'])) {
-			$enabled_sid_off_array = explode("||", trim($snortcfg['rule_sid_off']));
-			$disabled_sids = array_flip($enabled_sid_off_array);
-		}
-
-		$files = glob("{$snortdir}/snort_{$snortcfg}_{$if_real}/rules/*.rules");
-		foreach ($files as $file) {
-			$splitcontents = file($file);
-			$changed = false;
-			foreach ( $splitcontents as $counter => $value ) {
-				$sid = snort_get_rule_part($value, 'sid:', ';', 0);
-				if (!is_numeric($sid))
-					continue;
-				if (isset($enabled_sids["enablesid {$sid}"])) {
-					if (substr($value, 0, 5) == "alert")
-						/* Rule is already enabled */
-						continue;
-					if (substr($value, 0, 7) == "# alert") {
-						/* Rule is disabled, change */
-						$splitcontents[$counter] = substr($value, 2);
-						$changed = true;
-					} else if (substr($splitcontents[$counter - 1], 0, 5) == "alert") {
-						/* Rule is already enabled */
-						continue;
-					} else if (substr($splitcontents[$counter - 1], 0, 7) == "# alert") { 
-						/* Rule is disabled, change */
-						$splitcontents[$counter - 1] = substr($value, 2);
-						$changed = true;
-					}
-				} else if (isset($disabled_sids["disablesid {$sid}"])) {
-					if (substr($value, 0, 7) == "# alert")
-						/* Rule is already disabled */
-						continue;
-					if (substr($value, 0, 5) == "alert") {
-						/* Rule is enabled, change */
-						$splitcontents[$counter] = "# {$value}";
-						$changed = true;
-					} else if (substr($splitcontents[$counter - 1], 0, 7) == "# alert") {
-						/* Rule is already disabled */
-						continue;
-					} else if (substr($splitcontents[$counter - 1], 0, 5) == "alert") { 
-						/* Rule is enabled, change */
-						$splitcontents[$counter - 1] = "# {$value}";
-						$changed = true;
-					}
-
+		/* Check if a pre-defined Snort VRT policy is selected. If so, */
+		/* add all the VRT policy rules to our enforcing rules set.    */
+		if (!empty($snortcfg['ips_policy'])) {
+			$policy_rules = snort_load_vrt_policy($snortcfg['ips_policy']);
+			foreach (array_keys($policy_rules) as $k1) {
+				foreach (array_keys($policy_rules[$k1]) as $k2) {
+					$enabled_rules[$k1][$k2]['rule'] = $policy_rules[$k1][$k2]['rule'];
+					$enabled_rules[$k1][$k2]['category'] = $policy_rules[$k1][$k2]['category'];
+					$enabled_rules[$k1][$k2]['disabled'] = $policy_rules[$k1][$k2]['disabled'];
+					$enabled_rules[$k1][$k2]['flowbits'] = $policy_rules[$k1][$k2]['flowbits'];
 				}
 			}
-			if ($changed == true)
-				@file_put_contents($file, implode("\n", $splitcontents));
+			unset($policy_rules);
 		}
-	}
 
-	/* Auto-enable any additional rules required to support checked flowbits in the enabled rules, */
-	/* and write them to the file "flowbit-required.rules" in the current snort configuration.     */
-	if ($snortcfg['autoflowbitrules'] == "on" ) {
-		update_status(gettext('Resolving and auto-enabling flowbit required rules for ' . snort_get_friendly_interface($snortcfg['interface']) . '...'));
-		log_error('Resolving and auto-enabling flowbit required rules for ' . snort_get_friendly_interface($snortcfg['interface']) . '...');
-		snort_write_flowbit_rules_file(snort_resolve_flowbits("{$snortdir}/snort_{$snortcfg['uuid']}_{$if_real}/rules/"), "{$snortdir}/snort_{$snortcfg['uuid']}_{$if_real}/{$flowbit_rules_file}");
+		/* Process any enablesid or disablesid modifications for the selected rules. */
+		snort_modify_sids($enabled_rules, $snortcfg);
+
+		/* Write the enforcing rules file to the Snort interface's "rules" directory. */
+		snort_write_enforcing_rules_file($enabled_rules, "{$snortdir}/snort_{$snortcfg['uuid']}_{$if_real}/rules/{$snort_enforcing_rules_file}");
+
+		/* If auto-flowbit resolution is enabled, generate the dependent flowbits rules file. */
+		if ($snortcfg['autoflowbitrules'] == "on") {
+			update_status(gettext('Resolving and auto-enabling flowbit required rules for ' . snort_get_friendly_interface($snortcfg['interface']) . '...'));
+			log_error('Resolving and auto-enabling flowbit required rules for ' . snort_get_friendly_interface($snortcfg['interface']) . '...');
+			$enabled_files[] = "{$snortdir}/snort_{$snortcfg['uuid']}_{$if_real}/rules/{$snort_enforcing_rules_file}";
+			snort_write_flowbit_rules_file(snort_resolve_flowbits($enabled_files), "{$snortdir}/snort_{$snortcfg['uuid']}_{$if_real}/rules/{$flowbit_rules_file}");
+		}
+
+		/* Build a new sid-msg.map file from the enabled rules. */
+        	build_sid_msg_map("{$snortdir}/snort_{$snortcfg['uuid']}_{$if_real}/rules/", "{$snortdir}/snort_{$snortcfg['uuid']}_{$if_real}/sid-msg.map");
+
+		/* Copy the master *.config and other *.map files to the interface's directory */
+		@copy("{$snortdir}/classification.config", "{$snortdir}/snort_{$snortcfg['uuid']}_{$if_real}/classification.config");
+		@copy("{$snortdir}/gen-msg.map", "{$snortdir}/snort_{$snortcfg['uuid']}_{$if_real}/gen-msg.map");
+		@copy("{$snortdir}/reference.config", "{$snortdir}/snort_{$snortcfg['uuid']}_{$if_real}/reference.config");
+		@copy("{$snortdir}/unicode.map", "{$snortdir}/snort_{$snortcfg['uuid']}_{$if_real}/unicode.map");
 	}
 }
 
 if ($snortdownload == 'on' || $emergingthreats == 'on') {
-
-	/* Build a new sid-msg.map file from downloaded and enabled rules. */
-	update_status(gettext('Generating new sid-msg map file...'));
-        build_sid_msg_map("{$snortdir}/rules/", "{$snortdir}/sid-msg.map");
 
 	update_status(gettext('Copying new config and map files...'));
 

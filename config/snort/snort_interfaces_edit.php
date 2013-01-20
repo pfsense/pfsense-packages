@@ -267,7 +267,7 @@ function enable_change(enable_change) {
 				<td width="22%" valign="top" class="vncell"><?php echo gettext("Kill states"); ?></td>
 				<td width="78%" class="vtable">
 					<input name="blockoffenderskill" id="blockoffenderskill" type="checkbox" value="on" <?php if ($pconfig['blockoffenderskill'] == "on") echo "checked"; ?>>
-					<br/<?php echo gettext("Should firewall states be killed for the blocked ip"); ?>>
+					<br/><?php echo gettext("Checking this option will kill firewall states for the blocked ip"); ?>
 				</td>
 	</tr>
 	<tr>
@@ -302,10 +302,10 @@ function enable_change(enable_change) {
 						<?=htmlspecialchars($ifacename2);?></option>
 						<?php endforeach; ?>
 				</select><br>
-				<span class="vexpl"><?php echo gettext("Lowmem and ac-bnfa are recommended for low end " .
-				"systems, Ac: high memory, best performance, ac-std: moderate " .
-				"memory,high performance, acs: small memory, moderateperformance, " .
-				"ac-banded: small memory,moderate performance, ac-sparsebands: small " .
+				<span class="vexpl"><?php echo gettext("LOWMEM and AC-BNFA are recommended for low end " .
+				"systems, AC: high memory, best performance, AC-STD: moderate " .
+				"memory,high performance, ACS: small memory, moderate performance, " .
+				"AC-BANDED: small memory,moderate performance, AC-SPARSEBANDS: small " .
 				"memory, high performance."); ?>
 				</span><br/></td>
 	</tr>
@@ -442,7 +442,6 @@ function enable_change(enable_change) {
 <tr>
 	<td width="22%" valign="top">&nbsp;</td>
 	<td width="78%"><span class="vexpl"><span class="red"><strong><?php echo gettext("Note:"); ?></strong></span><br/>
-		<br>
 		<?php echo gettext("Please save your settings before you click start."); ?>	
 	</td>
 </tr>

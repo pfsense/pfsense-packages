@@ -32,7 +32,7 @@
 require_once("guiconfig.inc");
 require_once("/usr/local/pkg/snort/snort.inc");
 
-global $g;
+global $g, $flowbit_rules_file;
 
 $snortdir = SNORTDIR;
 
@@ -47,40 +47,6 @@ if (isset($_POST['id']))
 if (is_null($id)) {
 	header("Location: /snort/snort_interfaces.php");
 	exit;
-}
-
-function snort_remove_rules($files, $snortdir, $snort_uuid, $if_real) {
-
-        if (empty($files))
-                return;
-
-        conf_mount_rw();
-	foreach ($files as $file) {
-		@unlink("{$snortdir}/snort_{$snort_uuid}_{$if_real}/rules/{$file}");
-		if (substr($file, -9) == ".so.rules") {
-			$slib = substr($file, 6, -6);
-			@unlink("{$snortdir}/snort_{$snort_uuid}_{$if_real}/dynamicrules/{$slib}");
-		}
-	}
-        conf_mount_ro();
-}
-
-function snort_copy_rules($files, $snortdir, $snort_uuid, $if_real) {
-
-        if (empty($files))
-                return;
-
-        conf_mount_rw();
-        foreach ($files as $file) {
-                if (!file_exists("{$snortdir}/snort_{$snort_uuid}_{$if_real}/rules/{$file}"))
-                        @copy("{$snortdir}/rules/{$file}", "{$snortdir}/snort_{$snort_uuid}_{$if_real}/rules/{$file}");
-		if (substr($file, -9) == ".so.rules") {
-			$slib = substr($enabled_item, 6, -6);
-			if (!file_exists("{$snortdir}/snort_{$snort_uuid}_{$if_real}/dynamicrules/{$slib}"))
-				@copy("/usr/local/lib/snort/dynamicrules/{$file}", "{$snortdir}/snort_{$snort_uuid}_{$if_real}/dynamicrules/{$slib}");
-		}
-        }
-        conf_mount_ro();
 }
 
 if (isset($id) && $a_nat[$id]) {
@@ -109,35 +75,25 @@ if ($a_nat[$id]['autoflowbitrules'] == 'on') {
 else
 	$btn_view_flowb_rules = " disabled";
 
+// If a Snort VRT policy is enabled and selected, remove all Snort VRT
+// rules from the configured rule sets to allow automatic selection.
+if ($a_nat[$id]['ips_policy_enable'] == 'on') {
+	if (isset($a_nat[$id]['ips_policy'])) {
+		$disable_vrt_rules = "disabled";
+		$enabled_sets = explode("||", $a_nat[$id]['rulesets']);
+
+		foreach ($enabled_sets as $k => $v) {
+			if (substr($v, 0, 6) == "snort_")
+				unset($enabled_sets[$k]);
+		}
+		$a_nat[$id]['rulesets'] = implode("||", $enabled_sets);
+	}
+}
+else
+	$disable_vrt_rules = "";
+
 /* alert file */
 if ($_POST["Submit"]) {
-	$enabled_items = "";
-	if (is_array($_POST['toenable']))
-		$enabled_items = implode("||", $_POST['toenable']);
-	else
-		$enabled_items = $_POST['toenable'];
-
-	$oenabled = explode("||", $a_nat[$id]['rulesets']);
-	$nenabled = explode("||", $enabled_items);
-	$tormv = array_diff($oenabled, $nenabled);
-	snort_remove_rules($tormv, $snortdir, $snort_uuid, $if_real);
-	$a_nat[$id]['rulesets'] = $enabled_items;
-
-	/* Copy the new enabled rule category files to the rules directory. */
-	snort_copy_rules(explode("||", $enabled_items), $snortdir, $snort_uuid, $if_real);
-
-	/* Load our rules map in preparation for writing the enforcing rules file. */
-	$enabled_rules = snort_load_rules_map("{$snortdir}/snort_{$snort_uuid}_{$if_real}/rules/");
-
-	if ($_POST['autoflowbits'] == "on") {
-		$a_nat[$id]['autoflowbitrules'] = 'on';
-		snort_write_flowbit_rules_file(snort_resolve_flowbits("{$snortdir}/snort_{$snort_uuid}_{$if_real}/rules/"), "{$snortdir}/snort_{$snort_uuid}_{$if_real}/rules/{$flowbit_rules_file}");
-	}
-	else {
-		$a_nat[$id]['autoflowbitrules'] = 'off';
-		if (file_exists("{$snortdir}/snort_{$snort_uuid}_{$if_real}/rules/{$flowbit_rules_file}"))
-			@unlink("{$snortdir}/snort_{$snort_uuid}_{$if_real}/rules/{$flowbit_rules_file}");
-	}
 
 	if ($_POST['ips_policy_enable'] == "on")
 		$a_nat[$id]['ips_policy_enable'] = 'on';
@@ -145,6 +101,22 @@ if ($_POST["Submit"]) {
 		$a_nat[$id]['ips_policy_enable'] = 'off';
 
 	$a_nat[$id]['ips_policy'] = $_POST['ips_policy'];
+
+	$enabled_items = "";
+	if (is_array($_POST['toenable']))
+		$enabled_items = implode("||", $_POST['toenable']);
+	else
+		$enabled_items = $_POST['toenable'];
+
+	$a_nat[$id]['rulesets'] = $enabled_items;
+
+	if ($_POST['autoflowbits'] == "on")
+		$a_nat[$id]['autoflowbitrules'] = 'on';
+	else {
+		$a_nat[$id]['autoflowbitrules'] = 'off';
+		if (file_exists("{$snortdir}/snort_{$snort_uuid}_{$if_real}/rules/{$flowbit_rules_file}"))
+			@unlink("{$snortdir}/snort_{$snort_uuid}_{$if_real}/rules/{$flowbit_rules_file}");
+	}
 
 	write_config();
 	sync_snort_package_config();
@@ -154,9 +126,6 @@ if ($_POST["Submit"]) {
 }
 
 if ($_POST['unselectall']) {
-	if (!empty($pconfig['rulesets']))
-		snort_remove_rules(explode("||", $pconfig['rulesets']), $snortdir, $snort_uuid, $if_real);
-
 	$a_nat[$id]['rulesets'] = "";
 
 	write_config();
@@ -178,7 +147,6 @@ if ($_POST['selectall']) {
 		foreach ($files as $file)
 			$rulesets[] = basename($file);
 	}
-	snort_copy_rules($rulesets, $snortdir, $snort_uuid, $if_real);
 
 	$a_nat[$id]['rulesets'] = implode("||", $rulesets);
 
@@ -226,11 +194,18 @@ function popup(url)
  if (window.focus) {newwin.focus()}
  return false;
 }
-
 function enable_change()
 {
  var endis = !(document.iform.ips_policy_enable.checked);
  document.iform.ips_policy.disabled=endis;
+
+ for (var i = 0; i < document.iform.elements.length; i++) {
+    if (document.iform.elements[i].type == 'checkbox') {
+       var str = document.iform.elements[i].value;
+       if (str.substr(0,6) == "snort_")
+          document.iform.elements[i].disabled = !(endis);
+    }
+ }
 }
 </script>
 
@@ -262,7 +237,7 @@ function enable_change()
 		<tr>
 			<td>
 		<?php printf(gettext("# The rules directory is empty. %s/rules"), $snortdir); ?> <br/>
-		<?php echo gettext("Please go to the updates page to download/fetch the rules configured."); ?>	
+		<?php echo gettext("Please go to the Updates tab to download/fetch the rules configured."); ?>	
 			</td>
 		</tr>
 <?php else: 
@@ -323,7 +298,10 @@ function enable_change()
 						<td width="15%" class="vncell">&nbsp;</td>
 						<td width="85%" class="vtable">
 						<?php echo gettext("If ticked, Snort will use rules from the pre-defined IPS policy " .
-						"selected below.  You must be using the Snort VRT rules to use this option."); ?><br/><br/></td>
+						"selected below.  You must be using the Snort VRT rules to use this option."); ?><br/>
+						<?php echo gettext("Selecting this option disables manual selection of Snort VRT categories in the list below, " .
+						"although Emerging Threats categories may still be selected if enabled on the Global Settings tab.  " .
+						"These will be added to the pre-defined Snort IPS policy rules from the Snort VRT."); ?><br><br/></td>
 					   </tr>
 					   <tr>
 						<td width="15%" class="listn"><?php echo gettext("IPS Policy"); ?></td>
@@ -428,7 +406,9 @@ function enable_change()
 						$file = $snortrules[$j];
 						echo "<td class='listr' width='5%' align=\"center\" valign=\"top\">";
 						if(is_array($enabled_rulesets_array)) {
-							if(in_array($file, $enabled_rulesets_array))
+							if (!empty($disable_vrt_rules))
+								$CHECKED = $disable_vrt_rules;
+							elseif(in_array($file, $enabled_rulesets_array))
 								$CHECKED = " checked=\"checked\"";
 							else
 								$CHECKED = "";
@@ -437,7 +417,7 @@ function enable_change()
 						echo "	\n<input type='checkbox' name='toenable[]' value='{$file}' {$CHECKED} />\n";
 						echo "</td>\n";
 						echo "<td class='listr' width='25%' >\n";
-						if (empty($CHECKED))
+						if (empty($CHECKED) || $CHECKED == "disabled")
 							echo $file;
 						else
 							echo "<a href='snort_rules.php?id={$id}&openruleset=" . urlencode($file) . "'>{$file}</a>\n";
@@ -448,7 +428,9 @@ function enable_change()
 						$file = $snortsorules[$j];
 						echo "<td class='listr' width='5%' align=\"center\" valign=\"top\">";
 						if(is_array($enabled_rulesets_array)) {
-							if(in_array($file, $enabled_rulesets_array))
+							if (!empty($disable_vrt_rules))
+								$CHECKED = $disable_vrt_rules;
+							elseif(in_array($file, $enabled_rulesets_array))
 								$CHECKED = " checked=\"checked\"";
 							else
 								$CHECKED = "";

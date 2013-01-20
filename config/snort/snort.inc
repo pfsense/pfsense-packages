@@ -39,11 +39,13 @@ require_once("filter.inc");
 
 /* package version */
 $snort_version = "2.9.2.3";
-$pfSense_snort_version = "2.5.2";
+$pfSense_snort_version = "2.5.3";
 $snort_package_version = "Snort {$snort_version} pkg v. {$pfSense_snort_version}";
 $snort_rules_file = "snortrules-snapshot-2923.tar.gz";
 $emerging_threats_version = "2.9.3";
 $flowbit_rules_file = "flowbit-required.rules";
+$snort_enforcing_rules_file = "snort.rules";
+
 define("SNORTDIR", "/usr/local/etc/snort");
 define("SNORTLOGDIR", "/var/log/snort");
 
@@ -720,20 +722,32 @@ function sync_snort_package_config() {
 	conf_mount_ro();
 }
 
-function build_sid_msg_map($rules_dir, $sid_file) {
+function build_sid_msg_map($rules_path, $sid_file) {
 
+	/*************************************************************/
 	/* This function reads all the rules file in the passed      */
-	/* directory and produces a properly formatted sid-msg.map   */
-	/* file for use by Snort and/or barnyard2.                   */
+	/* $rules_path variable and produces a properly formatted    */
+	/* sid-msg.map file for use by Snort and/or barnyard2.       */
+	/*************************************************************/
 
         $sidMap = array();
+	$rule_files = array();
 
-        /* Normalize the supplied rules path to have a trailing      */
-        /* slash in the directory name.                              */
-        $my_rules_dir = ((strrpos($rules_dir, '/') + 1) == strlen($rules_dir)) ? $rules_dir : $rules_dir . "/";
+	/* First check if we were passed a directory, a single file   */
+	/* or an array of filenames to read. Set our $rule_files      */
+	/* variable accordingly. If we can't figure it out, return    */
+	/* an empty rules map array.                                  */
+	if (is_dir($rules_path))
+		$rule_files = glob($rules_path . "*.rules");
+	elseif (is_file($rules_path))
+		$rule_files = (array)$rules_path;
+	elseif (is_array($rules_path))
+		$rule_files = $rules_path;
+	else
+		return;
 
         /* Read the rule files into an array, then iterate the list  */
-        foreach (glob($my_rules_dir . "*.rules") as $file) {
+        foreach ($rule_files as $file) {
 
              /* Don't process files with "deleted" in the filename   */
              if (preg_match('/deleted/i', $file))
@@ -751,10 +765,6 @@ function build_sid_msg_map($rules_dir, $sid_file) {
                   /* Skip any non-rule lines unless we're in         */
                   /* multiline mode.
                   if (!preg_match('/^\s*#*\s*(alert|drop|pass)/i', $rule) && !$b_Multiline)
-                       continue;
-
-                  /* Skip comment lines.                             */
-                  if (preg_match('/^\s*#/', $rule) && !preg_match('/^\s*#*\s*(alert|drop|pass)/i', $rule))
                        continue;
 
                   /* Test for a multi-line rule, and reassemble the  */
@@ -803,10 +813,12 @@ function build_sid_msg_map($rules_dir, $sid_file) {
 
 function snort_merge_reference_configs($cfg_in, $cfg_out) {
 
+	/***********************************************************/
 	/* This function takes a list of "reference.config" files  */
 	/* in the $cfg_in array and merges them into a single      */
 	/* file specified by $cfg_out.  The merging is done so     */
 	/* no duplication of lines occurs in the output file.      */
+	/***********************************************************/
 
         $outMap = array();
         foreach ($cfg_in as $file) {
@@ -836,10 +848,12 @@ function snort_merge_reference_configs($cfg_in, $cfg_out) {
 
 function snort_merge_classification_configs($cfg_in, $cfg_out) {
 
+	/************************************************************/
 	/* This function takes a list of "classification.config"    */
 	/* files in the $cfg_in array and merges them into a        */
 	/* single file specified by $cfg_out.  The merging is done  */
 	/* so no duplication of lines occurs in the output file.    */
+	/************************************************************/
 
         $outMap = array();
         foreach ($cfg_in as $file) {
@@ -869,8 +883,15 @@ function snort_merge_classification_configs($cfg_in, $cfg_out) {
 
 function snort_load_rules_map($rules_path) {
 
+	/***************************************************************/
 	/* This function loads and returns an array with all the rules */
 	/* found in the *.rules files in the passed rules path.        */
+	/*                                                             */
+	/* $rules_path can be:                                         */
+	/*      a directory (assumed to contain *.rules files)         */
+	/*      a filename (identifying a specific *.rules file)       */
+	/*      an array of filenames (identifying *.rules files)      */
+	/***************************************************************/
 
 	$map_ref = array();
 	$rule_files = array();
@@ -878,23 +899,33 @@ function snort_load_rules_map($rules_path) {
 	if (empty($rules_path))
 		return $map_ref;
 
-	/* Read all the rules into the map array.
-	 * The structure of the map is:
-	 *   map[gid][sid]['rule']['category']['disabled']['flowbits']
-	 *     where:
-	 *      gid      = Generator ID from rule, or 1 if general text rule
-	 *      sid      = Signature ID from rule
-         *      rule     = Rule text
-	 *      category = File name of file containing the rule
-	 *      disabled = 1 if rule is disabled (commented out), 0 if rule is active
-	 *      flowbits = Array of applicable flowbits if rule contains flowbits options
-	 */
+	/***************************************************************
+	 * Read all the rules into the map array.
+	 * The structure of the map array is:
+	 *
+	 *  map[gid][sid]['rule']['category']['disabled']['flowbits']
+	 *
+	 *  where:
+	 *   gid      = Generator ID from rule, or 1 if general text 
+	 *              rule
+	 *   sid      = Signature ID from rule
+         *   rule     = Complete rule text
+	 *   category = File name of file containing the rule
+	 *   disabled = 1 if rule is disabled (commented out), 0 if 
+	 *              rule is enabled
+	 *   flowbits = Array of applicable flowbits if rule contains 
+	 *              flowbits options
+	 ***************************************************************/
 
-	/* First check if we were passed a directory or a single file */
-	/* to read.                                                   */
+	/* First check if we were passed a directory, a single file   */
+	/* or an array of filenames to read. Set our $rule_files      */
+	/* variable accordingly. If we can't figure it out, return    */
+	/* an empty rules map array.                                  */
 	if (is_dir($rules_path))
 		$rule_files = glob($rules_path . "*.rules");
 	elseif (is_file($rules_path))
+		$rule_files = (array)$rules_path;
+	elseif (is_array($rules_path))
 		$rule_files = $rules_path;
 	else
 		return $map_ref;
@@ -916,6 +947,10 @@ function snort_load_rules_map($rules_path) {
 		/* Read and process each line from the rules in the */
 		/* current file into an array.                      */
 		foreach ($rules_array as $rule) {
+
+			/* Skip any lines that may be just spaces.  */
+			if (trim($rule) == "")
+				continue;
 
 			/* Skip any non-rule lines unless we're in  */
 			/* multiline mode.			    */
@@ -941,7 +976,16 @@ function snort_load_rules_map($rules_path) {
 			/* We have an actual single-line rule, or else a   */
 			/* re-assembled multiline rule that is now a       */
 			/* single-line rule, so store it in our rules map. */
+
+			/* Get and test the SID.  If we don't find one,    */
+			/* ignore and skip this rule as it is invalid.     */
 			$sid = snort_get_sid($rule);
+			if (empty($sid)) {
+				$b_Multiline = false;
+				$record = "";
+				continue;
+			}
+
 			$gid = snort_get_gid($rule);
 			$map_ref[$gid][$sid]['rule'] = $rule;
 			$map_ref[$gid][$sid]['category'] = basename($file, ".rules");
@@ -967,8 +1011,10 @@ function snort_load_rules_map($rules_path) {
 
 function snort_get_gid($rule) {
 
+	/****************************************************************/
 	/* If a gid is defined, then return it, else default to "1" for */
 	/* general text rules match.                                    */
+	/****************************************************************/
 
 	if (preg_match('/\bgid\s*:\s*(\d+)\s*;/i', $rule, $matches))
 		return trim($matches[1]);
@@ -977,18 +1023,36 @@ function snort_get_gid($rule) {
 }
 
 function snort_get_sid($rule) {
+
+	/***************************************************************/
+	/* If a sid is defined, then return it, else default to an     */
+	/* empty value.                                                */
+	/***************************************************************/
+
 	if (preg_match('/\bsid\s*:\s*(\d+)\s*;/i', $rule, $matches))
 		return trim($matches[1]);
 	else
-		/* Return a ridiculously large default if no sid     */
-		/* defined.  This should never happen.               */
-		return "999999999";
+		return "";
+}
+
+function snort_get_msg($rule) {
+
+	/**************************************************************/
+	/* Return the MSG section of the passed rule as a string.     */
+	/**************************************************************/
+
+	$msg = "";
+	if (preg_match('/\bmsg\s*:\s*"(.+?)"\s*;/i', $rule, $matches))
+		$msg = trim($matches[1]);
+	return $msg;
 }
 
 function snort_get_flowbits($rule) {
 
-	/* This will pull out "flowbits:set, unset or isset" entries */
-	/* from the rule text and return them in an array.           */
+	/*************************************************************/
+	/* This will pull out "flowbits:" options from the rule text */
+	/* and return them in an array.                              */
+	/*************************************************************/
 
 	$flowbits = array();
 	if (preg_match_all('/flowbits\b:\s*(set|setx|unset|toggle|isset|isnotset)\s*,([^;]+)/i', $rule, $matches)) {
@@ -1002,9 +1066,11 @@ function snort_get_flowbits($rule) {
 
 function snort_get_checked_flowbits(&$rules_map) {
 
+	/*************************************************************/
 	/* This function checks all the currently enabled rules to   */
 	/* find any checked flowbits, and returns the checked        */
 	/* flowbit names in an array.                                */
+	/*************************************************************/
 
 	$checked_flowbits = array();
 	foreach (array_keys($rules_map) as $k1) {
@@ -1028,9 +1094,11 @@ function snort_get_checked_flowbits(&$rules_map) {
 
 function snort_get_set_flowbits(&$rules_map) {
 
+	/*********************************************************/
 	/* This function checks all the currently enabled rules  */
 	/* to find any set flowbits, and returns the flowbit     */
 	/* names in an array.                                    */
+	/*********************************************************/
 
 	$set_flowbits = array();
 	foreach (array_keys($rules_map) as $k1) {
@@ -1054,10 +1122,12 @@ function snort_get_set_flowbits(&$rules_map) {
 
 function snort_find_flowbit_required_rules(&$all_rules, &$unchecked_flowbits) {
 
+	/********************************************************/
 	/* This function finds all rules that must be enabled   */
 	/* in order to satisfy the "checked flowbits" used by   */
 	/* the currently enabled rules.  It returns the list    */
 	/* of required rules in an array.                       */
+	/********************************************************/
 
 	$required_flowbits_rules = array();
 	foreach (array_keys($all_rules) as $k1) {
@@ -1086,6 +1156,7 @@ function snort_find_flowbit_required_rules(&$all_rules, &$unchecked_flowbits) {
 
 function snort_resolve_flowbits($rule_path) {
 
+	/******************************************************/
 	/* This function auto-resolves flowbit requirements   */
 	/* by finding all checked flowbits in the currently   */
 	/* enabled rules, and then making sure all the "set"  */
@@ -1093,9 +1164,14 @@ function snort_resolve_flowbits($rule_path) {
 	/* enabled.  For any that are not enabled, they are   */
 	/* copied to an array, enabled, and returned.         */
 	/*                                                    */
-	/* $rule_path --> rules directory of the interface    */
+	/* $rule_path --> rules files of the interface        */
 	/*                to resolve flowbit dependencies     */
-	/*                for.                                */
+	/*                for.  This can be either of the     */
+	/*                following:                          */
+	/*                  - directory of *.rules files      */
+	/*                  - array of *.rules filenames      */
+	/*                  - a single *.rules filename       */
+	/******************************************************/
 
 	$snortdir = SNORTDIR;
 
@@ -1130,21 +1206,32 @@ function snort_resolve_flowbits($rule_path) {
 	return $required_rules;
 }
 
-function snort_write_flowbit_rules_file($flowbit_rules, $rule_file) {
+function snort_write_flowbit_rules_file(&$flowbit_rules, $rule_file) {
 
+	/************************************************/
 	/* This function takes an array of rules in the */
 	/* rules_map format and writes them to the file */
 	/* given.                                       */
+	/************************************************/
+
+	if (empty($flowbit_rules))
+		return;
+
+	/* See if we were passed a directory or full    */
+	/* filename to write the rules to, and adjust   */
+	/* the destination argument accordingly.        */
+	if (is_dir($rule_file))
+		$rule_file = rtrim($rule_file, '/').'/flowbit-required.rules';
 
 	file_put_contents($rule_file, "# These rules set flowbits checked by your other enabled rules.  If the\n");
 	file_put_contents($rule_file, "# the dependent flowbits are not set, then some of your chosen rules may\n", FILE_APPEND);
 	file_put_contents($rule_file, "# not fire.  Enabling all rules that set these dependent flowbits ensures\n", FILE_APPEND);
-	file_put_contents($rule_file, "# your chosen rules fire as intended.\n\n", FILE_APPEND); 
+	file_put_contents($rule_file, "# your chosen rules fire as intended.\n#\n", FILE_APPEND); 
 	file_put_contents($rule_file, "# If you wish to prevent alerts from any of these rules, add the GID:SID\n", FILE_APPEND);
 	file_put_contents($rule_file, "# of the rule to the Suppression List for the interface.\n", FILE_APPEND);
 	foreach (array_keys($flowbit_rules) as $k1) {
 		foreach (array_keys($flowbit_rules[$k1]) as $k2) {
-			file_put_contents($rule_file, "#\n# Rule from category: " . $flowbit_rules[$k1][$k2]['category'], FILE_APPEND);
+			file_put_contents($rule_file, "\n# Category: " . $flowbit_rules[$k1][$k2]['category'], FILE_APPEND);
 			file_put_contents($rule_file, "   GID:" . $k1 . "  SID:" . $k2 . "\n", FILE_APPEND);
 			file_put_contents($rule_file, $flowbit_rules[$k1][$k2]['rule'], FILE_APPEND);
 		}
@@ -1153,6 +1240,7 @@ function snort_write_flowbit_rules_file($flowbit_rules, $rule_file) {
 
 function snort_load_vrt_policy($policy) {
 
+	/************************************************/
 	/* This function returns an array of all rules  */
 	/* marked with the passed in $policy metadata.  */
 	/*                                              */
@@ -1160,17 +1248,20 @@ function snort_load_vrt_policy($policy) {
 	/*              1.  connectivity                */
 	/*              2.  balanced                    */
 	/*              3.  security                    */
+	/************************************************/
 
 	$snortdir = SNORTDIR;
 	$vrt_policy_rules = array();
+
+	/* Create regular expression for searching. */
 	$policy_pcre = "/policy\\s" . $policy . "/i";
 
-	/* First, load up all the rules we have.        */
+	/* First, load up all the rules we have. */
 	$all_rules_map = snort_load_rules_map("{$snortdir}/rules/");
 
-	/* Now walk the rules list and find all those   */
-	/* that are defined as active for the chosen    */
-	/* security policy.                             */
+	/* Now walk the rules list and find all those */
+	/* that are defined as active for the chosen  */
+	/* security policy.                           */
 	foreach (array_keys($all_rules_map) as $k1) {
 		foreach (array_keys($all_rules_map[$k1]) as $k2) {
 			if (preg_match($policy_pcre, $all_rules_map[$k1][$k2]['rule'])) {
@@ -1185,19 +1276,105 @@ function snort_load_vrt_policy($policy) {
 		}
 	}
 
-	/* Release memory we no longer need.            */
+	/* Release memory we no longer need. */
 	unset($all_rules_map);
 	
-	/* Return all the rules that match the policy.  */
+	/* Return all the rules that match the policy. */
 	return $vrt_policy_rules;
 }
 
-function snort_write_enforcing_rules_file($rule_map, $rule_path) {
+function snort_write_enforcing_rules_file(&$rule_map, $rule_path) {
 
-	/* This function takes an array containing      */
-	/* the rules chosen for the active rule set,    */
-	/* writes them out to the passed path.          */ 
+	/************************************************/
+	/* This function takes a rules map array of     */
+	/* the rules chosen for the active rule set     */
+	/* and writes them out to the passed path.      */
+	/************************************************/
 
+	global $snort_enforcing_rules_file;
+
+	$rule_file = "/snort.rules";
+
+	/* See if we were passed a directory or full    */
+	/* filename to write the rules to, and adjust   */
+	/* the destination argument accordingly.        */
+	if (is_dir($rule_path))
+		$rule_file = rtrim($rule_path, '/').$rule_file;
+	else
+		$rule_file = $rule_path;
+
+	file_put_contents($rule_file, "# These rules are your current set of enforced rules for the protected\n");
+	file_put_contents($rule_file, "# interface.  This list was compiled from the categories selected on the\n", FILE_APPEND);
+	file_put_contents($rule_file, "# CATEGORIES tab of the Snort configuration for the interface and/or any\n", FILE_APPEND);
+	file_put_contents($rule_file, "# chosen Snort VRT pre-defined IPS Policy.\n#\n", FILE_APPEND);
+	file_put_contents($rule_file, "# Any enablesid or disablesid customizations you made have been applied\n", FILE_APPEND);
+	file_put_contents($rule_file, "# to the rules in this file.\n\n", FILE_APPEND);
+	foreach (array_keys($rule_map) as $k1) {
+		foreach (array_keys($rule_map[$k1]) as $k2) {
+			file_put_contents($rule_file, $rule_map[$k1][$k2]['rule'], FILE_APPEND);
+		}
+	}
+}
+
+function snort_load_sid_mods($sids, $value) {
+
+	/*****************************************/
+	/* This function parses the string of    */
+	/* SID values in $sids and returns an    */
+	/* array with the SID as the key and     */
+	/* passed $value as the value.  The SID  */
+	/* values in $sids are assumed to be     */
+	/* delimited by "||".                    */
+	/*****************************************/
+
+	$result = array();
+	if (empty($sids) || empty($value))
+		return $result;
+	$tmp = explode("||", $sids);
+	foreach ($tmp as $v) {
+		if (preg_match('/\s\d+/', $v, $match))
+			$result[trim($match[0])] = $value;
+	}
+	return $result;
+}
+
+function snort_modify_sids(&$rule_map, $snortcfg) {
+
+	/*****************************************/
+	/* This function modifies the rules in   */
+	/* the passed rules_map array based on   */
+	/* values in the enablesid/disablesid    */
+	/* configuration parameters.             */
+	/*                                       */
+	/*  $rule_map = array of current rules   */
+	/*  $snortcfg = config settings          */
+	/*****************************************/
+
+	if (!isset($snortcfg['rule_sid_on']) && !isset($snortcfg['rule_sid_off']))
+		return;
+
+	/* Load up our enablesid and disablesid  */
+	/* arrays with lists of modified SIDs    */
+	$enablesid = snort_load_sid_mods($snortcfg['rule_sid_on'], "enablesid");
+	$disablesid = snort_load_sid_mods($snortcfg['rule_sid_off'], "disablesid");
+
+	/* Turn on any rules that need to be     */
+	/* forced "on" with enablesid mods.      */
+	if (!empty($enablesid)) {
+		foreach ($enablesid as $k2 => $v) {
+			if ($rule_map[1][$k2]['disabled'] == 1)
+				$rule_map[1][$k2]['rule'] = ltrim(substr($rule_map[1][$k2]['rule'], strpos($rule_map[1][$k2]['rule'], "#") + 1));
+		}
+	}
+
+	/* Turn off any rules that need to be    */
+	/* forced "off" with disablesid mods.    */
+	if (!empty($disablesid)) {
+		foreach ($disablesid as $k2 => $v) {
+			if ($rule_map[1][$k2]['disabled'] == 0)
+				$rule_map[1][$k2]['rule'] = "# " . $rule_map[1][$k2]['rule'];
+		}
+	}
 }
 
 /* Start of main config files */
@@ -1464,10 +1641,12 @@ function snort_deinstall() {
 }
 
 function snort_generate_conf($snortcfg) {
-	global $config, $g, $flowbit_rules_file;
+	global $config, $g;
 
 	$snortdir = SNORTDIR;
 	$snortlogdir = SNORTLOGDIR;
+	$flowbit_rules_file = "flowbit-required.rules";
+	$snort_enforcing_rules_file = "snort.rules";
 
 	if (!is_array($config['installedpackages']['snortglobal']['rule']))
 		return;
@@ -1494,7 +1673,7 @@ function snort_generate_conf($snortcfg) {
 		"{$snortlogdir}/snort_{$if_real}{$snort_uuid}",
 		"{$snortlogdir}/snort_{$if_real}{$snort_uuid}/barnyard2", 
 		"{$snortcfgdir}/preproc_rules", 
-		"dynamicrules" => "{$snortcfgdir}/dynamicrules",
+		"dynamicrules" => "/usr/local/lib/snort/dynamicrules",
 		"dynamicengine" => "/usr/local/lib/snort/dynamicengine",
 		"dynamicpreprocessor" => "{$snortcfgdir}/dynamicpreprocessor"
 	    );
@@ -1900,25 +2079,58 @@ EOD;
 	/* generate rule sections to load */
 	$selected_rules_sections = "";
 	$dynamic_rules_sections = "";
-	if (!empty($snortcfg['rulesets'])) {
-		$enabled_rulesets_array = explode("||", $snortcfg['rulesets']);
-		foreach($enabled_rulesets_array as $enabled_item) {
-			if (file_exists("{$snortdir}/rules/{$enabled_item}") && !file_exists("{$snortcfgdir}/rules/{$enabled_item}"))
-				@copy("{$snortdir}/rules/{$enabled_item}", "{$snortcfgdir}/rules/{$enabled_item}");
-			if (substr($enabled_item, 0, 5) == "snort" && substr($enabled_item, -9) == ".so.rules") {
-				$slib = substr($enabled_item, 6, -6);
-				if (!file_exists("{$snort_dirs['dynamicrules']}/{$slib}"))
-					@copy("/usr/local/lib/snort/dynamicrules/{$slib}", "{$snort_dirs['dynamicrules']}/{$slib}");
-				if (file_exists("{$snort_dirs['dynamicrules']}/{$slib}") && 
-				    file_exists("{$snortcfgdir}/rules/{$enabled_item}"))
-					$selected_rules_sections  .= "include \$RULE_PATH/{$enabled_item}\n";
-			} else if (file_exists("{$snortcfgdir}/rules/{$enabled_item}"))
-				$selected_rules_sections  .= "include \$RULE_PATH/{$enabled_item}\n";
+	if (!empty($snortcfg['rulesets']) || $snortcfg['ips_policy_enable'] == 'on') {
+		$enabled_rules = array();
+		$enabled_files = array();
+
+		/* Remove any existing rules files (except custom rules) prior to building a new set. */
+		foreach (glob("{$snortcfgdir}/rules/*.rules") as $file) {
+			if (basename($file, ".rules") != "custom")
+				@unlink($file);
 		}
 
-		/* If auto-flowbit resolution is enabled and the rules file is present, include it. */
-		if (($snortcfg['autoflowbitrules'] == "on") && (file_exists("{$snortcfgdir}/rules/{$flowbit_rules_file}")))
-			$selected_rules_sections  .= "include \$RULE_PATH/{$flowbit_rules_file}\n";
+		/* Create an array with the full path filenames of the enabled  */
+		/* rule category files if we have any.                          */
+		if (!empty($snortcfg['rulesets'])) {
+			foreach (explode("||", $snortcfg['rulesets']) as $file)
+				$enabled_files[] = "{$snortdir}/rules/" . $file;
+
+			/* Load our rules map in preparation for writing the enforcing rules file. */
+			$enabled_rules = snort_load_rules_map($enabled_files);
+		}
+
+		/* Check if a pre-defined Snort VRT policy is selected. If so, */
+		/* add all the VRT policy rules to our enforcing rule set.     */
+		if (!empty($snortcfg['ips_policy'])) {
+			$policy_rules = snort_load_vrt_policy($snortcfg['ips_policy']);
+			foreach (array_keys($policy_rules) as $k1) {
+				foreach (array_keys($policy_rules[$k1]) as $k2) {
+					$enabled_rules[$k1][$k2]['rule'] = $policy_rules[$k1][$k2]['rule'];
+					$enabled_rules[$k1][$k2]['category'] = $policy_rules[$k1][$k2]['category'];
+					$enabled_rules[$k1][$k2]['disabled'] = $policy_rules[$k1][$k2]['disabled'];
+					$enabled_rules[$k1][$k2]['flowbits'] = $policy_rules[$k1][$k2]['flowbits'];
+				}
+			}
+			unset($policy_rules);
+		}
+
+		/* Process any enablesid or disablesid modifications for the selected rules. */
+		snort_modify_sids($enabled_rules, $snortcfg);
+
+		/* Write the enforcing rules file to the Snort interface's "rules" directory. */
+		snort_write_enforcing_rules_file($enabled_rules, "{$snortcfgdir}/rules/{$snort_enforcing_rules_file}");
+		if (file_exists("{$snortcfgdir}/rules/{$snort_enforcing_rules_file}"))
+			$selected_rules_sections = "include \$RULE_PATH/{$snort_enforcing_rules_file}\n";
+
+		/* If auto-flowbit resolution is enabled, generate the dependent flowbits rules file. */
+		if ($snortcfg['autoflowbitrules'] == 'on') {
+			$enabled_files[] = "{$snortcfgdir}/rules/{$snort_enforcing_rules_file}";
+			snort_write_flowbit_rules_file(snort_resolve_flowbits($enabled_files), "{$snortcfgdir}/rules/{$flowbit_rules_file}");
+		}
+
+		/* If we have the depedent flowbits rules file, then include it. */
+		if (file_exists("{$snortcfgdir}/rules/{$flowbit_rules_file}"))
+			$selected_rules_sections .= "include \$RULE_PATH/{$flowbit_rules_file}\n";
 	}
 
 	if (!empty($snortcfg['customrules'])) {
@@ -1926,6 +2138,10 @@ EOD;
 		$selected_rules_sections  .= "include \$RULE_PATH/custom.rules\n";
 	} else
 		@unlink("{$snortcfgdir}/rules/custom.rules");
+
+	/* Build a new sid-msg.map file from the enabled */
+	/* rules and copy it to the interface directory. */
+	build_sid_msg_map("{$snortcfgdir}/rules/", "{$snortcfgdir}/sid-msg.map");
 
 	$cksumcheck = "all";
 	if ($snortcfg['cksumcheck'] == 'on')
@@ -1961,15 +2177,19 @@ config disable_tcpopt_alerts
 config disable_ipopt_alerts
 config disable_decode_drops
 
+# Configure PCRE match limitations
+config pcre_match_limit: 3500
+config pcre_match_limit_recursion: 1500
+
 # Configure the detection engine  #
-config detection: search-method {$snort_performance} max_queue_events 5
+config detection: search-method {$snort_performance} search-optimize max-pattern-len 20 max_queue_events 5
 config event_queue: max_queue 8 log 5 order_events content_length
 
 # Configure protocol aware flushing  #
 # For more information see README.stream5  #
 config paf_max: 16000
 
-#Configure dynamic loaded libraries
+#Configure dynamically loaded libraries
 dynamicpreprocessor directory {$snort_dirs['dynamicpreprocessor']}
 dynamicengine directory {$snort_dirs['dynamicengine']}
 dynamicdetection directory {$snort_dirs['dynamicrules']}
@@ -1978,13 +2198,15 @@ dynamicdetection directory {$snort_dirs['dynamicrules']}
 preprocessor normalize_ip4
 preprocessor normalize_tcp: ips ecn stream
 preprocessor normalize_icmp4
+preprocessor normalize_ip6
+preprocessor normalize_icmp6
 
 # Flow and stream #
 preprocessor frag3_global: max_frags 65536
 preprocessor frag3_engine: policy bsd detect_anomalies overlap_limit 10 min_fragment_length 100 timeout 180
 
 preprocessor stream5_global: track_tcp yes, track_udp yes, track_icmp no, max_tcp 262144, max_udp 131072, max_active_responses 2, min_response_seconds 5{$def_stream5_mem_cap}
-preprocessor stream5_tcp: policy BSD, overlap_limit 10, timeout 180, require_3whs 180, ports both all{$def_max_queued_bytes_type}{$def_max_queued_segs_type}
+preprocessor stream5_tcp: policy BSD, overlap_limit 10, timeout 180, ports both all{$def_max_queued_bytes_type}{$def_max_queued_segs_type}
 preprocessor stream5_udp: timeout 180
 
 {$snort_preprocessors}
