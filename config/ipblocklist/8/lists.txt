@@ -1,1 +1,0 @@
-http://tomschaefer.org/temp/pfsense/tbg_primarythreats.txt
