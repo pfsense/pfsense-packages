@@ -158,6 +158,9 @@ if ($_POST['selectall']) {
 }
 
 $enabled_rulesets_array = explode("||", $a_nat[$id]['rulesets']);
+
+$if_friendly = snort_get_friendly_interface($pconfig['interface']);
+$pgtitle = "Snort: Interface {$if_friendly} Categories";
 include_once("head.inc");
 ?>
 
@@ -165,12 +168,8 @@ include_once("head.inc");
 
 <?php
 include("fbegin.inc"); 
-$if_friendly = snort_get_friendly_interface($pconfig['interface']);
-$pgtitle = "Snort: Interface {$if_friendly} Categories";
+if($pfsense_stable == 'yes'){echo '<p class="pgtitle">' . $pgtitle . '</p>';}
 
-if($pfsense_stable == 'yes'){echo '<p class="pgtitle">' . $pgtitle . '</p>';}?>
-
-<?php
 /* Display message */
 if ($input_errors) {
 	print_input_errors($input_errors); // TODO: add checks
