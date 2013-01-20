@@ -39,6 +39,7 @@ require_once("/usr/local/pkg/snort/snort.inc");
 global $g;
 
 $snortdir = SNORTDIR;
+$snort_upd_log = "/tmp/snort_update.log";
 
 /* load only javascript that is needed */
 $snort_load_jquery = 'yes';
@@ -57,7 +58,7 @@ if (file_exists("{$snortdir}/emerging.rules.tar.gz.md5"))
 
 /* check for logfile */
 $update_logfile_chk = 'no';
-if (file_exists("{$snortdir}/snort_update.log"))
+if (file_exists("{$snort_upd_log}"))
 	$update_logfile_chk = 'yes';
 
 $pgtitle = "Services: Snort: Updates";
@@ -68,6 +69,21 @@ include_once("head.inc");
 
 <?php include("fbegin.inc"); ?>
 <?if($pfsense_stable == 'yes'){echo '<p class="pgtitle">' . $pgtitle . '</p>';}?>
+
+<script language="javascript" type="text/javascript">
+function popup(url) 
+{
+ params  = 'width='+screen.width;
+ params += ', height='+screen.height;
+ params += ', top=0, left=0'
+ params += ', fullscreen=yes';
+
+ newwin=window.open(url,'windowname4', params);
+ if (window.focus) {newwin.focus()}
+ return false;
+}
+</script>
+
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
 <tr><td>
 <?php
@@ -157,10 +173,10 @@ include_once("head.inc");
 
 						if ($update_logfile_chk == 'yes') {
 							echo "
-				<button href='/snort/snort_rules_edit.php?openruleset={$snortdir}/snort_update.log'><span class='pwhitetxt'>" . gettext("Update Log") . "&nbsp;&nbsp;&nbsp;&nbsp;</span></button>\n";
+				<button href='/snort/snort_rules_edit.php?openruleset={$snort_upd_log}'><span class='pwhitetxt'>" . gettext("Update Log") . "&nbsp;&nbsp;&nbsp;&nbsp;</span></button>\n";
 						}else{
 							echo "
-				<button disabled='disabled' href='/snort/snort_rules_edit.php?openruleset={$snortdir}/snort_update.log'><span class='pwhitetxt'>" . gettext("Update Log") . "&nbsp;&nbsp;&nbsp;&nbsp;</span></button>\n";
+				<button disabled='disabled' href='/snort/snort_rules_edit.php?openruleset={$snort_upd_log}'><span class='pwhitetxt'>" . gettext("Update Log") . "&nbsp;&nbsp;&nbsp;&nbsp;</span></button>\n";
 						}
 							
 				?>

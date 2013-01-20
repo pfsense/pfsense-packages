@@ -37,6 +37,7 @@
 require_once("guiconfig.inc");
 require_once("/usr/local/pkg/snort/snort.inc");
 
+global $flowbit_rules_file;
 $snortdir = SNORTDIR;
 
 if (!is_array($config['installedpackages']['snortglobal']['rule'])) {
@@ -60,20 +61,39 @@ if (isset($id) && $a_rule[$id]) {
 $if_real = snort_get_real_interface($pconfig['interface']);
 $snort_uuid = $a_rule[$id]['uuid'];
 $file = $_GET['openruleset'];
-
-//read file into string, and get filesize also chk for empty files
 $contents = '';
-if (file_exists("{$snortdir}/snort_{$snort_uuid}_{$if_real}/rules/{$file}"))
-	$contents = file_get_contents("{$snortdir}/snort_{$snort_uuid}_{$if_real}/rules/{$file}");
-else {
+
+// Read the current rules file.
+// Test for the special case of an IPS Policy file.
+if (substr($file, 0, 10) == "IPS Policy") {
+	$rules_map = snort_load_vrt_policy($a_rule[$id]['ips_policy']);
+	if (isset($_GET['ids']))
+		$contents = $rules_map[1][trim($_GET['ids'])]['rule'];
+	else {
+		$contents = "# Snort IPS Policy - " . ucfirst($a_rule[$id]['ips_policy']) . "\n\n";
+		foreach (array_keys($rules_map) as $k1) {
+			foreach (array_keys($rules_map[$k1]) as $k2) {
+				$contents .= "# Category: " . $rules_map[$k1][$k2]['category'] . "   SID: {$k2}\n";
+				$contents .= $rules_map[$k1][$k2]['rule'] . "\n";
+			}
+		}
+	}
+	unset($rules_map);
+}
+elseif (isset($_GET['ids'])) {
+	$rules_map = snort_load_rules_map("{$snortdir}/rules/{$file}");
+	$contents = $rules_map[1][trim($_GET['ids'])]['rule'];
+}
+elseif ($file == $flowbit_rules_file)
+	$contents = file_get_contents("{$snortdir}/snort_{$snort_uuid}_{$if_real}/rules/{$flowbit_rules_file}");
+elseif (!file_exists("{$snortdir}/rules/{$file}")) {
 	header("Location: /snort/snort_rules.php?id={$id}&openruleset={$file}");
 	exit;
 }
+else
+	$contents = file_get_contents("{$snortdir}/rules/{$file}");
 
-//split the contents of the string file into an array using the delimiter
-$splitcontents = explode("\n", $contents);
-
-$pgtitle = array(gettext("Advanced"), gettext("File Editor"));
+$pgtitle = array(gettext("Advanced"), gettext("File Viewer"));
 
 ?>
 
@@ -90,7 +110,7 @@ $pgtitle = array(gettext("Advanced"), gettext("File Editor"));
 		<table width="100%" cellpadding="0" cellspacing="6" bgcolor="#eeeeee">
 		<tr>
 			<td>
-				<input type="button" class="formbtn" value="Cancel" onclick="window.close()">
+				<input type="button" class="formbtn" value="Return" onclick="window.close()">
 			</td>
 		</tr>
 		<tr>
