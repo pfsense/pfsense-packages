@@ -34,6 +34,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+
 require_once("guiconfig.inc");
 require_once("/usr/local/pkg/snort/snort.inc");
 
