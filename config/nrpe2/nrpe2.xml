@@ -81,6 +81,11 @@
 					<required/>
 				</rowhelperfield>
 				<rowhelperfield>
+					<fielddescr>Sudo</fielddescr>
+					<fieldname>sudo</fieldname>
+					<type>checkbox</type>
+				</rowhelperfield>
+				<rowhelperfield>
 					<fielddescr>Command</fielddescr>
 					<fieldname>command</fieldname>
 					<type>select_source</type>
