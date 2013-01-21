@@ -39,28 +39,34 @@ require_once("/etc/inc/pkg-utils.inc");
 require_once("/etc/inc/globals.inc");
 require_once("/usr/local/pkg/dansguardian.inc");
 
-function fetch_blacklist(){
+function fetch_blacklist() {
 	global $config,$g;
 	$url=$config['installedpackages']['dansguardianblacklist']['config'][0]['url'];
-	if (is_url($url)){
+	if (is_url($url)) {
 		conf_mount_rw();
 		print "file download start..";
 		unlink_if_exists("/usr/local/etc/dansguardian/lists/blacklist.tgz");
-		exec("/usr/bin/fetch -o /usr/local/etc/dansguardian/lists/blacklist.tgz ".escapeshellarg($url));
-		chdir ("/usr/local/etc/dansguardian/lists");
-		if (is_dir ("blacklists.old"))
-			exec ('rm -rf /usr/local/etc/dansguardian/lists/blacklists.old');
-		rename("blacklists","blacklists.old");
-		exec('/usr/bin/tar -xvzf /usr/local/etc/dansguardian/lists/blacklist.tgz 2>&1',$output,$return);
-		if (preg_match("/x\W+(\w+)/",$output[0],$matches)){
-			if ($matches[1] != "blacklists")
-				rename("./".$matches[1],"blacklists");
-			read_lists();
+		exec("/usr/bin/fetch -o /usr/local/etc/dansguardian/lists/blacklist.tgz ".escapeshellarg($url),$output,$return);
+		if ($return == 0) {
+			chdir ("/usr/local/etc/dansguardian/lists");
+			if (is_dir ("blacklists.old"))
+				exec ('rm -rf /usr/local/etc/dansguardian/lists/blacklists.old');
+			rename("blacklists","blacklists.old");
+			exec('/usr/bin/tar -xvzf /usr/local/etc/dansguardian/lists/blacklist.tgz 2>&1',$output,$return);
+			if (preg_match("/x\W+(\w+)/",$output[0],$matches)) {
+				if ($matches[1] != "blacklists")
+					rename("./".$matches[1],"blacklists");
+				read_lists();
 			}
-		else
-			file_notice("Dansguardian - Could not determine Blacklist extract dir. Categories not updated","");
-	   }
-	else{
+			else {
+				file_notice("Dansguardian - Could not determine Blacklist extract dir. Categories not updated","");
+			}
+		}
+		else {
+			file_notice("Dansguardian - Could not fetch blacklists from url","");
+		}
+	}
+	else {
 		file_notice("Dansguardian - Blacklist url is invalid.","");
 	}
 }
