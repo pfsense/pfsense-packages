@@ -737,10 +737,12 @@ function build_sid_msg_map($rules_path, $sid_file) {
 	/* or an array of filenames to read. Set our $rule_files      */
 	/* variable accordingly. If we can't figure it out, return    */
 	/* an empty rules map array.                                  */
-	if (is_dir($rules_path))
-		$rule_files = glob($rules_path . "*.rules");
-	elseif (is_file($rules_path))
-		$rule_files = (array)$rules_path;
+	if (is_string($rules_path)) {
+		if (is_dir($rules_path))
+			$rule_files = glob($rules_path . "*.rules");
+		elseif (is_file($rules_path))
+			$rule_files = (array)$rules_path;
+	}
 	elseif (is_array($rules_path))
 		$rule_files = $rules_path;
 	else
@@ -921,10 +923,12 @@ function snort_load_rules_map($rules_path) {
 	/* or an array of filenames to read. Set our $rule_files      */
 	/* variable accordingly. If we can't figure it out, return    */
 	/* an empty rules map array.                                  */
-	if (is_dir($rules_path))
-		$rule_files = glob($rules_path . "*.rules");
-	elseif (is_file($rules_path))
-		$rule_files = (array)$rules_path;
+	if (is_string($rules_path)) {
+		if (is_dir($rules_path))
+			$rule_files = glob($rules_path . "*.rules");
+		elseif (is_file($rules_path))
+			$rule_files = (array)$rules_path;
+	}
 	elseif (is_array($rules_path))
 		$rule_files = $rules_path;
 	else
