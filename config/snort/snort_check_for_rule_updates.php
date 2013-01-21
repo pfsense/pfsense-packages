@@ -388,7 +388,7 @@ if ($snortdownload == 'on' || $emergingthreats == 'on') {
 
         /* Determine which base etc file set to use for the master copy.      */
         /* If the Snort VRT rules are not enabled, then use Emerging Threats. */
-        if (($vrt_enabled == 'off') && (et_enabled == 'on')) {
+        if (($vrt_enabled == 'off') && ($et_enabled == 'on')) {
 		foreach (array("classification.config", "reference.config", "gen-msg.map", "unicode.map") as $file) {
 			if (file_exists("{$snortdir}/ET_{$file}"))
 				@rename("{$snortdir}/ET_{$file}", "{$snortdir}/{$file}");
