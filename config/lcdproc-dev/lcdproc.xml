@@ -431,7 +431,7 @@
 		</field>
 		<field>
 			<fieldname>offbrightness</fieldname>
-			<fielddescr>Offrightness</fielddescr>
+			<fielddescr>Off brightness</fielddescr>
 			<description>Set the off-brightness of the LCD panel. This value is used when the display is normally switched off in case LCDd is inactive. This option is not supported by all the LCD panels, leave "default" if unsure.</description>
 			<type>select</type>
 			<options>
