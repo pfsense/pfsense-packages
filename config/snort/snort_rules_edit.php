@@ -63,7 +63,9 @@ $snort_uuid = $a_rule[$id]['uuid'];
 $file = $_GET['openruleset'];
 $contents = '';
 
-// Read the current rules file.
+// Read the contents of the argument passed to us.
+// It may be an IPS policy string, an individual SID,
+// a standard rules file, or a complete file name.
 // Test for the special case of an IPS Policy file.
 if (substr($file, 0, 10) == "IPS Policy") {
 	$rules_map = snort_load_vrt_policy($a_rule[$id]['ips_policy']);
@@ -80,27 +82,33 @@ if (substr($file, 0, 10) == "IPS Policy") {
 	}
 	unset($rules_map);
 }
+// Is it a SID to load the rule text from?
 elseif (isset($_GET['ids'])) {
 	$rules_map = snort_load_rules_map("{$snortdir}/rules/{$file}");
 	$contents = $rules_map[1][trim($_GET['ids'])]['rule'];
 }
+// Is it our special flowbit rules file?
 elseif ($file == $flowbit_rules_file)
 	$contents = file_get_contents("{$snortdir}/snort_{$snort_uuid}_{$if_real}/rules/{$flowbit_rules_file}");
-elseif (!file_exists("{$snortdir}/rules/{$file}")) {
+// Is it a rules file in the ../rules/ directory?
+elseif (file_exists("{$snortdir}/rules/{$file}"))
+	$contents = file_get_contents("{$snortdir}/rules/{$file}");
+// Is it a fully qualified path and file?
+elseif (file_exists($file))
+	$contents = file_get_contents($file);
+// It is not something we can display, so exit.
+else {
 	header("Location: /snort/snort_rules.php?id={$id}&openruleset={$file}");
 	exit;
 }
-else
-	$contents = file_get_contents("{$snortdir}/rules/{$file}");
 
 $pgtitle = array(gettext("Advanced"), gettext("File Viewer"));
-
 ?>
 
 <?php include("head.inc");?>
 
 <body link="#000000" vlink="#000000" alink="#000000">
-	<?php if ($savemsg) print_info_box($savemsg); ?>
+<?php if ($savemsg) print_info_box($savemsg); ?>
 <?php include("fbegin.inc");?>
 
 <form action="snort_rules_edit.php" method="post">
