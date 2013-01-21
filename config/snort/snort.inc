@@ -765,7 +765,7 @@ function build_sid_msg_map($rules_path, $sid_file) {
              foreach ($rules_array as $rule) {
 
                   /* Skip any non-rule lines unless we're in         */
-                  /* multiline mode.
+                  /* multiline mode.				     */
                   if (!preg_match('/^\s*#*\s*(alert|drop|pass)/i', $rule) && !$b_Multiline)
                        continue;
 
