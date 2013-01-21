@@ -72,7 +72,7 @@ if (isset($_GET['dup']))
 
 if ($_POST["Submit"]) {
 	if ($_POST['descr'] == '' && $pconfig['descr'] == '') {
-		$input_errors[] = "Please  enter a description for your reference.";
+		$input_errors[] = "Please enter a description for your reference.";
 	}
 
 	if (!$_POST['interface'])
@@ -154,7 +154,7 @@ function enable_blockoffenders() {
 
 function enable_change(enable_change) {
 	endis = !(document.iform.enable.checked || enable_change);
-	// make shure a default answer is called if this is envoked.
+	// make sure a default answer is called if this is invoked.
 	endis2 = (document.iform.enable);
 	document.iform.performance.disabled = endis;
 	document.iform.blockoffenders7.disabled = endis;
@@ -232,7 +232,7 @@ function enable_change(enable_change) {
 			<?php 	endforeach; ?>
 			</select><br>
 			<span class="vexpl"><?php echo gettext("Choose which interface this rule applies to."); ?><br/>
-				<b><?php echo gettext("Hint:"); ?> </b><?php echo gettext("in most cases, you'll want to use WAN here."); ?></span><br/><br/></td>
+				<span class="red"><?php echo gettext("Hint:"); ?> </span><?php echo gettext("in most cases, you'll want to use WAN here."); ?></span><br/></td>
 	</tr>
 	<tr>
 				<td width="22%" valign="top" class="vncellreq"><?php echo gettext("Description"); ?></td>
@@ -240,8 +240,56 @@ function enable_change(enable_change) {
 					class="formfld" id="descr" size="40"
 					value="<?=htmlspecialchars($pconfig['descr']);?>"> <br/>
 				<span class="vexpl"><?php echo gettext("You may enter a description here for your " .
-				"reference (not parsed)."); ?></span><br/><br/></td>
+				"reference (not parsed)."); ?></span><br/></td>
 	</tr>
+<tr>
+	<td colspan="2" valign="top" class="listtopic"><?php echo gettext("Alert Settings"); ?></td>
+</tr>
+	<tr>
+				<td width="22%" valign="top" class="vncell"><?php echo gettext("Send alerts to main " .
+				"System logs"); ?></td>
+				<td width="78%" class="vtable"><input name="alertsystemlog"
+					type="checkbox" value="on"
+				<?php if ($pconfig['alertsystemlog'] == "on") echo "checked"; ?>
+				onClick="enable_change(false)"><br>
+				<?php echo gettext("Snort will send Alerts to the firewall's system logs."); ?></td>
+	</tr>
+	<tr>
+				<td width="22%" valign="top" class="vncell"><?php echo gettext("Block offenders"); ?></td>
+				<td width="78%" class="vtable">
+					<input name="blockoffenders7" id="blockoffenders7" type="checkbox" value="on"
+					<?php if ($pconfig['blockoffenders7'] == "on") echo "checked"; ?>
+					onClick="enable_blockoffenders()"><br>
+				<?php echo gettext("Checking this option will automatically block hosts that generate a " .
+				"Snort alert."); ?></td>
+	</tr>
+	<tr>
+				<td width="22%" valign="top" class="vncell"><?php echo gettext("Kill states"); ?></td>
+				<td width="78%" class="vtable">
+					<input name="blockoffenderskill" id="blockoffenderskill" type="checkbox" value="on" <?php if ($pconfig['blockoffenderskill'] == "on") echo "checked"; ?>>
+					<br/><?php echo gettext("Checking this option will kill firewall states for the blocked ip"); ?>
+				</td>
+	</tr>
+	<tr>
+				<td width="22%" valign="top" class="vncell"><?php echo gettext("Which ip to block"); ?></td>
+				<td width="78%" class="vtable">
+					<select name="blockoffendersip" class="formselect" id="blockoffendersip">
+				<?php
+					foreach (array("src", "dst", "both") as $btype) {
+						if ($btype == $pconfig['blockoffendersip'])
+							echo "<option value='{$btype}' selected>";
+						else
+							echo "<option value='{$btype}'>";
+						echo htmlspecialchars($btype) . '</option>';
+					}
+				?>
+					</select>
+				<br/><?php echo gettext("Which ip extracted from the packet you want to block"); ?> 
+				</td>
+	</tr>
+<tr>
+	<td colspan="2" valign="top" class="listtopic"><?php echo gettext("Performance Settings"); ?></td>
+</tr>
 	<tr>
 				<td width="22%" valign="top" class="vncell"><?php echo gettext("Memory Performance"); ?></td>
 				<td width="78%" class="vtable">
@@ -254,12 +302,20 @@ function enable_change(enable_change) {
 						<?=htmlspecialchars($ifacename2);?></option>
 						<?php endforeach; ?>
 				</select><br>
-				<span class="vexpl"><?php echo gettext("Lowmem and ac-bnfa are recommended for low end " .
-				"systems, Ac: high memory, best performance, ac-std: moderate " .
-				"memory,high performance, acs: small memory, moderateperformance, " .
-				"ac-banded: small memory,moderate performance, ac-sparsebands: small " .
+				<span class="vexpl"><?php echo gettext("LOWMEM and AC-BNFA are recommended for low end " .
+				"systems, AC: high memory, best performance, AC-STD: moderate " .
+				"memory,high performance, ACS: small memory, moderate performance, " .
+				"AC-BANDED: small memory,moderate performance, AC-SPARSEBANDS: small " .
 				"memory, high performance."); ?>
 				</span><br/></td>
+	</tr>
+	<tr>
+				<td width="22%" valign="top" class="vncell"><?php echo gettext("Checksum Check Disable"); ?></td>
+				<td width="78%" class="vtable">
+					<input name="cksumcheck" id="cksumcheck" type="checkbox" value="on" <?php if ($pconfig['cksumcheck'] == "on") echo "checked"; ?>>
+					<br><?php echo gettext("If ticked, checksum checking on Snort will be disabled to improve performance."); ?>
+					<br><?php echo gettext("Most of this is already done at the firewall/filter level."); ?>
+				</td>
 	</tr>
 	<tr>
 				<td colspan="2" valign="top" class="listtopic"><?php echo gettext("Choose the networks " .
@@ -316,39 +372,6 @@ function enable_change(enable_change) {
 				"setting at default."); ?><br/></td>
 	</tr>
 	<tr>
-				<td width="22%" valign="top" class="vncell"><?php echo gettext("Block offenders"); ?></td>
-				<td width="78%" class="vtable">
-					<input name="blockoffenders7" id="blockoffenders7" type="checkbox" value="on"
-					<?php if ($pconfig['blockoffenders7'] == "on") echo "checked"; ?>
-					onClick="enable_blockoffenders()"><br>
-				<?php echo gettext("Checking this option will automatically block hosts that generate a " .
-				"Snort alert."); ?></td>
-	</tr>
-	<tr>
-				<td width="22%" valign="top" class="vncell"><?php echo gettext("Kill states"); ?></td>
-				<td width="78%" class="vtable">
-					<input name="blockoffenderskill" id="blockoffenderskill" type="checkbox" value="on" <?php if ($pconfig['blockoffenderskill'] == "on") echo "checked"; ?>>
-					<br/<?php echo gettext("Should firewall states be killed for the blocked ip"); ?>>
-				</td>
-	</tr>
-	<tr>
-				<td width="22%" valign="top" class="vncell"><?php echo gettext("Which ip to block"); ?></td>
-				<td width="78%" class="vtable">
-					<select name="blockoffendersip" class="formselect" id="blockoffendersip">
-				<?php
-					foreach (array("src", "dst", "both") as $btype) {
-						if ($btype == $pconfig['blockoffendersip'])
-							echo "<option value='{$btype}' selected>";
-						else
-							echo "<option value='{$btype}'>";
-						echo htmlspecialchars($btype) . '</option>';
-					}
-				?>
-					</select>
-				<br/><?php echo gettext("Which ip extracted from the packet you want to block"); ?> 
-				</td>
-	</tr>
-	<tr>
 		<td width="22%" valign="top" class="vncell"><?php echo gettext("Whitelist"); ?></td>
 		<td width="78%" class="vtable">
 			<select name="whitelistname" class="formselect" id="whitelistname">
@@ -372,6 +395,10 @@ function enable_change(enable_change) {
 		<span class="red"><?php echo gettext("Note:"); ?></span><br/>&nbsp;<?php echo gettext("This option will only be used when block offenders is on."); ?>
 		</td>
 	</tr>
+<tr>
+	<td colspan="2" valign="top" class="listtopic"><?php echo gettext("Choose a suppression or filtering " .
+	"file if desired."); ?></td>
+</tr>
 	<tr>
 		<td width="22%" valign="top" class="vncell"><?php echo gettext("Suppression and filtering"); ?></td>
 		<td width="78%" class="vtable">
@@ -392,29 +419,12 @@ function enable_change(enable_change) {
 		?>
 		</select><br>
 		<span class="vexpl"><?php echo gettext("Choose the suppression or filtering file you " .
-		"will like this rule to use."); ?> </span><br/>&nbsp;<br/><span class="red"><?php echo gettext("Note:"); ?></span><br/>&nbsp;<?php echo gettext("Default " .
+		"will like this interface to use."); ?> </span><br/>&nbsp;<br/><span class="red"><?php echo gettext("Note:"); ?></span><br/>&nbsp;<?php echo gettext("Default " .
 		"option disables suppression and filtering."); ?></td>
-	</tr>
-	<tr>
-				<td width="22%" valign="top" class="vncell"><?php echo gettext("Checksum checking"); ?></td>
-				<td width="78%" class="vtable">
-					<input name="cksumcheck" id="cksumcheck" type="checkbox" value="on" <?php if ($pconfig['cksumcheck'] == "on") echo "checked"; ?>>
-					<br/<?php echo gettext("If ticked checksum checking on snort will be disabled to improve performance."); ?>>
-					<br/<?php echo gettext("Most of this is already done on the firewall/filter level"); ?>>
-				</td>
-	</tr>
-	<tr>
-		<td width="22%" valign="top" class="vncell"><?php echo gettext("Send alerts to main " .
-		"lSystem logs"); ?></td>
-		<td width="78%" class="vtable"><input name="alertsystemlog"
-			type="checkbox" value="on"
-			<?php if ($pconfig['alertsystemlog'] == "on") echo "checked"; ?>
-			onClick="enable_change(false)"><br>
-		<?php echo gettext("Snort will send Alerts to the firewall's system logs."); ?></td>
 	</tr>
 <tr>
 	<td colspan="2" valign="top" class="listtopic"><?php echo gettext("Arguments here will " .
-	"be automatically inserted into the snort configuration."); ?></td>
+	"be automatically inserted into the Snort configuration."); ?></td>
 </tr>
 <tr>
 	<td width="22%" valign="top" class="vncell"><?php echo gettext("Advanced configuration pass through"); ?></td>
@@ -432,7 +442,6 @@ function enable_change(enable_change) {
 <tr>
 	<td width="22%" valign="top">&nbsp;</td>
 	<td width="78%"><span class="vexpl"><span class="red"><strong><?php echo gettext("Note:"); ?></strong></span><br/>
-		<br>
 		<?php echo gettext("Please save your settings before you click start."); ?>	
 	</td>
 </tr>
