@@ -55,10 +55,13 @@ if (isset($id) && $a_nat[$id]) {
 
 	/* new options */
 	$pconfig['perform_stat'] = $a_nat[$id]['perform_stat'];
-	$pconfig['flow_depth'] = $a_nat[$id]['flow_depth'];
+	$pconfig['server_flow_depth'] = $a_nat[$id]['server_flow_depth'];
+	$pconfig['client_flow_depth'] = $a_nat[$id]['client_flow_depth'];
 	$pconfig['max_queued_bytes'] = $a_nat[$id]['max_queued_bytes'];
 	$pconfig['max_queued_segs'] = $a_nat[$id]['max_queued_segs'];
+	$pconfig['stream5_mem_cap'] = $a_nat[$id]['stream5_mem_cap'];
 	$pconfig['http_inspect'] = $a_nat[$id]['http_inspect'];
+	$pconfig['noalert_http_inspect'] = $a_nat[$id]['noalert_http_inspect'];
 	$pconfig['other_preprocs'] = $a_nat[$id]['other_preprocs'];
 	$pconfig['ftp_preprocessor'] = $a_nat[$id]['ftp_preprocessor'];
 	$pconfig['smtp_preprocessor'] = $a_nat[$id]['smtp_preprocessor'];
@@ -69,6 +72,8 @@ if (isset($id) && $a_nat[$id]) {
 	$pconfig['ssl_preproc'] = $a_nat[$id]['ssl_preproc'];
 	$pconfig['pop_preproc'] = $a_nat[$id]['pop_preproc'];
 	$pconfig['imap_preproc'] = $a_nat[$id]['imap_preproc'];
+	$pconfig['dnp3_preproc'] = $a_nat[$id]['dnp3_preproc'];
+	$pconfig['modbus_preproc'] = $a_nat[$id]['modbus_preproc'];
 }
 
 if ($_POST) {
@@ -78,12 +83,15 @@ if ($_POST) {
 	/* if no errors write to conf */
 	if (!$input_errors) {
 		/* post new options */
-		if ($_POST['flow_depth'] != "") { $natent['flow_depth'] = $_POST['flow_depth']; }else{ $natent['flow_depth'] = ""; }
+		if ($_POST['server_flow_depth'] != "") { $natent['server_flow_depth'] = $_POST['server_flow_depth']; }else{ $natent['server_flow_depth'] = ""; }
+		if ($_POST['client_flow_depth'] != "") { $natent['client_flow_depth'] = $_POST['client_flow_depth']; }else{ $natent['client_flow_depth'] = ""; }
 		if ($_POST['max_queued_bytes'] != "") { $natent['max_queued_bytes'] = $_POST['max_queued_bytes']; }else{ $natent['max_queued_bytes'] = ""; }
 		if ($_POST['max_queued_segs'] != "") { $natent['max_queued_segs'] = $_POST['max_queued_segs']; }else{ $natent['max_queued_segs'] = ""; }
+		if ($_POST['stream5_mem_cap'] != "") { $natent['stream5_mem_cap'] = $_POST['stream5_mem_cap']; }else{ $natent['stream5_mem_cap'] = ""; }
 
 		$natent['perform_stat'] = $_POST['perform_stat'] ? 'on' : 'off';
 		$natent['http_inspect'] = $_POST['http_inspect'] ? 'on' : 'off';
+		$natent['noalert_http_inspect'] = $_POST['noalert_http_inspect'] ? 'on' : 'off';
 		$natent['other_preprocs'] = $_POST['other_preprocs'] ? 'on' : 'off';
 		$natent['ftp_preprocessor'] = $_POST['ftp_preprocessor'] ? 'on' : 'off';
 		$natent['smtp_preprocessor'] = $_POST['smtp_preprocessor'] ? 'on' : 'off';
@@ -94,6 +102,8 @@ if ($_POST) {
 		$natent['ssl_preproc'] = $_POST['ssl_preproc'] ? 'on' : 'off';
 		$natent['pop_preproc'] = $_POST['pop_preproc'] ? 'on' : 'off';
 		$natent['imap_preproc'] = $_POST['imap_preproc'] ? 'on' : 'off';
+		$natent['dnp3_preproc'] = $_POST['dnp3_preproc'] ? 'on' : 'off';
+		$natent['modbus_preproc'] = $_POST['modbus_preproc'] ? 'on' : 'off';
 
 		if (isset($id) && $a_nat[$id])
 			$a_nat[$id] = $natent;
@@ -175,7 +185,7 @@ include_once("head.inc");
 		<td width="78%" class="vtable"><input name="perform_stat"
 			type="checkbox" value="on"
 			<?php if ($pconfig['perform_stat']=="on") echo "checked"; ?>
-			onClick="enable_change(false)"> <?php echo gettext("Performance Statistics for this interface."); ?></td>
+			onClick="enable_change(false)"> <?php echo gettext("Collect Performance Statistics for this interface."); ?></td>
 	</tr>
 	<tr>
 		<td colspan="2" valign="top" class="listtopic"><?php echo gettext("HTTP Inspect Settings"); ?></td>
@@ -193,18 +203,44 @@ include_once("head.inc");
 		<td class="vtable">
 		<table cellpadding="0" cellspacing="0">
 			<tr>
-				<td><input name="flow_depth" type="text" class="formfld"
-					id="flow_depth" size="5"
-					value="<?=htmlspecialchars($pconfig['flow_depth']);?>"> <?php echo gettext("<strong>-1</strong> " .
-				"to <strong>1460</strong> (<strong>-1</strong> disables HTTP " .
+				<td><input name="server_flow_depth" type="text" class="formfld"
+					id="flow_depth" size="6"
+					value="<?=htmlspecialchars($pconfig['server_flow_depth']);?>"> <?php echo gettext("<strong>-1</strong> " .
+				"to <strong>65535</strong> (<strong>-1</strong> disables HTTP " .
 				"inspect, <strong>0</strong> enables all HTTP inspect)"); ?></td>
 			</tr>
 		</table>
 		<?php echo gettext("Amount of HTTP server response payload to inspect. Snort's " .
 		"performance may increase by adjusting this value."); ?><br>
 		<?php echo gettext("Setting this value too low may cause false negatives. Values above 0 " .
-		"are specified in bytes. Default value is <strong>0</strong>"); ?><br>
+		"are specified in bytes.  Recommended setting is maximum (65535). Default value is <strong>300</strong>"); ?><br>
 		</td>
+	</tr>
+	<tr>
+		<td valign="top" class="vncell"><?php echo gettext("HTTP client flow depth"); ?></td>
+		<td class="vtable">
+		<table cellpadding="0" cellspacing="0">
+			<tr>
+				<td><input name="client_flow_depth" type="text" class="formfld"
+					id="flow_depth" size="6"
+					value="<?=htmlspecialchars($pconfig['client_flow_depth']);?>"> <?php echo gettext("<strong>-1</strong> " .
+				"to <strong>1460</strong> (<strong>-1</strong> disables HTTP " .
+				"inspect, <strong>0</strong> enables all HTTP inspect)"); ?></td>
+			</tr>
+		</table>
+		<?php echo gettext("Amount of raw HTTP client request payload to inspect. Snort's " .
+		"performance may increase by adjusting this value."); ?><br>
+		<?php echo gettext("Setting this value too low may cause false negatives. Values above 0 " .
+		"are specified in bytes.  Recommended setting is maximum (1460). Default value is <strong>300</strong>"); ?><br>
+		</td>
+	</tr>
+	<tr>
+		<td width="22%" valign="top" class="vncell"><?php echo gettext("Disable HTTP Alerts"); ?></td>
+		<td width="78%" class="vtable"><input name="noalert_http_inspect"
+			type="checkbox" value="on"
+			<?php if ($pconfig['noalert_http_inspect']=="on") echo "checked"; ?>
+			onClick="enable_change(false)"> <?php echo gettext("Tick to turn off alerts from the HTTP Inspect " .
+				"preprocessor.  This has no effect on HTTP rules in the rule set."); ?></td>
 	</tr>
 	<tr>
 		<td colspan="2" valign="top" class="listtopic"><?php echo gettext("Stream5 Settings"); ?></td>
@@ -215,7 +251,7 @@ include_once("head.inc");
 		<table cellpadding="0" cellspacing="0">
 			<tr>
 				<td><input name="max_queued_bytes" type="text" class="formfld"
-					id="max_queued_bytes" size="5"
+					id="max_queued_bytes" size="6"
 					value="<?=htmlspecialchars($pconfig['max_queued_bytes']);?>">
 				<?php echo gettext("Minimum is <strong>1024</strong>, Maximum is <strong>1073741824</strong> " .
 				"( default value is <strong>1048576</strong>, <strong>0</strong> " .
@@ -232,7 +268,7 @@ include_once("head.inc");
 		<table cellpadding="0" cellspacing="0">
 			<tr>
 				<td><input name="max_queued_segs" type="text" class="formfld"
-					id="max_queued_segs" size="5"
+					id="max_queued_segs" size="6"
 					value="<?=htmlspecialchars($pconfig['max_queued_segs']);?>">
 				<?php echo gettext("Minimum is <strong>2</strong>, Maximum is <strong>1073741824</strong> " .
 				"( default value is <strong>2621</strong>, <strong>0</strong> means " .
@@ -241,6 +277,22 @@ include_once("head.inc");
 		</table>
 		<?php echo gettext("The number of segments to be queued for reassembly for TCP sessions " .
 		"in memory. Default value is <strong>2621</strong>"); ?><br>
+		</td>
+	</tr>
+	<tr>
+		<td valign="top" class="vncell"><?php echo gettext("Memory Cap"); ?></td>
+		<td class="vtable">
+		<table cellpadding="0" cellspacing="0">
+			<tr>
+				<td><input name="stream5_mem_cap" type="text" class="formfld"
+					id="stream5_mem_cap" size="6"
+					value="<?=htmlspecialchars($pconfig['stream5_mem_cap']);?>">
+				<?php echo gettext("Minimum is <strong>32768</strong>, Maximum is <strong>1073741824</strong> " .
+				"( default value is <strong>8388608</strong>) "); ?></td>
+			</tr>
+		</table>
+		<?php echo gettext("The memory cap in bytes for TCP packet storage " .
+		"in RAM. Default value is <strong>8388608</strong> (8 MB)"); ?><br>
 		</td>
 	</tr>
 	<tr>
@@ -266,7 +318,7 @@ include_once("head.inc");
 	</tr>
 	<tr>
 		<td width="22%" valign="top" class="vncell"><?php echo gettext("Enable"); ?> <br>
-		<?php echo gettext("SMTP Normalizer"); ?></td>
+		<?php echo gettext("POP Normalizer"); ?></td>
 		<td width="78%" class="vtable"><input name="pop_preproc"
 			type="checkbox" value="on"
 			<?php if ($pconfig['pop_preproc']=="on") echo "checked"; ?>
@@ -275,7 +327,7 @@ include_once("head.inc");
 	</tr>
 	<tr>
 		<td width="22%" valign="top" class="vncell"><?php echo gettext("Enable"); ?> <br>
-		<?php echo gettext("SMTP Normalizer"); ?></td>
+		<?php echo gettext("IMAP Normalizer"); ?></td>
 		<td width="78%" class="vtable"><input name="imap_preproc"
 			type="checkbox" value="on"
 			<?php if ($pconfig['imap_preproc']=="on") echo "checked"; ?>
@@ -333,7 +385,30 @@ include_once("head.inc");
 			<input name="sensitive_data" type="checkbox" value="on"
 			<?php if ($pconfig['sensitive_data']=="on") echo "checked"; ?>
 			onClick="enable_change(false)"><br>
-		<?php echo gettext("Sensisitive data searches for CC or SS# in data"); ?>	
+		<?php echo gettext("Sensitive data searches for credit card or Social Security numbers in data"); ?>	
+		</td>
+	</tr>
+	<tr>
+		<td colspan="2" valign="top" class="listtopic"><?php echo gettext("SCADA Preprocessor Settings"); ?></td>
+	</tr>
+	<tr>
+		<td width="22%" valign="top" class="vncell"><?php echo gettext("Enable"); ?> <br> <?php echo gettext("Modbus Detection"); ?></td>
+		<td width="78%" class="vtable">
+			<input name="modbus_preproc" type="checkbox" value="on"
+			<?php if ($pconfig['modbus_preproc']=="on") echo "checked"; ?>
+			onClick="enable_change(false)"><br>
+		<?php echo gettext("Modbus is a protocol used in SCADA networks.  The default port is TCP 502. If your network does " .
+			"not contain Modbus-enabled devices, you should leave this preprocessor disabled."); ?>
+		</td>
+	</tr>
+	<tr>
+		<td width="22%" valign="top" class="vncell"><?php echo gettext("Enable"); ?> <br> <?php echo gettext("DNP3 Detection"); ?></td>
+		<td width="78%" class="vtable">
+			<input name="dnp3_preproc" type="checkbox" value="on"
+			<?php if ($pconfig['dnp3_preproc']=="on") echo "checked"; ?>
+			onClick="enable_change(false)"><br>
+		<?php echo gettext("DNP3 is a protocol used in SCADA networks.  The default port is TCP 20000. If your network does " .
+			"not contain DNP3-enabled devices, you should leave this preprocessor disabled."); ?>
 		</td>
 	</tr>
 	<tr>

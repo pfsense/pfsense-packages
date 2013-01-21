@@ -206,7 +206,7 @@ if ($pfsense_stable == 'yes')
 					<td width="17"></td>
 					<td><a href="snort_interfaces_edit.php?id=<?php echo $id_gen;?>"><img
 						src="../themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif"
-						width="17" height="17" border="0"></a></td>
+						width="17" height="17" border="0" title="<?php echo gettext('add interface');?>"></a></td>
 				</tr>
 			</table>
 			</td>
@@ -300,7 +300,7 @@ if ($pfsense_stable == 'yes')
 			<tr>
 				<td><a href="snort_interfaces_edit.php?id=<?=$i;?>"><img
 					src="/themes/<?= $g['theme']; ?>/images/icons/icon_e.gif"
-					width="17" height="17" border="0" title="<?php echo gettext('edit rule'); ?>"></a></td>
+					width="17" height="17" border="0" title="<?php echo gettext('edit interface'); ?>"></a></td>
 			</tr>
 		</table>
 	
@@ -313,11 +313,11 @@ if ($pfsense_stable == 'yes')
 					<tr>
 						<td><?php if ($nnats == 0): ?><img
 							src="../themes/<?= $g['theme']; ?>/images/icons/icon_x_d.gif"
-							width="17" height="17" title="<?php echo gettext("delete selected rules"); ?>" border="0"><?php else: ?><input
+							width="17" height="17" title="<?php echo gettext("delete selected interface"); ?>" border="0"><?php else: ?><input
 							name="del" type="image"
 							src="../themes/<?= $g['theme']; ?>/images/icons/icon_x.gif"
-							width="17" height="17" title="<?php echo gettext("delete selected mappings"); ?>"
-							onclick="return confirm('Do you really want to delete the selected Snort Rule?')"><?php endif; ?></td>
+							width="17" height="17" title="<?php echo gettext("delete selected interface"); ?>"
+							onclick="return confirm('Do you really want to delete the selected Snort mapping?')"><?php endif; ?></td>
 					</tr>
 				</table>
 				</td>
@@ -357,7 +357,7 @@ if ($pfsense_stable == 'yes')
 				<strong>Click</strong> on the <img
 					src="../themes/<?= $g['theme']; ?>/images/icons/icon_e.gif"
 					width="17" height="17" border="0" title="<?php echo gettext("Edit Icon"); ?>"> icon to edit a
-				interface and settings.<strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Click</strong>
+				interface and settings.<strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Click</strong>
 				on the <img
 					src="../themes/<?= $g['theme']; ?>/images/icons/icon_block.gif"
 					width="13" height="13" border="0" title="<?php echo gettext("Stop Icon"); ?>"> icon to <strong>stop</strong>
