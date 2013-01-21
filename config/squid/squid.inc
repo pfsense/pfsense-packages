@@ -219,6 +219,10 @@ function squid_install_command() {
 	exec("chmod a+rx " . SQUID_LOCALBASE . "/libexec/squid/dnsserver");
 	if(file_exists("/usr/local/pkg/swapstate_check.php"))
 		exec("/bin/chmod a+x /usr/local/pkg/swapstate_check.php");
+	write_rcfile(array(
+		"file" => "sqp_monitor.sh",
+		"start" => "/usr/local/pkg/sqpmon.sh &",
+		"stop" => "ps awux | grep \"sqpmon\" | grep -v \"grep\" | grep -v \"php\" | awk '{ print $2 }' | xargs kill"));
 
 	foreach (array(	SQUID_CONFBASE,
 			SQUID_ACLDIR,
@@ -230,7 +234,7 @@ function squid_install_command() {
 	/* kill any running proxy alarm scripts */
 	update_status("Checking for running processes... One moment please...");
 	log_error("Stopping any running proxy monitors");
-	mwexec("ps awux | grep \"proxy_monitor\" | grep -v \"grep\" | grep -v \"php\" | awk '{ print $2 }' | xargs kill");
+	mwexec("/usr/local/etc/rc.d/sqp_monitor.sh stop");
 	sleep(1);
 
 	if (!file_exists(SQUID_CONFBASE . '/mime.conf') && file_exists(SQUID_CONFBASE . '/mime.conf.default'))
@@ -251,7 +255,7 @@ function squid_install_command() {
 
 	/* restart proxy alarm scripts */
 	log_error("Starting a proxy monitor script");
-	mwexec_bg("/usr/local/etc/rc.d/proxy_monitor.sh");
+	mwexec_bg("/usr/local/etc/rc.d/sqp_monitor.sh start");
 
 	update_status("Reconfiguring filter... One moment please...");
 	filter_configure();
@@ -269,8 +273,8 @@ function squid_deinstall_command() {
 	mwexec('rm -rf $cachedir/swap.state');
 	mwexec('rm -rf $logdir');
 	update_status("Finishing package cleanup.");
-	mwexec('rm -f /usr/local/etc/rc.d/proxy_monitor.sh');
-	mwexec("ps awux | grep \"proxy_monitor\" | grep -v \"grep\" | grep -v \"php\" | awk '{ print $2 }' | xargs kill");
+	mwexec("/usr/local/etc/rc.d/sqp_monitor.sh stop");
+	mwexec('rm -f /usr/local/etc/rc.d/sqp_monitor.sh');
 	mwexec("ps awux | grep \"squid\" | grep -v \"grep\" | awk '{ print $2 }' | xargs kill");
 	mwexec("ps awux | grep \"dnsserver\" | grep -v \"grep\" | awk '{ print $2 }' | xargs kill");
 	mwexec("ps awux | grep \"unlinkd\" | grep -v \"grep\" | awk '{ print $2 }' | xargs kill");
