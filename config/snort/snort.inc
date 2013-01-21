@@ -722,7 +722,7 @@ function sync_snort_package_config() {
 	conf_mount_ro();
 }
 
-function build_sid_msg_map($rules_path, $sid_file) {
+function snort_build_sid_msg_map($rules_path, $sid_file) {
 
 	/*************************************************************/
 	/* This function reads all the rules file in the passed      */
@@ -1267,8 +1267,8 @@ function snort_write_flowbit_rules_file(&$flowbit_rules, $rule_file) {
 		@fwrite($fp, "# of the rule to the Suppression List for the interface.\n");
 		foreach ($flowbit_rules as $k1 => $rule) {
 			foreach ($rule as $k2 => $rule2) {
-				@fwrite($fp, "\n# Category: " . $rule2['category']);
-				@fwrite($fp, "   GID:" . $k1 . "  SID:" . $k2 . "\n");
+				@fwrite($fp, "\n# Category: {$rule2['category']}");
+				@fwrite($fp, "   GID:{$k1}  SID:{$k2}\n");
 				@fwrite($fp, $rule2['rule']);
 			}
 		}
@@ -2175,11 +2175,13 @@ EOD;
 		snort_write_enforcing_rules_file($enabled_rules, "{$snortcfgdir}/rules/{$snort_enforcing_rules_file}");
 		if (file_exists("{$snortcfgdir}/rules/{$snort_enforcing_rules_file}"))
 			$selected_rules_sections = "include \$RULE_PATH/{$snort_enforcing_rules_file}\n";
+		unset($enabled_rules);
 
 		/* If auto-flowbit resolution is enabled, generate the dependent flowbits rules file. */
 		if ($snortcfg['autoflowbitrules'] == 'on') {
 			$enabled_files[] = "{$snortcfgdir}/rules/{$snort_enforcing_rules_file}";
 			snort_write_flowbit_rules_file(snort_resolve_flowbits($enabled_files), "{$snortcfgdir}/rules/{$flowbit_rules_file}");
+			unset($enabled_files);
 		}
 
 		/* If we have the depedent flowbits rules file, then include it. */
@@ -2195,7 +2197,7 @@ EOD;
 
 	/* Build a new sid-msg.map file from the enabled */
 	/* rules and copy it to the interface directory. */
-	build_sid_msg_map("{$snortcfgdir}/rules/", "{$snortcfgdir}/sid-msg.map");
+	snort_build_sid_msg_map("{$snortcfgdir}/rules/", "{$snortcfgdir}/sid-msg.map");
 
 	$cksumcheck = "all";
 	if ($snortcfg['cksumcheck'] == 'on')
@@ -2292,6 +2294,8 @@ EOD;
 	}
 	fwrite($conf, $snort_conf_text);
 	fclose($conf);
+	unset($snort_conf_text, $selected_rules_sections, $suppress_file_name, $snort_misc_include_rules, $spoink_type, $snortunifiedlog_type, $alertsystemlog_type);
+	unset($home_net, $external_net, $vardef, $portvardef);
 }
 
 ?>
