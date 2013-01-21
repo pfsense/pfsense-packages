@@ -752,7 +752,7 @@ function build_sid_msg_map($rules_path, $sid_file) {
         foreach ($rule_files as $file) {
 
              /* Don't process files with "deleted" in the filename   */
-             if (preg_match('/deleted/i', $file))
+             if (stristr($file, "deleted"))
                   continue;
 
              /* Read the file into an array, skipping empty lines.   */
@@ -810,7 +810,7 @@ function build_sid_msg_map($rules_path, $sid_file) {
         ksort($sidMap);
 
         /* Now print the result to the supplied file */
-        file_put_contents($sid_file, array_values($sidMap));
+	@file_put_contents($sid_file, array_values($sidMap));
 }
 
 function snort_merge_reference_configs($cfg_in, $cfg_out) {
@@ -845,7 +845,7 @@ function snort_merge_reference_configs($cfg_in, $cfg_out) {
         $format = "config reference: %-12s %s\n";
         foreach ($outMap as $key=>$value)
                 $outMap[$key] = sprintf($format, $key, $value);
-        file_put_contents($cfg_out, array_values($outMap));
+        @file_put_contents($cfg_out, array_values($outMap));
 }
 
 function snort_merge_classification_configs($cfg_in, $cfg_out) {
@@ -880,7 +880,7 @@ function snort_merge_classification_configs($cfg_in, $cfg_out) {
         $format = "config classification: %s,%s\n";
         foreach ($outMap as $key=>$value)
                 $outMap[$key] = sprintf($format, $key, $value);
-        file_put_contents($cfg_out, array_values($outMap));
+        @file_put_contents($cfg_out, array_values($outMap));
 }
 
 function snort_load_rules_map($rules_path) {
@@ -939,7 +939,7 @@ function snort_load_rules_map($rules_path) {
 	foreach ($rule_files as $file) {
 
 		/* Don't process files with "deleted" in the filename. */
-		if (preg_match('/deleted/i', $file))
+		if (stristr($file, "deleted"))
 			continue;
 
 		/* Read the file contents into an array, skipping   */
@@ -953,7 +953,7 @@ function snort_load_rules_map($rules_path) {
 		foreach ($rules_array as $rule) {
 
 			/* Skip any lines that may be just spaces.  */
-			if (trim($rule) == "")
+			if (trim($rule, " \n") == "")
 				continue;
 
 			/* Skip any non-rule lines unless we're in  */
@@ -1077,22 +1077,32 @@ function snort_get_checked_flowbits(&$rules_map) {
 	/*************************************************************/
 
 	$checked_flowbits = array();
-	foreach (array_keys($rules_map) as $k1) {
-		foreach (array_keys($rules_map[$k1]) as $k2) {
-			if ($rules_map[$k1][$k2]['disabled'] == 1)
+	foreach ($rules_map as $rulem) {
+		if (!is_array($rulem))
+			continue;
+		foreach ($rulem as $rulem2) {
+			if (!is_array($rulem2))
 				continue;
-			if (empty($rules_map[$k1][$k2]['flowbits']))
+			if ($rulem2['disabled'] == 1)
 				continue;
-			foreach (array_values($rules_map[$k1][$k2]['flowbits']) as $flowbit) {
+			if (empty($rulem2['flowbits']))
+				continue;
+			if (!is_array($rulem2['flowbits']))
+				continue;
+			foreach ($rulem2['flowbits'] as $flowbit) {
+				if (empty($flowbit))
+					continue;
 				$action = substr($flowbit, 0, strpos($flowbit, ","));
 				if (preg_match('/is(not)?set/i', $action)) {
 					$tmp = substr($flowbit, strpos($flowbit, ",") +1 );
-					if (!in_array($tmp, $checked_flowbits))
+					if (!empty($tmp) && !in_array($tmp, $checked_flowbits))
 						$checked_flowbits[] = $tmp;
 				}
 			}
 		}
 	}
+	unset($rulem, $rulem2);
+
 	return $checked_flowbits;
 }
 
@@ -1105,22 +1115,30 @@ function snort_get_set_flowbits(&$rules_map) {
 	/*********************************************************/
 
 	$set_flowbits = array();
-	foreach (array_keys($rules_map) as $k1) {
-		foreach (array_keys($rules_map[$k1]) as $k2) {
-			if ($rules_map[$k1][$k2]['disabled'] == 1)
+	foreach ($rules_map as $rulem) {
+		if (!is_array($rulem))
+			continue;
+		foreach ($rulem as $rulem2) {
+			if ($rulem2['disabled'] == 1)
 				continue;
-			if (empty($rules_map[$k1][$k2]['flowbits']))
+			if (empty($rulem2['flowbits']))
 				continue;
-			foreach (array_values($rules_map[$k1][$k2]['flowbits']) as $flowbit) {
+			if (!is_array($rulem2['flowbits']))
+				continue;
+			foreach ($rulem2['flowbits'] as $flowbit) {
+				if (empty($flowbit))
+					continue;
 				$action = substr($flowbit, 0, strpos($flowbit, ","));
 				if (preg_match('/^set/i', $action)) {
 					$tmp = substr($flowbit, strpos($flowbit, ",") +1 );
-					if (!in_array($tmp, $set_flowbits))
+					if (!empty($tmp) && !in_array($tmp, $set_flowbits))
 						$set_flowbits[] = $tmp;
 				}
 			}
 		}
 	}
+	unset($rulem, $rulem2);
+
 	return $set_flowbits;
 }
 
@@ -1134,27 +1152,39 @@ function snort_find_flowbit_required_rules(&$all_rules, &$unchecked_flowbits) {
 	/********************************************************/
 
 	$required_flowbits_rules = array();
-	foreach (array_keys($all_rules) as $k1) {
-		foreach (array_keys($all_rules[$k1]) as $k2) {
-			if (empty($all_rules[$k1][$k2]['flowbits']))
+	foreach ($all_rules as $k1 => $rule) {
+		if (!is_array($rule))
+			continue;
+		foreach ($rule as $k2 => $rule2) {
+			if (empty($rule2['flowbits']))
 				continue;
-			foreach (array_values($all_rules[$k1][$k2]['flowbits']) as $flowbit) {
+			if (!is_array($rule2['flowbits']))
+				continue;
+			foreach ($rule2['flowbits'] as $flowbit) {
+				if (empty($flowbit))
+					continue;
 				$action = substr($flowbit, 0, strpos($flowbit, ","));
-				if (preg_match('/^set/i', $action)) {
+				if (!strcasecmp(substr($action, 0, 3), "set")) {
 					$tmp = substr($flowbit, strpos($flowbit, ",") +1 );
-					if (in_array($tmp, $unchecked_flowbits)) {
-						$required_flowbits_rules[$k1][$k2]['category'] = $all_rules[$k1][$k2]['category'];
-						if ($all_rules[$k1][$k2]['disabled'] == 0)
+					if (!empty($tmp) && in_array($tmp, $unchecked_flowbits)) {
+						if (!is_array($required_flowbits_rules[$k1]))
+							$required_flowbits_rules[$k1] = array();
+						if (!is_array($required_flowbits_rules[$k1][$k2]))
+							$required_flowbits_rules[$k1][$k2] = array();
+						$required_flowbits_rules[$k1][$k2]['category'] = $rule2['category'];
+						if ($rule2['disabled'] == 0)
 							/* If not disabled, just return the rule text "as is"   */
-							$required_flowbits_rules[$k1][$k2]['rule'] = ltrim($all_rules[$k1][$k2]['rule']);
+							$required_flowbits_rules[$k1][$k2]['rule'] = ltrim($rule2['rule']);
 						else
 							/* If rule is disabled, remove leading '#' to enable it */
-							$required_flowbits_rules[$k1][$k2]['rule'] = ltrim(substr($all_rules[$k1][$k2]['rule'], strpos($all_rules[$k1][$k2]['rule'], "#") + 1));
+							$required_flowbits_rules[$k1][$k2]['rule'] = ltrim(substr($rule2['rule'], strpos($rule2['rule'], "#") + 1));
 					}
 				}
 			}
 		}
 	}
+	unset($rule, $rule2);
+
 	return $required_flowbits_rules;
 }
 
@@ -1227,18 +1257,22 @@ function snort_write_flowbit_rules_file(&$flowbit_rules, $rule_file) {
 	if (is_dir($rule_file))
 		$rule_file = rtrim($rule_file, '/').'/flowbit-required.rules';
 
-	file_put_contents($rule_file, "# These rules set flowbits checked by your other enabled rules.  If the\n");
-	file_put_contents($rule_file, "# the dependent flowbits are not set, then some of your chosen rules may\n", FILE_APPEND);
-	file_put_contents($rule_file, "# not fire.  Enabling all rules that set these dependent flowbits ensures\n", FILE_APPEND);
-	file_put_contents($rule_file, "# your chosen rules fire as intended.\n#\n", FILE_APPEND); 
-	file_put_contents($rule_file, "# If you wish to prevent alerts from any of these rules, add the GID:SID\n", FILE_APPEND);
-	file_put_contents($rule_file, "# of the rule to the Suppression List for the interface.\n", FILE_APPEND);
-	foreach (array_keys($flowbit_rules) as $k1) {
-		foreach (array_keys($flowbit_rules[$k1]) as $k2) {
-			file_put_contents($rule_file, "\n# Category: " . $flowbit_rules[$k1][$k2]['category'], FILE_APPEND);
-			file_put_contents($rule_file, "   GID:" . $k1 . "  SID:" . $k2 . "\n", FILE_APPEND);
-			file_put_contents($rule_file, $flowbit_rules[$k1][$k2]['rule'], FILE_APPEND);
+	$fp = fopen($rule_file, "w");
+	if ($fp) {
+		@fwrite($fp, "# These rules set flowbits checked by your other enabled rules.  If the\n");
+		@fwrite($fp, "# the dependent flowbits are not set, then some of your chosen rules may\n");
+		@fwrite($fp, "# not fire.  Enabling all rules that set these dependent flowbits ensures\n");
+		@fwrite($fp, "# your chosen rules fire as intended.\n#\n"); 
+		@fwrite($fp, "# If you wish to prevent alerts from any of these rules, add the GID:SID\n");
+		@fwrite($fp, "# of the rule to the Suppression List for the interface.\n");
+		foreach ($flowbit_rules as $k1 => $rule) {
+			foreach ($rule as $k2 => $rule2) {
+				@fwrite($fp, "\n# Category: " . $rule2['category']);
+				@fwrite($fp, "   GID:" . $k1 . "  SID:" . $k2 . "\n");
+				@fwrite($fp, $rule2['rule']);
+			}
 		}
+		fclose($fp);
 	}
 }
 
@@ -1266,22 +1300,26 @@ function snort_load_vrt_policy($policy) {
 	/* Now walk the rules list and find all those */
 	/* that are defined as active for the chosen  */
 	/* security policy.                           */
-	foreach (array_keys($all_rules_map) as $k1) {
-		foreach (array_keys($all_rules_map[$k1]) as $k2) {
-			if (preg_match($policy_pcre, $all_rules_map[$k1][$k2]['rule'])) {
-				if (!preg_match('/flowbits\s*:\s*noalert/i', $all_rules_map[$k1][$k2]['rule'])) {
-					$vrt_policy_rules[$k1][$k2] = $all_rules_map[$k1][$k2];
+	foreach ($all_rules_map as $k1 => $arulem) {
+		foreach ($arulem as $k2 => $arulem2) {
+			if (preg_match($policy_pcre, $arulem2['rule'])) {
+				if (!preg_match('/flowbits\s*:\s*noalert/i', $arulem2['rule'])) {
+					if (!is_array($vrt_policy_rules[$k1]))
+						$vrt_policy_rules[$k1] = array();
+					if (!is_array($vrt_policy_rules[$k1][$k2]))
+						$vrt_policy_rules[$k1][$k2] = array();
+					$vrt_policy_rules[$k1][$k2] = $arulem2;
 
 					/* Enable the policy rule if disabled  */
-					if ($all_rules_map[$k1][$k2]['disabled'] == 1)
-						$vrt_policy_rules[$k1][$k2]['rule'] = ltrim(substr($all_rules_map[$k1][$k2]['rule'], strpos($all_rules_map[$k1][$k2]['rule'], "#") + 1));
+					if ($arulem2['disabled'] == 1)
+						$vrt_policy_rules[$k1][$k2]['rule'] = ltrim(substr($arulem2['rule'], strpos($arulem2['rule'], "#") + 1));
 				}
 			}
 		}
 	}
 
 	/* Release memory we no longer need. */
-	unset($all_rules_map);
+	unset($all_rules_map, $arulem, $arulem2);
 	
 	/* Return all the rules that match the policy. */
 	return $vrt_policy_rules;
@@ -1307,16 +1345,20 @@ function snort_write_enforcing_rules_file(&$rule_map, $rule_path) {
 	else
 		$rule_file = $rule_path;
 
-	file_put_contents($rule_file, "# These rules are your current set of enforced rules for the protected\n");
-	file_put_contents($rule_file, "# interface.  This list was compiled from the categories selected on the\n", FILE_APPEND);
-	file_put_contents($rule_file, "# CATEGORIES tab of the Snort configuration for the interface and/or any\n", FILE_APPEND);
-	file_put_contents($rule_file, "# chosen Snort VRT pre-defined IPS Policy.\n#\n", FILE_APPEND);
-	file_put_contents($rule_file, "# Any enablesid or disablesid customizations you made have been applied\n", FILE_APPEND);
-	file_put_contents($rule_file, "# to the rules in this file.\n\n", FILE_APPEND);
-	foreach (array_keys($rule_map) as $k1) {
-		foreach (array_keys($rule_map[$k1]) as $k2) {
-			file_put_contents($rule_file, $rule_map[$k1][$k2]['rule'], FILE_APPEND);
+	$fp = fopen($rule_file, "w");
+	if ($fp) {
+		@fwrite($fp, "# These rules are your current set of enforced rules for the protected\n");
+		@fwrite($fp, "# interface.  This list was compiled from the categories selected on the\n");
+		@fwrite($fp, "# CATEGORIES tab of the Snort configuration for the interface and/or any\n");
+		@fwrite($fp, "# chosen Snort VRT pre-defined IPS Policy.\n#\n");
+		@fwrite($fp, "# Any enablesid or disablesid customizations you made have been applied\n");
+		@fwrite($fp, "# to the rules in this file.\n\n");
+		foreach ($rule_map as $rulem) {
+			foreach ($rulem as $rulem2) {
+				@fwrite($fp, $rulem2['rule']);
+			}
 		}
+		fclose($fp);
 	}
 }
 
@@ -1365,18 +1407,22 @@ function snort_modify_sids(&$rule_map, $snortcfg) {
 	/* Turn on any rules that need to be     */
 	/* forced "on" with enablesid mods.      */
 	if (!empty($enablesid)) {
-		foreach ($enablesid as $k2 => $v) {
-			if ($rule_map[1][$k2]['disabled'] == 1)
-				$rule_map[1][$k2]['rule'] = ltrim(substr($rule_map[1][$k2]['rule'], strpos($rule_map[1][$k2]['rule'], "#") + 1));
+		foreach ($rule_map as $k1 => $rulem) {
+			foreach ($rulem as $k2 => $v) {
+				if (in_array($k2, $enablesid) && $v['disabled'] == 1) 
+					$rule_map[$k1][$k2]['rule'] = ltrim(substr($v['rule'], strpos($v['rule'], "#") + 1));
+			}
 		}
 	}
 
 	/* Turn off any rules that need to be    */
 	/* forced "off" with disablesid mods.    */
 	if (!empty($disablesid)) {
-		foreach ($disablesid as $k2 => $v) {
-			if ($rule_map[1][$k2]['disabled'] == 0)
-				$rule_map[1][$k2]['rule'] = "# " . $rule_map[1][$k2]['rule'];
+		foreach ($rule_map as $k1 => $rulem) {
+			foreach ($rulem as $k2 => $v) {
+				if (in_array($k2, $disablesid) && $v['disabled'] == 0) 
+					$rule_map[$k1][$k2]['rule'] = "# " . $v['rule'];
+			}
 		}
 	}
 }
@@ -2107,12 +2153,16 @@ EOD;
 		/* add all the VRT policy rules to our enforcing rule set.     */
 		if (!empty($snortcfg['ips_policy'])) {
 			$policy_rules = snort_load_vrt_policy($snortcfg['ips_policy']);
-			foreach (array_keys($policy_rules) as $k1) {
-				foreach (array_keys($policy_rules[$k1]) as $k2) {
-					$enabled_rules[$k1][$k2]['rule'] = $policy_rules[$k1][$k2]['rule'];
-					$enabled_rules[$k1][$k2]['category'] = $policy_rules[$k1][$k2]['category'];
-					$enabled_rules[$k1][$k2]['disabled'] = $policy_rules[$k1][$k2]['disabled'];
-					$enabled_rules[$k1][$k2]['flowbits'] = $policy_rules[$k1][$k2]['flowbits'];
+			foreach ($policy_rules as $k1 => $policy) {
+				foreach ($policy as $k2 => $p) {
+					if (!is_array($enabled_rules[$k1]))
+						$enabled_rules[$k1] = array();
+					if (!is_array($enabled_rules[$k1][$k2]))
+						$enabled_rules[$k1][$k2] = array();
+					$enabled_rules[$k1][$k2]['rule'] = $p['rule'];
+					$enabled_rules[$k1][$k2]['category'] = $p['category'];
+					$enabled_rules[$k1][$k2]['disabled'] = $p['disabled'];
+					$enabled_rules[$k1][$k2]['flowbits'] = $p['flowbits'];
 				}
 			}
 			unset($policy_rules);
