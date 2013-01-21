@@ -384,6 +384,7 @@ function popup(url)
 	foreach (array_keys($rules_map) as $k1) {
 		foreach (array_keys($rules_map[$k1]) as $k2) {
 			$sid = snort_get_sid($rules_map[$k1][$k2]['rule']);
+			$gid = snort_get_gid($rules_map[$k1][$k2]['rule']);
 			if (isset($disablesid[$sid])) {
 				$textss = "<span class=\"gray\">";
 				$textse = "</span>";
@@ -447,7 +448,7 @@ function popup(url)
 	?>
 			<td width="3%" align="center" valign="middle" nowrap class="list">
 				<a href="javascript: void(0)"
-				onclick="popup('snort_rules_edit.php?id=<?=$id;?>&openruleset=<?=$currentruleset;?>&ids=<?=$sid;?>')"><img
+				onclick="popup('snort_rules_edit.php?id=<?=$id;?>&openruleset=<?=$currentruleset;?>&ids=<?=$sid;?>&gid=<?=$gid;?>')"><img
 				src="../themes/<?= $g['theme']; ?>/images/icons/icon_right.gif"
 				title="<?php echo gettext("Click to view rule"); ?>" width="17" height="17" border="0"></a>
 				<!-- Codes by Quackit.com -->

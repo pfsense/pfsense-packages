@@ -70,7 +70,7 @@ $contents = '';
 if (substr($file, 0, 10) == "IPS Policy") {
 	$rules_map = snort_load_vrt_policy($a_rule[$id]['ips_policy']);
 	if (isset($_GET['ids']))
-		$contents = $rules_map[1][trim($_GET['ids'])]['rule'];
+		$contents = $rules_map[$_GET['gid']][trim($_GET['ids'])]['rule'];
 	else {
 		$contents = "# Snort IPS Policy - " . ucfirst($a_rule[$id]['ips_policy']) . "\n\n";
 		foreach (array_keys($rules_map) as $k1) {
@@ -85,7 +85,7 @@ if (substr($file, 0, 10) == "IPS Policy") {
 // Is it a SID to load the rule text from?
 elseif (isset($_GET['ids'])) {
 	$rules_map = snort_load_rules_map("{$snortdir}/rules/{$file}");
-	$contents = $rules_map[1][trim($_GET['ids'])]['rule'];
+	$contents = $rules_map[$_GET['gid']][trim($_GET['ids'])]['rule'];
 }
 // Is it our special flowbit rules file?
 elseif ($file == $flowbit_rules_file)
