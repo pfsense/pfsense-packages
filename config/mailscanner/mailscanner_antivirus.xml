@@ -100,9 +100,9 @@
  				<option><name>Virus Scanning (yes)</name><value>VirusScanning</value></option>
 				<option><name>Deliver Disinfected Files (no)</name><value>DeliverDisinfectedFiles</value></option>
 				<option><name>Still Deliver Silent Viruses (no)</name><value>StillDeliverSilentViruses</value></option>
-				<option><name>Block Encrypted Messages (no)</name><value>BlockEncryptedMessagese</value></option>
+				<option><name>Block Encrypted Messages (no)</name><value>BlockEncryptedMessageses</value></option>
 				<option><name>Block Unencrypted Messages (no)</name><value>BlockUnencryptedMessages</value></option>
-				<option><name>Allow Password-Protected Archives (no)</name><value>AllowPassword-ProtectedArchive</value></option>
+				<option><name>Allow Password-Protected Archives (no)</name><value>AllowPassword-ProtectedArchives</value></option>
 				<option><name>Check Filenames In Password-Protected Archives (yes)</name><value>CheckFilenamesInPassword-ProtectedArchives</value></option>
 				</options>
 				<size>08</size>
