@@ -372,7 +372,7 @@ function snort_apply_customizations($snortcfg, $if_real) {
 		}
 
 		/* Build a new sid-msg.map file from the enabled rules. */
-        	build_sid_msg_map("{$snortdir}/snort_{$snortcfg['uuid']}_{$if_real}/rules/", "{$snortdir}/snort_{$snortcfg['uuid']}_{$if_real}/sid-msg.map");
+        	snort_build_sid_msg_map("{$snortdir}/snort_{$snortcfg['uuid']}_{$if_real}/rules/", "{$snortdir}/snort_{$snortcfg['uuid']}_{$if_real}/sid-msg.map");
 
 		/* Copy the master *.config and other *.map files to the interface's directory */
 		@copy("{$snortdir}/classification.config", "{$snortdir}/snort_{$snortcfg['uuid']}_{$if_real}/classification.config");
