@@ -140,7 +140,7 @@ if (!empty($act)) {
 
 	$quoteservercn = $_GET['quoteservercn'];
 	$usetoken = $_GET['usetoken'];
-	if ($usetoken && ($act == "confinline"))
+	if ($usetoken && (substr($act, 0, 10) == "confinline"))
 		$input_errors[] = "You cannot use Microsoft Certificate Storage with an Inline configuration.";
 	if ($usetoken && (($act == "conf_yealink_t28") || ($act == "conf_yealink_t38g") || ($act == "conf_yealink_t38g2") || ($act == "conf_snom")))
 		$input_errors[] = "You cannot use Microsoft Certificate Storage with a Yealink or SNOM configuration.";
@@ -200,6 +200,14 @@ if (!empty($act)) {
 				$exp_name = urlencode($exp_name."-config.ovpn");
 				$expformat = "inline";
 				break;
+			case "confinlinedroid":
+				$exp_name = urlencode($exp_name."-android-config.ovpn");
+				$expformat = "inlinedroid";
+				break;
+			case "confinlineios":
+				$exp_name = urlencode($exp_name."-ios-config.ovpn");
+				$expformat = "inlineios";
+				break;
 			default:
 				$exp_name = urlencode($exp_name."-config.ovpn");
 				$expformat = "baseconf";
@@ -222,7 +230,7 @@ if (!empty($act)) {
 	}
 
 	if (empty($input_errors)) {
-		if (($act == "conf") || ($act == "confinline")) {
+		if (($act == "conf") || (substr($act, 0, 10) == "confinline")) {
 			$exp_size = strlen($exp_path);
 		} else {
 			$exp_size = filesize($exp_path);
@@ -232,7 +240,7 @@ if (!empty($act)) {
 		header("Content-Type: application/octet-stream");
 		header("Content-Disposition: attachment; filename={$exp_name}");
 		header("Content-Length: $exp_size");
-		if (($act == "conf") || ($act == "confinline")) {
+		if (($act == "conf") || (substr($act, 0, 10) == "confinline")) {
 			echo $exp_path;
 		} else {
 			readfile($exp_path);
@@ -408,19 +416,27 @@ function server_changed() {
 		cell1.className = "listr";
 		cell1.innerHTML = users[i][3];
 		cell2.className = "listr";
-		cell2.innerHTML = "<a href='javascript:download_begin(\"conf\"," + i + ", -1)'>Configuration</a>";
-		cell2.innerHTML += "<br/>";
-		cell2.innerHTML += "<a href='javascript:download_begin(\"confinline\"," + i + ", -1)'>Inline Configuration</a>";
-		cell2.innerHTML += "<br/>";
-		cell2.innerHTML += "<a href='javascript:download_begin(\"confzip\"," + i + ", -1)'>Configuration archive</a>";
-		cell2.innerHTML += "<br/>Windows Installers:<br/>";
+		cell2.innerHTML = "- Standard Configurations:<br/>";
+		cell2.innerHTML += "&nbsp;&nbsp; ";
+		cell2.innerHTML += "<a href='javascript:download_begin(\"confzip\"," + i + ", -1)'>Archive</a>";
+		cell2.innerHTML += "&nbsp;&nbsp; ";
+		cell2.innerHTML += "<a href='javascript:download_begin(\"conf\"," + i + ", -1)'>Config Only</a>";
+		cell2.innerHTML += "<br/>- Inline Configurations:<br/>";
+		cell2.innerHTML += "&nbsp;&nbsp; ";
+		cell2.innerHTML += "<a href='javascript:download_begin(\"confinlinedroid\"," + i + ", -1)'>Android</a>";
+		cell2.innerHTML += "&nbsp;&nbsp; ";
+		cell2.innerHTML += "<a href='javascript:download_begin(\"confinlineios\"," + i + ", -1)'>iOS</a>";
+		cell2.innerHTML += "&nbsp;&nbsp; ";
+		cell2.innerHTML += "<a href='javascript:download_begin(\"confinline\"," + i + ", -1)'>All Other Platforms</a>";
+		cell2.innerHTML += "<br/>- Windows Installers:<br/>";
 		cell2.innerHTML += "&nbsp;&nbsp; ";
 		cell2.innerHTML += "<a href='javascript:download_begin(\"inst\"," + i + ", -1)'>2.2</a>";
 		cell2.innerHTML += "&nbsp;&nbsp; ";
 		cell2.innerHTML += "<a href='javascript:download_begin(\"inst-2.3-x86\"," + i + ", -1)'>2.3-x86</a>";
 //		cell2.innerHTML += "&nbsp;&nbsp; ";
 //		cell2.innerHTML += "<a href='javascript:download_begin(\"inst-2.3-x64\"," + i + ", -1)'>2.3-x64</a>";
-		cell2.innerHTML += "<br/>";
+		cell2.innerHTML += "<br/>- Mac OSX:<br/>";
+		cell2.innerHTML += "&nbsp;&nbsp; ";
 		cell2.innerHTML += "<a href='javascript:download_begin(\"visc\"," + i + ", -1)'>Viscosity Bundle</a>";
 	}
 	for (j=0; j < certs.length; j++) {
@@ -437,22 +453,30 @@ function server_changed() {
 		cell1.className = "listr";
 		cell1.innerHTML = certs[j][1];
 		cell2.className = "listr";
-		cell2.innerHTML = "<a href='javascript:download_begin(\"conf\", -1," + j + ")'>Configuration</a>";
-		cell2.innerHTML += "<br/>";
-		cell2.innerHTML += "<a href='javascript:download_begin(\"confinline\", -1," + j + ")'>Inline Configuration</a>";
-		cell2.innerHTML += "<br/>";
-		cell2.innerHTML += "<a href='javascript:download_begin(\"confzip\", -1," + j + ")'>Configuration archive</a>";
-		cell2.innerHTML += "<br/>Windows Installers:<br/>";
+		cell2.innerHTML = "- Standard Configurations:<br/>";
+		cell2.innerHTML += "&nbsp;&nbsp; ";
+		cell2.innerHTML += "<a href='javascript:download_begin(\"confzip\", -1," + j + ")'>Archive</a>";
+		cell2.innerHTML += "&nbsp;&nbsp; ";
+		cell2.innerHTML += "<a href='javascript:download_begin(\"conf\", -1," + j + ")'>File Only</a>";
+		cell2.innerHTML += "<br/>- Inline Configurations:<br/>";
+		cell2.innerHTML += "&nbsp;&nbsp; ";
+		cell2.innerHTML += "<a href='javascript:download_begin(\"confinlinedroid\", -1," + j + ")'>Android</a>";
+		cell2.innerHTML += "&nbsp;&nbsp; ";
+		cell2.innerHTML += "<a href='javascript:download_begin(\"confinlineios\", -1," + j + ")'>iOS</a>";
+		cell2.innerHTML += "&nbsp;&nbsp; ";
+		cell2.innerHTML += "<a href='javascript:download_begin(\"confinline\", -1," + j + ")'>All Other Platforms</a>";
+		cell2.innerHTML += "<br/>- Windows Installers:<br/>";
 		cell2.innerHTML += "&nbsp;&nbsp; ";
 		cell2.innerHTML += "<a href='javascript:download_begin(\"inst\", -1," + j + ")'>2.2</a>";
 		cell2.innerHTML += "&nbsp;&nbsp; ";
 		cell2.innerHTML += "<a href='javascript:download_begin(\"inst-2.3-x86\", -1," + j + ")'>2.3-x86</a>";
 //		cell2.innerHTML += "&nbsp;&nbsp; ";
 //		cell2.innerHTML += "<a href='javascript:download_begin(\"inst-2.3-x64\", -1," + j + ")'>2.3-x64</a>";
-		cell2.innerHTML += "<br/>";
+		cell2.innerHTML += "<br/>- Mac OSX:<br/>";
+		cell2.innerHTML += "&nbsp;&nbsp; ";
 		cell2.innerHTML += "<a href='javascript:download_begin(\"visc\", -1," + j + ")'>Viscosity Bundle</a>";
 		if (servers[index][2] == "server_tls") {
-			cell2.innerHTML += "<br/>Yealink SIP Handsets: <br/>";
+			cell2.innerHTML += "<br/>- Yealink SIP Handsets: <br/>";
 			cell2.innerHTML += "&nbsp;&nbsp; ";
 			cell2.innerHTML += "<a href='javascript:download_begin(\"conf_yealink_t28\", -1," + j + ")'>T28</a>";
 			cell2.innerHTML += "&nbsp;&nbsp; ";
@@ -460,7 +484,7 @@ function server_changed() {
 			cell2.innerHTML += "&nbsp;&nbsp; ";
 			cell2.innerHTML += "<a href='javascript:download_begin(\"conf_yealink_t38g2\", -1," + j + ")'>T38G (2)</a>";
 			cell2.innerHTML += "<br/>";
-			cell2.innerHTML += "<a href='javascript:download_begin(\"conf_snom\", -1," + j + ")'>SNOM SIP Handset</a>";
+			cell2.innerHTML += "- <a href='javascript:download_begin(\"conf_snom\", -1," + j + ")'>SNOM SIP Handset</a>";
 		}
 	}
 	if (servers[index][2] == 'server_user') {
@@ -473,19 +497,27 @@ function server_changed() {
 		cell1.className = "listr";
 		cell1.innerHTML = "none";
 		cell2.className = "listr";
-		cell2.innerHTML = "<a href='javascript:download_begin(\"conf\"," + i + ")'>Configuration</a>";
-		cell2.innerHTML += "<br/>";
-		cell2.innerHTML += "<a href='javascript:download_begin(\"confinline\"," + i + ")'>Inline Configuration</a>";
-		cell2.innerHTML += "<br/>";
-		cell2.innerHTML += "<a href='javascript:download_begin(\"confzip\"," + i + ")'>Configuration archive</a>";
-		cell2.innerHTML += "<br/>Windows Installers:<br/>";
+		cell2.innerHTML = "- Standard Configurations:<br/>";
+		cell2.innerHTML += "&nbsp;&nbsp; ";
+		cell2.innerHTML += "<a href='javascript:download_begin(\"confzip\"," + i + ")'>Archive</a>";
+		cell2.innerHTML += "&nbsp;&nbsp; ";
+		cell2.innerHTML += "<a href='javascript:download_begin(\"conf\"," + i + ")'>File Only</a>";
+		cell2.innerHTML += "<br/>- Inline Configurations:<br/>";
+		cell2.innerHTML += "&nbsp;&nbsp; ";
+		cell2.innerHTML += "<a href='javascript:download_begin(\"confinlinedroid\"," + i + ")'>Android</a>";
+		cell2.innerHTML += "&nbsp;&nbsp; ";
+		cell2.innerHTML += "<a href='javascript:download_begin(\"confinlineios\"," + i + ")'>iOS</a>";
+		cell2.innerHTML += "&nbsp;&nbsp; ";
+		cell2.innerHTML += "<a href='javascript:download_begin(\"confinline\"," + i + ")'>All Other Platforms</a>";
+		cell2.innerHTML += "<br/>- Windows Installers:<br/>";
 		cell2.innerHTML += "&nbsp;&nbsp; ";
 		cell2.innerHTML += "<a href='javascript:download_begin(\"inst\"," + i + ")'>2.2</a>";
 		cell2.innerHTML += "&nbsp;&nbsp; ";
 		cell2.innerHTML += "<a href='javascript:download_begin(\"inst-2.3-x86\"," + i + ")'>2.3-x86</a>";
 //		cell2.innerHTML += "&nbsp;&nbsp; ";
 //		cell2.innerHTML += "<a href='javascript:download_begin(\"inst-2.3-x64\"," + i + ")'>2.3-x64</a>";
-		cell2.innerHTML += "<br/>";
+		cell2.innerHTML += "<br/>- Mac OSX:<br/>";
+		cell2.innerHTML += "&nbsp;&nbsp; ";
 		cell2.innerHTML += "<a href='javascript:download_begin(\"visc\"," + i + ")'>Viscosity Bundle</a>";
 	}
 }

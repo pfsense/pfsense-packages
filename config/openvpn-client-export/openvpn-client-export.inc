@@ -170,6 +170,7 @@ function openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $quotese
 	global $config, $input_errors, $g;
 
 	$nl = ($doslines) ? "\r\n" : "\n";
+	$conf = "";
 
 	$validconfig = openvpn_client_export_validate_config($srvid, $usrid, $crtid);
 	if ($validconfig) {
@@ -195,25 +196,31 @@ function openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $quotese
 		$server_host = $useaddr;
 
 	$server_port = $settings['local_port'];
-	$proto = (strtoupper($settings['protocol']) == 'UDP' ? 'udp' : "tcp-client");
+	$proto = (strtoupper($settings['protocol']) == 'UDP' ? 'udp' : "tcp");
+	if (($expformat == "inlineios") && ($proto == "tcp-client"))
+		$proto = "tcp";
 
 	$cipher = $settings['crypto'];
 
 	// add basic settings
 	$devmode = empty($settings['dev_mode']) ? "tun" : $settings['dev_mode'];
-	$conf  = "dev {$devmode}{$nl}";
-	if(! empty($settings['tunnel_networkv6'])) {
+	if (($expformat != "inlinedroid") && ($expformat != "inlineios"))
+		$conf .= "dev {$devmode}{$nl}";
+	if(!empty($settings['tunnel_networkv6']) && ($expformat != "inlinedroid") && ($expformat != "inlineios")) {
 		$conf .= "tun-ipv6{$nl}";
 	}
 	$conf .= "persist-tun{$nl}";
 	$conf .= "persist-key{$nl}";
-	$conf .= "proto {$proto}{$nl}";
+
+//	if ((($expformat != "inlinedroid") && ($expformat != "inlineios")) && ($proto == "tcp"))
+//		$conf .= "proto tcp-client{$nl}";
 	$conf .= "cipher {$cipher}{$nl}";
 	$conf .= "tls-client{$nl}";
 	$conf .= "client{$nl}";
-	$conf .= "resolv-retry infinite{$nl}";
-	$conf .= "remote {$server_host} {$server_port}{$nl}";
-	if (!empty($servercn) && ($expformat != "inline")) {
+	if (($expformat != "inlinedroid") && ($expformat != "inlineios"))
+		$conf .= "resolv-retry infinite{$nl}";
+	$conf .= "remote {$server_host} {$server_port} {$proto}{$nl}";
+	if (!empty($servercn) && ($expformat != "inlineios")) {
 		$qw = ($quoteservercn) ? "\"" : "";
 		$conf .= "tls-remote {$qw}{$servercn}{$qw}{$nl}";
 	}
@@ -263,11 +270,11 @@ function openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $quotese
 		} elseif ($usetoken) {
 			$conf .= "ca {$cafile}{$nl}";
 			$conf .= "cryptoapicert \"SUBJ:{$user['name']}\"{$nl}";
-		} elseif ($expformat != "inline") {
+		} elseif (substr($expformat, 0, 6) != "inline") {
 			$conf .= "pkcs12 {$prefix}.p12{$nl}";
 		}
 	} else if ($settings['mode'] == "server_user") {
-		if ($expformat != "inline")
+		if (substr($expformat, 0, 6) != "inline")
 			$conf .= "ca {$cafile}{$nl}";
 	}
 
@@ -280,7 +287,7 @@ function openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $quotese
 			$conf .= "tls-auth /config/openvpn/keys/ta.key 1{$nl}";
 		elseif ($expformat == "snom")
 			$conf .= "tls-auth /openvpn/ta.key 1{$nl}";
-		elseif ($expformat != "inline")
+		elseif (substr($expformat, 0, 6) != "inline")
 			$conf .= "tls-auth {$prefix}-tls.key 1{$nl}";
 	}
 
@@ -363,17 +370,19 @@ function openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $quotese
 			return $g['tmp_path'] . "/{$prefix}-config.zip";
 			break;
 		case "inline":
+		case "inlinedroid":
+		case "inlineios":
 			// Inline CA
-			$conf .= "<ca>{$nl}" . base64_decode($server_ca['crt']) . "</ca>{$nl}";
+			$conf .= "<ca>{$nl}" . trim(base64_decode($server_ca['crt'])) . "{$nl}</ca>{$nl}";
 			if ($settings['mode'] != "server_user") {
 				// Inline Cert
-				$conf .= "<cert>{$nl}" . base64_decode($cert['crt']) . "</cert>{$nl}";
+				$conf .= "<cert>{$nl}" . trim(base64_decode($cert['crt'])) . "{$nl}</cert>{$nl}";
 				// Inline Key
-				$conf .= "<key>{$nl}" . base64_decode($cert['prv']) . "</key>{$nl}";
+				$conf .= "<key>{$nl}" . trim(base64_decode($cert['prv'])) . "{$nl}</key>{$nl}";
 			}
 			// Inline TLS
 			if ($settings['tls']) {
-				$conf .= "<tls-auth>{$nl}" . base64_decode($settings['tls']) . "</tls-auth>{$nl} key-direction 1{$nl}";
+				$conf .= "<tls-auth>{$nl}" . trim(base64_decode($settings['tls'])) . "{$nl}</tls-auth>{$nl} key-direction 1{$nl}";
 			}
 			return $conf;
 			break;
@@ -708,8 +717,7 @@ function openvpn_client_export_sharedkey_config($srvid, $useaddr, $proxy, $zipco
 	$cipher = $settings['crypto'];
 
 	// add basic settings
-	if ($expformat != "inline")
-		$conf  = "dev tun\n";
+	$conf  = "dev tun\n";
 	if(! empty($settings['tunnel_networkv6'])) {
 		$conf .= "tun-ipv6\n";
 	}
@@ -718,8 +726,7 @@ function openvpn_client_export_sharedkey_config($srvid, $useaddr, $proxy, $zipco
 	$conf .= "proto {$proto}\n";
 	$conf .= "cipher {$cipher}\n";
 	$conf .= "client\n";
-	if ($expformat != "inline")
-		$conf .= "resolv-retry infinite\n";
+	$conf .= "resolv-retry infinite\n";
 	$conf .= "remote {$server_host} {$server_port}\n";
 	if ($settings['local_network']) {
 		list($ip, $mask) = explode('/', $settings['local_network']);
