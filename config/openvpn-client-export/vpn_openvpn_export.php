@@ -425,9 +425,9 @@ function server_changed() {
 		cell2.innerHTML += "&nbsp;&nbsp; ";
 		cell2.innerHTML += "<a href='javascript:download_begin(\"confinlinedroid\"," + i + ", -1)'>Android</a>";
 		cell2.innerHTML += "&nbsp;&nbsp; ";
-		cell2.innerHTML += "<a href='javascript:download_begin(\"confinlineios\"," + i + ", -1)'>iOS</a>";
+		cell2.innerHTML += "<a href='javascript:download_begin(\"confinlineios\"," + i + ", -1)'>OpenVPN Connect (iOS/Android)</a>";
 		cell2.innerHTML += "&nbsp;&nbsp; ";
-		cell2.innerHTML += "<a href='javascript:download_begin(\"confinline\"," + i + ", -1)'>All Other Platforms</a>";
+		cell2.innerHTML += "<a href='javascript:download_begin(\"confinline\"," + i + ", -1)'>Others</a>";
 		cell2.innerHTML += "<br/>- Windows Installers:<br/>";
 		cell2.innerHTML += "&nbsp;&nbsp; ";
 		cell2.innerHTML += "<a href='javascript:download_begin(\"inst\"," + i + ", -1)'>2.2</a>";
@@ -462,9 +462,9 @@ function server_changed() {
 		cell2.innerHTML += "&nbsp;&nbsp; ";
 		cell2.innerHTML += "<a href='javascript:download_begin(\"confinlinedroid\", -1," + j + ")'>Android</a>";
 		cell2.innerHTML += "&nbsp;&nbsp; ";
-		cell2.innerHTML += "<a href='javascript:download_begin(\"confinlineios\", -1," + j + ")'>iOS</a>";
+		cell2.innerHTML += "<a href='javascript:download_begin(\"confinlineios\", -1," + j + ")'>OpenVPN Connect (iOS/Android)</a>";
 		cell2.innerHTML += "&nbsp;&nbsp; ";
-		cell2.innerHTML += "<a href='javascript:download_begin(\"confinline\", -1," + j + ")'>All Other Platforms</a>";
+		cell2.innerHTML += "<a href='javascript:download_begin(\"confinline\", -1," + j + ")'>Others</a>";
 		cell2.innerHTML += "<br/>- Windows Installers:<br/>";
 		cell2.innerHTML += "&nbsp;&nbsp; ";
 		cell2.innerHTML += "<a href='javascript:download_begin(\"inst\", -1," + j + ")'>2.2</a>";
@@ -506,9 +506,9 @@ function server_changed() {
 		cell2.innerHTML += "&nbsp;&nbsp; ";
 		cell2.innerHTML += "<a href='javascript:download_begin(\"confinlinedroid\"," + i + ")'>Android</a>";
 		cell2.innerHTML += "&nbsp;&nbsp; ";
-		cell2.innerHTML += "<a href='javascript:download_begin(\"confinlineios\"," + i + ")'>iOS</a>";
+		cell2.innerHTML += "<a href='javascript:download_begin(\"confinlineios\"," + i + ")'>OpenVPN Connect (iOS/Android)</a>";
 		cell2.innerHTML += "&nbsp;&nbsp; ";
-		cell2.innerHTML += "<a href='javascript:download_begin(\"confinline\"," + i + ")'>All Other Platforms</a>";
+		cell2.innerHTML += "<a href='javascript:download_begin(\"confinline\"," + i + ")'>Others</a>";
 		cell2.innerHTML += "<br/>- Windows Installers:<br/>";
 		cell2.innerHTML += "&nbsp;&nbsp; ";
 		cell2.innerHTML += "<a href='javascript:download_begin(\"inst\"," + i + ")'>2.2</a>";
@@ -805,14 +805,28 @@ function useproxy_changed(obj) {
 				<table width="100%" id="users" width="100%" border="0" cellpadding="0" cellspacing="0">
 					<tr>
 						<td width="25%" class="listhdrr"><?=gettext("User");?></td>
-						<td width="50%" class="listhdrr"><?=gettext("Certificate Name");?></td>
-						<td width="25%" class="listhdrr"><?=gettext("Export");?></td>
+						<td width="35%" class="listhdrr"><?=gettext("Certificate Name");?></td>
+						<td width="40%" class="listhdrr"><?=gettext("Export");?></td>
 					</tr>
 				</table>
-				<table width="100%" width="100%" border="0" cellpadding="5" cellspacing="10">
+				<table width="100%" width="100%" border="0" cellpadding="0" cellspacing="5">
 					<tr>
 						<td align="right" valign="top" width="5%"><?= gettext("NOTE:") ?></td>
 						<td><?= gettext("If you expect to see a certain client in the list but it is not there, it is usually due to a CA mismatch between the OpenVPN server instance and the client certificates found in the User Manager.") ?></td>
+					</tr>
+					<tr>
+						<td colspan="2"><br/><strong><?= gettext("Links to OpenVPN clients for various platforms:") ?></strong></td>
+					</tr>
+					<tr>
+						<td>&nbsp;</td>
+						<td>
+						<a href="http://openvpn.net/index.php/open-source/downloads.html"><?= gettext("OpenVPN Community Client") ?></a> - <?=gettext("Binaries for Windows, Source for other platforms. Packaged above in the Windows Installers")?>
+						<br/><a href="https://play.google.com/store/apps/details?id=de.blinkt.openvpn"><?= gettext("OpenVPN For Android") ?></a> - <?=gettext("Recommended client for Android")?>
+						<br/><a href="http://www.featvpn.com/"><?= gettext("FEAT VPN For Android") ?></a> - <?=gettext("For older versions of Android")?>
+						<br/><?= gettext("OpenVPN Connect") ?>: <a href="https://play.google.com/store/apps/details?id=net.openvpn.openvpn"><?=gettext("Android (Google Play)")?></a> or <a href="https://itunes.apple.com/us/app/openvpn-connect/id590379981"><?=gettext("iOS (App Store)")?></a> - <?= gettext("Recommended client for iOS") ?>
+						<br/><a href="http://www.sparklabs.com/viscosity/"><?= gettext("Viscosity") ?></a> - <?= gettext("Recommended client for Mac OSX") ?>
+						<br/><a href="http://code.google.com/p/tunnelblick/"><?= gettext("Tunnelblick") ?></a> - <?= gettext("Free client for OSX") ?>
+						</td>
 					</tr>
 				</table>
 			</div>
