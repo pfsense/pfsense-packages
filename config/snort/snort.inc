@@ -944,6 +944,9 @@ function snort_load_rules_map($rules_path) {
 
 		/* Read the file contents into an array, skipping   */
 		/* empty lines.                                     */
+		if (!file_exists($file))
+			continue;
+
 		$rules_array = file($file, FILE_SKIP_EMPTY_LINES);
 		$record = "";
 		$b_Multiline = false;
