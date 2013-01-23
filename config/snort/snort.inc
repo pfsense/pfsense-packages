@@ -756,6 +756,8 @@ function snort_build_sid_msg_map($rules_path, $sid_file) {
                   continue;
 
              /* Read the file into an array, skipping empty lines.   */
+	     if (!file_exists($file))
+			continue;
              $rules_array = file($file, FILE_SKIP_EMPTY_LINES);
              $record = "";
              $b_Multiline = false;
@@ -824,6 +826,8 @@ function snort_merge_reference_configs($cfg_in, $cfg_out) {
 
         $outMap = array();
         foreach ($cfg_in as $file) {
+	     if (!file_exists($file))
+			continue;
                 $in = file($file, FILE_SKIP_EMPTY_LINES);
                 foreach ($in as $line) {
                         /* Skip comment lines  */
@@ -859,6 +863,8 @@ function snort_merge_classification_configs($cfg_in, $cfg_out) {
 
         $outMap = array();
         foreach ($cfg_in as $file) {
+	     if (!file_exists($file))
+			continue;
                 $in = file($file, FILE_SKIP_EMPTY_LINES);
                 foreach ($in as $line) {
                         if (preg_match('/(.*:)(\s*.*),(.*),(.*)/', $line, $matches)) {
@@ -947,6 +953,8 @@ function snort_load_rules_map($rules_path) {
 		if (!file_exists($file))
 			continue;
 
+	     if (!file_exists($file))
+			continue;
 		$rules_array = file($file, FILE_SKIP_EMPTY_LINES);
 		$record = "";
 		$b_Multiline = false;
