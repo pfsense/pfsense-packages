@@ -100,7 +100,7 @@ if ($currentruleset != 'custom.rules') {
 	if (substr($currentruleset, 0, 10) == "IPS Policy")
 		$rules_map = snort_load_vrt_policy($a_rule[$id]['ips_policy']);
 	elseif (!file_exists($rulefile))
-		$input_errors[] = "{$currentruleset} seems to be missing!!! Please go to the Category tab and save again the rule to regenerate it.";
+		$input_errors[] = "{$currentruleset} seems to be missing!!! Please go to the Category tab and save the rule set again to regenerate it.";
 	else
 		$rules_map = snort_load_rules_map($rulefile);
 }

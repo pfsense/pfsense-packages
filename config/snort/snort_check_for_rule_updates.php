@@ -335,8 +335,10 @@ function snort_apply_customizations($snortcfg, $if_real) {
 		/* Create an array with the full path filenames of the enabled  */
 		/* rule category files if we have any.                          */
 		if (!empty($snortcfg['rulesets'])) {
-			foreach (explode("||", $snortcfg['rulesets']) as $file)
-				$enabled_files[] = "{$snortdir}/rules/" . $file;
+			foreach (explode("||", $snortcfg['rulesets']) as $file) {
+				if (file_exists())
+					$enabled_files[] = "{$snortdir}/rules/" . $file;
+			}
 
 			/* Load our rules map in preparation for writing the enforcing rules file. */
 			$enabled_rules = snort_load_rules_map($enabled_files);
@@ -369,6 +371,11 @@ function snort_apply_customizations($snortcfg, $if_real) {
 			log_error('Resolving and auto-enabling flowbit required rules for ' . snort_get_friendly_interface($snortcfg['interface']) . '...');
 			$enabled_files[] = "{$snortdir}/snort_{$snortcfg['uuid']}_{$if_real}/rules/{$snort_enforcing_rules_file}";
 			snort_write_flowbit_rules_file(snort_resolve_flowbits($enabled_files), "{$snortdir}/snort_{$snortcfg['uuid']}_{$if_real}/rules/{$flowbit_rules_file}");
+			if (file_exists("{$snortdir}/snort_{$snortcfg['uuid']}_{$if_real}/rules/{$flowbit_rules_file}")) {
+				exec("/usr/bin/grep 'include \$RULE_PATH/{$flowbit_rules_file}' {$snortdir}/snort_{$snortcfg['uuid']}_{$if_real}/snort.conf", $out, $rval);
+				if (empty($out))
+					file_put_contents("{$snortdir}/snort_{$snortcfg['uuid']}_{$if_real}/snort.conf", "include \$RULE_PATH/{$flowbit_rules_file}\n", FILE_APPEND);
+			}
 		}
 
 		/* Build a new sid-msg.map file from the enabled rules. */
