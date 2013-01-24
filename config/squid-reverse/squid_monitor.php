@@ -115,7 +115,8 @@ include("head.inc");
 							<option value="15">15 lines</option>
 							<option value="20">20 lines</option>
 							<option value="25">25 lines</option>
-							<option value="30">30 lines</option>
+							<option value="100">100 lines</option>
+							<option value="200">200 lines</option>
 						</select>
 						<br/>
 						<span class="vexpl">
