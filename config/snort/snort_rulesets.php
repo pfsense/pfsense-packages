@@ -230,7 +230,9 @@ function enable_change()
 	<table id="maintable" class="tabcont" width="100%" border="0" cellpadding="0" cellspacing="0">
 <?php 
 	$isrulesfolderempty = glob("{$snortdir}/rules/*.rules");
-	$iscfgdirempty = glob("{$snortdir}/snort_{$snort_uuid}_{$if_real}/rules/*.rules");
+	$iscfgdirempty = array();
+	if (file_exists("{$snortdir}/snort_{$snort_uuid}_{$if_real}/rules/custom.rules"))
+		$iscfgdirempty = (array)("{$snortdir}/snort_{$snort_uuid}_{$if_real}/rules/custom.rules");
 	if (empty($isrulesfolderempty) && empty($iscfgdirempty)):
 ?>
 		<tr>
