@@ -755,9 +755,10 @@ function snort_build_sid_msg_map($rules_path, $sid_file) {
              if (stristr($file, "deleted"))
                   continue;
 
-             /* Read the file into an array, skipping empty lines.   */
+             /* Read the file into an array, skipping missing files. */
 	     if (!file_exists($file))
 			continue;
+
              $rules_array = file($file, FILE_SKIP_EMPTY_LINES);
              $record = "";
              $b_Multiline = false;
@@ -948,13 +949,11 @@ function snort_load_rules_map($rules_path) {
 		if (stristr($file, "deleted"))
 			continue;
 
-		/* Read the file contents into an array, skipping   */
-		/* empty lines.                                     */
+		/* Read the file contents into an array, skipping    */
+		/* missing files.                                    */
 		if (!file_exists($file))
 			continue;
 
-	     if (!file_exists($file))
-			continue;
 		$rules_array = file($file, FILE_SKIP_EMPTY_LINES);
 		$record = "";
 		$b_Multiline = false;
@@ -1331,7 +1330,7 @@ function snort_load_vrt_policy($policy) {
 
 	/* Release memory we no longer need. */
 	unset($all_rules_map, $arulem, $arulem2);
-	
+
 	/* Return all the rules that match the policy. */
 	return $vrt_policy_rules;
 }
@@ -1347,6 +1346,10 @@ function snort_write_enforcing_rules_file(&$rule_map, $rule_path) {
 	global $snort_enforcing_rules_file;
 
 	$rule_file = "/snort.rules";
+
+	/* If the $rule_map array is empty, then exit.  */
+	if (empty($rule_map))
+		return;
 
 	/* See if we were passed a directory or full    */
 	/* filename to write the rules to, and adjust   */
@@ -2153,8 +2156,10 @@ EOD;
 		/* Create an array with the full path filenames of the enabled  */
 		/* rule category files if we have any.                          */
 		if (!empty($snortcfg['rulesets'])) {
-			foreach (explode("||", $snortcfg['rulesets']) as $file)
-				$enabled_files[] = "{$snortdir}/rules/" . $file;
+			foreach (explode("||", $snortcfg['rulesets']) as $file) {
+				if (file_exists("{$snortdir}/rules/" . $file))
+					$enabled_files[] = "{$snortdir}/rules/" . $file;
+			}
 
 			/* Load our rules map in preparation for writing the enforcing rules file. */
 			$enabled_rules = snort_load_rules_map($enabled_files);
