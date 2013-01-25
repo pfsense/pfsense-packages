@@ -1793,7 +1793,7 @@
 		<descr>Monitoring agent.</descr>
 		<category>Services</category>
 		<config_file>http://www.pfsense.org/packages/config/zabbix2-agent/zabbix2-agent.xml</config_file>
-		<version>zabbix2-agent-2.0.4 pkg v0.3</version>
+		<version>zabbix2-agent-2.0.4 pkg v0.4</version>
 		<status>BETA</status>
 		<required_version>2.0</required_version>
 		<configurationfile>zabbix2-agent.xml</configurationfile>
