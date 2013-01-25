@@ -1790,7 +1790,7 @@
 			<custom_name>zabbix2-agent</custom_name>
 			<port>net-mgmt/zabbix2-agent</port>
 		</build_pbi>
-		<depends_on_package_base_url>http://www.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
+		<depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
 		<depends_on_package>zabbix2-agent-2.0.4.tbz</depends_on_package>
 		<depends_on_package_pbi>zabbix2-agent-2.0.4-amd64.pbi</depends_on_package_pbi>
 	</package>
