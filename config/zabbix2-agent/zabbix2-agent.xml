@@ -3,7 +3,7 @@
 	<name>zabbixagent</name>
 	<title>Services: Zabbix-2 Agent</title>
 	<category>Monitoring</category>
-	<version>0.3</version>
+	<version>0.4</version>
 	<addedit_string>Zabbix Agent has been created/modified.</addedit_string>
 	<delete_string>Zabbix Agent has been deleted.</delete_string>
 	<restart_command>/usr/local/etc/rc.d/zabbix2_agentd.sh restart</restart_command>
@@ -40,10 +40,9 @@
 			<fielddescr>Server Active</fielddescr>
 			<fieldname>serveractive</fieldname>
 			<description>List of comma delimited IP:port (or hostname:port) pairs of Zabbix servers for active checks</description>
-			<value>127.0.0.1</value>
+			<value></value>
 			<type>input</type>
 			<size>60</size>
-			<required>true</required>
 		</field>
 		<field>
 			<fielddescr>Hostname</fielddescr>
@@ -89,18 +88,6 @@
 			<size>60</size>
 			<required>true</required>
 			<description>Timeout (default 3). Do not spend more that Timeout seconds on getting requested value (1-255). The agent does not kill timeouted User Parameters processes!</description>
-		</field>
-		<field>
-			<fielddescr>Disable active checks</fielddescr>
-			<fieldname>disableactive</fieldname>
-			<type>checkbox</type>
-			<description>The agent will work only in passive mode listening for server. (generally net set)</description>
-		</field>
-		<field>
-			<fielddescr>Disable passive checks</fielddescr>
-			<fieldname>disablepassive</fieldname>
-			<type>checkbox</type>
-			<description>The agent will not listen on any TCP port. Only active checks will be processed. (generally not set)</description>
 		</field>
 		<field>
 			<fielddescr>User Parameters</fielddescr>
@@ -216,8 +203,6 @@
 	$ListenPort=$config['installedpackages']['zabbixagent']['config'][0]['listenport'];
 	$RefreshActChecks=$config['installedpackages']['zabbixagent']['config'][0]['refreshactchecks'];
 	$Timeout=$config['installedpackages']['zabbixagent']['config'][0]['timeout'];
-	$DisableActive=$config['installedpackages']['zabbixagent']['config'][0]['disableactive'];
-	$DisablePassive=$config['installedpackages']['zabbixagent']['config'][0]['disablepassive'];
 	$UserParams=base64_decode($config['installedpackages']['zabbixagent']['config'][0]['userparams']);
 
 	$conf = "Server=$Server\n";
@@ -232,12 +217,6 @@
 	$conf .= "LogFile=/var/log/zabbix2/zabbix2_agentd.log\n";
 	$conf .= "LogFileSize=1\n";
 	$conf .= "Timeout=$Timeout\n";
-	if (isset($DisableActive) && ($DisableActive == "on")) {
-		$conf .= "DisableActive=1\n";
-	}
-	if (isset($DisablePassive) && ($DisablePassive == "on")) {
-		$conf .= "DisablePassive=1\n";
-	}
 	$conf .= "$UserParams\n";
 
 	file_put_contents(ZABBIX_AGENT_BASE . "/etc/zabbix2/zabbix_agentd.conf", $conf);
