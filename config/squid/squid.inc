@@ -1043,8 +1043,8 @@ function squid_resync_auth() {
 	else {
 		$noauth = base64_decode($settings['no_auth_hosts']);
 		if (!empty($noauth)) {
-		      foreach (explode("\n", $noauth) as $host) {
-		      $host = trim($host);	
+			foreach (explode("\n", $noauth) as $host) {
+				$host = trim($host);	
 				$conf .= "acl noauth src $host\n";
 			}
 			$valid_acls[] = 'noauth';
