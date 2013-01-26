@@ -336,8 +336,8 @@ function snort_apply_customizations($snortcfg, $if_real) {
 		/* rule category files if we have any.                          */
 		if (!empty($snortcfg['rulesets'])) {
 			foreach (explode("||", $snortcfg['rulesets']) as $file) {
-				if (file_exists($file))
-					$enabled_files[] = "{$snortdir}/rules/" . $file;
+				if (file_exists("{$snortdir}/rules/{$file}"))
+					$enabled_files[] = "{$snortdir}/rules/{$file}";
 			}
 
 			/* Load our rules map in preparation for writing the enforcing rules file. */
@@ -348,12 +348,14 @@ function snort_apply_customizations($snortcfg, $if_real) {
 		/* add all the VRT policy rules to our enforcing rules set.    */
 		if (!empty($snortcfg['ips_policy'])) {
 			$policy_rules = snort_load_vrt_policy($snortcfg['ips_policy']);
-			foreach (array_keys($policy_rules) as $k1) {
-				foreach (array_keys($policy_rules[$k1]) as $k2) {
-					$enabled_rules[$k1][$k2]['rule'] = $policy_rules[$k1][$k2]['rule'];
-					$enabled_rules[$k1][$k2]['category'] = $policy_rules[$k1][$k2]['category'];
-					$enabled_rules[$k1][$k2]['disabled'] = $policy_rules[$k1][$k2]['disabled'];
-					$enabled_rules[$k1][$k2]['flowbits'] = $policy_rules[$k1][$k2]['flowbits'];
+			foreach ($policy_rules as $k1 => $prule) {
+				if (!is_array($prule))
+					continue;
+				foreach ($prule as $k2 => $prule2) {
+					$enabled_rules[$k1][$k2]['rule'] = $prule2['rule'];
+					$enabled_rules[$k1][$k2]['category'] = $prule2['category'];
+					$enabled_rules[$k1][$k2]['disabled'] = $prule2['disabled'];
+					$enabled_rules[$k1][$k2]['flowbits'] = $prule2['flowbits'];
 				}
 			}
 			unset($policy_rules);
@@ -372,9 +374,10 @@ function snort_apply_customizations($snortcfg, $if_real) {
 			$enabled_files[] = "{$snortdir}/snort_{$snortcfg['uuid']}_{$if_real}/rules/{$snort_enforcing_rules_file}";
 			snort_write_flowbit_rules_file(snort_resolve_flowbits($enabled_files), "{$snortdir}/snort_{$snortcfg['uuid']}_{$if_real}/rules/{$flowbit_rules_file}");
 			if (file_exists("{$snortdir}/snort_{$snortcfg['uuid']}_{$if_real}/rules/{$flowbit_rules_file}")) {
-				exec("/usr/bin/grep 'include \$RULE_PATH/{$flowbit_rules_file}' {$snortdir}/snort_{$snortcfg['uuid']}_{$if_real}/snort.conf", $out, $rval);
+				unset($out);
+				$_grbg = exec("/usr/bin/grep 'include \$RULE_PATH/{$flowbit_rules_file}' {$snortdir}/snort_{$snortcfg['uuid']}_{$if_real}/snort.conf | /usr/bin/grep -v grep", $out, $rval);
 				if (empty($out))
-					file_put_contents("{$snortdir}/snort_{$snortcfg['uuid']}_{$if_real}/snort.conf", "include \$RULE_PATH/{$flowbit_rules_file}\n", FILE_APPEND);
+					@file_put_contents("{$snortdir}/snort_{$snortcfg['uuid']}_{$if_real}/snort.conf", "include \$RULE_PATH/{$flowbit_rules_file}\n", FILE_APPEND);
 			}
 		}
 
