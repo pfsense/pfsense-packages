@@ -2253,6 +2253,9 @@ config disable_decode_drops
 config pcre_match_limit: 3500
 config pcre_match_limit_recursion: 1500
 
+# Show the YEAR in timestamps  #
+config show_year
+
 # Configure the detection engine  #
 config detection: search-method {$snort_performance} search-optimize max-pattern-len 20 max_queue_events 5
 config event_queue: max_queue 8 log 5 order_events content_length
