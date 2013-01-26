@@ -362,7 +362,7 @@ function popup(url)
 	<tr>
 		<td width="3%" class="list">&nbsp;</td>
 		<td colspan="7" class="listhdr" >&nbsp;</td>
-		<td width="3%" align="center" valign="middle" class="list"><a href="javascript: void(0)"
+		<td width="3%" align="center" valign="middle" class="listt"><a href="javascript: void(0)"
 				onclick="popup('snort_rules_edit.php?id=<?=$id;?>&openruleset=<?=$currentruleset;?>')">
 				<img src="../themes/<?= $g['theme']; ?>/images/icons/icon_service_restart.gif" <?php
 				echo "onmouseover='this.src=\"../themes/{$g['theme']}/images/icons/icon_services_restart_mo.gif\"' 
@@ -371,7 +371,7 @@ function popup(url)
 	</tr>
 	<tr id="frheader">
 		<td width="3%" class="list">&nbsp;</td>
-		<td width="9%" class="listhdr"><?php echo gettext("SID"); ?></td>
+		<td width="9%" class="listhdrr"><?php echo gettext("SID"); ?></td>
 		<td width="2%" class="listhdrr"><?php echo gettext("Proto"); ?></td>
 		<td width="14%" class="listhdrr"><?php echo gettext("Source"); ?></td>
 		<td width="12%" class="listhdrr"><?php echo gettext("Port"); ?></td>
@@ -446,7 +446,7 @@ function popup(url)
 				$textss $message $textse
 		       </td>";
 	?>
-			<td width="3%" align="center" valign="middle" nowrap class="list">
+			<td width="3%" align="center" valign="middle" nowrap class="listt">
 				<a href="javascript: void(0)"
 				onclick="popup('snort_rules_edit.php?id=<?=$id;?>&openruleset=<?=$currentruleset;?>&ids=<?=$sid;?>&gid=<?=$gid;?>')"><img
 				src="../themes/<?= $g['theme']; ?>/images/icons/icon_right.gif"
