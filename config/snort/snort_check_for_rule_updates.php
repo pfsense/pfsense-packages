@@ -336,7 +336,7 @@ function snort_apply_customizations($snortcfg, $if_real) {
 		/* rule category files if we have any.                          */
 		if (!empty($snortcfg['rulesets'])) {
 			foreach (explode("||", $snortcfg['rulesets']) as $file) {
-				if (file_exists($file))
+				if (file_exists("{$snortdir}/rules/" . $file))
 					$enabled_files[] = "{$snortdir}/rules/" . $file;
 			}
 
