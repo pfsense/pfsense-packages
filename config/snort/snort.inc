@@ -127,16 +127,16 @@ function snort_build_list($snortcfg, $listname = "", $whitelist = false) {
 	if ($listname == 'default' || empty($listname)) {
 		$wanip = 'yes'; $wangw = 'yes'; $wandns = 'yes'; $vips = 'yes'; $vpns = 'yes';
 	} else {
-                $whitelist = snort_find_list($listname);
-                if (empty($whitelist))
-                        return $whitelist;
-		$wanip = $whitelist['wanips'];
-		$wangw = $whitelist['wangateips'];
-		$wandns = $whitelist['wandnsips'];
-		$vips = $whitelist['vips'];
-		$vpns = $whitelist['vpnips'];
-		if (!empty($whitelist['address']) && is_alias($whitelist['address'])) {
-			$home_net .= trim(filter_expand_alias($whitelist['address']));
+                $list = snort_find_list($listname);
+                if (empty($list))
+                        return $list;
+		$wanip = $list['wanips'];
+		$wangw = $list['wangateips'];
+		$wandns = $list['wandnsips'];
+		$vips = $list['vips'];
+		$vpns = $list['vpnips'];
+		if (!empty($list['address']) && is_alias($list['address'])) {
+			$home_net .= trim(filter_expand_alias($list['address']));
 			$home_net .= " ";
 		}
 	}
@@ -154,51 +154,53 @@ function snort_build_list($snortcfg, $listname = "", $whitelist = false) {
 	/*  iterate through interface list and write out whitelist items
 	 *  and also compile a home_net list for snort.
 	 */
-	foreach ($int_array as $int) {
-		/* calculate interface subnet information */
-		if (function_exists('get_interface_ip')) {
-			$subnet = get_interface_ip($int);
-			if (is_ipaddr($subnet)) {
-				if ($whitelist == false) {
-					$sn = get_interface_subnet($int);
-					$home_net .= "{$subnet}/{$sn} ";
-				} else
-					$home_net .= "{$subnet} ";
-			}
-			if (function_exists("get_interface_ipv6")) {
-				$subnet = get_interface_ipv6($int);
-				if (is_ipaddrv6($subnet)) {
-					if ($whitelist == false) {
-						$sn = get_interface_subnetv6($int);
+	if ($wanip == 'yes') {
+		foreach ($int_array as $int) {
+			/* calculate interface subnet information */
+			if (function_exists('get_interface_ip')) {
+				if (!interface_has_gateway($int))
+					continue;
+				$subnet = get_interface_ip($int);
+				if (is_ipaddr($subnet)) {
+					if ($whitelist === false) {
+						$sn = get_interface_subnet($int);
 						$home_net .= "{$subnet}/{$sn} ";
 					} else
 						$home_net .= "{$subnet} ";
 				}
-			}
-		} else {
-			$ifcfg = $config['interfaces'][$int];
-			switch ($ifcfg['ipaddr']) {
-			case "pppoe":
-			case "pptp":
-			case "l2tp":
-				if (function_exists('get_interface_ip'))
-					$subnet = get_interface_ip($int);
-				else
-					$subnet = find_interface_ip("ng0");
-
-				if (is_ipaddr($subnet))
-					$home_net .= "{$subnet} ";
-				break;
-			case "dhcp":
-				$subnet = find_interface_ip(snort_get_real_interface($int));
-				if (is_ipaddr($subnet))
-					$home_net .= "{$subnet} ";
-				break;
-			default:
-				if (is_ipaddr($ifcfg['ipaddr'])) {
-					$home_net .= "{$ifcfg['ipaddr']} ";
+				if (function_exists("get_interface_ipv6")) {
+					if (!interface_has_gatewayv6($int))
+						continue;;
+					$subnet = get_interface_ipv6($int);
+					if (is_ipaddrv6($subnet)) {
+						if ($whitelist === false) {
+							$sn = get_interface_subnetv6($int);
+							$home_net .= "{$subnet}/{$sn} ";
+						} else
+							$home_net .= "{$subnet} ";
+					}
 				}
-				break;
+			} else {
+				$ifcfg = $config['interfaces'][$int];
+				switch ($ifcfg['ipaddr']) {
+				case "pppoe":
+				case "pptp":
+				case "l2tp":
+					$subnet = find_interface_ip("ng0");
+					if (is_ipaddr($subnet))
+						$home_net .= "{$subnet} ";
+					break;
+				case "dhcp":
+					$subnet = find_interface_ip(snort_get_real_interface($int));
+					if (is_ipaddr($subnet))
+						$home_net .= "{$subnet} ";
+					break;
+				default:
+					if (is_ipaddr($ifcfg['ipaddr'])) {
+						$home_net .= "{$ifcfg['ipaddr']} ";
+					}
+					break;
+				}
 			}
 		}
 	}
@@ -228,7 +230,7 @@ function snort_build_list($snortcfg, $listname = "", $whitelist = false) {
 		if (is_array($config['virtualip']) && is_array($config['virtualip']['vip'])) {
 			foreach($config['virtualip']['vip'] as $vip) {
 				if ($vip['subnet'] && $vip['mode'] != 'proxyarp') {
-					if ($whitelist == false)
+					if ($whitelist === false)
 						$home_net .= "{$vip['subnet']}/{$vip['subnet_bits']} ";
 					else
 						$home_net .= "{$vip['subnet']} ";
@@ -258,6 +260,7 @@ function snort_build_list($snortcfg, $listname = "", $whitelist = false) {
 		if (empty($valresult[$vald]))
 			$valresult[$vald] = $vald;
 	}
+	unset($home_net, $validator);
 
 	return $valresult;
 }
@@ -686,7 +689,7 @@ function sync_snort_package_config() {
 	conf_mount_rw();
 
 	/* do not start config build if rules is empty */
-	if (!is_array($config['installedpackages']['snortglobal']['rule'])) {
+	if (!is_array($config['installedpackages']['snortglobal']) && !is_array($config['installedpackages']['snortglobal']['rule'])) {
 		exec('/bin/rm /usr/local/etc/rc.d/snort.sh');
 		conf_mount_ro();
 		return;
