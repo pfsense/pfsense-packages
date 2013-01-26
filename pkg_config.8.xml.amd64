@@ -594,7 +594,7 @@
 		<required_version>2.0</required_version>
 		<configurationfile>dansguardian.xml</configurationfile>
 		<build_port_path>/usr/ports/www/dansguardian-devel</build_port_path>
-		<build_options>dansguardian_UNSET=APACHE;dansguardian_SET=TRICKLE CLAMD ICAP NTLM SSL</build_options>
+		<build_options>dansguardian-devel_UNSET=APACHE;dansguardian-devel_SET=TRICKLE CLAMD ICAP NTLM SSL</build_options>
 		<!-- NOTE: Distfile must be fetched manually from http://dansguardian.org/downloads/2/Alpha/dansguardian-2.12.0.0.tar.gz -->
 	</package>
 	<package>
@@ -1790,7 +1790,7 @@
 			<custom_name>zabbix2-agent</custom_name>
 			<port>net-mgmt/zabbix2-agent</port>
 		</build_pbi>
-		<depends_on_package_base_url>http://www.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
+		<depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
 		<depends_on_package>zabbix2-agent-2.0.4.tbz</depends_on_package>
 		<depends_on_package_pbi>zabbix2-agent-2.0.4-amd64.pbi</depends_on_package_pbi>
 	</package>
@@ -1799,7 +1799,7 @@
 		<descr>Monitoring agent proxy.</descr>
 		<category>Services</category>
 		<config_file>http://www.pfsense.org/packages/config/zabbix2-proxy/zabbix2-proxy.xml</config_file>
-		<version>zabbix2-proxy-2.0.4 pkg v0.3</version>
+		<version>zabbix2-proxy-2.0.4 pkg v0.4</version>
 		<status>BETA</status>
 		<required_version>2.0</required_version>
 		<configurationfile>zabbix2-proxy.xml</configurationfile>
