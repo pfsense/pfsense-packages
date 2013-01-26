@@ -3,7 +3,7 @@
 	<name>zabbixproxy</name>
 	<title>Services: Zabbix-2 Proxy</title>
 	<category>Monitoring</category>
-	<version>0.3</version>
+	<version>0.5</version>
 	<addedit_string>Zabbix Proxy has been created/modified.</addedit_string>
 	<delete_string>Zabbix Proxy has been deleted.</delete_string>
 	<restart_command>/usr/local/etc/rc.d/zabbix2_proxy.sh restart</restart_command>
@@ -242,12 +242,31 @@
 	</custom_php_resync_config_command>
 	<custom_php_deinstall_command>
 	<![CDATA[
-	exec("kill `cat /var/run/zabbix2/zabbix2_proxy.pid`");
+	$pfs_version = substr(trim(file_get_contents("/etc/version")),0,3);
+	switch ($pfs_version) {
+		case "1.2":
+		case "2.0":
+			define('ZABBIX_AGENT_BASE', '/usr/local');
+			define('ZABBIX_PROXY_BASE', '/usr/local');
+			break;
+		default:
+			define('ZABBIX_AGENT_BASE', '/usr/pbi/zabbix2-agent-' . php_uname("m"));
+			define('ZABBIX_PROXY_BASE', '/usr/pbi/zabbix2-proxy-' . php_uname("m"));
+	}
+
+	exec("/usr/bin/killall zabbix_proxy");
 
 	exec("/bin/rm " . ZABBIX_PROXY_BASE . "/etc/rc.d/zabbix2_proxy.sh");
 
-	exec("/bin/rm -r /var/log/zabbix2/");
-	exec("/bin/rm -r /var/run/zabbix2/");
+	// Check if Zabbix-2 Agent exists
+	if(file_exists(ZABBIX_AGENT_BASE . "/etc/zabbix2/zabbix_agentd.conf")) {
+		exec("/bin/rm  /var/log/zabbix2/zabbix_proxy.log");
+		exec("/bin/rm  /var/run/zabbix2/zabbix2_proxy.pid");
+	} else {
+		exec("/bin/rm -r /var/log/zabbix2/");
+		exec("/bin/rm -r /var/run/zabbix2/");
+	}
+
 	exec("/bin/rm -r /var/db/zabbix2/");
 	]]>
 	</custom_php_deinstall_command>
