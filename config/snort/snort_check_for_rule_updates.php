@@ -385,7 +385,7 @@ if ($snortdownload == 'on' || $emergingthreats == 'on') {
 	}
 	update_status(gettext('Restarting Snort to activate the new set of rules...'));
         exec("/bin/sh /usr/local/etc/rc.d/snort.sh restart");
-        sleep(10);
+        sleep(20);
         if (!is_process_running("snort"))
                exec("/bin/sh /usr/local/etc/rc.d/snort.sh start");
         update_output_window(gettext("Snort has restarted with your new set of rules..."));
