@@ -141,6 +141,16 @@ function snort_build_list($snortcfg, $listname = "", $whitelist = false) {
 		}
 	}
 
+	/* Always put snort running interface in the list */
+	$snortip = get_interface_ip($snortcfg['interface']);
+	if (is_ipaddr($snortip))
+		$home_net .= "{$snortip} ";
+	if (function_exists('get_interface_ipv6')) {
+		$snortip = get_interface_ipv6($snortcfg['interface']);
+		if (is_ipaddrv6($snortip))
+			$home_net .= "{$snortip} ";
+	}
+		
 	/*  iterate through interface list and write out whitelist items
 	 *  and also compile a home_net list for snort.
 	 */
