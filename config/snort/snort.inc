@@ -1680,19 +1680,6 @@ function snort_deinstall() {
 	sleep(2);
 	mwexec('/usr/sbin/pw userdel snort; /usr/sbin/pw groupdel snort', true);
 
-	if (!function_exists("get_interface_ipv6")) {
-		/* create a few directories and ensure the sample files are in place */
-		$snort_dirs = array( $snortdir, $snortlogdir,
-			"dynamicrules" => "/usr/local/lib/snort/dynamicrules",
-			"dynamicengine" => "/usr/local/lib/snort/dynamicengine",
-			"dynamicpreprocessor" => "/usr/local/lib/snort/dynamicpreprocessor"
-		    );
-		foreach ($snort_dirs as $dir) {
-			if (is_dir($dir))
-				mwexec("/bin/rm -rf {$dir}", true);
-		}
-	}
-
 	/* Remove snort cron entries Ugly code needs smoothness*/
 	if (!function_exists('snort_deinstall_cron')) {
 		function snort_deinstall_cron($crontask) {
@@ -1715,6 +1702,7 @@ function snort_deinstall() {
 		}
 	}
 
+	mwexec("/bin/rm {$snortdir}/*.md5; /bin/rm -r {$snortdir}/snort_*");
 	snort_deinstall_cron("snort2c");
 	snort_deinstall_cron("snort_check_for_rule_updates.php");
 	snort_deinstall_cron("snort_check_cron_misc.inc");
