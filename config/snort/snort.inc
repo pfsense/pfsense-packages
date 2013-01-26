@@ -1739,7 +1739,8 @@ function snort_prepare_rule_files($snortcfg, $snortcfgdir) {
 			$tmpfile = basename($file);
 			if (in_array("{$snortdir}/rules/{$tmpfile}", $enabled_files))
 				continue;
-			if (basename($tmpfile, ".rules") != "custom")
+			if ($tmpfile != "custom.rules" && $tmpfile != $flowbit_rules_file &&
+				$tmpfile != $snort_enforcing_rules_file)
 				@unlink($file);
 		}
 
