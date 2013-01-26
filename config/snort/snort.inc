@@ -141,20 +141,20 @@ function snort_build_list($snortcfg, $listname = "", $whitelist = false) {
 		}
 	}
 
-	/* build an interface array list */
-	if (function_exists('get_configured_interface_list'))
-		$int_array = get_configured_interface_list();
-	else {
-		$int_array = array('lan');
-		for ($j = 1; isset ($config['interfaces']['opt' . $j]); $j++)
-			if(isset($config['interfaces']['opt' . $j]['enable']))
-				$int_array[] = "opt{$j}";
-	}
-
 	/*  iterate through interface list and write out whitelist items
 	 *  and also compile a home_net list for snort.
 	 */
 	if ($wanip == 'yes') {
+		/* build an interface array list */
+		if (function_exists('get_configured_interface_list'))
+			$int_array = get_configured_interface_list();
+		else {
+			$int_array = array('wan', 'lan');
+			for ($j = 1; isset ($config['interfaces']['opt' . $j]); $j++)
+				if(isset($config['interfaces']['opt' . $j]['enable']))
+					$int_array[] = "opt{$j}";
+		}
+
 		foreach ($int_array as $int) {
 			/* calculate interface subnet information */
 			if (function_exists('get_interface_ip')) {
