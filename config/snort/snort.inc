@@ -1893,7 +1893,7 @@ function snort_generate_conf($snortcfg) {
 		"telnet_ports" => "23","snmp_ports" => "161", "ftp_ports" => "21",
 		"ssh_ports" => $ssh_port, "pop2_ports" => "109", "pop3_ports" => "110", 
 		"imap_ports" => "143", "sip_proxy_ports" => "5060:5090,16384:32768",
-		"sip_ports" => "5060:5090,16384:32768", "auth_ports" => "113", "finger_ports" => "79", 
+		"sip_ports" => "5060, 5061", "auth_ports" => "113", "finger_ports" => "79", 
 		"irc_ports" => "6665,6666,6667,6668,6669,7000", "smb_ports" => "139,445",
 		"nntp_ports" => "119", "rlogin_ports" => "513", "rsh_ports" => "514",
 		"ssl_ports" => "443,465,563,636,989,990,992,993,994,995",
@@ -2094,6 +2094,16 @@ preprocessor dcerpc2_server: default, policy WinXP, \
 	
 EOD;
 
+	$sip_ports = str_replace(",", " ", $snort_ports['sip_ports']);
+	$sip_preproc = <<<EOD
+# SIP preprocessor
+preprocessor sip: ports { {$sip_ports} }, max_call_id_len 300, \
+		max_from_len 100, max_to_len 200, max_via_len 1000, \
+		max_requestName_len 50, max_uri_len 100, ignore_call_channel,\
+		max_content_len 1000
+
+EOD;
+
 	$dns_ports = str_replace(",", " ", $snort_ports['dns_ports']);
 	/* def dns_preprocessor */
 	$dns_preprocessor = <<<EOD
@@ -2174,7 +2184,7 @@ EOD;
 		"ssl_preproc" => "ssl_preproc", "dnp3_preproc" => "dnp3_preproc", "modbus_preproc" => "modbus_preproc"
 	);
 	$snort_preproc = array (
-		"perform_stat", "http_inspect", "other_preprocs", "ftp_preprocessor", "smtp_preprocessor", "ssl_preproc",
+		"perform_stat", "http_inspect", "other_preprocs", "ftp_preprocessor", "smtp_preprocessor", "ssl_preproc", "sip_preproc",
 		"sf_portscan", "dce_rpc_2", "dns_preprocessor", "sensitive_data", "pop_preproc", "imap_preproc", "dnp3_preproc", "modbus_preproc"
 	);
 	$snort_preprocessors = "";

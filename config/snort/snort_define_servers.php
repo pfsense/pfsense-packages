@@ -72,7 +72,7 @@ $snort_ports = array(
 "telnet_ports" => "23","snmp_ports" => "161", "ftp_ports" => "21",
 "ssh_ports" => $ssh_port, "pop2_ports" => "109", "pop3_ports" => "110",
 "imap_ports" => "143", "sip_proxy_ports" => "5060:5090,16384:32768",
-"sip_ports" => "5060:5090,16384:32768", "auth_ports" => "113", "finger_ports" => "79",
+"sip_ports" => "5060,5061", "auth_ports" => "113", "finger_ports" => "79",
 "irc_ports" => "6665,6666,6667,6668,6669,7000", "smb_ports" => "139,445",
 "nntp_ports" => "119", "rlogin_ports" => "513", "rsh_ports" => "514",
 "ssl_ports" => "443,465,563,636,989,990,992,993,994,995",

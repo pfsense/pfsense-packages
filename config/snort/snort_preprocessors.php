@@ -72,6 +72,7 @@ if (isset($id) && $a_nat[$id]) {
 	$pconfig['ssl_preproc'] = $a_nat[$id]['ssl_preproc'];
 	$pconfig['pop_preproc'] = $a_nat[$id]['pop_preproc'];
 	$pconfig['imap_preproc'] = $a_nat[$id]['imap_preproc'];
+	$pconfig['sip_preproc'] = $a_nat[$id]['sip_preproc'];
 	$pconfig['dnp3_preproc'] = $a_nat[$id]['dnp3_preproc'];
 	$pconfig['modbus_preproc'] = $a_nat[$id]['modbus_preproc'];
 }
@@ -103,6 +104,8 @@ if ($_POST) {
 		$natent['pop_preproc'] = $_POST['pop_preproc'] ? 'on' : 'off';
 		$natent['imap_preproc'] = $_POST['imap_preproc'] ? 'on' : 'off';
 		$natent['dnp3_preproc'] = $_POST['dnp3_preproc'] ? 'on' : 'off';
+		$natent['modbus_preproc'] = $_POST['modbus_preproc'] ? 'on' : 'off';
+		$natent['sip_preproc'] = $_POST['sip_preproc'] ? 'on' : 'off';
 		$natent['modbus_preproc'] = $_POST['modbus_preproc'] ? 'on' : 'off';
 
 		if (isset($id) && $a_nat[$id])
@@ -360,6 +363,15 @@ include_once("head.inc");
 			<?php if ($pconfig['dce_rpc_2']=="on") echo "checked"; ?>
 			onClick="enable_change(false)"><br>
 		<?php echo gettext("The DCE/RPC preprocessor detects and decodes SMB and DCE/RPC traffic."); ?></td>
+	</tr>
+	<tr>
+		<td width="22%" valign="top" class="vncell"><?php echo gettext("Enable"); ?> <br>
+		<?php echo gettext("SIP Detection"); ?></td>
+		<td width="78%" class="vtable"><input name="sip_preproc"
+			type="checkbox" value="on"
+			<?php if ($pconfig['sip_preproc']=="on") echo "checked"; ?>
+			onClick="enable_change(false)"><br>
+		<?php echo gettext("The SIP preprocessor decodes SIP traffic and detects some vulnerabilities."); ?></td>
 	</tr>
 	<tr>
 		<td width="22%" valign="top" class="vncell"><?php echo gettext("Enable"); ?> <br>
