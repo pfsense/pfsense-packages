@@ -1250,7 +1250,7 @@ function snort_resolve_flowbits($rule_path) {
 	return $required_rules;
 }
 
-function snort_write_flowbit_rules_file(&$flowbit_rules, $rule_file) {
+function snort_write_flowbit_rules_file($flowbit_rules, $rule_file) {
 
 	/************************************************/
 	/* This function takes an array of rules in the */
@@ -1258,14 +1258,16 @@ function snort_write_flowbit_rules_file(&$flowbit_rules, $rule_file) {
 	/* given.                                       */
 	/************************************************/
 
-	if (empty($flowbit_rules))
-		return;
-
 	/* See if we were passed a directory or full    */
 	/* filename to write the rules to, and adjust   */
 	/* the destination argument accordingly.        */
 	if (is_dir($rule_file))
 		$rule_file = rtrim($rule_file, '/').'/flowbit-required.rules';
+
+	if (empty($flowbit_rules)) {
+		@file_put_contents($rule_file, "");
+		return;
+	}
 
 	$fp = fopen($rule_file, "w");
 	if ($fp) {
@@ -1335,7 +1337,7 @@ function snort_load_vrt_policy($policy) {
 	return $vrt_policy_rules;
 }
 
-function snort_write_enforcing_rules_file(&$rule_map, $rule_path) {
+function snort_write_enforcing_rules_file($rule_map, $rule_path) {
 
 	/************************************************/
 	/* This function takes a rules map array of     */
@@ -1347,10 +1349,6 @@ function snort_write_enforcing_rules_file(&$rule_map, $rule_path) {
 
 	$rule_file = "/snort.rules";
 
-	/* If the $rule_map array is empty, then exit.  */
-	if (empty($rule_map))
-		return;
-
 	/* See if we were passed a directory or full    */
 	/* filename to write the rules to, and adjust   */
 	/* the destination argument accordingly.        */
@@ -1358,6 +1356,12 @@ function snort_write_enforcing_rules_file(&$rule_map, $rule_path) {
 		$rule_file = rtrim($rule_path, '/').$rule_file;
 	else
 		$rule_file = $rule_path;
+
+	/* If the $rule_map array is empty, then exit.  */
+	if (empty($rule_map)) {
+		file_put_contents($rule_file, "");
+		return;
+	}
 
 	$fp = fopen($rule_file, "w");
 	if ($fp) {
@@ -1395,6 +1399,8 @@ function snort_load_sid_mods($sids, $value) {
 		if (preg_match('/\s\d+/', $v, $match))
 			$result[trim($match[0])] = $value;
 	}
+	unset($tmp);
+
 	return $result;
 }
 
@@ -1424,7 +1430,7 @@ function snort_modify_sids(&$rule_map, $snortcfg) {
 		foreach ($rule_map as $k1 => $rulem) {
 			foreach ($rulem as $k2 => $v) {
 				if (in_array($k2, $enablesid) && $v['disabled'] == 1) 
-					$rule_map[$k1][$k2]['rule'] = ltrim(substr($v['rule'], strpos($v['rule'], "#") + 1));
+					$rule_map[$k1][$k2]['rule'] = ltrim($v['rule'], " \t#");
 			}
 		}
 	}
@@ -1439,6 +1445,8 @@ function snort_modify_sids(&$rule_map, $snortcfg) {
 			}
 		}
 	}
+
+	unset($enablesid, $disablesid);
 }
 
 /* Start of main config files */
@@ -1702,6 +1710,87 @@ function snort_deinstall() {
 	/* Keep this as a last step */
 	if ($config['installedpackages']['snortglobal']['forcekeepsettings'] != 'on')
 		unset($config['installedpackages']['snortglobal']);
+}
+
+function snort_prepare_rule_files($snortcfg, $snortcfgdir) {
+	global $snort_enforcing_rules_file, $flowbit_rules_file;
+
+	$snortdir = SNORTDIR;
+
+	if (!empty($snortcfg['rulesets']) || $snortcfg['ips_policy_enable'] == 'on') {
+		$enabled_rules = array();
+		$enabled_files = array();
+
+		/* Create an array with the full path filenames of the enabled  */
+		/* rule category files if we have any.                          */
+		if (!empty($snortcfg['rulesets'])) {
+			foreach (explode("||", $snortcfg['rulesets']) as $file) {
+				if (file_exists("{$snortdir}/rules/" . $file))
+					$enabled_files[] = "{$snortdir}/rules/{$file}";
+			}
+
+			/* Load our rules map in preparation for writing the enforcing rules file. */
+			$enabled_rules = snort_load_rules_map($enabled_files);
+		}
+
+		/* Remove any existing rules files (except custom rules) prior to building a new set. */
+		foreach (glob("{$snortcfgdir}/rules/*.rules") as $file) {
+			$tmpfile = basename($file);
+			if (in_array($tmpfile, $enabled_files))
+				continue;
+			if (basename($tmpfile, ".rules") != "custom")
+				@unlink($file);
+		}
+
+		/* Check if a pre-defined Snort VRT policy is selected. If so, */
+		/* add all the VRT policy rules to our enforcing rule set.     */
+		if (!empty($snortcfg['ips_policy'])) {
+			$policy_rules = snort_load_vrt_policy($snortcfg['ips_policy']);
+			foreach ($policy_rules as $k1 => $policy) {
+				foreach ($policy as $k2 => $p) {
+					if (!is_array($enabled_rules[$k1]))
+						$enabled_rules[$k1] = array();
+					if (!is_array($enabled_rules[$k1][$k2]))
+						$enabled_rules[$k1][$k2] = array();
+					$enabled_rules[$k1][$k2]['rule'] = $p['rule'];
+					$enabled_rules[$k1][$k2]['category'] = $p['category'];
+					$enabled_rules[$k1][$k2]['disabled'] = $p['disabled'];
+					$enabled_rules[$k1][$k2]['flowbits'] = $p['flowbits'];
+				}
+			}
+			unset($policy_rules);
+		}
+
+		/* Process any enablesid or disablesid modifications for the selected rules. */
+		snort_modify_sids($enabled_rules, $snortcfg);
+
+		/* Write the enforcing rules file to the Snort interface's "rules" directory. */
+		snort_write_enforcing_rules_file($enabled_rules, "{$snortcfgdir}/rules/{$snort_enforcing_rules_file}");
+		unset($enabled_rules);
+
+		/* If auto-flowbit resolution is enabled, generate the dependent flowbits rules file. */
+		if ($snortcfg['autoflowbitrules'] == 'on') {
+			log_error('Resolving and auto-enabling flowbit required rules for ' . snort_get_friendly_interface($snortcfg['interface']) . '...');
+			$enabled_files[] = "{$snortcfgdir}/rules/{$snort_enforcing_rules_file}";
+			snort_write_flowbit_rules_file(snort_resolve_flowbits($enabled_files), "{$snortcfgdir}/rules/{$flowbit_rules_file}");
+		} else
+			/* Just put an empty file to always have the file present */
+			snort_write_flowbit_rules_file(array(), "{$snortcfgdir}/rules/{$flowbit_rules_file}");
+
+		unset($enabled_files);
+	} else {
+		snort_write_enforcing_rules_file(array(), "{$snortcfgdir}/rules/{$snort_enforcing_rules_file}");
+		snort_write_flowbit_rules_file(array(), "{$snortcfgdir}/rules/{$flowbit_rules_file}");
+	}
+
+	if (!empty($snortcfg['customrules']))
+		@file_put_contents("{$snortcfgdir}/rules/custom.rules", base64_decode($snortcfg['customrules']));
+	else
+		@file_put_contents("{$snortcfgdir}/rules/custom.rules", "");
+
+	/* Build a new sid-msg.map file from the enabled */
+	/* rules and copy it to the interface directory. */
+	snort_build_sid_msg_map("{$snortcfgdir}/rules/", "{$snortcfgdir}/sid-msg.map");
 }
 
 function snort_generate_conf($snortcfg) {
@@ -2141,79 +2230,11 @@ EOD;
 	}
 
 	/* generate rule sections to load */
-	$selected_rules_sections = "";
-	$dynamic_rules_sections = "";
-	if (!empty($snortcfg['rulesets']) || $snortcfg['ips_policy_enable'] == 'on') {
-		$enabled_rules = array();
-		$enabled_files = array();
-
-		/* Remove any existing rules files (except custom rules) prior to building a new set. */
-		foreach (glob("{$snortcfgdir}/rules/*.rules") as $file) {
-			if (basename($file, ".rules") != "custom")
-				@unlink($file);
-		}
-
-		/* Create an array with the full path filenames of the enabled  */
-		/* rule category files if we have any.                          */
-		if (!empty($snortcfg['rulesets'])) {
-			foreach (explode("||", $snortcfg['rulesets']) as $file) {
-				if (file_exists("{$snortdir}/rules/" . $file))
-					$enabled_files[] = "{$snortdir}/rules/" . $file;
-			}
-
-			/* Load our rules map in preparation for writing the enforcing rules file. */
-			$enabled_rules = snort_load_rules_map($enabled_files);
-		}
-
-		/* Check if a pre-defined Snort VRT policy is selected. If so, */
-		/* add all the VRT policy rules to our enforcing rule set.     */
-		if (!empty($snortcfg['ips_policy'])) {
-			$policy_rules = snort_load_vrt_policy($snortcfg['ips_policy']);
-			foreach ($policy_rules as $k1 => $policy) {
-				foreach ($policy as $k2 => $p) {
-					if (!is_array($enabled_rules[$k1]))
-						$enabled_rules[$k1] = array();
-					if (!is_array($enabled_rules[$k1][$k2]))
-						$enabled_rules[$k1][$k2] = array();
-					$enabled_rules[$k1][$k2]['rule'] = $p['rule'];
-					$enabled_rules[$k1][$k2]['category'] = $p['category'];
-					$enabled_rules[$k1][$k2]['disabled'] = $p['disabled'];
-					$enabled_rules[$k1][$k2]['flowbits'] = $p['flowbits'];
-				}
-			}
-			unset($policy_rules);
-		}
-
-		/* Process any enablesid or disablesid modifications for the selected rules. */
-		snort_modify_sids($enabled_rules, $snortcfg);
-
-		/* Write the enforcing rules file to the Snort interface's "rules" directory. */
-		snort_write_enforcing_rules_file($enabled_rules, "{$snortcfgdir}/rules/{$snort_enforcing_rules_file}");
-		if (file_exists("{$snortcfgdir}/rules/{$snort_enforcing_rules_file}"))
-			$selected_rules_sections = "include \$RULE_PATH/{$snort_enforcing_rules_file}\n";
-		unset($enabled_rules);
-
-		/* If auto-flowbit resolution is enabled, generate the dependent flowbits rules file. */
-		if ($snortcfg['autoflowbitrules'] == 'on') {
-			$enabled_files[] = "{$snortcfgdir}/rules/{$snort_enforcing_rules_file}";
-			snort_write_flowbit_rules_file(snort_resolve_flowbits($enabled_files), "{$snortcfgdir}/rules/{$flowbit_rules_file}");
-			unset($enabled_files);
-		}
-
-		/* If we have the depedent flowbits rules file, then include it. */
-		if (file_exists("{$snortcfgdir}/rules/{$flowbit_rules_file}"))
-			$selected_rules_sections .= "include \$RULE_PATH/{$flowbit_rules_file}\n";
-	}
-
-	if (!empty($snortcfg['customrules'])) {
-		@file_put_contents("{$snortcfgdir}/rules/custom.rules", base64_decode($snortcfg['customrules']));
-		$selected_rules_sections  .= "include \$RULE_PATH/custom.rules\n";
-	} else
-		@unlink("{$snortcfgdir}/rules/custom.rules");
-
-	/* Build a new sid-msg.map file from the enabled */
-	/* rules and copy it to the interface directory. */
-	snort_build_sid_msg_map("{$snortcfgdir}/rules/", "{$snortcfgdir}/sid-msg.map");
+	/* The files are always configured so the update process is easier */
+	$selected_rules_sections = "include \$RULE_PATH/{$snort_enforcing_rules_file}\n";
+	$selected_rules_sections .= "include \$RULE_PATH/{$flowbit_rules_file}\n";
+	$selected_rules_sections  .= "include \$RULE_PATH/custom.rules\n";
+	snort_prepare_rule_files($snortcfg, $snortcfgdir);
 
 	$cksumcheck = "all";
 	if ($snortcfg['cksumcheck'] == 'on')
