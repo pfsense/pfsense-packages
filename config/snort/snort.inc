@@ -1725,7 +1725,7 @@ function snort_prepare_rule_files($snortcfg, $snortcfgdir) {
 		/* rule category files if we have any.                          */
 		if (!empty($snortcfg['rulesets'])) {
 			foreach (explode("||", $snortcfg['rulesets']) as $file) {
-				if (file_exists("{$snortdir}/rules/" . $file))
+				if (file_exists("{$snortdir}/rules/{$file}"))
 					$enabled_files[] = "{$snortdir}/rules/{$file}";
 			}
 
@@ -1736,7 +1736,7 @@ function snort_prepare_rule_files($snortcfg, $snortcfgdir) {
 		/* Remove any existing rules files (except custom rules) prior to building a new set. */
 		foreach (glob("{$snortcfgdir}/rules/*.rules") as $file) {
 			$tmpfile = basename($file);
-			if (in_array($tmpfile, $enabled_files))
+			if (in_array("{$snortdir}/rules/{$tmpfile}", $enabled_files))
 				continue;
 			if (basename($tmpfile, ".rules") != "custom")
 				@unlink($file);
@@ -2187,7 +2187,8 @@ EOD;
 						@copy("/usr/local/lib/snort/dynamicpreprocessor/{$preproclib}.so", "{$snort_dirs['dynamicpreprocessor']}/{$preproclib}.so");
 						$snort_preprocessors .= $$preproc;
 						$snort_preprocessors .= "\n";
-					}
+					} else
+						log_error("Could not find the {$preproclib} file. Snort might error out!");
 				} else {
 					$snort_preprocessors .= $$preproc;
 					$snort_preprocessors .= "\n";
