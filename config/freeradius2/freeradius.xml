@@ -419,6 +419,12 @@
 			<type>input</type>
 		</field>
 		<field>
+			<fielddescr>Accounting Interim Interval</fielddescr>
+			<fieldname>varusersacctinteriminterval</fieldname>			
+			<description><![CDATA[Enter the seconds which should be between every interim-update. It MUST be more than 60s and SHOULD NOT be less than 600s. (Default: 600)]]></description>
+			<type>input</type>
+		</field>
+		<field>
 			<name>ADVANCED CONFIGURATION</name>
 			<type>listtopic</type>
 		</field>
