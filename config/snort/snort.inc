@@ -147,8 +147,13 @@ function snort_build_list($snortcfg, $listname = "", $whitelist = false) {
 		$home_net .= "{$snortip} ";
 	if (function_exists('get_interface_ipv6')) {
 		$snortip = get_interface_ipv6($snortcfg['interface']);
-		if (is_ipaddrv6($snortip))
-			$home_net .= "{$snortip} ";
+		if (is_ipaddrv6($snortip)) {
+			if ($whitelist === false) {
+				$sn = get_interface_subnet($int);
+				$home_net .= "{$subnet}/{$sn} ";
+			} else
+				$home_net .= "{$subnet} ";
+		}
 	}
 		
 	/*  iterate through interface list and write out whitelist items
