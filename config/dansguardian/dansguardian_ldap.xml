@@ -8,7 +8,7 @@
 /*
     dansguardian_ldap.xml
     part of pfSense (http://www.pfSense.com)
-    Copyright (C) 2012 Marcello Coutinho
+    Copyright (C) 2012-2013 Marcello Coutinho
     
     All rights reserved.                                                      
 */
@@ -17,7 +17,7 @@
     Redistribution and use in source and binary forms, with or without
     modification, are permitted provided that the following conditions are met:
 
-     1. Redistributions of source code must retain the above copyright notice,
+     1. Redistributions of source code MUST retain the above copyright notice,
         this list of conditions and the following disclaimer.
 
      2. Redistributions in binary form must reproduce the above copyright
@@ -63,8 +63,8 @@
 			<url>/pkg_edit.php?xml=dansguardian_blacklist.xml&amp;id=0</url>
 		</tab>
 		<tab>
-			<text>Access Lists</text>
-			<url>/pkg_edit.php?xml=dansguardian_antivirus_acl.xml&amp;id=0</url>
+			<text>ACLs</text>
+			<url>/pkg.php?xml=dansguardian_site_acl.xml</url>
 		</tab>
 		<tab>
 			<text>LDAP</text>
@@ -88,7 +88,7 @@
 			<url>/pkg_edit.php?xml=dansguardian_log.xml&amp;id=0</url>
 		</tab>
 		<tab>
-			<text>XMLRPC Sync</text>
+			<text>Sync</text>
 			<url>/pkg_edit.php?xml=dansguardian_sync.xml&amp;id=0</url>
 		</tab>
 		<tab>
@@ -109,7 +109,8 @@
 		<columnitem>
 			<fielddescr>username</fielddescr>
 			<fieldname>username</fieldname>
-		</columnitem>	
+		</columnitem>
+		<movable>on</movable>
 	</adddeleteeditpagefields>
 	<fields>
 	<field>
@@ -132,7 +133,7 @@
 	</field>
 	<field>
 		<fielddescr>Username</fielddescr>
-		<description><![CDATA[Username Example:<strong>cn=antispam,cn=Users</strong>]]></description>
+		<description><![CDATA[Username Example:<strong>cn=antispam,cn=Users OR username@mysite.com</strong>]]></description>
 		<fieldname>username</fieldname>
 		<type>input</type>
 		<size>25</size>

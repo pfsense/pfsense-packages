@@ -53,16 +53,16 @@ include("head.inc");
 		<?php
 	$tab_array = array();
 	$tab_array[] = array(gettext("Daemon"), false, "/pkg_edit.php?xml=dansguardian.xml&id=0");
-	$tab_array[] = array(gettext("General"), false, "/pkg_edit.php?xml=dansguardian_general.xml&id=0");
+	$tab_array[] = array(gettext("General"), false, "/pkg_edit.php?xml=dansguardian_config.xml&id=0");
 	$tab_array[] = array(gettext("Limits"), false, "/pkg_edit.php?xml=dansguardian_limits.xml&id=0");
 	$tab_array[] = array(gettext("Blacklist"), false, "/pkg_edit.php?xml=dansguardian_blacklist.xml&id=0");
-	$tab_array[] = array(gettext("Access Lists"), false, "/pkg_edit.php?xml=dansguardian_antivirus.xml&id=0");
+	$tab_array[] = array(gettext("ACLs"), false, "/pkg.php?xml=dansguardian_site_acl.xml");
 	$tab_array[] = array(gettext("LDAP"), false, "/pkg.php?xml=dansguardian_ldap.xml&id=0");
 	$tab_array[] = array(gettext("Groups"), false, "/pkg.php?xml=dansguardian_groups.xml&id=0");
-	$tab_array[] = array(gettext("Users"), false, "/pkg.php?xml=dansguardian_users.xml&id=0");
-	$tab_array[] = array(gettext("IPs"), false, "/pkg.php?xml=dansguardian_ips.xml&id=0");
+	$tab_array[] = array(gettext("Users"), false, "/pkg_edit.php?xml=dansguardian_users.xml&id=0");
+	$tab_array[] = array(gettext("IPs"), false, "/pkg_edit.php?xml=dansguardian_ips.xml&id=0");
 	$tab_array[] = array(gettext("Report and Log"), false, "/pkg_edit.php?xml=dansguardian_log.xml&id=0");
-	$tab_array[] = array(gettext("XMLRPC Sync"), false, "/pkg_edit.php?xml=dansguardian_sync.xml&id=0");
+	$tab_array[] = array(gettext("Sync"), false, "/pkg_edit.php?xml=dansguardian_sync.xml&id=0");
 	$tab_array[] = array(gettext("Help"), true, "/dansguardian_about.php");
 	display_top_tabs($tab_array);
 ?>

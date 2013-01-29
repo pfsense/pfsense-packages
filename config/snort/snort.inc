@@ -147,8 +147,13 @@ function snort_build_list($snortcfg, $listname = "", $whitelist = false) {
 		$home_net .= "{$snortip} ";
 	if (function_exists('get_interface_ipv6')) {
 		$snortip = get_interface_ipv6($snortcfg['interface']);
-		if (is_ipaddrv6($snortip))
-			$home_net .= "{$snortip} ";
+		if (is_ipaddrv6($snortip)) {
+			if ($whitelist === false) {
+				$sn = get_interface_subnet($int);
+				$home_net .= "{$subnet}/{$sn} ";
+			} else
+				$home_net .= "{$subnet} ";
+		}
 	}
 		
 	/*  iterate through interface list and write out whitelist items
@@ -446,17 +451,11 @@ function snort_postinstall() {
 	if (file_exists('/usr/local/lib/snort/dynamicpreprocessor/lib_sfdynamic_preprocessor_example.so'))
 		exec('/bin/rm /usr/local/lib/snort/dynamicpreprocessor/lib_sfdynamic_preprocessor_example*');
 
-	/*
-	mwexec("/usr/sbin/chown -R snort:snort /var/log/snort", true);
-	mwexec("/usr/sbin/chown -R snort:snort {$snortdir}", true);
-	mwexec('/usr/sbin/chown -R snort:snort /usr/local/lib/snort', true);
-	mwexec('/usr/sbin/chown snort:snort /tmp/snort*', true);
-	*/
-
 	/* remake saved settings */
 	if ($config['installedpackages']['snortglobal']['forcekeepsettings'] == 'on') {
 		update_status(gettext("Saved settings detected..."));
 		update_output_window(gettext("Please wait... rebuilding files..."));
+		@include_once("/usr/local/pkg/snort/snort_check_for_rule_updates.php");
 		sync_snort_package_config();
 		update_output_window(gettext("Finnished Rebuilding files..."));
 	}

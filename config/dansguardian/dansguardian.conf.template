@@ -30,7 +30,7 @@
 
 #create dansguardian.conf
 	$dg=<<<EOF
-# DansGuardian config file for version 2.12.0.0
+# DansGuardian config file for version 2.12.0.2
 
 # **NOTE** as of version 2.7.5 most of the list files are now in dansguardianf1.conf
 
@@ -52,7 +52,7 @@ reportinglevel = {$reportlevel}
 # and easier to customise the access denied page.
 # The language file is used no matter what setting however.
 #
-languagedir = '/usr/local/share/dansguardian/languages'
+languagedir = '{$dg_dir}/share/dansguardian/languages'
 
 # language to use from languagedir.
 language = '{$reportlanguage}'
@@ -131,6 +131,8 @@ proxyip = {$proxyip}
 # the port DansGuardian connects to proxy on
 proxyport = {$proxyport}
 
+proxytimeout = {$proxytimeout}
+
 # Whether to retrieve the original destination IP in transparent proxy
 # setups and check it against the domain pulled from the HTTP headers.
 #
@@ -178,7 +180,7 @@ nonstandarddelimiter = {$nonstandarddelimiter}
 # icons from banned domains.
 # on (default) | off
 usecustombannedimage = {$usecustombannedimage}
-custombannedimagefile = '/usr/local/share/dansguardian/transparent1x1.gif'
+custombannedimagefile = '{$dg_dir}/share/dansguardian/transparent1x1.gif'
 
 
 #Banned flash replacement
@@ -194,18 +196,18 @@ usecustombannedflash = {$usecustombannedflash}
 # to a group.  The more filter groups the more copies of the lists will be in RAM so
 # use as few as possible.
 filtergroups = {$filtergroups}
-filtergroupslist = '/usr/local/etc/dansguardian/lists/filtergroupslist'
+filtergroupslist = '{$dansguardian_dir}/lists/filtergroupslist'
 
 
 
 # Authentication files location
-bannediplist = '/usr/local/etc/dansguardian/lists/bannediplist'
-exceptioniplist = '/usr/local/etc/dansguardian/lists/exceptioniplist'
+bannediplist = '{$dansguardian_dir}/lists/bannediplist'
+exceptioniplist = '{$dansguardian_dir}/lists/exceptioniplist'
 
 # Per-Room blocking definition directory
 # A directory containing text files containing the room's name followed by IPs or ranges
 # Think of it as bannediplist on crack
-perroomblockingdirectory = '/usr/local/etc/dansguardian/lists/bannedrooms/'
+perroomblockingdirectory = '{$dansguardian_dir}/lists/bannedrooms/'
 
 # Show weighted phrases found
 # If enabled then the phrases found that made up the total which excedes
@@ -475,9 +477,9 @@ trickledelay = {$trickledelay}
 # one is forced to match as the default, regardless of user agent
 # and other matching mechanisms.
 #
-downloadmanager = '/usr/local/etc/dansguardian/downloadmanagers/fancy.conf'
-##!! Not compiled !! downloadmanager = '/usr/local/etc/dansguardian/downloadmanagers/trickle.conf'
-downloadmanager = '/usr/local/etc/dansguardian/downloadmanagers/default.conf'
+downloadmanager = '{$dansguardian_dir}/downloadmanagers/fancy.conf'
+##!! Not compiled !! downloadmanager = '{$dansguardian_dir}/downloadmanagers/trickle.conf'
+downloadmanager = '{$dansguardian_dir}/downloadmanagers/default.conf'
 
 
 
@@ -523,11 +525,11 @@ contentscanexceptions = {$contentscanexceptions}
 #
 # If you do not use multiple filter groups, you need not specify this option.
 #
-#authplugin = '/usr/local/etc/dansguardian/authplugins/proxy-basic.conf'
-#authplugin = '/usr/local/etc/dansguardian/authplugins/proxy-digest.conf'
-#authplugin = '/usr/local/etc/dansguardian/authplugins/proxy-ntlm.conf'
-#authplugin = '/usr/local/etc/dansguardian/authplugins/ident.conf'
-#authplugin = '/usr/local/etc/dansguardian/authplugins/ip.conf'
+#authplugin = '{$dansguardian_dir}/authplugins/proxy-basic.conf'
+#authplugin = '{$dansguardian_dir}/authplugins/proxy-digest.conf'
+#authplugin = '{$dansguardian_dir}/authplugins/proxy-ntlm.conf'
+#authplugin = '{$dansguardian_dir}/authplugins/ident.conf'
+#authplugin = '{$dansguardian_dir}/authplugins/ip.conf'
 {$authplugin}
 
 

@@ -432,6 +432,13 @@ if (is_array($arrusers) && !empty($arrusers)) {
 	$varusersmaxbandwidthdown = ($users['varusersmaxbandwidthdown']?$users['varusersmaxbandwidthdown']:'');
 	$varusersmaxbandwidthdown = $varusersmaxbandwidthdown * 1024;
 	
+	// Accounting-Interim-Interval - Must not be smaller than 60 and should be bigger than 600s
+	if (($users['varusersacctinteriminterval'] >= '0') && ($users['varusersacctinteriminterval'] < '60')) {
+		$varusersacctinteriminterval = 60;
+	} else {
+		$varusersacctinteriminterval = $users['varusersacctinteriminterval'];
+	}
+	
 	// Clear variables for next user foreach additional options TOP
 	$varuserstopadditionaloptions = '';
 	$varusersadditionaloptionstop = '';
@@ -542,6 +549,10 @@ if (is_array($arrusers) && !empty($arrusers)) {
 		if ($varusersreplyitem != '') { $varusersreplyitem .=","; }
 		$varusersreplyitem .= "\n\tWISPr-Bandwidth-Max-Down := $varusersmaxbandwidthdown";
 	}
+	if ($varusersacctinteriminterval != '') {
+		if ($varusersreplyitem != '') { $varusersreplyitem .=","; }
+		$varusersreplyitem .= "\n\tAcct-Interim-Interval := $varusersacctinteriminterval";
+	}
 	if ($varuserswisprredirectionurl != '') {
 		if ($varusersreplyitem != '') { $varusersreplyitem .=","; }
 		$varusersreplyitem .= "\n\tWISPr-Redirection-URL := $varuserswisprredirectionurl";
@@ -628,6 +639,15 @@ if (is_array($arrmacs) && !empty($arrmacs)) {
 	$varmacsmaxbandwidthup = $varmacsmaxbandwidthup * 1024;
 	$varmacsmaxbandwidthdown = ($macs['varmacsmaxbandwidthdown']?$macs['varmacsmaxbandwidthdown']:'');
 	$varmacsmaxbandwidthdown = $varmacsmaxbandwidthdown * 1024;
+	
+		
+	// Accounting-Interim-Interval
+	if (($users['varmacsacctinteriminterval'] >= '0') && ($users['varmacsacctinteriminterval'] < '60')) {
+		$varmacsacctinteriminterval = 60;
+	} else {
+		$varmacsacctinteriminterval = $users['varmacsacctinteriminterval'];
+	}
+	
 	
 	// Clear variables for next mac foreach additional options TOP
 	$varmacstopadditionaloptions = '';
@@ -722,6 +742,10 @@ if (is_array($arrmacs) && !empty($arrmacs)) {
 	if ($varmacsmaxbandwidthdown != '') {
 		if ($varmacsreplyitem != '') { $varmacsreplyitem .=","; }
 		$varmacsreplyitem .= "\n\tWISPr-Bandwidth-Max-Down := $varmacsmaxbandwidthdown";
+	}
+	if ($varmacsacctinteriminterval != '') {
+		if ($varmacsreplyitem != '') { $varmacsreplyitem .=","; }
+		$varmacsreplyitem .= "\n\tAcct-Interim-Interval := $varmacsacctinteriminterval";
 	}
 	if ($varmacswisprredirectionurl != '') {
 		if ($varmacsreplyitem != '') { $varmacsreplyitem .=","; }

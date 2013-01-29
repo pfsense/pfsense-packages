@@ -29,7 +29,7 @@
 */
 
 $dgf= <<<EOF
-# DansGuardian filter group config file for version 2.12.0.0
+# DansGuardian filter group config file for version 2.12.0
 
 
 # Filter group mode

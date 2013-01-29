@@ -474,7 +474,7 @@
 			<ports_after>security/barnyard2</ports_after>
 		</build_pbi>
 		<!-- Use both styles for now, since our snort port isn't yet optionsng, but barnyard2 and others are. -->
-		<build_options>barnyard2_UNSET=ODBC PGSQL PRELUDE;barnyard2_SET=GRE IPV6 MPLS MYSQL;snort_UNSET=TARGETBASED;snort_SET=DECODERPRE FLEXRESP3 GRE IPV6 MPLS NORMALIZER PERFPROFILE REACT SNORTSAM ZLIB;perl_SET=THREADS;WITH_THREADS=yes;WITH_IPV6=true;WITH_MPLS=true;WITH_GRE=true;WITHOUT_TARGETBASED=true;WITH_DECODERPRE=true;WITH_ZLIB=true;WITH_NORMALIZER=true;WITH_REACT=true;WITH_PERFPROFILE=true;WITH_FLEXRESP3=true;WITH_MYSQL=true;WITHOUT_ODBC=true;WITHOUT_POSTGRESQL=true;WITHOUT_PRELUDE=true;WITH_SNORTSAM=true;NOPORTDOCS=true</build_options>
+		<build_options>barnyard2_UNSET=ODBC PGSQL PRELUDE;barnyard2_SET=GRE IPV6 MPLS MYSQL;snort_UNSET=TARGETBASED;snort_SET=DECODERPRE FLEXRESP3 GRE IPV6 MPLS NORMALIZER PERFPROFILE REACT SNORTSAM ZLIB;perl_SET=THREADS;WITH_THREADS=yes;WITH_IPV6=true;WITH_MPLS=true;WITH_GRE=true;WITHOUT_TARGETBASED=true;WITH_DECODERPRE=true;WITH_ZLIB=true;WITH_NORMALIZER=true;WITH_REACT=true;WITH_FLEXRESP3=true;WITHOUT_ODBC=true;WITHOUT_POSTGRESQL=true;WITHOUT_PRELUDE=true;WITH_SNORTSAM=true;NOPORTDOCS=true</build_options>
 		<config_file>http://www.pfsense.com/packages/config/snort/snort.xml</config_file>
 		<version>2.9.2.3 pkg v. 2.5.4</version>
 		<required_version>2.0</required_version>
@@ -511,7 +511,8 @@
 			<port>security/snort</port>
 			<ports_after>security/barnyard2</ports_after>
 		</build_pbi>
-		<build_options>WITH_THREADS=yes;WITH_IPV6=true;WITH_MPLS=true;WITH_GRE=true;WITHOUT_TARGETBASED=true;WITH_DECODERPRE=true;WITH_ZLIB=true;WITH_NORMALIZER=true;WITH_REACT=true;WITH_PERFPROFILE=true;WITH_FLEXRESP3=true;WITH_MYSQL=true;WITHOUT_ODBC=true;WITHOUT_POSTGRESQL=true;WITHOUT_PRELUDE=true;WITH_SNORTSAM=true;NOPORTDOCS=true</build_options>
+		<!-- Use both styles for now, since our snort port isn't yet optionsng, but barnyard2 and others are. -->
+		<build_options>barnyard2_UNSET=ODBC PGSQL PRELUDE;barnyard2_SET=GRE IPV6 MPLS MYSQL;snort_UNSET=TARGETBASED;snort_SET=DECODERPRE FLEXRESP3 GRE IPV6 MPLS NORMALIZER PERFPROFILE REACT SNORTSAM ZLIB;perl_SET=THREADS;WITH_THREADS=yes;WITH_IPV6=true;WITH_MPLS=true;WITH_GRE=true;WITHOUT_TARGETBASED=true;WITH_DECODERPRE=true;WITH_ZLIB=true;WITH_NORMALIZER=true;WITH_REACT=true;WITH_FLEXRESP3=true;WITHOUT_ODBC=true;WITHOUT_POSTGRESQL=true;WITHOUT_PRELUDE=true;WITH_SNORTSAM=true;NOPORTDOCS=true</build_options>
 		<config_file>http://www.pfsense.com/packages/config/snort-dev/snort.xml</config_file>
 		<version>2.9.2.3 pkg v. 3.0</version>
 		<required_version>2.0</required_version>
@@ -584,16 +585,16 @@
 		<category>Services</category>
 		<config_file>http://www.pfsense.com/packages/config/dansguardian/dansguardian.xml</config_file>
 		<pkginfolink>http://forum.pfsense.org/index.php/topic,43786.0.html</pkginfolink>
-		<depends_on_package_base_url>http://e-sac.siteseguro.ws/packages/amd64/8/All/</depends_on_package_base_url>
-		<depends_on_package>dansguardian-2.12.0.0.tbz</depends_on_package>
-		<depends_on_package>clamav-0.97.3_1.tbz</depends_on_package>
-		<depends_on_package>ca_root_nss-3.13.3.tbz</depends_on_package>
-		<depends_on_package_pbi>dansguardian-2.12.0.0_2-amd64.pbi</depends_on_package_pbi>
-		<version>2.12.0.0 pkg v.0.1.6_1</version>
+		<depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
+		<depends_on_package>dansguardian-2.12.0.3.tbz</depends_on_package>
+		<depends_on_package>ca_root_nss-3.14.1.tbz</depends_on_package>
+		<depends_on_package_pbi>dansguardian-2.12.0.3-amd64.pbi</depends_on_package_pbi>
+		<version>2.12.0.3 pkg v.0.1.7</version>
 		<status>beta</status>
 		<required_version>2.0</required_version>
 		<configurationfile>dansguardian.xml</configurationfile>
 		<build_port_path>/usr/ports/www/dansguardian-devel</build_port_path>
+		<build_port_path>/usr/ports/www/ca_root_nss</build_port_path>
 		<build_options>dansguardian-devel_UNSET=APACHE;dansguardian-devel_SET=TRICKLE CLAMD ICAP NTLM SSL</build_options>
 		<!-- NOTE: Distfile must be fetched manually from http://dansguardian.org/downloads/2/Alpha/dansguardian-2.12.0.0.tar.gz -->
 	</package>
@@ -1378,7 +1379,7 @@
 		<depends_on_package_pbi>p7zip-9.20.1-amd64.pbi zip-3.0-amd64.pbi</depends_on_package_pbi>
 		<build_port_path>/usr/ports/archivers/p7zip</build_port_path>
 		<build_port_path>/usr/ports/archivers/zip</build_port_path>
-		<version>1.0.1</version>
+		<version>1.0.2</version>
 		<status>RELEASE</status>
 		<required_version>2.0</required_version>
 		<config_file>http://www.pfsense.com/packages/config/openvpn-client-export/openvpn-client-export.xml</config_file>
@@ -1780,7 +1781,7 @@
 		<descr>Monitoring agent.</descr>
 		<category>Services</category>
 		<config_file>http://www.pfsense.org/packages/config/zabbix2-agent/zabbix2-agent.xml</config_file>
-		<version>zabbix2-agent-2.0.4 pkg v0.3</version>
+		<version>zabbix2-agent-2.0.4 pkg v0.5</version>
 		<status>BETA</status>
 		<required_version>2.0</required_version>
 		<configurationfile>zabbix2-agent.xml</configurationfile>
@@ -1799,7 +1800,7 @@
 		<descr>Monitoring agent proxy.</descr>
 		<category>Services</category>
 		<config_file>http://www.pfsense.org/packages/config/zabbix2-proxy/zabbix2-proxy.xml</config_file>
-		<version>zabbix2-proxy-2.0.4 pkg v0.4</version>
+		<version>zabbix2-proxy-2.0.4 pkg v0.5</version>
 		<status>BETA</status>
 		<required_version>2.0</required_version>
 		<configurationfile>zabbix2-proxy.xml</configurationfile>

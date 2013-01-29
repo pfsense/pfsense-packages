@@ -8,7 +8,7 @@
 /*
     dansguardian_ldap.php
     part of pfSense (http://www.pfSense.com)
-    Copyright (C) 2012 Marcello Coutinho
+    Copyright (C) 2012-2013 Marcello Coutinho
     
     All rights reserved.                                                      
 */
@@ -17,7 +17,7 @@
     Redistribution and use in source and binary forms, with or without
     modification, are permitted provided that the following conditions are met:
 
-     1. Redistributions of source code must retain the above copyright notice,
+     1. Redistributions of source code MUST retain the above copyright notice,
         this list of conditions and the following disclaimer.
 
      2. Redistributions in binary form must reproduce the above copyright
@@ -107,7 +107,13 @@ if (is_array($config['installedpackages']['dansguardiangroups']['config']))
 		   				$ldap_dn = $server['dn'];
 		   				$ldap_host=$server['dc'];
 		   				$mask=(empty($server['mask'])?"USER":$server['mask']);
-				   		$result = get_ldap_members($group['name'],$server['username'].','.$server['dn'],$server['password']);
+		   				if (preg_match("/cn/",$server['username']))
+		   					$ldap_username=$server['username'].",".$server['dn'];
+		   				else
+		   					$ldap_username=$server['username'];
+		   				#$domainuser=split("cn=",$server['username']);
+		   				#$ldap_username=preg_replace("/,\./","@",$domainuser[1].preg_replace("/(,|)DC=/i",".",$server['dn']));
+				   		$result = get_ldap_members($group['name'],$ldap_username,$server['password']);
 		   				foreach($result as $key => $value) {
 			    			if (preg_match ("/\w+/",$value[0])){
 			    				#var_dump($value);

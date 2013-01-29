@@ -9,7 +9,7 @@
 /*
     dansguardian.xml
     part of the dansguardian for pfSense
-    Copyright (C) 2012 Marcello Coutinho
+    Copyright (C) 2012-2013 Marcello Coutinho
 
     All rights reserved.            
 			                                                                  */
@@ -18,7 +18,7 @@
     Redistribution and use in source and binary forms, with or without
     modification, are permitted provided that the following conditions are met:
 
-     1. Redistributions of source code must retain the above copyright notice,
+     1. Redistributions of source code MUST retain the above copyright notice,
         this list of conditions and the following disclaimer.
 
      2. Redistributions in binary form must reproduce the above copyright
@@ -188,11 +188,6 @@
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0755</chmod>
 	</additional_files_needed>
-	<additional_files_needed>
-		<item>http://www.pfsense.org/packages/config/dansguardian/blockedflash.swf</item>
-		<prefix>/usr/local/share/dansguardian/</prefix>
-		<chmod>0755</chmod>
-	</additional_files_needed>
 	<tabs>
 		<tab>
 			<text>Daemon</text>
@@ -212,8 +207,8 @@
 			<url>/pkg_edit.php?xml=dansguardian_blacklist.xml&amp;id=0</url>
 		</tab>
 		<tab>
-			<text>Access Lists</text>
-			<url>/pkg_edit.php?xml=dansguardian_antivirus_acl.xml&amp;id=0</url>
+			<text>ACLs</text>
+			<url>/pkg.php?xml=dansguardian_site_acl.xml</url>
 		</tab>
 		<tab>
 			<text>LDAP</text>
@@ -236,7 +231,7 @@
 			<url>/pkg_edit.php?xml=dansguardian_log.xml&amp;id=0</url>
 		</tab>
 		<tab>
-			<text>XMLRPC Sync</text>
+			<text>Sync</text>
 			<url>/pkg_edit.php?xml=dansguardian_sync.xml&amp;id=0</url>
 		</tab>
 		<tab>
@@ -258,7 +253,8 @@
 		<field>
 			<fielddescr>Listen Interface(s)</fielddescr>
 			<fieldname>interface</fieldname>
-			<description><![CDATA[Default: <strong>LAN/loopback</strong><br>Select interface(s) that you want to dansguardian listen on.]]></description>
+			<description><![CDATA[Default: <strong>LAN/loopback</strong><br>Select interface(s) that you want to dansguardian listen on.<br>
+						<strong>Note: Do NOT select more then one interface if you plan to use more then one authentication plugin.</strong>]]></description>
 			<type>interfaces_selection</type>
 			<required/>
 			<multiple/>
@@ -349,10 +345,28 @@
 			<description><![CDATA[Default: <strong>3128</strong><br>
 			 				Sets port number for proxy server.]]></description>
 		</field>
-
+		<field>
+			<fielddescr>Proxy Time out</fielddescr>
+			<fieldname>proxytimeout</fieldname>
+			<description><![CDATA[This option handle max time to wait for proxy server.]]></description>
+	    	<type>select</type>
+ 				<options>
+ 				<option><name>30 seconds (default)</name><value>30</value></option>
+ 				<option><name>20 seconds</name><value>20</value></option>
+ 				<option><name>40 seconds</name><value>40</value></option>
+ 				<option><name>50 seconds</name><value>50</value></option>
+ 				<option><name>60 seconds</name><value>60</value></option>
+ 				<option><name>70 seconds</name><value>70</value></option>
+ 				<option><name>80 seconds</name><value>80</value></option>
+ 				<option><name>90 seconds</name><value>90</value></option>
+ 				<default_value>30</default_value>
+ 				</options>
+		</field>
 	</fields>
 	<custom_php_install_command>
-		dansguardian_php_install_command();
+		update_status("Checking Dansguardian Blacklists... One moment please...");
+		update_output_window("This operation may take quite some time, please be patient.  Do not press stop or attempt to navigate away from this page during this process.");
+		dansguardian_php_install_command(false,true);
 	</custom_php_install_command>
 	<custom_php_deinstall_command>
 		dansguardian_php_deinstall_command();
