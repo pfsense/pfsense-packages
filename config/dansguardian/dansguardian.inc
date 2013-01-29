@@ -2,13 +2,13 @@
 /*
 	dansguardian.inc
 	part of the Dansguardian package for pfSense
-	Copyright (C) 2012 Marcello Coutinho
+	Copyright (C) 2012-2013 Marcello Coutinho
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
 	modification, are permitted provided that the following conditions are met:
 
-	1. Redistributions of source code must retain the above copyright notice,
+	1. Redistributions of source code MUST retain the above copyright notice,
 	   this list of conditions and the following disclaimer.
 
 	2. Redistributions in binary form must reproduce the above copyright
@@ -90,7 +90,7 @@ function check_ca_hashes(){
 		}
 }
 
-function sync_package_dansguardian($via_rpc=false) {
+function sync_package_dansguardian($via_rpc=false,$install_process=false) {
 	global $config,$g;
 
 	# detect boot process
@@ -136,7 +136,7 @@ function sync_package_dansguardian($via_rpc=false) {
 	#daemon options
 	$dansguardian_enabled=$dansguardian['enable_dg'];
 	$filterport=($dansguardian['filterports']?$dansguardian['filterports']:"8080");
-	$softrestart=(preg_match('/softrestart/',$dansguardian['daemon_options'])?"yes":"no");
+	$softrestart=(preg_match('/softrestart/',$dansguardian['daemon_options'])?"on":"off");
 	$nodaemon=(preg_match('/nodaemon/',$dansguardian['daemon_options'])?"yes":"off");
 	if (preg_match("/(\d+)\/(\d+)/",$dansguardian['children'],$matches)){
 		$minchildren=$matches[1];
@@ -159,6 +159,7 @@ function sync_package_dansguardian($via_rpc=false) {
 	$preforkchildren=($dansguardian['preforkchildren']?$dansguardian['preforkchildren']:"10");
 	$proxyip=($dansguardian['proxyip']?$dansguardian['proxyip']:"127.0.0.1");
 	$proxyport=($dansguardian['proxyport']?$dansguardian['proxyport']:"127.0.0.1");
+	$proxytimeout=($dansguardian['proxytimeout']?$dansguardian['proxytimeout']:"30");
 	
 	#general options
 	$urlcachenumber=($dansguardian_config['urlcachenumber']?$dansguardian_config['urlcachenumber']:"1000");
@@ -184,13 +185,14 @@ function sync_package_dansguardian($via_rpc=false) {
 	$recheckreplacedurls=(preg_match('/icapscan/',$dansguardian_config['misc_options'])?"on":"off");
 	$usexforwardedfor=(preg_match('/usexforwardedfor/',$dansguardian_config['misc_options'])?"on":"off");
 	$authplugin=(preg_match('/usr/',$dansguardian_config['auth_plugin'])?"authplugin = '".$dansguardian_config['auth_plugin']."'":"");
-	/*if ($dansguardian_config['auth_plugin']!=""){
+	if ($dansguardian_config['auth_plugin']!=""){
 		$auth_plugins=explode(",",$dansguardian_config['auth_plugin']);
 		$authplugin="";
 		foreach ($auth_plugins as $auth_selected)
-			$authplugin.="authplugin = '".$auth_selected."'\n";
+			if ($auth_selected != "none")
+				$authplugin.="authplugin = '".preg_replace("@/usr/local@",DANSGUARDIAN_DIR,$auth_selected)."'\n";
 	}
-	*/
+	
 	#limits
 	$maxuploadsize=($dansguardian_limits['maxuploadsize']?$dansguardian_limits['maxuploadsize']:"-1");
 	$maxcontentfiltersize=($dansguardian_limits['maxcontentfiltersize']?$dansguardian_limits['maxcontentfiltersize']:"256");
@@ -214,8 +216,8 @@ function sync_package_dansguardian($via_rpc=false) {
 	$reportlanguage=($dansguardian_log['report_language']?$dansguardian_log['report_language']:"ukenglish");
 	$showweightedfound=(preg_match('/showweightedfound/',$dansguardian_log['report_options'])?"on":"off");
 	$usecustombannedflash=(preg_match('/usecustombannedflash/',$dansguardian_log['report_options'])?"on":"off");
-	if (file_exists('/usr/local/share/dansguardian/blockedflash.swf'))
-		$custombannedflashfile="custombannedflashfile = '/usr/local/share/dansguardian/blockedflash.swf'";
+	if (file_exists(DANSGUARDIAN_DIR.'/share/dansguardian/blockedflash.swf'))
+		$custombannedflashfile="custombannedflashfile = '".DANSGUARDIAN_DIR."/share/dansguardian/blockedflash.swf'";
 	$usecustombannedimage=(preg_match('/usecustombannedimage/',$dansguardian_log['report_options'])?"on":"off");
 	$nonstandarddelimiter=(preg_match('/nonstandarddelimiter/',$dansguardian_log['report_options'])?"on":"off");
 	
@@ -317,7 +319,7 @@ function sync_package_dansguardian($via_rpc=false) {
 	$match[1]="/(\/usr.local)/";
 	$match[2]="/,/";
 	$replace[0]="$1'";
-	$replace[1]="contentscanner = '$1";
+	$replace[1]="contentscanner = '".DANSGUARDIAN_DIR;
 	$replace[2]="\n";
 	
 	$contentscanners=preg_replace($match,$replace,$dansguardian_config['content_scanners']);
@@ -327,7 +329,7 @@ function sync_package_dansguardian($via_rpc=false) {
 	$match[1]="/\/usr.local/";
 	$match[2]="/,/";
 	$replace[0]="$1>\n";
-	$replace[1]="\n.Include</usr/local";
+	$replace[1]="\n.Include<".DANSGUARDIAN_DIR;
 	$replace[2]=">";
 
 	#phrase ACL
@@ -909,27 +911,32 @@ EOF;
 		file_put_contents("/usr/local/share/dansguardian/languages/".$reportlanguage."/template.html",dg_text_area_decode($dansguardian_log['report_file']),LOCK_EX);
 	
 	#check blacklist download files
-	if ($dansguardian_blacklist['cron']=="force_download"){
-		log_error("Blacklist udpate process started");
-		file_notice("Dansguardian - Blacklist udpate process started","");
-		file_put_contents("/root/dansguardian_custom.script",base64_decode($dansguardian_blacklist['custom_script']),LOCK_EX);
-		if ($dansguardian_blacklist['enable_custom_script'] && $dansguardian_blacklist['custom_script'] != "")
-			mwexec_bg("/root/dansguardian_custom.script");
-		else
-			mwexec_bg("/usr/local/bin/php /usr/local/www/dansguardian.php fetch_blacklist");
+	if ($install_process == true){
+		require_once("/usr/local/www/dansguardian.php");
+		fetch_blacklist(false);
 		}
-	#update xml categories from downloaded file
-	if ($dansguardian_blacklist['cron']=="force_update"){
-		$config['installedpackages']['dansguardianblacklist']['config'][0]['cron']="never";
-		mwexec_bg("/usr/local/bin/php /usr/local/www/dansguardian.php update_lists");
-	}
+	else{
+		if ($dansguardian_blacklist['cron']=="force_download"){
+			log_error("Blacklist udpate process started");
+			file_notice("Dansguardian - Blacklist udpate process started","");
+			file_put_contents("/root/dansguardian_custom.script",base64_decode($dansguardian_blacklist['custom_script']),LOCK_EX);
+			if ($dansguardian_blacklist['enable_custom_script'] && $dansguardian_blacklist['custom_script'] != "")
+				mwexec_bg("/root/dansguardian_custom.script");
+			else
+				mwexec_bg("/usr/local/bin/php /usr/local/www/dansguardian.php fetch_blacklist");
+			}
+		#update xml categories from downloaded file
+		if ($dansguardian_blacklist['cron']=="force_update"){
+			$config['installedpackages']['dansguardianblacklist']['config'][0]['cron']="never";
+			mwexec_bg("/usr/local/bin/php /usr/local/www/dansguardian.php update_lists");
+		}
 	
-	#Import default blacklists 
-	if (!is_array($config['installedpackages']['dansguardianblacklistsurls']['config']))
-		mwexec_bg("/usr/local/bin/php /usr/local/www/dansguardian.php update_lists");
-
+		#Import default blacklists 
+		if (!is_array($config['installedpackages']['dansguardianblacklistsurls']['config']))
+			mwexec_bg("/usr/local/bin/php /usr/local/www/dansguardian.php update_lists");
+	}
 	#get clamav user
-	$cconf="/usr/local/etc/clamd.conf";
+	$cconf= DANSGUARDIAN_DIR. "/etc/clamd.conf";
 	$cconf_file=file_get_contents($cconf);
 	if (preg_match("/User (\w+)/",$cconf_file,$matches)){
 		$daemonuser = $matches[1];
@@ -958,12 +965,12 @@ EOF;
 	$cron_found=0;
 	if (is_array($config['cron']['item']))
 		foreach($config['cron']['item'] as $cron)
-			if (preg_match("/usr.local.(bin.freshclam|www.dansguardian)/",$cron["command"]))
+			if (preg_match("@".DANSGUARDIAN_DIR."/(bin.freshclam|www/dansguardian)@",$cron["command"]))
 				$cron_found++;
 			else
 				$new_cron['item'][]=$cron;
 				
-	$cron_cmd="/usr/local/bin/freshclam";
+	$cron_cmd= DANSGUARDIAN_DIR."/bin/freshclam";
 	if($dansguardian_config['cron'] && preg_match("/clamd/",$dansguardian_config['content_scanners']))
 		switch ($dansguardian_config['cron']){
 			case "day":
@@ -1076,7 +1083,7 @@ EOF;
 		configure_cron();
 	}
 	
-	$dirs=array('/usr/local/etc/dansguardian/lists/bannedrooms/',
+	$dirs=array(DANSGUARDIAN_DIR . '/etc/dansguardian/lists/bannedrooms/',
 				'/var/log/dansguardian');
 
 	foreach ($dirs as $dir)
@@ -1084,20 +1091,20 @@ EOF;
 			mkdir ($dir,0755,true);
 	
 	#update file owner
-	mwexec("chown -R $daemonuser:$daemongroup /usr/local/etc/dansguardian");
+	mwexec("chown -R $daemonuser:$daemongroup ".DANSGUARDIAN_DIR."/etc/dansguardian");
 	mwexec("chown -R $daemonuser:$daemongroup /var/log/dansguardian");
 	
 	#create config files
 	file_put_contents($dansguardian_dir."/dansguardian.conf", $dg, LOCK_EX);
 	
 	#check virus_scanner options
-	$libexec_dir="/usr/local/libexec/dansguardian/";
+	$libexec_dir= DANSGUARDIAN_DIR."/libexec/dansguardian/";
 	if (preg_match("/clamd/",$dansguardian_config['content_scanners'])){
 			
 		if (!(file_exists('/var/db/clamav/main.cvd')||file_exists('/var/db/clamav/main.cld'))){
 			file_notice("Dansguardian - No antivirus database found for clamav, running freshclam in background.","");
 			log_error('No antivirus database found for clamav, running freshclam in background.');
-			mwexec_bg('/usr/local/bin/freshclam');
+			mwexec_bg(DANSGUARDIAN_DIR.'/bin/freshclam');
 			}
 				
 			$match=array();
@@ -1114,7 +1121,7 @@ EOF;
 				}
 			
 			#clamd conf file
-			$cconf="/usr/local/etc/clamd.conf";
+			$cconf=DANSGUARDIAN_DIR."/etc/clamd.conf";
 			$cconf_file=file_get_contents($cconf);
 			if (preg_match("/User (\w+)/",$cconf_file,$matches)){
 				#clamd script file
@@ -1215,7 +1222,7 @@ function dansguardian_validate_input($post, &$input_errors) {
 }
 
 function dansguardian_php_install_command() {
-		sync_package_dansguardian();
+		sync_package_dansguardian(false,true);
 }
 
 function dansguardian_php_deinstall_command() {

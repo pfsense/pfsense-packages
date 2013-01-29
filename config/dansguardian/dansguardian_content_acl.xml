@@ -8,7 +8,7 @@
 /*
     dansguardian_content_acl.xml
     part of pfSense (http://www.pfSense.com)
-    Copyright (C) 2012 Marcello Coutinho
+    Copyright (C) 2012-2013 Marcello Coutinho
     
     All rights reserved.                                                      
 */
@@ -17,7 +17,7 @@
     Redistribution and use in source and binary forms, with or without
     modification, are permitted provided that the following conditions are met:
 
-     1. Redistributions of source code must retain the above copyright notice,
+     1. Redistributions of source code MUST retain the above copyright notice,
         this list of conditions and the following disclaimer.
 
      2. Redistributions in binary form must reproduce the above copyright
@@ -46,46 +46,30 @@
 	<title>Services: Dansguardian - Access Lists</title>
 	<include_file>/usr/local/pkg/dansguardian.inc</include_file>
 	<tabs>
-			<tab>
-			<text>Back to Config</text>
+<tab>
+			<text>Daemon</text>
 			<url>/pkg_edit.php?xml=dansguardian.xml&amp;id=0</url>
 		</tab>
 		<tab>
-			<text>Antivirus</text>
-			<url>/pkg_edit.php?xml=dansguardian_antivirus_acl.xml&amp;id=0</url>
+			<text>General</text>
+			<url>/pkg_edit.php?xml=dansguardian_config.xml&amp;id=0</url>
 		</tab>
 		<tab>
-			<text>Pics</text>
-			<url>/pkg.php?xml=dansguardian_pics_acl.xml&amp;id=0</url>
+			<text>Limits</text>
+			<url>/pkg_edit.php?xml=dansguardian_limits.xml&amp;id=0</url>
 		</tab>
 		<tab>
-			<text>Phrase</text>
-			<url>/pkg.php?xml=dansguardian_phrase_acl.xml</url>
+			<text>Blacklist</text>
+			<url>/pkg_edit.php?xml=dansguardian_blacklist.xml&amp;id=0</url>
 		</tab>
 		<tab>
-			<text>Site</text>
+			<text>ACLs</text>
 			<url>/pkg.php?xml=dansguardian_site_acl.xml</url>
-		</tab>
-		<tab>
-			<text>URL</text>
-			<url>/pkg.php?xml=dansguardian_url_acl.xml</url>
-		</tab>
-		<tab>
-			<text>Extension</text>
-			<url>/pkg.php?xml=dansguardian_file_acl.xml</url>
-		</tab>
-		<tab>
-			<text>Content</text>
-			<url>/pkg.php?xml=dansguardian_content_acl.xml</url>
 			<active/>
 		</tab>
 		<tab>
-			<text>Header</text>
-			<url>/pkg.php?xml=dansguardian_header_acl.xml</url>
-		</tab>
-		<tab>
-			<text>Searche Engine</text>
-			<url>/pkg.php?xml=dansguardian_search_acl.xml</url>
+			<text>LDAP</text>
+			<url>/pkg.php?xml=dansguardian_ldap.xml</url>
 		</tab>
 		<tab>
 			<text>Groups</text>
@@ -94,6 +78,68 @@
 		<tab>
 			<text>Users</text>
 			<url>/pkg_edit.php?xml=dansguardian_users.xml</url>
+		</tab>
+		<tab>
+			<text>IPs</text>
+			<url>/pkg_edit.php?xml=dansguardian_ips.xml</url>
+		</tab>
+		<tab>
+			<text>Report and log</text>
+			<url>/pkg_edit.php?xml=dansguardian_log.xml&amp;id=0</url>
+		</tab>
+		<tab>
+			<text>Sync</text>
+			<url>/pkg_edit.php?xml=dansguardian_sync.xml&amp;id=0</url>
+		</tab>
+		<tab>
+			<text>Help</text>
+			<url>/dansguardian_about.php</url>
+		</tab>
+		<tab>
+			<text>Antivirus</text>
+			<url>/pkg_edit.php?xml=dansguardian_antivirus_acl.xml&amp;id=0</url>
+			<tab_level>2</tab_level>
+		</tab>
+		<tab>
+			<text>Pics</text>
+			<url>/pkg.php?xml=dansguardian_pics_acl.xml&amp;id=0</url>
+			<tab_level>2</tab_level>
+		</tab>
+		<tab>
+			<text>Phrase Lists</text>
+			<url>/pkg.php?xml=dansguardian_phrase_acl.xml</url>
+			<tab_level>2</tab_level>
+		</tab>
+		<tab>
+			<text>Site Lists</text>
+			<url>/pkg.php?xml=dansguardian_site_acl.xml</url>
+			<tab_level>2</tab_level>
+		</tab>
+		<tab>
+			<text>URL Lists</text>
+			<url>/pkg.php?xml=dansguardian_url_acl.xml</url>
+			<tab_level>2</tab_level>
+		</tab>
+		<tab>
+			<text>Extension Lists</text>
+			<url>/pkg.php?xml=dansguardian_file_acl.xml</url>
+			<tab_level>2</tab_level>
+		</tab>
+		<tab>
+			<text>Content Lists</text>
+			<url>/pkg.php?xml=dansguardian_content_acl.xml</url>
+			<tab_level>2</tab_level>
+			<active/>
+		</tab>
+		<tab>
+			<text>Header</text>
+			<url>/pkg.php?xml=dansguardian_header_acl.xml</url>
+			<tab_level>2</tab_level>
+		</tab>
+		<tab>
+			<text>Searche Engine</text>
+			<url>/pkg.php?xml=dansguardian_search_acl.xml</url>
+			<tab_level>2</tab_level>
 		</tab>
 	</tabs>
 	<adddeleteeditpagefields>
@@ -104,7 +150,8 @@
 		<columnitem>
 			<fielddescr>Description</fielddescr>
 			<fieldname>description</fieldname>
-		</columnitem>	
+		</columnitem>
+		<movable>on</movable>
 	</adddeleteeditpagefields>
 	<fields>
 		<field>
