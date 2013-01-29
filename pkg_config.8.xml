@@ -487,7 +487,7 @@
 			<ports_after>security/barnyard2</ports_after>
 		</build_pbi>
 		<!-- Use both styles for now, since our snort port isn't yet optionsng, but barnyard2 and others are. -->
-		<build_options>barnyard2_UNSET=ODBC PGSQL PRELUDE;barnyard2_SET=GRE IPV6 MPLS MYSQL;snort_UNSET=TARGETBASED;snort_SET=DECODERPRE FLEXRESP3 GRE IPV6 MPLS NORMALIZER PERFPROFILE REACT SNORTSAM ZLIB;perl_SET=THREADS;WITH_THREADS=yes;WITH_IPV6=true;WITH_MPLS=true;WITH_GRE=true;WITHOUT_TARGETBASED=true;WITH_DECODERPRE=true;WITH_ZLIB=true;WITH_NORMALIZER=true;WITH_REACT=true;WITH_PERFPROFILE=true;WITH_FLEXRESP3=true;WITH_MYSQL=true;WITHOUT_ODBC=true;WITHOUT_POSTGRESQL=true;WITHOUT_PRELUDE=true;WITH_SNORTSAM=true;NOPORTDOCS=true</build_options>
+		<build_options>barnyard2_UNSET=ODBC PGSQL PRELUDE;barnyard2_SET=GRE IPV6 MPLS MYSQL;snort_UNSET=TARGETBASED;snort_SET=DECODERPRE FLEXRESP3 GRE IPV6 MPLS NORMALIZER PERFPROFILE REACT SNORTSAM ZLIB;perl_SET=THREADS;WITH_THREADS=yes;WITH_IPV6=true;WITH_MPLS=true;WITH_GRE=true;WITHOUT_TARGETBASED=true;WITH_DECODERPRE=true;WITH_ZLIB=true;WITH_NORMALIZER=true;WITH_REACT=true;WITH_FLEXRESP3=true;WITHOUT_ODBC=true;WITHOUT_POSTGRESQL=true;WITHOUT_PRELUDE=true;WITH_SNORTSAM=true;NOPORTDOCS=true</build_options>
 		<config_file>http://www.pfsense.com/packages/config/snort/snort.xml</config_file>
 		<version>2.9.2.3 pkg v. 2.5.4</version>
 		<required_version>2.0</required_version>
@@ -524,7 +524,8 @@
 			<port>security/snort</port>
 			<ports_after>security/barnyard2</ports_after>
 		</build_pbi>
-		<build_options>WITH_THREADS=yes;WITH_IPV6=true;WITH_MPLS=true;WITH_GRE=true;WITHOUT_TARGETBASED=true;WITH_DECODERPRE=true;WITH_ZLIB=true;WITH_NORMALIZER=true;WITH_REACT=true;WITH_PERFPROFILE=true;WITH_FLEXRESP3=true;WITH_MYSQL=true;WITHOUT_ODBC=true;WITHOUT_POSTGRESQL=true;WITHOUT_PRELUDE=true;WITH_SNORTSAM=true;NOPORTDOCS=true</build_options>
+		<!-- Use both styles for now, since our snort port isn't yet optionsng, but barnyard2 and others are. -->
+		<build_options>barnyard2_UNSET=ODBC PGSQL PRELUDE;barnyard2_SET=GRE IPV6 MPLS MYSQL;snort_UNSET=TARGETBASED;snort_SET=DECODERPRE FLEXRESP3 GRE IPV6 MPLS NORMALIZER PERFPROFILE REACT SNORTSAM ZLIB;perl_SET=THREADS;WITH_THREADS=yes;WITH_IPV6=true;WITH_MPLS=true;WITH_GRE=true;WITHOUT_TARGETBASED=true;WITH_DECODERPRE=true;WITH_ZLIB=true;WITH_NORMALIZER=true;WITH_REACT=true;WITH_FLEXRESP3=true;WITHOUT_ODBC=true;WITHOUT_POSTGRESQL=true;WITHOUT_PRELUDE=true;WITH_SNORTSAM=true;NOPORTDOCS=true</build_options>
 		<config_file>http://www.pfsense.com/packages/config/snort-dev/snort.xml</config_file>
 		<version>2.9.2.3 pkg v. 3.0</version>
 		<required_version>2.0</required_version>
