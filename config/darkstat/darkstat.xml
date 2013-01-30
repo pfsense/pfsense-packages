@@ -71,37 +71,31 @@
 		</tab>
 	</tabs>
 	<fields>
-		<field>
-			<fielddescr>Interface</fielddescr>
-			<fieldname>interface_array</fieldname>
-			<type>interfaces_selection</type>
-			<size>3</size>
-			<value>lan</value>
-			<multiple>true</multiple>
-		</field>
+      <field>
+         <fielddescr>Interface</fielddescr>
+         <fieldname>interface</fieldname>
+         <description>The interface that Darkstat will bind to.</description>
+         <type>interfaces_selection</type>
+         <required/>
+         <default_value>lan</default_value>
+      </field>
     </fields>
 	<custom_php_global_functions>
 		function sync_package_darkstat() {
-			if (!is_array($_POST['interface_array']))
-				return;
+		if ($_POST['interface']) {
 			conf_mount_rw();
-			$first = 0;
-			foreach($_POST['interface_array'] as $iface) {
-				$if = convert_friendly_interface_to_real_interface_name($iface);
-				if($if) {
-					$ifaces_final .= " -i " . $if;
-					$first = 1;
-				}
-			}
-			$start = "/usr/local/sbin/darkstat" . $ifaces_final . " -p 666 ";
+			$iface = convert_friendly_interface_to_real_interface_name($_POST['interface']);
+			$start = "/usr/local/sbin/darkstat -i " . $iface . " -p 666 ";
 			write_rcfile(array(
-					"file" => "darkstat.sh",
-					"start" => $start,
-					"stop" => "/usr/bin/killall darkstat"
+				"file" => "darkstat.sh",
+				"start" => $start,
+				"stop" => "/usr/bin/killall darkstat"
 				)
 			);
 			start_service("darkstat");
 			conf_mount_ro();
+		}
+
 		}
 	</custom_php_global_functions>
 		<custom_add_php_command>

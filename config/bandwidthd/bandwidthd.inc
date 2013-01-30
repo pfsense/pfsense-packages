@@ -88,9 +88,11 @@ function bandwidthd_install_config() {
 	if($graph_cutoff)
 		$graph_cutoff = "graph_cutoff $graph_cutoff\n";
 	$skip_intervals = $config['installedpackages']['bandwidthd']['config'][0]['skipintervals'];
-	if($skip_intervals)
+	if($skip_intervals) {
 		$skip_intervals = "skip_intervals $skip_intervals\n";
-
+	} else {
+		$skip_intervals = "skip_intervals 0\n";
+	}
 	if($config['installedpackages']['bandwidthd']['config'][0]['active_interface']){
 		$ifdescrs = array($config['installedpackages']['bandwidthd']['config'][0]['active_interface']);
 	} else {
