@@ -150,11 +150,10 @@
  				<option><name>Enable Deep URL Analysis (off)</name><value>deepurlanalysis</value></option>
  				<option><name>Infection/Scan Error Bypass on Scan Errors Only (on)</name><value>infectionbypasserrorsonly</value></option>
  				<option><name>Disable content scanning (off)</name><value>disablecontentscan</value></option>
- 				<option><name>Check servers ssl certificates (off)</name><value>sslcertcheck</value></option>
  				<option><name>Filter ssl sites forging SSL Certificates (off)</name><value>sslmitm</value></option>
  				</options>
  				<multiple/>
- 				<size>10</size>
+ 				<size>9</size>
 		</field>
 		<field>
 			<fielddescr>Pics</fielddescr>

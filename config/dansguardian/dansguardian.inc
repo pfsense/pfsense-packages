@@ -301,14 +301,14 @@ function sync_package_dansguardian($via_rpc=false,$install_process=false) {
 			exec("/usr/bin/openssl x509 -hash -noout -in /etc/ssl/demoCA/cacert.pem",$cert_hash);
 			file_put_contents("/usr/local/share/certs/".$cert_hash[0].".0",base64_decode($ca_cert['crt']));
 			$ca_pem = "cacertificatepath = '/etc/ssl/demoCA/cacert.pem'";
-		$generatedcertpath= "generatedcertpath = '/etc/ssl/demoCA/certs/'";
+		$generatedcertpath= "generatedcertpath = '".$dansguardian_dir."/ssl/generatedcerts'";
 		#generatedcertpath = ".$dansguardian_dir . "/ssl/generatedcerts";
 		$generatedlinkpath= "generatedlinkpath = '".$dansguardian_dir . "/ssl/generatedlinks'";
 			}
 		$svr_cert = lookup_cert($dansguardian_config["dcert"]);
 		if ($svr_cert != false) {
 			if(base64_decode($svr_cert['prv'])) {
-				file_put_contents("/etc/ssl/demoCA/private/serverkey.pem",base64_decode($svr_cert['prv']));
+				file_put_contents("/etc/ssl/demoCA/private/serverkey.pem",base64_decode($svr_cert['prv']).base64_decode($svr_cert['crt']));
 				$cert_key = "certprivatekeypath = '/etc/ssl/demoCA/private/serverkey.pem' ";
 			}
 		}
@@ -721,7 +721,7 @@ function sync_package_dansguardian($via_rpc=false,$install_process=false) {
 																				'mode'=> "1",
 																				'report_level'=>"global");
 
-	$groups=array("scancleancache","hexdecodecontent","blockdownloads","enablepics","deepurlanalysis","infectionbypasserrorsonly","disablecontentscan","sslcertcheck","sslmitm");
+	$groups=array("scancleancache","hexdecodecontent","blockdownloads","enablepics","deepurlanalysis","infectionbypasserrorsonly","disablecontentscan");
 	#loop on array
 	$count=1;
 	$user_xml="";
@@ -737,7 +737,6 @@ function sync_package_dansguardian($via_rpc=false,$install_process=false) {
 		$dansguardian_groups['embeddedurlweight']=($dansguardian_groups['embeddedurlweight']?$dansguardian_groups['embeddedurlweight']:"0");
 		$dansguardian_groups['bypass']=($dansguardian_groups['bypass']?$dansguardian_groups['bypass']:"0");
 		$dansguardian_groups['infectionbypass']=($dansguardian_groups['infectionbypass']?$dansguardian_groups['infectionbypass']:"0");
-		$dansguardian_groups['mitmkey']=($dansguardian_groups['mitmkey']?$dansguardian_groups['mitmkey']:"dgs3dD3da");
 		switch ($dansguardian_groups['reportinglevel']){
 			case "1":
 			case "2":
@@ -761,8 +760,18 @@ function sync_package_dansguardian($via_rpc=false,$install_process=false) {
 				$groupaccessdeniedaddress="";
 		}
 
-		foreach ($groups as $group)
+		foreach ($groups as $group){
 			$dansguardian_groups[$group]=(preg_match("/$group/",$dansguardian_groups['group_options'])?"on":"off");
+		}
+		if (preg_match("/sslmitm/",$dansguardian_groups['group_options'])){
+			$dansguardian_groups['mitmkey']="mitmkey = '".substr(md5(rand(100000000,999999999)),1,9)."'";
+			$dansguardian_groups["sslmitm"]="on";
+			$dansguardian_groups["sslcertcheck"]="on";
+		}
+		else{
+			$dansguardian_groups["sslmitm"]="off";
+			$dansguardian_groups["sslcertcheck"]="off";
+		}
 		#create group list files
 		$lists=array("phraseacl"   => array("bannedphrase","weightedphrase","exceptionphrase"),
 					 "siteacl"     => array("bannedsite","greysite","exceptionsite","exceptionfilesite","logsite"),
@@ -939,6 +948,7 @@ EOF;
 	$cconf= DANSGUARDIAN_DIR. "/etc/clamd.conf";
 	$cconf_file=file_get_contents($cconf);
 	if (preg_match("/User (\w+)/",$cconf_file,$matches)){
+		mwexec("/usr/sbin/pw user show {$matches[1]} || /usr/sbin/pw user add -n {$matches[1]} -s /usr/sbin/nologin");
 		$daemonuser = $matches[1];
 		$daemongroup = 'nobody';
 	}
@@ -1103,8 +1113,8 @@ EOF;
 			
 		if (!(file_exists('/var/db/clamav/main.cvd')||file_exists('/var/db/clamav/main.cld'))){
 			file_notice("Dansguardian - No antivirus database found for clamav, running freshclam in background.","");
-			log_error('No antivirus database found for clamav, running freshclam in background.');
-			mwexec_bg(DANSGUARDIAN_DIR.'/bin/freshclam');
+			log_error('No antivirus database found for clamav, running freshclam in background. Content-scanner may not work until freshclam finishes.');
+			mwexec_bg(DANSGUARDIAN_DIR.'/bin/freshclam && /usr/local/etc/rc.d/clamav-clamd');
 			}
 				
 			$match=array();
@@ -1130,12 +1140,16 @@ EOF;
 				foreach ($script_file as $script_line){
 					if(preg_match("/command=/",$script_line)){
 						$new_clamav_startup.= 'if [ ! -d /var/run/clamav ];then /bin/mkdir /var/run/clamav;fi'."\n";
+						$new_clamav_startup.= 'if [ ! -d /var/db/clamav ];then /bin/mkdir /var/db/clamav;fi'."\n";
+						$new_clamav_startup.= 'if [ ! -d /var/log/clamav ];then /bin/mkdir -p /var/log/clamav;fi'."\n";
 						$new_clamav_startup.= "chown -R ".$matches[1]." /var/run/clamav\n";
+						$new_clamav_startup.= "chown -R ".$matches[1]." /var/db/clamav\n";
 						$new_clamav_startup.= "chown -R ".$matches[1]." /var/log/clamav\n";
 						$new_clamav_startup.=$script_line;
 						}
 					elseif(!preg_match("/(mkdir|chown|sleep|mailscanner)/",$script_line)) {
 						$new_clamav_startup.=preg_replace("/NO/","YES",$script_line);
+						$new_clamav_startup.=preg_replace("@/usr/local@",DANSGUARDIAN_DIR,$script_line);
 						}
 					}
 				file_put_contents($script, $new_clamav_startup, LOCK_EX);
