@@ -81,6 +81,9 @@ if ($_POST) {
 	$natent = array();
 	$natent = $pconfig;
 
+	if ($_POST['pscan_ignore_scanners'] && !is_alias($_POST['pscan_ignore_scanners']))
+		$input_errors[] = "Only aliases are allowed";
+
 	/* if no errors write to conf */
 	if (!$input_errors) {
 		/* post new options */
@@ -89,6 +92,12 @@ if ($_POST) {
 		if ($_POST['max_queued_bytes'] != "") { $natent['max_queued_bytes'] = $_POST['max_queued_bytes']; }else{ $natent['max_queued_bytes'] = ""; }
 		if ($_POST['max_queued_segs'] != "") { $natent['max_queued_segs'] = $_POST['max_queued_segs']; }else{ $natent['max_queued_segs'] = ""; }
 		if ($_POST['stream5_mem_cap'] != "") { $natent['stream5_mem_cap'] = $_POST['stream5_mem_cap']; }else{ $natent['stream5_mem_cap'] = ""; }
+		if ($_POST['pscan_sense_level'] != "") { $natent['pscan_sense_level'] = $_POST['pscan_sense_level']; }else{ $natent['pscan_sense_level'] = "medium"; }
+
+		if ($_POST['pscan_ignore_scanners'])
+			$natent['pscan_ignore_scanners'] = $_POST['pscan_ignore_scanners'];
+		else
+			unset($natent['pscan_ignore_scanners']);
 
 		$natent['perform_stat'] = $_POST['perform_stat'] ? 'on' : 'off';
 		$natent['http_inspect'] = $_POST['http_inspect'] ? 'on' : 'off';
@@ -155,6 +164,10 @@ include_once("head.inc");
 
 ?>
 
+<script type="text/javascript" src="/javascript/autosuggest.js">
+</script>
+<script type="text/javascript" src="/javascript/suggestions.js">
+</script>
 <form action="snort_preprocessors.php" method="post"
 	enctype="multipart/form-data" name="iform" id="iform">
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
@@ -177,7 +190,7 @@ include_once("head.inc");
 		<td width="22%" valign="top">&nbsp;</td>
 		<td width="78%"><span class="vexpl"><span class="red"><strong<?php echo gettext("Note:"); ?>>
 		</strong></span><br>
-		<?php echo gettext("Rules may be dependent on preprocessors!"); ?><br>
+		<?php echo gettext("Rules may be dependent on preprocessors!  "); ?>
 		<?php echo gettext("Defaults will be used when there is no user input."); ?><br></td>
 	</tr>
 	<tr>
@@ -298,6 +311,46 @@ include_once("head.inc");
 		"in RAM. Default value is <strong>8388608</strong> (8 MB)"); ?><br>
 		</td>
 	</tr>
+
+	<tr>
+		<td colspan="2" valign="top" class="listtopic"><?php echo gettext("Portscan Settings"); ?></td>
+	</tr>
+	<tr>
+		<td width="22%" valign="top" class="vncell"><?php echo gettext("Enable"); ?> <br>
+		<?php echo gettext("Portscan Detection"); ?></td>
+		<td width="78%" class="vtable"><input name="sf_portscan"
+			type="checkbox" value="on"
+			<?php if ($pconfig['sf_portscan']=="on") echo "checked"; ?>
+			onClick="enable_change(false)"><br>
+		<?php echo gettext("Detects various types of portscans and portsweeps."); ?></td>
+	</tr>
+	<tr>
+		<td width="22%" valign="top" class="vncell"><?php echo gettext("Sensitivity"); ?> </td>
+		<td width="78%" class="vtable">
+			<select name="pscan_sense_level" class="formselect" id="pscan_sense_level">
+			<?php
+			$levels = array('low', 'medium', 'high');
+			foreach ($levels as $val): ?>
+			<option value="<?=$val;?>"
+			<?php if ($val == $pconfig['pscan_sense_level']) echo "selected"; ?>>
+				<?=gettext(ucfirst($val));?></option>
+				<?php endforeach; ?>
+			</select><br>
+			<?php echo gettext("LOW: alerts generated on error packets from the target host; "); ?>
+			<?php echo gettext("this setting should see few false positives.  "); ?><br>
+			<?php echo gettext("MEDIUM: tracks connection counts, so will generate filtered alerts; may "); ?>
+			<?php echo gettext("false positive on active hosts."); ?><br>
+			<?php echo gettext("HIGH: tracks hosts using a time window; will catch some slow scans, but is "); ?>
+			<?php echo gettext("very sensitive to active hosts."); ?><br/>
+		</td>
+	</tr>
+		<td width="22%" valign="top" class="vncell"><?php echo gettext("Ignore Scanners"); ?> </td>
+		<td width="78%" class="vtable">
+			<input name="pscan_ignore_scanners" type="text" size="40" autocomplete="off"  class="formfldalias" id="pscan_ignore_scanners"
+			value="<?=$pconfig['pscan_ignore_scanners'];?>"> <br><?php echo gettext("Ignores the specified entity as a source of scan alerts.  Entity must be a defined alias.");?><br>
+			<?php echo gettext("Default value: \$HOME_NET"); ?><?php echo gettext("  Leave " .
+			"blank for default value."); ?>
+		</td>
 	<tr>
 		<td colspan="2" valign="top" class="listtopic"><?php echo gettext("General Preprocessor Settings"); ?></td>
 	</tr>
@@ -345,15 +398,6 @@ include_once("head.inc");
 			<?php if ($pconfig['smtp_preprocessor']=="on") echo "checked"; ?>
 			onClick="enable_change(false)"><br>
 		<?php echo gettext("Normalize/Decode SMTP protocol for enforcement and buffer overflows."); ?></td>
-	</tr>
-	<tr>
-		<td width="22%" valign="top" class="vncell"><?php echo gettext("Enable"); ?> <br>
-		<?php echo gettext("Portscan Detection"); ?></td>
-		<td width="78%" class="vtable"><input name="sf_portscan"
-			type="checkbox" value="on"
-			<?php if ($pconfig['sf_portscan']=="on") echo "checked"; ?>
-			onClick="enable_change(false)"><br>
-		<?php echo gettext("Detects various types of portscans and portsweeps."); ?></td>
 	</tr>
 	<tr>
 		<td width="22%" valign="top" class="vncell"><?php echo gettext("Enable"); ?> <br>
@@ -438,6 +482,40 @@ include_once("head.inc");
 </table>
 </td></tr></table>
 </form>
+<script type="text/javascript">
+<?php
+        $isfirst = 0;
+        $aliases = "";
+        $addrisfirst = 0;
+        $portisfirst = 0;
+        $aliasesaddr = "";
+        $aliasesports = "";
+        if(isset($config['aliases']['alias']) && is_array($config['aliases']['alias']))
+                foreach($config['aliases']['alias'] as $alias_name) {
+                        if ($alias_name['type'] == "host" || $alias_name['type'] == "network") {
+				if($addrisfirst == 1) $aliasesaddr .= ",";
+				$aliasesaddr .= "'" . $alias_name['name'] . "'";
+				$addrisfirst = 1;
+			} else if ($alias_name['type'] == "port") {
+				if($portisfirst == 1) $aliasesports .= ",";
+				$aliasesports .= "'" . $alias_name['name'] . "'";
+				$portisfirst = 1;
+			}
+                }
+?>
+
+        var addressarray=new Array(<?php echo $aliasesaddr; ?>);
+        var portsarray=new Array(<?php echo $aliasesports; ?>);
+
+function createAutoSuggest() {
+<?php
+	echo "objAlias = new AutoSuggestControl(document.getElementById('pscan_ignore_scanners'), new StateSuggestions(addressarray));\n";
+?>
+}
+
+setTimeout("createAutoSuggest();", 500);
+
+</script>
 <?php include("fend.inc"); ?>
 </body>
 </html>

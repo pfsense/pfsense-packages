@@ -295,7 +295,9 @@ function enable_change(enable_change) {
 				<td width="78%" class="vtable">
 					<select name="performance" class="formselect" id="performance">
 					<?php
-					$interfaces2 = array('ac-bnfa' => 'AC-BNFA', 'lowmem' => 'LOWMEM', 'ac-std' => 'AC-STD', 'ac' => 'AC', 'ac-banded' => 'AC-BANDED', 'ac-sparsebands' => 'AC-SPARSEBANDS', 'acs' => 'ACS');
+					$interfaces2 = array('ac-bnfa' => 'AC-BNFA', 'ac-split' => 'AC-SPLIT', 'lowmem' => 'LOWMEM', 'ac-std' => 'AC-STD', 'ac' => 'AC',
+					'ac-nq' => 'AC-NQ', 'ac-bnfa-nq' => 'AC-BNFA-NQ', 'lowmem-nq' => 'LOWMEM-NQ', 'ac-banded' => 'AC-BANDED', 
+					'ac-sparsebands' => 'AC-SPARSEBANDS', 'acs' => 'ACS');
 					foreach ($interfaces2 as $iface2 => $ifacename2): ?>
 					<option value="<?=$iface2;?>"
 					<?php if ($iface2 == $pconfig['performance']) echo "selected"; ?>>
@@ -303,10 +305,10 @@ function enable_change(enable_change) {
 						<?php endforeach; ?>
 				</select><br>
 				<span class="vexpl"><?php echo gettext("LOWMEM and AC-BNFA are recommended for low end " .
-				"systems, AC: high memory, best performance, AC-STD: moderate " .
-				"memory,high performance, ACS: small memory, moderate performance, " .
-				"AC-BANDED: small memory,moderate performance, AC-SPARSEBANDS: small " .
-				"memory, high performance."); ?>
+				"systems, AC-SPLIT: low memory, high performance, short-hand for search-method ac split-any-any, AC: high memory, " .
+				"best performance, -NQ: the -nq option specifies that matches should not be queued and evaluated as they are found," . 
+				" AC-STD: moderate memory, high performance, ACS: small memory, moderate performance, " .
+				"AC-BANDED: small memory,moderate performance, AC-SPARSEBANDS: small memory, high performance."); ?>
 				</span><br/></td>
 	</tr>
 	<tr>
