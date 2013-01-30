@@ -2061,13 +2061,25 @@ PIPELINING CHUNKING DATA DSN RSET QUIT ONEX QUEU STARTTLS TICK TIME TURNME VERB 
 EOD;
 
 	/* def sf_portscan */
+	if (!empty($snortcfg['pscan_sense_level']))
+		$sf_pscan_sense_level = $snortcfg['pscan_sense_level'];
+	else
+		$sf_pscan_sense_level = "medium";
+
+	if (!empty($snortcfg['pscan_ignore_scanners']) && is_alias($snortcfg['pscan_ignore_scanners'])) {
+		$sf_pscan_ignore_scanners = filter_expand_alias($snortcfg['pscan_ignore_scanners']);
+		$sf_pscan_ignore_scanners = preg_replace('/\s+/', ',', trim($sf_pscan_ignore_scanners));
+	}
+	else
+		$sf_pscan_ignore_scanners = "\$HOME_NET";
+	
 	$sf_portscan = <<<EOD
 # sf Portscan  #
 preprocessor sfportscan: scan_type { all } \
                          proto  { all } \
                          memcap { 10000000 } \
-                         sense_level { medium } \
-                         ignore_scanners { \$HOME_NET }
+                         sense_level { {$sf_pscan_sense_level} } \
+                         ignore_scanners { {$sf_pscan_ignore_scanners} }
 	
 EOD;
 
