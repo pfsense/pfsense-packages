@@ -119,7 +119,7 @@
 			<type>input</type>
 		</field>
 		<field>
-			<fielddescr>Socket buffer bize</fielddescr>
+			<fielddescr>Socket buffer size</fielddescr>
 			<fieldname>window</fieldname>
 			<description>Enter the desired socket buffer size, if needed.</description>
 			<type>input</type>
