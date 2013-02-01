@@ -1200,7 +1200,7 @@ function snort_find_flowbit_required_rules(&$all_rules, &$unchecked_flowbits) {
 						else {
 							/* If rule is disabled, remove leading '#' to enable it */
 							$required_flowbits_rules[$k1][$k2]['rule'] = ltrim(substr($rule2['rule'], strpos($rule2['rule'], "#") + 1));
-							$required_flowbits_rules[$k1][$k2]['disabled'] = 1;
+							$required_flowbits_rules[$k1][$k2]['disabled'] = 0;
 						}
 					}
 				}
