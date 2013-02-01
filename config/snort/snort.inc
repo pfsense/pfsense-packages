@@ -1197,9 +1197,11 @@ function snort_find_flowbit_required_rules(&$all_rules, &$unchecked_flowbits) {
 						if ($rule2['disabled'] == 0)
 							/* If not disabled, just return the rule text "as is"   */
 							$required_flowbits_rules[$k1][$k2]['rule'] = ltrim($rule2['rule']);
-						else
+						else {
 							/* If rule is disabled, remove leading '#' to enable it */
 							$required_flowbits_rules[$k1][$k2]['rule'] = ltrim(substr($rule2['rule'], strpos($rule2['rule'], "#") + 1));
+							$required_flowbits_rules[$k1][$k2]['disabled'] = 1;
+						}
 					}
 				}
 			}
@@ -1335,8 +1337,10 @@ function snort_load_vrt_policy($policy) {
 					$vrt_policy_rules[$k1][$k2] = $arulem2;
 
 					/* Enable the policy rule if disabled  */
-					if ($arulem2['disabled'] == 1)
+					if ($arulem2['disabled'] == 1) {
 						$vrt_policy_rules[$k1][$k2]['rule'] = ltrim(substr($arulem2['rule'], strpos($arulem2['rule'], "#") + 1));
+						$vrt_policy_rules[$k1][$k2]['disabled'] = 0;
+					}
 				}
 			}
 		}
@@ -1441,8 +1445,10 @@ function snort_modify_sids(&$rule_map, $snortcfg) {
 	if (!empty($enablesid)) {
 		foreach ($rule_map as $k1 => $rulem) {
 			foreach ($rulem as $k2 => $v) {
-				if (in_array($k2, $enablesid) && $v['disabled'] == 1) 
+				if (in_array($k2, $enablesid) && $v['disabled'] == 1) {
 					$rule_map[$k1][$k2]['rule'] = ltrim($v['rule'], " \t#");
+					$rule_map[$k1][$k2]['disabled'] = 0;
+				}
 			}
 		}
 	}
@@ -1806,7 +1812,7 @@ function snort_filter_preproc_rules($snortcfg, &$active_rules) {
 	/* This function checks the $active_rules array   */
 	/* for rule options dependent upon preprocessors. */
 	/* Rules with rule options dependent upon any     */
-	/* non-enabled preprocessors are disabled to      */
+	/* non-enabled preprocessors are disabled to stop */
 	/* start-up errors from unknown rule options.     */
 	/*                                                */
 	/* $snortcfg     -> config parameters array for   */
@@ -1849,6 +1855,8 @@ function snort_filter_preproc_rules($snortcfg, &$active_rules) {
 	 ***************************************************/
 	foreach ($active_rules as $k1 => $rulem) {
 		foreach ($rulem as $k2 => $v) {
+			if ($v['disabled'] == 0)
+				continue;
 			foreach ($rule_opts_preprocs as $opt => $preproc) {
 				$pcre = "/\s*\b" . $opt . "/i";
 				if (($snortcfg[$preproc] != 'on') && preg_match($pcre, $v['rule'])) {
