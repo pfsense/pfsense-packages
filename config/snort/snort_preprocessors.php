@@ -187,10 +187,10 @@ include_once("head.inc");
 <tr><td class="tabcont">
 <table width="100%" border="0" cellpadding="6" cellspacing="0">
 	<tr>
-		<td width="22%" valign="top">&nbsp;</td>
-		<td width="78%"><span class="vexpl"><span class="red"><strong<?php echo gettext("Note:"); ?>>
-		</strong></span><br>
-		<?php echo gettext("Rules may be dependent on preprocessors!  "); ?>
+		<td colspan="2" align="center" valign="middle">
+		<span class="red"><strong><?php echo gettext("NOTE"); ?></strong></span><br>
+		<?php echo gettext("Rules may be dependent on preprocessors!  Disabling preprocessors may result in "); ?>
+		<?php echo gettext("dependent rules being automatically disabled."); ?><br>
 		<?php echo gettext("Defaults will be used when there is no user input."); ?><br></td>
 	</tr>
 	<tr>
