@@ -1452,8 +1452,10 @@ function snort_modify_sids(&$rule_map, $snortcfg) {
 	if (!empty($disablesid)) {
 		foreach ($rule_map as $k1 => $rulem) {
 			foreach ($rulem as $k2 => $v) {
-				if (in_array($k2, $disablesid) && $v['disabled'] == 0) 
+				if (in_array($k2, $disablesid) && $v['disabled'] == 0) { 
 					$rule_map[$k1][$k2]['rule'] = "# " . $v['rule'];
+					$rule_map[$k1][$k2]['disabled'] = 1;
+				}
 			}
 		}
 	}
@@ -1765,6 +1767,10 @@ function snort_prepare_rule_files($snortcfg, $snortcfgdir) {
 		/* Process any enablesid or disablesid modifications for the selected rules. */
 		snort_modify_sids($enabled_rules, $snortcfg);
 
+		/* Check for and disable any rules dependent upon disabled preprocessors. */
+		log_error('Checking for and disabling any rules dependent upon disabled preprocessors for ' . snort_get_friendly_interface($snortcfg['interface']) . '...');
+		snort_filter_preproc_rules($snortcfg, $enabled_rules);
+
 		/* Write the enforcing rules file to the Snort interface's "rules" directory. */
 		snort_write_enforcing_rules_file($enabled_rules, "{$snortcfgdir}/rules/{$snort_enforcing_rules_file}");
 		unset($enabled_rules);
@@ -1792,6 +1798,67 @@ function snort_prepare_rule_files($snortcfg, $snortcfgdir) {
 	/* Build a new sid-msg.map file from the enabled */
 	/* rules and copy it to the interface directory. */
 	snort_build_sid_msg_map("{$snortcfgdir}/rules/", "{$snortcfgdir}/sid-msg.map");
+}
+
+function snort_filter_preproc_rules($snortcfg, &$active_rules) {
+
+	/**************************************************/
+	/* This function checks the $active_rules array   */
+	/* for rule options dependent upon preprocessors. */
+	/* Rules with rule options dependent upon any     */
+	/* non-enabled preprocessors are disabled to      */
+	/* start-up errors from unknown rule options.     */
+	/*                                                */
+	/* $snortcfg     -> config parameters array for   */
+	/*                  the interface                 */
+	/* $active_rules -> rules_map array of enabled    */
+	/*                  rules for the interface       */
+	/**************************************************/
+
+	global $config;
+
+	if (empty($active_rules))
+		return;
+
+	/***************************************************
+	 * Construct an array of rule options with their   *
+	 * associated preprocessors.                       *
+	 *                                                 *
+	 * IMPORTANT -- Keep this part of the code current *
+	 * with changes to preprocessor rule options in    *
+	 * Snort VRT rules.                                *
+	 ***************************************************/
+	$rule_opts_preprocs = array("ssl_version:" => "ssl_preproc","ssl_state:" => "ssl_preproc",
+		 		    "dce_iface:" => "dce_rpc_2", "dce_opnum:" => "dce_rpc_2",
+				    "dce_stub_data;" => "dce_rpc_2", "sd_pattern:" => "sensitive_data",
+				    "sip_method:" => "sip_preproc", "sip_stat_code:" => "sip_preproc",
+				    "sip_header;" => "sip_preproc", "sip_body;" => "sip_preproc",
+				    "gtp_type:" => "gtp_preproc", "gtp_info:" => "gtp_preproc",
+				    "gtp_version:" => "gtp_preproc", "modbus_func:" => "modbus_preproc",
+				    "modbus_unit:" => "modbus_preproc", "modbus_data;" => "modbus_preproc",
+				    "dnp3_func:" => "dnp3_preproc", "dnp3_obj:" => "dnp3_preproc",
+				    "dnp3_ind:" => "dnp3_preproc", "dnp3_data;" => "dnp3_preproc");
+
+	/***************************************************
+	 * Iterate the enabled rules, and check for rule   *
+	 * options that depend on disabled preprocessors.  *
+	 * Disable any of these preprocessor-dependent     *
+	 * rules we find.  Once we find at least one       *
+	 * reason to disable the rule, stop further checks *
+	 * and go to the next rule.                        *
+	 ***************************************************/
+	foreach ($active_rules as $k1 => $rulem) {
+		foreach ($rulem as $k2 => $v) {
+			foreach ($rule_opts_preprocs as $opt => $preproc) {
+				$pcre = "/\s*\b" . $opt . "/i";
+				if (($snortcfg[$preproc] != 'on') && preg_match($pcre, $v['rule'])) {
+					$active_rules[$k1][$k2]['rule'] = "# " . $v['rule'];
+					$active_rules[$k1][$k2]['disabled'] = 1;
+					break;
+				}
+			}
+		}
+	}
 }
 
 function snort_generate_conf($snortcfg) {
