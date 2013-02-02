@@ -56,6 +56,7 @@ if (isset($id) && $a_nat[$id]) {
 	/* new options */
 	$pconfig['perform_stat'] = $a_nat[$id]['perform_stat'];
 	$pconfig['server_flow_depth'] = $a_nat[$id]['server_flow_depth'];
+	$pconfig['http_server_profile'] = $a_nat[$id]['http_server_profile'];
 	$pconfig['client_flow_depth'] = $a_nat[$id]['client_flow_depth'];
 	$pconfig['max_queued_bytes'] = $a_nat[$id]['max_queued_bytes'];
 	$pconfig['max_queued_segs'] = $a_nat[$id]['max_queued_segs'];
@@ -75,6 +76,7 @@ if (isset($id) && $a_nat[$id]) {
 	$pconfig['sip_preproc'] = $a_nat[$id]['sip_preproc'];
 	$pconfig['dnp3_preproc'] = $a_nat[$id]['dnp3_preproc'];
 	$pconfig['modbus_preproc'] = $a_nat[$id]['modbus_preproc'];
+	$pconfig['gtp_preproc'] = $a_nat[$id]['gtp_preproc'];
 }
 
 if ($_POST) {
@@ -88,6 +90,7 @@ if ($_POST) {
 	if (!$input_errors) {
 		/* post new options */
 		if ($_POST['server_flow_depth'] != "") { $natent['server_flow_depth'] = $_POST['server_flow_depth']; }else{ $natent['server_flow_depth'] = ""; }
+		if ($_POST['http_server_profile'] != "") { $natent['http_server_profile'] = $_POST['http_server_profile']; }else{ $natent['http_server_profile'] = "all"; }
 		if ($_POST['client_flow_depth'] != "") { $natent['client_flow_depth'] = $_POST['client_flow_depth']; }else{ $natent['client_flow_depth'] = ""; }
 		if ($_POST['max_queued_bytes'] != "") { $natent['max_queued_bytes'] = $_POST['max_queued_bytes']; }else{ $natent['max_queued_bytes'] = ""; }
 		if ($_POST['max_queued_segs'] != "") { $natent['max_queued_segs'] = $_POST['max_queued_segs']; }else{ $natent['max_queued_segs'] = ""; }
@@ -116,6 +119,7 @@ if ($_POST) {
 		$natent['modbus_preproc'] = $_POST['modbus_preproc'] ? 'on' : 'off';
 		$natent['sip_preproc'] = $_POST['sip_preproc'] ? 'on' : 'off';
 		$natent['modbus_preproc'] = $_POST['modbus_preproc'] ? 'on' : 'off';
+		$natent['gtp_preproc'] = $_POST['gtp_preproc'] ? 'on' : 'off';
 
 		if (isset($id) && $a_nat[$id])
 			$a_nat[$id] = $natent;
@@ -221,7 +225,7 @@ include_once("head.inc");
 			<tr>
 				<td><input name="server_flow_depth" type="text" class="formfld"
 					id="flow_depth" size="6"
-					value="<?=htmlspecialchars($pconfig['server_flow_depth']);?>"> <?php echo gettext("<strong>-1</strong> " .
+					value="<?=htmlspecialchars($pconfig['server_flow_depth']);?>">&nbsp;&nbsp;<?php echo gettext("<strong>-1</strong> " .
 				"to <strong>65535</strong> (<strong>-1</strong> disables HTTP " .
 				"inspect, <strong>0</strong> enables all HTTP inspect)"); ?></td>
 			</tr>
@@ -230,6 +234,23 @@ include_once("head.inc");
 		"performance may increase by adjusting this value."); ?><br>
 		<?php echo gettext("Setting this value too low may cause false negatives. Values above 0 " .
 		"are specified in bytes.  Recommended setting is maximum (65535). Default value is <strong>300</strong>"); ?><br>
+		</td>
+	</tr>
+	<tr>
+		<td width="22%" valign="top" class="vncell"><?php echo gettext("HTTP server profile"); ?> </td>
+		<td width="78%" class="vtable">
+			<select name="http_server_profile" class="formselect" id="http_server_profile">
+			<?php
+			$profile = array('All', 'Apache', 'IIS', 'IIS_4.0', 'IIS_5.0');
+			foreach ($profile as $val): ?>
+			<option value="<?=strtolower($val);?>"
+			<?php if (strtolower($val) == $pconfig['http_server_profile']) echo "selected"; ?>>
+				<?=gettext($val);?></option>
+				<?php endforeach; ?>
+			</select>&nbsp;&nbsp;<?php echo gettext("Choose the profile type of the protected web server."); ?><br>
+			<?php echo gettext(" The default is <strong>All</strong>.  "); ?>
+			<?php echo gettext("IIS_4.0 and IIS_5.0 are identical to IIS except they alert on the "); ?>
+			<?php echo gettext("double decoding vulnerability present in those two versions."); ?><br>
 		</td>
 	</tr>
 	<tr>
@@ -348,7 +369,7 @@ include_once("head.inc");
 		<td width="78%" class="vtable">
 			<input name="pscan_ignore_scanners" type="text" size="40" autocomplete="off"  class="formfldalias" id="pscan_ignore_scanners"
 			value="<?=$pconfig['pscan_ignore_scanners'];?>"> <br><?php echo gettext("Ignores the specified entity as a source of scan alerts.  Entity must be a defined alias.");?><br>
-			<?php echo gettext("Default value: \$HOME_NET"); ?><?php echo gettext("  Leave " .
+			<?php echo gettext("Default value: \$HOME_NET."); ?><?php echo gettext("  Leave " .
 			"blank for default value."); ?>
 		</td>
 	<tr>
@@ -416,6 +437,15 @@ include_once("head.inc");
 			<?php if ($pconfig['sip_preproc']=="on") echo "checked"; ?>
 			onClick="enable_change(false)"><br>
 		<?php echo gettext("The SIP preprocessor decodes SIP traffic and detects some vulnerabilities."); ?></td>
+	</tr>
+	<tr>
+		<td width="22%" valign="top" class="vncell"><?php echo gettext("Enable"); ?> <br>
+		<?php echo gettext("GTP Detection"); ?></td>
+		<td width="78%" class="vtable"><input name="gtp_preproc"
+			type="checkbox" value="on"
+			<?php if ($pconfig['gtp_preproc']=="on") echo "checked"; ?>
+			onClick="enable_change(false)"><br>
+		<?php echo gettext("The GTP preprocessor decodes GPRS Tunneling Protocol traffic and detects intrusion attempts."); ?></td>
 	</tr>
 	<tr>
 		<td width="22%" valign="top" class="vncell"><?php echo gettext("Enable"); ?> <br>
