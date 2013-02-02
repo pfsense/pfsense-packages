@@ -198,6 +198,7 @@ categorydisplaythreshold = {$dansguardian_groups['categorydisplaythreshold']}
 # WARNING: This option is highly CPU intensive!
 embeddedurlweight = {$dansguardian_groups['embeddedurlweight']}
 
+maxuploadsize = {$dansguardian_groups['maxuploadsize']}
 # Enable PICS rating support
 #
 # Defaults to disabled
@@ -370,7 +371,7 @@ deepurlanalysis = {$dansguardian_groups['deepurlanalysis']}
 #SSL certificate checking
 # Check that ssl certificates for servers on https connections are valid
 # and signed by a ca in the configured path
-sslcertcheck = {$dansguardian_groups['sslcertcheck']}
+sslcheckcert = {$dansguardian_groups['sslcheckcert']}
 
 #SSL man in the middle
 # Forge ssl certificates for all sites, decrypt the data then re encrypt it

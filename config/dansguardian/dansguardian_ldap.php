@@ -129,7 +129,11 @@ if (is_array($config['installedpackages']['dansguardiangroups']['config']))
 		   					}
 		   			}
 	   			}
-		   	if (!empty($members)){
+		   	if (empty($members)){
+		   		$config['installedpackages']['dansguardianusers']['config'][0][strtolower($group['name'])] = NULL;
+		   	 	$apply_config++;
+		   		}
+		   	else{
 		   	$import_users = explode("\n", $members);
 			asort($import_users);
 			$members=base64_encode(implode("\n", $import_users));

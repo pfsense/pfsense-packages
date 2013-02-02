@@ -150,6 +150,7 @@
  				<option><name>Enable Deep URL Analysis (off)</name><value>deepurlanalysis</value></option>
  				<option><name>Infection/Scan Error Bypass on Scan Errors Only (on)</name><value>infectionbypasserrorsonly</value></option>
  				<option><name>Disable content scanning (off)</name><value>disablecontentscan</value></option>
+ 				<option><name>Check Server SSLCertificates (off)</name><value>sslcheckcert</value></option>
  				<option><name>Filter ssl sites forging SSL Certificates (off)</name><value>sslmitm</value></option>
  				</options>
  				<multiple/>
@@ -297,7 +298,7 @@
  				</options>
 		</field>
 		<field>
-			<fielddescr>Naughtiness limite</fielddescr>
+			<fielddescr>Naughtiness limit</fielddescr>
 			<fieldname>naughtynesslimit</fieldname>
 			<description><![CDATA[This the limit over which the page will be blocked.  Each weighted phrase is given a value either positive or negative and the values added up.<br>
 					Phrases to do with good subjects will have negative values, and bad subjects will have positive values.<br>
@@ -315,6 +316,17 @@
 			A value of 0 here indicates that search terms should be extracted, for logging/reporting purposes, but no filtering should be performed on the resulting text.]]></description>
 			<type>input</type>
 			<size>10</size>
+		</field>
+		<field>
+			<fielddescr>Max upload size</fielddescr>
+			<fieldname>maxuploadsize</fieldname>
+			<type>input</type>
+			<size>10</size>
+			<description><![CDATA[POST protection (web upload and forms) does not block forms without any file upload, i.e. this is just for blocking or limiting uploads measured in kibibytes after MIME encoding and header bumph<br>
+					use 0 for a complete block<br>
+					use higher (e.g. 512 = 512Kbytes) for limiting<br>
+					use -1 for no blocking(default)<br>
+					Leave empty to use global Max upload size limit value.]]></description>
 		</field>
 		<field>
 			<fielddescr>Category display threshold</fielddescr>

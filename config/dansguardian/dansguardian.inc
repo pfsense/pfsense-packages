@@ -721,7 +721,7 @@ function sync_package_dansguardian($via_rpc=false,$install_process=false) {
 																				'mode'=> "1",
 																				'report_level'=>"global");
 
-	$groups=array("scancleancache","hexdecodecontent","blockdownloads","enablepics","deepurlanalysis","infectionbypasserrorsonly","disablecontentscan");
+	$groups=array("scancleancache","hexdecodecontent","blockdownloads","enablepics","deepurlanalysis","infectionbypasserrorsonly","disablecontentscan","sslcheckcert","sslmitm");
 	#loop on array
 	$count=1;
 	$user_xml="";
@@ -737,6 +737,7 @@ function sync_package_dansguardian($via_rpc=false,$install_process=false) {
 		$dansguardian_groups['embeddedurlweight']=($dansguardian_groups['embeddedurlweight']?$dansguardian_groups['embeddedurlweight']:"0");
 		$dansguardian_groups['bypass']=($dansguardian_groups['bypass']?$dansguardian_groups['bypass']:"0");
 		$dansguardian_groups['infectionbypass']=($dansguardian_groups['infectionbypass']?$dansguardian_groups['infectionbypass']:"0");
+		$dansguardian_groups['maxuploadsize']=($dansguardian_groups['maxuploadsize']?$dansguardian_groups['maxuploadsize']:$maxuploadsize);
 		switch ($dansguardian_groups['reportinglevel']){
 			case "1":
 			case "2":
@@ -763,15 +764,7 @@ function sync_package_dansguardian($via_rpc=false,$install_process=false) {
 		foreach ($groups as $group){
 			$dansguardian_groups[$group]=(preg_match("/$group/",$dansguardian_groups['group_options'])?"on":"off");
 		}
-		if (preg_match("/sslmitm/",$dansguardian_groups['group_options'])){
-			$dansguardian_groups['mitmkey']="mitmkey = '".substr(md5(rand(100000000,999999999)),1,9)."'";
-			$dansguardian_groups["sslmitm"]="on";
-			$dansguardian_groups["sslcertcheck"]="on";
-		}
-		else{
-			$dansguardian_groups["sslmitm"]="off";
-			$dansguardian_groups["sslcertcheck"]="off";
-		}
+		
 		#create group list files
 		$lists=array("phraseacl"   => array("bannedphrase","weightedphrase","exceptionphrase"),
 					 "siteacl"     => array("bannedsite","greysite","exceptionsite","exceptionfilesite","logsite"),
