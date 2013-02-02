@@ -1977,7 +1977,8 @@ function snort_generate_conf($snortcfg) {
 		"DCERPC_NCACN_IP_TCP" => "139,445", "DCERPC_NCADG_IP_UDP" => "138,1024:",
 		"DCERPC_NCACN_IP_LONG" => "135,139,445,593,1024:", "DCERPC_NCACN_UDP_LONG" => "135,1024:",
 		"DCERPC_NCACN_UDP_SHORT" => "135,593,1024:", "DCERPC_NCACN_TCP" => "2103,2105,2107",
-		"DCERPC_BRIGHTSTORE" => "6503,6504", "DNP3_PORTS" => "20000", "MODBUS_PORTS" => "502"
+		"DCERPC_BRIGHTSTORE" => "6503,6504", "DNP3_PORTS" => "20000", "MODBUS_PORTS" => "502",
+		"GTP_PORTS" => "2123,2152,3386"
 	);
 
 	$portvardef = "";
@@ -2002,6 +2003,10 @@ EOD;
 	if ((!empty($snortcfg['server_flow_depth'])) || ($snortcfg['server_flow_depth'] == '0'))
 		$def_server_flow_depth_type = $snortcfg['server_flow_depth'];
 
+	$http_server_profile = "all";
+	if (!empty($snortcfg['http_server_profile']))
+		$http_server_profile = $snortcfg['http_server_profile'];
+
 	$def_client_flow_depth_type = '300';
 	if ((!empty($snortcfg['client_flow_depth'])) || ($snortcfg['client_flow_depth'] == '0'))
 		$def_client_flow_depth_type = $snortcfg['client_flow_depth'];
@@ -2017,7 +2022,7 @@ EOD;
 # HTTP Inspect  #
 preprocessor http_inspect: global iis_unicode_map unicode.map 1252 compress_depth 65535 decompress_depth 65535
 
-preprocessor http_inspect_server: server default profile all {$noalert_http_inspect}\
+preprocessor http_inspect_server: server default profile {$http_server_profile} {$noalert_http_inspect}\
 	ports  { {$http_ports} }  \
 	http_methods { GET POST PUT SEARCH MKCOL COPY MOVE LOCK UNLOCK NOTIFY POLL BCOPY BDELETE BMOVE LINK UNLINK OPTIONS HEAD DELETE TRACE TRACK CONNECT SOURCE SUBSCRIBE UNSUBSCRIBE PROPFIND PROPPATCH BPROPFIND BPROPPATCH RPC_CONNECT PROXY_SUCCESS BITS_POST CCM_POST SMS_POST RPC_IN_DATA RPC_OUT_DATA RPC_ECHO_DATA } \
 	server_flow_depth {$def_server_flow_depth_type} \
@@ -2221,6 +2226,14 @@ preprocessor modbus: \
 	
 EOD;
 
+	/* def gtp_preprocessor */
+	$gtp_ports = str_replace(",", " ", $snort_ports['GTP_PORTS']);
+	$gtp_preproc = <<<EOD
+# GTP preprocessor #
+preprocessor gtp: ports { {$gtp_ports} }
+	
+EOD;
+
 	$def_ssl_ports_ignore = str_replace(",", " ", $snort_ports['ssl_ports']);
 	$ssl_preproc = <<<EOD
 # Ignore SSL and Encryption  #
@@ -2267,11 +2280,11 @@ EOD;
 	$snort_preproc_libs = array(
 		"dce_rpc_2" => "dce2_preproc", "dns_preprocessor" => "dns_preproc", "ftp_preprocessor" => "ftptelnet_preproc", "imap_preproc" => "imap_preproc",
 		"pop_preproc" => "pop_preproc", "reputation_preproc" => "reputation_preproc", "sensitive_data" => "sdf_preproc", 
-		"sip_preproc" => "sip_preproc", "smtp_preprocessor" => "smtp_preproc", "ssh_preproc" => "ssh_preproc", 
+		"sip_preproc" => "sip_preproc", "gtp_preproc" => "gtp_preproc", "smtp_preprocessor" => "smtp_preproc", "ssh_preproc" => "ssh_preproc", 
 		"ssl_preproc" => "ssl_preproc", "dnp3_preproc" => "dnp3_preproc", "modbus_preproc" => "modbus_preproc"
 	);
 	$snort_preproc = array (
-		"perform_stat", "http_inspect", "other_preprocs", "ftp_preprocessor", "smtp_preprocessor", "ssl_preproc", "sip_preproc",
+		"perform_stat", "http_inspect", "other_preprocs", "ftp_preprocessor", "smtp_preprocessor", "ssl_preproc", "sip_preproc", "gtp_preproc",
 		"sf_portscan", "dce_rpc_2", "dns_preprocessor", "sensitive_data", "pop_preproc", "imap_preproc", "dnp3_preproc", "modbus_preproc"
 	);
 	$snort_preprocessors = "";
@@ -2368,6 +2381,9 @@ config disable_ttcp_alerts
 config disable_tcpopt_alerts
 config disable_ipopt_alerts
 config disable_decode_drops
+
+# Enable the GTP decoder  #
+config enable_gtp
 
 # Configure PCRE match limitations
 config pcre_match_limit: 3500
