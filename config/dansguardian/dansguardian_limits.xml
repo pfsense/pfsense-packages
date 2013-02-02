@@ -107,7 +107,7 @@
 			<fieldname>maxuploadsize</fieldname>
 			<type>input</type>
 			<size>10</size>
-			<description><![CDATA[POST protection (web upload and forms) does not block forms without any file upload, i.e. this is just for blocking or limiting uploads measured in kibibytes after MIME encoding and header bumph<br>
+			<description><![CDATA[POST protection (web upload and forms) does not block forms without any file upload, i.e. this is just for blocking or limiting uploads measured in kilobytes after MIME encoding and header bump<br>
 					use 0 for a complete block<br>
 					use higher (e.g. 512 = 512Kbytes) for limiting<br>
 					use -1 for no blocking(default)]]></description>
