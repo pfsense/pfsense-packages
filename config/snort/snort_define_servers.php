@@ -75,7 +75,7 @@ $snort_ports = array(
 "sip_ports" => "5060,5061", "auth_ports" => "113", "finger_ports" => "79",
 "irc_ports" => "6665,6666,6667,6668,6669,7000", "smb_ports" => "139,445",
 "nntp_ports" => "119", "rlogin_ports" => "513", "rsh_ports" => "514",
-"ssl_ports" => "443,465,563,636,989,990,992,993,994,995",
+"ssl_ports" => "443,465,563,636,989,990,992,993,994,995", "GTP_PORTS" => "2123,2152,3386",
 "file_data_ports" => "\$HTTP_PORTS,110,143", "shellcode_ports" => "!80",
 "sun_rpc_ports" => "111,32770,32771,32772,32773,32774,32775,32776,32777,32778,32779",
 "DCERPC_NCACN_IP_TCP" => "139,445", "DCERPC_NCADG_IP_UDP" => "138,1024:",
