@@ -294,16 +294,15 @@ function lightsquid_resync() {
 					$ifmgr = $ifmgr . $realif[0] . ";";
 			}
 
-			# ? delete ?
-			$config['installedpackages']['squidcache']['config'][0]['ext_cachemanager'] = $ifmgr;
-			# now right
-			$config['installedpackages']['squidnac']['config'][0]['ext_cachemanager'] = $ifmgr;
-
-			write_config();
-			if (function_exists('squid_resync')) {
-				squid_resync();
-			} 
-			else update_log("Function 'squid_resync' not found.");
+			/* Only save and resync if we're actually making any changes. */
+			if (strpos($config['installedpackages']['squidnac']['config'][0]['ext_cachemanager'], $ifmgr) === FALSE) {
+				$config['installedpackages']['squidnac']['config'][0]['ext_cachemanager'] = $ifmgr;
+				write_config();
+				if (function_exists('squid_resync'))
+					squid_resync();
+				else
+					update_log("Function 'squid_resync' not found.");
+			}
 		}
 	}
 
