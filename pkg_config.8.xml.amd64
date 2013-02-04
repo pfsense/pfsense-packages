@@ -31,7 +31,7 @@
 	<package>
 		<name>Asterisk</name>
 		<pkginfolink>http://forum.pfsense.org/index.php/topic,47210.0.html</pkginfolink>
-		<descr><![CDATA[Asterisk is an open source framework for building communications applications.<br>Asterisk turns an ordinary computer into a communications server.]]></descr>
+		<descr><![CDATA[Asterisk is an open source framework for building communications applications.<br />Asterisk turns an ordinary computer into a communications server.]]></descr>
 		<website>http://www.asterisk.org/</website>
 		<category>Services</category>
 		<version>1.8.8.1 pkg v 0.1</version>
@@ -104,9 +104,9 @@
 	<package>
 		<name>pfBlocker</name>
 		<website/>
-		<descr><![CDATA[Introduce Enhanced Aliastable Feature to pfsense.<br>
-			Assign many IP urls lists from sites like I-blocklist to a single alias and then choose rule action to take.<br>
-			This package also Block countries and IP ranges.<br>
+		<descr><![CDATA[Introduce Enhanced Aliastable Feature to pfsense.<br />
+			Assign many IP urls lists from sites like I-blocklist to a single alias and then choose rule action to take.<br />
+			This package also Block countries and IP ranges.<br />
 			pfBlocker replaces Countryblock and IPblocklist]]></descr>
 		<category>Firewall</category>
 		<pkginfolink>http://forum.pfsense.org/index.php/topic,42543.0.html</pkginfolink>
@@ -133,7 +133,7 @@
 	<package>
 		<name>haproxy</name>
 		<pkginfolink>http://doc.pfsense.org/index.php/haproxy_package</pkginfolink>
-		<descr><![CDATA[The Reliable, High Performance HTTP Load Balancer<br>
+		<descr><![CDATA[The Reliable, High Performance HTTP Load Balancer<br />
 				This package implements HTTP balance features from Haproxy.]]></descr>
 		<website>http://haproxy.1wt.eu/</website>
 		<category>Services</category>
@@ -150,7 +150,7 @@
 	<package>
 		<name>haproxy-full</name>
 		<pkginfolink>http://doc.pfsense.org/index.php/haproxy_package</pkginfolink>
-		<descr><![CDATA[The Reliable, High Performance TCP/HTTP Load Balancer package<br>
+		<descr><![CDATA[The Reliable, High Performance TCP/HTTP Load Balancer package<br />
 				This package implements both TCP and HTTP balance features from Haproxy.]]></descr>
 		<website>http://haproxy.1wt.eu/</website>
 		<category>Services</category>
@@ -557,8 +557,8 @@
 	<package>
 		<name>Postfix Forwarder</name>
 		<website>http://www.postfix.org/</website>
-		<descr><![CDATA[Postfix mail forwarder acts as a relay server for your domain.<br>
-				It can do first and second line antispam combat before sending incoming mail to local mail servers.<br>
+		<descr><![CDATA[Postfix mail forwarder acts as a relay server for your domain.<br />
+				It can do first and second line antispam combat before sending incoming mail to local mail servers.<br />
 				Postfix can also detect zombies, check RBLS, SPF, seach ldap for valid recipients and use third part antispam engines like policyd and mailscanner for better antispam solution.]]></descr>
 		<category>Services</category>
 		<pkginfolink>http://forum.pfsense.org/index.php/topic,40622.0.html</pkginfolink>
@@ -577,10 +577,10 @@
 	<package>
 		<name>Dansguardian</name>
 		<website>http://www.dansguardian.org/</website>
-		<descr><![CDATA[DansGuardian is an award winning Open Source web content filter.<br>
-						It filters the actual content of pages based on many methods including phrase matching, PICS filtering and URL filtering.<br>
-						It does not purely filter based on a banned list of sites like lesser totally commercial filters.<br>
-						For all non-commercial it's free, without cost.<br>
+		<descr><![CDATA[DansGuardian is an award winning Open Source web content filter.<br />
+						It filters the actual content of pages based on many methods including phrase matching, PICS filtering and URL filtering.<br />
+						It does not purely filter based on a banned list of sites like lesser totally commercial filters.<br />
+						For all non-commercial it's free, without cost.<br />
 						For all commercial use visit dansguardian website to get a licence.]]></descr>
 		<category>Services</category>
 		<config_file>http://www.pfsense.com/packages/config/dansguardian/dansguardian.xml</config_file>
@@ -602,7 +602,7 @@
 		<name>mailscanner-dev</name>
 		<internal_name>mailscanner</internal_name>
 		<website>www.mailscanner.info</website>
-		<descr><![CDATA[MailScanner is an e-mail security and anti-spam package for e-mail gateway systems.<br>
+		<descr><![CDATA[MailScanner is an e-mail security and anti-spam package for e-mail gateway systems.<br />
 						This is a level3 mail scanning tool with high CPU load.]]></descr>
 		<category>Services</category>
 		<config_file>http://www.pfsense.com/packages/config/mailscanner/mailscanner.xml</config_file>
@@ -701,7 +701,7 @@
 	<package>
 		<name>Sarg</name>
 		<website>http://www.dansguardian.org/</website>
-		<descr><![CDATA[Sarg - Squid Analysis Report Generator is a tool that allow you to view "where" your users are going to on the Internet.<br>
+		<descr><![CDATA[Sarg - Squid Analysis Report Generator is a tool that allow you to view "where" your users are going to on the Internet.<br />
 						Sarg provides many informations about Proxy(squid,squidguard or dansguardian) users activities: times, bytes, sites, etc...]]></descr>
 		<category>Network Report</category>
 		<config_file>http://www.pfsense.com/packages/config/sarg/sarg.xml</config_file>
@@ -722,8 +722,8 @@
 		<name>Ipguard-dev</name>
 		<internal_name>ipguard</internal_name>
 		<website>http://ipguard.deep.perm.ru/</website>
-		<descr><![CDATA[Ipguard listens network for ARP packets. All permitted MAC-IP pairs listed in config files.<br>
-						If it receives one with MAC-IP pair, which is not listed in 'ethers' file, it will send ARP reply with configured fake address.<br>
+		<descr><![CDATA[Ipguard listens network for ARP packets. All permitted MAC-IP pairs listed in config files.<br />
+						If it receives one with MAC-IP pair, which is not listed in 'ethers' file, it will send ARP reply with configured fake address.<br />
 						This will prevent not permitted host to work properly in local ethernet segment.]]></descr>
 		<category>Security</category>
 		<config_file>http://www.pfsense.com/packages/config/ipguard/ipguard.xml</config_file>
@@ -740,7 +740,7 @@
 	</package>
 	<package>
 		<name>Varnish</name>
-		<descr><![CDATA[Varnish is a state-of-the-art, high-performance HTTP accelerator.<br>
+		<descr><![CDATA[Varnish is a state-of-the-art, high-performance HTTP accelerator.<br />
 						It uses the advanced features in FreeBSD 6/7/8 to achieve its high performance.]]></descr>
 		<website>http://varnish-cache.org</website>
 		<pkginfolink>http://doc.pfsense.org/index.php/Varnish_package</pkginfolink>
@@ -760,8 +760,8 @@
 	<package>
 		<name>Varnish3</name>
 		<internal_name>varnish</internal_name>
-		<descr><![CDATA[Varnish is a state-of-the-art, high-performance HTTP accelerator.<br>
-						It uses the advanced features in FreeBSD 6/7/8 to achieve its high performance.<br>
+		<descr><![CDATA[Varnish is a state-of-the-art, high-performance HTTP accelerator.<br />
+						It uses the advanced features in FreeBSD 6/7/8 to achieve its high performance.<br />
 						Version 3.0.2 includes streaming support]]></descr>
 		<website>http://varnish-cache.org</website>
 		<pkginfolink>http://doc.pfsense.org/index.php/Varnish_package</pkginfolink>
@@ -1080,9 +1080,9 @@
 	<package>
 		<name>freeradius2</name>
 		<website>http://www.freeradius.org/</website>
-		<descr><![CDATA[A free implementation of the RADIUS protocol.<br>
-					Support: MySQL, PostgreSQL, LDAP, Kerberos<br>
-					FreeRADIUS and FreeRADIUS2 settings are not compatible so don't use them together or try to update<br>
+		<descr><![CDATA[A free implementation of the RADIUS protocol.<br />
+					Support: MySQL, PostgreSQL, LDAP, Kerberos<br />
+					FreeRADIUS and FreeRADIUS2 settings are not compatible so don't use them together or try to update<br />
 					On pfSense docs there is a how-to which could help you on porting users.]]></descr>
 		<pkginfolink>http://doc.pfsense.org/index.php/FreeRADIUS_2.x_package</pkginfolink>
 		<category>System</category>
@@ -1224,8 +1224,8 @@
 	<package>
 		<name>squid3</name>
 		<internal_name>squid</internal_name>
-		<descr><![CDATA[High performance web proxy cache.<br>
-			It combines squid as a proxy server with it's capabilities of acting as a HTTP / HTTPS reverse proxy.<br>
+		<descr><![CDATA[High performance web proxy cache.<br />
+			It combines squid as a proxy server with it's capabilities of acting as a HTTP / HTTPS reverse proxy.<br />
 			It includes an Exchange-Web-Access (OWA) Assistant.]]></descr>
 		<pkginfolink>http://forum.pfsense.org/index.php/topic,48347.0.html</pkginfolink>
 		<website>http://www.squid-cache.org/</website>
@@ -1601,7 +1601,7 @@
 	</package>
 	<package>
 		<name>SSHDCond</name>
-		<descr><![CDATA[Allows to define SSH overrides for users,groups,hosts and addresses using Match in a convenient way.<br>
+		<descr><![CDATA[Allows to define SSH overrides for users,groups,hosts and addresses using Match in a convenient way.<br />
 				This package acts as an access list frontend for ssh connections]]></descr>
 		<category>Enhancements</category>
 		<version>1.0</version>
@@ -1623,7 +1623,7 @@
 	</package>
 	<package>
 		<name>zebedee</name>
-		<descr><![CDATA[Zebedee is a simple program to establish an encrypted, compressed "tunnel" for TCP/IP or UDP data transfer between two systems.<br>
+		<descr><![CDATA[Zebedee is a simple program to establish an encrypted, compressed "tunnel" for TCP/IP or UDP data transfer between two systems.<br />
 				This allows traffic such as telnet, ftp and X to be protected from snooping as well as potentially gaining performance over low-bandwidth networks from compression.]]>
 		</descr>
 		<category>Services</category>
