@@ -11,7 +11,8 @@ if($user_login == 'ok'){
 <title>Rename</title>
 </head>
 <body>
-<script language="javascript">
+<script type="text/javascript">
+//<![CDATA[
 <?
 //print_r($_POST);
 if($_POST['o'] != $_POST['n']){
@@ -30,6 +31,7 @@ if($_POST['o'] != $_POST['n']){
 }
 
 ?>
+//]]>
 </script>
 </body>
 </html>
