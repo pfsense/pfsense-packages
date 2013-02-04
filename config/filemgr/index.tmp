@@ -1,11 +1,11 @@
 <html>
-<HEAD>
-<SCRIPT language="JavaScript">
-<!--
+<head>
+<SCRIPT type="text/javascript">
+//<![CDATA[
 window.parent.location="../../index.php";
-//-->
+//]]>
 </SCRIPT>
-</HEAD>
+</head>
 
 
 </html>
