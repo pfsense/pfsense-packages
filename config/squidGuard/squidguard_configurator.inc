@@ -443,8 +443,11 @@ function squid_reconfigure($remove_only = '')
     # update config
     if (is_array($conf)) $conf = implode(";", $conf);
 
-    $config['installedpackages']['squid']['config'][0]['custom_options'] = $conf;
-    write_config('Update redirector options to squid config.');
+	/* Only update squid options if we have something to do, otherwise this can interfere with squid's default options in a new install. */
+	if (!empty($conf)) {
+		$config['installedpackages']['squid']['config'][0]['custom_options'] = $conf;
+		write_config('Update redirector options to squid config.');
+	}
 
     # resync squid package, if installed
     if (function_exists('squid_resync')) {
