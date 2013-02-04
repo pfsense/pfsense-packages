@@ -862,11 +862,13 @@ http_access allow manager localhost
 EOD;
 
 	if(!empty($settings['ext_cachemanager'])) {
-	  $extmgr = explode(";", ($settings['ext_cachemanager']));
+		$extmgr = array_unique(explode(";", rtrim($settings['ext_cachemanager'], ';')));
     $count = 1;
     $conf .= "\n# Allow external cache managers\n";
 //    $conf .= "acl ext_manager src ".$settings['ext_cachemanager']."\n";
 	 foreach ($extmgr as $mgr) {
+		if (empty($mgr))
+			continue;
     $conf .= "acl ext_manager_".$count." src ";
     $conf .= $mgr." ";
     $conf .= "\n";
