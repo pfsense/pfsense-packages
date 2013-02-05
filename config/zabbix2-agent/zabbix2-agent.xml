@@ -3,7 +3,7 @@
 	<name>zabbixagent</name>
 	<title>Services: Zabbix-2 Agent</title>
 	<category>Monitoring</category>
-	<version>0.5</version>
+	<version>0.6</version>
 	<addedit_string>Zabbix Agent has been created/modified.</addedit_string>
 	<delete_string>Zabbix Agent has been deleted.</delete_string>
 	<restart_command>/usr/local/etc/rc.d/zabbix2_agentd.sh restart</restart_command>
@@ -77,7 +77,6 @@
 			<value>120</value>
 			<type>input</type>
 			<size>60</size>
-			<required>false</required>
 			<description>The agent will refresh list of active checks once per 120 (default) seconds.</description>
 		</field>
 		<field>
@@ -88,6 +87,30 @@
 			<size>60</size>
 			<required>true</required>
 			<description>Timeout (default 3). Do not spend more that Timeout seconds on getting requested value (1-255). The agent does not kill timeouted User Parameters processes!</description>
+		</field>
+		<field>
+			<fielddescr>Buffer Send</fielddescr>
+			<fieldname>buffersend</fieldname>
+			<value>5</value>
+			<type>input</type>
+			<size>60</size>
+			<description>Buffer Send (default 5). Do not keep data longer than N seconds in buffer (1-3600).</description>
+		</field>
+		<field>
+			<fielddescr>Buffer Size</fielddescr>
+			<fieldname>buffersize</fieldname>
+			<value>100</value>
+			<type>input</type>
+			<size>60</size>
+			<description>Buffer Size (default 100). Maximum number of values in a memory buffer (2-65535). The agent will send all collected data to Zabbix server or proxy if the buffer is full.</description>
+		</field>
+		<field>
+			<fielddescr>Start Agents</fielddescr>
+			<fieldname>startagents</fieldname>
+			<value>3</value>
+			<type>input</type>
+			<size>60</size>
+			<description>Start Agents (default 3). Number of pre-forked instances of zabbix_agentd that process passive checks (0-100).If set to 0, disables passive checks and the agent will not listen on any TCP port.</description>
 		</field>
 		<field>
 			<fielddescr>User Parameters</fielddescr>
@@ -127,24 +150,22 @@
 
 	exec("/bin/rm -f " . ZABBIX_AGENT_BASE . "/etc/rc.d/zabbix2_agentd");
 
+	/* rc_file options */
 	$start  = "/bin/mkdir -p /var/log/zabbix2\n";
 	$start .= "/usr/sbin/chown -R zabbix:zabbix /var/log/zabbix2\n";
-
 	$start .= "/bin/mkdir -p /var/run/zabbix2\n";
 	$start .= "/usr/sbin/chown -R zabbix:zabbix /var/run/zabbix2\n";
-
-	$start .= "echo \"Starting Zabbix Agent\"...\n";
-
-	/* start zabbix agent */
+	$start .= "echo \"Starting Zabbix Agent...\"\n";
 	$start .= ZABBIX_AGENT_BASE . "/sbin/zabbix_agentd\n";
 
-	$stop  = "echo \"Stopping Zabbix Agent\"\n";
+	$stop  = "echo \"Stopping Zabbix Agent...\"\n";
 	$stop .= "/usr/bin/killall zabbix_agentd\n";
+	$stop .= "/bin/sleep 5\n";
+
 	/* write out rc.d start/stop file */
 	write_rcfile(array(
 					"file" => "zabbix2_agentd.sh",
-					"start" => "{$start}",
-					"restart" => "$stop\n" . "sleep 5\n" . "{$start}",
+					"start" => "$start",
 					"stop" => "$stop"
 			)
 	);
@@ -179,14 +200,48 @@
 	}
 
 	$RefreshActiveChecks=$_POST['refreshactchecks'];
-	if (!preg_match("/^\d+$/", $RefreshActiveChecks)) {
-		$input_errors[]='Refresh Active Checks is not numeric.';
+	if ($RefreshActiveChecks != '') {
+		if (!preg_match("/^\d+$/", $RefreshActiveChecks)) {
+			$input_errors[]='Refresh Active Checks is not numeric.';
+		} elseif ( $RefreshActiveChecks < 60 || $RefreshActiveChecks > 3600 ) {
+			$input_errors[]='You must enter a valid value for \'Refresh Active Checks\'';
+		}
 	}
 
 	$Timeout=$_POST['timeout'];
 	if (!preg_match("/^\d+$/", $Timeout)) {
 		$input_errors[]='Timeout is not numeric.';
+	} elseif ( $Timeout < 1 || $Timeout > 255 ) {
+		$input_errors[]='You must enter a valid value for \'Timeout\'';
 	}
+
+	$BufferSend=$_POST['buffersend'];
+	if ($BufferSend != '') {
+		if (!preg_match("/^\d+$/", $BufferSend)) {
+			$input_errors[]='Buffer Send is not numeric.';
+		} elseif ( $BufferSend < 1 || $BufferSend > 3600 ) {
+			$input_errors[]='You must enter a valid value for \'Buffer Send\'';
+		}
+	}
+	
+	$BufferSize=$_POST['buffersize'];
+	if ($BufferSize != '') {
+		if (!preg_match("/^\d+$/", $BufferSize)) {
+			$input_errors[]='Bufer Size is not numeric.';
+		} elseif ( $BufferSize < 2 || $BufferSize > 65535 ) {
+			$input_errors[]='You must enter a valid value for \'Buffer Size\'';
+		}
+	}
+	
+	$StartAgents=$_POST['startagents'];
+	if ($StartAgents != '') {
+		if (!preg_match("/^\d+$/", $StartAgents)) {
+			$input_errors[]='Start Agents is not numeric.';
+		} elseif ( $StartAgents < 0 || $StartAgents > 100 ) {
+			$input_errors[]='You must enter a valid value for \'Start Agents\'';
+		}
+	}
+
 	]]>
 	</custom_php_validation_command>
 	<custom_add_php_command></custom_add_php_command>
@@ -201,8 +256,11 @@
 	$Hostname=$config['installedpackages']['zabbixagent']['config'][0]['hostname'];
 	$ListenIP=$config['installedpackages']['zabbixagent']['config'][0]['listenip'];
 	$ListenPort=$config['installedpackages']['zabbixagent']['config'][0]['listenport'];
-	$RefreshActChecks=$config['installedpackages']['zabbixagent']['config'][0]['refreshactchecks'];
+	$RefreshActChecks=($config['installedpackages']['zabbixagent']['config'][0]['refreshactchecks'] ? $config['installedpackages']['zabbixagent']['config'][0]['refreshactchecks'] : 120);
 	$Timeout=$config['installedpackages']['zabbixagent']['config'][0]['timeout'];
+	$BufferSend=($config['installedpackages']['zabbixagent']['config'][0]['buffersend'] ? $config['installedpackages']['zabbixagent']['config'][0]['buffersend'] : 5);
+	$BufferSize=($config['installedpackages']['zabbixagent']['config'][0]['buffersize'] ? $config['installedpackages']['zabbixagent']['config'][0]['buffersize'] : 100);
+	$StartAgents=($config['installedpackages']['zabbixagent']['config'][0]['startagents'] != '' ? $config['installedpackages']['zabbixagent']['config'][0]['startagents'] : 3);
 	$UserParams=base64_decode($config['installedpackages']['zabbixagent']['config'][0]['userparams']);
 
 	$conf = "Server=$Server\n";
@@ -210,16 +268,39 @@
 	$conf .= "Hostname=$Hostname\n";
 	$conf .= "ListenIP=$ListenIP\n";
 	$conf .= "ListenPort=$ListenPort\n";
-	$conf .= "StartAgents=5\n";
 	$conf .= "RefreshActiveChecks=$RefreshActChecks\n";
 	$conf .= "DebugLevel=3\n";
 	$conf .= "PidFile=/var/run/zabbix2/zabbix2_agentd.pid\n";
 	$conf .= "LogFile=/var/log/zabbix2/zabbix2_agentd.log\n";
 	$conf .= "LogFileSize=1\n";
 	$conf .= "Timeout=$Timeout\n";
+	$conf .= "BufferSend=$BufferSend\n";
+	$conf .= "BufferSize=$BufferSize\n";
+	$conf .= "StartAgents=$StartAgents\n";
 	$conf .= "$UserParams\n";
 
 	file_put_contents(ZABBIX_AGENT_BASE . "/etc/zabbix2/zabbix_agentd.conf", $conf);
+
+	/* rc_file options */
+	$start  = "/bin/mkdir -p /var/log/zabbix2\n";
+	$start .= "/usr/sbin/chown -R zabbix:zabbix /var/log/zabbix2\n";
+	$start .= "/bin/mkdir -p /var/run/zabbix2\n";
+	$start .= "/usr/sbin/chown -R zabbix:zabbix /var/run/zabbix2\n";
+	$start .= "echo \"Starting Zabbix Agent...\"\n";
+	$start .= ZABBIX_AGENT_BASE . "/sbin/zabbix_agentd\n";
+
+	$stop  = "echo \"Stopping Zabbix Agent...\"\n";
+	$stop .= "/usr/bin/killall zabbix_agentd\n";
+	$stop .= "/bin/sleep 5\n";
+
+	/* write out rc.d start/stop file */
+	write_rcfile(array(
+					"file" => "zabbix2_agentd.sh",
+					"start" => "$start",
+					"stop" => "$stop"
+			)
+	);
+
 	conf_mount_ro();
 
 	]]>
