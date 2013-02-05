@@ -219,10 +219,6 @@ function squid_install_command() {
 	exec("chmod a+rx " . SQUID_LOCALBASE . "/libexec/squid/dnsserver");
 	if(file_exists("/usr/local/pkg/swapstate_check.php"))
 		exec("/bin/chmod a+x /usr/local/pkg/swapstate_check.php");
-	write_rcfile(array(
-		"file" => "sqp_monitor.sh",
-		"start" => "/usr/local/pkg/sqpmon.sh &",
-		"stop" => "ps awux | grep \"sqpmon\" | grep -v \"grep\" | grep -v \"php\" | awk '{ print $2 }' | xargs kill"));
 
 	foreach (array(	SQUID_CONFBASE,
 			SQUID_ACLDIR,
@@ -1479,6 +1475,10 @@ if [ -z "`ps auxw | grep "[s]quid -D"|awk '{print $2}'`" ];then
 EOD;
 	conf_mount_rw();
 	write_rcfile($rc);
+	write_rcfile(array(
+		"file" => "sqp_monitor.sh",
+		"start" => "/usr/local/pkg/sqpmon.sh &",
+		"stop" => "ps awux | grep \"sqpmon\" | grep -v \"grep\" | grep -v \"php\" | awk '{ print $2 }' | xargs kill"));
 	conf_mount_ro();
 }
 ?>
