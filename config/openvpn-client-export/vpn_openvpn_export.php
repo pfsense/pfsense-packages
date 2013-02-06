@@ -3,7 +3,7 @@
 	vpn_openvpn_export.php
 
 	Copyright (C) 2008 Shrew Soft Inc.
-	Copyright (C) 2010 Ermal Lu�i
+	Copyright (C) 2010 Ermal Luçi
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
@@ -256,9 +256,9 @@ include("head.inc");
 
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">
 <?php include("fbegin.inc"); ?>
-<script language="JavaScript">
-	var viscosityAvailable = false;
-<!--
+<script type="text/javascript">
+//<![CDATA[
+var viscosityAvailable = false;
 
 var servers = new Array();
 <?php foreach ($ras_server as $sindex => $server): ?>
@@ -367,32 +367,32 @@ function download_begin(act, i, j) {
 
 	var dlurl;
 	dlurl  = "/vpn_openvpn_export.php?act=" + act;
-	dlurl += "&srvid=" + escape(servers[index][0]);
+	dlurl += "&amp;srvid=" + escape(servers[index][0]);
 	if (users[i]) {
-		dlurl += "&usrid=" + escape(users[i][0]);
-		dlurl += "&crtid=" + escape(users[i][1]);
+		dlurl += "&amp;usrid=" + escape(users[i][0]);
+		dlurl += "&amp;crtid=" + escape(users[i][1]);
 	}
 	if (certs[j]) {
-		dlurl += "&usrid=";
-		dlurl += "&crtid=" + escape(certs[j][0]);
+		dlurl += "&amp;usrid=";
+		dlurl += "&amp;crtid=" + escape(certs[j][0]);
 	}
-	dlurl += "&useaddr=" + escape(useaddr);
-	dlurl += "&quoteservercn=" + escape(quoteservercn);
-	dlurl += "&openvpnmanager=" + escape(openvpnmanager);
-	dlurl += "&usetoken=" + escape(usetoken);
+	dlurl += "&amp;useaddr=" + escape(useaddr);
+	dlurl += "&amp;quoteservercn=" + escape(quoteservercn);
+	dlurl += "&amp;openvpnmanager=" + escape(openvpnmanager);
+	dlurl += "&amp;usetoken=" + escape(usetoken);
 	if (usepass)
-		dlurl += "&password=" + escape(pass);
+		dlurl += "&amp;password=" + escape(pass);
 	if (useproxy) {
-		dlurl += "&proxy_addr=" + escape(proxyaddr);
-		dlurl += "&proxy_port=" + escape(proxyport);
-		dlurl += "&proxy_authtype=" + escape(proxyauth);
+		dlurl += "&amp;proxy_addr=" + escape(proxyaddr);
+		dlurl += "&amp;proxy_port=" + escape(proxyport);
+		dlurl += "&amp;proxy_authtype=" + escape(proxyauth);
 		if (useproxypass) {
-			dlurl += "&proxy_user=" + escape(proxyuser);
-			dlurl += "&proxy_password=" + escape(proxypass);
+			dlurl += "&amp;proxy_user=" + escape(proxyuser);
+			dlurl += "&amp;proxy_password=" + escape(proxypass);
 		}
 	}
 
-	dlurl += "&advancedoptions=" + escape(advancedoptions);
+	dlurl += "&amp;advancedoptions=" + escape(advancedoptions);
 
 	window.open(dlurl,"_self");
 }
@@ -416,28 +416,28 @@ function server_changed() {
 		cell1.className = "listr";
 		cell1.innerHTML = users[i][3];
 		cell2.className = "listr";
-		cell2.innerHTML = "- Standard Configurations:<br/>";
+		cell2.innerHTML = "- Standard Configurations:<br\/>";
 		cell2.innerHTML += "&nbsp;&nbsp; ";
-		cell2.innerHTML += "<a href='javascript:download_begin(\"confzip\"," + i + ", -1)'>Archive</a>";
+		cell2.innerHTML += "<a href='javascript:download_begin(\"confzip\"," + i + ", -1)'>Archive<\/a>";
 		cell2.innerHTML += "&nbsp;&nbsp; ";
-		cell2.innerHTML += "<a href='javascript:download_begin(\"conf\"," + i + ", -1)'>Config Only</a>";
-		cell2.innerHTML += "<br/>- Inline Configurations:<br/>";
+		cell2.innerHTML += "<a href='javascript:download_begin(\"conf\"," + i + ", -1)'>Config Only<\/a>";
+		cell2.innerHTML += "<br\/>- Inline Configurations:<br\/>";
 		cell2.innerHTML += "&nbsp;&nbsp; ";
-		cell2.innerHTML += "<a href='javascript:download_begin(\"confinlinedroid\"," + i + ", -1)'>Android</a>";
+		cell2.innerHTML += "<a href='javascript:download_begin(\"confinlinedroid\"," + i + ", -1)'>Android<\/a>";
 		cell2.innerHTML += "&nbsp;&nbsp; ";
-		cell2.innerHTML += "<a href='javascript:download_begin(\"confinlineios\"," + i + ", -1)'>OpenVPN Connect (iOS/Android)</a>";
+		cell2.innerHTML += "<a href='javascript:download_begin(\"confinlineios\"," + i + ", -1)'>OpenVPN Connect (iOS/Android)<\/a>";
 		cell2.innerHTML += "&nbsp;&nbsp; ";
-		cell2.innerHTML += "<a href='javascript:download_begin(\"confinline\"," + i + ", -1)'>Others</a>";
-		cell2.innerHTML += "<br/>- Windows Installers:<br/>";
+		cell2.innerHTML += "<a href='javascript:download_begin(\"confinline\"," + i + ", -1)'>Others<\/a>";
+		cell2.innerHTML += "<br\/>- Windows Installers:<br\/>";
 		cell2.innerHTML += "&nbsp;&nbsp; ";
-		cell2.innerHTML += "<a href='javascript:download_begin(\"inst\"," + i + ", -1)'>2.2</a>";
+		cell2.innerHTML += "<a href='javascript:download_begin(\"inst\"," + i + ", -1)'>2.2<\/a>";
 		cell2.innerHTML += "&nbsp;&nbsp; ";
-		cell2.innerHTML += "<a href='javascript:download_begin(\"inst-2.3-x86\"," + i + ", -1)'>2.3-x86</a>";
+		cell2.innerHTML += "<a href='javascript:download_begin(\"inst-2.3-x86\"," + i + ", -1)'>2.3-x86<\/a>";
 //		cell2.innerHTML += "&nbsp;&nbsp; ";
-//		cell2.innerHTML += "<a href='javascript:download_begin(\"inst-2.3-x64\"," + i + ", -1)'>2.3-x64</a>";
-		cell2.innerHTML += "<br/>- Mac OSX:<br/>";
+//		cell2.innerHTML += "<a href='javascript:download_begin(\"inst-2.3-x64\"," + i + ", -1)'>2.3-x64<\/a>";
+		cell2.innerHTML += "<br\/>- Mac OSX:<br\/>";
 		cell2.innerHTML += "&nbsp;&nbsp; ";
-		cell2.innerHTML += "<a href='javascript:download_begin(\"visc\"," + i + ", -1)'>Viscosity Bundle</a>";
+		cell2.innerHTML += "<a href='javascript:download_begin(\"visc\"," + i + ", -1)'>Viscosity Bundle<\/a>";
 	}
 	for (j=0; j < certs.length; j++) {
 		var row = table.insertRow(table.rows.length);
@@ -453,38 +453,38 @@ function server_changed() {
 		cell1.className = "listr";
 		cell1.innerHTML = certs[j][1];
 		cell2.className = "listr";
-		cell2.innerHTML = "- Standard Configurations:<br/>";
+		cell2.innerHTML = "- Standard Configurations:<br\/>";
 		cell2.innerHTML += "&nbsp;&nbsp; ";
-		cell2.innerHTML += "<a href='javascript:download_begin(\"confzip\", -1," + j + ")'>Archive</a>";
+		cell2.innerHTML += "<a href='javascript:download_begin(\"confzip\", -1," + j + ")'>Archive<\/a>";
 		cell2.innerHTML += "&nbsp;&nbsp; ";
-		cell2.innerHTML += "<a href='javascript:download_begin(\"conf\", -1," + j + ")'>File Only</a>";
-		cell2.innerHTML += "<br/>- Inline Configurations:<br/>";
+		cell2.innerHTML += "<a href='javascript:download_begin(\"conf\", -1," + j + ")'>File Only<\/a>";
+		cell2.innerHTML += "<br\/>- Inline Configurations:<br\/>";
 		cell2.innerHTML += "&nbsp;&nbsp; ";
-		cell2.innerHTML += "<a href='javascript:download_begin(\"confinlinedroid\", -1," + j + ")'>Android</a>";
+		cell2.innerHTML += "<a href='javascript:download_begin(\"confinlinedroid\", -1," + j + ")'>Android<\/a>";
 		cell2.innerHTML += "&nbsp;&nbsp; ";
-		cell2.innerHTML += "<a href='javascript:download_begin(\"confinlineios\", -1," + j + ")'>OpenVPN Connect (iOS/Android)</a>";
+		cell2.innerHTML += "<a href='javascript:download_begin(\"confinlineios\", -1," + j + ")'>OpenVPN Connect (iOS/Android)<\/a>";
 		cell2.innerHTML += "&nbsp;&nbsp; ";
-		cell2.innerHTML += "<a href='javascript:download_begin(\"confinline\", -1," + j + ")'>Others</a>";
-		cell2.innerHTML += "<br/>- Windows Installers:<br/>";
+		cell2.innerHTML += "<a href='javascript:download_begin(\"confinline\", -1," + j + ")'>Others<\/a>";
+		cell2.innerHTML += "<br\/>- Windows Installers:<br\/>";
 		cell2.innerHTML += "&nbsp;&nbsp; ";
-		cell2.innerHTML += "<a href='javascript:download_begin(\"inst\", -1," + j + ")'>2.2</a>";
+		cell2.innerHTML += "<a href='javascript:download_begin(\"inst\", -1," + j + ")'>2.2<\/a>";
 		cell2.innerHTML += "&nbsp;&nbsp; ";
-		cell2.innerHTML += "<a href='javascript:download_begin(\"inst-2.3-x86\", -1," + j + ")'>2.3-x86</a>";
+		cell2.innerHTML += "<a href='javascript:download_begin(\"inst-2.3-x86\", -1," + j + ")'>2.3-x86<\/a>";
 //		cell2.innerHTML += "&nbsp;&nbsp; ";
-//		cell2.innerHTML += "<a href='javascript:download_begin(\"inst-2.3-x64\", -1," + j + ")'>2.3-x64</a>";
-		cell2.innerHTML += "<br/>- Mac OSX:<br/>";
+//		cell2.innerHTML += "<a href='javascript:download_begin(\"inst-2.3-x64\", -1," + j + ")'>2.3-x64<\/a>";
+		cell2.innerHTML += "<br\/>- Mac OSX:<br\/>";
 		cell2.innerHTML += "&nbsp;&nbsp; ";
-		cell2.innerHTML += "<a href='javascript:download_begin(\"visc\", -1," + j + ")'>Viscosity Bundle</a>";
+		cell2.innerHTML += "<a href='javascript:download_begin(\"visc\", -1," + j + ")'>Viscosity Bundle<\/a>";
 		if (servers[index][2] == "server_tls") {
-			cell2.innerHTML += "<br/>- Yealink SIP Handsets: <br/>";
+			cell2.innerHTML += "<br\/>- Yealink SIP Handsets: <br\/>";
 			cell2.innerHTML += "&nbsp;&nbsp; ";
-			cell2.innerHTML += "<a href='javascript:download_begin(\"conf_yealink_t28\", -1," + j + ")'>T28</a>";
+			cell2.innerHTML += "<a href='javascript:download_begin(\"conf_yealink_t28\", -1," + j + ")'>T28<\/a>";
 			cell2.innerHTML += "&nbsp;&nbsp; ";
-			cell2.innerHTML += "<a href='javascript:download_begin(\"conf_yealink_t38g\", -1," + j + ")'>T38G (1)</a>";
+			cell2.innerHTML += "<a href='javascript:download_begin(\"conf_yealink_t38g\", -1," + j + ")'>T38G (1)<\/a>";
 			cell2.innerHTML += "&nbsp;&nbsp; ";
-			cell2.innerHTML += "<a href='javascript:download_begin(\"conf_yealink_t38g2\", -1," + j + ")'>T38G (2)</a>";
-			cell2.innerHTML += "<br/>";
-			cell2.innerHTML += "- <a href='javascript:download_begin(\"conf_snom\", -1," + j + ")'>SNOM SIP Handset</a>";
+			cell2.innerHTML += "<a href='javascript:download_begin(\"conf_yealink_t38g2\", -1," + j + ")'>T38G (2)<\/a>";
+			cell2.innerHTML += "<br\/>";
+			cell2.innerHTML += "- <a href='javascript:download_begin(\"conf_snom\", -1," + j + ")'>SNOM SIP Handset<\/a>";
 		}
 	}
 	if (servers[index][2] == 'server_user') {
@@ -497,28 +497,28 @@ function server_changed() {
 		cell1.className = "listr";
 		cell1.innerHTML = "none";
 		cell2.className = "listr";
-		cell2.innerHTML = "- Standard Configurations:<br/>";
+		cell2.innerHTML = "- Standard Configurations:<br\/>";
 		cell2.innerHTML += "&nbsp;&nbsp; ";
-		cell2.innerHTML += "<a href='javascript:download_begin(\"confzip\"," + i + ")'>Archive</a>";
+		cell2.innerHTML += "<a href='javascript:download_begin(\"confzip\"," + i + ")'>Archive<\/a>";
 		cell2.innerHTML += "&nbsp;&nbsp; ";
-		cell2.innerHTML += "<a href='javascript:download_begin(\"conf\"," + i + ")'>File Only</a>";
-		cell2.innerHTML += "<br/>- Inline Configurations:<br/>";
+		cell2.innerHTML += "<a href='javascript:download_begin(\"conf\"," + i + ")'>File Only<\/a>";
+		cell2.innerHTML += "<br\/>- Inline Configurations:<br\/>";
 		cell2.innerHTML += "&nbsp;&nbsp; ";
-		cell2.innerHTML += "<a href='javascript:download_begin(\"confinlinedroid\"," + i + ")'>Android</a>";
+		cell2.innerHTML += "<a href='javascript:download_begin(\"confinlinedroid\"," + i + ")'>Android<\a>";
 		cell2.innerHTML += "&nbsp;&nbsp; ";
-		cell2.innerHTML += "<a href='javascript:download_begin(\"confinlineios\"," + i + ")'>OpenVPN Connect (iOS/Android)</a>";
+		cell2.innerHTML += "<a href='javascript:download_begin(\"confinlineios\"," + i + ")'>OpenVPN Connect (iOS/Android)<\/a>";
 		cell2.innerHTML += "&nbsp;&nbsp; ";
-		cell2.innerHTML += "<a href='javascript:download_begin(\"confinline\"," + i + ")'>Others</a>";
-		cell2.innerHTML += "<br/>- Windows Installers:<br/>";
+		cell2.innerHTML += "<a href='javascript:download_begin(\"confinline\"," + i + ")'>Others<\/a>";
+		cell2.innerHTML += "<br\/>- Windows Installers:<br\/>";
 		cell2.innerHTML += "&nbsp;&nbsp; ";
-		cell2.innerHTML += "<a href='javascript:download_begin(\"inst\"," + i + ")'>2.2</a>";
+		cell2.innerHTML += "<a href='javascript:download_begin(\"inst\"," + i + ")'>2.2<\/a>";
 		cell2.innerHTML += "&nbsp;&nbsp; ";
-		cell2.innerHTML += "<a href='javascript:download_begin(\"inst-2.3-x86\"," + i + ")'>2.3-x86</a>";
+		cell2.innerHTML += "<a href='javascript:download_begin(\"inst-2.3-x86\"," + i + ")'>2.3-x86<\/a>";
 //		cell2.innerHTML += "&nbsp;&nbsp; ";
-//		cell2.innerHTML += "<a href='javascript:download_begin(\"inst-2.3-x64\"," + i + ")'>2.3-x64</a>";
-		cell2.innerHTML += "<br/>- Mac OSX:<br/>";
+//		cell2.innerHTML += "<a href='javascript:download_begin(\"inst-2.3-x64\"," + i + ")'>2.3-x64<\/a>";
+		cell2.innerHTML += "<br\/>- Mac OSX:<br\/>";
 		cell2.innerHTML += "&nbsp;&nbsp; ";
-		cell2.innerHTML += "<a href='javascript:download_begin(\"visc\"," + i + ")'>Viscosity Bundle</a>";
+		cell2.innerHTML += "<a href='javascript:download_begin(\"visc\"," + i + ")'>Viscosity Bundle<\/a>";
 	}
 }
 
@@ -548,7 +548,7 @@ function useproxy_changed(obj) {
 		$(obj.id + '_opts').hide();
 	}
 }
-//-->
+//]]>
 </script>
 <?php
 	if ($input_errors)
@@ -556,7 +556,7 @@ function useproxy_changed(obj) {
 	if ($savemsg)
 		print_info_box($savemsg);
 ?>
-<table width="100%" border="0" cellpadding="0" cellspacing="0">
+<table width="100%" border="0" cellpadding="0" cellspacing="0" summary="openvpn export">
  	<tr>
 		<td>
 			<?php
@@ -574,11 +574,11 @@ function useproxy_changed(obj) {
 	<tr>
 		<td id="mainarea">
 			<div class="tabcont">
-				<table width="100%" border="0" cellpadding="6" cellspacing="0">
+				<table width="100%" border="0" cellpadding="6" cellspacing="0" summary="main area">
 					<tr>
 						<td width="22%" valign="top" class="vncellreq">Remote Access Server</td>
 						<td width="78%" class="vtable">
-							<select name="server" id="server" class="formselect" onChange="server_changed()">
+							<select name="server" id="server" class="formselect" onchange="server_changed()">
 								<?php foreach($ras_server as & $server): ?>
 								<option value="<?=$server['sindex'];?>"><?=$server['name'];?></option>
 								<?php endforeach; ?>
@@ -588,10 +588,10 @@ function useproxy_changed(obj) {
 					<tr>
 						<td width="22%" valign="top" class="vncell">Host Name Resolution</td>
 						<td width="78%" class="vtable">
-							<table border="0" cellpadding="2" cellspacing="0">
+							<table border="0" cellpadding="2" cellspacing="0" summary="name resolution">
 								<tr>
 									<td>
-										<select name="useaddr" id="useaddr" class="formselect" onChange="useaddr_changed(this)">
+										<select name="useaddr" id="useaddr" class="formselect" onchange="useaddr_changed(this)">
 											<option value="serveraddr" >Interface IP Address</option>
 											<option value="serverhostname" >Installation hostname</option>
 											<?php if (is_array($config['dyndnses']['dyndns'])): ?>
@@ -602,7 +602,7 @@ function useproxy_changed(obj) {
 											<option value="other">Other</option>
 										</select>
 										<br />
-										<div style="display:none;" name="HostName" id="HostName">
+										<div style="display:none;" id="HostName">
 											<input name="useaddr_hostname" id="useaddr_hostname" />
 											<span class="vexpl">
 												Enter the hostname or IP address the client will use to connect to this server.
@@ -616,10 +616,10 @@ function useproxy_changed(obj) {
 					<tr>
 						<td width="22%" valign="top" class="vncell">Quote Server CN</td>
 						<td width="78%" class="vtable">
-							<table border="0" cellpadding="2" cellspacing="0">
+							<table border="0" cellpadding="2" cellspacing="0" summary="quote server cn">
 								<tr>
 									<td>
-										<input name="quoteservercn" id="quoteservercn" type="checkbox" value="yes">
+										<input name="quoteservercn" id="quoteservercn" type="checkbox" value="yes" />
 									</td>
 									<td>
 										<span class="vexpl">
@@ -633,10 +633,10 @@ function useproxy_changed(obj) {
 					<tr>
 						<td width="22%" valign="top" class="vncell">Certificate Export Options</td>
 						<td width="78%" class="vtable">
-							<table border="0" cellpadding="2" cellspacing="0">
+							<table border="0" cellpadding="2" cellspacing="0" summary="export options">
 								<tr>
 									<td>
-										<input name="usetoken" id="usetoken" type="checkbox" value="yes">
+										<input name="usetoken" id="usetoken" type="checkbox" value="yes" />
 									</td>
 									<td>
 										<span class="vexpl">
@@ -645,10 +645,10 @@ function useproxy_changed(obj) {
 									</td>
 								</tr>
 							</table>
-							<table border="0" cellpadding="2" cellspacing="0">
+							<table border="0" cellpadding="2" cellspacing="0" summary="checkbox for password">
 								<tr>
 									<td>
-										<input name="usepass" id="usepass" type="checkbox" value="yes" onClick="usepass_changed()">
+										<input name="usepass" id="usepass" type="checkbox" value="yes" onclick="usepass_changed()" />
 									</td>
 									<td>
 										<span class="vexpl">
@@ -657,7 +657,7 @@ function useproxy_changed(obj) {
 									</td>
 								</tr>
 							</table>
-							<table border="0" cellpadding="2" cellspacing="0" id="usepass_opts" style="display:none">
+							<table border="0" cellpadding="2" cellspacing="0" id="usepass_opts" style="display:none" summary="password">
 								<tr>
 									<td align="right">
 										<span class="vexpl">
@@ -684,10 +684,10 @@ function useproxy_changed(obj) {
 					<tr>
 						<td width="22%" valign="top" class="vncell">Use HTTP Proxy</td>
 						<td width="78%" class="vtable">
-							 <table border="0" cellpadding="2" cellspacing="0">
+							 <table border="0" cellpadding="2" cellspacing="0" summary="http proxy">
 								<tr>
 									<td>
-										<input name="useproxy" id="useproxy" type="checkbox" value="yes" onClick="useproxy_changed(this)">
+										<input name="useproxy" id="useproxy" type="checkbox" value="yes" onclick="useproxy_changed(this)" />
 
 									</td>
 									<td>
@@ -697,9 +697,9 @@ function useproxy_changed(obj) {
 									</td>
 								</tr>
 							</table>
-							<table border="0" cellpadding="2" cellspacing="0" id="useproxy_opts" style="display:none">
+							<table border="0" cellpadding="2" cellspacing="0" id="useproxy_opts" style="display:none" summary="user options">
 								<tr>
-									<td align="right" width='25%'>
+									<td align="right" width="25%">
 										<span class="vexpl">
 											 &nbsp;     IP Address :&nbsp;
 										</span>
@@ -709,21 +709,21 @@ function useproxy_changed(obj) {
 									</td>
 								</tr>
 								<tr>
-									<td align="right" width='25%'>
+									<td align="right" width="25%">
 										<span class="vexpl">
 											 &nbsp;      Port :&nbsp;
 										</span>
+									</td>
 														<td>
 										<input name="proxyport" id="proxyport" class="formfld unknown" size="5" value="" />
 									</td>
 								</tr>
-							<br />
 								<tr>
 									<td width="25%">
-
+							<br />
 									</td>
 									<td>
-										<select name="useproxypass" id="useproxypass" class="formselect" onChange="useproxy_changed(this)">
+										<select name="useproxypass" id="useproxypass" class="formselect" onchange="useproxy_changed(this)">
 											<option value="none">none</option>
 											<option value="basic">basic</option>
 											<option value="ntlm">ntlm</option>
@@ -732,7 +732,7 @@ function useproxy_changed(obj) {
 											Choose HTTP proxy authentication if any.
 										</span>
 							<br />
-							<table border="0" cellpadding="2" cellspacing="0" id="useproxypass_opts" style="display:none">
+							<table border="0" cellpadding="2" cellspacing="0" id="useproxypass_opts" style="display:none" summary="name and password">
 								<tr>
 									<td align="right" width="25%">
 										<span class="vexpl">
@@ -758,6 +758,7 @@ function useproxy_changed(obj) {
 										<span class="vexpl">
 											 &nbsp;Confirm :&nbsp;
 										</span>
+									</td>
 														<td>
 										<input name="proxyconf" id="proxyconf" type="password" class="formfld pwd" size="20" value="" />
 									</td>
@@ -771,10 +772,10 @@ function useproxy_changed(obj) {
 					<tr>
 						<td width="22%" valign="top" class="vncell">Management&nbsp;Interface<br/>OpenVPNManager</td>
 						<td width="78%" class="vtable">
-							<table border="0" cellpadding="2" cellspacing="0">
+							<table border="0" cellpadding="2" cellspacing="0" summary="openvpn manager">
 								<tr>
 									<td>
-										<input name="openvpnmanager" id="openvpnmanager" type="checkbox" value="yes">
+										<input name="openvpnmanager" id="openvpnmanager" type="checkbox" value="yes" />
 									</td>
 									<td>
 										<span class="vexpl">
@@ -793,7 +794,7 @@ function useproxy_changed(obj) {
 					<tr>
 						<td width="22%" valign="top" class="vncell">Additional configuration options</td>
 						<td width="78%" class="vtable">
-							<textarea rows="6" cols="78" name="advancedoptions" id="advancedoptions"></textarea><br/>
+							<textarea rows="6" cols="68" name="advancedoptions" id="advancedoptions"></textarea><br/>
 							<?=gettext("Enter any additional options you would like to add to the OpenVPN client export configuration here, separated by a line break or semicolon"); ?><br/>
 							<?=gettext("EXAMPLE: remote-random"); ?>;
 						</td>
@@ -802,14 +803,14 @@ function useproxy_changed(obj) {
 						<td colspan="2" valign="top" class="listtopic">Client Install Packages</td>
 					</tr>
 				</table>
-				<table width="100%" id="users" width="100%" border="0" cellpadding="0" cellspacing="0">
+				<table width="100%" id="users" border="0" cellpadding="0" cellspacing="0" summary="heading">
 					<tr>
 						<td width="25%" class="listhdrr"><?=gettext("User");?></td>
 						<td width="35%" class="listhdrr"><?=gettext("Certificate Name");?></td>
 						<td width="40%" class="listhdrr"><?=gettext("Export");?></td>
 					</tr>
 				</table>
-				<table width="100%" width="100%" border="0" cellpadding="0" cellspacing="5">
+				<table width="100%" border="0" cellpadding="0" cellspacing="5" summary="note">
 					<tr>
 						<td align="right" valign="top" width="5%"><?= gettext("NOTE:") ?></td>
 						<td><?= gettext("If you expect to see a certain client in the list but it is not there, it is usually due to a CA mismatch between the OpenVPN server instance and the client certificates found in the User Manager.") ?></td>
@@ -833,10 +834,12 @@ function useproxy_changed(obj) {
 		</td>
 	</tr>
 </table>
-<script language="JavaScript">
-<!--
+<script type="text/javascript">
+//<![CDATA[
 server_changed();
-//-->
+//]]>
 </script>
-</body>
+
 <?php include("fend.inc"); ?>
+</body>
+</html>
