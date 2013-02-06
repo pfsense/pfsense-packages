@@ -132,48 +132,48 @@ if ($_POST) {
 	}
 }
 
+$closehead = false;
 $pgtitle = array(gettext("System"),gettext("Patches"), gettext("Edit"));
 include("head.inc");
 
 ?>
-<link rel="stylesheet" href="/pfCenter/javascript/chosen/chosen.css" />
+<link type="text/css" rel="stylesheet" href="/pfCenter/javascript/chosen/chosen.css" />
+<script src="/pfCenter/javascript/chosen/chosen.proto.js" type="text/javascript"></script>
 </head>
 
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">
-<script src="/pfCenter/javascript/chosen/chosen.proto.js" type="text/javascript"></script>
 
-<?php
-include("fbegin.inc"); ?>
+<?php include("fbegin.inc"); ?>
 <?php if ($input_errors) print_input_errors($input_errors); ?>
 <form action="system_patches_edit.php" method="post" name="iform" id="iform">
-<table width="100%" border="0" cellpadding="6" cellspacing="0">
+<table width="100%" border="0" cellpadding="6" cellspacing="0" summary="system patches edit">
 <tr>
 	<td colspan="2" valign="top" class="listtopic"><?=gettext("Edit Patch Entry"); ?></td>
 </tr>
 <tr>
 	<td width="22%" valign="top" class="vncellreq"><strong><?=gettext("Description"); ?></strong></td>
 	<td width="78%" class="vtable">
-		<input name="descr" type="text" class="formfld unknown" id="descr" size="40" value="<?=htmlspecialchars($pconfig['descr']);?>">
-		<br> <span class="vexpl"><?=gettext("Enter a description here for your reference."); ?></span></td>
+		<input name="descr" type="text" class="formfld unknown" id="descr" size="40" value="<?=htmlspecialchars($pconfig['descr']);?>" />
+		<br /> <span class="vexpl"><?=gettext("Enter a description here for your reference."); ?></span></td>
 </tr>
 <tr>
 	<td width="22%" valign="top" class="vncell"><?=gettext("URL/Commit ID"); ?></td>
 	<td width="78%" class="vtable">
-		<input name="location" type="text" class="formfld unknown" id="location" size="40" value="<?=htmlspecialchars($pconfig['location']);?>">
-		<br> <span class="vexpl"><?=gettext("Enter a URL to a patch, or a commit ID from the main github repository (NOT the tools or packages repos!)."); ?></span></td>
+		<input name="location" type="text" class="formfld unknown" id="location" size="40" value="<?=htmlspecialchars($pconfig['location']);?>" />
+		<br /> <span class="vexpl"><?=gettext("Enter a URL to a patch, or a commit ID from the main github repository (NOT the tools or packages repos!)."); ?></span></td>
 </tr>
 <tr>
 	<td width="22%" valign="top" class="vncell"><?=gettext("Patch Contents"); ?></td>
 	<td width="78%" class="vtable">
-		<textarea name="patch" class="" id="patch" ROWS="15" COLS="70" wrap="off"><?=base64_decode($pconfig['patch']);?></textarea>
-		<br> <span class="vexpl"><?=gettext("The contents of the patch. You can paste a patch here, or enter a URL/commit ID above, it can then be fetched into here automatically."); ?></span></td>
+		<textarea name="patch" class="" id="patch" rows="15" cols="70" wrap="off"><?=base64_decode($pconfig['patch']);?></textarea>
+		<br /> <span class="vexpl"><?=gettext("The contents of the patch. You can paste a patch here, or enter a URL/commit ID above, it can then be fetched into here automatically."); ?></span></td>
 </tr>
 <tr>
 	<td width="22%" valign="top" class="vncell"><?=gettext("Path Strip Count:"); ?></td>
 	<td width="78%" class="vtable">
 		<select name="pathstrip" class="formselect" id="pathstrip">
 <?php		for ($i = 0; $i < 20; $i++): ?>
-			<option value="<?=$i;?>" <?php if ($i == $pconfig['pathstrip']) echo "selected"; ?>><?=$i;?></option>
+			<option value="<?=$i;?>" <?php if ($i == $pconfig['pathstrip']) echo "selected=\"selected\""; ?>><?=$i;?></option>
 <?php 		endfor; ?>
 		</select>
 	</td>
@@ -181,13 +181,13 @@ include("fbegin.inc"); ?>
 <tr>
 	<td width="22%" valign="top" class="vncell"><?=gettext("Base Directory"); ?></td>
 	<td width="78%" class="vtable">
-		<input name="basedir" type="text" class="formfld unknown" id="basedir" size="40" value="<?=htmlspecialchars($pconfig['basedir']);?>">
-		<br> <span class="vexpl"><?=gettext("Enter the base directory for the patch, default is /. Patches from github are all based in /. Custom patches may need a full path here such as /usr/local/www/"); ?></span></td>
+		<input name="basedir" type="text" class="formfld unknown" id="basedir" size="40" value="<?=htmlspecialchars($pconfig['basedir']);?>" />
+		<br /> <span class="vexpl"><?=gettext("Enter the base directory for the patch, default is /. Patches from github are all based in /. Custom patches may need a full path here such as /usr/local/www/"); ?></span></td>
 </tr>
 <tr>
 	<td width="22%" valign="top" class="vncell"><?=gettext("Ignore Whitespace"); ?></td>
 	<td width="78%" class="vtable">
-		<input name="ignorewhitespace" type="checkbox" id="ignorewhitespace" value="yes" <?php if ($pconfig['ignorewhitespace']) echo "checked"; ?>>
+		<input name="ignorewhitespace" type="checkbox" id="ignorewhitespace" value="yes" <?php if ($pconfig['ignorewhitespace']) echo "checked=\"checked\""; ?> />
 		<strong><?=gettext("Ignore Whitespace"); ?></strong><br />
 		<span class="vexpl"><?=gettext("Set this option to ignore whitespace in the patch."); ?></span>
 	</td>
@@ -196,7 +196,7 @@ include("fbegin.inc"); ?>
 <tr>
 	<td width="22%" valign="top" class="vncell"><?=gettext("Auto Apply"); ?></td>
 	<td width="78%" class="vtable">
-		<input name="autoapply" type="checkbox" id="autoapply" value="yes" <?php if ($pconfig['autoapply']) echo "checked"; ?>>
+		<input name="autoapply" type="checkbox" id="autoapply" value="yes" <?php if ($pconfig['autoapply']) echo "checked=\"checked\""; ?> />
 		<strong><?=gettext("Auto-Apply Patch"); ?></strong><br />
 		<span class="vexpl"><?=gettext("Set this option to apply the patch automatically when possible, useful for patches to survive after firmware updates."); ?></span>
 	</td>
@@ -209,10 +209,10 @@ include("fbegin.inc"); ?>
 <tr>
 	<td width="22%" valign="top">&nbsp;</td>
 	<td width="78%">
-		<input name="Submit" type="submit" class="formbtn" value="<?=gettext("Save"); ?>"> <input type="button" class="formbtn" value="<?=gettext("Cancel"); ?>" onclick="history.back()">
+		<input name="Submit" type="submit" class="formbtn" value="<?=gettext("Save"); ?>" /> <input type="button" class="formbtn" value="<?=gettext("Cancel"); ?>" onclick="history.back()" />
 		<?php if (isset($id) && $a_patches[$id]): ?>
-		<input name="id" type="hidden" value="<?=htmlspecialchars($id);?>">
-		<input name="uniqid" type="hidden" value="<?=htmlspecialchars($pconfig['uniqid']);?>">
+		<input name="id" type="hidden" value="<?=htmlspecialchars($id);?>" />
+		<input name="uniqid" type="hidden" value="<?=htmlspecialchars($pconfig['uniqid']);?>" />
 		<?php endif; ?>
 	</td>
 </tr>
