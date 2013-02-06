@@ -367,32 +367,32 @@ function download_begin(act, i, j) {
 
 	var dlurl;
 	dlurl  = "/vpn_openvpn_export.php?act=" + act;
-	dlurl += "&amp;srvid=" + escape(servers[index][0]);
+	dlurl += "&srvid=" + escape(servers[index][0]);
 	if (users[i]) {
-		dlurl += "&amp;usrid=" + escape(users[i][0]);
-		dlurl += "&amp;crtid=" + escape(users[i][1]);
+		dlurl += "&usrid=" + escape(users[i][0]);
+		dlurl += "&crtid=" + escape(users[i][1]);
 	}
 	if (certs[j]) {
-		dlurl += "&amp;usrid=";
-		dlurl += "&amp;crtid=" + escape(certs[j][0]);
+		dlurl += "&usrid=";
+		dlurl += "&crtid=" + escape(certs[j][0]);
 	}
-	dlurl += "&amp;useaddr=" + escape(useaddr);
-	dlurl += "&amp;quoteservercn=" + escape(quoteservercn);
-	dlurl += "&amp;openvpnmanager=" + escape(openvpnmanager);
-	dlurl += "&amp;usetoken=" + escape(usetoken);
+	dlurl += "&useaddr=" + escape(useaddr);
+	dlurl += "&quoteservercn=" + escape(quoteservercn);
+	dlurl += "&openvpnmanager=" + escape(openvpnmanager);
+	dlurl += "&usetoken=" + escape(usetoken);
 	if (usepass)
-		dlurl += "&amp;password=" + escape(pass);
+		dlurl += "&password=" + escape(pass);
 	if (useproxy) {
-		dlurl += "&amp;proxy_addr=" + escape(proxyaddr);
-		dlurl += "&amp;proxy_port=" + escape(proxyport);
-		dlurl += "&amp;proxy_authtype=" + escape(proxyauth);
+		dlurl += "&proxy_addr=" + escape(proxyaddr);
+		dlurl += "&proxy_port=" + escape(proxyport);
+		dlurl += "&proxy_authtype=" + escape(proxyauth);
 		if (useproxypass) {
-			dlurl += "&amp;proxy_user=" + escape(proxyuser);
-			dlurl += "&amp;proxy_password=" + escape(proxypass);
+			dlurl += "&proxy_user=" + escape(proxyuser);
+			dlurl += "&proxy_password=" + escape(proxypass);
 		}
 	}
 
-	dlurl += "&amp;advancedoptions=" + escape(advancedoptions);
+	dlurl += "&advancedoptions=" + escape(advancedoptions);
 
 	window.open(dlurl,"_self");
 }
