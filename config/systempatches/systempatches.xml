@@ -40,7 +40,7 @@
 	<requirements>None</requirements>
 	<faq>Applies patches supplied by the user to the firewall.</faq>
 	<name>System Patches</name>
-	<version>0.5</version>
+	<version>0.5.1</version>
 	<title>System: Patches</title>
 	<menu>
 		<name>Patches</name>
