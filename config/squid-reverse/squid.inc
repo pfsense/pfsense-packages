@@ -6,6 +6,7 @@
 	Copyright (C) 2006 Fernando Lemos
 	Copyright (C) 2012 Martin Fuchs	
 	Copyright (C) 2012 Marcello Coutinho
+	Copyright (C) 2013 Gekkenhuis
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
@@ -1052,6 +1053,10 @@ acl sslports port 443 563 $webgui_port $addtl_sslports
 acl manager proto cache_object
 acl purge method PURGE
 acl connect method CONNECT
+
+# Define protocols used for redirects
+acl HTTP proto HTTP
+acl HTTPS proto HTTPS
 
 
 EOD;

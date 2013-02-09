@@ -4,6 +4,7 @@
 	squid_reverse.inc
 	Copyright (C) 2012 Martin Fuchs	
 	Copyright (C) 2012 Marcello Coutinho
+	Copyright (C) 2013 Gekkenhuis
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
@@ -40,6 +41,8 @@ function squid_resync_reverse() {
 		$reverse_peers=$config['installedpackages']['squidreversepeer']['config'];
 	if (is_array($config['installedpackages']['squidreverseuri']))
 		$reverse_maps=$config['installedpackages']['squidreverseuri']['config'];
+	if (is_array($config['installedpackages']['squidreverseredir']))
+		$reverse_redir=$config['installedpackages']['squidreverseredir']['config'];
 
 	$conf = "# Reverse Proxy settings\n";
 
@@ -124,6 +127,38 @@ function squid_resync_reverse() {
  			}
  	}
   	
+	//REDIRECTS
+	if (is_array($reverse_redir)) {
+		foreach ($reverse_redir as $rdr) {
+			if($rdr['enable'] == "on" && $rdr['name'] != "" && $rdr['pathregex'] != "" && $rdr['redirurl'] != "") {
+				$conf_rdr = "# Redirect: {$rdr['description']}\n";
+
+				if (is_array($rdr['row'])) {
+					foreach ($rdr['row'] as $uri) {
+						$conf_rdr .= "acl rdr_dst_{$rdr['name']} dstdomain {$uri['uri']}\n";
+					}
+				}
+
+				$conf_rdr .= "acl rdr_path_{$rdr['name']} urlpath_regex {$rdr['pathregex']}\n";
+				$conf_rdr .= "deny_info {$rdr['redirurl']} rdr_path_{$rdr['name']}\n";
+
+				foreach (explode(',', $rdr['protocol']) as $rdr_protocol) {
+					if($rdr_protocol == "HTTP") {
+						$conf_rdr .= "http_access deny HTTP rdr_dst_{$rdr['name']} rdr_path_{$rdr['name']}\n";
+					}
+
+					if($rdr_protocol == "HTTPS") {
+						$conf_rdr .= "http_access deny HTTPS rdr_dst_{$rdr['name']} rdr_path_{$rdr['name']}\n";
+					}
+				}
+
+				$conf_rdr .= "\n";
+			}
+
+			$conf .= $conf_rdr;
+		}
+	}
+
 	//ACLS and MAPPINGS
 
  	//create an empty owa_dirs to populate based on user selected options
