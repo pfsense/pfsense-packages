@@ -64,6 +64,10 @@
 			<url>/pkg.php?xml=squid_reverse_uri.xml</url>
 		</tab>
 		<tab>
+			<text>Redirects</text>
+			<url>/pkg.php?xml=squid_reverse_redir.xml</url>
+		</tab>
+		<tab>
 			<text>Real time</text>
 			<url>/squid_monitor.php?menu=reverse</url>
 		</tab>
