@@ -308,56 +308,6 @@
 			<type>input</type>
 			<size>70</size>
 		</field>
-				<field>
-			<name>SSL man in the middle Filtering</name>
-			<type>listtopic</type>
-		</field>
-		<field>
-			<fielddescr>HTTPS/SSL interception</fielddescr>
-			<fieldname>ssl_proxy</fieldname>
-			<description><![CDATA[Enable SSL filtering.]]></description>
-			<type>checkbox</type>
-			<enablefields>dca,dcert,sslcrtd_children,check_certificate</enablefields>
-		</field>
-		<field>
-			<fielddescr>SSL Proxy port</fielddescr>
-			<fieldname>ssl_proxy_port</fieldname>
-			<description>This is the port the proxy server will listen on to intercept ssl while using transparent proxy.</description>
-			<type>input</type>
-			<size>5</size>
-			<default_value>3129</default_value>
-		</field>
-		<field>
-			<fielddescr>Cert</fielddescr>
-			<fieldname>dcert</fieldname>
-			<description><![CDATA[Select Certificate to use in SSL interception<br>
-								To create a Certificate on pfsense, go to <strong>system -> Cert Manager<strong>]]></description>
-	    	<type>select_source</type>
-			<source><![CDATA[$config['cert']]]></source>
-			<source_name>descr</source_name>
-			<source_value>refid</source_value>
-		</field>
-		<field>
-			<fielddescr>sslcrtd children</fielddescr>
-			<fieldname>sslcrtd_children</fieldname>
-			<description><![CDATA[This is the number of ssl crt deamon children to start. Default value is 5.<br>
-			if Squid is used in busy environments this may need to be increased, as well as the number of 'sslcrtd_children']]></description>
-			<type>input</type>
-			<size>2</size>
-			<default_value>5</default_value>
-		</field>
-		<field>
-			<fielddescr>Remote Cert checks</fielddescr>
-			<fieldname>interception_checks</fieldname>
-			<description><![CDATA[Select remote ssl cert checks to do.<br>Defaul is to do not select any of these options.]]></description>
-		<type>select</type>
-		<options>
-				<option><name>Accept remote server certificate Erros</name><value>sslproxy_cert_error</value></option>
-				<option><name>Do not verify remote certificate</name><value>sslproxy_flags</value></option>
-		</options>
-		<multiple/>
-		<size>3</size>
-		</field>
 		<field>
 			<name>Logging Settings</name>
 			<type>listtopic</type>
