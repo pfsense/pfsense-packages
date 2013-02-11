@@ -149,10 +149,10 @@ function snort_build_list($snortcfg, $listname = "", $whitelist = false) {
 		$snortip = get_interface_ipv6($snortcfg['interface']);
 		if (is_ipaddrv6($snortip)) {
 			if ($whitelist === false) {
-				$sn = get_interface_subnet($int);
-				$home_net .= "{$subnet}/{$sn} ";
+				$sn = get_interface_subnetv6($int);
+				$home_net .= "{$snortip}/{$sn} ";
 			} else
-				$home_net .= "{$subnet} ";
+				$home_net .= "{$snortip} ";
 		}
 	}
 		
