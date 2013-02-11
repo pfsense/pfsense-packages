@@ -383,7 +383,8 @@ Country Sub-Domains List = %etc-dir%/country.domains.conf
 			chown ("/var/spool/MailScanner/{$msc_dir}",'postfix');
 			}
 		}
-	chown ('/var/spool/postfix','postfix');
+	if (is_dir('/var/spool/postfix'))
+		chown ('/var/spool/postfix','postfix');
 	
 	$mlang=strtolower($report['language']);
 	$mfiles[]="/usr/local/etc/MailScanner/virus.scanners.conf";
@@ -590,7 +591,7 @@ Country Sub-Domains List = %etc-dir%/country.domains.conf
 						}
 					}
 				file_put_contents($script, $new_clamav_startup, LOCK_EX);
-				
+				mwexec("/usr/sbin/pw user show postfix || /usr/sbin/pw user add -n postfix -s /usr/sbin/nologin");
 				chmod ($script,0755);
 				if($config['installedpackages']['mailscanner']['config'][0]['enable']){
 					if (is_process_running('clamd')){
