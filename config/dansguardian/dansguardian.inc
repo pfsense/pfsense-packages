@@ -737,7 +737,7 @@ function sync_package_dansguardian($via_rpc=false,$install_process=false) {
 		$dansguardian_groups['embeddedurlweight']=($dansguardian_groups['embeddedurlweight']?$dansguardian_groups['embeddedurlweight']:"0");
 		$dansguardian_groups['bypass']=($dansguardian_groups['bypass']?$dansguardian_groups['bypass']:"0");
 		$dansguardian_groups['infectionbypass']=($dansguardian_groups['infectionbypass']?$dansguardian_groups['infectionbypass']:"0");
-		$dansguardian_groups['maxuploadsize']=($dansguardian_groups['maxuploadsize']?$dansguardian_groups['maxuploadsize']:$maxuploadsize);
+		$dansguardian_groups['maxuploadsize']=(is_numeric($dansguardian_groups['maxuploadsize'])?$dansguardian_groups['maxuploadsize']:$maxuploadsize);
 		switch ($dansguardian_groups['reportinglevel']){
 			case "1":
 			case "2":
@@ -780,6 +780,11 @@ function sync_package_dansguardian($via_rpc=false,$install_process=false) {
 				foreach (explode(",",$dansguardian_groups[$list_key]) as $dacl){
 					if (! is_array(${$list_value}))
 						${$list_value}=array();
+					// try to avoid errors on empty acl group options
+					if (!preg_match("/\d+/",$dacl)){
+						log_error("dansguardian - Config error, Group {$dansguardian_group_name} {$list_key} cannot be empty! Trying to load default acl values");
+						$dacl=0;
+					}
 					$file_temp=file_get_contents(DANSGUARDIAN_DIR . "/etc/dansguardian/lists/{$list_value}list.{$dacl}")."\n";
 					${$list_value}=array_merge(explode("\n",$file_temp),${$list_value});
 				}
@@ -788,7 +793,7 @@ function sync_package_dansguardian($via_rpc=false,$install_process=false) {
 				#save group file and unset array
 				file_put_contents(DANSGUARDIAN_DIR . "/etc/dansguardian/lists/{$list_value}list.g_{$dansguardian_groups['name']}",implode("\n",array_unique(${$list_value}))."\n",LOCK_EX);
 				unset(${$list_value});
-				}		
+				}
 		}
 		/*
 		bannedphraselist = '/usr/local/etc/dansguardian/lists/bannedphraselist.{$dansguardian_groups['phraseacl']}'
@@ -902,9 +907,9 @@ EOF;
 	#Create/update filtergroupsiplist
 	file_put_contents($dansguardian_dir."/lists/authplugins/ipgroups",$filtergroupsiplist,LOCK_EX);
 	#Create/update userlist xml file
-	$ips_xml_header=file_get_contents("/usr/local/pkg/dansguardian_ips_header.xml");
-	$user_xml_header=file_get_contents("/usr/local/pkg/dansguardian_users_header.xml");
-	$user_xml_footer=file_get_contents("/usr/local/pkg/dansguardian_users_footer.xml");
+	$ips_xml_header=file_get_contents("/usr/local/pkg/dansguardian_ips_header.xml.template");
+	$user_xml_header=file_get_contents("/usr/local/pkg/dansguardian_users_header.xml.template");
+	$user_xml_footer=file_get_contents("/usr/local/pkg/dansguardian_users_footer.xml.template");
 	file_put_contents("/usr/local/pkg/dansguardian_users.xml",$user_xml_header.$user_xml.$user_xml_footer,LOCK_EX);
 	file_put_contents("/usr/local/pkg/dansguardian_ips.xml",$ips_xml_header.$ips_xml.$user_xml_footer,LOCK_EX);
 	
@@ -1221,11 +1226,18 @@ function dansguardian_validate_input($post, &$input_errors) {
 				$input_errors[] = "{$value} cannot be used as name.";
 		else if ($key == "name" && preg_match("/\W/",$value)) 
 				$input_errors[] = "{$value} cannot be used as name. Use only a-z 0-9 characters";
+		else if ($key== "group_options"){
+			$acls=array("pics","phrase","site","url","extension","header","content","search");
+			foreach ($acls as $gacl)
+				if (!array_key_exists($gacl."acl",$post))
+					$input_errors[] = ucfirst($gacl)." must has at least one acl assigned."; 
+		}
 		else if (empty($value))
 				continue;
 		else if($key == "freq" && (!preg_match("/^\d+(h|m|d)$/",$value) || $value == 0))
 				$input_errors[] = "A valid number with a time reference is required for the field 'Update Frequency'";
 	}
+
 }
 
 function dansguardian_php_install_command() {
