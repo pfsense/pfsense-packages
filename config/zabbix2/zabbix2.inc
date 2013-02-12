@@ -185,31 +185,30 @@ EOF;
 	if (is_array($config['installedpackages']['zabbixagent'])){
 		$zbagent_config = $config['installedpackages']['zabbixagent']['config'][0];
 		if ($zbagent_config['agentenabled']=="on"){
-			$RefreshActChecks=($zbagent_config['refreshactchecks'] ? $zbagent_config['refreshactchecks'] : 120);
-			$BufferSend=($zbagent_config['buffersend'] ? $zbagent_config['buffersend'] : 5);
-			$BufferSize=($zbagent_config['buffersize'] ? $zbagent_config['buffersize'] : 100);
-			$StartAgents=($zbagent_config['startagents'] != '' ? $zbagent_config['startagents'] : 3);
+			$RefreshActChecks=(preg_match("/(\d+)/",$zbagent_config['refreshactchecks'],$matches)? $matches[1] : "120");
+			$BufferSend=(preg_match("/(\d+)/",$zbagent_config['buffersend'],$matches)? $matches[1]  : "5"  );
+			$BufferSize=(preg_match("/(\d+)/",$zbagent_config['buffersize'],$matches)? $matches[1]  : "100");
+			$StartAgents=(preg_match("/(\d+)/",$zbagent_config['startagents'],$matches)? $matches[1] :"3" );
 			$UserParams=base64_decode($zbagent_config['userparams']);
 		
 			$zbagent_conf_file = <<< EOF
 Server={$zbagent_config['server']}
-ServerActive={$zbagent_config['serveractive']}]
+ServerActive={$zbagent_config['serveractive']}
 Hostname={$zbagent_config['hostname']}
 ListenIP={$zbagent_config['listenip']}
 ListenPort={$zbagent_config['listenport']}
-RefreshActiveChecks={$StartAgents};
-DebugLevel=3\n";
-PidFile=/var/run/zabbix2/zabbix2_agentd.pid\n";
-LogFile=/var/log/zabbix2/zabbix2_agentd.log\n";
-LogFileSize=1\n";
+RefreshActiveChecks={$RefreshActChecks}
+DebugLevel=3
+PidFile=/var/run/zabbix2/zabbix2_agentd.pid
+LogFile=/var/log/zabbix2/zabbix2_agentd.log
+LogFileSize=1
 Timeout={$zbagent_config['timeout']}
 BufferSend={$BufferSend}
 BufferSize={$BufferSize}
-StartAgents={$zbagent_config['server']}
-$UserParams\n";
+StartAgents={$StartAgents}
+{$UserParams}
 
 EOF;
-
 		file_put_contents(ZABBIX_AGENT_BASE . "/etc/zabbix2/zabbix_agentd.conf",  strtr($zbagent_conf_file, array("\r" => "")));
 		}
 	}
