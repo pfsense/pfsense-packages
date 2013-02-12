@@ -536,6 +536,17 @@
 		<configurationfile>olsrd.xml</configurationfile>
 	</package>
 	<package>
+		<name>routed</name>
+		<website>http://www.pfsense.com/</website>
+		<descr>RIP v1 and v2 daemon.</descr>
+		<category>Network Management</category>
+		<config_file>http://www.pfsense.com/packages/config/routed/routed.xml</config_file>
+		<version>1.1</version>
+		<status>Stable</status>
+		<required_version>2.1</required_version>
+		<configurationfile>routed.xml</configurationfile>
+	</package>
+	<package>
 		<name>spamd</name>
 		<website>http://www.openbsd.org/spamd/</website>
 		<descr>Tarpits like spamd are fake SMTP servers, which accept connections but don't deliver mail. Instead, they keep the connections open and reply very slowly. If the peer is patient enough to actually complete the SMTP dialogue (which will take ten minutes or more), the tarpit returns a 'temporary error' code (4xx), which indicates that the mail could not be delivered successfully and that the sender should keep the mail in their queue and retry again later.</descr>
