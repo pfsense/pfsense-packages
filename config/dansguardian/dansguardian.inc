@@ -765,6 +765,7 @@ function sync_package_dansguardian($via_rpc=false,$install_process=false) {
 			$dansguardian_groups[$group]=(preg_match("/$group/",$dansguardian_groups['group_options'])?"on":"off");
 		}
 		
+		
 		#create group list files
 		$lists=array("phraseacl"   => array("bannedphrase","weightedphrase","exceptionphrase"),
 					 "siteacl"     => array("bannedsite","greysite","exceptionsite","exceptionfilesite","logsite"),
@@ -775,16 +776,16 @@ function sync_package_dansguardian($via_rpc=false,$install_process=false) {
 					 "searchacl"   => array("searchengineregexp","bannedsearchterm","weightedsearchterm","exceptionsearchterm")
 					 );
 		foreach ($lists as $list_key => $list_array){
+		// verify groups acls to avoid errors on empty acl group options
+		if (!preg_match("/\w+/",$dansguardian_groups[$list_key])){
+			log_error("dansguardian - Config warning, Group {$dansguardian_group_name} {$list_key} cannot be empty! Trying to load sample values");
+			}
 			foreach ($list_array as $list_value){
 				#read all access lists applied tho this group option
 				foreach (explode(",",$dansguardian_groups[$list_key]) as $dacl){
 					if (! is_array(${$list_value}))
 						${$list_value}=array();
-					// try to avoid errors on empty acl group options
-					if (!preg_match("/\d+/",$dacl)){
-						log_error("dansguardian - Config error, Group {$dansguardian_group_name} {$list_key} cannot be empty! Trying to load default acl values");
-						$dacl=0;
-					}
+					$dacl=(preg_match("/\w+/",$dacl)? $dacl : "sample");
 					$file_temp=file_get_contents(DANSGUARDIAN_DIR . "/etc/dansguardian/lists/{$list_value}list.{$dacl}")."\n";
 					${$list_value}=array_merge(explode("\n",$file_temp),${$list_value});
 				}
@@ -907,9 +908,9 @@ EOF;
 	#Create/update filtergroupsiplist
 	file_put_contents($dansguardian_dir."/lists/authplugins/ipgroups",$filtergroupsiplist,LOCK_EX);
 	#Create/update userlist xml file
-	$ips_xml_header=file_get_contents("/usr/local/pkg/dansguardian_ips_header.xml.template");
-	$user_xml_header=file_get_contents("/usr/local/pkg/dansguardian_users_header.xml.template");
-	$user_xml_footer=file_get_contents("/usr/local/pkg/dansguardian_users_footer.xml.template");
+	$ips_xml_header=file_get_contents("/usr/local/pkg/dansguardian_ips_header.template");
+	$user_xml_header=file_get_contents("/usr/local/pkg/dansguardian_users_header.template");
+	$user_xml_footer=file_get_contents("/usr/local/pkg/dansguardian_users_footer.template");
 	file_put_contents("/usr/local/pkg/dansguardian_users.xml",$user_xml_header.$user_xml.$user_xml_footer,LOCK_EX);
 	file_put_contents("/usr/local/pkg/dansguardian_ips.xml",$ips_xml_header.$ips_xml.$user_xml_footer,LOCK_EX);
 	

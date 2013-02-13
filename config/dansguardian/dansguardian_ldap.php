@@ -130,9 +130,11 @@ if (is_array($config['installedpackages']['dansguardiangroups']['config']))
 		   			}
 	   			}
 		   	if (empty($members)){
-		   		$config['installedpackages']['dansguardianusers']['config'][0][strtolower($group['name'])] = NULL;
-		   	 	$apply_config++;
-		   		}
+		   		if (!is_null($config['installedpackages']['dansguardianusers']['config'][0][strtolower($group['name'])])){
+			   		$config['installedpackages']['dansguardianusers']['config'][0][strtolower($group['name'])] = NULL;
+			   	 	$apply_config++;
+		   			}
+			   	}
 		   	else{
 		   	$import_users = explode("\n", $members);
 			asort($import_users);
@@ -146,11 +148,13 @@ if (is_array($config['installedpackages']['dansguardiangroups']['config']))
 		$id++;			
 	}
 if ($apply_config > 0){
-	print "user list from LDAP is different from current group, applying new configuration...";
+	print "User list from LDAP is different from current group, applying new configuration...";
 	write_config();
 	include("/usr/local/pkg/dansguardian.inc");
 	sync_package_dansguardian();
 	print "done\n";
+}else {
+   print "User list from LDAP is already the same as current group, no changes made\n";
 }
 
 #mount filesystem read-only
