@@ -1537,7 +1537,6 @@
 		<status>Alpha</status>
 		<maintainer>warren@decoy.co.za</maintainer>
 		<required_version>2.0</required_version>
-		<maximum_version>2.1</maximum_version>
 		<pkginfolink>http://doc.pfsense.org/index.php/Unbound_package</pkginfolink>
 		<config_file>http://www.pfsense.com/packages/config/unbound/unbound.xml</config_file>
 		<configurationfile>unbound.xml</configurationfile>
