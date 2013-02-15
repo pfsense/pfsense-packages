@@ -1749,6 +1749,26 @@
 		<depends_on_package_pbi>iftop-0.17-amd64.pbi</depends_on_package_pbi>
 	</package>
 	<package>
+		<!-- This does not exist yet, this is here to trigger a pkg build -->
+		<name>git</name>
+		<pkginfolink>http://forum.pfsense.org/</pkginfolink>
+		<descr><![CDATA[GIT Source Code Management]]></descr>
+		<category>Services</category>
+		<version>0.1</version>
+		<status>Beta</status>
+		<required_version>3.0</required_version>
+		<config_file>http://www.pfsense.com/packages/config/git/git.xml</config_file>
+		<maintainer>jimp@pfsense.org</maintainer>
+		<configurationfile>git.xml</configurationfile>
+		<build_options>git_UNSET=GITWEB GUI HTMLDOCS CVS P4 SVN;git_SET=CONTRIB CURL ETCSHELLS ICONV NLS PERL</build_options>
+		<build_port_path>/usr/ports/devel/git</build_port_path>
+		<build_pbi>
+			<port>devel/git</port>
+		</build_pbi>
+		<depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
+		<depends_on_package_pbi>git-1.8.1.3-amd64.pbi</depends_on_package_pbi>
+	</package>
+	<package>
 		<name>tinc</name>
 		<website>http://www.tinc-vpn.org/</website>
 		<descr>tinc is a Virtual Private Network (VPN) daemon that uses tunnelling and encryption to create a secure private mesh network between hosts on the Internet.</descr>
