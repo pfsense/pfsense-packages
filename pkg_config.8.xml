@@ -1566,6 +1566,7 @@
 			<ports_before>dns/ldns textproc/expat2 devel/libevent2</ports_before>
 			<port>dns/unbound</port>
 		</build_pbi>
+		<depends_on_package_pbi>unbound-1.4.19-i386.pbi</depends_on_package_pbi>
 		<build_options>unbound_UNSET=GOST;unbound_SET=LIBEVENT THREADS</build_options>
 		<logging>
 			<facilityname>unbound</facilityname>
