@@ -697,7 +697,7 @@
 		<maintainer>dv_serg@mail.ru</maintainer>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
 		<depends_on_package>lightsquid-1.8_2.tbz</depends_on_package>
-		<depends_on_package>perl-5.12.4_3.tbz</depends_on_package>
+		<depends_on_package>perl-5.14.2_2.tbz</depends_on_package>
 		<depends_on_package_pbi>lightsquid-1.8_2-amd64.pbi</depends_on_package_pbi>
 		<build_port_path>/usr/ports/www/lightsquid</build_port_path>
 		<build_pbi>
@@ -1219,7 +1219,7 @@
 		<required_version>2</required_version>
 		<maintainer>fernando@netfilter.com.br seth.mos@dds.nl mfuchs77@googlemail.com jimp@pfsense.org</maintainer>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
-		<depends_on_package>squid-2.7.9_1.tbz</depends_on_package>
+		<depends_on_package>squid-2.7.9_3.tbz</depends_on_package>
 		<depends_on_package>squid_radius_auth-1.10.tbz</depends_on_package>
 		<depends_on_package>libwww-5.4.0_4.tbz</depends_on_package>
 		<depends_on_package_pbi>squid-2.7.9_3-amd64.pbi</depends_on_package_pbi>
@@ -1329,8 +1329,7 @@
 		<depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
 		<depends_on_package>squidGuard-1.4_4.tbz</depends_on_package>
 		<depends_on_package>db41-4.1.25_4.tbz</depends_on_package>
-		<depends_on_package>db3-3.3.11_3,1.tbz</depends_on_package>
-		<depends_on_package>cyrus-sasl-2.1.25_1.tbz</depends_on_package>
+		<depends_on_package>cyrus-sasl-2.1.26_2.tbz</depends_on_package>
 		<depends_on_package_pbi>squidguard-1.4_4-amd64.pbi</depends_on_package_pbi>
 		<build_port_path>/usr/ports/www/squidguard</build_port_path>
 		<build_port_path>/usr/ports/databases/db41</build_port_path>
