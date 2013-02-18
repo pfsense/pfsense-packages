@@ -133,8 +133,8 @@ if ($_POST) {
 			$a_backend = &$config['installedpackages']['haproxy']['ha_backends']['item'];
 
 			for ( $i = 0; $i < count($a_backend); $i++) {
-				if ($a_backend[$i]['pool'] == $pool['name'])
-					$a_backend[$i]['pool'] = $_POST['name'];
+				if ($a_backend[$i]['backend_serverpool'] == $pool['name'])
+					$a_backend[$i]['backend_serverpool'] = $_POST['name'];
 			}
 		}
 

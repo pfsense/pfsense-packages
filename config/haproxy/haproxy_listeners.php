@@ -140,7 +140,7 @@ include("head.inc");
 					<?=$textss . $backend['type'] . $textse;?>
                   </td>
                   <td class="listlr" ondblclick="document.location='haproxy_listeners_edit.php?id=<?=$i;?>';">
-					<?=$textss . $backend['pool'] . $textse;?>
+					<?=$textss . $backend['backend_serverpool'] . $textse;?>
                   </td>
                   <td class="list" nowrap>
                     <table border="0" cellspacing="0" cellpadding="1">
