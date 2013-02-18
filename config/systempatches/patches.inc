@@ -41,7 +41,7 @@ function patch_commit($patch, $action, $test=false, $fulldetail=false) {
 	$check = ($test) ? "--check" : "";
 	$force = ($action == "revert") ? "-f" : "-t";
 	$direction = ($action == "revert") ? "--reverse" : "--forward";
-	$whitespace = $patch['ignorewhitespace'] ? "--ignore-whitespace" : "";
+	$whitespace = isset($patch['ignorewhitespace']) ? "--ignore-whitespace" : "";
 	$pathstrip = '-p' . $patch['pathstrip'];
 	$full_patch_command = "{$patch_cmd} --directory={$directory} {$force} {$pathstrip} {$filename} {$check} {$direction} {$whitespace}";
 	patch_write($patch);
