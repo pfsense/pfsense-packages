@@ -316,15 +316,15 @@
 		<descr>ntop is a network probe that shows network usage in a way similar to what top does for processes. In interactive mode, it displays the network status on the user's terminal. In Web mode it acts as a Web server, creating an HTML dump of the network status. It sports a NetFlow/sFlow emitter/collector, an HTTP-based client interface for creating ntop-centric monitoring applications, and RRD for persistently storing traffic statistics.</descr>
 		<category>Network Management</category>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
-		<depends_on_package_pbi>ntop-4.1.0_5-i386.pbi</depends_on_package_pbi>
-		<depends_on_package>rrdtool-1.2.30_1.tbz</depends_on_package>
+		<depends_on_package_pbi>ntop-5.0.1-i386.pbi</depends_on_package_pbi>
+		<depends_on_package>rrdtool-1.2.30_2.tbz</depends_on_package>
 		<depends_on_package>gdbm-1.9.1.tbz</depends_on_package>
-		<depends_on_package>perl-5.12.4_4.tbz</depends_on_package>
-		<depends_on_package>libpcap-1.1.1_1.tbz</depends_on_package>
-		<depends_on_package>GeoIP-1.4.8_1.tbz</depends_on_package>
+		<depends_on_package>perl-5.14.2_2.tbz</depends_on_package>
+		<depends_on_package>libpcap-1.3.0.tbz</depends_on_package>
+		<depends_on_package>GeoIP-1.4.8_3.tbz</depends_on_package>
 		<depends_on_package>font-util-1.2.0.tbz</depends_on_package>
 		<depends_on_package>webfonts-0.30_6.tbz</depends_on_package>
-		<depends_on_package>ntop-4.1.0_3.tbz</depends_on_package>
+		<depends_on_package>ntop-5.0.1.tbz</depends_on_package>
 		<build_port_path>/usr/ports/net/GeoIP</build_port_path>
 		<build_port_path>/usr/ports/databases/gdbm</build_port_path>
 		<build_port_path>/usr/ports/databases/rrdtool12</build_port_path>
@@ -337,7 +337,7 @@
 			<port>net/ntop</port>
 		</build_pbi>
 		<build_options>WITH_PCAP_PORT=true;WITH_XMLDUMP=true;WITHOUT_JUMBO_FRAMES=true;WITH_MAKO=true;WITHOUT_DEJAVU=true;WITH_JSON=true;WITH_MMAP=true;WITHOUT_PERL_MODULE=true;WITHOUT_PYTHON_MODULE=true;WITHOUT_RUBY_MODULE=true;WITHOUT_EXAMPLES=true;WITHOUT_FPECTL=true;WITH_IPV6=true;WITH_NLS=true;WITHOUT_PTH=true;WITH_PYMALLOC=true;WITHOUT_SEM=true;WITH_THREADS=true;WITHOUT_UCS2=true;WITH_UCS4=true;WITH_FONTCONFIG=true;WITH_ICONV=true;WITHOUT_XPM=true;WITHOUT_DAG=true;WITHOUT_DIGCOLA=true;WITHOUT_IPSEPCOLA=true;WITHOUT_PANGOCAIRO=true;WITHOUT_GTK=true;WITHOUT_XCB=true</build_options>
-		<version>4.1.0_3 v2.3</version>
+		<version>5.0.1 v2.3</version>
 		<status>BETA</status>
 		<required_version>2.0</required_version>
 		<config_file>http://www.pfsense.com/packages/config/ntop2/ntop.xml</config_file>
