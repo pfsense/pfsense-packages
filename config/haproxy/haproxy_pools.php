@@ -114,7 +114,7 @@ include("head.inc");
 		 $fe_list = "";
 		 $sep = "";
 		 foreach ($a_backends as $backend) {
-			 if($backend['pool'] == $pool['name']) {
+			 if($backend['backend_serverpool'] == $pool['name']) {
 				 $fe_list .= $sep . $backend['name'];
 				 $sep = ", ";
 			 }
