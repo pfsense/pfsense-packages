@@ -154,9 +154,10 @@ function sync_package_zabbix2(){
 		define('ZABBIX_AGENT_BASE', '/usr/pbi/zabbix2-agent-' . php_uname("m"));
 		define('ZABBIX_PROXY_BASE', '/usr/pbi/zabbix2-proxy-' . php_uname("m"));
 		}
-	else
+	else {
 		define('ZABBIX_AGENT_BASE', '/usr/local');
 		define('ZABBIX_PROXY_BASE', '/usr/local');
+	}
 
 	#check zabbix proxy config
 	if (is_array($config['installedpackages']['zabbixproxy'])){
@@ -287,17 +288,18 @@ EOF;
  
 	$zproxy_rcfile="/usr/local/etc/rc.d/zabbix2_proxy.sh";
 	if (is_array($zbproxy_config) && $zbproxy_config['proxyenabled']=="on"){
-		$zproxy_start= strtr($dir_checks, array("\r" => "")). "echo \"Starting Zabbix Proxy\"...\n";
+		$zproxy_start= strtr($dir_checks, array("\r" => "")). "\necho \"Starting Zabbix Proxy\"...\n";
 		/* start zabbix proxy */
 		$zproxy_start .= ZABBIX_PROXY_BASE . "/sbin/zabbix_proxy\n";
 	
 		$zproxy_stop  = "echo \"Stopping Zabbix Proxy\"\n";
-	    $zproxy_stop .= "/usr/bin/killall zabbix_proxy\n";
+		$zproxy_stop .= "/usr/bin/killall zabbix_proxy\n";
+		$zproxy_stop .= "/bin/sleep 5\n";
+
 		/* write out rc.d start/stop file */
 		write_rcfile(array(
 			"file" => "zabbix2_proxy.sh",
 			"start" => $zproxy_start,
-			"restart" => $zproxy_stop . "\nsleep 5\n" . $zproxy_start,
 			"stop" => $zproxy_stop
 			)
 		);
@@ -311,7 +313,7 @@ EOF;
 	
 	$zagent_rcfile="/usr/local/etc/rc.d/zabbix2_agentd.sh";
 	if (is_array($zbagent_config) && $zbagent_config['agentenabled']=="on"){
-		$zagent_start .= strtr($dir_checks, array("\r" => "")). "echo \"Starting Zabbix Agent...\"\n";
+		$zagent_start .= strtr($dir_checks, array("\r" => "")). "\necho \"Starting Zabbix Agent...\"\n";
 		$zagent_start .= ZABBIX_AGENT_BASE . "/sbin/zabbix_agentd\n";
 	
 		$zagent_stop  = "echo \"Stopping Zabbix Agent...\"\n";
@@ -322,7 +324,6 @@ EOF;
 		write_rcfile(array(
 						"file" => "zabbix2_agentd.sh",
 						"start" => "$zagent_start",
-						"restart" => "$zagent_stop\n" . "sleep 5\n" . "{$zagent_start}",
 						"stop" => "$zagent_stop"
 				)
 		);
