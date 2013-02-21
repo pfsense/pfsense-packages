@@ -670,6 +670,9 @@
 		<category>NET</category>
 		<config_file>http://www.pfsense.com/packages/config/openbgpd/openbgpd.xml</config_file>
 		<build_port_path>/usr/ports/net/openbgpd</build_port_path>
+		<build_pbi>
+			<port>net/openbgpd</port>
+		</build_pbi>
 		<version>0.5.6</version>
 		<status>STABLE</status>
 		<pkginfolink>http://doc.pfsense.org/index.php/OpenBGPD_package</pkginfolink>
