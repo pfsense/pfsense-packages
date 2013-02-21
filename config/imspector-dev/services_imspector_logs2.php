@@ -67,7 +67,6 @@ function convert_dir_list ($topdir) {
 		return;
 	$imspector_config = $config['installedpackages']['imspector']['config'][0];
 	$limit=(preg_match("/\d+/",$imspector_config['reportlimit'])?$imspector_config['reportlimit']:"50");
-	file_put_contents("/tmp/teste.txt",$limit." teste",LOCK_EX);
 	$count=0;
 	if ($dh = opendir($topdir)) {
 		while (($file = readdir($dh)) !== false) {
@@ -188,6 +187,7 @@ include("head.inc");
 </table>
 
 <?php
+$csrf_token= csrf_get_tokens();
 $zz = <<<EOD
 <script type="text/javascript">
 var section = 'none';
@@ -213,7 +213,7 @@ function xmlhttpPost()
 	}
 
 	document.getElementById('im_status').style.display = "inline";
-	self.xmlHttpReq.send("mode=render&section=" + section);
+	self.xmlHttpReq.send("mode=render&section=" + section + "&__csrf_magic={$csrf_token}");
 }
 
 function updatepage(str)
