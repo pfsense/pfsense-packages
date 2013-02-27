@@ -193,6 +193,7 @@
 		<depends_on_package_pbi>haproxy-1.5.4.21-i386.pbi</depends_on_package_pbi>
 		<build_port_path>/usr/ports/net/haproxy-devel</build_port_path>
 		<build_pbi>
+			<custom_name>haproxy-devel</custom_name>
 			<port>/usr/ports/net/haproxy-devel</port>
 		</build_pbi>
 		<build_options>OPTIONS_UNSET=PCRE DPCRE;OPTIONS_SET=OPENSSL SPCRE</build_options>
