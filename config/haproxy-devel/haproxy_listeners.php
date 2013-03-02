@@ -10,7 +10,7 @@
 	Redistribution and use in source and binary forms, with or without
 	modification, are permitted provided that the following conditions are met:
 
-	1. Redistributions of source code MUST retain the above copyright notice,
+	1. Redistributions of source code must retain the above copyright notice,
 	   this list of conditions and the following disclaimer.
 
 	2. Redistributions in binary form must reproduce the above copyright
@@ -54,14 +54,14 @@ if ($_POST) {
 }
 
 if ($_GET['act'] == "del") {
-	if ($a_backend[$_GET['id']]) {
+	if (isset($a_backend[$_GET['id']])) {
 		if (!$input_errors) {
 			unset($a_backend[$_GET['id']]);
 			write_config();
 			touch($d_haproxyconfdirty_path);
-			header("Location: haproxy_frontends.php");
-			exit;
 		}
+		header("Location: haproxy_listeners.php");
+		exit;
 	}
 }
 
@@ -69,13 +69,13 @@ $pfSversion = str_replace("\n", "", file_get_contents("/etc/version"));
 if(strstr($pfSversion, "1.2"))
 	$one_two = true;
 	
-$pgtitle = "Services: HAProxy: Frontend";
+$pgtitle = "Services: HAProxy: Listener";
 include("head.inc");
 
 ?>
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">
 <?php include("fbegin.inc"); ?>
-<form action="haproxy_frontends.php" method="post">
+<form action="haproxy_listeners.php" method="post">
 <?php if($one_two): ?>
 <p class="pgtitle"><?=$pgtitle?></p>
 <?php endif; ?>
@@ -89,10 +89,10 @@ include("head.inc");
   <?php
         /* active tabs */
         $tab_array = array();
-		$tab_array[] = array("Settings", false, "haproxy_global.php");
-        $tab_array[] = array("Frontends", true, "haproxy_frontends.php");		
-		$tab_array[] = array("Servers", false, "haproxy_servers.php");
-		display_top_tabs($tab_array);
+	$tab_array[] = array("Settings", false, "haproxy_global.php");
+        $tab_array[] = array("Listener", true, "haproxy_listeners.php");		
+	$tab_array[] = array("Server Pool", false, "haproxy_pools.php");
+	display_top_tabs($tab_array);
   ?>
   </td></tr>
   <tr>
@@ -100,42 +100,65 @@ include("head.inc");
 	<div id="mainarea">
               <table class="tabcont" width="100%" border="0" cellpadding="0" cellspacing="0">
                 <tr>
-                  <td width="30%" class="listhdrr">Name</td>
-                  <td width="40%" class="listhdrr">Description</td>
-                  <td width="10%" class="listhdrr">Stats URI</td>
+                  <td width="20%" class="listhdrr">Name</td>
+                  <td width="30%" class="listhdrr">Description</td>
+                  <td width="20%" class="listhdrr">Address</td>
                   <td width="10%" class="listhdrr">Type</td>
-                  <td width="10%" class="list"></td>
-				</tr>
-			  <?php $i = 0; foreach ($a_backend as $backend): ?>
+                  <td width="10%" class="listhdrr">Server&nbsp;pool</td>
+                  <td width="5%" class="list"></td>
+		</tr>
+<?php
+		$i = 0;
+		foreach ($a_backend as $backend):
+		$textss = $textse = "";
+		if ($backend['status'] != 'active') {
+			$textss = "<span class=\"gray\">";
+			$textse = "</span>";
+		}
+?>
                 <tr>
-                  <td class="listlr" ondblclick="document.location='haproxy_frontends_edit.php?id=<?=$i;?>';">
-					<?=$backend['name'];?>
+                  <td class="listlr" ondblclick="document.location='haproxy_listeners_edit.php?id=<?=$i;?>';">
+					<?=$textss . $backend['name'] . $textse;?>
                   </td>
-                  <td class="listlr" ondblclick="document.location='haproxy_frontends_edit.php?id=<?=$i;?>';">
-					<?=$backend['desc'];?>
+                  <td class="listlr" ondblclick="document.location='haproxy_listeners_edit.php?id=<?=$i;?>';">
+					<?=$textss . $backend['desc'] . $textse;?>
                   </td>
-                 <td class="listlr" ondblclick="document.location='haproxy_frontends_edit.php?id=<?=$i;?>';">
-					<?=$backend['stats_uri'];?>
-                 </td>
-                  <td class="listlr" ondblclick="document.location='haproxy_frontends_edit.php?id=<?=$i;?>';">
-					<?=$backend['type'];?>
+                  <td class="listlr" ondblclick="document.location='haproxy_listeners_edit.php?id=<?=$i;?>';">
+<?php
+			echo $textss;
+			if($backend['extaddr'] == "any") 
+				echo "0.0.0.0";
+			elseif($backend['extaddr']) 
+				echo $backend['extaddr'];
+			else 
+				echo get_current_wan_address('wan');
+			echo ":" . $backend['port'];
+			echo $textse;
+?>
+                  </td>
+                  <td class="listlr" ondblclick="document.location='haproxy_listeners_edit.php?id=<?=$i;?>';">
+					<?=$textss . $backend['type'] . $textse;?>
+                  </td>
+                  <td class="listlr" ondblclick="document.location='haproxy_listeners_edit.php?id=<?=$i;?>';">
+					<?=$textss . $backend['backend_serverpool'] . $textse;?>
                   </td>
                   <td class="list" nowrap>
                     <table border="0" cellspacing="0" cellpadding="1">
                       <tr>
-                        <td valign="middle"><a href="haproxy_frontends_edit.php?id=<?=$i;?>"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_e.gif" width="17" height="17" border="0"></a></td>
-                        <td valign="middle"><a href="haproxy_frontends.php?act=del&id=<?=$i;?>" onclick="return confirm('Do you really want to delete this entry?')"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_x.gif" width="17" height="17" border="0"></a></td>
+                        <td valign="middle"><a href="haproxy_listeners_edit.php?id=<?=$i;?>"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_e.gif" width="17" height="17" border="0"></a></td>
+                        <td valign="middle"><a href="haproxy_listeners.php?act=del&id=<?=$i;?>" onclick="return confirm('Do you really want to delete this entry?')"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_x.gif" width="17" height="17" border="0"></a></td>
+                        <td valign="middle"><a href="haproxy_listeners_edit.php?dup=<?=$i;?>"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif" width="17" height="17" border="0"></a></td>
                       </tr>
                     </table>
                   </td>
                 </tr>
                 <?php $i++; endforeach; ?>
                 <tr>
-                  <td class="list" colspan="4"></td>
+                  <td class="list" colspan="5"></td>
                   <td class="list">
                     <table border="0" cellspacing="0" cellpadding="1">
                       <tr>
-                        <td valign="middle"><a href="haproxy_frontends_edit.php"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif" width="17" height="17" border="0"></a></td>
+                        <td valign="middle"><a href="haproxy_listeners_edit.php"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif" width="17" height="17" border="0"></a></td>
                       </tr>
                     </table>
                   </td>
