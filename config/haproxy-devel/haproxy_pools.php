@@ -1,7 +1,7 @@
 <?php
 /* $Id: load_balancer_virtual_server.php,v 1.6.2.1 2006/01/02 23:46:24 sullrich Exp $ */
 /*
-	haproxy_servers.php
+	haproxy_pools.php
 	part of pfSense (http://www.pfsense.com/)
 	Copyright (C) 2009 Scott Ullrich <sullrich@pfsense.com>
 	Copyright (C) 2008 Remco Hoef <remcoverhoef@pfsense.com>
@@ -34,11 +34,14 @@ require_once("haproxy.inc");
 
 $d_haproxyconfdirty_path = $g['varrun_path'] . "/haproxy.conf.dirty";
 
-if (!is_array($config['installedpackages']['haproxy']['ha_servers']['item'])) {
-	$config['installedpackages']['haproxy']['ha_servers']['item'] = array();
+if (!is_array($config['installedpackages']['haproxy']['ha_pools']['item'])) {
+	$config['installedpackages']['haproxy']['ha_pools']['item'] = array();
+}
+if (!is_array($config['installedpackages']['haproxy']['ha_backends']['item'])) {
+	$config['installedpackages']['haproxy']['ha_backends']['item'] = array();
 }
 
-$a_server = &$config['installedpackages']['haproxy']['ha_servers']['item'];
+$a_pools = &$config['installedpackages']['haproxy']['ha_pools']['item'];
 $a_backends = &$config['installedpackages']['haproxy']['ha_backends']['item'];
 
 if ($_POST) {
@@ -55,22 +58,20 @@ if ($_POST) {
 }
 
 if ($_GET['act'] == "del") {
-	if ($a_server[$_GET['id']]) {
-		if (!$input_errors) {
-			unset($a_server[$_GET['id']]);
-			write_config();
-			touch($d_haproxyconfdirty_path);
-			header("Location: haproxy_servers.php");
-			exit;
-		}
+	if (isset($a_pools[$_GET['id']])) {
+		unset($a_pools[$_GET['id']]);
+		write_config();
+		touch($d_haproxyconfdirty_path);
 	}
+	header("Location: haproxy_pools.php");
+	exit;
 }
 
 $pfSversion = str_replace("\n", "", file_get_contents("/etc/version"));
 if(strstr($pfSversion, "1.2"))
 	$one_two = true;
 	
-$pgtitle = "Services: HAProxy: Servers";
+$pgtitle = "Services: HAProxy: Server pools";
 include("head.inc");
 
 ?>
@@ -79,21 +80,21 @@ include("head.inc");
 <?php if($one_two): ?>
 <p class="pgtitle"><?=$pgtitle?></p>
 <?php endif; ?>
-<form action="haproxy_servers.php" method="post">
+<form action="haproxy_pools.php" method="post">
 <?php if ($input_errors) print_input_errors($input_errors); ?>
 <?php if ($savemsg) print_info_box($savemsg); ?>
 <?php if (file_exists($d_haproxyconfdirty_path)): ?><p>
-<?php print_info_box_np("The virtual server configuration has been changed.<br>You must apply the changes in order for them to take effect.");?><br>
+<?php print_info_box_np("The virtual pool configuration has been changed.<br>You must apply the changes in order for them to take effect.");?><br>
 <?php endif; ?>
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
   <tr><td class="tabnavtbl">
   <?php
         /* active tabs */
         $tab_array = array();
-		$tab_array[] = array("Settings", false, "haproxy_global.php");
-        $tab_array[] = array("Frontends", false, "haproxy_frontends.php");
-		$tab_array[] = array("Servers", true, "haproxy_servers.php");
-		display_top_tabs($tab_array);
+	$tab_array[] = array("Settings", false, "haproxy_global.php");
+        $tab_array[] = array("Listener", false, "haproxy_listeners.php");
+	$tab_array[] = array("Server Pool", true, "haproxy_pools.php");
+	display_top_tabs($tab_array);
   ?>
   </td></tr>
   <tr>
@@ -102,60 +103,59 @@ include("head.inc");
               <table class="tabcont" width="100%" border="0" cellpadding="0" cellspacing="0">
                 <tr>
                   <td width="30%" class="listhdrr">Name</td>
-                  <td width="30%" class="listhdrr">Server</td>
-                  <td width="20%" class="listhdrr">Status</td>
-                  <td width="30%" class="listhdrr">Frontend</td>
-                  <td width="10%" class="listhdrr">Cookie</td>
-                  <td width="10%" class="listhdrr">Weight</td>
+                  <td width="10%" class="listhdrr">Servers</td>
+                  <td width="40%" class="listhdrr">Listener</td>
                   <td width="10%" class="list"></td>
 				</tr>
-                <?php $i = 0; foreach ($a_server as $server): ?>
-                <tr>
-                  <td class="listlr" ondblclick="document.location='haproxy_servers_edit.php?id=<?=$i;?>';">
-			<?=$server['name'];?>
-                  </td>
-                  <td class="listlr" ondblclick="document.location='haproxy_servers_edit.php?id=<?=$i;?>';">
-			<?=$server['address'] . ":"?>
 <?php
-			if($server['port']) {
-				echo $server['port'];
-			} else {
-				foreach ($a_backends as $backend) {
-					if($backend['name'] == $server['backend']) {
-						echo $backend['port'];
-					}
-				}
-			}
+		 $i = 0;
+		 foreach ($a_pools as $pool):
+
+		 $fe_list = "";
+		 $sep = "";
+		 foreach ($a_backends as $backend) {
+			 if($backend['backend_serverpool'] == $pool['name']) {
+				 $fe_list .= $sep . $backend['name'];
+				 $sep = ", ";
+			 }
+		 }
+		 $textss = $textse = "";
+		 if ($fe_list == "") {
+			 $textss = "<span class=\"gray\">";
+			 $textse = "</span>";
+		 }
+		 if (is_array($pool['ha_servers']))
+			 $count = count($pool['ha_servers']['item']);
+		 else
+			 $count = 0;
 ?>
+                <tr>
+                  <td class="listlr" ondblclick="document.location='haproxy_pool_edit.php?id=<?=$i;?>';">
+			<?=$textss . $pool['name'] . $textse;?>
                   </td>
-                  <td class="listlr" ondblclick="document.location='haproxy_servers_edit.php?id=<?=$i;?>';">
-			<?=$server['status'];?>
+                  <td class="listlr" ondblclick="document.location='haproxy_pool_edit.php?id=<?=$i;?>';">
+			<?=$textss . $count . $textse;?>
                   </td>
-                  <td class="listlr" ondblclick="document.location='haproxy_servers_edit.php?id=<?=$i;?>';">
-			<?=$server['backend'];?>
-                  </td>
-                  <td class="listlr" ondblclick="document.location='haproxy_servers_edit.php?id=<?=$i;?>';">
-			<?=$server['cookie'];?>
-                  </td>
-                  <td class="listlr" ondblclick="document.location='haproxy_servers_edit.php?id=<?=$i;?>';">
-			<?=$server['weight'];?>
+                  <td class="listlr" ondblclick="document.location='haproxy_pool_edit.php?id=<?=$i;?>';">
+			<?=$textss . $fe_list . $textse;?>
                   </td>
                   <td class="list" nowrap>
                     <table border="0" cellspacing="0" cellpadding="1">
                       <tr>
-                        <td valign="middle"><a href="haproxy_servers_edit.php?id=<?=$i;?>"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_e.gif" width="17" height="17" border="0"></a></td>
-                        <td valign="middle"><a href="haproxy_servers.php?act=del&id=<?=$i;?>" onclick="return confirm('Do you really want to delete this entry?')"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_x.gif" width="17" height="17" border="0"></a></td>
+                        <td valign="middle"><a href="haproxy_pool_edit.php?id=<?=$i;?>"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_e.gif" width="17" height="17" border="0"></a></td>
+                        <td valign="middle"><a href="haproxy_pools.php?act=del&id=<?=$i;?>" onclick="return confirm('Do you really want to delete this entry?')"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_x.gif" width="17" height="17" border="0"></a></td>
+                        <td valign="middle"><a href="haproxy_pool_edit.php?dup=<?=$i;?>"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif" width="17" height="17" border="0"></a></td>
                       </tr>
                     </table>
                   </td>
                 </tr>
                 <?php $i++; endforeach; ?>
                 <tr>
-                  <td class="list" colspan="6"></td>
+                  <td class="list" colspan="3"></td>
                   <td class="list">
                     <table border="0" cellspacing="0" cellpadding="1">
                       <tr>
-                        <td valign="middle"><a href="haproxy_servers_edit.php"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif" width="17" height="17" border="0"></a></td>
+                        <td valign="middle"><a href="haproxy_pool_edit.php"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif" width="17" height="17" border="0"></a></td>
                       </tr>
                     </table>
                   </td>
