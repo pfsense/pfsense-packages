@@ -34,7 +34,7 @@
 /* ========================================================================== */
 
 function varnish_settings_post_validate($post, $input_errors) {
-	if($post['storagesize'] && !is_numeric($post['storagesize'])) 
+	if( !is_numeric($post['storagesize'])) 
 		$input_errors[] = "A valid number is required for the field 'Storage size'";	
 	if($post['listeningport'] && !is_numeric($post['listeningport'])) 
 		$input_errors[] = "A valid number is required for the field 'Listening port'";	
