@@ -47,6 +47,9 @@ else
 if (isset($_GET['dup']))
 	$id = $_GET['dup'];
 
+global $simplefields;
+$simplefields = array("retries","balance","connection_timeout","server_timeout", "stats_enabled","stats_username","stats_password","stats_uri","stats_realm","stats_node_enabled","stats_node","stats_desc","stats_refresh");
+
 if (isset($id) && $a_pools[$id]) {
 	$pconfig['name'] = $a_pools[$id]['name'];
 	$pconfig['checkinter'] = $a_pools[$id]['checkinter'];
@@ -54,6 +57,9 @@ if (isset($id) && $a_pools[$id]) {
 	$pconfig['cookie'] = $a_pools[$id]['cookie'];
 	$pconfig['advanced'] = base64_decode($a_pools[$id]['advanced']);
 	$pconfig['a_servers']=&$a_pools[$id]['ha_servers']['item'];	
+	
+	foreach($simplefields as $stat)
+		$pconfig[$stat] = $a_pools[$id][$stat];
 }
 
 if (isset($_GET['dup']))
@@ -70,11 +76,31 @@ if ($_POST) {
 	
 	$reqdfields = explode(" ", "name");
 	$reqdfieldsn = explode(",", "Name");		
-
 	do_input_validation($_POST, $reqdfields, $reqdfieldsn, &$input_errors);
 
+	if ($_POST['stats_enabled']) {
+		$reqdfields = explode(" ", "name stats_username stats_password stats_uri stats_realm");
+		$reqdfieldsn = explode(",", "Name,Stats Username,Stats Password,Stats Uri,Stats Realm");		
+		do_input_validation($_POST, $reqdfields, $reqdfieldsn, &$input_errors);
+	}
+	
 	if (preg_match("/[^a-zA-Z0-9\.\-_]/", $_POST['name']))
 		$input_errors[] = "The field 'Name' contains invalid characters.";
+		
+	if (!is_numeric($_POST['connection_timeout']))
+		$input_errors[] = "The field 'Connection timeout' value is not a number.";
+
+	if (!is_numeric($_POST['server_timeout']))
+		$input_errors[] = "The field 'Server timeout' value is not a number.";
+
+	if (!$_POST['retries'] && is_numeric($_POST['retries']))
+		$input_errors[] = "The field 'Retries' value is not a number.";
+
+	if (preg_match("/[^a-zA-Z0-9\.\-_]/", $_POST['stats_username']))
+		$input_errors[] = "The field 'Stats Username' contains invalid characters.";
+
+	if (preg_match("/[^a-zA-Z0-9\.\-_]/", $_POST['stats_password']))
+		$input_errors[] = "The field 'Stats Password' contains invalid characters.";
 
 	/* Ensure that our pool names are unique */
 	for ($i=0; isset($config['installedpackages']['haproxy']['ha_pools']['item'][$i]); $i++)
@@ -149,6 +175,10 @@ if ($_POST) {
 		update_if_changed("checkinter", $pool['checkinter'], $_POST['checkinter']);
 		update_if_changed("monitor_uri", $pool['monitor_uri'], $_POST['monitor_uri']);
 
+		global $simplefields;
+		foreach($simplefields as $stat)
+			update_if_changed($stat, $pool[$stat], $_POST[$stat]);
+	
 		if (isset($id) && $a_pools[$id]) {
 			$a_pools[$id] = $pool;
 		} else {
@@ -175,7 +205,7 @@ $pfSversion = str_replace("\n", "", file_get_contents("/etc/version"));
 if(strstr($pfSversion, "1.2"))
 	$one_two = true;
 
-$pgtitle = "HAProxy: pool: Edit";
+$pgtitle = "HAProxy: Backend: Edit";
 include("head.inc");
 
 row_helper();
@@ -184,16 +214,37 @@ row_helper();
 
 <input type='hidden' name='address_type' value='textbox' />
 
-<body link="#0000CC" vlink="#0000CC" alink="#0000CC">
-<script type="text/javascript" language="javascript" src="pool.js"></script>
-
+<body link="#0000CC" vlink="#0000CC" alink="#0000CC" onload="updatevisibility()">
+  <style type="text/css">
+	.haproxy_stats_visible{display:none;}
+  </style>
 <script language="javascript">
-function clearcombo(){
-  for (var i=document.iform.serversSelect.options.length-1; i>=0; i--){
-    document.iform.serversSelect.options[i] = null;
-  }
-  document.iform.serversSelect.selectedIndex = -1;
-}
+	function clearcombo(){
+	  for (var i=document.iform.serversSelect.options.length-1; i>=0; i--){
+		document.iform.serversSelect.options[i] = null;
+	  }
+	  document.iform.serversSelect.selectedIndex = -1;
+	}
+
+	function setCSSdisplay(cssID, display)
+	{
+		var ss = document.styleSheets;
+		for (var i=0; i<ss.length; i++) {
+			var rules = ss[i].cssRules || ss[i].rules;
+			for (var j=0; j<rules.length; j++) {
+				if (rules[j].selectorText === cssID) {
+					rules[j].style.display = display ? "" : "none";
+				}
+			}
+		}
+	}
+	
+	function updatevisibility()
+	{
+		setCSSdisplay(".haproxy_stats_visible", stats_enabled.checked);
+	}
+
+
 </script>
 <script type="text/javascript">
 	rowname[0] = "server_name";
@@ -218,6 +269,7 @@ function clearcombo(){
 <p class="pgtitle"><?=$pgtitle?></p>
 <?php endif; ?>
 	<form action="haproxy_pool_edit.php" method="post" name="iform" id="iform">
+	<div class="tabcont">
 	<table width="100%" border="0" cellpadding="6" cellspacing="0">
 		<tr>
 			<td colspan="2" valign="top" class="listtopic">Edit HAProxy pool</td>
@@ -248,11 +300,11 @@ function clearcombo(){
 			<td width="78%" class="vtable" colspan="2" valign="top">
 			<table class="" width="100%" cellpadding="0" cellspacing="0" id='servertable'>
 	                <tr>
-	                  <td width="30%" class="">Name</td>
-	                  <td width="30%" class="">Address</td>
-	                  <td width="18%" class="">Port</td>
-	                  <td width="18%" class="">Weight</td>
-	                  <td width="5%" class="">Backup</td>
+	                  <td width="30%" class="listhdrr">Name</td>
+	                  <td width="30%" class="listhdrr">Address</td>
+	                  <td width="18%" class="listhdrr">Port</td>
+	                  <td width="18%" class="listhdrr">Weight</td>
+	                  <td width="5%" class="listhdr">Backup</td>
 	                  <td width="4%" class=""></td>
 			</tr>
 			<?php 
@@ -266,11 +318,11 @@ function clearcombo(){
 			foreach ($a_servers as $server) {
 			?>
 			<tr id="tr_view_<?=$counter;?>" name="tr_view_<?=$counter;?>">
-			<td class="vtable"><?=$server['name']; ?></td>
-			<td class="vtable"><?=$server['address']; ?></td>
-			<td class="vtable"><?=$server['port']; ?></td>
-			<td class="vtable"><?=$server['weight']; ?></td>
-			<td class="vtable"><?=$server['backup']; ?></td>
+			<td class="vtable listlr"><?=$server['name']; ?></td>
+			<td class="vtable listr"><?=$server['address']; ?></td>
+			<td class="vtable listr"><?=$server['port']; ?></td>
+			<td class="vtable listr"><?=$server['weight']; ?></td>
+			<td class="vtable listr"><?=$server['backup']; ?></td>
 			<td class="list">
 			  <table border="0" cellspacing="0" cellpadding="1"><tr>
 			  <td valign="middle">
@@ -313,6 +365,71 @@ function clearcombo(){
 			</td>
 		</tr>
 		<tr align="left">
+			<td width="22%" valign="top" class="vncellreq">Balance</td>
+			<td width="78%" class="vtable" colspan="2">
+				<table width="100%">
+				<tr>
+					<td width="20%" valign="top">
+						<input type="radio" name="balance" id="balance" value="roundrobin"<?php if($pconfig['balance'] == "roundrobin") echo " CHECKED"; ?>>Round robin</input>
+					</td>
+					<td>
+						  Each server is used in turns, according to their weights.
+		                  This is the smoothest and fairest algorithm when the server's
+		                  processing time remains equally distributed. This algorithm
+		                  is dynamic, which means that server weights may be adjusted
+		                  on the fly for slow starts for instance.
+					</td>
+				</tr>
+				<tr>
+					<td width="20%" valign="top">
+						<input type="radio" name="balance" id="balance" value="static-rr"<?php if($pconfig['balance'] == "static-rr") echo " CHECKED"; ?>>Static Round Robin</input>
+					</td>
+					<td>
+						Each server is used in turns, according to their weights.
+				This algorithm is as similar to roundrobin except that it is
+				static, which means that changing a server's weight on the
+				fly will have no effect. On the other hand, it has no design
+				limitation on the number of servers, and when a server goes
+				up, it is always immediately reintroduced into the farm, once
+				the full map is recomputed. It also uses slightly less CPU to
+				run (around -1%).					
+					</td>
+				</tr>
+				<tr>
+					<td width="20%" valign="top">
+						<input type="radio" name="balance" id="balance" value="leastconn"<?php if($pconfig['balance'] == "leastconn") echo " CHECKED"; ?>>Least Connections</input>
+					</td>
+					<td>
+						  The server with the lowest number of connections receives the
+				connection. Round-robin is performed within groups of servers
+				of the same load to ensure that all servers will be used. Use
+				of this algorithm is recommended where very long sessions are
+				expected, such as LDAP, SQL, TSE, etc... but is not very well
+				suited for protocols using short sessions such as HTTP. This
+				algorithm is dynamic, which means that server weights may be
+				adjusted on the fly for slow starts for instance.
+					</td>
+				</tr>
+				  <tr><td valign="top"><input type="radio" name="balance" id="balance" value="source"<?php if($pconfig['balance'] == 
+"source") echo " CHECKED"; ?>>Source</input></td><td>
+		 			  The source IP address is hashed and divided by the total
+	                  weight of the running servers to designate which server will
+	                  receive the request. This ensures that the same client IP
+	                  address will always reach the same server as long as no
+	                  server goes down or up. If the hash result changes due to the
+	                  number of running servers changing, many clients will be
+					  directed to a different server. This algorithm is generally
+	                  used in TCP mode where no cookie may be inserted. It may also
+	                  be used on the Internet to provide a best-effort stickyness
+	                  to clients which refuse session cookies. This algorithm is
+	                  static, which means that changing a server's weight on the
+	                  fly will have no effect.
+					</td>
+				</tr>
+				</table>
+			</td>
+		</tr>
+		<tr align="left">
 			<td width="22%" valign="top" class="vncell">Check freq</td>
 			<td width="78%" class="vtable" colspan="2">
 				<input name="checkinter" type="text" <?if(isset($pconfig['checkinter'])) echo "value=\"{$pconfig['checkinter']}\"";?>size="20"> milliseconds
@@ -334,6 +451,106 @@ function clearcombo(){
 				NOTE: paste text into this box that you would like to pass thru.
 			</td>
 		</tr>
+	</table>
+	<br/>
+	<table width="100%" border="0" cellpadding="6" cellspacing="0">
+		<tr>
+			<td colspan="2" valign="top" class="listtopic">Advanced settings</td>
+		</tr>
+		<tr align="left">
+			<td width="22%" valign="top" class="vncellreq">Connection timeout</td>
+			<td width="78%" class="vtable" colspan="2">
+				<input name="connection_timeout" type="text" <?if(isset($pconfig['connection_timeout'])) echo "value=\"{$pconfig['connection_timeout']}\"";?> size="64">
+				<div>the time (in milliseconds) we give up if the connection does not complete within (30000).</div>
+			</td>
+		</tr>
+		<tr align="left">
+			<td width="22%" valign="top" class="vncellreq">Server timeout</td>
+			<td width="78%" class="vtable" colspan="2">
+				<input name="server_timeout" type="text" <?if(isset($pconfig['server_timeout'])) echo "value=\"{$pconfig['server_timeout']}\"";?> size="64">
+				<div>the time (in milliseconds) we accept to wait for data from the server, or for the server to accept data (30000).</div>
+			</td>
+		</tr>
+		<tr align="left">
+			<td width="22%" valign="top" class="vncell">Retries</td>
+			<td width="78%" class="vtable" colspan="2">
+				<input name="retries" type="text" <?if(isset($pconfig['retries'])) echo "value=\"{$pconfig['retries']}\"";?> size="64">
+				<div>After a connection failure to a server, it is possible to retry, potentially
+on another server. This is useful if health-checks are too rare and you don't
+want the clients to see the failures. The number of attempts to reconnect is
+set by the 'retries' parameter.</div>
+			</td>
+		</tr>
+	</table>
+	<br/>&nbsp;<br/>	
+	<table width="100%" border="0" cellpadding="6" cellspacing="0">
+		<tr>
+			<td colspan="2" valign="top" class="listtopic">Statistics</td>
+		</tr>
+		<tr align="left">
+			<td width="22%" valign="top" class="vncell">Stats Enabled</td>
+			<td width="78%" class="vtable" colspan="2">
+				<input id="stats_enabled" name="stats_enabled" type="checkbox" value="yes" <?php if ($pconfig['stats_enabled']=='yes') echo "checked"; ?> onclick='updatevisibility();'>
+			</td>
+		</tr>
+		<tr class="haproxy_stats_visible" align="left" id='stats_realm_row' name='stats_realm_row'>
+			<td width="22%" valign="top" class="vncellreq">Stats Realm</td>
+			<td width="78%" class="vtable" colspan="2">
+				<input id="stats_realm" name="stats_realm" type="text" <?if(isset($pconfig['stats_realm'])) echo "value=\"{$pconfig['stats_realm']}\"";?> size="64"><br/>
+				EXAMPLE: haproxystats
+			</td>
+		</tr>
+		<tr class="haproxy_stats_visible" align="left" id='stats_uri_row' name='stats_uri_row'>
+			<td width="22%" valign="top" class="vncellreq">Stats Uri</td>
+			<td width="78%" class="vtable" colspan="2">
+				<input id="stats_uri" name="stats_uri" type="text" <?if(isset($pconfig['stats_uri'])) echo "value=\"{$pconfig['stats_uri']}\"";?> size="64"><br/>
+				EXAMPLE: /haproxy?stats
+			</td>
+		</tr>
+		<tr class="haproxy_stats_visible" align="left" id='stats_username_row' name='stats_username_row'>
+			<td width="22%" valign="top" class="vncellreq">Stats Username</td>
+			<td width="78%" class="vtable" colspan="2">
+				<input id="stats_username" name="stats_username" type="text" <?if(isset($pconfig['stats_username'])) echo "value=\"{$pconfig['stats_username']}\"";?> size="64">
+			</td>
+		</tr>
+		
+		<tr class="haproxy_stats_visible" align="left" id='stats_password_row' name='stats_password_row'>
+			<td width="22%" valign="top" class="vncellreq">Stats Password</td>
+			<td width="78%" class="vtable" colspan="2">
+				<input id="stats_password" name="stats_password" type="password" <?if(isset($pconfig['stats_password'])) echo "value=\"{$pconfig['stats_password']}\"";?> size="64">
+				<br/>
+			</td>
+		</tr>
+		<tr class="haproxy_stats_visible" align="left" id='stats_node_enabled_row' name='stats_node_enabled_row'>
+			<td width="22%" valign="top" class="vncell">Stats Enable Node Name</td>
+			<td width="78%" class="vtable" colspan="2">
+				<input id="stats_node_enabled" name="stats_node_enabled" type="checkbox" value="yes" <?php if ($pconfig['stats_node_enabled']=='yes') echo "checked"; ?>>
+				<br/>
+			</td>
+		</tr>
+		<tr class="haproxy_stats_visible" align="left" id='stats_node_row' name='stats_node_row'>
+			<td width="22%" valign="top" class="vncell">Stats Node</td>
+			<td width="78%" class="vtable" colspan="2">
+				<input id="stats_node" name="stats_node" type="text" <?if(isset($pconfig['stats_node'])) echo "value=\"{$pconfig['stats_node']}\"";?> size="64"><br/>
+				The node name is displayed in the stats and helps to differentiate which server in a cluster is actually serving clients.<br/>
+				Leave blank to use the system name.
+			</td>
+		</tr>
+		<tr class="haproxy_stats_visible" align="left" id='stats_desc_row' name='stats_desc_row'>
+			<td width="22%" valign="top" class="vncell">Stats Description</td>
+			<td width="78%" class="vtable" colspan="2">
+				<input id="stats_desc" name="stats_desc" type="text" <?if(isset($pconfig['stats_node'])) echo "value=\"{$pconfig['stats_desc']}\"";?> size="64"><br/>
+			</td>
+		</tr>
+		<tr class="haproxy_stats_visible" align="left" id='stats_refresh_row' name='stats_refresh_row'>
+			<td width="22%" valign="top" class="vncell">Stats Refresh</td>
+			<td width="78%" class="vtable" colspan="2">
+				<input id="stats_refresh" name="stats_refresh" type="text" <?if(isset($pconfig['stats_refresh'])) echo "value=\"{$pconfig['stats_refresh']}\"";?> size="10" maxlength="30"><br/>
+				Specify the refresh rate of the stats page in seconds, or specified time unit (us, ms, s, m, h, d).
+			</td>
+		</tr>
+	</table>	
+	<table width="100%" border="0" cellpadding="6" cellspacing="0">
 		<tr align="left">
 			<td width="22%" valign="top">&nbsp;</td>
 			<td width="78%">
@@ -345,6 +562,7 @@ function clearcombo(){
 			</td>
 		</tr>
 	</table>
+	</div>
 	</form>
 <br>
 <?php include("fend.inc"); ?>

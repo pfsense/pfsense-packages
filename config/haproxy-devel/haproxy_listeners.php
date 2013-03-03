@@ -98,7 +98,7 @@ include("head.inc");
   <tr>
     <td>
 	<div id="mainarea">
-              <table class="tabcont" width="100%" border="0" cellpadding="0" cellspacing="0">
+              <table class="tabcont sortable" width="100%" border="0" cellpadding="0" cellspacing="0">
                 <tr>
                   <td width="20%" class="listhdrr">Name</td>
                   <td width="30%" class="listhdrr">Description</td>
@@ -153,6 +153,7 @@ include("head.inc");
                   </td>
                 </tr>
                 <?php $i++; endforeach; ?>
+				<tfoot>
                 <tr>
                   <td class="list" colspan="5"></td>
                   <td class="list">
@@ -163,6 +164,7 @@ include("head.inc");
                     </table>
                   </td>
                 </tr>
+				</tfoot>
               </table>
 	   </div>
 	</table>

@@ -33,6 +33,78 @@
 require("guiconfig.inc");
 require_once("haproxy.inc");
 
+function get_certificat_usage($refid) {
+	$usage = array();
+	$cert = lookup_cert($refid);
+	if (is_cert_revoked($cert))
+		$usage[] = "Revoked";
+	if (is_webgui_cert($refid))
+		$usage[] = "webConfigurator";
+	if (is_user_cert($refid))
+		$usage[] = "User Cert";
+	if (is_openvpn_server_cert($refid))
+		$usage[] = "OpenVPN Server";
+	if (is_openvpn_client_cert($refid))
+		$usage[] = "OpenVPN Client";
+	if (is_ipsec_cert($cert['refid']))
+		$usage[] = "IPsec Tunnel";
+	if (is_captiveportal_cert($refid))
+		$usage[] = "Captive Portal";
+	
+	return $usage;
+}
+
+/// This function (is intendet to) provides a uniform way to retrieve a list of use selectable certificates
+function get_certificates_server($get_includeWebCert=false) {
+	global $config;
+	$certificates=array();
+	$a_cert = &$config['cert'];
+	foreach ($a_cert as $cert)
+	{
+		if ($get_ca == false && is_webgui_cert($cert['refid']))
+			continue;
+
+		$selected = "";
+		$caname = "";
+		$inuse = "";
+		$revoked = "";
+		$ca = lookup_ca($cert['caref']);
+		if ($ca)
+			$caname = " (CA: {$ca['descr']})";
+		if ($pconfig['certref'] == $cert['refid'])
+			$selected = "selected";
+		if (cert_in_use($cert['refid']))
+			$inuse = " *In Use";
+		if (is_cert_revoked($cert))
+		$revoked = " *Revoked";
+		
+		$usagestr="";
+		$usage = get_certificat_usage($cert['refid']);
+		foreach($usage as $use){
+			$usagestr .= " " . $use;
+		}		
+		if ($usagestr != "")
+			$usagestr = " (".trim($usagestr).")";
+		
+		$certificates[$cert['refid']] = $cert['descr'] . $caname . $inuse . $revoked . $usagestr;
+	}
+	return $certificates;
+}
+
+function echo_html_select($name, $keyvaluelist, $selected, $listEmptyMessage="")
+{
+	if (count($keyvaluelist)>0){						
+		echo "<select name=\"$name\" class=\"formselect\">";
+		foreach($keyvaluelist as $key => $desc){
+			$selectedhtml = $key == $selected ? "selected" : "";
+			echo "<option value=\"{$key}\" {$selectedhtml}>{$desc}</option>";
+		}
+		echo "</select>";
+	} else {
+		echo $listEmptyMessage;
+	}
+}
+
 function haproxy_acl_select($mode) {
 	global $a_acltypes;
 
@@ -66,25 +138,11 @@ if (isset($id) && $a_backend[$id]) {
 	$pconfig['name'] = $a_backend[$id]['name'];
 	$pconfig['desc'] = $a_backend[$id]['desc'];
 	$pconfig['status'] = $a_backend[$id]['status'];
-	$pconfig['connection_timeout'] = $a_backend[$id]['connection_timeout'];
-	$pconfig['server_timeout'] = $a_backend[$id]['server_timeout'];
-	$pconfig['retries'] = $a_backend[$id]['retries'];
 	
 	$pconfig['type'] = $a_backend[$id]['type'];
-	$pconfig['balance'] = $a_backend[$id]['balance'];
 
 	$pconfig['forwardfor'] = $a_backend[$id]['forwardfor'];
 	$pconfig['httpclose'] = $a_backend[$id]['httpclose'];
-
-	$pconfig['stats_enabled'] = $a_backend[$id]['stats_enabled'];
-	$pconfig['stats_username'] = $a_backend[$id]['stats_username'];
-	$pconfig['stats_password'] = $a_backend[$id]['stats_password'];
-	$pconfig['stats_uri'] = $a_backend[$id]['stats_uri'];
-	$pconfig['stats_realm'] = $a_backend[$id]['stats_realm'];
-	$pconfig['stats_node_enabled'] = $a_backend[$id]['stats_node_enabled'];
-	$pconfig['stats_node'] = $a_backend[$id]['stats_node'];
-	$pconfig['stats_desc'] = $a_backend[$id]['stats_desc'];
-	$pconfig['stats_refresh'] = $a_backend[$id]['stats_refresh'];
 	
 	$pconfig['type'] = $a_backend[$id]['type'];
 	$pconfig['extaddr'] = $a_backend[$id]['extaddr'];	
@@ -92,10 +150,9 @@ if (isset($id) && $a_backend[$id]) {
 	$pconfig['max_connections'] = $a_backend[$id]['max_connections'];	
 	$pconfig['client_timeout'] = $a_backend[$id]['client_timeout'];	
 	$pconfig['port'] = $a_backend[$id]['port'];	
-	$pconfig['svrport'] = $a_backend[$id]['svrport'];	
 	$pconfig['a_acl']=&$a_backend[$id]['ha_acls']['item'];	
 	$pconfig['advanced'] = base64_decode($a_backend[$id]['advanced']);
-	$pconfig['dcert'] = base64_decode($a_backend[$id]['dcert']);
+	$pconfig['ssloffloadcert'] = $a_backend[$id]['ssloffloadcert'];
 	$pconfig['dcertadv'] = $a_backend[$id]['dcertadv'];
 	$pconfig['ssloffload'] = $a_backend[$id]['ssloffload'];
 }
@@ -112,38 +169,12 @@ if ($_POST) {
 	unset($input_errors);
 	$pconfig = $_POST;
 	
-	if ($_POST['stats_enabled']) {
-		$reqdfields = explode(" ", "name connection_timeout server_timeout stats_username stats_password stats_uri stats_realm");
-		$reqdfieldsn = explode(",", "Name,Connection timeout,Server timeout,Stats Username,Stats Password,Stats Uri,Stats Realm");		
-	} else {
-		$reqdfields = explode(" ", "name connection_timeout server_timeout");
-		$reqdfieldsn = explode(",", "Name,Connection timeout,Server timeout");		
-	}
-	
-	do_input_validation($_POST, $reqdfields, $reqdfieldsn, &$input_errors);
-
-	$reqdfields = explode(" ", "name type port max_connections client_timeout");
-	$reqdfieldsn = explode(",", "Name,Type,Port,Max connections,Client timeout");
-	
+	$reqdfields = explode(" ", "name type port max_connections");
+	$reqdfieldsn = explode(",", "Name,Type,Port,Max connections");
 	do_input_validation($_POST, $reqdfields, $reqdfieldsn, &$input_errors);
 
 	if (preg_match("/[^a-zA-Z0-9\.\-_]/", $_POST['name']))
 		$input_errors[] = "The field 'Name' contains invalid characters.";
-
-	if (!is_numeric($_POST['connection_timeout']))
-		$input_errors[] = "The field 'Connection timeout' value is not a number.";
-
-	if (!is_numeric($_POST['server_timeout']))
-		$input_errors[] = "The field 'Server timeout' value is not a number.";
-
-	if (!$_POST['retries'] && is_numeric($_POST['retries']))
-		$input_errors[] = "The field 'Retries' value is not a number.";
-
-	if (preg_match("/[^a-zA-Z0-9\.\-_]/", $_POST['stats_username']))
-		$input_errors[] = "The field 'Stats Username' contains invalid characters.";
-
-	if (preg_match("/[^a-zA-Z0-9\.\-_]/", $_POST['stats_password']))
-		$input_errors[] = "The field 'Stats Password' contains invalid characters.";
 
 	if (!is_numeric($_POST['max_connections']))
 		$input_errors[] = "The field 'Max connections' value is not a number.";
@@ -208,32 +239,18 @@ if ($_POST) {
 		update_if_changed("name", $backend['name'], $_POST['name']);
 		update_if_changed("description", $backend['desc'], $_POST['desc']);
 		update_if_changed("status", $backend['status'], $_POST['status']);
-		update_if_changed("connection_timeout", $backend['connection_timeout'], $_POST['connection_timeout']);
-		update_if_changed("server_timeout", $backend['server_timeout'], $_POST['server_timeout']);
-		update_if_changed("retries", $backend['retries'], $_POST['retries']);
 		update_if_changed("type", $backend['type'], $_POST['type']);
-		update_if_changed("balance", $backend['balance'], $_POST['balance']);
 		update_if_changed("cookie_name", $backend['cookie_name'], $_POST['cookie_name']);
 		update_if_changed("forwardfor", $backend['forwardfor'], $_POST['forwardfor']);
 		update_if_changed("httpclose", $backend['httpclose'], $_POST['httpclose']);
-		update_if_changed("stats_enabled", $backend['stats_enabled'], $_POST['stats_enabled']);
-		update_if_changed("stats_username", $backend['stats_username'], $_POST['stats_username']);
-		update_if_changed("stats_password", $backend['stats_password'], $_POST['stats_password']);
-		update_if_changed("stats_uri", $backend['stats_uri'], $_POST['stats_uri']);
-		update_if_changed("stats_realm", $backend['stats_realm'], $_POST['stats_realm']);
-		update_if_changed("stats_node_enabled", $backend['stats_node_enabled'], $_POST['stats_node_enabled']);
-		update_if_changed("stats_node", $backend['stats_node'], $_POST['stats_node']);
-		update_if_changed("stats_desc", $backend['stats_desc'], $_POST['stats_desc']);
-		update_if_changed("stats_refresh", $backend['stats_refresh'], $_POST['stats_refresh']);
 		update_if_changed("type", $backend['type'], $_POST['type']);
 		update_if_changed("port", $backend['port'], $_POST['port']);
-		update_if_changed("svrport", $backend['svrport'], $_POST['svrport']);
 		update_if_changed("extaddr", $backend['extaddr'], $_POST['extaddr']);
 		update_if_changed("backend_serverpool", $backend['backend_serverpool'], $_POST['backend_serverpool']);
 		update_if_changed("max_connections", $backend['max_connections'], $_POST['max_connections']);
 		update_if_changed("client_timeout", $backend['client_timeout'], $_POST['client_timeout']);
 		update_if_changed("advanced", $backend['advanced'], base64_encode($_POST['advanced']));
-		update_if_changed("dcert", $backend['dcert'], base64_encode($_POST['dcert']));
+		update_if_changed("ssloffloadcert", $backend['ssloffloadcert'], $_POST['ssloffloadcert']);
 		update_if_changed("dcertadv", $backend['dcertadv'], $_POST['dcertadv']);
 		update_if_changed("ssloffload", $backend['ssloffload'], $_POST['ssloffload']);
 		$backend['ha_acls']['item'] = $a_acl;
@@ -263,7 +280,12 @@ include("head.inc");
 
 ?>
 
-<body link="#0000CC" vlink="#0000CC" alink="#0000CC">
+<body link="#0000CC" vlink="#0000CC" alink="#0000CC" onload="updatevisibility()">
+  <style type="text/css">
+	.haproxy_mode_http{display:none;}
+	.haproxy_ssloffloading_enabled{display:none;}
+  </style>
+
 <?php if($one_two): ?>
 <script type="text/javascript" src="/javascript/scriptaculous/prototype.js"></script>
 <script type="text/javascript" src="/javascript/scriptaculous/scriptaculous.js"></script>
@@ -411,45 +433,35 @@ include("head.inc");
 	rowtype[2] = "textbox";
 	rowsize[2] = "35";
 
-	function toggle_stats() {
-		var stats_enabled=document.getElementById('stats_enabled');
-		var stats_realm_row=document.getElementById('stats_realm_row');
-		var stats_username_row=document.getElementById('stats_username_row');
-		var stats_password_row=document.getElementById('stats_password_row');
-		var stats_uri_row=document.getElementById('stats_uri_row');
-		var stats_node_enabled_row=document.getElementById('stats_node_enabled_row');
-		var stats_node_row=document.getElementById('stats_node_row');
-		var stats_desc_row=document.getElementById('stats_desc_row');
-		var stats_refresh_row=document.getElementById('stats_refresh_row');
-		
-		if (stats_enabled.checked) {
-			stats_realm_row.style.display='';
-			stats_username_row.style.display='';
-			stats_password_row.style.display='';
-			stats_uri_row.style.display='';
-			stats_node_enabled_row.style.display='';
-			stats_node_row.style.display='';
-			stats_desc_row.style.display='';
-			stats_refresh_row.style.display='';
-		} else {
-			stats_realm_row.style.display='none';
-			stats_username_row.style.display='none';
-			stats_password_row.style.display='none';
-			stats_uri_row.style.display='none';
-			stats_node_enabled_row.style.display='none';
-			stats_node_row.style.display='none';
-			stats_desc_row.style.display='none';
-			stats_refresh_row.style.display='none';
+	function setCSSdisplay(cssID, display)
+	{
+		var ss = document.styleSheets;
+		for (var i=0; i<ss.length; i++) {
+			var rules = ss[i].cssRules || ss[i].rules;
+			for (var j=0; j<rules.length; j++) {
+				if (rules[j].selectorText === cssID) {
+					rules[j].style.display = display ? "" : "none";
+				}
+			}
 		}
 	}
+	
+	function updatevisibility()
+	{
+		setCSSdisplay(".haproxy_ssloffloading_enabled", ssloffload.checked);
+		setCSSdisplay(".haproxy_mode_http", type.value == "http");
+	}
+	
 	function type_change() {
 		var type, d, i, j, el, row;
 		var count = <?=count($a_acltypes);?>;
 		var acl = [ <?php foreach ($a_acltypes as $expr) echo "'".$expr['name']."'," ?> ];
 		var mode = [ <?php foreach ($a_acltypes as $expr) echo "'".$expr['mode']."'," ?> ];
 
-	        d = document;
+        d = document;
 		type = d.getElementById("type").value;
+		
+
 		for (i = 0; i < 99; i++) {
 			el = d.getElementById("acl_expression" + i);
 			row = d.getElementById("aclrow" + i);
@@ -465,6 +477,7 @@ include("head.inc");
 				}
 			}
 		}
+		updatevisibility();
 	}
 </script>
 <?php include("fbegin.inc"); ?>
@@ -473,6 +486,7 @@ include("head.inc");
 <p class="pgtitle"><?=$pgtitle?></p>
 <?php endif; ?>
 <form action="haproxy_listeners_edit.php" method="post" name="iform" id="iform">
+	<div class="tabcont">
 	<table width="100%" border="0" cellpadding="6" cellspacing="0">
 		<tr>
 			<td colspan="2" valign="top" class="listtopic">Edit haproxy listener</td>
@@ -549,13 +563,6 @@ include("head.inc");
 				?>
 				</select>
 		<tr align="left">
-			<td width="22%" valign="top" class="vncell">Server Port</td>
-			<td width="78%" class="vtable" colspan="2">
-				<input name="svrport" type="text" <?if(isset($pconfig['svrport'])) echo "value=\"{$pconfig['svrport']}\"";?> size="10" maxlength="10">
-				<div>The default server port.</div>
-			</td>
-		</tr>
-		<tr align="left">
 			<td width="22%" valign="top" class="vncellreq">Type</td>
 			<td width="78%" class="vtable" colspan="2">
 				<select name="type" id="type" onchange="type_change();">
@@ -619,7 +626,7 @@ include("head.inc");
 			<a onclick="javascript:addRowTo('acltable'); return false;" href="#">
 			<img border="0" src="/themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif" alt="" title="add another entry" />
 			</a><br/>
-			For more information about ACL's please see <a href='http://haproxy.1wt.eu/download/1.3/doc/configuration.txt' target='_new'>HAProxy Documentation</a> Section 7 - Using ACL's
+			For more information about ACL's please see <a href='http://haproxy.1wt.eu/download/1.5/doc/configuration.txt' target='_new'>HAProxy Documentation</a> Section 7 - Using ACL's
 			</td>
 		</tr>
 	</table>
@@ -629,235 +636,88 @@ include("head.inc");
 			<td colspan="2" valign="top" class="listtopic">Advanced settings</td>
 		</tr>
 		<tr align="left">
-			<td width="22%" valign="top" class="vncellreq">Connection timeout</td>
+			<td width="22%" valign="top" class="vncellreq">Max connections</td>
 			<td width="78%" class="vtable" colspan="2">
-				<input name="connection_timeout" type="text" <?if(isset($pconfig['connection_timeout'])) echo "value=\"{$pconfig['connection_timeout']}\"";?> size="64">
-				<div>the time (in milliseconds) we give up if the connection does not complete within (30000).</div>
+				<input name="max_connections" type="text" <?if(isset($pconfig['max_connections'])) echo "value=\"{$pconfig['max_connections']}\"";?> size="10" maxlength="10">
 			</td>
 		</tr>
 		<tr align="left">
-			<td width="22%" valign="top" class="vncellreq">Server timeout</td>
+			<td width="22%" valign="top" class="vncellreq">Client timeout</td>
 			<td width="78%" class="vtable" colspan="2">
-				<input name="server_timeout" type="text" <?if(isset($pconfig['server_timeout'])) echo "value=\"{$pconfig['server_timeout']}\"";?> size="64">
-				<div>the time (in milliseconds) we accept to wait for data from the server, or for the server to accept data (30000).</div>
+				<input name="client_timeout" type="text" <?if(isset($pconfig['client_timeout'])) echo "value=\"{$pconfig['client_timeout']}\"";?> size="10" maxlength="10">
+				<div>the time (in milliseconds) we accept to wait for data from the client, or for the client to accept data (30000).</div>
 			</td>
 		</tr>
 		<tr align="left">
-			<td width="22%" valign="top" class="vncell">Retries</td>
+			<td width="22%" valign="top" class="vncell">Use 'forwardfor' option</td>
 			<td width="78%" class="vtable" colspan="2">
-				<input name="retries" type="text" <?if(isset($pconfig['retries'])) echo "value=\"{$pconfig['retries']}\"";?> size="64">
-				<div>After a connection failure to a server, it is possible to retry, potentially
-on another server. This is useful if health-checks are too rare and you don't
-want the clients to see the failures. The number of attempts to reconnect is
-set by the 'retries' parameter (2).</div>
-			</td>
-		</tr>
-		<tr align="left">
-			<td width="22%" valign="top" class="vncellreq">Balance</td>
-			<td width="78%" class="vtable" colspan="2">
-				<table width="100%">
-				<tr>
-					<td width="20%" valign="top">
-						<input type="radio" name="balance" id="balance" value="roundrobin"<?php if($pconfig['balance'] == "roundrobin") echo " CHECKED"; ?>>Round robin</input>
-					</td>
-					<td>
-						  Each server is used in turns, according to their weights.
-		                  This is the smoothest and fairest algorithm when the server's
-		                  processing time remains equally distributed. This algorithm
-		                  is dynamic, which means that server weights may be adjusted
-		                  on the fly for slow starts for instance.
-					</td>
-				</tr>
-				<tr>
-					<td width="20%" valign="top">
-						<input type="radio" name="balance" id="balance" value="static-rr"<?php if($pconfig['balance'] == "static-rr") echo " CHECKED"; ?>>Static Round Robin</input>
-					</td>
-					<td>
-						Each server is used in turns, according to their weights.
-				This algorithm is as similar to roundrobin except that it is
-				static, which means that changing a server's weight on the
-				fly will have no effect. On the other hand, it has no design
-				limitation on the number of servers, and when a server goes
-				up, it is always immediately reintroduced into the farm, once
-				the full map is recomputed. It also uses slightly less CPU to
-				run (around -1%).					
-					</td>
-				</tr>
-				<tr>
-					<td width="20%" valign="top">
-						<input type="radio" name="balance" id="balance" value="leastconn"<?php if($pconfig['balance'] == "leastconn") echo " CHECKED"; ?>>Least Connections</input>
-					</td>
-					<td>
-						  The server with the lowest number of connections receives the
-				connection. Round-robin is performed within groups of servers
-				of the same load to ensure that all servers will be used. Use
-				of this algorithm is recommended where very long sessions are
-				expected, such as LDAP, SQL, TSE, etc... but is not very well
-				suited for protocols using short sessions such as HTTP. This
-				algorithm is dynamic, which means that server weights may be
-				adjusted on the fly for slow starts for instance.
-					</td>
-				</tr>
-				  <tr><td valign="top"><input type="radio" name="balance" id="balance" value="source"<?php if($pconfig['balance'] == 
-"source") echo " CHECKED"; ?>>Source</input></td><td>
-		 			  The source IP address is hashed and divided by the total
-	                  weight of the running servers to designate which server will
-	                  receive the request. This ensures that the same client IP
-	                  address will always reach the same server as long as no
-	                  server goes down or up. If the hash result changes due to the
-	                  number of running servers changing, many clients will be
-					  directed to a different server. This algorithm is generally
-	                  used in TCP mode where no cookie may be inserted. It may also
-	                  be used on the Internet to provide a best-effort stickyness
-	                  to clients which refuse session cookies. This algorithm is
-	                  static, which means that changing a server's weight on the
-	                  fly will have no effect.
-					</td>
-				</tr>
-				</table>
-			</td>
-		</tr>
-		<tr align="left">
-			<td width="22%" valign="top" class="vncell">Stats Enabled</td>
-			<td width="78%" class="vtable" colspan="2">
-				<input id="stats_enabled" name="stats_enabled" type="checkbox" value="yes" <?php if ($pconfig['stats_enabled']=='yes') echo "checked"; ?> onclick='toggle_stats();'><br/>
-				EXAMPLE: haproxystats
-			</td>
-		</tr>
-		<tr align="left" id='stats_realm_row' name='stats_realm_row' <?if ($pconfig['stats_enabled']!='yes') echo "style=\"display: none;\"";?>>
-			<td width="22%" valign="top" class="vncellreq">Stats Realm</td>
-			<td width="78%" class="vtable" colspan="2">
-				<input id="stats_realm" name="stats_realm" type="text" <?if(isset($pconfig['stats_realm'])) echo "value=\"{$pconfig['stats_realm']}\"";?> size="64">
-			</td>
-		</tr>
-		<tr align="left" id='stats_uri_row' name='stats_uri_row' <?if ($pconfig['stats_enabled']!='yes') echo "style=\"display: none;\"";?>>
-			<td width="22%" valign="top" class="vncellreq">Stats Uri</td>
-			<td width="78%" class="vtable" colspan="2">
-				<input id="stats_uri" name="stats_uri" type="text" <?if(isset($pconfig['stats_uri'])) echo "value=\"{$pconfig['stats_uri']}\"";?> size="64"><br/>
-				EXAMPLE: /haproxy?stats
-			</td>
-		</tr>
-		<tr align="left" id='stats_username_row' name='stats_username_row' <?if ($pconfig['stats_enabled']!='yes') echo "style=\"display: none;\"";?>>
-			<td width="22%" valign="top" class="vncellreq">Stats Username</td>
-			<td width="78%" class="vtable" colspan="2">
-				<input id="stats_username" name="stats_username" type="text" <?if(isset($pconfig['stats_username'])) echo "value=\"{$pconfig['stats_username']}\"";?> size="64">
-			</td>
-		</tr>
-		
-		<tr align="left" id='stats_password_row' name='stats_password_row' <?if ($pconfig['stats_enabled']!='yes') echo "style=\"display: none;\"";?>>
-			<td width="22%" valign="top" class="vncellreq">Stats Password</td>
-			<td width="78%" class="vtable" colspan="2">
-				<input id="stats_password" name="stats_password" type="password" <?if(isset($pconfig['stats_password'])) echo "value=\"{$pconfig['stats_password']}\"";?> size="64">
+				<input id="forwardfor" name="forwardfor" type="checkbox" value="yes" <?php if ($pconfig['forwardfor']=='yes') echo "checked"; ?>>
 				<br/>
+				The 'forwardfor' option creates an HTTP 'X-Forwarded-For' header which
+				contains the client's IP address. This is useful to let the final web server
+				know what the client address was (eg for statistics on domains)
 			</td>
 		</tr>
-		<tr align="left" id='stats_node_enabled_row' name='stats_node_enabled_row' <?if ($pconfig['stats_enabled']!='yes') echo "style=\"display: none;\"";?>>
-			<td width="22%" valign="top" class="vncell">Stats Enable Node Name</td>
+		<tr align="left">
+			<td width="22%" valign="top" class="vncell">Use 'httpclose' option</td>
 			<td width="78%" class="vtable" colspan="2">
-				<input id="stats_node_enabled" name="stats_node_enabled" type="checkbox" value="yes" <?php if ($pconfig['stats_node_enabled']=='yes') echo "checked"; ?>>
+				<input id="httpclose" name="httpclose" type="checkbox" value="yes" <?php if ($pconfig['httpclose']=='yes') echo "checked"; ?>>
 				<br/>
+				The 'httpclose' option removes any 'Connection' header both ways, and
+				adds a 'Connection: close' header in each direction. This makes it easier to
+				disable HTTP keep-alive than the previous 4-rules block.
 			</td>
 		</tr>
-		<tr align="left" id='stats_node_row' name='stats_node_row' <?if ($pconfig['stats_enabled']!='yes') echo "style=\"display: none;\"";?>>
-			<td width="22%" valign="top" class="vncell">Stats Node</td>
+		<tr align="left">
+			<td width="22%" valign="top" class="vncell">Advanced pass thru</td>
 			<td width="78%" class="vtable" colspan="2">
-				<input id="stats_node" name="stats_node" type="text" <?if(isset($pconfig['stats_node'])) echo "value=\"{$pconfig['stats_node']}\"";?> size="64"><br/>
-				The node name is displayed in the stats and helps to differentiate which server in a cluster is actually serving clients.<br/>
-				Leave blank to use the system name.
+				<textarea name='advanced' rows="4" cols="70" id='advanced'><?php echo $pconfig['advanced']; ?></textarea>
+				<br/>
+				NOTE: paste text into this box that you would like to pass thru.
 			</td>
 		</tr>
-		<tr align="left" id='stats_desc_row' name='stats_desc_row' <?if ($pconfig['stats_enabled']!='yes') echo "style=\"display: none;\"";?>>
-			<td width="22%" valign="top" class="vncell">Stats Description</td>
-			<td width="78%" class="vtable" colspan="2">
-				<input id="stats_desc" name="stats_desc" type="text" <?if(isset($pconfig['stats_node'])) echo "value=\"{$pconfig['stats_desc']}\"";?> size="64"><br/>
-			</td>
-		</tr>
-		<tr align="left" id='stats_refresh_row' name='stats_refresh_row' <?if ($pconfig['stats_enabled']!='yes') echo "style=\"display: none;\"";?>>
-			<td width="22%" valign="top" class="vncell">Stats Refresh</td>
-			<td width="78%" class="vtable" colspan="2">
-				<input id="stats_refresh" name="stats_refresh" type="text" <?if(isset($pconfig['stats_refresh'])) echo "value=\"{$pconfig['stats_refresh']}\"";?> size="10" maxlength="30"><br/>
-				Specify the refresh rate of the stats page in seconds, or specified time unit (us, ms, s, m, h, d).
-			</td>
-		</tr>
-				<tr align="left">
-					<td width="22%" valign="top" class="vncellreq">Max connections</td>
-					<td width="78%" class="vtable" colspan="2">
-						<input name="max_connections" type="text" <?if(isset($pconfig['max_connections'])) echo "value=\"{$pconfig['max_connections']}\"";?> size="10" maxlength="10">
-					</td>
-				</tr>
-				<tr align="left">
-					<td width="22%" valign="top" class="vncellreq">Client timeout</td>
-					<td width="78%" class="vtable" colspan="2">
-						<input name="client_timeout" type="text" <?if(isset($pconfig['client_timeout'])) echo "value=\"{$pconfig['client_timeout']}\"";?> size="10" maxlength="10">
-						<div>the time (in milliseconds) we accept to wait for data from the client, or for the client to accept data (30000).</div>
-					</td>
-				</tr>
-			<tr align="left">
-				<td width="22%" valign="top" class="vncell">Use 'forwardfor' option</td>
-				<td width="78%" class="vtable" colspan="2">
-					<input id="forwardfor" name="forwardfor" type="checkbox" value="yes" <?php if ($pconfig['forwardfor']=='yes') echo "checked"; ?>>
-					<br/>
-					The 'forwardfor' option creates an HTTP 'X-Forwarded-For' header which
-					contains the client's IP address. This is useful to let the final web server
-					know what the client address was (eg for statistics on domains)
-				</td>
-			</tr>
-			<tr align="left">
-				<td width="22%" valign="top" class="vncell">Use 'httpclose' option</td>
-				<td width="78%" class="vtable" colspan="2">
-					<input id="httpclose" name="httpclose" type="checkbox" value="yes" <?php if ($pconfig['httpclose']=='yes') echo "checked"; ?>>
-					<br/>
-					The 'httpclose' option removes any 'Connection' header both ways, and
-					adds a 'Connection: close' header in each direction. This makes it easier to
-					disable HTTP keep-alive than the previous 4-rules block.
-				</td>
-			</tr>
-			<tr align="left">
-				<td width="22%" valign="top" class="vncell">Advanced pass thru</td>
-				<td width="78%" class="vtable" colspan="2">
-					<textarea name='advanced' rows="4" cols="70" id='advanced'><?php echo $pconfig['advanced']; ?></textarea>
-					<br/>
-					NOTE: paste text into this box that you would like to pass thru.
-				</td>
-			</tr>
 	</table>
 	<br/>&nbsp;<br/>
 <?
 	global $haproxy_sni_ssloffloading;
 	if ($haproxy_sni_ssloffloading):
 ?>
-	<table width="100%" border="0" cellpadding="6" cellspacing="0">
+	<table class="haproxy_mode_http" width="100%" border="0" cellpadding="6" cellspacing="0">
 		<tr>
 			<td colspan="2" valign="top" class="listtopic">SSL Offloading</td>
 		</tr>
 		<tr align="left">
-				<td width="22%" valign="top" class="vncell">Use Offloading</td>
-				<td width="78%" class="vtable" colspan="2">
-					<input id="ssloffload" name="ssloffload" type="checkbox" value="yes" <?php if ($pconfig['ssloffload']=='yes') echo "checked"; ?>>
-					<br/>
-					The SSL Offloading will reduce web servers load by encrypt data to users on internet and send it without encrytion to internal servers.  
-				</td>
-			</tr>	
-			</tr>
-			<tr align="left">
-				<td width="22%" valign="top" class="vncell">cert</td>
-				<td width="78%" class="vtable" colspan="2">
-					<textarea name='dcert' rows="8" cols="70" id='dcert'><?php echo $pconfig['dcert']; ?></textarea>
-					<br/>
-					NOTE: paste cert and rsa key to use on this frontend.
-				</td>
-			</tr>
-			<tr align="left">
-				<td width="22%" valign="top" class="vncell">Advanced ssl options</td>
-				<td width="78%" class="vtable" colspan="2">
-					<input type='text' name='dcertadv' size="64" id='dcertadv' <?if(isset($pconfig['dcertadv'])) echo "value=\"{$pconfig['dcertadv']}\"";?> size="10" maxlength="64">
-					<br/>
-					NOTE: Paste additional ssl options(without commas) to include on ssl listening options.<br>
-					some options: force-sslv3, force-tlsv10 force-tlsv11 force-tlsv12 no-sslv3 no-tlsv10 no-tlsv11 no-tlsv12 no-tls-tickets
-				</td>
-			</tr>
+			<td width="22%" valign="top" class="vncell">Use Offloading</td>
+			<td width="78%" class="vtable" colspan="2">
+				<input id="ssloffload" name="ssloffload" type="checkbox" value="yes" <?php if ($pconfig['ssloffload']=='yes') echo "checked";?> onclick="updatevisibility();"><strong>Use Offloading</strong></input>
+				<br/>
+				The SSL Offloading will reduce web servers load by encrypt data to users on internet and send it without encrytion to internal servers.  
+			</td>
+		</tr>
+		<tr class="haproxy_ssloffloading_enabled" align="left">
+			<td width="22%" valign="top" class="vncell">Certificate</td>
+			<td width="78%" class="vtable" colspan="2">
+				<?  
+					$servercerts = get_certificates_server();
+					echo_html_select("ssloffloadcert", $servercerts, $pconfig['ssloffloadcert'], '<b>No Certificates defined.</b> <br/>Create one under <a href="system_certmanager.php">System &gt; Cert Manager</a>.');
+				?>
+				<br/>
+				NOTE: choose the cert to use on this frontend.
+			</td>
+		</tr>
+		<tr class="haproxy_ssloffloading_enabled" align="left">
+			<td width="22%" valign="top" class="vncell">Advanced ssl options</td>
+			<td width="78%" class="vtable" colspan="2">
+				<input type='text' name='dcertadv' size="64" id='dcertadv' <?if(isset($pconfig['dcertadv'])) echo "value=\"{$pconfig['dcertadv']}\"";?> size="10" maxlength="64">
+				<br/>
+				NOTE: Paste additional ssl options(without commas) to include on ssl listening options.<br>
+				some options: force-sslv3, force-tlsv10 force-tlsv11 force-tlsv12 no-sslv3 no-tlsv10 no-tlsv11 no-tlsv12 no-tls-tickets
+			</td>
+		</tr>
+		<tr>
+			<td>&nbsp;</td>
+		</tr>
 	</table>
-	<br/>&nbsp;<br/>
 <?	
 	endif; 
 ?>
@@ -878,6 +738,7 @@ set by the 'retries' parameter (2).</div>
 			</td>
 		</tr>
 	</table>
+	</div>
 	</form>
 <br>
 <script type="text/javascript">
