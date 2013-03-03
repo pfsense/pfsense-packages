@@ -228,14 +228,41 @@ EOD;
 		$bandwidthd_nano_dir = "/var/bandwidthd";
 		$bandwidthd_htdocs_dir = $bandwidthd_nano_dir . "/htdocs";
 		$rc['start'] = <<<EOD
-/bin/mkdir -p {$bandwidthd_nano_dir}
-/bin/mkdir -p {$bandwidthd_htdocs_dir}
-/bin/ln -s {$bandwidthd_base_dir}/bandwidthd {$bandwidthd_nano_dir}/bandwidthd
-/bin/ln -s {$bandwidthd_config_dir} {$bandwidthd_nano_dir}/etc
+if [ ! -d "{$bandwidthd_nano_dir}" ] ; then
+	if [ -e "{$bandwidthd_nano_dir}" ] ; then
+		/bin/rm -f {$bandwidthd_nano_dir}
+	fi
+	/bin/mkdir -p {$bandwidthd_nano_dir}
+fi
+if [ ! -d "{$bandwidthd_htdocs_dir}" ] ; then
+	if [ -e "{$bandwidthd_htdocs_dir}" ] ; then
+		/bin/rm -f {$bandwidthd_htdocs_dir}
+	fi
+	/bin/mkdir -p {$bandwidthd_htdocs_dir}
+fi
+if [ ! -L "{$bandwidthd_nano_dir}/bandwidthd" ] ; then
+	if [ -e "{$bandwidthd_nano_dir}/bandwidthd" ] ; then
+		/bin/rm -Rf {$bandwidthd_nano_dir}/bandwidthd
+	fi
+	/bin/ln -s {$bandwidthd_base_dir}/bandwidthd {$bandwidthd_nano_dir}/bandwidthd
+fi
+if [ ! -L "{$bandwidthd_nano_dir}/etc" ] ; then
+	if [ -e "{$bandwidthd_nano_dir}/etc" ] ; then
+		/bin/rm -Rf {$bandwidthd_nano_dir}/etc
+	fi
+	/bin/ln -s {$bandwidthd_config_dir} {$bandwidthd_nano_dir}/etc
+fi
+
 cd {$bandwidthd_nano_dir}
 {$bandwidthd_nano_dir}/bandwidthd
 cd -
 EOD;
+		if (!is_dir($bandwidthd_nano_dir)) {
+			if (file_exists($bandwidthd_nano_dir)) {
+				unlink($bandwidthd_nano_dir);
+			}
+			mkdir($bandwidthd_nano_dir);
+		}
 	} else {
 		$bandwidthd_htdocs_dir = $bandwidthd_base_dir . "/htdocs";
 		$rc['start'] = <<<EOD
@@ -246,16 +273,29 @@ EOD;
 	/* write out rc.d start/stop file */
 	write_rcfile($rc);
 
-	exec("/bin/rm /usr/local/www/bandwidthd");
-	exec("/bin/ln -s " . $bandwidthd_htdocs_dir . " /usr/local/www/bandwidthd");
-	exec("echo \"Please start bandwidthd to populate this directory.\" > " . $bandwidthd_htdocs_dir . "/index.html");
+	if (!is_dir($bandwidthd_htdocs_dir)) {
+		if (file_exists($bandwidthd_htdocs_dir)) {
+			unlink($bandwidthd_htdocs_dir);
+		}
+		mkdir($bandwidthd_htdocs_dir);
+	}
+	$bandwidthd_www_link = $g["www_path"] . "/bandwidthd";
+	if (!is_link($bandwidthd_www_link)) {
+		if (file_exists($bandwidthd_www_link)) {
+			// It is a file and not a link - clean it up.
+			unlink($bandwidthd_www_link);
+		}
+		symlink($bandwidthd_htdocs_dir, $bandwidthd_www_link);
+	}
 
+	$bandwidthd_index_file = $bandwidthd_htdocs_dir . "/index.html";
+	if (!file_exists($bandwidthd_index_file)) {
+		exec("echo \"Please start bandwidthd to populate this directory.\" > " . $bandwidthd_index_file);
+	}
 	conf_mount_ro();
 	config_unlock();
-
 	stop_service("bandwidthd");
 	start_service("bandwidthd");
-
 }
 
 ?>
