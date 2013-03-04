@@ -56,6 +56,7 @@ if (isset($id) && $a_pools[$id]) {
 	$pconfig['monitor_uri'] = $a_pools[$id]['monitor_uri'];
 	$pconfig['cookie'] = $a_pools[$id]['cookie'];
 	$pconfig['advanced'] = base64_decode($a_pools[$id]['advanced']);
+	$pconfig['advanced_backend'] = base64_decode($a_pools[$id]['advanced_backend']);
 	$pconfig['a_servers']=&$a_pools[$id]['ha_servers']['item'];	
 	
 	foreach($simplefields as $stat)
@@ -136,11 +137,10 @@ if ($_POST) {
 			if (!preg_match("/.{2,}/", $server_address))
 				$input_errors[] = "The field 'Address' is required.";
 
-			if (!preg_match("/.{2,}/", $server_weight))
-				$input_errors[] = "The field 'Weight' is required.";
 
 			if (!is_numeric($server_weight))
 				$input_errors[] = "The field 'Weight' value is not a number.";
+
 			if ($server_port && !is_numeric($server_port))
 				$input_errors[] = "The field 'Port' value is not a number.";
 		}
@@ -172,6 +172,7 @@ if ($_POST) {
 		update_if_changed("name", $pool['name'], $_POST['name']);
 		update_if_changed("cookie", $pool['cookie'], $_POST['cookie']);
 		update_if_changed("advanced", $pool['advanced'], base64_encode($_POST['advanced']));
+		update_if_changed("advanced_backend", $pool['advanced_backend'], base64_encode($_POST['advanced_backend']));
 		update_if_changed("checkinter", $pool['checkinter'], $_POST['checkinter']);
 		update_if_changed("monitor_uri", $pool['monitor_uri'], $_POST['monitor_uri']);
 
@@ -329,6 +330,9 @@ row_helper();
 			  <img src="/themes/<?= $g['theme']; ?>/images/icons/icon_e.gif" title="edit entry" width="17" height="17" border="0" onclick="editRow(<?=$counter;?>); return false;">
 			  </td>
 			  <td valign="middle">
+			  <img src="/themes/<?= $g['theme']; ?>/images/icons/icon_x.gif" title="delete entry" width="17" height="17" border="0" onclick="deleteRow(<?=$counter;?>, 'servertable'); return false;">
+			  </td>
+			  <td valign="middle">
 			  <img src="/themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif" title="duplicate entry" width="17" height="17" border="0" onclick="dupRow(<?=$counter;?>, 'servertable'); return false;">
 			  </td></tr></table>
 			</td>
@@ -366,10 +370,10 @@ row_helper();
 		</tr>
 		<tr align="left">
 			<td width="22%" valign="top" class="vncellreq">Balance</td>
-			<td width="78%" class="vtable" colspan="2">
+			<td width="78%" class="vtable" colspan="1">
 				<table width="100%">
 				<tr>
-					<td width="20%" valign="top">
+					<td width="25%" valign="top">
 						<input type="radio" name="balance" id="balance" value="roundrobin"<?php if($pconfig['balance'] == "roundrobin") echo " CHECKED"; ?>>Round robin</input>
 					</td>
 					<td>
@@ -381,7 +385,7 @@ row_helper();
 					</td>
 				</tr>
 				<tr>
-					<td width="20%" valign="top">
+					<td width="25%" valign="top">
 						<input type="radio" name="balance" id="balance" value="static-rr"<?php if($pconfig['balance'] == "static-rr") echo " CHECKED"; ?>>Static Round Robin</input>
 					</td>
 					<td>
@@ -396,7 +400,7 @@ row_helper();
 					</td>
 				</tr>
 				<tr>
-					<td width="20%" valign="top">
+					<td width="25%" valign="top">
 						<input type="radio" name="balance" id="balance" value="leastconn"<?php if($pconfig['balance'] == "leastconn") echo " CHECKED"; ?>>Least Connections</input>
 					</td>
 					<td>
@@ -444,13 +448,24 @@ row_helper();
 			</td>
 		</tr>
 		<tr align="left">
-			<td width="22%" valign="top" class="vncell">Advanced pass thru</td>
+			<td width="22%" valign="top" class="vncell">Per server pass thru</td>
 			<td width="78%" class="vtable" colspan="2">
-				<textarea name='advanced' rows="4" cols="70" id='advanced'><?php echo $pconfig['advanced']; ?></textarea>
+				<input type="text" name='advanced' id='advanced' value='<?php echo $pconfig['advanced']; ?>' size="64">
 				<br/>
-				NOTE: paste text into this box that you would like to pass thru.
+				NOTE: paste text into this box that you would like to pass thru. Applied to each 'server' line.
 			</td>
 		</tr>
+
+		<tr align="left">
+			<td width="22%" valign="top" class="vncell">Backend pass thru</td>
+			<td width="78%" class="vtable" colspan="2">
+				<textarea  rows="4" cols="70" name='advanced_backend' id='advanced_backend'><?php echo $pconfig['advanced_backend']; ?></textarea>
+				<br/>
+				NOTE: paste text into this box that you would like to pass thru. Applied to the backend section.
+			</td>
+		</tr>
+
+
 	</table>
 	<br/>
 	<table width="100%" border="0" cellpadding="6" cellspacing="0">
@@ -667,6 +682,14 @@ function dupRow(rowId, tableId) {
 	    else
                 newEl.value = dupEl.value;
     }
+}
+
+function deleteRow(rowId, tableId) {
+	var view = document.getElementById("tr_view_" + rowId);
+	var edit = document.getElementById("tr_edit_" + rowId);
+
+	view.parentNode.removeChild(view);
+	edit.parentNode.removeChild(edit);
 }
 
 function removeRow(el) {
