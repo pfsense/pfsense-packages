@@ -136,11 +136,10 @@ if ($_POST) {
 			if (!preg_match("/.{2,}/", $server_address))
 				$input_errors[] = "The field 'Address' is required.";
 
-			if (!preg_match("/.{2,}/", $server_weight))
-				$input_errors[] = "The field 'Weight' is required.";
 
 			if (!is_numeric($server_weight))
 				$input_errors[] = "The field 'Weight' value is not a number.";
+
 			if ($server_port && !is_numeric($server_port))
 				$input_errors[] = "The field 'Port' value is not a number.";
 		}
