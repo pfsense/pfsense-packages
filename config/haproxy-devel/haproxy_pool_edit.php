@@ -330,6 +330,9 @@ row_helper();
 			  <img src="/themes/<?= $g['theme']; ?>/images/icons/icon_e.gif" title="edit entry" width="17" height="17" border="0" onclick="editRow(<?=$counter;?>); return false;">
 			  </td>
 			  <td valign="middle">
+			  <img src="/themes/<?= $g['theme']; ?>/images/icons/icon_x.gif" title="delete entry" width="17" height="17" border="0" onclick="deleteRow(<?=$counter;?>, 'servertable'); return false;">
+			  </td>
+			  <td valign="middle">
 			  <img src="/themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif" title="duplicate entry" width="17" height="17" border="0" onclick="dupRow(<?=$counter;?>, 'servertable'); return false;">
 			  </td></tr></table>
 			</td>
@@ -679,6 +682,14 @@ function dupRow(rowId, tableId) {
 	    else
                 newEl.value = dupEl.value;
     }
+}
+
+function deleteRow(rowId, tableId) {
+	var view = document.getElementById("tr_view_" + rowId);
+	var edit = document.getElementById("tr_edit_" + rowId);
+
+	view.parentNode.removeChild(view);
+	edit.parentNode.removeChild(edit);
 }
 
 function removeRow(el) {
