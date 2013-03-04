@@ -61,8 +61,7 @@ $a_acltypes[] = array('name' => 'path_contains', 'descr' => 'Path contains',
 				'mode' => 'http', 'syntax' => 'path_dir -i');
 $a_acltypes[] = array('name' => 'source_ip', 'descr' => 'Source IP',
 				'mode' => '', 'syntax' => 'src');
-if ($haproxy_sni_ssloffloading)
-{
+if ($haproxy_sni_ssloffloading) {
 	$a_acltypes[] = array('name' => 'ssl_sni_matches',  'descr' => 'Server Name Indication TLS extension matches', 
 					'mode' => 'https', 'syntax' => 'req_ssl_sni -i', 'advancedoptions' => "tcp-request inspect-delay 5s\r\ntcp-request content accept if { req_ssl_hello_type 1 }");
 }
@@ -341,34 +340,34 @@ function write_backend($fd, $name, $pool, $frontend) {
 
 	fwrite ($fd, "\tmode\t\t\t" . $backend_type . "\n");
 
-	if($frontend['balance'])
-		fwrite ($fd, "\tbalance\t\t\t" . $frontend['balance'] . "\n");
+	if($pool['balance'])
+		fwrite ($fd, "\tbalance\t\t\t" . $pool['balance'] . "\n");
 
-	if($frontend['connection_timeout'])
-		fwrite ($fd, "\tcontimeout\t\t" . $frontend['connection_timeout'] . "\n");
+	if($pool['connection_timeout'])
+		fwrite ($fd, "\tcontimeout\t\t" . $pool['connection_timeout'] . "\n");
 
-	if($frontend['server_timeout'])
-		fwrite ($fd, "\tsrvtimeout\t\t" . $frontend['server_timeout'] . "\n");
+	if($pool['server_timeout'])
+		fwrite ($fd, "\tsrvtimeout\t\t" . $pool['server_timeout'] . "\n");
 
-	if($frontend['retries'])
-		fwrite ($fd, "\tretries\t\t\t" . $frontend['retries'] . "\n");
+	if($pool['retries'])
+		fwrite ($fd, "\tretries\t\t\t" . $pool['retries'] . "\n");
 
-	if($frontend['stats_enabled']=='yes') {
+	if($pool['stats_enabled']=='yes') {
 		fwrite ($fd, "\tstats\t\t\tenable\n");
-		if($frontend['stats_uri'])
-			fwrite ($fd, "\tstats\t\t\turi ".$frontend['stats_uri']."\n");
-		if($frontend['stats_realm'])
-			fwrite ($fd, "\tstats\t\t\trealm " . $frontend['stats_realm'] . "\n");
+		if($pool['stats_uri'])
+			fwrite ($fd, "\tstats\t\t\turi ".$pool['stats_uri']."\n");
+		if($pool['stats_realm'])
+			fwrite ($fd, "\tstats\t\t\trealm " . $pool['stats_realm'] . "\n");
 		else 
 			fwrite ($fd, "\tstats\t\t\trealm .\n");
-		fwrite ($fd, "\tstats\t\t\tauth " . $frontend['stats_username'].":". $frontend['stats_password']."\n");
+		fwrite ($fd, "\tstats\t\t\tauth " . $pool['stats_username'].":". $pool['stats_password']."\n");
 		
-		if($frontend['stats_node_enabled']=='yes')
-			fwrite ($fd, "\tstats\t\t\tshow-node " . $frontend['stats_node'] . "\n");
-		if($frontend['stats_desc'])
-			fwrite ($fd, "\tstats\t\t\tshow-desc " . $frontend['stats_desc'] . "\n");
-		if($frontend['stats_refresh'])
-			fwrite ($fd, "\tstats\t\t\trefresh " . $frontend['stats_refresh'] . "\n");
+		if($pool['stats_node_enabled']=='yes')
+			fwrite ($fd, "\tstats\t\t\tshow-node " . $pool['stats_node'] . "\n");
+		if($pool['stats_desc'])
+			fwrite ($fd, "\tstats\t\t\tshow-desc " . $pool['stats_desc'] . "\n");
+		if($pool['stats_refresh'])
+			fwrite ($fd, "\tstats\t\t\trefresh " . $pool['stats_refresh'] . "\n");
 	}
 
 	$uri = $pool['monitor_uri'];
@@ -397,15 +396,6 @@ function write_backend($fd, $name, $pool, $frontend) {
 
 	$a_servers = &$pool['ha_servers']['item'];
 	foreach($a_servers as $be) {
-		if(!$be['port']) {
-			// the listener can specify a default port
-			$be['port'] = $frontend['svrport'];
-		}
-		if(!$be['port']) {
-			// last resort, use the frontend port
-			$ports = split(",", "{$frontend['port']},");
-			$be['port'] = $ports[0];
-		}
 		if (!$be['name'])
 			$be['name'] = $be['address'];
 		if($be['backup']) {
@@ -472,7 +462,10 @@ function haproxy_writeconf() {
 			if ($backend['ssloffload']){
 				//ssl crt ./server.pem ca-file ./ca.crt verify optional crt-ignore-err all crl-file ./ca_crl.pem
 				$ssl_info="ssl crt /var/etc/{$backend['name']}.{$backend['port']}.crt {$backend['dcertadv']}";
-				file_put_contents("/var/etc/{$backend['name']}.{$backend['port']}.crt",base64_decode($backend['dcert']));
+				$cert = lookup_cert($backend['ssloffloadcert']);
+				$certcontent = base64_decode($cert['crt']).base64_decode($cert['prv']);
+				file_put_contents("/var/etc/{$backend['name']}.{$backend['port']}.crt", $certcontent);
+				unset($certcontent);
 			}else{
 				$ssl_info="";
 				unlink_if_exists("var/etc/{$backend['name']}.{$backend['port']}.crt");
