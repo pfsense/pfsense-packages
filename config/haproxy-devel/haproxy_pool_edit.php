@@ -366,10 +366,10 @@ row_helper();
 		</tr>
 		<tr align="left">
 			<td width="22%" valign="top" class="vncellreq">Balance</td>
-			<td width="78%" class="vtable" colspan="2">
+			<td width="78%" class="vtable" colspan="1">
 				<table width="100%">
 				<tr>
-					<td width="20%" valign="top">
+					<td width="25%" valign="top">
 						<input type="radio" name="balance" id="balance" value="roundrobin"<?php if($pconfig['balance'] == "roundrobin") echo " CHECKED"; ?>>Round robin</input>
 					</td>
 					<td>
@@ -381,7 +381,7 @@ row_helper();
 					</td>
 				</tr>
 				<tr>
-					<td width="20%" valign="top">
+					<td width="25%" valign="top">
 						<input type="radio" name="balance" id="balance" value="static-rr"<?php if($pconfig['balance'] == "static-rr") echo " CHECKED"; ?>>Static Round Robin</input>
 					</td>
 					<td>
@@ -396,7 +396,7 @@ row_helper();
 					</td>
 				</tr>
 				<tr>
-					<td width="20%" valign="top">
+					<td width="25%" valign="top">
 						<input type="radio" name="balance" id="balance" value="leastconn"<?php if($pconfig['balance'] == "leastconn") echo " CHECKED"; ?>>Least Connections</input>
 					</td>
 					<td>
