@@ -119,7 +119,7 @@
                         <fielddescr>Rewrite url</fielddescr>
                         <fieldname>rewriteurl</fieldname>
                 </columnitem>
-		
+
 		<columnitem>
 			<fielddescr>Type</fielddescr>
 			<fieldname>directortype</fieldname>
@@ -176,13 +176,13 @@
 			<type>input</type>
 			<size>40</size>
 		</field>
-      	        <field>
-                        <fielddescr>Rewrite Host</fielddescr>
-                        <fieldname>rewritehost</fieldname>
-                        <description>Hint image.mysite.com</description>
-                        <type>input</type>
-                        <size>40</size>
-                </field>
+		<field>
+			<fielddescr>Rewrite Host</fielddescr>
+			<fieldname>rewritehost</fieldname>
+			<description>Hint image.mysite.com</description>
+			<type>input</type>
+			<size>40</size>
+		</field>
                 <field>
                         <fielddescr>Rewrite URL</fielddescr>
                         <fieldname>rewriteurl</fieldname>
