@@ -377,6 +377,16 @@ function write_backend($fd, $name, $pool, $frontend) {
 		$uri = "/";
 	fwrite ($fd, "\toption\t\t\t{$httpchk} HEAD " . $uri . " HTTP/1.0\n");
 
+	if ($pool['advanced_backend']) {
+		$adv_be	= explode("\n", base64_decode($pool['advanced_backend']));
+		foreach($adv_be as $adv_line) {
+			$adv_line = trim($adv_line);
+			if ($adv_line != "") {
+				fwrite($fd, "\t" . $adv_line . "\n");
+			}
+		}
+	}
+
 	if($pool['cookie']  && strtolower($frontend['type']) == "http") 
 		$cookie = " cookie {$pool['cookie']} ";
 	else 

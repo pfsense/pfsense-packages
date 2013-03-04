@@ -56,6 +56,7 @@ if (isset($id) && $a_pools[$id]) {
 	$pconfig['monitor_uri'] = $a_pools[$id]['monitor_uri'];
 	$pconfig['cookie'] = $a_pools[$id]['cookie'];
 	$pconfig['advanced'] = base64_decode($a_pools[$id]['advanced']);
+	$pconfig['advanced_backend'] = base64_decode($a_pools[$id]['advanced_backend']);
 	$pconfig['a_servers']=&$a_pools[$id]['ha_servers']['item'];	
 	
 	foreach($simplefields as $stat)
@@ -171,6 +172,7 @@ if ($_POST) {
 		update_if_changed("name", $pool['name'], $_POST['name']);
 		update_if_changed("cookie", $pool['cookie'], $_POST['cookie']);
 		update_if_changed("advanced", $pool['advanced'], base64_encode($_POST['advanced']));
+		update_if_changed("advanced_backend", $pool['advanced_backend'], base64_encode($_POST['advanced_backend']));
 		update_if_changed("checkinter", $pool['checkinter'], $_POST['checkinter']);
 		update_if_changed("monitor_uri", $pool['monitor_uri'], $_POST['monitor_uri']);
 
@@ -443,13 +445,24 @@ row_helper();
 			</td>
 		</tr>
 		<tr align="left">
-			<td width="22%" valign="top" class="vncell">Advanced pass thru</td>
+			<td width="22%" valign="top" class="vncell">Per server pass thru</td>
 			<td width="78%" class="vtable" colspan="2">
-				<textarea name='advanced' rows="4" cols="70" id='advanced'><?php echo $pconfig['advanced']; ?></textarea>
+				<input type="text" name='advanced' id='advanced' value='<?php echo $pconfig['advanced']; ?>' size="64">
 				<br/>
-				NOTE: paste text into this box that you would like to pass thru.
+				NOTE: paste text into this box that you would like to pass thru. Applied to each 'server' line.
 			</td>
 		</tr>
+
+		<tr align="left">
+			<td width="22%" valign="top" class="vncell">Backend pass thru</td>
+			<td width="78%" class="vtable" colspan="2">
+				<textarea  rows="4" cols="70" name='advanced_backend' id='advanced_backend'><?php echo $pconfig['advanced_backend']; ?></textarea>
+				<br/>
+				NOTE: paste text into this box that you would like to pass thru. Applied to the backend section.
+			</td>
+		</tr>
+
+
 	</table>
 	<br/>
 	<table width="100%" border="0" cellpadding="6" cellspacing="0">
