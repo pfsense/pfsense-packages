@@ -195,7 +195,7 @@
 		<size>80</size>
 		</field>
 		<field>
-			<fielddescr>Enabled logging</fielddescr>
+			<fielddescr>Enable logging</fielddescr>
 			<fieldname>log_enabled</fieldname>
 			<description>This will enable the access log. Don't switch this on if you don't have much disk space left.</description>
 			<type>checkbox</type>

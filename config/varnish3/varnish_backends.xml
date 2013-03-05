@@ -11,7 +11,7 @@
     Copyright (C) 2010 Scott Ullrich <sullrich@gmail.com>
     Copyright (C) 2011 Marcello Coutinho
     All rights reserved.                                                      
-*/
+/*/
 /* ========================================================================== */
 /*
     Redistribution and use in source and binary forms, with or without
@@ -219,6 +219,12 @@
 			<fieldname>probe_threshold</fieldname>
 			<description><![CDATA[<a href="https://www.varnish-cache.org/trac/wiki/BackendPolling">Enter the value of how many of those must have succeeded for us to consider the backend healthy.</a>]]></description>
 			<type>input</type>
+		</field>
+		<field>
+			<fielddescr>Disable Probe</fielddescr>
+			<fieldname>probe_disable</fieldname>
+			<description>Check to disable probing for this backend</description>
+			<type>checkbox</type>
 		</field>
 		<field>
 			<fielddescr>Mappings</fielddescr>

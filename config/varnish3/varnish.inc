@@ -34,7 +34,7 @@
 /* ========================================================================== */
 
 function varnish_settings_post_validate($post, $input_errors) {
-	if($post['storagesize'] && !is_numeric($post['storagesize'])) 
+	if( !is_numeric($post['storagesize'])) 
 		$input_errors[] = "A valid number is required for the field 'Storage size'";	
 	if($post['listeningport'] && !is_numeric($post['listeningport'])) 
 		$input_errors[] = "A valid number is required for the field 'Listening port'";	
@@ -329,6 +329,22 @@ function get_backend_config_txt() {
 				$probe_threshold = $backend['probe_threshold'];
 			else 
 				$probe_threshold = "5";
+
+
+			if ($backend['probe_disable']) {
+				$probe = "";
+			} else {
+				$probe = <<<EOFPROBE
+	.probe = {
+		 {$probe_url}
+		.interval = {$probe_interval};
+		.timeout = {$probe_timeout};
+		.window = {$probe_window};
+		.threshold = {$probe_threshold};
+	}
+EOFPROBE;
+			}
+
 			if (isset($probe_threshold)){
 				#last parameter set ,so write conf if backend is in use
 				if ($backends_in_use[$backend['backendname']] != ""){
@@ -340,13 +356,7 @@ backend {$backend['backendname']}BACKEND {
 	.port = "{$backend['port']}";
 	.first_byte_timeout = {$first_byte_timeout};
 	.connect_timeout = {$connect_timeout};
-	.probe = {
-		{$probe_url}
-		.interval = {$probe_interval};
-		.timeout = {$probe_timeout};
-		.window = {$probe_window};
-		.threshold = {$probe_threshold};
-	}
+{$probe}
 }
 
 
