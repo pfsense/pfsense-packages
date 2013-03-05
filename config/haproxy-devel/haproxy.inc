@@ -66,6 +66,60 @@ if ($haproxy_sni_ssloffloading) {
 					'mode' => 'https', 'syntax' => 'req_ssl_sni -i', 'advancedoptions' => "tcp-request inspect-delay 5s\r\ntcp-request content accept if { req_ssl_hello_type 1 }");
 }
 
+function write_bpi2bz2_script($scriptfilename)
+{
+	$pbi2bz2 = <<<EOD
+#!/bin/sh
+# PC-BSD PBI to tar.bz2 convertor
+if [ $# -ne 1 ] ; then
+echo "Usage: $(basename $0) file"; exit 1
+fi
+if [ ! -r $1 ] ; then
+echo "Error: $1: File doesn't exist or is not readable." ; exit 1
+fi
+PKG="$(basename $1 .pbi).tar.bz2"
+printf "Converting PBI -> tar.bz2... "
+tail +$(awk '/__PBI_ARCHIVE__/ {print NR+1}' $1) $1 >\${PKG} 2>&1
+if [ $? -ne 0 ] ; then
+printf "\nError: Couldn't convert PBI file. PBI is probably corrupt.\n"
+rm \${PKG}
+exit 1
+fi
+echo "Done."
+
+EOD;
+	$fd = fopen($scriptfilename, "w");
+	fwrite($fd, $pbi2bz2);
+	fclose($fd);
+}
+
+function pfSense2_0_installPBI()
+{
+	write_bpi2bz2_script("/tmp/pbi2bz2.sh");
+
+	$arch = php_uname("m");
+	$urlarch = ($arch == "i386") ? "" : $arch . '/';
+	$rel = get_freebsd_version();
+	$priv_url = "http://files.pfsense.org/packages/{$urlarch}{$rel}/All/";
+
+	download_file_with_progress_bar("$priv_url/haproxy-devel-1.5-dev17-$arch.pbi","/tmp/haproxy-devel-1.5-dev17.pbi");
+
+	$commands = <<<EOD
+cd /tmp
+chmod +x pbi2bz2.sh
+./pbi2bz2.sh haproxy-devel-1.5-dev17.pbi
+mkdir /tmp/OUT
+echo ##CD
+cd /tmp/OUT/
+echo ##TAR
+tar jfx ../haproxy-devel-1.5-dev17.tar.bz2 sbin
+cp ./sbin/haproxy /usr/local/sbin/haproxy
+
+EOD;
+	`$commands`;
+	echo "DONE!";
+}
+
 function haproxy_custom_php_deinstall_command() {
 	exec("cd /var/db/pkg && pkg_delete `ls | grep haproxy`");
 	exec("rm /usr/local/pkg/haproxy.inc");
@@ -233,6 +287,10 @@ EOD;
 		write_config();
 	}
 
+	$pfSversion = str_replace("\n", "", file_get_contents("/etc/version"));
+	if(strstr($pfSversion, "2.0")) 
+		pfSense2_0_installPBI();
+	
 	conf_mount_ro();
 
 	exec("/usr/local/etc/rc.d/haproxy.sh start");

@@ -48,8 +48,9 @@ function get_certificat_usage($refid) {
 		$usage[] = "OpenVPN Client";
 	if (is_ipsec_cert($cert['refid']))
 		$usage[] = "IPsec Tunnel";
-	if (is_captiveportal_cert($refid))
-		$usage[] = "Captive Portal";
+	if (function_exists("is_captiveportal_cert"))
+		if (is_captiveportal_cert($refid))
+			$usage[] = "Captive Portal";
 	
 	return $usage;
 }
