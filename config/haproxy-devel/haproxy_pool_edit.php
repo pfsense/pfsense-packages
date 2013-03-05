@@ -88,13 +88,13 @@ if ($_POST) {
 	if (preg_match("/[^a-zA-Z0-9\.\-_]/", $_POST['name']))
 		$input_errors[] = "The field 'Name' contains invalid characters.";
 		
-	if (!is_numeric($_POST['connection_timeout']))
+	if ($_POST['connection_timeout'] !== "" && !is_numeric($_POST['connection_timeout']))
 		$input_errors[] = "The field 'Connection timeout' value is not a number.";
 
-	if (!is_numeric($_POST['server_timeout']))
+	if ($_POST['server_timeout'] !== "" && !is_numeric($_POST['server_timeout']))
 		$input_errors[] = "The field 'Server timeout' value is not a number.";
 
-	if (!$_POST['retries'] && is_numeric($_POST['retries']))
+	if ($_POST['retries'] !== "" && !is_numeric($_POST['retries']))
 		$input_errors[] = "The field 'Retries' value is not a number.";
 
 	if (preg_match("/[^a-zA-Z0-9\.\-_]/", $_POST['stats_username']))
@@ -215,7 +215,7 @@ row_helper();
 
 <input type='hidden' name='address_type' value='textbox' />
 
-<body link="#0000CC" vlink="#0000CC" alink="#0000CC" onload="updatevisibility()">
+<body link="#0000CC" vlink="#0000CC" alink="#0000CC"">
   <style type="text/css">
 	.haproxy_stats_visible{display:none;}
   </style>
@@ -476,14 +476,14 @@ row_helper();
 			<td width="22%" valign="top" class="vncellreq">Connection timeout</td>
 			<td width="78%" class="vtable" colspan="2">
 				<input name="connection_timeout" type="text" <?if(isset($pconfig['connection_timeout'])) echo "value=\"{$pconfig['connection_timeout']}\"";?> size="64">
-				<div>the time (in milliseconds) we give up if the connection does not complete within (30000).</div>
+				<div>the time (in milliseconds) we give up if the connection does not complete within (default 30000).</div>
 			</td>
 		</tr>
 		<tr align="left">
 			<td width="22%" valign="top" class="vncellreq">Server timeout</td>
 			<td width="78%" class="vtable" colspan="2">
 				<input name="server_timeout" type="text" <?if(isset($pconfig['server_timeout'])) echo "value=\"{$pconfig['server_timeout']}\"";?> size="64">
-				<div>the time (in milliseconds) we accept to wait for data from the server, or for the server to accept data (30000).</div>
+				<div>the time (in milliseconds) we accept to wait for data from the server, or for the server to accept data (default 30000).</div>
 			</td>
 		</tr>
 		<tr align="left">
@@ -586,6 +586,7 @@ set by the 'retries' parameter.</div>
 	rows = 1;
 	totalrows =  <?php echo $counter; ?>;
 	loaded =  <?php echo $counter; ?>;
+	updatevisibility();
 </script>
 </body>
 </html>

@@ -52,8 +52,14 @@ if ($_POST) {
 		config_lock();
 		$retval = haproxy_configure();
 		config_unlock();
-		$savemsg = get_std_save_message($retval);
-		unlink_if_exists($d_haproxyconfdirty_path);
+
+		$result = haproxy_check_writtenconfig_error();
+		if ($result)
+			$savemsg = gettext($result);
+		else {
+			$savemsg = get_std_save_message($retval);
+			unlink_if_exists($d_haproxyconfdirty_path);
+		}
 	}
 }
 
