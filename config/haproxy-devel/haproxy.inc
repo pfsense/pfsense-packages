@@ -343,14 +343,17 @@ function write_backend($fd, $name, $pool, $frontend) {
 	if($pool['balance'])
 		fwrite ($fd, "\tbalance\t\t\t" . $pool['balance'] . "\n");
 
-	if($pool['connection_timeout'])
-		fwrite ($fd, "\tcontimeout\t\t" . $pool['connection_timeout'] . "\n");
+	if(!$pool['connection_timeout'])
+		$pool['connection_timeout'] = 30000;
+	fwrite ($fd, "\tcontimeout\t\t" . $pool['connection_timeout'] . "\n");
 
-	if($pool['server_timeout'])
-		fwrite ($fd, "\tsrvtimeout\t\t" . $pool['server_timeout'] . "\n");
+	if(!$pool['server_timeout'])
+		$pool['server_timeout'] = 30000;
+	fwrite ($fd, "\tsrvtimeout\t\t" . $pool['server_timeout'] . "\n");
 
-	if($pool['retries'])
-		fwrite ($fd, "\tretries\t\t\t" . $pool['retries'] . "\n");
+	if(!$pool['retries'])
+		$pool['retries'] = 3;
+	fwrite ($fd, "\tretries\t\t\t" . $pool['retries'] . "\n");
 
 	if($pool['stats_enabled']=='yes') {
 		fwrite ($fd, "\tstats\t\t\tenable\n");
@@ -424,6 +427,14 @@ function haproxy_configure() {
 	return haproxy_check_run(1);
 }
 
+function haproxy_check_writtenconfig_error() {
+	$configcheckoutput = shell_exec("haproxy -c -V -f /var/etc/haproxy.cfg 2>&1");
+	if (!strstr($configcheckoutput, "Configuration file is valid"))
+		return $configcheckoutput;
+	else
+		return false;
+}
+
 function haproxy_writeconf() {
 	global $config, $g;
 
@@ -471,13 +482,13 @@ function haproxy_writeconf() {
 			//check ssl info
 			if ($backend['ssloffload']){
 				//ssl crt ./server.pem ca-file ./ca.crt verify optional crt-ignore-err all crl-file ./ca_crl.pem
-				$ssl_info="ssl crt /var/etc/{$backend['name']}.{$backend['port']}.crt {$backend['dcertadv']}";
+				$ssl_crt=" crt /var/etc/{$backend['name']}.{$backend['port']}.crt";
 				$cert = lookup_cert($backend['ssloffloadcert']);
 				$certcontent = base64_decode($cert['crt']).base64_decode($cert['prv']);
 				file_put_contents("/var/etc/{$backend['name']}.{$backend['port']}.crt", $certcontent);
 				unset($certcontent);
 			}else{
-				$ssl_info="";
+				$ssl_crt="";
 				unlink_if_exists("var/etc/{$backend['name']}.{$backend['port']}.crt");
 			}
 
@@ -499,7 +510,12 @@ function haproxy_writeconf() {
 			$b['max_connections'] = $backend['max_connections'];
 			$b['client_timeout'] = $backend['client_timeout'];
 			$b['advanced'] = $backend['advanced'];
-			$b['ssl_info'] = $ssl_info;
+			
+			if ($ssl_crt != "") {
+				if ($b['ssl_info'] == "")
+					$b['ssl_info'] = "ssl {$backend['dcertadv']}";
+				$b['ssl_info'] .= $ssl_crt;
+			}
 
 			// pointer to each backend 
 			$b['config'][] = $backend;
@@ -566,8 +582,10 @@ function haproxy_writeconf() {
 			if($bind['max_connections'])
 				fwrite ($fd, "\tmaxconn\t\t\t" . $bind['max_connections'] . "\n");
 
-			if($bind['client_timeout'])
-				fwrite ($fd, "\tclitimeout\t\t" . $bind['client_timeout'] . "\n");
+			if(!$bind['client_timeout'])
+				$bind['client_timeout'] = 30000;
+			
+			fwrite ($fd, "\tclitimeout\t\t" . $bind['client_timeout'] . "\n");
 
 	
 			// Combine the rest of the listener configs

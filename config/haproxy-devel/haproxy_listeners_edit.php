@@ -139,6 +139,7 @@ if (isset($id) && $a_backend[$id]) {
 	$pconfig['name'] = $a_backend[$id]['name'];
 	$pconfig['desc'] = $a_backend[$id]['desc'];
 	$pconfig['status'] = $a_backend[$id]['status'];
+	$pconfig['secondary'] = $a_backend[$id]['secondary'];	
 	
 	$pconfig['type'] = $a_backend[$id]['type'];
 
@@ -185,7 +186,7 @@ if ($_POST) {
 		if ($port && !is_numeric($port))
 			$input_errors[] = "The field 'Port' value is not a number.";
 
-	if (!is_numeric($_POST['client_timeout']))
+	if ($_POST['client_timeout'] !== "" && !is_numeric($_POST['client_timeout']))
 		$input_errors[] = "The field 'Client timeout' value is not a number.";
 
 	/* Ensure that our pool names are unique */
@@ -240,6 +241,7 @@ if ($_POST) {
 		update_if_changed("name", $backend['name'], $_POST['name']);
 		update_if_changed("description", $backend['desc'], $_POST['desc']);
 		update_if_changed("status", $backend['status'], $_POST['status']);
+		update_if_changed("secondary", $backend['secondary'], $_POST['secondary']);
 		update_if_changed("type", $backend['type'], $_POST['type']);
 		update_if_changed("cookie_name", $backend['cookie_name'], $_POST['cookie_name']);
 		update_if_changed("forwardfor", $backend['forwardfor'], $_POST['forwardfor']);
@@ -281,10 +283,11 @@ include("head.inc");
 
 ?>
 
-<body link="#0000CC" vlink="#0000CC" alink="#0000CC" onload="updatevisibility()">
+<body link="#0000CC" vlink="#0000CC" alink="#0000CC">
   <style type="text/css">
 	.haproxy_mode_http{display:none;}
 	.haproxy_ssloffloading_enabled{display:none;}
+	.haproxy_primary{}
   </style>
 
 <?php if($one_two): ?>
@@ -451,6 +454,7 @@ include("head.inc");
 	{
 		setCSSdisplay(".haproxy_ssloffloading_enabled", ssloffload.checked);
 		setCSSdisplay(".haproxy_mode_http", type.value == "http");
+		setCSSdisplay(".haproxy_primary", !secondary.checked);
 	}
 	
 	function type_change() {
@@ -505,6 +509,14 @@ include("head.inc");
 			</td>
 		</tr>
 		<tr align="left">
+			<td width="22%" valign="top" class="vncell">Shared Frontend</td>
+			<td width="78%" class="vtable" colspan="2">
+				<input id="secondary" name="secondary" type="checkbox" value="yes" <?php if ($pconfig['secondary']=='yes') echo "checked"; ?> onclick="updatevisibility();">secondary backend</checkbox><br/>
+				Use this setting to configure multiple backends/accesslists for a single frontend.<br/>
+				All settings of which only 1 can exist will be hidden. And 
+			</td>
+		</tr>
+		<tr align="left">
 			<td width="22%" valign="top" class="vncellreq">Status</td>
 			<td width="78%" class="vtable" colspan="2">
 				<select name="status" id="status">
@@ -546,6 +558,12 @@ include("head.inc");
 				<div>The port to listen to.  To specify multiple ports, separate with a comma (,). EXAMPLE: 80,443</div>
 			</td>
 		</tr>
+		<tr class="haproxy_primary" align="left">
+			<td width="22%" valign="top" class="vncellreq">Max connections</td>
+			<td width="78%" class="vtable" colspan="2">
+				<input name="max_connections" type="text" <?if(isset($pconfig['max_connections'])) echo "value=\"{$pconfig['max_connections']}\"";?> size="10" maxlength="10">
+			</td>
+		</tr>	
 		<tr>
 			  <td width="22%" valign="top" class="vncellreq">Backend server pool</td>
 			  <td width="78%" class="vtable">
@@ -573,7 +591,7 @@ include("head.inc");
 					<option value="health"<?php if($pconfig['type'] == "health") echo " SELECTED"; ?>>Health</option>
 				</select>
 			</td>
-		</tr>		
+		</tr>
 		<tr>
 			<td width="22%" valign="top" class="vncell">Access Control lists</td>
 			<td width="78%" class="vtable" colspan="2" valign="top">
@@ -632,21 +650,15 @@ include("head.inc");
 		</tr>
 	</table>
 	<br/>&nbsp;<br/>
-	<table width="100%" border="0" cellpadding="6" cellspacing="0">
+	<table class="haproxy_primary" width="100%" border="0" cellpadding="6" cellspacing="0">
 		<tr>
 			<td colspan="2" valign="top" class="listtopic">Advanced settings</td>
 		</tr>
 		<tr align="left">
-			<td width="22%" valign="top" class="vncellreq">Max connections</td>
-			<td width="78%" class="vtable" colspan="2">
-				<input name="max_connections" type="text" <?if(isset($pconfig['max_connections'])) echo "value=\"{$pconfig['max_connections']}\"";?> size="10" maxlength="10">
-			</td>
-		</tr>
-		<tr align="left">
-			<td width="22%" valign="top" class="vncellreq">Client timeout</td>
+			<td width="22%" valign="top" class="vncell">Client timeout</td>
 			<td width="78%" class="vtable" colspan="2">
 				<input name="client_timeout" type="text" <?if(isset($pconfig['client_timeout'])) echo "value=\"{$pconfig['client_timeout']}\"";?> size="10" maxlength="10">
-				<div>the time (in milliseconds) we accept to wait for data from the client, or for the client to accept data (30000).</div>
+				<div>the time (in milliseconds) we accept to wait for data from the client, or for the client to accept data (default 30000).</div>
 			</td>
 		</tr>
 		<tr align="left">
@@ -677,8 +689,10 @@ include("head.inc");
 				NOTE: paste text into this box that you would like to pass thru.
 			</td>
 		</tr>
+		<tr>
+			<td>&nbsp;</td>
+		</tr>
 	</table>
-	<br/>&nbsp;<br/>
 <?
 	global $haproxy_sni_ssloffloading;
 	if ($haproxy_sni_ssloffloading):
@@ -747,6 +761,8 @@ include("head.inc");
 	rows = 1;
 	totalrows =  <?php echo $counter; ?>;
 	loaded =  <?php echo $counter; ?>;
+	
+	updatevisibility();
 </script>
 <?php include("fend.inc"); ?>
 </body>
