@@ -699,8 +699,8 @@ include("head.inc");
 			<td width="22%" valign="top" class="vncell">Certificate</td>
 			<td width="78%" class="vtable" colspan="2">
 				<?  
-					//$servercerts = get_certificates_server();
-					//echo_html_select("ssloffloadcert", $servercerts, $pconfig['ssloffloadcert'], '<b>No Certificates defined.</b> <br/>Create one under <a href="system_certmanager.php">System &gt; Cert Manager</a>.');
+					$servercerts = get_certificates_server();
+					echo_html_select("ssloffloadcert", $servercerts, $pconfig['ssloffloadcert'], '<b>No Certificates defined.</b> <br/>Create one under <a href="system_certmanager.php">System &gt; Cert Manager</a>.');
 				?>
 				<br/>
 				NOTE: choose the cert to use on this frontend.
