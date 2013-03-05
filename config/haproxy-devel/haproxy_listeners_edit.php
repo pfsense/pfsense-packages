@@ -48,8 +48,9 @@ function get_certificat_usage($refid) {
 		$usage[] = "OpenVPN Client";
 	if (is_ipsec_cert($cert['refid']))
 		$usage[] = "IPsec Tunnel";
-	if (is_captiveportal_cert($refid))
-		$usage[] = "Captive Portal";
+	if (function_exists("is_captiveportal_cert"))
+		if (is_captiveportal_cert($refid))
+			$usage[] = "Captive Portal";
 	
 	return $usage;
 }
@@ -698,8 +699,8 @@ include("head.inc");
 			<td width="22%" valign="top" class="vncell">Certificate</td>
 			<td width="78%" class="vtable" colspan="2">
 				<?  
-					//$servercerts = get_certificates_server();
-					//echo_html_select("ssloffloadcert", $servercerts, $pconfig['ssloffloadcert'], '<b>No Certificates defined.</b> <br/>Create one under <a href="system_certmanager.php">System &gt; Cert Manager</a>.');
+					$servercerts = get_certificates_server();
+					echo_html_select("ssloffloadcert", $servercerts, $pconfig['ssloffloadcert'], '<b>No Certificates defined.</b> <br/>Create one under <a href="system_certmanager.php">System &gt; Cert Manager</a>.');
 				?>
 				<br/>
 				NOTE: choose the cert to use on this frontend.
