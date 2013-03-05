@@ -215,11 +215,11 @@ function quagga_ospfd_install_conf() {
 			$conffile .= $redist;
 
 		if (!empty($noredist)) {
-			$conffile .= $noredist;
 			$conffile .= "  distribute-list dnr-list out connected\n";
 			$conffile .= "  distribute-list dnr-list out kernel\n";
 			$conffile .= "  distribute-list dnr-list out static\n";
 			//$conffile .= "  distribute-list dnr-list out ospf\n";
+			$conffile .= $noredist;
 			$conffile .= "  access-list dnr-list permit any\n";
 		}
 
