@@ -882,7 +882,7 @@
 		<descr>VMware Tools</descr>
 		<website>http://open-vm-tools.sourceforge.net/</website>
 		<category>Services</category>
-		<version>8.7.0.3046 (build-313025)</version>
+		<version>8.7.0.3046 (build-425873)</version>
 		<status>Stable</status>
 		<pkginfolink>http://doc.pfsense.org/index.php/Open_VM_Tools_package</pkginfolink>
 		<required_version>2.0</required_version>
@@ -890,27 +890,27 @@
 		<configurationfile>open-vm-tools.xml</configurationfile>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
 		<build_port_path>/usr/ports/emulators/open-vm-tools-nox11/</build_port_path>
-		<depends_on_package>open-vm-tools-nox11-313025_2.tbz</depends_on_package>
-		<depends_on_package>icu-4.8.1.1_1.tbz</depends_on_package>
+		<depends_on_package>open-vm-tools-nox11-425873_3,1.tbz</depends_on_package>
+		<depends_on_package>icu-50.1.2.tbz</depends_on_package>
 		<build_port_path>/usr/ports/devel/icu</build_port_path>
-		<depends_on_package>fusefs-kmod-0.3.9.p1.20080208_7.tbz</depends_on_package>
+		<depends_on_package>fusefs-kmod-0.3.9.p1.20080208_11.tbz</depends_on_package>
 		<build_port_path>/usr/ports/sysutils/fusefs-kmod</build_port_path>
-		<depends_on_package>fusefs-libs-2.7.4.tbz</depends_on_package>
+		<depends_on_package>fusefs-libs-2.9.2.tbz</depends_on_package>
 		<build_port_path>/usr/ports/sysutils/fusefs-libs</build_port_path>
-		<depends_on_package>glib-2.28.8_3.tbz</depends_on_package>
+		<depends_on_package>glib-2.28.8_5.tbz</depends_on_package>
 		<build_port_path>/usr/ports/devel/glib2</build_port_path>
 		<depends_on_package>libdnet-1.11_3.tbz</depends_on_package>
 		<build_port_path>/usr/ports/net/libdnet</build_port_path>
-		<depends_on_package>libiconv-1.13.1_1.tbz</depends_on_package>
+		<depends_on_package>libiconv-1.14.tbz</depends_on_package>
 		<build_port_path>/usr/ports/converters/libiconv</build_port_path>
-		<depends_on_package>pcre-8.21_1.tbz</depends_on_package>
+		<depends_on_package>pcre-8.32.tbz</depends_on_package>
 		<build_port_path>/usr/ports/devel/pcre</build_port_path>
-		<depends_on_package>perl-5.12.3.tbz</depends_on_package>
+		<depends_on_package>perl-5.14.2_2.tbz</depends_on_package>
 		<build_port_path>/usr/ports/lang/perl5.14</build_port_path>
-		<depends_on_package>pkg-config-0.25_1.tbz</depends_on_package>
+		<depends_on_package>pkgconf-0.8.9.tbz</depends_on_package>
 		<build_port_path>/usr/ports/devel/pkg-config</build_port_path>
 		<depends_on_package>python27-2.7.2_3.tbz</depends_on_package>
-		<build_port_path>/usr/ports/lang/python27</build_port_path>
+		<build_port_path>python27-2.7.3_6.tbz</build_port_path>
 		<build_pbi>
 			<port>emulators/open-vm-tools-nox11</port>
 		</build_pbi>
