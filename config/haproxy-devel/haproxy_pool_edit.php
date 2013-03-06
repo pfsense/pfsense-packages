@@ -586,6 +586,8 @@ set by the 'retries' parameter.</div>
 	rows = 1;
 	totalrows =  <?php echo $counter; ?>;
 	loaded =  <?php echo $counter; ?>;
+
+	updatevisibility();
 </script>
 </body>
 </html>
