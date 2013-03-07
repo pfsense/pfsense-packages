@@ -113,8 +113,9 @@ if ($_POST) {
 		$server_name=$_POST['server_name'.$x];
 		$server_address=$_POST['server_address'.$x];
 		$server_port=$_POST['server_port'.$x];
+		$server_ssl=$_POST['server_ssl'.$x];
 		$server_weight=$_POST['server_weight'.$x];
-		$server_backup=$_POST['server_backup'.$x];
+		$server_status=$_POST['server_status'.$x];
 
 		if ($server_address) {
 
@@ -122,8 +123,9 @@ if ($_POST) {
 			$server['name']=$server_name;
 			$server['address']=$server_address;
 			$server['port']=$server_port;
+			$server['ssl']=$server_ssl;
 			$server['weight']=$server_weight;
-			$server['backup']=$server_backup;
+			$server['status']=$server_status;
 			$a_servers[]=$server;
 
 			if (preg_match("/[^a-zA-Z0-9\.\-_]/", $server_name))
@@ -257,12 +259,15 @@ row_helper();
 	rowname[2] = "server_port";
 	rowtype[2] = "textbox";
 	rowsize[2] = "5";
-	rowname[3] = "server_weight";
-	rowtype[3] = "textbox";
+	rowname[3] = "server_ssl";
+	rowtype[3] = "checkbox";
 	rowsize[3] = "5";
-	rowname[4] = "server_backup";
-	rowtype[4] = "checkbox";
+	rowname[4] = "server_weight";
+	rowtype[4] = "textbox";
 	rowsize[4] = "5";
+	rowname[5] = "server_status";
+	rowtype[5] = "select";
+	rowsize[5] = "1";
 </script>
 <?php include("fbegin.inc"); ?>
 <?php if ($input_errors) print_input_errors($input_errors); ?>
@@ -295,16 +300,15 @@ row_helper();
 			</td>
 		</tr>
 		<tr align="left">
-			<td class="vncellreq" colspan="3">Server list</td>
-		</tr>
-		<tr>
-			<td width="78%" class="vtable" colspan="2" valign="top">
+			<td class="vncell" colspan="3"><strong>Server list</strong>
+			
 			<table class="" width="100%" cellpadding="0" cellspacing="0" id='servertable'>
 	                <tr>
 	                  <td width="30%" class="listhdrr">Name</td>
 	                  <td width="30%" class="listhdrr">Address</td>
 	                  <td width="18%" class="listhdrr">Port</td>
-	                  <td width="18%" class="listhdrr">Weight</td>
+	                  <td width="5%" class="listhdrr">SSL</td>
+	                  <td width="8%" class="listhdrr">Weight</td>
 	                  <td width="5%" class="listhdr">Backup</td>
 	                  <td width="4%" class=""></td>
 			</tr>
@@ -322,8 +326,9 @@ row_helper();
 			<td class="vtable listlr"><?=$server['name']; ?></td>
 			<td class="vtable listr"><?=$server['address']; ?></td>
 			<td class="vtable listr"><?=$server['port']; ?></td>
+			<td class="vtable listr"><?=$server['ssl']; ?></td>
 			<td class="vtable listr"><?=$server['weight']; ?></td>
-			<td class="vtable listr"><?=$server['backup']; ?></td>
+			<td class="vtable listr"><?=$server['status']; ?></td>
 			<td class="list">
 			  <table border="0" cellspacing="0" cellpadding="1"><tr>
 			  <td valign="middle">
@@ -345,9 +350,17 @@ row_helper();
 				<td class="vtable">
 				  <input name="server_port<?=$counter;?>" id="server_port<?=$counter;?>" type="text" value="<?=$server['port']; ?>" size="5"/></td>
 				<td class="vtable">
+				  <input name="server_ssl<?=$counter;?>" id="server_ssl<?=$counter;?>" type="checkbox" value="<?=$server['ssl']; ?>" size="5"/></td>
+				<td class="vtable">
 				  <input name="server_weight<?=$counter;?>" id="server_weight<?=$counter;?>" type="text" value="<?=$server['weight']; ?>" size="5"/></td>
 				<td class="vtable">
-				  <input name="server_backup<?=$counter;?>" id="server_backup<?=$counter;?>" type="checkbox" value="yes" <?php if ($server['backup']=='yes') echo "checked"; ?>/></td>
+				<select name="server_status<?=$counter;?>" id="server_status<?=$counter;?>">
+				  <option value="active"  <?php if($server['status']=='active') echo "SELECTED";?>>active</option>
+				  <option value="backup" <?php  if($server['status']=='backup') echo "SELECTED";?>>backup</option>
+				  <option value="disabled" <?php  if($server['status']=='disabled') echo "SELECTED";?>>disabled</option>
+				  <option value="inactive" <?php  if($server['status']=='inactive') echo "SELECTED";?>>inactive</option>
+				</select>
+				</td>
 				<td class="list">
 			         <table border="0" cellspacing="0" cellpadding="1"><tr>
 			         <td valign="middle">
@@ -473,14 +486,14 @@ row_helper();
 			<td colspan="2" valign="top" class="listtopic">Advanced settings</td>
 		</tr>
 		<tr align="left">
-			<td width="22%" valign="top" class="vncellreq">Connection timeout</td>
+			<td width="22%" valign="top" class="vncell">Connection timeout</td>
 			<td width="78%" class="vtable" colspan="2">
 				<input name="connection_timeout" type="text" <?if(isset($pconfig['connection_timeout'])) echo "value=\"{$pconfig['connection_timeout']}\"";?> size="64">
 				<div>the time (in milliseconds) we give up if the connection does not complete within (default 30000).</div>
 			</td>
 		</tr>
 		<tr align="left">
-			<td width="22%" valign="top" class="vncellreq">Server timeout</td>
+			<td width="22%" valign="top" class="vncell">Server timeout</td>
 			<td width="78%" class="vtable" colspan="2">
 				<input name="server_timeout" type="text" <?if(isset($pconfig['server_timeout'])) echo "value=\"{$pconfig['server_timeout']}\"";?> size="64">
 				<div>the time (in milliseconds) we accept to wait for data from the server, or for the server to accept data (default 30000).</div>
@@ -582,7 +595,7 @@ set by the 'retries' parameter.</div>
 <br>
 <?php include("fend.inc"); ?>
 <script type="text/javascript">
-	field_counter_js = 5;
+	field_counter_js = 6;
 	rows = 1;
 	totalrows =  <?php echo $counter; ?>;
 	loaded =  <?php echo $counter; ?>;
@@ -594,6 +607,13 @@ set by the 'retries' parameter.</div>
 <?php
 
 function row_helper() {
+	$options = <<<EOD
+  <option value='active' SELECTED>active</option>"+
+"  <option value='backup'>backup</option>"+
+"  <option value='disabled'>disabled</option>"+
+"  <option value='inactive'>inactive</option>
+EOD;
+
 	echo <<<EOF
 <script type="text/javascript">
 // Global Variables
