@@ -64,6 +64,10 @@ function get_certificates_server($get_includeWebCert=false) {
 	{
 		if ($get_ca == false && is_webgui_cert($cert['refid']))
 			continue;
+			
+		$purpose = cert_get_purpose($cert['crt']);
+		if ($purpose['server'] != 'Yes')
+			continue;
 
 		$selected = "";
 		$caname = "";
@@ -126,6 +130,9 @@ if (!is_array($config['installedpackages']['haproxy']['ha_backends']['item'])) {
 $a_backend = &$config['installedpackages']['haproxy']['ha_backends']['item'];
 $a_pools = &$config['installedpackages']['haproxy']['ha_pools']['item'];
 
+global $simplefields;
+$simplefields = array('name','desc','status','secondary','type','forwardfor','httpclose','extaddr','backend_serverpool',
+	'max_connections','client_timeout','port','ssloffloadcert','dcertadv','ssloffload','ssloffloadacl');
 
 if (isset($_POST['id']))
 	$id = $_POST['id'];
@@ -136,27 +143,11 @@ if (isset($_GET['dup']))
 	$id = $_GET['dup'];
 
 if (isset($id) && $a_backend[$id]) {
-	$pconfig['name'] = $a_backend[$id]['name'];
-	$pconfig['desc'] = $a_backend[$id]['desc'];
-	$pconfig['status'] = $a_backend[$id]['status'];
-	$pconfig['secondary'] = $a_backend[$id]['secondary'];	
-	
-	$pconfig['type'] = $a_backend[$id]['type'];
-
-	$pconfig['forwardfor'] = $a_backend[$id]['forwardfor'];
-	$pconfig['httpclose'] = $a_backend[$id]['httpclose'];
-	
-	$pconfig['type'] = $a_backend[$id]['type'];
-	$pconfig['extaddr'] = $a_backend[$id]['extaddr'];	
-	$pconfig['backend_serverpool'] = $a_backend[$id]['backend_serverpool'];	
-	$pconfig['max_connections'] = $a_backend[$id]['max_connections'];	
-	$pconfig['client_timeout'] = $a_backend[$id]['client_timeout'];	
-	$pconfig['port'] = $a_backend[$id]['port'];	
 	$pconfig['a_acl']=&$a_backend[$id]['ha_acls']['item'];	
 	$pconfig['advanced'] = base64_decode($a_backend[$id]['advanced']);
-	$pconfig['ssloffloadcert'] = $a_backend[$id]['ssloffloadcert'];
-	$pconfig['dcertadv'] = $a_backend[$id]['dcertadv'];
-	$pconfig['ssloffload'] = $a_backend[$id]['ssloffload'];
+	
+	foreach($simplefields as $stat)
+		$pconfig[$stat] = $a_backend[$id][$stat];
 }
 
 if (isset($_GET['dup']))
@@ -237,25 +228,11 @@ if ($_POST) {
 		if($backend['name'] != "")
 			$changedesc .= " modified '{$backend['name']}' pool:";
 		
+		foreach($simplefields as $stat)
+			update_if_changed($stat, $backend[$stat], $_POST[$stat]);
 
-		update_if_changed("name", $backend['name'], $_POST['name']);
-		update_if_changed("description", $backend['desc'], $_POST['desc']);
-		update_if_changed("status", $backend['status'], $_POST['status']);
-		update_if_changed("secondary", $backend['secondary'], $_POST['secondary']);
-		update_if_changed("type", $backend['type'], $_POST['type']);
-		update_if_changed("cookie_name", $backend['cookie_name'], $_POST['cookie_name']);
-		update_if_changed("forwardfor", $backend['forwardfor'], $_POST['forwardfor']);
-		update_if_changed("httpclose", $backend['httpclose'], $_POST['httpclose']);
-		update_if_changed("type", $backend['type'], $_POST['type']);
-		update_if_changed("port", $backend['port'], $_POST['port']);
-		update_if_changed("extaddr", $backend['extaddr'], $_POST['extaddr']);
-		update_if_changed("backend_serverpool", $backend['backend_serverpool'], $_POST['backend_serverpool']);
-		update_if_changed("max_connections", $backend['max_connections'], $_POST['max_connections']);
-		update_if_changed("client_timeout", $backend['client_timeout'], $_POST['client_timeout']);
+		
 		update_if_changed("advanced", $backend['advanced'], base64_encode($_POST['advanced']));
-		update_if_changed("ssloffloadcert", $backend['ssloffloadcert'], $_POST['ssloffloadcert']);
-		update_if_changed("dcertadv", $backend['dcertadv'], $_POST['dcertadv']);
-		update_if_changed("ssloffload", $backend['ssloffload'], $_POST['ssloffload']);
 		$backend['ha_acls']['item'] = $a_acl;
 
 		if (isset($id) && $a_backend[$id]) {
@@ -277,6 +254,12 @@ if ($_POST) {
 $pfSversion = str_replace("\n", "", file_get_contents("/etc/version"));
 if(strstr($pfSversion, "1.2"))
 	$one_two = true;
+
+if (!$id)
+{
+	//default value for new items.
+	$pconfig['ssloffloadacl'] = "yes";
+}
 
 $pgtitle = "HAProxy: Frontend: Edit";
 include("head.inc");
@@ -718,6 +701,12 @@ include("head.inc");
 				?>
 				<br/>
 				NOTE: choose the cert to use on this frontend.
+			</td>
+		</tr>
+		<tr class="haproxy_ssloffloading_enabled" align="left">
+			<td width="22%" valign="top" class="vncell">ACL for certificate CN</td>
+			<td width="78%" class="vtable" colspan="2">
+				<input id="ssloffloadacl" name="ssloffloadacl" type="checkbox" value="yes" <?php if ($pconfig['ssloffloadacl']=='yes') echo "checked";?> onclick="updatevisibility();">Add ACL for certificate CommonName.</input>
 			</td>
 		</tr>
 		<tr class="haproxy_ssloffloading_enabled" align="left">

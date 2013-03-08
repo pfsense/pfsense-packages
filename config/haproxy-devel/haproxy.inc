@@ -322,7 +322,7 @@ function haproxy_find_acl($name) {
 }
 
 function write_backend($fd, $name, $pool, $frontend) {
-	if(!is_array($pool['ha_servers']['item']))
+	if(!is_array($pool['ha_servers']['item']) && !$pool['stats_enabled']=='yes')
 		return;
 
 	fwrite ($fd, "backend " . $name . "\n");
@@ -408,15 +408,21 @@ function write_backend($fd, $name, $pool, $frontend) {
 		$checkinter = "";
 
 	$a_servers = &$pool['ha_servers']['item'];
-	foreach($a_servers as $be) {
-		if (!$be['name'])
-			$be['name'] = $be['address'];
-		if($be['backup']) {
-			$isbackup = "backup";
-		} else {
-			$isbackup = "";
+	if (is_array($a_servers))
+	{
+		foreach($a_servers as $be) {
+			if (!$be['status'] == "inactive")
+				continue;
+			
+			if (!$be['name'])
+				$be['name'] = $be['address'];
+			if(!$be['status'] || $be['status'] != 'active') {
+				$isbackup = $be['status'];
+			} else {
+				$isbackup = "";
+			}
+			fwrite ($fd, "\tserver\t\t\t" . $be['name'] . " " . $be['address'].":" . $be['port'] . " $cookie " . " $checkinter $isbackup weight " . $be['weight'] . "{$advanced_txt}\n");
 		}
-		fwrite ($fd, "\tserver\t\t\t" . $be['name'] . " " . $be['address'].":" . $be['port'] . " $cookie " . " $checkinter $isbackup weight " . $be['weight'] . "{$advanced_txt}\n");
 	}
 	fwrite ($fd, "\n");
 }
@@ -524,7 +530,7 @@ function haproxy_writeconf() {
 	
 	$a_pendingpl = array();
 
-	// Construct and write out configuration file
+	// Construct and write out configuration for each "frontend"
 	if(is_array($a_bind)) {
 		foreach ($a_bind as $bind) {
 			if (count($bind['config']) > 1)
@@ -576,8 +582,10 @@ function haproxy_writeconf() {
 			if($bind['httpclose']) 
 				fwrite ($fd, "\toption\t\t\thttpclose\n");
 
-			if($bind['forwardfor']) 
+			if($bind['forwardfor']) {
 				fwrite ($fd, "\toption\t\t\tforwardfor\n");
+				fwrite ($fd, "\treqadd X-Forwarded-Proto:\ https\tif { ssl_fc }\n");
+			}
 
 			if($bind['max_connections'])
 				fwrite ($fd, "\tmaxconn\t\t\t" . $bind['max_connections'] . "\n");
@@ -614,6 +622,15 @@ function haproxy_writeconf() {
 					$a_pendingpl[$poolname]['frontend'] = $bconfig;
 				}
 
+				if ($bconfig['ssloffload'] && $bconfig['ssloffloadacl']) {
+					$aclname = "SNI_" . $poolname;
+					$cert_cn = cert_get_cn($bconfig['ssloffloadcert'] ,true);
+					//$expr = "req_ssl_sni -i $cert_cn";
+					$expr = "hdr(host) -i $cert_cn";
+					fwrite ($fd, "\tacl\t\t\t" . $aclname . "\t" . $expr . "\n");
+					fwrite ($fd, "\tuse_backend\t\t" . $poolname . " if " . $aclname . "\n");
+				}
+				
 				foreach ($a_acl as $entry) {
 					$acl = haproxy_find_acl($entry['expression']);
 					if (!$acl)
@@ -638,6 +655,7 @@ function haproxy_writeconf() {
 			fwrite ($fd, "\n");
 		}
 	}
+	// Construct and write out configuration for each "backend"
 	if (is_array($a_pendingpl) && is_array($a_pools)) {
 		foreach ($a_pendingpl as $pending) {
 			foreach ($a_pools as $pool) {
