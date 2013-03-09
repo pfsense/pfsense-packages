@@ -33,6 +33,16 @@
 require("guiconfig.inc");
 require_once("haproxy.inc");
 
+/* Compatibility function for pfSense 2.0 */
+if (!function_exists("cert_get_purpose")) {	
+	function cert_get_purpose(){
+		$result = array();
+		$result['server'] = "Yes";
+		return $result;
+	}
+}
+/**/
+
 function get_certificat_usage($refid) {
 	$usage = array();
 	$cert = lookup_cert($refid);
@@ -55,7 +65,7 @@ function get_certificat_usage($refid) {
 	return $usage;
 }
 
-/// This function (is intendet to) provides a uniform way to retrieve a list of use selectable certificates
+// This function (is intended to) provides a uniform way to retrieve a list of server certificates
 function get_certificates_server($get_includeWebCert=false) {
 	global $config;
 	$certificates=array();
@@ -64,7 +74,7 @@ function get_certificates_server($get_includeWebCert=false) {
 	{
 		if ($get_ca == false && is_webgui_cert($cert['refid']))
 			continue;
-			
+
 		$purpose = cert_get_purpose($cert['crt']);
 		if ($purpose['server'] != 'Yes')
 			continue;
@@ -496,7 +506,8 @@ include("head.inc");
 			<td width="78%" class="vtable" colspan="2">
 				<input id="secondary" name="secondary" type="checkbox" value="yes" <?php if ($pconfig['secondary']=='yes') echo "checked"; ?> onclick="updatevisibility();">secondary backend</checkbox><br/>
 				Use this setting to configure multiple backends/accesslists for a single frontend.<br/>
-				All settings of which only 1 can exist will be hidden. And 
+				All settings of which only 1 can exist will be hidden.<br/>
+				The frontend settings will be merged into 1 set of frontend configuration.
 			</td>
 		</tr>
 		<tr align="left">
@@ -513,6 +524,7 @@ include("head.inc");
 			  <td width="78%" class="vtable">
 				<select name="extaddr" class="formfld">
 					<option value="" <?php if (!$pconfig['extaddr']) echo "selected"; ?>>Interface address</option>
+					<option value="localhost" <?php if ('localhost' == $pconfig['extaddr']) echo "selected"; ?>>Localhost</option>
 				<?php
 					if (is_array($config['virtualip']['vip'])):
 						foreach ($config['virtualip']['vip'] as $sn): 
