@@ -326,7 +326,7 @@ row_helper();
 			<td class="vtable listlr"><?=$server['name']; ?></td>
 			<td class="vtable listr"><?=$server['address']; ?></td>
 			<td class="vtable listr"><?=$server['port']; ?></td>
-			<td class="vtable listr"><?=$server['ssl']; ?></td>
+			<td class="vtable listr"><?=$server['ssl']=='yes'?'yes':'no'; ?></td>
 			<td class="vtable listr"><?=$server['weight']; ?></td>
 			<td class="vtable listr"><?=$server['status']; ?></td>
 			<td class="list">
@@ -350,7 +350,7 @@ row_helper();
 				<td class="vtable">
 				  <input name="server_port<?=$counter;?>" id="server_port<?=$counter;?>" type="text" value="<?=$server['port']; ?>" size="5"/></td>
 				<td class="vtable">
-				  <input name="server_ssl<?=$counter;?>" id="server_ssl<?=$counter;?>" type="checkbox" value="<?=$server['ssl']; ?>" size="5"/></td>
+				  <input name="server_ssl<?=$counter;?>" id="server_ssl<?=$counter;?>" type="checkbox" value="yes" <?=$server['ssl']=='yes'?"checked":""; ?> size="5"/></td>
 				<td class="vtable">
 				  <input name="server_weight<?=$counter;?>" id="server_weight<?=$counter;?>" type="text" value="<?=$server['weight']; ?>" size="5"/></td>
 				<td class="vtable">

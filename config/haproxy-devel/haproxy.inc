@@ -63,7 +63,7 @@ $a_acltypes[] = array('name' => 'source_ip', 'descr' => 'Source IP',
 				'mode' => '', 'syntax' => 'src');
 if ($haproxy_sni_ssloffloading) {
 	$a_acltypes[] = array('name' => 'ssl_sni_matches',  'descr' => 'Server Name Indication TLS extension matches', 
-					'mode' => 'https', 'syntax' => 'req_ssl_sni -i', 'advancedoptions' => "tcp-request inspect-delay 5s\r\ntcp-request content accept if { req_ssl_hello_type 1 }");
+					'mode' => 'https', 'syntax' => 'req_ssl_sni -i', 'advancedoptions' => "tcp-request inspect-delay 5s\n\ttcp-request content accept if { req_ssl_hello_type 1 }");
 }
 
 function haproxy_custom_php_deinstall_command() {
@@ -324,7 +324,20 @@ function haproxy_find_acl($name) {
 function write_backend($fd, $name, $pool, $frontend) {
 	if(!is_array($pool['ha_servers']['item']) && !$pool['stats_enabled']=='yes')
 		return;
+		
+	$a_servers = &$pool['ha_servers']['item'];
 
+	unset($sslserverpresent);
+	if (is_array($a_servers))
+	{
+		foreach($a_servers as $be) {
+			if (!$be['status'] == "inactive")
+				continue;
+			if ($be['ssl'])
+				$sslserverpresent = true;
+		}
+	}
+	
 	fwrite ($fd, "backend " . $name . "\n");
 	if($pool['cookie_name'] && strtolower($frontend['type']) == "http")
 		fwrite ($fd, "\tcookie\t\t\t" . $pool['cookie_name'] . " insert indirect\n");
@@ -333,7 +346,7 @@ function write_backend($fd, $name, $pool, $frontend) {
 	if(strtolower($frontend['type']) == "https") {
 		$backend_type = "tcp";
 		$httpchk = "ssl-hello-chk";
-	} else { 
+	} else {
 		$backend_type = $frontend['type'];
 		$httpchk = "httpchk";
 	}
@@ -378,7 +391,9 @@ function write_backend($fd, $name, $pool, $frontend) {
 		$uri = $pool['monitor_uri'];
 	else
 		$uri = "/";
-	fwrite ($fd, "\toption\t\t\t{$httpchk} HEAD " . $uri . " HTTP/1.0\n");
+		
+	if (!$sslserverpresent)
+		fwrite ($fd, "\toption\t\t\t{$httpchk} HEAD " . $uri . " HTTP/1.0\n");
 
 	if ($pool['advanced_backend']) {
 		$adv_be	= explode("\n", base64_decode($pool['advanced_backend']));
@@ -407,7 +422,6 @@ function write_backend($fd, $name, $pool, $frontend) {
 	else
 		$checkinter = "";
 
-	$a_servers = &$pool['ha_servers']['item'];
 	if (is_array($a_servers))
 	{
 		foreach($a_servers as $be) {
@@ -421,7 +435,8 @@ function write_backend($fd, $name, $pool, $frontend) {
 			} else {
 				$isbackup = "";
 			}
-			fwrite ($fd, "\tserver\t\t\t" . $be['name'] . " " . $be['address'].":" . $be['port'] . " $cookie " . " $checkinter $isbackup weight " . $be['weight'] . "{$advanced_txt}\n");
+			$ssl = ($backend_type == "http" && $be['ssl'] == 'yes') ? ' ssl' : "";
+			fwrite ($fd, "\tserver\t\t\t" . $be['name'] . " " . $be['address'].":" . $be['port'] . "$ssl $cookie $checkinter $isbackup weight " . $be['weight'] . "{$advanced_txt}\n");
 		}
 	}
 	fwrite ($fd, "\n");
@@ -486,7 +501,7 @@ function haproxy_writeconf() {
 			}
 
 			//check ssl info
-			if ($backend['ssloffload']){
+			if (strtolower($backend['type']) == "http" && $backend['ssloffload']){
 				//ssl crt ./server.pem ca-file ./ca.crt verify optional crt-ignore-err all crl-file ./ca_crl.pem
 				$ssl_crt=" crt /var/etc/{$backend['name']}.{$backend['port']}.crt";
 				$cert = lookup_cert($backend['ssloffloadcert']);
@@ -497,6 +512,9 @@ function haproxy_writeconf() {
 				$ssl_crt="";
 				unlink_if_exists("var/etc/{$backend['name']}.{$backend['port']}.crt");
 			}
+			
+			if ($backend['extaddr']=='localhost')
+				$backend['extaddr'] = "127.0.0.1";
 
 			$bname = $backend['extaddr'] . ":" . $backend['port'];
 			if (!is_array($a_bind[$bname])) {
@@ -538,6 +556,8 @@ function haproxy_writeconf() {
 			else
 				$frontendinfo = "frontend {$bind['name']}\n";
 
+			$advancedextra = array();
+			
 			// Prepare ports for processing by splitting
 			$portss = "{$bind['port']},";
 			$ports = split(",", $portss);
@@ -622,7 +642,7 @@ function haproxy_writeconf() {
 					$a_pendingpl[$poolname]['frontend'] = $bconfig;
 				}
 
-				if ($bconfig['ssloffload'] && $bconfig['ssloffloadacl']) {
+				if (strtolower($bind['type']) == "http" && $bconfig['ssloffload'] && $bconfig['ssloffloadacl']) {
 					$aclname = "SNI_" . $poolname;
 					$cert_cn = cert_get_cn($bconfig['ssloffloadcert'] ,true);
 					//$expr = "req_ssl_sni -i $cert_cn";
@@ -648,10 +668,15 @@ function haproxy_writeconf() {
 					$aclname = $i . "_" . $entry['name'];
 					fwrite ($fd, "\tacl\t\t\t" . $aclname . "\t" . $expr . "\n");
 					fwrite ($fd, "\tuse_backend\t\t" . $poolname . " if " . $aclname . "\n");
+					
+					if ($acl['advancedoptions'] != '')
+						$advancedextra[$acl['syntax']] = $acl['advancedoptions']."\n";
 					$i++;
 				}
 
 			}
+			foreach($advancedextra as $extra)
+				fwrite ($fd, "\t".$extra."\n");
 			fwrite ($fd, "\n");
 		}
 	}
