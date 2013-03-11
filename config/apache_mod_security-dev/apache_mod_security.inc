@@ -321,7 +321,7 @@ function generate_apache_configuration() {
 #       then edit /usr/local/pkg/apache_* files.                                 #
 #                                                                                #
 #       And don't forget to submit your changes to:                              #
-#       https://github.com/bsdperimeter/pfsense-packages                         #
+#       https://github.com/pfsense/pfsense-packages                              #
 ##################################################################################
 
 

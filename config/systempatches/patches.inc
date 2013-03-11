@@ -29,7 +29,7 @@
 require_once("globals.inc");
 require_once("util.inc");
 
-$git_root_url = "http://github.com/bsdperimeter/pfsense/commit/";
+$git_root_url = "http://github.com/pfsense/pfsense/commit/";
 $patch_suffix = ".patch";
 $patch_dir = "/var/patches";
 $patch_cmd = "/usr/bin/patch";
