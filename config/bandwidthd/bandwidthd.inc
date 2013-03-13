@@ -252,7 +252,12 @@ if [ ! -L "{$bandwidthd_nano_dir}/etc" ] ; then
 	fi
 	/bin/ln -s {$bandwidthd_config_dir} {$bandwidthd_nano_dir}/etc
 fi
-
+if [ ! -f "{$bandwidthd_htdocs_dir}/legend.gif" ] ; then
+	/bin/cp {$bandwidthd_base_dir}/htdocs/legend.gif {$bandwidthd_htdocs_dir}
+fi
+if [ ! -f "{$bandwidthd_htdocs_dir}/logo.gif" ] ; then
+	/bin/cp {$bandwidthd_base_dir}/htdocs/logo.gif {$bandwidthd_htdocs_dir}
+fi
 cd {$bandwidthd_nano_dir}
 {$bandwidthd_nano_dir}/bandwidthd
 cd -
