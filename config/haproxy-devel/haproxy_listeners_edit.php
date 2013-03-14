@@ -101,18 +101,20 @@ function get_certificates_server($get_includeWebCert=false) {
 		if ($usagestr != "")
 			$usagestr = " (".trim($usagestr).")";
 		
-		$certificates[$cert['refid']] = $cert['descr'] . $caname . $inuse . $revoked . $usagestr;
+		$certificates[$cert['refid']]['name'] = $cert['descr'] . $caname . $inuse . $revoked . $usagestr;
 	}
 	return $certificates;
 }
 
-function echo_html_select($name, $keyvaluelist, $selected, $listEmptyMessage="")
+function echo_html_select($name, $keyvaluelist, $selected, $listEmptyMessage="", $onchangeEvent="")
 {
-	if (count($keyvaluelist)>0){						
-		echo "<select name=\"$name\" class=\"formselect\">";
+	if (count($keyvaluelist)>0){
+		if ($onchangeEvent != "")
+			$onchangeEvent .= " onchange=$onchangeEvent";
+		echo "<select name=\"$name\" id=\"$name\" class=\"formselect\"$onchangeEvent>";
 		foreach($keyvaluelist as $key => $desc){
 			$selectedhtml = $key == $selected ? "selected" : "";
-			echo "<option value=\"{$key}\" {$selectedhtml}>{$desc}</option>";
+			echo "<option value=\"{$key}\" {$selectedhtml}>{$desc['name']}</option>";
 		}
 		echo "</select>";
 	} else {
@@ -141,7 +143,7 @@ $a_backend = &$config['installedpackages']['haproxy']['ha_backends']['item'];
 $a_pools = &$config['installedpackages']['haproxy']['ha_pools']['item'];
 
 global $simplefields;
-$simplefields = array('name','desc','status','secondary','type','forwardfor','httpclose','extaddr','backend_serverpool',
+$simplefields = array('name','desc','status','secondary','primary_frontend','type','forwardfor','httpclose','extaddr','backend_serverpool',
 	'max_connections','client_timeout','port','ssloffloadcert','dcertadv','ssloffload','ssloffloadacl');
 
 if (isset($_POST['id']))
@@ -151,6 +153,8 @@ else
 
 if (isset($_GET['dup']))
 	$id = $_GET['dup'];
+
+$id = get_frontend_id($id);
 
 if (isset($id) && $a_backend[$id]) {
 	$pconfig['a_acl']=&$a_backend[$id]['ha_acls']['item'];	
@@ -193,7 +197,7 @@ if ($_POST) {
 	/* Ensure that our pool names are unique */
 	for ($i=0; isset($config['installedpackages']['haproxy']['ha_backends']['item'][$i]); $i++)
 		if (($_POST['name'] == $config['installedpackages']['haproxy']['ha_backends']['item'][$i]['name']) && ($i != $id))
-			$input_errors[] = "This frontend name has already been used. Frontend names must be unique.";
+			$input_errors[] = "This frontend name has already been used. Frontend names must be unique. $i != $id";
 
 	$a_acl=array();			
 	$acl_names=array(); 
@@ -273,7 +277,6 @@ if (!$id)
 
 $pgtitle = "HAProxy: Frontend: Edit";
 include("head.inc");
-
 ?>
 
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">
@@ -281,6 +284,7 @@ include("head.inc");
 	.haproxy_mode_http{display:none;}
 	.haproxy_ssloffloading_enabled{display:none;}
 	.haproxy_primary{}
+	.haproxy_secondary{display:none;}
   </style>
 
 <?php if($one_two): ?>
@@ -445,21 +449,32 @@ include("head.inc");
 	
 	function updatevisibility()
 	{
+		d = document;
+		ssloffload = d.getElementById("ssloffload");
+		type = d.getElementById("type");
+		secondary = d.getElementById("secondary");
+		primary_frontend = d.getElementById("primary_frontend");
+		
+		if (secondary.checked)
+			type = primaryfrontends[primary_frontend.value]['ref']['type'];
+		else
+			type = d.getElementById("type").value;
+			
 		setCSSdisplay(".haproxy_ssloffloading_enabled", ssloffload.checked);
-		setCSSdisplay(".haproxy_mode_http", type.value == "http");
+		setCSSdisplay(".haproxy_mode_http", type == "http");
 		setCSSdisplay(".haproxy_primary", !secondary.checked);
+		setCSSdisplay(".haproxy_secondary", secondary.checked);
+		
+		type_change(type);
 	}
 	
-	function type_change() {
-		var type, d, i, j, el, row;
+	function type_change(type) {
+		var d, i, j, el, row;
 		var count = <?=count($a_acltypes);?>;
 		var acl = [ <?php foreach ($a_acltypes as $expr) echo "'".$expr['name']."'," ?> ];
 		var mode = [ <?php foreach ($a_acltypes as $expr) echo "'".$expr['mode']."'," ?> ];
 
         d = document;
-		type = d.getElementById("type").value;
-		
-
 		for (i = 0; i < 99; i++) {
 			el = d.getElementById("acl_expression" + i);
 			row = d.getElementById("aclrow" + i);
@@ -475,7 +490,6 @@ include("head.inc");
 				}
 			}
 		}
-		updatevisibility();
 	}
 </script>
 <?php include("fbegin.inc"); ?>
@@ -502,15 +516,6 @@ include("head.inc");
 			</td>
 		</tr>
 		<tr align="left">
-			<td width="22%" valign="top" class="vncell">Shared Frontend</td>
-			<td width="78%" class="vtable" colspan="2">
-				<input id="secondary" name="secondary" type="checkbox" value="yes" <?php if ($pconfig['secondary']=='yes') echo "checked"; ?> onclick="updatevisibility();">secondary backend</checkbox><br/>
-				Use this setting to configure multiple backends/accesslists for a single frontend.<br/>
-				All settings of which only 1 can exist will be hidden.<br/>
-				The frontend settings will be merged into 1 set of frontend configuration.
-			</td>
-		</tr>
-		<tr align="left">
 			<td width="22%" valign="top" class="vncellreq">Status</td>
 			<td width="78%" class="vtable" colspan="2">
 				<select name="status" id="status">
@@ -519,7 +524,25 @@ include("head.inc");
 				</select>
 			</td>
 		</tr>		
-		<tr>
+		<tr align="left">
+			<td width="22%" valign="top" class="vncell">Shared Frontend</td>
+			<td width="78%" class="vtable" colspan="2">
+				<input id="secondary" name="secondary" type="checkbox" value="yes" <?php if ($pconfig['secondary']=='yes') echo "checked"; ?> onclick="updatevisibility();"/>
+				Use this setting to configure multiple backends/accesslists for a single frontend.<br/>
+				All settings of which only 1 can exist will be hidden.<br/>
+				The frontend settings will be merged into 1 set of frontend configuration.
+			</td>
+		</tr>
+		<tr class="haproxy_secondary" align="left">
+			<td width="22%" valign="top" class="vncellreq">Primary frontend</td>
+			<td width="78%" class="vtable" colspan="2">
+				<?
+				$primaryfrontends = get_haproxy_frontends($pconfig['name']);
+				echo_html_select('primary_frontend',$primaryfrontends, $pconfig['primary_frontend'],"You must first create a 'primary' frontend.","updatevisibility();");
+				?>
+			</td>
+		</tr>
+		<tr class="haproxy_primary">
 			  <td width="22%" valign="top" class="vncellreq">External address</td>
 			  <td width="78%" class="vtable">
 				<select name="extaddr" class="formfld">
@@ -546,7 +569,7 @@ include("head.inc");
 				</span>
 			  </td>
 		</tr>
-		<tr align="left">
+		<tr class="haproxy_primary" align="left">
 			<td width="22%" valign="top" class="vncellreq">External port</td>
 			<td width="78%" class="vtable" colspan="2">
 				<input name="port" type="text" <?if(isset($pconfig['port'])) echo "value=\"{$pconfig['port']}\"";?> size="30" maxlength="500">
@@ -576,10 +599,10 @@ include("head.inc");
 					}
 				?>
 				</select>
-		<tr align="left">
+		<tr class="haproxy_primary" align="left">
 			<td width="22%" valign="top" class="vncellreq">Type</td>
 			<td width="78%" class="vtable" colspan="2">
-				<select name="type" id="type" onchange="type_change();">
+				<select name="type" id="type" onchange="updatevisibility();">
 					<option value="http"<?php if($pconfig['type'] == "http") echo " SELECTED"; ?>>HTTP</option>
 					<option value="https"<?php if($pconfig['type'] == "https") echo " SELECTED"; ?>>HTTPS</option>
 					<option value="tcp"<?php if($pconfig['type'] == "tcp") echo " SELECTED"; ?>>TCP</option>
@@ -663,7 +686,11 @@ include("head.inc");
 				<br/>
 				The 'forwardfor' option creates an HTTP 'X-Forwarded-For' header which
 				contains the client's IP address. This is useful to let the final web server
-				know what the client address was (eg for statistics on domains)
+				know what the client address was. (eg for statistics on domains)<br/>
+				<br/>
+				It is important to note that as long as HAProxy does not support keep-alive connections, 
+				only the first request of a connection will receive the header. For this reason, 
+				it is important to ensure that option httpclose is set when using this option.
 			</td>
 		</tr>
 		<tr align="left">
@@ -744,7 +771,7 @@ include("head.inc");
 				<input name="Submit" type="submit" class="formbtn" value="Save">  
 				<input type="button" class="formbtn" value="Cancel" onclick="history.back()">
 				<?php if (isset($id) && $a_backend[$id]): ?>
-				<input name="id" type="hidden" value="<?=$id;?>">
+				<input name="id" type="hidden" value="<?=$a_backend[$id]['name'];?>">
 				<?php endif; ?>
 			</td>
 		</tr>
@@ -757,6 +784,12 @@ include("head.inc");
 	</div>
 	</form>
 <br>
+<script type="text/javascript">
+<?
+	phparray_to_javascriptarray($primaryfrontends,"primaryfrontends",Array('/*','/*/name','/*/ref','/*/ref/type','/*/ref/ssloffload'));
+?>
+
+</script>
 <script type="text/javascript">
 	field_counter_js = 3;
 	rows = 1;
