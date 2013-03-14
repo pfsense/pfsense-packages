@@ -348,9 +348,12 @@ function write_backend($fd, $name, $pool, $frontend) {
 		$httpchk = "ssl-hello-chk";
 	} else {
 		$backend_type = $frontend['type'];
-		$httpchk = "httpchk";
+		if(strtolower($frontend['type']) == "http")
+			$httpchk = "httpchk";
+		else
+			unset($httpchk);
 	}
-
+			
 	fwrite ($fd, "\tmode\t\t\t" . $backend_type . "\n");
 
 	if($pool['balance'])
@@ -392,7 +395,7 @@ function write_backend($fd, $name, $pool, $frontend) {
 	else
 		$uri = "/";
 		
-	if (!$sslserverpresent)
+	if ($httpchk)
 		fwrite ($fd, "\toption\t\t\t{$httpchk} HEAD " . $uri . " HTTP/1.0\n");
 
 	if ($pool['advanced_backend']) {
@@ -451,7 +454,7 @@ function haproxy_configure() {
 function haproxy_check_writtenconfig_error() {
 	$configcheckoutput = shell_exec("haproxy -c -V -f /var/etc/haproxy.cfg 2>&1");
 	if (!strstr($configcheckoutput, "Configuration file is valid"))
-		return $configcheckoutput;
+		return str_replace("\n","<br/>\n", $configcheckoutput);
 	else
 		return false;
 }
@@ -528,12 +531,16 @@ function haproxy_writeconf() {
 			$b = &$a_bind[$bname];
 			
 			// Overwrite ?
-			$b['type'] = $backend['type'];
-			$b['forwardfor'] = $backend['forwardfor'];
-			$b['httpclose'] = $backend['httpclose'];
-			$b['max_connections'] = $backend['max_connections'];
-			$b['client_timeout'] = $backend['client_timeout'];
-			$b['advanced'] = $backend['advanced'];
+			if ($backend['secondary'] != 'yes') {
+				if (isset($b['type']))
+					$input_errors[] = "Multiple primary frondends for $bname";
+				$b['type'] = $backend['type'];
+				$b['forwardfor'] = $backend['forwardfor'];
+				$b['httpclose'] = $backend['httpclose'];
+				$b['max_connections'] = $backend['max_connections'];
+				$b['client_timeout'] = $backend['client_timeout'];
+				$b['advanced'] = $backend['advanced'];
+			}
 			
 			if ($ssl_crt != "") {
 				if ($b['ssl_info'] == "")
@@ -585,14 +592,12 @@ function haproxy_writeconf() {
 				$advanced = base64_decode($bind['advanced']);
 				fwrite($fd, "\t" . $advanced . "\n");
 			}
-			
+
 			// https is an alias for tcp for clarity purpouses
 			if(strtolower($bind['type']) == "https") {
 				$backend_type = "tcp";
-				$httpchk = "ssl-hello-chk";
-			} else { 
+			} else {
 				$backend_type = $bind['type'];
-				$httpchk = "httpchk";
 			}
 
 			fwrite ($fd, "\tmode\t\t\t" . $backend_type . "\n");
@@ -711,6 +716,9 @@ function haproxy_writeconf() {
 	// create config file
 	fclose($fd);
 
+	if ($input_errors)
+		print_input_errors($input_errors);
+	
 	if (isset($a_global['carpdev']))
 		haproxy_install_cron(true);
 	else
@@ -879,6 +887,108 @@ function haproxy_do_xmlrpc_sync($sync_to_ip, $password) {
 	} else {
 		log_error("HAProxy XMLRPC reload data success with {$url}:{$port} (exec_php).");
 	}
+}
+
+function get_frontend_id($name) {
+	global $a_backend;
+	$i = 0;
+	foreach($a_backend as $backend)
+	{
+		if ($backend['name'] == $name)
+			return $i;
+		$i++;
+	}
+	return null;
+}
+
+function get_frontend_ipport($fontend) {
+	global $a_backend;
+	if ($fontend['secondary'] == 'yes')
+		$mainfontend = $a_backend[get_frontend_id($fontend['primary_frontend'])];
+	else
+		$mainfontend = $fontend;
+	if($mainfontend['extaddr'] == "any") 
+		$result = "0.0.0.0";
+	elseif($mainfontend['extaddr']) 
+		$result = $mainfontend['extaddr'];
+	else 
+		$result = get_current_wan_address('wan');
+	return $result . ":" . $mainfontend['port'];
+	return 'abc';
+}
+
+function haproxy_check_config() {
+	global $config;
+	$a_backends = &$config['installedpackages']['haproxy']['ha_backends']['item'];
+	$result = false;
+	$activefrontends = array();
+	$issues = array();
+	
+	foreach($a_backends as $frontend) {
+		if (($frontend['status'] != 'active') || ($frontend['secondary'] == 'yes'))
+			continue;
+		$ipport = get_frontend_ipport($frontend);
+		if (isset($activefrontends[$ipport]))
+			$issues['P_'.$ipport] = "Multiple primary frontends with IP:Port \"$ipport\"";
+		else
+			$activefrontends[$ipport] = true;
+	}
+	foreach($a_backends as $frontend) {
+		if (($frontend['status'] != 'active') || ($frontend['secondary'] != 'yes'))
+			continue;
+		$ipport = get_frontend_ipport($frontend);
+		if (!isset($activefrontends[$ipport]))
+			$issues['S_'.$frontend['name']] = "Secondary frontend \"{$frontend['name']}\" without active primary frontend.";
+	}
+	foreach ($issues as $item)
+		$result .= ($result == false ? "" : "<br/>") . $item;	
+	return $result;
+}
+
+function get_haproxy_frontends($excludeitem="") {
+	global $config;
+	$a_frontend = &$config['installedpackages']['haproxy']['ha_backends']['item'];
+	$result = array();
+	foreach($a_frontend as &$frontend)
+	{
+		if ($frontend['secondary'])
+			continue;
+		if ($frontend['name'] == $excludeitem)
+			continue;
+		
+		$serveradress = "{$frontend['extaddr']}:{$frontend['port']}";
+		$result[$frontend['name']]['name'] = "{$frontend['name']} - {$frontend['type']} ({$serveradress})";
+		$result[$frontend['name']]['ref'] = &$frontend;
+	}
+	asort($result, SORT_STRING);
+	return $result;
+}
+
+function phparray_to_javascriptarray_recursive($nestID, $path, $items, $nodeName, $includeitems) {
+	$offset = str_repeat('  ',$nestID);
+	$itemName = "item$nestID";
+	echo "{$offset}$nodeName = {};\n";
+	if (is_array($items))
+		foreach ($items as $key => $item)
+		{
+			if (in_array($path.'/'.$key, $includeitems))
+				$subpath = $path.'/'.$key;
+			else
+				$subpath = $path.'/*';
+			if (in_array($subpath, $includeitems) || in_array($path.'/*', $includeitems)) {
+				if (is_array($item)) {
+					$subNodeName = "item$nestID";
+					phparray_to_javascriptarray_recursive($nestID+1, $subpath, $items[$key], $subNodeName, $includeitems);
+					echo "{$offset}{$nodeName}['{$key}'] = $itemName;\n";
+				} else
+					echo "{$offset}{$nodeName}['$key'] = '$item';\n";
+			}
+		}
+}
+
+function phparray_to_javascriptarray($items, $javaMapName, $includeitems)
+{
+		phparray_to_javascriptarray_recursive(1,'',$items, $javaMapName, $includeitems);
 }
 
 ?>

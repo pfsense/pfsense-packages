@@ -450,7 +450,7 @@ row_helper();
 			<td width="22%" valign="top" class="vncell">Check freq</td>
 			<td width="78%" class="vtable" colspan="2">
 				<input name="checkinter" type="text" <?if(isset($pconfig['checkinter'])) echo "value=\"{$pconfig['checkinter']}\"";?>size="20"> milliseconds
-				<br/>Defaults to 1000 if left blank.
+				<br/>For HTTP/HTTPS defaults to 1000 if left blank. For TCP no check will be performed if left empty.
 			</td>
 		</tr>
 		<tr align="left">
