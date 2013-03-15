@@ -165,7 +165,7 @@ include("head.inc");
 <tr>
 	<td width="22%" valign="top" class="vncell"><?=gettext("Patch Contents"); ?></td>
 	<td width="78%" class="vtable">
-		<textarea name="patch" class="" id="patch" rows="15" cols="70" wrap="off"><?=base64_decode($pconfig['patch']);?></textarea>
+		<textarea name="patch" class="" id="patch" rows="15" cols="70" wrap="off"><?=htmlspecialchars(base64_decode($pconfig['patch']));?></textarea>
 		<br /> <span class="vexpl"><?=gettext("The contents of the patch. You can paste a patch here, or enter a URL/commit ID above, it can then be fetched into here automatically."); ?></span></td>
 </tr>
 <tr>
