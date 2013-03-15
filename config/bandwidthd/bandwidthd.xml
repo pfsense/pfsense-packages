@@ -96,7 +96,7 @@
 		<field>
 			<fielddescr>Skip intervals</fielddescr>
 			<fieldname>skipintervals</fieldname>
-			<description>Number of intervals (2.5 minute) to skip between graphing. Default 0.</description>
+			<description>Number of intervals to skip between graphing. Default 0. Each interval is 200 seconds = 3 min 20 sec.</description>
 			<type>input</type>
 		</field>
 		<field>
@@ -108,19 +108,20 @@
 		<field>
 			<fielddescr>Promiscuous</fielddescr>
 			<fieldname>promiscuous</fieldname>
-			<description>Put interface in promiscuous mode to score to traffic that may not be routing through the host machine.</description>
+			<description>Put interface in promiscuous mode to see traffic that may not be routing through the host machine.&lt;br&gt;
+			Note: If the interface is connected to a switch then the interface will only see the traffic on its port.</description>
 			<type>checkbox</type>
 		</field>
 		<field>
 			<fielddescr>output_cdf</fielddescr>
 			<fieldname>outputcdf</fieldname>
-			<description>Log data to cdf file htdocs/log.cdf</description>
+			<description>Log data to cdf files log*.cdf</description>
 			<type>checkbox</type>
 		</field>
 		<field>
 			<fielddescr>recover_cdf</fielddescr>
 			<fieldname>recovercdf</fieldname>
-			<description>Read back the cdf file on startup</description>
+			<description>Read back the cdf files on startup</description>
 			<type>checkbox</type>
 		</field>
 		<field>
@@ -139,8 +140,23 @@
 		<field>
 			<fielddescr>Meta Refresh</fielddescr>
 			<fieldname>meta_refresh</fieldname>
-			<description>Set META REFRESH seconds (default 150, use 0 to disable).</description>
+			<description>Sets the interval (seconds) at which the browser graph display refreshes (default 150, use 0 to disable).</description>
 			<type>input</type>
+		</field>
+		<field>
+			<fielddescr>Graph and Log Info</fielddescr>
+			<fieldname>graph_log_info</fieldname>
+			<description>If draw graphs is on, then the daily report and graph html data is regenerated every (skip intervals + 1) * 200 seconds. The data volumes in the report are for the same period as the span of the graph.&lt;br&gt;
+			If output_cdf is on, then a cron job is added to rotate the log files at 00:01 each day. 6 log files are kept for each log frequency (daily, weekly, monthly, yearly). At the respective rotation intervals, the oldest log is deleted, the others are shuffled back and a new log is created.&lt;br&gt;
+			&lt;table cellpadding=1 cellspacing=0 style=&quot;text-align: left;&quot;&gt; &lt;tbody&gt;
+			&lt;tr&gt;&lt;th&gt;  &lt;/th&gt;&lt;th&gt; Data Interval &lt;/th&gt;&lt;th&gt; Graph Span &lt;/th&gt;&lt;th&gt; Log Rotation &lt;/th&gt;&lt;th&gt; Log File Name &lt;/th&gt;&lt;/tr&gt;
+			&lt;tr&gt;&lt;th&gt; Daily &lt;/th&gt;&lt;td&gt; 200 seconds &lt;/td&gt;&lt;td&gt; 2 days &lt;/td&gt;&lt;td&gt; 1 day &lt;/td&gt;&lt;td&gt; log.1.[0-5].cdf &lt;/td&gt;&lt;/tr&gt;
+			&lt;tr&gt;&lt;th&gt; Weekly &lt;/th&gt;&lt;td&gt; 10 minutes &lt;/td&gt;&lt;td&gt; 7 days &lt;/td&gt;&lt;td&gt; 7 days &lt;/td&gt;&lt;td&gt; log.2.[0-5].cdf &lt;/td&gt;&lt;/tr&gt;
+			&lt;tr&gt;&lt;th&gt; Monthly &lt;/th&gt;&lt;td&gt; 1 hour &lt;/td&gt;&lt;td&gt; 35 days &lt;/td&gt;&lt;td&gt; 35 days &lt;/td&gt;&lt;td&gt; log.3.[0-5].cdf &lt;/td&gt;&lt;/tr&gt;
+			&lt;tr&gt;&lt;th&gt; Yearly &lt;/th&gt;&lt;td&gt; 12 hours &lt;/td&gt;&lt;td&gt; 412.5 days &lt;/td&gt;&lt;td&gt; 412.5 days &lt;/td&gt;&lt;td&gt; log.4.[0-5].cdf &lt;/td&gt;&lt;/tr&gt;
+			&lt;/tbody&gt; &lt;/table&gt;
+			</description>
+			<type>info</type>
 		</field>
 	</fields>
 	<custom_php_resync_config_command>

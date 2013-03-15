@@ -46,6 +46,8 @@ function bandwidthd_install_deinstall() {
 	exec("rm -f /usr/local/etc/rc.d/bandwidthd*");
 	exec("rm -rf " . PKG_BANDWIDTHD_BASE . "/htdocs");
 	exec("rm -f /usr/local/www/bandwidthd");
+	// Remove the cron job, if it is there
+	install_cron_job("/bin/kill -HUP `cat /var/run/bandwidthd.pid`", false);
 	conf_mount_ro();
 	config_unlock();
 }
@@ -79,7 +81,9 @@ function bandwidthd_install_config() {
 		$recover_cdf = "recover_cdf true\n";
 	$output_cdf = $config['installedpackages']['bandwidthd']['config'][0]['outputcdf'];
 	if($output_cdf)
-		$output_cdf = "output_cdf true\n";
+		$output_cdf_string = "output_cdf true\n";
+	else
+		$output_cdf_string = "";
 	$promiscuous = $config['installedpackages']['bandwidthd']['config'][0]['promiscuous'];
 	if($promiscuous)
 		$promiscuous = "promiscuous true\n";
@@ -180,7 +184,7 @@ $graph_cutoff
 $promiscuous
 
 #Log data to cdf file htdocs/log.cdf
-$output_cdf
+$output_cdf_string
 
 #Read back the cdf file on startup
 $recover_cdf
@@ -296,6 +300,16 @@ EOD;
 	$bandwidthd_index_file = $bandwidthd_htdocs_dir . "/index.html";
 	if (!file_exists($bandwidthd_index_file)) {
 		exec("echo \"Please start bandwidthd to populate this directory.\" > " . $bandwidthd_index_file);
+	}
+	
+	if($output_cdf) {
+		// Use cron job to rotate logs every day at 00:01
+		install_cron_job("/bin/kill -HUP `cat /var/run/bandwidthd.pid`", true, "1", "0");
+	}
+	else
+	{
+		// Remove the cron job, if it is there
+		install_cron_job("/bin/kill -HUP `cat /var/run/bandwidthd.pid`", false);
 	}
 	conf_mount_ro();
 	config_unlock();
