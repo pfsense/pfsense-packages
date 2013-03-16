@@ -32,7 +32,6 @@ require_once("functions.inc");
 require_once("pkg-utils.inc");
 require_once("notices.inc");
 
-
 global $haproxy_sni_ssloffloading;
 $haproxy_sni_ssloffloading=true;// can only be used with recent 1.5-dev17 builds.
 
@@ -439,7 +438,7 @@ function write_backend($fd, $name, $pool, $frontend) {
 				$isbackup = "";
 			}
 			$ssl = ($backend_type == "http" && $be['ssl'] == 'yes') ? ' ssl' : "";
-			fwrite ($fd, "\tserver\t\t\t" . $be['name'] . " " . $be['address'].":" . $be['port'] . "$ssl $cookie $checkinter $isbackup weight " . $be['weight'] . "{$advanced_txt}\n");
+			fwrite ($fd, "\tserver\t\t\t" . $be['name'] . " " . $be['address'].":" . $be['port'] . "$ssl $cookie $checkinter $isbackup weight " . $be['weight'] . "{$advanced_txt} {$be['advanced']}\n");
 		}
 	}
 	fwrite ($fd, "\n");
@@ -451,12 +450,20 @@ function haproxy_configure() {
 	return haproxy_check_run(1);
 }
 
-function haproxy_check_writtenconfig_error() {
-	$configcheckoutput = shell_exec("haproxy -c -V -f /var/etc/haproxy.cfg 2>&1");
-	if (!strstr($configcheckoutput, "Configuration file is valid"))
-		return str_replace("\n","<br/>\n", $configcheckoutput);
-	else
-		return false;
+function haproxy_check_writtenconfig_error(&$messages) {
+	$retval = exec("haproxy -c -V -f /var/etc/haproxy.cfg 2>&1", $output, $err);
+	$messages = "";
+	if ($err > 1)
+		$messages = "<h2><strong>FATAL ERROR CODE: $err while starting haproxy</strong></h2>";
+	elseif ($err == 1)
+		$messages = "Errors found while starting haproxy";
+		
+	if ((count($output) > 1) && $output[0] != "Configuration file is valid")
+	{
+		foreach($output as $line)
+			$messages .= "<br/>" . htmlspecialchars($line) . "\n";
+	}
+	return (strstr($retval, "Configuration file is valid"));
 }
 
 function haproxy_writeconf() {
@@ -540,6 +547,7 @@ function haproxy_writeconf() {
 				$b['max_connections'] = $backend['max_connections'];
 				$b['client_timeout'] = $backend['client_timeout'];
 				$b['advanced'] = $backend['advanced'];
+				$b['ssloffload'] = $backend['ssloffload'];
 			}
 			
 			if ($ssl_crt != "") {
@@ -594,7 +602,7 @@ function haproxy_writeconf() {
 			}
 
 			// https is an alias for tcp for clarity purpouses
-			if(strtolower($bind['type']) == "https") {
+			if($bind['type'] == "https") {
 				$backend_type = "tcp";
 			} else {
 				$backend_type = $bind['type'];
@@ -604,12 +612,18 @@ function haproxy_writeconf() {
 			fwrite ($fd, "\tlog\t\t\tglobal\n");
 			fwrite ($fd, "\toption\t\t\tdontlognull\n");
 
-			if($bind['httpclose']) 
-				fwrite ($fd, "\toption\t\t\thttpclose\n");
+			if ($backend_type == 'http')
+			{
+				if($bind['httpclose']) 
+					fwrite ($fd, "\toption\t\t\thttpclose\n");
 
-			if($bind['forwardfor']) {
-				fwrite ($fd, "\toption\t\t\tforwardfor\n");
-				fwrite ($fd, "\treqadd X-Forwarded-Proto:\ https\tif { ssl_fc }\n");
+				if($bind['forwardfor']) {
+					fwrite ($fd, "\toption\t\t\tforwardfor\n");
+					if($bind['ssloffload'] == "yes")
+						fwrite ($fd, "\treqadd X-Forwarded-Proto:\ https\n");
+					else
+						fwrite ($fd, "\treqadd X-Forwarded-Proto:\ http\n");
+				}
 			}
 
 			if($bind['max_connections'])
@@ -678,7 +692,6 @@ function haproxy_writeconf() {
 						$advancedextra[$acl['syntax']] = $acl['advancedoptions']."\n";
 					$i++;
 				}
-
 			}
 			foreach($advancedextra as $extra)
 				fwrite ($fd, "\t".$extra."\n");
@@ -717,7 +730,10 @@ function haproxy_writeconf() {
 	fclose($fd);
 
 	if ($input_errors)
+	{
+		require_once("guiconfig.inc");
 		print_input_errors($input_errors);
+	}
 	
 	if (isset($a_global['carpdev']))
 		haproxy_install_cron(true);
@@ -961,6 +977,30 @@ function get_haproxy_frontends($excludeitem="") {
 		$result[$frontend['name']]['ref'] = &$frontend;
 	}
 	asort($result, SORT_STRING);
+	return $result;
+}
+
+function get_frontent_acls($frontend) {
+	$result = array();
+	$a_acl = &$frontend['ha_acls']['item'];
+	if (is_array($a_acl))
+	{
+		foreach ($a_acl as $entry) {
+			$acl = haproxy_find_acl($entry['expression']);
+			if (!$acl)
+				continue;
+
+			// Filter out acls for different modes
+			if ($acl['mode'] != '' && $acl['mode'] != strtolower($frontend['type']))
+				continue;
+			
+			$acl_item = array();
+			$acl_item['descr'] = $acl['descr'] . " " . $entry['value'];
+			$acl_item['ref'] = $entry;
+			
+			$result[] = $acl_item;
+		}
+	}
 	return $result;
 }
 

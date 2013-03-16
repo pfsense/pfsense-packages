@@ -76,8 +76,8 @@ function get_certificates_server($get_includeWebCert=false) {
 			continue;
 
 		$purpose = cert_get_purpose($cert['crt']);
-		if ($purpose['server'] != 'Yes')
-			continue;
+		//$certserverpurpose = $purpose['server'] == 'Yes' ? " [Server certificate]" : "";
+		$certserverpurpose = "";
 
 		$selected = "";
 		$caname = "";
@@ -101,7 +101,7 @@ function get_certificates_server($get_includeWebCert=false) {
 		if ($usagestr != "")
 			$usagestr = " (".trim($usagestr).")";
 		
-		$certificates[$cert['refid']]['name'] = $cert['descr'] . $caname . $inuse . $revoked . $usagestr;
+		$certificates[$cert['refid']]['name'] = $cert['descr'] . $caname . $certserverpurpose . $inuse . $revoked . $usagestr;
 	}
 	return $certificates;
 }
@@ -607,7 +607,11 @@ include("head.inc");
 					<option value="https"<?php if($pconfig['type'] == "https") echo " SELECTED"; ?>>HTTPS</option>
 					<option value="tcp"<?php if($pconfig['type'] == "tcp") echo " SELECTED"; ?>>TCP</option>
 					<option value="health"<?php if($pconfig['type'] == "health") echo " SELECTED"; ?>>Health</option>
-				</select>
+				</select><br/>
+				<span class="vexpl">
+					This defines the processing type of HAProxy, and will determine the availabe options for acl checks and also several other options.<br/>
+					Please note that for https encryption/decryption on HAProxy with a certificate the processing type needs to be set to 'http'.
+				</span>
 			</td>
 		</tr>
 		<tr>
@@ -679,7 +683,7 @@ include("head.inc");
 				<div>the time (in milliseconds) we accept to wait for data from the client, or for the client to accept data (default 30000).</div>
 			</td>
 		</tr>
-		<tr align="left">
+		<tr align="left" class="haproxy_mode_http">
 			<td width="22%" valign="top" class="vncell">Use 'forwardfor' option</td>
 			<td width="78%" class="vtable" colspan="2">
 				<input id="forwardfor" name="forwardfor" type="checkbox" value="yes" <?php if ($pconfig['forwardfor']=='yes') echo "checked"; ?>>
@@ -693,7 +697,7 @@ include("head.inc");
 				it is important to ensure that option httpclose is set when using this option.
 			</td>
 		</tr>
-		<tr align="left">
+		<tr align="left" class="haproxy_mode_http">
 			<td width="22%" valign="top" class="vncell">Use 'httpclose' option</td>
 			<td width="78%" class="vtable" colspan="2">
 				<input id="httpclose" name="httpclose" type="checkbox" value="yes" <?php if ($pconfig['httpclose']=='yes') echo "checked"; ?>>
