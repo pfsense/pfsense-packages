@@ -53,13 +53,10 @@ if ($_POST) {
 		$retval = haproxy_configure();
 		config_unlock();
 
-		$result = haproxy_check_writtenconfig_error();
+		$result = haproxy_check_writtenconfig_error($messages);
+		$savemsg = $messages;
 		if ($result)
-			$savemsg = gettext($result);
-		else {
-			$savemsg = get_std_save_message($retval);
 			unlink_if_exists($d_haproxyconfdirty_path);
-		}
 	}
 }
 
@@ -90,7 +87,7 @@ include("head.inc");
 <?php if ($input_errors) print_input_errors($input_errors); ?>
 <?php if ($savemsg) print_info_box($savemsg); ?>
 <?php if (file_exists($d_haproxyconfdirty_path)): ?><p>
-<?php print_info_box_np("The virtual pool configuration has been changed.<br>You must apply the changes in order for them to take effect.");?><br>
+<?php print_info_box_np("The haproxy configuration has been changed.<br>You must apply the changes in order for them to take effect.");?><br>
 <?php endif; ?>
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
   <tr><td class="tabnavtbl">

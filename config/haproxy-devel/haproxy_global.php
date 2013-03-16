@@ -49,13 +49,10 @@ if ($_POST) {
 		$retval = haproxy_configure();
 		config_unlock();
 
-		$result = haproxy_check_writtenconfig_error();
+		$result = haproxy_check_writtenconfig_error($messages);
+		$savemsg = $messages;
 		if ($result)
-			$savemsg = gettext($result);
-		else {
-			$savemsg = get_std_save_message($retval);
 			unlink_if_exists($d_haproxyconfdirty_path);
-		}
 	} else {
 		if ($_POST['enable']) {
 			$reqdfields = explode(" ", "maxconn");
@@ -89,7 +86,7 @@ if ($_POST) {
 			$config['installedpackages']['haproxy']['loglevel'] = $_POST['loglevel'] ? $_POST['loglevel'] : false;
 			$config['installedpackages']['haproxy']['carpdev'] = $_POST['carpdev'] ? $_POST['carpdev'] : false;
 			$config['installedpackages']['haproxy']['syncpassword'] = $_POST['syncpassword'] ? $_POST['syncpassword'] : false;
-			$config['installedpackages']['haproxy']['advanced'] = base64_encode($_POST['advanced']) ? $_POST['advanced'] : false;
+			$config['installedpackages']['haproxy']['advanced'] = $_POST['advanced'] ? base64_encode($_POST['advanced']) : false;
 			$config['installedpackages']['haproxy']['nbproc'] = $_POST['nbproc'] ? $_POST['nbproc'] : false;			
 			touch($d_haproxyconfdirty_path);
 			write_config();
@@ -146,7 +143,7 @@ function enable_change(enable_change) {
 <?php if ($input_errors) print_input_errors($input_errors); ?>
 <?php if ($savemsg) print_info_box($savemsg); ?>
 <?php if (file_exists($d_haproxyconfdirty_path)): ?><p>
-<?php print_info_box_np("The load balancer configuration has been changed.<br>You must apply the changes in order for them to take effect.");?><br>
+<?php print_info_box_np("The haproxy configuration has been changed.<br>You must apply the changes in order for them to take effect.");?><br>
 <?php endif; ?>
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
 	<tr><td class="tabnavtbl">
@@ -344,7 +341,7 @@ function enable_change(enable_change) {
 			<tr>
 				<td width="22%" valign="top" class="vncell">Synchronization password</td>
 				<td width="78%" class="vtable">
-					<input name="syncpassword" type="password" value="<?=$pconfig['syncpassword'];?>">
+					<input name="syncpassword" type="password" autocomplete="off" value="<?=$pconfig['syncpassword'];?>">
 					<br/>
 					<strong>Enter the password that will be used during configuration synchronization.  This is generally the remote webConfigurator password.</strong>
 				</td>
