@@ -110,23 +110,24 @@ if ($_POST) {
 
 	$a_servers=array();			
 	for($x=0; $x<99; $x++) {
-		$server_name=$_POST['server_name'.$x];
-		$server_address=$_POST['server_address'.$x];
-		$server_port=$_POST['server_port'.$x];
-		$server_ssl=$_POST['server_ssl'.$x];
-		$server_weight=$_POST['server_weight'.$x];
-		$server_status=$_POST['server_status'.$x];
+		$server_name     = $_POST['server_name'.$x];
+		$server_address  = $_POST['server_address'.$x];
+		$server_port     = $_POST['server_port'.$x];
+		$server_ssl      = $_POST['server_ssl'.$x];
+		$server_weight   = $_POST['server_weight'.$x];
+		$server_status   = $_POST['server_status'.$x];
+		$server_advanced = $_POST['server_advanced'.$x];
 
 		if ($server_address) {
-
-			$server=array();
-			$server['name']=$server_name;
-			$server['address']=$server_address;
-			$server['port']=$server_port;
-			$server['ssl']=$server_ssl;
-			$server['weight']=$server_weight;
-			$server['status']=$server_status;
-			$a_servers[]=$server;
+			$server = array();
+			$server['name']     = $server_name;
+			$server['address']  = $server_address;
+			$server['port']     = $server_port;
+			$server['ssl']      = $server_ssl;
+			$server['weight']   = $server_weight;
+			$server['status']   = $server_status;
+			$server['advanced'] = $server_advanced;
+			$a_servers[] = $server;
 
 			if (preg_match("/[^a-zA-Z0-9\.\-_]/", $server_name))
 				$input_errors[] = "The field 'Name' contains invalid characters.";
@@ -134,10 +135,10 @@ if ($_POST) {
 				$input_errors[] = "The field 'Address' contains invalid characters.";
 
 			if (!preg_match("/.{2,}/", $server_name))
-				$input_errors[] = "The field 'Name' is required.";
+				$input_errors[] = "The field 'Name' is required (and must be at least 2 characters).";
 
 			if (!preg_match("/.{2,}/", $server_address))
-				$input_errors[] = "The field 'Address' is required.";
+				$input_errors[] = "The field 'Address' is required (and must be at least 2 characters).";
 
 
 			if (!is_numeric($server_weight))
@@ -167,7 +168,7 @@ if ($_POST) {
 		}
 
 		if($pool['name'] != "")
-			$changedesc .= " modified '{$pool['name']}' pool:";
+			$changedesc .= " modified pool: '{$pool['name']}'";
 
 		$pool['ha_servers']['item']=$a_servers;
 
@@ -304,12 +305,13 @@ row_helper();
 			
 			<table class="" width="100%" cellpadding="0" cellspacing="0" id='servertable'>
 	                <tr>
-	                  <td width="30%" class="listhdrr">Name</td>
-	                  <td width="30%" class="listhdrr">Address</td>
-	                  <td width="18%" class="listhdrr">Port</td>
+	                  <td width="20%" class="listhdrr">Name</td>
+	                  <td width="10%" class="listhdrr">Address</td>
+	                  <td width="5%" class="listhdrr">Port</td>
 	                  <td width="5%" class="listhdrr">SSL</td>
 	                  <td width="8%" class="listhdrr">Weight</td>
 	                  <td width="5%" class="listhdr">Backup</td>
+	                  <td width="15%" class="listhdr">Advanced</td>
 	                  <td width="4%" class=""></td>
 			</tr>
 			<?php 
@@ -322,13 +324,14 @@ row_helper();
 			$counter=0;
 			foreach ($a_servers as $server) {
 			?>
-			<tr id="tr_view_<?=$counter;?>" name="tr_view_<?=$counter;?>">
+			<tr id="tr_view_<?=$counter;?>" name="tr_view_<?=$counter;?>" ondblclick="editRow(<?=$counter;?>); return false;" >
 			<td class="vtable listlr"><?=$server['name']; ?></td>
 			<td class="vtable listr"><?=$server['address']; ?></td>
 			<td class="vtable listr"><?=$server['port']; ?></td>
 			<td class="vtable listr"><?=$server['ssl']=='yes'?'yes':'no'; ?></td>
 			<td class="vtable listr"><?=$server['weight']; ?></td>
 			<td class="vtable listr"><?=$server['status']; ?></td>
+			<td class="vtable listr"><?=htmlspecialchars($server['advanced']); ?></td>
 			<td class="list">
 			  <table border="0" cellspacing="0" cellpadding="1"><tr>
 			  <td valign="middle">
@@ -346,7 +349,7 @@ row_helper();
 				<td class="vtable">
 				  <input name="server_name<?=$counter;?>" id="server_name<?=$counter;?>" type="text" value="<?=$server['name']; ?>" size="30"/></td>
 				<td class="vtable">
-				  <input name="server_address<?=$counter;?>" id="server_address<?=$counter;?>" type="text" value="<?=$server['address']; ?>" size="30"/></td>
+				  <input name="server_address<?=$counter;?>" id="server_address<?=$counter;?>" type="text" value="<?=$server['address']; ?>" size="20"/></td>
 				<td class="vtable">
 				  <input name="server_port<?=$counter;?>" id="server_port<?=$counter;?>" type="text" value="<?=$server['port']; ?>" size="5"/></td>
 				<td class="vtable">
@@ -355,12 +358,14 @@ row_helper();
 				  <input name="server_weight<?=$counter;?>" id="server_weight<?=$counter;?>" type="text" value="<?=$server['weight']; ?>" size="5"/></td>
 				<td class="vtable">
 				<select name="server_status<?=$counter;?>" id="server_status<?=$counter;?>">
-				  <option value="active"  <?php if($server['status']=='active') echo "SELECTED";?>>active</option>
+				  <option value="active" <?php if($server['status']=='active') echo "SELECTED";?>>active</option>
 				  <option value="backup" <?php  if($server['status']=='backup') echo "SELECTED";?>>backup</option>
 				  <option value="disabled" <?php  if($server['status']=='disabled') echo "SELECTED";?>>disabled</option>
 				  <option value="inactive" <?php  if($server['status']=='inactive') echo "SELECTED";?>>inactive</option>
 				</select>
 				</td>
+				<td class="vtable">
+				  <input name="server_advanced<?=$counter;?>" id="server_advanced<?=$counter;?>" type="text" value="<?=htmlspecialchars($server['advanced']); ?>" size="20"/></td>
 				<td class="list">
 			         <table border="0" cellspacing="0" cellpadding="1"><tr>
 			         <td valign="middle">

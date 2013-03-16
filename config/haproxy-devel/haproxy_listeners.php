@@ -50,13 +50,10 @@ if ($_POST) {
 		$retval = haproxy_configure();
 		config_unlock();
 
-		$result = haproxy_check_writtenconfig_error();
+		$result = haproxy_check_writtenconfig_error($messages);
+		$savemsg = $messages;
 		if ($result)
-			$savemsg = gettext($result);
-		else {
-			$savemsg = get_std_save_message($retval);
 			unlink_if_exists($d_haproxyconfdirty_path);
-		}
 	}
 } else {
 	$result = haproxy_check_config($retval);
@@ -96,7 +93,7 @@ include("head.inc");
 <?php if ($input_errors) print_input_errors($input_errors); ?>
 <?php if ($savemsg) print_info_box($savemsg); ?>
 <?php if (file_exists($d_haproxyconfdirty_path)): ?><p>
-<?php print_info_box_np("The virtual server configuration has been changed.<br>You must apply the changes in order for them to take effect.");?><br>
+<?php print_info_box_np("The haproxy configuration has been changed.<br>You must apply the changes in order for them to take effect.");?><br>
 <?php endif; ?>
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
   <tr><td class="tabnavtbl">
@@ -161,6 +158,15 @@ include("head.inc");
 					$cert = lookup_cert($backend['ssloffloadcert']);?>
 					<img src="<?=$certimg;?>" alt="SSL offloading" title="SSL offloading cert: '<?=$cert['descr'];?>'" border="0" height="16" width="16" />
 				<? endif;?>
+				<?
+				$acls = get_frontent_acls($backend);
+				$isadvset = "";
+				foreach ($acls as $acl) {
+					$isadvset .= "&#10;" . $acl['descr'];
+				}
+				if ($isadvset) 
+					echo "<img src=\"./themes/{$g['theme']}/images/icons/icon_advanced.gif\" title=\"" . gettext("advanced settings set") . ": {$isadvset}\" border=\"0\">";
+				?>
 			  </td>
 			  <td class="listlr" ondblclick="document.location='haproxy_listeners_edit.php?id=<?=$backendname;?>';">
 				<?=$backend['name'];?>
