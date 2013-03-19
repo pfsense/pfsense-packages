@@ -320,11 +320,11 @@ function bgpd_validate_group() {
 	if ($_POST['name'] == "")
 		$input_errors[] = "You must enter a name.";
 
-	$_POST['name'] = remove_bad_chars($_POST['name']);
+	$_POST['name'] = openbgpd_remove_bad_chars($_POST['name']);
 
 }
 
-function remove_bad_chars($string) {
+function openbgpd_remove_bad_chars($string) {
 	return preg_replace('/[^a-z|_|0-9]/i','',$string);
 }
 
