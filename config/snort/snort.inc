@@ -1855,7 +1855,8 @@ function snort_filter_preproc_rules($snortcfg, &$active_rules) {
 	 ***************************************************/
 	foreach ($active_rules as $k1 => $rulem) {
 		foreach ($rulem as $k2 => $v) {
-			if ($v['disabled'] == 0)
+			/* If rule is already disabled, skip it. */
+			if ($v['disabled'] == 1)
 				continue;
 			foreach ($rule_opts_preprocs as $opt => $preproc) {
 				$pcre = "/\s*\b" . $opt . "/i";
