@@ -629,6 +629,14 @@ function squid_resync_general() {
 		if($real_ifaces[$i][0]) {
 			$conf .= "http_port {$real_ifaces[$i][0]}:$port\n";
 		}
+                // XXX: bind on Virtual IP too.
+                if($config['virtualip']['vip']) {
+                        foreach($config['virtualip']['vip'] as $vip) {
+                                if($vip['interface'] == $iface) {
+                                        $conf .= "http_port {$vip['subnet']}:$port\n";
+                                }
+                        }
+                }
 	}
 	if (($settings['transparent_proxy'] == 'on')) {
 		$conf .= "http_port 127.0.0.1:" . $settings['proxy_port'] . " transparent\n";
