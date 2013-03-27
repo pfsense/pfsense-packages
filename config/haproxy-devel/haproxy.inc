@@ -360,11 +360,11 @@ function write_backend($fd, $name, $pool, $frontend) {
 
 	if(!$pool['connection_timeout'])
 		$pool['connection_timeout'] = 30000;
-	fwrite ($fd, "\tcontimeout\t\t" . $pool['connection_timeout'] . "\n");
+	fwrite ($fd, "\ttimeout connect\t\t" . $pool['connection_timeout'] . "\n");
 
 	if(!$pool['server_timeout'])
 		$pool['server_timeout'] = 30000;
-	fwrite ($fd, "\tsrvtimeout\t\t" . $pool['server_timeout'] . "\n");
+	fwrite ($fd, "\ttimeout server\t\t" . $pool['server_timeout'] . "\n");
 
 	if(!$pool['retries'])
 		$pool['retries'] = 3;
@@ -375,10 +375,13 @@ function write_backend($fd, $name, $pool, $frontend) {
 		if($pool['stats_uri'])
 			fwrite ($fd, "\tstats\t\t\turi ".$pool['stats_uri']."\n");
 		if($pool['stats_realm'])
-			fwrite ($fd, "\tstats\t\t\trealm " . $pool['stats_realm'] . "\n");
+			fwrite ($fd, "\tstats\t\t\trealm " . haproxy_escapestring($pool['stats_realm']) . "\n");
 		else 
 			fwrite ($fd, "\tstats\t\t\trealm .\n");
-		fwrite ($fd, "\tstats\t\t\tauth " . $pool['stats_username'].":". $pool['stats_password']."\n");
+		fwrite ($fd, "\tstats\t\t\tauth " . haproxy_escapestring($pool['stats_username']).":". haproxy_escapestring($pool['stats_password'])."\n");
+		
+		if($pool['stats_admin']=='yes')
+			fwrite ($fd, "\tstats\t\t\tadmin if TRUE" . "\n");
 		
 		if($pool['stats_node_enabled']=='yes')
 			fwrite ($fd, "\tstats\t\t\tshow-node " . $pool['stats_node'] . "\n");
@@ -477,8 +480,6 @@ function haproxy_writeconf() {
 
 	if(is_array($a_global)) {
 		fwrite ($fd, "global\n");
-		if($a_global['advanced'])
-			fwrite ($fd, "\t" . base64_decode($a_global['advanced']) . "\n");
 		fwrite ($fd, "\tmaxconn\t\t\t".$a_global['maxconn']."\n");
 		if($a_global['remotesyslog'])
 			fwrite ($fd, "\tlog\t\t\t{$a_global['remotesyslog']}\t{$a_global['logfacility']}\t{$a_global['loglevel']}\n");
@@ -488,10 +489,18 @@ function haproxy_writeconf() {
 		if($a_global['nbproc'])
 			$numprocs = $a_global['nbproc'];
 		else 
-			$numprocs = trim(`/sbin/sysctl kern.smp.cpus | cut -d" " -f2`);			
+			$numprocs ="1";
 		fwrite ($fd, "\tnbproc\t\t\t$numprocs\n");
 		fwrite ($fd, "\tchroot\t\t\t/var/empty\n");
 		fwrite ($fd, "\tdaemon\n");
+		
+		// Keep the advanced options on the bottom of the global settings, to allow additional sections to be easely added
+		if($a_global['advanced']) {
+			$adv = explode("\n", base64_decode($a_global['advanced']));
+			foreach($adv as $adv_line) {
+				fwrite($fd, "\t" . $adv_line . "\n");
+			}
+		}
 		fwrite ($fd, "\n");
 	}
 
@@ -548,6 +557,7 @@ function haproxy_writeconf() {
 				$b['client_timeout'] = $backend['client_timeout'];
 				$b['advanced'] = $backend['advanced'];
 				$b['ssloffload'] = $backend['ssloffload'];
+				$b['advanced_bind'] = $backend['advanced_bind'];
 			}
 			
 			if ($ssl_crt != "") {
@@ -577,6 +587,7 @@ function haproxy_writeconf() {
 			$portss = "{$bind['port']},";
 			$ports = split(",", $portss);
 			$ssl_info = $bind['ssl_info'];
+			$advanced_bind = $bind['advanced_bind'];
 			// Initialize variable
 			$listenip = "";
 			
@@ -584,11 +595,11 @@ function haproxy_writeconf() {
 			foreach($ports as $port) {
 				if($port) {
 					if($bind['extaddr'] == "any") 
-						$listenip .=  "\tbind\t\t\t0.0.0.0:{$port} {$ssl_info}\n";
+						$listenip .=  "\tbind\t\t\t0.0.0.0:{$port} {$ssl_info} {$advanced_bind}\n";
 					elseif($bind['extaddr']) 
-						$listenip .=  "\tbind\t\t\t{$bind['extaddr']}:{$port} {$ssl_info}\n";	
+						$listenip .=  "\tbind\t\t\t{$bind['extaddr']}:{$port} {$ssl_info} {$advanced_bind}\n";	
 					else 
-						$listenip .= "\tbind\t\t\t" . get_current_wan_address('wan') . ":{$port} {$ssl_info}\n";
+						$listenip .= "\tbind\t\t\t" . get_current_wan_address('wan') . ":{$port} {$ssl_info} {$advanced_bind}\n";
 				}
 			}
 			
@@ -632,7 +643,7 @@ function haproxy_writeconf() {
 			if(!$bind['client_timeout'])
 				$bind['client_timeout'] = 30000;
 			
-			fwrite ($fd, "\tclitimeout\t\t" . $bind['client_timeout'] . "\n");
+			fwrite ($fd, "\ttimeout client\t\t" . $bind['client_timeout'] . "\n");
 
 	
 			// Combine the rest of the listener configs
@@ -1026,9 +1037,14 @@ function phparray_to_javascriptarray_recursive($nestID, $path, $items, $nodeName
 		}
 }
 
-function phparray_to_javascriptarray($items, $javaMapName, $includeitems)
-{
+function phparray_to_javascriptarray($items, $javaMapName, $includeitems) {
 		phparray_to_javascriptarray_recursive(1,'',$items, $javaMapName, $includeitems);
+}
+
+function haproxy_escapestring($configurationsting) {
+	$result = str_replace('\\', '\\\\', $configurationsting);
+	$result = str_replace(' ', '\\ ', $result);
+	return str_replace('#', '\\#', $result);
 }
 
 ?>

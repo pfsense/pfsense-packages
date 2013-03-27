@@ -48,7 +48,7 @@ if (isset($_GET['dup']))
 	$id = $_GET['dup'];
 
 global $simplefields;
-$simplefields = array("retries","balance","connection_timeout","server_timeout", "stats_enabled","stats_username","stats_password","stats_uri","stats_realm","stats_node_enabled","stats_node","stats_desc","stats_refresh");
+$simplefields = array("retries","balance","connection_timeout","server_timeout", "stats_enabled","stats_username","stats_password","stats_uri","stats_realm","stats_admin","stats_node_enabled","stats_node","stats_desc","stats_refresh");
 
 if (isset($id) && $a_pools[$id]) {
 	$pconfig['name'] = $a_pools[$id]['name'];
@@ -97,10 +97,12 @@ if ($_POST) {
 	if ($_POST['retries'] !== "" && !is_numeric($_POST['retries']))
 		$input_errors[] = "The field 'Retries' value is not a number.";
 
-	if (preg_match("/[^a-zA-Z0-9\.\-_]/", $_POST['stats_username']))
+	// the colon ":" is invalid in the username, other than that pretty much any character can be used.
+	if (preg_match("/[^a-zA-Z0-9!-\/;-~ ]/", $_POST['stats_username']))
 		$input_errors[] = "The field 'Stats Username' contains invalid characters.";
 
-	if (preg_match("/[^a-zA-Z0-9\.\-_]/", $_POST['stats_password']))
+	// the colon ":" can also be used in the password
+	if (preg_match("/[^a-zA-Z0-9!-~ ]/", $_POST['stats_password']))
 		$input_errors[] = "The field 'Stats Password' contains invalid characters.";
 
 	/* Ensure that our pool names are unique */
@@ -256,7 +258,7 @@ row_helper();
 	rowsize[0] = "30";
 	rowname[1] = "server_address";
 	rowtype[1] = "textbox";
-	rowsize[1] = "30";
+	rowsize[1] = "20";
 	rowname[2] = "server_port";
 	rowtype[2] = "textbox";
 	rowsize[2] = "5";
@@ -269,6 +271,9 @@ row_helper();
 	rowname[5] = "server_status";
 	rowtype[5] = "select";
 	rowsize[5] = "1";
+	rowname[6] = "server_name";
+	rowtype[6] = "textbox";
+	rowsize[6] = "20";
 </script>
 <?php include("fbegin.inc"); ?>
 <?php if ($input_errors) print_input_errors($input_errors); ?>
@@ -543,14 +548,24 @@ set by the 'retries' parameter.</div>
 		<tr class="haproxy_stats_visible" align="left" id='stats_username_row' name='stats_username_row'>
 			<td width="22%" valign="top" class="vncellreq">Stats Username</td>
 			<td width="78%" class="vtable" colspan="2">
-				<input id="stats_username" name="stats_username" type="text" <?if(isset($pconfig['stats_username'])) echo "value=\"{$pconfig['stats_username']}\"";?> size="64">
+				<input id="stats_username" name="stats_username" type="text" <?if(isset($pconfig['stats_username'])) echo "value=\"".htmlspecialchars($pconfig['stats_username'])."\"";?> size="64">
 			</td>
 		</tr>
 		
 		<tr class="haproxy_stats_visible" align="left" id='stats_password_row' name='stats_password_row'>
 			<td width="22%" valign="top" class="vncellreq">Stats Password</td>
 			<td width="78%" class="vtable" colspan="2">
-				<input id="stats_password" name="stats_password" type="password" <?if(isset($pconfig['stats_password'])) echo "value=\"{$pconfig['stats_password']}\"";?> size="64">
+				<input id="stats_password" name="stats_password" type="password" <?
+					if(isset($pconfig['stats_password'])) 
+						echo "value=\"".htmlspecialchars($pconfig['stats_password'])."\"";
+					?> size="64">
+				<br/>
+			</td>
+		</tr>
+		<tr class="haproxy_stats_visible" align="left" id='stats_node_admin_row' name='stats_node_enabled_row'>
+			<td width="22%" valign="top" class="vncell">Stats Admin</td>
+			<td width="78%" class="vtable" colspan="2">
+				<input id="stats_admin" name="stats_admin" type="checkbox" value="yes" <?php if ($pconfig['stats_admin']=='yes') echo "checked"; ?>>
 				<br/>
 			</td>
 		</tr>
@@ -600,7 +615,7 @@ set by the 'retries' parameter.</div>
 <br>
 <?php include("fend.inc"); ?>
 <script type="text/javascript">
-	field_counter_js = 6;
+	field_counter_js = 7;
 	rows = 1;
 	totalrows =  <?php echo $counter; ?>;
 	loaded =  <?php echo $counter; ?>;
