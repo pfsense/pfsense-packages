@@ -144,7 +144,7 @@ $a_pools = &$config['installedpackages']['haproxy']['ha_pools']['item'];
 
 global $simplefields;
 $simplefields = array('name','desc','status','secondary','primary_frontend','type','forwardfor','httpclose','extaddr','backend_serverpool',
-	'max_connections','client_timeout','port','ssloffloadcert','dcertadv','ssloffload','ssloffloadacl');
+	'max_connections','client_timeout','port','ssloffloadcert','dcertadv','ssloffload','ssloffloadacl','advanced_bind');
 
 if (isset($_POST['id']))
 	$id = $_POST['id'];
@@ -708,9 +708,17 @@ include("head.inc");
 			</td>
 		</tr>
 		<tr align="left">
+			<td width="22%" valign="top" class="vncell">Bind pass thru</td>
+			<td width="78%" class="vtable" colspan="2">
+				<input name="advanced_bind" type="text" <?if(isset($pconfig['advanced_bind'])) echo "value=\"".htmlspecialchars($pconfig['advanced_bind'])."\"";?> size="64">
+				<br/>
+				NOTE: paste text into this box that you would like to pass behind the bind option.
+			</td>
+		</tr>
+		<tr align="left">
 			<td width="22%" valign="top" class="vncell">Advanced pass thru</td>
 			<td width="78%" class="vtable" colspan="2">
-				<textarea name='advanced' rows="4" cols="70" id='advanced'><?php echo $pconfig['advanced']; ?></textarea>
+				<textarea name='advanced' rows="4" cols="70" id='advanced'><?php echo htmlspecialchars($pconfig['advanced']); ?></textarea>
 				<br/>
 				NOTE: paste text into this box that you would like to pass thru.
 			</td>
@@ -752,7 +760,7 @@ include("head.inc");
 				<input id="ssloffloadacl" name="ssloffloadacl" type="checkbox" value="yes" <?php if ($pconfig['ssloffloadacl']=='yes') echo "checked";?> onclick="updatevisibility();">Add ACL for certificate CommonName.</input>
 			</td>
 		</tr>
-		<tr class="haproxy_ssloffloading_enabled" align="left">
+		<tr class="haproxy_ssloffloading_enabled haproxy_primary" align="left">
 			<td width="22%" valign="top" class="vncell">Advanced ssl options</td>
 			<td width="78%" class="vtable" colspan="2">
 				<input type='text' name='dcertadv' size="64" id='dcertadv' <?if(isset($pconfig['dcertadv'])) echo "value=\"{$pconfig['dcertadv']}\"";?> size="10" maxlength="64">
