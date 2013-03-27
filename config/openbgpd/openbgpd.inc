@@ -122,11 +122,8 @@ function openbgpd_install_conf() {
                 $conffile .= "		tcp md5sig password {$neighbor['md5sigpass']}\n";
 	      }
               if($neighbor['md5sigkey']) {
-		$hex = "";
-		for ($i = 0; $i < strlen($neighbor['md5sigkey']); $i++)
-			$hex .= dechex(ord($neighbor['md5sigkey'][$i]));
-		$setkeycf .= "add {$openbgpd_conf['listenip']} {$neighbor['neighbor']} tcp 0x1000 -A tcp-md5 0x{$hex};\n";
-                $conffile .= "		tcp md5sig key {$hex}\n";
+		$setkeycf .= "add {$openbgpd_conf['listenip']} {$neighbor['neighbor']} tcp 0x1000 -A tcp-md5 0x{$neighbor['md5sigkey']};\n";
+                $conffile .= "		tcp md5sig key {$neighbor['md5sigkey']}\n";
 	      }
               foreach($neighbor['row'] as $row) {
                 $conffile .= "		{$row['parameters']} {$row['parmvalue']} \n";
@@ -152,11 +149,8 @@ function openbgpd_install_conf() {
 		$conffile .= "	tcp md5sig password {$neighbor['md5sigpass']}\n";
 	  }
 	  if ($neighbor['md5sigkey']) {
-		$hex = "";
-		for ($i = 0; $i < strlen($neighbor['md5sigkey']); $i++)
-			$hex .= dechex(ord($neighbor['md5sigkey'][$i]));
-		$setkeycf .= "add {$openbgpd_conf['listenip']} {$neighbor['neighbor']} tcp 0x1000 -A tcp-md5 0x{$hex};\n";
-		$conffile .= "	tcp md5sig key {$hex}\n";
+		$setkeycf .= "add {$openbgpd_conf['listenip']} {$neighbor['neighbor']} tcp 0x1000 -A tcp-md5 0x{$neighbor['md5sigkey']};\n";
+		$conffile .= "	tcp md5sig key {$neighbor['md5sigkey']}\n";
 	  }
           $used_this_item = true;
           foreach($neighbor['row'] as $row) {
