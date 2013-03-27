@@ -227,7 +227,9 @@ function enable_change(enable_change) {
 				<td class="vtable">
 					<input name="nbproc" type="text" class="formfld" id="nbproc" size="18" value="<?=htmlspecialchars($pconfig['nbproc']);?>">
 					<br/>
-					Defaults to number of cores/processors installed if left blank (<?php echo trim(`/sbin/sysctl kern.smp.cpus | cut -d" " -f2`); ?> detected).
+					Defaults to 1 if left blank (<?php echo trim(`/sbin/sysctl kern.smp.cpus | cut -d" " -f2`); ?> CPU core(s) detected).<br/>
+					Note : Consider leaving this value empty or 1  because in multi-process mode (nbproc > 1) memory is not shared between the processes, which could result in random behaviours for several options like ACL's, sticky connections and some others.<br/>
+					For more information about the <b>"nbproc"</b> option please see <b><a href='http://haproxy.1wt.eu/download/1.5/doc/configuration.txt' target='_new'>HAProxy Documentation</a> </b>
 				</td>
 			</tr>
 			<tr>
@@ -235,7 +237,8 @@ function enable_change(enable_change) {
 					Remote syslog host
 				</td>
 				<td class="vtable">
-					<input name="remotesyslog" type="text" class="formfld" id="remotesyslog" size="18" value="<?=htmlspecialchars($pconfig['remotesyslog']);?>">
+					<input name="remotesyslog" type="text" class="formfld" id="remotesyslog" size="18" value="<?=htmlspecialchars($pconfig['remotesyslog']);?>"><br/>
+					To log to the local pfSense systemlog fill the host with the value <b>/var/run/log</b>, however if a lot of messages are generated logging is likely to be incomplete. (Also currently no informational logging gets shown in the systemlog.)
 				</td>
 			</tr>
 			<tr>
