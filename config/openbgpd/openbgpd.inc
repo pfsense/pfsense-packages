@@ -122,8 +122,11 @@ function openbgpd_install_conf() {
                 $conffile .= "		tcp md5sig password {$neighbor['md5sigpass']}\n";
 	      }
               if($neighbor['md5sigkey']) {
-		$setkeycf .= "add {$openbgpd_conf['listenip']} {$neighbor['neighbor']} tcp 0x1000 -A tcp-md5 0x{$neighbor['md5sigkey']};\n";
-                $conffile .= "		tcp md5sig key {$neighbor['md5sigkey']}\n";
+		$hex = "";
+		for ($i = 0; $i < strlen($neighbor['md5sigkey']); $i++)
+			$hex .= dechex(ord($neighbor['md5sigkey'][$i]));
+		$setkeycf .= "add {$openbgpd_conf['listenip']} {$neighbor['neighbor']} tcp 0x1000 -A tcp-md5 0x{$hex};\n";
+                $conffile .= "		tcp md5sig key {$hex}\n";
 	      }
               foreach($neighbor['row'] as $row) {
                 $conffile .= "		{$row['parameters']} {$row['parmvalue']} \n";
@@ -149,8 +152,11 @@ function openbgpd_install_conf() {
 		$conffile .= "	tcp md5sig password {$neighbor['md5sigpass']}\n";
 	  }
 	  if ($neighbor['md5sigkey']) {
-		$setkeycf .= "add {$openbgpd_conf['listenip']} {$neighbor['neighbor']} tcp 0x1000 -A tcp-md5 0x{$neighbor['md5sigkey']};\n";
-		$conffile .= "	tcp md5sig key {$neighbor['md5sigkey']}\n";
+		$hex = "";
+		for ($i = 0; $i < strlen($neighbor['md5sigkey']); $i++)
+			$hex .= dechex(ord($neighbor['md5sigkey'][$i]));
+		$setkeycf .= "add {$openbgpd_conf['listenip']} {$neighbor['neighbor']} tcp 0x1000 -A tcp-md5 0x{$hex};\n";
+		$conffile .= "	tcp md5sig key {$hex}\n";
 	  }
           $used_this_item = true;
           foreach($neighbor['row'] as $row) {
@@ -173,13 +179,9 @@ function openbgpd_install_conf() {
     }
   }
 	safe_mkdir($bgpd_config_base);
-	$fd = fopen("{$bgpd_config_base}/bgpd.conf", "w");
-
-  // Write out the configuration file
-	fwrite($fd, $conffile);
-
-	// Close file handle
-	fclose($fd);
+	  // Write out the configuration file
+	@file_put_contents("{$bgpd_config_base}/bgpd.conf", "w");
+	@chmod("{$bgpd_config_base}/bgpd.conf", 0666);
 
 	// Create rc.d file
 	$rc_file_stop = <<<EOF
@@ -320,11 +322,11 @@ function bgpd_validate_group() {
 	if ($_POST['name'] == "")
 		$input_errors[] = "You must enter a name.";
 
-	$_POST['name'] = openbgpd_remove_bad_chars($_POST['name']);
+	$_POST['name'] = remove_bad_chars($_POST['name']);
 
 }
 
-function openbgpd_remove_bad_chars($string) {
+function remove_bad_chars($string) {
 	return preg_replace('/[^a-z|_|0-9]/i','',$string);
 }
 
