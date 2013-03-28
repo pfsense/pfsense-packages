@@ -113,22 +113,24 @@ function openbgpd_install_conf() {
         if(is_array($openbgpd_neighbors)) {
           foreach($openbgpd_neighbors as $neighbor) {
             if($neighbor['groupname'] == $group['name']) {
-              $conffile .= "		neighbor {$neighbor['neighbor']} {\n";
-			  $conffile .= "    	 descr \"{$neighbor['descr']}\"\n";
+              $conffile .= "\tneighbor {$neighbor['neighbor']} {\n";
+			  $conffile .= "\t\tdescr \"{$neighbor['descr']}\"\n";
               if($neighbor['md5sigpass']) {
-                $conffile .= "		tcp md5sig password {$neighbor['md5sigpass']}\n";
+                $conffile .= "\t\ttcp md5sig password {$neighbor['md5sigpass']}\n";
 	      }
               if($neighbor['md5sigkey']) {
-                $conffile .= "		tcp md5sig key {$neighbor['md5sigkey']}\n";
+                $conffile .= "\t\ttcp md5sig key {$neighbor['md5sigkey']}\n";
 	      }
 		  $setlocaladdr = true;
-              foreach($neighbor['row'] as $row) {
-		if ($row['parameters'] == "local-address")
-			$setlocaladdr = false;
-                $conffile .= "		{$row['parameters']} {$row['parmvalue']} \n";
-              }
+		if (is_array($neighbor['row'])) {
+		      foreach($neighbor['row'] as $row) {
+			if ($row['parameters'] == "local-address")
+				$setlocaladdr = false;
+			$conffile .= "\t\t{$row['parameters']} {$row['parmvalue']} \n";
+		      }
+              	}
 		  if ($setlocaladdr == true)
-			$conffile .= "\tlocal-address {$openbgpd_conf['listenip']}\n";
+			$conffile .= "\t\tlocal-address {$openbgpd_conf['listenip']}\n";
               $conffile .= "}\n";
             }
           }
@@ -143,25 +145,25 @@ function openbgpd_install_conf() {
         $used_this_item = false;
         if($neighbor['groupname'] == "") {
           $conffile .= "neighbor {$neighbor['neighbor']} {\n";
-          $conffile .= "		descr \"{$neighbor['descr']}\"\n";
+          $conffile .= "\tdescr \"{$neighbor['descr']}\"\n";
 	  if  ($neighbor['md5sigpass']) {
-		$conffile .= "	tcp md5sig password {$neighbor['md5sigpass']}\n";
+		$conffile .= "\ttcp md5sig password {$neighbor['md5sigpass']}\n";
 	  }
 	  if ($neighbor['md5sigkey']) {
-		$conffile .= "	tcp md5sig key {$neighbor['md5sigkey']}\n";
+		$conffile .= "\ttcp md5sig key {$neighbor['md5sigkey']}\n";
 	  }
-          $used_this_item = true;
 	  $setlocaladdr = true;
-          foreach($neighbor['row'] as $row) {
-		if ($row['parameters'] == "local-address")
-			$setlocaladdr = false;
-            $conffile .= "	{$row['parameters']} {$row['parmvalue']} \n";
-          }
+	if (is_array($neighbor['row'])) {
+		  foreach($neighbor['row'] as $row) {
+			if ($row['parameters'] == "local-address")
+				$setlocaladdr = false;
+		    $conffile .= "\t{$row['parameters']} {$row['parmvalue']} \n";
+		  }
+	}
 	  if ($setlocaladdr == true)
 		$conffile .= "\tlocal-address {$openbgpd_conf['listenip']}\n";
         }
-		if($used_this_item)
-			$conffile .= "}\n";
+	$conffile .= "}\n";
       }
     }
 
@@ -177,7 +179,7 @@ function openbgpd_install_conf() {
   }
 	safe_mkdir($bgpd_config_base);
 	  // Write out the configuration file
-	@file_put_contents("{$bgpd_config_base}/bgpd.conf", "w");
+	@file_put_contents("{$bgpd_config_base}/bgpd.conf", $conffile);
 	@chmod("{$bgpd_config_base}/bgpd.conf", 0666);
 
 	// Create rc.d file
