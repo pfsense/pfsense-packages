@@ -121,9 +121,14 @@ function openbgpd_install_conf() {
               if($neighbor['md5sigkey']) {
                 $conffile .= "		tcp md5sig key {$neighbor['md5sigkey']}\n";
 	      }
+		  $setlocaladdr = true;
               foreach($neighbor['row'] as $row) {
+		if ($row['parameters'] == "local-address")
+			$setlocaladdr = false;
                 $conffile .= "		{$row['parameters']} {$row['parmvalue']} \n";
               }
+		  if ($setlocaladdr == true)
+			$conffile .= "\tlocal-address {$openbgpd_conf['listenip']}\n";
               $conffile .= "}\n";
             }
           }
@@ -146,9 +151,14 @@ function openbgpd_install_conf() {
 		$conffile .= "	tcp md5sig key {$neighbor['md5sigkey']}\n";
 	  }
           $used_this_item = true;
+	  $setlocaladdr = true;
           foreach($neighbor['row'] as $row) {
+		if ($row['parameters'] == "local-address")
+			$setlocaladdr = false;
             $conffile .= "	{$row['parameters']} {$row['parmvalue']} \n";
           }
+	  if ($setlocaladdr == true)
+		$conffile .= "\tlocal-address {$openbgpd_conf['listenip']}\n";
         }
 		if($used_this_item)
 			$conffile .= "}\n";
