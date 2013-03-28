@@ -29,6 +29,7 @@
 	POSSIBILITY OF SUCH DAMAGE.
 */
 
+require_once("globals.inc");
 require_once("config.inc");
 require_once("filter.inc");
 require_once("rrd.inc");
@@ -162,7 +163,7 @@ function set_mail_report_cron_jobs($a_mailreports) {
 
 include('phpmailer/class.phpmailer.php');
 
-function mail_report_send($headertext, $attachments) {
+function mail_report_send($headertext, $cmdtext, $logtext, $attachments) {
 	global $config, $g;
 
 	if (empty($config['notifications']['smtp']['ipaddress']))
@@ -191,7 +192,11 @@ function mail_report_send($headertext, $attachments) {
 	$address = $config['notifications']['smtp']['notifyemailaddress'];
 	$mail->AddAddress($address, "Report Recipient");
 	$mail->Subject = "{$config['system']['hostname']}.{$config['system']['domain']} Graph Report: {$headertext}";
-	$mail->Body .= "This is a periodic graph report from your firewall, {$config['system']['hostname']}.{$config['system']['domain']}.<br/><br/>Current report: {$headertext}\n";
+	$mail->Body .= "This is a periodic report from your firewall, {$config['system']['hostname']}.{$config['system']['domain']}.<br /><br />Current report: {$headertext}<br />\n<br />\n";
+	if (!empty($cmdtext))
+		$mail->Body .= $cmdtext;
+	if (!empty($logtext))
+		$mail->Body .= $logtext;
 	if(is_array($attachments)) {
 		foreach($attachments as $filename) {
 			$shortname = basename($filename);
@@ -1199,6 +1204,26 @@ function timeDiff($time, $opt = array()) {
 	}
 	$opt['distance'] && $str .= ($str && $opt['to'] >= $time) ? ' ago' : ' away';
 	return $str;
+}
+
+function mail_report_get_log($logfile, $tail, $grepfor) {
+	global $g, $config;
+	$logfile = "{$g['varlog_path']}/{$logfile}";
+	$logarr = "";
+	$grepline = "  ";
+	if(is_array($grepfor))
+		foreach($grepfor as $agrep)
+			$grepline .= " | grep \"$agrep\"";
+	if($config['system']['disablesyslogclog']) {
+		exec("cat {$logfile}{$grepline} | /usr/bin/tail -n {$tail}", $logarr);
+	} else {
+		if(isset($config['system']['usefifolog'])) {
+			exec("/usr/sbin/fifolog_reader {$logfile}{$grepline} | /usr/bin/tail -n {$tail}", $logarr);
+		} else {
+			exec("/usr/sbin/clog {$logfile}{$grepline}| grep -v \"CLOG\" | grep -v \"\033\" | /usr/bin/tail -n {$tail}", $logarr);
+		}
+	}
+	return($logarr);
 }
 
 ?>

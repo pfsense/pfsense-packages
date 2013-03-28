@@ -44,16 +44,13 @@ require_once("mail_reports.inc");
 /* if the rrd graphs are not enabled redirect to settings page */
 if(! isset($config['rrd']['enable'])) {
 	header("Location: status_rrd_graph_settings.php");
-	exit;
+	return;
 }
 
-$graphid = $_GET['graphid'];
-if (isset($_POST['graphid']))
-	$graphid = $_POST['graphid'];
-
-$id = $_GET['id'];
-if (isset($_POST['id']))
-	$id = $_POST['id'];
+$cmdid = $_REQUEST['cmdid'];
+$logid = $_REQUEST['logid'];
+$graphid = $_REQUEST['graphid'];
+$id = $_REQUEST['id'];
 
 if (!is_array($config['mailreports']['schedule']))
 	$config['mailreports']['schedule'] = array();
@@ -63,19 +60,40 @@ if (isset($id) && $a_mailreports[$id]) {
 	if (!is_array($a_mailreports[$id]['row']))
 		$a_mailreports[$id]['row'] = array();
 	$pconfig = $a_mailreports[$id];
+	$a_cmds = $a_mailreports[$id]['cmd']['row'];
+	$a_logs = $a_mailreports[$id]['log']['row'];
 	$a_graphs = $a_mailreports[$id]['row'];
-} else {
-	$pconfig = array();
-	$a_graphs = array();
 }
 
+if (!is_array($pconfig))
+	$pconfig = array();
+if (!is_array($a_cmds))
+	$a_cmds = array();
+if (!is_array($a_logs))
+	$a_logs = array();
+if (!is_array($a_graphs))
+	$a_graphs = array();
+
+
 if ($_GET['act'] == "del") {
-	if ($a_graphs[$graphid]) {
+	if (is_numeric($cmdid) && $a_cmds[$cmdid]) {
+		unset($a_cmds[$cmdid]);
+		$a_mailreports[$id]['cmd']['row'] = $a_cmds;
+		write_config();
+		header("Location: status_mail_report_edit.php?id={$id}");
+		return;
+	} elseif (is_numeric($logid) && $a_logs[$logid]) {
+		unset($a_logs[$logid]);
+		$a_mailreports[$id]['log']['row'] = $a_logs;
+		write_config();
+		header("Location: status_mail_report_edit.php?id={$id}");
+		return;
+	} elseif (is_numeric($graphid) && $a_graphs[$graphid]) {
 		unset($a_graphs[$graphid]);
 		$a_mailreports[$id]['row'] = $a_graphs;
 		write_config();
 		header("Location: status_mail_report_edit.php?id={$id}");
-		exit;
+		return;
 	}
 }
 
@@ -97,7 +115,7 @@ if ($_POST) {
 	if ($_POST['Submit'] == "Send Now") {
 		mwexec_bg("/usr/local/bin/mail_reports_generate.php {$id}");
 		header("Location: status_mail_report_edit.php?id={$id}");
-		exit;
+		return;
 	}
 	$friendly = "";
 
@@ -124,7 +142,9 @@ if ($_POST) {
 			unset($pconfig['dayofmonth']);
 	}
 
-	// Copy graphs back into the schedule.
+	// Copy back into the schedule.
+	$pconfig['cmd']["row"] = $a_cmds;
+	$pconfig['log']["row"] = $a_logs;
 	$pconfig["row"] = $a_graphs;
 
 	$pconfig['schedule_friendly'] = $friendly;
@@ -139,7 +159,7 @@ if ($_POST) {
 	write_config();
 	configure_cron();
 	header("Location: status_mail_report.php");
-	exit;
+	return;
 }
 
 $pgtitle = array(gettext("Status"),gettext("Edit Mail Reports"));
@@ -220,6 +240,78 @@ include("head.inc");
 			<td></td>
 		</tr>
 		<tr>
+			<td class="listtopic" colspan="4">Report Commands</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td width="30%" class="listhdr"><?=gettext("Name");?></td>
+			<td width="60%" colspan="3" class="listhdr"><?=gettext("Command");?></td>
+			<td width="10%" class="list">
+			<?php if (isset($id) && $a_mailreports[$id]): ?>
+				<a href="status_mail_report_add_cmd.php?reportid=<?php echo $id ;?>"><img src="./themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif" width="17" height="17" border="0"></a>
+			</td>
+			<?php else: ?>
+			</td>
+				<tr><td colspan="5" align="center"><br/>Save the report first, then items may be added.<br/></td></tr>
+			<?php endif; ?>
+		</tr>
+		<?php $i = 0; foreach ($a_cmds as $cmd): ?>
+		<tr ondblclick="document.location='status_mail_report_add_cmd.php?reportid=<?php echo $id ;?>&amp;id=<?=$i;?>'">
+			<td class="listlr"><?php echo htmlspecialchars($cmd['descr']); ?></td>
+			<td colspan="3" class="listlr"><?php echo htmlspecialchars($cmd['detail']); ?></td>
+			<td valign="middle" nowrap class="list">
+				<a href="status_mail_report_add_cmd.php?reportid=<?php echo $id ;?>&id=<?=$i;?>"><img src="./themes/<?= $g['theme']; ?>/images/icons/icon_e.gif" width="17" height="17" border="0"></a>
+				&nbsp;
+				<a href="status_mail_report_edit.php?act=del&id=<?php echo $id ;?>&cmdid=<?=$i;?>" onclick="return confirm('<?=gettext("Do you really want to delete this entry?");?>')"><img src="./themes/<?= $g['theme']; ?>/images/icons/icon_x.gif" width="17" height="17" border="0"></a>
+			</td>
+		</tr>
+		<?php $i++; endforeach; ?>
+		<tr>
+			<td class="list" colspan="4"></td>
+			<td class="list">
+			<?php if (isset($id) && $a_mailreports[$id]): ?>
+				<a href="status_mail_report_add_cmd.php?reportid=<?php echo $id ;?>"><img src="./themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif" width="17" height="17" border="0"></a>
+			<?php endif; ?>
+			</td>
+		</tr>
+		<tr>
+			<td class="listtopic" colspan="4">Report Logs</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td width="30%" class="listhdr"><?=gettext("Log");?></td>
+			<td width="20%" class="listhdr"><?=gettext("# Rows");?></td>
+			<td width="40%" colspan="2" class="listhdr"><?=gettext("Filter");?></td>
+			<td width="10%" class="list">
+			<?php if (isset($id) && $a_mailreports[$id]): ?>
+				<a href="status_mail_report_add_log.php?reportid=<?php echo $id ;?>"><img src="./themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif" width="17" height="17" border="0"></a>
+			</td>
+			<?php else: ?>
+			</td>
+				<tr><td colspan="5" align="center"><br/>Save the report first, then items may be added.<br/></td></tr>
+			<?php endif; ?>
+		</tr>
+		<?php $i = 0; foreach ($a_logs as $log): ?>
+		<tr ondblclick="document.location='status_mail_report_add_log.php?reportid=<?php echo $id ;?>&amp;id=<?=$i;?>'">
+			<td class="listlr"><?php echo $log['logfile']; ?></td>
+			<td class="listlr"><?php echo $log['lines']; ?></td>
+			<td colspan="2" class="listlr"><?php echo $log['detail']; ?></td>
+			<td valign="middle" nowrap class="list">
+				<a href="status_mail_report_add_cmd.php?reportid=<?php echo $id ;?>&id=<?=$i;?>"><img src="./themes/<?= $g['theme']; ?>/images/icons/icon_e.gif" width="17" height="17" border="0"></a>
+				&nbsp;
+				<a href="status_mail_report_edit.php?act=del&id=<?php echo $id ;?>&logid=<?=$i;?>" onclick="return confirm('<?=gettext("Do you really want to delete this entry?");?>')"><img src="./themes/<?= $g['theme']; ?>/images/icons/icon_x.gif" width="17" height="17" border="0"></a>
+			</td>
+		</tr>
+		<?php $i++; endforeach; ?>
+		<tr>
+			<td class="list" colspan="4"></td>
+			<td class="list">
+			<?php if (isset($id) && $a_mailreports[$id]): ?>
+				<a href="status_mail_report_add_log.php?reportid=<?php echo $id ;?>"><img src="./themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif" width="17" height="17" border="0"></a>
+			<?php endif; ?>
+			</td>
+		</tr>
+		<tr>
 			<td class="listtopic" colspan="4">Report Graphs</td>
 			<td></td>
 		</tr>
@@ -234,7 +326,7 @@ include("head.inc");
 			</td>
 			<?php else: ?>
 			</td>
-				<tr><td colspan="5" align="center"><br/>Save the report first, then you may add graphs.<br/></td></tr>
+				<tr><td colspan="5" align="center"><br/>Save the report first, then items may be added.<br/></td></tr>
 			<?php endif; ?>
 		</tr>
 		<?php $i = 0; foreach ($a_graphs as $graph): 
@@ -246,7 +338,7 @@ include("head.inc");
 			}
 			$prettyprint = ucwords(implode(" :: ", $optionc));
 		?>
-		<tr ondblclick="document.location='status_mail_report_edit.php?id=<?=$i;?>'">
+		<tr ondblclick="document.location='status_mail_report_add_graph.php?reportid=<?php echo $id ;?>&amp;id=<?=$i;?>'">
 			<td class="listlr"><?php echo $prettyprint; ?></td>
 			<td class="listlr"><?php echo $graph['style']; ?></td>
 			<td class="listlr"><?php echo $graph['timespan']; ?></td>

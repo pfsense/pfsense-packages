@@ -53,17 +53,42 @@ if (!$config['mailreports']['schedule'][$id])
 	exit;
 
 $thisreport = $config['mailreports']['schedule'][$id];
+$cmds = $thisreport['cmd']['row'];
+$logs = $thisreport['log']['row'];
 $graphs = $thisreport['row'];
 
-// No graphs on the report, bail!
-if (!is_array($graphs) || !(count($graphs) > 0))
-	exit;
+// If there is nothing to do, bail!
+if ((!is_array($cmds) || !(count($cmds) > 0))
+	&& (!is_array($logs) || !(count($logs) > 0))
+	&& (!is_array($graphs) || !(count($graphs) > 0)))
+	return;
 
 // Print report header
 
+// Print command output
+$cmdtext = "";
+foreach ($cmds as $cmd) {
+	$output = "";
+	$cmdtext .= "Command output for {$cmd['descr']}<br />\n";
+	exec($cmd['detail'], $output);
+	$cmdtext .= "<pre>\n";
+	$cmdtext .= implode("\n", $output);
+	$cmdtext .= "\n</pre>";
+}
+
+// Print log output
+$logtext = "";
+foreach ($logs as $log) {
+	$lines = empty($log['lines']) ? 50 : $log['lines'];
+	$filter = empty($log['detail']) ? null : array($log['detail']);
+	$logtext .= "Log output for {$log['logfile']}<br />\n";
+	$logtext .= "<pre>\n";
+	$logtext .= implode("\n", mail_report_get_log($log['logfile'], $lines, $filter));
+	$logtext .= "\n</pre>";
+}
+
 // For each graph, print a header and the graph
 $attach = array();
-$idx=0;
 foreach ($graphs as $thisgraph) {
 	$dates = get_dates($thisgraph['period'], $thisgraph['timespan']);
 	$start = $dates['start'];
@@ -71,6 +96,6 @@ foreach ($graphs as $thisgraph) {
 	$attach[] = mail_report_generate_graph($thisgraph['graph'], $thisgraph['style'], $thisgraph['timespan'], $start, $end);
 }
 
-mail_report_send($thisreport['descr'], $attach);
+mail_report_send($thisreport['descr'], $cmdtext, $logtext, $attach);
 
 ?>

@@ -74,11 +74,13 @@ include("head.inc");
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
 	<tr><td><div id="mainarea">
 	<table class="tabcont" width="100%" border="0" cellpadding="0" cellspacing="0">
-		<tr><td colspan="4">Here you can define a list of reports, containing multiple RRD graphs, to be sent by e-mail. </td></tr>
+		<tr><td colspan="4">Here you can define a list of reports to be sent by e-mail. </td></tr>
 		<tr><td>&nbsp;</td></tr>
 		<tr>
-			<td width="45%" class="listhdr"><?=gettext("Description");?></td>
-			<td width="35%" class="listhdr"><?=gettext("Schedule");?></td>
+			<td width="35%" class="listhdr"><?=gettext("Description");?></td>
+			<td width="25%" class="listhdr"><?=gettext("Schedule");?></td>
+			<td width="10%" class="listhdr"><?=gettext("Cmds");?></td>
+			<td width="10%" class="listhdr"><?=gettext("Logs");?></td>
 			<td width="10%" class="listhdr"><?=gettext("Graphs");?></td>
 			<td width="10%" class="list"><a href="status_mail_report_edit.php"><img src="./themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif" width="17" height="17" border="0"></a></td>
 		</tr>
@@ -86,6 +88,8 @@ include("head.inc");
 		<tr ondblclick="document.location='status_mail_report_edit.php?id=<?=$i;?>'">
 			<td class="listlr"><?php echo $mailreport['descr']; ?></td>
 			<td class="listlr"><?php echo $mailreport['schedule_friendly']; ?></td>
+			<td class="listlr"><?php echo count($mailreport['cmd']['row']); ?></td>
+			<td class="listlr"><?php echo count($mailreport['log']['row']); ?></td>
 			<td class="listlr"><?php echo count($mailreport['row']); ?></td>
 			<td valign="middle" nowrap class="list">
 				<a href="status_mail_report_edit.php?id=<?=$i;?>"><img src="./themes/<?= $g['theme']; ?>/images/icons/icon_e.gif" width="17" height="17" border="0"></a>
@@ -95,7 +99,7 @@ include("head.inc");
 		</tr>
 		<?php $i++; endforeach; ?>
 		<tr>
-			<td class="list" colspan="3"></td>
+			<td class="list" colspan="5"></td>
 			<td class="list"><a href="status_mail_report_edit.php"><img src="./themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif" width="17" height="17" border="0"></a></td>
 		</tr>
 		<tr>

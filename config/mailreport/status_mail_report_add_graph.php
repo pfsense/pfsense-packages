@@ -50,13 +50,8 @@ if(! isset($config['rrd']['enable'])) {
 	header("Location: status_rrd_graph_settings.php");
 }
 
-$reportid = $_GET['reportid'];
-if (isset($_POST['reportid']))
-	$reportid = $_POST['reportid'];
-
-$id = $_GET['id'];
-if (isset($_POST['id']))
-	$id = $_POST['id'];
+$reportid = $_REQUEST['reportid'];
+$id = $_REQUEST['id'];
 
 if (!is_array($config['mailreports']['schedule']))
 	$config['mailreports']['schedule'] = array();
@@ -65,7 +60,7 @@ $a_mailreports = &$config['mailreports']['schedule'];
 
 if (!isset($reportid) || !isset($a_mailreports[$reportid])) {
 	header("Location: status_mail_report.php");
-	exit;
+	return;
 }
 
 if (!is_array($a_mailreports[$reportid]['row']))
@@ -80,7 +75,7 @@ if (isset($id) && $a_graphs[$id]) {
 
 if (isset($id) && !($a_graphs[$id])) {
 	header("Location: status_mail_report_edit.php?id={$reportid}");
-	exit;
+	return;
 }
 
 
@@ -159,7 +154,7 @@ if ($_POST) {
 
 	write_config();
 	header("Location: status_mail_report_edit.php?id={$reportid}");
-	exit;
+	return;
 }
 
 
