@@ -79,7 +79,6 @@ function openbgpd_install_conf() {
       $openbgpd_neighbors = &$config['installedpackages']['openbgpdneighbors']['config'];
 
     $conffile = "# This file was created by the package manager.  Do not edit!\n\n";
-    $setkeycf = "";
 
     // Setup AS #
     if($openbgpd_conf['asnum'])
@@ -116,13 +115,10 @@ function openbgpd_install_conf() {
             if($neighbor['groupname'] == $group['name']) {
               $conffile .= "		neighbor {$neighbor['neighbor']} {\n";
 			  $conffile .= "    	 descr \"{$neighbor['descr']}\"\n";
-	      $setkeycf .= "delete {$openbgpd_conf['listenip']} {$neighbor['neighbor']} tcp 0x1000;\n";
               if($neighbor['md5sigpass']) {
-		$setkeycf .= "add {$openbgpd_conf['listenip']} {$neighbor['neighbor']} tcp 0x1000 -A tcp-md5 \"{$neighbor['md5sigpass']}\";\n";
                 $conffile .= "		tcp md5sig password {$neighbor['md5sigpass']}\n";
 	      }
               if($neighbor['md5sigkey']) {
-		$setkeycf .= "add {$openbgpd_conf['listenip']} {$neighbor['neighbor']} tcp 0x1000 -A tcp-md5 0x{$neighbor['md5sigkey']};\n";
                 $conffile .= "		tcp md5sig key {$neighbor['md5sigkey']}\n";
 	      }
               foreach($neighbor['row'] as $row) {
@@ -143,13 +139,10 @@ function openbgpd_install_conf() {
         if($neighbor['groupname'] == "") {
           $conffile .= "neighbor {$neighbor['neighbor']} {\n";
           $conffile .= "		descr \"{$neighbor['descr']}\"\n";
-	  $setkeycf .= "delete {$openbgpd_conf['listenip']} {$neighbor['neighbor']} tcp 0x1000;\n";
 	  if  ($neighbor['md5sigpass']) {
-		$setkeycf .= "add {$openbgpd_conf['listenip']} {$neighbor['neighbor']} tcp 0x1000 -A tcp-md5 \"{$neighbor['md5sigpass']}\";\n";
 		$conffile .= "	tcp md5sig password {$neighbor['md5sigpass']}\n";
 	  }
 	  if ($neighbor['md5sigkey']) {
-		$setkeycf .= "add {$openbgpd_conf['listenip']} {$neighbor['neighbor']} tcp 0x1000 -A tcp-md5 0x{$neighbor['md5sigkey']};\n";
 		$conffile .= "	tcp md5sig key {$neighbor['md5sigkey']}\n";
 	  }
           $used_this_item = true;
@@ -179,7 +172,7 @@ function openbgpd_install_conf() {
 
 	// Create rc.d file
 	$rc_file_stop = <<<EOF
-killall -9 bgpd
+killall -TERM bgpd
 EOF;
 	$rc_file_start = <<<EOF
 
@@ -191,12 +184,14 @@ if [ `pw usershow {$pkg_login} 2>&1 | grep -c "pw: no such user"` -gt 0 ]; then
 fi
 
 /bin/mkdir -p {$bgpd_config_base}
-chmod u+rw,go-rw {$bgpd_config_base}/bgpd.conf
 /usr/sbin/chown -R root:wheel {$bgpd_config_base}
+/bin/chmod u+rw,go-rw {$bgpd_config_base}/bgpd.conf
 
 NUMBGPD=`ps auxw | grep -c '[b]gpd.*parent'`
 if [ \${NUMBGPD} -lt 1 ] ; then
 	{$pkg_bin}/bgpd -f {$bgpd_config_base}/bgpd.conf
+else
+	{$pkg_bin}/bgpctl reload
 fi
 EOF;
 	write_rcfile(array(
@@ -206,17 +201,11 @@ EOF;
 		)
 	);
 
-	// TCP-MD5 support on freebsd. See tcp(5) for more
-	$fd = fopen("{$g['tmp_path']}/bgpdsetkey.conf", "w");
-	fwrite($fd, $setkeycf );
-	fclose($fd);
-	exec("setkey -f {$g['tmp_path']}/bgpdsetkey.conf");
-
 	// bgpd process running?  if so reload, else start.
 	if(is_openbgpd_running() == true) {
-		exec("bgpctl reload");
+		exec("{$pkg_bin}/bgpctl reload");
 	} else {
-		exec("bgpd");
+		exec("{$pkg_bin}/bgpd -f {$bgpd_config_base}/bgpd.conf");
 	}
 
 	conf_mount_ro();
@@ -245,21 +234,6 @@ function openbgpd_put_raw_config($conffile) {
 
 function deinstall_openbgpd() {
 	global $config, $g;
-
-	if($config['installedpackages']['openbgpd']['config'])
-		$openbgpd_conf = &$config['installedpackages']['openbgpd']['config'][0];
-	if($config['installedpackages']['openbgpdneighbors']['config'])
-		$openbgpd_neighbors = &$config['installedpackages']['openbgpdneighbors']['config'];
-	$setkeycf = "";
-	if(is_array($openbgpd_neighbors)) {
-		foreach($openbgpd_neighbors as $neighbor)
-			$setkeycf .= "delete {$openbgpd_conf['listenip']} {$neighbor['neighbor']} tcp 0x1000;\n";
-	}
-	// Clear all SADB entries used.
-	$fd = fopen("{$g['tmp_path']}/bgpdsetkey.conf", "w");
-        fwrite($fd, $setkeycf );
-        fclose($fd);
-        exec("setkey -f {$g['tmp_path']}/bgpdsetkey.conf");
 
 	exec("rm /usr/local/etc/rc.d/bgpd.sh");
 	exec("rm /usr/local/www/openbgpd_status.php");
