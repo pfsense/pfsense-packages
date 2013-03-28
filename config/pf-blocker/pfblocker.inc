@@ -52,29 +52,6 @@ function cb_get_real_interface_address($iface) {
 	return array($ip, long2ip(hexdec($netmask)));
 }
 
-function pfblocker_Range2CIDR($ip_min, $ip_max) {
-	#function called without any args
-	if ($ip_min == "" || $ip_max == "")
-		return "";
-	#function called with same ip in min and max
-	if ($ip_min == $ip_max)
-		return $ip_min. "/32";
-	#convert ip to decimal numbers
-	$ip_min_long=ip2long($ip_min);
-	$ip_max_long=ip2long($ip_max);
-	#check long results
-	if ($ip_min_long == -1 || $ip_max_long  == -1)
-		return "";
-	#identify bits mask
-	$bits=(32 -strlen(decbin($ip_max_long - $ip_min_long)));
-	if ($bits < 0)
-		return "";
-	#identify first ip on range network
-	$network=long2ip( $ip_min_long & ((1<<32)-(1<<(32-$bits))-1) );
-	#print decbin($ip_min_long)."\n".$network."\n";
-	return $network . "/". $bits;
-}
-
 function sync_package_pfblocker($cron="") {
 	global $g,$config;
 	
@@ -290,10 +267,12 @@ function sync_package_pfblocker($cron="") {
 										foreach ($url_list as $line){
 											# Network range 192.168.0.0-192.168.0.254
 											if (preg_match("/(\d+\.\d+\.\d+\.\d+)-(\d+\.\d+\.\d+\.\d+)/",$line,$matches)){
-												$cidr= pfblocker_Range2CIDR($matches[1],$matches[2]);
-												if ($cidr != ""){
-													${$alias}.= $cidr."\n";
-													$new_file.= $cidr."\n";
+												$a_cidr = ip_range_to_subnet_array($matches[1],$matches[2]);
+												if (is_array($a_cidr)) {
+													foreach ($a_cidr as $cidr) {
+														${$alias}.= $cidr."\n";
+														$new_file.= $cidr."\n";
+													}
 												}
 											}
 											# CIDR format 192.168.0.0/16
