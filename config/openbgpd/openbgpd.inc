@@ -180,7 +180,7 @@ function openbgpd_install_conf() {
 	safe_mkdir($bgpd_config_base);
 	  // Write out the configuration file
 	@file_put_contents("{$bgpd_config_base}/bgpd.conf", $conffile);
-	@chmod("{$bgpd_config_base}/bgpd.conf", 0666);
+	@chmod("{$bgpd_config_base}/bgpd.conf", 0600);
 
 	// Create rc.d file
 	$rc_file_stop = <<<EOF
@@ -197,7 +197,7 @@ fi
 
 /bin/mkdir -p {$bgpd_config_base}
 /usr/sbin/chown -R root:wheel {$bgpd_config_base}
-/bin/chmod u+rw,go-rw {$bgpd_config_base}/bgpd.conf
+/bin/chmod 0600  {$bgpd_config_base}/bgpd.conf
 
 NUMBGPD=`ps auxw | grep -c '[b]gpd.*parent'`
 if [ \${NUMBGPD} -lt 1 ] ; then
