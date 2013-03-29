@@ -102,7 +102,7 @@ else {
 	exit;
 }
 
-$pgtitle = array(gettext("Advanced"), gettext("File Viewer"));
+$pgtitle = array(gettext("Snort"), gettext("File Viewer"));
 ?>
 
 <?php include("head.inc");?>

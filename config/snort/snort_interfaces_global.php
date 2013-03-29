@@ -132,7 +132,7 @@ if ($input_errors)
 	<td colspan="2" valign="top" class="listtopic"><?php echo gettext("Please Choose The " .
 		"Type Of Rules You Wish To Download"); ?></td>
 </tr>
-	<td width="22%" valign="top" class="vncell"><?php echo gettext("Install Snort.org rules"); ?></td>
+	<td width="22%" valign="top" class="vncell"><?php printf(gettext("Install %sSnort VRT%s rules"), '<strong>' , '</strong>'); ?></td>
 	<td width="78%" class="vtable">
 		<table cellpadding="0" cellspacing="0">
 		<tr>
@@ -160,15 +160,15 @@ if ($input_errors)
 	</table>
 	<table width="100%" border="0" cellpadding="6" cellspacing="0">
 		<tr>
-			<td colspan="2" valign="top" class="optsect_t2"><?php echo gettext("Oinkmaster code"); ?></td>
+			<td colspan="2" valign="top" class="optsect_t2"><b><?php echo gettext("Oinkmaster code"); ?></b></td>
 		</tr>
 		<tr>
-			<td class="vncell" valign="top"><?php echo gettext("Code"); ?></td>
-			<td class="vtable"><input name="oinkmastercode" type="text"
+			<td valign="top"><?php echo gettext("Code"); ?></td>
+			<td><input name="oinkmastercode" type="text"
 				class="formfld" id="oinkmastercode" size="52"
 				value="<?=htmlspecialchars($pconfig['oinkmastercode']);?>"><br>
 			<?php echo gettext("Obtain a snort.org Oinkmaster code and paste here."); ?></td>
-	
+		</tr>
 	</table>
 
 </tr>
@@ -233,10 +233,10 @@ if ($input_errors)
 	</table>
 	<table width="100%" border="0" cellpadding="6" cellspacing="0">
 		<tr>
-			<td class="vncell3"><?php echo gettext("Size in"); ?> <strong>MB</strong></td>
-			<td class="vtable"><input name="snortloglimitsize" type="text"
+			<td><?php echo gettext("Size in"); ?> <strong>MB</strong></td>
+			<td><input name="snortloglimitsize" type="text"
 				class="formfld" id="snortloglimitsize" size="7"
-				value="<?=htmlspecialchars($pconfig['snortloglimitsize']);?>">
+				value="<?=htmlspecialchars($pconfig['snortloglimitsize']);?>">&nbsp;&nbsp;
 			<?php echo gettext("Default is"); ?> <strong>20%</strong> <?php echo gettext("of available space."); ?></td>
 	
 	</table>
