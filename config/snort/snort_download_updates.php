@@ -36,10 +36,9 @@
 require_once("guiconfig.inc");
 require_once("/usr/local/pkg/snort/snort.inc");
 
-global $g;
+global $g, $update_log;
 
 $snortdir = SNORTDIR;
-$snort_upd_log = "/tmp/snort_update.log";
 
 /* load only javascript that is needed */
 $snort_load_jquery = 'yes';
@@ -56,9 +55,20 @@ $emergingt_net_sig_chk_local = 'N/A';
 if (file_exists("{$snortdir}/emerging.rules.tar.gz.md5"))
 	$emergingt_net_sig_chk_local = file_get_contents("{$snortdir}/emerging.rules.tar.gz.md5");
 
+/* Check for postback to see if we should clear the update log file. */
+if (isset($_POST['clear'])) {
+	if (file_exists("{$update_log}"))
+		mwexec("/bin/rm -f {$update_log}");
+}
+
+if (isset($_POST['update'])) {
+	header("Location: /snort/snort_download_rules.php");
+	exit;
+}
+
 /* check for logfile */
 $update_logfile_chk = 'no';
-if (file_exists("{$snort_upd_log}"))
+if (file_exists("{$update_log}"))
 	$update_logfile_chk = 'yes';
 
 $pgtitle = "Services: Snort: Updates";
@@ -84,6 +94,8 @@ function popup(url)
 }
 </script>
 
+<form action="snort_download_updates.php" method="post" name="iform" id="iform">
+
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
 <tr><td>
 <?php
@@ -101,8 +113,7 @@ function popup(url)
 <tr>
 		<td>
 		<div id="mainarea3">
-		<table id="maintable4" class="tabcont" width="100%" border="0"
-			cellpadding="0" cellspacing="0">
+		<table id="maintable4" class="tabcont" width="100%" border="0" cellpadding="0" cellspacing="0">
 			<tr align="center">
 				<td>
 				<br/>
@@ -140,7 +151,7 @@ function popup(url)
 
 						if ($snortdownload != 'on' && $emergingthreats != 'on') {
 							echo '
-			<button disabled="disabled"><span class="download">' . gettext("Update Rules") . '&nbsp;&nbsp;&nbsp;&nbsp;</span></button><br/>
+			<button disabled="disabled"><span class="download">' . gettext("Update Rules") . '</span></button><br/>
 			<p style="text-align:left; margin-left:150px;">
 			<font color="#fc3608" size="2px"><b>' . gettext("WARNING:") . '</b></font><font size="1px" color="#000000">&nbsp;&nbsp;' . gettext('No rule types have been selected for download. "Global Settings Tab"') . '</font><br>';
 
@@ -148,7 +159,7 @@ function popup(url)
 						} else {
 
 							echo '
-			<a href="/snort/snort_download_rules.php"><button ><span class="download">' . gettext("Update Rules") . '&nbsp;&nbsp;&nbsp;&nbsp;</span></button></a><br/>' . "\n";
+			<input type="submit" value="' . gettext("Update Rules") . '" name="update" id="Submit" class="formbtn" /><br/>' . "\n";
 
 						}
 
@@ -168,17 +179,17 @@ function popup(url)
 						<p style="text-align: left; margin-left: 225px;">
 						<font color='#777777' size='1.5px'><b><?php echo gettext("VIEW UPDATE LOG"); ?></b></font><br>
 						<br>
-
 				<?php
 
 						if ($update_logfile_chk == 'yes') {
 							echo "
-				<button href='/snort/snort_rules_edit.php?openruleset={$snort_upd_log}'><span class='pwhitetxt'>" . gettext("Update Log") . "&nbsp;&nbsp;&nbsp;&nbsp;</span></button>\n";
+				<button class=\"formbtn\" onclick=\"popup('snort_log_view.php?logfile={$update_log}')\"><span class='pwhitetxt'>" . gettext("View Log") . "</span></button>";
+				echo "&nbsp;&nbsp;&nbsp;&nbsp;<input type=\"submit\" value=\"Clear Log\" name=\"clear\" id=\"Submit\" class=\"formbtn\" />\n";
 						}else{
 							echo "
-				<button disabled='disabled' href='/snort/snort_rules_edit.php?openruleset={$snort_upd_log}'><span class='pwhitetxt'>" . gettext("Update Log") . "&nbsp;&nbsp;&nbsp;&nbsp;</span></button>\n";
+				<button disabled='disabled'><span class='pwhitetxt'>" . gettext("View Log") . "</span></button>&nbsp;&nbsp;&nbsp;" . gettext("Log is empty.") . "\n";
 						}
-							
+						echo '<br><br>' . gettext("The log file is limited to 512K in size and automatically clears when the limit is exceeded.");
 				?>
 						<br/>
 						</p>
@@ -207,16 +218,12 @@ function popup(url)
 			</tr>
 		</table>
 		</div>
-
-
-
-
-
 		<br>
 		</td>
 	</tr>
 </table>
 <!-- end of final table --></div>
+		</form>
 <?php include("fend.inc"); ?>
 </body>
 </html>
