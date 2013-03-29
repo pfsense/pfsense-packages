@@ -69,7 +69,7 @@ if ((!is_array($cmds) || !(count($cmds) > 0))
 $cmdtext = "";
 foreach ($cmds as $cmd) {
 	$output = "";
-	$cmdtext .= "Command output for {$cmd['descr']}<br />\n";
+	$cmdtext .= "Command output: {$cmd['descr']} (" . htmlspecialchars($cmd['detail']) . ")<br />\n";
 	exec($cmd['detail'], $output);
 	$cmdtext .= "<pre>\n";
 	$cmdtext .= implode("\n", $output);
@@ -81,7 +81,7 @@ $logtext = "";
 foreach ($logs as $log) {
 	$lines = empty($log['lines']) ? 50 : $log['lines'];
 	$filter = empty($log['detail']) ? null : array($log['detail']);
-	$logtext .= "Log output for {$log['logfile']}<br />\n";
+	$logtext .= "Log output: " . get_friendly_log_name($log['logfile']) . " ({$log['logfile']})<br />\n";
 	$logtext .= "<pre>\n";
 	$logtext .= implode("\n", mail_report_get_log($log['logfile'], $lines, $filter));
 	$logtext .= "\n</pre>";

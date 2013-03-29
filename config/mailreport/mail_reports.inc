@@ -43,6 +43,28 @@ $graph_length = array(
 	"year" => 31622400,
 	"4year" => 126489600);
 
+$logfile_friendly = array(
+	"dhcpd"      => "DHCP",
+	"filter"     => "Firewall (raw)",
+	"gateways"   => "Gateway Events",
+	"installer"  => "Installation",
+	"ipsec"      => "IPsec VPN",
+	"l2tps"      => "L2TP Server (raw)",
+	"lighttpd"   => "Web Server (lighttpd)",
+	"ntpd"       => "NTP",
+	"openvpn"    => "OpenVPN",
+	"poes"       => "PPPoE Server (raw)",
+	"portalauth" => "Captive Portal Authentication",
+	"ppp"        => "PPP",
+	"pptps"      => "PPTP Server (raw)",
+	"relayd"     => "Load Balancer (relayd)",
+	"resolver"   => "DNS Resolver",
+	"routing"    => "Routing",
+	"system"     => "System",
+	"vpn"        => "PPTP/L2TP/PPPoE Server Login Events",
+	"wireless"   => "Wireless"
+);
+
 function get_dates($curperiod, $graph) {
 	global $graph_length;
 	$now = time();
@@ -208,7 +230,7 @@ function mail_report_send($headertext, $cmdtext, $logtext, $attachments) {
 	if(!$mail->Send()) {
 		echo "Mailer Error: " . $mail->ErrorInfo;
 	} else {
-		echo "<strong>Message sent to {$userid}!</strong>\n";
+		echo "<strong>Message sent to {$address}!</strong>\n";
 	}
 }
 
@@ -1224,6 +1246,14 @@ function mail_report_get_log($logfile, $tail, $grepfor) {
 		}
 	}
 	return($logarr);
+}
+
+function get_friendly_log_name($logfile) {
+	global $logfile_friendly;
+	$friendly = str_replace(".log", "", $logfile);
+	if (!empty($logfile_friendly[$friendly]))
+		$friendly = $logfile_friendly[$friendly];
+	return $friendly;
 }
 
 ?>

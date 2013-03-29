@@ -293,7 +293,7 @@ include("head.inc");
 		</tr>
 		<?php $i = 0; foreach ($a_logs as $log): ?>
 		<tr ondblclick="document.location='status_mail_report_add_log.php?reportid=<?php echo $id ;?>&amp;id=<?=$i;?>'">
-			<td class="listlr"><?php echo $log['logfile']; ?></td>
+			<td class="listlr"><?php echo get_friendly_log_name($log['logfile']); ?></td>
 			<td class="listlr"><?php echo $log['lines']; ?></td>
 			<td colspan="2" class="listlr"><?php echo $log['detail']; ?></td>
 			<td valign="middle" nowrap class="list">

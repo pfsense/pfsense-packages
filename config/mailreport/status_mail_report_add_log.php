@@ -72,9 +72,6 @@ if (isset($id) && !($a_logs[$id])) {
 	return;
 }
 
-
-
-
 $logpath = "/var/log/";
 chdir($logpath);
 $logfiles = glob("*.log");
@@ -118,12 +115,11 @@ include("head.inc");
 				<select name="logfile" class="formselect" style="z-index: -10;">
 				<?php
 				foreach ($logfiles as $logfile) {
-					$friendly = str_replace(".log", "", $logfile);
 					echo "<option value=\"{$logfile}\"";
 					if ($pconfig['logfile'] == $logfile) {
 						echo " selected";
 					}
-					echo ">" . htmlspecialchars($friendly) . "</option>\n";
+					echo ">" . htmlspecialchars(get_friendly_log_name($logfile)) . "</option>\n";
 				}
 				?>
 				</select>

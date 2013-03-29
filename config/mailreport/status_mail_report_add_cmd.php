@@ -118,6 +118,14 @@ include("head.inc");
 			</td>
 		</tr>
 		<tr>
+			<td>&nbsp;</td>
+			<td>
+				<br/>NOTE: The command will be run during the report and its stdout output will be included in the report body. Be extremely careful what commands you choose to run, the same warnings apply as those when using Diagnostics &gt; Command.
+				<br/>
+				<br/>Do not use this solely as a way to run a command on a schedule, use the Cron package for that purpose instead.
+			</td>
+		</tr>
+		<tr>
 			<td colspan="2" align="center">
 			<input name="Submit" type="submit" class="formbtn" value="<?=gettext("Save");?>">
 			<a href="status_mail_report_edit.php?id=<?php echo $reportid;?>"><input name="cancel" type="button" class="formbtn" value="<?=gettext("Cancel");?>"></a>
