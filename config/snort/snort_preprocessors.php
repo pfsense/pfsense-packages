@@ -36,6 +36,11 @@ require_once("/usr/local/pkg/snort/snort.inc");
 
 global $g;
 
+if (!is_array($config['installedpackages']['snortglobal'])) {
+	$config['installedpackages']['snortglobal'] = array();
+}
+$vrt_enabled = $config['installedpackages']['snortglobal']['snortdownload'];
+
 if (!is_array($config['installedpackages']['snortglobal']['rule'])) {
 	$config['installedpackages']['snortglobal']['rule'] = array();
 }
@@ -77,6 +82,11 @@ if (isset($id) && $a_nat[$id]) {
 	$pconfig['dnp3_preproc'] = $a_nat[$id]['dnp3_preproc'];
 	$pconfig['modbus_preproc'] = $a_nat[$id]['modbus_preproc'];
 	$pconfig['gtp_preproc'] = $a_nat[$id]['gtp_preproc'];
+
+	/* If not using the Snort VRT rules, then disable */
+	/* the Sensitive Data (sdf) preprocessor.         */
+	if ($vrt_enabled == "off")
+		$pconfig['sensitive_data'] = "off";
 }
 
 if ($_POST) {
@@ -469,9 +479,14 @@ include_once("head.inc");
 		<td width="22%" valign="top" class="vncell"><?php echo gettext("Enable"); ?> <br> <?php echo gettext("Sensitive Data"); ?></td>
 		<td width="78%" class="vtable">
 			<input name="sensitive_data" type="checkbox" value="on"
-			<?php if ($pconfig['sensitive_data']=="on") echo "checked"; ?>
+			<?php if ($pconfig['sensitive_data'] == "on")
+				 echo "checked";
+			      elseif ($vrt_enabled == "off")
+				 echo "disabled";
+			?>
 			onClick="enable_change(false)"><br>
-		<?php echo gettext("Sensitive data searches for credit card or Social Security numbers in data"); ?>	
+		<?php echo gettext("Sensitive data searches for credit card or Social Security numbers and e-mail addresses in data."); ?><br/>
+		<span class="red"><strong><?php echo gettext("Note: "); ?></strong></span><?php echo gettext("To enable this preprocessor, you must select the Snort VRT rules on the Global Settings tab."); ?>	
 		</td>
 	</tr>
 	<tr>
