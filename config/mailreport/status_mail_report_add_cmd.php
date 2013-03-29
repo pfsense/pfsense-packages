@@ -120,7 +120,7 @@ include("head.inc");
 		<tr>
 			<td>&nbsp;</td>
 			<td>
-				<br/>NOTE: The command will be run during the report and its stdout output will be included in the report body. Be extremely careful what commands you choose to run, the same warnings apply as those when using Diagnostics &gt; Command.
+				<br/>NOTE: Use full paths to commands to ensure they run properly. The command will be run during the report and its stdout output will be included in the report body. Be extremely careful what commands you choose to run, the same warnings apply as those when using Diagnostics &gt; Command.
 				<br/>
 				<br/>Do not use this solely as a way to run a command on a schedule, use the Cron package for that purpose instead.
 			</td>
