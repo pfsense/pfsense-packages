@@ -127,6 +127,8 @@ if ($_POST) {
 		}
 
 		write_config();
+		if ($thispatch['autoapply'])
+			patch_add_shellcmd();
 		header("Location: system_patches.php");
 		return;
 	}
@@ -192,7 +194,6 @@ include("head.inc");
 		<span class="vexpl"><?=gettext("Set this option to ignore whitespace in the patch."); ?></span>
 	</td>
 </tr>
-<!-- This isn't ready yet 
 <tr>
 	<td width="22%" valign="top" class="vncell"><?=gettext("Auto Apply"); ?></td>
 	<td width="78%" class="vtable">
@@ -201,7 +202,6 @@ include("head.inc");
 		<span class="vexpl"><?=gettext("Set this option to apply the patch automatically when possible, useful for patches to survive after firmware updates."); ?></span>
 	</td>
 </tr>
--->
 <tr>
 	<td width="22%" valign="top">&nbsp;</td>
 	<td width="78%">Patch id: <?php echo $pconfig['uniqid']; ?></td>

@@ -40,8 +40,9 @@
 	<requirements>None</requirements>
 	<faq>Applies patches supplied by the user to the firewall.</faq>
 	<name>System Patches</name>
-	<version>0.5.1</version>
+	<version>0.8</version>
 	<title>System: Patches</title>
+	<include_file>/usr/local/pkg/patches.inc</include_file>
 	<menu>
 		<name>Patches</name>
 		<tooltiptext></tooltiptext>
@@ -59,8 +60,19 @@
 		<item>http://www.pfsense.com/packages/config/systempatches/system_patches_edit.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
+		<prefix>/usr/local/bin/</prefix>
+		<chmod>755</chmod>
+		<item>http://www.pfsense.com/packages/config/systempatches/apply_patches.php</item>
+	</additional_files_needed>
+	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>644</chmod>
 		<item>http://www.pfsense.com/packages/config/systempatches/patches.inc</item>
 	</additional_files_needed>
+	<custom_php_install_command>
+		patch_package_install();
+	</custom_php_install_command>
+	<custom_php_deinstall_command>
+		patch_package_deinstall();
+	</custom_php_deinstall_command>
 </packagegui>

@@ -179,11 +179,12 @@ include("head.inc");
 <tr id="frheader">
 <td width="5%" class="list">&nbsp;</td>
 <td width="5%" class="listhdrr"><?=gettext("Description");?></td>
-<td width="65%" class="listhdrr"><?=gettext("URL/ID");?></td>
+<td width="60%" class="listhdrr"><?=gettext("URL/ID");?></td>
 <td width="5%" class="listhdrr"><?=gettext("Fetch");?></td>
 <td width="5%" class="listhdrr"><?=gettext("Test");?></td>
 <td width="5%" class="listhdrr"><?=gettext("Apply");?></td>
 <td width="5%" class="listhdr"><?=gettext("Revert");?></td>
+<td width="5%" class="listhdr"><?=gettext("Auto Apply");?></td>
 <td width="5%" class="list">
 <table border="0" cellspacing="0" cellpadding="1" summary="buttons">
 	<tr><td width="17">
@@ -241,6 +242,9 @@ foreach ($a_patches as $thispatch):
 	<?php if ($can_revert): ?>
 		<a href="system_patches.php?id=<?=$i;?>&amp;act=revert"><?php echo gettext("Revert"); ?></a>
 	<?php endif; ?>
+	</td>
+	<td class="listr" onclick="fr_toggle(<?=$npatches;?>)" id="frd<?=$npatches;?>" ondblclick="document.location='system_patches_edit.php?id=<?=$npatches;?>';">
+		<?= isset($thispatch['autoapply']) ? "Yes" : "No" ?>
 	</td>
 	<td valign="middle" class="list" nowrap>
 		<table border="0" cellspacing="0" cellpadding="1" summary="edit">
