@@ -33,7 +33,7 @@
 require_once("guiconfig.inc");
 require_once("/usr/local/pkg/snort/snort.inc");
 
-global $g, $flowbit_rules_file;
+global $g, $flowbit_rules_file, $rebuild_rules;
 
 $snortdir = SNORTDIR;
 $rules_map = array();
@@ -221,11 +221,22 @@ if ($_POST['customrules']) {
 		for($i = $start; $i > $end; $i--)
 			$error .= $output[$i];
 		$input_errors[] = "Custom rules have errors:\n {$error}";
-	} else {
+	}
+	else {
 		header("Location: /snort/snort_rules.php?id={$id}&openruleset={$currentruleset}");
 		exit;
 	}
-} else if ($_POST) {
+}
+
+else if ($_POST['apply']) {
+	write_config();
+	$rebuild_rules = "on";
+	sync_snort_package_config();
+	$rebuild_rules = "off";
+	header("Location: /snort/snort_rules.php?id={$id}&openruleset={$currentruleset}");
+	exit;
+}
+else if($_POST) {
 	unset($a_rule[$id]['customrules']);
 	write_config();
 	header("Location: /snort/snort_rules.php?id={$id}&openruleset={$currentruleset}");
@@ -361,7 +372,9 @@ function popup(url)
 <?php else: ?>
 	<tr>
 		<td width="3%" class="list">&nbsp;</td>
-		<td colspan="7" class="listhdr" >&nbsp;</td>
+		<td colspan="7" class="listhdr" ><input type="submit" name="apply" id="apply" value="Apply Changes" class="formbtn">
+			&nbsp;&nbsp;&nbsp;<?php echo gettext("Click to restart Snort with your changes."); ?>
+			<input type='hidden' name='id' value='<?=$id;?>'></td>
 		<td width="3%" align="center" valign="middle" class="listt"><a href="javascript: void(0)"
 				onclick="popup('snort_rules_edit.php?id=<?=$id;?>&openruleset=<?=$currentruleset;?>')">
 				<img src="../themes/<?= $g['theme']; ?>/images/icons/icon_service_restart.gif" <?php

@@ -32,7 +32,7 @@
 require_once("guiconfig.inc");
 require_once("/usr/local/pkg/snort/snort.inc");
 
-global $g, $flowbit_rules_file;
+global $g, $flowbit_rules_file, $rebuild_rules;
 
 $snortdir = SNORTDIR;
 
@@ -119,7 +119,9 @@ if ($_POST["Submit"]) {
 	}
 
 	write_config();
+	$rebuild_rules = "on";
 	sync_snort_package_config();
+	$rebuild_rules = "off";
 
 	header("Location: /snort/snort_rulesets.php?id=$id");
 	exit;

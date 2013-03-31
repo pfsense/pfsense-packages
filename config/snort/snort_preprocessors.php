@@ -251,7 +251,7 @@ include_once("head.inc");
 		<td width="78%" class="vtable">
 			<select name="http_server_profile" class="formselect" id="http_server_profile">
 			<?php
-			$profile = array('All', 'Apache', 'IIS', 'IIS_4.0', 'IIS_5.0');
+			$profile = array('All', 'Apache', 'IIS', 'IIS4_0', 'IIS5_0');
 			foreach ($profile as $val): ?>
 			<option value="<?=strtolower($val);?>"
 			<?php if (strtolower($val) == $pconfig['http_server_profile']) echo "selected"; ?>>
@@ -522,7 +522,8 @@ include_once("head.inc");
 				<td width="22%" valign="top">&nbsp;</td>
 				<td width="78%"><span class="vexpl"><span class="red"><strong><?php echo gettext("Note:"); ?></strong></span>
 				<br>
-				<?php echo gettext("Please save your settings before you click Start."); ?> </td>
+				<?php echo gettext("Please save your settings before you click Start.  Preprocessor changes will rebuild the rules file,"); ?>
+				</br><?php echo gettext("and restart Snort if running.  This will take several seconds."); ?></td>
 			</tr>
 </table>
 </td></tr></table>
