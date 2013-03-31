@@ -37,21 +37,17 @@
 require_once("guiconfig.inc");
 require_once("/usr/local/pkg/snort/snort.inc");
 
-if (!is_array($config['installedpackages']['snortglobal']['rule'])) {
-	$config['installedpackages']['snortglobal']['rule'] = array();
-}
-$a_rule = &$config['installedpackages']['snortglobal']['rule'];
+global $update_log;
 
-$file = $_GET['logfile'];
 $contents = '';
 
 // Read the contents of the argument passed to us.
 // Is it a fully qualified path and file?
-if (file_exists($file))
-	$contents = file_get_contents($file);
+if (file_exists($_GET['logfile']))
+	$contents = file_get_contents($_GET['logfile']);
 // It is not something we can display, so print an error.
 else
-	$contents = gettext("\n\nERROR -- File: {$file} not found!");
+	$contents = gettext("\n\nERROR -- File: {$_GET['logfile']} not found!");
 
 $pgtitle = array(gettext("Snort"), gettext("Log File Viewer"));
 ?>
@@ -72,7 +68,7 @@ $pgtitle = array(gettext("Snort"), gettext("Log File Viewer"));
 				<input type="button" class="formbtn" value="Return" onclick="window.close()">
 			</td>
 			<td align="right">
-				<b><?php echo gettext("Log File: "); ?></b>&nbsp;<?=$file;?>&nbsp;&nbsp;&nbsp;&nbsp;
+				<b><?php echo gettext("Log File: ") . '</b>&nbsp;' . $_GET['logfile']; ?>&nbsp;&nbsp;&nbsp;&nbsp;
 			</td>
 		</tr>
 		<tr>

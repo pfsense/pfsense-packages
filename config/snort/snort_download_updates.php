@@ -40,6 +40,8 @@ global $g, $update_log;
 
 $snortdir = SNORTDIR;
 
+$log = $update_log;
+
 /* load only javascript that is needed */
 $snort_load_jquery = 'yes';
 $snort_load_jquery_colorbox = 'yes';
@@ -183,7 +185,7 @@ function popup(url)
 
 						if ($update_logfile_chk == 'yes') {
 							echo "
-				<button class=\"formbtn\" onclick=\"popup('snort_log_view.php?logfile={$update_log}')\"><span class='pwhitetxt'>" . gettext("View Log") . "</span></button>";
+				<button class=\"formbtn\" onclick=\"popup('snort_log_view.php?logfile={$log}')\"><span class='pwhitetxt'>" . gettext("View Log") . "</span></button>";
 				echo "&nbsp;&nbsp;&nbsp;&nbsp;<input type=\"submit\" value=\"Clear Log\" name=\"clear\" id=\"Submit\" class=\"formbtn\" />\n";
 						}else{
 							echo "
