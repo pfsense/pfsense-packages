@@ -31,7 +31,7 @@
 require_once("guiconfig.inc");
 require_once("/usr/local/pkg/snort/snort.inc");
 
-global $g;
+global $g, $rebuild_rules;
 
 if (!is_array($config['installedpackages']['snortglobal']))
 	$config['installedpackages']['snortglobal'] = array();
@@ -50,10 +50,15 @@ if (is_null($id)) {
 }
 
 $pconfig = array();
-if (empty($snortglob['rule'][$id]['uuid']))
+if (empty($snortglob['rule'][$id]['uuid'])) {
+	/* Adding new interface, so flag rules to build. */
 	$pconfig['uuid'] = snort_generate_id();
-else
+	$rebuild_rules = "on";
+}
+else {
 	$pconfig['uuid'] = $a_rule[$id]['uuid'];
+	$rebuild_rules = "off";
+}
 $snort_uuid = $pconfig['uuid'];
 
 if (isset($id) && $a_rule[$id]) {
@@ -77,14 +82,6 @@ if ($_POST["Submit"]) {
 
 	if (!$_POST['interface'])
 		$input_errors[] = "Interface is mandatory";
-/*
-	foreach ($a_rule as $natent) {
-		if (isset($id) && ($a_rule[$id]) && ($a_rule[$id] === $natent))
-			continue;
-		if ($natent['interface'] == $_POST['interface'])
-			$input_errors[] = "This interface is already configured for another instance";
-	}
-*/
 
 	/* if no errors write to conf */
 	if (!$input_errors) {
@@ -122,13 +119,14 @@ if ($_POST["Submit"]) {
 			snort_stop($natent, $if_real);
 		write_config();
 		sync_snort_package_config();
+		$rebuild_rules = "off";
 
 		header( 'Expires: Sat, 26 Jul 1997 05:00:00 GMT' );
 		header( 'Last-Modified: ' . gmdate( 'D, d M Y H:i:s' ) . ' GMT' );
 		header( 'Cache-Control: no-store, no-cache, must-revalidate' );
 		header( 'Cache-Control: post-check=0, pre-check=0', false );
 		header( 'Pragma: no-cache' );
-		header("Location: /snort/snort_interfaces.php");
+		header("Location: /snort/snort_interfaces_edit.php?id=$id");
 		exit;
 	} else
 		$pconfig = $_POST;
