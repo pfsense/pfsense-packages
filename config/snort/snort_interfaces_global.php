@@ -50,6 +50,7 @@ $pconfig['snortloglimit'] = $config['installedpackages']['snortglobal']['snortlo
 $pconfig['snortloglimitsize'] = $config['installedpackages']['snortglobal']['snortloglimitsize'];
 $pconfig['autorulesupdate7'] = $config['installedpackages']['snortglobal']['autorulesupdate7'];
 $pconfig['forcekeepsettings'] = $config['installedpackages']['snortglobal']['forcekeepsettings'];
+$pconfig['protect_preproc_rules'] = $config['installedpackages']['snortglobal']['protect_preproc_rules'];
 
 /* if no errors move foward */
 if (!$input_errors) {
@@ -58,8 +59,10 @@ if (!$input_errors) {
 
 		$config['installedpackages']['snortglobal']['snortdownload'] = $_POST['snortdownload'];
 		$config['installedpackages']['snortglobal']['oinkmastercode'] = $_POST['oinkmastercode'];
+
 		$config['installedpackages']['snortglobal']['emergingthreats'] = $_POST['emergingthreats'] ? 'on' : 'off';
 		$config['installedpackages']['snortglobal']['rm_blocked'] = $_POST['rm_blocked'];
+		$config['installedpackages']['snortglobal']['protect_preproc_rules'] = $_POST['protect_preproc_rules'] ? 'on' : 'off';
 		if ($_POST['snortloglimitsize']) {
 			$config['installedpackages']['snortglobal']['snortloglimit'] = $_POST['snortloglimit'];
 			$config['installedpackages']['snortglobal']['snortloglimitsize'] = $_POST['snortloglimitsize'];
@@ -110,6 +113,22 @@ if ($input_errors)
 
 ?>
 
+<script language="JavaScript">
+<!--
+function enable_snort_vrt(btn) {
+	if (btn == 'off') {
+		document.iform.oinkmastercode.disabled = "true";
+		document.iform.protect_preproc_rules.disabled = "true";
+	}
+	if (btn == 'on') {
+		document.iform.oinkmastercode.disabled = "";
+		document.iform.protect_preproc_rules.disabled = "";
+	}	
+}
+//-->
+</script>
+
+
 <form action="snort_interfaces_global.php" method="post" enctype="multipart/form-data" name="iform" id="iform">
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
 <tr><td class="tabnavtbl">
@@ -134,40 +153,53 @@ if ($input_errors)
 </tr>
 	<td width="22%" valign="top" class="vncell"><?php printf(gettext("Install %sSnort VRT%s rules"), '<strong>' , '</strong>'); ?></td>
 	<td width="78%" class="vtable">
-		<table cellpadding="0" cellspacing="0">
+		<table width="100%" border="0" cellpadding="2" cellspacing="0">
 		<tr>
-			<td colspan="2"><input name="snortdownload" type="radio"
-				id="snortdownload" value="off" 
-<?php if($pconfig['snortdownload']=='off' || $pconfig['snortdownload']=='') echo 'checked'; ?>>
-			<?php printf(gettext("Do %sNOT%s Install"), '<strong>',  '</strong>'); ?></td>
+			<td><input name="snortdownload" type="radio" id="snortdownload" value="off" onclick="enable_snort_vrt('off')"  
+			<?php if($pconfig['snortdownload']=='off' || $pconfig['snortdownload']=='') echo 'checked'; ?> >&nbsp;&nbsp;</td>
+			<td><span class="vexpl"><?php printf(gettext("Do %sNOT%s Install"), '<strong>',  '</strong>'); ?></span></td>
 		</tr>
 		<tr>
-			<td colspan="2"><input name="snortdownload" type="radio"
-				id="snortdownload" value="on" 
-	<?php if($pconfig['snortdownload']=='on') echo 'checked'; ?>> <?php echo gettext("Install " .
-	"Basic Rules or Premium rules"); ?> <br>
-			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a
-				href="https://www.snort.org/signup" target="_blank"><?php echo gettext("Sign Up for a " .
-			"Basic Rule Account"); ?></a><br>
-			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a
-				href="http://www.snort.org/vrt/buy-a-subscription"
-				target="_blank"><?php echo gettext("Sign Up for Sourcefire VRT Certified Premium " .
-			"Rules. This Is Highly Recommended"); ?></a></td>
-		</tr>
+			<td><input name="snortdownload" type="radio" id="snortdownload" value="on" onclick="enable_snort_vrt('on')" 
+			<?php if($pconfig['snortdownload']=='on') echo 'checked'; ?>></td>
+			<td><span class="vexpl"><?php echo gettext("Install Basic Rules or Premium rules"); ?></span></td>
 		<tr>
 			<td>&nbsp;</td>
-		</tr>
-	</table>
-	<table width="100%" border="0" cellpadding="6" cellspacing="0">
-		<tr>
-			<td colspan="2" valign="top" class="optsect_t2"><b><?php echo gettext("Oinkmaster code"); ?></b></td>
+			<td><a href="https://www.snort.org/signup" target="_blank"><?php echo gettext("Sign Up for a Basic Rule Account"); ?> </a><br>
+			<a href="http://www.snort.org/vrt/buy-a-subscription" target="_blank">
+			<?php echo gettext("Sign Up for Sourcefire VRT Certified Premium Rules.  This Is Highly Recommended"); ?></a></td>
 		</tr>
 		<tr>
-			<td valign="top"><?php echo gettext("Code"); ?></td>
+			<td colspan="2">&nbsp;</td>
+		</tr>
+		</table>
+		<table width="100%" border="0" cellpadding="2" cellspacing="0">
+		<tr>
+			<td colspan="2" valign="top"><b><span class="vexpl"><?php echo gettext("Oinkmaster Configuration"); ?></span></b></td>
+		</tr>
+		<tr>
+			<td valign="top"><span class="vexpl"><strong><?php echo gettext("Code"); ?><strong></span</td>
 			<td><input name="oinkmastercode" type="text"
 				class="formfld" id="oinkmastercode" size="52"
-				value="<?=htmlspecialchars($pconfig['oinkmastercode']);?>"><br>
-			<?php echo gettext("Obtain a snort.org Oinkmaster code and paste here."); ?></td>
+				value="<?=htmlspecialchars($pconfig['oinkmastercode']);?>" 
+				<?php if($pconfig['snortdownload']<>'on') echo 'disabled'; ?>><br>
+			<?php echo gettext("Obtain a snort.org Oinkmaster code and paste it here."); ?></td>
+		</tr>
+		<tr>
+			<td colspan="2">&nbsp;</td>
+		</tr>
+		<tr>
+			<td colspan="2" valign="middle"><b><span class="vexpl"><?php echo gettext("Protect Customized Preprocessor Rules"); ?></span></b></td>
+		</tr>
+		<tr>
+			<td valign="top"><input name="protect_preproc_rules" id="protect_preproc_rules" type="checkbox" value="yes"
+				<?php if ($config['installedpackages']['snortglobal']['protect_preproc_rules']=="on") echo "checked"; 
+				if($pconfig['snortdownload']<>'on') echo ' disabled'; ?> ><br>
+			</td>
+			<td><span class="vexpl"><?php echo gettext("Check this box if you maintain customized preprocessor rules files "); ?><br>
+				<?php echo gettext("and do not want them overwritten by automatic rule updates."); ?><br>
+				<?php printf(gettext("%sHint:%s  Most users should leave this unchecked."), '<span class="red"><strong>', '</strong></span>'); ?></span></br>
+			</td>
 		</tr>
 	</table>
 
@@ -195,8 +227,8 @@ if ($input_errors)
 			<?=htmlspecialchars($ifacename3);?></option>
 			<?php endforeach; ?>
 	</select><br>
-	<span class="vexpl"><?php echo gettext("Please select the update times for rules."); ?><br>
-	<?php echo gettext("Hint: in most cases, every 12 hours is a good choice."); ?></span></td>
+	<span class="vexpl"><?php echo gettext("Please select the update times for rules."); ?></br>
+	<?php printf(gettext("%sHint%s: in most cases, every 12 hours is a good choice."), '<span class="red"><strong>','</strong></span>'); ?></span></td>
 </tr>
 <tr>
 	<td colspan="2" valign="top" class="listtopic"><?php echo gettext("General Settings"); ?></td>
@@ -215,14 +247,14 @@ if ($input_errors)
 		<tr>
 			<td colspan="2"><input name="snortloglimit" type="radio"
 				id="snortloglimit" value="on" 
-<?php if($pconfig['snortloglimit']=='on') echo 'checked'; ?>>
-		<strong><?php echo gettext("Enable"); ?></strong> <?php echo gettext("directory size limit"); ?> (<strong><?php echo gettext("Default"); ?></strong>)</td>
+<?php if($pconfig['snortloglimit']=='on') echo 'checked'; ?>><span class="vexpl">
+		<strong><?php echo gettext("Enable"); ?></strong> <?php echo gettext("directory size limit"); ?> (<strong><?php echo gettext("Default"); ?></strong>)</span></td>
 		</tr>
 		<tr>
 			<td colspan="2"><input name="snortloglimit" type="radio"
 				id="snortloglimit" value="off" 
-<?php if($pconfig['snortloglimit']=='off') echo 'checked'; ?>> <strong><?php echo gettext("Disable"); ?></strong>
-			<?php echo gettext("directory size limit"); ?><br>
+<?php if($pconfig['snortloglimit']=='off') echo 'checked'; ?>> <span class="vexpl"><strong><?php echo gettext("Disable"); ?></strong>
+			<?php echo gettext("directory size limit"); ?></span><br>
 			<br>
 			<span class="red"><strong><?php echo gettext("Warning"); ?></span>:</strong> <?php echo gettext("Nanobsd " .
 			"should use no more than 10MB of space."); ?></td>
@@ -233,7 +265,7 @@ if ($input_errors)
 	</table>
 	<table width="100%" border="0" cellpadding="6" cellspacing="0">
 		<tr>
-			<td><?php echo gettext("Size in"); ?> <strong>MB</strong></td>
+			<td><span class="vexpl"><?php echo gettext("Size in"); ?> <strong>MB</strong><span></td>
 			<td><input name="snortloglimitsize" type="text"
 				class="formfld" id="snortloglimitsize" size="7"
 				value="<?=htmlspecialchars($pconfig['snortloglimitsize']);?>">&nbsp;&nbsp;
@@ -242,7 +274,6 @@ if ($input_errors)
 	</table>
 
 </tr>
-
 <tr>
 	<td width="22%" valign="top" class="vncell"><?php echo gettext("Remove blocked hosts " .
 	"every"); ?></td>
@@ -256,9 +287,8 @@ if ($input_errors)
 			<?=htmlspecialchars($ifacename3);?></option>
 			<?php endforeach; ?>
 	</select><br>
-	<span class="vexpl"><?php echo gettext("Please select the amount of time you would like " .
-	"hosts to be blocked for."); ?><br>
-	<?php echo gettext("Hint: in most cases, 1 hour is a good choice."); ?></span></td>
+	<?php echo gettext("Please select the amount of time you would like hosts to be blocked for."); ?></br>
+	<?php printf(gettext("%sHint:%s in most cases, 1 hour is a good choice."), '<span class="red"><strong>', '</strong></span>'); ?></td>
 </tr>
 <tr>
 	<td width="22%" valign="top" class="vncell"><?php echo gettext("Keep snort settings " .
