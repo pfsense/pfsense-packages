@@ -38,8 +38,8 @@ require_once("functions.inc");
 require_once("filter.inc");
 
 // Explicitly declare these as global so they work through function call includes 
-global $snort_rules_file, $emerging_threats_version, $update_log;
-global $flowbit_rules_file, $snort_enforcing_rules_file;
+global $snort_rules_file, $snort_version, $emerging_threats_version, $update_log;
+global $flowbit_rules_file, $snort_enforcing_rules_file, $rebuild_rules;
 
 define("SNORTDIR", "/usr/local/etc/snort");
 define("SNORTLOGDIR", "/var/log/snort");
@@ -56,6 +56,9 @@ $flowbit_rules_file = "flowbit-required.rules";
 $snort_enforcing_rules_file = "snort.rules";
 $update_log = SNORTLOGDIR;
 $update_log .= "/update.log";
+
+/* Rebuild Rules Flag -- if "on", rebuild enforcing rules and flowbit-rules files */
+$rebuild_rules = "off";
 
 if (!is_array($config['installedpackages']['snortglobal']))
 	$config['installedpackages']['snortglobal'] = array();
@@ -435,7 +438,8 @@ function snort_post_delete_logs($snort_uuid = 0) {
 }
 
 function snort_postinstall() {
-	global $config, $g, $snort_rules_file, $emerging_threats_version, $update_log;
+	global $config, $g, $snort_rules_file, $emerging_threats_version;
+	global $snort_version, $update_log, $rebuild_rules;
 
 	$snortdir = SNORTDIR;
 
@@ -464,8 +468,11 @@ function snort_postinstall() {
 		update_status(gettext("Saved settings detected..."));
 		update_output_window(gettext("Please wait... rebuilding files..."));
 		@include_once("/usr/local/pkg/snort/snort_check_for_rule_updates.php");
+		update_status(gettext("Generating snort.conf configuration from saved settings..."));
+		$rebuild_rules = "on";
 		sync_snort_package_config();
-		update_output_window(gettext("Finished Rebuilding files..."));
+		$rebuild_rules = "off";
+		update_output_window(gettext("Finished rebuilding files..."));
 	}
 }
 
@@ -702,6 +709,7 @@ function snort_rules_up_install_cron($should_install) {
 /* Only run when all ifaces needed to sync. Expects filesystem rw */
 function sync_snort_package_config() {
 	global $config, $g, $flowbit_rules_file, $snort_enforcing_rules_file;
+	global $snort_version, $rebuild_rules;
 
 	conf_mount_rw();
 
@@ -716,10 +724,25 @@ function sync_snort_package_config() {
 	foreach ($snortconf as $value) {
 		$if_real = snort_get_real_interface($value['interface']);
 
-		/* create snort configuration file */
+		/****************************************************/
+		/* Construct a pointer to the PBI folder for use on */
+		/* pfSense 2.1. Test for a PBI folder structure,    */
+		/* and if found, make sure appropriate directory    */
+		/* exists for each configured interface.  This will */
+		/* prevent symlink errors on future package edits.  */
+		/****************************************************/
+		$arch = php_uname("m");
+		$snortcfgdir_pbi = "/usr/pbi/snort-{$arch}/etc/snort/snort_{$value['uuid']}_{$if_real}";
+		if (is_dir("/usr/pbi/snort-{$arch}")) {
+			/* Create interface subdirectory if missing */
+			if (!is_dir($snortcfgdir_pbi))
+				exec("/bin/mkdir -p $snortcfgdir_pbi");
+		}
+
+		/* create a snort conf file for interface           */
 		snort_generate_conf($value);
 
-		/* create barnyard2 configuration file */
+		/* create barnyard2 conf file for interface         */
 		if ($value['barnyard_enable'] == 'on')
 			snort_create_barnyard2_conf($value, $if_real);
 	}
@@ -1653,7 +1676,7 @@ function snort_generate_barnyard2_conf($snortcfg, $if_real) {
 config reference_file:	    {$snortdir}/snort_{$snort_uuid}_{$if_real}/reference.config
 config classification_file: {$snortdir}/snort_{$snort_uuid}_{$if_real}/classification.config
 config gen_file:            {$snortdir}/snort_{$snort_uuid}_{$if_real}/gen-msg.map
-config sid_file:	        {$snortdir}/snort_{$snort_uuid}_{$if_real}/sid-msg.map
+config sid_file:	    {$snortdir}/snort_{$snort_uuid}_{$if_real}/sid-msg.map
 
 config hostname:       $snortbarnyardlog_hostname_info_chk
 config interface:      {$if_real}
@@ -1682,12 +1705,12 @@ EOD;
 }
 
 function snort_deinstall() {
+
 	global $config, $g;
 
 	$snortdir = SNORTDIR;
 	$snortlogdir = SNORTLOGDIR;
 
-	/* decrease bpf buffers back to 4096, from 20480 */
 	mwexec('/usr/bin/killall snort', true);
 	sleep(2);
 	mwexec('/usr/bin/killall -9 snort', true);
@@ -1698,7 +1721,7 @@ function snort_deinstall() {
 	sleep(2);
 	mwexec('/usr/sbin/pw userdel snort; /usr/sbin/pw groupdel snort', true);
 
-	/* Remove snort cron entries Ugly code needs smoothness*/
+	/* Remove snort cron entries Ugly code needs smoothness */
 	if (!function_exists('snort_deinstall_cron')) {
 		function snort_deinstall_cron($crontask) {
 			global $config, $g;
@@ -1720,15 +1743,14 @@ function snort_deinstall() {
 		}
 	}
 
-	/* Totally wipe out the Snort configuration directory. */
-	mwexec("/bin/rm -rf {$snortdir}");
-	mwexec("/bin/rm -rf /usr/local/lib/snort");
-
 	/* Remove all the Snort cron jobs. */
 	snort_deinstall_cron("snort2c");
 	snort_deinstall_cron("snort_check_for_rule_updates.php");
 	snort_deinstall_cron("snort_check_cron_misc.inc");
 	configure_cron();
+
+	/* Wipe out Snort configuration since it auto rebuilds. */
+	mwexec("/bin/rm -rf {$snortdir}");
 
 	/* Keep this as a last step */
 	if ($config['installedpackages']['snortglobal']['forcekeepsettings'] != 'on')
@@ -1736,9 +1758,13 @@ function snort_deinstall() {
 }
 
 function snort_prepare_rule_files($snortcfg, $snortcfgdir) {
-	global $snort_enforcing_rules_file, $flowbit_rules_file;
+	global $snort_enforcing_rules_file, $flowbit_rules_file, $rebuild_rules;
 
 	$snortdir = SNORTDIR;
+
+	/* If there is no reason to rebuild the rules, exit. */
+	if ($rebuild_rules == "off")
+		return;
 
 	if (!empty($snortcfg['rulesets']) || $snortcfg['ips_policy_enable'] == 'on') {
 		$enabled_rules = array();
@@ -1754,16 +1780,6 @@ function snort_prepare_rule_files($snortcfg, $snortcfgdir) {
 
 			/* Load our rules map in preparation for writing the enforcing rules file. */
 			$enabled_rules = snort_load_rules_map($enabled_files);
-		}
-
-		/* Remove any existing rules files (except custom rules) prior to building a new set. */
-		foreach (glob("{$snortcfgdir}/rules/*.rules") as $file) {
-			$tmpfile = basename($file);
-			if (in_array("{$snortdir}/rules/{$tmpfile}", $enabled_files))
-				continue;
-			if ($tmpfile != "custom.rules" && $tmpfile != $flowbit_rules_file &&
-				$tmpfile != $snort_enforcing_rules_file)
-				@unlink($file);
 		}
 
 		/* Check if a pre-defined Snort VRT policy is selected. If so, */
@@ -1887,7 +1903,7 @@ function snort_filter_preproc_rules($snortcfg, &$active_rules) {
 
 function snort_generate_conf($snortcfg) {
 
-	global $config, $g, $flowbit_rules_file, $snort_enforcing_rules_file;
+	global $config, $g, $flowbit_rules_file, $snort_enforcing_rules_file, $rebuild_rules;
 
 	$snortdir = SNORTDIR;
 	$snortlogdir = SNORTLOGDIR;
@@ -1926,12 +1942,20 @@ function snort_generate_conf($snortcfg) {
 			safe_mkdir($dir);
 	}
 
+	/********************************************************************/
+	/* For fail-safe on an initial startup following installation, and  */
+	/* before a rules update has occurred, copy the default config      */
+	/* files to the interface directory.  If files already exist in     */
+	/* the interface directory, that means a rule update has been done  */
+	/* and we should leave the customized files put in place by the     */
+	/* rules update process.                                            */
+	/********************************************************************/
 	$snort_files = array("gen-msg.map", "classification.config", "reference.config",
 			"sid-msg.map", "unicode.map", "threshold.conf", "preproc_rules/preprocessor.rules",
 			"preproc_rules/decoder.rules", "preproc_rules/sensitive-data.rules"
 		);
 	foreach ($snort_files as $file) {
-		if (file_exists("{$snortdir}/{$file}"))
+		if (file_exists("{$snortdir}/{$file}") && !file_exists("{$snortcfgdir}/{$file}"))
 			@copy("{$snortdir}/{$file}", "{$snortcfgdir}/{$file}");
 	}
 
