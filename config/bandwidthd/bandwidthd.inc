@@ -64,46 +64,47 @@ function bandwidthd_install_config() {
 	config_lock();
 
 	/* user defined values */
-	$meta_refresh = $config['installedpackages']['bandwidthd']['config'][0]['meta_refresh'];
+	$bandwidthd_config = $config['installedpackages']['bandwidthd']['config'][0];
+	$meta_refresh = $bandwidthd_config['meta_refresh'];
 	if($meta_refresh)
 		$meta_refresh = "meta_refresh $meta_refresh\n";
-	$graph = $config['installedpackages']['bandwidthd']['config'][0]['drawgraphs'];
+	$graph = $bandwidthd_config['drawgraphs'];
 	if($graph)
 		$graph = "graph true\n";
 	else
 		$graph = "graph false\n";
 
-	$filter_text = $config['installedpackages']['bandwidthd']['config'][0]['filter'];
+	$filter_text = $bandwidthd_config['filter'];
 	if($filter_text)
 		$filter_text = "filter $filter_text\n";
-	$recover_cdf = $config['installedpackages']['bandwidthd']['config'][0]['recovercdf'];
+	$recover_cdf = $bandwidthd_config['recovercdf'];
 	if($recover_cdf)
 		$recover_cdf = "recover_cdf true\n";
-	$output_cdf = $config['installedpackages']['bandwidthd']['config'][0]['outputcdf'];
+	$output_cdf = $bandwidthd_config['outputcdf'];
 	if($output_cdf)
 		$output_cdf_string = "output_cdf true\n";
 	else
 		$output_cdf_string = "";
-	$promiscuous = $config['installedpackages']['bandwidthd']['config'][0]['promiscuous'];
+	$promiscuous = $bandwidthd_config['promiscuous'];
 	if($promiscuous)
 		$promiscuous = "promiscuous true\n";
 	else
 		$promiscuous = "promiscuous false\n";
 
-	$graph_cutoff = $config['installedpackages']['bandwidthd']['config'][0]['graphcutoff'];
+	$graph_cutoff = $bandwidthd_config['graphcutoff'];
 	if($graph_cutoff)
 		$graph_cutoff = "graph_cutoff $graph_cutoff\n";
-	$skip_intervals = $config['installedpackages']['bandwidthd']['config'][0]['skipintervals'];
+	$skip_intervals = $bandwidthd_config['skipintervals'];
 	if($skip_intervals)
 		$skip_intervals = "skip_intervals $skip_intervals\n";
 
-	if($config['installedpackages']['bandwidthd']['config'][0]['active_interface']){
-		$ifdescrs = array($config['installedpackages']['bandwidthd']['config'][0]['active_interface']);
+	if($bandwidthd_config['active_interface']){
+		$ifdescrs = array($bandwidthd_config['active_interface']);
 	} else {
 		log_error("You should specify an interface for bandwidthd to listen on. Exiting.");
 	}
 
-	$subnets_custom = explode(';',str_replace(' ','',$config['installedpackages']['bandwidthd']['config'][0]['subnets_custom']));
+	$subnets_custom = explode(';',str_replace(' ','',$bandwidthd_config['subnets_custom']));
 
 	/* initialize to "" */
 	$subnets = "";
@@ -212,26 +213,40 @@ EOF;
 	fwrite($fd, $config_file);
 	fclose($fd);
 
+	if ($g['platform'] == 'nanobsd') {
+		$bandwidthd_nano_dir = "/var/bandwidthd";
+		$bandwidthd_htdocs_dir = $bandwidthd_nano_dir . "/htdocs";
+		if (!is_dir($bandwidthd_nano_dir)) {
+			if (file_exists($bandwidthd_nano_dir)) {
+				unlink($bandwidthd_nano_dir);
+			}
+			mkdir($bandwidthd_nano_dir);
+		}
+	} else {
+		$bandwidthd_htdocs_dir = $bandwidthd_base_dir . "/htdocs";
+	}
+
 	$rc = array();
 	$rc['file'] = 'bandwidthd.sh';
 	$rc['stop'] = <<<EOD
 /usr/bin/killall bandwidthd
 EOD;
 
-	if ($g['platform'] == 'nanobsd') {
-		// On nanobsd, /var/bandwidthd is created.
-		// In that is a real /var/bandwidth/htdocs, where the graph data is written
-		// A soft link to the real bandwidth program is made - /var/bandwidthd/bandwidthd
-		// A soft link to the etc folder with the conf file is made - /var/bandwidthd/etc
-		// bandwidthd is started from /var/bandwidthd with the current dir /var/bandwidth
-		// This way, it:
-		//   looks in ./etc for the conf file
-		//   writes graph files in ./htdocs
-		//   writes cdf log files (if selected in the config) to ./
-		// All of this is on the /var filesystem, which is a read-write memory disk on nanobsd
-		$bandwidthd_nano_dir = "/var/bandwidthd";
-		$bandwidthd_htdocs_dir = $bandwidthd_nano_dir . "/htdocs";
-		$rc['start'] = <<<EOD
+	// If this is an old config before the enable checkbox was added, then enable by default
+	$bandwidthd_enable = (!isset($bandwidthd_config['enable']) || ($bandwidthd_config['enable']));
+	if ($bandwidthd_enable) {
+		if ($g['platform'] == 'nanobsd') {
+			// On nanobsd, /var/bandwidthd is created.
+			// In that is a real /var/bandwidth/htdocs, where the graph data is written
+			// A soft link to the real bandwidth program is made - /var/bandwidthd/bandwidthd
+			// A soft link to the etc folder with the conf file is made - /var/bandwidthd/etc
+			// bandwidthd is started from /var/bandwidthd with the current dir /var/bandwidth
+			// This way, it:
+			//   looks in ./etc for the conf file
+			//   writes graph files in ./htdocs
+			//   writes cdf log files (if selected in the config) to ./
+			// All of this is on the /var filesystem, which is a read-write memory disk on nanobsd
+			$rc['start'] = <<<EOD
 if [ ! -d "{$bandwidthd_nano_dir}" ] ; then
 	if [ -e "{$bandwidthd_nano_dir}" ] ; then
 		/bin/rm -f {$bandwidthd_nano_dir}
@@ -266,17 +281,15 @@ cd {$bandwidthd_nano_dir}
 {$bandwidthd_nano_dir}/bandwidthd
 cd -
 EOD;
-		if (!is_dir($bandwidthd_nano_dir)) {
-			if (file_exists($bandwidthd_nano_dir)) {
-				unlink($bandwidthd_nano_dir);
-			}
-			mkdir($bandwidthd_nano_dir);
-		}
-	} else {
-		$bandwidthd_htdocs_dir = $bandwidthd_base_dir . "/htdocs";
-		$rc['start'] = <<<EOD
+		} else {
+			$rc['start'] = <<<EOD
 /usr/local/bandwidthd/bandwidthd
 EOD;
+		}
+	} else {
+		// bandwidthd is disabled, so do not put any real start commands in the script.
+		// This effectively disables it but keeps all the files in place (e.g. saved logs) ready to reload when it is enabled.
+		$rc['start'] = "return";
 	}
 
 	/* write out rc.d start/stop file */
@@ -302,7 +315,7 @@ EOD;
 		exec("echo \"Please start bandwidthd to populate this directory.\" > " . $bandwidthd_index_file);
 	}
 	
-	if($output_cdf) {
+	if (($bandwidthd_enable) && ($output_cdf)) {
 		// Use cron job to rotate logs every day at 00:01
 		install_cron_job("/bin/kill -HUP `cat /var/run/bandwidthd.pid`", true, "1", "0");
 	}
@@ -314,7 +327,9 @@ EOD;
 	conf_mount_ro();
 	config_unlock();
 	stop_service("bandwidthd");
-	start_service("bandwidthd");
+	if ($bandwidthd_enable) {
+		start_service("bandwidthd");
+	}
 }
 
 ?>

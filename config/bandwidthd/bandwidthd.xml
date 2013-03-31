@@ -7,7 +7,7 @@
 /* $Id$ */
 /* ========================================================================== */
 /*
-    authng.xml
+    bandwidthd.xml
     part of pfSense (http://www.pfSense.com)
     Copyright (C) 2007 to whom it may belong
     All rights reserved.
@@ -41,10 +41,10 @@
                                                                               */
 /* ========================================================================== */
         ]]>
-        </copyright>
-    <description>Describe your package here</description>
-    <requirements>Describe your package requirements here</requirements>
-    <faq>Currently there are no FAQ items provided.</faq>
+	</copyright>
+	<description>Describe your package here</description>
+	<requirements>Describe your package requirements here</requirements>
+	<faq>Currently there are no FAQ items provided.</faq>
 	<name>bandwidthd</name>
 	<version>2.0.1.4</version>
 	<title>Bandwidthd</title>
@@ -60,7 +60,7 @@
 			<name>bandwidthd</name>
 			<rcfile>bandwidthd.sh</rcfile>
 			<executable>bandwidthd</executable>
-    </service>
+	</service>
 	<tabs>
 		<tab>
 			<text>BandwidthD</text>
@@ -79,6 +79,12 @@
 		<item>http://www.pfsense.com/packages/config/bandwidthd/bandwidthd.inc</item>
 	</additional_files_needed>
 	<fields>
+		<field>
+			<fielddescr>Enable bandwidthd</fielddescr>
+			<fieldname>enable</fieldname>
+			<type>checkbox</type>
+			<description></description>
+		</field>			
 		<field>
 			<fielddescr>Interface</fielddescr>
 			<fieldname>active_interface</fieldname>
