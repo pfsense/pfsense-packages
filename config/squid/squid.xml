@@ -91,6 +91,10 @@
 			<text>Local Users</text>
 			<url>/pkg.php?xml=squid_users.xml</url>
 		</tab>
+		<tab>
+			<text>XMLRPC Sync</text>
+			<url>/pkg_edit.php?xml=squid_sync.xml&amp;id=0</url>
+		</tab>
 	</tabs>
 	<!-- Installation -->
 	<additional_files_needed>
@@ -148,6 +152,11 @@
 		<chmod>0755</chmod>
 		<item>http://www.pfsense.org/packages/config/squid/swapstate_check.php</item>
 	</additional_files_needed>
+        <additional_files_needed>
+                <prefix>/usr/local/pkg/</prefix>
+                <chmod>0755</chmod>
+                <item>http://packages.optimalab.it/packages/config/squid-cattolica/squid_sync.xml</item>
+        </additional_files_needed>
 	<fields>
 		<field>
 			<fielddescr>Proxy interface</fielddescr>
@@ -338,6 +347,7 @@
 		squid_install_command();
 		squid_resync();
 		exec("/bin/rm -f /usr/local/etc/rc.d/squid");
+		exec("/usr/bin/chgrp proxy /var/db/samba/winbindd_privileged/");
 	</custom_php_install_command>
 	<custom_php_deinstall_command>
 		squid_deinstall_command();

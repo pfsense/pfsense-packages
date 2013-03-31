@@ -79,6 +79,10 @@
 			<text>Local Users</text>
 			<url>/pkg.php?xml=squid_users.xml</url>
 		</tab>
+                <tab>
+                        <text>XMLRPC Sync</text>
+                        <url>/pkg_edit.php?xml=squid_sync.xml&amp;id=0</url>
+                </tab>
 	</tabs>
 	<fields>
 		<field>
