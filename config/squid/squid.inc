@@ -539,6 +539,109 @@ function squid_validate_auth($post, $input_errors) {
 	}
 }
 
+function squid_validate_sync($post, $input_errors) {
+	if ( isset($post['synconchanges']) ) {
+	    $ipaddress = $post['ipaddress'];
+	    if (!empty($ipaddress) && !is_ipaddr($ipaddress))
+		$input_errors[] = "The value '$ipaddress' is not a valid IP address";
+	}
+}
+
+function squid_do_xmlrpc_sync($sync_to_ip, $password) {
+        global $config;
+
+        if(!isset($password) || !isset($sync_to_ip) )
+                return;
+
+        $synconchanges = $config['installedpackages']['squidsync']['config'][0]['synconchanges'];
+	if ( !isset($synconchanges) )
+	    return;
+
+	// build xmlrpc url
+	$proto = $config['system']['webgui']['protocol'];
+	if( !isset($proto) ) {
+    	    $proto = "https";
+	}
+	$port = $config['system']['webgui']['port'];
+	/* if port is empty lets rely on the protocol selection */
+	if( !isset($port) ) {
+    	    if($proto == "https") 
+        	$port = "443";
+            else 
+                $port = "80";
+	}
+        $url = $proto . "://" . $sync_to_ip;
+
+        /* xml will hold the sections to sync */
+        $xml = array();
+    	log_error("Include squid config");
+        $xml['squid'] = $config['installedpackages']['squid'];
+        $xml['squidcache'] = $config['installedpackages']['squidcache'];
+        $xml['squidauth'] = $config['installedpackages']['squidauth'];
+        $xml['squidnac'] = $config['installedpackages']['squidnac'];
+        $xml['squidupstream'] = $config['installedpackages']['squidupstream'];
+
+        if (count($xml) > 0){
+            /* assemble xmlrpc payload */
+            $params = array(
+                XML_RPC_encode($password),
+                XML_RPC_encode($xml)
+            );
+            log_error("Beginning squid XMLRPC sync to {$url}:{$port}.");
+            $method = 'pfsense.merge_installedpackages_section_xmlrpc';
+            $msg = new XML_RPC_Message($method, $params);
+            $cli = new XML_RPC_Client('/xmlrpc.php', $url, $port);
+            $cli->setCredentials('admin', $password);
+            /* send our XMLRPC message and timeout after 250 seconds */
+            $resp = $cli->send($msg, "250");
+            if(!$resp) {
+                $error = "A communications error occurred while attempting squid XMLRPC sync with {$url}:{$port}.";
+                log_error($error);
+                file_notice("sync_settings", $error, "Squid Settings Sync", "");
+            } elseif($resp->faultCode()) {
+                $cli->setDebug(1);
+                $resp = $cli->send($msg, "250");
+                $error = "An error code was received while attempting squid XMLRPC sync with {$url}:{$port} - Code " . $resp->faultCode() . ": " . $resp->faultString();
+                log_error($error);
+                file_notice("sync_settings", $error, "Squid Settings Sync", "");
+            } else {
+                log_error("squid XMLRPC sync successfully completed with {$url}:{$port}.");
+            }
+
+                
+            /* tell squid to reload our settings on the destionation sync host. */
+            $method = 'pfsense.exec_php';
+            $execcmd  = "require_once('/usr/local/pkg/squid.inc');\n";
+            $execcmd .= "squid_resync();";
+                
+            /* assemble xmlrpc payload */
+            $params = array(
+                    XML_RPC_encode($password),
+                    XML_RPC_encode($execcmd)
+            );
+        
+            log_error("squid XMLRPC reload data {$url}:{$port}.");
+            $msg = new XML_RPC_Message($method, $params);
+            $cli = new XML_RPC_Client('/xmlrpc.php', $url, $port);
+            $cli->setCredentials('admin', $password);
+            $resp = $cli->send($msg, "250");
+            if(!$resp) {
+                    $error = "A communications error occurred while attempting squid XMLRPC sync with {$url}:{$port} (pfsense.exec_php).";
+                    log_error($error);
+                    file_notice("sync_settings", $error, "squid Settings Sync", "");
+            } elseif($resp->faultCode()) {
+                    $cli->setDebug(1);
+                    $resp = $cli->send($msg, "250");
+                    $error = "An error code was received while attempting squid XMLRPC sync with {$url}:{$port} - Code " . $resp->faultCode() . ": " . $resp->faultString();
+                    log_error($error);
+                    file_notice("sync_settings", $error, "squid Settings Sync", "");
+            } else {
+                    log_error("squid XMLRPC reload data success with {$url}:{$port} (pfsense.exec_php).");
+            }
+        }
+}
+
+
 function squid_install_cron($should_install) {
 	global $config, $g;
 	if($g['booting']==true) 
@@ -629,6 +732,14 @@ function squid_resync_general() {
 		if($real_ifaces[$i][0]) {
 			$conf .= "http_port {$real_ifaces[$i][0]}:$port\n";
 		}
+                // XXX: bind on Virtual IP too.
+                if($config['virtualip']['vip']) {
+                        foreach($config['virtualip']['vip'] as $vip) {
+                                if($vip['interface'] == $iface) {
+                                        $conf .= "http_port {$vip['subnet']}:$port\n";
+                                }
+                        }
+                }
 	}
 	if (($settings['transparent_proxy'] == 'on')) {
 		$conf .= "http_port 127.0.0.1:" . $settings['proxy_port'] . " transparent\n";
@@ -1183,6 +1294,23 @@ function squid_resync() {
 	}
 	filter_configure();
 	conf_mount_ro();
+
+	//
+	// XMLRPC Sync
+	//
+        $synconchanges = $config['installedpackages']['squidsync']['config'][0]['synconchanges'];
+        if( isset($synconchanges) && $synconchanges ) {
+    	    log_error("[Proxy server] Starting XMLRPC sync.");
+    	    foreach ($config['installedpackages']['squidsync']['config'] as $rs) {
+                foreach($rs['row'] as $sh){
+            	    $sync_to_ip = $sh['ipaddress'];
+            	    $password   = $sh['password'];
+            	    if( isset($password) && isset($sync_to_ip) )
+            		squid_do_xmlrpc_sync($sync_to_ip, $password);
+            	}
+    	    }
+    	    log_error("[Proxy server] Ending XMLRPC sync.");
+	}
 }
 
 function squid_print_javascript_auth() {
