@@ -92,6 +92,11 @@ if (empty($categories[0]) && ($currentruleset != "custom.rules")) {
 		$currentruleset = "custom.rules";
 }
 
+/* One last sanity check -- if the rules directory is empty, default to loading custom rules */
+$tmp = glob("{$snortdir}/rules/*.rules");
+if (empty($tmp))
+	$currentruleset = "custom.rules";
+
 $ruledir = "{$snortdir}/rules";
 $rulefile = "{$ruledir}/{$currentruleset}";
 if ($currentruleset != 'custom.rules') {
@@ -100,7 +105,7 @@ if ($currentruleset != 'custom.rules') {
 	if (substr($currentruleset, 0, 10) == "IPS Policy")
 		$rules_map = snort_load_vrt_policy($a_rule[$id]['ips_policy']);
 	elseif (!file_exists($rulefile))
-		$input_errors[] = "{$currentruleset} seems to be missing!!! Please go to the Category tab and save the rule set again to regenerate it.";
+		$input_errors[] = gettext("{$currentruleset} seems to be missing!!! Please verify rules files have been downloaded, then go to the Categories tab and save the rule set again.");
 	else
 		$rules_map = snort_load_rules_map($rulefile);
 }

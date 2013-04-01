@@ -62,6 +62,21 @@ $if_real = snort_get_real_interface($pconfig['interface']);
 $snort_uuid = $a_nat[$id]['uuid'];
 $snortdownload = $config['installedpackages']['snortglobal']['snortdownload'];
 $emergingdownload = $config['installedpackages']['snortglobal']['emergingthreats'];
+$snortcommunitydownload = $config['installedpackages']['snortglobal']['snortcommunityrules'];
+
+$no_emerging_files = false;
+$no_snort_files = false;
+$no_community_files = false;
+
+/* Test rule categories currently downloaded to $SNORTDIR/rules and set appropriate flags */
+$test = glob("{$snortdir}/rules/emerging-*.rules");
+if (empty($test))
+	$no_emerging_files = true;
+$test = glob("{$snortdir}/rules/snort_*.rules");
+if (empty($test))
+	$no_snort_files = true;
+if (!file_exists("{$snortdir}/rules/GPLv2_community.rules"))
+	$no_community_files = true;
 
 if (($snortdownload == 'off') || ($a_nat[$id]['ips_policy_enable'] != 'on'))
 	$policy_select_disable = "disabled";
@@ -141,6 +156,11 @@ if ($_POST['selectall']) {
 	$rulesets = array();
 	if ($emergingdownload == 'on') {
 		$files = glob("{$snortdir}/rules/emerging*.rules");
+		foreach ($files as $file)
+			$rulesets[] = basename($file);
+	}
+	if ($snortcommunitydownload == 'on') {
+		$files = glob("{$snortdir}/rules/sc_*.rules");
 		foreach ($files as $file)
 			$rulesets[] = basename($file);
 	}
@@ -235,12 +255,12 @@ function enable_change()
 	$iscfgdirempty = array();
 	if (file_exists("{$snortdir}/snort_{$snort_uuid}_{$if_real}/rules/custom.rules"))
 		$iscfgdirempty = (array)("{$snortdir}/snort_{$snort_uuid}_{$if_real}/rules/custom.rules");
-	if (empty($isrulesfolderempty) && empty($iscfgdirempty)):
+	if (empty($isrulesfolderempty)):
 ?>
 		<tr>
-			<td>
-		<?php printf(gettext("# The rules directory is empty. %s/rules"), $snortdir); ?> <br/>
-		<?php echo gettext("Please go to the Updates tab to download/fetch the rules configured."); ?>	
+			<td class="vexpl"><br/>
+		<?php printf(gettext("# The rules directory is empty:  %s%s/rules%s"), '<strong>',$snortdir,'</strong>'); ?> <br/><br/>
+		<?php printf(gettext("Please go to the %sUpdates%s tab to download the rules configured on the %sGlobal%s tab."),'<strong>' ,'</strong>', '<strong>' ,'</strong>'); ?>
 			</td>
 		</tr>
 <?php else: 
@@ -260,28 +280,30 @@ function enable_change()
 			</tr>
 			<tr>
 				<td colspan="6" valign="center" class="listn">
-					<table width="100%" border="0" cellpadding="0" cellspacing="0">
+					<table width="100%" border="0" cellpadding="2" cellspacing="2">
 					   <tr>
 						<td width="15%" class="listn"><?php echo gettext("Resolve Flowbits"); ?></td>
-						<td width="85%"><input name="autoflowbits" id="autoflowbitrules" type="checkbox" value="on" <?php if ($a_nat[$id]['autoflowbitrules'] == "on") echo "checked"; ?>/></td>
+						<td width="85%"><input name="autoflowbits" id="autoflowbitrules" type="checkbox" value="on" <?php if ($a_nat[$id]['autoflowbitrules'] == "on") echo "checked"; ?>/>
+						&nbsp;&nbsp;<span class="vexpl"><?php echo gettext("If ticked, Snort will auto-enable rules required for checked flowbits."); ?>
+						</span></td>
 					   </tr>
 					   <tr>
 						<td width="15%" class="vncell">&nbsp;</td>
 						<td width="85%" class="vtable">
-						<?php echo gettext("If ticked, Snort will examine the enabled rules in your chosen " .
+						<?php echo gettext("Snort will examine the enabled rules in your chosen " .
 						"rule categories for checked flowbits.  Any rules that set these dependent flowbits will " .
-						"be automatically enabled and added to the list of files in the interface rules directory."); ?><br/><br/></td>
+						"be automatically enabled and added to the list of files in the interface rules directory."); ?><br/></td>
 					   </tr>
 					   <tr>
 						<td width="15%" class="listn"><?php echo gettext("Auto Flowbit Rules"); ?></td>
-						<td width="85%"><input type="button" class="formbtn" value="View" onclick="popup('snort_rules_edit.php?id=<?=$id;?>&openruleset=<?=$flowbit_rules_file;?>')" <?php echo $btn_view_flowb_rules; ?>/></td>
+						<td width="85%"><input type="button" class="formbtn" value="View" onclick="popup('snort_rules_edit.php?id=<?=$id;?>&openruleset=<?=$flowbit_rules_file;?>')" <?php echo $btn_view_flowb_rules; ?>/>
+						&nbsp;&nbsp;<span class="vexpl"><?php echo gettext("Click to view auto-enabled rules required to satisfy flowbit dependencies"); ?></span></td>
 					   </tr>
 					   <tr>
 						<td width="15%">&nbsp;</td>
 						<td width="85%">
-						<?php echo gettext("Click to view auto-enabled rules required to satisfy flowbit " .
-						"dependencies from the selected rule categories below.  Auto-enabled rules generating unwanted alerts " .
-						"should have their GID:SID added to the Suppression List for the interface."); ?><br/><br/></td>
+						<?php printf(gettext("%sNote:  %sAuto-enabled rules generating unwanted alerts should have their GID:SID added to the Suppression List for the interface."), '<span class="red"><strong>', '</strong></span>'); ?>
+						<br/></td>
 					   </tr>
 					</table>
 				</td>
@@ -291,20 +313,20 @@ function enable_change()
 			</tr>
 			<tr>
 				<td colspan="6" valign="center" class="listn">
-					<table width="100%" border="0" cellpadding="0" cellspacing="0">
+					<table width="100%" border="0" cellpadding="2" cellspacing="2">
 					   <tr>
 						<td width="15%" class="listn"><?php echo gettext("Use IPS Policy"); ?></td>
 						<td width="85%"><input name="ips_policy_enable" id="ips_policy_enable" type="checkbox" value="on" <?php if ($a_nat[$id]['ips_policy_enable'] == "on") echo "checked"; ?>
-						<?php if ($snortdownload == "off") echo "disabled" ?> onClick="enable_change()"/></td>
+						<?php if ($snortdownload == "off") echo "disabled" ?> onClick="enable_change()"/>&nbsp;&nbsp;<span class="vexpl">
+						<?php echo gettext("If ticked, Snort will use rules from the pre-defined IPS policy selected below."); ?></span></td>
 					   </tr>
 					   <tr>
 						<td width="15%" class="vncell">&nbsp;</td>
 						<td width="85%" class="vtable">
-						<?php echo gettext("If ticked, Snort will use rules from the pre-defined IPS policy " .
-						"selected below.  You must be using the Snort VRT rules to use this option."); ?><br/>
+  						<?php printf(gettext("%sNote:%s  You must be using the Snort VRT rules to use this option."),'<span class="red"><strong>','</strong></span>'); ?>
 						<?php echo gettext("Selecting this option disables manual selection of Snort VRT categories in the list below, " .
 						"although Emerging Threats categories may still be selected if enabled on the Global Settings tab.  " .
-						"These will be added to the pre-defined Snort IPS policy rules from the Snort VRT."); ?><br><br/></td>
+						"These will be added to the pre-defined Snort IPS policy rules from the Snort VRT."); ?><br/></td>
 					   </tr>
 					   <tr>
 						<td width="15%" class="listn"><?php echo gettext("IPS Policy"); ?></td>
@@ -313,15 +335,16 @@ function enable_change()
 									<option value="balanced" <?php if ($pconfig['ips_policy'] == "balanced") echo "selected"; ?>><?php echo gettext("Balanced"); ?></option>
 									<option value="security" <?php if ($pconfig['ips_policy'] == "security") echo "selected"; ?>><?php echo gettext("Security"); ?></option>
 								</select>
-						</td>
+						&nbsp;&nbsp;<span class="vexpl"><?php echo gettext("Snort IPS policies are:  Connectivity, Balanced or Security."); ?></span></td>
 					   </tr>
 					   <tr>
 						<td width="15%">&nbsp;</td>
 						<td width="85%">
-						<?php echo gettext("Snort IPS policies are:  Connectivity, Balanced or Security.  " .
-						"Connectivity blocks most major threats with few or no false positives.  Balanced is a good starter policy.  It " .
-						"is speedy, has good base coverage level, and covers most threats of the day.  It includes all rules in Connectivity.  " .
-						"Security is a stringent policy.  It contains everything in the first two plus policy-type rules such as Flash in an Excel file."); ?><br/><br/></td>
+						<?php echo gettext("Connectivity blocks most major threats with few or no false positives.  " . 
+						"Balanced is a good starter policy.  It is speedy, has good base coverage level, and covers " . 
+						"most threats of the day.  It includes all rules in Connectivity." . 
+						"Security is a stringent policy.  It contains everything in the first two " .
+						"plus policy-type rules such as Flash in an Excel file."); ?><br/></td>
 					   </tr>
 					</table>
 				</td>
@@ -329,27 +352,75 @@ function enable_change()
 			<tr>
 				<td colspan="6" class="listtopic"><?php echo gettext("Check the rulesets that you would like Snort to load at startup."); ?><br/></td>
 			</tr>
-			<tr>
-				<td colspan="1" align="middle" valign="center"><br/><input value="Select All" type="submit" name="selectall" id="selectall" /><br/></td>
-				<td colspan="1" align="middle" valign="center"><br/><input value="Unselect All" type="submit" name="unselectall" id="selectall" /><br/></td>
-				<td colspan="1" align="middle" valign="center"><br/><input value="Save" class="formbtn" type="submit" name="Submit" id="Submit" /></td>
-				<td colspan="3" valign="center"><?php echo gettext("Click to save changes and auto-resolve flowbit rules (if option is selected above)"); ?><br/></td>
-			</tr>
 			<tr>    <td colspan="6">&nbsp;</td> </tr>
+			<tr>
+				<td colspan="6">
+					<table width=100% border="0" cellpadding="2" cellspacing="2">
+						<tr>
+							<td valign="middle"><input value="Select All" type="submit" name="selectall" id="selectall" /></td>
+							<td valign="middle"><input value="Unselect All" type="submit" name="unselectall" id="selectall" /></td>
+							<td valign="middle"><input value="Save" class="formbtn" type="submit" name="Submit" id="Submit" /></td>
+							<td valign="middle"><span class="vexpl"><?php echo gettext("Click to save changes and auto-resolve flowbit rules (if option is selected above)"); ?></span></td>
+						</tr>
+					</table>
+			</tr>
+			<tr>
+			    <td colspan="6">&nbsp;</td>
+			</tr>
+
+			<?php if ($no_community_files)
+				$msg_community = "NOTE: Snort Community Rules have not been downloaded.  Perform a Rules Update to enable them.";
+			      else
+				$msg_community = "Snort GPLv2 Community Rules (VRT certified)";
+			?>
+			<?php if ($snortcommunitydownload == 'on'): ?>
 			<tr id="frheader">
-				<?php if ($emergingdownload == 'on'): ?>
-					<td width="5%" class="listhdrr"><?php echo gettext("Enabled"); ?></td>
+				<td width="5%" class="listhdrr"><?php echo gettext("Enabled"); ?></td>
+				<td colspan="5" class="listhdrr"><?php echo gettext('Ruleset: Snort GPLv2 Community Rules');?></td>
+			</tr>
+			<?php if (in_array("GPLv2_community.rules", $enabled_rulesets_array)): ?>
+			<tr>
+				<td width="5" class="listr" align="center" valign="top">
+				<input type="checkbox" name="toenable[]" value="GPLv2_community.rules" checked="checked"/></td>
+				<td colspan="5" class="listr"><a href="snort_rules.php?id=<?=$id;?>&openruleset=GPLv2_community.rules"><?php echo gettext("{$msg_community}"); ?></a></td>
+			</tr>
+			<?php else: ?>
+			<tr>
+				<td width="5" class="listr" align="center" valign="top">
+				<input type="checkbox" name="toenable[]" value="GPLv2_community.rules" <?php if ($snortcommunitydownload == 'off') echo "disabled"; ?>/></td>
+				<td colspan="5" class="listr"><?php echo gettext("{$msg_community}"); ?></td>
+			</tr>
+
+			<?php endif; ?>
+			<?php else: ?>
+			<tr>
+			    <td colspan="6">&nbsp;</td>
+			</tr>
+			<?php endif; ?>
+
+			<?php if ($no_emerging_files)
+				  $msg_emerging = "downloaded.";
+			      else
+				  $msg_emerging = "enabled.";
+			      if ($no_snort_files)
+				  $msg_snort = "downloaded.";
+			      else
+				  $msg_snort = "enabled.";
+			?>
+			<tr id="frheader">
+				<?php if ($emergingdownload == 'on' && !$no_emerging_files): ?>
+					<td width="5%" class="listhdrr" align="center"><?php echo gettext("Enabled"); ?></td>
 					<td width="25%" class="listhdrr"><?php echo gettext('Ruleset: Emerging Threats');?></td>
 				<?php else: ?>
-					<td colspan="2" width="30%" class="listhdrr"><?php echo gettext("Emerging rules have not been enabled"); ?></td>
+					<td colspan="2" align="center" width="30%" class="listhdrr"><?php echo gettext("Emerging Threats rules not {$msg_emerging}"); ?></td>
 				<?php endif; ?>
-				<?php if ($snortdownload == 'on'): ?>
-					<td width="5%" class="listhdrr"><?php echo gettext("Enabled"); ?></td>
-					<td width="25%" class="listhdrr"><?php echo gettext('Ruleset: Snort');?></td>
-					<td width="5%" class="listhdrr"><?php echo gettext("Enabled"); ?></td>
-					<td width="25%" class="listhdrr"><?php echo gettext('Ruleset: Snort SO');?></td>
+				<?php if ($snortdownload == 'on' && !$no_snort_files): ?>
+					<td width="5%" class="listhdrr" align="center"><?php echo gettext("Enabled"); ?></td>
+					<td width="25%" class="listhdrr"><?php echo gettext('Ruleset: Snort Text Rules');?></td>
+					<td width="5%" class="listhdrr" align="center"><?php echo gettext("Enabled"); ?></td>
+					<td width="25%" class="listhdrr"><?php echo gettext('Ruleset: Snort SO Rules');?></td>
 				<?php else: ?>
-					<td colspan="2" width="60%" class="listhdrr"><?php echo gettext("Snort rules have not been enabled"); ?></td>
+					<td colspan="4" align="center" width="60%" class="listhdrr"><?php echo gettext("Snort VRT rules have not been {$msg_snort}"); ?></td>
 				<?php endif; ?>
 				</tr>
 			<?php

@@ -51,6 +51,8 @@ $pconfig['snortloglimitsize'] = $config['installedpackages']['snortglobal']['sno
 $pconfig['autorulesupdate7'] = $config['installedpackages']['snortglobal']['autorulesupdate7'];
 $pconfig['forcekeepsettings'] = $config['installedpackages']['snortglobal']['forcekeepsettings'];
 $pconfig['protect_preproc_rules'] = $config['installedpackages']['snortglobal']['protect_preproc_rules'];
+$pconfig['snortcommunityrules'] = $config['installedpackages']['snortglobal']['snortcommunityrules'];
+
 
 /* if no errors move foward */
 if (!$input_errors) {
@@ -59,8 +61,9 @@ if (!$input_errors) {
 
 		$config['installedpackages']['snortglobal']['snortdownload'] = $_POST['snortdownload'];
 		$config['installedpackages']['snortglobal']['oinkmastercode'] = $_POST['oinkmastercode'];
-
+		$config['installedpackages']['snortglobal']['snortcommunityrules'] = $_POST['snortcommunityrules'] ? 'on' : 'off';
 		$config['installedpackages']['snortglobal']['emergingthreats'] = $_POST['emergingthreats'] ? 'on' : 'off';
+
 		$config['installedpackages']['snortglobal']['rm_blocked'] = $_POST['rm_blocked'];
 		$config['installedpackages']['snortglobal']['protect_preproc_rules'] = $_POST['protect_preproc_rules'] ? 'on' : 'off';
 		if ($_POST['snortloglimitsize']) {
@@ -143,7 +146,8 @@ function enable_snort_vrt(btn) {
         $tab_array[6] = array(gettext("Suppress"), false, "/snort/snort_interfaces_suppress.php");
         display_top_tabs($tab_array);
 ?>
-</td></tr>
+</td>
+</tr>
 <tr>
 	<td class="tabcont">
 	<table width="100%" border="0" cellpadding="6" cellspacing="0">
@@ -196,8 +200,8 @@ function enable_snort_vrt(btn) {
 				<?php if ($config['installedpackages']['snortglobal']['protect_preproc_rules']=="on") echo "checked"; 
 				if($pconfig['snortdownload']<>'on') echo ' disabled'; ?> ><br>
 			</td>
-			<td><span class="vexpl"><?php echo gettext("Check this box if you maintain customized preprocessor rules files "); ?><br>
-				<?php echo gettext("and do not want them overwritten by automatic rule updates."); ?><br>
+			<td><span class="vexpl"><?php echo gettext("Check this box if you maintain customized preprocessor rules files and"); ?><br/>
+				<?php echo gettext("do not want them overwritten by automatic Snort VRT rule updates."); ?><br/><br/>
 				<?php printf(gettext("%sHint:%s  Most users should leave this unchecked."), '<span class="red"><strong>', '</strong></span>'); ?></span></br>
 			</td>
 		</tr>
@@ -205,14 +209,33 @@ function enable_snort_vrt(btn) {
 
 </tr>
 <tr>
-	<td width="22%" valign="top" class="vncell"><?php printf(gettext("Install %sEmergingthreats%s " .
+	<td width="22%" valign="top" class="vncell"><?php printf(gettext("Install %sSnort Community%s " .
 	"rules"), '<strong>' , '</strong>'); ?></td>
-	<td width="78%" class="vtable"><input name="emergingthreats"
-		type="checkbox" value="yes"
-		<?php if ($config['installedpackages']['snortglobal']['emergingthreats']=="on") echo "checked"; ?>
-		><br>
-	<?php echo gettext("Emerging Threats is an open source community that produces fastest " .
-	"moving and diverse Snort Rules."); ?></td>
+	<td width="78%" class="vtable">
+		<table width="100%" border="0" cellpadding="2" cellspacing="0">
+			<tr>
+				<td valign="top" width="8%"><input name="snortcommunityrules" type="checkbox" value="yes"
+				<?php if ($config['installedpackages']['snortglobal']['snortcommunityrules']=="on") echo "checked"; ?> ></td>
+				<td><span class="vexpl"><?php echo gettext("The Snort Community Ruleset is a GPLv2 VRT certified ruleset that is distributed free of charge " .
+				"without any VRT License restrictions.  This ruleset is updated daily and is a subset of the subscriber ruleset."); ?>
+				<br/><br/><?php printf(gettext("%sNote:  %sIf you are a Snort VRT Paid Subscriber, the community ruleset is already built into your download."),'<span class="red"><strong>' ,'</strong></span>'); ?></span><br></td>
+			</tr>
+		</table></td>
+</tr>
+
+<tr>
+	<td width="22%" valign="top" class="vncell"><?php printf(gettext("Install %sEmerging Threats%s " .
+	"rules"), '<strong>' , '</strong>'); ?></td>
+	<td width="78%" class="vtable">
+		<table width="100%" border="0" cellpadding="2" cellspacing="0">
+			<tr>
+				<td valign="top" width="8%"><input name="emergingthreats" type="checkbox" value="yes" 
+				<?php if ($config['installedpackages']['snortglobal']['emergingthreats']=="on") echo "checked"; ?>>
+				<td><span class="vexpl"><?php echo gettext("Emerging Threats is an open source community that produces fast " .
+				"moving and diverse Snort Rules."); ?></span></td>
+			</tr>
+		</table>
+	</td>
 </tr>
 <tr>
 	<td width="22%" valign="top" class="vncell"><?php echo gettext("Update rules " .
@@ -226,8 +249,8 @@ function enable_snort_vrt(btn) {
 		<?php if ($iface3 == $pconfig['autorulesupdate7']) echo "selected"; ?>>
 			<?=htmlspecialchars($ifacename3);?></option>
 			<?php endforeach; ?>
-	</select><br>
-	<span class="vexpl"><?php echo gettext("Please select the update times for rules."); ?></br>
+	</select><span class="vexpl">&nbsp;&nbsp;<?php echo gettext("Please select the update times for rules."); ?><br/><br/>
+	
 	<?php printf(gettext("%sHint%s: in most cases, every 12 hours is a good choice."), '<span class="red"><strong>','</strong></span>'); ?></span></td>
 </tr>
 <tr>
@@ -241,7 +264,7 @@ function enable_snort_vrt(btn) {
 	<br/>
 	<br/>
 	<span class="red"><strong><?php echo gettext("Note"); ?></span>:</strong><br>
-	<?php echo gettext("Available space is"); ?> <strong><?php echo $snortlogCurrentDSKsize; ?>MB</strong></td>
+	<?php echo gettext("Available space is"); ?> <strong><?php echo $snortlogCurrentDSKsize; ?>&nbsp;MB</strong></td>
 	<td width="78%" class="vtable">
 	<table cellpadding="0" cellspacing="0">
 		<tr>
@@ -263,14 +286,13 @@ function enable_snort_vrt(btn) {
 			<td>&nbsp;</td>
 		</tr>
 	</table>
-	<table width="100%" border="0" cellpadding="6" cellspacing="0">
+	<table width="100%" border="0" cellpadding="2" cellspacing="0">
 		<tr>
 			<td><span class="vexpl"><?php echo gettext("Size in"); ?> <strong>MB</strong><span></td>
-			<td><input name="snortloglimitsize" type="text"
-				class="formfld" id="snortloglimitsize" size="7"
-				value="<?=htmlspecialchars($pconfig['snortloglimitsize']);?>">&nbsp;&nbsp;
-			<?php echo gettext("Default is"); ?> <strong>20%</strong> <?php echo gettext("of available space."); ?></td>
-	
+			<td><input name="snortloglimitsize" type="text" class="formfld" id="snortloglimitsize" size="7" value="
+			<?=htmlspecialchars($pconfig['snortloglimitsize']);?>">&nbsp;&nbsp;
+			<?php printf(gettext("Default is %s20%%%s of available space."), '<strong>', '</strong>'); ?></td>
+		</tr>
 	</table>
 
 </tr>
@@ -286,8 +308,8 @@ function enable_snort_vrt(btn) {
 		<?php if ($iface3 == $pconfig['rm_blocked']) echo "selected"; ?>>
 			<?=htmlspecialchars($ifacename3);?></option>
 			<?php endforeach; ?>
-	</select><br>
-	<?php echo gettext("Please select the amount of time you would like hosts to be blocked for."); ?></br>
+	</select>&nbsp;&nbsp;
+	<?php echo gettext("Please select the amount of time you would like hosts to be blocked for."); ?><br/><br/>
 	<?php printf(gettext("%sHint:%s in most cases, 1 hour is a good choice."), '<span class="red"><strong>', '</strong></span>'); ?></td>
 </tr>
 <tr>
@@ -296,8 +318,7 @@ function enable_snort_vrt(btn) {
 	<td width="78%" class="vtable"><input name="forcekeepsettings"
 		id="forcekeepsettings" type="checkbox" value="yes"
 		<?php if ($config['installedpackages']['snortglobal']['forcekeepsettings']=="on") echo "checked"; ?>
-		><br>
-	<?php echo gettext("Settings will not be removed during deinstall."); ?></td>
+		>&nbsp;&nbsp;<?php echo gettext("Settings will not be removed during deinstall."); ?></td>
 </tr>
 <tr>
 	<td width="22%" valign="top">
@@ -309,8 +330,8 @@ function enable_snort_vrt(btn) {
 	<td width="22%" valign="top">&nbsp;</td>
 	<td width="78%"><span class="vexpl"><span class="red"><strong><?php echo gettext("Note:"); ?><br>
 	</strong></span> <?php echo gettext("Changing any settings on this page will affect all " .
-	"interfaces. Please, double check if your oink code is correct and " .
-				"the type of snort.org account you hold."); ?></span></td>
+	"interfaces. Double check that your oink code is correct, and verify the " .
+				"type of Snort.org account you hold."); ?></span></td>
 </tr>
 	</table>
 </td></tr>
