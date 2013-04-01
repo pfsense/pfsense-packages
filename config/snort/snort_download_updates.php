@@ -36,7 +36,7 @@
 require_once("guiconfig.inc");
 require_once("/usr/local/pkg/snort/snort.inc");
 
-global $g, $update_log;
+global $g, $update_log, $snort_rules_file, $emergingthreats_filename;
 
 $snortdir = SNORTDIR;
 
@@ -47,6 +47,7 @@ $snort_load_jquery = 'yes';
 $snort_load_jquery_colorbox = 'yes';
 $snortdownload = $config['installedpackages']['snortglobal']['snortdownload'];
 $emergingthreats = $config['installedpackages']['snortglobal']['emergingthreats'];
+$snortcommunityrules = $config['installedpackages']['snortglobal']['snortcommunityrules'];
 
 /* quick md5s chk */
 $snort_org_sig_chk_local = 'N/A';
@@ -54,8 +55,12 @@ if (file_exists("{$snortdir}/{$snort_rules_file}.md5"))
 	$snort_org_sig_chk_local = file_get_contents("{$snortdir}/{$snort_rules_file}.md5");
 
 $emergingt_net_sig_chk_local = 'N/A';
-if (file_exists("{$snortdir}/emerging.rules.tar.gz.md5"))
-	$emergingt_net_sig_chk_local = file_get_contents("{$snortdir}/emerging.rules.tar.gz.md5");
+if (file_exists("{$snortdir}/{$emergingthreats_filename}.md5"))
+	$emergingt_net_sig_chk_local = file_get_contents("{$snortdir}/{$emergingthreats_filename}.md5");
+
+$snort_community_sig_chk_local = 'N/A';
+if (file_exists("{$snortdir}/{$snort_community_rules_filename}.md5"))
+	$snort_community_sig_chk_local = file_get_contents("{$snortdir}/{$snort_community_rules_filename}.md5");
 
 /* Check for postback to see if we should clear the update log file. */
 if (isset($_POST['clear'])) {
@@ -125,14 +130,15 @@ function popup(url)
 						<td id="download_rules_td" style="background-color: #eeeeee">
 						<div height="32" width="725px" style="background-color: #eeeeee">
 
-						<font color="#777777" size="1.5px">
+						<font color="#777777" size="2.5px">
 						<p style="text-align: left; margin-left: 225px;">
-							<b><?php echo gettext("INSTALLED SIGNATURE RULESET"); ?></b></font><br>
-							<br>
-							<font color="#FF850A" size="1px"><b>SNORT.ORG >>></b></font>
+							<b><?php echo gettext("INSTALLED RULESET SIGNATURES"); ?></b></font><br/>
+							<font color="#FF850A" size="1px"><b>SNORT.ORG&nbsp;&nbsp;--></b></font>
 							<font size="1px" color="#000000">&nbsp;&nbsp;<? echo $snort_org_sig_chk_local; ?></font><br>
-							<font color="#FF850A" size="1px"><b>EMERGINGTHREATS.NET >>></b></font>
+							<font color="#FF850A" size="1px"><b>EMERGINGTHREATS.NET&nbsp;&nbsp;--></b></font>
 							<font size="1px" color="#000000">&nbsp;&nbsp;<? echo $emergingt_net_sig_chk_local; ?></font><br>
+							<font color="#FF850A" size="1px"><b>SNORT GPLv2 COMMUNITY RULES&nbsp;&nbsp;--></b></font>
+							<font size="1px" color="#000000">&nbsp;&nbsp;<? echo $snort_community_sig_chk_local; ?></font><br>
 						</p>
 						</div>
 						</td>
@@ -146,7 +152,7 @@ function popup(url)
 						<div height="32" width="725px" style='background-color: #eeeeee'>
 
 						<p style="text-align: left; margin-left: 225px;">
-						<font color='#777777' size='1.5px'><b><?php echo gettext("UPDATE YOUR RULES"); ?></b></font><br>
+						<font color='#777777' size='2.5px'><b><?php echo gettext("UPDATE YOUR RULESET"); ?></b></font><br>
 						<br/>
 
 			<?php
@@ -179,14 +185,14 @@ function popup(url)
 						<div height="32" width="725px" style='background-color: #eeeeee'>
 
 						<p style="text-align: left; margin-left: 225px;">
-						<font color='#777777' size='1.5px'><b><?php echo gettext("VIEW UPDATE LOG"); ?></b></font><br>
+						<font color='#777777' size='2.5px'><b><?php echo gettext("VIEW UPDATE LOG"); ?></b></font><br>
 						<br>
 				<?php
 
 						if ($update_logfile_chk == 'yes') {
 							echo "
 				<button class=\"formbtn\" onclick=\"popup('snort_log_view.php?logfile={$log}')\"><span class='pwhitetxt'>" . gettext("View Log") . "</span></button>";
-				echo "&nbsp;&nbsp;&nbsp;&nbsp;<input type=\"submit\" value=\"Clear Log\" name=\"clear\" id=\"Submit\" class=\"formbtn\" />\n";
+				echo "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type=\"submit\" value=\"Clear Log\" name=\"clear\" id=\"Submit\" class=\"formbtn\" />\n";
 						}else{
 							echo "
 				<button disabled='disabled'><span class='pwhitetxt'>" . gettext("View Log") . "</span></button>&nbsp;&nbsp;&nbsp;" . gettext("Log is empty.") . "\n";
