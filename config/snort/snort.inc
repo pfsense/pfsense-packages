@@ -39,7 +39,8 @@ require_once("filter.inc");
 
 // Explicitly declare these as global so they work through function call includes 
 global $snort_rules_file, $snort_version, $emerging_threats_version, $update_log;
-global $flowbit_rules_file, $snort_enforcing_rules_file, $rebuild_rules;
+global $flowbit_rules_file, $snort_enforcing_rules_file, $rebuild_rules, $is_postinstall;
+global $$snort_community_rules_filename, $snort_community_rules_url, $emergingthreats_filename;
 
 define("SNORTDIR", "/usr/local/etc/snort");
 define("SNORTLOGDIR", "/var/log/snort");
@@ -52,6 +53,9 @@ $snort_package_version = "Snort {$snort_version} pkg v. {$pfSense_snort_version}
 /* Important file definitions */
 $snort_rules_file = "snortrules-snapshot-2941.tar.gz";
 $emerging_threats_version = "2.9.0";
+$emergingthreats_filename = "emerging.rules.tar.gz";
+$snort_community_rules_url = "https://s3.amazonaws.com/snort-org/www/rules/community/";
+$snort_community_rules_filename = "community-rules.tar.gz";
 $flowbit_rules_file = "flowbit-required.rules";
 $snort_enforcing_rules_file = "snort.rules";
 $update_log = SNORTLOGDIR;
@@ -59,6 +63,9 @@ $update_log .= "/update.log";
 
 /* Rebuild Rules Flag -- if "on", rebuild enforcing rules and flowbit-rules files */
 $rebuild_rules = "off";
+
+/* Post-install Flag -- normally "false" except during post-install of package */
+$is_postinstall = false;
 
 if (!is_array($config['installedpackages']['snortglobal']))
 	$config['installedpackages']['snortglobal'] = array();
@@ -439,9 +446,12 @@ function snort_post_delete_logs($snort_uuid = 0) {
 
 function snort_postinstall() {
 	global $config, $g, $snort_rules_file, $emerging_threats_version;
-	global $snort_version, $update_log, $rebuild_rules;
+	global $snort_version, $update_log, $rebuild_rules, $is_postinstall;
 
 	$snortdir = SNORTDIR;
+
+	/* Set flag for post-install in progress */
+	$is_postinstall = true;
 
 	/* cleanup default files */
 	@rename("{$snortdir}/snort.conf-sample", "{$snortdir}/snort.conf");
@@ -474,6 +484,9 @@ function snort_postinstall() {
 		$rebuild_rules = "off";
 		update_output_window(gettext("Finished rebuilding files..."));
 	}
+
+	/* Done with post-install, so clear flag */
+	$is_postinstall = false;
 }
 
 function snort_Getdirsize($node) {
@@ -1911,6 +1924,12 @@ function snort_generate_conf($snortcfg) {
 	if (!is_array($config['installedpackages']['snortglobal']['rule']))
 		return;
 
+	/* See if we should protect and not modify the preprocessor rules files */
+	if (!empty($config['installedpackages']['snortglobal']['protect_preproc_rules'])) 	
+		$protect_preproc_rules = $config['installedpackages']['snortglobal']['protect_preproc_rules'];
+	else
+		$protect_preproc_rules = "off";
+
 	$if_real = snort_get_real_interface($snortcfg['interface']);
 	$snort_uuid = $snortcfg['uuid'];
 	$snortcfgdir = "{$snortdir}/snort_{$snort_uuid}_{$if_real}";
@@ -2356,14 +2375,14 @@ EOD;
 	if (file_exists("{$snortcfgdir}/classification.config"))
 		$snort_misc_include_rules .= "include {$snortcfgdir}/classification.config\n";
 	if (is_dir("{$snortcfgdir}/preproc_rules")) {
-		if ($snortcfg['sensitive_data'] == 'on') {
+		if ($snortcfg['sensitive_data'] == 'on' && $protect_preproc_rules == "off") {
 			$sedcmd = '/^#alert.*classtype:sdf/s/^#//';
 			if (file_exists("{$snortcfgdir}/preproc_rules/sensitive-data.rules"))
 				$snort_misc_include_rules .= "include \$PREPROC_RULE_PATH/sensitive-data.rules\n";
 		} else
 			$sedcmd = '/^alert.*classtype:sdf/s/^/#/';
 		if (file_exists("{$snortcfgdir}/preproc_rules/decoder.rules") &&
-		    file_exists("{$snortcfgdir}/preproc_rules/preprocessor.rules")) {
+		    file_exists("{$snortcfgdir}/preproc_rules/preprocessor.rules") && $protect_preproc_rules == "off") {
 			@file_put_contents("{$g['tmp_path']}/sedcmd", $sedcmd);
 			mwexec("/usr/bin/sed -I '' -f {$g['tmp_path']}/sedcmd {$snortcfgdir}/preproc_rules/preprocessor.rules");
 			mwexec("/usr/bin/sed -I '' -f {$g['tmp_path']}/sedcmd {$snortcfgdir}/preproc_rules/decoder.rules");
