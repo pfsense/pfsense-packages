@@ -524,7 +524,7 @@ function haproxy_writeconf() {
 				//ssl crt ./server.pem ca-file ./ca.crt verify optional crt-ignore-err all crl-file ./ca_crl.pem
 				$ssl_crt=" crt /var/etc/{$backend['name']}.{$backend['port']}.crt";
 				$cert = lookup_cert($backend['ssloffloadcert']);
-				$certcontent = base64_decode($cert['crt']).base64_decode($cert['prv']);
+				$certcontent = base64_decode($cert['crt'])."\r\n".base64_decode($cert['prv']);
 				file_put_contents("/var/etc/{$backend['name']}.{$backend['port']}.crt", $certcontent);
 				unset($certcontent);
 			}else{
