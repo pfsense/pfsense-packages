@@ -40,7 +40,7 @@ require_once("filter.inc");
 // Explicitly declare these as global so they work through function call includes 
 global $snort_rules_file, $snort_version, $emerging_threats_version, $update_log;
 global $flowbit_rules_file, $snort_enforcing_rules_file, $rebuild_rules, $is_postinstall;
-global $$snort_community_rules_filename, $snort_community_rules_url, $emergingthreats_filename;
+global $snort_community_rules_filename, $snort_community_rules_url, $emergingthreats_filename;
 
 define("SNORTDIR", "/usr/local/etc/snort");
 define("SNORTLOGDIR", "/var/log/snort");
@@ -726,8 +726,8 @@ function sync_snort_package_config() {
 
 	conf_mount_rw();
 
-	/* do not start config build if rules is empty */
-	if (!is_array($config['installedpackages']['snortglobal']) && !is_array($config['installedpackages']['snortglobal']['rule'])) {
+	/* do not start config build if rules is empty  or there are no Snort settings */
+	if (!is_array($config['installedpackages']['snortglobal']) || !is_array($config['installedpackages']['snortglobal']['rule'])) {
 		exec('/bin/rm /usr/local/etc/rc.d/snort.sh');
 		conf_mount_ro();
 		return;
