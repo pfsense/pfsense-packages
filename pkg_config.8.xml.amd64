@@ -489,7 +489,7 @@
 		<build_port_path>/usr/ports/net/daq</build_port_path>
 		<build_port_path>/usr/ports/net/libnet</build_port_path>
 		<build_port_path>/usr/ports/security/barnyard2</build_port_path>
-		<build_port_path>/usr/ports/databases/mysql51-client</build_port_path>
+		<build_port_path>/usr/ports/databases/mysql55-client</build_port_path>
 		<build_port_path>/usr/ports/security/snort</build_port_path>
 		<build_pbi>
 			<port>security/snort</port>
