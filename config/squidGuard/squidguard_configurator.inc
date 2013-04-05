@@ -414,7 +414,6 @@ function squid_reconfigure($remove_only = '')
     global $squidguard_config;
     $conf = '';
     $cust_opt = $config['installedpackages']['squid']['config'][0]['custom_options'];
-
     # remove old options
     if (!empty($cust_opt)) {
         $conf = explode(";", $cust_opt);
@@ -444,7 +443,7 @@ function squid_reconfigure($remove_only = '')
     if (is_array($conf)) $conf = implode(";", $conf);
 
 	/* Only update squid options if we have something to do, otherwise this can interfere with squid's default options in a new install. */
-	if (!empty($conf)) {
+	if ($conf != $cust_opt) {
 		$config['installedpackages']['squid']['config'][0]['custom_options'] = $conf;
 		write_config('Update redirector options to squid config.');
 	}
