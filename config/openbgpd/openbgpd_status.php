@@ -62,6 +62,7 @@ function doCmdT($title, $command) {
 		$fd = popen("{$command} 2>&1", "r");
 		while (($line = fgets($fd)) !== FALSE) {
 			echo htmlspecialchars($line, ENT_NOQUOTES);
+			ob_flush();
 		}
 		pclose($fd);
 	}
