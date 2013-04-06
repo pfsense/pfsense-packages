@@ -115,11 +115,24 @@ if ($_POST["Submit"]) {
 		} else
 			$a_rule[] = $natent;
 
+		/* If Snort is disabled on this interface, stop any running instance */
 		if ($natent['enable'] != 'on')
 			snort_stop($natent, $if_real);
+
+		/* Save configuration changes */
 		write_config();
-		sync_snort_package_config();
+
+		/* Update snort.conf file for this interface */
 		$rebuild_rules = "off";
+		snort_generate_conf($a_rule[$id]);
+
+		/* Restart snort if running to activate changes  */
+		$if_real = snort_get_real_interface($a_rule[$id]['interface']);
+		if (snort_is_running($a_rule[$id]['uuid'], $if_real) == 'yes') {
+			snort_stop($a_rule[$id], $if_real);
+			sleep(2);
+			snort_start($a_rule[$id], $if_real);
+		}
 
 		header( 'Expires: Sat, 26 Jul 1997 05:00:00 GMT' );
 		header( 'Last-Modified: ' . gmdate( 'D, d M Y H:i:s' ) . ' GMT' );

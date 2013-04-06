@@ -134,9 +134,22 @@ if ($_POST["Submit"]) {
 	}
 
 	write_config();
+
+	/*************************************************/
+	/* Update the snort conf file and rebuild the    */
+	/* rules for this interface.                     */
+	/*************************************************/
 	$rebuild_rules = "on";
-	sync_snort_package_config();
+	snort_generate_conf($a_nat[$id]);
 	$rebuild_rules = "off";
+
+	/* Restart snort if running to activate changes  */
+	$if_real = snort_get_real_interface($a_nat[$id]['interface']);
+	if (snort_is_running($a_nat[$id]['uuid'], $if_real) == 'yes') {
+		snort_stop($a_nat[$id], $if_real);
+		sleep(2);
+		snort_start($a_nat[$id], $if_real);
+	}
 
 	header("Location: /snort/snort_rulesets.php?id=$id");
 	exit;
@@ -382,7 +395,7 @@ function enable_change()
 			<tr>
 				<td width="5" class="listr" align="center" valign="top">
 				<input type="checkbox" name="toenable[]" value="GPLv2_community.rules" checked="checked"/></td>
-				<td colspan="5" class="listr"><a href="snort_rules.php?id=<?=$id;?>&openruleset=GPLv2_community.rules"><?php echo gettext("{$msg_community}"); ?></a></td>
+				<td colspan="5" class="listr"><a href='snort_rules.php?id=<?=$id;?>&openruleset=GPLv2_community.rules'><?php echo gettext("{$msg_community}"); ?></a></td>
 			</tr>
 			<?php else: ?>
 			<tr>

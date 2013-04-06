@@ -126,7 +126,20 @@ if ($_POST) {
 
 		write_config();
 
-		sync_snort_package_config();
+		/*************************************************/
+		/* Update the snort conf file and rebuild the    */
+		/* rules for this interface.                     */
+		/*************************************************/
+		$rebuild_rules = "off";
+		snort_generate_conf($a_nat[$id]);
+
+		/* Restart snort if running to activate changes  */
+		$if_real = snort_get_real_interface($a_nat[$id]['interface']);
+		if (snort_is_running($a_nat[$id]['uuid'], $if_real) == 'yes') {
+			snort_stop($a_nat[$id], $if_real);
+			sleep(2);
+			snort_start($a_nat[$id], $if_real);
+		}
 
 		/* after click go to this page */
 		header( 'Expires: Sat, 26 Jul 1997 05:00:00 GMT' );

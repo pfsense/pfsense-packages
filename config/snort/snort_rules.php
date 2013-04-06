@@ -234,10 +234,27 @@ if ($_POST['customrules']) {
 }
 
 else if ($_POST['apply']) {
+
+	/* Save new configuration */
 	write_config();
+
+	/*************************************************/
+	/* Update the snort conf file and rebuild the    */
+	/* rules for this interface.                     */
+	/*************************************************/
 	$rebuild_rules = "on";
-	sync_snort_package_config();
+	snort_generate_conf($a_rule[$id]);
 	$rebuild_rules = "off";
+
+	/* Restart snort if running to activate changes  */
+	$if_real = snort_get_real_interface($a_rule[$id]['interface']);
+	if (snort_is_running($a_rule[$id]['uuid'], $if_real) == 'yes') {
+		snort_stop($a_rule[$id], $if_real);
+		sleep(2);
+		snort_start($a_rule[$id], $if_real);
+	}
+
+	/* Return to this same page */
 	header("Location: /snort/snort_rules.php?id={$id}&openruleset={$currentruleset}");
 	exit;
 }

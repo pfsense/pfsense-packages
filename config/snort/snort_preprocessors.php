@@ -34,7 +34,7 @@
 require_once("guiconfig.inc");
 require_once("/usr/local/pkg/snort/snort.inc");
 
-global $g;
+global $g, $rebuild_rules;
 
 if (!is_array($config['installedpackages']['snortglobal'])) {
 	$config['installedpackages']['snortglobal'] = array();
@@ -82,6 +82,8 @@ if (isset($id) && $a_nat[$id]) {
 	$pconfig['dnp3_preproc'] = $a_nat[$id]['dnp3_preproc'];
 	$pconfig['modbus_preproc'] = $a_nat[$id]['modbus_preproc'];
 	$pconfig['gtp_preproc'] = $a_nat[$id]['gtp_preproc'];
+	$pconfig['preproc_auto_rule_disable'] = $a_nat[$id]['preproc_auto_rule_disable'];
+	$pconfig['protect_preproc_rules'] = $a_nat[$id]['protect_preproc_rules'];
 
 	/* If not using the Snort VRT rules, then disable */
 	/* the Sensitive Data (sdf) preprocessor.         */
@@ -130,6 +132,8 @@ if ($_POST) {
 		$natent['sip_preproc'] = $_POST['sip_preproc'] ? 'on' : 'off';
 		$natent['modbus_preproc'] = $_POST['modbus_preproc'] ? 'on' : 'off';
 		$natent['gtp_preproc'] = $_POST['gtp_preproc'] ? 'on' : 'off';
+		$natent['preproc_auto_rule_disable'] = $_POST['preproc_auto_rule_disable'] ? 'on' : 'off';
+		$natent['protect_preproc_rules'] = $_POST['protect_preproc_rules'] ? 'on' : 'off';
 
 		if (isset($id) && $a_nat[$id])
 			$a_nat[$id] = $natent;
@@ -142,8 +146,22 @@ if ($_POST) {
 
 		write_config();
 
-		$if_real = snort_get_real_interface($pconfig['interface']);
-		sync_snort_package_config();
+		/* Set flag to rebuild rules for this interface  */
+		$rebuild_rules = "on";
+
+		/*************************************************/
+		/* Update the snort conf file and rebuild the    */
+		/* rules for this interface.                     */
+		/*************************************************/
+		snort_generate_conf($natent);
+
+		/* Restart snort if running to activate changes  */
+		$if_real = snort_get_real_interface($natent['interface']);
+		if (snort_is_running($natent['uuid'], $if_real) == 'yes') {
+			snort_stop($natent, $if_real);
+			sleep(2);
+			snort_start($natent, $if_real);
+		}
 
 		/* after click go to this page */
 		header( 'Expires: Sat, 26 Jul 1997 05:00:00 GMT' );
@@ -201,21 +219,57 @@ include_once("head.inc");
 <tr><td class="tabcont">
 <table width="100%" border="0" cellpadding="6" cellspacing="0">
 	<tr>
-		<td colspan="2" align="center" valign="middle">
-		<span class="red"><strong><?php echo gettext("NOTE"); ?></strong></span><br>
+		<td colspan="2" align="left" valign="middle">
 		<?php echo gettext("Rules may be dependent on preprocessors!  Disabling preprocessors may result in "); ?>
-		<?php echo gettext("dependent rules being automatically disabled."); ?><br>
-		<?php echo gettext("Defaults will be used when there is no user input."); ?><br></td>
+		<?php echo gettext("Snort start failures unless dependent rules are also disabled."); ?>
+		<?php echo gettext("The Auto-Rule Disable feature can be used, but note the warning about compromising protection.  " . 
+		"Defaults will be used where no user input is provided."); ?></td>
 	</tr>
 	<tr>
-		<td colspan="2" valign="top" class="listtopic"><?php echo gettext("Performance Statistics"); ?></td>
+
+		<td colspan="2" valign="top" class="listtopic"><?php echo gettext("Preprocessors Configuration"); ?></td>
 	</tr>
 	<tr>
 		<td width="22%" valign="top" class="vncell"><?php echo gettext("Enable"); ?></td>
-		<td width="78%" class="vtable"><input name="perform_stat"
-			type="checkbox" value="on"
+		<td width="78%" class="vtable"><input name="perform_stat" type="checkbox" value="on" 
 			<?php if ($pconfig['perform_stat']=="on") echo "checked"; ?>
 			onClick="enable_change(false)"> <?php echo gettext("Collect Performance Statistics for this interface."); ?></td>
+	</tr>
+	<tr>
+		<td width="22%" valign="top" class="vncell"><?php echo gettext("Protect Customized Preprocessor Rules"); ?></td>
+		<td width="78%" class="vtable"><input name="protect_preproc_rules" type="checkbox" value="on" 
+			<?php if ($pconfig['protect_preproc_rules']=="on") echo "checked "; 
+			if ($vrt_enabled <> 'on') echo "disabled"; ?>
+			onClick="enable_change(false)"> <?php echo gettext("Check this box if you maintain customized preprocessor text rules files for this interface."); ?>
+			<table width="100%" border="0" cellpadding="2" cellpadding="2">
+				<tr>
+					<td width="3%">&nbsp;</td>
+					<td><?php echo gettext("Enable this only if you use customized preprocessor text rules files and " . 
+					"you do not want them overwritten by automatic Snort VRT rule updates.  " . 
+					"This option is disabled when Snort VRT rules download is not enabled on the Global Settings tab."); ?><br/><br/>
+					<?php printf(gettext("%sHint:%s  Most users should leave this unchecked."), '<span class="red"><strong>', '</strong></span>'); ?></span></td>
+				</tr>
+			</table>
+		</td>
+	</tr>
+	<tr>
+		<td width="22%" valign="top" class="vncell"><?php echo gettext("Auto Rule Disable"); ?></td>
+		<td width="78%" class="vtable"><input name="preproc_auto_rule_disable" type="checkbox" value="on" 
+			<?php if ($pconfig['preproc_auto_rule_disable']=="on") echo "checked"; ?>
+			onClick="enable_change(false)"> <?php echo gettext("Auto-disable text rules dependent on disabled preprocessors for this interface.  "); 
+			echo gettext("Default is ") . '<strong>' . gettext("Not Checked."); ?></strong><br/>
+			<table width="100%" border="0" cellpadding="2" cellpadding="2">
+				<tr>
+					<td width="3%">&nbsp;</td>
+					<td><span class="red"><strong><?php echo gettext("Warning:  "); ?></strong></span>
+					<?php echo gettext("Enabling this option allows Snort to automatically disable any text rules " . 
+					"containing rule options or content modifiers that are dependent upon the preprocessors " . 
+					"you have not enabled.  This may facilitate starting Snort without errors related to " . 
+					"disabled preprocessors, but can substantially compromise the level of protection by " .
+					"automatically disabling detection rules."); ?></td>
+				</tr>
+			</table>
+		</td>
 	</tr>
 	<tr>
 		<td colspan="2" valign="top" class="listtopic"><?php echo gettext("HTTP Inspect Settings"); ?></td>
@@ -224,9 +278,10 @@ include_once("head.inc");
 		<td width="22%" valign="top" class="vncell"><?php echo gettext("Enable"); ?></td>
 		<td width="78%" class="vtable"><input name="http_inspect"
 			type="checkbox" value="on"
-			<?php if ($pconfig['http_inspect']=="on") echo "checked"; ?>
+			<?php if ($pconfig['http_inspect']=="on" || empty($pconfig['http_inspect'])) echo "checked"; ?>
 			onClick="enable_change(false)"> <?php echo gettext("Use HTTP Inspect to " .
-				"Normalize/Decode and detect HTTP traffic and protocol anomalies."); ?></td>
+				"Normalize/Decode and detect HTTP traffic and protocol anomalies.  Default is "); ?>
+			<strong><?php echo gettext("Checked."); ?></strong></td>
 	</tr>
 	<tr>
 		<td valign="top" class="vncell"><?php echo gettext("HTTP server flow depth"); ?></td>
@@ -285,9 +340,10 @@ include_once("head.inc");
 		<td width="22%" valign="top" class="vncell"><?php echo gettext("Disable HTTP Alerts"); ?></td>
 		<td width="78%" class="vtable"><input name="noalert_http_inspect"
 			type="checkbox" value="on"
-			<?php if ($pconfig['noalert_http_inspect']=="on") echo "checked"; ?>
-			onClick="enable_change(false)"> <?php echo gettext("Tick to turn off alerts from the HTTP Inspect " .
-				"preprocessor.  This has no effect on HTTP rules in the rule set."); ?></td>
+			<?php if ($pconfig['noalert_http_inspect']=="on" || empty($pconfig['noalert_http_inspect'])) echo "checked"; ?>
+			onClick="enable_change(false)"> <?php echo gettext("Turn off alerts from HTTP Inspect " .
+				"preprocessor.  This has no effect on HTTP rules.  Default is "); ?>
+			<strong><?php echo gettext("Checked."); ?></strong></td>
 	</tr>
 	<tr>
 		<td colspan="2" valign="top" class="listtopic"><?php echo gettext("Stream5 Settings"); ?></td>

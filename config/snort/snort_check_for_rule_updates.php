@@ -38,6 +38,7 @@ global $protect_preproc_rules, $is_postinstall, $snort_community_rules_filename;
 global $snort_community_rules_url, $snort_rules_file, $emergingthreats_filename;
 
 $snortdir = SNORTDIR;
+$snortlibdir = SNORTLIBDIR;
 $snortlogdir = SNORTLOGDIR;
 
 if (!isset($snort_gui_include))
@@ -65,9 +66,6 @@ $emergingthreats_filename_md5 = "{$emergingthreats_filename}.md5";
 /* Snort GPLv2 Community Rules MD5 file */
 $snort_community_rules_filename_md5 = "{$snort_community_rules_filename}.md5";
 
-/* Set flag for protected customized preprocessor rules if configured */
-$protect_preproc_rules = $config['installedpackages']['snortglobal']['protect_preproc_rules'];
-
 /* Start of code */
 conf_mount_rw();
 
@@ -80,12 +78,12 @@ exec("/bin/mkdir -p {$snortdir}/rules");
 exec("/bin/mkdir -p {$snortdir}/signatures");
 exec("/bin/mkdir -p {$snortdir}/preproc_rules");
 exec("/bin/mkdir -p {$tmpfname}");
-exec("/bin/mkdir -p /usr/local/lib/snort/dynamicrules");
+exec("/bin/mkdir -p {$snortlibdir}/dynamicrules");
 exec("/bin/mkdir -p {$snortlogdir}");
 
-/* See if we need to automatically clear the Update Log based on 512K size limit */
+/* See if we need to automatically clear the Update Log based on 1024K size limit */
 if (file_exists($update_log)) {
-	if (524288 < filesize($update_log))
+	if (1048576 < filesize($update_log))
 		exec("/bin/rm -r {$update_log}");
 }
 
@@ -377,16 +375,16 @@ if ($snortdownload == 'on') {
 
 		/* extract so rules */
 		update_status(gettext("Extracting Snort VRT Shared Objects rules..."));
-		exec('/bin/mkdir -p /usr/local/lib/snort/dynamicrules/');
+		exec('/bin/mkdir -p {$snortlibdir}/dynamicrules/');
 		error_log(gettext("\tUsing Snort VRT precompiled SO rules for {$freebsd_version_so} ...\n"), 3, $update_log);
 		$snort_arch = php_uname("m");
 		$nosorules = false;
 		if ($snort_arch  == 'i386'){
 			exec("/usr/bin/tar xzf {$tmpfname}/{$snort_filename} -C {$snortdir}/tmp so_rules/precompiled/$freebsd_version_so/i386/{$snort_version}/");
-			exec("/bin/cp {$snortdir}/tmp/so_rules/precompiled/$freebsd_version_so/i386/{$snort_version}/* /usr/local/lib/snort/dynamicrules/");
+			exec("/bin/cp {$snortdir}/tmp/so_rules/precompiled/$freebsd_version_so/i386/{$snort_version}/* {$snortlibdir}/dynamicrules/");
 		} elseif ($snort_arch == 'amd64') {
 			exec("/usr/bin/tar xzf {$tmpfname}/{$snort_filename} -C {$snortdir}/tmp so_rules/precompiled/$freebsd_version_so/x86-64/{$snort_version}/");
-			exec("/bin/cp {$snortdir}/tmp/so_rules/precompiled/$freebsd_version_so/x86-64/{$snort_version}/* /usr/local/lib/snort/dynamicrules/");
+			exec("/bin/cp {$snortdir}/tmp/so_rules/precompiled/$freebsd_version_so/x86-64/{$snort_version}/* {$snortlibdir}/dynamicrules/");
 		} else
 			$nosorules = true;
 		exec("rm -r {$snortdir}/tmp/so_rules");
@@ -440,7 +438,7 @@ if ($snortdownload == 'on') {
 
 function snort_apply_customizations($snortcfg, $if_real) {
 
-	global $vrt_enabled, $protect_preproc_rules;
+	global $vrt_enabled;
 	$snortdir = SNORTDIR;
 
 	/* Update the Preprocessor rules for the master configuration and for the interface if Snort VRT rules are in use. */
@@ -449,7 +447,7 @@ function snort_apply_customizations($snortcfg, $if_real) {
 		exec("/bin/cp {$snortdir}/tmp/preproc_rules/*.rules {$snortdir}/preproc_rules/");
 
 		/* Check if customized preprocessor rule protection is enabled before overwriting them. */
-		if ($protect_preproc_rules <> "on")
+		if ($snortcfg['protect_preproc_rules'] <> 'on')
 			exec("/bin/cp {$snortdir}/tmp/preproc_rules/*.rules {$snortdir}/snort_{$snortcfg['uuid']}_{$if_real}/preproc_rules/");
 	}
 	else {
@@ -520,19 +518,20 @@ if ($snortdownload == 'on' || $emergingthreats == 'on' || $snortcommunityrules =
 		else
 			$rebuild_rules = 'on';
 
-		/*  Log a message if protecting customized preprocessor rules. */
-		if ($protect_preproc_rules == 'on')
-			error_log(gettext("\tPreprocessor rules flagged as protected - not overwriting them...\n"), 3, $update_log);
-
+		/* Create configuration for each active Snort interface */
 		foreach ($config['installedpackages']['snortglobal']['rule'] as $id => $value) {
-
-			/* Create configuration for each active Snort interface */
 			$if_real = snort_get_real_interface($value['interface']);
 			$tmp = "Updating rules configuration for: " . snort_get_friendly_interface($value['interface']) . " ...";
 			update_status(gettext($tmp));
-			log_error($tmp);
-			error_log(gettext("\t" .$tmp . "\n"), 3, $update_log);
 			snort_apply_customizations($value, $if_real);
+
+			/*  Log a message in Update Log if protecting customized preprocessor rules. */
+			$tmp = "\t" . $tmp . "\n";
+			if ($value['protect_preproc_rules'] == 'on') {
+				$tmp .= gettext("\tPreprocessor text rules flagged as protected and not updated for ");
+				$tmp .= snort_get_friendly_interface($value['interface']) . "...\n";
+			}
+			error_log($tmp, 3, $update_log);
 		}
 	}
 	else {

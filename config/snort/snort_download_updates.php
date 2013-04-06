@@ -95,7 +95,7 @@ function popup(url)
  params += ', top=0, left=0'
  params += ', fullscreen=yes';
 
- newwin=window.open(url,'windowname4', params);
+ newwin=window.open(url,'LogViewer', params);
  if (window.focus) {newwin.focus()}
  return false;
 }
@@ -197,7 +197,7 @@ function popup(url)
 							echo "
 				<button disabled='disabled'><span class='pwhitetxt'>" . gettext("View Log") . "</span></button>&nbsp;&nbsp;&nbsp;" . gettext("Log is empty.") . "\n";
 						}
-						echo '<br><br>' . gettext("The log file is limited to 512K in size and automatically clears when the limit is exceeded.");
+						echo '<br><br>' . gettext("The log file is limited to 1024K in size and automatically clears when the limit is exceeded.");
 				?>
 						<br/>
 						</p>
@@ -213,8 +213,8 @@ function popup(url)
 					<tr>
 						<td id="download_rules_td" style='background-color: #eeeeee'>
 						<div height="32" width="725px" style='background-color: #eeeeee'>
-							<font color='#FF850A' size='1px'><b><?php echo gettext("NOTE:"); ?></b></font><font size='1px'
-								color='#000000'>&nbsp;&nbsp;<?php echo gettext("Snort.org and Emergingthreats.net " .
+							<font size='1px'><span class="red"><b><?php echo gettext("NOTE:"); ?></b></span></font><font size='1px'
+								color='#000000'>&nbsp;&nbsp;<?php echo gettext("Snort.org and EmergingThreats.net " .
 								"will go down from time to time. Please be patient."); ?>
 							</font>
 						</div>

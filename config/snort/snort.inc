@@ -42,13 +42,24 @@ global $snort_rules_file, $snort_version, $emerging_threats_version, $update_log
 global $flowbit_rules_file, $snort_enforcing_rules_file, $rebuild_rules, $is_postinstall;
 global $snort_community_rules_filename, $snort_community_rules_url, $emergingthreats_filename;
 
-define("SNORTDIR", "/usr/local/etc/snort");
-define("SNORTLOGDIR", "/var/log/snort");
-
 /* package version */
 $snort_version = "2.9.4.1";
 $pfSense_snort_version = "2.5.5";
 $snort_package_version = "Snort {$snort_version} pkg v. {$pfSense_snort_version}";
+
+// Define SNORTDIR and SNORTLIBDIR constants according to FreeBSD version (PBI support or no PBI)
+if (floatval(php_uname("r")) >= 8.3) {
+	exec("/usr/local/sbin/pbi_info | grep 'snort-{$snort_version}' | xargs /usr/local/sbin/pbi_info | awk '/Prefix/ {print $2}'",$pbidirarray);
+	$snort_pbidir = "{$pbidirarray[0]}";
+	define("SNORTDIR", "{$snort_pbidir}/etc/snort");
+	define("SNORTLIBDIR", "{$snort_pbidir}/lib/snort");
+}
+else {
+	define("SNORTDIR", "/usr/local/etc/snort");
+	define("SNORTLIBDIR", "/usr/local/lib/snort");
+}
+
+define("SNORTLOGDIR", "/var/log/snort");
 
 /* Important file definitions */
 $snort_rules_file = "snortrules-snapshot-2941.tar.gz";
@@ -314,7 +325,7 @@ function snort_barnyard_stop($snortcfg, $if_real) {
 	$snort_uuid = $snortcfg['uuid'];
 	if (file_exists("{$g['varrun_path']}/barnyard2_{$if_real}{$snort_uuid}.pid") && isvalidpid("{$g['varrun_path']}/barnyard2_{$if_real}{$snort_uuid}.pid")) {
 		killbypid("{$g['varrun_path']}/barnyard2_{$if_real}{$snort_uuid}.pid");
-		@unlink("{$g['varrun_path']}/barnyard2_{$if_real}{$snort_uuid}.pid");
+//		@unlink("{$g['varrun_path']}/barnyard2_{$if_real}{$snort_uuid}.pid");
 	}
 }
 
@@ -324,7 +335,7 @@ function snort_stop($snortcfg, $if_real) {
 	$snort_uuid = $snortcfg['uuid'];
 	if (file_exists("{$g['varrun_path']}/snort_{$if_real}{$snort_uuid}.pid") && isvalidpid("{$g['varrun_path']}/snort_{$if_real}{$snort_uuid}.pid")) {
 		killbypid("{$g['varrun_path']}/snort_{$if_real}{$snort_uuid}.pid");
-		exec("/bin/rm {$g['varrun_path']}/snort_{$if_real}{$snort_uuid}.pid");
+//		exec("/bin/rm {$g['varrun_path']}/snort_{$if_real}{$snort_uuid}.pid");
 	}
 
 	snort_barnyard_stop($snortcfg, $if_real);
@@ -449,6 +460,7 @@ function snort_postinstall() {
 	global $snort_version, $update_log, $rebuild_rules, $is_postinstall;
 
 	$snortdir = SNORTDIR;
+	$snortlibdir = SNORTLIBDIR;
 
 	/* Set flag for post-install in progress */
 	$is_postinstall = true;
@@ -462,23 +474,33 @@ function snort_postinstall() {
 	@rename("{$snortdir}/generators-sample", "{$snortdir}/generators");
 	@rename("{$snortdir}/reference.config-sample", "{$snortdir}/reference.config");
 	@rename("{$snortdir}/gen-msg.map-sample", "{$snortdir}/gen-msg.map");
+
+	/* fix up the preprocessor rules filenames from a PBI package install */
+	$preproc_rules = array("decoder.rules", "preprocessor.rules", "sensitive-data.rules");
+	foreach ($preproc_rules as $file) {
+		if (file_exists("{$snortdir}/preproc_rules/{$file}-sample"))
+			@rename("{$snortdir}/preproc_rules/{$file}-sample", "{$snortdir}/preproc_rules/{$file}");
+	}
+
+	/* Remove any previously installed scripts since we rebuild them */
 	@unlink("{$snortdir}/sid");
 	@unlink("/usr/local/etc/rc.d/snort");
 	@unlink("/usr/local/etc/rc.d/barnyard2");
 
-	/* remove example files */
-	if (file_exists('/usr/local/lib/snort/dynamicrules/lib_sfdynamic_example_rule.so.0'))
-		exec('rm /usr/local/lib/snort/dynamicrules/lib_sfdynamic_example*');
-
-	if (file_exists('/usr/local/lib/snort/dynamicpreprocessor/lib_sfdynamic_preprocessor_example.so'))
-		exec('/bin/rm /usr/local/lib/snort/dynamicpreprocessor/lib_sfdynamic_preprocessor_example*');
+	/* remove example library files */
+	$files = glob("{$snortlibdir}/dynamicrules/*_example*");
+	foreach ($files as $f)
+		@unlink($f);
+	$files = glob("{$snortlibdir}/dynamicpreprocessor/*_example*");
+	foreach ($files as $f)
+		@unlink($f);
 
 	/* remake saved settings */
 	if ($config['installedpackages']['snortglobal']['forcekeepsettings'] == 'on') {
 		update_status(gettext("Saved settings detected..."));
-		update_output_window(gettext("Please wait... rebuilding files..."));
+		update_output_window(gettext("Please wait... rebuilding installation with saved settings..."));
 		@include_once("/usr/local/pkg/snort/snort_check_for_rule_updates.php");
-		update_status(gettext("Generating snort.conf configuration from saved settings..."));
+		update_status(gettext("Generating snort.conf configuration file from saved settings..."));
 		$rebuild_rules = "on";
 		sync_snort_package_config();
 		$rebuild_rules = "off";
@@ -724,9 +746,11 @@ function sync_snort_package_config() {
 	global $config, $g, $flowbit_rules_file, $snort_enforcing_rules_file;
 	global $snort_version, $rebuild_rules;
 
+	$snortdir = SNORTDIR;
+
 	conf_mount_rw();
 
-	/* do not start config build if rules is empty  or there are no Snort settings */
+	/* do not start config build if rules is empty or there are no Snort settings */
 	if (!is_array($config['installedpackages']['snortglobal']) || !is_array($config['installedpackages']['snortglobal']['rule'])) {
 		exec('/bin/rm /usr/local/etc/rc.d/snort.sh');
 		conf_mount_ro();
@@ -737,25 +761,10 @@ function sync_snort_package_config() {
 	foreach ($snortconf as $value) {
 		$if_real = snort_get_real_interface($value['interface']);
 
-		/****************************************************/
-		/* Construct a pointer to the PBI folder for use on */
-		/* pfSense 2.1. Test for a PBI folder structure,    */
-		/* and if found, make sure appropriate directory    */
-		/* exists for each configured interface.  This will */
-		/* prevent symlink errors on future package edits.  */
-		/****************************************************/
-		$arch = php_uname("m");
-		$snortcfgdir_pbi = "/usr/pbi/snort-{$arch}/etc/snort/snort_{$value['uuid']}_{$if_real}";
-		if (is_dir("/usr/pbi/snort-{$arch}")) {
-			/* Create interface subdirectory if missing */
-			if (!is_dir($snortcfgdir_pbi))
-				exec("/bin/mkdir -p $snortcfgdir_pbi");
-		}
-
-		/* create a snort conf file for interface           */
+		/* create a snort.conf file for interface           */
 		snort_generate_conf($value);
 
-		/* create barnyard2 conf file for interface         */
+		/* create barnyard2.conf file for interface         */
 		if ($value['barnyard_enable'] == 'on')
 			snort_create_barnyard2_conf($value, $if_real);
 	}
@@ -1722,8 +1731,9 @@ function snort_deinstall() {
 	global $config, $g;
 
 	$snortdir = SNORTDIR;
-	$snortlogdir = SNORTLOGDIR;
+	$snortlibdir = SNORTLIBDIR;
 
+	/* Make sure all active Snort processes are terminated */
 	mwexec('/usr/bin/killall snort', true);
 	sleep(2);
 	mwexec('/usr/bin/killall -9 snort', true);
@@ -1732,6 +1742,8 @@ function snort_deinstall() {
 	sleep(2);
 	mwexec('/usr/bin/killall -9 barnyard2', true);
 	sleep(2);
+
+	/* Remove the snort user and group */
 	mwexec('/usr/sbin/pw userdel snort; /usr/sbin/pw groupdel snort', true);
 
 	/* Remove snort cron entries Ugly code needs smoothness */
@@ -1762,8 +1774,21 @@ function snort_deinstall() {
 	snort_deinstall_cron("snort_check_cron_misc.inc");
 	configure_cron();
 
-	/* Wipe out Snort configuration since it auto rebuilds. */
-	mwexec("/bin/rm -rf {$snortdir}");
+	/**********************************************************/
+	/* Test for existence of library backup tarballs in /tmp. */
+	/* If these are present, then a package "delete"          */
+	/* operation is in progress and we need to wipe out the   */
+	/* configuration files.  Otherwise we leave the binary-   */
+	/* side configuration intact since only a GUI files       */
+	/* deinstall and reinstall operation is in progress.      */
+	/*							  */
+	/* XXX: hopefully a better method presents itself in      */
+	/*      versions of pfSense.				  */
+	/**********************************************************/
+	if (file_exists("/tmp/pkg_libs.tgz") || file_exists("/tmp/pkg_bins.tgz")) {
+		mwexec("/bin/rm -rf {$snortdir}");
+		mwexec("/bin/rm -rf {$snortlibdir}/dynamicrules");
+	}
 
 	/* Keep this as a last step */
 	if ($config['installedpackages']['snortglobal']['forcekeepsettings'] != 'on')
@@ -1771,14 +1796,19 @@ function snort_deinstall() {
 }
 
 function snort_prepare_rule_files($snortcfg, $snortcfgdir) {
+
 	global $snort_enforcing_rules_file, $flowbit_rules_file, $rebuild_rules;
 
 	$snortdir = SNORTDIR;
 
-	/* If there is no reason to rebuild the rules, exit. */
+	/* If there is no reason to rebuild the rules, exit to save time. */
 	if ($rebuild_rules == "off")
 		return;
 
+	/* Log a message for rules rebuild in progress */
+	log_error(gettext("Updating rules configuration for: " . snort_get_friendly_interface($snortcfg['interface']) . " ..."));
+
+	/* Only rebuild rules if some are selected or an IPS Policy is enabled  */
 	if (!empty($snortcfg['rulesets']) || $snortcfg['ips_policy_enable'] == 'on') {
 		$enabled_rules = array();
 		$enabled_files = array();
@@ -1817,9 +1847,12 @@ function snort_prepare_rule_files($snortcfg, $snortcfgdir) {
 		/* Process any enablesid or disablesid modifications for the selected rules. */
 		snort_modify_sids($enabled_rules, $snortcfg);
 
-		/* Check for and disable any rules dependent upon disabled preprocessors. */
-		log_error('Checking for and disabling any rules dependent upon disabled preprocessors for ' . snort_get_friendly_interface($snortcfg['interface']) . '...');
-		snort_filter_preproc_rules($snortcfg, $enabled_rules);
+		/* Check for and disable any rules dependent upon disabled preprocessors if  */
+		/* this option is enabled for the interface.                                 */
+		if ($snortcfg['preproc_auto_rule_disable'] == "on") {
+			log_error('Auto-disabling rules dependent on disabled preprocessors for ' . snort_get_friendly_interface($snortcfg['interface']) . '...');
+			snort_filter_preproc_rules($snortcfg, $enabled_rules);
+		}
 
 		/* Write the enforcing rules file to the Snort interface's "rules" directory. */
 		snort_write_enforcing_rules_file($enabled_rules, "{$snortcfgdir}/rules/{$snort_enforcing_rules_file}");
@@ -1827,9 +1860,19 @@ function snort_prepare_rule_files($snortcfg, $snortcfgdir) {
 
 		/* If auto-flowbit resolution is enabled, generate the dependent flowbits rules file. */
 		if ($snortcfg['autoflowbitrules'] == 'on') {
-			log_error('Resolving and auto-enabling flowbit required rules for ' . snort_get_friendly_interface($snortcfg['interface']) . '...');
+			log_error('Resolving and auto-enabling any flowbit-required rules for ' . snort_get_friendly_interface($snortcfg['interface']) . '...');
 			$enabled_files[] = "{$snortcfgdir}/rules/{$snort_enforcing_rules_file}";
-			snort_write_flowbit_rules_file(snort_resolve_flowbits($enabled_files), "{$snortcfgdir}/rules/{$flowbit_rules_file}");
+			$fbits = snort_resolve_flowbits($enabled_files);
+
+			/* Check for and disable any flowbit-required rules dependent upon     */
+			/* disabled preprocessors if this option is enabled for the interface. */
+			if ($snortcfg['preproc_auto_rule_disable'] == "on") {
+				log_error('Auto-disabling flowbit-required rules dependent on disabled preprocessors for ' . snort_get_friendly_interface($snortcfg['interface']) . '...');
+				snort_filter_preproc_rules($snortcfg, $fbits, true);
+			}
+			snort_filter_preproc_rules($snortcfg, $fbits, true);
+			snort_write_flowbit_rules_file($fbits, "{$snortcfgdir}/rules/{$flowbit_rules_file}");
+			unset($fbits);
 		} else
 			/* Just put an empty file to always have the file present */
 			snort_write_flowbit_rules_file(array(), "{$snortcfgdir}/rules/{$flowbit_rules_file}");
@@ -1847,10 +1890,11 @@ function snort_prepare_rule_files($snortcfg, $snortcfgdir) {
 
 	/* Build a new sid-msg.map file from the enabled */
 	/* rules and copy it to the interface directory. */
+	log_error(gettext("Building new sig-msg.map file for " . snort_get_friendly_interface($snortcfg['interface']) . "..."));
 	snort_build_sid_msg_map("{$snortcfgdir}/rules/", "{$snortcfgdir}/sid-msg.map");
 }
 
-function snort_filter_preproc_rules($snortcfg, &$active_rules) {
+function snort_filter_preproc_rules($snortcfg, &$active_rules, $persist_log = false) {
 
 	/**************************************************/
 	/* This function checks the $active_rules array   */
@@ -1863,11 +1907,22 @@ function snort_filter_preproc_rules($snortcfg, &$active_rules) {
 	/*                  the interface                 */
 	/* $active_rules -> rules_map array of enabled    */
 	/*                  rules for the interface       */
+	/*						  */
+	/* NOTE: This feature must be enabled in the GUI  */
+	/*       by the user.  Use of this feature can    */
+	/*       severely degrade Snort's ability to      */
+	/*       detect threats by disabling potenitally  */
+	/*       rules.                                   */
 	/**************************************************/
 
 	global $config;
 
-	if (empty($active_rules))
+	$snortlogdir = SNORTLOGDIR;
+	$disabled_count = 0;
+	$log_msg = array();
+
+	/* Check if no rules or if this option is disabled */
+	if (empty($active_rules) || $snortcfg['preproc_auto_rule_disable'] <> 'on')
 		return;
 
 	/***************************************************
@@ -1877,8 +1932,16 @@ function snort_filter_preproc_rules($snortcfg, &$active_rules) {
 	 * IMPORTANT -- Keep this part of the code current *
 	 * with changes to preprocessor rule options in    *
 	 * Snort VRT rules.                                *
+	 *                                                 *
+	 * Last Update: 04/05/2013                         *
+	 *                                                 *
+	 * Added: http_inspect content modifiers and       *
+	 *        various "service" metadata values.       *
+	 *						   *
 	 ***************************************************/
 	$rule_opts_preprocs = array("ssl_version:" => "ssl_preproc","ssl_state:" => "ssl_preproc",
+				    "service ssl" => "ssl_preproc", "service ftp" => "ftp_preprocessor",
+				    "service telnet" => "ftp_preprocessor", "service dns" => "dns_preprocessor",
 		 		    "dce_iface:" => "dce_rpc_2", "dce_opnum:" => "dce_rpc_2",
 				    "dce_stub_data;" => "dce_rpc_2", "sd_pattern:" => "sensitive_data",
 				    "sip_method:" => "sip_preproc", "sip_stat_code:" => "sip_preproc",
@@ -1887,7 +1950,16 @@ function snort_filter_preproc_rules($snortcfg, &$active_rules) {
 				    "gtp_version:" => "gtp_preproc", "modbus_func:" => "modbus_preproc",
 				    "modbus_unit:" => "modbus_preproc", "modbus_data;" => "modbus_preproc",
 				    "dnp3_func:" => "dnp3_preproc", "dnp3_obj:" => "dnp3_preproc",
-				    "dnp3_ind:" => "dnp3_preproc", "dnp3_data;" => "dnp3_preproc");
+				    "dnp3_ind:" => "dnp3_preproc", "dnp3_data;" => "dnp3_preproc",
+				    "http_client_body;" => "http_inspect", "http_cookie;" => "http_inspect",
+				    "http_raw_cookie;" => "http_inspect", "http_header;" => "http_inspect",
+				    "http_raw_header;" => "http_inspect", "http_method;" => "http_inspect",
+				    "http_uri;" => "http_inspect", "http_raw_uri;" => "http_inspect",
+				    "http_stat_code;" => "http_inspect", "http_stat_msg;" => "http_inspect",
+				    "uricontent:" => "http_inspect", "urilen:" => "http_inspect",
+				    "http_encode;" => "http_inspect", "service http" => "http_inspect",
+				    "service imap" => "imap_preproc", "service pop2" => "pop_preproc",
+				    "service pop3" => "pop_preproc", "service smtp" => "smtp_preprocessor");
 
 	/***************************************************
 	 * Iterate the enabled rules, and check for rule   *
@@ -1899,19 +1971,75 @@ function snort_filter_preproc_rules($snortcfg, &$active_rules) {
 	 ***************************************************/
 	foreach ($active_rules as $k1 => $rulem) {
 		foreach ($rulem as $k2 => $v) {
+
 			/* If rule is already disabled, skip it. */
 			if ($v['disabled'] == 1)
 				continue;
+
 			foreach ($rule_opts_preprocs as $opt => $preproc) {
-				$pcre = "/\s*\b" . $opt . "/i";
+				$pcre = "/\s*\b" . preg_quote($opt) . "/i";
 				if (($snortcfg[$preproc] != 'on') && preg_match($pcre, $v['rule'])) {
 					$active_rules[$k1][$k2]['rule'] = "# " . $v['rule'];
 					$active_rules[$k1][$k2]['disabled'] = 1;
+					$disabled_count++;
+
+					/* Accumulate auto-disabled rules for logging */
+					$tmp = $active_rules[$k1][$k2]['category'] . "  ";
+					$tmp .= "{$k1}:{$k2}  Preproc: {$preproc}  Param: {$opt}";
+					$log_msg[] = $tmp;
 					break;
 				}
 			}
 		}
 	}
+
+	/***************************************************************/
+	/* If we are persisting the log from the last pass, then open  */
+	/* the log file in append mode.  Otherwise open in overwrite   */
+	/* to clear the log in case we have zero disabled rules.       */
+	/*							       */
+	/* Typically "persist log" mode is used on the second pass     */
+	/* when flowbit-required rules are being assessed after the    */
+	/* primary enforcing rules have been evaluated.                */
+	/***************************************************************/
+	$iface = snort_get_friendly_interface($snortcfg['interface']);
+	$file = "{$snortlogdir}/{$iface}_disabled_preproc_rules.log";
+	if ($persist_log)
+		$fp = fopen($file, 'a');
+	else
+		$fp = fopen($file, 'w');
+
+	/***************************************************/
+	/* Log a warning if we auto-disabled any rules     */
+	/* just so the user is aware protection is less    */
+	/* than optimal with the preprocessors disabled.   */
+	/***************************************************/
+	if ($disabled_count > 0) {
+		log_error(gettext("Warning:  auto-disabled {$disabled_count} rules due to disabled preprocessor dependencies."));
+		natcasesort($log_msg);
+		if ($fp) {
+			/* Only write the header when not persisting the log */
+			if (!$persist_log) {
+				@fwrite($fp, "#\n# Run Time: " . date("Y-m-d H:i:s") . "\n#\n");
+				@fwrite($fp, "#\n# These rules were auto-disabled because they contain options or operators\n");
+				@fwrite($fp, "# dependent on preprocessors that are currently NOT ENABLED on the Preprocessors\n");
+				@fwrite($fp, "# tab.  Without these dependent preprocessors enabled, Snort would fail to start\n");
+				@fwrite($fp, "# if the rules listed below were enabled.  Therefore the listed rules have been\n");
+				@fwrite($fp, "# automatically disabled.  This behavior is controlled by the Auto-Rule Disable\n");
+				@fwrite($fp, "# feature on the Preprocessors tab.\n#\n");
+				@fwrite($fp, "# WARNING: Using the auto-disable rule feature is not recommended because it can\n");
+				@fwrite($fp, "# significantly reduce the threat detection capabilities of Snort!\n#\n");
+				@fwrite($fp, "# Log Format is: RULE CATEGORY    GID:SID   PREPROC   METADATA/CONTENT PARAMETER\n#\n");
+			}
+			foreach ($log_msg as $m) {
+				@fwrite($fp, $m . "\n");
+			}
+		}
+		log_error(gettext("See '{$file}' for list of auto-disabled rules."));
+		unset($log_msg);
+	}
+	if ($fp)
+		fclose($fp);
 }
 
 function snort_generate_conf($snortcfg) {
@@ -1919,14 +2047,15 @@ function snort_generate_conf($snortcfg) {
 	global $config, $g, $flowbit_rules_file, $snort_enforcing_rules_file, $rebuild_rules;
 
 	$snortdir = SNORTDIR;
+	$snortlibdir = SNORTLIBDIR;
 	$snortlogdir = SNORTLOGDIR;
 
 	if (!is_array($config['installedpackages']['snortglobal']['rule']))
 		return;
 
 	/* See if we should protect and not modify the preprocessor rules files */
-	if (!empty($config['installedpackages']['snortglobal']['protect_preproc_rules'])) 	
-		$protect_preproc_rules = $config['installedpackages']['snortglobal']['protect_preproc_rules'];
+	if (!empty($snortcfg['protect_preproc_rules'])) 	
+		$protect_preproc_rules = $snortcfg['protect_preproc_rules'];
 	else
 		$protect_preproc_rules = "off";
 
@@ -1952,8 +2081,8 @@ function snort_generate_conf($snortcfg) {
 		"{$snortlogdir}/snort_{$if_real}{$snort_uuid}",
 		"{$snortlogdir}/snort_{$if_real}{$snort_uuid}/barnyard2", 
 		"{$snortcfgdir}/preproc_rules", 
-		"dynamicrules" => "/usr/local/lib/snort/dynamicrules",
-		"dynamicengine" => "/usr/local/lib/snort/dynamicengine",
+		"dynamicrules" => "{$snortlibdir}/dynamicrules",
+		"dynamicengine" => "{$snortlibdir}/dynamicengine",
 		"dynamicpreprocessor" => "{$snortcfgdir}/dynamicpreprocessor"
 	    );
 	foreach ($snort_dirs as $dir) {
@@ -2069,7 +2198,7 @@ EOD;
 	if ((!empty($snortcfg['client_flow_depth'])) || ($snortcfg['client_flow_depth'] == '0'))
 		$def_client_flow_depth_type = $snortcfg['client_flow_depth'];
 
-	if ($snortcfg['noalert_http_inspect'] == 'on')
+	if ($snortcfg['noalert_http_inspect'] == 'on' || empty($snortcfg['noalert_http_inspect']))
 		$noalert_http_inspect = "no_alerts ";
 	else
 		$noalert_http_inspect = "";
@@ -2314,6 +2443,16 @@ EOD;
 	if (!empty($snortcfg['stream5_mem_cap']))
 		$def_stream5_mem_cap = ", memcap {$snortcfg['stream5_mem_cap']}";
 
+	/* Default the HTTP_INSPECT preprocessor to "on" if not set.  */
+	/* The preprocessor is required by hundreds of Snort rules,   */
+	/* and without it Snort may not start and/or the number of    */
+	/* rules required to be disabled reduces Snort's capability.  */
+	/* Alerts from the HTTP_INSPECT preprocessor default to "off" */
+	/* unless a specific value has been set by the user.          */
+	/**************************************************************/
+	if (empty($snortcfg['http_inspect']))
+		$snortcfg['http_inspect'] = 'on';
+
 	/* define servers and ports snortdefservers */
 	$snort_servers = array (
 		"dns_servers" => "\$HOME_NET", "smtp_servers" => "\$HOME_NET", "http_servers" => "\$HOME_NET",
@@ -2352,8 +2491,8 @@ EOD;
 			if (!empty($snort_preproc_libs[$preproc])) {
 				$preproclib = "libsf_" . $snort_preproc_libs[$preproc];
 				if (!file_exists($snort_dirs['dynamicpreprocessor'] . "{$preproclib}.so")) {
-					if (file_exists("/usr/local/lib/snort/dynamicpreprocessor/{$preproclib}.so")) {
-						@copy("/usr/local/lib/snort/dynamicpreprocessor/{$preproclib}.so", "{$snort_dirs['dynamicpreprocessor']}/{$preproclib}.so");
+					if (file_exists("{$snortlibdir}/dynamicpreprocessor/{$preproclib}.so")) {
+						@copy("{$snortlibdir}/dynamicpreprocessor/{$preproclib}.so", "{$snort_dirs['dynamicpreprocessor']}/{$preproclib}.so");
 						$snort_preprocessors .= $$preproc;
 						$snort_preprocessors .= "\n";
 					} else
@@ -2387,10 +2526,14 @@ EOD;
 			mwexec("/usr/bin/sed -I '' -f {$g['tmp_path']}/sedcmd {$snortcfgdir}/preproc_rules/preprocessor.rules");
 			mwexec("/usr/bin/sed -I '' -f {$g['tmp_path']}/sedcmd {$snortcfgdir}/preproc_rules/decoder.rules");
 			@unlink("{$g['tmp_path']}/sedcmd");
-
 			$snort_misc_include_rules .= "include \$PREPROC_RULE_PATH/decoder.rules\n";
 			$snort_misc_include_rules .= "include \$PREPROC_RULE_PATH/preprocessor.rules\n";
-		} else {
+		} else if (file_exists("{$snortcfgdir}/preproc_rules/decoder.rules") &&
+			   file_exists("{$snortcfgdir}/preproc_rules/preprocessor.rules") && $protect_preproc_rules == "on") {
+			$snort_misc_include_rules .= "include \$PREPROC_RULE_PATH/decoder.rules\n";
+			$snort_misc_include_rules .= "include \$PREPROC_RULE_PATH/preprocessor.rules\n";
+		}
+		else {
 			$snort_misc_include_rules .= "config autogenerate_preprocessor_decoder_rules\n";
 			log_error("Seems preprocessor/decoder rules are missing, enabling autogeneration of them");
 		}

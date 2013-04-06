@@ -50,7 +50,6 @@ $pconfig['snortloglimit'] = $config['installedpackages']['snortglobal']['snortlo
 $pconfig['snortloglimitsize'] = $config['installedpackages']['snortglobal']['snortloglimitsize'];
 $pconfig['autorulesupdate7'] = $config['installedpackages']['snortglobal']['autorulesupdate7'];
 $pconfig['forcekeepsettings'] = $config['installedpackages']['snortglobal']['forcekeepsettings'];
-$pconfig['protect_preproc_rules'] = $config['installedpackages']['snortglobal']['protect_preproc_rules'];
 $pconfig['snortcommunityrules'] = $config['installedpackages']['snortglobal']['snortcommunityrules'];
 
 
@@ -65,7 +64,6 @@ if (!$input_errors) {
 		$config['installedpackages']['snortglobal']['emergingthreats'] = $_POST['emergingthreats'] ? 'on' : 'off';
 
 		$config['installedpackages']['snortglobal']['rm_blocked'] = $_POST['rm_blocked'];
-		$config['installedpackages']['snortglobal']['protect_preproc_rules'] = $_POST['protect_preproc_rules'] ? 'on' : 'off';
 		if ($_POST['snortloglimitsize']) {
 			$config['installedpackages']['snortglobal']['snortloglimit'] = $_POST['snortloglimit'];
 			$config['installedpackages']['snortglobal']['snortloglimitsize'] = $_POST['snortloglimitsize'];
@@ -121,11 +119,9 @@ if ($input_errors)
 function enable_snort_vrt(btn) {
 	if (btn == 'off') {
 		document.iform.oinkmastercode.disabled = "true";
-		document.iform.protect_preproc_rules.disabled = "true";
 	}
 	if (btn == 'on') {
 		document.iform.oinkmastercode.disabled = "";
-		document.iform.protect_preproc_rules.disabled = "";
 	}	
 }
 //-->
@@ -189,24 +185,7 @@ function enable_snort_vrt(btn) {
 				<?php if($pconfig['snortdownload']<>'on') echo 'disabled'; ?>><br>
 			<?php echo gettext("Obtain a snort.org Oinkmaster code and paste it here."); ?></td>
 		</tr>
-		<tr>
-			<td colspan="2">&nbsp;</td>
-		</tr>
-		<tr>
-			<td colspan="2" valign="middle"><b><span class="vexpl"><?php echo gettext("Protect Customized Preprocessor Rules"); ?></span></b></td>
-		</tr>
-		<tr>
-			<td valign="top"><input name="protect_preproc_rules" id="protect_preproc_rules" type="checkbox" value="yes"
-				<?php if ($config['installedpackages']['snortglobal']['protect_preproc_rules']=="on") echo "checked"; 
-				if($pconfig['snortdownload']<>'on') echo ' disabled'; ?> ><br>
-			</td>
-			<td><span class="vexpl"><?php echo gettext("Check this box if you maintain customized preprocessor rules files and"); ?><br/>
-				<?php echo gettext("do not want them overwritten by automatic Snort VRT rule updates."); ?><br/><br/>
-				<?php printf(gettext("%sHint:%s  Most users should leave this unchecked."), '<span class="red"><strong>', '</strong></span>'); ?></span></br>
-			</td>
-		</tr>
 	</table>
-
 </tr>
 <tr>
 	<td width="22%" valign="top" class="vncell"><?php printf(gettext("Install %sSnort Community%s " .
@@ -218,11 +197,10 @@ function enable_snort_vrt(btn) {
 				<?php if ($config['installedpackages']['snortglobal']['snortcommunityrules']=="on") echo "checked"; ?> ></td>
 				<td><span class="vexpl"><?php echo gettext("The Snort Community Ruleset is a GPLv2 VRT certified ruleset that is distributed free of charge " .
 				"without any VRT License restrictions.  This ruleset is updated daily and is a subset of the subscriber ruleset."); ?>
-				<br/><br/><?php printf(gettext("%sNote:  %sIf you are a Snort VRT Paid Subscriber, the community ruleset is already built into your download."),'<span class="red"><strong>' ,'</strong></span>'); ?></span><br></td>
+				<br/><br/><?php printf(gettext("%sNote:  %sIf you are a Snort VRT Paid Subscriber, the community ruleset is already built into your download of the Snort VRT rules, and there is no benefit in adding this rule set."),'<span class="red"><strong>' ,'</strong></span>'); ?></span><br></td>
 			</tr>
 		</table></td>
 </tr>
-
 <tr>
 	<td width="22%" valign="top" class="vncell"><?php printf(gettext("Install %sEmerging Threats%s " .
 	"rules"), '<strong>' , '</strong>'); ?></td>

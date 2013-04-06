@@ -232,7 +232,7 @@ if ($pfsense_stable == 'yes')
 	else
 		$biconfn = 'block';
 
-	?>
+?>
 		<td class="listt">
 			<input type="checkbox" id="frc<?=$nnats;?>" name="rule[]" value="<?=$i;?>" onClick="fr_bgcolor('<?=$nnats;?>')" style="margin: 0; padding: 0;"></td>
 		<td class="listr" 
