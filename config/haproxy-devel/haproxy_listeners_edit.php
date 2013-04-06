@@ -106,22 +106,6 @@ function get_certificates_server($get_includeWebCert=false) {
 	return $certificates;
 }
 
-function echo_html_select($name, $keyvaluelist, $selected, $listEmptyMessage="", $onchangeEvent="")
-{
-	if (count($keyvaluelist)>0){
-		if ($onchangeEvent != "")
-			$onchangeEvent .= " onchange=$onchangeEvent";
-		echo "<select name=\"$name\" id=\"$name\" class=\"formselect\"$onchangeEvent>";
-		foreach($keyvaluelist as $key => $desc){
-			$selectedhtml = $key == $selected ? "selected" : "";
-			echo "<option value=\"{$key}\" {$selectedhtml}>{$desc['name']}</option>";
-		}
-		echo "</select>";
-	} else {
-		echo $listEmptyMessage;
-	}
-}
-
 function haproxy_acl_select($mode) {
 	global $a_acltypes;
 

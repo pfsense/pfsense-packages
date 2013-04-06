@@ -65,6 +65,39 @@ if ($haproxy_sni_ssloffloading) {
 					'mode' => 'https', 'syntax' => 'req_ssl_sni -i', 'advancedoptions' => "tcp-request inspect-delay 5s\n\ttcp-request content accept if { req_ssl_hello_type 1 }");
 }
 
+$a_checktypes['none'] = array('name' => 'none', 'syntax' => '',
+	'descr' => 'No health checks will be performed.');
+$a_checktypes['Basic'] = array('name' => 'Basic', 'syntax' => '',
+	'descr' => 'Basic socket connection check');
+$a_checktypes['HTTP'] = array('name' => 'HTTP', 'syntax' => 'httpchk',
+	'descr' => 'HTTP protocol to check on the servers health, can also be used for HTTPS servers(requirs checking the SSL box for the servers).', 'parameters' => "uri,method,version");
+/* seams this was added in HAProxy1.5dev18, haproxy-devel package is currently using 1.5dev17
+$a_checktypes['Agent'] = array('name' => 'Agent', 'syntax' => 'lb-agent-chk', 'usedifferenport' => 'yes', 
+	'descr' => 'Use a TCP connection to read an ASCII string of the form 100%,75%,drain,down (others in haproxy manual)');
+*/
+$a_checktypes['LDAP'] = array('name' => 'LDAP', 'syntax' => 'ldap-check',
+	'descr' => 'Use LDAPv3 health checks for server testing');
+$a_checktypes['MySQL'] = array('name' => 'MySQL', 'syntax' => 'mysql-check',
+	'descr' => 'Use MySQL health checks for server testing', 'parameters' => 'username');
+$a_checktypes['PostgreSQL'] = array('name' => 'PostgreSQL', 'syntax' => 'pgsql-check',
+	'descr' => 'Use PostgreSQL health checks for server testing', 'parameters' => 'username');
+$a_checktypes['Redis'] = array('name' => 'Redis', 'syntax' => 'redis-check',
+	'descr' => 'Test that the server correctly talks REDIS protocol.');
+$a_checktypes['SMTP'] = array('name' => 'SMTP', 'syntax' => 'smtpchk HELO',
+	'descr' => 'Use SMTP HELO health checks for server testing', 'parameters' => 'domain');
+$a_checktypes['ESMTP'] = array('name' => 'ESMTP', 'syntax' => 'smtpchk EHLO',
+	'descr' => 'Use ESMTP EHLO health checks for server testing', 'parameters' => 'domain');
+$a_checktypes['SSL'] = array('name' => 'SSL', 'syntax' => 'ssl-hello-chk',
+	'descr' => 'Use SSLv3 client hello health checks for server testing.');
+
+$a_httpcheck_method['OPTIONS'] = array('name' => 'OPTIONS', 'syntax' => 'OPTIONS');
+$a_httpcheck_method['HEAD']    = array('name' => 'HEAD', 'syntax' => 'HEAD');
+$a_httpcheck_method['GET']     = array('name' => 'GET', 'syntax' => 'GET');
+$a_httpcheck_method['POST']    = array('name' => 'POST', 'syntax' => 'POST');
+$a_httpcheck_method['PUT']     = array('name' => 'PUT', 'syntax' => 'PUT');
+$a_httpcheck_method['DELETE']  = array('name' => 'DELETE', 'syntax' => 'DELETE');
+$a_httpcheck_method['TRACE']   = array('name' => 'TRACE', 'syntax' => 'TRACE');
+
 function haproxy_custom_php_deinstall_command() {
 	exec("cd /var/db/pkg && pkg_delete `ls | grep haproxy`");
 	exec("rm /usr/local/pkg/haproxy.inc");
@@ -323,6 +356,7 @@ function haproxy_find_acl($name) {
 function write_backend($fd, $name, $pool, $frontend) {
 	if(!is_array($pool['ha_servers']['item']) && !$pool['stats_enabled']=='yes')
 		return;
+	global $a_checktypes;
 		
 	$a_servers = &$pool['ha_servers']['item'];
 
@@ -344,17 +378,31 @@ function write_backend($fd, $name, $pool, $frontend) {
 	// https is an alias for tcp for clarity purpouses
 	if(strtolower($frontend['type']) == "https") {
 		$backend_type = "tcp";
-		$httpchk = "ssl-hello-chk";
 	} else {
 		$backend_type = $frontend['type'];
-		if(strtolower($frontend['type']) == "http")
-			$httpchk = "httpchk";
-		else
-			unset($httpchk);
 	}
 			
 	fwrite ($fd, "\tmode\t\t\t" . $backend_type . "\n");
-
+	
+	$check_type = $pool['check_type'];
+	if ($check_type != 'none')
+	{
+		$optioncheck = $a_checktypes[$check_type]['syntax'];
+		if ($check_type == "MySQL" || $check_type == "PostgreSQL")
+			$optioncheck .= " user " . $pool['monitor_username'];
+		if ($check_type == "SMTP" || $check_type == "ESMTP")
+			$optioncheck .= " " . $pool['monitor_domain'];
+		if ($check_type == "HTTP")
+		{
+			$uri = $pool['monitor_uri'];
+			if (!$uri)
+				$uri = "/";
+			$optioncheck .= " {$pool['httpcheck_method']} {$uri} {$pool['monitor_httpversion']}";
+		}
+	} else {
+		$optioncheck = "httpchk";
+	}
+	
 	if($pool['balance'])
 		fwrite ($fd, "\tbalance\t\t\t" . $pool['balance'] . "\n");
 
@@ -397,8 +445,8 @@ function write_backend($fd, $name, $pool, $frontend) {
 	else
 		$uri = "/";
 		
-	if ($httpchk)
-		fwrite ($fd, "\toption\t\t\t{$httpchk} HEAD " . $uri . " HTTP/1.0\n");
+	if ($optioncheck)
+		fwrite ($fd, "\toption\t\t\t{$optioncheck}\n");
 
 	if ($pool['advanced_backend']) {
 		$adv_be	= explode("\n", base64_decode($pool['advanced_backend']));
@@ -410,7 +458,7 @@ function write_backend($fd, $name, $pool, $frontend) {
 		}
 	}
 
-	if($pool['cookie']  && strtolower($frontend['type']) == "http") 
+	if($pool['cookie'] && strtolower($frontend['type']) == "http") 
 		$cookie = " cookie {$pool['cookie']} ";
 	else 
 		$cookie = "";
@@ -420,12 +468,14 @@ function write_backend($fd, $name, $pool, $frontend) {
 	} else {
 		$advanced_txt = "";
 	}
-	if($pool['checkinter']) 
-		$checkinter = "check inter {$pool['checkinter']}";
-	else if (strtolower($frontend['type']) != "tcp")
-		$checkinter = "check inter 1000";
-	else
-		$checkinter = "";
+	
+	if ($check_type != 'none')
+	{
+		if($pool['checkinter']) 
+			$checkinter = "check inter {$pool['checkinter']}";
+		else 
+			$checkinter = "check inter 1000";
+	}
 
 	if (is_array($a_servers))
 	{
@@ -440,7 +490,11 @@ function write_backend($fd, $name, $pool, $frontend) {
 			} else {
 				$isbackup = "";
 			}
-			$ssl = ($backend_type == "http" && $be['ssl'] == 'yes') ? ' ssl' : "";
+			$ssl = "";
+			if ($be['ssl'] == 'yes')
+			{
+				$ssl = $backend_type == "http" ? ' ssl' : ' check-ssl';
+			}
 			fwrite ($fd, "\tserver\t\t\t" . $be['name'] . " " . $be['address'].":" . $be['port'] . "$ssl $cookie $checkinter $isbackup weight " . $be['weight'] . "{$advanced_txt} {$be['advanced']}\n");
 		}
 	}
@@ -1045,6 +1099,22 @@ function haproxy_escapestring($configurationsting) {
 	$result = str_replace('\\', '\\\\', $configurationsting);
 	$result = str_replace(' ', '\\ ', $result);
 	return str_replace('#', '\\#', $result);
+}
+
+function echo_html_select($name, $keyvaluelist, $selected, $listEmptyMessage="", $onchangeEvent="")
+{
+	if (count($keyvaluelist)>0){
+		if ($onchangeEvent != "")
+			$onchangeEvent .= " onchange=$onchangeEvent";
+		echo "<select name=\"$name\" id=\"$name\" class=\"formselect\"$onchangeEvent>";
+		foreach($keyvaluelist as $key => $desc){
+			$selectedhtml = $key == $selected ? "selected" : "";
+			echo "<option value=\"{$key}\" {$selectedhtml}>{$desc['name']}</option>";
+		}
+		echo "</select>";
+	} else {
+		echo $listEmptyMessage;
+	}
 }
 
 ?>

@@ -92,10 +92,10 @@ include("head.inc");
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
   <tr><td class="tabnavtbl">
   <?php
-        /* active tabs */
-        $tab_array = array();
+	/* active tabs */
+	$tab_array = array();
 	$tab_array[] = array("Settings", false, "haproxy_global.php");
-        $tab_array[] = array("Listener", false, "haproxy_listeners.php");
+	$tab_array[] = array("Listener", false, "haproxy_listeners.php");
 	$tab_array[] = array("Server Pool", true, "haproxy_pools.php");
 	display_top_tabs($tab_array);
   ?>
@@ -103,72 +103,89 @@ include("head.inc");
   <tr>
     <td>
 	<div id="mainarea">
-              <table class="tabcont sortable" width="100%" border="0" cellpadding="0" cellspacing="0">
-                <tr>
-                  <td width="30%" class="listhdrr">Name</td>
-                  <td width="10%" class="listhdrr">Servers</td>
-                  <td width="40%" class="listhdrr">Listener</td>
-                  <td width="10%" class="list"></td>
-				</tr>
+		<table class="tabcont sortable" width="100%" border="0" cellpadding="0" cellspacing="0">
+		<tr>
+			<td width="5%" class="listhdrr">Advanced</td>
+			<td width="25%" class="listhdrr">Name</td>
+			<td width="10%" class="listhdrr">Servers</td>
+			<td width="10%" class="listhdrr">Check</td>
+			<td width="30%" class="listhdrr">Listener</td>
+			<td width="10%" class="list"></td>
+		</tr>
 <?php
-		 $i = 0;
-		 foreach ($a_pools as $pool):
-
-		 $fe_list = "";
-		 $sep = "";
-		 foreach ($a_backends as $backend) {
-			 if($backend['backend_serverpool'] == $pool['name']) {
-				 $fe_list .= $sep . $backend['name'];
-				 $sep = ", ";
-			 }
-		 }
-		 $textss = $textse = "";
-		 if ($fe_list == "") {
-			 $textss = "<span class=\"gray\">";
-			 $textse = "</span>";
-		 }
-		 if (is_array($pool['ha_servers']))
-			 $count = count($pool['ha_servers']['item']);
-		 else
-			 $count = 0;
+		$img_adv = "/themes/{$g['theme']}/images/icons/icon_advanced.gif";
+		$i = 0;
+		foreach ($a_pools as $pool){
+			$fe_list = "";
+			$sep = "";
+			foreach ($a_backends as $backend) {
+				 if($backend['backend_serverpool'] == $pool['name']) {
+					 $fe_list .= $sep . $backend['name'];
+					 $sep = ", ";
+				 }
+			}
+			$textgray = $fe_list == "" ? " gray" : "";
+			
+			if (is_array($pool['ha_servers']))
+				$count = count($pool['ha_servers']['item']);
+			else
+				 $count = 0;
 ?>
-                <tr>
-                  <td class="listlr" ondblclick="document.location='haproxy_pool_edit.php?id=<?=$i;?>';">
-			<?=$textss . $pool['name'] . $textse;?>
-                  </td>
-                  <td class="listlr" ondblclick="document.location='haproxy_pool_edit.php?id=<?=$i;?>';">
-			<?=$textss . $count . $textse;?>
-                  </td>
-                  <td class="listlr" ondblclick="document.location='haproxy_pool_edit.php?id=<?=$i;?>';">
-			<?=$textss . $fe_list . $textse;?>
-                  </td>
-                  <td class="list" nowrap>
-                    <table border="0" cellspacing="0" cellpadding="1">
-                      <tr>
-                        <td valign="middle"><a href="haproxy_pool_edit.php?id=<?=$i;?>"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_e.gif" width="17" height="17" border="0"></a></td>
-                        <td valign="middle"><a href="haproxy_pools.php?act=del&id=<?=$i;?>" onclick="return confirm('Do you really want to delete this entry?')"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_x.gif" width="17" height="17" border="0"></a></td>
-                        <td valign="middle"><a href="haproxy_pool_edit.php?dup=<?=$i;?>"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif" width="17" height="17" border="0"></a></td>
-                      </tr>
-                    </table>
-                  </td>
-                </tr>
-                <?php $i++; endforeach; ?>
-				<tfoot>
-                <tr>
-                  <td class="list" colspan="3"></td>
-                  <td class="list">
-                    <table border="0" cellspacing="0" cellpadding="1">
-                      <tr>
-                        <td valign="middle"><a href="haproxy_pool_edit.php"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif" width="17" height="17" border="0"></a></td>
-                      </tr>
-                    </table>
-                  </td>
-                </tr>
-				</tfoot>
-              </table>
-	   </div>
+			<tr class="<?=$textgray?>">
+			  <td class="listlr" ondblclick="document.location='haproxy_pool_edit.php?id=<?=$i;?>';">
+			  <?
+				if ($pool['stats_enabled']=='yes'){
+					echo "<img src=\"./themes/{$g['theme']}/images/icons/icon_log_s.gif\"" . ' title="stats enabled" width="11" height="15" border="0">';
+				}
+				$isadvset = "";
+				if ($pool['advanced']) $isadvset .= "Per server pass thru\r\n";
+				if ($pool['advanced_backend']) $isadvset .= "Backend pass thru\r\n";
+				if ($isadvset)
+					echo "<img src=\"$img_adv\" title=\"" . gettext("advanced settings set") . ": {$isadvset}\" border=\"0\">";				
+			  ?>
+			  </td>
+			  <td class="listlr" ondblclick="document.location='haproxy_pool_edit.php?id=<?=$i;?>';">
+				<?=$pool['name'];?>
+			  </td>
+			  <td class="listlr" ondblclick="document.location='haproxy_pool_edit.php?id=<?=$i;?>';">
+				<?=$count;?>
+			  </td>
+			  <td class="listlr" ondblclick="document.location='haproxy_pool_edit.php?id=<?=$i;?>';">
+				<?=$a_checktypes[$pool['check_type']]['name'];?>
+			  </td>
+			  <td class="listlr" ondblclick="document.location='haproxy_pool_edit.php?id=<?=$i;?>';">
+				<?=$fe_list;?>
+			  </td>
+			  <td class="list" nowrap>
+				<table border="0" cellspacing="0" cellpadding="1">
+				  <tr>
+					<td valign="middle"><a href="haproxy_pool_edit.php?id=<?=$i;?>"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_e.gif" width="17" height="17" border="0"></a></td>
+					<td valign="middle"><a href="haproxy_pools.php?act=del&id=<?=$i;?>" onclick="return confirm('Do you really want to delete this entry?')"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_x.gif" width="17" height="17" border="0"></a></td>
+					<td valign="middle"><a href="haproxy_pool_edit.php?dup=<?=$i;?>"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif" width="17" height="17" border="0"></a></td>
+				  </tr>
+				</table>
+			  </td>
+			</tr>
+<?php
+			$i++; 
+		}
+?>
+			<tfoot>
+			<tr>
+			  <td class="list" colspan="5"></td>
+			  <td class="list">
+				<table border="0" cellspacing="0" cellpadding="1">
+				  <tr>
+					<td valign="middle"><a href="haproxy_pool_edit.php"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif" width="17" height="17" border="0"></a></td>
+				  </tr>
+				</table>
+			  </td>
+			</tr>
+			</tfoot>
+		</table>
+	</div>
 	</table>
-            </form>
+	</form>
 <?php include("fend.inc"); ?>
 </body>
 </html>

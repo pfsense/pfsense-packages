@@ -30,6 +30,7 @@
 */
 
 require("guiconfig.inc");
+require_once("haproxy.inc");
 
 $d_haproxyconfdirty_path = $g['varrun_path'] . "/haproxy.conf.dirty";
 
@@ -48,13 +49,13 @@ if (isset($_GET['dup']))
 	$id = $_GET['dup'];
 
 global $simplefields;
-$simplefields = array("retries","balance","connection_timeout","server_timeout", "stats_enabled","stats_username","stats_password","stats_uri","stats_realm","stats_admin","stats_node_enabled","stats_node","stats_desc","stats_refresh");
+$simplefields = array(
+"name","cookie","balance",
+"check_type","checkinter","httpcheck_method","monitor_uri","monitor_httpversion","monitor_username","monitor_domain",
+"connection_timeout","server_timeout","retries",
+"stats_enabled","stats_username","stats_password","stats_uri","stats_realm","stats_admin","stats_node_enabled","stats_node","stats_desc","stats_refresh");
 
 if (isset($id) && $a_pools[$id]) {
-	$pconfig['name'] = $a_pools[$id]['name'];
-	$pconfig['checkinter'] = $a_pools[$id]['checkinter'];
-	$pconfig['monitor_uri'] = $a_pools[$id]['monitor_uri'];
-	$pconfig['cookie'] = $a_pools[$id]['cookie'];
 	$pconfig['advanced'] = base64_decode($a_pools[$id]['advanced']);
 	$pconfig['advanced_backend'] = base64_decode($a_pools[$id]['advanced_backend']);
 	$pconfig['a_servers']=&$a_pools[$id]['ha_servers']['item'];	
@@ -87,7 +88,10 @@ if ($_POST) {
 	
 	if (preg_match("/[^a-zA-Z0-9\.\-_]/", $_POST['name']))
 		$input_errors[] = "The field 'Name' contains invalid characters.";
-		
+	
+	if ($_POST['checkinter'] !== "" && !is_numeric($_POST['checkinter']))
+		$input_errors[] = "The field 'Check frequency' value is not a number.";
+	
 	if ($_POST['connection_timeout'] !== "" && !is_numeric($_POST['connection_timeout']))
 		$input_errors[] = "The field 'Connection timeout' value is not a number.";
 
@@ -216,13 +220,21 @@ include("head.inc");
 
 row_helper();
 
+// 'processing' done, make all simple fields usable in html.
+foreach($simplefields as $field){
+	$pconfig[$field] = htmlspecialchars($pconfig[$field]);
+}
 ?>
 
 <input type='hidden' name='address_type' value='textbox' />
 
-<body link="#0000CC" vlink="#0000CC" alink="#0000CC"">
+<body link="#0000CC" vlink="#0000CC" alink="#0000CC">
   <style type="text/css">
 	.haproxy_stats_visible{display:none;}
+	.haproxy_check_enabled{display:none;}
+	.haproxy_check_http{display:none;}
+	.haproxy_check_username{display:none;}
+	.haproxy_check_smtp{display:none;}
   </style>
 <script language="javascript">
 	function clearcombo(){
@@ -247,7 +259,20 @@ row_helper();
 	
 	function updatevisibility()
 	{
+		d = document;
 		setCSSdisplay(".haproxy_stats_visible", stats_enabled.checked);
+		
+		check_type = d.getElementById("check_type").value;
+		check_type_description = d.getElementById("check_type_description");
+		check_type_description.innerHTML=checktypes[check_type]["descr"]; 
+		setCSSdisplay(".haproxy_check_enabled", check_type != 'none');
+		setCSSdisplay(".haproxy_check_http", check_type == 'HTTP');
+		setCSSdisplay(".haproxy_check_username", check_type == 'MySQL' ||  check_type == 'PostgreSQL');
+		setCSSdisplay(".haproxy_check_smtp", check_type == 'SMTP' ||  check_type == 'ESMTP');
+
+		monitor_username = d.getElementById("monitor_username");
+		sqlcheckusername = d.getElementById("sqlcheckusername");
+		sqlcheckusername.innerHTML=monitor_username.value;
 	}
 
 
@@ -271,7 +296,7 @@ row_helper();
 	rowname[5] = "server_status";
 	rowtype[5] = "select";
 	rowsize[5] = "1";
-	rowname[6] = "server_name";
+	rowname[6] = "server_advanced";
 	rowtype[6] = "textbox";
 	rowsize[6] = "20";
 </script>
@@ -457,20 +482,6 @@ row_helper();
 			</td>
 		</tr>
 		<tr align="left">
-			<td width="22%" valign="top" class="vncell">Check freq</td>
-			<td width="78%" class="vtable" colspan="2">
-				<input name="checkinter" type="text" <?if(isset($pconfig['checkinter'])) echo "value=\"{$pconfig['checkinter']}\"";?>size="20"> milliseconds
-				<br/>For HTTP/HTTPS defaults to 1000 if left blank. For TCP no check will be performed if left empty.
-			</td>
-		</tr>
-		<tr align="left">
-			<td width="22%" valign="top" class="vncell">Health check URI</td>
-			<td width="78%" class="vtable" colspan="2">
-				<input name="monitor_uri" type="text" <?if(isset($pconfig['monitor_uri'])) echo "value=\"{$pconfig['monitor_uri']}\"";?>size="64">
-				<br/>Defaults to / if left blank.
-			</td>
-		</tr>
-		<tr align="left">
 			<td width="22%" valign="top" class="vncell">Per server pass thru</td>
 			<td width="78%" class="vtable" colspan="2">
 				<input type="text" name='advanced' id='advanced' value='<?php echo $pconfig['advanced']; ?>' size="64">
@@ -488,7 +499,74 @@ row_helper();
 			</td>
 		</tr>
 
-
+	</table>
+	<br/>
+	<table width="100%" border="0" cellpadding="6" cellspacing="0">
+		<tr>
+			<td colspan="2" valign="top" class="listtopic">Health checking</td>
+		</tr>
+		<tr align="left">
+			<td width="22%" valign="top" class="vncell">Health check method</td>
+			<td width="78%" class="vtable" colspan="2">
+				<?
+				echo_html_select("check_type",$a_checktypes,$pconfig['check_type']?$pconfig['check_type']:"HTML","","updatevisibility();");
+				?><br/>
+				<textarea readonly="yes" cols="60" rows="2" id="check_type_description" name="check_type_description" style="padding:5px; border:1px dashed #990000; background-color: #ffffff; color: #000000; font-size: 8pt;"></textarea>
+			</td>
+		</tr>
+		<tr align="left" class="haproxy_check_enabled">
+			<td width="22%" valign="top" class="vncell">Check frequency</td>
+			<td width="78%" class="vtable" colspan="2">
+				<input name="checkinter" type="text" <?if(isset($pconfig['checkinter'])) echo "value=\"{$pconfig['checkinter']}\"";?>size="20"> milliseconds
+				<br/>For HTTP/HTTPS defaults to 1000 if left blank. For TCP no check will be performed if left empty.
+			</td>
+		</tr>
+		<tr align="left" class="haproxy_check_http">
+			<td width="22%" valign="top" class="vncell">Http check method</td>
+			<td width="78%" class="vtable" colspan="2">
+				<?
+				echo_html_select("httpcheck_method",$a_httpcheck_method,$pconfig['httpcheck_method']);
+				?>
+				<br/>OPTIONS is the method usually best to perform server checks, HEAD and GET can also be used
+			</td>
+		</tr>
+		<tr align="left" class="haproxy_check_http">
+			<td width="22%" valign="top" class="vncell">Http check URI</td>
+			<td width="78%" class="vtable" colspan="2">
+				<input name="monitor_uri" type="text" <?if(isset($pconfig['monitor_uri'])) echo "value=\"{$pconfig['monitor_uri']}\"";?>size="64">
+				<br/>Defaults to / if left blank.
+			</td>
+		</tr>
+		<tr align="left" class="haproxy_check_http">
+			<td width="22%" valign="top" class="vncell">Http check version</td>
+			<td width="78%" class="vtable" colspan="2">
+				<input name="monitor_httpversion" type="text" <?if(isset($pconfig['monitor_httpversion'])) echo "value=\"{$pconfig['monitor_httpversion']}\"";?>size="64">
+				<br/>Defaults to "HTTP/1.0" if left blank.
+				Note that the Host field is mandatory in HTTP/1.1, and as a trick, it is possible to pass it
+				after "\r\n" following the version string like this:<br/>
+				&nbsp;&nbsp;&nbsp;&nbsp;"<i>HTTP/1.1\r\nHost:\ www</i>"<br/>
+				Also some hosts might require an accept parameter like this:<br/>
+				&nbsp;&nbsp;&nbsp;&nbsp;"<i>HTTP/1.0\r\nHost:\ webservername:8080\r\nAccept:\ */*</i>"
+			</td>
+		</tr>
+		<tr align="left" class="haproxy_check_username">
+			<td width="22%" valign="top" class="vncell">Check with Username</td>
+			<td width="78%" class="vtable" colspan="2">
+				<input name="monitor_username" id="monitor_username" type="text" <?if(isset($pconfig['monitor_username'])) echo "value=\"{$pconfig['monitor_username']}\"";?>size="64" onchange="updatevisibility();" onkeyup="updatevisibility();">
+				<br/>
+				This is the username which will be used when connecting to MySQL/PostgreSQL server.
+				<pre>
+USE mysql;
+CREATE USER '<span id="sqlcheckusername" name="sqlcheckusername"></span>'@'&lt;pfSenseIP&gt;';
+FLUSH PRIVILEGES;</pre>
+			</td>
+		</tr>
+		<tr align="left" class="haproxy_check_smtp">
+			<td width="22%" valign="top" class="vncell">Domain</td>
+			<td width="78%" class="vtable" colspan="2">
+				<input name="monitor_domain" type="text" <?if(isset($pconfig['monitor_domain'])) echo "value=\"{$pconfig['monitor_domain']}\"";?>size="64">
+			</td>
+		</tr>
 	</table>
 	<br/>
 	<table width="100%" border="0" cellpadding="6" cellspacing="0">
@@ -548,7 +626,7 @@ set by the 'retries' parameter.</div>
 		<tr class="haproxy_stats_visible" align="left" id='stats_username_row' name='stats_username_row'>
 			<td width="22%" valign="top" class="vncellreq">Stats Username</td>
 			<td width="78%" class="vtable" colspan="2">
-				<input id="stats_username" name="stats_username" type="text" <?if(isset($pconfig['stats_username'])) echo "value=\"".htmlspecialchars($pconfig['stats_username'])."\"";?> size="64">
+				<input id="stats_username" name="stats_username" type="text" <?if(isset($pconfig['stats_username'])) echo "value=\"".$pconfig['stats_username']."\"";?> size="64">
 			</td>
 		</tr>
 		
@@ -557,7 +635,7 @@ set by the 'retries' parameter.</div>
 			<td width="78%" class="vtable" colspan="2">
 				<input id="stats_password" name="stats_password" type="password" <?
 					if(isset($pconfig['stats_password'])) 
-						echo "value=\"".htmlspecialchars($pconfig['stats_password'])."\"";
+						echo "value=\"".$pconfig['stats_password']."\"";
 					?> size="64">
 				<br/>
 			</td>
@@ -615,6 +693,10 @@ set by the 'retries' parameter.</div>
 <br>
 <?php include("fend.inc"); ?>
 <script type="text/javascript">
+<?
+	phparray_to_javascriptarray($a_checktypes,"checktypes",Array('/*','/*/name','/*/descr'));
+?>
+
 	field_counter_js = 7;
 	rows = 1;
 	totalrows =  <?php echo $counter; ?>;
