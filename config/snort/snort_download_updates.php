@@ -36,11 +36,11 @@
 require_once("guiconfig.inc");
 require_once("/usr/local/pkg/snort/snort.inc");
 
-global $g, $update_log, $snort_rules_file, $emergingthreats_filename;
+global $g, $snort_rules_upd_log, $snort_rules_file, $emergingthreats_filename;
 
 $snortdir = SNORTDIR;
 
-$log = $update_log;
+$log = $snort_rules_upd_log;
 
 /* load only javascript that is needed */
 $snort_load_jquery = 'yes';
@@ -64,8 +64,8 @@ if (file_exists("{$snortdir}/{$snort_community_rules_filename}.md5"))
 
 /* Check for postback to see if we should clear the update log file. */
 if (isset($_POST['clear'])) {
-	if (file_exists("{$update_log}"))
-		mwexec("/bin/rm -f {$update_log}");
+	if (file_exists("{$snort_rules_upd_log}"))
+		mwexec("/bin/rm -f {$snort_rules_upd_log}");
 }
 
 if (isset($_POST['update'])) {
@@ -74,9 +74,9 @@ if (isset($_POST['update'])) {
 }
 
 /* check for logfile */
-$update_logfile_chk = 'no';
-if (file_exists("{$update_log}"))
-	$update_logfile_chk = 'yes';
+$snort_rules_upd_logfile_chk = 'no';
+if (file_exists("{$snort_rules_upd_log}"))
+	$snort_rules_upd_logfile_chk = 'yes';
 
 $pgtitle = "Services: Snort: Updates";
 include_once("head.inc");
@@ -189,7 +189,7 @@ function popup(url)
 						<br>
 				<?php
 
-						if ($update_logfile_chk == 'yes') {
+						if ($snort_rules_upd_logfile_chk == 'yes') {
 							echo "
 				<button class=\"formbtn\" onclick=\"popup('snort_log_view.php?logfile={$log}')\"><span class='pwhitetxt'>" . gettext("View Log") . "</span></button>";
 				echo "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type=\"submit\" value=\"Clear Log\" name=\"clear\" id=\"Submit\" class=\"formbtn\" />\n";

@@ -37,8 +37,6 @@
 require_once("guiconfig.inc");
 require_once("/usr/local/pkg/snort/snort.inc");
 
-global $update_log;
-
 $contents = '';
 
 // Read the contents of the argument passed to us.

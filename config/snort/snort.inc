@@ -69,8 +69,8 @@ $snort_community_rules_url = "https://s3.amazonaws.com/snort-org/www/rules/commu
 $snort_community_rules_filename = "community-rules.tar.gz";
 $flowbit_rules_file = "flowbit-required.rules";
 $snort_enforcing_rules_file = "snort.rules";
-$update_log = SNORTLOGDIR;
-$update_log .= "/update.log";
+$snort_rules_upd_log = SNORTLOGDIR;
+$snort_rules_upd_log .= "/snort_rules_update.log";
 
 /* Rebuild Rules Flag -- if "on", rebuild enforcing rules and flowbit-rules files */
 $rebuild_rules = "off";
@@ -325,7 +325,7 @@ function snort_barnyard_stop($snortcfg, $if_real) {
 	$snort_uuid = $snortcfg['uuid'];
 	if (file_exists("{$g['varrun_path']}/barnyard2_{$if_real}{$snort_uuid}.pid") && isvalidpid("{$g['varrun_path']}/barnyard2_{$if_real}{$snort_uuid}.pid")) {
 		killbypid("{$g['varrun_path']}/barnyard2_{$if_real}{$snort_uuid}.pid");
-//		@unlink("{$g['varrun_path']}/barnyard2_{$if_real}{$snort_uuid}.pid");
+		@unlink("{$g['varrun_path']}/barnyard2_{$if_real}{$snort_uuid}.pid");
 	}
 }
 
@@ -335,7 +335,7 @@ function snort_stop($snortcfg, $if_real) {
 	$snort_uuid = $snortcfg['uuid'];
 	if (file_exists("{$g['varrun_path']}/snort_{$if_real}{$snort_uuid}.pid") && isvalidpid("{$g['varrun_path']}/snort_{$if_real}{$snort_uuid}.pid")) {
 		killbypid("{$g['varrun_path']}/snort_{$if_real}{$snort_uuid}.pid");
-//		exec("/bin/rm {$g['varrun_path']}/snort_{$if_real}{$snort_uuid}.pid");
+		exec("/bin/rm {$g['varrun_path']}/snort_{$if_real}{$snort_uuid}.pid");
 	}
 
 	snort_barnyard_stop($snortcfg, $if_real);
@@ -457,7 +457,7 @@ function snort_post_delete_logs($snort_uuid = 0) {
 
 function snort_postinstall() {
 	global $config, $g, $snort_rules_file, $emerging_threats_version;
-	global $snort_version, $update_log, $rebuild_rules, $is_postinstall;
+	global $snort_version, $rebuild_rules, $is_postinstall;
 
 	$snortdir = SNORTDIR;
 	$snortlibdir = SNORTLIBDIR;
@@ -1783,7 +1783,7 @@ function snort_deinstall() {
 	/* deinstall and reinstall operation is in progress.      */
 	/*							  */
 	/* XXX: hopefully a better method presents itself in      */
-	/*      versions of pfSense.				  */
+	/*      future versions of pfSense.                       */
 	/**********************************************************/
 	if (file_exists("/tmp/pkg_libs.tgz") || file_exists("/tmp/pkg_bins.tgz")) {
 		mwexec("/bin/rm -rf {$snortdir}");
@@ -1911,8 +1911,8 @@ function snort_filter_preproc_rules($snortcfg, &$active_rules, $persist_log = fa
 	/* NOTE: This feature must be enabled in the GUI  */
 	/*       by the user.  Use of this feature can    */
 	/*       severely degrade Snort's ability to      */
-	/*       detect threats by disabling potenitally  */
-	/*       rules.                                   */
+	/*       detect threats by disabling potentially  */
+	/*       crucial detection rules.                 */
 	/**************************************************/
 
 	global $config;
@@ -1933,11 +1933,15 @@ function snort_filter_preproc_rules($snortcfg, &$active_rules, $persist_log = fa
 	 * with changes to preprocessor rule options in    *
 	 * Snort VRT rules.                                *
 	 *                                                 *
+	 *                                                 *
+	 * Format of array is:                             *
+	 *    "rule_option" => "dependent_preprocessor"    *
+	 *                                                 *
 	 * Last Update: 04/05/2013                         *
 	 *                                                 *
 	 * Added: http_inspect content modifiers and       *
 	 *        various "service" metadata values.       *
-	 *						   *
+	 *                                                 *
 	 ***************************************************/
 	$rule_opts_preprocs = array("ssl_version:" => "ssl_preproc","ssl_state:" => "ssl_preproc",
 				    "service ssl" => "ssl_preproc", "service ftp" => "ftp_preprocessor",
@@ -2094,17 +2098,20 @@ function snort_generate_conf($snortcfg) {
 	/* For fail-safe on an initial startup following installation, and  */
 	/* before a rules update has occurred, copy the default config      */
 	/* files to the interface directory.  If files already exist in     */
-	/* the interface directory, that means a rule update has been done  */
-	/* and we should leave the customized files put in place by the     */
-	/* rules update process.                                            */
+	/* the interface directory, or they are newer, that means a rule    */
+	/* update has been done and we should leave the customized files    */
+	/* put in place by therules update process.                         */
 	/********************************************************************/
 	$snort_files = array("gen-msg.map", "classification.config", "reference.config",
 			"sid-msg.map", "unicode.map", "threshold.conf", "preproc_rules/preprocessor.rules",
 			"preproc_rules/decoder.rules", "preproc_rules/sensitive-data.rules"
 		);
 	foreach ($snort_files as $file) {
-		if (file_exists("{$snortdir}/{$file}") && !file_exists("{$snortcfgdir}/{$file}"))
-			@copy("{$snortdir}/{$file}", "{$snortcfgdir}/{$file}");
+		if (file_exists("{$snortdir}/{$file}")) {
+			$ftime = filemtime("{$snortdir}/{$file}");
+			if (!file_exists("{$snortcfgdir}/{$file}") || ($ftime > filemtime("{$snortcfgdir}/{$file}")))
+				@copy("{$snortdir}/{$file}", "{$snortcfgdir}/{$file}");
+		}
 	}
 
 	/* define alertsystemlog */

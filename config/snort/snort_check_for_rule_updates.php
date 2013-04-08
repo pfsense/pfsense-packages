@@ -82,13 +82,13 @@ exec("/bin/mkdir -p {$snortlibdir}/dynamicrules");
 exec("/bin/mkdir -p {$snortlogdir}");
 
 /* See if we need to automatically clear the Update Log based on 1024K size limit */
-if (file_exists($update_log)) {
-	if (1048576 < filesize($update_log))
-		exec("/bin/rm -r {$update_log}");
+if (file_exists($snort_rules_upd_log)) {
+	if (1048576 < filesize($snort_rules_upd_log))
+		exec("/bin/rm -r {$snort_rules_upd_log}");
 }
 
 /* Log start time for this rules update */
-error_log(gettext("Starting rules update...  Time: " . date("Y-m-d H:i:s") . "\n"), 3, $update_log);
+error_log(gettext("Starting rules update...  Time: " . date("Y-m-d H:i:s") . "\n"), 3, $snort_rules_upd_log);
 
 /* Set user agent to Mozilla */
 ini_set('user_agent','Mozilla/4.0 (compatible; MSIE 6.0)');
@@ -97,7 +97,7 @@ ini_set("memory_limit","150M");
 /*  download md5 sig from snort.org */
 if ($snortdownload == 'on') {
 	update_status(gettext("Downloading Snort VRT md5 file..."));
-	error_log(gettext("\tDownloading Snort VRT md5 file...\n"), 3, $update_log);
+	error_log(gettext("\tDownloading Snort VRT md5 file...\n"), 3, $snort_rules_upd_log);
         $max_tries = 4;
         while ($max_tries > 0) {
 	       $image = @file_get_contents("{$snort_rule_url}{$snort_filename_md5}");
@@ -110,14 +110,14 @@ if ($snortdownload == 'on') {
                        break;
         }
         log_error("Snort MD5 Attempts: " . (4 - $max_tries + 1));
-        error_log("\tChecking Snort VRT md5 file...\n", 3, $update_log);
+        error_log("\tChecking Snort VRT md5 file...\n", 3, $snort_rules_upd_log);
 	@file_put_contents("{$tmpfname}/{$snort_filename_md5}", $image);
 	if (0 == filesize("{$tmpfname}/{$snort_filename_md5}")) {
 		update_status(gettext("Please wait... You may only check for New Rules every 15 minutes..."));
 		log_error(gettext("Please wait... You may only check for New Rules every 15 minutes..."));
 		update_output_window(gettext("Rules are released every month from snort.org. You may download the Rules at any time."));
 		$snortdownload = 'off';
-		error_log(gettext("\tSnort VRT md5 download failed.  Site may be offline or Oinkcode is not authorized for this level or version.\n"), 3, $update_log);
+		error_log(gettext("\tSnort VRT md5 download failed.  Site may be offline or Oinkcode is not authorized for this level or version.\n"), 3, $snort_rules_upd_log);
 	} else
 		update_status(gettext("Done downloading snort.org md5."));
 }
@@ -130,7 +130,7 @@ if ($snortdownload == 'on') {
 		if ($md5_check_new == $md5_check_old) {
 			update_status(gettext("Snort VRT rules are up to date..."));
 			log_error(gettext("Snort VRT rules are up to date..."));
-			error_log(gettext("\tSnort VRT rules are up to date.\n"), 3, $update_log);
+			error_log(gettext("\tSnort VRT rules are up to date.\n"), 3, $snort_rules_upd_log);
 			$snortdownload = 'off';
 		}
 	}
@@ -140,7 +140,7 @@ if ($snortdownload == 'on') {
 if ($snortdownload == 'on') {
 	update_status(gettext("There is a new set of Snort VRT rules posted. Downloading..."));
 	log_error(gettext("There is a new set of Snort VRT rules posted. Downloading..."));
-	error_log(gettext("\tThere is a new set of Snort VRT rules posted. Downloading...\n"), 3, $update_log);
+	error_log(gettext("\tThere is a new set of Snort VRT rules posted. Downloading...\n"), 3, $snort_rules_upd_log);
         $max_tries = 4;
         while ($max_tries > 0) {
         	download_file_with_progress_bar("{$snort_rule_url}{$snort_filename}", "{$tmpfname}/{$snort_filename}");
@@ -154,12 +154,12 @@ if ($snortdownload == 'on') {
         }  
 	update_status(gettext("Done downloading Snort VRT rules file."));
         log_error("Snort Rules Attempts: " . (4 - $max_tries + 1));
-	error_log(gettext("\tDone downloading rules file.\n"),3, $update_log);
+	error_log(gettext("\tDone downloading rules file.\n"),3, $snort_rules_upd_log);
 	if (300000 > filesize("{$tmpfname}/$snort_filename")){
 		update_output_window(gettext("Snort VRT rules file download failed..."));
 		log_error(gettext("Snort VRT rules file download failed..."));
                 log_error("Failed Rules Filesize: " . filesize("{$tmpfname}/$snort_filename"));
-		error_log(gettext("\tSnort VRT rules file download failed.  Snort VRT rules will not be updated.\n"), 3, $update_log);
+		error_log(gettext("\tSnort VRT rules file download failed.  Snort VRT rules will not be updated.\n"), 3, $snort_rules_upd_log);
 		$snortdownload = 'off';
 	}
 }
@@ -167,17 +167,17 @@ if ($snortdownload == 'on') {
 /*  download md5 sig from Snort GPLv2 Community Rules */
 if ($snortcommunityrules == 'on') {
 	update_status(gettext("Downloading Snort GPLv2 Community Rules md5 file..."));
-	error_log(gettext("\tDownloading Snort GPLv2 Community Rules md5 file...\n"), 3, $update_log);
+	error_log(gettext("\tDownloading Snort GPLv2 Community Rules md5 file...\n"), 3, $snort_rules_upd_log);
         $image = file_get_contents("{$snort_community_rules_url}{$snort_community_rules_filename_md5}");
 	update_status(gettext("Done downloading Snort GPLv2 Community Rules md5"));
-	error_log(gettext("\tChecking Snort GPLv2 Community Rules md5.\n"), 3, $update_log);
+	error_log(gettext("\tChecking Snort GPLv2 Community Rules md5.\n"), 3, $snort_rules_upd_log);
 	@file_put_contents("{$tmpfname}/{$snort_community_rules_filename_md5}", $image);
 
 	/* See if the file download was successful, and turn off Snort GPLv2 update if it failed. */
 	if (0 == filesize("{$tmpfname}/{$snort_community_rules_filename_md5}")){
 		update_output_window(gettext("Snort GPLv2 Community Rules md5 file download failed.  Community Rules will not be updated."));
 		log_error(gettext("Snort GPLv2 Community Rules md5 file download failed.  Community Rules will not be updated."));
-		error_log(gettext("\tSnort GPLv2 Community Rules md5 file download failed.  Community Rules will not be updated.\n"), 3, $update_log);
+		error_log(gettext("\tSnort GPLv2 Community Rules md5 file download failed.  Community Rules will not be updated.\n"), 3, $snort_rules_upd_log);
 		$snortcommunityrules = 'off';
 	}
 
@@ -188,7 +188,7 @@ if ($snortcommunityrules == 'on') {
 		if ($snort_comm_md5_check_new == $snort_comm_md5_check_old) {
 			update_status(gettext("Snort GPLv2 Community Rules are up to date..."));
 			log_error(gettext("Snort GPLv2 Community Rules are up to date..."));
-			error_log(gettext("\tSnort GPLv2 Community Rules are up to date.\n"), 3, $update_log);
+			error_log(gettext("\tSnort GPLv2 Community Rules are up to date.\n"), 3, $snort_rules_upd_log);
 			$snortcommunityrules = 'off';
 		}
 	}
@@ -198,7 +198,7 @@ if ($snortcommunityrules == 'on') {
 if ($snortcommunityrules == "on") {
 	update_status(gettext("There is a new set of Snort GPLv2 Community Rules posted. Downloading..."));
 	log_error(gettext("There is a new set of Snort GPLv2 Community Rules posted. Downloading..."));
-	error_log(gettext("\tThere is a new set of Snort GPLv2 Community Rules posted. Downloading...\n"), 3, $update_log);
+	error_log(gettext("\tThere is a new set of Snort GPLv2 Community Rules posted. Downloading...\n"), 3, $snort_rules_upd_log);
 	download_file_with_progress_bar("{$snort_community_rules_url}{$snort_community_rules_filename}", "{$tmpfname}/{$snort_community_rules_filename}");
 
 	/* Test for a valid rules file download.  Turn off Snort Community update if download failed. */
@@ -206,13 +206,13 @@ if ($snortcommunityrules == "on") {
 		update_output_window(gettext("Snort GPLv2 Community Rules file download failed..."));
 		log_error(gettext("Snort GPLv2 Community Rules file download failed..."));
                 log_error("Failed Rules Filesize: " . filesize("{$tmpfname}/{$snort_community_rules_filename}"));
-		error_log(gettext("\tSnort GPLv2 Community Rules file download failed.  Community Rules will not be updated.\n"), 3, $update_log);
+		error_log(gettext("\tSnort GPLv2 Community Rules file download failed.  Community Rules will not be updated.\n"), 3, $snort_rules_upd_log);
 		$snortcommunityrules = 'off';
 	}
 	else {
 		update_status(gettext('Done downloading Snort GPLv2 Community Rules file.'));
 		log_error("Snort GPLv2 Community Rules file update downloaded succsesfully");
-		error_log(gettext("\tDone downloading Snort GPLv2 Community Rules file.\n"), 3, $update_log);
+		error_log(gettext("\tDone downloading Snort GPLv2 Community Rules file.\n"), 3, $snort_rules_upd_log);
 	}
 }
 
@@ -221,7 +221,7 @@ if ($snortcommunityrules == 'on') {
 	safe_mkdir("{$snortdir}/tmp/community");
 	if (file_exists("{$tmpfname}/{$snort_community_rules_filename}")) {
 		update_status(gettext("Extracting Snort GPLv2 Community Rules..."));
-		error_log(gettext("\tExtracting and installing Snort GPLv2 Community Rules...\n"), 3, $update_log);
+		error_log(gettext("\tExtracting and installing Snort GPLv2 Community Rules...\n"), 3, $snort_rules_upd_log);
 		exec("/usr/bin/tar xzf {$tmpfname}/{$snort_community_rules_filename} -C {$snortdir}/tmp/community/");
 
 		$files = glob("{$snortdir}/tmp/community/community-rules/*.rules");
@@ -241,7 +241,7 @@ if ($snortcommunityrules == 'on') {
 			@copy("{$tmpfname}/$snort_community_rules_filename_md5", "{$snortdir}/{$snort_community_rules_filename_md5}");
 		}
                 update_status(gettext("Extraction of Snort GPLv2 Community Rules completed..."));
-		error_log(gettext("\tInstallation of Snort GPLv2 Community Rules completed.\n"), 3, $update_log);
+		error_log(gettext("\tInstallation of Snort GPLv2 Community Rules completed.\n"), 3, $snort_rules_upd_log);
 		exec("rm -r {$snortdir}/tmp/community");
 	}
 }
@@ -249,7 +249,7 @@ if ($snortcommunityrules == 'on') {
 /*  download md5 sig from emergingthreats.net */
 if ($emergingthreats == 'on') {
 	update_status(gettext("Downloading EmergingThreats md5 file..."));
-	error_log(gettext("\tDownloading EmergingThreats md5 file...\n"), 3, $update_log);
+	error_log(gettext("\tDownloading EmergingThreats md5 file...\n"), 3, $snort_rules_upd_log);
 
 	/* If using Sourcefire VRT rules with ET, then we should use the open-nogpl ET rules.  */
 	if ($vrt_enabled == "on")
@@ -258,14 +258,14 @@ if ($emergingthreats == 'on') {
 	        $image = @file_get_contents("http://rules.emergingthreats.net/open/snort-{$emerging_threats_version}/emerging.rules.tar.gz.md5");
 
 	update_status(gettext("Done downloading EmergingThreats md5"));
-	error_log(gettext("\tChecking EmergingThreats md5.\n"), 3, $update_log);
+	error_log(gettext("\tChecking EmergingThreats md5.\n"), 3, $snort_rules_upd_log);
 	@file_put_contents("{$tmpfname}/{$emergingthreats_filename_md5}", $image);
 
 	/* See if the file download was successful, and turn off ET update if it failed. */
 	if (0 == filesize("{$tmpfname}/$emergingthreats_filename_md5")){
 		update_output_window(gettext("EmergingThreats md5 file download failed.  EmergingThreats rules will not be updated."));
 		log_error(gettext("EmergingThreats md5 file download failed.  EmergingThreats rules will not be updated."));
-		error_log(gettext("\tEmergingThreats md5 file download failed.  EmergingThreats rules will not be updated.\n"), 3, $update_log);
+		error_log(gettext("\tEmergingThreats md5 file download failed.  EmergingThreats rules will not be updated.\n"), 3, $snort_rules_upd_log);
 		$emergingthreats = 'off';
 	}
 
@@ -276,7 +276,7 @@ if ($emergingthreats == 'on') {
 		if ($emerg_md5_check_new == $emerg_md5_check_old) {
 			update_status(gettext("Emerging Threats rules are up to date..."));
 			log_error(gettext("Emerging Threat rules are up to date..."));
-			error_log(gettext("\tEmerging Threats rules are up to date.\n"), 3, $update_log);
+			error_log(gettext("\tEmerging Threats rules are up to date.\n"), 3, $snort_rules_upd_log);
 			$emergingthreats = 'off';
 		}
 	}
@@ -286,7 +286,7 @@ if ($emergingthreats == 'on') {
 if ($emergingthreats == "on") {
 	update_status(gettext("There is a new set of EmergingThreats rules posted. Downloading..."));
 	log_error(gettext("There is a new set of EmergingThreats rules posted. Downloading..."));
-	error_log(gettext("\tThere is a new set of EmergingThreats rules posted. Downloading...\n"), 3, $update_log);
+	error_log(gettext("\tThere is a new set of EmergingThreats rules posted. Downloading...\n"), 3, $snort_rules_upd_log);
 
 	/* If using Sourcefire VRT rules with ET, then we should use the open-nogpl ET rules.  */
 	if ($vrt_enabled == "on")
@@ -299,13 +299,13 @@ if ($emergingthreats == "on") {
 		update_output_window(gettext("EmergingThreats rules file download failed..."));
 		log_error(gettext("EmergingThreats rules file download failed..."));
                 log_error("Failed Rules Filesize: " . filesize("{$tmpfname}/$emergingthreats_filename"));
-		error_log(gettext("\tEmergingThreats rules file download failed.  EmergingThreats rules will not be updated.\n"), 3, $update_log);
+		error_log(gettext("\tEmergingThreats rules file download failed.  EmergingThreats rules will not be updated.\n"), 3, $snort_rules_upd_log);
 		$emergingthreats = 'off';
 	}
 	else {
 		update_status(gettext('Done downloading EmergingThreats rules file.'));
 		log_error("EmergingThreats rules file update downloaded succsesfully");
-		error_log(gettext("\tDone downloading EmergingThreats rules file.\n"), 3, $update_log);
+		error_log(gettext("\tDone downloading EmergingThreats rules file.\n"), 3, $snort_rules_upd_log);
 	}
 }
 
@@ -314,7 +314,7 @@ if ($emergingthreats == 'on') {
 	safe_mkdir("{$snortdir}/tmp/emerging");
 	if (file_exists("{$tmpfname}/{$emergingthreats_filename}")) {
 		update_status(gettext("Extracting EmergingThreats.org rules..."));
-		error_log(gettext("\tExtracting and installing EmergingThreats.org rules...\n"), 3, $update_log);
+		error_log(gettext("\tExtracting and installing EmergingThreats.org rules...\n"), 3, $snort_rules_upd_log);
 		exec("/usr/bin/tar xzf {$tmpfname}/{$emergingthreats_filename} -C {$snortdir}/tmp/emerging rules/");
 
 		$files = glob("{$snortdir}/tmp/emerging/rules/*.rules");
@@ -340,7 +340,7 @@ if ($emergingthreats == 'on') {
 			@copy("{$tmpfname}/$emergingthreats_filename_md5", "{$snortdir}/$emergingthreats_filename_md5");
 		}
                 update_status(gettext("Extraction of EmergingThreats.org rules completed..."));
-		error_log(gettext("\tInstallation of EmergingThreats.org rules completed.\n"), 3, $update_log);
+		error_log(gettext("\tInstallation of EmergingThreats.org rules completed.\n"), 3, $snort_rules_upd_log);
 		exec("rm -r {$snortdir}/tmp/emerging");
 	}
 }
@@ -356,7 +356,7 @@ if ($snortdownload == 'on') {
 			$freebsd_version_so = 'FreeBSD-9-0';
 
 		update_status(gettext("Extracting Snort VRT rules..."));
-		error_log(gettext("\tExtracting and installing Snort VRT rules...\n"), 3, $update_log);
+		error_log(gettext("\tExtracting and installing Snort VRT rules...\n"), 3, $snort_rules_upd_log);
 		/* extract snort.org rules and add prefix to all snort.org files */
 		safe_mkdir("{$snortdir}/tmp/snortrules");
 		exec("/usr/bin/tar xzf {$tmpfname}/{$snort_filename} -C {$snortdir}/tmp/snortrules rules/");
@@ -376,7 +376,7 @@ if ($snortdownload == 'on') {
 		/* extract so rules */
 		update_status(gettext("Extracting Snort VRT Shared Objects rules..."));
 		exec('/bin/mkdir -p {$snortlibdir}/dynamicrules/');
-		error_log(gettext("\tUsing Snort VRT precompiled SO rules for {$freebsd_version_so} ...\n"), 3, $update_log);
+		error_log(gettext("\tUsing Snort VRT precompiled SO rules for {$freebsd_version_so} ...\n"), 3, $snort_rules_upd_log);
 		$snort_arch = php_uname("m");
 		$nosorules = false;
 		if ($snort_arch  == 'i386'){
@@ -432,7 +432,7 @@ if ($snortdownload == 'on') {
 			@copy("{$tmpfname}/$snort_filename_md5", "{$snortdir}/$snort_filename_md5");
 		}
 		update_status(gettext("Extraction of Snort VRT rules completed..."));
-		error_log(gettext("\tInstallation of Snort VRT rules completed.\n"), 3, $update_log);
+		error_log(gettext("\tInstallation of Snort VRT rules completed.\n"), 3, $snort_rules_upd_log);
 	}
 }
 
@@ -444,11 +444,14 @@ function snort_apply_customizations($snortcfg, $if_real) {
 	/* Update the Preprocessor rules for the master configuration and for the interface if Snort VRT rules are in use. */
 	if ($vrt_enabled == 'on') {
 		exec("/bin/mkdir -p {$snortdir}/snort_{$snortcfg['uuid']}_{$if_real}/preproc_rules");
-		exec("/bin/cp {$snortdir}/tmp/preproc_rules/*.rules {$snortdir}/preproc_rules/");
-
-		/* Check if customized preprocessor rule protection is enabled before overwriting them. */
-		if ($snortcfg['protect_preproc_rules'] <> 'on')
-			exec("/bin/cp {$snortdir}/tmp/preproc_rules/*.rules {$snortdir}/snort_{$snortcfg['uuid']}_{$if_real}/preproc_rules/");
+		$preproc_files = glob("{$snortdir}/tmp/preproc_rules/*.rules");
+		foreach ($preproc_files as $file) {
+			$newfile = basename($file);
+			@copy($file, "{$snortdir}/preproc_rules/{$newfile}"); 
+			/* Check if customized preprocessor rule protection is enabled for interface before overwriting them. */
+			if ($snortcfg['protect_preproc_rules'] <> 'on')
+				@copy($file, "{$snortdir}/snort_{$snortcfg['uuid']}_{$if_real}/preproc_rules/{$newfile}");
+		}
 	}
 	else {
 		exec("/bin/mkdir -p {$snortdir}/snort_{$snortcfg['uuid']}_{$if_real}/preproc_rules");
@@ -466,7 +469,7 @@ function snort_apply_customizations($snortcfg, $if_real) {
 if ($snortdownload == 'on' || $emergingthreats == 'on' || $snortcommunityrules == 'on') {
 
 	update_status(gettext('Copying new config and map files...'));
-	error_log(gettext("\tCopying new config and map files...\n"), 3, $update_log);
+	error_log(gettext("\tCopying new config and map files...\n"), 3, $snort_rules_upd_log);
 
         /* Determine which config and map file set to use for the master copy. */
         /* If the Snort VRT rules are not enabled, then use Emerging Threats.  */
@@ -531,13 +534,13 @@ if ($snortdownload == 'on' || $emergingthreats == 'on' || $snortcommunityrules =
 				$tmp .= gettext("\tPreprocessor text rules flagged as protected and not updated for ");
 				$tmp .= snort_get_friendly_interface($value['interface']) . "...\n";
 			}
-			error_log($tmp, 3, $update_log);
+			error_log($tmp, 3, $snort_rules_upd_log);
 		}
 	}
 	else {
 	        update_output_window(gettext("\nWarning:  No interfaces configured for Snort were found..."));
 	        update_output_window(gettext("          When Snort is added to an interface, the rules will rebuild...\n"));
-		error_log(gettext("\tWarning:  No interfaces configured for Snort were found...\n"), 3, $update_log);
+		error_log(gettext("\tWarning:  No interfaces configured for Snort were found...\n"), 3, $snort_rules_upd_log);
 	}
 
 	/* Clear the rebuild rules flag.  */
@@ -552,17 +555,17 @@ if ($snortdownload == 'on' || $emergingthreats == 'on' || $snortcommunityrules =
 	/* Restart snort if already running to pick up the new rules. */
        	if (is_process_running("snort")) {
 		update_status(gettext('Restarting Snort to activate the new set of rules...'));
-		error_log(gettext("\tRestarting Snort to activate the new set of rules...\n"), 3, $update_log);
+		error_log(gettext("\tRestarting Snort to activate the new set of rules...\n"), 3, $snort_rules_upd_log);
        		exec("/bin/sh /usr/local/etc/rc.d/snort.sh restart");
 	        update_output_window(gettext("Snort has restarted with your new set of rules..."));
        		log_error(gettext("Snort has restarted with your new set of rules..."));
-		error_log(gettext("\tSnort has restarted with your new set of rules.\n"), 3, $update_log);
+		error_log(gettext("\tSnort has restarted with your new set of rules.\n"), 3, $snort_rules_upd_log);
 	}
 }
 
 update_status(gettext("The Rules update has finished..."));
 log_error(gettext("The Rules update has finished."));
-error_log(gettext("The Rules update has finished.  Time: " . date("Y-m-d H:i:s"). "\n\n"), 3, $update_log);
+error_log(gettext("The Rules update has finished.  Time: " . date("Y-m-d H:i:s"). "\n\n"), 3, $snort_rules_upd_log);
 conf_mount_ro();
 
 ?>
