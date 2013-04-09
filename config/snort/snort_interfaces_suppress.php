@@ -134,10 +134,10 @@ if($pfsense_stable == 'yes'){echo '<p class="pgtitle">' . $pgtitle . '</p>';}
 </table>
 </td></tr>
 <tr>
-	<td colspan="3" width="100%"><span class="vexpl"><span class="red"><strong><?php echo gettext("Note:"); ?></strong></span>
+	<td colspan="3" width="100%"><br/><span class="vexpl"><span class="red"><strong><?php echo gettext("Note:"); ?></strong></span>
 	<p><span class="vexpl"><?php echo gettext("Here you can create event filtering and " .
-	"suppression for your snort package rules."); ?><br>
-	<?php echo gettext("Please note that you must restart a running rule so that changes can " .
+	"suppression for your snort package rules."); ?><br/><br/>
+	<?php echo gettext("Please note that you must restart a running Interface so that changes can " .
 	"take effect."); ?></span></p></td>
 </tr>
 </table>
