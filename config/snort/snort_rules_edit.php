@@ -62,6 +62,7 @@ $if_real = snort_get_real_interface($pconfig['interface']);
 $snort_uuid = $a_rule[$id]['uuid'];
 $file = $_GET['openruleset'];
 $contents = '';
+$wrap_flag = "off";
 
 // Read the contents of the argument passed to us.
 // It may be an IPS policy string, an individual SID,
@@ -69,8 +70,10 @@ $contents = '';
 // Test for the special case of an IPS Policy file.
 if (substr($file, 0, 10) == "IPS Policy") {
 	$rules_map = snort_load_vrt_policy($a_rule[$id]['ips_policy']);
-	if (isset($_GET['ids']))
+	if (isset($_GET['ids'])) {
 		$contents = $rules_map[$_GET['gid']][trim($_GET['ids'])]['rule'];
+		$wrap_flag = "on";
+	}
 	else {
 		$contents = "# Snort IPS Policy - " . ucfirst($a_rule[$id]['ips_policy']) . "\n\n";
 		foreach (array_keys($rules_map) as $k1) {
@@ -86,6 +89,7 @@ if (substr($file, 0, 10) == "IPS Policy") {
 elseif (isset($_GET['ids'])) {
 	$rules_map = snort_load_rules_map("{$snortdir}/rules/{$file}");
 	$contents = $rules_map[$_GET['gid']][trim($_GET['ids'])]['rule'];
+	$wrap_flag = "on";
 }
 // Is it our special flowbit rules file?
 elseif ($file == $flowbit_rules_file)
@@ -102,7 +106,7 @@ else {
 	exit;
 }
 
-$pgtitle = array(gettext("Advanced"), gettext("File Viewer"));
+$pgtitle = array(gettext("Snort"), gettext("File Viewer"));
 ?>
 
 <?php include("head.inc");?>
@@ -124,7 +128,7 @@ $pgtitle = array(gettext("Advanced"), gettext("File Viewer"));
 		<tr>
 			<td valign="top" class="label">
 			<div style="background: #eeeeee;" id="textareaitem"><!-- NOTE: The opening *and* the closing textarea tag must be on the same line. -->
-			<textarea wrap="off" rows="33" cols="90" name="code2"><?=$contents;?></textarea>
+			<textarea wrap="<?=$wrap_flag?>" rows="33" cols="90" name="code2"><?=$contents;?></textarea>
 			</div>
 			</td>
 		</tr>

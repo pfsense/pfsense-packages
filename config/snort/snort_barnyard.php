@@ -173,10 +173,10 @@ function enable_change(enable_change) {
 					<?php echo gettext("This will enable barnyard2 for this interface. You will also have to set the database credentials."); ?></td>
 			</tr>
 			<tr>
-				<td colspan="2" valign="top" class="listtopic"><?php echo gettext("Mysql Settings"); ?></td>
+				<td colspan="2" valign="top" class="listtopic"><?php echo gettext("MySQL Settings"); ?></td>
 			</tr>
 			<tr>
-				<td width="22%" valign="top" class="vncell"><?php echo gettext("Log to a Mysql Database"); ?></td>
+				<td width="22%" valign="top" class="vncell"><?php echo gettext("Log to a MySQL Database"); ?></td>
 				<td width="78%" class="vtable"><input name="barnyard_mysql"
 					type="text" class="formfld" id="barnyard_mysql" size="100"
 					value="<?=htmlspecialchars($pconfig['barnyard_mysql']);?>"> <br>
@@ -207,7 +207,7 @@ function enable_change(enable_change) {
 				<td width="22%" valign="top">&nbsp;</td>
 				<td width="78%"><span class="vexpl"><span class="red"><strong><?php echo gettext("Note:"); ?></strong></span>
 				<br>
-				<?php echo gettext("Please save your settings befor you click start."); ?> </td>
+				<?php echo gettext("Please save your settings before you click start."); ?> </td>
 			</tr>
 		</table>
 
