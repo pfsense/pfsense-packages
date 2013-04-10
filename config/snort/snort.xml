@@ -46,8 +46,8 @@
 	<requirements>Describe your package requirements here</requirements>
 	<faq>Currently there are no FAQ items provided.</faq>
 	<name>Snort</name>
-	<version>2.9.2.3</version>
-	<title>Services:2.9.2.3 pkg v. 2.5.3</title>
+	<version>2.9.4.1</version>
+	<title>Services:2.9.4.1 pkg v. 2.5.5</title>
 	<include_file>/usr/local/pkg/snort/snort.inc</include_file>
 	<menu>
 		<name>Snort</name>
@@ -163,6 +163,11 @@
 		<chmod>077</chmod>
 		<item>http://www.pfsense.com/packages/config/snort/snort_interfaces_suppress_edit.php</item>
 	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/www/snort/</prefix>
+		<chmod>077</chmod>
+		<item>http://www.pfsense.com/packages/config/snort/snort_log_view.php</item>
+	</additional_files_needed>
 	<fields>
 	</fields>
 	<custom_add_php_command>
@@ -177,3 +182,4 @@
 		snort_deinstall();
 	</custom_php_deinstall_command>
 </packagegui>
+

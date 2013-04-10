@@ -31,7 +31,7 @@
 require_once("guiconfig.inc");
 require_once("/usr/local/pkg/snort/snort.inc");
 
-global $g;
+global $g, $rebuild_rules;
 
 if (!is_array($config['installedpackages']['snortglobal']))
 	$config['installedpackages']['snortglobal'] = array();
@@ -50,10 +50,15 @@ if (is_null($id)) {
 }
 
 $pconfig = array();
-if (empty($snortglob['rule'][$id]['uuid']))
+if (empty($snortglob['rule'][$id]['uuid'])) {
+	/* Adding new interface, so flag rules to build. */
 	$pconfig['uuid'] = snort_generate_id();
-else
+	$rebuild_rules = "on";
+}
+else {
 	$pconfig['uuid'] = $a_rule[$id]['uuid'];
+	$rebuild_rules = "off";
+}
 $snort_uuid = $pconfig['uuid'];
 
 if (isset($id) && $a_rule[$id]) {
@@ -77,14 +82,6 @@ if ($_POST["Submit"]) {
 
 	if (!$_POST['interface'])
 		$input_errors[] = "Interface is mandatory";
-/*
-	foreach ($a_rule as $natent) {
-		if (isset($id) && ($a_rule[$id]) && ($a_rule[$id] === $natent))
-			continue;
-		if ($natent['interface'] == $_POST['interface'])
-			$input_errors[] = "This interface is already configured for another instance";
-	}
-*/
 
 	/* if no errors write to conf */
 	if (!$input_errors) {
@@ -118,10 +115,16 @@ if ($_POST["Submit"]) {
 		} else
 			$a_rule[] = $natent;
 
+		/* If Snort is disabled on this interface, stop any running instance */
 		if ($natent['enable'] != 'on')
 			snort_stop($natent, $if_real);
+
+		/* Save configuration changes */
 		write_config();
-		sync_snort_package_config();
+
+		/* Update snort.conf file for this interface */
+		$rebuild_rules = "off";
+		snort_generate_conf($a_rule[$id]);
 
 		header( 'Expires: Sat, 26 Jul 1997 05:00:00 GMT' );
 		header( 'Last-Modified: ' . gmdate( 'D, d M Y H:i:s' ) . ' GMT' );
