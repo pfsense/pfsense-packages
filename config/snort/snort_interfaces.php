@@ -61,10 +61,14 @@ if (isset($_POST['del_x'])) {
 		}
 		conf_mount_ro();
 	  
+		/* If all the Snort interfaces are removed, then unset the config array. */
+		if (empty($a_nat))
+			unset($a_nat);
+
 		write_config();
 		sleep(2);
 	  
-		/* if there are no ifaces do not create snort.sh */
+		/* if there are no ifaces remaining do not create snort.sh */
 		if (!empty($config['installedpackages']['snortglobal']['rule']))
 			snort_create_rc();
 		else {
@@ -228,7 +232,7 @@ if ($pfsense_stable == 'yes')
 	else
 		$biconfn = 'block';
 
-	?>
+?>
 		<td class="listt">
 			<input type="checkbox" id="frc<?=$nnats;?>" name="rule[]" value="<?=$i;?>" onClick="fr_bgcolor('<?=$nnats;?>')" style="margin: 0; padding: 0;"></td>
 		<td class="listr" 

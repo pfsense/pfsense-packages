@@ -33,7 +33,7 @@
 require_once("guiconfig.inc");
 require_once("/usr/local/pkg/snort/snort.inc");
 
-global $g, $flowbit_rules_file;
+global $g, $flowbit_rules_file, $rebuild_rules;
 
 $snortdir = SNORTDIR;
 $rules_map = array();
@@ -92,6 +92,11 @@ if (empty($categories[0]) && ($currentruleset != "custom.rules")) {
 		$currentruleset = "custom.rules";
 }
 
+/* One last sanity check -- if the rules directory is empty, default to loading custom rules */
+$tmp = glob("{$snortdir}/rules/*.rules");
+if (empty($tmp))
+	$currentruleset = "custom.rules";
+
 $ruledir = "{$snortdir}/rules";
 $rulefile = "{$ruledir}/{$currentruleset}";
 if ($currentruleset != 'custom.rules') {
@@ -100,7 +105,7 @@ if ($currentruleset != 'custom.rules') {
 	if (substr($currentruleset, 0, 10) == "IPS Policy")
 		$rules_map = snort_load_vrt_policy($a_rule[$id]['ips_policy']);
 	elseif (!file_exists($rulefile))
-		$input_errors[] = "{$currentruleset} seems to be missing!!! Please go to the Category tab and save the rule set again to regenerate it.";
+		$input_errors[] = gettext("{$currentruleset} seems to be missing!!! Please verify rules files have been downloaded, then go to the Categories tab and save the rule set again.");
 	else
 		$rules_map = snort_load_rules_map($rulefile);
 }
@@ -221,11 +226,31 @@ if ($_POST['customrules']) {
 		for($i = $start; $i > $end; $i--)
 			$error .= $output[$i];
 		$input_errors[] = "Custom rules have errors:\n {$error}";
-	} else {
+	}
+	else {
 		header("Location: /snort/snort_rules.php?id={$id}&openruleset={$currentruleset}");
 		exit;
 	}
-} else if ($_POST) {
+}
+
+else if ($_POST['apply']) {
+
+	/* Save new configuration */
+	write_config();
+
+	/*************************************************/
+	/* Update the snort conf file and rebuild the    */
+	/* rules for this interface.                     */
+	/*************************************************/
+	$rebuild_rules = "on";
+	snort_generate_conf($a_rule[$id]);
+	$rebuild_rules = "off";
+
+	/* Return to this same page */
+	header("Location: /snort/snort_rules.php?id={$id}&openruleset={$currentruleset}");
+	exit;
+}
+else if($_POST) {
 	unset($a_rule[$id]['customrules']);
 	write_config();
 	header("Location: /snort/snort_rules.php?id={$id}&openruleset={$currentruleset}");
@@ -361,7 +386,9 @@ function popup(url)
 <?php else: ?>
 	<tr>
 		<td width="3%" class="list">&nbsp;</td>
-		<td colspan="7" class="listhdr" >&nbsp;</td>
+		<td colspan="7" class="listhdr" ><input type="submit" name="apply" id="apply" value="Apply Changes" class="formbtn">
+			&nbsp;&nbsp;&nbsp;<?php echo gettext("Click to rebuild the rules with your changes.  Snort must be restarted to use the new rules."); ?>
+			<input type='hidden' name='id' value='<?=$id;?>'></td>
 		<td width="3%" align="center" valign="middle" class="listt"><a href="javascript: void(0)"
 				onclick="popup('snort_rules_edit.php?id=<?=$id;?>&openruleset=<?=$currentruleset;?>')">
 				<img src="../themes/<?= $g['theme']; ?>/images/icons/icon_service_restart.gif" <?php
@@ -449,7 +476,7 @@ function popup(url)
 			<td width="3%" align="center" valign="middle" nowrap class="listt">
 				<a href="javascript: void(0)"
 				onclick="popup('snort_rules_edit.php?id=<?=$id;?>&openruleset=<?=$currentruleset;?>&ids=<?=$sid;?>&gid=<?=$gid;?>')"><img
-				src="../themes/<?= $g['theme']; ?>/images/icons/icon_right.gif"
+				src="../themes/<?= $g['theme']; ?>/images/icons/icon_right.gif" 
 				title="<?php echo gettext("Click to view rule"); ?>" width="17" height="17" border="0"></a>
 				<!-- Codes by Quackit.com -->
 			</td>

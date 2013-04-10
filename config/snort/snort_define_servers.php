@@ -126,7 +126,9 @@ if ($_POST) {
 
 		write_config();
 
-		sync_snort_package_config();
+		/* Update the snort conf file for this interface. */
+		$rebuild_rules = "off";
+		snort_generate_conf($a_nat[$id]);
 
 		/* after click go to this page */
 		header( 'Expires: Sat, 26 Jul 1997 05:00:00 GMT' );
