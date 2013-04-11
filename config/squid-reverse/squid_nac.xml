@@ -139,6 +139,24 @@
 			<encoding>base64</encoding>
 		</field>
 		<field>
+			<fielddescr>Block user agents</fielddescr>
+			<fieldname>block_user_agent</fieldname>
+			<description>Enter each user agent on a new line that will be blocked to the users that are allowed to use the proxy. You also can use regular expressions.</description>
+			<type>textarea</type>
+			<cols>50</cols>
+			<rows>5</rows>
+			<encoding>base64</encoding>
+		</field>
+		<field>
+			<fielddescr>Block MIME types (reply only)</fielddescr>
+			<fieldname>block_reply_mime_type</fieldname>
+			<description>Enter each MIME type on a new line that will be blocked to the users that are allowed to use the proxy. You also can use regular expressions. Useful to block javascript (application/x-javascript).</description>
+			<type>textarea</type>
+			<cols>50</cols>
+			<rows>5</rows>
+			<encoding>base64</encoding>
+		</field>
+		<field>
 			<name>Squid Allowed ports</name>
 			<type>listtopic</type>
 		</field>
