@@ -1457,9 +1457,17 @@ function snort_load_sid_mods($sids, $value) {
 	/* This function parses the string of    */
 	/* SID values in $sids and returns an    */
 	/* array with the SID as the key and     */
-	/* passed $value as the value.  The SID  */
-	/* values in $sids are assumed to be     */
-	/* delimited by "||".                    */
+	/* value.  The SID values in $sids are   */
+	/* assumed to be delimited by "||".      */
+	/*                                       */
+	/* $sids ==> string of SID values from   */
+	/*           saved config file.          */
+	/*                                       */
+	/* $value ==> type of mod (enable or     */
+	/*            disable).  Not currently   */
+	/*            utilized, but maintained   */
+	/*            so as not to break legacy  */
+	/*            code elsewhere.            */
 	/*****************************************/
 
 	$result = array();
@@ -1468,7 +1476,7 @@ function snort_load_sid_mods($sids, $value) {
 	$tmp = explode("||", $sids);
 	foreach ($tmp as $v) {
 		if (preg_match('/\s\d+/', $v, $match))
-			$result[trim($match[0])] = $value;
+			$result[trim($match[0])] = trim($match[0]);
 	}
 	unset($tmp);
 
@@ -1513,14 +1521,13 @@ function snort_modify_sids(&$rule_map, $snortcfg) {
 	if (!empty($disablesid)) {
 		foreach ($rule_map as $k1 => $rulem) {
 			foreach ($rulem as $k2 => $v) {
-				if (in_array($k2, $disablesid) && $v['disabled'] == 0) { 
+				if (in_array($k2, $disablesid) && $v['disabled'] == 0) {
 					$rule_map[$k1][$k2]['rule'] = "# " . $v['rule'];
 					$rule_map[$k1][$k2]['disabled'] = 1;
 				}
 			}
 		}
 	}
-
 	unset($enablesid, $disablesid);
 }
 
