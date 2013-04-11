@@ -225,6 +225,20 @@ function squid_install_command() {
 			$config['installedpackages']['squidnac']['config'][0]['blacklist'] = $settingsnac['blacklist'];
 		}
 	}
+	
+	if(! empty($settingsnac['block_user_agent'])) {
+		if(strstr($settingsnac['block_user_agent'], ",")) {
+			$settingsnac['block_user_agent'] = base64_encode(implode("\n", explode(",", $settingsnac['block_user_agent'])));
+			$config['installedpackages']['squidnac']['config'][0]['block_user_agent'] = $settingsnac['block_user_agent'];
+		}
+	}
+	
+	if(! empty($settingsnac['block_reply_mime_type'])) {
+		if(strstr($settingsnac['block_reply_mime_type'], ",")) {
+			$settingsnac['block_reply_mime_type'] = base64_encode(implode("\n", explode(",", $settingsnac['block_reply_mime_type'])));
+			$config['installedpackages']['squidnac']['config'][0]['block_reply_mime_type'] = $settingsnac['block_reply_mime_type'];
+		}
+	}
 		
 	/*Migrate reverse settings*/
 	if (is_array($config['installedpackages']['squidreverse'])){
@@ -1078,6 +1092,8 @@ EOD;
 				'banned_hosts' => 'src',
 				'whitelist' => 'dstdom_regex -i',
 				'blacklist' => 'dstdom_regex -i',
+				'block_user_agent' => 'browser -i',
+				'block_reply_mime_type' => 'rep_mime_type -i',
 	);
 	foreach ($options as $option => $directive) {
 		$contents = sq_text_area_decode($settings[$option]);
@@ -1289,6 +1305,18 @@ function squid_resync_auth() {
 		if (squid_is_valid_acl('blacklist')) {
 			$conf .= "# Block access to blacklist domains\n";
 			$conf .= "http_access deny blacklist\n";
+		}
+	}
+	if(! empty($settingsnac['block_user_agent'])) {
+		if (squid_is_valid_acl('block_user_agent')) {
+			$conf .= "# Block access with user agents and browsers\n";
+			$conf .= "http_access deny block_user_agent\n";
+		}
+	}
+	if(! empty($settingsnac['block_reply_mime_type'])) {
+		if (squid_is_valid_acl('block_reply_mime_type')) {
+			$conf .= "# Block access with mime type in the reply\n";
+			$conf .= "http_reply_access deny block_reply_mime_type\n";
 		}
 	}
 
