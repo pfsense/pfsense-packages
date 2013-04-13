@@ -191,11 +191,6 @@ if ($_POST) {
 		$acl_value=$_POST['acl_value'.$x];
 
 		if ($acl_name) {
-			// check for duplicates
-			if (in_array($acl_name, $acl_names)) {
-				$input_errors[] = "The name '$acl_name' is duplicate.";
-			}
-
 			$acl_names[]=$acl_name;
 
 			$acl=array();
@@ -207,7 +202,7 @@ if ($_POST) {
 			if (preg_match("/[^a-zA-Z0-9\.\-_]/", $acl_name))
 				$input_errors[] = "The field 'Name' contains invalid characters.";
 
-			if (!preg_match("/.{2,}/", $acl_value))
+			if (!preg_match("/.{1,}/", $acl_value))
 				$input_errors[] = "The field 'Value' is required.";
 
 			if (!preg_match("/.{2,}/", $acl_name))
@@ -602,55 +597,56 @@ include("head.inc");
 			<td width="22%" valign="top" class="vncell">Access Control lists</td>
 			<td width="78%" class="vtable" colspan="2" valign="top">
 			<table class="" width="100%" cellpadding="0" cellspacing="0" id='acltable'>
-	                <tr>
-	                  <td width="35%" class="">Name</td>
-	                  <td width="40%" class="">Expression</td>
-	                  <td width="20%" class="">Value</td>
-	                  <td width="5%" class=""></td>
-			</tr>
-			<?php 
-			$a_acl=$pconfig['a_acl'];
+				<tr>
+				  <td width="35%" class="">Name</td>
+				  <td width="40%" class="">Expression</td>
+				  <td width="20%" class="">Value</td>
+				  <td width="5%" class=""></td>
+				</tr>
+				<?php 
+				$a_acl=$pconfig['a_acl'];
 
-			if (!is_array($a_acl)) {
-				$a_acl=array();
-			}
+				if (!is_array($a_acl)) {
+					$a_acl=array();
+				}
 
-			$counter=0;
-			foreach ($a_acl as $acl) {
-				$t = haproxy_find_acl($acl['expression']);
-				$display = '';
-				if (!$t || ($t['mode'] != '' && $t['mode'] != strtolower($pconfig['type'])))
-					$display = 'style="display: none;"';
-			?>
-			<tr id="aclrow<?=$counter;?>" <?=$display;?>>
-				<td><input name="acl_name<?=$counter;?>" id="acl_name<?=$counter;?>" type="text" value="<?=$acl['name']; ?>" size="20"/></td>
-				<td>
-				<select name="acl_expression<?=$counter;?>" id="acl_expression<?=$counter;?>">
+				$counter=0;
+				foreach ($a_acl as $acl) {
+					$t = haproxy_find_acl($acl['expression']);
+					$display = '';
+					if (!$t || ($t['mode'] != '' && $t['mode'] != strtolower($pconfig['type'])))
+						$display = 'style="display: none;"';
+				?>
+				<tr id="aclrow<?=$counter;?>" <?=$display;?>>
+					<td><input name="acl_name<?=$counter;?>" id="acl_name<?=$counter;?>" type="text" value="<?=$acl['name']; ?>" size="20"/></td>
+					<td>
+					<select name="acl_expression<?=$counter;?>" id="acl_expression<?=$counter;?>">
+					<?php
+					foreach ($a_acltypes as $expr) { ?>
+						<option value="<?=$expr['name'];?>"<?php if($acl['expression'] == $expr['name']) echo " SELECTED"; ?>><?=$expr['descr'];?>:</option>
+					<?php } ?>
+					</select>
+					</td>
+					<td><input name="acl_value<?=$counter;?>" id="acl_value<?=$counter;?>" type="text" value="<?=$acl['value']; ?>" size="35"/></td>
+					<td class="list">
+						 <table border="0" cellspacing="0" cellpadding="1"><tr>
+						 <td valign="middle">
+					  <img src="/themes/<?= $g['theme']; ?>/images/icons/icon_x.gif" title="delete entry" width="17" height="17" border="0" onclick="removeRow(this); return false;">
+						 </td>
+						 <td valign="middle">
+					 <img src="/themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif" title="duplicate entry" width="17" height="17" border="0" onclick="dupRow(<?=$counter;?>, 'acltable'); return false;">
+						 </td></tr></table>
+					</td>
+				</tr>
 				<?php
-				foreach ($a_acltypes as $expr) { ?>
-					<option value="<?=$expr['name'];?>"<?php if($acl['expression'] == $expr['name']) echo " SELECTED"; ?>><?=$expr['descr'];?>:</option>
-				<?php } ?>
-				</select>
-				</td>
-				<td><input name="acl_value<?=$counter;?>" id="acl_value<?=$counter;?>" type="text" value="<?=$acl['value']; ?>" size="35"/></td>
-			  	<td class="list">
-			         <table border="0" cellspacing="0" cellpadding="1"><tr>
-			         <td valign="middle">
-				  <img src="/themes/<?= $g['theme']; ?>/images/icons/icon_x.gif" title="delete entry" width="17" height="17" border="0" onclick="removeRow(this); return false;">
-			         </td>
-			         <td valign="middle">
-				 <img src="/themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif" title="duplicate entry" width="17" height="17" border="0" onclick="dupRow(<?=$counter;?>, 'acltable'); return false;">
-			         </td></tr></table>
-				</td>
-			</tr>
-			<?php
-			$counter++;
-			}
-			?>
+				$counter++;
+				}
+				?>
 			</table>
 			<a onclick="javascript:addRowTo('acltable'); return false;" href="#">
 			<img border="0" src="/themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif" alt="" title="add another entry" />
 			</a><br/>
+			acl's with the same name wil be 'combined', acl's with different names will be evaluated seperately.<br/>
 			For more information about ACL's please see <a href='http://haproxy.1wt.eu/download/1.5/doc/configuration.txt' target='_new'>HAProxy Documentation</a> Section 7 - Using ACL's
 			</td>
 		</tr>

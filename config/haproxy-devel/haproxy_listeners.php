@@ -30,9 +30,6 @@
 */
 
 require_once("guiconfig.inc");
-
-$d_haproxyconfdirty_path = $g['varrun_path'] . "/haproxy.conf.dirty";
-
 require_once("haproxy.inc");
 require_once("certs.inc");
 
@@ -137,7 +134,10 @@ include("head.inc");
 		}
 		usort($a_backend,'sort_backends');
 		
-		$certimg = "/themes/{$g['theme']}/images/icons/icon_frmfld_cert.png";
+		$img_cert = "/themes/{$g['theme']}/images/icons/icon_frmfld_cert.png";
+		$img_adv = "/themes/{$g['theme']}/images/icons/icon_advanced.gif";
+		$img_acl = "/themes/{$g['theme']}/images/icons/icon_ts_rule.gif";
+		
 		unset($ipport_previous);
 		foreach ($a_backend as $backend):
 			$backendname = $backend['name'];
@@ -154,18 +154,27 @@ include("head.inc");
 				<?=$backend['secondary']!='yes'?"yes":"no";?>
 			  </td>
 			  <td class="listlr" ondblclick="document.location='haproxy_listeners_edit.php?id=<?=$backendname;?>';">
-				<? if (strtolower($backend['type']) == "http" && $backend['ssloffload']):
-					$cert = lookup_cert($backend['ssloffloadcert']);?>
-					<img src="<?=$certimg;?>" alt="SSL offloading" title="SSL offloading cert: '<?=$cert['descr'];?>'" border="0" height="16" width="16" />
-				<? endif;?>
-				<?
-				$acls = get_frontent_acls($backend);
-				$isadvset = "";
-				foreach ($acls as $acl) {
-					$isadvset .= "&#10;" . $acl['descr'];
+				<? 
+				if (strtolower($backend['type']) == "http" && $backend['ssloffload'])
+				{
+					$cert = lookup_cert($backend['ssloffloadcert']);
+					echo '<img src="'.$img_cert.'" title="SSL offloading cert: '.$cert['descr'].'" alt="SSL offloading" border="0" height="16" width="16" />';
 				}
-				if ($isadvset) 
-					echo "<img src=\"./themes/{$g['theme']}/images/icons/icon_advanced.gif\" title=\"" . gettext("advanced settings set") . ": {$isadvset}\" border=\"0\">";
+				
+				$acls = get_frontent_acls($backend);
+				$isaclset = "";
+				foreach ($acls as $acl) {
+					$isaclset .= "&#10;" . $acl['descr'];
+				}
+				if ($isaclset) 
+					echo "<img src=\"$img_acl\" title=\"" . gettext("acl's used") . ": {$isaclset}\" border=\"0\">";
+					
+				$isadvset = "";
+				if ($backend['advanced_bind']) $isadvset .= "Advanced bind: {$backend['advanced_bind']}\r\n";
+				if ($backend['advanced']) $isadvset .= "advanced settings used\r\n";
+				if ($isadvset)
+					echo "<img src=\"$img_adv\" title=\"" . gettext("advanced settings set") . ": {$isadvset}\" border=\"0\">";				
+				
 				?>
 			  </td>
 			  <td class="listlr" ondblclick="document.location='haproxy_listeners_edit.php?id=<?=$backendname;?>';">
