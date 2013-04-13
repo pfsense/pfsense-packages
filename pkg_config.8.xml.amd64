@@ -170,7 +170,7 @@
 				This package implements TCP, HTTP and HTTPS balance features from Haproxy.]]></descr>
 		<website>http://haproxy.1wt.eu/</website>
 		<category>Services</category>
-		<version>1.5-dev17 pkg v 0.1</version>
+		<version>1.5-dev18 pkg v 0.2</version>
 		<status>Release</status>
 		<required_version>2.1</required_version>
 		<config_file>http://www.pfsense.com/packages/config/haproxy-devel/haproxy.xml</config_file>
@@ -184,7 +184,7 @@
 			<custom_name>haproxy-devel</custom_name>
 			<port>/usr/ports/net/haproxy-devel</port>
 		</build_pbi>
-		<build_options>WITH_PORTS_OPENSSL=yes;OPTIONS_UNSET=PCRE DPCRE;OPTIONS_SET=OPENSSL SPCRE</build_options>
+		<build_options>WITH_OPENSSL_PORT=yes;OPTIONS_UNSET=PCRE DPCRE;OPTIONS_SET=OPENSSL SPCRE</build_options>
 	</package>
 	<package>
 		<name>Apache with mod_security-dev</name>
