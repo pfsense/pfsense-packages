@@ -51,7 +51,7 @@ if (isset($_GET['dup']))
 global $simplefields;
 $simplefields = array(
 "name","cookie","balance",
-"check_type","checkinter","httpcheck_method","monitor_uri","monitor_httpversion","monitor_username","monitor_domain",
+"check_type","checkinter","httpcheck_method","monitor_uri","monitor_httpversion","monitor_username","monitor_domain","monitor_agentport",
 "connection_timeout","server_timeout","retries",
 "stats_enabled","stats_username","stats_password","stats_uri","stats_realm","stats_admin","stats_node_enabled","stats_node","stats_desc","stats_refresh");
 
@@ -269,10 +269,15 @@ foreach($simplefields as $field){
 		setCSSdisplay(".haproxy_check_http", check_type == 'HTTP');
 		setCSSdisplay(".haproxy_check_username", check_type == 'MySQL' ||  check_type == 'PostgreSQL');
 		setCSSdisplay(".haproxy_check_smtp", check_type == 'SMTP' ||  check_type == 'ESMTP');
+		setCSSdisplay(".haproxy_check_agent", check_type == 'Agent');
 
 		monitor_username = d.getElementById("monitor_username");
 		sqlcheckusername = d.getElementById("sqlcheckusername");
-		sqlcheckusername.innerHTML=monitor_username.value;
+		if(!browser_InnerText_support){
+			sqlcheckusername.textContent = monitor_username.value;
+		} else{
+			sqlcheckusername.innerText = monitor_username.value;
+		}
 	}
 
 
@@ -567,6 +572,14 @@ FLUSH PRIVILEGES;</pre>
 				<input name="monitor_domain" type="text" <?if(isset($pconfig['monitor_domain'])) echo "value=\"{$pconfig['monitor_domain']}\"";?>size="64">
 			</td>
 		</tr>
+		<tr align="left" class="haproxy_check_agent">
+			<td width="22%" valign="top" class="vncell">Agentport</td>
+			<td width="78%" class="vtable" colspan="2">
+				<input name="monitor_agentport" type="text" <?if(isset($pconfig['monitor_agentport'])) echo "value=\"{$pconfig['monitor_agentport']}\"";?>size="64">
+				<br/>
+				Fill in the TCP portnumber the healtcheck should be performed on.
+			</td>
+		</tr>
 	</table>
 	<br/>
 	<table width="100%" border="0" cellpadding="6" cellspacing="0">
@@ -696,6 +709,7 @@ set by the 'retries' parameter.</div>
 <?
 	phparray_to_javascriptarray($a_checktypes,"checktypes",Array('/*','/*/name','/*/descr'));
 ?>
+	browser_InnerText_support = (document.getElementsByTagName("body")[0].innerText != undefined) ? true : false;
 
 	field_counter_js = 7;
 	rows = 1;

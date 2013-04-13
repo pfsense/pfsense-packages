@@ -29,11 +29,9 @@
 	POSSIBILITY OF SUCH DAMAGE.
 */
 
-require("globals.inc");
-require("guiconfig.inc");
+require_once("guiconfig.inc");
 require_once("haproxy.inc");
-
-$d_haproxyconfdirty_path = $g['varrun_path'] . "/haproxy.conf.dirty";
+require_once("globals.inc");
 
 if (!is_array($config['installedpackages']['haproxy'])) 
 	$config['installedpackages']['haproxy'] = array();
