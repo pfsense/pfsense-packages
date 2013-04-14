@@ -911,11 +911,19 @@ function snort_merge_reference_configs($cfg_in, $cfg_out) {
         /* Sort the new reference map.  */
         uksort($outMap,'strnatcasecmp');
 
+	/**********************************************************/
+	/* Do NOT write an empty references.config file, just     */
+	/* exit instead.                                          */
+	/**********************************************************/
+	if (empty($outMap))
+		return false;
+
         /* Format and write it to the supplied output file.  */
         $format = "config reference: %-12s %s\n";
         foreach ($outMap as $key=>$value)
                 $outMap[$key] = sprintf($format, $key, $value);
         @file_put_contents($cfg_out, array_values($outMap));
+	return true;
 }
 
 function snort_merge_classification_configs($cfg_in, $cfg_out) {
@@ -948,11 +956,19 @@ function snort_merge_classification_configs($cfg_in, $cfg_out) {
         /* Sort the new classification map.  */
         uksort($outMap,'strnatcasecmp');
 
+	/**********************************************************/
+	/* Do NOT write an empty classification.config file, just */
+	/* exit instead.                                          */
+	/**********************************************************/
+	if (empty($outMap))
+		return false;
+
         /* Format and write it to the supplied output file.  */
         $format = "config classification: %s,%s\n";
         foreach ($outMap as $key=>$value)
                 $outMap[$key] = sprintf($format, $key, $value);
         @file_put_contents($cfg_out, array_values($outMap));
+	return true;
 }
 
 function snort_load_rules_map($rules_path) {
