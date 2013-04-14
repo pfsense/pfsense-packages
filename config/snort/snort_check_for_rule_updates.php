@@ -456,10 +456,10 @@ function snort_apply_customizations($snortcfg, $if_real) {
 	snort_prepare_rule_files($snortcfg, "{$snortdir}/snort_{$snortcfg['uuid']}_{$if_real}");
 
 	/* Copy the master config and map files to the interface directory */
-	@copy("{$snortdir}/tmp/classification.config", "{$snortdir}/snort_{$snortcfg['uuid']}_{$if_real}/classification.config");
-	@copy("{$snortdir}/tmp/gen-msg.map", "{$snortdir}/snort_{$snortcfg['uuid']}_{$if_real}/gen-msg.map");
-	@copy("{$snortdir}/tmp/reference.config", "{$snortdir}/snort_{$snortcfg['uuid']}_{$if_real}/reference.config");
-	@copy("{$snortdir}/tmp/unicode.map", "{$snortdir}/snort_{$snortcfg['uuid']}_{$if_real}/unicode.map");
+	@copy("{$snortdir}/classification.config", "{$snortdir}/snort_{$snortcfg['uuid']}_{$if_real}/classification.config");
+	@copy("{$snortdir}/gen-msg.map", "{$snortdir}/snort_{$snortcfg['uuid']}_{$if_real}/gen-msg.map");
+	@copy("{$snortdir}/reference.config", "{$snortdir}/snort_{$snortcfg['uuid']}_{$if_real}/reference.config");
+	@copy("{$snortdir}/unicode.map", "{$snortdir}/snort_{$snortcfg['uuid']}_{$if_real}/unicode.map");
 }
 
 if ($snortdownload == 'on' || $emergingthreats == 'on' || $snortcommunityrules == 'on') {
@@ -470,42 +470,36 @@ if ($snortdownload == 'on' || $emergingthreats == 'on' || $snortcommunityrules =
         /* Determine which config and map file set to use for the master copy. */
         /* If the Snort VRT rules are not enabled, then use Emerging Threats.  */
         if (($vrt_enabled == 'off') && ($et_enabled == 'on')) {
-		foreach (array("classification.config", "reference.config", "gen-msg.map", "unicode.map") as $file) {
-			if (file_exists("{$snortdir}/tmp/ET_{$file}"))
-				@rename("{$snortdir}/tmp/ET_{$file}", "{$snortdir}/tmp/{$file}");
-		}
+		$cfgs = glob("{$snortdir}/tmp/*reference.config");
+		$cfgs[] = "{$snortdir}/reference.config";
+		snort_merge_reference_configs($cfgs, "{$snortdir}/reference.config");
+		$cfgs = glob("{$snortdir}/tmp/*classification.config");
+		$cfgs[] = "{$snortdir}/classification.config";
+		snort_merge_classification_configs($cfgs, "{$snortdir}/classification.config");
         }
         elseif (($vrt_enabled == 'on') && ($et_enabled == 'off')) {
 		foreach (array("classification.config", "reference.config", "gen-msg.map", "unicode.map") as $file) {
 			if (file_exists("{$snortdir}/tmp/VRT_{$file}"))
-				@rename("{$snortdir}/tmp/VRT_{$file}", "{$snortdir}/tmp/{$file}");
+				@copy("{$snortdir}/tmp/VRT_{$file}", "{$snortdir}/{$file}");
                 }
         }
         elseif (($vrt_enabled == 'on') && ($et_enabled == 'on')) {
-               /* Both VRT and ET rules are enabled, so build combined  */
-               /* reference.config and classification.config files.     */
-                $cfgs = glob("{$snortdir}/tmp/*reference.config");
-                snort_merge_reference_configs($cfgs, "{$snortdir}/tmp/reference.config");
-                $cfgs = glob("{$snortdir}/tmp/*classification.config");
-                snort_merge_classification_configs($cfgs, "{$snortdir}/tmp/classification.config");
-
+		/* Both VRT and ET rules are enabled, so build combined  */
+		/* reference.config and classification.config files, but */
+		/* only if we downloaded both rule sets.  Otherwise we   */
+		/* risk creating an incomplete file.                     */
+		$cfgs = glob("{$snortdir}/tmp/*reference.config");
+		$cfgs[] = "{$snortdir}/reference.config";
+		snort_merge_reference_configs($cfgs, "{$snortdir}/reference.config");
+		$cfgs = glob("{$snortdir}/tmp/*classification.config");
+		$cfgs[] = "{$snortdir}/classification.config";
+		snort_merge_classification_configs($cfgs, "{$snortdir}/classification.config");
 		/* Use the unicode.map and gen-msg.map files from VRT rules. */
 		if (file_exists("{$snortdir}/tmp/VRT_unicode.map"))
-			@rename("{$snortdir}/tmp/VRT_unicode.map", "{$snortdir}/tmp/gen-msg.map");
+			@copy("{$snortdir}/tmp/VRT_unicode.map", "{$snortdir}/unicode.map");
 		if (file_exists("{$snortdir}/tmp/VRT_gen-msg.map"))
-			@rename("{$snortdir}/tmp/VRT_gen-msg.map", "{$snortdir}/tmp/gen-msg.map");
+			@copy("{$snortdir}/tmp/VRT_gen-msg.map", "{$snortdir}/gen-msg.map");
         }
-	else {
-		/* Just Snort GPLv2 Community Rules may be enabled, so make sure required */
-		/* default config files are present in the rules extraction tmp working   */
-		/* directory. Only copy missing files not captured in logic above.        */
-
-		$snort_files = array("gen-msg.map", "classification.config", "reference.config", "unicode.map");
-		foreach ($snort_files as $file) {
-			if (file_exists("{$snortdir}/{$file}") && !file_exists("{$snortdir}/tmp/{$file}"))
-				@copy("{$snortdir}/{$file}", "{$snortdir}/tmp/{$file}");
-		}
-	}
 
 	/* Start the rules rebuild proccess for each configured interface */
 	if (is_array($config['installedpackages']['snortglobal']['rule'])) {
