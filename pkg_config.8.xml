@@ -1587,8 +1587,8 @@
 		<maintainer>ey@tm-k.com</maintainer>
 		<config_file>http://www.pfsense.org/packages/config/widescreen/widescreen.xml</config_file>
 		<configurationfile>widescreen.xml</configurationfile>
-		<!-- Disabling on 2.1 since it overwrites the menu -->
-		<maximum_version>2.1</maximum_version>
+		<!-- Disabling on 2.0.2 and 2.1 since it overwrites the menu -->
+		<maximum_version>2.0.1</maximum_version>
 	</package>
 	<package>
 		<name>NRPE v2</name>
