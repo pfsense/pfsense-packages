@@ -61,7 +61,7 @@ if ($_REQUEST['getactivity'])
 $pgtitle = "Proxy Squid: Realtime stat (sqstat)";
 
 require_once("head.inc");
-
+$csrf_token= csrf_get_tokens();
 ?>
 
 <link   href="sqstat.css" rel="stylesheet" type="text/css"/>
@@ -79,7 +79,7 @@ function el(id) {
 
 function getactivity(action) {
     var url  = "<?php echo ($_SERVER["PHP_SELF"]); ?>";
-    var pars = "getactivity=yes";
+    var pars = "getactivity=yes" + "<? echo '&__csrf_magic='.$csrf_token ?>";
 
     var myAjax = new Ajax.Request( url,
             {
