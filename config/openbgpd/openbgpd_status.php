@@ -60,9 +60,13 @@ function doCmdT($title, $command) {
 		fclose($fd);
 	} else {
 		$fd = popen("{$command} 2>&1", "r");
+		$ct = 0;
 		while (($line = fgets($fd)) !== FALSE) {
 			echo htmlspecialchars($line, ENT_NOQUOTES);
-			ob_flush();
+			if ($ct++ > 1000) {
+				ob_flush();
+				$ct = 0;
+			}
 		}
 		pclose($fd);
 	}
