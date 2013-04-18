@@ -161,8 +161,8 @@ function openbgpd_install_conf() {
 					}
 					if ($setlocaladdr == true)
 						$conffile .= "\tlocal-address {$openbgpd_conf['listenip']}\n";
+					$conffile .= "}\n";
 				}
-				$conffile .= "}\n";
 			}
 		}
 
