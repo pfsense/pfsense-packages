@@ -142,7 +142,6 @@ function openbgpd_install_conf() {
 		// Handle neighbors that do not have a group assigned to them
 		if(is_array($openbgpd_neighbors)) {
 			foreach($openbgpd_neighbors as $neighbor) {
-				$used_this_item = false;
 				if($neighbor['groupname'] == "") {
 					$conffile .= "neighbor {$neighbor['neighbor']} {\n";
 					$conffile .= "\tdescr \"{$neighbor['descr']}\"\n";
