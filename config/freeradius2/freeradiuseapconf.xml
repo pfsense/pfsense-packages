@@ -10,6 +10,7 @@
 	freeradiuseapconf.xml
 	part of pfSense (http://www.pfSense.com)
 	Copyright (C) 2011 - 2012 Alexander Wilke <nachtfalkeaw@web.de>
+	Copyright (C) 2013 Marcello Coutinho (revocation list code)
 	All rights reserved.
 
 	Based on m0n0wall (http://m0n0.ch/wall)
@@ -171,7 +172,7 @@
 									<b>uncheked</b>: FreeRADIUS Cert-Manager (not recommended) (Default: unchecked)<br>
 									<b>cheked</b>: Firewall Cert-Manager (recommended)]]></description>
 			<type>checkbox</type>
-			<enablefields>ssl_ca_cert,ssl_server_cert,vareapconfenableclientp12</enablefields>
+			<enablefields>ssl_ca_cert,ssl_ca_crl,ssl_server_cert,vareapconfenableclientp12</enablefields>
 		</field>
 		<field>
 			<fielddescr>Private Key Password</fielddescr>
@@ -190,6 +191,17 @@
 			<source_name>descr</source_name>
 			<source_value>refid</source_value>
 		</field>
+		<field>
+			<fielddescr>SSL Revocation List</fielddescr>
+			<fieldname>ssl_ca_crl</fieldname>
+			<description><![CDATA[Choose the SSL CA Certficate revocation list here which you created with the firewall's Cert Manager.<br>
+									Choose "none" if you do not use any kind of certificates or the freeradius Cert Manager. (Default: none)]]></description>
+			<type>select_source</type>
+			<source><![CDATA[freeradius_get_ca_crl()]]></source>
+			<source_name>descr</source_name>
+			<source_value>refid</source_value>
+		</field>
+
 		<field>
 			<fielddescr>SSL Server Certificate</fielddescr>
 			<fieldname>ssl_server_cert</fieldname>

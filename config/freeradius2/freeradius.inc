@@ -5,6 +5,7 @@
 	freeradius.inc
 	part of pfSense (http://www.pfSense.com)
 	Copyright (C) 2011 - 2012 Alexander Wilke <nachtfalkeaw@web.de>
+	Copyright (C) 2013 Marcello Coutinho (revocation list code)
 	All rights reserved.
 
 	Based on m0n0wall (http://m0n0.ch/wall)
@@ -948,12 +949,18 @@ if ($eapconf['vareapconfchoosecertmanager'] == 'on') {
 
 
 			if(base64_decode($ca_cert['crt'])) {
+				$crl_cert = lookup_crl($eapconf["ssl_ca_crl"]);
+				if ($crl_cert != false){
+					$crl=base64_decode($crl_cert['txt']);
+					$check_crl="check_crl = yes";
+				}
+				else{
+					$check_crl="check_crl = no";
+				}
 				file_put_contents(FREERADIUS_BASE . "/etc/raddb/certs/ca_cert.pem", 
-					base64_decode($ca_cert['crt']));
+					base64_decode($ca_cert['crt']). $crl);
 				$conf['ssl_ca_cert'] = FREERADIUS_BASE . "/etc/raddb/certs/ca_cert.pem";
 			}
-
-
 			$svr_cert = lookup_cert($eapconf["ssl_server_cert"]);
 			if ($svr_cert != false) {
 				if(base64_decode($svr_cert['prv'])) {
@@ -1055,7 +1062,7 @@ else {
 			random_file = \${certdir}/random
 			fragment_size = $vareapconffragmentsize
 			include_length = $vareapconfincludelength
-		#	check_crl = yes
+			{$check_crl}
 			CA_path = \${cadir}
 			$vareapconfcheckcertissuer
 			$vareapconfcheckcertcn
@@ -1117,6 +1124,18 @@ function freeradius_get_ca_certs() {
 		$ca_arr[] = array('refid' => $ca['refid'], 'descr' => $ca['descr']);
 	}
 	return $ca_arr;
+}
+
+// Gets started from freeradiuseapconf.xml
+function freeradius_get_ca_crl() {
+	global $config;
+	$crl_arr = array();
+	$crl_arr[] = array('refid' => 'none', 'descr' => 'none');
+
+	foreach ($config['crl'] as $crl) {
+		$crl_arr[] = array('refid' => $crl['refid'], 'descr' => $crl['descr']);
+	}
+	return $crl_arr;
 }
 
 // Gets started from freeradiuseapconf.xml
