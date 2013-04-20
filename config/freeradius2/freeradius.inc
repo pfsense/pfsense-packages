@@ -5,7 +5,7 @@
 	freeradius.inc
 	part of pfSense (http://www.pfSense.com)
 	Copyright (C) 2011 - 2012 Alexander Wilke <nachtfalkeaw@web.de>
-	Copyright (C) 2013 Marcello Coutinho (revocation list code)
+	Copyright (C) 2013 Marcello Coutinho
 	All rights reserved.
 
 	Based on m0n0wall (http://m0n0.ch/wall)
@@ -48,16 +48,24 @@ require_once("services.inc");
 
 // Check pfSense version
 $pfs_version = substr(trim(file_get_contents("/etc/version")),0,3);
-switch ($pfs_version) {
-	case "1.2":
-	case "2.0":
-		define('FREERADIUS_BASE', '/usr/local');
-		break;
-	default:
-		define('FREERADIUS_BASE', '/usr/pbi/freeradius-' . php_uname("m"));
+if ($pf_version > 2.0){
+	define('FREERADIUS_BASE', '/usr/pbi/freeradius-' . php_uname("m"));
 }
-// End: Check pfSense version
+else{
+	define('FREERADIUS_BASE', '/usr/local');		
+}
 
+// Check freeradius lib version
+	$frlib="";
+	$libfiles = scandir(FREERADIUS_BASE . "/lib/");
+	foreach ($libfiles as $libfile){
+		if (preg_match("/freeradius-/",$libfile))
+			$frlib=FREERADIUS_BASE . "/lib/{$libfile}";
+	}
+	if ($frlib == ""){
+		log_error("freeRADIUS - No freeradius lib found on ".FREERADIUS_BASE."/lib");
+	}
+	
 function freeradius_deinstall_command() {
 	if (substr(trim(file_get_contents("/etc/version")),0,3) == "2.0") {
 		exec("cd /var/db/pkg && pkg_delete `ls | grep freeradius`");
@@ -69,7 +77,7 @@ function freeradius_deinstall_command() {
 function freeradius_install_command() {
 	global $config;
 	conf_mount_rw();
-
+	
 	// put the constant to a variable
 	$varFREERADIUS_BASE = FREERADIUS_BASE;
 
@@ -80,7 +88,7 @@ function freeradius_install_command() {
 	exec("mkdir " . FREERADIUS_BASE . "/etc/raddb/scripts");
 	if (!file_exists("/var/log/radutmp")) { exec("touch /var/log/radutmp");	}
 	if (!file_exists("/var/log/radwtmp")) {	exec("touch /var/log/radwtmp");	}
-	exec("chown -R root:wheel " . FREERADIUS_BASE . "/etc/raddb && chown -R root:wheel " . FREERADIUS_BASE . "/lib/freeradius-2.1.12 && chown -R root:wheel /var/log/radacct");
+	exec("chown -R root:wheel " . FREERADIUS_BASE . "/etc/raddb && chown -R root:wheel {$frlib} && chown -R root:wheel /var/log/radacct");
 
 	// creating a backup file of the original policy.conf no matter if user checked this or not
 	if (!file_exists(FREERADIUS_BASE . "/etc/raddb/policy.conf.backup")) {
@@ -214,7 +222,7 @@ raddbdir = \${sysconfdir}/raddb
 radacctdir = \${logdir}/radacct
 confdir = \${raddbdir}
 run_dir = \${localstatedir}/run
-libdir = \${exec_prefix}/lib/freeradius-2.1.12
+libdir = {$frlib}
 pidfile = \${run_dir}/radiusd.pid
 db_dir = \${raddbdir}
 name = radiusd
@@ -951,7 +959,7 @@ if ($eapconf['vareapconfchoosecertmanager'] == 'on') {
 			if(base64_decode($ca_cert['crt'])) {
 				$crl_cert = lookup_crl($eapconf["ssl_ca_crl"]);
 				if ($crl_cert != false){
-					$crl=base64_decode($crl_cert['txt']);
+					$crl=base64_decode($crl_cert['text']);
 					$check_crl="check_crl = yes";
 				}
 				else{
