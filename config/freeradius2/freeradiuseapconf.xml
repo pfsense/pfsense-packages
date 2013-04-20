@@ -172,7 +172,7 @@
 									<b>uncheked</b>: FreeRADIUS Cert-Manager (not recommended) (Default: unchecked)<br>
 									<b>cheked</b>: Firewall Cert-Manager (recommended)]]></description>
 			<type>checkbox</type>
-			<enablefields>ssl_ca_cert,ssl_ca_crl,ssl_server_cert,vareapconfenableclientp12</enablefields>
+			<enablefields>ssl_ca_cert,ssl_ca_crl,ssl_server_cert</enablefields>
 		</field>
 		<field>
 			<fielddescr>Private Key Password</fielddescr>
@@ -212,6 +212,7 @@
 			<source_name>descr</source_name>
 			<source_value>refid</source_value>
 		</field>
+		<!-- Not needed anymore because pfsense itself can do this now>
 		<field>
 			<fielddescr>Create client.p12 for export</fielddescr>
 			<fieldname>vareapconfenableclientp12</fieldname>
@@ -219,6 +220,7 @@
 			<type>checkbox</type>
 			<enablefields>ssl_client_cert</enablefields>
 		</field>
+		-->
 		<field>
 			<fielddescr>SSL Client Certificate</fielddescr>
 			<fieldname>ssl_client_cert</fieldname>
