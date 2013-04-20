@@ -48,7 +48,7 @@ require_once("services.inc");
 
 // Check pfSense version
 $pfs_version = substr(trim(file_get_contents("/etc/version")),0,3);
-if ($pf_version > 2.0){
+if ($pfs_version > 2.0){
 	define('FREERADIUS_BASE', '/usr/pbi/freeradius-' . php_uname("m"));
 }
 else{
