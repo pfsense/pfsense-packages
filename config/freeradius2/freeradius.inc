@@ -985,7 +985,7 @@ if ($eapconf['vareapconfchoosecertmanager'] == 'on') {
 				$conf['ssl_server_cert'] = FREERADIUS_BASE . "/etc/raddb/certs/server_cert.pem";
 			}
 			
-			
+			/* Not needed anymore because pfsense can do this by default
 			if ($eapconf['vareapconfenableclientp12'] == 'on') {
 				$svr_cert = lookup_cert($eapconf["ssl_client_cert"]);
 				if ($svr_cert != false) {
@@ -1005,7 +1005,7 @@ if ($eapconf['vareapconfchoosecertmanager'] == 'on') {
 			
 			exec("openssl pkcs12 -export -in " . FREERADIUS_BASE . "/etc/raddb/certs/client_cert.pem -inkey " . FREERADIUS_BASE . "/etc/raddb/certs/client_key.pem -out " . FREERADIUS_BASE . "/etc/raddb/certs/client_cert.p12 -passout pass\:");	
 			}
-			
+			*/
 			$conf['ssl_cert_dir'] = FREERADIUS_BASE . '/etc/raddb/certs';
 		}
 
