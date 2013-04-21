@@ -220,7 +220,6 @@
 			<type>checkbox</type>
 			<enablefields>ssl_client_cert</enablefields>
 		</field>
-		-->
 		<field>
 			<fielddescr>SSL Client Certificate</fielddescr>
 			<fieldname>ssl_client_cert</fieldname>
@@ -231,6 +230,7 @@
 			<source_name>descr</source_name>
 			<source_value>refid</source_value>
 		</field>
+		-->
 		<field>
 			<name>EAP-TLS</name>
 			<type>listtopic</type>
