@@ -244,35 +244,29 @@ function enable_snort_vrt(btn) {
 	<span class="red"><strong><?php echo gettext("Note"); ?></span>:</strong><br>
 	<?php echo gettext("Available space is"); ?> <strong><?php echo $snortlogCurrentDSKsize; ?>&nbsp;MB</strong></td>
 	<td width="78%" class="vtable">
-	<table cellpadding="0" cellspacing="0">
-		<tr>
-			<td colspan="2"><input name="snortloglimit" type="radio"
-				id="snortloglimit" value="on" 
-<?php if($pconfig['snortloglimit']=='on') echo 'checked'; ?>><span class="vexpl">
-		<strong><?php echo gettext("Enable"); ?></strong> <?php echo gettext("directory size limit"); ?> (<strong><?php echo gettext("Default"); ?></strong>)</span></td>
-		</tr>
-		<tr>
-			<td colspan="2"><input name="snortloglimit" type="radio"
-				id="snortloglimit" value="off" 
-<?php if($pconfig['snortloglimit']=='off') echo 'checked'; ?>> <span class="vexpl"><strong><?php echo gettext("Disable"); ?></strong>
-			<?php echo gettext("directory size limit"); ?></span><br>
-			<br>
-			<span class="red"><strong><?php echo gettext("Warning"); ?></span>:</strong> <?php echo gettext("Nanobsd " .
-			"should use no more than 10MB of space."); ?></td>
-		</tr>
-		<tr>
-			<td>&nbsp;</td>
-		</tr>
-	</table>
-	<table width="100%" border="0" cellpadding="2" cellspacing="0">
-		<tr>
-			<td><span class="vexpl"><?php echo gettext("Size in"); ?> <strong>MB</strong><span></td>
-			<td><input name="snortloglimitsize" type="text" class="formfld" id="snortloglimitsize" size="7" value="
-			<?=htmlspecialchars($pconfig['snortloglimitsize']);?>">&nbsp;&nbsp;
-			<?php printf(gettext("Default is %s20%%%s of available space."), '<strong>', '</strong>'); ?></td>
-		</tr>
-	</table>
-
+		<table cellpadding="0" cellspacing="0">
+			<tr>
+				<td colspan="2"><input name="snortloglimit" type="radio" id="snortloglimit" value="on" 
+					<?php if($pconfig['snortloglimit']=='on') echo 'checked'; ?>><span class="vexpl">
+					<strong><?php echo gettext("Enable"); ?></strong> <?php echo gettext("directory size limit"); ?> (<strong><?php echo gettext("Default"); ?></strong>)</span></td>
+			</tr>
+			<tr>
+				<td colspan="2"><input name="snortloglimit" type="radio" id="snortloglimit" value="off" 
+					<?php if($pconfig['snortloglimit']=='off') echo 'checked'; ?>> <span class="vexpl"><strong><?php echo gettext("Disable"); ?></strong>
+					<?php echo gettext("directory size limit"); ?></span><br>
+				<br>
+				<span class="red"><strong><?php echo gettext("Warning"); ?></span>:</strong> <?php echo gettext("Nanobsd " .
+				"should use no more than 10MB of space."); ?></td>
+			</tr>
+		</table>
+		<table width="100%" border="0" cellpadding="2" cellspacing="0">
+			<tr>
+				<td><span class="vexpl"><?php echo gettext("Size in"); ?> <strong>MB</strong></span></td>
+				<td><input name="snortloglimitsize" type="text" class="formfld" id="snortloglimitsize" size="10" value="<?=htmlspecialchars($pconfig['snortloglimitsize']);?>">
+				&nbsp;&nbsp;<?php printf(gettext("Default is %s20%%%s of available space."), '<strong>', '</strong>'); ?></td>
+			</tr>
+		</table>
+	</td>
 </tr>
 <tr>
 	<td width="22%" valign="top" class="vncell"><?php echo gettext("Remove blocked hosts " .
