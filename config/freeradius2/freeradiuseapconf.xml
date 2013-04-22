@@ -195,6 +195,7 @@
 			<fielddescr>SSL Revocation List</fielddescr>
 			<fieldname>ssl_ca_crl</fieldname>
 			<description><![CDATA[Choose the SSL CA Certficate revocation list here which you created with the firewall's Cert Manager.<br>
+									<b>HINT:</b> You need to restart freeradius service after adding a certificate to the CRL.<br>
 									Choose "none" if you do not use any kind of certificates or the freeradius Cert Manager. (Default: none)]]></description>
 			<type>select_source</type>
 			<source><![CDATA[freeradius_get_ca_crl()]]></source>
