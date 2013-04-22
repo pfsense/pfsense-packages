@@ -44,7 +44,7 @@ global $snort_community_rules_filename, $snort_community_rules_url, $emergingthr
 
 /* package version */
 $snort_version = "2.9.4.1";
-$pfSense_snort_version = "2.5.5";
+$pfSense_snort_version = "2.5.6";
 $snort_package_version = "Snort {$snort_version} pkg v. {$pfSense_snort_version}";
 
 // Define SNORTDIR and SNORTLIBDIR constants according to FreeBSD version (PBI support or no PBI)
@@ -1572,8 +1572,9 @@ function snort_create_rc() {
 
 	if [ ! -f {$g['varrun_path']}/barnyard2_{$if_real}{$snort_uuid}.pid ]; then
 		/bin/pgrep -xf '/usr/local/bin/barnyard2 -r {$snort_uuid} -f snort_{$snort_uuid}_{$if_real}.u2 --pid-path {$g['varrun_path']} --nolock-pidfile -c {$snortdir}/snort_{$snort_uuid}_{$if_real}/barnyard2.conf -d /var/log/snort/snort_{$if_real}{$snort_uuid} -D -q' > {$g['varrun_path']}/barnyard2_{$if_real}{$snort_uuid}.pid
+	else
+		/bin/pgrep -F {$g['varrun_path']}/barnyard2_{$if_real}{$snort_uuid}.pid
 	fi
-	/bin/pgrep -F {$g['varrun_path']}/barnyard2_{$if_real}{$snort_uuid}.pid
 	if [ $? = 0 ]; then
 		/bin/pkill -HUP -F {$g['varrun_path']}/barnyard2_{$if_real}{$snort_uuid}.pid -a
 	else
@@ -1584,10 +1585,30 @@ EOE;
 		$stop_barnyard2 = <<<EOE
 
 	if [ -f {$g['varrun_path']}/barnyard2_{$if_real}{$snort_uuid}.pid ]; then
+		pid=`/bin/pgrep -F {$g['varrun_path']}/barnyard2_{$if_real}{$snort_uuid}.pid`
                 /bin/pkill -F {$g['varrun_path']}/barnyard2_{$if_real}{$snort_uuid}.pid -a
-		/bin/rm /var/run/barnyard2_{$if_real}{$snort_uuid}.pid
+		time=0 timeout=30
+		while kill -0 \$pid 2>/dev/null; do
+			sleep 1
+			time=\$((time+1))
+			if [ \$time -gt \$timeout ]; then
+				break
+			fi
+		done
+		if [ -f /var/run/barnyard2_{$if_real}{$snort_uuid}.pid ]; then
+			/bin/rm /var/run/barnyard2_{$if_real}{$snort_uuid}.pid
+		fi
 	else
+		pid=`/bin/pgrep -xf '/usr/local/bin/barnyard2 -r {$snort_uuid} -f snort_{$snort_uuid}_{$if_real}.u2 --pid-path {$g['varrun_path']} --nolock-pidfile -c {$snortdir}/snort_{$snort_uuid}_{$if_real}/barnyard2.conf -d /var/log/snort/snort_{$if_real}{$snort_uuid} -D -q'`
 		/bin/pkill -xf '/usr/local/bin/barnyard2 -r {$snort_uuid} -f snort_{$snort_uuid}_{$if_real}.u2 --pid-path {$g['varrun_path']} --nolock-pidfile -c {$snortdir}/snort_{$snort_uuid}_{$if_real}/barnyard2.conf -d /var/log/snort/snort_{$if_real}{$snort_uuid} -D -q'
+		time=0 timeout=30
+		while kill -0 \$pid 2>/dev/null; do
+			sleep 1
+			time=\$((time+1))
+			if [ \$time -gt \$timeout ]; then
+				break
+			fi
+		done
         fi
 
 EOE;
@@ -1599,20 +1620,12 @@ EOE;
 		$start_snort_iface_start[] = <<<EOE
 
 ###### For Each Iface
-#### Only try to restart if snort is running on Iface
-	if [ ! -f {$g['varrun_path']}/snort_{$if_real}{$snort_uuid}.pid ]; then
-		/bin/pgrep -xf '/usr/local/bin/snort -R {$snort_uuid} -D -q -l /var/log/snort/snort_{$if_real}{$snort_uuid} --pid-path {$g['varrun_path']} --nolock-pidfile -G {$snort_uuid} -c {$snortdir}/snort_{$snort_uuid}_{$if_real}/snort.conf -i {$if_real}' > {$g['varrun_path']}/snort_{$if_real}{$snort_uuid}.pid
-	fi
-	/bin/pgrep -nF {$g['varrun_path']}/snort_{$if_real}{$snort_uuid}.pid
-	if [ $? = 0 ]; then
-		/bin/pkill -HUP -F {$g['varrun_path']}/snort_{$if_real}{$snort_uuid}.pid -a
-		/usr/bin/logger -p daemon.info -i -t SnortStartup "Snort SOFT START For {$value['descr']}({$snort_uuid}_{$if_real})..."
-	else
-		# Start snort and barnyard2
+	# Start snort and barnyard2
+	if [ -f {$g['varrun_path']}/snort_{$if_real}{$snort_uuid}.pid ]; then
 		/bin/rm {$g['varrun_path']}/snort_{$if_real}{$snort_uuid}.pid
-		/usr/local/bin/snort -R {$snort_uuid} -D -q -l /var/log/snort/snort_{$if_real}{$snort_uuid} --pid-path {$g['varrun_path']} --nolock-pidfile -G {$snort_uuid} -c {$snortdir}/snort_{$snort_uuid}_{$if_real}/snort.conf -i {$if_real}
-		/usr/bin/logger -p daemon.info -i -t SnortStartup "Snort START For {$value['descr']}({$snort_uuid}_{$if_real})..."
 	fi
+	/usr/local/bin/snort -R {$snort_uuid} -D -q -l /var/log/snort/snort_{$if_real}{$snort_uuid} --pid-path {$g['varrun_path']} --nolock-pidfile -G {$snort_uuid} -c {$snortdir}/snort_{$snort_uuid}_{$if_real}/snort.conf -i {$if_real}
+	/usr/bin/logger -p daemon.info -i -t SnortStartup "Snort START For {$value['descr']}({$snort_uuid}_{$if_real})..."
 
 	sleep 2
 	{$start_barnyard2}
@@ -1623,10 +1636,30 @@ EOE;
 
 	/usr/bin/logger -p daemon.info -i -t SnortStartup "Snort STOP For {$value['descr']}({$snort_uuid}_{$if_real})..."
 	if [ -f {$g['varrun_path']}/snort_{$if_real}{$snort_uuid}.pid ]; then
+		pid=`/bin/pgrep -F {$g['varrun_path']}/snort_{$if_real}{$snort_uuid}.pid`
 		/bin/pkill -F {$g['varrun_path']}/snort_{$if_real}{$snort_uuid}.pid -a
-		/bin/rm /var/run/snort_{$if_real}{$snort_uuid}.pid
-	else 
+		time=0 timeout=30
+		while kill -0 \$pid 2>/dev/null; do
+			sleep 1
+			time=\$((time+1))
+			if [ \$time -gt \$timeout ]; then
+				break
+			fi
+		done
+		if [ -f /var/run/snort_{$if_real}{$snort_uuid}.pid ]; then
+			/bin/rm /var/run/snort_{$if_real}{$snort_uuid}.pid
+		fi
+	else
+		pid=`/bin/pgrep -xf '/usr/local/bin/snort -R {$snort_uuid} -D -q -l /var/log/snort/snort_{$if_real}{$snort_uuid} --pid-path {$g['varrun_path']} --nolock-pidfile -G {$snort_uuid} -c {$snortdir}/snort_{$snort_uuid}_{$if_real}/snort.conf -i {$if_real}'`
 		/bin/pkill -xf '/usr/local/bin/snort -R {$snort_uuid} -D -q -l /var/log/snort/snort_{$if_real}{$snort_uuid} --pid-path {$g['varrun_path']} --nolock-pidfile -G {$snort_uuid} -c {$snortdir}/snort_{$snort_uuid}_{$if_real}/snort.conf -i {$if_real}'
+		time=0 timeout=30
+		while kill -0 \$pid 2>/dev/null; do
+			sleep 1
+			time=\$((time+1))
+			if [ \$time -gt \$timeout ]; then
+				break
+			fi
+		done
 	fi
 
 	sleep 2
@@ -1727,6 +1760,9 @@ config hostname:       $snortbarnyardlog_hostname_info_chk
 config interface:      {$if_real}
 config decode_data_link
 config waldo_file: /var/log/snort/snort_{$if_real}{$snort_uuid}/barnyard2/{$snort_uuid}_{$if_real}.waldo
+
+# Show year in timestamps
+config show_year
 
 ## START user pass through ##
 
@@ -2625,6 +2661,9 @@ config pcre_match_limit_recursion: 1500
 # Configure the detection engine  #
 config detection: search-method {$snort_performance} search-optimize max-pattern-len 20 max_queue_events 5
 config event_queue: max_queue 8 log 5 order_events content_length
+
+# Configure to show year in timestamps
+config show_year
 
 # Configure protocol aware flushing  #
 # For more information see README.stream5  #
