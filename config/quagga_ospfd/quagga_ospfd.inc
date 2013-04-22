@@ -290,7 +290,24 @@ EOF;
 	exec("chmod u+rw,go-rw {$quagga_config_base}/zebra.conf");
 
 	// Kick off newly created rc.d script
-	exec("/usr/local/etc/rc.d/quagga.sh restart");
+	if (is_ipaddr($ospfd_conf['carpstatusip'])) {
+		$status = quagga_get_carp_status_by_ip($ospfd_conf['carpstatusip']);
+		switch (strtoupper($status)) {
+			// Stop the service if the VIP is in BACKUP or INIT state.
+			case "BACKUP":
+			case "INIT":
+				exec("/usr/local/etc/rc.d/quagga.sh stop");
+				break;
+			// Start the service if the VIP is MASTER state.
+			case "MASTER":
+			// Assume it's up if the status can't be determined.
+			default:
+				exec("/usr/local/etc/rc.d/quagga.sh restart");
+				break;
+		}
+	} else {
+		exec("/usr/local/etc/rc.d/quagga.sh restart");
+	}
 
 	// Back to RO mount for NanoBSD and friends
 	conf_mount_ro();
@@ -343,6 +360,20 @@ function quagga_ospfd_put_raw_config($conffile) {
 		$config['installedpackages']['quaggaospfd']['rawconfig']['item'] = explode("\n",$_POST['quagga_ospfd_raw']);
 		$config['installedpackages']['quaggaospfd']['rawconfig'] = $conffile;
 	}
+}
+
+function quagga_get_carp_status_by_ip($ipaddr) {
+	$iface = find_carp_interface($ipaddr);
+	if ($iface) {
+		$status = get_carp_interface_status($iface);
+		// If there is no status for that interface, return null.
+		if (!$status)
+			$status = null;
+	} else {
+		// If there is no VIP by that IP, return null.
+		$status = null;
+	}
+	return $status;
 }
 
 ?>

@@ -1,6 +1,6 @@
 <packagegui>
 	<name>quagga_ospfd</name>
-	<version>0.5.2</version>
+	<version>0.5.3</version>
 	<title>Services: Quagga OSPFd</title>
 	<include_file>/usr/local/pkg/quagga_ospfd.inc</include_file>
 	<aftersaveredirect>pkg_edit.php?xml=quagga_ospfd.xml&amp;id=0</aftersaveredirect>
@@ -175,6 +175,13 @@
 					<size>10</size>
 				</rowhelperfield>
 			</rowhelper>
+		</field>
+		<field>
+			<fielddescr>CARP Status IP</fielddescr>
+			<fieldname>carpstatusip</fieldname>
+			<description>IP address used to determine the CARP status. When the VIP is in BACKUP status, quagga will not be started. &lt;br/&gt;NOTE: Requires changes to /etc/rc.carpmaster to start quagga and /etc/rc.carpbackup to stop quagga or it will not be fully effective.</description>
+			<type>input</type>
+			<size>25</size>
 		</field>
 	</fields>
 	<custom_php_resync_config_command>
