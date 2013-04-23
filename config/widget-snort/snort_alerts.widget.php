@@ -60,55 +60,62 @@ function sksort(&$array, $subkey="id", $sort_ascending=false) {
 /* check if firewall widget variable is set */
 if (!isset($nentries)) $nentries = 5;
 
-/* retrieve snort variables */
-require_once("/usr/local/pkg/snort/snort.inc");
-if (!is_array($config['installedpackages']['snortglobal']['rule']))
-	$config['installedpackages']['snortglobal']['rule'] = array();
-$a_instance = &$config['installedpackages']['snortglobal']['rule'];
+/* check if Snort include file exists before we use it */
+if (file_exists("/usr/local/pkg/snort/snort.inc")) {
+	require_once("/usr/local/pkg/snort/snort.inc");
 
-/* read log file(s) */
-$counter=0;
-foreach ($a_instance as $instanceid => $instance) {
-	$snort_uuid = $a_instance[$instanceid]['uuid'];
-	$if_real = snort_get_real_interface($a_instance[$instanceid]['interface']);
+	/* retrieve snort variables */
+	if (!is_array($config['installedpackages']['snortglobal']['rule']))
+		$config['installedpackages']['snortglobal']['rule'] = array();
+	$a_instance = &$config['installedpackages']['snortglobal']['rule'];
 
-	/* make sure alert file exists */
-	if (file_exists("/var/log/snort/snort_{$if_real}{$snort_uuid}/alert")) {
-		exec("tail -n{$nentries} /var/log/snort/snort_{$if_real}{$snort_uuid}/alert > /tmp/alert_{$snort_uuid}");
-		if (file_exists("/tmp/alert_{$snort_uuid}")) {
-			$tmpblocked = array_flip(snort_get_blocked_ips());
+	/* read log file(s) */
+	$counter=0;
+	foreach ($a_instance as $instanceid => $instance) {
+		$snort_uuid = $a_instance[$instanceid]['uuid'];
+		$if_real = snort_get_real_interface($a_instance[$instanceid]['interface']);
 
-			/*                 0         1           2      3      4    5    6    7      8     9    10    11             12    */
-			/* File format timestamp,sig_generator,sig_id,sig_rev,msg,proto,src,srcport,dst,dstport,id,classification,priority */
-			$fd = fopen("/tmp/alert_{$snort_uuid}", "r");
-			while (($fields = fgetcsv($fd, 1000, ',', '"')) !== FALSE) {
-				if(count($fields) < 11)
-					continue;
+		/* make sure alert file exists */
+		if (file_exists("/var/log/snort/snort_{$if_real}{$snort_uuid}/alert")) {
+			exec("tail -n{$nentries} /var/log/snort/snort_{$if_real}{$snort_uuid}/alert > /tmp/alert_{$snort_uuid}");
+			if (file_exists("/tmp/alert_{$snort_uuid}")) {
+				$tmpblocked = array_flip(snort_get_blocked_ips());
 
-				$snort_alerts[$counter]['instanceid'] = $a_instance[$instanceid]['interface'];
-				$snort_alerts[$counter]['timestamp'] = $fields[0];
-				$snort_alerts[$counter]['timeonly'] = substr($fields[0], 6, -8);
-				$snort_alerts[$counter]['dateonly'] = substr($fields[0], 0, -17);
-				$snort_alerts[$counter]['src'] = $fields[6];
-				$snort_alerts[$counter]['srcport'] = $fields[7];
-				$snort_alerts[$counter]['dst'] = $fields[8];
-				$snort_alerts[$counter]['dstport'] = $fields[9];
-				$snort_alerts[$counter]['priority'] = $fields[12];
-				$snort_alerts[$counter]['category'] = $fields[11];
-				$counter++;
+				/*                 0         1           2      3      4    5    6    7      8     9    10    11             12    */
+				/* File format timestamp,sig_generator,sig_id,sig_rev,msg,proto,src,srcport,dst,dstport,id,classification,priority */
+				$fd = fopen("/tmp/alert_{$snort_uuid}", "r");
+				while (($fields = fgetcsv($fd, 1000, ',', '"')) !== FALSE) {
+					if(count($fields) < 11)
+						continue;
+
+					$snort_alerts[$counter]['instanceid'] = $a_instance[$instanceid]['interface'];
+					$snort_alerts[$counter]['timestamp'] = $fields[0];
+					/* Look for the dash separating date and time so we can handle entries with year in them */
+					$snort_alerts[$counter]['timeonly'] = substr($fields[0], strpos($fields[0], '-')+1, -8);
+					$snort_alerts[$counter]['dateonly'] = substr($fields[0], 0, strpos($fields[0], '-'));
+					$snort_alerts[$counter]['src'] = $fields[6];
+					$snort_alerts[$counter]['srcport'] = $fields[7];
+					$snort_alerts[$counter]['dst'] = $fields[8];
+					$snort_alerts[$counter]['dstport'] = $fields[9];
+					$snort_alerts[$counter]['priority'] = $fields[12];
+					$snort_alerts[$counter]['category'] = $fields[11];
+					$counter++;
+				};
+				fclose($fd);
+				@unlink("/tmp/alert_{$snort_uuid}");
 			};
-			fclose($fd);
-			@unlink("/tmp/alert_{$snort_uuid}");
 		};
 	};
-};
 
-/* sort the array */
-if (isset($config['syslog']['reverse'])) {
-	sksort($snort_alerts, 'timestamp', false);
+	/* sort the array */
+	if (isset($config['syslog']['reverse'])) {
+		sksort($snort_alerts, 'timestamp', false);
+	} else {
+		sksort($snort_alerts, 'timestamp', true);
+	};
 } else {
-	sksort($snort_alerts, 'timestamp', true);
-};
+	$msg = gettext("The Snort package is not installed.");
+}
 
 /* display the result */
 ?>
@@ -131,7 +138,13 @@ if (is_array($snort_alerts)) {
 		$counter++;
 		if($counter >= $nentries) break;
 	}
-};
+} else {
+	if (!empty($msg)) {
+		echo ("  <tr class=\"snort-alert-entry\">
+				<td colspan=\"3\" align=\"center\"><br>{$msg}</br></td>
+			 </tr>");
+	}
+}
 ?>
 	</tbody>
 </table>
