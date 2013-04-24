@@ -2,7 +2,7 @@ diff --git /etc/inc/openvpn.inc.orig /etc/inc/openvpn.inc
 index 777b395..701a032 100644
 --- a/etc/inc/openvpn.inc
 +++ b/etc/inc/openvpn.inc
-@@ -394,21 +394,39 @@ function openvpn_reconfigure($mode, $settings) {
+@@ -394,19 +394,37 @@ function openvpn_reconfigure($mode, $settings) {
  				// If the CIDR is less than a /30, OpenVPN will complain if you try to
  				//  use the server directive. It works for a single client without it.
  				//  See ticket #1417
@@ -12,14 +12,10 @@ index 777b395..701a032 100644
  					$conf .= "client-config-dir {$g['varetc_path']}/openvpn-csc\n";
  				}
  			case 'p2p_shared_key':
--				$baselong = ip2long32($ip) & ip2long($mask);
--				$ip1 = long2ip32($baselong + 1);
--				$ip2 = long2ip32($baselong + 2);
+-				list($ip1, $ip2) = openvpn_get_interface_ip($ip, $mask);
 -				$conf .= "ifconfig $ip1 $ip2\n";
 +				if (!empty($ip) && !empty($mask)) {
-+					$baselong = ip2long32($ip) & ip2long($mask);
-+					$ip1 = long2ip32($baselong + 1);
-+					$ip2 = long2ip32($baselong + 2);
++					list($ip1, $ip2) = openvpn_get_interface_ip($ip, $mask);
 +					$conf .= "ifconfig $ip1 $ip2\n";
 +				}
  				break;
@@ -61,13 +57,6 @@ index 777b395..701a032 100644
                                         $authcfgs = explode(",", $settings['authmode']);
                                         $sed = "\$authmodes=array(";
  
-@@ -1021,4 +1039,4 @@ function openvpn_refresh_crls() {
- 	}
- }
- 
--?>
-\ No newline at end of file
-+?>
 diff --git /usr/local/www/vpn_openvpn_server.php.orig /usr/local/www/vpn_openvpn_server.php
 index 0ef67a7..bd9f527 100644
 --- a/usr/local/www/vpn_openvpn_server.php

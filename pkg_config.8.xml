@@ -1658,7 +1658,7 @@
 		<descr>Patch to fix OpenVPN tap bridging on 2.0.x. WARNING! Cannot be uninstalled.</descr>
 		<category>System</category>
 		<config_file>http://www.pfsense.com/packages/config/openvpn_tapfix_20x/openvpn_tapfix_20x.xml</config_file>
-		<version>0.3</version>
+		<version>0.4</version>
 		<status>BETA</status>
 		<required_version>2.0</required_version>
 		<maximum_version>2.0.4</maximum_version>

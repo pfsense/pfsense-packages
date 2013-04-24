@@ -46,7 +46,7 @@
     <requirements>pfSense 2.0.x</requirements>
     <faq>None</faq>
 	<name>OpenVPN tap Bridging Fix</name>
-	<version>0.1</version>
+	<version>0.4</version>
 	<title>OpenVPN tap Bridging Fix</title>
 	<include_file>/usr/local/pkg/openvpn_tapfix_20x.inc</include_file>
 	<additional_files_needed>
@@ -58,6 +58,11 @@
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>077</chmod>
 		<item>http://www.pfsense.com/packages/config/openvpn_tapfix_20x/openvpn_tapfix_20x.patch</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/pkg/</prefix>
+		<chmod>077</chmod>
+		<item>http://www.pfsense.com/packages/config/openvpn_tapfix_20x/openvpn_tapfix_203.patch</item>
 	</additional_files_needed>
 	<custom_php_install_command>
 		openvpn_tapfix_20x_install();
