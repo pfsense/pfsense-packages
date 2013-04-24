@@ -90,7 +90,6 @@ if (file_exists("/usr/local/pkg/snort/snort.inc")) {
 
 					$snort_alerts[$counter]['instanceid'] = $a_instance[$instanceid]['interface'];
 					$snort_alerts[$counter]['timestamp'] = $fields[0];
-					/* Look for the dash separating date and time so we can handle entries with year in them */
 					$snort_alerts[$counter]['timeonly'] = substr($fields[0], strpos($fields[0], '-')+1, -8);
 					$snort_alerts[$counter]['dateonly'] = substr($fields[0], 0, strpos($fields[0], '-'));
 					$snort_alerts[$counter]['src'] = $fields[6];
