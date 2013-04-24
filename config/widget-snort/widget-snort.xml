@@ -46,9 +46,15 @@
 	<requirements>Dashboard package and Snort</requirements>
 	<faq>Currently there are no FAQ	items provided.</faq>
 	<name>widget-snort</name>
-	<version>0.3.3</version>
+	<version>0.3.4</version>
 	<title>Widget - Snort</title>
 	<include_file>/usr/local/www/widgets/include/widget-snort.inc</include_file>
+	<menu>
+	</menu>
+	<service>
+	</service>
+	<tabs>
+	</tabs>
 	<additional_files_needed>
 		<prefix>/usr/local/www/widgets/javascript/</prefix>
 		<chmod>0644</chmod>
@@ -64,6 +70,14 @@
 		<chmod>0644</chmod>
 		<item>http://www.pfsense.com/packages/config/widget-snort/widget-snort.inc</item>
 	</additional_files_needed>
+	<fields>
+	</fields>
+	<custom_add_php_command>
+	</custom_add_php_command>
+	<custom_php_resync_config_command>
+	</custom_php_resync_config_command>
+	<custom_php_install_command>
+	</custom_php_install_command>
 	<custom_php_deinstall_command>
 		widget_snort_uninstall();
 	</custom_php_deinstall_command>

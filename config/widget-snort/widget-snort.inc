@@ -1,8 +1,5 @@
 <?php
-
-require_once("guiconfig.inc");
 require_once("config.inc");
-
 function widget_snort_uninstall() {
 
 	global $config;
@@ -19,10 +16,9 @@ function widget_snort_uninstall() {
 		write_config();
 	}
 
-	/* Remove our associated file */
+	/* Remove our associated files */
 	unlink("/usr/local/www/widgets/include/widget-snort.inc");
 	unlink("/usr/local/www/widgets/widgets/snort_alerts.widget.php");
 	unlink("/usr/local/www/widgets/javascript/snort_alerts.js");
 }
-
 ?>
