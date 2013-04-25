@@ -23,6 +23,12 @@
 	POSSIBILITY OF SUCH DAMAGE.
 */
 
+// Define basedir constant for unbound according to FreeBSD version (PBI support or no PBI)
+if (floatval(php_uname("r")) >= 8.3)
+	define("UNBOUND_BASE", "/usr/pbi/unbound-" . php_uname("m"));
+else
+	define("UNBOUND_BASE", "/usr/local");
+
 if(!function_exists("is_service_running"))
 	require_once("service-utils.inc");
 
@@ -51,19 +57,19 @@ function unbound_initial_setup() {
 
 	// Setup unbound
 	// Create and chown dirs
-	mwexec("/bin/mkdir -p /usr/local/etc/unbound /usr/local/etc/unbound/dev");
-	@chown("/usr/local/etc/unbound/.", "unbound");
-	@chown("/usr/local/etc/unbound/dev.", "unbound");
+	mwexec("/bin/mkdir -p " . UNBOUND_BASE . "/etc/unbound " . UNBOUND_BASE . "/etc/unbound/dev");
+	@chown(UNBOUND_BASE . "/etc/unbound/.", "unbound");
+	@chown(UNBOUND_BASE . "/etc/unbound/dev.", "unbound");
 	// Touch needed files
-	@touch("/usr/local/etc/unbound/root.hints");
-	@touch("/usr/local/etc/unbound/root-trust-anchor");
+	@touch(UNBOUND_BASE . "/etc/unbound/root.hints");
+	@touch(UNBOUND_BASE . "/etc/unbound/root-trust-anchor");
 	// Ensure files and folders belong to unbound
-	@chown("/usr/local/etc/unbound/root-trust-anchor", "unbound");
-	@chgrp("/usr/local/etc/unbound/root-trust-anchor", "wheel");
-	@chmod("/usr/local/etc/unbound/root-trust-anchor", 0600);
+	@chown(UNBOUND_BASE . "/etc/unbound/root-trust-anchor", "unbound");
+	@chgrp(UNBOUND_BASE . "/etc/unbound/root-trust-anchor", "wheel");
+	@chmod(UNBOUND_BASE . "/etc/unbound/root-trust-anchor", 0600);
 	// We do not need the sample conf or the default rc.d startup file
-	@unlink_if_exists("/usr/local/etc/unbound/unbound.conf.sample");
-	@unlink_if_exists("/usr/local/etc/rc.d/unbound");
+	@unlink_if_exists(UNBOUND_BASE . "/etc/unbound/unbound.conf.sample");
+	@unlink_if_exists(UNBOUND_BASE . "/etc/rc.d/unbound");
 
 	// Setup rc file for startup and shutdown.
 	unbound_rc_setup();
@@ -82,7 +88,7 @@ function unbound_initial_setup() {
 	unbound_resync_config();
 	unbound_keys_setup();
 
-	exec("/usr/sbin/chown -R unbound:wheel /usr/local/etc/unbound/*");
+	exec("/usr/sbin/chown -R unbound:wheel " . UNBOUND_BASE . "/etc/unbound/*");
 
 	// Write out the XML config
 	write_config();
@@ -97,14 +103,14 @@ function unbound_anchor_setup() {
 . IN DS 19036 8 2 49AAC11D7B6F6446702E54A1607371607A1A41855200FD2CE1CDDE32F24E8FB5
 EOD;
 
-	file_put_contents("/usr/local/etc/unbound/root-trust-anchor", $conf);
+	file_put_contents(UNBOUND_BASE . "/etc/unbound/root-trust-anchor", $conf);
 
 }
 
 function unbound_keys_setup() {
 
 	// Generate SSL Keys for controlling the unbound server
-	mwexec("/usr/local/sbin/unbound-control-setup");
+	mwexec(UNBOUND_BASE . "/sbin/unbound-control-setup");
 
 }
 
@@ -234,7 +240,7 @@ function unbound_control($action) {
 				break;
 		case "anchor_update":
 				//Update the Root Trust Anchor
-				mwexec("/usr/local/sbin/unbound-anchor -a /usr/local/etc/unbound/root-trust-anchor", true);
+				mwexec(UNBOUND_BASE . "/sbin/unbound-anchor -a " . UNBOUND_BASE . "/etc/unbound/root-trust-anchor", true);
 				break;
 		default:
 				break;
@@ -391,6 +397,8 @@ function unbound_acls_config() {
 function unbound_resync_config() {
 	global $config, $g, $input_errors;
 
+	$unbound_base = UNBOUND_BASE;
+
 	if (!is_array($config['installedpackages']['unbound']['config']))
 		$config['installedpackages']['unbound']['config'] = array();
 
@@ -423,7 +431,7 @@ function unbound_resync_config() {
 
 	if($unbound_config['dnssec_status'] == "on") {
 		$module_config = "validator iterator";
-		$anchor_file = "auto-trust-anchor-file: /usr/local/etc/unbound/root-trust-anchor";
+		$anchor_file = "auto-trust-anchor-file: " . UNBOUND_BASE . "/etc/unbound/root-trust-anchor";
 	} else
 		$module_config = "iterator";
 
@@ -490,7 +498,6 @@ EOF;
 	$unwanted_reply_threshold = (!empty($unbound_config['unwanted_reply_threshold'])) ? $unbound_config['unwanted_reply_threshold'] : "0";
 
 
-
 	$unbound_conf = <<<EOD
 #########################
 # Unbound configuration #
@@ -502,7 +509,7 @@ EOF;
 server:
 chroot: ""
 username: "unbound"
-directory: "/usr/local/etc/unbound"
+directory: "{$unbound_base}/etc/unbound"
 pidfile: "{$g['varrun_path']}/unbound.pid"
 root-hints: "root.hints"
 harden-referral-path: no
@@ -564,14 +571,14 @@ access-control: ::1 allow
 
 EOD;
 
-# Handle custom options
-if(!empty($unbound_config['custom_options'])) {
-	$custom_options = explode(";", ($unbound_config['custom_options']));
-	$unbound_conf .= "# Unbound Custom options\n";
-	foreach ($custom_options as $ent) {
-		$unbound_conf .= $ent."\n";
+	# Handle custom options
+	if(!empty($unbound_config['custom_options'])) {
+		$custom_options = explode(";", ($unbound_config['custom_options']));
+		$unbound_conf .= "# Unbound Custom options\n";
+		foreach ($custom_options as $ent) {
+			$unbound_conf .= $ent."\n";
+		}
 	}
-}
 
 	$unbound_conf .= <<<EOD
 
@@ -582,21 +589,21 @@ remote-control:
 control-enable: yes
 control-interface: 127.0.0.1
 control-port: 953
-server-key-file: "/usr/local/etc/unbound/unbound_server.key"
-server-cert-file: "/usr/local/etc/unbound/unbound_server.pem"
-control-key-file: "/usr/local/etc/unbound/unbound_control.key"
-control-cert-file: "/usr/local/etc/unbound/unbound_control.pem"
+server-key-file: "{$unbound_base}/etc/unbound/unbound_server.key"
+server-cert-file: "{$unbound_base}/etc/unbound/unbound_server.pem"
+control-key-file: "{$unbound_base}/etc/unbound/unbound_control.key"
+control-cert-file: "{$unbound_base}/etc/unbound/unbound_control.pem"
 
 EOD;
 
 
-	file_put_contents("/usr/local/etc/unbound/unbound.conf", $unbound_conf);
+	file_put_contents("{$unbound_base}/etc/unbound/unbound.conf", $unbound_conf);
 
 }
 
 function unbound_ctl_exec($cmd) {
 
-	mwexec("/usr/local/sbin/unbound-control $cmd");
+	mwexec(UNBOUND_BASE . "/sbin/unbound-control $cmd");
 
 }
 
@@ -671,7 +678,7 @@ function unbound_optimization() {
 
 function fetch_root_hints() {
 
-	$destination_file = "/usr/local/etc/unbound/root.hints";
+	$destination_file = UNBOUND_BASE . "/etc/unbound/root.hints";
 	if (filesize($destination_file) == 0 ) {
 		conf_mount_rw();
 		$fout = fopen($destination_file, "w");
@@ -769,7 +776,7 @@ function unbound_uninstall() {
 
 	unbound_control("termstop");
 	// Remove pkg config directory and startup file
-	mwexec("rm -rf /usr/local/etc/unbound");
+	mwexec("rm -rf " . UNBOUND_BASE . "/etc/unbound");
 	@unlink("/usr/local/etc/rc.d/unbound.sh");
 	@unlink("{$g['varlog_path']}/unbound.log");
 	@unlink("/var/tmp/unbound_cache");

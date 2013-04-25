@@ -31,6 +31,12 @@
 
 require("guiconfig.inc");
 
+// Define basedir constant for unbound according to FreeBSD version (PBI support or no PBI)
+if (floatval(php_uname("r")) >= 8.3)
+	define("UNBOUND_BASE", "/usr/pbi/unbound-" . php_uname("m"));
+else
+	define("UNBOUND_BASE", "/usr/local");
+
 if(!is_process_running("unbound")) {
 	Header("Location: /pkg_edit.php?xml=unbound.xml&id=0");
 	exit;
@@ -138,7 +144,7 @@ function execCmds() {
 		<tr>
 			<td class="tabcont" width="100%">
 			<?php
-				$entries = trim(exec("/usr/local/sbin/unbound-control dump_cache | wc -l"));
+				$entries = trim(exec(UNBOUND_BASE . "/sbin/unbound-control dump_cache | wc -l"));
 				defCmdT("Unbound status", "unbound-control status", "6");
 				defCmdT("Unbound stats", "unbound-control stats_noreset");
 				defCmdT("Unbound stubs", "unbound-control list_stubs", "8");
@@ -146,7 +152,7 @@ function execCmds() {
 				defCmdT("Unbound local zones", "unbound-control list_local_zones");
 				defCmdT("Unbound local data", "unbound-control list_local_data");
 				defCmdT("Unbound cache ($entries entries)", "unbound-control dump_cache", "60");
-				defCmdT("Unbound configuration", "/bin/cat /usr/local/etc/unbound/unbound.conf", "60");
+				defCmdT("Unbound configuration", "/bin/cat " . UNBOUND_BASE . "/etc/unbound/unbound.conf", "60");
 				listCmds();
 				execCmds();
 			?>
