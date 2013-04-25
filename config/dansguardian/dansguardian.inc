@@ -101,8 +101,13 @@ function sync_package_dansguardian($via_rpc=false,$install_process=false) {
 			$boot_process="on";
 	}
 
-	if (is_process_running('dansguardian') && isset($boot_process) && $via_rpc==false)
+	if (is_process_running('dansguardian') && isset($boot_process) && $via_rpc==false){
+		log_error("[Dansguardian] - Detected boot process pr:".is_process_running('dansguardian')." bp:".isset($boot_process)." rpc:".$via_rpc);
 		return;
+		}
+	else{
+		log_error("[Dansguardian] - Save settings package call pr:".is_process_running('dansguardian')." bp:".isset($boot_process)." rpc:".$via_rpc);
+	}
 		
 	#assign xml arrays
 	if (!is_array($config['installedpackages']['dansguardian']))
@@ -1136,6 +1141,11 @@ EOF;
 				#clamd script file
 				$script='/usr/local/etc/rc.d/clamav-clamd';
 				$script_file=file($script);
+				$new_clamav_startup="";
+				$cpreg_m[0]="/NO/";
+				$cpreg_m[1]="@/usr/local@";
+				$cpreg_r[0]="YES";
+				$cpreg_r[1]=DANSGUARDIAN_DIR;
 				foreach ($script_file as $script_line){
 					if(preg_match("/command=/",$script_line)){
 						$new_clamav_startup.= 'if [ ! -d /var/run/clamav ];then /bin/mkdir /var/run/clamav;fi'."\n";
@@ -1147,8 +1157,7 @@ EOF;
 						$new_clamav_startup.=$script_line;
 						}
 					elseif(!preg_match("/(mkdir|chown|sleep|mailscanner)/",$script_line)) {
-						$new_clamav_startup.=preg_replace("/NO/","YES",$script_line);
-						$new_clamav_startup.=preg_replace("@/usr/local@",DANSGUARDIAN_DIR,$script_line);
+						$new_clamav_startup.=preg_replace($cpreg_m,$cpreg_p,$script_line);
 						}
 					}
 				file_put_contents($script, $new_clamav_startup, LOCK_EX);
@@ -1202,21 +1211,55 @@ EOF;
     
     #avoid sync during boot process
 	if (!isset($boot_process)){
-	    $synconchanges = $config['installedpackages']['dansguardiansync']['config'][0]['synconchanges'];
-		if(!$synconchanges && !$syncondbchanges) 
-			return;
-		log_error("[dansguardian] dansguardian_xmlrpc_sync.php is starting.");
-		foreach ($config['installedpackages']['dansguardiansync']['config'] as $rs ){
-			foreach($rs['row'] as $sh){
-				$sync_to_ip = $sh['ipaddress'];
-				$password   = $sh['password'];
-				$sync_type = $sh['sync_type'];
-				if($password && $sync_to_ip)
-					dansguardian_do_xmlrpc_sync($sync_to_ip, $password,$sync_type);
-				}
-			}
-		log_error("[dansguardian] dansguardian_xmlrpc_sync.php is ending.");
+	  /* Uses XMLRPC to synchronize the changes to a remote node */
+	  if (is_array($config['installedpackages']['dansguardiansync']['config'])){
+		$dans_sync=$config['installedpackages']['dansguardiansync']['config'][0];
+		$synconchanges = $dans_sync['synconchanges'];
+		$synctimeout = $dans_sync['synctimeout'];
+		switch ($synconchanges){
+			case "manual":
+				if (is_array($dans_sync[row])){
+					$rs=$dans_sync[row];
+					}
+				else{
+					log_error("[Dansguardian] xmlrpc sync is enabled but there is no hosts to push on dansguardian config.");
+					return;
+					}
+				break;
+			case "auto":
+					if (is_array($config['installedpackages']['carpsettings']) && is_array($config['installedpackages']['carpsettings']['config'])){
+						$system_carp=$config['installedpackages']['carpsettings']['config'][0];
+						$rs[0]['ipaddress']=$system_carp['synchronizetoip'];
+						$rs[0]['username']=$system_carp['username'];
+						$rs[0]['password']=$system_carp['password'];
+						if (! is_ipaddr($system_carp['synchronizetoip'])){
+							log_error("[Dansguardian] xmlrpc sync is enabled but there is no system backup hosts to push squid config.");
+							return;
+							}
+					}
+					else{
+						log_error("[Dansguardian] xmlrpc sync is enabled but there is no system backup hosts to push squid config.");
+						return;
+					}
+				break;		
+			default:
+				return;
+			break;
 		}
+		if (is_array($rs)){
+			log_error("[Dansguardian] xmlrpc sync is starting.");
+			foreach($rs as $sh){
+				$sync_to_ip = $sh['ipaddress'];
+				$password = $sh['password'];
+				$username = ($sh['username']?$sh['username']:"admin");
+				if($password && $sync_to_ip)
+					dansguardian_do_xmlrpc_sync($sync_to_ip,$username,$password,$sync_type,$synctimeout);
+				}
+			log_error("[Dansguardian] xmlrpc sync is ending.");
+			}
+ 		}
+    }
+    
 }
 
 function dansguardian_validate_input($post, &$input_errors) {
@@ -1260,14 +1303,20 @@ function dansguardian_php_deinstall_command() {
 	}
 }
 
-function dansguardian_do_xmlrpc_sync($sync_to_ip, $password,$sync_type) {
+function dansguardian_do_xmlrpc_sync($sync_to_ip,$username,$password,$sync_type,$synctimeout) {
 	global $config, $g;
 
+	if(!$username)
+		return;
+	
 	if(!$password)
 		return;
 
 	if(!$sync_to_ip)
 		return;
+
+	if(!$synctimeout)
+		$synctimeout=30;
 
 	$xmlrpc_sync_neighbor = $sync_to_ip;
     if($config['system']['webgui']['protocol'] != "") {
@@ -1286,28 +1335,26 @@ function dansguardian_do_xmlrpc_sync($sync_to_ip, $password,$sync_type) {
 
 	/* xml will hold the sections to sync */
 	$xml = array();
-	$sync_xml=$config['installedpackages']['dansguardiansync']['config'][0]['synconchanges'];
-	if ($sync_xml){
-		log_error("Include dansguardian config");
-		$xml['dansguardian'] = $config['installedpackages']['dansguardian'];
-		$xml['dansguardianantivirusacl'] = $config['installedpackages']['dansguardianantivirusacl'];
-		$xml['dansguardianconfig'] = $config['installedpackages']['dansguardianconfig'];
-		$xml['dansguardianblacklist'] = $config['installedpackages']['dansguardianblacklist'];
-		$xml['dansguardianldap'] = $config['installedpackages']['dansguardianldap'];
-		$xml['dansguardiancontentacl'] = $config['installedpackages']['dansguardiancontentacl'];
-		$xml['dansguardianfileacl'] = $config['installedpackages']['dansguardianfileacl'];
-		$xml['dansguardiangroups'] = $config['installedpackages']['dansguardiangroups'];
-		$xml['dansguardianheaderacl'] = $config['installedpackages']['dansguardianheaderacl'];
-		$xml['dansguardianlimits'] = $config['installedpackages']['dansguardianlimits'];
-		$xml['dansguardianlog'] = $config['installedpackages']['dansguardianlog'];
-		$xml['dansguardianphraseacl'] = $config['installedpackages']['dansguardianphraseacl'];
-		$xml['dansguardianpicsacl'] = $config['installedpackages']['dansguardianpicsacl'];
-		$xml['dansguardiansearchacl'] = $config['installedpackages']['dansguardiansearchacl'];
-		$xml['dansguardiansiteacl'] = $config['installedpackages']['dansguardiansiteacl'];
-		$xml['dansguardianurlacl'] = $config['installedpackages']['dansguardianurlacl'];
-		$xml['dansguardianusers'] = $config['installedpackages']['dansguardianusers'];
+	log_error("Include dansguardian config");
+	$xml['dansguardian'] = $config['installedpackages']['dansguardian'];
+	$xml['dansguardianantivirusacl'] = $config['installedpackages']['dansguardianantivirusacl'];
+	$xml['dansguardianconfig'] = $config['installedpackages']['dansguardianconfig'];
+	$xml['dansguardianblacklist'] = $config['installedpackages']['dansguardianblacklist'];
+	$xml['dansguardianldap'] = $config['installedpackages']['dansguardianldap'];
+	$xml['dansguardiancontentacl'] = $config['installedpackages']['dansguardiancontentacl'];
+	$xml['dansguardianfileacl'] = $config['installedpackages']['dansguardianfileacl'];
+	$xml['dansguardiangroups'] = $config['installedpackages']['dansguardiangroups'];
+	$xml['dansguardianheaderacl'] = $config['installedpackages']['dansguardianheaderacl'];
+	$xml['dansguardianlimits'] = $config['installedpackages']['dansguardianlimits'];
+	$xml['dansguardianlog'] = $config['installedpackages']['dansguardianlog'];
+	$xml['dansguardianphraseacl'] = $config['installedpackages']['dansguardianphraseacl'];
+	$xml['dansguardianpicsacl'] = $config['installedpackages']['dansguardianpicsacl'];
+	$xml['dansguardiansearchacl'] = $config['installedpackages']['dansguardiansearchacl'];
+	$xml['dansguardiansiteacl'] = $config['installedpackages']['dansguardiansiteacl'];
+	$xml['dansguardianurlacl'] = $config['installedpackages']['dansguardianurlacl'];
+	$xml['dansguardianusers'] = $config['installedpackages']['dansguardianusers'];
+	$xml['dansguardianips'] = $config['installedpackages']['dansguardianips'];
 		
-	}
 	if (count($xml) > 0){
 		/* assemble xmlrpc payload */
 		$params = array(
@@ -1321,18 +1368,18 @@ function dansguardian_do_xmlrpc_sync($sync_to_ip, $password,$sync_type) {
 		$method = 'pfsense.merge_installedpackages_section_xmlrpc';
 		$msg = new XML_RPC_Message($method, $params);
 		$cli = new XML_RPC_Client('/xmlrpc.php', $url, $port);
-		$cli->setCredentials('admin', $password);
+		$cli->setCredentials($username, $password);
 		if($g['debug'])
 			$cli->setDebug(1);
-		/* send our XMLRPC message and timeout after 30 seconds */
-		$resp = $cli->send($msg, "30");
+		/* send our XMLRPC message and timeout after $synctimeout seconds */
+		$resp = $cli->send($msg, $synctimeout);
 		if(!$resp) {
 			$error = "A communications error occurred while attempting dansguardian XMLRPC sync with {$url}:{$port}.";
 			log_error($error);
 			file_notice("sync_settings", $error, "dansguardian Settings Sync", "");
 		} elseif($resp->faultCode()) {
 			$cli->setDebug(1);
-			$resp = $cli->send($msg, "30");
+			$resp = $cli->send($msg, $synctimeout);
 			$error = "An error code was received while attempting dansguardian XMLRPC sync with {$url}:{$port} - Code " . $resp->faultCode() . ": " . $resp->faultString();
 			log_error($error);
 			file_notice("sync_settings", $error, "dansguardian Settings Sync", "");
@@ -1354,15 +1401,15 @@ function dansguardian_do_xmlrpc_sync($sync_to_ip, $password,$sync_type) {
 		log_error("dansguardian XMLRPC reload data {$url}:{$port}.");
 		$msg = new XML_RPC_Message($method, $params);
 		$cli = new XML_RPC_Client('/xmlrpc.php', $url, $port);
-		$cli->setCredentials('admin', $password);
-		$resp = $cli->send($msg, "30");
+		$cli->setCredentials($username, $password);
+		$resp = $cli->send($msg, $synctimeout);
 		if(!$resp) {
 			$error = "A communications error occurred while attempting dansguardian XMLRPC sync with {$url}:{$port} (pfsense.exec_php).";
 			log_error($error);
 			file_notice("sync_settings", $error, "dansguardian Settings Sync", "");
 		} elseif($resp->faultCode()) {
 			$cli->setDebug(1);
-			$resp = $cli->send($msg, "30");
+			$resp = $cli->send($msg, $synctimeout);
 			$error = "An error code was received while attempting dansguardian XMLRPC sync with {$url}:{$port} - Code " . $resp->faultCode() . ": " . $resp->faultString();
 			log_error($error);
 			file_notice("sync_settings", $error, "dansguardian Settings Sync", "");
