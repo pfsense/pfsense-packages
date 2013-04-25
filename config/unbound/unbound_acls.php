@@ -95,7 +95,7 @@ if ($_POST) {
 				$input_errors[] = gettext("You must enter a valid IPv4 address for {$networkacl[$x]['acl_network']}.");
 		}
 	}
-	
+
 	if (!$input_errors) {
 
 		if ($pconfig['Submit'] == gettext("Save")) {
@@ -173,7 +173,7 @@ if (is_subsystem_dirty("unbound"))
 		print_info_box_np(gettext("The settings for Unbound DNS has changed. You must apply the configuration to take affect."));
 ?>
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
- 	<tr>
+	<tr>
 		<td class="tabnavtbl">
 			<ul id="tabnav">
 			<?php
@@ -186,7 +186,7 @@ if (is_subsystem_dirty("unbound"))
 			?>
 			</ul>
 		</td>
-	</tr>    
+	</tr>
 	<tr>
 		<td class="tabcont">
 

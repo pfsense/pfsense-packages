@@ -39,25 +39,25 @@ fi
 sleep 5
 
 while [ /bin/true ]; do
-        if [  ! -f /var/run/unbound_alarm ]; then
-                NUM_PROCS=`/bin/pgrep unbound | wc -l | awk '{print $1}'`
-                if [ $NUM_PROCS -lt 1 ]; then
-                        # Unbound is not running
-                        echo "Unbound has exited." | logger -p daemon.info -i -t Unbound_Alarm
-                        echo "Attempting restart..." | logger -p daemon.info -i -t Unbound_Alarm
-                        /usr/local/etc/rc.d/unbound.sh start
-                        sleep 3
-                        touch /var/run/unbound_alarm
-                fi
-        fi
-        NUM_PROCS=`/bin/pgrep unbound | wc -l | awk '{print $1}'`
-        if [ $NUM_PROCS -gt 0 ]; then
-                if [ -f /var/run/unbound_alarm ]; then
-                        echo "Unbound has resumed." | logger -p daemon.info -i -t Unbound_Alarm
-                        rm /var/run/unbound_alarm
-                fi
-        fi
-        sleep $LOOP_SLEEP
+	if [ ! -f /var/run/unbound_alarm ]; then
+		NUM_PROCS=`/bin/pgrep unbound | wc -l | awk '{print $1}'`
+		if [ $NUM_PROCS -lt 1 ]; then
+			# Unbound is not running
+			echo "Unbound has exited." | logger -p daemon.info -i -t Unbound_Alarm
+			echo "Attempting restart..." | logger -p daemon.info -i -t Unbound_Alarm
+			/usr/local/etc/rc.d/unbound.sh start
+			sleep 3
+			touch /var/run/unbound_alarm
+		fi
+	fi
+	NUM_PROCS=`/bin/pgrep unbound | wc -l | awk '{print $1}'`
+	if [ $NUM_PROCS -gt 0 ]; then
+		if [ -f /var/run/unbound_alarm ]; then
+			echo "Unbound has resumed." | logger -p daemon.info -i -t Unbound_Alarm
+			rm /var/run/unbound_alarm
+		fi
+	fi
+	sleep $LOOP_SLEEP
 done
 
 if [ -f /var/run/unbound_alarm ]; then

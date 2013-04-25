@@ -40,11 +40,11 @@ $pgtitle = "Services: Unbound DNS Forwarder: Status";
 include("head.inc");
 
 function doCmdT($title, $command, $rows) {
-    echo "<p>\n";
-    echo "<a name=\"" . $title . "\">\n";
-    echo "<table width=\"100%\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\">\n";
-    echo "<tr><td class=\"listtopic\">" . $title . "</td></tr>\n";
-    echo "<tr><td class=\"listlr\"><textarea style=\"font-family:courier\"cols=\"101\" rows=\"$rows\">";		/* no newline after pre */
+	echo "<p>\n";
+	echo "<a name=\"" . $title . "\">\n";
+	echo "<table width=\"100%\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\">\n";
+	echo "<tr><td class=\"listtopic\">" . $title . "</td></tr>\n";
+	echo "<tr><td class=\"listlr\"><textarea style=\"font-family:courier\"cols=\"101\" rows=\"$rows\">";		/* no newline after pre */
 
 	if ($command == "dumpconfigxml") {
 		$fd = @fopen("/conf/config.xml", "r");
@@ -71,46 +71,46 @@ function doCmdT($title, $command, $rows) {
 			echo htmlspecialchars($execOutput[$i],ENT_NOQUOTES);
 		}
 	}
-    echo "</textarea></tr>\n";
-    echo "</table>\n";
+	echo "</textarea></tr>\n";
+	echo "</table>\n";
 }
 
 /* Execute a command, giving it a title which is the same as the command. */
 function doCmd($command) {
-    doCmdT($command,$command);
+	doCmdT($command,$command);
 }
 
 /* Define a command, with a title, to be executed later. */
 function defCmdT($title, $command, $rows = "20") {
-    global $commands;
-    $title = htmlspecialchars($title,ENT_NOQUOTES);
-    $commands[] = array($title, $command, $rows);
+	global $commands;
+	$title = htmlspecialchars($title,ENT_NOQUOTES);
+	$commands[] = array($title, $command, $rows);
 }
 
 /* Define a command, with a title which is the same as the command,
  * to be executed later.
  */
 function defCmd($command) {
-    defCmdT($command,$command);
+	defCmdT($command,$command);
 }
 
 /* List all of the commands as an index. */
 function listCmds() {
-    global $commands;
-    echo "<p>" . gettext("This status page includes the following information") . ":\n";
-    echo "<ul width=\"100%\">\n";
-    for ($i = 0; isset($commands[$i]); $i++ ) {
-        echo "<li><strong><a href=\"#" . $commands[$i][0] . "\">" . $commands[$i][0] . "</a></strong>\n";
-    }
-    echo "</ul>\n";
+	global $commands;
+	echo "<p>" . gettext("This status page includes the following information") . ":\n";
+	echo "<ul width=\"100%\">\n";
+	for ($i = 0; isset($commands[$i]); $i++ ) {
+		echo "<li><strong><a href=\"#" . $commands[$i][0] . "\">" . $commands[$i][0] . "</a></strong>\n";
+	}
+	echo "</ul>\n";
 }
 
 /* Execute all of the commands which were defined by a call to defCmd. */
 function execCmds() {
-    global $commands;
-    for ($i = 0; isset($commands[$i]); $i++ ) {
-        doCmdT($commands[$i][0], $commands[$i][1], $commands[$i][2]);
-    }
+	global $commands;
+	for ($i = 0; isset($commands[$i]); $i++ ) {
+		doCmdT($commands[$i][0], $commands[$i][1], $commands[$i][2]);
+	}
 }
 
 ?>
@@ -135,8 +135,8 @@ function execCmds() {
 		</tr>
 	</table>
 	<table width="100%" border="0" cellpadding="0" cellspacing="0">
-	   <tr>
-	    <td class="tabcont" width="100%">
+		<tr>
+			<td class="tabcont" width="100%">
 			<?php
 				$entries = trim(exec("/usr/local/sbin/unbound-control dump_cache | wc -l"));
 				defCmdT("Unbound status", "unbound-control status", "6");
@@ -150,8 +150,8 @@ function execCmds() {
 				listCmds();
 				execCmds();
 			?>
-	    </td>
-	   </tr>
+			</td>
+		</tr>
 	</table>
 	</div>
 <?php include("fend.inc"); ?>
