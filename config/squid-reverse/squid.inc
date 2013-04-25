@@ -5,7 +5,7 @@
 	Copyright (C) 2006-2009 Scott Ullrich
 	Copyright (C) 2006 Fernando Lemos
 	Copyright (C) 2012 Martin Fuchs	
-	Copyright (C) 2012 Marcello Coutinho
+	Copyright (C) 2012-2013 Marcello Coutinho
 	Copyright (C) 2013 Gekkenhuis
 	All rights reserved.
 
@@ -1851,27 +1851,55 @@ EOD;
 /* Uses XMLRPC to synchronize the changes to a remote node */
 function squid_sync_on_changes() {
 	global $config, $g;
-	
-	log_error("[squid] xmlrpc sync is starting.");
-	$synconchanges = $config['installedpackages']['squidsync']['config'][0]['synconchanges'];	
-	if(!$synconchanges) 
-		return;
-	foreach ($config['installedpackages']['squidsync']['config'] as $rs ){
-		foreach($rs['row'] as $sh){
-			$sync_to_ip = $sh['ipaddress'];
-			$password = $sh['password'];
-			if($sh['username'])
-				$username = $sh['username'];
-			else
-				$username = 'admin';
-			if($password && $sync_to_ip)
-				squid_do_xmlrpc_sync($sync_to_ip, $username, $password);
+	print"<PRE>"; 
+	if (is_array($config['installedpackages']['squidsync']['config'])){
+		$squid_sync=$config['installedpackages']['squidsync']['config'][0];
+		$synconchanges = $squid_sync['synconchanges'];
+		$synctimeout = $squid_sync['synctimeout'];
+		switch ($synconchanges){
+			case "manual":
+				if (is_array($squid_sync[row])){
+					$rs=$squid_sync[row];
+					}
+				else{
+					log_error("[squid] xmlrpc sync is enabled but there is no hosts to push on squid config.");
+					return;
+					}
+				break;
+			case "auto":
+					if (is_array($config['installedpackages']['carpsettings']) && is_array($config['installedpackages']['carpsettings']['config'])){
+						$system_carp=$config['installedpackages']['carpsettings']['config'][0];
+						$rs[0]['ipaddress']=$system_carp['synchronizetoip'];
+						$rs[0]['username']=$system_carp['username'];
+						$rs[0]['password']=$system_carp['password'];
+					}
+					else{
+						log_error("[squid] xmlrpc sync is enabled but there is no system backup hosts to push squid config.");
+						return;
+					}
+				break;			
+			default:
+				return;
+			break;
+		}
+		if (is_array($rs)){
+			log_error("[squid] xmlrpc sync is starting.");
+			foreach($rs as $sh){
+				$sync_to_ip = $sh['ipaddress'];
+				$password = $sh['password'];
+				if($sh['username'])
+					$username = $sh['username'];
+				else
+					$username = 'admin';
+				if($password && $sync_to_ip)
+					squid_do_xmlrpc_sync($sync_to_ip, $username, $password,$synctimeout);
+				}
+			log_error("[squid] xmlrpc sync is ending.");
 			}
-	}
-	log_error("[squid] xmlrpc sync is ending.");
+ 		}
 }
 /* Do the actual XMLRPC sync */
-function squid_do_xmlrpc_sync($sync_to_ip, $username, $password) {
+function squid_do_xmlrpc_sync($sync_to_ip, $username, $password, $synctimeout) {
 	global $config, $g;
 
 	if(!$username)
@@ -1883,6 +1911,10 @@ function squid_do_xmlrpc_sync($sync_to_ip, $username, $password) {
 	if(!$sync_to_ip)
 		return;
 
+	if(!$synctimeout)
+		$synctimeout=250;
+		
+		
 	$xmlrpc_sync_neighbor = $sync_to_ip;
     if($config['system']['webgui']['protocol'] != "") {
 		$synchronizetoip = $config['system']['webgui']['protocol'];
@@ -1925,15 +1957,15 @@ function squid_do_xmlrpc_sync($sync_to_ip, $username, $password) {
 	$cli->setCredentials($username, $password);
 	if($g['debug'])
 		$cli->setDebug(1);
-	/* send our XMLRPC message and timeout after 250 seconds */
-	$resp = $cli->send($msg, "250");
+	/* send our XMLRPC message and timeout after defined sync timeout value*/
+	$resp = $cli->send($msg, $synctimeout);
 	if(!$resp) {
 		$error = "A communications error occurred while attempting squid XMLRPC sync with {$url}:{$port}.";
 		log_error($error);
 		file_notice("sync_settings", $error, "squid Settings Sync", "");
 	} elseif($resp->faultCode()) {
 		$cli->setDebug(1);
-		$resp = $cli->send($msg, "250");
+		$resp = $cli->send($msg, $synctimeout);
 		$error = "An error code was received while attempting squid XMLRPC sync with {$url}:{$port} - Code " . $resp->faultCode() . ": " . $resp->faultString();
 		log_error($error);
 		file_notice("sync_settings", $error, "squid Settings Sync", "");
@@ -1955,14 +1987,14 @@ function squid_do_xmlrpc_sync($sync_to_ip, $username, $password) {
 	$msg = new XML_RPC_Message($method, $params);
 	$cli = new XML_RPC_Client('/xmlrpc.php', $url, $port);
 	$cli->setCredentials($username, $password);
-	$resp = $cli->send($msg, "250");
+	$resp = $cli->send($msg, $synctimeout);
 	if(!$resp) {
 		$error = "A communications error occurred while attempting squid XMLRPC sync with {$url}:{$port} (pfsense.exec_php).";
 		log_error($error);
 		file_notice("sync_settings", $error, "squid Settings Sync", "");
 	} elseif($resp->faultCode()) {
 		$cli->setDebug(1);
-		$resp = $cli->send($msg, "250");
+		$resp = $cli->send($msg, $synctimeout);
 		$error = "An error code was received while attempting squid XMLRPC sync with {$url}:{$port} - Code " . $resp->faultCode() . ": " . $resp->faultString();
 		log_error($error);
 		file_notice("sync_settings", $error, "squid Settings Sync", "");
@@ -1971,5 +2003,4 @@ function squid_do_xmlrpc_sync($sync_to_ip, $username, $password) {
 	}
 	
 }
-
 ?>
