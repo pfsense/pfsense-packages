@@ -1851,7 +1851,6 @@ EOD;
 /* Uses XMLRPC to synchronize the changes to a remote node */
 function squid_sync_on_changes() {
 	global $config, $g;
-	print"<PRE>"; 
 	if (is_array($config['installedpackages']['squidsync']['config'])){
 		$squid_sync=$config['installedpackages']['squidsync']['config'][0];
 		$synconchanges = $squid_sync['synconchanges'];
