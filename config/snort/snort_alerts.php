@@ -219,7 +219,7 @@ if ($pconfig['arefresh'] == 'on')
 				<td width="78%" class="vtable">
 					<input name="download" type="submit" class="formbtn" value="Download"> <?php echo gettext('All ' .
 						'log files will be saved.'); ?> <a href="/snort/snort_alerts.php?action=clear&instance=<?=$instanceid;?>">
-					<input name="delete" type="button" class="formbtn" value="Clear"
+					<input name="delete" type="submit" class="formbtn" value="Clear"
 					onclick="return confirm('Do you really want to remove all instance logs?')"></a>
 					<span class="red"><strong><?php echo gettext('Warning:'); ?></strong></span> <?php echo ' ' . gettext('all log files will be deleted.'); ?>
 				</td>

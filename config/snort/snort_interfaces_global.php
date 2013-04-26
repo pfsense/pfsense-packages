@@ -52,6 +52,8 @@ $pconfig['autorulesupdate7'] = $config['installedpackages']['snortglobal']['auto
 $pconfig['forcekeepsettings'] = $config['installedpackages']['snortglobal']['forcekeepsettings'];
 $pconfig['snortcommunityrules'] = $config['installedpackages']['snortglobal']['snortcommunityrules'];
 
+if (empty($pconfig['snortloglimit']))
+	$pconfig['snortloglimit'] = 'on';
 
 /* if no errors move foward */
 if (!$input_errors) {

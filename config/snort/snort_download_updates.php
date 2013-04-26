@@ -99,6 +99,22 @@ function popup(url)
  if (window.focus) {newwin.focus()}
  return false;
 }
+
+function wopen(url, name, w, h)
+{
+// Fudge factors for window decoration space.
+// In my tests these work well on all platforms & browsers.
+w += 32;
+h += 96;
+ var win = window.open(url,
+  name, 
+  'width=' + w + ', height=' + h + ', ' +
+  'location=no, menubar=no, ' +
+  'status=no, toolbar=no, scrollbars=yes, resizable=yes');
+ win.resizeTo(w, h);
+ win.focus();
+}
+
 </script>
 
 <form action="snort_download_updates.php" method="post" name="iform" id="iform">
@@ -161,7 +177,8 @@ function popup(url)
 							echo '
 			<button disabled="disabled"><span class="download">' . gettext("Update Rules") . '</span></button><br/>
 			<p style="text-align:left; margin-left:150px;">
-			<font color="#fc3608" size="2px"><b>' . gettext("WARNING:") . '</b></font><font size="1px" color="#000000">&nbsp;&nbsp;' . gettext('No rule types have been selected for download. "Global Settings Tab"') . '</font><br>';
+			<font color="#fc3608" size="2px"><b>' . gettext("WARNING:") . '</b></font><font size="1px" color="#000000">&nbsp;&nbsp;' . gettext('No rule types have been selected for download. ') .
+			gettext('Visit the ') . '<a href="snort_interfaces_global.php">Global Settings Tab</a>' . gettext(' to select rule types.') . '</font><br>';
 
 							echo '</p>' . "\n";
 						} else {
@@ -191,7 +208,7 @@ function popup(url)
 
 						if ($snort_rules_upd_logfile_chk == 'yes') {
 							echo "
-				<button class=\"formbtn\" onclick=\"popup('snort_log_view.php?logfile={$log}')\"><span class='pwhitetxt'>" . gettext("View Log") . "</span></button>";
+				<button class=\"formbtn\" onclick=\"wopen('snort_log_view.php?logfile={$log}', 'LogViewer', 800, 600)\"><span class='pwhitetxt'>" . gettext("View Log") . "</span></button>";
 				echo "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type=\"submit\" value=\"Clear Log\" name=\"clear\" id=\"Submit\" class=\"formbtn\" />\n";
 						}else{
 							echo "

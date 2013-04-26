@@ -113,7 +113,7 @@ $pgtitle = array(gettext("Snort"), gettext("File Viewer"));
 
 <body link="#000000" vlink="#000000" alink="#000000">
 <?php if ($savemsg) print_info_box($savemsg); ?>
-<?php include("fbegin.inc");?>
+<?php // include("fbegin.inc");?>
 
 <form action="snort_rules_edit.php" method="post">
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
@@ -121,14 +121,20 @@ $pgtitle = array(gettext("Snort"), gettext("File Viewer"));
 	<td class="tabcont">
 		<table width="100%" cellpadding="0" cellspacing="6" bgcolor="#eeeeee">
 		<tr>
-			<td>
+			<td class="pgtitle" colspan="2">Snort: Rules Viewer</td>
+		</tr>
+		<tr>
+			<td width="20%">
 				<input type="button" class="formbtn" value="Return" onclick="window.close()">
+			</td>
+			<td align="right">
+				<b><?php echo gettext("Rules File: ") . '</b>&nbsp;' . $file; ?>&nbsp;&nbsp;&nbsp;&nbsp;
 			</td>
 		</tr>
 		<tr>
-			<td valign="top" class="label">
-			<div style="background: #eeeeee;" id="textareaitem"><!-- NOTE: The opening *and* the closing textarea tag must be on the same line. -->
-			<textarea wrap="<?=$wrap_flag?>" rows="33" cols="90" name="code2"><?=$contents;?></textarea>
+			<td valign="top" class="label" colspan="2">
+			<div style="background: #eeeeee; width:100%; height:100%;" id="textareaitem"><!-- NOTE: The opening *and* the closing textarea tag must be on the same line. -->
+			<textarea style="width:100%; height:100%;" wrap="<?=$wrap_flag?>" rows="33" cols="80" name="code2"><?=$contents;?></textarea>
 			</div>
 			</td>
 		</tr>
@@ -137,6 +143,6 @@ $pgtitle = array(gettext("Snort"), gettext("File Viewer"));
 </tr>
 </table>
 </form>
-<?php include("fend.inc");?>
+<?php // include("fend.inc");?>
 </body>
 </html>
