@@ -154,11 +154,7 @@ ENDPHP\n";
 }
 
 function unbound_install() {
-
-	conf_mount_rw();
 	unbound_initial_setup();
-	conf_mount_ro();
-
 }
 
 function unbound_control($action) {
