@@ -9,7 +9,7 @@
 		    part of the Unbound package for pfSense (http://www.pfSense.com)
 		    Copyright (C) 2011 Warren Baker
 		    All rights reserved.
-		                                                       						  */
+		*/
 		/* ========================================================================== */
 		/*
 		    Redistribution and use in source and binary forms, with or without
@@ -34,7 +34,7 @@
 		    POSSIBILITY OF SUCH DAMAGE.
 		                                                                              */
 		/* ========================================================================== */
-		        ]]>
+		]]>
 	</copyright>
 	<description>Unbound is a validating, recursive, and caching DNS resolver.</description>
 	<requirements/>
@@ -142,7 +142,7 @@
 			<fieldname>forwarding_mode</fieldname>
 			<fielddescr>Enable forwarding mode</fielddescr>
 			<description>Configure the server to make use of the DNS servers configured in &lt;a href="system.php"&gt;System: General setup&lt;/a&gt;. &lt;br/&gt;
-						&lt;b&gt;Note:&lt;/b&gt; Disabling this will cause Unbound to perform DNS queries without 
+						&lt;b&gt;Note:&lt;/b&gt; Disabling this will cause Unbound to perform DNS queries without
 						using the upstream configured DNS servers.</description>
 			<type>checkbox</type>
 			<default_value>on</default_value>
