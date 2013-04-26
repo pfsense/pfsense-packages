@@ -82,8 +82,10 @@ if (($snortdownload == 'off') || ($a_nat[$id]['ips_policy_enable'] != 'on'))
 	$policy_select_disable = "disabled";
 
 if ($a_nat[$id]['autoflowbitrules'] == 'on') {
-	if (file_exists("{$snortdir}/snort_{$snort_uuid}_{$if_real}/rules/{$flowbit_rules_file}"))
+	if (file_exists("{$snortdir}/snort_{$snort_uuid}_{$if_real}/rules/{$flowbit_rules_file}") &&
+	    filesize("{$snortdir}/snort_{$snort_uuid}_{$if_real}/rules/{$flowbit_rules_file}") > 0) {
 		$btn_view_flowb_rules = "";
+	}
 	else
 		$btn_view_flowb_rules = " disabled";
 }
@@ -220,6 +222,22 @@ function popup(url)
  if (window.focus) {newwin.focus()}
  return false;
 }
+
+function wopen(url, name, w, h)
+{
+// Fudge factors for window decoration space.
+// In my tests these work well on all platforms & browsers.
+w += 32;
+h += 96;
+ var win = window.open(url,
+  name, 
+  'width=' + w + ', height=' + h + ', ' +
+  'location=no, menubar=no, ' +
+  'status=no, toolbar=no, scrollbars=yes, resizable=yes');
+ win.resizeTo(w, h);
+ win.focus();
+}
+
 function enable_change()
 {
  var endis = !(document.iform.ips_policy_enable.checked);
@@ -265,7 +283,10 @@ function enable_change()
 		<tr>
 			<td class="vexpl"><br/>
 		<?php printf(gettext("# The rules directory is empty:  %s%s/rules%s"), '<strong>',$snortdir,'</strong>'); ?> <br/><br/>
-		<?php printf(gettext("Please go to the %sUpdates%s tab to download the rules configured on the %sGlobal%s tab."),'<strong>' ,'</strong>', '<strong>' ,'</strong>'); ?>
+		<?php echo gettext("Please go to the ") . '<a href="snort_download_updates.php"><strong>' . gettext("Updates") . 
+			'</strong></a>' . gettext(" tab to download the rules configured on the ") . 
+			'<a href="snort_interfaces_global.php"><strong>' . gettext("Global") . 
+			'</strong></a>' . gettext(" tab."); ?>
 			</td>
 		</tr>
 <?php else: 
@@ -302,7 +323,7 @@ function enable_change()
 					   </tr>
 					   <tr>
 						<td width="15%" class="listn"><?php echo gettext("Auto Flowbit Rules"); ?></td>
-						<td width="85%"><input type="button" class="formbtn" value="View" onclick="popup('snort_rules_edit.php?id=<?=$id;?>&openruleset=<?=$flowbit_rules_file;?>')" <?php echo $btn_view_flowb_rules; ?>/>
+						<td width="85%"><input type="button" class="formbtn" value="View" onclick="wopen('snort_rules_edit.php?id=<?=$id;?>&openruleset=<?=$flowbit_rules_file;?>','FileViewer',800,600)" <?php echo $btn_view_flowb_rules; ?>/>
 						&nbsp;&nbsp;<span class="vexpl"><?php echo gettext("Click to view auto-enabled rules required to satisfy flowbit dependencies"); ?></span></td>
 					   </tr>
 					   <tr>

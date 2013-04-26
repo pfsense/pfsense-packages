@@ -33,7 +33,7 @@
 require_once("guiconfig.inc");
 require_once("/usr/local/pkg/snort/snort.inc");
 
-global $g;
+global $g, $rebuild_rules;
 
 $id = $_GET['id'];
 if (isset($_POST['id']))

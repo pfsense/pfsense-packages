@@ -122,9 +122,11 @@ if ($_POST["Submit"]) {
 		/* Save configuration changes */
 		write_config();
 
-		/* Update snort.conf file for this interface */
+		/* Most changes don't require a rules rebuild, so default to "off" */
 		$rebuild_rules = "off";
-		snort_generate_conf($a_rule[$id]);
+
+		/* Update snort.conf and snort.sh files for this interface */
+		sync_snort_package_config();
 
 		header( 'Expires: Sat, 26 Jul 1997 05:00:00 GMT' );
 		header( 'Last-Modified: ' . gmdate( 'D, d M Y H:i:s' ) . ' GMT' );
