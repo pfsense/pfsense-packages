@@ -212,10 +212,22 @@ if ($_GET['act'] == "resetall" && !empty($rules_map)) {
 	exit;
 }
 
+if ($_POST['clear']) {
+	unset($a_rule[$id]['customrules']);
+	write_config();
+	$rebuild_rules = "on";
+	snort_generate_conf($a_rule[$id]);
+	$rebuild_rules = "off";
+	header("Location: /snort/snort_rules.php?id={$id}&openruleset={$currentruleset}");
+	exit;
+}
+
 if ($_POST['customrules']) {
 	$a_rule[$id]['customrules'] = base64_encode($_POST['customrules']);
 	write_config();
-	sync_snort_package_config();
+	$rebuild_rules = "on";
+	snort_generate_conf($a_rule[$id]);
+	$rebuild_rules = "off";
 	$output = "";
 	$retcode = "";
 	exec("snort -c {$snortdir}/snort_{$snort_uuid}_{$if_real}/snort.conf -T 2>&1", $output, $retcode);
@@ -299,6 +311,22 @@ function popup(url)
  if (window.focus) {newwin.focus()}
  return false;
 }
+
+function wopen(url, name, w, h)
+{
+// Fudge factors for window decoration space.
+// In my tests these work well on all platforms & browsers.
+w += 32;
+h += 96;
+ var win = window.open(url,
+  name, 
+  'width=' + w + ', height=' + h + ', ' +
+  'location=no, menubar=no, ' +
+  'status=no, toolbar=no, scrollbars=yes, resizable=yes');
+ win.resizeTo(w, h);
+ win.focus();
+}
+
 </script>
 
 <form action="/snort/snort_rules.php" method="post" name="iform" id="iform">
@@ -376,10 +404,14 @@ function popup(url)
 		<td width="3%" class="list">&nbsp;</td>
 	</tr>
 	<tr>
+		<td colspan="9">&nbsp;</td>
+	</tr>
+	<tr>
 		<td width="3%" class="list">&nbsp;</td>
-		<td colspan="7" class="vtable">
-			<input name="Submit" type="submit" class="formbtn" value="Save">
-			<input type="button" class="formbtn" value="Cancel" onclick="history.back()">
+		<td colspan="7">
+			<input name="Submit" type="submit" class="formbtn" value=" Save ">&nbsp;&nbsp;
+			<input type="button" class="formbtn" value="Cancel" onclick="history.back()">&nbsp;&nbsp;
+			<input name="clear" type="submit" class="formbtn" id="clear" value="Clear" onclick="return confirm('Do you really want to erase all custom rules?')">
 		</td>
 		<td width="3%" class="list">&nbsp;</td>
 	</tr>
@@ -390,7 +422,7 @@ function popup(url)
 			&nbsp;&nbsp;&nbsp;<?php echo gettext("Click to rebuild the rules with your changes.  Snort must be restarted to use the new rules."); ?>
 			<input type='hidden' name='id' value='<?=$id;?>'></td>
 		<td width="3%" align="center" valign="middle" class="listt"><a href="javascript: void(0)"
-				onclick="popup('snort_rules_edit.php?id=<?=$id;?>&openruleset=<?=$currentruleset;?>')">
+				onclick="wopen('snort_rules_edit.php?id=<?=$id;?>&openruleset=<?=$currentruleset;?>','FileViewer',800,600)">
 				<img src="../themes/<?= $g['theme']; ?>/images/icons/icon_service_restart.gif" <?php
 				echo "onmouseover='this.src=\"../themes/{$g['theme']}/images/icons/icon_services_restart_mo.gif\"' 
 				onmouseout='this.src=\"../themes/{$g['theme']}/images/icons/icon_service_restart.gif\"' ";?>				
@@ -475,7 +507,7 @@ function popup(url)
 	?>
 			<td width="3%" align="center" valign="middle" nowrap class="listt">
 				<a href="javascript: void(0)"
-				onclick="popup('snort_rules_edit.php?id=<?=$id;?>&openruleset=<?=$currentruleset;?>&ids=<?=$sid;?>&gid=<?=$gid;?>')"><img
+				onclick="wopen('snort_rules_edit.php?id=<?=$id;?>&openruleset=<?=$currentruleset;?>&ids=<?=$sid;?>&gid=<?=$gid;?>','FileViewer',800,600)"><img
 				src="../themes/<?= $g['theme']; ?>/images/icons/icon_right.gif" 
 				title="<?php echo gettext("Click to view rule"); ?>" width="17" height="17" border="0"></a>
 				<!-- Codes by Quackit.com -->

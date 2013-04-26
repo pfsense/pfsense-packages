@@ -32,7 +32,7 @@
 require_once("guiconfig.inc");
 require_once("/usr/local/pkg/snort/snort.inc");
 
-global $g;
+global $g, $rebuild_rules;
 
 $id = $_GET['id'];
 if (isset($_POST['id']))
@@ -87,6 +87,9 @@ if ($_POST) {
 		}
 
 		write_config();
+
+		/* No need to rebuild rules if just toggling Barnyard2 on or off */
+		$rebuild_rules = "off";
 		sync_snort_package_config();
 
 		/* after click go to this page */

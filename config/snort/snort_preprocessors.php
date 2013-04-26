@@ -35,6 +35,7 @@ require_once("guiconfig.inc");
 require_once("/usr/local/pkg/snort/snort.inc");
 
 global $g, $rebuild_rules;
+$snortlogdir = SNORTLOGDIR;
 
 if (!is_array($config['installedpackages']['snortglobal'])) {
 	$config['installedpackages']['snortglobal'] = array();
@@ -89,7 +90,35 @@ if (isset($id) && $a_nat[$id]) {
 	/* the Sensitive Data (sdf) preprocessor.         */
 	if ($vrt_enabled == "off")
 		$pconfig['sensitive_data'] = "off";
+
+	/**********************************************************/
+	/* To keep new users from shooting themselves in the foot */
+	/* enable the most common and necessary preprocessors by  */
+	/* default.                                               */
+	/**********************************************************/
+	if (empty($pconfig['ftp_preprocessor']))
+		$pconfig['ftp_preprocessor'] = 'on';
+	if (empty($pconfig['smtp_preprocessor']))
+		$pconfig['smtp_preprocessor'] = 'on';
+	if (empty($pconfig['dce_rpc_2']))
+		$pconfig['dce_rpc_2'] = 'on';
+	if (empty($pconfig['dns_preprocessor']))
+		$pconfig['dns_preprocessor'] = 'on';
+	if (empty($pconfig['ssl_preproc']))
+		$pconfig['ssl_preproc'] = 'on';
+	if (empty($pconfig['pop_preproc']))
+		$pconfig['pop_preproc'] = 'on';
+	if (empty($pconfig['imap_preproc']))
+		$pconfig['imap_preproc'] = 'on';
+	if (empty($pconfig['sip_preproc']))
+		$pconfig['sip_preproc'] = 'on';
+	if (empty($pconfig['other_preprocs']))
+		$pconfig['other_preprocs'] = 'on';
 }
+
+/* Define the "disabled_preproc_rules.log" file for this interface */
+$iface = snort_get_friendly_interface($pconfig['interface']);
+$disabled_rules_log = "{$snortlogdir}/{$iface}_disabled_preproc_rules.log";
 
 if ($_POST) {
 	$natent = array();
@@ -134,6 +163,10 @@ if ($_POST) {
 		$natent['gtp_preproc'] = $_POST['gtp_preproc'] ? 'on' : 'off';
 		$natent['preproc_auto_rule_disable'] = $_POST['preproc_auto_rule_disable'] ? 'on' : 'off';
 		$natent['protect_preproc_rules'] = $_POST['protect_preproc_rules'] ? 'on' : 'off';
+
+		/* If 'preproc_auto_rule_disable' is off, then clear log file */
+		if ($natent['preproc_auto_rule_disable'] == 'off')
+			@unlink("{$disabled_rules_log}");
 
 		if (isset($id) && $a_nat[$id])
 			$a_nat[$id] = $natent;
@@ -193,6 +226,25 @@ include_once("head.inc");
 </script>
 <script type="text/javascript" src="/javascript/suggestions.js">
 </script>
+
+<script language="javascript" type="text/javascript">
+
+function wopen(url, name, w, h)
+{
+// Fudge factors for window decoration space.
+// In my tests these work well on all platforms & browsers.
+w += 32;
+h += 96;
+ var win = window.open(url,
+  name, 
+  'width=' + w + ', height=' + h + ', ' +
+  'location=no, menubar=no, ' +
+  'status=no, toolbar=no, scrollbars=yes, resizable=yes');
+ win.resizeTo(w, h);
+ win.focus();
+}
+</script>
+
 <form action="snort_preprocessors.php" method="post"
 	enctype="multipart/form-data" name="iform" id="iform">
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
@@ -261,6 +313,13 @@ include_once("head.inc");
 					"disabled preprocessors, but can substantially compromise the level of protection by " .
 					"automatically disabling detection rules."); ?></td>
 				</tr>
+			<?php if (file_exists($disabled_rules_log) && filesize($disabled_rules_log) > 0): ?>
+				<tr>
+					<td width="3%">&nbsp;</td>
+					<td class="vexpl"><input type="button" class="formbtn" value="View" onclick="wopen('snort_rules_edit.php?id=<?=$id;?>&openruleset=<?=$disabled_rules_log;?>','FileViewer',800,600)"/>
+					&nbsp;&nbsp;&nbsp;<?php echo gettext("Click to view the list of currently auto-disabled rules"); ?></td>
+				</tr>
+			<?php endif; ?>
 			</table>
 		</td>
 	</tr>
@@ -441,7 +500,8 @@ include_once("head.inc");
 			type="checkbox" value="on"
 			<?php if ($pconfig['other_preprocs']=="on") echo "checked"; ?>
 			onClick="enable_change(false)"><br>
-		<?php echo gettext("Normalize/Decode RPC traffic and detects Back Orifice traffic on the network."); ?></td>
+		<?php echo gettext("Normalize/Decode RPC traffic and detects Back Orifice traffic on the network.  Default is ") . 
+		"<strong>" . gettext("Checked") . "</strong>"; ?></td>
 	</tr>
 	<tr>
 		<td width="22%" valign="top" class="vncell"><?php echo gettext("Enable"); ?> <br>
@@ -450,7 +510,8 @@ include_once("head.inc");
 			type="checkbox" value="on"
 			<?php if ($pconfig['ftp_preprocessor']=="on") echo "checked"; ?>
 			onClick="enable_change(false)"><br>
-		<?php echo gettext("Normalize/Decode FTP and Telnet traffic and protocol anomalies."); ?></td>
+		<?php echo gettext("Normalize/Decode FTP and Telnet traffic and protocol anomalies.  Default is ") . 
+		"<strong>" . gettext("Checked") . "</strong>"; ?></td>
 	</tr>
 	<tr>
 		<td width="22%" valign="top" class="vncell"><?php echo gettext("Enable"); ?> <br>
@@ -459,7 +520,8 @@ include_once("head.inc");
 			type="checkbox" value="on"
 			<?php if ($pconfig['pop_preproc']=="on") echo "checked"; ?>
 			onClick="enable_change(false)"><br>
-		<?php echo gettext("Normalize/Decode POP protocol for enforcement and buffer overflows."); ?></td>
+		<?php echo gettext("Normalize/Decode POP protocol for enforcement and buffer overflows.  Default is ") . 
+		"<strong>" . gettext("Checked") . "</strong>"; ?></td>
 	</tr>
 	<tr>
 		<td width="22%" valign="top" class="vncell"><?php echo gettext("Enable"); ?> <br>
@@ -468,7 +530,8 @@ include_once("head.inc");
 			type="checkbox" value="on"
 			<?php if ($pconfig['imap_preproc']=="on") echo "checked"; ?>
 			onClick="enable_change(false)"><br>
-		<?php echo gettext("Normalize/Decode IMAP protocol for enforcement and buffer overflows."); ?></td>
+		<?php echo gettext("Normalize/Decode IMAP protocol for enforcement and buffer overflows.  Default is ") . 
+		"<strong>" . gettext("Checked") . "</strong>"; ?></td>
 	</tr>
 	<tr>
 		<td width="22%" valign="top" class="vncell"><?php echo gettext("Enable"); ?> <br>
@@ -477,7 +540,8 @@ include_once("head.inc");
 			type="checkbox" value="on"
 			<?php if ($pconfig['smtp_preprocessor']=="on") echo "checked"; ?>
 			onClick="enable_change(false)"><br>
-		<?php echo gettext("Normalize/Decode SMTP protocol for enforcement and buffer overflows."); ?></td>
+		<?php echo gettext("Normalize/Decode SMTP protocol for enforcement and buffer overflows.  Default is ") . 
+		"<strong>" . gettext("Checked") . "</strong>"; ?></td>
 	</tr>
 	<tr>
 		<td width="22%" valign="top" class="vncell"><?php echo gettext("Enable"); ?> <br>
@@ -486,7 +550,8 @@ include_once("head.inc");
 			type="checkbox" value="on"
 			<?php if ($pconfig['dce_rpc_2']=="on") echo "checked"; ?>
 			onClick="enable_change(false)"><br>
-		<?php echo gettext("The DCE/RPC preprocessor detects and decodes SMB and DCE/RPC traffic."); ?></td>
+		<?php echo gettext("The DCE/RPC preprocessor detects and decodes SMB and DCE/RPC traffic.  Default is ") . 
+		"<strong>" . gettext("Checked") . "</strong>"; ?></td>
 	</tr>
 	<tr>
 		<td width="22%" valign="top" class="vncell"><?php echo gettext("Enable"); ?> <br>
@@ -495,7 +560,8 @@ include_once("head.inc");
 			type="checkbox" value="on"
 			<?php if ($pconfig['sip_preproc']=="on") echo "checked"; ?>
 			onClick="enable_change(false)"><br>
-		<?php echo gettext("The SIP preprocessor decodes SIP traffic and detects some vulnerabilities."); ?></td>
+		<?php echo gettext("The SIP preprocessor decodes SIP traffic and detects some vulnerabilities.  Default is ") . 
+		"<strong>" . gettext("Checked") . "</strong>"; ?></td>
 	</tr>
 	<tr>
 		<td width="22%" valign="top" class="vncell"><?php echo gettext("Enable"); ?> <br>
@@ -513,7 +579,8 @@ include_once("head.inc");
 			type="checkbox" value="on"
 			<?php if ($pconfig['dns_preprocessor']=="on") echo "checked"; ?>
 			onClick="enable_change(false)"><br>
-		<?php echo gettext("The DNS preprocessor decodes DNS Response traffic and detects some vulnerabilities."); ?></td>
+		<?php echo gettext("The DNS preprocessor decodes DNS Response traffic and detects some vulnerabilities.  Default is ") . 
+		"<strong>" . gettext("Checked") . "</strong>"; ?></td>
 	</tr>
 	<tr>
 		<td width="22%" valign="top" class="vncell"><?php echo gettext("Enable"); ?> <br> <?php echo gettext("SSL Data"); ?></td>
@@ -521,7 +588,8 @@ include_once("head.inc");
 			<input name="ssl_preproc" type="checkbox" value="on"
 			<?php if ($pconfig['ssl_preproc']=="on") echo "checked"; ?>
 			onClick="enable_change(false)"><br>
-		<?php echo gettext("SSL data searches for irregularities during SSL protocol exchange"); ?>	
+		<?php echo gettext("SSL data searches for irregularities during SSL protocol exchange.  Default is ") . 
+		"<strong>" . gettext("Checked") . "</strong>"; ?>	
 		</td>
 	</tr>
 	<tr>

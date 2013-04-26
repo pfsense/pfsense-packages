@@ -135,21 +135,23 @@ if ($pconfig['brefresh'] == 'on')
 <?php if ($savemsg) print_info_box($savemsg); ?>
 <form action="/snort/snort_blocked.php" method="post">
 <table width="99%" border="0" cellpadding="0" cellspacing="0">
-<tr><td>
-<?php
-	$tab_array = array();
-	$tab_array[0] = array(gettext("Snort Interfaces"), false, "/snort/snort_interfaces.php");
-	$tab_array[1] = array(gettext("Global Settings"), false, "/snort/snort_interfaces_global.php");
-	$tab_array[2] = array(gettext("Updates"), false, "/snort/snort_download_updates.php");
-	$tab_array[3] = array(gettext("Alerts"), false, "/snort/snort_alerts.php");
-	$tab_array[4] = array(gettext("Blocked"), true, "/snort/snort_blocked.php");
-	$tab_array[5] = array(gettext("Whitelists"), false, "/snort/snort_interfaces_whitelist.php");
-	$tab_array[6] = array(gettext("Suppress"), false, "/snort/snort_interfaces_suppress.php");
-	display_top_tabs($tab_array);
-?>
-</td></tr>
-	<tr>
-		<td>
+<tr>
+	<td>
+		<?php
+		$tab_array = array();
+		$tab_array[0] = array(gettext("Snort Interfaces"), false, "/snort/snort_interfaces.php");
+		$tab_array[1] = array(gettext("Global Settings"), false, "/snort/snort_interfaces_global.php");
+		$tab_array[2] = array(gettext("Updates"), false, "/snort/snort_download_updates.php");
+		$tab_array[3] = array(gettext("Alerts"), false, "/snort/snort_alerts.php");
+		$tab_array[4] = array(gettext("Blocked"), true, "/snort/snort_blocked.php");
+		$tab_array[5] = array(gettext("Whitelists"), false, "/snort/snort_interfaces_whitelist.php");
+		$tab_array[6] = array(gettext("Suppress"), false, "/snort/snort_interfaces_suppress.php");
+		display_top_tabs($tab_array);
+		?>
+	</td>
+</tr>
+<tr>
+	<td>
 		<table id="maintable" class="tabcont" width="100%" border="0"
 			cellpadding="0" cellspacing="0">
 			<tr>
@@ -164,7 +166,7 @@ if ($pconfig['brefresh'] == 'on')
 					<input name="download" type="submit" class="formbtn" value="Download"> <?php echo gettext("All " .
 				"blocked hosts will be saved."); ?> <input name="remove" type="submit"
 					class="formbtn" value="Clear"> <span class="red"><strong><?php echo gettext("Warning:"); ?></strong></span>
-				<?php echo gettext("all hosts will be removed."); ?></form>
+				<?php echo gettext("all hosts will be removed."); ?>
 				</td>
 			</tr>
 			<tr>
@@ -179,17 +181,16 @@ if ($pconfig['brefresh'] == 'on')
 				"number of blocked entries to view. %sDefault%s is %s500%s."), '<strong>', '</strong>', '<strong>', '</strong>'); ?>
 				</td>
 			</tr>
-	<tr>
-		<td colspan="2">
-			<table id="sortabletable1" class="sortable" width="100%" border="0"
-				cellpadding="0" cellspacing="0">
-				<tr id="frheader">
-					<td width="5%" class="listhdrr">#</td>
-					<td width="15%" class="listhdrr"><?php echo gettext("IP"); ?></td>
-					<td width="70%" class="listhdrr"><?php echo gettext("Alert Description"); ?></td>
-					<td width="5%" class="listhdrr"><?php echo gettext("Remove"); ?></td>
-				</tr>
-		<?php
+			<tr>
+				<td colspan="2">
+				<table id="sortabletable1" class="sortable" width="100%" border="0" cellpadding="0" cellspacing="0">
+					<tr id="frheader">
+						<td width="5%" class="listhdrr">#</td>
+						<td width="15%" class="listhdrr"><?php echo gettext("IP"); ?></td>
+						<td width="70%" class="listhdrr"><?php echo gettext("Alert Description"); ?></td>
+						<td width="5%" class="listhdrr"><?php echo gettext("Remove"); ?></td>
+					</tr>
+			<?php
 			/* set the arrays */
 			$blocked_ips_array = array();
 			if (is_array($blocked_ips)) {
@@ -242,27 +243,25 @@ if ($pconfig['brefresh'] == 'on')
 					$counter++;
 
 				/* use one echo to do the magic*/
-				echo "<tr>
-			<td width='5%' >&nbsp;{$counter}</td>
-			<td width='15%' >&nbsp;{$blocked_ip}</td>
-			<td width='70%' >&nbsp;{$blocked_desc}</td>
-			<td width='5%' align=\"center\" valign=\"top\"'><a href='snort_blocked.php?todelete=" . trim(urlencode($blocked_ip)) . "'>
-			<img title=\"" . gettext("Delete") . "\" border=\"0\" name='todelete' id='todelete' alt=\"Delete\" src=\"../themes/{$g['theme']}/images/icons/icon_x.gif\"></a></td>
-			</tr>\n";
-
+					echo "<tr>
+						<td width='5%' >&nbsp;{$counter}</td>
+						<td width='15%' >&nbsp;{$blocked_ip}</td>
+						<td width='70%' >&nbsp;{$blocked_desc}</td>
+						<td width='5%' align=\"center\" valign=\"top\"'><a href='snort_blocked.php?todelete=" . trim(urlencode($blocked_ip)) . "'>
+						<img title=\"" . gettext("Delete") . "\" border=\"0\" name='todelete' id='todelete' alt=\"Delete\" src=\"../themes/{$g['theme']}/images/icons/icon_x.gif\"></a></td>
+					</tr>\n";
 			}
 
-			echo "\n<tr><td colspan='3' align=\"center\" valign=\"top\">{$counter} items listed.</td></tr>";
-		} else
-			echo "\n<tr><td colspan='3' align=\"center\" valign=\"top\"><br><strong>There are currently no items being blocked by snort.</strong></td></tr>";
-
-		?>
+				echo "\n<tr><td colspan='4' align=\"center\" valign=\"top\">{$counter} items listed.</td></tr>";
+			} else
+				echo "\n<tr><td colspan='4' align=\"center\" valign=\"top\"><br><strong>There are currently no items being blocked by snort.</strong></td></tr>";
+			?>
+				</table>
+			</td>
+		</tr>
 		</table>
-		</td>
-	</tr>
-</table>
-		</td>
-	</tr>
+	</td>
+</tr>
 </table>
 </form>
 <?php

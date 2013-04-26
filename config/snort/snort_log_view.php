@@ -54,13 +54,16 @@ $pgtitle = array(gettext("Snort"), gettext("Log File Viewer"));
 
 <body link="#000000" vlink="#000000" alink="#000000">
 <?php if ($savemsg) print_info_box($savemsg); ?>
-<?php include("fbegin.inc");?>
+<?php // include("fbegin.inc");?>
 
 <form action="snort_log_view.php" method="post">
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
 <tr>
 	<td class="tabcont">
 		<table width="100%" cellpadding="0" cellspacing="6" bgcolor="#eeeeee">
+		<tr>
+			<td class="pgtitle" colspan="2">Snort: Log File Viewer</td>
+		</tr>
 		<tr>
 			<td align="left" width="20%">
 				<input type="button" class="formbtn" value="Return" onclick="window.close()">
@@ -71,8 +74,8 @@ $pgtitle = array(gettext("Snort"), gettext("Log File Viewer"));
 		</tr>
 		<tr>
 			<td colspan="2" valign="top" class="label">
-			<div style="background: #eeeeee;" id="textareaitem"><!-- NOTE: The opening *and* the closing textarea tag must be on the same line. -->
-			<textarea readonly wrap="off" rows="33" cols="90" name="code2"><?=$contents;?></textarea>
+			<div style="background: #eeeeee; width:100%; height:100%;" id="textareaitem"><!-- NOTE: The opening *and* the closing textarea tag must be on the same line. -->
+			<textarea style="width:100%; height:100%;" readonly wrap="off" rows="33" cols="80" name="code2"><?=$contents;?></textarea>
 			</div>
 			</td>
 		</tr>
@@ -81,6 +84,6 @@ $pgtitle = array(gettext("Snort"), gettext("Log File Viewer"));
 </tr>
 </table>
 </form>
-<?php include("fend.inc");?>
+<?php // include("fend.inc");?>
 </body>
 </html>
