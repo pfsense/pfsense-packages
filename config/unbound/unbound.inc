@@ -593,7 +593,9 @@ control-cert-file: "{$unbound_base}/etc/unbound/unbound_control.pem"
 EOD;
 
 
+	cont_mount_rw();
 	file_put_contents("{$unbound_base}/etc/unbound/unbound.conf", $unbound_conf);
+	cont_mount_ro();
 
 }
 
