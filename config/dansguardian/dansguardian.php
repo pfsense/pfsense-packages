@@ -39,11 +39,19 @@ require_once("/etc/inc/pkg-utils.inc");
 require_once("/etc/inc/globals.inc");
 require_once("/usr/local/pkg/dansguardian.inc");
         
-function fetch_blacklist($log_notice=true) {
+function fetch_blacklist($log_notice=true,$install_process=false) {
 	global $config,$g;
-	$url=$config['installedpackages']['dansguardianblacklist']['config'][0]['url'];
-	if (is_url($url)) {
-		conf_mount_rw();
+	if (is_array($config['installedpackages']['dansguardianblacklist'] && is_array($config['installedpackages']['dansguardianblacklist']['config']))){
+	   	$url=$config['installedpackages']['dansguardianblacklist']['config'][0]['url'];
+	   	$uw="Found a previouns install, checking Blacklist config...";
+		}
+	else{
+		$uw="Found a clean install, reading default access lists...";
+		}
+	   conf_mount_rw();
+	   if ($install_process == true)
+	   	update_output_window($uw);
+	   if (isset($url) && is_url($url)) {
 		if ($log_notice==true){
 			print "file download start..";
 			unlink_if_exists("/usr/local/pkg/blacklist.tgz");
@@ -82,11 +90,13 @@ function fetch_blacklist($log_notice=true) {
 		}
 	}
 	else {
-		if (!empty($url))
+		if ($install_process==true)
+			read_lists(false,$uw);
+		elseif (!empty($url))
 			file_notice("Dansguardian - Blacklist url is invalid.","");
 	}
 }
-function read_lists($log_notice=true){
+function read_lists($log_notice=true,$uw=""){
 	global $config,$g;
 	$group_type=array();
 	$dir=DANSGUARDIAN_DIR . "/etc/dansguardian/lists";
@@ -152,12 +162,14 @@ function read_lists($log_notice=true){
 			$edit_file=preg_replace('/size.19/','size>5',$edit_file);
 		file_put_contents("/usr/local/pkg/dansguardian_".$edit_xml."_acl.xml",$edit_file,LOCK_EX);
 		}
-	if($log_notice==true)
-		file_notice("Dansguardian - Blacklist applied, check site and URL access lists for categories","");
-	#foreach($config['installedpackages'] as $key => $values)
-	#	if (preg_match("/dansguardian(phrase|black|white)lists/",$key))
-	#		print "$key\n";
 	write_config();
+	if($log_notice==true && $uw==""){
+		file_notice("Dansguardian - Blacklist applied, check site and URL access lists for categories","");
+		}
+	else{
+		$uw.="done\n";
+		update_output_window($uw);
+		}	
 }
 
 if ($argv[1]=="update_lists")

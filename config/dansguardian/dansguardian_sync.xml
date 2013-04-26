@@ -102,7 +102,7 @@
 			<type>listtopic</type>
 		</field>
 		<field>
-			<fielddescr>Automatically sync squid configuration changes</fielddescr>
+			<fielddescr>Automatically sync dansguardian configuration changes</fielddescr>
 			<fieldname>synconchanges</fieldname>
 			<description>Select a sync method for dansguardian.</description>
 			<type>select</type>

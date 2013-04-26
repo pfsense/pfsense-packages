@@ -926,7 +926,8 @@ EOF;
 	#check blacklist download files
 	if ($install_process == true){
 		require_once("/usr/local/www/dansguardian.php");
-		fetch_blacklist(false);
+		fetch_blacklist(false,true);
+		update_output_window("Blacklist check done, continuing package config sync.");
 		}
 	else{
 		if ($dansguardian_blacklist['cron']=="force_download"){
@@ -961,7 +962,6 @@ EOF;
 		$daemongroup = 'nobody';
 	}
 	$filtergroups=($count > 1?($count -1):1);	
-	
 	$filterip="";
 	$filterports="";
 	foreach (explode(",", $dansguardian['interface']) as $i => $iface) {
@@ -1089,7 +1089,6 @@ EOF;
 	conf_mount_rw();
 
 	write_config();
-	
 	#update cron
 	if ($cron_found > 0){
 		$config['cron']=$new_cron;
@@ -1113,19 +1112,15 @@ EOF;
 	
 	#check virus_scanner options
 	$libexec_dir= DANSGUARDIAN_DIR."/libexec/dansguardian/";
-	if (preg_match("/clamd/",$dansguardian_config['content_scanners'])){
+	if ($install_process==true)
+		update_output_window("Skipping clamav check during package install.");
+	if (preg_match("/clamd/",$dansguardian_config['content_scanners']) && $install_process==false){
 			
 		if (!(file_exists('/var/db/clamav/main.cvd')||file_exists('/var/db/clamav/main.cld'))){
 			file_notice("Dansguardian - No antivirus database found for clamav, running freshclam in background.","");
 			log_error('No antivirus database found for clamav, running freshclam in background. Content-scanner may not work until freshclam finishes.');
 			mwexec_bg(DANSGUARDIAN_DIR.'/bin/freshclam && /usr/local/etc/rc.d/clamav-clamd');
 			}
-				
-			$match=array();
-			$match[0]='/NO/';
-			$replace=array();
-			$replace[0]='YES';
-
 			#clamdscan.conf dansguardian file	
 			$cconf=DANSGUARDIAN_DIR . "/etc/dansguardian/contentscanners/clamdscan.conf";
 			$cconf_file=file_get_contents($cconf);
@@ -1133,16 +1128,15 @@ EOF;
 				$cconf_file=preg_replace('/#clamdudsfile/','clamdudsfile',$cconf_file);
 				file_put_contents($cconf, $cconf_file, LOCK_EX);
 				}
-			
 			#clamd conf file
 			$cconf=DANSGUARDIAN_DIR."/etc/clamd.conf";
 			$cconf_file=file_get_contents($cconf);
 			if (preg_match("/User (\w+)/",$cconf_file,$matches)){
 				#clamd script file
-				$script='/usr/local/etc/rc.d/clamav-clamd';
-				$script_file=file($script);
+				$clamav_script='/usr/local/etc/rc.d/clamav-clamd';
+				$script_file=file($clamav_script);
 				$new_clamav_startup="";
-				$cpreg_m[0]="/NO/";
+				$cpreg_m[0]="@NO@";
 				$cpreg_m[1]="@/usr/local@";
 				$cpreg_r[0]="YES";
 				$cpreg_r[1]=DANSGUARDIAN_DIR;
@@ -1157,11 +1151,12 @@ EOF;
 						$new_clamav_startup.=$script_line;
 						}
 					elseif(!preg_match("/(mkdir|chown|sleep|mailscanner)/",$script_line)) {
-						$new_clamav_startup.=preg_replace($cpreg_m,$cpreg_p,$script_line);
+						$new_clamav_startup.=preg_replace($cpreg_m,$cpreg_r,$script_line);
 						}
 					}
-				file_put_contents($script, $new_clamav_startup, LOCK_EX);
+				file_put_contents($clamav_script, $new_clamav_startup, LOCK_EX);
 				chmod ($script,0755);
+				
 				if (file_exists('/var/run/dansguardian.pid') && is_process_running('clamd')){
 					log_error('Stopping clamav-clamd');
 					mwexec("$script stop");
@@ -1173,8 +1168,7 @@ EOF;
 					mwexec_bg("$script start");
 				}
 			}	
-	}
-
+	}	
 	#check certificate hashed
 	
 	$script='/usr/local/etc/rc.d/dansguardian.sh';
@@ -1208,6 +1202,7 @@ EOF;
 
 	#mount read only
     conf_mount_ro();
+    
     
     #avoid sync during boot process
 	if (!isset($boot_process)){
