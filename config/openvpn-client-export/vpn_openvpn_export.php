@@ -781,7 +781,7 @@ function useproxy_changed(obj) {
 										<span class="vexpl">
 											 This will change the generated .ovpn configuration to allow for usage of the management interface.
 											 And include the OpenVPNManager program in the "Windows Installers". With this OpenVPN can be used also by non-administrator users.
-											 This is also usefull for Windows7/Vista systems where elevated permissions are needed to add routes to the system.
+											 This is also useful for Windows Vista/7/8 systems where elevated permissions are needed to add routes to the system.
 										</span>
 									</td>
 								</tr>
