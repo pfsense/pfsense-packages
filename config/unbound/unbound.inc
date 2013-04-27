@@ -53,11 +53,11 @@ function unbound_initial_setup() {
 	$unbound_config = &$config['installedpackages']['unbound']['config'][0];
 
 	// Ensure Unbound user exists
-	exec("/usr/sbin/pw useradd unbound");
+	mwexec("/usr/sbin/pw useradd unbound", true);
 
 	// Setup unbound
 	// Create and chown dirs
-	mwexec("/bin/mkdir -p " . UNBOUND_BASE . "/etc/unbound " . UNBOUND_BASE . "/etc/unbound/dev");
+	mwexec("/bin/mkdir -p " . UNBOUND_BASE . "/etc/unbound/dev");
 	@chown(UNBOUND_BASE . "/etc/unbound/.", "unbound");
 	@chown(UNBOUND_BASE . "/etc/unbound/dev.", "unbound");
 	// Touch needed files
@@ -593,9 +593,9 @@ control-cert-file: "{$unbound_base}/etc/unbound/unbound_control.pem"
 EOD;
 
 
-	cont_mount_rw();
+	conf_mount_rw();
 	file_put_contents("{$unbound_base}/etc/unbound/unbound.conf", $unbound_conf);
-	cont_mount_ro();
+	conf_mount_ro();
 
 }
 
