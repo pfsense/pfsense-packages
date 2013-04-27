@@ -390,13 +390,13 @@ if ($snortdownload == 'on') {
 
 		/* extract so rules */
 		update_status(gettext("Extracting Snort VRT Shared Objects rules..."));
-		exec('/bin/mkdir -p {$snortlibdir}/dynamicrules/');
+		exec("/bin/mkdir -p {$snortlibdir}/dynamicrules/");
 		error_log(gettext("\tUsing Snort VRT precompiled SO rules for {$freebsd_version_so} ...\n"), 3, $snort_rules_upd_log);
 		$snort_arch = php_uname("m");
 		$nosorules = false;
 		if ($snort_arch  == 'i386'){
 			exec("/usr/bin/tar xzf {$tmpfname}/{$snort_filename} -C {$snortdir}/tmp so_rules/precompiled/{$freebsd_version_so}/i386/{$snort_version}/");
-			exec("/bin/cp {$snortdir}/tmp/so_rules/precompiled/$freebsd_version_so/i386/{$snort_version}/* {$snortlibdir}/dynamicrules/");
+			exec("/bin/cp {$snortdir}/tmp/so_rules/precompiled/{$freebsd_version_so}/i386/{$snort_version}/* {$snortlibdir}/dynamicrules/");
 		} elseif ($snort_arch == 'amd64') {
 			exec("/usr/bin/tar xzf {$tmpfname}/{$snort_filename} -C {$snortdir}/tmp so_rules/precompiled/{$freebsd_version_so}/x86-64/{$snort_version}/");
 			exec("/bin/cp {$snortdir}/tmp/so_rules/precompiled/{$freebsd_version_so}/x86-64/{$snort_version}/* {$snortlibdir}/dynamicrules/");
