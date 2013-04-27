@@ -29,26 +29,21 @@
 	Some mods made from pfBlocker widget to make this for HAProxy on Pfsense
 	Copyleft 2012 by jvorhees
 */
-@require_once("guiconfig.inc");
-@require_once("pfsense-utils.inc");
-@require_once("functions.inc");
+require_once("guiconfig.inc");
+require_once("pfsense-utils.inc");
+require_once("functions.inc");
 #Retrieve parameters
+require_once("haproxy_socketinfo.inc");
 require_once("/usr/local/www/widgets/include/haproxy.widget.inc");
 ?><div id='HAProxy'><?php
+
 #Backends/Servers Actions if asked
 if(!empty($_GET['act']) and !empty($_GET['be']) and !empty($_GET['srv'])) {
-	switch($_GET['act']) {
-		case 'start':
-			$controlresult=exec('/bin/echo "enable server '.$_GET['be'].'/'.$_GET['srv'].'" | /usr/local/bin/socat unix-connect:/tmp/haproxy.socket stdio',$debug);
-		break;
-		case 'stop':
-			$controlresult=exec('/bin/echo "disable server '.$_GET['be'].'/'.$_GET['srv'].'" | /usr/local/bin/socat unix-connect:/tmp/haproxy.socket stdio',$debug);
-		break;
-	}
+	$backend = $_GET['be'];
+	$server =  $_GET['srv'];
+	$enable = $_GET['act'] == 'start' ? true : false;
+	haproxy_set_server_enabled($backend, $server, $enable);
 }
-
-echo "<table style=\"padding-top:0px; padding-bottom:0px; padding-left:0px; padding-right:0px\" width=\"100%\" border=\"0\" cellpadding=\"0\" 
-cellspacing=\"0\"";
 
 $out="<img src ='/themes/{$g['theme']}/images/icons/icon_interface_down.gif'>";
 $in="<img src ='/themes/{$g['theme']}/images/icons/icon_interface_up.gif'>";
@@ -58,65 +53,19 @@ $log="<img src ='/themes/{$g['theme']}/images/icons/icon_log.gif'>";
 $start="<img src ='/themes/{$g['theme']}/images/icons/icon_service_start.gif' title='Enable this backend/server'>";
 $stop="<img src ='/themes/{$g['theme']}/images/icons/icon_service_stop.gif' title='Disable this backend/server'>";
 
-$frontends=array();
-$backends=array();
-$servers=array();
 $clients=array();
 $clientstraffic=array();
 
-$hastatoutput=exec('/bin/echo "show stat" | /usr/local/bin/socat unix-connect:/tmp/haproxy.socket stdio',$debug);
-foreach($debug as $line) {
-	list($pxname,$svname,$qcur,$qmax,$scur,$smax,$slim,$stot,$bin,$bout,$dreq,$dresp,$ereq,$econ,$eresp,$wretr,$wredis,$status,$weight,$act,$bck,$chkfail,$chkdown,$lastchg,$downtime,$qlimit,$pid,$iid,$sid,$throttle,$lbtot,$tracked,$type,$rate,$rate_lim,$rate_max,$check_status,$check_code,$check_duration,$hrsp_1xx,$hrsp_2xx,$hrsp_3xx,$hrsp_4xx,$hrsp_5xx,$hrsp_other,$hanafail,$req_rate,$req_rate_max,$req_tot,$cli_abrt,$srv_abrt) = explode(",", $line);
-	#Retrieve data
-	switch ($svname) {
-	case "FRONTEND":	
-		$frontends[] = array(
-			"pxname" => $pxname,
-			"scur" => $scur,
-			"slim" => $slim,
-			"status" => $status);
-	break;
-	case "BACKEND":	
-		$backends[] = array(
-			"pxname" => $pxname,
-			"scur" => $scur,
-			"slim" => $slim,
-			"status" => $status);
-	break;
-	default:	
-		$servers[] = array(
-			"pxname" => $pxname,
-			"svname" => $svname,
-			"scur" => $scur,
-			"status" => $status);
-	}
+$statistics = haproxy_get_statistics();
+$frontends = $statistics['frontends'];
+$backends = $statistics['backends'];
+$servers = $statistics['servers'];
+
+if ($show_clients == "YES") {
+	$clients = haproxy_get_clients();
 }
 
-$hasessoutput=exec('/bin/echo "show sess" | /usr/local/bin/socat unix-connect:/tmp/haproxy.socket stdio',$debug);
-foreach($debug as $line) {
-	list($sessid,$proto,$src,$fe,$be,$srv,$ts,$age,$calls,$rq,$rp,$s0,$s1,$exp) = explode(" ", $line);
-	#Retrieve data
-	$sessid = explode(":", $sessid);
-	$src = explode("=", $src);
-	$srcip = explode(":", $src[1]);
-	$srcport = explode(":", $src[1]);
-	$be = explode("=", $be);
-	$srv = explode("=", $srv);
-	$age = explode("=", $age);
-	$calls = explode("=", $calls);
-	$exp = explode("=", $exp);
-	$clients[] = array(
-		"sessid" => $sessid[0],
-		"src" => $src[1],
-		"srcip" => $srcip[0],
-		"srcport" => $srcport[1],
-		"be" => $be[1],
-		"srv" => $srv[1],
-		"age" => $age[1],
-		"calls" => $calls[1],
-		"exp" => $exp[1]);
-}
-
+echo "<table style=\"padding-top:0px; padding-bottom:0px; padding-left:0px; padding-right:0px\" width=\"100%\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\"";
 #Frontends
 if ($show_frontends == "YES") {
 	print "<tr><td class=\"widgetsubheader\" colspan=\"4\"><strong>FrontEnd(s)</strong></td></tr>";
@@ -140,19 +89,19 @@ if ($show_frontends == "YES") {
 
 #Backends/Servers w/o clients
 print "<tr><td class=\"widgetsubheader\" colspan=\"4\"><strong>Backend(s)/Server(s)</strong></td></tr>";
-        print "<tr><td class=\"listlr\"><strong>Backend(s)</strong><br>&nbsp;Server(s)";
+print "<tr><td class=\"listlr\"><strong>Backend(s)</strong><br>&nbsp;Server(s)";
 if ($show_clients == "YES") {
 	print "<br>&nbsp;&nbsp;<font color=\"blue\"><i>Client(s) addr:port</i></font>";
 }
-	print "</td>";
-        print "<td class=\"listlr\"><strong>Sessions</strong><br>(cur/max)<br>";
+print "</td>";
+print "<td class=\"listlr\"><strong>Sessions</strong><br>(cur/max)<br>";
 if ($show_clients == "YES" and $show_clients_traffic != "YES") {
 	print "<font color=\"blue\">age/id</font>";
 } elseif ($show_clients == "YES" and $show_clients_traffic == "YES") {
 	print "<font color=\"blue\">age/traffic i/o</font>";
 }
-	print "</td>";
-        print "<td class=\"listlr\" colspan=\"2\"><strong><center>Status<br>/<br>Actions</center></strong></td>";
+print "</td>";
+print "<td class=\"listlr\" colspan=\"2\"><strong><center>Status<br>/<br>Actions</center></strong></td>";
 
 foreach ($backends as $be => $bedata) {
 	if ($bedata['status'] == "UP") {
@@ -178,10 +127,22 @@ foreach ($backends as $be => $bedata) {
 				$statusicon = $in;
 				$acticon = $stop;
 				$srvname = $srvdata['svname'];
-			} else {
+			} elseif ($srvdata['status'] == "no check") {
+				$nextaction = "stop";
+				$statusicon = $in;
+				$acticon = $stop;
+				$srvname = $srvdata['svname'];
+				$srvdata['scur'] = "<font color=\"blue\">no check</font>";
+			} elseif ($srvdata['status'] == "MAINT") {
 				$nextaction = "start";
 				$statusicon = $out;
 				$acticon = $start;
+				$srvname = "<font color=\"blue\">".$srvdata['svname']."</font>";
+				$srvdata['scur'] = "<font color=\"blue\">".$srvdata['status']."</font>";
+			} else {
+				$nextaction = "stop";
+				$statusicon = $out;
+				$acticon = $stop;
 				$srvname = "<font color=\"red\">".$srvdata['svname']."</font>";
 				$srvdata['scur'] = "<font color=\"red\">".$srvdata['status']."</font>";
 			}
@@ -189,7 +150,7 @@ foreach ($backends as $be => $bedata) {
 			print "<tr><td class=\"listlr\">&nbsp;".$srvname."</td>";
 			print "<td class=\"listlr\">".$srvdata['scur']."</td>";
 			print "<td class=\"listlr\"$icondetails><center>".$statusicon."</center></td>";
-			print "<td class=\"listlr\"><center><a href=\"#\" onclick=\"control_haproxy('".$nextaction."','".$bedata['pxname']."','".$srvdata['svname']."');\">".$acticon."</a></center></td></tr>";
+			print "<td class=\"listlr\"><center><a  onclick=\"control_haproxy('".$nextaction."','".$bedata['pxname']."','".$srvdata['svname']."');\">".$acticon."</a></center></td></tr>";
 
 			if ($show_clients == "YES") {
 				foreach ($clients as $cli => $clidata) {
@@ -227,23 +188,25 @@ foreach ($backends as $be => $bedata) {
 echo"</table></div>";
 ?>
 <script type="text/javascript">
-        function getstatus_haproxy() {
-                var url = "/widgets/widgets/haproxy.widget.php";
-                var pars = 'getupdatestatus=yes';
-                var myAjax = new Ajax.Request(
-                        url,
-                        {
-                                method: 'get',
-                                parameters: pars,
-                                onComplete: activitycallback_haproxy
-                        });
-                //I know it's ugly but works.
-                setTimeout('getstatus_haproxy()', <?= $refresh_rate ?>);
-                }
-        function activitycallback_haproxy(transport) {
-                $('HAProxy').innerHTML = transport.responseText;
-        }
-        getstatus_haproxy();
+	function getstatusgetupdate() {
+		var url = "/widgets/widgets/haproxy.widget.php";
+		var pars = 'getupdatestatus=yes';
+		var myAjax = new Ajax.Request(
+			url,
+			{
+					method: 'get',
+					parameters: pars,
+					onComplete: activitycallback_haproxy
+			});
+	}
+	function getstatus_haproxy() {
+		getstatusgetupdate();
+		setTimeout('getstatus_haproxy()', <?= $refresh_rate ?>);
+	}
+	function activitycallback_haproxy(transport) {
+			$('HAProxy').innerHTML = transport.responseText;
+	}
+	getstatus_haproxy();
 </script>
 <script type="text/javascript">
         function control_haproxy(act,be,srv) {
@@ -253,8 +216,9 @@ echo"</table></div>";
                         url,
                         {
                                 method: 'get',
-                                parameters: pars
+                                parameters: pars,
                                 //onComplete: activitycallback_haproxy
+								onComplete: getstatusgetupdate
                         });
         }
 </script>
