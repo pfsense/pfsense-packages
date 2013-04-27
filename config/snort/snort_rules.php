@@ -399,7 +399,7 @@ h += 96;
 			<input type='hidden' name='openruleset' value='custom.rules'>
 			<input type='hidden' name='id' value='<?=$id;?>'>
 			
-			<textarea wrap="on" cols="85" rows="40" name="customrules"><?=$pconfig['customrules'];?></textarea>
+			<textarea wrap="soft" cols="85" rows="40" name="customrules"><?=$pconfig['customrules'];?></textarea>
 		</td>
 		<td width="3%" class="list">&nbsp;</td>
 	</tr>

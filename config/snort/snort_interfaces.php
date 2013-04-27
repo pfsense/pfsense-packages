@@ -103,11 +103,11 @@ if ($_GET['act'] == 'bartoggle' && is_numeric($id)) {
 	$if_friendly = snort_get_friendly_interface($snortcfg['interface']);
 
 	if (snort_is_running($snortcfg['uuid'], $if_real, 'barnyard2') == 'no') {
-		log_error("Toggle (barnyard starting) for {$if_friendly}({$if_real})...");
+		log_error("Toggle (barnyard starting) for {$if_friendly}({$snortcfg['descr']})...");
 		sync_snort_package_config();
 		snort_barnyard_start($snortcfg, $if_real);
 	} else {
-		log_error("Toggle (barnyard stopping) for {$if_friendly}({$if_real})...");
+		log_error("Toggle (barnyard stopping) for {$if_friendly}({$snortcfg['descr']})...");
 		snort_barnyard_stop($snortcfg, $if_real);
 	}
 
@@ -123,7 +123,7 @@ if ($_GET['act'] == 'toggle' && is_numeric($id)) {
 	$if_friendly = snort_get_friendly_interface($snortcfg['interface']);
 
 	if (snort_is_running($snortcfg['uuid'], $if_real) == 'yes') {
-		log_error("Toggle (snort stopping) for {$if_friendly}({$if_real})...");
+		log_error("Toggle (snort stopping) for {$if_friendly}({$snortcfg['descr']})...");
 		snort_stop($snortcfg, $if_real);
 
 		header( 'Expires: Sat, 26 Jul 1997 05:00:00 GMT' );
@@ -132,7 +132,7 @@ if ($_GET['act'] == 'toggle' && is_numeric($id)) {
 		header( 'Cache-Control: post-check=0, pre-check=0', false );
 		header( 'Pragma: no-cache' );
 	} else {
-		log_error("Toggle (snort starting) for {$if_friendly}({$if_real})...");
+		log_error("Toggle (snort starting) for {$if_friendly}({$snortcfg['descr']})...");
 
 		/* set flag to rebuild interface rules before starting Snort */
 		$rebuild_rules = "on";
