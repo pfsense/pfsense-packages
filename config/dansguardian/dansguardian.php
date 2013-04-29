@@ -41,7 +41,7 @@ require_once("/usr/local/pkg/dansguardian.inc");
         
 function fetch_blacklist($log_notice=true,$install_process=false) {
 	global $config,$g;
-	if (is_array($config['installedpackages']['dansguardianblacklist'] && is_array($config['installedpackages']['dansguardianblacklist']['config']))){
+	if (is_array($config['installedpackages']['dansguardianblacklist']) && is_array($config['installedpackages']['dansguardianblacklist']['config'])){
 	   	$url=$config['installedpackages']['dansguardianblacklist']['config'][0]['url'];
 	   	$uw="Found a previouns install, checking Blacklist config...";
 		}

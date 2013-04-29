@@ -1133,8 +1133,8 @@ EOF;
 			$cconf_file=file_get_contents($cconf);
 			if (preg_match("/User (\w+)/",$cconf_file,$matches)){
 				#clamd script file
-				$clamav_script='/usr/local/etc/rc.d/clamav-clamd';
-				$script_file=file($clamav_script);
+				$script='/usr/local/etc/rc.d/clamav-clamd';
+				$script_file=file($script);
 				$new_clamav_startup="";
 				$cpreg_m[0]="@NO@";
 				$cpreg_m[1]="@/usr/local@";
@@ -1154,7 +1154,7 @@ EOF;
 						$new_clamav_startup.=preg_replace($cpreg_m,$cpreg_r,$script_line);
 						}
 					}
-				file_put_contents($clamav_script, $new_clamav_startup, LOCK_EX);
+				file_put_contents($script, $new_clamav_startup, LOCK_EX);
 				chmod ($script,0755);
 				
 				if (file_exists('/var/run/dansguardian.pid') && is_process_running('clamd')){
