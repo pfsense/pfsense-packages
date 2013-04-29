@@ -205,6 +205,7 @@ function unbound_control($action) {
 							@unlink("/var/run/dnsmasq.pid");
 							mwexec("/bin/ln -s /var/run/unbound.pid /var/run/dnsmasq.pid");
 						}
+					mwexec_bg("/usr/local/etc/rc.d/unbound_monitor.sh start");
 					fetch_root_hints();
 				}
 				break;
@@ -212,12 +213,14 @@ function unbound_control($action) {
 		case "stop":
 				//Stop unbound and unmount the file system
 				if($unbound_config['unbound_status'] == "on") {
+					mwexec_bg("/usr/local/etc/rc.d/unbound_monitor.sh stop");
 					unbound_ctl_exec("stop");
 				}
 				break;
 
 		case "termstop":
 				//Stop Unbound by sigkillbypid();
+				mwexec_bg("/usr/local/etc/rc.d/unbound_monitor.sh stop");
 				sigkillbypid("{$g['varrun_path']}/unbound.pid", "TERM");
 				break;
 
