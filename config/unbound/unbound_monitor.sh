@@ -35,10 +35,23 @@ if [ -f /var/run/unbound_alarm ]; then
 	rm /var/run/unbound_alarm
 fi
 
+
+if [ "$1" = "stop" ]; then
+	pkill -f unbound_monitor.sh
+	exit 0
+fi
+
+PROCS=`/bin/pgrep -f unbound_monitor.sh | wc -l | awk '{print $1}'`
+
+if [ ${PROCS} -gt 2 ]; then
+	echo "There are another unbound monitor proccess running"
+	exit 0
+fi
+
 # Sleep 5 seconds on startup not to mangle with existing boot scripts.
 sleep 5
 
-while [ /bin/true ]; do
+while true; do
 	if [ ! -f /var/run/unbound_alarm ]; then
 		NUM_PROCS=`/bin/pgrep unbound | wc -l | awk '{print $1}'`
 		if [ $NUM_PROCS -lt 1 ]; then
