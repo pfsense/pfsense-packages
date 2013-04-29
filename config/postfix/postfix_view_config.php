@@ -2,14 +2,14 @@
 /*
 	postfix_view_config.php
 	part of pfSense (http://www.pfsense.com/)
-	Copyright (C) 2011 Marcello Coutinho <marcellocoutinho@gmail.com>
+	Copyright (C) 2011-2013 Marcello Coutinho <marcellocoutinho@gmail.com>
 	based on varnish_view_config.
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
 	modification, are permitted provided that the following conditions are met:
 
-	1. Redistributions of source code must retain the above copyright notice,
+	1. Redistributions of source code MUST retain the above copyright notice,
 	   this list of conditions and the following disclaimer.
 
 	2. Redistributions in binary form must reproduce the above copyright
@@ -29,15 +29,21 @@
 */
 
 require("guiconfig.inc");
+$pf_version=substr(trim(file_get_contents("/etc/version")),0,3);
+if ($pf_version > 2.0)
+	define('POSTFIX_LOCALBASE', '/usr/pbi/postfix-' . php_uname("m"));
+else
+  define('POSTFIX_LOCALBASE','/usr/local');
+  
 function get_file($file){
-	$files['main']="/usr/local/etc/postfix/main.cf";
-	$files['master']="/usr/local/etc/postfix/master.cf";
-	$files['recipients']="/usr/local/etc/postfix/relay_recipients";
-	$files['header']="/usr/local/etc/postfix/header_check";
-	$files['mime']="/usr/local/etc/postfix/mime_check";
-	$files['body']="/usr/local/etc/postfix/body_check";
-	$files['cidr']="/usr/local/etc/postfix/cal_cidr";
-	$files['pcre']="/usr/local/etc/postfix/cal_pcre";
+	$files['main']=POSTFIX_LOCALBASE."/etc/postfix/main.cf";
+	$files['master']=POSTFIX_LOCALBASE."/etc/postfix/master.cf";
+	$files['recipients']=POSTFIX_LOCALBASE."/etc/postfix/relay_recipients";
+	$files['header']=POSTFIX_LOCALBASE."/etc/postfix/header_check";
+	$files['mime']=POSTFIX_LOCALBASE."/etc/postfix/mime_check";
+	$files['body']=POSTFIX_LOCALBASE."/etc/postfix/body_check";
+	$files['cidr']=POSTFIX_LOCALBASE."/etc/postfix/cal_cidr";
+	$files['pcre']=POSTFIX_LOCALBASE."/etc/postfix/cal_pcre";
 
 	if ($files[$file]!="" && file_exists($files[$file])){
 		print '<textarea rows="50" cols="100%">';

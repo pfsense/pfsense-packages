@@ -2,14 +2,14 @@
 /*
 	postfix_view_config.php
 	part of pfSense (http://www.pfsense.com/)
-	Copyright (C) 2011 Marcello Coutinho <marcellocoutinho@gmail.com>
+	Copyright (C) 2011-2013 Marcello Coutinho <marcellocoutinho@gmail.com>
 	based on varnish_view_config.
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
 	modification, are permitted provided that the following conditions are met:
 
-	1. Redistributions of source code must retain the above copyright notice,
+	1. Redistributions of source code MUST retain the above copyright notice,
 	   this list of conditions and the following disclaimer.
 
 	2. Redistributions in binary form must reproduce the above copyright
@@ -33,11 +33,17 @@ require("guiconfig.inc");
 $uname=posix_uname();
 if ($uname['machine']=='amd64')
         ini_set('memory_limit', '250M');
-        
+
+$pf_version=substr(trim(file_get_contents("/etc/version")),0,3);
+if ($pf_version > 2.0)
+	define('POSTFIX_LOCALBASE', '/usr/pbi/postfix-' . php_uname("m"));
+else
+  define('POSTFIX_LOCALBASE','/usr/local');
+  
 function get_cmd(){
 	if ($_REQUEST['cmd'] =='mailq'){
 		#exec("/usr/local/bin/mailq" . escapeshellarg('^'.$m.$j." ".$hour.".*".$grep)." /var/log/maillog", $lists);
-		exec("/usr/local/bin/mailq", $mailq);
+		exec(POSTFIX_LOCALBASE."/bin/mailq", $mailq);
 		print '<table class="tabcont" width="100%" border="0" cellpadding="8" cellspacing="0">';
 		print '<tr><td colspan="6" valign="top" class="listtopic">'.gettext($_REQUEST['cmd']." Results").'</td></tr>';
 		print '<tr><td class="listlr"><strong>SID</strong></td>';
@@ -67,9 +73,9 @@ function get_cmd(){
 	}
 	if ($_REQUEST['cmd'] =='qshape'){
 		if ($_REQUEST['qshape']!="")
-			exec("/usr/local/bin/qshape -".preg_replace("/\W/","",$_REQUEST['type'])." ". preg_replace("/\W/","",$_REQUEST['qshape']), $qshape);			
+			exec(POSTFIX_LOCALBASE."/bin/qshape -".preg_replace("/\W/","",$_REQUEST['type'])." ". preg_replace("/\W/","",$_REQUEST['qshape']), $qshape);			
 		else
-			exec("/usr/local/bin/qshape", $qshape);
+			exec(POSTFIX_LOCALBASE."/bin/qshape", $qshape);
 		print '<table class="tabcont" width="100%" border="0" cellpadding="8" cellspacing="0">';
 		print '<tr><td colspan="12" valign="top" class="listtopic">'.gettext($_REQUEST['cmd']." Results").'</td></tr>';
 		$td='<td valign="top" class="listlr">';

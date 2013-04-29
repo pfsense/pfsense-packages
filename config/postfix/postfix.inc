@@ -3,14 +3,14 @@
 	postfix.inc
 	part of the Postfix package for pfSense
 	Copyright (C) 2010 Erik Fonnesbeck
-	Copyright (C) 2012 Marcello Coutinho
+	Copyright (C) 2011-2013 Marcello Coutinho
 
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
 	modification, are permitted provided that the following conditions are met:
 
-	1. Redistributions of source code must retain the above copyright notice,
+	1. Redistributions of source code MUST retain the above copyright notice,
 	   this list of conditions and the following disclaimer.
 
 	2. Redistributions in binary form must reproduce the above copyright
@@ -33,6 +33,13 @@ require_once("util.inc");
 require_once("functions.inc");
 require_once("pkg-utils.inc");
 require_once("globals.inc");
+
+$pf_version=substr(trim(file_get_contents("/etc/version")),0,3);
+if ($pf_version > 2.0)
+	define('POSTFIX_LOCALBASE', '/usr/pbi/postfix-' . php_uname("m"));
+else
+  define('POSTFIX_LOCALBASE','/usr/local');
+  
 
 $uname=posix_uname();
 if ($uname['machine']=='amd64')
@@ -57,7 +64,7 @@ function sync_relay_recipients($via_cron="cron"){
 	if ($config['installedpackages']['postfixrecipients']['config']) {
 		$relay_recipients="";
 		$relay_ldap_recipients="";
-		$ad_export="/usr/local/etc/postfix/adexport.pl";
+		$ad_export= "/usr/local/bin/adexport.pl";
 		$postfix_enabled=$config['installedpackages']['postfix']['config'][0]['enable_postfix'];
 		if (is_array($config['installedpackages']['postfixrecipients']['config'])) {
 			$relay_ldap_recipients="";
@@ -73,7 +80,7 @@ function sync_relay_recipients($via_cron="cron"){
 				#validate cront job
 				if ($via_cron == "gui"){
 					#running via pfsense gui, not time for ldap fetch.
-					$ldap_recipients='/usr/local/etc/postfix/relay_ldap_recipients.txt';
+					$ldap_recipients= POSTFIX_LOCALBASE. '/etc/postfix/relay_ldap_recipients.txt';
 					if (!file_exists($ldap_recipients))
 						system('/usr/bin/touch '. $ldap_recipients);
 					$relay_ldap_recipients=file_get_contents($ldap_recipients);
@@ -83,7 +90,7 @@ function sync_relay_recipients($via_cron="cron"){
 					$ldap_temp=array();
 					foreach ($postfix_recipients_config['row'] as $postfix_ldap) {
 						print "extracting from ".$postfix_ldap['dc']."...";
-						$filename="/usr/local/etc/postfix/relay_ldap_recipients.".$postfix_ldap['dc'].".txt";
+						$filename=POSTFIX_LOCALBASE."/etc/postfix/relay_ldap_recipients.".$postfix_ldap['dc'].".txt";
 						exec($ad_export." ".$postfix_ldap['dc']." ".$postfix_ldap['cn']." ".$postfix_ldap['username']." ".$postfix_ldap['password'],$ldap_fetch,$status);
 						if ($status == 0){
 							#write backup conf for ldap server
@@ -115,20 +122,20 @@ function sync_relay_recipients($via_cron="cron"){
 							$relay_ldap_recipients.=($recipient != ""?preg_replace("/\s+/","",$recipient)." OK\n":"");
 						
 					#save ldap relay recipients
-					file_put_contents("/usr/local/etc/postfix/relay_ldap_recipients.txt",$relay_ldap_recipients, LOCK_EX);
+					file_put_contents(POSTFIX_LOCALBASE."/etc/postfix/relay_ldap_recipients.txt",$relay_ldap_recipients, LOCK_EX);
 					}
 				}
 		}
 	#save all relay recipients, remove duplicates and reload postfix
-	$recipients_file="/usr/local/etc/postfix/relay_recipients";
+	$recipients_file=POSTFIX_LOCALBASE."/etc/postfix/relay_recipients";
 	file_put_contents($recipients_file.".unsort",$relay_ldap_recipients."\n".$relay_recipients, LOCK_EX);
 	exec('/usr/bin/sort -u '.$recipients_file.'.unsort > '.$recipients_file);
 	unlink_if_exists($recipients_file.'.unsort');
-	exec("/usr/local/sbin/postmap /usr/local/etc/postfix/relay_recipients");
+	exec(POSTFIX_LOCALBASE."/sbin/postmap ".POSTFIX_LOCALBASE."/etc/postfix/relay_recipients");
 	mwexec("/usr/local/sbin/postfix reload");
 	}
 	if($relay_recipients !="" || $relay_ldap_recipients!="")
-		return("relay_recipient_maps = hash:/usr/local/etc/postfix/relay_recipients\n");
+		return("relay_recipient_maps = hash:".POSTFIX_LOCALBASE."/etc/postfix/relay_recipients\n");
 		
 }
 function check_cron(){
@@ -137,7 +144,7 @@ function check_cron(){
 			$new_cron=array();
 			$cron_cmd_sqlite = "";
 			$cron_postfix_sqlite="";
-			$cron_cmd="/usr/local/bin/php -q /usr/local/www/postfix_recipients.php";
+			$cron_cmd= "/usr/local/bin/php -q /usr/local/www/postfix_recipients.php";
 			$postfix_enabled=$config['installedpackages']['postfix']['config'][0]['enable_postfix'];
 			#check ldap update
 			if (is_array($config['installedpackages']['postfixrecipients']['config']))
@@ -359,10 +366,11 @@ function sync_package_postfix() {
 
 
 ABOUT;
+$pf_dir=POSTFIX_LOCALBASE;
 	$postfix_main=<<<EOF
 #main.cf\
 {$copyright}
-mynetworks = /usr/local/etc/postfix/mynetwork_table
+mynetworks = {$pf_dir}/etc/postfix/mynetwork_table
 mynetworks_style = host
 
 EOF;
@@ -373,7 +381,7 @@ EOF;
 		}
 	#Header Maps
 	if ($config['installedpackages']['postfixacl']['config'][0]['header_maps']){
-		$postfix_main .= "header_checks = pcre:/usr/local/etc/postfix/header_check\n";
+		$postfix_main .= "header_checks = pcre:".POSTFIX_LOCALBASE."/etc/postfix/header_check\n";
 		$postfix_main .= "header_size_limit = 1024000\n";
 		$header_check = px_text_area_decode($config['installedpackages']['postfixacl']['config'][0]['header_maps']);
 		}
@@ -383,12 +391,12 @@ EOF;
 		}
 	#MIME Maps
 	if ($config['installedpackages']['postfixacl']['config'][0]['mime_maps']){
-		$postfix_main .= "mime_header_checks = pcre:/usr/local/etc/postfix/mime_check\n";
+		$postfix_main .= "mime_header_checks = pcre:".POSTFIX_LOCALBASE."/etc/postfix/mime_check\n";
 		$mime_check = px_text_area_decode($config['installedpackages']['postfixacl']['config'][0]['mime_maps']);
 		}
 	#Body Maps
 	if ($config['installedpackages']['postfixacl']['config'][0]['body_maps']){
-		$postfix_main .= "body_checks = pcre:/usr/local/etc/postfix/body_check\n";
+		$postfix_main .= "body_checks = pcre:".POSTFIX_LOCALBASE."/etc/postfix/body_check\n";
 		$body_check = px_text_area_decode($config['installedpackages']['postfixacl']['config'][0]['body_maps']);
 		}
 	#Client CIDR
@@ -406,7 +414,7 @@ EOF;
 		}
 	$postfix_main .= px_text_area_decode($postfix_config['maincf'])."\n". 
 		"relay_domains ={$relay_domains}\n" .
-		"transport_maps = hash:/usr/local/etc/postfix/transport\n" .
+		"transport_maps = hash:".POSTFIX_LOCALBASE."/etc/postfix/transport\n" .
 		"local_recipient_maps =\n" .
 		$all_relay_recipients.
 		"mydestination =\n" .
@@ -467,8 +475,8 @@ smtpd_sender_restrictions = reject_non_fqdn_sender,
 # Allow connections from specified local clients and strong check everybody else.								
 smtpd_client_restrictions = permit_mynetworks,
 				reject_unauth_destination,
-				check_client_access pcre:/usr/local/etc/postfix/cal_pcre,
-				check_client_access cidr:/usr/local/etc/postfix/cal_cidr,
+				check_client_access pcre:{$pf_dir}/etc/postfix/cal_pcre,
+				check_client_access cidr:{$pf_dir}/etc/postfix/cal_cidr,
 				reject_unknown_client_hostname,
 				reject_unauth_pipelining,
 				reject_multi_recipient_bounce,
@@ -477,9 +485,9 @@ smtpd_client_restrictions = permit_mynetworks,
 smtpd_recipient_restrictions = permit_mynetworks,
 				reject_unauth_destination,
 				reject_unauth_pipelining,
-				check_client_access pcre:/usr/local/etc/postfix/cal_pcre,
-				check_client_access cidr:/usr/local/etc/postfix/cal_cidr,
-				check_sender_access hash:/usr/local/etc/postfix/sender_access,
+				check_client_access pcre:{$pf_dir}/etc/postfix/cal_pcre,
+				check_client_access cidr:{$pf_dir}/etc/postfix/cal_cidr,
+				check_sender_access hash:{$pf_dir}/etc/postfix/sender_access,
 				reject_invalid_helo_hostname,
 				reject_non_fqdn_helo_hostname,
 				reject_unknown_recipient_domain,
@@ -505,18 +513,18 @@ smtpd_sender_restrictions = reject_unknown_sender_domain,
 # Allow connections from specified local clients and rbl check everybody else if rbl check are set.
 smtpd_client_restrictions = permit_mynetworks,
 				reject_unauth_destination,
-				check_sender_access hash:/usr/local/etc/postfix/sender_access,
-				check_client_access pcre:/usr/local/etc/postfix/cal_pcre,
-				check_client_access cidr:/usr/local/etc/postfix/cal_cidr
+				check_sender_access hash:{$pf_dir}/etc/postfix/sender_access,
+				check_client_access pcre:{$pf_dir}/etc/postfix/cal_pcre,
+				check_client_access cidr:{$pf_dir}/etc/postfix/cal_cidr
 				RBLRBLRBL
 
 # Whitelisting: local clients may specify any destination domain.
 #,
 smtpd_recipient_restrictions = permit_mynetworks, 
 				reject_unauth_destination,
-				check_sender_access hash:/usr/local/etc/postfix/sender_access,
-				check_client_access pcre:/usr/local/etc/postfix/cal_pcre,
-				check_client_access cidr:/usr/local/etc/postfix/cal_cidr,
+				check_sender_access hash:{$pf_dir}/etc/postfix/sender_access,
+				check_client_access pcre:{$pf_dir}/etc/postfix/cal_pcre,
+				check_client_access cidr:{$pf_dir}/etc/postfix/cal_cidr,
 				SPFSPFSPFRBLRBLRBL
 
 EOF;
@@ -578,7 +586,7 @@ switch ($antispam['zombie_blocker'])
 			$postfix_main.="postscreen_greet_action = ".$antispam['zombie_blocker']."\n";
 			}
 	
-	$postfix_main.="postscreen_access_list = permit_mynetworks,\n\t\t\tcidr:/usr/local/etc/postfix/cal_cidr\n";
+	$postfix_main.="postscreen_access_list = permit_mynetworks,\n\t\t\tcidr:".POSTFIX_LOCALBASE."/etc/postfix/cal_cidr\n";
 	$postfix_main.="postscreen_dnsbl_action= ".$antispam['zombie_blocker']."\n";
 	$postfix_main.="postscreen_blacklist_action= ".$antispam['zombie_blocker']."\n";
 
@@ -670,20 +678,20 @@ MASTEREOF2;
 	conf_mount_rw();
 
 	log_error("Writing out configuration");
-	file_put_contents("/usr/local/etc/postfix/main.cf", $postfix_main, LOCK_EX);
-	file_put_contents("/usr/local/etc/postfix/master.cf", $postfix_master, LOCK_EX);
-	file_put_contents("/usr/local/etc/postfix/transport", $transport, LOCK_EX);
-	file_put_contents("/usr/local/etc/postfix/sender_access", $sender_access, LOCK_EX);
-	file_put_contents("/usr/local/etc/postfix/cal_cidr", $cal_cidr, LOCK_EX);
-	file_put_contents("/usr/local/etc/postfix/cal_pcre", $cal_pcre, LOCK_EX);
-	file_put_contents("/usr/local/etc/postfix/header_check", $header_check, LOCK_EX);
-	file_put_contents("/usr/local/etc/postfix/mime_check", $mime_check, LOCK_EX);
-	file_put_contents("/usr/local/etc/postfix/body_check", $body_check, LOCK_EX);
-	file_put_contents("/usr/local/etc/postfix/mynetwork_table", $mynetworks, LOCK_EX);
+	file_put_contents(POSTFIX_LOCALBASE."/etc/postfix/main.cf", $postfix_main, LOCK_EX);
+	file_put_contents(POSTFIX_LOCALBASE."/etc/postfix/master.cf", $postfix_master, LOCK_EX);
+	file_put_contents(POSTFIX_LOCALBASE."/etc/postfix/transport", $transport, LOCK_EX);
+	file_put_contents(POSTFIX_LOCALBASE."/etc/postfix/sender_access", $sender_access, LOCK_EX);
+	file_put_contents(POSTFIX_LOCALBASE."/etc/postfix/cal_cidr", $cal_cidr, LOCK_EX);
+	file_put_contents(POSTFIX_LOCALBASE."/etc/postfix/cal_pcre", $cal_pcre, LOCK_EX);
+	file_put_contents(POSTFIX_LOCALBASE."/etc/postfix/header_check", $header_check, LOCK_EX);
+	file_put_contents(POSTFIX_LOCALBASE."/etc/postfix/mime_check", $mime_check, LOCK_EX);
+	file_put_contents(POSTFIX_LOCALBASE."/etc/postfix/body_check", $body_check, LOCK_EX);
+	file_put_contents(POSTFIX_LOCALBASE."/etc/postfix/mynetwork_table", $mynetworks, LOCK_EX);
 	$FILES=array("transport","sender_access");
 	foreach ($FILES as $file)
 		{
-		mwexec("/usr/local/sbin/postmap /usr/local/etc/postfix/".$file);
+		mwexec(POSTFIX_LOCALBASE."/sbin/postmap ".POSTFIX_LOCALBASE."/etc/postfix/".$file);
 		}
 	
 	#check postix dirs
@@ -710,6 +718,7 @@ MASTEREOF2;
 }
 function postfix_start(){
 	global $config;
+	$pf_dir=POSTFIX_LOCALBASE;
 	$start=<<<EOF
 	
 	sysctl kern.ipc.nmbclusters=65536
@@ -717,10 +726,10 @@ function postfix_start(){
 	sysctl kern.maxfiles=131072
 	sysctl kern.maxfilesperproc=104856
 	sysctl kern.threads.max_threads_per_proc=4096
-	/usr/local/sbin/postfix start
+	{$pf_dir}/sbin/postfix start
 	
 EOF;
-	$stop = "/usr/local/sbin/postfix stop\n";
+	$stop = POSTFIX_LOCALBASE."/sbin/postfix stop\n";
 	log_error("Writing rc_file");		
 	write_rcfile(array("file" => "postfix.sh", "start" => $start, "stop" => $stop));
 
@@ -730,7 +739,7 @@ EOF;
 	if ($config['installedpackages']['postfix']['config'][0]['enable_postfix']){
 		log_error("Reloading/starting postfix");
 		system('/bin/chmod +x /usr/local/etc/rc.d/postfix.sh');
-		mwexec_bg("/usr/local/sbin/postfix reload || /usr/local/etc/rc.d/postfix.sh start");
+		mwexec_bg(POSTFIX_LOCALBASE."/sbin/postfix reload || /usr/local/etc/rc.d/postfix.sh start");
 		log_error("Postfix setup completed");
 		}
 	else{
@@ -783,33 +792,75 @@ function postfix_php_deinstall_command() {
 
 /* Uses XMLRPC to synchronize the changes to a remote node */
 function postfix_sync_on_changes() {
-	global $config, $g;
-	$synconchanges = $config['installedpackages']['postfixsync']['config'][0]['synconchanges'];
-	$syncondbchanges= $config['installedpackages']['postfixsync']['config'][0]['rsync'];	
-	if(!$synconchanges && !$syncondbchanges) 
-		return;
-	log_error("[postfix] postfix_xmlrpc_sync.php is starting.");
-	foreach ($config['installedpackages']['postfixsync']['config'] as $rs ){
-		foreach($rs['row'] as $sh){
-		$sync_to_ip = $sh['ipaddress'];
-		$password   = $sh['password'];
-		$sync_type = $sh['sync_type'];
-		if($password && $sync_to_ip)
-			postfix_do_xmlrpc_sync($sync_to_ip, $password,$sync_type);
+	global $config, $g;			
+	if (is_array($config['installedpackages']['postfixsync']['config'])){
+		$postfix_sync=$config['installedpackages']['postfixsync']['config'][0];
+		$synctimeout = $postfix_sync['synctimeout'];
+		$synconchanges = $postfix_sync['synconchanges'];
+		switch ($synconchanges){
+			case "manual":
+				if (is_array($postfix_sync[row])){
+					$rs=$postfix_sync[row];
+					}
+				else{
+					log_error("[postfix] xmlrpc sync is enabled but there is no hosts to push postfix config.");
+					return;
+					}
+				break;
+			case "auto":
+					if (is_array($config['installedpackages']['carpsettings']) && is_array($config['installedpackages']['carpsettings']['config'])){
+						$system_carp=$config['installedpackages']['carpsettings']['config'][0];
+						$rs[0]['ipaddress']=$system_carp['synchronizetoip'];
+						$rs[0]['username']=$system_carp['username'];
+						$rs[0]['password']=$system_carp['password'];
+						$rs[0]['enabless']=true;
+						$rs[0]['sync_type']="xmlrpc";
+						if (! is_ipaddr($system_carp['synchronizetoip'])){
+							log_error("[postfix] xmlrpc sync is enabled but there is no system backup hosts to push postfix config.");
+							return;
+							}
+					}
+					else{
+						log_error("[postfix] xmlrpc sync is enabled but there is no system backup hosts to push postfix config.");
+						return;
+					}
+				break;			
+			default:
+				return;
+			break;
 		}
-	}
-	log_error("[postfix] postfix_xmlrpc_sync.php is ending.");
+		if (is_array($rs)){
+			log_error("[postfix] xmlrpc sync is starting.");
+			foreach($rs as $sh){
+				$sync_to_ip = $sh['ipaddress'];
+				if($sh['username'])
+					$username = $sh['username'];
+				else
+					$username = 'admin';
+				if($sh['password'] && $sh['ipaddress'] && $sh['enabless'])
+					postfix_do_xmlrpc_sync($sh['ipaddress'], $username, $sh['password'],$sh['sync_type'],$synctimeout);
+				}
+			log_error("[postfix] xmlrpc sync is ending.");
+			}
+ 		}
 }
 
+
 /* Do the actual XMLRPC sync */
-function postfix_do_xmlrpc_sync($sync_to_ip, $password,$sync_type) {
+function postfix_do_xmlrpc_sync($sync_to_ip,$username,$password,$sync_type,$synctimeout) {
 	global $config, $g;
 
+	if(!$username)
+		$username="admin";
+	
 	if(!$password)
 		return;
 
 	if(!$sync_to_ip)
 		return;
+		
+	if(!$synctimeout)
+		$synctimeout=120;
 
 	$xmlrpc_sync_neighbor = $sync_to_ip;
     if($config['system']['webgui']['protocol'] != "") {
@@ -851,18 +902,18 @@ function postfix_do_xmlrpc_sync($sync_to_ip, $password,$sync_type) {
 		$method = 'pfsense.merge_installedpackages_section_xmlrpc';
 		$msg = new XML_RPC_Message($method, $params);
 		$cli = new XML_RPC_Client('/xmlrpc.php', $url, $port);
-		$cli->setCredentials('admin', $password);
+		$cli->setCredentials($username, $password);
 		if($g['debug'])
 			$cli->setDebug(1);
-		/* send our XMLRPC message and timeout after 250 seconds */
-		$resp = $cli->send($msg, "250");
+		/* send our XMLRPC message and timeout after $sync_timeout seconds */
+		$resp = $cli->send($msg, $synctimeout);
 		if(!$resp) {
 			$error = "A communications error occurred while attempting postfix XMLRPC sync with {$url}:{$port}.";
 			log_error($error);
 			file_notice("sync_settings", $error, "Postfix Settings Sync", "");
 		} elseif($resp->faultCode()) {
 			$cli->setDebug(1);
-			$resp = $cli->send($msg, "250");
+			$resp = $cli->send($msg, $synctimeout);
 			$error = "An error code was received while attempting postfix XMLRPC sync with {$url}:{$port} - Code " . $resp->faultCode() . ": " . $resp->faultString();
 			log_error($error);
 			file_notice("sync_settings", $error, "Postfix Settings Sync", "");
@@ -884,15 +935,15 @@ function postfix_do_xmlrpc_sync($sync_to_ip, $password,$sync_type) {
 		log_error("postfix XMLRPC reload data {$url}:{$port}.");
 		$msg = new XML_RPC_Message($method, $params);
 		$cli = new XML_RPC_Client('/xmlrpc.php', $url, $port);
-		$cli->setCredentials('admin', $password);
-		$resp = $cli->send($msg, "250");
+		$cli->setCredentials($username, $password);
+		$resp = $cli->send($msg, $synctimeout);
 		if(!$resp) {
 			$error = "A communications error occurred while attempting postfix XMLRPC sync with {$url}:{$port} (pfsense.exec_php).";
 			log_error($error);
 			file_notice("sync_settings", $error, "postfix Settings Sync", "");
 		} elseif($resp->faultCode()) {
 			$cli->setDebug(1);
-			$resp = $cli->send($msg, "250");
+			$resp = $cli->send($msg, $synctimeout);
 			$error = "An error code was received while attempting postfix XMLRPC sync with {$url}:{$port} - Code " . $resp->faultCode() . ": " . $resp->faultString();
 			log_error($error);
 			file_notice("sync_settings", $error, "postfix Settings Sync", "");
