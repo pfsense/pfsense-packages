@@ -37,13 +37,17 @@ $show_clients = "YES";
 $show_clients_traffic = "YES";
 
 function haproxy_socket_command($command){
-	$socket = stream_socket_client('unix:///tmp/haproxy.socket');
-	fwrite($socket, "$command\n");
 	$result = array();
-	while (!feof($socket)) {
-        $result[] = fgets($socket);
-    }
-	fclose($socket);
+	if (file_exists("/tmp/haproxy.socket")) {
+		$socket = stream_socket_client('unix:///tmp/haproxy.socket', $errno, $errstr);
+		if ($socket) {
+			fwrite($socket, "$command\n");
+			while (!feof($socket)) {
+				$result[] = fgets($socket);
+			}
+			fclose($socket);
+		}
+	}
 	return $result;
 }
 
