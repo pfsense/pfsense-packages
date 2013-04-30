@@ -40,7 +40,7 @@
 	<requirements/>
 	<faq/>
 	<name>unbound</name>
-	<version>1.4.20_4</version>
+	<version>1.4.20_5</version>
 	<title>Services: Unbound DNS Forwarder: Basic Settings</title>
 	<include_file>/usr/local/pkg/unbound.inc</include_file>
 	<menu>
@@ -76,7 +76,7 @@
 		<item>http://www.pfsense.org/packages/config/unbound/unbound_advanced.xml</item>
 	</additional_files_needed>
 	<additional_files_needed>
-		<prefix>/usr/local/etc/rc.d/</prefix>
+		<prefix>/usr/local/bin/</prefix>
 		<chmod>0755</chmod>
 		<item>http://www.pfsense.org/packages/config/unbound/unbound_monitor.sh</item>
 	</additional_files_needed>

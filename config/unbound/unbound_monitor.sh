@@ -27,33 +27,48 @@
 #	POSSIBILITY OF SUCH DAMAGE.
 #
 
+export PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin
+
 set -e
 
 LOOP_SLEEP=5
+PIDFILE=/var/run/unbound_monitor.pid
 
 if [ -f /var/run/unbound_alarm ]; then
 	rm /var/run/unbound_alarm
 fi
 
+PID=""
+if [ -f "${PIDFILE}" ]; then
+	PID=`head -n 1 ${PIDFILE}`
+fi
 
 if [ "$1" = "stop" ]; then
-	pkill -f unbound_monitor.sh
+	if [ -n "${PID}" ] && ps -p ${PID} | grep -q unbound_monitor.sh; then
+		kill ${PID}
+	else
+		pkill -f unbound_monitor.sh
+	fi
 	exit 0
 fi
 
-PROCS=`/bin/pgrep -f unbound_monitor.sh | wc -l | awk '{print $1}'`
-
-if [ ${PROCS} -gt 1 ]; then
+if [ -n "${PID}" ] && ps -p ${PID} | grep -q unbound_monitor.sh; then
 	echo "There are another unbound monitor proccess running"
 	exit 0
 fi
+
+echo $$ > ${PIDFILE}
 
 # Sleep 5 seconds on startup not to mangle with existing boot scripts.
 sleep 5
 
 while true; do
+	if [ ! -f "${PIDFILE}" ]; then
+		echo $$ > ${PIDFILE}
+	fi
+
 	if [ ! -f /var/run/unbound_alarm ]; then
-		NUM_PROCS=`/bin/pgrep unbound | wc -l | awk '{print $1}'`
+		NUM_PROCS=`pgrep unbound | wc -l | awk '{print $1}'`
 		if [ $NUM_PROCS -lt 1 ]; then
 			# Unbound is not running
 			echo "Unbound has exited." | logger -p daemon.info -i -t Unbound_Alarm
@@ -63,7 +78,7 @@ while true; do
 			touch /var/run/unbound_alarm
 		fi
 	fi
-	NUM_PROCS=`/bin/pgrep unbound | wc -l | awk '{print $1}'`
+	NUM_PROCS=`pgrep unbound | wc -l | awk '{print $1}'`
 	if [ $NUM_PROCS -gt 0 ]; then
 		if [ -f /var/run/unbound_alarm ]; then
 			echo "Unbound has resumed." | logger -p daemon.info -i -t Unbound_Alarm

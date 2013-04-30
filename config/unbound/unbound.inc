@@ -70,6 +70,7 @@ function unbound_initial_setup() {
 	// We do not need the sample conf or the default rc.d startup file
 	@unlink_if_exists(UNBOUND_BASE . "/etc/unbound/unbound.conf.sample");
 	@unlink_if_exists(UNBOUND_BASE . "/etc/rc.d/unbound");
+	@unlink_if_exists("/usr/local/etc/rc.d/unbound");
 
 	// Setup rc file for startup and shutdown.
 	unbound_rc_setup();
@@ -205,7 +206,7 @@ function unbound_control($action) {
 							@unlink("/var/run/dnsmasq.pid");
 							mwexec("/bin/ln -s /var/run/unbound.pid /var/run/dnsmasq.pid");
 						}
-					mwexec_bg("/usr/local/etc/rc.d/unbound_monitor.sh start");
+					mwexec_bg("/usr/local/bin/unbound_monitor.sh");
 					fetch_root_hints();
 				}
 				break;
@@ -213,14 +214,14 @@ function unbound_control($action) {
 		case "stop":
 				//Stop unbound and unmount the file system
 				if($unbound_config['unbound_status'] == "on") {
-					mwexec_bg("/usr/local/etc/rc.d/unbound_monitor.sh stop");
+					mwexec_bg("/usr/local/bin/unbound_monitor.sh stop");
 					unbound_ctl_exec("stop");
 				}
 				break;
 
 		case "termstop":
 				//Stop Unbound by sigkillbypid();
-				mwexec_bg("/usr/local/etc/rc.d/unbound_monitor.sh stop");
+				mwexec_bg("/usr/local/bin/unbound_monitor.sh stop");
 				sigkillbypid("{$g['varrun_path']}/unbound.pid", "TERM");
 				break;
 
