@@ -43,7 +43,7 @@ fi
 
 PROCS=`/bin/pgrep -f unbound_monitor.sh | wc -l | awk '{print $1}'`
 
-if [ ${PROCS} -gt 2 ]; then
+if [ ${PROCS} -gt 1 ]; then
 	echo "There are another unbound monitor proccess running"
 	exit 0
 fi
