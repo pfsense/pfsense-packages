@@ -422,6 +422,9 @@ function write_backend($fd, $name, $pool, $frontend) {
 		$pool['retries'] = 3;
 	fwrite ($fd, "\tretries\t\t\t" . $pool['retries'] . "\n");
 
+	if ($pool['transparent_clientip'])
+		fwrite ($fd, "\tsource 0.0.0.0 usesrc clientip\n");
+		
 	if($pool['stats_enabled']=='yes') {
 		fwrite ($fd, "\tstats\t\t\tenable\n");
 		if($pool['stats_uri'])
@@ -505,13 +508,17 @@ function write_backend($fd, $name, $pool, $frontend) {
 }
 
 function haproxy_configure() {
+	global $g;
 	// reload haproxy
-	haproxy_writeconf();
+	haproxy_writeconf("{$g['varetc_path']}/haproxy.cfg");
 	return haproxy_check_run(1);
 }
 
-function haproxy_check_writtenconfig_error(&$messages) {
-	$retval = exec("haproxy -c -V -f /var/etc/haproxy.cfg 2>&1", $output, $err);
+function haproxy_check_and_run(&$messages, $reload) {
+	global $g;
+	$configname = "{$g['varetc_path']}/haproxy.cfg";
+	haproxy_writeconf("$configname.new");
+	$retval = exec("haproxy -c -V -f $configname.new 2>&1", $output, $err);
 	$messages = "";
 	if ($err > 1)
 		$messages = "<h2><strong>FATAL ERROR CODE: $err while starting haproxy</strong></h2>";
@@ -523,17 +530,24 @@ function haproxy_check_writtenconfig_error(&$messages) {
 		foreach($output as $line)
 			$messages .= "<br/>" . htmlspecialchars($line) . "\n";
 	}
-	return (strstr($retval, "Configuration file is valid"));
+	$ok = strstr($retval, "Configuration file is valid");
+	if ($ok && $reload) {
+		global $haproxy_run_message;
+		exec("mv $configname.new $configname");
+		$ok = haproxy_check_run(1) == 0;
+		$messages = $haproxy_run_message;
+	}
+	return $ok;
 }
 
-function haproxy_writeconf() {
-	global $config, $g;
+function haproxy_writeconf($configfile) {
+	global $config;
 
 	$a_global = &$config['installedpackages']['haproxy'];
 	$a_backends = &$config['installedpackages']['haproxy']['ha_backends']['item'];
 	$a_pools = &$config['installedpackages']['haproxy']['ha_pools']['item'];
 
-	$fd = fopen("{$g['varetc_path']}/haproxy.cfg", "w");
+	$fd = fopen($configfile, "w");
 
 	if(is_array($a_global)) {
 		fwrite ($fd, "global\n");
@@ -541,7 +555,10 @@ function haproxy_writeconf() {
 		if($a_global['remotesyslog'])
 			fwrite ($fd, "\tlog\t\t\t{$a_global['remotesyslog']}\t{$a_global['logfacility']}\t{$a_global['loglevel']}\n");
 		fwrite ($fd, "\tstats socket /tmp/haproxy.socket level admin\n");
-		fwrite ($fd, "\tuid\t\t\t80\n");
+		
+		if(!use_transparent_clientip_proxying())
+			fwrite ($fd, "\tuid\t\t\t80\n");
+			
 		fwrite ($fd, "\tgid\t\t\t80\n");
 		// Set numprocs if defined or use system default (#cores)
 		if($a_global['nbproc'])
@@ -831,13 +848,91 @@ function haproxy_is_running() {
         return $running;
 }
 
+
+function haproxy_load_modules() {
+	// On FreeBSD 8 ipfw is needed to allow 'transparent' proxying (getting reply's to a non-local ip to pass back to the client-socket)..
+	// On FreeBSD 9 it is probably possible to do the same with the pf option "divert-reply"
+	mute_kernel_msgs();
+        if (!is_module_loaded("ipfw.ko")) {
+                mwexec("/sbin/kldload ipfw");
+                /* make sure ipfw is not on pfil hooks */
+                mwexec("/sbin/sysctl net.inet.ip.pfil.inbound=\"pf\" net.inet6.ip6.pfil.inbound=\"pf\"" .
+                        " net.inet.ip.pfil.outbound=\"pf\" net.inet6.ip6.pfil.outbound=\"pf\"");
+        }
+	/* Activate layer2 filtering */
+	mwexec("/sbin/sysctl net.link.ether.ipfw=1");
+	unmute_kernel_msgs();
+}
+
+function use_transparent_clientip_proxying() {
+	global $config;
+	$a_backends = &$config['installedpackages']['haproxy']['ha_pools']['item'];
+	foreach ($a_backends as $backend) {
+		if ($backend["transparent_clientip"] == 'yes') {
+			return true;
+			break;
+		}
+	}
+	return false;
+}
+
+function load_ipfw_rules() {
+	// On FreeBSD 8 pf does not support "divert-reply" so ipfw is needed.
+	global $g, $config;
+	$ipfw_zone_haproxy = "haproxy";
+	
+	$a_backends = &$config['installedpackages']['haproxy']['ha_pools']['item'];
+	
+	haproxy_load_modules();
+	
+	$transparent_backends = array();
+	foreach ($a_backends as $backend) {
+		if ($backend["transparent_clientip"] != 'yes')
+			continue;
+		$real_if = get_real_interface($backend["transparent_interface"]);
+		$a_servers = &$backend['ha_servers']['item'];
+		foreach($a_servers as $server) {	
+			if (is_array($a_servers)) {
+			
+				foreach($a_servers as $be) {
+					if (!$be['status'] == "inactive")
+						continue;
+					if (!is_ipaddr($be['address']))
+						continue;
+					$item = array();
+					$item['address'] = $be['address'];
+					$item['port'] = $be['port'];
+					$item['interface'] = $real_if;//"em0";
+					$transparent_backends[] = $item;
+				}
+			}
+		}
+	}
+	mwexec("/usr/local/sbin/ipfw_context -a $ipfw_zone_haproxy", true);
+	mwexec("/usr/local/sbin/ipfw_context -a $ipfw_zone_haproxy -n em0", true);
+	$rulenum = 64000; // why that high? captiveportal.inc also does it...
+	$rules = "flush\n";
+	foreach($transparent_backends as $transparent_be) {
+		$rules .= "add $rulenum fwd localhost tcp from {$transparent_be["address"]} {$transparent_be["port"]} to any in recv {$transparent_be["interface"]}\n";
+		$rulenum++;
+	}
+	
+
+	file_put_contents("{$g['tmp_path']}/ipfw_{$ipfw_zone_haproxy}.haproxy.rules", $rules);
+	mwexec("/usr/local/sbin/ipfw_context -s $ipfw_zone_haproxy", true);
+	mwexec("/sbin/ipfw -x $ipfw_zone_haproxy -q {$g['tmp_path']}/ipfw_{$ipfw_zone_haproxy}.haproxy.rules", true);
+}
+
 function haproxy_check_run($reload) {
-	global $config, $g;
+	global $config, $g, $haproxy_run_message;
 
 	$a_global = &$config['installedpackages']['haproxy'];
 
 	exec("/usr/bin/limits -n 300014");
 
+	if(use_transparent_clientip_proxying())
+		load_ipfw_rules();
+	
 	if(isset($a_global['enable'])) {
 		if (isset($a_global['carpdev'])) {
 			$status = get_carp_interface_status($a_global['carpdev']);
@@ -856,16 +951,18 @@ function haproxy_check_run($reload) {
 			return (0);
 
 		if (haproxy_is_running()) {
-			exec("/usr/local/sbin/haproxy -f /var/etc/haproxy.cfg -p /var/run/haproxy.pid -st `cat /var/run/haproxy.pid`");
+			exec("/usr/local/sbin/haproxy -f /var/etc/haproxy.cfg -p /var/run/haproxy.pid -st `cat /var/run/haproxy.pid` 2>&1", $output, $errcode);
 		} else {
-			exec("/usr/local/sbin/haproxy -f /var/etc/haproxy.cfg -p /var/run/haproxy.pid -D");
+			exec("/usr/local/sbin/haproxy -f /var/etc/haproxy.cfg -p /var/run/haproxy.pid -D 2>&1", $output, $errcode);
 		}
-		return (0);
+		foreach($output as $line)
+			$haproxy_run_message .= "<br/>" . htmlspecialchars($line) . "\n";
+		return ($errcode);
 	} else {
 		if ($reload && haproxy_is_running()) {
 			exec("/bin/pkill -F /var/run/haproxy.pid haproxy");
 		}
-		return (1);
+		return (0);
 	}
 	
 }
