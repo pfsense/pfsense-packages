@@ -99,7 +99,7 @@
 		<field>
 			<fieldname>prefetch</fieldname>
 			<fielddescr>Prefetch Support</fielddescr>
-			<description>If enabled, the message cache elements are prefetched before they expire to keep the cache up to date. Enabling this option causes an increase of about 10 percent more traffic and load on the server, but popular items do not expire form the cache. Default is disabled.</description>
+			<description>If enabled, the message cache elements are prefetched before they expire to keep the cache up to date. Enabling this option causes an increase of about 10 percent more traffic and load on the server, but popular items do not expire from the cache. Default is disabled.</description>
 			<type>checkbox</type>
 			<default_value>off</default_value>
 			<advancedfield/>
@@ -123,7 +123,7 @@
 		<field>
 			<fieldname>harden_dnssec_stripped</fieldname>
 			<fielddescr>Harden DNSSEC data</fielddescr>
-			<description>If enabled, DNSSEC data is required for trust-anchored zones. If such data is absent, the zone is becomes bogus. If disabled then and no DNSSEC data is received, then the zone is made insecure. The default is enabled.</description>
+			<description>If enabled, DNSSEC data is required for trust-anchored zones. If such data is absent, the zone is considered bogus. If disabled and no DNSSEC data is received, then the zone is made insecure. The default is enabled.</description>
 			<type>checkbox</type>
 			<default_value>on</default_value>
 			<advancedfield/>
@@ -305,7 +305,7 @@
 		<field>
 			<fielddescr>Custom Options</fielddescr>
 			<fieldname>custom_options</fieldname>
-			<description>You can put your own custom options here, separated by semi-colons (;). These configurations options will then be added to the configuration file. &lt;br/&gt; &lt;b&gt;Note:&lt;/b&gt; They need to be Unbound native configuration options, otherwise Unbound will &lt;b&gt;not&lt;/b&gt; work.</description>
+			<description>You can put your own custom options here, separated by semi-colons (;). These configuration options will then be added to the configuration file. &lt;br/&gt; &lt;b&gt;Note:&lt;/b&gt; They need to be Unbound native configuration options, otherwise Unbound will &lt;b&gt;not&lt;/b&gt; work.</description>
 			<type>textarea</type>
 			<cols>65</cols>
 			<rows>5</rows>
