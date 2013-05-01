@@ -542,7 +542,7 @@ function usepass_changed() {
 function useproxy_changed(obj) {
 
 	if ((obj.id == "useproxy" && obj.checked) ||
-		$(obj.id + 'pass').value != 'none') {
+		(obj.id == "useproxypass" && (obj.value != 'none'))) {
 		$(obj.id + '_opts').show();
 	} else {
 		$(obj.id + '_opts').hide();
