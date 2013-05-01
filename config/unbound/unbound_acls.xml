@@ -99,10 +99,10 @@
 			<fieldname>aclaction</fieldname>
 			<fielddescr>Action</fielddescr>
 			<description>&lt;br/&gt;Choose an action:&lt;br/&gt;&lt;br/&gt;
-						&lt;b&gt;Allow:&lt;/b&gt; This actions allows queries from hosts within the netblock(s) defined below.&lt;br/&gt;
-						&lt;b&gt;Allow Snoop:&lt;/b&gt; This actions allows recursive and nonrecursive access from hosts within the netblock(s) defined below. Used for cache snooping and ideally should only be configured for your administrative host.&lt;br/&gt;
-						&lt;b&gt;Deny:&lt;/b&gt; This actions stops queries from hosts within the netblock(s) defined below.&lt;br/&gt;
-						&lt;b&gt;Refuse:&lt;/b&gt; This actions also stops queries from hosts within the netblock(s) defined below, but sends back DNS rcode REFUSED error message back to the client.</description>
+						&lt;b&gt;Allow:&lt;/b&gt; This action allows queries from hosts within the netblock(s) defined below.&lt;br/&gt;
+						&lt;b&gt;Allow Snoop:&lt;/b&gt; This action allows recursive and nonrecursive access from hosts within the netblock(s) defined below. Used for cache snooping and ideally should only be configured for your administrative host.&lt;br/&gt;
+						&lt;b&gt;Deny:&lt;/b&gt; This action stops queries from hosts within the netblock(s) defined below.&lt;br/&gt;
+						&lt;b&gt;Refuse:&lt;/b&gt; This action also stops queries from hosts within the netblock(s) defined below, but sends a DNS rcode REFUSED error message back to the client.</description>
 			<type>select</type>
 			<options>
 				<option><name>Allow</name><value>allow</value></option>
