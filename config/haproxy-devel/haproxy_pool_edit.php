@@ -50,7 +50,7 @@ if (isset($_GET['dup']))
 
 global $simplefields;
 $simplefields = array(
-"name","cookie","balance",
+"name","cookie","balance","transparent_clientip","transparent_interface",
 "check_type","checkinter","httpcheck_method","monitor_uri","monitor_httpversion","monitor_username","monitor_domain","monitor_agentport",
 "connection_timeout","server_timeout","retries",
 "stats_enabled","stats_username","stats_password","stats_uri","stats_realm","stats_admin","stats_node_enabled","stats_node","stats_desc","stats_refresh");
@@ -235,6 +235,8 @@ foreach($simplefields as $field){
 	.haproxy_check_http{display:none;}
 	.haproxy_check_username{display:none;}
 	.haproxy_check_smtp{display:none;}
+	.haproxy_transparent_clientip{display:none;}
+	.haproxy_check_agent{display:none;}
   </style>
 <script language="javascript">
 	function clearcombo(){
@@ -271,6 +273,9 @@ foreach($simplefields as $field){
 		setCSSdisplay(".haproxy_check_smtp", check_type == 'SMTP' ||  check_type == 'ESMTP');
 		setCSSdisplay(".haproxy_check_agent", check_type == 'Agent');
 
+		transparent_clientip = d.getElementById("transparent_clientip");
+		setCSSdisplay(".haproxy_transparent_clientip", transparent_clientip.checked);
+		
 		monitor_username = d.getElementById("monitor_username");
 		sqlcheckusername = d.getElementById("sqlcheckusername");
 		if(!browser_InnerText_support){
@@ -486,6 +491,32 @@ foreach($simplefields as $field){
 				</table>
 			</td>
 		</tr>
+		<tr align="left" style="display:none;">
+			<td width="22%" valign="top" class="vncell">Transparent ClientIP</td>
+			<td width="78%" class="vtable" colspan="2">
+				<input id="transparent_clientip" name="transparent_clientip" type="checkbox" value="yes" <?php if ($pconfig['transparent_clientip']=='yes') echo "checked"; ?> onclick='updatevisibility();'>
+				Use Client-IP to connect to backend servers.
+				<div class="haproxy_transparent_clientip">
+			
+			<?
+				$interfaces = get_configured_interface_with_descr();
+				$interfaces2 = array();
+				foreach($interfaces as $key => $name)
+				{
+					
+					$interfaces2[$key]['name'] = $name;
+				}
+				echo_html_select("transparent_interface",$interfaces2,$pconfig['transparent_interface']?$pconfig['transparent_interface']:"lan","","updatevisibility();");	
+			?>Interface that will connect to the backend server. (this will generally be your LAN or OPT1(dmz) interface)<br/>			
+				</div>
+				<br/>
+				Connect transparently to the backend server's so the connection seams to come straight from the client ip address.
+				For proper workings this requires the reply's traffic to pass through pfSense by means of correct routing.
+				(uses the option "source 0.0.0.0 usesrc clientip")
+				<br/><br/>
+				Note : When this is enabled for a single backend HAProxy will run as 'root', which reduces security.
+			</td>
+		</tr>
 		<tr align="left">
 			<td width="22%" valign="top" class="vncell">Per server pass thru</td>
 			<td width="78%" class="vtable" colspan="2">
@@ -514,7 +545,7 @@ foreach($simplefields as $field){
 			<td width="22%" valign="top" class="vncell">Health check method</td>
 			<td width="78%" class="vtable" colspan="2">
 				<?
-				echo_html_select("check_type",$a_checktypes,$pconfig['check_type']?$pconfig['check_type']:"HTML","","updatevisibility();");
+				echo_html_select("check_type",$a_checktypes,$pconfig['check_type']?$pconfig['check_type']:"HTTP","","updatevisibility();");
 				?><br/>
 				<textarea readonly="yes" cols="60" rows="2" id="check_type_description" name="check_type_description" style="padding:5px; border:1px dashed #990000; background-color: #ffffff; color: #000000; font-size: 8pt;"></textarea>
 			</td>

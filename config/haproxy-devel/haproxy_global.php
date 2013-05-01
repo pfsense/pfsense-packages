@@ -42,13 +42,7 @@ if ($_POST) {
 	$pconfig = $_POST;
 	
 	if ($_POST['apply']) {
-		$retval = 0;
-		config_lock();
-		$retval = haproxy_configure();
-		config_unlock();
-
-		$result = haproxy_check_writtenconfig_error($messages);
-		$savemsg = $messages;
+		$result = haproxy_check_and_run($savemsg, true);
 		if ($result)
 			unlink_if_exists($d_haproxyconfdirty_path);
 	} else {
