@@ -53,7 +53,7 @@ if [ "$1" = "stop" ]; then
 fi
 
 if [ -n "${PID}" ] && ps -p ${PID} | grep -q unbound_monitor.sh; then
-	echo "There are another unbound monitor proccess running"
+	echo "There is another unbound monitor process running"
 	exit 0
 fi
 
