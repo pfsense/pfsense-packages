@@ -477,8 +477,8 @@ if('ok' == 'ok'){
 		
 	</div>
 	<form id="path" name="path" method="get" action="" class="path">
-		<input type="text" name="p" id="location" value="<?php echo $current_folder; ?>" />
-		<img src="rbfmimg/go.png" name="go" width="35" height="18" id="go" alt="go" title="go" />
+		<input name="p" type="text" id="location" value="<?php echo $current_folder; ?>" />
+		<input name="go" type="image" id="go" value="Go" src="rbfmimg/go.png" style="width:35;height:18" />
 	</form>
 	<div class="url_path"><br />URL path: <a href="/<?php echo $url_path; ?>" target="_blank"><?php echo $url_path; ?></a></div>
 	<div class="container"> <?php echo $container; ?> <?php echo $error; ?> </div>
