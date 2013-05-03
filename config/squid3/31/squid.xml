@@ -111,112 +111,112 @@
 	<additional_files_needed>
 	    <prefix>/usr/local/pkg/</prefix>
 	    <chmod>0755</chmod>
-		<item>http://www.pfsense.org/packages/config/squid-reverse/squid.inc</item>
+		<item>http://www.pfsense.org/packages/config/squid3/31/squid.inc</item>
 	</additional_files_needed>
 	<additional_files_needed>
 	    <prefix>/usr/local/pkg/</prefix>
 	    <chmod>0755</chmod>
-		<item>http://www.pfsense.org/packages/config/squid-reverse/squid_reverse_general.xml</item>
+		<item>http://www.pfsense.org/packages/config/squid3/31/squid_reverse_general.xml</item>
 	</additional_files_needed>
 	<additional_files_needed>
 	    <prefix>/usr/local/pkg/</prefix>
 	    <chmod>0755</chmod>
-		<item>http://www.pfsense.org/packages/config/squid-reverse/squid_reverse_peer.xml</item>
+		<item>http://www.pfsense.org/packages/config/squid3/31/squid_reverse_peer.xml</item>
 	</additional_files_needed>
 	<additional_files_needed>
 	    <prefix>/usr/local/pkg/</prefix>
 	    <chmod>0755</chmod>
-		<item>http://www.pfsense.org/packages/config/squid-reverse/squid_reverse_uri.xml</item>
+		<item>http://www.pfsense.org/packages/config/squid3/31/squid_reverse_uri.xml</item>
 	</additional_files_needed>
 	<additional_files_needed>
 	    <prefix>/usr/local/pkg/</prefix>
 	    <chmod>0755</chmod>
-		<item>http://www.pfsense.org/packages/config/squid-reverse/squid_reverse_sync.xml</item>
+		<item>http://www.pfsense.org/packages/config/squid3/31/squid_reverse_sync.xml</item>
 	</additional_files_needed>
 	<additional_files_needed>
 	    <prefix>/usr/local/pkg/</prefix>
 	    <chmod>0755</chmod>
-		<item>http://www.pfsense.org/packages/config/squid-reverse/squid_sync.xml</item>
+		<item>http://www.pfsense.org/packages/config/squid3/31/squid_sync.xml</item>
 	</additional_files_needed>
 	<additional_files_needed>
 	    <prefix>/usr/local/pkg/</prefix>
 	    <chmod>0755</chmod>
-		<item>http://www.pfsense.org/packages/config/squid-reverse/squid_cache.xml</item>
+		<item>http://www.pfsense.org/packages/config/squid3/31/squid_cache.xml</item>
 	</additional_files_needed>
 	<additional_files_needed>
 	    <prefix>/usr/local/pkg/</prefix>
 	    <chmod>0755</chmod>
-		<item>http://www.pfsense.org/packages/config/squid-reverse/squid_nac.xml</item>
+		<item>http://www.pfsense.org/packages/config/squid3/31/squid_nac.xml</item>
 	</additional_files_needed>
 	<additional_files_needed>
 	    <prefix>/usr/local/pkg/</prefix>
 	    <chmod>0755</chmod>
-		<item>http://www.pfsense.org/packages/config/squid-reverse/squid_ng.xml</item>
+		<item>http://www.pfsense.org/packages/config/squid3/31/squid_ng.xml</item>
 	</additional_files_needed>
 	<additional_files_needed>
 	    <prefix>/usr/local/pkg/</prefix>
 	    <chmod>0755</chmod>
-		<item>http://www.pfsense.org/packages/config/squid-reverse/squid_ng.inc</item>
+		<item>http://www.pfsense.org/packages/config/squid3/31/squid_ng.inc</item>
 	</additional_files_needed>
 	<additional_files_needed>
 	    <prefix>/usr/local/pkg/</prefix>
 	    <chmod>0755</chmod>
-		<item>http://www.pfsense.org/packages/config/squid-reverse/squid_traffic.xml</item>
+		<item>http://www.pfsense.org/packages/config/squid3/31/squid_traffic.xml</item>
 	</additional_files_needed>
 	<additional_files_needed>
 	    <prefix>/usr/local/pkg/</prefix>
 	    <chmod>0755</chmod>
-		<item>http://www.pfsense.org/packages/config/squid-reverse/squid_upstream.xml</item>
+		<item>http://www.pfsense.org/packages/config/squid3/31/squid_upstream.xml</item>
 	</additional_files_needed>
 	<additional_files_needed>
 	    <prefix>/usr/local/pkg/</prefix>
 	    <chmod>0755</chmod>
-		<item>http://www.pfsense.org/packages/config/squid-reverse/squid_reverse.xml</item>
+		<item>http://www.pfsense.org/packages/config/squid3/31/squid_reverse.xml</item>
 	</additional_files_needed>
 	<additional_files_needed>
 	    <prefix>/usr/local/pkg/</prefix>
 	    <chmod>0755</chmod>
-		<item>http://www.pfsense.org/packages/config/squid-reverse/squid_reverse.inc</item>
+		<item>http://www.pfsense.org/packages/config/squid3/31/squid_reverse.inc</item>
 	</additional_files_needed>
 	<additional_files_needed>
 	    <prefix>/usr/local/pkg/</prefix>
 	    <chmod>0755</chmod>
-		<item>http://www.pfsense.org/packages/config/squid-reverse/squid_auth.xml</item>
+		<item>http://www.pfsense.org/packages/config/squid3/31/squid_auth.xml</item>
 	</additional_files_needed>
 	<additional_files_needed>
 	    <prefix>/usr/local/pkg/</prefix>
 	    <chmod>0755</chmod>
-		<item>http://www.pfsense.org/packages/config/squid-reverse/squid_users.xml</item>
+		<item>http://www.pfsense.org/packages/config/squid3/31/squid_users.xml</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 	    <chmod>0755</chmod>
-		<item>http://www.pfsense.org/packages/config/squid-reverse/sqpmon.sh</item>
-	</additional_files_needed>
-	<additional_files_needed>
-		<prefix>/usr/local/pkg/</prefix>
-		<chmod>0755</chmod>
-		<item>http://www.pfsense.org/packages/config/squid-reverse/swapstate_check.php</item>
+		<item>http://www.pfsense.org/packages/config/squid3/31/sqpmon.sh</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0755</chmod>
-		<item>http://www.pfsense.org/packages/config/squid-reverse/squid_reverse_redir.xml</item>
+		<item>http://www.pfsense.org/packages/config/squid3/31/swapstate_check.php</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/pkg/</prefix>
+		<chmod>0755</chmod>
+		<item>http://www.pfsense.org/packages/config/squid3/31/squid_reverse_redir.xml</item>
 	</additional_files_needed>
 	<additional_files_needed>
 	    <prefix>/usr/local/www/</prefix>
 	    <chmod>0755</chmod>
-		<item>http://www.pfsense.org/packages/config/squid-reverse/squid_monitor.php</item>
+		<item>http://www.pfsense.org/packages/config/squid3/31/squid_monitor.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
 	    <prefix>/usr/local/www/</prefix>
 	    <chmod>0755</chmod>
-		<item>http://www.pfsense.org/packages/config/squid-reverse/squid_monitor_data.php</item>
+		<item>http://www.pfsense.org/packages/config/squid3/31/squid_monitor_data.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
 	    <prefix>/usr/local/www/</prefix>
 	    <chmod>0755</chmod>
-		<item>http://www.pfsense.org/packages/config/squid-reverse/squid_log_parser.php</item>
+		<item>http://www.pfsense.org/packages/config/squid3/31/squid_log_parser.php</item>
 	</additional_files_needed>
 
 	<fields>
