@@ -772,23 +772,6 @@
       <configurationfile>squid.xml</configurationfile>
     </package>
     <package>
-      <name>squid3</name>
-      <descr>DISCONTINUED on pfSense 1.2.x [EXPERIMENTAL! Not all directives are ported yet! High performance web proxy cache.]</descr>
-      <website>http://www.squid-cache.org/</website>
-      <category>Network</category>
-		<version>3.1.14_0.1</version>
-      <status>DISCONTINUED on pfSense 1.2.x</status>
-      <required_version>1.2.1</required_version>
-      <maintainer>fernando@netfilter.com.br seth.mos@dds.nl mfuchs77@googlemail.com</maintainer>
-      <depends_on_package_base_url>http://files.pfsense.org/packages/7/All/</depends_on_package_base_url>
-		  <depends_on_package>squid-3.1.14.tbz</depends_on_package>
-      <depends_on_package>squid_radius_auth-1.10.tbz</depends_on_package>
-      <depends_on_package>openldap-client-2.4.10.tbz</depends_on_package>
-      <config_file>http://www.pfsense.org/packages/config/squid3/squid.xml</config_file>
-      <configurationfile>squid.xml</configurationfile>
-	  <noembedded>true</noembedded>
-    </package>
-    <package>
       <name>LCDproc</name>
       <descr>LCD display driver</descr>
       <website>http://www.lcdproc.org/</website>
