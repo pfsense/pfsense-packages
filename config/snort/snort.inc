@@ -513,7 +513,8 @@ function snort_postinstall() {
 		log_error(gettext("[Snort] Finished rebuilding installation from saved settings..."));
 		update_status(gettext("Starting Snort using rebuilt configuration..."));
 		log_error(gettext("[Snort] Starting Snort using rebuilt configuration..."));
-		start_service("snort");
+		if (!$g['booting'])
+			start_service("snort");
 	}
 
 	/* Done with post-install, so clear flag */
