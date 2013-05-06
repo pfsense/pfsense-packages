@@ -77,6 +77,14 @@
 						<required/>
 				</field>
 				<field>
+						<fielddescr>Order</fielddescr>
+						<fieldname>order</fieldname>
+						<description><![CDATA[
+								Select the new position for this target category. Target categories are listed in this order on ALCs and are matched from the top down in sequence.<br>
+						]]></description>
+						<type>select</type>
+				</field>
+				<field>
 						<fielddescr>Domain List</fielddescr>
 						<fieldname>domains</fieldname>
 						<description><![CDATA[
@@ -163,12 +171,18 @@
 						<description><![CDATA[Check this option to enable logging for this ACL.]]></description>
 				</field>
 				</fields>
-	<custom_delete_php_command/>
+	<custom_php_command_before_form>
+				squidguard_before_form_dest(&amp;$pkg);
+	</custom_php_command_before_form>
 	<custom_php_validation_command>
 				squidguard_validate_destination($_POST, &amp;$input_errors);
 	</custom_php_validation_command>
 	<custom_php_resync_config_command>
+				squidguard_resync_dest();
 	</custom_php_resync_config_command>
+	<custom_delete_php_command>
+				squidguard_resync_dest();
+	</custom_delete_php_command>
 	<custom_php_after_form_command>
 				squidGuard_print_javascript();
 	</custom_php_after_form_command>

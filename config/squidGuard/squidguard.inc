@@ -373,6 +373,44 @@ function squidguard_resync_acl() {
     }
 }
 
+# -----------------------------------------------------------------------------
+# squidguard_resync_dest
+# -----------------------------------------------------------------------------
+
+function squidguard_resync_dest() {
+	global $config; # !!! ORDER !!!
+
+	$conf = $config['installedpackages'][MODULE_DESTINATION]['config'];
+	$id = isset($_POST['id']) ? $_POST['id'] : $_GET['id'];
+
+	# --- sources part ---
+	# move current id by order
+	if (($id !== '') and is_array($conf)) {
+		$src_new = array();
+
+		foreach ($conf as $key => $src) {
+			$order = $src[F_ORDER];
+			# n_key: no_move=$key+$order or move=$order+$key
+			$n_key = is_numeric($order) ? sprintf("%04d%04d", $order, $key) : sprintf("%04d%04d", $key, 9999);
+			unset($src[F_ORDER]); # ! must be unset for display correct default position in 'select'!
+			$src_new[$n_key] = $src;
+		}
+		# sort by key
+		ksort($src_new);
+		reset($src_new);
+
+		$src_new = array_values($src_new); # make keys '0, 1, 2, ...'
+
+		# renew config
+		unset ($config['installedpackages'][MODULE_DESTINATION]['config']);
+		$config['installedpackages'][MODULE_DESTINATION]['config'] = $src_new;
+		write_config('Update squidguarddest config');
+
+		# renew global $squidguard_config
+		sg_init(convert_pfxml_to_sgxml());
+	}
+}
+
 # =============================================================================
 # common functions
 # =============================================================================
@@ -593,6 +631,27 @@ function squidguard_before_form_acl($pkg, $is_acl=true) {
         }
         $i++;
     }
+}
+
+# -----------------------------------------------------------------------------
+# squidguard_before_form_dest
+# -----------------------------------------------------------------------------
+function squidguard_before_form_dest($pkg) {
+	global $g, $squidguard_config;
+	$destination_items = get_sgconf_items_list(F_DESTINATIONS, 'name');
+//var_dump($squidguard_config);
+	$i=0;
+	foreach($pkg['fields']['field'] as $field) {
+		# order
+		if (is_array($destination_items) && $field['fieldname'] == 'order') {
+			$fld = &$pkg['fields']['field'][$i];
+			foreach($destination_items as $nmkey => $nm)
+				$fld['options']['option'][] = array('name'=>$nm, 'value'=>$nmkey);
+			$fld['options']['option'][] = array('name'=>'--- Last ---', 'value'=>'9999');
+			$fld['options']['option'][] = array('name'=>'-----', 'value'=>''); # ! this is must be last !
+		}
+		$i++;
+	}
 }
 
 # -----------------------------------------------------------------------------
@@ -1551,6 +1610,7 @@ function squidguard_do_xmlrpc_sync($sync_to_ip, $password, $varsyncport, $varsyn
 function squidguard_all_after_XMLRPC_resync() {
 	
 	squidguard_resync_acl();
+	squidguard_resync_dest();
 	squidguard_resync();
 	
 	log_error("SquidGuard: Finished XMLRPC process. It should be OK. For more information look at the host which started sync.");
