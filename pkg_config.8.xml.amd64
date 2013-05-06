@@ -932,8 +932,8 @@
 		<category>Security</category>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
 		<depends_on_package>lua-5.1.5_4.tbz</depends_on_package>
-		<depends_on_package>nmap-6.01.tbz</depends_on_package>
-		<depends_on_package_pbi>nmap-6.01_1-amd64.pbi</depends_on_package_pbi>
+		<depends_on_package>nmap-6.25_1.tbz</depends_on_package>
+		<depends_on_package_pbi>nmap-6.25_1-amd64.pbi</depends_on_package_pbi>
 		<config_file>http://www.pfsense.com/packages/config/nmap/nmap.xml</config_file>
 		<version>nmap-6.01 pkg v1.2</version>
 		<status>Stable</status>
