@@ -1,17 +1,20 @@
 <?php
 # ------------------------------------------------------------------------------
 /*  squidguard.inc
-    2006-2011 Serg Dvoriancev
+
+	Copyright (C) 2006-2011 Serg Dvoriancev
+	Copyright (C) 2013 Alexander Wilke <nachtfalkeaw@web.de>
+	Copyright (C) 2013 Marcello Coutinho
 
     part of pfSense (www.pfSense.com)
 
     Redistribution and use in source and binary forms, with or without
     modification, are permitted provided that the following conditions are met:
 
-    1. Redistributions of source code must retain the above copyright notice,
+    1. Redistributions of source code MUST retain the above copyright notice,
        this list of conditions and the following disclaimer.
 
-    2. Redistributions in binary form must reproduce the above copyright
+    2. Redistributions in binary form MUST reproduce the above copyright
        notice, this list of conditions and the following disclaimer in the
        documentation and/or other materials provided with the distribution.
 
@@ -302,13 +305,9 @@ function squidguard_validate_rewrite($post, $input_errors) {
 # -----------------------------------------------------------------------------
 function squidguard_resync() {
     $upload_file = '';
-    $submit = '';
-    $url    = '';
-    $proxy  = '';
-
-    $submit = isset($_POST['submit'])          ? $_POST['submit']          : $_GET['submit'];
-    $url    = isset($_POST[F_BLACKLISTURL])    ? $_POST[F_BLACKLISTURL]    : $_GET[F_BLACKLISTURL];
-    $proxy  = isset($_POST['blacklist_proxy']) ? $_POST['blacklist_proxy'] : $_GET['blacklist_proxy'];
+    $submit = isset($_REQUEST['submit'])         ? $_REQUEST['submit']          : '';
+    $url    = isset($_REQUEST[F_BLACKLISTURL])   ? $_REQUEST[F_BLACKLISTURL]    : '';
+    $proxy  = isset($_REQUEST['blacklist_proxy'])? $_REQUEST['blacklist_proxy'] : '';
 
     sg_init(convert_pfxml_to_sgxml());
 
@@ -332,7 +331,10 @@ function squidguard_resync() {
     //}
 
     squidguard_cron_install();
-	squidguard_sync_on_changes();
+    
+    //Sync only with apply button to avoid multiples reloads on backup server while editing master config
+    if ($submit == APPLY_BTN) 
+		squidguard_sync_on_changes();
 }
 
 # -----------------------------------------------------------------------------
@@ -1465,52 +1467,75 @@ function squidguard_blacklist_list()
 /* Uses XMLRPC to synchronize the changes to a remote node */
 function squidguard_sync_on_changes() {
 	global $config, $g;
-	$varsyncenablexmlrpc = $config['installedpackages']['squidguardsync']['config'][0]['varsyncenablexmlrpc'];
-	$varsynctimeout = $config['installedpackages']['squidguardsync']['config'][0]['varsynctimeout'];	
-
-	// if checkbox is NOT checked do nothing
-	if(!$varsyncenablexmlrpc) {
+	if (is_array($config['installedpackages']['squidguardsync'])){
+		$synconchanges = $config['installedpackages']['squidguardsync']['config'][0]['varsyncenablexmlrpc'];
+		$varsynctimeout = $config['installedpackages']['squidguardsync']['config'][0]['varsynctimeout'];
+		}
+	else
+	{
 		return;
 	}
- 
-	log_error("SquidGuard: Starting XMLRPC process (squidguard_do_xmlrpc_sync) with timeout {$varsynctimeout} seconds.");
-	
-	// if checkbox is checked get IP and password of the destination hosts
-	foreach ($config['installedpackages']['squidguardsync']['config'] as $rs ){
-		foreach($rs['row'] as $sh){
-			// if checkbox is NOT checked do nothing
-			if($sh['varsyncdestinenable']) {
-				$varsyncprotocol 	= $sh['varsyncprotocol'];
-				$sync_to_ip 		= $sh['varsyncipaddress'];
-				$password   		= $sh['varsyncpassword'];
-				$varsyncport 		= $sh['varsyncport'];
-				// check if all credentials are complete for this host
-				if($password && $sync_to_ip && $varsyncport && $varsyncprotocol) {
-					squidguard_do_xmlrpc_sync($sync_to_ip, $password, $varsyncport, $varsyncprotocol);
+
+	// if checkbox is NOT checked do nothing
+	switch ($synconchanges){
+		case "manual":
+			if (is_array($config['installedpackages']['squidguardsync']['config'][0]['row'])){
+				$rs=$config['installedpackages']['squidguardsync']['config'][0]['row'];
+				}
+			else{
+				log_error("[Squidguard] xmlrpc sync is enabled but there is no hosts to push on Squidguard config.");
+				return;
+				}
+			break;
+		case "auto":
+				if (is_array($config['installedpackages']['carpsettings']) && is_array($config['installedpackages']['carpsettings']['config'])){
+					$system_carp=$config['installedpackages']['carpsettings']['config'][0];
+					$rs[0]['varsyncdestinenable']="on";
+					$rs[0]['varsyncprotocol']=($config['system']['webgui']['protocol']!=""?$config['system']['webgui']['protocol']:"https");
+					$rs[0]['varsyncipaddress']=$system_carp['synchronizetoip'];
+					$rs[0]['varsyncpassword']=$system_carp['password'];
+					$rs[0]['varsyncport']=($config['system']['webgui']['port']!=""?$config['system']['webgui']['port']:"443");
+					if (! is_ipaddr($system_carp['synchronizetoip'])){
+						log_error("[Squidguard] xmlrpc sync is enabled but there is no system backup hosts to push squid config.");
+						return;
+						}
+				}
+				else{
+					log_error("[Squidguard] xmlrpc sync is enabled but there is no system backup hosts to push squid config.");
+					return;
+				}
+			break;		
+		default:
+			return;
+		break;
+		}
+		if (is_array($rs)){
+			log_error("[SquidGuard] xmlrpc sync is starting with timeout {$varsynctimeout} seconds.");
+			foreach($rs as $sh){
+				if($sh['varsyncdestinenable']){
+					$varsyncprotocol 	= $sh['varsyncprotocol'];
+					$sync_to_ip 		= $sh['varsyncipaddress'];
+					$password   		= $sh['varsyncpassword'];
+					$varsyncport 		= $sh['varsyncport'];
+					if($password && $sync_to_ip)
+						squidguard_do_xmlrpc_sync($sync_to_ip, $password, $varsyncport, $varsyncprotocol,$varsynctimeout);
+					else
+						log_error("SquidGuard: XMLRPC Sync with {$sh['varsyncipaddress']} has incomplete credentials. No XMLRPC Sync done!");
 				}
 				else {
-					log_error("SquidGuard: XMLRPC Sync with {$sh['varsyncipaddress']} has incomplete credentials. No XMLRPC Sync done!");
+				log_error("SquidGuard: XMLRPC Sync with {$sh['varsyncipaddress']} is disabled");
 				}
 			}
-			else {
-				log_error("SquidGuard: XMLRPC Sync with {$sh['varsyncipaddress']} is disabled");
+			log_error("[SquidGuard] xmlrpc sync is ending.");
 			}
-		}
-	}
-	log_error("SquidGuard: Finished XMLRPC process (squidguard_do_xmlrpc_sync).");
 }
 
 /* Do the actual XMLRPC sync */
-function squidguard_do_xmlrpc_sync($sync_to_ip, $password, $varsyncport, $varsyncprotocol) {
+function squidguard_do_xmlrpc_sync($sync_to_ip, $password, $varsyncport, $varsyncprotocol,$varsynctimeout) {
 	global $config, $g;
 
-	$varsynctimeout = $config['installedpackages']['squidguardsync']['config'][0]['varsynctimeout'];
-
-	if($varsynctimeout == '' || $varsynctimeout == 0) {
+	if($varsynctimeout == '' || $varsynctimeout == 0)
 		$varsynctimeout = 150;
-	}
-
-	// log_error("SquidGuard: Starting XMLRPC process (squidguard_do_xmlrpc_sync) with timeout {$varsynctimeout} seconds.");
 
 	if(!$password)
 		return;
