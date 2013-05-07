@@ -1615,6 +1615,27 @@
 		<configurationfile>nrpe2.xml</configurationfile>
 	</package>
 	<package>
+		<name>Check_mk agent</name>
+		<website>https://github.com/sileht/check_mk/blob/master/doc/README</website>
+		<descr><![CDATA[The basic idea of check_mk is to fetch "all" information about a target host at once.<br>For each host to be monitored check_mk is called by Nagios only once per time period.]]></descr>
+		<category>Services</category>
+		<depends_on_package_base_url>http://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
+		<build_port_path>/usr/ports/sysutils/muse</build_port_path>
+		<build_port_path>/usr/ports/sysutils/ipmitool</build_port_path>
+		<build_port_path>devel/libstatgrab</build_port_path>
+		<build_pbi>
+			<ports_before>sysutils/ipmitool devel/libstatgrab</ports_before>
+			<port>sysutils/muse</port>
+		</build_pbi>
+		<build_options></build_options>
+		<config_file>http://www.pfsense.com/packages/config/checkmk-agent/checkmk.xml</config_file>
+		<version>v0.1</version>
+		<status>RC1</status>
+		<required_version>2.0</required_version>
+		<maintainer>marcellocoutinho@gmail.com</maintainer>
+		<configurationfile>checkmk.xml</configurationfile>
+	</package>
+	<package>
 		<name>SSHDCond</name>
 		<descr><![CDATA[Allows to define SSH overrides for users,groups,hosts and addresses using Match in a convenient way.<br />
 				This package acts as an access list frontend for ssh connections]]></descr>
