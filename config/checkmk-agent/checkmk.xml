@@ -83,7 +83,9 @@
 			<fieldname>checkmkenable</fieldname>
 			<type>checkbox</type>
 			<size>60</size>
-			<description>Enable check_mk Agent on this server. This will check all config options to run check_mk binary on your system.</description>
+			<description><![CDATA[Enable check_mk Agent on this server. This will check all config options to run check_mk binary on your system.<br>
+						<strong>Reference:</strong><br>https://github.com/sileht/check_mk/tree/master/doc<br><br>
+						<strong>Latest check_mk version:</strong> fetch -o /usr/local/bin/check_mk_agent 'http://git.mathias-kettner.de/git/?p=check_mk.git;a=blob_plain;f=agents/check_mk_agent.freebsd;hb=HEAD']]></description>
 			<required/>
 		</field>
 		<field>
@@ -100,15 +102,7 @@
 			<description>Enter hosts(comma separeted) that can communicate with this agent.</description>
 			<type>input</type>
 			<size>60</size>
-		</field>
-		<field>
-			<fielddescr>Hosts.allow</fielddescr>
-			<fieldname>checkmkhosts</fieldname>
-			<description><![CDATA[https://github.com/sileht/check_mk/tree/master/doc]]></description>
-			<type>info</type>
-			<size>60</size>
-		</field>
-		
+		</field>	
 	</fields>
 	<custom_php_install_command>
 		checkmk_install();
