@@ -42,7 +42,7 @@
     <faq>Currently there are no FAQ items provided.</faq>
 	<name>checkmk</name>
 	<version>0.5</version>
-	<title>checkmk</title>
+	<title>Check_mk Agent</title>
 	<include_file>/usr/local/pkg/checkmk.inc</include_file>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
@@ -55,10 +55,10 @@
 		<item>http://www.pfsense.com/packages/config/checkmk-agent/checkmk_sync.xml</item>
 	</additional_files_needed>
 	<menu>
-		<name>checkmk</name>
+		<name>Check_mk Agent</name>
 		<tooltiptext>checkmk</tooltiptext>
 		<section>Diagnostics</section>
-		<configfile>checkmk.xml</configfile>
+		<url>/pkg_edit.php?xml=checkmk.xml</url>
 	</menu>
 	<tabs>
 		<tab>

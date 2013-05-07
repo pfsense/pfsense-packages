@@ -42,7 +42,7 @@
     <faq>Currently there are no FAQ items provided.</faq>
 	<name>checkmksync</name>
 	<version>1.1</version>
-	<title>checkmk: Sync</title>
+	<title>Check_mk Agent: Sync</title>
 	<include_file>/usr/local/pkg/checkmk.inc</include_file>
 	<tabs>
 		<tab>
