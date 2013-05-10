@@ -595,7 +595,7 @@
 		<!-- NOTE: Distfile must be fetched manually from http://dansguardian.org/downloads/2/Alpha/dansguardian-2.12.0.0.tar.gz -->
 	</package>
 	<package>
-		<name>mailscanner-dev</name>
+		<name>mailscanner</name>
 		<internal_name>mailscanner</internal_name>
 		<website>www.mailscanner.info</website>
 		<descr><![CDATA[MailScanner is an e-mail security and anti-spam package for e-mail gateway systems.<br />
@@ -610,7 +610,7 @@
 		<depends_on_package>p5-Mail-SPF-2.007.tbz</depends_on_package>
 		<depends_on_package>p5-IP-Country-2.27.tbz</depends_on_package>
 		<depends_on_package_pbi>mailscanner-4.84.5_3-amd64.pbi</depends_on_package_pbi>
-		<version>4.84.5_3 pkg v.0.2.1</version>
+		<version>4.84.5_3 pkg v.0.2.2</version>
 		<status>beta</status>
 		<required_version>2.0</required_version>
 		<configurationfile>mailscanner.xml</configurationfile>
