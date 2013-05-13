@@ -463,7 +463,7 @@ EOF;
 	}
 	if ($antispam['reject_unknown_helo_hostname']){
 		$reject_unknown_helo_hostname = <<<EOF
-smtpd_helo_restrictions = check_helo_access pcre:/usr/local/etc/postfix/helo_check,
+smtpd_helo_restrictions = check_helo_access pcre:{$pf_dir}/etc/postfix/helo_check,
 				reject_unknown_helo_hostname,
 				reject_invalid_helo_hostname,
 				reject_non_fqdn_helo_hostname,
@@ -703,6 +703,7 @@ MASTEREOF2;
 	file_put_contents(POSTFIX_LOCALBASE."/etc/postfix/cal_cidr", $cal_cidr, LOCK_EX);
 	file_put_contents(POSTFIX_LOCALBASE."/etc/postfix/cal_pcre", $cal_pcre, LOCK_EX);
 	file_put_contents(POSTFIX_LOCALBASE."/etc/postfix/header_check", $header_check, LOCK_EX);
+	file_put_contents(POSTFIX_LOCALBASE."/etc/postfix/helo_check", $helo_check, LOCK_EX);
 	file_put_contents(POSTFIX_LOCALBASE."/etc/postfix/mime_check", $mime_check, LOCK_EX);
 	file_put_contents(POSTFIX_LOCALBASE."/etc/postfix/body_check", $body_check, LOCK_EX);
 	file_put_contents(POSTFIX_LOCALBASE."/etc/postfix/mynetwork_table", $mynetworks, LOCK_EX);
