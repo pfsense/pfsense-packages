@@ -28,12 +28,6 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-// Turn on buffering to speed up rendering
-ini_set('output_buffering','true');
-
-// Start buffering with a cache size of 100000
-ob_start(null, "1000");
-
 $nocsrf = true;
 require_once("guiconfig.inc");
 require_once("/usr/local/pkg/snort/snort.inc");
@@ -225,6 +219,13 @@ if ($pfsense_stable == 'yes')
 			</td>
 		</tr>
 <?php $nnats = $i = 0;
+
+// Turn on buffering to speed up rendering
+ini_set('output_buffering','true');
+
+// Start buffering to fix display lag issues in IE9 and IE10
+ob_start(null, 0);
+
 /* If no interfaces are defined, then turn off the "no rules" warning */
 $no_rules_footnote = false;
 if ($id_gen == 0)
@@ -344,7 +345,7 @@ foreach ($a_nat as $natent): ?>
 			</table>
 		</td>	
 		</tr>
-		<?php $i++; $nnats++; endforeach; ?>
+		<?php $i++; $nnats++; endforeach; ob_end_flush(); ?>
 			<tr>
 				<td class="list"></td>
 				<td class="list" colspan="6">

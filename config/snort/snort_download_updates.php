@@ -88,18 +88,6 @@ include_once("head.inc");
 <?if($pfsense_stable == 'yes'){echo '<p class="pgtitle">' . $pgtitle . '</p>';}?>
 
 <script language="javascript" type="text/javascript">
-function popup(url) 
-{
- params  = 'width='+screen.width;
- params += ', height='+screen.height;
- params += ', top=0, left=0'
- params += ', fullscreen=yes';
-
- newwin=window.open(url,'LogViewer', params);
- if (window.focus) {newwin.focus()}
- return false;
-}
-
 function wopen(url, name, w, h)
 {
 // Fudge factors for window decoration space.

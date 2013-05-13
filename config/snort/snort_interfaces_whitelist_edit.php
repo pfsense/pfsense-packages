@@ -66,7 +66,7 @@ function is_validwhitelistname($name) {
 	if (!is_string($name))
 		return false;
 
-	if (!preg_match("/[^a-zA-Z0-9\.\/]/", $name))
+	if (!preg_match("/[^a-zA-Z0-9\_\.\/]/", $name))
 		return true;
 
 	return false;
@@ -80,6 +80,7 @@ if (isset($id) && $a_whitelist[$id]) {
 	$pconfig['detail'] = $a_whitelist[$id]['detail'];
 	$pconfig['address'] = $a_whitelist[$id]['address'];
 	$pconfig['descr'] = html_entity_decode($a_whitelist[$id]['descr']);
+	$pconfig['localnets'] = $a_whitelist[$id]['localnets'];
 	$pconfig['wanips'] = $a_whitelist[$id]['wanips'];
 	$pconfig['wangateips'] = $a_whitelist[$id]['wangateips'];
 	$pconfig['wandnsips'] = $a_whitelist[$id]['wandnsips'];
@@ -102,7 +103,7 @@ if ($_POST['submit']) {
 		$input_errors[] = gettext("Whitelist file names may not be named defaultwhitelist.");
 
 	if (is_validwhitelistname($_POST['name']) == false)
-		$input_errors[] = gettext("Whitelist file name may only consist of the characters a-z, A-Z and 0-9 _. Note: No Spaces. Press Cancel to reset.");
+		$input_errors[] = gettext("Whitelist file name may only consist of the characters \"a-z, A-Z, 0-9 and _\". Note: No Spaces or dashes. Press Cancel to reset.");
 
 	/* check for name conflicts */
 	foreach ($a_whitelist as $w_list) {
@@ -124,6 +125,7 @@ if ($_POST['submit']) {
 		/* post user input */
 		$w_list['name'] = $_POST['name'];
 		$w_list['uuid'] = $whitelist_uuid;
+		$w_list['localnets'] = $_POST['localnets']? 'yes' : 'no';
 		$w_list['wanips'] = $_POST['wanips']? 'yes' : 'no';
 		$w_list['wangateips'] = $_POST['wangateips']? 'yes' : 'no';
 		$w_list['wandnsips'] = $_POST['wandnsips']? 'yes' : 'no';
@@ -179,8 +181,8 @@ if ($savemsg)
 		<td class="vtable"><input name="name" type="text" id="name"
 			size="40" value="<?=htmlspecialchars($pconfig['name']);?>" /> <br />
 		<span class="vexpl"> <?php echo gettext("The list name may only consist of the " .
-		"characters a-z, A-Z and 0-9."); ?> <span class="red"><?php echo gettext("Note:"); ?> </span>
-		<?php echo gettext("No Spaces."); ?> </span></td>
+		"characters \"a-z, A-Z, 0-9 and _\"."); ?>&nbsp;&nbsp;<span class="red"><?php echo gettext("Note:"); ?> </span>
+		<?php echo gettext("No Spaces or dashes."); ?> </span></td>
 	</tr>
 	<tr>
 		<td width="22%" valign="top" class="vncell"><?php echo gettext("Description"); ?></td>
@@ -190,24 +192,33 @@ if ($savemsg)
 		"reference (not parsed)."); ?> </span></td>
 	</tr>
 	<tr>
-		<td colspan="2" valign="top" class="listtopic"><?php echo gettext("Add auto generated ips."); ?></td>
+		<td colspan="2" valign="top" class="listtopic"><?php echo gettext("Add auto-generated IP Addresses."); ?></td>
 	</tr>
+
+	<tr>
+		<td width="22%" valign="top" class="vncell"><?php echo gettext("Local Networks"); ?></td>
+		<td width="78%" class="vtable"><input name="localnets" type="checkbox"
+			id="localnets" size="40" value="yes"
+			<?php if($pconfig['localnets'] == 'yes'){ echo "checked";} if($pconfig['localnets'] == ''){ echo "checked";} ?> />
+		<span class="vexpl"> <?php echo gettext("Add firewall Local Networks to the list (excluding WAN)."); ?> </span></td>
+	</tr>
+
 	<tr>
 		<td width="22%" valign="top" class="vncell"><?php echo gettext("WAN IPs"); ?></td>
 		<td width="78%" class="vtable"><input name="wanips" type="checkbox"
 			id="wanips" size="40" value="yes"
 			<?php if($pconfig['wanips'] == 'yes'){ echo "checked";} if($pconfig['wanips'] == ''){ echo "checked";} ?> />
-		<span class="vexpl"> <?php echo gettext("Add WAN IPs to the list."); ?> </span></td>
+		<span class="vexpl"> <?php echo gettext("Add WAN interface IPs to the list."); ?> </span></td>
 	</tr>
 	<tr>
-		<td width="22%" valign="top" class="vncell"><?php echo gettext("Wan Gateways"); ?></td>
+		<td width="22%" valign="top" class="vncell"><?php echo gettext("WAN Gateways"); ?></td>
 		<td width="78%" class="vtable"><input name="wangateips"
 			type="checkbox" id="wangateips" size="40" value="yes"
 			<?php if($pconfig['wangateips'] == 'yes'){ echo "checked";} if($pconfig['wangateips'] == ''){ echo "checked";} ?> />
 		<span class="vexpl"> <?php echo gettext("Add WAN Gateways to the list."); ?> </span></td>
 	</tr>
 	<tr>
-		<td width="22%" valign="top" class="vncell"><?php echo gettext("Wan DNS servers"); ?></td>
+		<td width="22%" valign="top" class="vncell"><?php echo gettext("WAN DNS servers"); ?></td>
 		<td width="78%" class="vtable"><input name="wandnsips"
 			type="checkbox" id="wandnsips" size="40" value="yes"
 			<?php if($pconfig['wandnsips'] == 'yes'){ echo "checked";} if($pconfig['wandnsips'] == ''){ echo "checked";} ?> />
@@ -228,11 +239,11 @@ if ($savemsg)
 		<span class="vexpl"> <?php echo gettext("Add VPN Addresses to the list."); ?> </span></td>
 	</tr>
 	<tr>
-		<td colspan="2" valign="top" class="listtopic"><?php echo gettext("Add your own custom ips."); ?></td>
+		<td colspan="2" valign="top" class="listtopic"><?php echo gettext("Add custom IP Addresses from configured Aliases."); ?></td>
 	</tr>
 	<tr>
 		<td width="22%" valign="top" class="vncellreq">
-		<div id="addressnetworkport"><?php echo gettext("Alias of IP's"); ?></div>
+		<div id="addressnetworkport"><?php echo gettext("Alias Name:"); ?></div>
 		</td>
 		<td width="78%" class="vtable">
 		<input autocomplete="off" name="address" type="text" class="formfldalias" id="address" size="30" value="<?=htmlspecialchars($pconfig['address']);?>" />

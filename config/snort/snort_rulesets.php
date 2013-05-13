@@ -299,7 +299,7 @@ function enable_change()
 ?>
 		<tr>
 			<td>
-			<table id="sortabletable1" class="sortable" width="100%" border="0"
+			<table width="100%" border="0"
 				cellpadding="0" cellspacing="0">
 			<tr>
 				<td colspan="6" class="listtopic"><?php echo gettext("Automatic flowbit resolution"); ?><br/></td>
@@ -323,7 +323,7 @@ function enable_change()
 					   </tr>
 					   <tr>
 						<td width="15%" class="listn"><?php echo gettext("Auto Flowbit Rules"); ?></td>
-						<td width="85%"><input type="button" class="formbtn" value="View" onclick="wopen('snort_rules_edit.php?id=<?=$id;?>&openruleset=<?=$flowbit_rules_file;?>','FileViewer',800,600)" <?php echo $btn_view_flowb_rules; ?>/>
+						<td width="85%"><input type="button" class="formbtn" value="View" onclick="parent.location='snort_rules_flowbits.php?id=<?=$id;?>'" <?php echo $btn_view_flowb_rules; ?>/>
 						&nbsp;&nbsp;<span class="vexpl"><?php echo gettext("Click to view auto-enabled rules required to satisfy flowbit dependencies"); ?></span></td>
 					   </tr>
 					   <tr>

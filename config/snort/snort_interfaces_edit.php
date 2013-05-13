@@ -76,10 +76,6 @@ if (isset($_GET['dup']))
 	unset($id);
 
 if ($_POST["Submit"]) {
-	if ($_POST['descr'] == '' && $pconfig['descr'] == '') {
-		$input_errors[] = "Please enter a description for your reference.";
-	}
-
 	if (!$_POST['interface'])
 		$input_errors[] = "Interface is mandatory";
 
@@ -89,7 +85,19 @@ if ($_POST["Submit"]) {
 		$natent['interface'] = $_POST['interface'];
 		$natent['enable'] = $_POST['enable'] ? 'on' : 'off';
 		$natent['uuid'] = $pconfig['uuid'];
-		if ($_POST['descr']) $natent['descr'] =  $_POST['descr']; else unset($natent['descr']);
+
+		/* See if the HOME_NET, EXTERNAL_NET, WHITELIST or SUPPRESS LIST values were changed */
+		$snort_reload = false;
+		if ($_POST['homelistname'] && ($_POST['homelistname'] <> $natent['homelistname']))
+			$snort_reload = true;
+		if ($_POST['externallistname'] && ($_POST['externallistname'] <> $natent['externallistname']))
+			$snort_reload = true;
+		if ($_POST['suppresslistname'] && ($_POST['suppresslistname'] <> $natent['suppresslistname']))
+			$snort_reload = true;
+		if ($_POST['whitelistname'] && ($_POST['whitelistname'] <> $natent['whitelistname']))
+			$snort_reload = true;
+
+		if ($_POST['descr']) $natent['descr'] =  $_POST['descr']; else $natent['descr'] = strtoupper($natent['interface']);
 		if ($_POST['performance']) $natent['performance'] = $_POST['performance']; else  unset($natent['performance']);
 		/* if post = on use on off or rewrite the conf */
 		if ($_POST['blockoffenders7'] == "on") $natent['blockoffenders7'] = 'on'; else $natent['blockoffenders7'] = 'off';
@@ -128,6 +136,15 @@ if ($_POST["Submit"]) {
 		/* Update snort.conf and snort.sh files for this interface */
 		sync_snort_package_config();
 
+		/*******************************************************/
+		/* Signal Snort to reload configuration if we changed  */
+		/* HOME_NET, the Whitelist, EXTERNAL_NET or Suppress   */
+		/* list values.  The function only signals a running   */
+		/* Snort instance to safely reload these parameters.   */
+		/*******************************************************/
+		if ($snort_reload == true)
+			snort_reload_config($natent, $if_real);
+
 		header( 'Expires: Sat, 26 Jul 1997 05:00:00 GMT' );
 		header( 'Last-Modified: ' . gmdate( 'D, d M Y H:i:s' ) . ' GMT' );
 		header( 'Cache-Control: no-store, no-cache, must-revalidate' );
@@ -148,29 +165,6 @@ include_once("head.inc");
 
 <?php include("fbegin.inc"); ?>
 
-<script language="JavaScript">
-<!--
-
-function enable_blockoffenders() {
-	var endis = !(document.iform.blockoffenders7.checked);
-	document.iform.blockoffenderskill.disabled=endis;
-	document.iform.blockoffendersip.disabled=endis;
-}
-
-function enable_change(enable_change) {
-	endis = !(document.iform.enable.checked || enable_change);
-	// make sure a default answer is called if this is invoked.
-	endis2 = (document.iform.enable);
-	document.iform.performance.disabled = endis;
-	document.iform.blockoffenders7.disabled = endis;
-	document.iform.alertsystemlog.disabled = endis;
-	document.iform.externallistname.disabled = endis;
-	document.iform.homelistname.disabled = endis;
-	document.iform.suppresslistname.disabled = endis;
-	document.iform.configpassthru.disabled = endis;
-}
-//-->
-</script>
 <?if($pfsense_stable == 'yes'){echo '<p class="pgtitle">' . $pgtitle . '</p>';}?>
 
 <?php
@@ -220,7 +214,7 @@ function enable_change(enable_change) {
 	<tr>
 		<td width="22%" valign="top" class="vncellreq"><?php echo gettext("Interface"); ?></td>
 		<td width="78%" class="vtable">
-			<select name="interface" class="formselect">
+			<select name="interface" class="formselect" tabindex="0">
 		<?php
 			if (function_exists('get_configured_interface_with_descr'))
 				$interfaces = get_configured_interface_with_descr();
@@ -235,8 +229,8 @@ function enable_change(enable_change) {
 			<?php if ($iface == $pconfig['interface']) echo "selected"; ?>><?=htmlspecialchars($ifacename);?>
 				</option>
 			<?php 	endforeach; ?>
-			</select><br>
-			<span class="vexpl"><?php echo gettext("Choose which interface this rule applies to."); ?><br/>
+			</select>&nbsp;&nbsp;
+			<span class="vexpl"><?php echo gettext("Choose which interface this Snort instance applies to."); ?><br/>
 				<span class="red"><?php echo gettext("Hint:"); ?> </span><?php echo gettext("in most cases, you'll want to use WAN here."); ?></span><br/></td>
 	</tr>
 	<tr>
@@ -244,8 +238,7 @@ function enable_change(enable_change) {
 				<td width="78%" class="vtable"><input name="descr" type="text"
 					class="formfld" id="descr" size="40"
 					value="<?=htmlspecialchars($pconfig['descr']);?>"> <br/>
-				<span class="vexpl"><?php echo gettext("You may enter a description here for your " .
-				"reference (not parsed)."); ?></span><br/></td>
+				<span class="vexpl"><?php echo gettext("Enter a meaningful description here for your reference."); ?></span><br/></td>
 	</tr>
 <tr>
 	<td colspan="2" valign="top" class="listtopic"><?php echo gettext("Alert Settings"); ?></td>
@@ -256,7 +249,7 @@ function enable_change(enable_change) {
 				<td width="78%" class="vtable"><input name="alertsystemlog"
 					type="checkbox" value="on"
 				<?php if ($pconfig['alertsystemlog'] == "on") echo "checked"; ?>
-				onClick="enable_change(false)"><br>
+				onClick="enable_change(false)">
 				<?php echo gettext("Snort will send Alerts to the firewall's system logs."); ?></td>
 	</tr>
 	<tr>
@@ -264,7 +257,7 @@ function enable_change(enable_change) {
 				<td width="78%" class="vtable">
 					<input name="blockoffenders7" id="blockoffenders7" type="checkbox" value="on"
 					<?php if ($pconfig['blockoffenders7'] == "on") echo "checked"; ?>
-					onClick="enable_blockoffenders()"><br>
+					onClick="enable_blockoffenders()">
 				<?php echo gettext("Checking this option will automatically block hosts that generate a " .
 				"Snort alert."); ?></td>
 	</tr>
@@ -272,11 +265,11 @@ function enable_change(enable_change) {
 				<td width="22%" valign="top" class="vncell"><?php echo gettext("Kill states"); ?></td>
 				<td width="78%" class="vtable">
 					<input name="blockoffenderskill" id="blockoffenderskill" type="checkbox" value="on" <?php if ($pconfig['blockoffenderskill'] == "on") echo "checked"; ?>>
-					<br/><?php echo gettext("Checking this option will kill firewall states for the blocked ip"); ?>
+					<?php echo gettext("Checking this option will kill firewall states for the blocked IP"); ?>
 				</td>
 	</tr>
 	<tr>
-				<td width="22%" valign="top" class="vncell"><?php echo gettext("Which ip to block"); ?></td>
+				<td width="22%" valign="top" class="vncell"><?php echo gettext("Which IP to block"); ?></td>
 				<td width="78%" class="vtable">
 					<select name="blockoffendersip" class="formselect" id="blockoffendersip">
 				<?php
@@ -288,8 +281,8 @@ function enable_change(enable_change) {
 						echo htmlspecialchars($btype) . '</option>';
 					}
 				?>
-					</select>
-				<br/><?php echo gettext("Which ip extracted from the packet you want to block"); ?> 
+					</select>&nbsp;&nbsp;
+				<?php echo gettext("Select which IP extracted from the packet you wish to block"); ?> 
 				</td>
 	</tr>
 <tr>
@@ -308,7 +301,8 @@ function enable_change(enable_change) {
 					<?php if ($iface2 == $pconfig['performance']) echo "selected"; ?>>
 						<?=htmlspecialchars($ifacename2);?></option>
 						<?php endforeach; ?>
-				</select><br>
+					</select>&nbsp;&nbsp;
+				<?php echo gettext("Choose a search performance setting"); ?><br/>
 				<span class="vexpl"><?php echo gettext("LOWMEM and AC-BNFA are recommended for low end " .
 				"systems, AC-SPLIT: low memory, high performance, short-hand for search-method ac split-any-any, AC: high memory, " .
 				"best performance, -NQ: the -nq option specifies that matches should not be queued and evaluated as they are found," . 
@@ -320,86 +314,99 @@ function enable_change(enable_change) {
 				<td width="22%" valign="top" class="vncell"><?php echo gettext("Checksum Check Disable"); ?></td>
 				<td width="78%" class="vtable">
 					<input name="cksumcheck" id="cksumcheck" type="checkbox" value="on" <?php if ($pconfig['cksumcheck'] == "on") echo "checked"; ?>>
-					<br><?php echo gettext("If ticked, checksum checking on Snort will be disabled to improve performance."); ?>
-					<br><?php echo gettext("Most of this is already done at the firewall/filter level."); ?>
+					<?php echo gettext("Disable checksum checking within Snort to improve performance."); ?>
+					<br><span class="red"><?php echo gettext("Hint: ") . "</span>" . 
+					gettext("Most of this is already done at the firewall/filter level, so it is usually safe to check this box."); ?>
 				</td>
 	</tr>
 	<tr>
 				<td colspan="2" valign="top" class="listtopic"><?php echo gettext("Choose the networks " .
-				"snort should inspect and whitelist."); ?></td>
+				"Snort should inspect and whitelist."); ?></td>
 	</tr>
 	<tr>
-				<td width="22%" valign="top" class="vncell"><?php echo gettext("Home net"); ?></td>
+				<td width="22%" valign="top" class="vncell"><?php echo gettext("Home Net"); ?></td>
 				<td width="78%" class="vtable">
+
 					<select name="homelistname" class="formselect" id="homelistname">
-				<?php
-					echo "<option value='default' >default</option>";
-					/* find whitelist names and filter by type */
-					if (is_array($snortglob['whitelist']['item'])) {
-						foreach ($snortglob['whitelist']['item'] as $value) {
-							$ilistname = $value['name'];
-							if ($ilistname == $pconfig['homelistname'])
-								echo "<option value='$ilistname' selected>";
-							else
-								echo "<option value='$ilistname'>";
-							echo htmlspecialchars($ilistname) . '</option>';
+					<?php
+						echo "<option value='default' >default</option>";
+						/* find whitelist names and filter by type */
+						if (is_array($snortglob['whitelist']['item'])) {
+							foreach ($snortglob['whitelist']['item'] as $value) {
+								$ilistname = $value['name'];
+								if ($ilistname == $pconfig['homelistname'])
+									echo "<option value='$ilistname' selected>";
+								else
+									echo "<option value='$ilistname'>";
+								echo htmlspecialchars($ilistname) . '</option>';
+							}
 						}
-					}
-				?>
-				</select><br/>
-				<span class="vexpl"><?php echo gettext("Choose the home net you will like this rule to " .
-				"use."); ?> </span><br/>&nbsp;<br/><span class="red"><?php echo gettext("Note:"); ?></span>&nbsp;<?php echo gettext("Default home " .
-				"net adds only local networks."); ?><br>
-				<span class="red"><?php echo gettext("Hint:"); ?></span>&nbsp;<?php echo gettext("Most users add a list of " .
-				"friendly ips that the firewall cant see."); ?><br/></td>
+					?>
+					</select>
+					&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="button" class="formbtns" value="View List"  
+					onclick="viewList('<?=$id;?>','homelistname')" id="btnHomeNet" 
+					title="<?php echo gettext("Click to view currently selected Home Net contents"); ?>"/>
+					<br/>
+					<span class="vexpl"><?php echo gettext("Choose the Home Net you want this interface to use."); ?></span>
+				 	<br/></br>
+					<span class="red"><?php echo gettext("Note:"); ?></span>&nbsp;<?php echo gettext("Default Home " .
+					"Net adds only local networks, WAN IPs, Gateways, VPNs and VIPs."); ?><br/>
+					<span class="red"><?php echo gettext("Hint:"); ?></span>&nbsp;<?php echo gettext("Create an Alias to hold a list of " .
+					"friendly IPs that the firewall cannot see or to customize the default Home Net."); ?><br/>
+				</td>
 	</tr>
 	<tr>
-				<td width="22%" valign="top" class="vncell"><?php echo gettext("External net"); ?></td>
+				<td width="22%" valign="top" class="vncell"><?php echo gettext("External Net"); ?></td>
 				<td width="78%" class="vtable">
 					<select name="externallistname" class="formselect" id="externallistname">
-				<?php
-					echo "<option value='default' >default</option>";
-					/* find whitelist names and filter by type */
-					if (is_array($snortglob['whitelist']['item'])) {
-						foreach ($snortglob['whitelist']['item'] as $value) {
-							$ilistname = $value['name'];
-							if ($ilistname == $pconfig['externallistname'])
-								echo "<option value='$ilistname' selected>";
-							else
-								echo "<option value='$ilistname'>";
-							echo htmlspecialchars($ilistname) . '</option>';
+					<?php
+						echo "<option value='default' >default</option>";
+						/* find whitelist names and filter by type */
+						if (is_array($snortglob['whitelist']['item'])) {
+							foreach ($snortglob['whitelist']['item'] as $value) {
+								$ilistname = $value['name'];
+								if ($ilistname == $pconfig['externallistname'])
+									echo "<option value='$ilistname' selected>";
+								else
+									echo "<option value='$ilistname'>";
+								echo htmlspecialchars($ilistname) . '</option>';
+							}
 						}
-					}
-				?>
-				</select><br/>
-				<span class="vexpl"><?php echo gettext("Choose the external net you will like this rule " .
-				"to use."); ?> </span>&nbsp;<br/><span class="red"><?php echo gettext("Note:"); ?></span>&nbsp;<?php echo gettext("Default " .
-				"external net, networks that are not home net."); ?><br/>
-				<span class="red"><?php echo gettext("Hint:"); ?></span>&nbsp;<?php echo gettext("Most users should leave this " .
-				"setting at default."); ?><br/></td>
+					?>
+					</select>&nbsp;&nbsp;
+					<span class="vexpl"><?php echo gettext("Choose the External Net you want this interface " .
+					"to use."); ?></span>&nbsp;<br/><br/>
+					<span class="red"><?php echo gettext("Note:"); ?></span>&nbsp;<?php echo gettext("Default " .
+					"External Net is networks that are not Home Net."); ?><br/>
+					<span class="red"><?php echo gettext("Hint:"); ?></span>&nbsp;<?php echo gettext("Most users should leave this " .
+					"setting at default.  Create an Alias for custom External Net settings."); ?><br/>
+				</td>
 	</tr>
 	<tr>
 		<td width="22%" valign="top" class="vncell"><?php echo gettext("Whitelist"); ?></td>
 		<td width="78%" class="vtable">
 			<select name="whitelistname" class="formselect" id="whitelistname">
-		<?php
-			/* find whitelist names and filter by type, make sure to track by uuid */
-			echo "<option value='default' >default</option>\n";
-			if (is_array($snortglob['whitelist']['item'])) {
-				foreach ($snortglob['whitelist']['item'] as $value) {
-					if ($value['name'] == $pconfig['whitelistname'])
-						echo "<option value='{$value['name']}' selected>";
-					else
-						echo "<option value='{$value['name']}'>";
-					echo htmlspecialchars($value['name']) . '</option>';
+			<?php
+				/* find whitelist names and filter by type, make sure to track by uuid */
+				echo "<option value='default' >default</option>\n";
+				if (is_array($snortglob['whitelist']['item'])) {
+					foreach ($snortglob['whitelist']['item'] as $value) {
+						if ($value['name'] == $pconfig['whitelistname'])
+							echo "<option value='{$value['name']}' selected>";
+						else
+							echo "<option value='{$value['name']}'>";
+						echo htmlspecialchars($value['name']) . '</option>';
+					}
 				}
-			}
-		?>
-		</select><br>
-		<span class="vexpl"><?php echo gettext("Choose the whitelist you will like this rule to " .
-		"use."); ?> </span><br/>&nbsp;<br/><span class="red"><?php echo gettext("Note:"); ?></span><br/>&nbsp;<?php echo gettext("Default " .
-		"whitelist adds only local networks."); ?><br/>
-		<span class="red"><?php echo gettext("Note:"); ?></span><br/>&nbsp;<?php echo gettext("This option will only be used when block offenders is on."); ?>
+			?>
+			</select>
+			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="button" class="formbtns" value="View List" onclick="viewList('<?=$id;?>','whitelistname')" 
+			id="btnWhitelist" title="<?php echo gettext("Click to view currently selected Whitelist contents"); ?>"/>
+			<br/>
+			<span class="vexpl"><?php echo gettext("Choose the whitelist you want this interface to " .
+			"use."); ?> </span><br/>&nbsp;<br/><span class="red"><?php echo gettext("Hint:"); ?></span>&nbsp;<?php echo gettext("Default " .
+			"whitelist adds local networks, WAN IPs, Gateways, VPNs and VIPs.  Create an Alias to customize."); ?><br/>
+			<span class="red"><?php echo gettext("Note:"); ?></span>&nbsp;<?php echo gettext("This option will only be used when block offenders is on."); ?>
 		</td>
 	</tr>
 <tr>
@@ -424,10 +431,14 @@ function enable_change(enable_change) {
 				}
 			}
 		?>
-		</select><br>
+		</select>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="button" class="formbtns" value="View List" onclick="viewList('<?=$id;?>','suppresslistname', 'suppress')" 
+		id="btnSuppressList" title="<?php echo gettext("Click to view currently selected Suppression List contents"); ?>"/>
+		<br/>
 		<span class="vexpl"><?php echo gettext("Choose the suppression or filtering file you " .
-		"will like this interface to use."); ?> </span><br/>&nbsp;<br/><span class="red"><?php echo gettext("Note:"); ?></span><br/>&nbsp;<?php echo gettext("Default " .
-		"option disables suppression and filtering."); ?></td>
+		"want this interface to use."); ?> </span><br/>&nbsp;<br/><span class="red"><?php echo gettext("Note: ") . "</span>" . 
+		gettext("Default option disables suppression and filtering."); ?>
+		</td>
 	</tr>
 <tr>
 	<td colspan="2" valign="top" class="listtopic"><?php echo gettext("Arguments here will " .
@@ -437,19 +448,19 @@ function enable_change(enable_change) {
 	<td width="22%" valign="top" class="vncell"><?php echo gettext("Advanced configuration pass through"); ?></td>
 	<td width="78%" class="vtable">
 		<textarea wrap="off" name="configpassthru" cols="65" rows="12" id="configpassthru"><?=htmlspecialchars($pconfig['configpassthru']);?></textarea>
-		
 	</td>
 </tr>
 <tr>
 	<td width="22%" valign="top"></td>
-	<td width="78%"><input name="Submit" type="submit" class="formbtn" value="Save">
-		<input name="id" type="hidden" value="<?=$id;?>">
+	<td width="78%"><input name="Submit" type="submit" class="formbtn" value="Save" title="<?php echo 
+			gettext("Click to save settings and exit"); ?>"/>
+			<input name="id" type="hidden" value="<?=$id;?>"/>
 	</td>
 </tr>
 <tr>
 	<td width="22%" valign="top">&nbsp;</td>
-	<td width="78%"><span class="vexpl"><span class="red"><strong><?php echo gettext("Note:"); ?></strong></span><br/>
-		<?php echo gettext("Please save your settings before you click start."); ?>	
+	<td width="78%"><span class="vexpl"><span class="red"><strong><?php echo gettext("Note: ") . "</strong></span>" . 
+		gettext("Please save your settings before you attempt to start Snort."); ?>	
 	</td>
 </tr>
 </table>
@@ -458,8 +469,61 @@ function enable_change(enable_change) {
 </form>
 <script language="JavaScript">
 <!--
-enable_change(false);
-enable_blockoffenders();
+function enable_blockoffenders() {
+	var endis = !(document.iform.blockoffenders7.checked);
+	document.iform.blockoffenderskill.disabled=endis;
+	document.iform.blockoffendersip.disabled=endis;
+	document.iform.whitelistname.disabled=endis;
+	document.iform.btnWhitelist.disabled=endis;
+}
+
+function enable_change(enable_change) {
+	endis = !(document.iform.enable.checked || enable_change);
+	// make sure a default answer is called if this is invoked.
+	endis2 = (document.iform.enable);
+	document.iform.performance.disabled = endis;
+	document.iform.blockoffenders7.disabled = endis;
+	document.iform.blockoffendersip.disabled=endis;
+	document.iform.blockoffenderskill.disabled=endis;
+	document.iform.alertsystemlog.disabled = endis;
+	document.iform.externallistname.disabled = endis;
+	document.iform.cksumcheck.disabled = endis;
+	document.iform.homelistname.disabled = endis;
+	document.iform.whitelistname.disabled=endis;
+	document.iform.suppresslistname.disabled = endis;
+	document.iform.configpassthru.disabled = endis;
+	document.iform.btnHomeNet.disabled=endis;
+	document.iform.btnWhitelist.disabled=endis;
+	document.iform.btnSuppressList.disabled=endis;
+}
+
+function wopen(url, name, w, h) {
+	// Fudge factors for window decoration space.
+	// In my tests these work well on all platforms & browsers.
+	w += 32;
+	h += 96;
+ 	var win = window.open(url,
+  			name, 
+	  		'width=' + w + ', height=' + h + ', ' +
+  			'location=no, menubar=no, ' +
+  			'status=no, toolbar=no, scrollbars=yes, resizable=yes');
+ 	win.resizeTo(w, h);
+ 	win.focus();
+}
+
+function getSelectedValue(elemID) {
+	var ctrl = document.getElementById(elemID);
+	return ctrl.options[ctrl.selectedIndex].value;
+}
+
+function viewList(id, elemID, elemType) {
+	if (typeof elemType == "undefined") {
+		elemType = "whitelist";
+	}
+	var url = "snort_list_view.php?id=" + id + "&wlist=";
+	url = url + getSelectedValue(elemID) + "&type=" + elemType;
+	wopen(url, 'WhitelistViewer', 640, 480);
+}
 //-->
 </script>
 <?php include("fend.inc"); ?>

@@ -36,7 +36,7 @@ require_once("service-utils.inc");
 
 global $snort_gui_include, $vrt_enabled, $et_enabled, $rebuild_rules, $snort_rules_upd_log;
 global $protect_preproc_rules, $is_postinstall, $snort_community_rules_filename;
-global $snort_community_rules_url, $snort_rules_file, $emergingthreats_filename;
+global $snort_community_rules_url, $snort_rules_file, $emergingthreats_filename, $g;
 
 $snortdir = SNORTDIR;
 $snortlibdir = SNORTLIBDIR;
@@ -558,8 +558,8 @@ if ($snortdownload == 'on' || $emergingthreats == 'on' || $snortcommunityrules =
 		exec("/bin/rm -r {$snortdir}/tmp");
 	}
 
-	/* Restart snort if already running to pick up the new rules. */
-       	if (is_process_running("snort")) {
+	/* Restart snort if already running and we are not rebooting to pick up the new rules. */
+       	if (is_process_running("snort") && !$g['booting']) {
 		update_status(gettext('Restarting Snort to activate the new set of rules...'));
 		error_log(gettext("\tRestarting Snort to activate the new set of rules...\n"), 3, $snort_rules_upd_log);
        		restart_service("snort");

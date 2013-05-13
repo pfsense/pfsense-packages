@@ -58,7 +58,7 @@ function is_validwhitelistname($name) {
 	if (!is_string($name))
 		return false;
 
-	if (!preg_match("/[^a-zA-Z0-9\.\/]/", $name))
+	if (!preg_match("/[^a-zA-Z0-9\_\.\/]/", $name))
 		return true;
 
 	return false;
@@ -88,7 +88,7 @@ if ($_POST['submit']) {
 		$input_errors[] = "Whitelist file names may not be named defaultwhitelist.";
 
 	if (is_validwhitelistname($_POST['name']) == false)
-		$input_errors[] = "Whitelist file name may only consist of the characters a-z, A-Z and 0-9 _. Note: No Spaces. Press Cancel to reset.";
+		$input_errors[] = "Whitelist file name may only consist of the characters \"a-z, A-Z, 0-9 and _\". Note: No Spaces or dashes. Press Cancel to reset.";
 
 	/* check for name conflicts */
 	foreach ($a_suppress as $s_list) {
@@ -151,8 +151,8 @@ if ($savemsg)
 	<td width="78%" class="vtable"><input name="name" type="text" id="name"
 		class="formfld unkown" size="40" value="<?=htmlspecialchars($pconfig['name']);?>" /> <br />
 	<span class="vexpl"> <?php echo gettext("The list name may only consist of the " .
-	"characters a-z, A-Z and 0-9."); ?> <span class="red"><?php echo gettext("Note:"); ?> </span>
-	<?php echo gettext("No Spaces."); ?> </span></td>
+	"characters \"a-z, A-Z, 0-9 and _\"."); ?>&nbsp;&nbsp;<span class="red"><?php echo gettext("Note:"); ?> </span>
+	<?php echo gettext("No Spaces or dashes."); ?> </span></td>
 </tr>
 <tr>
 	<td width="22%" valign="top" class="vncell"><?php echo gettext("Description"); ?></td>
