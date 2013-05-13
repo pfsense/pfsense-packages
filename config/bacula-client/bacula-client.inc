@@ -5,7 +5,7 @@
     bacula-client.inc
     part of pfSense (http://www.pfSense.com)
     Copyright (C) 2012 Marcio Carlos Braga Antao
-    Copyright (C) 2012 Marcello Coutinho
+    Copyright (C) 2012-2013 Marcello Coutinho
     All rights reserved.
 
     Based on m0n0wall (http://m0n0.ch/wall)
@@ -17,10 +17,10 @@
     Redistribution and use in source and binary forms, with or without
     modification, are permitted provided that the following conditions are met:
 
-     1. Redistributions of source code must retain the above copyright notice,
+     1. Redistributions of source code MUST retain the above copyright notice,
         this list of conditions and the following disclaimer.
 
-     2. Redistributions in binary form must reproduce the above copyright
+     2. Redistributions in binary form MUST reproduce the above copyright
         notice, this list of conditions and the following disclaimer in the
         documentation and/or other materials provided with the distribution.
 
@@ -39,6 +39,12 @@
  require_once("config.inc");
  require_once("util.inc");
  
+ $pf_version=substr(trim(file_get_contents("/etc/version")),0,3);
+if ($pf_version > 2.0)
+	define('BACULA_LOCALBASE', '/usr/pbi/bacula-' . php_uname("m"));
+else
+  define('BACULA_LOCALBASE','/usr/local');
+  
 function baculaclient_custom_php_install_command(){
 	global $g, $config;
 	baculaclient_custom_php_write_config();	
@@ -50,7 +56,7 @@ function baculaclient_custom_php_deinstall_command(){
 	conf_mount_rw();
 
 	// 1. Delete our config file
-	unlink_if_exists("/usr/local/etc/bacula-fd.conf");
+	unlink_if_exists(BACULA_LOCALBASE."/etc/bacula-fd.conf");
 
 	// 2. Re-run sshd config generation script
 	exec("/usr/local/etc/rc.d/bacula-fd.sh stop");
@@ -65,6 +71,7 @@ function baculaclient_custom_php_write_config(){
 	if (file_exists($startup_file)){
 		$startup_script=file_get_contents($startup_file);
 		$startup_script=preg_replace("/NO/","YES",$startup_script);
+		$startup_script=preg_replace("@/usr/local/etc/bacula-fd.conf@",BACULA_LOCALBASE."/etc/bacula-fd.conf",$startup_script);
 		file_put_contents("{$startup_file}.sh",$startup_script,LOCK_EX);
 		// Ensure bacula-fd has a+rx
 		exec("chmod a+rx {$startup_file}.sh");
@@ -103,7 +110,7 @@ function baculaclient_custom_php_write_config(){
 			$jobs="20";	
 			}
 		$baculaclient_conf .= "FileDaemon { \n\t Name = {$LocalDirector}-fd #\n\t FDport = {$port}\n\t WorkingDirectory = /var/db/bacula\n\t Pid Directory = /var/run\n\tMaximum Concurrent Jobs = {$jobs}\n\t}\n";
-		file_put_contents("/usr/local/etc/bacula-fd.conf",$baculaclient_conf,LOCK_EX);
+		file_put_contents(BACULA_LOCALBASE."/etc/bacula-fd.conf",$baculaclient_conf,LOCK_EX);
 		exec("/usr/local/etc/rc.d/bacula-fd.sh restart");
 		// Mount Read-only
 		conf_mount_ro();

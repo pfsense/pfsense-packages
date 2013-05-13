@@ -1,26 +1,25 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<!DOCTYPE packagegui SYSTEM "./schema/packages.dtd">
-<?xml-stylesheet type="text/xsl" href="./xsl/package.xsl"?>
+<!DOCTYPE packagegui SYSTEM "../schema/packages.dtd">
+<?xml-stylesheet type="text/xsl" href="../xsl/package.xsl"?>
 <packagegui>
-	<copyright>
-	<![CDATA[
-/* $Id$ */
+        <copyright>
+        <![CDATA[
 /* ========================================================================== */
 /*
-    postfix_sync.xml
-    part of the Postfix package for pfSense
-    Copyright (C) 2011-2013 Marcello Coutinho
-    All rights reserved.            
-                                                                  */
+    checkmk_sync.xml
+    part of pfSense (http://www.pfSense.com)
+    Copyright (C) 2013 Marcello Coutinho
+    All rights reserved.
+                                                                              */
 /* ========================================================================== */
 /*
     Redistribution and use in source and binary forms, with or without
     modification, are permitted provided that the following conditions are met:
 
-     1. Redistributions of source code MUST retain the above copyright notice,
+     1. Redistributions of source code must retain the above copyright notice,
         this list of conditions and the following disclaimer.
 
-     2. Redistributions in binary form MUST reproduce the above copyright
+     2. Redistributions in binary form must reproduce the above copyright
         notice, this list of conditions and the following disclaimer in the
         documentation and/or other materials provided with the distribution.
 
@@ -36,63 +35,36 @@
     POSSIBILITY OF SUCH DAMAGE.
                                                                               */
 /* ========================================================================== */
-	]]>
-	</copyright>
-	<description>Describe your package here</description>
-	<requirements>Describe your package requirements here</requirements>
-	<faq>Currently there are no FAQ items provided.</faq>
-	<name>mailscannersync</name>
-	<version>1.0</version>
-	<title>Services: MailScanner</title>
-	<include_file>/usr/local/pkg/mailscanner.inc</include_file>
-<tabs>
+        ]]>
+        </copyright>
+    <description>Describe your package here</description>
+    <requirements>Describe your package requirements here</requirements>
+    <faq>Currently there are no FAQ items provided.</faq>
+	<name>checkmksync</name>
+	<version>1.1</version>
+	<title>Check_mk Agent: Sync</title>
+	<include_file>/usr/local/pkg/checkmk.inc</include_file>
+	<tabs>
 		<tab>
-			<text>General</text>
-			<url>/pkg_edit.php?xml=mailscanner.xml&amp;id=0</url>
-		</tab>
-		<tab>
-			<text>Attachments</text>
-			<url>/pkg_edit.php?xml=mailscanner_attachments.xml&amp;id=0</url>
-		</tab>
-		<tab>
-			<text>Antivirus</text>
-			<url>/pkg_edit.php?xml=mailscanner_antivirus.xml&amp;id=0</url>
-		</tab>
-		<tab>
-			<text>Content</text>
-			<url>/pkg_edit.php?xml=mailscanner_content.xml&amp;id=0</url>
-		</tab>
-		<tab>
-			<text>AntiSpam</text>
-			<url>/pkg_edit.php?xml=mailscanner_antispam.xml&amp;id=0</url>			
-		</tab>
-		<tab>
-			<text>Alerts</text>
-			<url>/pkg_edit.php?xml=mailscanner_alerts.xml&amp;id=0</url>
-		</tab>
-			<tab>
-			<text>Reporting</text>
-			<url>/pkg_edit.php?xml=mailscanner_report.xml&amp;id=0</url>
+			<text>Config</text>
+			<url>/pkg_edit.php?xml=checkmk.xml</url>
 		</tab>
 		<tab>
 			<text>XMLRPC Sync</text>
-			<url>/pkg_edit.php?xml=mailscanner_sync.xml&amp;id=0</url>
+			<url>/pkg_edit.php?xml=checkmk_sync.xml</url>
 			<active/>
 		</tab>
-		<tab>
-			<text>Help</text>
-			<url>/mailscanner_about.php</url>
-		</tab>
-</tabs>
+	</tabs>
 	<fields>
 		<field>
-			<name>mailscanner XMLRPC Sync</name>
 			<type>listtopic</type>
-		</field>
+			<fieldname>temp</fieldname>
+			<name>Enable checkmk configuration sync</name>
+		</field>		
 		<field>
-			<fielddescr>Sync method</fielddescr>
+			<fielddescr>Sync Option</fielddescr>
 			<fieldname>synconchanges</fieldname>
-			<description>Automatically sync postfix mailscanner changes.</description>
+			<description>Automatically sync check_mk configuration changes.</description>
 			<type>select</type>
 			<required/>
 			<default_value>auto</default_value>
@@ -118,19 +90,22 @@
 			</options>
 		</field>
 		<field>
-			<fielddescr>Remote Server</fielddescr>
+			<fielddescr>Remote Servers</fielddescr>
 			<fieldname>none</fieldname>
 			<type>rowhelper</type>
 			<rowhelper>
 			<rowhelperfield>
-				<fielddescr>Enable</fielddescr>
-				<fieldname>enabless</fieldname>
-				<type>checkbox</type>
-			</rowhelperfield>
-			<rowhelperfield>
 				<fielddescr>IP Address</fielddescr>
 				<fieldname>ipaddress</fieldname>
 				<description>IP Address of remote server</description>
+				<type>input</type>
+				<size>20</size>
+				<required/>
+			</rowhelperfield>
+			<rowhelperfield>
+				<fielddescr>User Name</fielddescr>
+				<fieldname>username</fieldname>
+				<description>user name of remote server</description>
 				<type>input</type>
 				<size>20</size>
 			</rowhelperfield>
@@ -140,20 +115,15 @@
 				<description>Password for remote server.</description>
 				<type>password</type>
 				<size>20</size>
+				<required/>
 			</rowhelperfield>
 			</rowhelper>
 		</field>
 	</fields>
-	<custom_php_install_command>
-		mailscanner_php_install_command();
-	</custom_php_install_command>
-	<custom_php_deinstall_command>
-		mailscanner_php_deinstall_command();
-	</custom_php_deinstall_command>
-	<custom_php_validation_command>
-		mailscanner_validate_input($_POST, &amp;$input_errors);
-	</custom_php_validation_command>	
 	<custom_php_resync_config_command>
-		sync_package_mailscanner();
+		checkmk_sync_on_changes();		
 	</custom_php_resync_config_command>
+	<custom_php_command_before_form>	
+		unset($_POST['temp']);
+	</custom_php_command_before_form>
 </packagegui>

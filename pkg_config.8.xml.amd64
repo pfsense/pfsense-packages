@@ -563,7 +563,7 @@
 		<depends_on_package>postfix-2.8.7,1.tbz</depends_on_package>
 		<depends_on_package>perl-5.12.4_3.tbz</depends_on_package>
 		<depends_on_package_pbi>postfix-2.9.4_2-amd64.pbi</depends_on_package_pbi>
-		<version>2.8.7,1 pkg v.2.3.4_1</version>
+		<version>2.8.7,1 pkg v.2.3.5</version>
 		<status>RC1</status>
 		<required_version>2.0</required_version>
 		<configurationfile>postfix.xml</configurationfile>
@@ -595,7 +595,7 @@
 		<!-- NOTE: Distfile must be fetched manually from http://dansguardian.org/downloads/2/Alpha/dansguardian-2.12.0.0.tar.gz -->
 	</package>
 	<package>
-		<name>mailscanner-dev</name>
+		<name>mailscanner</name>
 		<internal_name>mailscanner</internal_name>
 		<website>www.mailscanner.info</website>
 		<descr><![CDATA[MailScanner is an e-mail security and anti-spam package for e-mail gateway systems.<br />
@@ -610,7 +610,7 @@
 		<depends_on_package>p5-Mail-SPF-2.007.tbz</depends_on_package>
 		<depends_on_package>p5-IP-Country-2.27.tbz</depends_on_package>
 		<depends_on_package_pbi>mailscanner-4.84.5_3-amd64.pbi</depends_on_package_pbi>
-		<version>4.84.5_3 pkg v.0.2.1</version>
+		<version>4.84.5_3 pkg v.0.2.2</version>
 		<status>beta</status>
 		<required_version>2.0</required_version>
 		<configurationfile>mailscanner.xml</configurationfile>
@@ -709,11 +709,11 @@
 		<config_file>http://www.pfsense.com/packages/config/sarg/sarg.xml</config_file>
 		<pkginfolink>http://forum.pfsense.org/index.php/topic,47765.0.html</pkginfolink>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
-		<depends_on_package>sarg-2.3.2_2.tbz</depends_on_package>
-		<depends_on_package>gd-2.0.35_7,1.tbz</depends_on_package>
-		<depends_on_package_pbi>sarg-2.3.2_5-amd64.pbi</depends_on_package_pbi>
-		<version>2.3.2 pkg v.0.6.1</version>
-		<status>RC2</status>
+		<depends_on_package>sarg-2.3.6.tbz</depends_on_package>
+		<depends_on_package>gd-2.0.35_8,1.tbz</depends_on_package>
+		<depends_on_package_pbi>sarg-2.3.6-amd64.pbi</depends_on_package_pbi>
+		<version>2.3.6 pkg v.0.6.1</version>
+		<status>Release</status>
 		<required_version>2.0</required_version>
 		<configurationfile>sarg.xml</configurationfile>
 		<build_port_path>/usr/ports/www/sarg</build_port_path>
@@ -932,10 +932,10 @@
 		<category>Security</category>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
 		<depends_on_package>lua-5.1.5_4.tbz</depends_on_package>
-		<depends_on_package>nmap-6.01.tbz</depends_on_package>
-		<depends_on_package_pbi>nmap-6.01_1-amd64.pbi</depends_on_package_pbi>
+		<depends_on_package>nmap-6.25_1.tbz</depends_on_package>
+		<depends_on_package_pbi>nmap-6.25_1-amd64.pbi</depends_on_package_pbi>
 		<config_file>http://www.pfsense.com/packages/config/nmap/nmap.xml</config_file>
-		<version>nmap-6.01 pkg v1.2</version>
+		<version>nmap-6.25_1 pkg v1.2</version>
 		<status>Stable</status>
 		<pkginfolink>http://doc.pfsense.org/index.php/Nmap_package</pkginfolink>
 		<required_version>2.0</required_version>
@@ -1241,14 +1241,40 @@
 		<depends_on_package>libwww-5.4.0_4.tbz</depends_on_package>
 		<build_pbi>
 			<ports_before>www/libwww</ports_before>
-			<port>www/squid33</port>
-			<ports_after>www/squid_radius_auth security/clamav www/squidclamav</ports_after>
+			<port>www/squid31</port>
+			<ports_after>www/squid_radius_auth</ports_after>
 		</build_pbi>
 		<build_options>c-icap_UNSET=IPV6 squid33_UNSET=AUTH_SMB AUTH_SQL DNS_HELPER FS_COSS ESI ECAP SNMP STACKTRACES STRICT_HTTP TP_IPF TP_IPFW VIA_DB DEBUG DOCS EXAMPLES;squid33_SET=ARP_ACL AUTH_KERB AUTH_LDAP AUTH_NIS AUTH_SASL CACHE_DIGESTS DELAY_POOLS FOLLOW_XFF TP_PF MSSL_CRTD WCCP WCCPV2 FS_AUFS HTCP ICAP ICMP IDENT IPV6 KQUEUE LARGEFILE SSL SSL_CRTD</build_options>
 		<!--<build_options>WITH_SQUID_KERB_AUTH=true;WITH_SQUID_LDAP_AUTH=true;WITH_SQUID_NIS_AUTH=true;WITH_SQUID_SASL_AUTH=true;WITH_SQUID_IPV6=true;WITH_SQUID_DELAY_POOLS=true;WITH_SQUID_SNMP=true;WITH_SQUID_SSL=true;WITH_SQUID_SSL_CRTD=true;WITH_SQUID_PINGER=true;WITHOUT_SQUID_DNS_HELPER=true;WITH_SQUID_HTCP=true;WITH_SQUID_VIA_DB=true;WITH_SQUID_CACHE_DIGESTS=true;WITHOUT_SQUID_WCCP=true;WITH_SQUID_WCCPV2=true;WITHOUT_SQUID_STRICT_HTTP=true;WITH_SQUID_IDENT=true;WITH_SQUID_REFERER_LOG=true;WITH_SQUID_USERAGENT_LOG=true;WITH_SQUID_ARP_ACL=true;WITH_SQUID_IPFW=true;WITH_SQUID_PF=true;WITHOUT_SQUID_IPFILTER=true;WITH_SQUID_FOLLOW_XFF=true;WITHOUT_SQUID_ECAP=true;WITHOUT_SQUID_ICAP=true;WITHOUT_SQUID_ESI=true;WITH_SQUID_AUFS=true;WITHOUT_SQUID_COSS=true;WITHOUT_SQUID_KQUEUE=true;WITH_SQUID_LARGEFILE=true;WITHOUT_SQUID_STACKTRACES=true;WITHOUT_SQUID_DEBUG=true</build_options>-->
 		<config_file>http://www.pfsense.org/packages/config/squid3/31/squid.xml</config_file>
 		<configurationfile>squid.xml</configurationfile>
 		<depends_on_package_pbi>squid-3.1.22_1-amd64.pbi</depends_on_package_pbi>
+	</package>
+	<package>
+		<name>squid3-dev</name>
+		<internal_name>squid</internal_name>
+		<descr><![CDATA[High performance web proxy cache.<br />
+			It combines squid as a proxy server with it's capabilities of acting as a HTTP / HTTPS reverse proxy.<br />
+			It includes an Exchange-Web-Access (OWA) Assistant, ssl filtering and antivirus integration via i-cap]]></descr>
+		<pkginfolink>http://forum.pfsense.org/index.php/topic,48347.0.html</pkginfolink>
+		<website>http://www.squid-cache.org/</website>
+		<category>Network</category>
+		<version>3.3.4 pkg 2.1</version>
+		<status>beta</status>
+		<required_version>2.0</required_version>
+		<maintainer>marcellocoutinho@gmail.com fernando@netfilter.com.br seth.mos@dds.nl mfuchs77@googlemail.com jimp@pfsense.org</maintainer>
+		<depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
+		<depends_on_package>squid-3.3.4.tbz</depends_on_package>
+		<depends_on_package>libwww-5.4.0_4.tbz</depends_on_package>
+		<build_pbi>
+			<ports_before>www/libwww</ports_before>
+			<port>www/squid33</port>
+			<ports_after>www/squid_radius_auth security/clamav www/squidclamav</ports_after>
+		</build_pbi>
+		<build_options>c-icap_UNSET=IPV6 squid33_UNSET=AUTH_SMB AUTH_SQL DNS_HELPER FS_COSS ESI ECAP SNMP STACKTRACES STRICT_HTTP TP_IPF TP_IPFW VIA_DB DEBUG DOCS EXAMPLES;squid33_SET=ARP_ACL AUTH_KERB AUTH_LDAP AUTH_NIS AUTH_SASL CACHE_DIGESTS DELAY_POOLS FOLLOW_XFF TP_PF MSSL_CRTD WCCP WCCPV2 FS_AUFS HTCP ICAP ICMP IDENT IPV6 KQUEUE LARGEFILE SSL SSL_CRTD</build_options>
+		<config_file>http://www.pfsense.org/packages/config/squid3/33/squid.xml</config_file>
+		<configurationfile>squid.xml</configurationfile>
+		<depends_on_package_pbi>squid-3.3.4-amd64.pbi</depends_on_package_pbi>
 	</package>
 	<package>
 		<name>LCDproc</name>
@@ -1312,7 +1338,7 @@
 		<website>http://www.squidGuard.org/</website>
 		<maintainer>dv_serg@mail.ru</maintainer>
 		<category>Network Management</category>
-		<version>1.4_4 pkg v.1.9.2</version>
+		<version>1.4_4 pkg v.1.9.3</version>
 		<status>Beta</status>
 		<required_version>1.1</required_version>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
@@ -1602,6 +1628,27 @@
 		<configurationfile>nrpe2.xml</configurationfile>
 	</package>
 	<package>
+		<name>Check_mk agent</name>
+		<website>https://github.com/sileht/check_mk/blob/master/doc/README</website>
+		<descr><![CDATA[The basic idea of check_mk is to fetch "all" information about a target host at once.<br>For each host to be monitored check_mk is called by Nagios only once per time period.]]></descr>
+		<category>Services</category>
+		<depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
+		<build_port_path>/usr/ports/sysutils/muse</build_port_path>
+		<build_port_path>/usr/ports/sysutils/ipmitool</build_port_path>
+		<build_port_path>devel/libstatgrab</build_port_path>
+		<build_pbi>
+			<ports_before>sysutils/ipmitool devel/libstatgrab</ports_before>
+			<port>sysutils/muse</port>
+		</build_pbi>
+		<build_options></build_options>
+		<config_file>http://www.pfsense.com/packages/config/checkmk-agent/checkmk.xml</config_file>
+		<version>v0.1</version>
+		<status>RC1</status>
+		<required_version>2.0</required_version>
+		<maintainer>marcellocoutinho@gmail.com</maintainer>
+		<configurationfile>checkmk.xml</configurationfile>
+	</package>
+	<package>
 		<name>SSHDCond</name>
 		<descr><![CDATA[Allows to define SSH overrides for users,groups,hosts and addresses using Match in a convenient way.<br />
 				This package acts as an access list frontend for ssh connections]]></descr>
@@ -1685,7 +1732,7 @@
 		<descr><![CDATA[Bacula is a set of Open Source, computer programs that permit you (or the system administrator) to manage backup, recovery, and verification of computer data across a network of computers of different kinds.]]></descr>
 		<website>http://www.bacula.org/</website>
 		<category>Services</category>
-		<version>5.2.6 pkg v 1.0</version>
+		<version>5.2.6 pkg v 1.0.1</version>
 		<status>Stable</status>
 		<required_version>2.0</required_version>
 		<config_file>http://www.pfsense.com/packages/config/bacula-client/bacula-client.xml</config_file>

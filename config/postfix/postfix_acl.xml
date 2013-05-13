@@ -5,11 +5,11 @@
 	<copyright>
 	<![CDATA[
 /* $Id$ */
-/* ========================================================================== */
+/* ========================================================================== */post	
 /*
     postfix.xml
     part of the Postfix package for pfSense
-    Copyright (C) 2010 Marcello Coutinho
+    Copyright (C) 2011-2013 Marcello Coutinho
     All rights reserved.            
                                                                   */
 /* ========================================================================== */
@@ -17,10 +17,10 @@
     Redistribution and use in source and binary forms, with or without
     modification, are permitted provided that the following conditions are met:
 
-     1. Redistributions of source code must retain the above copyright notice,
+     1. Redistributions of source code MUST retain the above copyright notice,
         this list of conditions and the following disclaimer.
 
-     2. Redistributions in binary form must reproduce the above copyright
+     2. Redistributions in binary form MUST reproduce the above copyright
         notice, this list of conditions and the following disclaimer in the
         documentation and/or other materials provided with the distribution.
 
@@ -108,6 +108,20 @@
 								/^From:.*spammer@myspam.net/ REJECT<br>
 								/^From:.*@mytrustdomain OK<br>
 								See http://www.postfix.org/header_checks.5.html for more help]]>
+			</description>
+			<type>textarea</type>
+			<cols>83</cols>
+			<rows>15</rows>
+			<encoding>base64</encoding>
+		</field>
+		<field>
+			<fielddescr>Helo</fielddescr>
+			<fieldname>helo_maps</fieldname>
+			<description><![CDATA[<strong>PCRE filters</strong><a href=http://www.postfix.org/pcre_table.5.html> that are applied to initial message helo info. Hint:<br>
+								/^tmpstr.*/ REJECT<br>
+								/^myserver.local/ REJECT external server with local domain info<br>
+								/^trusted_network.local/ DUNNO trusted remote misconfigured server<br>
+								See http://www.postfix.org/postconf.5.html#smtpd_helo_restrictions for more help]]>
 			</description>
 			<type>textarea</type>
 			<cols>83</cols>

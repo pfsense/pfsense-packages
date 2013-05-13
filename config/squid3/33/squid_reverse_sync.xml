@@ -7,9 +7,9 @@
 /* $Id$ */
 /* ========================================================================== */
 /*
-    postfix_sync.xml
-    part of the Postfix package for pfSense
-    Copyright (C) 2011-2013 Marcello Coutinho
+    squid_sync.xml
+    part of the sarg package for pfSense
+    Copyright (C) 2012-2013 Marcello Coutinho
     All rights reserved.            
                                                                   */
 /* ========================================================================== */
@@ -20,7 +20,7 @@
      1. Redistributions of source code MUST retain the above copyright notice,
         this list of conditions and the following disclaimer.
 
-     2. Redistributions in binary form MUST reproduce the above copyright
+     2. Redistributions in binary form must reproduce the above copyright
         notice, this list of conditions and the following disclaimer in the
         documentation and/or other materials provided with the distribution.
 
@@ -41,58 +41,46 @@
 	<description>Describe your package here</description>
 	<requirements>Describe your package requirements here</requirements>
 	<faq>Currently there are no FAQ items provided.</faq>
-	<name>mailscannersync</name>
+	<name>squidsync</name>
 	<version>1.0</version>
-	<title>Services: MailScanner</title>
-	<include_file>/usr/local/pkg/mailscanner.inc</include_file>
-<tabs>
+	<title>Reverse Proxy server: XMLRPC Sync</title>
+	<include_file>/usr/local/pkg/squid.inc</include_file>
+	<tabs>
 		<tab>
 			<text>General</text>
-			<url>/pkg_edit.php?xml=mailscanner.xml&amp;id=0</url>
+			<url>/pkg_edit.php?xml=squid_reverse_general.xml&amp;id=0</url>
 		</tab>
 		<tab>
-			<text>Attachments</text>
-			<url>/pkg_edit.php?xml=mailscanner_attachments.xml&amp;id=0</url>
+			<text>Web Servers</text>
+			<url>/pkg.php?xml=squid_reverse_peer.xml</url>
 		</tab>
 		<tab>
-			<text>Antivirus</text>
-			<url>/pkg_edit.php?xml=mailscanner_antivirus.xml&amp;id=0</url>
+			<text>Mappings</text>
+			<url>/pkg.php?xml=squid_reverse_uri.xml</url>
 		</tab>
 		<tab>
-			<text>Content</text>
-			<url>/pkg_edit.php?xml=mailscanner_content.xml&amp;id=0</url>
+			<text>Redirects</text>
+			<url>/pkg.php?xml=squid_reverse_redir.xml</url>
 		</tab>
 		<tab>
-			<text>AntiSpam</text>
-			<url>/pkg_edit.php?xml=mailscanner_antispam.xml&amp;id=0</url>			
+			<text>Real time</text>
+			<url>/squid_monitor.php?menu=reverse</url>
 		</tab>
 		<tab>
-			<text>Alerts</text>
-			<url>/pkg_edit.php?xml=mailscanner_alerts.xml&amp;id=0</url>
-		</tab>
-			<tab>
-			<text>Reporting</text>
-			<url>/pkg_edit.php?xml=mailscanner_report.xml&amp;id=0</url>
-		</tab>
-		<tab>
-			<text>XMLRPC Sync</text>
-			<url>/pkg_edit.php?xml=mailscanner_sync.xml&amp;id=0</url>
+			<text>Sync</text>
+			<url>/pkg_edit.php?xml=squid_reverse_sync.xml&amp;id=0</url>
 			<active/>
 		</tab>
-		<tab>
-			<text>Help</text>
-			<url>/mailscanner_about.php</url>
-		</tab>
-</tabs>
+	</tabs>
 	<fields>
 		<field>
-			<name>mailscanner XMLRPC Sync</name>
+			<name>XMLRPC Sync</name>
 			<type>listtopic</type>
 		</field>
 		<field>
-			<fielddescr>Sync method</fielddescr>
+			<fielddescr>Automatically sync squid configuration changes</fielddescr>
 			<fieldname>synconchanges</fieldname>
-			<description>Automatically sync postfix mailscanner changes.</description>
+			<description>Select a sync method for squid.</description>
 			<type>select</type>
 			<required/>
 			<default_value>auto</default_value>
@@ -123,11 +111,6 @@
 			<type>rowhelper</type>
 			<rowhelper>
 			<rowhelperfield>
-				<fielddescr>Enable</fielddescr>
-				<fieldname>enabless</fieldname>
-				<type>checkbox</type>
-			</rowhelperfield>
-			<rowhelperfield>
 				<fielddescr>IP Address</fielddescr>
 				<fieldname>ipaddress</fieldname>
 				<description>IP Address of remote server</description>
@@ -144,16 +127,9 @@
 			</rowhelper>
 		</field>
 	</fields>
-	<custom_php_install_command>
-		mailscanner_php_install_command();
-	</custom_php_install_command>
-	<custom_php_deinstall_command>
-		mailscanner_php_deinstall_command();
-	</custom_php_deinstall_command>
 	<custom_php_validation_command>
-		mailscanner_validate_input($_POST, &amp;$input_errors);
-	</custom_php_validation_command>	
+	</custom_php_validation_command>
 	<custom_php_resync_config_command>
-		sync_package_mailscanner();
+		squid_resync();
 	</custom_php_resync_config_command>
 </packagegui>

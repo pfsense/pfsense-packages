@@ -96,7 +96,7 @@ function haproxy_get_statistics(){// "show stat"
 	return $result;
 }
 
-function haproxy_get_clients(){// "show sess"
+function haproxy_get_clients($show_traffic = false){// "show sess"
 	$clients=array();
 	$sessions = haproxy_socket_command("show sess");
 	foreach($sessions as $line) {
@@ -122,8 +122,20 @@ function haproxy_get_clients(){// "show sess"
 			"calls" => $calls[1],
 			"exp" => $exp[1]);
 	}
+	if ($show_traffic) {
+		foreach($clients as &$client) {
+			$session_data = haproxy_socket_command("show sess {$client['sessid']}");
+			$client['session_data'] = $session_data;
+			
+			$req = explode(" ",$session_data[13]);
+			$x = explode("=",$req[7]);
+			$client['session_datareq'] = $x[1];
+			$res = explode(" ",$session_data[16]);
+			$x = explode("=",$res[7]);
+			$client['session_datares'] = $x[1];
+		}
+	}
 	return $clients;
 }
 
 ?>
-

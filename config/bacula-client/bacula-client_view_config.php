@@ -34,6 +34,12 @@ $pfSversion = str_replace("\n", "", file_get_contents("/etc/version"));
 if(strstr($pfSversion, "1.2"))
 	$one_two = true;
 
+ $pf_version=substr(trim(file_get_contents("/etc/version")),0,3);
+if ($pf_version > 2.0)
+	define('BACULA_LOCALBASE', '/usr/pbi/bacula-' . php_uname("m"));
+else
+  define('BACULA_LOCALBASE','/usr/local');
+	
 $pgtitle = "Bacula-Client: View Configuration";
 include("head.inc");
 
@@ -68,7 +74,7 @@ include("head.inc");
      						<td class="tabcont" >
 									<textarea id="varnishlogs" rows="50" cols="87%">
 <?php 
-	$config_file = file_get_contents("/usr/local/etc/bacula-fd.conf");
+	$config_file = file_get_contents(BACULA_LOCALBASE."/etc/bacula-fd.conf");
 	echo $config_file;
 ?>
 									</textarea>
