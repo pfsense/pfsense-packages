@@ -1268,10 +1268,10 @@ function snort_get_flowbits($rule) {
 	if (preg_match_all('/flowbits\b\s*:\s*(set|setx|unset|toggle|isset|isnotset)\s*,([^;]+)/i', $rule, $matches)) {
 		$i = -1;
 		while (++$i < count($matches[1])) {
-			$action = trim($matches[1][$i]) . ",";
+			$action = trim($matches[1][$i]);
 			$target = preg_split('/[&|]/', $matches[2][$i]);
 			foreach ($target as $t)
-				$flowbits[] = $action . trim($t);
+				$flowbits[] = "{$action}," . trim($t);
 		}
 	}
 
@@ -1316,9 +1316,10 @@ function snort_get_checked_flowbits(&$rules_map) {
 					continue;
 				$action = substr(strtolower($flowbit), 0, $pos);
 				if ($action == "isset" || $action == "isnotset") {
-					$tmp = substr($flowbit, strpos($flowbit, ",") + 1 );
-					if (!empty($tmp))
-						$checked_flowbits[$tmp] = $action;
+					$target = preg_split('/[&|]/', substr($flowbit, $pos + 1));
+					foreach ($target as $t)
+						if (!empty($t) && !isset($checked_flowbits[$t]))
+							$checked_flowbits[$t] = $action;
 				}
 			}
 		}
@@ -1356,9 +1357,10 @@ function snort_get_set_flowbits(&$rules_map) {
 					continue;
 				$action = substr(strtolower($flowbit), 0, $pos);
 				if ($action == "set" || $action == "toggle" || $action == "setx") {
-					$tmp = substr($flowbit, strpos($flowbit, ",") + 1 );
-					if (!empty($tmp))
-						$set_flowbits[$tmp] = $action;
+					$target = preg_split('/[&|]/', substr($flowbit, $pos + 1));
+					foreach ($target as $t)
+						if (!empty($t) && !isset($set_flowbits[$t]))
+							$set_flowbits[$t] = $action;
 				}
 			}
 		}
@@ -3162,7 +3164,7 @@ function snort_do_xmlrpc_sync($sync_to_ip, $username, $password, $synctimeout) {
 		log_error("snort XMLRPC sync successfully completed with {$url}:{$port}.");
 	}
 	
-	/* tell squid to reload our settings on the destination sync host. */
+	/* tell snort to reload our settings on the destination sync host. */
 	$method = 'pfsense.exec_php';
 	$execcmd  = "require_once('/usr/local/pkg/snort/snort.inc');\n";
 	$execcmd .= "sync_snort_package_config();";
