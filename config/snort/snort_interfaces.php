@@ -252,7 +252,7 @@ foreach ($a_nat as $natent): ?>
 	else{
 		$iconfn = 'pass';
 		$iconfn_msg1 = 'Snort is running on ';
-		$iconfn_msg = '. Click to stop.';
+		$iconfn_msg2 = '. Click to stop.';
 	}
 	if (snort_is_running($snort_uuid, $if_real, 'barnyard2') == 'no'){
 		$biconfn = 'block';
