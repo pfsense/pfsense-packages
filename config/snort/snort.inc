@@ -34,6 +34,7 @@ require_once("pfsense-utils.inc");
 require_once("config.inc");
 require_once("functions.inc");
 require_once("service-utils.inc");
+require_once("pkg-utils.inc");
 
 // Needed on 2.0 because of filter_get_vpns_list()
 require_once("filter.inc");
@@ -887,7 +888,9 @@ function sync_snort_package_config() {
 	snort_rules_up_install_cron($snortglob['autorulesupdate7'] != "never_up" ? true : false);
 
 	configure_cron();
-
+	
+	snort_sync_on_changes();
+	
 	conf_mount_ro();
 }
 
@@ -3040,4 +3043,153 @@ EOD;
 	unset($home_net, $external_net, $vardef, $portvardef);
 }
 
+/* Uses XMLRPC to synchronize the changes to a remote node */
+function snort_sync_on_changes() {
+	global $config, $g;
+	if (is_array($config['installedpackages']['snortsync']['config'])){
+		$snort_sync=$config['installedpackages']['snortsync']['config'][0];
+		$synconchanges = $snort_sync['varsynconchanges'];
+		$synctimeout = $snort_sync['varsynctimeout'];
+		switch ($synconchanges){
+			case "manual":
+				if (is_array($snort_sync[row])){
+					$rs=$snort_sync[row];
+					}
+				else{
+					log_error("[snort] xmlrpc sync is enabled but there is no hosts to push snort config.");
+					return;
+					}
+				break;
+			case "auto":
+					if (is_array($config['installedpackages']['carpsettings']) && is_array($config['installedpackages']['carpsettings']['config'])){
+						$system_carp=$config['installedpackages']['carpsettings']['config'][0];
+						$rs[0]['varsyncipaddress']=$system_carp['synchronizetoip'];
+						$rs[0]['varsyncusername']=$system_carp['username'];
+						$rs[0]['varsyncpassword']=$system_carp['password'];
+						if ($system_carp['synchronizetoip'] ==""){
+							log_error("[snort] xmlrpc sync is enabled but there is no system backup hosts to push snort config.");
+							return;
+						}
+					}
+					else{
+						log_error("[snort] xmlrpc sync is enabled but there is no system backup hosts to push snort config.");
+						return;
+					}
+				break;			
+			default:
+				return;
+			break;
+		}
+		if (is_array($rs)){
+			log_error("[snort] xmlrpc sync is starting.");
+			foreach($rs as $sh){
+				$sync_to_ip = $sh['varsyncipaddress'];
+				$password = $sh['varsyncpassword'];
+				if($sh['varsyncusername'])
+					$username = $sh['varsyncusername'];
+				else
+					$username = 'admin';
+				if($password && $sync_to_ip)
+					snort_do_xmlrpc_sync($sync_to_ip, $username, $password,$synctimeout);
+				}
+			log_error("[snort] xmlrpc sync is ending.");
+			}
+ 		}
+}
+/* Do the actual XMLRPC sync */
+function snort_do_xmlrpc_sync($sync_to_ip, $username, $password, $synctimeout) {
+	global $config, $g;
+
+	if(!$username)
+		return;
+		
+	if(!$password)
+		return;
+
+	if(!$sync_to_ip)
+		return;
+
+	if(!$synctimeout)
+		$synctimeout=150;
+		
+		
+	$xmlrpc_sync_neighbor = $sync_to_ip;
+    if($config['system']['webgui']['protocol'] != "") {
+		$synchronizetoip = $config['system']['webgui']['protocol'];
+		$synchronizetoip .= "://";
+    }
+    $port = $config['system']['webgui']['port'];
+    /* if port is empty lets rely on the protocol selection */
+    if($port == "") {
+		if($config['system']['webgui']['protocol'] == "http") 
+			$port = "80";
+		else 
+			$port = "443";
+    }
+	$synchronizetoip .= $sync_to_ip;
+
+	/* xml will hold the sections to sync */
+	$xml = array();
+	$xml['snortglobal'] = $config['installedpackages']['snortglobal'];
+	/* assemble xmlrpc payload */
+	$params = array(
+		XML_RPC_encode($password),
+		XML_RPC_encode($xml)
+	);
+
+	/* set a few variables needed for sync code borrowed from filter.inc */
+	$url = $synchronizetoip;
+	log_error("Beginning snort XMLRPC sync to {$url}:{$port}.");
+	$method = 'pfsense.merge_installedpackages_section_xmlrpc';
+	$msg = new XML_RPC_Message($method, $params);
+	$cli = new XML_RPC_Client('/xmlrpc.php', $url, $port);
+	$cli->setCredentials($username, $password);
+	if($g['debug'])
+		$cli->setDebug(1);
+	/* send our XMLRPC message and timeout after defined sync timeout value*/
+	$resp = $cli->send($msg, $synctimeout);
+	if(!$resp) {
+		$error = "A communications error occurred while attempting snort XMLRPC sync with {$url}:{$port}.";
+		log_error($error);
+		file_notice("sync_settings", $error, "snort Settings Sync", "");
+	} elseif($resp->faultCode()) {
+		$cli->setDebug(1);
+		$resp = $cli->send($msg, $synctimeout);
+		$error = "An error code was received while attempting snort XMLRPC sync with {$url}:{$port} - Code " . $resp->faultCode() . ": " . $resp->faultString();
+		log_error($error);
+		file_notice("sync_settings", $error, "snort Settings Sync", "");
+	} else {
+		log_error("snort XMLRPC sync successfully completed with {$url}:{$port}.");
+	}
+	
+	/* tell squid to reload our settings on the destination sync host. */
+	$method = 'pfsense.exec_php';
+	$execcmd  = "require_once('/usr/local/pkg/snort/snort.inc');\n";
+	$execcmd .= "sync_snort_package_config();";
+	/* assemble xmlrpc payload */
+	$params = array(
+		XML_RPC_encode($password),
+		XML_RPC_encode($execcmd)
+	);
+	
+	log_error("snort XMLRPC reload data {$url}:{$port}.");
+	$msg = new XML_RPC_Message($method, $params);
+	$cli = new XML_RPC_Client('/xmlrpc.php', $url, $port);
+	$cli->setCredentials($username, $password);
+	$resp = $cli->send($msg, $synctimeout);
+	if(!$resp) {
+		$error = "A communications error occurred while attempting snort XMLRPC sync with {$url}:{$port} (pfsense.exec_php).";
+		log_error($error);
+		file_notice("sync_settings", $error, "snort Settings Sync", "");
+	} elseif($resp->faultCode()) {
+		$cli->setDebug(1);
+		$resp = $cli->send($msg, $synctimeout);
+		$error = "An error code was received while attempting snort XMLRPC sync with {$url}:{$port} - Code " . $resp->faultCode() . ": " . $resp->faultString();
+		log_error($error);
+		file_notice("sync_settings", $error, "snort Settings Sync", "");
+	} else {
+		log_error("snort XMLRPC reload data success with {$url}:{$port} (pfsense.exec_php).");
+	}
+	
+}
 ?>
