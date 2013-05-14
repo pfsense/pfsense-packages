@@ -257,16 +257,28 @@ function enable_change()
 <input type="hidden" name="id" id="id" value="<?=$id;?>" />
 <table width="99%" border="0" cellpadding="0" cellspacing="0">
 <tr><td>
-<?php
-        $tab_array = array();
-        $tab_array[] = array(gettext("Snort Interfaces"), false, "/snort/snort_interfaces.php");
-        $tab_array[] = array(gettext("If Settings"), false, "/snort/snort_interfaces_edit.php?id={$id}");
-        $tab_array[] = array(gettext("Categories"), true, "/snort/snort_rulesets.php?id={$id}");
-        $tab_array[] = array(gettext("Rules"), false, "/snort/snort_rules.php?id={$id}");
-        $tab_array[] = array(gettext("Variables"), false, "/snort/snort_define_servers.php?id={$id}");
-        $tab_array[] = array(gettext("Preprocessors"), false, "/snort/snort_preprocessors.php?id={$id}");
-        $tab_array[] = array(gettext("Barnyard2"), false, "/snort/snort_barnyard.php?id={$id}");
-        display_top_tabs($tab_array);
+<?php    
+	$tab_array = array();
+	$tab_array[0] = array(gettext("Snort Interfaces"), true, "/snort/snort_interfaces.php");
+	$tab_array[1] = array(gettext("Global Settings"), false, "/snort/snort_interfaces_global.php");
+	$tab_array[2] = array(gettext("Updates"), false, "/snort/snort_download_updates.php");
+	$tab_array[3] = array(gettext("Alerts"), false, "/snort/snort_alerts.php");
+	$tab_array[4] = array(gettext("Blocked"), false, "/snort/snort_blocked.php");
+	$tab_array[5] = array(gettext("Whitelists"), false, "/snort/snort_interfaces_whitelist.php");
+	$tab_array[6] = array(gettext("Suppress"), false, "/snort/snort_interfaces_suppress.php");
+	$tab_array[7] = array(gettext("Sync"), false, "/pkg_edit.php?xml=snort/snort_sync.xml");
+	display_top_tabs($tab_array);
+	echo '</td></tr>';
+	echo '<tr><td class="tabnavtbl">';
+	$menu_iface=($if_friendly?substr($if_friendly,0,5)." ":"Iface ");
+    $tab_array = array();
+    $tab_array[] = array($menu_iface . gettext("Settings"), false, "/snort/snort_interfaces_edit.php?id={$id}");
+    $tab_array[] = array($menu_iface . gettext("Categories"), true, "/snort/snort_rulesets.php?id={$id}");
+    $tab_array[] = array($menu_iface . gettext("Rules"), false, "/snort/snort_rules.php?id={$id}");
+    $tab_array[] = array($menu_iface . gettext("Variables"), false, "/snort/snort_define_servers.php?id={$id}");
+    $tab_array[] = array($menu_iface . gettext("Preprocessors"), false, "/snort/snort_preprocessors.php?id={$id}");
+    $tab_array[] = array($menu_iface . gettext("Barnyard2"), false, "/snort/snort_barnyard.php?id={$id}");
+    display_top_tabs($tab_array);
 ?>
 </td></tr>
 <tr>
