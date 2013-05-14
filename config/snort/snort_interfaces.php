@@ -184,6 +184,7 @@ if ($pfsense_stable == 'yes')
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
 <tr><td>
 <?php
+
         $tab_array = array();
         $tab_array[0] = array(gettext("Snort Interfaces"), true, "/snort/snort_interfaces.php");
         $tab_array[1] = array(gettext("Global Settings"), false, "/snort/snort_interfaces_global.php");
@@ -192,6 +193,7 @@ if ($pfsense_stable == 'yes')
         $tab_array[4] = array(gettext("Blocked"), false, "/snort/snort_blocked.php");
         $tab_array[5] = array(gettext("Whitelists"), false, "/snort/snort_interfaces_whitelist.php");
         $tab_array[6] = array(gettext("Suppress"), false, "/snort/snort_interfaces_suppress.php");
+        $tab_array[7] = array(gettext("Sync"), false, "/pkg_edit.php?xml=snort/snort_sync.xml");
         display_top_tabs($tab_array);
 ?>
 </td></tr>
@@ -240,15 +242,28 @@ foreach ($a_nat as $natent): ?>
 /* convert fake interfaces to real and check if iface is up */
 /* There has to be a smarter way to do this */
 	$if_real = snort_get_real_interface($natent['interface']);
+	$natend_friendly= snort_get_friendly_interface($natent['interface']);
 	$snort_uuid = $natent['uuid'];
-	if (snort_is_running($snort_uuid, $if_real) == 'no')
-		$iconfn = 'pass';
-	else
+	if (snort_is_running($snort_uuid, $if_real) == 'no'){
 		$iconfn = 'block';
-	if (snort_is_running($snort_uuid, $if_real, 'barnyard2') == 'no')
-		$biconfn = 'pass';
-	else
+		$iconfn_msg1 = 'Snort is not running on ';
+		$iconfn_msg2 = '. Click to start.';
+	}
+	else{
+		$iconfn = 'pass';
+		$iconfn_msg1 = 'Snort is running on ';
+		$iconfn_msg = '. Click to stop.';
+	}
+	if (snort_is_running($snort_uuid, $if_real, 'barnyard2') == 'no'){
 		$biconfn = 'block';
+		$biconfn_msg1 = 'Barnyard2 is not running on ';
+		$biconfn_msg2 = '. Click to start.';
+	}
+	else{
+		$biconfn = 'pass';
+		$biconfn_msg1 = 'Barnyard2 is running on ';
+		$biconfn_msg2 = '. Click to stop.';
+		}
 
 	/* See if interface has any rules defined and set boolean flag */
 	$no_rules = true;
@@ -271,7 +286,7 @@ foreach ($a_nat as $natent): ?>
 			id="frd<?=$nnats;?>"
 			ondblclick="document.location='snort_interfaces_edit.php?id=<?=$nnats;?>';">
 			<?php
-				echo snort_get_friendly_interface($natent['interface']);
+				echo $natend_friendly;
 			?>
 		</td>
 		<td class="listr" 
@@ -284,7 +299,7 @@ foreach ($a_nat as $natent): ?>
 				echo "<a href='?act=toggle&id={$i}'>
 					<img src='../themes/{$g['theme']}/images/icons/icon_{$iconfn}.gif'
 					width='13' height='13' border='0'
-					title='" . gettext('click to toggle start/stop snort') . "'></a>";
+					title='" . gettext($iconfn_msg1.$natend_friendly.$iconfn_msg2) . "'></a>";
 				echo ($no_rules) ? "&nbsp;<img src=\"../themes/{$g['theme']}/images/icons/icon_frmfld_imp.png\" width=\"15\" height=\"15\" border=\"0\">" : "";
 			} else
 				echo strtoupper("disabled");
@@ -325,7 +340,7 @@ foreach ($a_nat as $natent): ?>
 				echo "<a href='?act=bartoggle&id={$i}'>
 					<img src='../themes/{$g['theme']}/images/icons/icon_{$biconfn}.gif'
 					width='13' height='13' border='0'
-					title='" . gettext('click to toggle start/stop barnyard') . "'></a>";
+					title='" . gettext($biconfn_msg1.$natend_friendly.$biconfn_msg2) . "'></a>";
 			} else
 				echo strtoupper("disabled");
 			?>
@@ -406,9 +421,11 @@ foreach ($a_nat as $natent): ?>
 					</td>
 					<td width="3%">&nbsp;
 					</td>
-					<td><strong>Click</strong> on the <img src="../themes/<?= $g['theme']; ?>/images/icons/icon_pass.gif"
-						width="13" height="13" border="0" title="<?php echo gettext("Start Icon"); ?>"> icon to <strong>start</strong>
-						snort and barnyard2.
+					<td><img src="../themes/<?= $g['theme']; ?>/images/icons/icon_pass.gif"
+						width="13" height="13" border="0" title="<?php echo gettext("Running"); ?>">
+						<img src="../themes/<?= $g['theme']; ?>/images/icons/icon_block.gif"
+						width="13" height="13" border="0" title="<?php echo gettext("Not Running"); ?>">  icons will show current 
+						snort and barnyard2 status.
 					</td>
 				</tr>
 				<tr>
@@ -417,9 +434,7 @@ foreach ($a_nat as $natent): ?>
 						an interface and settings.
 					<td width="3%">&nbsp;
 					</td>
-					<td><strong>Click</strong> on the <img src="../themes/<?= $g['theme']; ?>/images/icons/icon_block.gif"
-						width="13" height="13" border="0" title="<?php echo gettext("Stop Icon"); ?>"> icon to <strong>stop</strong>
-						snort and barnyard2.
+					<td><strong>Click</strong> on the status icons to <strong>toggle</strong> snort and barnyard2 status.
 					</td>
 				</tr>
 				<tr>

@@ -85,6 +85,7 @@ if ($savemsg) print_info_box($savemsg);
         $tab_array[4] = array(gettext("Blocked"), false, "/snort/snort_blocked.php");
         $tab_array[5] = array(gettext("Whitelists"), true, "/snort/snort_interfaces_whitelist.php");
         $tab_array[6] = array(gettext("Suppress"), false, "/snort/snort_interfaces_suppress.php");
+        $tab_array[7] = array(gettext("Sync"), false, "/pkg_edit.php?xml=snort/snort_sync.xml");
         display_top_tabs($tab_array);
 ?>
 	</td>

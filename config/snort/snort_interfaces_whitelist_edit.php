@@ -170,6 +170,21 @@ if ($savemsg)
 </script>
 <form action="snort_interfaces_whitelist_edit.php" method="post" name="iform" id="iform">
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
+<tr><td>
+<?php
+        $tab_array = array();
+        $tab_array[0] = array(gettext("Snort Interfaces"), false, "/snort/snort_interfaces.php");
+        $tab_array[1] = array(gettext("Global Settings"), false, "/snort/snort_interfaces_global.php");
+        $tab_array[2] = array(gettext("Updates"), false, "/snort/snort_download_updates.php");
+        $tab_array[3] = array(gettext("Alerts"), false, "/snort/snort_alerts.php");
+        $tab_array[4] = array(gettext("Blocked"), false, "/snort/snort_blocked.php");
+        $tab_array[5] = array(gettext("Whitelists"), true, "/snort/snort_interfaces_whitelist.php");
+        $tab_array[6] = array(gettext("Suppress"), false, "/snort/snort_interfaces_suppress.php");
+        $tab_array[7] = array(gettext("Sync"), false, "/pkg_edit.php?xml=snort/snort_sync.xml");
+        display_top_tabs($tab_array);
+?>
+	</td>
+</tr>
 <tr><td class="tabcont">
 <table width="100%" border="0" cellpadding="6" cellspacing="0">
 	<tr>
