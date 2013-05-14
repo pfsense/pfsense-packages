@@ -431,18 +431,17 @@ h += 96;
 			<tr>
 				<td class="listtopic"><?php echo gettext("Selected Category Rules"); ?></td>
 			</tr>
-
 			<tr>
 				<td>
-					<table class="tabcont" width="100%" border="0" cellpadding="0" cellspacing="0">
+					<table class="tabcont" style="table-layout: fixed;" width="100%" border="0" cellpadding="0" cellspacing="0">
 						<tr id="frheader">
-							<td width="11px" class="list" align="left">&nbsp;</td>
-							<td width="9%" class="listhdrr" align="center"><?php echo gettext("SID"); ?></td>
-							<td width="2%" class="listhdrr" align="center"><?php echo gettext("Proto"); ?></td>
+							<td width="12px" class="list" align="left">&nbsp;</td>
+							<td width="10%" class="listhdrr" align="center"><?php echo gettext("SID"); ?></td>
+							<td width="7%" class="listhdrr" align="center"><?php echo gettext("Proto"); ?></td>
 							<td width="14%" class="listhdrr" align="center"><?php echo gettext("Source"); ?></td>
-							<td width="12%" class="listhdrr" align="center"><?php echo gettext("Port"); ?></td>
+							<td width="10%" class="listhdrr" align="center"><?php echo gettext("Port"); ?></td>
 							<td width="14%" class="listhdrr" align="center"><?php echo gettext("Destination"); ?></td>
-							<td width="12%" class="listhdrr" align="center"><?php echo gettext("Port"); ?></td>
+							<td width="10%" class="listhdrr" align="center"><?php echo gettext("Port"); ?></td>
 							<td class="listhdrr" align="center"><?php echo gettext("Message"); ?></td>
 							<td width="18px" class="list" align="right"><a href="javascript: void(0)"
 							onclick="wopen('snort_rules_edit.php?id=<?=$id;?>&openruleset=<?=$currentruleset;?>','FileViewer',800,600)">
@@ -482,39 +481,39 @@ h += 96;
 								$tmp = trim(preg_replace('/^\s*#+\s*/', '', $tmp));
 								$rule_content = preg_split('/[\s]+/', $tmp);
 
-								$protocol = truncate($rule_content[1], 5); //protocol location
-								$source = truncate($rule_content[2], 13); //source location
-								$source_port = truncate($rule_content[3], 12); //source port location
-								$destination = truncate($rule_content[5], 13); //destination location
-								$destination_port = truncate($rule_content[6], 12); //destination port location
+								$protocol = truncate($rule_content[1], 6); //protocol location
+								$source = truncate($rule_content[2], 14); //source location
+								$source_port = truncate($rule_content[3], 10); //source port location
+								$destination = truncate($rule_content[5], 14); //destination location
+								$destination_port = truncate($rule_content[6], 10); //destination port location
 								$message = snort_get_msg($v['rule']);
 
-						echo "<tr><td width=\"11px\" class=\"listt\" align=\"left\" valign=\"middle\"> $textss
+						echo "<tr><td width=\"12px\" class=\"listt\" align=\"left\" valign=\"middle\"> $textss
 								<a href='?id={$id}&openruleset={$currentruleset}&act=toggle&ids={$sid}'>
 								<img src=\"../themes/{$g['theme']}/images/icons/{$iconb}\"
 								width=\"11\" height=\"11\" border=\"0\"  
 								title='" . gettext("Click to toggle enabled/disabled state") . "'></a>
 								$textse
 							       </td>
-							       <td width=\"9%\" class=\"listlr\" align=\"center\">
+							       <td width=\"10%\" class=\"listlr\" align=\"center\">
 									$textss $sid $textse
 							       </td>
-							       <td width=\"2%\" class=\"listlr\" align=\"center\">
+							       <td width=\"7%\" class=\"listlr\" align=\"center\">
 									$textss $protocol $textse
 							       </td>
 							       <td width=\"14%\" class=\"listlr\" align=\"center\">
 									$textss $source $textse
 							       </td>
-							       <td width=\"12%\" class=\"listlr\" align=\"center\">
+							       <td width=\"10%\" class=\"listlr\" align=\"center\">
 									$textss $source_port $textse
 							       </td>
 							       <td width=\"14%\" class=\"listlr\" align=\"center\">
 									$textss $destination $textse
 							       </td>
-							       <td width=\"12%\" class=\"listlr\" align=\"center\">
+							       <td width=\"10%\" class=\"listlr\" align=\"center\">
 								       $textss $destination_port $textse
 							       </td>
-								<td class=\"listbg\" style=\"word-wrap:break-word;\"><font color=\"white\"> 
+								<td class=\"listbg\" style=\"word-wrap:break-word; whitespace:pre-line;\"><font color=\"white\"> 
 									$textss $message $textse
 							       </td>";
 						?>
