@@ -573,10 +573,10 @@
 		<pkginfolink>http://forum.pfsense.org/index.php/topic,40622.0.html</pkginfolink>
 		<config_file>http://www.pfsense.com/packages/config/postfix/postfix.xml</config_file>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
-		<depends_on_package>postfix-2.8.7,1.tbz</depends_on_package>
+		<depends_on_package>postfix-2.10.0,1.tbz</depends_on_package>
 		<depends_on_package>perl-5.12.4_3.tbz</depends_on_package>
-		<depends_on_package_pbi>postfix-2.9.4_2-i386.pbi</depends_on_package_pbi>
-		<version>2.8.7,1 pkg v.2.3.5</version>
+		<depends_on_package_pbi>postfix-2.10.0-i386.pbi</depends_on_package_pbi>
+		<version>2.10.0 pkg v.2.3.5</version>
 		<status>RC1</status>
 		<required_version>2.0</required_version>
 		<configurationfile>postfix.xml</configurationfile>
@@ -1278,6 +1278,7 @@
 		<maintainer>marcellocoutinho@gmail.com fernando@netfilter.com.br seth.mos@dds.nl mfuchs77@googlemail.com jimp@pfsense.org</maintainer>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
 		<depends_on_package>squid-3.3.4.tbz</depends_on_package>
+		<depends_on_package>libltdl-2.4.2.tbz</depends_on_package>
 		<depends_on_package>libwww-5.4.0_4.tbz</depends_on_package>
 		<build_pbi>
 			<ports_before>www/libwww</ports_before>
@@ -1560,7 +1561,7 @@
 		<descr>Unbound is a validating, recursive, and caching DNS resolver. This package is a drop in replacement for Services: DNS Forwarder and also supports DNSSEC extensions. Once installed please configure the Unbound service by visiting Services: Unbound DNS.</descr>
 		<website>http://www.unbound.net/</website>
 		<category>Services</category>
-		<version>1.4.20_5</version>
+		<version>1.4.20_6</version>
 		<status>Alpha</status>
 		<maintainer>warren@decoy.co.za</maintainer>
 		<required_version>2.0</required_version>
