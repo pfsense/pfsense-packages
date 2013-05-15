@@ -4,7 +4,7 @@
 /*
 	freeradius.inc
 	part of pfSense (http://www.pfSense.com)
-	Copyright (C) 2011 - 2012 Alexander Wilke <nachtfalkeaw@web.de>
+	Copyright (C) 2013 Alexander Wilke <nachtfalkeaw@web.de>
 	Copyright (C) 2013 Marcello Coutinho
 	All rights reserved.
 
@@ -2521,52 +2521,75 @@ conf_mount_ro();
 /* Uses XMLRPC to synchronize the changes to a remote node */
 function freeradius_sync_on_changes() {
 	global $config, $g;
-	$varsyncenablexmlrpc = $config['installedpackages']['freeradiussync']['config'][0]['varsyncenablexmlrpc'];
-	$varsynctimeout = $config['installedpackages']['freeradiussync']['config'][0]['varsynctimeout'];	
-
-	// if checkbox is NOT checked do nothing
-	if(!$varsyncenablexmlrpc) {
+	if (is_array($config['installedpackages'][freeradiussync'])){
+		$synconchanges = $config['installedpackages'][freeradiussync']['config'][0]['varsyncenablexmlrpc'];
+		$varsynctimeout = $config['installedpackages'][freeradiussync']['config'][0]['varsynctimeout'];
+		}
+	else
+	{
 		return;
 	}
- 
-	log_error("FreeRADIUS: Starting XMLRPC process (freeradius_do_xmlrpc_sync) with timeout {$varsynctimeout} seconds.");
-	
-	// if checkbox is checked get IP and password of the destination hosts
-	foreach ($config['installedpackages']['freeradiussync']['config'] as $rs ){
-		foreach($rs['row'] as $sh){
-			// if checkbox is NOT checked do nothing
-			if($sh['varsyncdestinenable']) {
-				$varsyncprotocol 	= $sh['varsyncprotocol'];
-				$sync_to_ip 		= $sh['varsyncipaddress'];
-				$password   		= $sh['varsyncpassword'];
-				$varsyncport 		= $sh['varsyncport'];
-				// check if all credentials are complete for this host
-				if($password && $sync_to_ip && $varsyncport && $varsyncprotocol) {
-					freeradius_do_xmlrpc_sync($sync_to_ip, $password, $varsyncport, $varsyncprotocol);
+
+	// if checkbox is NOT checked do nothing
+	switch ($synconchanges){
+		case "manual":
+			if (is_array($config['installedpackages'][freeradiussync']['config'][0]['row'])){
+				$rs=$config['installedpackages'][freeradiussync']['config'][0]['row'];
+				}
+			else{
+				log_error("[FreeRADIUS]: xmlrpc sync is enabled but there is no hosts to push on FreeRADIUS config.");
+				return;
+				}
+			break;
+		case "auto":
+				if (is_array($config['installedpackages']['carpsettings']) && is_array($config['installedpackages']['carpsettings']['config'])){
+					$system_carp=$config['installedpackages']['carpsettings']['config'][0];
+					$rs[0]['varsyncdestinenable']="on";
+					$rs[0]['varsyncprotocol']=($config['system']['webgui']['protocol']!=""?$config['system']['webgui']['protocol']:"https");
+					$rs[0]['varsyncipaddress']=$system_carp['synchronizetoip'];
+					$rs[0]['varsyncpassword']=$system_carp['password'];
+					$rs[0]['varsyncport']=($config['system']['webgui']['port']!=""?$config['system']['webgui']['port']:"443");
+					if (! is_ipaddr($system_carp['synchronizetoip'])){
+						log_error("[FreeRADIUS]: xmlrpc sync is enabled but there is no system backup hosts to push FreeRADIUS config.");
+						return;
+						}
+				}
+				else{
+					log_error("[FreeRADIUS]: xmlrpc sync is enabled but there is no system backup hosts to push FreeRADIUS config.");
+					return;
+				}
+			break;		
+		default:
+			return;
+		break;
+		}
+		if (is_array($rs)){
+			log_error("[FreeRADIUS]: xmlrpc sync is starting with timeout {$varsynctimeout} seconds.");
+			foreach($rs as $sh){
+				if($sh['varsyncdestinenable']){
+					$varsyncprotocol 	= $sh['varsyncprotocol'];
+					$sync_to_ip 		= $sh['varsyncipaddress'];
+					$password   		= $sh['varsyncpassword'];
+					$varsyncport 		= $sh['varsyncport'];
+					if($password && $sync_to_ip)
+						freeradius_do_xmlrpc_sync($sync_to_ip, $password, $varsyncport, $varsyncprotocol,$varsynctimeout);
+					else
+						log_error("[FreeRADIUS]: XMLRPC Sync with {$sh['varsyncipaddress']} has incomplete credentials. No XMLRPC Sync done!");
 				}
 				else {
-					log_error("FreeRADIUS: XMLRPC Sync with {$sh['varsyncipaddress']} has incomplete credentials. No XMLRPC Sync done!");
+				log_error("[FreeRADIUS]: XMLRPC Sync with {$sh['varsyncipaddress']} is disabled");
 				}
 			}
-			else {
-				log_error("FreeRADIUS: XMLRPC Sync with {$sh['varsyncipaddress']} is disabled");
+			log_error("[FreeRADIUS]: xmlrpc sync is ending.");
 			}
-		}
-	}
-	log_error("FreeRADIUS: Finished XMLRPC process (freeradius_do_xmlrpc_sync).");
 }
 
 /* Do the actual XMLRPC sync */
-function freeradius_do_xmlrpc_sync($sync_to_ip, $password, $varsyncport, $varsyncprotocol) {
+function freeradius_do_xmlrpc_sync($sync_to_ip, $password, $varsyncport, $varsyncprotocol,$varsynctimeout) {
 	global $config, $g;
 
-	$varsynctimeout = $config['installedpackages']['freeradiussync']['config'][0]['varsynctimeout'];
-
-	if($varsynctimeout == '' || $varsynctimeout == 0) {
+	if($varsynctimeout == '' || $varsynctimeout == 0)
 		$varsynctimeout = 150;
-	}
-
-	// log_error("FreeRADIUS: Starting XMLRPC process (freeradius_do_xmlrpc_sync) with timeout {$varsynctimeout} seconds.");
 
 	if(!$password)
 		return;
@@ -2600,7 +2623,7 @@ function freeradius_do_xmlrpc_sync($sync_to_ip, $password, $varsyncport, $varsyn
 
 	/* set a few variables needed for sync code borrowed from filter.inc */
 	$url = $synchronizetoip;
-	log_error("FreeRADIUS: Beginning FreeRADIUS XMLRPC sync with {$url}:{$port}.");
+	log_error("[FreeRADIUS]: Beginning FreeRADIUS XMLRPC sync with {$url}:{$port}.");
 	$method = 'pfsense.merge_installedpackages_section_xmlrpc';
 	$msg = new XML_RPC_Message($method, $params);
 	$cli = new XML_RPC_Client('/xmlrpc.php', $url, $port);
@@ -2611,22 +2634,22 @@ function freeradius_do_xmlrpc_sync($sync_to_ip, $password, $varsyncport, $varsyn
 		$resp = $cli->send($msg, $varsynctimeout);
 		if(!$resp) {
 			$error = "A communications error occurred while FreeRADIUS was attempting XMLRPC sync with {$url}:{$port}.";
-			log_error("FreeRADIUS: $error");
-			file_notice("sync_settings", $error, "freeradius Settings Sync", "");
+			log_error("[FreeRADIUS]: $error");
+			file_notice("sync_settings", $error, "FreeRADIUS Settings Sync", "");
 		} elseif($resp->faultCode()) {
 			$cli->setDebug(1);
 			$resp = $cli->send($msg, $varsynctimeout);
 			$error = "An error code was received while FreeRADIUS XMLRPC was attempting to sync with {$url}:{$port} - Code " . $resp->faultCode() . ": " . $resp->faultString();
-			log_error("FreeRADIUS: $error");
-			file_notice("sync_settings", $error, "freeradius Settings Sync", "");
+			log_error("[FreeRADIUS]: $error");
+			file_notice("sync_settings", $error, "FreeRADIUS Settings Sync", "");
 		} else {
-			log_error("FreeRADIUS: XMLRPC has synced data successfully with {$url}:{$port}.");
+			log_error("[FreeRADIUS]: XMLRPC has synced data successfully with {$url}:{$port}.");
 		}
 	
-	/* tell freeradius to reload our settings on the destionation sync host. */
+	/* tell FreeRADIUS to reload our settings on the destionation sync host. */
 	$method = 'pfsense.exec_php';
 	$execcmd  = "require_once('/usr/local/pkg/freeradius.inc');\n";
-	// pfblocker just needed one fuction to reload after XMLRPC. freeRADIUS needs more so we point to a fuction below which contains all fuctions
+	// pfblocker just needed one fuction to reload after XMLRPC. FreeRADIUS needs more so we point to a fuction below which contains all fuctions
 	$execcmd .= "freeradius_all_after_XMLRPC_resync();";
 	
 	/* assemble xmlrpc payload */
@@ -2635,7 +2658,7 @@ function freeradius_do_xmlrpc_sync($sync_to_ip, $password, $varsyncport, $varsyn
 		XML_RPC_encode($execcmd)
 	);
 
-	log_error("FreeRADIUS XMLRPC is reloading data on {$url}:{$port}.");
+	log_error("[FreeRADIUS]: XMLRPC is reloading data on {$url}:{$port}.");
 	$msg = new XML_RPC_Message($method, $params);
 	$cli = new XML_RPC_Client('/xmlrpc.php', $url, $port);
 	$cli->setCredentials('admin', $password);
@@ -2643,20 +2666,18 @@ function freeradius_do_xmlrpc_sync($sync_to_ip, $password, $varsyncport, $varsyn
 		if(!$resp) {
 			$error = "A communications error occurred while FreeRADIUS was attempting XMLRPC sync with {$url}:{$port} (exec_php).";
 			log_error($error);
-			file_notice("sync_settings", $error, "freeradius Settings Sync", "");
+			file_notice("sync_settings", $error, "FreeRADIUS Settings Sync", "");
 		} elseif($resp->faultCode()) {
 			$cli->setDebug(1);
 			$resp = $cli->send($msg, $varsynctimeout);
 			$error = "An error code was received while FreeRADIUS XMLRPC was attempting to sync with {$url}:{$port} - Code " . $resp->faultCode() . ": " . $resp->faultString();
 			log_error($error);
-			file_notice("sync_settings", $error, "freeradius Settings Sync", "");
+			file_notice("sync_settings", $error, "FreeRADIUS Settings Sync", "");
 		} else {
-			log_error("FreeRADIUS: XMLRPC has reloaded data successfully on {$url}:{$port} (exec_php).");
+			log_error("[FreeRADIUS]: XMLRPC has reloaded data successfully on {$url}:{$port} (exec_php).");
 		}
 
 }
-
-// ##### The part above is based on the code of pfblocker #####
 
 // This function restarts all other needed functions after XMLRPC so that the content of .XML + .INC will be written in the files (clients.conf, users)
 // Adding more functions will increase the to sync
