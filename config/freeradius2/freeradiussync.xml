@@ -9,8 +9,8 @@
 /*
 freeradiussync.xml
 part of pfSense (http://www.pfSense.com)
-Copyright (C) 2011 - 2012 Alexander Wilke <nachtfalkeaw@web.de>
-Copyright (C) 2011 Marcello Coutinho <marcellocoutinho@gmail.com>
+Copyright (C) 2013 Alexander Wilke <nachtfalkeaw@web.de>
+Copyright (C) 2013 Marcello Coutinho <marcellocoutinho@gmail.com>
 based on pfblocker_sync.xml
 All rights reserved.
 
@@ -47,7 +47,7 @@ POSSIBILITY OF SUCH DAMAGE.
 	<requirements>Describe your package requirements here</requirements>
 	<faq>Currently there are no FAQ items provided.</faq>
 	<name>freeradiussync</name>
-	<version>2.1.12</version>
+	<version>2.2.0</version>
 	<title>FreeRADIUS: XMLRPC Sync</title>
 	<include_file>/usr/local/pkg/freeradius.inc</include_file>
 	<menu>
@@ -111,23 +111,29 @@ POSSIBILITY OF SUCH DAMAGE.
 	</tabs>
 	<fields>
 		<field>
-			<name>freeRADIUS XMLRPC Sync</name>
+			<name>FreeRADIUS XMLRPC Sync</name>
 			<type>listtopic</type>
 		</field>
 		<field>
-			<fielddescr>Automatically sync freeRADIUS configuration changes?</fielddescr>
+			<fielddescr>Enable Sync</fielddescr>
 			<fieldname>varsyncenablexmlrpc</fieldname>
 			<description><![CDATA[All changes will be synced immediately to the IPs listed below if this option is checked.<br>
-						Only <b>Users</b>, <b>MACs</b> and <b>NAS / Clients</b> will be synced.<br>
-						<b>Important:</b> Only sync from host A to B, A to C but <b>do not</B> enable XMLRPC sync <b>to</b> A. This will result in a loop!]]></description>
-			<type>checkbox</type>
+						<b>Important:</b> While using "Sync to hosts defined below", only sync from host A to B, A to C but <b>do not</B> enable XMLRPC sync <b>to</b> A. This will result in a loop!]]></description>
+			<type>select</type>
+			<required/>
+			<default_value>auto</default_value>
+			<options>
+				<option><name>Sync to configured system backup server</name><value>auto</value></option>
+				<option><name>Sync to host(s) defined below</name><value>manual</value></option>
+				<option><name>Do not sync this package configuration</name><value>disabled</value></option>
+			</options>
 		</field>
 		<field>
-                        <fielddescr>XMLRPC timeout</fielddescr>
+			<fielddescr>XMLRPC timeout</fielddescr>
 			<fieldname>varsynctimeout</fieldname>
 			<description><![CDATA[Timeout in seconds for the XMLRPC timeout. Default: 150]]></description>
 			<type>input</type>
-                        <default_value>150</default_value>
+						<default_value>150</default_value>
 			<size>5</size>
 		</field>
 
@@ -166,7 +172,7 @@ POSSIBILITY OF SUCH DAMAGE.
 					<type>input</type>
 					<size>3</size>
 				</rowhelperfield>
-                                <rowhelperfield>
+				<rowhelperfield>
 					<fielddescr>GUI Admin Password</fielddescr>
 					<fieldname>varsyncpassword</fieldname>
 					<description><![CDATA[Password of the user "admin" on the destination host.]]></description>
