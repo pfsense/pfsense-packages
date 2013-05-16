@@ -1649,7 +1649,7 @@ function squid_resync_auth() {
 		$prompt = ($settings['auth_prompt'] ? $settings['auth_prompt'] : 'Please enter your credentials to access the proxy');
 		switch ($auth_method) {
 			case 'local':
-				$conf .= 'auth_param basic program '.SQUID_LOCALBASE.'/libexec/squid/baisc_ncsa_auth ' . SQUID_PASSWD . "\n";
+				$conf .= 'auth_param basic program '.SQUID_LOCALBASE.'/libexec/squid/basic_ncsa_auth ' . SQUID_PASSWD . "\n";
 				break;
 			case 'ldap':
 				$port = (isset($settings['auth_server_port']) ? ":{$settings['auth_server_port']}" : '');
@@ -1691,7 +1691,7 @@ EOD;
 
 		// Include squidguard denied acl log in squid
 		if ($settingsconfig['log_sqd'])
-			$conf .="http_access deny passowrd sglog\n";
+			$conf .="http_access deny password sglog\n";
 			
 		// Allow the other ACLs as long as they authenticate
 		foreach ($password as $acl)
