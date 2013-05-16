@@ -284,7 +284,16 @@
 			</options>
 			<multiple/>
 			<size>06</size>
-		</field>		
+		</field>
+		<field>
+			<fielddescr>Custom refresh_patterns</fielddescr>
+			<fieldname>custom_refresh_patterns</fieldname>
+			<description>Enter custom refresh_patterns for better dynamic cache. This options will be included only if dynamic cache is enabled.</description>
+			<type>textarea</type>
+			<cols>67</cols>
+			<rows>5</rows>
+			<encoding>base64</encoding>
+		</field>
 	</fields>
 	<custom_php_command_before_form>
 		if($_POST['harddisk_cache_size'] != $config['installedpackages']['squidcache']['config'][0]['harddisk_cache_size']) {

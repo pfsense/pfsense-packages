@@ -645,10 +645,11 @@ function squidguard_before_form_dest($pkg) {
 	$i=0;
 	foreach($pkg['fields']['field'] as $field) {
 		# order
-		if (is_array($destination_items) && $field['fieldname'] == 'order') {
+		if ($field['fieldname'] == 'order') {
 			$fld = &$pkg['fields']['field'][$i];
-			foreach($destination_items as $nmkey => $nm)
-				$fld['options']['option'][] = array('name'=>$nm, 'value'=>$nmkey);
+			if (is_array($destination_items))
+				foreach($destination_items as $nmkey => $nm)
+					$fld['options']['option'][] = array('name'=>$nm, 'value'=>$nmkey);
 			$fld['options']['option'][] = array('name'=>'--- Last ---', 'value'=>'9999');
 			$fld['options']['option'][] = array('name'=>'-----', 'value'=>''); # ! this is must be last !
 		}

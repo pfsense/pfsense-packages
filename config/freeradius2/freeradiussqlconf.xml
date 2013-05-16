@@ -9,7 +9,7 @@
 /*
 	freeradiussqlconf.xml
 	part of pfSense (http://www.pfSense.com)
-	Copyright (C) 2011 - 2012 Alexander Wilke <nachtfalkeaw@web.de>
+	Copyright (C) 2013 Alexander Wilke <nachtfalkeaw@web.de>
 	All rights reserved.
 
 	Based on m0n0wall (http://m0n0.ch/wall)
@@ -45,7 +45,7 @@
 	<requirements>Describe your package requirements here</requirements>
 	<faq>Currently there are no FAQ items provided.</faq>
 	<name>freeradiussqlconf</name>
-	<version>none</version>
+	<version>2.2.0</version>
 	<title>FreeRADIUS: SQL</title>
 	<aftersaveredirect>pkg_edit.php?xml=freeradiussqlconf.xml&amp;id=0</aftersaveredirect>
 	<include_file>/usr/local/pkg/freeradius.inc</include_file>

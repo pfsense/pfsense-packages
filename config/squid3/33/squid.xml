@@ -370,12 +370,13 @@
 			<default_value>3129</default_value>
 		</field>
 		<field>
-			<fielddescr>Cert</fielddescr>
-			<fieldname>dcert</fieldname>
-			<description><![CDATA[Select Certificate to use in SSL interception<br>
-								To create a Certificate on pfsense, go to <strong>system -> Cert Manager<strong>]]></description>
+			<fielddescr>CA</fielddescr>
+			<fieldname>dca</fieldname>
+			<description><![CDATA[Select Certificate Authority to use when SSL interception is enabled.<br>
+								To create a CA on pfsense, go to <strong>system -> Cert Manager<strong><br>
+								Install the CA crt as an trusted ca on each computer you want to filter ssl to avoid ssl error on each connection.]]></description>
 	    	<type>select_source</type>
-			<source><![CDATA[$config['cert']]]></source>
+			<source><![CDATA[$config['ca']]]></source>
 			<source_name>descr</source_name>
 			<source_value>refid</source_value>
 		</field>
@@ -401,11 +402,17 @@
 		<size>3</size>
 		</field>
 		<field>
-			<fielddescr>sslcrtd adapt</fielddescr>
+			<fielddescr>Certificate adapt</fielddescr>
 			<fieldname>interception_adapt</fieldname>
-			<description><![CDATA[Pass original SSL server certificate information to the user. Allow the user to make an informed decision on whether to trust the server certificate.<br>Hint: setCommonName ssl::certDomainMismatch<br><a target=_new href='http://wiki.squid-cache.org/Features/MimicSslServerCert'>wiki doc with reference</a>]]></description>
-			<type>input</type>
-			<size>70</size>
+			<description><![CDATA[Pass original SSL server certificate information to the user. Allow the user to make an informed decision on whether to trust the server certificate.<br>Hint: Set subject CN<br><a target=_new href='http://wiki.squid-cache.org/Features/MimicSslServerCert'>wiki doc with reference</a>]]></description>
+			<type>select</type>
+			<options>
+					<option><name>Sets the "Not After" (setValidAfter).</name><value>setValidAfter</value></option>
+					<option><name>Sets the "Not Before" (setValidBefore).</name><value>setValidBefore</value></option>
+					<option><name>Sets CN property (setCommonName)</name><value>setCommonName</value></option>
+			</options>
+			<multiple/>
+			<size>3</size>
 		</field>
 		<field>
 			<name>Logging Settings</name>

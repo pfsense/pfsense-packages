@@ -2,7 +2,7 @@
 /*
 	freeradius_view_config.php
 	part of pfSense (http://www.pfsense.com/)
-	Copyright (C) 2011 - 2012 Alexander Wilke <nachtfalkeaw@web.de>
+	Copyright (C) 2013 Alexander Wilke <nachtfalkeaw@web.de>
 	Copyright (C) 2011 Marcello Coutinho <marcellocoutinho@gmail.com>
 	based on postfix_view_config.php
 	based on varnish_view_config.
