@@ -57,6 +57,18 @@ if (isset($_POST['del_x'])) {
 			exec("/bin/rm -r /var/log/snort/snort_{$if_real}{$snort_uuid}");
 			exec("/bin/rm -r {$snortdir}/snort_{$snort_uuid}_{$if_real}");
 
+			// If interface had auto-generated Suppress List, then
+			// delete that along with the interface
+			$autolist = "{$a_nat[$rulei]['interface']}" . "suppress";
+			$a_suppress = &$config['installedpackages']['snortglobal']['suppress']['item'];
+			foreach ($a_suppress as $k => $i) {
+				if ($i['name'] == $autolist) {
+					unset($config['installedpackages']['snortglobal']['suppress']['item'][$k]);
+					break;
+				}
+			}
+
+			// Finally delete the interface's config entry entirely
 			unset($a_nat[$rulei]);
 		}
 		conf_mount_ro();
@@ -215,7 +227,7 @@ if ($pfsense_stable == 'yes')
 					<td></td>
 					<td align="center" valign="middle"><a href="snort_interfaces_edit.php?id=<?php echo $id_gen;?>"><img
 						src="../themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif"
-						width="17" height="17" border="0" title="<?php echo gettext('add interface');?>"></a></td>
+						width="17" height="17" border="0" title="<?php echo gettext('Add Snort interface mapping');?>"></a></td>
 				</tr>
 			</table>
 			</td>
@@ -354,7 +366,7 @@ foreach ($a_nat as $natent): ?>
 				<tr>
 					<td><a href="snort_interfaces_edit.php?id=<?=$i;?>"><img
 						src="/themes/<?= $g['theme']; ?>/images/icons/icon_e.gif"
-						width="17" height="17" border="0" title="<?php echo gettext('edit interface'); ?>"></a>
+						width="17" height="17" border="0" title="<?php echo gettext('Edit Snort interface mapping'); ?>"></a>
 					</td>
 				</tr>
 			</table>
@@ -374,11 +386,13 @@ foreach ($a_nat as $natent): ?>
 						<tr>
 							<td><?php if ($nnats == 0): ?><img
 								src="../themes/<?= $g['theme']; ?>/images/icons/icon_x_d.gif"
-								width="17" height="17" title="<?php echo gettext("delete selected interface"); ?>" border="0"><?php else: ?>
+								width="17" height="17" " border="0">
+							    <?php else: ?>
 								<input name="del" type="image"
 								src="../themes/<?= $g['theme']; ?>/images/icons/icon_x.gif"
-								width="17" height="17" title="<?php echo gettext("delete selected interface"); ?>"
-								onclick="return confirm('Do you really want to delete the selected Snort mapping?')"><?php endif; ?></td>
+								width="17" height="17" title="<?php echo gettext("Delete selected Snort interface mapping(s)"); ?>"
+								onclick="return intf_del()">
+							    <?php endif; ?></td>
 						</tr>
 					</table>
 				</td>
@@ -396,9 +410,12 @@ foreach ($a_nat as $natent): ?>
 			<table class="tabcont" width="100%" border="0" cellpadding="1" cellspacing="1">
 				<tr>
 					<td colspan="3"><span class="red"><strong><?php echo gettext("Note:"); ?></strong></span> <br>
-						<?php echo gettext('This is the <strong>Snort Menu</strong> where you can see an over ' .
-						'view of all your interface settings.  ' .
-						'Please visit the <strong>Global Settings</strong> tab before adding ' . 'an interface.'); ?>
+						<?php echo gettext("This is the ") . "<strong>" . gettext("Snort Menu ") . 
+						"</strong>" . gettext("where you can see an overview of all your interface settings.");
+						if (empty($a_nat)) {
+							echo gettext("Please visit the ") . "<strong>" . gettext("Global Settings") . 
+							"</strong>" . gettext(" tab before adding an interface."); 
+						}?>
 					</td>
 				</tr>
 				<tr>
@@ -448,6 +465,26 @@ foreach ($a_nat as $natent): ?>
 	</tr>
 </table>
 </form>
+
+<script type="text/javascript">
+
+function intf_del() {
+	var isSelected = false;
+	var inputs = document.iform.elements;
+	for (var i = 0; i < inputs.length; i++) {
+		if (inputs[i].type == "checkbox") {
+			if (inputs[i].checked)
+				isSelected = true;
+		}
+	}
+	if (isSelected)
+		return confirm('Do you really want to delete the selected Snort mapping?');
+	else
+		alert("There is no Snort mapping selected for deletion.  Click the checkbox beside the Snort mapping(s) you wish to delete.");
+}
+
+</script>
+
 <?php
 include("fend.inc");
 ?>

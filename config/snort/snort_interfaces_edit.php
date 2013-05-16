@@ -57,10 +57,21 @@ if (empty($snortglob['rule'][$id]['uuid'])) {
 }
 else {
 	$pconfig['uuid'] = $a_rule[$id]['uuid'];
+	$pconfig['descr'] = $a_rule[$id]['descr'];
 	$rebuild_rules = "off";
 }
 $snort_uuid = $pconfig['uuid'];
 
+// Get the physical configured interfaces on the firewall
+if (function_exists('get_configured_interface_with_descr'))
+	$interfaces = get_configured_interface_with_descr();
+else {
+	$interfaces = array('wan' => 'WAN', 'lan' => 'LAN');
+	for ($i = 1; isset($config['interfaces']['opt' . $i]); $i++)
+		$interfaces['opt' . $i] = $config['interfaces']['opt' . $i]['descr'];
+}
+
+// See if interface is already configured, and use its values
 if (isset($id) && $a_rule[$id]) {
 	/* old options */
 	$pconfig = $a_rule[$id];
@@ -68,8 +79,24 @@ if (isset($id) && $a_rule[$id]) {
 		$pconfig['configpassthru'] = base64_decode($pconfig['configpassthru']);
 	if (empty($pconfig['uuid']))
 		$pconfig['uuid'] = $snort_uuid;
-	if (!$pconfig['interface'])
-		$pconfig['interface'] = "wan";
+}
+// Must be a new interface, so try to pick next available physical interface to use
+elseif (isset($id) && !isset($a_rule[$id])) {
+	$ifaces = get_configured_interface_list();
+	$ifrules = array();
+	foreach($a_rule as $r)
+		$ifrules[] = $r['interface'];
+	foreach ($ifaces as $i) {
+		if (!in_array($i, $ifrules)) {
+			$pconfig['interface'] = $i;
+			break;
+		}
+	}
+	if (count($ifrules) == count($ifaces)) {
+		$input_errors[] = "No more available interfaces to configure for Snort!";
+		$interfaces = array();
+		$pconfig = array();
+	}
 }
 
 if (isset($_GET['dup']))
@@ -228,19 +255,11 @@ include_once("head.inc");
 		<td width="78%" class="vtable">
 			<select name="interface" class="formselect" tabindex="0">
 		<?php
-			if (function_exists('get_configured_interface_with_descr'))
-				$interfaces = get_configured_interface_with_descr();
-			else {
-				$interfaces = array('wan' => 'WAN', 'lan' => 'LAN');
-				for ($i = 1; isset($config['interfaces']['opt' . $i]); $i++) {
-					$interfaces['opt' . $i] = $config['interfaces']['opt' . $i]['descr'];
-				}
-			}
 			foreach ($interfaces as $iface => $ifacename): ?>
 				<option value="<?=$iface;?>"
-			<?php if ($iface == $pconfig['interface']) echo "selected"; ?>><?=htmlspecialchars($ifacename);?>
+			<?php if ($iface == $pconfig['interface']) echo " selected"; ?>><?=htmlspecialchars($ifacename);?>
 				</option>
-			<?php 	endforeach; ?>
+			<?php endforeach; ?>
 			</select>&nbsp;&nbsp;
 			<span class="vexpl"><?php echo gettext("Choose which interface this Snort instance applies to."); ?><br/>
 				<span class="red"><?php echo gettext("Hint:"); ?> </span><?php echo gettext("in most cases, you'll want to use WAN here."); ?></span><br/></td>
@@ -248,8 +267,7 @@ include_once("head.inc");
 	<tr>
 				<td width="22%" valign="top" class="vncellreq"><?php echo gettext("Description"); ?></td>
 				<td width="78%" class="vtable"><input name="descr" type="text"
-					class="formfld" id="descr" size="40"
-					value="<?=htmlspecialchars($pconfig['descr']);?>"> <br/>
+				class="formfld" id="descr" size="40" value="<?=htmlspecialchars($pconfig['descr']); ?>"> <br/>
 				<span class="vexpl"><?php echo gettext("Enter a meaningful description here for your reference."); ?></span><br/></td>
 	</tr>
 <tr>
