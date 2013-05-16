@@ -847,7 +847,7 @@ function snort_rules_up_install_cron($should_install) {
 }
 
 /* Only run when all ifaces needed to sync. Expects filesystem rw */
-function sync_snort_package_config() {
+function sync_snort_package_config($via_rpc=false) {
 	global $config, $g, $flowbit_rules_file, $snort_enforcing_rules_file;
 	global $snort_version, $rebuild_rules;
 
@@ -891,6 +891,11 @@ function sync_snort_package_config() {
 	
 	snort_sync_on_changes();
 	
+	if ($via_rpc==true){
+
+		// include here all function calls snort need after xml rpc sync code on backup server
+
+	}
 	conf_mount_ro();
 }
 
@@ -3167,7 +3172,7 @@ function snort_do_xmlrpc_sync($sync_to_ip, $username, $password, $synctimeout) {
 	/* tell snort to reload our settings on the destination sync host. */
 	$method = 'pfsense.exec_php';
 	$execcmd  = "require_once('/usr/local/pkg/snort/snort.inc');\n";
-	$execcmd .= "sync_snort_package_config();";
+	$execcmd .= "sync_snort_package_config(true);";
 	/* assemble xmlrpc payload */
 	$params = array(
 		XML_RPC_encode($password),
