@@ -2521,9 +2521,9 @@ conf_mount_ro();
 /* Uses XMLRPC to synchronize the changes to a remote node */
 function freeradius_sync_on_changes() {
 	global $config, $g;
-	if (is_array($config['installedpackages'][freeradiussync'])){
-		$synconchanges = $config['installedpackages'][freeradiussync']['config'][0]['varsyncenablexmlrpc'];
-		$varsynctimeout = $config['installedpackages'][freeradiussync']['config'][0]['varsynctimeout'];
+	if (is_array($config['installedpackages']['freeradiussync'])){
+		$synconchanges = $config['installedpackages']['freeradiussync']['config'][0]['varsyncenablexmlrpc'];
+		$varsynctimeout = $config['installedpackages']['freeradiussync']['config'][0]['varsynctimeout'];
 		}
 	else
 	{
@@ -2533,8 +2533,8 @@ function freeradius_sync_on_changes() {
 	// if checkbox is NOT checked do nothing
 	switch ($synconchanges){
 		case "manual":
-			if (is_array($config['installedpackages'][freeradiussync']['config'][0]['row'])){
-				$rs=$config['installedpackages'][freeradiussync']['config'][0]['row'];
+			if (is_array($config['installedpackages']['freeradiussync']['config'][0]['row'])){
+				$rs=$config['installedpackages']['freeradiussync']['config'][0]['row'];
 				}
 			else{
 				log_error("[FreeRADIUS]: xmlrpc sync is enabled but there is no hosts to push on FreeRADIUS config.");
