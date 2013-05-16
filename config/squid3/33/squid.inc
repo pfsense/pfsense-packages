@@ -819,31 +819,49 @@ function squid_resync_general() {
 	$ssl_port = ($settings['ssl_proxy_port'] ? $settings['ssl_proxy_port'] : 3127);
 	
 #Read assigned interfaces
+	$real_ifaces = array();
+	
 	if($settings['active_interface'])
 		$proxy_ifaces = explode(",", $settings['active_interface']);
 	else
 		$proxy_ifaces=array("lan");
 
-	if ($settings['transparent_proxy']=="on")
+	if ($settings['transparent_proxy']=="on"){
 		$transparent_ifaces = explode(",", $settings['transparent_active_interface']);
-	else
+		foreach ($transparent_ifaces as $t_iface){
+			$t_iface_ip = squid_get_real_interface_address($t_iface);
+			if($t_iface_ip[0])
+				$real_ifaces[]=$t_iface_ip;
+			}
+		}
+	else{
 		$transparent_ifaces=array();
+	}
 	
-	if ($settings['ssl_proxy']=="on")
+	if ($settings['ssl_proxy']=="on"){
 		$ssl_ifaces = explode(",", $settings['ssl_active_interface']);
-	else
+		foreach ($ssl_ifaces as $s_iface){
+			$s_iface_ip = squid_get_real_interface_address($s_iface);
+			if($s_iface_ip[0])
+				$real_ifaces[]=$s_iface_ip;
+			}
+		}
+	else{
 		$ssl_ifaces=array();
-	
-	$real_ifaces = array();
+	}
+
+	#check all proxy interfaces selected
 	foreach ($proxy_ifaces as $iface) {
 		$iface_ip = squid_get_real_interface_address($iface);
 		if($iface_ip[0]) {
+			$real_ifaces[]=$iface_ip;
 			if (in_array($iface,$ssl_ifaces))
 				$conf .= "http_port {$iface_ip[0]}:{$port} {$ssl_interception}\n";
 			else
 				$conf .= "http_port {$iface_ip[0]}:{$port}\n";
 			}
 		}
+			
 	if (($settings['transparent_proxy'] == 'on')) {
 		if ($settings['ssl_proxy'] == "on" && count($ssl_ifaces)>0){
 			$conf .= "http_port 127.0.0.1:{$port} intercept {$ssl_interception}\n";
@@ -905,7 +923,8 @@ EOD;
 			list($ip, $mask) = $iface;
 			$ip = long2ip(ip2long($ip) & ip2long($mask));
 			$mask = 32-log((ip2long($mask) ^ ip2long('255.255.255.255'))+1,2);
-			$src .= " $ip/$mask";
+			if (!preg_match("@$ip/$mask@",$src))
+				$src .= " $ip/$mask";
 		}
 		$conf .= "# Allow local network(s) on interface(s)\n";
 		$conf .= "acl localnet src $src\n";
@@ -1038,6 +1057,7 @@ $disk_cache_opts
 minimum_object_size {$min_objsize} KB
 maximum_object_size {$max_objsize}
 offline_mode {$offline_mode}
+
 EOD;
 
 	if (!empty($settings['cache_swap_low'])) $conf .= "cache_swap_low {$settings['cache_swap_low']}\n";
@@ -1116,11 +1136,15 @@ function squid_resync_nac() {
 	$conf = <<<EOD
 
 # Setup some default acls
+# From 3.2 further configuration cleanups have been done to make things easier and safer. The manager, localhost, and to_localhost ACL definitions are now built-in.
+# acl localhost src 127.0.0.1/32
 acl allsrc src all
-acl localhost src 127.0.0.1/32
 acl safeports port 21 70 80 210 280 443 488 563 591 631 777 901 $webgui_port $port $ssl_port 1025-65535 $addtl_ports
 acl sslports port 443 563 $webgui_port $addtl_sslports
-acl sqmanager proto cache_object
+
+# From 3.2 further configuration cleanups have been done to make things easier and safer. The manager, localhost, and to_localhost ACL definitions are now built-in.
+#acl manager proto cache_object
+
 acl purge method PURGE
 acl connect method CONNECT
 
@@ -1164,7 +1188,7 @@ EOD;
 	}
 
 	$conf .= <<<EOD
-http_access allow sqmanager localhost
+http_access allow manager localhost
 
 EOD;
 
@@ -1176,20 +1200,22 @@ EOD;
 	 		foreach ($extmgr as $mgr) {
     			$conf .= "acl ext_manager src {$mgr}\n";
 	 			}
-	 		$conf .= "http_access allow sqmanager ext_manager\n";
+	 		$conf .= "http_access allow manager ext_manager\n";
 			}
 		}
 	
   $conf .= <<<EOD
   
-http_access deny sqmanager
+http_access deny manager
 http_access allow purge localhost
 http_access deny purge
 http_access deny !safeports
 http_access deny CONNECT !sslports
 
 # Always allow localhost connections
-http_access allow localhost
+# From 3.2 further configuration cleanups have been done to make things easier and safer. 
+# The manager, localhost, and to_localhost ACL definitions are now built-in.
+# http_access allow localhost
 
 EOD;
 
@@ -1250,6 +1276,7 @@ icap_service service_resp respmod_precache bypass=0 icap://127.0.0.1:1344/squidc
 
 adaptation_access service_req allow all
 adaptation_access service_resp allow all
+
 EOF;
 		#check if icap is enabled on rc.conf.local
 		if (file_exists("/etc/rc.conf.local")){
@@ -1473,8 +1500,15 @@ function squid_resync_auth() {
 		}
 		
 	// Package integration
-	if(!empty($settingsconfig['custom_options']))
-		$conf.="# Package Integration\n".preg_replace('/;/',"\n",$settingsconfig['custom_options'])."\n\n";
+	if(!empty($settingsconfig['custom_options'])){
+		$co_preg[0]='/;/';
+		$co_rep[0]="\n";
+		$co_preg[1]="/redirect_program/";
+		$co_rep[1]="url_rewrite_program";
+		$co_preg[2]="/redirector_bypass/";
+		$co_rep[2]="url_rewrite_bypass";
+		$conf.="# Package Integration\n".preg_replace($co_preg,$co_rep,$settingsconfig['custom_options'])."\n\n";
+		}
 	
 	// Custom User Options
 	$conf .= "# Custom options\n".sq_text_area_decode($settingsconfig['custom_options_squid3'])."\n\n";
