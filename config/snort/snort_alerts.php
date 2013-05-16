@@ -83,7 +83,7 @@ if ($_POST['todelete'] || $_GET['todelete']) {
 		$ip = $_GET['todelete'];
 	if (is_ipaddr($ip)) {
 		exec("/sbin/pfctl -t snort2c -T delete {$ip}");
-		$savemsg = "Host IP address {$ip} has been removed from the Bocked Hosts table.";
+		$savemsg = "Host IP address {$ip} has been removed from the Blocked Table.";
 	}
 }
 
@@ -118,7 +118,7 @@ if ($_GET['act'] == "addsuppress" && is_numeric($_GET['sidid']) && is_numeric($_
 			}
 		}
 	}
-	$savemsg = "GID:SID '{$_GET['gen_id']}:{$_GET['sidid']}' has been added to the Suppress List.";
+	$savemsg = "An entry for 'suppress gen_id {$_GET['gen_id']}, sig_id {$_GET['sidid']}' has been added to the Suppress List.";
 	write_config();
 	sync_snort_package_config();
 }
@@ -250,18 +250,18 @@ if ($pconfig['arefresh'] == 'on')
 				<?php echo gettext("(Most recent entries are listed first)"); ?></td>
 			</tr>
 	<tr>
-	<td width="100%" colspan="2" class='vtable'>
-	<table id="myTable" width="100%" class="sortable" border="1" cellpadding="0" cellspacing="0">
+	<td width="100%" colspan="2">
+	<table id="myTable" style="table-layout: fixed;" width="100%" class="sortable" border="1" cellpadding="0" cellspacing="0">
 	<thead>
-		<th class="listhdrr" align="center" axis="date"><?php echo gettext("DATE"); ?></th>
-		<th class="listhdrr" align="center" axis="number"><?php echo gettext("PRI"); ?></th>
-		<th class="listhdrr" align="center"axis="string"><?php echo gettext("PROTO"); ?></th>
+		<th class="listhdrr" width="8%" align="center" axis="date"><?php echo gettext("DATE"); ?></th>
+		<th class="listhdrr" width="18em" align="center" axis="number"><?php echo gettext("PRI"); ?></th>
+		<th class="listhdrr" width="38em" align="center"axis="string"><?php echo gettext("PROTO"); ?></th>
 		<th class="listhdrr" width="10%" axis="string"><?php echo gettext("CLASS"); ?></th>
-		<th class="listhdrr" width="25%" axis="string"><?php echo gettext("SRC"); ?></th>
-		<th class="listhdrr" align="center" axis="string"><?php echo gettext("SPORT"); ?></th>
-		<th class="listhdrr" width="25%" axis="string"><?php echo gettext("DST"); ?></th>
-		<th class="listhdrr" align="center" axis="string"><?php echo gettext("DPORT"); ?></th>
-		<th class="listhdrr" axis="string"><?php echo gettext("SID"); ?></th>
+		<th class="listhdrr" width="13%" axis="string"><?php echo gettext("SRC"); ?></th>
+		<th class="listhdrr" width="8%" align="center" axis="string"><?php echo gettext("SPORT"); ?></th>
+		<th class="listhdrr" width="13%" axis="string"><?php echo gettext("DST"); ?></th>
+		<th class="listhdrr" width="8%" align="center" axis="string"><?php echo gettext("DPORT"); ?></th>
+		<th class="listhdrr" width="9%" axis="string"><?php echo gettext("SID"); ?></th>
 		<th class="listhdrr" axis="string"><?php echo gettext("DESCRIPTION"); ?></th>
 	</thead>
 	<tbody>
@@ -295,7 +295,7 @@ if (file_exists("/var/log/snort/snort_{$if_real}{$snort_uuid}/alert")) {
 			$alert_ip_src = $fields[6];
 			if (isset($tmpblocked[$fields[6]])) {
 				$alert_ip_src .= "<br/><a href='?instance={$id}&todelete=" . trim(urlencode($fields[6])) . "'>
-				<img title=\"" . gettext("Remove from Blocked Hosts") . "\" border=\"0\" width='10' height='10' name='todelete' id='todelete' alt=\"Remove from Blocked Hosts\" src=\"../themes/{$g['theme']}/images/icons/icon_x.gif\"/></a>"; 
+				<img title=\"" . gettext("Remove host from Blocked Table") . "\" border=\"0\" width='10' height='10' name='todelete' id='todelete' alt=\"Remove from Blocked Hosts\" src=\"../themes/{$g['theme']}/images/icons/icon_x.gif\"/></a>"; 
 			}
 			/* IP SRC Port */
 			$alert_src_p = $fields[7];
@@ -303,7 +303,7 @@ if (file_exists("/var/log/snort/snort_{$if_real}{$snort_uuid}/alert")) {
 			$alert_ip_dst = $fields[8];
 			if (isset($tmpblocked[$fields[8]])) {
 				$alert_ip_dst .= "<br/><a href='?instance={$id}&todelete=" . trim(urlencode($fields[8])) . "'>
-				<img title=\"" . gettext("Remove from Blocked Hosts") . "\" border=\"0\" width='10' height='10' name='todelete' id='todelete' alt=\"Remove from Blocked Hosts\" src=\"../themes/{$g['theme']}/images/icons/icon_x.gif\"/></a>";
+				<img title=\"" . gettext("Remove host from Blocked Table") . "\" border=\"0\" width='10' height='10' name='todelete' id='todelete' alt=\"Remove from Blocked Hosts\" src=\"../themes/{$g['theme']}/images/icons/icon_x.gif\"/></a>";
 			}
 			/* IP DST Port */
 			$alert_dst_p = $fields[9];
@@ -312,24 +312,24 @@ if (file_exists("/var/log/snort/snort_{$if_real}{$snort_uuid}/alert")) {
 			if (!isset($supplist[$fields[1]][$fields[2]])) {
 				$sidsupplink = "<a href='?instance={$instanceid}&act=addsuppress&sidid={$fields[2]}&gen_id={$fields[1]}&descr={$alert_descr_url}'>";
 				$sidsupplink .= "<img src='../themes/{$g['theme']}/images/icons/icon_plus.gif' width='10' height='10' border='0' ";
-				$sidsupplink .= "title='" . gettext("Add GID:SID to Suppress List") . "'></a>";	
+				$sidsupplink .= "title='" . gettext("Add this gen_id:sig_id to Suppress List") . "'></a>";	
 			}
 			else {
 				$sidsupplink = "<img src='../themes/{$g['theme']}/images/icons/icon_plus_d.gif' width='10' height='10' border='0' ";
-				$sidsupplink .= "title='" . gettext("GID:SID already in Suppress List") . "'/>";	
+				$sidsupplink .= "title='" . gettext("This gen_id:sig_id already in Suppress List") . "'/>";	
 			}
 			$alert_class = $fields[11];
 
 			echo "<tr>
-				<td class='listr' align='center'>{$alert_date}<br/>{$alert_time}</td>
-				<td class='listr' align='center'>{$alert_priority}</td>
-				<td class='listr' align='center'>{$alert_proto}</td>
+				<td class='listr' width='8%' align='center'>{$alert_date}<br/>{$alert_time}</td>
+				<td class='listr' width='18em' align='center'>{$alert_priority}</td>
+				<td class='listr' width='38em' align='center'>{$alert_proto}</td>
 				<td class='listr' width='10%'>{$alert_class}</td>
-				<td class='listr' width='25%' align='center' style=\"word-break:break-all;\">{$alert_ip_src}</td>
-				<td class='listr' align='center'>{$alert_src_p}</td>
-				<td class='listr' width='25%' align='center' style=\"word-break:break-all;\">{$alert_ip_dst}</td>
-				<td class='listr' align='center'>{$alert_dst_p}</td>
-				<td class='listr' align='center'>{$alert_sid_str}<br/>{$sidsupplink}</td>
+				<td class='listr' width='13%' align='center' style=\"word-break:break-all;\">{$alert_ip_src}</td>
+				<td class='listr' width='8%' align='center'>{$alert_src_p}</td>
+				<td class='listr' width='13%' align='center' style=\"word-break:break-all;\">{$alert_ip_dst}</td>
+				<td class='listr' width='8%' align='center'>{$alert_dst_p}</td>
+				<td class='listr' width='9%' align='center'>{$alert_sid_str}<br/>{$sidsupplink}</td>
 				<td class='listr' style=\"word-wrap:break-word;\">{$alert_descr}</td>
 				</tr>\n";
 

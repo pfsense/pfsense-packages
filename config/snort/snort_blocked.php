@@ -183,12 +183,12 @@ if ($pconfig['brefresh'] == 'on')
 			</tr>
 			<tr>
 				<td colspan="2">
-				<table id="sortabletable1" class="sortable" width="100%" border="0" cellpadding="2" cellspacing="0">
+				<table id="sortabletable1" style="table-layout: fixed;" class="sortable" width="100%" border="0" cellpadding="2" cellspacing="0">
 					<thead>
 						<th class='listhdr' width="5%" class="listhdrr" align="center" axis="number">#</th>
 						<th class='listhdr' width="15%" class="listhdrr" align="center" axis="string"><?php echo gettext("IP"); ?></th>
 						<th class='listhdr' width="70%" class="listhdrr" axis="string"><?php echo gettext("Alert Description"); ?></th>
-						<th class='listhdr' width="5%" class="listhdrr" align="center"><?php echo gettext("Remove"); ?></th>
+						<th class='listhdr' width="10%" class="listhdrr" align="center"><?php echo gettext("Remove"); ?></th>
 					</thead>
 				<tbody>
 			<?php
@@ -248,8 +248,8 @@ if ($pconfig['brefresh'] == 'on')
 						<td width='5%' align=\"center\" valign=\"middle\" class=\"listr\">{$counter}</td>
 						<td width='15%' valign=\"middle\" class=\"listr\">{$blocked_ip}</td>
 						<td width='70%' valign=\"middle\" class=\"listr\">{$blocked_desc}</td>
-						<td width='5%' align=\"center\" valign=\"middle\" class=\"listr\"><a href='snort_blocked.php?todelete=" . trim(urlencode($blocked_ip)) . "'>
-						<img title=\"" . gettext("Delete") . "\" border=\"0\" name='todelete' id='todelete' alt=\"Delete\" src=\"../themes/{$g['theme']}/images/icons/icon_x.gif\"></a></td>
+						<td width='10%' align=\"center\" valign=\"middle\" class=\"listr\"><a href='snort_blocked.php?todelete=" . trim(urlencode($blocked_ip)) . "'>
+						<img title=\"" . gettext("Delete host from Blocked Table") . "\" border=\"0\" name='todelete' id='todelete' alt=\"Delete host from Blocked Table\" src=\"../themes/{$g['theme']}/images/icons/icon_x.gif\"></a></td>
 					</tr>\n";
 			}
 
@@ -260,7 +260,7 @@ if ($pconfig['brefresh'] == 'on')
 			</td>
 		</tr>
 		<tr>
-			<td colspan="2" class="vncell" align="center">
+			<td colspan="2" class="vexpl" align="center">
 			<?php	if (!empty($blocked_ips_array)) {
 					if ($counter > 1)
 						echo "{$counter}" . gettext(" host IP addresses are currently being blocked.");

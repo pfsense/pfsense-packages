@@ -71,6 +71,38 @@ function truncate($string, $length) {
 	return $string; 
 }
 
+function add_title_attribute($tag, $title) {
+
+	/********************************
+	 * This function adds a "title" *
+	 * attribute to the passed tag  *
+	 * and sets the value to the    *
+	 * value specified by "$title". *
+	 ********************************/
+	$result = "";
+	if (empty($tag)) {
+		// If passed an empty element tag, then
+		// just create a <span> tag with title
+		$result = "<span title=\"" . $title . "\">";
+	}
+	else {
+		// Find the ending ">" for the element tag
+		$pos = strpos($tag, ">");
+		if ($pos !== false) {
+			// We found the ">" delimter, so add "title"
+			// attribute and close the element tag
+			$result = substr($tag, 0, $pos) . " title=\"" . $title . "\">";
+		}
+		else {
+			// We did not find the ">" delimiter, so
+			// something is wrong, just return the
+			// tag "as-is"
+			$result = $tag;
+		}
+	}
+	return $result;
+}
+
 /* convert fake interfaces to real */
 $if_real = snort_get_real_interface($pconfig['interface']);
 $snort_uuid = $a_rule[$id]['uuid'];
@@ -348,7 +380,7 @@ h += 96;
 	<tr><td class="tabcont">
 		<table width="100%" border="0" cellpadding="4" cellspacing="0">
 			<tr>
-				<td class="listtopic"><?php echo gettext("Rule Categories"); ?></td>
+				<td class="listtopic"><?php echo gettext("Available Rule Categories"); ?></td>
 			</tr>
 
 			<tr>
@@ -396,7 +428,7 @@ h += 96;
 			</tr>
 		<?php else: ?>
 			<tr>
-				<td class="listtopic"><?php echo gettext("SID Enable/Disable Overrides"); ?></td>
+				<td class="listtopic"><?php echo gettext("Rule Signature ID (SID) Enable/Disable Overrides"); ?></td>
 			</tr>
 			<tr>
 				<td class="vncell">
@@ -429,19 +461,19 @@ h += 96;
 			</tr>
 
 			<tr>
-				<td class="listtopic"><?php echo gettext("Selected Category Rules"); ?></td>
+				<td class="listtopic"><?php echo gettext("Selected Category's Rules"); ?></td>
 			</tr>
 			<tr>
 				<td>
 					<table class="tabcont" style="table-layout: fixed;" width="100%" border="0" cellpadding="0" cellspacing="0">
 						<tr id="frheader">
 							<td width="12px" class="list" align="left">&nbsp;</td>
-							<td width="10%" class="listhdrr" align="center"><?php echo gettext("SID"); ?></td>
+							<td width="9%" class="listhdrr" align="center"><?php echo gettext("SID"); ?></td>
 							<td width="7%" class="listhdrr" align="center"><?php echo gettext("Proto"); ?></td>
 							<td width="14%" class="listhdrr" align="center"><?php echo gettext("Source"); ?></td>
-							<td width="10%" class="listhdrr" align="center"><?php echo gettext("Port"); ?></td>
+							<td width="11%" class="listhdrr" align="center"><?php echo gettext("Port"); ?></td>
 							<td width="14%" class="listhdrr" align="center"><?php echo gettext("Destination"); ?></td>
-							<td width="10%" class="listhdrr" align="center"><?php echo gettext("Port"); ?></td>
+							<td width="11%" class="listhdrr" align="center"><?php echo gettext("Port"); ?></td>
 							<td class="listhdrr" align="center"><?php echo gettext("Message"); ?></td>
 							<td width="18px" class="list" align="right"><a href="javascript: void(0)"
 							onclick="wopen('snort_rules_edit.php?id=<?=$id;?>&openruleset=<?=$currentruleset;?>','FileViewer',800,600)">
@@ -481,11 +513,18 @@ h += 96;
 								$tmp = trim(preg_replace('/^\s*#+\s*/', '', $tmp));
 								$rule_content = preg_split('/[\s]+/', $tmp);
 
-								$protocol = truncate($rule_content[1], 6); //protocol location
-								$source = truncate($rule_content[2], 14); //source location
-								$source_port = truncate($rule_content[3], 10); //source port location
-								$destination = truncate($rule_content[5], 14); //destination location
-								$destination_port = truncate($rule_content[6], 10); //destination port location
+								// Create custom <span> tags for the fields we truncate so we can 
+								// have a "title" attribute for tooltips to show the full string.
+								$srcspan = add_title_attribute($textss, $rule_content[2]);
+								$srcprtspan = add_title_attribute($textss, $rule_content[3]);
+								$dstspan = add_title_attribute($textss, $rule_content[5]);
+								$dstprtspan = add_title_attribute($textss, $rule_content[6]);
+
+								$protocol = $rule_content[1]; //protocol field
+								$source = truncate($rule_content[2], 14); //source field
+								$source_port = truncate($rule_content[3], 10); //source port field
+								$destination = truncate($rule_content[5], 14); //destination field
+								$destination_port = truncate($rule_content[6], 10); //destination port field
 								$message = snort_get_msg($v['rule']);
 
 						echo "<tr><td width=\"12px\" class=\"listt\" align=\"left\" valign=\"middle\"> $textss
@@ -495,26 +534,26 @@ h += 96;
 								title='" . gettext("Click to toggle enabled/disabled state") . "'></a>
 								$textse
 							       </td>
-							       <td width=\"10%\" class=\"listlr\" align=\"center\">
-									$textss $sid $textse
+							       <td width=\"9%\" class=\"listlr\" align=\"center\">
+									{$textss}{$sid}{$textse}
 							       </td>
 							       <td width=\"7%\" class=\"listlr\" align=\"center\">
-									$textss $protocol $textse
+									{$textss}{$protocol}{$textse}
 							       </td>
 							       <td width=\"14%\" class=\"listlr\" align=\"center\">
-									$textss $source $textse
+									{$srcspan}{$source}{$textse}
 							       </td>
-							       <td width=\"10%\" class=\"listlr\" align=\"center\">
-									$textss $source_port $textse
+							       <td width=\"11%\" class=\"listlr\" align=\"center\">
+									{$srcprtspan}{$source_port}{$textse}
 							       </td>
 							       <td width=\"14%\" class=\"listlr\" align=\"center\">
-									$textss $destination $textse
+									{$dstspan}{$destination}{$textse}
 							       </td>
-							       <td width=\"10%\" class=\"listlr\" align=\"center\">
-								       $textss $destination_port $textse
+							       <td width=\"11%\" class=\"listlr\" align=\"center\">
+								       {$dstprtspan}{$destination_port}{$textse}
 							       </td>
 								<td class=\"listbg\" style=\"word-wrap:break-word; whitespace:pre-line;\"><font color=\"white\"> 
-									$textss $message $textse
+									{$textss}{$message}{$textse}
 							       </td>";
 						?>
 								<td width="18px" align="right" valign="middle" nowrap class="listt">
