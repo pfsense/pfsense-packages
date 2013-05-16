@@ -401,11 +401,17 @@
 		<size>3</size>
 		</field>
 		<field>
-			<fielddescr>sslcrtd adapt</fielddescr>
+			<fielddescr>Certificate adapt</fielddescr>
 			<fieldname>interception_adapt</fieldname>
-			<description><![CDATA[Pass original SSL server certificate information to the user. Allow the user to make an informed decision on whether to trust the server certificate.<br>Hint: setCommonName ssl::certDomainMismatch<br><a target=_new href='http://wiki.squid-cache.org/Features/MimicSslServerCert'>wiki doc with reference</a>]]></description>
-			<type>input</type>
-			<size>70</size>
+			<description><![CDATA[Pass original SSL server certificate information to the user. Allow the user to make an informed decision on whether to trust the server certificate.<br>Hint: Set subject CN<br><a target=_new href='http://wiki.squid-cache.org/Features/MimicSslServerCert'>wiki doc with reference</a>]]></description>
+			<type>select</type>
+			<options>
+					<option><name>Sets the "Not After" (setValidAfter).</name><value>setValidAfter</value></option>
+					<option><name>Sets the "Not Before" (setValidBefore).</name><value>setValidBefore</value></option>
+					<option><name>Sets CN property (setCommonName)</name><value>setCommonName</value></option>
+			</options>
+			<multiple/>
+			<size>3</size>
 		</field>
 		<field>
 			<name>Logging Settings</name>
