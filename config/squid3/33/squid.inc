@@ -824,7 +824,7 @@ function squid_resync_general() {
 	#Check ssl interception
 	if (($settings['ssl_proxy'] == 'on')) {
 		squid_check_ca_hashes();
-		$srv_cert = lookup_cert($settings["dcert"]);
+		$srv_cert = lookup_ca($settings["dca"]);
 		if ($srv_cert != false) {
 			if(base64_decode($srv_cert['prv'])) {
 				#check if ssl_db was initilized by squid
@@ -836,13 +836,15 @@ function squid_resync_general() {
 				}
 				#force squid user permission on /var/squid/lib/ssl_db/
 				squid_chown_recursive("/var/squid/lib/ssl_db/", 'proxy', 'proxy');
+				# cert, key, version, cipher,options, clientca, cafile, capath, crlfile, dhparams,sslflags, and sslcontext
 				$crt_pk=SQUID_CONFBASE."/serverkey.pem";
+				$crt_capath=SQUID_LOCALBASE."/share/certs/";
 				file_put_contents($crt_pk,base64_decode($srv_cert['prv']).base64_decode($srv_cert['crt']));
 				$sslcrtd_children= ($settings['sslcrtd_children'] ? $settings['sslcrtd_children'] : 5);
-				$ssl_interception.="ssl-bump generate-host-certificates=on dynamic_cert_mem_cache_size=".($sslcrtd_children*2)."MB cert={$crt_pk}\n";
+				$ssl_interception.="ssl-bump generate-host-certificates=on dynamic_cert_mem_cache_size=".($sslcrtd_children*2)."MB cert={$crt_pk} capath={$crt_capath}\n";
 				$interception_checks  = "sslcrtd_program ".SQUID_LOCALBASE."/libexec/squid/ssl_crtd -s /var/squid/lib/ssl_db -M 4MB -b 2048\n";
 				$interception_checks .= "sslcrtd_children {$sslcrtd_children}\n";
-				$interception_checks .= 'sslproxy_capath '.SQUID_LOCALBASE.'/share/certs'."\n";
+				$interception_checks .= "sslproxy_capath {$crt_capath}\n";
 				if (preg_match("/sslproxy_cert_error/",$settings["interception_checks"]))
 					$interception_checks.="sslproxy_cert_error allow all\n";
 				if (preg_match("/sslproxy_flags/",$settings["interception_checks"]))
@@ -1087,9 +1089,10 @@ EOC;
 }
 
 	If ($settings['custom_refresh_patterns'] !="")
-		$conf .= sq_text_area_decode($settings['custom_refresh_patterns']);
+		$conf .= sq_text_area_decode($settings['custom_refresh_patterns'])."\n";
 		
 	$conf .= <<< EOD
+	
 cache_mem $memory_cache_size MB
 maximum_object_size_in_memory {$max_objsize_in_mem} KB
 memory_replacement_policy {$memory_policy}

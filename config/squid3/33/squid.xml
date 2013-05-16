@@ -370,12 +370,13 @@
 			<default_value>3129</default_value>
 		</field>
 		<field>
-			<fielddescr>Cert</fielddescr>
-			<fieldname>dcert</fieldname>
-			<description><![CDATA[Select Certificate to use in SSL interception<br>
-								To create a Certificate on pfsense, go to <strong>system -> Cert Manager<strong>]]></description>
+			<fielddescr>CA</fielddescr>
+			<fieldname>dca</fieldname>
+			<description><![CDATA[Select Certificate Authority to use when SSL interception is enabled.<br>
+								To create a CA on pfsense, go to <strong>system -> Cert Manager<strong><br>
+								Install the CA crt as an trusted ca on each computer you want to filter ssl to avoid ssl error on each connection.]]></description>
 	    	<type>select_source</type>
-			<source><![CDATA[$config['cert']]]></source>
+			<source><![CDATA[$config['ca']]]></source>
 			<source_name>descr</source_name>
 			<source_value>refid</source_value>
 		</field>
