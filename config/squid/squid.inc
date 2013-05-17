@@ -295,7 +295,7 @@ function squid_before_form_general($pkg) {
 	}
 	$field = &$pkg['fields']['field'][$i];
 
-	for ($i = 0; $i < count($values) - 1; $i++)
+	for ($i = 0; $i < count($values); $i++)
 		$field['options']['option'][] = array('name' => $names[$i], 'value' => $values[$i]);
 }
 
