@@ -257,9 +257,9 @@ if ($pconfig['arefresh'] == 'on')
 		<th class="listhdrr" width="18em" align="center" axis="number"><?php echo gettext("PRI"); ?></th>
 		<th class="listhdrr" width="38em" align="center"axis="string"><?php echo gettext("PROTO"); ?></th>
 		<th class="listhdrr" width="10%" axis="string"><?php echo gettext("CLASS"); ?></th>
-		<th class="listhdrr" width="13%" axis="string"><?php echo gettext("SRC"); ?></th>
+		<th class="listhdrr" width="14%" axis="string"><?php echo gettext("SRC"); ?></th>
 		<th class="listhdrr" width="8%" align="center" axis="string"><?php echo gettext("SPORT"); ?></th>
-		<th class="listhdrr" width="13%" axis="string"><?php echo gettext("DST"); ?></th>
+		<th class="listhdrr" width="14%" axis="string"><?php echo gettext("DST"); ?></th>
 		<th class="listhdrr" width="8%" align="center" axis="string"><?php echo gettext("DPORT"); ?></th>
 		<th class="listhdrr" width="9%" axis="string"><?php echo gettext("SID"); ?></th>
 		<th class="listhdrr" axis="string"><?php echo gettext("DESCRIPTION"); ?></th>
