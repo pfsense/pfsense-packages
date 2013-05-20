@@ -1280,11 +1280,13 @@
 		<depends_on_package>squid-3.3.4.tbz</depends_on_package>
 		<depends_on_package>libltdl-2.4.2.tbz</depends_on_package>
 		<depends_on_package>libwww-5.4.0_4.tbz</depends_on_package>
+		<depends_on_package>squidclamav-6.10_1.tbz</depends_on_package>
+		<depends_on_package>clamav-0.97.8.tbz</depends_on_package>
 		<depends_on_package>ca_root_nss-3.14.1.tbz</depends_on_package>
 		<build_pbi>
 			<ports_before>www/libwww</ports_before>
 			<port>www/squid33</port>
-			<ports_after>www/squid_radius_auth security/clamav www/squidclamav security/ca_root_nss</ports_after>
+			<ports_after>www/squid_radius_auth security/clamav www/squidclamav security/ca_root_nss www/c-icap-modules</ports_after>
 		</build_pbi>
 		<build_options>c-icap_UNSET=IPV6 squid33_UNSET=AUTH_SMB AUTH_SQL DNS_HELPER FS_COSS ESI SNMP ECAP STACKTRACES STRICT_HTTP TP_IPF TP_IPFW VIA_DB DEBUG DOCS EXAMPLES;squid33_SET=ARP_ACL AUTH_KERB AUTH_LDAP AUTH_NIS AUTH_SASL CACHE_DIGESTS DELAY_POOLS FOLLOW_XFF TP_PF MSSL_CRTD WCCP WCCPV2 FS_AUFS HTCP ICAP ICMP IDENT IPV6 KQUEUE LARGEFILE SSL SSL_CRTD</build_options>
 		<config_file>http://www.pfsense.org/packages/config/squid3/33/squid.xml</config_file>

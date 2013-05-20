@@ -427,6 +427,10 @@ function squid_validate_general($post, $input_errors) {
 		$input_errors[] = "You can not run squid on the same port as the webgui";
 	}
 
+	if (($post['ssl_proxy'] == 'on') && ( $post['dca'] == '')) {
+		$input_errors[] = "SSL interception cannot be enabled without a CA.";
+	}
+	
 	foreach (array('defined_ip_proxy_off') as $hosts) {
 		foreach (explode(";", $post[$hosts]) as $host) {
 			$host = trim($host);
@@ -783,7 +787,7 @@ function squid_check_ca_hashes(){
 	#check certificates
 	$cert_count=0;
 	if (is_dir(SQUID_LOCALBASE. '/share/certs'))
-		if ($handle = opendir(SQUID_LOCALBASE.'/usr/local/share/certs')) {
+		if ($handle = opendir(SQUID_LOCALBASE.'/share/certs')) {
     		while (false !== ($file = readdir($handle)))
         		if (preg_match ("/\d+.0/",$file))
             		$cert_count++;
@@ -1345,9 +1349,9 @@ EOF;
 		if (!file_exists(SQUID_LOCALBASE."/etc/c-icap/squidclamav.conf.sample"))
 			if (file_exists(SQUID_LOCALBASE."/etc/c-icap/squidclamav.conf.default")){
 				$sample_file=file_get_contents(SQUID_LOCALBASE."/etc/c-icap/squidclamav.conf.default");
-				$matches[0]="@/var/run/clamav/clamd.ctl@";
-				$replaces[0]="/var/run/clamav/clamd.sock";
-				file_put_contents(SQUID_LOCALBASE."/etc/c-icap/squidclamav.conf.sample",preg_replace($matches,$replaces,$sample_file),LOCK_EX);
+				$clamav_m[0]="@/var/run/clamav/clamd.ctl@";
+				$clamav_r[0]="/var/run/clamav/clamd.sock";
+				file_put_contents(SQUID_LOCALBASE."/etc/c-icap/squidclamav.conf.sample",preg_replace($clamav_m,$clamav_r,$sample_file),LOCK_EX);
 			}
 		#c-icap.conf
 		if (!file_exists(SQUID_LOCALBASE."/etc/c-icap/c-icap.conf.sample"))
@@ -1355,8 +1359,6 @@ EOF;
 				$sample_file=file_get_contents(SQUID_LOCALBASE."/etc/c-icap/c-icap.conf.default");
 				if (! preg_match ("/squidclamav/"))
 					$sample_file.="\nService squidclamav squidclamav.so\n";
-				if (! preg_match ("/User proxy/"))
-					$sample_file.="\nUser proxy\n";
 					
 				file_put_contents(SQUID_LOCALBASE."/etc/c-icap/c-icap.conf.sample",$sample_file,LOCK_EX);
 			}
@@ -1378,8 +1380,8 @@ EOF;
 			$antivirus_config = $config['installedpackages']['squidantivirus']['config'][0];		
 		}
 		#check dirs
-		$dirs=array("/var/run/c-icap" => "proxy",
-					"/var/log/c-icap" => "proxy",
+		$dirs=array("/var/run/c-icap" => "clamav",
+					"/var/log/c-icap" => "clamav",
 					"/var/log/clamav" => "clamav",
 					"/var/run/clamav" => "clamav",
 					"/var/db/clamav" => "clamav");
@@ -1404,11 +1406,20 @@ EOF;
 		
 		#check antivirus daemons
 		#check icap
-		if (is_process_running("c-icap"))
-			mwexec_bg("/usr/local/etc/rc.d/c-icap reload");
-		else
+		if (is_process_running("c-icap")){
+			mwexec('/bin/echo -n "reconfigure" > /var/run/c-icap/c-icap.ctl');
+			}
+		else{
+			#check c-icap user on startup file
+				$c_icap_rcfile="/usr/local/etc/rc.d/c-icap";
+			if (file_exists($c_icap_rcfile)){
+				$sample_file=file_get_contents($c_icap_rcfile);
+				$cicapm[0]="@c_icap_user=.*}@";
+				$cicapr[0]='c_icap_user="clamav"}';
+				file_put_contents($c_icap_rcfile,preg_replace($cicapm,$cicapr,$sample_file),LOCK_EX);
+				}
 			mwexec("/usr/local/etc/rc.d/c-icap start");
-			
+			}
 		#check clamav
 		if (is_process_running("clamd"))
 			mwexec_bg("/usr/local/etc/rc.d/clamav-clamd reload");
