@@ -3058,7 +3058,7 @@ function snort_sync_on_changes() {
 					$rs=$snort_sync[row];
 				}
 				else{
-					log_error("[snort] xmlrpc sync is enabled but there are no hosts to push snort config.");
+					log_error("[snort] xmlrpc sync is enabled but there are no hosts configured as replication targets.");
 					return;
 				}
 				break;
@@ -3069,12 +3069,12 @@ function snort_sync_on_changes() {
 						$rs[0]['varsyncusername']=$system_carp['username'];
 						$rs[0]['varsyncpassword']=$system_carp['password'];
 						if ($system_carp['synchronizetoip'] ==""){
-							log_error("[snort] xmlrpc sync is enabled but there are no system backup hosts to push snort config.");
+							log_error("[snort] xmlrpc sync is enabled but there are no system backup hosts configured as replication targets.");
 							return;
 						}
 					}
 					else{
-						log_error("[snort] xmlrpc sync is enabled but there are no system backup hosts to push snort config.");
+						log_error("[snort] xmlrpc sync is enabled but there are no system backup hosts configured as replication targets.");
 						return;
 					}
 				break;			
@@ -3137,7 +3137,7 @@ function snort_do_xmlrpc_sync($sync_to_ip, $username, $password, $synctimeout) {
 
 	/* set a few variables needed for sync code borrowed from filter.inc */
 	$url = $synchronizetoip;
-	log_error("[snort] Beginning Snort pkg XMLRPC sync to {$url}:{$port}.");
+	log_error("[snort] Beginning Snort pkg configuration XMLRPC sync to {$url}:{$port}.");
 	$method = 'pfsense.merge_installedpackages_section_xmlrpc';
 	$msg = new XML_RPC_Message($method, $params);
 	$cli = new XML_RPC_Client('/xmlrpc.php', $url, $port);
@@ -3157,33 +3157,50 @@ function snort_do_xmlrpc_sync($sync_to_ip, $username, $password, $synctimeout) {
 		log_error($error);
 		file_notice("sync_settings", $error, "snort Settings Sync", "");
 	} else {
-		log_error("[snort] Snort pkg XMLRPC sync successfully completed with {$url}:{$port}.");
+		log_error("[snort] Snort pkg configuration XMLRPC sync successfully completed with {$url}:{$port}.");
 	}
-	
-	/* tell snort to reload our settings on the destination sync host. */
-	$method = 'pfsense.exec_php';
-	$execcmd  = "require_once('/usr/local/pkg/snort/snort.inc');\n";
-	$execcmd .= "snort_sync_build_slave_conf();";
+
+	/* Build a series of commands for the secondary host to execute to will reload the new settings. */
+	$execcmd = <<<EOD
+	include_once("/usr/local/pkg/snort/snort.inc");
+	global \$g, \$rebuild_rules, \$snort_gui_include, \$is_postinstall, \$pkg_interface;
+	\$is_postinstall = true;
+	\$snort_gui_include = false;
+	log_error(gettext("[snort] XMLRPC pkg sync: Downloading and updating configured rule types..."));
+	ob_start();
+	include_once("/usr/local/pkg/snort/snort_check_for_rule_updates.php");
+	\$is_postinstall = false;
+	ob_end_clean();
+	log_error(gettext("[snort] XMLRPC pkg sync: Generating snort.conf file using Master Host's settings..."));
+	\$rebuild_rules = "on";
+	sync_snort_package_config();
+	\$rebuild_rules = "off";
+	log_error(gettext("[snort] XMLRPC pkg sync process on this host is complete..."));
+
+EOD;
+
 	/* assemble xmlrpc payload */
+	$method = 'pfsense.exec_php';
 	$params = array(
 		XML_RPC_encode($password),
 		XML_RPC_encode($execcmd)
 	);
 	
-	log_error("[snort] Snort XMLRPC sending reload configuration cmds to {$url}:{$port}.");
+	log_error("[snort] Snort XMLRPC sending reload configuration cmd to {$url}:{$port}.");
 	$msg = new XML_RPC_Message($method, $params);
 	$cli = new XML_RPC_Client('/xmlrpc.php', $url, $port);
 	$cli->setCredentials($username, $password);
+	$cli->setDebug("1");
 	$resp = $cli->send($msg, $synctimeout);
 	if(!$resp) {
 		$error = "A communications error occurred while attempting snort XMLRPC sync with {$url}:{$port} (pfsense.exec_php).";
 		log_error($error);
 		file_notice("sync_settings", $error, "snort Settings Sync", "");
 	} elseif($resp->faultCode()) {
-		$cli->setDebug(1);
-		$resp = $cli->send($msg, $synctimeout);
 		$error = "An error code was received while attempting snort XMLRPC sync with {$url}:{$port} - Code " . $resp->faultCode() . ": " . $resp->faultString();
 		log_error($error);
+		$value = $resp->value();
+		log_error(print_r($value, true));
 		file_notice("sync_settings", $error, "snort Settings Sync", "");
 	} else {
 		log_error("[snort] Snort pkg XMLRPC reload configuration success with {$url}:{$port} (pfsense.exec_php).");
