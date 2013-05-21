@@ -849,7 +849,7 @@ function snort_rules_up_install_cron($should_install) {
 /* Only run when all ifaces needed to sync. Expects filesystem rw */
 function sync_snort_package_config() {
 	global $config, $g, $flowbit_rules_file, $snort_enforcing_rules_file;
-	global $snort_version, $rebuild_rules;
+	global $snort_version, $rebuild_rules, $is_postinstall;
 
 	$snortdir = SNORTDIR;
 
@@ -889,7 +889,9 @@ function sync_snort_package_config() {
 
 	configure_cron();
 	
-	snort_sync_on_changes();
+	/* Do not attempt package sync if reinstalling package or booting */
+	if (!$is_postinstall && !$g['booting'])
+		snort_sync_on_changes();
 	
 	conf_mount_ro();
 }
@@ -2048,6 +2050,7 @@ function snort_deinstall() {
 	if ($config['installedpackages']['snortglobal']['forcekeepsettings'] != 'on') {
 		log_error(gettext("Not saving settings... all Snort configuration info and logs deleted..."));
 		unset($config['installedpackages']['snortglobal']);
+		unset($config['installedpackages']['snortsync']);
 		@unlink("{$snort_rules_upd_log}");
 		mwexec("/bin/rm -rf {$snortlogdir}");
 		log_error(gettext("[Snort] The package has been removed from this system..."));
@@ -3047,11 +3050,17 @@ EOD;
 
 /* Uses XMLRPC to synchronize the changes to a remote node */
 function snort_sync_on_changes() {
-	global $config, $g;
+	global $config, $g, $is_postinstall;
+
+	/* Do not attempt a package sync while booting up or installing package */
+	if ($g['booting'] || $is_postinstall == true)
+		return;
+
 	if (is_array($config['installedpackages']['snortsync']['config'])){
 		$snort_sync=$config['installedpackages']['snortsync']['config'][0];
 		$synconchanges = $snort_sync['varsynconchanges'];
 		$synctimeout = $snort_sync['varsynctimeout'];
+		$syncdownloadrules = $snort_sync['vardownloadrules'];
 		switch ($synconchanges){
 			case "manual":
 				if (is_array($snort_sync[row])){
@@ -3068,6 +3077,7 @@ function snort_sync_on_changes() {
 						$rs[0]['varsyncipaddress']=$system_carp['synchronizetoip'];
 						$rs[0]['varsyncusername']=$system_carp['username'];
 						$rs[0]['varsyncpassword']=$system_carp['password'];
+						$rs[0]['varsyncsnortstart']="no";
 						if ($system_carp['synchronizetoip'] ==""){
 							log_error("[snort] xmlrpc sync is enabled but there are no system backup hosts configured as replication targets.");
 							return;
@@ -3085,6 +3095,10 @@ function snort_sync_on_changes() {
 		if (is_array($rs)){
 			log_error("[snort] Snort pkg xmlrpc sync is starting.");
 			foreach($rs as $sh){
+				if ($sh['varsyncsnortstart'])
+					$syncstartsnort = $sh['varsyncsnortstart'];
+				else
+					$syncstartsnort = "OFF";
 				$sync_to_ip = $sh['varsyncipaddress'];
 				$password = $sh['varsyncpassword'];
 				if($sh['varsyncusername'])
@@ -3092,7 +3106,7 @@ function snort_sync_on_changes() {
 				else
 					$username = 'admin';
 				if($password && $sync_to_ip)
-					snort_do_xmlrpc_sync($sync_to_ip, $username, $password, $synctimeout);
+					snort_do_xmlrpc_sync($syncdownloadrules, $sync_to_ip, $username, $password, $synctimeout, $syncstartsnort);
 			}
 			log_error("[snort] Snort pkg xmlrpc sync completed.");
 		}
@@ -3100,17 +3114,22 @@ function snort_sync_on_changes() {
 }
 
 /* Do the actual XMLRPC sync */
-function snort_do_xmlrpc_sync($sync_to_ip, $username, $password, $synctimeout) {
-	global $config, $g;
+function snort_do_xmlrpc_sync($syncdownloadrules, $sync_to_ip, $username, $password, $synctimeout, $syncstartsnort) {
+	global $config, $g, $is_postinstall;
+
+	/* Do not attempt a package sync while booting up or installing package */
+	if ($g['booting'] || $is_postinstall == true)
+		return;
 
 	if(!$username || !$password || !$sync_to_ip) {
 		log_error("[snort] A required XMLRPC sync parameter (user, host IP or password) is empty ... aborting pkg sync");
 		return;
 	}
 
+	/* Test key variables and set defaults if empty */
 	if(!$synctimeout)
 		$synctimeout=150;
-		
+
 	$xmlrpc_sync_neighbor = $sync_to_ip;
 	if($config['system']['webgui']['protocol'] != "") {
 		$synchronizetoip = $config['system']['webgui']['protocol'];
@@ -3160,22 +3179,37 @@ function snort_do_xmlrpc_sync($sync_to_ip, $username, $password, $synctimeout) {
 		log_error("[snort] Snort pkg configuration XMLRPC sync successfully completed with {$url}:{$port}.");
 	}
 
-	/* Build a series of commands for the secondary host to execute to will reload the new settings. */
+	$downloadrulescmd = "";
+	if ($syncdownloadrules == "yes") {
+		$downloadrulescmd = "log_error(gettext(\"[snort] XMLRPC pkg sync: Requested update of downloaded rules files...\"));\n";
+		$downloadrulescmd .= "include_once(\"/usr/local/pkg/snort/snort_check_for_rule_updates.php\");\n";
+	}
+	$snortstart = "";
+	if ($syncstartsnort == "ON") {
+		$snortstart = "log_error(gettext(\"[snort] XMLRPC pkg sync: Requested restart of Snort...\"));\n";
+		$snortstart .= "if (!is_process_running(\"snort\")) {\n";
+		$snortstart .= "exec(\"/usr/local/etc/rc.d/snort.sh start 2>&1 &\");\n}\n";
+	}
+
+	/* Build a series of commands for the secondary host to execute that will load the new settings. */
 	$execcmd = <<<EOD
-	include_once("/usr/local/pkg/snort/snort.inc");
+	require_once("/usr/local/pkg/snort/snort.inc");
+	require_once("service-utils.inc");
 	global \$g, \$rebuild_rules, \$snort_gui_include, \$is_postinstall, \$pkg_interface;
+	\$orig_pkg_interface = \$pkg_interface;
 	\$is_postinstall = true;
 	\$snort_gui_include = false;
-	log_error(gettext("[snort] XMLRPC pkg sync: Downloading and updating configured rule types..."));
-	ob_start();
-	include_once("/usr/local/pkg/snort/snort_check_for_rule_updates.php");
+	\$pkg_interface = "console";
+	{$downloadrulescmd}
 	\$is_postinstall = false;
-	ob_end_clean();
 	log_error(gettext("[snort] XMLRPC pkg sync: Generating snort.conf file using Master Host's settings..."));
 	\$rebuild_rules = "on";
 	sync_snort_package_config();
 	\$rebuild_rules = "off";
+	{$snortstart}
 	log_error(gettext("[snort] XMLRPC pkg sync process on this host is complete..."));
+	\$pkg_interface = \$orig_pkg_interface;
+	return true;
 
 EOD;
 
@@ -3199,45 +3233,10 @@ EOD;
 	} elseif($resp->faultCode()) {
 		$error = "An error code was received while attempting snort XMLRPC sync with {$url}:{$port} - Code " . $resp->faultCode() . ": " . $resp->faultString();
 		log_error($error);
-		$value = $resp->value();
-		log_error(print_r($value, true));
 		file_notice("sync_settings", $error, "snort Settings Sync", "");
 	} else {
 		log_error("[snort] Snort pkg XMLRPC reload configuration success with {$url}:{$port} (pfsense.exec_php).");
 	}
-}
-
-function snort_sync_build_slave_conf() {
-
-	/*************************************************/
-	/* This function is called by the XMLRPC package */
-	/* sync process on the master host and is used   */
-	/* to build the initial Snort configuration on   */
-	/* a slave (or secondary) host after the push    */
-	/* of the config.xml data.                       */
-	/*************************************************/
-
-	global $g, $rebuild_rules, $snort_gui_include, $is_postinstall;
-
-	// First download fresh rules if necessary
-	unset($snort_gui_include);
-	$is_postinstall = true;
-	log_error(gettext("[snort] XMLRPC pkg sync: Downloading and updating configured rule types..."));
-
-	// Suppress all PHP output by swallowing it in the output buffer and then discarding it
-	ob_start();
-
-	// Now start the actual configuration build on the remote slave
-	@include_once("/usr/local/pkg/snort/snort_check_for_rule_updates.php");
-	$is_postinstall = false;
-	log_error(gettext("[snort] XMLRPC pkg sync: Generating snort.conf file using Master Host's settings..."));
-	$rebuild_rules = "on";
-	sync_snort_package_config();
-	$rebuild_rules = "off";
-	log_error(gettext("[snort] XMLRPC pkg sync process on this host is complete..."));
-
-	// Finally, discard any buffered PHP output and return
-	ob_end_clean();
 }
 
 ?>
