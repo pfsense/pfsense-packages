@@ -184,11 +184,17 @@ if ($pconfig['brefresh'] == 'on')
 			<tr>
 				<td colspan="2">
 				<table id="sortabletable1" style="table-layout: fixed;" class="sortable" width="100%" border="0" cellpadding="2" cellspacing="0">
+					<colgroup>
+						<col width="5%" align="center" axis="number">
+						<col width="15%" align="center" axis="string">
+						<col width="70%" align="left" axis="string">
+						<col width="10%" align="center">
+					</colgroup>
 					<thead>
-						<th class='listhdr' width="5%" class="listhdrr" align="center" axis="number">#</th>
-						<th class='listhdr' width="15%" class="listhdrr" align="center" axis="string"><?php echo gettext("IP"); ?></th>
-						<th class='listhdr' width="70%" class="listhdrr" axis="string"><?php echo gettext("Alert Description"); ?></th>
-						<th class='listhdr' width="10%" class="listhdrr" align="center"><?php echo gettext("Remove"); ?></th>
+						<th class="listhdrr" axis="number">#</th>
+						<th class="listhdrr" axis="string"><?php echo gettext("IP"); ?></th>
+						<th class="listhdrr" axis="string"><?php echo gettext("Alert Description"); ?></th>
+						<th class="listhdrr"><?php echo gettext("Remove"); ?></th>
 					</thead>
 				<tbody>
 			<?php
@@ -245,10 +251,10 @@ if ($pconfig['brefresh'] == 'on')
 
 				/* use one echo to do the magic*/
 					echo "<tr>
-						<td width='5%' align=\"center\" valign=\"middle\" class=\"listr\">{$counter}</td>
-						<td width='15%' valign=\"middle\" class=\"listr\">{$blocked_ip}</td>
-						<td width='70%' valign=\"middle\" class=\"listr\">{$blocked_desc}</td>
-						<td width='10%' align=\"center\" valign=\"middle\" class=\"listr\"><a href='snort_blocked.php?todelete=" . trim(urlencode($blocked_ip)) . "'>
+						<td align=\"center\" valign=\"middle\" class=\"listr\">{$counter}</td>
+						<td valign=\"middle\" class=\"listr\">{$blocked_ip}</td>
+						<td valign=\"middle\" class=\"listr\">{$blocked_desc}</td>
+						<td align=\"center\" valign=\"middle\" class=\"listr\"><a href='snort_blocked.php?todelete=" . trim(urlencode($blocked_ip)) . "'>
 						<img title=\"" . gettext("Delete host from Blocked Table") . "\" border=\"0\" name='todelete' id='todelete' alt=\"Delete host from Blocked Table\" src=\"../themes/{$g['theme']}/images/icons/icon_x.gif\"></a></td>
 					</tr>\n";
 			}

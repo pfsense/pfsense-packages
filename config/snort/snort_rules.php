@@ -465,23 +465,35 @@ h += 96;
 			</tr>
 			<tr>
 				<td>
-					<table class="tabcont" style="table-layout: fixed;" width="100%" border="0" cellpadding="0" cellspacing="0">
-						<tr id="frheader">
-							<td width="12px" class="list" align="left">&nbsp;</td>
-							<td width="9%" class="listhdrr" align="center"><?php echo gettext("SID"); ?></td>
-							<td width="7%" class="listhdrr" align="center"><?php echo gettext("Proto"); ?></td>
-							<td width="14%" class="listhdrr" align="center"><?php echo gettext("Source"); ?></td>
-							<td width="11%" class="listhdrr" align="center"><?php echo gettext("Port"); ?></td>
-							<td width="14%" class="listhdrr" align="center"><?php echo gettext("Destination"); ?></td>
-							<td width="11%" class="listhdrr" align="center"><?php echo gettext("Port"); ?></td>
-							<td class="listhdrr" align="center"><?php echo gettext("Message"); ?></td>
-							<td width="18px" class="list" align="right"><a href="javascript: void(0)"
+					<table id="myTable" class="sortable" style="table-layout: fixed;" width="100%" border="0" cellpadding="0" cellspacing="0">
+						<colgroup>
+							<col width="15" align="left" valign="middle">
+							<col width="9%" align="center" axis="number">
+							<col width="60" align="center" axis="string">
+							<col width="14%" align="center" axis="string">
+							<col width="11%" align="center" axis="string">
+							<col width="14%" align="center" axis="string">
+							<col width="11%" align="center" axis="string">
+							<col axis="string">
+							<col width="22" align="right" valign="middle">
+						</colgroup>
+						<thead>
+							<th class="list">&nbsp;</th>
+							<th class="listhdrr"><?php echo gettext("SID"); ?></th>
+							<th class="listhdrr"><?php echo gettext("Proto"); ?></th>
+							<th class="listhdrr"><?php echo gettext("Source"); ?></th>
+							<th class="listhdrr"><?php echo gettext("Port"); ?></th>
+							<th class="listhdrr"><?php echo gettext("Destination"); ?></th>
+							<th class="listhdrr"><?php echo gettext("Port"); ?></th>
+							<th class="listhdrr"><?php echo gettext("Message"); ?></th>
+							<th class="list"><a href="javascript: void(0)" 
 							onclick="wopen('snort_rules_edit.php?id=<?=$id;?>&openruleset=<?=$currentruleset;?>','FileViewer',800,600)">
 							<img src="../themes/<?= $g['theme']; ?>/images/icons/icon_service_restart.gif" <?php
 							echo "onmouseover='this.src=\"../themes/{$g['theme']}/images/icons/icon_services_restart_mo.gif\"' 
 							onmouseout='this.src=\"../themes/{$g['theme']}/images/icons/icon_service_restart.gif\"' ";?>				
-							title="<?php echo gettext("Click to view full text of all the category rules"); ?>" width="17" height="17" border="0"></a></td>
-						</tr>
+							title="<?php echo gettext("Click to view full text of all the category rules"); ?>" width="17" height="17" border="0"></a></th>
+						</thead>
+						<tbody>
 
 					<?php
 						foreach ($rules_map as $k1 => $rulem) {
@@ -527,37 +539,37 @@ h += 96;
 								$destination_port = truncate($rule_content[6], 10); //destination port field
 								$message = snort_get_msg($v['rule']);
 
-						echo "<tr><td width=\"12px\" class=\"listt\" align=\"left\" valign=\"middle\"> $textss
+						echo "<tr><td class=\"listt\" align=\"left\" valign=\"middle\"> $textss
 								<a href='?id={$id}&openruleset={$currentruleset}&act=toggle&ids={$sid}'>
 								<img src=\"../themes/{$g['theme']}/images/icons/{$iconb}\"
 								width=\"11\" height=\"11\" border=\"0\"  
 								title='" . gettext("Click to toggle enabled/disabled state") . "'></a>
 								$textse
 							       </td>
-							       <td width=\"9%\" class=\"listlr\" align=\"center\">
+							       <td class=\"listlr\" align=\"center\">
 									{$textss}{$sid}{$textse}
 							       </td>
-							       <td width=\"7%\" class=\"listlr\" align=\"center\">
+							       <td class=\"listlr\" align=\"center\">
 									{$textss}{$protocol}{$textse}
 							       </td>
-							       <td width=\"14%\" class=\"listlr\" align=\"center\">
+							       <td class=\"listlr\" align=\"center\">
 									{$srcspan}{$source}{$textse}
 							       </td>
-							       <td width=\"11%\" class=\"listlr\" align=\"center\">
+							       <td class=\"listlr\" align=\"center\">
 									{$srcprtspan}{$source_port}{$textse}
 							       </td>
-							       <td width=\"14%\" class=\"listlr\" align=\"center\">
+							       <td class=\"listlr\" align=\"center\">
 									{$dstspan}{$destination}{$textse}
 							       </td>
-							       <td width=\"11%\" class=\"listlr\" align=\"center\">
+							       <td class=\"listlr\" align=\"center\">
 								       {$dstprtspan}{$destination_port}{$textse}
 							       </td>
 								<td class=\"listbg\" style=\"word-wrap:break-word; whitespace:pre-line;\"><font color=\"white\"> 
 									{$textss}{$message}{$textse}
 							       </td>";
 						?>
-								<td width="18px" align="right" valign="middle" nowrap class="listt">
-									<a href="javascript: void(0)"
+								<td align="right" valign="middle" nowrap class="listt">
+									<a href="javascript: void(0)" 
 									onclick="wopen('snort_rules_edit.php?id=<?=$id;?>&openruleset=<?=$currentruleset;?>&ids=<?=$sid;?>&gid=<?=$gid;?>','FileViewer',800,600)"><img
 									src="../themes/<?= $g['theme']; ?>/images/icons/icon_right.gif" 
 									title="<?php echo gettext("Click to view the entire rule text"); ?>" width="17" height="17" border="0"></a>
@@ -568,6 +580,7 @@ h += 96;
 						}
 						unset($rulem, $v);
 						?>
+					    </tbody>
 					</table>
 				</td>
 			</tr>

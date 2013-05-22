@@ -252,18 +252,30 @@ if ($pconfig['arefresh'] == 'on')
 	<tr>
 	<td width="100%" colspan="2">
 	<table id="myTable" style="table-layout: fixed;" width="100%" class="sortable" border="1" cellpadding="0" cellspacing="0">
-	<thead>
-		<th class="listhdrr" width="8%" align="center" axis="date"><?php echo gettext("DATE"); ?></th>
-		<th class="listhdrr" width="18em" align="center" axis="number"><?php echo gettext("PRI"); ?></th>
-		<th class="listhdrr" width="38em" align="center"axis="string"><?php echo gettext("PROTO"); ?></th>
-		<th class="listhdrr" width="10%" axis="string"><?php echo gettext("CLASS"); ?></th>
-		<th class="listhdrr" width="14%" axis="string"><?php echo gettext("SRC"); ?></th>
-		<th class="listhdrr" width="8%" align="center" axis="string"><?php echo gettext("SPORT"); ?></th>
-		<th class="listhdrr" width="14%" axis="string"><?php echo gettext("DST"); ?></th>
-		<th class="listhdrr" width="8%" align="center" axis="string"><?php echo gettext("DPORT"); ?></th>
-		<th class="listhdrr" width="9%" axis="string"><?php echo gettext("SID"); ?></th>
-		<th class="listhdrr" axis="string"><?php echo gettext("DESCRIPTION"); ?></th>
-	</thead>
+		<colgroup>
+			<col width="9%" align="center" axis="date">
+			<col width="45" align="center" axis="number">
+			<col width="65" align="center" axis="string">
+			<col width="10%" axis="string">
+			<col width="13%" align="center" axis="string">
+			<col width="8%" align="center" axis="string">
+			<col width="13%" align="center" axis="string">
+			<col width="8%" align="center" axis="string">
+			<col width="9%" align="center" axis="number">
+			<col axis="string">
+		</colgroup>
+		<thead>
+			<th class="listhdrr" axis="date"><?php echo gettext("DATE"); ?></th>
+			<th class="listhdrr" axis="number"><?php echo gettext("PRI"); ?></th>
+			<th class="listhdrr" axis="string"><?php echo gettext("PROTO"); ?></th>
+			<th class="listhdrr" axis="string"><?php echo gettext("CLASS"); ?></th>
+			<th class="listhdrr" axis="string"><?php echo gettext("SRC"); ?></th>
+			<th class="listhdrr" axis="string"><?php echo gettext("SPORT"); ?></th>
+			<th class="listhdrr" axis="string"><?php echo gettext("DST"); ?></th>
+			<th class="listhdrr" axis="string"><?php echo gettext("DPORT"); ?></th>
+			<th class="listhdrr" axis="number"><?php echo gettext("SID"); ?></th>
+			<th class="listhdrr" axis="string"><?php echo gettext("DESCRIPTION"); ?></th>
+		</thead>
 	<tbody>
 	<?php
 
@@ -321,15 +333,15 @@ if (file_exists("/var/log/snort/snort_{$if_real}{$snort_uuid}/alert")) {
 			$alert_class = $fields[11];
 
 			echo "<tr>
-				<td class='listr' width='8%' align='center'>{$alert_date}<br/>{$alert_time}</td>
-				<td class='listr' width='18em' align='center'>{$alert_priority}</td>
-				<td class='listr' width='38em' align='center'>{$alert_proto}</td>
-				<td class='listr' width='10%'>{$alert_class}</td>
-				<td class='listr' width='13%' align='center' style=\"word-break:break-all;\">{$alert_ip_src}</td>
-				<td class='listr' width='8%' align='center'>{$alert_src_p}</td>
-				<td class='listr' width='13%' align='center' style=\"word-break:break-all;\">{$alert_ip_dst}</td>
-				<td class='listr' width='8%' align='center'>{$alert_dst_p}</td>
-				<td class='listr' width='9%' align='center'>{$alert_sid_str}<br/>{$sidsupplink}</td>
+				<td class='listr' align='center'>{$alert_date}<br/>{$alert_time}</td>
+				<td class='listr' align='center'>{$alert_priority}</td>
+				<td class='listr' align='center'>{$alert_proto}</td>
+				<td class='listr' style=\"word-wrap:break-word;\">{$alert_class}</td>
+				<td class='listr' align='center'>{$alert_ip_src}</td>
+				<td class='listr' align='center'>{$alert_src_p}</td>
+				<td class='listr' align='center'>{$alert_ip_dst}</td>
+				<td class='listr' align='center'>{$alert_dst_p}</td>
+				<td class='listr' align='center'>{$alert_sid_str}<br/>{$sidsupplink}</td>
 				<td class='listr' style=\"word-wrap:break-word;\">{$alert_descr}</td>
 				</tr>\n";
 
