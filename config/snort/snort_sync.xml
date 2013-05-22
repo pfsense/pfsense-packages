@@ -175,6 +175,7 @@ POSSIBILITY OF SUCH DAMAGE.
 					<fieldname>varsyncsnortstart</fieldname>
 					<description><![CDATA[Start Snort on target host if not already running.]]></description>
 					<type>checkbox</type>
+					<value>ON</value>
 				</rowhelperfield>
 			</rowhelper>
 		</field>
@@ -184,7 +185,6 @@ POSSIBILITY OF SUCH DAMAGE.
 		</field>
 	</fields>
 	<custom_delete_php_command>
-		write_config();snort_sync_on_changes();
 	</custom_delete_php_command>	
 	<custom_php_resync_config_command>
 		write_config();snort_sync_on_changes();

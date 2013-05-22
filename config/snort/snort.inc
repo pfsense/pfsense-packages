@@ -857,7 +857,7 @@ function sync_snort_package_config() {
 
 	/* do not start config build if rules is empty or there are no Snort settings */
 	if (!is_array($config['installedpackages']['snortglobal']) || !is_array($config['installedpackages']['snortglobal']['rule'])) {
-		exec('/bin/rm /usr/local/etc/rc.d/snort.sh');
+		exec("/bin/rm /usr/local/etc/rc.d/snort.sh");
 		conf_mount_ro();
 		return;
 	}
@@ -3053,7 +3053,7 @@ function snort_sync_on_changes() {
 	global $config, $g, $is_postinstall;
 
 	/* Do not attempt a package sync while booting up or installing package */
-	if ($g['booting'] || $is_postinstall == true)
+	if ($g['booting'] || $is_postinstall)
 		return;
 
 	if (is_array($config['installedpackages']['snortsync']['config'])){
@@ -3118,7 +3118,7 @@ function snort_do_xmlrpc_sync($syncdownloadrules, $sync_to_ip, $username, $passw
 	global $config, $g, $is_postinstall;
 
 	/* Do not attempt a package sync while booting up or installing package */
-	if ($g['booting'] || $is_postinstall == true)
+	if ($g['booting'] || $is_postinstall)
 		return;
 
 	if(!$username || !$password || !$sync_to_ip) {
@@ -3161,8 +3161,7 @@ function snort_do_xmlrpc_sync($syncdownloadrules, $sync_to_ip, $username, $passw
 	$msg = new XML_RPC_Message($method, $params);
 	$cli = new XML_RPC_Client('/xmlrpc.php', $url, $port);
 	$cli->setCredentials($username, $password);
-	if($g['debug'])
-		$cli->setDebug(1);
+
 	/* send our XMLRPC message and timeout after defined sync timeout value*/
 	$resp = $cli->send($msg, $synctimeout);
 	if(!$resp) {
@@ -3170,8 +3169,6 @@ function snort_do_xmlrpc_sync($syncdownloadrules, $sync_to_ip, $username, $passw
 		log_error($error);
 		file_notice("sync_settings", $error, "snort Settings Sync", "");
 	} elseif($resp->faultCode()) {
-		$cli->setDebug(1);
-		$resp = $cli->send($msg, $synctimeout);
 		$error = "An error code was received while attempting snort XMLRPC sync with {$url}:{$port} - Code " . $resp->faultCode() . ": " . $resp->faultString();
 		log_error($error);
 		file_notice("sync_settings", $error, "snort Settings Sync", "");
@@ -3181,14 +3178,16 @@ function snort_do_xmlrpc_sync($syncdownloadrules, $sync_to_ip, $username, $passw
 
 	$downloadrulescmd = "";
 	if ($syncdownloadrules == "yes") {
-		$downloadrulescmd = "log_error(gettext(\"[snort] XMLRPC pkg sync: Requested update of downloaded rules files...\"));\n";
+		$downloadrulescmd = "log_error(gettext(\"[snort] XMLRPC pkg sync: Update of downloaded rule sets requested...\"));\n";
 		$downloadrulescmd .= "include_once(\"/usr/local/pkg/snort/snort_check_for_rule_updates.php\");\n";
 	}
 	$snortstart = "";
 	if ($syncstartsnort == "ON") {
-		$snortstart = "log_error(gettext(\"[snort] XMLRPC pkg sync: Requested restart of Snort...\"));\n";
+		$snortstart = "log_error(gettext(\"[snort] XMLRPC pkg sync: Checking Snort status...\"));\n";
 		$snortstart .= "if (!is_process_running(\"snort\")) {\n";
+		$snortstart .= "log_error(gettext(\"[snort] XMLRPC pkg sync: Snort not running. Sending a start command...\"));\n";
 		$snortstart .= "exec(\"/usr/local/etc/rc.d/snort.sh start 2>&1 &\");\n}\n";
+		$snortstart .= "else {log_error(gettext(\"[snort] XMLRPC pkg sync: Snort is running...\"));\n}\n";
 	}
 
 	/* Build a series of commands for the secondary host to execute that will load the new settings. */
@@ -3224,7 +3223,6 @@ EOD;
 	$msg = new XML_RPC_Message($method, $params);
 	$cli = new XML_RPC_Client('/xmlrpc.php', $url, $port);
 	$cli->setCredentials($username, $password);
-	$cli->setDebug("1");
 	$resp = $cli->send($msg, $synctimeout);
 	if(!$resp) {
 		$error = "A communications error occurred while attempting snort XMLRPC sync with {$url}:{$port} (pfsense.exec_php).";
