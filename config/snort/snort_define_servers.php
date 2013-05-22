@@ -190,8 +190,8 @@ if ($savemsg)
 ?>
 </td></tr>
 <tr>
-		<td class="tabcont">
-		<table width="100%" border="0" cellpadding="6" cellspacing="0">
+		<td><div id="mainarea">
+		<table id="maintable" class="tabcont" width="100%" border="0" cellpadding="6" cellspacing="0">
 		<tr>
 			<td colspan="2" valign="top" class="listtopic"><?php echo gettext("Define Servers"); ?></td>
 		</tr>
@@ -244,6 +244,7 @@ if ($savemsg)
 			</td>
 		</tr>
 	</table>
+</div>
 </td></tr>
 </table>
 </form>

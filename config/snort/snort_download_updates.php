@@ -124,7 +124,7 @@ h += 96;
 </td></tr>
 <tr>
 		<td>
-		<div id="mainarea3">
+		<div id="mainarea">
 		<table id="maintable4" class="tabcont" width="100%" border="0" cellpadding="0" cellspacing="0">
 			<tr align="center">
 				<td>

@@ -207,7 +207,7 @@ include_once("head.inc");
 
 <form action="snort_interfaces_edit.php<?php echo "?id=$id";?>" method="post" name="iform" id="iform">
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
-<tr><td class="tabnavtbl">
+<tr><td>
 <?php
     $tab_array = array();
 	$tab_array[0] = array(gettext("Snort Interfaces"), true, "/snort/snort_interfaces.php");
@@ -232,8 +232,8 @@ include_once("head.inc");
 	display_top_tabs($tab_array);
 ?>
 </td></tr>
-<tr><td class="tabcont">
-<table width="100%" border="0" cellpadding="6" cellspacing="0">
+<tr><td><div id="mainarea">
+<table id="maintable" class="tabcont" width="100%" border="0" cellpadding="6" cellspacing="0">
 	<tr>
 		<td colspan="2" valign="top" class="listtopic"><?php echo gettext("General Settings"); ?></td>
 	</tr>
@@ -494,6 +494,7 @@ include_once("head.inc");
 	</td>
 </tr>
 </table>
+</div>
 </td></tr>
 </table>
 </form>

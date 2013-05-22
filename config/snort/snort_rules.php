@@ -352,7 +352,7 @@ h += 96;
 
 <form action="/snort/snort_rules.php" method="post" name="iform" id="iform">
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
-	<tr><td class="tabnavtbl">
+	<tr><td>
 	<?php
 		$tab_array = array();
 		$tab_array[0] = array(gettext("Snort Interfaces"), true, "/snort/snort_interfaces.php");
@@ -377,8 +377,8 @@ h += 96;
         display_top_tabs($tab_array);
 	?>
 	</td></tr>
-	<tr><td class="tabcont">
-		<table width="100%" border="0" cellpadding="4" cellspacing="0">
+	<tr><td><div id="mainarea">
+		<table id="maintable" class="tabcont" width="100%" border="0" cellpadding="4" cellspacing="0">
 			<tr>
 				<td class="listtopic"><?php echo gettext("Available Rule Categories"); ?></td>
 			</tr>
@@ -612,6 +612,7 @@ h += 96;
 			</tr>
 		<?php endif;?>
 		</table>
+	</div>
 	</td>
 	</tr>
 </table>

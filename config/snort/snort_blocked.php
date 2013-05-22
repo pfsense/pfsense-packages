@@ -146,13 +146,13 @@ if ($pconfig['brefresh'] == 'on')
 		$tab_array[4] = array(gettext("Blocked"), true, "/snort/snort_blocked.php");
 		$tab_array[5] = array(gettext("Whitelists"), false, "/snort/snort_interfaces_whitelist.php");
 		$tab_array[6] = array(gettext("Suppress"), false, "/snort/snort_interfaces_suppress.php");
-        $tab_array[7] = array(gettext("Sync"), false, "/pkg_edit.php?xml=snort/snort_sync.xml");
+	        $tab_array[7] = array(gettext("Sync"), false, "/pkg_edit.php?xml=snort/snort_sync.xml");
 		display_top_tabs($tab_array);
 		?>
 	</td>
 </tr>
 <tr>
-	<td>
+	<td><div id="mainarea">
 		<table id="maintable" class="tabcont" width="100%" border="0" cellpadding="6" cellspacing="0">
 			<tr>
 				<td colspan="2" class="listtopic"><?php echo gettext("Blocked Hosts Log View Settings"); ?></td>
@@ -280,6 +280,7 @@ if ($pconfig['brefresh'] == 'on')
 			</td>
 		</tr>
 	</table>
+	</div>
 	</td>
 </tr>
 </table>

@@ -205,8 +205,8 @@ if ($pconfig['arefresh'] == 'on')
 ?>
 </td></tr>
 <tr>
-	<td>
-		<table class="tabcont" width="100%" border="0" cellspacing="0" cellpadding="6">
+	<td><div id="mainarea">
+		<table id="maintable" class="tabcont" width="100%" border="0" cellspacing="0" cellpadding="6">
 			<tr>
 				<td colspan="2" class="listtopic"><?php echo gettext("Alert Log View Settings"); ?></td>
 			</tr>
@@ -357,6 +357,7 @@ if (file_exists("/var/log/snort/snort_{$if_real}{$snort_uuid}/alert")) {
 	</td>
 </tr>
 </table>
+</div>
 </td></tr>
 </table>
 </form>

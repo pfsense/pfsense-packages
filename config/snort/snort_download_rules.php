@@ -46,11 +46,11 @@ include("head.inc");
 <?if($pfsense_stable == 'yes'){echo '<p class="pgtitle">' . $pgtitle . '</p>';}?>
 
 <form action="/snort/snort_download_updates.php" method="GET">
-<div id="mainarea">
+
 <table width="100%" border="0" cellpadding="6" cellspacing="0">
 	<tr>
-		<td class="tabcont" align="center">
-		<table width="100%" border="0" cellpadding="6" cellspacing="0">
+		<td align="center"><div id="mainarea">
+		<table id="maintable" class="tabcont"  width="100%" border="0" cellpadding="6" cellspacing="0">
 			<tr>
 				<td class="tabcont" align="center">
 				<table width="420" border="0" cellpadding="0" cellspacing="0">
@@ -80,10 +80,10 @@ include("head.inc");
 				<td class="tabcont" align="center" valign="middle"><input type="submit" name="return" id="return" Value="Return"></td>
 			</tr>
 		</table>
+		</div>
 		</td>
 	</tr>
 </table>
-</div>
 </form>
 <?php include("fend.inc");?>
 </body>

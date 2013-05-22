@@ -142,8 +142,10 @@ if ($savemsg)
 	print_info_box($savemsg);
 ?>
 <form action="snort_rules_flowbits.php" method="post" name="iform" id="iform">
+<div id="mainarea">
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
-<tr><td class="tabcont">
+<tr>
+<td class="tabcont">
 <table width="100%" border="0" cellpadding="6" cellspacing="0">
 	<tr>
 		<td valign="middle" class="listtopic"><?php echo gettext("Auto-Generated Flowbit-Required Rules"); ?></td>
@@ -186,12 +188,20 @@ if ($savemsg)
 	<tr>
 		<td>
 		<table id="myTable" width="100%" class="sortable" border="1" cellpadding="0" cellspacing="0">
+			<colgroup>
+				<col width="11%" axis="number">
+				<col width="10%" axis="string">
+				<col width="14%" axis="string">
+				<col width="14%" axis="string">
+				<col width="20%" axis="string">
+				<col axis="string">
+			</colgroup>
 			<thead>
-				<th width="12%" class="listhdrr" axis="number"><?php echo gettext("SID"); ?></th>
-				<td width="10%" class="listhdrr" axis="string"><?php echo gettext("Proto"); ?></th>
-				<th width="14%" class="listhdrr" axis="string"><?php echo gettext("Source"); ?></th>
-				<th width="14%" class="listhdrr" axis="string"><?php echo gettext("Destination"); ?></th>
-				<th width="20%" class="listhdrr" axis="string"><?php echo gettext("Flowbits"); ?></th>
+				<th class="listhdrr" axis="number"><?php echo gettext("SID"); ?></th>
+				<td class="listhdrr" axis="string"><?php echo gettext("Proto"); ?></th>
+				<th class="listhdrr" axis="string"><?php echo gettext("Source"); ?></th>
+				<th class="listhdrr" axis="string"><?php echo gettext("Destination"); ?></th>
+				<th class="listhdrr" axis="string"><?php echo gettext("Flowbits"); ?></th>
 				<th class="listhdrr" axis="string"><?php echo gettext("Message"); ?></th>
 			<thead>
 			<tbody>
@@ -231,11 +241,11 @@ if ($savemsg)
 
 							// Use "echo" to write the table HTML row-by-row.
 							echo "<tr>" . 
-								"<td width=\"12%\" class=\"listr\">{$sid}&nbsp;{$supplink}</td>" . 
-								"<td width=\"10%\" class=\"listr\">{$protocol}</td>" . 
-								"<td width=\"14%\" class=\"listr\">{$source}</td>" . 
-								"<td width=\"14%\" class=\"listr\">{$destination}</td>" . 
-								"<td width=\"20%\" class=\"listr\" style=\"word-wrap:break-word; word-break:normal;\">{$flowbits}</td>" . 
+								"<td class=\"listr\">{$sid}&nbsp;{$supplink}</td>" . 
+								"<td class=\"listr\">{$protocol}</td>" . 
+								"<td class=\"listr\"><span title=\"{$rule_content[2]}\">{$source}</span></td>" . 
+								"<td class=\"listr\"><span title=\"{$rule_content[5]}\">{$destination}</span></td>" . 
+								"<td class=\"listr\" style=\"word-wrap:break-word; word-break:normal;\">{$flowbits}</td>" . 
 								"<td class=\"listr\" style=\"word-wrap:break-word; word-break:normal;\">{$message}</td>" . 
 							"</tr>";
 							$count++;
@@ -257,8 +267,10 @@ if ($savemsg)
 	</tr>
 	<?php endif; ?>
 </table>
-</td></tr>
+</td>
+</tr>
 </table>
+</div>
 </form>
 <?php include("fend.inc"); ?>
 </body>

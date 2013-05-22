@@ -194,25 +194,26 @@ if ($pfsense_stable == 'yes')
 ?>
 
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
-<tr><td>
-<?php
-
-        $tab_array = array();
-        $tab_array[0] = array(gettext("Snort Interfaces"), true, "/snort/snort_interfaces.php");
-        $tab_array[1] = array(gettext("Global Settings"), false, "/snort/snort_interfaces_global.php");
-        $tab_array[2] = array(gettext("Updates"), false, "/snort/snort_download_updates.php");
-        $tab_array[3] = array(gettext("Alerts"), false, "/snort/snort_alerts.php");
-        $tab_array[4] = array(gettext("Blocked"), false, "/snort/snort_blocked.php");
-        $tab_array[5] = array(gettext("Whitelists"), false, "/snort/snort_interfaces_whitelist.php");
-        $tab_array[6] = array(gettext("Suppress"), false, "/snort/snort_interfaces_suppress.php");
-        $tab_array[7] = array(gettext("Sync"), false, "/pkg_edit.php?xml=snort/snort_sync.xml");
-        display_top_tabs($tab_array);
-?>
-</td></tr>
 <tr>
 	<td>
-	<div id="mainarea2">
-	<table class="tabcont" width="100%" border="0" cellpadding="0" cellspacing="0">
+	<?php
+		$tab_array = array();
+		$tab_array[0] = array(gettext("Snort Interfaces"), true, "/snort/snort_interfaces.php");
+		$tab_array[1] = array(gettext("Global Settings"), false, "/snort/snort_interfaces_global.php");
+		$tab_array[2] = array(gettext("Updates"), false, "/snort/snort_download_updates.php");
+		$tab_array[3] = array(gettext("Alerts"), false, "/snort/snort_alerts.php");
+		$tab_array[4] = array(gettext("Blocked"), false, "/snort/snort_blocked.php");
+		$tab_array[5] = array(gettext("Whitelists"), false, "/snort/snort_interfaces_whitelist.php");
+		$tab_array[6] = array(gettext("Suppress"), false, "/snort/snort_interfaces_suppress.php");
+		$tab_array[7] = array(gettext("Sync"), false, "/pkg_edit.php?xml=snort/snort_sync.xml");
+		display_top_tabs($tab_array);
+	?>
+	</td>
+</tr>
+<tr>
+	<td>
+	<div id="mainarea">
+	<table id="maintable" class="tabcont" width="100%" border="0" cellpadding="0" cellspacing="0">
 		<tr id="frheader">
 			<td width="3%" class="list">&nbsp;</td>
 			<td width="10%" class="listhdrr"><?php echo gettext("If"); ?></td>
@@ -226,82 +227,82 @@ if ($pfsense_stable == 'yes')
 				<tr>
 					<td></td>
 					<td align="center" valign="middle"><a href="snort_interfaces_edit.php?id=<?php echo $id_gen;?>"><img
-						src="../themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif"
-						width="17" height="17" border="0" title="<?php echo gettext('Add Snort interface mapping');?>"></a></td>
+					src="../themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif"
+					width="17" height="17" border="0" title="<?php echo gettext('Add Snort interface mapping');?>"></a></td>
 				</tr>
 			</table>
 			</td>
 		</tr>
-<?php $nnats = $i = 0;
+		<?php $nnats = $i = 0;
 
-// Turn on buffering to speed up rendering
-ini_set('output_buffering','true');
+		// Turn on buffering to speed up rendering
+		ini_set('output_buffering','true');
 
-// Start buffering to fix display lag issues in IE9 and IE10
-ob_start(null, 0);
+		// Start buffering to fix display lag issues in IE9 and IE10
+		ob_start(null, 0);
 
-/* If no interfaces are defined, then turn off the "no rules" warning */
-$no_rules_footnote = false;
-if ($id_gen == 0)
-	$no_rules = false;
-else
-	$no_rules = true;
+		/* If no interfaces are defined, then turn off the "no rules" warning */
+		$no_rules_footnote = false;
+		if ($id_gen == 0)
+			$no_rules = false;
+		else
+			$no_rules = true;
 
-foreach ($a_nat as $natent): ?>
-	<tr valign="top" id="fr<?=$nnats;?>">
-<?php
+		foreach ($a_nat as $natent): ?>
+		<tr valign="top" id="fr<?=$nnats;?>">
+		<?php
 
-/* convert fake interfaces to real and check if iface is up */
-/* There has to be a smarter way to do this */
-	$if_real = snort_get_real_interface($natent['interface']);
-	$natend_friendly= snort_get_friendly_interface($natent['interface']);
-	$snort_uuid = $natent['uuid'];
-	if (snort_is_running($snort_uuid, $if_real) == 'no'){
-		$iconfn = 'block';
-		$iconfn_msg1 = 'Snort is not running on ';
-		$iconfn_msg2 = '. Click to start.';
-	}
-	else{
-		$iconfn = 'pass';
-		$iconfn_msg1 = 'Snort is running on ';
-		$iconfn_msg2 = '. Click to stop.';
-	}
-	if (snort_is_running($snort_uuid, $if_real, 'barnyard2') == 'no'){
-		$biconfn = 'block';
-		$biconfn_msg1 = 'Barnyard2 is not running on ';
-		$biconfn_msg2 = '. Click to start.';
-	}
-	else{
-		$biconfn = 'pass';
-		$biconfn_msg1 = 'Barnyard2 is running on ';
-		$biconfn_msg2 = '. Click to stop.';
-		}
+			/* convert fake interfaces to real and check if iface is up */
+			/* There has to be a smarter way to do this */
+			$if_real = snort_get_real_interface($natent['interface']);
+			$natend_friendly= snort_get_friendly_interface($natent['interface']);
+			$snort_uuid = $natent['uuid'];
+			if (snort_is_running($snort_uuid, $if_real) == 'no'){
+				$iconfn = 'block';
+				$iconfn_msg1 = 'Snort is not running on ';
+				$iconfn_msg2 = '. Click to start.';
+			}
+			else{
+				$iconfn = 'pass';
+				$iconfn_msg1 = 'Snort is running on ';
+				$iconfn_msg2 = '. Click to stop.';
+			}
+			if (snort_is_running($snort_uuid, $if_real, 'barnyard2') == 'no'){
+				$biconfn = 'block';
+				$biconfn_msg1 = 'Barnyard2 is not running on ';
+				$biconfn_msg2 = '. Click to start.';
+			}
+			else{
+				$biconfn = 'pass';
+				$biconfn_msg1 = 'Barnyard2 is running on ';
+				$biconfn_msg2 = '. Click to stop.';
+				}
 
-	/* See if interface has any rules defined and set boolean flag */
-	$no_rules = true;
-	if (isset($natent['customrules']) && !empty($natent['customrules']))
-		$no_rules = false;
-	if (isset($natent['rulesets']) && !empty($natent['rulesets']))
-		$no_rules = false;
-	if (isset($natent['ips_policy']) && !empty($natent['ips_policy']))
-		$no_rules = false;
-	/* Do not display the "no rules" warning if interface disabled */
-	if ($natent['enable'] == "off")
-		$no_rules = false;
-	if ($no_rules)
-		$no_rules_footnote = true;
-?>
-		<td class="listt">
+			/* See if interface has any rules defined and set boolean flag */
+			$no_rules = true;
+			if (isset($natent['customrules']) && !empty($natent['customrules']))
+				$no_rules = false;
+			if (isset($natent['rulesets']) && !empty($natent['rulesets']))
+				$no_rules = false;
+			if (isset($natent['ips_policy']) && !empty($natent['ips_policy']))
+				$no_rules = false;
+			/* Do not display the "no rules" warning if interface disabled */
+			if ($natent['enable'] == "off")
+				$no_rules = false;
+			if ($no_rules)
+				$no_rules_footnote = true;
+		?>
+			<td class="listt">
 			<input type="checkbox" id="frc<?=$nnats;?>" name="rule[]" value="<?=$i;?>" onClick="fr_bgcolor('<?=$nnats;?>')" style="margin: 0; padding: 0;">
 			</td>
-		<td class="listr" 
+			<td class="listr" 
 			id="frd<?=$nnats;?>"
 			ondblclick="document.location='snort_interfaces_edit.php?id=<?=$nnats;?>';">
 			<?php
 				echo $natend_friendly;
 			?>
-		</td>
-		<td class="listr" 
+			</td>
+			<td class="listr" 
 			id="frd<?=$nnats;?>"
 			ondblclick="document.location='snort_interfaces_edit.php?id=<?=$nnats;?>';">
 			<?php
@@ -316,8 +317,8 @@ foreach ($a_nat as $natent): ?>
 			} else
 				echo strtoupper("disabled");
 			?>
-		</td>
-		<td class="listr" 
+			</td>
+			<td class="listr" 
 			id="frd<?=$nnats;?>"
 			ondblclick="document.location='snort_interfaces_edit.php?id=<?=$nnats;?>';">
 			<?php
@@ -328,8 +329,8 @@ foreach ($a_nat as $natent): ?>
 				$check_performance = "lowmem";
 			}
 			?> <?=strtoupper($check_performance);?>
-		</td>
-		<td class="listr" 
+			</td>
+			<td class="listr" 
 			id="frd<?=$nnats;?>"
 			ondblclick="document.location='snort_interfaces_edit.php?id=<?=$nnats;?>';">
 			<?php
@@ -341,8 +342,8 @@ foreach ($a_nat as $natent): ?>
 				$check_blockoffenders = disabled;
 			}
 			?> <?=strtoupper($check_blockoffenders);?>
-		</td>
-		<td class="listr" 
+			</td>
+			<td class="listr" 
 			id="frd<?=$nnats;?>"
 			ondblclick="document.location='snort_interfaces_edit.php?id=<?=$nnats;?>';">
 			<?php
@@ -356,12 +357,12 @@ foreach ($a_nat as $natent): ?>
 			} else
 				echo strtoupper("disabled");
 			?>
-		</td>
-		<td class="listbg" 
+			</td>
+			<td class="listbg" 
 			ondblclick="document.location='snort_interfaces_edit.php?id=<?=$nnats;?>';">
 			<font color="#ffffff"> <?=htmlspecialchars($natent['descr']);?>&nbsp;
-		</td>
-		<td valign="middle" class="list" nowrap>
+			</td>
+			<td valign="middle" class="list" nowrap>
 			<table border="0" cellspacing="0" cellpadding="0">
 				<tr>
 					<td><a href="snort_interfaces_edit.php?id=<?=$i;?>"><img
@@ -370,46 +371,42 @@ foreach ($a_nat as $natent): ?>
 					</td>
 				</tr>
 			</table>
-		</td>	
+			</td>	
 		</tr>
 		<?php $i++; $nnats++; endforeach; ob_end_flush(); ?>
-			<tr>
-				<td class="list"></td>
-				<td class="list" colspan="6">
-					<?php if ($no_rules_footnote): ?><br><img src="../themes/<?= $g['theme']; ?>/images/icons/icon_frmfld_imp.png" width="15" height="15" border="0">
-						<span class="red">&nbsp;&nbsp <?php echo gettext("WARNING: Marked interface currently has no rules defined for Snort"); ?></span>
-					<?php else: ?>&nbsp;
-					<?php endif; ?>					 
-				</td>
-				<td class="list" valign="middle" nowrap>
-					<table border="0" cellspacing="0" cellpadding="0">
-						<tr>
-							<td><?php if ($nnats == 0): ?><img
-								src="../themes/<?= $g['theme']; ?>/images/icons/icon_x_d.gif"
-								width="17" height="17" " border="0">
-							    <?php else: ?>
-								<input name="del" type="image"
-								src="../themes/<?= $g['theme']; ?>/images/icons/icon_x.gif"
-								width="17" height="17" title="<?php echo gettext("Delete selected Snort interface mapping(s)"); ?>"
-								onclick="return intf_del()">
-							    <?php endif; ?></td>
-						</tr>
-					</table>
-				</td>
-			</tr>
-		</table>
-		</div>
-		</td>
-	</tr>
-</table>
-
-<br>
-<table width="100%" border="0" cellpadding="0" cellspacing="0">
-	<tr>
-		<td>
-			<table class="tabcont" width="100%" border="0" cellpadding="1" cellspacing="1">
+		<tr>
+			<td class="list"></td>
+			<td class="list" colspan="6">
+				<?php if ($no_rules_footnote): ?><br><img src="../themes/<?= $g['theme']; ?>/images/icons/icon_frmfld_imp.png" width="15" height="15" border="0">
+					<span class="red">&nbsp;&nbsp <?php echo gettext("WARNING: Marked interface currently has no rules defined for Snort"); ?></span>
+				<?php else: ?>&nbsp;
+				<?php endif; ?>					 
+			</td>
+			<td class="list" valign="middle" nowrap>
+				<table border="0" cellspacing="0" cellpadding="0">
+					<tr>
+						<td><?php if ($nnats == 0): ?><img
+						src="../themes/<?= $g['theme']; ?>/images/icons/icon_x_d.gif"
+						width="17" height="17" " border="0">
+						<?php else: ?>
+						<input name="del" type="image"
+						src="../themes/<?= $g['theme']; ?>/images/icons/icon_x.gif"
+						width="17" height="17" title="<?php echo gettext("Delete selected Snort interface mapping(s)"); ?>"
+						onclick="return intf_del()">
+						<?php endif; ?></td>
+					</tr>
+				</table>
+			</td>
+		</tr>
+		<tr>
+		<td colspan="8">&nbsp;</td>
+		</tr>
+		<tr>
+			<td>&nbsp;</td>
+			<td colspan="6">
+			<table class="tabcont" width="100%" border="0" cellpadding="1" cellspacing="0">
 				<tr>
-					<td colspan="3"><span class="red"><strong><?php echo gettext("Note:"); ?></strong></span> <br>
+					<td colspan="3" class="vexpl"><span class="red"><strong><?php echo gettext("Note:"); ?></strong></span> <br>
 						<?php echo gettext("This is the ") . "<strong>" . gettext("Snort Menu ") . 
 						"</strong>" . gettext("where you can see an overview of all your interface settings.");
 						if (empty($a_nat)) {
@@ -419,26 +416,26 @@ foreach ($a_nat as $natent): ?>
 					</td>
 				</tr>
 				<tr>
-					<td colspan="3"><br>
+					<td colspan="3" class="vexpl"><br>
 					</td>
 				</tr>
 				<tr>
-					<td colspan="3"><span class="red"><strong><?php echo gettext("Warning:"); ?></strong></span><br>
+					<td colspan="3" class="vexpl"><span class="red"><strong><?php echo gettext("Warning:"); ?></strong></span><br>
 						<strong><?php echo gettext("New settings will not take effect until interface restart."); ?></strong>
 					</td>
 				</tr>
 				<tr>
-					<td colspan="3"><br>
+					<td colspan="3" class="vexpl"><br>
 					</td>
 				</tr>
 				<tr>
-					<td><strong>Click</strong> on the <img src="../themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif"
+					<td class="vexpl"><strong>Click</strong> on the <img src="../themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif"
 						width="17" height="17" border="0" title="<?php echo gettext("Add Icon"); ?>"> icon to add 
 						an interface.
 					</td>
-					<td width="3%">&nbsp;
+					<td width="3%" class="vexpl">&nbsp;
 					</td>
-					<td><img src="../themes/<?= $g['theme']; ?>/images/icons/icon_pass.gif"
+					<td class="vexpl"><img src="../themes/<?= $g['theme']; ?>/images/icons/icon_pass.gif"
 						width="13" height="13" border="0" title="<?php echo gettext("Running"); ?>">
 						<img src="../themes/<?= $g['theme']; ?>/images/icons/icon_block.gif"
 						width="13" height="13" border="0" title="<?php echo gettext("Not Running"); ?>">  icons will show current 
@@ -446,23 +443,28 @@ foreach ($a_nat as $natent): ?>
 					</td>
 				</tr>
 				<tr>
-					<td><strong>Click</strong> on the <img src="../themes/<?= $g['theme']; ?>/images/icons/icon_e.gif"
+					<td class="vexpl"><strong>Click</strong> on the <img src="../themes/<?= $g['theme']; ?>/images/icons/icon_e.gif"
 						width="17" height="17" border="0" title="<?php echo gettext("Edit Icon"); ?>"> icon to edit 
 						an interface and settings.
 					<td width="3%">&nbsp;
 					</td>
-					<td><strong>Click</strong> on the status icons to <strong>toggle</strong> snort and barnyard2 status.
+					<td class="vexpl"><strong>Click</strong> on the status icons to <strong>toggle</strong> snort and barnyard2 status.
 					</td>
 				</tr>
 				<tr>
-					<td colspan="3"><strong> Click</strong> on the <img src="../themes/<?= $g['theme']; ?>/images/icons/icon_x.gif"
+					<td colspan="3" class="vexpl"><strong> Click</strong> on the <img src="../themes/<?= $g['theme']; ?>/images/icons/icon_x.gif"
 						width="17" height="17" border="0" title="<?php echo gettext("Delete Icon"); ?>"> icon to
 						delete an interface and settings.
 					</td>
 				</tr>
 			</table>
-		</td>
-	</tr>
+			</td>
+			<td>&nbsp;</td>
+		</tr>
+	</table>
+	</div>
+	</td>
+</tr>
 </table>
 </form>
 

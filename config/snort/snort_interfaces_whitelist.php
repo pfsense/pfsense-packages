@@ -91,8 +91,8 @@ if ($savemsg) print_info_box($savemsg);
 	</td>
 </tr>
 <tr>
-	<td class="tabcont">
-	<table width="100%" border="0" cellpadding="6" cellspacing="0">
+	<td><div id="mainarea">
+	<table id="maintable" class="tabcont" width="100%" border="0" cellpadding="6" cellspacing="0">
 		<tr>
 			<td width="20%" class="listhdrr">File Name</td>
 			<td width="40%" class="listhdrr">Values</td>
@@ -151,6 +151,7 @@ if ($savemsg) print_info_box($savemsg);
 				</td>
 			</tr>
 		</table>
+		</div>
 		</td>
 	</tr>
 </table>

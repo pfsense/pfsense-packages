@@ -161,7 +161,7 @@ function enable_change(enable_change) {
 		$tab_array[7] = array(gettext("Sync"), false, "/pkg_edit.php?xml=snort/snort_sync.xml");
 		display_top_tabs($tab_array);
 		echo '</td></tr>';
-		echo '<tr><td class="tabnavtbl">';
+		echo '<tr><td>';
 		$menu_iface=($if_friendly?substr($if_friendly,0,5)." ":"Iface ");
         $tab_array = array();
         $tab_array[] = array($menu_iface . gettext("Settings"), false, "/snort/snort_interfaces_edit.php?id={$id}");
@@ -174,8 +174,8 @@ function enable_change(enable_change) {
 ?>
 </td></tr>
 	<tr>
-		<td class="tabcont">
-		<table width="100%" border="0" cellpadding="6" cellspacing="0">
+		<td><div id="mainarea">
+		<table id="maintable" class="tabcont" width="100%" border="0" cellpadding="6" cellspacing="0">
 			<tr>
 				<td colspan="2" valign="top" class="listtopic"><?php echo gettext("General Barnyard2 " .
 				"Settings"); ?></td>
@@ -225,7 +225,9 @@ function enable_change(enable_change) {
 				<?php echo gettext("Please save your settings before you click start."); ?> </td>
 			</tr>
 		</table>
-
+		</div>
+		</td>
+	</tr>
 </table>
 </form>
 <script language="JavaScript">

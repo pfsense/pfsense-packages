@@ -84,8 +84,8 @@ if($pfsense_stable == 'yes'){echo '<p class="pgtitle">' . $pgtitle . '</p>';}
 ?>
 </td>
 </tr>
-<tr><td class="tabcont">
-<table width="100%" border="0" cellpadding="0" cellspacing="0">
+<tr><td><div id="mainarea">
+<table id="maintable" class="tabcont" width="100%" border="0" cellpadding="0" cellspacing="0">
 <tr>
 	<td width="30%" class="listhdrr"><?php echo gettext("File Name"); ?></td>
 	<td width="60%" class="listhdr"><?php echo gettext("Description"); ?></td>
@@ -130,6 +130,7 @@ if($pfsense_stable == 'yes'){echo '<p class="pgtitle">' . $pgtitle . '</p>';}
 				width="17" height="17" border="0" title="<?php echo gettext("add a new list"); ?>"></a></td>
 		</tr>
 	</table>
+	</div>
 	</td>
 </tr>
 </table>

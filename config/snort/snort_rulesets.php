@@ -255,7 +255,7 @@ function enable_change()
 
 <form action="snort_rulesets.php" method="post" name="iform" id="iform">
 <input type="hidden" name="id" id="id" value="<?=$id;?>" />
-<table width="99%" border="0" cellpadding="0" cellspacing="0">
+<table width="100%" border="0" cellpadding="0" cellspacing="0">
 <tr><td>
 <?php    
 	$tab_array = array();
