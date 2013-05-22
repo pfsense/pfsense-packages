@@ -149,7 +149,7 @@ if ($snortdownload == 'on') {
 	$rc = true;
         while ($max_tries > 0) {
 		$rc = snort_download_file_url("{$snort_rule_url}{$snort_filename_md5}", "{$tmpfname}/{$snort_filename_md5}");
-		if ($rc == true)
+		if ($rc === true)
 			break;
 		else {
 			/* If "forbidden" error, no need to retry so just exit */
@@ -167,7 +167,7 @@ if ($snortdownload == 'on') {
 		} 
 	}
 	log_error("[Snort] Snort MD5 Attempts: " . (4 - $max_tries + 1));
-	if ($rc == true) {
+	if ($rc === true) {
 		if ($pkg_interface <> "console")
 			update_status(gettext("Done downloading snort.org md5."));
 		error_log("\tChecking Snort VRT md5 file...\n", 3, $snort_rules_upd_log);
@@ -212,7 +212,7 @@ if ($snortdownload == 'on') {
 	$rc = true;
         while ($max_tries > 0) {
         	$rc = snort_download_file_url("{$snort_rule_url}{$snort_filename}", "{$tmpfname}/{$snort_filename}");
-		if ($rc == true)
+		if ($rc === true)
 			break;
 		else {
 			if ($rc >= 500) {
@@ -235,7 +235,7 @@ if ($snortdownload == 'on') {
 			}
 		}
         }
-	if ($rc == true) {
+	if ($rc === true) {
 		if ($pkg_interface <> "console")
 			update_status(gettext("Done downloading Snort VRT rules file."));
         	log_error("[Snort] Snort VRT Rules Attempts: " . (4 - $max_tries + 1));
@@ -271,7 +271,7 @@ if ($snortcommunityrules == 'on') {
 
 	$rc = snort_download_file_url("{$snort_community_rules_url}{$snort_community_rules_filename_md5}", "{$tmpfname}/{$snort_community_rules_filename_md5}");
 
-	if ($rc == true) {
+	if ($rc === true) {
 		if ($pkg_interface <> "console")
 			update_status(gettext("Done downloading Snort GPLv2 Community Rules md5"));
 		error_log(gettext("\tChecking Snort GPLv2 Community Rules md5.\n"), 3, $snort_rules_upd_log);
@@ -308,7 +308,7 @@ if ($snortcommunityrules == "on") {
 	$rc = snort_download_file_url("{$snort_community_rules_url}{$snort_community_rules_filename}", "{$tmpfname}/{$snort_community_rules_filename}");
 
 	/* Test for a valid rules file download.  Turn off Snort Community update if download failed. */
-	if ($rc == true) {
+	if ($rc === true) {
 		if (trim(file_get_contents("{$tmpfname}/{$snort_community_rules_filename_md5}")) != trim(md5_file("{$tmpfname}/{$snort_community_rules_filename}"))){
 			if ($pkg_interface <> "console")
 				update_output_window(gettext("Snort GPLv2 Community Rules file MD5 checksum failed..."));
@@ -383,11 +383,10 @@ if ($emergingthreats == 'on') {
 	else
 		$rc = snort_download_file_url("http://rules.emergingthreats.net/open/snort-{$emerging_threats_version}/{$emergingthreats_filename_md5}", "{$tmpfname}/{$emergingthreats_filename_md5}");
 
-	if ($rc == true) {
+	if ($rc === true) {
 		if ($pkg_interface <> "console")
 			update_status(gettext("Done downloading EmergingThreats md5"));
 		error_log(gettext("\tChecking EmergingThreats md5.\n"), 3, $snort_rules_upd_log);
-
 		if (file_exists("{$snortdir}/{$emergingthreats_filename_md5}") && $emergingthreats == "on") {
 			/* Check if were up to date emergingthreats.net */
 			$emerg_md5_check_new = file_get_contents("{$tmpfname}/{$emergingthreats_filename_md5}");
@@ -425,7 +424,7 @@ if ($emergingthreats == "on") {
 		$rc = snort_download_file_url("http://rules.emergingthreats.net/open/snort-{$emerging_threats_version}/emerging.rules.tar.gz", "{$tmpfname}/{$emergingthreats_filename}");
 
 	/* Test for a valid rules file download.  Turn off ET update if download failed. */
-	if ($rc == true) {
+	if ($rc === true) {
 		if (trim(file_get_contents("{$tmpfname}/{$emergingthreats_filename_md5}")) != trim(md5_file("{$tmpfname}/{$emergingthreats_filename}"))){
 			if ($pkg_interface <> "console")
 				update_output_window(gettext("EmergingThreats rules file MD5 checksum failed..."));
