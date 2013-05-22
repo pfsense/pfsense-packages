@@ -34,6 +34,8 @@ require_once("functions.inc");
 require_once("service-utils.inc");
 require_once("/usr/local/pkg/snort/snort.inc");
 
+global $g;
+
 $pgtitle = "Services: Snort: Update Rules";
 include("head.inc");
 ?>
@@ -44,35 +46,45 @@ include("head.inc");
 <?if($pfsense_stable == 'yes'){echo '<p class="pgtitle">' . $pgtitle . '</p>';}?>
 
 <form action="/snort/snort_download_updates.php" method="GET">
-<table width="100%" border="0" cellpadding="0" cellspacing="0">
-<tr>
-	<td>
-	<div id="mainarea">
-		<table class="tabcont" width="100%" border="0" cellpadding="6" cellspacing="0">
-		<tr>
-			<td ><!-- progress bar -->
-			<table id="progholder" width='320' style='border-collapse: collapse; border: 1px solid #000000;' cellpadding='2' cellspacing='2'>
+<div id="mainarea">
+<table width="100%" border="0" cellpadding="6" cellspacing="0">
+	<tr>
+		<td class="tabcont" align="center">
+		<table width="100%" border="0" cellpadding="6" cellspacing="0">
 			<tr>
-				<td>
-					<img border='0' src='../themes/<?= $g['theme']; ?>/images/misc/progress_bar.gif'
-						width='280' height='23' name='progressbar' id='progressbar' alt='' />
+				<td align="center">
+				<table width="420" border="0" cellpadding="0" cellspacing="0">
+					<tr>
+						<td style="background:url('../themes/<?= $g['theme']; ?>/images/misc/bar_left.gif')" height="15" width="5"></td>
+						<td style="background:url('../themes/<?= $g['theme']; ?>/images/misc/bar_gray.gif')" height="15" width="410">
+						<table id="progholder" width='410' cellpadding='0' cellspacing='0'>
+							<tr>
+								<td><img border='0' src='../themes/<?= $g['theme']; ?>/images/misc/bar_blue.gif'
+								width='0' height='15' name='progressbar' id='progressbar' alt='' /></td
+							</tr>
+						</table>
+						</td>
+						<td style="background:url('../themes/<?= $g['theme']; ?>/images/misc/bar_right.gif')" height="15" width="5"></td>
+					</tr>
+				</table>
 				</td>
 			</tr>
-			</table>
-			<br />
-				<textarea cols="60" rows="2" name="status" id="status" wrap="hard">
-					<?=gettext("Initializing...");?>
-				</textarea>
-				<textarea cols="60" rows="2" name="output" id="output" wrap="hard">
-				</textarea>
-			</td>
-		</tr>
+			<tr>
+				<td align="center">
+				<!-- status box -->
+				<textarea cols="85" rows="2" name="status" id="status" wrap="soft"><?=gettext("Initializing..."); ?>.</textarea>
+				<!-- command output box -->
+				<textarea cols="85" rows="12" name="output" id="output" wrap="soft"></textarea>
+				</td>
+			</tr>
+			<tr>
+				<td align="center" valign="middle"><input type="submit" name="return" id="return" Value="Return"></td>
+			</tr>
 		</table>
-	</div>
-	</td>
-</tr>
-	<tr><td><input type="submit" name="return" id="return" Value="Return"></td></tr>
+		</td>
+	</tr>
 </table>
+</div>
 </form>
 <?php include("fend.inc");?>
 </body>
