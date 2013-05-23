@@ -260,7 +260,7 @@ foreach ($a_patches as $thispatch):
 	</td></tr>
 <?php $i++; $npatches++; endforeach; ?>
 	<tr>
-	<td class="list" colspan="7"></td>
+	<td class="list" colspan="8"></td>
 	<td class="list" valign="middle" nowrap>
 	<table border="0" cellspacing="0" cellpadding="1" summary="edit">
 	<tr>
