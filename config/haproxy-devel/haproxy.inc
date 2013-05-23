@@ -867,10 +867,12 @@ function haproxy_load_modules() {
 function use_transparent_clientip_proxying() {
 	global $config;
 	$a_backends = &$config['installedpackages']['haproxy']['ha_pools']['item'];
-	foreach ($a_backends as $backend) {
-		if ($backend["transparent_clientip"] == 'yes') {
-			return true;
-			break;
+	if (is_array($a_backends)) {
+		foreach ($a_backends as $backend) {
+			if ($backend["transparent_clientip"] == 'yes') {
+				return true;
+				break;
+			}
 		}
 	}
 	return false;
@@ -939,7 +941,8 @@ function haproxy_check_run($reload) {
 			if ($status != "MASTER") {
 				if (haproxy_is_running()) {
 					log_error("Stopping haproxy on CARP backup.");
-					exec("/bin/pkill -F /var/run/haproxy.pid haproxy");
+					//exec("/bin/pkill -F /var/run/haproxy.pid haproxy");//doesnt work for multiple pid's in a pidfile
+					haproxy_kill();
 				}
 				return (0);
 			} else if (haproxy_is_running() && $reload == 0) { 
@@ -951,7 +954,11 @@ function haproxy_check_run($reload) {
 			return (0);
 
 		if (haproxy_is_running()) {
-			exec("/usr/local/sbin/haproxy -f /var/etc/haproxy.cfg -p /var/run/haproxy.pid -st `cat /var/run/haproxy.pid` 2>&1", $output, $errcode);
+			if (isset($a_global['terminate_on_reload']))
+				$sf_st = "-st";//terminate old process as soon as the new process is listening
+			else
+				$sf_st = "-sf";//finish serving existing connections exit when done, and the new process is listening
+			exec("/usr/local/sbin/haproxy -f /var/etc/haproxy.cfg -p /var/run/haproxy.pid $sf_st `cat /var/run/haproxy.pid` 2>&1", $output, $errcode);
 		} else {
 			exec("/usr/local/sbin/haproxy -f /var/etc/haproxy.cfg -p /var/run/haproxy.pid -D 2>&1", $output, $errcode);
 		}
@@ -960,11 +967,23 @@ function haproxy_check_run($reload) {
 		return ($errcode);
 	} else {
 		if ($reload && haproxy_is_running()) {
-			exec("/bin/pkill -F /var/run/haproxy.pid haproxy");
+			//exec("/bin/pkill -F /var/run/haproxy.pid haproxy");//doesnt work for multiple pid's in a pidfile
+			haproxy_kill();
 		}
 		return (0);
 	}
-	
+}
+
+function haproxy_kill($killimmediately = true) {
+	if ($killimmediately)
+		$signal = "KILL"; // stop now
+	else
+		$signal = "USR1"; // stop when all connections are closed
+	killprocesses("haproxy", "/var/run/haproxy.pid", $signal);
+}
+
+function killprocesses($processname, $pidfile, $signal = "KILL") {
+	exec("kill -$signal `pgrep -x $processname | grep -w -f $pidfile`");
 }
 
 function haproxy_do_xmlrpc_sync($sync_to_ip, $password) {
