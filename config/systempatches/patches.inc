@@ -52,12 +52,14 @@ function patch_commit($patch, $action, $test=false, $fulldetail=false) {
 	$whitespace = isset($patch['ignorewhitespace']) ? "--ignore-whitespace" : "";
 	$pathstrip = '-p' . $patch['pathstrip'];
 	$full_patch_command = "{$patch_cmd} --directory={$directory} {$force} {$pathstrip} {$filename} {$check} {$direction} {$whitespace}";
+	conf_mount_rw();
 	patch_write($patch);
 	if (!$fulldetail)
 		$output = (mwexec($full_patch_command, true) == 0);
 	else
 		$output = $full_patch_command . "\n\n" . shell_exec($full_patch_command . ' 2>&1');
 	patch_erase($patch);
+	conf_mount_ro();
 	return $output;
 }
 

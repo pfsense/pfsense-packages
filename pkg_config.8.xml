@@ -1735,9 +1735,9 @@
 		<name>System Patches</name>
 		<descr>A package to apply and maintain custom system patches.</descr>
 		<maintainer>jimp@pfsense.org</maintainer>
-		<version>0.8</version>
+		<version>0.9</version>
 		<category>System</category>
-		<status>BETA</status>
+		<status>RELEASE</status>
 		<config_file>http://www.pfsense.com/packages/config/systempatches/systempatches.xml</config_file>
 		<pkginfolink></pkginfolink>
 		<required_version>2.0</required_version>
