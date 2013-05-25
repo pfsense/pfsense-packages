@@ -1902,5 +1902,23 @@
 		<depends_on_package>zabbix2-proxy-2.0.4.tbz</depends_on_package>
 		<depends_on_package_pbi>zabbix2-proxy-2.0.4-i386.pbi</depends_on_package_pbi>
 	</package>
-	</packages>
+	<package>
+		<!-- This does not exist yet, this is here to trigger a PBI build -->
+		<name>ipmitool</name>
+		<pkginfolink>http://forum.pfsense.org/</pkginfolink>
+		<descr><![CDATA[IPMI Tools for local/remote data retrieval and control (Console only, no GUI)]]></descr>
+		<category>Services</category>
+		<version>1.8.12</version>
+		<status>Beta</status>
+		<required_version>2.1</required_version>
+		<config_file>http://www.pfsense.com/packages/config/ipmitool/ipmitool.xml</config_file>
+		<maintainer>jimp@pfsense.org</maintainer>
+		<configurationfile>ipmitool.xml</configurationfile>
+		<build_pbi>
+			<port>sysutils/ipmitool</port>
+		</build_pbi>
+		<depends_on_package_base_url>http://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
+		<depends_on_package_pbi>ipmitool-1.8.12-i386.pbi</depends_on_package_pbi>
+	</package>
+</packages>
 </pfsensepkgs>
