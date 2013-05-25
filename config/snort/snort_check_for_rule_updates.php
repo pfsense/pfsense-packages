@@ -97,28 +97,34 @@ function snort_download_file_url($url, $file_out) {
 		if (!$ch)
 			return false;
 		curl_setopt($ch, CURLOPT_FILE, $fp);
-		curl_setopt($ch, CURLOPT_HEADER, 0);
+		curl_setopt($ch, CURLOPT_HEADER, false);
 		curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+		curl_setopt($ch, CURLOPT_USERAGENT, "Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.8.1.1) Gecko/20061204 Firefox/2.0.0.1");
 		/* Don't verify SSL peers since we don't have the certificates to do so. */
 		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
 		curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 60);
 		curl_setopt($ch, CURLOPT_TIMEOUT, 0);
-		$rc = curl_exec($ch);
-		if ($rc === false) {
-			$last_curl_error = curl_error($ch);
-			curl_close($ch);
-			fclose($fp);
-			log_error("[snort] Function 'curl_exec()' in 'snort_download_file_url()' returned '{$last_curl_error}' ...");
-			return false;
+		$counter = 0;
+		/* Try up to 4 times to download the file before giving up */
+		while ($counter++ <= 4) {
+			$rc = curl_exec($ch);
+			if ($rc === true)
+				break;
+			sleep(15);
 		}
 		$http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 		$last_curl_error = curl_error($ch);
 		curl_close($ch);
 		fclose($fp);
+		/* If we had to try more than once, log it */
+		if ($counter > 1)
+			log_error(gettext("File '" . basename($file_out) . "' download attempts: {$counter} ..."));
 		return ($http_code == 200) ? true : $http_code;
 	}
-	else
-		return false; 
+	else {
+		log_error(gettext("[Snort] Failed to create file {$file_out} ..."));
+		return false;
+	}
 }
 
 /* Start of code */
@@ -158,21 +164,24 @@ if ($snortdownload == 'on') {
 		error_log("\tChecking Snort VRT md5 file...\n", 3, $snort_rules_upd_log);
 	}
 	else {
+		error_log(gettext("\tSnort VRT md5 download failed.\n"), 3, $snort_rules_upd_log);
 		if ($rc == 403) {
 			$snort_err_msg = gettext("Too many attempts or Oinkcode not authorized for this Snort version.\n");
-			$snort_err_msg .= gettext("\tFree Registered Users may download Snort VRT Rules once every 15 minutes.\n");
+			$snort_err_msg .= gettext("\tFree Registered User accounts may download Snort VRT Rules once every 15 minutes.\n");
+			$snort_err_msg .= gettext("\tPaid Subscriber accounts have no download limits.\n");
 		}
 		else
-			$snort_err_msg = gettext("Server returned error code {$rc}.");
+			$snort_err_msg = gettext("Server returned error code '{$rc}'.");
 		if ($pkg_interface <> "console") {
 			update_status(gettext("Snort VRT md5 error ... Server returned error code {$rc} ..."));
-			update_output_window(gettext("Server error msg: '{$last_curl_error}'")); 
+			update_output_window(gettext("Snort VRT rules will not be updated.\n{$snort_err_msg}")); 
 		}
 		log_error(gettext("[Snort] Snort VRT md5 download failed..."));
-		log_error(gettext("[Snort] Server returned error '{$last_curl_error}' ..."));
-		error_log(gettext("\tSnort VRT md5 download failed.\n"), 3, $snort_rules_upd_log);
+		log_error(gettext("[Snort] Server returned error code '{$rc}'..."));
 		error_log(gettext("\t{$snort_err_msg}\n"), 3, $snort_rules_upd_log);
-		error_log(gettext("\tServer error message was '{$last_curl_error}'\n"), 3, $snort_rules_upd_log);
+		if ($pkg_interface == "console")
+			error_log(gettext("\tServer error message was '{$last_curl_error}'\n"), 3, $snort_rules_upd_log);
+		error_log(gettext("\tSnort VRT rules will not be updated.\n"), 3, $snort_rules_upd_log);
 		$snortdownload = 'off';
 	}
 }
@@ -209,19 +218,20 @@ if ($snortdownload == 'on') {
 			log_error(gettext("[Snort] Snort VRT rules file download failed.  Bad MD5 checksum..."));
         	        log_error(gettext("[Snort] Failed File MD5: " . md5_file("{$tmpfname}/{$snort_filename}")));
 			log_error(gettext("[Snort] Expected File MD5: " . file_get_contents("{$tmpfname}/{$snort_filename_md5}")));
-			error_log(gettext("\tSnort VRT rules file download failed.  Snort VRT rules will not be updated.\n"), 3, $snort_rules_upd_log);
+			error_log(gettext("\tSnort VRT rules file download failed.  Bad MD5 checksum.\n"), 3, $snort_rules_upd_log);
 			error_log(gettext("\tDownloaded Snort VRT file MD5: " . md5_file("{$tmpfname}/{$snort_filename}") . "\n"), 3, $snort_rules_upd_log);
 			error_log(gettext("\tExpected Snort VRT file MD5: " . file_get_contents("{$tmpfname}/{$snort_filename_md5}") . "\n"), 3, $snort_rules_upd_log);
+			error_log(gettext("\tSnort VRT rules file download failed.  Snort VRT rules will not be updated.\n"), 3, $snort_rules_upd_log);
 			$snortdownload = 'off';
 		}
 	}
 	else {
 		if ($pkg_interface <> "console")
 			update_output_window(gettext("Snort VRT rules file download failed..."));
-		log_error(gettext("[Snort] Snort VRT rules file download failed... server returned error {$rc}..."));
-		log_error(gettext("[Snort] The error text was '{$last_curl_error}' ..."));
+		log_error(gettext("[Snort] Snort VRT rules file download failed... server returned error '{$rc}'..."));
 		error_log(gettext("\tSnort VRT rules file download failed.  Server returned error {$rc}.\n"), 3, $snort_rules_upd_log);
-		error_log(gettext("\tThe error text was '{$last_curl_error}'\n"), 3, $snort_rules_upd_log);
+		if ($pkg_interface == "console")
+			error_log(gettext("\tThe error text was '{$last_curl_error}'\n"), 3, $snort_rules_upd_log);
 		error_log(gettext("\tSnort VRT rules will not be updated.\n"), 3, $snort_rules_upd_log);
 		$snortdownload = 'off';
 	}
@@ -253,9 +263,10 @@ if ($snortcommunityrules == 'on') {
 	else {
 		if ($pkg_interface <> "console")
 			update_output_window(gettext("Snort GPLv2 Community Rules md5 file download failed.  Community Rules will not be updated."));
-		log_error(gettext("[Snort] Snort GPLv2 Community Rules md5 file download failed.  Server returned error code {$rc}."));
-		error_log(gettext("\tSnort GPLv2 Community Rules md5 file download failed.  Server returned error code {$rc}.\n"), 3, $snort_rules_upd_log);
-		error_log(gettext("\tThe error text is '{$last_curl_error}'\n"), 3, $snort_rules_upd_log);
+		log_error(gettext("[Snort] Snort GPLv2 Community Rules md5 file download failed.  Server returned error code '{$rc}'."));
+		error_log(gettext("\tSnort GPLv2 Community Rules md5 file download failed.  Server returned error code '{$rc}'.\n"), 3, $snort_rules_upd_log);
+		if ($pkg_interface == "console")
+			error_log(gettext("\tThe error text is '{$last_curl_error}'\n"), 3, $snort_rules_upd_log);
 		error_log(gettext("\tSnort GPLv2 Community Rules will not be updated.\n"), 3, $snort_rules_upd_log);
 		$snortcommunityrules = 'off';
 	}
@@ -294,9 +305,10 @@ if ($snortcommunityrules == "on") {
 			update_status(gettext("The server returned error code {$rc} ... skipping GPLv2 Community Rules..."));
 			update_output_window(gettext("Snort GPLv2 Community Rules file download failed..."));
 		}
-		log_error(gettext("[Snort] Snort GPLv2 Community Rules file download failed.  Server returned error {$rc}..."));
-		error_log(gettext("\tSnort GPLv2 Community Rules download failed.  Server returned error {$rc}...\n"), 3, $snort_rules_upd_log);
-		error_log(gettext("\tThe error text is '{$last_curl_error}'\n"), 3, $snort_rules_upd_log);
+		log_error(gettext("[Snort] Snort GPLv2 Community Rules file download failed.  Server returned error '{$rc}'..."));
+		error_log(gettext("\tSnort GPLv2 Community Rules download failed.  Server returned error '{$rc}'...\n"), 3, $snort_rules_upd_log);
+		if ($pkg_interface == "console")
+			error_log(gettext("\tThe error text is '{$last_curl_error}'\n"), 3, $snort_rules_upd_log);
 		$snortcommunityrules = 'off';
 	}
 }
@@ -367,9 +379,10 @@ if ($emergingthreats == 'on') {
 	else {
 		if ($pkg_interface <> "console")
 			update_output_window(gettext("EmergingThreats md5 file download failed.  EmergingThreats rules will not be updated."));
-		log_error(gettext("[Snort] EmergingThreats md5 file download failed.  Server returned error code {$rc}."));
-		error_log(gettext("\tEmergingThreats md5 file download failed.  Server returned error code {$rc}.\n"), 3, $snort_rules_upd_log);
-		error_log(gettext("\tThe error text is '{$last_curl_error}'\n"), 3, $snort_rules_upd_log);
+		log_error(gettext("[Snort] EmergingThreats md5 file download failed.  Server returned error code '{$rc}'."));
+		error_log(gettext("\tEmergingThreats md5 file download failed.  Server returned error code '{$rc}'.\n"), 3, $snort_rules_upd_log);
+		if ($pkg_interface == "console")
+			error_log(gettext("\tThe error text is '{$last_curl_error}'\n"), 3, $snort_rules_upd_log);
 		error_log(gettext("\tEmergingThreats rules will not be updated.\n"), 3, $snort_rules_upd_log);
 		$emergingthreats = 'off';
 	}
@@ -413,9 +426,10 @@ if ($emergingthreats == "on") {
 			update_status(gettext("The server returned error code {$rc} ... skipping EmergingThreats update..."));
 			update_output_window(gettext("EmergingThreats rules file download failed..."));
 		}
-		log_error(gettext("[Snort] EmergingThreats rules file download failed.  Server returned error {$rc}..."));
-		error_log(gettext("\tEmergingThreats rules file download failed.  Server returned error {$rc}...\n"), 3, $snort_rules_upd_log);
-		error_log(gettext("\tThe error text is '{$last_curl_error}'\n"), 3, $snort_rules_upd_log);
+		log_error(gettext("[Snort] EmergingThreats rules file download failed.  Server returned error '{$rc}'..."));
+		error_log(gettext("\tEmergingThreats rules file download failed.  Server returned error '{$rc}'...\n"), 3, $snort_rules_upd_log);
+		if ($pkg_interface == "console")
+			error_log(gettext("\tThe error text is '{$last_curl_error}'\n"), 3, $snort_rules_upd_log);
 		$emergingthreats = 'off';
 	}
 }
