@@ -116,13 +116,14 @@ POSSIBILITY OF SUCH DAMAGE.
 			<fielddescr>Refresh Rule Sets</fielddescr>
 			<fieldname>vardownloadrules</fieldname>
 			<description><![CDATA[Ask target hosts to refresh rule sets files on each sync operation.<br/><br/>
-					During each Snort package sync operation, ask the target host to check for 
+					During each Snort package sync operation, ask the target remote host to check for 
 					a new set of posted rule sets files and refresh the local copies if necessary.  The default is 
-					to refresh the files if newer versions have been posted.]]></description>
+					to refresh the files if newer versions have been posted.<br/><br/>
+					<b>Note: </b>The sync process will wait for the rules download and rebuild to finish on the target remote host before returning.]]></description>
 			<type>select</type>
 			<default_value>yes</default_value>
 			<options>
-				<option><name>Signal target hosts to refresh rules files</name><value>yes</value></option>
+				<option><name>Signal target host to refresh rules files</name><value>yes</value></option>
 				<option><name>Do NOT ask target host to refresh rules files</name><value>no</value></option>
 			</options>
 		</field>
