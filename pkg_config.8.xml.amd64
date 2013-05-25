@@ -1906,7 +1906,7 @@
 		</build_pbi>
 		<build_options>ipmitool_SET=FREEIPMI;freeipmi_UNSET=DOCS DEBUG IOPERM</build_options>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
-		<depends_on_package_pbi>ipmitool-1.8.12-amd64.pbi</depends_on_package_pbi>
+		<depends_on_package_pbi>ipmitool-1.8.12_3-amd64.pbi</depends_on_package_pbi>
 	</package>
 </packages>
 </pfsensepkgs>
