@@ -1917,6 +1917,7 @@
 		<build_pbi>
 			<port>sysutils/ipmitool</port>
 		</build_pbi>
+		<build_options>ipmitool_SET=FREEIPMI;freeipmi_UNSET=DOCS DEBUG IOPERM</build_options>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
 		<depends_on_package_pbi>ipmitool-1.8.12-i386.pbi</depends_on_package_pbi>
 	</package>
