@@ -83,6 +83,16 @@ function snort_download_file_url($url, $file_out) {
 
 	global $g, $config, $pkg_interface, $last_curl_error;
 
+	/* Array of message strings for HTTP Response Codes */
+	$http_resp_msg = array( 200 => "OK", 202 => "Accepted", 204 => "No Content", 205 => "Reset Content", 
+				206 => "Partial Content", 301 => "Moved Permanently", 302 => "Found", 
+				305 => "Use Proxy", 307 => "Temporary Redirect", 400 => "Bad Request", 
+				401 => "Unauthorized", 402 => "Payment Required", 403 => "Forbidden", 
+				404 => "Not Found", 405 => "Method Not Allowed", 407 => "Proxy Authentication Required", 
+				408 => "Request Timeout", 410 => "Gone", 500 => "Internal Server Error", 
+				501 => "Not Implemented", 502 => "Bad Gateway", 503 => "Service Unavailable", 
+				504 => "Gateway Timeout", 505 => "HTTP Version Not Supported" );
+
 	$last_curl_error = "";
 
 	/* If not in console mode, use the built-in progress-bar function */
@@ -99,21 +109,26 @@ function snort_download_file_url($url, $file_out) {
 		curl_setopt($ch, CURLOPT_FILE, $fp);
 		curl_setopt($ch, CURLOPT_HEADER, false);
 		curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-		curl_setopt($ch, CURLOPT_USERAGENT, "Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.8.1.1) Gecko/20061204 Firefox/2.0.0.1");
+		curl_setopt($ch, CURLOPT_USERAGENT, "Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.1; Win64; x64; Trident/6.0)");
 		/* Don't verify SSL peers since we don't have the certificates to do so. */
 		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-		curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 60);
+		curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 30);
 		curl_setopt($ch, CURLOPT_TIMEOUT, 0);
 		$counter = 0;
+		$rc = true;
 		/* Try up to 4 times to download the file before giving up */
-		while ($counter++ <= 4) {
+		while ($counter < 4) {
+			$counter++;
 			$rc = curl_exec($ch);
 			if ($rc === true)
 				break;
 			sleep(15);
 		}
+		if ($rc === false)
+			$last_curl_error = curl_error($ch);
 		$http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-		$last_curl_error = curl_error($ch);
+		if (isset($http_resp_msg[$http_code]))
+			$last_curl_error = $http_resp_msg[$http_code];
 		curl_close($ch);
 		fclose($fp);
 		/* If we had to try more than once, log it */
@@ -122,6 +137,7 @@ function snort_download_file_url($url, $file_out) {
 		return ($http_code == 200) ? true : $http_code;
 	}
 	else {
+		$last_curl_error = gettext("Failed to create file " . $file_out);
 		log_error(gettext("[Snort] Failed to create file {$file_out} ..."));
 		return false;
 	}
