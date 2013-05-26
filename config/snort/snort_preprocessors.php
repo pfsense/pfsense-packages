@@ -532,7 +532,7 @@ include_once("head.inc");
 				gettext("603979776") . "</strong>" . gettext(" (576 MB)"); ?>.</td>
 			</tr>
 		</table>
-		<?php echo gettext("Maximum amount of memory the preprocessor will us for logging the URI and Hostname data. The default " .
+		<?php echo gettext("Maximum amount of memory the preprocessor will use for logging the URI and Hostname data. The default " .
 		"value is ") . "<strong>" . gettext("150,994,944") . "</strong>" . gettext(" (144 MB)."); ?>
 		<?php echo gettext("  This option determines the maximum HTTP sessions that will log URI and Hostname data at any given instant. ") . 
 		gettext("  Max Logged Sessions = MEMCAP / 2304"); ?>.<br/>
