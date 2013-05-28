@@ -90,7 +90,7 @@ function check_ca_hashes(){
 		}
 }
 
-function sync_package_dansguardian($via_rpc=false,$install_process=false) {
+function sync_package_dansguardian($via_rpc="no",$install_process=false) {
 	global $config,$g;
 
 	# detect boot process
@@ -101,7 +101,7 @@ function sync_package_dansguardian($via_rpc=false,$install_process=false) {
 			$boot_process="on";
 	}
 
-	if (is_process_running('dansguardian') && isset($boot_process) && $via_rpc==false){
+	if (is_process_running('dansguardian') && isset($boot_process) && $via_rpc=="no"){
 		log_error("[Dansguardian] - Detected boot process pr:".is_process_running('dansguardian')." bp:".isset($boot_process)." rpc:".$via_rpc);
 		return;
 		}
@@ -1205,7 +1205,7 @@ EOF;
     
     
     #avoid sync during boot process
-	if (!isset($boot_process)){
+	if (!isset($boot_process) || $via_rpc=="yes"){
 	  /* Uses XMLRPC to synchronize the changes to a remote node */
 	  if (is_array($config['installedpackages']['dansguardiansync']['config'])){
 		$dans_sync=$config['installedpackages']['dansguardiansync']['config'][0];
@@ -1280,7 +1280,7 @@ function dansguardian_validate_input($post, &$input_errors) {
 }
 
 function dansguardian_php_install_command() {
-		sync_package_dansguardian(false,true);
+		sync_package_dansguardian("no",true);
 }
 
 function dansguardian_php_deinstall_command() {
@@ -1385,7 +1385,7 @@ function dansguardian_do_xmlrpc_sync($sync_to_ip,$username,$password,$sync_type,
 		/* tell dansguardian to reload our settings on the destionation sync host. */
 		$method = 'pfsense.exec_php';
 		$execcmd  = "require_once('/usr/local/pkg/dansguardian.inc');\n";
-		$execcmd .= "sync_package_dansguardian(true);";
+		$execcmd .= "sync_package_dansguardian('yes');";
 		
 		/* assemble xmlrpc payload */
 		$params = array(
