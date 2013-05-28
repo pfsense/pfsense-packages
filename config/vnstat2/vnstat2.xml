@@ -48,7 +48,7 @@
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0644</chmod>
-		<item>http://www.pfsense.com/packages/config/vnstat2/bin/vnstat_php_frontend-1.4.1.tar.gz</item>
+		<item>http://files.pfsense.org/packages/8/vnstat/vnstat_php_frontend-1.4.1.tar.gz</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
@@ -68,22 +68,22 @@
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0644</chmod>
-		<item>http://www.pfsense.com/packages/config/vnstat2/bin/diag_vnstat.abc</item>
+		<item>http://files.pfsense.org/packages/8/vnstat/diag_vnstat.abc</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0644</chmod>
-		<item>http://www.pfsense.com/packages/config/vnstat2/bin/diag_vnstat2.abc</item>
+		<item>http://files.pfsense.org/packages/8/vnstat/diag_vnstat2.abc</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0644</chmod>
-		<item>http://www.pfsense.com/packages/config/vnstat2/bin/vnstat2_img.abc</item>
+		<item>http://files.pfsense.org/packages/8/vnstat/vnstat2_img.abc</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0644</chmod>
-		<item>http://www.pfsense.com/packages/config/vnstat2/bin/vnstati.abc</item>
+		<item>http://files.pfsense.org/packages/8/vnstat/vnstati.abc</item>
 	</additional_files_needed>
 	<fields>
 		<field>

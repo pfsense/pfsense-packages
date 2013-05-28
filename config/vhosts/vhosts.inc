@@ -736,31 +736,31 @@ function vhosts_install_command() {
 	if(stristr(php_uname('r'), '7.2') == TRUE) {
 		if (!file_exists('/usr/local/php5')) {
 			chdir('/usr/local/');
-			exec ("fetch http://www.pfsense.com/packages/config/vhosts/freebsd7.2/php5.tar.gz");
+			exec ("fetch http://files.pfsense.org/packages/7/vhosts/php5.tar.gz");
 			exec("tar zxvf /usr/local/php5.tar.gz -C /usr/local/");
 			exec("rm /usr/local/php5.tar.gz");
 		}
 		if (!file_exists('/usr/local/lib/libxml2.so.5')) {
 			chdir('/usr/local/lib/');
-			exec ("fetch http://www.pfsense.com/packages/config/vhosts/freebsd7.2/usr.local.lib/libxml2.so.5");
+			exec ("fetch http://files.pfsense.org/packages/7/vhosts/usr.local.lib/libxml2.so.5");
 		}
 		if (!file_exists('/usr/local/lib/libxml2.so')) {
 			chdir('/usr/local/lib/');
-			exec ("fetch http://www.pfsense.com/packages/config/vhosts/freebsd7.2/usr.local.lib/libxml2.so");
+			exec ("fetch http://files.pfsense.org/packages/7/vhosts/usr.local.lib/libxml2.so");
 		}
 		if (!file_exists('/usr/local/lib/libxml2.la')) {
 			chdir('/usr/local/lib/');
-			exec ("fetch http://www.pfsense.com/packages/config/vhosts/freebsd7.2/usr.local.lib/libxml2.la");
+			exec ("fetch http://files.pfsense.org/packages/7/vhosts/usr.local.lib/libxml2.la");
 		}
 		if (!file_exists('/usr/local/lib/libxml2.a')) {
 			chdir('/usr/local/lib/');
-			exec ("fetch http://www.pfsense.com/packages/config/vhosts/freebsd7.2/usr.local.lib/lib/libxml2.a");
+			exec ("fetch http://files.pfsense.org/packages/7/vhosts/usr.local.lib/lib/libxml2.a");
 		}
 	}
 	if(stristr(php_uname('r'), '8.1') == TRUE) {
 		if (!file_exists('/usr/local/php5')) {
 			chdir('/usr/local/');
-			exec ("fetch http://www.pfsense.com/packages/config/vhosts/freebsd8.0/php5.tar.gz");
+			exec ("fetch http://files.pfsense.org/packages/8/vhosts/php5.tar.gz");
 			exec("tar zxvf /usr/local/php5.tar.gz -C /usr/local/");
 			exec("rm /usr/local/php5.tar.gz");
 		}
