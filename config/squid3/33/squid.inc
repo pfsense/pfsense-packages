@@ -1748,7 +1748,7 @@ function squid_resync_msnt() {
 	chmod(SQUID_CONFBASE."/msntauth.conf", 0600);
 }
 
-function squid_resync() {
+function squid_resync($via_rpc="no") {
 	global $config;
 	
 	# detect boot process
@@ -1759,7 +1759,9 @@ function squid_resync() {
 			$boot_process="on";
 	}
 	
-	if (is_process_running('squid') && isset($boot_process))
+	log_error("[Squid] - Squid_resync function call pr:".is_process_running('squid')." bp:".isset($boot_process)." rpc:".$via_rpc);
+	
+	if (is_process_running('squid') && isset($boot_process) && $via_rpc=="no")
 		return;
 	
 	conf_mount_rw();
@@ -1785,7 +1787,7 @@ function squid_resync() {
 	squid_resync_users();
 	squid_write_rcfile();
 		
-	if(!isset($boot_process))
+	if(!isset($boot_process) || $via_rpc="yes")
 		squid_sync_on_changes();
 	
 	#write config file
@@ -2295,7 +2297,7 @@ function squid_do_xmlrpc_sync($sync_to_ip, $username, $password, $synctimeout) {
 
 	/* set a few variables needed for sync code borrowed from filter.inc */
 	$url = $synchronizetoip;
-	log_error("Beginning squid XMLRPC sync to {$url}:{$port}.");
+	log_error("[Squid] Beginning squid XMLRPC sync to {$url}:{$port}.");
 	$method = 'pfsense.merge_installedpackages_section_xmlrpc';
 	$msg = new XML_RPC_Message($method, $params);
 	$cli = new XML_RPC_Client('/xmlrpc.php', $url, $port);
@@ -2315,20 +2317,20 @@ function squid_do_xmlrpc_sync($sync_to_ip, $username, $password, $synctimeout) {
 		log_error($error);
 		file_notice("sync_settings", $error, "squid Settings Sync", "");
 	} else {
-		log_error("squid XMLRPC sync successfully completed with {$url}:{$port}.");
+		log_error("[Squid] XMLRPC sync successfully completed with {$url}:{$port}.");
 	}
 	
 	/* tell squid to reload our settings on the destination sync host. */
 	$method = 'pfsense.exec_php';
 	$execcmd  = "require_once('/usr/local/pkg/squid.inc');\n";
-	$execcmd .= "squid_resync();";
+	$execcmd .= "squid_resync('yes');";
 	/* assemble xmlrpc payload */
 	$params = array(
 		XML_RPC_encode($password),
 		XML_RPC_encode($execcmd)
 	);
 	
-	log_error("squid XMLRPC reload data {$url}:{$port}.");
+	log_error("[Squid] XMLRPC reload data {$url}:{$port}.");
 	$msg = new XML_RPC_Message($method, $params);
 	$cli = new XML_RPC_Client('/xmlrpc.php', $url, $port);
 	$cli->setCredentials($username, $password);
@@ -2340,7 +2342,7 @@ function squid_do_xmlrpc_sync($sync_to_ip, $username, $password, $synctimeout) {
 	} elseif($resp->faultCode()) {
 		$cli->setDebug(1);
 		$resp = $cli->send($msg, $synctimeout);
-		$error = "An error code was received while attempting squid XMLRPC sync with {$url}:{$port} - Code " . $resp->faultCode() . ": " . $resp->faultString();
+		$error = "[Squid] An error code was received while attempting squid XMLRPC sync with {$url}:{$port} - Code " . $resp->faultCode() . ": " . $resp->faultString();
 		log_error($error);
 		file_notice("sync_settings", $error, "squid Settings Sync", "");
 	} else {
