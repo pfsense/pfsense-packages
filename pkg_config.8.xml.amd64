@@ -1360,7 +1360,7 @@
 		<depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
 		<depends_on_package_pbi>squidguard-squid3-1.4_4-amd64.pbi</depends_on_package_pbi>
 		<build_pbi>
-			<ports_before>www/squid31 databases/db41 security/cyrus-sasl2</ports_before>
+			<ports_before>www/squid33 databases/db41 security/cyrus-sasl2</ports_before>
 			<port>www/squidguard</port>
 			<custom_name>squidguard-squid3</custom_name>
 		</build_pbi>
