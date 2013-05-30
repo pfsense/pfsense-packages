@@ -88,18 +88,6 @@ include_once("head.inc");
 <?if($pfsense_stable == 'yes'){echo '<p class="pgtitle">' . $pgtitle . '</p>';}?>
 
 <script language="javascript" type="text/javascript">
-function popup(url) 
-{
- params  = 'width='+screen.width;
- params += ', height='+screen.height;
- params += ', top=0, left=0'
- params += ', fullscreen=yes';
-
- newwin=window.open(url,'LogViewer', params);
- if (window.focus) {newwin.focus()}
- return false;
-}
-
 function wopen(url, name, w, h)
 {
 // Fudge factors for window decoration space.
@@ -130,12 +118,13 @@ h += 96;
         $tab_array[4] = array(gettext("Blocked"), false, "/snort/snort_blocked.php");
         $tab_array[5] = array(gettext("Whitelists"), false, "/snort/snort_interfaces_whitelist.php");
         $tab_array[6] = array(gettext("Suppress"), false, "/snort/snort_interfaces_suppress.php");
+        $tab_array[7] = array(gettext("Sync"), false, "/pkg_edit.php?xml=snort/snort_sync.xml");
         display_top_tabs($tab_array);
 ?>
 </td></tr>
 <tr>
 		<td>
-		<div id="mainarea3">
+		<div id="mainarea">
 		<table id="maintable4" class="tabcont" width="100%" border="0" cellpadding="0" cellspacing="0">
 			<tr align="center">
 				<td>
