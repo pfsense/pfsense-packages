@@ -68,6 +68,7 @@ if ($_POST) {
 
 		if (!$input_errors) {
 			$config['installedpackages']['haproxy']['enable'] = $_POST['enable'] ? true : false;
+			$config['installedpackages']['haproxy']['terminate_on_reload'] = $_POST['terminate_on_reload'] ? true : false;
 			$config['installedpackages']['haproxy']['maxconn'] = $_POST['maxconn'] ? $_POST['maxconn'] : false;
 			$config['installedpackages']['haproxy']['enablesync'] = $_POST['enablesync'] ? true : false;
 			$config['installedpackages']['haproxy']['synchost1'] = $_POST['synchost1'] ? $_POST['synchost1'] : false;
@@ -84,10 +85,10 @@ if ($_POST) {
 			write_config();
 		}
 	}
-	
 }
 
 $pconfig['enable'] = isset($config['installedpackages']['haproxy']['enable']);
+$pconfig['terminate_on_reload'] = isset($config['installedpackages']['haproxy']['terminate_on_reload']);
 $pconfig['maxconn'] = $config['installedpackages']['haproxy']['maxconn'];
 $pconfig['enablesync'] = isset($config['installedpackages']['haproxy']['enablesync']);
 $pconfig['syncpassword'] = $config['installedpackages']['haproxy']['syncpassword'];
@@ -177,9 +178,9 @@ function enable_change(enable_change) {
 					Sets the maximum per-process number of concurrent connections to X.<br/>
 					<strong>NOTE:</strong> setting this value too high will result in HAProxy not being able to allocate enough memory.<br/>
 				<?php
-					$hascpu = trim(`top | grep haproxy | awk '{ print $6 }'`);
-					if($hascpu)
-						echo "<p>Current memory usage {$hascpu}.</p>";
+					$memusage = trim(`ps auxw | grep haproxy | grep -v grep | awk '{ print $5 }'`);
+					if($memusage)
+						echo "<p>Current memory usage: {$memusage} K.</p>";
 				?>
 					</td><td>
 					<table style="border: 1px solid #000;">
@@ -223,6 +224,15 @@ function enable_change(enable_change) {
 					Note : Consider leaving this value empty or 1  because in multi-process mode (nbproc > 1) memory is not shared between the processes, which could result in random behaviours for several options like ACL's, sticky connections and some others.<br/>
 					For more information about the <b>"nbproc"</b> option please see <b><a href='http://haproxy.1wt.eu/download/1.5/doc/configuration.txt' target='_new'>HAProxy Documentation</a> </b>
 				</td>
+			</tr>
+			<tr>
+				<td width="22%" valign="top" class="vncell">Reload behaviour</td>
+				<td width="78%" class="vtable">
+				<input name="terminate_on_reload" type="checkbox" value="yes" <?php if ($pconfig['terminate_on_reload']) echo "checked"; ?>>
+				Force immediate stop of old process on reload. (closes existing connections)<br/><br/>Note: when this option is selected connections will be closed when haproxy is restarted.
+				Otherwise the existing connections will be served by the old haproxy process untill they are closed.
+				Checking this option will interupt existing connections on a restart. (which happens when the configuration is applied,
+				but possibly also when pfSense detects an interface comming up or changing its ip-address)</td>
 			</tr>
 			<tr>
 				<td valign="top" class="vncell">
