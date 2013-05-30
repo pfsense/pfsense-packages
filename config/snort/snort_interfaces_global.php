@@ -132,7 +132,7 @@ function enable_snort_vrt(btn) {
 
 <form action="snort_interfaces_global.php" method="post" enctype="multipart/form-data" name="iform" id="iform">
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
-<tr><td class="tabnavtbl">
+<tr><td>
 <?php
         $tab_array = array();
         $tab_array[0] = array(gettext("Snort Interfaces"), false, "/snort/snort_interfaces.php");
@@ -142,13 +142,14 @@ function enable_snort_vrt(btn) {
         $tab_array[4] = array(gettext("Blocked"), false, "/snort/snort_blocked.php");
         $tab_array[5] = array(gettext("Whitelists"), false, "/snort/snort_interfaces_whitelist.php");
         $tab_array[6] = array(gettext("Suppress"), false, "/snort/snort_interfaces_suppress.php");
+        $tab_array[7] = array(gettext("Sync"), false, "/pkg_edit.php?xml=snort/snort_sync.xml");
         display_top_tabs($tab_array);
 ?>
-</td>
-</tr>
+</td></tr>
 <tr>
-	<td class="tabcont">
-	<table width="100%" border="0" cellpadding="6" cellspacing="0">
+	<td>
+	<div id="mainarea">
+	<table id="maintable" class="tabcont" width="100%" border="0" cellpadding="6" cellspacing="0">
 <tr>
 	<td colspan="2" valign="top" class="listtopic"><?php echo gettext("Please Choose The " .
 		"Type Of Rules You Wish To Download"); ?></td>
@@ -308,6 +309,7 @@ function enable_snort_vrt(btn) {
 				"type of Snort.org account you hold."); ?></span></td>
 </tr>
 	</table>
+</div><br/>
 </td></tr>
 </table>
 </form>

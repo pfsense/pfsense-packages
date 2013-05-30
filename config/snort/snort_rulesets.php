@@ -84,7 +84,7 @@ if (($snortdownload == 'off') || ($a_nat[$id]['ips_policy_enable'] != 'on'))
 if ($a_nat[$id]['autoflowbitrules'] == 'on') {
 	if (file_exists("{$snortdir}/snort_{$snort_uuid}_{$if_real}/rules/{$flowbit_rules_file}") &&
 	    filesize("{$snortdir}/snort_{$snort_uuid}_{$if_real}/rules/{$flowbit_rules_file}") > 0) {
-		$btn_view_flowb_rules = "";
+		$btn_view_flowb_rules = " title=\"" . gettext("View flowbit-required rules") . "\"";
 	}
 	else
 		$btn_view_flowb_rules = " disabled";
@@ -255,18 +255,30 @@ function enable_change()
 
 <form action="snort_rulesets.php" method="post" name="iform" id="iform">
 <input type="hidden" name="id" id="id" value="<?=$id;?>" />
-<table width="99%" border="0" cellpadding="0" cellspacing="0">
+<table width="100%" border="0" cellpadding="0" cellspacing="0">
 <tr><td>
-<?php
-        $tab_array = array();
-        $tab_array[] = array(gettext("Snort Interfaces"), false, "/snort/snort_interfaces.php");
-        $tab_array[] = array(gettext("If Settings"), false, "/snort/snort_interfaces_edit.php?id={$id}");
-        $tab_array[] = array(gettext("Categories"), true, "/snort/snort_rulesets.php?id={$id}");
-        $tab_array[] = array(gettext("Rules"), false, "/snort/snort_rules.php?id={$id}");
-        $tab_array[] = array(gettext("Variables"), false, "/snort/snort_define_servers.php?id={$id}");
-        $tab_array[] = array(gettext("Preprocessors"), false, "/snort/snort_preprocessors.php?id={$id}");
-        $tab_array[] = array(gettext("Barnyard2"), false, "/snort/snort_barnyard.php?id={$id}");
-        display_top_tabs($tab_array);
+<?php    
+	$tab_array = array();
+	$tab_array[0] = array(gettext("Snort Interfaces"), true, "/snort/snort_interfaces.php");
+	$tab_array[1] = array(gettext("Global Settings"), false, "/snort/snort_interfaces_global.php");
+	$tab_array[2] = array(gettext("Updates"), false, "/snort/snort_download_updates.php");
+	$tab_array[3] = array(gettext("Alerts"), false, "/snort/snort_alerts.php");
+	$tab_array[4] = array(gettext("Blocked"), false, "/snort/snort_blocked.php");
+	$tab_array[5] = array(gettext("Whitelists"), false, "/snort/snort_interfaces_whitelist.php");
+	$tab_array[6] = array(gettext("Suppress"), false, "/snort/snort_interfaces_suppress.php");
+	$tab_array[7] = array(gettext("Sync"), false, "/pkg_edit.php?xml=snort/snort_sync.xml");
+	display_top_tabs($tab_array);
+	echo '</td></tr>';
+	echo '<tr><td class="tabnavtbl">';
+	$menu_iface=($if_friendly?substr($if_friendly,0,5)." ":"Iface ");
+    $tab_array = array();
+    $tab_array[] = array($menu_iface . gettext("Settings"), false, "/snort/snort_interfaces_edit.php?id={$id}");
+    $tab_array[] = array($menu_iface . gettext("Categories"), true, "/snort/snort_rulesets.php?id={$id}");
+    $tab_array[] = array($menu_iface . gettext("Rules"), false, "/snort/snort_rules.php?id={$id}");
+    $tab_array[] = array($menu_iface . gettext("Variables"), false, "/snort/snort_define_servers.php?id={$id}");
+    $tab_array[] = array($menu_iface . gettext("Preprocessors"), false, "/snort/snort_preprocessors.php?id={$id}");
+    $tab_array[] = array($menu_iface . gettext("Barnyard2"), false, "/snort/snort_barnyard.php?id={$id}");
+    display_top_tabs($tab_array);
 ?>
 </td></tr>
 <tr>
@@ -299,7 +311,7 @@ function enable_change()
 ?>
 		<tr>
 			<td>
-			<table id="sortabletable1" class="sortable" width="100%" border="0"
+			<table width="100%" border="0"
 				cellpadding="0" cellspacing="0">
 			<tr>
 				<td colspan="6" class="listtopic"><?php echo gettext("Automatic flowbit resolution"); ?><br/></td>
@@ -323,7 +335,7 @@ function enable_change()
 					   </tr>
 					   <tr>
 						<td width="15%" class="listn"><?php echo gettext("Auto Flowbit Rules"); ?></td>
-						<td width="85%"><input type="button" class="formbtn" value="View" onclick="wopen('snort_rules_edit.php?id=<?=$id;?>&openruleset=<?=$flowbit_rules_file;?>','FileViewer',800,600)" <?php echo $btn_view_flowb_rules; ?>/>
+						<td width="85%"><input type="button" class="formbtns" value="View" onclick="parent.location='snort_rules_flowbits.php?id=<?=$id;?>'" <?php echo $btn_view_flowb_rules; ?>/>
 						&nbsp;&nbsp;<span class="vexpl"><?php echo gettext("Click to view auto-enabled rules required to satisfy flowbit dependencies"); ?></span></td>
 					   </tr>
 					   <tr>
@@ -377,24 +389,19 @@ function enable_change()
 				</td>
 			</tr>
 			<tr>
-				<td colspan="6" class="listtopic"><?php echo gettext("Check the rulesets that you would like Snort to load at startup."); ?><br/></td>
+				<td colspan="6" class="listtopic"><?php echo gettext("Select the rulesets you would like Snort to load at startup"); ?><br/></td>
 			</tr>
-			<tr>    <td colspan="6">&nbsp;</td> </tr>
 			<tr>
 				<td colspan="6">
-					<table width=100% border="0" cellpadding="2" cellspacing="2">
-						<tr>
-							<td valign="middle"><input value="Select All" type="submit" name="selectall" id="selectall" /></td>
-							<td valign="middle"><input value="Unselect All" type="submit" name="unselectall" id="selectall" /></td>
-							<td valign="middle"><input value="Save" class="formbtn" type="submit" name="Submit" id="Submit" /></td>
+					<table width=90% align="center" border="0" cellpadding="2" cellspacing="0">
+						<tr height="45px">
+							<td valign="middle"><input value="Select All" class="formbtns" type="submit" name="selectall" id="selectall" title="<?php echo gettext("Add all to enforcing rules"); ?>"/></td>
+							<td valign="middle"><input value="Unselect All" class="formbtns" type="submit" name="unselectall" id="unselectall" title="<?php echo gettext("Remove all from enforcing rules"); ?>"/></td>
+							<td valign="middle"><input value=" Save " class="formbtns" type="submit" name="Submit" id="Submit" title="<?php echo gettext("Save changes to enforcing rules and rebuild"); ?>"/></td>
 							<td valign="middle"><span class="vexpl"><?php echo gettext("Click to save changes and auto-resolve flowbit rules (if option is selected above)"); ?></span></td>
 						</tr>
 					</table>
 			</tr>
-			<tr>
-			    <td colspan="6">&nbsp;</td>
-			</tr>
-
 			<?php if ($no_community_files)
 				$msg_community = "NOTE: Snort Community Rules have not been downloaded.  Perform a Rules Update to enable them.";
 			      else
@@ -419,10 +426,6 @@ function enable_change()
 			</tr>
 
 			<?php endif; ?>
-			<?php else: ?>
-			<tr>
-			    <td colspan="6">&nbsp;</td>
-			</tr>
 			<?php endif; ?>
 
 			<?php if ($no_emerging_files)
@@ -551,11 +554,11 @@ function enable_change()
 	</td>
 </tr>
 <tr>
-<td colspan="6" class="vtable">&nbsp;<br/></td>
+<td colspan="6" class="vexpl">&nbsp;<br/></td>
 </tr>
 			<tr>
-				<td colspan="2" align="middle" valign="center"><br/><input value="Save" type="submit" name="Submit" id="Submit" class="formbtn" /></td>
-				<td colspan="4" valign="center">&nbsp;<br><br/></td>
+				<td colspan="6" align="center" valign="middle">
+				<input value="Save" type="submit" name="Submit" id="Submit" class="formbtn" title=" <?php echo gettext("Click to Save changes and rebuild rules"); ?>"/></td>
 			</tr>
 <?php endif; ?>
 </table>

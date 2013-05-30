@@ -79,12 +79,13 @@ if($pfsense_stable == 'yes'){echo '<p class="pgtitle">' . $pgtitle . '</p>';}
         $tab_array[4] = array(gettext("Blocked"), false, "/snort/snort_blocked.php");
         $tab_array[5] = array(gettext("Whitelists"), false, "/snort/snort_interfaces_whitelist.php");
         $tab_array[6] = array(gettext("Suppress"), true, "/snort/snort_interfaces_suppress.php");
+        $tab_array[7] = array(gettext("Sync"), false, "/pkg_edit.php?xml=snort/snort_sync.xml");
         display_top_tabs($tab_array);
 ?>
 </td>
 </tr>
-<tr><td class="tabcont">
-<table width="100%" border="0" cellpadding="0" cellspacing="0">
+<tr><td><div id="mainarea">
+<table id="maintable" class="tabcont" width="100%" border="0" cellpadding="0" cellspacing="0">
 <tr>
 	<td width="30%" class="listhdrr"><?php echo gettext("File Name"); ?></td>
 	<td width="60%" class="listhdr"><?php echo gettext("Description"); ?></td>
@@ -129,6 +130,7 @@ if($pfsense_stable == 'yes'){echo '<p class="pgtitle">' . $pgtitle . '</p>';}
 				width="17" height="17" border="0" title="<?php echo gettext("add a new list"); ?>"></a></td>
 		</tr>
 	</table>
+	</div>
 	</td>
 </tr>
 </table>

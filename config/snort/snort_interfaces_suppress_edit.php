@@ -58,7 +58,7 @@ function is_validwhitelistname($name) {
 	if (!is_string($name))
 		return false;
 
-	if (!preg_match("/[^a-zA-Z0-9\.\/]/", $name))
+	if (!preg_match("/[^a-zA-Z0-9\_\.\/]/", $name))
 		return true;
 
 	return false;
@@ -88,7 +88,7 @@ if ($_POST['submit']) {
 		$input_errors[] = "Whitelist file names may not be named defaultwhitelist.";
 
 	if (is_validwhitelistname($_POST['name']) == false)
-		$input_errors[] = "Whitelist file name may only consist of the characters a-z, A-Z and 0-9 _. Note: No Spaces. Press Cancel to reset.";
+		$input_errors[] = "Whitelist file name may only consist of the characters \"a-z, A-Z, 0-9 and _\". Note: No Spaces or dashes. Press Cancel to reset.";
 
 	/* check for name conflicts */
 	foreach ($a_suppress as $s_list) {
@@ -141,8 +141,22 @@ if ($savemsg)
 ?>
 <form action="/snort/snort_interfaces_suppress_edit.php" name="iform" id="iform" method="post">
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
-<tr><td class="tabcont">
-<table width="100%" border="0" cellpadding="6" cellspacing="0">
+<tr><td>
+<?php
+        $tab_array = array();
+        $tab_array[0] = array(gettext("Snort Interfaces"), false, "/snort/snort_interfaces.php");
+        $tab_array[1] = array(gettext("Global Settings"), false, "/snort/snort_interfaces_global.php");
+        $tab_array[2] = array(gettext("Updates"), false, "/snort/snort_download_updates.php");
+        $tab_array[3] = array(gettext("Alerts"), false, "/snort/snort_alerts.php");
+        $tab_array[4] = array(gettext("Blocked"), false, "/snort/snort_blocked.php");
+        $tab_array[5] = array(gettext("Whitelists"), false, "/snort/snort_interfaces_whitelist.php");
+        $tab_array[6] = array(gettext("Suppress"), true, "/snort/snort_interfaces_suppress.php");
+        $tab_array[7] = array(gettext("Sync"), false, "/pkg_edit.php?xml=/snort/snort_sync.xml");
+        display_top_tabs($tab_array);
+?>
+</td></tr>
+<tr><td><div id="mainarea">
+<table id="maintable" class="tabcont" width="100%" border="0" cellpadding="6" cellspacing="0">
 <tr>
 	<td colspan="2" class="listtopic">Add the name and description of the file.</td>
 </tr>
@@ -151,8 +165,8 @@ if ($savemsg)
 	<td width="78%" class="vtable"><input name="name" type="text" id="name"
 		class="formfld unkown" size="40" value="<?=htmlspecialchars($pconfig['name']);?>" /> <br />
 	<span class="vexpl"> <?php echo gettext("The list name may only consist of the " .
-	"characters a-z, A-Z and 0-9."); ?> <span class="red"><?php echo gettext("Note:"); ?> </span>
-	<?php echo gettext("No Spaces."); ?> </span></td>
+	"characters \"a-z, A-Z, 0-9 and _\"."); ?>&nbsp;&nbsp;<span class="red"><?php echo gettext("Note:"); ?> </span>
+	<?php echo gettext("No Spaces or dashes."); ?> </span></td>
 </tr>
 <tr>
 	<td width="22%" valign="top" class="vncell"><?php echo gettext("Description"); ?></td>
@@ -205,6 +219,7 @@ if ($savemsg)
 	</td>
 </tr>
 </table>
+</div>
 </td></tr>
 </table>
 </form>
