@@ -160,23 +160,32 @@ if ($_POST) {
 	unset($input_errors);
 	$pconfig = $_POST;
 	
-	$reqdfields = explode(" ", "name type port max_connections");
-	$reqdfieldsn = explode(",", "Name,Type,Port,Max connections");
+	
+	if ($pconfig['secondary'] != "yes") {
+		$reqdfields = explode(" ", "name type port max_connections");
+		$reqdfieldsn = explode(",", "Name,Type,Port,Max connections");
+	} else {
+		$reqdfields = explode(" ", "name");
+		$reqdfieldsn = explode(",", "Name");
+	}
+	
 	do_input_validation($_POST, $reqdfields, $reqdfieldsn, &$input_errors);
 
 	if (preg_match("/[^a-zA-Z0-9\.\-_]/", $_POST['name']))
 		$input_errors[] = "The field 'Name' contains invalid characters.";
 
-	if (!is_numeric($_POST['max_connections']))
-		$input_errors[] = "The field 'Max connections' value is not a number.";
+	if ($pconfig['secondary'] != "yes") {
+		if (!is_numeric($_POST['max_connections']))
+			$input_errors[] = "The field 'Max connections' value is not a number.";
 
-	$ports = split(",", $_POST['port'] . ",");
-	foreach($ports as $port)
-		if ($port && !is_numeric($port))
-			$input_errors[] = "The field 'Port' value is not a number.";
+		$ports = split(",", $_POST['port'] . ",");
+		foreach($ports as $port)
+			if ($port && !is_numeric($port))
+				$input_errors[] = "The field 'Port' value is not a number.";
 
-	if ($_POST['client_timeout'] !== "" && !is_numeric($_POST['client_timeout']))
-		$input_errors[] = "The field 'Client timeout' value is not a number.";
+		if ($_POST['client_timeout'] !== "" && !is_numeric($_POST['client_timeout']))
+			$input_errors[] = "The field 'Client timeout' value is not a number.";
+	}
 
 	/* Ensure that our pool names are unique */
 	for ($i=0; isset($config['installedpackages']['haproxy']['ha_backends']['item'][$i]); $i++)
