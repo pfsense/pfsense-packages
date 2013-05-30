@@ -723,6 +723,7 @@ function sync_package_dansguardian($via_rpc="no",$install_process=false) {
 																				'urlacl'=> "Default",
 																				'group_options' => "scancleancache,infectionbypasserrorsonly",
 																				'reportinglevel'=>'3',
+																				'group_name_source'=>'name',
 																				'mode'=> "1",
 																				'report_level'=>"global");
 
@@ -979,7 +980,7 @@ EOF;
 	$cron_found=0;
 	if (is_array($config['cron']['item']))
 		foreach($config['cron']['item'] as $cron)
-			if (preg_match("@".DANSGUARDIAN_DIR."/(bin.freshclam|www/dansguardian)@",$cron["command"]))
+			if (preg_match("@(".DANSGUARDIAN_DIR."|/usr/local)/(bin.freshclam|www/dansguardian)@",$cron["command"]))
 				$cron_found++;
 			else
 				$new_cron['item'][]=$cron;
@@ -1062,6 +1063,7 @@ EOF;
 	$cron_cmd="/usr/local/bin/php /usr/local/www/dansguardian_ldap.php";
 	if (is_array($config['installedpackages']['dansguardiangroups']['config']))
 	 foreach ($config['installedpackages']['dansguardiangroups']['config'] as $dansguardian_groups){
+	  $dans_group_source=($dansguardian_groups['groupnamesource'] !="" ? $dansguardian_groups['groupnamesource'] : "name");
 	  if(preg_match('/(\d+)m/',$dansguardian_groups['freq'],$matches)){
 				$new_cron['item'][]=array(	"minute" =>	"*/".$matches[1],
 											"hour"	 =>	"*",
@@ -1069,7 +1071,7 @@ EOF;
 											"month"  =>	"*",
 											"wday"	 =>	"*",
 											"who"	 =>	"root",
-											"command"=>	$cron_cmd." ".$dansguardian_groups['name']);
+											"command"=>	"{$cron_cmd} $dans_group_source '{$dansguardian_groups[$dans_group_source]}'");
 				$config['cron']=$new_cron;
 				$cron_found++;
 		}
@@ -1080,7 +1082,7 @@ EOF;
 											"month"  =>	"*",
 											"wday"	 =>	"*",
 											"who"	 =>	"root",
-											"command"=>	$cron_cmd." ".$dansguardian_groups['name']);
+											"command"=>	"{$cron_cmd} $dans_group_source '{$dansguardian_groups[$dans_group_source]}'");
 				$config['cron']=$new_cron;
 				$cron_found++;
 		}

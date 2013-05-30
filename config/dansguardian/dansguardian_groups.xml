@@ -386,10 +386,20 @@
 			<type>listtopic</type>
 		</field>
 		<field>
+			<fielddescr>LDAP group name source</fielddescr>
+			<fieldname>groupnamesource</fieldname>
+			<description><![CDATA[ This option determines where to look for LDAP group/OU name.]]></description>
+	    	<type>select</type>
+ 				<options>
+ 				<option><name>Dansguardian Group Name(default)</name><value>name</value></option>
+ 				<option><name>Dansguardian Group Description</name><value>description</value></option>
+ 				</options>
+		</field>
+		<field>
 			<fielddescr>LDAP</fielddescr>
 			<fieldname>ldap</fieldname>
-			<description><![CDATA[Select Active directory servers to extract users from<br>
-								 The group must has the same name in dansguardian and on active directory<br>
+			<description><![CDATA[Select LDAP servers to extract users from<br>
+								 The group must has the same name( or description) in dansguardian and on active directory<br>
 								 <strong>This is not aplicable for default group</strong>]]></description>
 	    	<type>select_source</type>
 	    	<size>05</size>
@@ -397,6 +407,31 @@
 			<source><![CDATA[$config['installedpackages']['dansguardianldap']['config']]]></source>
 			<source_name>dc</source_name>
 			<source_value>dc</source_value>
+		</field>
+		<field>
+			<fielddescr>LDAP user account status</fielddescr>
+			<fieldname>useraccountcontrol</fieldname>
+			<description><![CDATA[Import only users with these account status. Leave empty to do not check account status.]]></description>
+	    	<type>select</type>
+ 				<options>
+ 				<option><name>Normal (code 512)</name><value>512</value></option>
+				<option><name>Disabled Account (code 514)</name><value>514</value></option>
+ 				<option><name>Account is Disabled (code 2)</name><value>2</value></option>
+ 				<option><name>Account Locked Out (code 16)</name><value>16</value></option>
+ 				<option><name>Entered Bad Password (code 17)</name><value>17</value></option>
+ 				<option><name>No Password is Required(code 32)</name><value>32</value></option>
+ 				<option><name>Password CANNOT Change(code 64)</name><value>64</value></option>
+ 				<option><name>Password has Expired (code 8388608)</name><value>8388608</value></option>
+ 				<option><name>Account will Never Expire (code 65536)</name><value>65536</value></option>
+ 				<option><name>Enabled and Does NOT expire Paswword (code 66048)</name><value>66048</value></option>
+ 				<option><name>Server Trusted Account for Delegation (code 8192)</name><value>8192</value></option>
+ 				<option><name>Trusted Account for Delegation (code 524288)</name><value>524288</value></option>
+ 				<option><name>Enabled, User Cannot Change Password, Password Never Expires (code 590336)</name><value>590336</value></option>
+ 				<option><name>Normal Account, Password will not expire and Currently Disabled (code 66050)</name><value>66050</value></option>
+				<option><name>Account Enabled, Password does not expire, currently Locked out (code 66064)</name><value>66064</value></option>
+ 				</options>
+ 			<multiple/>
+ 			<size>16</size>
 		</field>
 		<field>
 			<fielddescr>Update frequency</fielddescr>
