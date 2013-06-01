@@ -57,7 +57,7 @@
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>077</chmod>
-		<item>http://www.pfsense.com/packages/config/dashboard/binaries/widgets.tgz</item>
+		<item>http://files.pfsense.org/packages/widgets.tgz</item>
 	</additional_files_needed>
 	<custom_php_install_command>
 		dashboard_install();

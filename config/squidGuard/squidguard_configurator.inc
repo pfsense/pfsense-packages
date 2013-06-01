@@ -112,9 +112,12 @@ define('REDIRECT_URL_ARGS', '&a=%a&n=%n&i=%i&s=%s&t=%t&u=%u');
 # ------------------------------------------------------------------------------
 
 $pf_version=substr(trim(file_get_contents("/etc/version")),0,3);
-if ($pf_version > 2.0)
-	define('SQUIDGUARD_LOCALBASE', '/usr/pbi/squidguard-' . php_uname("m"));
-else
+if ($pf_version > 2.0) {
+	if (file_exists('/usr/pbi/squidguard-squid3-' . php_uname("m")))
+		define('SQUIDGUARD_LOCALBASE', '/usr/pbi/squidguard-squid3-' . php_uname("m"));
+	else
+		define('SQUIDGUARD_LOCALBASE', '/usr/pbi/squidguard-' . php_uname("m"));
+} else
 	define('SQUIDGUARD_LOCALBASE','/usr/local');
 
 if (!defined('SQUID_LOCALBASE') && ($pf_version > 2.0))

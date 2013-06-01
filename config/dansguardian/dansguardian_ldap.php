@@ -56,6 +56,7 @@ function get_ldap_members($group,$user,$password) {
 	global $ldap_host;
 	global $ldap_dn;
 	$LDAPFieldsToFind = array("member");
+		print  "{$ldap_host} {$ldap_dn}\n";
 	$ldap = ldap_connect($ldap_host) or die("Could not connect to LDAP");
 
 	// OPTIONS TO AD
@@ -64,7 +65,10 @@ function get_ldap_members($group,$user,$password) {
 
 	ldap_bind($ldap, $user, $password) or die("Could not bind to LDAP");
 
-	$results = ldap_search($ldap,$ldap_dn,"cn=" . $group,$LDAPFieldsToFind);
+	//check if group is just a name or an ldap string
+	$group_cn=(preg_match("/cn=/i",$group)? $group : "cn={$group}");
+	
+	$results = ldap_search($ldap,$ldap_dn,$group_cn,$LDAPFieldsToFind);
 	
 	$member_list = ldap_get_entries($ldap, $results);
 	$group_member_details = array();
@@ -77,7 +81,8 @@ function get_ldap_members($group,$user,$password) {
 				$member_search = ldap_search($ldap, $ldap_dn, "(CN=" . $member_cn . ")");
 				$member_details = ldap_get_entries($ldap, $member_search);
 				$group_member_details[] = array($member_details[0]['samaccountname'][0],
-												$member_details[0]['displayname'][0]);
+												$member_details[0]['displayname'][0],
+												$member_details[0]['useraccountcontrol'][0]);
 			}
 	ldap_close($ldap);
 	array_shift($group_member_details);
@@ -96,11 +101,12 @@ $apply_config=0;
 if (is_array($config['installedpackages']['dansguardiangroups']['config']))
 	foreach($config['installedpackages']['dansguardiangroups']['config'] as $group) {
 		#ignore default group
-		if ($id > 0)
-			if ($argv[1] == "" || $argv[1] == $group['name']){
+		if ($id > 0){
+			$ldap_group_source=(preg_match("/description/",$argv[1]) ? "description" : "name");
+			if ($argv[2] == $group[$ldap_group_source]){
 	   		$members="";
 	   		$ldap_servers= explode (',',$group['ldap']);
-	   		echo  "Group : " . $group['name']."\n";
+	   		echo  "Group : {$group['name']}({$group['description']})\n";
 	   		if (is_array($config['installedpackages']['dansguardianldap']['config']))
 	   			foreach ($config['installedpackages']['dansguardianldap']['config'] as $server){
 		   			if (in_array($server['dc'],$ldap_servers)){
@@ -113,18 +119,28 @@ if (is_array($config['installedpackages']['dansguardiangroups']['config']))
 		   					$ldap_username=$server['username'];
 		   				#$domainuser=split("cn=",$server['username']);
 		   				#$ldap_username=preg_replace("/,\./","@",$domainuser[1].preg_replace("/(,|)DC=/i",".",$server['dn']));
-				   		$result = get_ldap_members($group['name'],$ldap_username,$server['password']);
-		   				foreach($result as $key => $value) {
-			    			if (preg_match ("/\w+/",$value[0])){
+				   		$result = get_ldap_members($group[$ldap_group_source],$ldap_username,$server['password']);
+				   		if ($group['useraccountcontrol'] !="")
+				   			$valid_account_codes=explode(",",$group['useraccountcontrol']);
+		   				foreach($result as $mvalue) {
+			    			if (preg_match ("/\w+/",$mvalue[0])){
 			    				#var_dump($value);
-			    				$name= preg_replace('/[^(\x20-\x7F)]*/','', $value[1]);
+			    				$name= preg_replace("/&([a-z])[a-z]+;/i", "$1", htmlentities($mvalue[1]));//preg_replace('/[^(\x20-\x7F)]*/','', $mvalue[1]);
 			    				$pattern[0]="/USER/";
 			    				$pattern[1]="/,/";
 			    				$pattern[2]="/NAME/";
-			    				$replace[0]=$value[0];
+			    				$replace[0]=$mvalue[0];
 			    				$replace[1]="\n";
 			    				$replace[2]="$name";
-		    	  				$members .= preg_replace($pattern,$replace,$mask)."\n";
+			    				
+			    				if (is_array($valid_account_codes)){
+			    					if (in_array($mvalue[2],$valid_account_codes,true))
+		    	  						$members .= preg_replace($pattern,$replace,$mask)."\n";
+			    					}
+			    				else
+			    					{
+			    					$members .= preg_replace($pattern,$replace,$mask)."\n";
+			    					}
 			    				}
 		   					}
 		   			}
@@ -144,8 +160,9 @@ if (is_array($config['installedpackages']['dansguardiangroups']['config']))
 		   		$apply_config++;
 		   		}
 		   	}
-			}
-		$id++;			
+		  }
+		}		
+		$id++;
 	}
 if ($apply_config > 0){
 	print "User list from LDAP is different from current group, applying new configuration...";

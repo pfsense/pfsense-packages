@@ -77,7 +77,7 @@
 	<additional_files_needed>
 		<prefix>/tmp/</prefix>
 		<chmod>0755</chmod>
-		<item>http://www.pfsense.com/packages/config/dnsblacklist/blacklists.tar.gz</item>
+		<item>http://files.pfsense.org/packages/blacklists.tar.gz</item>
 	</additional_files_needed>
 	<fields>
 		<field>

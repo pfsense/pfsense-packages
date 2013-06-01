@@ -608,7 +608,7 @@ FLUSH PRIVILEGES;</pre>
 			<td width="78%" class="vtable" colspan="2">
 				<input name="monitor_agentport" type="text" <?if(isset($pconfig['monitor_agentport'])) echo "value=\"{$pconfig['monitor_agentport']}\"";?>size="64">
 				<br/>
-				Fill in the TCP portnumber the healtcheck should be performed on.
+				Fill in the TCP portnumber the healthcheck should be performed on.
 			</td>
 		</tr>
 	</table>

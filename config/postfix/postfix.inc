@@ -278,9 +278,10 @@ function check_cron(){
 			
 		
 }
-function sync_package_postfix($via_rpc=false) {
+function sync_package_postfix($via_rpc="no") {
 	global $config;
 	
+	log_error("sync_package_postfix called with via_rpc={$via_rpc}");
 	# detect boot process
 	if (is_array($_POST)){
 		if (preg_match("/\w+/",$_POST['__csrf_magic']))
@@ -289,7 +290,7 @@ function sync_package_postfix($via_rpc=false) {
 			$boot_process="on";
 	}
 		
-	if(is_process_running("master") && isset($boot_process) && $via_rpc==false)
+	if(is_process_running("master") && isset($boot_process) && $via_rpc=="no")
 		return;
 		
 	#check patch in /etc/inc/config.
@@ -731,7 +732,7 @@ MASTEREOF2;
 	postfix_start();
 	
 	#Do not sync during boot
-	if(!isset($boot_process))
+	if(!isset($boot_process) || $via_rpc=="yes")
 		postfix_sync_on_changes();
 		
 }
@@ -944,7 +945,7 @@ function postfix_do_xmlrpc_sync($sync_to_ip,$username,$password,$sync_type,$sync
 		/* tell postfix to reload our settings on the destionation sync host. */
 		$method = 'pfsense.exec_php';
 		$execcmd  = "require_once('/usr/local/pkg/postfix.inc');\n";
-		$execcmd .= "sync_package_postfix(true);";
+		$execcmd .= "sync_package_postfix('yes');";
 		
 		/* assemble xmlrpc payload */
 		$params = array(

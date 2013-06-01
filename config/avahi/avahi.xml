@@ -84,12 +84,12 @@
 	<additional_files_needed>
 		<prefix>/root/</prefix>
 		<chmod>0755</chmod>
-		<item>http://www.pfsense.org/packages/config/avahi/binaries/avahi.tar.gz</item>
+		<item>http://files.pfsense.org/packages/avahi/avahi.tar.gz</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/root/</prefix>
 		<chmod>0755</chmod>
-		<item>http://www.pfsense.org/packages/config/avahi/binaries/avahi8.tar.gz</item>
+		<item>http://files.pfsense.org/packages/avahi/avahi8.tar.gz</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
