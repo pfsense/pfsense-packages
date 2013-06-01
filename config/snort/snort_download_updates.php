@@ -129,35 +129,31 @@ h += 96;
 			<tr align="center">
 				<td>
 				<br/>
-				<table id="download_rules" height="32px" width="725px" border="0"
-					cellpadding="5px" cellspacing="0">
+				<table id="download_rules" height="32px" width="725px" border="0" cellpadding="5px" cellspacing="0">
 					<tr>
 						<td id="download_rules_td" style="background-color: #eeeeee">
 						<div height="32" width="725px" style="background-color: #eeeeee">
-
 						<font color="#777777" size="2.5px">
 						<p style="text-align: left; margin-left: 225px;">
-							<b><?php echo gettext("INSTALLED RULESET SIGNATURES"); ?></b></font><br/>
+							<b><?php echo gettext("INSTALLED RULESET SIGNATURES"); ?></b></font><br/><br/>
 							<font color="#FF850A" size="1px"><b>SNORT.ORG&nbsp;&nbsp;--></b></font>
-							<font size="1px" color="#000000">&nbsp;&nbsp;<? echo $snort_org_sig_chk_local; ?></font><br>
+							<font size="1px" color="#000000">&nbsp;&nbsp;<? echo $snort_org_sig_chk_local; ?></font><br/>
 							<font color="#FF850A" size="1px"><b>EMERGINGTHREATS.NET&nbsp;&nbsp;--></b></font>
-							<font size="1px" color="#000000">&nbsp;&nbsp;<? echo $emergingt_net_sig_chk_local; ?></font><br>
+							<font size="1px" color="#000000">&nbsp;&nbsp;<? echo $emergingt_net_sig_chk_local; ?></font><br/>
 							<font color="#FF850A" size="1px"><b>SNORT GPLv2 COMMUNITY RULES&nbsp;&nbsp;--></b></font>
-							<font size="1px" color="#000000">&nbsp;&nbsp;<? echo $snort_community_sig_chk_local; ?></font><br>
+							<font size="1px" color="#000000">&nbsp;&nbsp;<? echo $snort_community_sig_chk_local; ?></font><br/>
 						</p>
 						</div>
 						</td>
 					</tr>
 				</table>
 				<br/>
-				<table id="download_rules" height="32px" width="725px" border="0"
-					cellpadding="5px" cellspacing="0">
+				<table id="download_rules" height="32px" width="725px" border="0" cellpadding="5px" cellspacing="0">
 					<tr>
 						<td id="download_rules_td" style='background-color: #eeeeee'>
 						<div height="32" width="725px" style='background-color: #eeeeee'>
-
 						<p style="text-align: left; margin-left: 225px;">
-						<font color='#777777' size='2.5px'><b><?php echo gettext("UPDATE YOUR RULESET"); ?></b></font><br>
+						<font color='#777777' size='2.5px'><b><?php echo gettext("UPDATE YOUR RULESET"); ?></b></font><br/>
 						<br/>
 
 			<?php
@@ -167,7 +163,7 @@ h += 96;
 			<button disabled="disabled"><span class="download">' . gettext("Update Rules") . '</span></button><br/>
 			<p style="text-align:left; margin-left:150px;">
 			<font color="#fc3608" size="2px"><b>' . gettext("WARNING:") . '</b></font><font size="1px" color="#000000">&nbsp;&nbsp;' . gettext('No rule types have been selected for download. ') .
-			gettext('Visit the ') . '<a href="snort_interfaces_global.php">Global Settings Tab</a>' . gettext(' to select rule types.') . '</font><br>';
+			gettext('Visit the ') . '<a href="snort_interfaces_global.php">Global Settings Tab</a>' . gettext(' to select rule types.') . '</font><br/>';
 
 							echo '</p>' . "\n";
 						} else {
@@ -184,14 +180,12 @@ h += 96;
 					</tr>
 				</table>
 				<br/>
-				<table id="download_rules" height="32px" width="725px" border="0"
-					cellpadding="5px" cellspacing="0">
+				<table id="download_rules" height="32px" width="725px" border="0" cellpadding="5px" cellspacing="0">
 					<tr>
 						<td id="download_rules_td" style='background-color: #eeeeee'>
 						<div height="32" width="725px" style='background-color: #eeeeee'>
-
 						<p style="text-align: left; margin-left: 225px;">
-						<font color='#777777' size='2.5px'><b><?php echo gettext("VIEW UPDATE LOG"); ?></b></font><br>
+						<font color='#777777' size='2.5px'><b><?php echo gettext("VIEW UPDATE LOG"); ?></b></font><br/>
 						<br>
 				<?php
 
@@ -214,8 +208,7 @@ h += 96;
 
 				<br/>
 
-				<table id="download_rules" height="32px" width="725px" border="0"
-					cellpadding="5px" cellspacing="0">
+				<table id="download_rules" height="32px" width="725px" border="0" cellpadding="5px" cellspacing="0">
 					<tr>
 						<td id="download_rules_td" style='background-color: #eeeeee'>
 						<div height="32" width="725px" style='background-color: #eeeeee'><span class="vexpl">

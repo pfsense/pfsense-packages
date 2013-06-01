@@ -49,7 +49,7 @@ include("head.inc");
 
 <table width="100%" border="0" cellpadding="6" cellspacing="0">
 	<tr>
-		<td align="center"><div id="mainarea">
+		<td align="center"><div id="boxarea">
 		<table id="maintable" class="tabcont"  width="100%" border="0" cellpadding="6" cellspacing="0">
 			<tr>
 				<td class="tabcont" align="center">
