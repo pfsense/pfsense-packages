@@ -218,11 +218,10 @@ h += 96;
 					cellpadding="5px" cellspacing="0">
 					<tr>
 						<td id="download_rules_td" style='background-color: #eeeeee'>
-						<div height="32" width="725px" style='background-color: #eeeeee'>
-							<font size='1px'><span class="red"><b><?php echo gettext("NOTE:"); ?></b></span></font><font size='1px'
-								color='#000000'>&nbsp;&nbsp;<?php echo gettext("Snort.org and EmergingThreats.net " .
-								"will go down from time to time. Please be patient."); ?>
-							</font>
+						<div height="32" width="725px" style='background-color: #eeeeee'><span class="vexpl">
+							<span class="red"><b><?php echo gettext("NOTE:"); ?></b></span>
+							&nbsp;&nbsp;<?php echo gettext("Snort.org and EmergingThreats.net " .
+							"will go down from time to time. Please be patient."); ?></span>
 						</div>
 						</td>
 					</tr>
@@ -236,8 +235,8 @@ h += 96;
 		</td>
 	</tr>
 </table>
-<!-- end of final table --></div>
-		</form>
+<!-- end of final table -->
+</form>
 <?php include("fend.inc"); ?>
 </body>
 </html>
