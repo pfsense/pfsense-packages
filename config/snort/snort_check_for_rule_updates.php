@@ -122,6 +122,8 @@ function snort_download_file_url($url, $file_out) {
 			$rc = curl_exec($ch);
 			if ($rc === true)
 				break;
+			log_error(gettext("[Snort] Rules download error: " . curl_error($ch)));
+			log_error(gettext("[Snort] Will retry in 15 seconds..."));
 			sleep(15);
 		}
 		if ($rc === false)
@@ -725,6 +727,10 @@ if ($snortdownload == 'on' || $emergingthreats == 'on' || $snortcommunityrules =
 		        update_output_window(gettext("Snort has restarted with your new set of rules..."));
        		log_error(gettext("[Snort] Snort has restarted with your new set of rules..."));
 		error_log(gettext("\tSnort has restarted with your new set of rules.\n"), 3, $snort_rules_upd_log);
+	}
+	else {
+		if ($pkg_interface <> "console")
+			update_output_window(gettext("The rules update task is complete..."));
 	}
 }
 
