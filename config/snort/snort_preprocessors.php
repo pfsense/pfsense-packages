@@ -754,7 +754,7 @@ include_once("head.inc");
 			<?php echo gettext("Do not queue large packets in reassembly buffer to increase performance.  Default is ") . 
 			"<strong>" . gettext("Not Checked") . "</strong>"; ?>.<br/>
 			<?php echo "<span class=\"red\"><strong>" . gettext("Warning:  ") . "</strong></span>" . 
-			gettext("Enabing this option could result in missed packets.  Recommended setting is not checked."); ?></td>  
+			gettext("Enabling this option could result in missed packets.  Recommended setting is not checked."); ?></td>  
 	</tr>
 	<tr>
 		<td valign="top" class="vncell"><?php echo gettext("Max Queued Bytes"); ?></td>

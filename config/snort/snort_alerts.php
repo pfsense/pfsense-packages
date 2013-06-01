@@ -305,6 +305,8 @@ if (file_exists("/var/log/snort/snort_{$if_real}{$snort_uuid}/alert")) {
 			$alert_proto = $fields[5];
 			/* IP SRC */
 			$alert_ip_src = $fields[6];
+			/* Add zero-width space as soft-break opportunity after each colon if we have an IPv6 address */
+			$alert_ip_src = str_replace(":", ":&#8203;", $alert_ip_src);
 			if (isset($tmpblocked[$fields[6]])) {
 				$alert_ip_src .= "<br/><a href='?instance={$id}&todelete=" . trim(urlencode($fields[6])) . "'>
 				<img title=\"" . gettext("Remove host from Blocked Table") . "\" border=\"0\" width='10' height='10' name='todelete' id='todelete' alt=\"Remove from Blocked Hosts\" src=\"../themes/{$g['theme']}/images/icons/icon_x.gif\"/></a>"; 
@@ -313,6 +315,8 @@ if (file_exists("/var/log/snort/snort_{$if_real}{$snort_uuid}/alert")) {
 			$alert_src_p = $fields[7];
 			/* IP Destination */
 			$alert_ip_dst = $fields[8];
+			/* Add zero-width space as soft-break opportunity after each colon if we have an IPv6 address */
+			$alert_ip_dst = str_replace(":", ":&#8203;", $alert_ip_dst);
 			if (isset($tmpblocked[$fields[8]])) {
 				$alert_ip_dst .= "<br/><a href='?instance={$id}&todelete=" . trim(urlencode($fields[8])) . "'>
 				<img title=\"" . gettext("Remove host from Blocked Table") . "\" border=\"0\" width='10' height='10' name='todelete' id='todelete' alt=\"Remove from Blocked Hosts\" src=\"../themes/{$g['theme']}/images/icons/icon_x.gif\"/></a>";

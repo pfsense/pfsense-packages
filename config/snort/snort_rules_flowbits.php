@@ -142,7 +142,7 @@ if ($savemsg)
 	print_info_box($savemsg);
 ?>
 <form action="snort_rules_flowbits.php" method="post" name="iform" id="iform">
-<div id="mainarea">
+<div id="boxarea">
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
 <tr>
 <td class="tabcont">

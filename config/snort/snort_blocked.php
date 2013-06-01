@@ -249,10 +249,13 @@ if ($pconfig['brefresh'] == 'on')
 				else
 					$counter++;
 
+				/* Add zero-width space as soft-break opportunity after each colon if we have an IPv6 address */
+				$tmp_ip = str_replace(":", ":&#8203;", $blocked_ip);
+
 				/* use one echo to do the magic*/
 					echo "<tr>
 						<td align=\"center\" valign=\"middle\" class=\"listr\">{$counter}</td>
-						<td valign=\"middle\" class=\"listr\">{$blocked_ip}</td>
+						<td valign=\"middle\" class=\"listr\">{$tmp_ip}</td>
 						<td valign=\"middle\" class=\"listr\">{$blocked_desc}</td>
 						<td align=\"center\" valign=\"middle\" class=\"listr\"><a href='snort_blocked.php?todelete=" . trim(urlencode($blocked_ip)) . "'>
 						<img title=\"" . gettext("Delete host from Blocked Table") . "\" border=\"0\" name='todelete' id='todelete' alt=\"Delete host from Blocked Table\" src=\"../themes/{$g['theme']}/images/icons/icon_x.gif\"></a></td>

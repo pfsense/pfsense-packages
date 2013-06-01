@@ -35,6 +35,7 @@ require_once("/usr/local/pkg/snort/snort.inc");
 global $g, $rebuild_rules;
 
 $snortdir = SNORTDIR;
+$rcdir = RCFILEPREFIX;
 
 $id = $_GET['id'];
 if (isset($_POST['id']))
@@ -60,11 +61,14 @@ if (isset($_POST['del_x'])) {
 			// If interface had auto-generated Suppress List, then
 			// delete that along with the interface
 			$autolist = "{$a_nat[$rulei]['interface']}" . "suppress";
-			$a_suppress = &$config['installedpackages']['snortglobal']['suppress']['item'];
-			foreach ($a_suppress as $k => $i) {
-				if ($i['name'] == $autolist) {
-					unset($config['installedpackages']['snortglobal']['suppress']['item'][$k]);
-					break;
+			if (is_array($config['installedpackages']['snortglobal']['suppress']) && 
+			    is_array($config['installedpackages']['snortglobal']['suppress']['item'])) {
+				$a_suppress = &$config['installedpackages']['snortglobal']['suppress']['item'];
+				foreach ($a_suppress as $k => $i) {
+					if ($i['name'] == $autolist) {
+						unset($config['installedpackages']['snortglobal']['suppress']['item'][$k]);
+						break;
+					}
 				}
 			}
 
@@ -85,7 +89,7 @@ if (isset($_POST['del_x'])) {
 			snort_create_rc();
 		else {
 			conf_mount_rw();
-			@unlink('/usr/local/etc/rc.d/snort.sh');
+			@unlink("{$rcdir}/snort.sh");
 			conf_mount_ro();
 		}
 	  
