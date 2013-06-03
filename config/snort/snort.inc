@@ -146,6 +146,8 @@ function snort_load_suppress_sigs($snortcfg) {
 
 	$suppress = array();
 
+	if (!is_array($config['installedpackages']['snortglobal']))
+		return;
 	if (!is_array($config['installedpackages']['snortglobal']['suppress']))
 		return;
 	if (!is_array($config['installedpackages']['snortglobal']['suppress']['item']))
@@ -258,15 +260,7 @@ function snort_build_list($snortcfg, $listname = "", $whitelist = false) {
 		/*  Skip the WAN interface as we do not typically want that whole subnet */
 		/*  whitelisted (just the interface IP itself).                          */
 		/*************************************************************************/
-		if (function_exists('get_configured_interface_list'))
-			$int_array = get_configured_interface_list();
-		else {
-			$int_array = array('wan', 'lan');
-			for ($j = 1; isset ($config['interfaces']['opt' . $j]); $j++) {
-				if(isset($config['interfaces']['opt' . $j]['enable']))
-					$int_array[] = "opt{$j}";
-			}
-		}
+		$int_array = get_configured_interface_list();
 		foreach ($int_array as $int) {
 			if ($int == "wan")
 				continue;
@@ -291,9 +285,6 @@ function snort_build_list($snortcfg, $listname = "", $whitelist = false) {
 		}
 	}
 
-	/* Grab the default gateway if set */
-	$default_gw = exec("/sbin/route -n get default |grep 'gateway:' | /usr/bin/awk '{ print $2 }'");
-
 	if ($wanip == 'yes') {
 		$ip = get_interface_ip("wan");
 		if (is_ipaddr($ip)) {
@@ -310,6 +301,8 @@ function snort_build_list($snortcfg, $listname = "", $whitelist = false) {
 	}
 
 	if ($wangw == 'yes') {
+		/* Grab the default gateway if set */
+		$default_gw = exec("/sbin/route -n get default |grep 'gateway:' | /usr/bin/awk '{ print $2 }'");
 		if (is_ipaddr($default_gw) && !in_array($default_gw, $home_net))
 			$home_net[] = $default_gw;
 
@@ -589,6 +582,7 @@ function snort_postinstall() {
 		update_status(gettext("Saved settings detected..."));
 		update_output_window(gettext("Please wait... rebuilding installation with saved settings..."));
 		log_error(gettext("[Snort] Downloading and updating configured rule types..."));
+		update_output_window(gettext("Please wait... downloading and updating configured rule types..."));
 		@include_once("/usr/local/pkg/snort/snort_check_for_rule_updates.php");
 		update_status(gettext("Generating snort.conf configuration file from saved settings..."));
 		$rebuild_rules = "on";
@@ -600,7 +594,9 @@ function snort_postinstall() {
 		/* Only try to start Snort if not in reboot */
 		if (!$g['booting']) {
 			update_status(gettext("Starting Snort using rebuilt configuration..."));
+			update_output_window(gettext("Please wait... while Snort is started..."));
 			log_error(gettext("[Snort] Starting Snort using rebuilt configuration..."));
+			update_output_window(gettext("Snort has been started using the rebuilt configuration..."));
 			start_service("snort");
 		}
 	}
@@ -852,12 +848,13 @@ function sync_snort_package_config() {
 	global $snort_version, $rebuild_rules, $is_postinstall;
 
 	$snortdir = SNORTDIR;
+	$rcdir = RCFILEPREFIX;
 
 	conf_mount_rw();
 
 	/* do not start config build if rules is empty or there are no Snort settings */
 	if (!is_array($config['installedpackages']['snortglobal']) || !is_array($config['installedpackages']['snortglobal']['rule'])) {
-		exec("/bin/rm /usr/local/etc/rc.d/snort.sh");
+		@unlink("{$rcdir}/snort.sh");
 		conf_mount_ro();
 		return;
 	}
