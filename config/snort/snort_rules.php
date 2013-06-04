@@ -496,6 +496,7 @@ h += 96;
 						<tbody>
 
 					<?php
+						$counter = 0;
 						foreach ($rules_map as $k1 => $rulem) {
 							foreach ($rulem as $k2 => $v) {
 								$sid = snort_get_sid($v['rule']);
@@ -576,6 +577,7 @@ h += 96;
 								</td>
 							</tr>
 						<?php
+								$counter++;
 							}
 						}
 						unset($rulem, $v);
@@ -586,7 +588,10 @@ h += 96;
 			</tr>
 			<tr>
 				<td>
-					<table class="tabcont" width="100%" border="0" cellspacing="0" cellpadding="1">
+					<table width="100%" border="0" cellspacing="0" cellpadding="1">
+						<tr>
+							<td class="vexpl" colspan="2" height="30" valign="middle"><?php echo gettext("Rule Count: {$counter}"); ?></td>
+						</tr>
 						<tr>
 							<td width="16"><img src="../themes/<?= $g['theme']; ?>/images/icons/icon_block.gif"
 								width="11" height="11"></td>
