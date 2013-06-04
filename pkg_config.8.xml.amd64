@@ -1324,7 +1324,7 @@
 	</package>
 	<package>
 		<name>squidGuard</name>
-		<descr>High perfomance web proxy URL filter. Requires proxy Squid package.</descr>
+		<descr>High perfomance web proxy URL filter. Requires proxy Squid 2.x package.</descr>
 		<website>http://www.squidGuard.org/</website>
 		<maintainer>dv_serg@mail.ru</maintainer>
 		<category>Network Management</category>
@@ -1350,13 +1350,13 @@
 	</package>
 	<package>
 		<name>squidGuard-squid3</name>
-		<descr>High perfomance web proxy URL filter. Requires proxy Squid package.</descr>
+		<descr>High perfomance web proxy URL filter. Requires proxy Squid 3.x package.</descr>
 		<website>http://www.squidGuard.org/</website>
 		<maintainer>dv_serg@mail.ru</maintainer>
 		<category>Network Management</category>
 		<version>1.4_4 pkg v.1.9.4</version>
-		<status>Beta</status>
-		<required_version>2.2</required_version>
+		<status>Experimental</status>
+		<required_version>2.1</required_version>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
 		<depends_on_package_pbi>squidguard-squid3-1.4_4-amd64.pbi</depends_on_package_pbi>
 		<build_pbi>
@@ -1364,7 +1364,7 @@
 			<port>www/squidguard</port>
 			<custom_name>squidguard-squid3</custom_name>
 		</build_pbi>
-		<build_options>OPTIONS_SET=FETCH LDAP SAMPLE_BL SQUID33;OPTIONS_UNSET=DNS_BL DOCS QUOTE_STRING SQUID27 SQUID32;c-icap_UNSET=IPV6 squid33_UNSET=AUTH_SMB AUTH_SQL DNS_HELPER FS_COSS ESI SNMP ECAP STACKTRACES STRICT_HTTP TP_IPF TP_IPFW VIA_DB DEBUG DOCS EXAMPLES;squid33_SET=ARP_ACL AUTH_KERB AUTH_LDAP AUTH_NIS AUTH_SASL CACHE_DIGESTS DELAY_POOLS FOLLOW_XFF TP_PF MSSL_CRTD WCCP WCCPV2 FS_AUFS HTCP ICAP ICMP IDENT IPV6 KQUEUE LARGEFILE SSL SSL_CRTD</build_options>
+		<build_options>OPTIONS_SET=FETCH LDAP;squidGuard_UNSET=SQUID27;squidGuard_SET=SAMPLE_BL SASL SQUID33;c-icap_UNSET=IPV6 squid33_UNSET=AUTH_SMB AUTH_SQL DNS_HELPER FS_COSS ESI SNMP ECAP STACKTRACES STRICT_HTTP TP_IPF TP_IPFW VIA_DB DEBUG DOCS EXAMPLES;squid33_SET=ARP_ACL AUTH_KERB AUTH_LDAP AUTH_NIS AUTH_SASL CACHE_DIGESTS DELAY_POOLS FOLLOW_XFF TP_PF MSSL_CRTD WCCP WCCPV2 FS_AUFS HTCP ICAP ICMP IDENT IPV6 KQUEUE LARGEFILE SSL SSL_CRTD</build_options>
 		<config_file>http://www.pfsense.org/packages/config/squidGuard/squidguard.xml</config_file>
 		<configurationfile>squidguard.xml</configurationfile>
 	</package>
