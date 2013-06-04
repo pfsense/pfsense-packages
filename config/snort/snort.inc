@@ -39,6 +39,9 @@ require_once("pkg-utils.inc");
 // Needed on 2.0 because of filter_get_vpns_list()
 require_once("filter.inc");
 
+// Snort GUI needs some extra PHP memory space to manipulate large rules arrays
+ini_set("memory_limit", "192M");
+
 // Explicitly declare these as global so they work through function call includes 
 global $snort_rules_file, $snort_version, $emerging_threats_version, $snort_rules_upd_log;
 global $all_rules, $flowbit_rules_file, $snort_enforcing_rules_file, $rebuild_rules, $is_postinstall;
@@ -1529,20 +1532,21 @@ function snort_load_vrt_policy($policy, $load_rules_map=true) {
 	$snortdir = SNORTDIR;
 	$vrt_policy_rules = array();
 
-	/* Create regular expression for searching. */
-	$policy_pcre = "/policy\\s" . $policy . "/i";
-
 	/* Refresh the map of all the rules if flag */
 	/* is set.                                  */
-	if ($load_rules_map == true)
-		$all_rules = snort_load_rules_map("{$snortdir}/rules/");
+	if ($load_rules_map) {
+		/* Since only Snort VRT rules have IPS Policy metadata, */
+		/* limit our search to just those files.                */
+		$snort_vrt_files = glob("{$snortdir}/rules/snort_*.rules");
+		$all_rules = array();
+		$all_rules = snort_load_rules_map($snort_vrt_files);
+	}
 
-	/* Now walk the rules list and find all those */
-	/* that are defined as active for the chosen  */
-	/* security policy.                           */
+	/* Now walk the rules list and find all those that are defined  */
+	/* defined as active for the chosen security policy.            */
 	foreach ($all_rules as $k1 => $arulem) {
 		foreach ($arulem as $k2 => $arulem2) {
-			if (preg_match($policy_pcre, $arulem2['rule'])) {
+			if (strripos($arulem2['rule'], "policy {$policy}-ips") !== false) {
 				if (!preg_match('/flowbits\s*:\s*noalert/i', $arulem2['rule'])) {
 					if (!is_array($vrt_policy_rules[$k1]))
 						$vrt_policy_rules[$k1] = array();
@@ -1564,9 +1568,9 @@ function snort_load_vrt_policy($policy, $load_rules_map=true) {
 	unset($arulem, $arulem2);
 
 	/* If we loaded the ALL_RULES map,   */
-	/* then release the memory.          */
+	/* then release the global memory.   */
 	if ($load_rules_map == true)
-		unset($all_rules);
+		unset($GLOBALS['all_rules']);
 
 	/* Return all the rules that match the policy. */
 	return $vrt_policy_rules;
@@ -2075,6 +2079,7 @@ function snort_prepare_rule_files($snortcfg, $snortcfgdir) {
 		$no_rules_defined = false;
 
 		/* Load up all the rules into a Rules Map array. */
+		$all_rules = array();
 		$all_rules = snort_load_rules_map("{$snortdir}/rules/");
 
 		/* Create an array with the filenames of the enabled  */
@@ -2160,7 +2165,7 @@ function snort_prepare_rule_files($snortcfg, $snortcfgdir) {
 			/* Just put an empty file to always have the file present */
 			snort_write_flowbit_rules_file(array(), "{$snortcfgdir}/rules/{$flowbit_rules_file}");
 
-		unset($enabled_rules, $all_rules);
+		unset($GLOBALS['all_rules']);
 	} else {
 		snort_write_enforcing_rules_file(array(), "{$snortcfgdir}/rules/{$snort_enforcing_rules_file}");
 		snort_write_flowbit_rules_file(array(), "{$snortcfgdir}/rules/{$flowbit_rules_file}");
