@@ -167,7 +167,7 @@ if ($_POST['selectall']) {
 			$rulesets[] = basename($file);
 	}
 	if ($snortcommunitydownload == 'on') {
-		$files = glob("{$snortdir}/rules/sc_*.rules");
+		$files = glob("{$snortdir}/rules/*_community.rules");
 		foreach ($files as $file)
 			$rulesets[] = basename($file);
 	}
@@ -348,7 +348,7 @@ function enable_change()
 				</td>
 			</tr>
 			<tr>
-				<td colspan="6" class="listtopic"><?php echo gettext("Snort IPS Policy Selection"); ?><br/></td>
+				<td colspan="6" class="listtopic"><?php echo gettext("Snort IPS Policy selection"); ?><br/></td>
 			</tr>
 			<tr>
 				<td colspan="6" valign="center" class="listn">
@@ -389,7 +389,7 @@ function enable_change()
 				</td>
 			</tr>
 			<tr>
-				<td colspan="6" class="listtopic"><?php echo gettext("Select the rulesets you would like Snort to load at startup"); ?><br/></td>
+				<td colspan="6" class="listtopic"><?php echo gettext("Select the rulesets Snort will load at startup"); ?><br/></td>
 			</tr>
 			<tr>
 				<td colspan="6">
