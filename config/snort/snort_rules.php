@@ -192,6 +192,7 @@ if ($_GET['act'] == "toggle" && $_GET['ids'] && !empty($rules_map)) {
 	/* Update the config.xml file. */
 	write_config();
 
+	$_GET['openruleset'] = $currentruleset;
 	header("Location: /snort/snort_rules.php?id={$id}&openruleset={$currentruleset}");
 	exit;
 }
@@ -227,6 +228,7 @@ if ($_GET['act'] == "resetcategory" && !empty($rules_map)) {
 		unset($a_rule[$id]['rule_sid_off']);
 	write_config();
 
+	$_GET['openruleset'] = $currentruleset;
 	header("Location: /snort/snort_rules.php?id={$id}&openruleset={$currentruleset}");
 	exit;
 }
@@ -240,6 +242,7 @@ if ($_GET['act'] == "resetall" && !empty($rules_map)) {
 	/* Update the config.xml file. */
 	write_config();
 
+	$_GET['openruleset'] = $currentruleset;
 	header("Location: /snort/snort_rules.php?id={$id}&openruleset={$currentruleset}");
 	exit;
 }
@@ -323,32 +326,6 @@ if ($savemsg) {
 }
 
 ?>
-
-<script language="javascript" type="text/javascript">
-function go()
-{
-    var box = document.iform.selectbox;
-    destination = box.options[box.selectedIndex].value;
-    if (destination) 
-		location.href = destination;
-}
-
-function wopen(url, name, w, h)
-{
-// Fudge factors for window decoration space.
-// In my tests these work well on all platforms & browsers.
-w += 32;
-h += 96;
- var win = window.open(url,
-  name, 
-  'width=' + w + ', height=' + h + ', ' +
-  'location=no, menubar=no, ' +
-  'status=no, toolbar=no, scrollbars=yes, resizable=yes');
- win.resizeTo(w, h);
- win.focus();
-}
-
-</script>
 
 <form action="/snort/snort_rules.php" method="post" name="iform" id="iform">
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
@@ -435,8 +412,9 @@ h += 96;
 					<table width="100%" align="center" border="0" cellpadding="0" cellspacing="0">
 						<tr>
 							<td width="55%" valign="middle" rowspan="2"><input type="submit" name="apply" id="apply" value="<?php echo gettext("Apply"); ?>" class="formbtn" 
-							    title="<?php echo gettext("Click to rebuild the rules with your changes"); ?>"/>
-							    <input type='hidden' name='id' value='<?=$id;?>'/></td>
+							title="<?php echo gettext("Click to rebuild the rules with your changes"); ?>"/>
+							<input type='hidden' name='id' value='<?=$id;?>'/>
+							<input type='hidden' name='openruleset' value='<?=$currentruleset;?>'/></td>
 							<td class="vexpl" valign="middle"><?php echo "<a href='?id={$id}&openruleset={$currentruleset}&act=resetcategory'>
 							<img src=\"../themes/{$g['theme']}/images/icons/icon_x.gif\" width=\"15\" height=\"15\" 
 							onmouseout='this.src=\"../themes/{$g['theme']}/images/icons/icon_x.gif\"' 
@@ -623,5 +601,31 @@ h += 96;
 </table>
 </form>
 <?php include("fend.inc"); ?>
+
+<script language="javascript" type="text/javascript">
+function go()
+{
+    var box = document.iform.selectbox;
+    destination = box.options[box.selectedIndex].value;
+    if (destination) 
+		location.href = destination;
+}
+
+function wopen(url, name, w, h)
+{
+// Fudge factors for window decoration space.
+// In my tests these work well on all platforms & browsers.
+w += 32;
+h += 96;
+ var win = window.open(url,
+  name, 
+  'width=' + w + ', height=' + h + ', ' +
+  'location=no, menubar=no, ' +
+  'status=no, toolbar=no, scrollbars=yes, resizable=yes');
+ win.resizeTo(w, h);
+ win.focus();
+}
+
+</script>
 </body>
 </html>
