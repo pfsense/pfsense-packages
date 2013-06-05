@@ -1288,7 +1288,7 @@ function snort_get_flowbits($rule) {
 	return $flowbits;
 }
 
-function snort_get_checked_flowbits(&$rules_map) {
+function snort_get_checked_flowbits($rules_map) {
 
 	/*************************************************************/
 	/* This function checks all the currently enabled rules to   */
@@ -1331,7 +1331,7 @@ function snort_get_checked_flowbits(&$rules_map) {
 	return $checked_flowbits;
 }
 
-function snort_get_set_flowbits(&$rules_map) {
+function snort_get_set_flowbits($rules_map) {
 
 	/*********************************************************/
 	/* This function checks all the currently enabled rules  */
@@ -1372,7 +1372,7 @@ function snort_get_set_flowbits(&$rules_map) {
 	return $set_flowbits;
 }
 
-function snort_find_flowbit_required_rules(&$all_rules, &$unchecked_flowbits) {
+function snort_find_flowbit_required_rules($all_rules, $unchecked_flowbits) {
 
 	/********************************************************/
 	/* This function finds all rules that must be enabled   */
@@ -1420,7 +1420,7 @@ function snort_find_flowbit_required_rules(&$all_rules, &$unchecked_flowbits) {
 	return $required_flowbits_rules;
 }
 
-function snort_resolve_flowbits(&$active_rules) {
+function snort_resolve_flowbits($active_rules) {
 
 	/******************************************************/
 	/* This function auto-resolves flowbit requirements   */
