@@ -192,8 +192,8 @@ function enable_change(enable_change) {
 			</tr>
 			<tr>
 				<td width="22%" valign="top" class="vncell"><?php echo gettext("Log to a MySQL Database"); ?></td>
-				<td width="78%" class="vtable"><input name="barnyard_mysql"
-					type="text" class="formfld" id="barnyard_mysql" size="100"
+				<td width="78%" class="vtable"><input name="barnyard_mysql" 
+					type="text" class="formfld" id="barnyard_mysql" style="width:95%;" size="85" 
 					value="<?=htmlspecialchars($pconfig['barnyard_mysql']);?>"> <br>
 				<span class="vexpl"><?php echo gettext("Example: output database: alert, mysql, " .
 				"dbname=snort user=snort host=localhost password=xyz"); ?><br>
@@ -206,8 +206,8 @@ function enable_change(enable_change) {
 			<tr>
 				<td width="22%" valign="top" class="vncell"<?php echo gettext("Advanced configuration " .
 				"pass through"); ?></td>
-				<td width="78%" class="vtable"><textarea name="barnconfigpassthru"
-					cols="60" rows="7" id="barnconfigpassthru" ><?=htmlspecialchars($pconfig['barnconfigpassthru']);?></textarea>
+				<td width="78%" class="vtable"><textarea name="barnconfigpassthru" style="width:95%;"
+					cols="65" rows="7" id="barnconfigpassthru" ><?=htmlspecialchars($pconfig['barnconfigpassthru']);?></textarea>
 				<br>
 				<?php echo gettext("Arguments here will be automatically inserted into the running " .
 				"barnyard2 configuration."); ?></td>

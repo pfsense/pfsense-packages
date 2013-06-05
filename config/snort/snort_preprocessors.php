@@ -1143,7 +1143,7 @@ include_once("head.inc");
 				<td width="22%" valign="top">&nbsp;</td>
 				<td width="78%"><span class="vexpl"><span class="red"><strong><?php echo gettext("Note: "); ?></strong></span>
 				<?php echo gettext("Please save your settings before you exit.  Preprocessor changes will rebuild the rules file.  This "); ?>
-				</br><?php echo gettext("may take several seconds.  Snort must also be restarted to activate any changes made on this screen."); ?></td>
+				<?php echo gettext("may take several seconds.  Snort must also be restarted to activate any changes made on this screen."); ?></td>
 			</tr>
 </table>
 </div>

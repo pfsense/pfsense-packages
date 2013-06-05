@@ -411,7 +411,7 @@ if ($savemsg) {
 				<td class="vncell">
 					<table width="100%" align="center" border="0" cellpadding="0" cellspacing="0">
 						<tr>
-							<td width="55%" valign="middle" rowspan="2"><input type="submit" name="apply" id="apply" value="<?php echo gettext("Apply"); ?>" class="formbtn" 
+							<td width="50%" valign="middle" rowspan="2"><input type="submit" name="apply" id="apply" value="<?php echo gettext("Apply"); ?>" class="formbtn" 
 							title="<?php echo gettext("Click to rebuild the rules with your changes"); ?>"/>
 							<input type='hidden' name='id' value='<?=$id;?>'/>
 							<input type='hidden' name='openruleset' value='<?=$currentruleset;?>'/></td>
