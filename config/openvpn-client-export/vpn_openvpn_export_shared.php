@@ -267,7 +267,7 @@ function useaddr_changed(obj) {
 function useproxy_changed(obj) {
 
 	if ((obj.id == "useproxy" && obj.checked) ||
-		$(obj.id + "useproxypass" && (obj.value != 'none'))) {
+		(obj.id == "useproxypass" && (obj.value != 'none'))) {
 		$(obj.id + '_opts').show();
 	} else {
 		$(obj.id + '_opts').hide();
