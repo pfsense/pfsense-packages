@@ -230,7 +230,10 @@ function openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $quotese
 			$input_errors[] = "This server uses UDP protocol and cannot communicate with HTTP proxy.";
 			return;
 		}
-		$conf .= "http-proxy {$proxy['ip']} {$proxy['port']} ";
+		if ($proxy['proxy_type'] == "http") 
+			$conf .= "http-proxy {$proxy['ip']} {$proxy['port']} ";
+		if ($proxy['proxy_type'] == "socks") 
+			$conf .= "socks-proxy {$proxy['ip']} {$proxy['port']} ";
 		if ($proxy['proxy_authtype'] != "none") {
 			if (!isset($proxy['passwdfile']))
 				$proxy['passwdfile'] = openvpn_client_export_prefix($srvid, $usrid, $crtid) . "-proxy";
@@ -749,7 +752,10 @@ function openvpn_client_export_sharedkey_config($srvid, $useaddr, $proxy, $zipco
 			$input_errors[] = "This server uses UDP protocol and cannot communicate with HTTP proxy.";
 			return;
 		}
-		$conf .= "http-proxy {$proxy['ip']} {$proxy['port']} ";
+		if ($proxy['proxy_type'] == "http") 
+			$conf .= "http-proxy {$proxy['ip']} {$proxy['port']} ";
+		if ($proxy['proxy_type'] == "socks") 
+			$conf .= "socks-proxy {$proxy['ip']} {$proxy['port']} ";
 		if ($proxy['proxy_authtype'] != "none") {
 			if (!isset($proxy['passwdfile']))
 				$proxy['passwdfile'] = openvpn_client_export_prefix($srvid) . "-proxy";
