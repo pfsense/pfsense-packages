@@ -653,7 +653,7 @@ MASTEREOF;
 	foreach (explode(",", $ifaces) as $i => $iface) {
 		$real_ifaces[] = px_get_real_interface_address($iface);
 		if($real_ifaces[$i][0]) {
-			$postfix_master .=$real_ifaces[$i][0].":25	inet  n       -       n       -       1       smtpd\n\t-o user=postfix\n";
+			$postfix_master .=$real_ifaces[$i][0].":25	inet  n       -       n       -       -       smtpd\n";
 		}
 	}
 		
