@@ -174,7 +174,7 @@ function squid_resync_reverse() {
 					array_push($owa_dirs,'autodiscover');
 			if($settings['reverse_owa_webservice']){
 					array_push($owa_dirs,'EWS');
-					$conf .= "ignore_expect_100 on\n";
+					//$conf .= "ignore_expect_100 on\n"; Obsolete on 3.3
 					}
 			}
 		if (is_array($owa_dirs))

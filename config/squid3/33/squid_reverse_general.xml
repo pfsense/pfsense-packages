@@ -200,7 +200,10 @@
 		<field>
 			<fielddescr>Enable OWA reverse proxy</fielddescr>
 			<fieldname>reverse_owa</fieldname>
-			<description>If this field is checked, squid will act as an accelerator/ SSL offloader for Outlook Web App.</description>
+			<description><![CDATA[If this field is checked, squid will act as an accelerator/ SSL offloader for Outlook Web App.<br><br>
+			See also:<br>
+			<a target=_new href='http://support.microsoft.com/?scid=kb%3Ben-us%3B327800&x=17&y=16'>How to configure SSL Offloading for Outlook Web Access in Exchange 2000 Server and in Exchange Server 2003</a>
+			]]></description>
 			<type>checkbox</type>
 			<enablefields>reverse_owa_ip,reverse_owa_activesync,reverse_owa_rpchttp,reverse_owa_webservice,reverse_owa_autodiscover</enablefields>		
 		</field>
