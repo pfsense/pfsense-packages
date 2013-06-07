@@ -112,12 +112,14 @@ else
 /* alert file */
 if ($_POST["Submit"]) {
 
-	if ($_POST['ips_policy_enable'] == "on")
+	if ($_POST['ips_policy_enable'] == "on") {
 		$a_nat[$id]['ips_policy_enable'] = 'on';
-	else
+		$a_nat[$id]['ips_policy'] = $_POST['ips_policy'];
+	}
+	else {
 		$a_nat[$id]['ips_policy_enable'] = 'off';
-
-	$a_nat[$id]['ips_policy'] = $_POST['ips_policy'];
+		unset($a_nat[$id]['ips_policy']);
+	}
 
 	$enabled_items = "";
 	if (is_array($_POST['toenable']))
@@ -152,6 +154,15 @@ if ($_POST["Submit"]) {
 if ($_POST['unselectall']) {
 	$a_nat[$id]['rulesets'] = "";
 
+	if ($_POST['ips_policy_enable'] == "on") {
+		$a_nat[$id]['ips_policy_enable'] = 'on';
+		$a_nat[$id]['ips_policy'] = $_POST['ips_policy'];
+	}
+	else {
+		$a_nat[$id]['ips_policy_enable'] = 'off';
+		unset($a_nat[$id]['ips_policy']);
+	}
+
 	write_config();
 	sync_snort_package_config();
 
@@ -161,17 +172,29 @@ if ($_POST['unselectall']) {
 
 if ($_POST['selectall']) {
 	$rulesets = array();
+
+	if ($_POST['ips_policy_enable'] == "on") {
+		$a_nat[$id]['ips_policy_enable'] = 'on';
+		$a_nat[$id]['ips_policy'] = $_POST['ips_policy'];
+	}
+	else {
+		$a_nat[$id]['ips_policy_enable'] = 'off';
+		unset($a_nat[$id]['ips_policy']);
+	}
+
 	if ($emergingdownload == 'on') {
 		$files = glob("{$snortdir}/rules/emerging*.rules");
 		foreach ($files as $file)
 			$rulesets[] = basename($file);
 	}
 	if ($snortcommunitydownload == 'on') {
-		$files = glob("{$snortdir}/rules/sc_*.rules");
+		$files = glob("{$snortdir}/rules/*_community.rules");
 		foreach ($files as $file)
 			$rulesets[] = basename($file);
 	}
-	if ($snortdownload == 'on') {
+
+	/* Include the Snort VRT rules only if enabled and no IPS policy is set */
+	if ($snortdownload == 'on' && $a_nat[$id]['ips_policy_enable'] == 'off') {
 		$files = glob("{$snortdir}/rules/snort*.rules");
 		foreach ($files as $file)
 			$rulesets[] = basename($file);
@@ -210,49 +233,6 @@ if ($savemsg) {
 
 ?>
 
-<script language="javascript" type="text/javascript">
-function popup(url) 
-{
- params  = 'width='+screen.width;
- params += ', height='+screen.height;
- params += ', top=0, left=0'
- params += ', fullscreen=yes';
-
- newwin=window.open(url,'windowname4', params);
- if (window.focus) {newwin.focus()}
- return false;
-}
-
-function wopen(url, name, w, h)
-{
-// Fudge factors for window decoration space.
-// In my tests these work well on all platforms & browsers.
-w += 32;
-h += 96;
- var win = window.open(url,
-  name, 
-  'width=' + w + ', height=' + h + ', ' +
-  'location=no, menubar=no, ' +
-  'status=no, toolbar=no, scrollbars=yes, resizable=yes');
- win.resizeTo(w, h);
- win.focus();
-}
-
-function enable_change()
-{
- var endis = !(document.iform.ips_policy_enable.checked);
- document.iform.ips_policy.disabled=endis;
-
- for (var i = 0; i < document.iform.elements.length; i++) {
-    if (document.iform.elements[i].type == 'checkbox') {
-       var str = document.iform.elements[i].value;
-       if (str.substr(0,6) == "snort_")
-          document.iform.elements[i].disabled = !(endis);
-    }
- }
-}
-</script>
-
 <form action="snort_rulesets.php" method="post" name="iform" id="iform">
 <input type="hidden" name="id" id="id" value="<?=$id;?>" />
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
@@ -271,14 +251,14 @@ function enable_change()
 	echo '</td></tr>';
 	echo '<tr><td class="tabnavtbl">';
 	$menu_iface=($if_friendly?substr($if_friendly,0,5)." ":"Iface ");
-    $tab_array = array();
-    $tab_array[] = array($menu_iface . gettext("Settings"), false, "/snort/snort_interfaces_edit.php?id={$id}");
-    $tab_array[] = array($menu_iface . gettext("Categories"), true, "/snort/snort_rulesets.php?id={$id}");
-    $tab_array[] = array($menu_iface . gettext("Rules"), false, "/snort/snort_rules.php?id={$id}");
-    $tab_array[] = array($menu_iface . gettext("Variables"), false, "/snort/snort_define_servers.php?id={$id}");
-    $tab_array[] = array($menu_iface . gettext("Preprocessors"), false, "/snort/snort_preprocessors.php?id={$id}");
-    $tab_array[] = array($menu_iface . gettext("Barnyard2"), false, "/snort/snort_barnyard.php?id={$id}");
-    display_top_tabs($tab_array);
+	$tab_array = array();
+	$tab_array[] = array($menu_iface . gettext("Settings"), false, "/snort/snort_interfaces_edit.php?id={$id}");
+	$tab_array[] = array($menu_iface . gettext("Categories"), true, "/snort/snort_rulesets.php?id={$id}");
+	$tab_array[] = array($menu_iface . gettext("Rules"), false, "/snort/snort_rules.php?id={$id}");
+	$tab_array[] = array($menu_iface . gettext("Variables"), false, "/snort/snort_define_servers.php?id={$id}");
+	$tab_array[] = array($menu_iface . gettext("Preprocessors"), false, "/snort/snort_preprocessors.php?id={$id}");
+	$tab_array[] = array($menu_iface . gettext("Barnyard2"), false, "/snort/snort_barnyard.php?id={$id}");
+	display_top_tabs($tab_array);
 ?>
 </td></tr>
 <tr>
@@ -348,7 +328,7 @@ function enable_change()
 				</td>
 			</tr>
 			<tr>
-				<td colspan="6" class="listtopic"><?php echo gettext("Snort IPS Policy Selection"); ?><br/></td>
+				<td colspan="6" class="listtopic"><?php echo gettext("Snort IPS Policy selection"); ?><br/></td>
 			</tr>
 			<tr>
 				<td colspan="6" valign="center" class="listn">
@@ -389,7 +369,7 @@ function enable_change()
 				</td>
 			</tr>
 			<tr>
-				<td colspan="6" class="listtopic"><?php echo gettext("Select the rulesets you would like Snort to load at startup"); ?><br/></td>
+				<td colspan="6" class="listtopic"><?php echo gettext("Select the rulesets Snort will load at startup"); ?><br/></td>
 			</tr>
 			<tr>
 				<td colspan="6">
@@ -570,5 +550,38 @@ function enable_change()
 <?php
 include("fend.inc");
 ?>
+
+<script language="javascript" type="text/javascript">
+
+function wopen(url, name, w, h)
+{
+// Fudge factors for window decoration space.
+// In my tests these work well on all platforms & browsers.
+w += 32;
+h += 96;
+ var win = window.open(url,
+  name, 
+  'width=' + w + ', height=' + h + ', ' +
+  'location=no, menubar=no, ' +
+  'status=no, toolbar=no, scrollbars=yes, resizable=yes');
+ win.resizeTo(w, h);
+ win.focus();
+}
+
+function enable_change()
+{
+ var endis = !(document.iform.ips_policy_enable.checked);
+ document.iform.ips_policy.disabled=endis;
+
+ for (var i = 0; i < document.iform.elements.length; i++) {
+    if (document.iform.elements[i].type == 'checkbox') {
+       var str = document.iform.elements[i].value;
+       if (str.substr(0,6) == "snort_")
+          document.iform.elements[i].disabled = !(endis);
+    }
+ }
+}
+</script>
+
 </body>
 </html>

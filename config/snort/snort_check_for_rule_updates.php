@@ -41,6 +41,8 @@ $snortdir = SNORTDIR;
 $snortlibdir = SNORTLIBDIR;
 $snortlogdir = SNORTLOGDIR;
 
+/* Save the state of $pkg_interface so we can restore it */
+$pkg_interface_orig = $pkg_interface;
 if ($snort_gui_include)
 	$pkg_interface = "";
 else
@@ -739,5 +741,8 @@ if ($pkg_interface <> "console")
 log_error(gettext("[Snort] The Rules update has finished."));
 error_log(gettext("The Rules update has finished.  Time: " . date("Y-m-d H:i:s"). "\n\n"), 3, $snort_rules_upd_log);
 conf_mount_ro();
+
+/* Restore the state of $pkg_interface */
+$pkg_interface = $pkg_interface_orig;
 
 ?>
