@@ -297,7 +297,7 @@ include("head.inc");
 			<td class="listlr"><?php echo $log['lines']; ?></td>
 			<td colspan="2" class="listlr"><?php echo $log['detail']; ?></td>
 			<td valign="middle" nowrap class="list">
-				<a href="status_mail_report_add_cmd.php?reportid=<?php echo $id ;?>&id=<?=$i;?>"><img src="./themes/<?= $g['theme']; ?>/images/icons/icon_e.gif" width="17" height="17" border="0"></a>
+				<a href="status_mail_report_add_log.php?reportid=<?php echo $id ;?>&id=<?=$i;?>"><img src="./themes/<?= $g['theme']; ?>/images/icons/icon_e.gif" width="17" height="17" border="0"></a>
 				&nbsp;
 				<a href="status_mail_report_edit.php?act=del&id=<?php echo $id ;?>&logid=<?=$i;?>" onclick="return confirm('<?=gettext("Do you really want to delete this entry?");?>')"><img src="./themes/<?= $g['theme']; ?>/images/icons/icon_x.gif" width="17" height="17" border="0"></a>
 			</td>
