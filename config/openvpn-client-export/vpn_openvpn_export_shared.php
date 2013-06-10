@@ -3,7 +3,7 @@
 	vpn_openvpn_export.php
 
 	Copyright (C) 2008 Shrew Soft Inc.
-	Copyright (C) 2010 Ermal Luçi
+	Copyright (C) 2010 Ermal LuÃ§i
 	All rights reserved. 
 
 	Redistribution and use in source and binary forms, with or without
@@ -98,6 +98,7 @@ if(($act == "skconf") || ($act == "skzipconf")) {
 			$input_errors[] = "You need to specify a port for the proxy ip.";
 		} else
 			$proxy['port'] = $_GET['proxy_port'];
+		$proxy['proxy_type'] = $_GET['proxy_type'];
 		$proxy['proxy_authtype'] = $_GET['proxy_authtype'];
 		if ($_GET['proxy_authtype'] != "none") {
 			if (empty($_GET['proxy_user'])) {
@@ -193,6 +194,8 @@ function download_begin(act) {
 		if (document.getElementById("useproxypass").value != 'none')
 			useproxypass = 1;
 
+		var proxytype = document.getElementById("useproxytype").value;
+
 		var proxyauth = document.getElementById("useproxypass").value;
 		var proxyuser = document.getElementById("proxyuser").value;
 		var proxypass = document.getElementById("proxypass").value;
@@ -215,15 +218,16 @@ function download_begin(act) {
 
 	var dlurl;
 	dlurl  = "/vpn_openvpn_export_shared.php?act=" + act;
-	dlurl += "&amp;srvid=" + servers[index][0];
-	dlurl += "&amp;useaddr=" + useaddr;
+	dlurl += "&srvid=" + servers[index][0];
+	dlurl += "&useaddr=" + useaddr;
 	if (useproxy) {
-		dlurl += "&amp;proxy_addr=" + proxyaddr;
-		dlurl += "&amp;proxy_port=" + proxyport;
-		dlurl += "&amp;proxy_authtype=" + proxyauth;
+		dlurl += "&proxy_type=" + escape(proxytype);
+		dlurl += "&proxy_addr=" + proxyaddr;
+		dlurl += "&proxy_port=" + proxyport;
+		dlurl += "&proxy_authtype=" + proxyauth;
 		if (useproxypass) {
-			dlurl += "&amp;proxy_user=" + proxyuser;
-			dlurl += "&amp;proxy_password=" + proxypass;
+			dlurl += "&proxy_user=" + proxyuser;
+			dlurl += "&proxy_password=" + proxypass;
 		}
 	}
 
@@ -263,7 +267,7 @@ function useaddr_changed(obj) {
 function useproxy_changed(obj) {
 
 	if ((obj.id == "useproxy" && obj.checked) ||
-		$(obj.id + 'pass').value != 'none') {
+		(obj.id == "useproxypass" && (obj.value != 'none'))) {
 		$(obj.id + '_opts').show();
 	} else {
 		$(obj.id + '_opts').hide();
@@ -324,7 +328,7 @@ function useproxy_changed(obj) {
 										</select>
 										<br />
 										<div style="display:none;" id="HostName">
-											<input name="useaddr_hostname" id="useaddr_hostname" />
+											<input name="useaddr_hostname" id="useaddr_hostname" size="40" />
 											<span class="vexpl">
 												Enter the hostname or IP address the client will use to connect to this server.
 											</span>
@@ -335,7 +339,7 @@ function useproxy_changed(obj) {
 						</td>
 					</tr>
 					<tr>
-						<td width="22%" valign="top" class="vncell">Use HTTP Proxy</td>
+						<td width="22%" valign="top" class="vncell">Use Proxy</td>
 						<td width="78%" class="vtable">
 							 <table border="0" cellpadding="2" cellspacing="0" summary="http proxy">
 								<tr>
@@ -345,7 +349,7 @@ function useproxy_changed(obj) {
 									</td>
 									<td>
 										<span class="vexpl">
-											Use HTTP proxy to communicate with the server.
+											Use proxy to communicate with the server.
 										</span>
 									</td>
 								</tr>
@@ -354,11 +358,24 @@ function useproxy_changed(obj) {
 								<tr>
 									<td align="right" width="25%">
 										<span class="vexpl">
+											 &nbsp;     Type :&nbsp;
+										</span>
+									</td>
+									<td>
+										<select name="useproxytype" id="useproxytype" class="formselect">
+											<option value="http">HTTP</option>
+											<option value="socks">Socks</option>
+										</select>
+									</td>
+								</tr>
+								<tr>
+									<td align="right" width="25%">
+										<span class="vexpl">
 											 &nbsp;     IP Address :&nbsp;
 										</span>
 									</td>
 									<td>
-										<input name="proxyaddr" id="proxyaddr" class="formfld unknown" size="20" value="" />
+										<input name="proxyaddr" id="proxyaddr" class="formfld unknown" size="30" value="" />
 									</td>
 								</tr>
 								<tr>
@@ -382,7 +399,7 @@ function useproxy_changed(obj) {
 											<option value="ntlm">ntlm</option>
 										</select>
 										<span class="vexpl">
-											Choose HTTP proxy authentication if any.
+											Choose proxy authentication if any.
 										</span>
 							<br />
 							<table border="0" cellpadding="2" cellspacing="0" id="useproxypass_opts" style="display:none" summary="name and password">
