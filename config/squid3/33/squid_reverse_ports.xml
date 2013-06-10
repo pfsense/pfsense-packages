@@ -7,8 +7,9 @@
 /* $Id$ */
 /* ========================================================================== */
 /*
-    squid_reverse_general.xml
+    squid_upstream.xml
     part of pfSense (http://www.pfSense.com)
+    Copyright (C) 2007 to whom it may belong
     Copyright (C) 2012 Marcello Coutinho
     All rights reserved.
 
@@ -45,18 +46,19 @@
     <description>Describe your package here</description>
     <requirements>Describe your package requirements here</requirements>
     <faq>Currently there are no FAQ items provided.</faq>
-	<name>squidreverseuri</name>
+	<name>squidports</name>
 	<version>none</version>
-	<title>Reverse Proxy server: Mappings</title>
+	<title>Proxy server: Remote proxy settings</title>		
 	<include_file>/usr/local/pkg/squid.inc</include_file>
 	<tabs>
-	<tab>
-		<text>General</text>
+		<tab>
+			<text>General</text>
 			<url>/pkg_edit.php?xml=squid_reverse_general.xml&amp;id=0</url>
 		</tab>
 		<tab>
 			<text>Additional ports</text>
 			<url>/pkg.php?xml=squid_reverse_ports.xml&amp;id=0</url>
+			<active/>
 		</tab>
 		<tab>
 			<text>Web Servers</text>
@@ -65,7 +67,6 @@
 		<tab>
 			<text>Mappings</text>
 			<url>/pkg.php?xml=squid_reverse_uri.xml</url>
-			<active/>
 		</tab>
 		<tab>
 			<text>Redirects</text>
@@ -82,81 +83,102 @@
 	</tabs>
 	<adddeleteeditpagefields>
 		<columnitem>
-			<fielddescr>Status</fielddescr>
+			<fielddescr>Enabled</fielddescr>
 			<fieldname>enable</fieldname>
 		</columnitem>
 		<columnitem>
-			<fielddescr>Group Name</fielddescr>
-			<fieldname>name</fieldname>
+			<fielddescr>SSL</fielddescr>
+			<fieldname>enablessl</fieldname>
 		</columnitem>
 		<columnitem>
-			<fielddescr>Peers</fielddescr>
-			<fieldname>peers</fieldname>
+			<fielddescr>Port</fielddescr>
+			<fieldname>port</fieldname>
 		</columnitem>
-		<columnitem>
-			<fielddescr>Description</fielddescr>
-			<fieldname>description</fieldname>
-		</columnitem>	
 	</adddeleteeditpagefields>
+	
 	<fields>
-			<field>
-			<name>Squid Reverse Peer Mappings</name>
-			<type>listtopic</type>
-		</field>
-			<field>
-			<fielddescr>Enable this URI</fielddescr>
+		<field>
+			<fielddescr>Enable port</fielddescr>
 			<fieldname>enable</fieldname>
-			<description><![CDATA[If this field is checked, then this URI(Uniform Resource Name) will be available for reverse config.]]></description>
+			<description>If this field is checked, the proxy-server will act in HTTPS reverse mode. &lt;br&gt;(You have to add a rule with destination "WAN-address")</description>
 			<type>checkbox</type>
+			<enablefields>port,reverse_defsite,reverse_ssl_cert,reverse_int_ca,reverse_ignore_ssl_valid</enablefields>
+			<required/>
+			<default_value>off</default_value>
 		</field>
 		<field>
-			<fielddescr>Group name</fielddescr>
-			<fieldname>name</fieldname>
-			<description><![CDATA[Name to identify this URI on squid reverse conf<br>
-						example: URI1]]></description>
+			<fielddescr>Enable SSL</fielddescr>
+			<fieldname>enablessl</fieldname>
+			<description>If this field is checked https is used for this port.</description>
+			<type>checkbox</type>
+			<enablefields>reverse_ssl_cert,reverse_int_ca,reverse_ignore_ssl_valid</enablefields>
+			<default_value>off</default_value>
+		</field>
+		<field>
+			<fielddescr>Port</fielddescr>
+			<fieldname>port</fieldname>
+			<description>This is the port the reverse-proxy will listen on. (Add this port also in the ACL config under 'acl safeports'')</description>
 			<type>input</type>
-			<size>20</size>
+			<size>5</size>
+			<default_value>443</default_value>
 		</field>
 		<field>
-			<fielddescr>Group Description</fielddescr>
-			<fieldname>description</fieldname>
-			<description><![CDATA[URI Group Description (optional)]]></description>
+			<fielddescr>Reverse default site</fielddescr>
+			<fieldname>reverse_defsite</fieldname>
+			<description>This is the reverse default site. (leave empty to use the external fqdn)</description>
 			<type>input</type>
 			<size>60</size>
 		</field>
 		<field>
-			<fielddescr>Peers</fielddescr>
-			<fieldname>peers</fieldname>
-			<description><![CDATA[Apply this Group Mappings to selected Peers<br>
-							Use CTRL + click to select.]]></description>
-	    	<type>select_source</type>
-			<source><![CDATA[$config['installedpackages']['squidreversepeer']['config']]]></source>
-			<source_name>name</source_name>
-			<source_value>name</source_value>
-			<multiple/>
-			<size>05</size>
+			<fielddescr>reverse SSL certificate</fielddescr>
+			<fieldname>reverse_ssl_cert</fieldname>
+			<description>Choose the SSL Server Certificate here.</description>
+	    		<type>select_source</type>
+			<source><![CDATA[$config['cert']]]></source>
+			<source_name>descr</source_name>
+			<source_value>refid</source_value>
 		</field>
-	<field>
-			<fielddescr><![CDATA[URIs]]></fielddescr>
-			<fieldname>none</fieldname>
-			<description><![CDATA[URI to publish]]></description>
-			<type>rowhelper</type>
-			<rowhelper>
-				<rowhelperfield>
-				<fielddescr><![CDATA[<strong>Url regex to match</strong><br><br>
-									Samples: .mydomain.com .mydomain.com/test<br>
-									www.mydomain.com http://www.mydomain.com/ ^http://www.mydomain.com/.*$]]></fielddescr>
-				<fieldname>uri</fieldname>
-				<type>input</type>
-				<size>70</size>
-			</rowhelperfield>
-			</rowhelper>
-		</field>		
+		<field>
+			<fielddescr>Enable client CA certificate</fielddescr>
+			<fieldname>enable_client_ca</fieldname>
+			<description>If this field is checked clients need an client certificate to authenticate.</description>
+			<type>checkbox</type>
+			<enablefields>client_ca</enablefields>
+			<default_value>off</default_value>
+		</field>
+		<field>
+			<fielddescr>client CA certificate</fielddescr>
+			<fieldname>client_ca</fieldname>
+			<description>Choose the client CA SSL Certificate here.</description>
+	    		<type>select_source</type>
+			<source><![CDATA[$config['ca']]]></source>
+			<source_name>descr</source_name>
+			<source_value>refid</source_value>
+		</field>
+		<field>
+			<fielddescr>SSL context</fielddescr>
+			<fieldname>ssl_context</fieldname>
+			<description>Sets the SSL context (e.g. 'id')</description>
+			<type>input</type>
+			<size>60</size>
+		</field>
+		<field>
+			<fielddescr>intermediate CA certificate (if needed)</fielddescr>
+			<fieldname>reverse_int_ca</fieldname>
+			<description>Paste a signed certificate in X.509 PEM format here.</description>
+			<type>textarea</type>
+			<cols>50</cols>
+			<rows>5</rows>
+			<encoding>base64</encoding>
+		</field>
+		<field>
+			<fielddescr>Ignore internal Certificate validation</fielddescr>
+			<fieldname>reverse_ignore_ssl_valid</fieldname>
+			<description>If this field is checked, internal certificate validation will be ignored.</description>
+			<type>checkbox</type>  
+			<default_value>on</default_value>
+		</field>
 	</fields>
-	<custom_php_command_before_form>
-	</custom_php_command_before_form>
-	<custom_php_validation_command>
-	</custom_php_validation_command>
 	<custom_php_resync_config_command>
 		squid_resync();
 	</custom_php_resync_config_command>
