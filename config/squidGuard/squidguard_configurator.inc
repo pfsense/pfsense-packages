@@ -244,6 +244,12 @@ define('F_SQUIDGUARD',          'squidGuard');
 define('F_LOGDIR',              'logdir');
 define('F_DBHOME',              'dbhome');
 define('F_WORKDIR',             'workdir');
+define('F_LDAPENABLE',          'ldap_enable');
+define('F_LDAPBINDDN',          'ldapbinddn');
+define('F_LDAPBINDPASS',        'ldapbindpass');
+define('F_LDAPVERSION',         'ldapversion');
+define('F_STRIPNTDOMAIN',       'stripntdomain');
+define('F_STRIPREALM',          'striprealm');
 define('F_BINPATH',             'binpath');
 define('F_PROCCESSCOUNT',       'process_count');
 define('F_SQUIDCONFIGFILE',     'squid_configfile');
@@ -331,6 +337,7 @@ function sg_init($init = '')
         $squidguard_config[F_BINPATH]         = SQUIDGUARD_BINPATH;
         $squidguard_config[F_SQUIDCONFIGFILE] = SQUID_CONFIGFILE;
         $squidguard_config[F_PROCCESSCOUNT]   = REDIRECTOR_PROCESS_COUNT;
+        
     } else {
         # copy config from $init
         foreach($init as $key => $in)
@@ -848,6 +855,15 @@ function sg_create_config()
     $sgconf[] = CONFIG_SG_HEADER;
     $sgconf[] = "logdir {$squidguard_config[F_LOGDIR]}";
     $sgconf[] = "dbhome {$squidguard_config[F_DBHOME]}";
+    if ( $squidguard_config[F_LDAPENABLE] == 'on' ) {
+        $sgconf[] = "ldapbinddn {$squidguard_config[F_LDAPBINDDN]}";
+        $sgconf[] = "ldapbindpass {$squidguard_config[F_LDAPBINDPASS]}";
+        $sgconf[] = "ldapprotover {$squidguard_config[F_LDAPVERSION]}";
+        if ( $squidguard_config[F_STRIPNTDOMAIN] )
+            $sgconf[] = "stripntdomain true";
+        if ( $squidguard_config[F_STRIPREALM] )
+            $sgconf[] = "striprealm true";
+    }
 
     # --- Times ---
     if ($squidguard_config[F_TIMES]) {
@@ -879,13 +895,17 @@ function sg_create_config()
             $sg_tag->set("src", $src[F_NAME], "", $src[F_DESCRIPTION]);
 
             # separate IP, domains, usernames
-            $tsrc = explode(" ", trim($src[F_SOURCE]));
-            foreach($tsrc as $sr) {
-                    $sr = trim($sr);
-                    if     (empty($sr))           continue;
-                    if     (is_ipaddr_valid($sr)) $sg_tag->items[] = "ip     $sr";
-                    elseif (is_domain_valid($sr)) $sg_tag->items[] = "domain $sr";
-                    elseif (is_username($sr))     $sg_tag->items[] = "user   " . str_replace("'", "", $sr);
+            if (strpos(trim($src[F_SOURCE]), 'ldapusersearch') === false) {
+                $tsrc = explode(" ", trim($src[F_SOURCE]));
+                foreach($tsrc as $sr) {
+                        $sr = trim($sr);
+                        if     (empty($sr))           continue;
+                        if     (is_ipaddr_valid($sr)) $sg_tag->items[] = "ip     $sr";
+                        elseif (is_domain_valid($sr)) $sg_tag->items[] = "domain $sr";
+                        elseif (is_username($sr))     $sg_tag->items[] = "user   " . str_replace("'", "", $sr);
+                }
+            } else {
+                $sg_tag->items[] = trim($src[F_SOURCE]);
             }
 
             if ($squidguard_config[F_ENABLELOG] == 'on' ) {
@@ -1172,6 +1192,16 @@ function sg_create_simple_config($blk_dbhome, $blk_destlist, $redirect_to = "404
     # init section
     $sgconf[] = "logdir $logdir";
     $sgconf[] = "dbhome $dbhome";
+    if ( $squidguard_config[F_LDAPENABLE] == 'on' ) {
+        $sgconf[] = "ldapbinddn {$squidguard_config[F_LDAPBINDDN]}";
+        $sgconf[] = "ldapbindpass {$squidguard_config[F_LDAPBINDPASS]}";
+        $sgconf[] = "ldapprotover {$squidguard_config[F_LDAPVERSION]}";
+        if ( $squidguard_config[F_STRIPNTDOMAIN] )
+            $sgconf[] = "stripntdomain true";
+        if ( $squidguard_config[F_STRIPREALM] )
+            $sgconf[] = "striprealm true";
+    }
+
     $sgconf[] = "";
 
     # destination section
@@ -1755,11 +1785,13 @@ function sg_check_src($sgx, $input_errors)
 
     # source may be as one ('source') field or as two ('ip' and 'domain') fields
     $src = (isset($sgx[F_SOURCE])) ? $sgx[F_SOURCE] : $sgx[F_IP] . " " . $sgx[F_DOMAINS];
-    $src = explode(" ", $src);
-    foreach ($src as $s_item) {
-        if ($s_item) {
-            if (!is_ipaddr_valid($s_item) and !is_domain_valid($s_item) and !is_username($s_item))
-                $elog[] = "SRC '{$sgx[F_NAME]}': Item '$s_item' is not a ip address or a domain or a 'username'.";
+    if (strpos($sgx[F_SOURCE], 'ldapusersearch') === false) {
+        $src = explode(" ", $src);
+        foreach ($src as $s_item) {
+                if ($s_item) {
+                        if (!is_ipaddr_valid($s_item) and !is_domain_valid($s_item) and !is_username($s_item) and (strpos($s_item, 'ldapusersearch') !== false))
+                                $elog[] = "SRC '{$sgx[F_NAME]}': Item '$s_item' is not a ip address or a domain or a 'username'.";
+                }
         }
     }
 

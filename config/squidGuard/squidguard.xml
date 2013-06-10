@@ -122,7 +122,61 @@
                         <description><![CDATA[Check this option to enable squidGuard]]></description>
                         <type>checkbox</type>
                 </field>
-				<field>
+                <field>
+                        <name>LDAP Options</name>
+                        <type>listtopic</type>
+                </field>
+                <field>
+                        <fielddescr>Enable LDAP Filter</fielddescr>
+                        <fieldname>ldap_enable</fieldname>
+                        <description><![CDATA[Enable options for setup ldap connection to create filters with ldap search]]></description>
+                        <type>checkbox</type>
+                        <enablefields>ldapbinddn,ldapbindpass,stripntdomain,striprealm,ldapversion</enablefields>
+                </field>
+                <field>
+                        <fielddescr>LDAP DN</fielddescr>
+                        <fieldname>ldapbinddn</fieldname>
+                        <description><![CDATA[Configure your LDAP DN (ex: cn=Administrator,cn=Users,dc=domain)]]></description>
+                        <type>input</type>
+                        <size>60</size>
+                </field>
+                <field>
+                        <fielddescr>LDAP DN Password</fielddescr>
+                        <fieldname>ldapbindpass</fieldname>
+                        <description><![CDATA[Password must be initialize with letters (Ex: Change123), valid format: [a-zA-Z\/][a-zA-Z0-9/_\-\.\/\:\%\+\?=&]]]></description>
+                        <type>password</type>
+                </field>
+                <field>
+                        <fielddescr>Strip NT domain name</fielddescr>
+                        <fieldname>stripntdomain</fieldname>
+                        <description><![CDATA[Strip NT domain name component from user names (/ or \ separated).]]></description>
+                        <type>checkbox</type>
+                        <default_value>on</default_value>
+                </field>
+                <field>
+                        <fielddescr>Strip Kerberos Realm</fielddescr>
+                        <fieldname>striprealm</fieldname>
+                        <description><![CDATA[Strip Kerberos Realm component from user names (@ separated).]]></description>
+                        <type>checkbox</type>
+                        <default_value>on</default_value>
+                </field>
+                <field>
+                        <fielddescr>LDAP Version</fielddescr>
+                        <fieldname>ldapversion</fieldname>
+                        <type>select</type>
+                        <default_value>3</default_value>
+                        <options>
+                                <option>
+                                        <name>Version 2</name>
+                                        <value>2</value>
+                                </option>
+                                <option>
+                                        <name>Version 3</name>
+                                        <value>3</value>
+                                </option>
+                        </options>
+                </field>
+                <field>
                         <name>Logging options</name>
                         <type>listtopic</type>
                 </field>
@@ -144,7 +198,7 @@
                         <description><![CDATA[Check this option to rotate the logs every day. This is recommended if you enable any kind of logging to limit file size and do not run out of disk space.]]></description>
                         <type>checkbox</type>
                 </field>
-				<field>
+		<field>
                         <name>Miscellaneous</name>
                         <type>listtopic</type>
                 </field>

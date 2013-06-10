@@ -979,6 +979,12 @@ function convert_pfxml_to_sgxml() {
 
     $sgxml[F_LOGDIR]           = SQUIDGUARD_LOGDIR;
     $sgxml[F_DBHOME]           = SQUIDGUARD_DBHOME;
+    $sgxml[F_LDAPENABLE]       = $pfxml['ldap_enable'];
+    $sgxml[F_LDAPBINDDN]       = $pfxml['ldapbinddn'];
+    $sgxml[F_LDAPBINDPASS]     = $pfxml['ldapbindpass'];
+    $sgxml[F_LDAPVERSION]      = $pfxml['ldapversion'];
+    $sgxml[F_STRIPNTDOMAIN]    = $pfxml['stripntdomain'];
+    $sgxml[F_STRIPREALM]       = $pfxml['striprealm'];
     $sgxml[F_BINPATH]          = SQUIDGUARD_BINPATH;
     $sgxml[F_WORKDIR]          = SQUIDGUARD_WORKDIR;
     $sgxml[F_SGCONF_XML]       = SQUIDGUARD_WORKDIR . SQUIDGUARD_CONFXML;
