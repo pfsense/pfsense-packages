@@ -1628,7 +1628,7 @@
 			<ports_before>net-mgmt/nagios-plugins</ports_before>
 			<port>net-mgmt/nrpe2</port>
 		</build_pbi>
-		<build_options>nrpe2_UNSET=SSL;nrpe2_SET=ARGS</build_options>
+		<build_options>nrpe2_SET=SSL;nrpe2_UNSET=ARGS</build_options>
 		<config_file>http://www.pfsense.com/packages/config/nrpe2/nrpe2.xml</config_file>
 		<version>2.12_3 v2.1</version>
 		<status>Beta</status>
