@@ -378,7 +378,7 @@ function quagga_ospfd_put_raw_config($conffile) {
 }
 
 function quagga_get_carp_status_by_ip($ipaddr) {
-	$iface = find_carp_interface($ipaddr);
+	$iface = trim(find_carp_interface($ipaddr));
 	if ($iface) {
 		$status = get_carp_interface_status($iface);
 		// If there is no status for that interface, return null.
