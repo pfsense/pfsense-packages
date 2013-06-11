@@ -248,7 +248,7 @@ function quagga_ospfd_install_conf() {
 		$carpcheckinterface = trim(find_carp_interface($ospfd_conf['carpstatusip']));
 		$carp_ip_status_check = <<<EOF
 
-CARP_STATUS=`/sbin/ifconfig ${carpcheckinterface} | /usr/bin/grep carp: | /usr/bin/awk '{print $2;}'`
+CARP_STATUS=`/sbin/ifconfig ${carpcheckinterface} | /usr/bin/grep carp: | /usr/bin/awk '{print \$2;}'`
 if [ \${CARP_STATUS} != "MASTER" ]; then
 	exit;
 fi
