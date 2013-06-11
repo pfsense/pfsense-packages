@@ -243,6 +243,18 @@ function quagga_ospfd_install_conf() {
 	fwrite($fd, $zebraconffile);
 	fclose($fd);
 
+	$carp_ip_status_check = "";
+	if (is_ipaddr($ospfd_conf['carpstatusip'])) {
+		$carpcheckinterface = trim(find_carp_interface($ospfd_conf['carpstatusip']));
+		$carp_ip_status_check = <<<EOF
+CARP_STATUS=`/sbin/ifconfig ${carpcheckinterface} | /usr/bin/grep carp: | /usr/bin/awk '{print $2;}'`
+if [ \${CARP_STATUS} != "MASTER" ]; then
+	exit;
+fi
+EOF;
+	}
+
+
 	// Create rc.d file
 	$rc_file_stop = <<<EOF
 if [ -e /var/run/quagga/zebra.pid ]; then
@@ -274,6 +286,7 @@ fi
 killall -9 zebra 2>/dev/null
 killall -9 ospfd 2>/dev/null
 sleep 1
+{$carp_ip_status_check}
 /usr/local/sbin/zebra -d -f {$quagga_config_base}/zebra.conf
 /usr/local/sbin/ospfd -d -f {$quagga_config_base}/ospfd.conf
 EOF;
