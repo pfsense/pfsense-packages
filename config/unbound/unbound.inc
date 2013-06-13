@@ -275,12 +275,14 @@ function unbound_get_network_interface_addresses() {
 								log_error("Unbound DNS: There was a problem setting up the Virtual IP for the interface ".link_ip_to_carp_interface($vip['subnet']));
 							} else {
 								$unbound_interfaces[$i]['virtual']['ipaddr'] = $virtual_ip;
+								$unbound_interfaces[$i]['virtual']['subnet'] = $vip['subnet_bits'];
+								$unbound_interfaces[$i]['virtual']['network'] = $virtual_ip;
 							}
 						}
 					}
 				}
 			}
-		} else if(isset($interfaces[$unboundif]['ipaddr'])) {
+		} else if (isset($interfaces[$unboundif]['ipaddr'])) {
 			/* Find the interface IP address for
 			 * XXX - this only works for IPv4 currently - the pfSense module needs IPv6 love
 			 */
@@ -378,7 +380,7 @@ function unbound_acls_config() {
 	global $config;
 
 	/* Configure the ACLs */
-	if(is_array($config['installedpackages']['unboundacls']['config'])) {
+	if (is_array($config['installedpackages']['unboundacls']['config'])) {
 		$unbound_acls = $config['installedpackages']['unboundacls']['config'];
 		$unboundcfg = "";
 		foreach($unbound_acls as $unbound_acl){
@@ -409,9 +411,9 @@ function unbound_resync_config() {
 	$unbound_allowed_networks = "";
 	$unboundnetcfg = unbound_get_network_interface_addresses();
 	foreach($unboundnetcfg as $netent) {
-		foreach($netent as $entry) {
+		foreach($netent as $nettype => $entry) {
 			$unbound_bind_interfaces .="interface: {$entry['ipaddr']}\n";
-			if($entry['ipaddr'] != "127.0.0.1" && $entry['ipaddr'] != "::1")
+			if($entry['ipaddr'] != "127.0.0.1" && $entry['ipaddr'] != "::1" && $nettype != "virtual")
 				$unbound_allowed_networks .= "access-control: {$entry['network']}/{$entry['subnet']} allow\n";
 		}
 	}
