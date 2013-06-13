@@ -487,7 +487,7 @@ EOF;
 	$outgoing_num_tcp = (!empty($unbound_config['outgoing_num_tcp'])) ? $unbound_config['outgoing_num_tcp'] : "10";
 	$incoming_num_tcp = (!empty($unbound_config['incoming_num_tcp'])) ? $unbound_config['incoming_num_tcp'] : "10";
 	$edns_buffer_size = (!empty($unbound_config['edns_buffer_size'])) ? $unbound_config['edns_buffer_size'] : "4096";
-	$num_queries_per_thread = (!empty($unbound_config['num_queries_per_thread'])) ? $unbound_config['num_queries_per_thread'] : "1024";
+	$num_queries_per_thread = (!empty($unbound_config['num_queries_per_thread'])) ? $unbound_config['num_queries_per_thread'] : "4096";
 	$jostle_timeout = (!empty($unbound_config['jostle_timeout'])) ? $unbound_config['jostle_timeout'] : "200";
 	$cache_max_ttl = (!empty($unbound_config['cache_max_ttl'])) ? $unbound_config['cache_max_ttl'] : "86400";
 	$cache_min_ttl = (!empty($unbound_config['cache_min_ttl'])) ? $unbound_config['cache_min_ttl'] : "0";
@@ -545,7 +545,7 @@ harden-dnssec-stripped: {$harden_dnssec_stripped}
 {$optimization['key_cache_slabs']}
 {$optimization['msg_cache_size']}
 {$optimization['rrset_cache_size']}
-{$optimization['outgoing_range']}
+outgoing-range: 8192
 {$optimization['so_rcvbuf']}
 
 # Interface IP(s) to bind to
@@ -643,14 +643,6 @@ function unbound_optimization() {
 	} else {
 		$optimization['msg_cache_size'] = "msg-cache-size: 4m";
 		$optimization['rrset_cache_size'] = "rrset-cache-size: 8m";
-	}
-
-	// More outgoing connections per thread otherwise assign a default of 4096 for a single thread
-	if($numprocs > 0) {
-		$or = (1024/$numprocs) - 50;
-		$optimization['outgoing_range'] = "outgoing-range: {$or}";
-	} else {
-		$optimization['outgoing_range'] = "outgoing-range: {4096}";
 	}
 
 	// Larger socket buffer for busy servers
