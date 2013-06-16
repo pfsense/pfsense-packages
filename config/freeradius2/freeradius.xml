@@ -275,7 +275,7 @@
 			
 									1. Write down the first 9 digits of the Epoch-Time on the client.<br>
 									2. Check with <b>date +%s</b> the Epoch-Time on your FreeRADIUS server and write down the first 9 digits.<br>
-									3. Subtract both values, multiply the result with 10 and enter the value in this field. (Default: 0)]]></description>
+									3. Subtract both values, multiply the result with 10 and enter the value in this field. Example: 30 or -180 (Default: 0)]]></description>
 			<type>input</type>
 			<default_value>0</default_value>
 		</field>
