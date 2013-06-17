@@ -1820,12 +1820,12 @@
 		<descr>tinc is a Virtual Private Network (VPN) daemon that uses tunnelling and encryption to create a secure private mesh network between hosts on the Internet.</descr>
 		<category>Network Management</category>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
-		<depends_on_package_pbi>tinc-1.0.19-amd64.pbi</depends_on_package_pbi>
+		<depends_on_package_pbi>tinc-1.0.21-amd64.pbi</depends_on_package_pbi>
 		<build_pbi>
 			<port>security/tinc</port>
 		</build_pbi>
 		<build_options></build_options>
-		<version>1.0.19</version>
+		<version>1.0.21</version>
 		<status>ALPHA</status>
 		<pkginfolink>http://doc.pfsense.org/index.php/tinc_package</pkginfolink>
 		<required_version>2.1</required_version>
