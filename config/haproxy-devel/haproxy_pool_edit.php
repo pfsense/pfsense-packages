@@ -491,7 +491,7 @@ foreach($simplefields as $field){
 				</table>
 			</td>
 		</tr>
-		<tr align="left" style="display:none;">
+		<tr align="left">
 			<td width="22%" valign="top" class="vncell">Transparent ClientIP</td>
 			<td width="78%" class="vtable" colspan="2">
 				<input id="transparent_clientip" name="transparent_clientip" type="checkbox" value="yes" <?php if ($pconfig['transparent_clientip']=='yes') echo "checked"; ?> onclick='updatevisibility();'>

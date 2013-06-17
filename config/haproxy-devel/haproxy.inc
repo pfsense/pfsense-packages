@@ -934,6 +934,8 @@ function haproxy_check_run($reload) {
 
 	if(use_transparent_clientip_proxying())
 		load_ipfw_rules();
+	else
+		mwexec("/usr/local/sbin/ipfw_context -d haproxy", true);
 	
 	if(isset($a_global['enable'])) {
 		if (isset($a_global['carpdev'])) {
