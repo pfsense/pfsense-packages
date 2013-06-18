@@ -49,15 +49,22 @@ $pconfig['rm_blocked'] = $config['installedpackages']['snortglobal']['rm_blocked
 $pconfig['snortloglimit'] = $config['installedpackages']['snortglobal']['snortloglimit'];
 $pconfig['snortloglimitsize'] = $config['installedpackages']['snortglobal']['snortloglimitsize'];
 $pconfig['autorulesupdate7'] = $config['installedpackages']['snortglobal']['autorulesupdate7'];
+$pconfig['rule_update_starttime'] = $config['installedpackages']['snortglobal']['rule_update_starttime'];
 $pconfig['forcekeepsettings'] = $config['installedpackages']['snortglobal']['forcekeepsettings'];
 $pconfig['snortcommunityrules'] = $config['installedpackages']['snortglobal']['snortcommunityrules'];
 
 if (empty($pconfig['snortloglimit']))
 	$pconfig['snortloglimit'] = 'on';
+if (empty($pconfig['rule_update_starttime']))
+	$pconfig['rule_update_starttime'] = '00:03';
+
+if ($_POST['rule_update_starttime']) {
+	if (!preg_match('/^([01]?[0-9]|2[0-3]):?([0-5][0-9])$/', $_POST['rule_update_starttime']))
+		$input_errors[] = "Invalid Rule Update Start Time!  Please supply a value in 24-hour format as 'HH:MM'.";
+}
 
 /* if no errors move foward */
 if (!$input_errors) {
-
 	if ($_POST["Submit"]) {
 
 		$config['installedpackages']['snortglobal']['snortdownload'] = $_POST['snortdownload'];
@@ -77,6 +84,14 @@ if (!$input_errors) {
 			$config['installedpackages']['snortglobal']['snortloglimitsize'] = $snortloglimitDSKsize;
 		}
 		$config['installedpackages']['snortglobal']['autorulesupdate7'] = $_POST['autorulesupdate7'];
+
+		/* Check and adjust format of Rule Update Starttime string to add colon and leading zero if necessary */
+		$pos = strpos($_POST['rule_update_starttime'], ":");
+		if ($pos === false) {
+			$tmp = str_pad($_POST['rule_update_starttime'], 4, "0", STR_PAD_LEFT);
+			$_POST['rule_update_starttime'] = substr($tmp, 0, 2) . ":" . substr($tmp, -2);
+		}
+		$config['installedpackages']['snortglobal']['rule_update_starttime'] = str_pad($_POST['rule_update_starttime'], 4, "0", STR_PAD_LEFT);
 		$config['installedpackages']['snortglobal']['forcekeepsettings'] = $_POST['forcekeepsettings'] ? 'on' : 'off';
 
 		$retval = 0;
@@ -116,20 +131,6 @@ if ($input_errors)
 
 ?>
 
-<script language="JavaScript">
-<!--
-function enable_snort_vrt(btn) {
-	if (btn == 'off') {
-		document.iform.oinkmastercode.disabled = "true";
-	}
-	if (btn == 'on') {
-		document.iform.oinkmastercode.disabled = "";
-	}	
-}
-//-->
-</script>
-
-
 <form action="snort_interfaces_global.php" method="post" enctype="multipart/form-data" name="iform" id="iform">
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
 <tr><td>
@@ -154,6 +155,7 @@ function enable_snort_vrt(btn) {
 	<td colspan="2" valign="top" class="listtopic"><?php echo gettext("Please Choose The " .
 		"Type Of Rules You Wish To Download"); ?></td>
 </tr>
+<tr>
 	<td width="22%" valign="top" class="vncell"><?php printf(gettext("Install %sSnort VRT%s rules"), '<strong>' , '</strong>'); ?></td>
 	<td width="78%" class="vtable">
 		<table width="100%" border="0" cellpadding="2" cellspacing="0">
@@ -181,7 +183,7 @@ function enable_snort_vrt(btn) {
 			<td colspan="2" valign="top"><b><span class="vexpl"><?php echo gettext("Oinkmaster Configuration"); ?></span></b></td>
 		</tr>
 		<tr>
-			<td valign="top"><span class="vexpl"><strong><?php echo gettext("Code"); ?><strong></span</td>
+			<td valign="top"><span class="vexpl"><strong><?php echo gettext("Code"); ?></strong></span></td>
 			<td><input name="oinkmastercode" type="text"
 				class="formfld" id="oinkmastercode" size="52"
 				value="<?=htmlspecialchars($pconfig['oinkmastercode']);?>" 
@@ -218,11 +220,14 @@ function enable_snort_vrt(btn) {
 		</table>
 	</td>
 </tr>
+
 <tr>
-	<td width="22%" valign="top" class="vncell"><?php echo gettext("Update rules " .
-	"automatically"); ?></td>
+	<td colspan="2" valign="top" class="listtopic"><?php echo gettext("Rules Update Settings"); ?></td>
+</tr>
+<tr>
+	<td width="22%" valign="top" class="vncell"><?php echo gettext("Update Interval"); ?></td>
 	<td width="78%" class="vtable">
-		<select name="autorulesupdate7" class="formselect" id="autorulesupdate7">
+		<select name="autorulesupdate7" class="formselect" id="autorulesupdate7" onchange="enable_change_rules_upd()">
 		<?php
 		$interfaces3 = array('never_up' => gettext('NEVER'), '6h_up' => gettext('6 HOURS'), '12h_up' => gettext('12 HOURS'), '1d_up' => gettext('1 DAY'), '4d_up' => gettext('4 DAYS'), '7d_up' => gettext('7 DAYS'), '28d_up' => gettext('28 DAYS'));
 		foreach ($interfaces3 as $iface3 => $ifacename3): ?>
@@ -230,21 +235,29 @@ function enable_snort_vrt(btn) {
 		<?php if ($iface3 == $pconfig['autorulesupdate7']) echo "selected"; ?>>
 			<?=htmlspecialchars($ifacename3);?></option>
 			<?php endforeach; ?>
-	</select><span class="vexpl">&nbsp;&nbsp;<?php echo gettext("Please select the update times for rules."); ?><br/><br/>
-	
-	<?php printf(gettext("%sHint%s: in most cases, every 12 hours is a good choice."), '<span class="red"><strong>','</strong></span>'); ?></span></td>
+	</select><span class="vexpl">&nbsp;&nbsp;<?php echo gettext("Please select the interval for rule updates. Choosing ") . 
+	"<strong>" . gettext("NEVER") . "</strong>" . gettext(" disables auto-updates."); ?><br/><br/>
+	<?php echo "<span class=\"red\"><strong>" . gettext("Hint: ") . "</strong></span>" . gettext("in most cases, every 12 hours is a good choice."); ?></span></td>
+</tr>
+<tr>
+	<td width="22%" valign="top" class="vncell"><?php echo gettext("Update Start Time"); ?></td>
+	<td width="78%" class="vtable"><input type="text" class="formfld" name="rule_update_starttime" id="rule_update_starttime" size="4" 
+	maxlength="5" value="<?=$pconfig['rule_update_starttime'];?>" <?php if ($pconfig['autorulesupdate7'] == "never_up") {echo "disabled";} ?>><span class="vexpl">&nbsp;&nbsp;
+	<?php echo gettext("Enter the rule update start time in 24-hour format (HH:MM). ") . "<strong>" . 
+	gettext("Default") . "&nbsp;</strong>" . gettext("is ") . "<strong>" . gettext("00:03") . "</strong></span>"; ?>.<br/><br/>
+	<?php echo gettext("Rules will update at the interval chosen above starting at the time specified here. For example, using the default " . 
+	"start time of 00:03 and choosing 12 Hours for the interval, the rules will update at 00:03 and 12:03 each day."); ?></td>
 </tr>
 <tr>
 	<td colspan="2" valign="top" class="listtopic"><?php echo gettext("General Settings"); ?></td>
 </tr>
-
 <tr>
 <?php $snortlogCurrentDSKsize = round(exec('df -k /var | grep -v "Filesystem" | awk \'{print $4}\'') / 1024); ?>
 	<td width="22%" valign="top" class="vncell"><?php echo gettext("Log Directory Size " .
 	"Limit"); ?><br/>
 	<br/>
 	<br/>
-	<span class="red"><strong><?php echo gettext("Note"); ?></span>:</strong><br>
+	<span class="red"><strong><?php echo gettext("Note:"); ?></strong></span><br/>
 	<?php echo gettext("Available space is"); ?> <strong><?php echo $snortlogCurrentDSKsize; ?>&nbsp;MB</strong></td>
 	<td width="78%" class="vtable">
 		<table cellpadding="0" cellspacing="0">
@@ -258,7 +271,7 @@ function enable_snort_vrt(btn) {
 					<?php if($pconfig['snortloglimit']=='off') echo 'checked'; ?>> <span class="vexpl"><strong><?php echo gettext("Disable"); ?></strong>
 					<?php echo gettext("directory size limit"); ?></span><br>
 				<br>
-				<span class="red"><strong><?php echo gettext("Warning"); ?></span>:</strong> <?php echo gettext("Nanobsd " .
+				<span class="red"><strong><?php echo gettext("Warning:"); ?></strong></span> <?php echo gettext("Nanobsd " .
 				"should use no more than 10MB of space."); ?></td>
 			</tr>
 		</table>
@@ -314,5 +327,27 @@ function enable_snort_vrt(btn) {
 </table>
 </form>
 <?php include("fend.inc"); ?>
+
+<script language="JavaScript">
+<!--
+function enable_snort_vrt(btn) {
+	if (btn == 'off') {
+		document.iform.oinkmastercode.disabled = "true";
+	}
+	if (btn == 'on') {
+		document.iform.oinkmastercode.disabled = "";
+	}	
+}
+
+function enable_change_rules_upd() {
+	if (document.iform.autorulesupdate7.selectedIndex == 0)
+		document.iform.rule_update_starttime.disabled="true";
+	else
+		document.iform.rule_update_starttime.disabled="";		
+}
+
+//-->
+</script>
+
 </body>
 </html>
