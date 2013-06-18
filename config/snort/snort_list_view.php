@@ -47,8 +47,12 @@ $type = $_GET['type'];
 
 if (isset($id) && isset($wlist)) {
 	$a_rule = $config['installedpackages']['snortglobal']['rule'][$id];
-	if ($type == "whitelist") {
+	if ($type == "homenet") {
 		$list = snort_build_list($a_rule, $wlist);
+		$contents = implode("\n", $list);
+	}
+	elseif ($type == "whitelist") {
+		$list = snort_build_list($a_rule, $wlist, true);
 		$contents = implode("\n", $list);
 	}
 	elseif ($type == "suppress") {

@@ -145,9 +145,9 @@ if ($_GET['act'] == 'toggle' && is_numeric($id)) {
 		log_error("Toggle (snort starting) for {$if_friendly}({$snortcfg['descr']})...");
 
 		/* set flag to rebuild interface rules before starting Snort */
-		$rebuild_rules = "on";
+		$rebuild_rules = true;
 		sync_snort_package_config();
-		$rebuild_rules = "off";
+		$rebuild_rules = false;
 		snort_start($snortcfg, $if_real);
 
 		header( 'Expires: Sat, 26 Jul 1997 05:00:00 GMT' );
@@ -364,7 +364,7 @@ if ($pfsense_stable == 'yes')
 			</td>
 			<td class="listbg" 
 			ondblclick="document.location='snort_interfaces_edit.php?id=<?=$nnats;?>';">
-			<font color="#ffffff"> <?=htmlspecialchars($natent['descr']);?>&nbsp;
+			<font color="#ffffff"> <?=htmlspecialchars($natent['descr']);?>&nbsp;</font>
 			</td>
 			<td valign="middle" class="list" nowrap>
 			<table border="0" cellspacing="0" cellpadding="0">
