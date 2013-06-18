@@ -4003,7 +4003,7 @@ USERNAME=`echo -n "\$1" | sed 's/[^0-9a-zA-Z._-]/X/g' `
 PASSWD=`echo -n "\$2" | sed 's/[^0-9a-f]/0/g' `
 SECRET=`echo -n "\$3" | sed 's/[^0-9a-f]/0/g' `
 PIN=`echo -n "\$4" | sed 's/[^0-9]/0/g' `
-OFFSET=`echo -n "\$5" | sed 's/[^0-9]/0/g' `
+OFFSET=`echo -n "\$5" | sed 's/[^0-9-]/0/g' `
 EPOCHTIME=`date +%s` ; EPOCHTIME=`chop \$EPOCHTIME`
 
 # delete old logins

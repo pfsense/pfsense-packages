@@ -156,14 +156,14 @@
 				This package implements TCP, HTTP and HTTPS balance features from Haproxy.]]></descr>
 		<website>http://haproxy.1wt.eu/</website>
 		<category>Services</category>
-		<version>1.5-dev18 pkg v 0.2</version>
+		<version>1.5-dev19 pkg v 0.3</version>
 		<status>Release</status>
 		<required_version>2.1</required_version>
 		<config_file>http://www.pfsense.com/packages/config/haproxy-devel/haproxy.xml</config_file>
 		<configurationfile>haproxy.xml</configurationfile>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
 		<depends_on_package>haproxy-1.4.21.tbz</depends_on_package>
-		<depends_on_package_pbi>haproxy-devel-1.5-dev18-amd64.pbi</depends_on_package_pbi>
+		<depends_on_package_pbi>haproxy-devel-1.5-dev19-amd64.pbi</depends_on_package_pbi>
 		<build_port_path>/usr/ports/net/haproxy-devel</build_port_path>
 		<build_pbi>
 			<ports_before>security/openssl</ports_before>
@@ -1246,7 +1246,7 @@
 		<pkginfolink>http://forum.pfsense.org/index.php/topic,48347.0.html</pkginfolink>
 		<website>http://www.squid-cache.org/</website>
 		<category>Network</category>
-		<version>3.3.4 pkg 2.1.2</version>
+		<version>3.3.5 pkg 2.1.2</version>
 		<status>beta</status>
 		<required_version>2.0</required_version>
 		<maintainer>marcellocoutinho@gmail.com fernando@netfilter.com.br seth.mos@dds.nl mfuchs77@googlemail.com jimp@pfsense.org</maintainer>
@@ -1255,17 +1255,18 @@
 		<depends_on_package>libltdl-2.4.2.tbz</depends_on_package>
 		<depends_on_package>libwww-5.4.0_4.tbz</depends_on_package>
 		<depends_on_package>squidclamav-6.10_1.tbz</depends_on_package>
+		<depends_on_package>cyrus-sasl-2.1.26_2.tbz</depends_on_package>
 		<depends_on_package>clamav-0.97.8.tbz</depends_on_package>
 		<depends_on_package>ca_root_nss-3.14.1.tbz</depends_on_package>
 		<build_pbi>
-			<ports_before>www/libwww</ports_before>
+			<ports_before>www/libwww security/cyrus-sasl2</ports_before>
 			<port>www/squid33</port>
 			<ports_after>www/squid_radius_auth security/clamav www/squidclamav security/ca_root_nss www/c-icap-modules</ports_after>
 		</build_pbi>
 		<build_options>c-icap_UNSET=IPV6 squid33_UNSET=AUTH_SMB AUTH_SQL DNS_HELPER FS_COSS ESI ECAP SNMP STACKTRACES STRICT_HTTP TP_IPF TP_IPFW VIA_DB DEBUG DOCS EXAMPLES;squid33_SET=ARP_ACL AUTH_KERB AUTH_LDAP AUTH_NIS AUTH_SASL CACHE_DIGESTS DELAY_POOLS FOLLOW_XFF TP_PF MSSL_CRTD WCCP WCCPV2 FS_AUFS HTCP ICAP ICMP IDENT IPV6 KQUEUE LARGEFILE SSL SSL_CRTD</build_options>
 		<config_file>http://www.pfsense.org/packages/config/squid3/33/squid.xml</config_file>
 		<configurationfile>squid.xml</configurationfile>
-		<depends_on_package_pbi>squid-3.3.4-amd64.pbi</depends_on_package_pbi>
+		<depends_on_package_pbi>squid-3.3.5-amd64.pbi</depends_on_package_pbi>
 	</package>
 	<package>
 		<name>LCDproc</name>
@@ -1557,7 +1558,7 @@
 		<descr>Unbound is a validating, recursive, and caching DNS resolver. This package is a drop in replacement for Services: DNS Forwarder and also supports DNSSEC extensions. Once installed please configure the Unbound service by visiting Services: Unbound DNS.</descr>
 		<website>http://www.unbound.net/</website>
 		<category>Services</category>
-		<version>1.4.20_6</version>
+		<version>1.4.20_7</version>
 		<status>Alpha</status>
 		<maintainer>warren@decoy.co.za</maintainer>
 		<required_version>2.0</required_version>
@@ -1712,7 +1713,7 @@
 		<name>Quagga OSPF</name>
 		<descr>OSPF routing protocol using Quagga -- WARNING! Installs files to the same place as OpenOSPFD and OpenBGPD. Installing both will break things.</descr>
 		<maintainer>jimp@pfsense.org</maintainer>
-		<version>0.99.20.1 v0.5.3</version>
+		<version>0.99.20.1 v0.5.4</version>
 		<category>Routing</category>
 		<status>BETA</status>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
@@ -1820,12 +1821,12 @@
 		<descr>tinc is a Virtual Private Network (VPN) daemon that uses tunnelling and encryption to create a secure private mesh network between hosts on the Internet.</descr>
 		<category>Network Management</category>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
-		<depends_on_package_pbi>tinc-1.0.19-amd64.pbi</depends_on_package_pbi>
+		<depends_on_package_pbi>tinc-1.0.21-amd64.pbi</depends_on_package_pbi>
 		<build_pbi>
 			<port>security/tinc</port>
 		</build_pbi>
 		<build_options></build_options>
-		<version>1.0.19</version>
+		<version>1.0.21</version>
 		<status>ALPHA</status>
 		<pkginfolink>http://doc.pfsense.org/index.php/tinc_package</pkginfolink>
 		<required_version>2.1</required_version>

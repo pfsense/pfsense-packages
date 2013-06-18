@@ -275,12 +275,14 @@ function unbound_get_network_interface_addresses() {
 								log_error("Unbound DNS: There was a problem setting up the Virtual IP for the interface ".link_ip_to_carp_interface($vip['subnet']));
 							} else {
 								$unbound_interfaces[$i]['virtual']['ipaddr'] = $virtual_ip;
+								$unbound_interfaces[$i]['virtual']['subnet'] = $vip['subnet_bits'];
+								$unbound_interfaces[$i]['virtual']['network'] = $virtual_ip;
 							}
 						}
 					}
 				}
 			}
-		} else if(isset($interfaces[$unboundif]['ipaddr'])) {
+		} else if (isset($interfaces[$unboundif]['ipaddr'])) {
 			/* Find the interface IP address for
 			 * XXX - this only works for IPv4 currently - the pfSense module needs IPv6 love
 			 */
@@ -378,7 +380,7 @@ function unbound_acls_config() {
 	global $config;
 
 	/* Configure the ACLs */
-	if(is_array($config['installedpackages']['unboundacls']['config'])) {
+	if (is_array($config['installedpackages']['unboundacls']['config'])) {
 		$unbound_acls = $config['installedpackages']['unboundacls']['config'];
 		$unboundcfg = "";
 		foreach($unbound_acls as $unbound_acl){
@@ -409,9 +411,9 @@ function unbound_resync_config() {
 	$unbound_allowed_networks = "";
 	$unboundnetcfg = unbound_get_network_interface_addresses();
 	foreach($unboundnetcfg as $netent) {
-		foreach($netent as $entry) {
+		foreach($netent as $nettype => $entry) {
 			$unbound_bind_interfaces .="interface: {$entry['ipaddr']}\n";
-			if($entry['ipaddr'] != "127.0.0.1" && $entry['ipaddr'] != "::1")
+			if($entry['ipaddr'] != "127.0.0.1" && $entry['ipaddr'] != "::1" && $nettype != "virtual")
 				$unbound_allowed_networks .= "access-control: {$entry['network']}/{$entry['subnet']} allow\n";
 		}
 	}
@@ -485,7 +487,7 @@ EOF;
 	$outgoing_num_tcp = (!empty($unbound_config['outgoing_num_tcp'])) ? $unbound_config['outgoing_num_tcp'] : "10";
 	$incoming_num_tcp = (!empty($unbound_config['incoming_num_tcp'])) ? $unbound_config['incoming_num_tcp'] : "10";
 	$edns_buffer_size = (!empty($unbound_config['edns_buffer_size'])) ? $unbound_config['edns_buffer_size'] : "4096";
-	$num_queries_per_thread = (!empty($unbound_config['num_queries_per_thread'])) ? $unbound_config['num_queries_per_thread'] : "1024";
+	$num_queries_per_thread = (!empty($unbound_config['num_queries_per_thread'])) ? $unbound_config['num_queries_per_thread'] : "4096";
 	$jostle_timeout = (!empty($unbound_config['jostle_timeout'])) ? $unbound_config['jostle_timeout'] : "200";
 	$cache_max_ttl = (!empty($unbound_config['cache_max_ttl'])) ? $unbound_config['cache_max_ttl'] : "86400";
 	$cache_min_ttl = (!empty($unbound_config['cache_min_ttl'])) ? $unbound_config['cache_min_ttl'] : "0";
@@ -543,7 +545,7 @@ harden-dnssec-stripped: {$harden_dnssec_stripped}
 {$optimization['key_cache_slabs']}
 {$optimization['msg_cache_size']}
 {$optimization['rrset_cache_size']}
-{$optimization['outgoing_range']}
+outgoing-range: 8192
 {$optimization['so_rcvbuf']}
 
 # Interface IP(s) to bind to
@@ -619,23 +621,19 @@ function unbound_optimization() {
 	// Set the number of threads equal to number of CPUs.
 	// Use 1 (disable threading) if for some reason this sysctl fails.
 	$numprocs = intval(trim(`/sbin/sysctl kern.smp.cpus | /usr/bin/cut -d" " -f2`));
-	if($numprocs > 0)
+	if($numprocs > 1) {
 		$optimization['number_threads'] = "num-threads: {$numprocs}";
-	else
+		$optimize_num = pow(2,floor(log($numprocs,2)));
+	} else {
 		$optimization['number_threads'] = "num-threads: 1";
+		$optimize_num = 4;
+	}
 
 	// Slabs to help reduce lock contention.
-	if ($numprocs > 4) {
-		$optimization['msg_cache_slabs'] = "msg-cache-slabs: {$numprocs}";
-		$optimization['rrset_cache_slabs'] = "rrset-cache-slabs: {$numprocs}";
-		$optimization['infra_cache_slabs'] = "infra-cache-slabs: {$numprocs}";
-		$optimization['key_cache_slabs'] = "key-cache-slabs: {$numprocs}";
-	} else {
-		$optimization['msg_cache_slabs'] = "msg-cache-slabs: 4";
-		$optimization['rrset_cache_slabs'] = "rrset-cache-slabs: 4";
-		$optimization['infra_cache_slabs'] = "infra-cache-slabs: 4";
-		$optimization['key_cache_slabs'] = "key-cache-slabs: 4";
-	}
+	$optimization['msg_cache_slabs'] = "msg-cache-slabs: {$optimize_num}";
+	$optimization['rrset_cache_slabs'] = "rrset-cache-slabs: {$optimize_num}";
+	$optimization['infra_cache_slabs'] = "infra-cache-slabs: {$optimize_num}";
+	$optimization['key_cache_slabs'] = "key-cache-slabs: {$optimize_num}";
 
 	// Memory usage - default is 4Mb if nothing has been selected
 	if(isset($unbound_config['msg_cache_size'])) {
@@ -645,14 +643,6 @@ function unbound_optimization() {
 	} else {
 		$optimization['msg_cache_size'] = "msg-cache-size: 4m";
 		$optimization['rrset_cache_size'] = "rrset-cache-size: 8m";
-	}
-
-	// More outgoing connections per thread otherwise assign a default of 4096 for a single thread
-	if($numprocs > 0) {
-		$or = (1024/$numprocs) - 50;
-		$optimization['outgoing_range'] = "outgoing-range: {$or}";
-	} else {
-		$optimization['outgoing_range'] = "outgoing-range: {4096}";
 	}
 
 	// Larger socket buffer for busy servers
