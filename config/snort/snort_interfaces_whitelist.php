@@ -160,12 +160,12 @@ if ($savemsg) print_info_box($savemsg);
 	cellspacing="1">
 	<tr>
 	<td width="100%"><span class="vexpl"><span class="red"><strong><?php echo gettext("Note:"); ?></strong></span>
-	<p><span class="vexpl"><?php echo gettext("Here you can create whitelist files for your " .
+	<p><?php echo gettext("Here you can create whitelist files for your " .
 	"snort package rules."); ?><br>
 	<?php echo gettext("Please add all the ips or networks you want to protect against snort " .
 	"block decisions."); ?><br>
 	<?php echo gettext("Remember that the default whitelist only includes local networks."); ?><br>
-	<?php echo gettext("Be careful, it is very easy to get locked out of your system."); ?></span></p></td>
+	<?php echo gettext("Be careful, it is very easy to get locked out of your system."); ?></p></span></td>
 	</tr>
 	<tr>
 	<td width="100%"><span class="vexpl"><?php echo gettext("Remember you must restart Snort on the interface for changes to take effect!"); ?></span></td>
