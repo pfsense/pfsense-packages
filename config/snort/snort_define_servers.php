@@ -127,7 +127,7 @@ if ($_POST) {
 		write_config();
 
 		/* Update the snort conf file for this interface. */
-		$rebuild_rules = "off";
+		$rebuild_rules = false;
 		snort_generate_conf($a_nat[$id]);
 
 		/* after click go to this page */

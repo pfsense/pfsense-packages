@@ -32,9 +32,10 @@
 require_once("guiconfig.inc");
 require_once("/usr/local/pkg/snort/snort.inc");
 
-global $g, $flowbit_rules_file, $rebuild_rules;
+global $g, $rebuild_rules;
 
 $snortdir = SNORTDIR;
+$flowbit_rules_file = FLOWBITS_FILENAME;
 
 if (!is_array($config['installedpackages']['snortglobal']['rule'])) {
 	$config['installedpackages']['snortglobal']['rule'] = array();
@@ -143,9 +144,9 @@ if ($_POST["Submit"]) {
 	/* Update the snort conf file and rebuild the    */
 	/* rules for this interface.                     */
 	/*************************************************/
-	$rebuild_rules = "on";
+	$rebuild_rules = true;
 	snort_generate_conf($a_nat[$id]);
-	$rebuild_rules = "off";
+	$rebuild_rules = false;
 
 	header("Location: /snort/snort_rulesets.php?id=$id");
 	exit;

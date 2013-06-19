@@ -36,11 +36,13 @@
 require_once("guiconfig.inc");
 require_once("/usr/local/pkg/snort/snort.inc");
 
-global $g, $snort_rules_upd_log, $snort_rules_file, $emergingthreats_filename;
-
+/* Define some locally required variables from Snort constants */
 $snortdir = SNORTDIR;
-
+$snort_rules_upd_log = RULES_UPD_LOGFILE;
 $log = $snort_rules_upd_log;
+$snort_rules_file = VRT_DNLD_FILENAME;
+$emergingthreats_filename = ET_DNLD_FILENAME;
+$snort_community_rules_filename = GPLV2_DNLD_FILENAME;
 
 /* load only javascript that is needed */
 $snort_load_jquery = 'yes';
@@ -133,8 +135,8 @@ h += 96;
 					<tr>
 						<td id="download_rules_td" style="background-color: #eeeeee">
 						<div height="32" width="725px" style="background-color: #eeeeee">
-						<font color="#777777" size="2.5px">
 						<p style="text-align: left; margin-left: 225px;">
+							<font color="#777777" size="2.5px">
 							<b><?php echo gettext("INSTALLED RULESET SIGNATURES"); ?></b></font><br/><br/>
 							<font color="#FF850A" size="1px"><b>SNORT.ORG&nbsp;&nbsp;--></b></font>
 							<font size="1px" color="#000000">&nbsp;&nbsp;<? echo $snort_org_sig_chk_local; ?></font><br/>
@@ -213,8 +215,9 @@ h += 96;
 						<td id="download_rules_td" style='background-color: #eeeeee'>
 						<div height="32" width="725px" style='background-color: #eeeeee'><span class="vexpl">
 							<span class="red"><b><?php echo gettext("NOTE:"); ?></b></span>
-							&nbsp;&nbsp;<?php echo gettext("Snort.org and EmergingThreats.net " .
-							"will go down from time to time. Please be patient."); ?></span>
+							&nbsp;&nbsp;<a href="http://www.snort.org/" target="_blank"><?php echo gettext("Snort.org") . "</a>" . 
+							gettext(" and ") . "<a href=\"http://www.emergingthreats.net/\" target=\"_blank\">" . gettext("EmergingThreats.net") . "</a>" . 
+							gettext(" will go down from time to time. Please be patient."); ?></span>
 						</div>
 						</td>
 					</tr>

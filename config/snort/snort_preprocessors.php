@@ -61,6 +61,11 @@ if (isset($id) && $a_nat[$id]) {
 
 	/* Get current values from config for page form fields */
 	$pconfig['perform_stat'] = $a_nat[$id]['perform_stat'];
+	$pconfig['host_attribute_table'] = $a_nat[$id]['host_attribute_table'];
+	$pconfig['host_attribute_data'] = $a_nat[$id]['host_attribute_data'];
+	$pconfig['max_attribute_hosts'] = $a_nat[$id]['max_attribute_hosts'];
+	$pconfig['max_attribute_services_per_host'] = $a_nat[$id]['max_attribute_services_per_host'];
+	$pconfig['max_paf'] = $a_nat[$id]['max_paf'];
 	$pconfig['server_flow_depth'] = $a_nat[$id]['server_flow_depth'];
 	$pconfig['http_server_profile'] = $a_nat[$id]['http_server_profile'];
 	$pconfig['client_flow_depth'] = $a_nat[$id]['client_flow_depth'];
@@ -124,6 +129,12 @@ if (isset($id) && $a_nat[$id]) {
 	/* enable the most common required preprocessors by default */
 	/* and set reasonable values for any options.               */
 	/************************************************************/
+	if (empty($pconfig['max_attribute_hosts']))
+		$pconfig['max_attribute_hosts'] = '10000';
+	if (empty($pconfig['max_attribute_services_per_host']))
+		$pconfig['max_attribute_services_per_host'] = '10';
+	if (empty($pconfig['max_paf']))
+		$pconfig['max_paf'] = '16000';
 	if (empty($pconfig['ftp_preprocessor']))
 		$pconfig['ftp_preprocessor'] = 'on';
 	if (empty($pconfig['smtp_preprocessor']))
@@ -200,6 +211,10 @@ if ($_POST['ResetAll']) {
 
 	/* Reset all the preprocessor settings to defaults */
 	$pconfig['perform_stat'] = "off";
+	$pconfig['host_attribute_table'] = "off";
+	$pconfig['max_attribute_hosts'] = '10000';
+	$pconfig['max_attribute_services_per_host'] = '10';
+	$pconfig['max_paf'] = '16000';
 	$pconfig['server_flow_depth'] = "300";
 	$pconfig['http_server_profile'] = "all";
 	$pconfig['client_flow_depth'] = "300";
@@ -266,6 +281,9 @@ elseif ($_POST['Submit']) {
 	/* if no errors write to conf */
 	if (!$input_errors) {
 		/* post new options */
+		if ($_POST['max_attribute_hosts'] != "") { $natent['max_attribute_hosts'] = $_POST['max_attribute_hosts']; }else{ $natent['max_attribute_hosts'] = "10000"; }
+		if ($_POST['max_attribute_services_per_host'] != "") { $natent['max_attribute_services_per_host'] = $_POST['max_attribute_services_per_host']; }else{ $natent['max_attribute_services_per_host'] = "10"; }
+		if ($_POST['max_paf'] != "") { $natent['max_paf'] = $_POST['max_paf']; }else{ $natent['max_paf'] = "16000"; }
 		if ($_POST['server_flow_depth'] != "") { $natent['server_flow_depth'] = $_POST['server_flow_depth']; }else{ $natent['server_flow_depth'] = "300"; }
 		if ($_POST['http_server_profile'] != "") { $natent['http_server_profile'] = $_POST['http_server_profile']; }else{ $natent['http_server_profile'] = "all"; }
 		if ($_POST['client_flow_depth'] != "") { $natent['client_flow_depth'] = $_POST['client_flow_depth']; }else{ $natent['client_flow_depth'] = "300"; }
@@ -295,6 +313,7 @@ elseif ($_POST['Submit']) {
 			unset($natent['pscan_ignore_scanners']);
 
 		$natent['perform_stat'] = $_POST['perform_stat'] ? 'on' : 'off';
+		$natent['host_attribute_table'] = $_POST['host_attribute_table'] ? 'on' : 'off';
 		$natent['http_inspect'] = $_POST['http_inspect'] ? 'on' : 'off';
 		$natent['http_inspect_enable_xff'] = $_POST['http_inspect_enable_xff'] ? 'on' : 'off';
 		$natent['http_inspect_log_uri'] = $_POST['http_inspect_log_uri'] ? 'on' : 'off';
@@ -342,14 +361,22 @@ elseif ($_POST['Submit']) {
 		write_config();
 
 		/* Set flag to rebuild rules for this interface  */
-		$rebuild_rules = "on";
+		$rebuild_rules = true;
 
 		/*************************************************/
-		/* Update the snort conf file and rebuild the    */
+		/* Update the snort.conf file and rebuild the    */
 		/* rules for this interface.                     */
 		/*************************************************/
 		snort_generate_conf($natent);
-		$rebuild_rules = "off";
+		$rebuild_rules = false;
+
+		/*******************************************************/
+		/* Signal Snort to reload Host Attribute Table if one  */
+		/* is configured and saved.                            */
+		/*******************************************************/
+		if ($natent['host_attribute_table'] == "on" && 
+		    !empty($natent['host_attribute_data']))
+			snort_reload_config($natent, "SIGURG");
 
 		/* after click go to this page */
 		header( 'Expires: Sat, 26 Jul 1997 05:00:00 GMT' );
@@ -361,6 +388,47 @@ elseif ($_POST['Submit']) {
 		exit;
 	}
 }
+elseif ($_POST['btn_import']) {
+	if (is_uploaded_file($_FILES['host_attribute_file']['tmp_name'])) {
+		$data = file_get_contents($_FILES['host_attribute_file']['tmp_name']);
+		if ($data === false)
+			$input_errors[] = gettext("Error uploading file {$_FILES['host_attribute_file']}!");
+		else {
+			if (isset($id) && $a_nat[$id]) {
+				$a_nat[$id]['host_attribute_table'] = "on";
+				$a_nat[$id]['host_attribute_data'] = base64_encode($data);
+				$pconfig['host_attribute_data'] = $a_nat[$id]['host_attribute_data'];
+				$a_nat[$id]['max_attribute_hosts'] = $pconfig['max_attribute_hosts'];
+				$a_nat[$id]['max_attribute_services_per_host'] = $pconfig['max_attribute_services_per_host'];
+				write_config();
+			}
+			header( 'Expires: Sat, 26 Jul 1997 05:00:00 GMT' );
+			header( 'Last-Modified: ' . gmdate( 'D, d M Y H:i:s' ) . ' GMT' );
+			header( 'Cache-Control: no-store, no-cache, must-revalidate' );
+			header( 'Cache-Control: post-check=0, pre-check=0', false );
+			header( 'Pragma: no-cache' );
+			header("Location: snort_preprocessors.php?id=$id");
+			exit;
+		}
+	}
+	else
+		$input_errors[] = gettext("No filename specified for import!");
+}
+elseif ($_POST['btn_edit_hat']) {
+	if (isset($id) && $a_nat[$id]) {
+		$a_nat[$id]['host_attribute_table'] = "on";
+		$a_nat[$id]['max_attribute_hosts'] = $pconfig['max_attribute_hosts'];
+		$a_nat[$id]['max_attribute_services_per_host'] = $pconfig['max_attribute_services_per_host'];
+		write_config();
+		header("Location: snort_edit_hat_data.php?id=$id");
+		exit;
+	}
+}
+
+/* If Host Attribute Table option is enabled, but */
+/* no Host Attribute data exists, flag an error.  */
+if ($pconfig['host_attribute_table'] == 'on' && empty($pconfig['host_attribute_data']))
+	$input_errors[] = gettext("The Host Attribute Table option is enabled, but no Host Attribute data has been loaded.  Data may be entered manually or imported from a suitable file.");
 
 $if_friendly = snort_get_friendly_interface($pconfig['interface']);
 $pgtitle = "Snort: Interface {$if_friendly}: Preprocessors and Flow";
@@ -481,12 +549,105 @@ include_once("head.inc");
 		</td>
 	</tr>
 	<tr>
+		<td colspan="2" valign="top" class="listtopic"><?php echo gettext("Host Attribute Table Settings"); ?></td>
+	</tr>
+	<tr>
+		<td width="22%" valign="top" class="vncell"><?php echo gettext("Enable"); ?></td>
+		<td width="78%" class="vtable"><input name="host_attribute_table"
+			type="checkbox" value="on" id="host_attribute_table" onclick="host_attribute_table_enable_change();" 
+			<?php if ($pconfig['host_attribute_table']=="on") echo "checked"; ?>>
+			<?php echo gettext("Use a Host Attribute Table file to auto-configure applicable preprocessors.  " .
+				"Default is "); ?><strong><?php echo gettext("Not Checked"); ?></strong>.</td>
+	</tr>
+	<tr>
+		<td width="22%" valign="top" class="vncell"><?php echo gettext("Host Attribute Data"); ?></td>
+		<td width="78%" class="vtable"><strong><?php echo gettext("Import From File"); ?></strong><br/>
+			<input name="host_attribute_file" type="file" class="formfld unknown" value="on" id="host_attribute_file" size="40" 
+			<?php if ($pconfig['host_attribute_table']<>"on") echo "disabled"; ?>>&nbsp;&nbsp;
+			<input type="submit" name="btn_import" id="btn_import" value="Import" class="formbtn" 
+			<?php if ($pconfig['host_attribute_table']<>"on") echo "disabled"; ?>><br/>
+			<?php echo gettext("Choose the Host Attributes file to use for auto-configuration."); ?><br/><br/>
+			<span class="red"><strong><?php echo gettext("Warning: "); ?></strong></span>
+			<?php echo gettext("The Host Attributes file has a required format.  See the "); ?><a href="http://manual.snort.org/" target="_blank">
+			<?php echo gettext("Snort Manual"); ?></a><?php echo gettext(" for details.  " . 
+			"An improperly formatted file may cause Snort to crash or fail to start.  The combination of "); ?>
+			<a href="http://nmap.org/" target="_blank"><?php echo gettext("NMap"); ?></a><?php echo gettext(" and "); ?>
+			<a href="http://code.google.com/p/hogger/" target="_blank"><?php echo gettext("Hogger"); ?></a><?php echo gettext(" or "); ?>
+			<a href="http://gamelinux.github.io/prads/" target="_blank"><?php echo gettext("PRADS"); ?></a><?php echo gettext(" can be used to " .
+			"scan networks and automatically generate a suitable Host Attribute Table file for import."); ?><br/><br/>
+			<input type="submit" id="btn_edit_hat" name="btn_edit_hat" value="<?php if (!empty($pconfig['host_attribute_data'])) {echo gettext(" Edit ");} else {echo gettext("Create");} ?>" 
+			class="formbtn" 
+			<?php if ($pconfig['host_attribute_table']<>"on") echo "disabled"; ?>>&nbsp;&nbsp;
+			<?php if (!empty($pconfig['host_attribute_data'])) {echo gettext("Click to View or Edit the Host Attribute data.");}
+			 else {echo gettext("Click to Create Host Attribute data manually.");}
+			if ($pconfig['host_attribute_table']=="on" && empty($pconfig['host_attribute_data'])){
+				echo "<br/><br/><span class=\"red\"><strong>" . gettext("Warning: ") . "</strong></span>" . 
+				gettext("No Host Attribute Data loaded - import from a file or enter it manually.");
+			} ?></td>
+	</tr>
+	<tr>
+		<td valign="top" class="vncell"><?php echo gettext("Maximum Hosts"); ?></td>
+		<td class="vtable">
+		<table cellpadding="0" cellspacing="0">
+			<tr>
+				<td><input name="max_attribute_hosts" type="text" class="formfld" id="max_attribute_hosts" size="6" 
+				value="<?=htmlspecialchars($pconfig['max_attribute_hosts']);?>" 
+				<?php if ($pconfig['host_attribute_table']<>"on") echo "disabled"; ?>>&nbsp;&nbsp;
+				<?php echo gettext("Max number of hosts to read from the Attribute Table.  Min is ") . 
+				"<strong>" . gettext("32") . "</strong>" . gettext(" and Max is ") . "<strong>" . 
+				gettext("524288") . "</strong>"; ?>.</td>
+			</tr>
+		</table>
+		<?php echo gettext("Sets a limit on the maximum number of hosts to read from the Attribute Table. If the number of hosts in " .
+		"the table exceeds this value, an error is logged and the remainder of the hosts are ignored.  " . 
+		"Default is ") . "<strong>" . gettext("10000") . "</strong>"; ?>.<br/>
+		</td>
+	</tr>
+	<tr>
+		<td valign="top" class="vncell"><?php echo gettext("Maximum Services Per Host"); ?></td>
+		<td class="vtable">
+		<table cellpadding="0" cellspacing="0">
+			<tr>
+				<td><input name="max_attribute_services_per_host" type="text" class="formfld" id="max_attribute_services_per_host" size="6" 
+				value="<?=htmlspecialchars($pconfig['max_attribute_services_per_host']);?>"
+				<?php if ($pconfig['host_attribute_table']<>"on") echo "disabled"; ?>>&nbsp;&nbsp;
+				<?php echo gettext("Max number of  per host services to read from the Attribute Table.  Min is ") . 
+				"<strong>" . gettext("1") . "</strong>" . gettext(" and Max is ") . "<strong>" . 
+				gettext("65535") . "</strong>"; ?>.</td>
+			</tr>
+		</table>
+		<?php echo gettext("Sets the per host limit of services to read from the Attribute Table. For a given host, if the number of " .
+		"services read exceeds this value, an error is logged and the remainder of the services for that host are ignored. " . 
+		"Default is ") . "<strong>" . gettext("10") . "</strong>.  " . gettext("A value of 0 disables Protocol Aware Flushing."); ?>.<br/>
+		</td>
+	</tr>
+	<tr>
+		<td colspan="2" valign="top" class="listtopic"><?php echo gettext("Protocol Aware Flushing Setting"); ?></td>
+	</tr>
+	<tr>
+		<td valign="top" class="vncell"><?php echo gettext("Protocol Aware Flushing Maximum PDU"); ?></td>
+		<td class="vtable">
+		<table cellpadding="0" cellspacing="0">
+			<tr>
+				<td><input name="max_paf" type="text" class="formfld" id="max_paf" size="6"
+				value="<?=htmlspecialchars($pconfig['max_paf']);?>">&nbsp;&nbsp;
+				<?php echo gettext("Max number of PDUs to be reassembled into a single PDU.  Min is ") . 
+				"<strong>" . gettext("0") . "</strong>" . gettext(" (off) and Max is ") . "<strong>" . 
+				gettext("63780") . "</strong>"; ?>.</td>
+			</tr>
+		</table>
+		<?php echo gettext("Multiple PDUs within a single TCP segment, as well as one PDU spanning multiple TCP segments, will be " .
+		"reassembled into one PDU per packet for each PDU.  PDUs larger than the configured maximum will be split into multiple packets. " . 
+		"Default is ") . "<strong>" . gettext("16000") . "</strong>.  " . gettext("A value of 0 disables Protocol Aware Flushing."); ?>.<br/>
+		</td>
+	</tr>
+	<tr>
 		<td colspan="2" valign="top" class="listtopic"><?php echo gettext("HTTP Inspect Settings"); ?></td>
 	</tr>
 	<tr>
 		<td width="22%" valign="top" class="vncell"><?php echo gettext("Enable"); ?></td>
-		<td width="78%" class="vtable"><input name="http_inspect"
-			type="checkbox" value="on" id="http_inspect" onclick="http_inspect_enable_change()" 
+		<td width="78%" class="vtable"><input name="http_inspect" 
+			type="checkbox" value="on" id="http_inspect" onclick="http_inspect_enable_change();" 
 			<?php if ($pconfig['http_inspect']=="on" || empty($pconfig['http_inspect'])) echo "checked"; ?>>
 			<?php echo gettext("Use HTTP Inspect to " .
 				"Normalize/Decode and detect HTTP traffic and protocol anomalies.  Default is "); ?>
@@ -578,7 +739,7 @@ include_once("head.inc");
 		<td class="vtable">
 		<table cellpadding="0" cellspacing="0">
 			<tr>
-				<td><input name="client_flow_depth" type="text" class="formfld"
+				<td><input name="client_flow_depth" type="text" class="formfld" 
 					id="client_flow_depth" size="6"
 					value="<?=htmlspecialchars($pconfig['client_flow_depth']);?>"> <?php echo gettext("<strong>-1</strong> " .
 				"to <strong>1460</strong> (<strong>-1</strong> disables HTTP " .
@@ -586,17 +747,17 @@ include_once("head.inc");
 			</tr>
 		</table>
 		<?php echo gettext("Amount of raw HTTP client request payload to inspect. Snort's " .
-		"performance may increase by adjusting this value."); ?><br>
+		"performance may increase by adjusting this value."); ?><br/>
 		<?php echo gettext("Setting this value too low may cause false negatives. Values above 0 " .
 		"are specified in bytes.  Recommended setting is maximum (1460). Default value is <strong>300</strong>"); ?><br/>
 		</td>
 	</tr>
 	<tr>
 		<td width="22%" valign="top" class="vncell"><?php echo gettext("Disable HTTP Alerts"); ?></td>
-		<td width="78%" class="vtable"><input name="noalert_http_inspect"
-			type="checkbox" value="on" id="noalert_http_inspect"
+		<td width="78%" class="vtable"><input name="noalert_http_inspect" 
+			type="checkbox" value="on" id="noalert_http_inspect" 
 			<?php if ($pconfig['noalert_http_inspect']=="on" || empty($pconfig['noalert_http_inspect'])) echo "checked"; ?>
-			onClick="enable_change(false)"> <?php echo gettext("Turn off alerts from HTTP Inspect " .
+			onClick="enable_change(false);"> <?php echo gettext("Turn off alerts from HTTP Inspect " .
 				"preprocessor.  This has no effect on HTTP rules.  Default is "); ?>
 			<strong><?php echo gettext("Checked"); ?></strong>.</td>
 	</tr>
@@ -606,7 +767,7 @@ include_once("head.inc");
 	</tr>
 	<tr>
 		<td width="22%" valign="top" class="vncell"><?php echo gettext("Enable"); ?></td>
-		<td width="78%" class="vtable"><input name="frag3_detection" type="checkbox" value="on" onclick="frag3_enable_change()" 
+		<td width="78%" class="vtable"><input name="frag3_detection" type="checkbox" value="on" onclick="frag3_enable_change();" 
 			<?php if ($pconfig['frag3_detection']=="on") echo "checked "; ?>
 			onClick="enable_change(false)">
 		<?php echo gettext("Use Frag3 Engine to detect IDS evasion attempts via target-based IP packet fragmentation.  Default is ") . 
@@ -639,7 +800,7 @@ include_once("head.inc");
 			</tr>
 		</table>
 		<?php echo gettext("The maximum number of simultaneous fragments to track.  Default value is ") .
-		"<strong>8192</strong>."; ?><br>
+		"<strong>8192</strong>."; ?><br/>
 		</td>
 	</tr>
 	<tr>
@@ -654,7 +815,7 @@ include_once("head.inc");
 			</tr>
 		</table>
 		<?php echo gettext("Sets the limit for the number of overlapping fragments allowed per packet.  Default value is ") .
-		"<strong>0</strong>" . gettext(" (unlimited)."); ?><br>
+		"<strong>0</strong>" . gettext(" (unlimited)."); ?><br/>
 		</td>
 	</tr>
 	<tr>
@@ -669,7 +830,7 @@ include_once("head.inc");
 			</tr>
 		</table>
 		<?php echo gettext("Defines smallest fragment size (payload size) that should be considered valid.  Default value is ") .
-		"<strong>0</strong>" . gettext(" (check is disabled)."); ?><br>
+		"<strong>0</strong>" . gettext(" (check is disabled)."); ?><br/>
 		</td>
 	</tr>
 	<tr>
@@ -694,13 +855,13 @@ include_once("head.inc");
 			<?php
 			$profile = array( 'BSD', 'BSD-Right', 'First', 'Last', 'Linux', 'Solaris', 'Windows' );
 			foreach ($profile as $val): ?>
-			<option value="<?=strtolower($val);?>"
+			<option value="<?=strtolower($val);?>" 
 			<?php if (strtolower($val) == $pconfig['frag3_policy']) echo "selected"; ?>>
 				<?=gettext($val);?></option>
 				<?php endforeach; ?>
 			</select>&nbsp;&nbsp;<?php echo gettext("Choose the IP fragmentation target policy appropriate for the protected hosts.  The default is ") . 
 			"<strong>" . gettext("BSD") . "</strong>"; ?>.<br/>
-			<?php echo gettext("Available OS targets are BSD, BSD-Right, First, Last, Linux, Solaris and Windows."); ?><br/></td>
+			<?php echo gettext("Available OS targets are BSD, BSD-Right, First, Last, Linux, Solaris and Windows."); ?><br/>
 		</td>
 	</tr>
 	<tr>
@@ -708,8 +869,8 @@ include_once("head.inc");
 	</tr>
 	<tr>
 		<td width="22%" valign="top" class="vncell"><?php echo gettext("Enable"); ?></td>
-		<td width="78%" class="vtable"><input name="stream5_reassembly" type="checkbox" value="on" onclick="stream5_enable_change()" 
-			<?php if ($pconfig['stream5_reassembly']=="on") echo "checked "; ?>">
+		<td width="78%" class="vtable"><input name="stream5_reassembly" type="checkbox" value="on" onclick="stream5_enable_change();"  
+			<?php if ($pconfig['stream5_reassembly']=="on") echo "checked"; ?>>
 		<?php echo gettext("Use Stream5 session reassembly for TCP, UDP and/or ICMP traffic.  Default is ") . 
 		"<strong>" . gettext("Checked") . "</strong>"; ?>.</td>
 	</tr>
@@ -750,7 +911,7 @@ include_once("head.inc");
 		<td width="22%" valign="top" class="vncell"><?php echo gettext("Do Not Store Large TCP Packets"); ?></td>
 		<td width="78%" class="vtable">
 			<input name="stream5_dont_store_lg_pkts" type="checkbox" value="on" 
-			<?php if ($pconfig['stream5_dont_store_lg_pkts']=="on") echo "checked "; ?>>
+			<?php if ($pconfig['stream5_dont_store_lg_pkts']=="on") echo "checked"; ?>>
 			<?php echo gettext("Do not queue large packets in reassembly buffer to increase performance.  Default is ") . 
 			"<strong>" . gettext("Not Checked") . "</strong>"; ?>.<br/>
 			<?php echo "<span class=\"red\"><strong>" . gettext("Warning:  ") . "</strong></span>" . 
@@ -761,7 +922,7 @@ include_once("head.inc");
 		<td class="vtable">
 		<table cellpadding="0" cellspacing="0">
 			<tr>
-				<td><input name="max_queued_bytes" type="text" class="formfld"
+				<td><input name="max_queued_bytes" type="text" class="formfld" 
 					id="max_queued_bytes" size="6"
 					value="<?=htmlspecialchars($pconfig['max_queued_bytes']);?>">
 				<?php echo gettext("Minimum is <strong>1024</strong>, Maximum is <strong>1073741824</strong> " .
@@ -770,7 +931,7 @@ include_once("head.inc");
 			</tr>
 		</table>
 		<?php echo gettext("The number of bytes to be queued for reassembly for TCP sessions in " .
-		"memory. Default value is <strong>1048576</strong>"); ?>.<br>
+		"memory. Default value is <strong>1048576</strong>"); ?>.<br/>
 		</td>
 	</tr>
 	<tr>
@@ -778,7 +939,7 @@ include_once("head.inc");
 		<td class="vtable">
 		<table cellpadding="0" cellspacing="0">
 			<tr>
-				<td><input name="max_queued_segs" type="text" class="formfld"
+				<td><input name="max_queued_segs" type="text" class="formfld" 
 					id="max_queued_segs" size="6"
 					value="<?=htmlspecialchars($pconfig['max_queued_segs']);?>">
 				<?php echo gettext("Minimum is <strong>2</strong>, Maximum is <strong>1073741824</strong> " .
@@ -787,7 +948,7 @@ include_once("head.inc");
 			</tr>
 		</table>
 		<?php echo gettext("The number of segments to be queued for reassembly for TCP sessions " .
-		"in memory. Default value is <strong>2621</strong>"); ?>.<br>
+		"in memory. Default value is <strong>2621</strong>"); ?>.<br/>
 		</td>
 	</tr>
 	<tr>
@@ -795,7 +956,7 @@ include_once("head.inc");
 		<td class="vtable">
 		<table cellpadding="0" cellspacing="0">
 			<tr>
-				<td><input name="stream5_mem_cap" type="text" class="formfld"
+				<td><input name="stream5_mem_cap" type="text" class="formfld" 
 					id="stream5_mem_cap" size="6"
 					value="<?=htmlspecialchars($pconfig['stream5_mem_cap']);?>">
 				<?php echo gettext("Minimum is <strong>32768</strong>, Maximum is <strong>1073741824</strong> " .
@@ -803,7 +964,7 @@ include_once("head.inc");
 			</tr>
 		</table>
 		<?php echo gettext("The memory cap in bytes for TCP packet storage " .
-		"in RAM. Default value is <strong>8388608</strong> (8 MB)"); ?>.<br>
+		"in RAM. Default value is <strong>8388608</strong> (8 MB)"); ?>.<br/>
 		</td>
 	</tr>
 	<tr>
@@ -811,7 +972,7 @@ include_once("head.inc");
 		<td class="vtable">
 		<table cellpadding="0" cellspacing="0">
 			<tr>
-				<td><input name="stream5_overlap_limit" type="text" class="formfld"
+				<td><input name="stream5_overlap_limit" type="text" class="formfld" 
 					id="stream5_overlap_limit" size="6"
 					value="<?=htmlspecialchars($pconfig['stream5_overlap_limit']);?>">
 				<?php echo gettext("Minimum is ") . "<strong>0</strong>" . gettext(" (unlimited), and the maximum is ") . 
@@ -819,7 +980,7 @@ include_once("head.inc");
 			</tr>
 		</table>
 		<?php echo gettext("Sets the limit for the number of overlapping fragments allowed per packet.  Default value is ") .
-		"<strong>0</strong>" . gettext(" (unlimited)."); ?><br>
+		"<strong>0</strong>" . gettext(" (unlimited)."); ?><br/>
 		</td>
 	</tr>
 	<tr>
@@ -827,7 +988,7 @@ include_once("head.inc");
 		<td class="vtable">
 		<table cellpadding="0" cellspacing="0">
 			<tr>
-				<td><input name="stream5_tcp_timeout" type="text" class="formfld"
+				<td><input name="stream5_tcp_timeout" type="text" class="formfld" 
 					id="stream5_tcp_timeout" size="6"
 					value="<?=htmlspecialchars($pconfig['stream5_tcp_timeout']);?>">
 				<?php echo gettext("TCP Session timeout in seconds.  Minimum is ") . "<strong>1</strong>" . gettext(" and the maximum is ") . 
@@ -835,7 +996,7 @@ include_once("head.inc");
 			</tr>
 		</table>
 		<?php echo gettext("Sets the session reassembly timeout period for TCP packets.  Default value is ") .
-		"<strong>30</strong>" . gettext(" seconds."); ?><br>
+		"<strong>30</strong>" . gettext(" seconds."); ?><br/>
 		</td>
 	</tr>
 	<tr>
@@ -843,7 +1004,7 @@ include_once("head.inc");
 		<td class="vtable">
 		<table cellpadding="0" cellspacing="0">
 			<tr>
-				<td><input name="stream5_udp_timeout" type="text" class="formfld"
+				<td><input name="stream5_udp_timeout" type="text" class="formfld" 
 					id="stream5_udp_timeout" size="6"
 					value="<?=htmlspecialchars($pconfig['stream5_udp_timeout']);?>">
 				<?php echo gettext("UDP Session timeout in seconds.  Minimum is ") . "<strong>1</strong>" . gettext(" and the maximum is ") . 
@@ -851,7 +1012,7 @@ include_once("head.inc");
 			</tr>
 		</table>
 		<?php echo gettext("Sets the session reassembly timeout period for UDP packets.  Default value is ") .
-		"<strong>30</strong>" . gettext(" seconds."); ?><br>
+		"<strong>30</strong>" . gettext(" seconds."); ?><br/>
 		</td>
 	</tr>
 	<tr>
@@ -859,7 +1020,7 @@ include_once("head.inc");
 		<td class="vtable">
 		<table cellpadding="0" cellspacing="0">
 			<tr>
-				<td><input name="stream5_icmp_timeout" type="text" class="formfld"
+				<td><input name="stream5_icmp_timeout" type="text" class="formfld" 
 					id="stream5_icmp_timeout" size="6"
 					value="<?=htmlspecialchars($pconfig['stream5_icmp_timeout']);?>">
 				<?php echo gettext("ICMP Session timeout in seconds.  Minimum is ") . "<strong>1</strong>" . gettext(" and the maximum is ") . 
@@ -867,33 +1028,32 @@ include_once("head.inc");
 			</tr>
 		</table>
 		<?php echo gettext("Sets the session reassembly timeout period for ICMP packets.  Default value is ") .
-		"<strong>30</strong>" . gettext(" seconds."); ?><br>
+		"<strong>30</strong>" . gettext(" seconds."); ?><br/>
 		</td>
 	</tr>
 	<tr>
-		<td width="22%" valign="top" class="vncell"><?php echo gettext("IP Target Policy"); ?> </td>
+		<td width="22%" valign="top" class="vncell"><?php echo gettext("IP Target Policy"); ?></td>
 		<td width="78%" class="vtable">
-			<select name="stream5_policy" class="formselect" id="stream5_policy">
+			<select name="stream5_policy" class="formselect" id="stream5_policy"> 
 			<?php
 			$profile = array( 'BSD', 'First', 'HPUX', 'HPUX10', 'Irix', 'Last', 'Linux', 'MacOS', 'Old-Linux', 
 					 'Solaris', 'Vista', 'Windows', 'Win2003' );
 			foreach ($profile as $val): ?>
-			<option value="<?=strtolower($val);?>"
+			<option value="<?=strtolower($val);?>" 
 			<?php if (strtolower($val) == $pconfig['stream5_policy']) echo "selected"; ?>>
 				<?=gettext($val);?></option>
 				<?php endforeach; ?>
 			</select>&nbsp;&nbsp;<?php echo gettext("Choose the TCP reassembly target policy appropriate for the protected hosts.  The default is ") . 
 			"<strong>" . gettext("BSD") . "</strong>"; ?>.<br/>
-			<?php echo gettext("Available OS targets are BSD, First, HPUX, HPUX10, Irix, Last, Linux, MacOS, Old Linux, Solaris, Vista, Windows, and Win2003 Server."); ?><br/></td>
+			<?php echo gettext("Available OS targets are BSD, First, HPUX, HPUX10, Irix, Last, Linux, MacOS, Old Linux, Solaris, Vista, Windows, and Win2003 Server."); ?><br/>
 		</td>
 	</tr>
 	<tr>
 		<td colspan="2" valign="top" class="listtopic"><?php echo gettext("Portscan Settings"); ?></td>
 	</tr>
 	<tr>
-		<td width="22%" valign="top" class="vncell"><?php echo gettext("Enable"); ?> <br>
-		<?php echo gettext("Portscan Detection"); ?></td>
-		<td width="78%" class="vtable"><input name="sf_portscan" onclick="sf_portscan_enable_change()" 
+		<td width="22%" valign="top" class="vncell"><?php echo gettext("Enable"); ?></td>
+		<td width="78%" class="vtable"><input name="sf_portscan" onclick="sf_portscan_enable_change();" 
 			type="checkbox" value="on" id="sf_portscan"   
 			<?php if ($pconfig['sf_portscan']=="on") echo "checked"; ?>>
 		<?php echo gettext("Use Portscan Detection to detect various types of port scans and sweeps.  Default is ") . 
@@ -902,12 +1062,12 @@ include_once("head.inc");
 	<tr>
 		<td width="22%" valign="top" class="vncell"><?php echo gettext("Protocol"); ?> </td>
 		<td width="78%" class="vtable">
-			<select name="pscan_protocol" class="formselect" id="pscan_protocol">
+			<select name="pscan_protocol" class="formselect" id="pscan_protocol"> 
 			<?php
 			$protos = array('all', 'tcp', 'udp', 'icmp', 'ip');
 			foreach ($protos as $val): ?>
 			<option value="<?=$val;?>"
-			<?php if ($val == $pconfig['pscan_protocol']) echo "selected"; ?>>
+			<?php if ($val == $pconfig['pscan_protocol']) echo "selected"; ?>> 
 				<?=gettext($val);?></option>
 				<?php endforeach; ?>
 			</select>&nbsp;&nbsp;<?php echo gettext("Choose the Portscan protocol type to alert for (all, tcp, udp, icmp or ip).  Default is ") . 
@@ -917,12 +1077,12 @@ include_once("head.inc");
 	<tr>
 		<td width="22%" valign="top" class="vncell"><?php echo gettext("Scan Type"); ?> </td>
 		<td width="78%" class="vtable">
-			<select name="pscan_type" class="formselect" id="pscan_type">
+			<select name="pscan_type" class="formselect" id="pscan_type"> 
 			<?php
 			$protos = array('all', 'portscan', 'portsweep', 'decoy_portscan', 'distributed_portscan');
 			foreach ($protos as $val): ?>
 			<option value="<?=$val;?>"
-			<?php if ($val == $pconfig['pscan_type']) echo "selected"; ?>>
+			<?php if ($val == $pconfig['pscan_type']) echo "selected"; ?>> 
 				<?=gettext($val);?></option>
 				<?php endforeach; ?>
 			</select>&nbsp;&nbsp;<?php echo gettext("Choose the Portscan scan type to alert for.  Default is ") . 
@@ -949,12 +1109,12 @@ include_once("head.inc");
 	<tr>
 		<td width="22%" valign="top" class="vncell"><?php echo gettext("Sensitivity"); ?> </td>
 		<td width="78%" class="vtable">
-			<select name="pscan_sense_level" class="formselect" id="pscan_sense_level">
+			<select name="pscan_sense_level" class="formselect" id="pscan_sense_level"> 
 			<?php
 			$levels = array('low', 'medium', 'high');
 			foreach ($levels as $val): ?>
 			<option value="<?=$val;?>"
-			<?php if ($val == $pconfig['pscan_sense_level']) echo "selected"; ?>>
+			<?php if ($val == $pconfig['pscan_sense_level']) echo "selected"; ?>> 
 				<?=gettext(ucfirst($val));?></option>
 				<?php endforeach; ?>
 			</select>&nbsp;&nbsp;<?php echo gettext("Choose the Portscan sensitivity level (Low, Medium, High).  Default is ") . 
@@ -980,7 +1140,7 @@ include_once("head.inc");
 		<td class="vtable">
 		<table cellpadding="0" cellspacing="0">
 			<tr>
-				<td><input name="pscan_memcap" type="text" class="formfld"
+				<td><input name="pscan_memcap" type="text" class="formfld" 
 					id="pscan_memcap" size="6"
 					value="<?=htmlspecialchars($pconfig['pscan_memcap']);?>">
 				<?php echo gettext("Maximum memory in bytes to allocate for portscan detection.  ") . 
@@ -990,13 +1150,13 @@ include_once("head.inc");
 		</table>
 		<?php echo gettext("The maximum number of bytes to allocate for portscan detection.  The higher this number, ") . 
 		gettext("the more nodes that can be tracked.  Default is ") . 
-		"<strong>10,000,000</strong>" . gettext(" bytes.  (10 MB)"); ?><br>
+		"<strong>10,000,000</strong>" . gettext(" bytes.  (10 MB)"); ?><br/>
 		</td>
 	</tr>
 	<tr>
 		<td width="22%" valign="top" class="vncell"><?php echo gettext("Ignore Scanners"); ?></td>
 		<td width="78%" class="vtable">
-			<input name="pscan_ignore_scanners" type="text" size="40" autocomplete="off"  class="formfldalias" id="pscan_ignore_scanners"
+			<input name="pscan_ignore_scanners" type="text" size="40" autocomplete="off"  class="formfldalias" id="pscan_ignore_scanners" 
 			value="<?=$pconfig['pscan_ignore_scanners'];?>">&nbsp;&nbsp;<?php echo gettext("Leave blank for default.  ") . 
 			gettext("Default value is ") . "<strong>" . gettext("\$HOME_NET") . "</strong>"; ?>.<br/>
 			<?php echo gettext("Ignores the specified entity as a source of scan alerts.  Entity must be a defined alias."); ?><br/>
@@ -1006,97 +1166,79 @@ include_once("head.inc");
 		<td colspan="2" valign="top" class="listtopic"><?php echo gettext("General Preprocessor Settings"); ?></td>
 	</tr>
 	<tr>
-		<td width="22%" valign="top" class="vncell"><?php echo gettext("Enable"); ?> <br>
-		<?php echo gettext("RPC Decode and Back Orifice detector"); ?></td>
-		<td width="78%" class="vtable"><input name="other_preprocs"
-			type="checkbox" value="on"
+		<td width="22%" valign="top" class="vncell"><?php echo gettext("Enable RPC Decode and Back Orifice detector"); ?></td>
+		<td width="78%" class="vtable"><input name="other_preprocs" type="checkbox" value="on" 
 			<?php if ($pconfig['other_preprocs']=="on") echo "checked"; ?>>
 		<?php echo gettext("Normalize/Decode RPC traffic and detects Back Orifice traffic on the network.  Default is ") . 
 		"<strong>" . gettext("Checked") . "</strong>"; ?>.</td>
 	</tr>
 	<tr>
-		<td width="22%" valign="top" class="vncell"><?php echo gettext("Enable"); ?> <br>
-		<?php echo gettext("FTP and Telnet Normalizer"); ?></td>
-		<td width="78%" class="vtable"><input name="ftp_preprocessor"
-			type="checkbox" value="on"
+		<td width="22%" valign="top" class="vncell"><?php echo gettext("Enable FTP and Telnet Normalizer"); ?></td>
+		<td width="78%" class="vtable"><input name="ftp_preprocessor" type="checkbox" value="on" 
 			<?php if ($pconfig['ftp_preprocessor']=="on") echo "checked"; ?>>
 		<?php echo gettext("Normalize/Decode FTP and Telnet traffic and protocol anomalies.  Default is ") . 
 		"<strong>" . gettext("Checked") . "</strong>"; ?>.</td>
 	</tr>
 	<tr>
-		<td width="22%" valign="top" class="vncell"><?php echo gettext("Enable"); ?> <br>
-		<?php echo gettext("POP Normalizer"); ?></td>
-		<td width="78%" class="vtable"><input name="pop_preproc"
-			type="checkbox" value="on"
+		<td width="22%" valign="top" class="vncell"><?php echo gettext("Enable POP Normalizer"); ?></td>
+		<td width="78%" class="vtable"><input name="pop_preproc" type="checkbox" value="on" 
 			<?php if ($pconfig['pop_preproc']=="on") echo "checked"; ?>>
 		<?php echo gettext("Normalize/Decode POP protocol for enforcement and buffer overflows.  Default is ") . 
 		"<strong>" . gettext("Checked") . "</strong>"; ?>.</td>
 	</tr>
 	<tr>
-		<td width="22%" valign="top" class="vncell"><?php echo gettext("Enable"); ?> <br>
-		<?php echo gettext("IMAP Normalizer"); ?></td>
-		<td width="78%" class="vtable"><input name="imap_preproc"
-			type="checkbox" value="on"
+		<td width="22%" valign="top" class="vncell"><?php echo gettext("Enable IMAP Normalizer"); ?></td>
+		<td width="78%" class="vtable"><input name="imap_preproc" type="checkbox" value="on" 
 			<?php if ($pconfig['imap_preproc']=="on") echo "checked"; ?>>
 		<?php echo gettext("Normalize/Decode IMAP protocol for enforcement and buffer overflows.  Default is ") . 
 		"<strong>" . gettext("Checked") . "</strong>"; ?>.</td>
 	</tr>
 	<tr>
-		<td width="22%" valign="top" class="vncell"><?php echo gettext("Enable"); ?> <br>
-		<?php echo gettext("SMTP Normalizer"); ?></td>
-		<td width="78%" class="vtable"><input name="smtp_preprocessor"
-			type="checkbox" value="on"
+		<td width="22%" valign="top" class="vncell"><?php echo gettext("Enable SMTP Normalizer"); ?></td>
+		<td width="78%" class="vtable"><input name="smtp_preprocessor" type="checkbox" value="on" 
 			<?php if ($pconfig['smtp_preprocessor']=="on") echo "checked"; ?>>
 		<?php echo gettext("Normalize/Decode SMTP protocol for enforcement and buffer overflows.  Default is ") . 
 		"<strong>" . gettext("Checked") . "</strong>"; ?>.</td>
 	</tr>
 	<tr>
-		<td width="22%" valign="top" class="vncell"><?php echo gettext("Enable"); ?> <br>
-		<?php echo gettext("DCE/RPC2 Detection"); ?></td>
-		<td width="78%" class="vtable"><input name="dce_rpc_2"
-			type="checkbox" value="on"
+		<td width="22%" valign="top" class="vncell"><?php echo gettext("Enable DCE/RPC2 Detection"); ?></td>
+		<td width="78%" class="vtable"><input name="dce_rpc_2" type="checkbox" value="on" 
 			<?php if ($pconfig['dce_rpc_2']=="on") echo "checked"; ?>>
 		<?php echo gettext("The DCE/RPC preprocessor detects and decodes SMB and DCE/RPC traffic.  Default is ") . 
 		"<strong>" . gettext("Checked") . "</strong>"; ?>.</td>
 	</tr>
 	<tr>
-		<td width="22%" valign="top" class="vncell"><?php echo gettext("Enable"); ?> <br>
-		<?php echo gettext("SIP Detection"); ?></td>
-		<td width="78%" class="vtable"><input name="sip_preproc"
-			type="checkbox" value="on"
+		<td width="22%" valign="top" class="vncell"><?php echo gettext("Enable SIP Detection"); ?></td>
+		<td width="78%" class="vtable"><input name="sip_preproc" type="checkbox" value="on" 
 			<?php if ($pconfig['sip_preproc']=="on") echo "checked"; ?>>
 		<?php echo gettext("The SIP preprocessor decodes SIP traffic and detects some vulnerabilities.  Default is ") . 
 		"<strong>" . gettext("Checked") . "</strong>"; ?>.</td>
 	</tr>
 	<tr>
-		<td width="22%" valign="top" class="vncell"><?php echo gettext("Enable"); ?> <br>
-		<?php echo gettext("GTP Detection"); ?></td>
-		<td width="78%" class="vtable"><input name="gtp_preproc"
-			type="checkbox" value="on"
+		<td width="22%" valign="top" class="vncell"><?php echo gettext("Enable GTP Detection"); ?></td>
+		<td width="78%" class="vtable"><input name="gtp_preproc" type="checkbox" value="on" 
 			<?php if ($pconfig['gtp_preproc']=="on") echo "checked"; ?>>
 		<?php echo gettext("The GTP preprocessor decodes GPRS Tunneling Protocol traffic and detects intrusion attempts."); ?></td>
 	</tr>
 	<tr>
-		<td width="22%" valign="top" class="vncell"><?php echo gettext("Enable"); ?> <br>
-		<?php echo gettext("DNS Detection"); ?></td>
-		<td width="78%" class="vtable"><input name="dns_preprocessor"
-			type="checkbox" value="on"
+		<td width="22%" valign="top" class="vncell"><?php echo gettext("Enable DNS Detection"); ?></td>
+		<td width="78%" class="vtable"><input name="dns_preprocessor" type="checkbox" value="on" 
 			<?php if ($pconfig['dns_preprocessor']=="on") echo "checked"; ?>>
 		<?php echo gettext("The DNS preprocessor decodes DNS Response traffic and detects vulnerabilities.  Default is ") . 
 		"<strong>" . gettext("Checked") . "</strong>"; ?>.</td>
 	</tr>
 	<tr>
-		<td width="22%" valign="top" class="vncell"><?php echo gettext("Enable"); ?> <br> <?php echo gettext("SSL Data"); ?></td>
+		<td width="22%" valign="top" class="vncell"><?php echo gettext("Enable SSL Data"); ?></td>
 		<td width="78%" class="vtable">
-			<input name="ssl_preproc" type="checkbox" value="on"
+			<input name="ssl_preproc" type="checkbox" value="on"  
 			<?php if ($pconfig['ssl_preproc']=="on") echo "checked"; ?>>
 		<?php echo gettext("SSL data searches for irregularities during SSL protocol exchange.  Default is ") . 
 		"<strong>" . gettext("Checked") . "</strong>"; ?>.</td>	
 	</tr>
 	<tr>
-		<td width="22%" valign="top" class="vncell"><?php echo gettext("Enable"); ?> <br> <?php echo gettext("Sensitive Data"); ?></td>
+		<td width="22%" valign="top" class="vncell"><?php echo gettext("Enable Sensitive Data"); ?></td>
 		<td width="78%" class="vtable">
-			<input name="sensitive_data" type="checkbox" value="on"
+			<input name="sensitive_data" type="checkbox" value="on" 
 			<?php if ($pconfig['sensitive_data'] == "on")
 				 echo "checked";
 			      elseif ($vrt_enabled == "off")
@@ -1104,47 +1246,49 @@ include_once("head.inc");
 			?>>
 			<?php echo gettext("Sensitive data searches for credit card or Social Security numbers and e-mail addresses in data."); ?>
 		<br/>
-		<span class="red"><strong><?php echo gettext("Note: "); ?></strong></span><?php echo gettext("To enable this preprocessor, you must select the Snort VRT rules on the Global Settings tab."); ?>	
+		<span class="red"><strong><?php echo gettext("Note: "); ?></strong></span><?php echo gettext("To enable this preprocessor, you must select the Snort VRT rules on the Global Settings tab."); ?>
 		</td>
 	</tr>
 	<tr>
 		<td colspan="2" valign="top" class="listtopic"><?php echo gettext("SCADA Preprocessor Settings"); ?></td>
 	</tr>
 	<tr>
-		<td width="22%" valign="top" class="vncell"><?php echo gettext("Enable"); ?> <br> <?php echo gettext("Modbus Detection"); ?></td>
+		<td width="22%" valign="top" class="vncell"><?php echo gettext("Enable Modbus Detection"); ?></td>
 		<td width="78%" class="vtable">
-			<input name="modbus_preproc" type="checkbox" value="on"
+			<input name="modbus_preproc" type="checkbox" value="on" 
 			<?php if ($pconfig['modbus_preproc']=="on") echo "checked"; ?>>
 			<?php echo gettext("Modbus is a protocol used in SCADA networks.  The default port is TCP 502.") . "<br/>" . 
-		  	gettext("If your network does not contain Modbus-enabled devices, you should leave this preprocessor disabled."); ?>
+		  	"<span class=\"red\"><strong>" . gettext("Note: ") . "</strong></span>" . 
+			gettext("If your network does not contain Modbus-enabled devices, you can leave this preprocessor disabled."); ?>
 		</td>
 	</tr>
 	<tr>
-		<td width="22%" valign="top" class="vncell"><?php echo gettext("Enable"); ?> <br> <?php echo gettext("DNP3 Detection"); ?></td>
+		<td width="22%" valign="top" class="vncell"><?php echo gettext("Enable DNP3 Detection"); ?></td>
 		<td width="78%" class="vtable">
-			<input name="dnp3_preproc" type="checkbox" value="on"
+			<input name="dnp3_preproc" type="checkbox" value="on" 
 			<?php if ($pconfig['dnp3_preproc']=="on") echo "checked"; ?>>
 			<?php echo gettext("DNP3 is a protocol used in SCADA networks.  The default port is TCP 20000.") . "<br/>" . 
-		  	gettext("If your network does not contain DNP3-enabled devices, you should leave this preprocessor disabled."); ?>
+		  	"<span class=\"red\"><strong>" . gettext("Note: ") . "</strong></span>" . 
+			gettext("If your network does not contain DNP3-enabled devices, you can leave this preprocessor disabled."); ?>
 		</td>
 	</tr>
 	<tr>
 		<td width="22%" valign="top">&nbsp;</td>
-				<td width="78%">
-					<input name="Submit" type="submit" class="formbtn" value="Save" title="<?php echo 
-					gettext("Save preprocessor settings"); ?>"/>
-					<input name="id" type="hidden" value="<?=$id;?>">&nbsp;&nbsp;&nbsp;&nbsp;
-				<input name="ResetAll" type="submit" class="formbtn" value="Reset" title="<?php echo 
-				gettext("Reset all settings to defaults") . "\" onclick=\"return confirm('" . 
-				gettext("WARNING:  This will reset ALL preprocessor settings to their defaults.  Click OK to continue or CANCEL to quit.") . 
-				"')\""; ?>/></td>
-			</tr>
-			<tr>
-				<td width="22%" valign="top">&nbsp;</td>
-				<td width="78%"><span class="vexpl"><span class="red"><strong><?php echo gettext("Note: "); ?></strong></span>
-				<?php echo gettext("Please save your settings before you exit.  Preprocessor changes will rebuild the rules file.  This "); ?>
-				<?php echo gettext("may take several seconds.  Snort must also be restarted to activate any changes made on this screen."); ?></td>
-			</tr>
+		<td width="78%">
+			<input name="Submit" type="submit" class="formbtn" value="Save" title="<?php echo 
+			gettext("Save preprocessor settings"); ?>">
+			<input name="id" type="hidden" value="<?=$id;?>">&nbsp;&nbsp;&nbsp;&nbsp;
+			<input name="ResetAll" type="submit" class="formbtn" value="Reset" title="<?php echo 
+			gettext("Reset all settings to defaults") . "\" onclick=\"return confirm('" . 
+			gettext("WARNING:  This will reset ALL preprocessor settings to their defaults.  Click OK to continue or CANCEL to quit.") . 
+			"');\""; ?>></td>
+	</tr>
+	<tr>
+		<td width="22%" valign="top">&nbsp;</td>
+		<td width="78%"><span class="vexpl"><span class="red"><strong><?php echo gettext("Note: "); ?></strong></span></span>
+			<?php echo gettext("Please save your settings before you exit.  Preprocessor changes will rebuild the rules file.  This "); ?>
+			<?php echo gettext("may take several seconds.  Snort must also be restarted to activate any changes made on this screen."); ?></td>
+	</tr>
 </table>
 </div>
 </td></tr></table>
@@ -1199,6 +1343,15 @@ function frag3_enable_change() {
 	document.iform.frag3_max_frags.disabled=endis;
 	document.iform.frag3_memcap.disabled=endis;
 	document.iform.frag3_timeout.disabled=endis;
+}
+
+function host_attribute_table_enable_change() {
+	var endis = !(document.iform.host_attribute_table.checked);
+	document.iform.host_attribute_file.disabled=endis;
+	document.iform.btn_import.disabled=endis;
+	document.iform.btn_edit_hat.disabled=endis;
+	document.iform.max_attribute_hosts.disabled=endis;
+	document.iform.max_attribute_services_per_host.disabled=endis;
 }
 
 function http_inspect_enable_change() {

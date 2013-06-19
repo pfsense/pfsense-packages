@@ -191,10 +191,12 @@ if ($pconfig['brefresh'] == 'on')
 						<col width="10%" align="center">
 					</colgroup>
 					<thead>
+					   <tr>
 						<th class="listhdrr" axis="number">#</th>
 						<th class="listhdrr" axis="string"><?php echo gettext("IP"); ?></th>
 						<th class="listhdrr" axis="string"><?php echo gettext("Alert Description"); ?></th>
 						<th class="listhdrr"><?php echo gettext("Remove"); ?></th>
+					   </tr>
 					</thead>
 				<tbody>
 			<?php
