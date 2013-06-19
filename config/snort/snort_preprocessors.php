@@ -618,7 +618,7 @@ include_once("head.inc");
 		</table>
 		<?php echo gettext("Sets the per host limit of services to read from the Attribute Table. For a given host, if the number of " .
 		"services read exceeds this value, an error is logged and the remainder of the services for that host are ignored. " . 
-		"Default is ") . "<strong>" . gettext("10") . "</strong>.  " . gettext("A value of 0 disables Protocol Aware Flushing."); ?>.<br/>
+		"Default is ") . "<strong>" . gettext("10") . "</strong>"; ?>.<br/>
 		</td>
 	</tr>
 	<tr>
