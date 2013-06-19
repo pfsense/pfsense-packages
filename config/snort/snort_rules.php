@@ -193,6 +193,75 @@ if ($_GET['act'] == "toggle" && $_GET['ids'] && !empty($rules_map)) {
 	write_config();
 
 	$_GET['openruleset'] = $currentruleset;
+//	header("Location: /snort/snort_rules.php?id={$id}&openruleset={$currentruleset}");
+//	exit;
+	$anchor = "rule_{$sid}";
+}
+
+if ($_GET['act'] == "disable_all" && !empty($rules_map)) {
+
+	// Mark all rules in the currently selected category "disabled".
+	foreach (array_keys($rules_map) as $k1) {
+		foreach (array_keys($rules_map[$k1]) as $k2) {
+			if (isset($enablesid[$k2]))
+				unset($enablesid[$k2]);
+			$disablesid[$k2] = "disablesid";
+		}
+	}
+	// Write the updated enablesid and disablesid values to the config file.
+	$tmp = "";
+	foreach ($enablesid as $k => $v) {
+		$tmp .= "||{$v} {$k}";
+	}
+	if (!empty($tmp))
+		$a_rule[$id]['rule_sid_on'] = $tmp;
+	else				
+		unset($a_rule[$id]['rule_sid_on']);
+	$tmp = "";
+	foreach ($disablesid as $k => $v) {
+		$tmp .= "||{$v} {$k}";
+	}
+	if (!empty($tmp))
+		$a_rule[$id]['rule_sid_off'] = $tmp;
+	else				
+		unset($a_rule[$id]['rule_sid_off']);
+	write_config();
+
+	$_GET['openruleset'] = $currentruleset;
+	header("Location: /snort/snort_rules.php?id={$id}&openruleset={$currentruleset}");
+	exit;
+}
+
+if ($_GET['act'] == "enable_all" && !empty($rules_map)) {
+
+	// Mark all rules in the currently selected category "enabled".
+	foreach (array_keys($rules_map) as $k1) {
+		foreach (array_keys($rules_map[$k1]) as $k2) {
+			if (isset($disablesid[$k2]))
+				unset($disablesid[$k2]);
+			$enablesid[$k2] = "enablesid";
+		}
+	}
+	// Write the updated enablesid and disablesid values to the config file.
+	$tmp = "";
+	foreach ($enablesid as $k => $v) {
+		$tmp .= "||{$v} {$k}";
+	}
+	if (!empty($tmp))
+		$a_rule[$id]['rule_sid_on'] = $tmp;
+	else				
+		unset($a_rule[$id]['rule_sid_on']);
+	$tmp = "";
+	foreach ($disablesid as $k => $v) {
+		$tmp .= "||{$v} {$k}";
+	}
+	if (!empty($tmp))
+		$a_rule[$id]['rule_sid_off'] = $tmp;
+	else				
+		unset($a_rule[$id]['rule_sid_off']);
+	write_config();
+
+	$_GET['openruleset'] = $currentruleset;
 	header("Location: /snort/snort_rules.php?id={$id}&openruleset={$currentruleset}");
 	exit;
 }
@@ -250,9 +319,9 @@ if ($_GET['act'] == "resetall" && !empty($rules_map)) {
 if ($_POST['clear']) {
 	unset($a_rule[$id]['customrules']);
 	write_config();
-	$rebuild_rules = "on";
+	$rebuild_rules = true;
 	snort_generate_conf($a_rule[$id]);
-	$rebuild_rules = "off";
+	$rebuild_rules = false;
 	header("Location: /snort/snort_rules.php?id={$id}&openruleset={$currentruleset}");
 	exit;
 }
@@ -260,9 +329,9 @@ if ($_POST['clear']) {
 if ($_POST['customrules']) {
 	$a_rule[$id]['customrules'] = base64_encode($_POST['customrules']);
 	write_config();
-	$rebuild_rules = "on";
+	$rebuild_rules = true;
 	snort_generate_conf($a_rule[$id]);
-	$rebuild_rules = "off";
+	$rebuild_rules = false;
 	$output = "";
 	$retcode = "";
 	exec("snort -c {$snortdir}/snort_{$snort_uuid}_{$if_real}/snort.conf -T 2>&1", $output, $retcode);
@@ -289,18 +358,18 @@ else if ($_POST['apply']) {
 	/* Update the snort conf file and rebuild the    */
 	/* rules for this interface.                     */
 	/*************************************************/
-	$rebuild_rules = "on";
+	$rebuild_rules = true;
 	snort_generate_conf($a_rule[$id]);
-	$rebuild_rules = "off";
+	$rebuild_rules = false;
 
 	/* Return to this same page */
 	header("Location: /snort/snort_rules.php?id={$id}&openruleset={$currentruleset}");
 	exit;
 }
-else if($_POST) {
-	unset($a_rule[$id]['customrules']);
-	write_config();
-	header("Location: /snort/snort_rules.php?id={$id}&openruleset={$currentruleset}");
+else if ($_POST['cancel']) {
+
+	/* Return to this same page */
+	header("Location: /snort/snort_rules.php?id={$id}");
 	exit;
 }
 
@@ -398,8 +467,8 @@ if ($savemsg) {
 			</tr>
 			<tr>
 				<td>
-					<input name="Submit" type="submit" class="formbtn" value="<?php echo gettext(" Save "); ?>" title=" <?php echo gettext("Save custom rules"); ?>"/>&nbsp;&nbsp;
-					<input type="button" class="formbtn" value=" <?php echo gettext("Cancel"); ?>" onclick="history.back()" title="<?php echo gettext("Cancel changes and return to last page"); ?>"/>&nbsp;&nbsp;
+					<input name="Submit" type="submit" class="formbtn" id="submit" value="<?php echo gettext(" Save "); ?>" title=" <?php echo gettext("Save custom rules"); ?>"/>&nbsp;&nbsp;
+					<input name="cancel" type="submit" class="formbtn" id="cancel" value="<?php echo gettext("Cancel"); ?>" title="<?php echo gettext("Cancel changes and return to last page"); ?>"/>&nbsp;&nbsp;
 					<input name="clear" type="submit" class="formbtn" id="clear" value="<?php echo gettext("Clear"); ?>" onclick="return confirm('<?php echo gettext("This will erase all custom rules for the interface.  Are you sure?"); ?>')" title="<?php echo gettext("Deletes all custom rules"); ?>"/>
 				</td>
 			</tr>
@@ -411,10 +480,12 @@ if ($savemsg) {
 				<td class="vncell">
 					<table width="100%" align="center" border="0" cellpadding="0" cellspacing="0">
 						<tr>
-							<td width="50%" valign="middle" rowspan="2"><input type="submit" name="apply" id="apply" value="<?php echo gettext("Apply"); ?>" class="formbtn" 
+							<td rowspan="4" width="48%" valign="middle"><input type="submit" name="apply" id="apply" value="<?php echo gettext("Apply"); ?>" class="formbtn" 
 							title="<?php echo gettext("Click to rebuild the rules with your changes"); ?>"/>
 							<input type='hidden' name='id' value='<?=$id;?>'/>
-							<input type='hidden' name='openruleset' value='<?=$currentruleset;?>'/></td>
+							<input type='hidden' name='openruleset' value='<?=$currentruleset;?>'/><br/><br/>
+							<span class="vexpl"><span class="red"><strong><?php echo gettext("Note: ") . "</strong></span>" . 
+							gettext("Snort must be restarted to activate any SID enable/disable changes made on this tab."); ?></span></td>
 							<td class="vexpl" valign="middle"><?php echo "<a href='?id={$id}&openruleset={$currentruleset}&act=resetcategory'>
 							<img src=\"../themes/{$g['theme']}/images/icons/icon_x.gif\" width=\"15\" height=\"15\" 
 							onmouseout='this.src=\"../themes/{$g['theme']}/images/icons/icon_x.gif\"' 
@@ -431,8 +502,20 @@ if ($savemsg) {
 							&nbsp;&nbsp;<?php echo gettext("Remove all Enable/Disable changes in all Categories"); ?></td>
 						</tr>
 						<tr>
-							<td colspan="2" class="vexpl" valign="middle"><span class="red"><strong><?php echo gettext("Note: ") . "</strong></span>" . 
-							gettext("Snort must be restarted to activate any SID enable/disable changes."); ?></td>
+							<td class="vexpl" valign="middle"><?php echo "<a href='?id={$id}&openruleset={$currentruleset}&act=disable_all'> 
+							<img src=\"../themes/{$g['theme']}/images/icons/icon_x.gif\" width=\"15\" height=\"15\" 
+							onmouseout='this.src=\"../themes/{$g['theme']}/images/icons/icon_x.gif\"' 
+							onmouseover='this.src=\"../themes/{$g['theme']}/images/icons/icon_x_mo.gif\"' border='0' 
+							title='" . gettext("Click to disable all rules in the selected category") . "'></a>"?>
+							&nbsp;&nbsp;<?php echo gettext("Disable all rules in the current Category"); ?></td>
+						</tr>
+						<tr>
+							<td class="vexpl" valign="middle"><?php echo "<a href='?id={$id}&openruleset={$currentruleset}&act=enable_all'> 
+							<img src=\"../themes/{$g['theme']}/images/icons/icon_x.gif\" width=\"15\" height=\"15\" 
+							onmouseout='this.src=\"../themes/{$g['theme']}/images/icons/icon_x.gif\"' 
+							onmouseover='this.src=\"../themes/{$g['theme']}/images/icons/icon_x_mo.gif\"' border='0' 
+							title='" . gettext("Click to enable all rules in the selected category") . "'></a>"?>
+							&nbsp;&nbsp;<?php echo gettext("Enable all rules in the current Category"); ?></td>
 						</tr>
 					</table>
 				</td>
@@ -456,6 +539,7 @@ if ($savemsg) {
 							<col width="22" align="right" valign="middle">
 						</colgroup>
 						<thead>
+						   <tr>
 							<th class="list">&nbsp;</th>
 							<th class="listhdrr"><?php echo gettext("SID"); ?></th>
 							<th class="listhdrr"><?php echo gettext("Proto"); ?></th>
@@ -470,6 +554,7 @@ if ($savemsg) {
 							echo "onmouseover='this.src=\"../themes/{$g['theme']}/images/icons/icon_services_restart_mo.gif\"' 
 							onmouseout='this.src=\"../themes/{$g['theme']}/images/icons/icon_service_restart.gif\"' ";?>				
 							title="<?php echo gettext("Click to view full text of all the category rules"); ?>" width="17" height="17" border="0"></a></th>
+						   </tr>
 						</thead>
 						<tbody>
 
@@ -519,7 +604,7 @@ if ($savemsg) {
 								$message = snort_get_msg($v['rule']);
 
 						echo "<tr><td class=\"listt\" align=\"left\" valign=\"middle\"> $textss
-								<a href='?id={$id}&openruleset={$currentruleset}&act=toggle&ids={$sid}'>
+								<a id=\"rule_{$sid}\" href='?id={$id}&openruleset={$currentruleset}&act=toggle&ids={$sid}'>
 								<img src=\"../themes/{$g['theme']}/images/icons/{$iconb}\"
 								width=\"11\" height=\"11\" border=\"0\"  
 								title='" . gettext("Click to toggle enabled/disabled state") . "'></a>
@@ -532,19 +617,19 @@ if ($savemsg) {
 									{$textss}{$protocol}{$textse}
 							       </td>
 							       <td class=\"listlr\" align=\"center\">
-									{$srcspan}{$source}{$textse}
+									{$srcspan}{$source}</span>
 							       </td>
 							       <td class=\"listlr\" align=\"center\">
-									{$srcprtspan}{$source_port}{$textse}
+									{$srcprtspan}{$source_port}</span>
 							       </td>
 							       <td class=\"listlr\" align=\"center\">
-									{$dstspan}{$destination}{$textse}
+									{$dstspan}{$destination}</span>
 							       </td>
 							       <td class=\"listlr\" align=\"center\">
-								       {$dstprtspan}{$destination_port}{$textse}
+								       {$dstprtspan}{$destination_port}</span>
 							       </td>
 								<td class=\"listbg\" style=\"word-wrap:break-word; whitespace:pre-line;\"><font color=\"white\"> 
-									{$textss}{$message}{$textse}
+									{$textss}{$message}{$textse}</font>
 							       </td>";
 						?>
 								<td align="right" valign="middle" nowrap class="listt">
@@ -615,16 +700,23 @@ function wopen(url, name, w, h)
 {
 // Fudge factors for window decoration space.
 // In my tests these work well on all platforms & browsers.
-w += 32;
-h += 96;
- var win = window.open(url,
-  name, 
-  'width=' + w + ', height=' + h + ', ' +
-  'location=no, menubar=no, ' +
-  'status=no, toolbar=no, scrollbars=yes, resizable=yes');
- win.resizeTo(w, h);
- win.focus();
+    w += 32;
+    h += 96;
+    var win = window.open(url,
+        name, 
+       'width=' + w + ', height=' + h + ', ' +
+       'location=no, menubar=no, ' +
+       'status=no, toolbar=no, scrollbars=yes, resizable=yes');
+    win.resizeTo(w, h);
+    win.focus();
 }
+
+<?php if (!empty($anchor)): ?>
+    // Scroll the last enabled/disabled SID into view
+    window.location.hash = "<?=$anchor; ?>";
+    window.scrollBy(0,-60); 
+
+<?php endif;?>
 
 </script>
 </body>

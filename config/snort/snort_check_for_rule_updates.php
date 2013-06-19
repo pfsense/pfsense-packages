@@ -33,13 +33,33 @@ require_once("functions.inc");
 require_once("service-utils.inc");
 require_once "/usr/local/pkg/snort/snort.inc";
 
-global $snort_gui_include, $vrt_enabled, $et_enabled, $rebuild_rules, $snort_rules_upd_log;
-global $protect_preproc_rules, $is_postinstall, $snort_community_rules_filename;
-global $snort_community_rules_url, $snort_rules_file, $emergingthreats_filename, $g, $pkg_interface;
+global $g, $pkg_interface, $snort_gui_include, $rebuild_rules;
+
+
+if (!defined("VRT_DNLD_FILENAME"))
+	define("VRT_DNLD_FILENAME", "snortrules-snapshot-2946.tar.gz");
+if (!defined("VRT_DNLD_URL"))
+	define("VRT_DNLD_URL", "https://www.snort.org/reg-rules/");
+if (!defined("ET_VERSION"))
+	define("ET_VERSION", "2.9.0");
+if (!defined("ET_DNLD_FILENAME"))
+	define("ET_DNLD_FILENAME", "emerging.rules.tar.gz");
+if (!defined("GPLV2_DNLD_FILENAME"))
+	define("GPLV2_DNLD_FILENAME", "community-rules.tar.gz");
+if (!defined("GPLV2_DNLD_URL"))
+	define("GPLV2_DNLD_URL", "https://s3.amazonaws.com/snort-org/www/rules/community/");
+if (!defined("FLOWBITS_FILENAME"))
+	define("FLOWBITS_FILENAME", "flowbit-required.rules");
+if (!defined("ENFORCING_RULES_FILENAME"))
+	define("ENFORCING_RULES_FILENAME", "snort.rules");
+if (!defined("RULES_UPD_LOGFILE"))
+	define("RULES_UPD_LOGFILE", SNORTLOGDIR . "/snort_rules_update.log");
+
 
 $snortdir = SNORTDIR;
 $snortlibdir = SNORTLIBDIR;
 $snortlogdir = SNORTLOGDIR;
+$snort_rules_upd_log = RULES_UPD_LOGFILE;
 
 /* Save the state of $pkg_interface so we can restore it */
 $pkg_interface_orig = $pkg_interface;
@@ -56,21 +76,23 @@ $snortcommunityrules = $config['installedpackages']['snortglobal']['snortcommuni
 $vrt_enabled = $config['installedpackages']['snortglobal']['snortdownload'];
 $et_enabled = $config['installedpackages']['snortglobal']['emergingthreats'];
 
-/* Directory where we download rule tarballs */
+/* Working directory for downloaded rules tarballs */
 $tmpfname = "{$snortdir}/tmp/snort_rules_up";
 
-/* Snort VRT rules files and URL */
-$snort_filename_md5 = "{$snort_rules_file}.md5";
-$snort_filename = "{$snort_rules_file}";
-//$snort_rule_url = "http://www.snort.org/pub-bin/oinkmaster.cgi/{$oinkid}/";
-/* Use current Sourcefire VRT download URL and abandon the old CGI one */
-$snort_rule_url = "https://www.snort.org/reg-rules/";
+/* Snort VRT rules filenames and URL */
+$snort_filename = VRT_DNLD_FILENAME;
+$snort_filename_md5 = VRT_DNLD_FILENAME . ".md5";
+$snort_rule_url = VRT_DNLD_URL;
 
-/* Emerging Threats rules MD5 file */
-$emergingthreats_filename_md5 = "{$emergingthreats_filename}.md5";
+/* Emerging Threats rules filenames and URL */
+$emergingthreats_filename = ET_DNLD_FILENAME;
+$emergingthreats_filename_md5 = ET_DNLD_FILENAME . ".md5";
+$emerging_threats_version = ET_VERSION;
 
-/* Snort GPLv2 Community Rules MD5 file */
-$snort_community_rules_filename_md5 = "{$snort_community_rules_filename}.md5";
+/* Snort GPLv2 Community Rules filenames and URL */
+$snort_community_rules_filename = GPLV2_DNLD_FILENAME;
+$snort_community_rules_filename_md5 = GPLV2_DNLD_FILENAME . ".md5";
+$snort_community_rules_url = GPLV2_DNLD_URL;
 
 /* Custom function for rules file download via URL */
 function snort_download_file_url($url, $file_out) {
@@ -80,10 +102,11 @@ function snort_download_file_url($url, $file_out) {
 	/* by $url using the CURL library functions and */
 	/* saves the content to the file specified by   */
 	/* $file.                                       */
-	/*                                              */	
+	/*                                              */
+	/* It provides logging of returned CURL errors. */
 	/************************************************/
 
-	global $g, $config, $pkg_interface, $last_curl_error;
+	global $g, $config, $pkg_interface, $last_curl_error, $fout, $ch, $file_size, $downloaded;
 
 	/* Array of message strings for HTTP Response Codes */
 	$http_resp_msg = array( 200 => "OK", 202 => "Accepted", 204 => "No Content", 205 => "Reset Content", 
@@ -97,19 +120,21 @@ function snort_download_file_url($url, $file_out) {
 
 	$last_curl_error = "";
 
-	/* If not in console mode, use the built-in progress-bar function */
-	if ($pkg_interface <> "console")
-		return download_file_with_progress_bar($url, $file_out);
-
-	/* Otherwise, use our custom function with no output */
-	/* (Note:  required to suppress errors from XMLRPC)  */
-	$fp = fopen($file_out, "wb");
-	if ($fp) {
+	$fout = fopen($file_out, "wb");
+	if ($fout) {
 		$ch = curl_init($url);
 		if (!$ch)
 			return false;
-		curl_setopt($ch, CURLOPT_FILE, $fp);
-		curl_setopt($ch, CURLOPT_HEADER, false);
+		curl_setopt($ch, CURLOPT_FILE, $fout);
+
+		/* NOTE: required to suppress errors from XMLRPC due to progress bar output  */
+		if ($g['snort_sync_in_progress'])
+			curl_setopt($ch, CURLOPT_HEADER, false);
+		else {
+			curl_setopt($ch, CURLOPT_HEADERFUNCTION, 'read_header');
+			curl_setopt($ch, CURLOPT_WRITEFUNCTION, 'read_body');
+		}
+
 		curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
 		curl_setopt($ch, CURLOPT_USERAGENT, "Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.1; Win64; x64; Trident/6.0)");
 		/* Don't verify SSL peers since we don't have the certificates to do so. */
@@ -134,7 +159,7 @@ function snort_download_file_url($url, $file_out) {
 		if (isset($http_resp_msg[$http_code]))
 			$last_curl_error = $http_resp_msg[$http_code];
 		curl_close($ch);
-		fclose($fp);
+		fclose($fout);
 		/* If we had to try more than once, log it */
 		if ($counter > 1)
 			log_error(gettext("File '" . basename($file_out) . "' download attempts: {$counter} ..."));
@@ -417,9 +442,9 @@ if ($emergingthreats == "on") {
 
 	/* If using Sourcefire VRT rules with ET, then we should use the open-nogpl ET rules.  */
 	if ($vrt_enabled == "on")
-		$rc = snort_download_file_url("http://rules.emergingthreats.net/open-nogpl/snort-{$emerging_threats_version}/emerging.rules.tar.gz", "{$tmpfname}/{$emergingthreats_filename}");
+		$rc = snort_download_file_url("http://rules.emergingthreats.net/open-nogpl/snort-{$emerging_threats_version}/{$emergingthreats_filename}", "{$tmpfname}/{$emergingthreats_filename}");
 	else
-		$rc = snort_download_file_url("http://rules.emergingthreats.net/open/snort-{$emerging_threats_version}/emerging.rules.tar.gz", "{$tmpfname}/{$emergingthreats_filename}");
+		$rc = snort_download_file_url("http://rules.emergingthreats.net/open/snort-{$emerging_threats_version}/{$emergingthreats_filename}", "{$tmpfname}/{$emergingthreats_filename}");
 
 	/* Test for a valid rules file download.  Turn off ET update if download failed. */
 	if ($rc === true) {
@@ -675,10 +700,10 @@ if ($snortdownload == 'on' || $emergingthreats == 'on' || $snortcommunityrules =
 
 		/* Set the flag to force rule rebuilds since we downloaded new rules,    */
 		/* except when in post-install mode.  Post-install does its own rebuild. */
-		if ($is_postinstall)
-			$rebuild_rules = 'off';
+		if ($g['snort_postinstall'])
+			$rebuild_rules = false;
 		else
-			$rebuild_rules = 'on';
+			$rebuild_rules = true;
 
 		/* Create configuration for each active Snort interface */
 		foreach ($config['installedpackages']['snortglobal']['rule'] as $id => $value) {
@@ -708,7 +733,7 @@ if ($snortdownload == 'on' || $emergingthreats == 'on' || $snortcommunityrules =
 	}
 
 	/* Clear the rebuild rules flag.  */
-	$rebuild_rules = 'off';
+	$rebuild_rules = false;
 
 	/*  remove old $tmpfname files */
 	if (is_dir("{$snortdir}/tmp")) {

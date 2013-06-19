@@ -38,9 +38,10 @@
 require_once("guiconfig.inc");
 require_once("/usr/local/pkg/snort/snort.inc");
 
-global $g, $flowbit_rules_file, $rebuild_rules;
+global $g, $rebuild_rules;
 
 $snortdir = SNORTDIR;
+$flowbit_rules_file = FLOWBITS_FILENAME;
 $rules_map = array();
 $supplist = array();
 
@@ -67,10 +68,10 @@ if ($a_nat[$id]['autoflowbitrules'] == 'on') {
 		$rules_map = snort_load_rules_map("{$snortdir}/snort_{$snort_uuid}_{$if_real}/rules/{$flowbit_rules_file}");
 	}
 	else
-		$savemsg = "There are no flowbit-required rules necessary for the current enforcing rule set.";
+		$savemsg = gettext("There are no flowbit-required rules necessary for the current enforcing rule set.");
 }
 else
-	$input_errors[] = "Auto-Flowbit rule generation is disabled for this interface!";
+	$input_errors[] = gettext("Auto-Flowbit rule generation is disabled for this interface!");
 
 if ($_GET['act'] == "addsuppress" && is_numeric($_GET['sidid']) && is_numeric($_GET['gen_id'])) {
 	$descr = snort_get_msg($rules_map[$_GET['gen_id']][$_GET['sidid']]['rule']);
@@ -83,6 +84,7 @@ if ($_GET['act'] == "addsuppress" && is_numeric($_GET['sidid']) && is_numeric($_
 	if (!is_array($config['installedpackages']['snortglobal']['suppress']['item']))
 		$config['installedpackages']['snortglobal']['suppress']['item'] = array();
 	$a_suppress = &$config['installedpackages']['snortglobal']['suppress']['item'];
+	$found_list = false;
 
 	if (empty($a_nat[$id]['suppresslistname']) || $a_nat[$id]['suppresslistname'] == 'default') {
 		$s_list = array();
@@ -92,9 +94,11 @@ if ($_GET['act'] == "addsuppress" && is_numeric($_GET['sidid']) && is_numeric($_
 		$s_list['suppresspassthru'] = base64_encode($suppress);
 		$a_suppress[] = $s_list;
 		$a_nat[$id]['suppresslistname'] = $s_list['name'];
+		$found_list = true;
 	} else {
 		foreach ($a_suppress as $a_id => $alist) {
 			if ($alist['name'] == $a_nat[$id]['suppresslistname']) {
+				$found_list = true;
 				if (!empty($alist['suppresspassthru'])) {
 					$tmplist = base64_decode($alist['suppresspassthru']);
 					$tmplist .= "\n{$suppress}";
@@ -104,10 +108,16 @@ if ($_GET['act'] == "addsuppress" && is_numeric($_GET['sidid']) && is_numeric($_
 			}
 		}
 	}
-	write_config();
-	$rebuild_rules = "off";
-	sync_snort_package_config();
-	$savemsg = "Wrote suppress rule for gen_id {$_GET['gen_id']}, sig_id {$_GET['sidid']} to the {$a_nat[$id]['suppresslistname']} Suppression List.";
+	if ($found_list) {
+		write_config();
+		$rebuild_rules = false;
+		sync_snort_package_config();
+		$savemsg = gettext("Wrote suppress rule for 'gen_id {$_GET['gen_id']}, sig_id {$_GET['sidid']}' to the '{$a_nat[$id]['suppresslistname']}' Suppression List.");
+	}
+	else {
+		/* We did not find the defined list, so notify the user with an error */
+		$input_errors[] = gettext("Suppress List '{$a_nat[$id]['suppresslistname']}' is defined for this interface, but it could not be found!");
+	}
 }
 
 function truncate($string, $length) {
@@ -165,11 +175,11 @@ if ($savemsg)
 	</tr>
 	<tr>
 		<td width="78%" class="vncell">
-			<table width="100%" border="0 cellspacing="2" cellpadding="0">
+			<table width="100%" border="0" cellspacing="2" cellpadding="0">
 				<tr>
 					<td width="17px"><img src="../themes/<?=$g['theme']?>/images/icons/icon_plus.gif" width='12' height='12' border='0'/></td>
 					<td><span class="vexpl"><?php echo gettext("Alert is Not Suppressed"); ?></span></td>
-					<td rowspan="3" align="right"><input id="cancelbutton" name="cancelbutton" type="button" class="formbtn" onclick="history.back()" <?php 
+					<td rowspan="3" align="right"><input id="cancelbutton" name="cancelbutton" type="button" class="formbtn" onclick="parent.location='snort_rulesets.php?id=<?=$id;?>'" <?php 
 					echo "value=\"" . gettext("Return") . "\" title=\"" . gettext("Return to previous page") . "\""; ?>/></td>
 				</tr>
 				<tr>
@@ -197,12 +207,14 @@ if ($savemsg)
 				<col axis="string">
 			</colgroup>
 			<thead>
+			   <tr>
 				<th class="listhdrr" axis="number"><?php echo gettext("SID"); ?></th>
-				<td class="listhdrr" axis="string"><?php echo gettext("Proto"); ?></th>
+				<th class="listhdrr" axis="string"><?php echo gettext("Proto"); ?></th>
 				<th class="listhdrr" axis="string"><?php echo gettext("Source"); ?></th>
 				<th class="listhdrr" axis="string"><?php echo gettext("Destination"); ?></th>
 				<th class="listhdrr" axis="string"><?php echo gettext("Flowbits"); ?></th>
 				<th class="listhdrr" axis="string"><?php echo gettext("Message"); ?></th>
+			   </tr>
 			<thead>
 			<tbody>
 				<?php
@@ -228,12 +240,12 @@ if ($savemsg)
 							else {
 								if (!isset($supplist[$gid][$sid])) {
 									$supplink = "<a href=\"?id={$id}&act=addsuppress&sidid={$sid}&gen_id={$gid}\">";
-									$supplink .= "<img src=\"../themes/{$g['theme']}/images/icons/icon_plus.gif\"";
+									$supplink .= "<img src=\"../themes/{$g['theme']}/images/icons/icon_plus.gif\" ";
 									$supplink .= "width='12' height='12' border='0' title='";
 									$supplink .= gettext("Click to add to Suppress List") . "'/></a>";
 								}
 								else {
-									$supplink .= "<img src=\"../themes/{$g['theme']}/images/icons/icon_plus_d.gif\"";
+									$supplink = "<img src=\"../themes/{$g['theme']}/images/icons/icon_plus_d.gif\" ";
 									$supplink .= "width='12' height='12' border='0' title='";
 									$supplink .= gettext("Alert has been suppressed") . "'/>";
 								}
@@ -260,7 +272,7 @@ if ($savemsg)
 	<?php if ($count > 20): ?>
 	<tr>
 		<td align="center" valign="middle">
-			<input id="cancelbutton" name="cancelbutton" type="button" class="formbtn" onclick="history.back()" <?php 
+			<input id="cancelbutton" name="cancelbutton" type="button" class="formbtn" onclick="parent.location='snort_rulesets.php?id=<?=$id;?>'" <?php 
 			echo "value=\"" . gettext("Return") . "\" title=\"" . gettext("Return to previous page") . "\""; ?>/>
 			<input name="id" type="hidden" value="<?=$id;?>" />
 		</td>

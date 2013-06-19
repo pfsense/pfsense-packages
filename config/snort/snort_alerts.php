@@ -40,6 +40,24 @@ require_once("/usr/local/pkg/snort/snort.inc");
 $snortalertlogt = $config['installedpackages']['snortglobal']['snortalertlogtype'];
 $supplist = array();
 
+function snort_is_alert_globally_suppressed($list, $gid, $sid) {
+
+	/************************************************/
+	/* Checks the passed $gid:$sid to see if it has */
+	/* been globally suppressed.  If true, then any */
+	/* "track by_src" or "track by_dst" options are */
+	/* disabled since they are overridden by the    */
+	/* global suppression of the $gid:$sid.         */
+	/************************************************/
+
+	if (is_array($list[$gid][$sid]))
+		return false;
+	elseif (!isset($list[$gid][$sid]))
+		return false;
+	else
+		return true;
+}
+
 if ($_GET['instance'])
 	$instanceid = $_GET['instance'];
 if ($_POST['instance'])
@@ -97,7 +115,9 @@ if ($_GET['act'] == "addsuppress" && is_numeric($_GET['sidid']) && is_numeric($_
 	if (!is_array($config['installedpackages']['snortglobal']['suppress']['item']))
 		$config['installedpackages']['snortglobal']['suppress']['item'] = array();
 	$a_suppress = &$config['installedpackages']['snortglobal']['suppress']['item'];
+	$found_list = false;
 
+	/* If no Suppress List is set for the interface, then create one with the interface name */
 	if (empty($a_instance[$instanceid]['suppresslistname']) || $a_instance[$instanceid]['suppresslistname'] == 'default') {
 		$s_list = array();
 		$s_list['name'] = $a_instance[$instanceid]['interface'] . "suppress";
@@ -106,9 +126,12 @@ if ($_GET['act'] == "addsuppress" && is_numeric($_GET['sidid']) && is_numeric($_
 		$s_list['suppresspassthru'] = base64_encode($suppress);
 		$a_suppress[] = $s_list;
 		$a_instance[$instanceid]['suppresslistname'] = $s_list['name'];
+		$found_list = true;
 	} else {
+		/* If we get here, a Suppress List is defined for the interface so see if we can find it */
 		foreach ($a_suppress as $a_id => $alist) {
 			if ($alist['name'] == $a_instance[$instanceid]['suppresslistname']) {
+				$found_list = true;
 				if (!empty($alist['suppresspassthru'])) {
 					$tmplist = base64_decode($alist['suppresspassthru']);
 					$tmplist .= "\n{$suppress}";
@@ -118,9 +141,76 @@ if ($_GET['act'] == "addsuppress" && is_numeric($_GET['sidid']) && is_numeric($_
 			}
 		}
 	}
-	$savemsg = "An entry for 'suppress gen_id {$_GET['gen_id']}, sig_id {$_GET['sidid']}' has been added to the Suppress List.";
-	write_config();
-	sync_snort_package_config();
+
+	if ($found_list) {
+		$savemsg = "An entry for 'suppress gen_id {$_GET['gen_id']}, sig_id {$_GET['sidid']}' has been added to the Suppress List.";
+		write_config();
+		sync_snort_package_config();
+		snort_reload_config($a_instance[$instanceid]);
+	}
+	else {
+		/* We did not find the defined list, so notify the user with an error */
+		$input_errors[] = gettext("Suppress List '{$a_instance[$instanceid]['suppresslistname']}' is defined for this interface, but it could not be found!");
+	}
+}
+
+if (($_GET['act'] == "addsuppress_srcip" || $_GET['act'] == "addsuppress_dstip") && is_numeric($_GET['sidid']) && is_numeric($_GET['gen_id'])) {
+	if ($_GET['act'] == "addsuppress_srcip")
+		$method = "by_src";
+	else
+		$method = "by_dst";
+	if (is_ipaddr($_GET['ip']) || is_ipaddrv6($_GET['ip'])) {
+		if (empty($_GET['descr']))
+			$suppress = "suppress gen_id {$_GET['gen_id']}, sig_id {$_GET['sidid']}, track {$method}, ip {$_GET['ip']}\n";
+		else  
+			$suppress = "#{$_GET['descr']}\nsuppress gen_id {$_GET['gen_id']}, sig_id {$_GET['sidid']}, track {$method}, ip {$_GET['ip']}\n";
+	}
+	else {
+		header("Location: /snort/snort_alerts.php?instance={$instanceid}");
+		exit;
+	}
+
+	/* Save the new Suppress entry to the list */
+	if (!is_array($config['installedpackages']['snortglobal']['suppress']))
+		$config['installedpackages']['snortglobal']['suppress'] = array();
+	if (!is_array($config['installedpackages']['snortglobal']['suppress']['item']))
+		$config['installedpackages']['snortglobal']['suppress']['item'] = array();
+	$a_suppress = &$config['installedpackages']['snortglobal']['suppress']['item'];
+	$found_list = false;
+
+	if (empty($a_instance[$instanceid]['suppresslistname']) || $a_instance[$instanceid]['suppresslistname'] == 'default') {
+		$s_list = array();
+		$s_list['name'] = $a_instance[$instanceid]['interface'] . "suppress";
+		$s_list['uuid'] = uniqid();
+		$s_list['descr']  =  "Auto-generated list for suppress";
+		$s_list['suppresspassthru'] = base64_encode($suppress);
+		$a_suppress[] = $s_list;
+		$a_instance[$instanceid]['suppresslistname'] = $s_list['name'];
+		$found_list = true;
+	} else {
+		foreach ($a_suppress as $a_id => $alist) {
+			if ($alist['name'] == $a_instance[$instanceid]['suppresslistname']) {
+				$found_list = true;
+				if (!empty($alist['suppresspassthru'])) {
+					$tmplist = base64_decode($alist['suppresspassthru']);
+					$tmplist .= "\n{$suppress}";
+					$alist['suppresspassthru'] = base64_encode($tmplist);
+					$a_suppress[$a_id] = $alist;
+				}
+			}
+		}
+	}
+
+	if ($found_list) {
+		$savemsg = "An entry for 'suppress gen_id {$_GET['gen_id']}, sig_id {$_GET['sidid']}, track {$method}, ip {$_GET['ip']}' has been added to the Suppress List.";
+		write_config();
+		sync_snort_package_config();
+		snort_reload_config($a_instance[$instanceid]);
+	}
+	else {
+		/* We did not find the defined list, so notify the user with an error */
+		$input_errors[] = gettext("Suppress List '{$a_instance[$instanceid]['suppresslistname']}' is defined for this interface, but it could not be found!");
+	}
 }
 
 if ($_GET['action'] == "clear" || $_POST['delete']) {
@@ -162,7 +252,7 @@ if ($_POST['download']) {
 }
 
 /* Load up an array with the current Suppression List GID,SID values */
-$supplist = snort_load_suppress_sigs($a_instance[$instanceid]);
+$supplist = snort_load_suppress_sigs($a_instance[$instanceid], true);
 
 $pgtitle = "Services: Snort: Snort Alerts";
 include_once("head.inc");
@@ -265,6 +355,7 @@ if ($pconfig['arefresh'] == 'on')
 			<col axis="string">
 		</colgroup>
 		<thead>
+		   <tr>
 			<th class="listhdrr" axis="date"><?php echo gettext("DATE"); ?></th>
 			<th class="listhdrr" axis="number"><?php echo gettext("PRI"); ?></th>
 			<th class="listhdrr" axis="string"><?php echo gettext("PROTO"); ?></th>
@@ -275,6 +366,7 @@ if ($pconfig['arefresh'] == 'on')
 			<th class="listhdrr" axis="string"><?php echo gettext("DPORT"); ?></th>
 			<th class="listhdrr" axis="number"><?php echo gettext("SID"); ?></th>
 			<th class="listhdrr" axis="string"><?php echo gettext("DESCRIPTION"); ?></th>
+		   </tr>
 		</thead>
 	<tbody>
 	<?php
@@ -307,9 +399,19 @@ if (file_exists("/var/log/snort/snort_{$if_real}{$snort_uuid}/alert")) {
 			$alert_ip_src = $fields[6];
 			/* Add zero-width space as soft-break opportunity after each colon if we have an IPv6 address */
 			$alert_ip_src = str_replace(":", ":&#8203;", $alert_ip_src);
+			if (!snort_is_alert_globally_suppressed($supplist, $fields[1], $fields[2]) && 
+			    !isset($supplist[$fields[1]][$fields[2]]['by_src'][$fields[6]])) {
+				$alert_ip_src .= "<br/><a href='?instance={$instanceid}&act=addsuppress_srcip&sidid={$fields[2]}&gen_id={$fields[1]}&descr={$alert_descr_url}&ip=" . trim(urlencode($fields[6])) . "'>";
+				$alert_ip_src .= "<img src='../themes/{$g['theme']}/images/icons/icon_plus.gif' width='12' height='12' border='0' ";
+				$alert_ip_src .= "title='" . gettext("Add this gen_id:sig_id track by_src IP to Suppress List") . "'></a>";	
+			}
+			elseif (isset($supplist[$fields[1]][$fields[2]]['by_src'][$fields[6]])) {
+				$alert_ip_src .= "<br/><img src='../themes/{$g['theme']}/images/icons/icon_plus_d.gif' width='12' height='12' border='0' ";
+				$alert_ip_src .= "title='" . gettext("This gen_id:sig_id track by_src IP already in Suppress List") . "'/>";	
+			}
 			if (isset($tmpblocked[$fields[6]])) {
-				$alert_ip_src .= "<br/><a href='?instance={$id}&todelete=" . trim(urlencode($fields[6])) . "'>
-				<img title=\"" . gettext("Remove host from Blocked Table") . "\" border=\"0\" width='10' height='10' name='todelete' id='todelete' alt=\"Remove from Blocked Hosts\" src=\"../themes/{$g['theme']}/images/icons/icon_x.gif\"/></a>"; 
+				$alert_ip_src .= "&nbsp;&nbsp;<a href='?instance={$id}&todelete=" . trim(urlencode($fields[6])) . "'>
+				<img title=\"" . gettext("Remove host from Blocked Table") . "\" border=\"0\" width='12' height='12' name='todelete' id='todelete' alt=\"Remove from Blocked Hosts\" src=\"../themes/{$g['theme']}/images/icons/icon_x.gif\"/></a>"; 
 			}
 			/* IP SRC Port */
 			$alert_src_p = $fields[7];
@@ -317,21 +419,31 @@ if (file_exists("/var/log/snort/snort_{$if_real}{$snort_uuid}/alert")) {
 			$alert_ip_dst = $fields[8];
 			/* Add zero-width space as soft-break opportunity after each colon if we have an IPv6 address */
 			$alert_ip_dst = str_replace(":", ":&#8203;", $alert_ip_dst);
+			if (!snort_is_alert_globally_suppressed($supplist, $fields[1], $fields[2]) && 
+			    !isset($supplist[$fields[1]][$fields[2]]['by_dst'][$fields[8]])) {
+				$alert_ip_dst .= "<br/><a href='?instance={$instanceid}&act=addsuppress_dstip&sidid={$fields[2]}&gen_id={$fields[1]}&descr={$alert_descr_url}&ip=" . trim(urlencode($fields[8])) . "'>";
+				$alert_ip_dst .= "<img src='../themes/{$g['theme']}/images/icons/icon_plus.gif' width='12' height='12' border='0' ";
+				$alert_ip_dst .= "title='" . gettext("Add this gen_id:sig_id track by_dst IP to Suppress List") . "'></a>";	
+			}
+			elseif (isset($supplist[$fields[1]][$fields[2]]['by_dst'][$fields[8]])) {
+				$alert_ip_dst .= "<br/><img src='../themes/{$g['theme']}/images/icons/icon_plus_d.gif' width='12' height='12' border='0' ";
+				$alert_ip_dst .= "title='" . gettext("This gen_id:sig_id track by_dst IP already in Suppress List") . "'/>";	
+			}
 			if (isset($tmpblocked[$fields[8]])) {
-				$alert_ip_dst .= "<br/><a href='?instance={$id}&todelete=" . trim(urlencode($fields[8])) . "'>
-				<img title=\"" . gettext("Remove host from Blocked Table") . "\" border=\"0\" width='10' height='10' name='todelete' id='todelete' alt=\"Remove from Blocked Hosts\" src=\"../themes/{$g['theme']}/images/icons/icon_x.gif\"/></a>";
+				$alert_ip_dst .= "&nbsp;&nbsp;<a href='?instance={$id}&todelete=" . trim(urlencode($fields[8])) . "'>
+				<img title=\"" . gettext("Remove host from Blocked Table") . "\" border=\"0\" width='12' height='12' name='todelete' id='todelete' alt=\"Remove from Blocked Hosts\" src=\"../themes/{$g['theme']}/images/icons/icon_x.gif\"/></a>";
 			}
 			/* IP DST Port */
 			$alert_dst_p = $fields[9];
 			/* SID */
 			$alert_sid_str = "{$fields[1]}:{$fields[2]}";
-			if (!isset($supplist[$fields[1]][$fields[2]])) {
+			if (!snort_is_alert_globally_suppressed($supplist, $fields[1], $fields[2])) {
 				$sidsupplink = "<a href='?instance={$instanceid}&act=addsuppress&sidid={$fields[2]}&gen_id={$fields[1]}&descr={$alert_descr_url}'>";
-				$sidsupplink .= "<img src='../themes/{$g['theme']}/images/icons/icon_plus.gif' width='10' height='10' border='0' ";
+				$sidsupplink .= "<img src='../themes/{$g['theme']}/images/icons/icon_plus.gif' width='12' height='12' border='0' ";
 				$sidsupplink .= "title='" . gettext("Add this gen_id:sig_id to Suppress List") . "'></a>";	
 			}
 			else {
-				$sidsupplink = "<img src='../themes/{$g['theme']}/images/icons/icon_plus_d.gif' width='10' height='10' border='0' ";
+				$sidsupplink = "<img src='../themes/{$g['theme']}/images/icons/icon_plus_d.gif' width='12' height='12' border='0' ";
 				$sidsupplink .= "title='" . gettext("This gen_id:sig_id already in Suppress List") . "'/>";	
 			}
 			$alert_class = $fields[11];
@@ -368,5 +480,6 @@ if (file_exists("/var/log/snort/snort_{$if_real}{$snort_uuid}/alert")) {
 <?php
 include("fend.inc");
 ?>
+
 </body>
 </html>

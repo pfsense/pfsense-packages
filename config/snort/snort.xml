@@ -46,8 +46,8 @@
 	<requirements>Describe your package requirements here</requirements>
 	<faq>Currently there are no FAQ items provided.</faq>
 	<name>Snort</name>
-	<version>2.9.4.1</version>
-	<title>Services:2.9.4.1 pkg v. 2.5.8</title>
+	<version>2.9.4.6</version>
+	<title>Services:2.9.4.6 pkg v. 2.5.9</title>
 	<include_file>/usr/local/pkg/snort/snort.inc</include_file>
 	<menu>
 		<name>Snort</name>
@@ -182,6 +182,11 @@
 		<prefix>/usr/local/www/snort/</prefix>
 		<chmod>077</chmod>
 		<item>http://www.pfsense.com/packages/config/snort/snort_rules_flowbits.php</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/www/snort/</prefix>
+		<chmod>077</chmod>
+		<item>http://www.pfsense.com/packages/config/snort/snort_edit_hat_data.php</item>
 	</additional_files_needed>
 	<fields>
 	</fields>

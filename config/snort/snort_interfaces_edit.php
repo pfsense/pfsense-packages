@@ -53,12 +53,12 @@ $pconfig = array();
 if (empty($snortglob['rule'][$id]['uuid'])) {
 	/* Adding new interface, so flag rules to build. */
 	$pconfig['uuid'] = snort_generate_id();
-	$rebuild_rules = "on";
+	$rebuild_rules = true;
 }
 else {
 	$pconfig['uuid'] = $a_rule[$id]['uuid'];
 	$pconfig['descr'] = $a_rule[$id]['descr'];
-	$rebuild_rules = "off";
+	$rebuild_rules = false;
 }
 $snort_uuid = $pconfig['uuid'];
 
@@ -137,6 +137,9 @@ if ($_POST["Submit"]) {
 		if ($_POST['alertsystemlog'] == "on") { $natent['alertsystemlog'] = 'on'; }else{ $natent['alertsystemlog'] = 'off'; }
 		if ($_POST['configpassthru']) $natent['configpassthru'] = base64_encode($_POST['configpassthru']); else unset($natent['configpassthru']);
 		if ($_POST['cksumcheck']) $natent['cksumcheck'] = 'on'; else $natent['cksumcheck'] = 'off';
+		if ($_POST['fpm_split_any_any'] == "on") { $natent['fpm_split_any_any'] = 'on'; }else{ $natent['fpm_split_any_any'] = 'off'; }
+		if ($_POST['fpm_search_optimize'] == "on") { $natent['fpm_search_optimize'] = 'on'; }else{ $natent['fpm_search_optimize'] = 'off'; }
+		if ($_POST['fpm_no_stream_inserts'] == "on") { $natent['fpm_no_stream_inserts'] = 'on'; }else{ $natent['fpm_no_stream_inserts'] = 'off'; }
 
 		$if_real = snort_get_real_interface($natent['interface']);
 		if (isset($id) && $a_rule[$id]) {
@@ -158,7 +161,7 @@ if ($_POST["Submit"]) {
 		write_config();
 
 		/* Most changes don't require a rules rebuild, so default to "off" */
-		$rebuild_rules = "off";
+		$rebuild_rules = false;
 
 		/* Update snort.conf and snort.sh files for this interface */
 		sync_snort_package_config();
@@ -170,7 +173,7 @@ if ($_POST["Submit"]) {
 		/* Snort instance to safely reload these parameters.   */
 		/*******************************************************/
 		if ($snort_reload == true)
-			snort_reload_config($natent, $if_real);
+			snort_reload_config($natent, "SIGHUP");
 
 		header( 'Expires: Sat, 26 Jul 1997 05:00:00 GMT' );
 		header( 'Last-Modified: ' . gmdate( 'D, d M Y H:i:s' ) . ' GMT' );
@@ -316,10 +319,10 @@ include_once("head.inc");
 				</td>
 	</tr>
 <tr>
-	<td colspan="2" valign="top" class="listtopic"><?php echo gettext("Performance Settings"); ?></td>
+	<td colspan="2" valign="top" class="listtopic"><?php echo gettext("Detection Performance Settings"); ?></td>
 </tr>
 	<tr>
-				<td width="22%" valign="top" class="vncell"><?php echo gettext("Memory Performance"); ?></td>
+				<td width="22%" valign="top" class="vncell"><?php echo gettext("Search Method"); ?></td>
 				<td width="78%" class="vtable">
 					<select name="performance" class="formselect" id="performance">
 					<?php
@@ -332,13 +335,47 @@ include_once("head.inc");
 						<?=htmlspecialchars($ifacename2);?></option>
 						<?php endforeach; ?>
 					</select>&nbsp;&nbsp;
-				<?php echo gettext("Choose a search performance setting"); ?><br/>
+				<?php echo gettext("Choose a fast pattern matcher algorithm. ") . "<strong>" . gettext("Default") . 
+				"</strong>" . gettext(" is ") . "<strong>" . gettext("AC-BNFA") . "</strong>"; ?>.<br/><br/>
 				<span class="vexpl"><?php echo gettext("LOWMEM and AC-BNFA are recommended for low end " .
 				"systems, AC-SPLIT: low memory, high performance, short-hand for search-method ac split-any-any, AC: high memory, " .
 				"best performance, -NQ: the -nq option specifies that matches should not be queued and evaluated as they are found," . 
 				" AC-STD: moderate memory, high performance, ACS: small memory, moderate performance, " .
 				"AC-BANDED: small memory,moderate performance, AC-SPARSEBANDS: small memory, high performance."); ?>
 				</span><br/></td>
+	</tr>
+	<tr>
+				<td width="22%" valign="top" class="vncell"><?php echo gettext("Split ANY-ANY"); ?></td>
+				<td width="78%" class="vtable">
+					<input name="fpm_split_any_any" id="fpm_split_any_any" type="checkbox" value="on" <?php if ($pconfig['fpm_split_any_any'] == "on") echo "checked"; ?>>
+					<?php echo gettext("Enable splitting of ANY-ANY port group.") . " <strong>" . gettext("Default") . "</strong>" . gettext(" is ") . 
+					"<strong>" . gettext("Not Checked") . "</strong>"; ?>.<br/>
+					<br/><?php echo gettext("This setting is a memory/performance trade-off.  It reduces memory footprint by not " . 
+					"putting the ANY-ANY port group into every port group, but instead splits these rules off into a single port group. " . 
+					"But doing so may require two port group evaluations per packet - one for the specific port group and one for the ANY-ANY " . 
+					"port group, thus potentially reducing performance."); ?>
+				</td>
+	</tr>
+	<tr>
+				<td width="22%" valign="top" class="vncell"><?php echo gettext("Search Optimize"); ?></td>
+				<td width="78%" class="vtable">
+					<input name="fpm_search_optimize" id="fpm_search_optimize" type="checkbox" value="on" <?php if ($pconfig['fpm_search_optimize'] == "on" || empty($pconfig['fpm_search_optimize'])) echo "checked"; ?>>
+					<?php echo gettext("Enable search optimization.") . " <strong>" . gettext("Default") . "</strong>" . gettext(" is ") . 
+					"<strong>" . gettext("Checked") . "</strong>"; ?>.<br/>
+					<br/><?php echo gettext("This setting optimizes fast pattern memory when used with search-methods AC or AC-SPLIT " . 
+					"by dynamically determining the size of a state based on the total number of states. When used with AC-BNFA, " . 
+					"some fail-state resolution will be attempted, potentially increasing performance."); ?>
+				</td>
+	</tr>
+	<tr>
+				<td width="22%" valign="top" class="vncell"><?php echo gettext("Stream Inserts"); ?></td>
+				<td width="78%" class="vtable">
+					<input name="fpm_no_stream_inserts" id="fpm_no_stream_inserts" type="checkbox" value="on" <? if ($pconfig['fpm_no_stream_inserts'] == "on") echo "checked"; ?>>
+					<?php echo gettext("Do not evaluate stream inserted packets against the detection engine.") . " <strong>" . gettext("Default") . "</strong>" . gettext(" is ") . 
+					"<strong>" . gettext("Not Checked") . "</strong>"; ?>.<br/>
+					<br/><?php echo gettext("This is a potential performance improvement based on the idea the stream rebuilt packet " . 
+					"will contain the payload in the inserted one, so the stream inserted packet does not need to be evaluated."); ?> 
+				</td>
 	</tr>
 	<tr>
 				<td width="22%" valign="top" class="vncell"><?php echo gettext("Checksum Check Disable"); ?></td>
@@ -374,11 +411,11 @@ include_once("head.inc");
 					?>
 					</select>
 					&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="button" class="formbtns" value="View List"  
-					onclick="viewList('<?=$id;?>','homelistname')" id="btnHomeNet" 
+					onclick="viewList('<?=$id;?>','homelistname','homenet')" id="btnHomeNet" 
 					title="<?php echo gettext("Click to view currently selected Home Net contents"); ?>"/>
 					<br/>
 					<span class="vexpl"><?php echo gettext("Choose the Home Net you want this interface to use."); ?></span>
-				 	<br/></br>
+				 	<br/><br/>
 					<span class="red"><?php echo gettext("Note:"); ?></span>&nbsp;<?php echo gettext("Default Home " .
 					"Net adds only local networks, WAN IPs, Gateways, VPNs and VIPs."); ?><br/>
 					<span class="red"><?php echo gettext("Hint:"); ?></span>&nbsp;<?php echo gettext("Create an Alias to hold a list of " .
@@ -430,7 +467,7 @@ include_once("head.inc");
 				}
 			?>
 			</select>
-			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="button" class="formbtns" value="View List" onclick="viewList('<?=$id;?>','whitelistname')" 
+			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="button" class="formbtns" value="View List" onclick="viewList('<?=$id;?>','whitelistname','whitelist')" 
 			id="btnWhitelist" title="<?php echo gettext("Click to view currently selected Whitelist contents"); ?>"/>
 			<br/>
 			<span class="vexpl"><?php echo gettext("Choose the whitelist you want this interface to " .
@@ -475,9 +512,9 @@ include_once("head.inc");
 	"be automatically inserted into the Snort configuration."); ?></td>
 </tr>
 <tr>
-	<td width="22%" valign="top" class="vncell"><?php echo gettext("Advanced configuration pass through"); ?></td>
+	<td width="22%" valign="top" class="vncell"><?php echo gettext("Advanced configuration pass-through"); ?></td>
 	<td width="78%" class="vtable">
-		<textarea wrap="off" name="configpassthru" cols="65" rows="12" id="configpassthru"><?=htmlspecialchars($pconfig['configpassthru']);?></textarea>
+		<textarea style="width:98%; height:100%;" wrap="off" name="configpassthru" cols="60" rows="8" id="configpassthru"><?=htmlspecialchars($pconfig['configpassthru']);?></textarea>
 	</td>
 </tr>
 <tr>
@@ -489,7 +526,7 @@ include_once("head.inc");
 </tr>
 <tr>
 	<td width="22%" valign="top">&nbsp;</td>
-	<td width="78%"><span class="vexpl"><span class="red"><strong><?php echo gettext("Note: ") . "</strong></span>" . 
+	<td width="78%"><span class="vexpl"><span class="red"><strong><?php echo gettext("Note: ") . "</strong></span></span>" . 
 		gettext("Please save your settings before you attempt to start Snort."); ?>	
 	</td>
 </tr>

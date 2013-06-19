@@ -98,7 +98,7 @@ if($pfsense_stable == 'yes'){echo '<p class="pgtitle">' . $pgtitle . '</p>';}
 		<?=htmlspecialchars($list['name']);?></td>
 	<td class="listbg"
 		ondblclick="document.location='snort_interfaces_suppress_edit.php?id=<?=$i;?>';">
-	<font color="#FFFFFF"> <?=htmlspecialchars($list['descr']);?>&nbsp;
+	<font color="#FFFFFF"> <?=htmlspecialchars($list['descr']);?>&nbsp;</font>
 	</td>
 
 	<td valign="middle" nowrap class="list">
@@ -130,17 +130,17 @@ if($pfsense_stable == 'yes'){echo '<p class="pgtitle">' . $pgtitle . '</p>';}
 				width="17" height="17" border="0" title="<?php echo gettext("add a new list"); ?>"></a></td>
 		</tr>
 	</table>
-	</div>
 	</td>
 </tr>
 </table>
+</div>
 </td></tr>
 <tr>
 	<td colspan="3" width="100%"><br/><span class="vexpl"><span class="red"><strong><?php echo gettext("Note:"); ?></strong></span>
-	<p><span class="vexpl"><?php echo gettext("Here you can create event filtering and " .
+	<p><?php echo gettext("Here you can create event filtering and " .
 	"suppression for your snort package rules."); ?><br/><br/>
 	<?php echo gettext("Please note that you must restart a running Interface so that changes can " .
-	"take effect."); ?></span></p></td>
+	"take effect."); ?></p></span></td>
 </tr>
 </table>
 </form>
