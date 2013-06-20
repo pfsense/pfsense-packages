@@ -1918,5 +1918,25 @@
 		<depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
 		<depends_on_package_pbi>ipmitool-1.8.12_3-amd64.pbi</depends_on_package_pbi>
 	</package>
+	<package>
+		<!-- This does not exist yet, this is here to trigger a build -->
+		<name>sudo</name>
+		<pkginfolink>http://forum.pfsense.org/</pkginfolink>
+		<descr><![CDATA[sudo allows delegation of privileges to users in the shell so commands can be run as other users, such as root. (Console only, no GUI)]]></descr>
+		<category>Services</category>
+		<version>0.1</version>
+		<status>Beta</status>
+		<required_version>2.2</required_version>
+		<config_file>http://www.pfsense.com/packages/config/sudo/sudo.xml</config_file>
+		<maintainer>jimp@pfsense.org</maintainer>
+		<configurationfile>sudo.xml</configurationfile>
+		<build_pbi>
+			<port>security/sudo</port>
+		</build_pbi>
+		<build_port_path>/usr/ports/security/sudo</build_port_path>
+		<depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
+		<depends_on_package>sudo-1.8.6.p8.tbz</depends_on_package>
+		<depends_on_package_pbi>sudo-1.8.6.p8-amd64.pbi</depends_on_package_pbi>
+	</package>
 </packages>
 </pfsensepkgs>
