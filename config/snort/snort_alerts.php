@@ -50,12 +50,78 @@ function snort_is_alert_globally_suppressed($list, $gid, $sid) {
 	/* global suppression of the $gid:$sid.         */
 	/************************************************/
 
+	/* If entry has a child array, then it's by src or dst ip. */
+	/* So if there is a child array or the keys are not set,   */
+	/* then this gid:sid is not globally suppressed.           */
 	if (is_array($list[$gid][$sid]))
 		return false;
 	elseif (!isset($list[$gid][$sid]))
 		return false;
 	else
 		return true;
+}
+
+function snort_add_supplist_entry($suppress) {
+
+	/************************************************/
+	/* Adds the passed entry to the Suppress List   */
+	/* for the active interface.  If a Suppress     */
+	/* List is defined for the interface, it is     */
+	/* used.  If no list is defined, a new default  */
+	/* list is created using the interface name.    */
+	/*                                              */
+	/* On Entry:                                    */
+	/*   $suppress --> suppression entry text       */
+	/*                                              */
+	/* Returns:                                     */
+	/*   TRUE if successful or FALSE on failure     */
+	/************************************************/
+
+	global $config, $a_instance, $instanceid;
+
+	if (!is_array($config['installedpackages']['snortglobal']['suppress']))
+		$config['installedpackages']['snortglobal']['suppress'] = array();
+	if (!is_array($config['installedpackages']['snortglobal']['suppress']['item']))
+		$config['installedpackages']['snortglobal']['suppress']['item'] = array();
+	$a_suppress = &$config['installedpackages']['snortglobal']['suppress']['item'];
+
+	$found_list = false;
+
+	/* If no Suppress List is set for the interface, then create one with the interface name */
+	if (empty($a_instance[$instanceid]['suppresslistname']) || $a_instance[$instanceid]['suppresslistname'] == 'default') {
+		$s_list = array();
+		$s_list['name'] = $a_instance[$instanceid]['interface'] . "suppress";
+		$s_list['uuid'] = uniqid();
+		$s_list['descr']  =  "Auto-generated list for Alert suppression";
+		$s_list['suppresspassthru'] = base64_encode($suppress);
+		$a_suppress[] = $s_list;
+		$a_instance[$instanceid]['suppresslistname'] = $s_list['name'];
+		$found_list = true;
+	} else {
+		/* If we get here, a Suppress List is defined for the interface so see if we can find it */
+		foreach ($a_suppress as $a_id => $alist) {
+			if ($alist['name'] == $a_instance[$instanceid]['suppresslistname']) {
+				$found_list = true;
+				if (!empty($alist['suppresspassthru'])) {
+					$tmplist = base64_decode($alist['suppresspassthru']);
+					$tmplist .= "\n{$suppress}";
+					$alist['suppresspassthru'] = base64_encode($tmplist);
+					$a_suppress[$a_id] = $alist;
+				}
+			}
+		}
+	}
+
+	/* If we created a new list or updated an existing one, save the change, */
+	/* tell Snort to load it, and return true; otherwise return false.       */
+	if ($found_list) {
+		write_config();
+		sync_snort_package_config();
+		snort_reload_config($a_instance[$instanceid]);
+		return true;
+	}
+	else
+		return false;
 }
 
 if ($_GET['instance'])
@@ -110,48 +176,12 @@ if ($_GET['act'] == "addsuppress" && is_numeric($_GET['sidid']) && is_numeric($_
 		$suppress = "suppress gen_id {$_GET['gen_id']}, sig_id {$_GET['sidid']}\n";
 	else
 		$suppress = "#{$_GET['descr']}\nsuppress gen_id {$_GET['gen_id']}, sig_id {$_GET['sidid']}";
-	if (!is_array($config['installedpackages']['snortglobal']['suppress']))
-		$config['installedpackages']['snortglobal']['suppress'] = array();
-	if (!is_array($config['installedpackages']['snortglobal']['suppress']['item']))
-		$config['installedpackages']['snortglobal']['suppress']['item'] = array();
-	$a_suppress = &$config['installedpackages']['snortglobal']['suppress']['item'];
-	$found_list = false;
 
-	/* If no Suppress List is set for the interface, then create one with the interface name */
-	if (empty($a_instance[$instanceid]['suppresslistname']) || $a_instance[$instanceid]['suppresslistname'] == 'default') {
-		$s_list = array();
-		$s_list['name'] = $a_instance[$instanceid]['interface'] . "suppress";
-		$s_list['uuid'] = uniqid();
-		$s_list['descr']  =  "Auto-generated list for suppress";
-		$s_list['suppresspassthru'] = base64_encode($suppress);
-		$a_suppress[] = $s_list;
-		$a_instance[$instanceid]['suppresslistname'] = $s_list['name'];
-		$found_list = true;
-	} else {
-		/* If we get here, a Suppress List is defined for the interface so see if we can find it */
-		foreach ($a_suppress as $a_id => $alist) {
-			if ($alist['name'] == $a_instance[$instanceid]['suppresslistname']) {
-				$found_list = true;
-				if (!empty($alist['suppresspassthru'])) {
-					$tmplist = base64_decode($alist['suppresspassthru']);
-					$tmplist .= "\n{$suppress}";
-					$alist['suppresspassthru'] = base64_encode($tmplist);
-					$a_suppress[$a_id] = $alist;
-				}
-			}
-		}
-	}
-
-	if ($found_list) {
+	/* Add the new entry to the Suppress List */
+	if (snort_add_supplist_entry($suppress))
 		$savemsg = "An entry for 'suppress gen_id {$_GET['gen_id']}, sig_id {$_GET['sidid']}' has been added to the Suppress List.";
-		write_config();
-		sync_snort_package_config();
-		snort_reload_config($a_instance[$instanceid]);
-	}
-	else {
-		/* We did not find the defined list, so notify the user with an error */
+	else
 		$input_errors[] = gettext("Suppress List '{$a_instance[$instanceid]['suppresslistname']}' is defined for this interface, but it could not be found!");
-	}
 }
 
 if (($_GET['act'] == "addsuppress_srcip" || $_GET['act'] == "addsuppress_dstip") && is_numeric($_GET['sidid']) && is_numeric($_GET['gen_id'])) {
@@ -159,6 +189,8 @@ if (($_GET['act'] == "addsuppress_srcip" || $_GET['act'] == "addsuppress_dstip")
 		$method = "by_src";
 	else
 		$method = "by_dst";
+
+	/* Check for valid IP addresses, exit if not valid */
 	if (is_ipaddr($_GET['ip']) || is_ipaddrv6($_GET['ip'])) {
 		if (empty($_GET['descr']))
 			$suppress = "suppress gen_id {$_GET['gen_id']}, sig_id {$_GET['sidid']}, track {$method}, ip {$_GET['ip']}\n";
@@ -170,47 +202,12 @@ if (($_GET['act'] == "addsuppress_srcip" || $_GET['act'] == "addsuppress_dstip")
 		exit;
 	}
 
-	/* Save the new Suppress entry to the list */
-	if (!is_array($config['installedpackages']['snortglobal']['suppress']))
-		$config['installedpackages']['snortglobal']['suppress'] = array();
-	if (!is_array($config['installedpackages']['snortglobal']['suppress']['item']))
-		$config['installedpackages']['snortglobal']['suppress']['item'] = array();
-	$a_suppress = &$config['installedpackages']['snortglobal']['suppress']['item'];
-	$found_list = false;
-
-	if (empty($a_instance[$instanceid]['suppresslistname']) || $a_instance[$instanceid]['suppresslistname'] == 'default') {
-		$s_list = array();
-		$s_list['name'] = $a_instance[$instanceid]['interface'] . "suppress";
-		$s_list['uuid'] = uniqid();
-		$s_list['descr']  =  "Auto-generated list for suppress";
-		$s_list['suppresspassthru'] = base64_encode($suppress);
-		$a_suppress[] = $s_list;
-		$a_instance[$instanceid]['suppresslistname'] = $s_list['name'];
-		$found_list = true;
-	} else {
-		foreach ($a_suppress as $a_id => $alist) {
-			if ($alist['name'] == $a_instance[$instanceid]['suppresslistname']) {
-				$found_list = true;
-				if (!empty($alist['suppresspassthru'])) {
-					$tmplist = base64_decode($alist['suppresspassthru']);
-					$tmplist .= "\n{$suppress}";
-					$alist['suppresspassthru'] = base64_encode($tmplist);
-					$a_suppress[$a_id] = $alist;
-				}
-			}
-		}
-	}
-
-	if ($found_list) {
+	/* Add the new entry to the Suppress List */
+	if (snort_add_supplist_entry($suppress))
 		$savemsg = "An entry for 'suppress gen_id {$_GET['gen_id']}, sig_id {$_GET['sidid']}, track {$method}, ip {$_GET['ip']}' has been added to the Suppress List.";
-		write_config();
-		sync_snort_package_config();
-		snort_reload_config($a_instance[$instanceid]);
-	}
-	else {
+	else
 		/* We did not find the defined list, so notify the user with an error */
 		$input_errors[] = gettext("Suppress List '{$a_instance[$instanceid]['suppresslistname']}' is defined for this interface, but it could not be found!");
-	}
 }
 
 if ($_GET['action'] == "clear" || $_POST['delete']) {
