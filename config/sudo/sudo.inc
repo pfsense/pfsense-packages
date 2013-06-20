@@ -147,6 +147,9 @@ function sudo_get_users($list_all_user = false) {
 	$users[] = $tmpuser;
 
 	foreach ($a_group as $group) {
+		/* The "all" group is internal and doesn't make sense to use here. */
+		if ($group['name'] == "all")
+			continue;
 		$tmpgroup = array();
 		$tmpgroup["name"] = "group:{$group['name']}";
 		$tmpgroup["descr"] = "Group: {$group['name']}";
