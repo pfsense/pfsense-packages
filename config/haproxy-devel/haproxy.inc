@@ -887,6 +887,7 @@ function load_ipfw_rules() {
 	
 	haproxy_load_modules();
 	
+	$transparent_interfaces = array();
 	$transparent_backends = array();
 	foreach ($a_backends as $backend) {
 		if ($backend["transparent_clientip"] != 'yes')
@@ -904,14 +905,19 @@ function load_ipfw_rules() {
 					$item = array();
 					$item['address'] = $be['address'];
 					$item['port'] = $be['port'];
-					$item['interface'] = $real_if;//"em0";
+					$item['interface'] = $real_if;
 					$transparent_backends[] = $item;
+					$transparent_interfaces[$real_if] = 1;
 				}
 			}
 		}
 	}
 	mwexec("/usr/local/sbin/ipfw_context -a $ipfw_zone_haproxy", true);
-	mwexec("/usr/local/sbin/ipfw_context -a $ipfw_zone_haproxy -n em0", true);
+	
+	foreach($transparent_interfaces as $transparent_if => $value) {
+		mwexec("/usr/local/sbin/ipfw_context -a $ipfw_zone_haproxy -n $transparent_if", true);
+	}
+	
 	$rulenum = 64000; // why that high? captiveportal.inc also does it...
 	$rules = "flush\n";
 	foreach($transparent_backends as $transparent_be) {
