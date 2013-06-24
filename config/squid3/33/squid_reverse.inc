@@ -89,6 +89,9 @@ function squid_resync_reverse() {
 	if(!empty($settings['reverse_ip'])) {
 		$reverse_ip = explode(";", ($settings['reverse_ip']));
 		foreach ($reverse_ip as $reip) {
+		      //IPv6 Addresses need to be enclosed in brackets
+		      if (strpos($reip, ':')) $reip = '[' . $reip . ']';
+		      
 		      //HTTP
 		      if (!empty($settings['reverse_http']))
 		      		$conf .= "http_port {$reip}:{$http_port} accel defaultsite={$http_defsite} vhost\n";
