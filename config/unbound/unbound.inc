@@ -842,28 +842,54 @@ function unbound_add_host_entries() {
 		}
 	}
 
+	$added_item_v4 = array();
+	$added_item_v6 = array();
 	// DNSMasq entries static host entries
 	if (isset($dnsmasqcfg['hosts'])) {
 		$hosts = $dnsmasqcfg['hosts'];
 		$host_entries = "";
 		$added_item = array();
 		foreach ($hosts as $host) {
-			$current_host = $host['host'];
-			if ($host['host'] != "")
-				$host['host'] = $host['host'].".";
-			if(!$added_item[$current_host]) {
-				$host_entries .= "local-data-ptr: \"{$host['ip']} {$host['host']}{$host['domain']}\"\n";
-				if(function_exists("is_ipaddrv6")) {
-					if (is_ipaddrv6($host['ip']))
-						$host_entries .= "local-data: \"{$host['host']}{$host['domain']} IN AAAA {$host['ip']}\"\n";
-					else
-						$host_entries .= "local-data: \"{$host['host']}{$host['domain']} IN A {$host['ip']}\"\n";
-				} else
-					$host_entries .= "local-data: \"{$host['host']}{$host['domain']} IN A {$host['ip']}\"\n";
-				if (!empty($host['descr']) && $unboundcfg['txtsupport'] == 'on')
-					$host_entries .= "local-data: '{$host['host']}{$host['domain']} TXT \"".addslashes($host['descr'])."\"'\n";
-
-				// Do not add duplicate entries
+			$current_host = ($host['host'] != "") ? $host['host'].".".$host['domain'] : $host['domain'];
+			if (function_exists("is_ipaddrv6") && is_ipaddrv6($host['ip'])) {
+				if (!$added_item_v6[$curent_host]) {
+					$host_entries .= "local-data-ptr: \"{$host['ip']} {$current_host}\"\n";
+					$host_entries .= "local-data: \"{$current_host} IN AAAA {$host['ip']}\"\n";
+					$added_item_v6[$current_host] = true;
+				}
+				if ($host['aliases']['item'] && is_array($host['aliases']['item']))
+					foreach ($host['aliases']['item'] as $alias) {
+						$current_alias = ($alias['host'] != "") ? $alias['host'].".".$alias['domain'] : $alias['domain'];
+						if (!$added_item_v6[$current_alias]) {
+							$host_entries .= "local-data: \"{$current_alias} IN AAAA {$host['ip']}\"\n";
+							$added_item_v6[$current_alias] = true;
+							if ((!$added_item[$current_alias]) && (!empty($alias['description'])) && ($unboundcfg['txtsupport'] == 'on')) {
+								$host_entries .= "local-data: '{$current_alias} TXT \"".addslashes($alias['description'])."\"'\n";
+								$added_item[$current_alias] = true;
+							}
+						}
+					}
+			} else {
+				if (!$added_item_v4[$current_host]) {
+					$host_entries .= "local-data-ptr: \"{$host['ip']} {$current_host}\"\n";
+					$host_entries .= "local-data: \"{$current_host} IN A {$host['ip']}\"\n";
+					$added_item_v4[$current_host] = true;
+				}
+				if ($host['aliases']['item'] && is_array($host['aliases']['item']))
+					foreach ($host['aliases']['item'] as $alias) {
+						$current_alias = ($alias['host'] != "") ? $alias['host'].".".$alias['domain'] : $alias['domain'];
+						if (!$added_item_v4[$current_alias]) {
+							$host_entries .= "local-data: \"{$current_alias} IN A {$host['ip']}\"\n";
+							$added_item_v4[$current_alias] = true;
+							if ((!$added_item[$current_alias]) && (!empty($alias['description'])) && ($unboundcfg['txtsupport'] == 'on')) {
+								$host_entries .= "local-data: '{$current_alias} TXT \"".addslashes($alias['description'])."\"'\n";
+								$added_item[$current_alias] = true;
+							}
+						}
+					}
+			}
+			if ((!$added_item[$current_host]) && (!empty($host['descr'])) && ($unboundcfg['txtsupport'] == 'on')) {
+				$host_entries .= "local-data: '{$current_host} TXT \"".addslashes($host['descr'])."\"'\n";
 				$added_item[$current_host] = true;
 			}
 		}
@@ -876,10 +902,16 @@ function unbound_add_host_entries() {
 			if(is_array($dhcpifconf['staticmap']) && isset($dhcpifconf['enable']))
 				foreach ($dhcpifconf['staticmap'] as $host)
 					if ($host['ipaddr'] && $host['hostname']) {
-						$host_entries .= "local-data-ptr: \"{$host['ipaddr']} {$host['hostname']}.{$syscfg['domain']}\"\n";
-						$host_entries .= "local-data: \"{$host['hostname']}.{$syscfg['domain']} IN A {$host['ipaddr']}\"\n";
-						if (!empty($host['descr']) && $unboundcfg['txtsupport'] == 'on')
-							$host_entries .= "local-data: '{$host['hostname']}.{$syscfg['domain']} TXT \"".addslashes($host['descr'])."\"'\n";
+						$current_host = $host['hostname'].".".$syscfg['domain'];
+						if (!$added_item_v4[$current_host]) {
+							$host_entries .= "local-data-ptr: \"{$host['ipaddr']} {$current_host}\"\n";
+							$host_entries .= "local-data: \"{$current_host} IN A {$host['ipaddr']}\"\n";
+							$added_item_v4[$current_host] = true;
+							if ((!$added_item[$current_host]) && (!empty($host['descr'])) && ($unboundcfg['txtsupport'] == 'on')) {
+								$host_entries .= "local-data: '{$host['hostname']}.{$syscfg['domain']} TXT \"".addslashes($host['descr'])."\"'\n";
+								$added_item[$current_host] = true;
+							}
+						}
 					}
 		$unbound_entries .= $host_entries;
 	}
@@ -889,15 +921,23 @@ function unbound_add_host_entries() {
 	$host_entries = "";
 	if(is_array($dhcplcfg)) {
 		foreach($dhcplcfg as $key=>$host) {
-			$host_entries .= "local-data-ptr: \"{$host['ipaddr']} {$host['fqdn']}\"\n";
-			$host_entries .= "local-data: \"{$host['fqdn']} IN A {$host['ipaddr']}\"\n";
-			if (!empty($host['name'])) {
-				$host_entries .= "local-data-ptr: \"{$host['ipaddr']} {$host['name']}\"\n";
-				$host_entries .= "local-data: \"{$host['name']} IN A {$host['ipaddr']}\"\n";
+			$current_host = $host['fqdn'];
+			if (!$added_item_v4[$current_host]) {
+				$host_entries .= "local-data-ptr: \"{$host['ipaddr']} {$host['fqdn']}\"\n";
+				$host_entries .= "local-data: \"{$host['fqdn']} IN A {$host['ipaddr']}\"\n";
+				$added_item_v4[$current_host] = true;
+				if ((!empty($host['name'])) && (!$added_item_v4[$host['name']])) {
+					$host_entries .= "local-data-ptr: \"{$host['ipaddr']} {$host['name']}\"\n";
+					$host_entries .= "local-data: \"{$host['name']} IN A {$host['ipaddr']}\"\n";
+					$added_item_v4[$host['name']] = true;
+				}
 			}
 		}
 		$unbound_entries .= $host_entries;
 	}
+	
+	// Need to handle DHCPv6 entries and leases too...
+	
 	return $unbound_entries;
 }
 
