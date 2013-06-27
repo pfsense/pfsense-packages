@@ -847,7 +847,7 @@ function unbound_add_host_entries() {
 	// DNSMasq entries static host entries
 	if (isset($dnsmasqcfg['hosts'])) {
 		$hosts = $dnsmasqcfg['hosts'];
-		$host_entries = "";
+		$host_entries = "# DNSMasq Host overrides\n";
 		$added_item = array();
 		foreach ($hosts as $host) {
 			$current_host = ($host['host'] != "") ? $host['host'].".".$host['domain'] : $host['domain'];
@@ -895,8 +895,9 @@ function unbound_add_host_entries() {
 		}
 		$unbound_entries .= $host_entries;
 	}
+	
 	// Static DHCP entries
-	$host_entries = "";
+	$host_entries = "# DHCP Reservations\n";
 	if (isset($unboundcfg['regdhcpstatic']) && is_array($config['dhcpd'])) {
 		foreach ($config['dhcpd'] as $dhcpif => $dhcpifconf)
 			if(is_array($dhcpifconf['staticmap']) && isset($dhcpifconf['enable']))
@@ -915,28 +916,60 @@ function unbound_add_host_entries() {
 					}
 		$unbound_entries .= $host_entries;
 	}
+	
+	// Static DHCPv6 entries
+	$host_entries = "# DHCPv6 reservations\n";
+	if (isset($unboundcfg['regdhcpstatic']) && is_array($config['dhcpdv6'])) {
+		foreach ($config['dhcpdv6'] as $dhcpif => $dhcpifconf)
+			if(is_array($dhcpifconf['staticmap']) && isset($dhcpifconf['enable']))
+				foreach ($dhcpifconf['staticmap'] as $host)
+					if ($host['ipaddrv6'] && $host['hostname']) {
+						$current_host = $host['hostname'].".".$syscfg['domain'];
+						if (!$added_item_v6[$current_host]) {
+							$host_entries .= "local-data-ptr: \"{$host['ipaddrv6']} {$current_host}\"\n";
+							$host_entries .= "local-data: \"{$current_host} IN AAAA {$host['ipaddrv6']}\"\n";
+							$added_item_v6[$current_host] = true;
+							if ((!$added_item[$current_host]) && (!empty($host['descr'])) && ($unboundcfg['txtsupport'] == 'on')) {
+								$host_entries .= "local-data: '{$host['hostname']}.{$syscfg['domain']} TXT \"".addslashes($host['descr'])."\"'\n";
+								$added_item[$current_host] = true;
+							}
+						}
+					}
+		$unbound_entries .= $host_entries;
+	}
 
 	// Handle DHCPLeases added host entries
 	$dhcplcfg = read_hosts();
-	$host_entries = "";
+	$host_entries = "# /etc/hosts entries\n";
 	if(is_array($dhcplcfg)) {
 		foreach($dhcplcfg as $key=>$host) {
 			$current_host = $host['fqdn'];
-			if (!$added_item_v4[$current_host]) {
-				$host_entries .= "local-data-ptr: \"{$host['ipaddr']} {$host['fqdn']}\"\n";
-				$host_entries .= "local-data: \"{$host['fqdn']} IN A {$host['ipaddr']}\"\n";
-				$added_item_v4[$current_host] = true;
-				if ((!empty($host['name'])) && (!$added_item_v4[$host['name']])) {
-					$host_entries .= "local-data-ptr: \"{$host['ipaddr']} {$host['name']}\"\n";
-					$host_entries .= "local-data: \"{$host['name']} IN A {$host['ipaddr']}\"\n";
-					$added_item_v4[$host['name']] = true;
+			if (function_exists("is_ipaddrv6") && is_ipaddrv6($host['ipaddr'])) {
+				if (!$added_item_v6[$current_host]) {
+					$host_entries .= "local-data-ptr: \"{$host['ipaddr']} {$host['fqdn']}\"\n";
+					$host_entries .= "local-data: \"{$host['fqdn']} IN AAAA {$host['ipaddr']}\"\n";
+					$added_item_v6[$current_host] = true;
+					if ((!empty($host['name'])) && (!$added_item_v6[$host['name']])) {
+						$host_entries .= "local-data-ptr: \"{$host['ipaddr']} {$host['name']}\"\n";
+						$host_entries .= "local-data: \"{$host['name']} IN AAAA {$host['ipaddr']}\"\n";
+						$added_item_v6[$host['name']] = true;
+					}
+				}
+			} else {
+				if (!$added_item_v4[$current_host]) {
+					$host_entries .= "local-data-ptr: \"{$host['ipaddr']} {$host['fqdn']}\"\n";
+					$host_entries .= "local-data: \"{$host['fqdn']} IN A {$host['ipaddr']}\"\n";
+					$added_item_v4[$current_host] = true;
+					if ((!empty($host['name'])) && (!$added_item_v4[$host['name']])) {
+						$host_entries .= "local-data-ptr: \"{$host['ipaddr']} {$host['name']}\"\n";
+						$host_entries .= "local-data: \"{$host['name']} IN A {$host['ipaddr']}\"\n";
+						$added_item_v4[$host['name']] = true;
+					}
 				}
 			}
 		}
 		$unbound_entries .= $host_entries;
 	}
-	
-	// Need to handle DHCPv6 entries and leases too...
 	
 	return $unbound_entries;
 }
