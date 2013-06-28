@@ -1,18 +1,24 @@
 <?php
 
 function tinc_save() {
+	global $config;
 	conf_mount_rw();
 	config_lock();
 	exec("/bin/mv -f /usr/local/etc/tinc /usr/local/etc/tinc.old");
 	safe_mkdir("/usr/local/etc/tinc");
 	safe_mkdir("/usr/local/etc/tinc/hosts");
 	exec("touch /usr/local/etc/tinc/WARNING-ENTIRE_DIRECTORY_ERASED_ON_SAVE_FROM_GUI");
-	$tincconf = $GLOBALS['config']['installedpackages']['tinc']['config'][0];
+	$tincconf = &$config['installedpackages']['tinc']['config'][0];
 	$fout = fopen("/usr/local/etc/tinc/tinc.conf","w");
+
+	// No proper config, bail out.
+	if (!isset($tincconf['name']) || empty($tincconf['name']))
+		return;
+
 	fwrite($fout, "name=".$tincconf['name']."\n");
 	fwrite($fout, "AddressFamily=".$tincconf['addressfamily']."\n");
-	if(!is_array($GLOBALS['config']['installedpackages']['tinchosts']['config'])) { $GLOBALS['config']['installedpackages']['tinchosts']['config']=Array(); }
-	foreach($GLOBALS['config']['installedpackages']['tinchosts']['config'] as $host) {
+	if(!is_array($config['installedpackages']['tinchosts']['config'])) { $config['installedpackages']['tinchosts']['config']=Array(); }
+	foreach($config['installedpackages']['tinchosts']['config'] as $host) {
 		if($host['connect'])
 		{
 			fwrite($fout, "ConnectTo=" . $host['name'] . "\n");
@@ -85,6 +91,7 @@ function tinc_save() {
 }
 
 function tinc_install() {
+	global $config;
 	safe_mkdir("/usr/local/etc/tinc");
 	safe_mkdir("/usr/local/etc/tinc/hosts");
 	$_rcfile['file']='tinc.sh';
@@ -98,10 +105,10 @@ function tinc_install() {
 	config_lock();
 
         /* Create Interface Group */
-        if (!is_array($GLOBALS['config']['ifgroups']['ifgroupentry']))
-        $GLOBALS['config']['ifgroups']['ifgroupentry'] = array();
+        if (!is_array($config['ifgroups']['ifgroupentry']))
+        $config['ifgroups']['ifgroupentry'] = array();
 
-        $a_ifgroups = &$GLOBALS['config']['ifgroups']['ifgroupentry'];
+        $a_ifgroups = &$config['ifgroups']['ifgroupentry'];
         $ifgroupentry = array();
         $ifgroupentry['members'] = '';
         $ifgroupentry['descr'] = 'tinc mesh VPN interface group';
@@ -118,13 +125,14 @@ function tinc_install() {
 }
 
 function tinc_deinstall() {
+	global $config;
         /* Remove Interface Group */
         conf_mount_rw();
         config_lock();
-        if (!is_array($GLOBALS['config']['ifgroups']['ifgroupentry']))
-        $GLOBALS['config']['ifgroups']['ifgroupentry'] = array();
+        if (!is_array($config['ifgroups']['ifgroupentry']))
+        $config['ifgroups']['ifgroupentry'] = array();
 
-        $a_ifgroups = &$GLOBALS['config']['ifgroups']['ifgroupentry'];
+        $a_ifgroups = &$config['ifgroups']['ifgroupentry'];
 
         $myid=-1;
         $i = 0;
