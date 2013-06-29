@@ -198,7 +198,7 @@ function unbound_control($action) {
 
 		case "start":
 				//Start unbound
-				if($unbound_config['unbound_status'] == "on") {
+				if($unbound_config['enable'] == "on") {
 					if(!is_service_running("unbound"))
 						unbound_ctl_exec("start");
 						/* Link dnsmasq.pid to prevent dhcpleases logging error */
@@ -213,7 +213,7 @@ function unbound_control($action) {
 
 		case "stop":
 				//Stop unbound and unmount the file system
-				if($unbound_config['unbound_status'] == "on") {
+				if($unbound_config['enable'] == "on") {
 					mwexec_bg("/usr/local/bin/unbound_monitor.sh stop");
 					unbound_ctl_exec("stop");
 				}
@@ -694,7 +694,7 @@ function fetch_root_hints() {
 function unbound_validate($post, $type=null) {
 	global $config, $input_errors;
 
-	if($post['unbound_status'] == "on" && isset($config['dnsmasq']['enable']))
+	if($post['enable'] == "on" && isset($config['dnsmasq']['enable']))
 		$input_errors[] = "The system dns-forwarder is still active. Disable it before enabling the Unbound service.";
 
 	/* Validate the access lists */
@@ -741,7 +741,7 @@ function unbound_reconfigure() {
 
 	$unbound_config = $config['installedpackages']['unbound']['config'][0];
 
-	if ($unbound_config['unbound_status'] != "on") {
+	if ($unbound_config['enable'] != "on") {
 		if(is_service_running("unbound"))
 			unbound_control("termstop");
 	} else {
