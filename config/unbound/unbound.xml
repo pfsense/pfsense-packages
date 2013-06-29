@@ -80,6 +80,9 @@
 		<chmod>0755</chmod>
 		<item>http://www.pfsense.org/packages/config/unbound/unbound_monitor.sh</item>
 	</additional_files_needed>
+	<system_services>
+		<dns/>
+	</system_services>
 	<tabs>
 		<tab>
 			<text>Unbound DNS Settings</text>
@@ -106,7 +109,7 @@
 			<type>listtopic</type>
 		</field>
 		<field>
-			<fieldname>unbound_status</fieldname>
+			<fieldname>enable</fieldname>
 			<fielddescr>Enable Unbound</fielddescr>
 			<description>Enable the use of Unbound as your DNS forwarder.</description>
 			<type>checkbox</type>
