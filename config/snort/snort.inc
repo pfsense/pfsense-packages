@@ -164,8 +164,13 @@ function snort_load_suppress_sigs($snortcfg, $track_by=false) {
 					if (preg_match('/\s*suppress\s*gen_id\b\s*(\d+),\s*sig_id\b\s*(\d+)\s*$/i', $line, $matches)) {
 						$genid = $matches[1];
 						$sigid = $matches[2];
-						if (!empty($genid) && !empty($sigid))
+						if (!empty($genid) && !empty($sigid)) {
+							if (!is_array($suppress[$genid]))
+								$suppress[$genid] = array();
+							if (!is_array($suppress[$genid][$sigid]))
+								$suppress[$genid][$sigid] = array();
 							$suppress[$genid][$sigid] = "suppress";
+						}
 					}
 
 					/* Get "track by IP" entries if requested */
@@ -176,8 +181,17 @@ function snort_load_suppress_sigs($snortcfg, $track_by=false) {
 							$sigid = $matches[2];
 							$whichip = trim($matches[3]);
 							$ip = $matches[4];
-							if (!empty($genid) && !empty($sigid) && !empty($whichip) && !empty($ip))
+							if (!empty($genid) && !empty($sigid) && !empty($whichip) && !empty($ip)) {
+								if (!is_array($suppress[$genid]))
+									$suppress[$genid] = array();
+								if (!is_array($suppress[$genid][$sigid]))
+									$suppress[$genid][$sigid] = array();
+								if (!is_array($suppress[$genid][$sigid][$whichip]))
+									$suppress[$genid][$sigid][$whichip] = array();
+								if (!is_array($suppress[$genid][$sigid][$whichip][$ip]))
+									$suppress[$genid][$sigid][$whichip][$ip] = array();
 								$suppress[$genid][$sigid][$whichip][$ip] = "suppress";
+							}
 						}
 						/* See if entry suppresses only by SRC or DST IPv6 address */
 						if (preg_match('/\s*suppress\s*gen_id\b\s*(\d+),\s*sig_id\b\s*(\d+),\s*track\s*(by_src|by_dst),\s*ip\s*([0-9a-f\.:]+)\s*$/i', $line, $matches)) {
@@ -185,8 +199,17 @@ function snort_load_suppress_sigs($snortcfg, $track_by=false) {
 							$sigid = $matches[2];
 							$whichip = trim($matches[3]);
 							$ip = trim($matches[4]);
-							if (!empty($genid) && !empty($sigid) && !empty($whichip) && !empty($ip))
+							if (!empty($genid) && !empty($sigid) && !empty($whichip) && !empty($ip)) {
+								if (!is_array($suppress[$genid]))
+									$suppress[$genid] = array();
+								if (!is_array($suppress[$genid][$sigid]))
+									$suppress[$genid][$sigid] = array();
+								if (!is_array($suppress[$genid][$sigid][$whichip]))
+									$suppress[$genid][$sigid][$whichip] = array();
+								if (!is_array($suppress[$genid][$sigid][$whichip][$ip]))
+									$suppress[$genid][$sigid][$whichip][$ip] = array();
 								$suppress[$genid][$sigid][$whichip][$ip] = "suppress";
+							}
 						}
 					}
 				}
@@ -3134,7 +3157,7 @@ preprocessor frag3_global: {$frag3_memcap}, {$frag3_max_frags}{$frag3_disabled}
 preprocessor frag3_engine: {$frag3_policy} detect_anomalies {$frag3_timeout} {$frag3_overlap_limit} {$frag3_min_frag_len} 
 
 preprocessor stream5_global:{$stream5_reassembly} track_tcp {$stream5_track_tcp}, track_udp {$stream5_track_udp}, track_icmp {$stream5_track_icmp}, max_tcp 262144, max_udp 131072, max_active_responses 2, min_response_seconds 5{$stream5_mem_cap}
-preprocessor stream5_tcp: {$stream5_policy}, {$stream5_overlap_limit}, {$stream5_tcp_timeout}, ports both all{$stream5_max_queued_bytes_type}{$stream5_max_queued_segs_type}{$stream5_require_3whs}{$stream5_no_reassemble_async}$stream5_dont_store_lg_pkts
+preprocessor stream5_tcp: {$stream5_policy}, {$stream5_overlap_limit}, {$stream5_tcp_timeout}, ports both all{$stream5_max_queued_bytes_type}{$stream5_max_queued_segs_type}{$stream5_require_3whs}{$stream5_no_reassemble_async}{$stream5_dont_store_lg_pkts}
 preprocessor stream5_udp: {$stream5_udp_timeout}
 preprocessor stream5_icmp: {$stream5_icmp_timeout}
 
