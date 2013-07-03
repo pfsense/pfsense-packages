@@ -511,9 +511,9 @@ if ($savemsg) {
 						</tr>
 						<tr>
 							<td class="vexpl" valign="middle"><?php echo "<a href='?id={$id}&openruleset={$currentruleset}&act=enable_all'> 
-							<img src=\"../themes/{$g['theme']}/images/icons/icon_x.gif\" width=\"15\" height=\"15\" 
-							onmouseout='this.src=\"../themes/{$g['theme']}/images/icons/icon_x.gif\"' 
-							onmouseover='this.src=\"../themes/{$g['theme']}/images/icons/icon_x_mo.gif\"' border='0' 
+							<img src=\"../themes/{$g['theme']}/images/icons/icon_plus.gif\" width=\"15\" height=\"15\" 
+							onmouseout='this.src=\"../themes/{$g['theme']}/images/icons/icon_plus.gif\"' 
+							onmouseover='this.src=\"../themes/{$g['theme']}/images/icons/icon_plus_mo.gif\"' border='0' 
 							title='" . gettext("Click to enable all rules in the selected category") . "'></a>"?>
 							&nbsp;&nbsp;<?php echo gettext("Enable all rules in the current Category"); ?></td>
 						</tr>
@@ -559,7 +559,7 @@ if ($savemsg) {
 						<tbody>
 
 					<?php
-						$counter = 0;
+						$counter = $enable_cnt = $disable_cnt = 0;
 						foreach ($rules_map as $k1 => $rulem) {
 							foreach ($rulem as $k2 => $v) {
 								$sid = snort_get_sid($v['rule']);
@@ -568,19 +568,23 @@ if ($savemsg) {
 									$textss = "<span class=\"gray\">";
 									$textse = "</span>";
 									$iconb = "icon_reject_d.gif";
+									$disable_cnt++;
 								}
 								elseif (($v['disabled'] == 1) && (!isset($enablesid[$sid]))) {
 									$textss = "<span class=\"gray\">";
 									$textse = "</span>";
 									$iconb = "icon_block_d.gif";
+									$disable_cnt++;
 								}
 								elseif (isset($enablesid[$sid])) {
 									$textss = $textse = "";
 									$iconb = "icon_reject.gif";
+									$enable_cnt++;
 								}
 								else {
 									$textss = $textse = "";
 									$iconb = "icon_block.gif";
+									$enable_cnt++;
 								}
 
 								// Pick off the first section of the rule (prior to the start of the MSG field),
@@ -653,7 +657,12 @@ if ($savemsg) {
 				<td>
 					<table width="100%" border="0" cellspacing="0" cellpadding="1">
 						<tr>
-							<td class="vexpl" colspan="2" height="30" valign="middle"><?php echo gettext("Rule Count: {$counter}"); ?></td>
+							<td width="16"></td>
+							<td class="vexpl" height="35" valign="top">
+							<strong><?php echo gettext("---  Category Rules Summary  ---") . "</strong><br/>" . 
+							gettext("Total Rules: {$counter}") . "&nbsp;&nbsp;&nbsp;&nbsp;" . 
+							gettext("Enabled: {$enable_cnt}") . "&nbsp;&nbsp;&nbsp;&nbsp;" . 
+							gettext("Disabled: {$disable_cnt}"); ?></td>
 						</tr>
 						<tr>
 							<td width="16"><img src="../themes/<?= $g['theme']; ?>/images/icons/icon_block.gif"
