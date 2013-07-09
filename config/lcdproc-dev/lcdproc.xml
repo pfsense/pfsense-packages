@@ -42,11 +42,6 @@
 	    <prefix>/usr/local/lib/lcdproc/</prefix>
 	    <chmod>0755</chmod>
 	</additional_files_needed>
-	<additional_files_needed>
-		<item>http://files.pfsense.org/misc/sdeclcd.so</item>
-	    <prefix>/usr/local/lib/lcdproc/</prefix>
-	    <chmod>0755</chmod>
-	</additional_files_needed>	
 	<service>
 		<name>lcdproc</name>
 		<rcfile>lcdproc.sh</rcfile>
@@ -257,7 +252,7 @@
 				</option>				
 				<option>
 					<value>sdeclcd</value>
-					<name>Watchguard Firebox with SDEC (x86 only)</name>
+					<name>Watchguard Firebox with SDEC</name>
 				</option>				
 				<option>
 					<value>sed1330</value>
