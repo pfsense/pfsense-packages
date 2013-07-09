@@ -1307,13 +1307,13 @@
 		<descr>LCD display driver - Development version</descr>
 		<website>http://www.lcdproc.org/</website>
 		<category>Utility</category>
-		<version>lcdproc-0.5.5 pkg v. 0.9.4</version>
+		<version>lcdproc-0.5.6 pkg v. 0.9.4</version>
 		<status>BETA</status>
 		<required_version>2.0</required_version>
 		<maintainer>michele@nt2.it</maintainer>
 		<pkginfolink>http://forum.pfsense.org/index.php/topic,44034.0.html</pkginfolink>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
-		<depends_on_package>lcdproc-0.5.5.tbz</depends_on_package>
+		<depends_on_package>lcdproc-0.5.6.tbz</depends_on_package>
 		<depends_on_package_pbi>lcdproc-0.5.6-i386.pbi</depends_on_package_pbi>
 		<config_file>http://www.pfsense.org/packages/config/lcdproc-dev/lcdproc.xml</config_file>
 		<configurationfile>lcdproc.xml</configurationfile>
