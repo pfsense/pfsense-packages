@@ -82,6 +82,7 @@ if ($_POST) {
 			$config['installedpackages']['haproxy']['logfacility'] = $_POST['logfacility'] ? $_POST['logfacility'] : false;
 			$config['installedpackages']['haproxy']['loglevel'] = $_POST['loglevel'] ? $_POST['loglevel'] : false;
 			$config['installedpackages']['haproxy']['carpdev'] = $_POST['carpdev'] ? $_POST['carpdev'] : false;
+			$config['installedpackages']['haproxy']['syncusername'] = $_POST['syncusername'] ? $_POST['syncusername'] : false;
 			$config['installedpackages']['haproxy']['syncpassword'] = $_POST['syncpassword'] ? $_POST['syncpassword'] : false;
 			$config['installedpackages']['haproxy']['advanced'] = base64_encode($_POST['advanced']) ? $_POST['advanced'] : false;
 			$config['installedpackages']['haproxy']['nbproc'] = $_POST['nbproc'] ? $_POST['nbproc'] : false;			
@@ -95,6 +96,7 @@ if ($_POST) {
 $pconfig['enable'] = isset($config['installedpackages']['haproxy']['enable']);
 $pconfig['maxconn'] = $config['installedpackages']['haproxy']['maxconn'];
 $pconfig['enablesync'] = isset($config['installedpackages']['haproxy']['enablesync']);
+$pconfig['syncusername'] = $config['installedpackages']['haproxy']['syncusername'];
 $pconfig['syncpassword'] = $config['installedpackages']['haproxy']['syncpassword'];
 $pconfig['synchost1'] = $config['installedpackages']['haproxy']['synchost1'];
 $pconfig['synchost2'] = $config['installedpackages']['haproxy']['synchost2'];
@@ -333,6 +335,14 @@ function enable_change(enable_change) {
 				<td width="78%" class="vtable">
 					<input name="enablesync" type="checkbox" value="yes" <?php if ($pconfig['enablesync']) echo "checked"; ?>>
 					<strong>Sync HAProxy configuration to backup CARP members via XMLRPC.</strong>
+				</td>
+			</tr>
+			<tr>
+				<td width="22%" valign="top" class="vncell">Synchronization username</td>
+				<td width="78%" class="vtable">
+					<input name="syncusername" type="text" value="<?= empty($pconfig['syncusername']) ? 'admin' : $pconfig['syncusername'];?>">
+					<br/>
+					<strong>Enter the usernmame that will be used during configuration synchronization.  This is generally "admin" or an admin-level privileged account on the target system..</strong>
 				</td>
 			</tr>
 			<tr>

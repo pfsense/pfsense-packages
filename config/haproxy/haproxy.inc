@@ -602,15 +602,18 @@ function haproxy_writeconf() {
 	if(isset($config['installedpackages']['haproxy']['enablesync'])) {
 		if($config['installedpackages']['haproxy']['synchost1']) {
 			haproxy_do_xmlrpc_sync($config['installedpackages']['haproxy']['synchost1'], 
+				$config['installedpackages']['haproxy']['syncusername'],
 				$config['installedpackages']['haproxy']['syncpassword']);
 		}
 		if($config['installedpackages']['haproxy']['synchost2']) {
 			haproxy_do_xmlrpc_sync($config['installedpackages']['haproxy']['synchost2'], 
+				$config['installedpackages']['haproxy']['syncusername'],
 				$config['installedpackages']['haproxy']['syncpassword']);
 		}
 		if($config['installedpackages']['haproxy']['synchost3']) {
 			haproxy_do_xmlrpc_sync($config['installedpackages']['haproxy']['synchost3'], 
-				$config['installedpackages']['haproxy']['syncpassword']);				
+				$config['installedpackages']['haproxy']['syncusername'],
+				$config['installedpackages']['haproxy']['syncpassword']);
 		}
 	}
 
@@ -673,7 +676,7 @@ function haproxy_check_run($reload) {
 	
 }
 
-function haproxy_do_xmlrpc_sync($sync_to_ip, $password) {
+function haproxy_do_xmlrpc_sync($sync_to_ip, $username, $password) {
 	global $config, $g;
 
 	if(!$password)
@@ -681,6 +684,9 @@ function haproxy_do_xmlrpc_sync($sync_to_ip, $password) {
 
 	if(!$sync_to_ip)
 		return;
+
+	if (empty($username))
+		$username = "admin";
 	
 	// Do not allow syncing to self.
 	$donotsync = false;
@@ -723,6 +729,7 @@ function haproxy_do_xmlrpc_sync($sync_to_ip, $password) {
 	unset($xml['synchost1']);
 	unset($xml['synchost2']);
 	unset($xml['synchost3']);
+	unset($xml['syncusername']);
 	unset($xml['syncpassword']);
 
 	/* assemble xmlrpc payload */
@@ -737,7 +744,7 @@ function haproxy_do_xmlrpc_sync($sync_to_ip, $password) {
 	$method = 'pfsense.merge_installedpackages_section_xmlrpc';
 	$msg = new XML_RPC_Message($method, $params);
 	$cli = new XML_RPC_Client('/xmlrpc.php', $url, $port);
-	$cli->setCredentials('admin', $password);
+	$cli->setCredentials($username, $password);
 	if($g['debug'])
 		$cli->setDebug(1);
 	/* send our XMLRPC message and timeout after 250 seconds */
@@ -770,7 +777,7 @@ function haproxy_do_xmlrpc_sync($sync_to_ip, $password) {
 	log_error("HAProxy XMLRPC reload data {$url}:{$port}.");
 	$msg = new XML_RPC_Message($method, $params);
 	$cli = new XML_RPC_Client('/xmlrpc.php', $url, $port);
-	$cli->setCredentials('admin', $password);
+	$cli->setCredentials($username, $password);
 	$resp = $cli->send($msg, "250");
 	if(!$resp) {
 		$error = "A communications error occurred while attempting HAProxy XMLRPC sync with {$url}:{$port} (exec_php).";
