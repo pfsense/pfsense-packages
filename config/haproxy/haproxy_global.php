@@ -342,7 +342,7 @@ function enable_change(enable_change) {
 				<td width="78%" class="vtable">
 					<input name="syncusername" type="text" value="<?= empty($pconfig['syncusername']) ? 'admin' : $pconfig['syncusername'];?>">
 					<br/>
-					<strong>Enter the usernmame that will be used during configuration synchronization.  This is generally "admin" or an admin-level privileged account on the target system..</strong>
+					<strong>Enter the username that will be used during configuration synchronization.  This is generally "admin" or an admin-level privileged account on the target system.</strong>
 				</td>
 			</tr>
 			<tr>
