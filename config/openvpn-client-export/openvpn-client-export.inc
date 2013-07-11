@@ -383,6 +383,9 @@ function openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $quotese
 				$conf .= "<cert>{$nl}" . trim(base64_decode($cert['crt'])) . "{$nl}</cert>{$nl}";
 				// Inline Key
 				$conf .= "<key>{$nl}" . trim(base64_decode($cert['prv'])) . "{$nl}</key>{$nl}";
+			} else {
+				// Work around OpenVPN Connect assuming you have a client cert even when you don't need one
+				$conf .= "setenv CLIENT_CERT 0{$nl}";
 			}
 			// Inline TLS
 			if ($settings['tls']) {
