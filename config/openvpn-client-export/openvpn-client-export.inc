@@ -343,7 +343,7 @@ function openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $quotese
 		case "zip":
 			// create template directory
 			$tempdir = "{$g['tmp_path']}/{$prefix}";
-			mkdir($tempdir, 0700, true);
+			@mkdir($tempdir, 0700, true);
 
 			file_put_contents("{$tempdir}/{$prefix}.ovpn", $conf);
 
@@ -368,10 +368,14 @@ function openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $quotese
 				else
 					openvpn_client_pem_to_pk12($p12file, $outpass, $crtfile, $keyfile, $cafile);
 			}
-			exec("cd {$tempdir}/.. && /usr/local/bin/zip -r {$g['tmp_path']}/{$prefix}-config.zip {$prefix}");
+			$command = "cd " . escapeshellarg("{$tempdir}/..")
+					. " && /usr/local/bin/zip -r "
+					. escapeshellarg("{$g['tmp_path']}/{$prefix}-config.zip")
+					. " " . escapeshellarg($prefix);
+			exec($command);
 			// Remove temporary directory
-			exec("rm -rf {$tempdir}");
-			return $g['tmp_path'] . "/{$prefix}-config.zip";
+			exec("rm -rf " . escapeshellarg($tempdir));
+			return "{$g['tmp_path']}/{$prefix}-config.zip";
 			break;
 		case "inline":
 		case "inlinedroid":
