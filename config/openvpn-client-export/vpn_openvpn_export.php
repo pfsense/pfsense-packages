@@ -603,6 +603,11 @@ function useproxy_changed(obj) {
 													<option value="<?php echo $ddns["host"] ?>">DynDNS: <?php echo $ddns["host"] ?></option>
 												<?php endforeach; ?>
 											<?php endif; ?>
+											<?php if (is_array($config['dnsupdates']['dnsupdate'])): ?>
+												<?php foreach ($config['dnsupdates']['dnsupdate'] as $ddns): ?>
+													<option value="<?php echo $ddns["host"] ?>">DynDNS: <?php echo $ddns["host"] ?></option>
+												<?php endforeach; ?>
+											<?php endif; ?>
 											<option value="other">Other</option>
 										</select>
 										<br />
