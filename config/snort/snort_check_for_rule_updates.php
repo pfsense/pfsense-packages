@@ -141,6 +141,18 @@ function snort_download_file_url($url, $file_out) {
 		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
 		curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 30);
 		curl_setopt($ch, CURLOPT_TIMEOUT, 0);
+
+		// Use the system proxy server setttings if configured
+		if (!empty($config['system']['proxyurl'])) {
+			curl_setopt($ch, CURLOPT_PROXY, $config['system']['proxyurl']);
+			if (!empty($config['system']['proxyport']))
+				curl_setopt($ch, CURLOPT_PROXYPORT, $config['system']['proxyport']);
+			if (!empty($config['system']['proxyuser']) && !empty($config['system']['proxypass'])) {
+				@curl_setopt($ch, CURLOPT_PROXYAUTH, CURLAUTH_ANY | CURLAUTH_ANYSAFE);
+				curl_setopt($ch, CURLOPT_PROXYUSERPWD, "{$config['system']['proxyuser']}:{$config['system']['proxypass']}");
+			}
+		}
+
 		$counter = 0;
 		$rc = true;
 		/* Try up to 4 times to download the file before giving up */
