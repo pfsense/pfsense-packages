@@ -459,7 +459,7 @@ function write_backend($fd, $name, $pool, $frontend) {
 		$adv_be	= explode("\n", base64_decode($pool['advanced_backend']));
 		foreach($adv_be as $adv_line) {
 			if ($adv_line != "") {
-				fwrite($fd, "\t" . $adv_line . "\n");
+				fwrite($fd, "\t" . str_replace("\r", "", $adv_line) . "\n");
 			}
 		}
 	}
@@ -573,7 +573,8 @@ function haproxy_writeconf($configfile) {
 		if($a_global['advanced']) {
 			$adv = explode("\n", base64_decode($a_global['advanced']));
 			foreach($adv as $adv_line) {
-				fwrite($fd, "\t" . $adv_line . "\n");
+				fwrite($fd, "\t" . str_replace("\r", "", $adv_line) . "\n");
+
 			}
 		}
 		fwrite ($fd, "\n");
@@ -687,7 +688,7 @@ function haproxy_writeconf($configfile) {
 				$advanced	= explode("\n", base64_decode($bind['advanced']));
 				foreach($advanced as $adv_line) {
 					if ($adv_line != "") {
-						fwrite($fd, "\t" . $adv_line . "\n");
+						fwrite($fd, "\t" . str_replace("\r", "", $adv_line) . "\n");
 					}
 				}
 			}
