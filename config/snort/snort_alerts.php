@@ -108,6 +108,10 @@ function snort_add_supplist_entry($suppress) {
 					$alist['suppresspassthru'] = base64_encode($tmplist);
 					$a_suppress[$a_id] = $alist;
 				}
+				else {
+					$alist['suppresspassthru'] = base64_encode($suppress);
+					$a_suppress[$a_id] = $alist;
+				}
 			}
 		}
 	}
