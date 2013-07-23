@@ -70,7 +70,7 @@ function doCmdT($title, $command) {
 		}
 		pclose($fd);
 	}
-	echo "</pre></tr>\n";
+	echo "</pre></td></tr>\n";
 	echo "</table>\n";
 }
 
