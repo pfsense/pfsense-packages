@@ -74,23 +74,11 @@ function doCmdT($title, $command) {
 	echo "</table>\n";
 }
 
-/* Execute a command, giving it a title which is the same as the command. */
-function doCmd($command) {
-	doCmdT($command,$command);
-}
-
 /* Define a command, with a title, to be executed later. */
 function defCmdT($title, $command) {
 	global $commands;
 	$title = htmlspecialchars($title,ENT_NOQUOTES);
 	$commands[] = array($title, $command);
-}
-
-/* Define a command, with a title which is the same as the command,
- * to be executed later.
- */
-function defCmd($command) {
-	defCmdT($command,$command);
 }
 
 /* List all of the commands as an index. */
