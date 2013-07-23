@@ -3,7 +3,7 @@
 /*
 	openbgpd_status.php
 	part of pfSense (http://www.pfsense.com/)
-    Copyright (C) 2007 Scott Ullrich (sullrich@gmail.com)
+	Copyright (C) 2007 Scott Ullrich (sullrich@gmail.com)
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
@@ -38,11 +38,11 @@ else
 include("head.inc");
 
 function doCmdT($title, $command) {
-    echo "<p>\n";
-    echo "<a name=\"" . $title . "\">\n";
-    echo "<table width=\"100%\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\">\n";
-    echo "<tr><td class=\"listtopic\">" . $title . "</td></tr>\n";
-    echo "<tr><td class=\"listlr\"><pre>";		/* no newline after pre */
+	echo "<p>\n";
+	echo "<a name=\"" . $title . "\">\n";
+	echo "<table width=\"100%\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\">\n";
+	echo "<tr><td class=\"listtopic\">" . $title . "</td></tr>\n";
+	echo "<tr><td class=\"listlr\"><pre>";		/* no newline after pre */
 
 	if ($command == "dumpconfigxml") {
 		$fd = @fopen("/conf/config.xml", "r");
@@ -70,46 +70,46 @@ function doCmdT($title, $command) {
 		}
 		pclose($fd);
 	}
-    echo "</pre></tr>\n";
-    echo "</table>\n";
+	echo "</pre></tr>\n";
+	echo "</table>\n";
 }
 
 /* Execute a command, giving it a title which is the same as the command. */
 function doCmd($command) {
-    doCmdT($command,$command);
+	doCmdT($command,$command);
 }
 
 /* Define a command, with a title, to be executed later. */
 function defCmdT($title, $command) {
-    global $commands;
-    $title = htmlspecialchars($title,ENT_NOQUOTES);
-    $commands[] = array($title, $command);
+	global $commands;
+	$title = htmlspecialchars($title,ENT_NOQUOTES);
+	$commands[] = array($title, $command);
 }
 
 /* Define a command, with a title which is the same as the command,
  * to be executed later.
  */
 function defCmd($command) {
-    defCmdT($command,$command);
+	defCmdT($command,$command);
 }
 
 /* List all of the commands as an index. */
 function listCmds() {
-    global $commands;
-    echo "<p>This status page includes the following information:\n";
-    echo "<ul width=\"700\">\n";
-    for ($i = 0; isset($commands[$i]); $i++ ) {
-        echo "<li><strong><a href=\"#" . $commands[$i][0] . "\">" . $commands[$i][0] . "</a></strong></li>\n";
-    }
-    echo "</ul>\n";
+	global $commands;
+	echo "<p>This status page includes the following information:\n";
+	echo "<ul width=\"700\">\n";
+	for ($i = 0; isset($commands[$i]); $i++ ) {
+		echo "<li><strong><a href=\"#" . $commands[$i][0] . "\">" . $commands[$i][0] . "</a></strong></li>\n";
+	}
+	echo "</ul>\n";
 }
 
 /* Execute all of the commands which were defined by a call to defCmd. */
 function execCmds() {
-    global $commands;
-    for ($i = 0; isset($commands[$i]); $i++ ) {
-        doCmdT($commands[$i][0], $commands[$i][1]);
-    }
+	global $commands;
+	for ($i = 0; isset($commands[$i]); $i++ ) {
+		doCmdT($commands[$i][0], $commands[$i][1]);
+	}
 }
 
 ?>
@@ -136,37 +136,36 @@ function execCmds() {
 ?>
 </table>
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
-   <tr>
-     <td class="tabcont" >
-      <form action="tinydns_status.php" method="post">
-    </form>
-    </td>
-   </tr>
-   <tr>
-    <td class="tabcont" >
+	<tr>
+		<td class="tabcont" >
+			<form action="tinydns_status.php" method="post">
+			</form>
+		</td>
+	</tr>
+	<tr>
+		<td class="tabcont" >
 
-<?php 
+<?php
 
-defCmdT("OpenBGPD Summary","bgpctl show summary"); 
-defCmdT("OpenBGPD Interfaces","bgpctl show interfaces"); 
-defCmdT("OpenBGPD Routing","bgpctl show rib"); 
-defCmdT("OpenBGPD Forwarding","bgpctl show fib"); 
-defCmdT("OpenBGPD Network","bgpctl show network"); 
-defCmdT("OpenBGPD Network","bgpctl show network"); 
-defCmdT("OpenBGPD Nexthops","bgpctl show nexthop"); 
+defCmdT("OpenBGPD Summary","bgpctl show summary");
+defCmdT("OpenBGPD Interfaces","bgpctl show interfaces");
+defCmdT("OpenBGPD Routing","bgpctl show rib");
+defCmdT("OpenBGPD Forwarding","bgpctl show fib");
+defCmdT("OpenBGPD Network","bgpctl show network");
+defCmdT("OpenBGPD Network","bgpctl show network");
+defCmdT("OpenBGPD Nexthops","bgpctl show nexthop");
 defCmdT("OpenBGPD IP","bgpctl show ip bgp");
-defCmdT("OpenBGPD Neighbors","bgpctl show neighbor"); 
+defCmdT("OpenBGPD Neighbors","bgpctl show neighbor");
 
 ?>
-		<div id="cmdspace" style="width:100%">
-		<?php listCmds(); ?>
-		
-		<?php execCmds(); ?>
-		</div>
+			<div id="cmdspace" style="width:100%">
+			<?php listCmds(); ?>
 
-      </table>
-     </td>
-    </tr>
+			<?php execCmds(); ?>
+			</div>
+
+		</td>
+	</tr>
 </table>
 </div>
 
