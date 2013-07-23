@@ -39,7 +39,7 @@ include("head.inc");
 
 function doCmdT($title, $command) {
 	echo "<p>\n";
-	echo "<a name=\"" . $title . "\">\n";
+	echo "<a name=\"" . $title . "\">&nbsp;</a>\n";
 	echo "<table width=\"100%\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\">\n";
 	echo "<tr><td class=\"listtopic\">" . $title . "</td></tr>\n";
 	echo "<tr><td class=\"listlr\"><pre>";		/* no newline after pre */
