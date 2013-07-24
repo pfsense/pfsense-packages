@@ -34,16 +34,18 @@ $commands = array();
 
 defCmdT("summary",	"OpenBGPD Summary",	"/usr/local/sbin/bgpctl show summary");
 defCmdT("interfaces",	"OpenBGPD Interfaces",	"/usr/local/sbin/bgpctl show interfaces");
-defCmdT("routing",	"OpenBGPD Routing",	"/usr/local/sbin/bgpctl show rib | /usr/bin/sed '1,4d'");
-defCmdT("forwarding",	"OpenBGPD Forwarding",	"/usr/local/sbin/bgpctl show fib");
+defCmdT("routing",	"OpenBGPD Routing",	"/usr/local/sbin/bgpctl show rib | /usr/bin/sed '1,4d'",	true);
+defCmdT("forwarding",	"OpenBGPD Forwarding",	"/usr/local/sbin/bgpctl show fib | /usr/bin/sed '1,5d'",	true);
 defCmdT("network",	"OpenBGPD Network",	"/usr/local/sbin/bgpctl show network");
 defCmdT("nexthops",	"OpenBGPD Nexthops",	"/usr/local/sbin/bgpctl show nexthop");
 defCmdT("ip",		"OpenBGPD IP",		"/usr/local/sbin/bgpctl show ip bgp");
 defCmdT("neighbors",	"OpenBGPD Neighbors",	"/usr/local/sbin/bgpctl show neighbor");
 
 if (isset($_REQUEST['isAjax'])) {
-	if (isset($_REQUEST['cmd']) && isset($commands[$_REQUEST['cmd']]))
+	if (isset($_REQUEST['cmd']) && isset($commands[$_REQUEST['cmd']])) {
+		echo "{$_REQUEST['cmd']}\n";
 		echo htmlspecialchars_decode(doCmdT($commands[$_REQUEST['cmd']][1], $_REQUEST['limit'], $_REQUEST['filter']));
+	}
 	exit;
 }
 
@@ -87,25 +89,25 @@ function countCmdT($command) {
 	return $c;
 }
 
-function showCmdT($idx, $title, $command) {
+function showCmdT($idx, $title, $command, $has_filter) {
 	echo "<p>\n";
 	echo "<a name=\"" . $title . "\">&nbsp;</a>\n";
 	echo "<table width=\"100%\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\">\n";
 	echo "<tr><td colspan=\"2\" class=\"listtopic\">" . $title . "</td></tr>\n";
 
 	$limit_default = "all";
-	if ($idx == "routing") {
+	if ($has_filter) {
 		$limit_options = array("10", "50", "100", "200", "500", "1000", "all");
 		$limit_default = "100";
 
 		echo "<tr><td class=\"listhdr\" style=\"font-weight:bold;\">\n";
-		echo "Display <select onchange=\"update_routing();\" name=\"routing_limit\" id=\"routing_limit\">\n";
+		echo "Display <select onchange=\"update_filter('{$idx}');\" name=\"{$idx}_limit\" id=\"{$idx}_limit\">\n";
 		foreach ($limit_options as $item)
 			echo "<option value='{$item}' " . ($item == $limit_default ? "selected" : "") . ">{$item}</option>\n";
-		echo "</select> of " . countCmdT($command) . " routes</td>\n";
+		echo "</select> of " . countCmdT($command) . " items</td>\n";
 		echo "<td class=\"listhdr\" align=\"right\" style=\"font-weight:bold;\">Filter expression: \n";
-		echo "<input type=\"text\" name=\"routing_filter\" id=\"routing_filter\" class=\"formfld search\" value=\"" . htmlspecialchars($_REQUEST['routing_filter']) . "\" size=\"30\" />\n";
-		echo "<input type=\"button\" class=\"formbtn\" value=\"Filter\" onclick=\"update_routing();\" />\n";
+		echo "<input type=\"text\" name=\"{$idx}_filter\" id=\"{$idx}_filter\" class=\"formfld search\" value=\"" . htmlspecialchars($_REQUEST["{$idx}_filter"]) . "\" size=\"30\" />\n";
+		echo "<input type=\"button\" class=\"formbtn\" value=\"Filter\" onclick=\"update_filter('{$idx}');\" />\n";
 		echo "</td></tr>\n";
 	}
 
@@ -116,10 +118,10 @@ function showCmdT($idx, $title, $command) {
 }
 
 /* Define a command, with a title, to be executed later. */
-function defCmdT($idx, $title, $command) {
+function defCmdT($idx, $title, $command, $has_filter = false) {
 	global $commands;
 	$title = htmlspecialchars($title,ENT_NOQUOTES);
-	$commands[$idx] = array($title, $command);
+	$commands[$idx] = array($title, $command, $has_filter);
 }
 
 /* List all of the commands as an index. */
@@ -136,7 +138,7 @@ function listCmds() {
 function execCmds() {
 	global $commands;
 	foreach ($commands as $idx => $command)
-		showCmdT($idx, $command[0], $command[1]);
+		showCmdT($idx, $command[0], $command[1], $command[2]);
 }
 
 ?>
@@ -180,23 +182,34 @@ function execCmds() {
 <script type="text/javascript">
 //<![CDATA[
 
-	function update_routing() {
+	function update_filter(cmd) {
 		var url = "openbgpd_status.php";
-		var index = document.getElementById("routing_limit").selectedIndex;
-		var limit = document.getElementById("routing_limit").options[index].value;
-		var filter = document.getElementById("routing_filter").value;
-		var params = "isAjax=true&cmd=routing&limit=" + limit + "&filter=" + filter;
+		var index = document.getElementById(cmd + "_limit").selectedIndex;
+		var limit = document.getElementById(cmd + "_limit").options[index].value;
+		var filter = document.getElementById(cmd + "_filter").value;
+		var params = "isAjax=true&cmd=" + cmd + "&limit=" + limit + "&filter=" + filter;
 		var myAjax = new Ajax.Request(
 			url,
 			{
 				method: 'post',
 				parameters: params,
-				onComplete: update_routing_callback
+				onComplete: update_filter_callback
 			});
 	}
 
-	function update_routing_callback(transport) {
-		document.getElementById("routing").textContent = transport.responseText;
+	function update_filter_callback(transport) {
+		// First line contain field id to be updated
+		var responseTextArr = transport.responseText.split("\n");
+		var result = "";
+		var i;
+
+		for (i = 1; i < responseTextArr.length; i++) {
+			result += responseTextArr[i];
+			if (i < responseTextArr.length - 1)
+				result += "\n";
+		}
+
+		document.getElementById(responseTextArr[0]).textContent = result;
 	}
 
 //]]>
