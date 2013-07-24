@@ -34,7 +34,7 @@ $commands = array();
 
 defCmdT("summary",	"OpenBGPD Summary",	"/usr/local/sbin/bgpctl show summary");
 defCmdT("interfaces",	"OpenBGPD Interfaces",	"/usr/local/sbin/bgpctl show interfaces");
-defCmdT("routing",	"OpenBGPD Routing",	"/usr/local/sbin/bgpctl show rib | sed '1,4d'");
+defCmdT("routing",	"OpenBGPD Routing",	"/usr/local/sbin/bgpctl show rib | /usr/bin/sed '1,4d'");
 defCmdT("forwarding",	"OpenBGPD Forwarding",	"/usr/local/sbin/bgpctl show fib");
 defCmdT("network",	"OpenBGPD Network",	"/usr/local/sbin/bgpctl show network");
 defCmdT("nexthops",	"OpenBGPD Nexthops",	"/usr/local/sbin/bgpctl show nexthop");
