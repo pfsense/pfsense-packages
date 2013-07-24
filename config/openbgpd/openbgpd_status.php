@@ -122,7 +122,6 @@ defCmdT("OpenBGPD Interfaces","bgpctl show interfaces");
 defCmdT("OpenBGPD Routing","bgpctl show rib");
 defCmdT("OpenBGPD Forwarding","bgpctl show fib");
 defCmdT("OpenBGPD Network","bgpctl show network");
-defCmdT("OpenBGPD Network","bgpctl show network");
 defCmdT("OpenBGPD Nexthops","bgpctl show nexthop");
 defCmdT("OpenBGPD IP","bgpctl show ip bgp");
 defCmdT("OpenBGPD Neighbors","bgpctl show neighbor");
