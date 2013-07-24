@@ -30,6 +30,17 @@
 
 require("guiconfig.inc");
 
+$commands = array();
+
+defCmdT("summary",	"OpenBGPD Summary",	"bgpctl show summary");
+defCmdT("interfaces",	"OpenBGPD Interfaces",	"bgpctl show interfaces");
+defCmdT("routing",	"OpenBGPD Routing",	"bgpctl show rib");
+defCmdT("forwarding",	"OpenBGPD Forwarding",	"bgpctl show fib");
+defCmdT("network",	"OpenBGPD Network",	"bgpctl show network");
+defCmdT("nexthops",	"OpenBGPD Nexthops",	"bgpctl show nexthop");
+defCmdT("ip",		"OpenBGPD IP",		"bgpctl show ip bgp");
+defCmdT("neighbors",	"OpenBGPD Neighbors",	"bgpctl show neighbor");
+
 if ($config['version'] >= 6)
 	$pgtitle = array("OpenBGPD", "Status");
 else
@@ -61,9 +72,9 @@ function doCmdT($command, $limit = 0, $filter = "") {
 	return $result;
 }
 
-function showCmdT($title, $command) {
+function showCmdT($idx, $title, $command) {
 	echo "<p>\n";
-	echo "<a name=\"" . $title . "\">&nbsp;</a>\n";
+	echo "<a name=\"" . $idx . "\">&nbsp;</a>\n";
 	echo "<table width=\"100%\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\">\n";
 	echo "<tr><td class=\"listtopic\">" . $title . "</td></tr>\n";
 	echo "<tr><td class=\"listlr\"><pre>";		/* no newline after pre */
@@ -73,10 +84,10 @@ function showCmdT($title, $command) {
 }
 
 /* Define a command, with a title, to be executed later. */
-function defCmdT($title, $command) {
+function defCmdT($idx, $title, $command) {
 	global $commands;
 	$title = htmlspecialchars($title,ENT_NOQUOTES);
-	$commands[] = array($title, $command);
+	$commands[$idx] = array($title, $command);
 }
 
 /* List all of the commands as an index. */
@@ -84,16 +95,16 @@ function listCmds() {
 	global $commands;
 	echo "<p>This status page includes the following information:\n";
 	echo "<ul width=\"700\">\n";
-	foreach ($commands as $command)
-		echo "<li><strong><a href=\"#" . $command[0] . "\">" . $command[0] . "</a></strong></li>\n";
+	foreach ($commands as $idx => $command)
+		echo "<li><strong><a href=\"#" . $idx . "\">" . $command[0] . "</a></strong></li>\n";
 	echo "</ul>\n";
 }
 
 /* Execute all of the commands which were defined by a call to defCmd. */
 function execCmds() {
 	global $commands;
-	foreach ($commands as $command)
-		showCmdT($command[0], $command[1]);
+	foreach ($commands as $idx => $command)
+		showCmdT($idx, $command[0], $command[1]);
 }
 
 ?>
@@ -129,18 +140,6 @@ function execCmds() {
 	<tr>
 		<td class="tabcont" >
 
-<?php
-
-defCmdT("OpenBGPD Summary","bgpctl show summary");
-defCmdT("OpenBGPD Interfaces","bgpctl show interfaces");
-defCmdT("OpenBGPD Routing","bgpctl show rib");
-defCmdT("OpenBGPD Forwarding","bgpctl show fib");
-defCmdT("OpenBGPD Network","bgpctl show network");
-defCmdT("OpenBGPD Nexthops","bgpctl show nexthop");
-defCmdT("OpenBGPD IP","bgpctl show ip bgp");
-defCmdT("OpenBGPD Neighbors","bgpctl show neighbor");
-
-?>
 			<div id="cmdspace" style="width:100%">
 			<?php listCmds(); ?>
 
