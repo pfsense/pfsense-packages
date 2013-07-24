@@ -34,17 +34,17 @@ $commands = array();
 
 defCmdT("summary",	"OpenBGPD Summary",	"/usr/local/sbin/bgpctl show summary");
 defCmdT("interfaces",	"OpenBGPD Interfaces",	"/usr/local/sbin/bgpctl show interfaces");
-defCmdT("routing",	"OpenBGPD Routing",	"/usr/local/sbin/bgpctl show rib | /usr/bin/sed '1,4d'",	true);
-defCmdT("forwarding",	"OpenBGPD Forwarding",	"/usr/local/sbin/bgpctl show fib | /usr/bin/sed '1,5d'",	true);
+defCmdT("routing",	"OpenBGPD Routing",	"/usr/local/sbin/bgpctl show rib",		true, 4);
+defCmdT("forwarding",	"OpenBGPD Forwarding",	"/usr/local/sbin/bgpctl show fib",		true, 5);
 defCmdT("network",	"OpenBGPD Network",	"/usr/local/sbin/bgpctl show network");
 defCmdT("nexthops",	"OpenBGPD Nexthops",	"/usr/local/sbin/bgpctl show nexthop");
-defCmdT("ip",		"OpenBGPD IP",		"/usr/local/sbin/bgpctl show ip bgp");
+defCmdT("ip",		"OpenBGPD IP",		"/usr/local/sbin/bgpctl show ip bgp",		true, 4);
 defCmdT("neighbors",	"OpenBGPD Neighbors",	"/usr/local/sbin/bgpctl show neighbor");
 
 if (isset($_REQUEST['isAjax'])) {
 	if (isset($_REQUEST['cmd']) && isset($commands[$_REQUEST['cmd']])) {
 		echo "{$_REQUEST['cmd']}\n";
-		echo htmlspecialchars_decode(doCmdT($commands[$_REQUEST['cmd']][1], $_REQUEST['limit'], $_REQUEST['filter']));
+		echo htmlspecialchars_decode(doCmdT($commands[$_REQUEST['cmd']]['command'], $_REQUEST['limit'], $_REQUEST['filter'], $_REQUEST['header_size']));
 	}
 	exit;
 }
@@ -56,12 +56,14 @@ else
 
 include("head.inc");
 
-function doCmdT($command, $limit = "all", $filter = "") {
+function doCmdT($command, $limit = "all", $filter = "", $header_size = 0) {
 	$grepline = "";
 	if (!empty($filter))
 		$grepline = " | /usr/bin/grep " . escapeshellarg(htmlspecialchars($filter));
-	if (is_numeric($limit) && $limit > 0)
+	if (is_numeric($limit) && $limit > 0) {
+		$limit += $header_size;
 		$headline = " | /usr/bin/head -n {$limit}";
+	}
 
 	$fd = popen("{$command}{$grepline}{$headline} 2>&1", "r");
 	$ct = 0;
@@ -89,39 +91,43 @@ function countCmdT($command) {
 	return $c;
 }
 
-function showCmdT($idx, $title, $command, $has_filter) {
+function showCmdT($idx, $data) {
 	echo "<p>\n";
-	echo "<a name=\"" . $title . "\">&nbsp;</a>\n";
+	echo "<a name=\"" . $data['title'] . "\">&nbsp;</a>\n";
 	echo "<table width=\"100%\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\">\n";
-	echo "<tr><td colspan=\"2\" class=\"listtopic\">" . $title . "</td></tr>\n";
+	echo "<tr><td colspan=\"2\" class=\"listtopic\">" . $data['title'] . "</td></tr>\n";
 
 	$limit_default = "all";
-	if ($has_filter) {
+	if ($data['has_filter']) {
 		$limit_options = array("10", "50", "100", "200", "500", "1000", "all");
 		$limit_default = "100";
 
 		echo "<tr><td class=\"listhdr\" style=\"font-weight:bold;\">\n";
-		echo "Display <select onchange=\"update_filter('{$idx}');\" name=\"{$idx}_limit\" id=\"{$idx}_limit\">\n";
+		echo "Display <select onchange=\"update_filter('{$idx}','{$data['header_size']}');\" name=\"{$idx}_limit\" id=\"{$idx}_limit\">\n";
 		foreach ($limit_options as $item)
 			echo "<option value='{$item}' " . ($item == $limit_default ? "selected" : "") . ">{$item}</option>\n";
-		echo "</select> of " . countCmdT($command) . " items</td>\n";
+		echo "</select> of " . countCmdT($data['command']) . " items</td>\n";
 		echo "<td class=\"listhdr\" align=\"right\" style=\"font-weight:bold;\">Filter expression: \n";
 		echo "<input type=\"text\" name=\"{$idx}_filter\" id=\"{$idx}_filter\" class=\"formfld search\" value=\"" . htmlspecialchars($_REQUEST["{$idx}_filter"]) . "\" size=\"30\" />\n";
-		echo "<input type=\"button\" class=\"formbtn\" value=\"Filter\" onclick=\"update_filter('{$idx}');\" />\n";
+		echo "<input type=\"button\" class=\"formbtn\" value=\"Filter\" onclick=\"update_filter('{$idx}','{$data['header_size']}');\" />\n";
 		echo "</td></tr>\n";
 	}
 
 	echo "<tr><td colspan=\"2\" class=\"listlr\"><pre id=\"{$idx}\">";	/* no newline after pre */
-	echo doCmdT($command, $limit_default);
+	echo doCmdT($data['command'], $limit_default, "", $data['header_size']);
 	echo "</pre></td></tr>\n";
 	echo "</table>\n";
 }
 
 /* Define a command, with a title, to be executed later. */
-function defCmdT($idx, $title, $command, $has_filter = false) {
+function defCmdT($idx, $title, $command, $has_filter = false, $header_size = 0) {
 	global $commands;
 	$title = htmlspecialchars($title,ENT_NOQUOTES);
-	$commands[$idx] = array($title, $command, $has_filter);
+	$commands[$idx] = array(
+		'title' => $title,
+		'command' => $command,
+		'has_filter' => $has_filter,
+		'header_size' => $header_size);
 }
 
 /* List all of the commands as an index. */
@@ -130,7 +136,7 @@ function listCmds() {
 	echo "<p>This status page includes the following information:\n";
 	echo "<ul width=\"700\">\n";
 	foreach ($commands as $idx => $command)
-		echo "<li><strong><a href=\"#" . $command[0] . "\">" . $command[0] . "</a></strong></li>\n";
+		echo "<li><strong><a href=\"#" . $command['title'] . "\">" . $command['title'] . "</a></strong></li>\n";
 	echo "</ul>\n";
 }
 
@@ -138,7 +144,7 @@ function listCmds() {
 function execCmds() {
 	global $commands;
 	foreach ($commands as $idx => $command)
-		showCmdT($idx, $command[0], $command[1], $command[2]);
+		showCmdT($idx, $command);
 }
 
 ?>
@@ -182,12 +188,12 @@ function execCmds() {
 <script type="text/javascript">
 //<![CDATA[
 
-	function update_filter(cmd) {
+	function update_filter(cmd, header_size) {
 		var url = "openbgpd_status.php";
 		var index = document.getElementById(cmd + "_limit").selectedIndex;
 		var limit = document.getElementById(cmd + "_limit").options[index].value;
 		var filter = document.getElementById(cmd + "_filter").value;
-		var params = "isAjax=true&cmd=" + cmd + "&limit=" + limit + "&filter=" + filter;
+		var params = "isAjax=true&cmd=" + cmd + "&limit=" + limit + "&filter=" + filter + "&header_size=" + header_size;
 		var myAjax = new Ajax.Request(
 			url,
 			{
