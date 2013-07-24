@@ -37,16 +37,24 @@ else
 
 include("head.inc");
 
-function doCmdT($command) {
-	$fd = popen("{$command} 2>&1", "r");
+function doCmdT($command, $limit = 0, $filter = "") {
+	$grepline = "";
+	if (!empty($filter))
+		$grepline = " | grep " . escapeshellarg(htmlspecialchars($filter));
+
+	$fd = popen("{$command}{$grepline} 2>&1", "r");
 	$ct = 0;
+	$cl = 0;
 	$result = "";
 	while (($line = fgets($fd)) !== FALSE) {
+		if ($limit > 0 && $cl >= $limit)
+			break;
 		$result .= htmlspecialchars($line, ENT_NOQUOTES);
 		if ($ct++ > 1000) {
 			ob_flush();
 			$ct = 0;
 		}
+		$cl++;
 	}
 	pclose($fd);
 
