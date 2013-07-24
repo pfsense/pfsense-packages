@@ -32,14 +32,14 @@ require("guiconfig.inc");
 
 $commands = array();
 
-defCmdT("summary",	"OpenBGPD Summary",	"bgpctl show summary");
-defCmdT("interfaces",	"OpenBGPD Interfaces",	"bgpctl show interfaces");
-defCmdT("routing",	"OpenBGPD Routing",	"bgpctl show rib | sed '1,4d'");
-defCmdT("forwarding",	"OpenBGPD Forwarding",	"bgpctl show fib");
-defCmdT("network",	"OpenBGPD Network",	"bgpctl show network");
-defCmdT("nexthops",	"OpenBGPD Nexthops",	"bgpctl show nexthop");
-defCmdT("ip",		"OpenBGPD IP",		"bgpctl show ip bgp");
-defCmdT("neighbors",	"OpenBGPD Neighbors",	"bgpctl show neighbor");
+defCmdT("summary",	"OpenBGPD Summary",	"/usr/local/sbin/bgpctl show summary");
+defCmdT("interfaces",	"OpenBGPD Interfaces",	"/usr/local/sbin/bgpctl show interfaces");
+defCmdT("routing",	"OpenBGPD Routing",	"/usr/local/sbin/bgpctl show rib | sed '1,4d'");
+defCmdT("forwarding",	"OpenBGPD Forwarding",	"/usr/local/sbin/bgpctl show fib");
+defCmdT("network",	"OpenBGPD Network",	"/usr/local/sbin/bgpctl show network");
+defCmdT("nexthops",	"OpenBGPD Nexthops",	"/usr/local/sbin/bgpctl show nexthop");
+defCmdT("ip",		"OpenBGPD IP",		"/usr/local/sbin/bgpctl show ip bgp");
+defCmdT("neighbors",	"OpenBGPD Neighbors",	"/usr/local/sbin/bgpctl show neighbor");
 
 if (isset($_REQUEST['isAjax'])) {
 	if (isset($_REQUEST['cmd']) && isset($commands[$_REQUEST['cmd']]))
@@ -57,9 +57,9 @@ include("head.inc");
 function doCmdT($command, $limit = "all", $filter = "") {
 	$grepline = "";
 	if (!empty($filter))
-		$grepline = " | grep " . escapeshellarg(htmlspecialchars($filter));
+		$grepline = " | /usr/bin/grep " . escapeshellarg(htmlspecialchars($filter));
 	if (is_numeric($limit) && $limit > 0)
-		$headline = " | head -n {$limit}";
+		$headline = " | /usr/bin/head -n {$limit}";
 
 	$fd = popen("{$command}{$grepline}{$headline} 2>&1", "r");
 	$ct = 0;
