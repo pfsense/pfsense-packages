@@ -37,23 +37,29 @@ else
 
 include("head.inc");
 
-function doCmdT($title, $command) {
-	echo "<p>\n";
-	echo "<a name=\"" . $title . "\">&nbsp;</a>\n";
-	echo "<table width=\"100%\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\">\n";
-	echo "<tr><td class=\"listtopic\">" . $title . "</td></tr>\n";
-	echo "<tr><td class=\"listlr\"><pre>";		/* no newline after pre */
-
+function doCmdT($command) {
 	$fd = popen("{$command} 2>&1", "r");
 	$ct = 0;
+	$result = "";
 	while (($line = fgets($fd)) !== FALSE) {
-		echo htmlspecialchars($line, ENT_NOQUOTES);
+		$result .= htmlspecialchars($line, ENT_NOQUOTES);
 		if ($ct++ > 1000) {
 			ob_flush();
 			$ct = 0;
 		}
 	}
 	pclose($fd);
+
+	return $result;
+}
+
+function showCmdT($title, $command) {
+	echo "<p>\n";
+	echo "<a name=\"" . $title . "\">&nbsp;</a>\n";
+	echo "<table width=\"100%\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\">\n";
+	echo "<tr><td class=\"listtopic\">" . $title . "</td></tr>\n";
+	echo "<tr><td class=\"listlr\"><pre>";		/* no newline after pre */
+	echo doCmdT($command);
 	echo "</pre></td></tr>\n";
 	echo "</table>\n";
 }
@@ -79,7 +85,7 @@ function listCmds() {
 function execCmds() {
 	global $commands;
 	foreach ($commands as $command)
-		doCmdT($command[0], $command[1]);
+		showCmdT($command[0], $command[1]);
 }
 
 ?>
