@@ -84,6 +84,8 @@ function countCmdT($command) {
 	while (fgets($fd) !== FALSE)
 		$c++;
 
+	pclose($fd);
+
 	return $c;
 }
 
