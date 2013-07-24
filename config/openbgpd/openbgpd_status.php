@@ -93,6 +93,7 @@ function showCmdT($idx, $title, $command) {
 	echo "<table width=\"100%\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\">\n";
 	echo "<tr><td colspan=\"2\" class=\"listtopic\">" . $title . "</td></tr>\n";
 
+	$limit_default = "all";
 	if ($idx == "routing") {
 		$limit_options = array("10", "50", "100", "200", "500", "1000", "all");
 		$limit_default = "100";
@@ -109,7 +110,7 @@ function showCmdT($idx, $title, $command) {
 	}
 
 	echo "<tr><td colspan=\"2\" class=\"listlr\"><pre id=\"{$idx}\">";	/* no newline after pre */
-	echo doCmdT($command);
+	echo doCmdT($command, $limit_default);
 	echo "</pre></td></tr>\n";
 	echo "</table>\n";
 }
