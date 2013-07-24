@@ -41,6 +41,12 @@ defCmdT("nexthops",	"OpenBGPD Nexthops",	"bgpctl show nexthop");
 defCmdT("ip",		"OpenBGPD IP",		"bgpctl show ip bgp");
 defCmdT("neighbors",	"OpenBGPD Neighbors",	"bgpctl show neighbor");
 
+if (isset($_REQUEST['isAjax'])) {
+	if (isset($_REQUEST['cmd']) && isset($commands[$_REQUEST['cmd']]))
+		echo htmlspecialchars_decode(doCmdT($commands[$_REQUEST['cmd']][1], $_REQUEST['limit']. $_REQUEST['filter']));
+	exit;
+}
+
 if ($config['version'] >= 6)
 	$pgtitle = array("OpenBGPD", "Status");
 else
