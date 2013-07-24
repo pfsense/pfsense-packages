@@ -78,12 +78,37 @@ function doCmdT($command, $limit = "all", $filter = "") {
 	return $result;
 }
 
+function countCmdT($command) {
+	$fd = popen("{$command} 2>&1", "r");
+	$c = 0;
+	while (fgets($fd) !== FALSE)
+		$c++;
+
+	return $c;
+}
+
 function showCmdT($idx, $title, $command) {
 	echo "<p>\n";
 	echo "<a name=\"" . $title . "\">&nbsp;</a>\n";
 	echo "<table width=\"100%\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\">\n";
-	echo "<tr><td class=\"listtopic\">" . $title . "</td></tr>\n";
-	echo "<tr><td class=\"listlr\"><pre>";		/* no newline after pre */
+	echo "<tr><td colspan=\"2\" class=\"listtopic\">" . $title . "</td></tr>\n";
+
+	if ($idx == "routing") {
+		$limit_options = array("10", "50", "100", "200", "500", "1000", "all");
+		$limit_default = "100";
+
+		echo "<tr><td class=\"listhdr\" style=\"font-weight:bold;\">\n";
+		echo "Display <select onchange=\"update_routing();\" name=\"routing_limit\" id=\"routing_limit\">\n";
+		foreach ($limit_options as $item)
+			echo "<option value='{$item}' " . ($item == $limit_default ? "selected" : "") . ">{$item}</option>\n";
+		echo "</select> of " . countCmdT($command) . " routes</td>\n";
+		echo "<td class=\"listhdr\" align=\"right\" style=\"font-weight:bold;\">Filter expression: \n";
+		echo "<input type=\"text\" name=\"routing_filter\" id=\"routing_filter\" class=\"formfld search\" value=\"" . htmlspecialchars($_REQUEST['routing_filter']) . "\" size=\"30\" />\n";
+		echo "<input type=\"button\" class=\"formbtn\" value=\"Filter\" onclick=\"update_routing();\" />\n";
+		echo "</td></tr>\n";
+	}
+
+	echo "<tr><td colspan=\"2\" class=\"listlr\"><pre id=\"{$idx}\">";	/* no newline after pre */
 	echo doCmdT($command);
 	echo "</pre></td></tr>\n";
 	echo "</table>\n";
@@ -156,6 +181,31 @@ function execCmds() {
 	</tr>
 </table>
 </div>
+
+<script type="text/javascript">
+//<![CDATA[
+
+	function update_routing() {
+		var url = "openbgpd_status.php";
+		var index = document.getElementById("routing_limit").selectedIndex;
+		var limit = document.getElementById("routing_limit").options[index].value;
+		var filter = document.getElementById("routing_filter").value;
+		var params = "isAjax=true&cmd=routing&limit=" + limit + "&filter=" + filter;
+		var myAjax = new Ajax.Request(
+			url,
+			{
+				method: 'post',
+				parameters: params,
+				onComplete: update_routing_callback
+			});
+	}
+
+	function update_routing_callback(transport) {
+		document.getElementById("routing").textContent = transport.responseText;
+	}
+
+//]]>
+</script>
 
 <?php include("fend.inc"); ?>
 
