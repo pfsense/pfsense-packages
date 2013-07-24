@@ -58,20 +58,18 @@ function doCmdT($command, $limit = "all", $filter = "") {
 	$grepline = "";
 	if (!empty($filter))
 		$grepline = " | grep " . escapeshellarg(htmlspecialchars($filter));
+	if (is_numeric($limit) && $limit > 0)
+		$headline = " | head -n {$limit}";
 
-	$fd = popen("{$command}{$grepline} 2>&1", "r");
+	$fd = popen("{$command}{$grepline}{$headline} 2>&1", "r");
 	$ct = 0;
-	$cl = 0;
 	$result = "";
 	while (($line = fgets($fd)) !== FALSE) {
-		if (is_numeric($limit) && $limit > 0 && $cl >= $limit)
-			break;
 		$result .= htmlspecialchars($line, ENT_NOQUOTES);
 		if ($ct++ > 1000) {
 			ob_flush();
 			$ct = 0;
 		}
-		$cl++;
 	}
 	pclose($fd);
 
