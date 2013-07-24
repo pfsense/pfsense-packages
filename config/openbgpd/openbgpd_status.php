@@ -34,7 +34,7 @@ $commands = array();
 
 defCmdT("summary",	"OpenBGPD Summary",	"bgpctl show summary");
 defCmdT("interfaces",	"OpenBGPD Interfaces",	"bgpctl show interfaces");
-defCmdT("routing",	"OpenBGPD Routing",	"bgpctl show rib");
+defCmdT("routing",	"OpenBGPD Routing",	"bgpctl show rib | sed '1,4d'");
 defCmdT("forwarding",	"OpenBGPD Forwarding",	"bgpctl show fib");
 defCmdT("network",	"OpenBGPD Network",	"bgpctl show network");
 defCmdT("nexthops",	"OpenBGPD Nexthops",	"bgpctl show nexthop");
