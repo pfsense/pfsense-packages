@@ -44,32 +44,16 @@ function doCmdT($title, $command) {
 	echo "<tr><td class=\"listtopic\">" . $title . "</td></tr>\n";
 	echo "<tr><td class=\"listlr\"><pre>";		/* no newline after pre */
 
-	if ($command == "dumpconfigxml") {
-		$fd = @fopen("/conf/config.xml", "r");
-		if ($fd) {
-			while (!feof($fd)) {
-				$line = fgets($fd);
-				/* remove sensitive contents */
-				$line = preg_replace("/<password>.*?<\\/password>/", "<password>xxxxx</password>", $line);
-				$line = preg_replace("/<pre-shared-key>.*?<\\/pre-shared-key>/", "<pre-shared-key>xxxxx</pre-shared-key>", $line);
-				$line = preg_replace("/<rocommunity>.*?<\\/rocommunity>/", "<rocommunity>xxxxx</rocommunity>", $line);
-				$line = str_replace("\t", "    ", $line);
-				echo htmlspecialchars($line,ENT_NOQUOTES);
-			}
+	$fd = popen("{$command} 2>&1", "r");
+	$ct = 0;
+	while (($line = fgets($fd)) !== FALSE) {
+		echo htmlspecialchars($line, ENT_NOQUOTES);
+		if ($ct++ > 1000) {
+			ob_flush();
+			$ct = 0;
 		}
-		fclose($fd);
-	} else {
-		$fd = popen("{$command} 2>&1", "r");
-		$ct = 0;
-		while (($line = fgets($fd)) !== FALSE) {
-			echo htmlspecialchars($line, ENT_NOQUOTES);
-			if ($ct++ > 1000) {
-				ob_flush();
-				$ct = 0;
-			}
-		}
-		pclose($fd);
 	}
+	pclose($fd);
 	echo "</pre></td></tr>\n";
 	echo "</table>\n";
 }
