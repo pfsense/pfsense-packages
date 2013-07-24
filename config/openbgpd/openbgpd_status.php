@@ -80,7 +80,7 @@ function doCmdT($command, $limit = 0, $filter = "") {
 
 function showCmdT($idx, $title, $command) {
 	echo "<p>\n";
-	echo "<a name=\"" . $idx . "\">&nbsp;</a>\n";
+	echo "<a name=\"" . $title . "\">&nbsp;</a>\n";
 	echo "<table width=\"100%\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\">\n";
 	echo "<tr><td class=\"listtopic\">" . $title . "</td></tr>\n";
 	echo "<tr><td class=\"listlr\"><pre>";		/* no newline after pre */
@@ -102,7 +102,7 @@ function listCmds() {
 	echo "<p>This status page includes the following information:\n";
 	echo "<ul width=\"700\">\n";
 	foreach ($commands as $idx => $command)
-		echo "<li><strong><a href=\"#" . $idx . "\">" . $command[0] . "</a></strong></li>\n";
+		echo "<li><strong><a href=\"#" . $command[0] . "\">" . $command[0] . "</a></strong></li>\n";
 	echo "</ul>\n";
 }
 
