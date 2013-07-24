@@ -54,7 +54,7 @@ else
 
 include("head.inc");
 
-function doCmdT($command, $limit = 0, $filter = "") {
+function doCmdT($command, $limit = "all", $filter = "") {
 	$grepline = "";
 	if (!empty($filter))
 		$grepline = " | grep " . escapeshellarg(htmlspecialchars($filter));
@@ -64,7 +64,7 @@ function doCmdT($command, $limit = 0, $filter = "") {
 	$cl = 0;
 	$result = "";
 	while (($line = fgets($fd)) !== FALSE) {
-		if ($limit > 0 && $cl >= $limit)
+		if (is_numeric($limit) && $limit > 0 && $cl >= $limit)
 			break;
 		$result .= htmlspecialchars($line, ENT_NOQUOTES);
 		if ($ct++ > 1000) {
