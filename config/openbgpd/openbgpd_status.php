@@ -114,7 +114,7 @@ function showCmdT($idx, $data) {
 	}
 
 	echo "<tr><td colspan=\"2\" class=\"listlr\"><pre id=\"{$idx}\">";	/* no newline after pre */
-	echo doCmdT($data['command'], $limit_default, "", $data['header_size']);
+	echo "Gathering data, please wait...\n";
 	echo "</pre></td></tr>\n";
 	echo "</table>\n";
 }
@@ -149,7 +149,67 @@ function execCmds() {
 
 ?>
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">
+
+<script type="text/javascript">
+//<![CDATA[
+
+	function update_filter(cmd, header_size) {
+		var url = "openbgpd_status.php";
+		var filter = "";
+		var limit = "all";
+		var limit_field = document.getElementById(cmd + "_limit");
+		if (limit_field) {
+			var index = limit_field.selectedIndex;
+			limit = limit_field.options[index].value;
+			filter = document.getElementById(cmd + "_filter").value;
+		}
+		var params = "isAjax=true&cmd=" + cmd + "&limit=" + limit + "&filter=" + filter + "&header_size=" + header_size;
+		var myAjax = new Ajax.Request(
+			url,
+			{
+				method: 'post',
+				parameters: params,
+				onComplete: update_filter_callback
+			});
+	}
+
+	function update_filter_callback(transport) {
+		// First line contain field id to be updated
+		var responseTextArr = transport.responseText.split("\n");
+		var result = "";
+		var i;
+
+		for (i = 1; i < responseTextArr.length; i++) {
+			result += responseTextArr[i];
+			if (i < responseTextArr.length - 1)
+				result += "\n";
+		}
+
+		document.getElementById(responseTextArr[0]).textContent = result;
+	}
+
+//]]>
+</script>
+
 <?php include("fbegin.inc"); ?>
+
+<script type="text/javascript">
+//<![CDATA[
+
+	function exec_all_cmds() {
+<?php
+		foreach ($commands as $idx => $command)
+			echo "\t\tupdate_filter('{$idx}', {$command['header_size']});\n";
+?>
+	}
+
+if (jQuery)
+	jQuery(document).ready(exec_all_cmds());
+else
+	document.observe('dom:loaded', exec_all_cmds());
+
+//]]>
+</script>
 
 <?php
 	if ($config['version'] < 6)
@@ -184,42 +244,6 @@ function execCmds() {
 	</tr>
 </table>
 </div>
-
-<script type="text/javascript">
-//<![CDATA[
-
-	function update_filter(cmd, header_size) {
-		var url = "openbgpd_status.php";
-		var index = document.getElementById(cmd + "_limit").selectedIndex;
-		var limit = document.getElementById(cmd + "_limit").options[index].value;
-		var filter = document.getElementById(cmd + "_filter").value;
-		var params = "isAjax=true&cmd=" + cmd + "&limit=" + limit + "&filter=" + filter + "&header_size=" + header_size;
-		var myAjax = new Ajax.Request(
-			url,
-			{
-				method: 'post',
-				parameters: params,
-				onComplete: update_filter_callback
-			});
-	}
-
-	function update_filter_callback(transport) {
-		// First line contain field id to be updated
-		var responseTextArr = transport.responseText.split("\n");
-		var result = "";
-		var i;
-
-		for (i = 1; i < responseTextArr.length; i++) {
-			result += responseTextArr[i];
-			if (i < responseTextArr.length - 1)
-				result += "\n";
-		}
-
-		document.getElementById(responseTextArr[0]).textContent = result;
-	}
-
-//]]>
-</script>
 
 <?php include("fend.inc"); ?>
 
