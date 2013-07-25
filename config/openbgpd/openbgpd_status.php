@@ -61,8 +61,10 @@ include("head.inc");
 
 function doCmdT($command, $limit = "all", $filter = "", $header_size = 0) {
 	$grepline = "";
-	if (!empty($filter))
-		$grepline = " | /usr/bin/grep " . escapeshellarg(htmlspecialchars($filter));
+	if (!empty($filter)) {
+		$ini = ($header_size > 0 ? $header_size+1 : 1);
+		$grepline = " | /usr/bin/sed -e '{$ini},\$ { /" . escapeshellarg(htmlspecialchars($filter)) . "/!d; };'";
+	}
 	if (is_numeric($limit) && $limit > 0) {
 		$limit += $header_size;
 		$headline = " | /usr/bin/head -n {$limit}";
