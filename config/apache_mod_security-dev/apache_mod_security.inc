@@ -165,7 +165,7 @@ function generate_apache_configuration() {
 	if (is_array($config['installedpackages']['apachesettings']))
 		$settings=$config['installedpackages']['apachesettings']['config'][0];
 	else
-		$setting=sarray();
+		$settings=array();
 
 	// Set global site e-mail
 	if ($settings['globalsiteadminemail']){
