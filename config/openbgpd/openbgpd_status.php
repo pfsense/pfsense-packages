@@ -200,16 +200,10 @@ function execCmds() {
 	function update_filter_callback(transport) {
 		// First line contain field id to be updated
 		var responseTextArr = transport.responseText.split("\n");
-		var result = "";
-		var i;
+		var id = responseTextArr.shift();
+		var result = responseTextArr.join("\n");
 
-		for (i = 1; i < responseTextArr.length; i++) {
-			result += responseTextArr[i];
-			if (i < responseTextArr.length - 1)
-				result += "\n";
-		}
-
-		document.getElementById(responseTextArr[0]).textContent = result;
+		document.getElementById(id).textContent = result;
 	}
 
 //]]>
