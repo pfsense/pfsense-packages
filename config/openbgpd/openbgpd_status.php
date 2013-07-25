@@ -236,10 +236,10 @@ function execCmds() {
 ?>
 	}
 
-if (jQuery)
-	jQuery(document).ready(function(){setTimeout('exec_all_cmds()', 5000);});
-else
+if (typeof jQuery == 'undefined')
 	document.observe('dom:loaded', function(){setTimeout('exec_all_cmds()', 5000);});
+else
+	jQuery(document).ready(function(){setTimeout('exec_all_cmds()', 5000);});
 
 //]]>
 </script>
