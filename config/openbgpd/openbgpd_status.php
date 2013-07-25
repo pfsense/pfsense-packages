@@ -204,9 +204,9 @@ function execCmds() {
 	}
 
 if (jQuery)
-	jQuery(document).ready(exec_all_cmds());
+	jQuery(document).ready(function(){setTimeout('exec_all_cmds()', 5000);});
 else
-	document.observe('dom:loaded', exec_all_cmds());
+	document.observe('dom:loaded', function(){setTimeout('exec_all_cmds()', 5000);});
 
 //]]>
 </script>
