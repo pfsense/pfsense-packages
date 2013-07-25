@@ -44,7 +44,10 @@ defCmdT("neighbors",	"OpenBGPD Neighbors",	"/usr/local/sbin/bgpctl show neighbor
 if (isset($_REQUEST['isAjax'])) {
 	if (isset($_REQUEST['cmd']) && isset($commands[$_REQUEST['cmd']])) {
 		echo "{$_REQUEST['cmd']}\n";
-		echo htmlspecialchars_decode(doCmdT($commands[$_REQUEST['cmd']]['command'], $_REQUEST['limit'], $_REQUEST['filter'], $_REQUEST['header_size']));
+		if (isset($_REQUEST['count']))
+			echo " of " . countCmdT($commands[$_REQUEST['cmd']]['command']) . " items";
+		else
+			echo htmlspecialchars_decode(doCmdT($commands[$_REQUEST['cmd']]['command'], $_REQUEST['limit'], $_REQUEST['filter'], $_REQUEST['header_size']));
 	}
 	exit;
 }
@@ -106,7 +109,7 @@ function showCmdT($idx, $data) {
 		echo "Display <select onchange=\"update_filter('{$idx}','{$data['header_size']}');\" name=\"{$idx}_limit\" id=\"{$idx}_limit\">\n";
 		foreach ($limit_options as $item)
 			echo "<option value='{$item}' " . ($item == $limit_default ? "selected" : "") . ">{$item}</option>\n";
-		echo "</select> of " . countCmdT($data['command']) . " items</td>\n";
+		echo "</select> <span name=\"{$idx}_count\" id=\"{$idx}_count\">items</span></td>\n";
 		echo "<td class=\"listhdr\" align=\"right\" style=\"font-weight:bold;\">Filter expression: \n";
 		echo "<input type=\"text\" name=\"{$idx}_filter\" id=\"{$idx}_filter\" class=\"formfld search\" value=\"" . htmlspecialchars($_REQUEST["{$idx}_filter"]) . "\" size=\"30\" />\n";
 		echo "<input type=\"button\" class=\"formbtn\" value=\"Filter\" onclick=\"update_filter('{$idx}','{$data['header_size']}');\" />\n";
@@ -153,6 +156,33 @@ function execCmds() {
 <script type="text/javascript">
 //<![CDATA[
 
+	function update_count(cmd, header_size) {
+		var url = "openbgpd_status.php";
+		var params = "isAjax=true&count=true&cmd=" + cmd + "&header_size=" + header_size;
+		var myAjax = new Ajax.Request(
+			url,
+			{
+				method: 'post',
+				parameters: params,
+				onComplete: update_count_callback
+			});
+	}
+
+	function update_count_callback(transport) {
+		// First line contain field id to be updated
+		var responseTextArr = transport.responseText.split("\n");
+		var result = "";
+		var i;
+
+		for (i = 1; i < responseTextArr.length; i++) {
+			result += responseTextArr[i];
+			if (i < responseTextArr.length - 1)
+				result += "\n";
+		}
+
+		document.getElementById(responseTextArr[0] + "_count").innerHTML = result;
+	}
+
 	function update_filter(cmd, header_size) {
 		var url = "openbgpd_status.php";
 		var filter = "";
@@ -198,8 +228,11 @@ function execCmds() {
 
 	function exec_all_cmds() {
 <?php
-		foreach ($commands as $idx => $command)
+		foreach ($commands as $idx => $command) {
+			if ($command['has_filter'])
+				echo "\t\tupdate_count('{$idx}', {$command['header_size']});\n";
 			echo "\t\tupdate_filter('{$idx}', {$command['header_size']});\n";
+		}
 ?>
 	}
 
