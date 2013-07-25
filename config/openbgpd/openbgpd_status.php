@@ -201,9 +201,8 @@ function execCmds() {
 		// First line contain field id to be updated
 		var responseTextArr = transport.responseText.split("\n");
 		var id = responseTextArr.shift();
-		var result = responseTextArr.join("\n");
 
-		document.getElementById(id).textContent = result;
+		document.getElementById(id).textContent = responseTextArr.join("\n");
 	}
 
 //]]>
