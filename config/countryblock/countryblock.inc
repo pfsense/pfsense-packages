@@ -139,7 +139,7 @@ function deinstall_command_cb()
 	exec("rm /usr/local/pkg/pf/countryblock.sh");
 	exec("pfctl -t countryblock -T kill");
 	exec("sed -i -e '/countryblock/d' /tmp/rules.debug");
-	exec("pfctl -o basic -f /tmp/rules.debug");
+	exec("pfctl -f /tmp/rules.debug");
 	conf_mount_ro();
 }
 
