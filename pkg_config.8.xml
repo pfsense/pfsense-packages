@@ -1946,7 +1946,7 @@
 			<port>security/sudo</port>
 		</build_pbi>
 		<build_port_path>/usr/ports/security/sudo</build_port_path>
-		<depends_on_package_base_url>http://files.pfsense.org/packages/i386/8/All/</depends_on_package_base_url>
+		<depends_on_package_base_url>http://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
 		<depends_on_package>sudo-1.8.6.p8.tbz</depends_on_package>
 		<depends_on_package_pbi>sudo-1.8.6p8-i386.pbi</depends_on_package_pbi>
 	</package>
