@@ -151,7 +151,7 @@
 		    <description></description>
 		    <rowhelper>
 				<rowhelperfield>
-				    <fielddescr>Announce the specified network as belonging to our AS.  If set to connected, routes to directly attached networks will be announced.  If set to static, all static routes will be announced.</fielddescr>
+				    <fielddescr>Announce the specified network as belonging to our AS.  If set to "(inet|inet6)connected", inet or inet6 routes to directly attached networks will be announced.  If set to "(inet|inet6) static", all inet or inet6 static routes will be announced.</fielddescr>
 				    <fieldname>networks</fieldname>
 				    <description>Network that you would like to advertise</description>
 				    <type>input</type>
