@@ -136,7 +136,7 @@ include("head.inc");
 		foreach ($a_backend as $backend):
 			$backendname = $backend['name'];
 			$textgray = $backend['status'] != 'active' ? " gray" : "";
-			if (isset($ipport_previous ) && $backend['ipport'] == $ipport_previous):
+			if (isset($ipport_previous ) && $backend['ipport'] != $ipport_previous):
 			?>
 				<tr class="<?=$textgray?>"><td collspan="7">&nbsp;</td></tr>
 			<?
