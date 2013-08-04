@@ -36,7 +36,7 @@ require_once("certs.inc");
 if (!is_array($config['installedpackages']['haproxy']['ha_backends']['item'])) {
 	$config['installedpackages']['haproxy']['ha_backends']['item'] = array();
 }
-$a_backend = &$config['installedpackages']['haproxy']['ha_backends']['item'];
+$a_frontend = &$config['installedpackages']['haproxy']['ha_backends']['item'];
 
 if ($_POST) {
 	$pconfig = $_POST;
@@ -56,9 +56,9 @@ $id = $_GET['id'];
 $id = get_frontend_id($id);
 	
 if ($_GET['act'] == "del") {
-	if (isset($a_backend[$id])) {
+	if (isset($a_frontend[$id])) {
 		if (!$input_errors) {
-			unset($a_backend[$id]);
+			unset($a_frontend[$id]);
 			write_config();
 			touch($d_haproxyconfdirty_path);
 		}
@@ -114,92 +114,94 @@ include("head.inc");
 		</tr>
 <?php
 		
-		function sort_backends(&$a, &$b) {
-			if ($a['ipport'] != $b['ipport'])
-				return $a['ipport'] > $b['ipport'] ? 1 : -1;
+		function sort_sharedfrontends(&$a, &$b) {
+			// make sure the 'primary frontend' is the first in the array, after that sort by name.
 			if ($a['secondary'] != $b['secondary'])
 				return $a['secondary'] > $b['secondary'] ? 1 : -1;
 			if ($a['name'] != $b['name'])
 				return $a['name'] > $b['name'] ? 1 : -1;
 			return 0;
 		}
-		foreach($a_backend as &$backend2) {
-			$backend2['ipport'] = get_frontend_ipport($backend2);
+		
+		$a_frontend_grouped = array();
+		foreach($a_frontend as &$frontend2) {
+			$ipport = get_frontend_ipport($frontend2);
+			$frontend2['ipport'] = $ipport;
+			$a_frontend_grouped[$ipport][] = $frontend2;
 		}
-		usort($a_backend,'sort_backends');
+		ksort($a_frontend_grouped);
 		
 		$img_cert = "/themes/{$g['theme']}/images/icons/icon_frmfld_cert.png";
 		$img_adv = "/themes/{$g['theme']}/images/icons/icon_advanced.gif";
 		$img_acl = "/themes/{$g['theme']}/images/icons/icon_ts_rule.gif";
-		
-		unset($ipport_previous);
-		foreach ($a_backend as $backend):
-			$backendname = $backend['name'];
-			$textgray = $backend['status'] != 'active' ? " gray" : "";
-			if (isset($ipport_previous ) && $backend['ipport'] == $ipport_previous):
-			?>
-				<tr class="<?=$textgray?>"><td collspan="7">&nbsp;</td></tr>
-			<?
-			endif;
-			$ipport_previous = $backend['ipport'];
-			?>
-			<tr class="<?=$textgray?>">
-			  <td class="listlr" style="<?=$backend['secondary']=='yes'?"visibility:hidden;":""?>" ondblclick="document.location='haproxy_listeners_edit.php?id=<?=$backendname;?>';">
-				<?=$backend['secondary']!='yes'?"yes":"no";?>
-			  </td>
-			  <td class="listlr" ondblclick="document.location='haproxy_listeners_edit.php?id=<?=$backendname;?>';">
-				<? 
-				if (strtolower($backend['type']) == "http" && $backend['ssloffload'])
-				{
-					$cert = lookup_cert($backend['ssloffloadcert']);
-					echo '<img src="'.$img_cert.'" title="SSL offloading cert: '.$cert['descr'].'" alt="SSL offloading" border="0" height="16" width="16" />';
-				}
-				
-				$acls = get_frontent_acls($backend);
-				$isaclset = "";
-				foreach ($acls as $acl) {
-					$isaclset .= "&#10;" . $acl['descr'];
-				}
-				if ($isaclset) 
-					echo "<img src=\"$img_acl\" title=\"" . gettext("acl's used") . ": {$isaclset}\" border=\"0\">";
-					
-				$isadvset = "";
-				if ($backend['advanced_bind']) $isadvset .= "Advanced bind: {$backend['advanced_bind']}\r\n";
-				if ($backend['advanced']) $isadvset .= "advanced settings used\r\n";
-				if ($isadvset)
-					echo "<img src=\"$img_adv\" title=\"" . gettext("advanced settings set") . ": {$isadvset}\" border=\"0\">";				
-				
+		$last_frontend_shared = false;
+		foreach ($a_frontend_grouped as $a_frontend) {
+			usort($a_frontend,'sort_sharedfrontends');
+			if (count($a_frontend) > 1 || $last_frontend_shared) {
+				?> <tr class="<?=$textgray?>"><td collspan="7">&nbsp;</td></tr> <?	
+			}
+			$last_frontend_shared = count($a_frontend) > 1;
+			foreach ($a_frontend as $frontend) {
+				$frontendname = $frontend['name'];
+				$textgray = $frontend['status'] != 'active' ? " gray" : "";
 				?>
-			  </td>
-			  <td class="listlr" ondblclick="document.location='haproxy_listeners_edit.php?id=<?=$backendname;?>';">
-				<?=$backend['name'];?>
-			  </td>
-			  <td class="listlr" ondblclick="document.location='haproxy_listeners_edit.php?id=<?=$backendname;?>';">
-				<?=$backend['desc'];?>
-			  </td>
-			  <td class="listlr" ondblclick="document.location='haproxy_listeners_edit.php?id=<?=$backendname;?>';">
-				<?=$backend['ipport'];?>
-			  </td>
-			  <td class="listlr" ondblclick="document.location='haproxy_listeners_edit.php?id=<?=$backendname;?>';">
-				<?=$backend['type']?>
-			  </td>
-			  <td class="listlr" ondblclick="document.location='haproxy_listeners_edit.php?id=<?=$backendname;?>';">
-				<?=$backend['backend_serverpool']?>
-			  </td>
-			  <td class="listlr" ondblclick="document.location='haproxy_listeners_edit.php?id=<?=$backendname;?>';">
-				<?=$backend['secondary'] == 'yes' ? $backend['primary_frontend'] : "";?>
-			  </td>
-			  <td class="list" nowrap>
-				<table border="0" cellspacing="0" cellpadding="1">
-				  <tr>
-					<td valign="middle"><a href="haproxy_listeners_edit.php?id=<?=$backendname;?>"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_e.gif" width="17" height="17" border="0"></a></td>
-					<td valign="middle"><a href="haproxy_listeners.php?act=del&id=<?=$backendname;?>" onclick="return confirm('Do you really want to delete this entry?')"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_x.gif" width="17" height="17" border="0"></a></td>
-					<td valign="middle"><a href="haproxy_listeners_edit.php?dup=<?=$backendname;?>"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif" width="17" height="17" border="0"></a></td>
-				  </tr>
-				</table>
-			  </td>
-			</tr>
-			<?php endforeach; ?>
+				<tr class="<?=$textgray?>">
+				  <td class="listlr" style="<?=$frontend['secondary']=='yes'?"visibility:hidden;":""?>" ondblclick="document.location='haproxy_listeners_edit.php?id=<?=$frontendname;?>';">
+					<?=$frontend['secondary']!='yes'?"yes":"no";?>
+				  </td>
+				  <td class="listlr" ondblclick="document.location='haproxy_listeners_edit.php?id=<?=$frontendname;?>';">
+					<? 
+					if (strtolower($frontend['type']) == "http" && $frontend['ssloffload']) {
+						$cert = lookup_cert($frontend['ssloffloadcert']);
+						echo '<img src="'.$img_cert.'" title="SSL offloading cert: '.$cert['descr'].'" alt="SSL offloading" border="0" height="16" width="16" />';
+					}
+					
+					$acls = get_frontent_acls($frontend);
+					$isaclset = "";
+					foreach ($acls as $acl) {
+						$isaclset .= "&#10;" . $acl['descr'];
+					}
+					if ($isaclset) 
+						echo "<img src=\"$img_acl\" title=\"" . gettext("acl's used") . ": {$isaclset}\" border=\"0\">";
+						
+					$isadvset = "";
+					if ($frontend['advanced_bind']) $isadvset .= "Advanced bind: {$frontend['advanced_bind']}\r\n";
+					if ($frontend['advanced']) $isadvset .= "advanced settings used\r\n";
+					if ($isadvset)
+						echo "<img src=\"$img_adv\" title=\"" . gettext("advanced settings set") . ": {$isadvset}\" border=\"0\">";				
+					
+					?>
+				  </td>
+				  <td class="listlr" ondblclick="document.location='haproxy_listeners_edit.php?id=<?=$frontendname;?>';">
+					<?=$frontend['name'];?>
+				  </td>
+				  <td class="listlr" ondblclick="document.location='haproxy_listeners_edit.php?id=<?=$frontendname;?>';">
+					<?=$frontend['desc'];?>
+				  </td>
+				  <td class="listlr" ondblclick="document.location='haproxy_listeners_edit.php?id=<?=$frontendname;?>';">
+					<?=$frontend['ipport'];?>
+				  </td>
+				  <td class="listlr" ondblclick="document.location='haproxy_listeners_edit.php?id=<?=$frontendname;?>';">
+					<?=$frontend['type']?>
+				  </td>
+				  <td class="listlr" ondblclick="document.location='haproxy_listeners_edit.php?id=<?=$frontendname;?>';">
+					<?=$frontend['backend_serverpool']?>
+				  </td>
+				  <td class="listlr" ondblclick="document.location='haproxy_listeners_edit.php?id=<?=$frontendname;?>';">
+					<?=$frontend['secondary'] == 'yes' ? $frontend['primary_frontend'] : "";?>
+				  </td>
+				  <td class="list" nowrap>
+					<table border="0" cellspacing="0" cellpadding="1">
+					  <tr>
+						<td valign="middle"><a href="haproxy_listeners_edit.php?id=<?=$frontendname;?>"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_e.gif" width="17" height="17" border="0"></a></td>
+						<td valign="middle"><a href="haproxy_listeners.php?act=del&id=<?=$frontendname;?>" onclick="return confirm('Do you really want to delete this entry?')"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_x.gif" width="17" height="17" border="0"></a></td>
+						<td valign="middle"><a href="haproxy_listeners_edit.php?dup=<?=$frontendname;?>"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif" width="17" height="17" border="0"></a></td>
+					  </tr>
+					</table>
+				  </td>
+				</tr><?php
+			}
+		} ?>
 			<tfoot>
 			<tr>
 			  <td class="list" colspan="8"></td>
