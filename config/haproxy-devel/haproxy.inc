@@ -486,7 +486,7 @@ function write_backend($fd, $name, $pool, $frontend) {
 	if (is_array($a_servers))
 	{
 		foreach($a_servers as $be) {
-			if (!$be['status'] == "inactive")
+			if ($be['status'] == "inactive")
 				continue;
 			
 			if (!$be['name'])
@@ -728,7 +728,7 @@ function haproxy_writeconf($configfile) {
 
 	
 			// Combine the rest of the listener configs
-			$default_once = 0;
+			$default_backend = "";
 			$i = 0;
 			foreach ($bind['config'] as $bconfig) {
 				$a_acl=&$bconfig['ha_acls']['item'];
@@ -742,9 +742,8 @@ function haproxy_writeconf($configfile) {
 					$poolname .= "_" . $bconfig['svrport'];
 
 				// Write this out once, and must be before any backend config text
-				if ($default_once == 0) {
-					fwrite ($fd, "\tdefault_backend\t\t" . $poolname . "\n");
-					$default_once++;
+				if ($default_backend = "" || $bconfig['secondary'] != 'yes') {
+					$default_backend = $poolname;
 				}
 
 				if (!isset($a_pendingpl[$poolname])) {
@@ -790,6 +789,8 @@ function haproxy_writeconf($configfile) {
 					fwrite ($fd, "\tuse_backend\t\t" . $poolname . " if " . $aclnames . "\n");
 				}
 			}
+			fwrite ($fd, "\tdefault_backend\t\t" . $default_backend . "\n");
+			
 			foreach($advancedextra as $extra)
 				fwrite ($fd, "\t".$extra."\n");
 			fwrite ($fd, "\n");
