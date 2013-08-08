@@ -1445,6 +1445,21 @@ function enable_change_all() {
 	document.iform.stream5_icmp_timeout.disabled=endis;
 }
 
+function wopen(url, name, w, h)
+{
+// Fudge factors for window decoration space.
+// In my tests these work well on all platforms & browsers.
+    w += 32;
+    h += 96;
+    var win = window.open(url,
+        name, 
+       'width=' + w + ', height=' + h + ', ' +
+       'location=no, menubar=no, ' +
+       'status=no, toolbar=no, scrollbars=yes, resizable=yes');
+    win.resizeTo(w, h);
+    win.focus();
+}
+
 // Set initial state of form controls
 enable_change_all();
 
