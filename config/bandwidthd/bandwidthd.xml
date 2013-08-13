@@ -131,6 +131,43 @@
 			<type>checkbox</type>
 		</field>
 		<field>
+			<fielddescr>output PostgreSQL</fielddescr>
+			<fieldname>outputpostgresql</fieldname>
+			<description>Log data to a PostgreSQL database.&lt;br&gt;
+			Get the postgreSQL schema and PHP files to display the results from: https://github.com/individual-it/bandwidthd-pSQL-frontend</description>
+			<type>checkbox</type>
+		</field>
+		<field>
+			<fielddescr>Database host</fielddescr>
+			<fieldname>postgresqlhost</fieldname>
+			<description>Hostname of the postgreSQL database server.</description>
+			<type>input</type>
+		</field>
+		<field>
+			<fielddescr>Database name</fielddescr>
+			<fieldname>postgresqldatabase</fieldname>
+			<description>Database on the postgreSQL database server.</description>
+			<type>input</type>
+		</field>
+		<field>
+			<fielddescr>Database Username</fielddescr>
+			<fieldname>postgresqlusername</fieldname>
+			<description>Username of the postgreSQL database server.</description>
+			<type>input</type>
+		</field>
+		<field>
+			<fielddescr>Database Password</fielddescr>
+			<fieldname>postgresqlpassword</fieldname>
+			<description>Password of the postgreSQL database server.</description>
+			<type>password</type>
+		</field>
+		<field>
+			<fielddescr>sensor_id</fielddescr>
+			<fieldname>sensorid</fieldname>
+			<description>Arbitrary sensor name, I recommend the sensors fully qualified domain name.</description>
+			<type>input</type>
+		</field>
+		<field>
 			<fielddescr>Filter</fielddescr>
 			<fieldname>filter</fieldname>
 			<description>Libpcap format filter string used to control what bandwidthd sees.  Please always include "ip" in the string to avoid strange problems.</description>
