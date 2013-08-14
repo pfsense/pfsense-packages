@@ -85,6 +85,27 @@ function bandwidthd_install_config() {
 		$output_cdf_string = "output_cdf true\n";
 	else
 		$output_cdf_string = "";
+
+	$output_postgresql = $bandwidthd_config['outputpostgresql'];
+	$postgresql_host = $bandwidthd_config['postgresqlhost'];
+	$postgresql_database = $bandwidthd_config['postgresqldatabase'];
+	$postgresql_username = $bandwidthd_config['postgresqlusername'];
+	$postgresql_password = $bandwidthd_config['postgresqlpassword'];
+	$postgresql_string = "";
+	if($output_postgresql) {
+		if ($postgresql_host && $postgresql_username && $postgresql_database && $postgresql_password)
+			$postgresql_string = "pgsql_connect_string \"user = $postgresql_username dbname = $postgresql_database password = $postgresql_password host = $postgresql_host\"\n";
+		else
+		  	log_error("You have to specify the postgreSQL Host, Database, Username and Password. Exiting.");
+	}
+
+	$sensor_id = $bandwidthd_config['sensorid'];
+
+	if($sensor_id)
+		$sensor_id_string = "sensor_id \"$sensor_id\"";
+	else
+		$sensor_id_string = "";
+
 	$promiscuous = $bandwidthd_config['promiscuous'];
 	if($promiscuous)
 		$promiscuous = "promiscuous true\n";
@@ -189,6 +210,14 @@ $output_cdf_string
 
 #Read back the cdf file on startup
 $recover_cdf
+
+# Standard postgres connect string, just like php, see postgres docs for
+# details
+$postgresql_string
+
+# Arbitrary sensor name, I recommend the sensors fully qualified domain
+# name
+$sensor_id_string
 
 #Libpcap format filter string used to control what bandwidthd sees
 #Please always include "ip" in the string to avoid strange problems
