@@ -1648,7 +1648,7 @@
 		</build_pbi>
 		<build_options>nrpe2_SET=SSL;nrpe2_UNSET=ARGS</build_options>
 		<config_file>http://www.pfsense.com/packages/config/nrpe2/nrpe2.xml</config_file>
-		<version>2.12_3 v2.1</version>
+		<version>2.12_3 v2.2</version>
 		<status>Beta</status>
 		<required_version>1.2</required_version>
 		<maintainer>erik@erikkristensen.com</maintainer>

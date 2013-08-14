@@ -159,8 +159,12 @@ function nrpe2_custom_php_write_config() {
 	conf_mount_rw();
 	$cmds = array();
 	foreach ($config['installedpackages']['nrpe2']['config'][0]['row'] as $cmd) {
+		$sudo_bin = "/usr/local/bin/sudo";
+		$sudo = (isset($cmd['sudo']) && is_executable($sudo_bin)) ? "{$sudo_bin} " : "";
+		$wcmd = !empty($cmd['warning']) ? "-w {$cmd['warning']}" : "";
+		$ccmd = !empty($cmd['critical']) ? "-c {$cmd['critical']}" : "";
 		if (is_executable("{$nagios_check_path}/{$cmd['command']}"))
-			$cmds[] = "command[{$cmd['name']}]={$nagios_check_path}/{$cmd['command']} -w {$cmd['warning']} -c {$cmd['critical']} {$cmd['extra']}\n";
+			$cmds[] = "command[{$cmd['name']}]={$sudo}{$nagios_check_path}/{$cmd['command']} {$wcmd} {$ccmd} {$cmd['extra']}\n";
 	}
 	$commands = implode($cmds);
 
