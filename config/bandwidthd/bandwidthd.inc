@@ -96,7 +96,7 @@ function bandwidthd_install_config() {
 		if ($postgresql_host && $postgresql_username && $postgresql_database && $postgresql_password)
 			$postgresql_string = "pgsql_connect_string \"user = $postgresql_username dbname = $postgresql_database password = $postgresql_password host = $postgresql_host\"\n";
 		else
-		  	log_error("You have specify the postgress Host, Database, Username and Password. Exiting.");
+		  	log_error("You have to specify the postgreSQL Host, Database, Username and Password. Exiting.");
 	}
 
 	$sensor_id = $bandwidthd_config['sensorid'];
