@@ -134,7 +134,7 @@
 			<fielddescr>output PostgreSQL</fielddescr>
 			<fieldname>outputpostgresql</fieldname>
 			<description>Log data to a PostgreSQL database.&lt;br&gt;
-			Get the postgreSQL schema and PHP files to display the results from: https://github.com/individual-it/bandwidthd-pSQL-frontend</description>
+			Get the postgreSQL schema and PHP files to display the results from: &lt;a target="_new" href="https://github.com/individual-it/bandwidthd-pSQL-frontend"&gt;https://github.com/individual-it/bandwidthd-pSQL-frontend&lt;/a&gt;</description>
 			<type>checkbox</type>
 		</field>
 		<field>
