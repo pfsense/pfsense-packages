@@ -63,6 +63,10 @@ if (isset($id) && $a_patches[$id]) {
 	$pconfig['ignorewhitespace'] = isset($a_patches[$id]['ignorewhitespace']);
 	$pconfig['autoapply'] = isset($a_patches[$id]['autoapply']);
 	$pconfig['uniqid'] = $a_patches[$id]['uniqid'];
+} else {
+	$pconfig['pathstrip'] = 1;
+	$pconfig['basedir'] = "/";
+	$pconfig['ignorewhitespace'] = true;
 }
 
 if (isset($_GET['dup']))
