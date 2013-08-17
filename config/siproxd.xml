@@ -84,6 +84,12 @@
 	</additional_files_needed>
 	<fields>
 		<field>
+			<fielddescr>Enable siproxd</fielddescr>
+			<fieldname>sipenable</fieldname>
+			<description>Enable or disable siproxd</description>
+			<type>checkbox</type>
+		</field>
+		<field>
 			<fielddescr>Inbound interface</fielddescr>
 			<fieldname>if_inbound</fieldname>
 			<description>Select the inbound interface.</description>
@@ -114,7 +120,7 @@
 		<field>
 			<fielddescr>Enable RTP proxy</fielddescr>
 			<fieldname>rtpenable</fieldname>
-			<description>Enable or disable the RTP proxy. (default is enabled)</description>
+			<description>Enable or disable the RTP proxy. (default is disabled)</description>
 			<type>select</type>
 			<options>
 				<option>
