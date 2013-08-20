@@ -534,7 +534,7 @@ function haproxy_writeconf() {
 				fwrite ($fd, "\tmaxconn\t\t\t" . $bind['max_connections'] . "\n");
 
 			if($bind['client_timeout'])
-				fwrite ($fd, "\tclitimeout\t\t" . $bind['client_timeout'] . "\n");
+				fwrite ($fd, "\ttimeout client\t\t" . $bind['client_timeout'] . "\n");
 
 	
 			// Combine the rest of the listener configs
