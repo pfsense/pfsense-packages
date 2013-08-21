@@ -599,6 +599,10 @@
 					<name>pw</name>
 					<value>pw</value>
 				</option>
+				<option>
+					<name>cyberpower</name>
+					<value>cyberpower</value>
+				</option>
 			</options>
 		</field>
 		<field>
