@@ -120,7 +120,7 @@
 		<field>
 			<fielddescr>Enable RTP proxy</fielddescr>
 			<fieldname>rtpenable</fieldname>
-			<description>Enable or disable the RTP proxy. (default is disabled)</description>
+			<description>Enable or disable the RTP proxy. (default is enabled)</description>
 			<type>select</type>
 			<options>
 				<option>

@@ -162,7 +162,7 @@ function sync_package_siproxd() {
 	if($siproxd_conf['rtpenable'] != "") {
 		fwrite($fout, "rtp_proxy_enable = " . $siproxd_conf['rtpenable'] . "\n");
 	} else {
-		fwrite($fout, "rtp_proxy_enable = 0\n");
+		fwrite($fout, "rtp_proxy_enable = 1\n");
 	}
 
 	if(($siproxd_conf['rtplower'] != "") && ($siproxd_conf['rtpupper'] != "")) {
