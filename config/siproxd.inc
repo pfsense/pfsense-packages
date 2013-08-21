@@ -70,8 +70,8 @@ function siproxd_generate_rules($type) {
 	}
 
 	/* proxy is turned off in package settings */
-	if($siproxd_conf['rtpenable'] == "0") {
-		log_error("WARNING: siproxd RTP proxy has not been enabled.  Not installing rules.");
+	if($siproxd_conf['sipenable'] == "0") {
+		log_error("WARNING: siproxd proxy has not been enabled.  Not installing rules.");
 		return "\n";
 	}
 
@@ -95,7 +95,9 @@ function siproxd_generate_rules($type) {
 			if($iface <> "") {
 				$rules .= "# allow SIP signaling and RTP traffic\n";
 				$rules .= "pass in on {$iface} proto udp from any to any port = {$port}\n";
-				$rules .= "pass in on {$iface} proto udp from any to any port {$rtplower}:{$rtpupper}\n";
+				if($siproxd_conf['rtpenable'] == "1") {
+					$rules .= "pass in on {$iface} proto udp from any to any port {$rtplower}:{$rtpupper}\n";
+				}
 			}
 		}
 		break;
@@ -125,7 +127,7 @@ function sync_package_siproxd() {
 	fwrite($fout, "# package management system.\n\n");
 
 	/* proxy is turned off in package settings */
-	if($siproxd_conf['rtpenable'] == "0") {
+	if($siproxd_conf['sipenable'] == "0") {
 		fclose($fout);
 		return;
 	}
