@@ -742,7 +742,7 @@ function haproxy_writeconf($configfile) {
 					$poolname .= "_" . $bconfig['svrport'];
 
 				// Write this out once, and must be before any backend config text
-				if ($default_backend = "" || $bconfig['secondary'] != 'yes') {
+				if ($default_backend == "" || $bconfig['secondary'] != 'yes') {
 					$default_backend = $poolname;
 				}
 
