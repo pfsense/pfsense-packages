@@ -156,7 +156,7 @@ function openvpn_client_export_validate_config($srvid, $usrid, $crtid) {
 	} elseif (($settings['mode'] == "server_tls") || (($settings['mode'] == "server_tls_user") && ($settings['authmode'] != "Local Database"))) {
 		$cert = $config['cert'][$crtid];
 		if (!$cert)
-			$input_errors[] = "Could not find client certifficate.";
+			$input_errors[] = "Could not find client certificate.";
 	} else
 		$nokeys = true;
 
@@ -316,11 +316,16 @@ function openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $quotese
 
 	if ($openvpnmanager)
 	{
+		if (!empty($settings['client_mgmt_port'])) {
+			$client_mgmt_port = $settings['client_mgmt_port'];
+		} else {
+			$client_mgmt_port = 166;
+		}
 		$conf .= $nl;
 		$conf .= "# dont terminate service process on wrong password, ask again{$nl}";
 		$conf .= "auth-retry interact{$nl}";
 		$conf .= "# open management channel{$nl}";
-		$conf .= "management 127.0.0.1 166{$nl}";
+		$conf .= "management 127.0.0.1 {$client_mgmt_port}{$nl}";
 		$conf .= "# wait for management to explicitly start connection{$nl}";
 		$conf .= "management-hold{$nl}";
 		$conf .= "# query management channel for user/pass{$nl}";
