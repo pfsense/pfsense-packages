@@ -996,7 +996,7 @@ function unbound_add_domain_overrides($pvt=false) {
 		foreach($result as $domain=>$ips) {
 			if ($pvt == true) {
 				if (strpos($domain, "in-addr.arpa") !== false)
-					$domain_entries .= "local-zone: \"$domain\" nodefault\n";
+					$domain_entries .= "local-zone: \"$domain\" transparent\n";
 				else
 					$domain_entries .= "private-domain: \"$domain\"\n";
 				if (isset($config['installedpackages']['unbound']['config'][0]['dnssec_status']))
