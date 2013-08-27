@@ -448,7 +448,7 @@ function sync_package_varnish() {
 						$vcl_recv_set_basic .= "\tset req.http.X-Forwarded-For = client.ip;\n\n";
 					break;
 					case 'append':
-						$vcl_recv_set_basic .= "\tset req.http.X-Forwarded-For = req.http.X-Forwarded-For , client.ip;\n\n";
+						$vcl_recv_set_basic .= "\tset req.http.X-Forwarded-For = req.http.X-Forwarded-For + \",\" + client.ip;\n\n";
 					break;
 					case 'create':
 						$vcl_recv_set_basic .= "\tset req.http.X-Forwarded-Varnish = client.ip;\n\n";
