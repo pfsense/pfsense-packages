@@ -1,6 +1,6 @@
 <?php
 /*	unbound.inc
-	(C)2010 Warren Baker (warren@decoy.co.za)
+	(C)2013 Warren Baker (warren@decoy.co.za)
 	Redistribution and use in source and binary forms, with or without
 	modification, are permitted provided that the following conditions are met:
 
@@ -987,23 +987,25 @@ function unbound_add_domain_overrides($pvt=false) {
 		$result = array();
 		foreach($sorted_domains as $domain) {
 			$domain_key = current($domain);
-			if(!isset($result[$domain_key])) {
+			if (!isset($result[$domain_key]))
 				$result[$domain_key] = array();
-			}
 			$result[$domain_key][] = $domain['ip'];
 		}
 
 		$domain_entries = "";
 		foreach($result as $domain=>$ips) {
-			if($pvt == true) {
-				$domain_entries .= "private-domain: \"$domain\"\n";
-				$domain_entries .= "domain-insecure: \"$domain\"\n";
+			if ($pvt == true) {
+				if (strpos($domain, "in-addr.arpa") !== false)
+					$domain_entries .= "local-zone: \"$domain\" nodefault\n";
+				else
+					$domain_entries .= "private-domain: \"$domain\"\n";
+				if (isset($config['installedpackages']['unbound']['config'][0]['dnssec_status']))
+					$domain_entries .= "domain-insecure: \"$domain\"\n";
 			} else {
 				$domain_entries .= "stub-zone:\n";
 				$domain_entries .= "\tname: \"$domain\"\n";
-				foreach($ips as $ip) {
+				foreach($ips as $ip)
 					$domain_entries .= "\tstub-addr: $ip\n";
-				}
 				$domain_entries .= "\tstub-prime: no\n";
 			}
 		}
