@@ -135,7 +135,7 @@ function varnish_get_url_mappings_txt() {
 			if ($url['directorurl'] || $url['directorurl2'] || $catch_all == "unset") {
 				if ($url['directorurl'] == "" && $url['directorurl2'] == "") {
 					// director with no host or url, so director for catch all traffic not specified in config
-					$lasturlmappings = "\telse\t{\n\t\tset req.backend = ".$url['directorname'].";\n\t\t}\n";
+					$lasturlmappings = "\telse\t{\n\t\tset req.backend = {$url['directorname']};\n\t\t}\n";
 					$catch_all = "set";
 					$isfirst = false;
 				} else {
@@ -170,19 +170,19 @@ function varnish_get_url_mappings_txt() {
   			}
   		}
 	}
-	if ($config['installedpackages']['varnishbackends']['config'])
+	if ($config['installedpackages']['varnishbackends']['config']) {
 		foreach($config['installedpackages']['varnishbackends']['config'] as $urlmapping) {
-			if ($urlmapping['row'])
+			if (isset($urlmapping['row'])) {
 				foreach($urlmapping['row'] as $url) {
 					$directo_grace_time = "";
 					if ($url['grace'])
 						$directo_grace_time = ($url['grace'] == "0s" ? "\n\t\t return(pass);" : "\n\t\tset req.grace={$url['grace']};");
 					$req = ($url['maptype'] ? $url['maptype'] : "http.host");
 					$fieldtype = ($url['fieldtype'] ? $url['fieldtype'] : "==");
-					if ($url['urlmapping'] != "" || $catch_all == 'unset') {
+					if ($url['urlmapping'] != "" || $catch_all == "unset") {
 						if ($url['urlmapping'] == "") {
 							$catch_all = "set";
-							$lasturlmappings .= "\telse\t{\n\t\tset req.backend = {$urlmapping['backendname']}BACKEND;\n\t\t}\n";
+							$lasturlmappings .= "set req.backend = {$urlmapping['backendname']}BACKEND;\n";
 						} else {
 							if (!$isfirst)
 								$urlmappings .= "\telse ";
@@ -190,16 +190,20 @@ function varnish_get_url_mappings_txt() {
 if (req.{$req} {$fieldtype} "{$url['urlmapping']}") {
 		set req.backend = {$urlmapping['backendname']}BACKEND;{$directo_grace_time}
 	} 
-	
+
 EOAU;
+							$isfirst = false;
 						}
 						$backends_in_use[$urlmapping['backendname']] .= ($url['directorurl'] == "" ? "catch_all " : "url_map ");
-						$isfirst = false;
 					}
 				}
+			}
 		}
+		if ($urlmappings != "")
+			$lasturlmappings = "\telse {\n\t\t$lasturlmappings\t}\n";
 		return $urlmappings.$lasturlmappings;
 	}
+}
 
 function create_varnish_rcd_file() {
 	global $config, $g;
@@ -455,24 +459,24 @@ function sync_package_varnish() {
 				}
 			}
 			if ($vcl['postcache']) {
-				$vcl_recv_action_basic.="\t#Disable post cache\n";
-				$vcl_recv_action_basic.="\t".'if (req.request == "POST") {'."\n\t\treturn(pass);\n\t\t}\n";
+				$vcl_recv_action_basic .= "\t#Disable post cache\n";
+				$vcl_recv_action_basic .= "\t".'if (req.request == "POST") {'."\n\t\treturn(pass);\n\t\t}\n";
 			}
 
-			$vcl_fetch_session ="#Disable cache when backend is starting a session\n";
-			$vcl_fetch_session.="\t".'if (beresp.http.Set-Cookie && beresp.http.Set-Cookie ~ "(PHPSESSID|phpsessid)") {'."\n\t\treturn(hit_for_pass);\n\t\t}\n";
-			$vcl_fetch_session.="\t".'if (beresp.http.Set-Cookie && beresp.http.Set-Cookie ~ "(JSESSION|jsession)") {'."\n\t\treturn(hit_for_pass);\n\t\t}\n";
+			$vcl_fetch_session = "#Disable cache when backend is starting a session\n";
+			$vcl_fetch_session .= "\t".'if (beresp.http.Set-Cookie && beresp.http.Set-Cookie ~ "(PHPSESSID|phpsessid)") {'."\n\t\treturn(hit_for_pass);\n\t\t}\n";
+			$vcl_fetch_session .= "\t".'if (beresp.http.Set-Cookie && beresp.http.Set-Cookie ~ "(JSESSION|jsession)") {'."\n\t\treturn(hit_for_pass);\n\t\t}\n";
 					
-			if ($vcl['sessioncache']== "never") {
-				$vcl_recv_session ="\t#Disable session cache\n";
-				$vcl_recv_session.="\t".'if (req.http.Cookie && req.http.Cookie ~ "(PHPSESSID|phpsessid)") {'."\n\t\treturn(pass);\n\t\t}\n";
-				$vcl_recv_session.="\t".'if (req.http.Cookie && req.http.Cookie ~ "(JSESSION|jsession)") {'."\n\t\treturn(pass);\n\t\t}\n";
-				$vcl_recv_session.="\t".'if (req.http.X-Requested-With == "XMLHttpRequest" || req.url ~ "nocache") {'."\n\t\treturn(pass);\n\t\t}\n";
-				$vcl_fetch_session.="\t".'if (beresp.http.X-Requested-With == "XMLHttpRequest" || req.url ~ "nocache") {'."\n\t\treturn(hit_for_pass);\n\t\t}\n";
-				$vcl_recv_static_prefix=($vcl['staticache']=="no"?"":"\n\t\tunset req.http.cookie;");
+			if ($vcl['sessioncache'] == "never") {
+				$vcl_recv_session = "\t#Disable session cache\n";
+				$vcl_recv_session .= "\t".'if (req.http.Cookie && req.http.Cookie ~ "(PHPSESSID|phpsessid)") {'."\n\t\treturn(pass);\n\t\t}\n";
+				$vcl_recv_session .= "\t".'if (req.http.Cookie && req.http.Cookie ~ "(JSESSION|jsession)") {'."\n\t\treturn(pass);\n\t\t}\n";
+				$vcl_recv_session .= "\t".'if (req.http.X-Requested-With == "XMLHttpRequest" || req.url ~ "nocache") {'."\n\t\treturn(pass);\n\t\t}\n";
+				$vcl_fetch_session .= "\t".'if (beresp.http.X-Requested-With == "XMLHttpRequest" || req.url ~ "nocache") {'."\n\t\treturn(hit_for_pass);\n\t\t}\n";
+				$vcl_recv_static_prefix = ($vcl['staticache'] == "no" ? "" : "\n\t\tunset req.http.cookie;");
 			} else {
 				$vcl_hash = "#Enable Per user session cache.\n";
-				$vcl_hash.= "sub vcl_hash {\n\thash_data(req.http.cookie);\n}\n";
+				$vcl_hash .= "sub vcl_hash {\n\thash_data(req.http.cookie);\n}\n";
 			}
 			// set static content var
 			$vcl_recv_static_sufix = ($vcl['staticache'] == 'no' ? "pass" : "lookup");
