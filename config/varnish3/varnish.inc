@@ -501,16 +501,16 @@ function sync_package_varnish() {
 			}
 				
 			if ($vcl['rfc2616']) {
-				$vcl_recv_action_basic.="\t#Be rfc2616 compliant\n";
-				$vcl_recv_action_basic.="\t".'if (req.request ~ "^(GET|HEAD|PUT|POST|TRACE|OPTIONS|DELETE)$") {'."\n\t\treturn(lookup);\n\t\t}\n\telse\t{\n\t\treturn(pipe);\n\t\t}\n";
+				$vcl_recv_action_basic .= "\t#Be rfc2616 compliant\n";
+				$vcl_recv_action_basic .= "\t".'if (req.request ~ "^(GET|HEAD|PUT|POST|TRACE|OPTIONS|DELETE)$") {'."\n\t\treturn(lookup);\n\t\t}\n\telse\t{\n\t\treturn(pipe);\n\t\t}\n";
 				//$vcl_recv_action_basic.="\t".'if (req.request != "GET" && req.request != "HEAD" && req.request != "PUT" && reqa.request != "POST" &&'."\n";
 				//$vcl_recv_action_basic.="\t".'    req.request != "TRACE" && req.request != "OPTIONS" && req.request != "DELETE") {return(pipe);}'."\n\n";
 			} else
-				$vcl_recv_action_basic.="\t".'if (req.request != "GET" && req.request != "HEAD") {return(pipe);}'."\n";
+				$vcl_recv_action_basic .= "\tif (req.request != \"GET\" && req.request != \"HEAD\") {return(pipe);}\n";
 			if ($vcl['restarts'])
-				$vcl_restarts=$vcl['restarts'];
+				$vcl_restarts = $vcl['restarts'];
 			if ($vcl['htmlerror'])
-				$errorvcl=text_area_decode($vcl['htmlerror']);
+				$errorvcl = text_area_decode($vcl['htmlerror']);
 		}
 
 	if (!$errorvcl)
