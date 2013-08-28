@@ -26,6 +26,7 @@
 	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 	POSSIBILITY OF SUCH DAMAGE.
 */
+require_once("config.inc");
 
 $pfs_version = substr(trim(file_get_contents("/etc/version")),0,3);
 switch ($pfs_version) {
@@ -71,6 +72,7 @@ function sudo_install() {
 function sudo_write_config() {
 	global $config;
 	$sudoers = "";
+	conf_mount_rw();
 	if (!is_array($config['installedpackages']['sudo']['config'][0]['row'])) {
 		/* No config, wipe sudoers file and bail. */
 		unlink(SUDO_SUDOERS);
@@ -104,6 +106,7 @@ function sudo_write_config() {
 		log_error("Sudoers file invalid: {$result}");
 		unlink($tmpsudoers);
 	}
+	conf_mount_ro();
 }
 
 /* Get a list of users and groups in a format we can use to make proper sudoers entries.
