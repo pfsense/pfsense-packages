@@ -1,6 +1,6 @@
 <?php
 /*
-	services_procwatch_add.php
+	services_servicewatchdog_add.php
 	Copyright (C) 2013 Jim Pingle
 	All rights reserved.
 
@@ -30,20 +30,20 @@
 */
 
 ##|+PRIV
-##|*IDENT=page-services-procwatch-add
-##|*NAME=Services: Add ProcWatch Services
-##|*DESCR=Allow access to the 'Add ProcWatch Services' page.
-##|*MATCH=services_procwatch.php-add*
+##|*IDENT=page-services-servicewatchdog-add
+##|*NAME=Services: Add Service Watchdog Services
+##|*DESCR=Allow access to the 'Add Service Watchdog Services' page.
+##|*MATCH=services_servicewatchdog.php-add*
 ##|-PRIV
 
 require("guiconfig.inc");
 require_once("service-utils.inc");
-require_once("procwatch.inc");
+require_once("servicewatchdog.inc");
 
-if (!is_array($config['installedpackages']['procwatch']['item'])) {
-	$config['installedpackages']['procwatch']['item'] = array();
+if (!is_array($config['installedpackages']['servicewatchdog']['item'])) {
+	$config['installedpackages']['servicewatchdog']['item'] = array();
 }
-$a_pwservices = &$config['installedpackages']['procwatch']['item'];
+$a_pwservices = &$config['installedpackages']['servicewatchdog']['item'];
 $a_pwservice_names = array();
 foreach ($a_pwservices as $svc) {
 	$a_pwservice_names[] = $svc['name'];
@@ -62,16 +62,16 @@ if ($_POST) {
 
 	if (!$input_errors) {
 		$a_pwservices[] = $system_services[$_POST['svcid']];
-		procwatch_cron_job();
+		servicewatchdog_cron_job();
 		write_config();
 
-		header("Location: services_procwatch.php");
+		header("Location: services_servicewatchdog.php");
 		return;
 	}
 }
 
 $closehead = false;
-$pgtitle = array(gettext("Services"),gettext("ProcWatch"), gettext("Add"));
+$pgtitle = array(gettext("Services"),gettext("servicewatchdog"), gettext("Add"));
 include("head.inc");
 
 ?>
@@ -83,7 +83,7 @@ include("head.inc");
 
 <?php include("fbegin.inc"); ?>
 <?php if ($input_errors) print_input_errors($input_errors); ?>
-<form action="services_procwatch_add.php" method="post" name="iform" id="iform">
+<form action="services_servicewatchdog_add.php" method="post" name="iform" id="iform">
 <table width="100%" border="0" cellpadding="6" cellspacing="0" summary="add monitored service">
 <tr>
 	<td colspan="2" valign="top" class="listtopic"><?=gettext("Add Service Entry"); ?></td>

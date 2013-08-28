@@ -6,7 +6,7 @@
 	<![CDATA[
 /* ========================================================================== */
 /*
-	procwatch.xml
+	servicewatchdog.xml
 	part of pfSense (http://www.pfSense.com)
 	Copyright (C) 2013 Jim Pingle
 	All rights reserved.
@@ -36,37 +36,37 @@
 /* ==========================================================================	*/
 	]]>
 	</copyright>
-	<description>ProcWatch</description>
+	<description>Service Watchdog</description>
 	<requirements>None</requirements>
 	<faq>Monitors for stopped services and restarts them.</faq>
-	<name>ProcWatch</name>
+	<name>Service Watchdog</name>
 	<version>1.0</version>
-	<title>Services: Procwatch</title>
-	<include_file>/usr/local/pkg/procwatch.inc</include_file>
+	<title>Services: Service Watchdog</title>
+	<include_file>/usr/local/pkg/servicewatchdog.inc</include_file>
 	<menu>
-		<name>ProcWatch</name>
+		<name>Service Watchdog</name>
 		<tooltiptext></tooltiptext>
 		<section>Services</section>
-		<url>/services_procwatch.php</url>
+		<url>/services_servicewatchdog.php</url>
 	</menu>
 	<additional_files_needed>
 		<prefix>/usr/local/www/</prefix>
 		<chmod>644</chmod>
-		<item>http://www.pfsense.com/packages/config/procwatch/services_procwatch.php</item>
+		<item>http://www.pfsense.com/packages/config/servicewatchdog/services_servicewatchdog.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/www/</prefix>
 		<chmod>644</chmod>
-		<item>http://www.pfsense.com/packages/config/procwatch/services_procwatch_add.php</item>
+		<item>http://www.pfsense.com/packages/config/servicewatchdog/services_servicewatchdog_add.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>755</chmod>
-		<item>http://www.pfsense.com/packages/config/procwatch/procwatch_cron.php</item>
+		<item>http://www.pfsense.com/packages/config/servicewatchdog/servicewatchdog_cron.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>644</chmod>
-		<item>http://www.pfsense.com/packages/config/procwatch/procwatch.inc</item>
+		<item>http://www.pfsense.com/packages/config/servicewatchdog/servicewatchdog.inc</item>
 	</additional_files_needed>
 </packagegui>

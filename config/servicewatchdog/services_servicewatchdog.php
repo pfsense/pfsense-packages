@@ -1,6 +1,6 @@
 <?php
 /*
-	services_procwatch.php
+	services_servicewatchdog.php
 	Copyright (C) 2013 Jim Pingle
 	All rights reserved.
 
@@ -30,21 +30,21 @@
 */
 
 ##|+PRIV
-##|*IDENT=page-services-procwatch
-##|*NAME=Services: ProcWatch
-##|*DESCR=Allow access to the 'Services: ProcWatch' page.
-##|*MATCH=services_procwatch.php*
+##|*IDENT=page-services-servicewatchdog
+##|*NAME=Services: Service Watchdog
+##|*DESCR=Allow access to the 'Services: Service Watchdog' page.
+##|*MATCH=services_servicewatchdog.php*
 ##|-PRIV
 
 require("guiconfig.inc");
 require_once("functions.inc");
 require_once("service-utils.inc");
-require_once("procwatch.inc");
+require_once("servicewatchdog.inc");
 
-if (!is_array($config['installedpackages']['procwatch']['item']))
-	$config['installedpackages']['procwatch']['item'] = array();
+if (!is_array($config['installedpackages']['servicewatchdog']['item']))
+	$config['installedpackages']['servicewatchdog']['item'] = array();
 
-$a_pwservices = &$config['installedpackages']['procwatch']['item'];
+$a_pwservices = &$config['installedpackages']['servicewatchdog']['item'];
 
 /* if a custom message has been passed along, lets process it */
 if ($_GET['savemsg'])
@@ -53,9 +53,9 @@ if ($_GET['savemsg'])
 if ($_GET['act'] == "del") {
 	if ($a_pwservices[$_GET['id']]) {
 		unset($a_pwservices[$_GET['id']]);
-		procwatch_cron_job();
+		servicewatchdog_cron_job();
 		write_config();
-		header("Location: services_procwatch.php");
+		header("Location: services_servicewatchdog.php");
 		exit;
 	}
 }
@@ -66,9 +66,9 @@ if (isset($_POST['del_x'])) {
 		foreach ($_POST['pwservices'] as $servicei) {
 			unset($a_pwservices[$servicei]);
 		}
-		procwatch_cron_job();
+		servicewatchdog_cron_job();
 		write_config();
-		header("Location: services_procwatch.php");
+		header("Location: services_servicewatchdog.php");
 		exit;
 	}
 } else {
@@ -108,15 +108,15 @@ if (isset($_POST['del_x'])) {
 				$a_pwservices_new[] = $a_pwservices[$i];
 		}
 		$a_pwservices = $a_pwservices_new;
-		procwatch_cron_job();
+		servicewatchdog_cron_job();
 		write_config();
-		header("Location: services_procwatch.php");
+		header("Location: services_servicewatchdog.php");
 		return;
 	}
 }
 
 $closehead = false;
-$pgtitle = array(gettext("Services"),gettext("ProcWatch"));
+$pgtitle = array(gettext("Services"),gettext("Service Watchdog"));
 include("head.inc");
 
 ?>
@@ -129,7 +129,7 @@ include("head.inc");
 </head>
 <body link="#000000" vlink="#000000" alink="#000000">
 <?php include("fbegin.inc"); ?>
-<form action="services_procwatch.php" method="post" name="iform">
+<form action="services_servicewatchdog.php" method="post" name="iform">
 <script type="text/javascript" language="javascript" src="/javascript/row_toggle.js"></script>
 <?php if ($savemsg) print_info_box($savemsg); ?>
 <table width="100%" border="0" cellpadding="0" cellspacing="0" summary="services to monitor">
@@ -152,7 +152,7 @@ include("head.inc");
 		<input name="del" type="image" src="./themes/<?= $g['theme']; ?>/images/icons/icon_x.gif" width="17" height="17" title="<?=gettext("delete selected services"); ?>" onclick="return confirm('<?=gettext("Do you really want to delete the selected services?");?>')" />
 	<?php endif; ?>
 	</td>
-	<td><a href="services_procwatch_add.php"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif" width="17" height="17" border="0" title="<?=gettext("add new service"); ?>" alt="add" /></a></td>
+	<td><a href="services_servicewatchdog_add.php"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif" width="17" height="17" border="0" title="<?=gettext("add new service"); ?>" alt="add" /></a></td>
 	</tr>
 </table>
 </td>
@@ -164,17 +164,17 @@ foreach ($a_pwservices as $thisservice):
 ?>
 	<tr valign="top" id="fr<?=$nservices;?>">
 	<td class="listt"><input type="checkbox" id="frc<?=$nservices;?>" name="pwservices[]" value="<?=$i;?>" onClick="fr_bgcolor('<?=$nservices;?>')" style="margin: 0; padding: 0; width: 15px; height: 15px;" /></td>
-	<td class="listlr" onclick="fr_toggle(<?=$nservices;?>)" id="frd<?=$nservices;?>" ondblclick="document.location='services_procwatch_add.php?id=<?=$nservices;?>';">
+	<td class="listlr" onclick="fr_toggle(<?=$nservices;?>)" id="frd<?=$nservices;?>" ondblclick="document.location='services_servicewatchdog_add.php?id=<?=$nservices;?>';">
 		<?=$thisservice['name'];?>
 	</td>
-	<td class="listr" onclick="fr_toggle(<?=$nservices;?>)" id="frd<?=$nservices;?>" ondblclick="document.location='services_procwatch_add.php?id=<?=$nservices;?>';">
+	<td class="listr" onclick="fr_toggle(<?=$nservices;?>)" id="frd<?=$nservices;?>" ondblclick="document.location='services_servicewatchdog_add.php?id=<?=$nservices;?>';">
 		<?=$thisservice['description'];?>
 	</td>
 	<td valign="middle" class="list" nowrap>
 		<table border="0" cellspacing="0" cellpadding="1" summary="add">
 		<tr>
 		<td><input onmouseover="fr_insline(<?=$nservices;?>, true)" onmouseout="fr_insline(<?=$nservices;?>, false)" name="move_<?=$i;?>" src="/themes/<?= $g['theme']; ?>/images/icons/icon_left.gif" title="<?=gettext("move selected services before this service");?>" height="17" type="image" width="17" border="0" /></td>
-		<td align="center" valign="middle"><a href="services_procwatch.php?act=del&amp;id=<?=$i;?>" onclick="return confirm('<?=gettext("Do you really want to delete this service?");?>')"><img src="./themes/<?= $g['theme']; ?>/images/icons/icon_x.gif" width="17" height="17" border="0" title="<?=gettext("delete service");?>" alt="delete" /></a></td>
+		<td align="center" valign="middle"><a href="services_servicewatchdog.php?act=del&amp;id=<?=$i;?>" onclick="return confirm('<?=gettext("Do you really want to delete this service?");?>')"><img src="./themes/<?= $g['theme']; ?>/images/icons/icon_x.gif" width="17" height="17" border="0" title="<?=gettext("delete service");?>" alt="delete" /></a></td>
 		</tr>
 		</table>
 	</td></tr>
@@ -194,7 +194,7 @@ foreach ($a_pwservices as $thisservice):
 		<input name="del" type="image" src="./themes/<?= $g['theme']; ?>/images/icons/icon_x.gif" width="17" height="17" title="<?=gettext("delete selected services"); ?>" onclick="return confirm('<?=gettext("Do you really want to delete the selected services?");?>')" />
 	<?php endif; ?>
 	</td>
-	<td><a href="services_procwatch_add.php"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif" width="17" height="17" border="0" title="<?=gettext("add new service"); ?>" alt="add" /></a></td>
+	<td><a href="services_servicewatchdog_add.php"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif" width="17" height="17" border="0" title="<?=gettext("add new service"); ?>" alt="add" /></a></td>
 	</tr>
 	</table>
 	</td>
