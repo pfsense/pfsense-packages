@@ -1950,5 +1950,17 @@
 		<depends_on_package>sudo-1.8.6.p8.tbz</depends_on_package>
 		<depends_on_package_pbi>sudo-1.8.6p8-i386.pbi</depends_on_package_pbi>
 	</package>
+	<package>
+		<name>ProcWatch</name>
+		<descr>Monitors for stopped services and restarts them.</descr>
+		<maintainer>jimp@pfsense.org</maintainer>
+		<version>1.0</version>
+		<category>Services</category>
+		<status>BETA</status>
+		<config_file>http://www.pfsense.com/packages/config/procwatch/procwatch.xml</config_file>
+		<pkginfolink></pkginfolink>
+		<required_version>2.1</required_version>
+		<configurationfile>procwatch.xml</configurationfile>
+	</package>
 </packages>
 </pfsensepkgs>
