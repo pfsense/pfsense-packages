@@ -58,6 +58,7 @@
 		<name>darkstat</name>
 		<rcfile>darkstat.sh</rcfile>
 		<executable>darkstat</executable>
+		<description>Darkstat bandwidth monitoring daemon</description>
 	</service>
 	<tabs>
 		<tab>

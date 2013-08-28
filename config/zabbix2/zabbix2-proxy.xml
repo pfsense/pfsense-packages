@@ -61,7 +61,7 @@
 		<name>zabbix-proxy</name>
 		<rcfile>zabbix2_proxy.sh</rcfile>
 		<executable>zabbix_proxy</executable>
-		<description>Zabbix proxy is a process which collects performance and availability data from one or more monitored devices and sends the information to a Zabbix server</description>
+		<description>Zabbix proxy collection daemon</description>
 	</service>
 	<tabs>
 		<tab>

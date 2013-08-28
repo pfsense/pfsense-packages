@@ -45,6 +45,7 @@
 		<name>OpenOSPFd</name>
 		<rcfile>ospfd.sh</rcfile>
 		<executable>ospfd</executable>
+		<description>OpenBSD OSPF Daemon</description>
 	</service>
 	<fields>
 		<field>

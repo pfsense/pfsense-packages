@@ -47,6 +47,7 @@
 		<name>avahi</name>
 		<rcfile>avahi-daemon.sh</rcfile>
 		<executable>avahi-daemon</executable>
+		<description>Avahi zeroconf/mDNS daemon</description>
 	</service>
 	<fields>
 		<field>

@@ -60,6 +60,7 @@
 		<name>ntop</name>
 		<rcfile>ntop.sh</rcfile>
 		<executable>ntop</executable>
+		<description>NTOP bandwidth monitoring/graphing</description>
 	</service>
 	<tabs>
 		<tab>

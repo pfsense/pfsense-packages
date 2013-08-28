@@ -60,6 +60,7 @@
 			<name>bandwidthd</name>
 			<rcfile>bandwidthd.sh</rcfile>
 			<executable>bandwidthd</executable>
+			<description>BandwidthD bandwidth monitoring daemon</description>
 	</service>
 	<tabs>
 		<tab>

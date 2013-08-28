@@ -56,6 +56,7 @@
                 <name>spamd</name>
                 <rcfile>spamd.sh</rcfile>
                 <executable>spamd</executable>
+		<description>SPAMD Greylisting Daemon</description>
         </service>
 	<tabs>
 		<tab>

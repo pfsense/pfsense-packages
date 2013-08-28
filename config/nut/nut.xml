@@ -61,6 +61,7 @@
 		<name>nut</name>
 		<rcfile>nut.sh</rcfile>
 		<executable>upsmon</executable>
+		<description>UPS monitoring daemon</description>
 	</service>
 	<tabs>
 		<tab>

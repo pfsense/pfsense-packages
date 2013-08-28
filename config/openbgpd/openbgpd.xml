@@ -49,6 +49,7 @@
     <name>bgpd</name>
     <rcfile>bgpd.sh</rcfile>
     <executable>bgpd</executable>
+	<description>OpenBSD BGP Daemon</description>
   </service>	
 	<additional_files_needed>
 		<prefix>/usr/local/www/</prefix>

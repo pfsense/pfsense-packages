@@ -221,6 +221,7 @@
 		<name>apache_mod_security</name>
 		<rcfile>/usr/local/etc/rc.d/apache_mod_security.sh</rcfile>
 		<executable>httpd</executable>
+		<description>HTTP Daemon with mod_security</description>
 	</service>
 	<custom_php_resync_config_command>
 		apache_mod_security_resync();

@@ -54,7 +54,7 @@
 	<service>
 		<name>tftp</name>
 		<executable>inetd</executable>
-		<description>Trivial File Transport Protocol is a very simple file transfer protocol. Often used with routers, voip phones and more.</description>    
+		<description>TFTP daemon</description>
 	</service>
 	<tabs>
 		<tab>

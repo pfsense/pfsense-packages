@@ -59,6 +59,7 @@
 	<service>
                 <name>iperf</name>
                 <executable>iperf</executable>
+		<description>iperf network performance testing daemon/client</description>
         </service>
 	<tabs>
 		<tab>

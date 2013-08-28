@@ -20,6 +20,7 @@
 		<name>blinkled</name>
 		<rcfile>blinkled.sh</rcfile>
 		<executable>blinkled</executable>
+		<description>Blinks LEDs to indicate network activity</description>
 	</service>
 	<fields>
 		<field>

@@ -25,6 +25,7 @@
 		<name>gwled</name>
 		<rcfile>gwled.sh</rcfile>
 		<executable>gwled</executable>
+		<description>Gateway LED Indicator Daemon</description>
 	</service>
 	<fields>
 		<field>

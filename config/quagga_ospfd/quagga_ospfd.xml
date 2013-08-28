@@ -50,11 +50,13 @@
 		<name>Quagga OSPFd</name>
 		<rcfile>quagga.sh</rcfile>
 		<executable>ospfd</executable>
+		<description>OSPF routing daemon</description>
 	</service>
 	<service>
 		<name>Quagga Zebra</name>
 		<rcfile>quagga.sh</rcfile>
 		<executable>zebra</executable>
+		<description>Quagga core/abstraction daemon</description>
 	</service>
 	<fields>
 		<field>

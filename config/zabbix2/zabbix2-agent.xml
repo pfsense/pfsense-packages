@@ -61,7 +61,7 @@
 		<name>zabbix_agentd</name>
 		<rcfile>zabbix2_agentd.sh</rcfile>
 		<executable>zabbix_agentd</executable>
-		<description>Zabbix Agent runs on a host being monitored. The agent provides host's performance and availability information for Zabbix Server.</description>
+		<description>Zabbix Agent host monitor daemon</description>
 	</service>
 	<tabs>
 		<tab>

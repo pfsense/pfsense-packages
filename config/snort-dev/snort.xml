@@ -59,8 +59,7 @@
 		<name>snort</name>
 		<rcfile>snort.sh</rcfile>
 		<executable>snort</executable>
-		<description>Snort is the most widely deployed IDS/IPS technology
-			worldwide.</description>
+		<description>Snort IDS/IPS Daemon</description>
 	</service>
 	<tabs>
 	</tabs>

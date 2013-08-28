@@ -17,6 +17,7 @@
 		<name>zabbix-proxy</name>
 		<rcfile>zabbix-proxy.sh</rcfile>
 		<executable>zabbix_proxy</executable>
+		<description>Zabbix proxy collection daemon</description>
 	</service>
 	<tabs>
 		<tab>

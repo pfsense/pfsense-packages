@@ -55,7 +55,7 @@
 		<name>cron</name>
 		<rcfile>cron.sh</rcfile>
 		<executable>cron</executable>
-		<description>The cron utility is used to manage commands on a schedule.</description>
+		<description>Scheduled commands daemon</description>
 	</service>
 	<tabs>
 		<tab>

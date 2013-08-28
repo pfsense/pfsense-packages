@@ -55,7 +55,7 @@
 		<name>tftp</name>
 		<rcfile>tftp.sh</rcfile>
 		<executable>inetd</executable>
-		<description>Trivial File Transport Protocol is a very simple file transfer protocol. Often used with routers, voip phones and more.</description>    
+		<description>TFTP daemon</description>
 	</service>
 	<tabs>
 		<tab>
