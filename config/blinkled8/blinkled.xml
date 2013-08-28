@@ -2,7 +2,7 @@
 <packagegui>
 	<title>Interfaces: Assign LEDs</title>
 	<name>blinkled</name>
-	<version>20090710</version>
+	<version>0.4</version>
 	<savetext>Save</savetext>
 	<include_file>/usr/local/pkg/blinkled.inc</include_file>
 	<menu>
