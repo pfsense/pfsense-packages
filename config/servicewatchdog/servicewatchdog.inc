@@ -28,7 +28,7 @@ function servicewatchdog_check_services() {
 	$a_pwservices = &$config['installedpackages']['servicewatchdog']['item'];
 
 	foreach ($a_pwservices as $svc) {
-		if (!is_service_running($svc['name'])) {
+		if (!get_service_status($svc)) {
 			$descr = strlen($svc['description']) > 50 ? substr($svc['description'], 0, 50) . "..." : $svc['description'];
 			log_error("Service Watchdog detected service {$svc['name']} stopped. Restarting {$svc['name']} ({$descr})");
 			service_control_start($svc['name'], $svc);
