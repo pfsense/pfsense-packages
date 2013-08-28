@@ -1941,7 +1941,7 @@
 		<name>Service Watchdog</name>
 		<descr>Monitors for stopped services and restarts them.</descr>
 		<maintainer>jimp@pfsense.org</maintainer>
-		<version>1.1</version>
+		<version>1.2</version>
 		<category>Services</category>
 		<status>BETA</status>
 		<config_file>http://www.pfsense.com/packages/config/servicewatchdog/servicewatchdog.xml</config_file>

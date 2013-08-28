@@ -44,7 +44,8 @@ if (!is_array($config['installedpackages']['servicewatchdog']['item'])) {
 	$config['installedpackages']['servicewatchdog']['item'] = array();
 }
 $a_pwservices = &$config['installedpackages']['servicewatchdog']['item'];
-$a_pwservice_names = array();
+// Pre-load "cron" into this array to blacklist it from being offered as a choice.
+$a_pwservice_names = array("cron");
 foreach ($a_pwservices as $svc) {
 	$a_pwservice_names[] = $svc['name'];
 }
@@ -94,7 +95,8 @@ include("head.inc");
 		<select name="svcid" class="formselect" id="svcid">
 <?php		$i=0;
 		foreach ($system_services as $svc): ?>
-			<?php if (!in_array($svc['name'], $a_pwservice_names)): ?>
+			<?php if (!empty($svc['name']) && !in_array($svc['name'], $a_pwservice_names)): ?>
+			<?php $svc['description'] = empty($svc['description']) ? get_pkg_descr($svc['name']) : $svc['description']; ?>
 			<option value="<?= $i ?>"><?=$svc['name'];?>: <?= strlen($svc['description']) > 50 ? substr($svc['description'], 0, 50) . "..." : $svc['description'];?></option>
 			<?php endif;
 			$i++; ?>
