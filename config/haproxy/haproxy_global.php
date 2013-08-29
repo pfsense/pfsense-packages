@@ -89,6 +89,12 @@ if ($_POST) {
 			touch($d_haproxyconfdirty_path);
 			write_config();
 		}
+
+		if ($_POST['Submit'] == "Save and Check Config") {
+			$check_output = haproxy_check_config();
+			if (empty($check_output))
+				$check_output = "No output.";
+		}
 	}
 	
 }
@@ -159,6 +165,14 @@ function enable_change(enable_change) {
 	<td>
 	<div id="mainarea">
 		<table class="tabcont" width="100%" border="0" cellpadding="6" cellspacing="0">
+		<?php if ($_POST['Submit'] == "Save and Check Config"): ?>
+			<tr><td colspan="2" valign="top" class="vncell">
+Configuration check output:
+<pre>
+<?= $check_output; ?>
+</pre>
+		</td></tr>
+		<?php endif; ?>
 			<tr>
 				<td colspan="2" valign="top" class="listtopic">General settings</td>
 			</tr>
@@ -386,6 +400,7 @@ function enable_change(enable_change) {
 				<td width="22%" valign="top">&nbsp;</td>
 					<td width="78%">
 						<input name="Submit" type="submit" class="formbtn" value="Save" onClick="enable_change(true)">
+						<input name="Submit" type="submit" class="formbtn" value="Save and Check Config" onClick="enable_change(true)">
 					</td>
 				</td>
 			</tr>

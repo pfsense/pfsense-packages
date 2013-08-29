@@ -637,6 +637,11 @@ function haproxy_is_running() {
         return $running;
 }
 
+function haproxy_check_config() {
+	exec("/usr/local/sbin/haproxy -c -f /var/etc/haproxy.cfg 2>&1", $output);
+	return implode("\n", $output);
+}
+
 function haproxy_check_run($reload) {
 	global $config, $g;
 
