@@ -95,7 +95,7 @@ include("head.inc");
 		<select name="svcid" class="formselect" id="svcid">
 <?php		$i=0;
 		foreach ($system_services as $svc): ?>
-			<?php if (!empty($svc['name']) && !in_array($svc['name'], $a_pwservice_names)): ?>
+			<?php if (!servicewatchdog_is_service_watched($svc)): ?>
 			<?php $svc['description'] = empty($svc['description']) ? get_pkg_descr($svc['name']) : $svc['description']; ?>
 			<option value="<?= $i ?>"><?=$svc['name'];?>: <?= strlen($svc['description']) > 50 ? substr($svc['description'], 0, 50) . "..." : $svc['description'];?></option>
 			<?php endif;
