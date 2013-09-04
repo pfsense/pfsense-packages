@@ -3290,7 +3290,7 @@ ldap {
 
 		#  Certificate Verification requirements.  Can be:
 		#    "never" (don't even bother trying)
-		#    "allow" (try, but don't fail if the cerificate
+		#    "allow" (try, but don't fail if the certificate
 		#		can't be verified)
 		#    "demand" (fail if the certificate doesn't verify.)
 		#
@@ -3449,7 +3449,7 @@ ldap ldap2{
 
 		#  Certificate Verification requirements.  Can be:
 		#    "never" (don't even bother trying)
-		#    "allow" (try, but don't fail if the cerificate
+		#    "allow" (try, but don't fail if the certificate
 		#		can't be verified)
 		#    "demand" (fail if the certificate doesn't verify.)
 		#
