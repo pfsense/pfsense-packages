@@ -79,7 +79,7 @@ define('HVDEF_PID_FILE',                '/var/run/havp.pid');
 define('HVDEF_WORK_DIR',                '/usr/local/etc/havp');
 
 $pfSversion = str_replace("\s", "", file_get_contents("/etc/version"));
-if(preg_match("/^2.0/",$pfSversion))
+if(preg_match("/^2./",$pfSversion))
 	define('HVDEF_LOG_DIR',			'/var/log/havp');
 else
 	define('HVDEF_LOG_DIR',			'/var/log');
@@ -413,6 +413,10 @@ function havp_check_system()
     havp_set_file_access(HVDEF_TEMPLATES,    HVDEF_USER, '');
     havp_set_file_access(HVDEF_TEMPLATES_EX, HVDEF_USER, '');
 
+    # havp log dir
+    if (!file_exists(HVDEF_LOG_DIR))
+    	mwexec("mkdir -p " . HVDEF_LOG_DIR);
+    havp_set_file_access(HVDEF_LOG_DIR, HVDEF_USER, '');
     # log files exists ?
     if (!file_exists(HVDEF_HAVP_ACCESSLOG)) file_put_contents(HVDEF_HAVP_ACCESSLOG, '');
     if (!file_exists(HVDEF_HAVP_ERRORLOG))  file_put_contents(HVDEF_HAVP_ERRORLOG,  '');
@@ -427,12 +431,16 @@ function havp_check_system()
     if (!file_exists(HVDEF_FRESHCLAM_CONF)) file_put_contents(HVDEF_FRESHCLAM_CONF, '');
     havp_set_file_access(HVDEF_FRESHCLAM_CONF, HVDEF_AVUSER, '0664');
 
+    # clam log dir
+    if (!file_exists(HVDEF_AVLOG_DIR))
+    	mwexec("mkdir -p " . HVDEF_AVLOG_DIR);
+    havp_set_file_access(HVDEF_AVLOG_DIR, HVDEF_USER, '');
     # log files exists ?
     if (!file_exists(HVDEF_CLAM_LOG))      file_put_contents(HVDEF_CLAM_LOG, '');
     if (!file_exists(HVDEF_FRESHCLAM_LOG)) file_put_contents(HVDEF_FRESHCLAM_LOG, '');
     # log dir permissions
-    if (!file_exists(HVDEF_AVLOG_DIR))
-        mwexec("mkdir -p " . HVDEF_AVLOG_DIR);
+    # if (!file_exists(HVDEF_AVLOG_DIR))
+    #    mwexec("mkdir -p " . HVDEF_AVLOG_DIR);
     havp_set_file_access(HVDEF_AVLOG_DIR, HVDEF_USER, '0777');
 
     # =-= ClamAV =-=
