@@ -139,13 +139,22 @@ function bandwidthd_install_config() {
 			$ifcfg = $config['interfaces'][$int];
 			$subnet = gen_subnet($ifcfg['ipaddr'], $ifcfg['subnet']);
 			$subnetmask = gen_subnet_mask($ifcfg['subnet']);
+			$subnet_with_mask = "";
 			if($subnet == "pppoe") {
 				$subnet = find_interface_ip("ng0");
-				if($subnet)
-					$subnets .= "subnet {$subnet}/32\n";
+				if($subnet) {
+					$subnet_with_mask = $subnet . "/32";
+				}
 			} else {
-				if($subnet)
-					$subnets .= "subnet {$subnet}/{$ifcfg['subnet']}\n";
+				if($subnet) {
+					$subnet_with_mask = $subnet . "/" . $ifcfg['subnet'];
+				}
+			}
+			if (!empty($subnet_with_mask)) {
+				/* Only add the subnet if the user has not specified it in the custom subnets. */
+				/* This avoids generating an unnecessary syntax error message from the config. */
+				if (!in_array($subnet_with_mask, $subnets_custom))
+					$subnets .= "subnet {$subnet_with_mask}\n";
 			}
 		}
 	}
@@ -197,7 +206,7 @@ $dev
 # intervals to skip before doing a graphing run
 $skip_intervals
 
-# Graph cutoff is how many k must be transfered by an
+# Graph cutoff is how many k must be transferred by an
 # ip before we bother to graph it
 $graph_cutoff
 
