@@ -1789,7 +1789,6 @@
 		<version>0.17</version>
 		<status>Beta</status>
 		<required_version>2.1</required_version>
-		<config_file>http://www.pfsense.com/packages/config/iftop/iftop.xml</config_file>
 		<maintainer>jimp@pfsense.org</maintainer>
 		<configurationfile>iftop.xml</configurationfile>
 		<build_pbi>
