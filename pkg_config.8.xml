@@ -1803,7 +1803,6 @@
 		<status>Beta</status>
 		<required_version>2.1</required_version>
 		<maintainer>jimp@pfsense.org</maintainer>
-		<configurationfile>iftop.xml</configurationfile>
 		<build_pbi>
 			<port>net-mgmt/iftop</port>
 		</build_pbi>
