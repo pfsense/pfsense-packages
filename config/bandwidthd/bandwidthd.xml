@@ -70,7 +70,7 @@
 		</tab>
 		<tab>
 			<text>Access BandwidthD</text>
-			<url>/bandwidthd" target="_blank</url>
+			<url>/bandwidthd/index.html" target="_blank</url>
 		</tab>
 	</tabs>
 	<configpath>installedpackages->package->bandwidthd</configpath>
