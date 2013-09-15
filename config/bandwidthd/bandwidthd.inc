@@ -66,22 +66,22 @@ function bandwidthd_install_config() {
 	/* user defined values */
 	$bandwidthd_config = $config['installedpackages']['bandwidthd']['config'][0];
 	$meta_refresh = $bandwidthd_config['meta_refresh'];
-	if($meta_refresh)
+	if ($meta_refresh)
 		$meta_refresh = "meta_refresh $meta_refresh\n";
 	$graph = $bandwidthd_config['drawgraphs'];
-	if($graph)
+	if ($graph)
 		$graph = "graph true\n";
 	else
 		$graph = "graph false\n";
 
 	$filter_text = $bandwidthd_config['filter'];
-	if($filter_text)
+	if ($filter_text)
 		$filter_text = "filter $filter_text\n";
 	$recover_cdf = $bandwidthd_config['recovercdf'];
-	if($recover_cdf)
+	if ($recover_cdf)
 		$recover_cdf = "recover_cdf true\n";
 	$output_cdf = $bandwidthd_config['outputcdf'];
-	if($output_cdf)
+	if ($output_cdf)
 		$output_cdf_string = "output_cdf true\n";
 	else
 		$output_cdf_string = "";
@@ -92,34 +92,34 @@ function bandwidthd_install_config() {
 	$postgresql_username = $bandwidthd_config['postgresqlusername'];
 	$postgresql_password = $bandwidthd_config['postgresqlpassword'];
 	$postgresql_string = "";
-	if($output_postgresql) {
+	if ($output_postgresql) {
 		if ($postgresql_host && $postgresql_username && $postgresql_database && $postgresql_password)
 			$postgresql_string = "pgsql_connect_string \"user = $postgresql_username dbname = $postgresql_database password = $postgresql_password host = $postgresql_host\"\n";
 		else
-		  	log_error("You have to specify the postgreSQL Host, Database, Username and Password. Exiting.");
+			log_error("You have to specify the postgreSQL Host, Database, Username and Password. Exiting.");
 	}
 
 	$sensor_id = $bandwidthd_config['sensorid'];
 
-	if($sensor_id)
+	if ($sensor_id)
 		$sensor_id_string = "sensor_id \"$sensor_id\"";
 	else
 		$sensor_id_string = "";
 
 	$promiscuous = $bandwidthd_config['promiscuous'];
-	if($promiscuous)
+	if ($promiscuous)
 		$promiscuous = "promiscuous true\n";
 	else
 		$promiscuous = "promiscuous false\n";
 
 	$graph_cutoff = $bandwidthd_config['graphcutoff'];
-	if($graph_cutoff)
+	if ($graph_cutoff)
 		$graph_cutoff = "graph_cutoff $graph_cutoff\n";
 	$skip_intervals = $bandwidthd_config['skipintervals'];
-	if($skip_intervals)
+	if ($skip_intervals)
 		$skip_intervals = "skip_intervals $skip_intervals\n";
 
-	if($bandwidthd_config['active_interface']){
+	if ($bandwidthd_config['active_interface']){
 		$ifdescrs = array($bandwidthd_config['active_interface']);
 	} else {
 		log_error("You should specify an interface for bandwidthd to listen on. Exiting.");
@@ -133,20 +133,20 @@ function bandwidthd_install_config() {
 	//for ($j = 1; isset($config['interfaces']['opt' . $j]); $j++) {
 		//$ifdescrs['opt' . $j] = "opt" . $j;
 	//}
-	if(is_array($ifdescrs)) {
-		foreach($ifdescrs as $int) {
+	if (is_array($ifdescrs)) {
+		foreach ($ifdescrs as $int) {
 			/* calculate interface subnet information */
 			$ifcfg = $config['interfaces'][$int];
 			$subnet = gen_subnet($ifcfg['ipaddr'], $ifcfg['subnet']);
 			$subnetmask = gen_subnet_mask($ifcfg['subnet']);
 			$subnet_with_mask = "";
-			if($subnet == "pppoe") {
+			if ($subnet == "pppoe") {
 				$subnet = find_interface_ip("ng0");
-				if($subnet) {
+				if ($subnet) {
 					$subnet_with_mask = $subnet . "/32";
 				}
 			} else {
-				if($subnet) {
+				if ($subnet) {
 					$subnet_with_mask = $subnet . "/" . $ifcfg['subnet'];
 				}
 			}
@@ -159,8 +159,8 @@ function bandwidthd_install_config() {
 		}
 	}
 
-	if(is_array($subnets_custom)) {
-		foreach($subnets_custom as $sub) {
+	if (is_array($subnets_custom)) {
+		foreach ($subnets_custom as $sub) {
 			if (!empty($sub) && is_subnet($sub))
 				$subnets .= "subnet {$sub}\n";
 		}
@@ -168,8 +168,8 @@ function bandwidthd_install_config() {
 
 	/* initialize to "" */
 	$dev = "";
-	if(is_array($ifdescrs)) {
-		foreach($ifdescrs as $ifdescr) {
+	if (is_array($ifdescrs)) {
+		foreach ($ifdescrs as $ifdescr) {
 			$descr = convert_friendly_interface_to_real_interface_name($ifdescr);
 			$dev .= "dev \"$descr\"\n";
 		}
@@ -232,7 +232,7 @@ $sensor_id_string
 #Please always include "ip" in the string to avoid strange problems
 $filter_text
 
-#Draw Graphs - This default to true to graph the traffic bandwidthd is recording
+#Draw Graphs - This defaults to true to graph the traffic bandwidthd is recording
 #Usually set this to false if you only want cdf output or
 #you are using the database output option.  Bandwidthd will use very little
 #ram and cpu if this is set to false.
@@ -244,7 +244,7 @@ $meta_refresh
 EOF;
 
 	$fd = fopen("{$bandwidthd_config_dir}/bandwidthd.conf","w");
-	if(!$fd) {
+	if (!$fd) {
 		log_error("could not open {$bandwidthd_config_dir}/bandwidthd.conf for writing");
 		exit;
 	}
@@ -352,7 +352,7 @@ EOD;
 	if (!file_exists($bandwidthd_index_file)) {
 		exec("echo \"Please start bandwidthd to populate this directory.\" > " . $bandwidthd_index_file);
 	}
-	
+
 	if (($bandwidthd_enable) && ($output_cdf)) {
 		// Use cron job to rotate logs every day at 00:01
 		install_cron_job("/bin/kill -HUP `cat /var/run/bandwidthd.pid`", true, "1", "0");
