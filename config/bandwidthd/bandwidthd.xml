@@ -2,8 +2,8 @@
 <!DOCTYPE packagegui SYSTEM "../schema/packages.dtd">
 <?xml-stylesheet type="text/xsl" href="../xsl/package.xsl"?>
 <packagegui>
-        <copyright>
-        <![CDATA[
+	<copyright>
+	<![CDATA[
 /* $Id$ */
 /* ========================================================================== */
 /*
@@ -40,7 +40,7 @@
     POSSIBILITY OF SUCH DAMAGE.
                                                                               */
 /* ========================================================================== */
-        ]]>
+	]]>
 	</copyright>
 	<description>Describe your package here</description>
 	<requirements>Describe your package requirements here</requirements>
@@ -85,7 +85,7 @@
 			<fieldname>enable</fieldname>
 			<type>checkbox</type>
 			<description></description>
-		</field>			
+		</field>
 		<field>
 			<fielddescr>Interface</fielddescr>
 			<fieldname>active_interface</fieldname>
@@ -93,7 +93,7 @@
 			<type>interfaces_selection</type>
 			<required/>
 			<default_value>lan</default_value>
-		</field>	
+		</field>
 		<field>
 			<fielddescr>Subnet</fielddescr>
 			<fieldname>subnets_custom</fieldname>
