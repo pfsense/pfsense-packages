@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <packagegui>
-	<title>Services: LCDproc 0.5.5 pkg v. 0.9.4</title>
+	<title>Services: LCDproc 0.5.6 pkg v. 0.9.7</title>
 	<name>lcdproc</name>
-	<version>0.5.5 pkg v. 0.9.4</version>
+	<version>0.5.6 pkg v. 0.9.7</version>
 	<savetext>Save</savetext>
 	<include_file>/usr/local/pkg/lcdproc.inc</include_file>
 	<tabs>
@@ -100,9 +100,12 @@
 					<value>ugen1.2</value>
 					<name>USB Com port 2 alternate (/dev/ugen1.2)</name>
 				</option>
+					<value>ugen1.3</value>
+					<name>USB Com port 3 alternate (/dev/ugen1.3)</name>
+				</option>
 				<option>
 					<value>ugen2.2</value>
-					<name>USB Com port 3 alternate (/dev/ugen2.2)</name>
+					<name>USB Com port 4 alternate (/dev/ugen2.2)</name>
 				</option>				
 			</options>
 			<default_value>ucom1</default_value>
@@ -301,6 +304,87 @@
 			</options>
 			<default_value>pyramid</default_value>
 		</field>
+		<field>
+			<fieldname>connection_type</fieldname>
+			<fielddescr>Connection Type</fielddescr>
+			<description>Set connection type for the HD44780 driver</description>
+			<type>select</type>
+			<options>
+				<option>
+					<value>4bit</value>
+					<name>4bit wiring to parallel port</name>
+				</option>
+				<option>
+					<value>8bit</value>
+					<name>8bit wiring to parallel port(lcdtime)</name>
+				</option>
+				<option>
+					<value>winamp</value>
+					<name>8bit wiring winamp style to parallel port</name>
+				</option>
+				<option>
+					<value>serialLpt</value>
+					<name>Serial LPT wiring</name>
+				</option>
+				<option>
+					<value>picanlcd</value>
+					<name>PIC-an-LCD serial device</name>
+				</option>
+				<option>
+					<value>lcdserializer</value>
+					<name>LCD serializer</name>
+				</option>
+				<option>
+					<value>los-panel</value>
+					<name>LCD on serial panel device</name>
+				</option>
+				<option>
+					<value>vdr-lcd</value>
+					<name>VDR LCD serial device</name>
+				</option>
+				<option>
+					<value>vdr-wakeup</value>
+					<name>VDR-Wakeup module</name>
+				</option>
+				<option>
+					<value>pertelian</value>
+					<name>Pertelian X2040 LCD</name>
+				</option>
+				<option>
+					<value>bwctusb</value>
+					<name>BWCT USB device</name>
+				</option>
+				<option>
+					<value>lcd2usb</value>
+					<name>Till Harbaum's LCD2USB</name>
+				</option>
+				<option>
+					<value>usbtiny</value>
+					<name>Dick Streefland's USBtiny</name>
+				</option>
+				<option>
+					<value>lis2</value>
+					<name>LIS2 from VLSystem</name>
+				</option>
+				<option>
+					<value>mplay</value>
+					<name>MPlay Blast from VLSystem</name>
+				</option>
+				<option>
+					<value>ftdi</value>
+					<name>LCD connected to FTDI 2232D USB chip</name>
+				</option>
+				<option>
+					<value>usblcd</value>
+					<name>USBLCD adapter from Adams IT Services</name>
+				</option>
+				<option>
+					<value>i2c</value>
+					<name>LCD driven by PCF8574/PCA9554 connected via i2c</name>
+				</option>
+			</options>
+			<default_value>lcd2usb</default_value>
+		</field>	
 		<field>
 			<fieldname>refresh_frequency</fieldname>
 			<fielddescr>Refresh frequency</fielddescr>
