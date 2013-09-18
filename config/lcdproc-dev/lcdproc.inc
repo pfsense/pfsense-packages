@@ -81,6 +81,7 @@
 				case "lpt1":
 				case "ugen0.2":
 				case "ugen1.2":
+				case "ugen1.3";
 				case "ugen2.2":
 					continue;
 					break;
@@ -176,6 +177,9 @@
 					break;
 				case "ugen1.2":
 					$realport = "/dev/ugen1.2";
+					break;
+				case "ugen1.3":
+					$realport = "/dev/ugen1.3";
 					break;
 				case "ugen2.2":
 					$realport = "/dev/ugen2.2";
@@ -303,9 +307,11 @@
 				case "hd44780":
 					$config_text .= "[{$lcdproc_config['driver']}]\n";
 					$config_text .= "driverpath=/usr/local/lib/lcdproc/\n";
-					$config_text .= "ConnectionType=lcd2usb\n";
+					$config_text .= "ConnectionType={$lcdproc_config['connection_type']}\n";
+					$config_text .= "Device={$realport}\n";
+					$config_text .= "Port=0x378\n"; 
 					$config_text .= "Speed=0\n";
-					$config_text .= "Keypad=no\n";
+					$config_text .= "Keypad=yes\n";
 					$config_text .= set_lcd_value("contrast", 1000, 850);
 					$config_text .= set_lcd_value("brightness", 1000, 800);
 					$config_text .= set_lcd_value("offbrightness", 1000, 0);
@@ -315,6 +321,16 @@
 					$config_text .= "DelayMult=1\n";
 					$config_text .= "DelayBus=true\n";
 					$config_text .= "Size={$lcdproc_config['size']}\n";
+					if ($lcdproc_config[connection_type] == "winamp")
+					{
+					    $config_text .= "KeyDirect_1=Enter\n";
+					    $config_text .= "KeyDirect_2=Up\n";
+					    $config_text .= "KeyDirect_3=Down\n";
+					    $config_text .= "KeyDirect_4=Escape\n";
+					}
+					else
+					{
+					}
 					break;
 				case "icp_a106":
 					$config_text .= "[{$lcdproc_config['driver']}]\n";
