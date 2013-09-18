@@ -321,7 +321,7 @@ function sync_package_dansguardian($via_rpc="no",$install_process=false) {
 	
 	#contentscanners preg_replace patterns
 	$match[0]="/(conf)/";
-	$match[1]="/(\/usr.local)/";
+	$match[1]="/\/usr.local|".str_replace("/","\\/",DANSGUARDIAN_DIR)."/";
 	$match[2]="/,/";
 	$replace[0]="$1'";
 	$replace[1]="contentscanner = '".DANSGUARDIAN_DIR;
@@ -331,7 +331,7 @@ function sync_package_dansguardian($via_rpc="no",$install_process=false) {
 	
 	#includes preg_replace patterns
 	$match[0]="/(.)$/";
-	$match[1]="/\/usr.local/";
+	$match[1]="/\/usr.local|".str_replace("/","\\/",DANSGUARDIAN_DIR)."/";
 	$match[2]="/,/";
 	$replace[0]="$1>\n";
 	$replace[1]="\n.Include<".DANSGUARDIAN_DIR;
