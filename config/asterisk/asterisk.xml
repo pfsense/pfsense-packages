@@ -41,7 +41,7 @@
     <requirements>Asterisk 1.8.x</requirements>
     <faq>Currently there are no FAQ items provided.</faq>
 	<name>asterisk</name>
-	<version>0.1</version>
+	<version>0.2</version>
 	<title>asterisk</title>
 	<include_file>/usr/local/pkg/asterisk.inc</include_file>
 	<additional_files_needed>
