@@ -319,7 +319,6 @@ function sync_package_asterisk() {
 		file_put_contents($script, $add_sip_general_settings, LOCK_EX);
         }
 
-
 	$script='/usr/local/etc/rc.d/asterisk';
 	if (file_exists($script)){
 		$script_file=file_get_contents($script);
@@ -343,6 +342,25 @@ function sync_package_asterisk() {
 		mwexec("$script stop");			
 		mwexec_bg("$script start");
 	}
+
+	//for NanoBSD compatibility, move the /etc/asterisk configuration directory to /conf, and symlink it back
+
+	if (file_exists("/usr/pbi/asterisk-i386/etc/asterisk/")) {
+	//this should occur only on i386 systems v2.1 and up
+		rename("/usr/pbi/asterisk-i386/etc/asterisk", "/conf/asterisk");
+		symlink("/conf/asterisk", "/usr/pbi/asterisk-i386/etc/asterisk");	
+	}
+	if (file_exists("/usr/pbi/asterisk-amd64/etc/asterisk/")) {
+	//this should occur only on amd64 systems v2.1 and up
+		rename("/usr/pbi/asterisk-amd64/etc/asterisk", "/conf/asterisk");
+		symlink("/conf/asterisk", "/usr/pbi/asterisk-amd64/etc/asterisk");
+	}
+	if (file_exists("/usr/local/etc/asterisk/")) {
+	//this should occur on all systems v2.0
+		rename("/usr/local/etc/asterisk", "/usr/local/etc/asterisk.orig");
+	}
+	symlink("/conf/asterisk", "/usr/local/etc/asterisk");	
+	
 	#mount filesystem readonly
 	conf_mount_ro();
 	
