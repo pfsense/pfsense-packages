@@ -51,9 +51,24 @@ function sync_package_asterisk() {
 	#mount filesystem writeable
 	conf_mount_rw();
 	
+	//for NanoBSD compatibility, move the /etc/asterisk configuration directory to /conf, and symlink it back
+
+	if (file_exists("/usr/pbi/asterisk-i386/etc/asterisk/")) {
+	//this should occur only on i386 systems v2.1 and up
+		system("mv -f /usr/pbi/asterisk-i386/etc/asterisk/ /conf/asterisk/ && ln -s /conf/asterisk /usr/pbi/asterisk-i386/etc/asterisk");
+	}
+	if (file_exists("/usr/pbi/asterisk-amd64/etc/asterisk/")) {
+	//this should occur only on amd64 systems v2.1 and up
+		system("mv -f /usr/pbi/asterisk-amd64/etc/asterisk/ /conf/asterisk/ && ln -s /conf/asterisk /usr/pbi/asterisk-amd64/etc/asterisk");
+	}
+	if (file_exists("/usr/local/etc/asterisk/")) {
+	//this should occur on all systems v2.0 and up
+		system("mv -f /usr/local/etc/asterisk /usr/local/etc/asterisk.bak && ln -s /conf/asterisk /usr/local/etc/asterisk");
+	}
+	
 	//fix asterisk options for nanobsd: logging, db and calls log in /tmp
 	if ($g['platform'] == "nanobsd"){
-		$script='/usr/local/etc/asterisk/logger.conf';
+		$script='/conf/asterisk/logger.conf';
 		if (file_exists($script)){
 			$script_file=file_get_contents($script);
 			$pattern[0]='/messages =/';
@@ -62,7 +77,7 @@ function sync_package_asterisk() {
 			file_put_contents($script, $script_file, LOCK_EX);
 		}
 		
-		$script='/usr/local/etc/asterisk/asterisk.conf';
+		$script='/conf/asterisk/asterisk.conf';
 		if (file_exists($script)){
 			$script_file=file_get_contents($script);
 			$pattern[0]='@astdbdir => [a-z,A-Z,/]+@';
@@ -75,7 +90,7 @@ function sync_package_asterisk() {
 	}
 
 	//add modules settings, for disabling those not required on pfSense	
-        $script='/usr/local/etc/asterisk/modules.conf';
+        $script='/conf/asterisk/modules.conf';
 		if (file_exists($script)){
 			$add_modules_settings = "\n";
 			$add_modules_settings .= "noload => res_ael_share.so\n";
@@ -288,12 +303,11 @@ function sync_package_asterisk() {
 
             $script_file=file_get_contents($script);
             $script_file .= $add_modules_settings;
-            file_put_contents($script, $script_file, LOCK_EX);
+            file_put_contents($script, $script_file, FILE_APPEND);
         }
 
 	//replace general SIP settings as a newbie hint to start configuration
-        $script='/usr/local/etc/asterisk/sip.conf';
-        if (file_exists($script)){
+		$script='/conf/asterisk/sip.conf';
 		$add_sip_general_settings = "[general]\n";
 		$add_sip_general_settings .= ";The following general settings usually work on pfSense boxes.\n";
 		$add_sip_general_settings .= ";Adjust them as needed, and further SIP account settings are required.\n";
@@ -317,7 +331,7 @@ function sync_package_asterisk() {
 		$add_sip_general_settings .= "allow=alaw\n";
 
 		file_put_contents($script, $add_sip_general_settings, LOCK_EX);
-        }
+
 
 	$script='/usr/local/etc/rc.d/asterisk';
 	if (file_exists($script)){
@@ -335,7 +349,7 @@ function sync_package_asterisk() {
 			$add_logfolder_and_callogdir .= "  ln -s /tmp /var/log/asterisk/cdr-csv\n";
 			$add_logfolder_and_callogdir .= "fi\n";
 			
-			$script_file .= add_logfolder_and_callogdir;
+			$script_file .= $add_logfolder_and_callogdir;
 			file_put_contents($script, $script_file, LOCK_EX);
 		}
 		chmod ($script,0755);
@@ -343,23 +357,7 @@ function sync_package_asterisk() {
 		mwexec_bg("$script start");
 	}
 
-	//for NanoBSD compatibility, move the /etc/asterisk configuration directory to /conf, and symlink it back
 
-	if (file_exists("/usr/pbi/asterisk-i386/etc/asterisk/")) {
-	//this should occur only on i386 systems v2.1 and up
-		rename("/usr/pbi/asterisk-i386/etc/asterisk", "/conf/asterisk");
-		symlink("/conf/asterisk", "/usr/pbi/asterisk-i386/etc/asterisk");	
-	}
-	if (file_exists("/usr/pbi/asterisk-amd64/etc/asterisk/")) {
-	//this should occur only on amd64 systems v2.1 and up
-		rename("/usr/pbi/asterisk-amd64/etc/asterisk", "/conf/asterisk");
-		symlink("/conf/asterisk", "/usr/pbi/asterisk-amd64/etc/asterisk");
-	}
-	if (file_exists("/usr/local/etc/asterisk/")) {
-	//this should occur on all systems v2.0
-		rename("/usr/local/etc/asterisk", "/usr/local/etc/asterisk.orig");
-	}
-	symlink("/conf/asterisk", "/usr/local/etc/asterisk");	
 	
 	#mount filesystem readonly
 	conf_mount_ro();
