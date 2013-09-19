@@ -2,7 +2,7 @@
 /*
 	edit.php
 	Copyright (C) 2004, 2005 Scott Ullrich
-	Copyright (C) 2012 robreg@zsurob.hu
+	Copyright (C) 2013 robi <robreg@zsurob.hu>
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
@@ -34,11 +34,75 @@
 ##|*IDENT=page-status-asterisk
 ##|*NAME=Status: Asterisk config editor page
 ##|*DESCR=Allow access to the 'Status: Asterisk configuration files' page.
-##|*MATCH=status_asterisk_edit.php*
+##|*MATCH=asterisk_edit_file.php*
 ##|-PRIV
 
 $pgtitle = array(gettext("Status"),gettext("Asterisk configuration files"));
 require("guiconfig.inc");
+
+
+$backup_dir = "/conf";
+$backup_filename = "asterisk_config.bak.tgz";
+$backup_path = "{$backup_dir}/{$backup_filename}";
+$files_dir = "/conf/asterisk";
+$host = "{$config['system']['hostname']}.{$config['system']['domain']}";
+$downname = "asterisk-config-{$host}-".date("YmdHis").".bak.tgz";  //put the date in the filename
+
+if (($_GET['a'] == "download") && $_GET['t'] == "backup") {
+	conf_mount_rw();
+	system("cd {$files_dir} && tar czf {$backup_path} *");
+	conf_mount_ro();
+}
+
+if (($_GET['a'] == "download") && file_exists("{$backup_path}")) {
+	session_cache_limiter('public');
+	$fd = fopen("{$backup_path}", "rb");
+	header("Content-Type: application/force-download");
+	header("Content-Type: application/octet-stream");
+	header("Content-Type: application/download");
+	header("Content-Description: File Transfer");
+	header("Content-Disposition: attachment; filename=\"{$downname}\"");
+	header("Cache-Control: no-cache, must-revalidate"); // HTTP/1.1
+	header("Expires: Sat, 26 Jul 1997 05:00:00 GMT"); // Date in the past
+	header("Content-Length: " . filesize("{$backup_path}"));
+	fpassthru($fd);
+	exit;
+}
+
+if ($_GET['a'] == "other") {
+	if ($_GET['t'] == "restore") {
+		//extract files to $files_dir (/conf/asterisk)
+		if (file_exists($backup_path)) {
+			//echo "The file $filename exists";
+			conf_mount_rw();
+			//$sysretval = system("tar -xzC {$files_dir} -f {$backup_path} 2>&1");
+			exec("tar -xzC {$files_dir} -f {$backup_path} 2>&1", $sysretval);
+			$savemsg = "Backup has been restored " . $sysretval[1];
+			//$savemsg = "Backup has been restored " . $sysretval;
+			system("chmod -R 644 {$files_dir}/*");
+			header( 'Location: asterisk_edit_file.php?savemsg=' . $savemsg ) ;
+			conf_mount_ro();
+		} else {
+			header( 'Location: asterisk_edit_file.php?savemsg=Restore+failed.+Backup+file+not+found.' ) ;
+		}
+		exit;
+	}
+}
+
+if (($_POST['submit'] == "Upload") && is_uploaded_file($_FILES['ulfile']['tmp_name'])) {
+	$upfilnam = $_FILES['ulfile']['name'];
+	$upfiltim = strtotime(str_replace(".bak.tgz","",end(explode("-",$upfilnam))));
+	conf_mount_rw();
+	move_uploaded_file($_FILES['ulfile']['tmp_name'], "{$backup_path}");
+	$savemsg = "Uploaded ". htmlentities($_FILES['ulfile']['name']) . " file as " . $backup_path . "." ;
+	system('chmod -R 644 {$backup_path}');
+	if ($upfiltim) {		//take the date from the filename and update modified time accordingly
+		touch($backup_path, $upfiltim);
+	}
+	unset($_POST['txtCommand']);
+	conf_mount_ro();
+	header( 'Location: asterisk_edit_file.php?savemsg=' . $savemsg ) ;
+}
 
 if($_REQUEST['action']) {
 	switch($_REQUEST['action']) {
@@ -92,6 +156,13 @@ outputJavaScriptFileInline("javascript/base64.js");
 
 <body link="#000000" vlink="#000000" alink="#000000">
 <?php include("fbegin.inc"); ?>
+
+<?php
+$savemsg = $_GET["savemsg"];
+if ($savemsg) {
+  print_info_box($savemsg);
+}
+?>
 
 <script type="text/javascript">	
 	function loadFile() {
@@ -170,13 +241,50 @@ outputJavaScriptFileInline("javascript/base64.js");
 			<td>
 				<div id="mainarea">
 
-					<!-- file status box -->
-					<div style="display:none; background:#eeeeee;" id="fileStatusBox">
+					<!-- backup options -->
+					<div style="background:#eeeeee;">
 						<div class="vexpl" style="padding-left:15px;">
-							<strong id="fileStatus"></strong>
+						
+						<table width='98%' cellpadding='0' cellspacing='0' border='0'>
+						<tr>
+						<td width='80%'><br />
+						<b>Backup / Restore</b><br />
+						The 'Backup' button will tar gzip asterisk configuration files to <? echo $backup_path; ?> it then offers it to download.<br>
+						The 'Restore' button will be visible only if the <? echo $backup_path; ?> backup file exists.<br>
+						You can upload a backup file to the system, if one already exists at <? echo $backup_path; ?>, it will be overwritten.
+						<br />
+						</td>
+						<td width='20%' valign='middle' align='right'>
+						<?php
+						echo "  <input type='button' value='Backup' onclick=\"document.location.href='asterisk_edit_file.php?a=download&t=backup';\" />\n";
+						if (file_exists($backup_path)) {
+							echo "  <input type='button' value='Restore' onclick=\"document.location.href='asterisk_edit_file.php?a=other&t=restore';\" />\n";
+						}
+						?>
+						</td>
+						</tr></table><br>
+						<table width='98%' cellpadding='0' cellspacing='0' border='0'>
+						<tr>
+						<td width='20%' valign='middle' align='left'>
+						<?php
+						if (file_exists($backup_path)) {
+							echo $backup_filename . " date:<br>" . date ("Y F d H:i:s.", filemtime($backup_path));
+						}
+						?>
+						</td>
+						<td width='80%' valign='middle' align='right'>
+						<form action="asterisk_edit_file.php" method="POST" enctype="multipart/form-data" name="frmUpload" onSubmit="">
+						Upload backup file:
+						<input name="ulfile" type="file" class="button" id="ulfile">
+						<input name="submit" type="submit"  class="button" id="upload" value="Upload">
+						</form>
+						</td>
+						</tr>
+						</table><br />					
 						</div>
 					</div>
-									
+
+
 									
 					<table width="100%" border="0" cellpadding="0" cellspacing="0">
 						<tr>
@@ -186,8 +294,8 @@ outputJavaScriptFileInline("javascript/base64.js");
 					<table width="100%" cellpadding="9" cellspacing="9">
 						<tr>
 							<td align="center" class="list">
-								<?=gettext("Save / Load from path"); ?>:
-								<input type="text"   class="formfld file" id="fbTarget"         value="<?=gettext('/usr/local/etc/asterisk');?>" size="45" />
+								<?=gettext("Configuration files stored in"); ?>:
+								<input type="text"   class="formfld file" id="fbTarget"         value="<?=gettext($files_dir);?>" size="45" />
 								<input type="button" class="formbtn"      id="fbOpen"           value="<?=gettext('Browse');?>" />
 					<!--			<input type="button" class="formbtn"      onclick="loadFile();" value="<?=gettext('Load');?>" /> -->
 								<input type="button" class="formbtn"      onclick="saveFile();" value="<?=gettext('Save');?>" />
@@ -196,6 +304,16 @@ outputJavaScriptFileInline("javascript/base64.js");
 						</tr>
 					</table>
 
+					
+					
+					<!-- file status box -->
+					<div style="display:none; background:#eeeeee;" id="fileStatusBox">
+						<div class="vexpl" style="padding-left:15px;">
+							<strong id="fileStatus"></strong>
+						</div>
+					</div>
+					
+					
 					<!-- filebrowser -->
 					<div id="fbBrowser" style="display:none; border:1px dashed gray; width:98%;"></div>
 
@@ -241,6 +359,16 @@ outputJavaScriptFileInline("javascript/base64.js");
 		</tr>
 	</table>
 
+<p/>
+
+<span class="vexpl">
+	<span class="red">
+		<strong><?=gettext("Note:");?><br /></strong>
+	</span>
+	<?=gettext("Please back up your Asterisk configuration regularly.");?><br>
+	<?=gettext("It's worth to preserve the automatically generated filename of the downloaded backup file. It contains the backup creation date, which is used when uploading it back to the system.");?>
+</span>
+	
 <?php include("fend.inc"); ?>
 </body>
 </html>
