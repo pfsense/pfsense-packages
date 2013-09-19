@@ -56,7 +56,7 @@ function sync_package_asterisk() {
 		if (file_exists($script)){
 			$script_file=file_get_contents($script);
 			$pattern[0]='/messages =/';
-			$replace[0]='/tmp/log_asterisk =';
+			$replace[0]='/tmp/asterisk.log =';
 			$script_file=preg_replace($pattern,$replace,$script_file);
 			file_put_contents($script, $script_file, LOCK_EX);
 		}
