@@ -4,7 +4,7 @@
 	sarg.inc
     part of pfSense (http://www.pfSense.com)
 	Copyright (C) 2007 Joao Henrique F. Freitas
-    Copyright (C) 2012 Marcello Coutinho
+    Copyright (C) 2012-2013 Marcello Coutinho
     All rights reserved.
                                                                               */
 /* ========================================================================== */
@@ -34,11 +34,13 @@
 $pf_version=substr(trim(file_get_contents("/etc/version")),0,3);
 if ($pf_version > 2.0){
         define('SARG_DIR', '/usr/pbi/sarg-' . php_uname("m"));
+        define('SQGARD_DIR','/usr/pbi/squidguard-' . php_uname("m"));
         define('SQUID_DIR', '/usr/pbi/squid-' . php_uname("m"));
         define('DANSG_DIR', '/usr/pbi/dansguardian-' . php_uname("m"));
 	}
 else{
   define('SARG_DIR', '/usr/local');
+  define('SQGARD_DIR', '/usr/local');
   define('SQUID_DIR', '/usr/local');
   define('DANSG_DIR', '/usr/local');
 }
@@ -50,7 +52,7 @@ if ($uname['machine']=='amd64')
 // STATIC VARS
 $sarg_proxy=array(	'squid_rc'=> SQUID_DIR . '/etc/rc.d/squid.sh',
 					'squid_config'=> '/var/squid/logs/access.log',
-					'squidguard_config'=> SARG_DIR . '/etc/squidGuard/squidGuard.conf',
+					'squidguard_config'=> SQGARD_DIR . '/etc/squidGuard/squidGuard.conf',
 					'squidguard_block_log'=>'/var/squidGuard/log/block.log',
 					'dansguardian_config'=> DANSG_DIR . '/etc/dansguardian/dansguardian.conf',
 					'dansguardian_log'=>'/var/log/dansguardian/access.log');
@@ -258,7 +260,7 @@ function sync_package_sarg() {
 	$bytes_in_sites_users_report=(preg_match('/bytes_in_sites_users_report/',$sarg['report_options'])?"yes":"no");
 	$date_time_by=(preg_match('/date_time_by_bytes/',$sarg['report_options'])?"bytes":"");
 	$date_time_by.=(preg_match('/date_time_by_elap/',$sarg['report_options'])?" elap":"");
-	$date_format=(empty($sarg['report_date_format'])?"u":$sarg['report_date_format']);
+	$date_format=(preg_match("/\w/",$sarg['report_date_format'])?$sarg['report_date_format']:"u");
 	$report_type=preg_replace('/,/',' ',$sarg['report_type']);
 	$report_charset=(empty($sarg['report_charset'])?"UTF-8":$sarg['report_charset']);
 	$exclude_string=(empty($sarg['exclude_string'])?"":'exclude_string "'.$sarg['exclude_string'].'"');
