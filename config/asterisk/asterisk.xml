@@ -98,6 +98,6 @@
 	<custom_delete_php_command>
 	</custom_delete_php_command>	
 	<custom_php_resync_config_command>
-		sync_package_asterisk();
+/*		sync_package_asterisk(); */
 	</custom_php_resync_config_command>
 </packagegui>
