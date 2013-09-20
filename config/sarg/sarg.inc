@@ -291,6 +291,7 @@ function sync_package_sarg() {
 		file_put_contents( SARG_DIR . '/etc/sarg/usertab.conf', sarg_text_area_decode($sarguser['usertab']),LOCK_EX);
 		}
 	if($sarguser['ldap_enable']){
+		$usertab="ldap";
 		$LDAPHost=(empty($sarguser['ldap_host'])?"":"LDAPHost ".$sarguser['ldap_host']);
 		$LDAPort=(empty($sarguser['ldap_port'])?"":"LDAPPort ".$sarguser['ldap_port']);
 		$LDAPBindDN=(empty($sarguser['ldap_bind_dn'])?"":"LDAPBindDN ".$sarguser['ldap_bind_dn']);

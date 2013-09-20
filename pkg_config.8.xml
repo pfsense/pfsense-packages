@@ -715,12 +715,12 @@
 		<depends_on_package>sarg-2.3.6.tbz</depends_on_package>
 		<depends_on_package>gd-2.0.35_8,1.tbz</depends_on_package>
 		<depends_on_package_pbi>sarg-2.3.6-i386.pbi</depends_on_package_pbi>
-		<version>2.3.6 pkg v.0.6.2</version>
+		<version>2.3.6 pkg v.0.6.3</version>
 		<status>Release</status>
 		<required_version>2.0</required_version>
 		<configurationfile>sarg.xml</configurationfile>
 		<build_port_path>/usr/ports/www/sarg</build_port_path>
-		<build_options>sarg_UNSET=GD PHP</build_options>
+		<build_options>sarg_UNSET=PHP</build_options>
 		<after_install_info>Please visit sarg settings on Status Menu to configure sarg.</after_install_info>
 	</package>
 	<package>
