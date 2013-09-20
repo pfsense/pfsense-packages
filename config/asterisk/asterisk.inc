@@ -4,7 +4,7 @@
 	asterisk.inc
     part of pfSense (http://www.pfSense.com)
     Copyright (C) 2012 Marcello Coutinho
-	Copyright (C) 2013 robi <robreg@zsurob.hu>
+    Copyright (C) 2013 robi <robreg@zsurob.hu>
     All rights reserved.
                                                                               */
 /* ========================================================================== */
@@ -61,9 +61,13 @@ function sync_package_asterisk() {
 	//this should occur only on amd64 systems v2.1 and up
 		system("mv -f /usr/pbi/asterisk-amd64/etc/asterisk/ /conf/asterisk/ && ln -s /conf/asterisk /usr/pbi/asterisk-amd64/etc/asterisk");
 	}
-	if (file_exists("/usr/local/etc/asterisk/")) {
+	if (file_exists("/conf/asterisk/")) {
 	//this should occur on all systems v2.0 and up
-		system("mv -f /usr/local/etc/asterisk /usr/local/etc/asterisk.bak && ln -s /conf/asterisk /usr/local/etc/asterisk");
+		if (file_exists("/usr/local/etc/asterisk/")) {
+			system("mv -f /usr/local/etc/asterisk /usr/local/etc/asterisk.bak");
+		}
+		system("ln -s /conf/asterisk /usr/local/etc/asterisk");
+		system("cd /conf/asterisk && mkdir dist && mv *-dist dist");
 	}
 	
 	//fix asterisk options for nanobsd: logging, db and calls log in /tmp
@@ -93,6 +97,9 @@ function sync_package_asterisk() {
         $script='/conf/asterisk/modules.conf';
 		if (file_exists($script)){
 			$add_modules_settings = "\n";
+			$add_modules_settings .= ";The following modules settings work out of the box on pfSense boxes.\n";
+			$add_modules_settings .= ";Should you need any disabled module, check for its functionality individually.\n";
+			$add_modules_settings .= ";For more information check asterisk's online documentation.\n";
 			$add_modules_settings .= "noload => res_ael_share.so\n";
 			$add_modules_settings .= "noload => res_adsi.so\n";
 			$add_modules_settings .= ";noload => res_agi.so\n";
@@ -227,10 +234,11 @@ function sync_package_asterisk() {
 			$add_modules_settings .= "noload => cel_sqlite3_custom.so\n";
 			$add_modules_settings .= "noload => cel_tds.so\n";
 			$add_modules_settings .= ";noload => chan_agent.so\n";
+			$add_modules_settings .= "noload => chan_dahdi.so\n";
 			$add_modules_settings .= "noload => chan_gtalk.so\n";
 			$add_modules_settings .= "noload => chan_iax2.so\n";
 			$add_modules_settings .= ";noload => chan_local.so\n";
-			$add_modules_settings .= ";noload => chan_mgcp.so\n";
+			$add_modules_settings .= "noload => chan_mgcp.so\n";
 			$add_modules_settings .= ";noload => chan_multicast_rtp.so\n";
 			$add_modules_settings .= "noload => chan_oss.so\n";
 			$add_modules_settings .= ";noload => chan_sip.so\n";
@@ -238,6 +246,7 @@ function sync_package_asterisk() {
 			$add_modules_settings .= ";noload => codec_a_mu.so\n";
 			$add_modules_settings .= ";noload => codec_adpcm.so\n";
 			$add_modules_settings .= ";noload => codec_alaw.so\n";
+			$add_modules_settings .= "noload => codec_dahdi.so\n";
 			$add_modules_settings .= ";noload => codec_g726.so\n";
 			$add_modules_settings .= ";noload => codec_gsm.so\n";
 			$add_modules_settings .= ";noload => codec_lpc10.so\n";
@@ -284,7 +293,7 @@ function sync_package_asterisk() {
 			$add_modules_settings .= ";noload => func_uri.so\n";
 			$add_modules_settings .= "noload => pbx_ael.so\n";
 			$add_modules_settings .= ";noload => pbx_config.so\n";
-			$add_modules_settings .= ";noload => pbx_dundi.so\n";
+			$add_modules_settings .= "noload => pbx_dundi.so\n";
 			$add_modules_settings .= ";noload => pbx_loopback.so\n";
 			$add_modules_settings .= ";noload => pbx_realtime.so\n";
 			$add_modules_settings .= ";noload => pbx_spool.so\n";
@@ -303,7 +312,7 @@ function sync_package_asterisk() {
 
             $script_file=file_get_contents($script);
             $script_file .= $add_modules_settings;
-            file_put_contents($script, $script_file, FILE_APPEND);
+            file_put_contents($script, $script_file, LOCK_EX);
         }
 
 	//replace general SIP settings as a newbie hint to start configuration
@@ -311,7 +320,7 @@ function sync_package_asterisk() {
 		$add_sip_general_settings = "[general]\n";
 		$add_sip_general_settings .= ";The following general settings usually work on pfSense boxes.\n";
 		$add_sip_general_settings .= ";Adjust them as needed, and further SIP account settings are required.\n";
-		$add_sip_general_settings .= ";For more information check asterisk's online documentation or see the sip.conf-dist file.\n";
+		$add_sip_general_settings .= ";For more information check asterisk's online documentation or see the dist/sip.conf-dist file.\n";
 		$add_sip_general_settings .= "alwaysauthreject=yes\n";
 		$add_sip_general_settings .= "maxexpiry=600\n";
 		$add_sip_general_settings .= "defaultexpiry=100\n";
@@ -319,10 +328,10 @@ function sync_package_asterisk() {
 		$add_sip_general_settings .= "registertimeout=15\n";
 		$add_sip_general_settings .= "allowguest = no\n";
 		$add_sip_general_settings .= "bindport=5060\n";
-		$add_sip_general_settings .= "bindaddr=0.0.0.0 ;with this you don't need to setup any firewall rules at all\n";
+		$add_sip_general_settings .= "bindaddr=192.168.1.1 ;adjust this to your local network interface where to bind\n";
 		$add_sip_general_settings .= ";localnet=192.168.1.0/255.255.255.0 ;adjust this to your local networks where SIP phoners reside\n";
 		$add_sip_general_settings .= ";localnet=192.168.2.0/255.255.255.0 ;add a new line for each local network if you have more\n";
-		$add_sip_general_settings .= ";externhost=your.domain.name ;can be dyndns too\n";
+		$add_sip_general_settings .= ";externhost=your.domain.name ;can be dynamic dns too\n";
 		$add_sip_general_settings .= ";externrefresh=600 ;how ofteh to check for doman name's IP\n";
 		$add_sip_general_settings .= "jbenable=yes\n";
 		$add_sip_general_settings .= "disallow=all\n";
@@ -332,7 +341,6 @@ function sync_package_asterisk() {
 
 		file_put_contents($script, $add_sip_general_settings, LOCK_EX);
 
-
 	$script='/usr/local/etc/rc.d/asterisk';
 	if (file_exists($script)){
 		$script_file=file_get_contents($script);
@@ -341,6 +349,7 @@ function sync_package_asterisk() {
 			file_put_contents($script, $script_file, LOCK_EX);
 			}
 		if ($g['platform'] == "nanobsd"){
+			$add_logfolder_and_callogdir .= "\n";
 			$add_logfolder_and_callogdir = "if [ ! -d /var/log/asterisk ]; then\n";
 			$add_logfolder_and_callogdir .= "  mkdir /var/log/asterisk\n";
 			$add_logfolder_and_callogdir .= "fi\n";
@@ -356,12 +365,9 @@ function sync_package_asterisk() {
 		mwexec("$script stop");			
 		mwexec_bg("$script start");
 	}
-
-
 	
 	#mount filesystem readonly
 	conf_mount_ro();
-	
 }
 
 ?>
