@@ -62,12 +62,14 @@ function sync_package_asterisk() {
 		system("mv -f /usr/pbi/asterisk-amd64/etc/asterisk/ /conf/asterisk/ && ln -s /conf/asterisk /usr/pbi/asterisk-amd64/etc/asterisk");
 	}
 	if (file_exists("/conf/asterisk/")) {
-	//this should occur on all systems v2.0 and up
 		if (file_exists("/usr/local/etc/asterisk/")) {
 			system("mv -f /usr/local/etc/asterisk /usr/local/etc/asterisk.bak");
 		}
 		system("ln -s /conf/asterisk /usr/local/etc/asterisk");
 		system("cd /conf/asterisk && mkdir dist && mv *-dist dist");
+	} else {
+	//should reach here only on non-pbi installs (2.0.x)
+		system("mv -f /usr/local/etc/asterisk/ /conf/asterisk/ && ln -s /conf/asterisk /usr/local/etc/asterisk");
 	}
 	
 	//fix asterisk options for nanobsd: logging, db and calls log in /tmp
@@ -366,7 +368,10 @@ function sync_package_asterisk() {
 		mwexec_bg("$script start");
 	}
 	
-	#mount filesystem readonly
+	//prepare backup for factory defaults
+	system("cd /conf/asterisk/ && tar czf /conf.default/asterisk_factory_defaults_config.tgz *");
+	
+	//mount filesystem readonly
 	conf_mount_ro();
 }
 
