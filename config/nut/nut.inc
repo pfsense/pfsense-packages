@@ -288,24 +288,30 @@ EOD;
 
 		$stop = <<<EOD
 	if [ `pgrep upsmon | wc -l` != 0 ]; then
-		echo stopping upsmon
+		echo "Stopping upsmon"
 		/usr/bin/killall upsmon
+
 		while [ `pgrep upsmon | wc -l` != 0 ]; do
 			sleep 1
 		done
 	fi
+
 	if [ `pgrep upsd | wc -l` != 0 ]; then
-		echo stopping upsd
+		echo "Stopping upsd"
 		/usr/bin/killall upsd
 	fi
+
 	if [ `pgrep {$driver} | wc -l` != 0 ]; then
-		echo stopping {$driver}
+		echo "Stopping {$driver}"
 		/usr/local/libexec/nut/upsdrvctl stop
 	fi
+
 	sleep 1
+
 	if [ `pgrep {$driver} | wc -l` != 0 ]; then
-		echo forcing {$driver} termination
+		echo "Forcing {$driver} termination"
 		/usr/bin/killall {$driver}
+
 		while [ `pgrep {$driver} | wc -l` != 0 ]; do
 			sleep 1
 		done
@@ -314,19 +320,21 @@ EOD;
 EOD;
 
 		$start = <<<EOD
-if [ `pgrep {$driver} | wc -l` != 0 ]; then
-	{$stop}
+	if [ `pgrep {$driver} | wc -l` != 0 ]; then
+		{$stop}
 	fi
+
 	{$port_set}
-	echo starting {$driver}
-	if /usr/local/libexec/nut/upsdrvctl start; then
-		echo starting upsd
-		/usr/local/sbin/upsd {$ovr_user}
-		echo starting upsmon
-		/usr/local/sbin/upsmon {$name}@localhost
-	else
-		echo {$driver} failed to start
-	fi
+
+	echo "Starting {$driver}"
+	/usr/local/libexec/nut/upsdrvctl start;
+
+	echo "Starting upsd"
+	/usr/local/sbin/upsd {$ovr_user}
+
+	echo "Starting upsmon"
+	/usr/local/sbin/upsmon {$name}@localhost
+
 EOD;
 
 		/* write out configuration */
