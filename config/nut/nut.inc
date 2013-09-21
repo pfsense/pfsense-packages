@@ -54,15 +54,15 @@
 		if($config['installedpackages']['nut']['config'][0]["{$name}"])
 			return $config['installedpackages']['nut']['config'][0]["{$name}"];
 		return null;
-	}	
+	}
 
 	function nut_config_sub ($name,$len) {
 		global $config;
 		if(nut_config($name))
 			return substr(nut_config($name),0,strlen(nut_config($name))-$len);
 		return null;
-	}	
-	
+	}
+
 	function nut_write_config($file, $text, $mask = null, $uid = null) {
 		$conf = fopen($file, "w");
 		if(!$conf) {
@@ -76,7 +76,7 @@
 	}
 
 	function nut_validate_ip($ip,$check_cdir) {
-		/* validate cdir */	
+		/* validate cdir */
 		if($check_cdir)	{
 			$ip_array = explode("/",$ip);
 			if(count($ip_array) == 2) {
@@ -96,10 +96,10 @@
 				return false;
 		return true;
 	}
-	
+
 	function before_form_nut($pkg) {
 		/* return available serial ports */
-		
+
 		$serial_types = array("sio", "cua", "tty");
 		$ignore_files = array(".lock", ".init");
 
@@ -128,8 +128,8 @@
 			if ($field['fieldname'] == 'port')
 				break;
 			$i++;
-		}	
-		$field = &$pkg['fields']['field'][$i];	
+		}
+		$field = &$pkg['fields']['field'][$i];
 
 		/* add available serial ports */
 		for ($i = 0; $i < count($values) ; $i++)
@@ -144,7 +144,7 @@
 			if(!$post['remotename'])
 				$input_errors[] = 'You must specify a name in the \'Remote UPS Name\' field';
 			if($post['remotename'] && !eregi('^[a-z0-9_.-]+$', $post['remotename']))
-				$input_errors[] = 'Only [Aa-Zz], [0-9], and [-_] accepted in the \'Remote UPS Name\' field';		
+				$input_errors[] = 'Only [Aa-Zz], [0-9], and [-_] accepted in the \'Remote UPS Name\' field';
 			if(!$post['remoteaddr'] || !nut_validate_ip($post['remoteaddr'],false))
 				$input_errors[] = 'You must specify a valid address \'Remote UPS Address\' field';
 			if(!$post['remoteuser'])
@@ -158,7 +158,7 @@
 			if(!$post['name'])
 				$input_errors[] = 'You must specify a name in the \'Local UPS Name\' field';
 			if($post['name'] && !eregi('^[a-z0-9_.-]+$', $post['name']))
-				$input_errors[] = 'Only [Aa-Zz], [0-9], and [-_] accepted in the \'Local UPS Name\' field';			
+				$input_errors[] = 'Only [Aa-Zz], [0-9], and [-_] accepted in the \'Local UPS Name\' field';
 			if(!$post['driver'])
 				$input_errors[] = 'You must select a driver in the \'Local UPS Driver\' field';
 			if(!$post['port'])
@@ -176,7 +176,7 @@
 		@unlink(NUT_DIR.'/upsd.users');
 
 		exec('rm -rf /var/db/nut');
-	}	
+	}
 
 	function sync_package_nut_remote() {
 		$remotename = nut_config('remotename');
@@ -195,16 +195,16 @@ MINSUPPLIES 1
 SHUTDOWNCMD "/sbin/shutdown {$shutdownflag} +0"
 POWERDOWNFLAG /etc/killpower
 EOD;
-	
+
 		$stop = <<<EOD
 if [ `pgrep upsmon | wc -l` != 0 ]; then
 		/usr/bin/killall upsmon
-		while [ `pgrep upsmon | wc -l` != 0 ]; do 
+		while [ `pgrep upsmon | wc -l` != 0 ]; do
 			sleep 1
 		done
 	fi
 EOD;
-	
+
 		$start = $stop."\n\t/usr/local/sbin/upsmon {$remotename}@{$remoteaddr}\n";
 
 		/* write out configuration */
@@ -215,7 +215,7 @@ EOD;
 	    	'start' => $start,
 	    	'stop' => $stop
 	   		)
-		);	
+		);
 		conf_mount_ro();
 
 		return true;
@@ -488,7 +488,7 @@ EOD;
 		if($return && $_POST['monitor']) {
 			/* only start if changing settings as we have a startup script for system boot */
 			/* this prevents service from starting / stopping / starting on boot */
-				
+
 			nut_notice('Starting service');
 			nut_action('start');
 			if((int)exec('pgrep upsmon | wc -l') == 0)
@@ -513,7 +513,7 @@ EOD;
 			exec('rm -rf /var/db/nut');
 			conf_mount_ro();
 		}
-		
+
 		config_unlock();
 	}
 ?>
