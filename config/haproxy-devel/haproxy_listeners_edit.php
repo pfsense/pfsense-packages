@@ -229,6 +229,15 @@ if ($_POST) {
 			
 		if($backend['name'] != "")
 			$changedesc .= " modified '{$backend['name']}' pool:";
+			
+		// update references to this primary frontend
+		if ($backend['name'] != $_POST['name']) {
+			foreach($a_backend as &$frontend) {
+				if ($frontend['primary_frontend'] == $backend['name']) {
+					$frontend['primary_frontend'] = $_POST['name'];
+				}
+			}
+		}
 		
 		foreach($simplefields as $stat)
 			update_if_changed($stat, $backend[$stat], $_POST[$stat]);
