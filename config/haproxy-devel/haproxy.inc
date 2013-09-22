@@ -610,31 +610,28 @@ function haproxy_writeconf($configfile) {
 			
 			$bname = get_frontend_ipport($backend);
 
-			if ($backend['extaddr']=='localhost')
-				$backend['extaddr'] = "127.0.0.1";
-			
 			if (!is_array($a_bind[$bname])) {
 				$a_bind[$bname] = array();
 				$a_bind[$bname]['config'] = array();
-				// Settings which are constant for a merged frontend
-				$a_bind[$bname]['name'] = $backend['name'];
-				$a_bind[$bname]['extaddr'] = $backend['extaddr'];
-				$a_bind[$bname]['port'] = $backend['port'];
+				// Settings which are used only from the primary frontend
+				$primaryfrontend = get_primaryfrontend($backend);
+				$a_bind[$bname]['name']            = $primaryfrontend['name'];
+				$a_bind[$bname]['extaddr']         = $primaryfrontend['extaddr'];
+				$a_bind[$bname]['port']            = $primaryfrontend['port'];
+				$a_bind[$bname]['type']            = $primaryfrontend['type'];
+				$a_bind[$bname]['forwardfor']      = $primaryfrontend['forwardfor'];
+				$a_bind[$bname]['httpclose']       = $primaryfrontend['httpclose'];
+				$a_bind[$bname]['max_connections'] = $primaryfrontend['max_connections'];
+				$a_bind[$bname]['client_timeout']  = $primaryfrontend['client_timeout'];
+				$a_bind[$bname]['advanced']        = $primaryfrontend['advanced'];
+				$a_bind[$bname]['ssloffload']      = $primaryfrontend['ssloffload'];
+				$a_bind[$bname]['advanced_bind']   = $primaryfrontend['advanced_bind'];
 			}
 			$b = &$a_bind[$bname];
 			
-			// Overwrite ?
-			if ($backend['secondary'] != 'yes') {
-				if (isset($b['type']))
+			if (($backend['secondary'] != 'yes') && ($backend['name'] != $b['name'])) {
+				// only 1 frontend can be the primary for a set of frontends that share 1 address:port.
 					$input_errors[] = "Multiple primary frondends for $bname";
-				$b['type'] = $backend['type'];
-				$b['forwardfor'] = $backend['forwardfor'];
-				$b['httpclose'] = $backend['httpclose'];
-				$b['max_connections'] = $backend['max_connections'];
-				$b['client_timeout'] = $backend['client_timeout'];
-				$b['advanced'] = $backend['advanced'];
-				$b['ssloffload'] = $backend['ssloffload'];
-				$b['advanced_bind'] = $backend['advanced_bind'];
 			}
 			
 			if ($ssl_crt != "") {
@@ -1122,20 +1119,27 @@ function get_frontend_id($name) {
 	return null;
 }
 
-function get_frontend_ipport($fontend) {
+function get_primaryfrontend($frontend) {
 	global $config;
 	$a_backend = &$config['installedpackages']['haproxy']['ha_backends']['item'];
-	if ($fontend['secondary'] == 'yes')
-		$mainfontend = $a_backend[get_frontend_id($fontend['primary_frontend'])];
+	if ($frontend['secondary'] == 'yes')
+		$mainfrontend = $a_backend[get_frontend_id($frontend['primary_frontend'])];
 	else
-		$mainfontend = $fontend;
-	if($mainfontend['extaddr'] == "any") 
+		$mainfrontend = $frontend;
+	return $mainfrontend;
+}
+
+function get_frontend_ipport($frontend) {
+	$mainfrontend = get_primaryfrontend($frontend);
+	if($mainfrontend['extaddr'] == "any") 
 		$result = "0.0.0.0";
-	elseif($mainfontend['extaddr']) 
-		$result = $mainfontend['extaddr'];
+	elseif ($mainfrontend['extaddr'] == "localhost")
+		$result = "127.0.0.1";
+	elseif($mainfrontend['extaddr']) 
+		$result = $mainfrontend['extaddr'];
 	else 
 		$result = get_current_wan_address('wan');
-	return $result . ":" . $mainfontend['port'];
+	return $result . ":" . $mainfrontend['port'];
 }
 
 function haproxy_check_config() {
