@@ -42,6 +42,8 @@ if (!defined("VRT_DNLD_URL"))
 	define("VRT_DNLD_URL", "https://www.snort.org/reg-rules/");
 if (!defined("ET_VERSION"))
 	define("ET_VERSION", "2.9.0");
+if (!defined("ET_BASE_DNLD_URL"))
+	define("ET_BASE_DNLD_URL", "http://rules.emergingthreats.net/"); 
 if (!defined("ET_DNLD_FILENAME"))
 	define("ET_DNLD_FILENAME", "emerging.rules.tar.gz");
 if (!defined("GPLV2_DNLD_FILENAME"))
@@ -88,6 +90,10 @@ $snort_rule_url = VRT_DNLD_URL;
 $emergingthreats_filename = ET_DNLD_FILENAME;
 $emergingthreats_filename_md5 = ET_DNLD_FILENAME . ".md5";
 $emerging_threats_version = ET_VERSION;
+$emergingthreats_url = ET_BASE_DNLD_URL;
+// If using Sourcefire VRT rules with ET, then we should use the open-nogpl ET rules
+$emergingthreats_url .= $vrt_enabled == "on" ? "open-nogpl/" : "open/";
+$emergingthreats_url .= "snort-" . ET_VERSION . "/";
 
 /* Snort GPLv2 Community Rules filenames and URL */
 $snort_community_rules_filename = GPLV2_DNLD_FILENAME;
