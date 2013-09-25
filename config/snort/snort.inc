@@ -2766,19 +2766,23 @@ preprocessor http_inspect_server: server default profile {$http_server_profile} 
 EOD;
 
 	/* def ftp_preprocessor */
+	$telnet_ports = str_replace(",", " ", $snort_ports['telnet_ports']);
+	$ftp_ports = str_replace(",", " ", $snort_ports['ftp_ports']);
 	$ftp_preprocessor = <<<EOD
 # ftp preprocessor  #
 preprocessor ftp_telnet: global \
 inspection_type stateless
 
 preprocessor ftp_telnet_protocol: telnet \
-   normalize \
-   ayt_attack_thresh 200
+   normalize ports { {$telnet_ports} } \
+   ayt_attack_thresh 20 \
+   detect anomalies
 
-preprocessor ftp_telnet_protocol: \
-    ftp server default \
+preprocessor ftp_telnet_protocol: ftp server default \
     def_max_param_len 100 \
-    ports { 21 } \
+    ports { $ftp_ports } \
+    telnet_cmds yes \
+    ignore_telnet_erase_cmds yes \
     ftp_cmds { USER PASS ACCT CWD SDUP SMNT QUIT REIN PORT PASV TYPE STRU MODE } \
     ftp_cmds { RETR STOR STOU APPE ALLO REST RNFR RNTO ABOR DELE RMD MKD PWD } \
     ftp_cmds { LIST NLST SITE SYST STAT HELP NOOP } \
@@ -2809,6 +2813,7 @@ preprocessor ftp_telnet_protocol: \
 preprocessor ftp_telnet_protocol: ftp client default \
    max_resp_len 256 \
    bounce yes \
+   ignore_telnet_erase_cmds yes \
    telnet_cmds yes
 	
 EOD;
@@ -2899,10 +2904,23 @@ preprocessor sfportscan: scan_type { {$sf_pscan_type} } \
 	
 EOD;
 
-	$sun_rpc_ports = str_replace(",", " ", $snort_ports['sun_rpc_ports']);
-	/* def other_preprocs */
-	$other_preprocs = <<<EOD
+	/* def ssh_preproc */
+	$ssh_ports = str_replace(",", " ", $snort_ports['ssh_ports']);
+	$ssh_preproc = <<<EOD
+# SSH preprocessor #
+preprocessor ssh: server_ports { {$ssh_ports} } \
+	autodetect \
+	max_client_bytes 19600 \
+	max_encrypted_packets 20 \
+	max_server_version_len 100 \
+	enable_respoverflow enable_ssh1crc32 \
+	enable_srvoverflow enable_protomismatch
 
+EOD;
+
+	/* def other_preprocs */
+	$sun_rpc_ports = str_replace(",", " ", $snort_ports['sun_rpc_ports']);
+	$other_preprocs = <<<EOD
 # Other preprocs #
 preprocessor rpc_decode: {$sun_rpc_ports} no_alert_multiple_requests no_alert_large_fragments no_alert_incomplete
 
@@ -2925,10 +2943,38 @@ EOD;
 	$sip_ports = str_replace(",", " ", $snort_ports['sip_ports']);
 	$sip_preproc = <<<EOD
 # SIP preprocessor
-preprocessor sip: ports { {$sip_ports} }, max_call_id_len 300, \
-		max_from_len 100, max_to_len 200, max_via_len 1000, \
-		max_requestName_len 50, max_uri_len 100, ignore_call_channel,\
-		max_content_len 1000
+preprocessor sip: max_sessions 40000, \
+	ports { {$sip_ports} }, \
+	methods { invite \
+		cancel \
+		ack \
+		bye \
+		register \
+		options \
+		refer \
+		subscribe \
+		update \
+		join \
+		info \
+		message \
+		notify \
+		benotify \
+		do \
+		qauth \
+		sprack \
+		publish \
+		service \
+		unsubscribe \
+		prack }, \
+	max_call_id_len 80, \
+	max_from_len 256, \
+	max_to_len 256, \
+	max_via_len 1024, \
+	max_requestName_len 50, \
+	max_uri_len 512, \
+	ignore_call_channel, \
+	max_content_len 2048, \
+	max_contact_len 512
 
 EOD;
 
@@ -2970,10 +3016,13 @@ preprocessor gtp: ports { {$gtp_ports} }
 	
 EOD;
 
-	$def_ssl_ports_ignore = str_replace(",", " ", $snort_ports['ssl_ports']);
+	/* def ssl_preprocessor */
+	$ssl_ports = str_replace(",", " ", $snort_ports['ssl_ports']);
 	$ssl_preproc = <<<EOD
-# Ignore SSL and Encryption  #
-preprocessor ssl: ports { {$def_ssl_ports_ignore} }, trustservers, noinspect_encrypted
+# SSL preprocessor #
+preprocessor ssl: \
+	ports { {$ssl_ports} }, \
+	trustservers, noinspect_encrypted 
 
 EOD;
 
@@ -3018,7 +3067,7 @@ EOD;
 		"ssl_preproc" => "ssl_preproc", "dnp3_preproc" => "dnp3_preproc", "modbus_preproc" => "modbus_preproc"
 	);
 	$snort_preproc = array (
-		"perform_stat", "http_inspect", "other_preprocs", "ftp_preprocessor", "smtp_preprocessor", "ssl_preproc", "sip_preproc", "gtp_preproc",
+		"perform_stat", "http_inspect", "other_preprocs", "ftp_preprocessor", "smtp_preprocessor", "ssl_preproc", "sip_preproc", "gtp_preproc", "ssh_preproc",
 		"sf_portscan", "dce_rpc_2", "dns_preprocessor", "sensitive_data", "pop_preproc", "imap_preproc", "dnp3_preproc", "modbus_preproc"
 	);
 	$default_disabled_preprocs = array(
