@@ -2680,7 +2680,7 @@ function snort_generate_conf($snortcfg) {
 		$ssh_port = "22";
 	$snort_ports = array(
 		"dns_ports" => "53", "smtp_ports" => "25", "mail_ports" => "25,143,465,691",
-		http_ports" => "36,80,81,82,83,84,85,86,87,88,89,90,311,383,591,593,631,901,1220,1414,1741,1830,2301,2381,2809,3037,3057,3128,3443,3702,4343,4848,5250,6080,6988,7000,7001,7144,7145,7510,7777,7779,8000,8008,8014,8028,8080,8085,8088,8090,8118,8123,8180,8181,8222,8243,8280,8300,8500,8800,8888,8899,9000,9060,9080,9090,9091,9443,9999,10000,11371,34443,34444,41080,50000,50002,55555", 
+		"http_ports" => "36,80,81,82,83,84,85,86,87,88,89,90,311,383,591,593,631,901,1220,1414,1741,1830,2301,2381,2809,3037,3057,3128,3443,3702,4343,4848,5250,6080,6988,7000,7001,7144,7145,7510,7777,7779,8000,8008,8014,8028,8080,8085,8088,8090,8118,8123,8180,8181,8222,8243,8280,8300,8500,8800,8888,8899,9000,9060,9080,9090,9091,9443,9999,10000,11371,34443,34444,41080,50000,50002,55555", 
 		"oracle_ports" => "1024:", "mssql_ports" => "1433",
 		"telnet_ports" => "23","snmp_ports" => "161", "ftp_ports" => "21,2100,3535",
 		"ssh_ports" => $ssh_port, "pop2_ports" => "109", "pop3_ports" => "110", 
@@ -2769,14 +2769,14 @@ EOD;
 	$telnet_ports = str_replace(",", " ", $snort_ports['telnet_ports']);
 	$ftp_ports = str_replace(",", " ", $snort_ports['ftp_ports']);
 	$ftp_preprocessor = <<<EOD
-# ftp preprocessor  #
+# ftp_telnet preprocessor #
 preprocessor ftp_telnet: global \
 inspection_type stateless
 
 preprocessor ftp_telnet_protocol: telnet \
    normalize ports { {$telnet_ports} } \
    ayt_attack_thresh 20 \
-   detect anomalies
+   detect_anomalies
 
 preprocessor ftp_telnet_protocol: ftp server default \
     def_max_param_len 100 \
@@ -2820,6 +2820,7 @@ EOD;
 
 	$pop_ports = str_replace(",", " ", $snort_ports['pop3_ports']);
 	$pop_preproc = <<<EOD
+# POP preprocessor #
 preprocessor pop: \
 	ports { {$pop_ports} } \
         memcap 1310700 \
@@ -2831,6 +2832,7 @@ EOD;
 
 	$imap_ports = str_replace(",", " ", $snort_ports['imap_ports']);
 	$imap_preproc = <<<EOD
+# IMAP preprocessor #
 preprocessor imap: \
 	ports { {$imap_ports} } \
         memcap 1310700 \
@@ -2849,10 +2851,12 @@ preprocessor SMTP: \
     inspection_type stateful \
     normalize cmds \
     ignore_tls_data \
-    valid_cmds { MAIL RCPT HELP HELO ETRN EHLO EXPN VRFY ATRN SIZE BDAT DEBUG EMAL ESAM ESND ESOM EVFY IDENT NOOP RSET SEND SAML SOML AUTH TURN ETRN PIPELINING \
-CHUNKING DATA DSN RSET QUIT ONEX QUEU STARTTLS TICK TIME TURNME VERB X-EXPS X-LINK2STATE XADR XAUTH XCIR XEXCH50 XGEN XLICENSE XQUEU XSTA XTRN XUSR } \
-    normalize_cmds { MAIL RCPT HELP HELO ETRN EHLO EXPN VRFY ATRN SIZE BDAT DEBUG EMAL ESAM ESND ESOM EVFY IDENT NOOP RSET SEND SAML SOML AUTH TURN ETRN \
-PIPELINING CHUNKING DATA DSN RSET QUIT ONEX QUEU STARTTLS TICK TIME TURNME VERB X-EXPS X-LINK2STATE XADR XAUTH XCIR XEXCH50 XGEN XLICENSE XQUEU XSTA XTRN XUSR } \
+    valid_cmds { MAIL RCPT HELP HELO ETRN EHLO EXPN VRFY ATRN SIZE BDAT DEBUG EMAL ESAM ESND ESOM EVFY IDENT NOOP RSET \
+                 SEND SAML SOML AUTH TURN ETRN PIPELINING CHUNKING DATA DSN RSET QUIT ONEX QUEU STARTTLS TICK TIME \
+                 TURNME VERB X-EXPS X-LINK2STATE XADR XAUTH XCIR XEXCH50 XGEN XLICENSE XQUEU XSTA XTRN XUSR } \
+    normalize_cmds { MAIL RCPT HELP HELO ETRN EHLO EXPN VRFY ATRN SIZE BDAT DEBUG EMAL ESAM ESND ESOM EVFY IDENT NOOP \
+                     RSET SEND SAML SOML AUTH TURN ETRN PIPELINING CHUNKING DATA DSN RSET QUIT ONEX QUEU STARTTLS TICK \
+                     TIME TURNME VERB X-EXPS X-LINK2STATE XADR XAUTH XCIR XEXCH50 XGEN XLICENSE XQUEU XSTA XTRN XUSR } \
     max_header_line_len 1000 \ 
     max_response_line_len 512 \
     alt_max_command_line_len 260 { MAIL } \
@@ -2895,7 +2899,7 @@ EOD;
 	}
 	
 	$sf_portscan = <<<EOD
-# sf Portscan  #
+# sf Portscan  preprocessor #
 preprocessor sfportscan: scan_type { {$sf_pscan_type} } \
                          proto  { {$sf_pscan_protocol} } \
                          memcap { {$sf_pscan_memcap} } \
@@ -2924,14 +2928,14 @@ EOD;
 # Other preprocs #
 preprocessor rpc_decode: {$sun_rpc_ports} no_alert_multiple_requests no_alert_large_fragments no_alert_incomplete
 
-# Back Orifice
+# Back Orifice preprocessor #
 preprocessor bo
 	
 EOD;
 
 	/* def dce_rpc_2 */
 	$dce_rpc_2 = <<<EOD
-# DCE/RPC 2   #
+# DCE/RPC 2 #
 preprocessor dcerpc2: memcap 102400, events [co]
 preprocessor dcerpc2_server: default, policy WinXP, \
     detect [smb [{$snort_ports['smb_ports']}], tcp 135, udp 135, rpc-over-http-server 593], \
@@ -2942,7 +2946,7 @@ EOD;
 
 	$sip_ports = str_replace(",", " ", $snort_ports['sip_ports']);
 	$sip_preproc = <<<EOD
-# SIP preprocessor
+# SIP preprocessor #
 preprocessor sip: max_sessions 40000, \
 	ports { {$sip_ports} }, \
 	methods { invite \
