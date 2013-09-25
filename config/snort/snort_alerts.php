@@ -90,8 +90,8 @@ function snort_add_supplist_entry($suppress) {
 	/* If no Suppress List is set for the interface, then create one with the interface name */
 	if (empty($a_instance[$instanceid]['suppresslistname']) || $a_instance[$instanceid]['suppresslistname'] == 'default') {
 		$s_list = array();
-		$s_list['name'] = $a_instance[$instanceid]['interface'] . "suppress";
 		$s_list['uuid'] = uniqid();
+		$s_list['name'] = $a_instance[$instanceid]['interface'] . "suppress" . "_" . $s_list['uuid'];
 		$s_list['descr']  =  "Auto-generated list for Alert suppression";
 		$s_list['suppresspassthru'] = base64_encode($suppress);
 		$a_suppress[] = $s_list;
@@ -247,7 +247,6 @@ if ($_POST['download']) {
 		readfile("$file");
 		@unlink("/tmp/{$file_name}");
 	}
-
 	header("Location: /snort/snort_alerts.php?instance={$instanceid}");
 	exit;
 }
@@ -267,7 +266,7 @@ include_once("fbegin.inc");
 
 /* refresh every 60 secs */
 if ($pconfig['arefresh'] == 'on')
-	echo "<meta http-equiv=\"refresh\" content=\"60;url=/snort/snort_alerts.php\" />\n";
+	echo "<meta http-equiv=\"refresh\" content=\"60;url=/snort/snort_alerts.php?instance={$instanceid}\" />\n";
 ?>
 
 <?php if($pfsense_stable == 'yes'){echo '<p class="pgtitle">' . $pgtitle . '</p>';}
@@ -304,7 +303,7 @@ if ($pconfig['arefresh'] == 'on')
 			<tr>
 				<td width="22%" class="vncell"><?php echo gettext('Instance to inspect'); ?></td>
 				<td width="78%" class="vtable">
-					<select name="instance" id="instance" class="formselect" onChange="document.getElementById('formalert').submit()">
+					<select name="instance" id="instance" class="formselect" onChange="document.getElementById('formalert').method='get';document.getElementById('formalert').submit()">
 			<?php
 				foreach ($a_instance as $id => $instance) {
 					$selected = "";
@@ -400,19 +399,26 @@ if (file_exists("/var/log/snort/snort_{$if_real}{$snort_uuid}/alert")) {
 			$alert_ip_src = $fields[6];
 			/* Add zero-width space as soft-break opportunity after each colon if we have an IPv6 address */
 			$alert_ip_src = str_replace(":", ":&#8203;", $alert_ip_src);
+			/* Add Reverse DNS lookup icon */
+			$alert_ip_src .= "<br/><a href='/diag_dns.php?host={$fields[6]}&instance={$instanceid}'>";
+			$alert_ip_src .= "<img src='../themes/{$g['theme']}/images/icons/icon_log.gif' width='11' height='11' border='0' ";
+			$alert_ip_src .= "title='" . gettext("Resolve host via reverse DNS lookup") . "'></a>";
+			/* Add icons for auto-adding to Suppress List if appropriate */
 			if (!snort_is_alert_globally_suppressed($supplist, $fields[1], $fields[2]) && 
 			    !isset($supplist[$fields[1]][$fields[2]]['by_src'][$fields[6]])) {
-				$alert_ip_src .= "<br/><a href='?instance={$instanceid}&act=addsuppress_srcip&sidid={$fields[2]}&gen_id={$fields[1]}&descr={$alert_descr_url}&ip=" . trim(urlencode($fields[6])) . "'>";
+				$alert_ip_src .= "&nbsp;&nbsp;<a href='?instance={$instanceid}&act=addsuppress_srcip&sidid={$fields[2]}&gen_id={$fields[1]}&descr={$alert_descr_url}&ip=" . trim(urlencode($fields[6])) . "'>";
 				$alert_ip_src .= "<img src='../themes/{$g['theme']}/images/icons/icon_plus.gif' width='12' height='12' border='0' ";
-				$alert_ip_src .= "title='" . gettext("Add this gen_id:sig_id track by_src IP to Suppress List") . "'></a>";	
+				$alert_ip_src .= "title='" . gettext("Add this alert to the Suppress List and track by_src IP") . "'></a>";	
 			}
 			elseif (isset($supplist[$fields[1]][$fields[2]]['by_src'][$fields[6]])) {
-				$alert_ip_src .= "<br/><img src='../themes/{$g['theme']}/images/icons/icon_plus_d.gif' width='12' height='12' border='0' ";
-				$alert_ip_src .= "title='" . gettext("This gen_id:sig_id track by_src IP already in Suppress List") . "'/>";	
+				$alert_ip_src .= "&nbsp;&nbsp;<img src='../themes/{$g['theme']}/images/icons/icon_plus_d.gif' width='12' height='12' border='0' ";
+				$alert_ip_src .= "title='" . gettext("This alert track by_src IP is already in the Suppress List") . "'/>";	
 			}
+			/* Add icon for auto-removing from Blocked Table if required */
 			if (isset($tmpblocked[$fields[6]])) {
-				$alert_ip_src .= "&nbsp;&nbsp;<a href='?instance={$id}&todelete=" . trim(urlencode($fields[6])) . "'>
-				<img title=\"" . gettext("Remove host from Blocked Table") . "\" border=\"0\" width='12' height='12' name='todelete' id='todelete' alt=\"Remove from Blocked Hosts\" src=\"../themes/{$g['theme']}/images/icons/icon_x.gif\"/></a>"; 
+				$alert_ip_src .= "&nbsp;";
+				$alert_ip_src .= "<a href='?instance={$id}&todelete=" . trim(urlencode($fields[6])) . "'>
+				<img title=\"" . gettext("Remove host from Blocked Table") . "\" border=\"0\" width='12' height='12' name='todelete' id='todelete' alt=\"Remove from Blocked Hosts\" src=\"../themes/{$g['theme']}/images/icons/icon_x.gif\"></a>"; 
 			}
 			/* IP SRC Port */
 			$alert_src_p = $fields[7];
@@ -420,19 +426,26 @@ if (file_exists("/var/log/snort/snort_{$if_real}{$snort_uuid}/alert")) {
 			$alert_ip_dst = $fields[8];
 			/* Add zero-width space as soft-break opportunity after each colon if we have an IPv6 address */
 			$alert_ip_dst = str_replace(":", ":&#8203;", $alert_ip_dst);
+			/* Add Reverse DNS lookup icon */
+			$alert_ip_dst .= "<br/><a href='/diag_dns.php?host={$fields[8]}&instance={$instanceid}'>";
+			$alert_ip_dst .= "<img src='../themes/{$g['theme']}/images/icons/icon_log.gif' width='11' height='11' border='0' ";
+			$alert_ip_dst .= "title='" . gettext("Resolve host via reverse DNS lookup") . "'></a>";	
+			/* Add icons for auto-adding to Suppress List if appropriate */
 			if (!snort_is_alert_globally_suppressed($supplist, $fields[1], $fields[2]) && 
 			    !isset($supplist[$fields[1]][$fields[2]]['by_dst'][$fields[8]])) {
-				$alert_ip_dst .= "<br/><a href='?instance={$instanceid}&act=addsuppress_dstip&sidid={$fields[2]}&gen_id={$fields[1]}&descr={$alert_descr_url}&ip=" . trim(urlencode($fields[8])) . "'>";
+				$alert_ip_dst .= "&nbsp;&nbsp;<a href='?instance={$instanceid}&act=addsuppress_dstip&sidid={$fields[2]}&gen_id={$fields[1]}&descr={$alert_descr_url}&ip=" . trim(urlencode($fields[8])) . "'>";
 				$alert_ip_dst .= "<img src='../themes/{$g['theme']}/images/icons/icon_plus.gif' width='12' height='12' border='0' ";
-				$alert_ip_dst .= "title='" . gettext("Add this gen_id:sig_id track by_dst IP to Suppress List") . "'></a>";	
+				$alert_ip_dst .= "title='" . gettext("Add this alert to the Suppress List and track by_dst IP") . "'></a>";	
 			}
 			elseif (isset($supplist[$fields[1]][$fields[2]]['by_dst'][$fields[8]])) {
-				$alert_ip_dst .= "<br/><img src='../themes/{$g['theme']}/images/icons/icon_plus_d.gif' width='12' height='12' border='0' ";
-				$alert_ip_dst .= "title='" . gettext("This gen_id:sig_id track by_dst IP already in Suppress List") . "'/>";	
+				$alert_ip_dst .= "&nbsp;&nbsp;<img src='../themes/{$g['theme']}/images/icons/icon_plus_d.gif' width='12' height='12' border='0' ";
+				$alert_ip_dst .= "title='" . gettext("This alert track by_dst IP is already in the Suppress List") . "'/>";	
 			}
+			/* Add icon for auto-removing from Blocked Table if required */
 			if (isset($tmpblocked[$fields[8]])) {
-				$alert_ip_dst .= "&nbsp;&nbsp;<a href='?instance={$id}&todelete=" . trim(urlencode($fields[8])) . "'>
-				<img title=\"" . gettext("Remove host from Blocked Table") . "\" border=\"0\" width='12' height='12' name='todelete' id='todelete' alt=\"Remove from Blocked Hosts\" src=\"../themes/{$g['theme']}/images/icons/icon_x.gif\"/></a>";
+				$alert_ip_dst .= "&nbsp;";
+				$alert_ip_dst .= "<a href='?instance={$id}&todelete=" . trim(urlencode($fields[8])) . "'>
+				<img title=\"" . gettext("Remove host from Blocked Table") . "\" border=\"0\" width='12' height='12' name='todelete' id='todelete' alt=\"Remove from Blocked Hosts\" src=\"../themes/{$g['theme']}/images/icons/icon_x.gif\"></a>";
 			}
 			/* IP DST Port */
 			$alert_dst_p = $fields[9];
@@ -441,11 +454,11 @@ if (file_exists("/var/log/snort/snort_{$if_real}{$snort_uuid}/alert")) {
 			if (!snort_is_alert_globally_suppressed($supplist, $fields[1], $fields[2])) {
 				$sidsupplink = "<a href='?instance={$instanceid}&act=addsuppress&sidid={$fields[2]}&gen_id={$fields[1]}&descr={$alert_descr_url}'>";
 				$sidsupplink .= "<img src='../themes/{$g['theme']}/images/icons/icon_plus.gif' width='12' height='12' border='0' ";
-				$sidsupplink .= "title='" . gettext("Add this gen_id:sig_id to Suppress List") . "'></a>";	
+				$sidsupplink .= "title='" . gettext("Add this alert to the Suppress List") . "'></a>";	
 			}
 			else {
 				$sidsupplink = "<img src='../themes/{$g['theme']}/images/icons/icon_plus_d.gif' width='12' height='12' border='0' ";
-				$sidsupplink .= "title='" . gettext("This gen_id:sig_id already in Suppress List") . "'/>";	
+				$sidsupplink .= "title='" . gettext("This alert is already in the Suppress List") . "'/>";	
 			}
 			$alert_class = $fields[11];
 
