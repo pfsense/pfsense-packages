@@ -2364,6 +2364,10 @@ function snort_prepare_rule_files($snortcfg, $snortcfgdir) {
 			log_error('[Snort] Enabling any flowbit-required rules for: ' . snort_get_friendly_interface($snortcfg['interface']) . '...');
 			$fbits = snort_resolve_flowbits($all_rules, $enabled_rules);
 
+			/* Check for and disable any flowbit-required rules the user has  */
+			/* manually forced to a disabled state.                           */
+			snort_modify_sids($fbits, $snortcfg);
+
 			/* Check for and disable any flowbit-required rules dependent upon     */
 			/* disabled preprocessors if this option is enabled for the interface. */
 			if ($snortcfg['preproc_auto_rule_disable'] == "on") {
