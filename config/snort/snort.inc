@@ -3257,7 +3257,7 @@ EOD;
 # snort configuration file
 # generated automatically by the pfSense subsystems do not modify manually
 
-# Define Local Network  #
+# Define Local Network #
 var HOME_NET [{$home_net}]
 var EXTERNAL_NET [{$external_net}]
 
@@ -3265,16 +3265,16 @@ var EXTERNAL_NET [{$external_net}]
 var RULE_PATH {$snortcfgdir}/rules
 var PREPROC_RULE_PATH {$snortcfgdir}/preproc_rules
 
-# Define Servers  #
+# Define Servers #
 {$vardef}
 
-# Define Server Ports  #
+# Define Server Ports #
 {$portvardef}
 
 # Configure quiet startup mode #
 config quiet
 
-# Configure the snort decoder  #
+# Configure the snort decoder #
 config checksum_mode: {$cksumcheck}
 config disable_decode_alerts
 config disable_tcpopt_experimental_alerts
@@ -3284,14 +3284,14 @@ config disable_tcpopt_alerts
 config disable_ipopt_alerts
 config disable_decode_drops
 
-# Enable the GTP decoder  #
+# Enable the GTP decoder #
 config enable_gtp
 
 # Configure PCRE match limitations
 config pcre_match_limit: 3500
 config pcre_match_limit_recursion: 1500
 
-# Configure the detection engine  #
+# Configure the detection engine #
 config detection: {$cfg_detect_settings}
 config event_queue: max_queue 8 log 5 order_events content_length
 
