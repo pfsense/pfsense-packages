@@ -1792,24 +1792,33 @@ function snort_modify_sids(&$rule_map, $snortcfg) {
 	unset($enablesid, $disablesid);
 }
 
-/* Start of main config files */
-/* open snort.sh for writing" */
 function snort_create_rc() {
+
+	/*********************************************************/
+	/* This function builds the /usr/local/etc/rc.d/snort.sh */
+	/* shell script for starting and stopping Snort.  The    */
+	/* script is rebuilt on each package sync operation and  */
+	/* after any changes to snort.conf saved in the GUI.     */
+	/*********************************************************/
+
 	global $config, $g;
 
 	$snortdir = SNORTDIR;
 	$rcdir = RCFILEPREFIX;	
 
+	// If no interfaces are configured for Snort, exit
 	if (!is_array($config['installedpackages']['snortglobal']['rule']))
 		return;
-
-	$snortconf =& $config['installedpackages']['snortglobal']['rule'];
-	/* do not start config build if rules is empty */
+	$snortconf = $config['installedpackages']['snortglobal']['rule'];
 	if (empty($snortconf))
 		return;
 
+	// At least one interface is configured, so OK
 	$start_snort_iface_start = array();
 	$start_snort_iface_stop = array();
+
+	// Loop thru each configured interface and build
+	// the shell script.
 	foreach ($snortconf as $value) {
 		$snort_uuid = $value['uuid'];
 		$if_real = snort_get_real_interface($value['interface']);
@@ -1817,7 +1826,7 @@ function snort_create_rc() {
 		$start_barnyard = <<<EOE
 
 	if [ ! -f {$g['varrun_path']}/barnyard2_{$if_real}{$snort_uuid}.pid ]; then
-		pid=`/bin/pgrep -xf '/usr/local/bin/barnyard2 -r {$snort_uuid} -f snort_{$snort_uuid}_{$if_real}.u2 --pid-path {$g['varrun_path']} --nolock-pidfile -c {$snortdir}/snort_{$snort_uuid}_{$if_real}/barnyard2.conf -d /var/log/snort/snort_{$if_real}{$snort_uuid} -D -q' > {$g['varrun_path']}/barnyard2_{$if_real}{$snort_uuid}.pid`
+		pid=`/bin/pgrep -f "barnyard2 -r {$snort_uuid} "`
 	else
 		pid=`/bin/pgrep -F {$g['varrun_path']}/barnyard2_{$if_real}{$snort_uuid}.pid`
 	fi
@@ -1858,9 +1867,9 @@ EOE;
 			/bin/rm /var/run/barnyard2_{$if_real}{$snort_uuid}.pid
 		fi
 	else
-		pid=`/bin/pgrep -xf '/usr/local/bin/barnyard2 -r {$snort_uuid} -f snort_{$snort_uuid}_{$if_real}.u2 --pid-path {$g['varrun_path']} --nolock-pidfile -c {$snortdir}/snort_{$snort_uuid}_{$if_real}/barnyard2.conf -d /var/log/snort/snort_{$if_real}{$snort_uuid} -D -q'`
+		pid=`/bin/pgrep -f "barnyard2 -r {$snort_uuid} "`
 		if [ ! -z \$pid ]; then
-			/bin/pkill -xf '/usr/local/bin/barnyard2 -r {$snort_uuid} -f snort_{$snort_uuid}_{$if_real}.u2 --pid-path {$g['varrun_path']} --nolock-pidfile -c {$snortdir}/snort_{$snort_uuid}_{$if_real}/barnyard2.conf -d /var/log/snort/snort_{$if_real}{$snort_uuid} -D -q'
+			/bin/pkill -f "barnyard2 -r {$snort_uuid} "
 			time=0 timeout=30
 			while kill -0 \$pid 2>/dev/null; do
 				sleep 1
@@ -1883,10 +1892,11 @@ EOE;
 ###### For Each Iface
 	# Start snort and barnyard2
 	if [ ! -f {$g['varrun_path']}/snort_{$if_real}{$snort_uuid}.pid ]; then
-		pid=`/bin/pgrep -xf '/usr/local/bin/snort -R {$snort_uuid} -D -q -l /var/log/snort/snort_{$if_real}{$snort_uuid} --pid-path {$g['varrun_path']} --nolock-pidfile -G {$snort_uuid} -c {$snortdir}/snort_{$snort_uuid}_{$if_real}/snort.conf -i {$if_real}'`
+		pid=`/bin/pgrep -f "snort -R {$snort_uuid} "`
 	else
 		pid=`/bin/pgrep -F {$g['varrun_path']}/snort_{$if_real}{$snort_uuid}.pid`
 	fi
+
 	if [ ! -z \$pid ]; then
 		/usr/bin/logger -p daemon.info -i -t SnortStartup "Snort SOFT RESTART for {$value['descr']}({$snort_uuid}_{$if_real})..."
 		/bin/pkill -HUP \$pid
@@ -1918,10 +1928,10 @@ EOE;
 			/bin/rm /var/run/snort_{$if_real}{$snort_uuid}.pid
 		fi
 	else
-		pid=`/bin/pgrep -xf '/usr/local/bin/snort -R {$snort_uuid} -D -q -l /var/log/snort/snort_{$if_real}{$snort_uuid} --pid-path {$g['varrun_path']} --nolock-pidfile -G {$snort_uuid} -c {$snortdir}/snort_{$snort_uuid}_{$if_real}/snort.conf -i {$if_real}'`
+		pid=`/bin/pgrep -f "snort -R {$snort_uuid} "`
 		if [ ! -z \$pid ]; then
 			/usr/bin/logger -p daemon.info -i -t SnortStartup "Snort STOP for {$value['descr']}({$snort_uuid}_{$if_real})..."
-			/bin/pkill -xf '/usr/local/bin/snort -R {$snort_uuid} -D -q -l /var/log/snort/snort_{$if_real}{$snort_uuid} --pid-path {$g['varrun_path']} --nolock-pidfile -G {$snort_uuid} -c {$snortdir}/snort_{$snort_uuid}_{$if_real}/snort.conf -i {$if_real}'
+			/bin/pkill -f "snort -R {$snort_uuid} "
 			time=0 timeout=30
 			while kill -0 \$pid 2>/dev/null; do
 				sleep 1
@@ -1948,7 +1958,7 @@ EOE;
 # This file was automatically generated
 # by the pfSense service handler.
 # Code added to protect from double starts on pfSense bootup
-######## Begining of Main snort.sh
+######## Start of main snort.sh
 
 rc_start() {
 	{$rc_start}
