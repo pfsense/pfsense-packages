@@ -94,7 +94,7 @@ if ($_POST['download'])
 			@unlink("/tmp/{$file_name}");
 			exec("/bin/rm -fr /tmp/snort_blocked");
 		} else
-			$savemsg = "An error occurred while createing archive";
+			$savemsg = "An error occurred while creating archive";
 	} else
 		$savemsg = "No content on snort block list";
 }
@@ -257,7 +257,9 @@ if ($pconfig['brefresh'] == 'on')
 				/* use one echo to do the magic*/
 					echo "<tr>
 						<td align=\"center\" valign=\"middle\" class=\"listr\">{$counter}</td>
-						<td valign=\"middle\" class=\"listr\">{$tmp_ip}</td>
+						<td valign=\"middle\" class=\"listr\">{$tmp_ip}&nbsp;<a href='/diag_dns.php?host={$blocked_ip}'>
+						<img src='../themes/{$g['theme']}/images/icons/icon_log.gif' width='11' height='11' border='0' 
+						title='" . gettext("Resolve host via reverse DNS lookup") . "'></a></td>
 						<td valign=\"middle\" class=\"listr\">{$blocked_desc}</td>
 						<td align=\"center\" valign=\"middle\" class=\"listr\"><a href='snort_blocked.php?todelete=" . trim(urlencode($blocked_ip)) . "'>
 						<img title=\"" . gettext("Delete host from Blocked Table") . "\" border=\"0\" name='todelete' id='todelete' alt=\"Delete host from Blocked Table\" src=\"../themes/{$g['theme']}/images/icons/icon_x.gif\"></a></td>
