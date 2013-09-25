@@ -359,7 +359,7 @@ function snort_build_list($snortcfg, $listname = "", $whitelist = false) {
 		$vips = $list['vips'];
 		$vpns = $list['vpnips'];
 		if (!empty($list['address']) && is_alias($list['address'])) {
-			$home_net = explode(" ", trim(filter_expand_alias($list['address'])));
+			$home_net = explode(" ", trim(snort_get_alias_value($list['address'])));
 		}
 	}
 
@@ -2701,7 +2701,7 @@ function snort_generate_conf($snortcfg) {
 	$portvardef = "";
 	foreach ($snort_ports as $alias => $avalue) {
 		if (!empty($snortcfg["def_{$alias}"]) && is_alias($snortcfg["def_{$alias}"]))
-			$snort_ports[$alias] = filter_expand_alias($snortcfg["def_{$alias}"]);
+			$snort_ports[$alias] = snort_get_alias_value($snortcfg["def_{$alias}"]);
 		$snort_ports[$alias] = preg_replace('/\s+/', ',', trim($snort_ports[$alias]));
 		$portvardef .= "portvar " . strtoupper($alias) . " [" . $snort_ports[$alias] . "]\n";
 	}
@@ -2890,7 +2890,7 @@ EOD;
 		$sf_pscan_sense_level = $snortcfg['pscan_sense_level'];
 	$sf_pscan_ignore_scanners = "\$HOME_NET";
 	if (!empty($snortcfg['pscan_ignore_scanners']) && is_alias($snortcfg['pscan_ignore_scanners'])) {
-		$sf_pscan_ignore_scanners = filter_expand_alias($snortcfg['pscan_ignore_scanners']);
+		$sf_pscan_ignore_scanners = snort_get_alias_value($snortcfg['pscan_ignore_scanners']);
 		$sf_pscan_ignore_scanners = preg_replace('/\s+/', ',', trim($sf_pscan_ignore_scanners));
 	}
 	
@@ -3054,7 +3054,7 @@ EOD;
 	$vardef = "";
 	foreach ($snort_servers as $alias => $avalue) {
 		if (!empty($snortcfg["def_{$alias}"]) && is_alias($snortcfg["def_{$alias}"])) {
-			$avalue = filter_expand_alias($snortcfg["def_{$alias}"]);
+			$avalue = snort_get_alias_value($snortcfg["def_{$alias}"]);
 			$avalue = str_replace(" ", ",", trim($avalue));
 		}
 		$vardef .= "var " . strtoupper($alias) . " [{$avalue}]\n";
