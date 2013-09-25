@@ -83,6 +83,101 @@ $rebuild_rules = false;
 if (!is_array($config['installedpackages']['snortglobal']))
 	$config['installedpackages']['snortglobal'] = array();
 
+function snort_get_alias_value($alias) {
+	/***************************************************/
+	/* This function returns the value of the passed   */
+	/* Alias, or an empty string if the value cannot   */
+	/* be determined.                                  */
+	/*                                                 */
+	/* On Entry: $alias ==> Alias to be evaluated      */
+	/*  Returns: Alias value as a string or an empty   */
+	/*           string                                */
+	/***************************************************/
+
+	global $config;
+
+	$entries = array();
+	$tmp = "";
+
+	// If no Aliases are defined in the configuration,
+	// return an empty string.
+	if (empty($config['aliases']))
+		return $tmp;
+
+	// See if we were passed a valid Alias and return
+	// an empty string if not.
+	if (!is_alias($alias))
+		return $tmp;
+
+	// We have a valid Alias, so find its value or 
+	// values and return as a string.
+	return snort_unpack_alias($alias);
+}
+
+function snort_unpack_alias($alias) {
+
+	/**************************************************/
+	/* This function unpacks an Alias to determine    */
+	/* the actual values it represents.  Any nested   */
+	/* Aliases encountered are also unpacked via      */
+	/* recursive calls to this function.              */
+	/*                                                */
+	/* Fully-qualified-domain-name (FQDN) aliases     */
+	/* are detected and resolved via a pfctl() call.  */
+	/**************************************************/
+
+	global $config;
+	$value = "";
+
+	// Find the matching Alias entry in config
+	foreach ($config['aliases']['alias'] as $aliased) {
+		if($aliased['name'] == $alias) {
+			$addr = array();
+			$addr = explode(" ", trim($aliased['address']));
+			foreach ($addr as $a) {
+				if (!is_alias($a) && !empty($a)) {
+					if (is_ipaddr($a) || is_subnet($a) || is_port($a))
+						// If address, subnet or port, we found the final value
+						$value .= $a . " ";
+					elseif (is_hostname($a)) {
+						// Found a FQDN value for this Alias, so resolve it
+						$entries = array();
+						exec("/sbin/pfctl -t " . escapeshellarg($alias) . " -T show", $entries);
+						$value .= trim(implode(" ", $entries));
+					}
+					else
+						continue;
+				}
+				elseif (is_alias($a))
+					// Found a nested Alias, so recursively resolve it
+					$value .= snort_unpack_alias($a) . " ";
+			}
+			return trim($value);
+		}
+	}
+	return $value;
+}
+
+function snort_is_single_addr_alias($alias) {
+	/***************************************************/
+	/* This function evaluates the passed Alias to     */
+	/* determine if it represents a single IP address, */
+	/* or a network in CIDR form, and returns TRUE if  */
+	/* the condition is met, and FALSE if not.         */
+	/*                                                 */
+	/* On Entry: $alias ==> Alias to be evaluated      */
+	/*  Returns: TRUE if Alias represents a single     */
+	/*           IP address or network, and FALSE      */
+	/*           if not.                               */
+	/***************************************************/
+
+	/* If spaces in expanded Alias, it's not a single entity */
+	if (strpos(snort_get_alias_value($alias), " ") !== false)
+		return false;
+	else
+		return true;
+}
+
 function snort_get_blocked_ips() {
 	$blocked_ips = "";
 	exec('/sbin/pfctl -t snort2c -T show', $blocked_ips);
