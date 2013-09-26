@@ -1353,6 +1353,25 @@
 		<configurationfile>squidguard.xml</configurationfile>
 	</package>
 	<package>
+		<name>squidGuard-devel</name>
+		<descr>High perfomance web proxy URL filter. Requires proxy Squid 2.x package.</descr>
+		<website>http://www.squidGuard.org/</website>
+		<maintainer>gugabsd@mundounix.com.br</maintainer>
+		<category>Network Management</category>
+		<version>1.5_1 beta</version>
+		<status>Beta</status>
+		<required_version>2.1</required_version>
+		<depends_on_package_base_url>http://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
+		<depends_on_package_pbi>squidguard-devel-1.5_1-amd64.pbi</depends_on_package_pbi>
+		<build_pbi>
+			<ports_before>databases/db46</ports_before>
+			<port>www/squidguard-devel</port>
+		</build_pbi>
+		<build_options>squidGuard-devel_UNSET=SQUID32 SQUID33;squidGuard-devel_SET=LDAP STRIPNT SQUID27;squid_UNSET=DNS_HELPER IPFILTER PINGER STACKTRACES STRICT_HTTP_DESC USERAGENT_LOG WCCPV2;squid_SET=PF LDAP_AUTH NIS_AUTH SASL_AUTH ARP_ACL AUFS CACHE_DIGESTS CARP COSS DELAY_POOLS FOLLOW_XFF HTCP IDENT KERB_AUTH KQUEUE LARGEFILE REFERER_LOG SNMP SSL VIA_DB WCCP;SQUID_UID=proxy;SQUID_GID=proxy</build_options>
+		<config_file>http://www.pfsense.org/packages/config/squidGuard-devel/squidguard.xml</config_file>
+		<configurationfile>squidguard.xml</configurationfile>
+	</package>
+	<package>
 		<name>squidGuard-squid3</name>
 		<descr>High perfomance web proxy URL filter. Requires proxy Squid 3.x package.</descr>
 		<website>http://www.squidGuard.org/</website>
