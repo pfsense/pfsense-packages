@@ -50,10 +50,10 @@ $pgtitle = array(gettext("Status"),gettext("Asterisk Log"));
 include("head.inc");
 
 /* Path to Asterisk log file */
-if ($g['platform'] == "nanobsd")
-	$log = "/tmp/asterisk.log";
-else
-	$log = "/var/log/asterisk/messages";
+//if ($g['platform'] == "nanobsd")
+//	$log = "/tmp/asterisk.log";
+//else
+$log = "/var/log/asterisk/messages";
 
 ?>
 
@@ -66,18 +66,27 @@ $file = $_SERVER["SCRIPT_NAME"];
 $break = Explode('/', $file);
 $pfile = $break[count($break) - 1]; 
 
-if ($cmd == "trim") {
-	$trimres=shell_exec("tail -50 '$log' > /tmp/trimmed.csv; rm '$log'; mv /tmp/trimmed.csv '$log'; chmod 666 '$log'");
-}
 
-if ($cmd == "clear") {
-	$trimres=shell_exec("rm '$log'; touch '$log'; chmod 666 '$log'");
+if (file_exists($log) {
+	if ($cmd == "trim") {
+		$trimres=shell_exec("tail -50 '$log' > /tmp/trimmed_asterisk.log && rm '$log' && mv /tmp/trimmed_asterisk.log '$log' && chown asterisk:asterisk '$log' && chmod g+w '$log'");
+		header( 'Location: asterisk_log.php?savemsg=Log+trimmed.') ;
+	}
+	if ($cmd == "clear") {
+		$trimres=shell_exec("rm '$log' && touch '$log' && chown asterisk:asterisk '$log' && chmod g+w '$log'");
+		header( 'Location: asterisk_log.php?savemsg=Log+cleared.') ;
+	}
 }
-
 ?>
 
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">
 	<?php include("fbegin.inc"); ?>
+	<?php
+	$savemsg = $_GET["savemsg"];
+	if ($savemsg) {
+	  print_info_box($savemsg);
+	}
+	?>
 	<table width="100%" border="0" cellpadding="0" cellspacing="0">
 		<tr>
 			<td>
@@ -125,7 +134,7 @@ if ($cmd == "clear") {
 	<?=gettext("Trim keeps the last 50 lines of the log.");?>
 <?
 if ($g['platform'] == "nanobsd")
-        echo "<br>This log is lost when rebooting the system.";
+        echo "<br>This log may be lost when rebooting the system.";
 ?>
 
 
