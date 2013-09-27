@@ -4,7 +4,7 @@
 	status_asterisk.php
 	part of pfSense
 	Copyright (C) 2009 Scott Ullrich <sullrich@gmail.com>.
-	Copyright (C) 2012 robi <robreg@zsurob.hu>
+	Copyright (C) 2013 robi <robreg@zsurob.hu>
 	All rights reserved.
 
 	originally part of m0n0wall (http://m0n0.ch/wall)
@@ -96,14 +96,14 @@ $pfile = $break[count($break) - 1];
 						echo "<td align='center'><a href='$pfile?cmd=core+show+codecs+audio'><input type='button' name='command' value='Codecs' class='formbtns' style='width: 100px'></a></td>";
 						echo "<td align='center'><a href='$pfile?cmd=core+show+translation+recalc+10'><input type='button' name='command' value='Translation' class='formbtns' style='width: 100px'></a></td>";
 						echo "<td align='center'><a href='$pfile?cmd=sip+show+settings'><input type='button' name='command' value='SIP Settings' class='formbtns' style='width: 100px'></a></td>";
-						echo "</tr></tr>";
-						echo "<td></td>";
+						echo "</tr><tr>";
+						//echo "<td></td>";
 						echo "<td align='center'><a href='$pfile?cmd=sip+reload'><input type='button' name='command' value='Reload SIP' class='formbtns' style='width: 100px'></a></td>";
 						echo "<td align='center'><a href='$pfile?cmd=dialplan+reload'><input type='button' name='command' value='Reload Extensions' class='formbtns' style='width: 100px'></a></td>";
 						echo "<td align='center'><a href='$pfile?cmd=core+reload'><input type='button' name='command' value='Reload Core' class='formbtns' style='width: 100px'></a></td>";
 						echo "<td align='center'><a href='$pfile?cmd=core+show+uptime'><input type='button' name='command' value='Uptime' class='formbtns' style='width: 100px'></a></td>";
 						echo "<td align='center'><a href='$pfile?cmd=core+restart+now'><input type='button' name='command' value='Restart Asterisk' class='formbtns' style='width: 100px'></a></td>";
-						echo "<td></td>";
+						echo "<td align='right' colspan='2'><form name='input' action='$pfile' method='get'><input type='text' name='cmd' style='width: 145px'><input type='submit' value='SEND' class='formbtns' style='width: 50px'></form> </td>";
 						?>
 						</tr></table>
 						</td>
