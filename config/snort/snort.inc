@@ -47,7 +47,7 @@ global $rebuild_rules;
 
 /* package version */
 $snort_version = "2.9.4.6";
-$pfSense_snort_version = "2.5.9";
+$pfSense_snort_version = "2.6.0";
 $snort_package_version = "Snort {$snort_version} pkg v. {$pfSense_snort_version}";
 
 // Define SNORTDIR and SNORTLIBDIR constants according to FreeBSD version (PBI support or no PBI)
@@ -82,6 +82,101 @@ $rebuild_rules = false;
 
 if (!is_array($config['installedpackages']['snortglobal']))
 	$config['installedpackages']['snortglobal'] = array();
+
+function snort_get_alias_value($alias) {
+	/***************************************************/
+	/* This function returns the value of the passed   */
+	/* Alias, or an empty string if the value cannot   */
+	/* be determined.                                  */
+	/*                                                 */
+	/* On Entry: $alias ==> Alias to be evaluated      */
+	/*  Returns: Alias value as a string or an empty   */
+	/*           string                                */
+	/***************************************************/
+
+	global $config;
+
+	$entries = array();
+	$tmp = "";
+
+	// If no Aliases are defined in the configuration,
+	// return an empty string.
+	if (empty($config['aliases']))
+		return $tmp;
+
+	// See if we were passed a valid Alias and return
+	// an empty string if not.
+	if (!is_alias($alias))
+		return $tmp;
+
+	// We have a valid Alias, so find its value or 
+	// values and return as a string.
+	return snort_unpack_alias($alias);
+}
+
+function snort_unpack_alias($alias) {
+
+	/**************************************************/
+	/* This function unpacks an Alias to determine    */
+	/* the actual values it represents.  Any nested   */
+	/* Aliases encountered are also unpacked via      */
+	/* recursive calls to this function.              */
+	/*                                                */
+	/* Fully-qualified-domain-name (FQDN) aliases     */
+	/* are detected and resolved via a pfctl() call.  */
+	/**************************************************/
+
+	global $config;
+	$value = "";
+
+	// Find the matching Alias entry in config
+	foreach ($config['aliases']['alias'] as $aliased) {
+		if($aliased['name'] == $alias) {
+			$addr = array();
+			$addr = explode(" ", trim($aliased['address']));
+			foreach ($addr as $a) {
+				if (!is_alias($a) && !empty($a)) {
+					if (is_ipaddr($a) || is_subnet($a) || is_port($a))
+						// If address, subnet or port, we found the final value
+						$value .= $a . " ";
+					elseif (is_hostname($a)) {
+						// Found a FQDN value for this Alias, so resolve it
+						$entries = array();
+						exec("/sbin/pfctl -t " . escapeshellarg($alias) . " -T show", $entries);
+						$value .= trim(implode(" ", $entries));
+					}
+					else
+						continue;
+				}
+				elseif (is_alias($a))
+					// Found a nested Alias, so recursively resolve it
+					$value .= snort_unpack_alias($a) . " ";
+			}
+			return trim($value);
+		}
+	}
+	return $value;
+}
+
+function snort_is_single_addr_alias($alias) {
+	/***************************************************/
+	/* This function evaluates the passed Alias to     */
+	/* determine if it represents a single IP address, */
+	/* or a network in CIDR form, and returns TRUE if  */
+	/* the condition is met, and FALSE if not.         */
+	/*                                                 */
+	/* On Entry: $alias ==> Alias to be evaluated      */
+	/*  Returns: TRUE if Alias represents a single     */
+	/*           IP address or network, and FALSE      */
+	/*           if not.                               */
+	/***************************************************/
+
+	/* If spaces in expanded Alias, it's not a single entity */
+	if (strpos(snort_get_alias_value($alias), " ") !== false)
+		return false;
+	else
+		return true;
+}
 
 function snort_get_blocked_ips() {
 	$blocked_ips = "";
@@ -164,8 +259,13 @@ function snort_load_suppress_sigs($snortcfg, $track_by=false) {
 					if (preg_match('/\s*suppress\s*gen_id\b\s*(\d+),\s*sig_id\b\s*(\d+)\s*$/i', $line, $matches)) {
 						$genid = $matches[1];
 						$sigid = $matches[2];
-						if (!empty($genid) && !empty($sigid))
+						if (!empty($genid) && !empty($sigid)) {
+							if (!is_array($suppress[$genid]))
+								$suppress[$genid] = array();
+							if (!is_array($suppress[$genid][$sigid]))
+								$suppress[$genid][$sigid] = array();
 							$suppress[$genid][$sigid] = "suppress";
+						}
 					}
 
 					/* Get "track by IP" entries if requested */
@@ -176,8 +276,17 @@ function snort_load_suppress_sigs($snortcfg, $track_by=false) {
 							$sigid = $matches[2];
 							$whichip = trim($matches[3]);
 							$ip = $matches[4];
-							if (!empty($genid) && !empty($sigid) && !empty($whichip) && !empty($ip))
+							if (!empty($genid) && !empty($sigid) && !empty($whichip) && !empty($ip)) {
+								if (!is_array($suppress[$genid]))
+									$suppress[$genid] = array();
+								if (!is_array($suppress[$genid][$sigid]))
+									$suppress[$genid][$sigid] = array();
+								if (!is_array($suppress[$genid][$sigid][$whichip]))
+									$suppress[$genid][$sigid][$whichip] = array();
+								if (!is_array($suppress[$genid][$sigid][$whichip][$ip]))
+									$suppress[$genid][$sigid][$whichip][$ip] = array();
 								$suppress[$genid][$sigid][$whichip][$ip] = "suppress";
+							}
 						}
 						/* See if entry suppresses only by SRC or DST IPv6 address */
 						if (preg_match('/\s*suppress\s*gen_id\b\s*(\d+),\s*sig_id\b\s*(\d+),\s*track\s*(by_src|by_dst),\s*ip\s*([0-9a-f\.:]+)\s*$/i', $line, $matches)) {
@@ -185,8 +294,17 @@ function snort_load_suppress_sigs($snortcfg, $track_by=false) {
 							$sigid = $matches[2];
 							$whichip = trim($matches[3]);
 							$ip = trim($matches[4]);
-							if (!empty($genid) && !empty($sigid) && !empty($whichip) && !empty($ip))
+							if (!empty($genid) && !empty($sigid) && !empty($whichip) && !empty($ip)) {
+								if (!is_array($suppress[$genid]))
+									$suppress[$genid] = array();
+								if (!is_array($suppress[$genid][$sigid]))
+									$suppress[$genid][$sigid] = array();
+								if (!is_array($suppress[$genid][$sigid][$whichip]))
+									$suppress[$genid][$sigid][$whichip] = array();
+								if (!is_array($suppress[$genid][$sigid][$whichip][$ip]))
+									$suppress[$genid][$sigid][$whichip][$ip] = array();
 								$suppress[$genid][$sigid][$whichip][$ip] = "suppress";
+							}
 						}
 					}
 				}
@@ -241,7 +359,7 @@ function snort_build_list($snortcfg, $listname = "", $whitelist = false) {
 		$vips = $list['vips'];
 		$vpns = $list['vpnips'];
 		if (!empty($list['address']) && is_alias($list['address'])) {
-			$home_net = explode(" ", trim(filter_expand_alias($list['address'])));
+			$home_net = explode(" ", trim(snort_get_alias_value($list['address'])));
 		}
 	}
 
@@ -1769,24 +1887,33 @@ function snort_modify_sids(&$rule_map, $snortcfg) {
 	unset($enablesid, $disablesid);
 }
 
-/* Start of main config files */
-/* open snort.sh for writing" */
 function snort_create_rc() {
+
+	/*********************************************************/
+	/* This function builds the /usr/local/etc/rc.d/snort.sh */
+	/* shell script for starting and stopping Snort.  The    */
+	/* script is rebuilt on each package sync operation and  */
+	/* after any changes to snort.conf saved in the GUI.     */
+	/*********************************************************/
+
 	global $config, $g;
 
 	$snortdir = SNORTDIR;
 	$rcdir = RCFILEPREFIX;	
 
+	// If no interfaces are configured for Snort, exit
 	if (!is_array($config['installedpackages']['snortglobal']['rule']))
 		return;
-
-	$snortconf =& $config['installedpackages']['snortglobal']['rule'];
-	/* do not start config build if rules is empty */
+	$snortconf = $config['installedpackages']['snortglobal']['rule'];
 	if (empty($snortconf))
 		return;
 
+	// At least one interface is configured, so OK
 	$start_snort_iface_start = array();
 	$start_snort_iface_stop = array();
+
+	// Loop thru each configured interface and build
+	// the shell script.
 	foreach ($snortconf as $value) {
 		$snort_uuid = $value['uuid'];
 		$if_real = snort_get_real_interface($value['interface']);
@@ -1794,7 +1921,7 @@ function snort_create_rc() {
 		$start_barnyard = <<<EOE
 
 	if [ ! -f {$g['varrun_path']}/barnyard2_{$if_real}{$snort_uuid}.pid ]; then
-		pid=`/bin/pgrep -xf '/usr/local/bin/barnyard2 -r {$snort_uuid} -f snort_{$snort_uuid}_{$if_real}.u2 --pid-path {$g['varrun_path']} --nolock-pidfile -c {$snortdir}/snort_{$snort_uuid}_{$if_real}/barnyard2.conf -d /var/log/snort/snort_{$if_real}{$snort_uuid} -D -q' > {$g['varrun_path']}/barnyard2_{$if_real}{$snort_uuid}.pid`
+		pid=`/bin/pgrep -f "barnyard2 -r {$snort_uuid} "`
 	else
 		pid=`/bin/pgrep -F {$g['varrun_path']}/barnyard2_{$if_real}{$snort_uuid}.pid`
 	fi
@@ -1835,9 +1962,9 @@ EOE;
 			/bin/rm /var/run/barnyard2_{$if_real}{$snort_uuid}.pid
 		fi
 	else
-		pid=`/bin/pgrep -xf '/usr/local/bin/barnyard2 -r {$snort_uuid} -f snort_{$snort_uuid}_{$if_real}.u2 --pid-path {$g['varrun_path']} --nolock-pidfile -c {$snortdir}/snort_{$snort_uuid}_{$if_real}/barnyard2.conf -d /var/log/snort/snort_{$if_real}{$snort_uuid} -D -q'`
+		pid=`/bin/pgrep -f "barnyard2 -r {$snort_uuid} "`
 		if [ ! -z \$pid ]; then
-			/bin/pkill -xf '/usr/local/bin/barnyard2 -r {$snort_uuid} -f snort_{$snort_uuid}_{$if_real}.u2 --pid-path {$g['varrun_path']} --nolock-pidfile -c {$snortdir}/snort_{$snort_uuid}_{$if_real}/barnyard2.conf -d /var/log/snort/snort_{$if_real}{$snort_uuid} -D -q'
+			/bin/pkill -f "barnyard2 -r {$snort_uuid} "
 			time=0 timeout=30
 			while kill -0 \$pid 2>/dev/null; do
 				sleep 1
@@ -1860,10 +1987,11 @@ EOE;
 ###### For Each Iface
 	# Start snort and barnyard2
 	if [ ! -f {$g['varrun_path']}/snort_{$if_real}{$snort_uuid}.pid ]; then
-		pid=`/bin/pgrep -xf '/usr/local/bin/snort -R {$snort_uuid} -D -q -l /var/log/snort/snort_{$if_real}{$snort_uuid} --pid-path {$g['varrun_path']} --nolock-pidfile -G {$snort_uuid} -c {$snortdir}/snort_{$snort_uuid}_{$if_real}/snort.conf -i {$if_real}'`
+		pid=`/bin/pgrep -f "snort -R {$snort_uuid} "`
 	else
 		pid=`/bin/pgrep -F {$g['varrun_path']}/snort_{$if_real}{$snort_uuid}.pid`
 	fi
+
 	if [ ! -z \$pid ]; then
 		/usr/bin/logger -p daemon.info -i -t SnortStartup "Snort SOFT RESTART for {$value['descr']}({$snort_uuid}_{$if_real})..."
 		/bin/pkill -HUP \$pid
@@ -1895,10 +2023,10 @@ EOE;
 			/bin/rm /var/run/snort_{$if_real}{$snort_uuid}.pid
 		fi
 	else
-		pid=`/bin/pgrep -xf '/usr/local/bin/snort -R {$snort_uuid} -D -q -l /var/log/snort/snort_{$if_real}{$snort_uuid} --pid-path {$g['varrun_path']} --nolock-pidfile -G {$snort_uuid} -c {$snortdir}/snort_{$snort_uuid}_{$if_real}/snort.conf -i {$if_real}'`
+		pid=`/bin/pgrep -f "snort -R {$snort_uuid} "`
 		if [ ! -z \$pid ]; then
 			/usr/bin/logger -p daemon.info -i -t SnortStartup "Snort STOP for {$value['descr']}({$snort_uuid}_{$if_real})..."
-			/bin/pkill -xf '/usr/local/bin/snort -R {$snort_uuid} -D -q -l /var/log/snort/snort_{$if_real}{$snort_uuid} --pid-path {$g['varrun_path']} --nolock-pidfile -G {$snort_uuid} -c {$snortdir}/snort_{$snort_uuid}_{$if_real}/snort.conf -i {$if_real}'
+			/bin/pkill -f "snort -R {$snort_uuid} "
 			time=0 timeout=30
 			while kill -0 \$pid 2>/dev/null; do
 				sleep 1
@@ -1925,7 +2053,7 @@ EOE;
 # This file was automatically generated
 # by the pfSense service handler.
 # Code added to protect from double starts on pfSense bootup
-######## Begining of Main snort.sh
+######## Start of main snort.sh
 
 rc_start() {
 	{$rc_start}
@@ -2235,6 +2363,10 @@ function snort_prepare_rule_files($snortcfg, $snortcfgdir) {
 		if ($snortcfg['autoflowbitrules'] == 'on') {
 			log_error('[Snort] Enabling any flowbit-required rules for: ' . snort_get_friendly_interface($snortcfg['interface']) . '...');
 			$fbits = snort_resolve_flowbits($all_rules, $enabled_rules);
+
+			/* Check for and disable any flowbit-required rules the user has  */
+			/* manually forced to a disabled state.                           */
+			snort_modify_sids($fbits, $snortcfg);
 
 			/* Check for and disable any flowbit-required rules dependent upon     */
 			/* disabled preprocessors if this option is enabled for the interface. */
@@ -2548,14 +2680,15 @@ function snort_generate_conf($snortcfg) {
 		$ssh_port = "22";
 	$snort_ports = array(
 		"dns_ports" => "53", "smtp_ports" => "25", "mail_ports" => "25,143,465,691",
-		"http_ports" => "80,901,3128,8080,9000", "oracle_ports" => "1521", "mssql_ports" => "1433",
-		"telnet_ports" => "23","snmp_ports" => "161", "ftp_ports" => "21",
+		"http_ports" => "36,80,81,82,83,84,85,86,87,88,89,90,311,383,591,593,631,901,1220,1414,1741,1830,2301,2381,2809,3037,3057,3128,3443,3702,4343,4848,5250,6080,6988,7000,7001,7144,7145,7510,7777,7779,8000,8008,8014,8028,8080,8085,8088,8090,8118,8123,8180,8181,8222,8243,8280,8300,8500,8800,8888,8899,9000,9060,9080,9090,9091,9443,9999,10000,11371,34443,34444,41080,50000,50002,55555", 
+		"oracle_ports" => "1024:", "mssql_ports" => "1433",
+		"telnet_ports" => "23","snmp_ports" => "161", "ftp_ports" => "21,2100,3535",
 		"ssh_ports" => $ssh_port, "pop2_ports" => "109", "pop3_ports" => "110", 
 		"imap_ports" => "143", "sip_proxy_ports" => "5060:5090,16384:32768",
-		"sip_ports" => "5060,5061", "auth_ports" => "113", "finger_ports" => "79", 
+		"sip_ports" => "5060,5061, 5600", "auth_ports" => "113", "finger_ports" => "79", 
 		"irc_ports" => "6665,6666,6667,6668,6669,7000", "smb_ports" => "139,445",
 		"nntp_ports" => "119", "rlogin_ports" => "513", "rsh_ports" => "514",
-		"ssl_ports" => "443,465,563,636,989,990,992,993,994,995",
+		"ssl_ports" => "443,465,563,636,989,992,993,994,995,7801,7802,7900,7901,7902,7903,7904,7905,7906,7907,7908,7909,7910,7911,7912,7913,7914,7915,7916,7917,7918,7919,7920",
 		"file_data_ports" => "\$HTTP_PORTS,110,143", "shellcode_ports" => "!80", 
 		"sun_rpc_ports" => "111,32770,32771,32772,32773,32774,32775,32776,32777,32778,32779",
 		"DCERPC_NCACN_IP_TCP" => "139,445", "DCERPC_NCADG_IP_UDP" => "138,1024:",
@@ -2568,7 +2701,7 @@ function snort_generate_conf($snortcfg) {
 	$portvardef = "";
 	foreach ($snort_ports as $alias => $avalue) {
 		if (!empty($snortcfg["def_{$alias}"]) && is_alias($snortcfg["def_{$alias}"]))
-			$snort_ports[$alias] = filter_expand_alias($snortcfg["def_{$alias}"]);
+			$snort_ports[$alias] = snort_get_alias_value($snortcfg["def_{$alias}"]);
 		$snort_ports[$alias] = preg_replace('/\s+/', ',', trim($snort_ports[$alias]));
 		$portvardef .= "portvar " . strtoupper($alias) . " [" . $snort_ports[$alias] . "]\n";
 	}
@@ -2633,19 +2766,23 @@ preprocessor http_inspect_server: server default profile {$http_server_profile} 
 EOD;
 
 	/* def ftp_preprocessor */
+	$telnet_ports = str_replace(",", " ", $snort_ports['telnet_ports']);
+	$ftp_ports = str_replace(",", " ", $snort_ports['ftp_ports']);
 	$ftp_preprocessor = <<<EOD
-# ftp preprocessor  #
+# ftp_telnet preprocessor #
 preprocessor ftp_telnet: global \
 inspection_type stateless
 
 preprocessor ftp_telnet_protocol: telnet \
-   normalize \
-   ayt_attack_thresh 200
+   normalize ports { {$telnet_ports} } \
+   ayt_attack_thresh 20 \
+   detect_anomalies
 
-preprocessor ftp_telnet_protocol: \
-    ftp server default \
+preprocessor ftp_telnet_protocol: ftp server default \
     def_max_param_len 100 \
-    ports { 21 } \
+    ports { $ftp_ports } \
+    telnet_cmds yes \
+    ignore_telnet_erase_cmds yes \
     ftp_cmds { USER PASS ACCT CWD SDUP SMNT QUIT REIN PORT PASV TYPE STRU MODE } \
     ftp_cmds { RETR STOR STOU APPE ALLO REST RNFR RNTO ABOR DELE RMD MKD PWD } \
     ftp_cmds { LIST NLST SITE SYST STAT HELP NOOP } \
@@ -2676,12 +2813,14 @@ preprocessor ftp_telnet_protocol: \
 preprocessor ftp_telnet_protocol: ftp client default \
    max_resp_len 256 \
    bounce yes \
+   ignore_telnet_erase_cmds yes \
    telnet_cmds yes
 	
 EOD;
 
 	$pop_ports = str_replace(",", " ", $snort_ports['pop3_ports']);
 	$pop_preproc = <<<EOD
+# POP preprocessor #
 preprocessor pop: \
 	ports { {$pop_ports} } \
         memcap 1310700 \
@@ -2693,6 +2832,7 @@ EOD;
 
 	$imap_ports = str_replace(",", " ", $snort_ports['imap_ports']);
 	$imap_preproc = <<<EOD
+# IMAP preprocessor #
 preprocessor imap: \
 	ports { {$imap_ports} } \
         memcap 1310700 \
@@ -2711,10 +2851,12 @@ preprocessor SMTP: \
     inspection_type stateful \
     normalize cmds \
     ignore_tls_data \
-    valid_cmds { MAIL RCPT HELP HELO ETRN EHLO EXPN VRFY ATRN SIZE BDAT DEBUG EMAL ESAM ESND ESOM EVFY IDENT NOOP RSET SEND SAML SOML AUTH TURN ETRN PIPELINING \
-CHUNKING DATA DSN RSET QUIT ONEX QUEU STARTTLS TICK TIME TURNME VERB X-EXPS X-LINK2STATE XADR XAUTH XCIR XEXCH50 XGEN XLICENSE XQUEU XSTA XTRN XUSR } \
-    normalize_cmds { MAIL RCPT HELP HELO ETRN EHLO EXPN VRFY ATRN SIZE BDAT DEBUG EMAL ESAM ESND ESOM EVFY IDENT NOOP RSET SEND SAML SOML AUTH TURN ETRN \
-PIPELINING CHUNKING DATA DSN RSET QUIT ONEX QUEU STARTTLS TICK TIME TURNME VERB X-EXPS X-LINK2STATE XADR XAUTH XCIR XEXCH50 XGEN XLICENSE XQUEU XSTA XTRN XUSR } \
+    valid_cmds { MAIL RCPT HELP HELO ETRN EHLO EXPN VRFY ATRN SIZE BDAT DEBUG EMAL ESAM ESND ESOM EVFY IDENT NOOP RSET \
+                 SEND SAML SOML AUTH TURN ETRN PIPELINING CHUNKING DATA DSN RSET QUIT ONEX QUEU STARTTLS TICK TIME \
+                 TURNME VERB X-EXPS X-LINK2STATE XADR XAUTH XCIR XEXCH50 XGEN XLICENSE XQUEU XSTA XTRN XUSR } \
+    normalize_cmds { MAIL RCPT HELP HELO ETRN EHLO EXPN VRFY ATRN SIZE BDAT DEBUG EMAL ESAM ESND ESOM EVFY IDENT NOOP \
+                     RSET SEND SAML SOML AUTH TURN ETRN PIPELINING CHUNKING DATA DSN RSET QUIT ONEX QUEU STARTTLS TICK \
+                     TIME TURNME VERB X-EXPS X-LINK2STATE XADR XAUTH XCIR XEXCH50 XGEN XLICENSE XQUEU XSTA XTRN XUSR } \
     max_header_line_len 1000 \ 
     max_response_line_len 512 \
     alt_max_command_line_len 260 { MAIL } \
@@ -2752,12 +2894,12 @@ EOD;
 		$sf_pscan_sense_level = $snortcfg['pscan_sense_level'];
 	$sf_pscan_ignore_scanners = "\$HOME_NET";
 	if (!empty($snortcfg['pscan_ignore_scanners']) && is_alias($snortcfg['pscan_ignore_scanners'])) {
-		$sf_pscan_ignore_scanners = filter_expand_alias($snortcfg['pscan_ignore_scanners']);
+		$sf_pscan_ignore_scanners = snort_get_alias_value($snortcfg['pscan_ignore_scanners']);
 		$sf_pscan_ignore_scanners = preg_replace('/\s+/', ',', trim($sf_pscan_ignore_scanners));
 	}
 	
 	$sf_portscan = <<<EOD
-# sf Portscan  #
+# sf Portscan  preprocessor #
 preprocessor sfportscan: scan_type { {$sf_pscan_type} } \
                          proto  { {$sf_pscan_protocol} } \
                          memcap { {$sf_pscan_memcap} } \
@@ -2766,21 +2908,34 @@ preprocessor sfportscan: scan_type { {$sf_pscan_type} } \
 	
 EOD;
 
-	$sun_rpc_ports = str_replace(",", " ", $snort_ports['sun_rpc_ports']);
-	/* def other_preprocs */
-	$other_preprocs = <<<EOD
+	/* def ssh_preproc */
+	$ssh_ports = str_replace(",", " ", $snort_ports['ssh_ports']);
+	$ssh_preproc = <<<EOD
+# SSH preprocessor #
+preprocessor ssh: server_ports { {$ssh_ports} } \
+	autodetect \
+	max_client_bytes 19600 \
+	max_encrypted_packets 20 \
+	max_server_version_len 100 \
+	enable_respoverflow enable_ssh1crc32 \
+	enable_srvoverflow enable_protomismatch
 
+EOD;
+
+	/* def other_preprocs */
+	$sun_rpc_ports = str_replace(",", " ", $snort_ports['sun_rpc_ports']);
+	$other_preprocs = <<<EOD
 # Other preprocs #
 preprocessor rpc_decode: {$sun_rpc_ports} no_alert_multiple_requests no_alert_large_fragments no_alert_incomplete
 
-# Back Orifice
+# Back Orifice preprocessor #
 preprocessor bo
 	
 EOD;
 
 	/* def dce_rpc_2 */
 	$dce_rpc_2 = <<<EOD
-# DCE/RPC 2   #
+# DCE/RPC 2 #
 preprocessor dcerpc2: memcap 102400, events [co]
 preprocessor dcerpc2_server: default, policy WinXP, \
     detect [smb [{$snort_ports['smb_ports']}], tcp 135, udp 135, rpc-over-http-server 593], \
@@ -2791,11 +2946,39 @@ EOD;
 
 	$sip_ports = str_replace(",", " ", $snort_ports['sip_ports']);
 	$sip_preproc = <<<EOD
-# SIP preprocessor
-preprocessor sip: ports { {$sip_ports} }, max_call_id_len 300, \
-		max_from_len 100, max_to_len 200, max_via_len 1000, \
-		max_requestName_len 50, max_uri_len 100, ignore_call_channel,\
-		max_content_len 1000
+# SIP preprocessor #
+preprocessor sip: max_sessions 40000, \
+	ports { {$sip_ports} }, \
+	methods { invite \
+		cancel \
+		ack \
+		bye \
+		register \
+		options \
+		refer \
+		subscribe \
+		update \
+		join \
+		info \
+		message \
+		notify \
+		benotify \
+		do \
+		qauth \
+		sprack \
+		publish \
+		service \
+		unsubscribe \
+		prack }, \
+	max_call_id_len 80, \
+	max_from_len 256, \
+	max_to_len 256, \
+	max_via_len 1024, \
+	max_requestName_len 50, \
+	max_uri_len 512, \
+	ignore_call_channel, \
+	max_content_len 2048, \
+	max_contact_len 512
 
 EOD;
 
@@ -2837,10 +3020,13 @@ preprocessor gtp: ports { {$gtp_ports} }
 	
 EOD;
 
-	$def_ssl_ports_ignore = str_replace(",", " ", $snort_ports['ssl_ports']);
+	/* def ssl_preprocessor */
+	$ssl_ports = str_replace(",", " ", $snort_ports['ssl_ports']);
 	$ssl_preproc = <<<EOD
-# Ignore SSL and Encryption  #
-preprocessor ssl: ports { {$def_ssl_ports_ignore} }, trustservers, noinspect_encrypted
+# SSL preprocessor #
+preprocessor ssl: \
+	ports { {$ssl_ports} }, \
+	trustservers, noinspect_encrypted 
 
 EOD;
 
@@ -2872,7 +3058,7 @@ EOD;
 	$vardef = "";
 	foreach ($snort_servers as $alias => $avalue) {
 		if (!empty($snortcfg["def_{$alias}"]) && is_alias($snortcfg["def_{$alias}"])) {
-			$avalue = filter_expand_alias($snortcfg["def_{$alias}"]);
+			$avalue = snort_get_alias_value($snortcfg["def_{$alias}"]);
 			$avalue = str_replace(" ", ",", trim($avalue));
 		}
 		$vardef .= "var " . strtoupper($alias) . " [{$avalue}]\n";
@@ -2885,7 +3071,7 @@ EOD;
 		"ssl_preproc" => "ssl_preproc", "dnp3_preproc" => "dnp3_preproc", "modbus_preproc" => "modbus_preproc"
 	);
 	$snort_preproc = array (
-		"perform_stat", "http_inspect", "other_preprocs", "ftp_preprocessor", "smtp_preprocessor", "ssl_preproc", "sip_preproc", "gtp_preproc",
+		"perform_stat", "http_inspect", "other_preprocs", "ftp_preprocessor", "smtp_preprocessor", "ssl_preproc", "sip_preproc", "gtp_preproc", "ssh_preproc",
 		"sf_portscan", "dce_rpc_2", "dns_preprocessor", "sensitive_data", "pop_preproc", "imap_preproc", "dnp3_preproc", "modbus_preproc"
 	);
 	$default_disabled_preprocs = array(
@@ -3071,7 +3257,7 @@ EOD;
 # snort configuration file
 # generated automatically by the pfSense subsystems do not modify manually
 
-# Define Local Network  #
+# Define Local Network #
 var HOME_NET [{$home_net}]
 var EXTERNAL_NET [{$external_net}]
 
@@ -3079,16 +3265,16 @@ var EXTERNAL_NET [{$external_net}]
 var RULE_PATH {$snortcfgdir}/rules
 var PREPROC_RULE_PATH {$snortcfgdir}/preproc_rules
 
-# Define Servers  #
+# Define Servers #
 {$vardef}
 
-# Define Server Ports  #
+# Define Server Ports #
 {$portvardef}
 
 # Configure quiet startup mode #
 config quiet
 
-# Configure the snort decoder  #
+# Configure the snort decoder #
 config checksum_mode: {$cksumcheck}
 config disable_decode_alerts
 config disable_tcpopt_experimental_alerts
@@ -3098,14 +3284,14 @@ config disable_tcpopt_alerts
 config disable_ipopt_alerts
 config disable_decode_drops
 
-# Enable the GTP decoder  #
+# Enable the GTP decoder #
 config enable_gtp
 
 # Configure PCRE match limitations
 config pcre_match_limit: 3500
 config pcre_match_limit_recursion: 1500
 
-# Configure the detection engine  #
+# Configure the detection engine #
 config detection: {$cfg_detect_settings}
 config event_queue: max_queue 8 log 5 order_events content_length
 
@@ -3134,7 +3320,7 @@ preprocessor frag3_global: {$frag3_memcap}, {$frag3_max_frags}{$frag3_disabled}
 preprocessor frag3_engine: {$frag3_policy} detect_anomalies {$frag3_timeout} {$frag3_overlap_limit} {$frag3_min_frag_len} 
 
 preprocessor stream5_global:{$stream5_reassembly} track_tcp {$stream5_track_tcp}, track_udp {$stream5_track_udp}, track_icmp {$stream5_track_icmp}, max_tcp 262144, max_udp 131072, max_active_responses 2, min_response_seconds 5{$stream5_mem_cap}
-preprocessor stream5_tcp: {$stream5_policy}, {$stream5_overlap_limit}, {$stream5_tcp_timeout}, ports both all{$stream5_max_queued_bytes_type}{$stream5_max_queued_segs_type}{$stream5_require_3whs}{$stream5_no_reassemble_async}$stream5_dont_store_lg_pkts
+preprocessor stream5_tcp: {$stream5_policy}, {$stream5_overlap_limit}, {$stream5_tcp_timeout}, ports both all{$stream5_max_queued_bytes_type}{$stream5_max_queued_segs_type}{$stream5_require_3whs}{$stream5_no_reassemble_async}{$stream5_dont_store_lg_pkts}
 preprocessor stream5_udp: {$stream5_udp_timeout}
 preprocessor stream5_icmp: {$stream5_icmp_timeout}
 

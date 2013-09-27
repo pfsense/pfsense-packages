@@ -109,6 +109,7 @@ if (isset($id) && $a_nat[$id]) {
 	$pconfig['dnp3_preproc'] = $a_nat[$id]['dnp3_preproc'];
 	$pconfig['modbus_preproc'] = $a_nat[$id]['modbus_preproc'];
 	$pconfig['gtp_preproc'] = $a_nat[$id]['gtp_preproc'];
+	$pconfig['ssh_preproc'] = $a_nat[$id]['ssh_preproc'];
 	$pconfig['preproc_auto_rule_disable'] = $a_nat[$id]['preproc_auto_rule_disable'];
 	$pconfig['protect_preproc_rules'] = $a_nat[$id]['protect_preproc_rules'];
 	$pconfig['frag3_detection'] = $a_nat[$id]['frag3_detection'];
@@ -153,6 +154,8 @@ if (isset($id) && $a_nat[$id]) {
 		$pconfig['sip_preproc'] = 'on';
 	if (empty($pconfig['other_preprocs']))
 		$pconfig['other_preprocs'] = 'on';
+	if (empty($pconfig['ssh_preproc']))
+		$pconfig['ssh_preproc'] = 'on';
 	if (empty($pconfig['http_inspect_memcap']))
 		$pconfig['http_inspect_memcap'] = "150994944";
 	if (empty($pconfig['frag3_overlap_limit']))
@@ -258,6 +261,7 @@ if ($_POST['ResetAll']) {
 	$pconfig['dnp3_preproc'] = "off";
 	$pconfig['modbus_preproc'] = "off";
 	$pconfig['gtp_preproc'] = "off";
+	$pconfig['ssh_preproc'] = "on";
 	$pconfig['preproc_auto_rule_disable'] = "off";
 	$pconfig['protect_preproc_rules'] = "off";
 	$pconfig['frag3_detection'] = "on";
@@ -334,6 +338,7 @@ elseif ($_POST['Submit']) {
 		$natent['sip_preproc'] = $_POST['sip_preproc'] ? 'on' : 'off';
 		$natent['modbus_preproc'] = $_POST['modbus_preproc'] ? 'on' : 'off';
 		$natent['gtp_preproc'] = $_POST['gtp_preproc'] ? 'on' : 'off';
+		$natent['ssh_preproc'] = $_POST['ssh_preproc'] ? 'on' : 'off';
 		$natent['preproc_auto_rule_disable'] = $_POST['preproc_auto_rule_disable'] ? 'on' : 'off';
 		$natent['protect_preproc_rules'] = $_POST['protect_preproc_rules'] ? 'on' : 'off';
 		$natent['frag3_detection'] = $_POST['frag3_detection'] ? 'on' : 'off';
@@ -1221,6 +1226,12 @@ include_once("head.inc");
 		<?php echo gettext("The GTP preprocessor decodes GPRS Tunneling Protocol traffic and detects intrusion attempts."); ?></td>
 	</tr>
 	<tr>
+		<td width="22%" valign="top" class="vncell"><?php echo gettext("Enable SSH Detection"); ?></td>
+		<td width="78%" class="vtable"><input name="ssh_preproc" type="checkbox" value="on" 
+			<?php if ($pconfig['ssh_preproc']=="on") echo "checked"; ?>>
+		<?php echo gettext("The SSH preprocessor detects various Secure Shell exploit attempts."); ?></td>
+	</tr>
+	<tr>
 		<td width="22%" valign="top" class="vncell"><?php echo gettext("Enable DNS Detection"); ?></td>
 		<td width="78%" class="vtable"><input name="dns_preprocessor" type="checkbox" value="on" 
 			<?php if ($pconfig['dns_preprocessor']=="on") echo "checked"; ?>>
@@ -1443,6 +1454,21 @@ function enable_change_all() {
 	document.iform.stream5_tcp_timeout.disabled=endis;
 	document.iform.stream5_udp_timeout.disabled=endis;
 	document.iform.stream5_icmp_timeout.disabled=endis;
+}
+
+function wopen(url, name, w, h)
+{
+// Fudge factors for window decoration space.
+// In my tests these work well on all platforms & browsers.
+    w += 32;
+    h += 96;
+    var win = window.open(url,
+        name, 
+       'width=' + w + ', height=' + h + ', ' +
+       'location=no, menubar=no, ' +
+       'status=no, toolbar=no, scrollbars=yes, resizable=yes');
+    win.resizeTo(w, h);
+    win.focus();
 }
 
 // Set initial state of form controls

@@ -48,17 +48,17 @@ if (!is_array($config['installedpackages']['snortglobal']['rule'])) {
 }
 $a_nat = &$config['installedpackages']['snortglobal']['rule'];
 
-/* NOTE: KEEP IN SYNC WITH SNORT.INC since global do not work quite well with package */
+/* NOTE: KEEP IN SYNC WITH SNORT.INC since globals do not work well with package */
 /* define servers and ports snortdefservers */
 $snort_servers = array (
-"dns_servers" => "\$HOME_NET", "smtp_servers" => "\$HOME_NET", "http_servers" => "\$HOME_NET",
-"www_servers" => "\$HOME_NET", "sql_servers" => "\$HOME_NET", "telnet_servers" => "\$HOME_NET",
-"snmp_servers" => "\$HOME_NET", "ftp_servers" => "\$HOME_NET", "ssh_servers" => "\$HOME_NET",
-"pop_servers" => "\$HOME_NET", "imap_servers" => "\$HOME_NET", "sip_proxy_ip" => "\$HOME_NET",
-"sip_servers" => "\$HOME_NET", "rpc_servers" => "\$HOME_NET", "dnp3_server" => "\$HOME_NET", 
-"dnp3_client" => "\$HOME_NET", "modbus_server" => "\$HOME_NET", "modbus_client" => "\$HOME_NET",
-"enip_server" => "\$HOME_NET", "enip_client" => "\$HOME_NET",
-"aim_servers" => "64.12.24.0/23,64.12.28.0/23,64.12.161.0/24,64.12.163.0/24,64.12.200.0/24,205.188.3.0/24,205.188.5.0/24,205.188.7.0/24,205.188.9.0/24,205.188.153.0/24,205.188.179.0/24,205.188.248.0/24"
+	"dns_servers" => "\$HOME_NET", "smtp_servers" => "\$HOME_NET", "http_servers" => "\$HOME_NET",
+	"www_servers" => "\$HOME_NET", "sql_servers" => "\$HOME_NET", "telnet_servers" => "\$HOME_NET",
+	"snmp_servers" => "\$HOME_NET", "ftp_servers" => "\$HOME_NET", "ssh_servers" => "\$HOME_NET",
+	"pop_servers" => "\$HOME_NET", "imap_servers" => "\$HOME_NET", "sip_proxy_ip" => "\$HOME_NET",
+	"sip_servers" => "\$HOME_NET", "rpc_servers" => "\$HOME_NET", "dnp3_server" => "\$HOME_NET",
+	"dnp3_client" => "\$HOME_NET", "modbus_server" => "\$HOME_NET", "modbus_client" => "\$HOME_NET",
+	"enip_server" => "\$HOME_NET", "enip_client" => "\$HOME_NET",
+	"aim_servers" => "64.12.24.0/23,64.12.28.0/23,64.12.161.0/24,64.12.163.0/24,64.12.200.0/24,205.188.3.0/24,205.188.5.0/24,205.188.7.0/24,205.188.9.0/24,205.188.153.0/24,205.188.179.0/24,205.188.248.0/24"
 );
 
 /* if user has defined a custom ssh port, use it */
@@ -67,21 +67,23 @@ if(is_array($config['system']['ssh']) && isset($config['system']['ssh']['port'])
 else
         $ssh_port = "22";
 $snort_ports = array(
-"dns_ports" => "53", "smtp_ports" => "25", "mail_ports" => "25,143,465,691",
-"http_ports" => "80", "oracle_ports" => "1521", "mssql_ports" => "1433",
-"telnet_ports" => "23","snmp_ports" => "161", "ftp_ports" => "21",
-"ssh_ports" => $ssh_port, "pop2_ports" => "109", "pop3_ports" => "110",
-"imap_ports" => "143", "sip_proxy_ports" => "5060:5090,16384:32768",
-"sip_ports" => "5060,5061", "auth_ports" => "113", "finger_ports" => "79",
-"irc_ports" => "6665,6666,6667,6668,6669,7000", "smb_ports" => "139,445",
-"nntp_ports" => "119", "rlogin_ports" => "513", "rsh_ports" => "514",
-"ssl_ports" => "443,465,563,636,989,990,992,993,994,995", "GTP_PORTS" => "2123,2152,3386",
-"file_data_ports" => "\$HTTP_PORTS,110,143", "shellcode_ports" => "!80",
-"sun_rpc_ports" => "111,32770,32771,32772,32773,32774,32775,32776,32777,32778,32779",
-"DCERPC_NCACN_IP_TCP" => "139,445", "DCERPC_NCADG_IP_UDP" => "138,1024:",
-"DCERPC_NCACN_IP_LONG" => "135,139,445,593,1024:", "DCERPC_NCACN_UDP_LONG" => "135,1024:",
-"DCERPC_NCACN_UDP_SHORT" => "135,593,1024:", "DCERPC_NCACN_TCP" => "2103,2105,2107",
-"DCERPC_BRIGHTSTORE" => "6503,6504", "DNP3_PORTS" => "20000", "MODBUS_PORTS" => "502"
+	"dns_ports" => "53", "smtp_ports" => "25", "mail_ports" => "25,465,587,691",
+	"http_ports" => "36,80,81,82,83,84,85,86,87,88,89,90,311,383,591,593,631,901,1220,1414,1741,1830,2301,2381,2809,3037,3057,3128,3443,3702,4343,4848,5250,6080,6988,7000,7001,7144,7145,7510,7777,7779,8000,8008,8014,8028,8080,8085,8088,8090,8118,8123,8180,8181,8222,8243,8280,8300,8500,8800,8888,8899,9000,9060,9080,9090,9091,9443,9999,10000,11371,34443,34444,41080,50000,50002,55555", 
+	"oracle_ports" => "1024:", "mssql_ports" => "1433",
+	"telnet_ports" => "23","snmp_ports" => "161", "ftp_ports" => "21,2100,3535",
+	"ssh_ports" => $ssh_port, "pop2_ports" => "109", "pop3_ports" => "110", 
+	"imap_ports" => "143", "sip_proxy_ports" => "5060:5090,16384:32768",
+	"sip_ports" => "5060,5061,5600", "auth_ports" => "113", "finger_ports" => "79", 
+	"irc_ports" => "6665,6666,6667,6668,6669,7000", "smb_ports" => "139,445",
+	"nntp_ports" => "119", "rlogin_ports" => "513", "rsh_ports" => "514",
+	"ssl_ports" => "443,465,563,636,989,992,993,994,995,7801,7802,7900,7901,7902,7903,7904,7905,7906,7907,7908,7909,7910,7911,7912,7913,7914,7915,7916,7917,7918,7919,7920",
+	"file_data_ports" => "\$HTTP_PORTS,110,143", "shellcode_ports" => "!80", 
+	"sun_rpc_ports" => "111,32770,32771,32772,32773,32774,32775,32776,32777,32778,32779",
+	"DCERPC_NCACN_IP_TCP" => "139,445", "DCERPC_NCADG_IP_UDP" => "138,1024:",
+	"DCERPC_NCACN_IP_LONG" => "135,139,445,593,1024:", "DCERPC_NCACN_UDP_LONG" => "135,1024:",
+	"DCERPC_NCACN_UDP_SHORT" => "135,593,1024:", "DCERPC_NCACN_TCP" => "2103,2105,2107",
+	"DCERPC_BRIGHTSTORE" => "6503,6504", "DNP3_PORTS" => "20000", "MODBUS_PORTS" => "502",
+	"GTP_PORTS" => "2123,2152,3386"
 );
 
 $pconfig = $a_nat[$id];
@@ -220,7 +222,8 @@ if ($savemsg)
 		</tr>
 <?php
 		foreach ($snort_ports as $key => $server):
-			$server = substr($server, 0, 20);
+			if (strlen($server) > 40)
+				$server = substr($server, 0, 40) . "...";
 			$label = strtoupper($key);
 			$value = "";
 			if (!empty($pconfig["def_{$key}"]))
@@ -229,7 +232,7 @@ if ($savemsg)
 			<tr>
 				<td width='22%' valign='top' class='vncell'><?php echo gettext("Define"); ?> <?=$label;?></td>
 				<td width="78%" class="vtable">
-					<input name="def_<?=$key;?>" type="text" size="40" autocomplete="off"  class="formfldalias" id="def_<?=$key;?>"
+					<input name="def_<?=$key;?>" type="text" size="40" autocomplete="off" class="formfldalias" id="def_<?=$key;?>"
 					value="<?=$value;?>"> <br/>
 				<span class="vexpl"><?php echo gettext("Default value:"); ?> "<?=$server;?>" <br/> <?php echo gettext("Leave " .
 				"blank for default value."); ?></span>
