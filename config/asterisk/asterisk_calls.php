@@ -61,11 +61,13 @@ $pfile = $break[count($break) - 1];
 if (file_exists($callog))
 	switch ($cmd){
 		case "trim":
-		$trimres=shell_exec("tail -50 '$callog' > /tmp/trimmed.csv; rm '$callog'; mv /tmp/trimmed.csv '$callog'; chmod 666 '$callog'");
+		$trimres=shell_exec("tail -50 '$callog' > /tmp/trimmed_asterisk.csv && rm '$callog' && mv /tmp/trimmed_asterisk.csv '$callog' && chown asterisk:asterisk '$callog' && chmod g+w '$callog'");
+		header( 'Location: asterisk_calls.php?savemsg=Calls+log+trimmed.') ;
 		break;
 
 		case "clear":
-		$trimres=shell_exec("rm '$callog'; touch '$callog'; chmod 666 '$callog'");
+		$trimres=shell_exec("rm '$callog' && touch '$callog' && chown asterisk:asterisk '$callog' && chmod g+w '$callog'");
+		header( 'Location: asterisk_calls.php?savemsg=Calls+log+cleared.') ;
 		break;
 
 		case "download":
@@ -91,6 +93,12 @@ if (file_exists($callog))
 
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">
 	<?php include("fbegin.inc"); ?>
+	<?php
+	$savemsg = $_GET["savemsg"];
+	if ($savemsg) {
+	  print_info_box($savemsg);
+	}
+	?>
 	<table width="100%" border="0" cellpadding="0" cellspacing="0">
 		<tr>
 			<td>
@@ -159,7 +167,7 @@ if (file_exists($callog))
 
 <?
 if ($g['platform'] == "nanobsd")
-        echo "<br>This log is lost when rebooting the system.";
+        echo "<br>This log may be lost when rebooting the system.";
 ?>
 
 
