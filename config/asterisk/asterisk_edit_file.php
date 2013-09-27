@@ -50,7 +50,8 @@ $downname = "asterisk-config-{$host}-".date("YmdHis").".bak.tgz";  //put the dat
 
 if (($_GET['a'] == "download") && $_GET['t'] == "backup") {
 	conf_mount_rw();
-	system("cd {$files_dir} && tar czf {$backup_path} *");
+//	system("cd {$files_dir} && tar czf {$backup_path} *");
+	system("cd {$files_dir} && tar czf {$backup_path} --exclude 'dist/*' --exclude dist *");
 	conf_mount_ro();
 }
 
@@ -75,15 +76,37 @@ if ($_GET['a'] == "other") {
 		if (file_exists($backup_path)) {
 			//echo "The file $filename exists";
 			conf_mount_rw();
-			//$sysretval = system("tar -xzC {$files_dir} -f {$backup_path} 2>&1");
 			exec("tar -xzC {$files_dir} -f {$backup_path} 2>&1", $sysretval);
-			$savemsg = "Backup has been restored " . $sysretval[1];
-			//$savemsg = "Backup has been restored " . $sysretval;
+			$savemsg = "Backup has been restored, please restart Asterisk now " . $sysretval[1];
 			system("chmod -R 644 {$files_dir}/*");
 			header( 'Location: asterisk_edit_file.php?savemsg=' . $savemsg ) ;
 			conf_mount_ro();
 		} else {
 			header( 'Location: asterisk_edit_file.php?savemsg=Restore+failed.+Backup+file+not+found.' ) ;
+		}
+		exit;
+	}
+	if ($_GET['t'] == "factrest") {
+		//extract files to $files_dir (/conf/asterisk)
+		if (file_exists('/conf.default/asterisk_factory_defaults_config.tgz')) {
+			//echo "The file $filename exists";
+			conf_mount_rw();
+			exec("tar -xzC {$files_dir} -f /conf.default/asterisk_factory_defaults_config.tgz 2>&1", $sysretval);
+			$savemsg = "Factory configuration restored, please restart Asterisk now " . $sysretval[1];
+			system("chmod -R 644 {$files_dir}/*");
+			header( 'Location: asterisk_edit_file.php?savemsg=' . $savemsg ) ;
+			conf_mount_ro();
+		}
+		exit;
+	}
+	if ($_GET['t'] == "deldist") {
+		//delete dist directory from $files_dir/dist (/conf/asterisk/dist)
+		if (file_exists($files_dir . "/dist")) {
+			conf_mount_rw();
+			exec("rm -r {$files_dir}/dist 2>&1", $sysretval);
+			$savemsg = "Deleted dist files " . $sysretval[1];
+			header( 'Location: asterisk_edit_file.php?savemsg=' . $savemsg ) ;
+			conf_mount_ro();
 		}
 		exit;
 	}
@@ -222,6 +245,26 @@ if ($savemsg) {
 			}
 		);
 	}
+
+	
+
+	function ckrest() {
+		if(document.getElementById('ckrest').checked==true) {
+			document.getElementById('restfactdef').disabled=false;
+		} else {
+			document.getElementById('restfactdef').disabled=true;
+		}
+	}
+
+	function ckdist() {
+		if(document.getElementById('ckdist').checked==true) {
+			document.getElementById('deldistdire').disabled=false;
+		} else {
+			document.getElementById('deldistdire').disabled=true;
+		}
+	}
+ 	
+	
 </script>
 
 	<table width="100%" border="0" cellpadding="0" cellspacing="0">
@@ -244,11 +287,11 @@ if ($savemsg) {
 					<!-- backup options -->
 					<div style="background:#eeeeee;">
 						<div class="vexpl" style="padding-left:15px;">
-						
+						<br />
 						<table width='98%' cellpadding='0' cellspacing='0' border='0'>
 						<tr>
-						<td width='80%'><br />
-						<b>Backup / Restore</b><br />
+						<td width='80%'>
+						<b>Backup / Restore</b>
 						The 'Backup' button will tar gzip asterisk configuration files to <? echo $backup_path; ?> it then offers it to download.<br>
 						The 'Restore' button will be visible only if the <? echo $backup_path; ?> backup file exists.<br>
 						You can upload a backup file to the system, if one already exists at <? echo $backup_path; ?>, it will be overwritten.
@@ -354,6 +397,27 @@ if ($savemsg) {
 						<?php endif; ?>
 					</script>
 
+					
+					<div style="background:#eeeeee;">
+						<div class="vexpl" style="padding-left:15px;">
+						<table width='98%' cellpadding='0' cellspacing='0' border='0'>
+						<tr>
+						<td width='80%' valign='middle' align='right'><br />
+						<?php
+							if (file_exists($files_dir . "/dist")) {
+								echo "<input name='ckdist' id='ckdist' type='checkbox' onclick='return ckdist();' style='vertical-align:-3px;'>enable <input type='button' value='Delete dist files' name='deldistdire' id='deldistdire' disabled='disabled' onclick=\"document.location.href='asterisk_edit_file.php?a=other&t=deldist';\" />&nbsp;&nbsp;\n";
+							}
+							if (file_exists("/conf.default/asterisk_factory_defaults_config.tgz")) {
+								echo "<input name='ckrest' id='ckrest' type='checkbox' onclick='return ckrest();' style='vertical-align:-3px;'>enable <input type='button' value='Restore to factory defaults' name='restfactdef' id='restfactdef' disabled='disabled' onclick=\"document.location.href='asterisk_edit_file.php?a=other&t=factrest';\" />\n";
+							}
+						?>
+						<br /></td>
+						</tr>
+						</table><br />			
+						</div>
+					</div>
+					
+					
 				</div>
 			</td>
 		</tr>
@@ -367,6 +431,18 @@ if ($savemsg) {
 	</span>
 	<?=gettext("Please back up your Asterisk configuration regularly.");?><br>
 	<?=gettext("It's worth to preserve the automatically generated filename of the downloaded backup file. It contains the backup creation date, which is used when uploading it back to the system.");?>
+	<?php
+	$sipconf=$files_dir . "/sip.conf";
+	if (file_exists($sipconf)){
+		$sipconf_file=file_get_contents($sipconf);
+		if (strpos($sipconf_file,"demo extension for pfSense") !== false) {
+			?><br />
+			<?=gettext("This Asterisk configuration on pfSense contains two demo SIP accounts, 301 and 302 with password 1234, for you to test functionality. Check sip.conf for more details. These accounts can be safely removed at any time.");?>
+			<?php
+		}
+	}	
+	?>
+	
 </span>
 	
 <?php include("fend.inc"); ?>
