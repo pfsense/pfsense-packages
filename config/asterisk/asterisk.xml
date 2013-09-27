@@ -41,7 +41,7 @@
     <requirements>Asterisk 1.8.x</requirements>
     <faq>Currently there are no FAQ items provided.</faq>
 	<name>asterisk</name>
-	<version>0.2</version>
+	<version>0.3</version>
 	<title>asterisk</title>
 	<include_file>/usr/local/pkg/asterisk.inc</include_file>
 	<additional_files_needed>
@@ -98,6 +98,6 @@
 	<custom_delete_php_command>
 	</custom_delete_php_command>	
 	<custom_php_resync_config_command>
-/*		sync_package_asterisk(); */
+		sync_package_asterisk();
 	</custom_php_resync_config_command>
 </packagegui>
