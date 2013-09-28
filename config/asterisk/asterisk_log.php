@@ -67,7 +67,7 @@ $break = Explode('/', $file);
 $pfile = $break[count($break) - 1]; 
 
 
-if (file_exists($log) {
+if (file_exists($log)) {
 	if ($cmd == "trim") {
 		$trimres=shell_exec("tail -50 '$log' > /tmp/trimmed_asterisk.log && rm '$log' && mv /tmp/trimmed_asterisk.log '$log' && chown asterisk:asterisk '$log' && chmod g+w '$log'");
 		header( 'Location: asterisk_log.php?savemsg=Log+trimmed.') ;
