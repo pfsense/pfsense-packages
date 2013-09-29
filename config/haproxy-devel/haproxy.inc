@@ -31,9 +31,7 @@
 require_once("functions.inc");
 require_once("pkg-utils.inc");
 require_once("notices.inc");
-
-global $haproxy_sni_ssloffloading;
-$haproxy_sni_ssloffloading=true;// can only be used with recent 1.5-dev17 builds.
+require_once("haproxy_xmlrpcsyncclient.inc");
 
 $d_haproxyconfdirty_path = $g['varrun_path'] . "/haproxy.conf.dirty";
 
@@ -62,10 +60,9 @@ $a_acltypes[] = array('name' => 'source_ip', 'descr' => 'Source IP',
 				'mode' => '', 'syntax' => 'src %1$s');
 $a_acltypes[] = array('name' => 'backendservercount', 'descr' => 'Minimum count usable servers',
 				'mode' => '', 'syntax' => 'nbsrv(%2$s) ge %1$d', 'parameters' => 'value,backendname');
-if ($haproxy_sni_ssloffloading) {
-	$a_acltypes[] = array('name' => 'ssl_sni_matches',  'descr' => 'Server Name Indication TLS extension matches', 
-					'mode' => 'https', 'syntax' => 'req_ssl_sni -i %1$s', 'advancedoptions' => "tcp-request inspect-delay 5s\n\ttcp-request content accept if { req_ssl_hello_type 1 }");
-}
+// 'ssl_sni_matches' was added in HAProxy1.5dev17
+$a_acltypes[] = array('name' => 'ssl_sni_matches',  'descr' => 'Server Name Indication TLS extension matches', 
+				'mode' => 'https', 'syntax' => 'req_ssl_sni -i %1$s', 'advancedoptions' => "tcp-request inspect-delay 5s\n\ttcp-request content accept if { req_ssl_hello_type 1 }");
 
 $a_checktypes['none'] = array('name' => 'none', 'syntax' => '',
 	'descr' => 'No health checks will be performed.');
@@ -73,7 +70,7 @@ $a_checktypes['Basic'] = array('name' => 'Basic', 'syntax' => '',
 	'descr' => 'Basic socket connection check');
 $a_checktypes['HTTP'] = array('name' => 'HTTP', 'syntax' => 'httpchk',
 	'descr' => 'HTTP protocol to check on the servers health, can also be used for HTTPS servers(requirs checking the SSL box for the servers).', 'parameters' => "uri,method,version");
-/* 'Agent' was added in HAProxy1.5dev18 */
+// 'Agent' was added in HAProxy1.5dev18
 $a_checktypes['Agent'] = array('name' => 'Agent', 'syntax' => 'lb-agent-chk', 'usedifferenport' => 'yes', 
 	'descr' => 'Use a TCP connection to read an ASCII string of the form 100%,75%,drain,down (others in haproxy manual)');
 $a_checktypes['LDAP'] = array('name' => 'LDAP', 'syntax' => 'ldap-check',
@@ -318,34 +315,6 @@ function haproxy_install_cron($should_install) {
 
 function haproxy_find_acl($name) {
 	global $a_acltypes;
-
-	/* XXX why is this broken from xmlsync? */
-	if (!$a_acltypes) {
-		$a_acltypes = array();
-		$a_acltypes[] = array('name' => 'host_starts_with', 'descr' => 'Host starts with',
-			'mode' => 'http', 'syntax' => 'hdr_beg(host) -i');
-		$a_acltypes[] = array('name' => 'host_ends_with', 'descr' => 'Host ends with',
-			'mode' =>'http', 'syntax' => 'hdr_end(host) -i');
-		$a_acltypes[] = array('name' => 'host_matches', 'descr' => 'Host matches',
-			'mode' =>'http', 'syntax' => 'hdr(host) -i');
-		$a_acltypes[] = array('name' => 'host_regex', 'descr' => 'Host regex',
-			'mode' =>'http', 'syntax' => 'hdr_reg(host) -i');
-		$a_acltypes[] = array('name' => 'host_contains', 'descr' => 'Host contains',
-			'mode' => 'http', 'syntax' => 'hdr_dir(host) -i');
-		$a_acltypes[] = array('name' => 'path_starts_with', 'descr' => 'Path starts with',
-			'mode' => 'http', 'syntax' => 'path_beg -i');
-		$a_acltypes[] = array('name' => 'path_ends_with', 'descr' => 'Path ends with',
-			'mode' => 'http', 'syntax' => 'path_end -i');
-		$a_acltypes[] = array('name' => 'path_matches', 'descr' => 'Path matches',
-			'mode' => 'http', 'syntax' => 'path -i');
-		$a_acltypes[] = array('name' => 'path_regex', 'descr' => 'Path regex',
-			'mode' => 'http', 'syntax' => 'path_reg -i');
-		$a_acltypes[] = array('name' => 'path_contains', 'descr' => 'Path contains',
-			'mode' => 'http', 'syntax' => 'path_dir -i');
-		$a_acltypes[] = array('name' => 'source_ip', 'descr' => 'Source IP',
-			'mode' => '', 'syntax' => 'src');
-	}
-
 	if($a_acltypes) {
 		foreach ($a_acltypes as $acl) {
 			if ($acl['name'] == $name)
@@ -610,31 +579,28 @@ function haproxy_writeconf($configfile) {
 			
 			$bname = get_frontend_ipport($backend);
 
-			if ($backend['extaddr']=='localhost')
-				$backend['extaddr'] = "127.0.0.1";
-			
 			if (!is_array($a_bind[$bname])) {
 				$a_bind[$bname] = array();
 				$a_bind[$bname]['config'] = array();
-				// Settings which are constant for a merged frontend
-				$a_bind[$bname]['name'] = $backend['name'];
-				$a_bind[$bname]['extaddr'] = $backend['extaddr'];
-				$a_bind[$bname]['port'] = $backend['port'];
+				// Settings which are used only from the primary frontend
+				$primaryfrontend = get_primaryfrontend($backend);
+				$a_bind[$bname]['name']            = $primaryfrontend['name'];
+				$a_bind[$bname]['extaddr']         = $primaryfrontend['extaddr'];
+				$a_bind[$bname]['port']            = $primaryfrontend['port'];
+				$a_bind[$bname]['type']            = $primaryfrontend['type'];
+				$a_bind[$bname]['forwardfor']      = $primaryfrontend['forwardfor'];
+				$a_bind[$bname]['httpclose']       = $primaryfrontend['httpclose'];
+				$a_bind[$bname]['max_connections'] = $primaryfrontend['max_connections'];
+				$a_bind[$bname]['client_timeout']  = $primaryfrontend['client_timeout'];
+				$a_bind[$bname]['advanced']        = $primaryfrontend['advanced'];
+				$a_bind[$bname]['ssloffload']      = $primaryfrontend['ssloffload'];
+				$a_bind[$bname]['advanced_bind']   = $primaryfrontend['advanced_bind'];
 			}
 			$b = &$a_bind[$bname];
 			
-			// Overwrite ?
-			if ($backend['secondary'] != 'yes') {
-				if (isset($b['type']))
+			if (($backend['secondary'] != 'yes') && ($backend['name'] != $b['name'])) {
+				// only 1 frontend can be the primary for a set of frontends that share 1 address:port.
 					$input_errors[] = "Multiple primary frondends for $bname";
-				$b['type'] = $backend['type'];
-				$b['forwardfor'] = $backend['forwardfor'];
-				$b['httpclose'] = $backend['httpclose'];
-				$b['max_connections'] = $backend['max_connections'];
-				$b['client_timeout'] = $backend['client_timeout'];
-				$b['advanced'] = $backend['advanced'];
-				$b['ssloffload'] = $backend['ssloffload'];
-				$b['advanced_bind'] = $backend['advanced_bind'];
 			}
 			
 			if ($ssl_crt != "") {
@@ -808,29 +774,18 @@ function haproxy_writeconf($configfile) {
 	}
 	fwrite ($fd, "\n");
 
-	// Sync HAProxy configuration (if enabled)
-	if(isset($config['installedpackages']['haproxy']['enablesync'])) {
-		if($config['installedpackages']['haproxy']['synchost1']) {
-			haproxy_do_xmlrpc_sync($config['installedpackages']['haproxy']['synchost1'], 
-				$config['installedpackages']['haproxy']['syncpassword']);
-		}
-		if($config['installedpackages']['haproxy']['synchost2']) {
-			haproxy_do_xmlrpc_sync($config['installedpackages']['haproxy']['synchost2'], 
-				$config['installedpackages']['haproxy']['syncpassword']);
-		}
-		if($config['installedpackages']['haproxy']['synchost3']) {
-			haproxy_do_xmlrpc_sync($config['installedpackages']['haproxy']['synchost3'], 
-				$config['installedpackages']['haproxy']['syncpassword']);				
-		}
-	}
-
-	// create config file
+	// close config file
 	fclose($fd);
 
 	if ($input_errors)
 	{
 		require_once("guiconfig.inc");
 		print_input_errors($input_errors);
+	} else {
+		// Only sync to xmlrpc backup machine if no errors are found in config
+		if(isset($config['installedpackages']['haproxy']['enablesync'])) {
+			haproxy_do_xmlrpc_sync();
+		}
 	}
 	
 	if (isset($a_global['carpdev']))
@@ -996,117 +951,46 @@ function killprocesses($processname, $pidfile, $signal = "KILL") {
 	exec("kill -$signal `pgrep -x $processname | grep -w -f $pidfile`");
 }
 
-function haproxy_do_xmlrpc_sync($sync_to_ip, $password) {
-	global $config, $g;
-
-	if(!$password)
-		return;
-
-	if(!$sync_to_ip)
-		return;
+function haproxy_sync_xmlrpc_settings() {
+	global $config;
+	// preserve 'old' sync settings, that should not be overwritten by xmlrpc-sync.
+	$enable = isset($config['installedpackages']['haproxy']['enablesync']);
 	
-	// Do not allow syncing to self.
-	$donotsync = false;
-	$lanip = find_interface_ip($config['interfaces']['lan']['if']);
-	if($lanip == $sync_to_ip) 
-		$donotsync = true;
-	$wanip = find_interface_ip($config['interfaces']['wan']['if']);
-	if($wanip == $sync_to_ip) 
-		$donotsync = true;
-	for ($j = 1; isset($config['interfaces']['opt' . $j]); $j++) {
-		$optip = find_interface_ip($config['interfaces']['opt' . $j]['if']);
-		if($optip == $sync_to_ip) 
-		$donotsync = true;
-	}
-	if($donotsync) {
-		log_error("Disallowing sync loop for HAProxy sync.");
-		return;
-	}
+	$config['installedpackages']['haproxy'] = $config['installedpackages']['haproxysyncpkg'];
+	unset($config['installedpackages']['haproxysyncpkg']);
+	
+	// restore 'old' settings.
+	$config['installedpackages']['haproxy']['enablesync'] = $enable ? true : false;
+	
+	write_config("HAPROXY xmlrpc config synced"); // Write new 'merged' configuration
+}
 
-	$xmlrpc_sync_neighbor = $sync_to_ip;
-    if($config['system']['webgui']['protocol'] != "") {
-		$synchronizetoip = $config['system']['webgui']['protocol'];
-		$synchronizetoip .= "://";
-    }
-    $port = $config['system']['webgui']['port'];
-    /* if port is empty lets rely on the protocol selection */
-    if($port == "") {
-		if($config['system']['webgui']['protocol'] == "http") 
-			$port = "80";
-		else 
-			$port = "443";
-    }
-	$synchronizetoip .= $sync_to_ip;
+function haproxy_do_xmlrpc_sync() {
+	$syncinfo = array();
+	$syncinfo['sync_logname'] = "HAProxy";
+	$syncinfo['data'] = haproxy_xmlrpc_sync_prepare_config();
+	$syncinfo['sync_include'] = "/usr/local/pkg/haproxy.inc";	
+	$syncinfo['sync_done_execute'] = "haproxy_xmlrpc_sync_configure";	
+	xmlrpc_sync_execute($syncinfo);
+}
 
+function haproxy_xmlrpc_sync_prepare_config() {
 	/* xml will hold the sections to sync */
+	global $config;
 	$xml = array();
-	$xml['haproxy'] = $config['installedpackages']['haproxy'];
+	$xml['haproxysyncpkg'] = $config['installedpackages']['haproxy'];
+	return $xml;
+}
 
-	// Prevent sync loops
-	unset($xml['synchost1']);
-	unset($xml['synchost2']);
-	unset($xml['synchost3']);
-	unset($xml['syncpassword']);
-
-	/* assemble xmlrpc payload */
-	$params = array(
-		XML_RPC_encode($password),
-		XML_RPC_encode($xml)
-	);
-
-	/* set a few variables needed for sync code borrowed from filter.inc */
-	$url = $synchronizetoip;
-	log_error("Beginning HAProxy XMLRPC sync to {$url}:{$port}.");
-	$method = 'pfsense.merge_installedpackages_section_xmlrpc';
-	$msg = new XML_RPC_Message($method, $params);
-	$cli = new XML_RPC_Client('/xmlrpc.php', $url, $port);
-	$cli->setCredentials('admin', $password);
-	if($g['debug'])
-		$cli->setDebug(1);
-	/* send our XMLRPC message and timeout after 250 seconds */
-	$resp = $cli->send($msg, "250");
-	if(!$resp) {
-		$error = "A communications error occurred while attempting HAProxy XMLRPC sync with {$url}:{$port}.";
-		log_error($error);
-		file_notice("sync_settings", $error, "HAProxy Settings Sync", "");
-	} elseif($resp->faultCode()) {
-		$cli->setDebug(1);
-		$resp = $cli->send($msg, "250");
-		$error = "An error code was received while attempting HAProxy XMLRPC sync with {$url}:{$port} - Code " . $resp->faultCode() . ": " . $resp->faultString();
-		log_error($error);
-		file_notice("sync_settings", $error, "HAProxy Settings Sync", "");
-	} else {
-		log_error("HAProxy XMLRPC sync successfully completed with {$url}:{$port}.");
-	}
-
-	/* tell haproxy to reload our settings on the destionation sync host. */
-	$method = 'pfsense.exec_php';
-	$execcmd  = "require_once('/usr/local/pkg/haproxy.inc');\n";
-	$execcmd .= "haproxy_configure();\n";
+function haproxy_xmlrpc_sync_configure() {
+	// this function is called by xmlrpc after config has been synced.
 	
-	/* assemble xmlrpc payload */
-	$params = array(
-		XML_RPC_encode($password),
-		XML_RPC_encode($execcmd)
-	);
-
-	log_error("HAProxy XMLRPC reload data {$url}:{$port}.");
-	$msg = new XML_RPC_Message($method, $params);
-	$cli = new XML_RPC_Client('/xmlrpc.php', $url, $port);
-	$cli->setCredentials('admin', $password);
-	$resp = $cli->send($msg, "250");
-	if(!$resp) {
-		$error = "A communications error occurred while attempting HAProxy XMLRPC sync with {$url}:{$port} (exec_php).";
-		log_error($error);
-		file_notice("sync_settings", $error, "HAProxy Settings Reload", "");
-	} elseif($resp->faultCode()) {
-		$cli->setDebug(1);
-		$resp = $cli->send($msg, "250");
-		$error = "An error code was received while attempting HAProxy XMLRPC sync with {$url}:{$port} - Code " . $resp->faultCode() . ": " . $resp->faultString();
-		log_error($error);
-		file_notice("sync_settings", $error, "HAProxy Settings Sync", "");
-	} else {
-		log_error("HAProxy XMLRPC reload data success with {$url}:{$port} (exec_php).");
+	haproxy_sync_xmlrpc_settings();
+	haproxy_configure(); // Configure HAProxy config files to use the new configuration.
+	
+	// sync 2nd and further nodes in the chain if applicable.
+	if(isset($config['installedpackages']['haproxy']['enablesync'])) {
+		haproxy_do_xmlrpc_sync();
 	}
 }
 
@@ -1123,20 +1007,27 @@ function get_frontend_id($name) {
 	return null;
 }
 
-function get_frontend_ipport($fontend) {
+function get_primaryfrontend($frontend) {
 	global $config;
 	$a_backend = &$config['installedpackages']['haproxy']['ha_backends']['item'];
-	if ($fontend['secondary'] == 'yes')
-		$mainfontend = $a_backend[get_frontend_id($fontend['primary_frontend'])];
+	if ($frontend['secondary'] == 'yes')
+		$mainfrontend = $a_backend[get_frontend_id($frontend['primary_frontend'])];
 	else
-		$mainfontend = $fontend;
-	if($mainfontend['extaddr'] == "any") 
+		$mainfrontend = $frontend;
+	return $mainfrontend;
+}
+
+function get_frontend_ipport($frontend) {
+	$mainfrontend = get_primaryfrontend($frontend);
+	if($mainfrontend['extaddr'] == "any") 
 		$result = "0.0.0.0";
-	elseif($mainfontend['extaddr']) 
-		$result = $mainfontend['extaddr'];
+	elseif ($mainfrontend['extaddr'] == "localhost")
+		$result = "127.0.0.1";
+	elseif($mainfrontend['extaddr']) 
+		$result = $mainfrontend['extaddr'];
 	else 
 		$result = get_current_wan_address('wan');
-	return $result . ":" . $mainfontend['port'];
+	return $result . ":" . $mainfrontend['port'];
 }
 
 function haproxy_check_config() {
