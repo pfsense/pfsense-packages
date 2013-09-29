@@ -70,13 +70,10 @@ function sync_package_asterisk() {
 	//should reach here only on non-pbi installs (2.0.x)
 		system("mv -f /usr/local/etc/asterisk/ /conf/asterisk/ && ln -s /conf/asterisk /usr/local/etc/asterisk");
 	}
-	
-	//fix asterisk options for nanobsd: logging, db and calls log in /tmp
-//	if ($g['platform'] == "nanobsd"){
 		$script='/conf/asterisk/logger.conf';
 		if (file_exists($script)){
 			$script_file=file_get_contents($script);
-			$pattern[0]=';rotatestrategy';
+			$pattern[0]='@\\;rotatestrategy@';
 			$replace[0]='rotatestrategy = rotate ;by pfSense ;';
 			$script_file=preg_replace($pattern,$replace,$script_file);
 			file_put_contents($script, $script_file, LOCK_EX);
@@ -86,22 +83,21 @@ function sync_package_asterisk() {
 		if (file_exists($script)){
 		//point to the /var subdirs in the writable area in RAM
 			$script_file=file_get_contents($script);
-			$pattern[0]='[directories](!)';
+			$pattern[0]='@\\[directories\\]\\(!\\)@';
 			$replace[0]='[directories]';
-			$pattern[1]='@astetcdir => [A-Z,a-z,0-9,_,-,/]+@';
+			$pattern[1]='@astetcdir => [A-Z,a-z,0-9,\\_,\\-,/]+@';
 			$replace[1]='astetcdir => /conf/asterisk';
-			$pattern[2]='@astdbdir => [A-Z,a-z,0-9,_,-,/]+@';
+			$pattern[2]='@astdbdir => [A-Z,a-z,0-9,\\_,\\-,/]+@';
 			$replace[2]='astdbdir => /var/db/asterisk';
-			$pattern[3]='@astspooldir => [A-Z,a-z,0-9,_,-,/]+@';
+			$pattern[3]='@astspooldir => [A-Z,a-z,0-9,\\_,\\-,/]+@';
 			$replace[3]='astspooldir => /var/spool/asterisk';
-			$pattern[4]='@astrundir => [A-Z,a-z,0-9,_,-,/]+@';
+			$pattern[4]='@astrundir => [A-Z,a-z,0-9,\\_,\\-,/]+@';
 			$replace[4]='astrundir => /var/run/asterisk';
-			$pattern[5]='@astlogdir => [A-Z,a-z,0-9,_,-,/]+@';
+			$pattern[5]='@astlogdir => [A-Z,a-z,0-9,\\_,\\-,/]+@';
 			$replace[5]='astlogdir => /var/log/asterisk';
 			$script_file=preg_replace($pattern,$replace,$script_file);
 			file_put_contents($script, $script_file, LOCK_EX);
 		}
-//	}
 
 	//add modules settings, for disabling those not required on pfSense	
         $script='/conf/asterisk/modules.conf';
@@ -332,13 +328,13 @@ function sync_package_asterisk() {
 			$script_file=file_get_contents($script);
 			//strenghten a couple of security settings, and predefine codecs in the default SIP configuration
 			if (strpos($script_file,'pfSense') === false) {  //first check if already added...
-				$pattern[0]=';allowguest';
+				$pattern[0]='@\\;allowguest@';
 				$replace[0]='allowguest=no ;by pfSense ;';
-				$pattern[1]=';alwaysauthreject';
+				$pattern[1]='@\\;alwaysauthreject@';
 				$replace[1]='alwaysauthreject=yes ;by pfSense ;';
-				$pattern[2]='; jbenable';
+				$pattern[2]='@\\; jbenable@';
 				$replace[2]='jbenable=yes ;by pfSense ;';
-				$pattern[3]='[general]';
+				$pattern[3]='@\\[general\\]\n@';
 				$replace[3]='[general]\n;The following general settings usually work on pfSense boxes (note: please do not remove this comment line).\ndisallow=all ;by pfSense\nallow=g729\nallow=ulaw\nallow=alaw\n\n';
 				$script_file=preg_replace($pattern,$replace,$script_file);
 				file_put_contents($script, $script_file, LOCK_EX);
@@ -373,9 +369,11 @@ function sync_package_asterisk() {
 	if (file_exists($script)){
 		$script_file=file_get_contents($script);
 		if (preg_match('/NO/',$script_file)){
-			$script_file=preg_replace("/NO/","YES",$script_file);
-			$script_file=preg_replace("$command -nqrx 'core stop now'","#$command -nqrx 'core stop now'\n  killall $name",$script_file);
-			}
+			$pattern[0]="@NO@";
+			$replace[0]="YES";
+			$pattern[1]="@\\-nqrx 'core stop now'@";
+			$replace[1]="-nqrx 'core stop now'\n  killall " . '$name';
+			$script_file=preg_replace($pattern,$replace,$script_file);			}
 			//create the /var subdirs for the writable area in RAM
 			if (strpos($script_file,'pfSense') === false) {  //first check if already added...
 				$writable_area = "\n\n# Create paths in pfSense's volatile area if they don't exist (note: please do not remove this comment line)\n";
