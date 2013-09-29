@@ -59,26 +59,26 @@ if ($_POST) {
 		if ($_POST['maxconn'] && (!is_numeric($_POST['maxconn']))) 
 			$input_errors[] = "The maximum number of connections should be numeric.";
 
-		if($_POST['synchost1'] && !is_ipaddr($_POST['synchost1']))
+		/*if($_POST['synchost1'] && !is_ipaddr($_POST['synchost1']))
 			$input_errors[] = "Synchost1 needs to be an IPAddress.";
 		if($_POST['synchost2'] && !is_ipaddr($_POST['synchost2']))
 			$input_errors[] = "Synchost2 needs to be an IPAddress.";
 		if($_POST['synchost3'] && !is_ipaddr($_POST['synchost3']))
-			$input_errors[] = "Synchost3 needs to be an IPAddress.";
+			$input_errors[] = "Synchost3 needs to be an IPAddress.";*/
 
 		if (!$input_errors) {
 			$config['installedpackages']['haproxy']['enable'] = $_POST['enable'] ? true : false;
 			$config['installedpackages']['haproxy']['terminate_on_reload'] = $_POST['terminate_on_reload'] ? true : false;
 			$config['installedpackages']['haproxy']['maxconn'] = $_POST['maxconn'] ? $_POST['maxconn'] : false;
 			$config['installedpackages']['haproxy']['enablesync'] = $_POST['enablesync'] ? true : false;
-			$config['installedpackages']['haproxy']['synchost1'] = $_POST['synchost1'] ? $_POST['synchost1'] : false;
-			$config['installedpackages']['haproxy']['synchost2'] = $_POST['synchost2'] ? $_POST['synchost2'] : false;
-			$config['installedpackages']['haproxy']['synchost2'] = $_POST['synchost3'] ? $_POST['synchost3'] : false;
+			//$config['installedpackages']['haproxy']['synchost1'] = $_POST['synchost1'] ? $_POST['synchost1'] : false;
+			//$config['installedpackages']['haproxy']['synchost2'] = $_POST['synchost2'] ? $_POST['synchost2'] : false;
+			//$config['installedpackages']['haproxy']['synchost2'] = $_POST['synchost3'] ? $_POST['synchost3'] : false;
 			$config['installedpackages']['haproxy']['remotesyslog'] = $_POST['remotesyslog'] ? $_POST['remotesyslog'] : false;
 			$config['installedpackages']['haproxy']['logfacility'] = $_POST['logfacility'] ? $_POST['logfacility'] : false;
 			$config['installedpackages']['haproxy']['loglevel'] = $_POST['loglevel'] ? $_POST['loglevel'] : false;
 			$config['installedpackages']['haproxy']['carpdev'] = $_POST['carpdev'] ? $_POST['carpdev'] : false;
-			$config['installedpackages']['haproxy']['syncpassword'] = $_POST['syncpassword'] ? $_POST['syncpassword'] : false;
+			//$config['installedpackages']['haproxy']['syncpassword'] = $_POST['syncpassword'] ? $_POST['syncpassword'] : false;
 			$config['installedpackages']['haproxy']['advanced'] = $_POST['advanced'] ? base64_encode($_POST['advanced']) : false;
 			$config['installedpackages']['haproxy']['nbproc'] = $_POST['nbproc'] ? $_POST['nbproc'] : false;			
 			touch($d_haproxyconfdirty_path);
@@ -91,10 +91,10 @@ $pconfig['enable'] = isset($config['installedpackages']['haproxy']['enable']);
 $pconfig['terminate_on_reload'] = isset($config['installedpackages']['haproxy']['terminate_on_reload']);
 $pconfig['maxconn'] = $config['installedpackages']['haproxy']['maxconn'];
 $pconfig['enablesync'] = isset($config['installedpackages']['haproxy']['enablesync']);
-$pconfig['syncpassword'] = $config['installedpackages']['haproxy']['syncpassword'];
-$pconfig['synchost1'] = $config['installedpackages']['haproxy']['synchost1'];
-$pconfig['synchost2'] = $config['installedpackages']['haproxy']['synchost2'];
-$pconfig['synchost3'] = $config['installedpackages']['haproxy']['synchost3'];
+//$pconfig['syncpassword'] = $config['installedpackages']['haproxy']['syncpassword'];
+//$pconfig['synchost1'] = $config['installedpackages']['haproxy']['synchost1'];
+//$pconfig['synchost2'] = $config['installedpackages']['haproxy']['synchost2'];
+//$pconfig['synchost3'] = $config['installedpackages']['haproxy']['synchost3'];
 $pconfig['remotesyslog'] = $config['installedpackages']['haproxy']['remotesyslog'];
 $pconfig['logfacility'] = $config['installedpackages']['haproxy']['logfacility'];
 $pconfig['loglevel'] = $config['installedpackages']['haproxy']['loglevel'];
@@ -337,12 +337,15 @@ function enable_change(enable_change) {
 				<td colspan="2" valign="top" class="listtopic">Configuration synchronization</td>
 			</tr>
 			<tr>
-				<td width="22%" valign="top" class="vncell">&nbsp;</td>
+				<td width="22%" valign="top" class="vncell">HAProxy Sync</td>
 				<td width="78%" class="vtable">
 					<input name="enablesync" type="checkbox" value="yes" <?php if ($pconfig['enablesync']) echo "checked"; ?>>
-					<strong>Sync HAProxy configuration to backup CARP members via XMLRPC.</strong>
+					<strong>Sync HAProxy configuration to backup CARP members via XMLRPC.</strong><br/>
+					Note: remeber to also turn on HAProxy Sync on the backup nodes.<br/>
+					The synchronisation host and password are those configured in pfSense main <a href="/system_hasync.php">"System: High Availability Sync"</a> settings.
 				</td>
 			</tr>
+<!--
 			<tr>
 				<td width="22%" valign="top" class="vncell">Synchronization password</td>
 				<td width="78%" class="vtable">
@@ -375,6 +378,7 @@ function enable_change(enable_change) {
 					<strong>Synchronize settings to this hosts IP address.</strong>
 				</td>
 			</tr>
+-->
 			<tr>
 				<td>
 					&nbsp;
