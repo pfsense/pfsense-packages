@@ -88,14 +88,15 @@ if ($_GET['act'] == "addsuppress" && is_numeric($_GET['sidid']) && is_numeric($_
 
 	if (empty($a_nat[$id]['suppresslistname']) || $a_nat[$id]['suppresslistname'] == 'default') {
 		$s_list = array();
-		$s_list['name'] = $a_nat[$id]['interface'] . "suppress";
 		$s_list['uuid'] = uniqid();
-		$s_list['descr']  =  "Auto-generated list for alert suppression";
+		$s_list['name'] = $a_nat[$id]['interface'] . "suppress" . "_" . $s_list['uuid'];
+		$s_list['descr']  =  "Auto-generated list for Alert suppression";
 		$s_list['suppresspassthru'] = base64_encode($suppress);
 		$a_suppress[] = $s_list;
 		$a_nat[$id]['suppresslistname'] = $s_list['name'];
 		$found_list = true;
 	} else {
+		/* If we get here, a Suppress List is defined for the interface so see if we can find it */
 		foreach ($a_suppress as $a_id => $alist) {
 			if ($alist['name'] == $a_nat[$id]['suppresslistname']) {
 				$found_list = true;
@@ -105,6 +106,10 @@ if ($_GET['act'] == "addsuppress" && is_numeric($_GET['sidid']) && is_numeric($_
 					$alist['suppresspassthru'] = base64_encode($tmplist);
 					$a_suppress[$a_id] = $alist;
 				}
+				else {
+					$alist['suppresspassthru'] = base64_encode($suppress);
+					$a_suppress[$a_id] = $alist;
+				}
 			}
 		}
 	}
@@ -112,7 +117,8 @@ if ($_GET['act'] == "addsuppress" && is_numeric($_GET['sidid']) && is_numeric($_
 		write_config();
 		$rebuild_rules = false;
 		sync_snort_package_config();
-		$savemsg = gettext("Wrote suppress rule for 'gen_id {$_GET['gen_id']}, sig_id {$_GET['sidid']}' to the '{$a_nat[$id]['suppresslistname']}' Suppression List.");
+		snort_reload_config($a_nat[$id]);
+		$savemsg = gettext("An entry to suppress the Alert for 'gen_id {$_GET['gen_id']}, sig_id {$_GET['sidid']}' has been added to Suppress List '{$a_nat[$id]['suppresslistname']}'.");
 	}
 	else {
 		/* We did not find the defined list, so notify the user with an error */
