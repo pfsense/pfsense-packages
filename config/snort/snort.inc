@@ -123,7 +123,7 @@ function snort_unpack_alias($alias) {
 	/* recursive calls to this function.              */
 	/*                                                */
 	/* Fully-qualified-domain-name (FQDN) aliases     */
-	/* are detected and resolved via a pfctl() call.  */
+	/* are detected and resolved via DNS.             */
 	/**************************************************/
 
 	global $config;
@@ -141,9 +141,11 @@ function snort_unpack_alias($alias) {
 						$value .= $a . " ";
 					elseif (is_hostname($a)) {
 						// Found a FQDN value for this Alias, so resolve it
-						$entries = array();
-						exec("/sbin/pfctl -t " . escapeshellarg($alias) . " -T show", $entries);
-						$value .= trim(implode(" ", $entries));
+						$entries = gethostbynamel($a);
+						if ($entries !== FALSE)
+							$value .= trim(implode(" ", $entries)) . " ";
+						else
+							log_error(gettext("[Snort] Failed to resolve FQDN '{$a}' in Alias '{$alias}'..."));
 					}
 					else
 						continue;
