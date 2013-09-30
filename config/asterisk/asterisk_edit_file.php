@@ -170,7 +170,7 @@ if($_REQUEST['action']) {
 	}
 	exit;
 }
-
+$shortcut_section = "asterisk";
 require("head.inc");
 outputJavaScriptFileInline("filebrowser/browser.js");
 outputJavaScriptFileInline("javascript/base64.js");

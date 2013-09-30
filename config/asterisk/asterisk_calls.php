@@ -46,6 +46,7 @@
 require_once("guiconfig.inc");
 
 $pgtitle = array(gettext("Status"),gettext("Asterisk Calls"));
+$shortcut_section = "asterisk";
 include("head.inc");
 
 /* Path to call log database */

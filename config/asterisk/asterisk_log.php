@@ -47,6 +47,7 @@
 require_once("guiconfig.inc");
 
 $pgtitle = array(gettext("Status"),gettext("Asterisk Log"));
+$shortcut_section = "asterisk";
 include("head.inc");
 
 /* Path to Asterisk log file */

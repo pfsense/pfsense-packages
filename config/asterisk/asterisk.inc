@@ -3,8 +3,8 @@
 /*
 	asterisk.inc
     part of pfSense (http://www.pfSense.com)
-    Copyright (C) 2012 Marcello Coutinho
-    Copyright (C) 2013 robi <robreg@zsurob.hu>
+    Copyright (C) 2012-2013 Marcello Coutinho
+    Copyright (C) 2012-2013 robi <robreg@zsurob.hu>
     All rights reserved.
                                                                               */
 /* ========================================================================== */
@@ -32,6 +32,13 @@
                                                                               */
 /* ========================================================================== */
 
+define('ASTERISK_CONF_DIR', '/conf/asterisk');
+//Check pfsense version
+$pf_version=substr(trim(file_get_contents("/etc/version")),0,3);
+if ($pf_version > 2.0)
+	define('ASTERISK_LOCALBASE', '/usr/pbi/asterisk-' . php_uname("m"));
+else
+	define('ASTERISK_LOCALBASE','/usr/local');
 
 function asterisk_install() {
 	sync_package_asterisk();
@@ -51,32 +58,30 @@ function sync_package_asterisk() {
 	#mount filesystem writeable
 	conf_mount_rw();
 	
-	//for NanoBSD compatibility, move the /etc/asterisk configuration directory to /conf, and symlink it back
-	if (file_exists("/usr/pbi/asterisk-i386/etc/asterisk/")) {
-	//this should occur only on i386 systems v2.1 and up
-		system("mv -f /usr/pbi/asterisk-i386/etc/asterisk/ /conf/asterisk/ && ln -s /conf/asterisk /usr/pbi/asterisk-i386/etc/asterisk");
-	}
-	if (file_exists("/usr/pbi/asterisk-amd64/etc/asterisk/")) {
-	//this should occur only on amd64 systems v2.1 and up
-		system("mv -f /usr/pbi/asterisk-amd64/etc/asterisk/ /conf/asterisk/ && ln -s /conf/asterisk /usr/pbi/asterisk-amd64/etc/asterisk");
-	}
-	if (file_exists("/conf/asterisk/")) {
-		if (file_exists("/usr/local/etc/asterisk/")) {
-			system("mv -f /usr/local/etc/asterisk /usr/local/etc/asterisk.bak");
-		}
-		system("ln -s /conf/asterisk /usr/local/etc/asterisk");
-		system("cd /conf/asterisk && mkdir dist && mv *-dist dist");
-	} else {
-	//should reach here only on non-pbi installs (2.0.x)
-		system("mv -f /usr/local/etc/asterisk/ /conf/asterisk/ && ln -s /conf/asterisk /usr/local/etc/asterisk");
-	}
+	
+  	//for NanoBSD compatibility, move the /etc/asterisk configuration directory to /conf, and symlink it back
+  	if (!file_exists("/conf/asterisk/") && file_exists(ASTERISK_LOCALBASE."/etc/asterisk/")){
+  		rename(ASTERISK_LOCALBASE. "/etc/asterisk", ASTERISK_CONF_DIR);
+  		symlink (ASTERISK_CONF_DIR , ASTERISK_LOCALBASE. "/etc/asterisk");
+  	}
+
+  	//check or move -dist files on dist dir
+  	$dist_dir=ASTERISK_CONF_DIR ."/dist";
+  	if (!is_dir($dist_dir))
+  		mkdir($dist_dir,0755,TRUE);
+
+  	$dist_files= scandir(ASTERISK_CONF_DIR);
+  	foreach ($dist_files as $dist){
+  		if (preg_match("/-dist/",$dist))
+  			rename (ASTERISK_CONF_DIR."/$dist", ASTERISK_CONF_DIR."/dist/$dist");
+  	}
 	
 	//fix asterisk options for nanobsd: logging, db and calls log in /tmp
 //	if ($g['platform'] == "nanobsd"){
 		$script='/conf/asterisk/logger.conf';
 		if (file_exists($script)){
 			$script_file=file_get_contents($script);
-			$pattern[0]=';rotatestrategy';
+			$pattern[0]='@;rotatestrategy@';
 			$replace[0]='rotatestrategy = rotate ;by pfSense ;';
 			$script_file=preg_replace($pattern,$replace,$script_file);
 			file_put_contents($script, $script_file, LOCK_EX);
@@ -86,17 +91,17 @@ function sync_package_asterisk() {
 		if (file_exists($script)){
 		//point to the /var subdirs in the writable area in RAM
 			$script_file=file_get_contents($script);
-			$pattern[0]='[directories](!)';
+			$pattern[0]='@[directories](!)@';
 			$replace[0]='[directories]';
-			$pattern[1]='@astetcdir => [A-Z,a-z,0-9,_,-,/]+@';
+			$pattern[1]='@astetcdir => \S+@';
 			$replace[1]='astetcdir => /conf/asterisk';
-			$pattern[2]='@astdbdir => [A-Z,a-z,0-9,_,-,/]+@';
+			$pattern[2]='@astdbdir => \S+@';
 			$replace[2]='astdbdir => /var/db/asterisk';
-			$pattern[3]='@astspooldir => [A-Z,a-z,0-9,_,-,/]+@';
+			$pattern[3]='@astspooldir => \S+@';
 			$replace[3]='astspooldir => /var/spool/asterisk';
-			$pattern[4]='@astrundir => [A-Z,a-z,0-9,_,-,/]+@';
+			$pattern[4]='@astrundir => \S+@';
 			$replace[4]='astrundir => /var/run/asterisk';
-			$pattern[5]='@astlogdir => [A-Z,a-z,0-9,_,-,/]+@';
+			$pattern[5]='@astlogdir => \S+@';
 			$replace[5]='astlogdir => /var/log/asterisk';
 			$script_file=preg_replace($pattern,$replace,$script_file);
 			file_put_contents($script, $script_file, LOCK_EX);
@@ -108,219 +113,221 @@ function sync_package_asterisk() {
 		if (file_exists($script)){
 			$script_file=file_get_contents($script);
 			if (strpos($script_file,'pfSense') === false) {  //first check if already added...
-				$add_modules_settings = "\n";
-				$add_modules_settings .= ";The following modules settings work out of the box on pfSense (note: do not remove this comment line).\n";
-				$add_modules_settings .= ";Should you need any disabled module, check for its functionality individually in your environment.\n";
-				$add_modules_settings .= ";For more information check asterisk's online documentation.\n";
-				$add_modules_settings .= "noload => res_ael_share.so\n";
-				$add_modules_settings .= "noload => res_adsi.so\n";
-				$add_modules_settings .= ";noload => res_agi.so\n";
-				$add_modules_settings .= "noload => res_calendar.so\n";
-				$add_modules_settings .= "noload => res_crypto.so\n";
-				$add_modules_settings .= ";noload => res_fax.so\n";
-				$add_modules_settings .= "noload => res_jabber.so\n";
-				$add_modules_settings .= "noload => res_monitor.so\n";
-				$add_modules_settings .= ";noload => res_stun_monitor.so\n";
-				$add_modules_settings .= "noload => res_smdi.so\n";
-				$add_modules_settings .= "noload => res_speech.so\n";
-				$add_modules_settings .= "noload => res_odbc.so\n";
-				$add_modules_settings .= "noload => res_musiconhold.so\n";
-				$add_modules_settings .= "noload => app_celgenuserevent.so\n";
-				$add_modules_settings .= ";noload => app_confbridge.so\n";
-				$add_modules_settings .= ";noload => app_minivm.so\n";
-				$add_modules_settings .= ";noload => app_originate.so\n";
-				$add_modules_settings .= ";noload => app_playtones.so\n";
-				$add_modules_settings .= ";noload => app_readexten.so\n";
-				$add_modules_settings .= ";noload => app_waituntil.so\n";
-				$add_modules_settings .= ";noload => bridge_builtin_features.so\n";
-				$add_modules_settings .= ";noload => bridge_multiplexed.so\n";
-				$add_modules_settings .= ";noload => bridge_simple.so\n";
-				$add_modules_settings .= ";noload => bridge_softmix.so\n";
-				$add_modules_settings .= "noload => cdr_adaptive_odbc.so\n";
-				$add_modules_settings .= "noload => chan_jingle.so\n";
-				$add_modules_settings .= ";noload => chan_bridge.so\n";
-				$add_modules_settings .= "noload => chan_unistim.so\n";
-				$add_modules_settings .= ";noload => codec_g722.so\n";
-				$add_modules_settings .= ";noload => format_g719.so\n";
-				$add_modules_settings .= "noload => format_sln16.so\n";
-				$add_modules_settings .= "noload => format_siren14.so\n";
-				$add_modules_settings .= "noload => format_siren7.so\n";
-				$add_modules_settings .= ";noload => func_aes.so\n";
-				$add_modules_settings .= ";noload => func_audiohookinherit.so\n";
-				$add_modules_settings .= ";noload => func_blacklist.so\n";
-				$add_modules_settings .= ";noload => func_config.so\n";
-				$add_modules_settings .= ";noload => func_devstate.so\n";
-				$add_modules_settings .= ";noload => func_dialgroup.so\n";
-				$add_modules_settings .= ";noload => func_dialplan.so\n";
-				$add_modules_settings .= ";noload => func_extstate.so\n";
-				$add_modules_settings .= ";noload => func_iconv.so\n";
-				$add_modules_settings .= ";noload => func_lock.so\n";
-				$add_modules_settings .= ";noload => func_module.so\n";
-				$add_modules_settings .= ";noload => func_shell.so\n";
-				$add_modules_settings .= ";noload => func_speex.so\n";
-				$add_modules_settings .= ";noload => func_sprintf.so\n";
-				$add_modules_settings .= ";noload => func_sysinfo.so\n";
-				$add_modules_settings .= ";noload => func_version.so\n";
-				$add_modules_settings .= ";noload => res_curl.so\n";
-				$add_modules_settings .= "noload => func_vmcount.so\n";
-				$add_modules_settings .= "noload => func_volume.so\n";
-				$add_modules_settings .= "noload => res_clialiases.so\n";
-				$add_modules_settings .= "noload => res_config_curl.so\n";
-				$add_modules_settings .= "noload => res_config_ldap.so\n";
-				$add_modules_settings .= "noload => res_config_sqlite.so\n";
-				$add_modules_settings .= ";noload => res_limit.so\n";
-				$add_modules_settings .= ";noload => res_phoneprov.so\n";
-				$add_modules_settings .= "noload => res_realtime.so\n";
-				$add_modules_settings .= "noload => res_timing_pthread.so\n";
-				$add_modules_settings .= ";noload => app_adsiprog.so\n";
-				$add_modules_settings .= ";noload => app_alarmreceiver.so\n";
-				$add_modules_settings .= ";noload => app_amd.so\n";
-				$add_modules_settings .= ";noload => app_authenticate.so\n";
-				$add_modules_settings .= ";noload => app_cdr.so\n";
-				$add_modules_settings .= ";noload => app_chanisavail.so\n";
-				$add_modules_settings .= ";noload => app_channelredirect.so\n";
-				$add_modules_settings .= ";noload => app_chanspy.so\n";
-				$add_modules_settings .= ";noload => app_controlplayback.so\n";
-				$add_modules_settings .= "noload => app_db.so\n";
-				$add_modules_settings .= ";noload => app_dial.so\n";
-				$add_modules_settings .= ";noload => app_dictate.so\n";
-				$add_modules_settings .= ";noload => app_directed_pickup.so\n";
-				$add_modules_settings .= ";noload => app_directory.so\n";
-				$add_modules_settings .= ";noload => app_disa.so\n";
-				$add_modules_settings .= ";noload => app_dumpchan.so\n";
-				$add_modules_settings .= ";noload => app_echo.so\n";
-				$add_modules_settings .= ";noload => app_exec.so\n";
-				$add_modules_settings .= ";noload => app_externalivr.so\n";
-				$add_modules_settings .= ";noload => app_festival.so\n";
-				$add_modules_settings .= ";noload => app_followme.so\n";
-				$add_modules_settings .= ";noload => app_forkcdr.so\n";
-				$add_modules_settings .= ";noload => app_getcpeid.so\n";
-				$add_modules_settings .= ";noload => app_ices.so\n";
-				$add_modules_settings .= ";noload => app_image.so\n";
-				$add_modules_settings .= ";noload => app_macro.so\n";
-				$add_modules_settings .= ";noload => app_milliwatt.so\n";
-				$add_modules_settings .= ";noload => app_mixmonitor.so\n";
-				$add_modules_settings .= ";noload => app_mp3.so\n";
-				$add_modules_settings .= ";noload => app_morsecode.so\n";
-				$add_modules_settings .= ";noload => app_nbscat.so\n";
-				$add_modules_settings .= ";noload => app_parkandannounce.so\n";
-				$add_modules_settings .= ";noload => app_playback.so\n";
-				$add_modules_settings .= ";noload => app_privacy.so\n";
-				$add_modules_settings .= ";noload => app_queue.so\n";
-				$add_modules_settings .= ";noload => app_read.so\n";
-				$add_modules_settings .= ";noload => app_readfile.so\n";
-				$add_modules_settings .= ";noload => app_record.so\n";
-				$add_modules_settings .= ";noload => app_sayunixtime.so\n";
-				$add_modules_settings .= ";noload => app_senddtmf.so\n";
-				$add_modules_settings .= ";noload => app_sendtext.so\n";
-				$add_modules_settings .= ";noload => app_setcallerid.so\n";
-				$add_modules_settings .= ";noload => app_sms.so\n";
-				$add_modules_settings .= ";noload => app_softhangup.so\n";
-				$add_modules_settings .= "noload => app_speech_utils.so\n";
-				$add_modules_settings .= ";noload => app_stack.so\n";
-				$add_modules_settings .= ";noload => app_system.so\n";
-				$add_modules_settings .= ";noload => app_talkdetect.so\n";
-				$add_modules_settings .= ";noload => app_test.so\n";
-				$add_modules_settings .= ";noload => app_transfer.so\n";
-				$add_modules_settings .= ";noload => app_url.so\n";
-				$add_modules_settings .= ";noload => app_userevent.so\n";
-				$add_modules_settings .= ";noload => app_verbose.so\n";
-				$add_modules_settings .= ";noload => app_voicemail.so\n";
-				$add_modules_settings .= ";noload => app_waitforring.so\n";
-				$add_modules_settings .= ";noload => app_waitforsilence.so\n";
-				$add_modules_settings .= ";noload => app_while.so\n";
-				$add_modules_settings .= ";noload => app_zapateller.so\n";
-				$add_modules_settings .= ";noload => cdr_csv.so\n";
-				$add_modules_settings .= "noload => cdr_custom.so\n";
-				$add_modules_settings .= ";noload => cdr_manager.so\n";
-				$add_modules_settings .= "noload => cdr_pgsql.so\n";
-				$add_modules_settings .= "noload => cdr_radius.so\n";
-				$add_modules_settings .= "noload => cdr_sqlite.so\n";
-				$add_modules_settings .= "noload => cdr_sqlite3_custom.so\n";
-				$add_modules_settings .= "noload => cdr_syslog.so\n";
-				$add_modules_settings .= ";noload => cel_custom.so\n";
-				$add_modules_settings .= ";noload => cel_manager.so\n";
-				$add_modules_settings .= "noload => cel_odbc.so\n";
-				$add_modules_settings .= "noload => cel_pgsql.so\n";
-				$add_modules_settings .= "noload => cel_radius.so\n";
-				$add_modules_settings .= "noload => cel_sqlite3_custom.so\n";
-				$add_modules_settings .= "noload => cel_tds.so\n";
-				$add_modules_settings .= ";noload => chan_agent.so\n";
-				$add_modules_settings .= "noload => chan_dahdi.so\n";
-				$add_modules_settings .= "noload => chan_gtalk.so\n";
-				$add_modules_settings .= "noload => chan_iax2.so\n";
-				$add_modules_settings .= ";noload => chan_local.so\n";
-				$add_modules_settings .= "noload => chan_mgcp.so\n";
-				$add_modules_settings .= ";noload => chan_multicast_rtp.so\n";
-				$add_modules_settings .= "noload => chan_oss.so\n";
-				$add_modules_settings .= ";noload => chan_sip.so\n";
-				$add_modules_settings .= "noload => chan_skinny.so\n";
-				$add_modules_settings .= ";noload => codec_a_mu.so\n";
-				$add_modules_settings .= ";noload => codec_adpcm.so\n";
-				$add_modules_settings .= ";noload => codec_alaw.so\n";
-				$add_modules_settings .= "noload => codec_dahdi.so\n";
-				$add_modules_settings .= ";noload => codec_g726.so\n";
-				$add_modules_settings .= ";noload => codec_gsm.so\n";
-				$add_modules_settings .= ";noload => codec_lpc10.so\n";
-				$add_modules_settings .= ";noload => codec_speex.so\n";
-				$add_modules_settings .= ";noload => codec_ulaw.so\n";
-				$add_modules_settings .= ";noload => format_g723.so\n";
-				$add_modules_settings .= ";noload => format_g726.so\n";
-				$add_modules_settings .= ";noload => format_g729.so\n";
-				$add_modules_settings .= ";noload => format_gsm.so\n";
-				$add_modules_settings .= ";noload => format_h263.so\n";
-				$add_modules_settings .= ";noload => format_h264.so\n";
-				$add_modules_settings .= ";noload => format_ilbc.so\n";
-				$add_modules_settings .= "noload => format_jpeg.so\n";
-				$add_modules_settings .= ";noload => format_ogg_vorbis.so\n";
-				$add_modules_settings .= ";noload => format_pcm.so\n";
-				$add_modules_settings .= ";noload => format_sln.so\n";
-				$add_modules_settings .= ";noload => format_vox.so\n";
-				$add_modules_settings .= ";noload => format_wav.so\n";
-				$add_modules_settings .= ";noload => format_wav_gsm.so\n";
-				$add_modules_settings .= ";noload => func_base64.so\n";
-				$add_modules_settings .= ";noload => func_callcompletion.so\n";
-				$add_modules_settings .= ";noload => func_callerid.so\n";
-				$add_modules_settings .= ";noload => func_cdr.so\n";
-				$add_modules_settings .= ";noload => func_channel.so\n";
-				$add_modules_settings .= ";noload => func_curl.so\n";
-				$add_modules_settings .= ";noload => func_cut.so\n";
-				$add_modules_settings .= "noload => func_db.so\n";
-				$add_modules_settings .= ";noload => func_enum.so\n";
-				$add_modules_settings .= ";noload => func_env.so\n";
-				$add_modules_settings .= ";noload => func_frame_trace.so\n";
-				$add_modules_settings .= ";noload => func_global.so\n";
-				$add_modules_settings .= ";noload => func_groupcount.so\n";
-				$add_modules_settings .= ";noload => func_logic.so\n";
-				$add_modules_settings .= ";noload => func_math.so\n";
-				$add_modules_settings .= ";noload => func_md5.so\n";
-				$add_modules_settings .= "noload => func_odbc.so\n";
-				$add_modules_settings .= ";noload => func_pitchshift.so\n";
-				$add_modules_settings .= ";noload => func_rand.so\n";
-				$add_modules_settings .= ";noload => func_realtime.so\n";
-				$add_modules_settings .= ";noload => func_sha1.so\n";
-				$add_modules_settings .= ";noload => func_srv.so\n";
-				$add_modules_settings .= ";noload => func_strings.so\n";
-				$add_modules_settings .= ";noload => func_timeout.so\n";
-				$add_modules_settings .= ";noload => func_uri.so\n";
-				$add_modules_settings .= "noload => pbx_ael.so\n";
-				$add_modules_settings .= ";noload => pbx_config.so\n";
-				$add_modules_settings .= "noload => pbx_dundi.so\n";
-				$add_modules_settings .= ";noload => pbx_loopback.so\n";
-				$add_modules_settings .= ";noload => pbx_realtime.so\n";
-				$add_modules_settings .= ";noload => pbx_spool.so\n";
-				$add_modules_settings .= ";noload => res_clioriginate.so\n";
-				$add_modules_settings .= "noload => res_config_pgsql.so\n";
-				$add_modules_settings .= ";noload => res_convert.so\n";
-				$add_modules_settings .= ";noload => res_mutestream.so\n";
-				$add_modules_settings .= ";noload => res_rtp_asterisk.so\n";
-				$add_modules_settings .= ";noload => res_rtp_multicast.so\n";
-				$add_modules_settings .= ";noload => res_security_log.so\n";
-				$add_modules_settings .= ";noload => res_snmp.so\n";
-				$add_modules_settings .= "noload => cdr_odbc.so\n";
-				$add_modules_settings .= "noload => cdr_tds.so\n";
-				$add_modules_settings .= "noload => chan_h323.so\n";
-				$add_modules_settings .= "noload => res_config_odbc.so\n";
+				$add_modules_settings=<<<EOF
+;The following modules settings work out of the box on pfSense (note: do not remove this comment line).
+;Should you need any disabled module, check for its functionality individually in your environment.
+;For more information check asterisk's online documentation.
+noload => res_ael_share.so
+noload => res_adsi.so
+;noload => res_agi.so
+noload => res_calendar.so
+noload => res_crypto.so
+;noload => res_fax.so
+noload => res_jabber.so
+noload => res_monitor.so
+;noload => res_stun_monitor.so
+noload => res_smdi.so
+noload => res_speech.so
+noload => res_odbc.so
+noload => res_musiconhold.so
+noload => app_celgenuserevent.so
+;noload => app_confbridge.so
+;noload => app_minivm.so
+;noload => app_originate.so
+;noload => app_playtones.so
+;noload => app_readexten.so
+;noload => app_waituntil.so
+;noload => bridge_builtin_features.so
+;noload => bridge_multiplexed.so
+;noload => bridge_simple.so
+;noload => bridge_softmix.so
+noload => cdr_adaptive_odbc.so
+noload => chan_jingle.so
+;noload => chan_bridge.so
+noload => chan_unistim.so
+;noload => codec_g722.so
+;noload => format_g719.so
+noload => format_sln16.so
+noload => format_siren14.so
+noload => format_siren7.so
+;noload => func_aes.so
+;noload => func_audiohookinherit.so
+;noload => func_blacklist.so
+;noload => func_config.so
+;noload => func_devstate.so
+;noload => func_dialgroup.so
+;noload => func_dialplan.so
+;noload => func_extstate.so
+;noload => func_iconv.so
+;noload => func_lock.so
+;noload => func_module.so
+;noload => func_shell.so
+;noload => func_speex.so
+;noload => func_sprintf.so
+;noload => func_sysinfo.so
+;noload => func_version.so
+;noload => res_curl.so
+noload => func_vmcount.so
+noload => func_volume.so
+noload => res_clialiases.so
+noload => res_config_curl.so
+noload => res_config_ldap.so
+noload => res_config_sqlite.so
+;noload => res_limit.so
+;noload => res_phoneprov.so
+noload => res_realtime.so
+noload => res_timing_pthread.so
+;noload => app_adsiprog.so
+;noload => app_alarmreceiver.so
+;noload => app_amd.so
+;noload => app_authenticate.so
+;noload => app_cdr.so
+;noload => app_chanisavail.so
+;noload => app_channelredirect.so
+;noload => app_chanspy.so
+;noload => app_controlplayback.so
+noload => app_db.so
+;noload => app_dial.so
+;noload => app_dictate.so
+;noload => app_directed_pickup.so
+;noload => app_directory.so
+;noload => app_disa.so
+;noload => app_dumpchan.so
+;noload => app_echo.so
+;noload => app_exec.so
+;noload => app_externalivr.so
+;noload => app_festival.so
+;noload => app_followme.so
+;noload => app_forkcdr.so
+;noload => app_getcpeid.so
+;noload => app_ices.so
+;noload => app_image.so
+;noload => app_macro.so
+;noload => app_milliwatt.so
+;noload => app_mixmonitor.so
+;noload => app_mp3.so
+;noload => app_morsecode.so
+;noload => app_nbscat.so
+;noload => app_parkandannounce.so
+;noload => app_playback.so
+;noload => app_privacy.so
+;noload => app_queue.so
+;noload => app_read.so
+;noload => app_readfile.so
+;noload => app_record.so
+;noload => app_sayunixtime.so
+;noload => app_senddtmf.so
+;noload => app_sendtext.so
+;noload => app_setcallerid.so
+;noload => app_sms.so
+;noload => app_softhangup.so
+noload => app_speech_utils.so
+;noload => app_stack.so
+;noload => app_system.so
+;noload => app_talkdetect.so
+;noload => app_test.so
+;noload => app_transfer.so
+;noload => app_url.so
+;noload => app_userevent.so
+;noload => app_verbose.so
+;noload => app_voicemail.so
+;noload => app_waitforring.so
+;noload => app_waitforsilence.so
+;noload => app_while.so
+;noload => app_zapateller.so
+;noload => cdr_csv.so
+noload => cdr_custom.so
+;noload => cdr_manager.so
+noload => cdr_pgsql.so
+noload => cdr_radius.so
+noload => cdr_sqlite.so
+noload => cdr_sqlite3_custom.so
+noload => cdr_syslog.so
+;noload => cel_custom.so
+;noload => cel_manager.so
+noload => cel_odbc.so
+noload => cel_pgsql.so
+noload => cel_radius.so
+noload => cel_sqlite3_custom.so
+noload => cel_tds.so
+;noload => chan_agent.so
+noload => chan_dahdi.so
+noload => chan_gtalk.so
+noload => chan_iax2.so
+;noload => chan_local.so
+noload => chan_mgcp.so
+;noload => chan_multicast_rtp.so
+noload => chan_oss.so
+;noload => chan_sip.so
+noload => chan_skinny.so
+;noload => codec_a_mu.so
+;noload => codec_adpcm.so
+;noload => codec_alaw.so
+noload => codec_dahdi.so
+;noload => codec_g726.so
+;noload => codec_gsm.so
+;noload => codec_lpc10.so
+;noload => codec_speex.so
+;noload => codec_ulaw.so
+;noload => format_g723.so
+;noload => format_g726.so
+;noload => format_g729.so
+;noload => format_gsm.so
+;noload => format_h263.so
+;noload => format_h264.so
+;noload => format_ilbc.so
+noload => format_jpeg.so
+;noload => format_ogg_vorbis.so
+;noload => format_pcm.so
+;noload => format_sln.so
+;noload => format_vox.so
+;noload => format_wav.so
+;noload => format_wav_gsm.so
+;noload => func_base64.so
+;noload => func_callcompletion.so
+;noload => func_callerid.so
+;noload => func_cdr.so
+;noload => func_channel.so
+;noload => func_curl.so
+;noload => func_cut.so
+noload => func_db.so
+;noload => func_enum.so
+;noload => func_env.so
+;noload => func_frame_trace.so
+;noload => func_global.so
+;noload => func_groupcount.so
+;noload => func_logic.so
+;noload => func_math.so
+;noload => func_md5.so
+noload => func_odbc.so
+;noload => func_pitchshift.so
+;noload => func_rand.so
+;noload => func_realtime.so
+;noload => func_sha1.so
+;noload => func_srv.so
+;noload => func_strings.so
+;noload => func_timeout.so
+;noload => func_uri.so
+noload => pbx_ael.so
+;noload => pbx_config.so
+noload => pbx_dundi.so
+;noload => pbx_loopback.so
+;noload => pbx_realtime.so
+;noload => pbx_spool.so
+;noload => res_clioriginate.so
+noload => res_config_pgsql.so
+;noload => res_convert.so
+;noload => res_mutestream.so
+;noload => res_rtp_asterisk.so
+;noload => res_rtp_multicast.so
+;noload => res_security_log.so
+;noload => res_snmp.so
+noload => cdr_odbc.so
+noload => cdr_tds.so
+noload => chan_h323.so
+noload => res_config_odbc.so
+
+EOF;
 				$script_file .= $add_modules_settings;
 				file_put_contents($script, $script_file, LOCK_EX);
 			}
@@ -345,25 +352,29 @@ function sync_package_asterisk() {
 			}
 	
 			if (strpos($script_file,'demo extension for pfSense') === false) {  //first check if already added...
-				$add_demo_extension = "\n\n";
-				$add_demo_extension .= "[301]\n";
-				$add_demo_extension .= ";demo extension for pfSense\n";
-				$add_demo_extension .= "type=friend\n";
-				$add_demo_extension .= "defaultuser=301\n";
-				$add_demo_extension .= "insecure=port,invite\n";
-				$add_demo_extension .= "secret=1234\n";
-				$add_demo_extension .= "regexten=301\n";
-				$add_demo_extension .= "host=dynamic\n";
-				$add_demo_extension .= "context=default\n\n";
-				$add_demo_extension .= "[302]\n";
-				$add_demo_extension .= ";demo extension for pfSense\n";
-				$add_demo_extension .= "type=friend\n";
-				$add_demo_extension .= "defaultuser=302\n";
-				$add_demo_extension .= "insecure=port,invite\n";
-				$add_demo_extension .= "secret=1234\n";
-				$add_demo_extension .= "regexten=302\n";
-				$add_demo_extension .= "host=dynamic\n";
-				$add_demo_extension .= "context=default\n\n";
+				$add_demo_extension = <<<EOF
+				
+[301]
+;demo extension for pfSense
+type=friend
+defaultuser=301
+insecure=port,invite
+secret=1234
+regexten=301
+host=dynamic
+context=default
+
+[302]
+;demo extension for pfSense
+type=friend
+defaultuser=302
+insecure=port,invite
+secret=1234
+regexten=302
+host=dynamic
+context=default
+
+EOF;
 				$script_file .= $add_demo_extension;
 				file_put_contents($script, $script_file, LOCK_EX);
 			}
@@ -374,40 +385,32 @@ function sync_package_asterisk() {
 		$script_file=file_get_contents($script);
 		if (preg_match('/NO/',$script_file)){
 			$script_file=preg_replace("/NO/","YES",$script_file);
-			$script_file=preg_replace("$command -nqrx 'core stop now'","#$command -nqrx 'core stop now'\n  killall $name",$script_file);
-			}
+			$script_file=preg_replace("/core stop now'/","core stop now'\n  killall \$name",$script_file);
+			
 			//create the /var subdirs for the writable area in RAM
 			if (strpos($script_file,'pfSense') === false) {  //first check if already added...
-				$writable_area = "\n\n# Create paths in pfSense's volatile area if they don't exist (note: please do not remove this comment line)\n";
-				$writable_area .= "if [ ! -d /var/db/asterisk ]; then\n";
-				$writable_area .= "  mkdir -p /var/db/asterisk\n";
-				$writable_area .= "  chown -R asterisk:asterisk /var/db/asterisk\n";
-				$writable_area .= "  chmod -R g+w /var/db/asterisk\n";
-				$writable_area .= "fi\n\n";
-				$writable_area .= "if [ ! -d /var/spool/asterisk ]; then\n";
-				$writable_area .= "  mkdir -p /var/spool/asterisk\n";
-				$writable_area .= "  chown -R asterisk:asterisk /var/spool/asterisk\n";
-				$writable_area .= "  chmod -R g+w /var/spool/asterisk\n";
-				$writable_area .= "fi\n\n";
-				$writable_area .= "if [ ! -d /var/run/asterisk ]; then\n";
-				$writable_area .= "  mkdir -p /var/run/asterisk\n";
-				$writable_area .= "  chown -R asterisk:asterisk /var/run/asterisk\n";
-				$writable_area .= "  chmod -R g+w /var/run/asterisk\n";
-				$writable_area .= "fi\n\n";
-				$writable_area .= "if [ ! -d /var/log/asterisk ]; then\n";
-				$writable_area .= "  mkdir -p /var/log/asterisk\n";
-				$writable_area .= "  chown -R asterisk:asterisk /var/log/asterisk\n";
-				$writable_area .= "  chmod -R g+w /var/log/asterisk\n";
-				$writable_area .= "fi\n\n";
-				$writable_area .= "if [ ! -d /var/log/asterisk/cdr-csv ]; then\n";
-				$writable_area .= "  mkdir -p /var/log/asterisk/cdr-csv\n";
-				$writable_area .= "  chown -R asterisk:asterisk /var/log/asterisk/cdr-csv\n";
-				$writable_area .= "  chmod -R g+w /var/log/asterisk/cdr-csv\n";
-				$writable_area .= "fi\n\n";
+				$writable_area = <<< EOF
+# Create paths in pfSense's volatile area if they don't exist (note: please do not remove this comment line)
+for a in db spool run log 
+do
+if [ ! -d /var/\$a/asterisk ]; then
+  mkdir -p /var/\$a/asterisk
+  chown -R asterisk:asterisk /var/\$a/asterisk
+  chmod -R g+w /var/\$a/asterisk
+fi
+done
+
+if [ ! -d /var/log/asterisk/cdr-csv ]; then
+  mkdir -p /var/log/asterisk/cdr-csv
+  chown -R asterisk:asterisk /var/log/asterisk/cdr-csv
+  chmod -R g+w /var/log/asterisk/cdr-csv
+fi
+
+EOF;
 				$script_file .= $writable_area;
 			}
 			file_put_contents($script, $script_file, LOCK_EX);
-
+		}
 		chmod ($script,0755);
 		mwexec("$script stop");			
 		mwexec_bg("$script start");
