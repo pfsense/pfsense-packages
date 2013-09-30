@@ -338,14 +338,14 @@ EOF;
 			$script_file=file_get_contents($script);
 			//strenghten a couple of security settings, and predefine codecs in the default SIP configuration
 			if (strpos($script_file,'pfSense') === false) {  //first check if already added...
-				$pattern[0]=';allowguest';
+				$pattern[0]='/;allowguest\S+/';
 				$replace[0]='allowguest=no ;by pfSense ;';
-				$pattern[1]=';alwaysauthreject';
+				$pattern[1]='/;alwaysauthreject/';
 				$replace[1]='alwaysauthreject=yes ;by pfSense ;';
-				$pattern[2]='; jbenable';
+				$pattern[2]='/; jbenable/';
 				$replace[2]='jbenable=yes ;by pfSense ;';
-				$pattern[3]='[general]';
-				$replace[3]='[general]\n;The following general settings usually work on pfSense boxes (note: please do not remove this comment line).\ndisallow=all ;by pfSense\nallow=g729\nallow=ulaw\nallow=alaw\n\n';
+				$pattern[3]='/(First disallow all codecs)/';
+				$replace[3]="$1\n;The following general settings usually work on pfSense boxes (note: please do not remove this comment line).\ndisallow=all ;by pfSense\nallow=g729\nallow=gsm\nallow=ulaw\nallow=alaw\n\n";
 				$script_file=preg_replace($pattern,$replace,$script_file);
 				file_put_contents($script, $script_file, LOCK_EX);
 			}
