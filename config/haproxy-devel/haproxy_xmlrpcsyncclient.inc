@@ -60,7 +60,7 @@ function xmlrpc_sync_execute($syncinfo) {
 		$donotsync = true;
 	
 	if($donotsync) {
-		log_error("Disallowing sync loop for HAProxy sync.");
+		log_error("Disallowing sync loop for {$sync_logname} sync.");
 		return;
 	}
 
@@ -114,7 +114,7 @@ function xmlrpc_sync_execute($syncinfo) {
 		log_error("{$sync_logname} XMLRPC sync successfully completed with {$url}:{$port}.");
 	}
 
-	/* tell haproxy to reload our settings on the destionation sync host. */
+	/* tell package to reload our settings on the destination sync host. */
 	$method = 'pfsense.exec_php';
 	$execcmd  = "require_once('{$sync_include}');\n";
 	$execcmd .= "{$sync_function}();\n";
@@ -125,7 +125,7 @@ function xmlrpc_sync_execute($syncinfo) {
 		XML_RPC_encode($execcmd)
 	);
 
-	log_error("HAProxy XMLRPC reload data {$url}:{$port}.");
+	log_error("{$sync_logname} XMLRPC reload data {$url}:{$port}.");
 	$msg = new XML_RPC_Message($method, $params);
 	$cli = new XML_RPC_Client('/xmlrpc.php', $url, $port);
 	$cli->setCredentials('admin', $password);
