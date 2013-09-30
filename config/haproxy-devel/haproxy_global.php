@@ -341,7 +341,7 @@ function enable_change(enable_change) {
 				<td width="78%" class="vtable">
 					<input name="enablesync" type="checkbox" value="yes" <?php if ($pconfig['enablesync']) echo "checked"; ?>>
 					<strong>Sync HAProxy configuration to backup CARP members via XMLRPC.</strong><br/>
-					Note: remeber to also turn on HAProxy Sync on the backup nodes.<br/>
+					Note: remember to also turn on HAProxy Sync on the backup nodes.<br/>
 					The synchronisation host and password are those configured in pfSense main <a href="/system_hasync.php">"System: High Availability Sync"</a> settings.
 				</td>
 			</tr>
