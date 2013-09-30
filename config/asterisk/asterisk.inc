@@ -58,26 +58,25 @@ function sync_package_asterisk() {
 	#mount filesystem writeable
 	conf_mount_rw();
 	
-	
   	//for NanoBSD compatibility, move the /etc/asterisk configuration directory to /conf, and symlink it back
-  	if (!file_exists("/conf/asterisk/") && file_exists(ASTERISK_LOCALBASE."/etc/asterisk/")){
-  		rename(ASTERISK_LOCALBASE. "/etc/asterisk", ASTERISK_CONF_DIR);
-  		symlink (ASTERISK_CONF_DIR , ASTERISK_LOCALBASE. "/etc/asterisk");
-  	}
-
-  	//check or move -dist files on dist dir
   	$dist_dir=ASTERISK_CONF_DIR ."/dist";
   	if (!is_dir($dist_dir))
   		mkdir($dist_dir,0755,TRUE);
 
-  	$dist_files= scandir(ASTERISK_CONF_DIR);
-  	foreach ($dist_files as $dist){
-  		if (preg_match("/-dist/",$dist))
-  			rename (ASTERISK_CONF_DIR."/$dist", ASTERISK_CONF_DIR."/dist/$dist");
-  	}
+  	if(file_exists (ASTERISK_LOCALBASE."/etc/asterisk") && !is_link(ASTERISK_LOCALBASE."/etc/asterisk")){
+  		$dist_files= scandir(ASTERISK_LOCALBASE."/etc/asterisk");
+  		foreach ($dist_files as $dist){
+  			if (preg_match("/-dist/",$dist))
+  				rename (ASTERISK_LOCALBASE."/etc/asterisk"."/$dist", "$dist_dir/$dist");
+  			elseif (preg_match("/\w+/",$dist))
+  				rename (ASTERISK_LOCALBASE."/etc/asterisk"."/$dist", ASTERISK_CONF_DIR."/$dist");
+  			}
+  		rmdir(ASTERISK_LOCALBASE. "/etc/asterisk");
+  		symlink (ASTERISK_CONF_DIR , ASTERISK_LOCALBASE. "/etc/asterisk");
+  		}
 	
 	//fix asterisk options for nanobsd: logging, db and calls log in /tmp
-//	if ($g['platform'] == "nanobsd"){
+	//	if ($g['platform'] == "nanobsd"){
 		$script='/conf/asterisk/logger.conf';
 		if (file_exists($script)){
 			$script_file=file_get_contents($script);
@@ -91,17 +90,17 @@ function sync_package_asterisk() {
 		if (file_exists($script)){
 		//point to the /var subdirs in the writable area in RAM
 			$script_file=file_get_contents($script);
-			$pattern[0]='@[directories](!)@';
-			$replace[0]='[directories]';
-			$pattern[1]='@astetcdir => \S+@';
+			$pattern[0]='/(\Wdirectories\W)\S+/';
+			$replace[0]='$1';
+			$pattern[1]='/astetcdir => \S+/';
 			$replace[1]='astetcdir => /conf/asterisk';
-			$pattern[2]='@astdbdir => \S+@';
+			$pattern[2]='/astdbdir => \S+/';
 			$replace[2]='astdbdir => /var/db/asterisk';
-			$pattern[3]='@astspooldir => \S+@';
+			$pattern[3]='/astspooldir => \S+/';
 			$replace[3]='astspooldir => /var/spool/asterisk';
-			$pattern[4]='@astrundir => \S+@';
+			$pattern[4]='/astrundir => \S+/';
 			$replace[4]='astrundir => /var/run/asterisk';
-			$pattern[5]='@astlogdir => \S+@';
+			$pattern[5]='/astlogdir => \S+/';
 			$replace[5]='astlogdir => /var/log/asterisk';
 			$script_file=preg_replace($pattern,$replace,$script_file);
 			file_put_contents($script, $script_file, LOCK_EX);
