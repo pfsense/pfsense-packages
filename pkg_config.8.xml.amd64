@@ -1366,6 +1366,7 @@
 		<build_pbi>
 			<ports_before>databases/db46</ports_before>
 			<port>www/squidguard-devel</port>
+			<custom_name>squidguard-devel</custom_name>
 		</build_pbi>
 		<build_options>squidGuard-devel_UNSET=SQUID32 SQUID33;squidGuard-devel_SET=LDAP STRIPNT SQUID27;squid_UNSET=DNS_HELPER IPFILTER PINGER STACKTRACES STRICT_HTTP_DESC USERAGENT_LOG WCCPV2;squid_SET=PF LDAP_AUTH NIS_AUTH SASL_AUTH ARP_ACL AUFS CACHE_DIGESTS CARP COSS DELAY_POOLS FOLLOW_XFF HTCP IDENT KERB_AUTH KQUEUE LARGEFILE REFERER_LOG SNMP SSL VIA_DB WCCP;SQUID_UID=proxy;SQUID_GID=proxy</build_options>
 		<config_file>http://www.pfsense.org/packages/config/squidGuard-devel/squidguard.xml</config_file>
