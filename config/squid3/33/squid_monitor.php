@@ -43,6 +43,7 @@ if(strstr($pfSversion, "1.2"))
         $one_two = true;
 
 $pgtitle = "Status: Proxy Monitor";
+$shortcut_section = "squid";
 include("head.inc");
 ?>
 

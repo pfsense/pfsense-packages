@@ -40,7 +40,8 @@ require_once('service-utils.inc');
 
 if(!function_exists("filter_configure")) 
 	require_once("filter.inc");
-	
+
+$shortcut_section = "squid";
 $pf_version=substr(trim(file_get_contents("/etc/version")),0,3);
 if ($pf_version > 2.0)
 	define('SQUID_LOCALBASE', '/usr/pbi/squid-' . php_uname("m"));
@@ -155,7 +156,9 @@ function squid_install_command() {
 		$settingsnac = $config['installedpackages']['squidnac']['config'][0];
 	if (is_array($config['installedpackages']['squid']['config']))
 		$settingsgen = $config['installedpackages']['squid']['config'][0];
-		
+
+	if (file_exists("/usr/local/pkg/check_ip.php"))
+		rename("/usr/local/pkg/check_ip.php",SQUID_LOCALBASE . "/libexec/squid/check_ip.php");
 	/* Set storage system */
 	if ($g['platform'] == "nanobsd") {
 		$config['installedpackages']['squidcache']['config'][0]['harddisk_cache_system'] = 'null';
@@ -659,7 +662,7 @@ function squid_validate_auth($post, $input_errors) {
 	}
 
 	$auth_method = $post['auth_method'];
-	if (($auth_method != 'none') && ($auth_method != 'local')) {
+	if (($auth_method != 'none') && ($auth_method != 'local') && ($auth_method != 'cp')) {
 		$server = trim($post['auth_server']);
 		if (empty($server))
 			$input_errors[] = 'The field \'Authentication server\' is required';
@@ -1633,13 +1636,22 @@ function squid_resync_auth() {
 		$conf .= "acl sglog url_regex -i sgr=ACCESSDENIED\n";
 
 	$transparent_proxy = ($settingsconfig['transparent_proxy'] == 'on');
-	$auth_method = (($settings['auth_method'] && !$transparent_proxy) ? $settings['auth_method'] : 'none');
+	if ($transparent_proxy){
+		if (preg_match ("/(none|cp)/",$settings['auth_method']))
+			$auth_method=$settings['auth_method'];
+		else
+			$auth_method="none";
+	}
+	else{
+		$auth_method=$settings['auth_method'];
+	}
 	// Allow the remaining ACLs if no authentication is set
-	if ($auth_method == 'none') {
+	if ($auth_method == 'none' || $auth_method == 'cp') {
 		// Include squidguard denied acl log in squid
 		if ($settingsconfig['log_sqd'])
 			$conf .="http_access deny sglog\n";
-
+	}
+	if ($auth_method == 'none'  ) {
 		$conf .="# Setup allowed acls\n";
 		$allowed = array('allowed_subnets');
 		if ($settingsconfig['allow_interface'] == 'on') {
@@ -1658,7 +1670,7 @@ function squid_resync_auth() {
 		}
 
 		// Set up the external authentication programs
-		$auth_ttl = ($settings['auth_ttl'] ? $settings['auth_ttl'] : 60);
+		$auth_ttl = ($settings['auth_ttl'] ? $settings['auth_ttl'] : 5);
 		$processes = ($settings['auth_processes'] ? $settings['auth_processes'] : 5);
 		$prompt = ($settings['auth_prompt'] ? $settings['auth_prompt'] : 'Please enter your credentials to access the proxy');
 		switch ($auth_method) {
@@ -1674,11 +1686,17 @@ function squid_resync_auth() {
 				$port = (isset($settings['auth_server_port']) ? "-p {$settings['auth_server_port']}" : '');
 				$conf .= "auth_param basic program ". SQUID_LOCALBASE . "/libexec/squid/basic_radius_auth -w {$settings['radius_secret']} -h {$settings['auth_server']} $port\n";
 				break;
+			case 'cp':
+				$conf .= "external_acl_type check_filter children-startup={$processes} ttl={$auth_ttl} %SRC ". SQUID_LOCALBASE . "/libexec/squid/check_ip.php\n";
+				$conf .= "acl dgfilter external check_filter\n";
+				$conf .= "http_access allow dgfilter\n";
+				break;
 			case 'msnt':
 				$conf .= "auth_param basic program ". SQUID_LOCALBASE . "/libexec/squid/basic_msnt_auth\n";
 				squid_resync_msnt();
 				break;
 		}
+		if ($auth_method != 'cp'){
 		$conf .= <<< EOD
 auth_param basic children $processes
 auth_param basic realm $prompt
@@ -1686,7 +1704,7 @@ auth_param basic credentialsttl $auth_ttl minutes
 acl password proxy_auth REQUIRED
 
 EOD;
-
+		}
 		// Onto the ACLs
 		$password = array('localnet', 'allowed_subnets');
 		$passwordless = array('unrestricted_hosts');
@@ -1703,13 +1721,15 @@ EOD;
 		foreach ($passwordless as $acl)
 			$conf .= "http_access allow $acl\n";
 
-		// Include squidguard denied acl log in squid
-		if ($settingsconfig['log_sqd'])
-			$conf .="http_access deny password sglog\n";
+		if ($auth_method != 'cp'){
+			// Include squidguard denied acl log in squid
+			if ($settingsconfig['log_sqd'])
+				$conf .="http_access deny password sglog\n";
 			
-		// Allow the other ACLs as long as they authenticate
-		foreach ($password as $acl)
-			$conf .= "http_access allow password $acl\n";
+			// Allow the other ACLs as long as they authenticate
+			foreach ($password as $acl)
+				$conf .= "http_access allow password $acl\n";
+			}
 	}
 
 	$conf .= "# Default block all to be sure\n";
@@ -1844,7 +1864,7 @@ function squid_print_javascript_auth() {
 	$transparent_proxy = ($config['installedpackages']['squid']['config'][0]['transparent_proxy'] == 'on');
 
 	// No authentication for transparent proxy
-	if ($transparent_proxy) {
+	if ($transparent_proxy and preg_match("/(local|ldap|radius|msnt|ntlm)/",$config['installedpackages']['squidauth']['config'][0]['auth_method'])) {
 		$javascript = <<< EOD
 <script language="JavaScript">
 <!--
@@ -1959,6 +1979,24 @@ function on_auth_method_changed() {
 			document.iform.radius_secret.disabled = 1;
 			document.iform.msnt_secondary.disabled = 0;
 			break;
+		case 'cp':
+			document.iform.auth_server.disabled = 1;
+			document.iform.auth_server_port.disabled = 1;
+			document.iform.auth_ntdomain.disabled = 1;
+			document.iform.ldap_user.disabled = 1;
+			document.iform.ldap_version.disabled = 1;
+			document.iform.ldap_userattribute.disabled = 1;
+			document.iform.ldap_filter.disabled = 1;
+			document.iform.ldap_pass.disabled = 1;
+			document.iform.ldap_basedomain.disabled = 1;
+			document.iform.radius_secret.disabled = 1;
+			document.iform.msnt_secondary.disabled = 1;
+			document.iform.auth_prompt.disabled = 1;
+			document.iform.auth_processes.disabled = 0;
+			document.iform.auth_ttl.disabled = 0;
+			document.iform.unrestricted_auth.disabled = 1;
+			document.iform.no_auth_hosts.disabled = 1;
+			break;
 	}
 }
 -->
@@ -1975,43 +2013,51 @@ function squid_print_javascript_auth2() {
 }
 
 function squid_generate_rules($type) {
-	global $config;
+	global $config,$pf_version;
 	$squid_conf = $config['installedpackages']['squid']['config'][0];
-	
 	//check captive portal option
 	$cp_file='/etc/inc/captiveportal.inc';
 	$pfsense_version=preg_replace("/\s/","",file_get_contents("/etc/version"));
 	$port = ($settings['proxy_port'] ? $settings['proxy_port'] : 3128);
-	$cp_inc = file($cp_file);
-	$new_cp_inc="";
-	$found_rule=0;
-	foreach ($cp_inc as $line){
-		$new_line=$line;
-		//remove applied squid patch
-		if (preg_match('/} set 1 skipto 65314/',$line)){
-			$found_rule++;
-			$new_line ="";
+		$cp_inc = file($cp_file);
+		$new_cp_inc="";
+		$found_rule=0;
+		foreach ($cp_inc as $line){
+			$new_line=$line;
+			//remove applied squid patch
+			if (preg_match('/skipto 65314 ip/',$line)){
+				$found_rule++;
+				$new_line ="";
+				}
+				
+			if (substr($pfsense_version,0,3) > 2.0){
+				if (preg_match('/255.255.255.255/',$line) && $squid_conf['patch_cp']){
+					$found_rule++;
+					$new_line .= "\n\t".'$cprules .= "add {$rulenum} skipto 65314 ip from any to {$ips} '.$port.' in\n";'."\n";
+					$new_line .= "\t".'$cprules .= "add {$rulenum} skipto 65314 ip from {$ips} '.$port.' to any out\n";'."\n";
+					}
 			}
-		//add squid patch option based on current config	            
-		if (preg_match('/set 1 pass ip from any to/',$line) && $squid_conf['patch_cp']){
-			$found_rule++;
-			$new_line = "\t".'$cprules .= "add {$rulenum} set 1 skipto 65314 ip from any to {$ips} '.$port.' in\n";'."\n";
-			$new_line .= $line;
+			else{
+				//add squid patch option based on current config	            
+				if (preg_match('/set 1 pass ip from any to/',$line) && $squid_conf['patch_cp']){
+					$found_rule++;
+					$new_line = "\t".'$cprules .= "add {$rulenum} set 1 skipto 65314 ip from any to {$ips} '.$port.' in\n";'."\n";
+					$new_line .= $line;
+					}
+				if (preg_match('/set 1 pass ip from {/',$line) && $squid_conf['patch_cp']){
+					$found_rule++;
+					$new_line = "\t".'$cprules .= "add {$rulenum} set 1 skipto 65314 ip from {$ips} '.$port.' to any out\n";'."\n";
+					$new_line .= $line;
+					}
+				}
+			$new_cp_inc .= $new_line;
 			}
-		if (preg_match('/set 1 pass ip from {/',$line) && $squid_conf['patch_cp']){
-			$found_rule++;
-			$new_line = "\t".'$cprules .= "add {$rulenum} set 1 skipto 65314 ip from {$ips} '.$port.' to any out\n";'."\n";
-			$new_line .= $line;
+		if (!file_exists('/root/'.$pfsense_version.'.captiveportal.inc.backup')) {
+			copy ($cp_file,'/root/'.$pfsense_version.'.captiveportal.inc.backup');
 			}
-		$new_cp_inc .= $new_line;
-		}
-	if (!file_exists('/root/'.$pfsense_version.'.captiveportal.inc.backup')) {
-		copy ($cp_file,'/root/'.$pfsense_version.'.captiveportal.inc.backup');
-		}
-	if($found_rule > 0){
-		file_put_contents($cp_file,$new_cp_inc, LOCK_EX);
-		}
-	
+		if($found_rule > 0){
+			file_put_contents($cp_file,$new_cp_inc, LOCK_EX);
+			}
 	//normal squid rule check
 	if (($squid_conf['transparent_proxy'] != 'on') || ($squid_conf['allow_interface'] != 'on')) {
 		return;
