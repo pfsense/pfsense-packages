@@ -41,11 +41,11 @@
 /* ==========================================================================	*/
 	]]>
 	</copyright>
-	<description>Describe your package here</description>
-	<requirements>Describe your package requirements here</requirements>
+	<description>ARP Monitoring Daemon</description>
+	<requirements>None</requirements>
 	<faq>Currently there are no FAQ items provided.</faq>
 	<name>arpwatch</name>
-	<version>2.1.a13</version>
+	<version>2.1.a14 pkg v1.1</version>
 	<title>arpwatch: Settings</title>
 	<aftersaveredirect>pkg_edit.php?xml=arpwatch.xml&amp;id=0</aftersaveredirect>
 	<menu>
@@ -77,6 +77,11 @@
 		<chmod>a+rx</chmod>
 		<item>http://www.pfsense.com/packages/config/arpwatch_reports.php</item>
 	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/sbin/</prefix>
+		<chmod>a+rx</chmod>
+		<item>http://www.pfsense.com/packages/config/sm.php</item>
+	</additional_files_needed>
 	<fields>
 		<field>
 			<fielddescr>Listening Interface</fielddescr>
@@ -84,11 +89,18 @@
 			<description>Choose the desired listening interface here.</description>
 			<type>interfaces_selection</type>
 		</field>
+		<field>
+			<fielddescr>Enable E-mail Notifications</fielddescr>
+			<fieldname>enable_email</fieldname>
+			<type>checkbox</type>
+			<description>Sends an E-mail notification for each new station and ARP change as they are seen.&lt;br/&gt;NOTE: Only works on pfSense 2.1 or later.&lt;br/&gt;Configure SMTP and address settings in System &gt; Advanced on the Notifications tab</description>
+		</field>
 	</fields>
 	<custom_php_global_functions>
 	<![CDATA[
 	function sync_package_arpwatch() {
 		global $config;
+		$pf_version=substr(trim(file_get_contents("/etc/version")),0,3);
 		conf_mount_rw();
 		config_lock();
 		$log_file = "/var/log/arp.dat";
@@ -97,9 +109,14 @@
 		} else {
 			$int = $config['installedpackages']['arpwatch']['config'][0]['interface'];
 		}
+		$mail = "";
+		if(($pf_version > 2.0) && (isset($_POST['enable_email']) || ($config['installedpackages']['arpwatch']['config'][0]['enable_email'] == "on"))) {
+			if (!empty($config['notifications']['smtp']['notifyemailaddress']))
+				$mail = " -m {$config['notifications']['smtp']['notifyemailaddress']}";
+		}
 		$int = convert_friendly_interface_to_real_interface_name($int);
 		$start = "touch {$log_file}\n";
-		$start .= "/usr/local/sbin/arpwatch -d -f {$log_file} -i {$int} > /var/log/arpwatch.reports 2>&amp;1 &amp;";
+		$start .= "/usr/local/sbin/arpwatch -d -f {$log_file} -i {$int} {$mail} > /var/log/arpwatch.reports 2>&amp;1 &amp;";
 		$stop = "/usr/bin/killall arpwatch";
 		write_rcfile(array(
 			"file" => "arpwatch.sh",
@@ -121,6 +138,7 @@
 	<custom_php_install_command>
 	<![CDATA[
 		unlink_if_exists("/usr/local/etc/rc.d/arpwatch.sh");
+		@link("/usr/sbin/sm.php", "/usr/sbin/sendmail");
 	]]>
 	</custom_php_install_command>
 </packagegui>
