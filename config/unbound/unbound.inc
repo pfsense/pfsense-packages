@@ -461,7 +461,7 @@ function unbound_resync_config() {
 private-address: 10.0.0.0/8
 private-address: 172.16.0.0/12
 private-address: 192.168.0.0/16
-private-address: 192.254.0.0/16
+private-address: 169.254.0.0/16
 private-address: fd00::/8
 private-address: fe80::/10
 # Set private domains in case authorative name server returns a RFC1918 IP address
