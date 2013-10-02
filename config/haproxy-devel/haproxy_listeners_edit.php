@@ -725,10 +725,6 @@ include("head.inc");
 			<td>&nbsp;</td>
 		</tr>
 	</table>
-<?
-	global $haproxy_sni_ssloffloading;
-	if ($haproxy_sni_ssloffloading):
-?>
 	<table class="haproxy_mode_http" width="100%" border="0" cellpadding="6" cellspacing="0">
 		<tr>
 			<td colspan="2" valign="top" class="listtopic">SSL Offloading</td>
@@ -771,9 +767,6 @@ include("head.inc");
 			<td>&nbsp;</td>
 		</tr>
 	</table>
-<?	
-	endif; 
-?>
 	<table width="100%" border="0" cellpadding="6" cellspacing="0">
 		<tr align="left">
 			<td width="22%" valign="top">&nbsp;</td>
