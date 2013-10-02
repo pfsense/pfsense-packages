@@ -33,8 +33,20 @@
 /* ========================================================================== */
 $pf_version=substr(trim(file_get_contents("/etc/version")),0,3);
 if ($pf_version > 2.0){
+
+	// Function to get squidGuard directory
+	// each squidGuard version has a different directory
+	function getsqGuardDir() {
+		foreach (glob("/usr/pbi/*",GLOB_ONLYDIR) as $dirname) {
+			if (preg_match("/squidguard-/i", $dirname)) {
+				return trim($dirname);
+				break;
+			}
+		}
+	}
+
         define('SARG_DIR', '/usr/pbi/sarg-' . php_uname("m"));
-        define('SQGARD_DIR','/usr/pbi/squidguard-' . php_uname("m"));
+        define('SQGARD_DIR', getsqGuardDir());
         define('SQUID_DIR', '/usr/pbi/squid-' . php_uname("m"));
         define('DANSG_DIR', '/usr/pbi/dansguardian-' . php_uname("m"));
 	}
