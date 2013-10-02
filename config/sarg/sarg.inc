@@ -142,7 +142,7 @@ EOF;
 	}
 	#create a new file to speedup find search
 	file_put_contents("/root/sarg_run_{$id}.sh",$gzip_script,LOCK_EX);
-	mwexec($cmd. " ".$args);
+	mwexec("export LC_ALL=C && " .$cmd. " ".$args);
 	#check if there is a script to run after file save
 	if (is_array($config['installedpackages']['sarg']))
 		switch ($config['installedpackages']['sarg']['config'][0]['proxy_server']){
