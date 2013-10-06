@@ -546,6 +546,7 @@ harden-dnssec-stripped: {$harden_dnssec_stripped}
 {$optimization['rrset_cache_size']}
 outgoing-range: 8192
 {$optimization['so_rcvbuf']}
+{$optimization['so_sndbuf']}
 
 # Interface IP(s) to bind to
 {$unbound_bind_interfaces}
@@ -648,20 +649,21 @@ function unbound_optimization() {
 	// Check that it is set to 4MB (by default the OS has it configured to 4MB)
 	foreach ($config['sysctl']['item'] as $tunable) {
 		if ($tunable['tunable'] == 'kern.ipc.maxsockbuf') {
-			$so = floor(($tunable['value']/1024/1024)-1);
+			if ($tunable['value'] == 'default')
+				$maxsockbuf = '4262144';
+			else
+				$maxsockbuf = $tunable['value'];
+			$so = floor(($maxsockbuf/1024/1024)-1);
 			// Check to ensure that the number is not a negative
 			if ($so > 0) {
 				$optimization['so_rcvbuf'] = "so-rcvbuf: {$so}m";
 				$optimization['so_sndbuf'] = "so-sndbuf: {$so}m";
 			} else {
-				unset($optimization['so_rcvbuf']);
-				unset($optimization['so_sndbuf']);
+				$optimization['so_rcvbuf'] = "#so-rcvbuf: 4m";
+				$optimization['so_sndbuf'] = "#so-sndbuf: 4m";
 			}
 		}
 	}
-	// Safety check in case kern.ipc.maxsockbuf is deleted.
-	if(!isset($optimization['so_rcvbuf']))
-		$optimization['so_rcvbuf'] = "#so-rcvbuf: 4m";
 
 	return $optimization;
 }
