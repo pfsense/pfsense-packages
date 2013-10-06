@@ -650,11 +650,13 @@ function unbound_optimization() {
 		if ($tunable['tunable'] == 'kern.ipc.maxsockbuf') {
 			$so = floor(($tunable['value']/1024/1024)-1);
 			// Check to ensure that the number is not a negative
-			if ($so > 0)
+			if ($so > 0) {
 				$optimization['so_rcvbuf'] = "so-rcvbuf: {$so}m";
-			else
+				$optimization['so_sndbuf'] = "so-sndbuf: {$so}m";
+			} else {
 				unset($optimization['so_rcvbuf']);
-
+				unset($optimization['so_sndbuf']);
+			}
 		}
 	}
 	// Safety check in case kern.ipc.maxsockbuf is deleted.
