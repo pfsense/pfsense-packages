@@ -467,9 +467,8 @@ private-address: fe80::/10
 # Set private domains in case authorative name server returns a RFC1918 IP address
 EOF;
 
-	// Add private-domain options
-	$private_domains = unbound_add_domain_overrides(true);
-
+		// Add private-domain options
+		$private_domains = unbound_add_domain_overrides(true);
 	}
 
 	//Setup optimization
