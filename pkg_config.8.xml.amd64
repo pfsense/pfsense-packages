@@ -48,6 +48,26 @@
 		<after_install_info>Please visit the Asterisk tab on status menu.</after_install_info>
 	</package>
 	<package>
+		<name>bind</name>
+		<!-- <pkginfolink>http://doc.pfsense.org/index.php/bind</pkginfolink> -->
+		<descr><![CDATA[The most widely used name server software]]></descr>
+		<website>http://www.isc.org/downloads/BIND/</website>
+		<category>Services</category>
+		<version>9.9.4 pkg v 0.1</version>
+		<status>Beta</status>
+		<required_version>2.1</required_version>
+		<config_file>http://www.pfsense.com/packages/config/bind/bind.xml</config_file>
+		<configurationfile>bind.xml</configurationfile>
+		<depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
+		<!--<depends_on_package_pbi>bind-amd64.pbi</depends_on_package_pbi>-->
+		<build_port_path>/usr/ports/dns/bind99</build_port_path>
+		<build_pbi>
+			<custom_name>bind</custom_name>
+			<port>dns/bind99</port>
+		</build_pbi>
+		<build_options>OPTIONS_UNSET=IDN REPLACE_BASE FIXED_RRSET GSSAPI;OPTIONS_SET=IPV6 LINKS SSL THREADS XML DLZ_FILESYSTEM FILTER_AAAA SIGCHASE RRL LARGE_FILE</build_options>
+	</package>
+	<package>
 		<name>Filer</name>
 		<website/>
 		<descr>Allows you to create and overwrite files from the GUI.</descr>
