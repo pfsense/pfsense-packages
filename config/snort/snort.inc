@@ -47,7 +47,7 @@ global $rebuild_rules;
 
 /* package version */
 $snort_version = "2.9.4.6";
-$pfSense_snort_version = "2.6.0";
+$pfSense_snort_version = "2.6.1";
 $snort_package_version = "Snort {$snort_version} pkg v. {$pfSense_snort_version}";
 
 // Define SNORTDIR and SNORTLIBDIR constants according to FreeBSD version (PBI support or no PBI)
