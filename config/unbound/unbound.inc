@@ -855,7 +855,7 @@ function unbound_add_host_entries() {
 		foreach ($hosts as $host) {
 			$current_host = ($host['host'] != "") ? $host['host'].".".$host['domain'] : $host['domain'];
 			if (function_exists("is_ipaddrv6") && is_ipaddrv6($host['ip'])) {
-				if (!$added_item_v6[$curent_host]) {
+				if (!$added_item_v6[$current_host]) {
 					$host_entries .= "local-data-ptr: \"{$host['ip']} {$current_host}\"\n";
 					$host_entries .= "local-data: \"{$current_host} IN AAAA {$host['ip']}\"\n";
 					$added_item_v6[$current_host] = true;
