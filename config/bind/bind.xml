@@ -1,0 +1,231 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE packagegui SYSTEM "../schema/packages.dtd">
+<?xml-stylesheet type="text/xsl" href="../xsl/package.xsl"?>
+<packagegui>
+        <copyright>
+        <![CDATA[
+/* $Id$ */
+/* ========================================================================== */
+/*
+    bind.xml
+    part of pfSense (http://www.pfSense.com)
+    part of the Bind package for pfSense
+    Copyright (C) 2013 Juliano Oliveira/Adriano Brancher
+    All rights reserved.
+
+    Based on m0n0wall (http://m0n0.ch/wall)
+    Copyright (C) 2003-2006 Manuel Kasper <mk@neon1.net>.
+    All rights reserved.
+                                                                              */
+/* ========================================================================== */
+/*
+    Redistribution and use in source and binary forms, with or without
+    modification, are permitted provided that the following conditions are met:
+
+     1. Redistributions of source code must retain the above copyright notice,
+        this list of conditions and the following disclaimer.
+
+     2. Redistributions in binary form must reproduce the above copyright
+        notice, this list of conditions and the following disclaimer in the
+        documentation and/or other materials provided with the distribution.
+
+    THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
+    INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+    AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+    AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+    OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+    INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+    POSSIBILITY OF SUCH DAMAGE.
+                                                                              */
+/* ========================================================================== */
+        ]]>
+
+        </copyright>
+    <description>Describe your package here</description>
+    <requirements>Describe your package requirements here</requirements>
+    <faq>Currently there are no FAQ items provided.</faq>
+        <name>bind</name>
+        <version>1.0</version>
+        <title>Bind: Domain Named Settings</title>
+        <include_file>/usr/local/pkg/bind.inc</include_file>
+        <menu>
+                <name>Bind Server</name>
+                <tooltiptext>Modify Bind settings</tooltiptext>
+                <section>Services</section>
+                <url>/pkg_edit.php?xml=bind.xml</url>
+        </menu>
+        <service>
+                <name>named</name>
+                <rcfile>named.sh</rcfile>
+                <executable>named</executable>
+                <description>Domain Name Service</description>
+        </service>
+        <tabs>
+                <tab>
+                        <text>Settings</text>
+                        <url>/pkg_edit.php?xml=bind.xml</url>
+                        <active/>
+                </tab>
+                <tab>
+                        <text>ACLs</text>
+                        <url>/pkg.php?xml=bind_acls.xml</url>
+                </tab>
+                <tab>
+                        <text>Views</text>
+                        <url>/pkg.php?xml=bind_views.xml</url>
+                </tab>
+                <tab>
+                        <text>Zones</text>
+                         <url>/pkg.php?xml=bind_zones.xml</url>
+                </tab>
+                <tab>
+                        <text>Sync</text>
+                         <url>/pkg_edit.php?xml=bind_sync.xml</url>
+                </tab>
+
+        </tabs>
+        <!-- Installation -->
+        <additional_files_needed>
+            <prefix>/usr/local/pkg/</prefix>
+            <chmod>0755</chmod>
+                <item>http://www.useb.org.br/packages/config/bind/bind.xml</item>
+        </additional_files_needed>
+        <additional_files_needed>
+            <prefix>/usr/local/pkg/</prefix>
+            <chmod>0755</chmod>
+                <item>http://www.useb.org.br/packages/config/bind/bind_views.xml</item>
+        </additional_files_needed>
+        <additional_files_needed>
+            <prefix>/usr/local/pkg/</prefix>
+            <chmod>0755</chmod>
+                <item>http://www.pfsense.org/packages/config/bind/bind_zones.xml</item>
+        </additional_files_needed>
+        <additional_files_needed>
+            <prefix>/usr/local/pkg/</prefix>
+            <chmod>0755</chmod>
+                <item>http://www.pfsense.org/packages/config/bind/bind_acls.xml</item>
+        </additional_files_needed>
+        <additional_files_needed>
+            <prefix>/usr/local/pkg/</prefix>
+            <chmod>0755</chmod>
+                <item>http://www.pfsense.org/packages/config/bind/bind.inc</item>
+        </additional_files_needed>
+        <additional_files_needed>
+            <prefix>/usr/local/pkg/</prefix>
+            <chmod>0755</chmod>
+                <item>http://www.pfsense.org/packages/config/bind/bind_sync.xml</item>
+        </additional_files_needed>
+        <additional_files_needed>
+            <prefix>/usr/local/www/shortcuts/</prefix>
+            <chmod>0755</chmod>
+                <item>http://www.pfsense.org/packages/config/bind/pkg_bind.inc</item>
+        </additional_files_needed>
+        <fields>
+                <field>
+                        <fielddescr>Enable Bind</fielddescr>
+                        <fieldname>enable_bind</fieldname>
+                        <description>Enable DNS Bind on Server.</description>
+                        <type>checkbox</type>
+                        <required/>
+                </field>
+                <field>
+                        <fielddescr>Enable logging</fielddescr>
+                        <fieldname>bind_logging</fieldname>
+                        <description>Enable Bind logs, /var/log/named.log</description>
+                        <type>checkbox</type>
+                </field>
+                <field>
+                        <fielddescr>Enable Notify</fielddescr>
+                        <fieldname>bind_notify</fieldname>
+                        <description>Update imediaty slave zone</description>
+                        <type>checkbox</type>
+                </field>
+                <field>
+                        <fielddescr>Hide Version</fielddescr>
+                        <fieldname>bind_hide_version</fieldname>
+                        <description>Hide the version of BIND, this prevents discover the version of our servers, use any exploit that exploits a vulnerability in Bind.</description>
+                        <type>checkbox</type>
+                </field>
+                <field>
+                        <fielddescr>Limitar Memory RAM</fielddescr>
+                        <fieldname>bind_ram_limite</fieldname>
+                        <description>Limits the use of RAM for the DNS when much use does not exhaust the resources of the machine, recommend 256M</description>
+                        <type>input</type>
+                	<size>80</size>
+			<default_value>256M</default_value>
+               	</field>
+                <field>
+                        <type>listtopic</type>
+                        <name>Listen on Interfaces</name>
+                        <fieldname>temp01</fieldname>
+                </field>
+                <field>
+                        <fielddescr>Listen-on</fielddescr>
+                        <fieldname>listenon</fieldname>
+                        <description>Enable Named to listen on</description>
+                        <type>interfaces_selection</type>
+                        <showlistenall/>
+                        <showvirtualips/>
+                        <multiple/>
+                </field>
+                <field>
+                        <type>listtopic</type>
+                        <name>Forwarder Config</name>
+                        <fieldname>temp01</fieldname>
+                </field>
+                <field>
+                        <fielddescr>Forwarder</fielddescr>
+                        <fieldname>bind_forwarder</fieldname>
+                        <description>Forwardes enable DNS Bind on Server.</description>
+                        <type>checkbox</type>
+                        <enablefields>bind_forwader_ips</enablefields>
+                </field>
+                <field>
+                        <fielddescr>Forwarder IPs</fielddescr>
+                        <fieldname>bind_forwader_ips</fieldname>
+                        <description>Paste here ips do forwarder. Separate by semi-colons (;). [Applies only to Forwarder mode]</description>
+                        <type>input</type>
+                	<size>80</size>
+                </field>
+                <field>
+                        <type>listtopic</type>
+                        <name>Custon Options</name>
+                        <fieldname>temp01</fieldname>
+                </field>
+    		<field>
+                        <fielddescr>Custom Options</fielddescr>
+                        <fieldname>bind_custom_options</fieldname>
+                        <description><![CDATA[You can put your own custom options here, one per line.<br>
+                        			They'll be added to the configuration. They need to be named.conf native options.]]>
+                       	</description>
+                        <type>textarea</type>
+                        <cols>65</cols>
+                        <rows>5</rows>
+                        <encoding>base64</encoding>
+                </field>
+        </fields>
+    	<custom_php_after_head_command>
+    	</custom_php_after_head_command>
+        <custom_php_command_before_form>
+                bind_views_before_form_dest(&amp;$pkg,"bindacls","name","listenonv6");
+                bind_views_before_form_dest(&amp;$pkg,"bindacls","name","listenon");
+        </custom_php_command_before_form>
+        <custom_add_php_command>
+        </custom_add_php_command>
+    	<custom_php_validation_command>
+    	</custom_php_validation_command>
+        <custom_php_resync_config_command>
+        	bind_sync();
+        </custom_php_resync_config_command>
+        <custom_php_install_command>
+       		bind_write_rcfile();
+		create_log_file(); 
+	</custom_php_install_command>
+        <custom_php_deinstall_command>
+		delete_log_file();
+        </custom_php_deinstall_command>
+        <filter_rules_needed></filter_rules_needed>
+</packagegui>
