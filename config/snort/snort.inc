@@ -180,6 +180,44 @@ function snort_is_single_addr_alias($alias) {
 		return true;
 }
 
+function snort_expand_port_range($ports) {
+	/**************************************************/
+	/* This function examines the passed ports string */
+	/* and expands any embedded port ranges into the  */
+	/* individual ports separated by commas.  A port  */
+	/* range is indicated by a colon in the string.   */
+	/*                                                */
+	/* On Entry: $ports ==> string to be evaluated    */
+	/*                      with commas separating    */
+	/*                      the port values.          */
+	/*  Returns: string with any encountered port     */
+	/*           ranges expanded.                     */
+	/**************************************************/
+
+	$value = "";
+
+	// Split the incoming string on the commas
+	$tmp = explode(",", $ports);
+
+	// Look for any included port range and expand it
+	foreach ($tmp as $val) {
+		if (is_portrange($val)) {
+			$start = strtok($val, ":");
+			$end = strtok(":");
+			if ($end !== false) {
+				$val = $start . ",";
+				for ($i = intval($start) + 1; $i < intval($end); $i++)
+					$val .= strval($i) . ",";
+				$val .= $end;
+			}
+		}
+		$value .= $val . ",";
+	}
+
+	// Remove any trailing comma in return value
+	return trim($value, ",");
+}
+
 function snort_get_blocked_ips() {
 	$blocked_ips = "";
 	exec('/sbin/pfctl -t snort2c -T show', $blocked_ips);
@@ -2751,7 +2789,7 @@ EOD;
 			$http_inspect_server_opts .= " \\\n\tlog_hostname";
 	}
 
-	$http_ports = str_replace(",", " ", $snort_ports['http_ports']);
+	$http_ports = str_replace(",", " ", snort_expand_port_range($snort_ports['http_ports']));
 
 	/* def http_inspect */
 	$http_inspect = <<<EOD
@@ -2768,8 +2806,8 @@ preprocessor http_inspect_server: server default profile {$http_server_profile} 
 EOD;
 
 	/* def ftp_preprocessor */
-	$telnet_ports = str_replace(",", " ", $snort_ports['telnet_ports']);
-	$ftp_ports = str_replace(",", " ", $snort_ports['ftp_ports']);
+	$telnet_ports = str_replace(",", " ", snort_expand_port_range($snort_ports['telnet_ports']));
+	$ftp_ports = str_replace(",", " ", snort_expand_port_range($snort_ports['ftp_ports']));
 	$ftp_preprocessor = <<<EOD
 # ftp_telnet preprocessor #
 preprocessor ftp_telnet: global \
@@ -2820,7 +2858,7 @@ preprocessor ftp_telnet_protocol: ftp client default \
 	
 EOD;
 
-	$pop_ports = str_replace(",", " ", $snort_ports['pop3_ports']);
+	$pop_ports = str_replace(",", " ", snort_expand_port_range($snort_ports['pop3_ports']));
 	$pop_preproc = <<<EOD
 # POP preprocessor #
 preprocessor pop: \
@@ -2832,7 +2870,7 @@ preprocessor pop: \
 
 EOD;
 
-	$imap_ports = str_replace(",", " ", $snort_ports['imap_ports']);
+	$imap_ports = str_replace(",", " ", snort_expand_port_range($snort_ports['imap_ports']));
 	$imap_preproc = <<<EOD
 # IMAP preprocessor #
 preprocessor imap: \
@@ -2844,7 +2882,7 @@ preprocessor imap: \
 
 EOD;
 
-	$smtp_ports = str_replace(",", " ", $snort_ports['mail_ports']);
+	$smtp_ports = str_replace(",", " ", snort_expand_port_range($snort_ports['mail_ports']));
 	/* def smtp_preprocessor */
 	$smtp_preprocessor = <<<EOD
 # SMTP preprocessor #
@@ -2911,7 +2949,7 @@ preprocessor sfportscan: scan_type { {$sf_pscan_type} } \
 EOD;
 
 	/* def ssh_preproc */
-	$ssh_ports = str_replace(",", " ", $snort_ports['ssh_ports']);
+	$ssh_ports = str_replace(",", " ", snort_expand_port_range($snort_ports['ssh_ports']));
 	$ssh_preproc = <<<EOD
 # SSH preprocessor #
 preprocessor ssh: server_ports { {$ssh_ports} } \
@@ -2925,7 +2963,7 @@ preprocessor ssh: server_ports { {$ssh_ports} } \
 EOD;
 
 	/* def other_preprocs */
-	$sun_rpc_ports = str_replace(",", " ", $snort_ports['sun_rpc_ports']);
+	$sun_rpc_ports = str_replace(",", " ", snort_expand_port_range($snort_ports['sun_rpc_ports']));
 	$other_preprocs = <<<EOD
 # Other preprocs #
 preprocessor rpc_decode: {$sun_rpc_ports} no_alert_multiple_requests no_alert_large_fragments no_alert_incomplete
@@ -2946,7 +2984,7 @@ preprocessor dcerpc2_server: default, policy WinXP, \
 	
 EOD;
 
-	$sip_ports = str_replace(",", " ", $snort_ports['sip_ports']);
+	$sip_ports = str_replace(",", " ", snort_expand_port_range($snort_ports['sip_ports']));
 	$sip_preproc = <<<EOD
 # SIP preprocessor #
 preprocessor sip: max_sessions 40000, \
@@ -2984,7 +3022,7 @@ preprocessor sip: max_sessions 40000, \
 
 EOD;
 
-	$dns_ports = str_replace(",", " ", $snort_ports['dns_ports']);
+	$dns_ports = str_replace(",", " ", snort_expand_port_range($snort_ports['dns_ports']));
 	/* def dns_preprocessor */
 	$dns_preprocessor = <<<EOD
 # DNS preprocessor #
@@ -2995,7 +3033,7 @@ preprocessor dns: \
 EOD;
 
 	/* def dnp3_preprocessor */
-	$dnp3_ports = str_replace(",", " ", $snort_ports['DNP3_PORTS']);
+	$dnp3_ports = str_replace(",", " ", snort_expand_port_range($snort_ports['DNP3_PORTS']));
 	$dnp3_preproc = <<<EOD
 # DNP3 preprocessor #
 preprocessor dnp3: \
@@ -3006,7 +3044,7 @@ preprocessor dnp3: \
 EOD;
 
 	/* def modbus_preprocessor */
-	$modbus_ports = str_replace(",", " ", $snort_ports['MODBUS_PORTS']);
+	$modbus_ports = str_replace(",", " ", snort_expand_port_range($snort_ports['MODBUS_PORTS']));
 	$modbus_preproc = <<<EOD
 # Modbus preprocessor #
 preprocessor modbus: \
@@ -3015,7 +3053,7 @@ preprocessor modbus: \
 EOD;
 
 	/* def gtp_preprocessor */
-	$gtp_ports = str_replace(",", " ", $snort_ports['GTP_PORTS']);
+	$gtp_ports = str_replace(",", " ", snort_expand_port_range($snort_ports['GTP_PORTS']));
 	$gtp_preproc = <<<EOD
 # GTP preprocessor #
 preprocessor gtp: ports { {$gtp_ports} }
@@ -3023,7 +3061,7 @@ preprocessor gtp: ports { {$gtp_ports} }
 EOD;
 
 	/* def ssl_preprocessor */
-	$ssl_ports = str_replace(",", " ", $snort_ports['ssl_ports']);
+	$ssl_ports = str_replace(",", " ", snort_expand_port_range($snort_ports['ssl_ports']));
 	$ssl_preproc = <<<EOD
 # SSL preprocessor #
 preprocessor ssl: \
