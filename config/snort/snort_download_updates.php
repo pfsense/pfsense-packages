@@ -40,8 +40,14 @@ require_once("/usr/local/pkg/snort/snort.inc");
 $snortdir = SNORTDIR;
 $snort_rules_upd_log = RULES_UPD_LOGFILE;
 $log = $snort_rules_upd_log;
-$snort_rules_file = VRT_DNLD_FILENAME;
-$emergingthreats_filename = ET_DNLD_FILENAME;
+
+/* Grab the Snort binary version programmatically and */
+/* use it to construct the proper Snort VRT rules     */
+/* tarball filename.                                  */
+exec("/usr/local/bin/snort -V 2>&1 |/usr/bin/grep Version | /usr/bin/cut -c20-26", $snortver);
+$snortver[0] = str_replace(".", "", $snortver[0]);
+$snort_rules_file = "snortrules-snapshot-{$snortver[0]}.tar.gz";
+//$snort_rules_file = VRT_DNLD_FILENAME;
 $snort_community_rules_filename = GPLV2_DNLD_FILENAME;
 
 /* load only javascript that is needed */
@@ -49,7 +55,17 @@ $snort_load_jquery = 'yes';
 $snort_load_jquery_colorbox = 'yes';
 $snortdownload = $config['installedpackages']['snortglobal']['snortdownload'];
 $emergingthreats = $config['installedpackages']['snortglobal']['emergingthreats'];
+$etpro = $config['installedpackages']['snortglobal']['emergingthreats_pro'];
 $snortcommunityrules = $config['installedpackages']['snortglobal']['snortcommunityrules'];
+
+if ($etpro == "on") {
+	$emergingthreats_filename = ETPRO_DNLD_FILENAME;
+	$et_name = "EMERGING THREATS PRO RULES";
+}
+else {
+	$emergingthreats_filename = ET_DNLD_FILENAME;
+	$et_name = "EMERGING THREATS RULES";
+}
 
 /* quick md5s chk */
 $snort_org_sig_chk_local = 'N/A';
@@ -138,9 +154,9 @@ h += 96;
 						<p style="text-align: left; margin-left: 225px;">
 							<font color="#777777" size="2.5px">
 							<b><?php echo gettext("INSTALLED RULESET SIGNATURES"); ?></b></font><br/><br/>
-							<font color="#FF850A" size="1px"><b>SNORT.ORG&nbsp;&nbsp;--></b></font>
+							<font color="#FF850A" size="1px"><b>SNORT VRT RULES&nbsp;&nbsp;--></b></font>
 							<font size="1px" color="#000000">&nbsp;&nbsp;<? echo $snort_org_sig_chk_local; ?></font><br/>
-							<font color="#FF850A" size="1px"><b>EMERGINGTHREATS.NET&nbsp;&nbsp;--></b></font>
+							<font color="#FF850A" size="1px"><b><?=$et_name;?>&nbsp;&nbsp;--></b></font>
 							<font size="1px" color="#000000">&nbsp;&nbsp;<? echo $emergingt_net_sig_chk_local; ?></font><br/>
 							<font color="#FF850A" size="1px"><b>SNORT GPLv2 COMMUNITY RULES&nbsp;&nbsp;--></b></font>
 							<font size="1px" color="#000000">&nbsp;&nbsp;<? echo $snort_community_sig_chk_local; ?></font><br/>
@@ -160,7 +176,7 @@ h += 96;
 
 			<?php
 
-						if ($snortdownload != 'on' && $emergingthreats != 'on') {
+						if ($snortdownload != 'on' && $emergingthreats != 'on' && $etpro != 'on') {
 							echo '
 			<button disabled="disabled"><span class="download">' . gettext("Update Rules") . '</span></button><br/>
 			<p style="text-align:left; margin-left:150px;">

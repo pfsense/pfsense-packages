@@ -44,7 +44,9 @@ $snortdir = SNORTDIR;
 /* make things short  */
 $pconfig['snortdownload'] = $config['installedpackages']['snortglobal']['snortdownload'];
 $pconfig['oinkmastercode'] = $config['installedpackages']['snortglobal']['oinkmastercode'];
+$pconfig['etpro_code'] = $config['installedpackages']['snortglobal']['etpro_code'];
 $pconfig['emergingthreats'] = $config['installedpackages']['snortglobal']['emergingthreats'];
+$pconfig['emergingthreats_pro'] = $config['installedpackages']['snortglobal']['emergingthreats_pro'];
 $pconfig['rm_blocked'] = $config['installedpackages']['snortglobal']['rm_blocked'];
 $pconfig['snortloglimit'] = $config['installedpackages']['snortglobal']['snortloglimit'];
 $pconfig['snortloglimitsize'] = $config['installedpackages']['snortglobal']['snortloglimitsize'];
@@ -63,14 +65,22 @@ if ($_POST['rule_update_starttime']) {
 		$input_errors[] = "Invalid Rule Update Start Time!  Please supply a value in 24-hour format as 'HH:MM'.";
 }
 
+if ($_POST['snortdownload'] == "on" && empty($_POST['oinkmastercode']))
+		$input_errors[] = "You must supply an Oinkmaster code in the box provided in order to enable Snort VRT rules!";
+
+if ($_POST['emergingthreats_pro'] == "on" && empty($_POST['etpro_code']))
+		$input_errors[] = "You must supply a subscription code in the box provided in order to enable Emerging Threats Pro rules!";
+
 /* if no errors move foward */
 if (!$input_errors) {
 	if ($_POST["Submit"]) {
 
-		$config['installedpackages']['snortglobal']['snortdownload'] = $_POST['snortdownload'];
+		$config['installedpackages']['snortglobal']['snortdownload'] = $_POST['snortdownload'] ? 'on' : 'off';
 		$config['installedpackages']['snortglobal']['oinkmastercode'] = $_POST['oinkmastercode'];
 		$config['installedpackages']['snortglobal']['snortcommunityrules'] = $_POST['snortcommunityrules'] ? 'on' : 'off';
 		$config['installedpackages']['snortglobal']['emergingthreats'] = $_POST['emergingthreats'] ? 'on' : 'off';
+		$config['installedpackages']['snortglobal']['emergingthreats_pro'] = $_POST['emergingthreats_pro'] ? 'on' : 'off';
+		$config['installedpackages']['snortglobal']['etpro_code'] = $_POST['etpro_code'];
 
 		$config['installedpackages']['snortglobal']['rm_blocked'] = $_POST['rm_blocked'];
 		if ($_POST['snortloglimitsize']) {
@@ -160,19 +170,14 @@ if ($input_errors)
 	<td width="78%" class="vtable">
 		<table width="100%" border="0" cellpadding="2" cellspacing="0">
 		<tr>
-			<td><input name="snortdownload" type="radio" id="snortdownload" value="off" onclick="enable_snort_vrt('off')"  
-			<?php if($pconfig['snortdownload']=='off' || $pconfig['snortdownload']=='') echo 'checked'; ?> >&nbsp;&nbsp;</td>
-			<td><span class="vexpl"><?php printf(gettext("Do %sNOT%s Install"), '<strong>',  '</strong>'); ?></span></td>
-		</tr>
-		<tr>
-			<td><input name="snortdownload" type="radio" id="snortdownload" value="on" onclick="enable_snort_vrt('on')" 
+			<td><input name="snortdownload" type="checkbox" id="snortdownload" value="on" onclick="enable_snort_vrt();" 
 			<?php if($pconfig['snortdownload']=='on') echo 'checked'; ?>></td>
-			<td><span class="vexpl"><?php echo gettext("Install Basic Rules or Premium rules"); ?></span></td>
+			<td><span class="vexpl"><?php echo gettext("Snort VRT free Registered User or paid Subscriber rules"); ?></span></td>
 		<tr>
 			<td>&nbsp;</td>
-			<td><a href="https://www.snort.org/signup" target="_blank"><?php echo gettext("Sign Up for a Basic Rule Account"); ?> </a><br>
+			<td><a href="https://www.snort.org/signup" target="_blank"><?php echo gettext("Sign Up for a free Registered User Rule Account"); ?> </a><br>
 			<a href="http://www.snort.org/vrt/buy-a-subscription" target="_blank">
-			<?php echo gettext("Sign Up for Sourcefire VRT Certified Premium Rules.  This Is Highly Recommended"); ?></a></td>
+			<?php echo gettext("Sign Up for paid Sourcefire VRT Certified Subscriber Rules"); ?></a></td>
 		</tr>
 		<tr>
 			<td colspan="2">&nbsp;</td>
@@ -180,17 +185,17 @@ if ($input_errors)
 		</table>
 		<table width="100%" border="0" cellpadding="2" cellspacing="0">
 		<tr>
-			<td colspan="2" valign="top"><b><span class="vexpl"><?php echo gettext("Oinkmaster Configuration"); ?></span></b></td>
+			<td colspan="2" valign="top"><b><span class="vexpl"><?php echo gettext("Snort VRT Oinkmaster Configuration"); ?></span></b></td>
 		</tr>
 		<tr>
-			<td valign="top"><span class="vexpl"><strong><?php echo gettext("Code"); ?></strong></span></td>
+			<td valign="top"><span class="vexpl"><strong><?php echo gettext("Code:"); ?></strong></span></td>
 			<td><input name="oinkmastercode" type="text"
 				class="formfld" id="oinkmastercode" size="52"
 				value="<?=htmlspecialchars($pconfig['oinkmastercode']);?>" 
 				<?php if($pconfig['snortdownload']<>'on') echo 'disabled'; ?>><br>
 			<?php echo gettext("Obtain a snort.org Oinkmaster code and paste it here."); ?></td>
 		</tr>
-	</table>
+		</table>
 </tr>
 <tr>
 	<td width="22%" valign="top" class="vncell"><?php printf(gettext("Install %sSnort Community%s " .
@@ -198,7 +203,7 @@ if ($input_errors)
 	<td width="78%" class="vtable">
 		<table width="100%" border="0" cellpadding="2" cellspacing="0">
 			<tr>
-				<td valign="top" width="8%"><input name="snortcommunityrules" type="checkbox" value="yes"
+				<td valign="top" width="8%"><input name="snortcommunityrules" type="checkbox" value="on"
 				<?php if ($config['installedpackages']['snortglobal']['snortcommunityrules']=="on") echo "checked"; ?> ></td>
 				<td><span class="vexpl"><?php echo gettext("The Snort Community Ruleset is a GPLv2 VRT certified ruleset that is distributed free of charge " .
 				"without any VRT License restrictions.  This ruleset is updated daily and is a subset of the subscriber ruleset."); ?>
@@ -212,11 +217,41 @@ if ($input_errors)
 	<td width="78%" class="vtable">
 		<table width="100%" border="0" cellpadding="2" cellspacing="0">
 			<tr>
-				<td valign="top" width="8%"><input name="emergingthreats" type="checkbox" value="yes" 
-				<?php if ($config['installedpackages']['snortglobal']['emergingthreats']=="on") echo "checked"; ?>>
-				<td><span class="vexpl"><?php echo gettext("Emerging Threats is an open source community that produces fast " .
-				"moving and diverse Snort Rules."); ?></span></td>
+				<td valign="top" width="8%"><input name="emergingthreats" type="checkbox" value="on" onclick="enable_et_rules();" 
+				<?php if ($config['installedpackages']['snortglobal']['emergingthreats']=="on") echo "checked"; ?>></td>
+				<td><span class="vexpl"><?php echo gettext("ETOpen is an open source set of Snort rules whose coverage " .
+				"is more limited than ETPro."); ?></span></td>
 			</tr>
+			<tr>
+				<td valign="top" width="8%"><input name="emergingthreats_pro" type="checkbox" value="on" onclick="enable_etpro_rules();" 
+				<?php if ($config['installedpackages']['snortglobal']['emergingthreats_pro']=="on") echo "checked"; ?>></td>
+				<td><span class="vexpl"><?php echo gettext("ETPro for Snort offers daily updates and extensive coverage of current malware threats."); ?></span></td>
+			</tr>
+		<tr>
+			<td>&nbsp;</td>
+			<td><a href="http://www.emergingthreats.net/solutions/etpro-ruleset/" target="_blank"><?php echo gettext("Sign Up for an ETPro Account"); ?> </a></td>
+		</tr>
+		<tr>
+			<td>&nbsp;</td>
+			<td class="vexpl"><?php echo "<span class='red'><strong>" . gettext("Note:") . "</strong></span>" . "&nbsp;" . 
+			gettext("The ETPro rules contain all of the ETOpen rules, so the ETOpen rules are not required and are disabled when the ETPro rules are selected."); ?></td>
+		</tr>
+		<tr>
+			<td colspan="2">&nbsp;</td>
+		</tr>
+		</table>
+		<table width="100%" border="0" cellpadding="2" cellspacing="0">
+		<tr>
+			<td colspan="2" valign="top"><b><span class="vexpl"><?php echo gettext("ETPro Subscription Configuration"); ?></span></b></td>
+		</tr>
+		<tr>
+			<td valign="top"><span class="vexpl"><strong><?php echo gettext("Code:"); ?></strong></span></td>
+			<td><input name="etpro_code" type="text"
+				class="formfld" id="etpro_code" size="52"
+				value="<?=htmlspecialchars($pconfig['etpro_code']);?>" 
+				<?php if($pconfig['emergingthreats_pro']<>'on') echo 'disabled'; ?>><br>
+			<?php echo gettext("Obtain an ETPro subscription code and paste it here."); ?></td>
+		</tr>
 		</table>
 	</td>
 </tr>
@@ -330,13 +365,28 @@ if ($input_errors)
 
 <script language="JavaScript">
 <!--
-function enable_snort_vrt(btn) {
-	if (btn == 'off') {
-		document.iform.oinkmastercode.disabled = "true";
+function enable_snort_vrt() {
+	var endis = !(document.iform.snortdownload.checked);
+	document.iform.oinkmastercode.disabled = endis;
+	document.iform.etpro_code.disabled = endis;
+}
+
+function enable_et_rules() {
+	var endis = document.iform.emergingthreats.checked;
+	if (endis) {
+		document.iform.emergingthreats_pro.checked = !(endis);
+		document.iform.etpro_code.disabled = "true";
 	}
-	if (btn == 'on') {
-		document.iform.oinkmastercode.disabled = "";
-	}	
+}
+
+function enable_etpro_rules() {
+	var endis = document.iform.emergingthreats_pro.checked;
+	if (endis) {
+		document.iform.emergingthreats.checked = !(endis);
+		document.iform.etpro_code.disabled = "";
+	}
+	else
+		document.iform.etpro_code.disabled = "true";
 }
 
 function enable_change_rules_upd() {

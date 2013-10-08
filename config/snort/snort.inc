@@ -67,12 +67,9 @@ else {
 
 /* Define some useful constants for Snort */
 define("SNORTLOGDIR", "/var/log/snort");
-define("VRT_DNLD_FILENAME", "snortrules-snapshot-2946.tar.gz");
-define("VRT_DNLD_URL", "https://www.snort.org/reg-rules/");
-define("ET_VERSION", "2.9.0");
 define("ET_DNLD_FILENAME", "emerging.rules.tar.gz");
+define("ETPRO_DNLD_FILENAME", "etpro.rules.tar.gz");
 define("GPLV2_DNLD_FILENAME", "community-rules.tar.gz");
-define("GPLV2_DNLD_URL", "https://s3.amazonaws.com/snort-org/www/rules/community/");
 define("FLOWBITS_FILENAME", "flowbit-required.rules");
 define("ENFORCING_RULES_FILENAME", "snort.rules");
 define("RULES_UPD_LOGFILE", SNORTLOGDIR . "/snort_rules_update.log");
