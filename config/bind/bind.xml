@@ -140,7 +140,7 @@
                 <field>
                         <fielddescr>Enable Notify</fielddescr>
                         <fieldname>bind_notify</fieldname>
-                        <description>Update imediaty slave zone</description>
+                        <description>Notify slave server after any update on master.</description>
                         <type>checkbox</type>
                 </field>
                 <field>
@@ -151,7 +151,7 @@
                 </field>
                 <field>
                         <fielddescr>Limitar Memory RAM</fielddescr>
-                        <fieldname>bind_ram_limite</fieldname>
+                        <fieldname>bind_ram_limit</fieldname>
                         <description>Limits the use of RAM for the DNS when much use does not exhaust the resources of the machine, recommend 256M</description>
                         <type>input</type>
                 	<size>80</size>
@@ -181,18 +181,18 @@
                         <fieldname>bind_forwarder</fieldname>
                         <description>Forwardes enable DNS Bind on Server.</description>
                         <type>checkbox</type>
-                        <enablefields>bind_forwader_ips</enablefields>
+                        <enablefields>bind_forwarder_ips</enablefields>
                 </field>
                 <field>
                         <fielddescr>Forwarder IPs</fielddescr>
-                        <fieldname>bind_forwader_ips</fieldname>
-                        <description>Paste here ips do forwarder. Separate by semi-colons (;). [Applies only to Forwarder mode]</description>
+                        <fieldname>bind_forwarder_ips</fieldname>
+                        <description>Enter IPs to forward. Separate by semi-colons (;). [Applies only to Forwarder mode]</description>
                         <type>input</type>
                 	<size>80</size>
                 </field>
                 <field>
                         <type>listtopic</type>
-                        <name>Custon Options</name>
+                        <name>custom Options</name>
                         <fieldname>temp01</fieldname>
                 </field>
     		<field>

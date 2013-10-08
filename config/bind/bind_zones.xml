@@ -153,8 +153,8 @@
                         <type>checkbox</type>
                 </field>
 		<field>
-			<fielddescr>Custon Option</fielddescr>
-			<fieldname>custon</fieldname>
+			<fielddescr>custom Option</fielddescr>
+			<fieldname>custom</fieldname>
 			<description>You can put your own custom options here, separated by semi-colons (;).</description>
 	                <type>textarea</type>
                         <cols>65</cols>
@@ -176,7 +176,7 @@
 		<field>
 			<fielddescr>IP Master Zone</fielddescr>
 			<fieldname>slaveip</fieldname>
-			<description>In which case the zone is slave, enter the IP address of the master DNS zone.</description>
+			<description>If zone is slave, enter the IP address of the master DNS zone.</description>
 			<type>input</type>
 		</field>
 		<field>

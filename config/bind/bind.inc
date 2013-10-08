@@ -45,8 +45,8 @@ function bind_sync(){
 	$bind = $config["installedpackages"]["bind"]["config"][0]; 
 	$bind_enable = $bind['enable_bind'];
 	$bind_forwarder = $bind['bind_forwarder'];
-	$forwader_ips = $bind['bind_forwader_ips'];
-	$ram_limite = $bind['bind_ram_limite'];
+	$forwarder_ips = $bind['bind_forwarder_ips'];
+	$ram_limit = $bind['bind_ram_limit'];
 	$hide_version = $bind['bind_hide_version'];
 	$bind_notify = $bind['bind_notify'];
 	$custom_options = base64_decode($bind['bind_custom_options']);
@@ -62,7 +62,7 @@ $bind_conf .= <<<EOD
 		pid-file "/var/run/named/pid";
 		statistics-file "/var/log/named.stats";
 
-		max-cache-size $ram_limite;\n
+		max-cache-size $ram_limit;\n
 EOD;
 
 	//check ips to listen on
@@ -97,7 +97,7 @@ EOD;
 
 	#forwarder config
 	if ($bind_forwarder == on)
-		$bind_conf .="\t\tforwarders { $forwader_ips };\n";
+		$bind_conf .="\t\tforwarders { $forwarder_ips };\n";
 	if ($bind_notify == on)
 		$bind_conf .="\t\tnotify yes;\n"; 
 	if ($hide_version == on)
@@ -188,7 +188,7 @@ EOD;
 			$zonename = $zone['name'];	
 			$zonetype = $zone['type'];	
 			$zoneview = $zone['view'];	
-			$zonecuston = $zone['custon'];	
+			$zonecustom = $zone['custom'];	
 			$zoneipslave = $zone['slaveip'];	
 			$zonereverso = $zone['reverso'];				
 			if($zone['allowupdate'] == '')
@@ -221,8 +221,8 @@ EOD;
 						$bind_conf .= "\t\tallow-query { $zoneallowquery;};\n"; 
 				 	if ($zonetype != "slave")		
 						$bind_conf .= "\t\tallow-transfer { $zoneallowtransfer;};\n"; 
-				 	if ($zonecuston != '')		
-        					$bind_conf .= "\t\t$zonecuston\n";
+				 	if ($zonecustom != '')		
+        					$bind_conf .= "\t\t$zonecustom\n";
 					$bind_conf .= "\t};\n\n";
         
 					if (!(file_exists("/etc/namedb/$zonetype"))) {
