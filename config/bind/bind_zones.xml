@@ -368,10 +368,10 @@
                 bind_views_before_form_dest(&amp;$pkg,"bindacls","name","allowquery");
                 bind_views_before_form_dest(&amp;$pkg,"bindacls","name","allowupdate");
        		bind_views_before_form_dest(&amp;$pkg,"bindviews","name","view");
-       		bind_zona_before_form_dest(&amp;$pkg,"bindzone","name","serial");
+       		bind_zone_before_form_dest(&amp;$pkg,"bindzone","name","serial");
         </custom_php_command_before_form>
 	<custom_php_validation_command>
-		$_POST['serial']=$_POST['serial']+1;        
+		$_POST['serial']=date("9U");        
 	</custom_php_validation_command>
 	<custom_delete_php_command>
 	        bind_sync();

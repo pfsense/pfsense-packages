@@ -127,7 +127,8 @@
                 <field>
                         <fielddescr>Enable Bind</fielddescr>
                         <fieldname>enable_bind</fieldname>
-                        <description>Enable DNS Bind on Server.</description>
+                        <description><![CDATA[Enable DNS Bind on Server<br>
+                        	Disable Dns forwarder service on selected interfaces before enabling bind.]]></description>
                         <type>checkbox</type>
                         <required/>
                 </field>
@@ -150,12 +151,12 @@
                         <type>checkbox</type>
                 </field>
                 <field>
-                        <fielddescr>Limitar Memory RAM</fielddescr>
-                        <fieldname>bind_ram_limit</fieldname>
-                        <description>Limits the use of RAM for the DNS when much use does not exhaust the resources of the machine, recommend 256M</description>
-                        <type>input</type>
-                	<size>80</size>
-			<default_value>256M</default_value>
+					<fielddescr>Limitar Memory RAM</fielddescr>
+					<fieldname>bind_ram_limit</fieldname>
+					<description>Limits the use of RAM for the DNS when much use does not exhaust the resources of the machine, recommend 256M</description>
+					<type>input</type>
+                	<size>10</size>
+					<default_value>256M</default_value>
                	</field>
                 <field>
                         <type>listtopic</type>
@@ -165,7 +166,7 @@
                 <field>
                         <fielddescr>Listen-on</fielddescr>
                         <fieldname>listenon</fieldname>
-                        <description>Enable Named to listen on</description>
+                        <description><![CDATA[Enable Named to listen on.]]></description>
                         <type>interfaces_selection</type>
                         <showlistenall/>
                         <showvirtualips/>

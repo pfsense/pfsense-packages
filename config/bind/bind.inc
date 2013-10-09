@@ -38,7 +38,15 @@ require_once('service-utils.inc');
 if(!function_exists("filter_configure")) 
 	require_once("filter.inc");
 
-function bind_sync(){
+$pf_version=substr(trim(file_get_contents("/etc/version")),0,3);
+if ($pf_version > 2.0)
+	define('BIND_LOCALBASE', '/usr/pbi/bind-' . php_uname("m"));
+else
+  define('BIND_LOCALBASE','/usr/local');
+
+define('CHROOT_LOCALBASE','/conf/named');
+
+ function bind_sync(){
 
 	global $config;
 
@@ -46,7 +54,7 @@ function bind_sync(){
 	$bind_enable = $bind['enable_bind'];
 	$bind_forwarder = $bind['bind_forwarder'];
 	$forwarder_ips = $bind['bind_forwarder_ips'];
-	$ram_limit = $bind['bind_ram_limit'];
+	$ram_limit = ($bind['bind_ram_limit']?$bind['bind_ram_limit']:"256M");
 	$hide_version = $bind['bind_hide_version'];
 	$bind_notify = $bind['bind_notify'];
 	$custom_options = base64_decode($bind['bind_custom_options']);
@@ -225,14 +233,6 @@ EOD;
         					$bind_conf .= "\t\t$zonecustom\n";
 					$bind_conf .= "\t};\n\n";
         
-					if (!(file_exists("/etc/namedb/$zonetype"))) {
-            					mwexec("mkdir /etc/namedb/$zonetype");
-					}
-					
-					if (!(file_exists("/etc/namedb/$zonetype/$zoneview"))) {
-            					mwexec("mkdir /etc/namedb/$zonetype/$zoneview");
-					}
-
 					if ($zonetype == "master"){
 						$zonetll = $zone['tll'];				
 						$zonemail = $zone['mail'];				
@@ -274,7 +274,7 @@ EOD;
 							$zone_conf .= "\t IN NS \t\t$zonenameserver.\n";	
 						else{	
 							$zone_conf .= "@ \t IN NS \t\t$zonenameserver.\n";	
-							$zone_conf .= "@ \t IN A \t\t$zoneipns\n";	
+							$zone_conf .= "@ \t IN A \t\t$zoneipns\n";
 						}
 						for ($y=0; $y<sizeof($zone['row']); $y++)
 						{
@@ -285,7 +285,10 @@ EOD;
 							
 							$zone_conf .= "$hostname \t IN $hosttype $hostvalue \t$hostdst\n";	
 						}	
-						file_put_contents("/etc/namedb/$zonetype/$zoneview/$zonename.DB", $zone_conf);
+						if (!(is_dir(CHROOT_LOCALBASE."/etc/namedb/$zonetype/$zoneview"))) {
+            					mkdir(CHROOT_LOCALBASE."/etc/namedb/$zonetype/$zoneview",0755,true);
+					}
+						file_put_contents(CHROOT_LOCALBASE."/etc/namedb/$zonetype/$zoneview/$zonename.DB", $zone_conf);
 	
 					#reader file domain zone
 					#reader file host definition		
@@ -295,11 +298,20 @@ EOD;
 
 		$bind_conf .= "};\n"; 
 	}
-	if (!is_dir("/etc/namedb"))
-		mkdir("/etc/namedb",0755);
-	file_put_contents('/etc/namedb/named.conf', $bind_conf);
+	$dirs=array("/etc/namedb","/var/run/named","/var/dump","/var/log","/var/stats");
+	foreach ($dirs as $dir){
+		if (!is_dir(CHROOT_LOCALBASE .$dir))
+			mkdir(CHROOT_LOCALBASE .$dir,0755,true);
+		}
+	file_put_contents(CHROOT_LOCALBASE.'/etc/namedb/named.conf', $bind_conf);
+	if (!file_exists(CHROOT_LOCALBASE."/etc/namedb/named.root")){
+		$named_root=file_get_contents("http://www.internic.net/domain/named.root");
+		file_put_contents(CHROOT_LOCALBASE."/etc/namedb/named.root",$named_root,LOCK_EX);
+	}
 
-	
+	bind_write_rcfile();
+	chown(CHROOT_LOCALBASE."/var/log","bind");
+	chgrp(CHROOT_LOCALBASE."/var/log","bind");
  	if($bind_enable == "on")
  		mwexec("/usr/local/etc/rc.d/named.sh restart");
  	else
@@ -384,7 +396,7 @@ function bind_views_before_form_dest($pkg,$data_group,$fieldname,$dest) {
         }
 }
 
-# Analizador do serial da zona de dns 
+# check zone serial number 
 # -----------------------------------------------------------------------------
 
 function get_bind_conf_serial($data_group, $fieldname) {
@@ -398,10 +410,10 @@ function get_bind_conf_serial($data_group, $fieldname) {
     return $res;
 }
 
-# Carregar o campo com os dados da views
+# load data into fields
 # -----------------------------------------------------------------------------
 
-function bind_zona_before_form_dest($pkg,$data_group,$fieldname,$dest) {
+function bind_zone_before_form_dest($pkg,$data_group,$fieldname,$dest) {
         
 	$destination_items = get_bind_conf_serial($data_group,$fieldname);
 	$i=0;
@@ -410,7 +422,7 @@ function bind_zona_before_form_dest($pkg,$data_group,$fieldname,$dest) {
                 # 
                 if ($field['fieldname'] == $dest) {
                         $fld = &$pkg['fields']['field'][$i];
-                        $fld['default_value'] = date("Y")."000000"; 
+                        $fld['default_value'] = date("YmdHis"); 
                         #$fld['value'] = date("Ymdhms")."boa"; 
                 }
                 $i++;
@@ -422,7 +434,7 @@ function bind_write_rcfile() {
         $rc['file'] = 'named.sh';
         $rc['start'] = <<<EOD
 if [ -z "`ps auxw | grep "[n]amed -c /etc/namedb/named.conf"|awk '{print $2}'`" ];then
-        {$BIND_LOCALBASE}/sbin/named -c /etc/namedb/named.conf -u bind
+        {$BIND_LOCALBASE}/sbin/named -c /etc/namedb/named.conf -u bind -t /conf/named/
 fi
 
 EOD;
@@ -432,11 +444,11 @@ sleep 2
 EOD;
         $rc['restart'] = <<<EOD
 if [ -z "`ps auxw | grep "[n]amed -c /etc/namedb/named.conf"|awk '{print $2}'`" ];then
-        	{$BIND_LOCALBASE}/sbin/named -c /etc/namedb/named.conf -u bind
+        	{$BIND_LOCALBASE}/sbin/named -c /etc/namedb/named.conf -u bind -t /conf/named/
         else
 		killall -9 named 2>/dev/null
          	sleep 3	
-		$BIND_LOCALBASE}/sbin/named -c /etc/namedb/named.conf -u bind
+        	{$BIND_LOCALBASE}/sbin/named -c /etc/namedb/named.conf -u bind -t /conf/named/
         fi
 
 EOD;
@@ -446,13 +458,13 @@ EOD;
 }
 
 function create_log_file(){
- 	mwexec("touch /var/log/named.log");
- 	mwexec("chown bind:bind /var/log/named.log");
- 	mwexec("chmod 755 /var/log/named.log");
+ 	mwexec("touch ".CHROOT_LOCALBASE."/var/log/named.log");
+ 	mwexec("chown bind:bind ".CHROOT_LOCALBASE."/var/log/named.log");
+ 	mwexec("chmod 755 ".CHROOT_LOCALBASE."/var/log/named.log");
 }
 
 function delete_log_file(){
- 	mwexec("rm /var/log/named.log");
+ 	mwexec("rm ".CHROOT_LOCALBASE."/var/log/named.log");
 }
 /* Uses XMLRPC to synchronize the changes to a remote node */
 function bind_sync_on_changes() {
