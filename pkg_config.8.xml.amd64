@@ -1701,8 +1701,8 @@
 		<name>mailreport</name>
 		<descr>Allows you to setup periodic e-mail reports containing command output, log file contents, and RRD graphs.</descr>
 		<category>Network Management</category>
-		<version>2.0.4</version>
-		<status>BETA</status>
+		<version>2.0.5</version>
+		<status>Stable</status>
 		<required_version>2.0</required_version>
 		<config_file>http://www.pfsense.com/packages/config/mailreport/mailreport.xml</config_file>
 		<configurationfile>mailreport.xml</configurationfile>

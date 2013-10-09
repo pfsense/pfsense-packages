@@ -229,8 +229,6 @@ function mail_report_send($headertext, $cmdtext, $logtext, $attachments) {
 
 	if(!$mail->Send()) {
 		echo "Mailer Error: " . $mail->ErrorInfo;
-	} else {
-		echo "<strong>Message sent to {$address}!</strong>\n";
 	}
 }
 
