@@ -59,7 +59,7 @@
 		<config_file>http://www.pfsense.com/packages/config/bind/bind.xml</config_file>
 		<configurationfile>bind.xml</configurationfile>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
-		<!--<depends_on_package_pbi>bind-amd64.pbi</depends_on_package_pbi>-->
+		<depends_on_package_pbi>bind-9.9.4-amd64.pbi</depends_on_package_pbi>
 		<build_port_path>/usr/ports/dns/bind99</build_port_path>
 		<build_pbi>
 			<custom_name>bind</custom_name>
