@@ -371,7 +371,7 @@
        		bind_zone_before_form_dest(&amp;$pkg,"bindzone","name","serial");
         </custom_php_command_before_form>
 	<custom_php_validation_command>
-		$_POST['serial']=date("9U");        
+		$_POST['serial']=(date("U")+ 1000000000); 
 	</custom_php_validation_command>
 	<custom_delete_php_command>
 	        bind_sync();
