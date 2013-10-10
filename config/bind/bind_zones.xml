@@ -50,7 +50,6 @@
 	<version>none</version>
 	<title>Bind: Zones Settings</title>
 	<include_file>/usr/local/pkg/bind.inc</include_file>
-	<!-- Menu is where this packages menu will appear -->
 	<menu>
 		<name>Bind Server</name>
 		<tooltiptext></tooltiptext>
@@ -80,8 +79,6 @@
                          <url>/pkg_edit.php?xml=bind_sync.xml</url>
                 </tab>
         </tabs>
-	<!-- configpath gets expanded out automatically and config items will be
-         stored in that location -->
 	<configpath>['installedpackages']['bindzone']['config']</configpath>
 	<adddeleteeditpagefields>
 		<columnitem>
@@ -102,8 +99,6 @@
 		</columnitem>
 		<movable>on</movable>
 	</adddeleteeditpagefields>
-	<!-- fields gets invoked when the user adds or edits a item.   the following items
-         will be parsed and rendered for the user as a gui with input, and selectboxes. -->
 	<fields>
 		<field>
 		        <type>listtopic</type>
@@ -298,46 +293,16 @@
 			<description>Select Type Host</description>
 		        <type>select</type>
                         	<options>
-                                <option>
-                                        <name>A</name>
-                                        <value>A</value>
-                                </option>
-                                <option>
-                                        <name>AAAA</name>
-                                        <value>AAAA</value>
-                                </option>
-                                <option>
-                                        <name>DNAME</name>
-                                        <value>DNAME</value>
-                                </option>
-                                <option>
-                                        <name>MX</name>
-                                        <value>MX</value>
-                                </option>
-                                <option>
-                                        <name>CNAME</name>
-                                        <value>CNAME</value>
-                                </option>
-                                <option>
-                                        <name>NS</name>
-                                        <value>NS</value>
-                                </option>
-                                <option>
-                                        <name>LOC</name>
-                                        <value>LOC</value>
-                                </option>
-                                <option>
-                                        <name>SRV</name>
-                                        <value>SRV</value>
-                                </option>
-                                <option>
-                                        <name>PTR</name>
-                                        <value>PTR</value>
-                                </option>
-                                <option>
-                                        <name>TXT</name>
-                                        <value>TXT</value>
-                                </option>
+                                <option><name>A</name><value>A</value></option>
+                                <option><name>AAAA</name><value>AAAA</value></option>
+                                <option><name>DNAME</name><value>DNAME</value></option>
+                                <option><name>MX</name><value>MX</value></option>
+                                <option><name>CNAME</name><value>CNAME</value></option>
+                                <option><name>NS</name><value>NS</value></option>
+                                <option><name>LOC</name><value>LOC</value></option>
+                                <option><name>SRV</name><value>SRV</value></option>
+                                <option><name>PTR</name><value>PTR</value></option>
+                                <option><name>TXT</name><value>TXT</value></option>
                         </options>
                         </rowhelperfield>
                         <rowhelperfield>
@@ -364,11 +329,6 @@
                 bind_print_javascript_type_zone();
         </custom_php_after_head_command>
         <custom_php_command_before_form>
-                bind_views_before_form_dest(&amp;$pkg,"bindacls","name","allowtransfer");
-                bind_views_before_form_dest(&amp;$pkg,"bindacls","name","allowquery");
-                bind_views_before_form_dest(&amp;$pkg,"bindacls","name","allowupdate");
-       		bind_views_before_form_dest(&amp;$pkg,"bindviews","name","view");
-       		bind_zone_before_form_dest(&amp;$pkg,"bindzone","name","serial");
         </custom_php_command_before_form>
 	<custom_php_validation_command>
 		$_POST['serial']=(date("U")+ 1000000000); 

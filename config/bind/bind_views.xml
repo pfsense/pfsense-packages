@@ -50,7 +50,6 @@
 	<version>0.1.0</version>
 	<title>Bind: Views Settings</title>
 	<include_file>/usr/local/pkg/bind.inc</include_file>
-	<!-- Menu is where this packages menu will appear -->
 	<menu>
 		<name>Bind Server</name>
 		<tooltiptext></tooltiptext>
@@ -80,8 +79,6 @@
                          <url>/pkg_edit.php?xml=bind_sync.xml</url>
                 </tab>
         </tabs>
-<!-- configpath gets expanded out automatically and config items will be
-         stored in that location -->
 	<configpath>['installedpackages']['bindviews']['config']</configpath>
 	<adddeleteeditpagefields>
 		<columnitem>
@@ -94,8 +91,6 @@
 		</columnitem>
 		<movable>on</movable>
 	</adddeleteeditpagefields>
-	<!-- fields gets invoked when the user adds or edits a item.   the following items
-         will be parsed and rendered for the user as a gui with input, and selectboxes. -->
 	<fields>
 		<field>
 			<fielddescr>View Name</fielddescr>
@@ -157,8 +152,6 @@
                 </field>
 	</fields>
         <custom_php_command_before_form>
-                bind_views_before_form_dest(&amp;$pkg,"bindacls","name","match-clients");
-                bind_views_before_form_dest(&amp;$pkg,"bindacls","name","allow-recursion");
         </custom_php_command_before_form>
 	<custom_delete_php_command>
 	</custom_delete_php_command>	
