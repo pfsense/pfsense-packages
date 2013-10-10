@@ -72,7 +72,20 @@ $bind_conf .= <<<EOD
 
 		max-cache-size $ram_limit;\n
 EOD;
-
+	// check response rate limit option
+	//https://kb.isc.org/article/AA-01000/0/A-Quick-Introduction-to-Response-Rate-Limiting.html
+	//http://ss.vix.su/~vjs/rl-arm.html
+	if ($bind['rate_enabled']=="on"){
+		$rate_limit=($bind['rate_limit']?$bind['rate_limit']:"15");
+		$log_only=($bind['log_only']=="no"?"no":"yes");
+		$bind_conf .= <<<EOD
+		rate-limit {
+			responses-per-second {$rate_limit};
+			log-only {$log_only};
+    		};
+    	
+EOD;
+	}
 	//check ips to listen on
 	if (preg_match("/All/",$bind['listenon'])){
 		$bind_listenonv6="Any;";
@@ -97,7 +110,7 @@ EOD;
 	}
 	$bind_listenonv6=($bind_listenonv6==""?"none;":$bind_listenonv6);
 	$bind_listenon=($bind_listenon==""?"none;":$bind_listenon);
-	print "<PRE>$bind_listenonv6 $bind_listenon";
+	//print "<PRE>$bind_listenonv6 $bind_listenon";
 	if (key_exists("ipv6allow",$config['system'])){
 		$bind_conf .="\t\tlisten-on-v6 { $bind_listenonv6 };\n";
 		}

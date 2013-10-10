@@ -125,12 +125,26 @@
         </additional_files_needed>
         <fields>
                 <field>
+                        <type>listtopic</type>
+                        <name>Daemon Settings</name>
+                        <fieldname>temp01</fieldname>
+                </field>
+                <field>
                         <fielddescr>Enable Bind</fielddescr>
                         <fieldname>enable_bind</fieldname>
                         <description><![CDATA[Enable DNS Bind on Server<br>
                         	Disable Dns forwarder service on selected interfaces before enabling bind.]]></description>
                         <type>checkbox</type>
                         <required/>
+                </field>
+              <field>
+                        <fielddescr>Listen-on</fielddescr>
+                        <fieldname>listenon</fieldname>
+                        <description><![CDATA[Enable Named to listen on.]]></description>
+                        <type>interfaces_selection</type>
+                        <showlistenall/>
+                        <showvirtualips/>
+                        <multiple/>
                 </field>
                 <field>
                         <fielddescr>Enable logging</fielddescr>
@@ -151,27 +165,43 @@
                         <type>checkbox</type>
                 </field>
                 <field>
-					<fielddescr>Limitar Memory RAM</fielddescr>
+					<fielddescr>Limit Memory use</fielddescr>
 					<fieldname>bind_ram_limit</fieldname>
-					<description>Limits the use of RAM for the DNS when much use does not exhaust the resources of the machine, recommend 256M</description>
+					<description>Limits RAM use for DNS server, recommend 256M</description>
 					<type>input</type>
                 	<size>10</size>
 					<default_value>256M</default_value>
                	</field>
                 <field>
                         <type>listtopic</type>
-                        <name>Listen on Interfaces</name>
+                        <name>Response limit</name>
                         <fieldname>temp01</fieldname>
                 </field>
                 <field>
-                        <fielddescr>Listen-on</fielddescr>
-                        <fieldname>listenon</fieldname>
-                        <description><![CDATA[Enable Named to listen on.]]></description>
-                        <type>interfaces_selection</type>
-                        <showlistenall/>
-                        <showvirtualips/>
-                        <multiple/>
+                        <fielddescr>Rate limit</fielddescr>
+                        <fieldname>rate_enabled</fieldname>
+                        <description>Limit/rate response queries to prevent DOS attack.</description>
+                        <type>checkbox</type>
+                        <enablefields>rate_limit,log_only</enablefields>
                 </field>
+				<field>
+					<fielddescr>Limit Action</fielddescr>
+					<fieldname>log_only</fieldname>
+					<description>Select what to do when a query reaches a limit.</description>
+					<type>select</type>
+						<options>
+							<option><name>Deny query</name><value>no</value></option>
+							<option><name>Log only</name><value>yes</value></option>
+						</options>
+				</field>
+				<field>
+					<fielddescr>limit</fielddescr>
+					<fieldname>rate_limit</fieldname>
+					<description>Set rate limit. Default to 15.</description>
+					<type>input</type>
+                	<size>10</size>
+                </field>
+
                 <field>
                         <type>listtopic</type>
                         <name>Forwarder Config</name>
@@ -211,8 +241,6 @@
     	<custom_php_after_head_command>
     	</custom_php_after_head_command>
         <custom_php_command_before_form>
-                bind_views_before_form_dest(&amp;$pkg,"bindacls","name","listenonv6");
-                bind_views_before_form_dest(&amp;$pkg,"bindacls","name","listenon");
         </custom_php_command_before_form>
         <custom_add_php_command>
         </custom_add_php_command>
