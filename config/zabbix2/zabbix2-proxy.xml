@@ -137,5 +137,5 @@
 	<custom_php_validation_command>validate_input_zabbix2($_POST, &amp;$input_errors);</custom_php_validation_command>
 	<custom_add_php_command></custom_add_php_command>
 	<custom_php_resync_config_command>sync_package_zabbix2();</custom_php_resync_config_command>
-	<custom_php_deinstall_command>php_deinstall_zabbix2();</custom_php_deinstall_command>
+	<custom_php_deinstall_command>php_deinstall_zabbix2_proxy();</custom_php_deinstall_command>
 </packagegui>

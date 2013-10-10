@@ -42,38 +42,61 @@ function php_install_zabbix2(){
 	sync_package_zabbix2();	
 }
 
-function php_deinstall_zabbix2(){
-	global $config, $g;
+function php_deinstall_zabbix2_agent(){
+   global $config, $g;
 
-	conf_mount_rw();
-	$pfs_version = substr(trim(file_get_contents("/etc/version")),0,3);
-	if ($pfs_version > 2.0){
-		define('ZABBIX_AGENT_BASE', '/usr/pbi/zabbix2-agent-' . php_uname("m"));
-		define('ZABBIX_PROXY_BASE', '/usr/pbi/zabbix2-proxy-' . php_uname("m"));
-	} else {
-		define('ZABBIX_AGENT_BASE', '/usr/local');
-		define('ZABBIX_PROXY_BASE', '/usr/local');
-	}
-	
-	exec("/usr/bin/killall zabbix_proxy");
-	unlink_if_exists(ZABBIX_PROXY_BASE . "/etc/rc.d/zabbix2_proxy.sh");
-	unlink_if_exists(ZABBIX_PROXY_BASE . "/etc/zabbix2/zabbix_proxy.conf");
-	unlink_if_exists("/var/log/zabbix2/zabbix_proxy.log");
-	unlink_if_exists("/var/run/zabbix2/zabbix2_proxy.pid");
+   conf_mount_rw();
+   $pfs_version = substr(trim(file_get_contents("/etc/version")),0,3);
+   if ($pfs_version > 2.0){
+      define('ZABBIX_AGENT_BASE', '/usr/pbi/zabbix2-agent-' . php_uname("m"));
+   } else {
+      define('ZABBIX_AGENT_BASE', '/usr/local');
+   }
 
-	exec("/usr/bin/killall zabbix_agentd");
-	unlink_if_exists(ZABBIX_AGENT_BASE . "/etc/rc.d/zabbix2_agentd.sh");
-	unlink_if_exists(ZABBIX_AGENT_BASE . "/etc/zabbix2/zabbix_agentd.conf");
-	unlink_if_exists("/var/log/zabbix2/zabbix2_agentd.log");
-	unlink_if_exists("/var/run/zabbix2/zabbix2_agentd.pid");
+   exec("/usr/bin/killall zabbix_agentd");
+   unlink_if_exists(ZABBIX_AGENT_BASE . "/etc/rc.d/zabbix2_agentd.sh");
+   unlink_if_exists(ZABBIX_AGENT_BASE . "/etc/zabbix2/zabbix_agentd.conf");
+   unlink_if_exists("/var/log/zabbix2/zabbix2_agentd.log");
+   unlink_if_exists("/var/run/zabbix2/zabbix2_agentd.pid");
 
-	if (is_dir("/var/log/zabbix2"))
-		exec("/bin/rm -r /var/log/zabbix2/");
-	if (is_dir("/var/run/zabbix2"))
-		exec("/bin/rm -r /var/run/zabbix2/");
-	if (is_dir("/var/db/zabbix2"))
-		exec("/bin/rm -r /var/db/zabbix2/");
-		conf_mount_ro();
+   if (!is_array($config['installedpackages']['zabbixproxy'])){
+      if (is_dir("/var/log/zabbix2"))
+         exec("/bin/rm -r /var/log/zabbix2/");
+      if (is_dir("/var/run/zabbix2"))
+         exec("/bin/rm -r /var/run/zabbix2/");
+   }
+
+   conf_mount_ro();
+}
+
+function php_deinstall_zabbix2_proxy(){
+   global $config, $g;
+
+   conf_mount_rw();
+   $pfs_version = substr(trim(file_get_contents("/etc/version")),0,3);
+   if ($pfs_version > 2.0){
+      define('ZABBIX_PROXY_BASE', '/usr/pbi/zabbix2-proxy-' . php_uname("m"));
+   } else {
+      define('ZABBIX_PROXY_BASE', '/usr/local');
+   }
+
+   exec("/usr/bin/killall zabbix_proxy");
+   unlink_if_exists(ZABBIX_PROXY_BASE . "/etc/rc.d/zabbix2_proxy.sh");
+   unlink_if_exists(ZABBIX_PROXY_BASE . "/etc/zabbix2/zabbix_proxy.conf");
+   unlink_if_exists("/var/log/zabbix2/zabbix_proxy.log");
+   unlink_if_exists("/var/run/zabbix2/zabbix2_proxy.pid");
+
+   if (!is_array($config['installedpackages']['zabbixagent'])){
+      if (is_dir("/var/log/zabbix2"))
+         exec("/bin/rm -r /var/log/zabbix2/");
+      if (is_dir("/var/run/zabbix2"))
+         exec("/bin/rm -r /var/run/zabbix2/");
+   }
+
+   if (is_dir("/var/db/zabbix2"))
+      exec("/bin/rm -r /var/db/zabbix2/");
+
+   conf_mount_ro();
 }
 
 function validate_input_zabbix2($post,&$input_errors){
