@@ -271,7 +271,7 @@ EOD;
 							$zoneallowtransfer = "none"; 	
 						else
 							$zoneallowtransfer = str_replace(',','; ',$zone['allowtransfer']); 		
-						$zone_conf .= "\$TTL $zonetll\n;\n";
+						$zone_conf = "\$TTL $zonetll\n;\n";
 						$zone_conf .= ";\tDatabase file {$zonename}.DB for {$zonename} zone.\n";
 						$zone_conf .= ";\tZone version {$zoneserial}\n;\n";
 					 	if($zonereverso == "on")
