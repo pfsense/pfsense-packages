@@ -82,11 +82,11 @@
 	<configpath>['installedpackages']['bindzone']['config']</configpath>
 	<adddeleteeditpagefields>
 		<columnitem>
-			<fielddescr>Zones Name</fielddescr>
+			<fielddescr>Zone Name</fielddescr>
 			<fieldname>name</fieldname>
 		</columnitem>
 		<columnitem>
-			<fielddescr>Zonas Type</fielddescr>
+			<fielddescr>Zone Type</fielddescr>
 			<fieldname>type</fieldname>
 		</columnitem>
 		<columnitem>
@@ -106,16 +106,16 @@
                         <fieldname>temp01</fieldname>
 		</field>
 		<field>
-			<fielddescr>Zone Name:</fielddescr>
+			<fielddescr>Zone Name</fielddescr>
 			<fieldname>name</fieldname>
-			<description>Enter the name for zone (ex:exemple.com.br)</description>
+			<description>Enter the name for zone (ex:mydomain.com)</description>
 			<type>input</type>
-                        <required/>
+			<required/>
 		</field>
 		<field>
-			<fielddescr>Zonas Type</fielddescr>
+			<fielddescr>Zone Type</fielddescr>
 			<fieldname>type</fieldname>
-			<description>Select the type that zone to Master Primary DNS, Secondary DNS to select Slave.</description>
+			<description>Select zone type</description>
 		        <type>select</type>
                         	<options>
                                 <option>
@@ -142,9 +142,9 @@
 			<source_value>name</source_value>
 		</field>
                 <field>
-                        <fielddescr>Zone Reverse</fielddescr>
+                        <fielddescr>Reverse Zone</fielddescr>
                         <fieldname>reverso</fieldname>
-                        <description>Enable this if the zone is reverse.</description>
+                        <description>Enable if this is a reverse zone.</description>
                         <type>checkbox</type>
                 </field>
 		<field>
@@ -188,19 +188,19 @@
 		<field>
 			<fielddescr>Name Server</fielddescr>
 			<fieldname>nameserver</fieldname>
-			<description>Enter ns.example.com is a nameserver for example.com</description>
+			<description>Enter nameserver for this zone</description>
 			<type>input</type>
 		</field>
 		<field>
-			<fielddescr>IP Name Server</fielddescr>
+			<fielddescr>Base Domain ip</fielddescr>
 			<fieldname>ipns</fieldname>
-			<description>Enter address ip for nameserver</description>
+			<description>Enter ip address for base domain lookup. Ex: nslookup mydomain.com</description>
 			<type>input</type>
 		</field>
 		<field>
 			<fielddescr>Mail Admin Zone</fielddescr>
 			<fieldname>mail</fieldname>
-			<description>Enter mail admin zone, is . not @</description>
+			<description>Enter mail admin zone.</description>
 			<type>input</type>
 		</field>
 		<field>
@@ -272,23 +272,28 @@
 		</field>
 		<field>
 		        <type>listtopic</type>
-                        <name>Hosts Configuration Zone Domain</name>
+                        <name>Zone Domain records</name>
                         <fieldname>temp02</fieldname>
 		</field>
                 <field>
-                        <fielddescr>Enter the desired host, "Host Name" is the name of the Host: www or pop, "Host Type" simple kind host, "Value" in case the MX priority, "CNAME or IP address" is the destination host.</fielddescr>
+                        <fielddescr>Enter Domain records.</fielddescr>
+                        <description><![CDATA[<b>"Record"</b> is the name or last octec of ip. Sample: www or pop<br>
+                        		 <b>"Type"</b> is the type of the record Sample: A CNAME MX NS<br>
+                        		 <b>"Priority"</b> in used only in mx records to define its priority<br>
+                        		 <b>"Alias or IP address"</b> is the destination host or ip address.<br><br>
+                        		 You can order elements on this list with drag and drop between columns.]]></description>
                         <fieldname>none</fieldname>
                     <type>rowhelper</type>
                     <rowhelper>
                         <rowhelperfield>
-                            <fielddescr>Host Name</fielddescr>
+                            <fielddescr>Record</fielddescr>
                             <fieldname>hostname</fieldname>
                             <description>Enter the Host Name (ex: www)</description>
                             <type>input</type>
-                            <size>20</size>
+                            <size>10</size>
                         </rowhelperfield>
                         <rowhelperfield>
-			<fielddescr>Host Type</fielddescr>
+			<fielddescr>Type</fielddescr>
 			<fieldname>hosttype</fieldname>
 			<description>Select Type Host</description>
 		        <type>select</type>
@@ -306,18 +311,18 @@
                         </options>
                         </rowhelperfield>
                         <rowhelperfield>
-                            <fielddescr>Value</fielddescr>
+                            <fielddescr>Priority</fielddescr>
                             <fieldname>hostvalue</fieldname>
                             <description>MX 10 or 20</description>
                             <type>input</type>
-                            <size>1</size>
+                            <size>3</size>
                         </rowhelperfield>
                         <rowhelperfield>
-                            <fielddescr>Ip Address or CNAME destination</fielddescr>
+                            <fielddescr>Alias or IP address</fielddescr>
                             <fieldname>hostdst</fieldname>
                             <description>Enter the IP address or CNAME destination for Domain (ex: 10.31.11.1 or mail.example.com)</description>
                             <type>input</type>
-                            <size>20</size>
+                            <size>35</size>
                         </rowhelperfield>
                     </rowhelper>
                 </field>
@@ -331,7 +336,8 @@
         <custom_php_command_before_form>
         </custom_php_command_before_form>
 	<custom_php_validation_command>
-		$_POST['serial']=(date("U")+ 1000000000); 
+		$_POST['serial']=(date("U")+ 1000000000);
+		bind_zone_validate($_POST, &amp;$input_errors);
 	</custom_php_validation_command>
 	<custom_delete_php_command>
 	        bind_sync();
