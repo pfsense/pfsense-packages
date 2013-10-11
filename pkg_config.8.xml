@@ -1928,10 +1928,9 @@
 		<build_port_path>/usr/ports/net-mgmt/zabbix2-proxy</build_port_path>
 		<build_pbi>
 			<custom_name>zabbix2-proxy</custom_name>
-			<ports_before>security/heimdal</ports_before>
 			<port>net-mgmt/zabbix2-proxy</port>
 		</build_pbi>
-		<build_options>OPTIONS_SET+= SQLITE IPV6;OPTIONS_UNSET+= MYSQL JABBER</build_options>
+		<build_options>OPTIONS_SET+= SQLITE IPV6;OPTIONS_UNSET+= MYSQL JABBER GSSAPI</build_options>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
 		<depends_on_package>zabbix2-proxy-2.0.8.tbz</depends_on_package>
 		<depends_on_package_pbi>zabbix2-proxy-2.0.8-i386.pbi</depends_on_package_pbi>
