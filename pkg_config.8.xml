@@ -2002,5 +2002,23 @@
 			<port>net-mgmt/softflowd</port>
 		</build_pbi>
 	</package>
+        <package>
+                <name>ossec</name>
+                <website>http://www.ossec.net/</website>
+                <descr>OSSEC server.</descr>
+                <category>Services</category>
+                <version>2.7</version>
+                <status>ALPHA</status>
+                <required_version>2.1</required_version>
+                <depends_on_package_base_url>http://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
+                <depends_on_package_pbi>ossec-hids-2.7-i386.pbi</depends_on_package_pbi>
+                <build_pbi>
+                        <port>security/ossec-hids-server</port>
+                </build_pbi>
+                <build_options></build_options>
+                <maintainer>laleger@gmail.com</maintainer>
+                <config_file>http://www.pfsense.com/packages/config/ossec/ossec.xml</config_file>
+                <configurationfile>ossec.xml</configurationfile>
+        </package>
 </packages>
 </pfsensepkgs>
