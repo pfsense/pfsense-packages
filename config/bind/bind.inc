@@ -73,7 +73,8 @@ function bind_zone_validate($post, $input_errors){
  function bind_sync(){
 
 	global $config;
-
+	conf_mount_rw();
+	
 	$bind = $config["installedpackages"]["bind"]["config"][0]; 
 	$bind_enable = $bind['enable_bind'];
 	$bind_forwarder = $bind['bind_forwarder'];
@@ -358,6 +359,7 @@ EOD;
  		mwexec("/usr/local/etc/rc.d/named.sh restart");
  	else
  		mwexec("/usr/local/etc/rc.d/named.sh stop");
+ 	conf_mount_ro();
 }
 
 function bind_print_javascript_type_zone(){
@@ -434,13 +436,17 @@ EOD;
 }
 
 function create_log_file(){
+	conf_mount_rw();
  	mwexec("touch ".CHROOT_LOCALBASE."/var/log/named.log");
  	mwexec("chown bind:bind ".CHROOT_LOCALBASE."/var/log/named.log");
  	mwexec("chmod 755 ".CHROOT_LOCALBASE."/var/log/named.log");
+ 	conf_mount_ro();
 }
 
 function delete_log_file(){
+	conf_mount_rw();
  	mwexec("rm ".CHROOT_LOCALBASE."/var/log/named.log");
+ 	conf_mount_ro();
 }
 /* Uses XMLRPC to synchronize the changes to a remote node */
 function bind_sync_on_changes() {
