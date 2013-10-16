@@ -63,6 +63,7 @@ $if_real = snort_get_real_interface($pconfig['interface']);
 $snort_uuid = $a_nat[$id]['uuid'];
 $snortdownload = $config['installedpackages']['snortglobal']['snortdownload'];
 $emergingdownload = $config['installedpackages']['snortglobal']['emergingthreats'];
+$etpro = $config['installedpackages']['snortglobal']['emergingthreats_pro'];
 $snortcommunitydownload = $config['installedpackages']['snortglobal']['snortcommunityrules'];
 
 $no_emerging_files = false;
@@ -70,10 +71,13 @@ $no_snort_files = false;
 $no_community_files = false;
 
 /* Test rule categories currently downloaded to $SNORTDIR/rules and set appropriate flags */
-$test = glob("{$snortdir}/rules/emerging-*.rules");
+if (($etpro == 'off' || empty($etpro)) && $emergingdownload == 'on')
+	$test = glob("{$snortdir}/rules/emerging-*.rules");
+elseif ($etpro == 'on' && ($emergingdownload == 'off' || empty($emergingdownload)))
+	$test = glob("{$snortdir}/rules/etpro-*.rules");
 if (empty($test))
 	$no_emerging_files = true;
-$test = glob("{$snortdir}/rules/snort_*.rules");
+$test = glob("{$snortdir}/rules/snort*.rules");
 if (empty($test))
 	$no_snort_files = true;
 if (!file_exists("{$snortdir}/rules/GPLv2_community.rules"))
@@ -184,10 +188,16 @@ if ($_POST['selectall']) {
 	}
 
 	if ($emergingdownload == 'on') {
-		$files = glob("{$snortdir}/rules/emerging*.rules");
+		$files = glob("{$snortdir}/rules/emerging-*.rules");
 		foreach ($files as $file)
 			$rulesets[] = basename($file);
 	}
+	elseif ($etpro == 'on') {
+		$files = glob("{$snortdir}/rules/etpro-*.rules");
+		foreach ($files as $file)
+			$rulesets[] = basename($file);
+	}
+
 	if ($snortcommunitydownload == 'on') {
 		$files = glob("{$snortdir}/rules/*_community.rules");
 		foreach ($files as $file)
@@ -421,7 +431,10 @@ if ($savemsg) {
 			<tr id="frheader">
 				<?php if ($emergingdownload == 'on' && !$no_emerging_files): ?>
 					<td width="5%" class="listhdrr" align="center"><?php echo gettext("Enabled"); ?></td>
-					<td width="25%" class="listhdrr"><?php echo gettext('Ruleset: Emerging Threats');?></td>
+					<td width="25%" class="listhdrr"><?php echo gettext('Ruleset: ET Open Rules');?></td>
+				<?php elseif ($etpro == 'on' && !$no_emerging_files): ?>
+					<td width="5%" class="listhdrr" align="center"><?php echo gettext("Enabled"); ?></td>
+					<td width="25%" class="listhdrr"><?php echo gettext('Ruleset: ET Pro Rules');?></td>
 				<?php else: ?>
 					<td colspan="2" align="center" width="30%" class="listhdrr"><?php echo gettext("Emerging Threats rules not {$msg_emerging}"); ?></td>
 				<?php endif; ?>
@@ -446,7 +459,9 @@ if ($savemsg) {
 					$filename = basename($filename);
 					if (substr($filename, -5) != "rules")
 						continue;
-					if (strstr($filename, "emerging") && $emergingdownload == 'on')
+					if (strstr($filename, "emerging-") && $emergingdownload == 'on')
+						$emergingrules[] = $filename;
+					else if (strstr($filename, "etpro-") && $etpro == 'on')
 						$emergingrules[] = $filename;
 					else if (strstr($filename, "snort") && $snortdownload == 'on') {
 						if (strstr($filename, ".so.rules"))

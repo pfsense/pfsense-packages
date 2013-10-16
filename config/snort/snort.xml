@@ -47,7 +47,7 @@
 	<faq>Currently there are no FAQ items provided.</faq>
 	<name>Snort</name>
 	<version>2.9.4.6</version>
-	<title>Services:2.9.4.6 pkg v. 2.6.0</title>
+	<title>Services:2.9.4.6 pkg v. 2.6.1</title>
 	<include_file>/usr/local/pkg/snort/snort.inc</include_file>
 	<menu>
 		<name>Snort</name>
