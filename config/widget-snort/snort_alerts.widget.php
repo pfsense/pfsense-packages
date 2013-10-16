@@ -25,6 +25,9 @@
     ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
     POSSIBILITY OF SUCH DAMAGE.
 */
+
+require_once("/usr/local/www/widgets/include/widget-snort.inc");
+
 global $config, $g;
 
 /* array sorting */

@@ -1,5 +1,10 @@
 <?php
 require_once("config.inc");
+
+//set variable for custom title
+$snort_alerts_title = "Snort Alerts";
+$snort_alerts_title_link = "snort/snort_alerts.php";
+
 function widget_snort_uninstall() {
 
 	global $config;
