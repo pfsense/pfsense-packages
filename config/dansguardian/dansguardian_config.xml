@@ -274,7 +274,7 @@
 		</field>
 		<field>
 			<fielddescr>ICAP URL</fielddescr>
-			<fieldname>contentscannertimeout</fieldname>
+			<fieldname>icapurl</fieldname>
 			<type>input</type>
 			<size>40</size>
 			<description><![CDATA[Enter ICAP URL in <strong>icap://icapserver:1344/avscan</strong> format<br>
