@@ -48,7 +48,7 @@
 	<name>squidreverse</name>
 	<version>none</version>
 	<title>Proxy server: Reverse Proxy</title>
-	<include_file>squid.inc</include_file>
+	<include_file>/usr/local/pkg/squid.inc</include_file>
 	<tabs>
 <tab>
 			<text>General</text>
