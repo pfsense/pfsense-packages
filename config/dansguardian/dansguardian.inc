@@ -185,6 +185,7 @@ function sync_package_dansguardian($via_rpc="no",$install_process=false) {
 	$icapscan=(preg_match('/icapscan/',$dansguardian_config['content_scanners'])?"on":"off");
 	$contentscannertimeout=($dansguardian_config['contentscannertimeout']?$dansguardian_config['contentscannertimeout']:"60");
 	$contentscanexceptions=($dansguardian_config['contentscanexceptions']?"on":"off");
+	$icapurl=($dansguardian_config['icapurl']?$dansguardian_config['icapurl']:"icap://icapserver:1344/avscan");
 	$recheckreplacedurls=(preg_match('/recheckreplacedurls/',$dansguardian_config['misc_options'])?"on":"off");
 	$forwardedfor=(preg_match('/forwardedfor/',$dansguardian_config['misc_options'])?"on":"off");
 	$recheckreplacedurls=(preg_match('/icapscan/',$dansguardian_config['misc_options'])?"on":"off");
@@ -974,6 +975,7 @@ EOF;
 	$filterip=($filterip==""?"filterip = ":$filterip);
 	$filterports=($filterports==""?"filterports = $filterport":$filterports);
 	include("/usr/local/pkg/dansguardian.conf.template");	
+	include("/usr/local/pkg/icapscan.conf.template");	
 
 	#check cron_tab
 	$new_cron=array();
@@ -1111,6 +1113,7 @@ EOF;
 	
 	#create config files
 	file_put_contents($dansguardian_dir."/dansguardian.conf", $dg, LOCK_EX);
+	file_put_contents($dansguardian_dir."/contentscanners/icapscan.conf", $icapconf, LOCK_EX);
 	
 	#check virus_scanner options
 	$libexec_dir= DANSGUARDIAN_DIR."/libexec/dansguardian/";
