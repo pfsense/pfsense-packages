@@ -46,7 +46,7 @@
 	<requirements>Dashboard package and Snort</requirements>
 	<faq>Currently there are no FAQ	items provided.</faq>
 	<name>widget-snort</name>
-	<version>0.3.4</version>
+	<version>0.3.5</version>
 	<title>Widget - Snort</title>
 	<include_file>/usr/local/www/widgets/include/widget-snort.inc</include_file>
 	<menu>
