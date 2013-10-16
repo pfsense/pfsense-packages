@@ -261,7 +261,7 @@ if ($savemsg)
 		<div id="addressnetworkport"><?php echo gettext("Alias Name:"); ?></div>
 		</td>
 		<td width="78%" class="vtable">
-		<input autocomplete="off" name="address" type="text" class="formfldalias" id="address" size="30" value="<?=htmlspecialchars($pconfig['address']);?>" />
+		<input autocomplete="off" name="address" type="text" class="formfldalias" id="address" size="30" value="<?=htmlspecialchars($pconfig['address']);?>" title="<?=trim(filter_expand_alias($pconfig['address']));?>"/>
 		</td>
 	</tr>
 	<tr>
@@ -286,6 +286,9 @@ if ($savemsg)
         if(isset($config['aliases']['alias']) && is_array($config['aliases']['alias']))
                 foreach($config['aliases']['alias'] as $alias_name) {
 			if ($alias_name['type'] != "host" && $alias_name['type'] != "network")
+				continue;
+			// Skip any Alias that resolves to an empty string
+			if (trim(filter_expand_alias($alias_name['name'])) == "")
 				continue;
                         if($addrisfirst == 1) $aliasesaddr .= ",";
                         $aliasesaddr .= "'" . $alias_name['name'] . "'";
