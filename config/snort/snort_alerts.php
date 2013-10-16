@@ -171,7 +171,7 @@ if ($_POST['todelete'] || $_GET['todelete']) {
 		$ip = $_GET['todelete'];
 	if (is_ipaddr($ip)) {
 		exec("/sbin/pfctl -t snort2c -T delete {$ip}");
-		$savemsg = "Host IP address {$ip} has been removed from the Blocked Table.";
+		$savemsg = gettext("Host IP address {$ip} has been removed from the Blocked Table.");
 	}
 }
 
@@ -183,7 +183,7 @@ if ($_GET['act'] == "addsuppress" && is_numeric($_GET['sidid']) && is_numeric($_
 
 	/* Add the new entry to the Suppress List */
 	if (snort_add_supplist_entry($suppress))
-		$savemsg = "An entry for 'suppress gen_id {$_GET['gen_id']}, sig_id {$_GET['sidid']}' has been added to the Suppress List.";
+		$savemsg = gettext("An entry for 'suppress gen_id {$_GET['gen_id']}, sig_id {$_GET['sidid']}' has been added to the Suppress List.");
 	else
 		$input_errors[] = gettext("Suppress List '{$a_instance[$instanceid]['suppresslistname']}' is defined for this interface, but it could not be found!");
 }
@@ -208,7 +208,7 @@ if (($_GET['act'] == "addsuppress_srcip" || $_GET['act'] == "addsuppress_dstip")
 
 	/* Add the new entry to the Suppress List */
 	if (snort_add_supplist_entry($suppress))
-		$savemsg = "An entry for 'suppress gen_id {$_GET['gen_id']}, sig_id {$_GET['sidid']}, track {$method}, ip {$_GET['ip']}' has been added to the Suppress List.";
+		$savemsg = gettext("An entry for 'suppress gen_id {$_GET['gen_id']}, sig_id {$_GET['sidid']}, track {$method}, ip {$_GET['ip']}' has been added to the Suppress List.");
 	else
 		/* We did not find the defined list, so notify the user with an error */
 		$input_errors[] = gettext("Suppress List '{$a_instance[$instanceid]['suppresslistname']}' is defined for this interface, but it could not be found!");
@@ -221,8 +221,7 @@ if ($_GET['action'] == "clear" || $_POST['delete']) {
 	if ($fd)
 		fclose($fd);
 	conf_mount_ro();
-	/* XXX: This is needed is snort is run as snort user */
-	//mwexec('/usr/sbin/chown snort:snort /var/log/snort/*', true);
+	/* XXX: This is needed if snort is run as snort user */
 	mwexec('/bin/chmod 660 /var/log/snort/*', true);
 	if (file_exists("{$g['varrun_path']}/snort_{$if_real}{$snort_uuid}.pid"))
 		mwexec("/bin/pkill -HUP -F {$g['varrun_path']}/snort_{$if_real}{$snort_uuid}.pid -a");
@@ -233,22 +232,28 @@ if ($_GET['action'] == "clear" || $_POST['delete']) {
 if ($_POST['download']) {
 	$save_date = exec('/bin/date "+%Y-%m-%d-%H-%M-%S"');
 	$file_name = "snort_logs_{$save_date}_{$if_real}.tar.gz";
-	exec("/usr/bin/tar cfz /tmp/{$file_name} /var/log/snort/snort_{$if_real}{$snort_uuid}");
+	exec("cd /var/log/snort/snort_{$if_real}{$snort_uuid} && /usr/bin/tar -czf /tmp/{$file_name} *");
 
 	if (file_exists("/tmp/{$file_name}")) {
-		$file = "/tmp/snort_logs_{$save_date}.tar.gz";
-		header("Expires: Mon, 26 Jul 1997 05:00:00 GMT\n");
-		header("Pragma: private"); // needed for IE
-		header("Cache-Control: private, must-revalidate"); // needed for IE
-		header('Content-type: application/force-download');
-		header('Content-Transfer-Encoding: Binary');
-		header("Content-length: ".filesize($file));
+		ob_start(); //important or other posts will fail
+		if (isset($_SERVER['HTTPS'])) {
+			header('Pragma: ');
+			header('Cache-Control: ');
+		} else {
+			header("Pragma: private");
+			header("Cache-Control: private, must-revalidate");
+		}
+		header("Content-Type: application/octet-stream");
+		header("Content-length: " . filesize("/tmp/{$file_name}"));
 		header("Content-disposition: attachment; filename = {$file_name}");
-		readfile("$file");
+		ob_end_clean(); //important or other post will fail
+		readfile("/tmp/{$file_name}");
+
+		// Clean up the temp file
 		@unlink("/tmp/{$file_name}");
 	}
-	header("Location: /snort/snort_alerts.php?instance={$instanceid}");
-	exit;
+	else
+		$savemsg = gettext("An error occurred while creating archive");
 }
 
 /* Load up an array with the current Suppression List GID,SID values */

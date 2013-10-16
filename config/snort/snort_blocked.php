@@ -67,7 +67,6 @@ if ($_POST['download'])
 	exec('/sbin/pfctl -t snort2c -T show', $blocked_ips_array_save);
 	/* build the list */
 	if (is_array($blocked_ips_array_save) && count($blocked_ips_array_save) > 0) {
-		ob_start(); //important or other posts will fail
 		$save_date = exec('/bin/date "+%Y-%m-%d-%H-%M-%S"');
 		$file_name = "snort_blocked_{$save_date}.tar.gz";
 		exec('/bin/mkdir -p /tmp/snort_blocked');
@@ -79,24 +78,32 @@ if ($_POST['download'])
 			file_put_contents("/tmp/snort_blocked/snort_block.pf", "{$fileline}\n", FILE_APPEND);
 		}
 
-		exec("/usr/bin/tar cf /tmp/{$file_name} /tmp/snort_blocked");
+		// Create a tar gzip archive of blocked host IP addresses
+		exec("/usr/bin/tar -czf /tmp/{$file_name} -C/tmp/snort_blocked snort_block.pf");
 
+		// If we successfully created the archive, send it to the browser.
 		if(file_exists("/tmp/{$file_name}")) {
-			header("Expires: Mon, 26 Jul 1997 05:00:00 GMT\n");
-			header("Pragma: private"); // needed for IE
-			header("Cache-Control: private, must-revalidate"); // needed for IE
-			header('Content-type: application/force-download');
-			header('Content-Transfer-Encoding: Binary');
+			ob_start(); //important or other posts will fail
+			if (isset($_SERVER['HTTPS'])) {
+				header('Pragma: ');
+				header('Cache-Control: ');
+			} else {
+				header("Pragma: private");
+				header("Cache-Control: private, must-revalidate");
+			}
+			header("Content-Type: application/octet-stream");
 			header("Content-length: " . filesize("/tmp/{$file_name}"));
 			header("Content-disposition: attachment; filename = {$file_name}");
+			ob_end_clean(); //important or other post will fail
 			readfile("/tmp/{$file_name}");
-			ob_end_clean(); //importanr or other post will fail
+
+			// Clean up the temp files and directory
 			@unlink("/tmp/{$file_name}");
 			exec("/bin/rm -fr /tmp/snort_blocked");
 		} else
-			$savemsg = "An error occurred while creating archive";
+			$savemsg = gettext("An error occurred while creating archive");
 	} else
-		$savemsg = "No content on snort block list";
+		$savemsg = gettext("No content on snort block list");
 }
 
 if ($_POST['save'])
