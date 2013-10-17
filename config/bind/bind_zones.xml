@@ -94,6 +94,10 @@
 			<fieldname>view</fieldname>
 		</columnitem>
 		<columnitem>
+			<fielddescr>Serial</fielddescr>
+			<fieldname>serial</fieldname>
+		</columnitem>
+		<columnitem>
 			<fielddescr>Description</fielddescr>
 			<fieldname>description</fieldname>
 		</columnitem>
@@ -119,18 +123,11 @@
 			<fieldname>type</fieldname>
 			<description>Select zone type</description>
 		        <type>select</type>
-                        	<options>
-                                <option>
-                                        <name>Master</name>
-                                        <value>master</value>
-                                        <enablefields>description</enablefields>
-				</option>
-                                <option>
-                                        <name>Slave</name>
-                                        <value>slave</value>
-                                        <enablefields>ttl</enablefields>
-                                </option>
-                        </options>
+					<options>
+						<option><name>Master</name><value>master</value><enablefields>description</enablefields></option>
+						<option><name>Slave</name><value>slave</value><enablefields>ttl</enablefields></option>
+						<option><name>Forward</name><value>forward</value><enablefields>forward</enablefields></option>
+					</options>
                        <onchange>on_type_zone_changed()</onchange> 
 			<required/>
 		</field>
@@ -176,6 +173,19 @@
 			<description>If zone is slave, enter the IP address of the master DNS zone.</description>
 			<type>input</type>
 		</field>
+		<field>
+		        <type>listtopic</type>
+                        <name>Forward Zone Configuration </name>
+                        <fieldname>temp04</fieldname>
+		</field>
+		<field>
+			<fielddescr>Forwarders</fielddescr>
+			<fieldname>forwarders</fieldname>
+			<description>Enter forwarders IPs for this domain. Separate by semi-colons (;).</description>
+			<type>input</type>
+			<size>60</size>
+		</field>
+
 		<field>
 		        <type>listtopic</type>
                         <name>Master Zone Configuration </name>
@@ -352,7 +362,8 @@
         <custom_php_command_before_form>
         </custom_php_command_before_form>
 	<custom_php_validation_command>
-		$_POST['serial']=(date("U")+ 1000000000);
+		if ($_POST['type']=="master")
+			$_POST['serial']=(date("U")+ 1000000000);
 		bind_zone_validate($_POST, &amp;$input_errors);
 	</custom_php_validation_command>
 	<custom_delete_php_command>
