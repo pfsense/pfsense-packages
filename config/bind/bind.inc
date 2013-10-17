@@ -136,7 +136,6 @@ options {
 	pid-file "/var/run/named/pid";
 	statistics-file "/var/log/named.stats";
 	max-cache-size {$ram_limit};
-	query-source address * port 53;
 	
 EOD;
 	// check response rate limit option
@@ -417,15 +416,6 @@ EOD;
 			mkdir(CHROOT_LOCALBASE .$dir,0755,true);
 		}
 	//http://www.unixwiz.net/techtips/bind9-chroot.html
-	//create devices on chroot
-	exec('ls -lL /dev/zero /dev/null /dev/random',$devs);
-	foreach ($devs as $cdev){
-		$dev=explode(" ",preg_replace("/,/","",$cdev));
-		if (preg_match("/\w+/",$dev[15]) && !file_exists(CHROOT_LOCALBASE.$dev[15])){
-			if (preg_match("/\d+/",$dev[9]) && preg_match("/\d+/",$dev[11]))
-        		exec("/sbin/mknod ".CHROOT_LOCALBASE."{$dev[15]} c {$dev[9]} {$dev[11]}");
-			}
-		}
 
     file_put_contents(CHROOT_LOCALBASE.'/etc/namedb/named.conf', $bind_conf);
     file_put_contents(CHROOT_LOCALBASE.'/etc/namedb/rndc.conf', $rndc_file);
@@ -441,6 +431,7 @@ EOD;
 	
 	bind_write_rcfile();
 	chown(CHROOT_LOCALBASE."/var/log","bind");
+	chown(CHROOT_LOCALBASE."/var/run/named","bind");
 	chgrp(CHROOT_LOCALBASE."/var/log","bind");
  	if($bind_enable == "on")
  		mwexec("/usr/local/etc/rc.d/named.sh restart");
