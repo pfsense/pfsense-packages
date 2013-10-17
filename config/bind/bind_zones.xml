@@ -108,7 +108,9 @@
 		<field>
 			<fielddescr>Zone Name</fielddescr>
 			<fieldname>name</fieldname>
-			<description>Enter the name for zone (ex:mydomain.com)</description>
+			<description><![CDATA[Enter the name for zone (ex:mydomain.com)<br>
+						For reverse zones, include zone ip in reverse order or following your provider instructions.(Ex: 1.168.192)<br>
+						IN-ADDR.ARPA will be automaticaly included on conf files when reveser zone option is checked.]]></description>
 			<type>input</type>
 			<required/>
 		</field>
@@ -169,7 +171,7 @@
                         <fieldname>temp04</fieldname>
 		</field>
 		<field>
-			<fielddescr>IP Master Zone</fielddescr>
+			<fielddescr>Master Zone IP</fielddescr>
 			<fieldname>slaveip</fieldname>
 			<description>If zone is slave, enter the IP address of the master DNS zone.</description>
 			<type>input</type>
@@ -326,6 +328,20 @@
                         </rowhelperfield>
                     </rowhelper>
                 </field>
+		<field>
+		        <type>listtopic</type>
+                        <name>Zone config file</name>
+                        <fieldname>temp03</fieldname>
+		</field>
+		<field>
+			<fielddescr>Resulting config file</fielddescr>
+			<fieldname>resultconfig</fieldname>
+			<description>Resulting bind config file for this zone.</description>
+	                <type>textarea</type>
+                        <cols>75</cols>
+                        <rows>15</rows>
+		<encoding>base64</encoding>
+		</field>
 	</fields>
         <custom_php_after_form_command>
                 bind_print_javascript_type_zone2();
