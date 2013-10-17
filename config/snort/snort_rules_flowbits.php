@@ -58,6 +58,11 @@ if (is_null($id)) {
 	exit;
 }
 
+// Set who called us so we can return to the correct page with
+// the RETURN button.  We will just trust this User-Agent supplied
+// string for now.
+$referrer = $_SERVER['HTTP_REFERER'];
+
 $if_real = snort_get_real_interface($a_nat[$id]['interface']);
 $snort_uuid = $a_nat[$id]['uuid'];
 
@@ -185,7 +190,7 @@ if ($savemsg)
 				<tr>
 					<td width="17px"><img src="../themes/<?=$g['theme']?>/images/icons/icon_plus.gif" width='12' height='12' border='0'/></td>
 					<td><span class="vexpl"><?php echo gettext("Alert is Not Suppressed"); ?></span></td>
-					<td rowspan="3" align="right"><input id="cancelbutton" name="cancelbutton" type="button" class="formbtn" onclick="parent.location='snort_rulesets.php?id=<?=$id;?>'" <?php 
+					<td rowspan="3" align="right"><input id="cancelbutton" name="cancelbutton" type="button" class="formbtn" onclick="parent.location='<?=$referrer;?>'" <?php 
 					echo "value=\"" . gettext("Return") . "\" title=\"" . gettext("Return to previous page") . "\""; ?>/></td>
 				</tr>
 				<tr>
@@ -278,7 +283,7 @@ if ($savemsg)
 	<?php if ($count > 20): ?>
 	<tr>
 		<td align="center" valign="middle">
-			<input id="cancelbutton" name="cancelbutton" type="button" class="formbtn" onclick="parent.location='snort_rulesets.php?id=<?=$id;?>'" <?php 
+			<input id="cancelbutton" name="cancelbutton" type="button" class="formbtn" onclick="parent.location='<?=$referrer;?>'" <?php 
 			echo "value=\"" . gettext("Return") . "\" title=\"" . gettext("Return to previous page") . "\""; ?>/>
 			<input name="id" type="hidden" value="<?=$id;?>" />
 		</td>
