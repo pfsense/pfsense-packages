@@ -45,7 +45,7 @@ if ($pf_version > 2.0)
 else
   define('BIND_LOCALBASE','/usr/local');
 
-define('CHROOT_LOCALBASE','/conf/named');
+define('CHROOT_LOCALBASE','/cf/named');
 
 function bind_zone_validate($post, $input_errors){
 	if (key_exists("mail",$_POST))
@@ -437,7 +437,7 @@ function bind_write_rcfile() {
         $rc['file'] = 'named.sh';
         $rc['start'] = <<<EOD
 if [ -z "`ps auxw | grep "[n]amed -c /etc/namedb/named.conf"|awk '{print $2}'`" ];then
-        {$BIND_LOCALBASE}/sbin/named -c /etc/namedb/named.conf -u bind -t /conf/named/
+        {$BIND_LOCALBASE}/sbin/named -c /etc/namedb/named.conf -u bind -t /cf/named/
 fi
 
 EOD;
@@ -447,11 +447,11 @@ sleep 2
 EOD;
         $rc['restart'] = <<<EOD
 if [ -z "`ps auxw | grep "[n]amed -c /etc/namedb/named.conf"|awk '{print $2}'`" ];then
-        	{$BIND_LOCALBASE}/sbin/named -c /etc/namedb/named.conf -u bind -t /conf/named/
+        	{$BIND_LOCALBASE}/sbin/named -c /etc/namedb/named.conf -u bind -t /cf/named/
         else
 		killall -9 named 2>/dev/null
          	sleep 3	
-        	{$BIND_LOCALBASE}/sbin/named -c /etc/namedb/named.conf -u bind -t /conf/named/
+        	{$BIND_LOCALBASE}/sbin/named -c /etc/namedb/named.conf -u bind -t /cf/named/
         fi
 
 EOD;
