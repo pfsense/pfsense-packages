@@ -118,7 +118,7 @@ else if ($_POST['openruleset'])
 else
 	$currentruleset = $categories[0];
 
-if (empty($categories[0]) && ($currentruleset != "custom.rules")) {
+if (empty($categories[0]) && ($currentruleset != "custom.rules") && ($currentruleset != "Auto-Flowbit Rules")) {
 	if (!empty($a_rule[$id]['ips_policy']))
 		$currentruleset = "IPS Policy - " . ucfirst($a_rule[$id]['ips_policy']);
 	else

@@ -50,6 +50,21 @@ if (!is_array($config['installedpackages']['snortglobal']['rule'])) {
 }
 $a_nat = &$config['installedpackages']['snortglobal']['rule'];
 
+// Set who called us so we can return to the correct page with
+// the RETURN button.  We will just trust this User-Agent supplied
+// string for now.
+session_start();
+if(!isset($_SESSION['org_referer']))
+    $_SESSION['org_referer'] = $_SERVER['HTTP_REFERER'];
+$referrer = $_SESSION['org_referer'];
+
+if ($_POST['cancel']) {
+	unset($_SESSION['org_referer']);
+	session_write_close();
+	header("Location: {$referrer}");
+	exit;
+}
+
 $id = $_GET['id'];
 if (isset($_POST['id']))
 	$id = $_POST['id'];
@@ -57,11 +72,6 @@ if (is_null($id)) {
 	header("Location: /snort/snort_interfaces.php");
 	exit;
 }
-
-// Set who called us so we can return to the correct page with
-// the RETURN button.  We will just trust this User-Agent supplied
-// string for now.
-$referrer = $_SERVER['HTTP_REFERER'];
 
 $if_real = snort_get_real_interface($a_nat[$id]['interface']);
 $snort_uuid = $a_nat[$id]['uuid'];
@@ -190,8 +200,9 @@ if ($savemsg)
 				<tr>
 					<td width="17px"><img src="../themes/<?=$g['theme']?>/images/icons/icon_plus.gif" width='12' height='12' border='0'/></td>
 					<td><span class="vexpl"><?php echo gettext("Alert is Not Suppressed"); ?></span></td>
-					<td rowspan="3" align="right"><input id="cancelbutton" name="cancelbutton" type="button" class="formbtn" onclick="parent.location='<?=$referrer;?>'" <?php 
-					echo "value=\"" . gettext("Return") . "\" title=\"" . gettext("Return to previous page") . "\""; ?>/></td>
+					<td rowspan="3" align="right"><input id="cancel" name="cancel" type="submit" class="formbtn" <?php 
+					echo "value=\"" . gettext("Return") . "\" title=\"" . gettext("Return to previous page") . "\""; ?>/>
+					<input name="id" type="hidden" value="<?=$id;?>" /></td>
 				</tr>
 				<tr>
 					<td width="17px"><img src="../themes/<?=$g['theme']?>/images/icons/icon_plus_d.gif" width='12' height='12' border='0'/></td>
@@ -283,7 +294,7 @@ if ($savemsg)
 	<?php if ($count > 20): ?>
 	<tr>
 		<td align="center" valign="middle">
-			<input id="cancelbutton" name="cancelbutton" type="button" class="formbtn" onclick="parent.location='<?=$referrer;?>'" <?php 
+			<input id="cancel" name="cancel" type="submit" class="formbtn" <?php 
 			echo "value=\"" . gettext("Return") . "\" title=\"" . gettext("Return to previous page") . "\""; ?>/>
 			<input name="id" type="hidden" value="<?=$id;?>" />
 		</td>
