@@ -273,7 +273,8 @@
 		<field>
 			<fielddescr>Allow-update</fielddescr>
 			<fieldname>allowupdate</fieldname>
-			<description><![CDATA[Allow-update defines a match list eg IP address(es) that are allowed to submit dynamic updates for 'master' zones ie it enables Dynamic DNS (DDNS).]]></description>
+			<description><![CDATA[Select(CTRL+click) who are allowed to send updates to this zone.<br>
+						Allow-update defines a match list eg IP address(es) that are allowed to submit dynamic updates for 'master' zones ie it enables Dynamic DNS (DDNS).]]></description>
 	    	<type>select_source</type>
 			<source><![CDATA[$config['installedpackages']['bindacls']['config']]]></source>
 			<source_name>name</source_name>
@@ -284,7 +285,8 @@
 		<field>
 			<fielddescr>Allow-query</fielddescr>
 			<fieldname>allowquery</fieldname>
-			<description>Allow-query defines an match list of IP address(es) which are allowed to issue queries to the server.</description>
+			<description><![CDATA[Select(CTRL+click) who are allowed to query this zone.<br>
+			Allow-query defines an match list of IP address(es) which are allowed to issue queries to the server.]]></description>
 			<type>select_source</type>
 			<source><![CDATA[$config['installedpackages']['bindacls']['config']]]></source>
 			<source_name>name</source_name>
@@ -295,7 +297,8 @@
 		<field>
 			<fielddescr>Allow-transfer</fielddescr>
 			<fieldname>allowtransfer</fieldname>
-			<description>Allow-transfer defines a match list eg IP address(es) that are allowed to transfer (copy) the zone information from the server (master or slave for the zone). While on its face this may seem an excessively friendly default, DNS data is essentially public (that's why its there) and the bad guys can get all of it anyway. However if the thought of anyone being able to transfer your precious zone file is repugnant, or (and this is far more significant) you are concerned about possible DoS attack initiated by XFER requests, then use the following policy.</description>
+			<description><![CDATA[Select(CTRL+click) who are allowed to copy this zone.<br>
+						Allow-transfer defines a match list eg IP address(es) that are allowed to transfer (copy) the zone information from the server (master or slave for the zone). While on its face this may seem an excessively friendly default, DNS data is essentially public (that's why its there) and the bad guys can get all of it anyway. However if the thought of anyone being able to transfer your precious zone file is repugnant, or (and this is far more significant) you are concerned about possible DoS attack initiated by XFER requests, then use the following policy.]]></description>
 				    	<type>select_source</type>
 			<source><![CDATA[$config['installedpackages']['bindacls']['config']]]></source>
 			<source_name>name</source_name>
