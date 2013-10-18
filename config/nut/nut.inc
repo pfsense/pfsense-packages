@@ -272,7 +272,7 @@ EOD;
 		$upsd_users = "[monuser]\n";
 		$upsd_users .= "password = {$password}\n";
 		$upsd_users .= "upsmon master\n";
-		if($allowaddr && $allowuser) {
+		if($allowuser && $allowpass) {
 			$upsd_users .= "\n[$allowuser]\n";
 			$upsd_users .= "password = $allowpass\n";
 			$upsd_users .= "upsmon master\n";
@@ -356,7 +356,6 @@ EOD;
 		$snmpcommunity = nut_config('snmpcommunity');
 		$snmpfreq = nut_config('snmpfreq');
 		$snmpdisabletransfer = (nut_config('snmpdisabletransfer') == 'on');
-		$allowaddr = nut_config('allowaddr');
 		$allowuser = nut_config('allowuser');
 		$allowpass = nut_config('allowpass');
 
@@ -389,7 +388,7 @@ EOD;
 		$upsd_users = "[monuser]\n";
 		$upsd_users .= "password = {$password}\n";
 		$upsd_users .= "upsmon master\n";
-		if($allowaddr && $allowuser) {
+		if($allowuser && $allowpass) {
 			$upsd_users .= "\n[$allowuser]\n";
 			$upsd_users .= "password = $allowpass\n";
 			$upsd_users .= "upsmon master\n";
