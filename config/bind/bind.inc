@@ -254,7 +254,7 @@ EOD;
 			$viewallowrecursion = "none";
 		else
 			$viewallowrecursion = str_replace(',','; ',$views['allow-recursion']); 	
-		$viewcustomoptions = $views['bind_custom_options'];
+		$viewcustomoptions = base64_decode($views['bind_custom_options']);
 		
 		$bind_conf .= "view \"$viewname\" { \n\n"; 
 		$bind_conf .= "\trecursion $viewrecursion;\n"; 
@@ -280,7 +280,7 @@ EOD;
 			$zonename = $zone['name'];
 			$zonetype = $zone['type'];
 			$zoneview = $zone['view'];
-			$zonecustom = $zone['custom'];
+			$zonecustom = base64_decode($zone['custom']);
 			$zoneipslave = $zone['slaveip'];
 			$zoneforwarders=$zone['forwarders'];
 			$zonereverso = $zone['reverso'];
@@ -405,10 +405,9 @@ EOD;
 						//check dnssec keys creation for master zones
         				if($zone['dnssec']=="on"){
 	        				$zone_found=0;
-	        				foreach (glob(CHROOT_LOCALBASE."/etc/namedb/keys/*",GLOB_NOSORT) as $filename) {
-								if (preg_match("/$zonename/i", $filename))
-									$zone_found++;
-								}
+	        				foreach (glob(CHROOT_LOCALBASE."/etc/namedb/keys/*{$zonename}*key",GLOB_NOSORT) as $filename){
+								$zone_found++;
+	        					}
 							if ($zone_found==0){
 								$dnssec_bin="/usr/local/sbin/dnssec-keygen";
 								if (file_exists($dnssec_bin)){
@@ -420,6 +419,16 @@ EOD;
 										}
 									}
 	        					}
+	        				//get ds keys
+	        				$dsfromkey="/usr/local/sbin/dnssec-dsfromkey";
+	        				foreach (glob(CHROOT_LOCALBASE."/etc/namedb/keys/*{$zonename}*key",GLOB_NOSORT) as $filename) {
+	        						$zone_key=file_get_contents($filename);
+	        						if (preg_match("/IN DNSKEY 257 /",$zone_key) && file_exists($dsfromkey)){
+	        							exec("$dsfromkey $filename",$dsset);
+	        							$config["installedpackages"]["bindzone"]["config"][$x]['dsset']=base64_encode(array_pop($dsset)."\n".array_pop($dsset));
+	        							$write_config++;
+	        							}
+								}
         					}
 					break;
 					case "slave":
@@ -446,8 +455,18 @@ EOD;
 		if (!is_dir(CHROOT_LOCALBASE .$dir))
 			mkdir(CHROOT_LOCALBASE .$dir,0755,true);
 		}
+	//dev dirs for chroot
+	$bind_dev_dir=CHROOT_LOCALBASE."/dev";
+	if (!file_exists("$bind_dev_dir/random")){
+		$dev_dirs=array("null","zero","random","urandom");
+		exec("/sbin/mount -t devfs devfs {$bind_dev_dir}",$dout);
+		exec("/sbin/devfs -m {$bind_dev_dir} ruleset 1",$dout);
+		exec("/sbin/devfs -m {$bind_dev_dir} rule add hide",$dout);
+		foreach ($dev_dirs as $dev_dir)
+			exec("/sbin/devfs -m {$bind_dev_dir} rule add path $dev_dir unhide",$dout);
+		exec("/sbin/devfs -m {$bind_dev_dir} rule applyset",$dout);
+	}
 	//http://www.unixwiz.net/techtips/bind9-chroot.html
-
     file_put_contents(CHROOT_LOCALBASE.'/etc/namedb/named.conf', $bind_conf);
     file_put_contents(CHROOT_LOCALBASE.'/etc/namedb/rndc.conf', $rndc_file);
     
@@ -462,6 +481,7 @@ EOD;
 	
 	bind_write_rcfile();
 	chown(CHROOT_LOCALBASE."/etc/namedb/keys","bind");
+	chown(CHROOT_LOCALBASE."/etc/namedb","bind");
 	chown(CHROOT_LOCALBASE."/var/log","bind");
 	chown(CHROOT_LOCALBASE."/var/run/named","bind");
 	chgrp(CHROOT_LOCALBASE."/var/log","bind");
@@ -534,7 +554,7 @@ function bind_print_javascript_type_zone(){
 }
 
 function bind_print_javascript_type_zone2(){
-        print("<script language=\"JavaScript\">on_type_zone_changed();document.iform.resultconfig.disabled = 1;</script>\n");
+        print("<script language=\"JavaScript\">on_type_zone_changed();document.iform.resultconfig.disabled = 1;document.iform.dsset.disabled = 1;</script>\n");
 }
 
 function bind_write_rcfile() {
@@ -586,6 +606,7 @@ function bind_sync_on_changes() {
 		$bind_sync=$config['installedpackages']['bind']['config'][0];
 		$synconchanges = $bind_sync['synconchanges'];
 		$synctimeout = $bind_sync['synctimeout'];
+		$master_zone_ip=$bind_sync['masterip'];
 		switch ($synconchanges){
 			case "manual":
 				if (is_array($bind_sync[row])){
@@ -622,14 +643,14 @@ function bind_sync_on_changes() {
 				else
 					$username = 'admin';
 				if($password && $sync_to_ip)
-					bind_do_xmlrpc_sync($sync_to_ip, $username, $password,$synctimeout);
+					bind_do_xmlrpc_sync($sync_to_ip, $username, $password,$synctimeout,$master_zone_ip);
 				}
 			log_error("[bind] xmlrpc sync is ending.");
 			}
  		}
 }
 /* Do the actual XMLRPC sync */
-function bind_do_xmlrpc_sync($sync_to_ip, $username, $password, $synctimeout) {
+function bind_do_xmlrpc_sync($sync_to_ip, $username, $password, $synctimeout,$master_zone_ip) {
 	global $config, $g;
 
 	if(!$username)
@@ -666,6 +687,15 @@ function bind_do_xmlrpc_sync($sync_to_ip, $username, $password, $synctimeout) {
 	$xml['bindacls'] = $config['installedpackages']['bindacls'];
 	$xml['bindviews'] = $config['installedpackages']['bindviews'];
 	$xml['bindzone'] = $config['installedpackages']['bindzone'];
+	//change master zone to slave on backup servers
+	if(is_array($xml['bindzone']["config"])) 
+		for ($x=0; $x<sizeof($xml['bindzone']["config"]); $x++){
+			if ($xml['bindzone']["config"][$x]['type']=="master"){
+				$xml['bindzone']["config"][$x]['type']="slave";
+				$xml['bindzone']["config"][$x]['slaveip']=$master_zone_ip;
+			}
+			
+		}
 	/* assemble xmlrpc payload */
 	$params = array(
 		XML_RPC_encode($password),

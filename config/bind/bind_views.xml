@@ -148,7 +148,8 @@
                         <description>You can put your own custom options here, separated by semi-colons (;).</description>
                         <type>textarea</type>
                         <cols>65</cols>
-                        <rows>5</rows>
+                        <rows>8</rows>
+                        <encoding>base64</encoding>
                 </field>
 	</fields>
         <custom_php_command_before_form>

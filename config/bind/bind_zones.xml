@@ -119,6 +119,13 @@
 			<required/>
 		</field>
 		<field>
+			<fielddescr>Description</fielddescr>
+			<fieldname>description</fieldname>
+			<description>Enter the description for this zone.</description>
+			<type>input</type>
+			<size>70</size>
+		</field>
+		<field>
 			<fielddescr>Zone Type</fielddescr>
 			<fieldname>type</fieldname>
 			<description>Select zone type</description>
@@ -147,26 +154,34 @@
 			<type>checkbox</type>
 		</field>
 		<field>
+			<fielddescr>custom Option</fielddescr>
+			<fieldname>custom</fieldname>
+			<description>You can put your own custom options here.</description>
+			<type>textarea</type>
+			<cols>75</cols>
+			<rows>8</rows>
+			<encoding>base64</encoding>
+		</field>
+		<field>
+			<type>listtopic</type>
+			<name>DNSSEC</name>
+			<fieldname>temp04</fieldname>
+		</field>
+		<field>
 			<fielddescr>Inline Signing</fielddescr>
 			<fieldname>dnssec</fieldname>
 			<description>Enable inline DNSSEC Signing for this zones.</description>
 			<type>checkbox</type>
 		</field>
 		<field>
-			<fielddescr>custom Option</fielddescr>
-			<fieldname>custom</fieldname>
-			<description>You can put your own custom options here, separated by semi-colons (;).</description>
-	                <type>textarea</type>
-                        <cols>65</cols>
-                        <rows>3</rows>
-		</field>
-		<field>
-			<fielddescr>Description</fielddescr>
-			<fieldname>description</fieldname>
-			<description>Enter the description for this zone.</description>
-	                <type>textarea</type>
-                        <cols>65</cols>
-                        <rows>3</rows>
+			<fielddescr>DS set</fielddescr>
+			<fieldname>dsset</fieldname>
+			<description><![CDATA[Digest fingerprint of the Key Signing KeyResulting for this zone.<br>
+						Upload this ds set to your domain root server.]]></description>
+			<type>textarea</type>
+			<cols>75</cols>
+			<rows>3</rows>
+			<encoding>base64</encoding>
 		</field>
 		<field>
 		        <type>listtopic</type>
@@ -189,7 +204,7 @@
 			<fieldname>forwarders</fieldname>
 			<description>Enter forwarders IPs for this domain. Separate by semi-colons (;).</description>
 			<type>input</type>
-			<size>60</size>
+			<size>70</size>
 		</field>
 
 		<field>

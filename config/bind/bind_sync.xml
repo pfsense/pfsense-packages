@@ -64,7 +64,7 @@
 		</tab>
 		<tab>
 			<text>Sync</text>
-			<url>/pkg.php?xml=bind_sync.xml</url>
+			<url>/pkg_edit.php?xml=bind_sync.xml</url>
 			<active/>
 		</tab>
 	</tabs>
@@ -100,6 +100,16 @@
 				<option><name>250 seconds</name><value>250</value></option>
 				<option><name>120 seconds</name><value>120</value></option>
 			</options>
+		</field>
+		<field>
+			<fielddescr>Zone Master IP</fielddescr>
+			<fieldname>masterip</fieldname>
+			<description><![CDATA[Set master zone ip you want to use to sync backup server zones with master.<br>
+							<b>All master zones will be configured as backup on slave servers.</b><br>
+							Do not forget to create firewall rules to allow zone transfer between master and slave servers.]]></description>
+			<type>input</type>
+			<size>20</size>
+			<required/>
 		</field>
 		<field>
 			<fielddescr>Remote Server</fielddescr>
