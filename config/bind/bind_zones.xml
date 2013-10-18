@@ -140,12 +140,18 @@
 			<source_name>name</source_name>
 			<source_value>name</source_value>
 		</field>
-                <field>
-                        <fielddescr>Reverse Zone</fielddescr>
-                        <fieldname>reverso</fieldname>
-                        <description>Enable if this is a reverse zone.</description>
-                        <type>checkbox</type>
-                </field>
+		<field>
+			<fielddescr>Reverse Zone</fielddescr>
+			<fieldname>reverso</fieldname>
+			<description>Enable if this is a reverse zone.</description>
+			<type>checkbox</type>
+		</field>
+		<field>
+			<fielddescr>Inline Signing</fielddescr>
+			<fieldname>dnssec</fieldname>
+			<description>Enable inline DNSSEC Signing for this zones.</description>
+			<type>checkbox</type>
+		</field>
 		<field>
 			<fielddescr>custom Option</fielddescr>
 			<fieldname>custom</fieldname>

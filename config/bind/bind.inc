@@ -323,6 +323,15 @@ EOD;
 						$bind_conf .= "\t\tallow-query { $zoneallowquery;};\n"; 
 						$bind_conf .= "\t\tallow-transfer { $zoneallowtransfer;};\n";
         				}
+        			if ($zone['dnssec']=="on"){
+        				//https://kb.isc.org/article/AA-00626/
+        				$bind_conf .="\n\t\t# look for dnssec keys here:\n";
+        				$bind_conf .="\t\tkey-directory \"/etc/namedb/keys\";\n\n";
+        				$bind_conf .="\t\t# publish and activate dnssec keys:\n";
+        				$bind_conf .="\t\tauto-dnssec maintain;\n\n";
+        				$bind_conf .="\t\t# use inline signing:\n";
+        				$bind_conf .="\t\tinline-signing yes;\n\n";
+        				}
 				 	if ($zonecustom != '')
         				$bind_conf .= "\t\t$zonecustom\n";
         				
@@ -330,6 +339,9 @@ EOD;
         
 					switch($zonetype){
 					  case "master":
+					  	//check/update slave dir permission
+						chown(CHROOT_LOCALBASE."/etc/namedb/$zonetype","bind");
+						chown(CHROOT_LOCALBASE."/etc/namedb/$zonetype/$zoneview","bind");
 						$zonetll = ($zone['tll']?$zone['tll']:"43200");
 						$zonemail = ($zone['mail']?$zone['mail']:"zonemaster.{$zonename}");
 						$zonemail = preg_replace("/@/",".",$zonemail);				
@@ -390,6 +402,25 @@ EOD;
 						file_put_contents(CHROOT_LOCALBASE."/etc/namedb/$zonetype/$zoneview/$zonename.DB", $zone_conf);
 						$config["installedpackages"]["bindzone"]["config"][$x][resultconfig]=base64_encode($zone_conf);
 						$write_config++;
+						//check dnssec keys creation for master zones
+        				if($zone['dnssec']=="on"){
+	        				$zone_found=0;
+	        				foreach (glob(CHROOT_LOCALBASE."/etc/namedb/keys/*",GLOB_NOSORT) as $filename) {
+								if (preg_match("/$zonename/i", $filename))
+									$zone_found++;
+								}
+							if ($zone_found==0){
+								$dnssec_bin="/usr/local/sbin/dnssec-keygen";
+								if (file_exists($dnssec_bin)){
+									exec("{$dnssec_bin} -K ".CHROOT_LOCALBASE."/etc/namedb/keys {$zonename}",$kout);
+									exec("{$dnssec_bin} -K ".CHROOT_LOCALBASE."/etc/namedb/keys -fk {$zonename}",$kout);
+									foreach($kout as $filename){
+										chown(CHROOT_LOCALBASE."/etc/namedb/keys/{$filename}.key","bind");
+										chown(CHROOT_LOCALBASE."/etc/namedb/keys/{$filename}.private","bind");
+										}
+									}
+	        					}
+        					}
 					break;
 					case "slave":
 					//check/update slave dir permission
@@ -410,7 +441,7 @@ EOD;
 		}
 		$bind_conf .= "};\n";
 	}
-	$dirs=array("/etc/namedb","/var/run/named","/var/dump","/var/log","/var/stats","/dev");
+	$dirs=array("/etc/namedb/keys","/var/run/named","/var/dump","/var/log","/var/stats","/dev");
 	foreach ($dirs as $dir){
 		if (!is_dir(CHROOT_LOCALBASE .$dir))
 			mkdir(CHROOT_LOCALBASE .$dir,0755,true);
@@ -430,6 +461,7 @@ EOD;
 	}
 	
 	bind_write_rcfile();
+	chown(CHROOT_LOCALBASE."/etc/namedb/keys","bind");
 	chown(CHROOT_LOCALBASE."/var/log","bind");
 	chown(CHROOT_LOCALBASE."/var/run/named","bind");
 	chgrp(CHROOT_LOCALBASE."/var/log","bind");
@@ -453,7 +485,9 @@ function bind_print_javascript_type_zone(){
 					document.iform.slaveip.disabled = 1;
 					document.iform.tll.disabled = 0;
 					document.iform.nameserver.disabled = 0;
+					document.iform.reverso.disabled = 0;
 					document.iform.forwarders.disabled = 1;
+					document.iform.dnssec.disabled = 0;
 					document.iform.ipns.disabled = 0;
 					document.iform.mail.disabled = 0;
 					document.iform.serial.disabled = 0;
@@ -466,7 +500,9 @@ function bind_print_javascript_type_zone(){
 					document.iform.slaveip.disabled = 0;
 					document.iform.tll.disabled = 1;
 					document.iform.nameserver.disabled = 1;
+					document.iform.reverso.disabled = 0;
 					document.iform.forwarders.disabled = 1;
+					document.iform.dnssec.disabled = 0;
 					document.iform.ipns.disabled = 1;
 					document.iform.mail.disabled = 1;
 					document.iform.serial.disabled = 1;
@@ -479,7 +515,9 @@ function bind_print_javascript_type_zone(){
 					document.iform.slaveip.disabled = 1;
 					document.iform.tll.disabled = 1;
 					document.iform.nameserver.disabled = 1;
+					document.iform.reverso.disabled = 1;
 					document.iform.forwarders.disabled = 0;
+					document.iform.dnssec.disabled = 1;
 					document.iform.ipns.disabled = 1;
 					document.iform.mail.disabled = 1;
 					document.iform.serial.disabled = 1;
