@@ -130,7 +130,13 @@ function snort_download_file_url($url, $file_out) {
 	/* It provides logging of returned CURL errors. */
 	/************************************************/
 
-	global $g, $config, $pkg_interface, $last_curl_error, $fout, $ch, $file_size, $downloaded;
+	global $g, $config, $pkg_interface, $last_curl_error, $fout, $ch, $file_size, $downloaded, $first_progress_update;
+
+	// Initialize required variables for pfSense "read_body()" function
+	$file_size  = 1;
+	$downloaded = 1;
+	$first_progress_update = TRUE;
+
 
 	/* Array of message strings for HTTP Response Codes */
 	$http_resp_msg = array( 200 => "OK", 202 => "Accepted", 204 => "No Content", 205 => "Reset Content", 
