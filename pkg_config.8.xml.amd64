@@ -1609,7 +1609,7 @@
 			<ports_before>dns/ldns textproc/expat2 devel/libevent2</ports_before>
 			<port>dns/unbound</port>
 		</build_pbi>
-		<depends_on_package_pbi>unbound-1.4.20-amd64.pbi</depends_on_package_pbi>
+		<depends_on_package_pbi>unbound-1.4.21-amd64.pbi</depends_on_package_pbi>
 		<build_options>unbound_UNSET=GOST ECDSA;unbound_SET=LIBEVENT THREADS</build_options>
 		<logging>
 			<facilityname>unbound</facilityname>
