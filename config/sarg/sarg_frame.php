@@ -68,9 +68,11 @@ if ($report != "" )
 
 	#look for graph files inside reports. 
 	if (preg_match_all('/img src="([a-zA-Z0-9._-]+).png/',$report,$images)){
+		conf_mount_rw();
 		for ($x=0;$x<count($images[1]);$x++){
 			copy("{$dir}/{$prefix}/{$images[1][$x]}.png","/usr/local/www/sarg-images/temp/{$images[1][$x]}.{$rand}.png");
 			}
+		conf_mount_ro();
 		}
 	print preg_replace($pattern,$replace,$report);
 	}

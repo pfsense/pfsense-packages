@@ -260,7 +260,7 @@ function sync_package_sarg() {
 	$anonymous_output_files=(preg_match('/anonymous_output_files/',$sarg['report_options'])?"yes":"no");
 	$resolve_ip=(preg_match('/resolve_ip/',$sarg['report_options'])?"yes":"no");
 	$user_ip=(preg_match('/user_ip/',$sarg['report_options'])?"yes":"no");
-	$sort_order=(preg_match('/user_sort_field_order/',$sarg['report_options'])?"REVERSE":"NORMAL");
+	$sort_order=(preg_match('/user_sort_field_order/',$sarg['report_options'])?"reverse":"normal");
 	$remove_temp_files=(preg_match('/remove_temp_files/',$sarg['report_options'])?"yes":"no");
 	$main_index=(preg_match('/main_index/',$sarg['report_options'])?"yes":"no");
 	$index_tree=(preg_match('/index_tree/',$sarg['report_options'])?"file":"date");
