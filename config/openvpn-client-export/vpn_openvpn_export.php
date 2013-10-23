@@ -597,6 +597,8 @@ function useproxy_changed(obj) {
 									<td>
 										<select name="useaddr" id="useaddr" class="formselect" onchange="useaddr_changed(this)">
 											<option value="serveraddr" >Interface IP Address</option>
+											<option value="servermagic" >Automagic Multi-WAN IPs (port forward targets)</option>
+											<option value="servermagichost" >Automagic Multi-WAN DDNS Hostnames (port forward targets)</option>
 											<option value="serverhostname" >Installation hostname</option>
 											<?php if (is_array($config['dyndnses']['dyndns'])): ?>
 												<?php foreach ($config['dyndnses']['dyndns'] as $ddns): ?>

@@ -33,6 +33,10 @@
 
 require_once("globals.inc");
 require_once("openvpn.inc");
+require_once("filter.inc");
+require_once("shaper.inc");
+require_once("util.inc");
+require_once("pfsense-utils.inc");
 
 function openvpn_client_export_install() {
 	conf_mount_rw();
@@ -180,26 +184,8 @@ function openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $quotese
 	}
 
 	// determine basic variables
-	if ($useaddr == "serveraddr") {
-		$interface = $settings['interface'];
-		if (!empty($settings['ipaddr']) && is_ipaddr($settings['ipaddr'])) {
-			$server_host = $settings['ipaddr'];
-		} else {
-			if (!$interface || ($interface == "any"))
-				$interface = "wan";
-			$server_host = get_interface_ip($interface);
-		}
-	} else if ($useaddr == "serverhostname" || empty($useaddr)) {
-		$server_host = empty($config['system']['hostname']) ? "" : "{$config['system']['hostname']}.";
-		$server_host .= "{$config['system']['domain']}";
-	} else
-		$server_host = $useaddr;
-
+	$remotes = openvpn_client_export_build_remote_lines($settings, $useaddr, $interface, $expformat, $nl);
 	$server_port = $settings['local_port'];
-	$proto = (strtoupper($settings['protocol']) == 'UDP' ? 'udp' : "tcp");
-	if (($expformat == "inlineios") && ($proto == "tcp-client"))
-		$proto = "tcp";
-
 	$cipher = $settings['crypto'];
 
 	// add basic settings
@@ -219,7 +205,7 @@ function openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $quotese
 	$conf .= "client{$nl}";
 	if (($expformat != "inlinedroid") && ($expformat != "inlineios"))
 		$conf .= "resolv-retry infinite{$nl}";
-	$conf .= "remote {$server_host} {$server_port} {$proto}{$nl}";
+	$conf .= "$remotes{$nl}";
 	if (!empty($servercn) && ($expformat != "inlineios")) {
 		$qw = ($quoteservercn) ? "\"" : "";
 		$conf .= "tls-remote {$qw}{$servercn}{$qw}{$nl}";
@@ -811,4 +797,111 @@ function openvpn_client_export_sharedkey_config($srvid, $useaddr, $proxy, $zipco
 		return $conf;
 }
 
+function openvpn_client_export_build_remote_lines($settings, $useaddr, $interface, $expformat, $nl) {
+	global $config;
+	$remotes = array();
+	if (($useaddr == "serveraddr") || ($useaddr == "servermagic") || ($useaddr == "servermagichost")) {
+		$interface = $settings['interface'];
+		if (!empty($settings['ipaddr']) && is_ipaddr($settings['ipaddr'])) {
+			$server_host = $settings['ipaddr'];
+		} else {
+			if (!$interface || ($interface == "any"))
+				$interface = "wan";
+			$server_host = get_interface_ip($interface);
+		}
+	} else if ($useaddr == "serverhostname" || empty($useaddr)) {
+		$server_host = empty($config['system']['hostname']) ? "" : "{$config['system']['hostname']}.";
+		$server_host .= "{$config['system']['domain']}";
+	} else
+		$server_host = $useaddr;
+
+	$proto = (strtoupper($settings['protocol']) == 'UDP' ? 'udp' : "tcp");
+	if (($expformat == "inlineios") && ($proto == "tcp-client"))
+		$proto = "tcp";
+
+	if (($useaddr == "servermagic") || ($useaddr == "servermagichost")) {
+		$destinations = openvpn_client_export_find_port_forwards($server_host, $settings['local_port'], $proto, true, ($useaddr == "servermagichost"));
+		foreach ($destinations as $dest) {
+			$remotes[] = "remote {$dest['host']} {$dest['port']} {$dest['proto']}";
+		}
+	} else {
+		$remotes[] = "remote {$server_host} {$settings['local_port']} {$proto}";
+	}
+
+	return implode($nl, $remotes);
+}
+
+function openvpn_client_export_find_port_forwards($targetip, $targetport, $targetproto, $skipprivate, $findhostname=false) {
+	global $config, $FilterIflist;
+	if (empty($FilterIflist))
+		filter_generate_optcfg_array();
+	$destinations = array();
+
+	foreach ($config['nat']['rule'] as $natent) {
+		$dest = array();
+		if (!isset($natent['disabled'])
+			&& ($natent['target'] == $targetip)
+			&& ($natent['local-port'] == $targetport)
+			&& ($natent['protocol'] == $targetproto)) {
+			$dest['proto'] = $natent['protocol'];
+
+			// Could be multiple ports... But we can only use one.
+			$dports = is_port($natent['destination']['port']) ? array($natent['destination']['port']) : filter_expand_alias_array($natent['destination']['port']);
+			$dest['port'] = $dports[0];
+
+			// Could be network or address ...
+			$natif = (!$natent['interface']) ? "wan" : $natent['interface'];
+
+			if (!isset($FilterIflist[$natif]))
+				continue; // Skip if there is no interface
+
+			$dstaddr = trim(filter_generate_address($natent, 'destination', true));
+			if(!$dstaddr)
+				$dstaddr = $FilterIflist[$natif]['ip'];
+
+			$dstaddr_port = explode(" ", $dstaddr);
+
+			if(empty($dstaddr_port[0]) || strtolower(trim($dstaddr_port[0])) == "port")
+				continue; // Skip port forward if no destination address found
+
+
+			if (!is_ipaddr($dstaddr_port[0]))
+				continue; // We can only work with single IPs, not subnets!
+
+
+			if ($skipprivate && is_private_ip($dstaddr_port[0]))
+				continue; // Skipping a private IP destination!
+
+			$dest['host'] = $dstaddr_port[0];
+
+			if ($findhostname) {
+				$hostname = openvpn_client_export_find_hostname($natif);
+				if (!empty($hostname))
+					$dest['host'] = $hostname;
+			}
+
+			$destinations[] = $dest;
+		}
+	}
+
+	return $destinations;
+}
+
+function openvpn_client_export_find_hostname($interface) {
+	global $config;
+	$hostname = "";
+	if (is_array($config['dyndnses']['dyndns'])) {
+		foreach ($config['dyndnses']['dyndns'] as $ddns) {
+			if (($ddns['interface'] == $interface) && isset($ddns['enable']) && !empty($ddns['host']) && !is_numeric($ddns['host']) && is_hostname($ddns['host']))
+				return $ddns['host'];
+		}
+	}
+	if (is_array($config['dnsupdates']['dnsupdate'])) {
+		foreach ($config['dnsupdates']['dnsupdate'] as $ddns) {
+			if (($ddns['interface'] == $interface) && isset($ddns['enable']) && !empty($ddns['host']) && !is_numeric($ddns['host']) && is_hostname($ddns['host']))
+				return $ddns['host'];
+		}
+	}
+
+}
 ?>
