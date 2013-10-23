@@ -179,13 +179,14 @@
                	</field>
                 <field>
                         <type>listtopic</type>
-                        <name>Response limit</name>
+                        <name>Response Rate Limit</name>
                         <fieldname>temp01</fieldname>
                 </field>
                 <field>
                         <fielddescr>Rate limit</fielddescr>
                         <fieldname>rate_enabled</fieldname>
-                        <description>Limit/rate response queries to prevent DOS attack.</description>
+                        <description><![CDATA[<a target=_new href='https://kb.isc.org/article/AA-01000/189/A-Quick-Introduction-to-Response-Rate-Limiting.html?utm_source=isc&utm_medium=website&utm_term=rrl-kb&utm_content=kbarticle&utm_campaign=bind994_release_091913'>
+                        Limit/rate response queries</a> to prevent DOS attack.]]></description>
                         <type>checkbox</type>
                         <enablefields>rate_limit,log_only</enablefields>
                 </field>

@@ -82,6 +82,12 @@
 	<configpath>['installedpackages']['bindzone']['config']</configpath>
 	<adddeleteeditpagefields>
 		<columnitem>
+			<fielddescr>status</fielddescr>
+			<fieldname>disabled</fieldname>
+			<listmodeon>Disabled</listmodeon>
+			<listmodeoff>Enabled</listmodeoff>
+		</columnitem>
+		<columnitem>
 			<fielddescr>Zone Name</fielddescr>
 			<fieldname>name</fieldname>
 		</columnitem>
@@ -110,6 +116,12 @@
                         <fieldname>temp01</fieldname>
 		</field>
 		<field>
+			<fielddescr>Disable this zone</fielddescr>
+			<fieldname>disabled</fieldname>
+			<description><![CDATA[Do not Include this zone on bind config files.]]></description>
+			<type>checkbox</type>
+		</field>
+		<field>
 			<fielddescr>Zone Name</fielddescr>
 			<fieldname>name</fieldname>
 			<description><![CDATA[Enter the name for zone (ex:mydomain.com)<br>
@@ -128,14 +140,15 @@
 		<field>
 			<fielddescr>Zone Type</fielddescr>
 			<fieldname>type</fieldname>
-			<description>Select zone type</description>
+			<description><![CDATA[Select zone type.]]></description>
 		        <type>select</type>
 					<options>
 						<option><name>Master</name><value>master</value><enablefields>description</enablefields></option>
 						<option><name>Slave</name><value>slave</value><enablefields>ttl</enablefields></option>
 						<option><name>Forward</name><value>forward</value><enablefields>forward</enablefields></option>
+						<option><name>Redirect</name><value>redirect</value><enablefields>redirect</enablefields></option>
 					</options>
-                       <onchange>on_type_zone_changed()</onchange> 
+                       <onchange>on_type_zone_changed()</onchange>
 			<required/>
 		</field>
 		<field>
@@ -170,7 +183,7 @@
 		<field>
 			<fielddescr>Inline Signing</fielddescr>
 			<fieldname>dnssec</fieldname>
-			<description>Enable inline DNSSEC Signing for this zones.</description>
+			<description><![CDATA[<a target=_new href='https://kb.isc.org/article/AA-00626/109/Inline-Signing-in-ISC-BIND-9.9.0-Examples.html'>Enable inline DNSSEC Signing</a> afor this zones.]]></description>
 			<type>checkbox</type>
 		</field>
 		<field>
@@ -360,6 +373,7 @@
                             <type>input</type>
                             <size>35</size>
                         </rowhelperfield>
+                        <movable>on</movable>
                     </rowhelper>
                 </field>
 		<field>
