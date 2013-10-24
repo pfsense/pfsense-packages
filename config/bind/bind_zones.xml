@@ -183,7 +183,14 @@
 		<field>
 			<fielddescr>Inline Signing</fielddescr>
 			<fieldname>dnssec</fieldname>
+			<enablefields>backupkeys</enablefields>
 			<description><![CDATA[<a target=_new href='https://kb.isc.org/article/AA-00626/109/Inline-Signing-in-ISC-BIND-9.9.0-Examples.html'>Enable inline DNSSEC Signing</a> afor this zones.]]></description>
+			<type>checkbox</type>
+		</field>
+		<field>
+			<fielddescr>backup keys</fielddescr>
+			<fieldname>backupkeys</fieldname>
+			<description><![CDATA[Enable this option to include all DNSSEC key files on XML.]]></description>
 			<type>checkbox</type>
 		</field>
 		<field>

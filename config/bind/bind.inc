@@ -204,26 +204,40 @@ EOD;
 	$bind_conf .= "\t};\n\n";
 	
 	if ($bind_logging == on){
-$bind_conf .= <<<EOD
-
-	logging {
-		channel custom {
-			file "/var/log/named.log";
-			print-time yes;
-			print-category yes;
-		};
-
-		category config         {custom;};
-		category notify         {custom;};
-		category dnssec         {custom;};
-		category general        {custom;};
-		category security       {custom;};
-		category xfer-out       {custom;};
-		category lame-servers   {custom;};
-	}; 
+		//check if bind is included on syslog
+		$syslog_files=array("/etc/inc/system.inc","/var/etc/syslog.conf");
+		$restart_syslog=0;
+		foreach ($syslog_files as $syslog_file){
+			$syslog_file_data=file_get_contents($syslog_file);
+			if (!preg_match("/dnsmasq,named,filterdns/",$syslog_file_data)){
+				$syslog_file_data=preg_replace("/dnsmasq,filterdns/","dnsmasq,named,filterdns",$syslog_file_data);
+				file_put_contents($syslog_file,$syslog_file_data);
+				$restart_syslog++;
+				}
+			}
+		if ($restart_syslog > 0){
+			system("/usr/bin/killall -HUP syslogd");
+		}
+		$log_categories=explode(",",$bind['log_options']);
+		$log_severity=($bind['log_severity']?$bind['log_severity']:'default');
+		if (sizeof($log_categories) > 0 && $log_categories[0]!=""){
+			$bind_conf .= <<<EOD
+			
+		logging {
+			channel custom {
+				syslog daemon;
+				print-time no;
+				print-severity yes;
+				print-category yes;
+				severity {$log_severity};
+				};
 
 EOD;
-	}
+		foreach ($log_categories as $category)
+			$bind_conf .="\t\t\tcategory $category\t{custom;};\n";
+		$bind_conf .="\t\t};\n\n";				
+				}
+		 }
 
 	#Config Zone domain
 	if(!is_array($config["installedpackages"]["bindacls"]) || !is_array($config["installedpackages"]["bindacls"]["config"])){
@@ -427,14 +441,28 @@ EOD;
 								$zone_found++;
 	        					}
 							if ($zone_found==0){
+								$key_restored=0;
+								if(is_array($config['installedpackages']['dnsseckeys']) && is_array($config['installedpackages']['dnsseckeys']['config'])){
+									foreach ($config['installedpackages']['dnsseckeys']['config']as $filer)
+										if (preg_match ("/K$zonename\.+/",$filer['fullfile'])){
+											file_put_contents($filer['fullfile'],base64_decode($filer['filedata']),LOCK_EX);
+											chmod($filer['fullfile'],0700);
+											chown($filer['fullfile'],"bind");
+											$key_restored++;
+											}
+										}
+								if ($key_restored > 0){
+									log_error("[bind] {$key_restored} DNSSEC keys restored from XML backup for {$zonename} zone.");
+									}
 								$dnssec_bin="/usr/local/sbin/dnssec-keygen";
-								if (file_exists($dnssec_bin)){
+								if (file_exists($dnssec_bin) && $key_restored==0){
 									exec("{$dnssec_bin} -K ".CHROOT_LOCALBASE."/etc/namedb/keys {$zonename}",$kout);
 									exec("{$dnssec_bin} -K ".CHROOT_LOCALBASE."/etc/namedb/keys -fk {$zonename}",$kout);
 									foreach($kout as $filename){
 										chown(CHROOT_LOCALBASE."/etc/namedb/keys/{$filename}.key","bind");
 										chown(CHROOT_LOCALBASE."/etc/namedb/keys/{$filename}.private","bind");
 										}
+									log_error("[bind] DNSSEC keys for {$zonename} created.");
 									}
 	        					}
 	        				//get ds keys
@@ -447,6 +475,30 @@ EOD;
 	        							$write_config++;
 	        							}
 								}
+							//save dnssec keys to xml
+							
+							if($zone['backupkeys']=="on"){
+								$dnssec_keys=0;
+								foreach (glob(CHROOT_LOCALBASE."/etc/namedb/keys/*{$zonename}*",GLOB_NOSORT) as $filename){
+									$file_found=0;
+									if(is_array($config['installedpackages']['dnsseckeys']) && is_array($config['installedpackages']['dnsseckeys']['config'])){
+										foreach ($config['installedpackages']['dnsseckeys']['config']as $filer){
+											if ($filer['fullfile']==$filename)
+												$file_found++;
+											}
+										}
+									if ($file_found==0){
+										$config['installedpackages']['dnsseckeys']['config'][]=array('fullfile'=> $filename,
+																								'description'=> "bind {$zonename} DNSSEC backup file",
+																								'filedata'=> base64_encode(file_get_contents($filename)));
+										$write_config++;
+										$dnssec_keys++;
+										}
+									}
+									if($dnssec_keys>0){
+										log_error("[bind] {$dnssec_keys} DNSSEC keys for {$zonename} zone saved on XML config.");
+									}
+								}
         					}
 					break;
 					case "slave":
@@ -454,11 +506,21 @@ EOD;
 					chown(CHROOT_LOCALBASE."/etc/namedb/$zonetype","bind");
 					chown(CHROOT_LOCALBASE."/etc/namedb/$zonetype/$zoneview","bind");
 					//check if exists slave zone file
-					if (file_exists(CHROOT_LOCALBASE."/etc/namedb/$zonetype/$zoneview/$zonename.DB")){
-						$slave_file=file_get_contents(CHROOT_LOCALBASE."/etc/namedb/$zonetype/$zoneview/$zonename.DB");
-						$config["installedpackages"]["bindzone"]["config"][$x][resultconfig]=base64_encode($slave_file);
-						$write_config++;
+					$rsconfig="";
+					if ($zone['dnssec']=="on"){
+						if (file_exists(CHROOT_LOCALBASE."/etc/namedb/$zonetype/$zoneview/$zonename.DB.signed"))
+						exec("/usr/local/sbin/named-checkzone -D -f raw -o - {$zonename} ".CHROOT_LOCALBASE."/etc/namedb/$zonetype/$zoneview/$zonename.DB.signed",$slave_file);
 						}
+					else{
+						if (file_exists(CHROOT_LOCALBASE."/etc/namedb/$zonetype/$zoneview/$zonename.DB"))
+							$slave_file=file(CHROOT_LOCALBASE."/etc/namedb/$zonetype/$zoneview/$zonename.DB");
+						}
+					if (is_array($slave_file)){
+					foreach ($slave_file as $zfile)
+						$rsconfig.= $zfile;
+					$config["installedpackages"]["bindzone"]["config"][$x][resultconfig]=base64_encode($rsconfig);
+					$write_config++;
+					}
 					break;
 					}
 				}
@@ -534,6 +596,7 @@ function bind_print_javascript_type_zone(){
 					document.iform.reverso.disabled = 0;
 					document.iform.forwarders.disabled = 1;
 					document.iform.dnssec.disabled = 0;
+					document.iform.backupkeys.disabled = 0;
 					document.iform.ipns.disabled = 0;
 					document.iform.mail.disabled = 0;
 					document.iform.serial.disabled = 0;
@@ -549,6 +612,7 @@ function bind_print_javascript_type_zone(){
 					document.iform.reverso.disabled = 0;
 					document.iform.forwarders.disabled = 1;
 					document.iform.dnssec.disabled = 0;
+					document.iform.backupkeys.disabled = 0;
 					document.iform.ipns.disabled = 1;
 					document.iform.mail.disabled = 1;
 					document.iform.serial.disabled = 1;
@@ -564,6 +628,7 @@ function bind_print_javascript_type_zone(){
 					document.iform.reverso.disabled = 1;
 					document.iform.forwarders.disabled = 0;
 					document.iform.dnssec.disabled = 1;
+					document.iform.backupkeys.disabled = 1;
 					document.iform.ipns.disabled = 1;
 					document.iform.mail.disabled = 1;
 					document.iform.serial.disabled = 1;
@@ -579,6 +644,7 @@ function bind_print_javascript_type_zone(){
 					document.iform.reverso.disabled = 1;
 					document.iform.forwarders.disabled = 1;
 					document.iform.dnssec.disabled = 1;
+					document.iform.backupkeys.disabled = 1;
 					document.iform.ipns.disabled = 1;
 					document.iform.mail.disabled = 0;
 					document.iform.serial.disabled = 0;
@@ -728,6 +794,8 @@ function bind_do_xmlrpc_sync($sync_to_ip, $username, $password, $synctimeout,$ma
 	$xml['bindacls'] = $config['installedpackages']['bindacls'];
 	$xml['bindviews'] = $config['installedpackages']['bindviews'];
 	$xml['bindzone'] = $config['installedpackages']['bindzone'];
+	if (is_array($config['installedpackages']['dnsseckeys']))
+		$xml['dnsseckeys']=$config['installedpackages']['dnsseckeys'];
 	//change master zone to slave on backup servers
 	if(is_array($xml['bindzone']["config"])) 
 		for ($x=0; $x<sizeof($xml['bindzone']["config"]); $x++){

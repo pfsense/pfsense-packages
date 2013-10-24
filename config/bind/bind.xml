@@ -152,12 +152,6 @@
                         <multiple/>
                 </field>
                 <field>
-                        <fielddescr>Enable logging</fielddescr>
-                        <fieldname>bind_logging</fieldname>
-                        <description>Enable Bind logs, /var/log/named.log</description>
-                        <type>checkbox</type>
-                </field>
-                <field>
                         <fielddescr>Enable Notify</fielddescr>
                         <fieldname>bind_notify</fieldname>
                         <description>Notify slave server after any update on master.</description>
@@ -177,6 +171,64 @@
                 	<size>10</size>
 					<default_value>256M</default_value>
                	</field>
+                <field>
+                        <type>listtopic</type>
+                        <name>Logging options</name>
+                        <fieldname>temp01</fieldname>
+                </field>
+                <field>
+                        <fielddescr>Enable logging</fielddescr>
+                        <fieldname>bind_logging</fieldname>
+                        <description><![CDATA[Enable Bind logs on status-> system logs -> resolver menu.]]></description>
+                        <type>checkbox</type>
+                </field>
+				<field>
+					<fielddescr>Loggin serverity</fielddescr>
+					<fieldname>log_severity</fieldname>
+					<description><![CDATA[Select logging levels for selected categories.<BR>
+								use CTRL+click to select/unselect.<br>
+								The value 'dynamic' means assume the global level defined by either the command line parameter -d or by running rndc trace.]]></description>
+					<type>select</type>
+						<options>
+							<option><name>Critital</name><value>critical</value></option>
+							<option><name>Error</name><value>error</value></option>
+							<option><name>Warning</name><value>warning</value></option>
+							<option><name>Notice</name><value>Notice</value></option>
+							<option><name>info</name><value>info</value></option>
+							<option><name>Debug level 1</name><value>debug 1</value></option>
+							<option><name>Debug level 3</name><value>debug 3</value></option>
+							<option><name>Debug level 5</name><value>debug 5</value></option>
+							<option><name>Dynamic</name><value>dynamic</value></option>
+						</options>
+				</field>
+				<field>
+					<fielddescr>Loggin options</fielddescr>
+					<fieldname>log_options</fieldname>
+					<description><![CDATA[Select categories to log.<BR>
+								use CTRL+click to select/unselect.]]></description>
+					<type>select</type>
+						<options>
+							<option><name>Default-if this is the only category selected, it will log all categories except queries</name><value>default</value></option>
+							<option><name>General-Anything that is not classified as any other item in this list defaults to this category</name><value>general</value></option>
+							<option><name>Database-The value 'dynamic' means assume the global level defined by either the command line parameter -d or by running rndc trace</name><value>database</value></option>
+							<option><name>Security-Approval and denial of requests</name><value>security</value></option>
+							<option><name>Config-Configuration file parsing and processing</name><value>config</value></option>
+							<option><name>Resolver-Name resolution including recursive lookups</name><value>resolver</value></option>
+							<option><name>Xfer-in-Details of zone transfers the server is receiving.</name><value>xfer-in</value></option>
+							<option><name>Xfer-out-Details of zone transfers the server is sending.</name><value>xfer-out</value></option>
+							<option><name>Notify-Logs all NOTIFY operations.</name><value>notify</value></option>
+							<option><name>Client-Processing of client requests</name><value>client</value></option>
+							<option><name>Unmatched-No matching view clause or unrecognized class value.</name><value>unmatched</value></option>
+							<option><name>Queries-Logs all query transactions</name><value>queries</value></option>
+							<option><name>Network-Logs all network operations</name><value>network</value></option>
+							<option><name>Update-Logging of all dynamic update (DDNS) transactions</name><value>update</value></option>
+							<option><name>Dispatch-Dispatching of incoming packets to the server modules</name><value>dispatch</value></option>
+							<option><name>DNSSEC-DNSSEC and TSIG protocol processing</name><value>dnssec</value></option>
+							<option><name>lame-servers-Mis-configuration in the delegation of domains discovered by BIND</name><value>lame-servers</value></option>
+						</options>
+						<multiple/>
+						<size>18</size>
+				</field>
                 <field>
                         <type>listtopic</type>
                         <name>Response Rate Limit</name>
