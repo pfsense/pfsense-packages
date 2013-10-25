@@ -309,10 +309,8 @@
         </custom_php_resync_config_command>
         <custom_php_install_command>
        		bind_write_rcfile();
-		create_log_file(); 
 	</custom_php_install_command>
         <custom_php_deinstall_command>
-		delete_log_file();
         </custom_php_deinstall_command>
         <filter_rules_needed></filter_rules_needed>
 </packagegui>

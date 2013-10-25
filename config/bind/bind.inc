@@ -693,19 +693,6 @@ EOD;
         conf_mount_ro();
 }
 
-function create_log_file(){
-	conf_mount_rw();
- 	mwexec("touch ".CHROOT_LOCALBASE."/var/log/named.log");
- 	mwexec("chown bind:bind ".CHROOT_LOCALBASE."/var/log/named.log");
- 	mwexec("chmod 755 ".CHROOT_LOCALBASE."/var/log/named.log");
- 	conf_mount_ro();
-}
-
-function delete_log_file(){
-	conf_mount_rw();
- 	mwexec("rm ".CHROOT_LOCALBASE."/var/log/named.log");
- 	conf_mount_ro();
-}
 /* Uses XMLRPC to synchronize the changes to a remote node */
 function bind_sync_on_changes() {
 	global $config, $g;
@@ -725,11 +712,11 @@ function bind_sync_on_changes() {
 					}
 				break;
 			case "auto":
-					if (is_array($config['installedpackages']['carpsettings']) && is_array($config['installedpackages']['carpsettings']['config'])){
-						$system_carp=$config['installedpackages']['carpsettings']['config'][0];
-						$rs[0]['ipaddress']=$system_carp['synchronizetoip'];
-						$rs[0]['username']=$system_carp['username'];
-						$rs[0]['password']=$system_carp['password'];
+					if (is_array($config['hasync'])){
+						$hasync=$config['hasync'][0];
+						$rs[0]['ipaddress']=$hasync['synchronizetoip'];
+						$rs[0]['username']=$hasync['username'];
+						$rs[0]['password']=$hasync['password'];
 					}
 					else{
 						log_error("[bind] xmlrpc sync is enabled but there is no system backup hosts to push bind config.");
