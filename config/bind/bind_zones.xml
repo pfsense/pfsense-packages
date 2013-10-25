@@ -172,7 +172,7 @@
 			<description>You can put your own custom options here.</description>
 			<type>textarea</type>
 			<cols>75</cols>
-			<rows>8</rows>
+			<rows>5</rows>
 			<encoding>base64</encoding>
 		</field>
 		<field>
@@ -384,18 +384,36 @@
                     </rowhelper>
                 </field>
 		<field>
-		        <type>listtopic</type>
-                        <name>Zone config file</name>
-                        <fieldname>temp03</fieldname>
+			<type>listtopic</type>
+			<name>Custom Zone Domain records</name>
+			<fieldname>temp02</fieldname>
 		</field>
 		<field>
-			<fielddescr>Resulting config file</fielddescr>
+			<fielddescr></fielddescr>
+			<fieldname>customzonerecords</fieldname>
+			<description><![CDATA[Paste any custom zone records to include on this zone.<br>
+							This can be used for a fast migration setup.]]></description>
+	                <type>textarea</type>
+                        <cols>84</cols>
+                        <rows>10</rows>
+		<encoding>base64</encoding>
+		<dontdisplayname/>
+		<usecolspan2/>
+		</field>
+		<field>
+			<type>listtopic</type>
+			<name>Resulting Zone config file</name>
+		</field>
+		<field>
+			<fielddescr></fielddescr>
 			<fieldname>resultconfig</fieldname>
 			<description>Resulting bind config file for this zone.</description>
 	                <type>textarea</type>
-                        <cols>75</cols>
+                        <cols>84</cols>
                         <rows>15</rows>
 		<encoding>base64</encoding>
+		<dontdisplayname/>
+		<usecolspan2/>
 		</field>
 	</fields>
         <custom_php_after_form_command>
