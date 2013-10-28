@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE packagegui SYSTEM "./schema/packages.dtd">
+<?xml-stylesheet type="text/xsl" href="./xsl/package.xsl"?>
+<packagegui>
+        <copyright>
+        <![CDATA[
+/* $Id$ */
+/* ========================================================================== */
+/*
+    ossec_commands.xml
+    part of pfSense (http://www.pfSense.com)
+    Copyright (C) 2012 Lance Leger
+    All rights reserved.
+                                                                              */
+/* ========================================================================== */
+/*
+    Redistribution and use in source and binary forms, with or without
+    modification, are permitted provided that the following conditions are met:
+
+     1. Redistributions of source code must retain the above copyright notice,
+        this list of conditions and the following disclaimer.
+
+     2. Redistributions in binary form must reproduce the above copyright
+        notice, this list of conditions and the following disclaimer in the
+        documentation and/or other materials provided with the distribution.
+
+    THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
+    INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+    AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+    AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+    OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+    INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+    POSSIBILITY OF SUCH DAMAGE.
+                                                                              */
+/* ========================================================================== */
+        ]]>
+        </copyright>
+    <description>Describe your package here</description>
+    <requirements>Describe your package requirements here</requirements>
+    <faq>Currently there are no FAQ items provided.</faq>
+	<name>OSSEC Commands</name>
+	<version>0.1.0</version>
+	<title>Services: OSSEC Commands</title>
+	<include_file>/usr/local/pkg/ossec.inc</include_file>
+	<delete_string>A command has been deleted.</delete_string>
+	<addedit_string>A command has been created/modified.</addedit_string>
+	<menu>
+		<name>OSSEC</name>
+		<tooltiptext>Setup OSSEC</tooltiptext>
+		<section>Services</section>
+	</menu>
+	<tabs>
+		<tab>
+			<text>General</text>
+			<url>/pkg_edit.php?xml=ossec.xml&amp;id=0</url>
+		</tab>
+		<tab>
+			<text>Rules</text>
+			<url>/ossec_rules.php</url>
+		</tab>
+		<tab>
+			<text>Decoders</text>
+			<url>/ossec_decoders.php</url>
+		</tab>
+		<tab>
+			<text>Syschecks</text>
+			<url>/pkg.php?xml=ossec_syschecks.xml</url>
+		</tab>
+		<tab>
+			<text>Rootchecks</text>
+			<url>/pkg.php?xml=ossec_rootchecks.xml</url>
+		</tab>
+		<tab>
+			<text>Active Response</text>
+			<url>/pkg.php?xml=ossec_active_response.xml</url>
+		</tab>
+		<tab>
+			<text>Commands</text>
+			<url>/pkg.php?xml=ossec_commands.xml</url>
+			<active/>
+		</tab>
+		<tab>
+			<text>Local Rules</text>
+			<url>/pkg.php?xml=ossec_local_rules.xml</url>
+		</tab>
+		<tab>
+			<text>Local Decoders</text>
+			<url>/pkg.php?xml=ossec_local_decoders.xml</url>
+		</tab>		
+		<tab>
+			<text>Local Files</text>
+			<url>/pkg.php?xml=ossec_local_files.xml</url>
+		</tab>
+		<tab>
+			<text>Local Variables</text>
+			<url>/pkg.php?xml=ossec_local_variables.xml</url>
+		</tab>
+		<tab>
+			<text>Agents</text>
+			<url>/pkg.php?xml=ossec_agents.xml</url>
+		</tab>
+		<tab>
+			<text>Agent Control</text>
+			<url>/ossec_agent_control.php</url>
+		</tab>
+		<tab>
+			<text>Log Viewer</text>
+			<url>/ossec_log_viewer.php</url>
+		</tab>
+	</tabs>
+	<adddeleteeditpagefields>
+		<columnitem>
+			<fielddescr>Name</fielddescr>
+			<fieldname>name</fieldname>
+		</columnitem>
+		<columnitem>
+			<fielddescr>Executable</fielddescr>
+			<fieldname>executable</fieldname>
+		</columnitem>
+		<columnitem>
+			<fielddescr>Description</fielddescr>
+			<fieldname>description</fieldname>
+		</columnitem>
+	</adddeleteeditpagefields>
+	<fields>
+		<field>
+			<fielddescr>Name</fielddescr>
+			<fieldname>name</fieldname>
+			<description>Enter the command name</description>
+			<type>input</type>
+			<required/>
+		</field>
+		<field>
+			<fielddescr>Executable</fielddescr>
+			<fieldname>executable</fieldname>
+			<description>Enter the executable file name</description>
+			<type>input</type>
+			<required/>
+		</field>
+		<field>
+			<fielddescr>Expect</fielddescr>
+			<fieldname>expect</fieldname>
+			<description>Enter the arguments the command is expecting (i.e. srcip or username)</description>
+			<type>input</type>
+		</field>
+		<field>
+			<fielddescr>Timeout Allowed</fielddescr>
+			<fieldname>timeout_allowed</fieldname>
+			<type>checkbox</type>
+			<description>Command supports timeout</description>
+			<default_value>on</default_value>
+		</field>
+		<field>
+			<fielddescr>Description</fielddescr>
+			<fieldname>description</fieldname>
+			<description>Enter the description for this item</description>
+			<type>input</type>
+		</field>
+	</fields>
+	<custom_delete_php_command>
+		ossec_resync();
+	</custom_delete_php_command>
+	<custom_php_validation_command>
+		ossec_validate_commands($_POST, &amp;$input_errors);
+	</custom_php_validation_command>
+	<custom_php_resync_config_command>
+		ossec_resync();
+	</custom_php_resync_config_command>
+</packagegui>
