@@ -53,9 +53,21 @@ if (!$config['mailreports']['schedule'][$id])
 	exit;
 
 $thisreport = $config['mailreports']['schedule'][$id];
-$cmds = $thisreport['cmd']['row'];
-$logs = $thisreport['log']['row'];
-$graphs = $thisreport['row'];
+
+if (is_array($thisreport['cmd']) && is_array($thisreport['cmd']['row']))
+	$cmds = $thisreport['cmd']['row'];
+else
+	$cmds = array();
+
+if (is_array($thisreport['log']) && is_array($thisreport['log']['row']))
+	$logs = $thisreport['log']['row'];
+else
+	$logs = array();
+
+if (is_array($thisreport['row']))
+	$graphs = $thisreport['row'];
+else
+	$graphs = array();
 
 // If there is nothing to do, bail!
 if ((!is_array($cmds) || !(count($cmds) > 0))
