@@ -392,7 +392,7 @@
 	</fields>
 	<service>
 		<name>apache_mod_security</name>
-		<rcfile>/usr/local/etc/rc.d/apache_mod_security.sh</rcfile>
+		<rcfile>apache_mod_security.sh</rcfile>
 		<executable>httpd</executable>
 	</service>
 	<custom_php_resync_config_command>
