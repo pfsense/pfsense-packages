@@ -172,6 +172,7 @@ function openvpn_client_export_validate_config($srvid, $usrid, $crtid) {
 
 function openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $quoteservercn, $usetoken, $nokeys = false, $proxy, $expformat = "baseconf", $outpass = "", $skiptls=false, $doslines=false, $openvpnmanager, $advancedoptions = "") {
 	global $config, $input_errors, $g;
+	$pfs_version = substr(trim(file_get_contents("/etc/version")),0,3);
 
 	$nl = ($doslines) ? "\r\n" : "\n";
 	$conf = "";
@@ -297,8 +298,13 @@ function openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $quotese
 	}
 
 	// add optional settings
-	if ($settings['compression'])
-		$conf .= "comp-lzo{$nl}";
+	if (!empty($settings['compression'])) {
+		if ($pfs_version > 2.1)
+			$conf .= "comp-lzo {$settings['compression']}{$nl}";
+		else
+			$conf .= "comp-lzo{$nl}";
+	}
+
 	if ($settings['passtos'])
 		$conf .= "passtos{$nl}";
 
