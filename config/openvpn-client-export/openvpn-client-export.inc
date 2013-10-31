@@ -187,6 +187,7 @@ function openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $quotese
 	$remotes = openvpn_client_export_build_remote_lines($settings, $useaddr, $interface, $expformat, $nl);
 	$server_port = $settings['local_port'];
 	$cipher = $settings['crypto'];
+	$digest = !empty($settings['digest']) ? $settings['digest'] : "SHA1";
 
 	// add basic settings
 	$devmode = empty($settings['dev_mode']) ? "tun" : $settings['dev_mode'];
@@ -201,6 +202,7 @@ function openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $quotese
 //	if ((($expformat != "inlinedroid") && ($expformat != "inlineios")) && ($proto == "tcp"))
 //		$conf .= "proto tcp-client{$nl}";
 	$conf .= "cipher {$cipher}{$nl}";
+	$conf .= "auth {$digest}{$nl}";
 	$conf .= "tls-client{$nl}";
 	$conf .= "client{$nl}";
 	if (($expformat != "inlinedroid") && ($expformat != "inlineios"))
@@ -717,6 +719,7 @@ function openvpn_client_export_sharedkey_config($srvid, $useaddr, $proxy, $zipco
 	$proto = (strtoupper($settings['protocol']) == 'UDP' ? 'udp' : "tcp-client");
 
 	$cipher = $settings['crypto'];
+	$digest = !empty($settings['digest']) ? $settings['digest'] : "SHA1";
 
 	// add basic settings
 	$conf  = "dev tun\n";
@@ -727,6 +730,7 @@ function openvpn_client_export_sharedkey_config($srvid, $useaddr, $proxy, $zipco
 	$conf .= "persist-key\n";
 	$conf .= "proto {$proto}\n";
 	$conf .= "cipher {$cipher}\n";
+	$conf .= "auth {$digest}\n";
 	$conf .= "pull\n";
 	$conf .= "resolv-retry infinite\n";
 	$conf .= "remote {$server_host} {$server_port}\n";
