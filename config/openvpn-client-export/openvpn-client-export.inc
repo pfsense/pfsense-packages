@@ -208,9 +208,9 @@ function openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $quotese
 	if (($expformat != "inlinedroid") && ($expformat != "inlineios"))
 		$conf .= "resolv-retry infinite{$nl}";
 	$conf .= "$remotes{$nl}";
-	if (!empty($servercn) && ($expformat != "inlineios")) {
+	if (!empty($servercn)) {
 		$qw = ($quoteservercn) ? "\"" : "";
-		$conf .= "tls-remote {$qw}{$servercn}{$qw}{$nl}";
+		$conf .= "verify-x509-name {$qw}{$servercn}{$qw} name{$nl}";
 	}
 
 	if (!empty($proxy)) {
