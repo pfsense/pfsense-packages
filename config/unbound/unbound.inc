@@ -118,7 +118,6 @@ function unbound_keys_setup() {
 function unbound_rc_setup() {
 	global $config;
 
-
 	// Startup process and idea taken from TinyDNS package (author sullrich@gmail.com)
 	$filename = "unbound.sh";
 	$start = "/usr/local/bin/php -q -d auto_prepend_file=config.inc <<ENDPHP
@@ -240,7 +239,9 @@ function unbound_control($action) {
 				break;
 		case "anchor_update":
 				//Update the Root Trust Anchor
+				conf_mount_rw();
 				mwexec(UNBOUND_BASE . "/sbin/unbound-anchor -a " . UNBOUND_BASE . "/etc/unbound/root-trust-anchor", true);
+				conf_mount_ro();
 				break;
 		default:
 				break;
