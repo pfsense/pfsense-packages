@@ -23,6 +23,7 @@ if($options['s'] <> "") {
 
 $in = file("php://stdin");
 foreach($in as $line){
+	$line = trim($line);
 	if (       (substr($line, 0, 6) == "From: ")
 		|| (substr($line, 0, 6) == "Date: ")
 		|| (substr($line, 0, 4) == "To: "))
@@ -31,7 +32,7 @@ foreach($in as $line){
 		$subject = substr($line, 9);
 		continue;
 	}
-	$message .= "$line";
+	$message .= "$line\n";
 }
 
 if (!empty($subject))
