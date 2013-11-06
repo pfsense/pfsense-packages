@@ -197,7 +197,7 @@ function unbound_control($action) {
 
 		case "start":
 				//Start unbound
-				if($unbound_config['unbound_status'] == "on") {
+				if($unbound_config['enable'] == "on") {
 					if(!is_service_running("unbound"))
 						unbound_ctl_exec("start");
 						/* Link dnsmasq.pid to prevent dhcpleases logging error */
@@ -212,7 +212,7 @@ function unbound_control($action) {
 
 		case "stop":
 				//Stop unbound and unmount the file system
-				if($unbound_config['unbound_status'] == "on") {
+				if($unbound_config['enable'] == "on") {
 					mwexec_bg("/usr/local/bin/unbound_monitor.sh stop");
 					unbound_ctl_exec("stop");
 				}
@@ -698,7 +698,7 @@ function fetch_root_hints() {
 function unbound_validate($post, $type=null) {
 	global $config, $input_errors;
 
-	if($post['unbound_status'] == "on" && isset($config['dnsmasq']['enable']))
+	if($post['enable'] == "on" && isset($config['dnsmasq']['enable']))
 		$input_errors[] = "The system dns-forwarder is still active. Disable it before enabling the Unbound service.";
 
 	/* Validate the access lists */
@@ -745,7 +745,7 @@ function unbound_reconfigure() {
 
 	$unbound_config = $config['installedpackages']['unbound']['config'][0];
 
-	if ($unbound_config['unbound_status'] != "on") {
+	if ($unbound_config['enable'] != "on") {
 		if(is_service_running("unbound"))
 			unbound_control("termstop");
 	} else {
@@ -824,30 +824,49 @@ function unbound_add_host_entries() {
 		$unbound_entries .= "local-data: \"localhost.{$syscfg['domain']} AAAA ::1\"\n";
 	}
 
+	$added_item_v4 = array();
+	$added_item_v6 = array();
 	if ($config['interfaces']['lan']) {
+		$current_host = $syscfg['hostname'].".".$syscfg['domain'];
 		$cfgip = get_interface_ip("lan");
 		if (is_ipaddr($cfgip)) {
-			$unbound_entries .= "local-data-ptr: \"{$cfgip} {$syscfg['hostname']}.{$syscfg['domain']}\"\n";
-			$unbound_entries .= "local-data: \"{$syscfg['hostname']}.{$syscfg['domain']} A {$cfgip}\"\n";
+			$unbound_entries .= "local-data-ptr: \"{$cfgip} {$current_host}\"\n";
+			$unbound_entries .= "local-data: \"{$current_host} A {$cfgip}\"\n";
 			$unbound_entries .= "local-data: \"{$syscfg['hostname']} A {$cfgip}\"\n";
+			$added_item_v4[$current_host] = true;
+		}
+		$cfgip6 = get_interface_ipv6("lan");
+		if (is_ipaddrv6($cfgip6)) {
+			$unbound_entries .= "local-data-ptr: \"{$cfgip6} {$current_host}\"\n";
+			$unbound_entries .= "local-data: \"{$current_host} AAAA {$cfgip6}\"\n";
+			$unbound_entries .= "local-data: \"{$syscfg['hostname']} AAAA {$cfgip6}\"\n";
+			$added_item_v6[$current_host] = true;
 		}
 	} else {
 		$sysiflist = get_configured_interface_list();
 		foreach ($sysiflist as $sysif) {
 			if (!interface_has_gateway($sysif)) {
+				$current_host = $syscfg['hostname'].".".$syscfg['domain'];
 				$cfgip = get_interface_ip($sysif);
 				if (is_ipaddr($cfgip)) {
-					$unbound_entries .= "local-data-ptr: \"{$cfgip} {$syscfg['hostname']}.{$syscfg['domain']}\"\n";
-					$unbound_entries .= "local-data: \"{$syscfg['hostname']}.{$syscfg['domain']} A {$cfgip}\"\n";
+					$unbound_entries .= "local-data-ptr: \"{$cfgip} {$current_host}\"\n";
+					$unbound_entries .= "local-data: \"{$current_host} A {$cfgip}\"\n";
 					$unbound_entries .= "local-data: \"{$syscfg['hostname']} A {$cfgip}\"\n";
-					break;
+					$added_item_v4[$current_host] = true;
 				}
+				$cfgip6 = get_interface_ipv6($sysif);
+				if (is_ipaddr($cfgip6)) {
+					$unbound_entries .= "local-data-ptr: \"{$cfgip6} {$current_host}\"\n";
+					$unbound_entries .= "local-data: \"{$current_host} AAAA {$cfgip6}\"\n";
+					$unbound_entries .= "local-data: \"{$syscfg['hostname']} AAAA {$cfgip6}\"\n";
+					$added_item_v6[$current_host] = true;
+				}
+				if (is_ipaddr($cfgip) || is_ipaddr($cfgip6))
+					break;
 			}
 		}
 	}
 
-	$added_item_v4 = array();
-	$added_item_v6 = array();
 	// DNSMasq entries static host entries
 	if (isset($dnsmasqcfg['hosts'])) {
 		$hosts = $dnsmasqcfg['hosts'];
