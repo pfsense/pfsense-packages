@@ -1161,8 +1161,8 @@ include_once("head.inc");
 	<tr>
 		<td width="22%" valign="top" class="vncell"><?php echo gettext("Ignore Scanners"); ?></td>
 		<td width="78%" class="vtable">
-			<input name="pscan_ignore_scanners" type="text" size="40" autocomplete="off"  class="formfldalias" id="pscan_ignore_scanners" 
-			value="<?=$pconfig['pscan_ignore_scanners'];?>">&nbsp;&nbsp;<?php echo gettext("Leave blank for default.  ") . 
+			<input name="pscan_ignore_scanners" type="text" size="40" autocomplete="off" class="formfldalias" id="pscan_ignore_scanners" 
+			value="<?=$pconfig['pscan_ignore_scanners'];?>" title="<?=trim(filter_expand_alias($pconfig['pscan_ignore_scanners']));?>">&nbsp;&nbsp;<?php echo gettext("Leave blank for default.  ") . 
 			gettext("Default value is ") . "<strong>" . gettext("\$HOME_NET") . "</strong>"; ?>.<br/>
 			<?php echo gettext("Ignores the specified entity as a source of scan alerts.  Entity must be a defined alias."); ?><br/>
 		</td>
@@ -1315,6 +1315,8 @@ include_once("head.inc");
         if(isset($config['aliases']['alias']) && is_array($config['aliases']['alias']))
                 foreach($config['aliases']['alias'] as $alias_name) {
                         if ($alias_name['type'] == "host" || $alias_name['type'] == "network") {
+				if (trim(filter_expand_alias($alias_name['name'])) == "")
+					continue;
 				if($addrisfirst == 1) $aliasesaddr .= ",";
 				$aliasesaddr .= "'" . $alias_name['name'] . "'";
 				$addrisfirst = 1;

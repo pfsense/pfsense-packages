@@ -37,7 +37,7 @@
 require_once("guiconfig.inc");
 require_once("/usr/local/pkg/snort/snort.inc");
 
-global $flowbit_rules_file;
+$flowbit_rules_file = FLOWBITS_FILENAME;
 $snortdir = SNORTDIR;
 
 if (!is_array($config['installedpackages']['snortglobal']['rule'])) {
@@ -60,9 +60,16 @@ if (isset($id) && $a_rule[$id]) {
 /* convert fake interfaces to real */
 $if_real = snort_get_real_interface($pconfig['interface']);
 $snort_uuid = $a_rule[$id]['uuid'];
+$snortcfgdir = "{$snortdir}/snort_{$snort_uuid}_{$if_real}";
 $file = $_GET['openruleset'];
 $contents = '';
 $wrap_flag = "off";
+
+// Correct displayed file title if necessary
+if ($file == "Auto-Flowbit Rules")
+	$displayfile = FLOWBITS_FILENAME;
+else
+	$displayfile = $file;
 
 // Read the contents of the argument passed to us.
 // It may be an IPS policy string, an individual SID,
@@ -87,13 +94,18 @@ if (substr($file, 0, 10) == "IPS Policy") {
 }
 // Is it a SID to load the rule text from?
 elseif (isset($_GET['ids'])) {
-	$rules_map = snort_load_rules_map("{$snortdir}/rules/{$file}");
+	// If flowbit rule, point to interface-specific file
+	if ($file == "Auto-Flowbit Rules")
+		$rules_map = snort_load_rules_map("{$snortcfgdir}/rules/" . FLOWBITS_FILENAME);
+	else
+		$rules_map = snort_load_rules_map("{$snortdir}/rules/{$file}");
 	$contents = $rules_map[$_GET['gid']][trim($_GET['ids'])]['rule'];
 	$wrap_flag = "soft";
 }
+
 // Is it our special flowbit rules file?
-elseif ($file == $flowbit_rules_file)
-	$contents = file_get_contents("{$snortdir}/snort_{$snort_uuid}_{$if_real}/rules/{$flowbit_rules_file}");
+elseif ($file == "Auto-Flowbit Rules")
+	$contents = file_get_contents("{$snortcfgdir}/rules/{$flowbit_rules_file}");
 // Is it a rules file in the ../rules/ directory?
 elseif (file_exists("{$snortdir}/rules/{$file}"))
 	$contents = file_get_contents("{$snortdir}/rules/{$file}");
@@ -101,10 +113,8 @@ elseif (file_exists("{$snortdir}/rules/{$file}"))
 elseif (file_exists($file))
 	$contents = file_get_contents($file);
 // It is not something we can display, so exit.
-else {
-	header("Location: /snort/snort_rules.php?id={$id}&openruleset={$file}");
-	exit;
-}
+else
+	$input_errors[] = gettext("Unable to open file: {$displayfile}");
 
 $pgtitle = array(gettext("Snort"), gettext("File Viewer"));
 ?>
@@ -128,7 +138,7 @@ $pgtitle = array(gettext("Snort"), gettext("File Viewer"));
 				<input type="button" class="formbtn" value="Return" onclick="window.close()">
 			</td>
 			<td align="right">
-				<b><?php echo gettext("Rules File: ") . '</b>&nbsp;' . $file; ?>&nbsp;&nbsp;&nbsp;&nbsp;
+				<b><?php echo gettext("Rules File: ") . '</b>&nbsp;' . $displayfile; ?>&nbsp;&nbsp;&nbsp;&nbsp;
 			</td>
 		</tr>
 		<tr>

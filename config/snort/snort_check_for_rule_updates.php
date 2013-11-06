@@ -35,28 +35,24 @@ require_once "/usr/local/pkg/snort/snort.inc";
 
 global $g, $pkg_interface, $snort_gui_include, $rebuild_rules;
 
-
-if (!defined("VRT_DNLD_FILENAME"))
-	define("VRT_DNLD_FILENAME", "snortrules-snapshot-2946.tar.gz");
 if (!defined("VRT_DNLD_URL"))
 	define("VRT_DNLD_URL", "https://www.snort.org/reg-rules/");
 if (!defined("ET_VERSION"))
 	define("ET_VERSION", "2.9.0");
 if (!defined("ET_BASE_DNLD_URL"))
 	define("ET_BASE_DNLD_URL", "http://rules.emergingthreats.net/"); 
+if (!defined("ETPRO_BASE_DNLD_URL"))
+	define("ETPRO_BASE_DNLD_URL", "https://rules.emergingthreatspro.com/"); 
 if (!defined("ET_DNLD_FILENAME"))
 	define("ET_DNLD_FILENAME", "emerging.rules.tar.gz");
+if (!defined("ETPRO_DNLD_FILENAME"))
+	define("ETPRO_DNLD_FILENAME", "etpro.rules.tar.gz");
 if (!defined("GPLV2_DNLD_FILENAME"))
 	define("GPLV2_DNLD_FILENAME", "community-rules.tar.gz");
 if (!defined("GPLV2_DNLD_URL"))
 	define("GPLV2_DNLD_URL", "https://s3.amazonaws.com/snort-org/www/rules/community/");
-if (!defined("FLOWBITS_FILENAME"))
-	define("FLOWBITS_FILENAME", "flowbit-required.rules");
-if (!defined("ENFORCING_RULES_FILENAME"))
-	define("ENFORCING_RULES_FILENAME", "snort.rules");
 if (!defined("RULES_UPD_LOGFILE"))
 	define("RULES_UPD_LOGFILE", SNORTLOGDIR . "/snort_rules_update.log");
-
 
 $snortdir = SNORTDIR;
 $snortlibdir = SNORTLIBDIR;
@@ -72,8 +68,10 @@ else
 
 /* define checks */
 $oinkid = $config['installedpackages']['snortglobal']['oinkmastercode'];
+$etproid = $config['installedpackages']['snortglobal']['etpro_code'];
 $snortdownload = $config['installedpackages']['snortglobal']['snortdownload'];
 $emergingthreats = $config['installedpackages']['snortglobal']['emergingthreats'];
+$etpro = $config['installedpackages']['snortglobal']['emergingthreats_pro'];
 $snortcommunityrules = $config['installedpackages']['snortglobal']['snortcommunityrules'];
 $vrt_enabled = $config['installedpackages']['snortglobal']['snortdownload'];
 $et_enabled = $config['installedpackages']['snortglobal']['emergingthreats'];
@@ -81,19 +79,39 @@ $et_enabled = $config['installedpackages']['snortglobal']['emergingthreats'];
 /* Working directory for downloaded rules tarballs */
 $tmpfname = "{$snortdir}/tmp/snort_rules_up";
 
-/* Snort VRT rules filenames and URL */
-$snort_filename = VRT_DNLD_FILENAME;
-$snort_filename_md5 = VRT_DNLD_FILENAME . ".md5";
+/* Grab the Snort binary version programmatically and use it to construct */
+/* the proper Snort VRT rules tarball and md5 filenames.                  */
+exec("/usr/local/bin/snort -V 2>&1 |/usr/bin/grep Version | /usr/bin/cut -c20-26", $snortver);
+// Save the version with decimal delimiters for use in extracting the rules
+$snort_version = $snortver[0];
+// Create a collapsed version string for use in the tarball filename
+$snortver[0] = str_replace(".", "", $snortver[0]);
+$snort_filename = "snortrules-snapshot-{$snortver[0]}.tar.gz";
+$snort_filename_md5 = "{$snort_filename}.md5";
 $snort_rule_url = VRT_DNLD_URL;
 
-/* Emerging Threats rules filenames and URL */
-$emergingthreats_filename = ET_DNLD_FILENAME;
-$emergingthreats_filename_md5 = ET_DNLD_FILENAME . ".md5";
-$emerging_threats_version = ET_VERSION;
-$emergingthreats_url = ET_BASE_DNLD_URL;
-// If using Sourcefire VRT rules with ET, then we should use the open-nogpl ET rules
-$emergingthreats_url .= $vrt_enabled == "on" ? "open-nogpl/" : "open/";
-$emergingthreats_url .= "snort-" . ET_VERSION . "/";
+/* Set up Emerging Threats rules filenames and URL */
+if ($etpro == "on") {
+	$emergingthreats_filename = ETPRO_DNLD_FILENAME;
+	$emergingthreats_filename_md5 = ETPRO_DNLD_FILENAME . ".md5";
+	$emergingthreats_url = ETPRO_BASE_DNLD_URL;
+	$emergingthreats_url .= "{$etproid}/snort-" . ET_VERSION . "/";
+	$emergingthreats = "on";
+	$et_name = "Emerging Threats Pro";
+	$et_md5_remove = ET_DNLD_FILENAME . ".md5";
+	@unlink("{$snortdir}/{$et_md5_remove}");
+}
+else {
+	$emergingthreats_filename = ET_DNLD_FILENAME;
+	$emergingthreats_filename_md5 = ET_DNLD_FILENAME . ".md5";
+	$emergingthreats_url = ET_BASE_DNLD_URL;
+	// If using Sourcefire VRT rules with ET, then we should use the open-nogpl ET rules
+	$emergingthreats_url .= $vrt_enabled == "on" ? "open-nogpl/" : "open/";
+	$emergingthreats_url .= "snort-" . ET_VERSION . "/";
+	$et_name = "Emerging Threats Open";
+	$et_md5_remove = ETPRO_DNLD_FILENAME . ".md5";
+	@unlink("{$snortdir}/{$et_md5_remove}");
+}
 
 /* Snort GPLv2 Community Rules filenames and URL */
 $snort_community_rules_filename = GPLV2_DNLD_FILENAME;
@@ -112,7 +130,13 @@ function snort_download_file_url($url, $file_out) {
 	/* It provides logging of returned CURL errors. */
 	/************************************************/
 
-	global $g, $config, $pkg_interface, $last_curl_error, $fout, $ch, $file_size, $downloaded;
+	global $g, $config, $pkg_interface, $last_curl_error, $fout, $ch, $file_size, $downloaded, $first_progress_update;
+
+	// Initialize required variables for pfSense "read_body()" function
+	$file_size  = 1;
+	$downloaded = 1;
+	$first_progress_update = TRUE;
+
 
 	/* Array of message strings for HTTP Response Codes */
 	$http_resp_msg = array( 200 => "OK", 202 => "Accepted", 204 => "No Content", 205 => "Reset Content", 
@@ -418,34 +442,34 @@ if ($snortcommunityrules == 'on') {
 /*  download md5 sig from emergingthreats.net */
 if ($emergingthreats == 'on') {
 	if ($pkg_interface <> "console")
-		update_status(gettext("Downloading EmergingThreats md5 file..."));
-	error_log(gettext("\tDownloading EmergingThreats md5 file '{$emergingthreats_filename_md5}'...\n"), 3, $snort_rules_upd_log);
+		update_status(gettext("Downloading {$et_name} md5 file..."));
+	error_log(gettext("\tDownloading {$et_name} md5 file '{$emergingthreats_filename_md5}'...\n"), 3, $snort_rules_upd_log);
 	$rc = snort_download_file_url("{$emergingthreats_url}{$emergingthreats_filename_md5}", "{$tmpfname}/{$emergingthreats_filename_md5}");
 	if ($rc === true) {
 		if ($pkg_interface <> "console")
-			update_status(gettext("Done downloading EmergingThreats md5 file {$emergingthreats_filename_md5}"));
-		error_log(gettext("\tChecking EmergingThreats md5.\n"), 3, $snort_rules_upd_log);
+			update_status(gettext("Done downloading {$et_name} md5 file {$emergingthreats_filename_md5}"));
+		error_log(gettext("\tChecking {$et_name} md5.\n"), 3, $snort_rules_upd_log);
 		if (file_exists("{$snortdir}/{$emergingthreats_filename_md5}") && $emergingthreats == "on") {
 			/* Check if were up to date emergingthreats.net */
 			$emerg_md5_check_new = file_get_contents("{$tmpfname}/{$emergingthreats_filename_md5}");
 			$emerg_md5_check_old = file_get_contents("{$snortdir}/{$emergingthreats_filename_md5}");
 			if ($emerg_md5_check_new == $emerg_md5_check_old) {
 				if ($pkg_interface <> "console")
-					update_status(gettext("Emerging Threats rules are up to date..."));
-				log_error(gettext("[Snort] Emerging Threat rules are up to date..."));
-				error_log(gettext("\tEmerging Threats rules are up to date.\n"), 3, $snort_rules_upd_log);
+					update_status(gettext("{$et_name} rules are up to date..."));
+				log_error(gettext("[Snort] {$et_name} rules are up to date..."));
+				error_log(gettext("\t{$et_name} rules are up to date.\n"), 3, $snort_rules_upd_log);
 				$emergingthreats = 'off';
 			}
 		}
 	}
 	else {
 		if ($pkg_interface <> "console")
-			update_output_window(gettext("EmergingThreats md5 file download failed.  EmergingThreats rules will not be updated."));
-		log_error(gettext("[Snort] EmergingThreats md5 file download failed.  Server returned error code '{$rc}'."));
-		error_log(gettext("\tEmergingThreats md5 file download failed.  Server returned error code '{$rc}'.\n"), 3, $snort_rules_upd_log);
+			update_output_window(gettext("{$et_name} md5 file download failed.  {$et_name} rules will not be updated."));
+		log_error(gettext("[Snort] {$et_name} md5 file download failed.  Server returned error code '{$rc}'."));
+		error_log(gettext("\t{$et_name} md5 file download failed.  Server returned error code '{$rc}'.\n"), 3, $snort_rules_upd_log);
 		if ($pkg_interface == "console")
 			error_log(gettext("\tThe error text is '{$last_curl_error}'\n"), 3, $snort_rules_upd_log);
-		error_log(gettext("\tEmergingThreats rules will not be updated.\n"), 3, $snort_rules_upd_log);
+		error_log(gettext("\t{$et_name} rules will not be updated.\n"), 3, $snort_rules_upd_log);
 		$emergingthreats = 'off';
 	}
 }
@@ -453,9 +477,9 @@ if ($emergingthreats == 'on') {
 /* download emergingthreats rules file */
 if ($emergingthreats == "on") {
 	if ($pkg_interface <> "console")
-		update_status(gettext("There is a new set of EmergingThreats rules posted. Downloading {$emergingthreats_filename}..."));
-	log_error(gettext("[Snort] There is a new set of EmergingThreats rules posted. Downloading..."));
-	error_log(gettext("\tThere is a new set of EmergingThreats rules posted.\n"), 3, $snort_rules_upd_log);
+		update_status(gettext("There is a new set of {$et_name} rules posted. Downloading {$emergingthreats_filename}..."));
+	log_error(gettext("[Snort] There is a new set of {$et_name} rules posted. Downloading..."));
+	error_log(gettext("\tThere is a new set of {$et_name} rules posted.\n"), 3, $snort_rules_upd_log);
 	error_log(gettext("\tDownloading file '{$emergingthreats_filename}'...\n"), 3, $snort_rules_upd_log);
 	$rc = snort_download_file_url("{$emergingthreats_url}{$emergingthreats_filename}", "{$tmpfname}/{$emergingthreats_filename}");
 
@@ -463,29 +487,29 @@ if ($emergingthreats == "on") {
 	if ($rc === true) {
 		if (trim(file_get_contents("{$tmpfname}/{$emergingthreats_filename_md5}")) != trim(md5_file("{$tmpfname}/{$emergingthreats_filename}"))){
 			if ($pkg_interface <> "console")
-				update_output_window(gettext("EmergingThreats rules file MD5 checksum failed..."));
-			log_error(gettext("[Snort] EmergingThreats rules file download failed.  Bad MD5 checksum..."));
+				update_output_window(gettext("{$et_name} rules file MD5 checksum failed..."));
+			log_error(gettext("[Snort] {$et_name} rules file download failed.  Bad MD5 checksum..."));
         	        log_error(gettext("[Snort] Failed File MD5: " . md5_file("{$tmpfname}/{$emergingthreats_filename}")));
 			log_error(gettext("[Snort] Expected File MD5: " . file_get_contents("{$tmpfname}/{$emergingthreats_filename_md5}")));
-			error_log(gettext("\tEmergingThreats rules file download failed.  EmergingThreats rules will not be updated.\n"), 3, $snort_rules_upd_log);
+			error_log(gettext("\t{$et_name} rules file download failed.  {$et_name} rules will not be updated.\n"), 3, $snort_rules_upd_log);
 			error_log(gettext("\tDownloaded ET file MD5: " . md5_file("{$tmpfname}/{$emergingthreats_filename}") . "\n"), 3, $snort_rules_upd_log);
 			error_log(gettext("\tExpected ET file MD5: " . file_get_contents("{$tmpfname}/{$emergingthreats_filename_md5}") . "\n"), 3, $snort_rules_upd_log);
 			$emergingthreats = 'off';
 		}
 		else {
 			if ($pkg_interface <> "console")
-				update_status(gettext('Done downloading EmergingThreats rules file.'));
-			log_error("[Snort] EmergingThreats rules file update downloaded successfully");
-			error_log(gettext("\tDone downloading EmergingThreats rules file.\n"), 3, $snort_rules_upd_log);
+				update_status(gettext('Done downloading {$et_name} rules file.'));
+			log_error("[Snort] {$et_name} rules file update downloaded successfully");
+			error_log(gettext("\tDone downloading {$et_name} rules file.\n"), 3, $snort_rules_upd_log);
 		}
 	}
 	else {
 		if ($pkg_interface <> "console") {
-			update_status(gettext("The server returned error code {$rc} ... skipping EmergingThreats update..."));
-			update_output_window(gettext("EmergingThreats rules file download failed..."));
+			update_status(gettext("The server returned error code {$rc} ... skipping {$et_name} update..."));
+			update_output_window(gettext("{$et_name} rules file download failed..."));
 		}
-		log_error(gettext("[Snort] EmergingThreats rules file download failed.  Server returned error '{$rc}'..."));
-		error_log(gettext("\tEmergingThreats rules file download failed.  Server returned error '{$rc}'...\n"), 3, $snort_rules_upd_log);
+		log_error(gettext("[Snort] {$et_name} rules file download failed.  Server returned error '{$rc}'..."));
+		error_log(gettext("\t{$et_name} rules file download failed.  Server returned error '{$rc}'...\n"), 3, $snort_rules_upd_log);
 		if ($pkg_interface == "console")
 			error_log(gettext("\tThe error text is '{$last_curl_error}'\n"), 3, $snort_rules_upd_log);
 		$emergingthreats = 'off';
@@ -497,22 +521,34 @@ if ($emergingthreats == 'on') {
 	safe_mkdir("{$snortdir}/tmp/emerging");
 	if (file_exists("{$tmpfname}/{$emergingthreats_filename}")) {
 		if ($pkg_interface <> "console") {
-			update_status(gettext("Extracting EmergingThreats.org rules..."));
-			update_output_window(gettext("Installing EmergingThreats rules..."));
+			update_status(gettext("Extracting {$et_name} rules..."));
+			update_output_window(gettext("Installing {$et_name} rules..."));
 		}
-		error_log(gettext("\tExtracting and installing EmergingThreats.org rules...\n"), 3, $snort_rules_upd_log);
+		error_log(gettext("\tExtracting and installing {$et_name} rules...\n"), 3, $snort_rules_upd_log);
 		exec("/usr/bin/tar xzf {$tmpfname}/{$emergingthreats_filename} -C {$snortdir}/tmp/emerging rules/");
+
+		/* Remove the old Emerging Threats rules files */
+		array_map('unlink', glob("{$snortdir}/rules/emerging-*.rules"));
+		array_map('unlink', glob("{$snortdir}/rules/etpro-*.rules"));
+		array_map('unlink', glob("{$snortdir}/rules/emerging-*ips.txt"));
+		array_map('unlink', glob("{$snortdir}/rules/etpro-*ips.txt"));
 
 		$files = glob("{$snortdir}/tmp/emerging/rules/*.rules");
 		foreach ($files as $file) {
 			$newfile = basename($file);
-			@copy($file, "{$snortdir}/rules/{$newfile}");
+			if ($etpro == "on")
+				@copy($file, "{$snortdir}/rules/etpro-{$newfile}");
+			else
+				@copy($file, "{$snortdir}/rules/{$newfile}");
 		}
 		/* IP lists for Emerging Threats rules */
 		$files = glob("{$snortdir}/tmp/emerging/rules/*ips.txt");
 		foreach ($files as $file) {
 			$newfile = basename($file);
-			@copy($file, "{$snortdir}/rules/{$newfile}");
+			if ($etpro == "on")
+				@copy($file, "{$snortdir}/rules/etpro-{$newfile}");
+			else
+				@copy($file, "{$snortdir}/rules/emerging-{$newfile}");
 		}
                 /* base etc files for Emerging Threats rules */
 		foreach (array("classification.config", "reference.config", "gen-msg.map", "unicode.map") as $file) {
@@ -527,10 +563,10 @@ if ($emergingthreats == 'on') {
 			@copy("{$tmpfname}/{$emergingthreats_filename_md5}", "{$snortdir}/{$emergingthreats_filename_md5}");
 		}
 		if ($pkg_interface <> "console") {
-			update_status(gettext("Extraction of EmergingThreats.org rules completed..."));
-			update_output_window(gettext("Installation of EmergingThreats rules completed..."));
+			update_status(gettext("Extraction of {$et_name} rules completed..."));
+			update_output_window(gettext("Installation of {$et_name} rules completed..."));
 		}
-		error_log(gettext("\tInstallation of EmergingThreats.org rules completed.\n"), 3, $snort_rules_upd_log);
+		error_log(gettext("\tInstallation of {$et_name} rules completed.\n"), 3, $snort_rules_upd_log);
 		exec("rm -r {$snortdir}/tmp/emerging");
 	}
 }
@@ -543,6 +579,9 @@ if ($snortdownload == 'on') {
 		$freebsd_version_so = 'FreeBSD-8-1';
 		if (substr(php_uname("r"), 0, 1) == '9')
 			$freebsd_version_so = 'FreeBSD-9-0';
+
+		/* Remove the old Snort rules files */
+		array_map('unlink', glob("{$snortdir}/rules/snort_*.rules"));
 
 		if ($pkg_interface <> "console") {
 			update_status(gettext("Extracting Snort VRT rules..."));

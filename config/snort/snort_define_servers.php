@@ -203,15 +203,18 @@ if ($savemsg)
 				$server = substr($server, 0, 40) . "...";
 			$label = strtoupper($key);
 			$value = "";
-			if (!empty($pconfig["def_{$key}"]))
+			$title = "";
+			if (!empty($pconfig["def_{$key}"])) {
 				$value = htmlspecialchars($pconfig["def_{$key}"]);
+				$title = trim(filter_expand_alias($pconfig["def_{$key}"]));
+			}
 ?>
 			<tr>
 				<td width='22%' valign='top' class='vncell'><?php echo gettext("Define"); ?> <?=$label;?></td>
 				<td width="78%" class="vtable">
 					<input name="def_<?=$key;?>" size="40"
 					type="text" autocomplete="off" class="formfldalias" id="def_<?=$key;?>"
-					value="<?=$value;?>"> <br/>
+					value="<?=$value;?>" title="<?=$title;?>"> <br/>
 				<span class="vexpl"><?php echo gettext("Default value:"); ?> "<?=$server;?>" <br/><?php echo gettext("Leave " .
 				"blank for default value."); ?></span>
 				</td>
@@ -226,14 +229,17 @@ if ($savemsg)
 				$server = substr($server, 0, 40) . "...";
 			$label = strtoupper($key);
 			$value = "";
-			if (!empty($pconfig["def_{$key}"]))
+			$title = "";
+			if (!empty($pconfig["def_{$key}"])) {
 				$value = htmlspecialchars($pconfig["def_{$key}"]);
+				$title = trim(filter_expand_alias($pconfig["def_{$key}"]));
+			}
 ?>
 			<tr>
 				<td width='22%' valign='top' class='vncell'><?php echo gettext("Define"); ?> <?=$label;?></td>
 				<td width="78%" class="vtable">
 					<input name="def_<?=$key;?>" type="text" size="40" autocomplete="off" class="formfldalias" id="def_<?=$key;?>"
-					value="<?=$value;?>"> <br/>
+					value="<?=$value;?>" title="<?=$title;?>"> <br/>
 				<span class="vexpl"><?php echo gettext("Default value:"); ?> "<?=$server;?>" <br/> <?php echo gettext("Leave " .
 				"blank for default value."); ?></span>
 				</td>
@@ -262,6 +268,9 @@ if ($savemsg)
         if(isset($config['aliases']['alias']) && is_array($config['aliases']['alias']))
                 foreach($config['aliases']['alias'] as $alias_name) {
                         if ($alias_name['type'] == "host" || $alias_name['type'] == "network") {
+				// Skip any Aliases that resolve to an empty string
+				if (trim(filter_expand_alias($alias_name['name'])) == "")
+					continue;
 				if($addrisfirst == 1) $aliasesaddr .= ",";
 				$aliasesaddr .= "'" . $alias_name['name'] . "'";
 				$addrisfirst = 1;

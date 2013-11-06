@@ -50,6 +50,21 @@ if (!is_array($config['installedpackages']['snortglobal']['rule'])) {
 }
 $a_nat = &$config['installedpackages']['snortglobal']['rule'];
 
+// Set who called us so we can return to the correct page with
+// the RETURN button.  We will just trust this User-Agent supplied
+// string for now.
+session_start();
+if(!isset($_SESSION['org_referer']))
+    $_SESSION['org_referer'] = $_SERVER['HTTP_REFERER'];
+$referrer = $_SESSION['org_referer'];
+
+if ($_POST['cancel']) {
+	unset($_SESSION['org_referer']);
+	session_write_close();
+	header("Location: {$referrer}");
+	exit;
+}
+
 $id = $_GET['id'];
 if (isset($_POST['id']))
 	$id = $_POST['id'];
@@ -88,14 +103,15 @@ if ($_GET['act'] == "addsuppress" && is_numeric($_GET['sidid']) && is_numeric($_
 
 	if (empty($a_nat[$id]['suppresslistname']) || $a_nat[$id]['suppresslistname'] == 'default') {
 		$s_list = array();
-		$s_list['name'] = $a_nat[$id]['interface'] . "suppress";
 		$s_list['uuid'] = uniqid();
-		$s_list['descr']  =  "Auto-generated list for alert suppression";
+		$s_list['name'] = $a_nat[$id]['interface'] . "suppress" . "_" . $s_list['uuid'];
+		$s_list['descr']  =  "Auto-generated list for Alert suppression";
 		$s_list['suppresspassthru'] = base64_encode($suppress);
 		$a_suppress[] = $s_list;
 		$a_nat[$id]['suppresslistname'] = $s_list['name'];
 		$found_list = true;
 	} else {
+		/* If we get here, a Suppress List is defined for the interface so see if we can find it */
 		foreach ($a_suppress as $a_id => $alist) {
 			if ($alist['name'] == $a_nat[$id]['suppresslistname']) {
 				$found_list = true;
@@ -105,6 +121,10 @@ if ($_GET['act'] == "addsuppress" && is_numeric($_GET['sidid']) && is_numeric($_
 					$alist['suppresspassthru'] = base64_encode($tmplist);
 					$a_suppress[$a_id] = $alist;
 				}
+				else {
+					$alist['suppresspassthru'] = base64_encode($suppress);
+					$a_suppress[$a_id] = $alist;
+				}
 			}
 		}
 	}
@@ -112,7 +132,8 @@ if ($_GET['act'] == "addsuppress" && is_numeric($_GET['sidid']) && is_numeric($_
 		write_config();
 		$rebuild_rules = false;
 		sync_snort_package_config();
-		$savemsg = gettext("Wrote suppress rule for 'gen_id {$_GET['gen_id']}, sig_id {$_GET['sidid']}' to the '{$a_nat[$id]['suppresslistname']}' Suppression List.");
+		snort_reload_config($a_nat[$id]);
+		$savemsg = gettext("An entry to suppress the Alert for 'gen_id {$_GET['gen_id']}, sig_id {$_GET['sidid']}' has been added to Suppress List '{$a_nat[$id]['suppresslistname']}'.");
 	}
 	else {
 		/* We did not find the defined list, so notify the user with an error */
@@ -179,8 +200,9 @@ if ($savemsg)
 				<tr>
 					<td width="17px"><img src="../themes/<?=$g['theme']?>/images/icons/icon_plus.gif" width='12' height='12' border='0'/></td>
 					<td><span class="vexpl"><?php echo gettext("Alert is Not Suppressed"); ?></span></td>
-					<td rowspan="3" align="right"><input id="cancelbutton" name="cancelbutton" type="button" class="formbtn" onclick="parent.location='snort_rulesets.php?id=<?=$id;?>'" <?php 
-					echo "value=\"" . gettext("Return") . "\" title=\"" . gettext("Return to previous page") . "\""; ?>/></td>
+					<td rowspan="3" align="right"><input id="cancel" name="cancel" type="submit" class="formbtn" <?php 
+					echo "value=\"" . gettext("Return") . "\" title=\"" . gettext("Return to previous page") . "\""; ?>/>
+					<input name="id" type="hidden" value="<?=$id;?>" /></td>
 				</tr>
 				<tr>
 					<td width="17px"><img src="../themes/<?=$g['theme']?>/images/icons/icon_plus_d.gif" width='12' height='12' border='0'/></td>
@@ -272,7 +294,7 @@ if ($savemsg)
 	<?php if ($count > 20): ?>
 	<tr>
 		<td align="center" valign="middle">
-			<input id="cancelbutton" name="cancelbutton" type="button" class="formbtn" onclick="parent.location='snort_rulesets.php?id=<?=$id;?>'" <?php 
+			<input id="cancel" name="cancel" type="submit" class="formbtn" <?php 
 			echo "value=\"" . gettext("Return") . "\" title=\"" . gettext("Return to previous page") . "\""; ?>/>
 			<input name="id" type="hidden" value="<?=$id;?>" />
 		</td>

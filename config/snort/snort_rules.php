@@ -33,7 +33,7 @@
 require_once("guiconfig.inc");
 require_once("/usr/local/pkg/snort/snort.inc");
 
-global $g, $flowbit_rules_file, $rebuild_rules;
+global $g, $rebuild_rules;
 
 $snortdir = SNORTDIR;
 $rules_map = array();
@@ -106,6 +106,7 @@ function add_title_attribute($tag, $title) {
 /* convert fake interfaces to real */
 $if_real = snort_get_real_interface($pconfig['interface']);
 $snort_uuid = $a_rule[$id]['uuid'];
+$snortcfgdir = "{$snortdir}/snort_{$snort_uuid}_{$if_real}";
 $snortdownload = $config['installedpackages']['snortglobal']['snortdownload'];
 $emergingdownload = $config['installedpackages']['snortglobal']['emergingthreats'];
 $categories = explode("||", $pconfig['rulesets']);
@@ -117,7 +118,7 @@ else if ($_POST['openruleset'])
 else
 	$currentruleset = $categories[0];
 
-if (empty($categories[0]) && ($currentruleset != "custom.rules")) {
+if (empty($categories[0]) && ($currentruleset != "custom.rules") && ($currentruleset != "Auto-Flowbit Rules")) {
 	if (!empty($a_rule[$id]['ips_policy']))
 		$currentruleset = "IPS Policy - " . ucfirst($a_rule[$id]['ips_policy']);
 	else
@@ -133,6 +134,9 @@ $ruledir = "{$snortdir}/rules";
 $rulefile = "{$ruledir}/{$currentruleset}";
 if ($currentruleset != 'custom.rules') {
 	// Read the current rules file into our rules map array.
+	// If it is the auto-flowbits file, set the full path.
+	if ($currentruleset == "Auto-Flowbit Rules")
+		$rulefile = "{$snortcfgdir}/rules/" . FLOWBITS_FILENAME;
 	// Test for the special case of an IPS Policy file.
 	if (substr($currentruleset, 0, 10) == "IPS Policy")
 		$rules_map = snort_load_vrt_policy($a_rule[$id]['ips_policy']);
@@ -193,8 +197,6 @@ if ($_GET['act'] == "toggle" && $_GET['ids'] && !empty($rules_map)) {
 	write_config();
 
 	$_GET['openruleset'] = $currentruleset;
-//	header("Location: /snort/snort_rules.php?id={$id}&openruleset={$currentruleset}");
-//	exit;
 	$anchor = "rule_{$sid}";
 }
 
@@ -334,7 +336,7 @@ if ($_POST['customrules']) {
 	$rebuild_rules = false;
 	$output = "";
 	$retcode = "";
-	exec("snort -c {$snortdir}/snort_{$snort_uuid}_{$if_real}/snort.conf -T 2>&1", $output, $retcode);
+	exec("/usr/local/bin/snort -T -c {$snortdir}/snort_{$snort_uuid}_{$if_real}/snort.conf 2>&1", $output, $retcode);
 	if (intval($retcode) != 0) {
 		$error = "";
 		$start = count($output);
@@ -436,6 +438,8 @@ if ($savemsg) {
 					$files = explode("||", $pconfig['rulesets']);
 					if ($a_rule[$id]['ips_policy_enable'] == 'on')
 						$files[] = "IPS Policy - " . ucfirst($a_rule[$id]['ips_policy']);
+					if ($a_rule[$id]['autoflowbitrules'] == 'on')
+						$files[] = "Auto-Flowbit Rules";
 					natcasesort($files);
 					foreach ($files as $value) {
 						if ($snortdownload != 'on' && substr($value, 0, 6) == "snort_")
@@ -517,6 +521,17 @@ if ($savemsg) {
 							title='" . gettext("Click to enable all rules in the selected category") . "'></a>"?>
 							&nbsp;&nbsp;<?php echo gettext("Enable all rules in the current Category"); ?></td>
 						</tr>
+						<?php if ($currentruleset == 'Auto-Flowbit Rules'): ?>
+						<tr>
+							<td colspan="3">&nbsp;</td>
+						</tr>
+						<tr>
+							<td colspan="3" class="vexpl" align="center"><?php echo "<span class=\"red\"><b>" . gettext("WARNING: ") . "</b></span>" . 
+							gettext("You should not disable flowbit rules!  Add Suppress List entries for them instead by ") . 
+							"<a href='snort_rules_flowbits.php?id={$id}' title=\"" . gettext("Add Suppress List entry for Flowbit Rule") . "\">" . 
+							gettext("clicking here") . ".</a>";?></td>
+						</tr>
+						<?php endif;?>
 					</table>
 				</td>
 			</tr>
@@ -564,27 +579,32 @@ if ($savemsg) {
 							foreach ($rulem as $k2 => $v) {
 								$sid = snort_get_sid($v['rule']);
 								$gid = snort_get_gid($v['rule']);
+
 								if (isset($disablesid[$sid])) {
 									$textss = "<span class=\"gray\">";
 									$textse = "</span>";
 									$iconb = "icon_reject_d.gif";
 									$disable_cnt++;
+									$title = gettext("Disabled by user. Click to toggle to enabled state");
 								}
 								elseif (($v['disabled'] == 1) && (!isset($enablesid[$sid]))) {
 									$textss = "<span class=\"gray\">";
 									$textse = "</span>";
 									$iconb = "icon_block_d.gif";
 									$disable_cnt++;
+									$title = gettext("Disabled by default. Click to toggle to enabled state");
 								}
 								elseif (isset($enablesid[$sid])) {
 									$textss = $textse = "";
 									$iconb = "icon_reject.gif";
 									$enable_cnt++;
+									$title = gettext("Enabled by user. Click to toggle to disabled state");
 								}
 								else {
 									$textss = $textse = "";
 									$iconb = "icon_block.gif";
 									$enable_cnt++;
+									$title = gettext("Enabled by default. Click to toggle to disabled state");
 								}
 
 								// Pick off the first section of the rule (prior to the start of the MSG field),
@@ -611,7 +631,7 @@ if ($savemsg) {
 								<a id=\"rule_{$sid}\" href='?id={$id}&openruleset={$currentruleset}&act=toggle&ids={$sid}'>
 								<img src=\"../themes/{$g['theme']}/images/icons/{$iconb}\"
 								width=\"11\" height=\"11\" border=\"0\"  
-								title='" . gettext("Click to toggle enabled/disabled state") . "'></a>
+								title='{$title}'></a>
 								$textse
 							       </td>
 							       <td class=\"listlr\" align=\"center\">
@@ -638,8 +658,8 @@ if ($savemsg) {
 						?>
 								<td align="right" valign="middle" nowrap class="listt">
 									<a href="javascript: void(0)" 
-									onclick="wopen('snort_rules_edit.php?id=<?=$id;?>&openruleset=<?=$currentruleset;?>&ids=<?=$sid;?>&gid=<?=$gid;?>','FileViewer',800,600)"><img
-									src="../themes/<?= $g['theme']; ?>/images/icons/icon_right.gif" 
+									onclick="wopen('snort_rules_edit.php?id=<?=$id;?>&openruleset=<?=$currentruleset;?>&ids=<?=$sid;?>&gid=<?=$gid;?>','FileViewer',800,600)">
+									<img src="../themes/<?= $g['theme']; ?>/images/icons/icon_right.gif" 
 									title="<?php echo gettext("Click to view the entire rule text"); ?>" width="17" height="17" border="0"></a>
 								</td>
 							</tr>
