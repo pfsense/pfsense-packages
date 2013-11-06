@@ -2971,6 +2971,7 @@ function freeradius_modulesldap_resync() {
 	
 	// Variables for General Configuration ldap1
 	$varmodulesldapserver = ($arrmodulesldap['varmodulesldapserver']?$arrmodulesldap['varmodulesldapserver']:'ldap.your.domain');
+	$varmodulesldapserverport = ($arrmodulesldap['varmodulesldapserverport']?$arrmodulesldap['varmodulesldapserverport']:'389');
 	$varmodulesldapidentity = ($arrmodulesldap['varmodulesldapidentity']?$arrmodulesldap['varmodulesldapidentity']:'cn=admin,o=My Org,c=UA');
 	$varmodulesldappassword = ($arrmodulesldap['varmodulesldappassword']?$arrmodulesldap['varmodulesldappassword']:'mypass');
 	$varmodulesldapbasedn = ($arrmodulesldap['varmodulesldapbasedn']?$arrmodulesldap['varmodulesldapbasedn']:'o=My Org,c=UA');
@@ -2983,6 +2984,7 @@ function freeradius_modulesldap_resync() {
 	
 	// Variables for General Configuration ldap2
 	$varmodulesldap2server = ($arrmodulesldap['varmodulesldap2server']?$arrmodulesldap['varmodulesldap2server']:'ldap.your.domain');
+	$varmodulesldap2serverport = ($arrmodulesldap['varmodulesldap2serverport']?$arrmodulesldap['varmodulesldap2serverport']:'389');
 	$varmodulesldap2identity = ($arrmodulesldap['varmodulesldap2identity']?$arrmodulesldap['varmodulesldap2identity']:'cn=admin,o=My Org,c=UA');
 	$varmodulesldap2password = ($arrmodulesldap['varmodulesldap2password']?$arrmodulesldap['varmodulesldap2password']:'mypass');
 	$varmodulesldap2basedn = ($arrmodulesldap['varmodulesldap2basedn']?$arrmodulesldap['varmodulesldap2basedn']:'o=My Org,c=UA');
@@ -3237,6 +3239,7 @@ ldap {
 	#  Note that this needs to match the name in the LDAP
 	#  server certificate, if you're using ldaps.
 	server = "$varmodulesldapserver"
+	port = "$varmodulesldapserverport"
 	identity = "$varmodulesldapidentity"
 	password = $varmodulesldappassword
 	basedn = "$varmodulesldapbasedn"
@@ -3396,6 +3399,7 @@ ldap ldap2{
 	#  Note that this needs to match the name in the LDAP
 	#  server certificate, if you're using ldaps.
 	server = "$varmodulesldap2server"
+	port = "$varmodulesldap2serverport"
 	identity = "$varmodulesldap2identity"
 	password = $varmodulesldap2password
 	basedn = "$varmodulesldap2basedn"
