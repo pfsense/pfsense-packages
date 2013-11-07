@@ -429,7 +429,7 @@ EOD;
 							$hostname = (preg_match("/(MX|NS)/",$zone['row'][$y]['hosttype'])?"@":$zone['row'][$y]['hostname']);
 							$hosttype = $zone['row'][$y]['hosttype'];
 							$hostdst = $zone['row'][$y]['hostdst'];
-							if (preg_match("/[a-zA-Z]/",$hostdst) && !preg_match("/(TXT|SPF))/",$hosttype))
+							if (preg_match("/[a-zA-Z]/",$hostdst) && !preg_match("/(TXT|SPF)/",$hosttype))
 								$hostdst .= ".";
 							$hostvalue = $zone['row'][$y]['hostvalue'];
 							
@@ -578,10 +578,15 @@ EOD;
 	chown(CHROOT_LOCALBASE."/var/log","bind");
 	chown(CHROOT_LOCALBASE."/var/run/named","bind");
 	chgrp(CHROOT_LOCALBASE."/var/log","bind");
- 	if($bind_enable == "on")
- 		mwexec("/usr/local/etc/rc.d/named.sh restart");
- 	else
- 		mwexec("/usr/local/etc/rc.d/named.sh stop");
+	$bind_sh="/usr/local/etc/rc.d/named.sh";
+ 	if($bind_enable == "on"){
+ 		chmod ($bind_sh,0755);
+ 		mwexec("{$bind_sh} restart");
+ 		}
+ 	elseif (is_service_running('named')){
+ 		mwexec("{$bind_sh} stop");
+		chmod ($bind_sh,0644); 		
+ 		}
  	//sync to backup servers
  	bind_sync_on_changes();
  	conf_mount_ro();
