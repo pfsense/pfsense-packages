@@ -364,6 +364,7 @@
                                 <option><name>SRV</name><value>SRV</value></option>
                                 <option><name>PTR</name><value>PTR</value></option>
                                 <option><name>TXT</name><value>TXT</value></option>
+                                <option><name>SPF</name><value>SPF</value></option>
                         </options>
                         </rowhelperfield>
                         <rowhelperfield>

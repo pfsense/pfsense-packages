@@ -179,8 +179,8 @@ EOD;
 				$listenon=(pfSense_get_interface_addresses(convert_friendly_interface_to_real_interface_name($listenon)));
 				if (is_ipaddr($listenon['ipaddr']))
 					$bind_listenon .= $listenon['ipaddr']."; ";
-				elseif(is_ipaddrv6($listenon['ipaddr']))
-					$bind_listenonv6 .= $listenon['ipaddr']."; ";
+				if(is_ipaddrv6($listenon['ipaddr6']))
+					$bind_listenonv6 .= $listenon['ipaddr6']."; ";
 			}	
 		}
 	}
@@ -429,7 +429,7 @@ EOD;
 							$hostname = (preg_match("/(MX|NS)/",$zone['row'][$y]['hosttype'])?"@":$zone['row'][$y]['hostname']);
 							$hosttype = $zone['row'][$y]['hosttype'];
 							$hostdst = $zone['row'][$y]['hostdst'];
-							if (preg_match("/[a-zA-Z]/",$hostdst) && $hosttype !="TXT")
+							if (preg_match("/[a-zA-Z]/",$hostdst) && !preg_match("/(TXT|SPF))/",$hosttype))
 								$hostdst .= ".";
 							$hostvalue = $zone['row'][$y]['hostvalue'];
 							
