@@ -113,6 +113,11 @@
 		<chmod>0644</chmod>
 		<item>http://www.pfsense.com/packages/config/apache_mod_security-dev/apache_view_logs.php</item>
 	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/www/shortcuts/</prefix>
+		<chmod>0755</chmod>
+		<item>http://www.pfsense.org/packages/config/bind/pkg_apache.inc</item>
+	</additional_files_needed>
 	<tabs>
 		<tab>
 			<text>Apache</text>
@@ -150,9 +155,12 @@
 		</tab>
 	</tabs>
 	<adddeleteeditpagefields>
+		<movable>on</movable>
 		<columnitem>
 			<fielddescr>Status</fielddescr>
 			<fieldname>enable</fieldname>
+			<listmodeon>Enabled</listmodeon>
+			<listmodeoff>Disabled</listmodeoff>
 		</columnitem>
 		<columnitem>
 			<fielddescr>Iface</fielddescr>
@@ -267,11 +275,18 @@
 			<show_disable_value>none</show_disable_value>
 		</field>
 		<field>
+			<name><![CDATA[Location(s)]]></name>
+			<type>listtopic</type>
+		</field>
+		<field>
 			<fielddescr>
 				<![CDATA[Location(s)]]>
 			</fielddescr>
 			<fieldname>locations</fieldname>
 		    <type>rowhelper</type>
+		    <dontdisplayname/>
+			<usecolspan2/>
+			<movable>on</movable>
 		    <rowhelper>
 				<rowhelperfield>
 				    <fielddescr><![CDATA[gzip?]]></fielddescr>
@@ -288,7 +303,7 @@
 				    <fieldname>sitepath</fieldname>
 				    <description><![CDATA[Site path to publish.<br>leave blank to use /]]></description>
 				    <type>input</type>
-				    <size>5</size>
+				    <size>13</size>
 				</rowhelperfield>
 				<rowhelperfield>
 					<fielddescr><![CDATA[Balancer]]></fielddescr>
@@ -317,7 +332,7 @@
 				    <fieldname>backendpath</fieldname>
 				    <description><![CDATA[Backend redirect path.<br>Leave blank to use /]]></description>
 				    <type>input</type>
-				    <size>5</size>
+				    <size>13</size>
 				</rowhelperfield>
 				<rowhelperfield>
 					<fielddescr><![CDATA[ModSecurity]]></fielddescr>
@@ -344,7 +359,7 @@
 				    <fieldname>options</fieldname>
 				    <description><![CDATA[Additional proxypass options for this path.<br>ex: ttl=60 stickysession='JSESSIONID']]></description>
 				    <type>input</type>
-				    <size>5</size>
+				    <size>12</size>
 				</rowhelperfield>
 		    </rowhelper>
 		</field>
@@ -388,7 +403,6 @@
 			<rows>10</rows>
 			<encoding>base64</encoding>
 		</field>
-		
 	</fields>
 	<service>
 		<name>apache_mod_security</name>

@@ -27,7 +27,7 @@
 	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 	POSSIBILITY OF SUCH DAMAGE.
 */
-
+$shortcut_section = "apache";
 // Check to find out on which system the package is running
 $pf_version=substr(trim(file_get_contents("/etc/version")),0,3);
 if ($pf_version > 2.0)
@@ -127,20 +127,23 @@ function apache_mod_security_resync() {
 	global $config, $g;
 	apache_mod_security_install();
 	$dirs=array("base", "experimental","optional", "slr");
-	if (! file_exists(APACHEDIR ."/". MODSECURITY_DIR . "/LICENSE"))
-		exec ("tar -xzf /usr/local/pkg/modsecurity-crs_2.2.5.tar.gz -C ".APACHEDIR);
-	$write_config=0;
-	foreach ($dirs as $dir){
-		if ($handle = opendir(APACHEDIR ."/".MODSECURITY_DIR."/{$dir}_rules")) {
-		$write_config++;
-		$config['installedpackages']["modsecurityfiles{$dir}"]['config']=array();
-	    while (false !== ($entry = readdir($handle))) {
-    	    if (preg_match("/(\S+).conf/",$entry,$matches))
-    	    	$config["installedpackages"]["modsecurityfiles{$dir}"]["config"][]=array("file"=>$matches[1]);
-    		}
-    	closedir($handle);
+	$ms_file="/usr/local/pkg/modsecurity-crs_2.2.5.tar.gz";
+	if (file_exists($ms_file)){
+		if (! file_exists(APACHEDIR ."/". MODSECURITY_DIR . "/LICENSE"))
+			exec ("tar -xzf $ms_file -C ".APACHEDIR);
+		$write_config=0;
+		foreach ($dirs as $dir){
+			if ($handle = opendir(APACHEDIR ."/".MODSECURITY_DIR."/{$dir}_rules")) {
+				$write_config++;
+				$config['installedpackages']["modsecurityfiles{$dir}"]['config']=array();
+			    while (false !== ($entry = readdir($handle))) {
+		    	    if (preg_match("/(\S+).conf/",$entry,$matches))
+		    	    	$config["installedpackages"]["modsecurityfiles{$dir}"]["config"][]=array("file"=>$matches[1]);
+		    		}
+		    	closedir($handle);
+				}
+			}
 		}
-	}
 	if ($write_config > 0)
 		write_config();
 	apache_mod_security_checkconfig();
@@ -230,7 +233,8 @@ function generate_apache_configuration() {
 	
 	//performance settings
 	//reference http://httpd.apache.org/docs/2.2/mod/mpm_common.html
-	$performance_settings="KeepAlive {$settings['keepalive']}\n";
+	$keepalive=($settings['keepalive']?$settings['keepalive']:"on");
+	$performance_settings="KeepAlive {$keepalive}\n";
 	if ($settings['maxkeepalivereq'])
 		$performance_settings .= "MaxKeepAliveRequests {$settings['maxkeepalivereq']}\n";
 	if ($settings['keepalivetimeout'])
@@ -313,6 +317,8 @@ function generate_apache_configuration() {
 		}
 		
 	//configure virtual hosts
+	$namevirtualhosts=array();
+	$namevirtualhosts[0]=$global_listen;
 	if (is_array($config['installedpackages']['apachevirtualhost'])){
 		$vh_config= <<<EOF
 ##################################################################################
@@ -332,6 +338,9 @@ EOF;
 				$iface_address = apache_get_real_interface_address($virtualhost['interface']);
 				$ip=$iface_address[0];
 				$port=($virtualhost['port'] ? $virtualhost['port'] : $default_port[$virtualhost['proto']]);
+				if (!in_array("{$ip}:{$port}",$namevirtualhosts))
+					$namevirtualhosts[]="{$ip}:{$port}";
+				
 				$vh_config.="# {$virtualhost['description']}\n";
 				$vh_config.="<VirtualHost {$ip}:{$port}>\n";
 				$vh_config.=" ServerName ". preg_replace ("/\r\n(\S+)/","\n ServerAlias $1",base64_decode($virtualhost['primarysitehostname'])) ."\n";
@@ -487,31 +496,22 @@ EOF;
 		
 	// clear list of bound addresses before updating
 	$config['installedpackages']['apachesettings']['config'][0]['row'] = array();
-
 	// Process proxy sites
 	// Configure NameVirtualHost directives
 	$aliases = "";
-	$processed = array();
-	if(is_array($config['installedpackages']['apachemodsecurity'])) {
-		foreach($config['installedpackages']['apachemodsecurity']['config'] as $ams) {
-			if($ams['ipaddress'] && $ams['port']) 
-				$local_ip_port = "{$ams['ipaddress']}:{$ams['port']}";
-			else 
-				$local_ip_port = $global_listen;
-			// Do not add entries twice.
-			if(!in_array($local_ip_port, $processed)) {
-				// explicit bind if not global ip:port
-				if ($local_ip_port != $global_listen) {
-					$aliases .= "Listen $local_ip_port\n";
-					// Automatically add this to configuration
-					$config['installedpackages']['apachesettings']['config'][0]['row'][] = array('ipaddress' => $ams['ipaddress'], 'ipport' => $ams['port']); 
-				}
-				$mod_proxy .= "NameVirtualHost $local_ip_port\n";
-				$processed[] = $local_ip_port;
+	//add NameVirtualHost and listening entries to configured virtualhosts 
+	foreach ($namevirtualhosts as $namevirtualhost){
+		// explicit bind if not global ip:port
+		if ($namevirtualhost != $global_listen) {
+			$mod_proxy .= "NameVirtualHost {$namevirtualhost}\n";
+			$aliases .= "Listen $namevirtualhost\n";
+			// Automatically add this to configuration
+			$aplisten=split(":",$namevirtualhost);
+			$config['installedpackages']['apachesettings']['config'][0]['row'][] = array('ipaddress' => $aplisten[0], 'ipport' => $aplisten[1]);
 			}
 		}
-	}
 
+	
 //** Uncomment to allow adding ip/ports not used by any site proxies
 //** Otherwise unused addresses/ports will be automatically deleted from the configuration
 //	foreach ($configuredaliases as $ams) {
