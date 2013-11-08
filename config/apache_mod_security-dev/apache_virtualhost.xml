@@ -116,7 +116,7 @@
 	<additional_files_needed>
 		<prefix>/usr/local/www/shortcuts/</prefix>
 		<chmod>0755</chmod>
-		<item>http://www.pfsense.org/packages/config/bind/pkg_apache.inc</item>
+		<item>http://www.pfsense.org/packages/config/apache_mod_security-dev/pkg_apache.inc</item>
 	</additional_files_needed>
 	<tabs>
 		<tab>
