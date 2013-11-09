@@ -35,7 +35,7 @@ if ($pf_version > 2.0)
 else
   define('APACHEDIR', '/usr/local');
 // End of system check
-define ('MODSECURITY_DIR','modsecurity-crs_2.2.5');
+define ('MODSECURITY_DIR','crs');
 // Rules directory location
 define("rules_directory", APACHEDIR . "/". MODSECURITY_DIR);
 function apache_textarea_decode($base64){
@@ -56,10 +56,6 @@ function apache_get_real_interface_address($iface) {
 
 // Ensure NanoBSD can write. pkg_mgr will remount RO
 conf_mount_rw();
-
-// Needed mod_security directories
-if(!is_dir(APACHEDIR . "/". MODSECURITY_DIR)) 
-	safe_mkdir(APACHEDIR . "/". MODSECURITY_DIR);
 
 // Startup function
 function apache_mod_security_start() {
@@ -127,23 +123,23 @@ function apache_mod_security_resync() {
 	global $config, $g;
 	apache_mod_security_install();
 	$dirs=array("base", "experimental","optional", "slr");
-	$ms_file="/usr/local/pkg/modsecurity-crs_2.2.5.tar.gz";
-	if (file_exists($ms_file)){
-		if (! file_exists(APACHEDIR ."/". MODSECURITY_DIR . "/LICENSE"))
-			exec ("tar -xzf $ms_file -C ".APACHEDIR);
-		$write_config=0;
-		foreach ($dirs as $dir){
-			if ($handle = opendir(APACHEDIR ."/".MODSECURITY_DIR."/{$dir}_rules")) {
-				$write_config++;
-				$config['installedpackages']["modsecurityfiles{$dir}"]['config']=array();
-			    while (false !== ($entry = readdir($handle))) {
-		    	    if (preg_match("/(\S+).conf/",$entry,$matches))
-		    	    	$config["installedpackages"]["modsecurityfiles{$dir}"]["config"][]=array("file"=>$matches[1]);
-		    		}
-		    	closedir($handle);
+	if (! file_exists(APACHEDIR ."/". MODSECURITY_DIR . "/LICENSE")){
+		exec ("/usr/local/bin/git clone https://github.com/SpiderLabs/owasp-modsecurity-crs.git ".APACHEDIR."/".MODSECURITY_DIR);
+		//chdir (APACHEDIR."/".MODSECURITY_DIR);
+		//exec ("/usr/local/bin/git checkout -q 2.2.8");
+	}
+	$write_config=0;
+	foreach ($dirs as $dir){
+		if ($handle = opendir(APACHEDIR ."/".MODSECURITY_DIR."/{$dir}_rules")) {
+			$write_config++;
+			$config['installedpackages']["modsecurityfiles{$dir}"]['config']=array();
+			while (false !== ($entry = readdir($handle))) {
+				if (preg_match("/(\S+).conf/",$entry,$matches))
+					$config["installedpackages"]["modsecurityfiles{$dir}"]["config"][]=array("file"=>$matches[1]);
 				}
+			closedir($handle);
 			}
-		}
+			}
 	if ($write_config > 0)
 		write_config();
 	apache_mod_security_checkconfig();
