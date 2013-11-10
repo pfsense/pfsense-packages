@@ -435,6 +435,14 @@ EOD;
 							
 							$zone_conf .= "$hostname \t IN $hosttype $hostvalue \t$hostdst\n";
 						}
+        					if (($zone[regdhcpstatic] == 'on') && is_array($config['dhcpd'])) {
+                					foreach ($config['dhcpd'] as $dhcpif => $dhcpifconf)
+                        					if(is_array($dhcpifconf['staticmap']) && isset($dhcpifconf['enable']))
+                                					foreach ($dhcpifconf['staticmap'] as $host)
+                                        					if ($host['ipaddr'] && $host['hostname']) {
+											$zone_conf .= "{$host['hostname']}\tIN A\t{$host['ipaddr']}\n";
+                                        					}
+    						}
 						if ($zone['customzonerecords']!=""){
 							$zone_conf .= "\n\n;\n;custom zone records\n;\n".base64_decode($zone['customzonerecords'])."\n";
 						}
@@ -609,6 +617,7 @@ function bind_print_javascript_type_zone(){
 					document.iform.forwarders.disabled = 1;
 					document.iform.dnssec.disabled = 0;
 					document.iform.backupkeys.disabled = 0;
+					document.iform.regdhcpstatic.disabled = 0;
 					document.iform.ipns.disabled = 0;
 					document.iform.mail.disabled = 0;
 					document.iform.serial.disabled = 0;
@@ -625,6 +634,7 @@ function bind_print_javascript_type_zone(){
 					document.iform.forwarders.disabled = 1;
 					document.iform.dnssec.disabled = 0;
 					document.iform.backupkeys.disabled = 0;
+					document.iform.regdhcpstatic.disabled = 0;
 					document.iform.ipns.disabled = 1;
 					document.iform.mail.disabled = 1;
 					document.iform.serial.disabled = 1;
@@ -641,6 +651,7 @@ function bind_print_javascript_type_zone(){
 					document.iform.forwarders.disabled = 0;
 					document.iform.dnssec.disabled = 1;
 					document.iform.backupkeys.disabled = 1;
+					document.iform.regdhcpstatic.disabled = 1;
 					document.iform.ipns.disabled = 1;
 					document.iform.mail.disabled = 1;
 					document.iform.serial.disabled = 1;
@@ -657,6 +668,7 @@ function bind_print_javascript_type_zone(){
 					document.iform.forwarders.disabled = 1;
 					document.iform.dnssec.disabled = 1;
 					document.iform.backupkeys.disabled = 1;
+					document.iform.regdhcpstatic.disabled = 1;
 					document.iform.ipns.disabled = 1;
 					document.iform.mail.disabled = 0;
 					document.iform.serial.disabled = 0;

@@ -72,7 +72,6 @@
                 <tab>
                         <text>Zones</text>
                         <url>/pkg.php?xml=bind_zones.xml&amp;id=0</url>
-                        <active/>
                 </tab>
                 <tab>
                         <text>Sync</text>
@@ -384,6 +383,12 @@
                         <movable>on</movable>
                     </rowhelper>
                 </field>
+		<field>
+			<fieldname>regdhcpstatic</fieldname>
+			<fielddescr>Register DHCP static mappings</fielddescr>
+			<description>If this option is set, then DHCP static mappings will be registered in DNS, so that their name can be resolved.</description>
+			<type>checkbox</type>
+        </field>
 		<field>
 			<type>listtopic</type>
 			<name>Custom Zone Domain records</name>
