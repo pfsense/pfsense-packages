@@ -238,6 +238,9 @@ EOD;
 		$bind_conf .="\t\t};\n\n";				
 				}
 		 }
+	else {
+		$bind_conf .="\t\tlogging { category default { null; }; };\n\n";				
+	}
 
 	#Config Zone domain
 	if(!is_array($config["installedpackages"]["bindacls"]) || !is_array($config["installedpackages"]["bindacls"]["config"])){
