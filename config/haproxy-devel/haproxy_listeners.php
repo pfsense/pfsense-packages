@@ -166,9 +166,9 @@ include("head.inc");
 						
 					$isadvset = "";
 					if ($frontend['advanced_bind']) $isadvset .= "Advanced bind: {$frontend['advanced_bind']}\r\n";
-					if ($frontend['advanced']) $isadvset .= "advanced settings used\r\n";
+					if ($frontend['advanced']) $isadvset .= "Advanced pass thru setting used\r\n";
 					if ($isadvset)
-						echo "<img src=\"$img_adv\" title=\"" . gettext("advanced settings set") . ": {$isadvset}\" border=\"0\">";				
+						echo "<img src=\"$img_adv\" title=\"" . gettext("Advanced settings set") . ": {$isadvset}\" border=\"0\">";				
 					
 					?>
 				  </td>
