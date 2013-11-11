@@ -96,6 +96,15 @@ $a_httpcheck_method['PUT']     = array('name' => 'PUT', 'syntax' => 'PUT');
 $a_httpcheck_method['DELETE']  = array('name' => 'DELETE', 'syntax' => 'DELETE');
 $a_httpcheck_method['TRACE']   = array('name' => 'TRACE', 'syntax' => 'TRACE');
 
+$a_closetypes['none'] = array('name' => 'none', 'syntax' => '',
+	'descr' => 'No close headers will be changed.');
+$a_closetypes['httpclose'] = array('name' => 'httpclose', 'syntax' => 'httpclose',
+	'descr' => 'The "httpclose" option removes any "Connection" header both ways, and adds a "Connection: close" header in each direction. This makes it easier to disable HTTP keep-alive than the previous 4-rules block.');
+$a_closetypes['http-server-close'] = array('name' => 'http-server-close', 'syntax' => 'http-server-close',
+	'descr' => 'By default, when a client communicates with a server, HAProxy will only analyze, log, and process the first request of each connection. Setting "option http-server-close" enables HTTP connection-close mode on the server side while keeping the ability to support HTTP keep-alive and pipelining on the client side.  This provides the lowest latency on the client side (slow network) and the fastest session reuse on the server side to save server resources.');
+$a_closetypes['forceclose'] = array('name' => 'forceclose', 'syntax' => 'forceclose',
+	'descr' => 'Some HTTP servers do not necessarily close the connections when they receive the "Connection: close" set by "option httpclose", and if the client does not close either, then the connection remains open till the timeout expires. This causes high number of simultaneous connections on the servers and shows high global session times in the logs. Note that this option also enables the parsing of the full request and response, which means we can close the connection to the server very quickly, releasing some resources earlier than with httpclose.');
+
 function haproxy_custom_php_deinstall_command() {
 	exec("cd /var/db/pkg && pkg_delete `ls | grep haproxy`");
 	exec("rm /usr/local/pkg/haproxy.inc");
@@ -194,6 +203,7 @@ EOD;
 	fclose($fd);
 	exec("/etc/rc.d/devd restart");
 
+	$writeconfigupdate = false;
 	/* Do XML upgrade from haproxy 0.31 to haproxy-dev */
 	if (is_array($config['installedpackages']['haproxy']['ha_servers'])) {
 		/* We have an old config */
@@ -237,7 +247,7 @@ EOD;
 			$a_pools[] = $pool;
 		}
 		unset($config['installedpackages']['haproxy']['ha_servers']);
-		write_config();
+		$writeconfigupdate = true;
 	}
 	
 	/* XML update to: pkg v1.3 and 'pool' changed to 'backend_serverpool' because 'pool' was added to listtags() in xmlparse.inc */
@@ -249,7 +259,7 @@ EOD;
 			$frontend['backend_serverpool'] = $backend_serverpool;
 			unset($frontend['pool']);
 		}
-		write_config();
+		$writeconfigupdate = true;
 	}
 	//also move setting for existing 2.0 installations as only the new variable is used 
 	if (isset($config['installedpackages']['haproxy']['ha_backends']['item'][0]['pool']))
@@ -260,9 +270,21 @@ EOD;
 			$frontend['backend_serverpool'] = $backend_serverpool;
 			unset($frontend['pool']);
 		}
-		write_config();
+		$writeconfigupdate = true;
 	}
-
+	// update config to "haproxy-devel 1.5-dev19 pkg v0.5"
+	$a_backends = &$config['installedpackages']['haproxy']['ha_backends']['item'];
+	if(is_array($a_backends)) {
+		foreach ($a_backends as &$bind) {
+			if($bind['httpclose'] && $bind['httpclose'] == "yes" ) {
+				$bind['httpclose'] = "httpclose";
+				$writeconfigupdate = true;
+			}
+		}
+	}
+	if ($writeconfigupdate)
+		write_config("haproxy, update xml config version");
+	
 	conf_mount_ro();
 
 	exec("/usr/local/etc/rc.d/haproxy.sh start");
@@ -296,7 +318,7 @@ function haproxy_install_cron($should_install) {
 				$cron_item['command'] = "/usr/local/etc/rc.d/haproxy.sh check";		
 				$config['cron']['item'][] = $cron_item;
 				parse_config(true);
-				write_config();
+				write_config("haproxy, install cron CARP job");
 				configure_cron();
 			}
 		break;
@@ -305,7 +327,7 @@ function haproxy_install_cron($should_install) {
 				if($x > 0) {
 					unset($config['cron']['item'][$x]);
 					parse_config(true);
-					write_config();
+					write_config("haproxy, remove cron CARP job");
 				}
 				configure_cron();
 			}
@@ -672,8 +694,8 @@ function haproxy_writeconf($configfile) {
 
 			if ($backend_type == 'http')
 			{
-				if($bind['httpclose']) 
-					fwrite ($fd, "\toption\t\t\thttpclose\n");
+				if($bind['httpclose'] && $bind['httpclose'] != "none" ) 
+					fwrite ($fd, "\toption\t\t\t{$bind['httpclose']}\n");
 
 				if($bind['forwardfor']) {
 					fwrite ($fd, "\toption\t\t\tforwardfor\n");
@@ -962,7 +984,7 @@ function haproxy_sync_xmlrpc_settings() {
 	// restore 'old' settings.
 	$config['installedpackages']['haproxy']['enablesync'] = $enable ? true : false;
 	
-	write_config("HAPROXY xmlrpc config synced"); // Write new 'merged' configuration
+	write_config("haproxy, xmlrpc config synced"); // Write new 'merged' configuration
 }
 
 function haproxy_do_xmlrpc_sync() {

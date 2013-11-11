@@ -463,6 +463,12 @@ include("head.inc");
 		setCSSdisplay(".haproxy_secondary", secondary.checked);
 		
 		type_change(type);
+		
+		http_close = d.getElementById("httpclose").value;
+		http_close_description = d.getElementById("http_close_description");
+		http_close_description.innerHTML=closetypes[http_close]["descr"];
+		http_close_description.setAttribute('style','padding:5px; border:1px dashed #990000; background-color: #ffffff; color: #000000; font-size: 8pt; height:30px');
+		http_close_description.setAttribute('style','padding:5px; border:1px dashed #990000; background-color: #ffffff; color: #000000; font-size: 8pt; height:'+http_close_description.scrollHeight+'px');
 	}
 	
 	function type_change(type) {
@@ -698,11 +704,10 @@ include("head.inc");
 		<tr align="left" class="haproxy_mode_http">
 			<td width="22%" valign="top" class="vncell">Use 'httpclose' option</td>
 			<td width="78%" class="vtable" colspan="2">
-				<input id="httpclose" name="httpclose" type="checkbox" value="yes" <?php if ($pconfig['httpclose']=='yes') echo "checked"; ?>>
-				<br/>
-				The 'httpclose' option removes any 'Connection' header both ways, and
-				adds a 'Connection: close' header in each direction. This makes it easier to
-				disable HTTP keep-alive than the previous 4-rules block.
+				<?
+					echo_html_select("httpclose",$a_closetypes,$pconfig['httpclose']?$pconfig['httpclose']:"none","","updatevisibility();");
+				?><br/>
+				<textarea readonly="yes" cols="70" rows="3" id="http_close_description" name="http_close_description" style="padding:5px; border:1px dashed #990000; background-color: #ffffff; color: #000000; font-size: 8pt;"></textarea>
 			</td>
 		</tr>
 		<tr align="left">
@@ -790,6 +795,8 @@ include("head.inc");
 <script type="text/javascript">
 <?
 	phparray_to_javascriptarray($primaryfrontends,"primaryfrontends",Array('/*','/*/name','/*/ref','/*/ref/type','/*/ref/ssloffload'));
+	phparray_to_javascriptarray($a_closetypes,"closetypes",Array('/*','/*/name','/*/descr'));
+	
 ?>
 
 </script>
