@@ -9,7 +9,7 @@
 /*
     mailscanner_antivirus.xml
     part of the mailscaner package for pfSense
-    Copyright (C) 2011 Marcello Coutinho
+    Copyright (C) 2011-2013 Marcello Coutinho
     All rights reserved.            
                                                                   */
 /* ========================================================================== */
@@ -159,11 +159,17 @@
 				<size>30</size>
 		</field>
 		<field>
+			<name>Custom antivirus options</name>
+			<type>listtopic</type>
+		</field>
+		<field>
 			<fielddescr>Custom antivirus options</fielddescr>
 			<fieldname>custom</fieldname>
+			<dontdisplayname/>
+			<usecolspan2/>
 			<description><![CDATA[Paste your custom mailscanner antivirus settings here.]]></description>
 			<type>textarea</type>
-			<cols>60</cols>
+			<cols>90</cols>
 			<rows>15</rows>
 			<encoding>base64</encoding>
 		</field>

@@ -9,7 +9,7 @@
 /*
     mailscanner_attachments.xml
     part of the mailscaner package for pfSense
-    Copyright (C) 2011 Marcello Coutinho
+    Copyright (C) 2011-2013 Marcello Coutinho
     All rights reserved.            
                                                                   */
 /* ========================================================================== */
@@ -174,24 +174,32 @@
 				<size>5</size>
 		</field>
 		<field>
-			<name>Fileset rules</name>
+			<name>filename.rules.conf</name>
 			<type>listtopic</type>
 		</field>
 		<field>
 			<fielddescr>filename.rules.conf</fielddescr>
 			<fieldname>filename_rules</fieldname>
+			<dontdisplayname/>
+			<usecolspan2/>
 			<description><![CDATA[Edit archives.filename.rules.conf file here.<br>Leave this field blank to load sample file.]]></description>
 			<type>textarea</type>
-			<cols>85</cols>
+			<cols>90</cols>
 			<rows>15</rows>
 			<encoding>base64</encoding>
 		</field>
-				<field>
+		<field>
+			<name>filetypes.rules.conf</name>
+			<type>listtopic</type>
+		</field>
+		<field>
 			<fielddescr>filetypes.rules.conf</fielddescr>
 			<fieldname>filetype_rules</fieldname>
+			<dontdisplayname/>
+			<usecolspan2/>
 			<description><![CDATA[Edit archives.filetype.rules.conf file here.<br>Leave this field blank to load sample file.]]></description>
 			<type>textarea</type>
-			<cols>85</cols>
+			<cols>90</cols>
 			<rows>15</rows>
 			<encoding>base64</encoding>
 		</field>

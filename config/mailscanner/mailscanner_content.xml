@@ -9,7 +9,7 @@
 /*
     mailscanner_contents.xml
     part of the mailscaner package for pfSense
-    Copyright (C) 2011 Marcello Coutinho
+    Copyright (C) 2011-2013 Marcello Coutinho
     All rights reserved.            
                                                                   */
 /* ========================================================================== */
@@ -114,13 +114,13 @@
 				<multiple/>
 		</field>
 		<field>
-			<fielddescr>Allow IFrame Tags</fielddescr>
+			<fielddescr>IFrame Tags</fielddescr>
 			<fieldname>iframe_tags</fieldname>
 			<type>select</type>
  				<options>
- 				<option><name>disarm</name><value>disarm</value></option>
-				<option><name>yes</name><value>yes</value></option>
-				<option><name>no</name><value>no</value></option>
+ 				<option><name>Disarm</name><value>disarm</value></option>
+				<option><name>Allow</name><value>yes</value></option>
+				<option><name>Deny</name><value>no</value></option>
 				</options>
 			<description><![CDATA[Do you want to allow 'IFrame' tags in email messages?<br>
 					This is not a good idea as it allows various Microsoft Outlook security vulnerabilities to remain unprotected, but if you have a load of mailing lists sending them,
@@ -128,39 +128,39 @@
 			</description>
 		</field>
 			<field>
-			<fielddescr>Allow Form Tags</fielddescr>
+			<fielddescr>Form Tags</fielddescr>
 			<fieldname>form_tags</fieldname>
 			<type>select</type>
  				<options>
  				<option><name>disarm</name><value>disarm</value></option>
-				<option><name>yes</name><value>yes</value></option>
-				<option><name>no</name><value>no</value></option>
+				<option><name>Allow</name><value>yes</value></option>
+				<option><name>Deny</name><value>no</value></option>
 				</options>
 			<description><![CDATA[Do you want to allow 'Form' tags in email messages?<br>
 								This is a bad idea as these are used as scams to pursuade people to part with credit card information and other personal data.]]>
 			</description>
 		</field>
 			<field>
-			<fielddescr>Allow Script Tags</fielddescr>
+			<fielddescr>Script Tags</fielddescr>
 			<fieldname>script_tags</fieldname>
 			<type>select</type>
  				<options>
- 				<option><name>disarm</name><value>disarm</value></option>
-				<option><name>yes</name><value>yes</value></option>
-				<option><name>no</name><value>no</value></option>
+ 				<option><name>Disarm</name><value>disarm</value></option>
+				<option><name>Allow</name><value>yes</value></option>
+				<option><name>Deny</name><value>no</value></option>
 				</options>
 			<description><![CDATA[Do you want to allow 'Script' tags in email messages?<br>
 								This is a bad idea as these are used to exploit vulnerabilities in email applications and web browsers.]]>
 			</description>
 		</field>
 			<field>
-			<fielddescr>Allow web bugs</fielddescr>
+			<fielddescr>Web bugs</fielddescr>
 			<fieldname>web_bugs</fieldname>
 			<type>select</type>
  				<options>
- 				<option><name>disarm</name><value>disarm</value></option>
-				<option><name>yes</name><value>yes</value></option>
-				<option><name>no</name><value>no</value></option>
+ 				<option><name>Disarm</name><value>disarm</value></option>
+				<option><name>Allow</name><value>yes</value></option>
+				<option><name>Deny</name><value>no</value></option>
 				</options>
 			<description><![CDATA[Do you want to allow 'Img' tags with very small images in email messages?<br>
 								This is a bad idea as these are used as 'web bugs' to find out if a message	has been read.<br>
@@ -168,13 +168,13 @@
 			</description>
 		</field>
 			<field>
-			<fielddescr>Allow Object Codebase Tags</fielddescr>
+			<fielddescr>Object Codebase Tags</fielddescr>
 			<fieldname>codebase_tags</fieldname>
 			<type>select</type>
  				<options>
  				<option><name>disarm</name><value>disarm</value></option>
-				<option><name>yes</name><value>yes</value></option>
-				<option><name>no</name><value>no</value></option>
+				<option><name>allow</name><value>yes</value></option>
+				<option><name>deny</name><value>no</value></option>
 				</options>
 			<description><![CDATA[Do you want to allow <strong>'Object Codebase=...' or 'Object Data=...'</strong> tags in email messages?<br>
 								This is a bad idea as it leaves you unprotected against various	Microsoft-specific security vulnerabilities.<br>
@@ -182,33 +182,47 @@
 			</description>
 		</field>
 		<field>
-			<name>Phishing files</name>
+			<name>phishing.safe.sites.conf</name>
 			<type>listtopic</type>
 		</field>
 		<field>
 			<fielddescr>phishing.safe.sites.conf</fielddescr>
 			<fieldname>phishing_safe</fieldname>
-			<description><![CDATA[edit phishing.safe.sites.conf file here.<br>If you leave this field blank, it will load sample file.]]></description>
+			<dontdisplayname/>
+			<usecolspan2/>
+			<description><![CDATA[phishing.safe.sites.conf config file.<br>Leave this field blank to load sample file.]]></description>
 			<type>textarea</type>
-			<cols>70</cols>
-			<rows>15</rows>
-			<encoding>base64</encoding>
-		</field>
-				<field>
-			<fielddescr>phishing.bad.sites.conf</fielddescr>
-			<fieldname>phishing_bad</fieldname>
-			<description><![CDATA[edit phishing.bad.sites.conf file here.<br>If you leave this field blank, it will load sample file.]]></description>
-			<type>textarea</type>
-			<cols>70</cols>
+			<cols>90</cols>
 			<rows>15</rows>
 			<encoding>base64</encoding>
 		</field>
 		<field>
+			<name>phishing.bad.sites.conf</name>
+			<type>listtopic</type>
+		</field>
+		<field>
+			<fielddescr>phishing.bad.sites.conf</fielddescr>
+			<fieldname>phishing_bad</fieldname>
+			<dontdisplayname/>
+			<usecolspan2/>
+			<description><![CDATA[phishing.bad.sites.conf config file.<br>Leave this field blank to load sample file.]]></description>
+			<type>textarea</type>
+			<cols>90</cols>
+			<rows>15</rows>
+			<encoding>base64</encoding>
+		</field>
+		<field>
+			<name>country.domains.conf</name>
+			<type>listtopic</type>
+		</field>
+		<field>
 			<fielddescr>country.domains.conf</fielddescr>
 			<fieldname>country_domains</fieldname>
-			<description><![CDATA[edit country.domains.conf file here.<br>If you leave this field blank, it will load sample file.]]></description>
+			<dontdisplayname/>
+			<usecolspan2/>
+			<description><![CDATA[country.domains.conf config file.<br>Leave this field blank to load sample file.]]></description>
 			<type>textarea</type>
-			<cols>70</cols>
+			<cols>90</cols>
 			<rows>15</rows>
 			<encoding>base64</encoding>
 		</field>

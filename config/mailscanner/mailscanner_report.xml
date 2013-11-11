@@ -9,7 +9,7 @@
 /*
     mailscanner_report.xml
     part of the mailscaner package for pfSense
-    Copyright (C) 2011 Marcello Coutinho
+    Copyright (C) 2011-2013 Marcello Coutinho
     All rights reserved.            
                                                                   */
 /* ========================================================================== */
@@ -88,6 +88,31 @@
 		<field>
 			<name>Reports and Responses</name>
 			<type>listtopic</type>
+		</field>
+		<field>
+			<fielddescr>Language</fielddescr>
+			<fieldname>language</fieldname>
+			<description>
+			<![CDATA[Select report language.]]>
+			</description>
+	    	<type>select</type>
+ 				<options>
+ 				<option><name>EN (Default)</name><value>en</value></option>
+				<option><name>CA</name><value>ca</value></option>
+				<option><name>CY+EN</name><value>cy+en</value></option>
+				<option><name>CZ</name><value>cz</value></option>
+				<option><name>DE</name><value>de</value></option>
+				<option><name>DK</name><value>dk</value></option>
+				<option><name>ES</name><value>es</value></option>
+				<option><name>FR</name><value>fr</value></option>
+				<option><name>HU</name><value>hu</value></option>
+				<option><name>IT</name><value>it</value></option>
+				<option><name>NL</name><value>nl</value></option>
+				<option><name>PT_BR</name><value>pt_br</value></option>
+				<option><name>RO</name><value>ro</value></option>
+				<option><name>SE</name><value>se</value></option>
+				<option><name>SK</name><value>sk</value></option>
+				</options>
 		</field>
 		<field>
 			<fielddescr>Reports</fielddescr>
@@ -177,46 +202,29 @@
 				<size>20</size>
 		</field>
 		<field>
-			<name>Message Reports</name>
+			<name>Deleted Bad Content</name>
 			<type>listtopic</type>
 		</field>
 		<field>
-			<fielddescr>Language</fielddescr>
-			<fieldname>language</fieldname>
-			<description>
-			<![CDATA[Select report language.]]>
-			</description>
-	    	<type>select</type>
- 				<options>
- 				<option><name>EN (Default)</name><value>en</value></option>
-				<option><name>CA</name><value>ca</value></option>
-				<option><name>CY+EN</name><value>cy+en</value></option>
-				<option><name>CZ</name><value>cz</value></option>
-				<option><name>DE</name><value>de</value></option>
-				<option><name>DK</name><value>dk</value></option>
-				<option><name>ES</name><value>es</value></option>
-				<option><name>FR</name><value>fr</value></option>
-				<option><name>HU</name><value>hu</value></option>
-				<option><name>IT</name><value>it</value></option>
-				<option><name>NL</name><value>nl</value></option>
-				<option><name>PT_BR</name><value>pt_br</value></option>
-				<option><name>RO</name><value>ro</value></option>
-				<option><name>SE</name><value>se</value></option>
-				<option><name>SK</name><value>sk</value></option>
-				</options>
-		</field>
-				<field>
 			<fielddescr>Deleted Bad Content</fielddescr>
 			<fieldname>deletedbadcontent</fieldname>
+			<dontdisplayname/>
+			<usecolspan2/>
 			<description><![CDATA[Edit deleted.content.message.txt file here.<br>Leave this field blank to load sample file.]]></description>
 			<type>textarea</type>
 			<cols>90</cols>
 			<rows>15</rows>
 			<encoding>base64</encoding>
 		</field>
-			<field>
+		<field>
+			<name>Deleted Bad Filename</name>
+			<type>listtopic</type>
+		</field>
+		<field>
 			<fielddescr>Deleted Bad Filename</fielddescr>
 			<fieldname>deletedbadfilename</fieldname>
+			<dontdisplayname/>
+			<usecolspan2/>
 			<description><![CDATA[Edit deleted.filename.message.txt file here.<br>Leave this field blank to load sample file.]]></description>
 			<type>textarea</type>
 			<cols>90</cols>
@@ -224,8 +232,14 @@
 			<encoding>base64</encoding>
 		</field>
 		<field>
+			<name>Deleted Virus</name>
+			<type>listtopic</type>
+		</field>
+		<field>
 			<fielddescr>Deleted Virus</fielddescr>
 			<fieldname>deletedvirus</fieldname>
+			<dontdisplayname/>
+			<usecolspan2/>
 			<description><![CDATA[Edit deleted.virus.message.txt file here.<br>Leave this field blank to load sample file.]]></description>
 			<type>textarea</type>
 			<cols>90</cols>
@@ -233,35 +247,59 @@
 			<encoding>base64</encoding>
 		</field>
 		<field>
+			<name>Deleted Size</name>
+			<type>listtopic</type>
+		</field>
+		<field>
 			<fielddescr>Deleted Size</fielddescr>
 			<fieldname>deletedsize</fieldname>
+			<dontdisplayname/>
+			<usecolspan2/>
 			<description><![CDATA[Edit deleted.size.message.txt file here.<br>Leave this field blank to load sample file.]]></description>
 			<type>textarea</type>
 			<cols>90</cols>
 			<rows>15</rows>
 			<encoding>base64</encoding>
 		</field>
-				<field>
+		<field>
+			<name>Stored Bad Content</name>
+			<type>listtopic</type>
+		</field>
+		<field>
 			<fielddescr>Stored Bad Content</fielddescr>
 			<fieldname>storedbadcontent</fieldname>
+			<dontdisplayname/>
+			<usecolspan2/>
 			<description><![CDATA[Edit stored.content.message.txt file here.<br>Leave this field blank to load sample file.]]></description>
 			<type>textarea</type>
 			<cols>90</cols>
 			<rows>15</rows>
 			<encoding>base64</encoding>
 		</field>
-				<field>
+		<field>
+			<name>Stored Bad Filename</name>
+			<type>listtopic</type>
+		</field>
+		<field>
 			<fielddescr>Stored Bad Filename</fielddescr>
 			<fieldname>storedbadfilename</fieldname>
+			<dontdisplayname/>
+			<usecolspan2/>
 			<description><![CDATA[Edit stored.filename.message.txt file here.<br>Leave this field blank to load sample file.]]></description>
 			<type>textarea</type>
 			<cols>90</cols>
 			<rows>15</rows>
 			<encoding>base64</encoding>
 		</field>
-				<field>
+		<field>
+			<name>Stored Virus</name>
+			<type>listtopic</type>
+		</field>
+		<field>
 			<fielddescr>Stored Virus</fielddescr>
 			<fieldname>storedvirus</fieldname>
+			<dontdisplayname/>
+			<usecolspan2/>
 			<description><![CDATA[Edit stored.virus.message.txt file here.<br>Leave this field blank to load sample file.]]></description>
 			<type>textarea</type>
 			<cols>90</cols>
@@ -269,8 +307,14 @@
 			<encoding>base64</encoding>
 		</field>
 		<field>
+			<name>Disinfected Report</name>
+			<type>listtopic</type>
+		</field>
+		<field>
 			<fielddescr>Disinfected Report</fielddescr>
 			<fieldname>disinfected</fieldname>
+			<dontdisplayname/>
+			<usecolspan2/>
 			<description><![CDATA[Edit stored.size.message.txt file here.<br>Leave this field blank to load sample file.]]></description>
 			<type>textarea</type>
 			<cols>90</cols>
@@ -278,8 +322,14 @@
 			<encoding>base64</encoding>
 		</field>
 		<field>
+			<name>Stored Size</name>
+			<type>listtopic</type>
+		</field>
+		<field>
 			<fielddescr>Stored Size</fielddescr>
 			<fieldname>storedsize</fieldname>
+			<dontdisplayname/>
+			<usecolspan2/>
 			<description><![CDATA[Edit disinfected.report.txt file here.<br>Leave this field blank to load sample file.]]></description>
 			<type>textarea</type>
 			<cols>90</cols>
@@ -287,8 +337,14 @@
 			<encoding>base64</encoding>
 		</field>
 		<field>
+			<name>Sender content</name>
+			<type>listtopic</type>
+		</field>
+		<field>
 			<fielddescr>Sender content</fielddescr>
 			<fieldname>sendercontent</fieldname>
+			<dontdisplayname/>
+			<usecolspan2/>
 			<description><![CDATA[Edit sender.content.message.txt file here.<br>Leave this field blank to load sample file.]]></description>
 			<type>textarea</type>
 			<cols>90</cols>
@@ -296,8 +352,14 @@
 			<encoding>base64</encoding>
 		</field>
 		<field>
+			<name>Sender Error</name>
+			<type>listtopic</type>
+		</field>
+		<field>
 			<fielddescr>Sender Error</fielddescr>
 			<fieldname>sendererror</fieldname>
+			<dontdisplayname/>
+			<usecolspan2/>
 			<description><![CDATA[Edit sender.error.report.txt file here.<br>Leave this field blank to load sample file.]]></description>
 			<type>textarea</type>
 			<cols>90</cols>
@@ -305,8 +367,14 @@
 			<encoding>base64</encoding>
 		</field>
 		<field>
+			<name>Sender Bad Filename</name>
+			<type>listtopic</type>
+		</field>
+		<field>
 			<fielddescr>Sender Bad Filename</fielddescr>
 			<fieldname>senderbadfilename</fieldname>
+			<dontdisplayname/>
+			<usecolspan2/>
 			<description><![CDATA[Edit sender.filename.report.txt file here.<br>Leave this field blank to load sample file.]]></description>
 			<type>textarea</type>
 			<cols>90</cols>
@@ -314,8 +382,14 @@
 			<encoding>base64</encoding>
 		</field>
 		<field>
+			<name>Sender Virus Report</name>
+			<type>listtopic</type>
+		</field>
+		<field>
 			<fielddescr>Sender Virus Report</fielddescr>
 			<fieldname>sendervirus</fieldname>
+			<dontdisplayname/>
+			<usecolspan2/>
 			<description><![CDATA[Edit sender.virus.report.txt file here.<br>Leave this field blank to load sample file.]]></description>
 			<type>textarea</type>
 			<cols>90</cols>
@@ -323,8 +397,14 @@
 			<encoding>base64</encoding>
 		</field>
 		<field>
+			<name>Sender Size Report</name>
+			<type>listtopic</type>
+		</field>
+		<field>
 			<fielddescr>Sender Size Report</fielddescr>
 			<fieldname>sendersize</fieldname>
+			<dontdisplayname/>
+			<usecolspan2/>
 			<description><![CDATA[Edit sender.size.report.txt file here.<br>Leave this field blank to load sample file.]]></description>
 			<type>textarea</type>
 			<cols>90</cols>
@@ -332,8 +412,14 @@
 			<encoding>base64</encoding>
 		</field>
 		<field>
+			<name>Sender Spam report</name>
+			<type>listtopic</type>
+		</field>
+		<field>
 			<fielddescr>Sender Spam report</fielddescr>
 			<fieldname>senderspam</fieldname>
+			<dontdisplayname/>
+			<usecolspan2/>
 			<description><![CDATA[Edit sender.spam.report.txt file here.<br>Leave this field blank to load sample file.]]></description>
 			<type>textarea</type>
 			<cols>90</cols>
@@ -341,8 +427,14 @@
 			<encoding>base64</encoding>
 		</field>
 		<field>
+			<name>Sender SPam RBL report</name>
+			<type>listtopic</type>
+		</field>
+		<field>
 			<fielddescr>Sender SPam RBL report</fielddescr>
 			<fieldname>senderrbl</fieldname>
+			<dontdisplayname/>
+			<usecolspan2/>
 			<description><![CDATA[Edit sender.spam.rbl.report.txt file here.<br>Leave this field blank to load sample file.]]></description>
 			<type>textarea</type>
 			<cols>90</cols>
@@ -350,8 +442,14 @@
 			<encoding>base64</encoding>
 		</field>
 		<field>
+			<name>Sender Spam SA report</name>
+			<type>listtopic</type>
+		</field>
+		<field>
 			<fielddescr>Sender Spam SA report</fielddescr>
 			<fieldname>sendersa</fieldname>
+			<dontdisplayname/>
+			<usecolspan2/>
 			<description><![CDATA[Edit sender.spam.sa.report.txt file here.<br>Leave this field blank to load sample file.]]></description>
 			<type>textarea</type>
 			<cols>90</cols>
@@ -359,18 +457,29 @@
 			<encoding>base64</encoding>
 		</field>
 		<field>
+			<name>Sender Spam MCP report</name>
+			<type>listtopic</type>
+		</field>
+		<field>
 			<fielddescr>Sender Spam MCP report</fielddescr>
 			<fieldname>sendermcp</fieldname>
+			<dontdisplayname/>
+			<usecolspan2/>
 			<description><![CDATA[Edit sender.mcp.report.txt file here.<br>Leave this field blank to load sample file.]]></description>
 			<type>textarea</type>
 			<cols>90</cols>
 			<rows>15</rows>
 			<encoding>base64</encoding>
 		</field>
-		
+		<field>
+			<name>Recipients Spam report</name>
+			<type>listtopic</type>
+		</field>
 		<field>
 			<fielddescr>Recipients Spam report</fielddescr>
 			<fieldname>recipientspam</fieldname>
+			<dontdisplayname/>
+			<usecolspan2/>
 			<description><![CDATA[Edit recipient.spam.report.txt file here.<br>Leave this field blank to load sample file.]]></description>
 			<type>textarea</type>
 			<cols>90</cols>
@@ -378,8 +487,14 @@
 			<encoding>base64</encoding>
 		</field>
 		<field>
+			<name>Recipients MCP report</name>
+			<type>listtopic</type>
+		</field>
+		<field>
 			<fielddescr>Recipients MCP report</fielddescr>
 			<fieldname>recipientmcp</fieldname>
+			<dontdisplayname/>
+			<usecolspan2/>
 			<description><![CDATA[Edit recipient.mcp.report.txt file here.<br>Leave this field blank to load sample file.]]></description>
 			<type>textarea</type>
 			<cols>90</cols>
@@ -387,16 +502,20 @@
 			<encoding>base64</encoding>
 		</field>
 		<field>
+			<name>Rejection Report</name>
+			<type>listtopic</type>
+		</field>
+		<field>
 			<fielddescr>Rejection Report</fielddescr>
 			<fieldname>rejection</fieldname>
+			<dontdisplayname/>
+			<usecolspan2/>
 			<description><![CDATA[Edit rejection.report.txt file here.<br>Leave this field blank to load sample file.]]></description>
 			<type>textarea</type>
 			<cols>90</cols>
 			<rows>15</rows>
 			<encoding>base64</encoding>
 		</field>
-
-
 	</fields>
 	<custom_php_install_command>
 		mailscanner_php_install_command();

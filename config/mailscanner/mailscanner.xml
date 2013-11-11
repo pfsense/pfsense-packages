@@ -9,7 +9,7 @@
 /*
     mailscanner.xml
     part of the mailscaner package for pfSense
-    Copyright (C) 2011 Marcello Coutinho
+    Copyright (C) 2011-2013 Marcello Coutinho
     All rights reserved.            
                                                                   */
 /* ========================================================================== */
@@ -54,7 +54,7 @@
 	<service>
 		<name>mailscanner</name>
 		<rcfile>mailscanner</rcfile>
-		<executable>perl5.12.4</executable>
+		<executable>perl5.14.2</executable>
 		<description>MailScanner</description>
 	</service>
 	<additional_files_needed>
@@ -111,6 +111,11 @@
 		<item>http://www.pfsense.org/packages/config/mailscanner/mailscanner.conf.template</item>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0755</chmod>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/www/shortcuts/</prefix>
+		<chmod>0755</chmod>
+		<item>http://www.pfsense.org/packages/config/mailscanner/pkg_mailscanner.inc</item>
 	</additional_files_needed>
 <tabs>
 		<tab>
@@ -228,7 +233,7 @@
 			<fielddescr>Logging</fielddescr>
 			<fieldname>syslog</fieldname>
 			<description>
-			<![CDATA[Select virus scanner tests to enable. Mailscanner default options are in (&nbsp;).]]>
+			<![CDATA[Select logging options to enable. Mailscanner default options are in (&nbsp;).]]>
 			</description>
 	    	<type>select</type>
  				<options>

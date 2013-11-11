@@ -9,7 +9,7 @@
 /*
     mailscanner_antispam.xml
     part of the mailscanner package for pfSense
-    Copyright (C) 2011 Marcello Coutinho
+    Copyright (C) 2011-2013 Marcello Coutinho
     All rights reserved.            
                                                                   */
 /* ========================================================================== */
@@ -346,62 +346,93 @@
 			<size>5</size>
 		</field>
 		<field>
-			<name>Antispam Files</name>
+			<name>spam.assassin.prefs.conf</name>
 			<type>listtopic</type>
 		</field>
 		<field>
 			<fielddescr>spam.assassin.prefs.conf</fielddescr>
 			<fieldname>sa_pref_file</fieldname>
+			<dontdisplayname/>
+			<usecolspan2/>
 			<description><![CDATA[Edit spam.assassin.prefs.conf. Leave Blank to load sample file.]]></description>
 			<type>textarea</type>
-			<cols>80</cols>
+			<cols>90</cols>
 			<rows>15</rows>
 			<encoding>base64</encoding>
+		</field>
+		<field>
+			<name>spam.lists.conf</name>
+			<type>listtopic</type>
 		</field>
 		<field>
 			<fielddescr>spam.lists.conf</fielddescr>
 			<fieldname>rbl_file</fieldname>
+			<dontdisplayname/>
+			<usecolspan2/>
 			<description><![CDATA[Edit spam.lists.conf. Leave Blank to load sample file.<br>
 								<strong>Use this list only when not using postscreen RBL checks(postfix-forwareder package).</strong>]]></description>
 			<type>textarea</type>
-			<cols>80</cols>
+			<cols>90</cols>
 			<rows>15</rows>
 			<encoding>base64</encoding>
+		</field>
+		<field>
+			<name>bounce.rules</name>
+			<type>listtopic</type>
 		</field>
 		<field>
 			<fielddescr>bounce.rules</fielddescr>
 			<fieldname>bounce</fieldname>
+			<dontdisplayname/>
+			<usecolspan2/>
 			<description><![CDATA[Edit spam.assassin.prefs.conf. Leave Blank to load sample file.]]></description>
 			<type>textarea</type>
-			<cols>80</cols>
+			<cols>90</cols>
 			<rows>15</rows>
 			<encoding>base64</encoding>
+		</field>
+		<field>
+			<name>max.message.size.rules</name>
+			<type>listtopic</type>
 		</field>
 		<field>
 			<fielddescr>max.message.size.rules</fielddescr>
 			<fieldname>max_message_size</fieldname>
+			<dontdisplayname/>
+			<usecolspan2/>
 			<description><![CDATA[Edit spam.assassin.prefs.conf. Leave Blank to load sample file.]]></description>
 			<type>textarea</type>
-			<cols>80</cols>
+			<cols>90</cols>
 			<rows>15</rows>
 			<encoding>base64</encoding>
+		</field>
+		<field>
+			<name>spam.whitelist.rules</name>
+			<type>listtopic</type>
 		</field>
 		<field>
 			<fielddescr>spam.whitelist.rules</fielddescr>
 			<fieldname>spam_whitelist</fieldname>
+			<dontdisplayname/>
+			<usecolspan2/>
 			<description><![CDATA[Edit spam.assassin.prefs.conf. Leave Blank to load sample file.]]></description>
 			<type>textarea</type>
-			<cols>80</cols>
+			<cols>90</cols>
 			<rows>15</rows>
 			<encoding>base64</encoding>
 		</field>
-
+		<field>
+			<name>mcp.spam.assassin.prefs.conf</name>
+			<type>listtopic</type>
+		</field>
 		<field>
 			<fielddescr>mcp.spam.assassin.prefs.conf</fielddescr>
 			<fieldname>mcp_pref_file</fieldname>
+			<dontdisplayname/>
+			<usecolspan2/>
 			<description><![CDATA[Edit mcp.spam.assassin.prefs.conf. Leave Blank to load sample file.]]></description>
 			<type>textarea</type>
-			<cols>80</cols>
+			<cols>90</cols>
 			<rows>15</rows>
 			<encoding>base64</encoding>
 		</field>

@@ -27,7 +27,7 @@
 	POSSIBILITY OF SUCH DAMAGE.
 
 */
-
+$shortcut_section = "mailscanner";
 require_once("util.inc");
 require("globals.inc");
 #require("guiconfig.inc");
@@ -101,6 +101,7 @@ function sync_package_mailscanner($via_rpc=false) {
 		$config['installedpackages']['mscontent']['config'][0]=array('checks'=>'DangerousContentScanning,UseStricterPhishingNet,HighlightPhishingFraud',
 																	'iframe_tags'=>'disarm',
 																	'form_tags'=>'disarm',
+																	'script_tags'=>'disarm',
 																	'web_bugs'=>'disarm',
 																	'codebase_tags'=>'disarm');
 		$load_samples++;
@@ -116,7 +117,7 @@ function sync_package_mailscanner($via_rpc=false) {
 	$report=$config['installedpackages']['msreport']['config'][0];
 	if (!is_array($config['installedpackages']['msantispam'])){
 		$config['installedpackages']['msantispam']['config'][0]=array(	'rblfeatures'=>'spam_checks',
-																		'safeatures'=>'use_sa,sa_auto_whitelist,check_sa_if_on_spam_list,spam_score,cache_spamassassin_results,use_pyzor,use_razor,use_dcc,use_bayes,use_auto_learn_bayes',
+																		'safeatures'=>'use_sa,sa_auto_whitelist,check_sa_if_on_spam_list,spam_score,cache_spamassassin_results,use_razor,use_dcc,use_bayes,use_auto_learn_bayes',
 																		'sa_score'=>'6',
 																		'spam_actions'=>'deliver',
 																		'hi_score'=>'20',
@@ -259,6 +260,7 @@ function sync_package_mailscanner($via_rpc=false) {
 	/*
 Language Strings = %report-dir%/languages.conf
 */
+
 	#check files
 	$mailscanner_dir=MAILSCANNER_LOCALBASE ."/etc/MailScanner";
 	
@@ -309,7 +311,8 @@ Language Strings = %report-dir%/languages.conf
 		$load_samples++;
 	}
 	
-	$report_dir=MAILSCANNER_LOCALBASE."/share/MailScanner/reports/".strtolower($report['language']);
+	//$report_dir=MAILSCANNER_LOCALBASE."/share/MailScanner/reports/".strtolower($report['language']);
+	$report_dir="/usr/local/share/MailScanner/reports/".strtolower($report['language']);
 	#CHECK REPORT FILES
 	$report_files= array('deletedbadcontent' => 'deleted.content.message.txt',
 						'deletedbadfilename' => 'deleted.filename.message.txt',
@@ -377,8 +380,18 @@ Phishing Safe Sites File = %etc-dir%/phishing.safe.sites.conf
 Phishing Bad Sites File = %etc-dir%/phishing.bad.sites.conf
 Country Sub-Domains List = %etc-dir%/country.domains.conf
 */
-	
+	#get mailscanner version
+	$msc_bin=MAILSCANNER_LOCALBASE. "/sbin/mailscanner";
+	if (file_exists($msc_bin)){
+		$msc_bin_file=file_get_contents($msc_bin);
+		if (preg_match("/MailScannerVersion = '(\S+)'/",$msc_bin_file,$msv_matches))
+			$mailscanner_version=$msv_matches[1];
+		else
+			$mailscanner_version='4.83.5';
+	}
 	#create MailScanner.conf
+	$mlb=MAILSCANNER_LOCALBASE;
+
 	include("mailscanner.conf.template");
 	#write files
 	conf_mount_rw();
@@ -404,76 +417,77 @@ Country Sub-Domains List = %etc-dir%/country.domains.conf
 
 	#update spam.assassin.prefs.conf
 	$sa_temp=ms_text_area_decode($config['installedpackages']['msantispam']['config'][0]['sa_pref_file']);
-	$pattern[0]='/#ifplugin/';
-	$pattern[1]='/#pyzor_path/';
-	$pattern[2]='/usr.bin.pyzor/';
-	$pattern[3]='/#dcc_path/';
-	$pattern[4]='/#endif/';
-	$replacement[0]="ifplugin";
-	$replacement[1]="pyzor_path";
-	$replacement[2]="usr/local/bin/pyzor";
-	$replacement[3]="dcc_path";
-	$replacement[4]="endif";
+	$pattern[]='/#ifplugin/';
+	$pattern[]='/#dcc_path/';
+	$pattern[]='/#endif/';
+	
+	$replacement[]="ifplugin";
+	$replacement[]="dcc_path";
+	$replacement[]="endif";
 	if (preg_match('/use_razor/',$antispam['safeatures'])){
-			$pattern[5]='/\nuse_razor2\s+0/';
-			$replacement[5]="\n".'# use_razor2		0';
+			$pattern[]='/\nuse_razor2\s+0/';
+			$replacement[]="\n".'# use_razor2		0';
 			}
 	else{
-		$pattern[5]='/\n#\s+use_razor2\s+0/';
-		$replacement[5]="\n".'use_razor2		0';
+		$pattern[]='/\n#\s+use_razor2\s+0/';
+		$replacement[]="\n".'use_razor2		0';
 		}
 	if (preg_match('/use_dcc/',$antispam['safeatures'])){
-		$pattern[6]='/\nuse_dcc\s+0/';
-		$replacement[6]="\n".'# use_dcc		0';
+		$pattern[]='/\nuse_dcc\s+0/';
+		$replacement[]="\n".'# use_dcc		0';
 		}
 	else{
-		$pattern[6]='/\n#\s+use_dcc\s+0/';
-		$replacement[6]="\n".'use_dcc		0';
+		$pattern[]='/\n#\s+use_dcc\s+0/';
+		$replacement[]="\n".'use_dcc		0';
 		}
 	if (preg_match('/use_pyzor/',$antispam['safeatures'])){
-		$pattern[7]='/\nuse_pyzor\s+0/';
-		$replacement[7]="\n".'# use_pyzor	0';
+		$pattern[]='/#pyzor_path/';
+		$pattern[]='/usr.bin.pyzor/';
+		$pattern[]='/\nuse_pyzor\s+0/';
+		$replacement[]="pyzor_path";
+		$replacement[]="usr/local/bin/pyzor";
+		$replacement[]="\n".'# use_pyzor	0';
 		}
 	else{
-		$pattern[7]='/\n#\s+use_pyzor\s+0/';
-		$replacement[7]="\n".'# use_pyzor		0';
+		$pattern[]='/\n#\s+use_pyzor\s+0/';
+		$replacement[]="\n".'# use_pyzor		0';
 		}
 	if (preg_match('/use_auto_learn_bayes/',$antispam['safeatures'])){
-		$pattern[8]='/\nbayes_auto_learn\s+0/';
-		$replacement[8]="\n".'# bayes_auto_learn	0';
+		$pattern[]='/\nbayes_auto_learn\s+0/';
+		$replacement[]="\n".'# bayes_auto_learn	0';
 		}
 	else{
-		$pattern[8]='/\n#\s+bayes_auto_learn\s+0/';
-		$replacement[8]="\n".'bayes_auto_learn	0';
+		$pattern[]='/\n#\s+bayes_auto_learn\s+0/';
+		$replacement[]="\n".'bayes_auto_learn	0';
 		}
 	if (preg_match('/use_bayes/',$antispam['safeatures'])){
-		$pattern[9]='/\nuse_bayes\s+0/';
-		$replacement[9]="\n".'# use_bayes	0';
+		$pattern[]='/\nuse_bayes\s+0/';
+		$replacement[]="\n".'# use_bayes	0';
 		}
 	else{
-		$pattern[9]='/\n#\s+use_bayes\s+0/';
-		$replacement[9]="\n".'use_bayes	0';
+		$pattern[]='/\n#\s+use_bayes\s+0/';
+		$replacement[]="\n".'use_bayes	0';
 		}
 	if (preg_match('/sa_auto_whitelist/',$antispam['safeatures'])){
-		$pattern[10]='/\nuse_auto_whitelist\s+0/';
-		$replacement[10]="\n".'# use_auto_whitelist 0';
+		$pattern[]='/\nuse_auto_whitelist\s+0/';
+		$replacement[]="\n".'# use_auto_whitelist 0';
 		}
 	else{
-		$pattern[10]='/\n#\s*use_auto_whitelist 0/';
-		$replacement[10]="\n".'use_auto_whitelist	0';
+		$pattern[]='/\n#\s*use_auto_whitelist 0/';
+		$replacement[]="\n".'use_auto_whitelist	0';
 		}
 	if ($antispam['rblchecks']){
-		$pattern[11]='/\nskip_rbl_checks\s+1/';
-		$replacement[11]="\n".'# skip_rbl_checks	1';
+		$pattern[]='/\nskip_rbl_checks\s+1/';
+		$replacement[]="\n".'# skip_rbl_checks	1';
 		}
 	else{
-		$pattern[11]='/\n#\s+skip_rbl_checks\s+\d/';
-		$replacement[11]="\n".'skip_rbl_checks	1';
+		$pattern[]='/\n#\s+skip_rbl_checks\s+\d/';
+		$replacement[]="\n".'skip_rbl_checks	1';
 		}
-	$pattern[12]='/bayes_ignore_header ([a-zA-Z0-9_.-]+)MailScanner/';
-	$replacement[12]="bayes_ignore_header ".($mailscanner['orgname']!=""?$mailscanner['orgname']:"pfsense")."-MailScanner";
-	$pattern[13]='/envelope_sender_header X([a-zA-Z0-9_.-]+)MailScanner-From/';
-	$replacement[13]="envelope_sender_header X-".($mailscanner['orgname']!=""?$mailscanner['orgname']:"pfsense")."-MailScanner-From";
+	$pattern[]='/bayes_ignore_header ([a-zA-Z0-9_.-]+)MailScanner/';
+	$replacement[]="bayes_ignore_header ".($mailscanner['orgname']!=""?$mailscanner['orgname']:"Pfsense")."-MailScanner";
+	$pattern[]='/envelope_sender_header X([a-zA-Z0-9_.-]+)MailScanner-From/';
+	$replacement[]="envelope_sender_header X-".($mailscanner['orgname']!=""?$mailscanner['orgname']:"Pfsense")."-MailScanner-From";
 	
 	
 	$sa_temp=preg_replace($pattern,$replacement,$sa_temp);
@@ -525,34 +539,24 @@ Country Sub-Domains List = %etc-dir%/country.domains.conf
 			unlink_if_exists($libexec_dir.'clamav-wrapper');
 		}
 		else{
-			if (file_exists('/var/run/clamav/'))
-				chown('/var/run/clamav/', 'postfix');
-			if (file_exists('/var/log/clamav/'))
-				chown('/var/log/clamav/', 'postfix');
-			if (file_exists('/var/db/clamav/'))
-				chown('/var/db/clamav/', 'postfix');
-			if (file_exists('/var/db/clamav/bytecode.cld'))
-				chown('/var/db/clamav/bytecode.cld', 'postfix');
-			if (file_exists('/var/db/clamav/daily.cld'))
-				chown('/var/db/clamav/daily.cld', 'postfix');
-			if (file_exists('/var/db/clamav/main.cvd'))
-				chown('/var/db/clamav/main.cvd', 'postfix');
-			if (file_exists('/var/db/clamav/mirrors.dat'))
-				chown('/var/db/clamav/mirrors.dat', 'postfix');
-			if (file_exists('/var/log/clamav/clamd.log'))
-				chown('/var/log/clamav/clamd.log', 'postfix');
-			if (file_exists('/var/log/clamav/freshclam.log'))
-				chown('/var/log/clamav/freshclam.log', 'postfix');
-			
+			$av_dirs=array('run','log','db');
+			foreach ($av_dirs as $av_dir){
+				if (!is_dir("/var/$av_dir/clamav"))
+					mkdir("/var/$av_dir/clamav",0774,true);
+				chown("/var/$av_dir/clamav", 'postfix');
+				chgrp("/var/$av_dir/clamav", 'wheel');
+				}
+			$av_files=array('/var/db/clamav/daily.cld','/var/db/clamav/main.cvd','/var/db/clamav/mirrors.dat',
+							'/var/log/clamav/clamd.log','/var/log/clamav/freshclam.log','/var/db/clamav/bytecode.cld');
+			foreach ($av_files as $av_file){
+				if (file_exists($av_file))
+					chown($av_file, 'postfix');
+				}
 			copy($libexec_dir.'clamav-autoupdate.sample',$libexec_dir.'clamav-autoupdate');
 			chmod ($libexec_dir.'clamav-autoupdate',0755);
 			copy($libexec_dir.'clamav-wrapper.sample',$libexec_dir.'clamav-wrapper');
 			chmod ($libexec_dir.'clamav-autoupdate',0755);
-			if (!file_exists('/var/db/clamav/main.cvd')){
-				log_error('No clamav database found, running freshclam in background.');
-				mwexec_bg(MAILSCANNER_LOCALBASE. '/bin/freshclam');
-				}
-				
+							
 			#clamav-wrapper file
 			$cconf=$libexec_dir."clamav-wrapper";
 			if (file_exists($cconf)){
@@ -565,7 +569,7 @@ Country Sub-Domains List = %etc-dir%/country.domains.conf
 				
 			#freshclam conf file
 			$cconf=MAILSCANNER_LOCALBASE. "/etc/freshclam.conf";
-			if (file_exists($conf)){
+			if (file_exists($cconf)){
 				$cconf_file=file_get_contents($cconf);
 				if (preg_match('/DatabaseOwner clamav/',$cconf_file)){
 					$cconf_file=preg_replace("/DatabaseOwner clamav/","DatabaseOwner postfix",$cconf_file);
@@ -575,7 +579,7 @@ Country Sub-Domains List = %etc-dir%/country.domains.conf
 				
 			#clamd conf file
 			$cconf=MAILSCANNER_LOCALBASE. "/etc/clamd.conf";
-			if (file_exists($conf)){
+			if (file_exists($cconf)){
 				$cconf_file=file_get_contents($cconf);
 				if (preg_match('/User clamav/',$cconf_file)){
 					$cconf_file=preg_replace("/User clamav/","User postfix",$cconf_file);
@@ -616,6 +620,13 @@ Country Sub-Domains List = %etc-dir%/country.domains.conf
 						}
 					}
 				}
+				
+				#check clamav database
+				if (!file_exists('/var/db/clamav/main.cvd')){
+				log_error('No clamav database found, running freshclam in background.');
+				mwexec_bg(MAILSCANNER_LOCALBASE. '/bin/freshclam --config-file='.MAILSCANNER_LOCALBASE.'/etc/freshclam.conf --user=root');
+				}
+				
 		}
 	}
 	else{
@@ -660,7 +671,7 @@ Country Sub-Domains List = %etc-dir%/country.domains.conf
 						}
 					}
 				}
-				
+
 	$script=MAILSCANNER_LOCALBASE. '/etc/rc.d/mailscanner';
 
 	#fix MIME::ToolUtils deprecated function and usecure dependency calls in /usr/local/sbin/mailscanner
@@ -670,20 +681,35 @@ Country Sub-Domains List = %etc-dir%/country.domains.conf
 		exec('find '.MAILSCANNER_LOCALBASE. '/lib/perl5/site_perl -name Df.pm',$find_out);
 		$perl_bin="perl"; 
 		foreach($find_out as $perl_dir){
-			if (preg_match ('@usr/local/lib/perl5/site_perl/([.0-9]+)/mach/Filesys/Df.pm@',$perl_dir,$perl_match))
+			if (preg_match ('@/usr\S+lib/perl5/site_perl/([.0-9]+)/mach/Filesys/Df.pm@',$perl_dir,$perl_match))
 				$perl_bin.=$perl_match[1];
 		}
 		
 		$cconf_file=file_get_contents($cconf);
-		$pattern2[0]='@#!/usr.*bin/perl.*I@';
+		$pattern2[0]='@#!/usr\S+bin/perl.*I@';
 		$pattern2[1]='/\smy .current = config MIME::ToolUtils/';
 		$replacement2[0]='#!'.MAILSCANNER_LOCALBASE. "/bin/{$perl_bin} -U -I";
 		$replacement2[1]=' #my $current = config MIME::ToolUtils';
-		if (preg_match('@#!/usr.*bin/perl.*I@',$cconf_file)){
+		if (preg_match('@#!/usr\S+bin/perl.*I@',$cconf_file)){
 			$cconf_file=preg_replace($pattern2,$replacement2,$cconf_file);
 			file_put_contents($cconf, $cconf_file, LOCK_EX);
 			}
 	}
+
+	#check spam assassin rules
+	$saupdate="/usr/local/bin/sa-update";
+	if (file_exists($saupdate)){
+		$rules_found=0;
+		if (file_exists("/var/db/spamassassin")){
+			foreach (glob("/var/db/spamassassin/*",GLOB_ONLYDIR) as $dirname)
+				$rules_found++;
+			}
+ 		if ($rules_found==0){
+ 			log_error("Mailscanner- No spamassassin rules found, forcing sa-update.");
+ 			mwexec($saupdate);
+ 		}
+	}	
+
 	if (file_exists($script)){
 		$script_file=file_get_contents($script);
 		if (preg_match('/NO/',$script_file)){
