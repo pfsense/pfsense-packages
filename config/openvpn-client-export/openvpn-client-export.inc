@@ -209,7 +209,9 @@ function openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $quotese
 	if (($expformat != "inlinedroid") && ($expformat != "inlineios"))
 		$conf .= "resolv-retry infinite{$nl}";
 	$conf .= "$remotes{$nl}";
-	if (!empty($servercn)) {
+	/* This line can cause problems with auth-only setups and also with Yealink/Snom phones
+		since they are stuck on an older OpenVPN version that does not support this feature. */
+	if (!empty($servercn) && !$nokeys && (substr($expformat, 0, 7) != "yealink") && ($expformat != "snom")) {
 		$qw = ($quoteservercn) ? "\"" : "";
 		$conf .= "verify-x509-name {$qw}{$servercn}{$qw} name{$nl}";
 	}
