@@ -148,7 +148,7 @@
 		<additional_files_needed>
 		<prefix>/usr/local/www/shortcuts/</prefix>
 		<chmod>0755</chmod>
-		<item>http://www.pfsense.org/packages/config/postfix-dev/pkg_postfix.inc</item>
+		<item>http://www.pfsense.org/packages/config/postfix/pkg_postfix.inc</item>
 	</additional_files_needed>
 <tabs>
 		<tab>
