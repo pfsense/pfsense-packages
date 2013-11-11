@@ -72,6 +72,7 @@
                 <tab>
                         <text>Zones</text>
                         <url>/pkg.php?xml=bind_zones.xml&amp;id=0</url>
+                        <active/>
                 </tab>
                 <tab>
                         <text>Sync</text>
