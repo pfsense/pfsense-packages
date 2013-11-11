@@ -9,7 +9,7 @@
 /*
     postfix_recipients.xml
     part of the Postfix package for pfSense
-    Copyright (C) 2011 Marcello Coutinho
+    Copyright (C) 2011-2013 Marcello Coutinho
     All rights reserved.            
 */
 /* ========================================================================== */
@@ -119,33 +119,38 @@
 								Before using LDAP fetch you must install p5-perl-ldap package(hint: <strong>/usr/sbin/pkg_add -r p5-perl-ldap</strong>)]]></description>
 		</field>
 		<field>
-			<fielddescr><![CDATA[<strong>HINTS</strong><br>Hostname:<br>dc1.mysite.com<br><br>Domain:<br>dc=mysite,dc=com<br><br>Username:<br>cn=antispam,cn=Users<br>]]></fielddescr>
 			<fieldname>none</fieldname>
 			<type>rowhelper</type>
+			<dontdisplayname/>
+			<usecolspan2/>
+			<movable>on</movable>
 			<rowhelper>
 			<rowhelperfield>
 				<fielddescr>Hostname</fielddescr>
+				<description><![CDATA[<strong>Hostname Hint:</strong><br>dc1.mysite.com]]></description>
 				<fieldname>dc</fieldname>
 				<type>input</type>
-				<size>20</size>
+				<size>23</size>
 			</rowhelperfield>
 			<rowhelperfield>
 				<fielddescr>Domain</fielddescr>
+				<description><![CDATA[<strong>Domain Hint:</strong><br>dc=mysite,dc=com]]></description>
 				<fieldname>cn</fieldname>
 				<type>input</type>
-				<size>22</size>
+				<size>25</size>
 			</rowhelperfield>
 			<rowhelperfield>
 				<fielddescr>Username</fielddescr>
+				<description><![CDATA[<strong>Username Hint:</strong><br>Username:cn=antispam,cn=Users]]></description>
 				<fieldname>username</fieldname>
 				<type>input</type>
-				<size>20</size>
+				<size>24</size>
 			</rowhelperfield>
 			<rowhelperfield>
 				<fielddescr>Password</fielddescr>
 				<fieldname>password</fieldname>
 				<type>password</type>
-				<size>10</size>
+				<size>12</size>
 			</rowhelperfield>
 			</rowhelper>
 		</field>

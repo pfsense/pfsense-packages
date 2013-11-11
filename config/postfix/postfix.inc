@@ -29,6 +29,7 @@
 	POSSIBILITY OF SUCH DAMAGE.
 
 */
+$shortcut_section = "postfix";
 require_once("util.inc");
 require_once("functions.inc");
 require_once("pkg-utils.inc");
