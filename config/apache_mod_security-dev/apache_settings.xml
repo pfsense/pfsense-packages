@@ -294,7 +294,7 @@
                             <option><name>Off</name><value>Off</value></option>
                         </options>
                 </field>
-				<field>
+		<field>
 			<fielddescr>Network Access Status Page</fielddescr>
 			<fieldname>netaccessstatus</fieldname>
 			<description>
@@ -305,6 +305,7 @@
 				]]>
 			</description>
 			<type>input</type>
+		</field>
 	</fields>
 	<custom_php_resync_config_command>
 		apache_mod_security_resync();
