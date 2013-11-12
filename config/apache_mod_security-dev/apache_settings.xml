@@ -93,7 +93,7 @@
 			<fielddescr>Server hostname</fielddescr>
 			<fieldname>hostname</fieldname>
 			<description>
-				<![CDATA[Enter the servers hostname<br/
+				<![CDATA[Enter the servers hostname<br>
 					NOTE: Leave blank to use this devices hostname.]]>
 			</description>
 			<type>input</type>
@@ -102,11 +102,8 @@
 			<fielddescr>Default Bind to IP Address</fielddescr>
 			<fieldname>globalbindtoipaddr</fieldname>
 			<description>
-				<![CDATA[
-					This is the IP address the Proxy Server will listen on. 
-					<br/>
-					NOTE: Leave blank to bind to *
-				]]>
+				<![CDATA[This is the IP address the Proxy Server will listen on.<br/>
+					NOTE: Leave blank to bind to *]]>
 			</description>
 			<type>input</type>
 		</field>
@@ -114,10 +111,8 @@
 			<fielddescr>Default Bind to port</fielddescr>
 			<fieldname>globalbindtoport</fieldname>
 			<description>
-				<![CDATA[
-					This is the port the Proxy Server will listen on.<br>
-					NOTE: Leave blank to bind to 80
-				]]>					
+				<![CDATA[This is the port the Proxy Server will listen on.<br>
+					NOTE: Leave blank to bind to 80]]>					
 			</description>
 			<type>input</type>
 			<size>5</size>
@@ -286,7 +281,7 @@
                         <fielddescr>Status Page</fielddescr>
                         <fieldname>statuspage</fieldname>
                         <description>
-                                <![CDATA[Enable a Status Page for Apache and Mod_proxy. Acess htt://DefaultBindIP:DefaultBindPort/status-server]]>
+                                <![CDATA[Enable a status page for Apache and Mod_proxy. Access http://DefaultBindIP:DefaultBindPort/status-server]]>
                         </description>
                         <type>select</type>        
                         <options>
@@ -298,11 +293,8 @@
 			<fielddescr>Network Access Status Page</fielddescr>
 			<fieldname>netaccessstatus</fieldname>
 			<description>
-				<![CDATA[
-					Network can access a status page. Ex: 172.16.1.0/24
-					<br/>
-					NOTE: Leave blank define all networks
-				]]>
+				<![CDATA[Network can access a status page. Ex: 172.16.1.0/24<br/>
+					NOTE: Leave blank define all networks]]>
 			</description>
 			<type>input</type>
 		</field>
