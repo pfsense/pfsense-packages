@@ -87,6 +87,12 @@
 			<type>checkbox</type>
 		</field>
 		<field>
+			<fielddescr>Accept Filter</fielddescr>
+			<fieldname>acceptfilter</fieldname>
+			<description>Do not add routes for this interface subnet from OSPF into the routing table. (Suggested for Multi-WAN environments).</description>
+			<type>checkbox</type>
+		</field>
+		<field>
 			<fielddescr>Enable MD5 password for this Quagga OSPFd interface (default no)</fielddescr>
 			<fieldname>md5password</fieldname>
 			<description>Enables the use of an MD5 password to on this instance</description>

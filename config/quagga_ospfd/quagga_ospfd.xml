@@ -1,6 +1,6 @@
 <packagegui>
 	<name>quagga_ospfd</name>
-	<version>0.5.4</version>
+	<version>0.6</version>
 	<title>Services: Quagga OSPFd</title>
 	<include_file>/usr/local/pkg/quagga_ospfd.inc</include_file>
 	<aftersaveredirect>pkg_edit.php?xml=quagga_ospfd.xml&amp;id=0</aftersaveredirect>
@@ -161,6 +161,13 @@
 					<fielddescr>Disable &lt;br/&gt;Redistribution</fielddescr>
 					<fieldname>redistribute</fieldname>
 					<description>Redistribute rules.</description>
+					<type>checkbox</type>
+					<size>20</size>
+				</rowhelperfield>
+				<rowhelperfield>
+					<fielddescr>Disable &lt;br/&gt;Acceptance</fielddescr>
+					<fieldname>acceptfilter</fieldname>
+					<description>Accept Filter</description>
 					<type>checkbox</type>
 					<size>20</size>
 				</rowhelperfield>

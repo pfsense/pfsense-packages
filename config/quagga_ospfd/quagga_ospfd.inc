@@ -73,6 +73,8 @@ function quagga_ospfd_install_conf() {
 	// Since we need to embed this in a string, copy to a var. Can't embed constnats.
 	$quagga_config_base = PKG_QUAGGA_CONFIG_BASE;
 
+	$noaccept = "";
+
 	if ($config['installedpackages']['quaggaospfd']['rawconfig'] && $config['installedpackages']['quaggaospfd']['rawconfig']['item']) {
 		// if there is a raw config specifyed in tthe config.xml use that instead of the assisted config
 		$conffile = implode("\n",$config['installedpackages']['quaggaospfd']['rawconfig']['item']);
@@ -132,6 +134,9 @@ function quagga_ospfd_install_conf() {
 				if ($interface_subnet == 32)
 					$interface_subnet = 30;
 				$subnet = gen_subnet($interface_ip, $interface_subnet);
+				if (!empty($conf['acceptfilter'])) {
+					$noaccept .= "ip prefix-list ACCEPTFILTER deny {$subnet}/{$interface_subnet}\n";
+				}
 				if (!empty($conf['interfacearea'])) {
 					$interface_networks[] = array( "subnet" => "{$subnet}/{$interface_subnet}", "area" => $conf['interfacearea']);
 				}
@@ -151,6 +156,9 @@ function quagga_ospfd_install_conf() {
 			foreach ($ospfd_conf['row'] as $redistr) {
 				if (empty($redistr['routevalue']))
 					continue;
+				if (isset($redistr['acceptfilter'])) {
+					$noaccept .= "ip prefix-list ACCEPTFILTER deny {$redistr['routevalue']}\n";
+				}
 				if (isset($redistr['redistribute'])) {
 					$noredist .= "  access-list dnr-list deny {$redistr['routevalue']}\n";
 				} else {
@@ -239,6 +247,12 @@ function quagga_ospfd_install_conf() {
 		$zebraconffile .= "password {$ospfd_conf['password']}\n";
 	if ($ospfd_conf['logging'])
 		$zebraconffile .= "log syslog\n";
+	if (!empty($noaccept)) {
+		$zebraconffile .= $noaccept;
+		$zebraconffile .= "route-map ACCEPTFILTER permit 10\n";
+		$zebraconffile .= "match ip address prefix-list ACCEPTFILTER\n";
+		$zebraconffile .= "ip protocol ospf route-map ACCEPTFILTER\n";
+	}
 	$fd = fopen("{$quagga_config_base}/zebra.conf", "w");
 	fwrite($fd, $zebraconffile);
 	fclose($fd);
