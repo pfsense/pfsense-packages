@@ -447,12 +447,13 @@ function squid_validate_nac($post, $input_errors) {
 			$input_errors[] = "The time range '$time' is not a valid time range";
 	}
 
-  if(!empty($post['ext_cachemanager'])) {
-	 $extmgr = explode(";", ($post['ext_cachemanager']));
-	 foreach ($extmgr as $mgr) {
-    if (!is_ipaddr($mgr))
-      $input_errors[] = 'You must enter a valid IP address in the \'External Cache Manager\' field';
-	 }}
+	if(!empty($post['ext_cachemanager'])) {
+		$extmgr = explode(";", ($post['ext_cachemanager']));
+		foreach ($extmgr as $mgr) {
+			if (!empty($mgr) && !is_ipaddr($mgr))
+			$input_errors[] = 'You must enter a valid IP address in the \'External Cache Manager\' field';
+		}
+	}
 }
 
 function squid_validate_traffic($post, $input_errors) {
