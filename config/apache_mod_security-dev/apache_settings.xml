@@ -278,23 +278,23 @@
 			<type>listtopic</type>
 		</field>
 		<field>
-                        <fielddescr>Status Page</fielddescr>
-                        <fieldname>statuspage</fieldname>
-                        <description>
-                                <![CDATA[Enable a status page for Apache and Mod_proxy. Access http://DefaultBindIP:DefaultBindPort/status-server]]>
-                        </description>
-                        <type>select</type>        
-                        <options>
-                            <option><name>On</name><value>on</value></option>
-                            <option><name>Off</name><value>off</value></option>
-                        </options>
-                </field>
+			<fielddescr>Status Page</fielddescr>
+			<fieldname>statuspage</fieldname>
+			<description>
+ 			<![CDATA[Enable a status page for Apache and Mod_proxy. Access http://DefaultBindIP:DefaultBindPort/status-server]]>
+			</description>
+ 			<type>select</type>        
+			<options>
+				<option><name>Disabled (Default)</name><value>off</value></option>
+				<option><name>Enabled</name><value>on</value></option>
+			</options>
+		</field>
 		<field>
 			<fielddescr>Network Access Status Page</fielddescr>
 			<fieldname>netaccessstatus</fieldname>
 			<description>
-				<![CDATA[Network can access a status page. Ex: 172.16.1.0/24<br/>
-					NOTE: Leave blank define all networks]]>
+				<![CDATA[Networks that can access apache status page. Ex: 172.16.1.0/24<br/>
+					NOTE: Leave blank to allow access from any ip.(Not recommended for security reasons)]]>
 			</description>
 			<type>input</type>
 		</field>

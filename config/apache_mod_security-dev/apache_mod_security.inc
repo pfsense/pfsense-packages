@@ -548,31 +548,18 @@ EOF;
 		}
 	// Process Status Page 
 	$mod_status = "";
-	if ($setting('statuspage') == "on") {
+	if ($settings['statuspage'] == "on") {
 		$mod_status .= <<<EOF
 <Location /server-status>
 	SetHandler server-status
 	Order Deny,Allow
 	Deny from all
+	
 EOF;
-		$mod_status .= "Allow from  ".($settings['netaccessstatus'] ? $settings['netaccessstatus'] : "All")."\n";
+		$mod_status .= "Allow from ".($settings['netaccessstatus'] ? $settings['netaccessstatus'] : "All")."\n";
 		$mod_status .= "</Location>\n";
 	}
 	
-//** Uncomment to allow adding ip/ports not used by any site proxies
-//** Otherwise unused addresses/ports will be automatically deleted from the configuration
-//	foreach ($configuredaliases as $ams) {
-//		$local_ip_port = "{$ams['ipaddress']}:{$ams['ipport']}";
-//               if(!in_array($local_ip_port, $processed)) {
-//                	// explicit bind if not global ip:port
-//                        if ($local_ip_port != $global_listen) {
-//                        	$aliases .= "Listen $local_ip_port\n";    
-//                                // Automatically add this to configuration
-//                                $config['installedpackages']['apachesettings']['config'][0]['row'][] = array('ipaddress' => $ams['ipaddress'], 'ipport' => $ams['ipport']);
-//                        }
-//		}
-//	}
-
 	// update configuration with actual ip bindings
 	write_config($pkg['addedit_string']);
 

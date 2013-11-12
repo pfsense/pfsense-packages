@@ -303,7 +303,7 @@
 				    <fieldname>sitepath</fieldname>
 				    <description><![CDATA[Site path to publish.<br>leave blank to use /]]></description>
 				    <type>input</type>
-				    <size>13</size>
+				    <size>12</size>
 				</rowhelperfield>
 				<rowhelperfield>
 					<fielddescr><![CDATA[Balancer]]></fielddescr>
@@ -332,7 +332,7 @@
 				    <fieldname>backendpath</fieldname>
 				    <description><![CDATA[Backend redirect path.<br>Leave blank to use /]]></description>
 				    <type>input</type>
-				    <size>13</size>
+				    <size>12</size>
 				</rowhelperfield>
 				<rowhelperfield>
 					<fielddescr><![CDATA[ModSecurity]]></fielddescr>
@@ -359,7 +359,7 @@
 				    <fieldname>options</fieldname>
 				    <description><![CDATA[Additional proxypass options for this path.<br>ex: ttl=60 stickysession='JSESSIONID']]></description>
 				    <type>input</type>
-				    <size>12</size>
+				    <size>11</size>
 				</rowhelperfield>
 		    </rowhelper>
 		</field>
@@ -399,9 +399,11 @@
 			<fieldname>custom</fieldname>
 			<description>Paste extra apache config for this virtualhost. This is usefull for rewrite rules for example.</description>
 			<type>textarea</type>
-			<cols>65</cols>
+			<cols>90</cols>
 			<rows>10</rows>
 			<encoding>base64</encoding>
+			<dontdisplayname/>
+			<usecolspan2/>
 		</field>
 	</fields>
 	<service>
