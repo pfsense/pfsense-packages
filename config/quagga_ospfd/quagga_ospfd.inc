@@ -249,6 +249,7 @@ function quagga_ospfd_install_conf() {
 		$zebraconffile .= "log syslog\n";
 	if (!empty($noaccept)) {
 		$zebraconffile .= $noaccept;
+		$zebraconffile .= "ip prefix-list ACCEPTFILTER permit any\n";
 		$zebraconffile .= "route-map ACCEPTFILTER permit 10\n";
 		$zebraconffile .= "match ip address prefix-list ACCEPTFILTER\n";
 		$zebraconffile .= "ip protocol ospf route-map ACCEPTFILTER\n";
