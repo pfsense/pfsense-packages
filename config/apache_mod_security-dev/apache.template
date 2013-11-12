@@ -4,7 +4,9 @@
 		if(file_exists( APACHEDIR ."/libexec/apache22/mod_memcache.so"))
 			$mod_mem_cache = "LoadModule memcache_module libexec/apache22/mod_memcache.so\n";
 		}
-
+	if($mods_settings['enablemodsecurity']=="on")
+		$mod_security_module= "LoadModule security2_module libexec/apache22/mod_security2.so\n";
+		
 $apache_dir=APACHEDIR;
 	$apache_config = <<<EOF
 ##################################################################################
@@ -33,7 +35,6 @@ $apache_dir=APACHEDIR;
 # with ServerRoot set to "/usr/local" will be interpreted by the
 # server as "/usr/local//var/log/foo_log".
 
-{$mod_security}
 #
 # ServerRoot: The top of the directory tree under which the server's
 # configuration, error, and log files are kept.
@@ -126,6 +127,7 @@ LoadModule alias_module libexec/apache22/mod_alias.so
 LoadModule rewrite_module libexec/apache22/mod_rewrite.so
 LoadModule reqtimeout_module libexec/apache22/mod_reqtimeout.so
 {$mod_mem_cache}
+{$mod_security_module}
 
 <IfModule !mpm_netware_module>
 <IfModule !mpm_winnt_module>
