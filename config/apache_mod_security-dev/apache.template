@@ -197,6 +197,9 @@ DocumentRoot "{$apache_dir}/www/apache22"
     Deny from all
 </Directory>
 
+
+{$mod_status}
+
 #
 # Note that from this point forward you must specifically allow
 # particular features to be enabled - so if something's not working as
