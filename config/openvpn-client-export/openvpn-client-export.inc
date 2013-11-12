@@ -618,7 +618,7 @@ function viscosity_openvpn_client_config_exporter($srvid, $usrid, $crtid, $usead
 	// We need to nuke the ca line from the above config if it exists.
 	$conf = explode("\n", $conf);
 	for ($i=0; $i < count($conf); $i++) {
-		if (substr($conf[$i], 0, 3) == "ca ")
+		if ((substr($conf[$i], 0, 3) == "ca ") || (substr($conf[$i], 0, 7) == "pkcs12 "))
 			unset($conf[$i]);
 	}
 	$conf = implode("\n", $conf);
