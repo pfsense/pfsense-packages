@@ -197,7 +197,6 @@ DocumentRoot "{$apache_dir}/www/apache22"
     Deny from all
 </Directory>
 
-
 {$mod_status}
 
 #
