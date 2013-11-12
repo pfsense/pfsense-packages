@@ -548,7 +548,7 @@ EOF;
 		}
 	// Process Status Page 
 	$mod_status = "";
-	if ($setting('statuspage' == "on") {
+	if ($setting('statuspage') == "on") {
 		$mod_status .= <<<EOF
 		<Location /server-status>\n
 					SetHandler server-status
