@@ -548,17 +548,15 @@ EOF;
 		}
 	// Process Status Page 
 	$mod_status = "";
-	if ($setting('statuspage' == "on") {
+	if ($setting('statuspage') == "on") {
 		$mod_status .= <<<EOF
-		<Location /server-status>\n
-					SetHandler server-status
-					Order Deny,Allow
-					Deny from all
-		EOF;
+<Location /server-status>
+	SetHandler server-status
+	Order Deny,Allow
+	Deny from all
+EOF;
 		$mod_status .= "Allow from  ".($settings['netaccessstatus'] ? $settings['netaccessstatus'] : "All")."\n";
 		$mod_status .= "</Location>\n"
-		EOF;
-		
 	}
 	
 //** Uncomment to allow adding ip/ports not used by any site proxies
