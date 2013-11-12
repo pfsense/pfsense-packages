@@ -3,7 +3,7 @@
 	apache_mod_security.inc
 	part of apache_mod_security package (http://www.pfSense.com)
 	Copyright (C) 2009, 2010 Scott Ullrich
-	Copyright (C) 2012 Marcello Coutinho
+	Copyright (C) 2012-2013 Marcello Coutinho
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
@@ -37,7 +37,7 @@ else
 // End of system check
 define ('MODSECURITY_DIR','crs');
 // Rules directory location
-define("rules_directory", APACHEDIR . "/". MODSECURITY_DIR);
+define("RULES_DIRECTORY", APACHEDIR . "/". MODSECURITY_DIR);
 function apache_textarea_decode($base64){
 	return preg_replace("/\r\n/","\n",base64_decode($base64));
 }
@@ -134,7 +134,7 @@ function apache_mod_security_resync() {
 			$write_config++;
 			$config['installedpackages']["modsecurityfiles{$dir}"]['config']=array();
 			while (false !== ($entry = readdir($handle))) {
-				if (preg_match("/(\S+).conf/",$entry,$matches))
+				if (preg_match("/(\S+).conf$/",$entry,$matches))
 					$config["installedpackages"]["modsecurityfiles{$dir}"]["config"][]=array("file"=>$matches[1]);
 				}
 			closedir($handle);
@@ -296,7 +296,7 @@ function generate_apache_configuration() {
 					
 					$options.=($server['routeid'] ? " route={$server['routeid']}" : "");
 					$options.=($server['loadfactor'] ? " loadfactor={$server['loadfactor']}" : "");
-					if (isset($server['ping'])){
+					if (isset($server['ping']) && $server['ping']!=""){
 						$options.= " ping={$server['ping']}";
 						$options.=($server['ttl'] ? " ttl={$server['ttl']}" : "");
 						}
@@ -311,7 +311,47 @@ function generate_apache_configuration() {
 		//write balancer conf
 		file_put_contents(APACHEDIR."/etc/apache22/Includes/balancers.conf",$balancer_config,LOCK_EX);
 		}
-		
+	// configure modsecurity group options
+	//chroot apache http://forums.freebsd.org/showthread.php?t=6858
+		if (is_array($config['installedpackages']['apachemodsecuritygroups'])){
+			unset($mods_group);
+			$i=0;
+			$write_config=0;
+			foreach ($config['installedpackages']['apachemodsecuritygroups']['config'] as $mods_groups){
+				//RULES_DIRECTORY
+				$mods_group[$mods_groups['name']]="Include ".RULES_DIRECTORY ."/modsecurity_{$mods_groups['name']}_crs_10_setup.conf\n";
+				if ($mods_groups['crs10']==""){
+					if (file_exists(RULES_DIRECTORY .'/modsecurity_crs_10_setup.conf.example')){
+						$config['installedpackages']['apachemodsecuritygroups']['config'][$i]['crs10']=base64_encode(file_get_contents(RULES_DIRECTORY .'/modsecurity_crs_10_setup.conf.example'));
+						$write_config++;
+					}
+				}
+				file_put_contents(RULES_DIRECTORY ."/modsecurity_{$mods_groups['name']}_crs_10_setup.conf",apache_textarea_decode($config['installedpackages']['apachemodsecuritygroups']['config'][$i]['crs10']),LOCK_EX);
+				
+				foreach (split(",",$mods_groups['baserules']) as $baserule){
+					$mods_group[$mods_groups['name']].="  Include ".RULES_DIRECTORY ."/base_rules/{$baserule}.conf\n";
+					}
+				foreach (split(",",$mods_groups['optionalrules']) as $baserule){
+					$mods_group[$mods_groups['name']].="  Include ".RULES_DIRECTORY ."/optional_rules/{$baserule}.conf\n";
+					}
+				foreach (split(",",$mods_groups['slrrules']) as $baserule){
+					$mods_group[$mods_groups['name']].="  Include ".RULES_DIRECTORY ."/slr_rules/{$baserule}.conf\n";
+					}
+				foreach (split(",",$mods_groups['experimentalrules']) as $baserule){
+					$mods_group[$mods_groups['name']].="  Include ".RULES_DIRECTORY ."/experimental_rules/{$baserule}.conf\n";
+					}
+				$i++;
+				}
+			if ($write_config > 0)
+				write_config("load crs 10 setup file to modsecurity group {$mods_groups['name']}");
+		}
+	//print "<PRE>";
+	//var_dump($mods_group);
+	
+	//mod_security settings
+	if (is_array($config['installedpackages']['apachemodsecuritysettings'])){
+		$mods_settings=$config['installedpackages']['apachemodsecuritysettings']['config'][0];
+	}
 	//configure virtual hosts
 	$namevirtualhosts=array();
 	$namevirtualhosts[0]=$global_listen;
@@ -389,7 +429,10 @@ EOF;
 					$vh_config.="  ProxyPassReverse balancer://{$backend['balancer']}{$backend['backendpath']}\n";
 					if ($backend['compress']== "no")
 						$vh_config.="  SetInputFilter   INFLATE\n  SetOutputFilter  INFLATE\n";
-					if (is_array($config['installedpackages']['apachemodsecuritymanipulation'])){
+					if ($backend['modsecgroup']!="" && $backend['modsecgroup']!="none" && $mods_settings['enablemodsecurity']=="on"){
+						$vh_config.=$mods_group[$backend['modsecgroup']];
+					}
+					if (is_array($config['installedpackages']['apachemodsecuritymanipulation']) && $mods_settings['enablemodsecurity']=="on"){
 						foreach($config['installedpackages']['apachemodsecuritymanipulation']['config'] as $manipulation){
 							if ($backend['modsecmanipulation'] == $manipulation['name']){
 								if (is_array($manipulation['row']))
@@ -409,7 +452,7 @@ EOF;
 	// check/fix perl version on mod_security util files
 	$perl_files= array("httpd-guardian.pl","rules-updater.pl","runav.pl","arachni2modsec.pl","zap2modsec.pl","regression_tests/rulestest.pl");
 	foreach ($perl_files as $perl_file){
-		$file_path=rules_directory."/util/";
+		$file_path=RULES_DIRECTORY."/util/";
 		if (file_exists($file_path.$perl_file)){
 			$script=preg_replace("/#!\S+perl/","#!".APACHEDIR."/bin/perl",file_get_contents($file_path.$perl_file));
 			file_put_contents($file_path.$perl_file,$script,LOCK_EX);
@@ -426,12 +469,9 @@ EOF;
 			}
 	}
 	
-	//mod_security settings
-	if (is_array($config['installedpackages']['apachemodsecuritysettings']['config'])){
-		$mods_settings=$config['installedpackages']['apachemodsecuritysettings']['config'][0];
-		if ($mods_settings!="")
-			$SecGuardianLog="SecGuardianLog \"|".rules_directory."/util/httpd-guardian\"";
-		}
+
+	if ($mods_settings!="")
+		$SecGuardianLog="SecGuardianLog \"|".RULES_DIRECTORY."/util/httpd-guardian\"";
 	
 	//fix http-guardian.pl block bins
 	//$file_path=APACHEDIR.MODSECURITY_DIR."/util/".$perl_lib;
@@ -628,19 +668,20 @@ EOF;
 		$mod_security_custom = $config['installedpackages']['apachesettings']['config'][0]['modsecuritycustom'];
 
 	// Process and include rules
-	if(is_dir(rules_directory)) {
+	if(is_dir(RULES_DIRECTORY)) {
 		$mod_security_rules = "";
-		$files = return_dir_as_array(rules_directory);
+		$files = return_dir_as_array(RULES_DIRECTORY);
 		foreach($files as $file) { 
-			if(file_exists(rules_directory . "/" . $file)) {
+			if(file_exists(RULES_DIRECTORY . "/" . $file)) {
 				// XXX: TODO integrate snorts rule on / off thingie
-				$file_txt = file_get_contents(rules_directory . "/" . $file);
+				$file_txt = file_get_contents(RULES_DIRECTORY . "/" . $file);
 				$mod_security_rules .= $file_txt . "\n";
 			}
 		}
 	}
 
 	#include file templates
+	include ("/usr/local/pkg/apache_mod_security.template");
 	include ("/usr/local/pkg/apache.template");
 
 	file_put_contents(APACHEDIR . "/etc/apache22/httpd.conf",$apache_config,LOCK_EX);

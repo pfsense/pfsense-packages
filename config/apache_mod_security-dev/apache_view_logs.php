@@ -96,7 +96,7 @@ function showLog(content,url,logtype)
 			<?php
 				$tab_array = array();
 				$tab_array[] = array(gettext("Apache"), true, "/pkg_edit.php?xml=apache_settings.xml&amp;id=0");
-				$tab_array[] = array(gettext("ModSecurity"), false, "/pkg_edit.php?xml=apache_mod_security_setttings.xml");
+				$tab_array[] = array(gettext("ModSecurity"), false, "/pkg_edit.php?xml=apache_mod_security_settings.xml");
 				$tab_array[] = array(gettext("Sync"), false, "/pkg_edit.php?xml=apache_mod_security_sync.xml");
 				display_top_tabs($tab_array);
 			?>

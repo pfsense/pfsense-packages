@@ -5,69 +5,6 @@
 			$mod_mem_cache = "LoadModule memcache_module libexec/apache22/mod_memcache.so\n";
 		}
 
-/*
-<IfModule mod_security2.c>
-
-
-    # Turn the filtering engine On or Off
-    SecFilterEngine On
-
-	# XXX Add knobs for these
-	SecRuleEngine On
-	SecRequestBodyAccess On
-	SecResponseBodyAccess On
-
-	SecRequestBodyInMemoryLimit {$secrequestbodyinmemorylimit}
-	SecRequestBodyLimit {$secrequestbodylimit}
-
-	{$mod_security_custom}
-
-	SecResponseBodyMimeTypesClear
-	SecResponseBodyMimeType (null) text/plain text/html text/css text/xml
-
-	# XXX Add knobs for these
-	SecUploadDir /var/spool/apache/private
-	SecUploadKeepFiles Off
-
-    # The audit engine works independently and
-    # can be turned On of Off on the per-server or
-    # on the per-directory basis
-    SecAuditEngine {$secauditengine}
-
-	# XXX Add knobs for these
-    # Make sure that URL encoding is valid
-    SecFilterCheckURLEncoding On
-
-	# XXX Add knobs for these
-    # Unicode encoding check
-    SecFilterCheckUnicodeEncoding On
-
-	# XXX Add knobs for these
-    # Only allow bytes from this range
-    SecFilterForceByteRange 1 255
-
-	# Help prevent the effects of a Slowloris-type of attack
-	# $secreadstatelimit
-
-    # Cookie format checks.
-    SecFilterCheckCookieFormat On
-
-    # The name of the audit log file
-    SecAuditLog logs/audit_log
-    
-    #http-guardian Anti-dos protection
-    {$SecGuardianLog}
-
-    # Should mod_security inspect POST payloads
-    SecFilterScanPOST On
-
-	# Include rules from rules/ directory
-	{$mod_security_rules}
-
-</IfModule>
-
-*/
-
 $apache_dir=APACHEDIR;
 	$apache_config = <<<EOF
 ##################################################################################
@@ -96,6 +33,7 @@ $apache_dir=APACHEDIR;
 # with ServerRoot set to "/usr/local" will be interpreted by the
 # server as "/usr/local//var/log/foo_log".
 
+{$mod_security}
 #
 # ServerRoot: The top of the directory tree under which the server's
 # configuration, error, and log files are kept.

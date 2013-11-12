@@ -74,14 +74,20 @@
 		</tab>
 	</tabs>
 		<adddeleteeditpagefields>
+		<movable>on</movable>
 		<columnitem>
 			<fielddescr>Name</fielddescr>
 			<fieldname>name</fieldname>
 		</columnitem>
 		<columnitem>
+			<fielddescr>Logging</fielddescr>
+			<fieldname>secauditengine</fieldname>
+		</columnitem>
+		<columnitem>
 			<fielddescr>Description</fielddescr>
 			<fieldname>description</fieldname>
 		</columnitem>
+		
 	</adddeleteeditpagefields>
 	<fields>
 		<field>
@@ -94,6 +100,7 @@
 			<description>Enter group name</description>
 			<type>input</type>
 			<size>25</size>
+			<required/>
 		</field>
 		<field>
 			<fielddescr>Description</fielddescr>
@@ -102,6 +109,7 @@
 			<type>input</type>
 			<size>45</size>
 		</field>
+		
 		<field>
 			<fielddescr>Base Rules</fielddescr>
 			<fieldname>baserules</fieldname>
@@ -182,26 +190,50 @@
 			    <option><name>log everything, including very detailed debugging information</name><value>9</value></option>
 			</options>
 		</field>
-
 		<field>
-			<name>Custom options</name>
+			<name>mod_security crs 10 setup</name>
+			<type>listtopic</type>
+		</field>
+		<field>
+			<fielddescr>mod_security crs 10 setup</fielddescr>
+			<fieldname>crs10</fieldname>
+			<dontdisplayname/>
+			<usecolspan2/>
+			<description><![CDATA[<b>modsecurity_crs_10_setup.conf file.</b><br>Leave empty to load setup defaults.]]></description>
+			<type>textarea</type>
+			<encoding>base64</encoding>
+	      	<rows>15</rows>
+	      	<cols>90</cols>			
+		</field>
+		<field>
+			<name>Custom mod_security ErrorDocument</name>
 			<type>listtopic</type>
 		</field>
 		<field>
 			<fielddescr>Custom mod_security ErrorDocument</fielddescr>
 			<fieldname>errordocument</fieldname>
-			<description></description>
+			<dontdisplayname/>
+			<usecolspan2/>
+			<description>Custom mod_security ErrorDocument.</description>
 			<type>textarea</type>
+			<encoding>base64</encoding>
 	      	<rows>10</rows>
-	      	<cols>75</cols>			
+	      	<cols>90</cols>			
+		</field>
+		<field>
+			<name>Custom mod_security rules</name>
+			<type>listtopic</type>
 		</field>
 		<field>
 			<fielddescr>Custom mod_security rules</fielddescr>
 			<fieldname>modsecuritycustom</fieldname>
+			<dontdisplayname/>
+			<usecolspan2/>
 			<description>Paste any custom mod_security rules that you would like to use</description>
 			<type>textarea</type>
+			<encoding>base64</encoding>
 	      	<rows>10</rows>
-	      	<cols>75</cols>			
+	      	<cols>90</cols>			
 		</field>
 	</fields>
 	<custom_php_resync_config_command>

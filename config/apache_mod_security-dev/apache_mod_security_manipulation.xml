@@ -82,6 +82,7 @@
 			<fielddescr>Description</fielddescr>
 			<fieldname>description</fieldname>
 		</columnitem>
+		<movable>on</movable>
 	</adddeleteeditpagefields>
 	<fields>
 		<field>
