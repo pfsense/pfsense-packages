@@ -556,7 +556,7 @@ EOF;
 	Deny from all
 EOF;
 		$mod_status .= "Allow from  ".($settings['netaccessstatus'] ? $settings['netaccessstatus'] : "All")."\n";
-		$mod_status .= "</Location>\n"
+		$mod_status .= "</Location>\n";
 	}
 	
 //** Uncomment to allow adding ip/ports not used by any site proxies
