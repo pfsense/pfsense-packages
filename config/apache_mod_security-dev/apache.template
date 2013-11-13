@@ -6,7 +6,7 @@
 		}
 	if($mods_settings['enablemodsecurity']=="on")
 		$mod_security_module= "LoadModule security2_module libexec/apache22/mod_security2.so\n";
-		
+
 $apache_dir=APACHEDIR;
 	$apache_config = <<<EOF
 ##################################################################################

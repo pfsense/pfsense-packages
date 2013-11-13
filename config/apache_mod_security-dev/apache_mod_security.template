@@ -1,6 +1,6 @@
 <?php
 // Mod_security enabled?
-if($mods_settings['enablemodsecurity']=="on")  {
+if($mods_settings['enablemodsecurity']=="on") {
 	$enable_mod_security = true;
 	$mod_security = <<< EOF
 # -- Rule engine initialization ----------------------------------------------
