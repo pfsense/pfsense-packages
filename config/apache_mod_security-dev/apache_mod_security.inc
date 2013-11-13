@@ -709,7 +709,12 @@ EOF;
 	// Process Status Page 
 	$mod_status = "";
 	if ($settings['statuspage'] == "on") {
+		if($settings['extendedstatuspage']== "on"){
+			$extendedstatus="ExtendedStatus On";
+		}
 		$mod_status .= <<<EOF
+		$mod_status .= <<<EOF
+{$extendedstatus}
 <Location /server-status>
 	SetHandler server-status
 	Order Deny,Allow
