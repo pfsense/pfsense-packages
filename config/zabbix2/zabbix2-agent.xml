@@ -85,7 +85,6 @@
 			<fielddescr>Server</fielddescr>
 			<fieldname>server</fieldname>
 			<description>List of comma delimited IP addresses (or hostnames) of ZABBIX servers</description>
-			<value>127.0.0.1</value>
 			<type>input</type>
 			<size>60</size>
 		</field>
@@ -93,7 +92,6 @@
 			<fielddescr>Server Active</fielddescr>
 			<fieldname>serveractive</fieldname>
 			<description>List of comma delimited IP:port (or hostname:port) pairs of Zabbix servers for active checks</description>
-			<value></value>
 			<type>input</type>
 			<size>60</size>
 		</field>
@@ -101,30 +99,29 @@
 			<fielddescr>Hostname</fielddescr>
 			<fieldname>hostname</fieldname>
 			<description>Unique hostname. Required for active checks and must match hostname as configured on the Zabbix server (case sensitive).</description>
-			<value>localhost</value>
 			<type>input</type>
 			<size>60</size>
 		</field>
 		<field>
 			<fielddescr>Listen IP</fielddescr>
 			<fieldname>listenip</fieldname>
-			<value>0.0.0.0</value>
+			<default_value>0.0.0.0</default_value>
 			<type>input</type>
 			<size>60</size>
-			<description>Listen IP for connections from the server (generally 0.0.0.0 for all interfaces)</description>
+			<description>Listen IP for connections from the server (default 0.0.0.0 for all interfaces)</description>
 		</field>
 		<field>
 			<fielddescr>Listen Port</fielddescr>
 			<fieldname>listenport</fieldname>
-			<value>10050</value>
+			<default_value>10050</default_value>
 			<type>input</type>
 			<size>5</size>
-			<description>Listen port for connections from the server (generally 10050)</description>
+			<description>Listen port for connections from the server (default 10050)</description>
 		</field>
 		<field>
 			<fielddescr>Refresh Active Checks</fielddescr>
 			<fieldname>refreshactchecks</fieldname>
-			<value>120</value>
+			<default_value>120</default_value>
 			<type>input</type>
 			<size>5</size>
 			<description>The agent will refresh list of active checks once per 120 (default) seconds.</description>
@@ -132,15 +129,15 @@
 		<field>
 			<fielddescr>Timeout</fielddescr>
 			<fieldname>timeout</fieldname>
-			<value>3</value>
+			<default_value>3</default_value>
 			<type>input</type>
 			<size>5</size>
-			<description>Timeout (default 3). Do not spend more that Timeout seconds on getting requested value (1-255). The agent does not kill timeouted User Parameters processes!</description>
+			<description>Timeout (default 3). Do not spend more that Timeout seconds on getting requested value (1-30). The agent does not kill timeouted User Parameters processes!</description>
 		</field>
 		<field>
 			<fielddescr>Buffer Send</fielddescr>
 			<fieldname>buffersend</fieldname>
-			<value>5</value>
+			<default_value>5</default_value>
 			<type>input</type>
 			<size>5</size>
 			<description>Buffer Send (default 5). Do not keep data longer than N seconds in buffer (1-3600).</description>
@@ -148,7 +145,7 @@
 		<field>
 			<fielddescr>Buffer Size</fielddescr>
 			<fieldname>buffersize</fieldname>
-			<value>100</value>
+			<default_value>100</default_value>
 			<type>input</type>
 			<size>5</size>
 			<description>Buffer Size (default 100). Maximum number of values in a memory buffer (2-65535). The agent will send all collected data to Zabbix server or proxy if the buffer is full.</description>
@@ -156,7 +153,7 @@
 		<field>
 			<fielddescr>Start Agents</fielddescr>
 			<fieldname>startagents</fieldname>
-			<value>3</value>
+			<default_value>3</default_value>
 			<type>input</type>
 			<size>5</size>
 			<description>Start Agents (default 3). Number of pre-forked instances of zabbix_agentd that process passive checks (0-100).If set to 0, disables passive checks and the agent will not listen on any TCP port.</description>
@@ -165,7 +162,6 @@
 			<fielddescr>User Parameters</fielddescr>
 			<fieldname>userparams</fieldname>
 			<encoding>base64</encoding>
-			<value></value>
 			<type>textarea</type>
 			<rows>5</rows>
 			<cols>50</cols>
