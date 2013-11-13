@@ -9,6 +9,7 @@
     varnish_settings.xml
     part of pfSense (http://www.pfSense.com)
     Copyright (C) 2010 Scott Ullrich <sullrich@gmail.com>
+    Copyright (C) 2013 Marcello Coutinho
     All rights reserved.
                                                                               */
 /* ========================================================================== */
@@ -78,56 +79,92 @@
 	</tabs>
 	<fields>
 		<field>
+			<type>listtopic</type>
+			<name>vcl_recv_early</name>
+		</field>
+		<field>
 			<fielddescr>vcl_recv_early</fielddescr>
 			<fieldname>vcl_recv_early</fieldname>
+			<dontdisplayname/>
+			<usecolspan2/>
 			<description>Paste your custom  <![CDATA[<a target=_new href='http://varnish-cache.org/wiki/VCL'>vcl_recv</a>]]> code here.  This code will be included at the beginning of the vcl_recv function.</description>
 			<type>textarea</type>
-			<cols>50</cols>
+			<cols>90</cols>
 			<rows>10</rows>
 			<encoding>base64</encoding>
+		</field>
+		<field>
+			<type>listtopic</type>
+			<name>vcl_recv_late</name>
 		</field>
 		<field>
 			<fielddescr>vcl_recv_late</fielddescr>
 			<fieldname>vcl_recv_late</fieldname>
+			<dontdisplayname/>
+			<usecolspan2/>
 			<description>Paste your custom  <![CDATA[<a target=_new href='http://varnish-cache.org/wiki/VCL'>vcl_recv</a>]]> code here.  This code will be included at the end of the vcl_recv function.</description>
 			<type>textarea</type>
-			<cols>50</cols>
+			<cols>90</cols>
 			<rows>10</rows>
 			<encoding>base64</encoding>
+		</field>
+		<field>
+			<type>listtopic</type>
+			<name>vcl_fetch_early</name>
 		</field>
 		<field>
 			<fielddescr>vcl_fetch_early</fielddescr>
 			<fieldname>vcl_fetch_early</fieldname>
+			<dontdisplayname/>
+			<usecolspan2/>
 			<description>Paste your custom  <![CDATA[<a target=_new href='http://varnish-cache.org/wiki/VCL'>vcl_fetch</a>]]> code here.  This code will be included at the beginning of the vcl_fetch function.</description>
 			<type>textarea</type>
-			<cols>50</cols>
+			<cols>90</cols>
 			<rows>10</rows>
 			<encoding>base64</encoding>
+		</field>
+		<field>
+			<type>listtopic</type>
+			<name>vcl_fetch_late</name>
 		</field>
 		<field>
 			<fielddescr>vcl_fetch_late</fielddescr>
 			<fieldname>vcl_fetch_late</fieldname>
+			<dontdisplayname/>
+			<usecolspan2/>
 			<description>Paste your custom  <![CDATA[<a target=_new href='http://varnish-cache.org/wiki/VCL'>vcl_fetch</a>]]> code here.  This code will be included at the end of the vcl_fetch function.</description>
 			<type>textarea</type>
-			<cols>50</cols>
+			<cols>90</cols>
 			<rows>10</rows>
 			<encoding>base64</encoding>
+		</field>
+		<field>
+			<type>listtopic</type>
+			<name>vcl_pipe_early</name>
 		</field>
 		<field>
 			<fielddescr>vcl_pipe_early</fielddescr>
 			<fieldname>vcl_pipe_early</fieldname>
+			<dontdisplayname/>
+			<usecolspan2/>
 			<description>Paste your custom  <![CDATA[<a target=_new href='http://varnish-cache.org/wiki/VCL'>vcl_pipe</a>]]> code here.  This code will be included at the beginning of the vcl_pipe function.</description>			
 			<type>textarea</type>
-			<cols>50</cols>
+			<cols>90</cols>
 			<rows>10</rows>
 			<encoding>base64</encoding>
 		</field>
 		<field>
+			<type>listtopic</type>
+			<name>vcl_pipe_late</name>
+		</field>
+		<field>
 			<fielddescr>vcl_pipe_late</fielddescr>
 			<fieldname>vcl_pipe_late</fieldname>
+			<dontdisplayname/>
+			<usecolspan2/>
 			<description>Paste your custom <![CDATA[<a target=_new href='http://varnish-cache.org/wiki/VCL'>vcl_pipe</a>]]> code here.  This code will be included at the end of the vcl_pipe function.</description>
 			<type>textarea</type>
-			<cols>50</cols>
+			<cols>90</cols>
 			<rows>10</rows>
 			<encoding>base64</encoding>
 		</field>

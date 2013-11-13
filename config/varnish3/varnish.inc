@@ -4,7 +4,7 @@
 	varnish.inc
     part of pfSense (http://www.pfSense.com)
     Copyright (C) 2010 Scott Ullrich <sullrich@gmail.com>
-    Copyright (C) 2011 Marcello Coutinho
+    Copyright (C) 2011-2013 Marcello Coutinho
     Copyright (C) 2012 Marcio Carlos Antao
     All rights reserved.
                                                                               */
@@ -32,6 +32,14 @@
     POSSIBILITY OF SUCH DAMAGE.
                                                                               */
 /* ========================================================================== */
+$shortcut_section = "varnish";
+
+$pf_version=substr(trim(file_get_contents("/etc/version")),0,3);
+if ($pf_version > 2.0)
+	define('VARNISH_LOCALBASE', '/usr/pbi/varnish-' . php_uname("m"));
+else
+  define('VARNISH_LOCALBASE','/usr/local');
+
 
 function varnish_settings_post_validate($post, $input_errors) {
 	if( !is_numeric($post['storagesize'])) 
@@ -244,7 +252,6 @@ mkdir -p /var/varnish
 rm /var/varnish/storage.bin 2>/dev/null
 killall varnishd 2>/dev/null
 sleep 1
-sysctl kern.ipc.nmbclusters=65536
 sysctl kern.ipc.somaxconn=16384
 sysctl kern.maxfiles=131072
 sysctl kern.maxfilesperproc=104856
@@ -641,7 +648,15 @@ sub vcl_fini {
 }	
 
 EOF;
-
+		file_put_contents("/var/etc/default.vcl",$varnish_config_file,LOCK_EX);
+		$cc_file="/usr/local/bin/cc";
+		foreach (glob(VARNISH_LOCALBASE."/bin/gcc*") as $bin_file) {
+			$gcc_file=$bin_file;
+		}
+		if (!file_exists($cc_file) && file_exists($gcc_file)){
+			symlink($gcc_file,$cc_file);
+		}
+		
 		$fd = fopen("/var/etc/default.vcl", "w");
 		fwrite($fd, $varnish_config_file);
 		fclose($fd);
@@ -652,29 +667,67 @@ EOF;
 /* Uses XMLRPC to synchronize the changes to a remote node */
 function varnish_sync_on_changes() {
 	global $config, $g;
-	log_error("[varnish] varnish_xmlrpc_sync.php is starting.");
-	$synconchanges = $config['installedpackages']['varnishsync']['config'][0]['synconchanges'];	
-	if(!$synconchanges) 
-		return;
-	foreach ($config['installedpackages']['varnishsync']['config'] as $rs ){
-		foreach($rs['row'] as $sh){
-		$sync_to_ip = $sh['ipaddress'];
-		$password   = $sh['password'];
-		if($password && $sync_to_ip)
-			varnish_do_xmlrpc_sync($sync_to_ip, $password);
+	if (is_array($config['installedpackages']['varnishsync']['config'])){
+		$varnish_sync=$config['installedpackages']['varnishsync']['config'][0];
+		$synconchanges = $varnish_sync['synconchanges'];
+		$synctimeout = $varnish_sync['synctimeout'];
+		switch ($synconchanges){
+			case "manual":
+				if (is_array($varnish_sync[row])){
+					$rs=$varnish_sync[row];
+					}
+				else{
+					log_error("[varnish] xmlrpc sync is enabled but there is no hosts to push on varnish config.");
+					return;
+					}
+				break;
+			case "auto":
+					if (is_array($config['hasync'])){
+						$hasync=$config['hasync'][0];
+						$rs[0]['ipaddress']=$hasync['synchronizetoip'];
+						$rs[0]['username']=$hasync['username'];
+						$rs[0]['password']=$hasync['password'];
+					}
+					else{
+						log_error("[varnish] xmlrpc sync is enabled but there is no system backup hosts to push varnish config.");
+						return;
+					}
+				break;			
+			default:
+				return;
+			break;
 		}
-	}
-	log_error("[varnish] varnish_xmlrpc_sync.php is ending.");
+		if (is_array($rs)){
+			log_error("[varnish] xmlrpc sync is starting.");
+			foreach($rs as $sh){
+				$sync_to_ip = $sh['ipaddress'];
+				$password = $sh['password'];
+				if($sh['username'])
+					$username = $sh['username'];
+				else
+					$username = 'admin';
+				if($password && $sync_to_ip)
+					varnish_do_xmlrpc_sync($sync_to_ip, $username, $password,$synctimeout);
+				}
+			log_error("[varnish] xmlrpc sync is ending.");
+			}
+ 		}
 }
 /* Do the actual XMLRPC sync */
-function varnish_do_xmlrpc_sync($sync_to_ip, $password) {
+function varnish_do_xmlrpc_sync($sync_to_ip, $username, $password,$synctimeout) {
 	global $config, $g;
-
+	
+	if(!$username)
+		return;
+		
 	if(!$password)
 		return;
 
 	if(!$sync_to_ip)
 		return;
+	
+	if(!$synctimeout)
+		$synctimeout=25;
 
 	$xmlrpc_sync_neighbor = $sync_to_ip;
     if($config['system']['webgui']['protocol'] != "") {
@@ -710,18 +763,18 @@ function varnish_do_xmlrpc_sync($sync_to_ip, $password) {
 	$method = 'pfsense.merge_installedpackages_section_xmlrpc';
 	$msg = new XML_RPC_Message($method, $params);
 	$cli = new XML_RPC_Client('/xmlrpc.php', $url, $port);
-	$cli->setCredentials('admin', $password);
+	$cli->setCredentials($username, $password);
 	if($g['debug'])
 		$cli->setDebug(1);
-	/* send our XMLRPC message and timeout after 250 seconds */
-	$resp = $cli->send($msg, "250");
+	/* send our XMLRPC message and timeout after $synctimeout seconds */
+	$resp = $cli->send($msg, $synctimeout);
 	if(!$resp) {
 		$error = "A communications error occurred while attempting varnish XMLRPC sync with {$url}:{$port}.";
 		log_error($error);
 		file_notice("sync_settings", $error, "varnish Settings Sync", "");
 	} elseif($resp->faultCode()) {
 		$cli->setDebug(1);
-		$resp = $cli->send($msg, "250");
+		$resp = $cli->send($msg, $synctimeout);
 		$error = "An error code was received while attempting varnish XMLRPC sync with {$url}:{$port} - Code " . $resp->faultCode() . ": " . $resp->faultString();
 		log_error($error);
 		file_notice("sync_settings", $error, "varnish Settings Sync", "");
@@ -742,15 +795,15 @@ function varnish_do_xmlrpc_sync($sync_to_ip, $password) {
 	log_error("varnish XMLRPC reload data {$url}:{$port}.");
 	$msg = new XML_RPC_Message($method, $params);
 	$cli = new XML_RPC_Client('/xmlrpc.php', $url, $port);
-	$cli->setCredentials('admin', $password);
-	$resp = $cli->send($msg, "250");
+	$cli->setCredentials($username, $password);
+	$resp = $cli->send($msg, $synctimeout);
 	if(!$resp) {
 		$error = "A communications error occurred while attempting varnish XMLRPC sync with {$url}:{$port} (pfsense.exec_php).";
 		log_error($error);
 		file_notice("sync_settings", $error, "varnish Settings Sync", "");
 	} elseif($resp->faultCode()) {
 		$cli->setDebug(1);
-		$resp = $cli->send($msg, "250");
+		$resp = $cli->send($msg, $synctimeout);
 		$error = "An error code was received while attempting varnish XMLRPC sync with {$url}:{$port} - Code " . $resp->faultCode() . ": " . $resp->faultString();
 		log_error($error);
 		file_notice("sync_settings", $error, "varnish Settings Sync", "");

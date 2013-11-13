@@ -9,7 +9,7 @@
     varnish_backends.xml
     part of pfSense (http://www.pfSense.com)
     Copyright (C) 2010 Scott Ullrich <sullrich@gmail.com>
-    Copyright (C) 2011 Marcello Coutinho
+    Copyright (C) 2011-2013 Marcello Coutinho
     All rights reserved.                                                      
 /*/
 /* ========================================================================== */
@@ -85,6 +85,11 @@
 	    <chmod>0755</chmod>
 	    <item>http://www.pfsense.com/packages/config/varnish3/varnishstat.php</item>
 	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/www/shortcuts/</prefix>
+		<chmod>0755</chmod>
+		<item>http://www.pfsense.org/packages/config/varnish3/pkg_varnish.inc</item>
+	</additional_files_needed>
 	<menu>
 		<name>Varnish</name>
 		<tooltiptext>Varnish</tooltiptext>
@@ -129,14 +134,23 @@
 		</tab>
 	</tabs>
 	<adddeleteeditpagefields>
+		<movable>on</movable>
 		<columnitem>
 			<fielddescr>IPAddress</fielddescr>
 			<fieldname>ipaddress</fieldname>
 		</columnitem>
 		<columnitem>
+			<fielddescr>Port</fielddescr>
+			<fieldname>port</fieldname>
+		</columnitem>	
+		<columnitem>
 			<fielddescr>Name</fielddescr>
 			<fieldname>backendname</fieldname>
-		</columnitem>	
+		</columnitem>
+		<columnitem>
+			<fielddescr>Description</fielddescr>
+			<fieldname>description</fieldname>
+		</columnitem>
 	</adddeleteeditpagefields>
 	<fields>
 		<field>
@@ -163,7 +177,15 @@
 			<fieldname>port</fieldname>
 			<description>Enter the TCP/IP port of the webserver.</description>
 			<type>input</type>
+			<size>6</size>
 			<validate>^[0-9]+$</validate>
+		</field>
+		<field>
+			<fielddescr>Description</fielddescr>
+			<fieldname>description</fieldname>
+			<description>Enter the description for this Backend.</description>
+			<type>input</type>
+			<size>40</size>
 		</field>
 		<field>
 			<fielddescr>PerformanceMetrics</fielddescr>

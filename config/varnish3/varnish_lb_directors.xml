@@ -9,7 +9,7 @@
     varnish_lb_directors.xml
     part of pfSense (http://www.pfSense.com)
     Copyright (C) 2010 Scott Ullrich <sullrich@gmail.com>
-    Copyright (C) 2011 Marcello Coutinho
+    Copyright (C) 2011-2013 Marcello Coutinho
     
     All rights reserved.                                                      
 */
@@ -99,6 +99,7 @@
 		</tab>
 	</tabs>
 	<adddeleteeditpagefields>
+			<movable>on</movable>
 		<columnitem>
 			<fielddescr>Director name</fielddescr>
 			<fieldname>directorname</fieldname>

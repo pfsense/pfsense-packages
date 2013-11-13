@@ -787,17 +787,17 @@
 		<internal_name>varnish</internal_name>
 		<descr><![CDATA[Varnish is a state-of-the-art, high-performance HTTP accelerator.<br />
 						It uses the advanced features in FreeBSD 6/7/8 to achieve its high performance.<br />
-						Version 3.0.2 includes streaming support]]></descr>
+						Version 3 includes streaming support]]></descr>
 		<website>http://varnish-cache.org</website>
 		<pkginfolink>http://doc.pfsense.org/index.php/Varnish_package</pkginfolink>
 		<category>Services</category>
-		<version>3.0.2 pkg v.0.1</version>
-		<status>BETA</status>
+		<version>3.0.4 pkg v.0.2</version>
+		<status>RC</status>
 		<required_version>2.0</required_version>
 		<config_file>http://www.pfsense.com/packages/config/varnish3/varnish_backends.xml</config_file>
 		<configurationfile>varnish_backends.xml</configurationfile>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
-		<depends_on_package_pbi>varnish-3.0.3_2-i386.pbi</depends_on_package_pbi>
+		<depends_on_package_pbi>varnish-3.0.4-i386.pbi</depends_on_package_pbi>
 		<depends_on_package>varnish-3.0.2.tbz</depends_on_package>
 		<depends_on_package>pcre-8.21_1.tbz</depends_on_package>
 		<build_pbi>
