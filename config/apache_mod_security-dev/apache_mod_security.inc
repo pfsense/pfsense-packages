@@ -582,26 +582,28 @@ EOF;
 
 				#Check virtualhost locations
 				foreach ($virtualhost['row'] as $backend){
-					$vh_config.=" <Location ".($backend['sitepath'] ? $backend['sitepath'] : "/").">\n";
-					$vh_config.="  ProxyPass        balancer://{$backend['balancer']}{$backend['backendpath']}\n";
-					$vh_config.="  ProxyPassReverse balancer://{$backend['balancer']}{$backend['backendpath']}\n";
-					if ($backend['compress']== "no")
-						$vh_config.="  SetInputFilter   INFLATE\n  SetOutputFilter  INFLATE\n";
-					if ($backend['modsecgroup']!="" && $backend['modsecgroup']!="none" && $mods_settings['enablemodsecurity']=="on"){
-						$vh_config.=$mods_group[$backend['modsecgroup']];
-					}
-					if (is_array($config['installedpackages']['apachemodsecuritymanipulation']) && $mods_settings['enablemodsecurity']=="on"){
-						foreach($config['installedpackages']['apachemodsecuritymanipulation']['config'] as $manipulation){
-							if ($backend['modsecmanipulation'] == $manipulation['name']){
-								if (is_array($manipulation['row']))
-									foreach ($manipulation['row'] as $secrule)
-										$vh_config.="  {$secrule['type']} {$secrule['value']}\n";
+					if ($backend['balancer'] != "none"){
+						$vh_config.=" <Location ".($backend['sitepath'] ? $backend['sitepath'] : "/").">\n";
+						$vh_config.="  ProxyPass        balancer://{$backend['balancer']}{$backend['backendpath']}\n";
+						$vh_config.="  ProxyPassReverse balancer://{$backend['balancer']}{$backend['backendpath']}\n";
+						if ($backend['compress']== "no")
+							$vh_config.="  SetInputFilter   INFLATE\n  SetOutputFilter  INFLATE\n";
+						if ($backend['modsecgroup']!="" && $backend['modsecgroup']!="none" && $mods_settings['enablemodsecurity']=="on"){
+							$vh_config.=$mods_group[$backend['modsecgroup']];
+						}
+						if (is_array($config['installedpackages']['apachemodsecuritymanipulation']) && $mods_settings['enablemodsecurity']=="on"){
+							foreach($config['installedpackages']['apachemodsecuritymanipulation']['config'] as $manipulation){
+								if ($backend['modsecmanipulation'] == $manipulation['name']){
+									if (is_array($manipulation['row']))
+										foreach ($manipulation['row'] as $secrule)
+											$vh_config.="  {$secrule['type']} {$secrule['value']}\n";
+									}
 								}
 							}
-						}
-					$vh_config.= apache_textarea_decode($backend['custom'])."\n\n";
-					$vh_config.=" </Location>\n\n";
+						$vh_config.= apache_textarea_decode($backend['custom'])."\n\n";
+						$vh_config.=" </Location>\n\n";
 					}
+				}
 				$vh_config.="</VirtualHost>\n";
 				}
 			}
