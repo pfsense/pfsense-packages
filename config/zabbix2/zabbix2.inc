@@ -118,14 +118,18 @@ function validate_input_zabbix2($post,&$input_errors){
 		if (!preg_match("/\w+/", $post['hostname'])) {
 			$input_errors[]='Hostname field is required.';
 			}
-		
-		if (!is_ipaddr_configured($post['listenip']) && !preg_match("/(127.0.0.1|0.0.0.0)/",$post['listenip'])) {
-			$input_errors[]='Listen IP is not a configured IP address.';
+	
+		if ($post['listenip'] != '') {
+			if (!is_ipaddr_configured($post['listenip']) && !preg_match("/(127.0.0.1|0.0.0.0)/",$post['listenip'])) {
+				$input_errors[]='Listen IP is not a configured IP address.';
 			}
+		}
 
-		if (!preg_match("/^\d+$/", $post['listenport'])) {
-			$input_errors[]='Listen Port is not numeric.';
+		if ($post['listenport'] != '') {
+			if (!preg_match("/^\d+$/", $post['listenport'])) {
+				$input_errors[]='Listen Port is not numeric.';
 			}	
+		}
 
 		if ($post['refreshactchecks'] != '') {
 			if (!preg_match("/^\d+$/", $post['refreshactchecks'])) {
@@ -134,11 +138,13 @@ function validate_input_zabbix2($post,&$input_errors){
 				$input_errors[]='You must enter a valid value for \'Refresh Active Checks\'';
 			}
 		}
-	
-		if (!is_numericint($post['timeout'])) {
-			$input_errors[]='Timeout is not numeric.';
-		} elseif ( $post['timeout'] < 1 || $post['timeout'] > 255 ) {
-			$input_errors[]='You must enter a valid value for \'Timeout\'';
+
+		if ($post['timeout'] != '') {
+			if (!is_numericint($post['timeout'])) {
+				$input_errors[]='Timeout is not numeric.';
+			} elseif ( $post['timeout'] < 1 || $post['timeout'] > 30 ) {
+				$input_errors[]='You must enter a valid value for \'Timeout\'';
+			}
 		}
 	
 		if ($post['buffersend'] != '') {
@@ -214,19 +220,22 @@ EOF;
 			$BufferSize=(preg_match("/(\d+)/",$zbagent_config['buffersize'],$matches)? $matches[1]  : "100");
 			$StartAgents=(preg_match("/(\d+)/",$zbagent_config['startagents'],$matches)? $matches[1] :"3" );
 			$UserParams=base64_decode($zbagent_config['userparams']);
-		
+			$ListenIp=($zbagent_config['listenip'] != ''? $zbagent_config['listenip'] : "0.0.0.0");
+			$ListenPort=($zbagent_config['listenport'] != ''? $zbagent_config['listenport'] : "10050");
+			$TimeOut=($zbagent_config['timeout'] != ''? $zbagent_config['timeout'] : "3");
+	
 			$zbagent_conf_file = <<< EOF
 Server={$zbagent_config['server']}
 ServerActive={$zbagent_config['serveractive']}
 Hostname={$zbagent_config['hostname']}
-ListenIP={$zbagent_config['listenip']}
-ListenPort={$zbagent_config['listenport']}
+ListenIP={$ListenIp}
+ListenPort={$ListenPort}
 RefreshActiveChecks={$RefreshActChecks}
 DebugLevel=3
 PidFile=/var/run/zabbix2/zabbix2_agentd.pid
 LogFile=/var/log/zabbix2/zabbix2_agentd.log
 LogFileSize=1
-Timeout={$zbagent_config['timeout']}
+Timeout={$TimeOut}
 BufferSend={$BufferSend}
 BufferSize={$BufferSize}
 StartAgents={$StartAgents}

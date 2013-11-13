@@ -58,7 +58,7 @@
 		<url>/pkg_edit.php?xml=zabbix2-proxy.xml&amp;id=0</url>
 	</menu>
 	<service>
-		<name>zabbix-proxy</name>
+		<name>zabbix_proxy</name>
 		<rcfile>zabbix2_proxy.sh</rcfile>
 		<executable>zabbix_proxy</executable>
 		<description>Zabbix proxy collection daemon</description>
