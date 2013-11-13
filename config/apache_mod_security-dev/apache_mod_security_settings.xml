@@ -101,7 +101,6 @@
 			<fielddescr>Max request per IP</fielddescr>
 			<fieldname>SecReadStateLimit</fieldname>
 			<description>
-			//274
 				<![CDATA[This option limits number of POSTS accepted from same IP address and help prevent the effects of a Slowloris-type of attack.<br>
 				 More info about this attack can be found here: http://en.wikipedia.org/wiki/Slowloris
 				]]>					
