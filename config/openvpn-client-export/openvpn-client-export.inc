@@ -471,7 +471,7 @@ function openvpn_client_export_installer($srvid, $usrid, $crtid, $useaddr, $quot
 			$client_install_exe = "openvpn-install-2.3-x86_64.exe";
 			break;
 		default:
-			$client_install_exe = "openvpn-install-2.2.exe";
+			$client_install_exe = "openvpn-install-2.3-i686.exe";
 	}
 
 	$ovpndir = "/usr/local/share/openvpn";
@@ -499,6 +499,8 @@ function openvpn_client_export_installer($srvid, $usrid, $crtid, $useaddr, $quot
 	exec("cp -r {$workdir}/template/* {$tempdir}");
 	// and put the required installer exe in place
 	exec("/bin/cp {$tempdir}/{$client_install_exe} {$tempdir}/openvpn-install.exe");
+	if (stristr($openvpn_version, "x64"))
+		rename("{$tempdir}/openvpn-postinstall64.exe", "{$tempdir}/openvpn-postinstall.exe");
 
 	// write configuration file
 	$prefix = openvpn_client_export_prefix($srvid, $usrid, $crtid);
@@ -544,8 +546,6 @@ function openvpn_client_export_installer($srvid, $usrid, $crtid, $useaddr, $quot
 	if ($openvpnmanager)
 		$files .= "openvpnmanager ";
 
-	unlink("openvpn-postinstall.exe");
-	rename("openvpnmanager/openvpn-postinstall.exe","openvpn-postinstall.exe");
 	$files .= "openvpn-install.exe ";
 	$files .= "openvpn-postinstall.exe ";
 	if ($usetoken)

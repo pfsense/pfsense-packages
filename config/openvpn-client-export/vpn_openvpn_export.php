@@ -434,11 +434,9 @@ function server_changed() {
 		cell2.innerHTML += "<a href='javascript:download_begin(\"confinline\"," + i + ", -1)'>Others<\/a>";
 		cell2.innerHTML += "<br\/>- Windows Installers:<br\/>";
 		cell2.innerHTML += "&nbsp;&nbsp; ";
-		cell2.innerHTML += "<a href='javascript:download_begin(\"inst\"," + i + ", -1)'>2.2<\/a>";
-		cell2.innerHTML += "&nbsp;&nbsp; ";
 		cell2.innerHTML += "<a href='javascript:download_begin(\"inst-2.3-x86\"," + i + ", -1)'>2.3-x86<\/a>";
-//		cell2.innerHTML += "&nbsp;&nbsp; ";
-//		cell2.innerHTML += "<a href='javascript:download_begin(\"inst-2.3-x64\"," + i + ", -1)'>2.3-x64<\/a>";
+		cell2.innerHTML += "&nbsp;&nbsp; ";
+		cell2.innerHTML += "<a href='javascript:download_begin(\"inst-2.3-x64\"," + i + ", -1)'>2.3-x64<\/a>";
 		cell2.innerHTML += "<br\/>- Mac OSX:<br\/>";
 		cell2.innerHTML += "&nbsp;&nbsp; ";
 		cell2.innerHTML += "<a href='javascript:download_begin(\"visc\"," + i + ", -1)'>Viscosity Bundle<\/a>";
@@ -471,11 +469,9 @@ function server_changed() {
 		cell2.innerHTML += "<a href='javascript:download_begin(\"confinline\", -1," + j + ")'>Others<\/a>";
 		cell2.innerHTML += "<br\/>- Windows Installers:<br\/>";
 		cell2.innerHTML += "&nbsp;&nbsp; ";
-		cell2.innerHTML += "<a href='javascript:download_begin(\"inst\", -1," + j + ")'>2.2<\/a>";
-		cell2.innerHTML += "&nbsp;&nbsp; ";
 		cell2.innerHTML += "<a href='javascript:download_begin(\"inst-2.3-x86\", -1," + j + ")'>2.3-x86<\/a>";
-//		cell2.innerHTML += "&nbsp;&nbsp; ";
-//		cell2.innerHTML += "<a href='javascript:download_begin(\"inst-2.3-x64\", -1," + j + ")'>2.3-x64<\/a>";
+		cell2.innerHTML += "&nbsp;&nbsp; ";
+		cell2.innerHTML += "<a href='javascript:download_begin(\"inst-2.3-x64\", -1," + j + ")'>2.3-x64<\/a>";
 		cell2.innerHTML += "<br\/>- Mac OSX:<br\/>";
 		cell2.innerHTML += "&nbsp;&nbsp; ";
 		cell2.innerHTML += "<a href='javascript:download_begin(\"visc\", -1," + j + ")'>Viscosity Bundle<\/a>";
@@ -515,11 +511,9 @@ function server_changed() {
 		cell2.innerHTML += "<a href='javascript:download_begin(\"confinline\"," + i + ")'>Others<\/a>";
 		cell2.innerHTML += "<br\/>- Windows Installers:<br\/>";
 		cell2.innerHTML += "&nbsp;&nbsp; ";
-		cell2.innerHTML += "<a href='javascript:download_begin(\"inst\"," + i + ")'>2.2<\/a>";
-		cell2.innerHTML += "&nbsp;&nbsp; ";
 		cell2.innerHTML += "<a href='javascript:download_begin(\"inst-2.3-x86\"," + i + ")'>2.3-x86<\/a>";
-//		cell2.innerHTML += "&nbsp;&nbsp; ";
-//		cell2.innerHTML += "<a href='javascript:download_begin(\"inst-2.3-x64\"," + i + ")'>2.3-x64<\/a>";
+		cell2.innerHTML += "&nbsp;&nbsp; ";
+		cell2.innerHTML += "<a href='javascript:download_begin(\"inst-2.3-x64\"," + i + ")'>2.3-x64<\/a>";
 		cell2.innerHTML += "<br\/>- Mac OSX:<br\/>";
 		cell2.innerHTML += "&nbsp;&nbsp; ";
 		cell2.innerHTML += "<a href='javascript:download_begin(\"visc\"," + i + ")'>Viscosity Bundle<\/a>";
@@ -806,6 +800,7 @@ function useproxy_changed(obj) {
 											 This will change the generated .ovpn configuration to allow for usage of the management interface.
 											 And include the OpenVPNManager program in the "Windows Installers". With this OpenVPN can be used also by non-administrator users.
 											 This is also useful for Windows Vista/7/8 systems where elevated permissions are needed to add routes to the system.
+											<br/><br/>NOTE: This is not currently compatible with the 64-bit OpenVPN installer. It will work with the 32-bit installer on a 64-bit system.
 										</span>
 									</td>
 								</tr>
