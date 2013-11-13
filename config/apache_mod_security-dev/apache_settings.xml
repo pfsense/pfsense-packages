@@ -93,7 +93,7 @@
 			<fielddescr>Server hostname</fielddescr>
 			<fieldname>hostname</fieldname>
 			<description>
-				<![CDATA[Enter the servers hostname<br/
+				<![CDATA[Enter the servers hostname<br>
 					NOTE: Leave blank to use this devices hostname.]]>
 			</description>
 			<type>input</type>
@@ -295,7 +295,7 @@
 			<fielddescr>Network Access Status Page</fielddescr>
 			<fieldname>netaccessstatus</fieldname>
 			<description>
-				<![CDATA[Networks that can access apache status page. Ex: 172.16.1.0/24<br/
+				<![CDATA[Networks that can access apache status page. Ex: 172.16.1.0/24<br>
 					NOTE: Leave blank to allow access from any ip.(Not recommended for security reasons)]]>
 			</description>
 			<type>input</type>
