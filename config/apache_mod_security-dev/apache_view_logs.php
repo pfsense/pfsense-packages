@@ -42,7 +42,7 @@ $pfSversion = str_replace("\n", "", file_get_contents("/etc/version"));
 if(strstr($pfSversion, "1.2"))
         $one_two = true;
 
-$pgtitle = "Status: Apache Vhosts Logs";
+$pgtitle = "Status: Apache VirtualHost Logs";
 include("head.inc");
 ?>
 
@@ -171,8 +171,8 @@ function showLog(content,url,logtype)
 			</tbody>
 		</table>
 	</form>
-	<div id="bowserinfo" style='padding: 5px; border: 1px dashed #990000; font-weight:bold; font-size: 0.9em; text-align: center; margin: 1px; display:block; height: 12px;'> 
-		<span><span>
+	<div id="browserinfo" style='padding: 5px; border: 1px dashed #990000; font-weight:bold; font-size: 0.9em; text-align: center; margin: 1px; display:block; height: 12px;'> 
+		<span></span>
 	</div>
 	<!-- Squid Table --> 
 	<table width="100%" border="0" cellpadding="0" cellspacing="0">

@@ -73,7 +73,7 @@
 			<tab_level>2</tab_level>
 		</tab>
 	</tabs>
-		<adddeleteeditpagefields>
+	<adddeleteeditpagefields>
 		<movable>on</movable>
 		<columnitem>
 			<fielddescr>Name</fielddescr>
@@ -87,7 +87,7 @@
 			<fielddescr>Description</fielddescr>
 			<fieldname>description</fieldname>
 		</columnitem>
-		
+
 	</adddeleteeditpagefields>
 	<fields>
 		<field>
@@ -109,7 +109,7 @@
 			<type>input</type>
 			<size>45</size>
 		</field>
-		
+
 		<field>
 			<fielddescr>Base Rules</fielddescr>
 			<fieldname>baserules</fieldname>
@@ -202,8 +202,8 @@
 			<description><![CDATA[<b>modsecurity_crs_10_setup.conf file.</b><br>Leave empty to load setup defaults.]]></description>
 			<type>textarea</type>
 			<encoding>base64</encoding>
-	      	<rows>15</rows>
-	      	<cols>90</cols>			
+			<rows>15</rows>
+			<cols>90</cols>
 		</field>
 		<field>
 			<name>Custom mod_security ErrorDocument</name>
@@ -217,8 +217,8 @@
 			<description>Custom mod_security ErrorDocument.</description>
 			<type>textarea</type>
 			<encoding>base64</encoding>
-	      	<rows>10</rows>
-	      	<cols>90</cols>			
+		      	<rows>10</rows>
+		      	<cols>90</cols>
 		</field>
 		<field>
 			<name>Custom mod_security rules</name>
@@ -232,8 +232,8 @@
 			<description>Paste any custom mod_security rules that you would like to use</description>
 			<type>textarea</type>
 			<encoding>base64</encoding>
-	      	<rows>10</rows>
-	      	<cols>90</cols>			
+		      	<rows>10</rows>
+		      	<cols>90</cols>
 		</field>
 	</fields>
 	<custom_php_resync_config_command>

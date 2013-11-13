@@ -4,6 +4,7 @@
 	part of apache_mod_security package (http://www.pfSense.com)
 	Copyright (C) 2009, 2010 Scott Ullrich
 	Copyright (C) 2012-2013 Marcello Coutinho
+	Copyright (C) 2013 Stephane Lapie <stephane.lapie@asahinet.com>
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
@@ -27,6 +28,7 @@
 	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 	POSSIBILITY OF SUCH DAMAGE.
 */
+
 $shortcut_section = "apache";
 // Check to find out on which system the package is running
 $pf_version=substr(trim(file_get_contents("/etc/version")),0,3);
@@ -123,6 +125,7 @@ function apache_mod_security_resync() {
 	global $config, $g;
 	apache_mod_security_install();
 	$dirs=array("base", "experimental","optional", "slr");
+	log_error("apache_mod_security_package: configuration resync is starting.");
 	if (! file_exists(APACHEDIR ."/". MODSECURITY_DIR . "/LICENSE")){
 		exec ("/usr/local/bin/git clone https://github.com/SpiderLabs/owasp-modsecurity-crs.git ".APACHEDIR."/".MODSECURITY_DIR);
 		//chdir (APACHEDIR."/".MODSECURITY_DIR);
@@ -136,14 +139,165 @@ function apache_mod_security_resync() {
 			while (false !== ($entry = readdir($handle))) {
 				if (preg_match("/(\S+).conf$/",$entry,$matches))
 					$config["installedpackages"]["modsecurityfiles{$dir}"]["config"][]=array("file"=>$matches[1]);
-				}
+			}
 			closedir($handle);
-			}
-			}
+		}
+	}
 	if ($write_config > 0)
 		write_config();
 	apache_mod_security_checkconfig();
 	apache_mod_security_restart();
+	log_error("apache_mod_security_package: configuration resync is ending.");
+
+	if (is_array($config['installedpackages']['apachesync']['config'])){
+		$apache_sync = $config['installedpackages']['apachesync']['config'][0];
+		$synconchanges = $apache_sync['synconchanges'];
+		$synctimeout = $apache_sync['synctimeout'];
+		switch ($synconchanges){
+			case "manual":
+				if (is_array($apache_sync[row])){
+					$rs = $apache_sync[row];
+				} else {
+					log_error("apache_mod_security_package: xmlrpc sync is enabled but there is no hosts to push on apache config.");
+					return;
+				}
+				break;
+			case "auto":
+				if (is_array($config['installedpackages']['carpsettings']) && is_array($config['installedpackages']['carpsettings']['config'])){ // pfSense 2.0.x
+					$system_carp = $config['installedpackages']['carpsettings']['config'][0];
+					$rs[0]['ipaddress'] = $system_carp['synchronizetoip'];
+					$rs[0]['username'] = $system_carp['username'];
+					$rs[0]['password'] = $system_carp['password'];
+				} else if (is_array($config['hasync'])) { // pfSense 2.1
+					$system_carp = $config['hasync'];
+					$rs[0]['ipaddress'] = $system_carp['synchronizetoip'];
+					$rs[0]['username'] = $system_carp['username'];
+					$rs[0]['password'] = $system_carp['password'];
+				} else {
+					log_error("apache_mod_security_package: xmlrpc sync is enabled but there is no system backup hosts to push apache config.");
+					return;
+				}
+				break;
+			default:
+				return;
+			break;
+		}
+	}
+	if (is_array($rs)){
+		foreach($rs as $sh){
+			$sync_to_ip = $sh['ipaddress'];
+			$password = $sh['password'];
+			if ($sh['username'])
+				$username = $sh['username'];
+			else
+				$username = 'admin';
+			if ($password && $sync_to_ip)
+				apache_mod_security_do_xmlrpc_sync($sync_to_ip, $username, $password, $synctimeout);
+		}
+	}
+}
+
+// Do the actual XMLRPC Sync
+function apache_mod_security_do_xmlrpc_sync($sync_to_ip, $username, $password, $synctimeout) {
+        global $config, $g;
+
+	if(!$username)
+		return;
+
+        if(!$password)
+		return;
+
+	if(!$sync_to_ip)
+		return;
+
+	if(!$synctimeout)
+		$synctimeout=250;
+
+	$xmlrpc_sync_neighbor = $sync_to_ip;
+	if($config['system']['webgui']['protocol'] != "") {
+		$synchronizetoip = $config['system']['webgui']['protocol'];
+		$synchronizetoip .= "://";
+	}
+	$port = $config['system']['webgui']['port'];
+	/* if port is empty lets rely on the protocol selection */
+	if($port == "") {
+		if($config['system']['webgui']['protocol'] == "http")
+			$port = "80";
+		else
+			$port = "443";
+	}
+	$synchronizetoip .= $sync_to_ip;
+
+	/* xml will hold the sections to sync */
+	$xml = array();
+	$xml['apachesettings'] = $config['installedpackages']['apachesettings'];
+	$xml['apachemodsecurity'] = $config['installedpackages']['apachemodsecurity'];
+	$xml['apachemodsecuritysettings'] = $config['installedpackages']['apachemodsecuritysettings'];
+	$xml['apachebalancer'] = $config['installedpackages']['apachebalancer'];
+	$xml['apachevirtualhost'] = $config['installedpackages']['apachevirtualhost'];
+	$xml['apachelisten'] = $config['installedpackages']['apachelisten'];
+
+	/* assemble xmlrpc payload */
+	$params = array(
+		XML_RPC_encode($password),
+		XML_RPC_encode($xml)
+	);
+
+	/* set a few variables needed for sync code borrowed from filter.inc */
+	$url = $synchronizetoip;
+	log_error("apache_mod_security_package: Beginning apache_mod_security XMLRPC sync to {$url}:{$port}.");
+	$method = 'pfsense.merge_installedpackages_section_xmlrpc';
+	$msg = new XML_RPC_Message($method, $params);
+	$cli = new XML_RPC_Client('/xmlrpc.php', $url, $port);
+	$cli->setCredentials($username, $password);
+	if($g['debug'])
+		$cli->setDebug(1);
+	/* send our XMLRPC message and timeout after defined sync timeout value*/
+	$resp = $cli->send($msg, $synctimeout);
+	if(!$resp) {
+		$error = "A communications error occurred while attempting apache_mod_security XMLRPC sync with {$url}:{$port}.";
+		log_error($error);
+		file_notice("sync_settings", $error, "apache_mod_security Settings Sync", "");
+	} elseif($resp->faultCode()) {
+		$cli->setDebug(1);
+		$resp = $cli->send($msg, $synctimeout);
+		$error = "An error code was received while attempting apache_mod_security XMLRPC sync with {$url}:{$port} - Code " . $resp->faultCode() . ": " . $resp->faultString();
+		log_error($error);
+		file_notice("sync_settings", $error, "apache_mod_security Settings Sync", "");
+	} else {
+		log_error("apache_mod_security_package: XMLRPC sync successfully completed with {$url}:{$port}.");
+	}
+
+	/* tell apache_mod_security to reload our settings on the destination sync host. */
+	$method = 'pfsense.exec_php';
+	$execcmd  = "require_once('/usr/local/pkg/apache_mod_security.inc');\n";
+	$execcmd .= "apache_mod_security_resync();";
+	/* assemble xmlrpc payload */
+	$params = array(
+		XML_RPC_encode($password),
+		XML_RPC_encode($execcmd)
+	);
+
+	log_error("apache_mod_security_package: XMLRPC reload data {$url}:{$port}.");
+	$msg = new XML_RPC_Message($method, $params);
+	$cli = new XML_RPC_Client('/xmlrpc.php', $url, $port);
+	$cli->setCredentials($username, $password);
+	$resp = $cli->send($msg, $synctimeout);
+	if(!$resp) {
+		$error = "A communications error occurred while attempting apache_mod_security XMLRPC sync with {$url}:{$port} (pfsense.exec_php).";
+		log_error($error);
+		file_notice("sync_settings", $error, "apache_mod_security Settings Sync", "");
+	} elseif($resp->faultCode()) {
+		$cli->setDebug(1);
+		$resp = $cli->send($msg, $synctimeout);
+		$error = "An error code was received while attempting apache_mod_security XMLRPC sync with {$url}:{$port} - Code " . $resp->faultCode() . ": " . $resp->faultString();
+		log_error($error);
+		file_notice("sync_settings", $error, "apache_mod_security Settings Sync", "");
+	} else {
+		log_error("apache_mod_security XMLRPC reload data success with {$url}:{$port} (pfsense.exec_php).");
+	}
+
+
 }
 
 function apache_mod_security_checkconfig() {
@@ -197,7 +351,9 @@ function generate_apache_configuration() {
 		file_notice("apache_mod_security", $error, "apache_mod_security", "");
 	}
 	// Set global listening directive and ensure nothing is listening on this port already
-	$globalbind_ip = ($settings['globalbindtoipaddr'] ? $settings['globalbindtoipaddr'] : "*");
+	$iface_address = apache_get_real_interface_address($settings['globalbindtoipaddr']);
+	$ip=$iface_address[0];
+	$globalbind_ip = ($ip ? $ip : "*");
 	$globalbind_port = $settings['globalbindtoport'];
 	if ($globalbind_port == ""){
 		$globalbind_port ="80";
@@ -311,6 +467,7 @@ function generate_apache_configuration() {
 		//write balancer conf
 		file_put_contents(APACHEDIR."/etc/apache22/Includes/balancers.conf",$balancer_config,LOCK_EX);
 		}
+
 	// configure modsecurity group options
 	//chroot apache http://forums.freebsd.org/showthread.php?t=6858
 		if (is_array($config['installedpackages']['apachemodsecuritygroups'])){
@@ -327,31 +484,32 @@ function generate_apache_configuration() {
 					}
 				}
 				file_put_contents(RULES_DIRECTORY ."/modsecurity_{$mods_groups['name']}_crs_10_setup.conf",apache_textarea_decode($config['installedpackages']['apachemodsecuritygroups']['config'][$i]['crs10']),LOCK_EX);
-				
+
 				foreach (split(",",$mods_groups['baserules']) as $baserule){
 					$mods_group[$mods_groups['name']].="  Include ".RULES_DIRECTORY ."/base_rules/{$baserule}.conf\n";
-					}
+				}
 				foreach (split(",",$mods_groups['optionalrules']) as $baserule){
 					$mods_group[$mods_groups['name']].="  Include ".RULES_DIRECTORY ."/optional_rules/{$baserule}.conf\n";
-					}
+				}
 				foreach (split(",",$mods_groups['slrrules']) as $baserule){
 					$mods_group[$mods_groups['name']].="  Include ".RULES_DIRECTORY ."/slr_rules/{$baserule}.conf\n";
-					}
+				}
 				foreach (split(",",$mods_groups['experimentalrules']) as $baserule){
 					$mods_group[$mods_groups['name']].="  Include ".RULES_DIRECTORY ."/experimental_rules/{$baserule}.conf\n";
-					}
-				$i++;
 				}
+				$i++;
+			}
 			if ($write_config > 0)
 				write_config("load crs 10 setup file to modsecurity group {$mods_groups['name']}");
 		}
 	//print "<PRE>";
 	//var_dump($mods_group);
-	
+
 	//mod_security settings
 	if (is_array($config['installedpackages']['apachemodsecuritysettings'])){
 		$mods_settings=$config['installedpackages']['apachemodsecuritysettings']['config'][0];
 	}
+		
 	//configure virtual hosts
 	$namevirtualhosts=array();
 	$namevirtualhosts[0]=$global_listen;
@@ -376,7 +534,7 @@ EOF;
 				$port=($virtualhost['port'] ? $virtualhost['port'] : $default_port[$virtualhost['proto']]);
 				if (!in_array("{$ip}:{$port}",$namevirtualhosts))
 					$namevirtualhosts[]="{$ip}:{$port}";
-				
+
 				$vh_config.="# {$virtualhost['description']}\n";
 				$vh_config.="<VirtualHost {$ip}:{$port}>\n";
 				$vh_config.=" ServerName ". preg_replace ("/\r\n(\S+)/","\n ServerAlias $1",base64_decode($virtualhost['primarysitehostname'])) ."\n";
@@ -441,6 +599,7 @@ EOF;
 								}
 							}
 						}
+					$vh_config.= apache_textarea_decode($backend['custom'])."\n\n";
 					$vh_config.=" </Location>\n\n";
 					}
 				$vh_config.="</VirtualHost>\n";
@@ -469,7 +628,6 @@ EOF;
 			}
 	}
 	
-
 	if ($mods_settings!="")
 		$SecGuardianLog="SecGuardianLog \"|".RULES_DIRECTORY."/util/httpd-guardian\"";
 	
@@ -525,7 +683,7 @@ EOF;
 	// Read already configured addresses
 	if (is_array($settings['row'])){
 		foreach($settings['row'] as $row) {
-			if ($row['ipaddress'] && $row['ipport'])
+			if ($row['interface'] && $row['ipport'])
 				$configuredaliases[] = $row; 
 		}
 	}
@@ -544,8 +702,8 @@ EOF;
 			// Automatically add this to configuration
 			$aplisten=split(":",$namevirtualhost);
 			$config['installedpackages']['apachesettings']['config'][0]['row'][] = array('ipaddress' => $aplisten[0], 'ipport' => $aplisten[1]);
-			}
 		}
+	}
 	// Process Status Page 
 	$mod_status = "";
 	if ($settings['statuspage'] == "on") {
@@ -554,12 +712,12 @@ EOF;
 	SetHandler server-status
 	Order Deny,Allow
 	Deny from all
-	
+
 EOF;
 		$mod_status .= "Allow from ".($settings['netaccessstatus'] ? $settings['netaccessstatus'] : "All")."\n";
 		$mod_status .= "</Location>\n";
 	}
-	
+
 	// update configuration with actual ip bindings
 	write_config($pkg['addedit_string']);
 
