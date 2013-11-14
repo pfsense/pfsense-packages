@@ -138,7 +138,7 @@ if (!empty($act)) {
 	$advancedoptions = $_GET['advancedoptions'];
 	$openvpnmanager = $_GET['openvpnmanager'];
 
-	$quoteservercn = $_GET['quoteservercn'];
+	$verifyservercn = $_GET['verifyservercn'];
 	$usetoken = $_GET['usetoken'];
 	if ($usetoken && (substr($act, 0, 10) == "confinline"))
 		$input_errors[] = "You cannot use Microsoft Certificate Storage with an Inline configuration.";
@@ -213,17 +213,17 @@ if (!empty($act)) {
 				$exp_name = urlencode($exp_name."-config.ovpn");
 				$expformat = "baseconf";
 		}
-		$exp_path = openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $quoteservercn, $usetoken, $nokeys, $proxy, $expformat, $password, false, false, $openvpnmanager, $advancedoptions);
+		$exp_path = openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $verifyservercn, $usetoken, $nokeys, $proxy, $expformat, $password, false, false, $openvpnmanager, $advancedoptions);
 	}
 
 	if($act == "visc") {
 		$exp_name = urlencode($exp_name."-Viscosity.visc.zip");
-		$exp_path = viscosity_openvpn_client_config_exporter($srvid, $usrid, $crtid, $useaddr, $quoteservercn, $usetoken, $password, $proxy, $openvpnmanager, $advancedoptions);
+		$exp_path = viscosity_openvpn_client_config_exporter($srvid, $usrid, $crtid, $useaddr, $verifyservercn, $usetoken, $password, $proxy, $openvpnmanager, $advancedoptions);
 	}
 
 	if(substr($act, 0, 4) == "inst") {
 		$exp_name = urlencode($exp_name."-install.exe");
-		$exp_path = openvpn_client_export_installer($srvid, $usrid, $crtid, $useaddr, $quoteservercn, $usetoken, $password, $proxy, $openvpnmanager, $advancedoptions, substr($act, 5));
+		$exp_path = openvpn_client_export_installer($srvid, $usrid, $crtid, $useaddr, $verifyservercn, $usetoken, $password, $proxy, $openvpnmanager, $advancedoptions, substr($act, 5));
 	}
 
 	if (!$exp_path) {
@@ -304,9 +304,9 @@ function download_begin(act, i, j) {
 
 	advancedoptions = document.getElementById("advancedoptions").value;
 
-	var quoteservercn = 0;
-	if (document.getElementById("quoteservercn").checked)
-		quoteservercn = 1;
+	var verifyservercn;
+	verifyservercn = document.getElementById("verifyservercn").value;
+
 	var usetoken = 0;
 	if (document.getElementById("usetoken").checked)
 		usetoken = 1;
@@ -380,7 +380,7 @@ function download_begin(act, i, j) {
 		dlurl += "&crtid=" + escape(certs[j][0]);
 	}
 	dlurl += "&useaddr=" + escape(useaddr);
-	dlurl += "&quoteservercn=" + escape(quoteservercn);
+	dlurl += "&verifyservercn=" + escape(verifyservercn);
 	dlurl += "&openvpnmanager=" + escape(openvpnmanager);
 	dlurl += "&usetoken=" + escape(usetoken);
 	if (usepass)
@@ -619,16 +619,22 @@ function useproxy_changed(obj) {
 						</td>
 					</tr>
 					<tr>
-						<td width="22%" valign="top" class="vncell">Quote Server CN</td>
+						<td width="22%" valign="top" class="vncell">Verify Server CN</td>
 						<td width="78%" class="vtable">
-							<table border="0" cellpadding="2" cellspacing="0" summary="quote server cn">
+							<table border="0" cellpadding="2" cellspacing="0" summary="verify server cn">
 								<tr>
 									<td>
-										<input name="quoteservercn" id="quoteservercn" type="checkbox" value="yes" />
-									</td>
-									<td>
+										<select name="verifyservercn" id="verifyservercn" class="formselect">
+											<option value="auto">Automatic - Use verify-x509-name (OpenVPN 2.3+) where possible</option>
+											<option value="tls-remote">Use tls-remote (Deprecated, use only on old clients &lt;= OpenVPN 2.2.x)</option>
+											<option value="tls-remote-quote">Use tls-remote and quote the server CN</option>
+											<option value="none">Do not verify the server CN</option>
+										</select>
+										<br/>
 										<span class="vexpl">
-											 Enclose the server CN in quotes. Can help if your server CN contains spaces and certain clients cannot parse the server CN. Some clients have problems parsing the CN with quotes. Use only as needed.
+											Optionally verify the server certificate Common Name (CN) when the client connects. Current clients, including the most recent versions of Windows, Viscosity, Tunnelblick, OpenVPN on iOS and Android and so on should all work at the default automatic setting.
+											<br/><br/>Only use tls-remote if you must use an older client that you cannot control. The option has been deprecated by OpenVPN and will be removed in the next major version.
+											<br/><br/>With tls-remote the server CN may optionally be enclosed in quotes. This can help if the server CN contains spaces and certain clients cannot parse the server CN. Some clients have problems parsing the CN with quotes. Use only as needed.
 										</span>
 									</td>
 								</tr>
