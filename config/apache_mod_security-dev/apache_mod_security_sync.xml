@@ -86,11 +86,11 @@
 			<required/>
 			<default_value>250</default_value>
 			<options>
-				<option><name>250 seconds(Default)</name><value>250</value></option>
-				<option><name>120 seconds</name><value>120</value></option>
-				<option><name>90 seconds</name><value>90</value></option>
+				<option><name>30 seconds(Default)</name><value>30</value></option>
 				<option><name>60 seconds</name><value>60</value></option>
-				<option><name>30 seconds</name><value>30</value></option>
+				<option><name>90 seconds</name><value>90</value></option>
+				<option><name>120 seconds</name><value>120</value></option>
+				<option><name>250 seconds</name><value>250</value></option>
 			</options>
 		</field>
 		<field>

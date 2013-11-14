@@ -75,6 +75,11 @@
 			<active/>
 		</tab>
 		<tab>
+			<text>Location(s)</text>
+			<url>/pkg.php?xml=apache_location.xml</url>
+			<tab_level>2</tab_level>
+		</tab>
+		<tab>
 			<text>Virtual Hosts</text>
 			<url>/pkg.php?xml=apache_virtualhost.xml</url>
 			<tab_level>2</tab_level>

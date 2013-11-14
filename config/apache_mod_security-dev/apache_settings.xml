@@ -68,6 +68,11 @@
 			<tab_level>2</tab_level>
 		</tab>
 		<tab>
+			<text>Location(s)</text>
+			<url>/pkg.php?xml=apache_location.xml</url>
+			<tab_level>2</tab_level>
+		</tab>
+		<tab>
 			<text>Virtual Hosts</text>
 			<url>/pkg.php?xml=apache_virtualhost.xml</url>
 			<tab_level>2</tab_level>
@@ -88,6 +93,7 @@
 			<fieldname>globalsiteadminemail</fieldname>
 			<description>Enter the site administrators e-mail address</description>
 			<type>input</type>
+			<size>25</size>
 		</field>
 		<field>
 			<fielddescr>Server hostname</fielddescr>
@@ -97,6 +103,7 @@
 					NOTE: Leave blank to use this devices hostname.]]>
 			</description>
 			<type>input</type>
+			<size>25</size>
 		</field>
 		<field>
 			<fielddescr>Default Bind to IP Address</fielddescr>

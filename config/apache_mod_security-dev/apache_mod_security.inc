@@ -211,7 +211,7 @@ function apache_mod_security_do_xmlrpc_sync($sync_to_ip, $username, $password, $
 		return;
 
 	if(!$synctimeout)
-		$synctimeout=250;
+		$synctimeout=25;
 
 	$xmlrpc_sync_neighbor = $sync_to_ip;
 	if($config['system']['webgui']['protocol'] != "") {
@@ -472,19 +472,8 @@ function generate_apache_configuration() {
 	//chroot apache http://forums.freebsd.org/showthread.php?t=6858
 		if (is_array($config['installedpackages']['apachemodsecuritygroups'])){
 			unset($mods_group);
-			$i=0;
-			$write_config=0;
 			foreach ($config['installedpackages']['apachemodsecuritygroups']['config'] as $mods_groups){
 				//RULES_DIRECTORY
-				$mods_group[$mods_groups['name']]="Include ".RULES_DIRECTORY ."/modsecurity_{$mods_groups['name']}_crs_10_setup.conf\n";
-				if ($mods_groups['crs10']==""){
-					if (file_exists(RULES_DIRECTORY .'/modsecurity_crs_10_setup.conf.example')){
-						$config['installedpackages']['apachemodsecuritygroups']['config'][$i]['crs10']=base64_encode(file_get_contents(RULES_DIRECTORY .'/modsecurity_crs_10_setup.conf.example'));
-						$write_config++;
-					}
-				}
-				file_put_contents(RULES_DIRECTORY ."/modsecurity_{$mods_groups['name']}_crs_10_setup.conf",apache_textarea_decode($config['installedpackages']['apachemodsecuritygroups']['config'][$i]['crs10']),LOCK_EX);
-
 				foreach (split(",",$mods_groups['baserules']) as $baserule){
 					$mods_group[$mods_groups['name']].="  Include ".RULES_DIRECTORY ."/base_rules/{$baserule}.conf\n";
 				}
@@ -497,10 +486,7 @@ function generate_apache_configuration() {
 				foreach (split(",",$mods_groups['experimentalrules']) as $baserule){
 					$mods_group[$mods_groups['name']].="  Include ".RULES_DIRECTORY ."/experimental_rules/{$baserule}.conf\n";
 				}
-				$i++;
 			}
-			if ($write_config > 0)
-				write_config("load crs 10 setup file to modsecurity group {$mods_groups['name']}");
 		}
 	//print "<PRE>";
 	//var_dump($mods_group);
@@ -508,8 +494,20 @@ function generate_apache_configuration() {
 	//mod_security settings
 	if (is_array($config['installedpackages']['apachemodsecuritysettings'])){
 		$mods_settings=$config['installedpackages']['apachemodsecuritysettings']['config'][0];
-	}
-		
+	
+		if ($mods_settings['crs10']=="" && file_exists(RULES_DIRECTORY .'/modsecurity_crs_10_setup.conf.example')){
+			$config['installedpackages']['apachemodsecuritysettings']['config'][0]['crs10']=base64_encode(file_get_contents(RULES_DIRECTORY .'/modsecurity_crs_10_setup.conf.example'));
+			write_config("modsecurity - Load crs 10 default setup file.");
+			}
+			
+		$cr10_setup="Include ".RULES_DIRECTORY ."/modsecurity_crs_10_setup.conf\n";
+		file_put_contents(RULES_DIRECTORY ."/modsecurity_crs_10_setup.conf",apache_textarea_decode($config['installedpackages']['apachemodsecuritygroups']['config'][0]['crs10']),LOCK_EX);
+		}
+	// create location(s) array
+	if (is_array($config['installedpackages']['apachelocation'])){
+		foreach ($config['installedpackages']['apachelocation']['config'] as $location)
+			$apache_location[$location['name']]=$location;
+		}
 	//configure virtual hosts
 	$namevirtualhosts=array();
 	$namevirtualhosts[0]=$global_listen;
@@ -581,8 +579,9 @@ EOF;
 				$vh_config.= apache_textarea_decode($virtualhost['custom'])."\n\n";
 
 				#Check virtualhost locations
-				foreach ($virtualhost['row'] as $backend){
-					if ($backend['balancer'] != "none"){
+				foreach ($virtualhost['row'] as $be){
+					if ($be['location'] != "none"){
+						$backend=$apache_location[$be['location']];
 						$vh_config.=" <Location ".($backend['sitepath'] ? $backend['sitepath'] : "/").">\n";
 						$vh_config.="  ProxyPass        balancer://{$backend['balancer']}{$backend['backendpath']}\n";
 						$vh_config.="  ProxyPassReverse balancer://{$backend['balancer']}{$backend['backendpath']}\n";
@@ -712,7 +711,6 @@ EOF;
 		if($settings['extendedstatuspage']== "on"){
 			$extendedstatus="ExtendedStatus On";
 		}
-		$mod_status .= <<<EOF
 		$mod_status .= <<<EOF
 {$extendedstatus}
 <Location /server-status>
