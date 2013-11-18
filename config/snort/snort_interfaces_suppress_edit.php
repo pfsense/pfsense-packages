@@ -126,7 +126,7 @@ if ($_POST['submit']) {
 	}
 }
 
-$pgtitle = "Services: Snort: Suppression: Edit";
+$pgtitle = gettext("Snort: Suppression List Edit - {$a_suppress[$id]['name']}");
 include_once("head.inc");
 
 ?>
@@ -166,7 +166,7 @@ if ($savemsg)
 <tr>
 	<td width="22%" valign="top" class="vncellreq"><?php echo gettext("Name"); ?></td>
 	<td width="78%" class="vtable"><input name="name" type="text" id="name" 
-		class="formfld unkown" size="40" value="<?=htmlspecialchars($pconfig['name']);?>" /> <br />
+		class="formfld unknown" size="40" value="<?=htmlspecialchars($pconfig['name']);?>" /> <br />
 	<span class="vexpl"> <?php echo gettext("The list name may only consist of the " .
 	"characters \"a-z, A-Z, 0-9 and _\"."); ?>&nbsp;&nbsp;<span class="red"><?php echo gettext("Note:"); ?> </span>
 	<?php echo gettext("No Spaces or dashes."); ?> </span></td>
@@ -174,7 +174,7 @@ if ($savemsg)
 <tr>
 	<td width="22%" valign="top" class="vncell"><?php echo gettext("Description"); ?></td>
 	<td width="78%" class="vtable"><input name="descr" type="text" 
-		class="formfld unkown" id="descr" size="40" value="<?=$pconfig['descr'];?>" /> <br />
+		class="formfld unknown" id="descr" size="40" value="<?=$pconfig['descr'];?>" /> <br />
 	<span class="vexpl"> <?php echo gettext("You may enter a description here for your " .
 	"reference (not parsed)."); ?> </span></td>
 </tr>

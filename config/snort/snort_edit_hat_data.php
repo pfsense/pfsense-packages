@@ -80,7 +80,7 @@ if ($_POST['host_attribute_data']) {
 
 
 $if_friendly = snort_get_friendly_interface($a_nat[$id]['interface']);
-$pgtitle = "Services: Snort: {$if_friendly} Host Attribute Table Data";
+$pgtitle = gettext("Snort: Interface {$if_friendly} - Host Attribute Table Data");
 include_once("head.inc");
 
 ?>

@@ -379,7 +379,7 @@ require_once("guiconfig.inc");
 include_once("head.inc");
 
 $if_friendly = snort_get_friendly_interface($pconfig['interface']);
-$pgtitle = "Snort: {$if_friendly} Category: $currentruleset";
+$pgtitle = gettext("Snort: Interface {$if_friendly} - Rules: {$currentruleset}");
 ?>
 
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">

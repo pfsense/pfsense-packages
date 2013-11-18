@@ -102,6 +102,12 @@ elseif (isset($id) && !isset($a_rule[$id])) {
 if (isset($_GET['dup']))
 	unset($id);
 
+// Set defaults for empty key parameters
+if (empty($pconfig['blockoffendersip']))
+	$pconfig['blockoffendersip'] = "both";
+if (empty($pconfig['performance']))
+	$pconfig['performance'] = "ac-bnfa";
+
 if ($_POST["Submit"]) {
 	if (!$_POST['interface'])
 		$input_errors[] = "Interface is mandatory";
@@ -113,15 +119,13 @@ if ($_POST["Submit"]) {
 		$natent['enable'] = $_POST['enable'] ? 'on' : 'off';
 		$natent['uuid'] = $pconfig['uuid'];
 
-		/* See if the HOME_NET, EXTERNAL_NET, WHITELIST or SUPPRESS LIST values were changed */
+		/* See if the HOME_NET, EXTERNAL_NET, or SUPPRESS LIST values were changed */
 		$snort_reload = false;
 		if ($_POST['homelistname'] && ($_POST['homelistname'] <> $natent['homelistname']))
 			$snort_reload = true;
 		if ($_POST['externallistname'] && ($_POST['externallistname'] <> $natent['externallistname']))
 			$snort_reload = true;
 		if ($_POST['suppresslistname'] && ($_POST['suppresslistname'] <> $natent['suppresslistname']))
-			$snort_reload = true;
-		if ($_POST['whitelistname'] && ($_POST['whitelistname'] <> $natent['whitelistname']))
 			$snort_reload = true;
 
 		if ($_POST['descr']) $natent['descr'] =  $_POST['descr']; else $natent['descr'] = strtoupper($natent['interface']);
@@ -150,8 +154,100 @@ if ($_POST["Submit"]) {
 				exec("mv -f {$snortdir}/snort_" . $a_rule[$id]['uuid'] . "_{$oif_real} {$snortdir}/snort_" . $a_rule[$id]['uuid'] . "_{$if_real}");
 			}
 			$a_rule[$id] = $natent;
-		} else
+		} else {
+			// Adding new interface, so set required interface configuration defaults
+			$frag3_eng = array( "name" => "default", "bind_to" => "all", "policy" => "bsd", 
+					    "timeout" => 60, "min_ttl" => 1, "detect_anomalies" => "on", 
+					    "overlap_limit" => 0, "min_frag_len" => 0 );
+
+			$stream5_eng = array( "name" => "default", "bind_to" => "all", "policy" => "bsd", "timeout" => 30, 
+					      "max_queued_bytes" => 1048576, "detect_anomalies" => "off", "overlap_limit" => 0, 
+					      "max_queued_segs" => 2621, "require_3whs" => "off", "startup_3whs_timeout" => 0, 
+					      "no_reassemble_async" => "off", "max_window" => 0, "use_static_footprint_sizes" => "off", 
+					      "check_session_hijacking" => "off", "dont_store_lg_pkts" => "off", "ports_client" => "default", 
+					      "ports_both" => "default", "ports_server" => "none" );
+
+			$http_eng = array( "name" => "default", "bind_to" => "all", "server_profile" => "all", "enable_xff" => "off", 
+					   "log_uri" => "off", "log_hostname" => "off", "server_flow_depth" => 65535, "enable_cookie" => "on", 
+					   "client_flow_depth" => 1460, "extended_response_inspection" => "on", "no_alerts" => "off", 
+					   "unlimited_decompress" => "on", "inspect_gzip" => "on", "normalize_cookies" =>"on", 
+					   "normalize_headers" => "on", "normalize_utf" => "on", "normalize_javascript" => "on", 
+					   "allow_proxy_use" => "off", "inspect_uri_only" => "off", "max_javascript_whitespaces" => 200,
+					   "post_depth" => -1, "max_headers" => 0, "max_spaces" => 0, "max_header_length" => 0, "ports" => "default" );
+
+			$ftp_client_eng = array( "name" => "default", "bind_to" => "all", "max_resp_len" => 256, 
+						 "telnet_cmds" => "no", "ignore_telnet_erase_cmds" => "yes", 
+						 "bounce" => "yes", "bounce_to_net" => "", "bounce_to_port" => "" );
+
+			$ftp_server_eng = array( "name" => "default", "bind_to" => "all", "ports" => "default", 
+						 "telnet_cmds" => "no", "ignore_telnet_erase_cmds" => "yes", 
+						 "ignore_data_chan" => "no", "def_max_param_len" => 100 );
+
+			$natent['max_attribute_hosts'] = '10000';
+			$natent['max_attribute_services_per_host'] = '10';
+			$natent['max_paf'] = '16000';
+
+			$natent['ftp_preprocessor'] = 'on';
+			$natent['ftp_telnet_inspection_type'] = "stateful";
+			$natent['ftp_telnet_alert_encrypted'] = "off";
+			$natent['ftp_telnet_check_encrypted'] = "on";
+			$natent['ftp_telnet_normalize'] = "on";
+			$natent['ftp_telnet_detect_anomalies'] = "on";
+			$natent['ftp_telnet_ayt_attack_threshold'] = "20";
+			if (!is_array($natent['ftp_client_engine']['item']))
+				$natent['ftp_client_engine']['item'] = array();
+			$natent['ftp_client_engine']['item'][] = $ftp_client_eng;
+			if (!is_array($natent['ftp_server_engine']['item']))
+				$natent['ftp_server_engine']['item'] = array();
+			$natent['ftp_server_engine']['item'][] = $ftp_server_eng;
+
+			$natent['smtp_preprocessor'] = 'on';
+			$natent['dce_rpc_2'] = 'on';
+			$natent['dns_preprocessor'] = 'on';
+			$natent['ssl_preproc'] = 'on';
+			$natent['pop_preproc'] = 'on';
+			$natent['imap_preproc'] = 'on';
+			$natent['sip_preproc'] = 'on';
+			$natent['other_preprocs'] = 'on';
+
+			$natent['pscan_protocol'] = 'all';
+			$natent['pscan_type'] = 'all';
+			$natent['pscan_memcap'] = '10000000';
+			$natent['pscan_sense_level'] = 'medium';
+
+			$natent['http_inspect'] = "on";
+			$natent['http_inspect_proxy_alert'] = "off";
+			$natent['http_inspect_memcap'] = "150994944";
+			$natent['http_inspect_max_gzip_mem'] = "838860";
+			if (!is_array($natent['http_inspect_engine']['item']))
+				$natent['http_inspect_engine']['item'] = array();
+			$natent['http_inspect_engine']['item'][] = $http_eng;
+
+			$natent['frag3_max_frags'] = '8192';
+			$natent['frag3_memcap'] = '4194304';
+			$natent['frag3_detection'] = 'on';
+			if (!is_array($natent['frag3_engine']['item']))
+				$natent['frag3_engine']['item'] = array();
+			$natent['frag3_engine']['item'][] = $frag3_eng;
+
+			$natent['stream5_reassembly'] = 'on';
+			$natent['stream5_flush_on_alert'] = 'off';
+			$natent['stream5_prune_log_max'] = '1048576';
+			$natent['stream5_track_tcp'] = 'on';
+			$natent['stream5_max_tcp'] = '262144';
+			$natent['stream5_track_udp'] = 'on';
+			$natent['stream5_max_udp'] = '131072';
+			$natent['stream5_udp_timeout'] = '30';
+			$natent['stream5_track_icmp'] = 'off';
+			$natent['stream5_max_icmp'] = '65536';
+			$natent['stream5_icmp_timeout'] = '30';
+			$natent['stream5_mem_cap']= '8388608';
+			if (!is_array($natent['stream5_tcp_engine']['item']))
+				$natent['stream5_tcp_engine']['item'] = array();
+			$natent['stream5_tcp_engine']['item'][] = $stream5_eng;
+
 			$a_rule[] = $natent;
+		}
 
 		/* If Snort is disabled on this interface, stop any running instance */
 		if ($natent['enable'] != 'on')
@@ -168,9 +264,9 @@ if ($_POST["Submit"]) {
 
 		/*******************************************************/
 		/* Signal Snort to reload configuration if we changed  */
-		/* HOME_NET, the Whitelist, EXTERNAL_NET or Suppress   */
-		/* list values.  The function only signals a running   */
-		/* Snort instance to safely reload these parameters.   */
+		/* HOME_NET, EXTERNAL_NET or Suppress list values.     */
+		/* The function only signals a running Snort instance  */
+		/* to safely reload these parameters.                  */
 		/*******************************************************/
 		if ($snort_reload == true)
 			snort_reload_config($natent, "SIGHUP");
@@ -187,7 +283,7 @@ if ($_POST["Submit"]) {
 }
 
 $if_friendly = snort_get_friendly_interface($pconfig['interface']);
-$pgtitle = "Snort: Interface Edit: {$if_friendly}";
+$pgtitle = gettext("Snort: Interface {$if_friendly} - Edit Settings");
 include_once("head.inc");
 ?>
 
@@ -265,28 +361,24 @@ include_once("head.inc");
 			<?php endforeach; ?>
 			</select>&nbsp;&nbsp;
 			<span class="vexpl"><?php echo gettext("Choose which interface this Snort instance applies to."); ?><br/>
-				<span class="red"><?php echo gettext("Hint:"); ?> </span><?php echo gettext("in most cases, you'll want to use WAN here."); ?></span><br/></td>
+				<span class="red"><?php echo gettext("Hint:"); ?></span>&nbsp;<?php echo gettext("In most cases, you'll want to use WAN here."); ?></span><br/></td>
 	</tr>
 	<tr>
 				<td width="22%" valign="top" class="vncellreq"><?php echo gettext("Description"); ?></td>
-				<td width="78%" class="vtable"><input name="descr" type="text"
-				class="formfld" id="descr" size="40" value="<?=htmlspecialchars($pconfig['descr']); ?>"> <br/>
+				<td width="78%" class="vtable"><input name="descr" type="text" 
+				class="formfld unknown" id="descr" size="40" value="<?=htmlspecialchars($pconfig['descr']); ?>"> <br/>
 				<span class="vexpl"><?php echo gettext("Enter a meaningful description here for your reference."); ?></span><br/></td>
 	</tr>
 <tr>
 	<td colspan="2" valign="top" class="listtopic"><?php echo gettext("Alert Settings"); ?></td>
 </tr>
 	<tr>
-				<td width="22%" valign="top" class="vncell"><?php echo gettext("Send alerts to main " .
-				"System logs"); ?></td>
-				<td width="78%" class="vtable"><input name="alertsystemlog"
-					type="checkbox" value="on"
-				<?php if ($pconfig['alertsystemlog'] == "on") echo "checked"; ?>
-				onClick="enable_change(false)">
+				<td width="22%" valign="top" class="vncell"><?php echo gettext("Send Alerts to System Logs"); ?></td>
+				<td width="78%" class="vtable"><input name="alertsystemlog" type="checkbox" value="on" <?php if ($pconfig['alertsystemlog'] == "on") echo "checked"; ?>>
 				<?php echo gettext("Snort will send Alerts to the firewall's system logs."); ?></td>
 	</tr>
 	<tr>
-				<td width="22%" valign="top" class="vncell"><?php echo gettext("Block offenders"); ?></td>
+				<td width="22%" valign="top" class="vncell"><?php echo gettext("Block Offenders"); ?></td>
 				<td width="78%" class="vtable">
 					<input name="blockoffenders7" id="blockoffenders7" type="checkbox" value="on"
 					<?php if ($pconfig['blockoffenders7'] == "on") echo "checked"; ?>
@@ -295,14 +387,14 @@ include_once("head.inc");
 				"Snort alert."); ?></td>
 	</tr>
 	<tr>
-				<td width="22%" valign="top" class="vncell"><?php echo gettext("Kill states"); ?></td>
+				<td width="22%" valign="top" class="vncell"><?php echo gettext("Kill States"); ?></td>
 				<td width="78%" class="vtable">
 					<input name="blockoffenderskill" id="blockoffenderskill" type="checkbox" value="on" <?php if ($pconfig['blockoffenderskill'] == "on") echo "checked"; ?>>
 					<?php echo gettext("Checking this option will kill firewall states for the blocked IP"); ?>
 				</td>
 	</tr>
 	<tr>
-				<td width="22%" valign="top" class="vncell"><?php echo gettext("Which IP to block"); ?></td>
+				<td width="22%" valign="top" class="vncell"><?php echo gettext("Which IP to Block"); ?></td>
 				<td width="78%" class="vtable">
 					<select name="blockoffendersip" class="formselect" id="blockoffendersip">
 				<?php
@@ -315,7 +407,8 @@ include_once("head.inc");
 					}
 				?>
 					</select>&nbsp;&nbsp;
-				<?php echo gettext("Select which IP extracted from the packet you wish to block"); ?> 
+				<?php echo gettext("Select which IP extracted from the packet you wish to block"); ?><br/>
+				<span class="red"><?php echo gettext("Hint:") . "</span>&nbsp;" . gettext("Choosing BOTH is suggested, and it is the default value."); ?></span><br/></td>
 				</td>
 	</tr>
 <tr>
@@ -332,8 +425,8 @@ include_once("head.inc");
 					foreach ($interfaces2 as $iface2 => $ifacename2): ?>
 					<option value="<?=$iface2;?>"
 					<?php if ($iface2 == $pconfig['performance']) echo "selected"; ?>>
-						<?=htmlspecialchars($ifacename2);?></option>
-						<?php endforeach; ?>
+					<?=htmlspecialchars($ifacename2);?></option>
+					<?php endforeach; ?>
 					</select>&nbsp;&nbsp;
 				<?php echo gettext("Choose a fast pattern matcher algorithm. ") . "<strong>" . gettext("Default") . 
 				"</strong>" . gettext(" is ") . "<strong>" . gettext("AC-BNFA") . "</strong>"; ?>.<br/><br/>
@@ -471,17 +564,17 @@ include_once("head.inc");
 			id="btnWhitelist" title="<?php echo gettext("Click to view currently selected Whitelist contents"); ?>"/>
 			<br/>
 			<span class="vexpl"><?php echo gettext("Choose the whitelist you want this interface to " .
-			"use."); ?> </span><br/>&nbsp;<br/><span class="red"><?php echo gettext("Hint:"); ?></span>&nbsp;<?php echo gettext("Default " .
-			"whitelist adds local networks, WAN IPs, Gateways, VPNs and VIPs.  Create an Alias to customize."); ?><br/>
-			<span class="red"><?php echo gettext("Note:"); ?></span>&nbsp;<?php echo gettext("This option will only be used when block offenders is on."); ?>
+			"use."); ?> </span><br/><br/>
+			<span class="red"><?php echo gettext("Note:"); ?></span>&nbsp;<?php echo gettext("This option will only be used when block offenders is on."); ?><br/>
+			<span class="red"><?php echo gettext("Hint:"); ?></span>&nbsp;<?php echo gettext("Default " .
+			"whitelist adds local networks, WAN IPs, Gateways, VPNs and VIPs.  Create an Alias to customize."); ?>
 		</td>
 	</tr>
 <tr>
-	<td colspan="2" valign="top" class="listtopic"><?php echo gettext("Choose a suppression or filtering " .
-	"file if desired."); ?></td>
+	<td colspan="2" valign="top" class="listtopic"><?php echo gettext("Choose a suppression or filtering file if desired."); ?></td>
 </tr>
 	<tr>
-		<td width="22%" valign="top" class="vncell"><?php echo gettext("Suppression and filtering"); ?></td>
+		<td width="22%" valign="top" class="vncell"><?php echo gettext("Alert Suppression and Filtering"); ?></td>
 		<td width="78%" class="vtable">
 			<select name="suppresslistname" class="formselect" id="suppresslistname">
 		<?php
@@ -563,6 +656,9 @@ function enable_change(enable_change) {
 	document.iform.btnHomeNet.disabled=endis;
 	document.iform.btnWhitelist.disabled=endis;
 	document.iform.btnSuppressList.disabled=endis;
+	document.iform.fpm_split_any_any.disabled=endis;
+	document.iform.fpm_search_optimize.disabled=endis;
+	document.iform.fpm_no_stream_inserts.disabled=endis;
 }
 
 function wopen(url, name, w, h) {
@@ -592,6 +688,10 @@ function viewList(id, elemID, elemType) {
 	url = url + getSelectedValue(elemID) + "&type=" + elemType;
 	wopen(url, 'WhitelistViewer', 640, 480);
 }
+
+enable_change(false);
+enable_blockoffenders();
+
 //-->
 </script>
 <?php include("fend.inc"); ?>

@@ -59,6 +59,7 @@ if(!isset($_SESSION['org_referer']))
 $referrer = $_SESSION['org_referer'];
 
 if ($_POST['cancel']) {
+	session_start();
 	unset($_SESSION['org_referer']);
 	session_write_close();
 	header("Location: {$referrer}");
@@ -69,6 +70,9 @@ $id = $_GET['id'];
 if (isset($_POST['id']))
 	$id = $_POST['id'];
 if (is_null($id)) {
+	session_start();
+	unset($_SESSION['org_referer']);
+	session_write_close();
 	header("Location: /snort/snort_interfaces.php");
 	exit;
 }
@@ -158,7 +162,7 @@ function truncate($string, $length) {
 $supplist = snort_load_suppress_sigs($a_nat[$id]);
 
 $if_friendly = snort_get_friendly_interface($a_nat[$id]['interface']);
-$pgtitle = "Services: Snort: {$if_friendly} Flowbit Rules";
+$pgtitle = gettext("Snort: Interface {$if_friendly} - Flowbit Rules");
 include_once("head.inc");
 
 ?>

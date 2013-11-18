@@ -68,7 +68,7 @@ else
         $ssh_port = "22";
 $snort_ports = array(
 	"dns_ports" => "53", "smtp_ports" => "25", "mail_ports" => "25,465,587,691",
-	"http_ports" => "36,80,81,82,83,84,85,86,87,88,89,90,311,383,591,593,631,901,1220,1414,1741,1830,2301,2381,2809,3037,3057,3128,3443,3702,4343,4848,5250,6080,6988,7000,7001,7144,7145,7510,7777,7779,8000,8008,8014,8028,8080,8085,8088,8090,8118,8123,8180,8181,8222,8243,8280,8300,8500,8800,8888,8899,9000,9060,9080,9090,9091,9443,9999,10000,11371,34443,34444,41080,50000,50002,55555", 
+	"http_ports" => "36,80,81,82,83,84,85,86,87,88,89,90,311,383,591,593,631,901,1220,1414,1533,1741,1830,2301,2381,2809,3037,3057,3128,3443,3702,4343,4848,5250,6080,6988,7000,7001,7144,7145,7510,7777,7779,8000,8008,8014,8028,8080,8081,8082,8085,8088,8090,8118,8123,8180,8181,8222,8243,8280,8300,8500,8800,8888,8899,9000,9060,9080,9090,9091,9443,9999,10000,11371,15489,29991,33300,34412,34443,34444,41080,44440,50000,50002,51423,55555,56712", 
 	"oracle_ports" => "1024:", "mssql_ports" => "1433",
 	"telnet_ports" => "23","snmp_ports" => "161", "ftp_ports" => "21,2100,3535",
 	"ssh_ports" => $ssh_port, "pop2_ports" => "109", "pop3_ports" => "110", 
@@ -85,6 +85,11 @@ $snort_ports = array(
 	"DCERPC_BRIGHTSTORE" => "6503,6504", "DNP3_PORTS" => "20000", "MODBUS_PORTS" => "502",
 	"GTP_PORTS" => "2123,2152,3386"
 );
+
+// Sort our SERVERS and PORTS arrays to make values
+// easier to locate by the the user.
+ksort($snort_servers);
+ksort($snort_ports);
 
 $pconfig = $a_nat[$id];
 
@@ -144,7 +149,7 @@ if ($_POST) {
 }
 
 $if_friendly = snort_get_friendly_interface($pconfig['interface']);
-$pgtitle = "Snort: Interface {$if_friendly} Define Servers";
+$pgtitle = gettext("Snort: Interface {$if_friendly} Variables - Servers and Ports");
 include_once("head.inc");
 
 ?>
@@ -195,7 +200,7 @@ if ($savemsg)
 		<td><div id="mainarea">
 		<table id="maintable" class="tabcont" width="100%" border="0" cellpadding="6" cellspacing="0">
 		<tr>
-			<td colspan="2" valign="top" class="listtopic"><?php echo gettext("Define Servers"); ?></td>
+			<td colspan="2" valign="top" class="listtopic"><?php echo gettext("Define Servers (IP variables)"); ?></td>
 		</tr>
 <?php
 		foreach ($snort_servers as $key => $server):
@@ -210,8 +215,8 @@ if ($savemsg)
 			}
 ?>
 			<tr>
-				<td width='22%' valign='top' class='vncell'><?php echo gettext("Define"); ?> <?=$label;?></td>
-				<td width="78%" class="vtable">
+				<td width='30%' valign='top' class='vncell'><?php echo gettext("Define"); ?> <?=$label;?></td>
+				<td width="70%" class="vtable">
 					<input name="def_<?=$key;?>" size="40"
 					type="text" autocomplete="off" class="formfldalias" id="def_<?=$key;?>"
 					value="<?=$value;?>" title="<?=$title;?>"> <br/>
@@ -221,7 +226,7 @@ if ($savemsg)
 			</tr>
 <?php		endforeach; ?>
 		<tr>
-			<td colspan="2" valign="top" class="listtopic"><?php echo gettext("Define Ports"); ?></td>
+			<td colspan="2" valign="top" class="listtopic"><?php echo gettext("Define Ports (port variables)"); ?></td>
 		</tr>
 <?php
 		foreach ($snort_ports as $key => $server):
@@ -236,8 +241,8 @@ if ($savemsg)
 			}
 ?>
 			<tr>
-				<td width='22%' valign='top' class='vncell'><?php echo gettext("Define"); ?> <?=$label;?></td>
-				<td width="78%" class="vtable">
+				<td width='30%' valign='top' class='vncell'><?php echo gettext("Define"); ?> <?=$label;?></td>
+				<td width="70%" class="vtable">
 					<input name="def_<?=$key;?>" type="text" size="40" autocomplete="off" class="formfldalias" id="def_<?=$key;?>"
 					value="<?=$value;?>" title="<?=$title;?>"> <br/>
 				<span class="vexpl"><?php echo gettext("Default value:"); ?> "<?=$server;?>" <br/> <?php echo gettext("Leave " .
@@ -246,8 +251,8 @@ if ($savemsg)
 			</tr>
 <?php		endforeach; ?>
 		<tr>
-			<td width="22%" valign="top">&nbsp;</td>
-			<td width="78%">
+			<td width="30%" valign="top">&nbsp;</td>
+			<td width="70%">
 				<input name="Submit" type="submit" class="formbtn" value="Save">
 				<input name="id" type="hidden" value="<?=$id;?>">
 			</td>

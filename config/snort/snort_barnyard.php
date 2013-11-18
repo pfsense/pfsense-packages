@@ -104,7 +104,7 @@ if ($_POST) {
 }
 
 $if_friendly = snort_get_friendly_interface($pconfig['interface']);
-$pgtitle = "Snort: Interface: {$if_friendly} Barnyard2 Edit";
+$pgtitle = gettext("Snort: Interface {$if_friendly} - Barnyard2 Settings");
 include_once("head.inc");
 
 ?>
@@ -188,7 +188,7 @@ function enable_change(enable_change) {
 			<tr>
 				<td width="22%" valign="top" class="vncell"><?php echo gettext("Log to a MySQL Database"); ?></td>
 				<td width="78%" class="vtable"><input name="barnyard_mysql" 
-					type="text" class="formfld" id="barnyard_mysql" style="width:95%;" size="85" 
+					type="text" class="formfld unknown" id="barnyard_mysql" style="width:95%;" size="85" 
 					value="<?=htmlspecialchars($pconfig['barnyard_mysql']);?>"> <br/>
 				<span class="vexpl"><?php echo gettext("Example: output database: alert, mysql, " .
 				"dbname=snort user=snort host=localhost password=xyz"); ?><br/>

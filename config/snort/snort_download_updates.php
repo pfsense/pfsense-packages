@@ -96,7 +96,7 @@ $snort_rules_upd_logfile_chk = 'no';
 if (file_exists("{$snort_rules_upd_log}"))
 	$snort_rules_upd_logfile_chk = 'yes';
 
-$pgtitle = "Services: Snort: Updates";
+$pgtitle = gettext("Snort: Updates");
 include_once("head.inc");
 ?>
 

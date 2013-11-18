@@ -121,7 +121,7 @@ if ($_POST['save'])
 
 }
 
-$pgtitle = "Services: Snort Blocked Hosts";
+$pgtitle = gettext("Snort: Blocked Hosts");
 include_once("head.inc");
 
 ?>
@@ -180,7 +180,7 @@ if ($pconfig['brefresh'] == 'on')
 					name="brefresh" type="checkbox" value="on"
 					<?php if ($config['installedpackages']['snortglobal']['alertsblocks']['brefresh']=="on" || $config['installedpackages']['snortglobal']['alertsblocks']['brefresh']=='') echo "checked"; ?>>
 				<?php printf(gettext("%sDefault%s is %sON%s."), '<strong>', '</strong>', '<strong>', '</strong>'); ?>&nbsp;&nbsp;<input
-					name="blertnumber" type="text" class="formfld" id="blertnumber"
+					name="blertnumber" type="text" class="formfld unknown" id="blertnumber"
 					size="5" value="<?=htmlspecialchars($bnentries);?>"> <?php printf(gettext("Enter the " .
 				"number of blocked entries to view. %sDefault%s is %s500%s."), '<strong>', '</strong>', '<strong>', '</strong>'); ?>
 				</td>

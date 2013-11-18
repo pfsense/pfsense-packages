@@ -71,16 +71,20 @@ $no_snort_files = false;
 $no_community_files = false;
 
 /* Test rule categories currently downloaded to $SNORTDIR/rules and set appropriate flags */
-if (($etpro == 'off' || empty($etpro)) && $emergingdownload == 'on')
-	$test = glob("{$snortdir}/rules/emerging-*.rules");
-elseif ($etpro == 'on' && ($emergingdownload == 'off' || empty($emergingdownload)))
-	$test = glob("{$snortdir}/rules/etpro-*.rules");
+if (($etpro == 'off' || empty($etpro)) && $emergingdownload == 'on') {
+	$test = glob("{$snortdir}/rules/" . ET_OPEN_FILE_PREFIX . "*.rules");
+	$et_type = "ET Open";
+}
+elseif ($etpro == 'on' && ($emergingdownload == 'off' || empty($emergingdownload))) {
+	$test = glob("{$snortdir}/rules/" . ET_PRO_FILE_PREFIX . "*.rules");
+	$et_type = "ET Pro";
+}
 if (empty($test))
 	$no_emerging_files = true;
-$test = glob("{$snortdir}/rules/snort*.rules");
+$test = glob("{$snortdir}/rules/" . VRT_FILE_PREFIX . "*.rules");
 if (empty($test))
 	$no_snort_files = true;
-if (!file_exists("{$snortdir}/rules/GPLv2_community.rules"))
+if (!file_exists("{$snortdir}/rules/" . GPL_FILE_PREFIX . "community.rules"))
 	$no_community_files = true;
 
 if (($snortdownload == 'off') || ($a_nat[$id]['ips_policy_enable'] != 'on'))
@@ -188,25 +192,25 @@ if ($_POST['selectall']) {
 	}
 
 	if ($emergingdownload == 'on') {
-		$files = glob("{$snortdir}/rules/emerging-*.rules");
+		$files = glob("{$snortdir}/rules/" . ET_OPEN_FILE_PREFIX . "*.rules");
 		foreach ($files as $file)
 			$rulesets[] = basename($file);
 	}
 	elseif ($etpro == 'on') {
-		$files = glob("{$snortdir}/rules/etpro-*.rules");
+		$files = glob("{$snortdir}/rules/" . ET_PRO_FILE_PREFIX . "*.rules");
 		foreach ($files as $file)
 			$rulesets[] = basename($file);
 	}
 
 	if ($snortcommunitydownload == 'on') {
-		$files = glob("{$snortdir}/rules/*_community.rules");
+		$files = glob("{$snortdir}/rules/" . GPL_FILE_PREFIX . "community.rules");
 		foreach ($files as $file)
 			$rulesets[] = basename($file);
 	}
 
 	/* Include the Snort VRT rules only if enabled and no IPS policy is set */
 	if ($snortdownload == 'on' && $a_nat[$id]['ips_policy_enable'] == 'off') {
-		$files = glob("{$snortdir}/rules/snort*.rules");
+		$files = glob("{$snortdir}/rules/" . VRT_FILE_PREFIX . "*.rules");
 		foreach ($files as $file)
 			$rulesets[] = basename($file);
 	}
@@ -223,7 +227,7 @@ if ($_POST['selectall']) {
 $enabled_rulesets_array = explode("||", $a_nat[$id]['rulesets']);
 
 $if_friendly = snort_get_friendly_interface($pconfig['interface']);
-$pgtitle = "Snort: Interface {$if_friendly} Categories";
+$pgtitle = gettext("Snort: Interface {$if_friendly} - Categories");
 include_once("head.inc");
 ?>
 
@@ -309,7 +313,7 @@ if ($savemsg) {
 			</tr>
 			<tr>
 				<td colspan="6" valign="center" class="listn">
-					<table width="100%" border="0" cellpadding="2" cellspacing="2">
+					<table width="100%" border="0" cellpadding="2" cellspacing="0">
 					   <tr>
 						<td width="15%" class="listn"><?php echo gettext("Resolve Flowbits"); ?></td>
 						<td width="85%"><input name="autoflowbits" id="autoflowbitrules" type="checkbox" value="on" 
@@ -332,7 +336,7 @@ if ($savemsg) {
 					   <tr>
 						<td width="15%">&nbsp;</td>
 						<td width="85%">
-						<?php printf(gettext("%sNote:  %sAuto-enabled rules generating unwanted alerts should have their GID:SID added to the Suppression List for the interface."), '<span class="red"><strong>', '</strong></span>'); ?>
+						<?php echo "<span class=\"red\"><strong>" . gettext("Note:  ") . "</strong></span>" . gettext("Auto-enabled rules generating unwanted alerts should have their GID:SID added to the Suppression List for the interface."); ?>
 						<br/></td>
 					   </tr>
 					</table>
@@ -343,23 +347,23 @@ if ($savemsg) {
 			</tr>
 			<tr>
 				<td colspan="6" valign="center" class="listn">
-					<table width="100%" border="0" cellpadding="2" cellspacing="2">
+					<table width="100%" border="0" cellpadding="2" cellspacing="0">
 					   <tr>
 						<td width="15%" class="listn"><?php echo gettext("Use IPS Policy"); ?></td>
 						<td width="85%"><input name="ips_policy_enable" id="ips_policy_enable" type="checkbox" value="on" <?php if ($a_nat[$id]['ips_policy_enable'] == "on") echo "checked"; ?>
 						<?php if ($snortdownload == "off") echo "disabled" ?> onClick="enable_change()"/>&nbsp;&nbsp;<span class="vexpl">
-						<?php echo gettext("If checked, Snort will use rules from the pre-defined IPS policy selected below."); ?></span></td>
+						<?php echo gettext("If checked, Snort will use rules from one of three pre-defined IPS policies."); ?></span></td>
 					   </tr>
 					   <tr>
-						<td width="15%" class="vncell">&nbsp;</td>
-						<td width="85%" class="vtable">
-  						<?php printf(gettext("%sNote:%s  You must be using the Snort VRT rules to use this option."),'<span class="red"><strong>','</strong></span>'); ?>
+						<td width="15%" class="vncell" id="ips_col1">&nbsp;</td>
+						<td width="85%" class="vtable" id="ips_col2">
+  						<?php echo "<span class=\"red\"><strong>" . gettext("Note:  ") . "</strong></span>" . gettext("You must be using the Snort VRT rules to use this option."); ?>
 						<?php echo gettext("Selecting this option disables manual selection of Snort VRT categories in the list below, " .
 						"although Emerging Threats categories may still be selected if enabled on the Global Settings tab.  " .
 						"These will be added to the pre-defined Snort IPS policy rules from the Snort VRT."); ?><br/></td>
 					   </tr>
-					   <tr>
-						<td width="15%" class="listn"><?php echo gettext("IPS Policy"); ?></td>
+					   <tr id="ips_row1">
+						<td width="15%" class="listn"><?php echo gettext("IPS Policy Selection"); ?></td>
 						<td width="85%"><select name="ips_policy" class="formselect" <?=$policy_select_disable?> >
 									<option value="connectivity" <?php if ($pconfig['ips_policy'] == "connected") echo "selected"; ?>><?php echo gettext("Connectivity"); ?></option>
 									<option value="balanced" <?php if ($pconfig['ips_policy'] == "balanced") echo "selected"; ?>><?php echo gettext("Balanced"); ?></option>
@@ -367,7 +371,7 @@ if ($savemsg) {
 								</select>
 						&nbsp;&nbsp;<span class="vexpl"><?php echo gettext("Snort IPS policies are:  Connectivity, Balanced or Security."); ?></span></td>
 					   </tr>
-					   <tr>
+					   <tr id="ips_row2">
 						<td width="15%">&nbsp;</td>
 						<td width="85%">
 						<?php echo gettext("Connectivity blocks most major threats with few or no false positives.  " . 
@@ -397,22 +401,23 @@ if ($savemsg) {
 				$msg_community = "NOTE: Snort Community Rules have not been downloaded.  Perform a Rules Update to enable them.";
 			      else
 				$msg_community = "Snort GPLv2 Community Rules (VRT certified)";
+			      $community_rules_file = GPL_FILE_PREFIX . "community.rules";
 			?>
 			<?php if ($snortcommunitydownload == 'on'): ?>
 			<tr id="frheader">
 				<td width="5%" class="listhdrr"><?php echo gettext("Enabled"); ?></td>
 				<td colspan="5" class="listhdrr"><?php echo gettext('Ruleset: Snort GPLv2 Community Rules');?></td>
 			</tr>
-			<?php if (in_array("GPLv2_community.rules", $enabled_rulesets_array)): ?>
+			<?php if (in_array($community_rules_file, $enabled_rulesets_array)): ?>
 			<tr>
 				<td width="5" class="listr" align="center" valign="top">
-				<input type="checkbox" name="toenable[]" value="GPLv2_community.rules" checked="checked"/></td>
-				<td colspan="5" class="listr"><a href='snort_rules.php?id=<?=$id;?>&openruleset=GPLv2_community.rules'><?php echo gettext("{$msg_community}"); ?></a></td>
+				<input type="checkbox" name="toenable[]" value="<?=$community_rules_file;?>" checked="checked"/></td>
+				<td colspan="5" class="listr"><a href='snort_rules.php?id=<?=$id;?>&openruleset=<?=$community_rules_file;?>'><?php echo gettext("{$msg_community}"); ?></a></td>
 			</tr>
 			<?php else: ?>
 			<tr>
 				<td width="5" class="listr" align="center" valign="top">
-				<input type="checkbox" name="toenable[]" value="GPLv2_community.rules" <?php if ($snortcommunitydownload == 'off') echo "disabled"; ?>/></td>
+				<input type="checkbox" name="toenable[]" value="<?=$community_rules_file;?>" <?php if ($snortcommunitydownload == 'off') echo "disabled"; ?>/></td>
 				<td colspan="5" class="listr"><?php echo gettext("{$msg_community}"); ?></td>
 			</tr>
 
@@ -436,7 +441,7 @@ if ($savemsg) {
 					<td width="5%" class="listhdrr" align="center"><?php echo gettext("Enabled"); ?></td>
 					<td width="25%" class="listhdrr"><?php echo gettext('Ruleset: ET Pro Rules');?></td>
 				<?php else: ?>
-					<td colspan="2" align="center" width="30%" class="listhdrr"><?php echo gettext("Emerging Threats rules not {$msg_emerging}"); ?></td>
+					<td colspan="2" align="center" width="30%" class="listhdrr"><?php echo gettext("{$et_type} rules not {$msg_emerging}"); ?></td>
 				<?php endif; ?>
 				<?php if ($snortdownload == 'on' && !$no_snort_files): ?>
 					<td width="5%" class="listhdrr" align="center"><?php echo gettext("Enabled"); ?></td>
@@ -459,11 +464,11 @@ if ($savemsg) {
 					$filename = basename($filename);
 					if (substr($filename, -5) != "rules")
 						continue;
-					if (strstr($filename, "emerging-") && $emergingdownload == 'on')
+					if (strstr($filename, ET_OPEN_FILE_PREFIX) && $emergingdownload == 'on')
 						$emergingrules[] = $filename;
-					else if (strstr($filename, "etpro-") && $etpro == 'on')
+					else if (strstr($filename, ET_PRO_FILE_PREFIX) && $etpro == 'on')
 						$emergingrules[] = $filename;
-					else if (strstr($filename, "snort") && $snortdownload == 'on') {
+					else if (strstr($filename, VRT_FILE_PREFIX) && $snortdownload == 'on') {
 						if (strstr($filename, ".so.rules"))
 							$snortsorules[] = $filename;
 						else
@@ -589,6 +594,18 @@ function enable_change()
  var endis = !(document.iform.ips_policy_enable.checked);
  document.iform.ips_policy.disabled=endis;
 
+ if (endis) {
+	document.getElementById("ips_row1").style.display="none";
+	document.getElementById("ips_row2").style.display="none";
+	document.getElementById("ips_col1").className="vexpl";
+	document.getElementById("ips_col2").className="vexpl";
+ }
+ else {
+	document.getElementById("ips_row1").style.display="table-row";
+	document.getElementById("ips_row2").style.display="table-row";
+	document.getElementById("ips_col1").className="vncell";
+	document.getElementById("ips_col2").className="vtable";
+ }
  for (var i = 0; i < document.iform.elements.length; i++) {
     if (document.iform.elements[i].type == 'checkbox') {
        var str = document.iform.elements[i].value;
@@ -597,6 +614,10 @@ function enable_change()
     }
  }
 }
+
+// Set initial state of dynamic HTML form controls
+enable_change();
+
 </script>
 
 </body>
