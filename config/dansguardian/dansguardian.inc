@@ -231,6 +231,7 @@ function sync_package_dansguardian($via_rpc="no",$install_process=false) {
 	$nologger=(preg_match('/nologger/',$dansguardian_log['logging_options'])?"on":"off");
 	$logadblocks=(preg_match('/logadblocks/',$dansguardian_log['logging_options'])?"on":"off");
 	$anonymizelogs=(preg_match('/anonymizelogs/',$dansguardian_log['logging_options'])?"on":"off");
+	$logsyslog=(preg_match('/logsyslog/',$dansguardian_log['logging_options'])?"on":"off");
 
 	$loglevel=($dansguardian_log['loglevel']?$dansguardian_log['loglevel']:"2");
 	$logexceptionhits=($dansguardian_log['logexceptionhits']?$dansguardian_log['logexceptionhits']:"2");
