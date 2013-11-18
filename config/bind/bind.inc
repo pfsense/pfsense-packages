@@ -310,7 +310,8 @@ EOD;
 			$zonecustom = base64_decode($zone['custom']);
 			$zoneipslave = $zone['slaveip'];
 			$zoneforwarders=$zone['forwarders'];
-			$zonereverso = $zone['reverso'];
+			$zonereverso = $zone['reverso'];			
+			$zonereversv6o = $zone['reversv6o'];
 			
 			if (!(is_dir(CHROOT_LOCALBASE."/etc/namedb/$zonetype/$zoneview")))
             	mkdir(CHROOT_LOCALBASE."/etc/namedb/$zonetype/$zoneview",0755,true);
@@ -330,7 +331,10 @@ EOD;
 
 				if ($zoneview == $viewname){
 					if($zonereverso == "on")
-				 		$bind_conf .= "\tzone \"$zonename.in-addr.arpa\" {\n";
+						if($zonereversv6o == "on")
+					 		$bind_conf .= "\tzone \"$zonename.ip6.arpa\" {\n";
+						else
+							$bind_conf .= "\tzone \"$zonename.in-addr.arpa\" {\n";
 				  	else
 						$bind_conf .= "\tzone \"$zonename\" {\n";
         		
@@ -387,7 +391,8 @@ EOD;
 						$zoneminimum = ($zone['minimum']?$zone['minimum']:"3600");
 						$zonenameserver = $zone['nameserver'];
 						$zoneipns = $zone['ipns'];
-						$zonereverso = $zone['reverso'];
+						$zonereverso = $zone['reverso'];		
+						$zonereversv6o = $zone['reversv6o'];
 						if($zone['allowupdate'] == '')
 							$zoneallowupdate = "none";
 						else
@@ -402,7 +407,10 @@ EOD;
 							$zoneallowtransfer = str_replace(',','; ',$zone['allowtransfer']);
 						$zone_conf = "\$TTL {$zonetll}\n;\n";
 						if($zonereverso == "on")
-							$zone_conf .= "\$ORIGIN {$zonename}.in-addr.arpa.\n\n";
+							if($zonereversv6o == "on")
+								$zone_conf .= "\$ORIGIN {$zonename}.ip6.arpa.\n\n";
+							else
+								$zone_conf .= "\$ORIGIN {$zonename}.in-addr.arpa.\n\n";
 						else
 							$zone_conf .= "\$ORIGIN {$zonename}.\n\n";
 						$zone_conf .= ";\tDatabase file {$zonename}.DB for {$zonename} zone.\n";
@@ -432,7 +440,7 @@ EOD;
 							$hostname = (preg_match("/(MX|NS)/",$zone['row'][$y]['hosttype'])?"@":$zone['row'][$y]['hostname']);
 							$hosttype = $zone['row'][$y]['hosttype'];
 							$hostdst = $zone['row'][$y]['hostdst'];
-							if (preg_match("/[a-zA-Z]/",$hostdst) && !preg_match("/(TXT|SPF)/",$hosttype))
+							if (preg_match("/[a-zA-Z]/",$hostdst) && !preg_match("/(TXT|SPF|AAAA)/",$hosttype))
 								$hostdst .= ".";
 							$hostvalue = $zone['row'][$y]['hostvalue'];
 							
@@ -740,10 +748,12 @@ function bind_sync_on_changes() {
 				break;
 			case "auto":
 					if (is_array($config['hasync'])){
-						$hasync=$config['hasync'][0];
+						log_error("[bind] auto xmlrpc sync is enabled.");
+						$hasync=$config['hasync'];
 						$rs[0]['ipaddress']=$hasync['synchronizetoip'];
 						$rs[0]['username']=$hasync['username'];
-						$rs[0]['password']=$hasync['password'];
+						$rs[0]['password']=$hasync['password'];			
+						log_error("[bind] auto xmlrpc sync is set to ip [$sync_to_ip]");
 					}
 					else{
 						log_error("[bind] xmlrpc sync is enabled but there is no system backup hosts to push bind config.");
