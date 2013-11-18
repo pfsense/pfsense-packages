@@ -30,6 +30,7 @@
 */
 
 require("guiconfig.inc");
+require("/usr/local/pkg/tinydns.inc");
 
 /* Defaults to this page but if no settings are present, redirect to setup page */
 if(!$config['installedpackages']['tinydnsdomains']['config'])
@@ -105,7 +106,8 @@ foreach($config['installedpackages']['tinydnsdomains']['config'] as $ping) {
 		$status = file_get_contents("/var/db/pingstatus/$monitorip");
 	else
 		$status = "N/A";
-	if(stristr($tinydns_data, "+{$hostname}:{$ipaddress}") || stristr($tinydns_data, "={$hostname}:{$ipaddress}"))
+	$ip6 = tinydns_get_ip6_format($ipaddress);
+	if(stristr($tinydns_data, "+{$hostname}:{$ipaddress}") || stristr($tinydns_data, "={$hostname}:{$ipaddress}") || stristr($tinydns_data, ":{$hostname}:28:{$ip6}"))
 		$inservice = "<FONT COLOR='GREEN'>YES</FONT>";
 	else
 		$inservice = "<FONT COLOR='BLUE'>NO</FONT>";
@@ -158,7 +160,8 @@ foreach($config['installedpackages']['tinydnsdomains']['config'] as $ping) {
 		echo $ipaddress;
 		if($row['loadbalance'])
 			echo " (LB)";
-		if(stristr($tinydns_data, "+{$hostname}:{$row['failoverip']}") || stristr($tinydns_data, "={$hostname}:{$row['failoverip']}"))
+		$ip6 = tinydns_get_ip6_format($row['failoverip']);
+		if(stristr($tinydns_data, "+{$hostname}:{$row['failoverip']}") || stristr($tinydns_data, "={$hostname}:{$row['failoverip']}") || stristr($tinydns_data, ":{$hostname}:28:{$ip6}"))
 			$inservice = "<FONT COLOR='GREEN'>YES</FONT>";
 		else
 			$inservice = "<FONT COLOR='BLUE'>NO</FONT>";

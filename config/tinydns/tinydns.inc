@@ -399,44 +399,60 @@ function tinydns_setup_ping_items() {
 	 *   status and create a database of the status information that we can use.
 	 */
 	foreach($config['installedpackages']['tinydnsdomains']['config'] as $domain) {
-		if($domain['monitorip'] <> "")
-			$monitorip = $domain['monitorip'];
-			$interface = $domain['interface'];
+		if(!$domain['monitorip'])
+			continue;
+		if($domain['recordtype'] == "AAAA")
+			$inet = "inet6";
+		else
+			$inet = "";
+		$monitorip = $domain['monitorip'];
+		$interface = $domain['interface'];
 		if($domain['row']) {
 			foreach($domain['row'] as $row) {
 				if($row['pingthreshold'])
 					$pingthreshold = $row['pingthreshold'];
 				else
-					$row['pingthreshold'] = "";
+					$pingthreshold = "";
+				
+				if($row['wanpingthreshold'])
+					$wanpingthreshold = $row['wanpingthreshold'];
+				else
+					$wanpingthreshold = "";
+				
+				$info = get_interface_info($row['interface']);
+				if($domain['recordtype'] == "AAAA")					
+					$ip = $info['ipaddrv6'];
+				else
+					$ip = $info['ipaddr'];
+				
 				if($row['monitorip']) {
 					if(!in_array($row['monitorip'], $processed)) {
-						$info = get_interface_info($row['interface']);
-						$ip = $info['ipaddr'];
-						fwrite($fd, $ip . "|" . $row['monitorip'] . "|1|/usr/local/pkg/tinydns_down.php|/usr/local/pkg/tinydns_up.php|{$pingthreshold}\n");
+						fwrite($fd, $ip . "|" . $row['monitorip'] . "|1|/usr/local/pkg/tinydns_down.php|/usr/local/pkg/tinydns_up.php|{$pingthreshold}|{$wanpingthreshold}|{$inet}\n");
 						$processed[] = $row['monitorip'];
 					}
 				} else {
 					if(!in_array($monitorip, $processed)) {
-						$info = get_interface_info($interface);
-						$ip = $info['ipaddr'];
-						fwrite($fd, $ip . "|" . $monitorip . "|1|/usr/local/pkg/tinydns_down.php|/usr/local/pkg/tinydns_up.php|{$pingthreshold}\n");
+						fwrite($fd, $ip . "|" . $monitorip . "|1|/usr/local/pkg/tinydns_down.php|/usr/local/pkg/tinydns_up.php|{$pingthreshold}|{$wanpingthreshold}|{$inet}\n");
 						$processed[] = $monitorip;
 					}
 				}
 			}
 		}
+		
+		$info = get_interface_info($domain['interface']);
+		if($domain['recordtype'] == "AAAA") 			
+			$ip = $info['ipaddrv6'];
+		else
+			$ip = $info['ipaddr'];
+			
 		if($domain['monitorip']) {
 			if(!in_array($domain['monitorip'], $processed)) {
-				$info = get_interface_info($domain['interface']);
-				$ip =  $info['ipaddr'];
-				fwrite($fd, $ip . "|" . $domain['monitorip'] . "|1|/usr/local/pkg/tinydns_down.php|/usr/local/pkg/tinydns_up.php|{$pingthreshold}\n");
+				fwrite($fd, $ip . "|" . $domain['monitorip'] . "|1|/usr/local/pkg/tinydns_down.php|/usr/local/pkg/tinydns_up.php|{$pingthreshold}|{$wanpingthreshold}|{$inet}\n");
 				$processed[] = $domain['monitorip'];
 			}
 		} else {
 			if(!in_array($row['failoverip'], $processed)) {
-				$info = get_interface_info($domain['interface']);
-				$ip =  $info['ipaddr'];
-				fwrite($fd, $ip . "|" . $row['failoverip'] . "|1|/usr/local/pkg/tinydns_down.php|/usr/local/pkg/tinydns_up.php|{$pingthreshold}\n");
+				fwrite($fd, $ip . "|" . $row['failoverip'] . "|1|/usr/local/pkg/tinydns_down.php|/usr/local/pkg/tinydns_up.php|{$pingthreshold}|{$wanpingthreshold}|{$inet}\n");
 				$processed[] = $row['failoverip'];
 			}
 		}
@@ -1107,6 +1123,9 @@ function tinydns_get_dns_record_type($tinydnsrecord) {
 			break;
 		case($tinydnsrecord[0] == "+"):
 			$rtype = "A";
+			break;
+		case($tinydnsrecord[0] == ":"):
+			$rtype = "AAAA";
 			break;
 		case($tinydnsrecord[0] == "@"):
 			$rtype = "MX";
