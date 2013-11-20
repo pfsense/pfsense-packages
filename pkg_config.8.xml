@@ -254,7 +254,7 @@
 			<port>www/apache24</port>
 			<ports_after>www/mod_security www/mod_memcache</ports_after>
 		</build_pbi>
-		<build_options>apache24_UNSET=MPM_PREFORK MOST_DISABLED_MODULES PROXY_DISABLED_MODULES SESSION_DISABLED_MODULES;apache24_SET=MPM_EVENT MOST_ENABLED_MODULES MPM_SHARED SESSION_ENABLED_MODULES PROXY_ENABLED_MODULES SESSION_ENABLED_MODULES;mod_security_SET=MLOGC</build_options>
+		<build_options>apache24_UNSET=MPM_PREFORK;apache24_SET=MPM_EVENT SLOTMEM_SHM MOST_ENABLED_MODULES MPM_SHARED SESSION_ENABLED_MODULES PROXY_ENABLED_MODULES SESSION_ENABLED_MODULES;mod_security_SET=MLOGC</build_options>
 		<after_install_info>Please visit the ProxyServer settings tab and set the service up so that it may be started.</after_install_info>
 	</package>
 	<package>
