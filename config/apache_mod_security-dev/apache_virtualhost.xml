@@ -267,7 +267,7 @@
 			<show_disable_value>none</show_disable_value>
 		</field>
 		<field>
-			<fielddescr>intermediate CA certificate(optional)</fielddescr>
+			<fielddescr>Intermediate CA certificate (optional)</fielddescr>
 			<fieldname>reverse_int_ca</fieldname>
 			<description>Select intermediate CA assigned to certificate. Not all certificates require this.</description>
 			<type>select_source</type>
@@ -285,8 +285,8 @@
 			<rowhelper>
 				<rowhelperfield>
 					<fielddescr><![CDATA[Location]]></fielddescr>
-					<fieldname>Location</fieldname>
-					<description>Server locatino</description>
+					<fieldname>location</fieldname>
+					<description>Server Location</description>
 					<source><![CDATA[$config['installedpackages']['apachelocation']['config']]]></source>
 					<source_name>name</source_name>
 					<source_value>name</source_value>
