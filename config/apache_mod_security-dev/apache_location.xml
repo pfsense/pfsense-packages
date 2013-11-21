@@ -104,7 +104,7 @@
 			<fieldname>balancer</fieldname>
 		</columnitem>
 		<columnitem>
-			<fielddescr>lbmethod</fielddescr>
+			<fielddescr>LB Method</fielddescr>
 			<fieldname>lbmethod</fieldname>
 		</columnitem>
 		<columnitem>

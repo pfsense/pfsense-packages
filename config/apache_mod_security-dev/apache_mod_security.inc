@@ -582,6 +582,7 @@ EOF;
 				foreach ($virtualhost['row'] as $be){
 					if ($be['location'] != "none"){
 						$backend=$apache_location[$be['location']];
+						$vh_config.="# {$backend['name']}\n";
 						$vh_config.=" <Location ".($backend['sitepath'] ? $backend['sitepath'] : "/").">\n";
 						$vh_config.="  ProxyPass        balancer://{$backend['balancer']}{$backend['backendpath']}\n";
 						$vh_config.="  ProxyPassReverse balancer://{$backend['balancer']}{$backend['backendpath']}\n";
