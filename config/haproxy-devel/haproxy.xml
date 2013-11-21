@@ -100,6 +100,16 @@
 		<item>http://www.pfsense.com/packages/config/haproxy-devel/haproxy_xmlrpcsyncclient.inc</item>
 	</additional_files_needed>
 	<additional_files_needed>
+		<prefix>/usr/local/pkg/</prefix>
+		<chmod>077</chmod>
+		<item>http://www.pfsense.com/packages/config/haproxy-devel/isCertSigner.inc</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/pkg/</prefix>
+		<chmod>077</chmod>
+		<item>http://www.pfsense.com/packages/config/haproxy-devel/haproxy_utils.inc</item>
+	</additional_files_needed>
+	<additional_files_needed>
 		<prefix>/usr/local/www/widgets/widgets/</prefix>
 		<chmod>077</chmod>
 		<item>http://www.pfsense.com/packages/config/haproxy-devel/haproxy.widget.php</item>

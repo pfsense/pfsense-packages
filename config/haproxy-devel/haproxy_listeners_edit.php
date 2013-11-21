@@ -32,6 +32,7 @@
 
 require("guiconfig.inc");
 require_once("haproxy.inc");
+require_once("haproxy_utils.inc");
 
 /* Compatibility function for pfSense 2.0 */
 if (!function_exists("cert_get_purpose")) {	
@@ -274,6 +275,9 @@ if (!$id)
 
 $pgtitle = "HAProxy: Frontend: Edit";
 include("head.inc");
+
+$primaryfrontends = get_haproxy_frontends($pconfig['name']);
+$interfaces = haproxy_get_bindable_interfaces();
 ?>
 
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">
@@ -526,11 +530,16 @@ include("head.inc");
 					<option value="disabled"<?php if($pconfig['status'] == "disabled") echo " SELECTED"; ?>>Disabled</option>
 				</select>
 			</td>
-		</tr>		
+		</tr>
 		<tr align="left">
 			<td width="22%" valign="top" class="vncell">Shared Frontend</td>
 			<td width="78%" class="vtable" colspan="2">
+				<?if (count($primaryfrontends)==0){ ?>
+				<b>At least 1 primary frontend is needed.</b><br/><br/>
+				<? } else{ ?>
 				<input id="secondary" name="secondary" type="checkbox" value="yes" <?php if ($pconfig['secondary']=='yes') echo "checked"; ?> onclick="updatevisibility();"/>
+				<? } ?>
+				This can be used to host a second or more website on the same IP:Port combination.<br/>
 				Use this setting to configure multiple backends/accesslists for a single frontend.<br/>
 				All settings of which only 1 can exist will be hidden.<br/>
 				The frontend settings will be merged into 1 set of frontend configuration.
@@ -540,7 +549,6 @@ include("head.inc");
 			<td width="22%" valign="top" class="vncellreq">Primary frontend</td>
 			<td width="78%" class="vtable" colspan="2">
 				<?
-				$primaryfrontends = get_haproxy_frontends($pconfig['name']);
 				echo_html_select('primary_frontend',$primaryfrontends, $pconfig['primary_frontend'],"You must first create a 'primary' frontend.","updatevisibility();");
 				?>
 			</td>
@@ -548,22 +556,9 @@ include("head.inc");
 		<tr class="haproxy_primary">
 			  <td width="22%" valign="top" class="vncellreq">External address</td>
 			  <td width="78%" class="vtable">
-				<select name="extaddr" class="formfld">
-					<option value="" <?php if (!$pconfig['extaddr']) echo "selected"; ?>>Interface address</option>
-					<option value="localhost" <?php if ('localhost' == $pconfig['extaddr']) echo "selected"; ?>>Localhost</option>
-				<?php
-					if (is_array($config['virtualip']['vip'])):
-						foreach ($config['virtualip']['vip'] as $sn): 
+				<?
+				echo_html_select('extaddr', $interfaces, $pconfig['extaddr']);
 				?>
-					<option value="<?=$sn['subnet'];?>" <?php if ($sn['subnet'] == $pconfig['extaddr']) echo "selected"; ?>>
-						<?=htmlspecialchars("{$sn['subnet']} ({$sn['descr']})");?>
-					</option>
-				<?php
-						endforeach;
-					endif; 	
-				?>
-						<option value="any" <?php if($pconfig['extaddr'] == "any") echo "selected"; ?>>any</option>
-				</select>
 				<br />
 				<span class="vexpl">
 					If you want this rule to apply to another IP address than the IP address of the interface chosen above,
