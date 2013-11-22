@@ -100,6 +100,7 @@ if (isset($id) && $a_nat[$id]) {
 	$pconfig['dce_rpc_2'] = $a_nat[$id]['dce_rpc_2'];
 	$pconfig['dns_preprocessor'] = $a_nat[$id]['dns_preprocessor'];
 	$pconfig['sensitive_data'] = $a_nat[$id]['sensitive_data'];
+	$pconfig['sdf_alert_data_type'] = $a_nat[$id]['sdf_alert_data_type'];
 	$pconfig['sdf_alert_threshold'] = $a_nat[$id]['sdf_alert_threshold'];
 	$pconfig['sdf_mask_output'] = $a_nat[$id]['sdf_mask_output'];
 	$pconfig['ssl_preproc'] = $a_nat[$id]['ssl_preproc'];
@@ -410,6 +411,7 @@ if ($_POST['ResetAll']) {
 	$pconfig['dce_rpc_2'] = "on";
 	$pconfig['dns_preprocessor'] = "on";
 	$pconfig['sensitive_data'] = "off";
+	$pconfig['sdf_alert_data_type'] = "";
 	$pconfig['sdf_alert_threshold'] = "25";
 	$pconfig['sdf_mask_output'] = "off";
 	$pconfig['ssl_preproc'] = "on";
@@ -437,6 +439,8 @@ elseif ($_POST['Submit']) {
 	if ($_POST['sensitive_data'] == 'on') {
 		if ($_POST['sdf_alert_threshold'] < 1 || $_POST['sdf_alert_threshold'] > 4294067295)
 			$input_errors[] = gettext("The value for Sensitive_Data_Alert_Threshold must be between 1 and 4,294,067,295.");
+		if (empty($_POST['sdf_alert_data_type']))
+			$input_errors[] = gettext("You must select at least one item to Inspect for while Sensitive data Detections is enabled.");
 	}
 
 	/* if no errors write to conf */
@@ -480,6 +484,8 @@ elseif ($_POST['Submit']) {
 		$natent['dce_rpc_2'] = $_POST['dce_rpc_2'] ? 'on' : 'off';
 		$natent['dns_preprocessor'] = $_POST['dns_preprocessor'] ? 'on' : 'off';
 		$natent['sensitive_data'] = $_POST['sensitive_data'] ? 'on' : 'off';
+		$natent['sdf_alert_data_type'] = implode(",",$_POST['sdf_alert_data_type']);
+		$natent['sdf_alert_threshold'] = $_POST['sdf_alert_threshold'];
 		$natent['sdf_mask_output'] = $_POST['sdf_mask_output'] ? 'on' : 'off';
 		$natent['ssl_preproc'] = $_POST['ssl_preproc'] ? 'on' : 'off';
 		$natent['pop_preproc'] = $_POST['pop_preproc'] ? 'on' : 'off';
@@ -1247,6 +1253,7 @@ include_once("head.inc");
 			</select>&nbsp;&nbsp;<?php echo gettext("Choose to operate in stateful or stateless mode.  Default is ") . 
 			"<strong>" . gettext("stateful") . "</strong>."; ?><br/>
 		</td>
+		</tr>
 	<tr id="ftp_telnet_row_encrypted_check">
 		<td width="22%" valign="top" class="vncell"><?php echo gettext("Check Encrypted Traffic"); ?></td>
 		<td width="78%" class="vtable"><input name="ftp_telnet_check_encrypted" type="checkbox" value="on" 
@@ -1393,6 +1400,20 @@ include_once("head.inc");
 		"<a href=\"/snort/snort_interfaces_global.php\" title=\"" . gettext("Modify Snort global settings") . "\"/>" . gettext("Global Settings") . "</a>" . gettext(" tab."); ?>
 		</td>
 	</tr>
+	<tr id="sdf_alert_data_row">
+		<td width="22%" valign="top" class="vncell"><?php echo gettext("Inspection for"); ?> </td>
+		<td width="78%" class="vtable">
+			<select name="sdf_alert_data_type[]" class="formselect" id="sdf_alert_data_type" size="4" multiple="multiple"> 
+			<?php
+			$values = array('Credit Card', 'Email Addresses', 'U.S. Phone Numbers', 'U.S. Social Security Numbers');
+			foreach ($values as $val): ?>
+			<option value="<?=$val;?>"
+			<?php if (preg_match("/$val/",$pconfig['sdf_alert_data_type'])) echo "selected"; ?>> 
+				<?=gettext($val);?></option>
+				<?php endforeach; ?>
+			</select><br><?php echo gettext("Choose what type of sensitive alerts to detect.").$pconfig['sdf_alert_data_type']; ?><br/>
+		</td>
+		</tr>
 	<tr id="sdf_alert_threshold_row">
 		<td width="22%" valign="top" class="vncell"><?php echo gettext("Alert Threshold"); ?></td>
 		<td width="78%" class="vtable"><input name="sdf_alert_threshold" type="text" class="formfld unknown" id="sdf_alert_threshold" size="9" value="<?=htmlspecialchars($pconfig['sdf_alert_threshold']);?>">
@@ -1789,10 +1810,13 @@ function sensitive_data_enable_change() {
 	if (endis) {
 		document.getElementById("sdf_alert_threshold_row").style.display="none";
 		document.getElementById("sdf_mask_output_row").style.display="none";
+		document.getElementById("sdf_alert_data_type").style.display="none";
+		
 	}
 	else {
 		document.getElementById("sdf_alert_threshold_row").style.display="table-row";
 		document.getElementById("sdf_mask_output_row").style.display="table-row";
+		document.getElementById("sdf_alert_data_type").style.display="table-row";
 	}
 }
 
