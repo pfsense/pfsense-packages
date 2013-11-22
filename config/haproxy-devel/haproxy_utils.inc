@@ -31,6 +31,8 @@
   be moved to the general pfSense php library for possible easy use by other parts of pfSense
 */
 
+require_once("config.inc");
+
 function haproxy_interface_ip($interfacebindname,$userfriendly=false){
 	$list = haproxy_get_bindable_interfaces();
 	$item = $list[$interfacebindname];
@@ -153,11 +155,32 @@ function haproxy_get_bindable_interfaces($ipv="ipv4,ipv6", $interfacetype="any,l
 	return $bindable;
 }
 
-function haproxy_cert_signed_by($cert, $signedbycert) {
-	// uses function isCertSigner(a,b) from isCertSigner.inc to check if $cert was signed by $signedbycert
-	// returns true if it is
-	return isCertSigner(base64_decode($cert['crt']), base64_decode($signedbycert['crt']));
+function haproxy_get_cert_extensions($crt){
+	$cert = openssl_x509_parse(base64_decode($crt['crt']));
+	return $cert['extensions'];
 }
+
+function haproxy_get_cert_authoritykeyidentifier($cert)
+{
+	$certextension = haproxy_get_cert_extensions($cert);
+	$lines = preg_split('/[\n]+/',$certextension['authorityKeyIdentifier']);
+	return substr($lines[0],6);// cut off the starting string 'keyid:'
+}
+function haproxy_get_cert_subjectKeyIdentifier($cert)
+{
+	$certextension = haproxy_get_cert_extensions($cert);
+	$lines = preg_split('/[\n]+/',$certextension['subjectKeyIdentifier']);
+	return $lines[0];
+}
+
+function haproxy_cert_signed_by($cert, $signedbycert) {
+	// checks if $cert was signed by $signedbycert
+	// this does NOT validate a proper signature but only checks if the extension properties match.
+	$authoritykeyid = haproxy_get_cert_authoritykeyidentifier($cert);
+	$subjectid = haproxy_get_cert_subjectKeyIdentifier($signedbycert);
+	return $authoritykeyid == $subjectid;
+}
+
 function haproxy_get_certificates(){
 	global $config;
 	$allcerts = array();
