@@ -31,6 +31,7 @@
 require_once("functions.inc");
 require_once("pkg-utils.inc");
 require_once("notices.inc");
+require_once("haproxy_utils.inc");
 require_once("haproxy_xmlrpcsyncclient.inc");
 
 $d_haproxyconfdirty_path = $g['varrun_path'] . "/haproxy.conf.dirty";
@@ -107,7 +108,7 @@ $a_closetypes['forceclose'] = array('name' => 'forceclose', 'syntax' => 'forcecl
 
 function haproxy_custom_php_deinstall_command() {
 	exec("cd /var/db/pkg && pkg_delete `ls | grep haproxy`");
-	exec("rm /usr/local/pkg/haproxy.inc");
+	exec("rm /usr/local/pkg/haproxy*");
 	exec("rm /usr/local/www/haproxy*");
 	exec("rm /usr/local/etc/rc.d/haproxy.sh");
 	exec("rm /etc/devd/haproxy.conf");
@@ -592,6 +593,13 @@ function haproxy_writeconf($configfile) {
 				$ssl_crt=" crt /var/etc/{$backend['name']}.{$backend['port']}.crt";
 				$cert = lookup_cert($backend['ssloffloadcert']);
 				$certcontent = base64_decode($cert['crt'])."\r\n".base64_decode($cert['prv']);
+
+				$certchaincontent = ca_chain($cert);
+				if ($certchaincontent != "") {
+					$certcontent .= "\r\n" . $certchaincontent;
+				}
+				unset($certchaincontent);
+				
 				file_put_contents("/var/etc/{$backend['name']}.{$backend['port']}.crt", $certcontent);
 				unset($certcontent);
 			}else{
@@ -657,14 +665,12 @@ function haproxy_writeconf($configfile) {
 			$listenip = "";
 			
 			// Process and add bind directives for ports
-			foreach($ports as $port) {
-				if($port) {
-					if($bind['extaddr'] == "any") 
-						$listenip .=  "\tbind\t\t\t0.0.0.0:{$port} {$ssl_info} {$advanced_bind}\n";
-					elseif($bind['extaddr']) 
-						$listenip .=  "\tbind\t\t\t{$bind['extaddr']}:{$port} {$ssl_info} {$advanced_bind}\n";	
-					else 
-						$listenip .= "\tbind\t\t\t" . get_current_wan_address('wan') . ":{$port} {$ssl_info} {$advanced_bind}\n";
+			$ip = haproxy_interface_ip($bind['extaddr']);
+			if ($ip){
+				foreach($ports as $port) {
+					if($port) {
+						$listenip .=  "\tbind\t\t\t$ip:{$port} {$ssl_info} {$advanced_bind}\n";
+					}
 				}
 			}
 			
@@ -1039,16 +1045,11 @@ function get_primaryfrontend($frontend) {
 	return $mainfrontend;
 }
 
-function get_frontend_ipport($frontend) {
+function get_frontend_ipport($frontend,$userfriendly=false) {
 	$mainfrontend = get_primaryfrontend($frontend);
-	if($mainfrontend['extaddr'] == "any") 
-		$result = "0.0.0.0";
-	elseif ($mainfrontend['extaddr'] == "localhost")
-		$result = "127.0.0.1";
-	elseif($mainfrontend['extaddr']) 
-		$result = $mainfrontend['extaddr'];
-	else 
-		$result = get_current_wan_address('wan');
+	$result = haproxy_interface_ip($mainfrontend['extaddr'],$userfriendly);
+	if ($userfriendly and is_ipaddrv6($result))
+		$result = "[{$result}]";
 	return $result . ":" . $mainfrontend['port'];
 }
 
@@ -1099,7 +1100,7 @@ function get_haproxy_frontends($excludeitem="") {
 	return $result;
 }
 
-function get_frontent_acls($frontend) {
+function get_frontend_acls($frontend) {
 	$result = array();
 	$a_acl = &$frontend['ha_acls']['item'];
 	if (is_array($a_acl))
@@ -1123,51 +1124,10 @@ function get_frontent_acls($frontend) {
 	return $result;
 }
 
-function phparray_to_javascriptarray_recursive($nestID, $path, $items, $nodeName, $includeitems) {
-	$offset = str_repeat('  ',$nestID);
-	$itemName = "item$nestID";
-	echo "{$offset}$nodeName = {};\n";
-	if (is_array($items))
-		foreach ($items as $key => $item)
-		{
-			if (in_array($path.'/'.$key, $includeitems))
-				$subpath = $path.'/'.$key;
-			else
-				$subpath = $path.'/*';
-			if (in_array($subpath, $includeitems) || in_array($path.'/*', $includeitems)) {
-				if (is_array($item)) {
-					$subNodeName = "item$nestID";
-					phparray_to_javascriptarray_recursive($nestID+1, $subpath, $items[$key], $subNodeName, $includeitems);
-					echo "{$offset}{$nodeName}['{$key}'] = $itemName;\n";
-				} else
-					echo "{$offset}{$nodeName}['$key'] = '$item';\n";
-			}
-		}
-}
-
-function phparray_to_javascriptarray($items, $javaMapName, $includeitems) {
-		phparray_to_javascriptarray_recursive(1,'',$items, $javaMapName, $includeitems);
-}
-
 function haproxy_escapestring($configurationsting) {
 	$result = str_replace('\\', '\\\\', $configurationsting);
 	$result = str_replace(' ', '\\ ', $result);
 	return str_replace('#', '\\#', $result);
-}
-
-function echo_html_select($name, $keyvaluelist, $selected, $listEmptyMessage="", $onchangeEvent="") {
-	if (count($keyvaluelist)>0){
-		if ($onchangeEvent != "")
-			$onchangeEvent .= " onchange=$onchangeEvent";
-		echo "<select name=\"$name\" id=\"$name\" class=\"formselect\"$onchangeEvent>";
-		foreach($keyvaluelist as $key => $desc){
-			$selectedhtml = $key == $selected ? "selected" : "";
-			echo "<option value=\"{$key}\" {$selectedhtml}>{$desc['name']}</option>";
-		}
-		echo "</select>";
-	} else {
-		echo $listEmptyMessage;
-	}
 }
 
 ?>

@@ -32,6 +32,7 @@
 require_once("guiconfig.inc");
 require_once("haproxy.inc");
 require_once("certs.inc");
+require_once("haproxy_utils.inc");
 
 if (!is_array($config['installedpackages']['haproxy']['ha_backends']['item'])) {
 	$config['installedpackages']['haproxy']['ha_backends']['item'] = array();
@@ -125,7 +126,7 @@ include("head.inc");
 		
 		$a_frontend_grouped = array();
 		foreach($a_frontend as &$frontend2) {
-			$ipport = get_frontend_ipport($frontend2);
+			$ipport = get_frontend_ipport($frontend2, true);
 			$frontend2['ipport'] = $ipport;
 			$a_frontend_grouped[$ipport][] = $frontend2;
 		}
@@ -156,7 +157,7 @@ include("head.inc");
 						echo '<img src="'.$img_cert.'" title="SSL offloading cert: '.$cert['descr'].'" alt="SSL offloading" border="0" height="16" width="16" />';
 					}
 					
-					$acls = get_frontent_acls($frontend);
+					$acls = get_frontend_acls($frontend);
 					$isaclset = "";
 					foreach ($acls as $acl) {
 						$isaclset .= "&#10;" . $acl['descr'];
@@ -179,7 +180,7 @@ include("head.inc");
 					<?=$frontend['desc'];?>
 				  </td>
 				  <td class="listlr" ondblclick="document.location='haproxy_listeners_edit.php?id=<?=$frontendname;?>';">
-					<?=$frontend['ipport'];?>
+					<?=str_replace(" ","&nbsp;",$frontend['ipport']);?>
 				  </td>
 				  <td class="listlr" ondblclick="document.location='haproxy_listeners_edit.php?id=<?=$frontendname;?>';">
 					<?=$frontend['type']?>

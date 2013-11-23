@@ -31,6 +31,7 @@
 
 require("guiconfig.inc");
 require_once("haproxy.inc");
+require_once("haproxy_utils.inc");
 
 $d_haproxyconfdirty_path = $g['varrun_path'] . "/haproxy.conf.dirty";
 
@@ -137,7 +138,7 @@ if ($_POST) {
 
 			if (preg_match("/[^a-zA-Z0-9\.\-_]/", $server_name))
 				$input_errors[] = "The field 'Name' contains invalid characters.";
-			if (preg_match("/[^a-zA-Z0-9\.\-_]/", $server_address))
+			if (!is_ipaddr($server_address))
 				$input_errors[] = "The field 'Address' contains invalid characters.";
 
 			if (!preg_match("/.{2,}/", $server_name))
@@ -350,7 +351,7 @@ foreach($simplefields as $field){
 	                  <td width="5%" class="listhdrr">Port</td>
 	                  <td width="5%" class="listhdrr">SSL</td>
 	                  <td width="8%" class="listhdrr">Weight</td>
-	                  <td width="5%" class="listhdr">Backup</td>
+	                  <td width="5%" class="listhdrr">Mode</td>
 	                  <td width="15%" class="listhdr">Advanced</td>
 	                  <td width="4%" class=""></td>
 			</tr>
@@ -534,10 +535,7 @@ foreach($simplefields as $field){
 				NOTE: paste text into this box that you would like to pass thru. Applied to the backend section.
 			</td>
 		</tr>
-
-	</table>
-	<br/>
-	<table width="100%" border="0" cellpadding="6" cellspacing="0">
+		<tr><td>&nbsp;</td></tr>
 		<tr>
 			<td colspan="2" valign="top" class="listtopic">Health checking</td>
 		</tr>
@@ -611,9 +609,7 @@ FLUSH PRIVILEGES;</pre>
 				Fill in the TCP portnumber the healthcheck should be performed on.
 			</td>
 		</tr>
-	</table>
-	<br/>
-	<table width="100%" border="0" cellpadding="6" cellspacing="0">
+		<tr><td>&nbsp;</td></tr>
 		<tr>
 			<td colspan="2" valign="top" class="listtopic">Advanced settings</td>
 		</tr>
@@ -641,9 +637,7 @@ want the clients to see the failures. The number of attempts to reconnect is
 set by the 'retries' parameter.</div>
 			</td>
 		</tr>
-	</table>
-	<br/>&nbsp;<br/>	
-	<table width="100%" border="0" cellpadding="6" cellspacing="0">
+		<tr><td>&nbsp;</td></tr>
 		<tr>
 			<td colspan="2" valign="top" class="listtopic">Statistics</td>
 		</tr>
@@ -719,8 +713,7 @@ set by the 'retries' parameter.</div>
 				Specify the refresh rate of the stats page in seconds, or specified time unit (us, ms, s, m, h, d).
 			</td>
 		</tr>
-	</table>	
-	<table width="100%" border="0" cellpadding="6" cellspacing="0">
+		<tr><td>&nbsp;</td></tr>
 		<tr align="left">
 			<td width="22%" valign="top">&nbsp;</td>
 			<td width="78%">

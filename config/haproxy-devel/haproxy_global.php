@@ -31,6 +31,7 @@
 
 require_once("guiconfig.inc");
 require_once("haproxy.inc");
+require_once("haproxy_utils.inc");
 require_once("globals.inc");
 
 if (!is_array($config['installedpackages']['haproxy'])) 
@@ -41,6 +42,9 @@ if ($_POST) {
 	unset($input_errors);
 	$pconfig = $_POST;
 	
+	if ($_POST['calculate_certificate_chain']) {
+		haproxy_recalculate_certifcate_chain();
+	} else
 	if ($_POST['apply']) {
 		$result = haproxy_check_and_run($savemsg, true);
 		if ($result)
@@ -153,6 +157,20 @@ function enable_change(enable_change) {
 	<td>
 	<div id="mainarea">
 		<table class="tabcont" width="100%" border="0" cellpadding="6" cellspacing="0">
+			<tr>
+				<td colspan="2" valign="top" class="listtopic">Recalculate certificate chain.</td>
+			</tr>
+			<tr>
+				<td width="22%" valign="top" class="vncell">&nbsp;</td>
+				<td width="78%" class="vtable">
+					<input type="hidden" name="calculate_certificate_chain" id="calculate_certificate_chain">
+					<input type="button" class="formbtn" value="Recalculate certificate chains" onclick="$('calculate_certificate_chain').value='true';document.iform.submit();">
+					<br/>
+					This can be required after certificates have been created or imported. As pfSense 2.1.0 currently does not
+					always keep track of these dependencies which might be required to create a proper certificate chain when using SSLoffloading.
+				</td>
+			</tr>
+			
 			<tr>
 				<td colspan="2" valign="top" class="listtopic">General settings</td>
 			</tr>
