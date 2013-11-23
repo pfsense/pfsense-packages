@@ -161,132 +161,143 @@ include("head.inc");
 <form action="system_patches.php" method="post" name="iform">
 <script type="text/javascript" language="javascript" src="/javascript/row_toggle.js"></script>
 <?php if ($savemsg) print_info_box($savemsg); ?>
-<table width="100%" border="0" cellpadding="0" cellspacing="0" summary="system patches">
-<tr><td><div id="mainarea">
-<table class="tabcont" width="100%" border="0" cellpadding="0" cellspacing="0" summary="main area">
-<tr><td colspan="8" align="center">
-<?php echo gettext("This page allows you to add patches, either from the official code repository or ones pasted in from e-mail or other sources."); ?>
-<br/><br/>
-<strong><?php echo gettext("Use with caution!"); ?></strong>
-<br/><br/>
-<?php if (!empty($fulldetail)): ?>
-</td></tr>
-<tr><td></td><td colspan="7" align="left">Output of full patch <?php echo $_GET['fulltest']; ?> test:
-<pre><?php echo $fulldetail; ?></pre>
-<a href="system_patches.php">Close</a><br/><br/>
-<?php endif; ?>
-</td></tr>
-<tr id="frheader">
-<td width="5%" class="list">&nbsp;</td>
-<td width="5%" class="listhdrr"><?=gettext("Description");?></td>
-<td width="60%" class="listhdrr"><?=gettext("URL/ID");?></td>
-<td width="5%" class="listhdrr"><?=gettext("Fetch");?></td>
-<td width="5%" class="listhdrr"><?=gettext("Test");?></td>
-<td width="5%" class="listhdrr"><?=gettext("Apply");?></td>
-<td width="5%" class="listhdr"><?=gettext("Revert");?></td>
-<td width="5%" class="listhdr"><?=gettext("Auto Apply");?></td>
-<td width="5%" class="list">
-<table border="0" cellspacing="0" cellpadding="1" summary="buttons">
-	<tr><td width="17">
-	<?php if (count($a_patches) == 0): ?>
-		<img src="./themes/<?= $g['theme']; ?>/images/icons/icon_x_d.gif" width="17" height="17" title="<?=gettext("delete selected patches");?>" border="0" alt="delete" />
-	<?php else: ?>
-		<input name="del" type="image" src="./themes/<?= $g['theme']; ?>/images/icons/icon_x.gif" width="17" height="17" title="<?=gettext("delete selected patches"); ?>" onclick="return confirm('<?=gettext("Do you really want to delete the selected patches?");?>')" />
-	<?php endif; ?>
-	</td>
-	<td><a href="system_patches_edit.php"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif" width="17" height="17" border="0" title="<?=gettext("add new patch"); ?>" alt="add" /></a></td>
-	</tr>
-</table>
-</td>
-</tr>
-
-<?php
-$npatches = $i = 0;
-foreach ($a_patches as $thispatch):
-	$can_apply = patch_test_apply($thispatch);
-	$can_revert = patch_test_revert($thispatch);
-
-?>
-	<tr valign="top" id="fr<?=$npatches;?>">
-	<td class="listt"><input type="checkbox" id="frc<?=$npatches;?>" name="patch[]" value="<?=$i;?>" onClick="fr_bgcolor('<?=$npatches;?>')" style="margin: 0; padding: 0; width: 15px; height: 15px;" /></td>
-	<td class="listlr" onclick="fr_toggle(<?=$npatches;?>)" id="frd<?=$npatches;?>" ondblclick="document.location='system_patches_edit.php?id=<?=$npatches;?>';">
-		<?=$thispatch['descr'];?>
-	</td>
-	<td class="listr" onclick="fr_toggle(<?=$npatches;?>)" id="frd<?=$npatches;?>" ondblclick="document.location='system_patches_edit.php?id=<?=$npatches;?>';">
-		
-		<?php
-		if (!empty($thispatch['location']))
-			echo $thispatch['location'];
-		elseif (!empty($thispatch['patch']))
-			echo gettext("Saved Patch");
-		?>
-	</td>
-	<td class="listr" onclick="fr_toggle(<?=$npatches;?>)" id="frd<?=$npatches;?>" ondblclick="document.location='system_patches_edit.php?id=<?=$npatches;?>';">
-	<?php if (empty($thispatch['patch'])): ?>
-		<a href="system_patches.php?id=<?=$i;?>&amp;act=fetch"><?php echo gettext("Fetch"); ?></a>
-	<?php elseif (!empty($thispatch['location'])): ?>
-		<a href="system_patches.php?id=<?=$i;?>&amp;act=fetch"><?php echo gettext("Re-Fetch"); ?></a>
-	<?php endif; ?>
-	</td>
-	<td class="listr" onclick="fr_toggle(<?=$npatches;?>)" id="frd<?=$npatches;?>" ondblclick="document.location='system_patches_edit.php?id=<?=$npatches;?>';">
-	<?php if (!empty($thispatch['patch'])): ?>
-		<a href="system_patches.php?id=<?=$i;?>&amp;act=test"><?php echo gettext("Test"); ?></a>
-	<?php endif; ?>
-	</td>
-	<td class="listr" onclick="fr_toggle(<?=$npatches;?>)" id="frd<?=$npatches;?>" ondblclick="document.location='system_patches_edit.php?id=<?=$npatches;?>';">
-	<?php if ($can_apply): ?>
-		<a href="system_patches.php?id=<?=$i;?>&amp;act=apply"><?php echo gettext("Apply"); ?></a>
-	<?php endif; ?>
-	</td>
-	<td class="listr" onclick="fr_toggle(<?=$npatches;?>)" id="frd<?=$npatches;?>" ondblclick="document.location='system_patches_edit.php?id=<?=$npatches;?>';">
-	<?php if ($can_revert): ?>
-		<a href="system_patches.php?id=<?=$i;?>&amp;act=revert"><?php echo gettext("Revert"); ?></a>
-	<?php endif; ?>
-	</td>
-	<td class="listr" onclick="fr_toggle(<?=$npatches;?>)" id="frd<?=$npatches;?>" ondblclick="document.location='system_patches_edit.php?id=<?=$npatches;?>';">
-		<?= isset($thispatch['autoapply']) ? "Yes" : "No" ?>
-	</td>
-	<td valign="middle" class="list" nowrap>
-		<table border="0" cellspacing="0" cellpadding="1" summary="edit">
-		<tr>
-		<td><input onmouseover="fr_insline(<?=$npatches;?>, true)" onmouseout="fr_insline(<?=$npatches;?>, false)" name="move_<?=$i;?>" src="/themes/<?= $g['theme']; ?>/images/icons/icon_left.gif" title="<?=gettext("move selected patches before this patch");?>" height="17" type="image" width="17" border="0" /></td>
-		<td><a href="system_patches_edit.php?id=<?=$i;?>"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_e.gif" width="17" height="17" border="0" title="<?=gettext("edit patch"); ?>" alt="edit" /></a></td>
+	<table width="100%" border="0" cellpadding="0" cellspacing="0" summary="system patches">
+		<tr><td class="tabnavtbl">
+			<?php
+			/* active tabs */
+			$tab_array = array();
+			$tab_array[] = array("Patches", true, "system_patches.php");
+			$tab_array[] = array("Path rewrites", false, "system_patches_pathrewrites.php");
+			display_top_tabs($tab_array);
+			?>
+			</td>
 		</tr>
-		<tr>
-		<td align="center" valign="middle"><a href="system_patches.php?act=del&amp;id=<?=$i;?>" onclick="return confirm('<?=gettext("Do you really want to delete this patch?");?>')"><img src="./themes/<?= $g['theme']; ?>/images/icons/icon_x.gif" width="17" height="17" border="0" title="<?=gettext("delete patch");?>" alt="delete" /></a></td>
-		<td></td>
+		<tr><td><div id="mainarea">
+			<table class="tabcont" width="100%" border="0" cellpadding="0" cellspacing="0" summary="main area">
+			<tr><td colspan="8" align="center">
+			<?php echo gettext("This page allows you to add patches, either from the official code repository or ones pasted in from e-mail or other sources."); ?>
+			<br/><br/>
+			<strong><?php echo gettext("Use with caution!"); ?></strong>
+			<br/><br/>
+			<?php if (!empty($fulldetail)): ?>
+			</td></tr>
+			<tr><td></td><td colspan="7" align="left">Output of full patch <?php echo $_GET['fulltest']; ?> test:
+			<pre><?php echo $fulldetail; ?></pre>
+			<a href="system_patches.php">Close</a><br/><br/>
+			<?php endif; ?>
+			</td></tr>
+			<tr id="frheader">
+			<td width="5%" class="list">&nbsp;</td>
+			<td width="5%" class="listhdrr"><?=gettext("Description");?></td>
+			<td width="60%" class="listhdrr"><?=gettext("URL/ID");?></td>
+			<td width="5%" class="listhdrr"><?=gettext("Fetch");?></td>
+			<td width="5%" class="listhdrr"><?=gettext("Test");?></td>
+			<td width="5%" class="listhdrr"><?=gettext("Apply");?></td>
+			<td width="5%" class="listhdr"><?=gettext("Revert");?></td>
+			<td width="5%" class="listhdr"><?=gettext("Auto Apply");?></td>
+			<td width="5%" class="list">
+			<table border="0" cellspacing="0" cellpadding="1" summary="buttons">
+				<tr><td width="17">
+				<?php if (count($a_patches) == 0): ?>
+					<img src="./themes/<?= $g['theme']; ?>/images/icons/icon_x_d.gif" width="17" height="17" title="<?=gettext("delete selected patches");?>" border="0" alt="delete" />
+				<?php else: ?>
+					<input name="del" type="image" src="./themes/<?= $g['theme']; ?>/images/icons/icon_x.gif" width="17" height="17" title="<?=gettext("delete selected patches"); ?>" onclick="return confirm('<?=gettext("Do you really want to delete the selected patches?");?>')" />
+				<?php endif; ?>
+				</td>
+				<td><a href="system_patches_edit.php"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif" width="17" height="17" border="0" title="<?=gettext("add new patch"); ?>" alt="add" /></a></td>
+				</tr>
+			</table>
+			</td>
+			</tr>
+
+			<?php
+			$npatches = $i = 0;
+			foreach ($a_patches as $thispatch):
+				$can_apply = patch_test_apply($thispatch);
+				$can_revert = patch_test_revert($thispatch);
+
+			?>
+				<tr valign="top" id="fr<?=$npatches;?>">
+				<td class="listt"><input type="checkbox" id="frc<?=$npatches;?>" name="patch[]" value="<?=$i;?>" onClick="fr_bgcolor('<?=$npatches;?>')" style="margin: 0; padding: 0; width: 15px; height: 15px;" /></td>
+				<td class="listlr" onclick="fr_toggle(<?=$npatches;?>)" id="frd<?=$npatches;?>" ondblclick="document.location='system_patches_edit.php?id=<?=$npatches;?>';">
+					<?=$thispatch['descr'];?>
+				</td>
+				<td class="listr" onclick="fr_toggle(<?=$npatches;?>)" id="frd<?=$npatches;?>" ondblclick="document.location='system_patches_edit.php?id=<?=$npatches;?>';">
+					
+					<?php
+					if (!empty($thispatch['location']))
+						echo $thispatch['location'];
+					elseif (!empty($thispatch['patch']))
+						echo gettext("Saved Patch");
+					?>
+				</td>
+				<td class="listr" onclick="fr_toggle(<?=$npatches;?>)" id="frd<?=$npatches;?>" ondblclick="document.location='system_patches_edit.php?id=<?=$npatches;?>';">
+				<?php if (empty($thispatch['patch'])): ?>
+					<a href="system_patches.php?id=<?=$i;?>&amp;act=fetch"><?php echo gettext("Fetch"); ?></a>
+				<?php elseif (!empty($thispatch['location'])): ?>
+					<a href="system_patches.php?id=<?=$i;?>&amp;act=fetch"><?php echo gettext("Re-Fetch"); ?></a>
+				<?php endif; ?>
+				</td>
+				<td class="listr" onclick="fr_toggle(<?=$npatches;?>)" id="frd<?=$npatches;?>" ondblclick="document.location='system_patches_edit.php?id=<?=$npatches;?>';">
+				<?php if (!empty($thispatch['patch'])): ?>
+					<a href="system_patches.php?id=<?=$i;?>&amp;act=test"><?php echo gettext("Test"); ?></a>
+				<?php endif; ?>
+				</td>
+				<td class="listr" onclick="fr_toggle(<?=$npatches;?>)" id="frd<?=$npatches;?>" ondblclick="document.location='system_patches_edit.php?id=<?=$npatches;?>';">
+				<?php if ($can_apply): ?>
+					<a href="system_patches.php?id=<?=$i;?>&amp;act=apply"><?php echo gettext("Apply"); ?></a>
+				<?php endif; ?>
+				</td>
+				<td class="listr" onclick="fr_toggle(<?=$npatches;?>)" id="frd<?=$npatches;?>" ondblclick="document.location='system_patches_edit.php?id=<?=$npatches;?>';">
+				<?php if ($can_revert): ?>
+					<a href="system_patches.php?id=<?=$i;?>&amp;act=revert"><?php echo gettext("Revert"); ?></a>
+				<?php endif; ?>
+				</td>
+				<td class="listr" onclick="fr_toggle(<?=$npatches;?>)" id="frd<?=$npatches;?>" ondblclick="document.location='system_patches_edit.php?id=<?=$npatches;?>';">
+					<?= isset($thispatch['autoapply']) ? "Yes" : "No" ?>
+				</td>
+				<td valign="middle" class="list" nowrap>
+					<table border="0" cellspacing="0" cellpadding="1" summary="edit">
+					<tr>
+					<td><input onmouseover="fr_insline(<?=$npatches;?>, true)" onmouseout="fr_insline(<?=$npatches;?>, false)" name="move_<?=$i;?>" src="/themes/<?= $g['theme']; ?>/images/icons/icon_left.gif" title="<?=gettext("move selected patches before this patch");?>" height="17" type="image" width="17" border="0" /></td>
+					<td><a href="system_patches_edit.php?id=<?=$i;?>"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_e.gif" width="17" height="17" border="0" title="<?=gettext("edit patch"); ?>" alt="edit" /></a></td>
+					</tr>
+					<tr>
+					<td align="center" valign="middle"><a href="system_patches.php?act=del&amp;id=<?=$i;?>" onclick="return confirm('<?=gettext("Do you really want to delete this patch?");?>')"><img src="./themes/<?= $g['theme']; ?>/images/icons/icon_x.gif" width="17" height="17" border="0" title="<?=gettext("delete patch");?>" alt="delete" /></a></td>
+					<td></td>
+					</tr>
+					</table>
+				</td></tr>
+			<?php $i++; $npatches++; endforeach; ?>
+				<tr>
+				<td class="list" colspan="8"></td>
+				<td class="list" valign="middle" nowrap>
+				<table border="0" cellspacing="0" cellpadding="1" summary="edit">
+				<tr>
+				<td><?php if ($npatches == 0): ?><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_left_d.gif" width="17" height="17" title="<?=gettext("move selected patches to end"); ?>" border="0" alt="move" /><?php else: ?><input name="move_<?=$i;?>" type="image" src="/themes/<?= $g['theme']; ?>/images/icons/icon_left.gif" width="17" height="17" title="<?=gettext("move selected patches to end");?>" border="0" alt="move" /><?php endif; ?></td>
+				</tr>
+				<tr>
+				<td width="17">
+				<?php if (count($a_patches) == 0): ?>
+					<img src="./themes/<?= $g['theme']; ?>/images/icons/icon_x_d.gif" width="17" height="17" title="<?=gettext("delete selected patches");?>" border="0" alt="delete" />
+				<?php else: ?>
+					<input name="del" type="image" src="./themes/<?= $g['theme']; ?>/images/icons/icon_x.gif" width="17" height="17" title="<?=gettext("delete selected patches"); ?>" onclick="return confirm('<?=gettext("Do you really want to delete the selected patches?");?>')" />
+				<?php endif; ?>
+				</td>
+				<td><a href="system_patches_edit.php"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif" width="17" height="17" border="0" title="<?=gettext("add new patch"); ?>" alt="add" /></a></td>
+				</tr>
+				</table>
+				</td>
+				</tr>
+				<tr><td></td><td colspan="6">
+				<?php echo gettext("NOTE: Each patch is tested, and the appropriate action is shown. If neither 'Apply' or 'Revert' shows up, the patch cannot be used (check the pathstrip and whitespace options)."); ?>
+				<br/><br/>
+				<?php echo gettext("Use the 'Test' link to see if a patch can be applied or reverted. You can reorder patches so that higher patches apply later than lower patches."); ?>
+				</td><td></td></tr>
+				</table>
+			</div></td>
 		</tr>
-		</table>
-	</td></tr>
-<?php $i++; $npatches++; endforeach; ?>
-	<tr>
-	<td class="list" colspan="8"></td>
-	<td class="list" valign="middle" nowrap>
-	<table border="0" cellspacing="0" cellpadding="1" summary="edit">
-	<tr>
-	<td><?php if ($npatches == 0): ?><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_left_d.gif" width="17" height="17" title="<?=gettext("move selected patches to end"); ?>" border="0" alt="move" /><?php else: ?><input name="move_<?=$i;?>" type="image" src="/themes/<?= $g['theme']; ?>/images/icons/icon_left.gif" width="17" height="17" title="<?=gettext("move selected patches to end");?>" border="0" alt="move" /><?php endif; ?></td>
-	</tr>
-	<tr>
-	<td width="17">
-	<?php if (count($a_patches) == 0): ?>
-		<img src="./themes/<?= $g['theme']; ?>/images/icons/icon_x_d.gif" width="17" height="17" title="<?=gettext("delete selected patches");?>" border="0" alt="delete" />
-	<?php else: ?>
-		<input name="del" type="image" src="./themes/<?= $g['theme']; ?>/images/icons/icon_x.gif" width="17" height="17" title="<?=gettext("delete selected patches"); ?>" onclick="return confirm('<?=gettext("Do you really want to delete the selected patches?");?>')" />
-	<?php endif; ?>
-	</td>
-	<td><a href="system_patches_edit.php"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif" width="17" height="17" border="0" title="<?=gettext("add new patch"); ?>" alt="add" /></a></td>
-	</tr>
 	</table>
-	</td>
-	</tr>
-	<tr><td></td><td colspan="6">
-	<?php echo gettext("NOTE: Each patch is tested, and the appropriate action is shown. If neither 'Apply' or 'Revert' shows up, the patch cannot be used (check the pathstrip and whitespace options)."); ?>
-	<br/><br/>
-	<?php echo gettext("Use the 'Test' link to see if a patch can be applied or reverted. You can reorder patches so that higher patches apply later than lower patches."); ?>
-	</td><td></td></tr>
-	</table>
-</div></td></tr>
-</table>
 </form>
 <?php include("fend.inc"); ?>
 </body>

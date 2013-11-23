@@ -34,6 +34,7 @@ $git_root_url = "http://github.com/pfsense/pfsense/commit/";
 $patch_suffix = ".patch";
 $patch_dir = "/var/patches";
 $patch_cmd = "/usr/bin/patch";
+$patches_config = &$config['installedpackages']['patches'];
 
 function patch_package_install() {
 	patch_add_shellcmd();
@@ -97,6 +98,99 @@ function patch_fetch(& $patch) {
 	}
 }
 
+function starts_with($haystack, $needle) {
+    return !strncmp($haystack, $needle, strlen($needle));
+}
+
+function rewrite_patch_append(&$patch, &$textlines, $patchstart, $patchend, $newfileindex) {
+	global $patches_config;
+	$pathrewrites = base64_decode($patches_config['pathrewrites']);
+	$filepathrewrites = explode("\n", $pathrewrites);
+	
+	$old = $textlines[$newfileindex-1];
+	$new = $textlines[$newfileindex];
+	if ($old == "--- /dev/null")
+		$filename = substr($new,6);
+	else
+		$filename = substr($old,6);
+	
+	$skippatch = false;
+	foreach($filepathrewrites as $changeitem){
+		$oldnew = explode("|",$changeitem);
+		if ($oldnew[0] == $filename){
+			if ($oldnew[1] == "")
+				$skippatch = true;
+			else
+				$filename = $oldnew[1];
+		}
+	}
+	if ($old <> "--- /dev/null")
+		$textlines[$newfileindex-1]="--- a/".$filename;
+	if ($new <> "+++ /dev/null")
+		$textlines[$newfileindex]="+++ b/".$filename;
+	
+	if (!$skippatch){
+		for($j=$patchstart;$j<=$patchend;$j++){
+			$patch .= $textlines[$j]."\n";
+		}
+	}
+}
+
+function rewrite_patch_paths(&$patch) {
+	$patch = str_replace("\r\n","\n",$patch);// normalize enters to \n  as patch_fetch does
+	$patch = str_replace("\r","\n",$patch);  // not make sure of correct line endings.
+	
+	$textlines = explode("\n", $patch);
+	$patch = ""; // changed patch will be in this same variable
+
+	$paternid = 0;
+	$nextpatchfound = true;
+	$reading = false;
+	$patchnewstart = -1;
+	$patchstart = -1;  // position if "patch ..."
+	$newfileindex = -1;// position of "+++ ..."
+	$patchend = -1;
+	
+	$i = 0;
+	while ($i < count($textlines)){
+		$line = $textlines[$i];
+		
+		if (starts_with($line, 'diff ')){
+			$patchnewstart = $i;
+			$paternid=1;
+		} else
+		switch($paternid){
+			case 1:{ 
+				if (starts_with($line, 'new ')) 
+					break;
+				if (starts_with($line, 'deleted ')) 
+					break;
+				if (starts_with($line, 'index ')) $paternid++; else $paternid=0;
+				break;
+			}
+			case 2:{ if (starts_with($line, '--- ')) $paternid++; else $paternid=0;break;}
+			case 3:{
+				if (starts_with($line, '+++ ')){
+					if ($patchstart >= 0){
+						$patchend = $patchnewstart - 1;						
+						rewrite_patch_append($patch, $textlines, $patchstart, $patchend, $newfileindex);
+					}
+					$newfileindex = $i;
+					$patchstart = $patchnewstart;
+					$paternid++; 
+					$nextpatchfound = true;
+				} else $paternid=0;
+				break;
+			}
+		}
+		$i++;
+	}
+	if ($patchstart >= 0){
+		$patchend = $i - 1;
+		rewrite_patch_append($patch, $textlines, $patchstart, $patchend, $newfileindex);
+	}
+}
+
 /* Write a patch file out to $patch_dir */
 function patch_write($patch) {
 	global $patch_dir, $patch_suffix;
@@ -107,6 +201,9 @@ function patch_write($patch) {
 		return false;
 	} else {
 		$text = base64_decode($patch['patch']);
+		//print("<br/>patch_write".print_r($patch,true));
+		if (isset($patch['rewritepaths']))
+			rewrite_patch_paths($text);
 		$filename = $patch_dir . '/' . $patch['uniqid'] . $patch_suffix;
 		return (file_put_contents($filename, $text) > 0);
 	}
