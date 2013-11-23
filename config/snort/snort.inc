@@ -3204,8 +3204,18 @@ EOD;
 	if (is_dir("{$snortcfgdir}/preproc_rules")) {
 		if ($snortcfg['sensitive_data'] == 'on' && $protect_preproc_rules == "off") {
 			$sedcmd = '/^#alert.*classtype:sdf/s/^#//';
-			if (file_exists("{$snortcfgdir}/preproc_rules/sensitive-data.rules"))
+			if (file_exists("{$snortcfgdir}/preproc_rules/sensitive-data.rules")){
 				$snort_misc_include_rules .= "include \$PREPROC_RULE_PATH/sensitive-data.rules\n";
+				#enable only selected sensitive data
+				if (file_exists(SNORTDIR."/preproc_rules/sensitive-data.rules")){
+					$sdf_alert_pattern="(".preg_replace("/,/","|",$snortcfg['sdf_alert_data_type']).")";
+					$sd_tmp_file=file(SNORTDIR."/preproc_rules/sensitive-data.rules");
+					$sd_tmp_new_file="";
+					foreach ($sd_tmp_file as $sd_tmp_line)
+						$sd_tmp_new_file.=preg_match("/$sdf_alert_pattern/i",$sd_tmp_line) ? $sd_tmp_line : "";
+					file_put_contents("{$snortcfgdir}/preproc_rules/sensitive-data.rules",$sd_tmp_new_file,LOCK_EX);
+				}
+			}
 		} else
 			$sedcmd = '/^alert.*classtype:sdf/s/^/#/';
 		if (file_exists("{$snortcfgdir}/preproc_rules/decoder.rules") &&
