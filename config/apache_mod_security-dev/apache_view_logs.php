@@ -106,6 +106,7 @@ function showLog(content,url,logtype)
 				unset ($tab_array);
 				$tab_array[] = array(gettext("Daemon Options"), false, "pkg_edit.php?xml=apache_settings.xml");
 				$tab_array[] = array(gettext("Backends / Balancers"), false, "/pkg.php?xml=apache_balancer.xml");
+				$tab_array[] = array(gettext("Location(s)"), false, "/pkg.php?xml=apache_location.xml");
 				$tab_array[] = array(gettext("Virtual Hosts"), false, "/pkg.php?xml=apache_virtualhost.xml");
 				$tab_array[] = array(gettext("Logs"), true, "/apache_view_logs.php");
 				display_top_tabs($tab_array);

@@ -197,6 +197,7 @@
  				<option><name>nologger (off)</name><value>nologger</value></option>
  				<option><name>logadblocks (off)</name><value>logadblocks</value></option>
  				<option><name>Anonymize logs (off)</name><value>anonymizelogs</value></option>
+				<option><name>Log to syslog (off)</name><value>logsyslog</value></option>
  				</options>
  				<multiple/>
  				<size>6</size>

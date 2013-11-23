@@ -1,0 +1,237 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE packagegui SYSTEM "./schema/packages.dtd">
+<?xml-stylesheet type="text/xsl" href="./xsl/package.xsl"?>
+<packagegui>
+        <copyright>
+        <![CDATA[
+/* $Id$ */
+/* ========================================================================== */
+/*
+    apache_location.xml
+    part of apache_mod_security package (http://www.pfSense.com)
+    Copyright (C)2012 Marcello Coutinho
+    Copyright (C)2013 Stephane Lapie <stephane.lapie@asahinet.com>
+    All rights reserved.
+*/
+/* ========================================================================== */
+/*
+    Redistribution and use in source and binary forms, with or without
+    modification, are permitted provided that the following conditions are met:
+
+     1. Redistributions of source code MUST retain the above copyright notice,
+        this list of conditions and the following disclaimer.
+
+     2. Redistributions in binary form MUST reproduce the above copyright
+        notice, this list of conditions and the following disclaimer in the
+        documentation and/or other materials provided with the distribution.
+
+    THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
+    INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+    AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+    AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+    OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+    INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+    POSSIBILITY OF SUCH DAMAGE.
+*/
+/* ========================================================================== */
+]]>
+        </copyright>
+	<name>apachelocation</name>
+	<version>1.0</version>
+	<title>Apache reverse proxy: Locations</title>
+
+	<tabs>
+		<tab>
+			<text>Apache</text>
+			<url>/pkg_edit.php?xml=apache_settings.xml&amp;id=0</url>
+			<active/>			
+		</tab>
+		<tab>
+			<text>ModSecurity</text>
+			<url>/pkg_edit.php?xml=apache_mod_security_settings.xml</url>
+		</tab>
+		<tab>
+			<text>Sync</text>
+			<url>/pkg_edit.php?xml=apache_mod_security_sync.xml</url>
+		</tab>
+		<tab>
+			<text>Daemon Options</text>
+			<url>/pkg_edit.php?xml=apache_settings.xml</url>
+			<tab_level>2</tab_level>
+		</tab>
+		<tab>
+			<text>Backends / Balancers</text>
+			<url>/pkg.php?xml=apache_balancer.xml</url>
+			<tab_level>2</tab_level>
+		</tab>
+		<tab>
+			<text>Location(s)</text>
+			<url>/pkg.php?xml=apache_location.xml</url>
+			<active/>
+			<tab_level>2</tab_level>
+		</tab>
+		<tab>
+			<text>Virtual Hosts</text>
+			<url>/pkg.php?xml=apache_virtualhost.xml</url>
+			<tab_level>2</tab_level>
+		</tab>
+		<tab>
+			<text>Logs</text>
+			<url>/apache_view_logs.php</url>
+			<tab_level>2</tab_level>
+		</tab>
+	</tabs>
+	<adddeleteeditpagefields>
+		<movable>on</movable>
+		<columnitem>
+			<fielddescr>Identifier</fielddescr>
+			<fieldname>name</fieldname>
+		</columnitem>
+		<columnitem>
+			<fielddescr>Compress</fielddescr>
+			<fieldname>compress</fieldname>
+		</columnitem>
+		<columnitem>
+			<fielddescr>Site Path</fielddescr>
+			<fieldname>sitepath</fieldname>
+			<listmodeoff>/</listmodeoff>
+		</columnitem>
+		<columnitem>
+			<fielddescr>Balancer</fielddescr>
+			<fieldname>balancer</fieldname>
+		</columnitem>
+		<columnitem>
+			<fielddescr>LB Method</fielddescr>
+			<fieldname>lbmethod</fieldname>
+		</columnitem>
+		<columnitem>
+			<fielddescr>Backendpath</fielddescr>
+			<fieldname>backendpath</fieldname>
+			<listmodeoff>/</listmodeoff>
+		</columnitem>
+		<columnitem>
+			<fielddescr>Modsecurity</fielddescr>
+			<fieldname>modsecgroup</fieldname>
+			<listmodeoff>None</listmodeoff>
+		</columnitem>
+		<columnitem>
+			<fielddescr>Rule Manipulation</fielddescr>
+			<fieldname>modsecmanipulation</fieldname>
+			<listmodeoff>None</listmodeoff>
+		</columnitem>
+	</adddeleteeditpagefields>
+	<fields>
+		<field>
+			<name>Location Settings</name>
+			<type>listtopic</type>
+		</field>
+		<field>
+			<fielddescr><![CDATA[Identifier]]></fielddescr>
+			<fieldname>name</fieldname>
+			<description><![CDATA[Location name/identifier.]]></description>
+			<type>input</type>
+			<required/>
+			<size>20</size>
+		</field>
+		<field>
+			<fielddescr><![CDATA[gzip?]]></fielddescr>
+			<fieldname>compress</fieldname>
+			<description>Compress data to save bandwidth?</description>
+			<type>select</type>			
+			<options>
+				<option><name>yes</name><value>yes</value></option>
+				<option><name>no</name><value>no</value></option>
+			</options>
+		</field>
+		<field>
+			<fielddescr><![CDATA[Site Path]]></fielddescr>
+			<fieldname>sitepath</fieldname>
+			<description><![CDATA[Site path to publish.<br>leave blank to use /]]></description>
+			<type>input</type>
+			<size>30</size>
+		</field>
+		<field>
+			<fielddescr><![CDATA[Balancer]]></fielddescr>
+			<fieldname>balancer</fieldname>
+			<description>Server balancer / pool</description>
+			<source><![CDATA[$config['installedpackages']['apachebalancer']['config']]]></source>
+			<source_name>name</source_name>
+			<source_value>name</source_value>
+			<show_disable_value>none</show_disable_value>
+			<type>select_source</type>
+			<size>5</size>
+		</field>
+		<field>
+			<fielddescr><![CDATA[<a href='https://httpd.apache.org/docs/2.2/mod/mod_proxy.html#proxypass'>LB Method</a>]]></fielddescr>
+			<fieldname>lbmethod</fieldname>
+			<description>Server balance method</description>
+			<type>select</type>
+			<options>
+				<option><name>byrequests</name><value>byrequests</value></option>
+				<option><name>bytraffic</name><value>bytraffic</value></option>
+				<option><name>bybusyness</name><value>bybusyness</value></option>
+			</options>
+		</field>
+		<field>
+			<fielddescr>Backend Path</fielddescr>
+			<fieldname>backendpath</fieldname>
+			<description><![CDATA[Backend redirect path.<br>Leave blank to use /]]></description>
+			<type>input</type>
+			<size>30</size>
+		</field>
+		<field>
+			<fielddescr><![CDATA[ModSecurity]]></fielddescr>
+			<fieldname>modsecgroup</fieldname>
+			<description>Choose ModSecurity group to use on this virtual host.</description>
+			<type>select_source</type>
+			<source><![CDATA[$config['installedpackages']['apachemodsecuritygroups']['config']]]></source>
+			<source_name>name</source_name>
+			<source_value>name</source_value>
+			<show_disable_value>none</show_disable_value>
+		</field>
+		<field>
+			<fielddescr><![CDATA[Manipulations]]></fielddescr>
+			<fieldname>modsecmanipulation</fieldname>
+			<description>Choose Modsecurity group to use on this virtual host.</description>
+			<type>select_source</type>
+			<source><![CDATA[$config['installedpackages']['apachemodsecuritymanipulation']['config']]]></source>
+			<source_name>name</source_name>
+			<source_value>name</source_value>
+			<show_disable_value>none</show_disable_value>
+		</field>
+		<field>
+			<fielddescr><![CDATA[<a href='https://httpd.apache.org/docs/2.2/mod/mod_proxy.html#proxypass'>&nbsp;&nbsp;Balancer options</a>]]></fielddescr>
+			<fieldname>options</fieldname>
+			<description><![CDATA[Additional proxypass options for this path.<br>ex: ttl=60 stickysession='JSESSIONID']]></description>
+			<type>input</type>
+			<size>30</size>
+		</field>
+		<field>
+			<name>Custom Location Options</name>
+			<type>listtopic</type>
+		</field>
+		<field>
+			<fielddescr>Custom Options</fielddescr>
+			<fieldname>custom</fieldname>
+			<description><![CDATA[Pass extra Apache config for this Location. This is useful for SSLRequire rules for example.]]></description>
+			<type>textarea</type>
+			<cols>90</cols>
+			<rows>10</rows>
+			<encoding>base64</encoding>
+			<dontdisplayname/>
+			<usecolspan2/>
+		</field>
+	</fields>
+	<service>
+		<name>apache_mod_security</name>
+		<rcfile>apache_mod_security.sh</rcfile>
+		<executable>httpd</executable>
+	</service>
+	<custom_php_resync_config_command>
+		apache_mod_security_resync();
+	</custom_php_resync_config_command>
+	<include_file>/usr/local/pkg/apache_mod_security.inc</include_file>	
+</packagegui>
