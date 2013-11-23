@@ -435,12 +435,12 @@ elseif ($_POST['Submit']) {
 	$natent = array();
 	$natent = $pconfig;
 
-	// Validate SDF alert threshold if value if enabled
+	// Validate SDF alert threshold and alert data type values if SDF is enabled
 	if ($_POST['sensitive_data'] == 'on') {
 		if ($_POST['sdf_alert_threshold'] < 1 || $_POST['sdf_alert_threshold'] > 4294067295)
 			$input_errors[] = gettext("The value for Sensitive_Data_Alert_Threshold must be between 1 and 4,294,067,295.");
 		if (empty($_POST['sdf_alert_data_type']))
-			$input_errors[] = gettext("You must select at least one item to Inspect for while Sensitive data Detections is enabled.");
+			$input_errors[] = gettext("You must select at least one sensitive data type to inspect for when Sensitive Data detection is enabled.");
 	}
 
 	/* if no errors write to conf */
@@ -1401,7 +1401,7 @@ include_once("head.inc");
 		</td>
 	</tr>
 	<tr id="sdf_alert_data_row">
-		<td width="22%" valign="top" class="vncell"><?php echo gettext("Inspection for"); ?> </td>
+		<td width="22%" valign="top" class="vncell"><?php echo gettext("Inspect for"); ?> </td>
 		<td width="78%" class="vtable">
 			<select name="sdf_alert_data_type[]" class="formselect" id="sdf_alert_data_type" size="4" multiple="multiple"> 
 			<?php
@@ -1411,9 +1411,9 @@ include_once("head.inc");
 			<?php if (preg_match("/$val/",$pconfig['sdf_alert_data_type'])) echo "selected"; ?>> 
 				<?=gettext($val);?></option>
 				<?php endforeach; ?>
-			</select><br><?php echo gettext("Choose what type of sensitive alerts to detect.").$pconfig['sdf_alert_data_type']; ?><br/>
+			</select><br/><?php echo gettext("Choose which types of sensitive data to detect.  Use CTRL + Click for multiple selections."); ?><br/>
 		</td>
-		</tr>
+	</tr>
 	<tr id="sdf_alert_threshold_row">
 		<td width="22%" valign="top" class="vncell"><?php echo gettext("Alert Threshold"); ?></td>
 		<td width="78%" class="vtable"><input name="sdf_alert_threshold" type="text" class="formfld unknown" id="sdf_alert_threshold" size="9" value="<?=htmlspecialchars($pconfig['sdf_alert_threshold']);?>">
@@ -1810,13 +1810,13 @@ function sensitive_data_enable_change() {
 	if (endis) {
 		document.getElementById("sdf_alert_threshold_row").style.display="none";
 		document.getElementById("sdf_mask_output_row").style.display="none";
-		document.getElementById("sdf_alert_data_type").style.display="none";
+		document.getElementById("sdf_alert_data_row").style.display="none";
 		
 	}
 	else {
 		document.getElementById("sdf_alert_threshold_row").style.display="table-row";
 		document.getElementById("sdf_mask_output_row").style.display="table-row";
-		document.getElementById("sdf_alert_data_type").style.display="table-row";
+		document.getElementById("sdf_alert_data_row").style.display="table-row";
 	}
 }
 
