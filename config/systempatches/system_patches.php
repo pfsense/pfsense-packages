@@ -162,6 +162,17 @@ include("head.inc");
 <script type="text/javascript" language="javascript" src="/javascript/row_toggle.js"></script>
 <?php if ($savemsg) print_info_box($savemsg); ?>
 <table width="100%" border="0" cellpadding="0" cellspacing="0" summary="system patches">
+	<tr>
+		<td class="tabnavtbl">
+		<?php
+		/* active tabs */
+		$tab_array = array();
+		$tab_array[] = array("Patches", true, "system_patches.php");
+		$tab_array[] = array("Path rewrites", false, "system_patches_pathrewrites.php");
+		display_top_tabs($tab_array);
+		?>
+		</td>
+	</tr>
 <tr><td><div id="mainarea">
 <table class="tabcont" width="100%" border="0" cellpadding="0" cellspacing="0" summary="main area">
 <tr><td colspan="8" align="center">

@@ -34,6 +34,7 @@ $git_root_url = "http://github.com/pfsense/pfsense/commit/";
 $patch_suffix = ".patch";
 $patch_dir = "/var/patches";
 $patch_cmd = "/usr/bin/patch";
+$patches_config = &$config['installedpackages']['patches'];
 
 function patch_package_install() {
 	patch_add_shellcmd();
@@ -97,6 +98,17 @@ function patch_fetch(& $patch) {
 	}
 }
 
+function rewrite_patch_paths(&$patch) {
+	global $patches_config;
+	$pathrewrites = base64_decode($patches_config['pathrewrites']);
+	$filepathrewrites = explode("\n", $pathrewrites);
+	foreach($filepathrewrites as $changeitem){
+		$oldnew = explode("|",$changeitem);
+		$patch = str_replace("--- a/".$oldnew[0],"--- a/".$oldnew[1],$patch);
+		$patch = str_replace("+++ b/".$oldnew[0],"+++ b/".$oldnew[1],$patch);
+	}
+}
+
 /* Write a patch file out to $patch_dir */
 function patch_write($patch) {
 	global $patch_dir, $patch_suffix;
@@ -107,6 +119,8 @@ function patch_write($patch) {
 		return false;
 	} else {
 		$text = base64_decode($patch['patch']);
+		if (isset($patch['rewritepaths']))
+			rewrite_patch_paths($text);
 		$filename = $patch_dir . '/' . $patch['uniqid'] . $patch_suffix;
 		return (file_put_contents($filename, $text) > 0);
 	}
