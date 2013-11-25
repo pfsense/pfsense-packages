@@ -139,6 +139,7 @@ if (!empty($act)) {
 	$openvpnmanager = $_GET['openvpnmanager'];
 
 	$verifyservercn = $_GET['verifyservercn'];
+	$randomlocalport = $_GET['randomlocalport'];
 	$usetoken = $_GET['usetoken'];
 	if ($usetoken && (substr($act, 0, 10) == "confinline"))
 		$input_errors[] = "You cannot use Microsoft Certificate Storage with an Inline configuration.";
@@ -213,17 +214,17 @@ if (!empty($act)) {
 				$exp_name = urlencode($exp_name."-config.ovpn");
 				$expformat = "baseconf";
 		}
-		$exp_path = openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $verifyservercn, $usetoken, $nokeys, $proxy, $expformat, $password, false, false, $openvpnmanager, $advancedoptions);
+		$exp_path = openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $verifyservercn, $randomlocalport, $usetoken, $nokeys, $proxy, $expformat, $password, false, false, $openvpnmanager, $advancedoptions);
 	}
 
 	if($act == "visc") {
 		$exp_name = urlencode($exp_name."-Viscosity.visc.zip");
-		$exp_path = viscosity_openvpn_client_config_exporter($srvid, $usrid, $crtid, $useaddr, $verifyservercn, $usetoken, $password, $proxy, $openvpnmanager, $advancedoptions);
+		$exp_path = viscosity_openvpn_client_config_exporter($srvid, $usrid, $crtid, $useaddr, $verifyservercn, $randomlocalport, $usetoken, $password, $proxy, $openvpnmanager, $advancedoptions);
 	}
 
 	if(substr($act, 0, 4) == "inst") {
 		$exp_name = urlencode($exp_name."-install.exe");
-		$exp_path = openvpn_client_export_installer($srvid, $usrid, $crtid, $useaddr, $verifyservercn, $usetoken, $password, $proxy, $openvpnmanager, $advancedoptions, substr($act, 5));
+		$exp_path = openvpn_client_export_installer($srvid, $usrid, $crtid, $useaddr, $verifyservercn, $randomlocalport, $usetoken, $password, $proxy, $openvpnmanager, $advancedoptions, substr($act, 5));
 	}
 
 	if (!$exp_path) {
@@ -307,6 +308,9 @@ function download_begin(act, i, j) {
 	var verifyservercn;
 	verifyservercn = document.getElementById("verifyservercn").value;
 
+	var randomlocalport = 0;
+	if (document.getElementById("randomlocalport").checked)
+		randomlocalport = 1;
 	var usetoken = 0;
 	if (document.getElementById("usetoken").checked)
 		usetoken = 1;
@@ -381,6 +385,7 @@ function download_begin(act, i, j) {
 	}
 	dlurl += "&useaddr=" + escape(useaddr);
 	dlurl += "&verifyservercn=" + escape(verifyservercn);
+	dlurl += "&randomlocalport=" + escape(randomlocalport);
 	dlurl += "&openvpnmanager=" + escape(openvpnmanager);
 	dlurl += "&usetoken=" + escape(usetoken);
 	if (usepass)
@@ -642,6 +647,27 @@ function useproxy_changed(obj) {
 						</td>
 					</tr>
 					<tr>
+						<td width="22%" valign="top" class="vncell">Use Random Local Port</td>
+						<td width="78%" class="vtable">
+							 <table border="0" cellpadding="2" cellspacing="0" summary="random local port">
+								<tr>
+									<td>
+										<input name="randomlocalport" id="randomlocalport" type="checkbox" value="yes" checked="CHECKED" />
+									</td>
+									<td>
+										<span class="vexpl">
+											Use a random local source port (lport) for traffic from the client. Without this set, two clients may not run concurrently.
+										</span>
+									</td>
+								</tr>
+								<tr>
+									<td colspan="2">
+										<span class="vexpl"><br/>NOTE: Not supported on older clients. Automatically disabled for Yealink and Snom configurations.</span>
+									</td>
+								</tr>
+							</table>
+					</tr>
+					<tr>
 						<td width="22%" valign="top" class="vncell">Certificate Export Options</td>
 						<td width="78%" class="vtable">
 							<table border="0" cellpadding="2" cellspacing="0" summary="export options">
@@ -806,8 +832,12 @@ function useproxy_changed(obj) {
 											 This will change the generated .ovpn configuration to allow for usage of the management interface.
 											 And include the OpenVPNManager program in the "Windows Installers". With this OpenVPN can be used also by non-administrator users.
 											 This is also useful for Windows Vista/7/8 systems where elevated permissions are needed to add routes to the system.
-											<br/><br/>NOTE: This is not currently compatible with the 64-bit OpenVPN installer. It will work with the 32-bit installer on a 64-bit system.
 										</span>
+									</td>
+								</tr>
+								<tr>
+									<td colspan="2">
+										<span class="vexpl"><br/>NOTE: This is not currently compatible with the 64-bit OpenVPN installer. It will work with the 32-bit installer on a 64-bit system.</span>
 									</td>
 								</tr>
 							</table>
