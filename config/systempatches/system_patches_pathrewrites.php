@@ -91,12 +91,11 @@ include("head.inc");
 		<table class="tabcont" width="100%" border="0" cellpadding="0" cellspacing="0" summary="main area">
 		<tr><td colspan="8">
 			<?php 
-			echo gettext("This page allows you to set 'path rewrites' for files inside patches, set the 'rewrite path' checkbox in the and fill this memobox with the proper patchpath|realpath values seperated by pipes. Each file should be on a seperate line. If no realpath is set, that file will be skipped.");
+			echo gettext("This page allows you to set 'path rewrites' for files inside patches, set the 'rewrite path' checkbox in the patch and fill this memobox with the proper patchpath|realpath values seperated by pipes. Each file should be on a seperate line.");
 			echo gettext("<br/><br/>Example:");
 			?>
 			<br/>
-			<b>config/haproxy-devel/haproxy.xml|<br/>
-			config/haproxy-devel/haproxy.inc|usr/local/pkg/haproxy.inc<br/>
+			<b>config/haproxy-devel/haproxy.inc|usr/local/pkg/haproxy.inc<br/>
 			config/haproxy-devel/haproxy_global.php|usr/local/www/haproxy_global.php</b><br/>
 			<br/><br/>
 			</td>

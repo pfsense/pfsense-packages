@@ -217,7 +217,7 @@ include("head.inc");
 	<td width="78%" class="vtable">
 		<input name="rewritepaths" type="checkbox" id="rewritepaths" value="yes" <?php if ($pconfig['rewritepaths']) echo "checked=\"checked\""; ?> />
 		<strong><?=gettext("Rewrite file paths"); ?></strong><br />
-		<span class="vexpl"><?=gettext("Set this option for patches that need to apply to a different folder structure then they have on git."); ?></span>
+		<span class="vexpl"><?=gettext("Set this option for patches that need to apply to a different folder structure than they have on git."); ?></span>
 	</td>
 </tr>
 <tr>
