@@ -327,7 +327,7 @@ $interfaces = haproxy_get_bindable_interfaces();
 		else
 			seltext = "<?php echo haproxy_acl_select('http');?>";
 		if (seltext == '') {
-			alert("No ACL types available in current listener mode");
+			alert("No ACL types available in current frontend type");
 			return;
 		}
 
@@ -570,7 +570,7 @@ $interfaces = haproxy_get_bindable_interfaces();
 		<tr class="haproxy_primary" align="left">
 			<td width="22%" valign="top" class="vncellreq">External port</td>
 			<td width="78%" class="vtable" colspan="2">
-				<input name="port" type="text" <?if(isset($pconfig['port'])) echo "value=\"{$pconfig['port']}\"";?> size="30" maxlength="500">
+				<input name="port" type="text" <?if(isset($pconfig['port'])) echo "value=\"{$pconfig['port']}\"";?> size="10" maxlength="500">
 				<div>The port to listen to.  To specify multiple ports, separate with a comma (,). EXAMPLE: 80,443</div>
 			</td>
 		</tr>
@@ -734,7 +734,10 @@ $interfaces = haproxy_get_bindable_interfaces();
 			<td width="78%" class="vtable" colspan="2">
 				<input id="ssloffload" name="ssloffload" type="checkbox" value="yes" <?php if ($pconfig['ssloffload']=='yes') echo "checked";?> onclick="updatevisibility();"><strong>Use Offloading</strong></input>
 				<br/>
-				The SSL Offloading will reduce web servers load by encrypt data to users on internet and send it without encrytion to internal servers.  
+				SSL Offloading will reduce web servers load by maintaining and encrypting connection with users on internet while sending and retrieving data without encrytion to internal servers.
+				Also more ACL rules and http logging may be configured when this option is used. 
+				Certificates can be imported into the <a href="/system_camanager.php" target="_new">pfSense "Certificate Authority Manager"</a>
+				Please be aware this will not be possible work with all web applications. Some applictions will require setting the SSL checkbox on the backend server configurations so the connection to the webserver will also be a encrypted connection, in that case their will be a slight overall performance loss.
 			</td>
 		</tr>
 		<tr class="haproxy_ssloffloading_enabled" align="left">

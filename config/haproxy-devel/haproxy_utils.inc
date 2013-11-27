@@ -221,7 +221,8 @@ function haproxy_recalculate_certifcate_chain(){
 		}
 	}
 	if ($items_recalculated > 0)
-		write_config("Recalculated $items_recalculated certificate chains.");
+		write_config("Services: HAProxy: Recalculated $items_recalculated certificate chains.");
+	return $items_recalculated;
 }
 
 function phparray_to_javascriptarray_recursive($nestID, $path, $items, $nodeName, $includeitems) {
@@ -256,7 +257,8 @@ function echo_html_select($name, $keyvaluelist, $selected, $listEmptyMessage="",
 		echo "<select name=\"$name\" id=\"$name\" class=\"formselect\"$onchangeEvent>";
 		foreach($keyvaluelist as $key => $desc){
 			$selectedhtml = $key == $selected ? "selected" : "";
-			echo "<option value=\"{$key}\" {$selectedhtml}>{$desc['name']}</option>";
+			$name = htmlspecialchars($desc['name']);
+			echo "<option value=\"{$key}\" {$selectedhtml}>{$name}</option>";
 		}
 		echo "</select>";
 	} else {

@@ -72,7 +72,7 @@ $pfSversion = str_replace("\n", "", file_get_contents("/etc/version"));
 if(strstr($pfSversion, "1.2"))
 	$one_two = true;
 	
-$pgtitle = "Services: HAProxy: Listener";
+$pgtitle = "Services: HAProxy: Frontends";
 include("head.inc");
 
 ?>
@@ -93,8 +93,8 @@ include("head.inc");
         /* active tabs */
         $tab_array = array();
 	$tab_array[] = array("Settings", false, "haproxy_global.php");
-        $tab_array[] = array("Listener", true, "haproxy_listeners.php");		
-	$tab_array[] = array("Server Pool", false, "haproxy_pools.php");
+        $tab_array[] = array("Frontend", true, "haproxy_listeners.php");		
+	$tab_array[] = array("Backend", false, "haproxy_pools.php");
 	display_top_tabs($tab_array);
   ?>
   </td></tr>
@@ -109,7 +109,7 @@ include("head.inc");
 		  <td width="30%" class="listhdrr">Description</td>
 		  <td width="20%" class="listhdrr">Address</td>
 		  <td width="5%" class="listhdrr">Type</td>
-		  <td width="10%" class="listhdrr">Server&nbsp;pool</td>
+		  <td width="10%" class="listhdrr">Backend</td>
 		  <td width="20%" class="listhdrr">Parent</td>
 		  <td width="5%" class="list"></td>
 		</tr>
@@ -171,6 +171,15 @@ include("head.inc");
 					if ($isadvset)
 						echo "<img src=\"$img_adv\" title=\"" . gettext("Advanced settings set") . ": {$isadvset}\" border=\"0\">";				
 					
+					$backend_serverpool = $frontend['backend_serverpool'];
+					$backend = get_backend($backend_serverpool );
+					$servers = $backend['ha_servers']['item'];
+					$backend_serverpool_hint = gettext("Servers in pool:");
+					if (is_array($servers)){
+						foreach($servers as $server){
+							$backend_serverpool_hint .= "\n".$server['address'].":".$server['port'];
+						}
+					}
 					?>
 				  </td>
 				  <td class="listlr" ondblclick="document.location='haproxy_listeners_edit.php?id=<?=$frontendname;?>';">
@@ -186,7 +195,9 @@ include("head.inc");
 					<?=$frontend['type']?>
 				  </td>
 				  <td class="listlr" ondblclick="document.location='haproxy_listeners_edit.php?id=<?=$frontendname;?>';">
+					<div title='<?=$backend_serverpool_hint;?>'>
 					<?=$frontend['backend_serverpool']?>
+					</div>
 				  </td>
 				  <td class="listlr" ondblclick="document.location='haproxy_listeners_edit.php?id=<?=$frontendname;?>';">
 					<?=$frontend['secondary'] == 'yes' ? $frontend['primary_frontend'] : "";?>
@@ -194,9 +205,9 @@ include("head.inc");
 				  <td class="list" nowrap>
 					<table border="0" cellspacing="0" cellpadding="1">
 					  <tr>
-						<td valign="middle"><a href="haproxy_listeners_edit.php?id=<?=$frontendname;?>"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_e.gif" width="17" height="17" border="0"></a></td>
-						<td valign="middle"><a href="haproxy_listeners.php?act=del&id=<?=$frontendname;?>" onclick="return confirm('Do you really want to delete this entry?')"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_x.gif" width="17" height="17" border="0"></a></td>
-						<td valign="middle"><a href="haproxy_listeners_edit.php?dup=<?=$frontendname;?>"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif" width="17" height="17" border="0"></a></td>
+						<td valign="middle"><a href="haproxy_listeners_edit.php?id=<?=$frontendname;?>"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_e.gif"  title="<?=gettext("edit frontend");?>" width="17" height="17" border="0"></a></td>
+						<td valign="middle"><a href="haproxy_listeners.php?act=del&id=<?=$frontendname;?>" onclick="return confirm('Do you really want to delete this entry?')"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_x.gif" title="<?=gettext("delete frontend");?>"  width="17" height="17" border="0"></a></td>
+						<td valign="middle"><a href="haproxy_listeners_edit.php?dup=<?=$frontendname;?>"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif" title="<?=gettext("clone frontend");?>" width="17" height="17" border="0"></a></td>
 					  </tr>
 					</table>
 				  </td>
@@ -209,7 +220,7 @@ include("head.inc");
 			  <td class="list">
 				<table border="0" cellspacing="0" cellpadding="1">
 				  <tr>
-					<td valign="middle"><a href="haproxy_listeners_edit.php"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif" width="17" height="17" border="0"></a></td>
+					<td valign="middle"><a href="haproxy_listeners_edit.php"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif" title="<?=gettext("add new frontend");?>"  width="17" height="17" border="0"></a></td>
 				  </tr>
 				</table>
 			  </td>

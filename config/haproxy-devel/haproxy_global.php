@@ -43,7 +43,9 @@ if ($_POST) {
 	$pconfig = $_POST;
 	
 	if ($_POST['calculate_certificate_chain']) {
-		haproxy_recalculate_certifcate_chain();
+		$changed = haproxy_recalculate_certifcate_chain();
+		if ($changed > 0)
+			touch($d_haproxyconfdirty_path);
 	} else
 	if ($_POST['apply']) {
 		$result = haproxy_check_and_run($savemsg, true);
@@ -148,8 +150,8 @@ function enable_change(enable_change) {
 	/* active tabs */
 	$tab_array = array();
 	$tab_array[] = array("Settings", true, "haproxy_global.php");
-	$tab_array[] = array("Listener", false, "haproxy_listeners.php");	
-	$tab_array[] = array("Server Pool", false, "haproxy_pools.php");	
+	$tab_array[] = array("Frontend", false, "haproxy_listeners.php");	
+	$tab_array[] = array("Backend", false, "haproxy_pools.php");	
 	display_top_tabs($tab_array);
 	?>
 	</td></tr>

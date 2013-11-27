@@ -68,7 +68,7 @@ if (isset($id) && $a_pools[$id]) {
 if (isset($_GET['dup']))
 	unset($id);
 
-$changedesc = "Services: HAProxy: pools: ";
+$changedesc = "Services: HAProxy: Backend server pool: ";
 $changecount = 0;
 
 if ($_POST) {
@@ -216,7 +216,7 @@ $pfSversion = str_replace("\n", "", file_get_contents("/etc/version"));
 if(strstr($pfSversion, "1.2"))
 	$one_two = true;
 
-$pgtitle = "HAProxy: Backend: Edit";
+$pgtitle = "HAProxy: Backend server pool: Edit";
 include("head.inc");
 
 row_helper();
@@ -320,7 +320,7 @@ foreach($simplefields as $field){
 	<div class="tabcont">
 	<table width="100%" border="0" cellpadding="6" cellspacing="0">
 		<tr>
-			<td colspan="2" valign="top" class="listtopic">Edit HAProxy pool</td>
+			<td colspan="2" valign="top" class="listtopic">Edit HAProxy Backend server pool</td>
 		</tr>	
 		<tr align="left">
 			<td width="22%" valign="top" class="vncellreq">Name</td>
@@ -616,21 +616,21 @@ FLUSH PRIVILEGES;</pre>
 		<tr align="left">
 			<td width="22%" valign="top" class="vncell">Connection timeout</td>
 			<td width="78%" class="vtable" colspan="2">
-				<input name="connection_timeout" type="text" <?if(isset($pconfig['connection_timeout'])) echo "value=\"{$pconfig['connection_timeout']}\"";?> size="64">
+				<input name="connection_timeout" type="text" <?if(isset($pconfig['connection_timeout'])) echo "value=\"{$pconfig['connection_timeout']}\"";?> size="20">
 				<div>the time (in milliseconds) we give up if the connection does not complete within (default 30000).</div>
 			</td>
 		</tr>
 		<tr align="left">
 			<td width="22%" valign="top" class="vncell">Server timeout</td>
 			<td width="78%" class="vtable" colspan="2">
-				<input name="server_timeout" type="text" <?if(isset($pconfig['server_timeout'])) echo "value=\"{$pconfig['server_timeout']}\"";?> size="64">
+				<input name="server_timeout" type="text" <?if(isset($pconfig['server_timeout'])) echo "value=\"{$pconfig['server_timeout']}\"";?> size="20">
 				<div>the time (in milliseconds) we accept to wait for data from the server, or for the server to accept data (default 30000).</div>
 			</td>
 		</tr>
 		<tr align="left">
 			<td width="22%" valign="top" class="vncell">Retries</td>
 			<td width="78%" class="vtable" colspan="2">
-				<input name="retries" type="text" <?if(isset($pconfig['retries'])) echo "value=\"{$pconfig['retries']}\"";?> size="64">
+				<input name="retries" type="text" <?if(isset($pconfig['retries'])) echo "value=\"{$pconfig['retries']}\"";?> size="20">
 				<div>After a connection failure to a server, it is possible to retry, potentially
 on another server. This is useful if health-checks are too rare and you don't
 want the clients to see the failures. The number of attempts to reconnect is

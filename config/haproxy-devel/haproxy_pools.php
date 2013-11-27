@@ -67,7 +67,7 @@ $pfSversion = str_replace("\n", "", file_get_contents("/etc/version"));
 if(strstr($pfSversion, "1.2"))
 	$one_two = true;
 	
-$pgtitle = "Services: HAProxy: Server pools";
+$pgtitle = "Services: HAProxy: Backend server pools";
 include("head.inc");
 
 ?>
@@ -88,8 +88,8 @@ include("head.inc");
 	/* active tabs */
 	$tab_array = array();
 	$tab_array[] = array("Settings", false, "haproxy_global.php");
-	$tab_array[] = array("Listener", false, "haproxy_listeners.php");
-	$tab_array[] = array("Server Pool", true, "haproxy_pools.php");
+	$tab_array[] = array("Frontend", false, "haproxy_listeners.php");
+	$tab_array[] = array("Backend", true, "haproxy_pools.php");
 	display_top_tabs($tab_array);
   ?>
   </td></tr>
@@ -102,7 +102,7 @@ include("head.inc");
 			<td width="25%" class="listhdrr">Name</td>
 			<td width="10%" class="listhdrr">Servers</td>
 			<td width="10%" class="listhdrr">Check</td>
-			<td width="30%" class="listhdrr">Listener</td>
+			<td width="30%" class="listhdrr">Frontend</td>
 			<td width="10%" class="list"></td>
 		</tr>
 <?php
@@ -152,9 +152,9 @@ include("head.inc");
 			  <td class="list" nowrap>
 				<table border="0" cellspacing="0" cellpadding="1">
 				  <tr>
-					<td valign="middle"><a href="haproxy_pool_edit.php?id=<?=$i;?>"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_e.gif" width="17" height="17" border="0"></a></td>
-					<td valign="middle"><a href="haproxy_pools.php?act=del&id=<?=$i;?>" onclick="return confirm('Do you really want to delete this entry?')"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_x.gif" width="17" height="17" border="0"></a></td>
-					<td valign="middle"><a href="haproxy_pool_edit.php?dup=<?=$i;?>"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif" width="17" height="17" border="0"></a></td>
+					<td valign="middle"><a href="haproxy_pool_edit.php?id=<?=$i;?>"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_e.gif" title="<?=gettext("edit backend");?>" width="17" height="17" border="0"></a></td>
+					<td valign="middle"><a href="haproxy_pools.php?act=del&id=<?=$i;?>" onclick="return confirm('Do you really want to delete this entry?')"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_x.gif" title="<?=gettext("delete backend");?>" width="17" height="17" border="0"></a></td>
+					<td valign="middle"><a href="haproxy_pool_edit.php?dup=<?=$i;?>"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif" title="<?=gettext("clone backend");?>" width="17" height="17" border="0"></a></td>
 				  </tr>
 				</table>
 			  </td>
@@ -169,7 +169,7 @@ include("head.inc");
 			  <td class="list">
 				<table border="0" cellspacing="0" cellpadding="1">
 				  <tr>
-					<td valign="middle"><a href="haproxy_pool_edit.php"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif" width="17" height="17" border="0"></a></td>
+					<td valign="middle"><a href="haproxy_pool_edit.php"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif" title="<?=gettext("add new backend");?>" width="17" height="17" border="0"></a></td>
 				  </tr>
 				</table>
 			  </td>
