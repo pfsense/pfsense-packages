@@ -105,6 +105,7 @@ if ($etpro == "on") {
 	$emergingthreats_url = ETPRO_BASE_DNLD_URL;
 	$emergingthreats_url .= "{$etproid}/snort-" . ET_VERSION . "/";
 	$emergingthreats = "on";
+	$et_enabled= "on";
 	$et_name = "Emerging Threats Pro";
 	$et_md5_remove = ET_DNLD_FILENAME . ".md5";
 	@unlink("{$snortdir}/{$et_md5_remove}");
@@ -665,6 +666,11 @@ if ($snortdownload == 'on' || $emergingthreats == 'on' || $snortcommunityrules =
 		$cfgs = glob("{$snortdir}/tmp/*classification.config");
 		$cfgs[] = "{$snortdir}/classification.config";
 		snort_merge_classification_configs($cfgs, "{$snortdir}/classification.config");
+		/* Use the unicode.map and gen-msg.map files from ET rules. */
+		if (file_exists("{$snortdir}/tmp/ET_unicode.map"))
+			@copy("{$snortdir}/tmp/ET_unicode.map", "{$snortdir}/unicode.map");
+		if (file_exists("{$snortdir}/tmp/ET_gen-msg.map"))
+			@copy("{$snortdir}/tmp/ET_gen-msg.map", "{$snortdir}/gen-msg.map");
         }
         elseif (($vrt_enabled == 'on') && ($et_enabled == 'off')) {
 		foreach (array("classification.config", "reference.config", "gen-msg.map", "unicode.map") as $file) {
