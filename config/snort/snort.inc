@@ -1855,7 +1855,7 @@ function snort_create_rc() {
 	fi
 	if [ ! -z \$pid ]; then
 		/usr/bin/logger -p daemon.info -i -t SnortStartup "Barnyard2 STOP for {$value['descr']}({$snort_uuid}_{$if_real})..."
-		/bin/pkill $pid -a
+		/bin/pkill \$pid -a
 		time=0 timeout=30
 		while kill -0 \$pid 2>/dev/null; do
 			sleep 1
