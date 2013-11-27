@@ -2173,6 +2173,7 @@ function snort_deinstall() {
 		mwexec("/bin/rm -rf /usr/local/pkg/snort");
 		mwexec("/bin/rm -rf /usr/local/www/snort");
 		mwexec("/bin/rm -rf /usr/local/etc/snort");
+		mwexec("/bin/rm -rf /usr/local/lib/snort");
 	}
 
 	/* Keep this as a last step */
