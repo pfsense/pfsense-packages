@@ -2560,7 +2560,7 @@ function snort_generate_conf($snortcfg) {
 	/* update has been done and we should leave the customized files    */
 	/* put in place by the rules update process.                        */
 	/********************************************************************/
-	$snort_files = array("gen-msg.map", "classification.config", "reference.config",
+	$snort_files = array("gen-msg.map", "classification.config", "reference.config", "attribute_table.dtd", 
 			"sid-msg.map", "unicode.map", "threshold.conf", "preproc_rules/preprocessor.rules",
 			"preproc_rules/decoder.rules", "preproc_rules/sensitive-data.rules"
 		);

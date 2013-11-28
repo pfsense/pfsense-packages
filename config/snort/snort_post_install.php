@@ -142,7 +142,7 @@ function snort_build_new_conf($snortcfg) {
 	/* update has been done and we should leave the customized files    */
 	/* put in place by the rules update process.                        */
 	/********************************************************************/
-	$snort_files = array("gen-msg.map", "classification.config", "reference.config",
+	$snort_files = array("gen-msg.map", "classification.config", "reference.config", "attribute_table.dtd", 
 			"sid-msg.map", "unicode.map", "threshold.conf", "preproc_rules/preprocessor.rules",
 			"preproc_rules/decoder.rules", "preproc_rules/sensitive-data.rules"
 		);
@@ -787,8 +787,18 @@ EOD;
 	if (is_dir("{$snortcfgdir}/preproc_rules")) {
 		if ($snortcfg['sensitive_data'] == 'on' && $protect_preproc_rules == "off") {
 			$sedcmd = '/^#alert.*classtype:sdf/s/^#//';
-			if (file_exists("{$snortcfgdir}/preproc_rules/sensitive-data.rules"))
+			if (file_exists("{$snortcfgdir}/preproc_rules/sensitive-data.rules")){
 				$snort_misc_include_rules .= "include \$PREPROC_RULE_PATH/sensitive-data.rules\n";
+				#enable only selected sensitive data
+				if (file_exists(SNORTDIR."/preproc_rules/sensitive-data.rules")){
+					$sdf_alert_pattern="(".preg_replace("/,/","|",$snortcfg['sdf_alert_data_type']).")";
+					$sd_tmp_file=file(SNORTDIR."/preproc_rules/sensitive-data.rules");
+					$sd_tmp_new_file="";
+					foreach ($sd_tmp_file as $sd_tmp_line)
+						$sd_tmp_new_file.=preg_match("/$sdf_alert_pattern/i",$sd_tmp_line) ? $sd_tmp_line : "";
+					file_put_contents("{$snortcfgdir}/preproc_rules/sensitive-data.rules",$sd_tmp_new_file,LOCK_EX);
+				}
+			}
 		} else
 			$sedcmd = '/^alert.*classtype:sdf/s/^/#/';
 		if (file_exists("{$snortcfgdir}/preproc_rules/decoder.rules") &&
@@ -1364,6 +1374,7 @@ $g['snort_postinstall'] = true;
 @rename("{$snortdir}/generators-sample", "{$snortdir}/generators");
 @rename("{$snortdir}/reference.config-sample", "{$snortdir}/reference.config");
 @rename("{$snortdir}/gen-msg.map-sample", "{$snortdir}/gen-msg.map");
+@rename("{$snortdir}/attribute_table.dtd-sample", "{$snortdir}/attribute_table.dtd");
 
 /* fix up the preprocessor rules filenames from a PBI package install */
 $preproc_rules = array("decoder.rules", "preprocessor.rules", "sensitive-data.rules");
