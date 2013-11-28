@@ -233,6 +233,11 @@
 		<chmod>077</chmod>
 		<item>http://www.pfsense.com/packages/config/snort/snort_select_alias.php</item>
 	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/etc/inc/priv/</prefix>
+		<chmod>077</chmod>
+		<item>http://www.pfsense.com/packages/config/snort/snort.priv.inc</item>
+	</additional_files_needed>
 	<fields>
 	</fields>
 	<custom_add_php_command>
