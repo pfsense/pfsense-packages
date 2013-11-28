@@ -98,19 +98,21 @@ if (!$input_errors) {
 
 		// Now walk all the configured interface rulesets and remove
 		// any matching the disabled ruleset prefixes.
-		foreach ($config['installedpackages']['snortglobal']['rule'] as &$iface) {
-			// Disable Snort IPS policy if VRT rules are disabled
-			if ($disable_ips_policy) {
-				$iface['ips_policy_enable'] = 'off';
-				unset($iface['ips_policy']);
+		if (is_array($config['installedpackages']['snortglobal']['rule'])) {
+			foreach ($config['installedpackages']['snortglobal']['rule'] as &$iface) {
+				// Disable Snort IPS policy if VRT rules are disabled
+				if ($disable_ips_policy) {
+					$iface['ips_policy_enable'] = 'off';
+					unset($iface['ips_policy']);
+				}
+				$enabled_rules = explode("||", $iface['rulesets']);
+				foreach ($enabled_rules as $k => $v) {
+					foreach ($disabled_rules as $d)
+						if (strpos(trim($v), $d) !== false)
+							unset($enabled_rules[$k]);
+				}
+				$iface['rulesets'] = implode("||", $enabled_rules);
 			}
-			$enabled_rules = explode("||", $iface['rulesets']);
-			foreach ($enabled_rules as $k => $v) {
-				foreach ($disabled_rules as $d)
-					if (strpos(trim($v), $d) !== false)
-						unset($enabled_rules[$k]);
-			}
-			$iface['rulesets'] = implode("||", $enabled_rules);
 		}
 
 		$config['installedpackages']['snortglobal']['oinkmastercode'] = $_POST['oinkmastercode'];

@@ -695,7 +695,8 @@ if ($snortdownload == 'on' || $emergingthreats == 'on' || $snortcommunityrules =
         }
 
 	/* Start the rules rebuild proccess for each configured interface */
-	if (is_array($config['installedpackages']['snortglobal']['rule'])) {
+	if (is_array($config['installedpackages']['snortglobal']['rule']) &&
+	    !empty($config['installedpackages']['snortglobal']['rule'])) {
 
 		/* Set the flag to force rule rebuilds since we downloaded new rules,    */
 		/* except when in post-install mode.  Post-install does its own rebuild. */
