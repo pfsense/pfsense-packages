@@ -737,7 +737,7 @@ $interfaces = haproxy_get_bindable_interfaces();
 				SSL Offloading will reduce web servers load by maintaining and encrypting connection with users on internet while sending and retrieving data without encrytion to internal servers.
 				Also more ACL rules and http logging may be configured when this option is used. 
 				Certificates can be imported into the <a href="/system_camanager.php" target="_new">pfSense "Certificate Authority Manager"</a>
-				Please be aware this will not be possible work with all web applications. Some applictions will require setting the SSL checkbox on the backend server configurations so the connection to the webserver will also be a encrypted connection, in that case their will be a slight overall performance loss.
+				Please be aware this possibly will not work with all web applications. Some applications will require setting the SSL checkbox on the backend server configurations so the connection to the webserver will also be a encrypted connection, in that case there will be a slight overall performance loss.
 			</td>
 		</tr>
 		<tr class="haproxy_ssloffloading_enabled" align="left">
