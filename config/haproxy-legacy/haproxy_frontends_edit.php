@@ -590,9 +590,11 @@ set by the 'retries' parameter (2).</div>
 				  <td width="78%" class="vtable">
 					<select name="extaddr" class="formfld">
 						<option value="" <?php if (!$pconfig['extaddr']) echo "selected"; ?>>Interface address</option>
+						<option value="127.0.0.1" <?php if($pconfig['extaddr'] == "Localhost") echo "selected"; ?>>Localhost</option>
+						<option value="any" <?php if($pconfig['extaddr'] == "any") echo "selected"; ?>>any</option>
 					<?php
 						if (is_array($config['virtualip']['vip'])):
-							foreach ($config['virtualip']['vip'] as $sn): 
+							foreach ($config['virtualip']['vip'] as $sn):
 					?>
 						<option value="<?=$sn['subnet'];?>" <?php if ($sn['subnet'] == $pconfig['extaddr']) echo "selected"; ?>>
 							<?=htmlspecialchars("{$sn['subnet']} ({$sn['descr']})");?>
@@ -601,13 +603,14 @@ set by the 'retries' parameter (2).</div>
 							endforeach;
 						endif; 	
 					?>
-						<option value="any" <?php if($pconfig['extaddr'] == "any") echo "selected"; ?>>any</option>
+						
 					</select>
 					<br />
 					<span class="vexpl">
 						If you want this rule to apply to another IP address than the IP address of the interface chosen above,
 						select it here (you need to define <a href="firewall_virtual_ip.php">Virtual IP</a> addresses on the first).  
-						Also note that if you are trying to redirect connections on the LAN select the "any" option.
+						Also note that if you are trying to redirect connections on the LAN select the "any" option.<br>
+						While using carp, select localhost and forward via NAT.
 					</span>
 				  </td>
 				</tr>
