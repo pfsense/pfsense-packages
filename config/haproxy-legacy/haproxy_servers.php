@@ -28,7 +28,7 @@
 	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 	POSSIBILITY OF SUCH DAMAGE.
 */
-
+$shortcut_section = "haproxy";
 require_once("guiconfig.inc");
 require_once("haproxy.inc");
 
@@ -93,6 +93,7 @@ include("head.inc");
 		$tab_array[] = array("Settings", false, "haproxy_global.php");
         $tab_array[] = array("Frontends", false, "haproxy_frontends.php");
 		$tab_array[] = array("Servers", true, "haproxy_servers.php");
+		$tab_array[] = array("Sync", false, "pkg_edit.php?xml=haproxy_sync.xml");
 		display_top_tabs($tab_array);
   ?>
   </td></tr>

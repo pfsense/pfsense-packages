@@ -65,6 +65,11 @@
 		<item>http://www.pfsense.com/packages/config/haproxy-legacy/haproxy.inc</item>
 	</additional_files_needed>
 	<additional_files_needed>
+		<prefix>/usr/local/pkg/</prefix>
+		<chmod>077</chmod>
+		<item>http://www.pfsense.com/packages/config/haproxy-legacy/haproxy_sync.inc</item>
+	</additional_files_needed>
+	<additional_files_needed>
 		<prefix>/usr/local/www/</prefix>
 		<chmod>077</chmod>
 		<item>http://www.pfsense.com/packages/config/haproxy-legacy/haproxy_frontends.php</item>
@@ -88,6 +93,11 @@
 		<prefix>/usr/local/www/</prefix>
 		<chmod>077</chmod>
 		<item>http://www.pfsense.com/packages/config/haproxy-legacy/haproxy_servers_edit.php</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/www/shortcuts/</prefix>
+		<chmod>0755</chmod>
+		<item>http://www.pfsense.org/packages/config/haproxy-legacy/pkg_haproxy.inc</item>
 	</additional_files_needed>
 	<custom_delete_php_command>
 	</custom_delete_php_command>
