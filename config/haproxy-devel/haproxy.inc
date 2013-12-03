@@ -281,6 +281,18 @@ EOD;
 				$bind['httpclose'] = "httpclose";
 				$writeconfigupdate = true;
 			}
+			if (!$bind['extaddr']){
+				$bind['extaddr'] = "wan_ipv4";
+				$writeconfigupdate = true;
+			}
+			if ($bind['extaddr'] == "localhost"){
+				$bind['extaddr'] = "localhost_ipv4";
+				$writeconfigupdate = true;
+			}
+			if ($bind['extaddr'] == "any"){
+				$bind['extaddr'] = "any_ipv4";
+				$writeconfigupdate = true;
+			}
 		}
 	}
 	if ($writeconfigupdate)
@@ -721,7 +733,7 @@ function haproxy_writeconf($configfile) {
 			fwrite ($fd, "\ttimeout client\t\t" . $bind['client_timeout'] . "\n");
 
 	
-			// Combine the rest of the listener configs
+			// Combine the rest of the frontend configs
 			$default_backend = "";
 			$i = 0;
 			foreach ($bind['config'] as $bconfig) {
@@ -1122,6 +1134,17 @@ function get_frontend_acls($frontend) {
 		}
 	}
 	return $result;
+}
+
+function get_backend($name) {
+	global $config;
+	$a_backend = &$config['installedpackages']['haproxy']['ha_pools']['item'];
+	foreach($a_backend as $key => $backend)
+	{
+		if ($backend['name'] == $name)
+			return $backend;
+	}
+	return null;
 }
 
 function haproxy_escapestring($configurationsting) {
