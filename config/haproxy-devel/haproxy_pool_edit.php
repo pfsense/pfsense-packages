@@ -28,7 +28,7 @@
 	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 	POSSIBILITY OF SUCH DAMAGE.
 */
-
+$shortcut_section = "haproxy";
 require("guiconfig.inc");
 require_once("haproxy.inc");
 require_once("haproxy_utils.inc");
@@ -317,6 +317,20 @@ foreach($simplefields as $field){
 <p class="pgtitle"><?=$pgtitle?></p>
 <?php endif; ?>
 	<form action="haproxy_pool_edit.php" method="post" name="iform" id="iform">
+	
+	<table width="100%" border="0" cellpadding="0" cellspacing="0">
+	  <tr><td class="tabnavtbl">
+	  <?php
+		/* active tabs */
+		$tab_array = array();
+		$tab_array[] = array("Settings", false, "haproxy_global.php");
+		$tab_array[] = array("Frontend", false, "haproxy_listeners.php");
+		$tab_array[] = array("Backend", true, "haproxy_pools.php");
+		display_top_tabs($tab_array);
+	  ?>
+	  </td></tr>
+  <tr>
+    <td>
 	<div class="tabcont">
 	<table width="100%" border="0" cellpadding="6" cellspacing="0">
 		<tr>
@@ -726,6 +740,7 @@ set by the 'retries' parameter.</div>
 		</tr>
 	</table>
 	</div>
+	</td></tr></table>
 	</form>
 <br>
 <?php include("fend.inc"); ?>

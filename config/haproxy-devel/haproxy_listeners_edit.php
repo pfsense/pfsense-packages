@@ -29,7 +29,7 @@
 	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 	POSSIBILITY OF SUCH DAMAGE.
 */
-
+$shortcut_section = "haproxy";
 require("guiconfig.inc");
 require_once("haproxy.inc");
 require_once("haproxy_utils.inc");
@@ -505,6 +505,19 @@ $interfaces = haproxy_get_bindable_interfaces();
 <p class="pgtitle"><?=$pgtitle?></p>
 <?php endif; ?>
 <form action="haproxy_listeners_edit.php" method="post" name="iform" id="iform">
+<table width="100%" border="0" cellpadding="0" cellspacing="0">
+  <tr><td class="tabnavtbl">
+  <?php
+        /* active tabs */
+        $tab_array = array();
+	$tab_array[] = array("Settings", false, "haproxy_global.php");
+        $tab_array[] = array("Frontend", true, "haproxy_listeners.php");		
+	$tab_array[] = array("Backend", false, "haproxy_pools.php");
+	display_top_tabs($tab_array);
+  ?>
+  </td></tr>
+  <tr>
+    <td>
 	<div class="tabcont">
 	<table width="100%" border="0" cellpadding="6" cellspacing="0">
 		<tr>
@@ -787,7 +800,7 @@ $interfaces = haproxy_get_bindable_interfaces();
 			</td>
 		</tr>
 	</table>
-	</div>
+	</div></td></tr></table>
 	</form>
 <br>
 <script type="text/javascript">
