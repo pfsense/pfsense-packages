@@ -631,8 +631,8 @@
 		<pkginfolink>http://forum.pfsense.org/index.php/topic,43687.0.html</pkginfolink>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
 		<depends_on_package>MailScanner-4.84.5_3.tbz</depends_on_package>
-		<depends_on_package>perl-5.14.4_2.tbz</depends_on_package>
-		<depends_on_package>pyzor-0.5.0_2.tbz</depends_on_package>
+		<depends_on_package>perl5-5.16.3_4.tbz</depends_on_package>
+		<depends_on_package>pyzor-0.5.0_3.tbz</depends_on_package>
 		<depends_on_package>p5-Mail-SPF-2.9.0_1.tbz</depends_on_package>
 		<depends_on_package>p5-IP-Country-2.28.tbz</depends_on_package>
 		<depends_on_package_pbi>mailscanner-4.84.5_3-i386.pbi</depends_on_package_pbi>
