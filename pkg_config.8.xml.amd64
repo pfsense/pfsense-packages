@@ -617,26 +617,27 @@
 		<config_file>http://www.pfsense.com/packages/config/mailscanner/mailscanner.xml</config_file>
 		<pkginfolink>http://forum.pfsense.org/index.php/topic,43687.0.html</pkginfolink>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
-		<depends_on_package>MailScanner-4.84.5_3.tbz</depends_on_package>
+		<depends_on_package>dcc-dccd-1.3.141.tbz</depends_on_package>
 		<depends_on_package>perl5-5.16.3_4.tbz</depends_on_package>
 		<depends_on_package>pyzor-0.5.0_3.tbz</depends_on_package>
 		<depends_on_package>p5-Mail-SPF-2.9.0_1.tbz</depends_on_package>
 		<depends_on_package>p5-IP-Country-2.28.tbz</depends_on_package>
+		<depends_on_package>MailScanner-4.84.5_3.tbz</depends_on_package>
 		<depends_on_package_pbi>mailscanner-4.84.5_3-amd64.pbi</depends_on_package_pbi>
 		<version>4.84.5_3 pkg v.0.2.2</version>
 		<status>beta</status>
 		<required_version>2.0</required_version>
 		<configurationfile>mailscanner.xml</configurationfile>
-		<build_port_path>/usr/ports/mail/mailscanner</build_port_path>
 		<build_port_path>/usr/ports/mail/p5-Mail-SPF</build_port_path>
 		<build_port_path>/usr/ports/mail/pyzor</build_port_path>
 		<build_port_path>/usr/ports/net/p5-IP-Country</build_port_path>
 		<build_port_path>/usr/ports/mail/dcc-dccd</build_port_path>
+		<build_port_path>/usr/ports/mail/mailscanner</build_port_path>
 		<build_pbi>
 			<ports_before>mail/pyzor mail/p5-Mail-SPF net/p5-IP-Country mail/dcc-dccd</ports_before>
 			<port>mail/mailscanner</port>
 		</build_pbi>
-		<build_options>mailscanner_UNSET=BDC CLAMAVMODULE;mailscanner_SET=SPAMASSASSIN CLAMAV</build_options>
+		<build_options>mailscanner_UNSET=BDC CLAMAVMODULE;mailscanner_SET=SPAMASSASSIN CLAMAV;p5-Mail-SpamAssassin_SET=DCC</build_options>
 	</package>
 	<package>
 		<name>siproxd</name>
