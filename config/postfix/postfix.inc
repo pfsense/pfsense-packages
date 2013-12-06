@@ -581,6 +581,34 @@ switch ($antispam['zombie_blocker'])
 	$postfix_main.="soft_bounce = yes\n";	
 	}
 	
+	//check ips to listen on
+	$inet_protocols=($postfix_config['inet_protocol'] ? $postfix_config['inet_protocol'] : "ipv4");
+	$inet_interfaces =array();
+	if (preg_match("/All/",$postfix_config['enabled_interface'])){
+		$inet_interfaces[]="";
+		}
+	elseif ($postfix_config['enabled_interface'] == "lo0"){
+		$inet_interfaces[]="loopback-only";
+		}
+	else{
+		$ifaces = ($postfix_config['enabled_interface'] ? $postfix_config['enabled_interface'] : 'wan');
+		foreach (explode(',',$ifaces) as $listenon){
+			if (is_ipaddrv6($listenon) && preg_match("/(ipv6|all)/i",$inet_protocols))
+				$inet_interfaces[]= "{$listenon}";
+			elseif (is_ipaddr($listenon) && preg_match("/(ipv4|all)/i",$inet_protocols))
+				$inet_interfaces[]= "{$listenon}";
+			else{
+				$listenon=(pfSense_get_interface_addresses(convert_friendly_interface_to_real_interface_name($listenon)));
+				if (is_ipaddr($listenon['ipaddr']) && preg_match("/(ipv4|all)/i",$inet_protocols))
+					$inet_interfaces []= "{$listenon['ipaddr']}";
+				if(is_ipaddrv6($listenon['ipaddr6']) && preg_match("/(ipv6|all)/i",$inet_protocols))
+					$inet_interfaces []= "{$listenon['ipaddr6']}";
+			}
+		}
+	}
+	$postfix_main.= "inet_protocols = {$inet_protocols}\n";
+	$postfix_main.= "inet_interfaces = ".implode(",",$inet_interfaces)."\n";
+
 	if ($postscreen==1)	#Postscreen enabled
 	{
 	if(preg_match("/(\d+),(\d+)(s|m|h|w)/",$antispam['greet_time'],$greet)){
@@ -611,16 +639,17 @@ switch ($antispam['zombie_blocker'])
 	$postfix_main.="postscreen_blacklist_action= ".$antispam['zombie_blocker']."\n";
 
 	#postscreen interface loop
-	$ifaces = ($postfix_config['enabled_interface'] ? $postfix_config['enabled_interface'] : 'wan');
-	$real_ifaces = array();
-	$postfix_master="";
-	foreach (explode(",", $ifaces) as $i => $iface) {
-		$real_ifaces[] = px_get_real_interface_address($iface);
-		if($real_ifaces[$i][0]) {
-			$postfix_master .=$real_ifaces[$i][0].":25	inet  n       -       n       -       1       postscreen\n\t-o user=postfix\n";
-			$postfix_master .=($antispam['soft_bounce'] == "postscreen"?"\t-o soft_bounce=yes\n":"");
-		}
-	}
+	//$ifaces = ($postfix_config['enabled_interface'] ? $postfix_config['enabled_interface'] : 'wan');
+	//$real_ifaces = array();
+	//$postfix_master="";
+	//foreach (explode(",", $ifaces) as $i => $iface) {
+	//	$real_ifaces[] = px_get_real_interface_address($iface);
+	//	if($real_ifaces[$i][0]) {
+	//		$postfix_master .=$real_ifaces[$i][0].":25	inet  n       -       n       -       1       postscreen\n\t-o user=postfix\n";
+	$postfix_master = "smtp	inet  n       -       n       -       1       postscreen\n\t-o user=postfix\n";
+	$postfix_master .=($antispam['soft_bounce'] == "postscreen"?"\t-o soft_bounce=yes\n":"");
+	//	}
+	//}
 	$postfix_master .= $postfix_inets.<<<MASTEREOF
 smtpd     pass  -       -       n       -       -       smtpd
 dnsblog   unix  -       -       n       -       0       dnsblog
@@ -647,7 +676,7 @@ MASTEREOF;
 		}
 	
 	#interface loop
-	$postfix_inets="";
+	/*$postfix_inets="";
 	$ifaces = ($postfix_config['enabled_interface'] ? $postfix_config['enabled_interface'] : 'loopback');
 	$real_ifaces = array();
 	$postfix_master="";
@@ -657,6 +686,8 @@ MASTEREOF;
 			$postfix_master .=$real_ifaces[$i][0].":25	inet  n       -       n       -       -       smtpd\n";
 		}
 	}
+	*/
+	$postfix_master ="25	inet  n       -       n       -       -       smtpd\n";
 		
 	}
 	$rbl2.=($rbl2 !=""?"\t\t\t\tpermit\n":"permit\n");

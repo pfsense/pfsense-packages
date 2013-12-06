@@ -27,7 +27,7 @@
 	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 	POSSIBILITY OF SUCH DAMAGE.
 */
-
+$shortcut_section = "postfix";
 require("guiconfig.inc");
 $pf_version=substr(trim(file_get_contents("/etc/version")),0,3);
 if ($pf_version > 2.0)

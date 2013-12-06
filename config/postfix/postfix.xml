@@ -207,13 +207,31 @@
 			<description></description>
 		</field>
 		<field>
-			<fielddescr>Listen interface(s)</fielddescr>
+			<fielddescr>Listen Protocol</fielddescr>
+			<fieldname>inet_protocol</fieldname>
+			<description><![CDATA[Specify what protocols Postfix will use when it makes or accepts network connections<br>
+								 This option controls what DNS lookups Postfix will use when it makes network connections.<br><br>
+								 <b>Restart postfix daemon after changing Listen protocol.</b>]]></description>
+	    	<type>select</type>
+ 				<options>
+				<option><name>ipv4       (DEFAULT: enable IPv4 only)</name><value>ipv4</value></option>
+				<option><name>all        (enable IPv4, and IPv6 if supported)</name><value>all</value></option>
+				<option><name>ipv4, ipv6 (enable both IPv4 and IPv6)</name><value>ipv4,ipv6</value></option>
+				<option><name>ipv6       (enable IPv6 only</name><value>ipv6</value></option>
+				</options>
+			<required/>
+		</field>
+		<field>
+			<fielddescr>Listen on</fielddescr>
 			<fieldname>enabled_interface</fieldname>
 			<description><![CDATA[Interface(s) that daemon will bind to.<br>Do not listen on WAN without a good "antispam/close relay" configuration.<br>
-									If you need postfix on other ip then Interface address, choose localhost and then create a nat rule from external ip to localhost.]]></description>
+									If you need postfix on other ip then Interface address, choose localhost and then create a nat rule from external ip to localhost.<br><br>
+									<b>Restart postfix daemon after changing Listen on addresses/interfaces.</b>]]></description>
 			<type>interfaces_selection</type>
 			<required/>
 			<default_value>loopback</default_value>
+			<showlistenall/>
+			<showvirtualips/>
 			<multiple/>
 		</field>
 		<field>
