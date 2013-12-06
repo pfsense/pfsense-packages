@@ -631,8 +631,9 @@
 		<build_port_path>/usr/ports/mail/p5-Mail-SPF</build_port_path>
 		<build_port_path>/usr/ports/mail/pyzor</build_port_path>
 		<build_port_path>/usr/ports/net/p5-IP-Country</build_port_path>
+		<build_port_path>/usr/ports/mail/dcc-dccd</build_port_path>
 		<build_pbi>
-			<ports_before>mail/pyzor mail/p5-Mail-SPF net/p5-IP-Country</ports_before>
+			<ports_before>mail/pyzor mail/p5-Mail-SPF net/p5-IP-Country mail/dcc-dccd</ports_before>
 			<port>mail/mailscanner</port>
 		</build_pbi>
 		<build_options>mailscanner_UNSET=BDC CLAMAVMODULE;mailscanner_SET=SPAMASSASSIN CLAMAV</build_options>
