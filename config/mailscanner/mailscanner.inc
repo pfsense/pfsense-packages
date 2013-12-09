@@ -678,13 +678,13 @@ Country Sub-Domains List = %etc-dir%/country.domains.conf
 	$cconf=MAILSCANNER_LOCALBASE. "/sbin/mailscanner";
 	if (file_exists($cconf)){
 		#check perl's version
-		exec('find '.MAILSCANNER_LOCALBASE. '/lib/perl5/site_perl -name Df.pm',$find_out);
-		$perl_bin="perl"; 
-		foreach($find_out as $perl_dir){
-			if (preg_match ('@/usr\S+lib/perl5/site_perl/([.0-9]+)/mach/Filesys/Df.pm@',$perl_dir,$perl_match))
-				$perl_bin.=$perl_match[1];
+		$perl_bin="perl";
+		$perl_version_file=MAILSCANNER_LOCALBASE . '/etc/perl5_version';
+		if (file_exists($perl_version_file)) {
+			$perl_version = `/usr/bin/grep 'PERL_VERSION=' $perl_version_file | /usr/bin/cut -f2 -d'='`;
+			$perl_bin .= $perl_version;
 		}
-		
+
 		$cconf_file=file_get_contents($cconf);
 		$pattern2[0]='@#!/usr\S+bin/perl.*I@';
 		$pattern2[1]='/\smy .current = config MIME::ToolUtils/';
