@@ -137,7 +137,6 @@
 	<fields>
 		<field>
 			<fielddescr>DirectorSettings</fielddescr>
-			<fieldname>Director Settings</fieldname>
 			<type>listtopic</type>
 			<name>Director settings</name>
 		</field>
@@ -209,7 +208,6 @@
 		</field>
 		<field>
 			<fielddescr>Backendlist</fielddescr>
-			<fieldname>Backendlist</fieldname>
 			<type>listtopic</type>
 			<name>Backend Settings</name>
 		</field>
@@ -249,7 +247,6 @@
 		</field>
 		<field>
 			<fielddescr>FailoverSettings</fielddescr>
-			<fieldname>FailoverSettings</fieldname>
 			<type>listtopic</type>
 			<name>Failover Settings</name>
 		</field>

@@ -80,7 +80,6 @@
 	<fields>
 		<field>
 			<fielddescr>Listening</fielddescr>
-			<fieldname>Listening</fieldname>
 			<type>listtopic</type>
 			<name>Daemon options</name>
 		</field>
@@ -112,7 +111,6 @@
 		</field>
 		<field>
 			<fielddescr>StorageTypeLT</fielddescr>
-			<fieldname>StorageTypeLT</fieldname>
 			<type>listtopic</type>
 			<name>Storage type</name>
 		</field>
@@ -135,7 +133,6 @@
 
 		<field>
 			<fielddescr>WorkerThreadLT</fielddescr>
-			<fieldname>WorkerThreadLT</fieldname>
 			<type>listtopic</type>
 			<name>Worker thread configuration</name>
 		</field>
@@ -159,7 +156,6 @@
 		</field>
 		<field>
 			<fielddescr>BasicVCLLT</fielddescr>
-			<fieldname>BasicVCLLT</fieldname>
 			<type>listtopic</type>
 			<name>General VCL Settings</name>
 		</field>
@@ -245,7 +241,6 @@
  			</field>
 		<field>
 			<fielddescr>ErrorVCLLT</fielddescr>
-			<fieldname>ErrorVCLLT</fieldname>
 			<type>listtopic</type>
 			<name>Error Settings</name>
 		</field>

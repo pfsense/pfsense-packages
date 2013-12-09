@@ -155,7 +155,6 @@
 	<fields>
 		<field>
 			<fielddescr>BackendSettings</fielddescr>
-			<fieldname>BackendSettings</fieldname>
 			<type>listtopic</type>
 			<name>Backend settings</name>
 		</field>
@@ -189,7 +188,6 @@
 		</field>
 		<field>
 			<fielddescr>PerformanceMetrics</fielddescr>
-			<fieldname>PerformanceMetrics</fieldname>
 			<type>listtopic</type>
 			<name>Performance metrics</name>
 		</field>		
@@ -207,7 +205,6 @@
 		</field>
 		<field>
 			<fielddescr>ProbeInfo</fielddescr>
-			<fieldname>ProbeInfo</fieldname>
 			<type>listtopic</type>
 			<name>Probe settings</name>
 		</field>		
@@ -250,7 +247,6 @@
 		</field>
 		<field>
 			<fielddescr>Mappings</fielddescr>
-			<fieldname>Mappings</fieldname>
 			<type>listtopic</type>
 			<name>Backend Mappings</name>
 		</field>

@@ -65,8 +65,13 @@ function varnish_settings_post_validate($post, $input_errors) {
 }
 
 function varnish_lb_directors_post_validate($post, $input_errors) {
-	if (preg_match("/[^a-zA-Z0-9]/", $post['directorname']))
+	if (preg_match("/[^a-zA-Z0-9]/", $post['directorname'])){
 		$input_errors[] = "The directorname name must only contain the characters a-Z or 0-9";
+	}
+	else{
+		if(empty($post['failover']))
+			$_POST['failover'] = $post['directorname'];
+	}
 	if(stristr($post['directorurl'], 'http'))
 		$input_errors[] = "You do not need to include the http:// string in the director URL";
 	if($post['grace'] && ! preg_match("/^\d+(h|m|s)$/",$post['grace']))

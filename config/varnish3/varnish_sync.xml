@@ -80,7 +80,6 @@
 	<fields>
 		<field>
 			<type>listtopic</type>
-			<fieldname>temp</fieldname>
 			<name>Enable Varnish configuration sync</name>
 		</field>
 		<field>
