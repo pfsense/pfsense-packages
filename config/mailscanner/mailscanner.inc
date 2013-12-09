@@ -681,7 +681,7 @@ Country Sub-Domains List = %etc-dir%/country.domains.conf
 		$perl_bin="perl";
 		$perl_version_file=MAILSCANNER_LOCALBASE . '/etc/perl5_version';
 		if (file_exists($perl_version_file)) {
-			$perl_version = `/usr/bin/grep 'PERL_VERSION=' $perl_version_file | /usr/bin/cut -f2 -d'='`;
+			$perl_version = trim(`/usr/bin/grep 'PERL_VERSION=' $perl_version_file | /usr/bin/cut -f2 -d'='`);
 			$perl_bin .= $perl_version;
 		}
 
