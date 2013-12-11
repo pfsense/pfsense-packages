@@ -38,6 +38,11 @@
 require_once("guiconfig.inc");
 require_once("/usr/local/pkg/snort/snort.inc");
 
+if ($_POST['cancel']) {
+	header("Location: /snort/snort_interfaces_whitelist.php");
+	exit;
+}
+
 if (!is_array($config['installedpackages']['snortglobal']['whitelist']))
 	$config['installedpackages']['snortglobal']['whitelist'] = array();
 if (!is_array($config['installedpackages']['snortglobal']['whitelist']['item']))
@@ -88,6 +93,12 @@ if (isset($id) && $a_whitelist[$id]) {
 	$pconfig['vpnips'] = $a_whitelist[$id]['vpnips'];
 }
 
+// Check for returned "selected alias" if action is import
+if ($_GET['act'] == "import") {
+	if ($_GET['varname'] == "address" && !empty($_GET['varvalue']))
+		$pconfig[$_GET['varname']] = $_GET['varvalue'];
+}
+
 if ($_POST['submit']) {
 	conf_mount_rw();
 
@@ -118,7 +129,7 @@ if ($_POST['submit']) {
 
 	if ($_POST['address'])
 		if (!is_alias($_POST['address']))
-			$input_errors[] = gettext("A valid alias need to be provided");
+			$input_errors[] = gettext("A valid alias must be provided");
 
 	if (!$input_errors) {
 		$w_list = array();
@@ -151,7 +162,7 @@ if ($_POST['submit']) {
 	}
 }
 
-$pgtitle = "Services: Snort: Whitelist: Edit $whitelist_uuid";
+$pgtitle = gettext("Snort: Whitelist Edit - {$a_whitelist[$id]['name']}");
 include_once("head.inc");
 ?>
 
@@ -193,7 +204,7 @@ if ($savemsg)
 	</tr>
 	<tr>
 		<td valign="top" class="vncellreq"><?php echo gettext("Name"); ?></td>
-		<td class="vtable"><input name="name" type="text" id="name"
+		<td class="vtable"><input name="name" type="text" id="name" class="formfld unknown" 
 			size="40" value="<?=htmlspecialchars($pconfig['name']);?>" /> <br />
 		<span class="vexpl"> <?php echo gettext("The list name may only consist of the " .
 		"characters \"a-z, A-Z, 0-9 and _\"."); ?>&nbsp;&nbsp;<span class="red"><?php echo gettext("Note:"); ?> </span>
@@ -201,7 +212,7 @@ if ($savemsg)
 	</tr>
 	<tr>
 		<td width="22%" valign="top" class="vncell"><?php echo gettext("Description"); ?></td>
-		<td width="78%" class="vtable"><input name="descr" type="text"
+		<td width="78%" class="vtable"><input name="descr" type="text" class="formfld unknown" 
 			id="descr" size="40" value="<?=$pconfig['descr'];?>" /> <br />
 		<span class="vexpl"> <?php echo gettext("You may enter a description here for your " .
 		"reference (not parsed)."); ?> </span></td>
@@ -261,14 +272,17 @@ if ($savemsg)
 		<div id="addressnetworkport"><?php echo gettext("Alias Name:"); ?></div>
 		</td>
 		<td width="78%" class="vtable">
-		<input autocomplete="off" name="address" type="text" class="formfldalias" id="address" size="30" value="<?=htmlspecialchars($pconfig['address']);?>" title="<?=trim(filter_expand_alias($pconfig['address']));?>"/>
+		<input autocomplete="off" name="address" type="text" class="formfldalias" id="address" size="30" value="<?=htmlspecialchars($pconfig['address']);?>"
+		title="<?=trim(filter_expand_alias($pconfig['address']));?>" />
+		&nbsp;&nbsp;&nbsp;&nbsp;<input type="button" class="formbtns" value="Aliases" onclick="parent.location='snort_select_alias.php?id=0&type=host|network&varname=address&act=import&multi_ip=yes'" 
+		title="<?php echo gettext("Select an existing IP alias");?>"/>
 		</td>
 	</tr>
 	<tr>
 		<td width="22%" valign="top">&nbsp;</td>
 		<td width="78%">
 			<input id="submit" name="submit" type="submit" class="formbtn" value="Save" />
-			<input id="cancelbutton" name="cancelbutton" type="button" class="formbtn" value="Cancel" onclick="history.back()" />
+			<input id="cancel" name="cancel" type="submit" class="formbtn" value="Cancel" />
 			<input name="id" type="hidden" value="<?=$id;?>" />
 		</td>
 	</tr>
@@ -287,7 +301,7 @@ if ($savemsg)
                 foreach($config['aliases']['alias'] as $alias_name) {
 			if ($alias_name['type'] != "host" && $alias_name['type'] != "network")
 				continue;
-			// Skip any Alias that resolves to an empty string
+			// Skip any Aliases that resolve to an empty string
 			if (trim(filter_expand_alias($alias_name['name'])) == "")
 				continue;
                         if($addrisfirst == 1) $aliasesaddr .= ",";

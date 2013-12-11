@@ -61,7 +61,7 @@ if ($_GET['act'] == "del") {
 	}
 }
 
-$pgtitle = "Services: Snort: Whitelist";
+$pgtitle = gettext("Snort: Whitelists");
 include_once("head.inc");
 ?>
 

@@ -144,12 +144,13 @@ $if_real = snort_get_real_interface($a_instance[$instanceid]['interface']);
 if (is_array($config['installedpackages']['snortglobal']['alertsblocks'])) {
 	$pconfig['arefresh'] = $config['installedpackages']['snortglobal']['alertsblocks']['arefresh'];
 	$pconfig['alertnumber'] = $config['installedpackages']['snortglobal']['alertsblocks']['alertnumber'];
-	$anentries = $pconfig['alertnumber'];
-} else {
-	$anentries = '250';
-	$pconfig['alertnumber'] = '250';
-	$pconfig['arefresh'] = 'off';
 }
+
+if (empty($pconfig['alertnumber']))
+	$pconfig['alertnumber'] = '250';
+if (empty($pconfig['arefresh']))
+	$pconfig['arefresh'] = 'off';
+$anentries = $pconfig['alertnumber'];
 
 if ($_POST['save']) {
 	if (!is_array($config['installedpackages']['snortglobal']['alertsblocks']))
@@ -259,7 +260,7 @@ if ($_POST['download']) {
 /* Load up an array with the current Suppression List GID,SID values */
 $supplist = snort_load_suppress_sigs($a_instance[$instanceid], true);
 
-$pgtitle = "Services: Snort: Snort Alerts";
+$pgtitle = gettext("Snort: Snort Alerts");
 include_once("head.inc");
 
 ?>
@@ -336,7 +337,7 @@ if ($pconfig['arefresh'] == 'on')
 					<?php echo gettext('Refresh'); ?> <input name="arefresh" type="checkbox" value="on"
 					<?php if ($config['installedpackages']['snortglobal']['alertsblocks']['arefresh']=="on") echo "checked"; ?>>
 						<?php printf(gettext('%sDefault%s is %sON%s.'), '<strong>', '</strong>', '<strong>', '</strong>'); ?>&nbsp;&nbsp;
-					<input name="alertnumber" type="text" class="formfld" id="alertnumber" size="5" value="<?=htmlspecialchars($anentries);?>">
+					<input name="alertnumber" type="text" class="formfld unknown" id="alertnumber" size="5" value="<?=htmlspecialchars($anentries);?>">
 					<?php printf(gettext('Enter number of log entries to view. %sDefault%s is %s250%s.'), '<strong>', '</strong>', '<strong>', '</strong>'); ?>
 				</td>
 			</tr>

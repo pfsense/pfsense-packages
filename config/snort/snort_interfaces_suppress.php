@@ -84,7 +84,7 @@ if ($_GET['act'] == "del") {
 	}
 }
 
-$pgtitle = "Services: Snort: Suppression";
+$pgtitle = gettext("Snort: Suppression Lists");
 include_once("head.inc");
 
 ?>
