@@ -52,17 +52,13 @@ $snort_version = $snortver[0];
 
 /* package version */
 $pfSense_snort_version = "3.0.0";
-$snort_package_version = "Snort {$snort_version} pkg v. {$pfSense_snort_version}";
+$snort_package_version = "Snort {$snort_version} pkg v{$pfSense_snort_version}";
 
-// Define SNORTDIR and SNORTLIBDIR constants according to FreeBSD version (PBI support or no PBI)
-if (floatval(php_uname("r")) >= 8.3) {
-	exec("/usr/local/sbin/pbi_info | grep 'snort-{$snort_version}' | xargs /usr/local/sbin/pbi_info | awk '/Prefix/ {print $2}'",$pbidirarray);
-	$snort_pbidir = "{$pbidirarray[0]}";
-	/* In case this is an initial Snort install and pbi_info() above returned null, set a sane default value */
-	if (empty($snort_pbidir))
-		$snort_pbidir = "/usr/pbi/snort-" . php_uname("m");
-	define("SNORTDIR", "{$snort_pbidir}/etc/snort");
-	define("SNORTLIBDIR", "{$snort_pbidir}/lib/snort");
+// Define SNORTDIR and SNORTLIBDIR constants according to pfSense version
+$pfs_version=substr(trim(file_get_contents("/etc/version")),0,3);
+if ($pfs_version > 2.0) {
+	define("SNORTDIR", "/usr/pbi/snort-" . php_uname("m") . "/etc/snort");
+	define("SNORTLIBDIR", "/usr/pbi/snort-" . php_uname("m") . "/lib/snort");
 }
 else {
 	define("SNORTDIR", "/usr/local/etc/snort");
