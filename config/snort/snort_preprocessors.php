@@ -263,6 +263,8 @@ if (isset($id) && $a_nat[$id]) {
 		$pconfig['ftp_telnet_detect_anomalies'] = 'on';
 	if (empty($pconfig['ftp_telnet_ayt_attack_threshold']) && $pconfig['ftp_telnet_ayt_attack_threshold'] <> 0)
 		$pconfig['ftp_telnet_ayt_attack_threshold'] = '20';
+	if (empty($pconfig['sdf_alert_data_type']))
+		$pconfig['sdf_alert_data_type'] = "Credit Card,Email Addresses,U.S. Phone Numbers,U.S. Social Security Numbers";
 	if (empty($pconfig['sdf_alert_threshold']))
 		$pconfig['sdf_alert_threshold'] = '25';
 	if (empty($pconfig['sdf_mask_output']))
@@ -411,7 +413,7 @@ if ($_POST['ResetAll']) {
 	$pconfig['dce_rpc_2'] = "on";
 	$pconfig['dns_preprocessor'] = "on";
 	$pconfig['sensitive_data'] = "off";
-	$pconfig['sdf_alert_data_type'] = "";
+	$pconfig['sdf_alert_data_type'] = "Credit Card,Email Addresses,U.S. Phone Numbers,U.S. Social Security Numbers";
 	$pconfig['sdf_alert_threshold'] = "25";
 	$pconfig['sdf_mask_output'] = "off";
 	$pconfig['ssl_preproc'] = "on";
@@ -437,8 +439,8 @@ elseif ($_POST['Submit']) {
 
 	// Validate SDF alert threshold and alert data type values if SDF is enabled
 	if ($_POST['sensitive_data'] == 'on') {
-		if ($_POST['sdf_alert_threshold'] < 1 || $_POST['sdf_alert_threshold'] > 4294067295)
-			$input_errors[] = gettext("The value for Sensitive_Data_Alert_Threshold must be between 1 and 4,294,067,295.");
+		if ($_POST['sdf_alert_threshold'] < 1 || $_POST['sdf_alert_threshold'] > 65535)
+			$input_errors[] = gettext("The value for Sensitive_Data_Alert_Threshold must be between 1 and 65,535.");
 		if (empty($_POST['sdf_alert_data_type']))
 			$input_errors[] = gettext("You must select at least one sensitive data type to inspect for when Sensitive Data detection is enabled.");
 	}
@@ -469,6 +471,9 @@ elseif ($_POST['Submit']) {
 		if ($_POST['ftp_telnet_ayt_attack_threshold'] != "") { $natent['ftp_telnet_ayt_attack_threshold'] = $_POST['ftp_telnet_ayt_attack_threshold']; }else{ $natent['ftp_telnet_ayt_attack_threshold'] = "20"; }
 		if ($_POST['sdf_alert_threshold'] != "") { $natent['sdf_alert_threshold'] = $_POST['sdf_alert_threshold']; }else{ $natent['sdf_alert_threshold'] = "25"; }
 
+		// Set SDF inspection types
+		$natent['sdf_alert_data_type'] = implode(",",$_POST['sdf_alert_data_type']);
+
 		$natent['perform_stat'] = $_POST['perform_stat'] ? 'on' : 'off';
 		$natent['host_attribute_table'] = $_POST['host_attribute_table'] ? 'on' : 'off';
 		$natent['http_inspect'] = $_POST['http_inspect'] ? 'on' : 'off';
@@ -484,8 +489,6 @@ elseif ($_POST['Submit']) {
 		$natent['dce_rpc_2'] = $_POST['dce_rpc_2'] ? 'on' : 'off';
 		$natent['dns_preprocessor'] = $_POST['dns_preprocessor'] ? 'on' : 'off';
 		$natent['sensitive_data'] = $_POST['sensitive_data'] ? 'on' : 'off';
-		$natent['sdf_alert_data_type'] = implode(",",$_POST['sdf_alert_data_type']);
-		$natent['sdf_alert_threshold'] = $_POST['sdf_alert_threshold'];
 		$natent['sdf_mask_output'] = $_POST['sdf_mask_output'] ? 'on' : 'off';
 		$natent['ssl_preproc'] = $_POST['ssl_preproc'] ? 'on' : 'off';
 		$natent['pop_preproc'] = $_POST['pop_preproc'] ? 'on' : 'off';

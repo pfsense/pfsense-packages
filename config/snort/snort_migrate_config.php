@@ -279,6 +279,18 @@ foreach ($rule as &$r) {
 		$pconfig['ftp_server_engine']['item'][] = $default;
 	}
 
+	// Set sensible defaults for new SDF options if SDF is enabled
+	if ($pconfig['sensitive_data'] == 'on') {
+		if (empty($pconfig['sdf_alert_threshold'])) {
+			$pconfig['sdf_alert_threshold'] = 25;
+			$updated_cfg = true;
+		}
+		if (empty($pconfig['sdf_alert_data_type'])) {
+			$pconfig['sdf_alert_data_type'] = "Credit Card,Email Addresses,U.S. Phone Numbers,U.S. Social Security Numbers";
+			$updated_cfg = true;
+		}
+	}
+
 	// Save the new configuration data into the $config array pointer
 	$r = $pconfig;
 }

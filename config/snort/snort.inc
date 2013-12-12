@@ -3123,6 +3123,8 @@ EOD;
 		$sdf_mask_output = "\\\n\tmask_output";
 	else
 		$sdf_mask_output = "";
+	if (empty($snortcfg['sdf_alert_threshold']))
+		$snortcfg['sdf_alert_threshold'] = 25;
 	$sensitive_data = <<<EOD
 # SDF preprocessor #
 preprocessor sensitive_data: \
