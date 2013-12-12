@@ -282,32 +282,38 @@ EOD;
 
 	// Setup the standard FTP commands used for all FTP Server engines
 	$ftp_cmds = <<<EOD
-	ftp_cmds { USER PASS ACCT CWD SDUP SMNT QUIT REIN PORT PASV TYPE STRU MODE } \
-	ftp_cmds { RETR STOR STOU APPE ALLO REST RNFR RNTO ABOR DELE RMD MKD PWD } \
-	ftp_cmds { LIST NLST SITE SYST STAT HELP NOOP } \
-	ftp_cmds { AUTH ADAT PROT PBSZ CONF ENC } \
-	ftp_cmds { FEAT CEL CMD MACB } \
-	ftp_cmds { MDTM REST SIZE MLST MLSD } \
-	ftp_cmds { XPWD XCWD XCUP XMKD XRMD TEST CLNT } \
-	alt_max_param_len 0 { CDUP QUIT REIN PASV STOU ABOR PWD SYST NOOP } \
-	alt_max_param_len 100 { MDTM CEL XCWD SITE USER PASS REST DELE RMD SYST TEST STAT MACB EPSV CLNT LPRT } \
-	alt_max_param_len 200 { XMKD NLST ALLO STOU APPE RETR STOR CMD RNFR HELP } \
-	alt_max_param_len 256 { RNTO CWD } \
+	ftp_cmds { ABOR ACCT ADAT ALLO APPE AUTH CCC CDUP } \
+	ftp_cmds { CEL CLNT CMD CONF CWD DELE ENC EPRT } \
+	ftp_cmds { EPSV ESTA ESTP FEAT HELP LANG LIST LPRT } \
+	ftp_cmds { LPSV MACB MAIL MDTM MFMT MIC MKD MLSD MLST } \
+	ftp_cmds { MODE NLST NOOP OPTS PASS PASV PBSZ PORT } \
+	ftp_cmds { PROT PWD QUIT REIN REST RETR RMD RNFR } \
+	ftp_cmds { RNTO SDUP SITE SIZE SMNT STAT STOR STOU } \
+	ftp_cmds { STRU SYST TEST TYPE USER XCUP XCRC XCWD } \
+	ftp_cmds { XMAS XMD5 XMKD XPWD XRCP XRMD XRSQ XSEM } \
+	ftp_cmds { XSEN XSHA1 XSHA256 } \
+	alt_max_param_len 0 { ABOR CCC CDUP ESTA FEAT LPSV NOOP PASV PWD QUIT REIN STOU SYST XCUP XPWD } \
+	alt_max_param_len 200 { ALLO APPE CMD HELP NLST RETR RNFR STOR STOU XMKD } \
+	alt_max_param_len 256 { CWD RNTO } \
 	alt_max_param_len 400 { PORT } \
-	alt_max_param_len 512 { SIZE } \
-	chk_str_fmt { USER PASS ACCT CWD SDUP SMNT PORT TYPE STRU MODE } \
-	chk_str_fmt { RETR STOR STOU APPE ALLO REST RNFR RNTO DELE RMD MKD } \
-	chk_str_fmt { LIST NLST SITE SYST STAT HELP } \
-	chk_str_fmt { AUTH ADAT PROT PBSZ CONF ENC } \
-	chk_str_fmt { FEAT CEL CMD } \
-	chk_str_fmt { MDTM REST SIZE MLST MLSD } \
-	chk_str_fmt { XPWD XCWD XCUP XMKD XRMD TEST CLNT } \
-	cmd_validity MODE < char ASBCZ > \
-	cmd_validity STRU < char FRP > \
-	cmd_validity ALLO < int [ char R int ] > \
-	cmd_validity TYPE < { char AE [ char NTC ] | char I | char L [ number ] } > \
+	alt_max_param_len 512 { MFMT SIZE } \
+	chk_str_fmt { ACCT ADAT ALLO APPE AUTH CEL CLNT CMD } \
+	chk_str_fmt { CONF CWD DELE ENC EPRT EPSV ESTP HELP } \
+	chk_str_fmt { LANG LIST LPRT MACB MAIL MDTM MIC MKD } \
+	chk_str_fmt { MLSD MLST MODE NLST OPTS PASS PBSZ PORT } \
+	chk_str_fmt { PROT REST RETR RMD RNFR RNTO SDUP SITE } \
+	chk_str_fmt { SIZE SMNT STAT STOR STRU TEST TYPE USER } \
+	chk_str_fmt { XCRC XCWD XMAS XMD5 XMKD XRCP XRMD XRSQ } \ 
+	chk_str_fmt { XSEM XSEN XSHA1 XSHA256 } \
+	cmd_validity ALLO < int [ char R int ] > \    
+	cmd_validity EPSV < [ { char 12 | char A char L char L } ] > \
+	cmd_validity MACB < string > \
 	cmd_validity MDTM < [ date nnnnnnnnnnnnnn[.n[n[n]]] ] string > \
-	cmd_validity PORT < host_port >
+	cmd_validity MODE < char ASBCZ > \
+	cmd_validity PORT < host_port > \
+	cmd_validity PROT < char CSEP > \
+	cmd_validity STRU < char FRPO [ string ] > \    
+	cmd_validity TYPE < { char AE [ char NTC ] | char I | char L [ number ] } >
 
 EOD;
 
@@ -705,6 +711,8 @@ EOD;
 		$sdf_mask_output = "\\\n\tmask_output";
 	else
 		$sdf_mask_output = "";
+	if (empty($snortcfg['sdf_alert_threshold']))
+		$snortcfg['sdf_alert_threshold'] = 25;
 	$sensitive_data = <<<EOD
 # SDF preprocessor #
 preprocessor sensitive_data: \
