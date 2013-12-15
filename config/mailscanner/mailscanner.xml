@@ -54,7 +54,7 @@
 	<service>
 		<name>mailscanner</name>
 		<rcfile>mailscanner</rcfile>
-		<executable>perl5.14.2</executable>
+		<executable>perl5.16.3</executable>
 		<description>MailScanner</description>
 	</service>
 	<additional_files_needed>
