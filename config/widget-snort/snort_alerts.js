@@ -1,7 +1,7 @@
 
 var snortlines = Array();
 var snorttimer;
-var snortupdateDelay = 25500;
+var snortupdateDelay = 22000;
 var snortisBusy = false;
 var snortisPaused = false;
 
