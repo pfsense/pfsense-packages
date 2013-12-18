@@ -6,6 +6,7 @@
  * Copyright (C) 2003-2004 Manuel Kasper <mk@neon1.net>.
  * Copyright (C) 2008-2009 Robert Zelaya.
  * Copyright (C) 2011-2012 Ermal Luci
+ * Copyright (C) 2013 Bill Meeks
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -1223,7 +1224,7 @@ include_once("head.inc");
 					value="<?=$pconfig['pscan_ignore_scanners'];?>" title="<?=trim(filter_expand_alias($pconfig['pscan_ignore_scanners']));?>">&nbsp;&nbsp;<?php echo gettext("Leave blank for default.  ") . 
 					gettext("Default value is ") . "<strong>" . gettext("\$HOME_NET") . "</strong>"; ?>.</td>
 					<td class="vexpl" align="right">
-						<input type="button" class="formbtns" value="Aliases" onclick="parent.location='snort_select_alias.php?id=<?=$id;?>&type=host|network&varname=pscan_ignore_scanners&act=import&multi_ip=yes'"  
+						<input type="button" class="formbtns" value="Aliases" onclick="parent.location='snort_select_alias.php?id=<?=$id;?>&type=host|network&varname=pscan_ignore_scanners&act=import&multi_ip=yes&returl=<?=urlencode($_SERVER['PHP_SELF']);?>'"  
 						title="<?php echo gettext("Select an existing IP alias");?>"/></td>
 				</tr>
 				<tr>

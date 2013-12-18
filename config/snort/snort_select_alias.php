@@ -2,11 +2,7 @@
 /* $Id$ */
 /*
 	snort_select_alias.php
-	Copyright (C) 2004 Scott Ullrich
-	All rights reserved.
-
-	originially part of m0n0wall (http://m0n0.ch/wall)
-	Copyright (C) 2003-2004 Manuel Kasper <mk@neon1.net>.
+	Copyright (C) 2013 Bill Meeks
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
@@ -35,38 +31,37 @@ require("guiconfig.inc");
 require_once("functions.inc");
 require_once("/usr/local/pkg/snort/snort.inc");
 
-// Set who called us so we can return to the correct page with
-// the RETURN button.  We will just trust this User-Agent supplied
-// string for now.  Check and make sure we don't store this page
-// as the referrer so we don't stick the user in a loop.
-session_start();
-if(!isset($_SESSION['org_referer']) && strpos($_SERVER['HTTP_REFERER'], $SERVER['PHP_SELF']) === false)
-	$_SESSION['org_referer'] = substr($_SERVER['HTTP_REFERER'], 0, strpos($_SERVER['HTTP_REFERER'], "?"));
-$referrer = $_SESSION['org_referer'];
+// Need to keep track of who called us so we can return to the correct page
+// when the SAVE button is clicked.  On initial entry, a GET variable is 
+// passed with the referrer's URL encoded within.  That value is saved and
+// used when SAVE or CANCEL is clicked to return to the referring page.
+// 
 
-// Get the QUERY_STRING from our referrer so we can return it.
-if(!isset($_SESSION['org_querystr']))
-	$_SESSION['org_querystr'] = $_SERVER['QUERY_STRING'];
-$querystr = $_SESSION['org_querystr'];
+// Retrieve the QUERY STRING of the original referrer so we can return it.
+// On the initial pass, we will save it in a hidden POST field so we won't
+// overwrite it on subsequent POST-BACKs to this page.
+if (!isset($_POST['org_querystr']))
+	$querystr = $_SERVER['QUERY_STRING'];
 
 // Retrieve any passed QUERY STRING or POST variables
 $type = $_GET['type'];
 $varname = $_GET['varname'];
 $multi_ip = $_GET['multi_ip'];
+$referrer = urldecode($_GET['returl']);
 if (isset($_POST['type']))
 	$type = $_POST['type'];
 if (isset($_POST['varname']))
 	$varname = $_POST['varname'];
 if (isset($_POST['multi_ip']))
 	$multi_ip = $_POST['multi_ip'];
+if (isset($_POST['returl']))
+	$referrer = urldecode($_POST['returl']);
+if (isset($_POST['org_querystr']))
+	$querystr = $_POST['org_querystr'];
 
 // Make sure we have a valid VARIABLE name
 // and ALIAS TYPE, or else bail out.
 if (is_null($type) || is_null($varname)) {
-	session_start();
-	unset($_SESSION['org_referer']);
-	unset($_SESSION['org_querystr']);
-	session_write_close();
 	header("Location: http://{$referrer}?{$querystr}");
 	exit;
 }
@@ -103,10 +98,6 @@ switch (count($a_types)) {
 }
 
 if ($_POST['cancel']) {
-	session_start();
-	unset($_SESSION['org_referer']);
-	unset($_SESSION['org_querystr']);
-	session_write_close();
 	header("Location: {$referrer}?{$querystr}");
 	exit;
 }
@@ -118,10 +109,6 @@ if ($_POST['save']) {
 	// if no errors, write new entry to conf
 	if (!$input_errors) {
 		$selection = $_POST['alias'];
-		session_start();
-		unset($_SESSION['org_referer']);
-		unset($_SESSION['org_querystr']);
-		session_write_close();
 		header("Location: {$referrer}?{$querystr}&varvalue={$selection}");
 		exit;
 	}
@@ -138,6 +125,8 @@ include("head.inc");
 <input type="hidden" name="varname" value="<?=$varname;?>">
 <input type="hidden" name="type" value="<?=$type;?>">
 <input type="hidden" name="multi_ip" value="<?=$multi_ip;?>">
+<input type="hidden" name="returl" value="<?=$referrer;?>">
+<input type="hidden" name="org_querystr" value="<?=$querystr;?>">
 <?php if ($input_errors) print_input_errors($input_errors); ?>
 <div id="boxarea">
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
