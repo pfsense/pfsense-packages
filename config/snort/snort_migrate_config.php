@@ -2,10 +2,7 @@
 /*
  * snort_migrate_config.inc
  *
- * Copyright (C) 2006 Scott Ullrich
- * Copyright (C) 2009-2010 Robert Zelaya
- * Copyright (C) 2011-2012 Ermal Luci
- * part of pfSense
+ * Copyright (C) 2013 Bill Meeks
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -299,7 +296,7 @@ unset($r);
 
 // Write out the new configuration to disk if we changed anything
 if ($updated_cfg) {
-	$config['installedpackages']['snortglobal']['snort_config_ver'] = "3.0.0";
+	$config['installedpackages']['snortglobal']['snort_config_ver'] = "3.0.1";
 	log_error("[Snort] Saving configuration settings in new format...");
 	write_config();
 	log_error("[Snort] Settings successfully migrated to new configuration format...");

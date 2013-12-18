@@ -5,6 +5,7 @@
  * Copyright (C) 2006 Scott Ullrich
  * Copyright (C) 2009-2010 Robert Zelaya
  * Copyright (C) 2011-2012 Ermal Luci
+ * Copyright (C) 2013 Bill Meeks
  * part of pfSense
  * All rights reserved.
  *
@@ -1450,6 +1451,10 @@ if ($config['installedpackages']['snortglobal']['forcekeepsettings'] == 'on') {
 		update_output_window(gettext("Snort has been started using the rebuilt configuration..."));
 	}
 }
+
+/* Update Snort package version in configuration */
+$config['installedpackages']['snortglobal']['snort_config_ver'] = "3.0.1";
+write_config();
 
 /* Done with post-install, so clear flag */
 unset($g['snort_postinstall']);
