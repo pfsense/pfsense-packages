@@ -43,9 +43,14 @@ $log = $snort_rules_upd_log;
 
 /* Grab the Snort binary version programmatically and */
 /* use it to construct the proper Snort VRT rules     */
-/* tarball filename.                                  */
+/* tarball filename.  Fallback to a safe default if   */
+/* we fail.                                           */
+$snortver = array();
 exec("/usr/local/bin/snort -V 2>&1 |/usr/bin/grep Version | /usr/bin/cut -c20-26", $snortver);
+if (empty($snortver[0]))
+	$snortver[0] = "2.9.5.5";
 $snortver[0] = str_replace(".", "", $snortver[0]);
+
 $snort_rules_file = "snortrules-snapshot-{$snortver[0]}.tar.gz";
 //$snort_rules_file = VRT_DNLD_FILENAME;
 $snort_community_rules_filename = GPLV2_DNLD_FILENAME;

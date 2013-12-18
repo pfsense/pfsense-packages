@@ -5,6 +5,7 @@
  * Copyright (C) 2006 Scott Ullrich
  * Copyright (C) 2009-2010 Robert Zelaya
  * Copyright (C) 2011-2012 Ermal Luci
+ * Copyright (C) 2013 Bill Meeks
  * part of pfSense
  * All rights reserved.
  *
@@ -45,13 +46,15 @@ ini_set("memory_limit", "192M");
 // Explicitly declare this as global so it works through function call includes 
 global $rebuild_rules, $pfSense_snort_version;
 
-// Grab the Snort binary version programmatically
+// Grab the Snort binary version programmatically, but if that fails use a safe default
 $snortver = array();
 exec("/usr/local/bin/snort -V 2>&1 |/usr/bin/grep Version | /usr/bin/cut -c20-26", $snortver);
 $snort_version = $snortver[0];
+if (empty($snort_version))
+	$snort_version = "2.9.5.5";
 
 /* package version */
-$pfSense_snort_version = "3.0.0";
+$pfSense_snort_version = "3.0.1";
 $snort_package_version = "Snort {$snort_version} pkg v{$pfSense_snort_version}";
 
 // Define SNORTDIR and SNORTLIBDIR constants according to pfSense version
