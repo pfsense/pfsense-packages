@@ -484,7 +484,7 @@
 		<configurationfile>vhosts.xml</configurationfile>
 	</package>
 	<package>
-		<name>Snort</name>
+		<name>snort</name>
 		<pkginfolink></pkginfolink>
 		<website>http://www.snort.org</website>
 		<descr>Snort is an open source network intrusion prevention and detection system (IDS/IPS). Combining the benefits of signature, protocol, and anomaly-based inspection.</descr>
