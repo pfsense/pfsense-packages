@@ -528,7 +528,7 @@ if ($savemsg) {
 						<tr>
 							<td colspan="3" class="vexpl" align="center"><?php echo "<span class=\"red\"><b>" . gettext("WARNING: ") . "</b></span>" . 
 							gettext("You should not disable flowbit rules!  Add Suppress List entries for them instead by ") . 
-							"<a href='snort_rules_flowbits.php?id={$id}' title=\"" . gettext("Add Suppress List entry for Flowbit Rule") . "\">" . 
+							"<a href='snort_rules_flowbits.php?id={$id}&openruleset={$currentruleset}&returl=" . urlencode($_SERVER['PHP_SELF']) . "' title=\"" . gettext("Add Suppress List entry for Flowbit Rule") . "\">" . 
 							gettext("clicking here") . ".</a>";?></td>
 						</tr>
 						<?php endif;?>

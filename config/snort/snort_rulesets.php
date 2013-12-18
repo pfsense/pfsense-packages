@@ -330,7 +330,7 @@ if ($savemsg) {
 					   </tr>
 					   <tr>
 						<td width="15%" class="listn"><?php echo gettext("Auto Flowbit Rules"); ?></td>
-						<td width="85%"><input type="button" class="formbtns" value="View" onclick="parent.location='snort_rules_flowbits.php?id=<?=$id;?>'" <?php echo $btn_view_flowb_rules; ?>/>
+						<td width="85%"><input type="button" class="formbtns" value="View" onclick="parent.location='snort_rules_flowbits.php?id=<?=$id;?>&returl=<?=urlencode($_SERVER['PHP_SELF']);?>'" <?php echo $btn_view_flowb_rules; ?>/>
 						&nbsp;&nbsp;<span class="vexpl"><?php echo gettext("Click to view auto-enabled rules required to satisfy flowbit dependencies"); ?></span></td>
 					   </tr>
 					   <tr>
