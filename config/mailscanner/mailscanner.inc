@@ -442,15 +442,21 @@ Country Sub-Domains List = %etc-dir%/country.domains.conf
 		}
 	if (preg_match('/use_pyzor/',$antispam['safeatures'])){
 		$pattern[]='/#pyzor_path/';
+		$pattern[]="/\S+yzor_disabled/";
 		$pattern[]='/usr.bin.pyzor/';
-		$pattern[]='/\nuse_pyzor\s+0/';
+		$pattern[]='/use_pyzor/';
+		$pattern[]="/\S+o_not_use_pyzor/";
+		$replacement[]="pyzor_path";
 		$replacement[]="pyzor_path";
 		$replacement[]="usr/local/bin/pyzor";
-		$replacement[]="\n".'# use_pyzor	0';
+		$replacement[]="use_pyzor";
+		$replacement[]="use_pyzor";
 		}
 	else{
-		$pattern[]='/\n#\s+use_pyzor\s+0/';
-		$replacement[]="\n".'# use_pyzor		0';
+		$pattern[]='/use_pyzor/';
+		$pattern[]='/pyzor_path/';
+		$replacement[]="#do_not_use_pyzor";
+		$replacement[]="#pyzor_disabled";
 		}
 	if (preg_match('/use_auto_learn_bayes/',$antispam['safeatures'])){
 		$pattern[]='/\nbayes_auto_learn\s+0/';
@@ -677,23 +683,23 @@ Country Sub-Domains List = %etc-dir%/country.domains.conf
 	#fix MIME::ToolUtils deprecated function and usecure dependency calls in /usr/local/sbin/mailscanner
 	$cconf=MAILSCANNER_LOCALBASE. "/sbin/mailscanner";
 	if (file_exists($cconf)){
-		#check perl's version
-		$perl_bin="perl";
-		$perl_version_file=MAILSCANNER_LOCALBASE . '/etc/perl5_version';
-		if (file_exists($perl_version_file)) {
-			$perl_version = trim(`/usr/bin/grep 'PERL_VERSION=' $perl_version_file | /usr/bin/cut -f2 -d'='`);
-			$perl_bin .= $perl_version;
+		
+		$perl_bin="perl_mailscanner";
+		if(file_exists(MAILSCANNER_LOCALBASE . '/bin/perl') && !file_exists(MAILSCANNER_LOCALBASE . "/bin/{$perl_bin}")){
+		 	link(MAILSCANNER_LOCALBASE . '/bin/perl',MAILSCANNER_LOCALBASE . '/bin/perl_mailscanner');
 		}
-
-		$cconf_file=file_get_contents($cconf);
-		$pattern2[0]='@#!/usr\S+bin/perl.*I@';
-		$pattern2[1]='/\smy .current = config MIME::ToolUtils/';
-		$replacement2[0]='#!'.MAILSCANNER_LOCALBASE. "/bin/{$perl_bin} -U -I";
-		$replacement2[1]=' #my $current = config MIME::ToolUtils';
-		if (preg_match('@#!/usr\S+bin/perl.*I@',$cconf_file)){
-			$cconf_file=preg_replace($pattern2,$replacement2,$cconf_file);
-			file_put_contents($cconf, $cconf_file, LOCK_EX);
-			}
+		if (file_exists(MAILSCANNER_LOCALBASE . "/bin/{$perl_bin}")){
+			$cconf_file=file_get_contents($cconf);
+			$pattern2[0]='@#!/usr\S+bin/perl.*I@';
+			//$pattern2[1]='/\smy .current = config MIME::ToolUtils/';
+			$replacement2[0]='#!'.MAILSCANNER_LOCALBASE. "/bin/{$perl_bin} -U -I";
+			//$replacement2[1]=' #my $current = config MIME::ToolUtils';
+			if (preg_match('@#!/usr\S+bin/perl.*I@',$cconf_file)){
+				$cconf_file=preg_replace($pattern2,$replacement2,$cconf_file);
+				file_put_contents($cconf, $cconf_file, LOCK_EX);
+				}
+		}
+			
 	}
 
 	#check spam assassin rules
