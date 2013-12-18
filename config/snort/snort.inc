@@ -5,6 +5,7 @@
  * Copyright (C) 2006 Scott Ullrich
  * Copyright (C) 2009-2010 Robert Zelaya
  * Copyright (C) 2011-2012 Ermal Luci
+ * Copyright (C) 2013 Bill Meeks
  * part of pfSense
  * All rights reserved.
  *
@@ -45,24 +46,22 @@ ini_set("memory_limit", "192M");
 // Explicitly declare this as global so it works through function call includes 
 global $rebuild_rules, $pfSense_snort_version;
 
-// Grab the Snort binary version programmatically
+// Grab the Snort binary version programmatically, but if that fails use a safe default
 $snortver = array();
 exec("/usr/local/bin/snort -V 2>&1 |/usr/bin/grep Version | /usr/bin/cut -c20-26", $snortver);
 $snort_version = $snortver[0];
+if (empty($snort_version))
+	$snort_version = "2.9.5.5";
 
 /* package version */
-$pfSense_snort_version = "3.0.0";
-$snort_package_version = "Snort {$snort_version} pkg v. {$pfSense_snort_version}";
+$pfSense_snort_version = "3.0.1";
+$snort_package_version = "Snort {$snort_version} pkg v{$pfSense_snort_version}";
 
-// Define SNORTDIR and SNORTLIBDIR constants according to FreeBSD version (PBI support or no PBI)
-if (floatval(php_uname("r")) >= 8.3) {
-	exec("/usr/local/sbin/pbi_info | grep 'snort-{$snort_version}' | xargs /usr/local/sbin/pbi_info | awk '/Prefix/ {print $2}'",$pbidirarray);
-	$snort_pbidir = "{$pbidirarray[0]}";
-	/* In case this is an initial Snort install and pbi_info() above returned null, set a sane default value */
-	if (empty($snort_pbidir))
-		$snort_pbidir = "/usr/pbi/snort-" . php_uname("m");
-	define("SNORTDIR", "{$snort_pbidir}/etc/snort");
-	define("SNORTLIBDIR", "{$snort_pbidir}/lib/snort");
+// Define SNORTDIR and SNORTLIBDIR constants according to pfSense version
+$pfs_version=substr(trim(file_get_contents("/etc/version")),0,3);
+if ($pfs_version > 2.0) {
+	define("SNORTDIR", "/usr/pbi/snort-" . php_uname("m") . "/etc/snort");
+	define("SNORTLIBDIR", "/usr/pbi/snort-" . php_uname("m") . "/lib/snort");
 }
 else {
 	define("SNORTDIR", "/usr/local/etc/snort");
@@ -2700,32 +2699,38 @@ EOD;
 
 	// Setup the standard FTP commands used for all FTP Server engines
 	$ftp_cmds = <<<EOD
-	ftp_cmds { USER PASS ACCT CWD SDUP SMNT QUIT REIN PORT PASV TYPE STRU MODE } \
-	ftp_cmds { RETR STOR STOU APPE ALLO REST RNFR RNTO ABOR DELE RMD MKD PWD } \
-	ftp_cmds { LIST NLST SITE SYST STAT HELP NOOP } \
-	ftp_cmds { AUTH ADAT PROT PBSZ CONF ENC } \
-	ftp_cmds { FEAT CEL CMD MACB } \
-	ftp_cmds { MDTM REST SIZE MLST MLSD } \
-	ftp_cmds { XPWD XCWD XCUP XMKD XRMD TEST CLNT } \
-	alt_max_param_len 0 { CDUP QUIT REIN PASV STOU ABOR PWD SYST NOOP } \
-	alt_max_param_len 100 { MDTM CEL XCWD SITE USER PASS REST DELE RMD SYST TEST STAT MACB EPSV CLNT LPRT } \
-	alt_max_param_len 200 { XMKD NLST ALLO STOU APPE RETR STOR CMD RNFR HELP } \
-	alt_max_param_len 256 { RNTO CWD } \
+	ftp_cmds { ABOR ACCT ADAT ALLO APPE AUTH CCC CDUP } \
+	ftp_cmds { CEL CLNT CMD CONF CWD DELE ENC EPRT } \
+	ftp_cmds { EPSV ESTA ESTP FEAT HELP LANG LIST LPRT } \
+	ftp_cmds { LPSV MACB MAIL MDTM MFMT MIC MKD MLSD MLST } \
+	ftp_cmds { MODE NLST NOOP OPTS PASS PASV PBSZ PORT } \
+	ftp_cmds { PROT PWD QUIT REIN REST RETR RMD RNFR } \
+	ftp_cmds { RNTO SDUP SITE SIZE SMNT STAT STOR STOU } \
+	ftp_cmds { STRU SYST TEST TYPE USER XCUP XCRC XCWD } \
+	ftp_cmds { XMAS XMD5 XMKD XPWD XRCP XRMD XRSQ XSEM } \
+	ftp_cmds { XSEN XSHA1 XSHA256 } \
+	alt_max_param_len 0 { ABOR CCC CDUP ESTA FEAT LPSV NOOP PASV PWD QUIT REIN STOU SYST XCUP XPWD } \
+	alt_max_param_len 200 { ALLO APPE CMD HELP NLST RETR RNFR STOR STOU XMKD } \
+	alt_max_param_len 256 { CWD RNTO } \
 	alt_max_param_len 400 { PORT } \
-	alt_max_param_len 512 { SIZE } \
-	chk_str_fmt { USER PASS ACCT CWD SDUP SMNT PORT TYPE STRU MODE } \
-	chk_str_fmt { RETR STOR STOU APPE ALLO REST RNFR RNTO DELE RMD MKD } \
-	chk_str_fmt { LIST NLST SITE SYST STAT HELP } \
-	chk_str_fmt { AUTH ADAT PROT PBSZ CONF ENC } \
-	chk_str_fmt { FEAT CEL CMD } \
-	chk_str_fmt { MDTM REST SIZE MLST MLSD } \
-	chk_str_fmt { XPWD XCWD XCUP XMKD XRMD TEST CLNT } \
-	cmd_validity MODE < char ASBCZ > \
-	cmd_validity STRU < char FRP > \
-	cmd_validity ALLO < int [ char R int ] > \
-	cmd_validity TYPE < { char AE [ char NTC ] | char I | char L [ number ] } > \
+	alt_max_param_len 512 { MFMT SIZE } \
+	chk_str_fmt { ACCT ADAT ALLO APPE AUTH CEL CLNT CMD } \
+	chk_str_fmt { CONF CWD DELE ENC EPRT EPSV ESTP HELP } \
+	chk_str_fmt { LANG LIST LPRT MACB MAIL MDTM MIC MKD } \
+	chk_str_fmt { MLSD MLST MODE NLST OPTS PASS PBSZ PORT } \
+	chk_str_fmt { PROT REST RETR RMD RNFR RNTO SDUP SITE } \
+	chk_str_fmt { SIZE SMNT STAT STOR STRU TEST TYPE USER } \
+	chk_str_fmt { XCRC XCWD XMAS XMD5 XMKD XRCP XRMD XRSQ } \ 
+	chk_str_fmt { XSEM XSEN XSHA1 XSHA256 } \
+	cmd_validity ALLO < int [ char R int ] > \    
+	cmd_validity EPSV < [ { char 12 | char A char L char L } ] > \
+	cmd_validity MACB < string > \
 	cmd_validity MDTM < [ date nnnnnnnnnnnnnn[.n[n[n]]] ] string > \
-	cmd_validity PORT < host_port >
+	cmd_validity MODE < char ASBCZ > \
+	cmd_validity PORT < host_port > \
+	cmd_validity PROT < char CSEP > \
+	cmd_validity STRU < char FRPO [ string ] > \    
+	cmd_validity TYPE < { char AE [ char NTC ] | char I | char L [ number ] } >
 
 EOD;
 
@@ -3123,6 +3128,8 @@ EOD;
 		$sdf_mask_output = "\\\n\tmask_output";
 	else
 		$sdf_mask_output = "";
+	if (empty($snortcfg['sdf_alert_threshold']))
+		$snortcfg['sdf_alert_threshold'] = 25;
 	$sensitive_data = <<<EOD
 # SDF preprocessor #
 preprocessor sensitive_data: \

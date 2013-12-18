@@ -1,16 +1,7 @@
 <?php
 /*
  * snort_ftp_client_engine.php
- * Copyright (C) 2004 Scott Ullrich
- * Copyright (C) 2011-2012 Ermal Luci
- * All rights reserved.
- *
- * originially part of m0n0wall (http://m0n0.ch/wall)
- * Copyright (C) 2003-2004 Manuel Kasper <mk@neon1.net>.
- * All rights reserved.
- *
- * modified for the pfsense snort package
- * Copyright (C) 2009-2010 Robert Zelaya.
+ * Copyright (C) 2013 Bill Meeks
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -277,7 +268,7 @@ if ($savemsg)
 					<td class="vexpl"><input name="ftp_bind_to" type="text" class="formfldalias" id="ftp_bind_to" size="32" 
 					value="<?=htmlspecialchars($pconfig['bind_to']);?>" title="<?=trim(filter_expand_alias($pconfig['bind_to']));?>" autocomplete="off" >&nbsp;
 					<?php echo gettext("IP List to bind this engine to. (Cannot be blank)"); ?></td>
-					<td align="right"><input type="button" class="formbtns" value="Aliases" onclick="parent.location='snort_select_alias.php?id=<?=$id;?>&eng_id=<?=$eng_id;?>&type=host|network&varname=bind_to&act=import'" 
+					<td align="right"><input type="button" class="formbtns" value="Aliases" onclick="parent.location='snort_select_alias.php?id=<?=$id;?>&eng_id=<?=$eng_id;?>&type=host|network&varname=bind_to&act=import&returl=<?=urlencode($_SERVER['PHP_SELF']);?>'" 
 					title="<?php echo gettext("Select an existing IP alias");?>"/></td>
 				</tr>
 				<tr>
@@ -337,7 +328,7 @@ if ($savemsg)
 					value="<?=htmlspecialchars($pconfig['bounce_to_net']);?>" title="<?=trim(filter_expand_alias($pconfig['bounce_to_net']));?>" autocomplete="off"><span class="vexpl">&nbsp;
 					<?php echo gettext("Default is ") . "<strong>" . gettext("blank") . "</strong>.";?></span>
 				</td>
-				<td class="vexpl">&nbsp;&nbsp;<input type="button" class="formbtns" value="Aliases" onclick="parent.location='snort_select_alias.php?id=<?=$id;?>&eng_id=<?=$eng_id;?>&type=host|network&varname=bounce_to_net&act=import'"  
+				<td class="vexpl">&nbsp;&nbsp;<input type="button" class="formbtns" value="Aliases" onclick="parent.location='snort_select_alias.php?id=<?=$id;?>&eng_id=<?=$eng_id;?>&type=host|network&varname=bounce_to_net&act=import&returl=<?=urlencode($_SERVER['PHP_SELF']);?>'"  
 					title="<?php echo gettext("Select an existing IP alias");?>"/>
 				</td>
 			   </tr>
@@ -347,7 +338,7 @@ if ($savemsg)
 					value="<?=htmlspecialchars($pconfig['bounce_to_port']);?>" title="<?=trim(filter_expand_alias($pconfig['bounce_to_port']));?>" autocomplete="off"><span class="vexpl">&nbsp;
 					<?php echo gettext("Default is ") . "<strong>" . gettext("blank") . "</strong>.";?></span>
 				</td>
-				<td class="vexpl">&nbsp;&nbsp;<input type="button" class="formbtns" value="Aliases" onclick="parent.location='snort_select_alias.php?id=<?=$id;?>&eng_id=<?=$eng_id;?>&type=port&varname=bounce_to_port&act=import'"  
+				<td class="vexpl">&nbsp;&nbsp;<input type="button" class="formbtns" value="Aliases" onclick="parent.location='snort_select_alias.php?id=<?=$id;?>&eng_id=<?=$eng_id;?>&type=port&varname=bounce_to_port&act=import&returl=<?=urlencode($_SERVER['PHP_SELF']);?>'"  
 					title="<?php echo gettext("Select an existing port alias");?>"/>
 				</td>
 			   </tr>

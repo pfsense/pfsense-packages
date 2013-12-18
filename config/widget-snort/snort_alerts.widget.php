@@ -26,6 +26,7 @@
     POSSIBILITY OF SUCH DAMAGE.
 */
 
+require_once("guiconfig.inc");
 require_once("/usr/local/www/widgets/include/widget-snort.inc");
 
 global $config, $g;
@@ -61,7 +62,14 @@ function sksort(&$array, $subkey="id", $sort_ascending=false) {
 };
 
 /* check if firewall widget variable is set */
-if (!isset($nentries)) $nentries = 5;
+$nentries = $config['widgets']['widget_snort_display_lines'];
+if (!isset($nentries) || $nentries < 0) $nentries = 5;
+
+if(isset($_POST['widget_snort_display_lines'])) {
+	$config['widgets']['widget_snort_display_lines'] = $_POST['widget_snort_display_lines'];
+	write_config("Saved Snort Alerts Widget Displayed Lines Parameter via Dashboard");
+	header("Location: ../../index.php");
+}
 
 /* check if Snort include file exists before we use it */
 if (file_exists("/usr/local/pkg/snort/snort.inc")) {
@@ -121,6 +129,16 @@ if (file_exists("/usr/local/pkg/snort/snort.inc")) {
 
 /* display the result */
 ?>
+
+<input type="hidden" id="snort_alerts-config" name="snort_alerts-config" value="" />
+<div id="snort_alerts-settings" class="widgetconfigdiv" style="display:none;">
+	<form action="/widgets/widgets/snort_alerts.widget.php" method="post" name="iformd">
+		Enter number of recent alerts to display (default is 5)<br/>
+		<input type="text" size="5" name="widget_snort_display_lines" class="formfld unknown" id="widget_snort_display_lines" value="<?= $config['widgets']['widget_snort_display_lines'] ?>" />
+		&nbsp;&nbsp;<input id="submitd" name="submitd" type="submit" class="formbtn" value="Save" />
+    </form>
+</div>
+
 <table width="100%" border="0" cellspacing="0" cellpadding="0">
 	<tbody>
 		<tr class="snort-alert-header">
@@ -150,3 +168,13 @@ if (is_array($snort_alerts)) {
 ?>
 	</tbody>
 </table>
+
+<!-- needed to display the widget settings menu -->
+<script type="text/javascript">
+//<![CDATA[
+	selectIntLink = "snort_alerts-configure";
+	textlink = document.getElementById(selectIntLink);
+	textlink.style.display = "inline";
+//]]>
+</script>
+

@@ -42,12 +42,12 @@
 /* ========================================================================== */
         ]]>
 	</copyright>
-	<description>Describe your package here</description>
-	<requirements>Describe your package requirements here</requirements>
+	<description>Snort IDS/IPS Package</description>
+	<requirements>None</requirements>
 	<faq>Currently there are no FAQ items provided.</faq>
 	<name>Snort</name>
 	<version>2.9.5.5</version>
-	<title>Services:2.9.5.5 pkg v. 3.0.0</title>
+	<title>Services:2.9.5.5 pkg v3.0.1</title>
 	<include_file>/usr/local/pkg/snort/snort.inc</include_file>
 	<menu>
 		<name>Snort</name>
@@ -244,7 +244,7 @@
 	</custom_add_php_command>
 	<custom_php_resync_config_command>
 		<![CDATA[
-		if ($GLOBALS['pfSense_snort_version'] == "3.0.0")
+		if ($GLOBALS['pfSense_snort_version'] == "3.0.1")
 		sync_snort_package_config();
 		]]>
 	</custom_php_resync_config_command>
@@ -254,7 +254,8 @@
 		]]>
 	</custom_php_install_command>
 	<custom_php_deinstall_command>
+		<![CDATA[
 		snort_deinstall();
+		]]>
 	</custom_php_deinstall_command>
 </packagegui>
-

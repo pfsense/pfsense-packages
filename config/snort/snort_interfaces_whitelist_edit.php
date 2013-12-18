@@ -274,7 +274,7 @@ if ($savemsg)
 		<td width="78%" class="vtable">
 		<input autocomplete="off" name="address" type="text" class="formfldalias" id="address" size="30" value="<?=htmlspecialchars($pconfig['address']);?>"
 		title="<?=trim(filter_expand_alias($pconfig['address']));?>" />
-		&nbsp;&nbsp;&nbsp;&nbsp;<input type="button" class="formbtns" value="Aliases" onclick="parent.location='snort_select_alias.php?id=0&type=host|network&varname=address&act=import&multi_ip=yes'" 
+		&nbsp;&nbsp;&nbsp;&nbsp;<input type="button" class="formbtns" value="Aliases" onclick="parent.location='snort_select_alias.php?id=0&type=host|network&varname=address&act=import&multi_ip=yes&returl=<?=urlencode($_SERVER['PHP_SELF']);?>'" 
 		title="<?php echo gettext("Select an existing IP alias");?>"/>
 		</td>
 	</tr>

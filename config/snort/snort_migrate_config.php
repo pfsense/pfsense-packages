@@ -2,10 +2,7 @@
 /*
  * snort_migrate_config.inc
  *
- * Copyright (C) 2006 Scott Ullrich
- * Copyright (C) 2009-2010 Robert Zelaya
- * Copyright (C) 2011-2012 Ermal Luci
- * part of pfSense
+ * Copyright (C) 2013 Bill Meeks
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -279,6 +276,18 @@ foreach ($rule as &$r) {
 		$pconfig['ftp_server_engine']['item'][] = $default;
 	}
 
+	// Set sensible defaults for new SDF options if SDF is enabled
+	if ($pconfig['sensitive_data'] == 'on') {
+		if (empty($pconfig['sdf_alert_threshold'])) {
+			$pconfig['sdf_alert_threshold'] = 25;
+			$updated_cfg = true;
+		}
+		if (empty($pconfig['sdf_alert_data_type'])) {
+			$pconfig['sdf_alert_data_type'] = "Credit Card,Email Addresses,U.S. Phone Numbers,U.S. Social Security Numbers";
+			$updated_cfg = true;
+		}
+	}
+
 	// Save the new configuration data into the $config array pointer
 	$r = $pconfig;
 }
@@ -287,7 +296,7 @@ unset($r);
 
 // Write out the new configuration to disk if we changed anything
 if ($updated_cfg) {
-	$config['installedpackages']['snortglobal']['snort_config_ver'] = "3.0.0";
+	$config['installedpackages']['snortglobal']['snort_config_ver'] = "3.0.1";
 	log_error("[Snort] Saving configuration settings in new format...");
 	write_config();
 	log_error("[Snort] Settings successfully migrated to new configuration format...");

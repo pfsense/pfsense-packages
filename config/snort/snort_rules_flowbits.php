@@ -1,16 +1,7 @@
 <?php
 /*
  * snort_rules_flowbits.php
- * Copyright (C) 2004 Scott Ullrich
- * Copyright (C) 2011-2012 Ermal Luci
- * All rights reserved.
- *
- * originially part of m0n0wall (http://m0n0.ch/wall)
- * Copyright (C) 2003-2004 Manuel Kasper <mk@neon1.net>.
- * All rights reserved.
- *
- * modified for the pfsense snort package
- * Copyright (C) 2009-2010 Robert Zelaya.
+ * Copyright (C) 2013 Bill Meeks
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -51,18 +42,23 @@ if (!is_array($config['installedpackages']['snortglobal']['rule'])) {
 $a_nat = &$config['installedpackages']['snortglobal']['rule'];
 
 // Set who called us so we can return to the correct page with
-// the RETURN button.  We will just trust this User-Agent supplied
-// string for now.
+// the RETURN button. Save the original referrer and the query
+// string in session variables.
 session_start();
-if(!isset($_SESSION['org_referer']))
-    $_SESSION['org_referer'] = $_SERVER['HTTP_REFERER'];
-$referrer = $_SESSION['org_referer'];
+if (!isset($_SESSION['org_referrer']) || isset($_GET['returl'])) {
+	$_SESSION['org_referrer'] = urldecode($_GET['returl']);
+	$_SESSION['org_querystr'] = $_SERVER['QUERY_STRING'];
+}
+$referrer = $_SESSION['org_referrer'];
+$querystr = $_SESSION['org_querystr'];
+session_write_close();
 
 if ($_POST['cancel']) {
 	session_start();
-	unset($_SESSION['org_referer']);
+	unset($_SESSION['org_referrer']);
+	unset($_SESSION['org_querystr']);
 	session_write_close();
-	header("Location: {$referrer}");
+	header("Location: {$referrer}?{$querystr}");
 	exit;
 }
 
@@ -71,7 +67,8 @@ if (isset($_POST['id']))
 	$id = $_POST['id'];
 if (is_null($id)) {
 	session_start();
-	unset($_SESSION['org_referer']);
+	unset($_SESSION['org_referrer']);
+	unset($_SESSION['org_querystr']);
 	session_write_close();
 	header("Location: /snort/snort_interfaces.php");
 	exit;

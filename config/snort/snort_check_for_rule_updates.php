@@ -5,6 +5,7 @@
  * Copyright (C) 2006 Scott Ullrich
  * Copyright (C) 2009 Robert Zelaya
  * Copyright (C) 2011-2012 Ermal Luci
+ * Copyright (C) 2013 Bill Meeks
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -88,10 +89,15 @@ $et_enabled = $config['installedpackages']['snortglobal']['emergingthreats'];
 $tmpfname = "{$snortdir}/tmp/snort_rules_up";
 
 /* Grab the Snort binary version programmatically and use it to construct */
-/* the proper Snort VRT rules tarball and md5 filenames.                  */
+/* the proper Snort VRT rules tarball and md5 filenames. Fallback to a    */
+/* default in the event we fail.                                          */
+$snortver = array();
 exec("/usr/local/bin/snort -V 2>&1 |/usr/bin/grep Version | /usr/bin/cut -c20-26", $snortver);
 // Save the version with decimal delimiters for use in extracting the rules
 $snort_version = $snortver[0];
+if (empty($snort_version))
+	$snort_version = "2.9.5.5";
+
 // Create a collapsed version string for use in the tarball filename
 $snortver[0] = str_replace(".", "", $snortver[0]);
 $snort_filename = "snortrules-snapshot-{$snortver[0]}.tar.gz";
@@ -695,8 +701,7 @@ if ($snortdownload == 'on' || $emergingthreats == 'on' || $snortcommunityrules =
         }
 
 	/* Start the rules rebuild proccess for each configured interface */
-	if (is_array($config['installedpackages']['snortglobal']['rule']) &&
-	    !empty($config['installedpackages']['snortglobal']['rule'])) {
+	if (is_array($config['installedpackages']['snortglobal']['rule'])) {
 
 		/* Set the flag to force rule rebuilds since we downloaded new rules,    */
 		/* except when in post-install mode.  Post-install does its own rebuild. */
