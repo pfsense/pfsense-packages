@@ -1920,10 +1920,10 @@
 		<required_version>2.0</required_version>
 		<configurationfile>zabbix2-agent.xml</configurationfile>
 		<maintainer>dbaio@bsd.com.br</maintainer>
-		<build_port_path>/usr/ports/net-mgmt/zabbix2-agent</build_port_path>
+		<build_port_path>/usr/ports/net-mgmt/zabbix22-agent</build_port_path>
 		<build_pbi>
-			<custom_name>zabbix2-agent</custom_name>
-			<port>net-mgmt/zabbix2-agent</port>
+			<custom_name>zabbix22-agent</custom_name>
+			<port>net-mgmt/zabbix22-agent</port>
 		</build_pbi>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
 		<depends_on_package>zabbix2-agent-2.0.8.tbz</depends_on_package>
@@ -1939,10 +1939,10 @@
 		<required_version>2.0</required_version>
 		<configurationfile>zabbix2-proxy.xml</configurationfile>
 		<maintainer>dbaio@bsd.com.br</maintainer>
-		<build_port_path>/usr/ports/net-mgmt/zabbix2-proxy</build_port_path>
+		<build_port_path>/usr/ports/net-mgmt/zabbix22-proxy</build_port_path>
 		<build_pbi>
-			<custom_name>zabbix2-proxy</custom_name>
-			<port>net-mgmt/zabbix2-proxy</port>
+			<custom_name>zabbix22-proxy</custom_name>
+			<port>net-mgmt/zabbix22-proxy</port>
 		</build_pbi>
 		<build_options>OPTIONS_SET+= SQLITE IPV6;OPTIONS_UNSET+= MYSQL JABBER GSSAPI</build_options>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
