@@ -1902,7 +1902,7 @@
 		<descr>Monitoring agent.</descr>
 		<category>Services</category>
 		<config_file>http://www.pfsense.org/packages/config/zabbix2/zabbix2-agent.xml</config_file>
-		<version>zabbix2-agent-2.0.8 pkg v0.7_1</version>
+		<version>zabbix2-agent-2.2.1 pkg v0.8_0</version>
 		<status>BETA</status>
 		<required_version>2.0</required_version>
 		<configurationfile>zabbix2-agent.xml</configurationfile>
@@ -1913,15 +1913,15 @@
 			<port>net-mgmt/zabbix22-agent</port>
 		</build_pbi>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
-		<depends_on_package>zabbix2-agent-2.0.8.tbz</depends_on_package>
-		<depends_on_package_pbi>zabbix2-agent-2.0.8-amd64.pbi</depends_on_package_pbi>
+		<depends_on_package>zabbix22-agent-2.2.1.tbz</depends_on_package>
+		<depends_on_package_pbi>zabbix22-agent-2.2.1-amd64.pbi</depends_on_package_pbi>
 	</package>
 	<package>
 		<name>Zabbix-2 Proxy</name>
 		<descr>Monitoring agent proxy.</descr>
 		<category>Services</category>
 		<config_file>http://www.pfsense.org/packages/config/zabbix2/zabbix2-proxy.xml</config_file>
-		<version>zabbix2-proxy-2.0.8 pkg v0.7_1</version>
+		<version>zabbix2-proxy-2.2.1 pkg v0.8_0</version>
 		<status>BETA</status>
 		<required_version>2.0</required_version>
 		<configurationfile>zabbix2-proxy.xml</configurationfile>
@@ -1933,8 +1933,8 @@
 		</build_pbi>
 		<build_options>OPTIONS_SET+= SQLITE IPV6;OPTIONS_UNSET+= MYSQL JABBER GSSAPI</build_options>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
-		<depends_on_package>zabbix2-proxy-2.0.8.tbz</depends_on_package>
-		<depends_on_package_pbi>zabbix2-proxy-2.0.8-amd64.pbi</depends_on_package_pbi>
+		<depends_on_package>zabbix22-proxy-2.2.1.tbz</depends_on_package>
+		<depends_on_package_pbi>zabbix22-proxy-2.2.1-amd64.pbi</depends_on_package_pbi>
 	</package>
 	<package>
 		<!-- This does not exist yet, this is here to trigger a PBI build -->
