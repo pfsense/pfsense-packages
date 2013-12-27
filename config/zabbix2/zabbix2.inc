@@ -48,7 +48,7 @@ function php_deinstall_zabbix2_agent(){
    conf_mount_rw();
    $pfs_version = substr(trim(file_get_contents("/etc/version")),0,3);
    if ($pfs_version > 2.0){
-      define('ZABBIX_AGENT_BASE', '/usr/pbi/zabbix2-agent-' . php_uname("m"));
+      define('ZABBIX_AGENT_BASE', '/usr/pbi/zabbix22-agent-' . php_uname("m"));
    } else {
       define('ZABBIX_AGENT_BASE', '/usr/local');
    }
@@ -75,7 +75,7 @@ function php_deinstall_zabbix2_proxy(){
    conf_mount_rw();
    $pfs_version = substr(trim(file_get_contents("/etc/version")),0,3);
    if ($pfs_version > 2.0){
-      define('ZABBIX_PROXY_BASE', '/usr/pbi/zabbix2-proxy-' . php_uname("m"));
+      define('ZABBIX_PROXY_BASE', '/usr/pbi/zabbix22-proxy-' . php_uname("m"));
    } else {
       define('ZABBIX_PROXY_BASE', '/usr/local');
    }
@@ -180,8 +180,8 @@ function sync_package_zabbix2(){
 	#check pfsense version
 	$pfs_version = substr(trim(file_get_contents("/etc/version")),0,3);
 	if ($pfs_version > 2.0){
-		define('ZABBIX_AGENT_BASE', '/usr/pbi/zabbix2-agent-' . php_uname("m"));
-		define('ZABBIX_PROXY_BASE', '/usr/pbi/zabbix2-proxy-' . php_uname("m"));
+		define('ZABBIX_AGENT_BASE', '/usr/pbi/zabbix22-agent-' . php_uname("m"));
+		define('ZABBIX_PROXY_BASE', '/usr/pbi/zabbix22-proxy-' . php_uname("m"));
 		}
 	else {
 		define('ZABBIX_AGENT_BASE', '/usr/local');
