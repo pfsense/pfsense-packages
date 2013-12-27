@@ -55,7 +55,7 @@ function php_deinstall_zabbix2_agent(){
 
    exec("/usr/bin/killall zabbix_agentd");
    unlink_if_exists(ZABBIX_AGENT_BASE . "/etc/rc.d/zabbix2_agentd.sh");
-   unlink_if_exists(ZABBIX_AGENT_BASE . "/etc/zabbix2/zabbix_agentd.conf");
+   unlink_if_exists(ZABBIX_AGENT_BASE . "/etc/zabbix22/zabbix_agentd.conf");
    unlink_if_exists("/var/log/zabbix2/zabbix2_agentd.log");
    unlink_if_exists("/var/run/zabbix2/zabbix2_agentd.pid");
 
@@ -82,7 +82,7 @@ function php_deinstall_zabbix2_proxy(){
 
    exec("/usr/bin/killall zabbix_proxy");
    unlink_if_exists(ZABBIX_PROXY_BASE . "/etc/rc.d/zabbix2_proxy.sh");
-   unlink_if_exists(ZABBIX_PROXY_BASE . "/etc/zabbix2/zabbix_proxy.conf");
+   unlink_if_exists(ZABBIX_PROXY_BASE . "/etc/zabbix22/zabbix_proxy.conf");
    unlink_if_exists("/var/log/zabbix2/zabbix_proxy.log");
    unlink_if_exists("/var/run/zabbix2/zabbix2_proxy.pid");
 
@@ -208,7 +208,7 @@ Fping6Location=/usr/local/sbin/fping6
 ProxyMode={$Mode}
 
 EOF;
-			file_put_contents(ZABBIX_PROXY_BASE . "/etc/zabbix2/zabbix_proxy.conf", strtr($zbproxy_conf_file, array("\r" => "")));
+			file_put_contents(ZABBIX_PROXY_BASE . "/etc/zabbix22/zabbix_proxy.conf", strtr($zbproxy_conf_file, array("\r" => "")));
 		}
 	}
 	/* check zabbix agent settings*/
@@ -242,7 +242,7 @@ StartAgents={$StartAgents}
 {$UserParams}
 
 EOF;
-		file_put_contents(ZABBIX_AGENT_BASE . "/etc/zabbix2/zabbix_agentd.conf",  strtr($zbagent_conf_file, array("\r" => "")));
+		file_put_contents(ZABBIX_AGENT_BASE . "/etc/zabbix22/zabbix_agentd.conf",  strtr($zbagent_conf_file, array("\r" => "")));
 		}
 	}
 	$want_sysctls = array(
@@ -291,8 +291,8 @@ EOF;
 
 	/*check startup script files*/
 	/* create a few directories and ensure the sample files are in place */
-	if (!is_dir(ZABBIX_PROXY_BASE . "/etc/zabbix2"))
-		exec("/bin/mkdir -p " . ZABBIX_PROXY_BASE . "/etc/zabbix2");
+	if (!is_dir(ZABBIX_PROXY_BASE . "/etc/zabbix22"))
+		exec("/bin/mkdir -p " . ZABBIX_PROXY_BASE . "/etc/zabbix22");
 
 	$dir_checks  = <<< EOF
 if [ ! -d /var/log/zabbix2 ]
