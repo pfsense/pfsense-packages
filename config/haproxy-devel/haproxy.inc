@@ -36,7 +36,6 @@ require_once("haproxy_utils.inc");
 require_once("haproxy_xmlrpcsyncclient.inc");
 
 $d_haproxyconfdirty_path = $g['varrun_path'] . "/haproxy.conf.dirty";
-$haproxy_confpath = "{$g['varetc_path']}/haproxy";
 
 $a_acltypes = array();
 $a_acltypes["host_starts_with"] = array('name' => 'Host starts with',
@@ -134,6 +133,12 @@ function haproxy_custom_php_install_command() {
 	global $g, $config;
 	conf_mount_rw();
 
+	$freebsd_version = substr(trim(`uname -r`), 0, 1);
+	if(!file_exists("/usr/bin/limits")) {
+		exec("fetch -q -o /usr/bin/limits http://files.pfsense.org/extras/{$freebsd_version}/limits");
+		exec("chmod a+rx /usr/bin/limits");
+	}
+	
 	$haproxy = <<<EOD
 #!/bin/sh
 
@@ -313,7 +318,7 @@ EOD;
 		write_config("haproxy, update xml config version");
 	
 	conf_mount_ro();
-
+	
 	exec("/usr/local/etc/rc.d/haproxy.sh start");
 }
 
@@ -530,17 +535,18 @@ function write_backend($fd, $name, $pool, $frontend) {
 }
 
 function haproxy_configure() {
-	global $g, $haproxy_confpath;
+	global $g;
 	// reload haproxy
-	haproxy_writeconf("{$haproxy_confpath}/haproxy.cfg");
+	haproxy_writeconf("{$g['varetc_path']}/haproxy");
 	return haproxy_check_run(1);
 }
 
 function haproxy_check_and_run(&$messages, $reload) {
-	global $g, $haproxy_confpath;
-	$configname = "{$haproxy_confpath}/haproxy.cfg";
-	haproxy_writeconf("$configname.new");
-	$retval = exec("haproxy -c -V -f $configname.new 2>&1", $output, $err);
+	global $g;
+	$configpath = "{$g['varetc_path']}/haproxy";
+	$testpath = "{$g['varetc_path']}/haproxy_test";
+	haproxy_writeconf($testpath);
+	$retval = exec("haproxy -c -V -f $testpath/haproxy.cfg 2>&1", $output, $err);
 	$messages = "";
 	if ($err > 1)
 		$messages = "<h2><strong>FATAL ERROR CODE: $err while starting haproxy</strong></h2>";
@@ -555,7 +561,8 @@ function haproxy_check_and_run(&$messages, $reload) {
 	$ok = strstr($retval, "Configuration file is valid");
 	if ($ok && $reload) {
 		global $haproxy_run_message;
-		exec("mv $configname.new $configname");
+		haproxy_writeconf($configpath);
+		rmdir_recursive($testpath);
 		$ok = haproxy_check_run(1) == 0;
 		$messages = $haproxy_run_message;
 	}
@@ -577,12 +584,14 @@ function haproxy_write_certificate_file($filename, $certid) {
 	unset($cert);
 }
 
-function haproxy_writeconf($configfile) {
-	global $config, $haproxy_confpath;
+function haproxy_writeconf($configpath) {
+	global $config;
 
-	rmdir_recursive($haproxy_confpath);
-	make_dirs($haproxy_confpath);
+	$configfile = $configpath . "/haproxy.cfg";
 
+	rmdir_recursive($configpath);
+	make_dirs($configpath);
+	
 	$a_global = &$config['installedpackages']['haproxy'];
 	$a_frontends = &$config['installedpackages']['haproxy']['ha_backends']['item'];
 	$a_backends = &$config['installedpackages']['haproxy']['ha_pools']['item'];
@@ -640,10 +649,10 @@ function haproxy_writeconf($configfile) {
 			//check ssl info
 			if (strtolower($frontend['type']) == "http" && $frontend['ssloffload']){
 				//ssl crt ./server.pem ca-file ./ca.crt verify optional crt-ignore-err all crl-file ./ca_crl.pem
-				$filename = "$haproxy_confpath/{$frontend['name']}.{$frontend['port']}.pem";
+				$filename = "$configpath/{$frontend['name']}.{$frontend['port']}.pem";
 				$ssl_crt = " crt $filename";
 				haproxy_write_certificate_file($filename, $frontend['ssloffloadcert']);
-				$subfolder = "$haproxy_confpath/{$frontend['name']}.{$frontend['port']}";
+				$subfolder = "$configpath/{$frontend['name']}.{$frontend['port']}";
 				$certs = $frontend['ha_certificates']['item'];
 				if (is_array($certs)){
 					if (count($certs) > 0){
@@ -890,12 +899,6 @@ function haproxy_writeconf($configfile) {
 		haproxy_install_cron(true);
 	else
 		haproxy_install_cron(false);
-
-	$freebsd_version = substr(trim(`uname -r`), 0, 1);
-	if(!file_exists("/usr/bin/limits")) {
-		exec("fetch -q -o /usr/bin/limits http://files.pfsense.org/extras/{$freebsd_version}/limits");
-		exec("chmod a+rx /usr/bin/limits");
-	}
 }
 
 function haproxy_is_running() {
@@ -986,9 +989,10 @@ function load_ipfw_rules() {
 }
 
 function haproxy_check_run($reload) {
-	global $config, $g, $haproxy_confpath, $haproxy_run_message;
+	global $config, $g, $haproxy_run_message;
 
 	$a_global = &$config['installedpackages']['haproxy'];
+	$configpath = "{$g['varetc_path']}/haproxy";
 
 	exec("/usr/bin/limits -n 300014");
 
@@ -1020,9 +1024,9 @@ function haproxy_check_run($reload) {
 				$sf_st = "-st";//terminate old process as soon as the new process is listening
 			else
 				$sf_st = "-sf";//finish serving existing connections exit when done, and the new process is listening
-			exec("/usr/local/sbin/haproxy -f {$haproxy_confpath}/haproxy.cfg -p /var/run/haproxy.pid $sf_st `cat /var/run/haproxy.pid` 2>&1", $output, $errcode);
+			exec("/usr/local/sbin/haproxy -f {$configpath}/haproxy.cfg -p /var/run/haproxy.pid $sf_st `cat /var/run/haproxy.pid` 2>&1", $output, $errcode);
 		} else {
-			exec("/usr/local/sbin/haproxy -f {$haproxy_confpath}/haproxy.cfg -p /var/run/haproxy.pid -D 2>&1", $output, $errcode);
+			exec("/usr/local/sbin/haproxy -f {$configpath}/haproxy.cfg -p /var/run/haproxy.pid -D 2>&1", $output, $errcode);
 		}
 		foreach($output as $line)
 			$haproxy_run_message .= "<br/>" . htmlspecialchars($line) . "\n";
