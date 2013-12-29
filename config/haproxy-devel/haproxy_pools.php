@@ -3,6 +3,7 @@
 /*
 	haproxy_pools.php
 	part of pfSense (http://www.pfsense.com/)
+	Copyright (C) 2013 PiBa-NL
 	Copyright (C) 2009 Scott Ullrich <sullrich@pfsense.com>
 	Copyright (C) 2008 Remco Hoef <remcoverhoef@pfsense.com>
 	All rights reserved.
@@ -79,8 +80,8 @@ include("head.inc");
 <form action="haproxy_pools.php" method="post">
 <?php if ($input_errors) print_input_errors($input_errors); ?>
 <?php if ($savemsg) print_info_box($savemsg); ?>
-<?php if (file_exists($d_haproxyconfdirty_path)): ?><p>
-<?php print_info_box_np("The haproxy configuration has been changed.<br>You must apply the changes in order for them to take effect.");?><br>
+<?php if (file_exists($d_haproxyconfdirty_path)): ?>
+<?php print_info_box_np("The haproxy configuration has been changed.<br/>You must apply the changes in order for them to take effect.");?><br/>
 <?php endif; ?>
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
   <tr><td class="tabnavtbl">
@@ -128,13 +129,13 @@ include("head.inc");
 			  <td class="listlr" ondblclick="document.location='haproxy_pool_edit.php?id=<?=$i;?>';">
 			  <?
 				if ($pool['stats_enabled']=='yes'){
-					echo "<img src=\"./themes/{$g['theme']}/images/icons/icon_log_s.gif\"" . ' title="stats enabled" width="11" height="15" border="0">';
+					echo "<img src=\"./themes/{$g['theme']}/images/icons/icon_log_s.gif\"" . ' title="stats enabled" width="11" height="15" border="0" />';
 				}
 				$isadvset = "";
 				if ($pool['advanced']) $isadvset .= "Per server pass thru\r\n";
 				if ($pool['advanced_backend']) $isadvset .= "Backend pass thru\r\n";
 				if ($isadvset)
-					echo "<img src=\"$img_adv\" title=\"" . gettext("advanced settings set") . ": {$isadvset}\" border=\"0\">";				
+					echo "<img src=\"$img_adv\" title=\"" . gettext("advanced settings set") . ": {$isadvset}\" border=\"0\" />";
 			  ?>
 			  </td>
 			  <td class="listlr" ondblclick="document.location='haproxy_pool_edit.php?id=<?=$i;?>';">
@@ -152,9 +153,9 @@ include("head.inc");
 			  <td class="list" nowrap>
 				<table border="0" cellspacing="0" cellpadding="1">
 				  <tr>
-					<td valign="middle"><a href="haproxy_pool_edit.php?id=<?=$i;?>"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_e.gif" title="<?=gettext("edit backend");?>" width="17" height="17" border="0"></a></td>
-					<td valign="middle"><a href="haproxy_pools.php?act=del&id=<?=$i;?>" onclick="return confirm('Do you really want to delete this entry?')"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_x.gif" title="<?=gettext("delete backend");?>" width="17" height="17" border="0"></a></td>
-					<td valign="middle"><a href="haproxy_pool_edit.php?dup=<?=$i;?>"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif" title="<?=gettext("clone backend");?>" width="17" height="17" border="0"></a></td>
+					<td valign="middle"><a href="haproxy_pool_edit.php?id=<?=$i;?>"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_e.gif" title="<?=gettext("edit backend");?>" width="17" height="17" border="0" /></a></td>
+					<td valign="middle"><a href="haproxy_pools.php?act=del&amp;id=<?=$i;?>" onclick="return confirm('Do you really want to delete this entry?')"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_x.gif" title="<?=gettext("delete backend");?>" width="17" height="17" border="0" /></a></td>
+					<td valign="middle"><a href="haproxy_pool_edit.php?dup=<?=$i;?>"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif" title="<?=gettext("clone backend");?>" width="17" height="17" border="0" /></a></td>
 				  </tr>
 				</table>
 			  </td>
@@ -169,7 +170,7 @@ include("head.inc");
 			  <td class="list">
 				<table border="0" cellspacing="0" cellpadding="1">
 				  <tr>
-					<td valign="middle"><a href="haproxy_pool_edit.php"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif" title="<?=gettext("add new backend");?>" width="17" height="17" border="0"></a></td>
+					<td valign="middle"><a href="haproxy_pool_edit.php"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif" title="<?=gettext("add new backend");?>" width="17" height="17" border="0" /></a></td>
 				  </tr>
 				</table>
 			  </td>

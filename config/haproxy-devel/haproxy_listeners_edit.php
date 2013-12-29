@@ -33,6 +33,7 @@ $shortcut_section = "haproxy";
 require("guiconfig.inc");
 require_once("haproxy.inc");
 require_once("haproxy_utils.inc");
+require_once("haproxy_htmllist.inc");
 
 /* Compatibility function for pfSense 2.0 */
 if (!function_exists("cert_get_purpose")) {	
@@ -44,76 +45,13 @@ if (!function_exists("cert_get_purpose")) {
 }
 /**/
 
-function get_certificat_usage($refid) {
-	$usage = array();
-	$cert = lookup_cert($refid);
-	if (is_cert_revoked($cert))
-		$usage[] = "Revoked";
-	if (is_webgui_cert($refid))
-		$usage[] = "webConfigurator";
-	if (is_user_cert($refid))
-		$usage[] = "User Cert";
-	if (is_openvpn_server_cert($refid))
-		$usage[] = "OpenVPN Server";
-	if (is_openvpn_client_cert($refid))
-		$usage[] = "OpenVPN Client";
-	if (is_ipsec_cert($cert['refid']))
-		$usage[] = "IPsec Tunnel";
-	if (function_exists("is_captiveportal_cert"))
-		if (is_captiveportal_cert($refid))
-			$usage[] = "Captive Portal";
-	
-	return $usage;
-}
-
-// This function (is intended to) provides a uniform way to retrieve a list of server certificates
-function get_certificates_server($get_includeWebCert=false) {
-	global $config;
-	$certificates=array();
-	$a_cert = &$config['cert'];
-	foreach ($a_cert as $cert)
-	{
-		if ($get_ca == false && is_webgui_cert($cert['refid']))
-			continue;
-
-		$purpose = cert_get_purpose($cert['crt']);
-		//$certserverpurpose = $purpose['server'] == 'Yes' ? " [Server certificate]" : "";
-		$certserverpurpose = "";
-
-		$selected = "";
-		$caname = "";
-		$inuse = "";
-		$revoked = "";
-		$ca = lookup_ca($cert['caref']);
-		if ($ca)
-			$caname = " (CA: {$ca['descr']})";
-		if ($pconfig['certref'] == $cert['refid'])
-			$selected = "selected";
-		if (cert_in_use($cert['refid']))
-			$inuse = " *In Use";
-		if (is_cert_revoked($cert))
-		$revoked = " *Revoked";
-		
-		$usagestr="";
-		$usage = get_certificat_usage($cert['refid']);
-		foreach($usage as $use){
-			$usagestr .= " " . $use;
-		}		
-		if ($usagestr != "")
-			$usagestr = " (".trim($usagestr).")";
-		
-		$certificates[$cert['refid']]['name'] = $cert['descr'] . $caname . $certserverpurpose . $inuse . $revoked . $usagestr;
-	}
-	return $certificates;
-}
-
-function haproxy_acl_select($mode) {
+function haproxy_js_acl_select($mode) {
 	global $a_acltypes;
 
 	$seltext = '';
-	foreach ($a_acltypes as $expr) {
+	foreach ($a_acltypes as $key => $expr) {
 		if ($expr['mode'] == '' || $expr['mode'] == $mode)
-			$seltext .= "<option value='" . $expr['name'] . "'>" . $expr['descr'] .":</option>";
+			$seltext .= "<option value='" . $key . "'>" . $expr['name'] .":<\/option>";
 	}
 	return $seltext;
 }
@@ -129,7 +67,7 @@ $a_pools = &$config['installedpackages']['haproxy']['ha_pools']['item'];
 
 global $simplefields;
 $simplefields = array('name','desc','status','secondary','primary_frontend','type','forwardfor','httpclose','extaddr','backend_serverpool',
-	'max_connections','client_timeout','port','ssloffloadcert','dcertadv','ssloffload','ssloffloadacl','advanced_bind');
+	'max_connections','client_timeout','port','ssloffloadcert','dcertadv','ssloffload','ssloffloadacl','advanced_bind','ssloffloadacladditional');
 
 if (isset($_POST['id']))
 	$id = $_POST['id'];
@@ -141,10 +79,41 @@ if (isset($_GET['dup']))
 
 $id = get_frontend_id($id);
 
+$servercerts = get_certificates_server();
+
+$fields_sslCertificates=array();
+$fields_sslCertificates[0]['name']="ssl_certificate";
+$fields_sslCertificates[0]['columnheader']="Certificates";
+$fields_sslCertificates[0]['colwidth']="95%";
+$fields_sslCertificates[0]['type']="select";
+$fields_sslCertificates[0]['size']="500px";
+$fields_sslCertificates[0]['items']=&$servercerts;
+
+$fields_aclSelectionList=array();
+$fields_aclSelectionList[0]['name']="name";
+$fields_aclSelectionList[0]['columnheader']="Name";
+$fields_aclSelectionList[0]['colwidth']="30%";
+$fields_aclSelectionList[0]['type']="textbox";
+$fields_aclSelectionList[0]['size']="20";
+
+$fields_aclSelectionList[1]['name']="expression";
+$fields_aclSelectionList[1]['columnheader']="Expression";
+$fields_aclSelectionList[1]['colwidth']="30%";
+$fields_aclSelectionList[1]['type']="select";
+$fields_aclSelectionList[1]['size']="10";
+$fields_aclSelectionList[1]['items']=&$a_acltypes;
+
+$fields_aclSelectionList[2]['name']="value";
+$fields_aclSelectionList[2]['columnheader']="Value";
+$fields_aclSelectionList[2]['colwidth']="35%";
+$fields_aclSelectionList[2]['type']="textbox";
+$fields_aclSelectionList[2]['size']="35";
+
+
 if (isset($id) && $a_backend[$id]) {
 	$pconfig['a_acl']=&$a_backend[$id]['ha_acls']['item'];	
+	$pconfig['a_certificates']=&$a_backend[$id]['ha_certificates']['item'];
 	$pconfig['advanced'] = base64_decode($a_backend[$id]['advanced']);
-	
 	foreach($simplefields as $stat)
 		$pconfig[$stat] = $a_backend[$id][$stat];
 }
@@ -163,8 +132,8 @@ if ($_POST) {
 	
 	
 	if ($pconfig['secondary'] != "yes") {
-		$reqdfields = explode(" ", "name type port max_connections");
-		$reqdfieldsn = explode(",", "Name,Type,Port,Max connections");
+		$reqdfields = explode(" ", "name type port");
+		$reqdfieldsn = explode(",", "Name,Type,Port");
 	} else {
 		$reqdfields = explode(" ", "name");
 		$reqdfieldsn = explode(",", "Name");
@@ -176,7 +145,7 @@ if ($_POST) {
 		$input_errors[] = "The field 'Name' contains invalid characters.";
 
 	if ($pconfig['secondary'] != "yes") {
-		if (!is_numeric($_POST['max_connections']))
+		if ($_POST['max_connections'] && !is_numeric($_POST['max_connections']))
 			$input_errors[] = "The field 'Max connections' value is not a number.";
 
 		$ports = split(",", $_POST['port'] . ",");
@@ -193,35 +162,25 @@ if ($_POST) {
 		if (($_POST['name'] == $config['installedpackages']['haproxy']['ha_backends']['item'][$i]['name']) && ($i != $id))
 			$input_errors[] = "This frontend name has already been used. Frontend names must be unique. $i != $id";
 
-	$a_acl=array();			
-	$acl_names=array(); 
-	for($x=0; $x<99; $x++) {
-		$acl_name=$_POST['acl_name'.$x];
-		$acl_expression=$_POST['acl_expression'.$x];
-		$acl_value=$_POST['acl_value'.$x];
+	$a_certificates = haproxy_htmllist_get_values($fields_sslCertificates);
+	$pconfig['a_certificates'] = $a_certificates;
+	
+	$a_acl = haproxy_htmllist_get_values($fields_aclSelectionList);
+	$pconfig['a_acl'] = $a_acl;
+	
+	foreach($a_acl as $acl) {
+		$acl_name = $acl['name'];
+		$acl_value = $acl['value'];
+		
+		if (preg_match("/[^a-zA-Z0-9\.\-_]/", $acl_name))
+			$input_errors[] = "The field 'Name' contains invalid characters.";
 
-		if ($acl_name) {
-			$acl_names[]=$acl_name;
+		if (!preg_match("/.{1,}/", $acl_value))
+			$input_errors[] = "The field 'Value' is required.";
 
-			$acl=array();
-			$acl['name']=$acl_name;
-			$acl['expression']=$acl_expression;
-			$acl['value']=$acl_value;
-			$a_acl[]=$acl;
-
-			if (preg_match("/[^a-zA-Z0-9\.\-_]/", $acl_name))
-				$input_errors[] = "The field 'Name' contains invalid characters.";
-
-			if (!preg_match("/.{1,}/", $acl_value))
-				$input_errors[] = "The field 'Value' is required.";
-
-			if (!preg_match("/.{2,}/", $acl_name))
-				$input_errors[] = "The field 'Name' is required.";
-
-			}
+		if (!preg_match("/.{2,}/", $acl_name))
+			$input_errors[] = "The field 'Name' is required with at least 2 characters.";
 	}
-
-	$pconfig['a_acl']=$a_acl;
 
 	if (!$input_errors) {
 		$backend = array();
@@ -242,10 +201,10 @@ if ($_POST) {
 		
 		foreach($simplefields as $stat)
 			update_if_changed($stat, $backend[$stat], $_POST[$stat]);
-
 		
 		update_if_changed("advanced", $backend['advanced'], base64_encode($_POST['advanced']));
 		$backend['ha_acls']['item'] = $a_acl;
+		$backend['ha_certificates']['item'] = $a_certificates;
 
 		if (isset($id) && $a_backend[$id]) {
 			$a_backend[$id] = $backend;
@@ -273,170 +232,55 @@ if (!$id)
 	$pconfig['ssloffloadacl'] = "yes";
 }
 
+$closehead = false;
 $pgtitle = "HAProxy: Frontend: Edit";
 include("head.inc");
 
 $primaryfrontends = get_haproxy_frontends($pconfig['name']);
 $interfaces = haproxy_get_bindable_interfaces();
-?>
 
-<body link="#0000CC" vlink="#0000CC" alink="#0000CC">
+?>
   <style type="text/css">
 	.haproxy_mode_http{display:none;}
 	.haproxy_ssloffloading_enabled{display:none;}
 	.haproxy_primary{}
 	.haproxy_secondary{display:none;}
   </style>
+</head>
+<body link="#0000CC" vlink="#0000CC" alink="#0000CC">
 
 <?php if($one_two): ?>
 <script type="text/javascript" src="/javascript/scriptaculous/prototype.js"></script>
 <script type="text/javascript" src="/javascript/scriptaculous/scriptaculous.js"></script>
 <?php endif; ?>
+
+
 <script type="text/javascript">
-	// Global Variables
-	var rowname = new Array(99);
-	var rowtype = new Array(99);
-	var newrow  = new Array(99);
-	var rowsize = new Array(99);
-
-	for (i = 0; i < 99; i++) {
-	        rowname[i] = '';
-	        rowtype[i] = '';
-	        newrow[i] = '';
-	        rowsize[i] = '25';
-	}
-
-	var field_counter_js = 0;
-	var loaded = 0;
-	var is_streaming_progress_bar = 0;
-	var temp_streaming_text = "";
-
-	var addRowTo = (function() {
-	    return (function (tableId) {
-	        var d, tbody, tr, td, bgc, i, ii, j, type, seltext;
-		var btable, btbody, btr, btd;
-
-	        d = document;
-		type = d.getElementById("type").value;
-		if (type == 'health')
-			seltext = "<?php echo haproxy_acl_select('health');?>";
-		else if (type == 'tcp')
-			seltext = "<?php echo haproxy_acl_select('tcp');?>";
-		else if (type == 'https')
-			seltext = "<?php echo haproxy_acl_select('https');?>";
-		else
-			seltext = "<?php echo haproxy_acl_select('http');?>";
-		if (seltext == '') {
-			alert("No ACL types available in current frontend type");
-			return;
+	function htmllist_get_select_options(tableId) {
+		var seltext;
+		seltext = "";
+		var type = d.getElementById("type").value;
+		if (tableId == 'tableA_acltable'){	
+			if (type == 'health')
+				seltext = "<?php echo haproxy_js_acl_select('health');?>";
+			else if (type == 'tcp')
+				seltext = "<?php echo haproxy_js_acl_select('tcp');?>";
+			else if (type == 'https')
+				seltext = "<?php echo haproxy_js_acl_select('https');?>";
+			else
+				seltext = "<?php echo haproxy_js_acl_select('http');?>";
+			if (seltext == '') {
+				alert("No ACL types available in current frontend type");
+				return;
+			}
 		}
-
-	        tbody = d.getElementById(tableId).getElementsByTagName("tbody").item(0);
-	        tr = d.createElement("tr");
-	        totalrows++;
-		tr.setAttribute("id","aclrow" + totalrows);
-	        for (i = 0; i < field_counter_js; i++) {
-	                td = d.createElement("td");
-	                if(rowtype[i] == 'textbox') {
-				td.innerHTML="<INPUT type='hidden' value='" + totalrows +"' name='" + rowname[i] + "_row-" + totalrows +
-					"'></input><input size='" + rowsize[i] + "' name='" + rowname[i] + totalrows +
-					"' id='" + rowname[i] + totalrows +
-				       	"'></input> ";
-	                } else if(rowtype[i] == 'select') {
-				td.innerHTML="<INPUT type='hidden' value='" + totalrows +"' name='" + rowname[i] + "_row-" + totalrows +
-					"'></input><select name='" + rowname[i] + totalrows + 
-					"' id='" + rowname[i] + totalrows +
-					"'>" + seltext + "</select> ";
-	                } else {
-				td.innerHTML="<INPUT type='hidden' value='" + totalrows +"' name='" + rowname[i] + "_row-" + totalrows +
-					"'></input><input type='checkbox' name='" + rowname[i] + totalrows +
-				        "' id='" + rowname[i] + totalrows + "'></input> ";
-	                }
-	                tr.appendChild(td);
-	        }
-		td = d.createElement("td");
-		td.rowSpan = "1";
-		td.setAttribute("class","list");
-
-		// Recreate the button table.
-		btable = document.createElement("table");
-		btable.setAttribute("border", "0");
-		btable.setAttribute("cellspacing", "0");
-		btable.setAttribute("cellpadding", "1");
-		btbody = document.createElement("tbody");
-		btr = document.createElement("tr");
-		btd = document.createElement("td");
-		btd.setAttribute("valign", "middle");
-		btd.innerHTML = '<img src="/themes/' + theme + '/images/icons/icon_x.gif" title="delete entry" width="17" height="17" border="0" onclick="removeRow(this); return false;">';
-		btr.appendChild(btd);
-		btd = document.createElement("td");
-		btd.setAttribute("valign", "middle");
-		btd.innerHTML = '<img src="/themes/' + theme + "/images/icons/icon_plus.gif\" title=\"duplicate entry\" width=\"17\" height=\"17\" border=\"0\" onclick=\"dupRow(" + totalrows + ", 'acltable'); return false;\">";
-		btr.appendChild(btd);
-		btbody.appendChild(btr);
-		btable.appendChild(btbody);
-
-		td.appendChild(btable);
-	        tr.appendChild(td);
-	        tbody.appendChild(tr);
-	    });
-	})();
-
-	function dupRow(rowId, tableId) {
-		var dupEl;
-		var newEl;
-
-		addRowTo(tableId);
-		for (i = 0; i < field_counter_js; i++) {
-			dupEl = document.getElementById(rowname[i] + rowId);
-			newEl = document.getElementById(rowname[i] + totalrows);
-			if (dupEl && newEl)
-				newEl.value = dupEl.value;
+		if (tableId == 'tableA_sslCertificates'){
+			seltext = "<?=haproxy_js_select_options($servercerts);?>";
 		}
+		return seltext;
 	}
 
-	function removeRow(el) {
-	    var cel;
-	    // Break out of one table first
-	    while (el && el.nodeName.toLowerCase() != "table")
-		    el = el.parentNode;
-	    while (el && el.nodeName.toLowerCase() != "tr")
-	            el = el.parentNode;
-
-	    if (el && el.parentNode) {
-	        cel = el.getElementsByTagName("td").item(0);
-	        el.parentNode.removeChild(el);
-	    }
-	}
-
-	function find_unique_field_name(field_name) {
-	        // loop through field_name and strip off -NUMBER
-	        var last_found_dash = 0;
-	        for (var i = 0; i < field_name.length; i++) {
-	                // is this a dash, if so, update
-	                //    last_found_dash
-	                if (field_name.substr(i,1) == "-" )
-	                        last_found_dash = i;
-	        }
-	        if (last_found_dash < 1)
-	                return field_name;
-	        return(field_name.substr(0,last_found_dash));
-	}
-
-	rowname[0] = "acl_name";
-	rowtype[0] = "textbox";
-	rowsize[0] = "20";
-
-	rowname[1] = "acl_expression";
-	rowtype[1] = "select";
-	rowsize[1] = "10";
-
-	rowname[2] = "acl_value";
-	rowtype[2] = "textbox";
-	rowsize[2] = "35";
-
-	function setCSSdisplay(cssID, display)
-	{
+	function setCSSdisplay(cssID, display) {
 		var ss = document.styleSheets;
 		for (var i=0; i<ss.length; i++) {
 			var rules = ss[i].cssRules || ss[i].rules;
@@ -448,8 +292,7 @@ $interfaces = haproxy_get_bindable_interfaces();
 		}
 	}
 	
-	function updatevisibility()
-	{
+	function updatevisibility()	{
 		d = document;
 		ssloffload = d.getElementById("ssloffload");
 		type = d.getElementById("type");
@@ -478,8 +321,8 @@ $interfaces = haproxy_get_bindable_interfaces();
 	function type_change(type) {
 		var d, i, j, el, row;
 		var count = <?=count($a_acltypes);?>;
-		var acl = [ <?php foreach ($a_acltypes as $expr) echo "'".$expr['name']."'," ?> ];
-		var mode = [ <?php foreach ($a_acltypes as $expr) echo "'".$expr['mode']."'," ?> ];
+		var acl = [ <?php foreach ($a_acltypes as $key => $expr) echo "'".$key."'," ?> ];
+		var mode = [ <?php foreach ($a_acltypes as $key => $expr) echo "'".$expr['mode']."'," ?> ];
 
         d = document;
 		for (i = 0; i < 99; i++) {
@@ -497,6 +340,26 @@ $interfaces = haproxy_get_bindable_interfaces();
 				}
 			}
 		}
+		
+		for (i = 0; i < 99; i++) {
+			el = d.getElementById("expression" + i);
+			//row_v = d.getElementById("tr_view_" + i);
+			row_e = d.getElementById("tr_edit_" + i);
+			if (!el)
+				continue;
+			for (j = 0; j < count; j++) {
+				if (acl[j] == el.value) {
+					if (mode[j] != '' && mode[j] != type) {
+						//Effect.Fade(row_v,{ duration: 1.0 });
+						Effect.Fade(row_e,{ duration: 1.0 });
+					} else {
+						//Effect.Appear(row_v,{ duration: 1.0 });
+						Effect.Appear(row_e,{ duration: 1.0 });
+					}
+				}
+			}
+		}
+		
 	}
 </script>
 <?php include("fbegin.inc"); ?>
@@ -526,13 +389,13 @@ $interfaces = haproxy_get_bindable_interfaces();
 		<tr>
 			<td width="22%" valign="top" class="vncellreq">Name</td>
 			<td width="78%" class="vtable" colspan="2">
-				<input name="name" type="text" <?if(isset($pconfig['name'])) echo "value=\"{$pconfig['name']}\"";?> size="25" maxlength="25">
+				<input name="name" type="text" <?if(isset($pconfig['name'])) echo "value=\"{$pconfig['name']}\"";?> size="25" maxlength="25" />
 			</td>
 		</tr>
 		<tr align="left">
 			<td width="22%" valign="top" class="vncell">Description</td>
 			<td width="78%" class="vtable" colspan="2">
-				<input name="desc" type="text" <?if(isset($pconfig['desc'])) echo "value=\"{$pconfig['desc']}\"";?> size="64">
+				<input name="desc" type="text" <?if(isset($pconfig['desc'])) echo "value=\"{$pconfig['desc']}\"";?> size="64" />
 			</td>
 		</tr>
 		<tr align="left">
@@ -550,7 +413,7 @@ $interfaces = haproxy_get_bindable_interfaces();
 				<?if (count($primaryfrontends)==0){ ?>
 				<b>At least 1 primary frontend is needed.</b><br/><br/>
 				<? } else{ ?>
-				<input id="secondary" name="secondary" type="checkbox" value="yes" <?php if ($pconfig['secondary']=='yes') echo "checked"; ?> onclick="updatevisibility();"/>
+				<input id="secondary" name="secondary" type="checkbox" value="yes" <?php if ($pconfig['secondary']=='yes') echo "checked"; ?> onclick="updatevisibility();" />
 				<? } ?>
 				This can be used to host a second or more website on the same IP:Port combination.<br/>
 				Use this setting to configure multiple backends/accesslists for a single frontend.<br/>
@@ -583,14 +446,14 @@ $interfaces = haproxy_get_bindable_interfaces();
 		<tr class="haproxy_primary" align="left">
 			<td width="22%" valign="top" class="vncellreq">External port</td>
 			<td width="78%" class="vtable" colspan="2">
-				<input name="port" type="text" <?if(isset($pconfig['port'])) echo "value=\"{$pconfig['port']}\"";?> size="10" maxlength="500">
+				<input name="port" type="text" <?if(isset($pconfig['port'])) echo "value=\"{$pconfig['port']}\"";?> size="10" maxlength="500" />
 				<div>The port to listen to.  To specify multiple ports, separate with a comma (,). EXAMPLE: 80,443</div>
 			</td>
 		</tr>
 		<tr class="haproxy_primary" align="left">
-			<td width="22%" valign="top" class="vncellreq">Max connections</td>
+			<td width="22%" valign="top" class="vncell">Max connections</td>
 			<td width="78%" class="vtable" colspan="2">
-				<input name="max_connections" type="text" <?if(isset($pconfig['max_connections'])) echo "value=\"{$pconfig['max_connections']}\"";?> size="10" maxlength="10">
+				<input name="max_connections" type="text" <?if(isset($pconfig['max_connections'])) echo "value=\"{$pconfig['max_connections']}\"";?> size="10" maxlength="10" />
 			</td>
 		</tr>	
 		<tr>
@@ -628,58 +491,14 @@ $interfaces = haproxy_get_bindable_interfaces();
 		<tr>
 			<td width="22%" valign="top" class="vncell">Access Control lists</td>
 			<td width="78%" class="vtable" colspan="2" valign="top">
-			<table class="" width="100%" cellpadding="0" cellspacing="0" id='acltable'>
-				<tr>
-				  <td width="35%" class="">Name</td>
-				  <td width="40%" class="">Expression</td>
-				  <td width="20%" class="">Value</td>
-				  <td width="5%" class=""></td>
-				</tr>
-				<?php 
-				$a_acl=$pconfig['a_acl'];
-
-				if (!is_array($a_acl)) {
-					$a_acl=array();
-				}
-
-				$counter=0;
-				foreach ($a_acl as $acl) {
-					$t = haproxy_find_acl($acl['expression']);
-					$display = '';
-					if (!$t || ($t['mode'] != '' && $t['mode'] != strtolower($pconfig['type'])))
-						$display = 'style="display: none;"';
-				?>
-				<tr id="aclrow<?=$counter;?>" <?=$display;?>>
-					<td><input name="acl_name<?=$counter;?>" id="acl_name<?=$counter;?>" type="text" value="<?=$acl['name']; ?>" size="20"/></td>
-					<td>
-					<select name="acl_expression<?=$counter;?>" id="acl_expression<?=$counter;?>">
-					<?php
-					foreach ($a_acltypes as $expr) { ?>
-						<option value="<?=$expr['name'];?>"<?php if($acl['expression'] == $expr['name']) echo " SELECTED"; ?>><?=$expr['descr'];?>:</option>
-					<?php } ?>
-					</select>
-					</td>
-					<td><input name="acl_value<?=$counter;?>" id="acl_value<?=$counter;?>" type="text" value="<?=$acl['value']; ?>" size="35"/></td>
-					<td class="list">
-						 <table border="0" cellspacing="0" cellpadding="1"><tr>
-						 <td valign="middle">
-					  <img src="/themes/<?= $g['theme']; ?>/images/icons/icon_x.gif" title="delete entry" width="17" height="17" border="0" onclick="removeRow(this); return false;">
-						 </td>
-						 <td valign="middle">
-					 <img src="/themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif" title="duplicate entry" width="17" height="17" border="0" onclick="dupRow(<?=$counter;?>, 'acltable'); return false;">
-						 </td></tr></table>
-					</td>
-				</tr>
-				<?php
-				$counter++;
-				}
-				?>
-			</table>
-			<a onclick="javascript:addRowTo('acltable'); return false;" href="#">
-			<img border="0" src="/themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif" alt="" title="add another entry" />
-			</a><br/>
+			<?
+			$counter=0;
+			$a_acl = $pconfig['a_acl'];
+			haproxy_htmllist("tableA_acltable", $a_acl, $fields_aclSelectionList, true);
+			?>
+			<br/>
 			acl's with the same name wil be 'combined', acl's with different names will be evaluated seperately.<br/>
-			For more information about ACL's please see <a href='http://haproxy.1wt.eu/download/1.5/doc/configuration.txt' target='_new'>HAProxy Documentation</a> Section 7 - Using ACL's
+			For more information about ACL's please see <a href='http://haproxy.1wt.eu/download/1.5/doc/configuration.txt' target='_blank'>HAProxy Documentation</a> Section 7 - Using ACL's
 			</td>
 		</tr>
 	</table>
@@ -691,14 +510,14 @@ $interfaces = haproxy_get_bindable_interfaces();
 		<tr align="left">
 			<td width="22%" valign="top" class="vncell">Client timeout</td>
 			<td width="78%" class="vtable" colspan="2">
-				<input name="client_timeout" type="text" <?if(isset($pconfig['client_timeout'])) echo "value=\"{$pconfig['client_timeout']}\"";?> size="10" maxlength="10">
+				<input name="client_timeout" type="text" <?if(isset($pconfig['client_timeout'])) echo "value=\"{$pconfig['client_timeout']}\"";?> size="10" maxlength="10" />
 				<div>the time (in milliseconds) we accept to wait for data from the client, or for the client to accept data (default 30000).</div>
 			</td>
 		</tr>
 		<tr align="left" class="haproxy_mode_http">
 			<td width="22%" valign="top" class="vncell">Use 'forwardfor' option</td>
 			<td width="78%" class="vtable" colspan="2">
-				<input id="forwardfor" name="forwardfor" type="checkbox" value="yes" <?php if ($pconfig['forwardfor']=='yes') echo "checked"; ?>>
+				<input id="forwardfor" name="forwardfor" type="checkbox" value="yes" <?php if ($pconfig['forwardfor']=='yes') echo "checked"; ?> />
 				<br/>
 				The 'forwardfor' option creates an HTTP 'X-Forwarded-For' header which
 				contains the client's IP address. This is useful to let the final web server
@@ -721,7 +540,7 @@ $interfaces = haproxy_get_bindable_interfaces();
 		<tr align="left">
 			<td width="22%" valign="top" class="vncell">Bind pass thru</td>
 			<td width="78%" class="vtable" colspan="2">
-				<input name="advanced_bind" type="text" <?if(isset($pconfig['advanced_bind'])) echo "value=\"".htmlspecialchars($pconfig['advanced_bind'])."\"";?> size="64">
+				<input name="advanced_bind" type="text" <?if(isset($pconfig['advanced_bind'])) echo "value=\"".htmlspecialchars($pconfig['advanced_bind'])."\"";?> size="64" />
 				<br/>
 				NOTE: paste text into this box that you would like to pass behind the bind option.
 			</td>
@@ -745,11 +564,11 @@ $interfaces = haproxy_get_bindable_interfaces();
 		<tr align="left">
 			<td width="22%" valign="top" class="vncell">Use Offloading</td>
 			<td width="78%" class="vtable" colspan="2">
-				<input id="ssloffload" name="ssloffload" type="checkbox" value="yes" <?php if ($pconfig['ssloffload']=='yes') echo "checked";?> onclick="updatevisibility();"><strong>Use Offloading</strong></input>
+				<input id="ssloffload" name="ssloffload" type="checkbox" value="yes" <?php if ($pconfig['ssloffload']=='yes') echo "checked";?> onclick="updatevisibility();" /><strong>Use Offloading</strong>
 				<br/>
 				SSL Offloading will reduce web servers load by maintaining and encrypting connection with users on internet while sending and retrieving data without encrytion to internal servers.
 				Also more ACL rules and http logging may be configured when this option is used. 
-				Certificates can be imported into the <a href="/system_camanager.php" target="_new">pfSense "Certificate Authority Manager"</a>
+				Certificates can be imported into the <a href="/system_camanager.php" target="_blank">pfSense "Certificate Authority Manager"</a>
 				Please be aware this possibly will not work with all web applications. Some applications will require setting the SSL checkbox on the backend server configurations so the connection to the webserver will also be a encrypted connection, in that case there will be a slight overall performance loss.
 			</td>
 		</tr>
@@ -757,25 +576,32 @@ $interfaces = haproxy_get_bindable_interfaces();
 			<td width="22%" valign="top" class="vncell">Certificate</td>
 			<td width="78%" class="vtable" colspan="2">
 				<?  
-					$servercerts = get_certificates_server();
 					echo_html_select("ssloffloadcert", $servercerts, $pconfig['ssloffloadcert'], '<b>No Certificates defined.</b> <br/>Create one under <a href="system_certmanager.php">System &gt; Cert Manager</a>.');
 				?>
 				<br/>
 				NOTE: choose the cert to use on this frontend.
+				<br/>
+				<input id="ssloffloadacl" name="ssloffloadacl" type="checkbox" value="yes" <?php if ($pconfig['ssloffloadacl']=='yes') echo "checked";?> onclick="updatevisibility();" />Add ACL for certificate CommonName.
 			</td>
 		</tr>
-		<tr class="haproxy_ssloffloading_enabled" align="left">
-			<td width="22%" valign="top" class="vncell">ACL for certificate CN</td>
-			<td width="78%" class="vtable" colspan="2">
-				<input id="ssloffloadacl" name="ssloffloadacl" type="checkbox" value="yes" <?php if ($pconfig['ssloffloadacl']=='yes') echo "checked";?> onclick="updatevisibility();">Add ACL for certificate CommonName.</input>
+		<tr class="haproxy_ssloffloading_enabled">
+			<td width="22%" valign="top" class="vncell">Additional certificates</td>
+			<td width="78%" class="vtable" colspan="2" valign="top">
+			Which of these certificate will be send will be determined by haproxys SNI recognition. If the browser does not send SNI this will not work properly. (IE on XP is one example, possibly also older browsers or mobile devices)
+			<?
+			$a_certificates = $pconfig['a_certificates'];
+			haproxy_htmllist("tableA_sslCertificates", $a_certificates, $fields_sslCertificates);
+			?>
+				<br/>
+				<input id="ssloffloadacladditional" name="ssloffloadacladditional" type="checkbox" value="yes" <?php if ($pconfig['ssloffloadacladditional']=='yes') echo "checked";?> onclick="updatevisibility();" />Add ACL for certificate CommonName.
 			</td>
 		</tr>
 		<tr class="haproxy_ssloffloading_enabled haproxy_primary" align="left">
 			<td width="22%" valign="top" class="vncell">Advanced ssl options</td>
 			<td width="78%" class="vtable" colspan="2">
-				<input type='text' name='dcertadv' size="64" id='dcertadv' <?if(isset($pconfig['dcertadv'])) echo "value=\"{$pconfig['dcertadv']}\"";?> size="10" maxlength="64">
+				<input type='text' name='dcertadv' size="64" id='dcertadv' <?if(isset($pconfig['dcertadv'])) echo "value=\"{$pconfig['dcertadv']}\"";?> maxlength="64" />
 				<br/>
-				NOTE: Paste additional ssl options(without commas) to include on ssl listening options.<br>
+				NOTE: Paste additional ssl options(without commas) to include on ssl listening options.<br/>
 				some options: force-sslv3, force-tlsv10 force-tlsv11 force-tlsv12 no-sslv3 no-tlsv10 no-tlsv11 no-tlsv12 no-tls-tickets
 			</td>
 		</tr>
@@ -787,10 +613,10 @@ $interfaces = haproxy_get_bindable_interfaces();
 		<tr align="left">
 			<td width="22%" valign="top">&nbsp;</td>
 			<td width="78%">
-				<input name="Submit" type="submit" class="formbtn" value="Save">  
-				<input type="button" class="formbtn" value="Cancel" onclick="history.back()">
+				<input name="Submit" type="submit" class="formbtn" value="Save" />  
+				<input type="button" class="formbtn" value="Cancel" onclick="history.back()" />
 				<?php if (isset($id) && $a_backend[$id]): ?>
-				<input name="id" type="hidden" value="<?=$a_backend[$id]['name'];?>">
+				<input name="id" type="hidden" value="<?=$a_backend[$id]['name'];?>" />
 				<?php endif; ?>
 			</td>
 		</tr>
@@ -802,23 +628,21 @@ $interfaces = haproxy_get_bindable_interfaces();
 	</table>
 	</div></td></tr></table>
 	</form>
-<br>
+<br/>
 <script type="text/javascript">
 <?
 	phparray_to_javascriptarray($primaryfrontends,"primaryfrontends",Array('/*','/*/name','/*/ref','/*/ref/type','/*/ref/ssloffload'));
 	phparray_to_javascriptarray($a_closetypes,"closetypes",Array('/*','/*/name','/*/descr'));
-	
+	phparray_to_javascriptarray($fields_sslCertificates,"fields_sslCertificates",Array('/*','/*/name','/*/type','/*/size','/*/items','/*/items/*','/*/items/*/*','/*/items/*/*/name'));
+	phparray_to_javascriptarray($fields_aclSelectionList,"fields_acltable",Array('/*','/*/name','/*/type','/*/size','/*/items','/*/items/*','/*/items/*/*','/*/items/*/*/name'));
 ?>
-
 </script>
 <script type="text/javascript">
-	field_counter_js = 3;
-	rows = 1;
 	totalrows =  <?php echo $counter; ?>;
-	loaded =  <?php echo $counter; ?>;
-	
 	updatevisibility();
 </script>
-<?php include("fend.inc"); ?>
+<?php 
+haproxy_htmllist_js();
+include("fend.inc"); ?>
 </body>
 </html>

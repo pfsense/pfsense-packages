@@ -1,5 +1,6 @@
 <?php
 /*
+		Copyright (C) 2013 PiBa-NL
         Copyright 2011 Thomas Schaefer - Tomschaefer.org
         Copyright 2011 Marcello Coutinho
         Part of pfSense widgets (www.pfsense.com)

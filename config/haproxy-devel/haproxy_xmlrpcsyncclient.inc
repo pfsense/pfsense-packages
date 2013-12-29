@@ -1,6 +1,7 @@
 <?php
 /*
     haproxy_xmlrpcsyncclient.inc
+	Copyright (C) 2013 PiBa-NL
 	Copyright (C) 2009 Scott Ullrich <sullrich@pfsense.com>
     Copyright (C) 2008 Remco Hoef
     All rights reserved.
