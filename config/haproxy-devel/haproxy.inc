@@ -1,6 +1,7 @@
 <?php
 /*
     haproxy.inc
+	Copyright (C) 2013 PiBa-NL
 	Copyright (C) 2009 Scott Ullrich <sullrich@pfsense.com>
     Copyright (C) 2008 Remco Hoef
     All rights reserved.
@@ -37,43 +38,45 @@ require_once("haproxy_xmlrpcsyncclient.inc");
 $d_haproxyconfdirty_path = $g['varrun_path'] . "/haproxy.conf.dirty";
 
 $a_acltypes = array();
-$a_acltypes[] = array('name' => 'host_starts_with', 'descr' => 'Host starts with',
+$a_acltypes["host_starts_with"] = array('name' => 'Host starts with',
 				'mode' => 'http', 'syntax' => 'hdr_beg(host) -i %1$s');
-$a_acltypes[] = array('name' => 'host_ends_with', 'descr' => 'Host ends with',
+$a_acltypes["host_ends_with"] = array('name' => 'Host ends with',
 				'mode' =>'http', 'syntax' => 'hdr_end(host) -i %1$s');
-$a_acltypes[] = array('name' => 'host_matches', 'descr' => 'Host matches',
+$a_acltypes["host_matches"] = array('name' => 'Host matches',
 				'mode' =>'http', 'syntax' => 'hdr(host) -i %1$s');
-$a_acltypes[] = array('name' => 'host_regex', 'descr' => 'Host regex',
+$a_acltypes["host_regex"] = array('name' => 'Host regex',
 				'mode' =>'http', 'syntax' => 'hdr_reg(host) -i %1$s');
-$a_acltypes[] = array('name' => 'host_contains', 'descr' => 'Host contains',
+$a_acltypes["host_contains"] = array('name' => 'Host contains',
 				'mode' => 'http', 'syntax' => 'hdr_dir(host) -i %1$s');
-$a_acltypes[] = array('name' => 'path_starts_with', 'descr' => 'Path starts with',
+$a_acltypes["path_starts_with"] = array('name' => 'Path starts with',
 				'mode' => 'http', 'syntax' => 'path_beg -i %1$s');
-$a_acltypes[] = array('name' => 'path_ends_with', 'descr' => 'Path ends with',
+$a_acltypes["path_ends_with"] = array('name' => 'Path ends with',
 				'mode' => 'http', 'syntax' => 'path_end -i %1$s');
-$a_acltypes[] = array('name' => 'path_matches', 'descr' => 'Path matches',
+$a_acltypes["path_matches"] = array('name' => 'Path matches',
 				'mode' => 'http', 'syntax' => 'path -i %1$s');
-$a_acltypes[] = array('name' => 'path_regex', 'descr' => 'Path regex',
+$a_acltypes["path_regex"] = array('name' => 'Path regex',
 				'mode' => 'http', 'syntax' => 'path_reg -i %1$s');
-$a_acltypes[] = array('name' => 'path_contains', 'descr' => 'Path contains',
+$a_acltypes["path_contains"] = array('name' => 'Path contains',
 				'mode' => 'http', 'syntax' => 'path_dir -i %1$s');
-$a_acltypes[] = array('name' => 'source_ip', 'descr' => 'Source IP',
+$a_acltypes["source_ip"] = array('name' => 'Source IP',
 				'mode' => '', 'syntax' => 'src %1$s');
-$a_acltypes[] = array('name' => 'backendservercount', 'descr' => 'Minimum count usable servers',
+$a_acltypes["backendservercount"] = array('name' => 'Minimum count usable servers',
 				'mode' => '', 'syntax' => 'nbsrv(%2$s) ge %1$d', 'parameters' => 'value,backendname');
 // 'ssl_sni_matches' was added in HAProxy1.5dev17
-$a_acltypes[] = array('name' => 'ssl_sni_matches',  'descr' => 'Server Name Indication TLS extension matches', 
+$a_acltypes["ssl_sni_matches"] = array('name' => 'Server Name Indication TLS extension matches', 
 				'mode' => 'https', 'syntax' => 'req_ssl_sni -i %1$s', 'advancedoptions' => "tcp-request inspect-delay 5s\n\ttcp-request content accept if { req_ssl_hello_type 1 }");
 
+$a_checktypes = array();
 $a_checktypes['none'] = array('name' => 'none', 'syntax' => '',
 	'descr' => 'No health checks will be performed.');
 $a_checktypes['Basic'] = array('name' => 'Basic', 'syntax' => '',
 	'descr' => 'Basic socket connection check');
 $a_checktypes['HTTP'] = array('name' => 'HTTP', 'syntax' => 'httpchk',
 	'descr' => 'HTTP protocol to check on the servers health, can also be used for HTTPS servers(requirs checking the SSL box for the servers).', 'parameters' => "uri,method,version");
-// 'Agent' was added in HAProxy1.5dev18
+// 'Agent' was added in HAProxy1.5dev18, and removed in 1.5dev20, in favor of the seperate agent-check option.
 $a_checktypes['Agent'] = array('name' => 'Agent', 'syntax' => 'lb-agent-chk', 'usedifferenport' => 'yes', 
-	'descr' => 'Use a TCP connection to read an ASCII string of the form 100%,75%,drain,down (others in haproxy manual)');
+	'descr' => 'Use a TCP connection to read an ASCII string of the form 100%,75%,drain,down (others in haproxy manual)',
+	deprecated => true);
 $a_checktypes['LDAP'] = array('name' => 'LDAP', 'syntax' => 'ldap-check',
 	'descr' => 'Use LDAPv3 health checks for server testing');
 $a_checktypes['MySQL'] = array('name' => 'MySQL', 'syntax' => 'mysql-check',
@@ -89,6 +92,7 @@ $a_checktypes['ESMTP'] = array('name' => 'ESMTP', 'syntax' => 'smtpchk EHLO',
 $a_checktypes['SSL'] = array('name' => 'SSL', 'syntax' => 'ssl-hello-chk',
 	'descr' => 'Use SSLv3 client hello health checks for server testing.');
 
+$a_httpcheck_method = array();
 $a_httpcheck_method['OPTIONS'] = array('name' => 'OPTIONS', 'syntax' => 'OPTIONS');
 $a_httpcheck_method['HEAD']    = array('name' => 'HEAD', 'syntax' => 'HEAD');
 $a_httpcheck_method['GET']     = array('name' => 'GET', 'syntax' => 'GET');
@@ -97,6 +101,7 @@ $a_httpcheck_method['PUT']     = array('name' => 'PUT', 'syntax' => 'PUT');
 $a_httpcheck_method['DELETE']  = array('name' => 'DELETE', 'syntax' => 'DELETE');
 $a_httpcheck_method['TRACE']   = array('name' => 'TRACE', 'syntax' => 'TRACE');
 
+$a_closetypes = array();
 $a_closetypes['none'] = array('name' => 'none', 'syntax' => '',
 	'descr' => 'No close headers will be changed.');
 $a_closetypes['httpclose'] = array('name' => 'httpclose', 'syntax' => 'httpclose',
@@ -105,6 +110,14 @@ $a_closetypes['http-server-close'] = array('name' => 'http-server-close', 'synta
 	'descr' => 'By default, when a client communicates with a server, HAProxy will only analyze, log, and process the first request of each connection. Setting "option http-server-close" enables HTTP connection-close mode on the server side while keeping the ability to support HTTP keep-alive and pipelining on the client side.  This provides the lowest latency on the client side (slow network) and the fastest session reuse on the server side to save server resources.');
 $a_closetypes['forceclose'] = array('name' => 'forceclose', 'syntax' => 'forceclose',
 	'descr' => 'Some HTTP servers do not necessarily close the connections when they receive the "Connection: close" set by "option httpclose", and if the client does not close either, then the connection remains open till the timeout expires. This causes high number of simultaneous connections on the servers and shows high global session times in the logs. Note that this option also enables the parsing of the full request and response, which means we can close the connection to the server very quickly, releasing some resources earlier than with httpclose.');
+$a_closetypes['http-keep-alive'] = array('name' => 'http-keep-alive', 'syntax' => 'http-keep-alive',
+	'descr' => 'By default, when a client communicates with a server, HAProxy will only analyze, log, and process the first request of each connection. Setting "option http-keep-alive" enables HTTP keep-alive mode on the client- and server- sides. This provides the lowest latency on the client side (slow network) and the fastest session reuse on the server side at the expense of maintaining idle connections to the servers. In general, it is possible with this option to achieve approximately twice the request rate that the "http-server-close" option achieves on small objects. There are mainly two situations where this option may be useful :   - when the server is non-HTTP compliant and authenticates the connection     instead of requests (eg: NTLM authentication)    - when the cost of establishing the connection to the server is significant     compared to the cost of retrieving the associated object from the server.');
+
+$a_servermodes = array();
+$a_servermodes["active"]['name'] = "active";
+$a_servermodes["backup"]['name'] = "backup";
+$a_servermodes["disabled"]['name'] = "disabled";
+$a_servermodes["inactive"]['name'] = "inactive";
 
 function haproxy_custom_php_deinstall_command() {
 	exec("cd /var/db/pkg && pkg_delete `ls | grep haproxy`");
@@ -120,6 +133,12 @@ function haproxy_custom_php_install_command() {
 	global $g, $config;
 	conf_mount_rw();
 
+	$freebsd_version = substr(trim(`uname -r`), 0, 1);
+	if(!file_exists("/usr/bin/limits")) {
+		exec("fetch -q -o /usr/bin/limits http://files.pfsense.org/extras/{$freebsd_version}/limits");
+		exec("chmod a+rx /usr/bin/limits");
+	}
+	
 	$haproxy = <<<EOD
 #!/bin/sh
 
@@ -299,7 +318,7 @@ EOD;
 		write_config("haproxy, update xml config version");
 	
 	conf_mount_ro();
-
+	
 	exec("/usr/local/etc/rc.d/haproxy.sh start");
 }
 
@@ -351,8 +370,8 @@ function haproxy_install_cron($should_install) {
 function haproxy_find_acl($name) {
 	global $a_acltypes;
 	if($a_acltypes) {
-		foreach ($a_acltypes as $acl) {
-			if ($acl['name'] == $name)
+		foreach ($a_acltypes as $key => $acl) {
+			if ($key == $name)
 				return $acl;
 		}
 	}
@@ -486,6 +505,10 @@ function write_backend($fd, $name, $pool, $frontend) {
 		else 
 			$checkinter = "check inter 1000";
 	}
+	
+	//agent-check requires at least haproxy v1.5dev20
+	if ($pool['agent_check'])
+		$agentcheck = " agent-check agent-inter {$pool['agent_inter']} agent-port {$pool['agent_port']}";
 
 	if (is_array($a_servers))
 	{
@@ -505,7 +528,7 @@ function write_backend($fd, $name, $pool, $frontend) {
 			{
 				$ssl = $backend_type == "http" ? ' ssl' : ' check-ssl';
 			}
-			fwrite ($fd, "\tserver\t\t\t" . $be['name'] . " " . $be['address'].":" . $be['port'] . "$ssl $cookie $checkinter$checkport $isbackup weight " . $be['weight'] . "{$advanced_txt} {$be['advanced']}\n");
+			fwrite ($fd, "\tserver\t\t\t" . $be['name'] . " " . $be['address'].":" . $be['port'] . "$ssl $cookie $checkinter$checkport$agentcheck $isbackup weight " . $be['weight'] . "{$advanced_txt} {$be['advanced']}\n");
 		}
 	}
 	fwrite ($fd, "\n");
@@ -514,15 +537,16 @@ function write_backend($fd, $name, $pool, $frontend) {
 function haproxy_configure() {
 	global $g;
 	// reload haproxy
-	haproxy_writeconf("{$g['varetc_path']}/haproxy.cfg");
+	haproxy_writeconf("{$g['varetc_path']}/haproxy");
 	return haproxy_check_run(1);
 }
 
 function haproxy_check_and_run(&$messages, $reload) {
 	global $g;
-	$configname = "{$g['varetc_path']}/haproxy.cfg";
-	haproxy_writeconf("$configname.new");
-	$retval = exec("haproxy -c -V -f $configname.new 2>&1", $output, $err);
+	$configpath = "{$g['varetc_path']}/haproxy";
+	$testpath = "{$g['varetc_path']}/haproxy_test";
+	haproxy_writeconf($testpath);
+	$retval = exec("haproxy -c -V -f $testpath/haproxy.cfg 2>&1", $output, $err);
 	$messages = "";
 	if ($err > 1)
 		$messages = "<h2><strong>FATAL ERROR CODE: $err while starting haproxy</strong></h2>";
@@ -537,25 +561,46 @@ function haproxy_check_and_run(&$messages, $reload) {
 	$ok = strstr($retval, "Configuration file is valid");
 	if ($ok && $reload) {
 		global $haproxy_run_message;
-		exec("mv $configname.new $configname");
+		haproxy_writeconf($configpath);
+		rmdir_recursive($testpath);
 		$ok = haproxy_check_run(1) == 0;
 		$messages = $haproxy_run_message;
 	}
 	return $ok;
 }
+function haproxy_write_certificate_file($filename, $certid) {
+	$cert = lookup_cert($certid);
 
-function haproxy_writeconf($configfile) {
+	$certcontent = base64_decode($cert['crt']);
+	$certcontent .= "\r\n".base64_decode($cert['prv']);
+	
+	$certchaincontent = ca_chain($cert);
+	if ($certchaincontent != "") {
+		$certcontent .= "\r\n" . $certchaincontent;
+	}
+	unset($certchaincontent);
+	file_put_contents($filename, $certcontent);
+	unset($certcontent);
+	unset($cert);
+}
+
+function haproxy_writeconf($configpath) {
 	global $config;
 
+	$configfile = $configpath . "/haproxy.cfg";
+
+	rmdir_recursive($configpath);
+	make_dirs($configpath);
+	
 	$a_global = &$config['installedpackages']['haproxy'];
-	$a_backends = &$config['installedpackages']['haproxy']['ha_backends']['item'];
-	$a_pools = &$config['installedpackages']['haproxy']['ha_pools']['item'];
-
+	$a_frontends = &$config['installedpackages']['haproxy']['ha_backends']['item'];
+	$a_backends = &$config['installedpackages']['haproxy']['ha_pools']['item'];
+	
 	$fd = fopen($configfile, "w");
-
 	if(is_array($a_global)) {
 		fwrite ($fd, "global\n");
-		fwrite ($fd, "\tmaxconn\t\t\t".$a_global['maxconn']."\n");
+		if ($a_global['maxconn'])
+			fwrite ($fd, "\tmaxconn\t\t\t".$a_global['maxconn']."\n");
 		if($a_global['remotesyslog'])
 			fwrite ($fd, "\tlog\t\t\t{$a_global['remotesyslog']}\t{$a_global['logfacility']}\t{$a_global['loglevel']}\n");
 		fwrite ($fd, "\tstats socket /tmp/haproxy.socket level admin\n");
@@ -586,46 +631,48 @@ function haproxy_writeconf($configfile) {
 
 	// Try and get a unique array for address:port as frontends can duplicate
 	$a_bind = array();
-	if(is_array($a_backends)) {
-		foreach ($a_backends as $backend) {
-			if($backend['status'] != 'active')
+	if(is_array($a_frontends)) {
+		foreach ($a_frontends as $frontend) {
+			if($frontend['status'] != 'active')
 			{
-				unlink_if_exists("var/etc/{$backend['name']}.{$backend['port']}.crt");
+				unlink_if_exists("var/etc/{$frontend['name']}.{$frontend['port']}.crt");
 				continue;
 			}
-			if(!$backend['backend_serverpool'])
+			if(!$frontend['backend_serverpool'])
 			{
-				unlink_if_exists("var/etc/{$backend['name']}.{$backend['port']}.crt");
+				unlink_if_exists("var/etc/{$frontend['name']}.{$frontend['port']}.crt");
 				continue;
-			}
-
-			//check ssl info
-			if (strtolower($backend['type']) == "http" && $backend['ssloffload']){
-				//ssl crt ./server.pem ca-file ./ca.crt verify optional crt-ignore-err all crl-file ./ca_crl.pem
-				$ssl_crt=" crt /var/etc/{$backend['name']}.{$backend['port']}.crt";
-				$cert = lookup_cert($backend['ssloffloadcert']);
-				$certcontent = base64_decode($cert['crt'])."\r\n".base64_decode($cert['prv']);
-
-				$certchaincontent = ca_chain($cert);
-				if ($certchaincontent != "") {
-					$certcontent .= "\r\n" . $certchaincontent;
-				}
-				unset($certchaincontent);
-				
-				file_put_contents("/var/etc/{$backend['name']}.{$backend['port']}.crt", $certcontent);
-				unset($certcontent);
-			}else{
-				$ssl_crt="";
-				unlink_if_exists("var/etc/{$backend['name']}.{$backend['port']}.crt");
 			}
 			
-			$bname = get_frontend_ipport($backend);
+			$bname = get_frontend_ipport($frontend);
+
+			//check ssl info
+			if (strtolower($frontend['type']) == "http" && $frontend['ssloffload']){
+				//ssl crt ./server.pem ca-file ./ca.crt verify optional crt-ignore-err all crl-file ./ca_crl.pem
+				$filename = "$configpath/{$frontend['name']}.{$frontend['port']}.pem";
+				$ssl_crt = " crt $filename";
+				haproxy_write_certificate_file($filename, $frontend['ssloffloadcert']);
+				$subfolder = "$configpath/{$frontend['name']}.{$frontend['port']}";
+				$certs = $frontend['ha_certificates']['item'];
+				if (is_array($certs)){
+					if (count($certs) > 0){
+						make_dirs($subfolder);
+						foreach($certs as $cert){
+							haproxy_write_certificate_file("$subfolder/{$cert['ssl_certificate']}.pem", $cert['ssl_certificate']);
+						}
+						$ssl_crt .= " crt $subfolder";
+					}
+				}
+			}else{
+				$ssl_crt="";
+				unlink_if_exists("var/etc/{$frontend['name']}.{$frontend['port']}.crt");
+			}
 
 			if (!is_array($a_bind[$bname])) {
 				$a_bind[$bname] = array();
 				$a_bind[$bname]['config'] = array();
 				// Settings which are used only from the primary frontend
-				$primaryfrontend = get_primaryfrontend($backend);
+				$primaryfrontend = get_primaryfrontend($frontend);
 				$a_bind[$bname]['name']            = $primaryfrontend['name'];
 				$a_bind[$bname]['extaddr']         = $primaryfrontend['extaddr'];
 				$a_bind[$bname]['port']            = $primaryfrontend['port'];
@@ -640,19 +687,19 @@ function haproxy_writeconf($configfile) {
 			}
 			$b = &$a_bind[$bname];
 			
-			if (($backend['secondary'] != 'yes') && ($backend['name'] != $b['name'])) {
+			if (($frontend['secondary'] != 'yes') && ($frontend['name'] != $b['name'])) {
 				// only 1 frontend can be the primary for a set of frontends that share 1 address:port.
 					$input_errors[] = "Multiple primary frondends for $bname";
 			}
 			
 			if ($ssl_crt != "") {
 				if ($b['ssl_info'] == "")
-					$b['ssl_info'] = "ssl {$backend['dcertadv']}";
+					$b['ssl_info'] = "ssl {$frontend['dcertadv']}";
 				$b['ssl_info'] .= $ssl_crt;
 			}
 
-			// pointer to each backend 
-			$b['config'][] = $backend;
+			// pointer to each frontend 
+			$b['config'][] = $frontend;
 		}
 	}
 	
@@ -736,32 +783,51 @@ function haproxy_writeconf($configfile) {
 			// Combine the rest of the frontend configs
 			$default_backend = "";
 			$i = 0;
-			foreach ($bind['config'] as $bconfig) {
-				$a_acl=&$bconfig['ha_acls']['item'];
+			foreach ($bind['config'] as $frontend) {
+				$a_acl=&$frontend['ha_acls']['item'];
 				if(!is_array($a_acl)) 
 					$a_acl=array();
 			
-				$poolname = $bconfig['backend_serverpool'] . "_" . strtolower($bconfig['type']);
+				$poolname = $frontend['backend_serverpool'] . "_" . strtolower($frontend['type']);
 
 				// Create different pools if the svrport is set
-				if ($bconfig['svrport'] > 0)
-					$poolname .= "_" . $bconfig['svrport'];
-
-				// Write this out once, and must be before any backend config text
-				if ($default_backend == "" || $bconfig['secondary'] != 'yes') {
-					$default_backend = $poolname;
-				}
+				if ($frontend['svrport'] > 0)
+					$poolname .= "_" . $frontend['svrport'];
 
 				if (!isset($a_pendingpl[$poolname])) {
 					$a_pendingpl[$poolname] = array();
 					$a_pendingpl[$poolname]['name'] = $poolname;
-					$a_pendingpl[$poolname]['frontend'] = $bconfig;
+					$a_pendingpl[$poolname]['frontend'] = $frontend;
 				}
 
-				if (strtolower($bind['type']) == "http" && $bconfig['ssloffload'] && $bconfig['ssloffloadacl']) {
+				if (strtolower($bind['type']) == "http" && $frontend['ssloffload']) {
 					$aclname = "SNI_" . $poolname;
-					$cert_cn = cert_get_cn($bconfig['ssloffloadcert'] ,true);
-					$a_acl[] = array('name' => $aclname,'expression' => 'host_matches', 'value' => $cert_cn);
+					if ($frontend['ssloffloadacl']){
+						$cert = lookup_cert($frontend['ssloffloadcert']);
+						$cert_cn = cert_get_cn($cert['crt']);
+						$descr = haproxy_escape_acl_name($cert['descr']);
+						$a_acl[] = array('name' => "{$aclname}_{$descr}",'expression' => 'host_matches', 'value' => $cert_cn);
+						unset($cert);
+					}
+					if ($frontend['ssloffloadacladditional']){
+						$certs = $frontend['ha_certificates']['item'];
+						if (is_array($certs)){
+							if (count($certs) > 0){
+								foreach($certs as $certref){
+									$cert = lookup_cert($certref['ssl_certificate']);
+									$cert_cn = cert_get_cn($cert['crt']);
+									$descr = haproxy_escape_acl_name($cert['descr']);
+									$a_acl[] = array('name' => "{$aclname}_{$descr}",'expression' => 'host_matches', 'value' => $cert_cn);
+									unset($cert);
+								}
+							}
+						}
+					}
+				}
+				
+				// Write this out once, and must be before any backend config text
+				if (($default_backend == "" || $frontend['secondary'] != 'yes') && count($a_acl) == 0 ) {
+					$default_backend = $poolname;
 				}
 				
 				// combine acl's with same name to allow for 'combined checks' to check for example hostname and fileextension together..
@@ -795,7 +861,8 @@ function haproxy_writeconf($configfile) {
 					fwrite ($fd, "\tuse_backend\t\t" . $poolname . " if " . $aclnames . "\n");
 				}
 			}
-			fwrite ($fd, "\tdefault_backend\t\t" . $default_backend . "\n");
+			if ($default_backend)
+				fwrite ($fd, "\tdefault_backend\t\t" . $default_backend . "\n");
 			
 			foreach($advancedextra as $extra)
 				fwrite ($fd, "\t".$extra."\n");
@@ -803,9 +870,9 @@ function haproxy_writeconf($configfile) {
 		}
 	}
 	// Construct and write out configuration for each "backend"
-	if (is_array($a_pendingpl) && is_array($a_pools)) {
+	if (is_array($a_pendingpl) && is_array($a_backends)) {
 		foreach ($a_pendingpl as $pending) {
-			foreach ($a_pools as $pool) {
+			foreach ($a_backends as $pool) {
 				if ($pending['frontend']['backend_serverpool'] == $pool['name']) {
 					write_backend($fd, $pending['name'], $pool, $pending['frontend']);
 				}
@@ -832,19 +899,12 @@ function haproxy_writeconf($configfile) {
 		haproxy_install_cron(true);
 	else
 		haproxy_install_cron(false);
-
-	$freebsd_version = substr(trim(`uname -r`), 0, 1);
-	if(!file_exists("/usr/bin/limits")) {
-		exec("fetch -q -o /usr/bin/limits http://files.pfsense.org/extras/{$freebsd_version}/limits");
-		exec("chmod a+rx /usr/bin/limits");
-	}
 }
 
 function haproxy_is_running() {
         $running = (shell_exec("/bin/pgrep -x haproxy") != '');
         return $running;
 }
-
 
 function haproxy_load_modules() {
 	// On FreeBSD 8 ipfw is needed to allow 'transparent' proxying (getting reply's to a non-local ip to pass back to the client-socket)..
@@ -932,6 +992,7 @@ function haproxy_check_run($reload) {
 	global $config, $g, $haproxy_run_message;
 
 	$a_global = &$config['installedpackages']['haproxy'];
+	$configpath = "{$g['varetc_path']}/haproxy";
 
 	exec("/usr/bin/limits -n 300014");
 
@@ -963,9 +1024,9 @@ function haproxy_check_run($reload) {
 				$sf_st = "-st";//terminate old process as soon as the new process is listening
 			else
 				$sf_st = "-sf";//finish serving existing connections exit when done, and the new process is listening
-			exec("/usr/local/sbin/haproxy -f /var/etc/haproxy.cfg -p /var/run/haproxy.pid $sf_st `cat /var/run/haproxy.pid` 2>&1", $output, $errcode);
+			exec("/usr/local/sbin/haproxy -f {$configpath}/haproxy.cfg -p /var/run/haproxy.pid $sf_st `cat /var/run/haproxy.pid` 2>&1", $output, $errcode);
 		} else {
-			exec("/usr/local/sbin/haproxy -f /var/etc/haproxy.cfg -p /var/run/haproxy.pid -D 2>&1", $output, $errcode);
+			exec("/usr/local/sbin/haproxy -f {$configpath}/haproxy.cfg -p /var/run/haproxy.pid -D 2>&1", $output, $errcode);
 		}
 		foreach($output as $line)
 			$haproxy_run_message .= "<br/>" . htmlspecialchars($line) . "\n";
@@ -1127,7 +1188,7 @@ function get_frontend_acls($frontend) {
 				continue;
 			
 			$acl_item = array();
-			$acl_item['descr'] = $acl['descr'] . ": " . $entry['value'];
+			$acl_item['descr'] = $acl['name'] . ": " . $entry['value'];
 			$acl_item['ref'] = $entry;
 			
 			$result[] = $acl_item;
@@ -1151,6 +1212,10 @@ function haproxy_escapestring($configurationsting) {
 	$result = str_replace('\\', '\\\\', $configurationsting);
 	$result = str_replace(' ', '\\ ', $result);
 	return str_replace('#', '\\#', $result);
+}
+
+function haproxy_escape_acl_name($aclname) {
+	return preg_replace_callback('([^A-Za-z0-9\._\-\:])', function($match){return "_".dechex(ord($match[0]));}, $aclname);
 }
 
 ?>
