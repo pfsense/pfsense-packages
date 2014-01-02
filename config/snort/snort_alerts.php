@@ -379,7 +379,7 @@ if ($pconfig['arefresh'] == 'on')
 
 /* make sure alert file exists */
 if (file_exists("/var/log/snort/snort_{$if_real}{$snort_uuid}/alert")) {
-	exec("tail -{$anentries} /var/log/snort/snort_{$if_real}{$snort_uuid}/alert | sort -r > /tmp/alert_{$snort_uuid}");
+	exec("tail -{$anentries} -r /var/log/snort/snort_{$if_real}{$snort_uuid}/alert > /tmp/alert_{$snort_uuid}");
 	if (file_exists("/tmp/alert_{$snort_uuid}")) {
 		$tmpblocked = array_flip(snort_get_blocked_ips());
 		$counter = 0;
