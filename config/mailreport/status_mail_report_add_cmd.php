@@ -1,9 +1,9 @@
 <?php
 /* $Id$ */
 /*
-	status_rrd_graph.php
+	status_mail_report_add_cmd.php
 	Part of pfSense
-	Copyright (C) 2011 Jim Pingle <jimp@pfsense.org>
+	Copyright (C) 2011-2014 Jim Pingle <jimp@pfsense.org>
 	Portions Copyright (C) 2007-2011 Seth Mos <seth.mos@dds.nl>
 	All rights reserved.
 
@@ -33,10 +33,10 @@
 */
 
 ##|+PRIV
-##|*IDENT=page-status-rrdgraphs
-##|*NAME=Status: RRD Graphs page
-##|*DESCR=Allow access to the 'Status: RRD Graphs' page.
-##|*MATCH=status_rrd_graph.php*
+##|*IDENT=page-status-mailreportsaddcmd
+##|*NAME=Status: E-Mail Reports: Add Command page
+##|*DESCR=Allow access to the 'Status: E-Mail Reports: Add Command' page.
+##|*MATCH=status_mail_report_add_cmd.php*
 ##|-PRIV
 
 require("guiconfig.inc");
