@@ -35,9 +35,7 @@ global $config, $g;
 function sksort(&$array, $subkey="id", $sort_ascending=false) {
         /* an empty array causes sksort to fail - this test alleviates the error */
 	if(empty($array))
-        {
-        return false;
-        }
+	        return false;
 	if (count($array)) {
 		$temp_array[key($array)] = array_shift($array);
 	};
@@ -100,7 +98,9 @@ if (file_exists("/usr/local/pkg/snort/snort.inc")) {
 						continue;
 
 					$snort_alerts[$counter]['instanceid'] = $a_instance[$instanceid]['interface'];
-					$snort_alerts[$counter]['timestamp'] = $fields[0];
+					// fields[0] is the timestamp.  Reverse its date order to YY/MM/DD for proper sorting
+					$tmp = substr($fields[0],6,2) . '/' . substr($fields[0],0,2) . '/' . substr($fields[0],3,2);
+					$snort_alerts[$counter]['timestamp'] = str_replace(substr($fields[0],0,8),$tmp,$fields[0]);
 					$snort_alerts[$counter]['timeonly'] = substr($fields[0], strpos($fields[0], '-')+1, -8);
 					$snort_alerts[$counter]['dateonly'] = substr($fields[0], 0, strpos($fields[0], '-'));
 					$snort_alerts[$counter]['src'] = $fields[6];
