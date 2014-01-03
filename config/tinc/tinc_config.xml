@@ -122,6 +122,12 @@
                         <cols>65</cols>
                 </field>
                 <field>
+                        <fielddescr>Generate RSA key pair</fielddescr>
+                        <fieldname>gen_rsa</fieldname>
+                        <description>This will generate a new RSA key pair in the fields above.</description>
+                        <type>checkbox</type>
+                </field>
+                <field>
                         <fielddescr>Extra Tinc Parameters</fielddescr>
                         <fieldname>extra</fieldname>
                         <description>Anything entered here will be added at the end of the tinc.conf configuration file. &lt;br&gt;</description>

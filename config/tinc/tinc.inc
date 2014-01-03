@@ -42,6 +42,22 @@ function tinc_save() {
 	}
 	fwrite($fout, base64_decode($tincconf['extra'])."\n");
 	fclose($fout);
+
+	// Check if we need to generate a new RSA key pair.
+	if ($tincconf['gen_rsa'])
+	{
+		safe_mkdir("/usr/local/etc/tinc/tmp");
+		exec("/usr/local/sbin/tincd -c /usr/local/etc/tinc/tmp -K");
+		$tincconf['cert_pub'] = base64_encode(file_get_contents('/usr/local/etc/tinc/tmp/rsa_key.pub'));
+		$tincconf['cert_key'] = base64_encode(file_get_contents('/usr/local/etc/tinc/tmp/rsa_key.priv'));
+		$tincconf['gen_rsa'] = false;
+		$config['installedpackages']['tinc']['config'][0]['cert_pub'] = $tincconf['cert_pub'];
+		$config['installedpackages']['tinc']['config'][0]['cert_key'] = $tincconf['cert_key'];
+		$config['installedpackages']['tinc']['config'][0]['gen_rsa'] = $tincconf['gen_rsa'];
+		rmdir_recursive("/usr/local/etc/tinc/tmp");
+		write_config();
+	}
+
 	$_output = "Subnet=" . $tincconf['localsubnet'] . "\n";
 	$_output .= base64_decode($tincconf['host_extra']) . "\n";
 	$_output .= base64_decode($tincconf['cert_pub']) . "\n";
@@ -86,6 +102,7 @@ function tinc_save() {
 	}
 	system("/usr/local/etc/rc.d/tinc.sh restart 2>/dev/null");
 	rmdir_recursive("/usr/local/etc/tinc.old");
+
 	conf_mount_ro();
 	config_unlock();
 }
