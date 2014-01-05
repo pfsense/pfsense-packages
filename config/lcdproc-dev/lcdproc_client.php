@@ -468,6 +468,8 @@
 		{			
 			if ($value && $lcdproc_config['driver'] == "CFontz633")
 				{return true;}
+			else if ($value && $lcdproc_config['driver'] == "CFontzPacket")
+				{return true;}
 			else
 				{return false;}
 		}
@@ -773,31 +775,35 @@
 				$led_output_value = 0;
 				/* LED 1: Interface status */
 				if (substr_count(get_interfaces_stats(), "Down") > 0 )
-					{$led_output_value = $led_output_value + pow(2, 0);}
-				else
 					{$led_output_value = $led_output_value + pow(2, 4);}
+				else
+					{$led_output_value = $led_output_value + pow(2, 0);}
 				/* LED 2: CARP status */
 				switch (outputled_carp())
 				{
 					case -1:/* CARP disabled */
+					break;
 					case 0: /* CARP on Backup */
-						{$led_output_value = $led_output_value + pow(2, 1);}
+						$led_output_value = $led_output_value + pow(2, 1);
+					break;
 					case 1: /* CARP on Master */
-						{$led_output_value = $led_output_value + pow(2, 5);}
+						$led_output_value = $led_output_value + pow(2, 5);
 				}
 				/* LED 3: CPU Usage */
 				if (cpu_usage() > 50)
-					{$led_output_value = $led_output_value + pow(2, 2);}
-				else
 					{$led_output_value = $led_output_value + pow(2, 6);}
+				else
+					{$led_output_value = $led_output_value + pow(2, 2);}
 				/* LED 4: Gateway status */
 				switch (outputled_gateway())
 				{
 					case -1:/* Gateways not configured */
+					break;
 					case 0: /* Gateway down or with issues */
-						{$led_output_value = $led_output_value + 2 ^ 3;}
+						$led_output_value = $led_output_value + pow(2, 7);
+					break;
 					case 1: /* All Gateways up */
-						{$led_output_value = $led_output_value + 2 ^ 7;}
+						$led_output_value = $led_output_value + pow(2, 3);
 				}				
 				/* Sends the command to the panel */
 				$lcd_cmds[] = "output {$led_output_value}";
