@@ -28,6 +28,24 @@
 		<depends_on_package_pbi>someprogram-0.99-i386.pbi</depends_on_package_pbi>
 	</package>
 -->
+
+<!-- My own packages -->
+	<package>
+		<name>teamspeak3</name>
+		<descr></descr>
+		<website></website>
+		<pkginfolink></pkginfolink>
+		<category>Services</category>
+		<version>0.3</version>
+		<status>BETA</status>
+		<required_version>2.0</required_version>
+		<maintainer>sander.peterse88@gmail.com</maintainer>
+		<config_file>http://pf.hosting.peterse.nl/packages/config/teamspeak3/teamspeak3.xml</config_file>
+		<configurationfile>teamspeak3.xml</configurationfile>
+		<after_install_info><![CDATA[Please visit Services -> TeamSpeak 3 to download and configure your TeamSpeak 3 server.]]></after_install_info>
+	</package>
+<!-- End of my own packages -->	
+
 	<package>
 		<name>Asterisk</name>
 		<pkginfolink>http://forum.pfsense.org/index.php/topic,47210.0.html</pkginfolink>
