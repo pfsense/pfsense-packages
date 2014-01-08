@@ -258,7 +258,7 @@ include("head.inc");
 			<td class="vtable" colspan="3">
 			<select name="dayofmonth">
 			<?php foreach($dayofmonth as $dom): ?>
-				<option value="<?php echo $dom; ?>" <?php if($pconfig["dayofmonth"] === $dom) echo "selected"; ?>><?php echo $dom; ?></option>
+				<option value="<?php echo $dom; ?>" <?php if($pconfig["dayofmonth"] == $dom) echo "selected"; ?>><?php echo $dom; ?></option>
 			<?php endforeach; ?>
 			</select>
 			<br/>Select the day of the month to send the report. Only valid for monthly and yearly reports.
@@ -270,8 +270,8 @@ include("head.inc");
 			<td class="vncell" valign="top" colspan="1">Time of Quarter</td>
 			<td class="vtable" colspan="3">
 			<select name="monthofquarter">
-			<?php foreach($monthofquarter as $moq): ?>
-				<option value="<?php echo $moq; ?>" <?php if($pconfig["monthofquarter"] === $moq) echo "selected"; ?>><?php echo $moq; ?></option>
+			<?php foreach($monthofquarter as $moqi => $moq): ?>
+				<option value="<?php echo $moqi; ?>" <?php if($pconfig["monthofquarter"] == $moqi) echo "selected"; ?>><?php echo $moq; ?></option>
 			<?php endforeach; ?>
 			</select>
 			<br/>Select the time of the quarter to send the report. Only valid for quarter reports.
@@ -283,8 +283,8 @@ include("head.inc");
 			<td class="vncell" valign="top" colspan="1">Month of the Year</td>
 			<td class="vtable" colspan="3">
 			<select name="monthofyear">
-			<?php foreach($monthofyear as $moy): ?>
-				<option value="<?php echo $moy; ?>" <?php if($pconfig["monthofyear"] === $moy) echo "selected"; ?>><?php echo $moy; ?></option>
+			<?php foreach($monthofyear as $moyi => $moy): ?>
+				<option value="<?php echo $moyi; ?>" <?php if($pconfig["monthofyear"] == $moyi) echo "selected"; ?>><?php echo $moy; ?></option>
 			<?php endforeach; ?>
 			</select>
 			<br/>Select the month of the year to send the report. Only valid for yearly reports.
