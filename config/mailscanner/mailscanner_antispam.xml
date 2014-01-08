@@ -169,7 +169,7 @@
 				<option><name>Spam Score (yes)</name><value>spam_score</value></option>
 				<option><name>Cache SpamAssassin Results (yes)</name><value>cache_spamassassin_results</value></option>
 				<option><name>Wait During Bayes Rebuild (no)</name><value>wait_during_bayes_rebuild</value></option>
-				<option><name>Use Pyzor plugin (yes)</name><value>use_pyzor</value></option>
+				<option><name>Use Pyzor plugin (no)</name><value>use_pyzor</value></option>
 				<option><name>Use Razor plugin (yes)</name><value>use_razor</value></option>
 				<option><name>Use DCC plugin (yes)</name><value>use_dcc</value></option>
 				<option><name>Use Bayes (yes)</name><value>use_bayes</value></option>

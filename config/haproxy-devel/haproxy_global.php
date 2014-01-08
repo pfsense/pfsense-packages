@@ -3,6 +3,7 @@
 /*
 	haproxy_global.php
 	part of pfSense (http://www.pfsense.com/)
+	Copyright (C) 2013 PiBa-NL
 	Copyright (C) 2009 Scott Ullrich <sullrich@pfsense.com>
 	Copyright (C) 2008 Remco Hoef <remcoverhoef@pfsense.com>
 	All rights reserved.
@@ -52,15 +53,15 @@ if ($_POST) {
 		if ($result)
 			unlink_if_exists($d_haproxyconfdirty_path);
 	} else {
-		if ($_POST['enable']) {
-			$reqdfields = explode(" ", "maxconn");
-			$reqdfieldsn = explode(",", "Maximum connections");		
-		}
+		//if ($_POST['enable']) {
+		//	$reqdfields = explode(" ", "maxconn");
+		//	$reqdfieldsn = explode(",", "Maximum connections");
+		//}
 
 		if ($_POST['carpdev'] == "disabled")
 			unset($_POST['carpdev']);
 
-		do_input_validation($_POST, $reqdfields, $reqdfieldsn, &$input_errors);
+		//do_input_validation($_POST, $reqdfields, $reqdfieldsn, &$input_errors);
 
 		if ($_POST['maxconn'] && (!is_numeric($_POST['maxconn']))) 
 			$input_errors[] = "The maximum number of connections should be numeric.";
@@ -126,7 +127,7 @@ include("head.inc");
 <script type="text/javascript" src="javascript/scriptaculous/prototype.js"></script>
 <script type="text/javascript" src="javascript/scriptaculous/scriptaculous.js"></script>
 <?php include("fbegin.inc"); ?>
-<script language="JavaScript">
+<script type="text/javascript">
 <!--
 function enable_change(enable_change) {
 	var endis;
@@ -141,8 +142,8 @@ function enable_change(enable_change) {
 <form action="haproxy_global.php" method="post" name="iform">
 <?php if ($input_errors) print_input_errors($input_errors); ?>
 <?php if ($savemsg) print_info_box($savemsg); ?>
-<?php if (file_exists($d_haproxyconfdirty_path)): ?><p>
-<?php print_info_box_np("The haproxy configuration has been changed.<br>You must apply the changes in order for them to take effect.");?><br>
+<?php if (file_exists($d_haproxyconfdirty_path)): ?>
+<?php print_info_box_np("The haproxy configuration has been changed.<br/>You must apply the changes in order for them to take effect.");?><br/>
 <?php endif; ?>
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
 	<tr><td class="tabnavtbl">
@@ -165,8 +166,8 @@ function enable_change(enable_change) {
 			<tr>
 				<td width="22%" valign="top" class="vncell">&nbsp;</td>
 				<td width="78%" class="vtable">
-					<input type="hidden" name="calculate_certificate_chain" id="calculate_certificate_chain">
-					<input type="button" class="formbtn" value="Recalculate certificate chains" onclick="$('calculate_certificate_chain').value='true';document.iform.submit();">
+					<input type="hidden" name="calculate_certificate_chain" id="calculate_certificate_chain" />
+					<input type="button" class="formbtn" value="Recalculate certificate chains" onclick="$('calculate_certificate_chain').value='true';document.iform.submit();" />
 					<br/>
 					This can be required after certificates have been created or imported. As pfSense 2.1.0 currently does not
 					always keep track of these dependencies which might be required to create a proper certificate chain when using SSLoffloading.
@@ -179,7 +180,7 @@ function enable_change(enable_change) {
 			<tr>
 				<td width="22%" valign="top" class="vncell">&nbsp;</td>
 				<td width="78%" class="vtable">
-				<input name="enable" type="checkbox" value="yes" <?php if ($pconfig['enable']) echo "checked"; ?> onClick="enable_change(false)">
+				<input name="enable" type="checkbox" value="yes" <?php if ($pconfig['enable']) echo "checked"; ?> onClick="enable_change(false)" />
 				<strong>Enable HAProxy</strong></td>
 			</tr>
 			<tr>
@@ -191,7 +192,7 @@ function enable_change(enable_change) {
 					<table cellpadding="0" cellspacing="0">
 						<tr>
 							<td>
-								<input name="maxconn" type="text" class="formfld" id="maxconn" size="5" <?if ($pconfig['enable']!='yes') echo "enabled=\"false\"";?>  value="<?=htmlspecialchars($pconfig['maxconn']);?>"> per Backend.
+								<input name="maxconn" type="text" class="formfld" id="maxconn" size="5" <?if ($pconfig['enable']!='yes') echo "enabled=\"false\"";?>  value="<?=htmlspecialchars($pconfig['maxconn']);?>" /> per Backend.
 							</td>
 						</tr>
 					</table>
@@ -205,29 +206,29 @@ function enable_change(enable_change) {
 					</td><td>
 					<table style="border: 1px solid #000;">
 						<tr>
-							<td><font size=-1>Connections</td>
-							<td><font size=-1>Memory usage</td>
+							<td><font size=-1>Connections</font></td>
+							<td><font size=-1>Memory usage</font></td>
 						</tr>
 						<tr>
 							<td colspan="2">
-								<hr noshade style="border: 1px solid #000;">
+								<hr noshade style="border: 1px solid #000;"></hr>
 							</td>
 						</tr>
 						<tr>
-							<td align="right"><font size=-1>999</td>
-							<td><font size=-1>1888K</td>
+							<td align="right"><font size=-1>999</font></td>
+							<td><font size=-1>1888K</font></td>
 						</tr>
 						<tr>
-							<td align="right"><font size=-1>99999</td>
-							<td><font size=-1>8032K</td>
+							<td align="right"><font size=-1>99999</font></td>
+							<td><font size=-1>8032K</font></td>
 						</tr>
 						<tr>
-							<td align="right"><font size=-1>999999</td>
-							<td><font size=-1>50016K</td>
+							<td align="right"><font size=-1>999999</font></td>
+							<td><font size=-1>50016K</font></td>
 						</tr>
 						<tr>
-							<td align="right"><font size=-1>9999999</td>
-							<td><font size=-1>467M</td>
+							<td align="right"><font size=-1>9999999</font></td>
+							<td><font size=-1>467M</font></td>
 						</tr>
 					</table>
 					</td></tr></table>
@@ -238,17 +239,17 @@ function enable_change(enable_change) {
 					Number of processes to start
 				</td>
 				<td class="vtable">
-					<input name="nbproc" type="text" class="formfld" id="nbproc" size="18" value="<?=htmlspecialchars($pconfig['nbproc']);?>">
+					<input name="nbproc" type="text" class="formfld" id="nbproc" size="18" value="<?=htmlspecialchars($pconfig['nbproc']);?>" />
 					<br/>
 					Defaults to 1 if left blank (<?php echo trim(`/sbin/sysctl kern.smp.cpus | cut -d" " -f2`); ?> CPU core(s) detected).<br/>
 					Note : Consider leaving this value empty or 1  because in multi-process mode (nbproc > 1) memory is not shared between the processes, which could result in random behaviours for several options like ACL's, sticky connections and some others.<br/>
-					For more information about the <b>"nbproc"</b> option please see <b><a href='http://haproxy.1wt.eu/download/1.5/doc/configuration.txt' target='_new'>HAProxy Documentation</a> </b>
+					For more information about the <b>"nbproc"</b> option please see <b><a href='http://cbonte.github.io/haproxy-dconv/configuration-1.5.html#nbproc' target='_blank'>HAProxy Documentation</a> </b>
 				</td>
 			</tr>
 			<tr>
 				<td width="22%" valign="top" class="vncell">Reload behaviour</td>
 				<td width="78%" class="vtable">
-				<input name="terminate_on_reload" type="checkbox" value="yes" <?php if ($pconfig['terminate_on_reload']) echo "checked"; ?>>
+				<input name="terminate_on_reload" type="checkbox" value="yes" <?php if ($pconfig['terminate_on_reload']) echo "checked"; ?> />
 				Force immediate stop of old process on reload. (closes existing connections)<br/><br/>Note: when this option is selected connections will be closed when haproxy is restarted.
 				Otherwise the existing connections will be served by the old haproxy process untill they are closed.
 				Checking this option will interupt existing connections on a restart. (which happens when the configuration is applied,
@@ -259,7 +260,7 @@ function enable_change(enable_change) {
 					Remote syslog host
 				</td>
 				<td class="vtable">
-					<input name="remotesyslog" type="text" class="formfld" id="remotesyslog" size="18" value="<?=htmlspecialchars($pconfig['remotesyslog']);?>"><br/>
+					<input name="remotesyslog" type="text" class="formfld" id="remotesyslog" size="18" value="<?=htmlspecialchars($pconfig['remotesyslog']);?>" /><br/>
 					To log to the local pfSense systemlog fill the host with the value <b>/var/run/log</b>, however if a lot of messages are generated logging is likely to be incomplete. (Also currently no informational logging gets shown in the systemlog.)
 				</td>
 			</tr>
@@ -359,7 +360,7 @@ function enable_change(enable_change) {
 			<tr>
 				<td width="22%" valign="top" class="vncell">HAProxy Sync</td>
 				<td width="78%" class="vtable">
-					<input name="enablesync" type="checkbox" value="yes" <?php if ($pconfig['enablesync']) echo "checked"; ?>>
+					<input name="enablesync" type="checkbox" value="yes" <?php if ($pconfig['enablesync']) echo "checked"; ?> />
 					<strong>Sync HAProxy configuration to backup CARP members via XMLRPC.</strong><br/>
 					Note: remember to also turn on HAProxy Sync on the backup nodes.<br/>
 					The synchronisation host and password are those configured in pfSense main <a href="/system_hasync.php">"System: High Availability Sync"</a> settings.
@@ -406,22 +407,20 @@ function enable_change(enable_change) {
 			</tr>
 			<tr>
 				<td width="22%" valign="top">&nbsp;</td>
-					<td width="78%">
-						<input name="Submit" type="submit" class="formbtn" value="Save" onClick="enable_change(true)">
-					</td>
+				<td width="78%">
+					<input name="Submit" type="submit" class="formbtn" value="Save" onClick="enable_change(true)" />
 				</td>
 			</tr>
 		</table>
 	</div>
 </table>
 
-<?php if(file_exists("/var/etc/haproxy.cfg")): ?>
-	<p/>
+<?php if(file_exists("/var/etc/haproxy/haproxy.cfg")): ?>
 	<div id="configuration" style="display:none; border-style:dashed; padding: 8px;">
-		<b><i>/var/etc/haproxy.cfg file contents:</b></i>
+		<b><i>/var/etc/haproxy.cfg file contents:</i></b>
 		<?php
-			if(file_exists("/var/etc/haproxy.cfg")) {
-				echo "<pre>" . trim(file_get_contents("/var/etc/haproxy.cfg")) . "</pre>";
+			if(file_exists("/var/etc/haproxy/haproxy.cfg")) {
+				echo "<pre>" . trim(file_get_contents("/var/etc/haproxy/haproxy.cfg")) . "</pre>";
 			}
 		?>
 	</div>
@@ -431,7 +430,7 @@ function enable_change(enable_change) {
 <?php endif; ?>
 
 </form>
-<script language="JavaScript">
+<script type="text/javascript">
 	function scroll_after_fade() {
 		scrollTo(0,99999999999);
 	}

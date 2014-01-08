@@ -41,6 +41,7 @@ function haproxy_interface_ip($interfacebindname,$userfriendly=false){
 		$result = $item['name'];
 	return $result;
 }
+
 function haproxy_get_bindable_interfaces($ipv="ipv4,ipv6", $interfacetype="any,localhost,real,carp,ipalias"){
 	// returns a list of ALL interface/IPs that can be used to bind a service to.
 	// filtered by the conditions given in the two filter parameters.
@@ -73,9 +74,18 @@ function haproxy_get_bindable_interfaces($ipv="ipv4,ipv6", $interfacetype="any,l
 					continue;
 				if (!isset($ifdetail['ipaddr']))
 					continue;
+				$descr = $ifdetail['descr'];
+				if (!$descr){
+					if ($if == "wan" && !$ifdetail['descr'])
+						$descr = "WAN";
+					else if ($if == "lan" && !$ifdetail['descr'])
+						$descr = "LAN";
+					else
+						$descr = $if;
+				}
 				$item = array();
-				$item[ip] = get_interface_ip($if);
-				$item[name] = $ifdetail['descr'].' address (IPv4)';
+				$item['ip'] = get_interface_ip($if);
+				$item['name'] = "$descr address (IPv4)";
 				$bindable[$if.'_ipv4'] = $item;
 			}
 		}
@@ -103,6 +113,9 @@ function haproxy_get_bindable_interfaces($ipv="ipv4,ipv6", $interfacetype="any,l
 			}
 		}
 	}
+	if (!isset($config['system']['ipv6allow']))
+		return $bindable;// skip adding the IPv6 addresses if those are not 'allowed'
+	
 	if (in_array("ipv6",$ipverions)){
 		if (in_array('any',$interfacetypes)){
 			$item = array();
@@ -122,9 +135,18 @@ function haproxy_get_bindable_interfaces($ipv="ipv4,ipv6", $interfacetype="any,l
 					continue;
 				if (!isset($ifdetail['ipaddrv6']))
 					continue;
+				$descr = $ifdetail['descr'];
+				if (!$descr){
+					if ($if == "wan" && !$ifdetail['descr'])
+						$descr = "WAN";
+					else if ($if == "lan" && !$ifdetail['descr'])
+						$descr = "LAN";
+					else
+						$descr = $if;
+				}
 				$item = array();
-				$item[ip] = get_interface_ipv6($if);
-				$item[name] = $ifdetail['descr'].' address (IPv6)';
+				$item['ip'] = get_interface_ipv6($if);
+				$item['name'] = "$descr  address (IPv6)";
 				$bindable[$if.'_ipv6'] = $item;
 			}
 		}		
@@ -225,6 +247,69 @@ function haproxy_recalculate_certifcate_chain(){
 	return $items_recalculated;
 }
 
+function get_certificat_usage($refid) {
+	$usage = array();
+	$cert = lookup_cert($refid);
+	if (is_cert_revoked($cert))
+		$usage[] = "Revoked";
+	if (is_webgui_cert($refid))
+		$usage[] = "webConfigurator";
+	if (is_user_cert($refid))
+		$usage[] = "User Cert";
+	if (is_openvpn_server_cert($refid))
+		$usage[] = "OpenVPN Server";
+	if (is_openvpn_client_cert($refid))
+		$usage[] = "OpenVPN Client";
+	if (is_ipsec_cert($cert['refid']))
+		$usage[] = "IPsec Tunnel";
+	if (function_exists("is_captiveportal_cert"))
+		if (is_captiveportal_cert($refid))
+			$usage[] = "Captive Portal";
+	
+	return $usage;
+}
+function get_certificates_server($get_includeWebCert=false) {
+	// This function (is intended to) provide a uniform way to retrieve a list of server certificates
+	global $config;
+	$certificates=array();
+	$a_cert = &$config['cert'];
+	foreach ($a_cert as $cert)
+	{
+		if ($get_ca == false && is_webgui_cert($cert['refid']))
+			continue;
+
+		$purpose = cert_get_purpose($cert['crt']);
+		//$certserverpurpose = $purpose['server'] == 'Yes' ? " [Server certificate]" : "";
+		$certserverpurpose = "";
+
+		$selected = "";
+		$caname = "";
+		$inuse = "";
+		$revoked = "";
+		$ca = lookup_ca($cert['caref']);
+		if ($ca)
+			$caname = " (CA: {$ca['descr']})";
+		if ($pconfig['certref'] == $cert['refid'])
+			$selected = "selected";
+		if (cert_in_use($cert['refid']))
+			$inuse = " *In Use";
+		if (is_cert_revoked($cert))
+		$revoked = " *Revoked";
+		
+		$usagestr="";
+		$usage = get_certificat_usage($cert['refid']);
+		foreach($usage as $use){
+			$usagestr .= " " . $use;
+		}		
+		if ($usagestr != "")
+			$usagestr = " (".trim($usagestr).")";
+		
+		$certificates[$cert['refid']]['name'] = $cert['descr'] . $caname . $certserverpurpose . $inuse . $revoked . $usagestr;
+	}
+	return $certificates;
+}
+
+
 function phparray_to_javascriptarray_recursive($nestID, $path, $items, $nodeName, $includeitems) {
 	$offset = str_repeat('  ',$nestID);
 	$itemName = "item$nestID";
@@ -241,25 +326,51 @@ function phparray_to_javascriptarray_recursive($nestID, $path, $items, $nodeName
 					$subNodeName = "item$nestID";
 					phparray_to_javascriptarray_recursive($nestID+1, $subpath, $items[$key], $subNodeName, $includeitems);
 					echo "{$offset}{$nodeName}['{$key}'] = $itemName;\n";
-				} else
-					echo "{$offset}{$nodeName}['$key'] = '$item';\n";
+				} else {
+					$item = json_encode($item);
+					echo "{$offset}{$nodeName}['$key'] = $item;\n";
+				}
 			}
 		}
 }
 function phparray_to_javascriptarray($items, $javaMapName, $includeitems) {
-		phparray_to_javascriptarray_recursive(1,'',$items, $javaMapName, $includeitems);
+	phparray_to_javascriptarray_recursive(1,'',$items, $javaMapName, $includeitems);
 }
 
-function echo_html_select($name, $keyvaluelist, $selected, $listEmptyMessage="", $onchangeEvent="") {
+function haproxy_html_select_options($keyvaluelist, $selected="") {
+	$result = "";
+	foreach($keyvaluelist as $key => $desc){
+		$selectedhtml = $key == $selected ? "selected" : "";
+		if ($desc['deprecated'] && $key != $selected){
+			continue;
+		}
+		$name = htmlspecialchars($desc['name']);
+		$result .= "<option value='{$key}' {$selectedhtml}>{$name}</option>";
+	}
+	return $result;
+}
+
+function haproxy_js_select_options($keyvaluelist, $selected="") {
+	$result = "";
+	foreach($keyvaluelist as $key => $desc){
+		$selectedhtml = $key == $selected ? "selected" : "";
+		if ($desc['deprecated'] && $key != $selected){
+			continue;
+		}
+		$name = htmlspecialchars($desc['name']);
+		$result .= "<option value='{$key}' {$selectedhtml}>{$name}<\/option>";
+	}
+	return $result;
+}
+
+function echo_html_select($name, $keyvaluelist, $selected, $listEmptyMessage="", $onchangeEvent="", $style="") {
 	if (count($keyvaluelist)>0){
 		if ($onchangeEvent != "")
-			$onchangeEvent .= " onchange=$onchangeEvent";
-		echo "<select name=\"$name\" id=\"$name\" class=\"formselect\"$onchangeEvent>";
-		foreach($keyvaluelist as $key => $desc){
-			$selectedhtml = $key == $selected ? "selected" : "";
-			$name = htmlspecialchars($desc['name']);
-			echo "<option value=\"{$key}\" {$selectedhtml}>{$name}</option>";
-		}
+			$onchangeEvent = " onchange='$onchangeEvent'";
+		if ($style != "")
+			$style = " style='$style'";
+		echo "<select name=\"$name\" id=\"$name\" class=\"formselect\"$onchangeEvent$style>";
+		echo haproxy_html_select_options($keyvaluelist, $selected);
 		echo "</select>";
 	} else {
 		echo $listEmptyMessage;

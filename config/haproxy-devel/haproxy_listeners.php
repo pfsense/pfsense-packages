@@ -1,8 +1,9 @@
 <?php
 /* $Id: load_balancer_virtual_server.php,v 1.6.2.1 2006/01/02 23:46:24 sullrich Exp $ */
 /*
-	haproxy_baclkends.php
+	haproxy_listeners.php
 	part of pfSense (http://www.pfsense.com/)
+	Copyright (C) 2013 PiBa-NL
 	Copyright (C) 2009 Scott Ullrich <sullrich@pfsense.com>
 	Copyright (C) 2008 Remco Hoef <remcoverhoef@pfsense.com>
 	All rights reserved.
@@ -84,16 +85,16 @@ include("head.inc");
 <?php endif; ?>
 <?php if ($input_errors) print_input_errors($input_errors); ?>
 <?php if ($savemsg) print_info_box($savemsg); ?>
-<?php if (file_exists($d_haproxyconfdirty_path)): ?><p>
-<?php print_info_box_np("The haproxy configuration has been changed.<br>You must apply the changes in order for them to take effect.");?><br>
+<?php if (file_exists($d_haproxyconfdirty_path)): ?>
+<?php print_info_box_np("The haproxy configuration has been changed.<br/>You must apply the changes in order for them to take effect.");?><br/>
 <?php endif; ?>
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
   <tr><td class="tabnavtbl">
   <?php
-        /* active tabs */
-        $tab_array = array();
+	/* active tabs */
+	$tab_array = array();
 	$tab_array[] = array("Settings", false, "haproxy_global.php");
-        $tab_array[] = array("Frontend", true, "haproxy_listeners.php");		
+	$tab_array[] = array("Frontend", true, "haproxy_listeners.php");		
 	$tab_array[] = array("Backend", false, "haproxy_pools.php");
 	display_top_tabs($tab_array);
   ?>
@@ -139,7 +140,7 @@ include("head.inc");
 		foreach ($a_frontend_grouped as $a_frontend) {
 			usort($a_frontend,'sort_sharedfrontends');
 			if (count($a_frontend) > 1 || $last_frontend_shared) {
-				?> <tr class="<?=$textgray?>"><td collspan="7">&nbsp;</td></tr> <?	
+				?> <tr class="<?=$textgray?>"><td colspan="7">&nbsp;</td></tr> <?	
 			}
 			$last_frontend_shared = count($a_frontend) > 1;
 			foreach ($a_frontend as $frontend) {
@@ -154,7 +155,17 @@ include("head.inc");
 					<? 
 					if (strtolower($frontend['type']) == "http" && $frontend['ssloffload']) {
 						$cert = lookup_cert($frontend['ssloffloadcert']);
-						echo '<img src="'.$img_cert.'" title="SSL offloading cert: '.$cert['descr'].'" alt="SSL offloading" border="0" height="16" width="16" />';
+						$descr = htmlspecialchars($cert['descr']);
+						$certs = $frontend['ha_certificates']['item'];
+						if (is_array($certs)){
+							if (count($certs) > 0){
+								foreach($certs as $certitem){
+									$cert = lookup_cert($certitem['ssl_certificate']);
+									$descr .= "\n".htmlspecialchars($cert['descr']);
+								}
+							}
+						}
+						echo '<img src="'.$img_cert.'" title="SSL offloading cert: '.$descr.'" alt="SSL offloading" border="0" height="16" width="16" />';
 					}
 					
 					$acls = get_frontend_acls($frontend);
@@ -162,14 +173,19 @@ include("head.inc");
 					foreach ($acls as $acl) {
 						$isaclset .= "&#10;" . $acl['descr'];
 					}
+					if ($frontend['ssloffloadacl'])
+						$isaclset .= "&#10;" . "Certificate ACL";
+					if ($frontend['ssloffloadacladditional'])
+						$isaclset .= "&#10;" . "Additional certificate ACLs";
+					
 					if ($isaclset) 
-						echo "<img src=\"$img_acl\" title=\"" . gettext("acl's used") . ": {$isaclset}\" border=\"0\">";
+						echo "<img src=\"$img_acl\" title=\"" . gettext("acl's used") . ": {$isaclset}\" border=\"0\" />";
 						
 					$isadvset = "";
 					if ($frontend['advanced_bind']) $isadvset .= "Advanced bind: {$frontend['advanced_bind']}\r\n";
 					if ($frontend['advanced']) $isadvset .= "Advanced pass thru setting used\r\n";
 					if ($isadvset)
-						echo "<img src=\"$img_adv\" title=\"" . gettext("Advanced settings set") . ": {$isadvset}\" border=\"0\">";				
+						echo "<img src=\"$img_adv\" title=\"" . gettext("Advanced settings set") . ": {$isadvset}\" border=\"0\" />";
 					
 					$backend_serverpool = $frontend['backend_serverpool'];
 					$backend = get_backend($backend_serverpool );
@@ -205,9 +221,9 @@ include("head.inc");
 				  <td class="list" nowrap>
 					<table border="0" cellspacing="0" cellpadding="1">
 					  <tr>
-						<td valign="middle"><a href="haproxy_listeners_edit.php?id=<?=$frontendname;?>"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_e.gif"  title="<?=gettext("edit frontend");?>" width="17" height="17" border="0"></a></td>
-						<td valign="middle"><a href="haproxy_listeners.php?act=del&id=<?=$frontendname;?>" onclick="return confirm('Do you really want to delete this entry?')"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_x.gif" title="<?=gettext("delete frontend");?>"  width="17" height="17" border="0"></a></td>
-						<td valign="middle"><a href="haproxy_listeners_edit.php?dup=<?=$frontendname;?>"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif" title="<?=gettext("clone frontend");?>" width="17" height="17" border="0"></a></td>
+						<td valign="middle"><a href="haproxy_listeners_edit.php?id=<?=$frontendname;?>"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_e.gif"  title="<?=gettext("edit frontend");?>" width="17" height="17" border="0" /></a></td>
+						<td valign="middle"><a href="haproxy_listeners.php?act=del&amp;id=<?=$frontendname;?>" onclick="return confirm('Do you really want to delete this entry?')"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_x.gif" title="<?=gettext("delete frontend");?>"  width="17" height="17" border="0" /></a></td>
+						<td valign="middle"><a href="haproxy_listeners_edit.php?dup=<?=$frontendname;?>"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif" title="<?=gettext("clone frontend");?>" width="17" height="17" border="0" /></a></td>
 					  </tr>
 					</table>
 				  </td>
@@ -220,7 +236,7 @@ include("head.inc");
 			  <td class="list">
 				<table border="0" cellspacing="0" cellpadding="1">
 				  <tr>
-					<td valign="middle"><a href="haproxy_listeners_edit.php"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif" title="<?=gettext("add new frontend");?>"  width="17" height="17" border="0"></a></td>
+					<td valign="middle"><a href="haproxy_listeners_edit.php"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif" title="<?=gettext("add new frontend");?>"  width="17" height="17" border="0" /></a></td>
 				  </tr>
 				</table>
 			  </td>

@@ -1,9 +1,9 @@
 <?php
 /* $Id$ */
 /*
-	status_rrd_graph.php
+	status_mail_report_edit.php
 	Part of pfSense
-	Copyright (C) 2011 Jim Pingle <jimp@pfsense.org>
+	Copyright (C) 2011-2014 Jim Pingle <jimp@pfsense.org>
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
@@ -32,20 +32,14 @@
 */
 
 ##|+PRIV
-##|*IDENT=page-status-rrdgraphs
-##|*NAME=Status: RRD Graphs page
-##|*DESCR=Allow access to the 'Status: RRD Graphs' page.
-##|*MATCH=status_rrd_graph.php*
+##|*IDENT=page-status-mailreportsedit
+##|*NAME=Status: E-Mail Reports: Edit Report page
+##|*DESCR=Allow access to the 'Status: E-Mail Reports: Edit Report' page.
+##|*MATCH=status_mail_report_edit.php*
 ##|-PRIV
 
 require("guiconfig.inc");
 require_once("mail_reports.inc");
-
-/* if the rrd graphs are not enabled redirect to settings page */
-if(! isset($config['rrd']['enable'])) {
-	header("Location: status_rrd_graph_settings.php");
-	return;
-}
 
 $cmdid = $_REQUEST['cmdid'];
 $logid = $_REQUEST['logid'];

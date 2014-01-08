@@ -199,7 +199,7 @@
 		<configurationfile>haproxy.xml</configurationfile>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
 		<depends_on_package>haproxy-1.4.21.tbz</depends_on_package>
-		<depends_on_package_pbi>haproxy-devel-1.5-dev19-i386.pbi</depends_on_package_pbi>
+		<depends_on_package_pbi>haproxy-devel-1.5-dev21-i386.pbi</depends_on_package_pbi>
 		<build_port_path>/usr/ports/net/haproxy-devel</build_port_path>
 		<build_pbi>
 			<ports_before>security/openssl</ports_before>
@@ -1133,7 +1133,7 @@
 		<website>http://bandwidthd.sourceforge.net/</website>
 		<descr>BandwidthD tracks usage of TCP/IP network subnets and builds html files with graphs to display utilization. Charts are built by individual IPs, and by default display utilization over 2 day, 8 day, 40 day, and 400 day periods. Furthermore, each ip address's utilization can be logged out at intervals of 3.3 minutes, 10 minutes, 1 hour or 12 hours in cdf format, or to a backend database server. HTTP, TCP, UDP, ICMP, VPN, and P2P traffic are color coded.</descr>
 		<category>System</category>
-		<version>2.0.1_5 pkg v.0.2</version>
+		<version>2.0.1_5 pkg v.0.3</version>
 		<status>BETA</status>
 		<required_version>1.2.1</required_version>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
@@ -1437,7 +1437,7 @@
 			<custom_name>zabbix-agent</custom_name>
 			<port>net-mgmt/zabbix-agent</port>
 		</build_pbi>
-		<build_options>WITHOUT_CARES=true;WITHOUT_CURL_DEBUG=true;WITHOUT_DEBUGGING=true;WITHOUT_DMALLOC=true;WITHOUT_ETCSYMLINK=true;WITHOUT_EXTRA_PATCHES=true;WITHOUT_GDBM=true;WITHOUT_GNUTLS=true;WITHOUT_IODBC=true;WITHOUT_IPMI=true;WITHOUT_KERBEROS4=true;WITHOUT_LDAP=true;WITHOUT_LDAPS=true;WITHOUT_LIBIDN=true;WITHOUT_LIBSIGSEGV=true;WITHOUT_LIBSSH2=true;WITHOUT_MFD_REWRITES=true;WITHOUT_MULTIPLICITY=true;WITHOUT_MYSQL=true;WITHOUT_NTLM=true;WITHOUT_PERL_MALLOC=true;WITHOUT_PGSQL=true;WITHOUT_RTMP=true;WITHOUT_SITECUSTOMIZE=true;WITHOUT_SSH=true;WITHOUT_SUIDPERL=true;WITHOUT_THREADS=true;WITHOUT_TKMIB=true;WITHOUT_TRACKMEMORY=true;WITHOUT_UNIXODBC=true;WITH_CA_BUNDLE=true;WITH_CURL=true;WITH_DUMMY=true;WITH_EXTRA_ENCODINGS=true;WITH_FETCH=true;WITH_FPING=true;WITH_IPV6=true;WITH_JABBER=true;WITH_LDAP=true;WITH_OPENSSL=true;WITH_PERL=true;WITH_PERL_64BITINT=true;WITH_PERL_EMBEDDED=true;WITH_PROXY=true;WITH_SASL=true;WITH_SQLITE=true;WITH_USE_PERL=true;WITH_WERROR=true</build_options>
+		<build_options>ca_root_nss_UNSET=ETCSYMLINK;zabbix22_SET=LDAP SSH SQLITE;zabbix22_UNSET=MYSQL</build_options>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
 		<depends_on_package>zabbix-agent-1.8.10,2.tbz</depends_on_package>
 		<depends_on_package_pbi>zabbix-agent-1.8.13-i386.pbi</depends_on_package_pbi>
@@ -1457,7 +1457,7 @@
 			<custom_name>zabbix-proxy</custom_name>
 			<port>net-mgmt/zabbix-proxy</port>
 		</build_pbi>
-		<build_options>WITHOUT_CARES=true;WITHOUT_CURL_DEBUG=true;WITHOUT_DEBUGGING=true;WITHOUT_DMALLOC=true;WITHOUT_ETCSYMLINK=true;WITHOUT_EXTRA_PATCHES=true;WITHOUT_GDBM=true;WITHOUT_GNUTLS=true;WITHOUT_IODBC=true;WITHOUT_IPMI=true;WITHOUT_KERBEROS4=true;WITHOUT_LDAP=true;WITHOUT_LDAPS=true;WITHOUT_LIBIDN=true;WITHOUT_LIBSIGSEGV=true;WITHOUT_LIBSSH2=true;WITHOUT_MFD_REWRITES=true;WITHOUT_MULTIPLICITY=true;WITHOUT_MYSQL=true;WITHOUT_NTLM=true;WITHOUT_PERL_MALLOC=true;WITHOUT_PGSQL=true;WITHOUT_RTMP=true;WITHOUT_SITECUSTOMIZE=true;WITHOUT_SSH=true;WITHOUT_SUIDPERL=true;WITHOUT_THREADS=true;WITHOUT_TKMIB=true;WITHOUT_TRACKMEMORY=true;WITHOUT_UNIXODBC=true;WITH_CA_BUNDLE=true;WITH_CURL=true;WITH_DUMMY=true;WITH_EXTRA_ENCODINGS=true;WITH_FETCH=true;WITH_FPING=true;WITH_IPV6=true;WITH_JABBER=true;WITH_LDAP=true;WITH_OPENSSL=true;WITH_PERL=true;WITH_PERL_64BITINT=true;WITH_PERL_EMBEDDED=true;WITH_PROXY=true;WITH_SASL=true;WITH_SQLITE=true;WITH_USE_PERL=true;WITH_WERROR=true</build_options>
+		<build_options>ca_root_nss_UNSET=ETCSYMLINK;zabbix22_SET=LDAP SSH SQLITE;zabbix22_UNSET=MYSQL</build_options>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
 		<depends_on_package>zabbix-proxy-1.8.8,2.tbz</depends_on_package>
 		<depends_on_package_pbi>zabbix-proxy-1.8.13-i386.pbi</depends_on_package_pbi>
@@ -1728,7 +1728,7 @@
 		<name>mailreport</name>
 		<descr>Allows you to setup periodic e-mail reports containing command output, log file contents, and RRD graphs.</descr>
 		<category>Network Management</category>
-		<version>2.0.6</version>
+		<version>2.0.7</version>
 		<status>Stable</status>
 		<required_version>2.0</required_version>
 		<config_file>http://www.pfsense.com/packages/config/mailreport/mailreport.xml</config_file>
@@ -1915,39 +1915,39 @@
 		<descr>Monitoring agent.</descr>
 		<category>Services</category>
 		<config_file>http://www.pfsense.org/packages/config/zabbix2/zabbix2-agent.xml</config_file>
-		<version>zabbix2-agent-2.0.8 pkg v0.7_1</version>
+		<version>zabbix2-agent-2.2.1 pkg v0.8_0</version>
 		<status>BETA</status>
 		<required_version>2.0</required_version>
 		<configurationfile>zabbix2-agent.xml</configurationfile>
 		<maintainer>dbaio@bsd.com.br</maintainer>
-		<build_port_path>/usr/ports/net-mgmt/zabbix2-agent</build_port_path>
+		<build_port_path>/usr/ports/net-mgmt/zabbix22-agent</build_port_path>
 		<build_pbi>
-			<custom_name>zabbix2-agent</custom_name>
-			<port>net-mgmt/zabbix2-agent</port>
+			<custom_name>zabbix22-agent</custom_name>
+			<port>net-mgmt/zabbix22-agent</port>
 		</build_pbi>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
-		<depends_on_package>zabbix2-agent-2.0.8.tbz</depends_on_package>
-		<depends_on_package_pbi>zabbix2-agent-2.0.8-i386.pbi</depends_on_package_pbi>
+		<depends_on_package>zabbix22-agent-2.2.1.tbz</depends_on_package>
+		<depends_on_package_pbi>zabbix22-agent-2.2.1-i386.pbi</depends_on_package_pbi>
 	</package>
 	<package>
 		<name>Zabbix-2 Proxy</name>
 		<descr>Monitoring agent proxy.</descr>
 		<category>Services</category>
 		<config_file>http://www.pfsense.org/packages/config/zabbix2/zabbix2-proxy.xml</config_file>
-		<version>zabbix2-proxy-2.0.8 pkg v0.7_1</version>
+		<version>zabbix2-proxy-2.2.1 pkg v0.8_0</version>
 		<status>BETA</status>
 		<required_version>2.0</required_version>
 		<configurationfile>zabbix2-proxy.xml</configurationfile>
 		<maintainer>dbaio@bsd.com.br</maintainer>
-		<build_port_path>/usr/ports/net-mgmt/zabbix2-proxy</build_port_path>
+		<build_port_path>/usr/ports/net-mgmt/zabbix22-proxy</build_port_path>
 		<build_pbi>
-			<custom_name>zabbix2-proxy</custom_name>
-			<port>net-mgmt/zabbix2-proxy</port>
+			<custom_name>zabbix22-proxy</custom_name>
+			<port>net-mgmt/zabbix22-proxy</port>
 		</build_pbi>
 		<build_options>OPTIONS_SET+= SQLITE IPV6;OPTIONS_UNSET+= MYSQL JABBER GSSAPI</build_options>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
-		<depends_on_package>zabbix2-proxy-2.0.8.tbz</depends_on_package>
-		<depends_on_package_pbi>zabbix2-proxy-2.0.8-i386.pbi</depends_on_package_pbi>
+		<depends_on_package>zabbix22-proxy-2.2.1.tbz</depends_on_package>
+		<depends_on_package_pbi>zabbix22-proxy-2.2.1-i386.pbi</depends_on_package_pbi>
 	</package>
 	<package>
 		<!-- This does not exist yet, this is here to trigger a PBI build -->
@@ -2015,6 +2015,26 @@
 		<build_pbi>
 			<port>net-mgmt/softflowd</port>
 		</build_pbi>
+	</package>
+	<package>
+		<name>Apcupsd</name>
+		<descr>Set of programs for controlling APC UPS.</descr>
+		<category>Services</category>
+		<config_file>http://www.pfsense.org/packages/config/apcupsd/apcupsd.xml</config_file>
+		<version>apcupsd-3.14.10_1 pkg v0.1</version>
+		<status>BETA</status>
+		<required_version>2.0</required_version>
+		<configurationfile>apcupsd.xml</configurationfile>
+		<maintainer>dbaio@bsd.com.br</maintainer>
+		<build_port_path>/usr/ports/sysutils/apcupsd</build_port_path>
+		<build_pbi>
+			<custom_name>apcupsd</custom_name>
+			<port>sysutils/apcupsd</port>
+		</build_pbi>
+		<build_options>OPTIONS_SET+= APCSMART_DRV APCDUMB_DRV PCNET_DRV USB TCP_WRAPPERS;OPTIONS_UNSET+= CLIENT_ONLY CGI SNMP_DRV SNMP_DRV_OLD TEST_DRV GAPCMON DOCS</build_options>
+		<depends_on_package_base_url>http://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
+		<depends_on_package>apcupsd-3.14.10_1.tbz</depends_on_package>
+		<depends_on_package_pbi>apcupsd-3.14.10_1-i386.pbi</depends_on_package_pbi>
 	</package>
 </packages>
 </pfsensepkgs>

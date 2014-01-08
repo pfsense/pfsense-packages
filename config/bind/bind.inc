@@ -105,10 +105,10 @@ function bind_zone_validate($post, $input_errors){
 		exec("$rndc_confgen ",$rndc_conf);
 		foreach($rndc_conf as $line)
 			$confgen_file.="$line\n";
-		file_put_contents(BIND_LOCALBASE."/etc/rndc-confgen.pfsese",$confgen_file);
+		file_put_contents(BIND_LOCALBASE."/etc/rndc-confgen.pfsense",$confgen_file);
 		}
-	if (file_exists(BIND_LOCALBASE."/etc/rndc-confgen.pfsese")){
-		$rndc_conf=file(BIND_LOCALBASE."/etc/rndc-confgen.pfsese");
+	if (file_exists(BIND_LOCALBASE."/etc/rndc-confgen.pfsense")){
+		$rndc_conf=file(BIND_LOCALBASE."/etc/rndc-confgen.pfsense");
 		$confgen="rndc.conf";
 		$rndc_bindconf="";
 		foreach ($rndc_conf as $line){
