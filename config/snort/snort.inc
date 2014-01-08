@@ -440,8 +440,8 @@ function snort_build_list($snortcfg, $listname = "", $whitelist = false) {
 		$gw = get_interface_gateway($snortcfg['interface']);
 		if (is_ipaddr($gw) && !in_array($gw, $home_net))
 			$home_net[] = $gw;
-		if (function_exists("get_interface_gatewayv6")) {
-			$gw = get_interface_gatewayv6($snortcfg['interface']);
+		if (function_exists("get_interface_gateway_v6")) {
+			$gw = get_interface_gateway_v6($snortcfg['interface']);
 			if (is_ipaddrv6($gw) && !in_array($gw, $home_net))
 				$home_net[] = $gw;
 		}
