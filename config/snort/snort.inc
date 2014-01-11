@@ -636,14 +636,14 @@ function snort_get_real_interface($interface) {
 }
 
 /*
- this code block is for deleteing logs while keeping the newest file,
+ this code block is for deleting logs while keeping the newest file,
  snort is linked to these files while running, do not take the easy way out
  by touch and rm, snort will lose sync and not log.
 */
 function snort_post_delete_logs($snort_uuid = 0) {
 	global $config, $g;
 
-	/* do not start config build if rules is empty */
+	/* do nothing if no Snort interfaces active */
 	if (!is_array($config['installedpackages']['snortglobal']['rule']))
 		return;
 
@@ -651,14 +651,22 @@ function snort_post_delete_logs($snort_uuid = 0) {
 		if ($value['uuid'] != $snort_uuid)
 			continue;
 		$if_real = snort_get_real_interface($value['interface']);
-		$snort_log_dir = "/var/log/snort/snort_{$if_real}{$snort_uuid}";
+		$snort_log_dir = SNORTLOGDIR . "/snort_{$if_real}{$snort_uuid}";
 
 		if ($if_real != '') {
+			/* Clean-up Barnyard2 files if any exist */
 			$filelist = glob("{$snort_log_dir}/*{$snort_uuid}_{$if_real}.u2.*");
 			unset($filelist[count($filelist) - 1]);
 			foreach ($filelist as $file)
 				@unlink($file);
 
+			/* Clean-up packet capture files if any exist */
+			$filelist = glob("{$snort_log_dir}/snort.log.*");
+			unset($filelist[count($filelist) - 1]);
+			foreach ($filelist as $file)
+				@unlink($file);
+
+			/* Clean-up stats files if they are enabled */
 			if ($value['perform_stat'] == 'on') {
 				$fd = fopen("{$snort_log_dir}/{$if_real}.stats", "w");
 				if ($fd) {
@@ -674,7 +682,7 @@ function snort_Getdirsize($node) {
 	if(!is_readable($node))
 		return false;
 
-	$blah = exec( "/usr/bin/du -kd $node" );
+	$blah = exec( "/usr/bin/du -kdc $node" );
 	return substr( $blah, 0, strpos($blah, 9) );
 }
 
