@@ -678,6 +678,7 @@ function snort_post_delete_logs($snort_uuid = 0) {
 	}
 }
 
+/* This returns size of passed directory or file in 1024-byte blocks */
 function snort_Getdirsize($node) {
 	if(!is_readable($node))
 		return false;
