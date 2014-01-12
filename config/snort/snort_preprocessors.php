@@ -509,24 +509,26 @@ elseif ($_POST['Submit']) {
 		$natent['stream5_track_udp'] = $_POST['stream5_track_udp'] ? 'on' : 'off';
 		$natent['stream5_track_icmp'] = $_POST['stream5_track_icmp'] ? 'on' : 'off';
 
-		/* If 'preproc_auto_rule_disable' is off, then clear log file */
-		if ($natent['preproc_auto_rule_disable'] == 'off')
-			@unlink("{$disabled_rules_log}");
-
 		if (isset($id) && $a_nat[$id]) {
 			$a_nat[$id] = $natent;
 			write_config();
 		}
 
-		/* Set flag to rebuild rules for this interface  */
-		$rebuild_rules = true;
+		conf_mount_rw();
 
 		/*************************************************/
 		/* Update the snort.conf file and rebuild the    */
 		/* rules for this interface.                     */
 		/*************************************************/
+		$rebuild_rules = true;
 		snort_generate_conf($natent);
 		$rebuild_rules = false;
+
+		/* If 'preproc_auto_rule_disable' is off, then clear log file */
+		if ($natent['preproc_auto_rule_disable'] == 'off')
+			@unlink("{$disabled_rules_log}");
+
+		conf_mount_ro();
 
 		/*******************************************************/
 		/* Signal Snort to reload Host Attribute Table if one  */

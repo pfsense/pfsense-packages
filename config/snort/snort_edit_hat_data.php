@@ -61,19 +61,23 @@ else
 	$pconfig['host_attribute_data'] = "";
 
 if ($_POST['clear']) {
+	conf_mount_rw();
 	unset($a_nat[$id]['host_attribute_data']);
 	write_config();
 	$rebuild_rules = false;
 	snort_generate_conf($a_nat[$id]);
+	conf_mount_ro();
 	header("Location: /snort/snort_edit_hat_data.php?id={$id}");
 	exit;
 }
 
 if ($_POST['host_attribute_data']) {
+	conf_mount_rw();
 	$a_nat[$id]['host_attribute_data'] = base64_encode($_POST['host_attribute_data']);
 	write_config();
 	$rebuild_rules = false;
 	snort_generate_conf($a_nat[$id]);
+	conf_mount_ro();
 	header("Location: /snort/snort_preprocessors.php?id={$id}");
 	exit;
 }

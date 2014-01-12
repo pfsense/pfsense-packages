@@ -100,8 +100,6 @@ if ($_GET['act'] == "import") {
 }
 
 if ($_POST['submit']) {
-	conf_mount_rw();
-
 	unset($input_errors);
 	$pconfig = $_POST;
 

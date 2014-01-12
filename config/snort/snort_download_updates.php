@@ -87,8 +87,10 @@ if (file_exists("{$snortdir}/{$snort_community_rules_filename}.md5"))
 
 /* Check for postback to see if we should clear the update log file. */
 if (isset($_POST['clear'])) {
+	conf_mount_rw();
 	if (file_exists("{$snort_rules_upd_log}"))
 		mwexec("/bin/rm -f {$snort_rules_upd_log}");
+	conf_mount_ro();
 }
 
 if (isset($_POST['update'])) {

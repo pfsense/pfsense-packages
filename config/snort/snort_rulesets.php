@@ -118,7 +118,6 @@ if ($a_nat[$id]['ips_policy_enable'] == 'on') {
 else
 	$disable_vrt_rules = "";
 
-/* alert file */
 if ($_POST["Submit"]) {
 
 	if ($_POST['ips_policy_enable'] == "on") {
@@ -146,6 +145,7 @@ if ($_POST["Submit"]) {
 			@unlink("{$snortdir}/snort_{$snort_uuid}_{$if_real}/rules/{$flowbit_rules_file}");
 	}
 
+	conf_mount_rw();
 	write_config();
 
 	/*************************************************/
@@ -155,6 +155,10 @@ if ($_POST["Submit"]) {
 	$rebuild_rules = true;
 	snort_generate_conf($a_nat[$id]);
 	$rebuild_rules = false;
+	conf_mount_ro();
+
+	/* Soft-restart Snort to live-load new rules */
+	snort_reload_config($a_nat[$id]);
 
 	header("Location: /snort/snort_rulesets.php?id=$id");
 	exit;
