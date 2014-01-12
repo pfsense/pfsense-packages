@@ -1354,6 +1354,7 @@ EOD;
 /*****************************************************************************/
 /* This starts the actual post-install code                                  */
 /*****************************************************************************/
+conf_mount_rw();
 
 /* Hard kill any running Snort processes that may have been started by any   */
 /* of the pfSense scripts such as check_reload_status() or rc.start_packages */
@@ -1436,7 +1437,6 @@ if ($config['installedpackages']['snortglobal']['forcekeepsettings'] == 'on') {
 
 	/* Add the recurring jobs created above to crontab */
 	configure_cron();
-	conf_mount_ro();
 
 	$rebuild_rules = false;
 	update_output_window(gettext("Finished rebuilding Snort configuration files..."));
@@ -1453,8 +1453,9 @@ if ($config['installedpackages']['snortglobal']['forcekeepsettings'] == 'on') {
 }
 
 /* Update Snort package version in configuration */
-$config['installedpackages']['snortglobal']['snort_config_ver'] = "3.0.1";
+$config['installedpackages']['snortglobal']['snort_config_ver'] = "3.0.2";
 write_config();
+conf_mount_ro();
 
 /* Done with post-install, so clear flag */
 unset($g['snort_postinstall']);

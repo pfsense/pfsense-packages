@@ -54,7 +54,7 @@ if (empty($snort_version))
 	$snort_version = "2.9.5.5";
 
 /* package version */
-$pfSense_snort_version = "3.0.1";
+$pfSense_snort_version = "3.0.2";
 $snort_package_version = "Snort {$snort_version} pkg v{$pfSense_snort_version}";
 
 // Define SNORTDIR and SNORTLIBDIR constants according to pfSense version
@@ -662,7 +662,6 @@ function snort_post_delete_logs($snort_uuid = 0) {
 
 			/* Clean-up packet capture files if any exist */
 			$filelist = glob("{$snort_log_dir}/snort.log.*");
-			unset($filelist[count($filelist) - 1]);
 			foreach ($filelist as $file)
 				@unlink($file);
 
