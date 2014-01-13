@@ -319,25 +319,21 @@ if ($_GET['act'] == "resetall" && !empty($rules_map)) {
 }
 
 if ($_POST['clear']) {
-	conf_mount_rw();
 	unset($a_rule[$id]['customrules']);
 	write_config();
 	$rebuild_rules = true;
 	snort_generate_conf($a_rule[$id]);
 	$rebuild_rules = false;
-	conf_mount_ro();
 	header("Location: /snort/snort_rules.php?id={$id}&openruleset={$currentruleset}");
 	exit;
 }
 
 if ($_POST['customrules']) {
-	conf_mount_rw();
 	$a_rule[$id]['customrules'] = base64_encode($_POST['customrules']);
 	write_config();
 	$rebuild_rules = true;
 	snort_generate_conf($a_rule[$id]);
 	$rebuild_rules = false;
-	conf_mount_ro();
 	$output = "";
 	$retcode = "";
 	exec("/usr/local/bin/snort -T -c {$snortdir}/snort_{$snort_uuid}_{$if_real}/snort.conf 2>&1", $output, $retcode);
@@ -356,7 +352,6 @@ if ($_POST['customrules']) {
 }
 
 else if ($_POST['apply']) {
-	conf_mount_rw();
 	/* Save new configuration */
 	write_config();
 
@@ -367,7 +362,6 @@ else if ($_POST['apply']) {
 	$rebuild_rules = true;
 	snort_generate_conf($a_rule[$id]);
 	$rebuild_rules = false;
-	conf_mount_ro();
 
 	/* Soft-restart Snort to live-load new rules */
 	snort_reload_config($a_rule[$id]);

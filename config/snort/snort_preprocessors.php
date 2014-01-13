@@ -514,8 +514,6 @@ elseif ($_POST['Submit']) {
 			write_config();
 		}
 
-		conf_mount_rw();
-
 		/*************************************************/
 		/* Update the snort.conf file and rebuild the    */
 		/* rules for this interface.                     */
@@ -527,8 +525,6 @@ elseif ($_POST['Submit']) {
 		/* If 'preproc_auto_rule_disable' is off, then clear log file */
 		if ($natent['preproc_auto_rule_disable'] == 'off')
 			@unlink("{$disabled_rules_log}");
-
-		conf_mount_ro();
 
 		/*******************************************************/
 		/* Signal Snort to reload Host Attribute Table if one  */
