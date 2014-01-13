@@ -131,13 +131,14 @@ if ($_POST) {
 
 		$a_nat[$id] = $natent;
 
-		conf_mount_rw();
 		write_config();
 
 		/* Update the snort conf file for this interface. */
 		$rebuild_rules = false;
 		snort_generate_conf($a_nat[$id]);
-		conf_mount_ro();
+
+		/* Soft-restart Snort to live-load new variables. */
+		snort_reload_config($a_nat[$id]);
 
 		/* after click go to this page */
 		header( 'Expires: Sat, 26 Jul 1997 05:00:00 GMT' );

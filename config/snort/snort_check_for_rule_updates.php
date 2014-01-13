@@ -104,6 +104,9 @@ $snort_filename = "snortrules-snapshot-{$snortver[0]}.tar.gz";
 $snort_filename_md5 = "{$snort_filename}.md5";
 $snort_rule_url = VRT_DNLD_URL;
 
+/* Mount the Snort conf directories R/W so we can modify files there */
+conf_mount_rw();
+
 /* Set up Emerging Threats rules filenames and URL */
 if ($etpro == "on") {
 	$emergingthreats_filename = ETPRO_DNLD_FILENAME;
@@ -364,8 +367,9 @@ function snort_fetch_new_rules($file_url, $file_dst, $file_md5, $desc = "") {
 
 }
 
+/**********************/
 /* Start of main code */
-conf_mount_rw();
+/**********************/
 
 /*  remove old $tmpfname files */
 if (is_dir("{$tmpfname}"))

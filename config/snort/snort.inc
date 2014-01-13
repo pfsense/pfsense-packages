@@ -2520,6 +2520,8 @@ function snort_generate_conf($snortcfg) {
 	if (!is_array($config['installedpackages']['snortglobal']['rule']))
 		return;
 
+	conf_mount_rw();
+
 	/* See if we should protect and not modify the preprocessor rules files */
 	if (!empty($snortcfg['protect_preproc_rules'])) 	
 		$protect_preproc_rules = $snortcfg['protect_preproc_rules'];
@@ -3767,10 +3769,12 @@ EOD;
 	$conf = fopen("{$snortcfgdir}/snort.conf", "w");
 	if(!$conf) {
 		log_error("Could not open {$snortcfgdir}/snort.conf for writing.");
+		conf_mount_ro();
 		return -1;
 	}
 	fwrite($conf, $snort_conf_text);
 	fclose($conf);
+	conf_mount_ro();
 	unset($snort_conf_text, $selected_rules_sections, $suppress_file_name, $snort_misc_include_rules, $spoink_type, $snortunifiedlog_type, $alertsystemlog_type);
 	unset($home_net, $external_net, $ipvardef, $portvardef);
 }

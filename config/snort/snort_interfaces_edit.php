@@ -150,8 +150,8 @@ if ($_POST["Submit"]) {
 			if ($natent['interface'] != $a_rule[$id]['interface']) {
 				$oif_real = snort_get_real_interface($a_rule[$id]['interface']);
 				snort_stop($a_rule[$id], $oif_real);
-				conf_mount_rw();
 				exec("rm -r /var/log/snort_{$oif_real}" . $a_rule[$id]['uuid']);
+				conf_mount_rw();
 				exec("mv -f {$snortdir}/snort_" . $a_rule[$id]['uuid'] . "_{$oif_real} {$snortdir}/snort_" . $a_rule[$id]['uuid'] . "_{$if_real}");
 				conf_mount_ro();
 			}

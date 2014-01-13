@@ -216,7 +216,6 @@ if (($_GET['act'] == "addsuppress_srcip" || $_GET['act'] == "addsuppress_dstip")
 }
 
 if ($_GET['action'] == "clear" || $_POST['delete']) {
-	conf_mount_rw();
 	snort_post_delete_logs($snort_uuid);
 	$fd = @fopen("/var/log/snort/snort_{$if_real}{$snort_uuid}/alert", "w+");
 	if ($fd)
@@ -225,13 +224,11 @@ if ($_GET['action'] == "clear" || $_POST['delete']) {
 	mwexec('/bin/chmod 660 /var/log/snort/*', true);
 	if (file_exists("{$g['varrun_path']}/snort_{$if_real}{$snort_uuid}.pid"))
 		mwexec("/bin/pkill -HUP -F {$g['varrun_path']}/snort_{$if_real}{$snort_uuid}.pid -a");
-	conf_mount_ro();
 	header("Location: /snort/snort_alerts.php?instance={$instanceid}");
 	exit;
 }
 
 if ($_POST['download']) {
-	conf_mount_rw();
 	$save_date = exec('/bin/date "+%Y-%m-%d-%H-%M-%S"');
 	$file_name = "snort_logs_{$save_date}_{$if_real}.tar.gz";
 	exec("cd /var/log/snort/snort_{$if_real}{$snort_uuid} && /usr/bin/tar -czf /tmp/{$file_name} *");
@@ -256,8 +253,6 @@ if ($_POST['download']) {
 	}
 	else
 		$savemsg = gettext("An error occurred while creating archive");
-
-	conf_mount_ro();
 }
 
 /* Load up an array with the current Suppression List GID,SID values */
