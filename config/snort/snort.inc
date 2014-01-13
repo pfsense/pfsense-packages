@@ -54,7 +54,7 @@ if (empty($snort_version))
 	$snort_version = "2.9.5.5";
 
 /* package version */
-$pfSense_snort_version = "3.0.1";
+$pfSense_snort_version = "3.0.2";
 $snort_package_version = "Snort {$snort_version} pkg v{$pfSense_snort_version}";
 
 // Define SNORTDIR and SNORTLIBDIR constants according to pfSense version
@@ -440,8 +440,8 @@ function snort_build_list($snortcfg, $listname = "", $whitelist = false) {
 		$gw = get_interface_gateway($snortcfg['interface']);
 		if (is_ipaddr($gw) && !in_array($gw, $home_net))
 			$home_net[] = $gw;
-		if (function_exists("get_interface_gatewayv6")) {
-			$gw = get_interface_gatewayv6($snortcfg['interface']);
+		if (function_exists("get_interface_gateway_v6")) {
+			$gw = get_interface_gateway_v6($snortcfg['interface']);
 			if (is_ipaddrv6($gw) && !in_array($gw, $home_net))
 				$home_net[] = $gw;
 		}
@@ -636,14 +636,14 @@ function snort_get_real_interface($interface) {
 }
 
 /*
- this code block is for deleteing logs while keeping the newest file,
+ this code block is for deleting logs while keeping the newest file,
  snort is linked to these files while running, do not take the easy way out
  by touch and rm, snort will lose sync and not log.
 */
 function snort_post_delete_logs($snort_uuid = 0) {
 	global $config, $g;
 
-	/* do not start config build if rules is empty */
+	/* do nothing if no Snort interfaces active */
 	if (!is_array($config['installedpackages']['snortglobal']['rule']))
 		return;
 
@@ -651,14 +651,21 @@ function snort_post_delete_logs($snort_uuid = 0) {
 		if ($value['uuid'] != $snort_uuid)
 			continue;
 		$if_real = snort_get_real_interface($value['interface']);
-		$snort_log_dir = "/var/log/snort/snort_{$if_real}{$snort_uuid}";
+		$snort_log_dir = SNORTLOGDIR . "/snort_{$if_real}{$snort_uuid}";
 
 		if ($if_real != '') {
+			/* Clean-up Barnyard2 files if any exist */
 			$filelist = glob("{$snort_log_dir}/*{$snort_uuid}_{$if_real}.u2.*");
 			unset($filelist[count($filelist) - 1]);
 			foreach ($filelist as $file)
 				@unlink($file);
 
+			/* Clean-up packet capture files if any exist */
+			$filelist = glob("{$snort_log_dir}/snort.log.*");
+			foreach ($filelist as $file)
+				@unlink($file);
+
+			/* Clean-up stats files if they are enabled */
 			if ($value['perform_stat'] == 'on') {
 				$fd = fopen("{$snort_log_dir}/{$if_real}.stats", "w");
 				if ($fd) {
@@ -670,11 +677,12 @@ function snort_post_delete_logs($snort_uuid = 0) {
 	}
 }
 
+/* This returns size of passed directory or file in 1024-byte blocks */
 function snort_Getdirsize($node) {
 	if(!is_readable($node))
 		return false;
 
-	$blah = exec( "/usr/bin/du -kd $node" );
+	$blah = exec( "/usr/bin/du -kdc $node" );
 	return substr( $blah, 0, strpos($blah, 9) );
 }
 

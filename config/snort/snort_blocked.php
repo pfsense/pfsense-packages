@@ -63,6 +63,7 @@ if ($_POST['remove']) {
 /* TODO: build a file with block ip and disc */
 if ($_POST['download'])
 {
+	conf_mount_rw();
 	$blocked_ips_array_save = "";
 	exec('/sbin/pfctl -t snort2c -T show', $blocked_ips_array_save);
 	/* build the list */
@@ -104,6 +105,8 @@ if ($_POST['download'])
 			$savemsg = gettext("An error occurred while creating archive");
 	} else
 		$savemsg = gettext("No content on snort block list");
+
+	conf_mount_ro();
 }
 
 if ($_POST['save'])

@@ -220,7 +220,7 @@ if ($pfsense_stable == 'yes')
 	<table id="maintable" class="tabcont" width="100%" border="0" cellpadding="0" cellspacing="0">
 		<tr id="frheader">
 			<td width="3%" class="list">&nbsp;</td>
-			<td width="10%" class="listhdrr"><?php echo gettext("If"); ?></td>
+			<td width="10%" class="listhdrr"><?php echo gettext("Interface"); ?></td>
 			<td width="13%" class="listhdrr"><?php echo gettext("Snort"); ?></td>
 			<td width="10%" class="listhdrr"><?php echo gettext("Performance"); ?></td>
 			<td width="10%" class="listhdrr"><?php echo gettext("Block"); ?></td>
