@@ -1,6 +1,4 @@
 <?php
-
-/* $Id$ */
 /*
 	openbgpd.inc
 	Copyright (C) 2007 Scott Ullrich (sullrich@gmail.com)
@@ -212,6 +210,7 @@ EOF;
 		)
 	);
 
+	$_gb = exec("/sbin/sysctl net.inet.ip.ipsec_in_use=1");
 	// bgpd process running?  if so reload, else start.
 	if(is_openbgpd_running() == true) {
 		exec("{$pkg_bin}/bgpctl reload");
