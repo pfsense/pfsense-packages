@@ -178,6 +178,7 @@ function openbgpd_install_conf() {
 	// Write out the configuration file
 	@file_put_contents("{$bgpd_config_base}/bgpd.conf", $conffile);
 	@chmod("{$bgpd_config_base}/bgpd.conf", 0600);
+	unset($conffile);
 
 	// Create rc.d file
 	$rc_file_stop = <<<EOF
@@ -209,6 +210,7 @@ EOF;
 			"stop" =>  $rc_file_stop
 		)
 	);
+	unset($rc_file_start, $rc_file_stop);
 
 	$_gb = exec("/sbin/sysctl net.inet.ip.ipsec_in_use=1");
 	// bgpd process running?  if so reload, else start.
