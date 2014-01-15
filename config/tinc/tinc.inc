@@ -31,12 +31,12 @@ function tinc_save() {
 		file_put_contents('/usr/local/etc/tinc/hosts/'.$host['name'],$_output);
 		if($host['host_up'])
 		{
-			file_put_contents('/usr/local/etc/tinc/hosts/'.$host['name'].'-up',base64_decode($host['host_up'])."\n");
+			file_put_contents('/usr/local/etc/tinc/hosts/'.$host['name'].'-up',str_replace("\r", "", base64_decode($host['host_up']))."\n");
 			chmod('/usr/local/etc/tinc/hosts/'.$host['name'].'-up', 0744);
 		}
 		if($host['host_down'])
 		{
-			file_put_contents('/usr/local/etc/tinc/hosts/'.$host['name'].'-down',base64_decode($host['host_down'])."\n");
+			file_put_contents('/usr/local/etc/tinc/hosts/'.$host['name'].'-down',str_replace("\r", "", base64_decode($host['host_down']))."\n");
 			chmod('/usr/local/etc/tinc/hosts/'.$host['name'].'-down', 0744);
 		}
 	}
@@ -77,27 +77,27 @@ function tinc_save() {
 	chmod("/usr/local/etc/tinc/tinc-up", 0744);
 	if($tincconf['tinc_down'])
 	{
-		file_put_contents('/usr/local/etc/tinc/tinc-down',base64_decode($tincconf['tinc_down']) . "\n");
+		file_put_contents('/usr/local/etc/tinc/tinc-down',str_replace("\r", "", base64_decode($tincconf['tinc_down'])) . "\n");
 		chmod("/usr/local/etc/tinc/tinc-down", 0744);
 	}
 	if($tincconf['host_up'])
 	{
-		file_put_contents('/usr/local/etc/tinc/host-up',base64_decode($tincconf['host_up']) . "\n");
+		file_put_contents('/usr/local/etc/tinc/host-up',str_replace("\r", "", base64_decode($tincconf['host_up'])) . "\n");
 		chmod("/usr/local/etc/tinc/host-up", 0744);
 	}
 	if($tincconf['host_down'])
 	{
-		file_put_contents('/usr/local/etc/tinc/host-down',base64_decode($tincconf['host_down']) . "\n");
+		file_put_contents('/usr/local/etc/tinc/host-down',str_replace("\r", "", base64_decode($tincconf['host_down'])) . "\n");
 		chmod("/usr/local/etc/tinc/host-down", 0744);
 	}
 	if($tincconf['subnet_up'])
 	{
-		file_put_contents('/usr/local/etc/tinc/subnet-up',base64_decode($tincconf['subnet_up']) . "\n");
+		file_put_contents('/usr/local/etc/tinc/subnet-up',str_replace("\r", "", base64_decode($tincconf['subnet_up'])) . "\n");
 		chmod("/usr/local/etc/tinc/subnet-up", 0744);
 	}
 	if($tincconf['subnet_down'])
 	{
-		file_put_contents('/usr/local/etc/tinc/subnet-down',base64_decode($tincconf['subnet_down']) . "\n");
+		file_put_contents('/usr/local/etc/tinc/subnet-down',str_replace("\r", "", base64_decode($tincconf['subnet_down'])) . "\n");
 		chmod("/usr/local/etc/tinc/subnet-down", 0744);
 	}
 	system("/usr/local/etc/rc.d/tinc.sh restart 2>/dev/null");
