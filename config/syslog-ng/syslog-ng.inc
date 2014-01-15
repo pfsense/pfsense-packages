@@ -405,7 +405,7 @@ function syslogng_write_rcfile() {
 	$pid_file = "/var/run/syslog-ng.pid";
 	$rc['file'] = 'syslog-ng.sh';
 	$rc['start'] = <<<EOD
-if [ -z "`ps auxw | grep "syslog-ng" | grep -v "syslog-ng.sh"`" ]; then
+if [ -z "`ps auxw | grep "syslog-ng" | grep -v "syslog-ng.sh" | grep -v "grep"`" ]; then
 	/usr/local/sbin/syslog-ng -p {$pid_file}
 fi
 
