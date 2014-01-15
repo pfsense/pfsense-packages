@@ -58,7 +58,6 @@
 		<configurationfile>bind.xml</configurationfile>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/10/All/</depends_on_package_base_url>
 		<depends_on_package_pbi>bind-9.9.4-i386.pbi</depends_on_package_pbi>
-		<build_port_path>/usr/ports/dns/bind99</build_port_path>
 		<build_pbi>
 			<custom_name>bind</custom_name>
 			<port>dns/bind99</port>
@@ -195,7 +194,6 @@
 		<configurationfile>haproxy.xml</configurationfile>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/10/All/</depends_on_package_base_url>
 		<depends_on_package_pbi>haproxy-devel-1.5-dev21-i386.pbi</depends_on_package_pbi>
-		<build_port_path>/usr/ports/net/haproxy-devel</build_port_path>
 		<build_pbi>
 			<ports_before>security/openssl</ports_before>
 			<custom_name>haproxy-devel</custom_name>
@@ -219,24 +217,6 @@
 		<depends_on_package_base_url>http://files.pfsense.org/packages/10/All/</depends_on_package_base_url>
 		<depends_on_package_pbi>proxy_mod_security-2.2.23_3-i386.pbi git-1.8.1.3-i386.pbi</depends_on_package_pbi>
 		<configurationfile>apache_virtualhost.xml</configurationfile>
-		<build_port_path>/usr/ports/devel/gettext</build_port_path>
-		<build_port_path>/usr/ports/misc/help2man</build_port_path>
-		<build_port_path>/usr/ports/devel/apr1</build_port_path>
-		<build_port_path>/usr/ports/devel/pkg-config</build_port_path>
-		<build_port_path>/usr/ports/databases/db42</build_port_path>
-		<build_port_path>/usr/ports/databases/gdbm</build_port_path>
-		<build_port_path>/usr/ports/www/apache22-worker-mpm</build_port_path>
-		<build_port_path>/usr/ports/www/mod_security</build_port_path>
-		<build_port_path>/usr/ports/www/mod_memcache</build_port_path>
-		<build_port_path>/usr/ports/www/p5-LWP-Protocol-https</build_port_path>
-		<build_port_path>/usr/ports/www/p5-LWP-UserAgent-Determined</build_port_path>
-		<build_port_path>/usr/ports/security/gnupg</build_port_path>
-		<build_port_path>/user/ports/net/spread</build_port_path>
-		<build_port_path>/user/ports/textproc/p5-XML-Smart</build_port_path>
-		<build_port_path>/user/ports/lang/p5-Switch</build_port_path>
-		<build_port_path>/user/ports/www/p5-Data-Validate-URI</build_port_path>
-		<build_port_path>/user/ports/devel/p5-Data-Types</build_port_path>
-		<build_port_path>/user/ports/devel/p5-Acme-Comment</build_port_path>
 		<build_pbi>
 			<custom_name>proxy_mod_security</custom_name>
 			<ports_before>devel/gettext misc/help2man databases/db42 databases/gdbm devel/apr1 www/p5-LWP-UserAgent-Determined www/p5-LWP-Protocol-https security/gnupg security/p5-GnuPG net/spread textproc/p5-XML-Smart lang/p5-Switch www/p5-Data-Validate-URI devel/p5-Data-Types devel/p5-Acme-Comment</ports_before>
@@ -259,24 +239,6 @@
 		<depends_on_package_base_url>http://files.pfsense.org/packages/10/All/</depends_on_package_base_url>
 		<depends_on_package_pbi>proxy_mod_security-2.2.23_3-i386.pbi</depends_on_package_pbi>
 		<configurationfile>apache_mod_security.xml</configurationfile>
-		<build_port_path>/usr/ports/devel/gettext</build_port_path>
-		<build_port_path>/usr/ports/misc/help2man</build_port_path>
-		<build_port_path>/usr/ports/devel/apr1</build_port_path>
-		<build_port_path>/usr/ports/devel/pkg-config</build_port_path>
-		<build_port_path>/usr/ports/databases/db42</build_port_path>
-		<build_port_path>/usr/ports/databases/gdbm</build_port_path>
-		<build_port_path>/usr/ports/www/apache22-worker-mpm</build_port_path>
-		<build_port_path>/usr/ports/www/mod_security</build_port_path>
-		<build_port_path>/usr/ports/www/mod_memcache</build_port_path>
-		<build_port_path>/usr/ports/www/p5-LWP-Protocol-https</build_port_path>
-		<build_port_path>/usr/ports/www/p5-LWP-UserAgent-Determined</build_port_path>
-		<build_port_path>/usr/ports/security/gnupg</build_port_path>
-		<build_port_path>/user/ports/net/spread</build_port_path>
-		<build_port_path>/user/ports/textproc/p5-XML-Smart</build_port_path>
-		<build_port_path>/user/ports/lang/p5-Switch</build_port_path>
-		<build_port_path>/user/ports/www/p5-Data-Validate-URI</build_port_path>
-		<build_port_path>/user/ports/devel/p5-Data-Types</build_port_path>
-		<build_port_path>/user/ports/devel/p5-Acme-Comment</build_port_path>
 		<build_pbi>
 			<custom_name>proxy_mod_security</custom_name>
 			<ports_before>devel/gettext misc/help2man databases/db42 databases/gdbm devel/apr1 www/p5-LWP-UserAgent-Determined www/p5-LWP-Protocol-https security/gnupg security/p5-GnuPG net/spread textproc/p5-XML-Smart lang/p5-Switch www/p5-Data-Validate-URI devel/p5-Data-Types devel/p5-Acme-Comment</ports_before>
@@ -313,8 +275,6 @@
 		<descr>Avahi is a system which facilitates service discovery on a local network. This means that you can plug your laptop or computer into a network and instantly be able to view other people who you can chat with, find printers to print to or find files being shared. This kind of technology is already found in Apple MacOS X (branded Rendezvous, Bonjour and sometimes Zeroconf) and is very convenient. Avahi is mainly based on Lennart Poettering's flexmdns mDNS implementation for Linux which has been discontinued in favour of Avahi.</descr>
 		<category>Network Management</category>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/10/All/</depends_on_package_base_url>
-		<build_port_path>/usr/ports/net/avahi</build_port_path>
-		<build_port_path>/usr/ports/net/avahi-app</build_port_path>
 		<build_pbi>
 			<port>net/avahi</port>
 		</build_pbi>
@@ -333,13 +293,6 @@
 		<category>Network Management</category>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/10/All/</depends_on_package_base_url>
 		<depends_on_package_pbi>ntop-5.0.1-i386.pbi</depends_on_package_pbi>
-		<build_port_path>/usr/ports/net/GeoIP</build_port_path>
-		<build_port_path>/usr/ports/databases/gdbm</build_port_path>
-		<build_port_path>/usr/ports/databases/rrdtool12</build_port_path>
-		<build_port_path>/usr/ports/x11-fonts/font-util</build_port_path>
-		<build_port_path>/usr/ports/graphics/graphviz</build_port_path>
-		<build_port_path>/usr/ports/x11-fonts/webfonts</build_port_path>
-		<build_port_path>/usr/ports/net/ntop</build_port_path>
 		<build_pbi>
 			<ports_before>databases/gdbm net/GeoIP x11-fonts/font-util x11-fonts/webfonts graphics/graphviz</ports_before>
 			<port>net/ntop</port>
@@ -477,13 +430,6 @@
 		<category>Security</category>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/10/All/</depends_on_package_base_url>
 		<depends_on_package_pbi>snort-2.9.5.5-i386.pbi</depends_on_package_pbi>
-		<build_port_path>/usr/ports/devel/pcre</build_port_path>
-		<build_port_path>/usr/ports/net/daq</build_port_path>
-		<build_port_path>/usr/ports/net/libnet</build_port_path>
-		<build_port_path>/usr/ports/net/libpcap</build_port_path>
-		<build_port_path>/usr/ports/security/barnyard2</build_port_path>
-		<build_port_path>/usr/ports/databases/mysql55-client</build_port_path>
-		<build_port_path>/usr/ports/security/snort</build_port_path>
 		<build_pbi>
 			<port>security/snort</port>
 			<ports_after>security/barnyard2</ports_after>
@@ -595,11 +541,6 @@
 		<status>beta</status>
 		<required_version>2.0</required_version>
 		<configurationfile>mailscanner.xml</configurationfile>
-		<build_port_path>/usr/ports/mail/p5-Mail-SPF</build_port_path>
-		<build_port_path>/usr/ports/mail/pyzor</build_port_path>
-		<build_port_path>/usr/ports/net/p5-IP-Country</build_port_path>
-		<build_port_path>/usr/ports/mail/dcc-dccd</build_port_path>
-		<build_port_path>/usr/ports/mail/mailscanner</build_port_path>
 		<build_pbi>
 			<ports_before>mail/pyzor mail/p5-Mail-SPF net/p5-IP-Country mail/dcc-dccd</ports_before>
 			<port>mail/mailscanner</port>
@@ -626,7 +567,6 @@
 		<descr>OpenBGPD is a FREE implementation of the Border Gateway Protocol, Version 4. It allows ordinary machines to be used as routers exchanging routes with other systems speaking the BGP protocol. -- WARNING! Installs files to the same place as Quagga OSPF. Installing both will result in a broken state, remove this package before installing Quagga OSPF.</descr>
 		<category>NET</category>
 		<config_file>http://www.pfsense.com/packages/config/openbgpd/openbgpd.xml</config_file>
-		<build_port_path>/usr/ports/net/openbgpd</build_port_path>
 		<build_pbi>
 			<port>net/openbgpd</port>
 		</build_pbi>
@@ -648,8 +588,6 @@
 		<depends_on_package_base_url>http://files.pfsense.org/packages/10/All/</depends_on_package_base_url>
 		<depends_on_package_pbi>openospfd-4.6-i386.pbi</depends_on_package_pbi>
 		<config_file>http://www.pfsense.com/packages/config/openospfd/openospfd.xml</config_file>
-		<build_port_path>/usr/ports/net/openospfd</build_port_path>
-		<build_port_path>/usr/ports/devel/libevent</build_port_path>
 		<build_pbi>
 			<ports_before>devel/libevent</ports_before>
 			<port>net/openospfd</port>
@@ -667,7 +605,6 @@
 		<maintainer>dv_serg@mail.ru</maintainer>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/10/All/</depends_on_package_base_url>
 		<depends_on_package_pbi>lightsquid-1.8_2-i386.pbi</depends_on_package_pbi>
-		<build_port_path>/usr/ports/www/lightsquid</build_port_path>
 		<build_pbi>
 			<ports_before>lang/perl5.14 graphics/gd graphics/p5-GD</ports_before>
 			<port>www/lightsquid</port>
@@ -755,8 +692,6 @@
 			<port>www/varnish</port>
 		</build_pbi>
 		<build_options>gcc_UNSET=JAVA</build_options>
-		<build_port_path>/usr/ports/www/varnish</build_port_path>
-		<build_port_path>/usr/ports/lang/gcc42</build_port_path>
 	</package>
 	<package>
 		<name>vnstat2</name>
@@ -803,9 +738,6 @@
 		<configurationfile>tinydns.xml</configurationfile>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/10/All/</depends_on_package_base_url>
 		<depends_on_package_pbi>djbdns-1.05_14-i386.pbi</depends_on_package_pbi>
-		<build_port_path>/usr/ports/sysutils/ucspi-tcp</build_port_path>
-		<build_port_path>/usr/ports/sysutils/daemontools</build_port_path>
-		<build_port_path>/usr/ports/dns/djbdns</build_port_path>
 		<build_pbi>
 			<ports_before>sysutils/ucspi-tcp sysutils/daemontools</ports_before>
 			<port>dns/djbdns</port>
@@ -825,17 +757,6 @@
 		<config_file>http://www.pfsense.org/packages/config/open-vm-tools_2/open-vm-tools.xml</config_file>
 		<configurationfile>open-vm-tools.xml</configurationfile>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/10/All/</depends_on_package_base_url>
-		<build_port_path>/usr/ports/emulators/open-vm-tools-nox11/</build_port_path>
-		<build_port_path>/usr/ports/devel/icu</build_port_path>
-		<build_port_path>/usr/ports/sysutils/fusefs-kmod</build_port_path>
-		<build_port_path>/usr/ports/sysutils/fusefs-libs</build_port_path>
-		<build_port_path>/usr/ports/devel/glib20</build_port_path>
-		<build_port_path>/usr/ports/net/libdnet</build_port_path>
-		<build_port_path>/usr/ports/converters/libiconv</build_port_path>
-		<build_port_path>/usr/ports/devel/pcre</build_port_path>
-		<build_port_path>/usr/ports/lang/perl5.14</build_port_path>
-		<build_port_path>/usr/ports/devel/pkg-config</build_port_path>
-		<build_port_path>python27-2.7.3_6.tbz</build_port_path>
 		<build_pbi>
 			<port>emulators/open-vm-tools-nox11</port>
 		</build_pbi>
@@ -1002,8 +923,6 @@
 		<depends_on_package_pbi>freeradius-1.1.8_5-i386.pbi</depends_on_package_pbi>
 		<config_file>http://www.pfsense.org/packages/config/freeradius.xml</config_file>
 		<configurationfile>freeradius.xml</configurationfile>
-		<build_port_path>/usr/ports/net/freeradius</build_port_path>
-		<build_port_path>/usr/ports/devel/libltdl</build_port_path>
 		<build_pbi>
 			<ports_before>devel/libltdl</ports_before>
 			<port>net/freeradius</port>
@@ -1047,9 +966,6 @@
 		<depends_on_package_pbi>bandwidthd-2.0.1_5-i386.pbi</depends_on_package_pbi>
 		<config_file>http://www.pfsense.org/packages/config/bandwidthd/bandwidthd.xml</config_file>
 		<configurationfile>bandwidthd.xml</configurationfile>
-		<build_port_path>/usr/ports/net/libpcap</build_port_path>
-		<build_port_path>/usr/ports/databases/postgresql84-client</build_port_path>
-		<build_port_path>/usr/ports/net-mgmt/bandwidthd</build_port_path>
 		<build_pbi>
 			<ports_before>net/libpcap databases/postgresql91-client graphics/gd</ports_before>
 			<port>net-mgmt/bandwidthd</port>
@@ -1128,9 +1044,6 @@
 		<maintainer>fernando@netfilter.com.br seth.mos@dds.nl mfuchs77@googlemail.com jimp@pfsense.org</maintainer>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/10/All/</depends_on_package_base_url>
 		<depends_on_package_pbi>squid-2.7.9_3-i386.pbi</depends_on_package_pbi>
-		<build_port_path>/usr/ports/www/squid</build_port_path>
-		<build_port_path>/usr/ports/www/squid_radius_auth</build_port_path>
-		<build_port_path>/usr/ports/www/libwww</build_port_path>
 		<build_pbi>
 			<ports_before>www/libwww</ports_before>
 			<port>www/squid</port>
@@ -1253,9 +1166,6 @@
 		<required_version>1.1</required_version>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/10/All/</depends_on_package_base_url>
 		<depends_on_package_pbi>squidguard-1.4_4-i386.pbi</depends_on_package_pbi>
-		<build_port_path>/usr/ports/www/squidguard</build_port_path>
-		<build_port_path>/usr/ports/databases/db41</build_port_path>
-		<build_port_path>/usr/ports/security/cyrus-sasl2</build_port_path>
 		<build_pbi>
 			<ports_before>databases/db41 security/cyrus-sasl2</ports_before>
 			<port>www/squidguard</port>
@@ -1314,7 +1224,6 @@
 		<required_version>1.2.3</required_version>
 		<configurationfile>zabbix-agent.xml</configurationfile>
 		<maintainer>remco.verhoef@redfive.biz</maintainer>
-		<build_port_path>/usr/ports/net-mgmt/zabbix-agent</build_port_path>
 		<build_pbi>
 			<custom_name>zabbix-agent</custom_name>
 			<port>net-mgmt/zabbix-agent</port>
@@ -1333,7 +1242,6 @@
 		<required_version>1.2.3</required_version>
 		<configurationfile>zabbix-proxy.xml</configurationfile>
 		<maintainer>cmb@pfsense.org</maintainer>
-		<build_port_path>/usr/ports/net-mgmt/zabbix-proxy</build_port_path>
 		<build_pbi>
 			<custom_name>zabbix-proxy</custom_name>
 			<port>net-mgmt/zabbix-proxy</port>
@@ -1412,7 +1320,6 @@
 		<configurationfile>blinkled.xml</configurationfile>
 		<pkginfolink>http://doc.pfsense.org/index.php/BlinkLED_Package</pkginfolink>
 		<website>http://doc.pfsense.org/index.php/BlinkLED_Package</website>
-		<build_port_path>/usr/ports/sysutils/blinkled</build_port_path>
 		<build_pbi>
 			<port>sysutils/blinkled</port>
 		</build_pbi>
@@ -1495,10 +1402,6 @@
 		<config_file>http://www.pfsense.com/packages/config/unbound/unbound.xml</config_file>
 		<configurationfile>unbound.xml</configurationfile>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/10/All/</depends_on_package_base_url>
-		<build_port_path>/usr/ports/dns/unbound/</build_port_path>
-		<build_port_path>/usr/ports/dns/ldns</build_port_path>
-		<build_port_path>/usr/ports/textproc/expat2</build_port_path>
-		<build_port_path>/usr/ports/devel/libevent2</build_port_path>
 		<build_pbi>
 			<ports_before>dns/ldns textproc/expat2 devel/libevent2</ports_before>
 			<port>dns/unbound</port>
@@ -1547,8 +1450,6 @@
 		<category>Services</category>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/10/All/</depends_on_package_base_url>
 		<depends_on_package_pbi>nrpe-2.13_2-i386.pbi</depends_on_package_pbi>
-		<build_port_path>/usr/ports/net-mgmt/nrpe2</build_port_path>
-		<build_port_path>/usr/ports/net-mgmt/nagios-plugins</build_port_path>
 		<build_pbi>
 			<ports_before>net-mgmt/nagios-plugins</ports_before>
 			<port>net-mgmt/nrpe2</port>
@@ -1567,9 +1468,6 @@
 		<descr><![CDATA[The basic idea of check_mk is to fetch "all" information about a target host at once.<br>For each host to be monitored check_mk is called by Nagios only once per time period.]]></descr>
 		<category>Services</category>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/10/All/</depends_on_package_base_url>
-		<build_port_path>/usr/ports/sysutils/muse</build_port_path>
-		<build_port_path>/usr/ports/sysutils/ipmitool</build_port_path>
-		<build_port_path>devel/libstatgrab</build_port_path>
 		<build_pbi>
 			<ports_before>sysutils/ipmitool devel/libstatgrab</ports_before>
 			<port>sysutils/muse</port>
@@ -1670,7 +1568,6 @@
 		<config_file>http://www.pfsense.com/packages/config/bacula-client/bacula-client.xml</config_file>
 		<depends_on_package_base_url>http://ftp.freebsd.org/pub/FreeBSD/ports/i386/packages-8.3-release/All/</depends_on_package_base_url>
 		<depends_on_package_pbi>bacula-5.2.12-i386.pbi</depends_on_package_pbi>
-		<build_port_path>/usr/ports/sysutils/bacula-client</build_port_path>
 		<build_pbi>
 			<port>sysutils/bacula-client</port>
 		</build_pbi>
@@ -1728,7 +1625,6 @@
 		<maintainer>jimp@pfsense.org</maintainer>
 		<configurationfile>git.xml</configurationfile>
 		<build_options>git_UNSET=GITWEB GUI HTMLDOCS CVS P4 SVN;git_SET=CONTRIB CURL ETCSHELLS ICONV NLS PERL</build_options>
-		<build_port_path>/usr/ports/devel/git</build_port_path>
 		<build_pbi>
 			<port>devel/git</port>
 		</build_pbi>
@@ -1787,7 +1683,6 @@
 		<required_version>2.0</required_version>
 		<configurationfile>zabbix2-agent.xml</configurationfile>
 		<maintainer>dbaio@bsd.com.br</maintainer>
-		<build_port_path>/usr/ports/net-mgmt/zabbix22-agent</build_port_path>
 		<build_pbi>
 			<custom_name>zabbix22-agent</custom_name>
 			<port>net-mgmt/zabbix22-agent</port>
@@ -1805,7 +1700,6 @@
 		<required_version>2.0</required_version>
 		<configurationfile>zabbix2-proxy.xml</configurationfile>
 		<maintainer>dbaio@bsd.com.br</maintainer>
-		<build_port_path>/usr/ports/net-mgmt/zabbix22-proxy</build_port_path>
 		<build_pbi>
 			<custom_name>zabbix22-proxy</custom_name>
 			<port>net-mgmt/zabbix22-proxy</port>
@@ -1847,7 +1741,6 @@
 		<build_pbi>
 			<port>security/sudo</port>
 		</build_pbi>
-		<build_port_path>/usr/ports/security/sudo</build_port_path>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/10/All/</depends_on_package_base_url>
 		<depends_on_package_pbi>sudo-1.8.6p8-i386.pbi</depends_on_package_pbi>
 	</package>
@@ -1890,7 +1783,6 @@
 		<required_version>2.0</required_version>
 		<configurationfile>apcupsd.xml</configurationfile>
 		<maintainer>dbaio@bsd.com.br</maintainer>
-		<build_port_path>/usr/ports/sysutils/apcupsd</build_port_path>
 		<build_pbi>
 			<custom_name>apcupsd</custom_name>
 			<port>sysutils/apcupsd</port>
