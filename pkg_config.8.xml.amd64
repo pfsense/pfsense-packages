@@ -101,7 +101,7 @@
 		<category>Diagnostics</category>
 		<pkginfolink>http://forum.pfsense.org/index.php/topic,26974.0.html</pkginfolink>
 		<config_file>http://pfsense.org/packages/config/filemgr/filemgr.xml</config_file>
-		<version>0.1.2</version>
+		<version>0.1.3</version>
 		<status>Beta</status>
 		<required_version>2.0</required_version>
 		<maintainer>tom@tomschaefer.org</maintainer>
@@ -113,7 +113,7 @@
 		<descr><![CDATA[Introduce Enhanced Aliastable Feature to pfsense.<br />
 			Assign many IP urls lists from sites like I-blocklist to a single alias and then choose rule action to take.<br />
 			This package also Block countries and IP ranges.<br />
-			pfBlocker replaces Countryblock and IPblocklist]]></descr>
+			pfBlocker replaces Countryblock and IPblocklist.]]></descr>
 		<category>Firewall</category>
 		<pkginfolink>http://forum.pfsense.org/index.php/topic,42543.0.html</pkginfolink>
 		<config_file>http://pfsense.org/packages/config/pf-blocker/pfblocker.xml</config_file>
@@ -157,7 +157,7 @@
 	<package>
 		<name>haproxy-full</name>
 		<pkginfolink>http://doc.pfsense.org/index.php/haproxy_package</pkginfolink>
-		<descr><![CDATA[The Reliable, High Performance TCP/HTTP Load Balancer package<br />
+		<descr><![CDATA[The Reliable, High Performance TCP/HTTP Load Balancer<br />
 				This package implements both TCP and HTTP balance features from Haproxy.<br />
 				(Legacy version)]]></descr>
 		<website>http://haproxy.1wt.eu/</website>
@@ -664,7 +664,7 @@
 		<build_pbi>
 			<port>net/openbgpd</port>
 		</build_pbi>
-		<version>0.9</version>
+		<version>0.9.1</version>
 		<status>STABLE</status>
 		<pkginfolink>http://doc.pfsense.org/index.php/OpenBGPD_package</pkginfolink>
 		<required_version>1.3</required_version>
@@ -712,7 +712,7 @@
 			<port>www/lightsquid</port>
 		</build_pbi>
 		<build_options>WITHOUT_DEBUGGING=true;WITHOUT_GDBM=true;WITHOUT_PERL_MALLOC=true;WITH_PERL_64BITINT=true;WITHOUT_THREADS=true;WITHOUT_MULTIPLICITY=true;WITHOUT_SUIDPERL=true;WITHOUT_SITECUSTOMIZE=true;WITH_USE_PERL=true;WITH_GDSUPPORT=true</build_options>
-		<status>Beta</status>
+		<status>RC1</status>
 		<required_version>2.0</required_version>
 		<config_file>http://www.pfsense.com/packages/config/lightsquid/lightsquid.xml</config_file>
 		<pkginfolink></pkginfolink>
@@ -815,7 +815,7 @@
 		<depends_on_package_pbi>vnstat-1.11_1-amd64.pbi</depends_on_package_pbi>
 		<build_port_path>/usr/ports/net/vnstat</build_port_path>
 		<version>1.10_2</version>
-		<status>test</status>
+		<status>Stable</status>
 		<required_version>2.0</required_version>
 		<maintainer>crazypark2@yahoo.dk</maintainer>
 		<config_file>http://www.pfsense.com/packages/config/vnstat2/vnstat2.xml</config_file>
@@ -1456,7 +1456,7 @@
 		<depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
 		<depends_on_package>p7zip-9.20.1.tbz</depends_on_package>
 		<depends_on_package>zip-3.0.tbz</depends_on_package>
-		<depends_on_package_pbi>p7zip-9.20.1-amd64.pbi zip-3.0-amd64.pbi</depends_on_package_pbi>
+		<depends_on_package_pbi>zip-3.0-amd64.pbi p7zip-9.20.1-amd64.pbi</depends_on_package_pbi>
 		<build_port_path>/usr/ports/archivers/p7zip</build_port_path>
 		<build_port_path>/usr/ports/archivers/zip</build_port_path>
 		<version>1.2.4</version>
@@ -1811,7 +1811,7 @@
 		<maintainer>jimp@pfsense.org</maintainer>
 		<configurationfile>urlsnarf.xml</configurationfile>
 		<build_pbi>
-			<ports_before>net/libnet</ports_before>
+			<ports_before>net/libnet10</ports_before>
 			<port>security/dsniff</port>
 		</build_pbi>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
@@ -1943,7 +1943,7 @@
 		<descr><![CDATA[IPMI Tools for local/remote data retrieval and control (Console only, no GUI)]]></descr>
 		<category>Services</category>
 		<version>1.8.12</version>
-		<status>Alpha</status>
+		<status>Beta</status>
 		<required_version>2.1</required_version>
 		<config_file>http://www.pfsense.com/packages/config/ipmitool/ipmitool.xml</config_file>
 		<maintainer>jimp@pfsense.org</maintainer>
