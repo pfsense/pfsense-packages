@@ -910,7 +910,7 @@
 		<depends_on_package>pkgconf-0.8.9.tbz</depends_on_package>
 		<build_port_path>/usr/ports/devel/pkg-config</build_port_path>
 		<depends_on_package>python27-2.7.2_3.tbz</depends_on_package>
-		<build_port_path>python27-2.7.3_6.tbz</build_port_path>
+		<build_port_path>/usr/ports/lang/python27</build_port_path>
 		<build_pbi>
 			<port>emulators/open-vm-tools-nox11</port>
 		</build_pbi>
