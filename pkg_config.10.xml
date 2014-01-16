@@ -171,7 +171,7 @@
 				(Legacy version)]]></descr>
 		<website>http://haproxy.1wt.eu/</website>
 		<category>Services</category>
-		<version>1.4.23 pkg v 1.1</version>
+		<version>1.4.24 pkg v 1.1</version>
 		<status>Release</status>
 		<required_version>2.0</required_version>
 		<config_file>http://www.pfsense.com/packages/config/haproxy-legacy/haproxy.xml</config_file>
@@ -206,9 +206,9 @@
 		<pkginfolink>http://doc.pfsense.org/index.php/ProxyServerModSecurity_package</pkginfolink>
 		<website>http://www.modsecurity.org/</website>
 		<descr><![CDATA[ModSecurity is a web application firewall that can work either embedded or as a reverse proxy.<br>
-				It provides protection from a range of attacks against web applications and allows for HTTP traffic monitoring, logging and real-time analysis.<br>
-				In addition this package allows URL forwarding which can be convenient for hosting multiple websites behind pfSense using 1 IP address.<br>
-				<b>Backup your location config before updating form 0.2.x to 0.3 package version.</b>]]></descr>
+			It provides protection from a range of attacks against web applications and allows for HTTP traffic monitoring, logging and real-time analysis.<br>
+			In addition this package allows URL forwarding which can be convenient for hosting multiple websites behind pfSense using 1 IP address.<br>
+			<b>Backup your location config before updating form 0.2.x to 0.3 package version.</b>]]></descr>
 		<category>Network Management</category>
 		<version>2.4.6 pkg v0.3</version>
 		<status>ALPHA</status>
@@ -435,7 +435,7 @@
 			<ports_after>security/barnyard2</ports_after>
 		</build_pbi>
 		<!-- Use both styles for now, since our snort port isn't yet optionsng, but barnyard2 and others are. -->
-		<build_options>barnyard2_UNSET=ODBC PGSQL PRELUDE;barnyard2_SET=GRE IPV6 MPLS MYSQL;snort_SET=TARGETBASED PERFPROFILE DECODERPRE REACT FLEXRESP3 GRE IPV6 MPLS NORMALIZER ZLIB;perl_SET=THREADS;WITH_THREADS=yes;WITH_IPV6=true;WITH_MPLS=true;WITH_GRE=true;WITH_TARGETBASED=true;WITH_PERFPROFILE=true;WITH_DECODERPRE=true;WITH_ZLIB=true;WITH_NORMALIZER=true;WITH_REACT=true;WITH_FLEXRESP3=true;WITHOUT_ODBC=true;WITHOUT_POSTGRESQL=true;WITHOUT_PRELUDE=true;NOPORTDOCS=true</build_options>
+		<build_options>barnyard2_UNSET=ODBC PGSQL PRELUDE;barnyard2_SET=GRE IPV6 MPLS MYSQL;snort_SET=TARGETBASED PERFPROFILE DECODERPRE FLEXRESP3 GRE IPV6 MPLS NORMALIZER ZLIB;perl_SET=THREADS;WITH_THREADS=yes;WITH_IPV6=true;WITH_MPLS=true;WITH_GRE=true;WITH_TARGETBASED=true;WITH_PERFPROFILE=true;WITH_DECODERPRE=true;WITH_ZLIB=true;WITH_NORMALIZER=true;WITH_REACT=true;WITH_FLEXRESP3=true;WITHOUT_ODBC=true;WITHOUT_POSTGRESQL=true;WITHOUT_PRELUDE=true;NOPORTDOCS=true</build_options>
 		<config_file>http://www.pfsense.com/packages/config/snort/snort.xml</config_file>
 		<version>2.9.5.5 pkg v3.0.2</version>
 		<required_version>2.0</required_version>
@@ -498,7 +498,7 @@
 		<depends_on_package_base_url>http://files.pfsense.org/packages/10/All/</depends_on_package_base_url>
 		<depends_on_package_pbi>postfix-2.10.2-i386.pbi</depends_on_package_pbi>
 		<version>2.10.2 pkg v.2.3.7</version>
-		<status>RC1</status>
+		<status>Release</status>
 		<required_version>2.0</required_version>
 		<configurationfile>postfix.xml</configurationfile>
 		<build_port_path>/usr/ports/mail/postfix</build_port_path>
@@ -601,7 +601,7 @@
 		<descr>High perfomance web proxy report (LightSquid). Proxy realtime stat (SQStat). Requires squid HTTP proxy.</descr>
 		<website>http://lightsquid.sf.net/</website>
 		<category>Network Report</category>
-		<version>1.8.0 pkg v.2.33</version>
+		<version>1.8.2 pkg v.2.33</version>
 		<maintainer>dv_serg@mail.ru</maintainer>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/10/All/</depends_on_package_base_url>
 		<depends_on_package_pbi>lightsquid-1.8_2-i386.pbi</depends_on_package_pbi>
@@ -1072,7 +1072,7 @@
 			<port>www/squid31</port>
 			<ports_after>www/squid_radius_auth</ports_after>
 		</build_pbi>
-		<build_options>c-icap_UNSET=IPV6 squid33_UNSET=AUTH_SMB AUTH_SQL DNS_HELPER FS_COSS ESI SNMP ECAP STACKTRACES STRICT_HTTP TP_IPF TP_IPFW VIA_DB DEBUG DOCS EXAMPLES;squid33_SET=ARP_ACL AUTH_KERB AUTH_LDAP AUTH_NIS AUTH_SASL CACHE_DIGESTS DELAY_POOLS FOLLOW_XFF TP_PF MSSL_CRTD WCCP WCCPV2 FS_AUFS HTCP ICAP ICMP IDENT IPV6 KQUEUE LARGEFILE SSL SSL_CRTD</build_options>
+		<build_options>c-icap_UNSET=IPV6;squid_UNSET=AUTH_SMB AUTH_SQL DNS_HELPER FS_COSS ESI SNMP ECAP STACKTRACES STRICT_HTTP TP_IPF TP_IPFW VIA_DB DEBUG DOCS EXAMPLES;squid_SET=ARP_ACL AUTH_KERB AUTH_LDAP AUTH_NIS AUTH_SASL CACHE_DIGESTS DELAY_POOLS FOLLOW_XFF TP_PF MSSL_CRTD WCCP WCCPV2 FS_AUFS HTCP ICAP ICMP IDENT IPV6 KQUEUE LARGEFILE SSL SSL_CRTD</build_options>
 		<!--<build_options>WITH_SQUID_KERB_AUTH=true;WITH_SQUID_LDAP_AUTH=true;WITH_SQUID_NIS_AUTH=true;WITH_SQUID_SASL_AUTH=true;WITH_SQUID_IPV6=true;WITH_SQUID_DELAY_POOLS=true;WITH_SQUID_SNMP=true;WITH_SQUID_SSL=true;WITH_SQUID_SSL_CRTD=true;WITH_SQUID_PINGER=true;WITHOUT_SQUID_DNS_HELPER=true;WITH_SQUID_HTCP=true;WITH_SQUID_VIA_DB=true;WITH_SQUID_CACHE_DIGESTS=true;WITHOUT_SQUID_WCCP=true;WITH_SQUID_WCCPV2=true;WITHOUT_SQUID_STRICT_HTTP=true;WITH_SQUID_IDENT=true;WITH_SQUID_REFERER_LOG=true;WITH_SQUID_USERAGENT_LOG=true;WITH_SQUID_ARP_ACL=true;WITH_SQUID_IPFW=true;WITH_SQUID_PF=true;WITHOUT_SQUID_IPFILTER=true;WITH_SQUID_FOLLOW_XFF=true;WITHOUT_SQUID_ECAP=true;WITHOUT_SQUID_ICAP=true;WITHOUT_SQUID_ESI=true;WITH_SQUID_AUFS=true;WITHOUT_SQUID_COSS=true;WITHOUT_SQUID_KQUEUE=true;WITH_SQUID_LARGEFILE=true;WITHOUT_SQUID_STACKTRACES=true;WITHOUT_SQUID_DEBUG=true</build_options>-->
 		<config_file>http://www.pfsense.org/packages/config/squid3/31/squid.xml</config_file>
 		<configurationfile>squid.xml</configurationfile>
@@ -1097,7 +1097,7 @@
 			<port>www/squid33</port>
 			<ports_after>www/squid_radius_auth security/clamav www/squidclamav security/ca_root_nss www/c-icap-modules</ports_after>
 		</build_pbi>
-		<build_options>c-icap_UNSET=IPV6 squid33_UNSET=AUTH_SMB AUTH_SQL DNS_HELPER FS_COSS ESI SNMP ECAP STACKTRACES STRICT_HTTP TP_IPF TP_IPFW VIA_DB DEBUG DOCS EXAMPLES AUTH_SASL;squid33_SET=ARP_ACL AUTH_KERB AUTH_LDAP AUTH_NIS CACHE_DIGESTS DELAY_POOLS FOLLOW_XFF TP_PF MSSL_CRTD WCCP WCCPV2 FS_AUFS HTCP ICAP ICMP IDENT IPV6 KQUEUE LARGEFILE SSL SSL_CRTD</build_options>
+		<build_options>c-icap_UNSET=IPV6;squid_UNSET=AUTH_SMB AUTH_SQL DNS_HELPER FS_COSS ESI SNMP ECAP STACKTRACES STRICT_HTTP TP_IPF TP_IPFW VIA_DB DEBUG DOCS EXAMPLES AUTH_SASL;squid_SET=ARP_ACL AUTH_KERB AUTH_LDAP AUTH_NIS CACHE_DIGESTS DELAY_POOLS FOLLOW_XFF TP_PF MSSL_CRTD WCCP WCCPV2 FS_AUFS HTCP ICAP ICMP IDENT IPV6 KQUEUE LARGEFILE SSL SSL_CRTD</build_options>
 		<config_file>http://www.pfsense.org/packages/config/squid3/33/squid.xml</config_file>
 		<configurationfile>squid.xml</configurationfile>
 		<depends_on_package_pbi>squid-3.3.10-i386.pbi</depends_on_package_pbi>
@@ -1116,7 +1116,7 @@
 		<config_file>http://www.pfsense.org/packages/config/lcdproc/lcdproc.xml</config_file>
 		<configurationfile>lcdproc.xml</configurationfile>
 		<build_port_path>/usr/ports/sysutils/lcdproc</build_port_path>
-		<build_options>WITH_USB=true;lcdproc_SET=USB</build_options>
+		<build_options>lcdproc_SET=USB</build_options>
 	</package>
 	<package>
 		<name>LCDproc-dev</name>
@@ -1210,7 +1210,7 @@
 			<port>www/squidguard</port>
 			<custom_name>squidguard-squid3</custom_name>
 		</build_pbi>
-		<build_options>OPTIONS_SET=FETCH LDAP;squidGuard_UNSET=SQUID27;squidGuard_SET=SAMPLE_BL SASL SQUID33;c-icap_UNSET=IPV6 squid33_UNSET=AUTH_SMB AUTH_SQL DNS_HELPER FS_COSS ESI SNMP ECAP STACKTRACES STRICT_HTTP TP_IPF TP_IPFW VIA_DB DEBUG DOCS EXAMPLES;squid33_SET=ARP_ACL AUTH_KERB AUTH_LDAP AUTH_NIS AUTH_SASL CACHE_DIGESTS DELAY_POOLS FOLLOW_XFF TP_PF MSSL_CRTD WCCP WCCPV2 FS_AUFS HTCP ICAP ICMP IDENT IPV6 KQUEUE LARGEFILE SSL SSL_CRTD</build_options>
+		<build_options>OPTIONS_SET=FETCH LDAP;squidGuard_UNSET=SQUID27;squidGuard_SET=SAMPLE_BL SASL SQUID33;c-icap_UNSET=IPV6 squid_UNSET=AUTH_SMB AUTH_SQL DNS_HELPER FS_COSS ESI SNMP ECAP STACKTRACES STRICT_HTTP TP_IPF TP_IPFW VIA_DB DEBUG DOCS EXAMPLES;squid_SET=ARP_ACL AUTH_KERB AUTH_LDAP AUTH_NIS AUTH_SASL CACHE_DIGESTS DELAY_POOLS FOLLOW_XFF TP_PF MSSL_CRTD WCCP WCCPV2 FS_AUFS HTCP ICAP ICMP IDENT IPV6 KQUEUE LARGEFILE SSL SSL_CRTD</build_options>
 		<config_file>http://www.pfsense.org/packages/config/squidGuard/squidguard.xml</config_file>
 		<configurationfile>squidguard.xml</configurationfile>
 	</package>
