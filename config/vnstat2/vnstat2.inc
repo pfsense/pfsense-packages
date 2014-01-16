@@ -199,7 +199,6 @@ function vnstat_php_frontend(){
 	global $config;
 // Unpack and move Vnstat frontend 
 	exec("cd ..");
-// Updated 1.5.1 to removed split() which is depreciated in vnstat.php
 	exec("tar -zxovf /usr/local/pkg/vnstat_php_frontend-1.5.1-updated.tar.gz");
 	exec("mv vnstat_php_frontend-1.5.1-updated /usr/local/www/vnstat2");
 // Find information to be writing in config.php 
