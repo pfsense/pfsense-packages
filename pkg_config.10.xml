@@ -38,7 +38,7 @@
 		<status>Beta</status>
 		<required_version>2.0</required_version>
 		<config_file>http://www.pfsense.com/packages/config/asterisk/asterisk.xml</config_file>
-		<depends_on_package_base_url>http://e-sac.siteseguro.ws/packages/10/All/</depends_on_package_base_url>
+		<depends_on_package_base_url>http://files.pfsense.org/packages/10/All/</depends_on_package_base_url>
 		<depends_on_package_pbi>asterisk-1.8.19.0-i386.pbi</depends_on_package_pbi>
 		<build_port_path>/usr/ports/net/asterisk</build_port_path>
 		<maintainer>marcellocoutinho@gmail.com robreg@zsurob.hu</maintainer>
@@ -834,7 +834,7 @@
 		<pkginfolink>http://doc.pfsense.org/index.php/IMSpector_package</pkginfolink>
 		<config_file>http://www.pfsense.com/packages/config/imspector-dev/imspector.xml</config_file>
 		<configurationfile>imspector.xml</configurationfile>
-		<depends_on_package_base_url>http://e-sac.siteseguro.ws/packages/10/All/</depends_on_package_base_url>
+		<depends_on_package_base_url>http://files.pfsense.org/packages/10/All/</depends_on_package_base_url>
 		<depends_on_package_pbi>imspector-20111108-i386.pbi</depends_on_package_pbi>
 	</package>
 	<package>
@@ -1566,7 +1566,7 @@
 		<status>Stable</status>
 		<required_version>2.0</required_version>
 		<config_file>http://www.pfsense.com/packages/config/bacula-client/bacula-client.xml</config_file>
-		<depends_on_package_base_url>http://ftp.freebsd.org/pub/FreeBSD/ports/i386/packages-8.3-release/All/</depends_on_package_base_url>
+		<depends_on_package_base_url>http://files.pfsense.org/packages/10/All/</depends_on_package_base_url>
 		<depends_on_package_pbi>bacula-5.2.12-i386.pbi</depends_on_package_pbi>
 		<build_pbi>
 			<port>sysutils/bacula-client</port>
