@@ -199,8 +199,8 @@ function vnstat_php_frontend(){
 	global $config;
 // Unpack and move Vnstat frontend 
 	exec("cd ..");
-	exec("tar -zxovf /usr/local/pkg/vnstat_php_frontend-1.4.1.tar.gz");
-	exec("mv vnstat_php_frontend-1.4.1 /usr/local/www/vnstat2");
+	exec("tar -zxovf /usr/local/pkg/vnstat_php_frontend-1.5.1-updated.tar.gz");
+	exec("mv vnstat_php_frontend-1.5.1-updated /usr/local/www/vnstat2");
 // Find information to be writing in config.php 
 	// $iface_list_array_items
         exec("ls /conf/vnstat/ | grep -v '\.'", $vnstat_nic_in);
@@ -227,6 +227,9 @@ function vnstat_php_frontend(){
 	}
         $iface_title_array = implode($iface_title_array_items2);
 	// php in php static items
+	// added to new items for the front end version 1.5.1
+	$locale = "\$locale = 'en_US.UTF-8';";
+	$language = "\$language = 'en';";
         $vnstat_bin2 = "\$vnstat_bin = '/usr/local/bin/vnstat';";
         $data_dir2 = "\$data_dir = './dumps';";
         $graph_format2 ="\$graph_format='svg';";
@@ -237,7 +240,7 @@ function vnstat_php_frontend(){
         $config_file = <<<EOF
 <?php
     //
-    // vnStat PHP frontend 1.4.1 (c)2006-2008 Bjorge Dijkstra (bjd@jooz.net)
+    // vnStat PHP frontend 1.5.1 (c)2006-2008 Bjorge Dijkstra (bjd@jooz.net)
     //
     // This program is free software; you can redistribute it and/or modify
     // it under the terms of the GNU General Public License as published by
@@ -264,7 +267,8 @@ function vnstat_php_frontend(){
     //
     // edit these to reflect your particular situation
     //
-
+$locale
+$language
     // list of network interfaces monitored by vnStat
 $iface_list_array
 
@@ -304,53 +308,6 @@ $graph_format2
     // and ALPHA from 0-127 where 0 is opaque and 127 completely transparent.
     //
     define('DEFAULT_COLORSCHEME', 'pfSense');
-
-    $colorscheme2
-         'stylesheet'         => 'vnstat.css',
-         'image_background'   => array( 255, 255, 255,   0 ),
-	 'graph_background'   => array( 220, 220, 230,   0 ),
-	 'graph_background_2' => array( 205, 205, 220,   0 ),
-	 'grid_stipple_1'     => array( 140, 140, 140,   0 ),
-         'grid_stipple_2'     => array( 200, 200, 200,   0 ),
-	 'border'             => array(   0,   0,   0,   0 ),
-	 'text'               => array(   0,   0,   0,   0 ),
-	 'rx'                 => array( 190, 190,  20,  50 ),
-	 'rx_border'	      => array(  40,  80,  40,  90 ),
-	 'tx'	              => array( 130, 160, 100,  50 ),
-	 'tx_border'          => array(  80,  40,  40,  90 )
-     );
-
-    // A red colorscheme based on a contribution by Enrico Tröger
-    $colorscheme3
-         'stylesheet'         => 'vnstat_red.css',
-         'image_background'   => array( 225, 225, 225,   0 ),
-	 'graph_background'   => array( 220, 220, 230,   0 ),
-	 'graph_background_2' => array( 205, 205, 220,   0 ),
-	 'grid_stipple_1'     => array( 140, 140, 140,   0 ),
-         'grid_stipple_2'     => array( 200, 200, 200,   0 ),
-	 'border'             => array(   0,   0,   0,   0 ),
-	 'text'               => array(   0,   0,   0,   0 ),
-	 'rx'                 => array( 190,  20,  20,  50 ),
-	 'rx_border'	      => array(  80,  40,  40,  90 ),
-	 'tx'	              => array( 130, 130, 130,  50 ),
-	 'tx_border'          => array(  60,  60,  60,  90 )
-     );
-
-    // A red colorscheme based on a contribution by Perry Mason
-    $colorscheme4
-         'stylesheet'         => 'vnstat_pfSense.css',
-         'image_background'   => array( 240, 240, 240,   0 ),
-	 'graph_background'   => array( 255, 255, 255,   0 ),
-	 'graph_background_2' => array( 255, 255, 255,   0 ),
-	 'grid_stipple_1'     => array( 144, 0, 0,   0 ),
-         'grid_stipple_2'     => array( 144, 0, 0,   0 ),
-	 'border'             => array(   0,   0,   0,   0 ),
-	 'text'               => array(   0,   0,   0,   0 ),
-	 'rx'                 => array( 190,  20,  20,  50 ),
-	 'rx_border'	      => array(  80,  40,  40,  90 ),
-	 'tx'	              => array( 130, 130, 130,  50 ),
-	 'tx_border'          => array(  60,  60,  60,  90 )
-     );
 ?>
 EOF;
 
