@@ -2007,7 +2007,7 @@
 			<custom_name>apcupsd</custom_name>
 			<port>sysutils/apcupsd</port>
 		</build_pbi>
-		<build_options>OPTIONS_SET+= APCSMART_DRV APCDUMB_DRV PCNET_DRV USB TCP_WRAPPERS SNMP_DRV;OPTIONS_UNSET+= CLIENT_ONLY CGI SNMP_DRV_OLD TEST_DRV GAPCMON DOCS</build_options>
+		<build_options>apcupsd_SET=APCSMART_DRV APCDUMB_DRV PCNET_DRV USB TCP_WRAPPERS SNMP_DRV;apcupsd_UNSET=CLIENT_ONLY CGI SNMP_DRV_OLD TEST_DRV GAPCMON DOCS</build_options>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
 		<depends_on_package>apcupsd-3.14.10_1.tbz</depends_on_package>
 		<depends_on_package_pbi>apcupsd-3.14.10_1-amd64.pbi</depends_on_package_pbi>
