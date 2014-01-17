@@ -15,7 +15,7 @@
 		<category>Services</category>
 		<version>0.99</version>
 		<status>Beta</status>
-		<required_version>2.1</required_version>
+		<required_version>2.2</required_version>
 		<config_file>http://www.pfsense.com/packages/config/someprogram/someprogram.xml</config_file>
 		<maintainer>me@example.com</maintainer>
 		<configurationfile>someprogram.xml</configurationfile>
@@ -37,7 +37,7 @@
 		<category>Services</category>
 		<version>1.8 pkg v0.3.1</version>
 		<status>Beta</status>
-		<required_version>2.0</required_version>
+		<required_version>2.2</required_version>
 		<config_file>http://www.pfsense.com/packages/config/asterisk/asterisk.xml</config_file>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/10/All/</depends_on_package_base_url>
 		<depends_on_package_pbi>asterisk-1.8.19.0-##ARCH##.pbi</depends_on_package_pbi>
@@ -54,7 +54,7 @@
 		<category>Services</category>
 		<version>9.9.4 pkg v 0.3.2</version>
 		<status>RC</status>
-		<required_version>2.1</required_version>
+		<required_version>2.2</required_version>
 		<config_file>http://www.pfsense.com/packages/config/bind/bind.xml</config_file>
 		<configurationfile>bind.xml</configurationfile>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/10/All/</depends_on_package_base_url>
@@ -74,7 +74,7 @@
 		<config_file>http://www.pfsense.com/packages/config/filer/filer.xml</config_file>
 		<version>0.60</version>
 		<status>Beta</status>
-		<required_version>2.0</required_version>
+		<required_version>2.2</required_version>
 		<maintainer>bscholer@cshl.edu</maintainer>
 		<configurationfile>filer.xml</configurationfile>
 	</package>
@@ -88,7 +88,7 @@
 		<depends_on_package_base_url>http://files.pfsense.org/packages/10/All/</depends_on_package_base_url>
 		<version>0.2.4</version>
 		<status>Beta</status>
-		<required_version>1.2.2</required_version>
+		<required_version>2.2</required_version>
 		<maintainer>tom@tomschaefer.org</maintainer>
 		<configurationfile>countryblock.xml</configurationfile>
 	</package>
@@ -100,7 +100,7 @@
 		<category>Services</category>
 		<version>0.1</version>
 		<status>BETA</status>
-		<required_version>2.0</required_version>
+		<required_version>2.2</required_version>
 		<maintainer>tom@tomschaefer.org</maintainer>
 		<config_file>http://www.pfsense.com/packages/config/strikeback/strikeback.xml</config_file>
 		<configurationfile>strikeback.xml</configurationfile>
@@ -115,7 +115,7 @@
 		<config_file>http://pfsense.org/packages/config/filemgr/filemgr.xml</config_file>
 		<version>0.1.3</version>
 		<status>Beta</status>
-		<required_version>2.0</required_version>
+		<required_version>2.2</required_version>
 		<maintainer>tom@tomschaefer.org</maintainer>
 		<configurationfile>filemgr.xml</configurationfile>
 	</package>
@@ -132,7 +132,7 @@
 		<depends_on_package_base_url>http://files.pfsense.org/packages/10/All/</depends_on_package_base_url>
 		<version>1.0.2</version>
 		<status>Release</status>
-		<required_version>2.0</required_version>
+		<required_version>2.2</required_version>
 		<maintainer>tom@tomschaefer.org marcellocoutinho@gmail.com</maintainer>
 		<configurationfile>pfblocker.xml</configurationfile>
 	</package>
@@ -144,7 +144,7 @@
 		<category>Diagnostics</category>
 		<version>0.5</version>
 		<status>BETA</status>
-		<required_version>1.2.3</required_version>
+		<required_version>2.2</required_version>
 		<config_file>http://www.pfsense.com/packages/config/anyterm/anyterm.xml</config_file>
 		<configurationfile>anyterm.xml</configurationfile>
 	</package>
@@ -158,7 +158,7 @@
 		<category>Services</category>
 		<version>1.4.24 pkg v 1.2.4</version>
 		<status>Release</status>
-		<required_version>2.0</required_version>
+		<required_version>2.2</required_version>
 		<config_file>http://www.pfsense.com/packages/config/haproxy/haproxy.xml</config_file>
 		<configurationfile>haproxy.xml</configurationfile>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/10/All/</depends_on_package_base_url>
@@ -175,7 +175,7 @@
 		<category>Services</category>
 		<version>1.4.24 pkg v 1.1</version>
 		<status>Release</status>
-		<required_version>2.0</required_version>
+		<required_version>2.2</required_version>
 		<config_file>http://www.pfsense.com/packages/config/haproxy-legacy/haproxy.xml</config_file>
 		<configurationfile>haproxy.xml</configurationfile>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/10/All/</depends_on_package_base_url>
@@ -191,7 +191,7 @@
 		<category>Services</category>
 		<version>1.5-dev19 pkg v 0.6</version>
 		<status>Release</status>
-		<required_version>2.1</required_version>
+		<required_version>2.2</required_version>
 		<config_file>http://www.pfsense.com/packages/config/haproxy-devel/haproxy.xml</config_file>
 		<configurationfile>haproxy.xml</configurationfile>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/10/All/</depends_on_package_base_url>
@@ -214,7 +214,7 @@
 		<category>Network Management</category>
 		<version>2.4.6 pkg v0.3</version>
 		<status>ALPHA</status>
-		<required_version>2.0</required_version>
+		<required_version>2.2</required_version>
 		<config_file>http://www.pfsense.com/packages/config/apache_mod_security-dev/apache_virtualhost.xml</config_file>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/10/All/</depends_on_package_base_url>
 		<depends_on_package_pbi>proxy_mod_security-2.2.23_3-##ARCH##.pbi git-1.8.1.3-##ARCH##.pbi</depends_on_package_pbi>
@@ -236,7 +236,7 @@
 		<category>Network Management</category>
 		<version>0.1.3</version>
 		<status>ALPHA</status>
-		<required_version>2.0</required_version>
+		<required_version>2.2</required_version>
 		<config_file>http://www.pfsense.com/packages/config/apache_mod_security/apache_mod_security.xml</config_file>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/10/All/</depends_on_package_base_url>
 		<depends_on_package_pbi>proxy_mod_security-2.2.23_3-##ARCH##.pbi</depends_on_package_pbi>
@@ -262,7 +262,7 @@
 		<version>1.0.35</version>
 		<status>Stable</status>
 		<configurationfile>pure-ftpd.xml</configurationfile>
-		<required_version>1.0</required_version>
+		<required_version>2.2</required_version>
 		<maximum_version>1.0</maximum_version>
 		<logging>
 			<facilityname>ftp</facilityname>
@@ -283,7 +283,7 @@
 		<depends_on_package_pbi>avahi-0.6.29-##ARCH##.pbi</depends_on_package_pbi>
 		<version>0.6.29 pkg v1.02</version>
 		<status>ALPHA</status>
-		<required_version>1.2.3</required_version>
+		<required_version>2.2</required_version>
 		<config_file>http://www.pfsense.com/packages/config/avahi/avahi.xml</config_file>
 		<configurationfile>avahi.xml</configurationfile>
 		<after_install_info>Please visit the Avahi settings tab and select which interfaces you do not wish Avahi to listen on and click save to start the service.</after_install_info>
@@ -302,7 +302,7 @@
 		<build_options>WITH_PCAP_PORT=true;WITH_XMLDUMP=true;WITHOUT_JUMBO_FRAMES=true;WITH_MAKO=true;WITHOUT_DEJAVU=true;WITH_JSON=true;WITH_MMAP=true;WITHOUT_PERL_MODULE=true;WITHOUT_PYTHON_MODULE=true;WITHOUT_RUBY_MODULE=true;WITHOUT_EXAMPLES=true;WITHOUT_FPECTL=true;WITH_IPV6=true;WITH_NLS=true;WITHOUT_PTH=true;WITH_PYMALLOC=true;WITHOUT_SEM=true;WITH_THREADS=true;WITHOUT_UCS2=true;WITH_UCS4=true;WITH_FONTCONFIG=true;WITH_ICONV=true;WITHOUT_XPM=true;WITHOUT_DAG=true;WITHOUT_DIGCOLA=true;WITHOUT_IPSEPCOLA=true;WITHOUT_PANGOCAIRO=true;WITHOUT_GTK=true;WITHOUT_XCB=true</build_options>
 		<version>5.0.1 v2.3</version>
 		<status>BETA</status>
-		<required_version>2.0</required_version>
+		<required_version>2.2</required_version>
 		<config_file>http://www.pfsense.com/packages/config/ntop2/ntop.xml</config_file>
 		<configurationfile>ntop.xml</configurationfile>
 		<noembedded>true</noembedded>
@@ -319,7 +319,7 @@
 		<build_port_path>/usr/ports/net/freeswitch</build_port_path>
 		<version>0.8.3.6</version>
 		<status>Beta</status>
-		<required_version>1.2.1</required_version>
+		<required_version>2.2</required_version>
 		<maintainer>markjcrane@gmail.com</maintainer>
 		<configurationfile>freeswitch.xml</configurationfile>
 		<noembedded>true</noembedded>
@@ -337,7 +337,7 @@
 		<build_port_path>/usr/ports/net/freeswitch</build_port_path>
 		<version>0.9.7.26</version>
 		<status>Beta</status>
-		<required_version>1.2.3</required_version>
+		<required_version>2.2</required_version>
 		<maintainer>markjcrane@gmail.com</maintainer>
 		<configurationfile>freeswitch.xml</configurationfile>
 		<noembedded>true</noembedded>
@@ -353,7 +353,7 @@
 		<depends_on_package_base_url>http://files.pfsense.org/packages/10/All/</depends_on_package_base_url>
 		<version>0.2.4</version>
 		<status>Alpha</status>
-		<required_version>1.2.1</required_version>
+		<required_version>2.2</required_version>
 		<maintainer>markjcrane@gmail.com</maintainer>
 		<configurationfile>notes.xml</configurationfile>
 	</package>
@@ -367,7 +367,7 @@
 		<depends_on_package_base_url>http://files.pfsense.org/packages/10/All/</depends_on_package_base_url>
 		<version>2.0</version>
 		<status>Stable</status>
-		<required_version>2.0</required_version>
+		<required_version>2.2</required_version>
 		<configurationfile>tftp.xml</configurationfile>
 	</package>
 	<package>
@@ -380,7 +380,7 @@
 		<depends_on_package_base_url>http://files.pfsense.org/packages/10/All/</depends_on_package_base_url>
 		<version>0.4.1</version>
 		<status>Beta</status>
-		<required_version>1.2.1</required_version>
+		<required_version>2.2</required_version>
 		<maintainer>markjcrane@gmail.com</maintainer>
 		<configurationfile>phpservice.xml</configurationfile>
 	</package>
@@ -394,7 +394,7 @@
 		<depends_on_package_base_url>http://files.pfsense.org/packages/10/All/</depends_on_package_base_url>
 		<version>0.1.5</version>
 		<status>Beta</status>
-		<required_version>1.2</required_version>
+		<required_version>2.2</required_version>
 		<maintainer>markjcrane@gmail.com</maintainer>
 		<configurationfile>backup.xml</configurationfile>
 	</package>
@@ -408,7 +408,7 @@
 		<depends_on_package_base_url>http://files.pfsense.org/packages/10/All/</depends_on_package_base_url>
 		<version>0.1.8</version>
 		<status>Beta</status>
-		<required_version>1.2</required_version>
+		<required_version>2.2</required_version>
 		<maintainer>markjcrane@gmail.com</maintainer>
 		<configurationfile>cron.xml</configurationfile>
 	</package>
@@ -422,7 +422,7 @@
 		<depends_on_package_base_url>http://files.pfsense.org/packages/10/All/</depends_on_package_base_url>
 		<version>0.7.4</version>
 		<status>Stable</status>
-		<required_version>1.2.3</required_version>
+		<required_version>2.2</required_version>
 		<maintainer>markjcrane@gmail.com</maintainer>
 		<configurationfile>vhosts.xml</configurationfile>
 	</package>
@@ -442,7 +442,7 @@
 		<build_options>barnyard2_UNSET=ODBC PGSQL PRELUDE;barnyard2_SET=GRE IPV6 MPLS MYSQL;snort_SET=TARGETBASED PERFPROFILE DECODERPRE FLEXRESP3 GRE IPV6 MPLS NORMALIZER ZLIB;perl_SET=THREADS;WITH_THREADS=yes;WITH_IPV6=true;WITH_MPLS=true;WITH_GRE=true;WITH_TARGETBASED=true;WITH_PERFPROFILE=true;WITH_DECODERPRE=true;WITH_ZLIB=true;WITH_NORMALIZER=true;WITH_REACT=true;WITH_FLEXRESP3=true;WITHOUT_ODBC=true;WITHOUT_POSTGRESQL=true;WITHOUT_PRELUDE=true;NOPORTDOCS=true</build_options>
 		<config_file>http://www.pfsense.com/packages/config/snort/snort.xml</config_file>
 		<version>2.9.5.5 pkg v3.0.2</version>
-		<required_version>2.0</required_version>
+		<required_version>2.2</required_version>
 		<status>Stable</status>
 		<configurationfile>/snort.xml</configurationfile>
 		<after_install_info>Please visit the Snort settings tab first and select your desired rules. Afterwards visit the update rules tab to download your configured rules.</after_install_info>
@@ -458,7 +458,7 @@
 		<build_port_path>/usr/ports/net/olsrd</build_port_path>
 		<version>1.0</version>
 		<status>Stable</status>
-		<required_version>2.1</required_version>
+		<required_version>2.2</required_version>
 		<configurationfile>olsrd.xml</configurationfile>
 	</package>
 	<package>
@@ -469,7 +469,7 @@
 		<config_file>http://www.pfsense.com/packages/config/routed/routed.xml</config_file>
 		<version>1.1</version>
 		<status>Stable</status>
-		<required_version>2.1</required_version>
+		<required_version>2.2</required_version>
 		<configurationfile>routed.xml</configurationfile>
 	</package>
 	<package>
@@ -482,7 +482,7 @@
 		<depends_on_package_pbi>spamd-4.9.1-##ARCH##.pbi</depends_on_package_pbi>
 		<version>4.9.1</version>
 		<status>Beta</status>
-		<required_version>1.2.1</required_version>
+		<required_version>2.2</required_version>
 		<configurationfile>spamd.xml</configurationfile>
 		<build_port_path>/usr/ports/mail/spamd</build_port_path>
 		<logging>
@@ -503,7 +503,7 @@
 		<depends_on_package_pbi>postfix-2.10.2-##ARCH##.pbi</depends_on_package_pbi>
 		<version>2.10.2 pkg v.2.3.7</version>
 		<status>Release</status>
-		<required_version>2.0</required_version>
+		<required_version>2.2</required_version>
 		<configurationfile>postfix.xml</configurationfile>
 		<build_port_path>/usr/ports/mail/postfix</build_port_path>
 		<build_options>WITH_PCRE=true;WITH_SPF=true;WITH_SASL2=true;WITH_TLS=true</build_options>
@@ -523,7 +523,7 @@
 		<depends_on_package_pbi>dansguardian-2.12.0.3-##ARCH##.pbi</depends_on_package_pbi>
 		<version>2.12.0.3 pkg v.0.1.8</version>
 		<status>beta</status>
-		<required_version>2.0</required_version>
+		<required_version>2.2</required_version>
 		<configurationfile>dansguardian.xml</configurationfile>
 		<build_port_path>/usr/ports/www/dansguardian-devel</build_port_path>
 		<build_port_path>/usr/ports/security/ca_root_nss</build_port_path>
@@ -543,7 +543,7 @@
 		<depends_on_package_pbi>mailscanner-4.84.5_3-##ARCH##.pbi</depends_on_package_pbi>
 		<version>4.84.5_3 pkg v.0.2.4</version>
 		<status>beta</status>
-		<required_version>2.0</required_version>
+		<required_version>2.2</required_version>
 		<configurationfile>mailscanner.xml</configurationfile>
 		<build_pbi>
 			<ports_before>mail/pyzor mail/p5-Mail-SPF net/p5-IP-Country mail/dcc-dccd</ports_before>
@@ -563,7 +563,7 @@
 		<build_port_path>/usr/ports/net/siproxd</build_port_path>
 		<version>0.8.0_2</version>
 		<status>Beta</status>
-		<required_version>1.2.1</required_version>
+		<required_version>2.2</required_version>
 		<configurationfile>siproxd.xml</configurationfile>
 	</package>
 	<package>
@@ -577,7 +577,7 @@
 		<version>0.9.1</version>
 		<status>STABLE</status>
 		<pkginfolink>http://doc.pfsense.org/index.php/OpenBGPD_package</pkginfolink>
-		<required_version>1.3</required_version>
+		<required_version>2.2</required_version>
 		<configurationfile>openbgpd.xml</configurationfile>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/10/All/</depends_on_package_base_url>
 		<depends_on_package_pbi>openbgpd-5.2.20121209-##ARCH##.pbi</depends_on_package_pbi>
@@ -597,7 +597,7 @@
 			<port>net/openospfd</port>
 		</build_pbi>
 		<pkginfolink></pkginfolink>
-		<required_version>1.2.1</required_version>
+		<required_version>2.2</required_version>
 		<configurationfile>openospfd.xml</configurationfile>
 	</package>
 	<package>
@@ -615,7 +615,7 @@
 		</build_pbi>
 		<build_options>WITHOUT_DEBUGGING=true;WITHOUT_GDBM=true;WITHOUT_PERL_MALLOC=true;WITH_PERL_64BITINT=true;WITHOUT_THREADS=true;WITHOUT_MULTIPLICITY=true;WITHOUT_SUIDPERL=true;WITHOUT_SITECUSTOMIZE=true;WITH_USE_PERL=true;WITH_GDSUPPORT=true</build_options>
 		<status>RC1</status>
-		<required_version>2.0</required_version>
+		<required_version>2.2</required_version>
 		<config_file>http://www.pfsense.com/packages/config/lightsquid/lightsquid.xml</config_file>
 		<pkginfolink></pkginfolink>
 		<configurationfile>lightsquid.xml</configurationfile>
@@ -633,7 +633,7 @@
 		<depends_on_package_pbi>sarg-2.3.6_2-##ARCH##.pbi</depends_on_package_pbi>
 		<version>2.3.6_2 pkg v.0.6.3</version>
 		<status>Release</status>
-		<required_version>2.0</required_version>
+		<required_version>2.2</required_version>
 		<configurationfile>sarg.xml</configurationfile>
 		<build_port_path>/usr/ports/www/sarg</build_port_path>
 		<build_options>sarg_UNSET=PHP</build_options>
@@ -653,7 +653,7 @@
 		<depends_on_package_pbi>ipguard-1.04-##ARCH##.pbi</depends_on_package_pbi>
 		<version>1.0.4 pkg v.0.1</version>
 		<status>beta</status>
-		<required_version>2.0</required_version>
+		<required_version>2.2</required_version>
 		<configurationfile>ipguard.xml</configurationfile>
 		<build_port_path>/usr/ports/security/ipguard</build_port_path>
 		<after_install_info>Please visit ipguard settings on the Firewall Menu to configure.</after_install_info>
@@ -667,7 +667,7 @@
 		<category>Services</category>
 		<version>2.1.5 pkg v.1.0</version>
 		<status>Release</status>
-		<required_version>2.0</required_version>
+		<required_version>2.2</required_version>
 		<config_file>http://www.pfsense.com/packages/config/varnish64/varnish_backends.xml</config_file>
 		<configurationfile>varnish_backends.xml</configurationfile>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/10/All/</depends_on_package_base_url>
@@ -686,7 +686,7 @@
 		<category>Services</category>
 		<version>3.0.4 pkg v.0.2.1</version>
 		<status>RC</status>
-		<required_version>2.0</required_version>
+		<required_version>2.2</required_version>
 		<config_file>http://www.pfsense.com/packages/config/varnish3/varnish_backends.xml</config_file>
 		<configurationfile>varnish_backends.xml</configurationfile>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/10/All/</depends_on_package_base_url>
@@ -708,7 +708,7 @@
 		<build_port_path>/usr/ports/net/vnstat</build_port_path>
 		<version>1.10_2</version>
 		<status>Stable</status>
-		<required_version>2.0</required_version>
+		<required_version>2.2</required_version>
 		<maintainer>crazypark2@yahoo.dk</maintainer>
 		<config_file>http://www.pfsense.com/packages/config/vnstat2/vnstat2.xml</config_file>
 		<configurationfile>vnstat2.xml</configurationfile>
@@ -721,7 +721,7 @@
 		<category>System</category>
 		<version>2.5.4</version>
 		<status>Beta</status>
-		<required_version>1.0</required_version>
+		<required_version>2.2</required_version>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/10/All/</depends_on_package_base_url>
 		<depends_on_package_pbi>mbmon-205_6-##ARCH##.pbi</depends_on_package_pbi>
 		<build_port_path>/usr/ports/sysutils/mbmon</build_port_path>
@@ -737,7 +737,7 @@
 		<version>1.0.6.18</version>
 		<status>Beta</status>
 		<pkginfolink>http://doc.pfsense.org/index.php/Tinydns_package</pkginfolink>
-		<required_version>2.0</required_version>
+		<required_version>2.2</required_version>
 		<config_file>http://www.pfsense.com/packages/config/tinydns/tinydns.xml</config_file>
 		<configurationfile>tinydns.xml</configurationfile>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/10/All/</depends_on_package_base_url>
@@ -757,7 +757,7 @@
 		<version>8.7.0.3046 (build-425873)</version>
 		<status>Stable</status>
 		<pkginfolink>http://doc.pfsense.org/index.php/Open_VM_Tools_package</pkginfolink>
-		<required_version>2.0</required_version>
+		<required_version>2.2</required_version>
 		<config_file>http://www.pfsense.org/packages/config/open-vm-tools_2/open-vm-tools.xml</config_file>
 		<configurationfile>open-vm-tools.xml</configurationfile>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/10/All/</depends_on_package_base_url>
@@ -774,7 +774,7 @@
 		<category>Services</category>
 		<version>1.20</version>
 		<status>Stable</status>
-		<required_version>1.2</required_version>
+		<required_version>2.2</required_version>
 		<pkginfolink>http://doc.pfsense.org/index.php/AutoConfigBackup</pkginfolink>
 		<config_file>http://www.pfsense.com/packages/config/autoconfigbackup/autoconfigbackup.xml</config_file>
 		<configurationfile>autoconfigbackup.xml</configurationfile>
@@ -786,7 +786,7 @@
 		<category>Services</category>
 		<version>2.09.1</version>
 		<status>Stable</status>
-		<required_version>1.0.1</required_version>
+		<required_version>2.2</required_version>
 		<config_file>http://www.pfsense.com/packages/config/arping/arping.xml</config_file>
 		<configurationfile>arping.xml</configurationfile>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/10/All/</depends_on_package_base_url>
@@ -805,7 +805,7 @@
 		<version>nmap-6.25_1 pkg v1.2</version>
 		<status>Stable</status>
 		<pkginfolink>http://doc.pfsense.org/index.php/Nmap_package</pkginfolink>
-		<required_version>2.0</required_version>
+		<required_version>2.2</required_version>
 		<configurationfile>nmap.xml</configurationfile>
 		<build_port_path>/usr/ports/security/nmap</build_port_path>
 	</package>
@@ -816,7 +816,7 @@
 		<category>Network Management</category>
 		<maintainer>billm@pfsense.org</maintainer>
 		<version>0.9-4</version>
-		<required_version>2.0</required_version>
+		<required_version>2.2</required_version>
 		<status>BETA</status>
 		<pkginfolink>http://doc.pfsense.org/index.php/IMSpector_package</pkginfolink>
 		<config_file>http://www.pfsense.com/packages/config/imspector/imspector.xml</config_file>
@@ -833,7 +833,7 @@
 		<category>Network Management</category>
 		<maintainer>marcellocoutinho@gmail.com</maintainer>
 		<version>20111108 pkg v 0.3.1</version>
-		<required_version>2.0</required_version>
+		<required_version>2.2</required_version>
 		<status>BETA</status>
 		<pkginfolink>http://doc.pfsense.org/index.php/IMSpector_package</pkginfolink>
 		<config_file>http://www.pfsense.com/packages/config/imspector-dev/imspector.xml</config_file>
@@ -848,7 +848,7 @@
 		<category>Network Management</category>
 		<version>2.6.4 pkg 2.0</version>
 		<status>BETA</status>
-		<required_version>2.0</required_version>
+		<required_version>2.2</required_version>
 		<maintainer>rswagoner@gmail.com</maintainer>
 		<config_file>http://www.pfsense.com/packages/config/nut/nut.xml</config_file>
 		<configurationfile>nut.xml</configurationfile>
@@ -864,7 +864,7 @@
 		<category>Network Management</category>
 		<version>0.2</version>
 		<maintainer>ptaylor@addressplus.net</maintainer>
-		<required_version>1.2.1</required_version>
+		<required_version>2.2</required_version>
 		<status>BETA</status>
 		<config_file>http://www.pfsense.org/packages/config/diag_states_pt/diag_new_states.xml</config_file>
 		<configurationfile>http://www.pfsense.com/packages/config/diag_states_pt/diag_new_states.xml</configurationfile>
@@ -878,7 +878,7 @@
 		<depends_on_package_pbi>darkstat-3.0.715-##ARCH##.pbi</depends_on_package_pbi>
 		<version>3.0.714</version>
 		<status>Stable</status>
-		<required_version>1.2.1</required_version>
+		<required_version>2.2</required_version>
 		<maintainer>sullrich+pfsp@gmail.com</maintainer>
 		<config_file>http://www.pfsense.com/packages/config/darkstat/darkstat.xml</config_file>
 		<configurationfile>darkstat.xml</configurationfile>
@@ -894,7 +894,7 @@
 		<depends_on_package_pbi>pfflowd-0.8-##ARCH##.pbi</depends_on_package_pbi>
 		<version>0.8.3</version>
 		<status>Stable</status>
-		<required_version>2.0</required_version>
+		<required_version>2.2</required_version>
 		<configurationfile>pfflowd.xml</configurationfile>
 		<maintainer></maintainer>
 		<build_port_path>/usr/ports/net/pfflowd-0.8</build_port_path>
@@ -909,7 +909,7 @@
 		<version>1.03_1</version>
 		<status>Stable</status>
 		<pkginfolink>http://doc.pfsense.org/index.php/Widentd_package</pkginfolink>
-		<required_version>1.2.1</required_version>
+		<required_version>2.2</required_version>
 		<config_file>http://www.pfsense.com/packages/config/widentd.xml</config_file>
 		<configurationfile>widentd.xml</configurationfile>
 		<build_port_path>/usr/ports/net/widentd</build_port_path>
@@ -921,7 +921,7 @@
 		<category>System</category>
 		<version>1.1.8 pkg v1.0.5</version>
 		<status>Beta</status>
-		<required_version>2.0</required_version>
+		<required_version>2.2</required_version>
 		<maintainer>none</maintainer>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/10/All/</depends_on_package_base_url>
 		<depends_on_package_pbi>freeradius-1.1.8_5-##ARCH##.pbi</depends_on_package_pbi>
@@ -944,7 +944,7 @@
 		<category>System</category>
 		<version>2.1.12_1/2.2.0 pkg v1.6.7_2</version>
 		<status>RC1</status>
-		<required_version>2.0</required_version>
+		<required_version>2.2</required_version>
 		<maintainer>nachtfalkeaw@web.de</maintainer>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/10/All/</depends_on_package_base_url>
 		<depends_on_package_pbi>freeradius-2.2.0-##ARCH##.pbi</depends_on_package_pbi>
@@ -965,7 +965,7 @@
 		<category>System</category>
 		<version>2.0.1_5 pkg v.0.3</version>
 		<status>BETA</status>
-		<required_version>1.2.1</required_version>
+		<required_version>2.2</required_version>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/10/All/</depends_on_package_base_url>
 		<depends_on_package_pbi>bandwidthd-2.0.1_5-##ARCH##.pbi</depends_on_package_pbi>
 		<config_file>http://www.pfsense.org/packages/config/bandwidthd/bandwidthd.xml</config_file>
@@ -986,7 +986,7 @@
 		<version>4.43.0</version>
 		<status>Stable</status>
 		<pkginfolink>http://doc.pfsense.org/index.php/Stunnel_package</pkginfolink>
-		<required_version>1.2.1</required_version>
+		<required_version>2.2</required_version>
 		<config_file>http://www.pfsense.com/packages/config/stunnel.xml</config_file>
 		<configurationfile>stunnel.xml</configurationfile>
 		<build_port_path>/usr/ports/security/stunnel</build_port_path>
@@ -1003,7 +1003,7 @@
 		<version>2.0.5</version>
 		<status>Beta</status>
 		<pkginfolink>http://doc.pfsense.org/index.php/Iperf_package</pkginfolink>
-		<required_version>1.2.1</required_version>
+		<required_version>2.2</required_version>
 		<configurationfile>iperf.xml</configurationfile>
 		<build_port_path>/usr/ports/benchmarks/iperf</build_port_path>
 	</package>
@@ -1016,7 +1016,7 @@
 		<depends_on_package_base_url>http://files.pfsense.org/packages/10/All</depends_on_package_base_url>
 		<depends_on_package_pbi>netio-1.26-##ARCH##.pbi</depends_on_package_pbi>
 		<version>1.26</version>
-		<required_version>2.0</required_version>
+		<required_version>2.2</required_version>
 		<status>ALPHA</status>
 		<configurationfile>netio.xml</configurationfile>
 		<build_port_path>/usr/ports/benchmarks/netio</build_port_path>
@@ -1031,7 +1031,7 @@
 		<depends_on_package_pbi>mtr-0.82_1-##ARCH##.pbi</depends_on_package_pbi>
 		<version>0.82</version>
 		<status>Stable</status>
-		<required_version>2.0</required_version>
+		<required_version>2.2</required_version>
 		<config_file>http://www.pfsense.com/packages/config/mtr-nox11.xml</config_file>
 		<configurationfile>mtr-nox11.xml</configurationfile>
 		<build_port_path>/usr/ports/net/mtr</build_port_path>
@@ -1044,7 +1044,7 @@
 		<category>Network</category>
 		<version>2.7.9 pkg v.4.3.3</version>
 		<status>Stable</status>
-		<required_version>2</required_version>
+		<required_version>2.2</required_version>
 		<maintainer>fernando@netfilter.com.br seth.mos@dds.nl mfuchs77@googlemail.com jimp@pfsense.org</maintainer>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/10/All/</depends_on_package_base_url>
 		<depends_on_package_pbi>squid-2.7.9_3-##ARCH##.pbi</depends_on_package_pbi>
@@ -1068,7 +1068,7 @@
 		<category>Network</category>
 		<version>3.1.20 pkg 2.0.6</version>
 		<status>beta</status>
-		<required_version>2.0</required_version>
+		<required_version>2.2</required_version>
 		<maintainer>marcellocoutinho@gmail.com fernando@netfilter.com.br seth.mos@dds.nl mfuchs77@googlemail.com jimp@pfsense.org</maintainer>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/10/All/</depends_on_package_base_url>
 		<build_pbi>
@@ -1093,7 +1093,7 @@
 		<category>Network</category>
 		<version>3.3.10 pkg 2.2</version>
 		<status>beta</status>
-		<required_version>2.0</required_version>
+		<required_version>2.2</required_version>
 		<maintainer>marcellocoutinho@gmail.com fernando@netfilter.com.br seth.mos@dds.nl mfuchs77@googlemail.com jimp@pfsense.org</maintainer>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/10/All/</depends_on_package_base_url>
 		<build_pbi>
@@ -1113,7 +1113,7 @@
 		<category>Utility</category>
 		<version>lcdproc-0.5.5</version>
 		<status>BETA</status>
-		<required_version>1.2.1</required_version>
+		<required_version>2.2</required_version>
 		<maintainer>seth.mos@dds.nl</maintainer>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/10/All/</depends_on_package_base_url>
 		<depends_on_package_pbi>lcdproc-0.5.6-##ARCH##.pbi</depends_on_package_pbi>
@@ -1130,7 +1130,7 @@
 		<category>Utility</category>
 		<version>lcdproc-0.5.6 pkg v. 0.9.7</version>
 		<status>BETA</status>
-		<required_version>2.0</required_version>
+		<required_version>2.2</required_version>
 		<maintainer>michele@nt2.it</maintainer>
 		<pkginfolink>http://forum.pfsense.org/index.php/topic,44034.0.html</pkginfolink>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/10/All/</depends_on_package_base_url>
@@ -1151,7 +1151,7 @@
 		<build_port_path>/usr/ports/net-mgmt/arpwatch</build_port_path>
 		<version>2.1.a15_6 pkg v1.1.1</version>
 		<status>ALPHA</status>
-		<required_version>2.0</required_version>
+		<required_version>2.2</required_version>
 		<config_file>http://www.pfsense.com/packages/config/arpwatch.xml</config_file>
 		<configurationfile>arpwatch.xml</configurationfile>
 		<logging>
@@ -1167,7 +1167,7 @@
 		<category>Network Management</category>
 		<version>1.4_4 pkg v.1.9.5</version>
 		<status>Beta</status>
-		<required_version>1.1</required_version>
+		<required_version>2.2</required_version>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/10/All/</depends_on_package_base_url>
 		<depends_on_package_pbi>squidguard-1.4_4-##ARCH##.pbi</depends_on_package_pbi>
 		<build_pbi>
@@ -1186,7 +1186,7 @@
 		<category>Network Management</category>
 		<version>1.5_1 beta</version>
 		<status>Beta</status>
-		<required_version>2.1</required_version>
+		<required_version>2.2</required_version>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/10/All/</depends_on_package_base_url>
 		<depends_on_package_pbi>squidguard-devel-1.5_1-##ARCH##.pbi</depends_on_package_pbi>
 		<build_pbi>
@@ -1206,7 +1206,7 @@
 		<category>Network Management</category>
 		<version>1.4_4 pkg v.1.9.5</version>
 		<status>Experimental</status>
-		<required_version>2.1</required_version>
+		<required_version>2.2</required_version>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/10/All/</depends_on_package_base_url>
 		<depends_on_package_pbi>squidguard-squid3-1.4_4-##ARCH##.pbi</depends_on_package_pbi>
 		<build_pbi>
@@ -1225,7 +1225,7 @@
 		<config_file>http://www.pfsense.com/packages/config/zabbix-agent/zabbix-agent.xml</config_file>
 		<version>1.8.10,2 pkg v1.1</version>
 		<status>FINAL</status>
-		<required_version>1.2.3</required_version>
+		<required_version>2.2</required_version>
 		<configurationfile>zabbix-agent.xml</configurationfile>
 		<maintainer>remco.verhoef@redfive.biz</maintainer>
 		<build_pbi>
@@ -1243,7 +1243,7 @@
 		<config_file>http://www.pfsense.com/packages/config/zabbix-proxy/zabbix-proxy.xml</config_file>
 		<version>1.8.8,2 pkg v1.1</version>
 		<status>FINAL</status>
-		<required_version>1.2.3</required_version>
+		<required_version>2.2</required_version>
 		<configurationfile>zabbix-proxy.xml</configurationfile>
 		<maintainer>cmb@pfsense.org</maintainer>
 		<build_pbi>
@@ -1264,7 +1264,7 @@
 		<build_port_path>/usr/ports/archivers/zip</build_port_path>
 		<version>1.2.4</version>
 		<status>RELEASE</status>
-		<required_version>2.0</required_version>
+		<required_version>2.2</required_version>
 		<config_file>http://www.pfsense.com/packages/config/openvpn-client-export/openvpn-client-export.xml</config_file>
 		<configurationfile>openvpn-client-export.xml</configurationfile>
 	</package>
@@ -1280,7 +1280,7 @@
 		<build_options>CLAMAVUSER=havp;CLAMAVGROUP=havp</build_options>
 		<version>0.91_1 pkg v1.01</version>
 		<status>BETA</status>
-		<required_version>1.2.2</required_version>
+		<required_version>2.2</required_version>
 		<config_file>http://www.pfsense.com/packages/config/havp/havp.xml</config_file>
 		<configurationfile>havp.xml</configurationfile>
 		<maintainer>dv_serg@mail.ru</maintainer>
@@ -1292,7 +1292,7 @@
 		<website>http://anduin.net/jailctl/</website>
 		<category>System</category>
 		<version>0.51</version>
-		<required_version>1.2.3</required_version>
+		<required_version>2.2</required_version>
 		<status>BETA</status>
 		<pkginfolink>http://doc.pfsense.org/index.php/PfJailctl_package</pkginfolink>
 		<config_file>http://www.pfsense.com/packages/config/jailctl.xml</config_file>
@@ -1305,7 +1305,7 @@
 		<website>http://anduin.net/jailctl/</website>
 		<category>System</category>
 		<version>0.2</version>
-		<required_version>1.2.3</required_version>
+		<required_version>2.2</required_version>
 		<status>BETA</status>
 		<pkginfolink>http://doc.pfsense.org/index.php/PfJailctl_package</pkginfolink>
 		<config_file>http://www.pfsense.com/packages/config/jail_template.xml</config_file>
@@ -1319,7 +1319,7 @@
 		<version>0.4</version>
 		<status>Beta</status>
 		<maintainer>jimp@pfsense.org</maintainer>
-		<required_version>1.2.3</required_version>
+		<required_version>2.2</required_version>
 		<config_file>http://www.pfsense.org/packages/config/blinkled8/blinkled.xml</config_file>
 		<configurationfile>blinkled.xml</configurationfile>
 		<pkginfolink>http://doc.pfsense.org/index.php/BlinkLED_Package</pkginfolink>
@@ -1337,7 +1337,7 @@
 		<version>0.2</version>
 		<status>Beta</status>
 		<maintainer>jimp@pfsense.org</maintainer>
-		<required_version>2.0</required_version>
+		<required_version>2.2</required_version>
 		<config_file>http://www.pfsense.org/packages/config/gwled/gwled.xml</config_file>
 		<configurationfile>gwled.xml</configurationfile>
 	</package>
@@ -1348,7 +1348,7 @@
 		<config_file>http://www.pfsense.com/packages/config/widget-snort/widget-snort.xml</config_file>
 		<version>0.3.7</version>
 		<status>BETA</status>
-		<required_version>1.2</required_version>
+		<required_version>2.2</required_version>
 		<configurationfile>widget-snort.xml</configurationfile>
 	</package>
 	<package>
@@ -1358,7 +1358,7 @@
 		<config_file>http://www.pfsense.com/packages/config/widget-havp/widget-havp.xml</config_file>
 		<version>0.1</version>
 		<status>BETA</status>
-		<required_version>1.2</required_version>
+		<required_version>2.2</required_version>
 		<configurationfile>widget-havp.xml</configurationfile>
 	</package>
 	<package>
@@ -1368,7 +1368,7 @@
 		<config_file>http://www.pfsense.com/packages/config/widget-antivirus/widget-antivirus.xml</config_file>
 		<version>0.1</version>
 		<status>BETA</status>
-		<required_version>1.2</required_version>
+		<required_version>2.2</required_version>
 		<configurationfile>widget-havp.xml</configurationfile>
 	</package>
 	<package>
@@ -1378,7 +1378,7 @@
 		<version>1.1</version>
 		<status>Beta</status>
 		<maintainer>jimp@pfsense.org</maintainer>
-		<required_version>1.2.3</required_version>
+		<required_version>2.2</required_version>
 		<config_file>http://www.pfsense.org/packages/config/rrd-summary/rrd-summary.xml</config_file>
 		<configurationfile>rrd-summary.xml</configurationfile>
 	</package>
@@ -1390,7 +1390,7 @@
 		<version>1.4.21_1</version>
 		<status>Alpha</status>
 		<maintainer>warren@decoy.co.za</maintainer>
-		<required_version>2.0</required_version>
+		<required_version>2.2</required_version>
 		<pkginfolink>http://doc.pfsense.org/index.php/Unbound_package</pkginfolink>
 		<config_file>http://www.pfsense.com/packages/config/unbound/unbound.xml</config_file>
 		<configurationfile>unbound.xml</configurationfile>
@@ -1417,7 +1417,7 @@
 		<config_file>http://www.pfsense.com/packages/config/shellcmd/shellcmd.xml</config_file>
 		<version>0.5</version>
 		<status>Beta</status>
-		<required_version>1.2</required_version>
+		<required_version>2.2</required_version>
 		<maintainer>markjcrane@gmail.com</maintainer>
 		<configurationfile>shellcmd.xml</configurationfile>
 	</package>
@@ -1429,7 +1429,7 @@
 		<category>Enhancements</category>
 		<version>0.2</version>
 		<status>BETA</status>
-		<required_version>2.0</required_version>
+		<required_version>2.2</required_version>
 		<maintainer>ey@tm-k.com</maintainer>
 		<config_file>http://www.pfsense.org/packages/config/widescreen/widescreen.xml</config_file>
 		<configurationfile>widescreen.xml</configurationfile>
@@ -1451,7 +1451,7 @@
 		<config_file>http://www.pfsense.com/packages/config/nrpe2/nrpe2.xml</config_file>
 		<version>2.12_3 v2.2</version>
 		<status>Beta</status>
-		<required_version>1.2</required_version>
+		<required_version>2.2</required_version>
 		<maintainer>erik@erikkristensen.com</maintainer>
 		<configurationfile>nrpe2.xml</configurationfile>
 	</package>
@@ -1469,7 +1469,7 @@
 		<config_file>http://www.pfsense.com/packages/config/checkmk-agent/checkmk.xml</config_file>
 		<version>v0.1</version>
 		<status>RC1</status>
-		<required_version>2.0</required_version>
+		<required_version>2.2</required_version>
 		<maintainer>marcellocoutinho@gmail.com</maintainer>
 		<configurationfile>checkmk.xml</configurationfile>
 	</package>
@@ -1480,7 +1480,7 @@
 		<category>Enhancements</category>
 		<version>1.0</version>
 		<status>Beta</status>
-		<required_version>2.0</required_version>
+		<required_version>2.2</required_version>
 		<config_file>http://www.pfsense.com/packages/config/sshdcond/sshdcond.xml</config_file>
 		<maintainer>namezero@afim.info</maintainer>
 		<configurationfile>sshdcond.xml</configurationfile>
@@ -1491,7 +1491,7 @@
 		<category>Network Management</category>
 		<version>2.0.7</version>
 		<status>Stable</status>
-		<required_version>2.0</required_version>
+		<required_version>2.2</required_version>
 		<config_file>http://www.pfsense.com/packages/config/mailreport/mailreport.xml</config_file>
 		<configurationfile>mailreport.xml</configurationfile>
 	</package>
@@ -1505,7 +1505,7 @@
 		<status>BETA</status>
 		<website>www.winton.org.uk/zebedee/</website>
 		<maintainer>jorgelustosa@gmail.com marcellocoutinho@gmail.com</maintainer>
-		<required_version>2.0</required_version>
+		<required_version>2.2</required_version>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/10/All/</depends_on_package_base_url>
 		<depends_on_package_pbi>zebedee-2.5.3-##ARCH##.pbi</depends_on_package_pbi>
 		<config_file>http://www.pfsense.com/packages/config/zebedee/zebedee.xml</config_file>
@@ -1519,7 +1519,7 @@
 		<config_file>http://www.pfsense.com/packages/config/openvpn_tapfix_20x/openvpn_tapfix_20x.xml</config_file>
 		<version>0.4</version>
 		<status>BETA</status>
-		<required_version>2.0</required_version>
+		<required_version>2.2</required_version>
 		<maximum_version>2.0.4</maximum_version>
 	</package>
 	<package>
@@ -1534,7 +1534,7 @@
 		<config_file>http://www.pfsense.com/packages/config/quagga_ospfd/quagga_ospfd.xml</config_file>
 		<build_port_path>/usr/ports/net/quagga</build_port_path>
 		<pkginfolink></pkginfolink>
-		<required_version>2.0</required_version>
+		<required_version>2.2</required_version>
 		<configurationfile>quagga_ospfd.xml</configurationfile>
 	</package>
 	<package>
@@ -1546,7 +1546,7 @@
 		<status>RELEASE</status>
 		<config_file>http://www.pfsense.com/packages/config/systempatches/systempatches.xml</config_file>
 		<pkginfolink></pkginfolink>
-		<required_version>2.0</required_version>
+		<required_version>2.2</required_version>
 		<configurationfile>systempatches.xml</configurationfile>
 	</package>
 	<package>
@@ -1557,7 +1557,7 @@
 		<category>Services</category>
 		<version>5.2.12_3 pkg v 1.0.1</version>
 		<status>Stable</status>
-		<required_version>2.0</required_version>
+		<required_version>2.2</required_version>
 		<config_file>http://www.pfsense.com/packages/config/bacula-client/bacula-client.xml</config_file>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/10/All/</depends_on_package_base_url>
 		<depends_on_package_pbi>bacula-5.2.12_3-##ARCH##.pbi</depends_on_package_pbi>
@@ -1576,7 +1576,7 @@
 		<category>Services</category>
 		<version>2.3_4</version>
 		<status>Beta</status>
-		<required_version>2.1</required_version>
+		<required_version>2.2</required_version>
 		<config_file>http://www.pfsense.com/packages/config/urlsnarf/urlsnarf.xml</config_file>
 		<maintainer>jimp@pfsense.org</maintainer>
 		<configurationfile>urlsnarf.xml</configurationfile>
@@ -1595,7 +1595,7 @@
 		<category>Services</category>
 		<version>0.17</version>
 		<status>Beta</status>
-		<required_version>2.1</required_version>
+		<required_version>2.2</required_version>
 		<config_file>http://www.pfsense.com/packages/config/iftop/iftop.xml</config_file>
 		<maintainer>jimp@pfsense.org</maintainer>
 		<configurationfile>iftop.xml</configurationfile>
@@ -1613,7 +1613,7 @@
 		<category>Services</category>
 		<version>1.8.1.3</version>
 		<status>Beta</status>
-		<required_version>2.1</required_version>
+		<required_version>2.2</required_version>
 		<config_file>http://www.pfsense.com/packages/config/git/git.xml</config_file>
 		<maintainer>jimp@pfsense.org</maintainer>
 		<configurationfile>git.xml</configurationfile>
@@ -1638,7 +1638,7 @@
 		<version>1.0.21</version>
 		<status>ALPHA</status>
 		<pkginfolink>http://doc.pfsense.org/index.php/tinc_package</pkginfolink>
-		<required_version>2.1</required_version>
+		<required_version>2.2</required_version>
 		<config_file>http://www.pfsense.com/packages/config/tinc/tinc.xml</config_file>
 		<configurationfile>tinc.xml</configurationfile>
 		<logging>
@@ -1654,7 +1654,7 @@
 		<category>Services</category>
 		<version>3.3.7_4</version>
 		<status>ALPHA</status>
-		<required_version>2.1</required_version>
+		<required_version>2.2</required_version>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/10/All/</depends_on_package_base_url>
 		<depends_on_package_pbi>syslog-ng-3.3.7_4-##ARCH##.pbi</depends_on_package_pbi>
 		<build_pbi>
@@ -1673,7 +1673,7 @@
 		<config_file>http://www.pfsense.org/packages/config/zabbix2/zabbix2-agent.xml</config_file>
 		<version>zabbix2-agent-2.2.1 pkg v0.8_0</version>
 		<status>BETA</status>
-		<required_version>2.0</required_version>
+		<required_version>2.2</required_version>
 		<configurationfile>zabbix2-agent.xml</configurationfile>
 		<maintainer>dbaio@bsd.com.br</maintainer>
 		<build_pbi>
@@ -1690,7 +1690,7 @@
 		<config_file>http://www.pfsense.org/packages/config/zabbix2/zabbix2-proxy.xml</config_file>
 		<version>zabbix2-proxy-2.2.1 pkg v0.8_0</version>
 		<status>BETA</status>
-		<required_version>2.0</required_version>
+		<required_version>2.2</required_version>
 		<configurationfile>zabbix2-proxy.xml</configurationfile>
 		<maintainer>dbaio@bsd.com.br</maintainer>
 		<build_pbi>
@@ -1709,7 +1709,7 @@
 		<category>Services</category>
 		<version>1.8.12</version>
 		<status>Beta</status>
-		<required_version>2.1</required_version>
+		<required_version>2.2</required_version>
 		<config_file>http://www.pfsense.com/packages/config/ipmitool/ipmitool.xml</config_file>
 		<maintainer>jimp@pfsense.org</maintainer>
 		<configurationfile>ipmitool.xml</configurationfile>
@@ -1727,7 +1727,7 @@
 		<category>Security</category>
 		<version>0.2</version>
 		<status>Beta</status>
-		<required_version>2.0.2</required_version>
+		<required_version>2.2</required_version>
 		<config_file>http://www.pfsense.com/packages/config/sudo/sudo.xml</config_file>
 		<maintainer>jimp@pfsense.org</maintainer>
 		<configurationfile>sudo.xml</configurationfile>
@@ -1746,7 +1746,7 @@
 		<status>BETA</status>
 		<config_file>http://www.pfsense.com/packages/config/servicewatchdog/servicewatchdog.xml</config_file>
 		<pkginfolink></pkginfolink>
-		<required_version>2.1</required_version>
+		<required_version>2.2</required_version>
 		<configurationfile>servicewatchdog.xml</configurationfile>
 	</package>
 	<package>
@@ -1759,7 +1759,7 @@
 		<depends_on_package_pbi>softflowd-0.9.8_2-##ARCH##.pbi</depends_on_package_pbi>
 		<version>0.9.8</version>
 		<status>Beta</status>
-		<required_version>2.1</required_version>
+		<required_version>2.2</required_version>
 		<configurationfile>softflowd.xml</configurationfile>
 		<maintainer></maintainer>
 		<build_pbi>
@@ -1773,7 +1773,7 @@
 		<config_file>http://www.pfsense.org/packages/config/apcupsd/apcupsd.xml</config_file>
 		<version>apcupsd-3.14.10_1 pkg v0.1</version>
 		<status>BETA</status>
-		<required_version>2.0</required_version>
+		<required_version>2.2</required_version>
 		<configurationfile>apcupsd.xml</configurationfile>
 		<maintainer>dbaio@bsd.com.br</maintainer>
 		<build_pbi>
