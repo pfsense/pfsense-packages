@@ -1632,7 +1632,7 @@
 			<port>dns/unbound</port>
 		</build_pbi>
 		<depends_on_package_pbi>unbound-1.4.21_1-i386.pbi</depends_on_package_pbi>
-		<build_options>unbound_UNSET=GOST ECDSA;unbound_SET=LIBEVENT THREADS</build_options>
+		<build_options>unbound_UNSET=GOST ECDSA;unbound_SET=LIBEVENT20 THREADS</build_options>
 		<logging>
 			<facilityname>unbound</facilityname>
 			<logfilename>unbound.log</logfilename>
