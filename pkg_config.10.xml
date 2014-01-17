@@ -251,26 +251,6 @@
 		<after_install_info>Please visit the ProxyServer settings tab and set the service up so that it may be started.</after_install_info>
 	</package>
 	<package>
-		<name>pure-ftpd</name>
-		<website>http://www.pureftpd.org/</website>
-		<descr>*DO NOT RUN THIS ON A FIREWALL. USE A DEDICATED MACHINE!* Pure FTPd Server is a fast, production quality, standards-conformant FTP server based on Troll-FTPd. It has no known vulnerabilities, is trivial to set up, and is especially designed for modern kernels. Features include PAM support, IPv6, chroot()ed home directories, virtual domains, built-in 'ls', FXP protocol, anti-warez system, bandwidth throttling, restricted ports for passive downloads, an LDAP backend, XML output, and more.</descr>
-		<category>FTP</category>
-		<config_file>http://www.pfsense.com/packages/config/pure-ftpd.xml</config_file>
-		<depends_on_package_base_url>http://files.pfsense.org/packages/10/All/</depends_on_package_base_url>
-		<depends_on_package_pbi>pure-ftpd-1.0.36-##ARCH##.pbi</depends_on_package_pbi>
-		<build_port_path>/usr/ports/ftp/pure-ftpd</build_port_path>
-		<version>1.0.35</version>
-		<status>Stable</status>
-		<configurationfile>pure-ftpd.xml</configurationfile>
-		<required_version>2.2</required_version>
-		<maximum_version>1.0</maximum_version>
-		<logging>
-			<facilityname>ftp</facilityname>
-			<logfilename>pure-ftpd.log</logfilename>
-		</logging>
-		<noembedded>true</noembedded>
-	</package>
-	<package>
 		<name>Avahi</name>
 		<pkginfolink>http://doc.pfsense.org/index.php/Avahi_package</pkginfolink>
 		<website>http://www.avahi.org/</website>
@@ -1422,21 +1402,6 @@
 		<configurationfile>shellcmd.xml</configurationfile>
 	</package>
 	<package>
-		<name>widescreen</name>
-		<descr>The package makes pfSense adapt to browser's current width. It is particularly convenient for Status->Dashboard page that allocates columns for widgets according to browser's current width. ATTENTION: the package heavily modifies pfsense_ng theme and affects other's themes appearance. Please REFRESH your browser's window after installing/uninstalling this package.</descr>
-		<website></website>
-		<pkginfolink></pkginfolink>
-		<category>Enhancements</category>
-		<version>0.2</version>
-		<status>BETA</status>
-		<required_version>2.2</required_version>
-		<maintainer>ey@tm-k.com</maintainer>
-		<config_file>http://www.pfsense.org/packages/config/widescreen/widescreen.xml</config_file>
-		<configurationfile>widescreen.xml</configurationfile>
-		<!-- Disabling on 2.0.2 and 2.1 since it overwrites the menu -->
-		<maximum_version>2.0.1</maximum_version>
-	</package>
-	<package>
 		<name>NRPE v2</name>
 		<website>http://wiki.nagios.org/index.php/Howtos:nrpe_nsca</website>
 		<descr>NRPE is an addon for Nagios that allows you to execute plugins on remote Linux/Unix hosts. This is useful if you need to monitor local resources/attributes like disk usage, CPU load, memory usage, etc. on a remote host.</descr>
@@ -1511,16 +1476,6 @@
 		<config_file>http://www.pfsense.com/packages/config/zebedee/zebedee.xml</config_file>
 		<configurationfile>zebedee.xml</configurationfile>
 		<build_port_path>/usr/ports/security/zebedee</build_port_path>
-	</package>
-	<package>
-		<name>OpenVPN tap Bridging Fix</name>
-		<descr>Patch to fix OpenVPN tap bridging on 2.0.x. WARNING! Cannot be uninstalled.</descr>
-		<category>System</category>
-		<config_file>http://www.pfsense.com/packages/config/openvpn_tapfix_20x/openvpn_tapfix_20x.xml</config_file>
-		<version>0.4</version>
-		<status>BETA</status>
-		<required_version>2.2</required_version>
-		<maximum_version>2.0.4</maximum_version>
 	</package>
 	<package>
 		<name>Quagga OSPF</name>
