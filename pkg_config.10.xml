@@ -1411,7 +1411,7 @@
 			<port>dns/unbound</port>
 		</build_pbi>
 		<depends_on_package_pbi>unbound-1.4.21_1-##ARCH##.pbi</depends_on_package_pbi>
-		<build_options>unbound_UNSET=GOST ECDSA;unbound_SET=LIBEVENT THREADS</build_options>
+		<build_options>unbound_UNSET=GOST ECDSA;unbound_SET=LIBEVENT20 THREADS</build_options>
 		<logging>
 			<facilityname>unbound</facilityname>
 			<logfilename>unbound.log</logfilename>
@@ -1566,12 +1566,12 @@
 		<descr><![CDATA[Bacula is a set of Open Source, computer programs that permit you (or the system administrator) to manage backup, recovery, and verification of computer data across a network of computers of different kinds.]]></descr>
 		<website>http://www.bacula.org/</website>
 		<category>Services</category>
-		<version>5.2.6 pkg v 1.0.1</version>
+		<version>5.2.12_3 pkg v 1.0.1</version>
 		<status>Stable</status>
 		<required_version>2.0</required_version>
 		<config_file>http://www.pfsense.com/packages/config/bacula-client/bacula-client.xml</config_file>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/10/All/</depends_on_package_base_url>
-		<depends_on_package_pbi>bacula-5.2.12-##ARCH##.pbi</depends_on_package_pbi>
+		<depends_on_package_pbi>bacula-5.2.12_3-##ARCH##.pbi</depends_on_package_pbi>
 		<build_pbi>
 			<port>sysutils/bacula-client</port>
 		</build_pbi>
