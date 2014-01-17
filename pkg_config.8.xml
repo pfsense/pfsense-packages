@@ -38,10 +38,10 @@
 		<status>Beta</status>
 		<required_version>2.0</required_version>
 		<config_file>http://www.pfsense.com/packages/config/asterisk/asterisk.xml</config_file>
-		<depends_on_package_base_url>http://e-sac.siteseguro.ws/packages/8/All/</depends_on_package_base_url>
-		<depends_on_package>asterisk18-1.8.8.1.tbz</depends_on_package>
-		<depends_on_package>openldap-sasl-client-2.4.26.tbz</depends_on_package>
-		<depends_on_package_pbi>asterisk-1.8.19.0-i386.pbi</depends_on_package_pbi>
+		<depends_on_package_base_url>http://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
+		<depends_on_package>asterisk18-1.8.25.0.tbz</depends_on_package>
+		<depends_on_package>openldap-client-2.4.38.tbz</depends_on_package>
+		<depends_on_package_pbi>asterisk-1.8.25.0-i386.pbi</depends_on_package_pbi>
 		<build_port_path>/usr/ports/net/asterisk</build_port_path>
 		<maintainer>marcellocoutinho@gmail.com robreg@zsurob.hu</maintainer>
 		<configurationfile>asterisk.xml</configurationfile>

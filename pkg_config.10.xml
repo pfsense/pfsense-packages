@@ -40,7 +40,7 @@
 		<required_version>2.2</required_version>
 		<config_file>http://www.pfsense.com/packages/config/asterisk/asterisk.xml</config_file>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/10/All/</depends_on_package_base_url>
-		<depends_on_package_pbi>asterisk-1.8.19.0-##ARCH##.pbi</depends_on_package_pbi>
+		<depends_on_package_pbi>asterisk-1.8.25.0-##ARCH##.pbi</depends_on_package_pbi>
 		<build_port_path>/usr/ports/net/asterisk</build_port_path>
 		<maintainer>marcellocoutinho@gmail.com robreg@zsurob.hu</maintainer>
 		<configurationfile>asterisk.xml</configurationfile>
