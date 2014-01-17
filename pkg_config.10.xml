@@ -4,6 +4,7 @@
 <copy_packages_to_host_ssh_port>222</copy_packages_to_host_ssh_port>
 <copy_packages_to_host_ssh>packagecopy@files.pfsense.org</copy_packages_to_host_ssh>
 <copy_packages_to_folder_ssh>/usr/local/www/files/packages/10/All/</copy_packages_to_folder_ssh>
+<depends_on_package_base_url>http://files.pfsense.org/packages/10/All/</depends_on_package_base_url>
 <packages>
 <!--
 	<package>
@@ -24,7 +25,6 @@
 			<port>net/someprogram</port>
 			<ports_after>www/somethingelsetoputinthepbi www/somethingelse</ports_after>
 		</build_pbi>
-		<depends_on_package_base_url>http://files.pfsense.org/packages/10/All/</depends_on_package_base_url>
 		<depends_on_package_pbi>someprogram-0.99-##ARCH##.pbi</depends_on_package_pbi>
 		<only_for_archs>i386 amd64</only_for_archs>
 	</package>
@@ -39,7 +39,6 @@
 		<status>Beta</status>
 		<required_version>2.2</required_version>
 		<config_file>http://www.pfsense.com/packages/config/asterisk/asterisk.xml</config_file>
-		<depends_on_package_base_url>http://files.pfsense.org/packages/10/All/</depends_on_package_base_url>
 		<depends_on_package_pbi>asterisk-1.8.25.0-##ARCH##.pbi</depends_on_package_pbi>
 		<build_port_path>/usr/ports/net/asterisk</build_port_path>
 		<maintainer>marcellocoutinho@gmail.com robreg@zsurob.hu</maintainer>
@@ -57,7 +56,6 @@
 		<required_version>2.2</required_version>
 		<config_file>http://www.pfsense.com/packages/config/bind/bind.xml</config_file>
 		<configurationfile>bind.xml</configurationfile>
-		<depends_on_package_base_url>http://files.pfsense.org/packages/10/All/</depends_on_package_base_url>
 		<depends_on_package_pbi>bind-9.9.4-##ARCH##.pbi</depends_on_package_pbi>
 		<build_pbi>
 			<custom_name>bind</custom_name>
@@ -85,7 +83,6 @@
 		<category>Firewall</category>
 		<pkginfolink>http://forum.pfsense.org/index.php/topic,25732.0.html</pkginfolink>
 		<config_file>http://www.pfsense.com/packages/config/countryblock/countryblock.xml</config_file>
-		<depends_on_package_base_url>http://files.pfsense.org/packages/10/All/</depends_on_package_base_url>
 		<version>0.2.4</version>
 		<status>Beta</status>
 		<required_version>2.2</required_version>
@@ -129,7 +126,6 @@
 		<category>Firewall</category>
 		<pkginfolink>http://forum.pfsense.org/index.php/topic,42543.0.html</pkginfolink>
 		<config_file>http://pfsense.org/packages/config/pf-blocker/pfblocker.xml</config_file>
-		<depends_on_package_base_url>http://files.pfsense.org/packages/10/All/</depends_on_package_base_url>
 		<version>1.0.2</version>
 		<status>Release</status>
 		<required_version>2.2</required_version>
@@ -161,7 +157,6 @@
 		<required_version>2.2</required_version>
 		<config_file>http://www.pfsense.com/packages/config/haproxy/haproxy.xml</config_file>
 		<configurationfile>haproxy.xml</configurationfile>
-		<depends_on_package_base_url>http://files.pfsense.org/packages/10/All/</depends_on_package_base_url>
 		<depends_on_package_pbi>haproxy-1.4.24-##ARCH##.pbi</depends_on_package_pbi>
 		<build_port_path>/usr/ports/net/haproxy</build_port_path>
 	</package>
@@ -178,7 +173,6 @@
 		<required_version>2.2</required_version>
 		<config_file>http://www.pfsense.com/packages/config/haproxy-legacy/haproxy.xml</config_file>
 		<configurationfile>haproxy.xml</configurationfile>
-		<depends_on_package_base_url>http://files.pfsense.org/packages/10/All/</depends_on_package_base_url>
 		<depends_on_package_pbi>haproxy-1.4.24-##ARCH##.pbi</depends_on_package_pbi>
 	</package>
 	<package>
@@ -194,7 +188,6 @@
 		<required_version>2.2</required_version>
 		<config_file>http://www.pfsense.com/packages/config/haproxy-devel/haproxy.xml</config_file>
 		<configurationfile>haproxy.xml</configurationfile>
-		<depends_on_package_base_url>http://files.pfsense.org/packages/10/All/</depends_on_package_base_url>
 		<depends_on_package_pbi>haproxy-devel-1.5-dev21-##ARCH##.pbi</depends_on_package_pbi>
 		<build_pbi>
 			<ports_before>security/openssl</ports_before>
@@ -216,7 +209,6 @@
 		<status>ALPHA</status>
 		<required_version>2.2</required_version>
 		<config_file>http://www.pfsense.com/packages/config/apache_mod_security-dev/apache_virtualhost.xml</config_file>
-		<depends_on_package_base_url>http://files.pfsense.org/packages/10/All/</depends_on_package_base_url>
 		<depends_on_package_pbi>proxy_mod_security-2.2.23_3-##ARCH##.pbi git-1.8.1.3-##ARCH##.pbi</depends_on_package_pbi>
 		<configurationfile>apache_virtualhost.xml</configurationfile>
 		<build_pbi>
@@ -238,7 +230,6 @@
 		<status>ALPHA</status>
 		<required_version>2.2</required_version>
 		<config_file>http://www.pfsense.com/packages/config/apache_mod_security/apache_mod_security.xml</config_file>
-		<depends_on_package_base_url>http://files.pfsense.org/packages/10/All/</depends_on_package_base_url>
 		<depends_on_package_pbi>proxy_mod_security-2.2.23_3-##ARCH##.pbi</depends_on_package_pbi>
 		<configurationfile>apache_mod_security.xml</configurationfile>
 		<build_pbi>
@@ -256,7 +247,6 @@
 		<website>http://www.avahi.org/</website>
 		<descr>Avahi is a system which facilitates service discovery on a local network. This means that you can plug your laptop or computer into a network and instantly be able to view other people who you can chat with, find printers to print to or find files being shared. This kind of technology is already found in Apple MacOS X (branded Rendezvous, Bonjour and sometimes Zeroconf) and is very convenient. Avahi is mainly based on Lennart Poettering's flexmdns mDNS implementation for Linux which has been discontinued in favour of Avahi.</descr>
 		<category>Network Management</category>
-		<depends_on_package_base_url>http://files.pfsense.org/packages/10/All/</depends_on_package_base_url>
 		<build_pbi>
 			<port>net/avahi</port>
 		</build_pbi>
@@ -273,7 +263,6 @@
 		<website>http://www.ntop.org/</website>
 		<descr>ntop is a network probe that shows network usage in a way similar to what top does for processes. In interactive mode, it displays the network status on the user's terminal. In Web mode it acts as a Web server, creating an HTML dump of the network status. It sports a NetFlow/sFlow emitter/collector, an HTTP-based client interface for creating ntop-centric monitoring applications, and RRD for persistently storing traffic statistics.</descr>
 		<category>Network Management</category>
-		<depends_on_package_base_url>http://files.pfsense.org/packages/10/All/</depends_on_package_base_url>
 		<depends_on_package_pbi>ntop-5.0.1-##ARCH##.pbi</depends_on_package_pbi>
 		<build_pbi>
 			<ports_before>databases/gdbm net/GeoIP x11-fonts/font-util x11-fonts/webfonts graphics/graphviz</ports_before>
@@ -294,7 +283,6 @@
 		<category>Services</category>
 		<pkginfolink>http://doc.pfsense.org/index.php/FreeSWITCH</pkginfolink>
 		<config_file>http://www.pfsense.com/packages/config/freeswitch/freeswitch.xml</config_file>
-		<depends_on_package_base_url>http://files.pfsense.org/packages/10/All/</depends_on_package_base_url>
 		<depends_on_package_pbi>freeswitch-1.0.6_1-##ARCH##.pbi</depends_on_package_pbi>
 		<build_port_path>/usr/ports/net/freeswitch</build_port_path>
 		<version>0.8.3.6</version>
@@ -313,7 +301,6 @@
 		<category>Services</category>
 		<pkginfolink>http://doc.pfsense.org/index.php/FreeSWITCH</pkginfolink>
 		<config_file>http://www.pfsense.com/packages/config/freeswitch_dev/freeswitch.xml</config_file>
-		<depends_on_package_base_url>http://files.pfsense.org/packages/10/All/</depends_on_package_base_url>
 		<build_port_path>/usr/ports/net/freeswitch</build_port_path>
 		<version>0.9.7.26</version>
 		<status>Beta</status>
@@ -330,7 +317,6 @@
 		<category>Status</category>
 		<pkginfolink/>
 		<config_file>http://www.pfsense.com/packages/config/notes/notes.xml</config_file>
-		<depends_on_package_base_url>http://files.pfsense.org/packages/10/All/</depends_on_package_base_url>
 		<version>0.2.4</version>
 		<status>Alpha</status>
 		<required_version>2.2</required_version>
@@ -344,7 +330,6 @@
 		<category>Services</category>
 		<pkginfolink/>
 		<config_file>http://www.pfsense.com/packages/config/tftp2/tftp.xml</config_file>
-		<depends_on_package_base_url>http://files.pfsense.org/packages/10/All/</depends_on_package_base_url>
 		<version>2.0</version>
 		<status>Stable</status>
 		<required_version>2.2</required_version>
@@ -357,7 +342,6 @@
 		<category>Services</category>
 		<pkginfolink>http://doc.pfsense.org/index.php/PHPService</pkginfolink>
 		<config_file>http://www.pfsense.com/packages/config/phpservice/phpservice.xml</config_file>
-		<depends_on_package_base_url>http://files.pfsense.org/packages/10/All/</depends_on_package_base_url>
 		<version>0.4.1</version>
 		<status>Beta</status>
 		<required_version>2.2</required_version>
@@ -371,7 +355,6 @@
 		<category>System</category>
 		<pkginfolink></pkginfolink>
 		<config_file>http://www.pfsense.com/packages/config/backup/backup.xml</config_file>
-		<depends_on_package_base_url>http://files.pfsense.org/packages/10/All/</depends_on_package_base_url>
 		<version>0.1.5</version>
 		<status>Beta</status>
 		<required_version>2.2</required_version>
@@ -385,7 +368,6 @@
 		<category>Services</category>
 		<pkginfolink></pkginfolink>
 		<config_file>http://www.pfsense.com/packages/config/cron/cron.xml</config_file>
-		<depends_on_package_base_url>http://files.pfsense.org/packages/10/All/</depends_on_package_base_url>
 		<version>0.1.8</version>
 		<status>Beta</status>
 		<required_version>2.2</required_version>
@@ -399,7 +381,6 @@
 		<category>Services</category>
 		<pkginfolink>http://doc.pfsense.org/index.php/vhosts</pkginfolink>
 		<config_file>http://www.pfsense.com/packages/config/vhosts/vhosts.xml</config_file>
-		<depends_on_package_base_url>http://files.pfsense.org/packages/10/All/</depends_on_package_base_url>
 		<version>0.7.4</version>
 		<status>Stable</status>
 		<required_version>2.2</required_version>
@@ -412,7 +393,6 @@
 		<website>http://www.snort.org</website>
 		<descr>Snort is an open source network intrusion prevention and detection system (IDS/IPS). Combining the benefits of signature, protocol, and anomaly-based inspection.</descr>
 		<category>Security</category>
-		<depends_on_package_base_url>http://files.pfsense.org/packages/10/All/</depends_on_package_base_url>
 		<depends_on_package_pbi>snort-2.9.5.5-##ARCH##.pbi</depends_on_package_pbi>
 		<build_pbi>
 			<port>security/snort</port>
@@ -433,7 +413,6 @@
 		<descr>The olsr.org OLSR daemon is an implementation of the Optimized Link State Routing protocol. OLSR is a routing protocol for mobile ad-hoc networks. The protocol is pro-active, table driven and utilizes a technique called multipoint relaying for message flooding.</descr>
 		<category>Services</category>
 		<config_file>http://www.pfsense.com/packages/config/olsrd.xml</config_file>
-		<depends_on_package_base_url>http://files.pfsense.org/packages/10/All/</depends_on_package_base_url>
 		<depends_on_package_pbi>olsrd-0.6.3-##ARCH##.pbi</depends_on_package_pbi>
 		<build_port_path>/usr/ports/net/olsrd</build_port_path>
 		<version>1.0</version>
@@ -458,7 +437,6 @@
 		<descr>Tarpits like spamd are fake SMTP servers, which accept connections but don't deliver mail. Instead, they keep the connections open and reply very slowly. If the peer is patient enough to actually complete the SMTP dialogue (which will take ten minutes or more), the tarpit returns a 'temporary error' code (4xx), which indicates that the mail could not be delivered successfully and that the sender should keep the mail in their queue and retry again later.</descr>
 		<category>Services</category>
 		<config_file>http://www.pfsense.com/packages/config/spamd/spamd.xml</config_file>
-		<depends_on_package_base_url>http://files.pfsense.org/packages/10/All/</depends_on_package_base_url>
 		<depends_on_package_pbi>spamd-4.9.1-##ARCH##.pbi</depends_on_package_pbi>
 		<version>4.9.1</version>
 		<status>Beta</status>
@@ -479,7 +457,6 @@
 		<category>Services</category>
 		<pkginfolink>http://forum.pfsense.org/index.php/topic,40622.0.html</pkginfolink>
 		<config_file>http://www.pfsense.com/packages/config/postfix/postfix.xml</config_file>
-		<depends_on_package_base_url>http://files.pfsense.org/packages/10/All/</depends_on_package_base_url>
 		<depends_on_package_pbi>postfix-2.10.2-##ARCH##.pbi</depends_on_package_pbi>
 		<version>2.10.2 pkg v.2.3.7</version>
 		<status>Release</status>
@@ -499,7 +476,6 @@
 		<category>Services</category>
 		<config_file>http://www.pfsense.com/packages/config/dansguardian/dansguardian.xml</config_file>
 		<pkginfolink>http://forum.pfsense.org/index.php/topic,43786.0.html</pkginfolink>
-		<depends_on_package_base_url>http://files.pfsense.org/packages/10/All/</depends_on_package_base_url>
 		<depends_on_package_pbi>dansguardian-2.12.0.3-##ARCH##.pbi</depends_on_package_pbi>
 		<version>2.12.0.3 pkg v.0.1.8</version>
 		<status>beta</status>
@@ -519,7 +495,6 @@
 		<category>Services</category>
 		<config_file>http://www.pfsense.com/packages/config/mailscanner/mailscanner.xml</config_file>
 		<pkginfolink>http://forum.pfsense.org/index.php/topic,43687.0.html</pkginfolink>
-		<depends_on_package_base_url>http://files.pfsense.org/packages/10/All/</depends_on_package_base_url>
 		<depends_on_package_pbi>mailscanner-4.84.5_3-##ARCH##.pbi</depends_on_package_pbi>
 		<version>4.84.5_3 pkg v.0.2.4</version>
 		<status>beta</status>
@@ -537,7 +512,6 @@
 		<descr>Proxy for handling NAT of multiple SIP devices to a single public IP.</descr>
 		<category>Services</category>
 		<config_file>http://www.pfsense.com/packages/config/siproxd.xml</config_file>
-		<depends_on_package_base_url>http://files.pfsense.org/packages/10/All/</depends_on_package_base_url>
 		<depends_on_package_pbi>siproxd-0.8.0-##ARCH##.pbi</depends_on_package_pbi>
 		<pkginfolink>http://doc.pfsense.org/index.php/Siproxd_package</pkginfolink>
 		<build_port_path>/usr/ports/net/siproxd</build_port_path>
@@ -559,7 +533,6 @@
 		<pkginfolink>http://doc.pfsense.org/index.php/OpenBGPD_package</pkginfolink>
 		<required_version>2.2</required_version>
 		<configurationfile>openbgpd.xml</configurationfile>
-		<depends_on_package_base_url>http://files.pfsense.org/packages/10/All/</depends_on_package_base_url>
 		<depends_on_package_pbi>openbgpd-5.2.20121209-##ARCH##.pbi</depends_on_package_pbi>
 	</package>
 	<package>
@@ -569,7 +542,6 @@
 		<version>0.5.2</version>
 		<category>Routing</category>
 		<status>DEPRECATED</status>
-		<depends_on_package_base_url>http://files.pfsense.org/packages/10/All/</depends_on_package_base_url>
 		<depends_on_package_pbi>openospfd-4.6-##ARCH##.pbi</depends_on_package_pbi>
 		<config_file>http://www.pfsense.com/packages/config/openospfd/openospfd.xml</config_file>
 		<build_pbi>
@@ -587,7 +559,6 @@
 		<category>Network Report</category>
 		<version>1.8.2 pkg v.2.33</version>
 		<maintainer>dv_serg@mail.ru</maintainer>
-		<depends_on_package_base_url>http://files.pfsense.org/packages/10/All/</depends_on_package_base_url>
 		<depends_on_package_pbi>lightsquid-1.8_2-##ARCH##.pbi</depends_on_package_pbi>
 		<build_pbi>
 			<ports_before>lang/perl5.14 graphics/gd graphics/p5-GD</ports_before>
@@ -609,7 +580,6 @@
 		<category>Network Report</category>
 		<config_file>http://www.pfsense.com/packages/config/sarg/sarg.xml</config_file>
 		<pkginfolink>http://forum.pfsense.org/index.php/topic,47765.0.html</pkginfolink>
-		<depends_on_package_base_url>http://files.pfsense.org/packages/10/All/</depends_on_package_base_url>
 		<depends_on_package_pbi>sarg-2.3.6_2-##ARCH##.pbi</depends_on_package_pbi>
 		<version>2.3.6_2 pkg v.0.6.3</version>
 		<status>Release</status>
@@ -629,7 +599,6 @@
 		<category>Security</category>
 		<config_file>http://www.pfsense.com/packages/config/ipguard/ipguard.xml</config_file>
 		<pkginfolink>http://forum.pfsense.org/index.php/topic,49917.msg263664.html#msg263664</pkginfolink>
-		<depends_on_package_base_url>http://files.pfsense.org/packages/10/All/</depends_on_package_base_url>
 		<depends_on_package_pbi>ipguard-1.04-##ARCH##.pbi</depends_on_package_pbi>
 		<version>1.0.4 pkg v.0.1</version>
 		<status>beta</status>
@@ -650,7 +619,6 @@
 		<required_version>2.2</required_version>
 		<config_file>http://www.pfsense.com/packages/config/varnish64/varnish_backends.xml</config_file>
 		<configurationfile>varnish_backends.xml</configurationfile>
-		<depends_on_package_base_url>http://files.pfsense.org/packages/10/All/</depends_on_package_base_url>
 		<depends_on_package_pbi>varnish-2.1.5_2-##ARCH##.pbi gcc-4.2.5.20090325_5-##ARCH##.pbi</depends_on_package_pbi>
 		<build_port_path>/usr/ports/www/varnish2</build_port_path>
 		<build_port_path>/usr/ports/lang/gcc42</build_port_path>
@@ -669,7 +637,6 @@
 		<required_version>2.2</required_version>
 		<config_file>http://www.pfsense.com/packages/config/varnish3/varnish_backends.xml</config_file>
 		<configurationfile>varnish_backends.xml</configurationfile>
-		<depends_on_package_base_url>http://files.pfsense.org/packages/10/All/</depends_on_package_base_url>
 		<depends_on_package_pbi>varnish-3.0.4-##ARCH##.pbi</depends_on_package_pbi>
 		<build_pbi>
 			<ports_before>lang/gcc</ports_before>
@@ -683,7 +650,6 @@
 		<descr>Vnstat is a console-based network traffic monitor&lt;br /&gt;The vnstat PHP frontend and vnstati adds a more user friendly way of displaying traffic usage.</descr>
 		<pkginfolink>http://forum.pfsense.org/index.php/topic,14179.0.html</pkginfolink>
 		<category>Network Management</category>
-		<depends_on_package_base_url>http://files.pfsense.org/packages/10/All/</depends_on_package_base_url>
 		<depends_on_package_pbi>vnstat-1.11_1-##ARCH##.pbi</depends_on_package_pbi>
 		<build_port_path>/usr/ports/net/vnstat</build_port_path>
 		<version>1.10_2</version>
@@ -702,7 +668,6 @@
 		<version>2.5.4</version>
 		<status>Beta</status>
 		<required_version>2.2</required_version>
-		<depends_on_package_base_url>http://files.pfsense.org/packages/10/All/</depends_on_package_base_url>
 		<depends_on_package_pbi>mbmon-205_6-##ARCH##.pbi</depends_on_package_pbi>
 		<build_port_path>/usr/ports/sysutils/mbmon</build_port_path>
 		<config_file>http://www.pfsense.com/packages/config/phpsysinfo/phpsysinfo.xml</config_file>
@@ -720,7 +685,6 @@
 		<required_version>2.2</required_version>
 		<config_file>http://www.pfsense.com/packages/config/tinydns/tinydns.xml</config_file>
 		<configurationfile>tinydns.xml</configurationfile>
-		<depends_on_package_base_url>http://files.pfsense.org/packages/10/All/</depends_on_package_base_url>
 		<depends_on_package_pbi>djbdns-1.05_14-##ARCH##.pbi</depends_on_package_pbi>
 		<build_pbi>
 			<ports_before>sysutils/ucspi-tcp sysutils/daemontools</ports_before>
@@ -740,7 +704,6 @@
 		<required_version>2.2</required_version>
 		<config_file>http://www.pfsense.org/packages/config/open-vm-tools_2/open-vm-tools.xml</config_file>
 		<configurationfile>open-vm-tools.xml</configurationfile>
-		<depends_on_package_base_url>http://files.pfsense.org/packages/10/All/</depends_on_package_base_url>
 		<build_pbi>
 			<port>emulators/open-vm-tools-nox11</port>
 		</build_pbi>
@@ -769,7 +732,6 @@
 		<required_version>2.2</required_version>
 		<config_file>http://www.pfsense.com/packages/config/arping/arping.xml</config_file>
 		<configurationfile>arping.xml</configurationfile>
-		<depends_on_package_base_url>http://files.pfsense.org/packages/10/All/</depends_on_package_base_url>
 		<depends_on_package_pbi>arping-2.09_1-##ARCH##.pbi</depends_on_package_pbi>
 		<build_port_path>/usr/ports/net/arping</build_port_path>
 		<pkginfolink>http://doc.pfsense.org/index.php/Arping</pkginfolink>
@@ -779,7 +741,6 @@
 		<maintainer>jimp@pfsense.org</maintainer>
 		<descr>NMap is a utility for network exploration or security auditing. It supports ping scanning (determine which hosts are up), many port scanning techniques (determine what services the hosts are offering), version detection (determine what application/service is runing on a port), and TCP/IP fingerprinting (remote host OS or device identification). It also offers flexible target and port specification, decoy/stealth scanning, SunRPC scanning, and more. Most Unix and Windows platforms are supported in both GUI and command line modes. Several popular handheld devices are also supported, including the Sharp Zaurus and the iPAQ.</descr>
 		<category>Security</category>
-		<depends_on_package_base_url>http://files.pfsense.org/packages/10/All/</depends_on_package_base_url>
 		<depends_on_package_pbi>nmap-6.25_1-##ARCH##.pbi</depends_on_package_pbi>
 		<config_file>http://www.pfsense.com/packages/config/nmap/nmap.xml</config_file>
 		<version>nmap-6.25_1 pkg v1.2</version>
@@ -801,7 +762,6 @@
 		<pkginfolink>http://doc.pfsense.org/index.php/IMSpector_package</pkginfolink>
 		<config_file>http://www.pfsense.com/packages/config/imspector/imspector.xml</config_file>
 		<configurationfile>imspector.xml</configurationfile>
-		<depends_on_package_base_url>http://files.pfsense.org/packages/10/All/</depends_on_package_base_url>
 		<depends_on_package_pbi>imspector-0.9-##ARCH##.pbi</depends_on_package_pbi>
 		<build_port_path>/usr/ports/net-im/imspector</build_port_path>
 	</package>
@@ -818,7 +778,6 @@
 		<pkginfolink>http://doc.pfsense.org/index.php/IMSpector_package</pkginfolink>
 		<config_file>http://www.pfsense.com/packages/config/imspector-dev/imspector.xml</config_file>
 		<configurationfile>imspector.xml</configurationfile>
-		<depends_on_package_base_url>http://files.pfsense.org/packages/10/All/</depends_on_package_base_url>
 		<depends_on_package_pbi>imspector-20111108-##ARCH##.pbi</depends_on_package_pbi>
 	</package>
 	<package>
@@ -832,7 +791,6 @@
 		<maintainer>rswagoner@gmail.com</maintainer>
 		<config_file>http://www.pfsense.com/packages/config/nut/nut.xml</config_file>
 		<configurationfile>nut.xml</configurationfile>
-		<depends_on_package_base_url>http://files.pfsense.org/packages/10/All/</depends_on_package_base_url>
 		<depends_on_package_pbi>nut-2.6.5_1-##ARCH##.pbi</depends_on_package_pbi>
 		<build_port_path>/usr/ports/sysutils/nut</build_port_path>
 		<pkginfolink>http://doc.pfsense.org/index.php/Nut_package</pkginfolink>
@@ -854,7 +812,6 @@
 		<website>http://dmr.ath.cx/net/darkstat/</website>
 		<descr>darkstat is a network statistics gatherer. It's a packet sniffer that runs as a background process on a cable/DSL router, gathers all sorts of statistics about network usage, and serves them over HTTP.</descr>
 		<category>Network Management</category>
-		<depends_on_package_base_url>http://files.pfsense.org/packages/10/All/</depends_on_package_base_url>
 		<depends_on_package_pbi>darkstat-3.0.715-##ARCH##.pbi</depends_on_package_pbi>
 		<version>3.0.714</version>
 		<status>Stable</status>
@@ -870,7 +827,6 @@
 		<descr>pfflowd converts OpenBSD PF status messages (sent via the pfsync interface) to Cisco NetFlow datagrams. These datagrams may be sent (via UDP) to a host of one's choice. Utilising the OpenBSD stateful packet filter infrastructure means that flow tracking is very fast and accurate.</descr>
 		<category>Network Management</category>
 		<config_file>http://www.pfsense.com/packages/config/pfflowd.xml</config_file>
-		<depends_on_package_base_url>http://files.pfsense.org/packages/10/All/</depends_on_package_base_url>
 		<depends_on_package_pbi>pfflowd-0.8-##ARCH##.pbi</depends_on_package_pbi>
 		<version>0.8.3</version>
 		<status>Stable</status>
@@ -884,7 +840,6 @@
 		<descr>RFC1413 auth/identd daemon with fixed fake reply</descr>
 		<website>http://www.webweaving.org/widentd</website>
 		<category>Services</category>
-		<depends_on_package_base_url>http://files.pfsense.org/packages/10/All/</depends_on_package_base_url>
 		<depends_on_package_pbi>widentd-1.03_1-##ARCH##.pbi</depends_on_package_pbi>
 		<version>1.03_1</version>
 		<status>Stable</status>
@@ -903,7 +858,6 @@
 		<status>Beta</status>
 		<required_version>2.2</required_version>
 		<maintainer>none</maintainer>
-		<depends_on_package_base_url>http://files.pfsense.org/packages/10/All/</depends_on_package_base_url>
 		<depends_on_package_pbi>freeradius-1.1.8_5-##ARCH##.pbi</depends_on_package_pbi>
 		<config_file>http://www.pfsense.org/packages/config/freeradius.xml</config_file>
 		<configurationfile>freeradius.xml</configurationfile>
@@ -926,7 +880,6 @@
 		<status>RC1</status>
 		<required_version>2.2</required_version>
 		<maintainer>nachtfalkeaw@web.de</maintainer>
-		<depends_on_package_base_url>http://files.pfsense.org/packages/10/All/</depends_on_package_base_url>
 		<depends_on_package_pbi>freeradius-2.2.0-##ARCH##.pbi</depends_on_package_pbi>
 		<config_file>http://www.pfsense.org/packages/config/freeradius2/freeradius.xml</config_file>
 		<configurationfile>freeradius.xml</configurationfile>
@@ -946,7 +899,6 @@
 		<version>2.0.1_5 pkg v.0.3</version>
 		<status>BETA</status>
 		<required_version>2.2</required_version>
-		<depends_on_package_base_url>http://files.pfsense.org/packages/10/All/</depends_on_package_base_url>
 		<depends_on_package_pbi>bandwidthd-2.0.1_5-##ARCH##.pbi</depends_on_package_pbi>
 		<config_file>http://www.pfsense.org/packages/config/bandwidthd/bandwidthd.xml</config_file>
 		<configurationfile>bandwidthd.xml</configurationfile>
@@ -961,7 +913,6 @@
 		<website>http://www.stunnel.org/</website>
 		<descr>An SSL encryption wrapper between remote client and local or remote servers. </descr>
 		<category>Network Management</category>
-		<depends_on_package_base_url>http://files.pfsense.org/packages/10/All/</depends_on_package_base_url>
 		<depends_on_package_pbi>stunnel-4.54-##ARCH##.pbi</depends_on_package_pbi>
 		<version>4.43.0</version>
 		<status>Stable</status>
@@ -978,7 +929,6 @@
 		<descr>Iperf is a tool for testing network throughput, loss, and jitter.</descr>
 		<category>Network Management</category>
 		<config_file>http://www.pfsense.com/packages/config/iperf.xml</config_file>
-		<depends_on_package_base_url>http://files.pfsense.org/packages/10/All/</depends_on_package_base_url>
 		<depends_on_package_pbi>iperf-2.0.5-##ARCH##.pbi</depends_on_package_pbi>
 		<version>2.0.5</version>
 		<status>Beta</status>
@@ -993,7 +943,6 @@
 		<descr>This is a network benchmark for DOS, OS/2 2.x, Windows NT/2000 and Unix. It measures the net throughput of a network via NetBIOS and/or TCP/IP protocols (Unix and DOS only support TCP/IP) using various different packet sizes.</descr>
 		<category>Network Management</category>
 		<config_file>http://www.pfsense.com/packages/config/netio.xml</config_file>
-		<depends_on_package_base_url>http://files.pfsense.org/packages/10/All</depends_on_package_base_url>
 		<depends_on_package_pbi>netio-1.26-##ARCH##.pbi</depends_on_package_pbi>
 		<version>1.26</version>
 		<required_version>2.2</required_version>
@@ -1007,7 +956,6 @@
 		<descr>Enhanced traceroute replacement</descr>
 		<website>http://www.bitwizard.nl/mtr/</website>
 		<category>Network Management</category>
-		<depends_on_package_base_url>http://files.pfsense.org/packages/10/All/</depends_on_package_base_url>
 		<depends_on_package_pbi>mtr-0.82_1-##ARCH##.pbi</depends_on_package_pbi>
 		<version>0.82</version>
 		<status>Stable</status>
@@ -1026,7 +974,6 @@
 		<status>Stable</status>
 		<required_version>2.2</required_version>
 		<maintainer>fernando@netfilter.com.br seth.mos@dds.nl mfuchs77@googlemail.com jimp@pfsense.org</maintainer>
-		<depends_on_package_base_url>http://files.pfsense.org/packages/10/All/</depends_on_package_base_url>
 		<depends_on_package_pbi>squid-2.7.9_3-##ARCH##.pbi</depends_on_package_pbi>
 		<build_pbi>
 			<ports_before>www/libwww</ports_before>
@@ -1050,7 +997,6 @@
 		<status>beta</status>
 		<required_version>2.2</required_version>
 		<maintainer>marcellocoutinho@gmail.com fernando@netfilter.com.br seth.mos@dds.nl mfuchs77@googlemail.com jimp@pfsense.org</maintainer>
-		<depends_on_package_base_url>http://files.pfsense.org/packages/10/All/</depends_on_package_base_url>
 		<build_pbi>
 			<ports_before>www/libwww</ports_before>
 			<port>www/squid31</port>
@@ -1075,7 +1021,6 @@
 		<status>beta</status>
 		<required_version>2.2</required_version>
 		<maintainer>marcellocoutinho@gmail.com fernando@netfilter.com.br seth.mos@dds.nl mfuchs77@googlemail.com jimp@pfsense.org</maintainer>
-		<depends_on_package_base_url>http://files.pfsense.org/packages/10/All/</depends_on_package_base_url>
 		<build_pbi>
 			<ports_before>www/libwww security/cyrus-sasl2</ports_before>
 			<port>www/squid33</port>
@@ -1095,7 +1040,6 @@
 		<status>BETA</status>
 		<required_version>2.2</required_version>
 		<maintainer>seth.mos@dds.nl</maintainer>
-		<depends_on_package_base_url>http://files.pfsense.org/packages/10/All/</depends_on_package_base_url>
 		<depends_on_package_pbi>lcdproc-0.5.6-##ARCH##.pbi</depends_on_package_pbi>
 		<config_file>http://www.pfsense.org/packages/config/lcdproc/lcdproc.xml</config_file>
 		<configurationfile>lcdproc.xml</configurationfile>
@@ -1113,7 +1057,6 @@
 		<required_version>2.2</required_version>
 		<maintainer>michele@nt2.it</maintainer>
 		<pkginfolink>http://forum.pfsense.org/index.php/topic,44034.0.html</pkginfolink>
-		<depends_on_package_base_url>http://files.pfsense.org/packages/10/All/</depends_on_package_base_url>
 		<depends_on_package_pbi>lcdproc-0.5.6-##ARCH##.pbi</depends_on_package_pbi>
 		<config_file>http://www.pfsense.org/packages/config/lcdproc-dev/lcdproc.xml</config_file>
 		<configurationfile>lcdproc.xml</configurationfile>
@@ -1126,7 +1069,6 @@
 		<descr>Arpwatch monitors ethernet/ip address pairings. It also logs certain changes to syslog.</descr>
 		<website>http://www-nrg.ee.lbl.gov/</website>
 		<category>Security</category>
-		<depends_on_package_base_url>http://files.pfsense.org/packages/10/All/</depends_on_package_base_url>
 		<depends_on_package_pbi>arpwatch-2.1.a15_6-##ARCH##.pbi</depends_on_package_pbi>
 		<build_port_path>/usr/ports/net-mgmt/arpwatch</build_port_path>
 		<version>2.1.a15_6 pkg v1.1.1</version>
@@ -1148,7 +1090,6 @@
 		<version>1.4_4 pkg v.1.9.5</version>
 		<status>Beta</status>
 		<required_version>2.2</required_version>
-		<depends_on_package_base_url>http://files.pfsense.org/packages/10/All/</depends_on_package_base_url>
 		<depends_on_package_pbi>squidguard-1.4_4-##ARCH##.pbi</depends_on_package_pbi>
 		<build_pbi>
 			<ports_before>databases/db41 security/cyrus-sasl2</ports_before>
@@ -1167,7 +1108,6 @@
 		<version>1.5_1 beta</version>
 		<status>Beta</status>
 		<required_version>2.2</required_version>
-		<depends_on_package_base_url>http://files.pfsense.org/packages/10/All/</depends_on_package_base_url>
 		<depends_on_package_pbi>squidguard-devel-1.5_1-##ARCH##.pbi</depends_on_package_pbi>
 		<build_pbi>
 			<ports_before>databases/db46</ports_before>
@@ -1187,7 +1127,6 @@
 		<version>1.4_4 pkg v.1.9.5</version>
 		<status>Experimental</status>
 		<required_version>2.2</required_version>
-		<depends_on_package_base_url>http://files.pfsense.org/packages/10/All/</depends_on_package_base_url>
 		<depends_on_package_pbi>squidguard-squid3-1.4_4-##ARCH##.pbi</depends_on_package_pbi>
 		<build_pbi>
 			<ports_before>www/squid33 databases/db41 security/cyrus-sasl2</ports_before>
@@ -1213,7 +1152,6 @@
 			<port>net-mgmt/zabbix-agent</port>
 		</build_pbi>
 		<build_options>ca_root_nss_UNSET=ETCSYMLINK;zabbix22_SET=LDAP SSH SQLITE;zabbix22_UNSET=MYSQL</build_options>
-		<depends_on_package_base_url>http://files.pfsense.org/packages/10/All/</depends_on_package_base_url>
 		<depends_on_package_pbi>zabbix-agent-1.8.13-##ARCH##.pbi</depends_on_package_pbi>
 	</package>
 	<package>
@@ -1231,14 +1169,12 @@
 			<port>net-mgmt/zabbix-proxy</port>
 		</build_pbi>
 		<build_options>ca_root_nss_UNSET=ETCSYMLINK;zabbix22_SET=LDAP SSH SQLITE;zabbix22_UNSET=MYSQL</build_options>
-		<depends_on_package_base_url>http://files.pfsense.org/packages/10/All/</depends_on_package_base_url>
 		<depends_on_package_pbi>zabbix-proxy-1.8.13-##ARCH##.pbi</depends_on_package_pbi>
 	</package>
 	<package>
 		<name>OpenVPN Client Export Utility</name>
 		<descr>Allows a pre-configured OpenVPN Windows Client or Mac OSX's Viscosity configuration bundle to be exported directly from pfSense.</descr>
 		<category>Security</category>
-		<depends_on_package_base_url>http://files.pfsense.org/packages/10/All/</depends_on_package_base_url>
 		<depends_on_package_pbi>zip-3.0-##ARCH##.pbi p7zip-9.20.1-##ARCH##.pbi</depends_on_package_pbi>
 		<build_port_path>/usr/ports/archivers/p7zip</build_port_path>
 		<build_port_path>/usr/ports/archivers/zip</build_port_path>
@@ -1254,7 +1190,6 @@
 		<website>http://www.server-side.de/</website>
 		<descr>Antivirus:  HAVP (HTTP Antivirus Proxy) is a proxy with a ClamAV anti-virus scanner. The main aims are continuous, non-blocking downloads and smooth scanning of dynamic and password protected HTTP traffic. Havp antivirus proxy has a parent and transparent proxy mode. It can be used with squid or standalone. And File Scanner for local files.</descr>
 		<category>Network Management</category>
-		<depends_on_package_base_url>http://files.pfsense.org/packages/10/All/</depends_on_package_base_url>
 		<depends_on_package_pbi>havp-0.91_1-##ARCH##.pbi</depends_on_package_pbi>
 		<build_port_path>/usr/ports/www/havp</build_port_path>
 		<build_options>CLAMAVUSER=havp;CLAMAVGROUP=havp</build_options>
@@ -1307,7 +1242,6 @@
 		<build_pbi>
 			<port>sysutils/blinkled</port>
 		</build_pbi>
-		<depends_on_package_base_url>http://files.pfsense.org/packages/10/All/</depends_on_package_base_url>
 		<depends_on_package_pbi>blinkled-0.1-##ARCH##.pbi</depends_on_package_pbi>
 	</package>
 	<package>
@@ -1374,7 +1308,6 @@
 		<pkginfolink>http://doc.pfsense.org/index.php/Unbound_package</pkginfolink>
 		<config_file>http://www.pfsense.com/packages/config/unbound/unbound.xml</config_file>
 		<configurationfile>unbound.xml</configurationfile>
-		<depends_on_package_base_url>http://files.pfsense.org/packages/10/All/</depends_on_package_base_url>
 		<build_pbi>
 			<ports_before>dns/ldns textproc/expat2 devel/libevent2</ports_before>
 			<port>dns/unbound</port>
@@ -1406,7 +1339,6 @@
 		<website>http://wiki.nagios.org/index.php/Howtos:nrpe_nsca</website>
 		<descr>NRPE is an addon for Nagios that allows you to execute plugins on remote Linux/Unix hosts. This is useful if you need to monitor local resources/attributes like disk usage, CPU load, memory usage, etc. on a remote host.</descr>
 		<category>Services</category>
-		<depends_on_package_base_url>http://files.pfsense.org/packages/10/All/</depends_on_package_base_url>
 		<depends_on_package_pbi>nrpe-2.13_2-##ARCH##.pbi</depends_on_package_pbi>
 		<build_pbi>
 			<ports_before>net-mgmt/nagios-plugins</ports_before>
@@ -1425,7 +1357,6 @@
 		<website>https://github.com/sileht/check_mk/blob/master/doc/README</website>
 		<descr><![CDATA[The basic idea of check_mk is to fetch "all" information about a target host at once.<br>For each host to be monitored check_mk is called by Nagios only once per time period.]]></descr>
 		<category>Services</category>
-		<depends_on_package_base_url>http://files.pfsense.org/packages/10/All/</depends_on_package_base_url>
 		<build_pbi>
 			<ports_before>sysutils/ipmitool devel/libstatgrab</ports_before>
 			<port>sysutils/muse</port>
@@ -1471,7 +1402,6 @@
 		<website>www.winton.org.uk/zebedee/</website>
 		<maintainer>jorgelustosa@gmail.com marcellocoutinho@gmail.com</maintainer>
 		<required_version>2.2</required_version>
-		<depends_on_package_base_url>http://files.pfsense.org/packages/10/All/</depends_on_package_base_url>
 		<depends_on_package_pbi>zebedee-2.5.3-##ARCH##.pbi</depends_on_package_pbi>
 		<config_file>http://www.pfsense.com/packages/config/zebedee/zebedee.xml</config_file>
 		<configurationfile>zebedee.xml</configurationfile>
@@ -1484,7 +1414,6 @@
 		<version>0.99.22.3 v0.6.1</version>
 		<category>Routing</category>
 		<status>BETA</status>
-		<depends_on_package_base_url>http://files.pfsense.org/packages/10/All/</depends_on_package_base_url>
 		<depends_on_package_pbi>quagga-0.99.22.3-##ARCH##.pbi</depends_on_package_pbi>
 		<config_file>http://www.pfsense.com/packages/config/quagga_ospfd/quagga_ospfd.xml</config_file>
 		<build_port_path>/usr/ports/net/quagga</build_port_path>
@@ -1514,7 +1443,6 @@
 		<status>Stable</status>
 		<required_version>2.2</required_version>
 		<config_file>http://www.pfsense.com/packages/config/bacula-client/bacula-client.xml</config_file>
-		<depends_on_package_base_url>http://files.pfsense.org/packages/10/All/</depends_on_package_base_url>
 		<depends_on_package_pbi>bacula-5.2.12_3-##ARCH##.pbi</depends_on_package_pbi>
 		<build_pbi>
 			<port>sysutils/bacula-client</port>
@@ -1539,7 +1467,6 @@
 			<ports_before>net/libnet10</ports_before>
 			<port>security/dsniff</port>
 		</build_pbi>
-		<depends_on_package_base_url>http://files.pfsense.org/packages/10/All/</depends_on_package_base_url>
 		<depends_on_package_pbi>dsniff-2.3_4-##ARCH##.pbi</depends_on_package_pbi>
 	</package>
 	<package>
@@ -1557,7 +1484,6 @@
 		<build_pbi>
 			<port>net-mgmt/iftop</port>
 		</build_pbi>
-		<depends_on_package_base_url>http://files.pfsense.org/packages/10/All/</depends_on_package_base_url>
 		<depends_on_package_pbi>iftop-0.17-##ARCH##.pbi</depends_on_package_pbi>
 	</package>
 	<package>
@@ -1576,7 +1502,6 @@
 		<build_pbi>
 			<port>devel/git</port>
 		</build_pbi>
-		<depends_on_package_base_url>http://files.pfsense.org/packages/10/All/</depends_on_package_base_url>
 		<depends_on_package_pbi>git-1.8.1.3-##ARCH##.pbi</depends_on_package_pbi>
 	</package>
 	<package>
@@ -1584,7 +1509,6 @@
 		<website>http://www.tinc-vpn.org/</website>
 		<descr>tinc is a Virtual Private Network (VPN) daemon that uses tunnelling and encryption to create a secure private mesh network between hosts on the Internet.</descr>
 		<category>Network Management</category>
-		<depends_on_package_base_url>http://files.pfsense.org/packages/10/All/</depends_on_package_base_url>
 		<depends_on_package_pbi>tinc-1.0.21-##ARCH##.pbi</depends_on_package_pbi>
 		<build_pbi>
 			<port>security/tinc</port>
@@ -1610,7 +1534,6 @@
 		<version>3.3.7_4</version>
 		<status>ALPHA</status>
 		<required_version>2.2</required_version>
-		<depends_on_package_base_url>http://files.pfsense.org/packages/10/All/</depends_on_package_base_url>
 		<depends_on_package_pbi>syslog-ng-3.3.7_4-##ARCH##.pbi</depends_on_package_pbi>
 		<build_pbi>
 			<ports_before>sysutils/logrotate</ports_before>
@@ -1635,7 +1558,6 @@
 			<custom_name>zabbix22-agent</custom_name>
 			<port>net-mgmt/zabbix22-agent</port>
 		</build_pbi>
-		<depends_on_package_base_url>http://files.pfsense.org/packages/10/All/</depends_on_package_base_url>
 		<depends_on_package_pbi>zabbix22-agent-2.2.1-##ARCH##.pbi</depends_on_package_pbi>
 	</package>
 	<package>
@@ -1653,7 +1575,6 @@
 			<port>net-mgmt/zabbix22-proxy</port>
 		</build_pbi>
 		<build_options>OPTIONS_SET+= SQLITE IPV6;OPTIONS_UNSET+= MYSQL JABBER GSSAPI</build_options>
-		<depends_on_package_base_url>http://files.pfsense.org/packages/10/All/</depends_on_package_base_url>
 		<depends_on_package_pbi>zabbix22-proxy-2.2.1-##ARCH##.pbi</depends_on_package_pbi>
 	</package>
 	<package>
@@ -1672,7 +1593,6 @@
 			<port>sysutils/ipmitool</port>
 		</build_pbi>
 		<build_options>ipmitool_SET=FREEIPMI;freeipmi_UNSET=DOCS DEBUG IOPERM</build_options>
-		<depends_on_package_base_url>http://files.pfsense.org/packages/10/All/</depends_on_package_base_url>
 		<depends_on_package_pbi>ipmitool-1.8.12_3-##ARCH##.pbi</depends_on_package_pbi>
 	</package>
 	<package>
@@ -1689,7 +1609,6 @@
 		<build_pbi>
 			<port>security/sudo</port>
 		</build_pbi>
-		<depends_on_package_base_url>http://files.pfsense.org/packages/10/All/</depends_on_package_base_url>
 		<depends_on_package_pbi>sudo-1.8.6p8-##ARCH##.pbi</depends_on_package_pbi>
 	</package>
 	<package>
@@ -1710,7 +1629,6 @@
 		<descr>Softflowd is flow-based network traffic analyser capable of Cisco NetFlow data export. Softflowd semi-statefully tracks traffic flows recorded by listening on a network interface or by reading a packet capture file. These flows may be reported via NetFlow to a collecting host or summarised within softflowd itself. Softflowd supports Netflow versions 1, 5 and 9 and is fully IPv6-capable - it can track IPv6 flows and send export datagrams via IPv6. It also supports export to multicast groups, allowing for redundant flow collectors.</descr>
 		<category>Network Management</category>
 		<config_file>http://www.pfsense.com/packages/config/softflowd/softflowd.xml</config_file>
-		<depends_on_package_base_url>http://files.pfsense.org/packages/10/All/</depends_on_package_base_url>
 		<depends_on_package_pbi>softflowd-0.9.8_2-##ARCH##.pbi</depends_on_package_pbi>
 		<version>0.9.8</version>
 		<status>Beta</status>
@@ -1736,7 +1654,6 @@
 			<port>sysutils/apcupsd</port>
 		</build_pbi>
 		<build_options>OPTIONS_SET+= APCSMART_DRV APCDUMB_DRV PCNET_DRV USB TCP_WRAPPERS SNMP_DRV;OPTIONS_UNSET+= CLIENT_ONLY CGI SNMP_DRV_OLD TEST_DRV GAPCMON DOCS</build_options>
-		<depends_on_package_base_url>http://files.pfsense.org/packages/10/All/</depends_on_package_base_url>
 		<depends_on_package_pbi>apcupsd-3.14.10_1-##ARCH##.pbi</depends_on_package_pbi>
 	</package>
 </packages>
