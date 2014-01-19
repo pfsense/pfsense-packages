@@ -177,24 +177,36 @@ function haproxy_get_bindable_interfaces($ipv="ipv4,ipv6", $interfacetype="any,l
 	return $bindable;
 }
 
-function haproxy_get_cert_extensions($crt){
+function haproxy_write_certificate_file($filename, $certid) {
+	// writes certificate including: cert-publickey + cert-privatekey + intermediate-publickey + ca-publickey
+	$cert = lookup_cert($certid);
+
+	$certcontent = base64_decode($cert['crt']);
+	$certcontent .= "\r\n".base64_decode($cert['prv']);
+	
+	$certchaincontent = ca_chain($cert);
+	if ($certchaincontent != "") {
+		$certcontent .= "\r\n" . $certchaincontent;
+	}
+	unset($certchaincontent);
+	file_put_contents($filename, $certcontent);
+	unset($certcontent);
+	unset($cert);
+}
+function haproxy_get_cert_extensions($crt) {
 	$cert = openssl_x509_parse(base64_decode($crt['crt']));
 	return $cert['extensions'];
 }
-
-function haproxy_get_cert_authoritykeyidentifier($cert)
-{
+function haproxy_get_cert_authoritykeyidentifier($cert) {
 	$certextension = haproxy_get_cert_extensions($cert);
 	$lines = preg_split('/[\n]+/',$certextension['authorityKeyIdentifier']);
 	return substr($lines[0],6);// cut off the starting string 'keyid:'
 }
-function haproxy_get_cert_subjectKeyIdentifier($cert)
-{
+function haproxy_get_cert_subjectKeyIdentifier($cert) {
 	$certextension = haproxy_get_cert_extensions($cert);
 	$lines = preg_split('/[\n]+/',$certextension['subjectKeyIdentifier']);
 	return $lines[0];
 }
-
 function haproxy_cert_signed_by($cert, $signedbycert) {
 	// checks if $cert was signed by $signedbycert
 	// this does NOT validate a proper signature but only checks if the extension properties match.
@@ -202,8 +214,7 @@ function haproxy_cert_signed_by($cert, $signedbycert) {
 	$subjectid = haproxy_get_cert_subjectKeyIdentifier($signedbycert);
 	return $authoritykeyid == $subjectid;
 }
-
-function haproxy_get_certificates(){
+function haproxy_get_certificates() {
 	global $config;
 	$allcerts = array();
 	foreach($config['cert'] as &$cert)
@@ -212,7 +223,7 @@ function haproxy_get_certificates(){
 		$allcerts[] = &$cert;
 	return $allcerts;
 }
-function haproxy_recalculate_certifcate_chain(){
+function haproxy_recalculate_certifcate_chain() {
 	// and set "selfsigned" for certificates that where used to sign themselves
 	// recalculate the "caref" for all certificates where it is currently unkown.
 	
@@ -246,7 +257,6 @@ function haproxy_recalculate_certifcate_chain(){
 		write_config("Services: HAProxy: Recalculated $items_recalculated certificate chains.");
 	return $items_recalculated;
 }
-
 function get_certificat_usage($refid) {
 	$usage = array();
 	$cert = lookup_cert($refid);
@@ -308,7 +318,6 @@ function get_certificates_server($get_includeWebCert=false) {
 	}
 	return $certificates;
 }
-
 
 function phparray_to_javascriptarray_recursive($nestID, $path, $items, $nodeName, $includeitems) {
 	$offset = str_repeat('  ',$nestID);

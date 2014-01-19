@@ -29,6 +29,7 @@
 */
 
 /* include all configuration functions */
+require_once("globals.inc");
 require_once("functions.inc");
 require_once("pkg-utils.inc");
 require_once("notices.inc");
@@ -64,7 +65,7 @@ $a_acltypes["backendservercount"] = array('name' => 'Minimum count usable server
 				'mode' => '', 'syntax' => 'nbsrv(%2$s) ge %1$d', 'parameters' => 'value,backendname');
 // 'ssl_sni_matches' was added in HAProxy1.5dev17
 $a_acltypes["ssl_sni_matches"] = array('name' => 'Server Name Indication TLS extension matches', 
-				'mode' => 'https', 'syntax' => 'req_ssl_sni -i %1$s', 'advancedoptions' => "tcp-request inspect-delay 5s\n\ttcp-request content accept if { req_ssl_hello_type 1 }");
+				'mode' => 'https', 'syntax' => 'req.ssl_sni -i %1$s', 'advancedoptions' => "tcp-request inspect-delay 5s\n\ttcp-request content accept if { req.ssl_hello_type 1 }");
 
 $a_checktypes = array();
 $a_checktypes['none'] = array('name' => 'none', 'syntax' => '',
@@ -119,6 +120,45 @@ $a_servermodes["backup"]['name'] = "backup";
 $a_servermodes["disabled"]['name'] = "disabled";
 $a_servermodes["inactive"]['name'] = "inactive";
 
+// http://www.exceliance.fr/sites/default/files/biblio/aloha_load_balancer_haproxy_cookie_persistence_methods_memo.pdf
+$a_cookiemode = array();
+$a_cookiemode['passive'] 				= array('name' => 'Passive', 'syntax' => 'cookie <cookie name>',
+	'descr' => 'Cookie is analysed on incoming request to choose server. HAProxy does not perform any insertion update or deletion on the Cookie or Set-Cookie. If the Cookie is not set, then the load-balancing algorithm is applied.');
+$a_cookiemode['passive-silent']			= array('name' => 'Passive-silent', 'syntax' => 'cookie <cookie name> indirect',
+	'descr' => 'Cookie is analysed on incoming request to choose server. HAProxy does not perform any insertion, update or deletion on the Cookie. Set-Cookie is removed from response if not required. If the Cookie is not set, then HAProxy applies the load-balancing algorithm.');
+$a_cookiemode['reset']					= array('name' => 'Reset', 'syntax' => 'cookie <cookie name> rewrite',
+	'descr' => 'Cookie is analysed on incoming request to choose server and Set-Cookie value is overwritten in response if present. If the Set-Cookie isn\'t sent by the server, then HAProxy won\'t set it.');
+$a_cookiemode['set']					= array('name' => 'Insert', 'syntax' => 'cookie <cookie name> insert',
+	'descr' => 'Cookie is analyzed on incoming request to choose server and Set-Cookie value is overwritten if present and set to an unknown value or inserted in response if not present.');
+$a_cookiemode['set-silent'] 			= array('name' => 'Insert-silent', 'syntax' => 'cookie <cookie name> insert indirect',
+	'descr' => 'Cookie is analyzed on incoming request to choose server and Set-Cookie value is overwritten if present, inserted in response if needed and removed if a valid Cookie was provided.');
+$a_cookiemode['insert-only'] 			= array('name' => 'Insert-preserve', 'syntax' => 'cookie <cookie name> preserve insert',
+	'descr' => 'Cookie is analyzed on incoming request to choose server. Set-Cookie value is set only if the server does not provide one or if the client came without the Cookie.');
+$a_cookiemode['insert-only-silent'] 	= array('name' => 'Insert-preserve-silent', 'syntax' => 'cookie <cookie name> preserve insert indirect',
+	'descr' => 'Cookie is analyzed on incoming request to choose server and Set-Cookie value is left untouched if present, inserted in response if needed or removed if not needed.');
+$a_cookiemode['session-prefix'] 		= array('name' => 'Session-prefix', 'syntax' => 'cookie <cookie name> prefix',
+	'descr' => 'Cookie is analyzed on incoming request to choose server whose Cookie Name prefix matches. Set Cookie value is prefixed using server line Cookie ID in response. Cookie is modified only between HAProxy and the client only');
+$a_cookiemode['passive-session-prefix'] = array('name' => 'Passive-session-prefix', 'syntax' => 'cookie <cookie name> preserve prefix indirect',
+	'descr' => 'Cookie is analysed on incoming request to choose server whose Cookie ID prefix matches.');
+foreach($a_cookiemode as &$cookiemode)
+	$cookiemode['descr'] = $cookiemode['descr'] . "\n\n" . $cookiemode['syntax'] . "";
+
+$a_sticky_type = array();
+$a_sticky_type['none'] = array('name' => 'none',
+	'descr' => "No stick-table will be used");
+$a_sticky_type['stick_sslsessionid'] = array('name' => 'Stick on SSL-Session-ID',
+	'descr' => "Only used on https frontends. Uses the SSL-Session-ID to persist clients to a server.");
+$a_sticky_type['stick_sourceipv4'] = array('name' => 'Stick on SourceIP IPv4',
+	'descr' => "Stick on the client ip, drawback is that multiple clients behind a natted public ip will be balanced to the same server.");
+$a_sticky_type['stick_sourceipv6'] = array('name' => 'Stick on SourceIP IPv6',
+	'descr' => "Stick on the client ip, drawback is that multiple clients behind a natted public ip will be balanced to the same server.");
+$a_sticky_type['stick_cookie_value'] = array('name' => 'Stick on existing Cookie value',
+	'descr' => "Stick on the value of a session cookie",
+	'cookiedescr' => "Enables SSL-session-id based persistence. (only use on 'https' and 'tcp' frontends that use SSL)<br/>EXAMPLE: JSESSIONID PHPSESSIONID ASP.NET_SessionId");
+$a_sticky_type['stick_rdp_cookie'] = array('name' => 'Stick on RDP-cookie',
+	'descr' => "Uses a RDP-Cookie send by the mstsc client, note that not all clients send this.",
+	'cookiedescr' => 'EXAMPLE: msts or mstshash');
+
 function haproxy_custom_php_deinstall_command() {
 	exec("cd /var/db/pkg && pkg_delete `ls | grep haproxy`");
 	exec("rm /usr/local/pkg/haproxy*");
@@ -133,7 +173,7 @@ function haproxy_custom_php_install_command() {
 	global $g, $config;
 	conf_mount_rw();
 
-	$freebsd_version = substr(trim(`uname -r`), 0, 1);
+	$freebsd_version = substr(trim(php_uname("r")), 0, 1);
 	if(!file_exists("/usr/bin/limits")) {
 		exec("fetch -q -o /usr/bin/limits http://files.pfsense.org/extras/{$freebsd_version}/limits");
 		exec("chmod a+rx /usr/bin/limits");
@@ -380,9 +420,10 @@ function haproxy_find_acl($name) {
 function write_backend($fd, $name, $pool, $frontend) {
 	if(!is_array($pool['ha_servers']['item']) && !$pool['stats_enabled']=='yes')
 		return;
-	global $a_checktypes;
+	global $a_checktypes, $a_cookiemode;
 		
 	$a_servers = &$pool['ha_servers']['item'];
+	$frontendtype = strtolower($frontend['type']);
 
 	unset($sslserverpresent);
 	if (is_array($a_servers))
@@ -396,17 +437,59 @@ function write_backend($fd, $name, $pool, $frontend) {
 	}
 	
 	fwrite ($fd, "backend " . $name . "\n");
-	if($pool['cookie_name'] && strtolower($frontend['type']) == "http")
-		fwrite ($fd, "\tcookie\t\t\t" . $pool['cookie_name'] . " insert indirect\n");
-
-	// https is an alias for tcp for clarity purpouses
+	// https is an alias for tcp for clarity purposes
 	if(strtolower($frontend['type']) == "https") {
 		$backend_type = "tcp";
 	} else {
 		$backend_type = $frontend['type'];
 	}
-			
 	fwrite ($fd, "\tmode\t\t\t" . $backend_type . "\n");
+
+	if ($frontendtype == "http") {
+		if ($pool["persist_cookie_enabled"] == "yes") {
+			$cookie_mode = $pool["persist_cookie_mode"];
+			$cookie_cachable = $pool["persist_cookie_cachable"];
+			$cookiesyntax = $a_cookiemode[$cookie_mode]["syntax"];
+			$cookie = str_replace("<cookie name>", $pool["persist_cookie_name"], $cookiesyntax);
+			$cookie .= $cookie_cachable == "yes" ? "" : " nocache";
+			fwrite ($fd, "\t" . $cookie . "\n");
+		}
+	}	
+	switch($pool["persist_sticky_type"]) {
+	case 'stick_sslsessionid':
+		if ($frontendtype == "https") {
+			fwrite ($fd, "\ttcp-request inspect-delay 5s\n");
+			fwrite ($fd, "\tstick-table type binary len 32 size ".$pool["persist_stick_tablesize"]." expire ".$pool["persist_stick_expire"]."\n");
+			fwrite ($fd, "\tacl clienthello req_ssl_hello_type 1\n");
+			fwrite ($fd, "\tacl serverhello rep_ssl_hello_type 2\n");
+			fwrite ($fd, "\ttcp-request content accept if clienthello\n");
+			fwrite ($fd, "\ttcp-response content accept if serverhello\n");
+			fwrite ($fd, "\tstick on payload_lv(43,1) if clienthello\n");
+			fwrite ($fd, "\tstick store-response payload_lv(43,1) if serverhello\n");
+		}
+		break;
+	case 'stick_rdp_cookie':
+		//tcp-request content accept if RDP_COOKIE
+		//fwrite ($fd, "\tstick on req.rdp_cookie(msts)\n");
+		fwrite ($fd, "\tstick-table type binary len 32 size ".$pool["persist_stick_tablesize"]." expire ".$pool["persist_stick_expire"]."\n");
+		fwrite ($fd, "\tstick on req.rdp_cookie(mstshash)\n");
+		break;
+	case 'stick_sourceipv4':
+		fwrite ($fd, "\tstick-table type ip size ".$pool["persist_stick_tablesize"]." expire ".$pool["persist_stick_expire"]."\n");
+		fwrite ($fd, "\tstick on src\n");
+		break;
+	case 'stick_sourceipv6':
+		fwrite ($fd, "\tstick-table type ip size ".$pool["persist_stick_tablesize"]." expire ".$pool["persist_stick_expire"]."\n");
+		fwrite ($fd, "\tstick on src\n");
+		break;
+	case 'stick_cookie_value':
+		if ($frontendtype == "http") {
+			fwrite ($fd, "\tstick-table type string len {$pool["persist_stick_length"]} size ".$pool["persist_stick_tablesize"]." expire ".$pool["persist_stick_expire"]."\n");
+			fwrite ($fd, "\tstick store-response res.cook({$pool["persist_stick_cookiename"]})\n");
+			fwrite ($fd, "\tstick on req.cook({$pool["persist_stick_cookiename"]})\n");
+		}
+		break;
+	}
 	
 	unset($checkport);
 	$check_type = $pool['check_type'];
@@ -456,17 +539,25 @@ function write_backend($fd, $name, $pool, $frontend) {
 			fwrite ($fd, "\tstats\t\t\trealm " . haproxy_escapestring($pool['stats_realm']) . "\n");
 		else 
 			fwrite ($fd, "\tstats\t\t\trealm .\n");
-		fwrite ($fd, "\tstats\t\t\tauth " . haproxy_escapestring($pool['stats_username']).":". haproxy_escapestring($pool['stats_password'])."\n");
+			
+		if ($pool['stats_username'] && $pool['stats_password'])
+			fwrite ($fd, "\tstats\t\t\tauth " . haproxy_escapestring($pool['stats_username']).":". haproxy_escapestring($pool['stats_password'])."\n");
 		
 		if($pool['stats_admin']=='yes')
 			fwrite ($fd, "\tstats\t\t\tadmin if TRUE" . "\n");
 		
-		if($pool['stats_node_enabled']=='yes')
+		if($pool['stats_node'])
 			fwrite ($fd, "\tstats\t\t\tshow-node " . $pool['stats_node'] . "\n");
 		if($pool['stats_desc'])
-			fwrite ($fd, "\tstats\t\t\tshow-desc " . $pool['stats_desc'] . "\n");
+			fwrite ($fd, "\tstats\t\t\tshow-desc " . haproxy_escapestring($pool['stats_desc']) . "\n");
 		if($pool['stats_refresh'])
 			fwrite ($fd, "\tstats\t\t\trefresh " . $pool['stats_refresh'] . "\n");
+		
+		if ($pool['stats_scope']) {
+			$scope_items = explode(",", $pool['stats_scope']);
+			foreach($scope_items as $scope_item)
+				fwrite ($fd, "\tstats\t\t\tscope " . $scope_item . "\n");
+		}
 	}
 
 	$uri = $pool['monitor_uri'];
@@ -478,6 +569,10 @@ function write_backend($fd, $name, $pool, $frontend) {
 	if ($optioncheck)
 		fwrite ($fd, "\toption\t\t\t{$optioncheck}\n");
 
+	if ($pool["strict_transport_security"] && is_numeric($pool["strict_transport_security"])){
+		fwrite ($fd, "\trspadd Strict-Transport-Security:\ max-age={$pool["strict_transport_security"]};\n");
+	}
+	
 	if ($pool['advanced_backend']) {
 		$adv_be	= explode("\n", base64_decode($pool['advanced_backend']));
 		foreach($adv_be as $adv_line) {
@@ -487,10 +582,6 @@ function write_backend($fd, $name, $pool, $frontend) {
 		}
 	}
 
-	if($pool['cookie'] && strtolower($frontend['type']) == "http") 
-		$cookie = " cookie {$pool['cookie']} ";
-	else 
-		$cookie = "";
 	if($pool['advanced']) {
 		$advanced = base64_decode($pool['advanced']);
 		$advanced_txt = " " . $advanced;
@@ -501,9 +592,9 @@ function write_backend($fd, $name, $pool, $frontend) {
 	if ($check_type != 'none')
 	{
 		if($pool['checkinter']) 
-			$checkinter = "check inter {$pool['checkinter']}";
+			$checkinter = " check inter {$pool['checkinter']}";
 		else 
-			$checkinter = "check inter 1000";
+			$checkinter = " check inter 1000";
 	}
 	
 	//agent-check requires at least haproxy v1.5dev20
@@ -515,6 +606,10 @@ function write_backend($fd, $name, $pool, $frontend) {
 		foreach($a_servers as $be) {
 			if ($be['status'] == "inactive")
 				continue;
+			if($be['cookie'] && $frontendtype == "http") 
+				$cookie = " cookie {$be['cookie']}";
+			else 
+				$cookie = "";
 			
 			if (!$be['name'])
 				$be['name'] = $be['address'];
@@ -528,7 +623,11 @@ function write_backend($fd, $name, $pool, $frontend) {
 			{
 				$ssl = $backend_type == "http" ? ' ssl' : ' check-ssl';
 			}
-			fwrite ($fd, "\tserver\t\t\t" . $be['name'] . " " . $be['address'].":" . $be['port'] . "$ssl $cookie $checkinter$checkport$agentcheck $isbackup weight " . $be['weight'] . "{$advanced_txt} {$be['advanced']}\n");
+			$weight = "";
+			if (is_numeric($be['weight'])){
+				$weight = " weight " . $be['weight'];
+			}
+			fwrite ($fd, "\tserver\t\t\t" . $be['name'] . " " . $be['address'].":" . $be['port'] . "$ssl$cookie$checkinter$checkport$agentcheck $isbackup$weight{$advanced_txt} {$be['advanced']}\n");
 		}
 	}
 	fwrite ($fd, "\n");
@@ -536,12 +635,13 @@ function write_backend($fd, $name, $pool, $frontend) {
 
 function haproxy_configure() {
 	global $g;
-	// reload haproxy
+	// reload haproxy with new configuration, while booting/xmlrpcsync/carpevents/other
 	haproxy_writeconf("{$g['varetc_path']}/haproxy");
 	return haproxy_check_run(1);
 }
 
 function haproxy_check_and_run(&$messages, $reload) {
+	// called from webgui 'apply', first checks validity of the configuration, and returns alerts/warnings if any.
 	global $g;
 	$configpath = "{$g['varetc_path']}/haproxy";
 	$testpath = "{$g['varetc_path']}/haproxy_test";
@@ -568,24 +668,11 @@ function haproxy_check_and_run(&$messages, $reload) {
 	}
 	return $ok;
 }
-function haproxy_write_certificate_file($filename, $certid) {
-	$cert = lookup_cert($certid);
-
-	$certcontent = base64_decode($cert['crt']);
-	$certcontent .= "\r\n".base64_decode($cert['prv']);
-	
-	$certchaincontent = ca_chain($cert);
-	if ($certchaincontent != "") {
-		$certcontent .= "\r\n" . $certchaincontent;
-	}
-	unset($certchaincontent);
-	file_put_contents($filename, $certcontent);
-	unset($certcontent);
-	unset($cert);
-}
 
 function haproxy_writeconf($configpath) {
 	global $config;
+	// writes the haproxy configuration and certificates to a specified path
+	// this can be a path only used to 'test' the configuration
 
 	$configfile = $configpath . "/haproxy.cfg";
 
@@ -627,6 +714,21 @@ function haproxy_writeconf($configpath) {
 			}
 		}
 		fwrite ($fd, "\n");
+		
+		$localstatsport = $a_global['localstatsport'];
+		if ($localstatsport){
+			fwrite ($fd, "listen HAProxyLocalStats\n");
+			fwrite ($fd, "\tbind 127.0.0.1:$localstatsport\n");
+			fwrite ($fd, "\tmode http\n");
+			fwrite ($fd, "\tstats enable\n");
+			fwrite ($fd, "\tstats refresh 10\n");
+			fwrite ($fd, "\tstats admin if TRUE\n");
+			fwrite ($fd, "\tstats uri /haproxy_stats.php?haproxystats=1\n");
+			fwrite ($fd, "\ttimeout client 5000\n");
+			fwrite ($fd, "\ttimeout connect 5000\n");
+			fwrite ($fd, "\ttimeout server 5000\n");
+			fwrite ($fd, "\n");
+		}
 	}
 
 	// Try and get a unique array for address:port as frontends can duplicate
@@ -784,10 +886,8 @@ function haproxy_writeconf($configpath) {
 			$default_backend = "";
 			$i = 0;
 			foreach ($bind['config'] as $frontend) {
-				$a_acl=&$frontend['ha_acls']['item'];
-				if(!is_array($a_acl)) 
-					$a_acl=array();
-			
+				$a_acl = &get_frontend_acls($frontend);
+
 				$poolname = $frontend['backend_serverpool'] . "_" . strtolower($frontend['type']);
 
 				// Create different pools if the svrport is set
@@ -799,31 +899,6 @@ function haproxy_writeconf($configpath) {
 					$a_pendingpl[$poolname]['name'] = $poolname;
 					$a_pendingpl[$poolname]['frontend'] = $frontend;
 				}
-
-				if (strtolower($bind['type']) == "http" && $frontend['ssloffload']) {
-					$aclname = "SNI_" . $poolname;
-					if ($frontend['ssloffloadacl']){
-						$cert = lookup_cert($frontend['ssloffloadcert']);
-						$cert_cn = cert_get_cn($cert['crt']);
-						$descr = haproxy_escape_acl_name($cert['descr']);
-						$a_acl[] = array('name' => "{$aclname}_{$descr}",'expression' => 'host_matches', 'value' => $cert_cn);
-						unset($cert);
-					}
-					if ($frontend['ssloffloadacladditional']){
-						$certs = $frontend['ha_certificates']['item'];
-						if (is_array($certs)){
-							if (count($certs) > 0){
-								foreach($certs as $certref){
-									$cert = lookup_cert($certref['ssl_certificate']);
-									$cert_cn = cert_get_cn($cert['crt']);
-									$descr = haproxy_escape_acl_name($cert['descr']);
-									$a_acl[] = array('name' => "{$aclname}_{$descr}",'expression' => 'host_matches', 'value' => $cert_cn);
-									unset($cert);
-								}
-							}
-						}
-					}
-				}
 				
 				// Write this out once, and must be before any backend config text
 				if (($default_backend == "" || $frontend['secondary'] != 'yes') && count($a_acl) == 0 ) {
@@ -833,8 +908,8 @@ function haproxy_writeconf($configpath) {
 				// combine acl's with same name to allow for 'combined checks' to check for example hostname and fileextension together..
 				$a_acl_combine = array();
 				foreach ($a_acl as $entry) {
-					$name = $entry['name'];
-					$a_acl_combine[$name][] = $entry;
+					$name = $entry['ref']['name'];
+					$a_acl_combine[$name][] = $entry['ref'];
 				}
 				
 				foreach ($a_acl_combine as $a_usebackend) {
@@ -935,16 +1010,9 @@ function use_transparent_clientip_proxying() {
 	return false;
 }
 
-function load_ipfw_rules() {
-	// On FreeBSD 8 pf does not support "divert-reply" so ipfw is needed.
-	global $g, $config;
-	$ipfw_zone_haproxy = "haproxy";
-	
+function haproxy_get_transparent_backends(){
+	global $config;
 	$a_backends = &$config['installedpackages']['haproxy']['ha_pools']['item'];
-	
-	haproxy_load_modules();
-	
-	$transparent_interfaces = array();
 	$transparent_backends = array();
 	foreach ($a_backends as $backend) {
 		if ($backend["transparent_clientip"] != 'yes')
@@ -960,14 +1028,50 @@ function load_ipfw_rules() {
 					if (!is_ipaddr($be['address']))
 						continue;
 					$item = array();
+					$item['name'] = $be['name'];
+					$item['interface'] = $real_if;
 					$item['address'] = $be['address'];
 					$item['port'] = $be['port'];
-					$item['interface'] = $real_if;
 					$transparent_backends[] = $item;
-					$transparent_interfaces[$real_if] = 1;
 				}
 			}
 		}
+	}
+	return $transparent_backends;
+}
+
+function haproxy_generate_rules($type) {
+	// called by filter.inc when pfSense rules generation happens
+	global $g, $config;
+	$rules = "";
+	switch($type) {
+	case 'filter':
+		$transparent_backends = haproxy_get_transparent_backends();
+		foreach($transparent_backends as $tb){
+			// This sloppy rule is needed because of ipfw is used to 'catch' return traffic.
+			$rules .= "# allow HAProxy transparent traffic\n";
+			$rules .= "pass  out  quick  on {$tb['interface']} inet proto tcp  from any to {$tb['address']} port {$tb['port']} flags S/SA keep state ( sloppy )  label \"HAPROXY_transparent_rule_{$tb['name']}\"\n";
+		}		
+		break;
+	}
+	return $rules;
+}
+
+function load_ipfw_rules() {
+	// On FreeBSD 8 pf does not support "divert-reply" so ipfw is needed.
+	global $g, $config;
+	$ipfw_zone_haproxy = "haproxy";
+	
+	$a_backends = &$config['installedpackages']['haproxy']['ha_pools']['item'];
+	
+	haproxy_load_modules();
+
+	$transparent_backends = haproxy_get_transparent_backends();
+	
+	$transparent_interfaces = array();
+	foreach($transparent_backends as $transparent_backend){
+		$interface = $transparent_backend['interface'];
+		$transparent_interfaces[$interface] = 1;
 	}
 	mwexec("/usr/local/sbin/ipfw_context -a $ipfw_zone_haproxy", true);
 	
@@ -996,9 +1100,10 @@ function haproxy_check_run($reload) {
 
 	exec("/usr/bin/limits -n 300014");
 
-	if(use_transparent_clientip_proxying())
+	if(use_transparent_clientip_proxying()) {
+		filter_configure();
 		load_ipfw_rules();
-	else
+	} else
 		mwexec("/usr/local/sbin/ipfw_context -d haproxy", true);
 	
 	if(isset($a_global['enable'])) {
@@ -1194,6 +1299,43 @@ function get_frontend_acls($frontend) {
 			$result[] = $acl_item;
 		}
 	}
+	
+	$mainfrontend = get_primaryfrontend($frontend);
+	if (strtolower($mainfrontend['type']) == "http" && $mainfrontend['ssloffload']) {
+		$a_acl = &$frontend['ha_acls']['item'];
+		if(!is_array($a_acl)) 
+			$a_acl=array();
+	
+		$poolname = $frontend['backend_serverpool'] . "_" . strtolower($frontend['type']);
+		$aclname = "SNI_" . $poolname;
+		if ($frontend['ssloffloadacl']){
+			$cert = lookup_cert($frontend['ssloffloadcert']);
+			$cert_cn = cert_get_cn($cert['crt']);
+			$descr = haproxy_escape_acl_name($cert['descr']);
+			unset($cert);
+			$acl_item = array();
+			$acl_item['descr'] = "Certificate ACL ".$cert_cn;
+			$acl_item['ref'] = array('name' => "{$aclname}_{$descr}",'expression' => 'host_matches', 'value' => $cert_cn);
+			$result[] = $acl_item;
+		}
+		if ($frontend['ssloffloadacladditional']){
+			$certs = $frontend['ha_certificates']['item'];
+			if (is_array($certs)){
+				if (count($certs) > 0){
+					foreach($certs as $certref){
+						$cert = lookup_cert($certref['ssl_certificate']);
+						$cert_cn = cert_get_cn($cert['crt']);
+						$descr = haproxy_escape_acl_name($cert['descr']);
+						unset($cert);
+						$acl_item = array();
+						$acl_item['descr'] = "Additional certificate ACLs: ".$cert_cn;
+						$acl_item['ref'] = array('name' => "{$aclname}_{$descr}",'expression' => 'host_matches', 'value' => $cert_cn);
+						$result[] = $acl_item;
+					}
+				}
+			}
+		}
+	}
 	return $result;
 }
 
@@ -1216,6 +1358,27 @@ function haproxy_escapestring($configurationsting) {
 
 function haproxy_escape_acl_name($aclname) {
 	return preg_replace_callback('([^A-Za-z0-9\._\-\:])', function($match){return "_".dechex(ord($match[0]));}, $aclname);
+}
+
+function haproxy_find_create_certificate($certificatename) {
+	global $g;
+	$cert = lookup_cert_by_name($certificatename);
+	if (is_array($cert))
+		return $cert;
+	global $config;
+	$a_cert =& $config['cert'];	
+	$cert = array();
+	$cert['refid'] = uniqid();
+	$cert['descr'] = gettext($certificatename);
+	mwexec("/usr/local/bin/openssl genrsa 1024 > {$g['tmp_path']}/ssl.key");
+	mwexec("/usr/local/bin/openssl req -new -x509 -nodes -sha256 -days 2000 -key {$g['tmp_path']}/ssl.key > {$g['tmp_path']}/ssl.crt");
+	$crt = file_get_contents("{$g['tmp_path']}/ssl.crt");
+	$key = file_get_contents("{$g['tmp_path']}/ssl.key");
+	unlink("{$g['tmp_path']}/ssl.key");
+	unlink("{$g['tmp_path']}/ssl.crt");
+	cert_import($cert, $crt, $key);
+	$a_cert[] = $cert;
+	return $cert;
 }
 
 ?>
