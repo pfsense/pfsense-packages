@@ -34,6 +34,7 @@ require("guiconfig.inc");
 require_once("haproxy.inc");
 require_once("haproxy_utils.inc");
 require_once("haproxy_htmllist.inc");
+require_once("pkg_haproxy_tabs.inc");
 
 /* Compatibility function for pfSense 2.0 */
 if (!function_exists("cert_get_purpose")) {	
@@ -55,8 +56,6 @@ function haproxy_js_acl_select($mode) {
 	}
 	return $seltext;
 }
-
-$d_haproxyconfdirty_path = $g['varrun_path'] . "/haproxy.conf.dirty";
 
 if (!is_array($config['installedpackages']['haproxy']['ha_backends']['item'])) {
 	$config['installedpackages']['haproxy']['ha_backends']['item'] = array();
@@ -371,12 +370,7 @@ $interfaces = haproxy_get_bindable_interfaces();
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
   <tr><td class="tabnavtbl">
   <?php
-        /* active tabs */
-        $tab_array = array();
-	$tab_array[] = array("Settings", false, "haproxy_global.php");
-        $tab_array[] = array("Frontend", true, "haproxy_listeners.php");		
-	$tab_array[] = array("Backend", false, "haproxy_pools.php");
-	display_top_tabs($tab_array);
+	haproxy_display_top_tabs_active($haproxy_tab_array['haproxy'], "frontend");
   ?>
   </td></tr>
   <tr>
@@ -447,7 +441,7 @@ $interfaces = haproxy_get_bindable_interfaces();
 			<td width="22%" valign="top" class="vncellreq">External port</td>
 			<td width="78%" class="vtable" colspan="2">
 				<input name="port" type="text" <?if(isset($pconfig['port'])) echo "value=\"{$pconfig['port']}\"";?> size="10" maxlength="500" />
-				<div>The port to listen to.  To specify multiple ports, separate with a comma (,). EXAMPLE: 80,443</div>
+				<div>The port to listen to. To specify multiple ports, separate with a comma (,). EXAMPLE: 80,8000</div>
 			</td>
 		</tr>
 		<tr class="haproxy_primary" align="left">
@@ -548,7 +542,8 @@ $interfaces = haproxy_get_bindable_interfaces();
 		<tr align="left">
 			<td width="22%" valign="top" class="vncell">Advanced pass thru</td>
 			<td width="78%" class="vtable" colspan="2">
-				<textarea name='advanced' rows="4" cols="70" id='advanced'><?php echo htmlspecialchars($pconfig['advanced']); ?></textarea>
+				<? $textrowcount = max(substr_count($pconfig['advanced'],"\n"), 2) + 2; ?>
+				<textarea name='advanced' rows="<?=$textrowcount;?>" cols="70" id='advanced'><?php echo htmlspecialchars($pconfig['advanced']); ?></textarea>
 				<br/>
 				NOTE: paste text into this box that you would like to pass thru.
 			</td>
@@ -599,7 +594,7 @@ $interfaces = haproxy_get_bindable_interfaces();
 		<tr class="haproxy_ssloffloading_enabled haproxy_primary" align="left">
 			<td width="22%" valign="top" class="vncell">Advanced ssl options</td>
 			<td width="78%" class="vtable" colspan="2">
-				<input type='text' name='dcertadv' size="64" id='dcertadv' <?if(isset($pconfig['dcertadv'])) echo "value=\"{$pconfig['dcertadv']}\"";?> maxlength="64" />
+				<input type='text' name='dcertadv' size="64" id='dcertadv' <?if(isset($pconfig['dcertadv'])) echo "value=\"{$pconfig['dcertadv']}\"";?> />
 				<br/>
 				NOTE: Paste additional ssl options(without commas) to include on ssl listening options.<br/>
 				some options: force-sslv3, force-tlsv10 force-tlsv11 force-tlsv12 no-sslv3 no-tlsv10 no-tlsv11 no-tlsv12 no-tls-tickets
