@@ -34,7 +34,7 @@ require_once("functions.inc");
 require_once("service-utils.inc");
 require_once "/usr/local/pkg/snort/snort.inc";
 
-global $g, $pkg_interface, $snort_gui_include, $rebuild_rules;
+global $g, $config, $pkg_interface, $snort_gui_include, $rebuild_rules;
 
 if (!defined("VRT_DNLD_URL"))
 	define("VRT_DNLD_URL", "https://www.snort.org/reg-rules/");
