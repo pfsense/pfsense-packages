@@ -170,15 +170,26 @@ function haproxy_custom_php_deinstall_command() {
 }
 
 function haproxy_custom_php_install_command() {
-	global $g, $config;
+	global $g, $config, $static_output;
+	$static_output .= "HAProxy, running haproxy_custom_php_install_command()\n";
+	update_output_window($static_output);
+	
+	$static_output .= "HAProxy, conf_mount_rw\n";
+	update_output_window($static_output);
 	conf_mount_rw();
-
+	
+	
 	$freebsd_version = substr(trim(php_uname("r")), 0, 1);
 	if(!file_exists("/usr/bin/limits")) {
+		$static_output .= "HAProxy, downloading 'limits'\n";
+		update_output_window($static_output);
+
 		exec("fetch -q -o /usr/bin/limits http://files.pfsense.org/extras/{$freebsd_version}/limits");
 		exec("chmod a+rx /usr/bin/limits");
 	}
 	
+	$static_output .= "HAProxy, create '/usr/local/etc/rc.d/haproxy.sh'\n";
+	update_output_window($static_output);
 	$haproxy = <<<EOD
 #!/bin/sh
 
@@ -242,6 +253,8 @@ EOD;
 	fclose($fd);
 	exec("chmod a+rx /usr/local/etc/rc.d/haproxy.sh");
 
+	$static_output .= "HAProxy, create '/etc/devd/haproxy.conf'\n";
+	update_output_window($static_output);
 	$devd = <<<EOD
 notify 0 {
         match "system"          "IFNET";
@@ -261,8 +274,13 @@ EOD;
 	$fd = fopen("/etc/devd/haproxy.conf", "w");
 	fwrite($fd, $devd);
 	fclose($fd);
+	$static_output .= "HAProxy, running: /etc/rc.d/devd restart \n";
+	update_output_window($static_output);
 	exec("/etc/rc.d/devd restart");
 
+	$static_output .= "HAProxy, update configuration\n";
+	update_output_window($static_output);
+	
 	$writeconfigupdate = false;
 	/* Do XML upgrade from haproxy 0.31 to haproxy-dev */
 	if (is_array($config['installedpackages']['haproxy']['ha_servers'])) {
@@ -354,12 +372,22 @@ EOD;
 			}
 		}
 	}
-	if ($writeconfigupdate)
-		write_config("haproxy, update xml config version");
+	if ($writeconfigupdate) {
+		$static_output .= "HAProxy, write updated config\n";
+		update_output_window($static_output);
+		write_config("HAProxy, update xml config version");
+	}
 	
+	$static_output .= "HAProxy, conf_mount_ro\n";
+	update_output_window($static_output);
 	conf_mount_ro();
 	
+	$static_output .= "HAProxy, calling: haproxy.sh start\n";
+	update_output_window($static_output);
 	exec("/usr/local/etc/rc.d/haproxy.sh start");
+	
+	$static_output .= "HAProxy, running haproxy_custom_php_install_command() DONE\n";
+	update_output_window($static_output);
 }
 
 function haproxy_install_cron($should_install) {
