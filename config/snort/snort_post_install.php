@@ -1409,7 +1409,7 @@ if ($config['installedpackages']['snortglobal']['forcekeepsettings'] == 'on') {
 	update_output_window(gettext("Please wait... downloading and updating configured rule types..."));
 	if ($pkg_interface <> "console")
 		$snort_gui_include = true;
-	include "/usr/local/pkg/snort/snort_check_for_rule_updates.php";
+	include("/usr/local/pkg/snort/snort_check_for_rule_updates.php");
 	update_status(gettext("Generating snort.conf configuration file from saved settings..."));
 	$rebuild_rules = true;
 
