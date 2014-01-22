@@ -34,8 +34,7 @@ require("guiconfig.inc");
 require_once("haproxy.inc");
 require_once("haproxy_utils.inc");
 require_once("haproxy_htmllist.inc");
-
-$d_haproxyconfdirty_path = $g['varrun_path'] . "/haproxy.conf.dirty";
+require_once("pkg_haproxy_tabs.inc");
 
 if (!is_array($config['installedpackages']['haproxy']['ha_pools']['item'])) {
 	$config['installedpackages']['haproxy']['ha_pools']['item'] = array();
@@ -53,49 +52,58 @@ if (isset($_GET['dup']))
 
 global $simplefields;
 $simplefields = array(
-"name","cookie","balance","transparent_clientip","transparent_interface",
+"name","balance","transparent_clientip","transparent_interface",
 "check_type","checkinter","httpcheck_method","monitor_uri","monitor_httpversion","monitor_username","monitor_domain","monitor_agentport",
 "agent_check","agent_port","agent_inter",
 "connection_timeout","server_timeout","retries",
-"stats_enabled","stats_username","stats_password","stats_uri","stats_realm","stats_admin","stats_node_enabled","stats_node","stats_desc","stats_refresh");
+"stats_enabled","stats_username","stats_password","stats_uri","stats_scope","stats_realm","stats_admin","stats_node","stats_desc","stats_refresh",
+"persist_stick_expire","persist_stick_tablesize","persist_stick_length","persist_stick_cookiename","persist_sticky_type",
+"persist_cookie_enabled","persist_cookie_name","persist_cookie_mode","persist_cookie_cachable",
+"strict_transport_security"
+);
 
 $fields_servers=array();
-$fields_servers[0]['name']="name";
-$fields_servers[0]['columnheader']="Name";
-$fields_servers[0]['colwidth']="20%";
-$fields_servers[0]['type']="textbox";
-$fields_servers[0]['size']="30";
-$fields_servers[1]['name']="address";
-$fields_servers[1]['columnheader']="Address";
-$fields_servers[1]['colwidth']="10%";
+$fields_servers[0]['name']="status";
+$fields_servers[0]['columnheader']="Mode";
+$fields_servers[0]['colwidth']="5%";
+$fields_servers[0]['type']="select";
+$fields_servers[0]['size']="5";
+$fields_servers[0]['items']=&$a_servermodes;
+$fields_servers[1]['name']="name";
+$fields_servers[1]['columnheader']="Name";
+$fields_servers[1]['colwidth']="20%";
 $fields_servers[1]['type']="textbox";
-$fields_servers[1]['size']="20";
-$fields_servers[2]['name']="port";
-$fields_servers[2]['columnheader']="Port";
-$fields_servers[2]['colwidth']="5%";
+$fields_servers[1]['size']="30";
+$fields_servers[2]['name']="address";
+$fields_servers[2]['columnheader']="Address";
+$fields_servers[2]['colwidth']="10%";
 $fields_servers[2]['type']="textbox";
-$fields_servers[2]['size']="5";
-$fields_servers[3]['name']="ssl";
-$fields_servers[3]['columnheader']="SSL";
+$fields_servers[2]['size']="20";
+$fields_servers[3]['name']="port";
+$fields_servers[3]['columnheader']="Port";
 $fields_servers[3]['colwidth']="5%";
-$fields_servers[3]['type']="checkbox";
-$fields_servers[3]['size']="30";
-$fields_servers[4]['name']="weight";
-$fields_servers[4]['columnheader']="Weight";
-$fields_servers[4]['colwidth']="8%";
-$fields_servers[4]['type']="textbox";
-$fields_servers[4]['size']="5";
-$fields_servers[5]['name']="status";
-$fields_servers[5]['columnheader']="Mode";
-$fields_servers[5]['colwidth']="5%";
-$fields_servers[5]['type']="select";
+$fields_servers[3]['type']="textbox";
+$fields_servers[3]['size']="5";
+$fields_servers[4]['name']="ssl";
+$fields_servers[4]['columnheader']="SSL";
+$fields_servers[4]['colwidth']="5%";
+$fields_servers[4]['type']="checkbox";
+$fields_servers[4]['size']="30";
+$fields_servers[5]['name']="weight";
+$fields_servers[5]['columnheader']="Weight";
+$fields_servers[5]['colwidth']="8%";
+$fields_servers[5]['type']="textbox";
 $fields_servers[5]['size']="5";
-$fields_servers[5]['items']=&$a_servermodes;
-$fields_servers[6]['name']="advanced";
-$fields_servers[6]['columnheader']="Advanced";
-$fields_servers[6]['colwidth']="15%";
+$fields_servers[6]['name']="cookie";
+$fields_servers[6]['columnheader']="Cookie";
+$fields_servers[6]['colwidth']="10%";
 $fields_servers[6]['type']="textbox";
-$fields_servers[6]['size']="20";
+$fields_servers[6]['size']="10";
+$fields_servers[7]['name']="advanced";
+$fields_servers[7]['columnheader']="Advanced";
+$fields_servers[7]['colwidth']="15%";
+$fields_servers[7]['type']="textbox";
+$fields_servers[7]['size']="20";
 
 if (isset($id) && $a_pools[$id]) {
 	$pconfig['advanced'] = base64_decode($a_pools[$id]['advanced']);
@@ -123,8 +131,13 @@ if ($_POST) {
 	do_input_validation($_POST, $reqdfields, $reqdfieldsn, &$input_errors);
 
 	if ($_POST['stats_enabled']) {
-		$reqdfields = explode(" ", "name stats_username stats_password stats_uri stats_realm");
-		$reqdfieldsn = explode(",", "Name,Stats Username,Stats Password,Stats Uri,Stats Realm");		
+		$reqdfields = explode(" ", "name stats_uri");
+		$reqdfieldsn = explode(",", "Name,Stats Uri");		
+		do_input_validation($_POST, $reqdfields, $reqdfieldsn, &$input_errors);
+	}
+	if ($_POST['stats_username']) {
+		$reqdfields = explode(" ", "stats_password stats_realm");
+		$reqdfieldsn = explode(",", "Stats Password,Stats Realm");		
 		do_input_validation($_POST, $reqdfields, $reqdfieldsn, &$input_errors);
 	}
 	
@@ -151,6 +164,9 @@ if ($_POST) {
 	if (preg_match("/[^a-zA-Z0-9!-~ ]/", $_POST['stats_password']))
 		$input_errors[] = "The field 'Stats Password' contains invalid characters.";
 
+	if (preg_match("/[^a-zA-Z0-9\-_]/", $_POST['stats_node']))
+		$input_errors[] = "The field 'Stats Node' contains invalid characters. Should be a string with digits(0-9), letters(A-Z, a-z), hyphen(-) or underscode(_)";
+		
 	/* Ensure that our pool names are unique */
 	for ($i=0; isset($config['installedpackages']['haproxy']['ha_pools']['item'][$i]); $i++)
 		if (($_POST['name'] == $config['installedpackages']['haproxy']['ha_pools']['item'][$i]['name']) && ($i != $id))
@@ -162,23 +178,25 @@ if ($_POST) {
 		$server_address = $server['address'];
 		$server_port    = $server['port'];
 		$server_weight  = $server['weight'];
+
 		if (preg_match("/[^a-zA-Z0-9\.\-_]/", $server_name))
 			$input_errors[] = "The field 'Name' contains invalid characters.";
-		if (!is_ipaddr($server_address))
-			$input_errors[] = "The field 'Address' is not a valid ip address.";
+
+		if (!is_ipaddr($server_address) && !is_hostname($server_address))
+			$input_errors[] = "The field 'Address' is not a valid ip address or hostname.";
 
 		if (!preg_match("/.{2,}/", $server_name))
 			$input_errors[] = "The field 'Name' is required (and must be at least 2 characters).";
 
-		if (!preg_match("/.{2,}/", $server_address))
-			$input_errors[] = "The field 'Address' is required (and must be at least 2 characters).";
-
-		if (!is_numeric($server_weight))
+		if ($server_weight && !is_numeric($server_weight))
 			$input_errors[] = "The field 'Weight' value is not a number.";
 
 		if ($server_port && !is_numeric($server_port))
 			$input_errors[] = "The field 'Port' value is not a number.";
 	}
+	
+	if ($_POST['strict_transport_security'] !== "" && !is_numeric($_POST['strict_transport_security']))
+		$input_errors[] = "The field 'Strict-Transport-Security' is not empty or a number.";
 
 	if (!$input_errors) {
 		$pool = array();
@@ -259,6 +277,10 @@ foreach($simplefields as $field){
 	.haproxy_transparent_clientip{display:none;}
 	.haproxy_check_agent{display:none;}
 	.haproxy_agent_check{display:none;}
+	.haproxy_stick_cookiename{display:none;}
+	.haproxy_stick_tableused{display:none;}
+	.haproxy_cookie_visible{display:none;}
+	.haproxy_help_serverlist{display:none;}
   </style>
 </head>
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">
@@ -286,15 +308,35 @@ foreach($simplefields as $field){
 			}
 		}
 	}
+	function toggleCSSdisplay(cssID)
+	{
+		var ss = document.styleSheets;
+		for (var i=0; i<ss.length; i++) {
+			var rules = ss[i].cssRules || ss[i].rules;
+			for (var j=0; j<rules.length; j++) {
+				if (rules[j].selectorText === cssID) {
+					rules[j].style.display = rules[j].style.display == "none" ? "" : "none";
+				}
+			}
+		}
+	}
 	
 	function updatevisibility()
 	{
 		d = document;
 		setCSSdisplay(".haproxy_stats_visible", stats_enabled.checked);
+		setCSSdisplay(".haproxy_cookie_visible", persist_cookie_enabled.checked);
 		
 		check_type = d.getElementById("check_type").value;
 		check_type_description = d.getElementById("check_type_description");
 		check_type_description.innerHTML=checktypes[check_type]["descr"]; 
+		
+		persist_cookie_mode = d.getElementById("persist_cookie_mode").value;
+		persist_cookie_mode_description = d.getElementById("persist_cookie_mode_description");
+		persist_cookie_mode_description.innerHTML=cookiemode[persist_cookie_mode]["descr"]; 
+		persist_cookie_mode_description.setAttribute('style','padding:5px; border:1px dashed #990000; background-color: #ffffff; color: #000000; font-size: 8pt; height:30px');
+		persist_cookie_mode_description.setAttribute('style','padding:5px; border:1px dashed #990000; background-color: #ffffff; color: #000000; font-size: 8pt; height:'+persist_cookie_mode_description.scrollHeight+'px');
+		
 		setCSSdisplay(".haproxy_check_enabled", check_type != 'none');
 		setCSSdisplay(".haproxy_check_http", check_type == 'HTTP');
 		setCSSdisplay(".haproxy_check_username", check_type == 'MySQL' ||  check_type == 'PostgreSQL');
@@ -305,6 +347,16 @@ foreach($simplefields as $field){
 
 		transparent_clientip = d.getElementById("transparent_clientip");
 		setCSSdisplay(".haproxy_transparent_clientip", transparent_clientip.checked);
+		
+		
+		persist_sticky_type = d.getElementById("persist_sticky_type").value;
+		setCSSdisplay(".haproxy_stick_tableused", persist_sticky_type != 'none');
+		setCSSdisplay(".haproxy_stick_cookiename", persist_sticky_type == 'stick_rdp_cookie' ||  persist_sticky_type == 'stick_cookie_value');
+		
+		cookie_example = sticky_type[persist_sticky_type]['cookiedescr'];
+		stick_cookiename_description = d.getElementById("stick_cookiename_description");
+		stick_cookiename_description.innerHTML = cookie_example;
+		sticky_type_description.innerHTML = sticky_type[persist_sticky_type]['descr'];
 		
 		monitor_username = d.getElementById("monitor_username");
 		sqlcheckusername = d.getElementById("sqlcheckusername");
@@ -325,12 +377,7 @@ foreach($simplefields as $field){
 	<table width="100%" border="0" cellpadding="0" cellspacing="0">
 	  <tr><td class="tabnavtbl">
 	  <?php
-		/* active tabs */
-		$tab_array = array();
-		$tab_array[] = array("Settings", false, "haproxy_global.php");
-		$tab_array[] = array("Frontend", false, "haproxy_listeners.php");
-		$tab_array[] = array("Backend", true, "haproxy_pools.php");
-		display_top_tabs($tab_array);
+		haproxy_display_top_tabs_active($haproxy_tab_array['haproxy'], "backend");
 	  ?>
 	  </td></tr>
   <tr>
@@ -347,25 +394,37 @@ foreach($simplefields as $field){
 			</td>
 		</tr>
 		<tr align="left">
-			<td width="22%" valign="top" class="vncell">Cookie</td>
-			<td width="78%" class="vtable" colspan="2">
-				<input name="cookie" type="text" <?if(isset($pconfig['cookie'])) echo "value=\"{$pconfig['cookie']}\"";?>size="64" /><br/>
-				  This value will be checked in incoming requests, and the first
-				  operational pool possessing the same value will be selected. In return, in
-				  cookie insertion or rewrite modes, this value will be assigned to the cookie
-				  sent to the client. There is nothing wrong in having several servers sharing
-				  the same cookie value, and it is in fact somewhat common between normal and
-				  backup servers. See also the "cookie" keyword in backend section.
-				
-			</td>
-		</tr>
-		<tr align="left">
 			<td class="vncell" colspan="3"><strong>Server list</strong>
+			<span style="float:right;">
+			Toggle serverlist help. <a onclick="toggleCSSdisplay('.haproxy_help_serverlist');" title="<?php echo gettext("Help"); ?>"><img style="vertical-align:middle" src="/themes/<?php echo $g['theme']; ?>/images/icons/icon_help.gif" border="0" alt="help" /></a>
+			</span>
 			<?
 			$counter=0;
 			$a_servers = $pconfig['a_servers'];
 			haproxy_htmllist("tableA_servers", $a_servers, $fields_servers);
 			?>
+			<table class="haproxy_help_serverlist" style="border:1px dashed green" cellspacing="0">
+			<tr><td class="vncell">
+			Mode: </td><td class="vncell">Active: server will be used normally<br/>
+			Backup: server is only used in load balancing when all other non-backup servers are unavailable<br/>
+			Disabled: server is marked down in maintenance mode<br/>
+			Inactive: server will not be available for use
+			</td></tr><tr><td class="vncell">
+			Name: </td><td class="vncell">Used to as a name for the server in for example the stats<br/>EXAMPLE: MyWebServer
+			</td></tr><tr><td class="vncell">
+			Address: </td><td class="vncell">IP or hostname(only resolved on start-up.)<br/>EXAMPLE: 192.168.1.22 , fe80::1000:2000:3000:4000%em0 , WebServer1.localdomain
+			</td></tr><tr><td class="vncell">
+			Port: </td><td class="vncell">The port of the backend.<br/>EXAMPLE: 80 or 443<br/>
+			</td></tr><tr><td class="vncell">
+			SSL: </td><td class="vncell">Is the backend using SSL (commonly with port 443)<br/>
+			</td></tr><tr><td class="vncell">
+			Weight: </td><td class="vncell">A weight between 0 and 256, this setting can be used when multiple servers on different hardware need to be balanced with with a different part the traffic. A server with weight 0 wont get new traffic. Default if empty: 1
+			</td></tr><tr><td class="vncell">
+			Cookie: </td><td class="vncell">the value of the cookie used to identify a server (only when cookie-persistence is enabled below)
+			</td></tr><tr><td class="vncell">
+			Advanced: </td><td class="vncell">More advanced settings like rise,fall,error-limit,send-proxy and others can be configured here.<br/>For a full list of options see the <a target="_blank" href="http://cbonte.github.io/haproxy-dconv/configuration-1.5.html#5.2">HAProxy manual: Server and default-server options</a>
+			</td></tr>
+			</table>
 			</td>
 		</tr>
 		<tr align="left">
@@ -437,6 +496,7 @@ foreach($simplefields as $field){
 		<tr align="left">
 			<td width="22%" valign="top" class="vncell">Transparent ClientIP</td>
 			<td width="78%" class="vtable" colspan="2">
+				WARNING Activating this option will load rules in IPFW and might interfere with CaptivePortal and possibly other services due to the way server return traffic must be 'captured' with a automatically created fwd rule. This also breaks directly accessing the (web)server on the ports configured above. Also a automatic sloppy pf rule is made to allow HAProxy to server traffic.<br/>
 				<input id="transparent_clientip" name="transparent_clientip" type="checkbox" value="yes" <?php if ($pconfig['transparent_clientip']=='yes') echo "checked"; ?> onclick='updatevisibility();' />
 				Use Client-IP to connect to backend servers.
 				<div class="haproxy_transparent_clientip">
@@ -457,7 +517,7 @@ foreach($simplefields as $field){
 				For proper workings this requires the reply's traffic to pass through pfSense by means of correct routing.
 				(uses the option "source 0.0.0.0 usesrc clientip")
 				<br/><br/>
-				Note : When this is enabled for a single backend HAProxy will run as 'root', which reduces security.
+				Note : When this is enabled for a single backend HAProxy will run as 'root' instead of chrooting to a lower privileged user, this reduces security in case of a a bit.
 			</td>
 		</tr>
 		<tr align="left">
@@ -472,7 +532,8 @@ foreach($simplefields as $field){
 		<tr align="left">
 			<td width="22%" valign="top" class="vncell">Backend pass thru</td>
 			<td width="78%" class="vtable" colspan="2">
-				<textarea  rows="4" cols="70" name='advanced_backend' id='advanced_backend'><?php echo $pconfig['advanced_backend']; ?></textarea>
+				<? $textrowcount = max(substr_count($pconfig['advanced_backend'],"\n"), 2) + 2; ?>
+				<textarea  rows="<?=$textrowcount;?>" cols="70" name='advanced_backend' id='advanced_backend'><?php echo $pconfig['advanced_backend']; ?></textarea>
 				<br/>
 				NOTE: paste text into this box that you would like to pass thru. Applied to the backend section.
 			</td>
@@ -608,7 +669,99 @@ set by the 'retries' parameter.</div>
 		</tr>
 		<tr><td>&nbsp;</td></tr>
 		<tr>
-			<td colspan="2" valign="top" class="listtopic">Statistics</td>
+			<td colspan="2" valign="top" class="listtopic">Cookie persistence</td>
+		</tr>
+		<tr align="left">
+			<td width="22%" valign="top" class="vncell">Cookie Enabled</td>
+			<td width="78%" class="vtable" colspan="2">
+				<input id="persist_cookie_enabled" name="persist_cookie_enabled" type="checkbox" value="yes" <?php if ($pconfig['persist_cookie_enabled']=='yes') echo "checked"; ?> onclick='updatevisibility();' />
+				Enables cookie based persistence. (only used on 'http' frontends)
+			</td>
+		</tr>
+		<tr class="haproxy_cookie_visible" align="left">
+			<td width="22%" valign="top" class="vncellreq">Server Cookies</td>
+			<td width="78%" class="vtable" colspan="2">
+				<b>Make sure to configure a different cookie on every server in this backend.<b/>
+			</td>
+		</tr>
+		<tr class="haproxy_cookie_visible" align="left">
+			<td width="22%" valign="top" class="vncellreq">Cookie Name</td>
+			<td width="78%" class="vtable" colspan="2">
+				<input id="persist_cookie_name" name="persist_cookie_name" type="text" <?if(isset($pconfig['persist_cookie_name'])) echo "value=\"{$pconfig['persist_cookie_name']}\"";?> size="64" /><br/>
+				The string name to track in Set-Cookie and Cookie HTTP headers.<br/>
+				EXAMPLE: MyLoadBalanceCookie JSESSIONID PHPSESSIONID ASP.NET_SessionId
+			</td>
+		</tr>
+		<tr class="haproxy_cookie_visible" align="left">
+			<td width="22%" valign="top" class="vncellreq">Cookie Mode</td>
+			<td width="78%" class="vtable" colspan="2">
+				<?
+				echo_html_select("persist_cookie_mode",$a_cookiemode,$pconfig['persist_cookie_mode'],"","updatevisibility();");
+				?>
+				Determines how HAProxy inserts/prefixes/replaces or examines cookie and set-cookie headers.<br/>
+				EXAMPLE: with an existing PHPSESSIONID you can for example use "Session-prefix" or to create a new cookie use "Insert-silent".<br/>
+				<br/>
+				<textarea readonly="yes" cols="60" rows="2" id="persist_cookie_mode_description" name="persist_cookie_mode_description" style="padding:5px; border:1px dashed #990000; background-color: #ffffff; color: #000000; font-size: 8pt;"></textarea>
+			</td>
+		</tr>
+		<tr class="haproxy_cookie_visible"  align="left">
+			<td width="22%" valign="top" class="vncell">Cookie Cachable</td>
+			<td width="78%" class="vtable" colspan="2">
+				<input id="persist_cookie_cachable" name="persist_cookie_cachable" type="checkbox" value="yes" <?php if ($pconfig['persist_cookie_cachable']=='yes') echo "checked"; ?> onclick='updatevisibility();' />
+				Allows shared caches to cache the server response.
+			</td>
+		</tr>
+		<tr><td>&nbsp;</td></tr>
+		<tr>
+			<td colspan="2" valign="top" class="listtopic">Stick-table persistence</td>
+		</tr>
+		<tr><td class="vncell"></td><td class="vncell">These options are used to make sure seperate requests from a single client go to the same backend. This can be required for servers that keep track of for example a shopping cart.</td></tr>
+		<tr align="left">
+			<td width="22%" valign="top" class="vncell">Stick tables</td>
+			<td width="78%" class="vtable" colspan="2">
+				<?
+				echo_html_select("persist_sticky_type",$a_sticky_type,$pconfig['persist_sticky_type'],"","updatevisibility();");
+				?>
+				Sticktables that are kept in memory, and when matched make sure the same server will be used.<br/>
+				<textarea readonly="yes" cols="60" rows="2" id="sticky_type_description" name="sticky_type_description" style="padding:5px; border:1px dashed #990000; background-color: #ffffff; color: #000000; font-size: 8pt;"></textarea>
+			</td>
+		</tr>
+		<tr align="left" class="haproxy_stick_cookiename">
+			<td width="22%" valign="top" class="vncellreq">Stick cookie name</td>
+			<td width="78%" class="vtable" colspan="2">
+				<input name="persist_stick_cookiename" type="text" <?if(isset($pconfig['persist_stick_cookiename'])) echo "value=\"{$pconfig['persist_stick_cookiename']}\"";?> size="20" />
+				Cookiename to use for sticktable<br/>
+				<span id="stick_cookiename_description"></span>
+			</td>
+		</tr>
+		<tr align="left" class="haproxy_stick_cookiename">
+			<td width="22%" valign="top" class="vncellreq">Stick cookie length</td>
+			<td width="78%" class="vtable" colspan="2">
+				<input name="persist_stick_length" type="text" <?if(isset($pconfig['persist_stick_length'])) echo "value=\"{$pconfig['persist_stick_length']}\"";?> size="20" />
+				The maximum number of characters that will be stored in a "string" type stick-table<br/>
+				<span id="stick_cookiename_description"></span>
+			</td>
+		</tr>
+		<tr align="left" class="haproxy_stick_tableused">
+			<td width="22%" valign="top" class="vncellreq">stick-table expire</td>
+			<td width="78%" class="vtable" colspan="2">
+				<input name="persist_stick_expire" type="text" <?if(isset($pconfig['persist_stick_expire'])) echo "value=\"{$pconfig['persist_stick_expire']}\"";?> size="20" /> d=days h=hour m=minute s=seconds ms=miliseconds(default)<br/>
+				Defines the maximum duration of an entry in the stick-table since it was last created, refreshed or matched.<br/>
+				EXAMPLE: 30m 
+			</td>
+		</tr>
+		<tr align="left" class="haproxy_stick_tableused">
+			<td width="22%" valign="top" class="vncellreq">stick-table size</td>
+			<td width="78%" class="vtable" colspan="2">
+				<input name="persist_stick_tablesize" type="text" <?if(isset($pconfig['persist_stick_tablesize'])) echo "value=\"{$pconfig['persist_stick_tablesize']}\"";?> size="20" /> maximum number of entries supports suffixes "k", "m", "g" for 2^10, 2^20 and 2^30 factors.<br/>
+				Is the maximum number of entries that can fit in the table. This value directly impacts memory usage. Count approximately
+				50 bytes per entry, plus the size of a string if any.<br/>
+				EXAMPLE: 50k
+			</td>
+		</tr>
+		<tr><td>&nbsp;</td></tr>
+		<tr>
+			<td colspan="2" valign="top" class="listtopic">Show Statistics</td>
 		</tr>
 		<tr align="left">
 			<td width="22%" valign="top" class="vncell">Stats Enabled</td>
@@ -616,63 +769,67 @@ set by the 'retries' parameter.</div>
 				<input id="stats_enabled" name="stats_enabled" type="checkbox" value="yes" <?php if ($pconfig['stats_enabled']=='yes') echo "checked"; ?> onclick='updatevisibility();' />
 			</td>
 		</tr>
-		<tr class="haproxy_stats_visible" align="left" id='stats_realm_row'>
-			<td width="22%" valign="top" class="vncellreq">Stats Realm</td>
-			<td width="78%" class="vtable" colspan="2">
-				<input id="stats_realm" name="stats_realm" type="text" <?if(isset($pconfig['stats_realm'])) echo "value=\"{$pconfig['stats_realm']}\"";?> size="64" /><br/>
-				EXAMPLE: haproxystats
-			</td>
-		</tr>
 		<tr class="haproxy_stats_visible" align="left" id='stats_uri_row'>
 			<td width="22%" valign="top" class="vncellreq">Stats Uri</td>
 			<td width="78%" class="vtable" colspan="2">
 				<input id="stats_uri" name="stats_uri" type="text" <?if(isset($pconfig['stats_uri'])) echo "value=\"{$pconfig['stats_uri']}\"";?> size="64" /><br/>
-				EXAMPLE: /haproxy?stats
+				This url can be used when this same backend is used for passing connections to backends<br/>
+				EXAMPLE: / or /haproxy?stats
+			</td>
+		</tr>
+		<tr class="haproxy_stats_visible" align="left" id='stats_scope_row'>
+			<td width="22%" valign="top" class="vncell">Stats Scope</td>
+			<td width="78%" class="vtable" colspan="2">
+				<input id="stats_scope" name="stats_scope" type="text" <?if(isset($pconfig['stats_scope'])) echo "value=\"{$pconfig['stats_scope']}\"";?> size="64" /><br/>
+				Determines which frontends and backends are shown, leave empty to show all.<br/>
+				EXAMPLE: frontendA,backend1,backend2
+			</td>
+		</tr>
+		<tr class="haproxy_stats_visible" align="left" id='stats_realm_row'>
+			<td width="22%" valign="top" class="vncell">Stats Realm</td>
+			<td width="78%" class="vtable" colspan="2">
+				<input id="stats_realm" name="stats_realm" type="text" <?if(isset($pconfig['stats_realm'])) echo "value=\"{$pconfig['stats_realm']}\"";?> size="64" /><br/>
+				The realm is shown when authentication is requested by haproxy.<br/>
+				EXAMPLE: haproxystats
 			</td>
 		</tr>
 		<tr class="haproxy_stats_visible" align="left" id='stats_username_row'>
-			<td width="22%" valign="top" class="vncellreq">Stats Username</td>
+			<td width="22%" valign="top" class="vncell">Stats Username</td>
 			<td width="78%" class="vtable" colspan="2">
 				<input id="stats_username" name="stats_username" type="text" <?if(isset($pconfig['stats_username'])) echo "value=\"".$pconfig['stats_username']."\"";?> size="64" />
+				EXAMPLE: admin
 			</td>
 		</tr>
-		
 		<tr class="haproxy_stats_visible" align="left" id='stats_password_row'>
-			<td width="22%" valign="top" class="vncellreq">Stats Password</td>
+			<td width="22%" valign="top" class="vncell">Stats Password</td>
 			<td width="78%" class="vtable" colspan="2">
 				<input id="stats_password" name="stats_password" type="password" <?
 					if(isset($pconfig['stats_password'])) 
 						echo "value=\"".$pconfig['stats_password']."\"";
 					?> size="64" />
-				<br/>
+				EXAMPLE: 1Your2Secret3P@ssword
 			</td>
 		</tr>
 		<tr class="haproxy_stats_visible" align="left" id='stats_node_admin_row'>
 			<td width="22%" valign="top" class="vncell">Stats Admin</td>
 			<td width="78%" class="vtable" colspan="2">
 				<input id="stats_admin" name="stats_admin" type="checkbox" value="yes" <?php if ($pconfig['stats_admin']=='yes') echo "checked"; ?> />
-				<br/>
-			</td>
-		</tr>
-		<tr class="haproxy_stats_visible" align="left" id='stats_node_enabled_row'>
-			<td width="22%" valign="top" class="vncell">Stats Enable Node Name</td>
-			<td width="78%" class="vtable" colspan="2">
-				<input id="stats_node_enabled" name="stats_node_enabled" type="checkbox" value="yes" <?php if ($pconfig['stats_node_enabled']=='yes') echo "checked"; ?> />
-				<br/>
+				Makes available the options disable/enable/softstop/softstart/killsessions from the stats page.<br/>
+				Note: This is not persisted when haproxy restarts. For publicly visible stats pages this should be disabled.
 			</td>
 		</tr>
 		<tr class="haproxy_stats_visible" align="left" id='stats_node_row'>
-			<td width="22%" valign="top" class="vncell">Stats Node</td>
+			<td width="22%" valign="top" class="vncell">Stats Nodename</td>
 			<td width="78%" class="vtable" colspan="2">
 				<input id="stats_node" name="stats_node" type="text" <?if(isset($pconfig['stats_node'])) echo "value=\"{$pconfig['stats_node']}\"";?> size="64" /><br/>
-				The node name is displayed in the stats and helps to differentiate which server in a cluster is actually serving clients.<br/>
-				Leave blank to use the system name.
+				The short name is displayed in the stats and helps to differentiate which server in a cluster is actually serving clients.
 			</td>
 		</tr>
 		<tr class="haproxy_stats_visible" align="left" id='stats_desc_row'>
 			<td width="22%" valign="top" class="vncell">Stats Description</td>
 			<td width="78%" class="vtable" colspan="2">
-				<input id="stats_desc" name="stats_desc" type="text" <?if(isset($pconfig['stats_node'])) echo "value=\"{$pconfig['stats_desc']}\"";?> size="64" /><br/>
+				<input id="stats_desc" name="stats_desc" type="text" <?if(isset($pconfig['stats_desc'])) echo "value=\"{$pconfig['stats_desc']}\"";?> size="64" /><br/><br/>
+				The description is displayed behind the Nodename set above.
 			</td>
 		</tr>
 		<tr class="haproxy_stats_visible" align="left" id='stats_refresh_row'>
@@ -680,6 +837,21 @@ set by the 'retries' parameter.</div>
 			<td width="78%" class="vtable" colspan="2">
 				<input id="stats_refresh" name="stats_refresh" type="text" <?if(isset($pconfig['stats_refresh'])) echo "value=\"{$pconfig['stats_refresh']}\"";?> size="10" maxlength="30" /><br/>
 				Specify the refresh rate of the stats page in seconds, or specified time unit (us, ms, s, m, h, d).
+			</td>
+		</tr>
+		<tr><td>&nbsp;</td></tr>
+		<tr>
+			<td colspan="2" valign="top" class="listtopic">Advanced</td>
+		</tr>
+		<tr class="" align="left" id='Strict-Transport-Security'>
+			<td width="22%" valign="top" class="vncell">Strict-Transport-Security</td>
+			<td width="78%" class="vtable" colspan="2">
+				When configured enables "HTTP Strict Transport Security" leave empty to disable.<br/>
+				<b>WARNING! the domain will only work over https with a valid certificate!</b><br/>
+				<input id="strict_transport_security" name="strict_transport_security" type="text" <?if(isset($pconfig['strict_transport_security'])) echo "value=\"{$pconfig['strict_transport_security']}\"";?> size="20" /> Seconds<br/>
+				If configured clients that requested the page with this setting active will not be able to visit this domain over a unencrypted http connection.
+				So make sure you understand the consequence of this setting or start with a really low value.<br/>
+				EXAMPLE: 60 for testing if you are absolutely sure you want this 31536000 (12 months) would be good for production.
 			</td>
 		</tr>
 		<tr><td>&nbsp;</td></tr>
@@ -702,6 +874,8 @@ set by the 'retries' parameter.</div>
 <?
 	phparray_to_javascriptarray($fields_servers,"fields_servers",Array('/*','/*/name','/*/type','/*/size','/*/items','/*/items/*','/*/items/*/*','/*/items/*/*/name'));
 	phparray_to_javascriptarray($a_checktypes,"checktypes",Array('/*','/*/name','/*/descr'));
+	phparray_to_javascriptarray($a_cookiemode,"cookiemode",Array('/*','/*/name','/*/descr'));
+	phparray_to_javascriptarray($a_sticky_type,"sticky_type",Array('/*','/*/descr','/*/cookiedescr'));
 ?>
 	browser_InnerText_support = (document.getElementsByTagName("body")[0].innerText != undefined) ? true : false;
 

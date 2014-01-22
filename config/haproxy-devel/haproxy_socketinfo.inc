@@ -57,15 +57,36 @@ function haproxy_set_server_enabled($backend, $server, $enable) {//"enable be/se
 	return haproxy_socket_command("$enablecommand server $backend/$server");
 }
 
+function haproxy_get_tables(){// "show table"
+	$result = array();
+	$cmdresult = haproxy_socket_command("show table");
+	foreach($cmdresult as $line) {
+		if (trim($line) == "")
+			continue;
+		list($table,$type,$size,$used) = explode(",", $line);
+		$table = explode(":", $table);
+		$type = explode(":", $type);
+		$size = explode(":", $size);
+		$used = explode(":", $used);
+		$newtable = array();
+		$tablename = trim($table[1]);
+		$newtable['type'] = trim($type[1]);
+		$newtable['size'] = $size[1];
+		$newtable['used'] = $used[1];
+		$result[$tablename] = $newtable;
+	}
+	return $result;
+}
+
 function haproxy_get_statistics(){// "show stat"
 	$result = array();
 	$frontends=array();
 	$backends=array();
 	$servers=array();
 
-	$result = haproxy_socket_command("show stat");
+	$cmdresult = haproxy_socket_command("show stat");
 	
-	foreach($result as $line) {
+	foreach($cmdresult as $line) {
 		list($pxname,$svname,$qcur,$qmax,$scur,$smax,$slim,$stot,$bin,$bout,$dreq,$dresp,$ereq,$econ,$eresp,$wretr,$wredis,$status,$weight,$act,$bck,$chkfail,$chkdown,$lastchg,$downtime,$qlimit,$pid,$iid,$sid,$throttle,$lbtot,$tracked,$type,$rate,$rate_lim,$rate_max,$check_status,$check_code,$check_duration,$hrsp_1xx,$hrsp_2xx,$hrsp_3xx,$hrsp_4xx,$hrsp_5xx,$hrsp_other,$hanafail,$req_rate,$req_rate_max,$req_tot,$cli_abrt,$srv_abrt,$comp_in,$comp_out,$comp_byp,$comp_rsp) = explode(",", $line);
 		#Retrieve data
 		switch ($svname) {
