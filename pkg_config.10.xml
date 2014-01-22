@@ -183,7 +183,7 @@
 				Supports acl's for smart backend switching.]]></descr>
 		<website>http://haproxy.1wt.eu/</website>
 		<category>Services</category>
-		<version>1.5-dev21 pkg v 0.6.1</version>
+		<version>1.5-dev21 pkg v 0.7</version>
 		<status>Release</status>
 		<required_version>2.2</required_version>
 		<config_file>http://www.pfsense.com/packages/config/haproxy-devel/haproxy.xml</config_file>
