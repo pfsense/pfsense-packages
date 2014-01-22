@@ -496,6 +496,7 @@ foreach($simplefields as $field){
 		<tr align="left">
 			<td width="22%" valign="top" class="vncell">Transparent ClientIP</td>
 			<td width="78%" class="vtable" colspan="2">
+				WARNING Activating this option will load rules in IPFW and might interfere with CaptivePortal and possibly other services due to the way server return traffic must be 'captured' with a automatically created fwd rule. This also breaks directly accessing the (web)server on the ports configured above. Also a automatic sloppy pf rule is made to allow HAProxy to server traffic.<br/>
 				<input id="transparent_clientip" name="transparent_clientip" type="checkbox" value="yes" <?php if ($pconfig['transparent_clientip']=='yes') echo "checked"; ?> onclick='updatevisibility();' />
 				Use Client-IP to connect to backend servers.
 				<div class="haproxy_transparent_clientip">
