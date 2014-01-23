@@ -10,7 +10,7 @@
 	<version>1.0</version>
 	<title>Vnstat2</title>
 	<aftersaveredirect>/diag_vnstat2.php</aftersaveredirect>
-	<include_file>/usr/local/pkg/vnstat2.inc</include_file>
+	<include_file>/usr/local/pkg/vnstat2/vnstat2.inc</include_file>
 	<menu>
 		<name>vnstat2</name>
 		<tooltiptext></tooltiptext>
