@@ -11,7 +11,7 @@ function vnstat_install_deinstall() {
 	exec("rm /usr/local/www/vnstati.php");
 	exec("rm /usr/local/www/vnstat2_img.php");
 	exec("rm -d -R /usr/local/pkg/vnstat2");
-	exec("rm /usr/local/etc/vnstat2.conf");
+	exec("rm /usr/local/etc/vnstat.conf");
 
 // Remove vnstat cron entry from config.xml
 	vnstat2_install_cron(false);
