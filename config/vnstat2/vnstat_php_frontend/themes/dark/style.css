@@ -1,0 +1,21 @@
+* {margin:0; padding:0;}
+body {background:#2f2f2f; font-family:Verdana; font-size:12px;}
+#wrap {width: 960px; background:#242424; padding:10px; margin:0 auto; border:1px solid #474747;}
+#sidebar {width: 160px; float: left; padding: 3px 4px; color: #fff; background-color: #2F2F2F; border:1px solid #474747; -moz-border-radius:8px;}
+#sidebar ul.iface {}
+#sidebar li.iface {list-style-type:none; color:#08BB08; text-transform:uppercase; padding-bottom:10px; text-align:center;}
+#sidebar a{color:#aaa;}
+#sidebar ul.page {}
+#sidebar li.page {list-style-type:none; text-transform:none;}
+#content {margin-left: 180px; width: 780px;}
+#header {padding: 3px; color: #fff; background-color: #2F2F2F; text-align: center; border:1px solid #474747; font-size:14px; font-weight:bold; -moz-border-radius:8px;}
+#footer {padding: 3px; color: #fff; background-color: #2F2F2F; text-align: center; border:1px solid #474747; font-size:11px; -moz-border-radius:8px; clear:both; margin-top:10px;}
+#footer a {color:#fff;}
+#main {padding: 10px 10px 10px 10px; color: #fff; background-color: #2F2F2F; text-align: center; border:1px solid #474747; -moz-border-radius:8px; margin-top:10px;}
+#main td {padding:1px 0;}
+#main td.numeric_odd {text-align: right; color: #fff; background:#474747;}
+#main td.numeric_even {text-align: right; color: #fff; background:#242424;}
+#main td.label_odd {color: #fff; background:#474747;}
+#main td.label_even {color: #fff; background:#242424;}
+#main th.label {color: #fff; padding:2px 0; border-bottom:1px solid #fff;}
+#main caption {padding: 3px 0 4px 0; color:#08BB08; text-transform:uppercase;}
