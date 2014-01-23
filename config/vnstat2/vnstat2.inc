@@ -2,7 +2,7 @@
 function vnstat_install_deinstall() {
 	conf_mount_rw();
 	global $config;
-// Remove Vnstat package and files
+// Remove Vnstat package and files 
     exec("cd /var/db/pkg/ && pkg_delete `ls | grep vnstat`");
 	exec("rm -d -R /usr/local/www/vnstat2");
 	exec("rm -d -R /usr/local/www/vnstati");
