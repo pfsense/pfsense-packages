@@ -421,7 +421,7 @@ if (file_exists("/var/log/snort/snort_{$if_real}{$snort_uuid}/alert")) {
 			/* Add icon for auto-removing from Blocked Table if required */
 			if (isset($tmpblocked[$fields[6]])) {
 				$alert_ip_src .= "&nbsp;";
-				$alert_ip_src .= "<a href='?instance={$id}&todelete=" . trim(urlencode($fields[6])) . "'>
+				$alert_ip_src .= "<a href='?instance={$instanceid}&todelete=" . trim(urlencode($fields[6])) . "'>
 				<img title=\"" . gettext("Remove host from Blocked Table") . "\" border=\"0\" width='12' height='12' name='todelete' id='todelete' alt=\"Remove from Blocked Hosts\" src=\"../themes/{$g['theme']}/images/icons/icon_x.gif\"></a>"; 
 			}
 			/* IP SRC Port */
@@ -448,7 +448,7 @@ if (file_exists("/var/log/snort/snort_{$if_real}{$snort_uuid}/alert")) {
 			/* Add icon for auto-removing from Blocked Table if required */
 			if (isset($tmpblocked[$fields[8]])) {
 				$alert_ip_dst .= "&nbsp;";
-				$alert_ip_dst .= "<a href='?instance={$id}&todelete=" . trim(urlencode($fields[8])) . "'>
+				$alert_ip_dst .= "<a href='?instance={$instanceid}&todelete=" . trim(urlencode($fields[8])) . "'>
 				<img title=\"" . gettext("Remove host from Blocked Table") . "\" border=\"0\" width='12' height='12' name='todelete' id='todelete' alt=\"Remove from Blocked Hosts\" src=\"../themes/{$g['theme']}/images/icons/icon_x.gif\"></a>";
 			}
 			/* IP DST Port */
