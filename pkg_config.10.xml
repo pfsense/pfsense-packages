@@ -183,7 +183,7 @@
 				Supports acl's for smart backend switching.]]></descr>
 		<website>http://haproxy.1wt.eu/</website>
 		<category>Services</category>
-		<version>1.5-dev19 pkg v 0.6</version>
+		<version>1.5-dev21 pkg v 0.6.1</version>
 		<status>Release</status>
 		<required_version>2.2</required_version>
 		<config_file>http://www.pfsense.com/packages/config/haproxy-devel/haproxy.xml</config_file>
@@ -209,7 +209,7 @@
 		<status>ALPHA</status>
 		<required_version>2.2</required_version>
 		<config_file>http://www.pfsense.com/packages/config/apache_mod_security-dev/apache_virtualhost.xml</config_file>
-		<depends_on_package_pbi>proxy_mod_security-2.2.23_3-##ARCH##.pbi git-1.8.1.3-##ARCH##.pbi</depends_on_package_pbi>
+		<depends_on_package_pbi>proxy_mod_security-2.2.23_3-##ARCH##.pbi git-1.8.5.2-##ARCH##.pbi</depends_on_package_pbi>
 		<configurationfile>apache_virtualhost.xml</configurationfile>
 		<build_pbi>
 			<custom_name>proxy_mod_security</custom_name>
@@ -1492,7 +1492,7 @@
 		<pkginfolink>http://forum.pfsense.org/</pkginfolink>
 		<descr><![CDATA[GIT Source Code Management (console/shell only)]]></descr>
 		<category>Services</category>
-		<version>1.8.1.3</version>
+		<version>1.8.5.2</version>
 		<status>Beta</status>
 		<required_version>2.2</required_version>
 		<config_file>http://www.pfsense.com/packages/config/git/git.xml</config_file>
@@ -1502,7 +1502,7 @@
 		<build_pbi>
 			<port>devel/git</port>
 		</build_pbi>
-		<depends_on_package_pbi>git-1.8.1.3-##ARCH##.pbi</depends_on_package_pbi>
+		<depends_on_package_pbi>git-1.8.5.2-##ARCH##.pbi</depends_on_package_pbi>
 	</package>
 	<package>
 		<name>tinc</name>

@@ -299,15 +299,17 @@ $interfaces = haproxy_get_bindable_interfaces();
 		secondary = d.getElementById("secondary");
 		primary_frontend = d.getElementById("primary_frontend");
 		
-		if (secondary.checked)
+		if ((secondary !== null) && (secondary.checked))
 			type = primaryfrontends[primary_frontend.value]['ref']['type'];
 		else
 			type = d.getElementById("type").value;
 			
 		setCSSdisplay(".haproxy_ssloffloading_enabled", ssloffload.checked);
 		setCSSdisplay(".haproxy_mode_http", type == "http");
-		setCSSdisplay(".haproxy_primary", !secondary.checked);
-		setCSSdisplay(".haproxy_secondary", secondary.checked);
+		if (secondary !== null) {
+			setCSSdisplay(".haproxy_primary", !secondary.checked);
+			setCSSdisplay(".haproxy_secondary", secondary.checked);
+		}
 		
 		type_change(type);
 		
