@@ -60,6 +60,11 @@
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0755</chmod>
 	</additional_files_needed>
+	<additional_files_needed>
+		<item>http://www.pfsense.org/packages/config/apcupsd/apcupsd_mail.php</item>
+		<prefix>/usr/local/pkg/</prefix>
+		<chmod>0755</chmod>
+	</additional_files_needed>
 	<menu>
 		<name>Apcupsd</name>
 		<tooltiptext>Setup Apcupsd specific settings</tooltiptext>
@@ -322,7 +327,7 @@ UPSTYPE   DEVICE           Description <br>
 			</options>
 		</field>
 	</fields>
-	<custom_php_install_command>sync_package_apcupsd();</custom_php_install_command>
+	<custom_php_install_command>php_install_apcupsd();</custom_php_install_command>
 	<custom_php_command_before_form></custom_php_command_before_form>
 	<custom_php_after_head_command></custom_php_after_head_command>
 	<custom_php_after_form_command></custom_php_after_form_command>
