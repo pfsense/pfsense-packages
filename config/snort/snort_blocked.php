@@ -127,6 +127,7 @@ include_once("head.inc");
 ?>
 
 <body link="#000000" vlink="#000000" alink="#000000">
+<script src="/javascript/filter_log.js" type="text/javascript"></script>
 
 <?php
 
@@ -264,7 +265,11 @@ if ($pconfig['brefresh'] == 'on')
 				/* use one echo to do the magic*/
 					echo "<tr>
 						<td align=\"center\" valign=\"middle\" class=\"listr\">{$counter}</td>
-						<td valign=\"middle\" class=\"listr\">{$tmp_ip}&nbsp;<a href='/diag_dns.php?host={$blocked_ip}'>
+						<td align=\"center\" valign=\"middle\" class=\"listr\">{$tmp_ip}<br/>
+						<a onclick=\"javascript:getURL('/diag_dns.php?host={$blocked_ip}&dialog_output=true', outputrule);\"> 
+						<img src='../themes/{$g['theme']}/images/icons/icon_log_d.gif' width='11' height='11' border='0' 
+						title='" . gettext("Resolve host via reverse DNS lookup") . "' style=\"cursor: pointer;\"></a>
+						<a href='/diag_dns.php?host={$blocked_ip}'>
 						<img src='../themes/{$g['theme']}/images/icons/icon_log.gif' width='11' height='11' border='0' 
 						title='" . gettext("Resolve host via reverse DNS lookup") . "'></a></td>
 						<td valign=\"middle\" class=\"listr\">{$blocked_desc}</td>
