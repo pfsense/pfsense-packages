@@ -264,16 +264,14 @@ include_once("head.inc");
 ?>
 
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">
-
+<script src="/javascript/filter_log.js" type="text/javascript"></script>
 <?php
 include_once("fbegin.inc");
 
 /* refresh every 60 secs */
 if ($pconfig['arefresh'] == 'on')
 	echo "<meta http-equiv=\"refresh\" content=\"60;url=/snort/snort_alerts.php?instance={$instanceid}\" />\n";
-?>
-
-<?php if($pfsense_stable == 'yes'){echo '<p class="pgtitle">' . $pgtitle . '</p>';}
+if($pfsense_stable == 'yes'){echo '<p class="pgtitle">' . $pgtitle . '</p>';}
 	/* Display Alert message */
 	if ($input_errors) {
 		print_input_errors($input_errors); // TODO: add checks
@@ -403,8 +401,11 @@ if (file_exists("/var/log/snort/snort_{$if_real}{$snort_uuid}/alert")) {
 			$alert_ip_src = $fields[6];
 			/* Add zero-width space as soft-break opportunity after each colon if we have an IPv6 address */
 			$alert_ip_src = str_replace(":", ":&#8203;", $alert_ip_src);
-			/* Add Reverse DNS lookup icon */
-			$alert_ip_src .= "<br/><a href='/diag_dns.php?host={$fields[6]}&instance={$instanceid}'>";
+			/* Add Reverse DNS lookup icons */
+			$alert_ip_src .= "<br/><a onclick=\"javascript:getURL('/diag_dns.php?host={$fields[6]}&dialog_output=true', outputrule);\">";
+			$alert_ip_src .= "<img src='../themes/{$g['theme']}/images/icons/icon_log_d.gif' width='11' height='11' border='0' ";
+			$alert_ip_src .= "title='" . gettext("Resolve host via reverse DNS lookup") . "' style=\"cursor: pointer;\"></a>";
+			$alert_ip_src .= "&nbsp;<a href='/diag_dns.php?host={$fields[6]}&instance={$instanceid}'>";
 			$alert_ip_src .= "<img src='../themes/{$g['theme']}/images/icons/icon_log.gif' width='11' height='11' border='0' ";
 			$alert_ip_src .= "title='" . gettext("Resolve host via reverse DNS lookup") . "'></a>";
 			/* Add icons for auto-adding to Suppress List if appropriate */
@@ -430,8 +431,11 @@ if (file_exists("/var/log/snort/snort_{$if_real}{$snort_uuid}/alert")) {
 			$alert_ip_dst = $fields[8];
 			/* Add zero-width space as soft-break opportunity after each colon if we have an IPv6 address */
 			$alert_ip_dst = str_replace(":", ":&#8203;", $alert_ip_dst);
-			/* Add Reverse DNS lookup icon */
-			$alert_ip_dst .= "<br/><a href='/diag_dns.php?host={$fields[8]}&instance={$instanceid}'>";
+			/* Add Reverse DNS lookup icons */
+			$alert_ip_dst .= "<br/><a onclick=\"javascript:getURL('/diag_dns.php?host={$fields[8]}&dialog_output=true', outputrule);\">";
+			$alert_ip_dst .= "<img src='../themes/{$g['theme']}/images/icons/icon_log_d.gif' width='11' height='11' border='0' ";
+			$alert_ip_dst .= "title='" . gettext("Resolve host via reverse DNS lookup") . "' style=\"cursor: pointer;\"></a>";
+			$alert_ip_dst .= "&nbsp;<a href='/diag_dns.php?host={$fields[8]}&instance={$instanceid}'>";
 			$alert_ip_dst .= "<img src='../themes/{$g['theme']}/images/icons/icon_log.gif' width='11' height='11' border='0' ";
 			$alert_ip_dst .= "title='" . gettext("Resolve host via reverse DNS lookup") . "'></a>";	
 			/* Add icons for auto-adding to Suppress List if appropriate */
