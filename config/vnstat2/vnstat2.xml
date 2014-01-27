@@ -12,7 +12,7 @@
 	<aftersaveredirect>/pkg_edit.php?xml=vnstat2.xml&amp;id=0</aftersaveredirect>
 	<include_file>/usr/local/pkg/vnstat2/vnstat2.inc</include_file>
 	<menu>
-		<name>vnstat2</name>
+		<name>Vnstat2</name>
 		<tooltiptext></tooltiptext>
 		<section>Status</section>
 		<url>/pkg_edit.php?xml=vnstat2.xml&amp;id=0</url>
