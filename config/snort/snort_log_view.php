@@ -42,7 +42,10 @@ $contents = '';
 // Read the contents of the argument passed to us.
 // Is it a fully qualified path and file?
 if (file_exists($_GET['logfile']))
-	$contents = file_get_contents($_GET['logfile']);
+	if (substr(realpath($_GET['logfile']), 0, strlen(SNORTLOGDIR)) != SNORTLOGDIR)
+		$contents = gettext("\n\nERROR -- File: {$_GET['logfile']} can not be viewed!");
+	else
+		$contents = file_get_contents($_GET['logfile']);
 // It is not something we can display, so print an error.
 else
 	$contents = gettext("\n\nERROR -- File: {$_GET['logfile']} not found!");
