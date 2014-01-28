@@ -115,8 +115,12 @@ elseif (file_exists("{$snortdir}/rules/{$file}"))
 elseif (file_exists("{$snortdir}/preproc_rules/{$file}"))
 	$contents = file_get_contents("{$snortdir}/preproc_rules/{$file}");
 // Is it a fully qualified path and file?
-elseif (file_exists($file))
-	$contents = file_get_contents($file);
+elseif (file_exists($file)) {
+	if (substr(realpath($file), 0, strlen(SNORTLOGDIR)) != SNORTLOGDIR)
+		$contents = gettext("\n\nERROR -- File: {$file} can not be viewed!");
+	else
+		$contents = file_get_contents($file);
+}
 // It is not something we can display, so exit.
 else
 	$input_errors[] = gettext("Unable to open file: {$displayfile}");
