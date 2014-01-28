@@ -7,6 +7,7 @@
  * Copyright (C) 2003-2004 Manuel Kasper <mk@neon1.net>.
  * Copyright (C) 2006 Scott Ullrich
  * Copyright (C) 2012 Ermal Luci
+ * Copyright (C) 2013,2014 Bill Meeks
  * All rights reserved.
  *
  * Modified for the Pfsense snort package v. 1.8+
@@ -141,6 +142,11 @@ $a_instance = &$config['installedpackages']['snortglobal']['rule'];
 $snort_uuid = $a_instance[$instanceid]['uuid'];
 $if_real = snort_get_real_interface($a_instance[$instanceid]['interface']);
 
+// Load up the arrays of force-enabled and force-disabled SIDs
+$enablesid = snort_load_sid_mods($a_instance[$instanceid]['rule_sid_on']);
+$disablesid = snort_load_sid_mods($a_instance[$instanceid]['rule_sid_off']);
+
+$pconfig = array();
 if (is_array($config['installedpackages']['snortglobal']['alertsblocks'])) {
 	$pconfig['arefresh'] = $config['installedpackages']['snortglobal']['alertsblocks']['arefresh'];
 	$pconfig['alertnumber'] = $config['installedpackages']['snortglobal']['alertsblocks']['alertnumber'];
@@ -213,6 +219,64 @@ if (($_GET['act'] == "addsuppress_srcip" || $_GET['act'] == "addsuppress_dstip")
 	else
 		/* We did not find the defined list, so notify the user with an error */
 		$input_errors[] = gettext("Suppress List '{$a_instance[$instanceid]['suppresslistname']}' is defined for this interface, but it could not be found!");
+}
+
+if ($_GET['act'] == "togglesid" && is_numeric($_GET['sidid']) && is_numeric($_GET['gen_id'])) {
+	// Get the GID tag embedded in the clicked rule icon.
+	$gid = $_GET['gen_id'];
+
+	// Get the SID tag embedded in the clicked rule icon.
+	$sid= $_GET['sidid'];
+
+	// See if the target SID is in our list of modified SIDs,
+	// and toggle it if present.
+	if (isset($enablesid[$gid][$sid]))
+		unset($enablesid[$gid][$sid]);
+	if (isset($disablesid[$gid][$sid]))
+		unset($disablesid[$gid][$sid]);
+	elseif (!isset($disablesid[$gid][$sid]))
+		$disablesid[$gid][$sid] = "disablesid";
+
+	// Write the updated enablesid and disablesid values to the config file.
+	$tmp = "";
+	foreach (array_keys($enablesid) as $k1) {
+		foreach (array_keys($enablesid[$k1]) as $k2)
+			$tmp .= "{$k1}:{$k2}||";
+	}
+	$tmp = rtrim($tmp, "||");
+
+	if (!empty($tmp))
+		$a_instance[$instanceid]['rule_sid_on'] = $tmp;
+	else				
+		unset($a_instance[$instanceid]['rule_sid_on']);
+
+	$tmp = "";
+	foreach (array_keys($disablesid) as $k1) {
+		foreach (array_keys($disablesid[$k1]) as $k2)
+			$tmp .= "{$k1}:{$k2}||";
+	}
+	$tmp = rtrim($tmp, "||");
+
+	if (!empty($tmp))
+		$a_instance[$instanceid]['rule_sid_off'] = $tmp;
+	else				
+		unset($a_instance[$instanceid]['rule_sid_off']);
+
+	/* Update the config.xml file. */
+	write_config();
+
+	/*************************************************/
+	/* Update the snort.conf file and rebuild the    */
+	/* rules for this interface.                     */
+	/*************************************************/
+	$rebuild_rules = true;
+	snort_generate_conf($a_instance[$instanceid]);
+	$rebuild_rules = false;
+
+	/* Soft-restart Snort to live-load the new rules */
+	snort_reload_config($a_instance[$instanceid]);
+
+	$savemsg = gettext("The state for rule {$gid}:{$sid} has been modified.  Snort is 'live-reloading' the new rules list.  Please wait at least 30 secs for the process to complete before toggling additional rules.");
 }
 
 if ($_GET['action'] == "clear" || $_POST['delete']) {
@@ -468,6 +532,18 @@ if (file_exists("/var/log/snort/snort_{$if_real}{$snort_uuid}/alert")) {
 				$sidsupplink = "<img src='../themes/{$g['theme']}/images/icons/icon_plus_d.gif' width='12' height='12' border='0' ";
 				$sidsupplink .= "title='" . gettext("This alert is already in the Suppress List") . "'/>";	
 			}
+			/* Add icon for toggling rule state */
+			if (isset($disablesid[$fields[1]][$fields[2]])) {
+				$sid_dsbl_link = "<a href='?instance={$instanceid}&act=togglesid&sidid={$fields[2]}&gen_id={$fields[1]}'>";
+				$sid_dsbl_link .= "<img src='../themes/{$g['theme']}/images/icons/icon_block_d.gif' width='11' height='11' border='0' ";
+				$sid_dsbl_link .= "title='" . gettext("Rule is forced to a disabled state. Click to remove the force-disable action.") . "'></a>";
+			}
+			else {
+				$sid_dsbl_link = "<a href='?instance={$instanceid}&act=togglesid&sidid={$fields[2]}&gen_id={$fields[1]}'>";
+				$sid_dsbl_link .= "<img src='../themes/{$g['theme']}/images/icons/icon_block.gif' width='11' height='11' border='0' ";
+				$sid_dsbl_link .= "title='" . gettext("Click to force-disable rule and remove from current rules set.") . "'></a>";
+			}
+			/* DESCRIPTION */
 			$alert_class = $fields[11];
 
 			echo "<tr>
@@ -479,7 +555,7 @@ if (file_exists("/var/log/snort/snort_{$if_real}{$snort_uuid}/alert")) {
 				<td class='listr' align='center'>{$alert_src_p}</td>
 				<td class='listr' align='center'>{$alert_ip_dst}</td>
 				<td class='listr' align='center'>{$alert_dst_p}</td>
-				<td class='listr' align='center'>{$alert_sid_str}<br/>{$sidsupplink}</td>
+				<td class='listr' align='center'>{$alert_sid_str}<br/>{$sidsupplink}&nbsp;&nbsp;{$sid_dsbl_link}</td>
 				<td class='listr' style=\"word-wrap:break-word;\">{$alert_descr}</td>
 				</tr>\n";
 
