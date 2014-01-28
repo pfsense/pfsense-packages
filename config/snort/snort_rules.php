@@ -167,18 +167,12 @@ if ($_GET['act'] == "toggle" && $_GET['ids'] && !empty($rules_map)) {
 	$sid= $_GET['ids'];
 
 	// See if the target SID is in our list of modified SIDs,
-	// and toggle it if present; otherwise, add it to the
-	// appropriate list.
-	if (isset($enablesid[$gid][$sid])) {
+	// and toggle it back to default if present; otherwise,
+	// add it to the appropriate modified SID list.
+	if (isset($enablesid[$gid][$sid]))
 		unset($enablesid[$gid][$sid]);
-		if (!isset($disablesid[$gid][$sid]))
-			$disablesid[$gid][$sid] = "disablesid";
-	}
-	elseif (isset($disablesid[$gid][$sid])) {
+	elseif (isset($disablesid[$gid][$sid]))
 		unset($disablesid[$gid][$sid]);
-		if (!isset($enablesid[$gid][$sid]))
-			$enablesid[$gid][$sid] = "enablesid";
-	}
 	else {
 		if ($rules_map[$gid][$sid]['disabled'] == 1)
 			$enablesid[$gid][$sid] = "enablesid";
@@ -759,7 +753,7 @@ if ($savemsg) {
 											$textse = "</span>";
 											$iconb = "icon_reject_d.gif";
 											$disable_cnt++;
-											$title = gettext("Disabled by user. Click to toggle to enabled state");
+											$title = gettext("Disabled by user. Click to toggle to default state");
 										}
 										elseif (($v['disabled'] == 1) && (!isset($enablesid[$gid][$sid]))) {
 											$textss = "<span class=\"gray\">";
@@ -772,7 +766,7 @@ if ($savemsg) {
 											$textss = $textse = "";
 											$iconb = "icon_reject.gif";
 											$enable_cnt++;
-											$title = gettext("Enabled by user. Click to toggle to disabled state");
+											$title = gettext("Enabled by user. Click to toggle to default state");
 										}
 										else {
 											$textss = $textse = "";
