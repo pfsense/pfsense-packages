@@ -146,6 +146,9 @@ $if_real = snort_get_real_interface($a_instance[$instanceid]['interface']);
 $enablesid = snort_load_sid_mods($a_instance[$instanceid]['rule_sid_on']);
 $disablesid = snort_load_sid_mods($a_instance[$instanceid]['rule_sid_off']);
 
+// Grab pfSense version so we can refer to it later on this page
+$pfs_version=substr(trim(file_get_contents("/etc/version")),0,3);
+
 $pconfig = array();
 if (is_array($config['installedpackages']['snortglobal']['alertsblocks'])) {
 	$pconfig['arefresh'] = $config['installedpackages']['snortglobal']['alertsblocks']['arefresh'];
@@ -465,13 +468,17 @@ if (file_exists("/var/log/snort/snort_{$if_real}{$snort_uuid}/alert")) {
 			$alert_ip_src = $fields[6];
 			/* Add zero-width space as soft-break opportunity after each colon if we have an IPv6 address */
 			$alert_ip_src = str_replace(":", ":&#8203;", $alert_ip_src);
-			/* Add Reverse DNS lookup icons */
-			$alert_ip_src .= "<br/><a onclick=\"javascript:getURL('/diag_dns.php?host={$fields[6]}&dialog_output=true', outputrule);\">";
-			$alert_ip_src .= "<img src='../themes/{$g['theme']}/images/icons/icon_log_d.gif' width='11' height='11' border='0' ";
-			$alert_ip_src .= "title='" . gettext("Resolve host via reverse DNS lookup") . "' style=\"cursor: pointer;\"></a>";
-			$alert_ip_src .= "&nbsp;<a href='/diag_dns.php?host={$fields[6]}&instance={$instanceid}'>";
+			/* Add Reverse DNS lookup icons (two different links if pfSense version supports them) */
+			$alert_ip_src .= "<br/>";
+			if ($pfs_version > 2.0) {
+				$alert_ip_src .= "<a onclick=\"javascript:getURL('/diag_dns.php?host={$fields[6]}&dialog_output=true', outputrule);\">";
+				$alert_ip_src .= "<img src='../themes/{$g['theme']}/images/icons/icon_log_d.gif' width='11' height='11' border='0' ";
+				$alert_ip_src .= "title='" . gettext("Resolve host via reverse DNS lookup (quick pop-up)") . "' style=\"cursor: pointer;\"></a>&nbsp;";
+			}
+			$alert_ip_src .= "<a href='/diag_dns.php?host={$fields[6]}&instance={$instanceid}'>";
 			$alert_ip_src .= "<img src='../themes/{$g['theme']}/images/icons/icon_log.gif' width='11' height='11' border='0' ";
 			$alert_ip_src .= "title='" . gettext("Resolve host via reverse DNS lookup") . "'></a>";
+
 			/* Add icons for auto-adding to Suppress List if appropriate */
 			if (!snort_is_alert_globally_suppressed($supplist, $fields[1], $fields[2]) && 
 			    !isset($supplist[$fields[1]][$fields[2]]['by_src'][$fields[6]])) {
@@ -495,11 +502,14 @@ if (file_exists("/var/log/snort/snort_{$if_real}{$snort_uuid}/alert")) {
 			$alert_ip_dst = $fields[8];
 			/* Add zero-width space as soft-break opportunity after each colon if we have an IPv6 address */
 			$alert_ip_dst = str_replace(":", ":&#8203;", $alert_ip_dst);
-			/* Add Reverse DNS lookup icons */
-			$alert_ip_dst .= "<br/><a onclick=\"javascript:getURL('/diag_dns.php?host={$fields[8]}&dialog_output=true', outputrule);\">";
-			$alert_ip_dst .= "<img src='../themes/{$g['theme']}/images/icons/icon_log_d.gif' width='11' height='11' border='0' ";
-			$alert_ip_dst .= "title='" . gettext("Resolve host via reverse DNS lookup") . "' style=\"cursor: pointer;\"></a>";
-			$alert_ip_dst .= "&nbsp;<a href='/diag_dns.php?host={$fields[8]}&instance={$instanceid}'>";
+			/* Add Reverse DNS lookup icons (two different links if pfSense version supports them) */
+			$alert_ip_dst .= "<br/>";
+			if ($pfs_version > 2.0) {
+				$alert_ip_dst .= "<a onclick=\"javascript:getURL('/diag_dns.php?host={$fields[8]}&dialog_output=true', outputrule);\">";
+				$alert_ip_dst .= "<img src='../themes/{$g['theme']}/images/icons/icon_log_d.gif' width='11' height='11' border='0' ";
+				$alert_ip_dst .= "title='" . gettext("Resolve host via reverse DNS lookup (quick pop-up)") . "' style=\"cursor: pointer;\"></a>&nbsp;";
+			}
+			$alert_ip_dst .= "<a href='/diag_dns.php?host={$fields[8]}&instance={$instanceid}'>";
 			$alert_ip_dst .= "<img src='../themes/{$g['theme']}/images/icons/icon_log.gif' width='11' height='11' border='0' ";
 			$alert_ip_dst .= "title='" . gettext("Resolve host via reverse DNS lookup") . "'></a>";	
 			/* Add icons for auto-adding to Suppress List if appropriate */
