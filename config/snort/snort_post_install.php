@@ -793,43 +793,9 @@ EOD;
 		$snort_misc_include_rules .= "include {$snortcfgdir}/reference.config\n";
 	if (file_exists("{$snortcfgdir}/classification.config"))
 		$snort_misc_include_rules .= "include {$snortcfgdir}/classification.config\n";
-	if (is_dir("{$snortcfgdir}/preproc_rules")) {
-		if ($snortcfg['sensitive_data'] == 'on' && $protect_preproc_rules == "off") {
-			$sedcmd = '/^#alert.*classtype:sdf/s/^#//';
-			if (file_exists("{$snortcfgdir}/preproc_rules/sensitive-data.rules")){
-				$snort_misc_include_rules .= "include \$PREPROC_RULE_PATH/sensitive-data.rules\n";
-				#enable only selected sensitive data
-				if (file_exists(SNORTDIR."/preproc_rules/sensitive-data.rules")){
-					$sdf_alert_pattern="(".preg_replace("/,/","|",$snortcfg['sdf_alert_data_type']).")";
-					$sd_tmp_file=file(SNORTDIR."/preproc_rules/sensitive-data.rules");
-					$sd_tmp_new_file="";
-					foreach ($sd_tmp_file as $sd_tmp_line)
-						$sd_tmp_new_file.=preg_match("/$sdf_alert_pattern/i",$sd_tmp_line) ? $sd_tmp_line : "";
-					file_put_contents("{$snortcfgdir}/preproc_rules/sensitive-data.rules",$sd_tmp_new_file,LOCK_EX);
-				}
-			}
-		} else
-			$sedcmd = '/^alert.*classtype:sdf/s/^/#/';
-		if (file_exists("{$snortcfgdir}/preproc_rules/decoder.rules") &&
-		    file_exists("{$snortcfgdir}/preproc_rules/preprocessor.rules") && $protect_preproc_rules == "off") {
-			@file_put_contents("{$g['tmp_path']}/sedcmd", $sedcmd);
-			mwexec("/usr/bin/sed -I '' -f {$g['tmp_path']}/sedcmd {$snortcfgdir}/preproc_rules/preprocessor.rules");
-			mwexec("/usr/bin/sed -I '' -f {$g['tmp_path']}/sedcmd {$snortcfgdir}/preproc_rules/decoder.rules");
-			@unlink("{$g['tmp_path']}/sedcmd");
-			$snort_misc_include_rules .= "include \$PREPROC_RULE_PATH/decoder.rules\n";
-			$snort_misc_include_rules .= "include \$PREPROC_RULE_PATH/preprocessor.rules\n";
-		} else if (file_exists("{$snortcfgdir}/preproc_rules/decoder.rules") &&
-			   file_exists("{$snortcfgdir}/preproc_rules/preprocessor.rules") && $protect_preproc_rules == "on") {
-			$snort_misc_include_rules .= "include \$PREPROC_RULE_PATH/decoder.rules\n";
-			$snort_misc_include_rules .= "include \$PREPROC_RULE_PATH/preprocessor.rules\n";
-		}
-		else {
-			$snort_misc_include_rules .= "config autogenerate_preprocessor_decoder_rules\n";
-			log_error("[Snort] Seems preprocessor/decoder rules are missing, enabling autogeneration of them");
-		}
-	} else {
+	if (!file_exists("{$snortcfgdir}/preproc_rules/decoder.rules") || !file_exists("{$snortcfgdir}/preproc_rules/preprocessor.rules")) {
 		$snort_misc_include_rules .= "config autogenerate_preprocessor_decoder_rules\n";
-		log_error("[Snort] Seems preprocessor/decoder rules are missing, enabling autogeneration of them");
+		log_error("[Snort] Seems preprocessor and/or decoder rules are missing, enabling autogeneration of them in conf file.");
 	}
 
 	/* generate rule sections to load */
@@ -1249,7 +1215,6 @@ ipvar EXTERNAL_NET [{$external_net}]
 
 # Define Rule Paths #
 var RULE_PATH {$snortcfgdir}/rules
-var PREPROC_RULE_PATH {$snortcfgdir}/preproc_rules
 
 # Define Servers #
 {$ipvardef}
@@ -1403,13 +1368,13 @@ if ($config['installedpackages']['snortglobal']['forcekeepsettings'] == 'on') {
 	update_status(gettext("Saved settings detected..."));
 	/* Do one-time settings migration for new multi-engine configurations */
 	update_output_window(gettext("Please wait... migrating settings to new multi-engine configuration..."));
-	include "/usr/local/pkg/snort/snort_migrate_config.php";
+	include('/usr/local/pkg/snort/snort_migrate_config.php');
 	update_output_window(gettext("Please wait... rebuilding installation with saved settings..."));
 	log_error(gettext("[Snort] Downloading and updating configured rule types..."));
 	update_output_window(gettext("Please wait... downloading and updating configured rule types..."));
 	if ($pkg_interface <> "console")
 		$snort_gui_include = true;
-	include("/usr/local/pkg/snort/snort_check_for_rule_updates.php");
+	include('/usr/local/pkg/snort/snort_check_for_rule_updates.php');
 	update_status(gettext("Generating snort.conf configuration file from saved settings..."));
 	$rebuild_rules = true;
 

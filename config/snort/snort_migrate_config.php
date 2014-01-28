@@ -1,8 +1,8 @@
 <?php
 /*
- * snort_migrate_config.inc
+ * snort_migrate_config.php
  *
- * Copyright (C) 2013 Bill Meeks
+ * Copyright (C) 2013, 2014 Bill Meeks
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -284,6 +284,40 @@ foreach ($rule as &$r) {
 		}
 		if (empty($pconfig['sdf_alert_data_type'])) {
 			$pconfig['sdf_alert_data_type'] = "Credit Card,Email Addresses,U.S. Phone Numbers,U.S. Social Security Numbers";
+			$updated_cfg = true;
+		}
+	}
+
+	// Change any ENABLE_SID settings to new format of GID:SID
+	if (!empty($pconfig['rule_sid_on'])) {
+		$tmp = explode("||", $pconfig['rule_sid_on']);
+		$new_tmp = "";
+		foreach ($tmp as $v) {
+			if (strpos($v, ":") === false) {
+				if (preg_match('/(\d+)/', $v, $match))
+					$new_tmp .= "1:{$match[1]}||";
+			}
+		}
+		$new_tmp = rtrim($new_tmp, " ||");
+		if (!empty($new_tmp)) {
+			$pconfig['rule_sid_on'] = $new_tmp;
+			$updated_cfg = true;
+		}
+	}
+
+	// Change any DISABLE_SID settings to new format of GID:SID
+	if (!empty($pconfig['rule_sid_off'])) {
+		$tmp = explode("||", $pconfig['rule_sid_off']);
+		$new_tmp = "";
+		foreach ($tmp as $v) {
+			if (strpos($v, ":") === false) {
+				if (preg_match('/(\d+)/', $v, $match))
+					$new_tmp .= "1:{$match[1]}||";
+			}
+		}
+		$new_tmp = rtrim($new_tmp, " ||");
+		if (!empty($new_tmp)) {
+			$pconfig['rule_sid_off'] = $new_tmp;
 			$updated_cfg = true;
 		}
 	}
