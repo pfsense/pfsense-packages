@@ -51,10 +51,10 @@ $snortver = array();
 exec("/usr/local/bin/snort -V 2>&1 |/usr/bin/grep Version | /usr/bin/cut -c20-26", $snortver);
 $snort_version = $snortver[0];
 if (empty($snort_version))
-	$snort_version = "2.9.5.5";
+	$snort_version = "2.9.5.6";
 
 /* package version */
-$pfSense_snort_version = "3.0.2";
+$pfSense_snort_version = "3.0.4";
 $snort_package_version = "Snort {$snort_version} pkg v{$pfSense_snort_version}";
 
 // Define SNORTDIR and SNORTLIBDIR constants according to pfSense version

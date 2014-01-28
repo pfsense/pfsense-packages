@@ -1417,7 +1417,7 @@ if ($config['installedpackages']['snortglobal']['forcekeepsettings'] == 'on') {
 }
 
 /* Update Snort package version in configuration */
-$config['installedpackages']['snortglobal']['snort_config_ver'] = "3.0.2";
+$config['installedpackages']['snortglobal']['snort_config_ver'] = "3.0.4";
 write_config();
 
 /* Done with post-install, so clear flag */
