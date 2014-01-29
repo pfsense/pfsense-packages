@@ -301,10 +301,8 @@
                         </tr>
                         <tr style="color: rgb(255, 255, 255);">
                             <td style="background-image: url(http://www.pfsense.com/assets/images/footer.gif); width: 802px; height: 60px; text-align: center; vertical-align: middle;">
-                                pfSense is (C) Copyright 2004, 2005, 2006 Scott Ullrich. All Rights Reserved.
+                                pfSense is Copyright 2004-2014 Electric Sheep Fencing LLC. All Rights Reserved.
                                 <br />
-                                MySQL: 0.0000 s, 0 request(s), PHP: 0.0052 s, total: 0.0052 s, document
-                                retrieved from cache.
                             </td>
                         </tr>
                     </tbody>
