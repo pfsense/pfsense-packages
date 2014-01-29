@@ -623,7 +623,7 @@ if ($savemsg) {
 									$textse = "</span>";
 									$iconb = "icon_reject_d.gif";
 									$disable_cnt++;
-									$title = gettext("Disabled by user. Click to toggle to enabled state");
+									$title = gettext("Disabled by user. Click to toggle to default state");
 								}
 								elseif (($v['disabled'] == 1) && (!isset($enablesid[$gid][$sid]))) {
 									$textss = "<span class=\"gray\">";
@@ -636,7 +636,7 @@ if ($savemsg) {
 									$textss = $textse = "";
 									$iconb = "icon_reject.gif";
 									$enable_cnt++;
-									$title = gettext("Enabled by user. Click to toggle to disabled state");
+									$title = gettext("Enabled by user. Click to toggle to default state");
 								}
 								else {
 									$textss = $textse = "";
