@@ -1232,8 +1232,7 @@ function mail_report_get_log($logfile, $tail, $grepfor) {
 	$logarr = "";
 	$grepline = "  ";
 	if(is_array($grepfor))
-		foreach($grepfor as $agrep)
-			$grepline .= " | grep \"$agrep\"";
+		$grepline = " | /usr/bin/egrep " . escapeshellarg(implode("|", $grepfor));
 	if($config['system']['disablesyslogclog']) {
 		exec("cat {$logfile}{$grepline} | /usr/bin/tail -n {$tail}", $logarr);
 	} else {
