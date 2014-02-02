@@ -178,7 +178,7 @@ if ($_POST) {
 	if ($pconfig['frequency'] == "yearly") {
 		$pconfig['monthofyear'] = isset($pconfig['monthofyear']) ? $pconfig['monthofyear'] : 1;
 		$friendly = "Yearly, on day {$pconfig['dayofmonth']} of {$monthofyear[$pconfig['monthofyear']]} at {$friendlytime}";
-	} else {
+	} elseif ($pconfig['frequency'] != "quarterly") {
 		if (isset($pconfig['monthofyear']))
 			unset($pconfig['monthofyear']);
 	}
