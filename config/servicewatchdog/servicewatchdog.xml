@@ -69,4 +69,10 @@
 		<chmod>644</chmod>
 		<item>http://www.pfsense.com/packages/config/servicewatchdog/servicewatchdog.inc</item>
 	</additional_files_needed>
+	<custom_php_install_command>
+		servicewatchdog_cron_job();
+	</custom_php_install_command>
+	<custom_php_deinstall_command>
+		servicewatchdog_cron_job(true);
+	</custom_php_deinstall_command>
 </packagegui>
