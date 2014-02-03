@@ -48,14 +48,14 @@ function servicewatchdog_is_service_watched($svc) {
 	return false;
 }
 
-function servicewatchdog_cron_job() {
+function servicewatchdog_cron_job($force_remove) {
 	global $config;
 	if (!is_array($config['installedpackages']['servicewatchdog']['item'])) {
 		$config['installedpackages']['servicewatchdog']['item'] = array();
 	}
 	$a_pwservices = &$config['installedpackages']['servicewatchdog']['item'];
 
-	if (count($a_pwservices) > 0) {
+	if (($force_remove == false) && (count($a_pwservices) > 0)) {
 		// Add the cron job if it doesn't exist.
 		install_cron_job("/usr/local/pkg/servicewatchdog_cron.php", true, "*/1");
 	} else {
