@@ -40,7 +40,7 @@
 	<requirements>None</requirements>
 	<faq>Monitors for stopped services and restarts them.</faq>
 	<name>Service Watchdog</name>
-	<version>1.4</version>
+	<version>1.5</version>
 	<title>Services: Service Watchdog</title>
 	<include_file>/usr/local/pkg/servicewatchdog.inc</include_file>
 	<menu>
@@ -69,4 +69,10 @@
 		<chmod>644</chmod>
 		<item>http://www.pfsense.com/packages/config/servicewatchdog/servicewatchdog.inc</item>
 	</additional_files_needed>
+	<custom_php_install_command>
+		servicewatchdog_cron_job();
+	</custom_php_install_command>
+	<custom_php_deinstall_command>
+		servicewatchdog_cron_job(true);
+	</custom_php_deinstall_command>
 </packagegui>
