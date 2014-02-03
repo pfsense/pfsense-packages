@@ -34,6 +34,7 @@ require_once("guiconfig.inc");
 require_once("haproxy.inc");
 require_once("certs.inc");
 require_once("haproxy_utils.inc");
+require_once("pkg_haproxy_tabs.inc");
 
 if (!is_array($config['installedpackages']['haproxy']['ha_backends']['item'])) {
 	$config['installedpackages']['haproxy']['ha_backends']['item'] = array();
@@ -91,12 +92,7 @@ include("head.inc");
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
   <tr><td class="tabnavtbl">
   <?php
-	/* active tabs */
-	$tab_array = array();
-	$tab_array[] = array("Settings", false, "haproxy_global.php");
-	$tab_array[] = array("Frontend", true, "haproxy_listeners.php");		
-	$tab_array[] = array("Backend", false, "haproxy_pools.php");
-	display_top_tabs($tab_array);
+	haproxy_display_top_tabs_active($haproxy_tab_array['haproxy'], "frontend");
   ?>
   </td></tr>
   <tr>
@@ -173,10 +169,6 @@ include("head.inc");
 					foreach ($acls as $acl) {
 						$isaclset .= "&#10;" . $acl['descr'];
 					}
-					if ($frontend['ssloffloadacl'])
-						$isaclset .= "&#10;" . "Certificate ACL";
-					if ($frontend['ssloffloadacladditional'])
-						$isaclset .= "&#10;" . "Additional certificate ACLs";
 					
 					if ($isaclset) 
 						echo "<img src=\"$img_acl\" title=\"" . gettext("acl's used") . ": {$isaclset}\" border=\"0\" />";

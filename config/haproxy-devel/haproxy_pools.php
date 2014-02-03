@@ -32,6 +32,7 @@
 $shortcut_section = "haproxy";
 require_once("guiconfig.inc");
 require_once("haproxy.inc");
+require_once("pkg_haproxy_tabs.inc");
 
 
 if (!is_array($config['installedpackages']['haproxy']['ha_pools']['item'])) {
@@ -86,12 +87,7 @@ include("head.inc");
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
   <tr><td class="tabnavtbl">
   <?php
-	/* active tabs */
-	$tab_array = array();
-	$tab_array[] = array("Settings", false, "haproxy_global.php");
-	$tab_array[] = array("Frontend", false, "haproxy_listeners.php");
-	$tab_array[] = array("Backend", true, "haproxy_pools.php");
-	display_top_tabs($tab_array);
+	haproxy_display_top_tabs_active($haproxy_tab_array['haproxy'], "backend");
   ?>
   </td></tr>
   <tr>
