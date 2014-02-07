@@ -38,7 +38,7 @@ $priv_list['page-services-snort']['match'][] = "snort/snort_rulesets.php*";
 $priv_list['page-services-snort']['match'][] = "snort/snort_select_alias.php*";
 $priv_list['page-services-snort']['match'][] = "snort/snort_stream5_engine.php*";
 $priv_list['page-services-snort']['match'][] = "pkg_edit.php?xml=snort_sync.xml*";
-$priv_list['page-services-snort']['match'][] = "pkg_edit.php?xml=sort/snort.xml*";
+$priv_list['page-services-snort']['match'][] = "pkg_edit.php?xml=snort/snort.xml*";
 $priv_list['page-services-snort']['match'][] = "snort/snort_check_cron_misc.inc*";
 $priv_list['page-services-snort']['match'][] = "snort/snort.inc*";
 
