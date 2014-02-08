@@ -34,8 +34,8 @@
 		*/
         ]]>
 	</copyright>
-    <description>Automatically backs up your pfSense configuration.  All contents are encrypted on the server.  Requires pfSense Premium Support Portal Subscription from https://portal.pfsense.org</description>
-    <requirements>pfSense Premium Support Portal</requirements>
+    <description>Automatically backs up your pfSense configuration.  All contents are encrypted on the server.  Requires Gold or Support Subscription from https://portal.pfsense.org</description>
+    <requirements>pfSense Portal subscription</requirements>
 	<name>AutoConfigBackup</name>
 	<version>1.20</version>
 	<title>Diagnostics: Auto Configuration Backup</title>
@@ -122,7 +122,7 @@
 		</field>
 		<field>
 			<fielddescr>Encryption Password</fielddescr>
-			<description>This password will be used to encrypt config.xml before sending to portal.pfsense.org.  Do not share the password and keep it safe!</description>
+			<description>This password will be used to encrypt config.xml before uploading. We recommend not setting this to the same thing as your portal.pfsense.org account. Keep record of this password in a safe place - without it, your configurations will be impossible to restore.</description>
 			<fieldname>crypto_password</fieldname>
 			<type>password</type>
 		</field>

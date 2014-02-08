@@ -192,7 +192,7 @@ function upload_config($reasonm = "") {
 					$fields_string .= $key.'='.$value.'&'; 
 				rtrim($fields_string,'&');
 
-				// Check configuration into the BSDP repo
+				// Check configuration into the ESF repo
 				$curl_session = curl_init();
 				curl_setopt($curl_session, CURLOPT_URL, $upload_url);  
 				curl_setopt($curl_session, CURLOPT_POST, count($post_fields));  
