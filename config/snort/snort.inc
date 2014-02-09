@@ -825,11 +825,11 @@ function snort_rm_blocked_install_cron($should_install) {
 	switch($should_install) {
 	case true:
 		$cron_item = array();
-		$cron_item['minute'] = "$snort_rm_blocked_min";
-		$cron_item['hour'] = "$snort_rm_blocked_hr";
-		$cron_item['mday'] = "$snort_rm_blocked_mday";
-		$cron_item['month'] = "$snort_rm_blocked_month";
-		$cron_item['wday'] = "$snort_rm_blocked_wday";
+		$cron_item['minute'] = $snort_rm_blocked_min;
+		$cron_item['hour'] = $snort_rm_blocked_hr;
+		$cron_item['mday'] = $snort_rm_blocked_mday;
+		$cron_item['month'] = $snort_rm_blocked_month;
+		$cron_item['wday'] = $snort_rm_blocked_wday;
 		$cron_item['who'] = "root";
 		$cron_item['command'] = "/usr/bin/nice -n20 /usr/local/sbin/expiretable -t $snort_rm_blocked_expire snort2c";
 
@@ -927,11 +927,11 @@ function snort_rules_up_install_cron($should_install) {
 	switch($should_install) {
 	case true:
 		$cron_item = array();
-		$cron_item['minute'] = "$snort_rules_up_min";
-		$cron_item['hour'] = "$snort_rules_up_hr";
-		$cron_item['mday'] = "$snort_rules_up_mday";
-		$cron_item['month'] = "$snort_rules_up_month";
-		$cron_item['wday'] = "$snort_rules_up_wday";
+		$cron_item['minute'] = $snort_rules_up_min;
+		$cron_item['hour'] = $snort_rules_up_hr;
+		$cron_item['mday'] = $snort_rules_up_mday;
+		$cron_item['month'] = $snort_rules_up_month;
+		$cron_item['wday'] = $snort_rules_up_wday;
 		$cron_item['who'] = "root";
 		$cron_item['command'] = "/usr/bin/nice -n20 /usr/local/bin/php -f /usr/local/pkg/snort/snort_check_for_rule_updates.php";
 
