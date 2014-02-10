@@ -230,7 +230,7 @@
 		<status>ALPHA</status>
 		<required_version>2.2</required_version>
 		<config_file>http://www.pfsense.com/packages/config/apache_mod_security/apache_mod_security.xml</config_file>
-		<depends_on_package_pbi>proxy_mod_security-2.2.23_3-##ARCH##.pbi</depends_on_package_pbi>
+		<depends_on_package_pbi>proxy_mod_security-2.2.26-##ARCH##.pbi</depends_on_package_pbi>
 		<configurationfile>apache_mod_security.xml</configurationfile>
 		<build_pbi>
 			<custom_name>proxy_mod_security</custom_name>
