@@ -209,7 +209,7 @@
 		<status>ALPHA</status>
 		<required_version>2.2</required_version>
 		<config_file>http://www.pfsense.com/packages/config/apache_mod_security-dev/apache_virtualhost.xml</config_file>
-		<depends_on_package_pbi>proxy_mod_security-2.2.23_3-##ARCH##.pbi git-1.8.5.2-##ARCH##.pbi</depends_on_package_pbi>
+		<depends_on_package_pbi>proxy_mod_security-2.2.26-##ARCH##.pbi git-1.8.5.2-##ARCH##.pbi</depends_on_package_pbi>
 		<configurationfile>apache_virtualhost.xml</configurationfile>
 		<build_pbi>
 			<custom_name>proxy_mod_security</custom_name>
@@ -393,7 +393,7 @@
 		<website>http://www.snort.org</website>
 		<descr>Snort is an open source network intrusion prevention and detection system (IDS/IPS). Combining the benefits of signature, protocol, and anomaly-based inspection.</descr>
 		<category>Security</category>
-		<depends_on_package_pbi>snort-2.9.5.5-##ARCH##.pbi</depends_on_package_pbi>
+		<depends_on_package_pbi>snort-2.9.5.6-##ARCH##.pbi</depends_on_package_pbi>
 		<build_pbi>
 			<port>security/snort</port>
 			<ports_after>security/barnyard2</ports_after>
@@ -413,7 +413,7 @@
 		<descr>The olsr.org OLSR daemon is an implementation of the Optimized Link State Routing protocol. OLSR is a routing protocol for mobile ad-hoc networks. The protocol is pro-active, table driven and utilizes a technique called multipoint relaying for message flooding.</descr>
 		<category>Services</category>
 		<config_file>http://www.pfsense.com/packages/config/olsrd.xml</config_file>
-		<depends_on_package_pbi>olsrd-0.6.3-##ARCH##.pbi</depends_on_package_pbi>
+		<depends_on_package_pbi>olsrd-0.6.5.2-##ARCH##.pbi</depends_on_package_pbi>
 		<build_port_path>/usr/ports/net/olsrd</build_port_path>
 		<version>1.0</version>
 		<status>Stable</status>
@@ -457,7 +457,7 @@
 		<category>Services</category>
 		<pkginfolink>http://forum.pfsense.org/index.php/topic,40622.0.html</pkginfolink>
 		<config_file>http://www.pfsense.com/packages/config/postfix/postfix.xml</config_file>
-		<depends_on_package_pbi>postfix-2.10.2-##ARCH##.pbi</depends_on_package_pbi>
+		<depends_on_package_pbi>postfix-2.11.0-##ARCH##.pbi</depends_on_package_pbi>
 		<version>2.10.2 pkg v.2.3.7</version>
 		<status>Release</status>
 		<required_version>2.2</required_version>
@@ -637,7 +637,7 @@
 		<required_version>2.2</required_version>
 		<config_file>http://www.pfsense.com/packages/config/varnish3/varnish_backends.xml</config_file>
 		<configurationfile>varnish_backends.xml</configurationfile>
-		<depends_on_package_pbi>varnish-3.0.4-##ARCH##.pbi</depends_on_package_pbi>
+		<depends_on_package_pbi>varnish-3.0.5-##ARCH##.pbi</depends_on_package_pbi>
 		<build_pbi>
 			<ports_before>lang/gcc</ports_before>
 			<port>www/varnish</port>
@@ -650,7 +650,7 @@
 		<descr>Vnstat is a console-based network traffic monitor&lt;br /&gt;The vnstat PHP frontend and vnstati adds a more user friendly way of displaying traffic usage.</descr>
 		<pkginfolink>http://forum.pfsense.org/index.php/topic,14179.0.html</pkginfolink>
 		<category>Network Management</category>
-		<depends_on_package_pbi>vnstat-1.11_1-##ARCH##.pbi</depends_on_package_pbi>
+		<depends_on_package_pbi>vnstat-1.11_5-##ARCH##.pbi</depends_on_package_pbi>
 		<build_port_path>/usr/ports/net/vnstat</build_port_path>
 		<version>1.10_2</version>
 		<status>Stable</status>
@@ -707,7 +707,7 @@
 		<build_pbi>
 			<port>emulators/open-vm-tools-nox11</port>
 		</build_pbi>
-		<depends_on_package_pbi>open-vm-tools-nox11-425873_2-##ARCH##.pbi</depends_on_package_pbi>
+		<depends_on_package_pbi>open-vm-tools-nox11-1280544_2-##ARCH##.pbi</depends_on_package_pbi>
 	</package>
 	<package>
 		<name>AutoConfigBackup</name>
@@ -727,12 +727,12 @@
 		<descr>Broadcasts a who-has ARP packet on the network and prints answers. </descr>
 		<website>http://www.habets.pp.se/synscan/programs.php?prog=arping</website>
 		<category>Services</category>
-		<version>2.09.1</version>
+		<version>2.13</version>
 		<status>Stable</status>
 		<required_version>2.2</required_version>
 		<config_file>http://www.pfsense.com/packages/config/arping/arping.xml</config_file>
 		<configurationfile>arping.xml</configurationfile>
-		<depends_on_package_pbi>arping-2.09_1-##ARCH##.pbi</depends_on_package_pbi>
+		<depends_on_package_pbi>arping-2.13-##ARCH##.pbi</depends_on_package_pbi>
 		<build_port_path>/usr/ports/net/arping</build_port_path>
 		<pkginfolink>http://doc.pfsense.org/index.php/Arping</pkginfolink>
 	</package>
@@ -840,7 +840,7 @@
 		<descr>RFC1413 auth/identd daemon with fixed fake reply</descr>
 		<website>http://www.webweaving.org/widentd</website>
 		<category>Services</category>
-		<depends_on_package_pbi>widentd-1.03_1-##ARCH##.pbi</depends_on_package_pbi>
+		<depends_on_package_pbi>widentd-1.03_2-##ARCH##.pbi</depends_on_package_pbi>
 		<version>1.03_1</version>
 		<status>Stable</status>
 		<pkginfolink>http://doc.pfsense.org/index.php/Widentd_package</pkginfolink>
@@ -880,7 +880,7 @@
 		<status>RC1</status>
 		<required_version>2.2</required_version>
 		<maintainer>nachtfalkeaw@web.de</maintainer>
-		<depends_on_package_pbi>freeradius-2.2.0-##ARCH##.pbi</depends_on_package_pbi>
+		<depends_on_package_pbi>freeradius-2.2.3_1-##ARCH##.pbi</depends_on_package_pbi>
 		<config_file>http://www.pfsense.org/packages/config/freeradius2/freeradius.xml</config_file>
 		<configurationfile>freeradius.xml</configurationfile>
 		<after_install_info>Please visit Services: FreeRADIUS</after_install_info>
@@ -913,7 +913,7 @@
 		<website>http://www.stunnel.org/</website>
 		<descr>An SSL encryption wrapper between remote client and local or remote servers. </descr>
 		<category>Network Management</category>
-		<depends_on_package_pbi>stunnel-4.54-##ARCH##.pbi</depends_on_package_pbi>
+		<depends_on_package_pbi>stunnel-4.56-##ARCH##.pbi</depends_on_package_pbi>
 		<version>4.43.0</version>
 		<status>Stable</status>
 		<pkginfolink>http://doc.pfsense.org/index.php/Stunnel_package</pkginfolink>
@@ -956,7 +956,7 @@
 		<descr>Enhanced traceroute replacement</descr>
 		<website>http://www.bitwizard.nl/mtr/</website>
 		<category>Network Management</category>
-		<depends_on_package_pbi>mtr-0.82_1-##ARCH##.pbi</depends_on_package_pbi>
+		<depends_on_package_pbi>mtr-0.85_1-##ARCH##.pbi</depends_on_package_pbi>
 		<version>0.82</version>
 		<status>Stable</status>
 		<required_version>2.2</required_version>
@@ -1509,7 +1509,7 @@
 		<website>http://www.tinc-vpn.org/</website>
 		<descr>tinc is a Virtual Private Network (VPN) daemon that uses tunnelling and encryption to create a secure private mesh network between hosts on the Internet.</descr>
 		<category>Network Management</category>
-		<depends_on_package_pbi>tinc-1.0.21-##ARCH##.pbi</depends_on_package_pbi>
+		<depends_on_package_pbi>tinc-1.0.22-##ARCH##.pbi</depends_on_package_pbi>
 		<build_pbi>
 			<port>security/tinc</port>
 		</build_pbi>
@@ -1534,7 +1534,7 @@
 		<version>3.3.7_4</version>
 		<status>ALPHA</status>
 		<required_version>2.2</required_version>
-		<depends_on_package_pbi>syslog-ng-3.3.7_4-##ARCH##.pbi</depends_on_package_pbi>
+		<depends_on_package_pbi>syslog-ng-3.4.7-##ARCH##.pbi</depends_on_package_pbi>
 		<build_pbi>
 			<ports_before>sysutils/logrotate</ports_before>
 			<port>sysutils/syslog-ng</port>
