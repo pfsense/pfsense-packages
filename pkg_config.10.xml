@@ -51,12 +51,12 @@
 		<descr><![CDATA[The most widely used name server software]]></descr>
 		<website>http://www.isc.org/downloads/BIND/</website>
 		<category>Services</category>
-		<version>9.9.4 pkg v 0.3.2</version>
+		<version>9.9.5 pkg v 0.3.2</version>
 		<status>RC</status>
 		<required_version>2.2</required_version>
 		<config_file>http://www.pfsense.com/packages/config/bind/bind.xml</config_file>
 		<configurationfile>bind.xml</configurationfile>
-		<depends_on_package_pbi>bind-9.9.4-##ARCH##.pbi</depends_on_package_pbi>
+		<depends_on_package_pbi>bind-9.9.5-##ARCH##.pbi</depends_on_package_pbi>
 		<build_pbi>
 			<custom_name>bind</custom_name>
 			<port>dns/bind99</port>
@@ -152,12 +152,12 @@
 				Supports acl's for smart backend switching.]]></descr>
 		<website>http://haproxy.1wt.eu/</website>
 		<category>Services</category>
-		<version>1.4.24 pkg v 1.2.4</version>
+		<version>1.4.24_1 pkg v 1.2.4</version>
 		<status>Release</status>
 		<required_version>2.2</required_version>
 		<config_file>http://www.pfsense.com/packages/config/haproxy/haproxy.xml</config_file>
 		<configurationfile>haproxy.xml</configurationfile>
-		<depends_on_package_pbi>haproxy-1.4.24-##ARCH##.pbi</depends_on_package_pbi>
+		<depends_on_package_pbi>haproxy-1.4.24_1-##ARCH##.pbi</depends_on_package_pbi>
 		<build_port_path>/usr/ports/net/haproxy</build_port_path>
 	</package>
 	<package>
@@ -168,12 +168,12 @@
 				(Legacy version)]]></descr>
 		<website>http://haproxy.1wt.eu/</website>
 		<category>Services</category>
-		<version>1.4.24 pkg v 1.1</version>
+		<version>1.4.24_1 pkg v 1.1</version>
 		<status>Release</status>
 		<required_version>2.2</required_version>
 		<config_file>http://www.pfsense.com/packages/config/haproxy-legacy/haproxy.xml</config_file>
 		<configurationfile>haproxy.xml</configurationfile>
-		<depends_on_package_pbi>haproxy-1.4.24-##ARCH##.pbi</depends_on_package_pbi>
+		<depends_on_package_pbi>haproxy-1.4.24_1-##ARCH##.pbi</depends_on_package_pbi>
 	</package>
 	<package>
 		<name>haproxy-devel</name>
@@ -183,12 +183,12 @@
 				Supports acl's for smart backend switching.]]></descr>
 		<website>http://haproxy.1wt.eu/</website>
 		<category>Services</category>
-		<version>1.5-dev21 pkg v 0.6.1</version>
+		<version>1.5-dev22 pkg v 0.6.1</version>
 		<status>Release</status>
 		<required_version>2.2</required_version>
 		<config_file>http://www.pfsense.com/packages/config/haproxy-devel/haproxy.xml</config_file>
 		<configurationfile>haproxy.xml</configurationfile>
-		<depends_on_package_pbi>haproxy-devel-1.5-dev21-##ARCH##.pbi</depends_on_package_pbi>
+		<depends_on_package_pbi>haproxy-devel-1.5-dev22-##ARCH##.pbi</depends_on_package_pbi>
 		<build_pbi>
 			<ports_before>security/openssl</ports_before>
 			<custom_name>haproxy-devel</custom_name>
@@ -437,7 +437,7 @@
 		<descr>Tarpits like spamd are fake SMTP servers, which accept connections but don't deliver mail. Instead, they keep the connections open and reply very slowly. If the peer is patient enough to actually complete the SMTP dialogue (which will take ten minutes or more), the tarpit returns a 'temporary error' code (4xx), which indicates that the mail could not be delivered successfully and that the sender should keep the mail in their queue and retry again later.</descr>
 		<category>Services</category>
 		<config_file>http://www.pfsense.com/packages/config/spamd/spamd.xml</config_file>
-		<depends_on_package_pbi>spamd-4.9.1-##ARCH##.pbi</depends_on_package_pbi>
+		<depends_on_package_pbi>spamd-4.9.1_1-##ARCH##.pbi</depends_on_package_pbi>
 		<version>4.9.1</version>
 		<status>Beta</status>
 		<required_version>2.2</required_version>
@@ -476,8 +476,8 @@
 		<category>Services</category>
 		<config_file>http://www.pfsense.com/packages/config/dansguardian/dansguardian.xml</config_file>
 		<pkginfolink>http://forum.pfsense.org/index.php/topic,43786.0.html</pkginfolink>
-		<depends_on_package_pbi>dansguardian-2.12.0.3-##ARCH##.pbi</depends_on_package_pbi>
-		<version>2.12.0.3 pkg v.0.1.8</version>
+		<depends_on_package_pbi>dansguardian-2.12.0.3_2-##ARCH##.pbi</depends_on_package_pbi>
+		<version>2.12.0.3_2 pkg v.0.1.8</version>
 		<status>beta</status>
 		<required_version>2.2</required_version>
 		<configurationfile>dansguardian.xml</configurationfile>
@@ -685,7 +685,7 @@
 		<required_version>2.2</required_version>
 		<config_file>http://www.pfsense.com/packages/config/tinydns/tinydns.xml</config_file>
 		<configurationfile>tinydns.xml</configurationfile>
-		<depends_on_package_pbi>djbdns-1.05_14-##ARCH##.pbi</depends_on_package_pbi>
+		<depends_on_package_pbi>djbdns-1.05_15-##ARCH##.pbi</depends_on_package_pbi>
 		<build_pbi>
 			<ports_before>sysutils/ucspi-tcp sysutils/daemontools</ports_before>
 			<port>dns/djbdns</port>
@@ -772,13 +772,13 @@
 		<website>http://www.imspector.org/</website>
 		<category>Network Management</category>
 		<maintainer>marcellocoutinho@gmail.com</maintainer>
-		<version>20111108 pkg v 0.3.1</version>
+		<version>20111108_1 pkg v 0.3.1</version>
 		<required_version>2.2</required_version>
 		<status>BETA</status>
 		<pkginfolink>http://doc.pfsense.org/index.php/IMSpector_package</pkginfolink>
 		<config_file>http://www.pfsense.com/packages/config/imspector-dev/imspector.xml</config_file>
 		<configurationfile>imspector.xml</configurationfile>
-		<depends_on_package_pbi>imspector-20111108-##ARCH##.pbi</depends_on_package_pbi>
+		<depends_on_package_pbi>imspector-20111108_1-##ARCH##.pbi</depends_on_package_pbi>
 	</package>
 	<package>
 		<name>nut</name>
@@ -812,8 +812,8 @@
 		<website>http://dmr.ath.cx/net/darkstat/</website>
 		<descr>darkstat is a network statistics gatherer. It's a packet sniffer that runs as a background process on a cable/DSL router, gathers all sorts of statistics about network usage, and serves them over HTTP.</descr>
 		<category>Network Management</category>
-		<depends_on_package_pbi>darkstat-3.0.715-##ARCH##.pbi</depends_on_package_pbi>
-		<version>3.0.714</version>
+		<depends_on_package_pbi>darkstat-3.0.718-##ARCH##.pbi</depends_on_package_pbi>
+		<version>3.0.718</version>
 		<status>Stable</status>
 		<required_version>2.2</required_version>
 		<maintainer>sullrich+pfsp@gmail.com</maintainer>
@@ -896,10 +896,10 @@
 		<website>http://bandwidthd.sourceforge.net/</website>
 		<descr>BandwidthD tracks usage of TCP/IP network subnets and builds html files with graphs to display utilization. Charts are built by individual IPs, and by default display utilization over 2 day, 8 day, 40 day, and 400 day periods. Furthermore, each ip address's utilization can be logged out at intervals of 3.3 minutes, 10 minutes, 1 hour or 12 hours in cdf format, or to a backend database server. HTTP, TCP, UDP, ICMP, VPN, and P2P traffic are color coded.</descr>
 		<category>System</category>
-		<version>2.0.1_5 pkg v.0.3</version>
+		<version>2.0.1_6 pkg v.0.3</version>
 		<status>BETA</status>
 		<required_version>2.2</required_version>
-		<depends_on_package_pbi>bandwidthd-2.0.1_5-##ARCH##.pbi</depends_on_package_pbi>
+		<depends_on_package_pbi>bandwidthd-2.0.1_6-##ARCH##.pbi</depends_on_package_pbi>
 		<config_file>http://www.pfsense.org/packages/config/bandwidthd/bandwidthd.xml</config_file>
 		<configurationfile>bandwidthd.xml</configurationfile>
 		<build_pbi>
@@ -974,7 +974,7 @@
 		<status>Stable</status>
 		<required_version>2.2</required_version>
 		<maintainer>fernando@netfilter.com.br seth.mos@dds.nl mfuchs77@googlemail.com jimp@pfsense.org</maintainer>
-		<depends_on_package_pbi>squid-2.7.9_3-##ARCH##.pbi</depends_on_package_pbi>
+		<depends_on_package_pbi>squid-2.7.9_4-##ARCH##.pbi</depends_on_package_pbi>
 		<build_pbi>
 			<ports_before>www/libwww</ports_before>
 			<port>www/squid</port>
@@ -1069,9 +1069,9 @@
 		<descr>Arpwatch monitors ethernet/ip address pairings. It also logs certain changes to syslog.</descr>
 		<website>http://www-nrg.ee.lbl.gov/</website>
 		<category>Security</category>
-		<depends_on_package_pbi>arpwatch-2.1.a15_6-##ARCH##.pbi</depends_on_package_pbi>
+		<depends_on_package_pbi>arpwatch-2.1.a15_7-##ARCH##.pbi</depends_on_package_pbi>
 		<build_port_path>/usr/ports/net-mgmt/arpwatch</build_port_path>
-		<version>2.1.a15_6 pkg v1.1.1</version>
+		<version>2.1.a15_7 pkg v1.1.1</version>
 		<status>ALPHA</status>
 		<required_version>2.2</required_version>
 		<config_file>http://www.pfsense.com/packages/config/arpwatch.xml</config_file>
@@ -1175,7 +1175,7 @@
 		<name>OpenVPN Client Export Utility</name>
 		<descr>Allows a pre-configured OpenVPN Windows Client or Mac OSX's Viscosity configuration bundle to be exported directly from pfSense.</descr>
 		<category>Security</category>
-		<depends_on_package_pbi>zip-3.0-##ARCH##.pbi p7zip-9.20.1-##ARCH##.pbi</depends_on_package_pbi>
+		<depends_on_package_pbi>zip-3.0-##ARCH##.pbi p7zip-9.20.1_2-##ARCH##.pbi</depends_on_package_pbi>
 		<build_port_path>/usr/ports/archivers/p7zip</build_port_path>
 		<build_port_path>/usr/ports/archivers/zip</build_port_path>
 		<version>1.2.4</version>
@@ -1558,7 +1558,7 @@
 			<custom_name>zabbix22-agent</custom_name>
 			<port>net-mgmt/zabbix22-agent</port>
 		</build_pbi>
-		<depends_on_package_pbi>zabbix22-agent-2.2.1-##ARCH##.pbi</depends_on_package_pbi>
+		<depends_on_package_pbi>zabbix22-agent-2.2.1_2-##ARCH##.pbi</depends_on_package_pbi>
 	</package>
 	<package>
 		<name>Zabbix-2 Proxy</name>
@@ -1575,7 +1575,7 @@
 			<port>net-mgmt/zabbix22-proxy</port>
 		</build_pbi>
 		<build_options>OPTIONS_SET+= SQLITE IPV6;OPTIONS_UNSET+= MYSQL JABBER GSSAPI</build_options>
-		<depends_on_package_pbi>zabbix22-proxy-2.2.1-##ARCH##.pbi</depends_on_package_pbi>
+		<depends_on_package_pbi>zabbix22-proxy-2.2.1_2-##ARCH##.pbi</depends_on_package_pbi>
 	</package>
 	<package>
 		<!-- This does not exist yet, this is here to trigger a PBI build -->
@@ -1583,7 +1583,7 @@
 		<pkginfolink>http://forum.pfsense.org/</pkginfolink>
 		<descr><![CDATA[IPMI Tools for local/remote data retrieval and control (Console only, no GUI)]]></descr>
 		<category>Services</category>
-		<version>1.8.12</version>
+		<version>1.8.12_4</version>
 		<status>Beta</status>
 		<required_version>2.2</required_version>
 		<config_file>http://www.pfsense.com/packages/config/ipmitool/ipmitool.xml</config_file>
@@ -1593,7 +1593,7 @@
 			<port>sysutils/ipmitool</port>
 		</build_pbi>
 		<build_options>ipmitool_SET=FREEIPMI;freeipmi_UNSET=DOCS DEBUG IOPERM</build_options>
-		<depends_on_package_pbi>ipmitool-1.8.12_3-##ARCH##.pbi</depends_on_package_pbi>
+		<depends_on_package_pbi>ipmitool-1.8.12_4-##ARCH##.pbi</depends_on_package_pbi>
 	</package>
 	<package>
 		<name>sudo</name>
@@ -1609,7 +1609,7 @@
 		<build_pbi>
 			<port>security/sudo</port>
 		</build_pbi>
-		<depends_on_package_pbi>sudo-1.8.6p8-##ARCH##.pbi</depends_on_package_pbi>
+		<depends_on_package_pbi>sudo-1.8.8-##ARCH##.pbi</depends_on_package_pbi>
 	</package>
 	<package>
 		<name>Service Watchdog</name>
