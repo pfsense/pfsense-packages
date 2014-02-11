@@ -742,6 +742,10 @@
 		<config_file>http://www.pfsense.com/packages/config/imspector-dev/imspector.xml</config_file>
 		<configurationfile>imspector.xml</configurationfile>
 		<depends_on_package_pbi>imspector-20111108_1-##ARCH##.pbi</depends_on_package_pbi>
+		<build_pbi>
+			<custom_name>imspector</custom_name>
+			<port>net-im/imspector-devel</port>
+		</build_pbi>
 	</package>
 	<package>
 		<name>nut</name>
