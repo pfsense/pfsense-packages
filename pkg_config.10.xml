@@ -784,24 +784,6 @@
 		<build_port_path>/usr/ports/net/widentd</build_port_path>
 	</package>
 	<package>
-		<name>freeradius</name>
-		<website>http://www.freeradius.org/</website>
-		<descr>A free implementation of the RADIUS protocol.</descr>
-		<category>System</category>
-		<version>1.1.8 pkg v1.0.5</version>
-		<status>Beta</status>
-		<required_version>2.2</required_version>
-		<maintainer>none</maintainer>
-		<depends_on_package_pbi>freeradius-1.1.8_5-##ARCH##.pbi</depends_on_package_pbi>
-		<config_file>http://www.pfsense.org/packages/config/freeradius.xml</config_file>
-		<configurationfile>freeradius.xml</configurationfile>
-		<build_pbi>
-			<ports_before>devel/libltdl</ports_before>
-			<port>net/freeradius</port>
-		</build_pbi>
-		<after_install_info>Please visit Services: freeRADIUS</after_install_info>
-	</package>
-	<package>
 		<name>freeradius2</name>
 		<website>http://www.freeradius.org/</website>
 		<descr><![CDATA[A free implementation of the RADIUS protocol.<br />
