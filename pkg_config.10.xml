@@ -251,7 +251,7 @@
 		<build_pbi>
 			<port>net/avahi</port>
 		</build_pbi>
-		<depends_on_package_pbi>avahi-0.6.29-##ARCH##.pbi</depends_on_package_pbi>
+		<depends_on_package_pbi>avahi-0.6.31-##ARCH##.pbi</depends_on_package_pbi>
 		<version>0.6.29 pkg v1.02</version>
 		<status>ALPHA</status>
 		<required_version>2.2</required_version>
