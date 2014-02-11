@@ -86,8 +86,8 @@ function test_connection($post) {
 
 	// Populate available backups
 	$curl_session = curl_init();
-	curl_setopt($curl_session, CURLOPT_USERPWD, "{$username}:{$password}");
 	curl_setopt($curl_session, CURLOPT_URL, $get_url);
+	curl_setopt($curl_session, CURLOPT_HTTPHEADER, array("Authorization: Basic " . base64_encode("{$username}:{$password}")));
 	curl_setopt($curl_session, CURLOPT_SSL_VERIFYPEER, 0);
 	curl_setopt($curl_session, CURLOPT_POST, 1);
 	curl_setopt($curl_session, CURLOPT_RETURNTRANSFER, 1);
@@ -148,7 +148,7 @@ function upload_config($reasonm = "") {
 	$encryptpw 			= $config['installedpackages']['autoconfigbackup']['config'][0]['crypto_password'];
 
 	// Define upload_url, must be present after other variable definitions due to username, password
-	$upload_url = "https://{$username}:{$password}@portal.pfsense.org/pfSconfigbackups/backup.php";
+	$upload_url = "https://portal.pfsense.org/pfSconfigbackups/backup.php";
 
 	if(!$username or !$password or !$encryptpw) {
 		if(!file_exists("/cf/conf/autoconfigback.notice")) {
@@ -195,6 +195,7 @@ function upload_config($reasonm = "") {
 				// Check configuration into the ESF repo
 				$curl_session = curl_init();
 				curl_setopt($curl_session, CURLOPT_URL, $upload_url);  
+				curl_setopt($curl_session, CURLOPT_HTTPHEADER, array("Authorization: Basic " . base64_encode("{$username}:{$password}")));
 				curl_setopt($curl_session, CURLOPT_POST, count($post_fields));  
 				curl_setopt($curl_session, CURLOPT_POSTFIELDS, $fields_string);
 				curl_setopt($curl_session, CURLOPT_RETURNTRANSFER, 1);		
