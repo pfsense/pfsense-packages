@@ -277,40 +277,6 @@
 		<noembedded>true</noembedded>
 	</package>
 	<package>
-		<name>FreeSWITCH</name>
-		<website>http://www.freeswitch.org/</website>
-		<descr>FreeSWITCH is an open source telephony platform designed to facilitate the creation of voice and chat driven products scaling from a soft-phone up to a soft-switch.  It can be used as a simple switching engine, a PBX, a media gateway or a media server to host IVR applications using simple scripts or XML to control the callflow. </descr>
-		<category>Services</category>
-		<pkginfolink>http://doc.pfsense.org/index.php/FreeSWITCH</pkginfolink>
-		<config_file>http://www.pfsense.com/packages/config/freeswitch/freeswitch.xml</config_file>
-		<depends_on_package_pbi>freeswitch-1.0.6_1-##ARCH##.pbi</depends_on_package_pbi>
-		<build_port_path>/usr/ports/net/freeswitch</build_port_path>
-		<version>0.8.3.6</version>
-		<status>Beta</status>
-		<required_version>2.2</required_version>
-		<maintainer>markjcrane@gmail.com</maintainer>
-		<configurationfile>freeswitch.xml</configurationfile>
-		<noembedded>true</noembedded>
-		<only_for_archs>i386</only_for_archs>
-	</package>
-	<package>
-		<name>FreeSWITCH Dev</name>
-		<internal_name>FreeSWITCH</internal_name>
-		<website>http://www.freeswitch.org/</website>
-		<descr>FreeSWITCH package development version.</descr>
-		<category>Services</category>
-		<pkginfolink>http://doc.pfsense.org/index.php/FreeSWITCH</pkginfolink>
-		<config_file>http://www.pfsense.com/packages/config/freeswitch_dev/freeswitch.xml</config_file>
-		<build_port_path>/usr/ports/net/freeswitch</build_port_path>
-		<version>0.9.7.26</version>
-		<status>Beta</status>
-		<required_version>2.2</required_version>
-		<maintainer>markjcrane@gmail.com</maintainer>
-		<configurationfile>freeswitch.xml</configurationfile>
-		<noembedded>true</noembedded>
-		<only_for_archs>i386</only_for_archs>
-	</package>
-	<package>
 		<name>Notes</name>
 		<website/>
 		<descr>Track things you want to note for this system.</descr>
@@ -606,22 +572,6 @@
 		<configurationfile>ipguard.xml</configurationfile>
 		<build_port_path>/usr/ports/security/ipguard</build_port_path>
 		<after_install_info>Please visit ipguard settings on the Firewall Menu to configure.</after_install_info>
-	</package>
-	<package>
-		<name>Varnish</name>
-		<descr><![CDATA[Varnish is a state-of-the-art, high-performance HTTP accelerator.<br />
-						It uses the advanced features in FreeBSD 6/7/8 to achieve its high performance.]]></descr>
-		<website>http://varnish-cache.org</website>
-		<pkginfolink>http://doc.pfsense.org/index.php/Varnish_package</pkginfolink>
-		<category>Services</category>
-		<version>2.1.5 pkg v.1.0</version>
-		<status>Release</status>
-		<required_version>2.2</required_version>
-		<config_file>http://www.pfsense.com/packages/config/varnish64/varnish_backends.xml</config_file>
-		<configurationfile>varnish_backends.xml</configurationfile>
-		<depends_on_package_pbi>varnish-2.1.5_2-##ARCH##.pbi gcc-4.2.5.20090325_5-##ARCH##.pbi</depends_on_package_pbi>
-		<build_port_path>/usr/ports/www/varnish2</build_port_path>
-		<build_port_path>/usr/ports/lang/gcc42</build_port_path>
 	</package>
 	<package>
 		<name>Varnish3</name>
