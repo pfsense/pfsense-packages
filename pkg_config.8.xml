@@ -333,6 +333,7 @@
 		<depends_on_package_base_url>http://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
 		<build_port_path>/usr/ports/net/avahi</build_port_path>
 		<build_port_path>/usr/ports/net/avahi-app</build_port_path>
+		<build_options>avahi_UNSET_FORCE=GTK</build_options>
 		<build_pbi>
 			<port>net/avahi</port>
 		</build_pbi>
