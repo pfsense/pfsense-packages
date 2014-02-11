@@ -40,7 +40,9 @@
 		<required_version>2.2</required_version>
 		<config_file>http://www.pfsense.com/packages/config/asterisk/asterisk.xml</config_file>
 		<depends_on_package_pbi>asterisk-1.8.25.0-##ARCH##.pbi</depends_on_package_pbi>
-		<build_port_path>/usr/ports/net/asterisk</build_port_path>
+		<build_pbi>
+			<port>net/asterisk</port>
+		</build_pbi>
 		<maintainer>marcellocoutinho@gmail.com robreg@zsurob.hu</maintainer>
 		<configurationfile>asterisk.xml</configurationfile>
 		<after_install_info>Please visit the Asterisk tab on status menu.</after_install_info>
@@ -158,7 +160,9 @@
 		<config_file>http://www.pfsense.com/packages/config/haproxy/haproxy.xml</config_file>
 		<configurationfile>haproxy.xml</configurationfile>
 		<depends_on_package_pbi>haproxy-1.4.24_1-##ARCH##.pbi</depends_on_package_pbi>
-		<build_port_path>/usr/ports/net/haproxy</build_port_path>
+		<build_pbi>
+			<port>net/haproxy</port>
+		</build_pbi>
 	</package>
 	<package>
 		<name>haproxy-full</name>
@@ -381,7 +385,9 @@
 		<category>Services</category>
 		<config_file>http://www.pfsense.com/packages/config/olsrd.xml</config_file>
 		<depends_on_package_pbi>olsrd-0.6.5.2-##ARCH##.pbi</depends_on_package_pbi>
-		<build_port_path>/usr/ports/net/olsrd</build_port_path>
+		<build_pbi>
+			<port>net/olsrd</port>
+		</build_pbi>
 		<version>1.0</version>
 		<status>Stable</status>
 		<required_version>2.2</required_version>
@@ -409,7 +415,9 @@
 		<status>Beta</status>
 		<required_version>2.2</required_version>
 		<configurationfile>spamd.xml</configurationfile>
-		<build_port_path>/usr/ports/mail/spamd</build_port_path>
+		<build_pbi>
+			<port>mail/spamd</port>
+		</build_pbi>
 		<logging>
 			<facilityname>spamd</facilityname>
 			<logfilename>spamd.log</logfilename>
@@ -429,7 +437,9 @@
 		<status>Release</status>
 		<required_version>2.2</required_version>
 		<configurationfile>postfix.xml</configurationfile>
-		<build_port_path>/usr/ports/mail/postfix</build_port_path>
+		<build_pbi>
+			<port>mail/postfix</port>
+		</build_pbi>
 		<build_options>WITH_PCRE=true;WITH_SPF=true;WITH_SASL2=true;WITH_TLS=true</build_options>
 	</package>
 	<package>
@@ -448,8 +458,11 @@
 		<status>beta</status>
 		<required_version>2.2</required_version>
 		<configurationfile>dansguardian.xml</configurationfile>
-		<build_port_path>/usr/ports/www/dansguardian-devel</build_port_path>
-		<build_port_path>/usr/ports/security/ca_root_nss</build_port_path>
+		<build_pbi>
+			<custom_name>dansguardian</custom_name>
+			<ports_before>security/ca_root_nss</ports_before>
+			<port>www/dansguardian-devel</port>
+		</build_pbi>
 		<build_options>dansguardian-devel_UNSET=APACHE;dansguardian-devel_SET=TRICKLE CLAMD ICAP NTLM SSL</build_options>
 		<!-- NOTE: Distfile must be fetched manually from http://dansguardian.org/downloads/2/Alpha/dansguardian-2.12.0.0.tar.gz -->
 	</package>
@@ -481,7 +494,9 @@
 		<config_file>http://www.pfsense.com/packages/config/siproxd.xml</config_file>
 		<depends_on_package_pbi>siproxd-0.8.0-##ARCH##.pbi</depends_on_package_pbi>
 		<pkginfolink>http://doc.pfsense.org/index.php/Siproxd_package</pkginfolink>
-		<build_port_path>/usr/ports/net/siproxd</build_port_path>
+		<build_pbi>
+			<port>net/siproxd</port>
+		</build_pbi>
 		<version>0.8.0_2</version>
 		<status>Beta</status>
 		<required_version>2.2</required_version>
@@ -535,7 +550,9 @@
 		<status>Release</status>
 		<required_version>2.2</required_version>
 		<configurationfile>sarg.xml</configurationfile>
-		<build_port_path>/usr/ports/www/sarg</build_port_path>
+		<build_pbi>
+			<port>www/sarg</port>
+		</build_pbi>
 		<build_options>sarg_UNSET=PHP</build_options>
 		<after_install_info>Please visit sarg settings on Status Menu to configure sarg.</after_install_info>
 	</package>
@@ -554,7 +571,9 @@
 		<status>beta</status>
 		<required_version>2.2</required_version>
 		<configurationfile>ipguard.xml</configurationfile>
-		<build_port_path>/usr/ports/security/ipguard</build_port_path>
+		<build_pbi>
+			<port>security/ipguard</port>
+		</build_pbi>
 		<after_install_info>Please visit ipguard settings on the Firewall Menu to configure.</after_install_info>
 	</package>
 	<package>
@@ -585,7 +604,9 @@
 		<pkginfolink>http://forum.pfsense.org/index.php/topic,14179.0.html</pkginfolink>
 		<category>Network Management</category>
 		<depends_on_package_pbi>vnstat-1.11_5-##ARCH##.pbi</depends_on_package_pbi>
-		<build_port_path>/usr/ports/net/vnstat</build_port_path>
+		<build_pbi>
+			<port>net/vnstat</port>
+		</build_pbi>
 		<version>1.10_2</version>
 		<status>Stable</status>
 		<required_version>2.2</required_version>
@@ -603,7 +624,9 @@
 		<status>Beta</status>
 		<required_version>2.2</required_version>
 		<depends_on_package_pbi>mbmon-205_6-##ARCH##.pbi</depends_on_package_pbi>
-		<build_port_path>/usr/ports/sysutils/mbmon</build_port_path>
+		<build_pbi>
+			<port>sysutils/mbmon</port>
+		</build_pbi>
 		<config_file>http://www.pfsense.com/packages/config/phpsysinfo/phpsysinfo.xml</config_file>
 		<configurationfile>phpsysinfo.xml</configurationfile>
 		<noembedded>true</noembedded>
@@ -667,7 +690,9 @@
 		<config_file>http://www.pfsense.com/packages/config/arping/arping.xml</config_file>
 		<configurationfile>arping.xml</configurationfile>
 		<depends_on_package_pbi>arping-2.13-##ARCH##.pbi</depends_on_package_pbi>
-		<build_port_path>/usr/ports/net/arping</build_port_path>
+		<build_pbi>
+			<port>net/arping</port>
+		</build_pbi>
 		<pkginfolink>http://doc.pfsense.org/index.php/Arping</pkginfolink>
 	</package>
 	<package>
@@ -682,7 +707,9 @@
 		<pkginfolink>http://doc.pfsense.org/index.php/Nmap_package</pkginfolink>
 		<required_version>2.2</required_version>
 		<configurationfile>nmap.xml</configurationfile>
-		<build_port_path>/usr/ports/security/nmap</build_port_path>
+		<build_pbi>
+			<port>security/nmap</port>
+		</build_pbi>
 	</package>
 	<package>
 		<name>imspector</name>
@@ -697,7 +724,9 @@
 		<config_file>http://www.pfsense.com/packages/config/imspector/imspector.xml</config_file>
 		<configurationfile>imspector.xml</configurationfile>
 		<depends_on_package_pbi>imspector-0.9-##ARCH##.pbi</depends_on_package_pbi>
-		<build_port_path>/usr/ports/net-im/imspector</build_port_path>
+		<build_pbi>
+			<port>net-im/imspector</port>
+		</build_pbi>
 	</package>
 	<package>
 		<name>imspector-dev</name>
@@ -726,7 +755,9 @@
 		<config_file>http://www.pfsense.com/packages/config/nut/nut.xml</config_file>
 		<configurationfile>nut.xml</configurationfile>
 		<depends_on_package_pbi>nut-2.6.5_1-##ARCH##.pbi</depends_on_package_pbi>
-		<build_port_path>/usr/ports/sysutils/nut</build_port_path>
+		<build_pbi>
+			<port>sysutils/nut</port>
+		</build_pbi>
 		<pkginfolink>http://doc.pfsense.org/index.php/Nut_package</pkginfolink>
 	</package>
 	<package>
@@ -753,7 +784,9 @@
 		<maintainer>sullrich+pfsp@gmail.com</maintainer>
 		<config_file>http://www.pfsense.com/packages/config/darkstat/darkstat.xml</config_file>
 		<configurationfile>darkstat.xml</configurationfile>
-		<build_port_path>/usr/ports/net-mgmt/darkstat</build_port_path>
+		<build_pbi>
+			<port>net-mgmt/darkstat</port>
+		</build_pbi>
 	</package>
 	<package>
 		<name>pfflowd</name>
@@ -767,7 +800,10 @@
 		<required_version>2.2</required_version>
 		<configurationfile>pfflowd.xml</configurationfile>
 		<maintainer></maintainer>
-		<build_port_path>/usr/ports/net/pfflowd-0.8</build_port_path>
+		<build_pbi>
+			<custom_name>pfflowd</custom_name>
+			<port>net/pfflowd-0.8</port>
+		</build_pbi>
 	</package>
 	<package>
 		<name>widentd</name>
@@ -781,7 +817,9 @@
 		<required_version>2.2</required_version>
 		<config_file>http://www.pfsense.com/packages/config/widentd.xml</config_file>
 		<configurationfile>widentd.xml</configurationfile>
-		<build_port_path>/usr/ports/net/widentd</build_port_path>
+		<build_pbi>
+			<port>net/widentd</port>
+		</build_pbi>
 	</package>
 	<package>
 		<name>freeradius2</name>
@@ -836,7 +874,9 @@
 		<required_version>2.2</required_version>
 		<config_file>http://www.pfsense.com/packages/config/stunnel.xml</config_file>
 		<configurationfile>stunnel.xml</configurationfile>
-		<build_port_path>/usr/ports/security/stunnel</build_port_path>
+		<build_pbi>
+			<port>security/stunnel</port>
+		</build_pbi>
 		<build_options>WITHOUT_FORK=true;WITH_PTHREAD=true;WITHOUT_UCONTEXT=true;WITHOUT_IPV6=true;WITH_LIBWRAP=true;WITHOUT_SSL_PORT=true</build_options>
 	</package>
 	<package>
@@ -851,7 +891,9 @@
 		<pkginfolink>http://doc.pfsense.org/index.php/Iperf_package</pkginfolink>
 		<required_version>2.2</required_version>
 		<configurationfile>iperf.xml</configurationfile>
-		<build_port_path>/usr/ports/benchmarks/iperf</build_port_path>
+		<build_pbi>
+			<port>benchmarks/iperf</port>
+		</build_pbi>
 	</package>
 	<package>
 		<name>netio</name>
@@ -864,7 +906,9 @@
 		<required_version>2.2</required_version>
 		<status>ALPHA</status>
 		<configurationfile>netio.xml</configurationfile>
-		<build_port_path>/usr/ports/benchmarks/netio</build_port_path>
+		<build_pbi>
+			<port>benchmarks/netio</port>
+		</build_pbi>
 	</package>
 	<package>
 		<name>mtr-nox11</name>
@@ -878,7 +922,9 @@
 		<required_version>2.2</required_version>
 		<config_file>http://www.pfsense.com/packages/config/mtr-nox11.xml</config_file>
 		<configurationfile>mtr-nox11.xml</configurationfile>
-		<build_port_path>/usr/ports/net/mtr</build_port_path>
+		<build_pbi>
+			<port>net/mtr</port>
+		</build_pbi>
 		<build_options>mtr_UNSET=X11</build_options>
 	</package>
 	<package>
@@ -959,7 +1005,9 @@
 		<depends_on_package_pbi>lcdproc-0.5.6-##ARCH##.pbi</depends_on_package_pbi>
 		<config_file>http://www.pfsense.org/packages/config/lcdproc/lcdproc.xml</config_file>
 		<configurationfile>lcdproc.xml</configurationfile>
-		<build_port_path>/usr/ports/sysutils/lcdproc</build_port_path>
+		<build_pbi>
+			<port>sysutils/lcdproc</port>
+		</build_pbi>
 		<build_options>lcdproc_SET=USB</build_options>
 	</package>
 	<package>
@@ -976,8 +1024,10 @@
 		<depends_on_package_pbi>lcdproc-0.5.6-##ARCH##.pbi</depends_on_package_pbi>
 		<config_file>http://www.pfsense.org/packages/config/lcdproc-dev/lcdproc.xml</config_file>
 		<configurationfile>lcdproc.xml</configurationfile>
-		<build_port_path>/usr/ports/sysutils/lcdproc</build_port_path>
-		<build_options>WITH_USB=true</build_options>
+		<build_pbi>
+			<port>sysutils/lcdproc</port>
+		</build_pbi>
+		<build_options>lcdproc_SET=USB</build_options>
 		<after_install_info>Please set the service options in Services-LCDproc before running the service.</after_install_info>
 	</package>
 	<package>
@@ -986,7 +1036,9 @@
 		<website>http://www-nrg.ee.lbl.gov/</website>
 		<category>Security</category>
 		<depends_on_package_pbi>arpwatch-2.1.a15_7-##ARCH##.pbi</depends_on_package_pbi>
-		<build_port_path>/usr/ports/net-mgmt/arpwatch</build_port_path>
+		<build_pbi>
+			<port>net-mgmt/arpwatch</port>
+		</build_pbi>
 		<version>2.1.a15_7 pkg v1.1.1</version>
 		<status>ALPHA</status>
 		<required_version>2.2</required_version>
@@ -1107,7 +1159,9 @@
 		<descr>Antivirus:  HAVP (HTTP Antivirus Proxy) is a proxy with a ClamAV anti-virus scanner. The main aims are continuous, non-blocking downloads and smooth scanning of dynamic and password protected HTTP traffic. Havp antivirus proxy has a parent and transparent proxy mode. It can be used with squid or standalone. And File Scanner for local files.</descr>
 		<category>Network Management</category>
 		<depends_on_package_pbi>havp-0.91_1-##ARCH##.pbi</depends_on_package_pbi>
-		<build_port_path>/usr/ports/www/havp</build_port_path>
+		<build_pbi>
+			<port>www/havp</port>
+		</build_pbi>
 		<build_options>CLAMAVUSER=havp;CLAMAVGROUP=havp</build_options>
 		<version>0.91_1 pkg v1.01</version>
 		<status>BETA</status>
@@ -1273,6 +1327,7 @@
 		<website>https://github.com/sileht/check_mk/blob/master/doc/README</website>
 		<descr><![CDATA[The basic idea of check_mk is to fetch "all" information about a target host at once.<br>For each host to be monitored check_mk is called by Nagios only once per time period.]]></descr>
 		<category>Services</category>
+		<depends_on_package_pbi>muse-0.2-##ARCH##.pbi</depends_on_package_pbi>
 		<build_pbi>
 			<ports_before>sysutils/ipmitool devel/libstatgrab</ports_before>
 			<port>sysutils/muse</port>
@@ -1321,7 +1376,9 @@
 		<depends_on_package_pbi>zebedee-2.5.3-##ARCH##.pbi</depends_on_package_pbi>
 		<config_file>http://www.pfsense.com/packages/config/zebedee/zebedee.xml</config_file>
 		<configurationfile>zebedee.xml</configurationfile>
-		<build_port_path>/usr/ports/security/zebedee</build_port_path>
+		<build_pbi>
+			<port>security/zebedee</port>
+		</build_pbi>
 	</package>
 	<package>
 		<name>Quagga OSPF</name>
@@ -1332,7 +1389,9 @@
 		<status>BETA</status>
 		<depends_on_package_pbi>quagga-0.99.22.3-##ARCH##.pbi</depends_on_package_pbi>
 		<config_file>http://www.pfsense.com/packages/config/quagga_ospfd/quagga_ospfd.xml</config_file>
-		<build_port_path>/usr/ports/net/quagga</build_port_path>
+		<build_pbi>
+			<port>net/quagga</port>
+		</build_pbi>
 		<pkginfolink></pkginfolink>
 		<required_version>2.2</required_version>
 		<configurationfile>quagga_ospfd.xml</configurationfile>
