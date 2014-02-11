@@ -65,7 +65,7 @@
 			<custom_name>bind</custom_name>
 			<port>dns/bind99</port>
 		</build_pbi>
-		<build_options>OPTIONS_UNSET=IDN REPLACE_BASE FIXED_RRSET GSSAPI;OPTIONS_SET=IPV6 LINKS SSL THREADS XML DLZ_FILESYSTEM FILTER_AAAA SIGCHASE RRL LARGE_FILE</build_options>
+		<build_options>OPTIONS_UNSET_FORCE=IDN REPLACE_BASE FIXED_RRSET GSSAPI;OPTIONS_SET=IPV6 LINKS SSL THREADS XML DLZ_FILESYSTEM FILTER_AAAA SIGCHASE RRL LARGE_FILE</build_options>
 	</package>
 	<package>
 		<name>Filer</name>
@@ -193,7 +193,7 @@
 			<custom_name>haproxy-devel</custom_name>
 			<port>/usr/ports/net/haproxy-devel</port>
 		</build_pbi>
-		<build_options>WITH_OPENSSL_PORT=yes;OPTIONS_UNSET=PCRE DPCRE;OPTIONS_SET=OPENSSL SPCRE</build_options>
+		<build_options>WITH_OPENSSL_PORT=yes;OPTIONS_UNSET_FORCE=PCRE DPCRE;OPTIONS_SET=OPENSSL SPCRE</build_options>
 	</package>
 	<package>
 		<name>Apache with mod_security-dev</name>
@@ -241,7 +241,7 @@
 			<port>www/apache24</port>
 			<ports_after>www/mod_security www/mod_memcache</ports_after>
 		</build_pbi>
-		<build_options>apache24_UNSET=MPM_PREFORK;apache24_SET=MPM_EVENT SLOTMEM_SHM MOST_ENABLED_MODULES MPM_SHARED SESSION_ENABLED_MODULES PROXY_ENABLED_MODULES SESSION_ENABLED_MODULES;mod_security_SET=MLOGC</build_options>
+		<build_options>apache24_UNSET_FORCE=MPM_PREFORK;apache24_SET=MPM_EVENT SLOTMEM_SHM MOST_ENABLED_MODULES MPM_SHARED SESSION_ENABLED_MODULES PROXY_ENABLED_MODULES SESSION_ENABLED_MODULES;mod_security_SET=MLOGC</build_options>
 		<after_install_info>Please visit the ProxyServer settings tab and set the service up so that it may be started.</after_install_info>
 	</package>
 	<package>
@@ -287,7 +287,7 @@
 			<port>www/apache22-worker-mpm</port>
 			<ports_after>www/mod_security www/mod_memcache</ports_after>
 		</build_pbi>
-		<build_options>OPTIONS_UNSET=BDB MYSQL PGSQL;OPTIONS_SET=SQLITE THREADS IPV6 SSL;WITH_MPM=worker;apache22-worker-mpm_UNSET=AUTHNZ_LDAP AUTHN_DBD BUCKETEER CASE_FILTER CASE_FILTER_IN CGID DBD EXT_FILTER LDAP LOG_FORENSIC OPTIONAL_FN_EXPORT OPTIONAL_FN_IMPORT OPTIONAL_HOOK_EXPORT OPTIONAL_HOOK_IMPORT SUBSTITUTE SUEXEC SUEXEC_RSRCLIMIT;apache22-worker-mpm_SET=ACTIONS ALIAS AUTHN_ALIAS VHOST_ALIAS ASIS AUTHN_ANON AUTHN_DBM AUTHN_DEFAULT AUTHN_FILE AUTHZ_DBM AUTHZ_DEFAULT AUTHZ_GROUPFILE AUTHZ_HOST AUTHZ_OWNER AUTHZ_USER AUTH_BASIC AUTH_DIGEST AUTOINDEX CACHE DISK_CACHE FILE_CACHE MEM_CACHE CERN_META CGI CHARSET_LITE DAV DAV_FS DEFLATE DIR DUMPIO ENV EXPIRES FILTER HEADERS IMAGEMAP INCLUDE INFO LOGIO LOG_CONFIG  MIME MIME_MAGIC NEGOTIATION PROXY PROXY_AJP PROXY_BALANCER PROXY_CONNECT PROXY_FTP PROXY_HTTP PROXY_SCGI REQTIMEOUT REWRITE SETENVIF SPELING STATUS THREADS UNIQUE_ID USERDIR USERTRACK VERSION</build_options>
+		<build_options>OPTIONS_UNSET_FORCE=BDB MYSQL PGSQL;OPTIONS_SET=SQLITE THREADS IPV6 SSL;WITH_MPM=worker;apache22-worker-mpm_UNSET_FORCE=AUTHNZ_LDAP AUTHN_DBD BUCKETEER CASE_FILTER CASE_FILTER_IN CGID DBD EXT_FILTER LDAP LOG_FORENSIC OPTIONAL_FN_EXPORT OPTIONAL_FN_IMPORT OPTIONAL_HOOK_EXPORT OPTIONAL_HOOK_IMPORT SUBSTITUTE SUEXEC SUEXEC_RSRCLIMIT;apache22-worker-mpm_SET=ACTIONS ALIAS AUTHN_ALIAS VHOST_ALIAS ASIS AUTHN_ANON AUTHN_DBM AUTHN_DEFAULT AUTHN_FILE AUTHZ_DBM AUTHZ_DEFAULT AUTHZ_GROUPFILE AUTHZ_HOST AUTHZ_OWNER AUTHZ_USER AUTH_BASIC AUTH_DIGEST AUTOINDEX CACHE DISK_CACHE FILE_CACHE MEM_CACHE CERN_META CGI CHARSET_LITE DAV DAV_FS DEFLATE DIR DUMPIO ENV EXPIRES FILTER HEADERS IMAGEMAP INCLUDE INFO LOGIO LOG_CONFIG  MIME MIME_MAGIC NEGOTIATION PROXY PROXY_AJP PROXY_BALANCER PROXY_CONNECT PROXY_FTP PROXY_HTTP PROXY_SCGI REQTIMEOUT REWRITE SETENVIF SPELING STATUS THREADS UNIQUE_ID USERDIR USERTRACK VERSION</build_options>
 		<after_install_info>Please visit the ProxyServer settings tab and set the service up so that it may be started.</after_install_info>
 	</package>
 	<package>
@@ -511,7 +511,7 @@
 			<ports_after>security/barnyard2</ports_after>
 		</build_pbi>
 		<!-- Use both styles for now, since our snort port isn't yet optionsng, but barnyard2 and others are. -->
-		<build_options>barnyard2_UNSET=ODBC PGSQL PRELUDE;barnyard2_SET=GRE IPV6 MPLS MYSQL PORT_PCAP;snort_SET=TARGETBASED PERFPROFILE DECODERPRE FLEXRESP3 GRE IPV6 MPLS NORMALIZER ZLIB;perl_SET=THREADS;WITH_THREADS=yes;WITH_IPV6=true;WITH_MPLS=true;WITH_GRE=true;WITH_TARGETBASED=true;WITH_PERFPROFILE=true;WITH_DECODERPRE=true;WITH_ZLIB=true;WITH_NORMALIZER=true;WITH_REACT=true;WITH_FLEXRESP3=true;WITHOUT_ODBC=true;WITHOUT_POSTGRESQL=true;WITHOUT_PRELUDE=true;NOPORTDOCS=true</build_options>
+		<build_options>barnyard2_UNSET_FORCE=ODBC PGSQL PRELUDE;barnyard2_SET=GRE IPV6 MPLS MYSQL PORT_PCAP;snort_SET=TARGETBASED PERFPROFILE DECODERPRE FLEXRESP3 GRE IPV6 MPLS NORMALIZER ZLIB;perl_SET=THREADS;WITH_THREADS=yes;WITH_IPV6=true;WITH_MPLS=true;WITH_GRE=true;WITH_TARGETBASED=true;WITH_PERFPROFILE=true;WITH_DECODERPRE=true;WITH_ZLIB=true;WITH_NORMALIZER=true;WITH_REACT=true;WITH_FLEXRESP3=true;WITHOUT_ODBC=true;WITHOUT_POSTGRESQL=true;WITHOUT_PRELUDE=true;NOPORTDOCS=true</build_options>
 		<config_file>http://www.pfsense.com/packages/config/snort/snort.xml</config_file>
 		<version>2.9.5.5 pkg v3.0.3</version>
 		<required_version>2.0</required_version>
@@ -605,7 +605,7 @@
 		<configurationfile>dansguardian.xml</configurationfile>
 		<build_port_path>/usr/ports/www/dansguardian-devel</build_port_path>
 		<build_port_path>/usr/ports/security/ca_root_nss</build_port_path>
-		<build_options>dansguardian-devel_UNSET=APACHE;dansguardian-devel_SET=TRICKLE CLAMD ICAP NTLM SSL</build_options>
+		<build_options>dansguardian-devel_UNSET_FORCE=APACHE;dansguardian-devel_SET=TRICKLE CLAMD ICAP NTLM SSL</build_options>
 		<!-- NOTE: Distfile must be fetched manually from http://dansguardian.org/downloads/2/Alpha/dansguardian-2.12.0.0.tar.gz -->
 	</package>
 	<package>
@@ -638,7 +638,7 @@
 			<ports_before>mail/pyzor mail/p5-Mail-SPF net/p5-IP-Country mail/dcc-dccd</ports_before>
 			<port>mail/mailscanner</port>
 		</build_pbi>
-		<build_options>mailscanner_UNSET=BDC CLAMAVMODULE;mailscanner_SET=SPAMASSASSIN CLAMAV;p5-Mail-SpamAssassin_SET=DCC</build_options>
+		<build_options>mailscanner_UNSET_FORCE=BDC CLAMAVMODULE;mailscanner_SET=SPAMASSASSIN CLAMAV;p5-Mail-SpamAssassin_SET=DCC</build_options>
 	</package>
 	<package>
 		<name>siproxd</name>
@@ -737,7 +737,7 @@
 		<required_version>2.0</required_version>
 		<configurationfile>sarg.xml</configurationfile>
 		<build_port_path>/usr/ports/www/sarg</build_port_path>
-		<build_options>sarg_UNSET=PHP</build_options>
+		<build_options>sarg_UNSET_FORCE=PHP</build_options>
 		<after_install_info>Please visit sarg settings on Status Menu to configure sarg.</after_install_info>
 	</package>
 	<package>
@@ -801,7 +801,7 @@
 			<ports_before>lang/gcc</ports_before>
 			<port>www/varnish</port>
 		</build_pbi>
-		<build_options>gcc_UNSET=JAVA</build_options>
+		<build_options>gcc_UNSET_FORCE=JAVA</build_options>
 		<build_port_path>/usr/ports/www/varnish</build_port_path>
 		<build_port_path>/usr/ports/lang/gcc42</build_port_path>
 	</package>
@@ -1203,7 +1203,7 @@
 		<config_file>http://www.pfsense.com/packages/config/mtr-nox11.xml</config_file>
 		<configurationfile>mtr-nox11.xml</configurationfile>
 		<build_port_path>/usr/ports/net/mtr</build_port_path>
-		<build_options>mtr_UNSET=X11</build_options>
+		<build_options>mtr_UNSET_FORCE=X11</build_options>
 	</package>
 	<package>
 		<name>squid</name>
@@ -1227,7 +1227,7 @@
 			<port>www/squid</port>
 			<ports_after>www/squid_radius_auth</ports_after>
 		</build_pbi>
-		<build_options>squid_UNSET=DNS_HELPER IPFILTER PINGER STACKTRACES STRICT_HTTP_DESC USERAGENT_LOG WCCPV2;squid_SET=PF LDAP_AUTH NIS_AUTH SASL_AUTH ARP_ACL AUFS CACHE_DIGESTS CARP COSS DELAY_POOLS FOLLOW_XFF HTCP IDENT KERB_AUTH KQUEUE LARGEFILE REFERER_LOG SNMP SSL VIA_DB WCCP;SQUID_UID=proxy;SQUID_GID=proxy</build_options>
+		<build_options>squid_UNSET_FORCE=DNS_HELPER IPFILTER PINGER STACKTRACES STRICT_HTTP_DESC USERAGENT_LOG WCCPV2;squid_SET=PF LDAP_AUTH NIS_AUTH SASL_AUTH ARP_ACL AUFS CACHE_DIGESTS CARP COSS DELAY_POOLS FOLLOW_XFF HTCP IDENT KERB_AUTH KQUEUE LARGEFILE REFERER_LOG SNMP SSL VIA_DB WCCP;SQUID_UID=proxy;SQUID_GID=proxy</build_options>
 		<config_file>http://www.pfsense.org/packages/config/squid/squid.xml</config_file>
 		<configurationfile>squid.xml</configurationfile>
 	</package>
@@ -1252,7 +1252,7 @@
 			<port>www/squid31</port>
 			<ports_after>www/squid_radius_auth</ports_after>
 		</build_pbi>
-		<build_options>c-icap_UNSET=IPV6;squid_UNSET=AUTH_SMB AUTH_SQL DNS_HELPER FS_COSS ESI SNMP ECAP STACKTRACES STRICT_HTTP TP_IPF TP_IPFW VIA_DB DEBUG DOCS EXAMPLES;squid_SET=ARP_ACL AUTH_KERB AUTH_LDAP AUTH_NIS AUTH_SASL CACHE_DIGESTS DELAY_POOLS FOLLOW_XFF TP_PF MSSL_CRTD WCCP WCCPV2 FS_AUFS HTCP ICAP ICMP IDENT IPV6 KQUEUE LARGEFILE SSL SSL_CRTD</build_options>
+		<build_options>c-icap_UNSET_FORCE=IPV6;squid_UNSET_FORCE=AUTH_SMB AUTH_SQL DNS_HELPER FS_COSS ESI SNMP ECAP STACKTRACES STRICT_HTTP TP_IPF TP_IPFW VIA_DB DEBUG DOCS EXAMPLES;squid_SET=ARP_ACL AUTH_KERB AUTH_LDAP AUTH_NIS AUTH_SASL CACHE_DIGESTS DELAY_POOLS FOLLOW_XFF TP_PF MSSL_CRTD WCCP WCCPV2 FS_AUFS HTCP ICAP ICMP IDENT IPV6 KQUEUE LARGEFILE SSL SSL_CRTD</build_options>
 		<!--<build_options>WITH_SQUID_KERB_AUTH=true;WITH_SQUID_LDAP_AUTH=true;WITH_SQUID_NIS_AUTH=true;WITH_SQUID_SASL_AUTH=true;WITH_SQUID_IPV6=true;WITH_SQUID_DELAY_POOLS=true;WITH_SQUID_SNMP=true;WITH_SQUID_SSL=true;WITH_SQUID_SSL_CRTD=true;WITH_SQUID_PINGER=true;WITHOUT_SQUID_DNS_HELPER=true;WITH_SQUID_HTCP=true;WITH_SQUID_VIA_DB=true;WITH_SQUID_CACHE_DIGESTS=true;WITHOUT_SQUID_WCCP=true;WITH_SQUID_WCCPV2=true;WITHOUT_SQUID_STRICT_HTTP=true;WITH_SQUID_IDENT=true;WITH_SQUID_REFERER_LOG=true;WITH_SQUID_USERAGENT_LOG=true;WITH_SQUID_ARP_ACL=true;WITH_SQUID_IPFW=true;WITH_SQUID_PF=true;WITHOUT_SQUID_IPFILTER=true;WITH_SQUID_FOLLOW_XFF=true;WITHOUT_SQUID_ECAP=true;WITHOUT_SQUID_ICAP=true;WITHOUT_SQUID_ESI=true;WITH_SQUID_AUFS=true;WITHOUT_SQUID_COSS=true;WITHOUT_SQUID_KQUEUE=true;WITH_SQUID_LARGEFILE=true;WITHOUT_SQUID_STACKTRACES=true;WITHOUT_SQUID_DEBUG=true</build_options>-->
 		<config_file>http://www.pfsense.org/packages/config/squid3/31/squid.xml</config_file>
 		<configurationfile>squid.xml</configurationfile>
@@ -1284,7 +1284,7 @@
 			<port>www/squid33</port>
 			<ports_after>www/squid_radius_auth security/clamav www/squidclamav security/ca_root_nss www/c-icap-modules</ports_after>
 		</build_pbi>
-		<build_options>c-icap_UNSET=IPV6;squid_UNSET=AUTH_SMB AUTH_SQL DNS_HELPER FS_COSS ESI SNMP ECAP STACKTRACES STRICT_HTTP TP_IPF TP_IPFW VIA_DB DEBUG DOCS EXAMPLES AUTH_SASL;squid_SET=ARP_ACL AUTH_KERB AUTH_LDAP AUTH_NIS CACHE_DIGESTS DELAY_POOLS FOLLOW_XFF TP_PF MSSL_CRTD WCCP WCCPV2 FS_AUFS HTCP ICAP ICMP IDENT IPV6 KQUEUE LARGEFILE SSL SSL_CRTD</build_options>
+		<build_options>c-icap_UNSET_FORCE=IPV6;squid_UNSET_FORCE=AUTH_SMB AUTH_SQL DNS_HELPER FS_COSS ESI SNMP ECAP STACKTRACES STRICT_HTTP TP_IPF TP_IPFW VIA_DB DEBUG DOCS EXAMPLES AUTH_SASL;squid_SET=ARP_ACL AUTH_KERB AUTH_LDAP AUTH_NIS CACHE_DIGESTS DELAY_POOLS FOLLOW_XFF TP_PF MSSL_CRTD WCCP WCCPV2 FS_AUFS HTCP ICAP ICMP IDENT IPV6 KQUEUE LARGEFILE SSL SSL_CRTD</build_options>
 		<config_file>http://www.pfsense.org/packages/config/squid3/33/squid.xml</config_file>
 		<configurationfile>squid.xml</configurationfile>
 		<depends_on_package_pbi>squid-3.3.10-amd64.pbi</depends_on_package_pbi>
@@ -1366,7 +1366,7 @@
 			<ports_before>databases/db41 security/cyrus-sasl2</ports_before>
 			<port>www/squidguard</port>
 		</build_pbi>
-		<build_options>squidGuard_UNSET=SQUID32 SQUID33;squidGuard_SET=SAMPLE_BL SASL LDAP SQUID27;squid_UNSET=DNS_HELPER IPFILTER PINGER STACKTRACES STRICT_HTTP_DESC USERAGENT_LOG WCCPV2;squid_SET=PF LDAP_AUTH NIS_AUTH SASL_AUTH ARP_ACL AUFS CACHE_DIGESTS CARP COSS DELAY_POOLS FOLLOW_XFF HTCP IDENT KERB_AUTH KQUEUE LARGEFILE REFERER_LOG SNMP SSL VIA_DB WCCP;SQUID_UID=proxy;SQUID_GID=proxy</build_options>
+		<build_options>squidGuard_UNSET_FORCE=SQUID32 SQUID33;squidGuard_SET=SAMPLE_BL SASL LDAP SQUID27;squid_UNSET_FORCE=DNS_HELPER IPFILTER PINGER STACKTRACES STRICT_HTTP_DESC USERAGENT_LOG WCCPV2;squid_SET=PF LDAP_AUTH NIS_AUTH SASL_AUTH ARP_ACL AUFS CACHE_DIGESTS CARP COSS DELAY_POOLS FOLLOW_XFF HTCP IDENT KERB_AUTH KQUEUE LARGEFILE REFERER_LOG SNMP SSL VIA_DB WCCP;SQUID_UID=proxy;SQUID_GID=proxy</build_options>
 		<config_file>http://www.pfsense.org/packages/config/squidGuard/squidguard.xml</config_file>
 		<configurationfile>squidguard.xml</configurationfile>
 	</package>
@@ -1386,7 +1386,7 @@
 			<port>www/squidguard-devel</port>
 			<custom_name>squidguard-devel</custom_name>
 		</build_pbi>
-		<build_options>squidGuard-devel_UNSET=SQUID32 SQUID33;squidGuard-devel_SET=LDAP STRIPNT SQUID27;squid_UNSET=DNS_HELPER IPFILTER PINGER STACKTRACES STRICT_HTTP_DESC USERAGENT_LOG WCCPV2;squid_SET=PF LDAP_AUTH NIS_AUTH SASL_AUTH ARP_ACL AUFS CACHE_DIGESTS CARP COSS DELAY_POOLS FOLLOW_XFF HTCP IDENT KERB_AUTH KQUEUE LARGEFILE REFERER_LOG SNMP SSL VIA_DB WCCP;SQUID_UID=proxy;SQUID_GID=proxy</build_options>
+		<build_options>squidGuard-devel_UNSET_FORCE=SQUID32 SQUID33;squidGuard-devel_SET=LDAP STRIPNT SQUID27;squid_UNSET_FORCE=DNS_HELPER IPFILTER PINGER STACKTRACES STRICT_HTTP_DESC USERAGENT_LOG WCCPV2;squid_SET=PF LDAP_AUTH NIS_AUTH SASL_AUTH ARP_ACL AUFS CACHE_DIGESTS CARP COSS DELAY_POOLS FOLLOW_XFF HTCP IDENT KERB_AUTH KQUEUE LARGEFILE REFERER_LOG SNMP SSL VIA_DB WCCP;SQUID_UID=proxy;SQUID_GID=proxy</build_options>
 		<config_file>http://www.pfsense.org/packages/config/squidGuard-devel/squidguard.xml</config_file>
 		<configurationfile>squidguard.xml</configurationfile>
 	</package>
@@ -1406,7 +1406,7 @@
 			<port>www/squidguard</port>
 			<custom_name>squidguard-squid3</custom_name>
 		</build_pbi>
-		<build_options>OPTIONS_SET=FETCH LDAP;squidGuard_UNSET=SQUID27;squidGuard_SET=SAMPLE_BL SASL SQUID33;c-icap_UNSET=IPV6 squid_UNSET=AUTH_SMB AUTH_SQL DNS_HELPER FS_COSS ESI SNMP ECAP STACKTRACES STRICT_HTTP TP_IPF TP_IPFW VIA_DB DEBUG DOCS EXAMPLES;squid_SET=ARP_ACL AUTH_KERB AUTH_LDAP AUTH_NIS AUTH_SASL CACHE_DIGESTS DELAY_POOLS FOLLOW_XFF TP_PF MSSL_CRTD WCCP WCCPV2 FS_AUFS HTCP ICAP ICMP IDENT IPV6 KQUEUE LARGEFILE SSL SSL_CRTD</build_options>
+		<build_options>OPTIONS_SET=FETCH LDAP;squidGuard_UNSET_FORCE=SQUID27;squidGuard_SET=SAMPLE_BL SASL SQUID33;c-icap_UNSET_FORCE=IPV6 squid_UNSET_FORCE=AUTH_SMB AUTH_SQL DNS_HELPER FS_COSS ESI SNMP ECAP STACKTRACES STRICT_HTTP TP_IPF TP_IPFW VIA_DB DEBUG DOCS EXAMPLES;squid_SET=ARP_ACL AUTH_KERB AUTH_LDAP AUTH_NIS AUTH_SASL CACHE_DIGESTS DELAY_POOLS FOLLOW_XFF TP_PF MSSL_CRTD WCCP WCCPV2 FS_AUFS HTCP ICAP ICMP IDENT IPV6 KQUEUE LARGEFILE SSL SSL_CRTD</build_options>
 		<config_file>http://www.pfsense.org/packages/config/squidGuard/squidguard.xml</config_file>
 		<configurationfile>squidguard.xml</configurationfile>
 	</package>
@@ -1425,7 +1425,7 @@
 			<custom_name>zabbix-agent</custom_name>
 			<port>net-mgmt/zabbix-agent</port>
 		</build_pbi>
-		<build_options>ca_root_nss_UNSET=ETCSYMLINK;zabbix22_SET=LDAP SSH SQLITE;zabbix22_UNSET=MYSQL</build_options>
+		<build_options>ca_root_nss_UNSET_FORCE=ETCSYMLINK;zabbix22_SET=LDAP SSH SQLITE;zabbix22_UNSET_FORCE=MYSQL</build_options>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
 		<depends_on_package>zabbix-agent-1.8.10,2.tbz</depends_on_package>
 		<depends_on_package_pbi>zabbix-agent-1.8.13-amd64.pbi</depends_on_package_pbi>
@@ -1445,7 +1445,7 @@
 			<custom_name>zabbix-proxy</custom_name>
 			<port>net-mgmt/zabbix-proxy</port>
 		</build_pbi>
-		<build_options>ca_root_nss_UNSET=ETCSYMLINK;zabbix22_SET=LDAP SSH SQLITE;zabbix22_UNSET=MYSQL</build_options>
+		<build_options>ca_root_nss_UNSET_FORCE=ETCSYMLINK;zabbix22_SET=LDAP SSH SQLITE;zabbix22_UNSET_FORCE=MYSQL</build_options>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
 		<depends_on_package>zabbix-proxy-1.8.8,2.tbz</depends_on_package>
 		<depends_on_package_pbi>zabbix-proxy-1.8.13-amd64.pbi</depends_on_package_pbi>
@@ -1609,7 +1609,7 @@
 			<port>dns/unbound</port>
 		</build_pbi>
 		<depends_on_package_pbi>unbound-1.4.21_1-amd64.pbi</depends_on_package_pbi>
-		<build_options>unbound_UNSET=GOST ECDSA;unbound_SET=LIBEVENT20 THREADS</build_options>
+		<build_options>unbound_UNSET_FORCE=GOST ECDSA;unbound_SET=LIBEVENT20 THREADS</build_options>
 		<logging>
 			<facilityname>unbound</facilityname>
 			<logfilename>unbound.log</logfilename>
@@ -1660,7 +1660,7 @@
 			<ports_before>net-mgmt/nagios-plugins</ports_before>
 			<port>net-mgmt/nrpe2</port>
 		</build_pbi>
-		<build_options>nrpe2_SET=SSL;nrpe2_UNSET=ARGS</build_options>
+		<build_options>nrpe2_SET=SSL;nrpe2_UNSET_FORCE=ARGS</build_options>
 		<config_file>http://www.pfsense.com/packages/config/nrpe2/nrpe2.xml</config_file>
 		<version>2.12_3 v2.2</version>
 		<status>Beta</status>
@@ -1837,7 +1837,7 @@
 		<config_file>http://www.pfsense.com/packages/config/git/git.xml</config_file>
 		<maintainer>jimp@pfsense.org</maintainer>
 		<configurationfile>git.xml</configurationfile>
-		<build_options>git_UNSET=GITWEB GUI HTMLDOCS CVS P4 SVN;git_SET=CONTRIB CURL ETCSHELLS ICONV NLS PERL</build_options>
+		<build_options>git_UNSET_FORCE=GITWEB GUI HTMLDOCS CVS P4 SVN;git_SET=CONTRIB CURL ETCSHELLS ICONV NLS PERL</build_options>
 		<build_port_path>/usr/ports/devel/git</build_port_path>
 		<build_pbi>
 			<port>devel/git</port>
@@ -1941,7 +1941,7 @@
 		<build_pbi>
 			<port>sysutils/ipmitool</port>
 		</build_pbi>
-		<build_options>ipmitool_SET=FREEIPMI;freeipmi_UNSET=DOCS DEBUG IOPERM</build_options>
+		<build_options>ipmitool_SET=FREEIPMI;freeipmi_UNSET_FORCE=DOCS DEBUG IOPERM</build_options>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
 		<depends_on_package_pbi>ipmitool-1.8.12_3-amd64.pbi</depends_on_package_pbi>
 	</package>
@@ -2008,7 +2008,7 @@
 			<custom_name>apcupsd</custom_name>
 			<port>sysutils/apcupsd</port>
 		</build_pbi>
-		<build_options>apcupsd_SET=APCSMART_DRV APCDUMB_DRV PCNET_DRV USB TCP_WRAPPERS SNMP_DRV;apcupsd_UNSET=CLIENT_ONLY CGI SNMP_DRV_OLD TEST_DRV GAPCMON DOCS</build_options>
+		<build_options>apcupsd_SET=APCSMART_DRV APCDUMB_DRV PCNET_DRV USB TCP_WRAPPERS SNMP_DRV;apcupsd_UNSET_FORCE=CLIENT_ONLY CGI SNMP_DRV_OLD TEST_DRV GAPCMON DOCS</build_options>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
 		<depends_on_package>apcupsd-3.14.10_1.tbz</depends_on_package>
 		<depends_on_package_pbi>apcupsd-3.14.10_1-amd64.pbi</depends_on_package_pbi>
