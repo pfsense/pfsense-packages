@@ -1654,13 +1654,13 @@
 		<depends_on_package>nrpe-2.12_3.tbz</depends_on_package>
 		<depends_on_package>nagios-plugins-1.4.15_1,1.tbz</depends_on_package>
 		<depends_on_package_pbi>nrpe-2.13_2-amd64.pbi</depends_on_package_pbi>
-		<build_port_path>/usr/ports/net-mgmt/nrpe2</build_port_path>
+		<build_port_path>/usr/ports/net-mgmt/nrpe</build_port_path>
 		<build_port_path>/usr/ports/net-mgmt/nagios-plugins</build_port_path>
 		<build_pbi>
 			<ports_before>net-mgmt/nagios-plugins</ports_before>
-			<port>net-mgmt/nrpe2</port>
+			<port>net-mgmt/nrpe</port>
 		</build_pbi>
-		<build_options>nrpe2_SET=SSL;nrpe2_UNSET_FORCE=ARGS</build_options>
+		<build_options>nrpe_SET=SSL;nrpe_UNSET_FORCE=ARGS</build_options>
 		<config_file>http://www.pfsense.com/packages/config/nrpe2/nrpe2.xml</config_file>
 		<version>2.12_3 v2.2</version>
 		<status>Beta</status>
