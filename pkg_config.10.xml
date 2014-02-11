@@ -503,23 +503,6 @@
 		<depends_on_package_pbi>openbgpd-5.2.20121209-##ARCH##.pbi</depends_on_package_pbi>
 	</package>
 	<package>
-		<name>OpenOSPFD</name>
-		<descr>This package is now considered deprecated. Please use the Quagga OSPF instead. -- WARNING! Installs files to the same place as Quagga OSPF. Installing both will result in a broken state, remove this package before installing Quagga OSPF.</descr>
-		<maintainer>cmb@pfsense.org</maintainer>
-		<version>0.5.2</version>
-		<category>Routing</category>
-		<status>DEPRECATED</status>
-		<depends_on_package_pbi>openospfd-4.6-##ARCH##.pbi</depends_on_package_pbi>
-		<config_file>http://www.pfsense.com/packages/config/openospfd/openospfd.xml</config_file>
-		<build_pbi>
-			<ports_before>devel/libevent</ports_before>
-			<port>net/openospfd</port>
-		</build_pbi>
-		<pkginfolink></pkginfolink>
-		<required_version>2.2</required_version>
-		<configurationfile>openospfd.xml</configurationfile>
-	</package>
-	<package>
 		<name>Lightsquid</name>
 		<descr>High perfomance web proxy report (LightSquid). Proxy realtime stat (SQStat). Requires squid HTTP proxy.</descr>
 		<website>http://lightsquid.sf.net/</website>
