@@ -139,6 +139,7 @@ function sync_package_apcupsd(){
 			$upsname=$apcupsd_config['upsname'];
 			$upscable=$apcupsd_config['upscable'];
 			$upstype=$apcupsd_config['upstype'];
+			$device=($apcupsd_config['device'] != ''? "DEVICE {$apcupsd_config['device']}" : "#DEVICE");
 			$polltime=($apcupsd_config['polltime'] != ''? $apcupsd_config['polltime'] : "60");
 			$onbatterydelay=($apcupsd_config['onbatterydelay'] != ''? $apcupsd_config['onbatterydelay'] : "6");
 			$batterylevel=($apcupsd_config['batterylevel'] != ''? $apcupsd_config['batterylevel'] : "5");
