@@ -34,6 +34,7 @@ require_once("guiconfig.inc");
 require_once("haproxy.inc");
 require_once("haproxy_utils.inc");
 require_once("globals.inc");
+require_once("pkg_haproxy_tabs.inc");
 
 if (!is_array($config['installedpackages']['haproxy'])) 
 	$config['installedpackages']['haproxy'] = array();
@@ -65,6 +66,9 @@ if ($_POST) {
 
 		if ($_POST['maxconn'] && (!is_numeric($_POST['maxconn']))) 
 			$input_errors[] = "The maximum number of connections should be numeric.";
+			
+		if ($_POST['localstatsport'] && (!is_numeric($_POST['localstatsport']))) 
+			$input_errors[] = "The local stats port should be numeric.";
 
 		/*if($_POST['synchost1'] && !is_ipaddr($_POST['synchost1']))
 			$input_errors[] = "Synchost1 needs to be an IPAddress.";
@@ -86,6 +90,7 @@ if ($_POST) {
 			$config['installedpackages']['haproxy']['loglevel'] = $_POST['loglevel'] ? $_POST['loglevel'] : false;
 			$config['installedpackages']['haproxy']['carpdev'] = $_POST['carpdev'] ? $_POST['carpdev'] : false;
 			//$config['installedpackages']['haproxy']['syncpassword'] = $_POST['syncpassword'] ? $_POST['syncpassword'] : false;
+			$config['installedpackages']['haproxy']['localstatsport'] = $_POST['localstatsport'] ? $_POST['localstatsport'] : false;
 			$config['installedpackages']['haproxy']['advanced'] = $_POST['advanced'] ? base64_encode($_POST['advanced']) : false;
 			$config['installedpackages']['haproxy']['nbproc'] = $_POST['nbproc'] ? $_POST['nbproc'] : false;			
 			touch($d_haproxyconfdirty_path);
@@ -106,6 +111,7 @@ $pconfig['remotesyslog'] = $config['installedpackages']['haproxy']['remotesyslog
 $pconfig['logfacility'] = $config['installedpackages']['haproxy']['logfacility'];
 $pconfig['loglevel'] = $config['installedpackages']['haproxy']['loglevel'];
 $pconfig['carpdev'] = $config['installedpackages']['haproxy']['carpdev'];
+$pconfig['localstatsport'] = $config['installedpackages']['haproxy']['localstatsport'];
 $pconfig['advanced'] = base64_decode($config['installedpackages']['haproxy']['advanced']);
 $pconfig['nbproc'] = $config['installedpackages']['haproxy']['nbproc'];
 
@@ -148,12 +154,7 @@ function enable_change(enable_change) {
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
 	<tr><td class="tabnavtbl">
 	<?php
-	/* active tabs */
-	$tab_array = array();
-	$tab_array[] = array("Settings", true, "haproxy_global.php");
-	$tab_array[] = array("Frontend", false, "haproxy_listeners.php");	
-	$tab_array[] = array("Backend", false, "haproxy_pools.php");	
-	display_top_tabs($tab_array);
+	haproxy_display_top_tabs_active($haproxy_tab_array['haproxy'], "settings");
 	?>
 	</td></tr>
 	<tr>
@@ -336,6 +337,18 @@ function enable_change(enable_change) {
 			<tr>
 				<td>
 					&nbsp;
+				</td>
+			</tr>
+			<tr>
+				<td colspan="2" valign="top" class="listtopic">Stats tab, 'internal' stats port</td>
+			</tr>
+			<tr>
+				<td width="22%" valign="top" class="vncell">Internal stats port</td>
+				<td class="vtable">
+					<input name="localstatsport" type="text" <?if(isset($pconfig['localstatsport'])) echo "value=\"{$pconfig['localstatsport']}\"";?> size="10" maxlength="5" /> EXAMPLE: 2200<br/>
+					Sets the internal port to be used for the stats tab.
+					This is bound to 127.0.0.1 so will not be directly exposed on any LAN/WAN/other interface. It is used to internally pass through the stats page.
+					Leave this setting empty to remove the "HAProxyLocalStats" item from the stats page and save a little on recources.
 				</td>
 			</tr>
 			<tr>

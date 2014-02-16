@@ -627,6 +627,21 @@ function haproxy_writeconf($configpath) {
 			}
 		}
 		fwrite ($fd, "\n");
+		
+		$localstatsport = $a_global['localstatsport'];
+		if ($localstatsport){
+			fwrite ($fd, "listen HAProxyLocalStats\n");
+			fwrite ($fd, "\tbind 127.0.0.1:$localstatsport\n");
+			fwrite ($fd, "\tmode http\n");
+			fwrite ($fd, "\tstats enable\n");
+			fwrite ($fd, "\tstats refresh 10\n");
+			fwrite ($fd, "\tstats admin if TRUE\n");
+			fwrite ($fd, "\tstats uri /haproxy_stats.php?haproxystats=1\n");
+			fwrite ($fd, "\ttimeout client 5000\n");
+			fwrite ($fd, "\ttimeout connect 5000\n");
+			fwrite ($fd, "\ttimeout server 5000\n");
+			fwrite ($fd, "\n");
+		}
 	}
 
 	// Try and get a unique array for address:port as frontends can duplicate

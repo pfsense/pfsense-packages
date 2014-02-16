@@ -34,6 +34,7 @@ require("guiconfig.inc");
 require_once("haproxy.inc");
 require_once("haproxy_utils.inc");
 require_once("haproxy_htmllist.inc");
+require_once("pkg_haproxy_tabs.inc");
 
 /* Compatibility function for pfSense 2.0 */
 if (!function_exists("cert_get_purpose")) {	
@@ -373,12 +374,7 @@ $interfaces = haproxy_get_bindable_interfaces();
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
   <tr><td class="tabnavtbl">
   <?php
-        /* active tabs */
-        $tab_array = array();
-	$tab_array[] = array("Settings", false, "haproxy_global.php");
-        $tab_array[] = array("Frontend", true, "haproxy_listeners.php");		
-	$tab_array[] = array("Backend", false, "haproxy_pools.php");
-	display_top_tabs($tab_array);
+	haproxy_display_top_tabs_active($haproxy_tab_array['haproxy'], "frontend");
   ?>
   </td></tr>
   <tr>
