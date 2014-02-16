@@ -1233,4 +1233,25 @@ function haproxy_escape_acl_name($aclname) {
 	return preg_replace_callback('([^A-Za-z0-9\._\-\:])', function($match){return "_".dechex(ord($match[0]));}, $aclname);
 }
 
+function haproxy_find_create_certificate($certificatename) {
+	global $g;
+	$cert = lookup_cert_by_name($certificatename);
+	if (is_array($cert))
+		return $cert;
+	global $config;
+	$a_cert =& $config['cert'];	
+	$cert = array();
+	$cert['refid'] = uniqid();
+	$cert['descr'] = gettext($certificatename);
+	mwexec("/usr/local/bin/openssl genrsa 1024 > {$g['tmp_path']}/ssl.key");
+	mwexec("/usr/local/bin/openssl req -new -x509 -nodes -sha256 -days 2000 -key {$g['tmp_path']}/ssl.key > {$g['tmp_path']}/ssl.crt");
+	$crt = file_get_contents("{$g['tmp_path']}/ssl.crt");
+	$key = file_get_contents("{$g['tmp_path']}/ssl.key");
+	unlink("{$g['tmp_path']}/ssl.key");
+	unlink("{$g['tmp_path']}/ssl.crt");
+	cert_import($cert, $crt, $key);
+	$a_cert[] = $cert;
+	return $cert;
+}
+
 ?>
