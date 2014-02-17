@@ -617,6 +617,7 @@ function haproxy_writeconf($configpath) {
 		fwrite ($fd, "\tnbproc\t\t\t$numprocs\n");
 		fwrite ($fd, "\tchroot\t\t\t/var/empty\n");
 		fwrite ($fd, "\tdaemon\n");
+		fwrite ($fd, "\tssl-server-verify none\n");
 		
 		// Keep the advanced options on the bottom of the global settings, to allow additional sections to be easely added
 		if($a_global['advanced']) {
