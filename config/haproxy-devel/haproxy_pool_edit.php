@@ -36,8 +36,6 @@ require_once("haproxy_utils.inc");
 require_once("haproxy_htmllist.inc");
 require_once("pkg_haproxy_tabs.inc");
 
-$d_haproxyconfdirty_path = $g['varrun_path'] . "/haproxy.conf.dirty";
-
 if (!is_array($config['installedpackages']['haproxy']['ha_pools']['item'])) {
 	$config['installedpackages']['haproxy']['ha_pools']['item'] = array();
 }
@@ -124,9 +122,14 @@ if ($_POST) {
 	do_input_validation($_POST, $reqdfields, $reqdfieldsn, &$input_errors);
 
 	if ($_POST['stats_enabled']) {
-		$reqdfields = explode(" ", "name stats_username stats_password stats_uri stats_realm");
-		$reqdfieldsn = explode(",", "Name,Stats Username,Stats Password,Stats Uri,Stats Realm");		
+		$reqdfields = explode(" ", "name stats_uri");
+		$reqdfieldsn = explode(",", "Name,Stats Uri");		
 		do_input_validation($_POST, $reqdfields, $reqdfieldsn, &$input_errors);
+		if ($_POST['stats_username']) {
+			$reqdfields = explode(" ", "stats_password stats_realm");
+			$reqdfieldsn = explode(",", "Stats Password,Stats Realm");		
+			do_input_validation($_POST, $reqdfields, $reqdfieldsn, &$input_errors);
+		}
 	}
 	
 	if (preg_match("/[^a-zA-Z0-9\.\-_]/", $_POST['name']))
@@ -152,6 +155,9 @@ if ($_POST) {
 	if (preg_match("/[^a-zA-Z0-9!-~ ]/", $_POST['stats_password']))
 		$input_errors[] = "The field 'Stats Password' contains invalid characters.";
 
+	if (preg_match("/[^a-zA-Z0-9\-_]/", $_POST['stats_node']))
+		$input_errors[] = "The field 'Stats Node' contains invalid characters. Should be a string with digits(0-9), letters(A-Z, a-z), hyphen(-) or underscode(_)";
+		
 	/* Ensure that our pool names are unique */
 	for ($i=0; isset($config['installedpackages']['haproxy']['ha_pools']['item'][$i]); $i++)
 		if (($_POST['name'] == $config['installedpackages']['haproxy']['ha_pools']['item'][$i]['name']) && ($i != $id))
@@ -163,18 +169,17 @@ if ($_POST) {
 		$server_address = $server['address'];
 		$server_port    = $server['port'];
 		$server_weight  = $server['weight'];
+
 		if (preg_match("/[^a-zA-Z0-9\.\-_]/", $server_name))
 			$input_errors[] = "The field 'Name' contains invalid characters.";
-		if (!is_ipaddr($server_address))
-			$input_errors[] = "The field 'Address' is not a valid ip address.";
+
+		if (!is_ipaddr($server_address) && !is_hostname($server_address))
+			$input_errors[] = "The field 'Address' is not a valid ip address or hostname.";
 
 		if (!preg_match("/.{2,}/", $server_name))
 			$input_errors[] = "The field 'Name' is required (and must be at least 2 characters).";
 
-		if (!preg_match("/.{2,}/", $server_address))
-			$input_errors[] = "The field 'Address' is required (and must be at least 2 characters).";
-
-		if (!is_numeric($server_weight))
+		if ($server_weight && !is_numeric($server_weight))
 			$input_errors[] = "The field 'Weight' value is not a number.";
 
 		if ($server_port && !is_numeric($server_port))
@@ -612,63 +617,67 @@ set by the 'retries' parameter.</div>
 				<input id="stats_enabled" name="stats_enabled" type="checkbox" value="yes" <?php if ($pconfig['stats_enabled']=='yes') echo "checked"; ?> onclick='updatevisibility();' />
 			</td>
 		</tr>
-		<tr class="haproxy_stats_visible" align="left" id='stats_realm_row'>
-			<td width="22%" valign="top" class="vncellreq">Stats Realm</td>
-			<td width="78%" class="vtable" colspan="2">
-				<input id="stats_realm" name="stats_realm" type="text" <?if(isset($pconfig['stats_realm'])) echo "value=\"{$pconfig['stats_realm']}\"";?> size="64" /><br/>
-				EXAMPLE: haproxystats
-			</td>
-		</tr>
 		<tr class="haproxy_stats_visible" align="left" id='stats_uri_row'>
 			<td width="22%" valign="top" class="vncellreq">Stats Uri</td>
 			<td width="78%" class="vtable" colspan="2">
 				<input id="stats_uri" name="stats_uri" type="text" <?if(isset($pconfig['stats_uri'])) echo "value=\"{$pconfig['stats_uri']}\"";?> size="64" /><br/>
-				EXAMPLE: /haproxy?stats
+				This url can be used when this same backend is used for passing connections to backends<br/>
+				EXAMPLE: / or /haproxy?stats
+			</td>
+		</tr>
+		<tr class="haproxy_stats_visible" align="left" id='stats_scope_row'>
+			<td width="22%" valign="top" class="vncell">Stats Scope</td>
+			<td width="78%" class="vtable" colspan="2">
+				<input id="stats_scope" name="stats_scope" type="text" <?if(isset($pconfig['stats_scope'])) echo "value=\"{$pconfig['stats_scope']}\"";?> size="64" /><br/>
+				Determines which frontends and backends are shown, leave empty to show all.<br/>
+				EXAMPLE: frontendA,backend1,backend2
+			</td>
+		</tr>
+		<tr class="haproxy_stats_visible" align="left" id='stats_realm_row'>
+			<td width="22%" valign="top" class="vncell">Stats Realm</td>
+			<td width="78%" class="vtable" colspan="2">
+				<input id="stats_realm" name="stats_realm" type="text" <?if(isset($pconfig['stats_realm'])) echo "value=\"{$pconfig['stats_realm']}\"";?> size="64" /><br/>
+				The realm is shown when authentication is requested by haproxy.<br/>
+				EXAMPLE: haproxystats
 			</td>
 		</tr>
 		<tr class="haproxy_stats_visible" align="left" id='stats_username_row'>
-			<td width="22%" valign="top" class="vncellreq">Stats Username</td>
+			<td width="22%" valign="top" class="vncell">Stats Username</td>
 			<td width="78%" class="vtable" colspan="2">
 				<input id="stats_username" name="stats_username" type="text" <?if(isset($pconfig['stats_username'])) echo "value=\"".$pconfig['stats_username']."\"";?> size="64" />
+				EXAMPLE: admin
 			</td>
 		</tr>
-		
 		<tr class="haproxy_stats_visible" align="left" id='stats_password_row'>
-			<td width="22%" valign="top" class="vncellreq">Stats Password</td>
+			<td width="22%" valign="top" class="vncell">Stats Password</td>
 			<td width="78%" class="vtable" colspan="2">
 				<input id="stats_password" name="stats_password" type="password" <?
 					if(isset($pconfig['stats_password'])) 
 						echo "value=\"".$pconfig['stats_password']."\"";
 					?> size="64" />
-				<br/>
+				EXAMPLE: 1Your2Secret3P@ssword
 			</td>
 		</tr>
 		<tr class="haproxy_stats_visible" align="left" id='stats_node_admin_row'>
 			<td width="22%" valign="top" class="vncell">Stats Admin</td>
 			<td width="78%" class="vtable" colspan="2">
 				<input id="stats_admin" name="stats_admin" type="checkbox" value="yes" <?php if ($pconfig['stats_admin']=='yes') echo "checked"; ?> />
-				<br/>
-			</td>
-		</tr>
-		<tr class="haproxy_stats_visible" align="left" id='stats_node_enabled_row'>
-			<td width="22%" valign="top" class="vncell">Stats Enable Node Name</td>
-			<td width="78%" class="vtable" colspan="2">
-				<input id="stats_node_enabled" name="stats_node_enabled" type="checkbox" value="yes" <?php if ($pconfig['stats_node_enabled']=='yes') echo "checked"; ?> />
-				<br/>
+				Makes available the options disable/enable/softstop/softstart/killsessions from the stats page.<br/>
+				Note: This is not persisted when haproxy restarts. For publicly visible stats pages this should be disabled.
 			</td>
 		</tr>
 		<tr class="haproxy_stats_visible" align="left" id='stats_node_row'>
-			<td width="22%" valign="top" class="vncell">Stats Node</td>
+			<td width="22%" valign="top" class="vncell">Stats Nodename</td>
 			<td width="78%" class="vtable" colspan="2">
 				<input id="stats_node" name="stats_node" type="text" <?if(isset($pconfig['stats_node'])) echo "value=\"{$pconfig['stats_node']}\"";?> size="64" /><br/>
-				The node name is displayed in the stats and helps to differentiate which server in a cluster is actually serving clients.<br/>
-				Leave blank to use the system name.
+				The short name is displayed in the stats and helps to differentiate which server in a cluster is actually serving clients.
 			</td>
 		</tr>
 		<tr class="haproxy_stats_visible" align="left" id='stats_desc_row'>
 			<td width="22%" valign="top" class="vncell">Stats Description</td>
 			<td width="78%" class="vtable" colspan="2">
-				<input id="stats_desc" name="stats_desc" type="text" <?if(isset($pconfig['stats_node'])) echo "value=\"{$pconfig['stats_desc']}\"";?> size="64" /><br/>
+				<input id="stats_desc" name="stats_desc" type="text" <?if(isset($pconfig['stats_desc'])) echo "value=\"{$pconfig['stats_desc']}\"";?> size="64" /><br/><br/>
+				The description is displayed behind the Nodename set above.
 			</td>
 		</tr>
 		<tr class="haproxy_stats_visible" align="left" id='stats_refresh_row'>

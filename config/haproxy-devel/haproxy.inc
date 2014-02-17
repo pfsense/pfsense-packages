@@ -456,17 +456,25 @@ function write_backend($fd, $name, $pool, $frontend) {
 			fwrite ($fd, "\tstats\t\t\trealm " . haproxy_escapestring($pool['stats_realm']) . "\n");
 		else 
 			fwrite ($fd, "\tstats\t\t\trealm .\n");
-		fwrite ($fd, "\tstats\t\t\tauth " . haproxy_escapestring($pool['stats_username']).":". haproxy_escapestring($pool['stats_password'])."\n");
+			
+		if ($pool['stats_username'] && $pool['stats_password'])
+			fwrite ($fd, "\tstats\t\t\tauth " . haproxy_escapestring($pool['stats_username']).":". haproxy_escapestring($pool['stats_password'])."\n");
 		
 		if($pool['stats_admin']=='yes')
 			fwrite ($fd, "\tstats\t\t\tadmin if TRUE" . "\n");
 		
-		if($pool['stats_node_enabled']=='yes')
+		if($pool['stats_node'])
 			fwrite ($fd, "\tstats\t\t\tshow-node " . $pool['stats_node'] . "\n");
 		if($pool['stats_desc'])
-			fwrite ($fd, "\tstats\t\t\tshow-desc " . $pool['stats_desc'] . "\n");
+			fwrite ($fd, "\tstats\t\t\tshow-desc " . haproxy_escapestring($pool['stats_desc']) . "\n");
 		if($pool['stats_refresh'])
 			fwrite ($fd, "\tstats\t\t\trefresh " . $pool['stats_refresh'] . "\n");
+		
+		if ($pool['stats_scope']) {
+			$scope_items = explode(",", $pool['stats_scope']);
+			foreach($scope_items as $scope_item)
+				fwrite ($fd, "\tstats\t\t\tscope " . $scope_item . "\n");
+		}
 	}
 
 	$uri = $pool['monitor_uri'];
