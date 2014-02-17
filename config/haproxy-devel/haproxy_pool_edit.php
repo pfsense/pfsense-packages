@@ -189,6 +189,9 @@ if ($_POST) {
 		if ($server_port && !is_numeric($server_port))
 			$input_errors[] = "The field 'Port' value is not a number.";
 	}
+	
+	if ($_POST['strict_transport_security'] !== "" && !is_numeric($_POST['strict_transport_security']))
+		$input_errors[] = "The field 'Strict-Transport-Security' is not empty or a number.";
 
 	if (!$input_errors) {
 		$pool = array();
@@ -786,6 +789,21 @@ set by the 'retries' parameter.</div>
 			<td width="78%" class="vtable" colspan="2">
 				<input id="stats_refresh" name="stats_refresh" type="text" <?if(isset($pconfig['stats_refresh'])) echo "value=\"{$pconfig['stats_refresh']}\"";?> size="10" maxlength="30" /><br/>
 				Specify the refresh rate of the stats page in seconds, or specified time unit (us, ms, s, m, h, d).
+			</td>
+		</tr>
+		<tr><td>&nbsp;</td></tr>
+		<tr>
+			<td colspan="2" valign="top" class="listtopic">Advanced</td>
+		</tr>
+		<tr class="" align="left" id='Strict-Transport-Security'>
+			<td width="22%" valign="top" class="vncell">Strict-Transport-Security</td>
+			<td width="78%" class="vtable" colspan="2">
+				When configured enables "HTTP Strict Transport Security" leave empty to disable.<br/>
+				<b>WARNING! the domain will only work over https with a valid certificate!</b><br/>
+				<input id="strict_transport_security" name="strict_transport_security" type="text" <?if(isset($pconfig['strict_transport_security'])) echo "value=\"{$pconfig['strict_transport_security']}\"";?> size="20" /> Seconds<br/>
+				If configured clients that requested the page with this setting active will not be able to visit this domain over a unencrypted http connection.
+				So make sure you understand the consequence of this setting or start with a really low value.<br/>
+				EXAMPLE: 60 for testing if you are absolutely sure you want this 31536000 (12 months) would be good for production.
 			</td>
 		</tr>
 		<tr><td>&nbsp;</td></tr>

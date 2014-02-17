@@ -560,6 +560,10 @@ function write_backend($fd, $name, $pool, $frontend) {
 	if ($optioncheck)
 		fwrite ($fd, "\toption\t\t\t{$optioncheck}\n");
 
+	if ($pool["strict_transport_security"] && is_numeric($pool["strict_transport_security"])){
+		fwrite ($fd, "\trspadd Strict-Transport-Security:\ max-age={$pool["strict_transport_security"]};\n");
+	}
+	
 	if ($pool['advanced_backend']) {
 		$adv_be	= explode("\n", base64_decode($pool['advanced_backend']));
 		foreach($adv_be as $adv_line) {
