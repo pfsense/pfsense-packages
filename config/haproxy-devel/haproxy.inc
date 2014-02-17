@@ -936,16 +936,9 @@ function use_transparent_clientip_proxying() {
 	return false;
 }
 
-function load_ipfw_rules() {
-	// On FreeBSD 8 pf does not support "divert-reply" so ipfw is needed.
-	global $g, $config;
-	$ipfw_zone_haproxy = "haproxy";
-	
+function haproxy_get_transparent_backends(){
+	global $config;
 	$a_backends = &$config['installedpackages']['haproxy']['ha_pools']['item'];
-	
-	haproxy_load_modules();
-	
-	$transparent_interfaces = array();
 	$transparent_backends = array();
 	foreach ($a_backends as $backend) {
 		if ($backend["transparent_clientip"] != 'yes')
@@ -961,14 +954,50 @@ function load_ipfw_rules() {
 					if (!is_ipaddr($be['address']))
 						continue;
 					$item = array();
+					$item['name'] = $be['name'];
+					$item['interface'] = $real_if;
 					$item['address'] = $be['address'];
 					$item['port'] = $be['port'];
-					$item['interface'] = $real_if;
 					$transparent_backends[] = $item;
-					$transparent_interfaces[$real_if] = 1;
 				}
 			}
 		}
+	}
+	return $transparent_backends;
+}
+
+function haproxy_generate_rules($type) {
+	// called by filter.inc when pfSense rules generation happens
+	global $g, $config;
+	$rules = "";
+	switch($type) {
+	case 'filter':
+		$transparent_backends = haproxy_get_transparent_backends();
+		foreach($transparent_backends as $tb){
+			// This sloppy rule is needed because of ipfw is used to 'catch' return traffic.
+			$rules .= "# allow HAProxy transparent traffic\n";
+			$rules .= "pass  out  quick  on {$tb['interface']} inet proto tcp  from any to {$tb['address']} port {$tb['port']} flags S/SA keep state ( sloppy )  label \"HAPROXY_transparent_rule_{$tb['name']}\"\n";
+		}		
+		break;
+	}
+	return $rules;
+}
+
+function load_ipfw_rules() {
+	// On FreeBSD 8 pf does not support "divert-reply" so ipfw is needed.
+	global $g, $config;
+	$ipfw_zone_haproxy = "haproxy";
+	
+	$a_backends = &$config['installedpackages']['haproxy']['ha_pools']['item'];
+	
+	haproxy_load_modules();
+
+	$transparent_backends = haproxy_get_transparent_backends();
+	
+	$transparent_interfaces = array();
+	foreach($transparent_backends as $transparent_backend){
+		$interface = $transparent_backend['interface'];
+		$transparent_interfaces[$interface] = 1;
 	}
 	mwexec("/usr/local/sbin/ipfw_context -a $ipfw_zone_haproxy", true);
 	
@@ -997,9 +1026,10 @@ function haproxy_check_run($reload) {
 
 	exec("/usr/bin/limits -n 300014");
 
-	if(use_transparent_clientip_proxying())
+	if(use_transparent_clientip_proxying()) {
+		filter_configure();
 		load_ipfw_rules();
-	else
+	} else
 		mwexec("/usr/local/sbin/ipfw_context -d haproxy", true);
 	
 	if(isset($a_global['enable'])) {
