@@ -628,6 +628,21 @@ function haproxy_writeconf($configpath) {
 			}
 		}
 		fwrite ($fd, "\n");
+		
+		$localstatsport = $a_global['localstatsport'];
+		if ($localstatsport){
+			fwrite ($fd, "listen HAProxyLocalStats\n");
+			fwrite ($fd, "\tbind 127.0.0.1:$localstatsport\n");
+			fwrite ($fd, "\tmode http\n");
+			fwrite ($fd, "\tstats enable\n");
+			fwrite ($fd, "\tstats refresh 10\n");
+			fwrite ($fd, "\tstats admin if TRUE\n");
+			fwrite ($fd, "\tstats uri /haproxy_stats.php?haproxystats=1\n");
+			fwrite ($fd, "\ttimeout client 5000\n");
+			fwrite ($fd, "\ttimeout connect 5000\n");
+			fwrite ($fd, "\ttimeout server 5000\n");
+			fwrite ($fd, "\n");
+		}
 	}
 
 	// Try and get a unique array for address:port as frontends can duplicate
@@ -1247,6 +1262,27 @@ function haproxy_escapestring($configurationsting) {
 
 function haproxy_escape_acl_name($aclname) {
 	return preg_replace_callback('([^A-Za-z0-9\._\-\:])', function($match){return "_".dechex(ord($match[0]));}, $aclname);
+}
+
+function haproxy_find_create_certificate($certificatename) {
+	global $g;
+	$cert = lookup_cert_by_name($certificatename);
+	if (is_array($cert))
+		return $cert;
+	global $config;
+	$a_cert =& $config['cert'];	
+	$cert = array();
+	$cert['refid'] = uniqid();
+	$cert['descr'] = gettext($certificatename);
+	mwexec("/usr/local/bin/openssl genrsa 1024 > {$g['tmp_path']}/ssl.key");
+	mwexec("/usr/local/bin/openssl req -new -x509 -nodes -sha256 -days 2000 -key {$g['tmp_path']}/ssl.key > {$g['tmp_path']}/ssl.crt");
+	$crt = file_get_contents("{$g['tmp_path']}/ssl.crt");
+	$key = file_get_contents("{$g['tmp_path']}/ssl.key");
+	unlink("{$g['tmp_path']}/ssl.key");
+	unlink("{$g['tmp_path']}/ssl.crt");
+	cert_import($cert, $crt, $key);
+	$a_cert[] = $cert;
+	return $cert;
 }
 
 ?>
