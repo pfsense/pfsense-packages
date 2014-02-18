@@ -87,6 +87,7 @@ function check_ca_hashes(){
 				$cert=0;
 				}
 			}
+		conf_mount_ro();
 		}
 }
 
@@ -1094,6 +1095,7 @@ EOF;
 	conf_mount_rw();
 
 	write_config();
+
 	#update cron
 	if ($cron_found > 0){
 		$config['cron']=$new_cron;
@@ -1180,8 +1182,8 @@ EOF;
 	$script='/usr/local/etc/rc.d/dansguardian.sh';
 	unlink_if_exists('/usr/local/etc/rc.d/dansguardian');
 	if($config['installedpackages']['dansguardian']['config'][0]['enable']=="on"){
-		copy('/usr/local/pkg/dansguardian_rc.template',$script);
-		chmod ($script,0755);
+		@copy('/usr/local/pkg/dansguardian_rc.template',$script);
+		@chmod ($script,0755);
 		if (is_process_running('dansguardian')){
 			log_error('Reloading Dansguardian');
 			exec("/usr/local/sbin/dansguardian -r");
@@ -1195,13 +1197,12 @@ EOF;
 		if (is_process_running('dansguardian')){
 			log_error('Dansguardian is disabled, stopping process...');
 			mwexec("$script stop");
-			}
-		if (file_exists($script))
-			chmod ($script,444);	
+		}
+		@unlink($script))
 	}
 	
 	if (!file_exists(DANSGUARDIAN_DIR . '/etc/dansguardian/lists/phraselists/pornography/weighted_russian_utf8'))
-		file_put_contents(DANSGUARDIAN_DIR . '/etc/dansguardian/lists/phraselists/pornography/weighted_russian_utf8',"",LOCK_EX);
+		@file_put_contents(DANSGUARDIAN_DIR . '/etc/dansguardian/lists/phraselists/pornography/weighted_russian_utf8',"",LOCK_EX);
 	
 	#check ca certs hashes	
 	check_ca_hashes();
@@ -1299,7 +1300,7 @@ function dansguardian_php_deinstall_command() {
 	
 	if (file_exists("/usr/local/etc/rc.d/dansguardian.sh")){
 		conf_mount_rw();
-		chmod ("/usr/local/etc/rc.d/dansguardian.sh",0444);
+		@unlink("/usr/local/etc/rc.d/dansguardian.sh");
 		conf_mount_ro();
 	}
 }
