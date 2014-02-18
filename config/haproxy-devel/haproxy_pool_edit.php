@@ -308,6 +308,18 @@ foreach($simplefields as $field){
 			}
 		}
 	}
+	function toggleCSSdisplay(cssID)
+	{
+		var ss = document.styleSheets;
+		for (var i=0; i<ss.length; i++) {
+			var rules = ss[i].cssRules || ss[i].rules;
+			for (var j=0; j<rules.length; j++) {
+				if (rules[j].selectorText === cssID) {
+					rules[j].style.display = rules[j].style.display == "none" ? "" : "none";
+				}
+			}
+		}
+	}
 	
 	function updatevisibility()
 	{
@@ -383,11 +395,36 @@ foreach($simplefields as $field){
 		</tr>
 		<tr align="left">
 			<td class="vncell" colspan="3"><strong>Server list</strong>
+			<span style="float:right;">
+			Toggle serverlist help. <a onclick="toggleCSSdisplay('.haproxy_help_serverlist');" title="<?php echo gettext("Help"); ?>"><img style="vertical-align:middle" src="/themes/<?php echo $g['theme']; ?>/images/icons/icon_help.gif" border="0" alt="help" /></a>
+			</span>
 			<?
 			$counter=0;
 			$a_servers = $pconfig['a_servers'];
 			haproxy_htmllist("tableA_servers", $a_servers, $fields_servers);
 			?>
+			<table class="haproxy_help_serverlist" style="border:1px dashed green" cellspacing="0">
+			<tr><td class="vncell">
+			Mode: </td><td class="vncell">Active: server will be used normally<br/>
+			Backup: server is only used in load balancing when all other non-backup servers are unavailable<br/>
+			Disabled: server is marked down in maintenance mode<br/>
+			Inactive: server will not be available for use
+			</td></tr><tr><td class="vncell">
+			Name: </td><td class="vncell">Used to as a name for the server in for example the stats<br/>EXAMPLE: MyWebServer
+			</td></tr><tr><td class="vncell">
+			Address: </td><td class="vncell">IP or hostname(only resolved on start-up.)<br/>EXAMPLE: 192.168.1.22 , fe80::1000:2000:3000:4000%em0 , WebServer1.localdomain
+			</td></tr><tr><td class="vncell">
+			Port: </td><td class="vncell">The port of the backend.<br/>EXAMPLE: 80 or 443<br/>
+			</td></tr><tr><td class="vncell">
+			SSL: </td><td class="vncell">Is the backend using SSL (commonly with port 443)<br/>
+			</td></tr><tr><td class="vncell">
+			Weight: </td><td class="vncell">A weight between 0 and 256, this setting can be used when multiple servers on different hardware need to be balanced with with a different part the traffic. A server with weight 0 wont get new traffic. Default if empty: 1
+			</td></tr><tr><td class="vncell">
+			Cookie: </td><td class="vncell">the value of the cookie used to identify a server (only when cookie-persistence is enabled below)
+			</td></tr><tr><td class="vncell">
+			Advanced: </td><td class="vncell">More advanced settings like rise,fall,error-limit,send-proxy and others can be configured here.<br/>For a full list of options see the <a target="_blank" href="http://cbonte.github.io/haproxy-dconv/configuration-1.5.html#5.2">HAProxy manual: Server and default-server options</a>
+			</td></tr>
+			</table>
 			</td>
 		</tr>
 		<tr align="left">
@@ -459,6 +496,7 @@ foreach($simplefields as $field){
 		<tr align="left">
 			<td width="22%" valign="top" class="vncell">Transparent ClientIP</td>
 			<td width="78%" class="vtable" colspan="2">
+				WARNING Activating this option will load rules in IPFW and might interfere with CaptivePortal and possibly other services due to the way server return traffic must be 'captured' with a automatically created fwd rule. This also breaks directly accessing the (web)server on the ports configured above. Also a automatic sloppy pf rule is made to allow HAProxy to server traffic.<br/>
 				<input id="transparent_clientip" name="transparent_clientip" type="checkbox" value="yes" <?php if ($pconfig['transparent_clientip']=='yes') echo "checked"; ?> onclick='updatevisibility();' />
 				Use Client-IP to connect to backend servers.
 				<div class="haproxy_transparent_clientip">
@@ -479,7 +517,7 @@ foreach($simplefields as $field){
 				For proper workings this requires the reply's traffic to pass through pfSense by means of correct routing.
 				(uses the option "source 0.0.0.0 usesrc clientip")
 				<br/><br/>
-				Note : When this is enabled for a single backend HAProxy will run as 'root', which reduces security.
+				Note : When this is enabled for a single backend HAProxy will run as 'root' instead of chrooting to a lower privileged user, this reduces security in case of a a bit.
 			</td>
 		</tr>
 		<tr align="left">
@@ -494,7 +532,8 @@ foreach($simplefields as $field){
 		<tr align="left">
 			<td width="22%" valign="top" class="vncell">Backend pass thru</td>
 			<td width="78%" class="vtable" colspan="2">
-				<textarea  rows="4" cols="70" name='advanced_backend' id='advanced_backend'><?php echo $pconfig['advanced_backend']; ?></textarea>
+				<? $textrowcount = max(substr_count($pconfig['advanced_backend'],"\n"), 2) + 2; ?>
+				<textarea  rows="<?=$textrowcount;?>" cols="70" name='advanced_backend' id='advanced_backend'><?php echo $pconfig['advanced_backend']; ?></textarea>
 				<br/>
 				NOTE: paste text into this box that you would like to pass thru. Applied to the backend section.
 			</td>
@@ -629,10 +668,10 @@ set by the 'retries' parameter.</div>
 			</td>
 		</tr>
 		<tr><td>&nbsp;</td></tr>
-	<tr>
+		<tr>
 			<td colspan="2" valign="top" class="listtopic">Cookie persistence</td>
-	</tr>
-	<tr align="left">
+		</tr>
+		<tr align="left">
 			<td width="22%" valign="top" class="vncell">Cookie Enabled</td>
 			<td width="78%" class="vtable" colspan="2">
 				<input id="persist_cookie_enabled" name="persist_cookie_enabled" type="checkbox" value="yes" <?php if ($pconfig['persist_cookie_enabled']=='yes') echo "checked"; ?> onclick='updatevisibility();' />
@@ -664,7 +703,7 @@ set by the 'retries' parameter.</div>
 				<br/>
 				<textarea readonly="yes" cols="60" rows="2" id="persist_cookie_mode_description" name="persist_cookie_mode_description" style="padding:5px; border:1px dashed #990000; background-color: #ffffff; color: #000000; font-size: 8pt;"></textarea>
 			</td>
-	</tr>
+		</tr>
 		<tr class="haproxy_cookie_visible"  align="left">
 			<td width="22%" valign="top" class="vncell">Cookie Cachable</td>
 			<td width="78%" class="vtable" colspan="2">
@@ -673,11 +712,11 @@ set by the 'retries' parameter.</div>
 			</td>
 		</tr>
 		<tr><td>&nbsp;</td></tr>
-	<tr>
+		<tr>
 			<td colspan="2" valign="top" class="listtopic">Stick-table persistence</td>
-	</tr>
+		</tr>
 		<tr><td class="vncell"></td><td class="vncell">These options are used to make sure seperate requests from a single client go to the same backend. This can be required for servers that keep track of for example a shopping cart.</td></tr>
-	<tr align="left">
+		<tr align="left">
 			<td width="22%" valign="top" class="vncell">Stick tables</td>
 			<td width="78%" class="vtable" colspan="2">
 				<?
