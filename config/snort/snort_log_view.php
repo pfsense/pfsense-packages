@@ -41,14 +41,15 @@ $contents = '';
 
 // Read the contents of the argument passed to us.
 // Is it a fully qualified path and file?
-if (file_exists($_GET['logfile']))
-	if (substr(realpath($_GET['logfile']), 0, strlen(SNORTLOGDIR)) != SNORTLOGDIR)
-		$contents = gettext("\n\nERROR -- File: {$_GET['logfile']} can not be viewed!");
+$logfile = htmlspecialchars($_GET['logfile'], ENT_QUOTES | ENT_HTML401);
+if (file_exists($logfile))
+	if (substr(realpath($logfile), 0, strlen(SNORTLOGDIR)) != SNORTLOGDIR)
+		$contents = gettext("\n\nERROR -- File: {$logfile} can not be viewed!");
 	else
-		$contents = file_get_contents($_GET['logfile']);
+		$contents = file_get_contents($logfile);
 // It is not something we can display, so print an error.
 else
-	$contents = gettext("\n\nERROR -- File: {$_GET['logfile']} not found!");
+	$contents = gettext("\n\nERROR -- File: {$logfile} not found!");
 
 $pgtitle = array(gettext("Snort"), gettext("Log File Viewer"));
 ?>
@@ -72,7 +73,7 @@ $pgtitle = array(gettext("Snort"), gettext("Log File Viewer"));
 				<input type="button" class="formbtn" value="Return" onclick="window.close()">
 			</td>
 			<td align="right">
-				<b><?php echo gettext("Log File: ") . '</b>&nbsp;' . $_GET['logfile']; ?>&nbsp;&nbsp;&nbsp;&nbsp;
+				<b><?php echo gettext("Log File: ") . '</b>&nbsp;' . $logfile; ?>&nbsp;&nbsp;&nbsp;&nbsp;
 			</td>
 		</tr>
 		<tr>
