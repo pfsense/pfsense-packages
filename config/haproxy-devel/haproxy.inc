@@ -119,6 +119,45 @@ $a_servermodes["backup"]['name'] = "backup";
 $a_servermodes["disabled"]['name'] = "disabled";
 $a_servermodes["inactive"]['name'] = "inactive";
 
+// http://www.exceliance.fr/sites/default/files/biblio/aloha_load_balancer_haproxy_cookie_persistence_methods_memo.pdf
+$a_cookiemode = array();
+$a_cookiemode['passive'] 				= array('name' => 'Passive', 'syntax' => 'cookie <cookie name>',
+	'descr' => 'Cookie is analysed on incoming request to choose server. HAProxy does not perform any insertion update or deletion on the Cookie or Set-Cookie. If the Cookie is not set, then the load-balancing algorithm is applied.');
+$a_cookiemode['passive-silent']			= array('name' => 'Passive-silent', 'syntax' => 'cookie <cookie name> indirect',
+	'descr' => 'Cookie is analysed on incoming request to choose server. HAProxy does not perform any insertion, update or deletion on the Cookie. Set-Cookie is removed from response if not required. If the Cookie is not set, then HAProxy applies the load-balancing algorithm.');
+$a_cookiemode['reset']					= array('name' => 'Reset', 'syntax' => 'cookie <cookie name> rewrite',
+	'descr' => 'Cookie is analysed on incoming request to choose server and Set-Cookie value is overwritten in response if present. If the Set-Cookie isn\'t sent by the server, then HAProxy won\'t set it.');
+$a_cookiemode['set']					= array('name' => 'Insert', 'syntax' => 'cookie <cookie name> insert',
+	'descr' => 'Cookie is analyzed on incoming request to choose server and Set-Cookie value is overwritten if present and set to an unknown value or inserted in response if not present.');
+$a_cookiemode['set-silent'] 			= array('name' => 'Insert-silent', 'syntax' => 'cookie <cookie name> insert indirect',
+	'descr' => 'Cookie is analyzed on incoming request to choose server and Set-Cookie value is overwritten if present, inserted in response if needed and removed if a valid Cookie was provided.');
+$a_cookiemode['insert-only'] 			= array('name' => 'Insert-preserve', 'syntax' => 'cookie <cookie name> preserve insert',
+	'descr' => 'Cookie is analyzed on incoming request to choose server. Set-Cookie value is set only if the server does not provide one or if the client came without the Cookie.');
+$a_cookiemode['insert-only-silent'] 	= array('name' => 'Insert-preserve-silent', 'syntax' => 'cookie <cookie name> preserve insert indirect',
+	'descr' => 'Cookie is analyzed on incoming request to choose server and Set-Cookie value is left untouched if present, inserted in response if needed or removed if not needed.');
+$a_cookiemode['session-prefix'] 		= array('name' => 'Session-prefix', 'syntax' => 'cookie <cookie name> prefix',
+	'descr' => 'Cookie is analyzed on incoming request to choose server whose Cookie Name prefix matches. Set Cookie value is prefixed using server line Cookie ID in response. Cookie is modified only between HAProxy and the client only');
+$a_cookiemode['passive-session-prefix'] = array('name' => 'Passive-session-prefix', 'syntax' => 'cookie <cookie name> preserve prefix indirect',
+	'descr' => 'Cookie is analysed on incoming request to choose server whose Cookie ID prefix matches.');
+foreach($a_cookiemode as &$cookiemode)
+	$cookiemode['descr'] = $cookiemode['descr'] . "\n\n" . $cookiemode['syntax'] . "";
+
+$a_sticky_type = array();
+$a_sticky_type['none'] = array('name' => 'none',
+	'descr' => "No stick-table will be used");
+$a_sticky_type['stick_sslsessionid'] = array('name' => 'Stick on SSL-Session-ID',
+	'descr' => "Only used on https frontends. Uses the SSL-Session-ID to persist clients to a server.");
+$a_sticky_type['stick_sourceipv4'] = array('name' => 'Stick on SourceIP IPv4',
+	'descr' => "Stick on the client ip, drawback is that multiple clients behind a natted public ip will be balanced to the same server.");
+$a_sticky_type['stick_sourceipv6'] = array('name' => 'Stick on SourceIP IPv6',
+	'descr' => "Stick on the client ip, drawback is that multiple clients behind a natted public ip will be balanced to the same server.");
+$a_sticky_type['stick_cookie_value'] = array('name' => 'Stick on existing Cookie value',
+	'descr' => "Stick on the value of a session cookie",
+	'cookiedescr' => "Enables SSL-session-id based persistence. (only use on 'https' and 'tcp' frontends that use SSL)<br/>EXAMPLE: JSESSIONID PHPSESSIONID ASP.NET_SessionId");
+$a_sticky_type['stick_rdp_cookie'] = array('name' => 'Stick on RDP-cookie',
+	'descr' => "Uses a RDP-Cookie send by the mstsc client, note that not all clients send this.",
+	'cookiedescr' => 'EXAMPLE: msts or mstshash');
+
 function haproxy_custom_php_deinstall_command() {
 	exec("cd /var/db/pkg && pkg_delete `ls | grep haproxy`");
 	exec("rm /usr/local/pkg/haproxy*");
@@ -380,9 +419,10 @@ function haproxy_find_acl($name) {
 function write_backend($fd, $name, $pool, $frontend) {
 	if(!is_array($pool['ha_servers']['item']) && !$pool['stats_enabled']=='yes')
 		return;
-	global $a_checktypes;
+	global $a_checktypes, $a_cookiemode;
 		
 	$a_servers = &$pool['ha_servers']['item'];
+	$frontendtype = strtolower($frontend['type']);
 
 	unset($sslserverpresent);
 	if (is_array($a_servers))
@@ -396,17 +436,59 @@ function write_backend($fd, $name, $pool, $frontend) {
 	}
 	
 	fwrite ($fd, "backend " . $name . "\n");
-	if($pool['cookie_name'] && strtolower($frontend['type']) == "http")
-		fwrite ($fd, "\tcookie\t\t\t" . $pool['cookie_name'] . " insert indirect\n");
-
-	// https is an alias for tcp for clarity purpouses
+	// https is an alias for tcp for clarity purposes
 	if(strtolower($frontend['type']) == "https") {
 		$backend_type = "tcp";
 	} else {
 		$backend_type = $frontend['type'];
 	}
-			
 	fwrite ($fd, "\tmode\t\t\t" . $backend_type . "\n");
+
+	if ($frontendtype == "http") {
+		if ($pool["persist_cookie_enabled"] == "yes") {
+			$cookie_mode = $pool["persist_cookie_mode"];
+			$cookie_cachable = $pool["persist_cookie_cachable"];
+			$cookiesyntax = $a_cookiemode[$cookie_mode]["syntax"];
+			$cookie = str_replace("<cookie name>", $pool["persist_cookie_name"], $cookiesyntax);
+			$cookie .= $cookie_cachable == "yes" ? "" : " nocache";
+			fwrite ($fd, "\t" . $cookie . "\n");
+		}
+	}	
+	switch($pool["persist_sticky_type"]) {
+	case 'stick_sslsessionid':
+		if ($frontendtype == "https") {
+			fwrite ($fd, "\ttcp-request inspect-delay 5s\n");
+			fwrite ($fd, "\tstick-table type binary len 32 size ".$pool["persist_stick_tablesize"]." expire ".$pool["persist_stick_expire"]."\n");
+			fwrite ($fd, "\tacl clienthello req_ssl_hello_type 1\n");
+			fwrite ($fd, "\tacl serverhello rep_ssl_hello_type 2\n");
+			fwrite ($fd, "\ttcp-request content accept if clienthello\n");
+			fwrite ($fd, "\ttcp-response content accept if serverhello\n");
+			fwrite ($fd, "\tstick on payload_lv(43,1) if clienthello\n");
+			fwrite ($fd, "\tstick store-response payload_lv(43,1) if serverhello\n");
+		}
+		break;
+	case 'stick_rdp_cookie':
+		//tcp-request content accept if RDP_COOKIE
+		//fwrite ($fd, "\tstick on req.rdp_cookie(msts)\n");
+		fwrite ($fd, "\tstick-table type binary len 32 size ".$pool["persist_stick_tablesize"]." expire ".$pool["persist_stick_expire"]."\n");
+		fwrite ($fd, "\tstick on req.rdp_cookie(mstshash)\n");
+		break;
+	case 'stick_sourceipv4':
+		fwrite ($fd, "\tstick-table type ip size ".$pool["persist_stick_tablesize"]." expire ".$pool["persist_stick_expire"]."\n");
+		fwrite ($fd, "\tstick on src\n");
+		break;
+	case 'stick_sourceipv6':
+		fwrite ($fd, "\tstick-table type ip size ".$pool["persist_stick_tablesize"]." expire ".$pool["persist_stick_expire"]."\n");
+		fwrite ($fd, "\tstick on src\n");
+		break;
+	case 'stick_cookie_value':
+		if ($frontendtype == "http") {
+			fwrite ($fd, "\tstick-table type string len {$pool["persist_stick_length"]} size ".$pool["persist_stick_tablesize"]." expire ".$pool["persist_stick_expire"]."\n");
+			fwrite ($fd, "\tstick store-response res.cook({$pool["persist_stick_cookiename"]})\n");
+			fwrite ($fd, "\tstick on req.cook({$pool["persist_stick_cookiename"]})\n");
+		}
+		break;
+	}
 	
 	unset($checkport);
 	$check_type = $pool['check_type'];
@@ -487,10 +569,6 @@ function write_backend($fd, $name, $pool, $frontend) {
 		}
 	}
 
-	if($pool['cookie'] && strtolower($frontend['type']) == "http") 
-		$cookie = " cookie {$pool['cookie']} ";
-	else 
-		$cookie = "";
 	if($pool['advanced']) {
 		$advanced = base64_decode($pool['advanced']);
 		$advanced_txt = " " . $advanced;
@@ -501,9 +579,9 @@ function write_backend($fd, $name, $pool, $frontend) {
 	if ($check_type != 'none')
 	{
 		if($pool['checkinter']) 
-			$checkinter = "check inter {$pool['checkinter']}";
+			$checkinter = " check inter {$pool['checkinter']}";
 		else 
-			$checkinter = "check inter 1000";
+			$checkinter = " check inter 1000";
 	}
 	
 	//agent-check requires at least haproxy v1.5dev20
@@ -515,6 +593,10 @@ function write_backend($fd, $name, $pool, $frontend) {
 		foreach($a_servers as $be) {
 			if ($be['status'] == "inactive")
 				continue;
+			if($be['cookie'] && $frontendtype == "http") 
+				$cookie = " cookie {$be['cookie']}";
+			else 
+				$cookie = "";
 			
 			if (!$be['name'])
 				$be['name'] = $be['address'];
@@ -528,7 +610,11 @@ function write_backend($fd, $name, $pool, $frontend) {
 			{
 				$ssl = $backend_type == "http" ? ' ssl' : ' check-ssl';
 			}
-			fwrite ($fd, "\tserver\t\t\t" . $be['name'] . " " . $be['address'].":" . $be['port'] . "$ssl $cookie $checkinter$checkport$agentcheck $isbackup weight " . $be['weight'] . "{$advanced_txt} {$be['advanced']}\n");
+			$weight = "";
+			if (is_numeric($be['weight'])){
+				$weight = " weight " . $be['weight'];
+			}
+			fwrite ($fd, "\tserver\t\t\t" . $be['name'] . " " . $be['address'].":" . $be['port'] . "$ssl$cookie$checkinter$checkport$agentcheck $isbackup$weight{$advanced_txt} {$be['advanced']}\n");
 		}
 	}
 	fwrite ($fd, "\n");

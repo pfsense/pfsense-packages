@@ -54,49 +54,58 @@ if (isset($_GET['dup']))
 
 global $simplefields;
 $simplefields = array(
-"name","cookie","balance","transparent_clientip","transparent_interface",
+"name","balance","transparent_clientip","transparent_interface",
 "check_type","checkinter","httpcheck_method","monitor_uri","monitor_httpversion","monitor_username","monitor_domain","monitor_agentport",
 "agent_check","agent_port","agent_inter",
 "connection_timeout","server_timeout","retries",
-"stats_enabled","stats_username","stats_password","stats_uri","stats_realm","stats_admin","stats_node_enabled","stats_node","stats_desc","stats_refresh");
+"stats_enabled","stats_username","stats_password","stats_uri","stats_scope","stats_realm","stats_admin","stats_node","stats_desc","stats_refresh",
+"persist_stick_expire","persist_stick_tablesize","persist_stick_length","persist_stick_cookiename","persist_sticky_type",
+"persist_cookie_enabled","persist_cookie_name","persist_cookie_mode","persist_cookie_cachable",
+"strict_transport_security"
+);
 
 $fields_servers=array();
-$fields_servers[0]['name']="name";
-$fields_servers[0]['columnheader']="Name";
-$fields_servers[0]['colwidth']="20%";
-$fields_servers[0]['type']="textbox";
-$fields_servers[0]['size']="30";
-$fields_servers[1]['name']="address";
-$fields_servers[1]['columnheader']="Address";
-$fields_servers[1]['colwidth']="10%";
+$fields_servers[0]['name']="status";
+$fields_servers[0]['columnheader']="Mode";
+$fields_servers[0]['colwidth']="5%";
+$fields_servers[0]['type']="select";
+$fields_servers[0]['size']="5";
+$fields_servers[0]['items']=&$a_servermodes;
+$fields_servers[1]['name']="name";
+$fields_servers[1]['columnheader']="Name";
+$fields_servers[1]['colwidth']="20%";
 $fields_servers[1]['type']="textbox";
-$fields_servers[1]['size']="20";
-$fields_servers[2]['name']="port";
-$fields_servers[2]['columnheader']="Port";
-$fields_servers[2]['colwidth']="5%";
+$fields_servers[1]['size']="30";
+$fields_servers[2]['name']="address";
+$fields_servers[2]['columnheader']="Address";
+$fields_servers[2]['colwidth']="10%";
 $fields_servers[2]['type']="textbox";
-$fields_servers[2]['size']="5";
-$fields_servers[3]['name']="ssl";
-$fields_servers[3]['columnheader']="SSL";
+$fields_servers[2]['size']="20";
+$fields_servers[3]['name']="port";
+$fields_servers[3]['columnheader']="Port";
 $fields_servers[3]['colwidth']="5%";
-$fields_servers[3]['type']="checkbox";
-$fields_servers[3]['size']="30";
-$fields_servers[4]['name']="weight";
-$fields_servers[4]['columnheader']="Weight";
-$fields_servers[4]['colwidth']="8%";
-$fields_servers[4]['type']="textbox";
-$fields_servers[4]['size']="5";
-$fields_servers[5]['name']="status";
-$fields_servers[5]['columnheader']="Mode";
-$fields_servers[5]['colwidth']="5%";
-$fields_servers[5]['type']="select";
+$fields_servers[3]['type']="textbox";
+$fields_servers[3]['size']="5";
+$fields_servers[4]['name']="ssl";
+$fields_servers[4]['columnheader']="SSL";
+$fields_servers[4]['colwidth']="5%";
+$fields_servers[4]['type']="checkbox";
+$fields_servers[4]['size']="30";
+$fields_servers[5]['name']="weight";
+$fields_servers[5]['columnheader']="Weight";
+$fields_servers[5]['colwidth']="8%";
+$fields_servers[5]['type']="textbox";
 $fields_servers[5]['size']="5";
-$fields_servers[5]['items']=&$a_servermodes;
-$fields_servers[6]['name']="advanced";
-$fields_servers[6]['columnheader']="Advanced";
-$fields_servers[6]['colwidth']="15%";
+$fields_servers[6]['name']="cookie";
+$fields_servers[6]['columnheader']="Cookie";
+$fields_servers[6]['colwidth']="10%";
 $fields_servers[6]['type']="textbox";
-$fields_servers[6]['size']="20";
+$fields_servers[6]['size']="10";
+$fields_servers[7]['name']="advanced";
+$fields_servers[7]['columnheader']="Advanced";
+$fields_servers[7]['colwidth']="15%";
+$fields_servers[7]['type']="textbox";
+$fields_servers[7]['size']="20";
 
 if (isset($id) && $a_pools[$id]) {
 	$pconfig['advanced'] = base64_decode($a_pools[$id]['advanced']);
@@ -260,6 +269,10 @@ foreach($simplefields as $field){
 	.haproxy_transparent_clientip{display:none;}
 	.haproxy_check_agent{display:none;}
 	.haproxy_agent_check{display:none;}
+	.haproxy_stick_cookiename{display:none;}
+	.haproxy_stick_tableused{display:none;}
+	.haproxy_cookie_visible{display:none;}
+	.haproxy_help_serverlist{display:none;}
   </style>
 </head>
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">
@@ -292,10 +305,18 @@ foreach($simplefields as $field){
 	{
 		d = document;
 		setCSSdisplay(".haproxy_stats_visible", stats_enabled.checked);
+		setCSSdisplay(".haproxy_cookie_visible", persist_cookie_enabled.checked);
 		
 		check_type = d.getElementById("check_type").value;
 		check_type_description = d.getElementById("check_type_description");
 		check_type_description.innerHTML=checktypes[check_type]["descr"]; 
+		
+		persist_cookie_mode = d.getElementById("persist_cookie_mode").value;
+		persist_cookie_mode_description = d.getElementById("persist_cookie_mode_description");
+		persist_cookie_mode_description.innerHTML=cookiemode[persist_cookie_mode]["descr"]; 
+		persist_cookie_mode_description.setAttribute('style','padding:5px; border:1px dashed #990000; background-color: #ffffff; color: #000000; font-size: 8pt; height:30px');
+		persist_cookie_mode_description.setAttribute('style','padding:5px; border:1px dashed #990000; background-color: #ffffff; color: #000000; font-size: 8pt; height:'+persist_cookie_mode_description.scrollHeight+'px');
+		
 		setCSSdisplay(".haproxy_check_enabled", check_type != 'none');
 		setCSSdisplay(".haproxy_check_http", check_type == 'HTTP');
 		setCSSdisplay(".haproxy_check_username", check_type == 'MySQL' ||  check_type == 'PostgreSQL');
@@ -306,6 +327,16 @@ foreach($simplefields as $field){
 
 		transparent_clientip = d.getElementById("transparent_clientip");
 		setCSSdisplay(".haproxy_transparent_clientip", transparent_clientip.checked);
+		
+		
+		persist_sticky_type = d.getElementById("persist_sticky_type").value;
+		setCSSdisplay(".haproxy_stick_tableused", persist_sticky_type != 'none');
+		setCSSdisplay(".haproxy_stick_cookiename", persist_sticky_type == 'stick_rdp_cookie' ||  persist_sticky_type == 'stick_cookie_value');
+		
+		cookie_example = sticky_type[persist_sticky_type]['cookiedescr'];
+		stick_cookiename_description = d.getElementById("stick_cookiename_description");
+		stick_cookiename_description.innerHTML = cookie_example;
+		sticky_type_description.innerHTML = sticky_type[persist_sticky_type]['descr'];
 		
 		monitor_username = d.getElementById("monitor_username");
 		sqlcheckusername = d.getElementById("sqlcheckusername");
@@ -340,19 +371,6 @@ foreach($simplefields as $field){
 			<td width="22%" valign="top" class="vncellreq">Name</td>
 			<td width="78%" class="vtable" colspan="2">
 				<input name="name" type="text" <?if(isset($pconfig['name'])) echo "value=\"{$pconfig['name']}\"";?> size="16" maxlength="16" />
-			</td>
-		</tr>
-		<tr align="left">
-			<td width="22%" valign="top" class="vncell">Cookie</td>
-			<td width="78%" class="vtable" colspan="2">
-				<input name="cookie" type="text" <?if(isset($pconfig['cookie'])) echo "value=\"{$pconfig['cookie']}\"";?>size="64" /><br/>
-				  This value will be checked in incoming requests, and the first
-				  operational pool possessing the same value will be selected. In return, in
-				  cookie insertion or rewrite modes, this value will be assigned to the cookie
-				  sent to the client. There is nothing wrong in having several servers sharing
-				  the same cookie value, and it is in fact somewhat common between normal and
-				  backup servers. See also the "cookie" keyword in backend section.
-				
 			</td>
 		</tr>
 		<tr align="left">
@@ -603,6 +621,98 @@ set by the 'retries' parameter.</div>
 			</td>
 		</tr>
 		<tr><td>&nbsp;</td></tr>
+	<tr>
+			<td colspan="2" valign="top" class="listtopic">Cookie persistence</td>
+	</tr>
+	<tr align="left">
+			<td width="22%" valign="top" class="vncell">Cookie Enabled</td>
+			<td width="78%" class="vtable" colspan="2">
+				<input id="persist_cookie_enabled" name="persist_cookie_enabled" type="checkbox" value="yes" <?php if ($pconfig['persist_cookie_enabled']=='yes') echo "checked"; ?> onclick='updatevisibility();' />
+				Enables cookie based persistence. (only used on 'http' frontends)
+			</td>
+		</tr>
+		<tr class="haproxy_cookie_visible" align="left">
+			<td width="22%" valign="top" class="vncellreq">Server Cookies</td>
+			<td width="78%" class="vtable" colspan="2">
+				<b>Make sure to configure a different cookie on every server in this backend.<b/>
+			</td>
+		</tr>
+		<tr class="haproxy_cookie_visible" align="left">
+			<td width="22%" valign="top" class="vncellreq">Cookie Name</td>
+			<td width="78%" class="vtable" colspan="2">
+				<input id="persist_cookie_name" name="persist_cookie_name" type="text" <?if(isset($pconfig['persist_cookie_name'])) echo "value=\"{$pconfig['persist_cookie_name']}\"";?> size="64" /><br/>
+				The string name to track in Set-Cookie and Cookie HTTP headers.<br/>
+				EXAMPLE: MyLoadBalanceCookie JSESSIONID PHPSESSIONID ASP.NET_SessionId
+			</td>
+		</tr>
+		<tr class="haproxy_cookie_visible" align="left">
+			<td width="22%" valign="top" class="vncellreq">Cookie Mode</td>
+			<td width="78%" class="vtable" colspan="2">
+				<?
+				echo_html_select("persist_cookie_mode",$a_cookiemode,$pconfig['persist_cookie_mode'],"","updatevisibility();");
+				?>
+				Determines how HAProxy inserts/prefixes/replaces or examines cookie and set-cookie headers.<br/>
+				EXAMPLE: with an existing PHPSESSIONID you can for example use "Session-prefix" or to create a new cookie use "Insert-silent".<br/>
+				<br/>
+				<textarea readonly="yes" cols="60" rows="2" id="persist_cookie_mode_description" name="persist_cookie_mode_description" style="padding:5px; border:1px dashed #990000; background-color: #ffffff; color: #000000; font-size: 8pt;"></textarea>
+			</td>
+	</tr>
+		<tr class="haproxy_cookie_visible"  align="left">
+			<td width="22%" valign="top" class="vncell">Cookie Cachable</td>
+			<td width="78%" class="vtable" colspan="2">
+				<input id="persist_cookie_cachable" name="persist_cookie_cachable" type="checkbox" value="yes" <?php if ($pconfig['persist_cookie_cachable']=='yes') echo "checked"; ?> onclick='updatevisibility();' />
+				Allows shared caches to cache the server response.
+			</td>
+		</tr>
+		<tr><td>&nbsp;</td></tr>
+	<tr>
+			<td colspan="2" valign="top" class="listtopic">Stick-table persistence</td>
+	</tr>
+		<tr><td class="vncell"></td><td class="vncell">These options are used to make sure seperate requests from a single client go to the same backend. This can be required for servers that keep track of for example a shopping cart.</td></tr>
+	<tr align="left">
+			<td width="22%" valign="top" class="vncell">Stick tables</td>
+			<td width="78%" class="vtable" colspan="2">
+				<?
+				echo_html_select("persist_sticky_type",$a_sticky_type,$pconfig['persist_sticky_type'],"","updatevisibility();");
+				?>
+				Sticktables that are kept in memory, and when matched make sure the same server will be used.<br/>
+				<textarea readonly="yes" cols="60" rows="2" id="sticky_type_description" name="sticky_type_description" style="padding:5px; border:1px dashed #990000; background-color: #ffffff; color: #000000; font-size: 8pt;"></textarea>
+			</td>
+		</tr>
+		<tr align="left" class="haproxy_stick_cookiename">
+			<td width="22%" valign="top" class="vncellreq">Stick cookie name</td>
+			<td width="78%" class="vtable" colspan="2">
+				<input name="persist_stick_cookiename" type="text" <?if(isset($pconfig['persist_stick_cookiename'])) echo "value=\"{$pconfig['persist_stick_cookiename']}\"";?> size="20" />
+				Cookiename to use for sticktable<br/>
+				<span id="stick_cookiename_description"></span>
+			</td>
+		</tr>
+		<tr align="left" class="haproxy_stick_cookiename">
+			<td width="22%" valign="top" class="vncellreq">Stick cookie length</td>
+			<td width="78%" class="vtable" colspan="2">
+				<input name="persist_stick_length" type="text" <?if(isset($pconfig['persist_stick_length'])) echo "value=\"{$pconfig['persist_stick_length']}\"";?> size="20" />
+				The maximum number of characters that will be stored in a "string" type stick-table<br/>
+				<span id="stick_cookiename_description"></span>
+			</td>
+		</tr>
+		<tr align="left" class="haproxy_stick_tableused">
+			<td width="22%" valign="top" class="vncellreq">stick-table expire</td>
+			<td width="78%" class="vtable" colspan="2">
+				<input name="persist_stick_expire" type="text" <?if(isset($pconfig['persist_stick_expire'])) echo "value=\"{$pconfig['persist_stick_expire']}\"";?> size="20" /> d=days h=hour m=minute s=seconds ms=miliseconds(default)<br/>
+				Defines the maximum duration of an entry in the stick-table since it was last created, refreshed or matched.<br/>
+				EXAMPLE: 30m 
+			</td>
+		</tr>
+		<tr align="left" class="haproxy_stick_tableused">
+			<td width="22%" valign="top" class="vncellreq">stick-table size</td>
+			<td width="78%" class="vtable" colspan="2">
+				<input name="persist_stick_tablesize" type="text" <?if(isset($pconfig['persist_stick_tablesize'])) echo "value=\"{$pconfig['persist_stick_tablesize']}\"";?> size="20" /> maximum number of entries supports suffixes "k", "m", "g" for 2^10, 2^20 and 2^30 factors.<br/>
+				Is the maximum number of entries that can fit in the table. This value directly impacts memory usage. Count approximately
+				50 bytes per entry, plus the size of a string if any.<br/>
+				EXAMPLE: 50k
+			</td>
+		</tr>
+		<tr><td>&nbsp;</td></tr>
 		<tr>
 			<td colspan="2" valign="top" class="listtopic">Statistics</td>
 		</tr>
@@ -698,6 +808,8 @@ set by the 'retries' parameter.</div>
 <?
 	phparray_to_javascriptarray($fields_servers,"fields_servers",Array('/*','/*/name','/*/type','/*/size','/*/items','/*/items/*','/*/items/*/*','/*/items/*/*/name'));
 	phparray_to_javascriptarray($a_checktypes,"checktypes",Array('/*','/*/name','/*/descr'));
+	phparray_to_javascriptarray($a_cookiemode,"cookiemode",Array('/*','/*/name','/*/descr'));
+	phparray_to_javascriptarray($a_sticky_type,"sticky_type",Array('/*','/*/descr','/*/cookiedescr'));
 ?>
 	browser_InnerText_support = (document.getElementsByTagName("body")[0].innerText != undefined) ? true : false;
 
