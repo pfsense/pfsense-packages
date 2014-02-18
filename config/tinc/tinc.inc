@@ -170,7 +170,7 @@ function tinc_deinstall() {
                 {
                         $realif = get_real_interface($ifs);
                         if ($realif)
-                                mwexec("/sbin/ifconfig  {$realif} -group " . $a_ifgroups[$_GET['id']]['ifname']);
+                                mwexec("/sbin/ifconfig  {$realif} -group " . escapeshellarg($a_ifgroups[$_GET['id']]['ifname']));
                 }
                 unset($a_ifgroups[$myid]);
         	mwexec("/bin/rm -f /tmp/config.cache");

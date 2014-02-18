@@ -1443,7 +1443,7 @@
 			<port>security/tinc</port>
 		</build_pbi>
 		<build_options></build_options>
-		<version>1.0.21</version>
+		<version>1.0.22 v1.1</version>
 		<status>ALPHA</status>
 		<pkginfolink>http://doc.pfsense.org/index.php/tinc_package</pkginfolink>
 		<required_version>2.2</required_version>
