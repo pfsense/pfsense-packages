@@ -5,6 +5,7 @@
  * Copyright (C) 2004, 2005 Scott Ullrich
  * Copyright (C) 2008, 2009 Robert Zelaya
  * Copyright (C) 2011 Ermal Luci
+ * Copyright (C) 2013, 2014 Bill Meeks
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -29,7 +30,6 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-
 require_once("guiconfig.inc");
 require_once("/usr/local/pkg/snort/snort.inc");
 
@@ -37,6 +37,7 @@ global $g, $rebuild_rules;
 
 $snortdir = SNORTDIR;
 $rules_map = array();
+$pconfig = array();
 
 if (!is_array($config['installedpackages']['snortglobal']['rule']))
 	$config['installedpackages']['snortglobal']['rule'] = array();
@@ -51,11 +52,8 @@ if (is_null($id)) {
 }
 
 if (isset($id) && $a_rule[$id]) {
-	$pconfig['enable'] = $a_rule[$id]['enable'];
 	$pconfig['interface'] = $a_rule[$id]['interface'];
 	$pconfig['rulesets'] = $a_rule[$id]['rulesets'];
-	if (!empty($a_rule[$id]['customrules']))
-		$pconfig['customrules'] = base64_decode($a_rule[$id]['customrules']);
 }
 
 function truncate($string, $length) {
@@ -109,7 +107,19 @@ $snort_uuid = $a_rule[$id]['uuid'];
 $snortcfgdir = "{$snortdir}/snort_{$snort_uuid}_{$if_real}";
 $snortdownload = $config['installedpackages']['snortglobal']['snortdownload'];
 $emergingdownload = $config['installedpackages']['snortglobal']['emergingthreats'];
+$etprodownload = $config['installedpackages']['snortglobal']['emergingthreats_pro'];
 $categories = explode("||", $pconfig['rulesets']);
+
+// add the standard rules files to the categories list
+$categories[] = "custom.rules";
+$categories[] = "decoder.rules";
+$categories[] = "preprocessor.rules";
+$categories[] = "sensitive-data.rules";
+if (!empty($a_rule[$id]['ips_policy']))
+	$categories[] = "IPS Policy - " . ucfirst($a_rule[$id]['ips_policy']);
+if ($a_rule[$id]['autoflowbitrules'] == 'on')
+	$categories[] = "Auto-Flowbit Rules";
+natcasesort($categories);
 
 if ($_GET['openruleset'])
 	$currentruleset = $_GET['openruleset'];
@@ -117,13 +127,6 @@ else if ($_POST['openruleset'])
 	$currentruleset = $_POST['openruleset'];
 else
 	$currentruleset = $categories[0];
-
-if (empty($categories[0]) && ($currentruleset != "custom.rules") && ($currentruleset != "Auto-Flowbit Rules")) {
-	if (!empty($a_rule[$id]['ips_policy']))
-		$currentruleset = "IPS Policy - " . ucfirst($a_rule[$id]['ips_policy']);
-	else
-		$currentruleset = "custom.rules";
-}
 
 /* One last sanity check -- if the rules directory is empty, default to loading custom rules */
 $tmp = glob("{$snortdir}/rules/*.rules");
@@ -136,58 +139,66 @@ if ($currentruleset != 'custom.rules') {
 	// Read the current rules file into our rules map array.
 	// If it is the auto-flowbits file, set the full path.
 	if ($currentruleset == "Auto-Flowbit Rules")
-		$rulefile = "{$snortcfgdir}/rules/" . FLOWBITS_FILENAME;
+		$rules_map = snort_load_rules_map("{$snortcfgdir}/rules/" . FLOWBITS_FILENAME);
 	// Test for the special case of an IPS Policy file.
-	if (substr($currentruleset, 0, 10) == "IPS Policy")
+	elseif (substr($currentruleset, 0, 10) == "IPS Policy")
 		$rules_map = snort_load_vrt_policy($a_rule[$id]['ips_policy']);
-	elseif (!file_exists($rulefile))
-		$input_errors[] = gettext("{$currentruleset} seems to be missing!!! Please verify rules files have been downloaded, then go to the Categories tab and save the rule set again.");
-	else
+	// Test for preproc_rules file and set the full path.
+	elseif (file_exists("{$snortdir}/preproc_rules/{$currentruleset}"))
+		$rules_map = snort_load_rules_map("{$snortdir}/preproc_rules/{$currentruleset}");
+	// Test for existence of regular text rules file and load it.
+	elseif (file_exists($rulefile))
 		$rules_map = snort_load_rules_map($rulefile);
+	else
+		$input_errors[] = gettext("{$currentruleset} seems to be missing!!! Please verify rules files have been downloaded, then go to the Categories tab and save the rule set again.");
 }
 
 /* Load up our enablesid and disablesid arrays with enabled or disabled SIDs */
-$enablesid = snort_load_sid_mods($a_rule[$id]['rule_sid_on'], "enablesid");
-$disablesid = snort_load_sid_mods($a_rule[$id]['rule_sid_off'], "disablesid");
+$enablesid = snort_load_sid_mods($a_rule[$id]['rule_sid_on']);
+$disablesid = snort_load_sid_mods($a_rule[$id]['rule_sid_off']);
 
 if ($_GET['act'] == "toggle" && $_GET['ids'] && !empty($rules_map)) {
+
+	// Get the GID tag embedded in the clicked rule icon.
+	$gid = $_GET['gid'];
 
 	// Get the SID tag embedded in the clicked rule icon.
 	$sid= $_GET['ids'];
 
 	// See if the target SID is in our list of modified SIDs,
-	// and toggle it if present; otherwise, add it to the
-	// appropriate list.
-	if (isset($enablesid[$sid])) {
-		unset($enablesid[$sid]);
-		if (!isset($disablesid[$sid]))
-			$disablesid[$sid] = "disablesid";
-	}
-	elseif (isset($disablesid[$sid])) {
-		unset($disablesid[$sid]);
-		if (!isset($enablesid[$sid]))
-			$enablesid[$sid] = "enablesid";
-	}
+	// and toggle it back to default if present; otherwise,
+	// add it to the appropriate modified SID list.
+	if (isset($enablesid[$gid][$sid]))
+		unset($enablesid[$gid][$sid]);
+	elseif (isset($disablesid[$gid][$sid]))
+		unset($disablesid[$gid][$sid]);
 	else {
-		if ($rules_map[1][$sid]['disabled'] == 1)
-			$enablesid[$sid] = "enablesid";
+		if ($rules_map[$gid][$sid]['disabled'] == 1)
+			$enablesid[$gid][$sid] = "enablesid";
 		else
-			$disablesid[$sid] = "disablesid";
+			$disablesid[$gid][$sid] = "disablesid";
 	}
 
 	// Write the updated enablesid and disablesid values to the config file.
 	$tmp = "";
-	foreach ($enablesid as $k => $v) {
-		$tmp .= "||{$v} {$k}";
+	foreach (array_keys($enablesid) as $k1) {
+		foreach (array_keys($enablesid[$k1]) as $k2)
+			$tmp .= "{$k1}:{$k2}||";
 	}
+	$tmp = rtrim($tmp, "||");
+
 	if (!empty($tmp))
 		$a_rule[$id]['rule_sid_on'] = $tmp;
 	else				
 		unset($a_rule[$id]['rule_sid_on']);
+
 	$tmp = "";
-	foreach ($disablesid as $k => $v) {
-		$tmp .= "||{$v} {$k}";
+	foreach (array_keys($disablesid) as $k1) {
+		foreach (array_keys($disablesid[$k1]) as $k2)
+			$tmp .= "{$k1}:{$k2}||";
 	}
+	$tmp = rtrim($tmp, "||");
+
 	if (!empty($tmp))
 		$a_rule[$id]['rule_sid_off'] = $tmp;
 	else				
@@ -197,7 +208,7 @@ if ($_GET['act'] == "toggle" && $_GET['ids'] && !empty($rules_map)) {
 	write_config();
 
 	$_GET['openruleset'] = $currentruleset;
-	$anchor = "rule_{$sid}";
+	$anchor = "rule_{$gid}_{$sid}";
 }
 
 if ($_GET['act'] == "disable_all" && !empty($rules_map)) {
@@ -205,28 +216,37 @@ if ($_GET['act'] == "disable_all" && !empty($rules_map)) {
 	// Mark all rules in the currently selected category "disabled".
 	foreach (array_keys($rules_map) as $k1) {
 		foreach (array_keys($rules_map[$k1]) as $k2) {
-			if (isset($enablesid[$k2]))
-				unset($enablesid[$k2]);
-			$disablesid[$k2] = "disablesid";
+			if (isset($enablesid[$k1][$k2]))
+				unset($enablesid[$k1][$k2]);
+			$disablesid[$k1][$k2] = "disablesid";
 		}
 	}
+
 	// Write the updated enablesid and disablesid values to the config file.
 	$tmp = "";
-	foreach ($enablesid as $k => $v) {
-		$tmp .= "||{$v} {$k}";
+	foreach (array_keys($enablesid) as $k1) {
+		foreach (array_keys($enablesid[$k1]) as $k2)
+			$tmp .= "{$k1}:{$k2}||";
 	}
+	$tmp = rtrim($tmp, "||");
+
 	if (!empty($tmp))
 		$a_rule[$id]['rule_sid_on'] = $tmp;
 	else				
 		unset($a_rule[$id]['rule_sid_on']);
+
 	$tmp = "";
-	foreach ($disablesid as $k => $v) {
-		$tmp .= "||{$v} {$k}";
+	foreach (array_keys($disablesid) as $k1) {
+		foreach (array_keys($disablesid[$k1]) as $k2)
+			$tmp .= "{$k1}:{$k2}||";
 	}
+	$tmp = rtrim($tmp, "||");
+
 	if (!empty($tmp))
 		$a_rule[$id]['rule_sid_off'] = $tmp;
 	else				
 		unset($a_rule[$id]['rule_sid_off']);
+
 	write_config();
 
 	$_GET['openruleset'] = $currentruleset;
@@ -239,28 +259,36 @@ if ($_GET['act'] == "enable_all" && !empty($rules_map)) {
 	// Mark all rules in the currently selected category "enabled".
 	foreach (array_keys($rules_map) as $k1) {
 		foreach (array_keys($rules_map[$k1]) as $k2) {
-			if (isset($disablesid[$k2]))
-				unset($disablesid[$k2]);
-			$enablesid[$k2] = "enablesid";
+			if (isset($disablesid[$k1][$k2]))
+				unset($disablesid[$k1][$k2]);
+			$enablesid[$k1][$k2] = "enablesid";
 		}
 	}
 	// Write the updated enablesid and disablesid values to the config file.
 	$tmp = "";
-	foreach ($enablesid as $k => $v) {
-		$tmp .= "||{$v} {$k}";
+	foreach (array_keys($enablesid) as $k1) {
+		foreach (array_keys($enablesid[$k1]) as $k2)
+			$tmp .= "{$k1}:{$k2}||";
 	}
+	$tmp = rtrim($tmp, "||");
+
 	if (!empty($tmp))
 		$a_rule[$id]['rule_sid_on'] = $tmp;
 	else				
 		unset($a_rule[$id]['rule_sid_on']);
+
 	$tmp = "";
-	foreach ($disablesid as $k => $v) {
-		$tmp .= "||{$v} {$k}";
+	foreach (array_keys($disablesid) as $k1) {
+		foreach (array_keys($disablesid[$k1]) as $k2)
+			$tmp .= "{$k1}:{$k2}||";
 	}
+	$tmp = rtrim($tmp, "||");
+
 	if (!empty($tmp))
 		$a_rule[$id]['rule_sid_off'] = $tmp;
 	else				
 		unset($a_rule[$id]['rule_sid_off']);
+
 	write_config();
 
 	$_GET['openruleset'] = $currentruleset;
@@ -273,30 +301,38 @@ if ($_GET['act'] == "resetcategory" && !empty($rules_map)) {
 	// Reset any modified SIDs in the current rule category to their defaults.
 	foreach (array_keys($rules_map) as $k1) {
 		foreach (array_keys($rules_map[$k1]) as $k2) {
-			if (isset($enablesid[$k2]))
-				unset($enablesid[$k2]);
-			if (isset($disablesid[$k2]))
-				unset($disablesid[$k2]);
+			if (isset($enablesid[$k1][$k2]))
+				unset($enablesid[$k1][$k2]);
+			if (isset($disablesid[$k1][$k2]))
+				unset($disablesid[$k1][$k2]);
 		}
 	}
 
 	// Write the updated enablesid and disablesid values to the config file.
 	$tmp = "";
-	foreach ($enablesid as $k => $v) {
-		$tmp .= "||{$v} {$k}";
+	foreach (array_keys($enablesid) as $k1) {
+		foreach (array_keys($enablesid[$k1]) as $k2)
+			$tmp .= "{$k1}:{$k2}||";
 	}
+	$tmp = rtrim($tmp, "||");
+
 	if (!empty($tmp))
 		$a_rule[$id]['rule_sid_on'] = $tmp;
 	else				
 		unset($a_rule[$id]['rule_sid_on']);
+
 	$tmp = "";
-	foreach ($disablesid as $k => $v) {
-		$tmp .= "||{$v} {$k}";
+	foreach (array_keys($disablesid) as $k1) {
+		foreach (array_keys($disablesid[$k1]) as $k2)
+			$tmp .= "{$k1}:{$k2}||";
 	}
+	$tmp = rtrim($tmp, "||");
+
 	if (!empty($tmp))
 		$a_rule[$id]['rule_sid_off'] = $tmp;
 	else				
 		unset($a_rule[$id]['rule_sid_off']);
+
 	write_config();
 
 	$_GET['openruleset'] = $currentruleset;
@@ -328,8 +364,11 @@ if ($_POST['clear']) {
 	exit;
 }
 
-if ($_POST['customrules']) {
-	$a_rule[$id]['customrules'] = base64_encode($_POST['customrules']);
+if ($_POST['submit']) {
+	if ($_POST['customrules'])
+		$a_rule[$id]['customrules'] = base64_encode($_POST['customrules']);
+	else
+		unset($a_rule[$id]['customrules']);
 	write_config();
 	$rebuild_rules = true;
 	snort_generate_conf($a_rule[$id]);
@@ -416,15 +455,15 @@ if ($savemsg) {
 		display_top_tabs($tab_array);
 		echo '</td></tr>';
 		echo '<tr><td class="tabnavtbl">';
-		$menu_iface=($if_friendly?substr($if_friendly,0,5)." ":"Iface ");;
-        $tab_array = array();
-        $tab_array[] = array($menu_iface . gettext("Settings"), false, "/snort/snort_interfaces_edit.php?id={$id}");
-	    $tab_array[] = array($menu_iface . gettext("Categories"), false, "/snort/snort_rulesets.php?id={$id}");
-        $tab_array[] = array($menu_iface . gettext("Rules"), true, "/snort/snort_rules.php?id={$id}");
-	    $tab_array[] = array($menu_iface . gettext("Variables"), false, "/snort/snort_define_servers.php?id={$id}");
-        $tab_array[] = array($menu_iface . gettext("Preprocessors"), false, "/snort/snort_preprocessors.php?id={$id}");
-	    $tab_array[] = array($menu_iface . gettext("Barnyard2"), false, "/snort/snort_barnyard.php?id={$id}");
-        display_top_tabs($tab_array);
+		$menu_iface=($if_friendly?substr($if_friendly,0,5)." ":"Iface ");
+		$tab_array = array();
+		$tab_array[] = array($menu_iface . gettext("Settings"), false, "/snort/snort_interfaces_edit.php?id={$id}");
+		$tab_array[] = array($menu_iface . gettext("Categories"), false, "/snort/snort_rulesets.php?id={$id}");
+		$tab_array[] = array($menu_iface . gettext("Rules"), true, "/snort/snort_rules.php?id={$id}");
+		$tab_array[] = array($menu_iface . gettext("Variables"), false, "/snort/snort_define_servers.php?id={$id}");
+		$tab_array[] = array($menu_iface . gettext("Preprocessors"), false, "/snort/snort_preprocessors.php?id={$id}");
+		$tab_array[] = array($menu_iface . gettext("Barnyard2"), false, "/snort/snort_barnyard.php?id={$id}");
+		display_top_tabs($tab_array);
 	?>
 	</td></tr>
 	<tr><td><div id="mainarea">
@@ -435,18 +474,13 @@ if ($savemsg) {
 
 			<tr>
 				<td class="vncell" height="30px"><strong><?php echo gettext("Category:"); ?></strong>&nbsp;&nbsp;<select id="selectbox" name="selectbox" class="formselect" onChange="go()">
-					<option value='?id=<?=$id;?>&openruleset=custom.rules'>custom.rules</option>
 					<?php
-					$files = explode("||", $pconfig['rulesets']);
-					if ($a_rule[$id]['ips_policy_enable'] == 'on')
-						$files[] = "IPS Policy - " . ucfirst($a_rule[$id]['ips_policy']);
-					if ($a_rule[$id]['autoflowbitrules'] == 'on')
-						$files[] = "Auto-Flowbit Rules";
-					natcasesort($files);
-					foreach ($files as $value) {
+					foreach ($categories as $value) {
 						if ($snortdownload != 'on' && substr($value, 0, 6) == "snort_")
 							continue;
 						if ($emergingdownload != 'on' && substr($value, 0, 8) == "emerging")
+							continue;
+						if ($etprodownload != 'on' && substr($value, 0, 6) == "etpro-")
 							continue;
 						if (empty($value))
 							continue;
@@ -468,12 +502,12 @@ if ($savemsg) {
 				<td valign="top" class="vtable">
 					<input type='hidden' name='openruleset' value='custom.rules'>
 					<input type='hidden' name='id' value='<?=$id;?>'>
-					<textarea wrap="soft" cols="90" rows="40" name="customrules"><?=$pconfig['customrules'];?></textarea>
+					<textarea wrap="soft" cols="90" rows="40" name="customrules"><?=base64_decode($a_rule[$id]['customrules']);?></textarea>
 				</td>
 			</tr>
 			<tr>
 				<td>
-					<input name="Submit" type="submit" class="formbtn" id="submit" value="<?php echo gettext(" Save "); ?>" title=" <?php echo gettext("Save custom rules"); ?>"/>&nbsp;&nbsp;
+					<input name="submit" type="submit" class="formbtn" id="submit" value="<?php echo gettext(" Save "); ?>" title=" <?php echo gettext("Save custom rules"); ?>"/>&nbsp;&nbsp;
 					<input name="cancel" type="submit" class="formbtn" id="cancel" value="<?php echo gettext("Cancel"); ?>" title="<?php echo gettext("Cancel changes and return to last page"); ?>"/>&nbsp;&nbsp;
 					<input name="clear" type="submit" class="formbtn" id="clear" value="<?php echo gettext("Clear"); ?>" onclick="return confirm('<?php echo gettext("This will erase all custom rules for the interface.  Are you sure?"); ?>')" title="<?php echo gettext("Deletes all custom rules"); ?>"/>
 				</td>
@@ -491,7 +525,7 @@ if ($savemsg) {
 							<input type='hidden' name='id' value='<?=$id;?>'/>
 							<input type='hidden' name='openruleset' value='<?=$currentruleset;?>'/><br/><br/>
 							<span class="vexpl"><span class="red"><strong><?php echo gettext("Note: ") . "</strong></span>" . 
-							gettext("Snort must be restarted to activate any SID enable/disable changes made on this tab."); ?></span></td>
+							gettext("Snort must be restarted to activate any rule enable/disable changes made on this tab."); ?></span></td>
 							<td class="vexpl" valign="middle"><?php echo "<a href='?id={$id}&openruleset={$currentruleset}&act=resetcategory'>
 							<img src=\"../themes/{$g['theme']}/images/icons/icon_x.gif\" width=\"15\" height=\"15\" 
 							onmouseout='this.src=\"../themes/{$g['theme']}/images/icons/icon_x.gif\"' 
@@ -543,11 +577,14 @@ if ($savemsg) {
 			</tr>
 			<tr>
 				<td>
+
+				<?php if ($currentruleset != 'decoder.rules' && $currentruleset != 'preprocessor.rules'): ?>
 					<table id="myTable" class="sortable" style="table-layout: fixed;" width="100%" border="0" cellpadding="0" cellspacing="0">
 						<colgroup>
 							<col width="15" align="left" valign="middle">
-							<col width="9%" align="center" axis="number">
-							<col width="60" align="center" axis="string">
+							<col width="6%" align="center" axis="number">
+							<col width="8%" align="center" axis="number">
+							<col width="54" align="center" axis="string">
 							<col width="14%" align="center" axis="string">
 							<col width="11%" align="center" axis="string">
 							<col width="14%" align="center" axis="string">
@@ -558,6 +595,7 @@ if ($savemsg) {
 						<thead>
 						   <tr>
 							<th class="list">&nbsp;</th>
+							<th class="listhdrr"><?php echo gettext("GID"); ?></th>
 							<th class="listhdrr"><?php echo gettext("SID"); ?></th>
 							<th class="listhdrr"><?php echo gettext("Proto"); ?></th>
 							<th class="listhdrr"><?php echo gettext("Source"); ?></th>
@@ -579,28 +617,28 @@ if ($savemsg) {
 						$counter = $enable_cnt = $disable_cnt = 0;
 						foreach ($rules_map as $k1 => $rulem) {
 							foreach ($rulem as $k2 => $v) {
-								$sid = snort_get_sid($v['rule']);
-								$gid = snort_get_gid($v['rule']);
+								$sid = $k2;
+								$gid = $k1;
 
-								if (isset($disablesid[$sid])) {
+								if (isset($disablesid[$gid][$sid])) {
 									$textss = "<span class=\"gray\">";
 									$textse = "</span>";
 									$iconb = "icon_reject_d.gif";
 									$disable_cnt++;
-									$title = gettext("Disabled by user. Click to toggle to enabled state");
+									$title = gettext("Disabled by user. Click to toggle to default state");
 								}
-								elseif (($v['disabled'] == 1) && (!isset($enablesid[$sid]))) {
+								elseif (($v['disabled'] == 1) && (!isset($enablesid[$gid][$sid]))) {
 									$textss = "<span class=\"gray\">";
 									$textse = "</span>";
 									$iconb = "icon_block_d.gif";
 									$disable_cnt++;
 									$title = gettext("Disabled by default. Click to toggle to enabled state");
 								}
-								elseif (isset($enablesid[$sid])) {
+								elseif (isset($enablesid[$gid][$sid])) {
 									$textss = $textse = "";
 									$iconb = "icon_reject.gif";
 									$enable_cnt++;
-									$title = gettext("Enabled by user. Click to toggle to disabled state");
+									$title = gettext("Enabled by user. Click to toggle to default state");
 								}
 								else {
 									$textss = $textse = "";
@@ -630,11 +668,14 @@ if ($savemsg) {
 								$message = snort_get_msg($v['rule']);
 
 						echo "<tr><td class=\"listt\" align=\"left\" valign=\"middle\"> $textss
-								<a id=\"rule_{$sid}\" href='?id={$id}&openruleset={$currentruleset}&act=toggle&ids={$sid}'>
+								<a id=\"rule_{$gid}_{$sid}\" href='?id={$id}&openruleset={$currentruleset}&act=toggle&gid={$gid}&ids={$sid}'>
 								<img src=\"../themes/{$g['theme']}/images/icons/{$iconb}\"
 								width=\"11\" height=\"11\" border=\"0\"  
 								title='{$title}'></a>
 								$textse
+							       </td>
+							       <td class=\"listlr\" align=\"center\">
+									{$textss}{$gid}{$textse}
 							       </td>
 							       <td class=\"listlr\" align=\"center\">
 									{$textss}{$sid}{$textse}
@@ -673,6 +714,119 @@ if ($savemsg) {
 						?>
 					    </tbody>
 					</table>
+
+				<?php else: ?>
+
+					<table id="myTable" class="sortable" style="table-layout: fixed;" width="100%" border="0" cellpadding="0" cellspacing="0">
+						<colgroup>
+							<col width="15" align="left" valign="middle">
+							<col width="6%" align="center" axis="number">
+							<col width="6%" align="center" axis="number">
+							<col width="22%" align="center" axis="string">
+							<col width="15%" align="center" axis="string">
+							<col align="left" axis="string">
+							<col width="22" align="right" valign="middle">
+						</colgroup>
+						<thead>
+						   <tr>
+							<th class="list">&nbsp;</th>
+							<th class="listhdrr"><?php echo gettext("GID"); ?></th>
+							<th class="listhdrr"><?php echo gettext("SID"); ?></th>
+							<th class="listhdrr"><?php echo gettext("Classification"); ?></th>
+							<th class="listhdrr"><?php echo gettext("IPS Policy"); ?></th>
+							<th class="listhdrr"><?php echo gettext("Message"); ?></th>
+							<th class="list"><a href="javascript: void(0)" 
+							onclick="wopen('snort_rules_edit.php?id=<?=$id;?>&openruleset=<?=$currentruleset;?>','FileViewer',800,600)">
+							<img src="../themes/<?= $g['theme']; ?>/images/icons/icon_service_restart.gif" <?php
+							echo "onmouseover='this.src=\"../themes/{$g['theme']}/images/icons/icon_services_restart_mo.gif\"' 
+							onmouseout='this.src=\"../themes/{$g['theme']}/images/icons/icon_service_restart.gif\"' ";?>				
+							title="<?php echo gettext("Click to view full text of all the category rules"); ?>" width="17" height="17" border="0"></a></th>
+						   </tr>
+						</thead>
+						<tbody>
+							<?php
+								$counter = $enable_cnt = $disable_cnt = 0;
+								foreach ($rules_map as $k1 => $rulem) {
+									foreach ($rulem as $k2 => $v) {
+										$sid = snort_get_sid($v['rule']);
+										$gid = snort_get_gid($v['rule']);
+										if (isset($disablesid[$gid][$sid])) {
+											$textss = "<span class=\"gray\">";
+											$textse = "</span>";
+											$iconb = "icon_reject_d.gif";
+											$disable_cnt++;
+											$title = gettext("Disabled by user. Click to toggle to default state");
+										}
+										elseif (($v['disabled'] == 1) && (!isset($enablesid[$gid][$sid]))) {
+											$textss = "<span class=\"gray\">";
+											$textse = "</span>";
+											$iconb = "icon_block_d.gif";
+											$disable_cnt++;
+											$title = gettext("Disabled by default. Click to toggle to enabled state");
+										}
+										elseif (isset($enablesid[$gid][$sid])) {
+											$textss = $textse = "";
+											$iconb = "icon_reject.gif";
+											$enable_cnt++;
+											$title = gettext("Enabled by user. Click to toggle to default state");
+										}
+										else {
+											$textss = $textse = "";
+											$iconb = "icon_block.gif";
+											$enable_cnt++;
+											$title = gettext("Enabled by default. Click to toggle to disabled state");
+										}
+										$message = snort_get_msg($v['rule']);
+										$matches = array();
+										if (preg_match('/(?:classtype\b\s*:)\s*(\S*\s*;)/iU', $v['rule'], $matches))
+											$classtype = trim($matches[1], " ;");
+										else
+											$classtype = "No Classtype Defined";
+										$matches = array();
+										if (preg_match_all('/(\S*-ips)(?:\s*drop|alert)(?:,|\s*|;)/i', $v['rule'], $matches))
+											$policy = implode("<br/>", $matches[1]);
+										else
+											$policy = "none";
+
+										echo "<tr><td class=\"listt\" align=\"left\" valign=\"middle\"> $textss
+										<a id=\"rule_{$sid}\" href='?id={$id}&openruleset={$currentruleset}&act=toggle&ids={$sid}&gid={$gid}'>
+										<img src=\"../themes/{$g['theme']}/images/icons/{$iconb}\"
+										width=\"11\" height=\"11\" border=\"0\"  
+										title='{$title}'></a>
+										$textse
+								       		</td>
+									       <td class=\"listlr\" align=\"center\">
+											{$textss}{$gid}{$textse}
+									       </td>
+									       <td class=\"listlr\" align=\"center\">
+											{$textss}{$sid}{$textse}
+										</td>
+										<td class=\"listlr\" align=\"center\">
+											{$textss}{$classtype}</span>
+							       			</td>
+							       			<td class=\"listlr\" align=\"center\">
+								       			{$textss}{$policy}</span>
+								       		</td>
+										<td class=\"listbg\" style=\"word-wrap:break-word; whitespace:pre-line;\"><font color=\"white\"> 
+											{$textss}{$message}{$textse}</font>
+							       			</td>";
+									?>
+										<td align="right" valign="middle" nowrap class="listt">
+											<a href="javascript: void(0)" 
+											onclick="wopen('snort_rules_edit.php?id=<?=$id;?>&openruleset=<?=$currentruleset;?>&ids=<?=$sid;?>&gid=<?=$gid;?>','FileViewer',800,600)">
+											<img src="../themes/<?= $g['theme']; ?>/images/icons/icon_right.gif" 
+											title="<?php echo gettext("Click to view the entire rule text"); ?>" width="17" height="17" border="0"></a>
+										</td>
+									   	</tr>
+							<?php
+										$counter++;
+									}
+								}
+							unset($rulem, $v);
+							?>
+						</tbody>
+					</table>
+				<?php endif;?>
 				</td>
 			</tr>
 			<tr>

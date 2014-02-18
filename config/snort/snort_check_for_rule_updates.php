@@ -34,7 +34,7 @@ require_once("functions.inc");
 require_once("service-utils.inc");
 require_once "/usr/local/pkg/snort/snort.inc";
 
-global $g, $pkg_interface, $snort_gui_include, $rebuild_rules;
+global $g, $config, $pkg_interface, $snort_gui_include, $rebuild_rules;
 
 if (!defined("VRT_DNLD_URL"))
 	define("VRT_DNLD_URL", "https://www.snort.org/reg-rules/");
@@ -96,7 +96,7 @@ exec("/usr/local/bin/snort -V 2>&1 |/usr/bin/grep Version | /usr/bin/cut -c20-26
 // Save the version with decimal delimiters for use in extracting the rules
 $snort_version = $snortver[0];
 if (empty($snort_version))
-	$snort_version = "2.9.5.5";
+	$snort_version = "2.9.5.6";
 
 // Create a collapsed version string for use in the tarball filename
 $snortver[0] = str_replace(".", "", $snortver[0]);

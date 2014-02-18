@@ -1,8 +1,8 @@
 <?php
 /*
- * snort_migrate_config.inc
+ * snort_migrate_config.php
  *
- * Copyright (C) 2013 Bill Meeks
+ * Copyright (C) 2013, 2014 Bill Meeks
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -288,6 +288,40 @@ foreach ($rule as &$r) {
 		}
 	}
 
+	// Change any ENABLE_SID settings to new format of GID:SID
+	if (!empty($pconfig['rule_sid_on'])) {
+		$tmp = explode("||", $pconfig['rule_sid_on']);
+		$new_tmp = "";
+		foreach ($tmp as $v) {
+			if (strpos($v, ":") === false) {
+				if (preg_match('/(\d+)/', $v, $match))
+					$new_tmp .= "1:{$match[1]}||";
+			}
+		}
+		$new_tmp = rtrim($new_tmp, " ||");
+		if (!empty($new_tmp)) {
+			$pconfig['rule_sid_on'] = $new_tmp;
+			$updated_cfg = true;
+		}
+	}
+
+	// Change any DISABLE_SID settings to new format of GID:SID
+	if (!empty($pconfig['rule_sid_off'])) {
+		$tmp = explode("||", $pconfig['rule_sid_off']);
+		$new_tmp = "";
+		foreach ($tmp as $v) {
+			if (strpos($v, ":") === false) {
+				if (preg_match('/(\d+)/', $v, $match))
+					$new_tmp .= "1:{$match[1]}||";
+			}
+		}
+		$new_tmp = rtrim($new_tmp, " ||");
+		if (!empty($new_tmp)) {
+			$pconfig['rule_sid_off'] = $new_tmp;
+			$updated_cfg = true;
+		}
+	}
+
 	// Save the new configuration data into the $config array pointer
 	$r = $pconfig;
 }
@@ -296,7 +330,7 @@ unset($r);
 
 // Write out the new configuration to disk if we changed anything
 if ($updated_cfg) {
-	$config['installedpackages']['snortglobal']['snort_config_ver'] = "3.0.2";
+	$config['installedpackages']['snortglobal']['snort_config_ver'] = "3.0.4";
 	log_error("[Snort] Saving configuration settings in new format...");
 	write_config();
 	log_error("[Snort] Settings successfully migrated to new configuration format...");

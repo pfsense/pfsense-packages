@@ -5,7 +5,7 @@
  * Copyright (C) 2006 Scott Ullrich
  * Copyright (C) 2009-2010 Robert Zelaya
  * Copyright (C) 2011-2012 Ermal Luci
- * Copyright (C) 2013 Bill Meeks
+ * Copyright (C) 2013,2014 Bill Meeks
  * part of pfSense
  * All rights reserved.
  *
@@ -51,10 +51,10 @@ $snortver = array();
 exec("/usr/local/bin/snort -V 2>&1 |/usr/bin/grep Version | /usr/bin/cut -c20-26", $snortver);
 $snort_version = $snortver[0];
 if (empty($snort_version))
-	$snort_version = "2.9.5.5";
+	$snort_version = "2.9.5.6";
 
 /* package version */
-$pfSense_snort_version = "3.0.2";
+$pfSense_snort_version = "3.0.4";
 $snort_package_version = "Snort {$snort_version} pkg v{$pfSense_snort_version}";
 
 // Define SNORTDIR and SNORTLIBDIR constants according to pfSense version
@@ -825,11 +825,11 @@ function snort_rm_blocked_install_cron($should_install) {
 	switch($should_install) {
 	case true:
 		$cron_item = array();
-		$cron_item['minute'] = "$snort_rm_blocked_min";
-		$cron_item['hour'] = "$snort_rm_blocked_hr";
-		$cron_item['mday'] = "$snort_rm_blocked_mday";
-		$cron_item['month'] = "$snort_rm_blocked_month";
-		$cron_item['wday'] = "$snort_rm_blocked_wday";
+		$cron_item['minute'] = $snort_rm_blocked_min;
+		$cron_item['hour'] = $snort_rm_blocked_hr;
+		$cron_item['mday'] = $snort_rm_blocked_mday;
+		$cron_item['month'] = $snort_rm_blocked_month;
+		$cron_item['wday'] = $snort_rm_blocked_wday;
 		$cron_item['who'] = "root";
 		$cron_item['command'] = "/usr/bin/nice -n20 /usr/local/sbin/expiretable -t $snort_rm_blocked_expire snort2c";
 
@@ -927,11 +927,11 @@ function snort_rules_up_install_cron($should_install) {
 	switch($should_install) {
 	case true:
 		$cron_item = array();
-		$cron_item['minute'] = "$snort_rules_up_min";
-		$cron_item['hour'] = "$snort_rules_up_hr";
-		$cron_item['mday'] = "$snort_rules_up_mday";
-		$cron_item['month'] = "$snort_rules_up_month";
-		$cron_item['wday'] = "$snort_rules_up_wday";
+		$cron_item['minute'] = $snort_rules_up_min;
+		$cron_item['hour'] = $snort_rules_up_hr;
+		$cron_item['mday'] = $snort_rules_up_mday;
+		$cron_item['month'] = $snort_rules_up_month;
+		$cron_item['wday'] = $snort_rules_up_wday;
 		$cron_item['who'] = "root";
 		$cron_item['command'] = "/usr/bin/nice -n20 /usr/local/bin/php -f /usr/local/pkg/snort/snort_check_for_rule_updates.php";
 
@@ -1739,34 +1739,32 @@ function snort_write_enforcing_rules_file($rule_map, $rule_path) {
 	}
 }
 
-function snort_load_sid_mods($sids, $value) {
+function snort_load_sid_mods($sids) {
 
 	/*****************************************/
 	/* This function parses the string of    */
-	/* SID values in $sids and returns an    */
-	/* array with the SID as the key and     */
-	/* value.  The SID values in $sids are   */
+	/* GID:SID values in $sids and returns   */
+	/* an array with the GID and SID as the  */
+	/* keys.  The values in $sids are        */
 	/* assumed to be delimited by "||".      */
 	/*                                       */
-	/* $sids ==> string of SID values from   */
-	/*           saved config file.          */
+	/* $sids   ==> string of GID:SID values  */
+	/*             from the config file.     */
 	/*                                       */
-	/* $value ==> type of mod (enable or     */
-	/*            disable).  Not currently   */
-	/*            utilized, but maintained   */
-	/*            so as not to break legacy  */
-	/*            code elsewhere.            */
+	/* Returns ==> a multidimensional array  */
+	/*             with GID and SID as the   */
+	/*             keys ($result[GID][SID])  */
 	/*****************************************/
 
 	$result = array();
-	if (empty($sids) || empty($value))
+	if (empty($sids))
 		return $result;
 	$tmp = explode("||", $sids);
 	foreach ($tmp as $v) {
-		if (preg_match('/\s\d+/', $v, $match)) {
-			if (!is_array($result[trim($match[0])]))
-				$result[trim($match[0])] = array();
-			$result[trim($match[0])] = trim($match[0]);
+		if (preg_match('/(\d+)\s*:\s*(\d+)/', $v, $match)) {
+			if (!is_array($result[$match[1]]))
+				$result[$match[1]] = array();
+			$result[$match[1]][$match[2]] = "{$match[1]}:{$match[2]}";
 		}
 	}
 	unset($tmp);
@@ -1791,15 +1789,15 @@ function snort_modify_sids(&$rule_map, $snortcfg) {
 
 	/* Load up our enablesid and disablesid  */
 	/* arrays with lists of modified SIDs    */
-	$enablesid = snort_load_sid_mods($snortcfg['rule_sid_on'], "enablesid");
-	$disablesid = snort_load_sid_mods($snortcfg['rule_sid_off'], "disablesid");
+	$enablesid = snort_load_sid_mods($snortcfg['rule_sid_on']);
+	$disablesid = snort_load_sid_mods($snortcfg['rule_sid_off']);
 
 	/* Turn on any rules that need to be     */
 	/* forced "on" with enablesid mods.      */
 	if (!empty($enablesid)) {
 		foreach ($rule_map as $k1 => $rulem) {
 			foreach ($rulem as $k2 => $v) {
-				if (in_array($k2, $enablesid) && $v['disabled'] == 1) {
+				if (isset($enablesid[$k1][$k2]) && $v['disabled'] == 1) {
 					$rule_map[$k1][$k2]['rule'] = ltrim($v['rule'], " \t#");
 					$rule_map[$k1][$k2]['disabled'] = 0;
 				}
@@ -1812,7 +1810,7 @@ function snort_modify_sids(&$rule_map, $snortcfg) {
 	if (!empty($disablesid)) {
 		foreach ($rule_map as $k1 => $rulem) {
 			foreach ($rulem as $k2 => $v) {
-				if (in_array($k2, $disablesid) && $v['disabled'] == 0) {
+				if (isset($disablesid[$k1][$k2]) && $v['disabled'] == 0) {
 					$rule_map[$k1][$k2]['rule'] = "# " . $v['rule'];
 					$rule_map[$k1][$k2]['disabled'] = 1;
 				}
@@ -2209,12 +2207,13 @@ function snort_prepare_rule_files($snortcfg, $snortcfgdir) {
 	/*                  to be written.                         */
 	/***********************************************************/
 
-	global $rebuild_rules;
+	global $g, $rebuild_rules;
 
 	$snortdir = SNORTDIR;
 	$flowbit_rules_file = FLOWBITS_FILENAME;
 	$snort_enforcing_rules_file = ENFORCING_RULES_FILENAME;
 	$no_rules_defined = true;
+	$enabled_rules = array();
 
 	/* If there is no reason to rebuild the rules, exit to save time. */
 	if (!$rebuild_rules)
@@ -2223,14 +2222,37 @@ function snort_prepare_rule_files($snortcfg, $snortcfgdir) {
 	/* Log a message for rules rebuild in progress */
 	log_error(gettext("[Snort] Updating rules configuration for: " . snort_get_friendly_interface($snortcfg['interface']) . " ..."));
 
+	/* Enable all, some or none of the SDF rules depending on setting. */
+	if ($snortcfg['sensitive_data'] == 'on' && $snortcfg['protect_preproc_rules'] != 'on') {
+		if (file_exists(SNORTDIR."/preproc_rules/sensitive-data.rules")) {
+			$sdf_alert_pattern="(".preg_replace("/,/","|",$snortcfg['sdf_alert_data_type']).")";
+			$sd_tmp_file=file(SNORTDIR."/preproc_rules/sensitive-data.rules");
+			$sd_tmp_new_file="";
+			foreach ($sd_tmp_file as $sd_tmp_line)
+				$sd_tmp_new_file.=preg_match("/$sdf_alert_pattern/i",$sd_tmp_line) ? $sd_tmp_line : "";
+			file_put_contents("{$snortcfgdir}/preproc_rules/sensitive-data.rules",$sd_tmp_new_file,LOCK_EX);
+		}
+	}
+	elseif ($snortcfg['sensitive_data'] != 'on' && $snortcfg['protect_preproc_rules'] != 'on') {
+		/* Setting is "off", so disable all SDF rules. */
+		$sedcmd = '/^alert.*classtype:sdf/s/^/#/';
+		@file_put_contents("{$g['tmp_path']}/sedcmd", $sedcmd);
+		mwexec("/usr/bin/sed -I '' -f {$g['tmp_path']}/sedcmd {$snortcfgdir}/preproc_rules/sensitive-data.rules");
+		@unlink("{$g['tmp_path']}/sedcmd");
+	}
+
+	/* Load the decoder, preprocessor and sensitive-data  */
+	/* rules from the interface's preproc_rule directory  */
+	/* into the $enabled_rules array.                     */
+	$enabled_rules = snort_load_rules_map("{$snortcfgdir}/preproc_rules/");
+
 	/* Only rebuild rules if some are selected or an IPS Policy is enabled  */
 	if (!empty($snortcfg['rulesets']) || $snortcfg['ips_policy_enable'] == 'on') {
-		$enabled_rules = array();
 		$enabled_files = array();
 		$all_rules = array();
 		$no_rules_defined = false;
 
-		/* Load up all the rules into a Rules Map array. */
+		/* Load up all the text rules into a Rules Map array. */
 		$all_rules = snort_load_rules_map("{$snortdir}/rules/");
 
 		/* Create an array with the filenames of the enabled  */
@@ -2320,7 +2342,8 @@ function snort_prepare_rule_files($snortcfg, $snortcfgdir) {
 			/* Just put an empty file to always have the file present */
 			snort_write_flowbit_rules_file(array(), "{$snortcfgdir}/rules/{$flowbit_rules_file}");
 	} else {
-		snort_write_enforcing_rules_file(array(), "{$snortcfgdir}/rules/{$snort_enforcing_rules_file}");
+		/* No regular rules or policy were selected, so just use the decoder and preproc rules */
+		snort_write_enforcing_rules_file($enabled_rules, "{$snortcfgdir}/rules/{$snort_enforcing_rules_file}");
 		snort_write_flowbit_rules_file(array(), "{$snortcfgdir}/rules/{$flowbit_rules_file}");
 	}
 
@@ -2333,7 +2356,7 @@ function snort_prepare_rule_files($snortcfg, $snortcfgdir) {
 
 	/* Log a warning if the interface has no rules defined or enabled */
 	if ($no_rules_defined)
-		log_error(gettext("[Snort] Warning - no text rules selected for: " . snort_get_friendly_interface($snortcfg['interface']) . " ..."));
+		log_error(gettext("[Snort] Warning - no text rules or IPS-Policy selected for: " . snort_get_friendly_interface($snortcfg['interface']) . " ..."));
 
 	/* Build a new sid-msg.map file from the enabled */
 	/* rules and copy it to the interface directory. */
@@ -3219,43 +3242,9 @@ EOD;
 		$snort_misc_include_rules .= "include {$snortcfgdir}/reference.config\n";
 	if (file_exists("{$snortcfgdir}/classification.config"))
 		$snort_misc_include_rules .= "include {$snortcfgdir}/classification.config\n";
-	if (is_dir("{$snortcfgdir}/preproc_rules")) {
-		if ($snortcfg['sensitive_data'] == 'on' && $protect_preproc_rules == "off") {
-			$sedcmd = '/^#alert.*classtype:sdf/s/^#//';
-			if (file_exists("{$snortcfgdir}/preproc_rules/sensitive-data.rules")){
-				$snort_misc_include_rules .= "include \$PREPROC_RULE_PATH/sensitive-data.rules\n";
-				#enable only selected sensitive data
-				if (file_exists(SNORTDIR."/preproc_rules/sensitive-data.rules")){
-					$sdf_alert_pattern="(".preg_replace("/,/","|",$snortcfg['sdf_alert_data_type']).")";
-					$sd_tmp_file=file(SNORTDIR."/preproc_rules/sensitive-data.rules");
-					$sd_tmp_new_file="";
-					foreach ($sd_tmp_file as $sd_tmp_line)
-						$sd_tmp_new_file.=preg_match("/$sdf_alert_pattern/i",$sd_tmp_line) ? $sd_tmp_line : "";
-					file_put_contents("{$snortcfgdir}/preproc_rules/sensitive-data.rules",$sd_tmp_new_file,LOCK_EX);
-				}
-			}
-		} else
-			$sedcmd = '/^alert.*classtype:sdf/s/^/#/';
-		if (file_exists("{$snortcfgdir}/preproc_rules/decoder.rules") &&
-		    file_exists("{$snortcfgdir}/preproc_rules/preprocessor.rules") && $protect_preproc_rules == "off") {
-			@file_put_contents("{$g['tmp_path']}/sedcmd", $sedcmd);
-			mwexec("/usr/bin/sed -I '' -f {$g['tmp_path']}/sedcmd {$snortcfgdir}/preproc_rules/preprocessor.rules");
-			mwexec("/usr/bin/sed -I '' -f {$g['tmp_path']}/sedcmd {$snortcfgdir}/preproc_rules/decoder.rules");
-			@unlink("{$g['tmp_path']}/sedcmd");
-			$snort_misc_include_rules .= "include \$PREPROC_RULE_PATH/decoder.rules\n";
-			$snort_misc_include_rules .= "include \$PREPROC_RULE_PATH/preprocessor.rules\n";
-		} else if (file_exists("{$snortcfgdir}/preproc_rules/decoder.rules") &&
-			   file_exists("{$snortcfgdir}/preproc_rules/preprocessor.rules") && $protect_preproc_rules == "on") {
-			$snort_misc_include_rules .= "include \$PREPROC_RULE_PATH/decoder.rules\n";
-			$snort_misc_include_rules .= "include \$PREPROC_RULE_PATH/preprocessor.rules\n";
-		}
-		else {
-			$snort_misc_include_rules .= "config autogenerate_preprocessor_decoder_rules\n";
-			log_error("[Snort] Seems preprocessor/decoder rules are missing, enabling autogeneration of them");
-		}
-	} else {
+	if (!file_exists("{$snortcfgdir}/preproc_rules/decoder.rules") || !file_exists("{$snortcfgdir}/preproc_rules/preprocessor.rules")) {
 		$snort_misc_include_rules .= "config autogenerate_preprocessor_decoder_rules\n";
-		log_error("[Snort] Seems preprocessor/decoder rules are missing, enabling autogeneration of them");
+		log_error("[Snort] Seems preprocessor and/or decoder rules are missing, enabling autogeneration of them in conf file.");
 	}
 
 	/* generate rule sections to load */
@@ -3673,9 +3662,8 @@ EOD;
 ipvar HOME_NET [{$home_net}]
 ipvar EXTERNAL_NET [{$external_net}]
 
-# Define Rule Paths #
+# Define Rule Path #
 var RULE_PATH {$snortcfgdir}/rules
-var PREPROC_RULE_PATH {$snortcfgdir}/preproc_rules
 
 # Define Servers #
 {$ipvardef}
