@@ -37,6 +37,7 @@ global $g, $rebuild_rules;
 
 $snortdir = SNORTDIR;
 $rules_map = array();
+$pconfig = array();
 
 if (!is_array($config['installedpackages']['snortglobal']['rule']))
 	$config['installedpackages']['snortglobal']['rule'] = array();
@@ -53,8 +54,6 @@ if (is_null($id)) {
 if (isset($id) && $a_rule[$id]) {
 	$pconfig['interface'] = $a_rule[$id]['interface'];
 	$pconfig['rulesets'] = $a_rule[$id]['rulesets'];
-	if (!empty($a_rule[$id]['customrules']))
-		$pconfig['customrules'] = base64_decode($a_rule[$id]['customrules']);
 }
 
 function truncate($string, $length) {
@@ -365,8 +364,11 @@ if ($_POST['clear']) {
 	exit;
 }
 
-if ($_POST['customrules']) {
-	$a_rule[$id]['customrules'] = base64_encode($_POST['customrules']);
+if ($_POST['submit']) {
+	if ($_POST['customrules'])
+		$a_rule[$id]['customrules'] = base64_encode($_POST['customrules']);
+	else
+		unset($a_rule[$id]['customrules']);
 	write_config();
 	$rebuild_rules = true;
 	snort_generate_conf($a_rule[$id]);
@@ -500,12 +502,12 @@ if ($savemsg) {
 				<td valign="top" class="vtable">
 					<input type='hidden' name='openruleset' value='custom.rules'>
 					<input type='hidden' name='id' value='<?=$id;?>'>
-					<textarea wrap="soft" cols="90" rows="40" name="customrules"><?=$pconfig['customrules'];?></textarea>
+					<textarea wrap="soft" cols="90" rows="40" name="customrules"><?=base64_decode($a_rule[$id]['customrules']);?></textarea>
 				</td>
 			</tr>
 			<tr>
 				<td>
-					<input name="Submit" type="submit" class="formbtn" id="submit" value="<?php echo gettext(" Save "); ?>" title=" <?php echo gettext("Save custom rules"); ?>"/>&nbsp;&nbsp;
+					<input name="submit" type="submit" class="formbtn" id="submit" value="<?php echo gettext(" Save "); ?>" title=" <?php echo gettext("Save custom rules"); ?>"/>&nbsp;&nbsp;
 					<input name="cancel" type="submit" class="formbtn" id="cancel" value="<?php echo gettext("Cancel"); ?>" title="<?php echo gettext("Cancel changes and return to last page"); ?>"/>&nbsp;&nbsp;
 					<input name="clear" type="submit" class="formbtn" id="clear" value="<?php echo gettext("Clear"); ?>" onclick="return confirm('<?php echo gettext("This will erase all custom rules for the interface.  Are you sure?"); ?>')" title="<?php echo gettext("Deletes all custom rules"); ?>"/>
 				</td>
