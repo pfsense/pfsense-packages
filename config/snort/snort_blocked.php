@@ -7,6 +7,7 @@
  *
  * Modified for the Pfsense snort package v. 1.8+
  * Copyright (C) 2009 Robert Zelaya Sr. Developer
+ * Copyright (C) 2014 Bill Meeks
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -32,6 +33,9 @@
 
 require_once("guiconfig.inc");
 require_once("/usr/local/pkg/snort/snort.inc");
+
+// Grab pfSense version so we can refer to it later on this page
+$pfs_version=substr(trim(file_get_contents("/etc/version")),0,3);
 
 if (!is_array($config['installedpackages']['snortglobal']['alertsblocks']))
 	$config['installedpackages']['snortglobal']['alertsblocks'] = array();
@@ -127,6 +131,7 @@ include_once("head.inc");
 ?>
 
 <body link="#000000" vlink="#000000" alink="#000000">
+<script src="/javascript/filter_log.js" type="text/javascript"></script>
 
 <?php
 
@@ -260,19 +265,25 @@ if ($pconfig['brefresh'] == 'on')
 
 				/* Add zero-width space as soft-break opportunity after each colon if we have an IPv6 address */
 				$tmp_ip = str_replace(":", ":&#8203;", $blocked_ip);
-
+				/* Add reverse DNS lookup icons (two different links if pfSense version supports them) */
+				$rdns_link = "";
+				if ($pfs_version > 2.0) {
+					$rdns_link .= "<a onclick=\"javascript:getURL('/diag_dns.php?host={$blocked_ip}&dialog_output=true', outputrule);\">";
+					$rdns_link .= "<img src='../themes/{$g['theme']}/images/icons/icon_log_d.gif' width='11' height='11' border='0' ";
+					$rdns_link .= "title='" . gettext("Resolve host via reverse DNS lookup (quick pop-up)") . "' style=\"cursor: pointer;\"></a>&nbsp;";
+				}
+				$rdns_link .= "<a href='/diag_dns.php?host={$blocked_ip}'>";
+				$rdns_link .= "<img src='../themes/{$g['theme']}/images/icons/icon_log.gif' width='11' height='11' border='0' ";
+				$rdns_link .= "title='" . gettext("Resolve host via reverse DNS lookup") . "'></a>";
 				/* use one echo to do the magic*/
 					echo "<tr>
 						<td align=\"center\" valign=\"middle\" class=\"listr\">{$counter}</td>
-						<td valign=\"middle\" class=\"listr\">{$tmp_ip}&nbsp;<a href='/diag_dns.php?host={$blocked_ip}'>
-						<img src='../themes/{$g['theme']}/images/icons/icon_log.gif' width='11' height='11' border='0' 
-						title='" . gettext("Resolve host via reverse DNS lookup") . "'></a></td>
+						<td align=\"center\" valign=\"middle\" class=\"listr\">{$tmp_ip}<br/>{$rdns_link}</td>
 						<td valign=\"middle\" class=\"listr\">{$blocked_desc}</td>
 						<td align=\"center\" valign=\"middle\" class=\"listr\"><a href='snort_blocked.php?todelete=" . trim(urlencode($blocked_ip)) . "'>
 						<img title=\"" . gettext("Delete host from Blocked Table") . "\" border=\"0\" name='todelete' id='todelete' alt=\"Delete host from Blocked Table\" src=\"../themes/{$g['theme']}/images/icons/icon_x.gif\"></a></td>
 					</tr>\n";
 			}
-
 		}
 		?>
 					</tbody>
