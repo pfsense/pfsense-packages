@@ -569,9 +569,14 @@ EOF;
 							$vh_config.= " SSLCertificateKeyFile ". APACHEDIR . "/etc/apache22/{$virtualhost["ssl_cert"]}.key\n";
 			       			}
 						}
-					$svr_ca =lookup_ca($virtualhost["reverse_int_ca"]);
+					$svr_ca =lookup_ca($virtualhost["ssl_cert_chain"]);
 					if ($svr_ca != false) {
-							file_put_contents(APACHEDIR . "/etc/apache22/{$virtualhost["reverse_int_ca"]}.crt",apache_textarea_decode($svr_ca['crt']),LOCK_EX);
+							file_put_contents(APACHEDIR . "/etc/apache22/{$virtualhost["ssl_cert_chain"]}.crt",apache_textarea_decode($svr_ca['crt']),LOCK_EX);
+							$vh_config.= " SSLCertificateChainFile ". APACHEDIR . "/etc/apache22/{$virtualhost["ssl_cert_chain"]}.crt\n";
+							}
+					$cli_ca =lookup_ca($virtualhost["reverse_int_ca"]);
+					if ($cli_ca != false) {
+							file_put_contents(APACHEDIR . "/etc/apache22/{$virtualhost["reverse_int_ca"]}.crt",apache_textarea_decode($cli_ca['crt']),LOCK_EX);
 							$vh_config.= " SSLCACertificateFile ". APACHEDIR . "/etc/apache22/{$virtualhost["reverse_int_ca"]}.crt\n";
 							}
 					}
