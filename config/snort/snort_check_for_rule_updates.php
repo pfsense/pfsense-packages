@@ -664,7 +664,7 @@ if ($snortdownload == 'on' || $emergingthreats == 'on' || $snortcommunityrules =
         /* the Snort VRT rules are not enabled, then use Emerging Threats  */
 	/* or Snort Community Rules, in that order, if either is enabled.  */
 	/*******************************************************************/
-	if ($snortdownload == 'on')
+	if ($snortdownload == 'on' || $vrt_enabled == 'on')
 		$prefix = "VRT_";
 	elseif ($emergingthreats == 'on')
 		$prefix = "ET_";
