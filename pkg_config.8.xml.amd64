@@ -2014,5 +2014,20 @@
 		<depends_on_package>apcupsd-3.14.10_1.tbz</depends_on_package>
 		<depends_on_package_pbi>apcupsd-3.14.10_1-amd64.pbi</depends_on_package_pbi>
 	</package>
+	<package>
+		<name>LADVD</name>
+		<descr>Send and decode link layer advertisements</descr>
+		<website>https://code.google.com/p/ladvd/</website>
+		<category>Network Management</category>
+		<version>1.0.4</version>
+		<status>BETA</status>
+		<depends_on_package_base_url>http://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
+		<depends_on_package_pbi>ladvd-1.0.4-amd64.pbi</depends_on_package_pbi>
+		<config_file>http://www.pfsense.org/packages/config/ladvd/ladvd.xml</config_file>
+		<build_port_path>/usr/ports/net/ladvd</build_port_path>
+		<pkginfolink></pkginfolink>
+		<required_version>2.1</required_version>
+		<configurationfile>ladvd.xml</configurationfile>
+	</package>
 </packages>
 </pfsensepkgs>
