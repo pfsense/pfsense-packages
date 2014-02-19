@@ -1198,7 +1198,7 @@ EOF;
 			log_error('Dansguardian is disabled, stopping process...');
 			mwexec("$script stop");
 		}
-		@unlink($script))
+		@unlink($script);
 	}
 	
 	if (!file_exists(DANSGUARDIAN_DIR . '/etc/dansguardian/lists/phraselists/pornography/weighted_russian_utf8'))
