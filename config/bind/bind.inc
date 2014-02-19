@@ -438,12 +438,33 @@ EOD;
 							
 							$zone_conf .= "$hostname \t IN $hosttype $hostvalue \t$hostdst\n";
 						}
-        					if (($zone[regdhcpstatic] == 'on') && is_array($config['dhcpd'])) {
-                					foreach ($config['dhcpd'] as $dhcpif => $dhcpifconf)
+						if (($zone[regdhcpstatic] == 'on') && is_array($config['dhcpd'])) {
+							foreach ($config['dhcpd'] as $dhcpif => $dhcpifconf)
                         					if(is_array($dhcpifconf['staticmap']) && isset($dhcpifconf['enable']))
                                 					foreach ($dhcpifconf['staticmap'] as $host)
                                         					if ($host['ipaddr'] && $host['hostname']) {
-											$zone_conf .= "{$host['hostname']}\tIN A\t{$host['ipaddr']}\n";
+											if($zonereverso == "on") {
+												$hostdomain = $dhcpifconf['domain'];
+												if(strlen($hostdomain) == 0) {
+													$hostdomain = $config['system']['domain'];
+												}
+												if(strlen($hostdomain) != 0) {
+													$hostdomain .= '.';
+												}
+												$zoneparts = array_reverse(explode('.',$zonename));
+												$addressparts = explode('.',$host['ipaddr']);
+												$addressstart = 0;
+												while($addressstart < count($zoneparts) && $addressstart < count($addressparts) && $zoneparts[$addressstart] == $addressparts[$addressstart]) {
+													 $addressstart++;
+												}
+												$shortaddress='';
+												for($addresspointer = count($addressparts)-1; $addresspointer >= $addressstart; $addresspointer--) {
+													$shortaddress .= (strlen($shortaddress) > 0 ? '.' : '') . $addressparts[$addresspointer];
+												}
+												$zone_conf .= "{$shortaddress}\tIN PTR\t{$host['hostname']}.{$hostdomain}\n";
+											} else {
+												$zone_conf .= "{$host['hostname']}\tIN A\t{$host['ipaddr']}\n";
+											}
                                         					}
     						}
 						if ($zone['customzonerecords']!=""){
