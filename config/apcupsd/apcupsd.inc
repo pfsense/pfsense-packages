@@ -39,6 +39,7 @@ require_once("globals.inc");
 
 function php_install_apcupsd(){
 	sync_package_apcupsd();	
+	apccontrol_scripts_install();
 }
 
 function php_deinstall_apcupsd(){
@@ -138,6 +139,7 @@ function sync_package_apcupsd(){
 			$upsname=$apcupsd_config['upsname'];
 			$upscable=$apcupsd_config['upscable'];
 			$upstype=$apcupsd_config['upstype'];
+			$device=($apcupsd_config['device'] != ''? "DEVICE {$apcupsd_config['device']}" : "#DEVICE");
 			$polltime=($apcupsd_config['polltime'] != ''? $apcupsd_config['polltime'] : "60");
 			$onbatterydelay=($apcupsd_config['onbatterydelay'] != ''? $apcupsd_config['onbatterydelay'] : "6");
 			$batterylevel=($apcupsd_config['batterylevel'] != ''? $apcupsd_config['batterylevel'] : "5");
@@ -185,7 +187,37 @@ function sync_package_apcupsd(){
 			unlink($apcupsd_rcfile);
 		}
 	}
-		
+
 	conf_mount_ro();
 }
+
+function apccontrol_scripts_install(){
+
+	// check pfsense version
+	$pfs_version = substr(trim(file_get_contents("/etc/version")),0,3);
+	if ($pfs_version > 2.0){
+		define('APCUPSD_BASE', '/usr/pbi/apcupsd-' . php_uname("m"));
+		}
+	else {
+		define('APCUPSD_BASE', '/usr/local');
+	}
+
+	$apccontrol_scripts = array("offbattery","onbattery","commfailure","commok","changeme");
+	foreach($apccontrol_scripts as $apccontrol_script) {
+
+		$apccontrol_script_file=<<<EOF
+#!/bin/sh
+
+/usr/local/bin/php -f /usr/local/pkg/apcupsd_mail.php {$apccontrol_script} > /dev/null
+
+exit 0
+
+EOF;
+
+		file_put_contents(APCUPSD_BASE . "/etc/apcupsd/" . $apccontrol_script, $apccontrol_script_file, LOCK_EX);
+	}
+
+}
+
 ?>
+
