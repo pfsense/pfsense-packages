@@ -296,29 +296,14 @@ if ($savemsg)
 <script type="text/javascript" src="/javascript/autosuggest.js">
 </script>
 <script type="text/javascript" src="/javascript/suggestions.js">
-
-<?php
-	$isfirst = 0;
-	$aliases = "";
-	$addrisfirst = 0;
-	$aliasesaddr = "";
-	if(isset($config['aliases']['alias']) && is_array($config['aliases']['alias']))
-		foreach($config['aliases']['alias'] as $alias_name) {
-			if ($alias_name['type'] != "host" && $alias_name['type'] != "network")
-				continue;
-			// Skip any Aliases that resolve to an empty string
-			if (trim(filter_expand_alias($alias_name['name'])) == "")
-				continue;
-			if($addrisfirst == 1) $aliasesaddr .= ",";
-			$aliasesaddr .= "'" . $alias_name['name'] . "'";
-			$addrisfirst = 1;
-		}
-?>
-	var addressarray=new Array(<?php echo $aliasesaddr; ?>);
+</script>
+<script type="text/javascript">
+//<![CDATA[
+var addressarray = <?= json_encode(get_alias_list(array("host", "network"))) ?>;
 
 function createAutoSuggest() {
 <?php
-	echo "objAlias = new AutoSuggestControl(document.getElementById('frag3_bind_to'), new StateSuggestions(addressarray));\n";
+	echo "\tvar objAlias = new AutoSuggestControl(document.getElementById('policy_bind_to'), new StateSuggestions(addressarray));\n";
 ?>
 }
 

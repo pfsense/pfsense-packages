@@ -47,14 +47,14 @@ $rcdir = RCFILEPREFIX;
 // Hard kill any running Suricata process that may have been started by any
 // of the pfSense scripts such as check_reload_status() or rc.start_packages
 if(is_process_running("suricata")) {
-	exec("/usr/bin/killall -z suricata");
+	killbyname("suricata");
 	sleep(2);
 	// Delete any leftover suricata PID files in /var/run
 	array_map('@unlink', glob("/var/run/suricata_*.pid"));
 }
 // Hard kill any running Barnyard2 processes
 if(is_process_running("barnyard")) {
-	exec("/usr/bin/killall -z barnyard2");
+	killbyname("barnyard2");
 	sleep(2);
 	// Delete any leftover barnyard2 PID files in /var/run
 	array_map('@unlink', glob("/var/run/barnyard2_*.pid"));
@@ -62,13 +62,6 @@ if(is_process_running("barnyard")) {
 
 // Set flag for post-install in progress
 $g['suricata_postinstall'] = true;
-
-// Fix up the sample filenames from a PBI package install
-//$sample_files = array("classification.config", "reference.config", "suricata.yaml");
-//foreach ($sample_files as $file) {
-//	if (file_exists("{$suricatadir}{$file}-sample"))
-//		@rename("{$suricatadir}{$file}-sample", "{$suricatadir}{$file}");
-//}
 
 // Remove any previously installed script since we rebuild it
 @unlink("{$rcdir}/suricata.sh");
@@ -92,7 +85,7 @@ if ($config['installedpackages']['suricata']['config'][0]['forcekeepsettings'] =
 	// Create the suricata.yaml files for each enabled interface
 	$suriconf = $config['installedpackages']['suricata']['rule'];
 	foreach ($suriconf as $value) {
-		$if_real = suricata_get_real_interface($value['interface']);
+		$if_real = get_real_interface($value['interface']);
 
 		// create a suricata.yaml file for interface
 		suricata_generate_yaml($value);

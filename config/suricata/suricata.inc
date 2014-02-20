@@ -29,6 +29,7 @@
 require_once("pfsense-utils.inc");
 require_once("config.inc");
 require_once("functions.inc");
+require_once("services.inc");
 require_once("service-utils.inc");
 require_once("pkg-utils.inc");
 require_once("filter.inc");
@@ -74,7 +75,7 @@ function suricata_generate_id() {
 function suricata_is_running($suricata_uuid, $if_real, $type = 'suricata') {
 	global $config, $g;
 
-	if (file_exists("{$g['varrun_path']}/{$type}_{$if_real}{$suricata_uuid}.pid") && isvalidpid("{$g['varrun_path']}/{$type}_{$if_real}{$suricata_uuid}.pid"))
+	if (isvalidpid("{$g['varrun_path']}/{$type}_{$if_real}{$suricata_uuid}.pid"))
 		return 'yes';
 	else
 		return 'no';
@@ -84,9 +85,9 @@ function suricata_barnyard_stop($suricatacfg, $if_real) {
 	global $config, $g;
 
 	$suricata_uuid = $suricatacfg['uuid'];
-	if (file_exists("{$g['varrun_path']}/barnyard2_{$if_real}{$suricata_uuid}.pid") && isvalidpid("{$g['varrun_path']}/barnyard2_{$if_real}{$suricata_uuid}.pid")) {
+	if (isvalidpid("{$g['varrun_path']}/barnyard2_{$if_real}{$suricata_uuid}.pid")) {
 		log_error("[Suricata] Barnyard2 STOP for {$suricatacfg['descr']}({$if_real})...");
-		exec("/bin/pkill -TERM -F {$g['varrun_path']}/barnyard2_{$if_real}{$suricata_uuid}.pid");
+		killbypid("{$g['varrun_path']}/barnyard2_{$if_real}{$suricata_uuid}.pid");
 	}
 }
 
@@ -94,14 +95,15 @@ function suricata_stop($suricatacfg, $if_real) {
 	global $config, $g;
 
 	$suricata_uuid = $suricatacfg['uuid'];
-	if (file_exists("{$g['varrun_path']}/suricata_{$if_real}{$suricata_uuid}.pid") && isvalidpid("{$g['varrun_path']}/suricata_{$if_real}{$suricata_uuid}.pid")) {
+	if (isvalidpid("{$g['varrun_path']}/suricata_{$if_real}{$suricata_uuid}.pid")) {
 		log_error("[Suricata] Suricata STOP for {$suricatacfg['descr']}({$if_real})...");
-		exec("/bin/pkill -TERM -F {$g['varrun_path']}/suricata_{$if_real}{$suricata_uuid}.pid");
-		sleep(1);
-	}
-	if (file_exists("{$g['varrun_path']}/suricata_{$if_real}{$suricata_uuid}.pid") && isvalidpid("{$g['varrun_path']}/suricata_{$if_real}{$suricata_uuid}.pid"))
-		exec("/bin/pkill -TERM -F {$g['varrun_path']}/suricata_{$if_real}{$suricata_uuid}.pid");
+		killbypid("{$g['varrun_path']}/suricata_{$if_real}{$suricata_uuid}.pid");
+		sleep(2);
 
+		// For some reason Suricata seems to need a double TERM signal to actually shutdown
+		if (isvalidpid("{$g['varrun_path']}/suricata_{$if_real}{$suricata_uuid}.pid"))
+			killbypid("{$g['varrun_path']}/suricata_{$if_real}{$suricata_uuid}.pid");
+	}
 	// Stop Barnyard2 on the interface if running
 	suricata_barnyard_stop($suricatacfg, $if_real);
 }
@@ -158,9 +160,10 @@ function suricata_reload_config($suricatacfg, $signal="USR2") {
 	/* Only send the SIGUSR2 if Suricata is running and   */
 	/* we can find a valid PID for the process.           */
 	/******************************************************/
-	if (file_exists("{$g['varrun_path']}/suricata_{$if_real}{$suricata_uuid}.pid") && isvalidpid("{$g['varrun_path']}/suricata_{$if_real}{$suricata_uuid}.pid")) {
+	if (isvalidpid("{$g['varrun_path']}/suricata_{$if_real}{$suricata_uuid}.pid")) {
 		log_error("[Suricata] Suricata LIVE RULE RELOAD initiated for {$suricatacfg['descr']} ({$if_real})...");
-		exec("/bin/pkill -{$signal} -F {$g['varrun_path']}/suricata_{$if_real}{$suricata_uuid}.pid 2>&1 &");
+		sigkillbypid("{$g['varrun_path']}/suricata_{$if_real}{$suricata_uuid}.pid", $signal);
+//		exec("/bin/pkill -{$signal} -F {$g['varrun_path']}/suricata_{$if_real}{$suricata_uuid}.pid 2>&1 &");
 	}
 }
 
@@ -186,63 +189,34 @@ function suricata_barnyard_reload_config($suricatacfg, $signal="HUP") {
 	/* Only send the SIGHUP if Barnyard2 is running and   */
 	/* we can find a valid PID for the process.           */
 	/******************************************************/
-	if (file_exists("{$g['varrun_path']}/barnyard2_{$if_real}{$suricata_uuid}.pid") && isvalidpid("{$g['varrun_path']}/barnyard2_{$if_real}{$suricata_uuid}.pid")) {
+	if (isvalidpid("{$g['varrun_path']}/barnyard2_{$if_real}{$suricata_uuid}.pid")) {
 		log_error("[Suricata] Barnyard2 CONFIG RELOAD initiated for {$suricatacfg['descr']} ({$if_real})...");
-		exec("/bin/pkill -{$signal} -F {$g['varrun_path']}/barnyard2_{$if_real}{$suricata_uuid}.pid 2>&1 &");
+		sigkillbypid("{$g['varrun_path']}/barnyard2_{$if_real}{$suricata_uuid}.pid", $signal);
+//		exec("/bin/pkill -{$signal} -F {$g['varrun_path']}/barnyard2_{$if_real}{$suricata_uuid}.pid 2>&1 &");
 	}
 }
 
 function suricata_get_friendly_interface($interface) {
 
-	if (function_exists('convert_friendly_interface_to_friendly_descr'))
-		$iface = convert_friendly_interface_to_friendly_descr($interface);
-	else {
-		if (!$interface || ($interface == "wan"))
-			$iface = "WAN";
-		else if(strtolower($interface) == "lan")
-			$iface = "LAN";
-		else if(strtolower($interface) == "pppoe")
-			$iface = "PPPoE";
-		else if(strtolower($interface) == "pptp")
-			$iface = "PPTP";
-		else
-			$iface = strtoupper($interface);
-	}
-
-	return $iface;
+	// Pass this directly to the system for now.
+	// Later, this wrapper will be removed and all
+	// the Suricata code changed to use the system call.
+	return convert_friendly_interface_to_friendly_descr($interface);
 }
 
 function suricata_get_real_interface($interface) {
-	global $config;
 
-	$lc_interface = strtolower($interface);
-	if (function_exists('get_real_interface'))
-		return get_real_interface($lc_interface);
-	else {
-		if ($lc_interface == "lan") {
-			if ($config['inerfaces']['lan'])
-				return $config['interfaces']['lan']['if'];
-			return $interface;
-		}
-		if ($lc_interface == "wan")
-			return $config['interfaces']['wan']['if'];
-		$ifdescrs = array();
-		for ($j = 1; isset($config['interfaces']['opt' . $j]); $j++) {
-			$ifname = "opt{$j}";
-			if(strtolower($ifname) == $lc_interface)
-				return $config['interfaces'][$ifname]['if'];
-			if(isset($config['interfaces'][$ifname]['descr']) && (strtolower($config['interfaces'][$ifname]['descr']) == $lc_interface))
-				return $config['interfaces'][$ifname]['if'];
-		}
-	} 
-
-	return $interface;
+	// Pass this directly to the system for now.
+	// Later, this wrapper will be removed and all
+	// the Suricata code changed to use the system call.
+	return get_real_interface($interface);
 }
 
 function suricata_get_blocked_ips() {
 
+	// This is a placeholder function for later use.
+	// Blocking is not currently enabled in Suricata.
 	return array();
-
 }
 
 /* func builds custom white lists */
@@ -451,18 +425,9 @@ function suricata_build_list($suricatacfg, $listname = "", $whitelist = false) {
 function suricata_rules_up_install_cron($should_install) {
 	global $config, $g;
 
-	if(!$config['cron']['item'])
-		$config['cron']['item'] = array();
+	$command = "/usr/bin/nice -n20 /usr/local/bin/php -f /usr/local/www/suricata/suricata_check_for_rule_updates.php";
 
-	$x=0;
-	$is_installed = false;
-	foreach($config['cron']['item'] as $item) {
-		if (strstr($item['command'], "suricata_check_for_rule_updates.php")) {
-			$is_installed = true;
-			break;
-		}
-		$x++;
-	}
+	// Get auto-rule update parameter from configuration
 	$suricata_rules_up_info_ck = $config['installedpackages']['suricata']['config'][0]['autoruleupdate'];
 
 	// See if a customized start time has been set for rule file updates
@@ -525,65 +490,14 @@ function suricata_rules_up_install_cron($should_install) {
 		$suricata_rules_up_month = "*";
 		$suricata_rules_up_wday = "*";
 	}
-	switch($should_install) {
-	case true:
-		$cron_item = array();
-		$cron_item['minute'] = $suricata_rules_up_min;
-		$cron_item['hour'] = $suricata_rules_up_hr;
-		$cron_item['mday'] = $suricata_rules_up_mday;
-		$cron_item['month'] = $suricata_rules_up_month;
-		$cron_item['wday'] = $suricata_rules_up_wday;
-		$cron_item['who'] = "root";
-		$cron_item['command'] = "/usr/bin/nice -n20 /usr/local/bin/php -f /usr/local/www/suricata/suricata_check_for_rule_updates.php";
 
-		// Add cron job if not already installed, else just update the existing one
-		if (!$is_installed) 
-			$config['cron']['item'][] = $cron_item;
-		elseif ($is_installed)
-			$config['cron']['item'][$x] = $cron_item;
-		break;
-	case false:
-		if($is_installed == true)
-			unset($config['cron']['item'][$x]);
-		break;
-	}
+	// System call to manage the cron job.
+	install_cron_job($command, $should_install, $suricata_rules_up_min, $suricata_rules_up_hr, $suricata_rules_up_mday, $suricata_rules_up_month, $suricata_rules_up_wday, "root");
 }
 
 function suricata_loglimit_install_cron($should_install) {
-	global $config, $g;
 
-	if (!is_array($config['cron']['item']))
-		$config['cron']['item'] = array();
-
-	$x=0;
-	$is_installed = false;
-	foreach($config['cron']['item'] as $item) {
-		if (strstr($item['command'], 'suricata_check_cron_misc.inc')) {
-			$is_installed = true;
-			break;
-		}
-		$x++;
-	}
-
-	switch($should_install) {
-		case true:
-			if(!$is_installed)  {
-				$cron_item = array();
-				$cron_item['minute'] = "*/5";
-				$cron_item['hour'] = "*";
-				$cron_item['mday'] = "*";
-				$cron_item['month'] = "*";
-				$cron_item['wday'] = "*";
-				$cron_item['who'] = "root";
-				$cron_item['command'] = "/usr/bin/nice -n20 /usr/local/bin/php -f /usr/local/pkg/suricata/suricata_check_cron_misc.inc";
-				$config['cron']['item'][] = $cron_item;
-			}
-			break;
-		case false:
-			if($is_installed == true)
-				unset($config['cron']['item'][$x]);
-			break;
-	}
+	install_cron_job("/usr/bin/nice -n20 /usr/local/bin/php -f /usr/local/pkg/suricata/suricata_check_cron_misc.inc", $should_install, "*/5");
 }
 
 function sync_suricata_package_config() {
@@ -617,13 +531,9 @@ function sync_suricata_package_config() {
 	suricata_create_rc();
 
 	$suricataglob = $config['installedpackages']['suricata']['config'][0];
-
+	// setup the log directory size check job if enabled
 	suricata_loglimit_install_cron($suricataglob['suricataloglimit'] == 'on' ? true : false);
-
-	// set the suricata block hosts time IMPORTANT
-//	suricata_rm_blocked_install_cron($suricataglob['rm_blocked'] != "never_b" ? true : false);
-
-	// set the suricata rules update time
+	// setup the suricata rules update job if enabled
 	suricata_rules_up_install_cron($suricataglob['autoruleupdate'] != "never_up" ? true : false);
 
 	write_config();
@@ -781,6 +691,7 @@ function suricata_post_delete_logs($suricata_uuid = 0) {
 			unset($filelist[count($filelist) - 1]);
 			foreach ($filelist as $file)
 				@unlink($file);
+			unset($filelist);
 		}
 	}
 }
@@ -1946,11 +1857,9 @@ esac
 EOD;
 
 	// Write out the suricata.sh script file
-	if (!@file_put_contents("{$rcdir}/suricata.sh", $suricata_sh_text)) {
-		log_error("Could not open {$rcdir}/suricata.sh for writing.");
-		return;
-	}
+	@file_put_contents("{$rcdir}/suricata.sh", $suricata_sh_text);
 	@chmod("{$rcdir}/suricata.sh", 0755);
+	unset($suricata_sh_text);
 }
 
 function suricata_generate_barnyard2_conf($suricatacfg, $if_real) {
@@ -2051,6 +1960,7 @@ EOD;
 
 	/* Write out barnyard2_conf text string to disk */
 	@file_put_contents("{$suricatadir}/barnyard2.conf", $barnyard2_conf_text);
+	unset($barnyard2_conf_text);
 }
 
 function suricata_generate_yaml($suricatacfg) {
@@ -2096,14 +2006,8 @@ function suricata_generate_yaml($suricatacfg) {
 	include("/usr/local/pkg/suricata/suricata_yaml_template.inc");
 
 	// Now write out the conf file using $suricata_conf_text contents
-	$conf = fopen("{$suricatacfgdir}/suricata.yaml", "w");
-	if(!$conf) {
-		log_error("Could not open {$suricatacfgdir}/suricata.yaml for writing.");
-		return -1;
-	}
-	fwrite($conf, $suricata_conf_text);
-	fclose($conf);
-
+	@file_put_contents("{$suricatacfgdir}/suricata.yaml", $suricata_conf_text); 
+	unset($suricata_conf_text);
 	conf_mount_ro();
 }
 

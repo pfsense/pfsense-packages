@@ -245,44 +245,22 @@ if ($savemsg)
 </table>
 </form>
 <script type="text/javascript">
-<?php
-        $isfirst = 0;
-        $aliases = "";
-        $addrisfirst = 0;
-        $portisfirst = 0;
-        $aliasesaddr = "";
-        $aliasesports = "";
-        if(isset($config['aliases']['alias']) && is_array($config['aliases']['alias']))
-                foreach($config['aliases']['alias'] as $alias_name) {
-                        if ($alias_name['type'] == "host" || $alias_name['type'] == "network") {
-				// Skip any Aliases that resolve to an empty string
-				if (trim(filter_expand_alias($alias_name['name'])) == "")
-					continue;
-				if($addrisfirst == 1) $aliasesaddr .= ",";
-				$aliasesaddr .= "'" . $alias_name['name'] . "'";
-				$addrisfirst = 1;
-			} else if ($alias_name['type'] == "port") {
-				if($portisfirst == 1) $aliasesports .= ",";
-				$aliasesports .= "'" . $alias_name['name'] . "'";
-				$portisfirst = 1;
-			}
-                }
-?>
+//<![CDATA[
+	var addressarray = <?= json_encode(get_alias_list(array("host", "network"))) ?>;
+	var portsarray  = <?= json_encode(get_alias_list("port")) ?>;
 
-        var addressarray=new Array(<?php echo $aliasesaddr; ?>);
-        var portsarray=new Array(<?php echo $aliasesports; ?>);
-
-function createAutoSuggest() {
-<?php
-	foreach ($suricata_servers as $key => $server)
-		echo "objAlias{$key} = new AutoSuggestControl(document.getElementById('def_{$key}'), new StateSuggestions(addressarray));\n";
-	foreach ($suricata_ports as $key => $server)
-		echo "pobjAlias{$key} = new AutoSuggestControl(document.getElementById('def_{$key}'), new StateSuggestions(portsarray));\n";
-?>
-}
+	function createAutoSuggest() {
+	<?php
+		foreach ($suricata_servers as $key => $server)
+			echo " var objAlias{$key} = new AutoSuggestControl(document.getElementById('def_{$key}'), new StateSuggestions(addressarray));\n";
+		foreach ($suricata_ports as $key => $server)
+			echo "var pobjAlias{$key} = new AutoSuggestControl(document.getElementById('def_{$key}'), new StateSuggestions(portsarray));\n";
+	?>
+	}
 
 setTimeout("createAutoSuggest();", 500);
 
+//]]>
 </script>
 
 <?php include("fend.inc"); ?>

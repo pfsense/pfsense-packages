@@ -34,7 +34,6 @@ require_once("/usr/local/pkg/suricata/suricata.inc");
 /* Define some locally required variables from Suricata constants */
 $suricatadir = SURICATADIR;
 $suricata_rules_upd_log = RULES_UPD_LOGFILE;
-$log = $suricata_rules_upd_log;
 
 /* load only javascript that is needed */
 $suricata_load_jquery = 'yes';
@@ -56,7 +55,7 @@ else {
 	$et_name = "EMERGING THREATS RULES";
 }
 
-/* quick md5s chk */
+/* quick md5 chk of downloaded rules */
 $snort_org_sig_chk_local = 'N/A';
 if (file_exists("{$suricatadir}{$snort_rules_file}.md5"))
 	$snort_org_sig_chk_local = file_get_contents("{$suricatadir}{$snort_rules_file}.md5");
@@ -70,48 +69,45 @@ if (file_exists("{$suricatadir}{$snort_community_rules_filename}.md5"))
 	$snort_community_sig_chk_local = file_get_contents("{$suricatadir}{$snort_community_rules_filename}.md5");
 
 /* Check for postback to see if we should clear the update log file. */
-if (isset($_POST['clear'])) {
+if ($_POST['clear']) {
 	if (file_exists("{$suricata_rules_upd_log}"))
 		mwexec("/bin/rm -f {$suricata_rules_upd_log}");
 }
 
-if (isset($_POST['update'])) {
+if ($_POST['update']) {
 	header("Location: /suricata/suricata_download_rules.php");
 	exit;
 }
 
 /* check for logfile */
-$suricata_rules_upd_log_chk = 'no';
 if (file_exists("{$suricata_rules_upd_log}"))
 	$suricata_rules_upd_log_chk = 'yes';
+else
+	$suricata_rules_upd_log_chk = 'no';
 
-$pgtitle = gettext("Suricata: Rule Updates");
+if ($_POST['view']&& $suricata_rules_upd_log_chk == 'yes') {
+	$contents = @file_get_contents($suricata_rules_upd_log);
+	if (empty($contents))
+		$input_errors[] = gettext("Unable to read log file: {$suricata_rules_upd_log}");
+}
+
+$pgtitle = gettext("Suricata: Update Rules Set Files");
 include_once("head.inc");
 ?>
 
 <body link="#000000" vlink="#000000" alink="#000000">
 
 <?php include("fbegin.inc"); ?>
-<?if($pfsense_stable == 'yes'){echo '<p class="pgtitle">' . $pgtitle . '</p>';}?>
+<?php
+	/* Display Alert message */
+	if ($input_errors) {
+		print_input_errors($input_errors);
+	}
 
-<script language="javascript" type="text/javascript">
-function wopen(url, name, w, h)
-{
-// Fudge factors for window decoration space.
-// In my tests these work well on all platforms & browsers.
-w += 32;
-h += 96;
- var win = window.open(url,
-  name, 
-  'width=' + w + ', height=' + h + ', ' +
-  'location=no, menubar=no, ' +
-  'status=no, toolbar=no, scrollbars=yes, resizable=yes');
- win.resizeTo(w, h);
- win.focus();
-}
-
-</script>
-
+	if ($savemsg) {
+		print_info_box($savemsg);
+	}
+?>
 <form action="suricata_download_updates.php" method="post" name="iform" id="iform">
 
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
@@ -128,111 +124,94 @@ h += 96;
 ?>
 </td></tr>
 <tr>
-		<td>
+	<td>
 		<div id="mainarea">
 		<table id="maintable4" class="tabcont" width="100%" border="0" cellpadding="0" cellspacing="0">
-			<tr align="center">
-				<td>
-				<br/>
-				<table id="download_rules" height="32px" width="725px" border="0" cellpadding="5px" cellspacing="0">
+			<tr>
+				<td valign="top" class="listtopic" align="center"><?php echo gettext("INSTALLED RULE SET MD5 SIGNATURES");?></td>
+			</tr>
+			<tr>
+				<td align="center"><br/>
+				<table width="100%" border="0" cellpadding="2" cellspacing="2">
 					<tr>
-						<td id="download_rules_td" style="background-color: #eeeeee">
-						<div height="32" width="725px" style="background-color: #eeeeee">
-						<p style="text-align: left; margin-left: 225px;">
-							<font color="#777777" size="2.5px">
-							<b><?php echo gettext("INSTALLED RULESET SIGNATURES"); ?></b></font><br/><br/>
-							<font color="#FF850A" size="1px"><b><?=$et_name;?>&nbsp;&nbsp;--></b></font>
-							<font size="1px" color="#000000">&nbsp;&nbsp;<? echo $emergingt_net_sig_chk_local; ?></font><br/>
-							<font color="#FF850A" size="1px"><b>SNORT VRT RULES&nbsp;&nbsp;--></b></font>
-							<font size="1px" color="#000000">&nbsp;&nbsp;<? echo $snort_org_sig_chk_local; ?></font><br/>
-							<font color="#FF850A" size="1px"><b>SNORT GPLv2 COMMUNITY RULES&nbsp;&nbsp;--></b></font>
-							<font size="1px" color="#000000">&nbsp;&nbsp;<? echo $snort_community_sig_chk_local; ?></font><br/>
-						</p>
-						</div>
-						</td>
+						<td align="right" class="vexpl"><b><?=$et_name;?>&nbsp;&nbsp;---></b></td>
+						<td class="vexpl"><? echo $emergingt_net_sig_chk_local; ?></td>
 					</tr>
-				</table>
-				<br/>
-				<table id="download_rules" height="32px" width="725px" border="0" cellpadding="5px" cellspacing="0">
 					<tr>
-						<td id="download_rules_td" style='background-color: #eeeeee'>
-						<div height="32" width="725px" style='background-color: #eeeeee'>
-						<p style="text-align: left; margin-left: 225px;">
-						<font color='#777777' size='2.5px'><b><?php echo gettext("UPDATE YOUR RULESET"); ?></b></font><br/>
+						<td align="right" class="vexpl"><b>SNORT VRT RULES&nbsp;&nbsp;---></b></td>
+						<td class="vexpl"><? echo $snort_org_sig_chk_local; ?></td>
+					</tr>
+						<td align="right" class="vexpl"><b>SNORT GPLv2 COMMUNITY RULES&nbsp;&nbsp;---></b></td>
+						<td class="vexpl"><? echo $snort_community_sig_chk_local; ?></td>
+					</tr>
+				</table><br/>
+				</td>
+			</tr>
+			<tr>
+				<td valign="top" class="listtopic" align="center"><?php echo gettext("UPDATE YOUR RULE SET");?></td>
+			</tr>
+			<tr>
+				<td align="center">
+					<?php if ($snortdownload != 'on' && $emergingthreats != 'on' && $etpro != 'on'): ?>
+						<br/><button disabled="disabled"><?php echo gettext("Update Rules"); ?></button><br/>
+						<p style="text-align:left;">
+						<font color="red" size="2px"><b><?php echo gettext("WARNING:");?></b></font><font size="1px" color="#000000">&nbsp;&nbsp;
+						<?php echo gettext('No rule types have been selected for download. ') . 
+						gettext('Visit the ') . '<a href="/suricata/suricata_global.php">Global Settings Tab</a>' . gettext(' to select rule types.'); ?>
+						</font><br/></p>
+					<?php else: ?>
 						<br/>
+						<input type="submit" value="<?php echo gettext(" Update "); ?>" name="update" id="submit" class="formbtn" 
+						title="<?php echo gettext("Check for new updates to configured rulesets"); ?>"/><br/><br/>
+					<?php endif; ?>
+				</td>
+			</tr>
 
-			<?php
-
-						if ($snortdownload != 'on' && $emergingthreats != 'on' && $etpro != 'on') {
-							echo '
-			<button disabled="disabled"><span class="download">' . gettext("Update Rules") . '</span></button><br/>
-			<p style="text-align:left; margin-left:150px;">
-			<font color="#fc3608" size="2px"><b>' . gettext("WARNING:") . '</b></font><font size="1px" color="#000000">&nbsp;&nbsp;' . gettext('No rule types have been selected for download. ') .
-			gettext('Visit the ') . '<a href="/suricata/suricata_global.php">Global Settings Tab</a>' . gettext(' to select rule types.') . '</font><br/>';
-
-							echo '</p>' . "\n";
-						} else {
-
-							echo '
-			<input type="submit" value="' . gettext("Update Rules") . '" name="update" id="Submit" class="formbtn" /><br/>' . "\n";
-
-						}
-
-			?> <br/>
-						</p>
-						</div>
-						</td>
-					</tr>
-				</table>
-				<br/>
-				<table id="download_rules" height="32px" width="725px" border="0" cellpadding="5px" cellspacing="0">
-					<tr>
-						<td id="download_rules_td" style='background-color: #eeeeee'>
-						<div height="32" width="725px" style='background-color: #eeeeee'>
-						<p style="text-align: left; margin-left: 225px;">
-						<font color='#777777' size='2.5px'><b><?php echo gettext("VIEW UPDATE LOG"); ?></b></font><br/>
-						<br>
-				<?php
-
-						if ($suricata_rules_upd_log_chk == 'yes') {
-							echo "
-				<button class=\"formbtn\" onclick=\"wopen('suricata_log_view.php?logfile={$log}', 'LogViewer', 800, 600)\"><span class='pwhitetxt'>" . gettext("View Log") . "</span></button>";
-				echo "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type=\"submit\" value=\"Clear Log\" name=\"clear\" id=\"Submit\" class=\"formbtn\" />\n";
-						}else{
-							echo "
-				<button disabled='disabled'><span class='pwhitetxt'>" . gettext("View Log") . "</span></button>&nbsp;&nbsp;&nbsp;" . gettext("Log is empty.") . "\n";
-						}
-						echo '<br><br>' . gettext("The log file is limited to 1024K in size and automatically clears when the limit is exceeded.");
-				?>
+			<tr>
+				<td valign="top" class="listtopic" align="center"><?php echo gettext("MANAGE RULE SET LOG");?></td>
+			</tr>
+			<tr>
+				<td align="center" valign="middle" class="vexpl">
+					<?php if ($suricata_rules_upd_log_chk == 'yes'): ?>
 						<br/>
-						</p>
+						<input type="submit" value="<?php echo gettext("View Log"); ?>" name="view" id="view" class="formbtn" 
+						title="<?php echo gettext("View rules update log contents"); ?>"/>
+						&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+						<input type="submit" value="<?php echo gettext("Clear Log"); ?>" name="clear" id="clear" class="formbtn" 
+						title="<?php echo gettext("Clear rules update log contents"); ?>" onClick="return confirm('Are you sure?\nOK to confirm, or CANCEL to quit');"/>
+						<br/>
+					<?php else: ?>
+						<br/>
+						<button disabled='disabled'><?php echo gettext("View Log"); ?></button>&nbsp;&nbsp;&nbsp;<?php echo gettext("Log is empty."); ?><br/>
+					<?php endif; ?>
+					<br/><?php echo gettext("The log file is limited to 1024K in size and automatically clears when the limit is exceeded."); ?><br/><br/>
+				</td>
+			</tr>
+			<?php if (!empty($contents)): ?>
+				<tr>
+					<td valign="top" class="listtopic" align="center"><?php echo gettext("RULE SET UPDATE LOG");?></td>
+				</tr>
+				<tr>
+					<td align="center">
+						<div style="background: #eeeeee; width:100%; height:100%;" id="textareaitem"><!-- NOTE: The opening *and* the closing textarea tag must be on the same line. -->
+							<textarea style="width:100%; height:100%;" readonly wrap="off" rows="24" cols="80" name="logtext"><?=$contents;?></textarea>
 						</div>
-						</td>
-					</tr>
-				</table>
-
-				<br/>
-
-				<table id="download_rules" height="32px" width="725px" border="0" cellpadding="5px" cellspacing="0">
-					<tr>
-						<td id="download_rules_td" style='background-color: #eeeeee'>
-						<div height="32" width="725px" style='background-color: #eeeeee'><span class="vexpl">
-							<span class="red"><b><?php echo gettext("NOTE:"); ?></b></span>
-							&nbsp;&nbsp;<a href="http://www.snort.org/" target="_blank"><?php echo gettext("Snort.org") . "</a>" . 
-							gettext(" and ") . "<a href=\"http://www.emergingthreats.net/\" target=\"_blank\">" . gettext("EmergingThreats.net") . "</a>" . 
-							gettext(" will go down from time to time. Please be patient."); ?></span>
-						</div>
-						</td>
-					</tr>
-				</table>
-
+					</td>
+				</tr>
+			<?php endif; ?>
+			<tr>
+				<td align="center">
+					<span class="vexpl"><br/><br/>
+					<span class="red"><b><?php echo gettext("NOTE:"); ?></b></span>
+					&nbsp;&nbsp;<a href="http://www.snort.org/" target="_blank"><?php echo gettext("Snort.org") . "</a>" . 
+					gettext(" and ") . "<a href=\"http://www.emergingthreats.net/\" target=\"_blank\">" . gettext("EmergingThreats.net") . "</a>" . 
+					gettext(" will go down from time to time. Please be patient."); ?></span><br/>
 				</td>
 			</tr>
 		</table>
 		</div>
-		<br>
-		</td>
-	</tr>
+	</td>
+</tr>
 </table>
 <!-- end of final table -->
 </form>

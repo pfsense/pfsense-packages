@@ -622,56 +622,20 @@ include_once("head.inc");
 </td></tr></table>
 </form>
 <script type="text/javascript">
-<?php
-        $isfirst = 0;
-        $aliases = "";
-        $addrisfirst = 0;
-        $portisfirst = 0;
-        $aliasesaddr = "";
-        $aliasesports = "";
-        if(isset($config['aliases']['alias']) && is_array($config['aliases']['alias']))
-                foreach($config['aliases']['alias'] as $alias_name) {
-                        if ($alias_name['type'] == "host" || $alias_name['type'] == "network") {
-				// Skip any Aliases that resolve to an empty string
-				if (trim(filter_expand_alias($alias_name['name'])) == "")
-					continue;
-				if($addrisfirst == 1) $aliasesaddr .= ",";
-				$aliasesaddr .= "'" . $alias_name['name'] . "'";
-				$addrisfirst = 1;
-			} else if ($alias_name['type'] == "port") {
-				if($portisfirst == 1) $aliasesports .= ",";
-				$aliasesports .= "'" . $alias_name['name'] . "'";
-				$portisfirst = 1;
-			}
-                }
-?>
-
-        var addressarray=new Array(<?php echo $aliasesaddr; ?>);
-        var portsarray=new Array(<?php echo $aliasesports; ?>);
-
-function createAutoSuggest() {
-<?php
-	echo "objAlias = new AutoSuggestControl(document.getElementById('pscan_ignore_scanners'), new StateSuggestions(addressarray));\n";
-	echo "objAlias = new AutoSuggestControl(document.getElementById('ftp_telnet_bounce_to_net'), new StateSuggestions(addressarray));\n";
-	echo "objAlias = new AutoSuggestControl(document.getElementById('ftp_telnet_bounce_to_port'), new StateSuggestions(portsarray));\n";
-?>
-}
-
-setTimeout("createAutoSuggest();", 500);
 
 function wopen(url, name, w, h)
 {
-// Fudge factors for window decoration space.
-// In my tests these work well on all platforms & browsers.
-    w += 32;
-    h += 96;
-    var win = window.open(url,
-        name, 
-       'width=' + w + ', height=' + h + ', ' +
-       'location=no, menubar=no, ' +
-       'status=no, toolbar=no, scrollbars=yes, resizable=yes');
-    win.resizeTo(w, h);
-    win.focus();
+	// Fudge factors for window decoration space.
+	// In my tests these work well on all platforms & browsers.
+	w += 32;
+	h += 96;
+	var win = window.open(url,
+			      name, 
+			      'width=' + w + ', height=' + h + ', ' +
+			      'location=no, menubar=no, ' +
+			      'status=no, toolbar=no, scrollbars=yes, resizable=yes');
+	    win.resizeTo(w, h);
+	    win.focus();
 }
 
 </script>
