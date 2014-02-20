@@ -77,7 +77,7 @@ ksort($suricata_ports);
 $pconfig = $a_nat[$id];
 
 /* convert fake interfaces to real */
-$if_real = suricata_get_real_interface($pconfig['interface']);
+$if_real = get_real_interface($pconfig['interface']);
 $suricata_uuid = $config['installedpackages']['suricata']['rule'][$id]['uuid'];
 
 if ($_POST) {
@@ -131,7 +131,7 @@ if ($_POST) {
 	}
 }
 
-$if_friendly = suricata_get_friendly_interface($pconfig['interface']);
+$if_friendly = convert_friendly_interface_to_friendly_descr($pconfig['interface']);
 $pgtitle = gettext("Suricata: Interface {$if_friendly} Variables - Servers and Ports");
 include_once("head.inc");
 

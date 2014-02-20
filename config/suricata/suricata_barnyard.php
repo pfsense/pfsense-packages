@@ -162,7 +162,7 @@ if ($_POST) {
 	}
 }
 
-$if_friendly = suricata_get_friendly_interface($pconfig['interface']);
+$if_friendly = convert_friendly_interface_to_friendly_descr($pconfig['interface']);
 $pgtitle = gettext("Suricata: Interface {$if_friendly} - Barnyard2 Settings");
 include_once("head.inc");
 

@@ -52,7 +52,7 @@ if (isset($_POST['del_x'])) {
 		conf_mount_rw();
 		foreach ($_POST['rule'] as $rulei) {
 			/* convert fake interfaces to real */
-			$if_real = suricata_get_real_interface($a_nat[$rulei]['interface']);
+			$if_real = get_real_interface($a_nat[$rulei]['interface']);
 			$suricata_uuid = $a_nat[$rulei]['uuid'];
 			suricata_stop($a_nat[$rulei], $if_real);
 			exec("/bin/rm -r {$suricatalogdir}suricata_{$if_real}{$suricata_uuid}");
@@ -109,8 +109,8 @@ if (isset($_POST['del_x'])) {
 /* start/stop Barnyard2 */
 if ($_GET['act'] == 'bartoggle' && is_numeric($id)) {
 	$suricatacfg = $config['installedpackages']['suricata']['rule'][$id];
-	$if_real = suricata_get_real_interface($suricatacfg['interface']);
-	$if_friendly = suricata_get_friendly_interface($suricatacfg['interface']);
+	$if_real = get_real_interface($suricatacfg['interface']);
+	$if_friendly = convert_friendly_interface_to_friendly_descr($suricatacfg['interface']);
 
 	if (suricata_is_running($suricatacfg['uuid'], $if_real, 'barnyard2') == 'no') {
 		log_error("Toggle (barnyard starting) for {$if_friendly}({$suricatacfg['descr']})...");
@@ -129,8 +129,8 @@ if ($_GET['act'] == 'bartoggle' && is_numeric($id)) {
 /* start/stop Suricata */
 if ($_GET['act'] == 'toggle' && is_numeric($id)) {
 	$suricatacfg = $config['installedpackages']['suricata']['rule'][$id];
-	$if_real = suricata_get_real_interface($suricatacfg['interface']);
-	$if_friendly = suricata_get_friendly_interface($suricatacfg['interface']);
+	$if_real = get_real_interface($suricatacfg['interface']);
+	$if_friendly = convert_friendly_interface_to_friendly_descr($suricatacfg['interface']);
 
 	if (suricata_is_running($suricatacfg['uuid'], $if_real) == 'yes') {
 		log_error("Toggle (suricata stopping) for {$if_friendly}({$suricatacfg['descr']})...");
@@ -234,8 +234,8 @@ if ($pfsense_stable == 'yes')
 
 			/* convert fake interfaces to real and check if iface is up */
 			/* There has to be a smarter way to do this */
-			$if_real = suricata_get_real_interface($natent['interface']);
-			$natend_friendly= suricata_get_friendly_interface($natent['interface']);
+			$if_real = get_real_interface($natent['interface']);
+			$natend_friendly= convert_friendly_interface_to_friendly_descr($natent['interface']);
 			$suricata_uuid = $natent['uuid'];
 			if (suricata_is_running($suricata_uuid, $if_real) == 'no'){
 				$iconfn = 'block';

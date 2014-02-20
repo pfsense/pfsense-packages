@@ -196,10 +196,10 @@ if ($_POST["Submit"]) {
 		if ($_POST['alertsystemlog'] == "on") { $natent['alertsystemlog'] = 'on'; }else{ $natent['alertsystemlog'] = 'off'; }
 		if ($_POST['configpassthru']) $natent['configpassthru'] = base64_encode($_POST['configpassthru']); else unset($natent['configpassthru']);
 
-		$if_real = suricata_get_real_interface($natent['interface']);
+		$if_real = get_real_interface($natent['interface']);
 		if (isset($id) && $a_rule[$id]) {
 			if ($natent['interface'] != $a_rule[$id]['interface']) {
-				$oif_real = suricata_get_real_interface($a_rule[$id]['interface']);
+				$oif_real = get_real_interface($a_rule[$id]['interface']);
 				suricata_stop($a_rule[$id], $oif_real);
 				exec("rm -r /var/log/suricata_{$oif_real}" . $a_rule[$id]['uuid']);
 				exec("mv -f {$suricatadir}/suricata_" . $a_rule[$id]['uuid'] . "_{$oif_real} {$suricatadir}/suricata_" . $a_rule[$id]['uuid'] . "_{$if_real}");
@@ -302,7 +302,7 @@ if ($_POST["Submit"]) {
 		$pconfig = $_POST;
 }
 
-$if_friendly = suricata_get_friendly_interface($pconfig['interface']);
+$if_friendly = convert_friendly_interface_to_friendly_descr($pconfig['interface']);
 $pgtitle = gettext("Suricata: Interface {$if_friendly} - Edit Settings");
 include_once("head.inc");
 ?>

@@ -102,7 +102,7 @@ function add_title_attribute($tag, $title) {
 }
 
 /* convert fake interfaces to real */
-$if_real = suricata_get_real_interface($pconfig['interface']);
+$if_real = get_real_interface($pconfig['interface']);
 $suricata_uuid = $a_rule[$id]['uuid'];
 $suricatacfgdir = "{$suricatadir}suricata_{$suricata_uuid}_{$if_real}";
 $snortdownload = $config['installedpackages']['suricata']['config'][0]['enable_vrt_rules'];
@@ -409,7 +409,7 @@ else if ($_POST['cancel']) {
 require_once("guiconfig.inc");
 include_once("head.inc");
 
-$if_friendly = suricata_get_friendly_interface($pconfig['interface']);
+$if_friendly = convert_friendly_interface_to_friendly_descr($pconfig['interface']);
 $pgtitle = gettext("Suricata: Interface {$if_friendly} - Rules: {$currentruleset}");
 ?>
 

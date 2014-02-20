@@ -141,7 +141,7 @@ if ($_POST['Submit']) {
 	}
 }
 
-$if_friendly = suricata_get_friendly_interface($config['installedpackages']['suricata']['rule'][$id]['interface']);
+$if_friendly = convert_friendly_interface_to_friendly_descr($config['installedpackages']['suricata']['rule'][$id]['interface']);
 $pgtitle = gettext("Suricata: Interface {$if_friendly} Operating System Policy Engine");
 include_once("head.inc");
 

@@ -57,7 +57,7 @@ if (isset($id) && $a_nat[$id]) {
 	$pconfig['ips_policy'] = $a_nat[$id]['ips_policy'];
 }
 
-$if_real = suricata_get_real_interface($pconfig['interface']);
+$if_real = get_real_interface($pconfig['interface']);
 $suricata_uuid = $a_nat[$id]['uuid'];
 $snortdownload = $config['installedpackages']['suricata']['config'][0]['enable_vrt_rules'] == 'on' ? 'on' : 'off';
 $emergingdownload = $config['installedpackages']['suricata']['config'][0]['enable_etopen_rules'] == 'on' ? 'on' : 'off';
@@ -225,7 +225,7 @@ if ($_POST['selectall']) {
 
 $enabled_rulesets_array = explode("||", $a_nat[$id]['rulesets']);
 
-$if_friendly = suricata_get_friendly_interface($pconfig['interface']);
+$if_friendly = convert_friendly_interface_to_friendly_descr($pconfig['interface']);
 $pgtitle = gettext("Suricata IDS: Interface {$if_friendly} - Categories");
 include_once("head.inc");
 ?>

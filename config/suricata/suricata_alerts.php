@@ -132,7 +132,7 @@ if (!is_array($config['installedpackages']['suricata']['rule']))
 	$config['installedpackages']['suricata']['rule'] = array();
 $a_instance = &$config['installedpackages']['suricata']['rule'];
 $suricata_uuid = $a_instance[$instanceid]['uuid'];
-$if_real = suricata_get_real_interface($a_instance[$instanceid]['interface']);
+$if_real = get_real_interface($a_instance[$instanceid]['interface']);
 $suricatalogdir = SURICATALOGDIR;
 
 // Load up the arrays of force-enabled and force-disabled SIDs

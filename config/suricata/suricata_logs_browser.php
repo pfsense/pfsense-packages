@@ -39,7 +39,7 @@ if (!is_array($config['installedpackages']['suricata']['rule']))
 	$config['installedpackages']['suricata']['rule'] = array();
 $a_instance = $config['installedpackages']['suricata']['rule'];
 $suricata_uuid = $a_instance[$instanceid]['uuid'];
-$if_real = suricata_get_real_interface($a_instance[$instanceid]['interface']);
+$if_real = get_real_interface($a_instance[$instanceid]['interface']);
 
 // Construct a pointer to the instance's logging subdirectory
 $suricatalogdir = SURICATALOGDIR . "suricata_{$if_real}{$suricata_uuid}";
@@ -148,7 +148,7 @@ if ($input_errors) {
 					$selected = "";
 					if ($id == $instanceid)
 						$selected = "selected";
-					echo "<option value='{$id}' {$selected}> (" . suricata_get_friendly_interface($instance['interface']) . "){$instance['descr']}</option>\n";
+					echo "<option value='{$id}' {$selected}> (" . convert_friendly_interface_to_friendly_descre($instance['interface']) . "){$instance['descr']}</option>\n";
 				}
 			?>
 					</select>&nbsp;&nbsp;<?php echo gettext('Choose which instance logs you want to view.'); ?>

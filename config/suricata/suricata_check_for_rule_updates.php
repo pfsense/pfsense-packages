@@ -617,14 +617,14 @@ if ($snortdownload == 'on' || $emergingthreats == 'on' || $snortcommunityrules =
 
 		/* Create configuration for each active Suricata interface */
 		foreach ($config['installedpackages']['suricata']['rule'] as $value) {
-			$if_real = suricata_get_real_interface($value['interface']);
+			$if_real = get_real_interface($value['interface']);
 			// Make sure the interface subdirectory exists.  We need to re-create
 			// it during a pkg reinstall on the intial rules set download.
 			if (!is_dir("{$suricatadir}suricata_{$value['uuid']}_{$if_real}"))
 				safe_mkdir("{$suricatadir}suricata_{$value['uuid']}_{$if_real}");
 			if (!is_dir("{$suricatadir}suricata_{$value['uuid']}_{$if_real}/rules"))
 				safe_mkdir("{$suricatadir}suricata_{$value['uuid']}_{$if_real}/rules");
-			$tmp = "Updating rules configuration for: " . suricata_get_friendly_interface($value['interface']) . " ...";
+			$tmp = "Updating rules configuration for: " . convert_friendly_interface_to_friendly_descr($value['interface']) . " ...";
 			if ($pkg_interface <> "console"){
 				update_status(gettext($tmp));
 				update_output_window(gettext("Please wait while Suricata interface files are being updated..."));
