@@ -90,9 +90,11 @@ function openbgpd_install_conf() {
 			$conffile .= "holdtime {$openbgpd_conf['holdtime']}\n";
 
 		// Specify listen ip
-		if($openbgpd_conf['listenip'])
+		if(!empty($openbgpd_conf['listenip']))
 			$conffile .= "listen on {$openbgpd_conf['listenip']}\n";
-
+		else
+			$conffile .= "listen on 0.0.0.0\n";
+			
 		// Specify router id
 		if($openbgpd_conf['routerid'])
 			$conffile .= "router-id {$openbgpd_conf['routerid']}\n";
@@ -127,8 +129,11 @@ function openbgpd_install_conf() {
 									$conffile .= "\t\t{$row['parameters']} {$row['parmvalue']} \n";
 								}
 							}
-							if ($setlocaladdr == true)
+							if ($setlocaladdr == true && !empty($openbgpd_conf['listenip']))
 								$conffile .= "\t\tlocal-address {$openbgpd_conf['listenip']}\n";
+							else
+								$conffile .= "\t\tlocal-address 0.0.0.0\n";
+								
 							$conffile .= "}\n";
 						}
 					}
@@ -157,8 +162,11 @@ function openbgpd_install_conf() {
 							$conffile .= "\t{$row['parameters']} {$row['parmvalue']} \n";
 						}
 					}
-					if ($setlocaladdr == true)
+					if ($setlocaladdr == true && !empty($openbgpd_conf['listenip']))
 						$conffile .= "\tlocal-address {$openbgpd_conf['listenip']}\n";
+					else
+						$conffile .= "\tlocal-address 0.0.0.0\n";
+
 					$conffile .= "}\n";
 				}
 			}
