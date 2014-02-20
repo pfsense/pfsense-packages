@@ -49,11 +49,8 @@ if (is_null($id)) {
 }
 
 if (isset($id) && $a_rule[$id]) {
-	$pconfig['enable'] = $a_rule[$id]['enable'];
 	$pconfig['interface'] = $a_rule[$id]['interface'];
 	$pconfig['rulesets'] = $a_rule[$id]['rulesets'];
-	if (!empty($a_rule[$id]['customrules']))
-		$pconfig['customrules'] = base64_decode($a_rule[$id]['customrules']);
 }
 
 function truncate($string, $length) {
@@ -357,26 +354,29 @@ if ($_POST['clear']) {
 }
 
 if ($_POST['customrules']) {
-	$a_rule[$id]['customrules'] = base64_encode($_POST['customrules']);
+	if ($_POST['customrules'])
+		$a_rule[$id]['customrules'] = base64_encode($_POST['customrules']);
+	else
+		unset($a_rule[$id]['customrules']);
 	write_config();
 	$rebuild_rules = true;
 	suricata_generate_yaml($a_rule[$id]);
 	$rebuild_rules = false;
 	$output = "";
 	$retcode = "";
-//	exec("/usr/local/bin/snort -T -c {$snortdir}/snort_{$snort_uuid}_{$if_real}/snort.conf 2>&1", $output, $retcode);
-//	if (intval($retcode) != 0) {
-//		$error = "";
-//		$start = count($output);
-//		$end = $start - 4;
-//		for($i = $start; $i > $end; $i--)
-//			$error .= $output[$i];
-//		$input_errors[] = "Custom rules have errors:\n {$error}";
-//	}
-//	else {
-//		header("Location: /snort/snort_rules.php?id={$id}&openruleset={$currentruleset}");
-//		exit;
-//	}
+	exec("/usr/local/bin/suricata -T --init-errors-fatal -c {$suricatacfgdir}/suricata.yaml 2>&1", $output, $retcode);
+	if (intval($retcode) != 0) {
+		$error = "";
+		$start = count($output);
+		$end = $start - 4;
+		for($i = $start; $i > $end; $i--)
+			$error .= $output[$i];
+		$input_errors[] = "Custom rules have errors:\n {$error}";
+	}
+	else {
+		header("Location: /suricata/suricata_rules.php?id={$id}&openruleset={$currentruleset}");
+		exit;
+	}
 }
 
 else if ($_POST['apply']) {
