@@ -73,8 +73,8 @@ if ($config['installedpackages']['suricata']['config'][0]['clearlogs'] == 'on') 
 }
 
 /* Remove the Suricata GUI app directories */
-@unlink("/usr/local/pkg/suricata");
-@unlink("/usr/local/www/suricata");
+mwexec("/bin/rm -rf /usr/local/pkg/suricata");
+mwexec("/bin/rm -rf /usr/local/www/suricata");
 
 /* Keep this as a last step */
 if ($config['installedpackages']['suricata']['config'][0]['forcekeepsettings'] != 'on') {
@@ -83,7 +83,6 @@ if ($config['installedpackages']['suricata']['config'][0]['forcekeepsettings'] !
 	unset($config['installedpackages']['suricatasync']);
 	@unlink("{$suricata_rules_upd_log}");
 	mwexec("/bin/rm -rf {$suricatalogdir}");
-	@unlink(SURICATALOGDIR);
 	log_error(gettext("[Suricata] The package has been removed from this system..."));
 }
 
