@@ -109,6 +109,7 @@ UPSCABLE {$upscable}
 #                            default of 3052 will be used.
 #
 UPSTYPE {$upstype}
+{$device}
 
 # POLLTIME <int>
 #   Interval (in seconds) at which apcupsd polls the UPS for status. This
