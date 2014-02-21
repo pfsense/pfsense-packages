@@ -935,8 +935,8 @@ EOF;
 		}
 	else{
 		if ($dansguardian_blacklist['cron']=="force_download"){
-			log_error("Blacklist udpate process started");
-			file_notice("Dansguardian - Blacklist udpate process started","");
+			log_error("Blacklist update process started");
+			file_notice("Dansguardian - Blacklist update process started","");
 			file_put_contents("/root/dansguardian_custom.script",base64_decode($dansguardian_blacklist['custom_script']),LOCK_EX);
 			if ($dansguardian_blacklist['enable_custom_script'] && $dansguardian_blacklist['custom_script'] != "")
 				mwexec_bg("/root/dansguardian_custom.script");

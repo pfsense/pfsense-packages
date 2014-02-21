@@ -10,7 +10,7 @@
 	<version>1.0</version>
 	<title>Vnstat2</title>
 	<aftersaveredirect>/diag_vnstat2.php</aftersaveredirect>
-	<include_file>/usr/local/pkg/vnstat2.inc</include_file>
+	<include_file>/usr/local/pkg/vnstat2/vnstat2.inc</include_file>
 	<menu>
 		<name>vnstat2</name>
 		<tooltiptext></tooltiptext>
@@ -54,3 +54,4 @@
 	<custom_php_install_command>vnstat_install_config();</custom_php_install_command>
 	<custom_php_deinstall_command>vnstat_install_deinstall();</custom_php_deinstall_command>
 </packagegui>
+

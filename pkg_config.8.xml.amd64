@@ -815,10 +815,10 @@
 		<depends_on_package>vnstat-1.11.tbz</depends_on_package>
 		<depends_on_package_pbi>vnstat-1.11_1-amd64.pbi</depends_on_package_pbi>
 		<build_port_path>/usr/ports/net/vnstat</build_port_path>
-		<version>1.10_2</version>
+		<version>1.11_1</version>
 		<status>Stable</status>
 		<required_version>2.0</required_version>
-		<maintainer>crazypark2@yahoo.dk</maintainer>
+		<maintainer>bryan.paradis@gmail.com</maintainer>
 		<config_file>http://www.pfsense.com/packages/config/vnstat2/vnstat2.xml</config_file>
 		<configurationfile>vnstat2.xml</configurationfile>
 		<after_install_info></after_install_info>
