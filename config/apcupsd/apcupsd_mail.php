@@ -35,10 +35,10 @@ global $config, $g;
 
 $apcstatus[killpower] = "UPS now committed to shut down";
 $apcstatus[commfailure] = "Communications with UPS lost";
-$apcstatus[commok] = "Communciations with UPS restored";
+$apcstatus[commok] = "Communications with UPS restored";
 $apcstatus[onbattery] = "Power failure. Running on UPS batteries";
 $apcstatus[offbattery] = "Power has returned...";
-$apcstatus[failing] = "UPS battery power exhaused. Doing shutdown";
+$apcstatus[failing] = "UPS battery power exhausted. Doing shutdown";
 $apcstatus[timeout] = "UPS battery runtime limit exceeded. Doing shutdown";
 $apcstatus[loadlimit] = "UPS battery discharge limit reached. Doing shutdown";
 $apcstatus[runlimit] = "UPS battery runtime percent reached. Doing shutdown";
@@ -93,4 +93,3 @@ if(!$mail->Send()) {
 }
 
 ?>
-
