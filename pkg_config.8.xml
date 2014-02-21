@@ -2030,7 +2030,7 @@
 		<category>Security</category>
 		<version>1.4.6 pkg v0.1</version>
 		<status>BETA</status>
-		<required_version>3.0</required_version>
+		<required_version>2.1</required_version>
 		<config_file>http://www.pfsense.org/packages/config/suricata/suricata.xml</config_file>
 		<configurationfile>suricata.xml</configurationfile>
 		<build_pbi>
