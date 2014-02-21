@@ -40,8 +40,9 @@ if (!is_array($config['installedpackages']['suricata']['rule']))
 	$config['installedpackages']['suricata']['rule'] = array();
 $a_rule = &$config['installedpackages']['suricata']['rule'];
 
-$id = $_GET['id'];
-if (isset($_POST['id']))
+if ($_GET['id'] && is_numeric($_POST['id']));
+	$id = htmlspecialchars($_GET['id'], ENT_QUOTES | ENT_HTML401);
+if ($_POST['id'] && is_numeric($_POST['id']))
 	$id = $_POST['id'];
 if (is_null($id)) {
         header("Location: /suricata/suricata_interfaces.php");
@@ -62,13 +63,7 @@ else {
 $suricata_uuid = $pconfig['uuid'];
 
 // Get the physical configured interfaces on the firewall
-if (function_exists('get_configured_interface_with_descr'))
-	$interfaces = get_configured_interface_with_descr();
-else {
-	$interfaces = array('wan' => 'WAN', 'lan' => 'LAN');
-	for ($i = 1; isset($config['interfaces']['opt' . $i]); $i++)
-		$interfaces['opt' . $i] = $config['interfaces']['opt' . $i]['descr'];
-}
+$interfaces = get_configured_interface_with_descr();
 
 // See if interface is already configured, and use its values
 if (isset($id) && $a_rule[$id]) {
@@ -96,9 +91,6 @@ elseif (isset($id) && !isset($a_rule[$id])) {
 		$pconfig = array();
 	}
 }
-
-if (isset($_GET['dup']))
-	unset($id);
 
 // Set defaults for any empty key parameters
 if (empty($pconfig['blockoffendersip']))
@@ -374,7 +366,7 @@ include_once("head.inc");
 			<?php endforeach; ?>
 			</select>&nbsp;&nbsp;
 			<span class="vexpl"><?php echo gettext("Choose which interface this Suricata instance applies to."); ?><br/>
-			<span class="red"><?php echo gettext("Hint:"); ?></span>&nbsp;<?php echo gettext("In most cases, you'll want to use WAN here."); ?></span><br/></td>
+			<span class="red"><?php echo gettext("Hint:"); ?></span>&nbsp;<?php echo gettext("In most cases, you'll want to use WAN here if this is the first Suricata-configured interface."); ?></span><br/></td>
 	</tr>
 	<tr>
 		<td width="22%" valign="top" class="vncellreq"><?php echo gettext("Description"); ?></td>
@@ -390,7 +382,6 @@ include_once("head.inc");
 		<td width="78%" class="vtable"><input name="alertsystemlog" type="checkbox" value="on" <?php if ($pconfig['alertsystemlog'] == "on") echo "checked"; ?>/>
 			<?php echo gettext("Suricata will send Alerts to the firewall's system log."); ?></td>
 	</tr>
-
 	<tr>
 		<td width="22%" valign="top" class="vncell"><?php echo gettext("Enable Stats Log"); ?></td>
 		<td width="78%" class="vtable"><input name="enable_stats_log" type="checkbox" value="on" <?php if ($pconfig['enable_stats_log'] == "on") echo "checked"; ?> 
@@ -466,8 +457,6 @@ include_once("head.inc");
 			gettext("This will consume a significant amount of disk space on a busy network when enabled!"); ?></div>
 		</td>
 	</tr>
-
-
 	<tr>
 		<td width="22%" valign="top" class="vncell"><?php echo gettext("Enable Packet Log"); ?></td>
 		<td width="78%" class="vtable"><input name="enable_pcap_log" id="enable_pcap_log" type="checkbox" value="on" <?php if ($pconfig['enable_pcap_log'] == "on") echo "checked"; ?> 
@@ -484,7 +473,6 @@ include_once("head.inc");
 			<?php echo gettext("Enter maximum size in ") . "<strong>" . gettext("MB") . "</strong>" . gettext(" for a packet log file.  Default is ") . "<strong>" . 
 			gettext("32") . "</strong>."; ?><br/><br/><?php echo gettext("When the packet log file size reaches the set limit, it will be rotated and a new one created.") ?></td>
 	</tr>
-	</tr>
 	<tr id="pcap_log_max_row">
 		<td width="22%" valign="top" class="vncell"><?php echo gettext("Max Packet Log Files"); ?></td>
 		<td width="78%" class="vtable"><input name="max_pcap_log_files" type="text" 
@@ -493,7 +481,7 @@ include_once("head.inc");
 			gettext("1000") . "</strong>."; ?><br/><br/><?php echo gettext("When the number of packet log files reaches the set limit, the oldest file will be overwritten.") ?></td>
 	</tr>
 
-<!--
+<!-- ### Blocking not yet enabled, so hide the controls ###
 <tr>
 	<td colspan="2" class="listtopic"><?php echo gettext("Alert Settings"); ?></td>
 </tr>
@@ -529,6 +517,7 @@ include_once("head.inc");
 			<span class="red"><?php echo gettext("Hint:") . "</span>&nbsp;" . gettext("Choosing BOTH is suggested, and it is the default value."); ?></span><br/></td>
 		</td>
 	</tr>
+  ### End of Blocking controls ###
 -->
 
 <tr>
@@ -897,7 +886,7 @@ function viewList(id, elemID, elemType) {
 }
 
 enable_change(false);
-enable_blockoffenders();
+//enable_blockoffenders();
 toggle_stats_log();
 toggle_http_log();
 toggle_tls_log();

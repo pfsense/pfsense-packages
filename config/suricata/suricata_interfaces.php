@@ -449,6 +449,12 @@ if ($pfsense_stable == 'yes')
 </form>
 
 <script type="text/javascript">
+<script language="javascript" type="text/javascript">
+
+var initiator = '';
+$(document).ready(function() {
+	$(":submit").click(function() { initiator = this.value });
+});
 
 function intf_del() {
 	var isSelected = false;
