@@ -5,10 +5,6 @@ function vnstat_install_deinstall() {
 // Remove Vnstat package and files 
 	exec("rm -d -R /usr/local/www/vnstat2");
 	exec("rm -d -R /usr/local/www/vnstati");
-	exec("rm /usr/local/www/diag_vnstat.php");
-	exec("rm /usr/local/www/diag_vnstat2.php");
-	exec("rm /usr/local/www/vnstati.php");
-	exec("rm /usr/local/www/vnstat2_img.php");
 	exec("rm -d -R /usr/local/pkg/vnstat2");
 	exec("rm /usr/local/etc/vnstat.conf");
 
@@ -153,11 +149,6 @@ function vnstat_install_config() {
 // Check for pbi install and arch type then create symlinks
 	if (file_exists('/usr/pbi/vnstat-i386')) { exec("ln -s /usr/local/etc/vnstat.conf /usr/pbi/vnstat-i386/etc/vnstat.conf"); }
 	if (file_exists('/usr/pbi/vnstat-amd64')) { exec("ln -s /usr/local/etc/vnstat.conf /usr/pbi/vnstat-amd64/etc/vnstat.conf"); }
-// Copy files to web dir
-	exec("[ ! -f /usr/local/www/diag_vnstat2.php ] && cp /usr/local/pkg/vnstat2/diag_vnstat2.abc /usr/local/www/diag_vnstat2.php");
-	exec("[ ! -f /usr/local/www/diag_vnstat.php ] && cp /usr/local/pkg/vnstat2/diag_vnstat.abc /usr/local/www/diag_vnstat.php");
-	exec("[ ! -f /usr/local/www/vnstati.php ] && cp /usr/local/pkg/vnstat2/vnstati.abc /usr/local/www/vnstati.php");
-	exec("[ ! -f /usr/local/www/vnstat2_img.php ] && cp /usr/local/pkg/vnstat2/vnstat2_img.abc /usr/local/www/vnstat2_img.php");
 // Add MonthRotate value to config.xml and write /usr/local/etc/vnstat.conf
 	$no_monthrotate = $config['installedpackages']['vnstat2']['config'][0]['monthrotate'];	
 	if ($no_monthrotate == ""){
