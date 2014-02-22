@@ -148,7 +148,7 @@ if ($input_errors) {
 					$selected = "";
 					if ($id == $instanceid)
 						$selected = "selected";
-					echo "<option value='{$id}' {$selected}> (" . convert_friendly_interface_to_friendly_descre($instance['interface']) . "){$instance['descr']}</option>\n";
+					echo "<option value='{$id}' {$selected}> (" . convert_friendly_interface_to_friendly_descr($instance['interface']) . "){$instance['descr']}</option>\n";
 				}
 			?>
 					</select>&nbsp;&nbsp;<?php echo gettext('Choose which instance logs you want to view.'); ?>
