@@ -431,17 +431,27 @@ if ($emergingthreats == 'on') {
 		array_map('unlink', glob("{$suricatadir}rules/{$eto_prefix}*ips.txt"));
 		array_map('unlink', glob("{$suricatadir}rules/{$etpro_prefix}*ips.txt"));
 
-		// The code below renames ET-Pro files with a prefix, so we
+		// The code below renames ET files with a prefix, so we
 		// skip renaming the Suricata default events rule files
-		// that are also bundled in the ET-Pro rules.
+		// that are also bundled in the ET rules.
 		$default_rules = array( "decoder-events.rules", "files.rules", "http-events.rules", "smtp-events.rules", "stream-events.rules" );
 		$files = glob("{$tmpfname}/emerging/rules/*.rules");
+		// Determine the correct prefix to use based on which
+		// Emerging Threats rules package is enabled.
+		if ($etpro == "on")
+			$prefix = ET_PRO_FILE_PREFIX;
+		else
+			$prefix = ET_OPEN_FILE_PREFIX;
 		foreach ($files as $file) {
 			$newfile = basename($file);
-			if ($etpro == "on" && !in_array($newfile, $default_rules))
-				@copy($file, "{$suricatadir}rules/" . ET_PRO_FILE_PREFIX . "{$newfile}");
-			else
+			if (in_array($newfile, $default_rules))
 				@copy($file, "{$suricatadir}rules/{$newfile}");
+			else {
+				if (strpos($newfile, $prefix) === FALSE)
+					@copy($file, "{$suricatadir}rules/{$prefix}{$newfile}");
+				else
+					@copy($file, "{$suricatadir}rules/{$newfile}");
+			}
 		}
 		/* IP lists for Emerging Threats rules */
 		$files = glob("{$tmpfname}/emerging/rules/*ips.txt");
