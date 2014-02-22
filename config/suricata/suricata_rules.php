@@ -40,7 +40,8 @@ if (!is_array($config['installedpackages']['suricata']['rule']))
 	$config['installedpackages']['suricata']['rule'] = array();
 $a_rule = &$config['installedpackages']['suricata']['rule'];
 
-$id = $_GET['id'];
+if (is_numeric($_GET['id']))
+	$id = $_GET['id'];
 if (isset($_POST['id']))
 	$id = $_POST['id'];
 if (is_null($id)) {
@@ -108,7 +109,7 @@ $etpro = $config['installedpackages']['suricata']['config'][0]['enable_etpro_rul
 $categories = explode("||", $pconfig['rulesets']);
 
 if ($_GET['openruleset'])
-	$currentruleset = $_GET['openruleset'];
+	$currentruleset = htmlspecialchars($_GET['openruleset'], ENT_QUOTES | ENT_HTML401);
 else if ($_POST['openruleset'])
 	$currentruleset = $_POST['openruleset'];
 else

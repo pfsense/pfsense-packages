@@ -121,10 +121,11 @@ function suricata_add_supplist_entry($suppress) {
 		return false;
 }
 
-if ($_GET['instance'])
-	$instanceid = $_GET['instance'];
 if ($_POST['instance'])
 	$instanceid = $_POST['instance'];
+// This is for the auto-refresh so wecan  stay on the same interface
+if (is_numeric($_GET['instance']))
+	$instanceid = $_GET['instance'];
 if (empty($instanceid))
 	$instanceid = 0;
 
@@ -163,63 +164,61 @@ if ($_POST['save']) {
 	exit;
 }
 
-//if ($_POST['todelete'] || $_GET['todelete']) {
-//	$ip = "";
-//	if($_POST['todelete'])
-//		$ip = $_POST['todelete'];
-//	else if($_GET['todelete'])
-//		$ip = $_GET['todelete'];
-//	if (is_ipaddr($ip)) {
-//		exec("/sbin/pfctl -t snort2c -T delete {$ip}");
-//		$savemsg = gettext("Host IP address {$ip} has been removed from the Blocked Table.");
+//if ($_POST['unblock'] && $_POST['ip']) {
+//	if (is_ipaddr($_POST['ip'])) {
+//		exec("/sbin/pfctl -t snort2c -T delete {$_POST['ip']}");
+//		$savemsg = gettext("Host IP address {$_POST['ip']} has been removed from the Blocked Table.");
 //	}
 //}
 
-if ($_GET['act'] == "addsuppress" && is_numeric($_GET['sidid']) && is_numeric($_GET['gen_id'])) {
-	if (empty($_GET['descr']))
-		$suppress = "suppress gen_id {$_GET['gen_id']}, sig_id {$_GET['sidid']}\n";
-	else
-		$suppress = "#{$_GET['descr']}\nsuppress gen_id {$_GET['gen_id']}, sig_id {$_GET['sidid']}\n";
-
-	/* Add the new entry to the Suppress List */
-	if (suricata_add_supplist_entry($suppress))
-		$savemsg = gettext("An entry for 'suppress gen_id {$_GET['gen_id']}, sig_id {$_GET['sidid']}' has been added to the Suppress List.");
-	else
-		$input_errors[] = gettext("Suppress List '{$a_instance[$instanceid]['suppresslistname']}' is defined for this interface, but it could not be found!");
-}
-
-if (($_GET['act'] == "addsuppress_srcip" || $_GET['act'] == "addsuppress_dstip") && is_numeric($_GET['sidid']) && is_numeric($_GET['gen_id'])) {
-	if ($_GET['act'] == "addsuppress_srcip")
+if (($_POST['addsuppress_srcip'] || $_POST['addsuppress_dstip'] || $_POST['addsuppress']) && is_numeric($_POST['sidid']) && is_numeric($_POST['gen_id'])) {
+	if ($_POST['addsuppress_srcip'])
 		$method = "by_src";
-	else
+	elseif ($_POST['addsuppress_dstip'])
 		$method = "by_dst";
+	else
+		$method ="all";
 
-	/* Check for valid IP addresses, exit if not valid */
-	if (is_ipaddr($_GET['ip']) || is_ipaddrv6($_GET['ip'])) {
-		if (empty($_GET['descr']))
-			$suppress = "suppress gen_id {$_GET['gen_id']}, sig_id {$_GET['sidid']}, track {$method}, ip {$_GET['ip']}\n";
-		else  
-			$suppress = "#{$_GET['descr']}\nsuppress gen_id {$_GET['gen_id']}, sig_id {$_GET['sidid']}, track {$method}, ip {$_GET['ip']}\n";
-	}
-	else {
-		header("Location: /suricata/suricata_alerts.php?instance={$instanceid}");
-		exit;
+	// See which kind of Suppress Entry to create
+	switch ($method) {
+		case "all":
+			if (empty($_POST['descr']))
+				$suppress = "suppress gen_id {$_POST['gen_id']}, sig_id {$_POST['sidid']}\n";
+			else
+				$suppress = "#{$_POST['descr']}\nsuppress gen_id {$_POST['gen_id']}, sig_id {$_POST['sidid']}\n";
+			$success = gettext("An entry for 'suppress gen_id {$_GET['gen_id']}, sig_id {$_GET['sidid']}' has been added to the Suppress List.");
+			break;
+		case "by_src":
+		case "by_dst":
+			// Check for valid IP addresses, exit if not valid
+			if (is_ipaddr($_POST['ip']) || is_ipaddrv6($_POST['ip'])) {
+				if (empty($_POST['descr']))
+					$suppress = "suppress gen_id {$_POST['gen_id']}, sig_id {$_POST['sidid']}, track {$method}, ip {$_POST['ip']}\n";
+				else  
+					$suppress = "#{$_POST['descr']}\nsuppress gen_id {$_POST['gen_id']}, sig_id {$_POST['sidid']}, track {$method}, ip {$_POST['ip']}\n";
+				$success = gettext("An entry for 'suppress gen_id {$_POST['gen_id']}, sig_id {$_POST['sidid']}, track {$method}, ip {$_POST['ip']}' has been added to the Suppress List.");
+			}
+			else {
+				header("Location: /suricata/suricata_alerts.php");
+				exit;
+			}
+			break;
+		default:
+			header("Location: /suricata/suricata_alerts.php");
+			exit;
 	}
 
 	/* Add the new entry to the Suppress List */
 	if (suricata_add_supplist_entry($suppress))
-		$savemsg = gettext("An entry for 'suppress gen_id {$_GET['gen_id']}, sig_id {$_GET['sidid']}, track {$method}, ip {$_GET['ip']}' has been added to the Suppress List.");
+		$savemsg = $success;
 	else
-		/* We did not find the defined list, so notify the user with an error */
 		$input_errors[] = gettext("Suppress List '{$a_instance[$instanceid]['suppresslistname']}' is defined for this interface, but it could not be found!");
 }
 
-if ($_GET['act'] == "togglesid" && is_numeric($_GET['sidid']) && is_numeric($_GET['gen_id'])) {
-	// Get the GID tag embedded in the clicked rule icon.
-	$gid = $_GET['gen_id'];
-
-	// Get the SID tag embedded in the clicked rule icon.
-	$sid= $_GET['sidid'];
+if ($_POST['togglesid'] && is_numeric($_POST['sidid']) && is_numeric($_POST['gen_id'])) {
+	// Get the GID and SID tags embedded in the clicked rule icon.
+	$gid = $_POST['gen_id'];
+	$sid= $_POST['sidid'];
 
 	// See if the target SID is in our list of modified SIDs,
 	// and toggle it if present.
@@ -272,7 +271,7 @@ if ($_GET['act'] == "togglesid" && is_numeric($_GET['sidid']) && is_numeric($_GE
 	$savemsg = gettext("The state for rule {$gid}:{$sid} has been modified.  Suricata is 'live-reloading' the new rules list.  Please wait at least 30 secs for the process to complete before toggling additional rules.");
 }
 
-if ($_GET['action'] == "clear" || $_POST['delete']) {
+if ($_POST['delete']) {
 	conf_mount_rw();
 	suricata_post_delete_logs($suricata_uuid);
 	$fd = @fopen("{$suricatalogdir}suricata_{$if_real}{$suricata_uuid}/alerts.log", "w+");
@@ -281,8 +280,7 @@ if ($_GET['action'] == "clear" || $_POST['delete']) {
 	conf_mount_ro();
 	/* XXX: This is needed if suricata is run as suricata user */
 	mwexec('/bin/chmod 660 {$suricatalogdir}*', true);
-	if (file_exists("{$g['varrun_path']}/suricata_{$if_real}{$suricata_uuid}.pid"))
-		mwexec("/bin/pkill -HUP -F {$g['varrun_path']}/suricata_{$if_real}{$suricata_uuid}.pid -a");
+	sigkillbypid("{$g['varrun_path']}/suricata_{$if_real}{$suricata_uuid}.pid", "HUP");
 	header("Location: /suricata/suricata_alerts.php?instance={$instanceid}");
 	exit;
 }
@@ -332,16 +330,21 @@ if ($pconfig['arefresh'] == 'on')
 	echo "<meta http-equiv=\"refresh\" content=\"60;url=/suricata/suricata_alerts.php?instance={$instanceid}\" />\n";
 ?>
 
-<?php if($pfsense_stable == 'yes'){echo '<p class="pgtitle">' . $pgtitle . '</p>';}
-	/* Display Alert message */
-	if ($input_errors) {
-		print_input_errors($input_errors); // TODO: add checks
-	}
-	if ($savemsg) {
-		print_info_box($savemsg);
-	}
+<?php
+/* Display Alert message */
+if ($input_errors) {
+	print_input_errors($input_errors); // TODO: add checks
+}
+if ($savemsg) {
+	print_info_box($savemsg);
+}
 ?>
 <form action="/suricata/suricata_alerts.php" method="post" id="formalert">
+<input type="hidden" name="sidid" id="sidid" value=""/>
+<input type="hidden" name="gen_id" id="gen_id" value=""/>
+<input type="hidden" name="ip" id="ip" value=""/>
+<input type="hidden" name="descr" id="descr" value=""/>
+
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
 <tr><td>
 <?php
@@ -349,7 +352,7 @@ if ($pconfig['arefresh'] == 'on')
 	$tab_array[] = array(gettext("Suricata Interfaces"), false, "/suricata/suricata_interfaces.php");
 	$tab_array[] = array(gettext("Global Settings"), false, "/suricata/suricata_global.php");
 	$tab_array[] = array(gettext("Update Rules"), false, "/suricata/suricata_download_updates.php");
-	$tab_array[] = array(gettext("Alerts"), true, "/suricata/suricata_alerts.php?instance={$instanceid}");
+	$tab_array[] = array(gettext("Alerts"), true, "/suricata/suricata_alerts.php");
 	$tab_array[] = array(gettext("Suppress"), false, "/suricata/suricata_suppress.php");
 	$tab_array[] = array(gettext("Logs Browser"), false, "/suricata/suricata_logs_browser.php");
 	display_top_tabs($tab_array);
@@ -364,7 +367,7 @@ if ($pconfig['arefresh'] == 'on')
 			<tr>
 				<td width="22%" class="vncell"><?php echo gettext('Instance to Inspect'); ?></td>
 				<td width="78%" class="vtable">
-					<select name="instance" id="instance" class="formselect" onChange="document.getElementById('formalert').method='get';document.getElementById('formalert').submit()">
+					<select name="instance" id="instance" class="formselect" onChange="document.getElementById('formalert').method='post';document.getElementById('formalert').submit()">
 			<?php
 				foreach ($a_instance as $id => $instance) {
 					$selected = "";
@@ -379,9 +382,9 @@ if ($pconfig['arefresh'] == 'on')
 				<td width="22%" class="vncell"><?php echo gettext('Save or Remove Logs'); ?></td>
 				<td width="78%" class="vtable">
 					<input name="download" type="submit" class="formbtns" value="Download"> <?php echo gettext('All ' .
-						'log files will be saved.'); ?>&nbsp;&nbsp;<a href="/suricata/suricata_alerts.php?action=clear&instance=<?=$instanceid;?>">
+						'log files will be saved.'); ?>&nbsp;&nbsp;
 					<input name="delete" type="submit" class="formbtns" value="Clear"
-					onclick="return confirm('Do you really want to remove all instance logs?')"></a>
+					onclick="return confirm('Do you really want to remove all instance logs?');"></a>
 					<span class="red"><strong><?php echo gettext('Warning:'); ?></strong></span> <?php echo ' ' . gettext('all log files will be deleted.'); ?>
 				</td>
 			</tr>
@@ -470,20 +473,19 @@ if (file_exists("/var/log/suricata/suricata_{$if_real}{$suricata_uuid}/alerts.lo
 			/* Add icons for auto-adding to Suppress List if appropriate */
 			if (!suricata_is_alert_globally_suppressed($supplist, $fields[2], $fields[3]) && 
 			    !isset($supplist[$fields[2]][$fields[3]]['by_src'][$fields[9]])) {
-				$alert_ip_src .= "&nbsp;&nbsp;<a href='?instance={$instanceid}&act=addsuppress_srcip&sidid={$fields[3]}&gen_id={$fields[2]}&descr={$alert_descr_url}&ip=" . trim(urlencode($fields[9])) . "'>";
-				$alert_ip_src .= "<img src='../themes/{$g['theme']}/images/icons/icon_plus.gif' width='12' height='12' border='0' ";
-				$alert_ip_src .= "title='" . gettext("Add this alert to the Suppress List and track by_src IP") . "'></a>";	
+				$alert_ip_src .= "&nbsp;&nbsp;<input type='image' name='addsuppress_srcip[]' onClick=\"encRuleSig('{$fields[2]}','{$fields[3]}','{$fields[9]}','{$alert_descr}');\" ";
+				$alert_ip_src .= "src='../themes/{$g['theme']}/images/icons/icon_plus.gif' width='12' height='12' border='0' ";
+				$alert_ip_src .= "title='" . gettext("Add this alert to the Suppress List and track by_src IP") . "'/>";	
 			}
 			elseif (isset($supplist[$fields[2]][$fields[3]]['by_src'][$fields[9]])) {
 				$alert_ip_src .= "&nbsp;&nbsp;<img src='../themes/{$g['theme']}/images/icons/icon_plus_d.gif' width='12' height='12' border='0' ";
 				$alert_ip_src .= "title='" . gettext("This alert track by_src IP is already in the Suppress List") . "'/>";	
 			}
 			/* Add icon for auto-removing from Blocked Table if required */
-			if (isset($tmpblocked[$fields[9]])) {
-				$alert_ip_src .= "&nbsp;";
-				$alert_ip_src .= "<a href='?instance={$instanceid}&todelete=" . trim(urlencode($fields[9])) . "'>
-				<img title=\"" . gettext("Remove host from Blocked Table") . "\" border=\"0\" width='12' height='12' name='todelete' id='todelete' alt=\"Remove from Blocked Hosts\" src=\"../themes/{$g['theme']}/images/icons/icon_x.gif\"></a>"; 
-			}
+//			if (isset($tmpblocked[$fields[9]])) {
+//				$alert_ip_src .= "&nbsp;<input type='image' name='unblock[]' onClick=\"document.getElementById('ip').value='{$fields[9]}';\" ";
+//				$alert_ip_src .= "title='" . gettext("Remove host from Blocked Table") . "' border='0' width='12' height='12' src=\"../themes/{$g['theme']}/images/icons/icon_x.gif\"/>"; 
+//			}
 			/* IP SRC Port */
 			$alert_src_p = $fields[10];
 			/* IP Destination */
@@ -499,29 +501,28 @@ if (file_exists("/var/log/suricata/suricata_{$if_real}{$suricata_uuid}/alerts.lo
 			$alert_ip_dst .= "title='" . gettext("Resolve host via reverse DNS lookup") . "'></a>";	
 			/* Add icons for auto-adding to Suppress List if appropriate */
 			if (!suricata_is_alert_globally_suppressed($supplist, $fields[2], $fields[3]) && 
-			    !isset($supplist[$fields[2]][$fields[3]]['by_dst'][$fields[1]])) {
-				$alert_ip_dst .= "&nbsp;&nbsp;<a href='?instance={$instanceid}&act=addsuppress_dstip&sidid={$fields[3]}&gen_id={$fields[2]}&descr={$alert_descr_url}&ip=" . trim(urlencode($fields[11])) . "'>";
-				$alert_ip_dst .= "<img src='../themes/{$g['theme']}/images/icons/icon_plus.gif' width='12' height='12' border='0' ";
-				$alert_ip_dst .= "title='" . gettext("Add this alert to the Suppress List and track by_dst IP") . "'></a>";	
+			    !isset($supplist[$fields[2]][$fields[3]]['by_dst'][$fields[11]])) {
+				$alert_ip_dst .= "&nbsp;&nbsp;<input type='image' name='addsuppress_dstip[]' onClick=\"encRuleSig('{$fields[2]}','{$fields[3]}','{$fields[11]}','{$alert_descr}');\" ";
+				$alert_ip_dst .= "src='../themes/{$g['theme']}/images/icons/icon_plus.gif' width='12' height='12' border='0' ";
+				$alert_ip_dst .= "title='" . gettext("Add this alert to the Suppress List and track by_dst IP") . "'/>";	
 			}
 			elseif (isset($supplist[$fields[2]][$fields[3]]['by_dst'][$fields[11]])) {
 				$alert_ip_dst .= "&nbsp;&nbsp;<img src='../themes/{$g['theme']}/images/icons/icon_plus_d.gif' width='12' height='12' border='0' ";
 				$alert_ip_dst .= "title='" . gettext("This alert track by_dst IP is already in the Suppress List") . "'/>";	
 			}
 			/* Add icon for auto-removing from Blocked Table if required */
-			if (isset($tmpblocked[$fields[11]])) {
-				$alert_ip_dst .= "&nbsp;";
-				$alert_ip_dst .= "<a href='?instance={$instanceid}&todelete=" . trim(urlencode($fields[11])) . "'>
-				<img title=\"" . gettext("Remove host from Blocked Table") . "\" border=\"0\" width='12' height='12' name='todelete' id='todelete' alt=\"Remove from Blocked Hosts\" src=\"../themes/{$g['theme']}/images/icons/icon_x.gif\"></a>";
-			}
+//			if (isset($tmpblocked[$fields[11]])) {
+//				$alert_ip_src .= "&nbsp;<input type='image' name='unblock[]' onClick=\"document.getElementById('ip').value='{$fields[11]}';\" ";
+//				$alert_ip_src .= "title='" . gettext("Remove host from Blocked Table") . "' border='0' width='12' height='12' src=\"../themes/{$g['theme']}/images/icons/icon_x.gif\"/>"; 
+//			}
 			/* IP DST Port */
 			$alert_dst_p = $fields[12];
 			/* SID */
 			$alert_sid_str = "{$fields[2]}:{$fields[3]}";
 			if (!suricata_is_alert_globally_suppressed($supplist, $fields[2], $fields[3])) {
-				$sidsupplink = "<a href='?instance={$instanceid}&act=addsuppress&sidid={$fields[3]}&gen_id={$fields[2]}&descr={$alert_descr_url}'>";
-				$sidsupplink .= "<img src='../themes/{$g['theme']}/images/icons/icon_plus.gif' width='12' height='12' border='0' ";
-				$sidsupplink .= "title='" . gettext("Add this alert to the Suppress List") . "'></a>";	
+				$sidsupplink = "<input type='image' name='addsuppress[]' onClick=\"encRuleSig('{$fields[2]}','{$fields[3]}','','{$alert_descr}');\" ";
+				$sidsupplink .= "src='../themes/{$g['theme']}/images/icons/icon_plus.gif' width='12' height='12' border='0' ";
+				$sidsupplink .= "title='" . gettext("Add this alert to the Suppress List") . "'/>";	
 			}
 			else {
 				$sidsupplink = "<img src='../themes/{$g['theme']}/images/icons/icon_plus_d.gif' width='12' height='12' border='0' ";
@@ -529,14 +530,14 @@ if (file_exists("/var/log/suricata/suricata_{$if_real}{$suricata_uuid}/alerts.lo
 			}
 			/* Add icon for toggling rule state */
 			if (isset($disablesid[$fields[2]][$fields[3]])) {
-				$sid_dsbl_link = "<a href='?instance={$instanceid}&act=togglesid&sidid={$fields[3]}&gen_id={$fields[2]}'>";
-				$sid_dsbl_link .= "<img src='../themes/{$g['theme']}/images/icons/icon_reject.gif' width='11' height='11' border='0' ";
-				$sid_dsbl_link .= "title='" . gettext("Rule is forced to a disabled state. Click to remove the force-disable action from this rule.") . "'></a>";
+				$sid_dsbl_link = "<input type='image' name='togglesid[]' onClick=\"encRuleSig('{$fields[2]}','{$fields[3]}','','');\" ";
+				$sid_dsbl_link .= "src='../themes/{$g['theme']}/images/icons/icon_reject.gif' width='11' height='11' border='0' ";
+				$sid_dsbl_link .= "title='" . gettext("Rule is forced to a disabled state. Click to remove the force-disable action from this rule.") . "'/>";
 			}
 			else {
-				$sid_dsbl_link = "<a href='?instance={$instanceid}&act=togglesid&sidid={$fields[3]}&gen_id={$fields[2]}'>";
+				$sid_dsbl_link = "<input type='image' name='togglesid[]' onClick=\"encRuleSig('{$fields[2]}','{$fields[3]}','','');\" ";
 				$sid_dsbl_link .= "<img src='../themes/{$g['theme']}/images/icons/icon_block.gif' width='11' height='11' border='0' ";
-				$sid_dsbl_link .= "title='" . gettext("Force-disable this rule and remove it from current rules set.") . "'></a>";
+				$sid_dsbl_link .= "title='" . gettext("Force-disable this rule and remove it from current rules set.") . "'/>";
 			}
 			/* DESCRIPTION */
 			$alert_class = $fields[6];
@@ -573,6 +574,21 @@ if (file_exists("/var/log/suricata/suricata_{$if_real}{$suricata_uuid}/alerts.lo
 <?php
 include("fend.inc");
 ?>
+<script type="text/javascript">
+function encRuleSig(rulegid,rulesid,srcip,ruledescr) {
 
+	// This function stuffs the passed GID, SID
+	// and other values into hidden Form Fields
+	// for postback.
+	if (typeof srcipip == "undefined")
+		var srcipip = "";
+	if (typeof ruledescr == "undefined")
+		var ruledescr = "";
+	document.getElementById("sidid").value = rulesid;
+	document.getElementById("gen_id").value = rulegid;
+	document.getElementById("ip").value = srcip;
+	document.getElementById("descr").value = ruledescr;
+}
+</script>
 </body>
 </html>

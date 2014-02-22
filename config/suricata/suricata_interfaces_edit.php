@@ -40,7 +40,7 @@ if (!is_array($config['installedpackages']['suricata']['rule']))
 	$config['installedpackages']['suricata']['rule'] = array();
 $a_rule = &$config['installedpackages']['suricata']['rule'];
 
-if ($_GET['id'] && is_numeric($_POST['id']));
+if ($_GET['id'] && is_numeric($_GET['id']));
 	$id = htmlspecialchars($_GET['id'], ENT_QUOTES | ENT_HTML401);
 if ($_POST['id'] && is_numeric($_POST['id']))
 	$id = $_POST['id'];
