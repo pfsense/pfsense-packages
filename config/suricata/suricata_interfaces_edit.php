@@ -263,7 +263,7 @@ if ($_POST["Submit"]) {
 			$natent['libhtp_policy']['item'][] = $default;
 
 			// Enable the basic default rules for the interface
-			$natent['rulesets'] = "decoder-events.rules||files.rules||http-events.rules||smtp-events.rules||stream-events";
+			$natent['rulesets'] = "decoder-events.rules||files.rules||http-events.rules||smtp-events.rules||stream-events.rules";
 
 			// Adding a new interface, so set flag to build new rules
 			$rebuild_rules = true;
