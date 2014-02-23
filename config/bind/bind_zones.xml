@@ -126,7 +126,7 @@
 			<fieldname>name</fieldname>
 			<description><![CDATA[Enter the name for zone (ex:mydomain.com)<br>
 						For reverse zones, include zone ip in reverse order or following your provider instructions.(Ex: 1.168.192)<br>
-						IN-ADDR.ARPA will be automaticaly included on conf files when reveser zone option is checked.]]></description>
+						IN-ADDR.ARPA will be automaticaly included on conf files when reverse zone option is checked.]]></description>
 			<type>input</type>
 			<required/>
 		</field>
