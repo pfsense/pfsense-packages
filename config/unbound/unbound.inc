@@ -544,7 +544,7 @@ EOD;
 	// Set up forward-zones if configured
 	if ($unbound_config['forwarding_mode'] == "on") {
 		$dnsservers = array();
-		if (!isset($config['system']['dnsallowoverride'])) {
+		if (isset($config['system']['dnsallowoverride'])) {
 			$ns = array_unique(get_nameservers());
 			foreach($ns as $nameserver) {
 				if ($nameserver)
