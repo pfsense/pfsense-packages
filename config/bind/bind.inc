@@ -200,8 +200,8 @@ EOD;
 	if ($hide_version == on)
 		$bind_conf .="\t\tversion \"N/A\";\n"; 
 
-	$bind_conf .="\t\t$custom_options\n"; 
-	$bind_conf .= "\t};\n\n";
+	$bind_conf .= preg_replace("/^/m","\t\t",$custom_options); 
+	$bind_conf .= "\n\t};\n\n";
 	
 	if ($bind_logging == on){
 		//check if bind is included on syslog
