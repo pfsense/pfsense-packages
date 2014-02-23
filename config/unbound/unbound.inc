@@ -701,8 +701,6 @@ function unbound_validate($post, $type=null) {
 			$input_errors[] = "You must enter a valid number in 'Minimum TTL for RRsets and messages'.";
 		if(!is_numeric($post['infra_host_ttl']))
 				$input_errors[] = "You must enter a valid number in 'TTL for Host cache entries'.";
-		if(!is_numeric($post['infra_lame_ttl']))
-				$input_errors[] = "You must enter a valid number in 'TTL for lame delegation'.";
 		if(!is_numeric($post['infra_cache_numhosts']))
 				$input_errors[] = "You must enter a valid number in 'Number of Hosts to cache'.";
 
