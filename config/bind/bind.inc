@@ -209,8 +209,9 @@ EOD;
 		$restart_syslog=0;
 		foreach ($syslog_files as $syslog_file){
 			$syslog_file_data=file_get_contents($syslog_file);
-			if (!preg_match("/dnsmasq,named,filterdns/",$syslog_file_data)){
+			if ( !preg_match("/dnsmasq,named,filterdns/",$syslog_file_data) || !preg_match("/'dnsmasq','named','filterdns'/",$syslog_file_data) ) {
 				$syslog_file_data=preg_replace("/dnsmasq,filterdns/","dnsmasq,named,filterdns",$syslog_file_data);
+				$syslog_file_data=preg_replace("/'dnsmasq','filterdns'/","'dnsmasq','named','filterdns'",$syslog_file_data);
 				file_put_contents($syslog_file,$syslog_file_data);
 				$restart_syslog++;
 				}
