@@ -543,11 +543,6 @@ EOD;
 
 	// Set up forward-zones if configured
 	if ($unbound_config['forwarding_mode'] == "on") {
-		$unbound_conf .=<<<EOD
-forward-zone:
-	name: "."
-
-EOD;
 		$dnsservers = array();
 		if (!isset($config['system']['dnsallowoverride'])) {
 			$ns = array_unique(get_nameservers());
@@ -562,8 +557,16 @@ EOD;
 					$dnsservers[] = $nameserver;
 			}
 		}
-		foreach($dnsservers as $dnsserver)
+
+		if (!empty($dnsservers)) {
+			$unbound_conf .=<<<EOD
+forward-zone:
+	name: "."
+
+EOD;
+			foreach($dnsservers as $dnsserver)
 				$unbound_conf .= "\tforward-addr: $dnsserver\n";
+		}
 	}
 
 
