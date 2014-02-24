@@ -37,8 +37,8 @@
 		]]>
 	</copyright>
 	<name>mailreport</name>
-	<version>2.0.9</version>
-	<title>Status: Mail Reports</title>
+	<version>2.0.10</version>
+	<title>Status: Email Reports</title>
 	<additional_files_needed>
 		<prefix>/usr/local/bin/</prefix>
 		<chmod>0755</chmod>
@@ -81,8 +81,8 @@
 		<item>http://www.pfsense.com/packages/config/mailreport/status_mail_report_add_graph.php</item>
 	</additional_files_needed>
 	<menu>
-		<name>E-Mail Reports</name>
-		<tooltiptext>Setup periodic e-mail reports.</tooltiptext>
+		<name>Email Reports</name>
+		<tooltiptext>Setup periodic email reports.</tooltiptext>
 		<section>Status</section>
 		<url>/status_mail_report.php</url>
 	</menu>

@@ -34,8 +34,8 @@
 
 ##|+PRIV
 ##|*IDENT=page-status-mailreportsaddlog
-##|*NAME=Status: E-Mail Reports: Add Log page
-##|*DESCR=Allow access to the 'Status: E-Mail Reports: Add Log' page.
+##|*NAME=Status: Email Reports: Add Log page
+##|*DESCR=Allow access to the 'Status: Email Reports: Add Log' page.
 ##|*MATCH=status_mail_report_add_log.php*
 ##|-PRIV
 
@@ -95,7 +95,7 @@ if ($_POST) {
 }
 
 
-$pgtitle = array(gettext("Status"),gettext("Add Mail Report Log"));
+$pgtitle = array(gettext("Status"),gettext("Add Email Report Log"));
 include("head.inc");
 ?>
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">
