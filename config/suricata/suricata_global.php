@@ -28,7 +28,6 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-
 require_once("guiconfig.inc");
 require_once("/usr/local/pkg/suricata/suricata.inc");
 
@@ -59,7 +58,6 @@ if (empty($pconfig['suricataloglimitsize']))
 	// Set limit to 20% of slice that is unused */
 	$pconfig['suricataloglimitsize'] = round(exec('df -k /var | grep -v "Filesystem" | awk \'{print $4}\'') * .20 / 1024);
 
-
 if ($_POST['autoruleupdatetime']) {
 	if (!preg_match('/^([01]?[0-9]|2[0-3]):?([0-5][0-9])$/', $_POST['autoruleupdatetime']))
 		$input_errors[] = "Invalid Rule Update Start Time!  Please supply a value in 24-hour format as 'HH:MM'.";
@@ -73,7 +71,7 @@ if ($_POST['enable_etpro_rules'] == "on" && empty($_POST['etprocode']))
 
 /* if no errors move foward with save */
 if (!$input_errors) {
-	if ($_POST["Submit"]) {
+	if ($_POST["save"]) {
 
 		$config['installedpackages']['suricata']['config'][0]['enable_vrt_rules'] = $_POST['enable_vrt_rules'] ? 'on' : 'off';
 		$config['installedpackages']['suricata']['config'][0]['snortcommunityrules'] = $_POST['snortcommunityrules'] ? 'on' : 'off';
@@ -388,14 +386,10 @@ if ($input_errors)
 		>&nbsp;<?php echo gettext("Settings will not be removed during package deinstallation."); ?></td>
 </tr>
 <tr>
-	<td width="22%" valign="top">
-	<td width="78%">
-		<input name="Submit" type="submit" class="formbtn" value="Save" >
-	</td>
+	<td colspan="2" align="center"><input name="save" type="submit" class="formbtn" value="Save"/></td>
 </tr>
 <tr>
-	<td width="22%" valign="top">&nbsp;</td>
-	<td width="78%" class="vexpl"><span class="red"><strong><?php echo gettext("Note:");?></strong>&nbsp;
+	<td colspan="2" class="vexpl" align="center"><span class="red"><strong><?php echo gettext("Note:");?></strong>&nbsp;
 	</span><?php echo gettext("Changing any settings on this page will affect all Suricata-configured interfaces.");?></td>
 </tr>
 	</table>

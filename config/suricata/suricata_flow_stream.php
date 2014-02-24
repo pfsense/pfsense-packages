@@ -28,7 +28,6 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-
 require_once("guiconfig.inc");
 require_once("/usr/local/pkg/suricata/suricata.inc");
 
@@ -37,15 +36,18 @@ global $g, $rebuild_rules;
 $id = $_GET['id'];
 if (isset($_POST['id']))
 	$id = $_POST['id'];
-if (is_null($id)) {
-        header("Location: /suricata/suricata_interfaces.php");
-        exit;
-}
+if (is_null($id))
+	$id=0;
 
 if (!is_array($config['installedpackages']['suricata']))
 	$config['installedpackages']['suricata'] = array();
 if (!is_array($config['installedpackages']['suricata']['rule']))
 	$config['installedpackages']['suricata']['rule'] = array();
+
+// Initialize required array variables as necessary
+if (!is_array($config['aliases']['alias']))
+	$config['aliases']['alias'] = array();
+$a_aliases = $config['aliases']['alias'];
 
 // Initialize Host-OS Policy engine arrays if necessary
 if (!is_array($config['installedpackages']['suricata']['rule'][$id]['host_os_policy']['item']))
@@ -54,6 +56,12 @@ if (!is_array($config['installedpackages']['suricata']['rule'][$id]['host_os_pol
 $a_nat = &$config['installedpackages']['suricata']['rule'];
 
 $host_os_policy_engine_next_id = count($a_nat[$id]['host_os_policy']['item']);
+
+// Build a lookup array of currently used engine 'bind_to' Aliases 
+// so we can screen matching Alias names from the list.
+$used = array();
+foreach ($a_nat[$id]['host_os_policy']['item'] as $v)
+	$used[$v['bind_to']] = true;
 
 $pconfig = array();
 if (isset($id) && $a_nat[$id]) {
@@ -76,29 +84,32 @@ if (isset($id) && $a_nat[$id]) {
 		$pconfig['host_os_policy'] = $a_nat[$id]['host_os_policy'];
 }
 
-// Check for returned "selected alias" if action is import
-if ($_GET['act'] == "import" && isset($_GET['varname']) && !empty($_GET['varvalue'])) {
-		$pconfig[$_GET['varname']] = $_GET['varvalue'];
+// Check for "import alias mode" and set flag if TRUE
+if ($_POST['import_alias']) {
+	$importalias = true;
+	$title = "Host Operating System Policy";
 }
+else
+	$importalias = false;
 
-if ($_GET['act'] && isset($_GET['eng_id'])) {
-
+if ($_POST['add_os_policy']) {
+	header("Location: suricata_os_policy_engine.php?id={$id}&eng_id={$host_os_policy_engine_next_id}");
+	exit;
+}
+elseif ($_POST['del_os_policy']) {
 	$natent = array();
 	$natent = $pconfig;
 
-	if ($_GET['act'] == "del_host_os_policy")
-		unset($natent['host_os_policy']['item'][$_GET['eng_id']]);
-
+	if ($_POST['eng_id'] != "") {
+		unset($natent['host_os_policy']['item'][$_POST['eng_id']]);
+		$pconfig = $natent;
+	}
 	if (isset($id) && $a_nat[$id]) {
 		$a_nat[$id] = $natent;
 		write_config();
 	}
-
-	header("Location: /suricata/suricata_flow_stream.php?id=$id");
-	exit;
 }
-
-if ($_POST['ResetAll']) {
+elseif ($_POST['ResetAll']) {
 
 	/* Reset all the settings to defaults */
 	$pconfig['ip_max_frags'] = "65535";
@@ -143,7 +154,7 @@ if ($_POST['ResetAll']) {
 	/* Log a message at the top of the page to inform the user */
 	$savemsg = gettext("All flow and stream settings have been reset to their defaults.");
 }
-elseif ($_POST['Submit']) {
+elseif ($_POST['save']) {
 	$natent = array();
 	$natent = $pconfig;
 
@@ -211,6 +222,54 @@ elseif ($_POST['Submit']) {
 		exit;
 	}
 }
+elseif ($_POST['save_import_alias']) {
+	$engine = array( "name" => "", "bind_to" => "", "policy" => "bsd" );
+
+	// See if anything was checked to import
+	if (is_array($_POST['aliastoimport']) && count($_POST['aliastoimport']) > 0) {
+		foreach ($_POST['aliastoimport'] as $item) {
+			$engine['name'] = strtolower($item);
+			$engine['bind_to'] = $item;
+			$a_nat[$id]['host_os_policy']['item'][] = $engine;
+		}
+	}
+	else {
+		$input_errors[] = gettext("No entries were selected for import.  Please select one or more Aliases for import and click SAVE.");
+		$importalias = true;
+	}
+
+	// if no errors, write new entry to conf
+	if (!$input_errors) {
+		// Reorder the engine array to ensure the 
+		// 'bind_to=all' entry is at the bottom if 
+		// the array contains more than one entry.
+		if (count($a_nat[$id]['host_os_policy']['item']) > 1) {
+			$i = -1;
+			foreach ($a_nat[$id]['host_os_policy']['item'] as $f => $v) {
+				if ($v['bind_to'] == "all") {
+					$i = $f;
+					break;
+				}
+			}
+			// Only relocate the entry if we 
+			// found it, and it's not already 
+			// at the end.
+			if ($i > -1 && ($i < (count($a_nat[$id]['host_os_policy']['item']) - 1))) {
+				$tmp = $a_nat[$id]['host_os_policy']['item'][$i];
+				unset($a_nat[$id]['host_os_policy']['item'][$i]);
+				$a_nat[$id]['host_os_policy']['item'][] = $tmp;
+			}
+			$pconfig['host_os_policy']['item'] = $a_nat[$id]['host_os_policy']['item'];
+		}
+
+		// Write the new engine array to config file
+		write_config();
+		$importalias = false;
+	}
+}
+elseif ($_POST['cancel_import_alias']) {
+	$importalias = false;
+}
 
 $if_friendly = convert_friendly_interface_to_friendly_descr($pconfig['interface']);
 $pgtitle = gettext("Suricata: Interface {$if_friendly} - Flow and Stream");
@@ -218,29 +277,21 @@ include_once("head.inc");
 ?>
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">
 
-<?php include("fbegin.inc"); ?>
-<?php if($pfsense_stable == 'yes'){echo '<p class="pgtitle">' . $pgtitle . '</p>';}
+<?php include("fbegin.inc");
 
-
-	/* Display Alert message */
-
+	/* Display error or save message */
 	if ($input_errors) {
 		print_input_errors($input_errors); // TODO: add checks
 	}
-
 	if ($savemsg) {
 		print_info_box($savemsg);
 	}
-
 ?>
 
-<script type="text/javascript" src="/javascript/autosuggest.js">
-</script>
-<script type="text/javascript" src="/javascript/suggestions.js">
-</script>
+<form action="suricata_flow_stream.php" method="post" name="iform" id="iform">
+<input type="hidden" name="eng_id" id="eng_id" value=""/>
+<input type="hidden" name="id" id="id" value="<?=$id;?>"/>
 
-<form action="suricata_flow_stream.php" method="post"
-	enctype="multipart/form-data" name="iform" id="iform">
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
 <tr><td>
 <?php
@@ -248,7 +299,7 @@ include_once("head.inc");
 	$tab_array[] = array(gettext("Suricata Interfaces"), true, "/suricata/suricata_interfaces.php");
 	$tab_array[] = array(gettext("Global Settings"), false, "/suricata/suricata_global.php");
 	$tab_array[] = array(gettext("Update Rules"), false, "/suricata/suricata_download_updates.php");
-	$tab_array[] = array(gettext("Alerts"), false, "/suricata/suricata_alerts.php");
+	$tab_array[] = array(gettext("Alerts"), false, "/suricata/suricata_alerts.php?instance={$id}");
 	$tab_array[] = array(gettext("Suppress"), false, "/suricata/suricata_suppress.php");
 	$tab_array[] = array(gettext("Logs Browser"), false, "/suricata/suricata_logs_browser.php");
 	display_top_tabs($tab_array);
@@ -267,6 +318,11 @@ include_once("head.inc");
 ?>
 </td></tr>
 <tr><td><div id="mainarea">
+
+<?php if ($importalias) : ?>
+	<?php include("/usr/local/www/suricata/suricata_import_aliases.php"); ?>
+<?php else: ?>
+
 <table id="maintable" class="tabcont" width="100%" border="0" cellpadding="6" cellspacing="0">
 	<tr>
 		<td colspan="2" valign="top" class="listtopic"><?php echo gettext("Host-Specific Defrag and Stream Settings"); ?></td>
@@ -284,12 +340,10 @@ include_once("head.inc");
 				<tr>
 					<th class="listhdrr" axis="string"><?php echo gettext("Name");?></th>
 					<th class="listhdrr" axis="string"><?php echo gettext("Bind-To Address Alias");?></th>
-					<th class="list" align="right"><a href="suricata_import_aliases.php?id=<?=$id?>&eng=host_os_policy">
-					<img src="../themes/<?= $g['theme'];?>/images/icons/icon_import_alias.gif" width="17" 
-					height="17" border="0" title="<?php echo gettext("Import policy configuration from existing Aliases");?>"></a>
-					<a href="suricata_os_policy_engine.php?id=<?=$id?>&eng_id=<?=$host_os_policy_engine_next_id?>">
-					<img src="../themes/<?= $g['theme'];?>/images/icons/icon_plus.gif" width="17" 
-					height="17" border="0" title="<?php echo gettext("Add a new policy configuration");?>"></a></th>
+					<th class="list" align="right"><input type="image" name="import_alias[]" src="../themes/<?= $g['theme'];?>/images/icons/icon_import_alias.gif" width="17" 
+					height="17" border="0" title="<?php echo gettext("Import policy configuration from existing Aliases");?>"/>
+					<input type="image" name="add_os_policy[]" src="../themes/<?= $g['theme'];?>/images/icons/icon_plus.gif" width="17" 
+					height="17" border="0" title="<?php echo gettext("Add a new policy configuration");?>"/></th>
 				</tr>
 			   </thead>
 			<?php foreach ($pconfig['host_os_policy']['item'] as $f => $v): ?>
@@ -300,9 +354,9 @@ include_once("head.inc");
 					<img src="/themes/<?=$g['theme'];?>/images/icons/icon_e.gif"  
 					width="17" height="17" border="0" title="<?=gettext("Edit this policy configuration");?>"></a>
 			<?php if ($v['bind_to'] <> "all") : ?> 
-					<a href="suricata_flow_stream.php?id=<?=$id;?>&eng_id=<?=$f;?>&act=del_host_os_policy" onclick="return confirm('Are you sure you want to delete this entry?');">
-					<img src="/themes/<?=$g['theme'];?>/images/icons/icon_x.gif" width="17" height="17" border="0" 
-					title="<?=gettext("Delete this policy configuration");?>"></a>
+					<input type="image" name="del_os_policy[]" value="<?=$f;?>" onclick="document.getElementById('eng_id').value='<?=$f;?>';return confirm('Are you sure you want to delete this entry?');" 
+					src="/themes/<?=$g['theme'];?>/images/icons/icon_x.gif" width="17" height="17" border="0" 
+					title="<?=gettext("Delete this policy configuration");?>"/>
 			<?php else : ?>
 					<img src="/themes/<?=$g['theme'];?>/images/icons/icon_x_d.gif" width="17" height="17" border="0" 
 					title="<?=gettext("Default policy configuration cannot be deleted");?>">
@@ -314,7 +368,6 @@ include_once("head.inc");
 		</td>
 	</tr>
 	<tr>
-
 		<td colspan="2" valign="top" class="listtopic"><?php echo gettext("IP Defragmentation"); ?></td>
 	</tr>
 	<tr>
@@ -603,7 +656,7 @@ include_once("head.inc");
 	<tr>
 		<td width="22%" valign="top">&nbsp;</td>
 		<td width="78%">
-			<input name="Submit" type="submit" class="formbtn" value="Save" title="<?php echo 
+			<input name="save" type="submit" class="formbtn" value="Save" title="<?php echo 
 			gettext("Save flow and stream settings"); ?>">
 			<input name="id" type="hidden" value="<?=$id;?>">&nbsp;&nbsp;&nbsp;&nbsp;
 			<input name="ResetAll" type="submit" class="formbtn" value="Reset" title="<?php echo 
@@ -618,6 +671,9 @@ include_once("head.inc");
 			<?php echo gettext("may take several seconds.  Suricata must also be restarted to activate any changes made on this screen."); ?></td>
 	</tr>
 </table>
+
+<?php endif; ?>
+
 </div>
 </td></tr></table>
 </form>

@@ -44,10 +44,8 @@ if ($_GET['id'] && is_numeric($_GET['id']));
 	$id = htmlspecialchars($_GET['id'], ENT_QUOTES | ENT_HTML401);
 if ($_POST['id'] && is_numeric($_POST['id']))
 	$id = $_POST['id'];
-if (is_null($id)) {
-        header("Location: /suricata/suricata_interfaces.php");
-        exit;
-}
+if (is_null($id))
+	$id = 0;
 
 $pconfig = array();
 if (empty($suricataglob['rule'][$id]['uuid'])) {
@@ -128,7 +126,7 @@ if (empty($pconfig['max_pcap_log_size']))
 if (empty($pconfig['max_pcap_log_files']))
 	$pconfig['max_pcap_log_files'] = "1000";
 
-if ($_POST["Submit"]) {
+if ($_POST["save"]) {
 	if (!$_POST['interface'])
 		$input_errors[] = gettext("Choosing an Interface is mandatory!");
 
@@ -255,7 +253,7 @@ if ($_POST["Submit"]) {
 			$natent['libhtp_policy']['item'][] = $default;
 
 			// Enable the basic default rules for the interface
-			$natent['rulesets'] = "decoder-events.rules||files.rules||http-events.rules||smtp-events.rules||stream-events";
+			$natent['rulesets'] = "decoder-events.rules||files.rules||http-events.rules||smtp-events.rules||stream-events.rules";
 
 			// Adding a new interface, so set flag to build new rules
 			$rebuild_rules = true;
@@ -301,19 +299,14 @@ include_once("head.inc");
 
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">
 
-<?php include("fbegin.inc"); ?>
-
-<?if($pfsense_stable == 'yes'){echo '<p class="pgtitle">' . $pgtitle . '</p>';}?>
-
-<?php
-	/* Display Alert message */
-	if ($input_errors) {
-		print_input_errors($input_errors);
-	}
-
-	if ($savemsg) {
-		print_info_box($savemsg);
-	}
+<?php include("fbegin.inc");
+/* Display Alert message */
+if ($input_errors) {
+	print_input_errors($input_errors);
+}
+if ($savemsg) {
+	print_info_box($savemsg);
+}
 ?>
 
 <form action="suricata_interfaces_edit.php<?php echo "?id=$id";?>" method="post" name="iform" id="iform">
@@ -654,6 +647,7 @@ include_once("head.inc");
 			"setting at default.  Create an Alias for custom External Net settings."); ?><br/>
 		</td>
 	</tr>
+<!--
 	<tr>
 		<td width="22%" valign="top" class="vncell"><?php echo gettext("Whitelist"); ?></td>
 		<td width="78%" class="vtable">
@@ -682,6 +676,7 @@ include_once("head.inc");
 			"whitelist adds local networks, WAN IPs, Gateways, VPNs and VIPs.  Create an Alias to customize."); ?>
 		</td>
 	</tr>
+-->
 <tr>
 	<td colspan="2" class="listtopic"><?php echo gettext("Alert Suppression and Filtering"); ?></td>
 </tr>
@@ -723,15 +718,13 @@ include_once("head.inc");
 	</td>
 </tr>
 <tr>
-	<td width="22%" valign="top"></td>
-	<td width="78%"><input name="Submit" type="submit" class="formbtn" value="Save" title="<?php echo 
+	<td colspan="2" align="center" valign="middle"><input name="save" type="submit" class="formbtn" value="Save" title="<?php echo 
 			gettext("Click to save settings and exit"); ?>"/>
 			<input name="id" type="hidden" value="<?=$id;?>"/>
 	</td>
 </tr>
 <tr>
-	<td width="22%" valign="top">&nbsp;</td>
-	<td width="78%"><span class="vexpl"><span class="red"><strong><?php echo gettext("Note: ") . "</strong></span></span>" . 
+	<td colspan="2" align="center" valign="middle"><span class="vexpl"><span class="red"><strong><?php echo gettext("Note: ") . "</strong></span></span>" . 
 		gettext("Please save your settings before you attempt to start Suricata."); ?>	
 	</td>
 </tr>
@@ -849,11 +842,11 @@ function enable_change(enable_change) {
 	document.iform.alertsystemlog.disabled = endis;
 	document.iform.externallistname.disabled = endis;
 	document.iform.homelistname.disabled = endis;
-	document.iform.whitelistname.disabled=endis;
+//	document.iform.whitelistname.disabled=endis;
 	document.iform.suppresslistname.disabled = endis;
 	document.iform.configpassthru.disabled = endis;
 	document.iform.btnHomeNet.disabled=endis;
-	document.iform.btnWhitelist.disabled=endis;
+//	document.iform.btnWhitelist.disabled=endis;
 	document.iform.btnSuppressList.disabled=endis;
 }
 

@@ -43,10 +43,8 @@ $a_nat = &$config['installedpackages']['suricata']['rule'];
 $id = $_GET['id'];
 if (isset($_POST['id']))
 	$id = $_POST['id'];
-if (is_null($id)) {
-	header("Location: /suricata/suricata_interfaces.php");
-	exit;
-}
+if (is_null($id))
+	$id = 0;
 
 if (isset($id) && $a_nat[$id]) {
 	$pconfig['enable'] = $a_nat[$id]['enable'];
@@ -117,9 +115,7 @@ if ($a_nat[$id]['ips_policy_enable'] == 'on') {
 else
 	$disable_vrt_rules = "";
 
-/* alert file */
-if ($_POST["Submit"]) {
-
+if ($_POST["save"]) {
 	if ($_POST['ips_policy_enable'] == "on") {
 		$a_nat[$id]['ips_policy_enable'] = 'on';
 		$a_nat[$id]['ips_policy'] = $_POST['ips_policy'];
@@ -129,11 +125,12 @@ if ($_POST["Submit"]) {
 		unset($a_nat[$id]['ips_policy']);
 	}
 
-	$enabled_items = "";
+	// Always start with the default events and files rules
+	$enabled_items = "decoder-events.rules||files.rules||http-events.rules||smtp-events.rules||stream-events.rules";
 	if (is_array($_POST['toenable']))
-		$enabled_items = implode("||", $_POST['toenable']);
+		$enabled_items .= "||" . implode("||", $_POST['toenable']);
 	else
-		$enabled_items = $_POST['toenable'];
+		$enabled_items .=  "||{$_POST['toenable']}";
 
 	$a_nat[$id]['rulesets'] = $enabled_items;
 
@@ -155,12 +152,12 @@ if ($_POST["Submit"]) {
 	suricata_generate_yaml($a_nat[$id]);
 	$rebuild_rules = false;
 
-	header("Location: /suricata/suricata_rulesets.php?id=$id");
-	exit;
+	/* Signal Suricata to "live reload" the rules */
+	suricata_reload_config($a_nat[$id]);
 }
-
-if ($_POST['unselectall']) {
-	$a_nat[$id]['rulesets'] = "";
+elseif ($_POST['unselectall']) {
+	// Remove all but the default events and files rules
+	$a_nat[$id]['rulesets'] = "decoder-events.rules||files.rules||http-events.rules||smtp-events.rules||stream-events.rules";
 
 	if ($_POST['ips_policy_enable'] == "on") {
 		$a_nat[$id]['ips_policy_enable'] = 'on';
@@ -173,13 +170,10 @@ if ($_POST['unselectall']) {
 
 	write_config();
 	sync_suricata_package_config();
-
-	header("Location: /suricata/suricata_rulesets.php?id=$id");
-	exit;
 }
-
-if ($_POST['selectall']) {
-	$rulesets = array();
+elseif ($_POST['selectall']) {
+	// Start with the required default events and files rules
+	$rulesets = array( "decoder-events.rules", "files.rules", "http-events.rules", "smtp-events.rules", "stream-events.rules" );
 
 	if ($_POST['ips_policy_enable'] == "on") {
 		$a_nat[$id]['ips_policy_enable'] = 'on';
@@ -218,9 +212,6 @@ if ($_POST['selectall']) {
 
 	write_config();
 	sync_suricata_package_config();
-
-	header("Location: /suricata/suricata_rulesets.php?id=$id");
-	exit;
 }
 
 $enabled_rulesets_array = explode("||", $a_nat[$id]['rulesets']);
@@ -234,7 +225,6 @@ include_once("head.inc");
 
 <?php
 include("fbegin.inc"); 
-if($pfsense_stable == 'yes'){echo '<p class="pgtitle">' . $pgtitle . '</p>';}
 
 /* Display message */
 if ($input_errors) {
@@ -282,9 +272,8 @@ if ($savemsg) {
 	$isrulesfolderempty = glob("{$suricatadir}rules/*.rules");
 	$iscfgdirempty = array();
 	if (file_exists("{$suricatadir}suricata_{$suricata_uuid}_{$if_real}/rules/custom.rules"))
-		$iscfgdirempty = (array)("{$suricatadir}suricata_{$suricata_uuid}_{$if_real}/rules/custom.rules");
-	if (empty($isrulesfolderempty)):
-?>
+		$iscfgdirempty = (array)("{$suricatadir}suricata_{$suricata_uuid}_{$if_real}/rules/custom.rules"); ?>
+<?php if (empty($isrulesfolderempty)): ?>
 		<tr>
 			<td class="vexpl"><br/>
 		<?php printf(gettext("# The rules directory is empty:  %s%srules%s"), '<strong>',$suricatadir,'</strong>'); ?> <br/><br/>
@@ -294,14 +283,7 @@ if ($savemsg) {
 			'</strong></a>' . gettext(" tab."); ?>
 			</td>
 		</tr>
-<?php else: 
-	$colspan = 4;
-	if ($emergingdownload != 'on')
-		$colspan -= 2;
-	if ($snortdownload != 'on')
-		$colspan -= 2;
-
-?>
+<?php else: ?>
 		<tr>
 			<td>
 			<table width="100%" border="0"
@@ -393,7 +375,7 @@ if ($savemsg) {
 						<tr height="45px">
 							<td valign="middle"><input value="Select All" class="formbtns" type="submit" name="selectall" id="selectall" title="<?php echo gettext("Add all to enforcing rules"); ?>"/></td>
 							<td valign="middle"><input value="Unselect All" class="formbtns" type="submit" name="unselectall" id="unselectall" title="<?php echo gettext("Remove all from enforcing rules"); ?>"/></td>
-							<td valign="middle"><input value=" Save " class="formbtns" type="submit" name="Submit" id="Submit" title="<?php echo gettext("Save changes to enforcing rules and rebuild"); ?>"/></td>
+							<td valign="middle"><input value=" Save " class="formbtns" type="submit" name="save" id="save" title="<?php echo gettext("Save changes to enforcing rules and rebuild"); ?>"/></td>
 							<td valign="middle"><span class="vexpl"><?php echo gettext("Click to save changes and auto-resolve flowbit rules (if option is selected above)"); ?></span></td>
 						</tr>
 					</table>
@@ -531,7 +513,7 @@ if ($savemsg) {
 </tr>
 			<tr>
 				<td colspan="4" align="center" valign="middle">
-				<input value="Save" type="submit" name="Submit" id="Submit" class="formbtn" title=" <?php echo gettext("Click to Save changes and rebuild rules"); ?>"/></td>
+				<input value="Save" type="submit" name="save" id="save" class="formbtn" title=" <?php echo gettext("Click to Save changes and rebuild rules"); ?>"/></td>
 			</tr>
 <?php endif; ?>
 </table>
@@ -581,7 +563,7 @@ function enable_change()
  for (var i = 0; i < document.iform.elements.length; i++) {
     if (document.iform.elements[i].type == 'checkbox') {
        var str = document.iform.elements[i].value;
-       if (str.substr(0,6) == "suricata_")
+       if (str.substr(0,6) == "snort_")
           document.iform.elements[i].disabled = !(endis);
     }
  }

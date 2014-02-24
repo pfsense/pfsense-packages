@@ -27,7 +27,6 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-
 require_once("guiconfig.inc");
 require_once("/usr/local/pkg/suricata/suricata.inc");
 
@@ -35,23 +34,26 @@ global $g, $rebuild_rules;
 
 $suricatadir = SURICATADIR;
 $rules_map = array();
+$pconfig = array();
 
 if (!is_array($config['installedpackages']['suricata']['rule']))
 	$config['installedpackages']['suricata']['rule'] = array();
 $a_rule = &$config['installedpackages']['suricata']['rule'];
 
-if (is_numeric($_GET['id']))
+log_error(print_r($_POST, true));
+
+if ($_GET['id'])
 	$id = $_GET['id'];
-if (isset($_POST['id']))
+if ($_POST['id'])
 	$id = $_POST['id'];
 if (is_null($id)) {
-        header("Location: /suricata/suricata_interfaces.php");
-        exit;
+	$id = 0;
 }
 
 if (isset($id) && $a_rule[$id]) {
 	$pconfig['interface'] = $a_rule[$id]['interface'];
 	$pconfig['rulesets'] = $a_rule[$id]['rulesets'];
+	$pconfig['customrules'] = base64_decode($a_rule[$id]['customrules']);
 }
 
 function truncate($string, $length) {
@@ -110,7 +112,9 @@ $categories = explode("||", $pconfig['rulesets']);
 
 if ($_GET['openruleset'])
 	$currentruleset = htmlspecialchars($_GET['openruleset'], ENT_QUOTES | ENT_HTML401);
-else if ($_POST['openruleset'])
+elseif ($_POST['selectbox'])
+	$currentruleset = $_POST['selectbox'];
+elseif ($_POST['openruleset'])
 	$currentruleset = $_POST['openruleset'];
 else
 	$currentruleset = $categories[0];
@@ -147,13 +151,11 @@ if ($currentruleset != 'custom.rules') {
 $enablesid = suricata_load_sid_mods($a_rule[$id]['rule_sid_on']);
 $disablesid = suricata_load_sid_mods($a_rule[$id]['rule_sid_off']);
 
-if ($_GET['act'] == "toggle" && $_GET['ids'] && !empty($rules_map)) {
+if ($_POST['toggle'] && is_numeric($_POST['sid']) && is_numeric($_POST['gid']) && !empty($rules_map)) {
 
-	// Get the GID tag embedded in the clicked rule icon.
-	$gid = $_GET['gid'];
-
-	// Get the SID tag embedded in the clicked rule icon.
-	$sid= $_GET['ids'];
+	// Get the GID:SID tags embedded in the clicked rule icon.
+	$gid = $_POST['gid'];
+	$sid = $_POST['sid'];
 
 	// See if the target SID is in our list of modified SIDs,
 	// and toggle it back to default if present; otherwise,
@@ -197,11 +199,9 @@ if ($_GET['act'] == "toggle" && $_GET['ids'] && !empty($rules_map)) {
 	/* Update the config.xml file. */
 	write_config();
 
-	$_GET['openruleset'] = $currentruleset;
 	$anchor = "rule_{$gid}_{$sid}";
 }
-
-if ($_GET['act'] == "disable_all" && !empty($rules_map)) {
+elseif ($_POST['disable_all'] && !empty($rules_map)) {
 
 	// Mark all rules in the currently selected category "disabled".
 	foreach (array_keys($rules_map) as $k1) {
@@ -238,13 +238,8 @@ if ($_GET['act'] == "disable_all" && !empty($rules_map)) {
 		unset($a_rule[$id]['rule_sid_off']);
 
 	write_config();
-
-	$_GET['openruleset'] = $currentruleset;
-	header("Location: /suricata/suricata_rules.php?id={$id}&openruleset={$currentruleset}");
-	exit;
 }
-
-if ($_GET['act'] == "enable_all" && !empty($rules_map)) {
+elseif ($_POST['enable_all'] && !empty($rules_map)) {
 
 	// Mark all rules in the currently selected category "enabled".
 	foreach (array_keys($rules_map) as $k1) {
@@ -280,13 +275,8 @@ if ($_GET['act'] == "enable_all" && !empty($rules_map)) {
 		unset($a_rule[$id]['rule_sid_off']);
 
 	write_config();
-
-	$_GET['openruleset'] = $currentruleset;
-	header("Location: /suricata/suricata_rules.php?id={$id}&openruleset={$currentruleset}");
-	exit;
 }
-
-if ($_GET['act'] == "resetcategory" && !empty($rules_map)) {
+elseif ($_POST['resetcategory'] && !empty($rules_map)) {
 
 	// Reset any modified SIDs in the current rule category to their defaults.
 	foreach (array_keys($rules_map) as $k1) {
@@ -324,13 +314,8 @@ if ($_GET['act'] == "resetcategory" && !empty($rules_map)) {
 		unset($a_rule[$id]['rule_sid_off']);
 
 	write_config();
-
-	$_GET['openruleset'] = $currentruleset;
-	header("Location: /suricata/suricata_rules.php?id={$id}&openruleset={$currentruleset}");
-	exit;
 }
-
-if ($_GET['act'] == "resetall" && !empty($rules_map)) {
+elseif ($_POST['resetall'] && !empty($rules_map)) {
 
 	// Remove all modified SIDs from config.xml and save the changes.
 	unset($a_rule[$id]['rule_sid_on']);
@@ -338,23 +323,20 @@ if ($_GET['act'] == "resetall" && !empty($rules_map)) {
 
 	/* Update the config.xml file. */
 	write_config();
-
-	$_GET['openruleset'] = $currentruleset;
-	header("Location: /suricata/suricata_rules.php?id={$id}&openruleset={$currentruleset}");
-	exit;
 }
-
-if ($_POST['clear']) {
+elseif ($_POST['clear']) {
 	unset($a_rule[$id]['customrules']);
 	write_config();
 	$rebuild_rules = true;
 	suricata_generate_yaml($a_rule[$id]);
 	$rebuild_rules = false;
-	header("Location: /suricata/suricata_rules.php?id={$id}&openruleset={$currentruleset}");
-	exit;
+	$pconfig['customrules'] = '';
 }
-
-if ($_POST['customrules']) {
+elseif ($_POST['cancel']) {
+	$pconfig['customrules'] = base64_decode($a_rule[$id]['customrules']);
+}
+elseif ($_POST['save']) {
+	$pconfig['customrules'] = $_POST['customrules'];
 	if ($_POST['customrules'])
 		$a_rule[$id]['customrules'] = base64_encode($_POST['customrules']);
 	else
@@ -363,24 +345,21 @@ if ($_POST['customrules']) {
 	$rebuild_rules = true;
 	suricata_generate_yaml($a_rule[$id]);
 	$rebuild_rules = false;
-	$output = "";
-	$retcode = "";
-	exec("/usr/local/bin/suricata -T --init-errors-fatal -c {$suricatacfgdir}/suricata.yaml 2>&1", $output, $retcode);
-	if (intval($retcode) != 0) {
-		$error = "";
-		$start = count($output);
-		$end = $start - 4;
-		for($i = $start; $i > $end; $i--)
-			$error .= $output[$i];
-		$input_errors[] = "Custom rules have errors:\n {$error}";
-	}
-	else {
-		header("Location: /suricata/suricata_rules.php?id={$id}&openruleset={$currentruleset}");
-		exit;
-	}
+	/* Signal Suricata to "live reload" the rules */
+	suricata_reload_config($a_rule[$id]);
+//	$output = "";
+//	$retcode = "";
+//	exec("/usr/local/bin/suricata -T --init-errors-fatal -c {$suricatacfgdir}/suricata.yaml 2>&1", $output, $retcode);
+//	if (intval($retcode) != 0) {
+//		$error = "";
+//		$start = count($output);
+//		$end = $start - 4;
+//		for($i = $start; $i > $end; $i--)
+//			$error .= $output[$i];
+//		$input_errors[] = "Custom rules have errors:\n {$error}";
+//	}
 }
-
-else if ($_POST['apply']) {
+elseif ($_POST['apply']) {
 
 	/* Save new configuration */
 	write_config();
@@ -395,16 +374,6 @@ else if ($_POST['apply']) {
 
 	/* Signal Suricata to "live reload" the rules */
 	suricata_reload_config($a_rule[$id]);
-
-	/* Return to this same page */
-	header("Location: /suricata/suricata_rules.php?id={$id}&openruleset={$currentruleset}");
-	exit;
-}
-else if ($_POST['cancel']) {
-
-	/* Return to this same page */
-	header("Location: /suricata/suricata_rules.php?id={$id}");
-	exit;
 }
 
 require_once("guiconfig.inc");
@@ -417,9 +386,7 @@ $pgtitle = gettext("Suricata: Interface {$if_friendly} - Rules: {$currentruleset
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">
 <?php
 include("fbegin.inc");
-if ($pfsense_stable == 'yes'){echo '<p class="pgtitle">' . $pgtitle . '</p>';}
-
-/* Display message */
+/* Display error or save messages if present */
 if ($input_errors) {
         print_input_errors($input_errors); // TODO: add checks
 }
@@ -430,7 +397,11 @@ if ($savemsg) {
 
 ?>
 
-<form action="/suricata/suricata_rules.php" method="post" name="iform" id="iform">
+<form action='/suricata/suricata_rules.php' method='post' name='iform' id='iform'>
+<input type='hidden' name='id' id='id' value='<?=$id;?>'/>
+<input type='hidden' name='openruleset' id='openruleset' value='<?=$currentruleset;?>'/>
+<input type='hidden' name='sid' id='sid' value=''/>
+<input type='hidden' name='gid' id='gid' value=''/>
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
 	<tr><td>
 	<?php
@@ -461,31 +432,31 @@ if ($savemsg) {
 			<tr>
 				<td class="listtopic"><?php echo gettext("Available Rule Categories"); ?></td>
 			</tr>
-
 			<tr>
-				<td class="vncell" height="30px"><strong><?php echo gettext("Category:"); ?></strong>&nbsp;&nbsp;<select id="selectbox" name="selectbox" class="formselect" onChange="go()">
-					<option value='?id=<?=$id;?>&openruleset=custom.rules'>custom.rules</option>
+				<td class="vncell" height="30px"><strong><?php echo gettext("Category:"); ?></strong>&nbsp;&nbsp;
+					<select id="selectbox" name="selectbox" class="formselect" onChange="go();">
+					<option value='custom.rules'>custom.rules</option>
 					<?php
-					$files = explode("||", $pconfig['rulesets']);
-					if ($a_rule[$id]['ips_policy_enable'] == 'on')
-						$files[] = "IPS Policy - " . ucfirst($a_rule[$id]['ips_policy']);
-					if ($a_rule[$id]['autoflowbitrules'] == 'on')
-						$files[] = "Auto-Flowbit Rules";
-					natcasesort($files);
-					foreach ($files as $value) {
-						if ($snortdownload != 'on' && substr($value, 0, mb_strlen(VRT_FILE_PREFIX)) == VRT_FILE_PREFIX)
-							continue;
-						if ($emergingdownload != 'on' && substr($value, 0, mb_strlen(ET_OPEN_FILE_PREFIX)) == ET_OPEN_FILE_PREFIX)
-							continue;
-						if ($etpro != 'on' && substr($value, 0, mb_strlen(ET_PRO_FILE_PREFIX)) == ET_PRO_FILE_PREFIX)
-							continue;
-						if (empty($value))
-							continue;
-						echo "<option value='?id={$id}&openruleset={$value}' ";
-						if ($value == $currentruleset)
-							echo "selected";
-						echo ">{$value}</option>\n";
-						}
+						$files = explode("||", $pconfig['rulesets']);
+						if ($a_rule[$id]['ips_policy_enable'] == 'on')
+							$files[] = "IPS Policy - " . ucfirst($a_rule[$id]['ips_policy']);
+						if ($a_rule[$id]['autoflowbitrules'] == 'on')
+							$files[] = "Auto-Flowbit Rules";
+						natcasesort($files);
+						foreach ($files as $value) {
+							if ($snortdownload != 'on' && substr($value, 0, mb_strlen(VRT_FILE_PREFIX)) == VRT_FILE_PREFIX)
+								continue;
+							if ($emergingdownload != 'on' && substr($value, 0, mb_strlen(ET_OPEN_FILE_PREFIX)) == ET_OPEN_FILE_PREFIX)
+								continue;
+							if ($etpro != 'on' && substr($value, 0, mb_strlen(ET_PRO_FILE_PREFIX)) == ET_PRO_FILE_PREFIX)
+								continue;
+							if (empty($value))
+								continue;
+							echo "<option value='{$value}' ";
+							if ($value == $currentruleset)
+								echo "selected";
+							echo ">{$value}</option>\n";
+							}
 					?>
 					</select>&nbsp;&nbsp;&nbsp;<?php echo gettext("Select the rule category to view"); ?>
 				</td>
@@ -497,15 +468,13 @@ if ($savemsg) {
 			</tr>
 			<tr>
 				<td valign="top" class="vtable">
-					<input type='hidden' name='openruleset' value='custom.rules'>
-					<input type='hidden' name='id' value='<?=$id;?>'>
 					<textarea wrap="soft" cols="90" rows="40" name="customrules"><?=$pconfig['customrules'];?></textarea>
 				</td>
 			</tr>
 			<tr>
 				<td>
-					<input name="Submit" type="submit" class="formbtn" id="submit" value="<?php echo gettext(" Save "); ?>" title=" <?php echo gettext("Save custom rules"); ?>"/>&nbsp;&nbsp;
-					<input name="cancel" type="submit" class="formbtn" id="cancel" value="<?php echo gettext("Cancel"); ?>" title="<?php echo gettext("Cancel changes and return to last page"); ?>"/>&nbsp;&nbsp;
+					<input name="save" type="submit" class="formbtn" id="save" value="<?php echo gettext(" Save "); ?>" title=" <?php echo gettext("Save custom rules"); ?>"/>&nbsp;&nbsp;
+					<input name="cancel" type="submit" class="formbtn" id="cancel" value="<?php echo gettext("Cancel"); ?>" title="<?php echo gettext("Cancel all changes made prior to last save"); ?>"/>&nbsp;&nbsp;
 					<input name="clear" type="submit" class="formbtn" id="clear" value="<?php echo gettext("Clear"); ?>" onclick="return confirm('<?php echo gettext("This will erase all custom rules for the interface.  Are you sure?"); ?>')" title="<?php echo gettext("Deletes all custom rules"); ?>"/>
 				</td>
 			</tr>
@@ -518,43 +487,40 @@ if ($savemsg) {
 					<table width="100%" align="center" border="0" cellpadding="0" cellspacing="0">
 						<tr>
 							<td rowspan="5" width="48%" valign="middle"><input type="submit" name="apply" id="apply" value="<?php echo gettext("Apply"); ?>" class="formbtn" 
-							title="<?php echo gettext("Click to rebuild the rules with your changes"); ?>"/>
-							<input type='hidden' name='id' value='<?=$id;?>'/>
-							<input type='hidden' name='openruleset' value='<?=$currentruleset;?>'/><br/><br/>
+							title="<?php echo gettext("Click to rebuild the rules with your changes"); ?>"/><br/><br/>
 							<span class="vexpl"><span class="red"><strong><?php echo gettext("Note: ") . "</strong></span>" . 
 							gettext("Suricata must be restarted to activate any SID enable/disable changes made on this tab."); ?></span></td>
-							<td class="vexpl" valign="middle"><?php echo "<a href='?id={$id}&openruleset={$currentruleset}&act=resetcategory'>
-							<img src=\"../themes/{$g['theme']}/images/icons/icon_x.gif\" width=\"15\" height=\"15\" 
+							<td class="vexpl" valign="middle"><?php echo "<input type='image' name='resetcategory[]' 
+							src=\"../themes/{$g['theme']}/images/icons/icon_x.gif\" width=\"15\" height=\"15\" 
 							onmouseout='this.src=\"../themes/{$g['theme']}/images/icons/icon_x.gif\"' 
 							onmouseover='this.src=\"../themes/{$g['theme']}/images/icons/icon_x_mo.gif\"' border='0' 
-							title='" . gettext("Click to remove enable/disable changes for rules in the selected category only") . "'></a>"?>
+							title='" . gettext("Click to remove enable/disable changes for rules in the selected category only") . "'/>"?>
 							&nbsp;&nbsp;<?php echo gettext("Remove Enable/Disable changes in the current Category"); ?></td>
 						</tr>
 						<tr>
-							<td class="vexpl" valign="middle"><?php echo "<a href='?id={$id}&openruleset={$currentruleset}&act=resetall'> 
-							<img src=\"../themes/{$g['theme']}/images/icons/icon_x.gif\" width=\"15\" height=\"15\" 
+							<td class="vexpl" valign="middle"><?php echo "<input type='image' name='resetall[]'  
+							src=\"../themes/{$g['theme']}/images/icons/icon_x.gif\" width=\"15\" height=\"15\" 
 							onmouseout='this.src=\"../themes/{$g['theme']}/images/icons/icon_x.gif\"' 
 							onmouseover='this.src=\"../themes/{$g['theme']}/images/icons/icon_x_mo.gif\"' border='0' 
-							title='" . gettext("Click to remove all enable/disable changes for rules in all categories") . "'></a>"?>
+							title='" . gettext("Click to remove all enable/disable changes for rules in all categories") . "'/>"?>
 							&nbsp;&nbsp;<?php echo gettext("Remove all Enable/Disable changes in all Categories"); ?></td>
 						</tr>
 						<tr>
-							<td class="vexpl" valign="middle"><?php echo "<a href='?id={$id}&openruleset={$currentruleset}&act=disable_all'> 
-							<img src=\"../themes/{$g['theme']}/images/icons/icon_x.gif\" width=\"15\" height=\"15\" 
+							<td class="vexpl" valign="middle"><?php echo "<input type='image' name='disable_all[]'  
+							src=\"../themes/{$g['theme']}/images/icons/icon_x.gif\" width=\"15\" height=\"15\" 
 							onmouseout='this.src=\"../themes/{$g['theme']}/images/icons/icon_x.gif\"' 
 							onmouseover='this.src=\"../themes/{$g['theme']}/images/icons/icon_x_mo.gif\"' border='0' 
-							title='" . gettext("Click to disable all rules in the selected category") . "'></a>"?>
+							title='" . gettext("Click to disable all rules in the selected category") . "'/>"?>
 							&nbsp;&nbsp;<?php echo gettext("Disable all rules in the current Category"); ?></td>
 						</tr>
 						<tr>
-							<td class="vexpl" valign="middle"><?php echo "<a href='?id={$id}&openruleset={$currentruleset}&act=enable_all'> 
-							<img src=\"../themes/{$g['theme']}/images/icons/icon_plus.gif\" width=\"15\" height=\"15\" 
+							<td class="vexpl" valign="middle"><?php echo "<input type='image' name='enable_all[]'  
+							src=\"../themes/{$g['theme']}/images/icons/icon_plus.gif\" width=\"15\" height=\"15\" 
 							onmouseout='this.src=\"../themes/{$g['theme']}/images/icons/icon_plus.gif\"' 
 							onmouseover='this.src=\"../themes/{$g['theme']}/images/icons/icon_plus_mo.gif\"' border='0' 
-							title='" . gettext("Click to enable all rules in the selected category") . "'></a>"?>
+							title='" . gettext("Click to enable all rules in the selected category") . "'/>"?>
 							&nbsp;&nbsp;<?php echo gettext("Enable all rules in the current Category"); ?></td>
 						</tr>
-
 						<tr>
 							<td class="vexpl" valign="middle"><a href="javascript: void(0)" 
 							onclick="wopen('suricata_rules_edit.php?id=<?=$id;?>&openruleset=<?=$currentruleset;?>','FileViewer',800,600)">
@@ -564,7 +530,6 @@ if ($savemsg) {
 							title="<?php echo gettext("Click to view full text of all the category rules"); ?>" width="17" height="17" border="0"></a>
 							&nbsp;&nbsp;<?php echo gettext("View full file contents for the current Category"); ?></td>
 						</tr>
-
 						<?php if ($currentruleset == 'Auto-Flowbit Rules'): ?>
 						<tr>
 							<td colspan="3">&nbsp;</td>
@@ -579,7 +544,6 @@ if ($savemsg) {
 					</table>
 				</td>
 			</tr>
-
 			<tr>
 				<td class="listtopic"><?php echo gettext("Selected Category's Rules"); ?></td>
 			</tr>
@@ -587,7 +551,7 @@ if ($savemsg) {
 				<td>
 					<table id="myTable" class="sortable" style="table-layout: fixed;" width="100%" border="0" cellpadding="0" cellspacing="0">
 						<colgroup>
-							<col width="14" align="left" valign="middle">
+							<col width="20" align="left" valign="middle">
 							<col width="6%" align="center" axis="number">
 							<col width="8%" align="center" axis="number">
 							<col width="54" align="center" axis="string">
@@ -668,11 +632,11 @@ if ($savemsg) {
 								$message = suricata_get_msg($v['rule']);
 								$sid_tooltip = gettext("View the raw text for this rule");
 
-						echo "<tr><td class=\"listt\" align=\"left\" valign=\"middle\">{$textss}
-								<a href='?id={$id}&openruleset={$currentruleset}&act=toggle&ids={$sid}'>
-								<img src=\"../themes/{$g['theme']}/images/icons/{$iconb}\"
-								width=\"11\" height=\"11\" border=\"0\"  
-								title='{$title}' id=\"rule_{$gid}_{$sid}\"></a>{$textse}
+						echo "<tr><td class=\"listt\" align=\"left\" valign=\"middle\" sorttable_customkey=\"\">{$textss}
+								<input type=\"image\" onClick=\"document.getElementById('sid').value='{$sid}';
+								document.getElementById('gid').value='{$gid}';\" 
+								src=\"../themes/{$g['theme']}/images/icons/{$iconb}\" width=\"11\" height=\"11\" border=\"0\"  
+								title='{$title}' name=\"toggle[]\"/>{$textse}
 							       </td>
 							       <td class=\"listlr\" align=\"center\" style=\"font-size: 10px;\">
 									{$textss}{$gid}{$textse}
@@ -753,15 +717,14 @@ if ($savemsg) {
 	</tr>
 </table>
 </form>
-<?php include("fend.inc"); ?>
-
 <script language="javascript" type="text/javascript">
 function go()
 {
-    var box = document.iform.selectbox;
-    destination = box.options[box.selectedIndex].value;
-    if (destination) 
-		location.href = destination;
+    var box = document.getElementById("selectbox");
+    var ruleset = box.options[box.selectedIndex].value;
+    if (ruleset) 
+	document.getElementById("openruleset").value = ruleset;
+    document.getElementById("iform").submit();
 }
 
 function wopen(url, name, w, h)
@@ -785,7 +748,8 @@ function wopen(url, name, w, h)
     window.scrollBy(0,-60); 
 
 <?php endif;?>
-
 </script>
+<?php include("fend.inc"); ?>
+
 </body>
 </html>

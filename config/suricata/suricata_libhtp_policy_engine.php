@@ -43,6 +43,10 @@ if (is_null($id)) {
  	header("Location: /suricata/suricata_interfaces.php");
 	exit;
 }
+if (is_null($eng_id)) {
+ 	header("Location: /suricata/suricata_app_parsers.php?id={$id}");
+	exit;
+}
 
 if (!is_array($config['installedpackages']['suricata']['rule']))
 	$config['installedpackages']['suricata']['rule'] = array();
@@ -71,7 +75,7 @@ else {
 		$pconfig['personality'] = "IDS";
 }
 
-if ($_POST['Cancel']) {
+if ($_POST['cancel']) {
 	header("Location: /suricata/suricata_app_parsers.php?id={$id}");
 	exit;
 }
@@ -82,7 +86,7 @@ if ($_GET['act'] == "import") {
 		$pconfig[$_GET['varname']] = $_GET['varvalue'];
 }
 
-if ($_POST['Submit']) {
+if ($_POST['save']) {
 
 	/* Grab all the POST values and save in new temp array */
 	$engine = array();
@@ -279,10 +283,10 @@ if ($savemsg)
 	<tr>
 		<td width="22%" valign="bottom">&nbsp;</td>
 		<td width="78%" valign="bottom">
-			<input name="Submit" id="submit" type="submit" class="formbtn" value=" Save " title="<?php echo 
+			<input name="save" id="save" type="submit" class="formbtn" value=" Save " title="<?php echo 
 			gettext("Save web server policy engine settings and return to App Parsers tab"); ?>">
 			&nbsp;&nbsp;&nbsp;&nbsp;
-			<input name="Cancel" id="cancel" type="submit" class="formbtn" value="Cancel" title="<?php echo 
+			<input name="cancel" id="cancel" type="submit" class="formbtn" value="Cancel" title="<?php echo 
 			gettext("Cancel changes and return to App Parsers tab"); ?>"></td>
 	</tr>
 </table>

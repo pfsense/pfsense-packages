@@ -91,6 +91,9 @@ if ($_POST['view']&& $suricata_rules_upd_log_chk == 'yes') {
 		$input_errors[] = gettext("Unable to read log file: {$suricata_rules_upd_log}");
 }
 
+if ($_POST['hide'])
+	$contents = "";
+
 $pgtitle = gettext("Suricata: Update Rules Set Files");
 include_once("head.inc");
 ?>
@@ -174,15 +177,20 @@ include_once("head.inc");
 				<td align="center" valign="middle" class="vexpl">
 					<?php if ($suricata_rules_upd_log_chk == 'yes'): ?>
 						<br/>
+					<?php if (!empty($contents)): ?>
+						<input type="submit" value="<?php echo gettext("Hide Log"); ?>" name="hide" id="hide" class="formbtn" 
+						title="<?php echo gettext("Hide rules update log"); ?>"/>
+					<?php else: ?>
 						<input type="submit" value="<?php echo gettext("View Log"); ?>" name="view" id="view" class="formbtn" 
-						title="<?php echo gettext("View rules update log contents"); ?>"/>
-						&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+						title="<?php echo gettext("View rules update log"); ?>"/>
+					<?php endif; ?>
+						&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 						<input type="submit" value="<?php echo gettext("Clear Log"); ?>" name="clear" id="clear" class="formbtn" 
-						title="<?php echo gettext("Clear rules update log contents"); ?>" onClick="return confirm('Are you sure?\nOK to confirm, or CANCEL to quit');"/>
+						title="<?php echo gettext("Clear rules update log"); ?>" onClick="return confirm('Are you sure?\nOK to confirm, or CANCEL to quit');"/>
 						<br/>
 					<?php else: ?>
 						<br/>
-						<button disabled='disabled'><?php echo gettext("View Log"); ?></button>&nbsp;&nbsp;&nbsp;<?php echo gettext("Log is empty."); ?><br/>
+						<button disabled='disabled'><?php echo gettext("View Log"); ?></button><br/><?php echo gettext("Log is empty."); ?><br/>
 					<?php endif; ?>
 					<br/><?php echo gettext("The log file is limited to 1024K in size and automatically clears when the limit is exceeded."); ?><br/><br/>
 				</td>
@@ -201,7 +209,7 @@ include_once("head.inc");
 			<?php endif; ?>
 			<tr>
 				<td align="center">
-					<span class="vexpl"><br/><br/>
+					<span class="vexpl"><br/>
 					<span class="red"><b><?php echo gettext("NOTE:"); ?></b></span>
 					&nbsp;&nbsp;<a href="http://www.snort.org/" target="_blank"><?php echo gettext("Snort.org") . "</a>" . 
 					gettext(" and ") . "<a href=\"http://www.emergingthreats.net/\" target=\"_blank\">" . gettext("EmergingThreats.net") . "</a>" . 
