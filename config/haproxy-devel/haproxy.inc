@@ -898,7 +898,7 @@ function haproxy_writeconf($configpath) {
 			$default_backend = "";
 			$i = 0;
 			foreach ($bind['config'] as $frontend) {
-				$a_acl = &get_frontend_acls($frontend);
+				$a_acl = get_frontend_acls($frontend);
 
 				$poolname = $frontend['backend_serverpool'] . "_" . strtolower($frontend['type']);
 
