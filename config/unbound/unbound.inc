@@ -572,11 +572,10 @@ EOD;
 
 	# Handle custom options
 	if (!empty($adv_config['custom_options'])) {
-		$custom_options = explode(";", ($unbound_config['custom_options']));
+		$custom_options = explode(";", ($adv_config['custom_options']));
 		$unbound_conf .= "\n# Unbound Custom options\n";
-		foreach ($custom_options as $ent) {
+		foreach ($custom_options as $ent)
 			$unbound_conf .= $ent."\n";
-		}
 	}
 
 	$unbound_conf .= <<<EOD
