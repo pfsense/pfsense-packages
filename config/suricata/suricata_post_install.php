@@ -87,6 +87,17 @@ if ($config['installedpackages']['suricata']['config'][0]['forcekeepsettings'] =
 	foreach ($suriconf as $value) {
 		$if_real = get_real_interface($value['interface']);
 
+		// ## BETA pkg bug fix-up -- be sure default rules enabled ##
+		$rules = explode("||", $value['rulesets']);
+		foreach (array( "decoder-events.rules", "files.rules", "http-events.rules", "smtp-events.rules", "stream-events.rules" ) as $r){
+			if (!in_array($r, $rules))
+				$rules[] = $r;
+		}
+		natcasesort($rules);
+		$value['rulesets'] = implode("||", $rules);
+		write_config();
+		// ## end of BETA pkg bug fix-up ##
+
 		// create a suricata.yaml file for interface
 		suricata_generate_yaml($value);
 
