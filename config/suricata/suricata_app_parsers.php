@@ -60,7 +60,7 @@ $libhtp_engine_next_id = count($a_nat[$id]['libhtp_policy']['item']);
 // Build a lookup array of currently used engine 'bind_to' Aliases 
 // so we can screen matching Alias names from the list.
 $used = array();
-foreach ($a_nat[$id]['host_os_policy']['item'] as $v)
+foreach ($a_nat[$id]['libhtp_policy']['item'] as $v)
 	$used[$v['bind_to']] = true;
 
 $pconfig = array();
@@ -86,17 +86,125 @@ if (isset($id) && $a_nat[$id]) {
 		$pconfig['libhtp_policy'] = $a_nat[$id]['libhtp_policy'];
 }
 
-// Check for "import alias mode" and set flag if TRUE
+// Check for "import or select alias mode" and set flags if TRUE.
+// "selectalias", when true, displays radio buttons to limit
+// multiple selections.
 if ($_POST['import_alias']) {
 	$importalias = true;
+	$selectalias = false;
 	$title = "HTTP Server Policy";
 }
-else
-	$importalias = false;
+elseif ($_POST['select_alias']) {
+	$importalias = true;
+	$selectalias = true;
+	$title = "HTTP Server Policy";
 
-if ($_POST['add_libhtp_policy']) {
-	header("Location: suricata_libhtp_policy_engine.php?id={$id}&eng_id={$libhtp_engine_next_id}");
-	exit;
+	// Preserve current Libhtp Policy Engine settings
+	$eng_id = $_POST['eng_id'];
+	$eng_name = $_POST['policy_name'];
+	$eng_bind = $_POST['policy_bind_to'];
+	$eng_personality = $_POST['personality'];
+	$eng_req_body_limit = $_POST['req_body_limit'];
+	$eng_resp_body_limit = $_POST['resp_body_limit'];
+	$eng_enable_double_decode_path = $_POST['enable_double_decode_path'];
+	$eng_enable_double_decode_query = $_POST['enable_double_decode_query'];
+	$mode = "add_edit_libhtp_policy";
+}
+if ($_POST['save_libhtp_policy']) {
+	if ($_POST['eng_id'] != "") {
+		$eng_id = $_POST['eng_id'];
+
+		// Grab all the POST values and save in new temp array
+		$engine = array();
+		$policy_name = trim($_POST['policy_name']);
+		if ($policy_name) { 
+			$engine['name'] = $policy_name;
+		}
+		else
+			$input_errors[] = gettext("The 'Policy Name' value cannot be blank.");
+
+		if ($_POST['policy_bind_to']) {
+			if (is_alias($_POST['policy_bind_to']))
+				$engine['bind_to'] = $_POST['policy_bind_to'];
+			elseif (strtolower(trim($_POST['policy_bind_to'])) == "all")
+				$engine['bind_to'] = "all";
+			else
+				$input_errors[] = gettext("You must provide a valid Alias or the reserved keyword 'all' for the 'Bind-To IP Address' value.");
+		}
+		else
+			$input_errors[] = gettext("The 'Bind-To IP Address' value cannot be blank.  Provide a valid Alias or the reserved keyword 'all'.");
+
+		if ($_POST['personality']) { $engine['personality'] = $_POST['personality']; } else { $engine['personality'] = "bsd"; }
+
+		if (is_numeric($_POST['req_body_limit']) && $_POST['req_body_limit'] >= 0)
+			$engine['request-body-limit'] = $_POST['req_body_limit'];
+		else
+			$input_errors[] = gettext("The value for 'Request Body Limit' must be all numbers and greater than or equal to zero.");
+
+		if (is_numeric($_POST['resp_body_limit']) && $_POST['resp_body_limit'] >= 0)
+			$engine['response-body-limit'] = $_POST['resp_body_limit'];
+		else
+			$input_errors[] = gettext("The value for 'Response Body Limit' must be all numbers and greater than or equal to zero.");
+
+		if ($_POST['enable_double_decode_path']) { $engine['double-decode-path'] = 'yes'; }else{ $engine['double-decode-path'] = 'no'; }
+		if ($_POST['enable_double_decode_query']) { $engine['double-decode-query'] = 'yes'; }else{ $engine['double-decode-query'] = 'no'; }
+
+		// Can only have one "all" Bind_To address
+		if ($engine['bind_to'] == "all" && $engine['name'] <> "default")
+			$input_errors[] = gettext("Only one default OS-Policy Engine can be bound to all addresses.");
+
+		// if no errors, write new entry to conf
+		if (!$input_errors) {
+			if (isset($eng_id) && $a_nat[$id]['libhtp_policy']['item'][$eng_id]) {
+				$a_nat[$id]['libhtp_policy']['item'][$eng_id] = $engine;
+			}
+			else
+				$a_nat[$id]['libhtp_policy']['item'][] = $engine;
+
+			/* Reorder the engine array to ensure the */
+			/* 'bind_to=all' entry is at the bottom   */
+			/* if it contains more than one entry.    */
+			if (count($a_nat[$id]['libhtp_policy']['item']) > 1) {
+				$i = -1;
+				foreach ($a_nat[$id]['libhtp_policy']['item'] as $f => $v) {
+					if ($v['bind_to'] == "all") {
+						$i = $f;
+						break;
+					}
+				}
+				/* Only relocate the entry if we  */
+				/* found it, and it's not already */
+				/* at the end.                    */
+				if ($i > -1 && ($i < (count($a_nat[$id]['libhtp_policy']['item']) - 1))) {
+					$tmp = $a_nat[$id]['libhtp_policy']['item'][$i];
+					unset($a_nat[$id]['libhtp_policy']['item'][$i]);
+					$a_nat[$id]['libhtp_policy']['item'][] = $tmp;
+				}
+			}
+
+			// Now write the new engine array to conf
+			write_config();
+			$pconfig['libhtp_policy']['item'] = $a_nat[$id]['libhtp_policy']['item'];
+		}
+		else {
+			$add_edit_libhtp_policy = true;
+			$pengcfg = $engine;
+		}
+	}	
+}
+elseif ($_POST['add_libhtp_policy']) {
+	$add_edit_libhtp_policy = true;
+	$pengcfg = array( "name" => "engine_{$libhtp_engine_next_id}", "bind_to" => "", "personality" => "IDS", 
+			  "request-body-limit" => "4096", "response-body-limit" => "4096", 
+			  "double-decode-path" => "no", "double-decode-query" => "no" );
+	$eng_id = $libhtp_engine_next_id;
+}
+elseif ($_POST['edit_libhtp_policy']) {
+	if ($_POST['eng_id'] != "") {
+		$add_edit_libhtp_policy = true;
+		$eng_id = $_POST['eng_id'];
+		$pengcfg = $a_nat[$id]['libhtp_policy']['item'][$eng_id];
+	}
 }
 elseif ($_POST['del_libhtp_policy']) {
 	$natent = array();
@@ -111,6 +219,9 @@ elseif ($_POST['del_libhtp_policy']) {
 		write_config();
 	}
 }
+elseif ($_POST['cancel_libhtp_policy']) {
+	$add_edit_libhtp_policy = false;
+}
 elseif ($_POST['ResetAll']) {
 
 	/* Reset all the settings to defaults */
@@ -120,54 +231,108 @@ elseif ($_POST['ResetAll']) {
 	$savemsg = gettext("All flow and stream settings have been reset to their defaults.");
 }
 elseif ($_POST['save_import_alias']) {
-	$engine = array( "name" => "", "bind_to" => "", "personality" => "IDS", 
-			 "request-body-limit" => "4096", "response-body-limit" => "4096", 
-			 "double-decode-path" => "no", "double-decode-query" => "no" );
+	// If saving out of "select alias" mode,
+	// then return to Libhtp Policy Engine edit
+	// page.
+	if ($_POST['mode'] == 'add_edit_libhtp_policy') {
+		$pengcfg = array();
+		$eng_id = $_POST['eng_id'];
+		$pengcfg['name'] = $_POST['eng_name'];
+		$pengcfg['bind_to'] = $_POST['eng_bind'];
+		$pengcfg['personality'] = $_POST['eng_personality'];
+		$pengcfg['request-body-limit'] = $_POST['eng_req_body_limit'];
+		$pengcfg['response-body-limit'] = $_POST['eng_resp_body_limit'];
+		$pengcfg['double-decode-path'] = $_POST['eng_enable_double_decode_path'];
+		$pengcfg['double-decode-query'] = $_POST['eng_enable_double_decode_query'];
+		$add_edit_libhtp_policy = true;
+		$mode = "add_edit_libhtp_policy";
 
-	// See if anything was checked to import
-	if (is_array($_POST['aliastoimport']) && count($_POST['aliastoimport']) > 0) {
-		foreach ($_POST['aliastoimport'] as $item) {
-			$engine['name'] = strtolower($item);
-			$engine['bind_to'] = $item;
-			$a_nat[$id]['libhtp_policy']['item'][] = $engine;
+		if (is_array($_POST['aliastoimport']) && count($_POST['aliastoimport']) == 1) {
+			$pengcfg['bind_to'] = $_POST['aliastoimport'][0];
+			$importalias = false;
+			$selectalias = false;
+		}
+		else {
+			$input_errors[] = gettext("No Alias is selected for import.  Nothing to SAVE.");
+			$importalias = true;
+			$selectalias = true;
+			$eng_id = $_POST['eng_id'];
+			$eng_name = $_POST['eng_name'];
+			$eng_bind = $_POST['eng_bind'];
+			$eng_personality = $_POST['eng_personality'];
+			$eng_req_body_limit = $_POST['eng_req_body_limit'];
+			$eng_resp_body_limit = $_POST['eng_resp_body_limit'];
+			$eng_enable_double_decode_path = $_POST['eng_enable_double_decode_path'];
+			$eng_enable_double_decode_query = $_POST['eng_enable_double_decode_query'];
 		}
 	}
 	else {
-		$input_errors[] = gettext("No entries were selected for import.  Please select one or more Aliases for import and click SAVE.");
-		$importalias = true;
-	}
+		$engine = array( "name" => "", "bind_to" => "", "personality" => "IDS", 
+				 "request-body-limit" => "4096", "response-body-limit" => "4096", 
+				 "double-decode-path" => "no", "double-decode-query" => "no" );
 
-	// if no errors, write new entry to conf
-	if (!$input_errors) {
-		// Reorder the engine array to ensure the 
-		// 'bind_to=all' entry is at the bottom if 
-		// the array contains more than one entry.
-		if (count($a_nat[$id]['libhtp_policy']['item']) > 1) {
-			$i = -1;
-			foreach ($a_nat[$id]['libhtp_policy']['item'] as $f => $v) {
-				if ($v['bind_to'] == "all") {
-					$i = $f;
-					break;
-				}
+		// See if anything was checked to import
+		if (is_array($_POST['aliastoimport']) && count($_POST['aliastoimport']) > 0) {
+			foreach ($_POST['aliastoimport'] as $item) {
+				$engine['name'] = strtolower($item);
+				$engine['bind_to'] = $item;
+				$a_nat[$id]['libhtp_policy']['item'][] = $engine;
 			}
-			// Only relocate the entry if we 
-			// found it, and it's not already 
-			// at the end.
-			if ($i > -1 && ($i < (count($a_nat[$id]['libhtp_policy']['item']) - 1))) {
-				$tmp = $a_nat[$id]['libhtp_policy']['item'][$i];
-				unset($a_nat[$id]['libhtp_policy']['item'][$i]);
-				$a_nat[$id]['libhtp_policy']['item'][] = $tmp;
-			}
-			$pconfig['libhtp_policy']['item'] = $a_nat[$id]['libhtp_policy']['item'];
+		}
+		else {
+			$input_errors[] = gettext("No entries were selected for import.  Please select one or more Aliases for import and click SAVE.");
+			$importalias = true;
 		}
 
-		// Write the new engine array to config file
-		write_config();
-		$importalias = false;
+		// if no errors, write new entry to conf
+		if (!$input_errors) {
+			// Reorder the engine array to ensure the 
+			// 'bind_to=all' entry is at the bottom if 
+			// the array contains more than one entry.
+			if (count($a_nat[$id]['libhtp_policy']['item']) > 1) {
+				$i = -1;
+				foreach ($a_nat[$id]['libhtp_policy']['item'] as $f => $v) {
+					if ($v['bind_to'] == "all") {
+						$i = $f;
+						break;
+					}
+				}
+				// Only relocate the entry if we 
+				// found it, and it's not already 
+				// at the end.
+				if ($i > -1 && ($i < (count($a_nat[$id]['libhtp_policy']['item']) - 1))) {
+					$tmp = $a_nat[$id]['libhtp_policy']['item'][$i];
+					unset($a_nat[$id]['libhtp_policy']['item'][$i]);
+					$a_nat[$id]['libhtp_policy']['item'][] = $tmp;
+				}
+				$pconfig['libhtp_policy']['item'] = $a_nat[$id]['libhtp_policy']['item'];
+			}
+
+			// Write the new engine array to config file
+			write_config();
+			$importalias = false;
+		}
 	}
 }
 elseif ($_POST['cancel_import_alias']) {
 	$importalias = false;
+	$selectalias = false;
+	$eng_id = $_POST['eng_id'];
+
+	// If cancelling out of "select alias" mode,
+	// then return to Libhtp Policy Engine edit
+	// page.
+	if ($_POST['mode'] == 'add_edit_libhtp_policy') {
+		$pengcfg = array();
+		$pengcfg['name'] = $_POST['eng_name'];
+		$pengcfg['bind_to'] = $_POST['eng_bind'];
+		$pengcfg['personality'] = $_POST['eng_personality'];
+		$pengcfg['request-body-limit'] = $_POST['eng_req_body_limit'];
+		$pengcfg['response-body-limit'] = $_POST['eng_resp_body_limit'];
+		$pengcfg['double-decode-path'] = $_POST['eng_enable_double_decode_path'];
+		$pengcfg['double-decode-query'] = $_POST['eng_enable_double_decode_query'];
+		$add_edit_libhtp_policy = true;
+	}
 }
 elseif ($_POST['save']) {
 	$natent = array();
@@ -222,7 +387,7 @@ include_once("head.inc");
 
 <form action="suricata_app_parsers.php" method="post"name="iform" id="iform">
 <input name="id" type="hidden" value="<?=$id;?>"/>
-<input type="hidden" name="eng_id" id="eng_id" value=""/>
+<input type="hidden" name="eng_id" id="eng_id" value="<?=$eng_id;?>"/>
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
 <tr><td>
 <?php
@@ -251,7 +416,21 @@ include_once("head.inc");
 <tr><td><div id="mainarea">
 
 <?php if ($importalias) : ?>
-	<?php include("/usr/local/www/suricata/suricata_import_aliases.php"); ?>
+	<?php include("/usr/local/www/suricata/suricata_import_aliases.php");
+		if ($selectalias) {
+			echo '<input type="hidden" name="eng_name" value="' . $eng_name . '"/>';
+			echo '<input type="hidden" name="eng_bind" value="' . $eng_bind . '"/>';
+			echo '<input type="hidden" name="eng_personality" value="' . $eng_personality . '"/>';
+			echo '<input type="hidden" name="eng_req_body_limit" value="' . $eng_req_body_limit . '"/>';
+			echo '<input type="hidden" name="eng_resp_body_limit" value="' . $eng_resp_body_limit . '"/>';
+			echo '<input type="hidden" name="eng_enable_double_decode_path" value="' . $eng_enable_double_decode_path . '"/>';
+			echo '<input type="hidden" name="eng_enable_double_decode_query" value="' . $eng_enable_double_decode_query . '"/>';
+		}
+	?>
+
+<?php elseif ($add_edit_libhtp_policy) : ?>
+	<?php include("/usr/local/www/suricata/suricata_libhtp_policy_engine.php"); ?>
+
 <?php else: ?>
 
 <table id="maintable" class="tabcont" width="100%" border="0" cellpadding="6" cellspacing="0">
@@ -297,9 +476,9 @@ include_once("head.inc");
 				<tr>
 					<td class="listlr" align="left"><?=gettext($v['name']);?></td>
 					<td class="listbg" align="center"><?=gettext($v['bind_to']);?></td>
-					<td class="listt" align="right"><a href="suricata_libhtp_policy_engine.php?id=<?=$id;?>&eng_id=<?=$f;?>">
-					<img src="/themes/<?=$g['theme'];?>/images/icons/icon_e.gif"  
-					width="17" height="17" border="0" title="<?=gettext("Edit this server configuration");?>"></a>
+					<td class="listt" align="right"><input type="image" name="edit_libhtp_policy[]" value="<?=$f;?>" onclick="document.getElementById('eng_id').value='<?=$f;?>'" 
+					src="/themes/<?=$g['theme'];?>/images/icons/icon_e.gif" 
+					width="17" height="17" border="0" title="<?=gettext("Edit this server configuration");?>"/>
 			<?php if ($v['bind_to'] <> "all") : ?> 
 					<input type="image" name="del_libhtp_policy[]" value="<?=$f;?>" onclick="document.getElementById('eng_id').value='<?=$f;?>';return confirm('Are you sure you want to delete this entry?');" 
 					src="/themes/<?=$g['theme'];?>/images/icons/icon_x.gif" width="17" height="17" border="0" 
@@ -338,23 +517,6 @@ include_once("head.inc");
 </div>
 </td></tr></table>
 </form>
-<script type="text/javascript">
-function wopen(url, name, w, h)
-{
-	// Fudge factors for window decoration space.
-	// In my tests these work well on all platforms & browsers.
-	w += 32;
-	h += 96;
-	var win = window.open(url,
-			      name, 
-			      'width=' + w + ', height=' + h + ', ' +
-			      'location=no, menubar=no, ' +
-			      'status=no, toolbar=no, scrollbars=yes, resizable=yes');
-	    win.resizeTo(w, h);
-	    win.focus();
-}
-
-</script>
 <?php include("fend.inc"); ?>
 </body>
 </html>

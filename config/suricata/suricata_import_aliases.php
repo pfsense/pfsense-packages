@@ -39,6 +39,8 @@
 	$a_aliases --> $config['aliases']['alias'] array
 	$title --> title string for import alias engine type
 	$used --> array of currently used engine 'bind_to' Alias names
+	$selectalias --> boolean to display radio buttons instead of checkboxes
+	$mode --> string value to indicate current operation mode
 
 	Information is returned from this page via the following form fields:
 
@@ -51,11 +53,21 @@
 <?php	$selectablealias = false;
 	if (!is_array($a_aliases))
 		$a_aliases = array();
+	if ($mode <> "")
+		echo '<input type="hidden" name="mode" id="mode" value="' . $mode . '"/>';
+	if ($selectalias == true) {
+		$fieldtype = "radio";
+		$header = gettext("Select an Alias to use as {$title} target from the list below.");
+	}
+	else {
+		$fieldtype = "checkbox";
+		$header = gettext("Select one or more Aliases to use as {$title} targets from the list below.");
+	}
 ?>
+
 <table id="maintable" class="tabcont" width="100%" border="0" cellpadding="6" cellspacing="0">
 <tr>
-	<td class="listtopic" align="center"><?=gettext("Select one or more Aliases to use as {$title} targets from the list below.");?>
-	</td>
+	<td class="listtopic" align="center"><?=$header;?></td>
 </tr>
 <tr>
 	<td>
@@ -99,7 +111,7 @@
 			  <td class="listlr" align="center"><img src="../themes/<?=$g['theme'];?>/images/icons/icon_block_d.gif" width="11" height"11" border="0"/>
 			<?php else: ?>
 			<tr>
-			  <td class="listlr" align="center"><input type="checkbox" name="aliastoimport[]" value="<?=htmlspecialchars($alias['name']);?>" title="<?=$tooltip;?>"/></td>
+			  <td class="listlr" align="center"><input type="<?=$fieldtype;?>" name="aliastoimport[]" value="<?=htmlspecialchars($alias['name']);?>" title="<?=$tooltip;?>"/></td>
 			<?php endif; ?>
 			  <td class="listr" align="left"><?=$textss . htmlspecialchars($alias['name']) . $textse;?></td>
 			  <td class="listr" align="left">

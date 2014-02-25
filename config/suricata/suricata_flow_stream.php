@@ -84,17 +84,111 @@ if (isset($id) && $a_nat[$id]) {
 		$pconfig['host_os_policy'] = $a_nat[$id]['host_os_policy'];
 }
 
-// Check for "import alias mode" and set flag if TRUE
+// Check for "import or select alias mode" and set flags if TRUE.
+// "selectalias", when true, displays radio buttons to limit
+// multiple selections.
 if ($_POST['import_alias']) {
 	$importalias = true;
+	$selectalias = false;
 	$title = "Host Operating System Policy";
 }
-else
-	$importalias = false;
+elseif ($_POST['select_alias']) {
+	$importalias = true;
+	$selectalias = true;
+	$title = "Host Operating System Policy";
 
-if ($_POST['add_os_policy']) {
-	header("Location: suricata_os_policy_engine.php?id={$id}&eng_id={$host_os_policy_engine_next_id}");
-	exit;
+	// Preserve current OS Policy Engine settings
+	$eng_id = $_POST['eng_id'];
+	$eng_name = $_POST['policy_name'];
+	$eng_bind = $_POST['policy_bind_to'];
+	$eng_policy = $_POST['policy'];
+	$mode = "add_edit_os_policy";
+}
+
+if ($_POST['save_os_policy']) {
+	if ($_POST['eng_id'] != "") {
+		$eng_id = $_POST['eng_id'];
+
+		// Grab all the POST values and save in new temp array
+		$engine = array();
+		$policy_name = trim($_POST['policy_name']);
+		if ($policy_name) { 
+			$engine['name'] = $policy_name;
+		}
+		else {
+			$input_errors[] = gettext("The 'Policy Name' value cannot be blank.");
+			$add_edit_os_policy = true;
+		}
+		if ($_POST['policy_bind_to']) {
+			if (is_alias($_POST['policy_bind_to']))
+				$engine['bind_to'] = $_POST['policy_bind_to'];
+			elseif (strtolower(trim($_POST['policy_bind_to'])) == "all")
+				$engine['bind_to'] = "all";
+			else {
+				$input_errors[] = gettext("You must provide a valid Alias or the reserved keyword 'all' for the 'Bind-To IP Address' value.");
+				$add_edit_os_policy = true;
+			}
+		}
+		else {
+			$input_errors[] = gettext("The 'Bind-To IP Address' value cannot be blank.  Provide a valid Alias or the reserved keyword 'all'.");
+			$add_edit_os_policy = true;
+		}
+
+		if ($_POST['policy']) { $engine['policy'] = $_POST['policy']; } else { $engine['policy'] = "bsd"; }
+
+		// Can only have one "all" Bind_To address
+		if ($engine['bind_to'] == "all" && $engine['name'] <> "default") {
+			$input_errors[] = gettext("Only one default OS-Policy Engine can be bound to all addresses.");
+			$add_edit_os_policy = true;
+			$pengcfg = $engine;
+		}
+
+		// if no errors, write new entry to conf
+		if (!$input_errors) {
+			if (isset($eng_id) && $a_nat[$id]['host_os_policy']['item'][$eng_id]) {
+				$a_nat[$id]['host_os_policy']['item'][$eng_id] = $engine;
+			}
+			else
+				$a_nat[$id]['host_os_policy']['item'][] = $engine;
+
+			/* Reorder the engine array to ensure the */
+			/* 'bind_to=all' entry is at the bottom   */
+			/* if it contains more than one entry.    */
+			if (count($a_nat[$id]['host_os_policy']['item']) > 1) {
+				$i = -1;
+				foreach ($a_nat[$id]['host_os_policy']['item'] as $f => $v) {
+					if ($v['bind_to'] == "all") {
+						$i = $f;
+						break;
+					}
+				}
+				/* Only relocate the entry if we  */
+				/* found it, and it's not already */
+				/* at the end.                    */
+				if ($i > -1 && ($i < (count($a_nat[$id]['host_os_policy']['item']) - 1))) {
+					$tmp = $a_nat[$id]['host_os_policy']['item'][$i];
+					unset($a_nat[$id]['host_os_policy']['item'][$i]);
+					$a_nat[$id]['host_os_policy']['item'][] = $tmp;
+				}
+			}
+
+			// Now write the new engine array to conf
+			write_config();
+			$pconfig['host_os_policy']['item'] = $a_nat[$id]['host_os_policy']['item'];
+		}
+	}	
+}
+elseif ($_POST['add_os_policy']) {
+	$add_edit_os_policy = true;
+	$pengcfg = array( "name" => "engine_{$host_os_policy_engine_next_id}", "bind_to" => "", "policy" => "bsd" );
+	$eng_id = $host_os_policy_engine_next_id;
+}
+elseif ($_POST['edit_os_policy']) {
+	if ($_POST['eng_id'] != "") {
+		$add_edit_os_policy = true;
+		$eng_id = $_POST['eng_id'];
+		$pengcfg = $a_nat[$id]['host_os_policy']['item'][$eng_id];
+	}
 }
 elseif ($_POST['del_os_policy']) {
 	$natent = array();
@@ -108,6 +202,9 @@ elseif ($_POST['del_os_policy']) {
 		$a_nat[$id] = $natent;
 		write_config();
 	}
+}
+elseif ($_POST['cancel_os_policy']) {
+	$add_edit_os_policy = false;
 }
 elseif ($_POST['ResetAll']) {
 
@@ -223,52 +320,97 @@ elseif ($_POST['save']) {
 	}
 }
 elseif ($_POST['save_import_alias']) {
-	$engine = array( "name" => "", "bind_to" => "", "policy" => "bsd" );
+	// If saving out of "select alias" mode,
+	// then return to Host OS Policy Engine edit
+	// page.
+	if ($_POST['mode'] =='add_edit_os_policy') {
+		$pengcfg = array();
+		$eng_id = $_POST['eng_id'];
+		$pengcfg['name'] = $_POST['eng_name'];
+		$pengcfg['bind_to'] = $_POST['eng_bind'];
+		$pengcfg['policy'] = $_POST['eng_policy'];
+		$add_edit_os_policy = true;
+		$mode = "add_edit_os_policy";
 
-	// See if anything was checked to import
-	if (is_array($_POST['aliastoimport']) && count($_POST['aliastoimport']) > 0) {
-		foreach ($_POST['aliastoimport'] as $item) {
-			$engine['name'] = strtolower($item);
-			$engine['bind_to'] = $item;
-			$a_nat[$id]['host_os_policy']['item'][] = $engine;
+		if (is_array($_POST['aliastoimport']) && count($_POST['aliastoimport']) == 1) {
+			$pengcfg['bind_to'] = $_POST['aliastoimport'][0];
+			$importalias = false;
+			$selectalias = false;
+		}
+		else {
+			$input_errors[] = gettext("No Alias is selected for import.  Nothing to SAVE.");
+			$importalias = true;
+			$selectalias = true;
+			$eng_id = $_POST['eng_id'];
+			$eng_name = $_POST['eng_name'];
+			$eng_bind = $_POST['eng_bind'];
+			$eng_policy = $_POST['eng_policy'];
 		}
 	}
 	else {
-		$input_errors[] = gettext("No entries were selected for import.  Please select one or more Aliases for import and click SAVE.");
-		$importalias = true;
-	}
+		// Assume we are importing one or more aliases
+		// for use in new Host OS Policy engines.
+		$engine = array( "name" => "", "bind_to" => "", "policy" => "bsd" );
 
-	// if no errors, write new entry to conf
-	if (!$input_errors) {
-		// Reorder the engine array to ensure the 
-		// 'bind_to=all' entry is at the bottom if 
-		// the array contains more than one entry.
-		if (count($a_nat[$id]['host_os_policy']['item']) > 1) {
-			$i = -1;
-			foreach ($a_nat[$id]['host_os_policy']['item'] as $f => $v) {
-				if ($v['bind_to'] == "all") {
-					$i = $f;
-					break;
-				}
+		// See if anything was checked to import
+		if (is_array($_POST['aliastoimport']) && count($_POST['aliastoimport']) > 0) {
+			foreach ($_POST['aliastoimport'] as $item) {
+				$engine['name'] = strtolower($item);
+				$engine['bind_to'] = $item;
+				$a_nat[$id]['host_os_policy']['item'][] = $engine;
 			}
-			// Only relocate the entry if we 
-			// found it, and it's not already 
-			// at the end.
-			if ($i > -1 && ($i < (count($a_nat[$id]['host_os_policy']['item']) - 1))) {
-				$tmp = $a_nat[$id]['host_os_policy']['item'][$i];
-				unset($a_nat[$id]['host_os_policy']['item'][$i]);
-				$a_nat[$id]['host_os_policy']['item'][] = $tmp;
-			}
-			$pconfig['host_os_policy']['item'] = $a_nat[$id]['host_os_policy']['item'];
+		}
+		else {
+			$input_errors[] = gettext("No entries were selected for import.  Please select one or more Aliases for import and click SAVE.");
+			$importalias = true;
 		}
 
-		// Write the new engine array to config file
-		write_config();
-		$importalias = false;
+		// if no errors, write new entry to conf
+		if (!$input_errors) {
+			// Reorder the engine array to ensure the 
+			// 'bind_to=all' entry is at the bottom if 
+			// the array contains more than one entry.
+			if (count($a_nat[$id]['host_os_policy']['item']) > 1) {
+				$i = -1;
+				foreach ($a_nat[$id]['host_os_policy']['item'] as $f => $v) {
+					if ($v['bind_to'] == "all") {
+						$i = $f;
+						break;
+					}
+				}
+				// Only relocate the entry if we 
+				// found it, and it's not already 
+				// at the end.
+				if ($i > -1 && ($i < (count($a_nat[$id]['host_os_policy']['item']) - 1))) {
+					$tmp = $a_nat[$id]['host_os_policy']['item'][$i];
+					unset($a_nat[$id]['host_os_policy']['item'][$i]);
+					$a_nat[$id]['host_os_policy']['item'][] = $tmp;
+				}
+				$pconfig['host_os_policy']['item'] = $a_nat[$id]['host_os_policy']['item'];
+			}
+
+			// Write the new engine array to config file
+			write_config();
+			$importalias = false;
+			$selectalias = false;
+		}
 	}
 }
 elseif ($_POST['cancel_import_alias']) {
 	$importalias = false;
+	$selectalias = false;
+	$eng_id = $_POST['eng_id'];
+
+	// If cancelling out of "select alias" mode,
+	// then return to Host OS Policy Engine edit
+	// page.
+	if ($_POST['mode'] == 'add_edit_os_policy') {
+		$pengcfg = array();
+		$pengcfg['name'] = $_POST['eng_name'];
+		$pengcfg['bind_to'] = $_POST['eng_bind'];
+		$pengcfg['policy'] = $_POST['eng_policy'];
+		$add_edit_os_policy = true;
+	}
 }
 
 $if_friendly = convert_friendly_interface_to_friendly_descr($pconfig['interface']);
@@ -289,7 +431,7 @@ include_once("head.inc");
 ?>
 
 <form action="suricata_flow_stream.php" method="post" name="iform" id="iform">
-<input type="hidden" name="eng_id" id="eng_id" value=""/>
+<input type="hidden" name="eng_id" id="eng_id" value="<?=$eng_id;?>"/>
 <input type="hidden" name="id" id="id" value="<?=$id;?>"/>
 
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
@@ -320,7 +462,17 @@ include_once("head.inc");
 <tr><td><div id="mainarea">
 
 <?php if ($importalias) : ?>
-	<?php include("/usr/local/www/suricata/suricata_import_aliases.php"); ?>
+	<?php include("/usr/local/www/suricata/suricata_import_aliases.php");
+		if ($selectalias) {
+			echo '<input type="hidden" name="eng_name" value="' . $eng_name . '"/>';
+			echo '<input type="hidden" name="eng_bind" value="' . $eng_bind . '"/>';
+			echo '<input type="hidden" name="eng_policy" value="' . $eng_policy . '"/>';
+		}
+	 ?>
+
+<?php elseif ($add_edit_os_policy) : ?>
+	<?php include("/usr/local/www/suricata/suricata_os_policy_engine.php"); ?>
+
 <?php else: ?>
 
 <table id="maintable" class="tabcont" width="100%" border="0" cellpadding="6" cellspacing="0">
@@ -350,9 +502,9 @@ include_once("head.inc");
 				<tr>
 					<td class="listlr" align="left"><?=gettext($v['name']);?></td>
 					<td class="listbg" align="center"><?=gettext($v['bind_to']);?></td>
-					<td class="listt" align="right"><a href="suricata_os_policy_engine.php?id=<?=$id;?>&eng_id=<?=$f;?>">
-					<img src="/themes/<?=$g['theme'];?>/images/icons/icon_e.gif"  
-					width="17" height="17" border="0" title="<?=gettext("Edit this policy configuration");?>"></a>
+					<td class="listt" align="right"><input type="image" name="edit_os_policy[]" value="<?=$f;?>" onclick="document.getElementById('eng_id').value='<?=$f;?>'" 
+					src="/themes/<?=$g['theme'];?>/images/icons/icon_e.gif" 
+					width="17" height="17" border="0" title="<?=gettext("Edit this policy configuration");?>"/>
 			<?php if ($v['bind_to'] <> "all") : ?> 
 					<input type="image" name="del_os_policy[]" value="<?=$f;?>" onclick="document.getElementById('eng_id').value='<?=$f;?>';return confirm('Are you sure you want to delete this entry?');" 
 					src="/themes/<?=$g['theme'];?>/images/icons/icon_x.gif" width="17" height="17" border="0" 
@@ -677,24 +829,6 @@ include_once("head.inc");
 </div>
 </td></tr></table>
 </form>
-<script type="text/javascript">
-
-function wopen(url, name, w, h)
-{
-	// Fudge factors for window decoration space.
-	// In my tests these work well on all platforms & browsers.
-	w += 32;
-	h += 96;
-	var win = window.open(url,
-			      name, 
-			      'width=' + w + ', height=' + h + ', ' +
-			      'location=no, menubar=no, ' +
-			      'status=no, toolbar=no, scrollbars=yes, resizable=yes');
-	    win.resizeTo(w, h);
-	    win.focus();
-}
-
-</script>
 <?php include("fend.inc"); ?>
 </body>
 </html>
