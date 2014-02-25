@@ -691,8 +691,8 @@ function sync_package_dansguardian($via_rpc="no",$install_process=false) {
 	file_put_contents($dansguardian_dir."/lists/contentscanners/exceptionvirusextensionlist",($dansguardian_antivirus['extension_enabled']?dg_text_area_decode($config['installedpackages']['dansguardianantivirusacl']['config'][0]['extension_list']):""),LOCK_EX);
 		
 	#log report
-	if ($dansguardian_log['report_file']=="" && file_exists("/usr/local/share/dansguardian/languages/".$reportlanguage."/template.html")){
-		$report_file=file_get_contents("/usr/local/share/dansguardian/languages/".$reportlanguage."/template.html");
+	if ($dansguardian_log['report_file']=="" && file_exists(dansguardian_dir."/usr/local/share/dansguardian/languages/".$reportlanguage."/template.html")){
+		$report_file=file_get_contents(dansguardian_dir."/usr/local/share/dansguardian/languages/".$reportlanguage."/template.html");
 		$report_file=preg_replace('/<.*(html|head)>/','',$report_file);
 		$config['installedpackages']['dansguardianlog']['config'][0]['report_file']=base64_encode($report_file);
 		$dansguardian_log['report_file']=base64_encode($report_file);
@@ -924,8 +924,8 @@ EOF;
 	file_put_contents("/usr/local/pkg/dansguardian_ips.xml",$ips_xml_header.$ips_xml.$user_xml_footer,LOCK_EX);
 	
 	#Create report template
-	if (is_dir("/usr/local/share/dansguardian/languages/".$reportlanguage)) 
-		file_put_contents("/usr/local/share/dansguardian/languages/".$reportlanguage."/template.html",dg_text_area_decode($dansguardian_log['report_file']),LOCK_EX);
+	if (is_dir(dansguardian_dir."/usr/local/share/dansguardian/languages/".$reportlanguage)) 
+		file_put_contents(dansguardian_dir."/usr/local/share/dansguardian/languages/".$reportlanguage."/template.html",dg_text_area_decode($dansguardian_log['report_file']),LOCK_EX);
 	
 	#check blacklist download files
 	if ($install_process == true){
