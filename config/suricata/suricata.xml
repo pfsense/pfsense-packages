@@ -153,11 +153,6 @@
 		<chmod>0755</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
-		<item>http://www.pfsense.com/packages/config/suricata/suricata_select_alias.php</item>
-		<prefix>/usr/local/www/suricata/</prefix>
-		<chmod>0755</chmod>
-	</additional_files_needed>
-	<additional_files_needed>
 		<item>http://www.pfsense.com/packages/config/suricata/suricata_suppress.php</item>
 		<prefix>/usr/local/www/suricata/</prefix>
 		<chmod>0755</chmod>
