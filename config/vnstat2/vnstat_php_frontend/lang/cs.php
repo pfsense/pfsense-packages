@@ -34,6 +34,6 @@ $L['datefmt_days'] = '%d. %B';
 $L['datefmt_days_img'] = '%d';
 $L['datefmt_months'] = '%B %Y';
 $L['datefmt_months_img'] = '%b';
-$L['datefmt_hours'] = '%k%P';
+$L['datefmt_hours'] = '%k%p';
 $L['datefmt_hours_img'] = '%k';
 $L['datefmt_top'] = '%d. %B %Y';
