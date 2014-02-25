@@ -1219,31 +1219,6 @@
 		<configurationfile>rrd-summary.xml</configurationfile>
 	</package>
 	<package>
-		<name>Unbound</name>
-		<descr>Unbound is a validating, recursive, and caching DNS resolver. This package is a drop in replacement for Services: DNS Forwarder and also supports DNSSEC extensions. Once installed please configure the Unbound service by visiting Services: Unbound DNS.</descr>
-		<website>http://www.unbound.net/</website>
-		<category>Services</category>
-		<version>1.4.21_1</version>
-		<status>Alpha</status>
-		<maintainer>warren@decoy.co.za</maintainer>
-		<required_version>2.2</required_version>
-		<pkginfolink>http://doc.pfsense.org/index.php/Unbound_package</pkginfolink>
-		<config_file>http://www.pfsense.com/packages/config/unbound/unbound.xml</config_file>
-		<configurationfile>unbound.xml</configurationfile>
-		<build_pbi>
-			<ports_before>dns/ldns textproc/expat2 devel/libevent2</ports_before>
-			<port>dns/unbound</port>
-		</build_pbi>
-		<depends_on_package_pbi>unbound-1.4.21_1-##ARCH##.pbi</depends_on_package_pbi>
-		<build_options>unbound_UNSET_FORCE=GOST ECDSA;unbound_SET_FORCE=LIBEVENT20 THREADS</build_options>
-		<logging>
-			<facilityname>unbound</facilityname>
-			<logfilename>unbound.log</logfilename>
-			<logtab>Unbound</logtab>
-		</logging>
-		<after_install_info>Please visit Services: Unbound DNS to configure the Unbound DNS service. Remember you will need to disable Services: DNS Forwarder before starting Unbound. Also note if your DHCP server makes use of pfSense as the DNS server, then you will now need to add the IP address of the respective interface to the DNS servers field, in the DHCP server configuration page.</after_install_info>
-	</package>
-	<package>
 		<name>Shellcmd</name>
 		<website/>
 		<descr>The shellcmd utility is used to manage commands on system startup.</descr>
