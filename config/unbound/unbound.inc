@@ -541,6 +541,14 @@ access-control: ::1 allow
 
 EOD;
 
+	# Handle custom options
+	if (!empty($adv_config['custom_options'])) {
+		$custom_options = explode(";", ($adv_config['custom_options']));
+		$unbound_conf .= "\n# Unbound Custom options\n";
+		foreach ($custom_options as $ent)
+			$unbound_conf .= $ent."\n";
+	}
+
 	// Set up forward-zones if configured
 	if ($unbound_config['forwarding_mode'] == "on") {
 		$dnsservers = array();
@@ -567,15 +575,6 @@ EOD;
 			foreach($dnsservers as $dnsserver)
 				$unbound_conf .= "\tforward-addr: $dnsserver\n";
 		}
-	}
-
-
-	# Handle custom options
-	if (!empty($adv_config['custom_options'])) {
-		$custom_options = explode(";", ($adv_config['custom_options']));
-		$unbound_conf .= "\n# Unbound Custom options\n";
-		foreach ($custom_options as $ent)
-			$unbound_conf .= $ent."\n";
 	}
 
 	$unbound_conf .= <<<EOD
