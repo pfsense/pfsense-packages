@@ -33,6 +33,7 @@ $pgtitle = "Quagga OSPF: Status";
 include("head.inc");
 
 $control_script = "/usr/local/bin/quaggactl";
+$pkg_homedir	= "/var/etc/quagga";
 
 /* List all of the commands as an index. */
 function listCmds() {
@@ -90,6 +91,7 @@ function doCmdT($title, $command) {
 				$tab_array = array();
 				$tab_array[] = array(gettext("Settings"), false, "/pkg_edit.php?xml=quagga_ospfd.xml&id=0");
 				$tab_array[] = array(gettext("Interface Settings"), false, "/pkg.php?xml=quagga_ospfd_interfaces.xml");
+				$tab_array[] = array(gettext("RAW Config"), false, "/pkg_edit.php?xml=quagga_ospfd_raw.xml&id=0");
 				$tab_array[] = array(gettext("Status"), true, "/status_ospfd.php");
 				display_top_tabs($tab_array);
 			?>
@@ -110,6 +112,8 @@ function doCmdT($title, $command) {
 								defCmdT("Quagga OSPF Interfaces", "{$control_script} ospf interfaces");
 								defCmdT("Quagga OSPF CPU Usage", "{$control_script} ospf cpu");
 								defCmdT("Quagga OSPF Memory", "{$control_script} ospf mem");
+								defCmdT("Quagga ospfd.conf", "/bin/cat {$pkg_homedir}/ospfd.conf");
+								defCmdT("Quagga zebra.conf", "/bin/cat {$pkg_homedir}/zebra.conf");
 ?>
 								<div id="cmdspace" style="width:100%">
 									<?php listCmds(); ?>

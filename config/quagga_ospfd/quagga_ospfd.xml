@@ -15,6 +15,11 @@
 		<item>http://www.pfsense.com/packages/config/quagga_ospfd/quagga_ospfd_interfaces.xml</item>
 	</additional_files_needed>
 	<additional_files_needed>
+		<prefix>/usr/local/pkg/</prefix>
+		<chmod>644</chmod>
+		<item>http://www.pfsense.com/packages/config/quagga_ospfd/quagga_ospfd_raw.xml</item>
+	</additional_files_needed>
+	<additional_files_needed>
 		<prefix>/usr/local/www/</prefix>
 		<chmod>644</chmod>
 		<item>http://www.pfsense.com/packages/config/quagga_ospfd/status_ospfd.php</item>
@@ -40,6 +45,10 @@
 		<tab>
 			<text>Interface Settings</text>
 			<url>pkg.php?xml=quagga_ospfd_interfaces.xml</url>
+		</tab>
+		<tab>
+			<text>Raw Config</text>
+			<url>pkg_edit.php?xml=quagga_ospfd_raw.xml&amp;id=0</url>
 		</tab>
 		<tab>
 			<text>Status</text>
