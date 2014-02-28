@@ -1137,14 +1137,6 @@ function haproxy_check_run($reload) {
 	$a_global = &$config['installedpackages']['haproxy'];
 	$configpath = "{$g['varetc_path']}/haproxy";
 
-	exec("/usr/bin/limits -n 300014");
-
-	if(use_transparent_clientip_proxying()) {
-		filter_configure();
-		load_ipfw_rules();
-	} else
-		mwexec("/usr/local/sbin/ipfw_context -d haproxy", true);
-	
 	if(isset($a_global['enable'])) {
 		if (isset($a_global['carpdev'])) {
 			$status = get_carp_interface_status($a_global['carpdev']);
@@ -1163,6 +1155,12 @@ function haproxy_check_run($reload) {
 		} else if ($reload == 0)
 			return (0);
 
+		if(use_transparent_clientip_proxying()) {
+			filter_configure();
+			load_ipfw_rules();
+		} else
+			mwexec("/usr/local/sbin/ipfw_context -d haproxy", true);
+		
 		if (haproxy_is_running()) {
 			if (isset($a_global['terminate_on_reload']))
 				$sf_st = "-st";//terminate old process as soon as the new process is listening
