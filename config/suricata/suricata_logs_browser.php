@@ -32,6 +32,8 @@ require_once("/usr/local/pkg/suricata/suricata.inc");
 
 if ($_POST['instance'])
 	$instanceid = $_POST['instance'];
+if ($_GET['instance'])
+	$instanceid = $_GET['instance'];
 if (empty($instanceid))
 	$instanceid = 0;
 
