@@ -68,7 +68,7 @@ if ($suricatalogdirsizeKB > 0 && $suricatalogdirsizeKB > $suricataloglimitsizeKB
 
 	/* Clean-up the logs for each configured Suricata instance */
 	foreach ($config['installedpackages']['suricata']['rule'] as $value) {
-		$if_real = suricata_get_real_interface($value['interface']);
+		$if_real = get_real_interface($value['interface']);
 		$suricata_uuid = $value['uuid'];
 		$suricata_log_dir = SURICATALOGDIR . "suricata_{$if_real}{$suricata_uuid}";
 		log_error(gettext("[Suricata] Truncating logs for {$value['descr']} ({$if_real})..."));

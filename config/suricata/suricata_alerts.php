@@ -274,12 +274,10 @@ if ($_POST['togglesid'] && is_numeric($_POST['sidid']) && is_numeric($_POST['gen
 }
 
 if ($_POST['delete']) {
-	conf_mount_rw();
 	suricata_post_delete_logs($suricata_uuid);
 	$fd = @fopen("{$suricatalogdir}suricata_{$if_real}{$suricata_uuid}/alerts.log", "w+");
 	if ($fd)
 		fclose($fd);
-	conf_mount_ro();
 	/* XXX: This is needed if suricata is run as suricata user */
 	mwexec('/bin/chmod 660 {$suricatalogdir}*', true);
 	sigkillbypid("{$g['varrun_path']}/suricata_{$if_real}{$suricata_uuid}.pid", "HUP");
@@ -375,7 +373,7 @@ if ($savemsg) {
 					$selected = "";
 					if ($id == $instanceid)
 						$selected = "selected";
-					echo "<option value='{$id}' {$selected}> (" . suricata_get_friendly_interface($instance['interface']) . "){$instance['descr']}</option>\n";
+					echo "<option value='{$id}' {$selected}> (" . convert_friendly_interface_to_friendly_descr($instance['interface']) . "){$instance['descr']}</option>\n";
 				}
 			?>
 					</select>&nbsp;&nbsp;<?php echo gettext('Choose which instance alerts you want to inspect.'); ?>
@@ -386,7 +384,7 @@ if ($savemsg) {
 					<input name="download" type="submit" class="formbtns" value="Download"> <?php echo gettext('All ' .
 						'log files will be saved.'); ?>&nbsp;&nbsp;
 					<input name="delete" type="submit" class="formbtns" value="Clear"
-					onclick="return confirm('Do you really want to remove all instance logs?');"></a>
+					onclick="return confirm('Do you really want to remove all instance logs?');">
 					<span class="red"><strong><?php echo gettext('Warning:'); ?></strong></span> <?php echo ' ' . gettext('all log files will be deleted.'); ?>
 				</td>
 			</tr>
@@ -439,21 +437,30 @@ if ($savemsg) {
 
 /* make sure alert file exists */
 if (file_exists("/var/log/suricata/suricata_{$if_real}{$suricata_uuid}/alerts.log")) {
-	exec("tail -{$anentries} -r /var/log/suricata/suricata_{$if_real}{$suricata_uuid}/alerts.log > /tmp/alerts_{$suricata_uuid}");
-	if (file_exists("/tmp/alerts_{$suricata_uuid}")) {
+	exec("tail -{$anentries} -r /var/log/suricata/suricata_{$if_real}{$suricata_uuid}/alerts.log > /tmp/alerts_suricata{$suricata_uuid}");
+	if (file_exists("/tmp/alerts_suricata{$suricata_uuid}")) {
 		$tmpblocked = array_flip(suricata_get_blocked_ips());
 		$counter = 0;
 		/*             0         1      2             3      4       5   6              7        8     9   10      11  12      */
 		/* File format timestamp,action,sig_generator,sig_id,sig_rev,msg,classification,priority,proto,src,srcport,dst,dstport */
-		$fd = fopen("/tmp/alerts_{$suricata_uuid}", "r");
+		$fd = fopen("/tmp/alerts_suricata{$suricata_uuid}", "r");
 		while (($fields = fgetcsv($fd, 1000, ',', '"')) !== FALSE) {
 			if(count($fields) < 12)
 				continue;
 
+			// Create a DateTime object from the event timestamp that
+			// we can use to easily manipulate output formats.
+			$event_tm = date_create_from_format("m/d/Y-H:i:s.u", $fields[0]);
+
+			// Check the 'CATEGORY' field for the text "(null)" and
+			// substitute "Not Assigned".
+			if ($fields[6] == "(null)")
+				$fields[6] = "Not Assigned";
+
 			/* Time */
-			$alert_time = substr($fields[0], strpos($fields[0], '-')+1, -7);
+			$alert_time = date_format($event_tm, "H:i:s");
 			/* Date */
-			$alert_date = trim(substr($fields[0], 0, strpos($fields[0], '-')));
+			$alert_date = date_format($event_tm, "m/d/Y");
 			/* Description */
 			$alert_descr = $fields[5];
 			$alert_descr_url = urlencode($fields[5]);
@@ -462,7 +469,7 @@ if (file_exists("/var/log/suricata/suricata_{$if_real}{$suricata_uuid}/alerts.lo
 			/* Protocol */
 			$alert_proto = $fields[8];
 			/* IP SRC */
-			$alert_ip_src = $fields[9];
+			$alert_ip_src = inet_ntop(inet_pton($fields[9]));
 			/* Add zero-width space as soft-break opportunity after each colon if we have an IPv6 address */
 			$alert_ip_src = str_replace(":", ":&#8203;", $alert_ip_src);
 			/* Add Reverse DNS lookup icons */
@@ -491,7 +498,7 @@ if (file_exists("/var/log/suricata/suricata_{$if_real}{$suricata_uuid}/alerts.lo
 			/* IP SRC Port */
 			$alert_src_p = $fields[10];
 			/* IP Destination */
-			$alert_ip_dst = $fields[11];
+			$alert_ip_dst = inet_ntop(inet_pton($fields[11]));
 			/* Add zero-width space as soft-break opportunity after each colon if we have an IPv6 address */
 			$alert_ip_dst = str_replace(":", ":&#8203;", $alert_ip_dst);
 			/* Add Reverse DNS lookup icons */
@@ -538,7 +545,7 @@ if (file_exists("/var/log/suricata/suricata_{$if_real}{$suricata_uuid}/alerts.lo
 			}
 			else {
 				$sid_dsbl_link = "<input type='image' name='togglesid[]' onClick=\"encRuleSig('{$fields[2]}','{$fields[3]}','','');\" ";
-				$sid_dsbl_link .= "<img src='../themes/{$g['theme']}/images/icons/icon_block.gif' width='11' height='11' border='0' ";
+				$sid_dsbl_link .= "src='../themes/{$g['theme']}/images/icons/icon_block.gif' width='11' height='11' border='0' ";
 				$sid_dsbl_link .= "title='" . gettext("Force-disable this rule and remove it from current rules set.") . "'/>";
 			}
 			/* DESCRIPTION */
@@ -560,7 +567,7 @@ if (file_exists("/var/log/suricata/suricata_{$if_real}{$suricata_uuid}/alerts.lo
 			$counter++;
 		}
 		fclose($fd);
-		@unlink("/tmp/alerts_{$suricata_uuid}");
+		@unlink("/tmp/alerts_suricata{$suricata_uuid}");
 	}
 }
 ?>

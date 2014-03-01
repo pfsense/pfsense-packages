@@ -53,9 +53,7 @@
  **************************************************************************************/
 ?>
 
-<tr>
-<td class="tabcont">
-<table width="100%" border="0" cellpadding="6" cellspacing="0">
+<table class="tabcont" width="100%" border="0" cellpadding="6" cellspacing="0">
 	<tr>
 		<td colspan="2" valign="middle" class="listtopic"><?php echo gettext("Suricata Target-Based HTTP Server Policy Configuration"); ?></td>
 	</tr>
@@ -163,8 +161,6 @@
 			gettext("Cancel changes and return to App Parsers tab"); ?>"></td>
 	</tr>
 </table>
-</td>
-</tr>
 
 <script type="text/javascript" src="/javascript/autosuggest.js">
 </script>

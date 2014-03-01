@@ -40,9 +40,9 @@ if (!is_array($config['installedpackages']['suricata']['rule']))
 	$config['installedpackages']['suricata']['rule'] = array();
 $a_rule = &$config['installedpackages']['suricata']['rule'];
 
-if ($_GET['id'] && is_numeric($_GET['id']));
+if ($_GET['id']);
 	$id = htmlspecialchars($_GET['id'], ENT_QUOTES | ENT_HTML401);
-if ($_POST['id'] && is_numeric($_POST['id']))
+if ($_POST['id'])
 	$id = $_POST['id'];
 if (is_null($id))
 	$id = 0;
@@ -130,8 +130,8 @@ if ($_POST["save"]) {
 	if (!$_POST['interface'])
 		$input_errors[] = gettext("Choosing an Interface is mandatory!");
 
-	if ($_POST['max_pending_packets'] < 1 || $_POST['max_pending_packets'] > 65535)
-		$input_errors[] = gettext("The value for Maximum-Pending-Packets must be between 1 and 65,535!");
+	if ($_POST['max_pending_packets'] < 1 || $_POST['max_pending_packets'] > 65000)
+		$input_errors[] = gettext("The value for Maximum-Pending-Packets must be between 1 and 65,000!");
 
 	if (!empty($_POST['max_pcap_log_size']) && !is_numeric($_POST['max_pcap_log_size']))
 		$input_errors[] = gettext("The value for 'Max Packet Log Size' must be numbers only.  Do not include any alphabetic characters."); 
@@ -145,15 +145,6 @@ if ($_POST["save"]) {
 		$natent['interface'] = $_POST['interface'];
 		$natent['enable'] = $_POST['enable'] ? 'on' : 'off';
 		$natent['uuid'] = $pconfig['uuid'];
-
-		// See if the HOME_NET, EXTERNAL_NET, or SUPPRESS LIST values were changed
-		$suricata_reload = false;
-		if ($_POST['homelistname'] && ($_POST['homelistname'] <> $natent['homelistname']))
-			$suricata_reload = true;
-		if ($_POST['externallistname'] && ($_POST['externallistname'] <> $natent['externallistname']))
-			$suricata_reload = true;
-		if ($_POST['suppresslistname'] && ($_POST['suppresslistname'] <> $natent['suppresslistname']))
-			$suricata_reload = true;
 
 		if ($_POST['descr']) $natent['descr'] =  $_POST['descr']; else $natent['descr'] = strtoupper($natent['interface']);
 		if ($_POST['max_pcap_log_size']) $natent['max_pcap_log_size'] = $_POST['max_pcap_log_size']; else unset($natent['max_pcap_log_size']);
@@ -253,7 +244,7 @@ if ($_POST["save"]) {
 			$natent['libhtp_policy']['item'][] = $default;
 
 			// Enable the basic default rules for the interface
-			$natent['rulesets'] = "decoder-events.rules||files.rules||http-events.rules||smtp-events.rules||stream-events.rules";
+			$natent['rulesets'] = "decoder-events.rules||files.rules||http-events.rules||smtp-events.rules||stream-events.rules||tls-events.rules";
 
 			// Adding a new interface, so set flag to build new rules
 			$rebuild_rules = true;
@@ -271,15 +262,6 @@ if ($_POST["save"]) {
 
 		// Update suricata.conf and suricata.sh files for this interface
 		sync_suricata_package_config();
-
-		/*******************************************************/
-		/* Signal Suricata to reload configuration if we changed  */
-		/* HOME_NET, EXTERNAL_NET or Suppress list values.     */
-		/* The function only signals a running Suricata instance  */
-		/* to safely reload these parameters.                  */
-		/*******************************************************/
-		if ($suricata_reload == true)
-			suricata_reload_config($natent, "USR2");
 
 		header( 'Expires: Sat, 26 Jul 1997 05:00:00 GMT' );
 		header( 'Last-Modified: ' . gmdate( 'D, d M Y H:i:s' ) . ' GMT' );
@@ -319,7 +301,7 @@ if ($savemsg) {
 	$tab_array[] = array(gettext("Update Rules"), false, "/suricata/suricata_download_updates.php");
 	$tab_array[] = array(gettext("Alerts"), false, "/suricata/suricata_alerts.php?instance={$id}");
 	$tab_array[] = array(gettext("Suppress"), false, "/suricata/suricata_suppress.php");
-	$tab_array[] = array(gettext("Logs Browser"), false, "/suricata/suricata_logs_browser.php");
+	$tab_array[] = array(gettext("Logs Browser"), false, "/suricata/suricata_logs_browser.php?instance={$id}");
 	display_top_tabs($tab_array);
 	echo '</td></tr>';
 	echo '<tr><td class="tabnavtbl">';
@@ -521,7 +503,9 @@ if ($savemsg) {
 		<td width="78%" class="vtable"><input name="max_pending_packets" type="text" 
 			class="formfld unknown" id="max_pending_packets" size="8" value="<?=htmlspecialchars($pconfig['max_pending_packets']); ?>"/>&nbsp;
 			<?php echo gettext("Enter number of simultaneous packets to process.  Default is ") . "<strong>" . 
-			gettext("1024") . "</strong>."; ?><br/><br/><?php echo gettext("Minimum value is 1 and the maximum value is 65,535.") ?></td>
+			gettext("1024") . "</strong>."; ?><br/><br/><?php echo gettext("This controls the number simultaneous packets the engine can handle. ") . 
+			gettext("Setting this higher generally keeps the threads more busy. The minimum value is 1 and the maximum value is 65,000. ") . "<br/><span class='red'><strong>" . 
+			gettext("Warning: ") . "</strong></span>" . gettext("Setting this too high can lead to degradation and a possible system crash by exhausting available memory.") ?></td>
 	</tr>
 	<tr>
 		<td width="22%" valign="top" class="vncell"><?php echo gettext("Detect-Engine Profile"); ?></td>
@@ -557,7 +541,7 @@ if ($savemsg) {
 			</select>&nbsp;&nbsp;
 			<?php echo gettext("Choose a multi-pattern matcher (MPM) algorithm. ") . "<strong>" . gettext("Default") . 
 			"</strong>" . gettext(" is ") . "<strong>" . gettext("AC") . "</strong>"; ?>.<br/><br/>
-			<?php echo gettext("AC is recommended for most systems. "); ?>
+			<?php echo gettext("AC is the default, and is the best choice for almost all systems."); ?>
 			<br/></td>
 	</tr>
 	<tr>
@@ -587,7 +571,7 @@ if ($savemsg) {
 			gettext("3000") . "</strong>."; ?><br/><br/><?php echo gettext("When set to 0 an internal default is used.  When left blank there is no recursion limit.") ?></td>
 	</tr>
 	<tr>
-		<td colspan="2" class="listtopic"><?php echo gettext("Networks " . "Suricata Should Inspect and Whitelist"); ?></td>
+		<td colspan="2" class="listtopic"><?php echo gettext("Networks " . "Suricata Should Inspect and Protect"); ?></td>
 	</tr>
 	<tr>
 		<td width="22%" valign="top" class="vncell"><?php echo gettext("Home Net"); ?></td>

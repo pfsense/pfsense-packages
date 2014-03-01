@@ -299,15 +299,14 @@ elseif ($_POST['save']) {
 
 		/**************************************************/
 		/* If we have a valid rule ID, save configuration */
-		/* then update the suricata.conf file and rebuild */
-		/* the rules for this interface.                  */
+		/* then update the suricata.conf file for this    */
+		/* interface.                                     */
 		/**************************************************/
 		if (isset($id) && $a_nat[$id]) {
 			$a_nat[$id] = $natent;
 			write_config();
-			$rebuild_rules = true;
-			suricata_generate_yaml($natent);
 			$rebuild_rules = false;
+			suricata_generate_yaml($natent);
 		}
 
 		header( 'Expires: Sat, 26 Jul 1997 05:00:00 GMT' );
@@ -443,7 +442,7 @@ include_once("head.inc");
 	$tab_array[] = array(gettext("Update Rules"), false, "/suricata/suricata_download_updates.php");
 	$tab_array[] = array(gettext("Alerts"), false, "/suricata/suricata_alerts.php?instance={$id}");
 	$tab_array[] = array(gettext("Suppress"), false, "/suricata/suricata_suppress.php");
-	$tab_array[] = array(gettext("Logs Browser"), false, "/suricata/suricata_logs_browser.php");
+	$tab_array[] = array(gettext("Logs Browser"), false, "/suricata/suricata_logs_browser.php?instance={$id}");
 	display_top_tabs($tab_array);
 	echo '</td></tr>';
 	echo '<tr><td>';

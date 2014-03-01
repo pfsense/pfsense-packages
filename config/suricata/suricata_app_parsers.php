@@ -348,15 +348,14 @@ elseif ($_POST['save']) {
 
 		/**************************************************/
 		/* If we have a valid rule ID, save configuration */
-		/* then update the suricata.conf file and rebuild */
-		/* the rules for this interface.                  */
+		/* then update the suricata.conf file for this    */
+		/* interface.                                     */
 		/**************************************************/
 		if (isset($id) && $a_nat[$id]) {
 			$a_nat[$id] = $natent;
 			write_config();
-			$rebuild_rules = true;
-			suricata_generate_yaml($natent);
 			$rebuild_rules = false;
+			suricata_generate_yaml($natent);
 		}
 
 		header( 'Expires: Sat, 26 Jul 1997 05:00:00 GMT' );
@@ -385,7 +384,7 @@ include_once("head.inc");
 	}
 ?>
 
-<form action="suricata_app_parsers.php" method="post"name="iform" id="iform">
+<form action="suricata_app_parsers.php" method="post" name="iform" id="iform">
 <input name="id" type="hidden" value="<?=$id;?>"/>
 <input type="hidden" name="eng_id" id="eng_id" value="<?=$eng_id;?>"/>
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
@@ -397,7 +396,7 @@ include_once("head.inc");
 	$tab_array[] = array(gettext("Update Rules"), false, "/suricata/suricata_download_updates.php");
 	$tab_array[] = array(gettext("Alerts"), false, "/suricata/suricata_alerts.php?instance={$id}");
 	$tab_array[] = array(gettext("Suppress"), false, "/suricata/suricata_suppress.php");
-	$tab_array[] = array(gettext("Logs Browser"), false, "/suricata/suricata_logs_browser.php");
+	$tab_array[] = array(gettext("Logs Browser"), false, "/suricata/suricata_logs_browser.php?instance={$id}");
 	display_top_tabs($tab_array);
 	echo '</td></tr>';
 	echo '<tr><td>';
@@ -469,7 +468,7 @@ include_once("head.inc");
 					<th class="list" align="right"><input type="image" name="import_alias[]" src="../themes/<?= $g['theme'];?>/images/icons/icon_import_alias.gif" width="17" 
 					height="17" border="0" title="<?php echo gettext("Import server configuration from existing Aliases");?>"/>
 					<input type="image" name="add_libhtp_policy[]"  src="../themes/<?= $g['theme'];?>/images/icons/icon_plus.gif" width="17" 
-					height="17" border="0" title="<?php echo gettext("Add a new server configuration");?>"></a></th>
+					height="17" border="0" title="<?php echo gettext("Add a new server configuration");?>"></th>
 				</tr>
 			   </thead>
 			<?php foreach ($pconfig['libhtp_policy']['item'] as $f => $v): ?>
@@ -482,7 +481,7 @@ include_once("head.inc");
 			<?php if ($v['bind_to'] <> "all") : ?> 
 					<input type="image" name="del_libhtp_policy[]" value="<?=$f;?>" onclick="document.getElementById('eng_id').value='<?=$f;?>';return confirm('Are you sure you want to delete this entry?');" 
 					src="/themes/<?=$g['theme'];?>/images/icons/icon_x.gif" width="17" height="17" border="0" 
-					title="<?=gettext("Delete this server configuration");?>"></a>
+					title="<?=gettext("Delete this server configuration");?>">
 			<?php else : ?>
 					<img src="/themes/<?=$g['theme'];?>/images/icons/icon_x_d.gif" width="17" height="17" border="0" 
 					title="<?=gettext("Default server configuration cannot be deleted");?>">

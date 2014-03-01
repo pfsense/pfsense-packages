@@ -40,8 +40,6 @@ if (!is_array($config['installedpackages']['suricata']['rule']))
 	$config['installedpackages']['suricata']['rule'] = array();
 $a_rule = &$config['installedpackages']['suricata']['rule'];
 
-log_error(print_r($_POST, true));
-
 if ($_GET['id'])
 	$id = $_GET['id'];
 if ($_POST['id'])
@@ -54,19 +52,6 @@ if (isset($id) && $a_rule[$id]) {
 	$pconfig['interface'] = $a_rule[$id]['interface'];
 	$pconfig['rulesets'] = $a_rule[$id]['rulesets'];
 	$pconfig['customrules'] = base64_decode($a_rule[$id]['customrules']);
-}
-
-function truncate($string, $length) {
-
-	/********************************
-	 * This function truncates the  *
-	 * passed string to the length  *
-	 * specified adding ellipsis if *
-	 * truncation was necessary.    *
-	 ********************************/
-	if (strlen($string) > $length)
-		$string = substr($string, 0, ($length - 2)) . "...";
-	return $string; 
 }
 
 function add_title_attribute($tag, $title) {
@@ -347,17 +332,6 @@ elseif ($_POST['save']) {
 	$rebuild_rules = false;
 	/* Signal Suricata to "live reload" the rules */
 	suricata_reload_config($a_rule[$id]);
-//	$output = "";
-//	$retcode = "";
-//	exec("/usr/local/bin/suricata -T --init-errors-fatal -c {$suricatacfgdir}/suricata.yaml 2>&1", $output, $retcode);
-//	if (intval($retcode) != 0) {
-//		$error = "";
-//		$start = count($output);
-//		$end = $start - 4;
-//		for($i = $start; $i > $end; $i--)
-//			$error .= $output[$i];
-//		$input_errors[] = "Custom rules have errors:\n {$error}";
-//	}
 }
 elseif ($_POST['apply']) {
 
@@ -411,7 +385,7 @@ if ($savemsg) {
 		$tab_array[] = array(gettext("Update Rules"), false, "/suricata/suricata_download_updates.php");
 		$tab_array[] = array(gettext("Alerts"), false, "/suricata/suricata_alerts.php?instance={$id}");
 		$tab_array[] = array(gettext("Suppress"), false, "/suricata/suricata_suppress.php");
-		$tab_array[] = array(gettext("Logs Browser"), false, "/suricata/suricata_logs_browser.php");
+		$tab_array[] = array(gettext("Logs Browser"), false, "/suricata/suricata_logs_browser.php?instance={$id}");
 		display_top_tabs($tab_array);
 		echo '</td></tr>';
 		echo '<tr><td class="tabnavtbl">';
@@ -554,7 +528,6 @@ if ($savemsg) {
 							<col width="20" align="left" valign="middle">
 							<col width="6%" align="center" axis="number">
 							<col width="8%" align="center" axis="number">
-							<col width="54" align="center" axis="string">
 							<col width="52" align="center" axis="string">
 							<col width="12%" align="center" axis="string">
 							<col width="9%" align="center" axis="string">
@@ -567,7 +540,6 @@ if ($savemsg) {
 							<th class="list">&nbsp;</th>
 							<th class="listhdrr"><?php echo gettext("GID"); ?></th>
 							<th class="listhdrr"><?php echo gettext("SID"); ?></th>
-							<th class="listhdrr"><?php echo gettext("Action"); ?></th>
 							<th class="listhdrr"><?php echo gettext("Proto"); ?></th>
 							<th class="listhdrr"><?php echo gettext("Source"); ?></th>
 							<th class="listhdrr"><?php echo gettext("Port"); ?></th>
@@ -618,17 +590,17 @@ if ($savemsg) {
 								$tmp = trim(preg_replace('/^\s*#+\s*/', '', $tmp));
 								$rule_content = preg_split('/[\s]+/', $tmp);
 
-								// Create custom <span> tags for the fields we truncate so we can 
+								// Create custom <span> tags for some of the fields so we can 
 								// have a "title" attribute for tooltips to show the full string.
 								$srcspan = add_title_attribute($textss, $rule_content[2]);
 								$srcprtspan = add_title_attribute($textss, $rule_content[3]);
 								$dstspan = add_title_attribute($textss, $rule_content[5]);
 								$dstprtspan = add_title_attribute($textss, $rule_content[6]);
 								$protocol = $rule_content[1]; //protocol field
-								$source = truncate($rule_content[2], 14); //source field
-								$source_port = truncate($rule_content[3], 10); //source port field
-								$destination = truncate($rule_content[5], 14); //destination field
-								$destination_port = truncate($rule_content[6], 10); //destination port field
+								$source = $rule_content[2]; //source field
+								$source_port = $rule_content[3]; //source port field
+								$destination = $rule_content[5]; //destination field
+								$destination_port = $rule_content[6]; //destination port field
 								$message = suricata_get_msg($v['rule']);
 								$sid_tooltip = gettext("View the raw text for this rule");
 
@@ -638,33 +610,30 @@ if ($savemsg) {
 								src=\"../themes/{$g['theme']}/images/icons/{$iconb}\" width=\"11\" height=\"11\" border=\"0\"  
 								title='{$title}' name=\"toggle[]\"/>{$textse}
 							       </td>
-							       <td class=\"listlr\" align=\"center\" style=\"font-size: 10px;\">
+							       <td class=\"listlr\" align=\"center\" style=\"font-size: 11px;\" ondblclick=\"wopen('suricata_rules_edit.php?id={$id}&openruleset={$currentruleset}&sid={$sid}&gid={$gid}','FileViewer',800,600);\">
 									{$textss}{$gid}{$textse}
 							       </td>
-							       <td class=\"listlr\" align=\"center\" style=\"font-size: 10px;\">
+							       <td class=\"listlr\" align=\"center\" style=\"font-size: 11px;\" ondblclick=\"wopen('suricata_rules_edit.php?id={$id}&openruleset={$currentruleset}&sid={$sid}&gid={$gid}','FileViewer',800,600);\">
 									<a href=\"javascript: void(0)\" 
-									onclick=\"wopen('suricata_rules_edit.php?id={$id}&openruleset={$currentruleset}&ids={$sid}&gid={$gid}','FileViewer',800,600)\" 
+									onclick=\"wopen('suricata_rules_edit.php?id={$id}&openruleset={$currentruleset}&sid={$sid}&gid={$gid}','FileViewer',800,600);\" 
 									title='{$sid_tooltip}'>{$textss}{$sid}{$textse}</a>
 							       </td>
-							       <td class=\"listlr\" align=\"center\" style=\"font-size: 10px;\">
-									{$textss}{$v['action']}{$textse}
-							       </td>
-							       <td class=\"listlr\" align=\"center\" style=\"font-size: 10px;\">
+							       <td class=\"listlr\" align=\"center\" style=\"font-size: 11px;\" ondblclick=\"wopen('suricata_rules_edit.php?id={$id}&openruleset={$currentruleset}&sid={$sid}&gid={$gid}','FileViewer',800,600);\">
 									{$textss}{$protocol}{$textse}
 							       </td>
-							       <td class=\"listlr\" align=\"center\" style=\"font-size: 10px;\">
+							       <td class=\"listlr ellipsis\" align=\"center\" style=\"font-size: 11px;\" ondblclick=\"wopen('suricata_rules_edit.php?id={$id}&openruleset={$currentruleset}&sid={$sid}&gid={$gid}','FileViewer',800,600);\">
 									{$srcspan}{$source}</span>
 							       </td>
-							       <td class=\"listlr\" align=\"center\" style=\"font-size: 10px;\">
+							       <td class=\"listlr ellipsis\" align=\"center\" style=\"font-size: 11px;\" ondblclick=\"wopen('suricata_rules_edit.php?id={$id}&openruleset={$currentruleset}&sid={$sid}&gid={$gid}','FileViewer',800,600);\">
 									{$srcprtspan}{$source_port}</span>
 							       </td>
-							       <td class=\"listlr\" align=\"center\" style=\"font-size: 10px;\">
+							       <td class=\"listlr ellipsis\" align=\"center\" style=\"font-size: 11px;\" ondblclick=\"wopen('suricata_rules_edit.php?id={$id}&openruleset={$currentruleset}&sid={$sid}&gid={$gid}','FileViewer',800,600);\">
 									{$dstspan}{$destination}</span>
 							       </td>
-							       <td class=\"listlr\" align=\"center\" style=\"font-size: 10px;\">
+							       <td class=\"listlr ellipsis\" align=\"center\" style=\"font-size: 11px;\" ondblclick=\"wopen('suricata_rules_edit.php?id={$id}&openruleset={$currentruleset}&sid={$sid}&gid={$gid}','FileViewer',800,600);\">
 								       {$dstprtspan}{$destination_port}</span>
 							       </td>
-								<td class=\"listbg\" style=\"word-wrap:break-word; whitespace:pre-line; font-size: 10px; font-color: white;\"> 
+								<td class=\"listbg\" style=\"word-wrap:break-word; whitespace:pre-line; font-size: 11px; font-color: white;\" ondblclick=\"wopen('suricata_rules_edit.php?id={$id}&openruleset={$currentruleset}&sid={$sid}&gid={$gid}','FileViewer',800,600);\"> 
 									{$textss}{$message}{$textse}
 							       </td>
 							</tr>";

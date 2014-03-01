@@ -35,6 +35,10 @@ global $g, $rebuild_rules;
 $suricatadir = SURICATADIR;
 $flowbit_rules_file = FLOWBITS_FILENAME;
 
+// Array of default events rules for Suricata
+$default_rules = array( "decoder-events.rules", "files.rules", "http-events.rules", 
+			"smtp-events.rules", "stream-events.rules", "tls-events.rules" );
+
 if (!is_array($config['installedpackages']['suricata']['rule'])) {
 	$config['installedpackages']['suricata']['rule'] = array();
 }
@@ -87,17 +91,6 @@ if (!file_exists("{$suricatadir}rules/" . GPL_FILE_PREFIX . "community.rules"))
 if (($snortdownload != 'on') || ($a_nat[$id]['ips_policy_enable'] != 'on'))
 	$policy_select_disable = "disabled";
 
-if ($a_nat[$id]['autoflowbitrules'] == 'on') {
-	if (file_exists("{$suricatadir}suricata_{$suricata_uuid}_{$if_real}/rules/{$flowbit_rules_file}") &&
-	    filesize("{$suricatadir}suricata_{$suricata_uuid}_{$if_real}/rules/{$flowbit_rules_file}") > 0) {
-		$btn_view_flowb_rules = " title=\"" . gettext("View flowbit-required rules") . "\"";
-	}
-	else
-		$btn_view_flowb_rules = " disabled";
-}
-else
-	$btn_view_flowb_rules = " disabled";
-
 // If a Snort VRT policy is enabled and selected, remove all Snort VRT
 // rules from the configured rule sets to allow automatic selection.
 if ($a_nat[$id]['ips_policy_enable'] == 'on') {
@@ -126,7 +119,7 @@ if ($_POST["save"]) {
 	}
 
 	// Always start with the default events and files rules
-	$enabled_items = "decoder-events.rules||files.rules||http-events.rules||smtp-events.rules||stream-events.rules";
+	$enabled_items = implode("||", $default_rules);
 	if (is_array($_POST['toenable']))
 		$enabled_items .= "||" . implode("||", $_POST['toenable']);
 	else
@@ -157,7 +150,7 @@ if ($_POST["save"]) {
 }
 elseif ($_POST['unselectall']) {
 	// Remove all but the default events and files rules
-	$a_nat[$id]['rulesets'] = "decoder-events.rules||files.rules||http-events.rules||smtp-events.rules||stream-events.rules";
+	$a_nat[$id]['rulesets'] = implode("||", $default_rules);
 
 	if ($_POST['ips_policy_enable'] == "on") {
 		$a_nat[$id]['ips_policy_enable'] = 'on';
@@ -173,7 +166,7 @@ elseif ($_POST['unselectall']) {
 }
 elseif ($_POST['selectall']) {
 	// Start with the required default events and files rules
-	$rulesets = array( "decoder-events.rules", "files.rules", "http-events.rules", "smtp-events.rules", "stream-events.rules" );
+	$rulesets = $default_rules;
 
 	if ($_POST['ips_policy_enable'] == "on") {
 		$a_nat[$id]['ips_policy_enable'] = 'on';
@@ -214,6 +207,19 @@ elseif ($_POST['selectall']) {
 	sync_suricata_package_config();
 }
 
+// See if we have any Auto-Flowbit rules and enable
+// the VIEW button if we do.
+if ($a_nat[$id]['autoflowbitrules'] == 'on') {
+	if (file_exists("{$suricatadir}suricata_{$suricata_uuid}_{$if_real}/rules/{$flowbit_rules_file}") &&
+	    filesize("{$suricatadir}suricata_{$suricata_uuid}_{$if_real}/rules/{$flowbit_rules_file}") > 0) {
+		$btn_view_flowb_rules = " title=\"" . gettext("View flowbit-required rules") . "\"";
+	}
+	else
+		$btn_view_flowb_rules = " disabled";
+}
+else
+	$btn_view_flowb_rules = " disabled";
+
 $enabled_rulesets_array = explode("||", $a_nat[$id]['rulesets']);
 
 $if_friendly = convert_friendly_interface_to_friendly_descr($pconfig['interface']);
@@ -248,7 +254,7 @@ if ($savemsg) {
 	$tab_array[] = array(gettext("Update Rules"), false, "/suricata/suricata_download_updates.php");
 	$tab_array[] = array(gettext("Alerts"), false, "/suricata/suricata_alerts.php?instance={$id}");
 	$tab_array[] = array(gettext("Suppress"), false, "/suricata/suricata_suppress.php");
-	$tab_array[] = array(gettext("Logs Browser"), false, "/suricata/suricata_logs_browser.php");
+	$tab_array[] = array(gettext("Logs Browser"), false, "/suricata/suricata_logs_browser.php?instance={$id}");
 	display_top_tabs($tab_array);
 	echo '</td></tr>';
 	echo '<tr><td class="tabnavtbl">';

@@ -49,9 +49,7 @@
  **************************************************************************************/
 ?>
 
-<tr>
-<td class="tabcont">
-<table width="100%" border="0" cellpadding="6" cellspacing="0">
+<table class="tabcont" width="100%" border="0" cellpadding="6" cellspacing="0">
 	<tr>
 		<td colspan="2" align="center" class="listtopic"><?php echo gettext("Suricata Target-Based Host OS Policy Engine Configuration"); ?></td>
 	</tr>
@@ -120,8 +118,6 @@
 			gettext("Cancel changes and return to Flow/Stream tab"); ?>"></td>
 	</tr>
 </table>
-</td>
-</tr>
 <script type="text/javascript" src="/javascript/autosuggest.js">
 </script>
 <script type="text/javascript" src="/javascript/suggestions.js">

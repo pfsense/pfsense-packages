@@ -36,10 +36,10 @@ $suricatadir = SURICATADIR;
 $suricatalogdir = SURICATALOGDIR;
 $rcdir = RCFILEPREFIX;
 
-if ($_POST['id'] && is_numeric($_POST['id']))
+if ($_POST['id'])
 	$id = $_POST['id'];
 else
-	$id = "";
+	$id = 0;
 
 if (!is_array($config['installedpackages']['suricata']['rule']))
 	$config['installedpackages']['suricata']['rule'] = array();
@@ -47,32 +47,15 @@ $a_nat = &$config['installedpackages']['suricata']['rule'];
 $id_gen = count($config['installedpackages']['suricata']['rule']);
 
 if ($_POST['del_x']) {
-	/* delete selected rules */
+	/* delete selected interfaces */
 	if (is_array($_POST['rule'])) {
 		conf_mount_rw();
 		foreach ($_POST['rule'] as $rulei) {
-			/* convert fake interfaces to real */
 			$if_real = get_real_interface($a_nat[$rulei]['interface']);
 			$suricata_uuid = $a_nat[$rulei]['uuid'];
 			suricata_stop($a_nat[$rulei], $if_real);
 			exec("/bin/rm -r {$suricatalogdir}suricata_{$if_real}{$suricata_uuid}");
 			exec("/bin/rm -r {$suricatadir}suricata_{$suricata_uuid}_{$if_real}");
-
-			// If interface had auto-generated Suppress List, then
-			// delete that along with the interface
-			$autolist = "{$a_nat[$rulei]['interface']}" . "suppress";
-			if (is_array($config['installedpackages']['suricata']['suppress']) && 
-			    is_array($config['installedpackages']['suricata']['suppress']['item'])) {
-				$a_suppress = &$config['installedpackages']['suricata']['suppress']['item'];
-				foreach ($a_suppress as $k => $i) {
-					if ($i['name'] == $autolist) {
-						unset($config['installedpackages']['suricata']['suppress']['item'][$k]);
-						break;
-					}
-				}
-			}
-
-			// Finally delete the interface's config entry entirely
 			unset($a_nat[$rulei]);
 		}
 		conf_mount_ro();
@@ -106,12 +89,12 @@ if ($_POST['del_x']) {
 }
 
 /* start/stop Barnyard2 */
-if ($_POST['bartoggle'] && is_numeric($id)) {
+if ($_POST['bartoggle']) {
 	$suricatacfg = $config['installedpackages']['suricata']['rule'][$id];
 	$if_real = get_real_interface($suricatacfg['interface']);
 	$if_friendly = convert_friendly_interface_to_friendly_descr($suricatacfg['interface']);
 
-	if (suricata_is_running($suricatacfg['uuid'], $if_real, 'barnyard2') == 'no') {
+	if (!suricata_is_running($suricatacfg['uuid'], $if_real, 'barnyard2')) {
 		log_error("Toggle (barnyard starting) for {$if_friendly}({$suricatacfg['descr']})...");
 		sync_suricata_package_config();
 		suricata_barnyard_start($suricatacfg, $if_real);
@@ -126,12 +109,12 @@ if ($_POST['bartoggle'] && is_numeric($id)) {
 }
 
 /* start/stop Suricata */
-if ($_POST['toggle'] && is_numeric($id)) {
+if ($_POST['toggle']) {
 	$suricatacfg = $config['installedpackages']['suricata']['rule'][$id];
 	$if_real = get_real_interface($suricatacfg['interface']);
 	$if_friendly = convert_friendly_interface_to_friendly_descr($suricatacfg['interface']);
 
-	if (suricata_is_running($suricatacfg['uuid'], $if_real) == 'yes') {
+	if (suricata_is_running($suricatacfg['uuid'], $if_real)) {
 		log_error("Toggle (suricata stopping) for {$if_friendly}({$suricatacfg['descr']})...");
 		suricata_stop($suricatacfg, $if_real);
 	} else {
@@ -151,8 +134,9 @@ if ($_POST['toggle'] && is_numeric($id)) {
 	header("Location: /suricata/suricata_interfaces.php");
 	exit;
 }
-
-$pgtitle = "Services: Suricata Intrusion Detection System";
+$suri_bin_ver = SURICATA_VER;
+$suri_pkg_ver = SURICATA_PKG_VER;
+$pgtitle = "Services: Suricata {$suri_bin_ver} pkg {$suri_pkg_ver} - Intrusion Detection System";
 include_once("head.inc");
 
 ?>
@@ -203,7 +187,7 @@ include_once("head.inc");
 		</colgroup>
 		<thead>
 		<tr id="frheader">
-			<th class="list">&nbsp;</td>
+			<th class="list">&nbsp;</th>
 			<th class="listhdrr"><?php echo gettext("Interface"); ?></th>
 			<th class="listhdrr"><?php echo gettext("Suricata"); ?></th>
 			<th class="listhdrr"><?php echo gettext("Pattern Matcher"); ?></th>
@@ -240,7 +224,7 @@ include_once("head.inc");
 			$if_real = get_real_interface($natent['interface']);
 			$natend_friendly= convert_friendly_interface_to_friendly_descr($natent['interface']);
 			$suricata_uuid = $natent['uuid'];
-			if (suricata_is_running($suricata_uuid, $if_real) == 'no'){
+			if (!suricata_is_running($suricata_uuid, $if_real)){
 				$iconfn = 'block';
 				$iconfn_msg1 = 'Suricata is not running on ';
 				$iconfn_msg2 = '. Click to start.';
@@ -250,7 +234,7 @@ include_once("head.inc");
 				$iconfn_msg1 = 'Suricata is running on ';
 				$iconfn_msg2 = '. Click to stop.';
 			}
-			if (suricata_is_running($suricata_uuid, $if_real, 'barnyard2') == 'no'){
+			if (!suricata_is_running($suricata_uuid, $if_real, 'barnyard2')){
 				$biconfn = 'block';
 				$biconfn_msg1 = 'Barnyard2 is not running on ';
 				$biconfn_msg2 = '. Click to start.';
