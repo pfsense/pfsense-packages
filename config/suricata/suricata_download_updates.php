@@ -45,11 +45,11 @@ $snort_community_rules_filename = GPLV2_DNLD_FILENAME;
 
 if ($etpro == "on") {
 	$emergingthreats_filename = ETPRO_DNLD_FILENAME;
-	$et_name = "EMERGING THREATS PRO RULES";
+	$et_name = "Emerging Threats Pro Rules";
 }
 else {
 	$emergingthreats_filename = ET_DNLD_FILENAME;
-	$et_name = "EMERGING THREATS OPEN RULES";
+	$et_name = "Emerging Threats Open Rules";
 }
 
 /* quick md5 chk of downloaded rules */
@@ -183,25 +183,25 @@ include_once("head.inc");
 				<table width="95%" border="0" cellpadding="2" cellspacing="2">
 					<thead>
 						<tr>
-							<th class="listhdrr"><?=gettext("Rule Set Name/Vendor");?></th>
+							<th class="listhdrr"><?=gettext("Rule Set Name/Publisher");?></th>
 							<th class="listhdrr"><?=gettext("MD5 Signature Hash");?></th>
 							<th class="listhdrr"><?=gettext("MD5 Signature Date");?></th>
 						</tr>
 					</thead>
 					<tr>
-						<td align="right" class="vexpl"><b><?=$et_name;?>&nbsp;&nbsp;---></b></td>
-						<td class="vexpl"><? echo trim($emergingt_net_sig_chk_local);?></td>
-						<td class="vexpl"><?php echo gettext($emergingt_net_sig_date);?></td>
+						<td align="center" class="vncell vexpl"><b><?=$et_name;?></b></td>
+						<td align="center" class="vncell vexpl"><? echo trim($emergingt_net_sig_chk_local);?></td>
+						<td align="center" class="vncell vexpl"><?php echo gettext($emergingt_net_sig_date);?></td>
 					</tr>
 					<tr>
-						<td align="right" class="vexpl"><b>SNORT VRT RULES&nbsp;&nbsp;---></b></td>
-						<td class="vexpl"><? echo trim($snort_org_sig_chk_local);?></td>
-						<td class="vexpl"><?php echo gettext($snort_org_sig_date);?></td>
+						<td align="center" class="vncell vexpl"><b>Snort VRT Rules</b></td>
+						<td align="center" class="vncell vexpl"><? echo trim($snort_org_sig_chk_local);?></td>
+						<td align="center" class="vncell vexpl"><?php echo gettext($snort_org_sig_date);?></td>
 					</tr>
 					<tr>
-						<td align="right" class="vexpl"><b>SNORT GPLv2 COMMUNITY RULES&nbsp;&nbsp;---></b></td>
-						<td class="vexpl"><? echo trim($snort_community_sig_chk_local);?></td>
-						<td class="vexpl"><?php echo gettext($snort_community_sig_sig_date);?></td>
+						<td align="center" class="vncell vexpl"><b>Snort GPLv2 Community Rules</b></td>
+						<td align="center" class="vncell vexpl"><? echo trim($snort_community_sig_chk_local);?></td>
+						<td align="center" class="vncell vexpl"><?php echo gettext($snort_community_sig_sig_date);?></td>
 					</tr>
 				</table><br/>
 				</td>
@@ -225,7 +225,7 @@ include_once("head.inc");
 						<input type="submit" value="<?=gettext("Check");?>" name="check" id="check" class="formbtn" 
 						title="<?php echo gettext("Check for new updates to enabled rule sets"); ?>"/>&nbsp;&nbsp;&nbsp;&nbsp;
 						<input type="submit" value="<?=gettext("Force");?>" name="force" id="force" class="formbtn" 
-						title="<?=gettext("Force an update of enabled rule sets");?>" 
+						title="<?=gettext("Force an update of all enabled rule sets");?>" 
 						onclick="return confirm('<?=gettext("This will zero-out the MD5 hashes to force a fresh download of enabled rule sets.  Click OK to continue or CANCEL to quit");?>');"/>
 						<br/><br/>
 					<?php endif; ?>
