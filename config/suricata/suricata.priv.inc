@@ -41,5 +41,7 @@ $priv_list['page-services-suricata']['match'][] = "suricata/suricata.inc*";
 $priv_list['page-services-suricata']['match'][] = "suricata/suricata_post_install.php*";
 $priv_list['page-services-suricata']['match'][] = "suricata/suricata_uninstall.php*";
 $priv_list['page-services-suricata']['match'][] = "suricata/suricata_generate_yaml.php*";
-
+$priv_list['page-services-suricata']['match'][] = "widgets/javascript/suricata_alerts.js*";
+$priv_list['page-services-suricata']['match'][] = "widgets/widgets/suricata_alerts.widget.php*";
+$priv_list['page-services-suricata']['match'][] = "widgets/include/widget-suricata.inc*";
 ?>

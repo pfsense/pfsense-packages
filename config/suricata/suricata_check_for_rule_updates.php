@@ -431,17 +431,27 @@ if ($emergingthreats == 'on') {
 		array_map('unlink', glob("{$suricatadir}rules/{$eto_prefix}*ips.txt"));
 		array_map('unlink', glob("{$suricatadir}rules/{$etpro_prefix}*ips.txt"));
 
-		// The code below renames ET-Pro files with a prefix, so we
+		// The code below renames ET files with a prefix, so we
 		// skip renaming the Suricata default events rule files
-		// that are also bundled in the ET-Pro rules.
-		$default_rules = array( "decoder-events.rules", "files.rules", "http-events.rules", "smtp-events.rules", "stream-events.rules" );
+		// that are also bundled in the ET rules.
+		$default_rules = array( "decoder-events.rules", "files.rules", "http-events.rules", "smtp-events.rules", "stream-events.rules", "tls-events.rules" );
 		$files = glob("{$tmpfname}/emerging/rules/*.rules");
+		// Determine the correct prefix to use based on which
+		// Emerging Threats rules package is enabled.
+		if ($etpro == "on")
+			$prefix = ET_PRO_FILE_PREFIX;
+		else
+			$prefix = ET_OPEN_FILE_PREFIX;
 		foreach ($files as $file) {
 			$newfile = basename($file);
-			if ($etpro == "on" && !in_array($newfile, $default_rules))
-				@copy($file, "{$suricatadir}rules/" . ET_PRO_FILE_PREFIX . "{$newfile}");
-			else
+			if (in_array($newfile, $default_rules))
 				@copy($file, "{$suricatadir}rules/{$newfile}");
+			else {
+				if (strpos($newfile, $prefix) === FALSE)
+					@copy($file, "{$suricatadir}rules/{$prefix}{$newfile}");
+				else
+					@copy($file, "{$suricatadir}rules/{$newfile}");
+			}
 		}
 		/* IP lists for Emerging Threats rules */
 		$files = glob("{$tmpfname}/emerging/rules/*ips.txt");
@@ -646,17 +656,38 @@ if ($snortdownload == 'on' || $emergingthreats == 'on' || $snortcommunityrules =
 	$rebuild_rules = false;
 
 	/* Restart Suricata if already running and we are not rebooting to pick up the new rules. */
-       	if (is_process_running("suricata") && !$g['booting']) {
-		if ($pkg_interface <> "console") {
-			update_status(gettext('Restarting Suricata to activate the new set of rules...'));
-			update_output_window(gettext("Please wait ... restarting Suricata will take some time..."));
+       	if (is_process_running("suricata") && !$g['booting'] &&
+	    !empty($config['installedpackages']['suricata']['rule'])) {
+
+		// See if "Live Reload" is configured and signal each Suricata instance
+		// if enabled, else just do a hard restart of all the instances.
+		if ($config['installedpackages']['suricata']['config'][0]['live_swap_updates'] == 'on') {
+			if ($pkg_interface <> "console") {
+				update_status(gettext('Signalling Suricata to live-load the new set of rules...'));
+				update_output_window(gettext("Please wait ... the process should complete in a few seconds..."));
+			}
+			log_error(gettext("[Suricata] Live-Reload of rules from auto-update is enabled..."));
+			error_log(gettext("\tLive-Reload of updated rules is enabled...\n"), 3, $suricata_rules_upd_log);
+			foreach ($config['installedpackages']['suricata']['rule'] as $value) {
+				$if_real = get_real_interface($value['interface']);
+				suricata_reload_config($value);
+				error_log(gettext("\tLive swap of updated rules requested for " . convert_friendly_interface_to_friendly_descr($value['interface']) . ".\n"), 3, $suricata_rules_upd_log);
+			}
+			log_error(gettext("[Suricata] Live-Reload of updated rules completed..."));
+			error_log(gettext("\tLive-Reload of the updated rules is complete.\n"), 3, $suricata_rules_upd_log);
 		}
-		error_log(gettext("\tRestarting Suricata to activate the new set of rules...\n"), 3, $suricata_rules_upd_log);
-       		restart_service("suricata");
-		if ($pkg_interface <> "console")
-		        update_output_window(gettext("Suricata has restarted with your new set of rules..."));
-       		log_error(gettext("[Suricata] Suricata has restarted with your new set of rules..."));
-		error_log(gettext("\tSuricata has restarted with your new set of rules.\n"), 3, $suricata_rules_upd_log);
+		else {
+			if ($pkg_interface <> "console") {
+				update_status(gettext('Restarting Suricata to activate the new set of rules...'));
+				update_output_window(gettext("Please wait ... restarting Suricata will take some time..."));
+			}
+			error_log(gettext("\tRestarting Suricata to activate the new set of rules...\n"), 3, $suricata_rules_upd_log);
+       			restart_service("suricata");
+			if ($pkg_interface <> "console")
+				update_output_window(gettext("Suricata has restarted with your new set of rules..."));
+			log_error(gettext("[Suricata] Suricata has restarted with your new set of rules..."));
+			error_log(gettext("\tSuricata has restarted with your new set of rules.\n"), 3, $suricata_rules_upd_log);
+		}
 	}
 	else {
 		if ($pkg_interface <> "console")
@@ -666,13 +697,17 @@ if ($snortdownload == 'on' || $emergingthreats == 'on' || $snortcommunityrules =
 
 // Remove old $tmpfname files
 if (is_dir("{$tmpfname}")) {
-	if ($pkg_interface <> "console")
+	if ($pkg_interface <> "console") {
 		update_status(gettext("Cleaning up after rules extraction..."));
+		update_output_window(gettext("Removing {$tmpfname} directory..."));
+	}
 	exec("/bin/rm -r {$tmpfname}");
 }
 
-if ($pkg_interface <> "console")
+if ($pkg_interface <> "console") {
 	update_status(gettext("The Rules update has finished..."));
+	update_output_window("");
+}
 log_error(gettext("[Suricata] The Rules update has finished."));
 error_log(gettext("The Rules update has finished.  Time: " . date("Y-m-d H:i:s"). "\n\n"), 3, $suricata_rules_upd_log);
 conf_mount_ro();

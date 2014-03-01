@@ -49,12 +49,16 @@ if (isset($id) && $a_rule[$id]) {
 	$pconfig['interface'] = $a_rule[$id]['interface'];
 	$pconfig['rulesets'] = $a_rule[$id]['rulesets'];
 }
+else {
+	header("Location: /suricata/suricata_interfaces.php");
+	exit;
+}
 
 /* convert fake interfaces to real */
-$if_real = suricata_get_real_interface($pconfig['interface']);
+$if_real = get_real_interface($pconfig['interface']);
 $suricata_uuid = $a_rule[$id]['uuid'];
 $suricatacfgdir = "{$suricatadir}suricata_{$suricata_uuid}_{$if_real}";
-$file = $_GET['openruleset'];
+$file = htmlspecialchars($_GET['openruleset'], ENT_QUOTES | ENT_HTML401);
 $contents = '';
 $wrap_flag = "off";
 
@@ -86,33 +90,26 @@ if (substr($file, 0, 10) == "IPS Policy") {
 	unset($rules_map);
 }
 // Is it a SID to load the rule text from?
-elseif (isset($_GET['ids'])) {
+elseif (isset($_GET['sid']) && is_numeric(trim($_GET['sid']))) {
 	// If flowbit rule, point to interface-specific file
 	if ($file == "Auto-Flowbit Rules")
 		$rules_map = suricata_load_rules_map("{$suricatacfgdir}rules/" . FLOWBITS_FILENAME);
 	else
 		$rules_map = suricata_load_rules_map("{$suricatadir}rules/{$file}");
-	$contents = $rules_map[$_GET['gid']][trim($_GET['ids'])]['rule'];
+	$contents = $rules_map[$_GET['gid']][trim($_GET['sid'])]['rule'];
 	$wrap_flag = "soft";
 }
-
 // Is it our special flowbit rules file?
 elseif ($file == "Auto-Flowbit Rules")
 	$contents = file_get_contents("{$suricatacfgdir}rules/{$flowbit_rules_file}");
 // Is it a rules file in the ../rules/ directory?
 elseif (file_exists("{$suricatadir}rules/{$file}"))
 	$contents = file_get_contents("{$suricatadir}rules/{$file}");
-// Is it a fully qualified path and file?
-elseif (file_exists($file))
-	if (substr(realpath($file), 0, strlen(SURICATALOGDIR)) != SURICATALOGDIR)
-		$contents = gettext("\n\nERROR -- File: {$file} can not be viewed!");
-	else
-		$contents = file_get_contents($file);
 // It is not something we can display, so exit.
 else
 	$input_errors[] = gettext("Unable to open file: {$displayfile}");
 
-$pgtitle = array(gettext("Suricata"), gettext("File Viewer"));
+$pgtitle = array(gettext("Suricata"), gettext("Rules File Viewer"));
 ?>
 
 <?php include("head.inc");?>
@@ -131,7 +128,7 @@ $pgtitle = array(gettext("Suricata"), gettext("File Viewer"));
 		</tr>
 		<tr>
 			<td width="20%">
-				<input type="button" class="formbtn" value="Return" onclick="window.close()">
+				<input type="button" class="formbtn" value="Close" onclick="window.close()"/>
 			</td>
 			<td align="right">
 				<b><?php echo gettext("Rules File: ") . '</b>&nbsp;' . $displayfile; ?>&nbsp;&nbsp;&nbsp;&nbsp;

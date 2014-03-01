@@ -73,8 +73,33 @@ if ($config['installedpackages']['suricata']['config'][0]['clearlogs'] == 'on') 
 }
 
 /* Remove the Suricata GUI app directories */
-@unlink("/usr/local/pkg/suricata");
-@unlink("/usr/local/www/suricata");
+mwexec("/bin/rm -rf /usr/local/pkg/suricata");
+mwexec("/bin/rm -rf /usr/local/www/suricata");
+
+/* Remove our associated Dashboard widget config and files. */
+/* If "save settings" is enabled, then save old widget      */
+/* container settings so we can restore them later.         */
+$widgets = $config['widgets']['sequence'];
+if (!empty($widgets)) {
+	$widgetlist = explode(",", $widgets);
+	foreach ($widgetlist as $key => $widget) {
+		if (strstr($widget, "suricata_alerts-container")) {
+			if ($config['installedpackages']['suricata']['config'][0]['forcekeepsettings'] == 'on') {
+				$config['installedpackages']['suricata']['config'][0]['dashboard_widget'] = $widget;
+				if ($config['widgets']['widget_suricata_display_lines']) {
+					$config['installedpackages']['suricata']['config'][0]['dashboard_widget_rows'] = $config['widgets']['widget_suricata_display_lines'];
+					unset($config['widgets']['widget_suricata_display_lines']);
+				}
+			}
+			unset($widgetlist[$key]);
+		}
+	}
+	$config['widgets']['sequence'] = implode(",", $widgetlist);
+	write_config();
+}
+@unlink("/usr/local/www/widgets/include/widget-suricata.inc");
+@unlink("/usr/local/www/widgets/widgets/suricata_alerts.widget.php");
+@unlink("/usr/local/www/widgets/javascript/suricata_alerts.js");
 
 /* Keep this as a last step */
 if ($config['installedpackages']['suricata']['config'][0]['forcekeepsettings'] != 'on') {
@@ -83,7 +108,6 @@ if ($config['installedpackages']['suricata']['config'][0]['forcekeepsettings'] !
 	unset($config['installedpackages']['suricatasync']);
 	@unlink("{$suricata_rules_upd_log}");
 	mwexec("/bin/rm -rf {$suricatalogdir}");
-	@unlink(SURICATALOGDIR);
 	log_error(gettext("[Suricata] The package has been removed from this system..."));
 }
 

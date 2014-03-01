@@ -41,34 +41,34 @@ if (!is_array($config['installedpackages']['suricata']['rule'])) {
 }
 $a_nat = &$config['installedpackages']['suricata']['rule'];
 
-// Set who called us so we can return to the correct page with
-// the RETURN button.  We will just trust this User-Agent supplied
-// string for now.
-session_start();
-if(!isset($_SESSION['org_referer']))
-    $_SESSION['org_referer'] = $_SERVER['HTTP_REFERER'];
-$referrer = $_SESSION['org_referer'];
-
-if ($_POST['cancel']) {
-	session_start();
-	unset($_SESSION['org_referer']);
-	session_write_close();
-	header("Location: {$referrer}");
-	exit;
-}
-
-$id = $_GET['id'];
 if (isset($_POST['id']))
 	$id = $_POST['id'];
+elseif (isset($_GET['id']))
+	$id = $_GET['id'];
+
 if (is_null($id)) {
-	session_start();
-	unset($_SESSION['org_referer']);
-	session_write_close();
 	header("Location: /suricata/suricata_interfaces.php");
 	exit;
 }
 
-$if_real = suricata_get_real_interface($a_nat[$id]['interface']);
+// Set who called us so we can return to the correct page with
+// the RETURN ('cancel') button.
+if ($_POST['referrer'])
+	$referrer = $_POST['referrer'];
+else
+	$referrer = $_SERVER['HTTP_REFERER'];
+
+// Make sure a rule index ID is appended to the return URL
+if (strpos($referrer, "?id={$id}") === FALSE)
+	$referrer .= "?id={$id}";
+
+// If RETURN button clicked, exit to original calling page
+if ($_POST['cancel']) {
+	header("Location: {$referrer}");
+	exit;
+}
+
+$if_real = get_real_interface($a_nat[$id]['interface']);
 $suricata_uuid = $a_nat[$id]['uuid'];
 
 /* We should normally never get to this page if Auto-Flowbits are disabled, but just in case... */
@@ -83,12 +83,13 @@ if ($a_nat[$id]['autoflowbitrules'] == 'on') {
 else
 	$input_errors[] = gettext("Auto-Flowbit rule generation is disabled for this interface!");
 
-if ($_GET['act'] == "addsuppress" && is_numeric($_GET['sidid']) && is_numeric($_GET['gen_id'])) {
-	$descr = suricata_get_msg($rules_map[$_GET['gen_id']][$_GET['sidid']]['rule']);
+if ($_POST['addsuppress'] && is_numeric($_POST['sid']) && is_numeric($_POST['gid'])) {
+	$descr = suricata_get_msg($rules_map[$_POST['gid']][$_POST['sid']]['rule']);
+	$suppress = gettext("## -- This rule manually suppressed from the Auto-Flowbits list. -- ##\n");
 	if (empty($descr))
-		$suppress = "suppress gen_id {$_GET['gen_id']}, sig_id {$_GET['sidid']}\n";
+		$suppress .= "suppress gen_id {$_POST['gid']}, sig_id {$_POST['sid']}\n";
 	else
-		$suppress = "# {$descr}\nsuppress gen_id {$_GET['gen_id']}, sig_id {$_GET['sidid']}\n";
+		$suppress .= "# {$descr}\nsuppress gen_id {$_POST['gid']}, sig_id {$_POST['sid']}\n";
 	if (!is_array($config['installedpackages']['suricata']['suppress']))
 		$config['installedpackages']['suricata']['suppress'] = array();
 	if (!is_array($config['installedpackages']['suricata']['suppress']['item']))
@@ -128,7 +129,7 @@ if ($_GET['act'] == "addsuppress" && is_numeric($_GET['sidid']) && is_numeric($_
 		$rebuild_rules = false;
 		sync_suricata_package_config();
 		suricata_reload_config($a_nat[$id]);
-		$savemsg = gettext("An entry to suppress the Alert for 'gen_id {$_GET['gen_id']}, sig_id {$_GET['sidid']}' has been added to Suppress List '{$a_nat[$id]['suppresslistname']}'.");
+		$savemsg = gettext("An entry to suppress the Alert for 'gen_id {$_POST['gid']}, sig_id {$_POST['sid']}' has been added to Suppress List '{$a_nat[$id]['suppresslistname']}'.");
 	}
 	else {
 		/* We did not find the defined list, so notify the user with an error */
@@ -136,23 +137,10 @@ if ($_GET['act'] == "addsuppress" && is_numeric($_GET['sidid']) && is_numeric($_
 	}
 }
 
-function truncate($string, $length) {
-
-	/********************************
-	 * This function truncates the  *
-	 * passed string to the length  *
-	 * specified adding ellipsis if *
-	 * truncation was necessary.    *
-	 ********************************/
-	if (strlen($string) > $length)
-		$string = substr($string, 0, ($length - 3)) . "...";
-	return $string; 
-}
-
 /* Load up an array with the current Suppression List GID,SID values */
 $supplist = suricata_load_suppress_sigs($a_nat[$id]);
 
-$if_friendly = suricata_get_friendly_interface($a_nat[$id]['interface']);
+$if_friendly = convert_friendly_interface_to_friendly_descr($a_nat[$id]['interface']);
 $pgtitle = gettext("Suricata: Interface {$if_friendly} - Flowbit Rules");
 include_once("head.inc");
 
@@ -162,12 +150,15 @@ include_once("head.inc");
 
 <?php
 include("fbegin.inc");
-if($pfsense_stable == 'yes'){echo '<p class="pgtitle">' . $pgtitle . '</p>';}
 if ($input_errors) print_input_errors($input_errors);
 if ($savemsg)
 	print_info_box($savemsg);
 ?>
 <form action="suricata_rules_flowbits.php" method="post" name="iform" id="iform">
+<input type="hidden" name="id" value="<?=$id;?>"/>
+<input type="hidden" name="referrer" value="<?=$referrer;?>"/>
+<input type="hidden" name="sid" id="sid" value=""/>
+<input type="hidden" name="gid" id="gid" value=""/>
 <div id="boxarea">
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
 <tr>
@@ -248,18 +239,19 @@ if ($savemsg)
 							$rule_content = preg_split('/[\s]+/', $tmp);
 
 							$protocol = $rule_content[1]; //protocol
-							$source = truncate($rule_content[2], 14); //source
-							$destination = truncate($rule_content[5], 14); //destination
+							$source = $rule_content[2]; //source
+							$destination = $rule_content[5]; //destination
 							$message = suricata_get_msg($v['rule']);
 							$flowbits = implode("; ", suricata_get_flowbits($v['rule']));
 							if (strstr($flowbits, "noalert"))
 								$supplink = "";
 							else {
 								if (!isset($supplist[$gid][$sid])) {
-									$supplink = "<a href=\"?id={$id}&act=addsuppress&sidid={$sid}&gen_id={$gid}\">";
-									$supplink .= "<img src=\"../themes/{$g['theme']}/images/icons/icon_plus.gif\" ";
+									$supplink = "<input type=\"image\" name=\"addsuppress[]\" onClick=\"document.getElementById('sid').value='{$sid}';";
+									$supplink .= "document.getElementById('gid').value='{$gid}';\" ";
+									$supplink .= "src=\"../themes/{$g['theme']}/images/icons/icon_plus.gif\" ";
 									$supplink .= "width='12' height='12' border='0' title='";
-									$supplink .= gettext("Click to add to Suppress List") . "'/></a>";
+									$supplink .= gettext("Click to add to Suppress List") . "'/>";
 								}
 								else {
 									$supplink = "<img src=\"../themes/{$g['theme']}/images/icons/icon_plus_d.gif\" ";
@@ -270,10 +262,10 @@ if ($savemsg)
 
 							// Use "echo" to write the table HTML row-by-row.
 							echo "<tr>" . 
-								"<td class=\"listr\">{$sid}&nbsp;{$supplink}</td>" . 
+								"<td class=\"listr\" sorttable_customkey=\"{$sid}\">{$sid}&nbsp;{$supplink}</td>" . 
 								"<td class=\"listr\">{$protocol}</td>" . 
-								"<td class=\"listr\"><span title=\"{$rule_content[2]}\">{$source}</span></td>" . 
-								"<td class=\"listr\"><span title=\"{$rule_content[5]}\">{$destination}</span></td>" . 
+								"<td class=\"listr ellipsis\"><span title=\"{$rule_content[2]}\">{$source}</span></td>" . 
+								"<td class=\"listr ellipsis\"><span title=\"{$rule_content[5]}\">{$destination}</span></td>" . 
 								"<td class=\"listr\" style=\"word-wrap:break-word; word-break:normal;\">{$flowbits}</td>" . 
 								"<td class=\"listr\" style=\"word-wrap:break-word; word-break:normal;\">{$message}</td>" . 
 							"</tr>";

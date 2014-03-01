@@ -28,7 +28,6 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-
 require_once("guiconfig.inc");
 require_once("/usr/local/pkg/suricata/suricata.inc");
 
@@ -46,6 +45,7 @@ $pconfig['suricataloglimit'] = $config['installedpackages']['suricata']['config'
 $pconfig['suricataloglimitsize'] = $config['installedpackages']['suricata']['config'][0]['suricataloglimitsize'];
 $pconfig['autoruleupdate'] = $config['installedpackages']['suricata']['config'][0]['autoruleupdate'];
 $pconfig['autoruleupdatetime'] = $config['installedpackages']['suricata']['config'][0]['autoruleupdatetime'];
+$pconfig['live_swap_updates'] = $config['installedpackages']['suricata']['config'][0]['live_swap_updates'];
 $pconfig['log_to_systemlog'] = $config['installedpackages']['suricata']['config'][0]['log_to_systemlog'];
 $pconfig['clearlogs'] = $config['installedpackages']['suricata']['config'][0]['clearlogs'];
 $pconfig['forcekeepsettings'] = $config['installedpackages']['suricata']['config'][0]['forcekeepsettings'];
@@ -58,7 +58,6 @@ if (empty($pconfig['autoruleupdatetime']))
 if (empty($pconfig['suricataloglimitsize']))
 	// Set limit to 20% of slice that is unused */
 	$pconfig['suricataloglimitsize'] = round(exec('df -k /var | grep -v "Filesystem" | awk \'{print $4}\'') * .20 / 1024);
-
 
 if ($_POST['autoruleupdatetime']) {
 	if (!preg_match('/^([01]?[0-9]|2[0-3]):?([0-5][0-9])$/', $_POST['autoruleupdatetime']))
@@ -73,7 +72,7 @@ if ($_POST['enable_etpro_rules'] == "on" && empty($_POST['etprocode']))
 
 /* if no errors move foward with save */
 if (!$input_errors) {
-	if ($_POST["Submit"]) {
+	if ($_POST["save"]) {
 
 		$config['installedpackages']['suricata']['config'][0]['enable_vrt_rules'] = $_POST['enable_vrt_rules'] ? 'on' : 'off';
 		$config['installedpackages']['suricata']['config'][0]['snortcommunityrules'] = $_POST['snortcommunityrules'] ? 'on' : 'off';
@@ -139,6 +138,7 @@ if (!$input_errors) {
 		}
 		$config['installedpackages']['suricata']['config'][0]['autoruleupdatetime'] = str_pad($_POST['autoruleupdatetime'], 4, "0", STR_PAD_LEFT);
 		$config['installedpackages']['suricata']['config'][0]['log_to_systemlog'] = $_POST['log_to_systemlog'] ? 'on' : 'off';
+		$config['installedpackages']['suricata']['config'][0]['live_swap_updates'] = $_POST['live_swap_updates'] ? 'on' : 'off';
 		$config['installedpackages']['suricata']['config'][0]['clearlogs'] = $_POST['clearlogs'] ? 'on' : 'off';
 		$config['installedpackages']['suricata']['config'][0]['forcekeepsettings'] = $_POST['forcekeepsettings'] ? 'on' : 'off';
 
@@ -187,7 +187,7 @@ if ($input_errors)
         $tab_array[] = array(gettext("Suricata Interfaces"), false, "/suricata/suricata_interfaces.php");
         $tab_array[] = array(gettext("Global Settings"), true, "/suricata/suricata_global.php");
 	$tab_array[] = array(gettext("Update Rules"), false, "/suricata/suricata_download_updates.php");
-	$tab_array[] = array(gettext("Alerts"), false, "/suricata/suricata_alerts.php?instance={$instanceid}");
+	$tab_array[] = array(gettext("Alerts"), false, "/suricata/suricata_alerts.php");
 	$tab_array[] = array(gettext("Suppress"), false, "/suricata/suricata_suppress.php");
 	$tab_array[] = array(gettext("Logs Browser"), false, "/suricata/suricata_logs_browser.php");
         display_top_tabs($tab_array);
@@ -206,13 +206,13 @@ if ($input_errors)
 		<table width="100%" border="0" cellpadding="2" cellspacing="0">
 			<tr>
 				<td valign="top" width="8%"><input name="enable_etopen_rules" type="checkbox" value="on" onclick="enable_et_rules();" 
-				<?php if ($config['installedpackages']['suricata']['config'][0]['enable_etopen_rules']=="on") echo "checked"; ?>></td>
+				<?php if ($config['installedpackages']['suricata']['config'][0]['enable_etopen_rules']=="on") echo "checked"; ?>/></td>
 				<td><span class="vexpl"><?php echo gettext("ETOpen is an open source set of Snort rules whose coverage " .
 				"is more limited than ETPro."); ?></span></td>
 			</tr>
 			<tr>
 				<td valign="top" width="8%"><input name="enable_etpro_rules" type="checkbox" value="on" onclick="enable_pro_rules();" 
-				<?php if ($config['installedpackages']['suricata']['config'][0]['enable_etpro_rules']=="on") echo "checked"; ?>></td>
+				<?php if ($config['installedpackages']['suricata']['config'][0]['enable_etpro_rules']=="on") echo "checked"; ?>/></td>
 				<td><span class="vexpl"><?php echo gettext("ETPro for Snort offers daily updates and extensive coverage of current malware threats."); ?></span></td>
 			</tr>
 		<tr>
@@ -234,9 +234,8 @@ if ($input_errors)
 		</tr>
 		<tr>
 			<td valign="top"><span class="vexpl"><strong><?php echo gettext("Code:"); ?></strong></span></td>
-			<td><input name="etprocode" type="text"
-				class="formfld unknown" id="etprocode" size="52"
-				value="<?=htmlspecialchars($pconfig['etprocode']);?>"><br/>
+			<td><input name="etprocode" type="text" class="formfld unknown" id="etprocode" size="52" 
+			value="<?=htmlspecialchars($pconfig['etprocode']);?>"/><br/>
 			<?php echo gettext("Obtain an ETPro subscription code and paste it here."); ?></td>
 		</tr>
 		</table>
@@ -248,7 +247,7 @@ if ($input_errors)
 		<table width="100%" border="0" cellpadding="2" cellspacing="0">
 		<tr>
 			<td><input name="enable_vrt_rules" type="checkbox" id="enable_vrt_rules" value="on" onclick="enable_snort_vrt();" 
-			<?php if($pconfig['enable_vrt_rules']=='on') echo 'checked'; ?>></td>
+			<?php if($pconfig['enable_vrt_rules']=='on') echo 'checked'; ?>/></td>
 			<td><span class="vexpl"><?php echo gettext("Snort VRT free Registered User or paid Subscriber rules"); ?></span></td>
 		<tr>
 			<td>&nbsp;</td>
@@ -266,9 +265,8 @@ if ($input_errors)
 		</tr>
 		<tr>
 			<td valign="top"><span class="vexpl"><strong><?php echo gettext("Code:"); ?></strong></span></td>
-			<td><input name="oinkcode" type="text"
-				class="formfld unknown" id="oinkcode" size="52"
-				value="<?=htmlspecialchars($pconfig['oinkcode']);?>"><br/>
+			<td><input name="oinkcode" type="text" class="formfld unknown" id="oinkcode" size="52" 
+			value="<?=htmlspecialchars($pconfig['oinkcode']);?>"/><br/>
 			<?php echo gettext("Obtain a snort.org Oinkmaster code and paste it here."); ?></td>
 		</tr>
 		</table>
@@ -279,7 +277,7 @@ if ($input_errors)
 		<table width="100%" border="0" cellpadding="2" cellspacing="0">
 			<tr>
 				<td valign="top" width="8%"><input name="snortcommunityrules" type="checkbox" value="on"
-				<?php if ($config['installedpackages']['suricata']['config'][0]['snortcommunityrules']=="on") echo "checked";?> ></td>
+				<?php if ($config['installedpackages']['suricata']['config'][0]['snortcommunityrules']=="on") echo " checked";?>/></td>
 				<td class="vexpl"><?php echo gettext("The Snort Community Ruleset is a GPLv2 VRT certified ruleset that is distributed free of charge " . 
 				"without any VRT License restrictions.  This ruleset is updated daily and is a subset of the subscriber ruleset.");?>
 				<br/><br/><?php echo "<span class=\"red\"><strong>" . gettext("Note:  ") . "</strong></span>" . 
@@ -302,18 +300,25 @@ if ($input_errors)
 		<?php if ($iface3 == $pconfig['autoruleupdate']) echo "selected"; ?>>
 			<?=htmlspecialchars($ifacename3);?></option>
 			<?php endforeach; ?>
-	</select><span class="vexpl">&nbsp;&nbsp;<?php echo gettext("Please select the interval for rule updates. Choosing ") . 
+	</select>&nbsp;&nbsp;<?php echo gettext("Please select the interval for rule updates. Choosing ") . 
 	"<strong>" . gettext("NEVER") . "</strong>" . gettext(" disables auto-updates."); ?><br/><br/>
-	<?php echo "<span class=\"red\"><strong>" . gettext("Hint: ") . "</strong></span>" . gettext("in most cases, every 12 hours is a good choice."); ?></span></td>
+	<?php echo "<span class=\"red\"><strong>" . gettext("Hint: ") . "</strong></span>" . gettext("in most cases, every 12 hours is a good choice."); ?></td>
 </tr>
 <tr>
 	<td width="22%" valign="top" class="vncell"><?php echo gettext("Update Start Time"); ?></td>
 	<td width="78%" class="vtable"><input type="text" class="formfld time" name="autoruleupdatetime" id="autoruleupdatetime" size="4" 
-	maxlength="5" value="<?=$pconfig['autoruleupdatetime'];?>" <?php if ($pconfig['autoruleupdate'] == "never_up") {echo "disabled";} ?>><span class="vexpl">&nbsp;&nbsp;
-	<?php echo gettext("Enter the rule update start time in 24-hour format (HH:MM). ") . "<strong>" . 
-	gettext("Default") . "&nbsp;</strong>" . gettext("is ") . "<strong>" . gettext("00:03") . "</strong></span>"; ?>.<br/><br/>
+	maxlength="5" value="<?=$pconfig['autoruleupdatetime'];?>" <?php if ($pconfig['autoruleupdate'] == "never_up") {echo "disabled";} ?>/>&nbsp;&nbsp;
+	<?php echo gettext("Enter the rule update start time in 24-hour format (HH:MM). Default is ") . "<strong>" . gettext("00:03") . "</strong>"; ?>.<br/><br/>
 	<?php echo gettext("Rules will update at the interval chosen above starting at the time specified here. For example, using the default " . 
 	"start time of 00:03 and choosing 12 Hours for the interval, the rules will update at 00:03 and 12:03 each day."); ?></td>
+</tr>
+<tr>
+	<td width="22%" valign="top" class="vncell"><?php echo gettext("Live Rule Swap on Update"); ?></td>
+	<td width="78%" class="vtable"><input name="live_swap_updates" id="live_swap_updates" type="checkbox" value="yes"
+	<?php if ($config['installedpackages']['suricata']['config'][0]['live_swap_updates']=="on") echo " checked"; ?>/>
+	&nbsp;<?php echo gettext("Enable \"Live Swap\" reload of rules after downloading an update.  Default is ") . "<strong>" . gettext("Not Checked") . "</strong>"; ?><br/><br/>
+	<?php echo gettext("When enabled, Suricata will perform a live load of the new rules following an update instead of a hard restart.  " . 
+	"If issues are encountered with live load, uncheck this option to perform a hard restart of all Suricata instances following an update."); ?></td>
 </tr>
 <tr>
 	<td colspan="2" valign="top" class="listtopic"><?php echo gettext("General Settings"); ?></td>
@@ -330,12 +335,12 @@ if ($input_errors)
 		<table cellpadding="0" cellspacing="0">
 			<tr>
 				<td colspan="2"><input name="suricataloglimit" type="radio" id="suricataloglimit" value="on" 
-					<?php if($pconfig['suricataloglimit']=='on') echo 'checked'; ?>><span class="vexpl">
+					<?php if($pconfig['suricataloglimit']=='on') echo 'checked'; ?>/><span class="vexpl">
 					<strong><?php echo gettext("Enable"); ?></strong> <?php echo gettext("directory size limit"); ?> (<strong><?php echo gettext("Default"); ?></strong>)</span></td>
 			</tr>
 			<tr>
 				<td colspan="2"><input name="suricataloglimit" type="radio" id="suricataloglimit" value="off" 
-					<?php if($pconfig['suricataloglimit']=='off') echo 'checked'; ?>> <span class="vexpl"><strong><?php echo gettext("Disable"); ?></strong>
+					<?php if($pconfig['suricataloglimit']=='off') echo 'checked'; ?>/> <span class="vexpl"><strong><?php echo gettext("Disable"); ?></strong>
 					<?php echo gettext("directory size limit"); ?></span><br/>
 				<br/>
 				<span class="red"><strong><?php echo gettext("Warning:"); ?></strong></span> <?php echo gettext("Nanobsd " .
@@ -345,7 +350,7 @@ if ($input_errors)
 		<table width="100%" border="0" cellpadding="2" cellspacing="0">
 			<tr>
 				<td class="vexpl"><?php echo gettext("Size in ") . "<strong>" . gettext("MB:") . "</strong>";?>&nbsp;
-				<input name="suricataloglimitsize" type="text" class="formfld unknown" id="suricataloglimitsize" size="10" value="<?=htmlspecialchars($pconfig['suricataloglimitsize']);?>">
+				<input name="suricataloglimitsize" type="text" class="formfld unknown" id="suricataloglimitsize" size="10" value="<?=htmlspecialchars($pconfig['suricataloglimitsize']);?>"/>
 				&nbsp;<?php echo gettext("Default is ") . "<strong>" . gettext("20%") . "</strong>" . gettext(" of available space.");?></td>
 			</tr>
 		</table>
@@ -368,34 +373,27 @@ if ($input_errors)
 </tr>
 <tr>
 	<td width="22%" valign="top" class="vncell"><?php echo gettext("Log to System Log"); ?></td>
-	<td width="78%" class="vtable"><input name="log_to_systemlog"
-		id="log_to_systemlog" type="checkbox" value="yes"
-		<?php if ($config['installedpackages']['suricata']['config'][0]['log_to_systemlog']=="on") echo "checked"; ?>
-		>&nbsp;<?php echo gettext("Copy Suricata messages to the firewall system log."); ?></td>
+	<td width="78%" class="vtable"><input name="log_to_systemlog" id="log_to_systemlog" type="checkbox" value="yes"
+	<?php if ($config['installedpackages']['suricata']['config'][0]['log_to_systemlog']=="on") echo " checked"; ?>/>&nbsp;
+	<?php echo gettext("Copy Suricata messages to the firewall system log."); ?></td>
 </tr>
 <tr>
 	<td width="22%" valign="top" class="vncell"><?php echo gettext("Remove Suricata Log Files After Deinstall"); ?></td>
-	<td width="78%" class="vtable"><input name="clearlogs"
-		id="clearlogs" type="checkbox" value="yes"
-		<?php if ($config['installedpackages']['suricata']['config'][0]['clearlogs']=="on") echo "checked"; ?>
-		>&nbsp;<?php echo gettext("Suricata log files will be removed during package deinstallation."); ?></td>
+	<td width="78%" class="vtable"><input name="clearlogs" id="clearlogs" type="checkbox" value="yes"
+	<?php if ($config['installedpackages']['suricata']['config'][0]['clearlogs']=="on") echo " checked"; ?>/>&nbsp;
+	<?php echo gettext("Suricata log files will be removed during package deinstallation."); ?></td>
 </tr>
 <tr>
 	<td width="22%" valign="top" class="vncell"><?php echo gettext("Keep Suricata Settings After Deinstall"); ?></td>
-	<td width="78%" class="vtable"><input name="forcekeepsettings"
-		id="forcekeepsettings" type="checkbox" value="yes"
-		<?php if ($config['installedpackages']['suricata']['config'][0]['forcekeepsettings']=="on") echo "checked"; ?>
-		>&nbsp;<?php echo gettext("Settings will not be removed during package deinstallation."); ?></td>
+	<td width="78%" class="vtable"><input name="forcekeepsettings" id="forcekeepsettings" type="checkbox" value="yes"
+	<?php if ($config['installedpackages']['suricata']['config'][0]['forcekeepsettings']=="on") echo " checked"; ?>/>&nbsp;
+	<?php echo gettext("Settings will not be removed during package deinstallation."); ?></td>
 </tr>
 <tr>
-	<td width="22%" valign="top">
-	<td width="78%">
-		<input name="Submit" type="submit" class="formbtn" value="Save" >
-	</td>
+	<td colspan="2" align="center"><input name="save" type="submit" class="formbtn" value="Save"/></td>
 </tr>
 <tr>
-	<td width="22%" valign="top">&nbsp;</td>
-	<td width="78%" class="vexpl"><span class="red"><strong><?php echo gettext("Note:");?></strong>&nbsp;
+	<td colspan="2" class="vexpl" align="center"><span class="red"><strong><?php echo gettext("Note:");?></strong>&nbsp;
 	</span><?php echo gettext("Changing any settings on this page will affect all Suricata-configured interfaces.");?></td>
 </tr>
 	</table>

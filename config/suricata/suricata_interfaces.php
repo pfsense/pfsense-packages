@@ -27,7 +27,6 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-$nocsrf = true;
 require_once("guiconfig.inc");
 require_once("/usr/local/pkg/suricata/suricata.inc");
 
@@ -37,42 +36,26 @@ $suricatadir = SURICATADIR;
 $suricatalogdir = SURICATALOGDIR;
 $rcdir = RCFILEPREFIX;
 
-$id = $_GET['id'];
-if (isset($_POST['id']))
+if ($_POST['id'])
 	$id = $_POST['id'];
+else
+	$id = 0;
 
 if (!is_array($config['installedpackages']['suricata']['rule']))
 	$config['installedpackages']['suricata']['rule'] = array();
 $a_nat = &$config['installedpackages']['suricata']['rule'];
 $id_gen = count($config['installedpackages']['suricata']['rule']);
 
-if (isset($_POST['del_x'])) {
-	/* delete selected rules */
+if ($_POST['del_x']) {
+	/* delete selected interfaces */
 	if (is_array($_POST['rule'])) {
 		conf_mount_rw();
 		foreach ($_POST['rule'] as $rulei) {
-			/* convert fake interfaces to real */
 			$if_real = get_real_interface($a_nat[$rulei]['interface']);
 			$suricata_uuid = $a_nat[$rulei]['uuid'];
 			suricata_stop($a_nat[$rulei], $if_real);
 			exec("/bin/rm -r {$suricatalogdir}suricata_{$if_real}{$suricata_uuid}");
 			exec("/bin/rm -r {$suricatadir}suricata_{$suricata_uuid}_{$if_real}");
-
-			// If interface had auto-generated Suppress List, then
-			// delete that along with the interface
-			$autolist = "{$a_nat[$rulei]['interface']}" . "suppress";
-			if (is_array($config['installedpackages']['suricata']['suppress']) && 
-			    is_array($config['installedpackages']['suricata']['suppress']['item'])) {
-				$a_suppress = &$config['installedpackages']['suricata']['suppress']['item'];
-				foreach ($a_suppress as $k => $i) {
-					if ($i['name'] == $autolist) {
-						unset($config['installedpackages']['suricata']['suppress']['item'][$k]);
-						break;
-					}
-				}
-			}
-
-			// Finally delete the interface's config entry entirely
 			unset($a_nat[$rulei]);
 		}
 		conf_mount_ro();
@@ -103,16 +86,15 @@ if (isset($_POST['del_x'])) {
 		header("Location: /suricata/suricata_interfaces.php");
 		exit;
 	}
-
 }
 
 /* start/stop Barnyard2 */
-if ($_GET['act'] == 'bartoggle' && is_numeric($id)) {
+if ($_POST['bartoggle']) {
 	$suricatacfg = $config['installedpackages']['suricata']['rule'][$id];
 	$if_real = get_real_interface($suricatacfg['interface']);
 	$if_friendly = convert_friendly_interface_to_friendly_descr($suricatacfg['interface']);
 
-	if (suricata_is_running($suricatacfg['uuid'], $if_real, 'barnyard2') == 'no') {
+	if (!suricata_is_running($suricatacfg['uuid'], $if_real, 'barnyard2')) {
 		log_error("Toggle (barnyard starting) for {$if_friendly}({$suricatacfg['descr']})...");
 		sync_suricata_package_config();
 		suricata_barnyard_start($suricatacfg, $if_real);
@@ -127,12 +109,12 @@ if ($_GET['act'] == 'bartoggle' && is_numeric($id)) {
 }
 
 /* start/stop Suricata */
-if ($_GET['act'] == 'toggle' && is_numeric($id)) {
+if ($_POST['toggle']) {
 	$suricatacfg = $config['installedpackages']['suricata']['rule'][$id];
 	$if_real = get_real_interface($suricatacfg['interface']);
 	$if_friendly = convert_friendly_interface_to_friendly_descr($suricatacfg['interface']);
 
-	if (suricata_is_running($suricatacfg['uuid'], $if_real) == 'yes') {
+	if (suricata_is_running($suricatacfg['uuid'], $if_real)) {
 		log_error("Toggle (suricata stopping) for {$if_friendly}({$suricatacfg['descr']})...");
 		suricata_stop($suricatacfg, $if_real);
 	} else {
@@ -152,24 +134,22 @@ if ($_GET['act'] == 'toggle' && is_numeric($id)) {
 	header("Location: /suricata/suricata_interfaces.php");
 	exit;
 }
-
-$pgtitle = "Services: Suricata Intrusion Detection System";
+$suri_bin_ver = SURICATA_VER;
+$suri_pkg_ver = SURICATA_PKG_VER;
+$pgtitle = "Services: Suricata {$suri_bin_ver} pkg {$suri_pkg_ver} - Intrusion Detection System";
 include_once("head.inc");
 
 ?>
 <body link="#000000" vlink="#000000" alink="#000000">
 
-<?php
-include_once("fbegin.inc");
-if ($pfsense_stable == 'yes')
-	echo '<p class="pgtitle">' . $pgtitle . '</p>';
-?>
+<?php include_once("fbegin.inc"); ?>
 
 <form action="suricata_interfaces.php" method="post" enctype="multipart/form-data" name="iform" id="iform">
+<input type="hidden" name="id" id="id" value="">
 <?php
 	/* Display Alert message */
 	if ($input_errors)
-		print_input_errors($input_errors); // TODO: add checks
+		print_input_errors($input_errors);
 
 	if ($savemsg)
 		print_info_box($savemsg);
@@ -194,25 +174,32 @@ if ($pfsense_stable == 'yes')
 	<td>
 	<div id="mainarea">
 	<table id="maintable" class="tabcont" width="100%" border="0" cellpadding="0" cellspacing="0">
+
+		<colgroup>
+			<col width="3%" align="center">
+			<col width="12%">
+			<col width="14%">
+			<col width="120" align="center">
+			<col width="65" align="center">
+			<col width="14%">
+			<col>
+			<col width="20" align="center">
+		</colgroup>
+		<thead>
 		<tr id="frheader">
-			<td width="3%" class="list">&nbsp;</td>
-			<td width="10%" class="listhdrr"><?php echo gettext("Interface"); ?></td>
-			<td width="13%" class="listhdrr"><?php echo gettext("Suricata"); ?></td>
-			<td width="10%" class="listhdrr"><?php echo gettext("Pattern Match"); ?></td>
-			<td width="10%" class="listhdrr"><?php echo gettext("Block"); ?></td>
-			<td width="12%" class="listhdrr"><?php echo gettext("Barnyard2"); ?></td>
-			<td width="30%" class="listhdr"><?php echo gettext("Description"); ?></td>
-			<td width="3%" class="list">
-			<table border="0" cellspacing="0" cellpadding="0">
-				<tr>
-					<td></td>
-					<td align="center" valign="middle"><a href="suricata_interfaces_edit.php?id=<?php echo $id_gen;?>"><img
-					src="../themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif"
-					width="17" height="17" border="0" title="<?php echo gettext('Add Suricata interface mapping');?>"></a></td>
-				</tr>
-			</table>
-			</td>
+			<th class="list">&nbsp;</th>
+			<th class="listhdrr"><?php echo gettext("Interface"); ?></th>
+			<th class="listhdrr"><?php echo gettext("Suricata"); ?></th>
+			<th class="listhdrr"><?php echo gettext("Pattern Matcher"); ?></th>
+			<th class="listhdrr"><?php echo gettext("Block"); ?></th>
+			<th class="listhdrr"><?php echo gettext("Barnyard2"); ?></th>
+			<th class="listhdr"><?php echo gettext("Description"); ?></th>
+			<th class="list"><a href="suricata_interfaces_edit.php?id=<?php echo $id_gen;?>">
+				<img src="../themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif"
+				width="17" height="17" border="0" title="<?php echo gettext('Add Suricata interface mapping');?>"></a>
+			</th>
 		</tr>
+		</thead>
 		<?php $nnats = $i = 0;
 
 		// Turn on buffering to speed up rendering
@@ -237,7 +224,7 @@ if ($pfsense_stable == 'yes')
 			$if_real = get_real_interface($natent['interface']);
 			$natend_friendly= convert_friendly_interface_to_friendly_descr($natent['interface']);
 			$suricata_uuid = $natent['uuid'];
-			if (suricata_is_running($suricata_uuid, $if_real) == 'no'){
+			if (!suricata_is_running($suricata_uuid, $if_real)){
 				$iconfn = 'block';
 				$iconfn_msg1 = 'Suricata is not running on ';
 				$iconfn_msg2 = '. Click to start.';
@@ -247,7 +234,7 @@ if ($pfsense_stable == 'yes')
 				$iconfn_msg1 = 'Suricata is running on ';
 				$iconfn_msg2 = '. Click to stop.';
 			}
-			if (suricata_is_running($suricata_uuid, $if_real, 'barnyard2') == 'no'){
+			if (!suricata_is_running($suricata_uuid, $if_real, 'barnyard2')){
 				$biconfn = 'block';
 				$biconfn_msg1 = 'Barnyard2 is not running on ';
 				$biconfn_msg2 = '. Click to start.';
@@ -275,31 +262,30 @@ if ($pfsense_stable == 'yes')
 			<td class="listt">
 			<input type="checkbox" id="frc<?=$nnats;?>" name="rule[]" value="<?=$i;?>" onClick="fr_bgcolor('<?=$nnats;?>')" style="margin: 0; padding: 0;">
 			</td>
-			<td class="listr" 
-			id="frd<?=$nnats;?>" valign="middle" 
+			<td class="listr" valign="middle" 
+			id="frd<?=$nnats;?>" 
 			ondblclick="document.location='suricata_interfaces_edit.php?id=<?=$nnats;?>';">
 			<?php
 				echo $natend_friendly;
 			?>
 			</td>
-			<td class="listr"  
+			<td class="listr" valign="middle"   
 			id="frd<?=$nnats;?>"  
 			ondblclick="document.location='suricata_interfaces_edit.php?id=<?=$nnats;?>';">
 			<?php
 			$check_suricata_info = $config['installedpackages']['suricata']['rule'][$nnats]['enable'];
 			if ($check_suricata_info == "on") {
-				echo gettext("ENABLED");
-				echo "<a href='?act=toggle&id={$i}'>
-					<img src='../themes/{$g['theme']}/images/icons/icon_{$iconfn}.gif'
-					width='13' height='13' border='0' 
-					title='" . gettext($iconfn_msg1.$natend_friendly.$iconfn_msg2) . "'></a>";
+				echo gettext("ENABLED") . "&nbsp;";
+				echo "<input type='image' src='../themes/{$g['theme']}/images/icons/icon_{$iconfn}.gif' width='13' height='13' border='0' ";
+				echo "onClick='document.getElementById(\"id\").value=\"{$nnats}\";' name=\"toggle[]\" ";
+				echo "title='" . gettext($iconfn_msg1.$natend_friendly.$iconfn_msg2) . "'/>";
 				echo ($no_rules) ? "&nbsp;<img src=\"../themes/{$g['theme']}/images/icons/icon_frmfld_imp.png\" width=\"15\" height=\"15\" border=\"0\">" : "";
 			} else
 				echo gettext("DISABLED");
 			?>
 			</td>
 			<td class="listr" 
-			id="frd<?=$nnats;?>" valign="middle" 
+			id="frd<?=$nnats;?>" valign="middle" align="center" 
 			ondblclick="document.location='suricata_interfaces_edit.php?id=<?=$nnats;?>';">
 			<?php
 			$check_performance_info = $config['installedpackages']['suricata']['rule'][$nnats]['mpm_algo'];
@@ -311,7 +297,7 @@ if ($pfsense_stable == 'yes')
 			?> <?=strtoupper($check_performance);?>
 			</td>
 			<td class="listr" 
-			id="frd<?=$nnats;?>" valign="middle" 
+			id="frd<?=$nnats;?>" valign="middle" align="center" 
 			ondblclick="document.location='suricata_interfaces_edit.php?id=<?=$nnats;?>';">
 			<?php
 			$check_blockoffenders_info = $config['installedpackages']['suricata']['rule'][$nnats]['blockoffenders'];
@@ -329,11 +315,9 @@ if ($pfsense_stable == 'yes')
 			<?php
 			$check_suricatabarnyardlog_info = $config['installedpackages']['suricata']['rule'][$nnats]['barnyard_enable'];
 			if ($check_suricatabarnyardlog_info == "on") {
-				echo gettext("ENABLED");
-				echo "<a href='?act=bartoggle&id={$i}'>
-					<img src='../themes/{$g['theme']}/images/icons/icon_{$biconfn}.gif'
-					width='13' height='13' border='0' 
-					title='" . gettext($biconfn_msg1.$natend_friendly.$biconfn_msg2) . "'></a>";
+				echo gettext("ENABLED") . "&nbsp;";
+				echo "<input type='image' name='bartoggle[]' src='../themes/{$g['theme']}/images/icons/icon_{$biconfn}.gif' width='13' height='13' border='0' ";
+				echo "onClick='document.getElementById(\"id\").value=\"{$nnats}\"'; title='" . gettext($biconfn_msg1.$natend_friendly.$biconfn_msg2) . "'/>";
 			} else
 				echo gettext("DISABLED");
 			?>
@@ -343,14 +327,9 @@ if ($pfsense_stable == 'yes')
 			<font color="#ffffff"> <?=htmlspecialchars($natent['descr']);?>&nbsp;</font>
 			</td>
 			<td valign="middle" class="list" nowrap>
-			<table border="0" cellspacing="0" cellpadding="0">
-				<tr>
-					<td><a href="suricata_interfaces_edit.php?id=<?=$i;?>"><img
-						src="/themes/<?= $g['theme']; ?>/images/icons/icon_e.gif"
-						width="17" height="17" border="0" title="<?php echo gettext('Edit Suricata interface mapping'); ?>"></a>
-					</td>
-				</tr>
-			</table>
+				<a href="suricata_interfaces_edit.php?id=<?=$i;?>">
+				<img src="/themes/<?= $g['theme']; ?>/images/icons/icon_e.gif"
+				width="17" height="17" border="0" title="<?php echo gettext('Edit Suricata interface mapping'); ?>"></a>
 			</td>	
 		</tr>
 		<?php $i++; $nnats++; endforeach; ob_end_flush(); ?>
@@ -363,19 +342,13 @@ if ($pfsense_stable == 'yes')
 				<?php endif; ?>					 
 			</td>
 			<td class="list" valign="middle" nowrap>
-				<table border="0" cellspacing="0" cellpadding="0">
-					<tr>
-						<td><?php if ($nnats == 0): ?><img
-						src="../themes/<?= $g['theme']; ?>/images/icons/icon_x_d.gif"
-						width="17" height="17" " border="0">
-						<?php else: ?>
-						<input name="del" type="image"
-						src="../themes/<?= $g['theme']; ?>/images/icons/icon_x.gif"
-						width="17" height="17" title="<?php echo gettext("Delete selected Suricata interface mapping(s)"); ?>"
-						onclick="return intf_del()">
-						<?php endif; ?></td>
-					</tr>
-				</table>
+				<?php if ($nnats == 0): ?>
+					<img src="../themes/<?= $g['theme']; ?>/images/icons/icon_x_d.gif" width="17" height="17" " border="0">
+				<?php else: ?>
+					<input name="del" type="image" src="../themes/<?= $g['theme']; ?>/images/icons/icon_x.gif" 
+					width="17" height="17" title="<?php echo gettext("Delete selected Suricata interface mapping(s)"); ?>"
+					onclick="return intf_del()">
+				<?php endif; ?>
 			</td>
 		</tr>
 		<tr>

@@ -42,7 +42,7 @@
 	<description>Suricata IDS/IPS Package</description>
 	<requirements>None</requirements>
 	<name>suricata</name>
-	<version>1.4.6 pkg v0.1-BETA</version>
+	<version>1.4.6 pkg v0.2-BETA</version>
 	<title>Services: Suricata IDS</title>
 	<include_file>/usr/local/pkg/suricata/suricata.inc</include_file>
 	<menu>
@@ -153,11 +153,6 @@
 		<chmod>0755</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
-		<item>http://www.pfsense.com/packages/config/suricata/suricata_select_alias.php</item>
-		<prefix>/usr/local/www/suricata/</prefix>
-		<chmod>0755</chmod>
-	</additional_files_needed>
-	<additional_files_needed>
 		<item>http://www.pfsense.com/packages/config/suricata/suricata_suppress.php</item>
 		<prefix>/usr/local/www/suricata/</prefix>
 		<chmod>0755</chmod>
@@ -211,6 +206,21 @@
 		<item>http://www.pfsense.com/packages/config/suricata/suricata_uninstall.php</item>
 		<prefix>/usr/local/www/suricata/</prefix>
 		<chmod>0755</chmod>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/www/widgets/javascript/</prefix>
+		<chmod>0644</chmod>
+		<item>http://www.pfsense.com/packages/config/suricata/suricata_alerts.js</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/www/widgets/widgets/</prefix>
+		<chmod>0644</chmod>
+		<item>http://www.pfsense.com/packages/config/suricata/suricata_alerts.widget.php</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/www/widgets/include/</prefix>
+		<chmod>0644</chmod>
+		<item>http://www.pfsense.com/packages/config/suricata/widget-suricata.inc</item>
 	</additional_files_needed>
 	<!-- configpath gets expanded out automatically and config items will be stored in that location -->
 	<configpath>['installedpackages']['suricata']</configpath>

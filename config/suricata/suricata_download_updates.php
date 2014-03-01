@@ -35,9 +35,6 @@ require_once("/usr/local/pkg/suricata/suricata.inc");
 $suricatadir = SURICATADIR;
 $suricata_rules_upd_log = RULES_UPD_LOGFILE;
 
-/* load only javascript that is needed */
-$suricata_load_jquery = 'yes';
-$suricata_load_jquery_colorbox = 'yes';
 $snortdownload = $config['installedpackages']['suricata']['config'][0]['enable_vrt_rules'];
 $emergingthreats = $config['installedpackages']['suricata']['config'][0]['enable_etopen_rules'];
 $etpro = $config['installedpackages']['suricata']['config'][0]['enable_etpro_rules'];
@@ -52,21 +49,48 @@ if ($etpro == "on") {
 }
 else {
 	$emergingthreats_filename = ET_DNLD_FILENAME;
-	$et_name = "EMERGING THREATS RULES";
+	$et_name = "EMERGING THREATS OPEN RULES";
 }
 
 /* quick md5 chk of downloaded rules */
-$snort_org_sig_chk_local = 'N/A';
-if (file_exists("{$suricatadir}{$snort_rules_file}.md5"))
+if ($snortdownload == 'on') {
+	$snort_org_sig_chk_local = 'Not Downloaded';
+	$snort_org_sig_date = 'Not Downloaded';
+}
+else {
+	$snort_org_sig_chk_local = 'Not Enabled';
+	$snort_org_sig_date = 'Not Enabled';
+}
+if (file_exists("{$suricatadir}{$snort_rules_file}.md5")){
 	$snort_org_sig_chk_local = file_get_contents("{$suricatadir}{$snort_rules_file}.md5");
+	$snort_org_sig_date = date(DATE_RFC850, filemtime("{$suricatadir}{$snort_rules_file}.md5"));
+}
 
-$emergingt_net_sig_chk_local = 'N/A';
-if (file_exists("{$suricatadir}{$emergingthreats_filename}.md5"))
+if ($etpro == "on" || $emergingthreats == "on") {
+	$emergingt_net_sig_chk_local = 'Not Downloaded';
+	$emergingt_net_sig_date = 'Not Downloaded';
+}
+else {
+	$emergingt_net_sig_chk_local = 'Not Enabled';
+	$emergingt_net_sig_date = 'Not Enabled';
+}
+if (file_exists("{$suricatadir}{$emergingthreats_filename}.md5")) {
 	$emergingt_net_sig_chk_local = file_get_contents("{$suricatadir}{$emergingthreats_filename}.md5");
+	$emergingt_net_sig_date = date(DATE_RFC850, filemtime("{$suricatadir}{$emergingthreats_filename}.md5"));
+}
 
-$snort_community_sig_chk_local = 'N/A';
-if (file_exists("{$suricatadir}{$snort_community_rules_filename}.md5"))
+if ($snortcommunityrules == 'on') {
+	$snort_community_sig_chk_local = 'Not Downloaded';
+	$snort_community_sig_sig_date = 'Not Downloaded';
+}
+else {
+	$snort_community_sig_chk_local = 'Not Enabled';
+	$snort_community_sig_sig_date = 'Not Enabled';
+}
+if (file_exists("{$suricatadir}{$snort_community_rules_filename}.md5")) {
 	$snort_community_sig_chk_local = file_get_contents("{$suricatadir}{$snort_community_rules_filename}.md5");
+	$snort_community_sig_sig_date = date(DATE_RFC850, filemtime("{$suricatadir}{$snort_community_rules_filename}.md5"));
+}
 
 /* Check for postback to see if we should clear the update log file. */
 if ($_POST['clear']) {
@@ -74,7 +98,28 @@ if ($_POST['clear']) {
 		mwexec("/bin/rm -f {$suricata_rules_upd_log}");
 }
 
-if ($_POST['update']) {
+if ($_POST['check']) {
+	// Go see if new updates for rule sets are available
+	header("Location: /suricata/suricata_download_rules.php");
+	exit;
+}
+
+if ($_POST['force']) {
+	// Mount file system R/W since we need to remove files
+	conf_mount_rw();
+
+	// Remove the existing MD5 signature files to force a download
+	if (file_exists("{$suricatadir}{$emergingthreats_filename}.md5"))
+		@unlink("{$suricatadir}{$emergingthreats_filename}.md5");
+	if (file_exists("{$suricatadir}{$snort_community_rules_filename}.md5"))
+		@unlink("{$suricatadir}{$snort_community_rules_filename}.md5");
+	if (file_exists("{$suricatadir}{$snort_rules_file}.md5"))
+		@unlink("{$suricatadir}{$snort_rules_file}.md5");
+
+	// Revert file system to R/O.
+	conf_mount_ro();
+	
+	// Go download the updates
 	header("Location: /suricata/suricata_download_rules.php");
 	exit;
 }
@@ -90,6 +135,9 @@ if ($_POST['view']&& $suricata_rules_upd_log_chk == 'yes') {
 	if (empty($contents))
 		$input_errors[] = gettext("Unable to read log file: {$suricata_rules_upd_log}");
 }
+
+if ($_POST['hide'])
+	$contents = "";
 
 $pgtitle = gettext("Suricata: Update Rules Set Files");
 include_once("head.inc");
@@ -128,21 +176,32 @@ include_once("head.inc");
 		<div id="mainarea">
 		<table id="maintable4" class="tabcont" width="100%" border="0" cellpadding="0" cellspacing="0">
 			<tr>
-				<td valign="top" class="listtopic" align="center"><?php echo gettext("INSTALLED RULE SET MD5 SIGNATURES");?></td>
+				<td valign="top" class="listtopic" align="center"><?php echo gettext("INSTALLED RULE SET MD5 SIGNATURE");?></td>
 			</tr>
 			<tr>
 				<td align="center"><br/>
-				<table width="100%" border="0" cellpadding="2" cellspacing="2">
+				<table width="95%" border="0" cellpadding="2" cellspacing="2">
+					<thead>
+						<tr>
+							<th class="listhdrr"><?=gettext("Rule Set Name/Vendor");?></th>
+							<th class="listhdrr"><?=gettext("MD5 Signature Hash");?></th>
+							<th class="listhdrr"><?=gettext("MD5 Signature Date");?></th>
+						</tr>
+					</thead>
 					<tr>
 						<td align="right" class="vexpl"><b><?=$et_name;?>&nbsp;&nbsp;---></b></td>
-						<td class="vexpl"><? echo $emergingt_net_sig_chk_local; ?></td>
+						<td class="vexpl"><? echo trim($emergingt_net_sig_chk_local);?></td>
+						<td class="vexpl"><?php echo gettext($emergingt_net_sig_date);?></td>
 					</tr>
 					<tr>
 						<td align="right" class="vexpl"><b>SNORT VRT RULES&nbsp;&nbsp;---></b></td>
-						<td class="vexpl"><? echo $snort_org_sig_chk_local; ?></td>
+						<td class="vexpl"><? echo trim($snort_org_sig_chk_local);?></td>
+						<td class="vexpl"><?php echo gettext($snort_org_sig_date);?></td>
 					</tr>
+					<tr>
 						<td align="right" class="vexpl"><b>SNORT GPLv2 COMMUNITY RULES&nbsp;&nbsp;---></b></td>
-						<td class="vexpl"><? echo $snort_community_sig_chk_local; ?></td>
+						<td class="vexpl"><? echo trim($snort_community_sig_chk_local);?></td>
+						<td class="vexpl"><?php echo gettext($snort_community_sig_sig_date);?></td>
 					</tr>
 				</table><br/>
 				</td>
@@ -153,16 +212,22 @@ include_once("head.inc");
 			<tr>
 				<td align="center">
 					<?php if ($snortdownload != 'on' && $emergingthreats != 'on' && $etpro != 'on'): ?>
-						<br/><button disabled="disabled"><?php echo gettext("Update Rules"); ?></button><br/>
-						<p style="text-align:left;">
-						<font color="red" size="2px"><b><?php echo gettext("WARNING:");?></b></font><font size="1px" color="#000000">&nbsp;&nbsp;
+						<br/><button disabled="disabled"><?=gettext("Check");?></button>&nbsp;&nbsp;&nbsp;&nbsp;
+						<button disabled="disabled"><?=gettext("Force");?></button>
+						<br/>
+						<p style="text-align:center;" class="vexpl">
+						<font class="red"><b><?php echo gettext("WARNING:");?></b></font>&nbsp;
 						<?php echo gettext('No rule types have been selected for download. ') . 
 						gettext('Visit the ') . '<a href="/suricata/suricata_global.php">Global Settings Tab</a>' . gettext(' to select rule types.'); ?>
-						</font><br/></p>
+						<br/></p>
 					<?php else: ?>
 						<br/>
-						<input type="submit" value="<?php echo gettext(" Update "); ?>" name="update" id="submit" class="formbtn" 
-						title="<?php echo gettext("Check for new updates to configured rulesets"); ?>"/><br/><br/>
+						<input type="submit" value="<?=gettext("Check");?>" name="check" id="check" class="formbtn" 
+						title="<?php echo gettext("Check for new updates to enabled rule sets"); ?>"/>&nbsp;&nbsp;&nbsp;&nbsp;
+						<input type="submit" value="<?=gettext("Force");?>" name="force" id="force" class="formbtn" 
+						title="<?=gettext("Force an update of enabled rule sets");?>" 
+						onclick="return confirm('<?=gettext("This will zero-out the MD5 hashes to force a fresh download of enabled rule sets.  Click OK to continue or CANCEL to quit");?>');"/>
+						<br/><br/>
 					<?php endif; ?>
 				</td>
 			</tr>
@@ -174,15 +239,20 @@ include_once("head.inc");
 				<td align="center" valign="middle" class="vexpl">
 					<?php if ($suricata_rules_upd_log_chk == 'yes'): ?>
 						<br/>
-						<input type="submit" value="<?php echo gettext("View Log"); ?>" name="view" id="view" class="formbtn" 
-						title="<?php echo gettext("View rules update log contents"); ?>"/>
-						&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-						<input type="submit" value="<?php echo gettext("Clear Log"); ?>" name="clear" id="clear" class="formbtn" 
-						title="<?php echo gettext("Clear rules update log contents"); ?>" onClick="return confirm('Are you sure?\nOK to confirm, or CANCEL to quit');"/>
+					<?php if (!empty($contents)): ?>
+						<input type="submit" value="<?php echo gettext("Hide"); ?>" name="hide" id="hide" class="formbtn" 
+						title="<?php echo gettext("Hide rules update log"); ?>"/>
+					<?php else: ?>
+						<input type="submit" value="<?php echo gettext("View"); ?>" name="view" id="view" class="formbtn" 
+						title="<?php echo gettext("View rules update log"); ?>"/>
+					<?php endif; ?>
+						&nbsp;&nbsp;&nbsp;&nbsp;
+						<input type="submit" value="<?php echo gettext("Clear"); ?>" name="clear" id="clear" class="formbtn" 
+						title="<?php echo gettext("Clear rules update log"); ?>" onClick="return confirm('Are you sure you want to delete the log contents?\nOK to confirm, or CANCEL to quit');"/>
 						<br/>
 					<?php else: ?>
 						<br/>
-						<button disabled='disabled'><?php echo gettext("View Log"); ?></button>&nbsp;&nbsp;&nbsp;<?php echo gettext("Log is empty."); ?><br/>
+						<button disabled='disabled'><?php echo gettext("View Log"); ?></button><br/><?php echo gettext("Log is empty."); ?><br/>
 					<?php endif; ?>
 					<br/><?php echo gettext("The log file is limited to 1024K in size and automatically clears when the limit is exceeded."); ?><br/><br/>
 				</td>
@@ -201,9 +271,9 @@ include_once("head.inc");
 			<?php endif; ?>
 			<tr>
 				<td align="center">
-					<span class="vexpl"><br/><br/>
+					<span class="vexpl"><br/>
 					<span class="red"><b><?php echo gettext("NOTE:"); ?></b></span>
-					&nbsp;&nbsp;<a href="http://www.snort.org/" target="_blank"><?php echo gettext("Snort.org") . "</a>" . 
+					&nbsp;<a href="http://www.snort.org/" target="_blank"><?php echo gettext("Snort.org") . "</a>" . 
 					gettext(" and ") . "<a href=\"http://www.emergingthreats.net/\" target=\"_blank\">" . gettext("EmergingThreats.net") . "</a>" . 
 					gettext(" will go down from time to time. Please be patient."); ?></span><br/>
 				</td>

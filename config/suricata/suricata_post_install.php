@@ -87,6 +87,17 @@ if ($config['installedpackages']['suricata']['config'][0]['forcekeepsettings'] =
 	foreach ($suriconf as $value) {
 		$if_real = get_real_interface($value['interface']);
 
+		// ## BETA pkg bug fix-up -- be sure default rules enabled ##
+		$rules = explode("||", $value['rulesets']);
+		foreach (array( "decoder-events.rules", "files.rules", "http-events.rules", "smtp-events.rules", "stream-events.rules", "tls-events.rules" ) as $r){
+			if (!in_array($r, $rules))
+				$rules[] = $r;
+		}
+		natcasesort($rules);
+		$value['rulesets'] = implode("||", $rules);
+		write_config();
+		// ## end of BETA pkg bug fix-up ##
+
 		// create a suricata.yaml file for interface
 		suricata_generate_yaml($value);
 
@@ -106,6 +117,12 @@ if ($config['installedpackages']['suricata']['config'][0]['forcekeepsettings'] =
 	// Add the recurring jobs created above to crontab
 	configure_cron();
 
+	// Restore the Dashboard Widget if it was previously enabled and saved
+	if (!empty($config['installedpackages']['suricata']['config'][0]['dashboard_widget']) && !empty($config['widgets']['sequence']))
+		$config['widgets']['sequence'] .= "," . $config['installedpackages']['suricata']['config'][0]['dashboard_widget'];
+	if (!empty($config['installedpackages']['suricata']['config'][0]['dashboard_widget_rows']) && !empty($config['widgets']))
+		$config['widgets']['widget_suricata_display_lines'] = $config['installedpackages']['suricata']['config'][0]['dashboard_widget_rows'];
+
 	$rebuild_rules = false;
 	update_output_window(gettext("Finished rebuilding Suricata configuration files..."));
 	log_error(gettext("[Suricata] Finished rebuilding installation from saved settings..."));
@@ -121,7 +138,7 @@ if ($config['installedpackages']['suricata']['config'][0]['forcekeepsettings'] =
 }
 
 // Update Suricata package version in configuration
-$config['installedpackages']['suricata']['config'][0]['suricata_config_ver'] = "0.1-BETA";
+$config['installedpackages']['suricata']['config'][0]['suricata_config_ver'] = "v0.2-BETA";
 write_config();
 
 // Done with post-install, so clear flag
