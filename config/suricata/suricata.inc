@@ -39,6 +39,10 @@ global $g, $config;
 if (!is_array($config['installedpackages']['suricata']))
 	$config['installedpackages']['suricata'] = array();
 
+// Define the binary and package build versions
+define('SURICATA_VER', '1.4.6');
+define('SURICATA_PKG_VER', 'v0.2-BETA');
+
 // Create some other useful defines
 define('SURICATADIR', '/usr/pbi/suricata-' . php_uname("m") . '/etc/suricata/');
 define('SURICATALOGDIR', '/var/log/suricata/');
@@ -76,9 +80,9 @@ function suricata_is_running($suricata_uuid, $if_real, $type = 'suricata') {
 	global $config, $g;
 
 	if (isvalidpid("{$g['varrun_path']}/{$type}_{$if_real}{$suricata_uuid}.pid"))
-		return 'yes';
+		return true;
 	else
-		return 'no';
+		return false;
 }
 
 function suricata_barnyard_stop($suricatacfg, $if_real) {
@@ -154,7 +158,7 @@ function suricata_reload_config($suricatacfg, $signal="USR2") {
 
 	$suricatadir = SURICATADIR;
 	$suricata_uuid = $suricatacfg['uuid'];
-	$if_real = suricata_get_real_interface($suricatacfg['interface']);
+	$if_real = get_real_interface($suricatacfg['interface']);
 
 	/******************************************************/
 	/* Only send the SIGUSR2 if Suricata is running and   */
@@ -183,7 +187,7 @@ function suricata_barnyard_reload_config($suricatacfg, $signal="HUP") {
 
 	$suricatadir = SURICATADIR;
 	$suricata_uuid = $suricatacfg['uuid'];
-	$if_real = suricata_get_real_interface($suricatacfg['interface']);
+	$if_real = get_real_interface($suricatacfg['interface']);
 
 	/******************************************************/
 	/* Only send the SIGHUP if Barnyard2 is running and   */
@@ -194,22 +198,6 @@ function suricata_barnyard_reload_config($suricatacfg, $signal="HUP") {
 		sigkillbypid("{$g['varrun_path']}/barnyard2_{$if_real}{$suricata_uuid}.pid", $signal);
 //		exec("/bin/pkill -{$signal} -F {$g['varrun_path']}/barnyard2_{$if_real}{$suricata_uuid}.pid 2>&1 &");
 	}
-}
-
-function suricata_get_friendly_interface($interface) {
-
-	// Pass this directly to the system for now.
-	// Later, this wrapper will be removed and all
-	// the Suricata code changed to use the system call.
-	return convert_friendly_interface_to_friendly_descr($interface);
-}
-
-function suricata_get_real_interface($interface) {
-
-	// Pass this directly to the system for now.
-	// Later, this wrapper will be removed and all
-	// the Suricata code changed to use the system call.
-	return get_real_interface($interface);
 }
 
 function suricata_get_blocked_ips() {
@@ -517,7 +505,7 @@ function sync_suricata_package_config() {
 
 	$suricataconf = $config['installedpackages']['suricata']['rule'];
 	foreach ($suricataconf as $value) {
-		$if_real = suricata_get_real_interface($value['interface']);
+		$if_real = get_real_interface($value['interface']);
 
 		// create a suricata.yaml file for interface
 		suricata_generate_yaml($value);
@@ -669,7 +657,7 @@ function suricata_post_delete_logs($suricata_uuid = 0) {
 	foreach ($config['installedpackages']['suricata']['rule'] as $value) {
 		if ($value['uuid'] != $suricata_uuid)
 			continue;
-		$if_real = suricata_get_real_interface($value['interface']);
+		$if_real = get_real_interface($value['interface']);
 		$suricata_log_dir = SURICATALOGDIR . "suricata_{$if_real}{$suricata_uuid}";
 
 		if ($if_real != '') {
@@ -1508,7 +1496,7 @@ function suricata_prepare_rule_files($suricatacfg, $suricatacfgdir) {
 		return;
 
 	// Log a message for rules rebuild in progress
-	log_error(gettext("[Suricata] Updating rules configuration for: " . suricata_get_friendly_interface($suricatacfg['interface']) . " ..."));
+	log_error(gettext("[Suricata] Updating rules configuration for: " . convert_friendly_interface_to_friendly_descr($suricatacfg['interface']) . " ..."));
 
 	// Only rebuild rules if some are selected or an IPS Policy is enabled
 	if (!empty($suricatacfg['rulesets']) || $suricatacfg['ips_policy_enable'] == 'on') {
@@ -1581,7 +1569,7 @@ function suricata_prepare_rule_files($suricatacfg, $suricatacfgdir) {
 
 		// If auto-flowbit resolution is enabled, generate the dependent flowbits rules file.
 		if ($suricatacfg['autoflowbitrules'] == 'on') {
-			log_error('[Suricata] Enabling any flowbit-required rules for: ' . suricata_get_friendly_interface($suricatacfg['interface']) . '...');
+			log_error('[Suricata] Enabling any flowbit-required rules for: ' . convert_friendly_interface_to_friendly_descr($suricatacfg['interface']) . '...');
 			$fbits = suricata_resolve_flowbits($all_rules, $enabled_rules);
 
 			// Check for and disable any flowbit-required rules the user has
@@ -1606,11 +1594,11 @@ function suricata_prepare_rule_files($suricatacfg, $suricatacfgdir) {
 
 	// Log a warning if the interface has no rules defined or enabled
 	if ($no_rules_defined)
-		log_error(gettext("[Suricata] Warning - no text rules selected for: " . suricata_get_friendly_interface($suricatacfg['interface']) . " ..."));
+		log_error(gettext("[Suricata] Warning - no text rules selected for: " . convert_friendly_interface_to_friendly_descr($suricatacfg['interface']) . " ..."));
 
 	// Build a new sid-msg.map file from the enabled
 	// rules and copy it to the interface directory.
-	log_error(gettext("[Suricata] Building new sig-msg.map file for " . suricata_get_friendly_interface($suricatacfg['interface']) . "..."));
+	log_error(gettext("[Suricata] Building new sig-msg.map file for " . convert_friendly_interface_to_friendly_descr($suricatacfg['interface']) . "..."));
 	suricata_build_sid_msg_map("{$suricatacfgdir}/rules/", "{$suricatacfgdir}/sid-msg.map");
 }
 
@@ -1695,7 +1683,7 @@ function suricata_create_rc() {
 	// the shell script.
 	foreach ($suricataconf as $value) {
 		$suricata_uuid = $value['uuid'];
-		$if_real = suricata_get_real_interface($value['interface']);
+		$if_real = get_real_interface($value['interface']);
 
 		$start_barnyard = <<<EOE
 
@@ -1914,12 +1902,16 @@ function suricata_generate_barnyard2_conf($suricatacfg, $if_real) {
 		$suricatabarnyardlog_output_plugins .= "# syslog_full: log to a syslog receiver\n";
 		$suricatabarnyardlog_output_plugins .= "output alert_syslog_full: sensor_name {$suricatabarnyardlog_hostname_info_chk}, ";
 		if ($suricatacfg['barnyard_syslog_local'] == 'on')
-			$suricatabarnyardlog_output_plugins .= "local, log_facility LOG_AUTH, log_priority LOG_INFO\n";
+			$suricatabarnyardlog_output_plugins .= "local, log_facility LOG_AUTH, log_priority LOG_INFO\n\n";
 		else {
 			$suricatabarnyardlog_output_plugins .= "server {$suricatacfg['barnyard_syslog_rhost']}, protocol {$suricatacfg['barnyard_syslog_proto']}, ";
 			$suricatabarnyardlog_output_plugins .= "port {$suricatacfg['barnyard_syslog_dport']}, operation_mode {$suricatacfg['barnyard_syslog_opmode']}, ";
-			$suricatabarnyardlog_output_plugins .= "log_facility {$suricatacfg['barnyard_syslog_facility']}, log_priority {$suricatacfg['barnyard_syslog_priority']}\n";
+			$suricatabarnyardlog_output_plugins .= "log_facility {$suricatacfg['barnyard_syslog_facility']}, log_priority {$suricatacfg['barnyard_syslog_priority']}\n\n";
 		}
+	}
+	if ($suricatacfg['barnyard_bro_ids_enable'] == 'on') {
+		$suricatabarnyardlog_output_plugins .= "# alert_bro: log to a Bro-IDS receiver\n";
+		$suricatabarnyardlog_output_plugins .= "output alert_bro: {$suricatacfg['barnyard_bro_ids_rhost']}:{$suricatacfg['barnyard_bro_ids_dport']}\n";
 	}
 
 	// Trim leading and trailing newlines and spaces
@@ -1986,7 +1978,7 @@ function suricata_generate_yaml($suricatacfg) {
 	$suricatalogdir = SURICATALOGDIR;
 	$flowbit_rules_file = FLOWBITS_FILENAME;
 	$suricata_enforcing_rules_file = ENFORCING_RULES_FILENAME;
-	$if_real = suricata_get_real_interface($suricatacfg['interface']);
+	$if_real = get_real_interface($suricatacfg['interface']);
 	$suricata_uuid = $suricatacfg['uuid'];
 	$suricatacfgdir = "{$suricatadir}suricata_{$suricata_uuid}_{$if_real}";
 
