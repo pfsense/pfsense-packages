@@ -193,6 +193,7 @@ function sync_package_zabbix2(){
 		$zbproxy_config = $config['installedpackages']['zabbixproxy']['config'][0];
 		if ($zbproxy_config['proxyenabled']=="on"){
 			$Mode=(is_numericint($zbproxy_config['proxymode'])?$zbproxy_config['proxymode'] : 0);
+                        $AdvancedParams=base64_decode($zbagent_config['advancedparams']);
 		
 			$zbproxy_conf_file = <<< EOF
 Server={$zbproxy_config['server']}
@@ -206,6 +207,7 @@ FpingLocation=/usr/local/sbin/fping
 #there's currently no fping6 (IPv6) dependency in the package, but if there was, the binary would likely also be in /usr/local/sbin
 Fping6Location=/usr/local/sbin/fping6
 ProxyMode={$Mode}
+{$AdvancedParams}
 
 EOF;
 			file_put_contents(ZABBIX_PROXY_BASE . "/etc/zabbix22/zabbix_proxy.conf", strtr($zbproxy_conf_file, array("\r" => "")));
