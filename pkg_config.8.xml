@@ -1591,7 +1591,7 @@
 		<config_file>http://www.pfsense.com/packages/config/unbound/unbound.xml</config_file>
 		<configurationfile>unbound.xml</configurationfile>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
-		<depends_on_package>unbound-1.4.21_1.tbz</depends_on_package>
+		<depends_on_package>unbound-1.4.21_3.tbz</depends_on_package>
 		<depends_on_package>ldns-1.6.16.tbz</depends_on_package>
 		<depends_on_package>expat-2.0.1_2.tbz</depends_on_package>
 		<depends_on_package>libevent-1.4.14b_2.tbz</depends_on_package>
@@ -1603,7 +1603,7 @@
 			<ports_before>dns/ldns textproc/expat2 devel/libevent2</ports_before>
 			<port>dns/unbound</port>
 		</build_pbi>
-		<depends_on_package_pbi>unbound-1.4.21_1-i386.pbi</depends_on_package_pbi>
+		<depends_on_package_pbi>unbound-1.4.21_3-i386.pbi</depends_on_package_pbi>
 		<build_options>unbound_UNSET_FORCE=GOST ECDSA;unbound_SET=LIBEVENT20 THREADS</build_options>
 		<logging>
 			<facilityname>unbound</facilityname>
