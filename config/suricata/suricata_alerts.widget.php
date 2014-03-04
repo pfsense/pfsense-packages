@@ -3,7 +3,9 @@
     suricata_alerts.widget.php
     Copyright (C) 2009 Jim Pingle
     mod 24-07-2012
-    mod 28-02-2014 for use with Suricata by Bill Meeks
+
+    Copyright (C) 2014 Bill Meeks
+    mod 03-Mar-2014 adapted for use with Suricata by Bill Meeks
 
     Redistribution and use in source and binary forms, with or without
     modification, are permitted provided that the following conditions are met:
@@ -67,10 +69,10 @@ function sksort(&$array, $subkey="id", $sort_ascending=false) {
         return true; 
 };
 
-/* check if firewall widget variable is set */
-$nentries = $config['widgets']['widget_suricata_display_lines'];
-if (!isset($nentries) || $nentries < 0)
-	$nentries = 5;
+/* check if suricata widget variable is set */
+$suri_nentries = $config['widgets']['widget_suricata_display_lines'];
+if (!isset($suri_nentries) || $suri_nentries < 0)
+	$suri_nentries = 5;
 
 // Called by Ajax to update alerts table contents
 if (isset($_GET['getNewAlerts'])) {
@@ -81,7 +83,7 @@ if (isset($_GET['getNewAlerts'])) {
 		$response .= $a['instanceid'] . " " . $a['dateonly'] . "||" . $a['timeonly'] . "||" . $a['src'] . ":" . $a['srcport'] . "||";
 		$response .= $a['dst'] . ":" . $a['dstport'] . "||" . $a['priority'] . "||" . $a['category'] . "\n";
 		$counter++;
-		if($counter >= $nentries)
+		if($counter >= $suri_nentries)
 			break;
 	}
 	echo $response;
@@ -94,10 +96,10 @@ if(isset($_POST['widget_suricata_display_lines'])) {
 	header("Location: ../../index.php");
 }
 
-// Read "$nentries" worth of alerts from the top of the alerts.log file
+// Read "$suri_nentries" worth of alerts from the top of the alerts.log file
 function suricata_widget_get_alerts() {
 
-	global $config, $a_instance, $nentries;
+	global $config, $a_instance, $suri_nentries;
 	$suricata_alerts = array();
 
 	/* read log file(s) */
@@ -106,17 +108,17 @@ function suricata_widget_get_alerts() {
 		$suricata_uuid = $a_instance[$instanceid]['uuid'];
 		$if_real = get_real_interface($a_instance[$instanceid]['interface']);
 
-		// make sure alert file exists, then grab the most recent {$nentries} from it
+		// make sure alert file exists, then grab the most recent {$suri_nentries} from it
 		// and write them to a temp file.
 		if (file_exists("/var/log/suricata/suricata_{$if_real}{$suricata_uuid}/alerts.log")) {
-			exec("tail -{$nentries} -r /var/log/suricata/suricata_{$if_real}{$suricata_uuid}/alerts.log > /tmp/surialerts_{$suricata_uuid}");
+			exec("tail -{$suri_nentries} -r /var/log/suricata/suricata_{$if_real}{$suricata_uuid}/alerts.log > /tmp/surialerts_{$suricata_uuid}");
 			if (file_exists("/tmp/surialerts_{$suricata_uuid}")) {
 
 				/*              0         1      2             3      4       5   6              7        8     9   10      11  12      */
 				/* File format: timestamp,action,sig_generator,sig_id,sig_rev,msg,classification,priority,proto,src,srcport,dst,dstport */
 				$fd = fopen("/tmp/surialerts_{$suricata_uuid}", "r");
 				while (($fields = fgetcsv($fd, 1000, ',', '"')) !== FALSE) {
-					if(count($fields) < 12)
+					if(count($fields) < 13)
 						continue;
 
 					// Create a DateTime object from the event timestamp that
@@ -132,9 +134,9 @@ function suricata_widget_get_alerts() {
 					$suricata_alerts[$counter]['timestamp'] = strval(date_timestamp_get($event_tm));
 					$suricata_alerts[$counter]['timeonly'] = date_format($event_tm, "H:i:s");
 					$suricata_alerts[$counter]['dateonly'] = date_format($event_tm, "M d");
-					$suricata_alerts[$counter]['src'] = inet_ntop(inet_pton($fields[9]));
+					$suricata_alerts[$counter]['src'] = $fields[9];
 					$suricata_alerts[$counter]['srcport'] = $fields[10];
-					$suricata_alerts[$counter]['dst'] = inet_ntop(inet_pton($fields[11]));
+					$suricata_alerts[$counter]['dst'] = $fields[11];
 					$suricata_alerts[$counter]['dstport'] = $fields[12];
 					$suricata_alerts[$counter]['priority'] = $fields[7];
 					$suricata_alerts[$counter]['category'] = $fields[6];
@@ -146,8 +148,12 @@ function suricata_widget_get_alerts() {
 		};
 	};
 
-	// Sort the alerts in descending order
-	sksort($suricata_alerts, 'timestamp', false);
+	// Sort the alerts array
+	if (isset($config['syslog']['reverse'])) {
+		sksort($suricata_alerts, 'timestamp', false);
+	} else {
+		sksort($suricata_alerts, 'timestamp', true);
+	}
 
 	return $suricata_alerts;
 }
@@ -157,10 +163,8 @@ function suricata_widget_get_alerts() {
 
 <script type="text/javascript">
 //<![CDATA[
-var suricataupdateDelay = 20000;
-var isBusy = false;
-var isPaused = false;
-var nentries = <?php echo $nentries; ?>;
+var suricataupdateDelay = 10000; // update every 10 second
+var suri_nentries = <?php echo $suri_nentries; ?>;
 //]]>
 </script>
 
@@ -183,17 +187,17 @@ var nentries = <?php echo $nentries; ?>;
 	</thead>
 	<tbody id="suricata-alert-entries">
 	<?php
-		$suricata_alerts = suricata_widget_get_alerts($nentries);
+		$suricata_alerts = suricata_widget_get_alerts($suri_nentries);
 		$counter=0;
 		if (is_array($suricata_alerts)) {
 			foreach ($suricata_alerts as $alert) {
-				$evenRowClass = $counter % 2 ? " listMReven" : " listMRodd";
+				$evenRowClass = $counter % 2 ? " listMRodd" : " listMReven";
 				echo("	<tr class='" . $evenRowClass . "'>
 				<td width='22%' class='listMRr' nowrap>" . $alert['instanceid'] . " " . $alert['dateonly'] . "<br/>" . $alert['timeonly'] . "</td>		
 				<td width='39%' class='listMRr'>" . $alert['src'] . ":" . $alert['srcport'] . "<br>" . $alert['dst'] . ":" . $alert['dstport'] . "</td>
-				<td width='39%' class='listMRr'>Priority: " . $alert['priority'] . "<br/>" . $alert['category'] . "</td></tr>");
+				<td width='39%' class='listMRr'>Pri: " . $alert['priority'] . "&nbsp;" . $alert['category'] . "</td></tr>");
 				$counter++;
-				if($counter >= $nentries)
+				if($counter >= $suri_nentries)
 					break;
 			}
 		}
@@ -201,13 +205,16 @@ var nentries = <?php echo $nentries; ?>;
 	</tbody>
 </table>
 
-<!-- needed to display the widget settings menu -->
 <script type="text/javascript">
+//<![CDATA[
+	var suricataupdateDelay = 10000; // update every 10 seconds
+	var suri_nentries = <?php echo $suri_nentries; ?>; // default is 5
+
+<!-- needed to display the widget settings menu -->
 //<![CDATA[
 	selectIntLink = "suricata_alerts-configure";
 	textlink = document.getElementById(selectIntLink);
 	textlink.style.display = "inline";
 //]]>
-
 </script>
 
