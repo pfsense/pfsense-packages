@@ -6,7 +6,7 @@ var suricataisPaused = false;
 function suricata_alerts_fetch_new_rules_callback(callback_data) {
 	var data_split;
 	var new_data_to_add = Array();
-	var data = callback_data.content;
+	var data = callback_data;
 
 	data_split = data.split("\n");
 
@@ -61,7 +61,14 @@ function fetch_new_surialerts() {
 		return;
 
 	suricataisBusy = true;
-	getURL('/widgets/widgets/suricata_alerts.widget.php?getNewAlerts=' + new Date().getTime(), suricata_alerts_fetch_new_rules_callback);
+
+	jQuery.ajax('/widgets/widgets/suricata_alerts.widget.php?getNewAlerts=' + new Date().getTime(), {
+		type: 'GET',
+		dataType: 'text',
+		success: function(data) {
+			suricata_alerts_fetch_new_rules_callback(data);
+		}
+	});
 }
 
 function suricata_alerts_toggle_pause() {
