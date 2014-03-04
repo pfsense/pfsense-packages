@@ -43,7 +43,7 @@ $pf_version=substr(trim(file_get_contents("/etc/version")),0,3);
 if ($pf_version > 2.0)
 	define('BIND_LOCALBASE', '/usr/pbi/bind-' . php_uname("m"));
 else
-  define('BIND_LOCALBASE','/usr/local');
+	define('BIND_LOCALBASE','/usr/local');
 
 define('CHROOT_LOCALBASE','/cf/named');
 
@@ -95,8 +95,7 @@ function bind_zone_validate($post, $input_errors){
 		}
 }
 
- function bind_sync(){
-
+function bind_sync(){
 	global $config;
 	conf_mount_rw();
 	//create rndc
@@ -164,8 +163,8 @@ EOD;
 	}
 	//check ips to listen on
 	if (preg_match("/All/",$bind['listenon'])){
-		$bind_listenonv6="Any;";
-		$bind_listenon="Any;";
+		$bind_listenonv6="any;";
+		$bind_listenon="any;";
 		}
 	else{
 		$bind_listenonv6="";
@@ -198,7 +197,7 @@ EOD;
 	if ($bind_notify == on)
 		$bind_conf .="\t\tnotify yes;\n"; 
 	if ($hide_version == on)
-		$bind_conf .="\t\tversion \"N/A\";\n"; 
+		$bind_conf .="\t\tversion none;\n";
 
 	$bind_conf .= preg_replace("/^/m","\t\t",$custom_options); 
 	$bind_conf .= "\n\t};\n\n";
@@ -245,15 +244,22 @@ EOD;
 
 	#Config Zone domain
 	if(!is_array($config["installedpackages"]["bindacls"]) || !is_array($config["installedpackages"]["bindacls"]["config"])){
-		$config["installedpackages"]["bindacls"]["config"][] =array("name"=>"any","description"=>"Default Access list","row" => array("value"=> "","description"=>""));
-		write_config("Create Default bind acl 'Any'");
+		$config["installedpackages"]["bindacls"]["config"][] =
+			array("name"=>"none","description"=>"BIND Built-in ACL","row"=>array("value"=>"","description"=>""));
+		$config["installedpackages"]["bindacls"]["config"][] =
+			array("name"=>"any","description"=>"BIND Built-in ACL","row"=>array("value"=>"","description"=>""));
+		$config["installedpackages"]["bindacls"]["config"][] =
+			array("name"=>"localhost","description"=>"BIND Built-in ACL","row"=>array("value"=>"","description"=>""));
+		$config["installedpackages"]["bindacls"]["config"][] =
+			array("name"=>"localnets","description"=>"BIND Built-in ACL","row"=>array("value"=>"","description"=>""));
+		write_config("Create BIND Built-in ACLs");
 		}
 	$bindacls = $config["installedpackages"]["bindacls"]["config"];
 	for ($i=0; $i<sizeof($bindacls); $i++)
 	{
 		$aclname = $bindacls[$i]['name'];
 		$aclhost = $bindacls[$i]['row'];
-		if($aclname != "any"){
+		if($aclname != "none" && $aclname != "any" && $aclname != "localhost" && $aclname != "localnets"){
 			$bind_conf .= "acl \"$aclname\" {\n";	
 			for ($u=0; $u<sizeof($aclhost); $u++)
 			{
