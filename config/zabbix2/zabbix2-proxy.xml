@@ -136,7 +136,7 @@
 			<type>textarea</type>
 			<rows>5</rows>
 			<cols>50</cols>
-			<description>Advanced paramete. There are some rearly used parameters that sometimes need defined. Value has form, example: StartDiscoverers=10</description>
+			<description>Advanced parameters. There are some rarely used parameters that sometimes need to be defined. Value has form, example: StartDiscoverers=10</description>
 		</field>
 
 	</fields>
