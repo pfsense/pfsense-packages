@@ -191,7 +191,7 @@ var suri_nentries = <?php echo $suri_nentries; ?>;
 		$counter=0;
 		if (is_array($suricata_alerts)) {
 			foreach ($suricata_alerts as $alert) {
-				$evenRowClass = $counter % 2 ? " listMRodd" : " listMReven";
+				$evenRowClass = $counter % 2 ? " listMReven" : " listMRodd";
 				echo("	<tr class='" . $evenRowClass . "'>
 				<td width='22%' class='listMRr' nowrap>" . $alert['instanceid'] . " " . $alert['dateonly'] . "<br/>" . $alert['timeonly'] . "</td>		
 				<td width='39%' class='listMRr'>" . $alert['src'] . ":" . $alert['srcport'] . "<br>" . $alert['dst'] . ":" . $alert['dstport'] . "</td>

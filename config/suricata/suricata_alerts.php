@@ -280,7 +280,6 @@ if ($_POST['delete']) {
 		fclose($fd);
 	/* XXX: This is needed if suricata is run as suricata user */
 	mwexec('/bin/chmod 660 {$suricatalogdir}*', true);
-	sigkillbypid("{$g['varrun_path']}/suricata_{$if_real}{$suricata_uuid}.pid", "HUP");
 	header("Location: /suricata/suricata_alerts.php?instance={$instanceid}");
 	exit;
 }

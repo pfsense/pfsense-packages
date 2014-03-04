@@ -95,12 +95,6 @@ if ($suricatalogdirsizeKB > 0 && $suricatalogdirsizeKB > $suricataloglimitsizeKB
 
 		// This is needed if suricata is run as suricata user
 		mwexec('/bin/chmod 660 /var/log/suricata/*', true);
-
-		// Soft-restart Suricata process to resync logging
-		if (file_exists("{$g['varrun_path']}/suricata_{$if_real}{$suricata_uuid}.pid")) {
-			log_error(gettext("[Suricata] Restarting logging on {$value['descr']} ({$if_real})..."));
-			mwexec("/bin/pkill -HUP -F {$g['varrun_path']}/suricata_{$if_real}{$suricata_uuid}.pid -a");
-		}
 	}
 	conf_mount_ro();
 	log_error(gettext("[Suricata] Automatic clean-up of Suricata logs completed."));
