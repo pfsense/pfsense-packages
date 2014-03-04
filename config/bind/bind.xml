@@ -160,7 +160,7 @@
                 <field>
                         <fielddescr>Hide Version</fielddescr>
                         <fieldname>bind_hide_version</fieldname>
-                        <description>Hide the version of BIND, this prevents discover the version of our servers, use any exploit that exploits a vulnerability in Bind.</description>
+                        <description>Hide the version of BIND (do not process queries to version.bind at all). This makes it more difficult to exploit the server.</description>
                         <type>checkbox</type>
                 </field>
                 <field>
