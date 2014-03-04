@@ -40,13 +40,12 @@ if (!is_array($config['installedpackages']['suricata']['rule']))
 	$config['installedpackages']['suricata']['rule'] = array();
 $a_rule = &$config['installedpackages']['suricata']['rule'];
 
-$id = $_GET['id'];
-if (isset($_POST['id']))
+if ($_GET['id']);
+	$id = htmlspecialchars($_GET['id'], ENT_QUOTES | ENT_HTML401);
+if ($_POST['id'])
 	$id = $_POST['id'];
-if (is_null($id)) {
-        header("Location: /suricata/suricata_interfaces.php");
-        exit;
-}
+if (is_null($id))
+	$id = 0;
 
 $pconfig = array();
 if (empty($suricataglob['rule'][$id]['uuid'])) {
@@ -62,13 +61,7 @@ else {
 $suricata_uuid = $pconfig['uuid'];
 
 // Get the physical configured interfaces on the firewall
-if (function_exists('get_configured_interface_with_descr'))
-	$interfaces = get_configured_interface_with_descr();
-else {
-	$interfaces = array('wan' => 'WAN', 'lan' => 'LAN');
-	for ($i = 1; isset($config['interfaces']['opt' . $i]); $i++)
-		$interfaces['opt' . $i] = $config['interfaces']['opt' . $i]['descr'];
-}
+$interfaces = get_configured_interface_with_descr();
 
 // See if interface is already configured, and use its values
 if (isset($id) && $a_rule[$id]) {
@@ -96,9 +89,6 @@ elseif (isset($id) && !isset($a_rule[$id])) {
 		$pconfig = array();
 	}
 }
-
-if (isset($_GET['dup']))
-	unset($id);
 
 // Set defaults for any empty key parameters
 if (empty($pconfig['blockoffendersip']))
@@ -136,12 +126,12 @@ if (empty($pconfig['max_pcap_log_size']))
 if (empty($pconfig['max_pcap_log_files']))
 	$pconfig['max_pcap_log_files'] = "1000";
 
-if ($_POST["Submit"]) {
+if ($_POST["save"]) {
 	if (!$_POST['interface'])
 		$input_errors[] = gettext("Choosing an Interface is mandatory!");
 
-	if ($_POST['max_pending_packets'] < 1 || $_POST['max_pending_packets'] > 65535)
-		$input_errors[] = gettext("The value for Maximum-Pending-Packets must be between 1 and 65,535!");
+	if ($_POST['max_pending_packets'] < 1 || $_POST['max_pending_packets'] > 65000)
+		$input_errors[] = gettext("The value for Maximum-Pending-Packets must be between 1 and 65,000!");
 
 	if (!empty($_POST['max_pcap_log_size']) && !is_numeric($_POST['max_pcap_log_size']))
 		$input_errors[] = gettext("The value for 'Max Packet Log Size' must be numbers only.  Do not include any alphabetic characters."); 
@@ -155,15 +145,6 @@ if ($_POST["Submit"]) {
 		$natent['interface'] = $_POST['interface'];
 		$natent['enable'] = $_POST['enable'] ? 'on' : 'off';
 		$natent['uuid'] = $pconfig['uuid'];
-
-		// See if the HOME_NET, EXTERNAL_NET, or SUPPRESS LIST values were changed
-		$suricata_reload = false;
-		if ($_POST['homelistname'] && ($_POST['homelistname'] <> $natent['homelistname']))
-			$suricata_reload = true;
-		if ($_POST['externallistname'] && ($_POST['externallistname'] <> $natent['externallistname']))
-			$suricata_reload = true;
-		if ($_POST['suppresslistname'] && ($_POST['suppresslistname'] <> $natent['suppresslistname']))
-			$suricata_reload = true;
 
 		if ($_POST['descr']) $natent['descr'] =  $_POST['descr']; else $natent['descr'] = strtoupper($natent['interface']);
 		if ($_POST['max_pcap_log_size']) $natent['max_pcap_log_size'] = $_POST['max_pcap_log_size']; else unset($natent['max_pcap_log_size']);
@@ -263,7 +244,7 @@ if ($_POST["Submit"]) {
 			$natent['libhtp_policy']['item'][] = $default;
 
 			// Enable the basic default rules for the interface
-			$natent['rulesets'] = "decoder-events.rules||files.rules||http-events.rules||smtp-events.rules||stream-events.rules";
+			$natent['rulesets'] = "decoder-events.rules||files.rules||http-events.rules||smtp-events.rules||stream-events.rules||tls-events.rules";
 
 			// Adding a new interface, so set flag to build new rules
 			$rebuild_rules = true;
@@ -281,15 +262,6 @@ if ($_POST["Submit"]) {
 
 		// Update suricata.conf and suricata.sh files for this interface
 		sync_suricata_package_config();
-
-		/*******************************************************/
-		/* Signal Suricata to reload configuration if we changed  */
-		/* HOME_NET, EXTERNAL_NET or Suppress list values.     */
-		/* The function only signals a running Suricata instance  */
-		/* to safely reload these parameters.                  */
-		/*******************************************************/
-		if ($suricata_reload == true)
-			suricata_reload_config($natent, "USR2");
 
 		header( 'Expires: Sat, 26 Jul 1997 05:00:00 GMT' );
 		header( 'Last-Modified: ' . gmdate( 'D, d M Y H:i:s' ) . ' GMT' );
@@ -309,19 +281,14 @@ include_once("head.inc");
 
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">
 
-<?php include("fbegin.inc"); ?>
-
-<?if($pfsense_stable == 'yes'){echo '<p class="pgtitle">' . $pgtitle . '</p>';}?>
-
-<?php
-	/* Display Alert message */
-	if ($input_errors) {
-		print_input_errors($input_errors);
-	}
-
-	if ($savemsg) {
-		print_info_box($savemsg);
-	}
+<?php include("fbegin.inc");
+/* Display Alert message */
+if ($input_errors) {
+	print_input_errors($input_errors);
+}
+if ($savemsg) {
+	print_info_box($savemsg);
+}
 ?>
 
 <form action="suricata_interfaces_edit.php<?php echo "?id=$id";?>" method="post" name="iform" id="iform">
@@ -334,7 +301,7 @@ include_once("head.inc");
 	$tab_array[] = array(gettext("Update Rules"), false, "/suricata/suricata_download_updates.php");
 	$tab_array[] = array(gettext("Alerts"), false, "/suricata/suricata_alerts.php?instance={$id}");
 	$tab_array[] = array(gettext("Suppress"), false, "/suricata/suricata_suppress.php");
-	$tab_array[] = array(gettext("Logs Browser"), false, "/suricata/suricata_logs_browser.php");
+	$tab_array[] = array(gettext("Logs Browser"), false, "/suricata/suricata_logs_browser.php?instance={$id}");
 	display_top_tabs($tab_array);
 	echo '</td></tr>';
 	echo '<tr><td class="tabnavtbl">';
@@ -374,7 +341,7 @@ include_once("head.inc");
 			<?php endforeach; ?>
 			</select>&nbsp;&nbsp;
 			<span class="vexpl"><?php echo gettext("Choose which interface this Suricata instance applies to."); ?><br/>
-			<span class="red"><?php echo gettext("Hint:"); ?></span>&nbsp;<?php echo gettext("In most cases, you'll want to use WAN here."); ?></span><br/></td>
+			<span class="red"><?php echo gettext("Hint:"); ?></span>&nbsp;<?php echo gettext("In most cases, you'll want to use WAN here if this is the first Suricata-configured interface."); ?></span><br/></td>
 	</tr>
 	<tr>
 		<td width="22%" valign="top" class="vncellreq"><?php echo gettext("Description"); ?></td>
@@ -390,7 +357,6 @@ include_once("head.inc");
 		<td width="78%" class="vtable"><input name="alertsystemlog" type="checkbox" value="on" <?php if ($pconfig['alertsystemlog'] == "on") echo "checked"; ?>/>
 			<?php echo gettext("Suricata will send Alerts to the firewall's system log."); ?></td>
 	</tr>
-
 	<tr>
 		<td width="22%" valign="top" class="vncell"><?php echo gettext("Enable Stats Log"); ?></td>
 		<td width="78%" class="vtable"><input name="enable_stats_log" type="checkbox" value="on" <?php if ($pconfig['enable_stats_log'] == "on") echo "checked"; ?> 
@@ -466,8 +432,6 @@ include_once("head.inc");
 			gettext("This will consume a significant amount of disk space on a busy network when enabled!"); ?></div>
 		</td>
 	</tr>
-
-
 	<tr>
 		<td width="22%" valign="top" class="vncell"><?php echo gettext("Enable Packet Log"); ?></td>
 		<td width="78%" class="vtable"><input name="enable_pcap_log" id="enable_pcap_log" type="checkbox" value="on" <?php if ($pconfig['enable_pcap_log'] == "on") echo "checked"; ?> 
@@ -484,7 +448,6 @@ include_once("head.inc");
 			<?php echo gettext("Enter maximum size in ") . "<strong>" . gettext("MB") . "</strong>" . gettext(" for a packet log file.  Default is ") . "<strong>" . 
 			gettext("32") . "</strong>."; ?><br/><br/><?php echo gettext("When the packet log file size reaches the set limit, it will be rotated and a new one created.") ?></td>
 	</tr>
-	</tr>
 	<tr id="pcap_log_max_row">
 		<td width="22%" valign="top" class="vncell"><?php echo gettext("Max Packet Log Files"); ?></td>
 		<td width="78%" class="vtable"><input name="max_pcap_log_files" type="text" 
@@ -493,7 +456,7 @@ include_once("head.inc");
 			gettext("1000") . "</strong>."; ?><br/><br/><?php echo gettext("When the number of packet log files reaches the set limit, the oldest file will be overwritten.") ?></td>
 	</tr>
 
-<!--
+<!-- ### Blocking not yet enabled, so hide the controls ###
 <tr>
 	<td colspan="2" class="listtopic"><?php echo gettext("Alert Settings"); ?></td>
 </tr>
@@ -529,6 +492,7 @@ include_once("head.inc");
 			<span class="red"><?php echo gettext("Hint:") . "</span>&nbsp;" . gettext("Choosing BOTH is suggested, and it is the default value."); ?></span><br/></td>
 		</td>
 	</tr>
+  ### End of Blocking controls ###
 -->
 
 <tr>
@@ -539,7 +503,9 @@ include_once("head.inc");
 		<td width="78%" class="vtable"><input name="max_pending_packets" type="text" 
 			class="formfld unknown" id="max_pending_packets" size="8" value="<?=htmlspecialchars($pconfig['max_pending_packets']); ?>"/>&nbsp;
 			<?php echo gettext("Enter number of simultaneous packets to process.  Default is ") . "<strong>" . 
-			gettext("1024") . "</strong>."; ?><br/><br/><?php echo gettext("Minimum value is 1 and the maximum value is 65,535.") ?></td>
+			gettext("1024") . "</strong>."; ?><br/><br/><?php echo gettext("This controls the number simultaneous packets the engine can handle. ") . 
+			gettext("Setting this higher generally keeps the threads more busy. The minimum value is 1 and the maximum value is 65,000. ") . "<br/><span class='red'><strong>" . 
+			gettext("Warning: ") . "</strong></span>" . gettext("Setting this too high can lead to degradation and a possible system crash by exhausting available memory.") ?></td>
 	</tr>
 	<tr>
 		<td width="22%" valign="top" class="vncell"><?php echo gettext("Detect-Engine Profile"); ?></td>
@@ -575,7 +541,7 @@ include_once("head.inc");
 			</select>&nbsp;&nbsp;
 			<?php echo gettext("Choose a multi-pattern matcher (MPM) algorithm. ") . "<strong>" . gettext("Default") . 
 			"</strong>" . gettext(" is ") . "<strong>" . gettext("AC") . "</strong>"; ?>.<br/><br/>
-			<?php echo gettext("AC is recommended for most systems. "); ?>
+			<?php echo gettext("AC is the default, and is the best choice for almost all systems."); ?>
 			<br/></td>
 	</tr>
 	<tr>
@@ -605,7 +571,7 @@ include_once("head.inc");
 			gettext("3000") . "</strong>."; ?><br/><br/><?php echo gettext("When set to 0 an internal default is used.  When left blank there is no recursion limit.") ?></td>
 	</tr>
 	<tr>
-		<td colspan="2" class="listtopic"><?php echo gettext("Networks " . "Suricata Should Inspect and Whitelist"); ?></td>
+		<td colspan="2" class="listtopic"><?php echo gettext("Networks " . "Suricata Should Inspect and Protect"); ?></td>
 	</tr>
 	<tr>
 		<td width="22%" valign="top" class="vncell"><?php echo gettext("Home Net"); ?></td>
@@ -665,6 +631,7 @@ include_once("head.inc");
 			"setting at default.  Create an Alias for custom External Net settings."); ?><br/>
 		</td>
 	</tr>
+<!--
 	<tr>
 		<td width="22%" valign="top" class="vncell"><?php echo gettext("Whitelist"); ?></td>
 		<td width="78%" class="vtable">
@@ -693,6 +660,7 @@ include_once("head.inc");
 			"whitelist adds local networks, WAN IPs, Gateways, VPNs and VIPs.  Create an Alias to customize."); ?>
 		</td>
 	</tr>
+-->
 <tr>
 	<td colspan="2" class="listtopic"><?php echo gettext("Alert Suppression and Filtering"); ?></td>
 </tr>
@@ -734,15 +702,13 @@ include_once("head.inc");
 	</td>
 </tr>
 <tr>
-	<td width="22%" valign="top"></td>
-	<td width="78%"><input name="Submit" type="submit" class="formbtn" value="Save" title="<?php echo 
+	<td colspan="2" align="center" valign="middle"><input name="save" type="submit" class="formbtn" value="Save" title="<?php echo 
 			gettext("Click to save settings and exit"); ?>"/>
 			<input name="id" type="hidden" value="<?=$id;?>"/>
 	</td>
 </tr>
 <tr>
-	<td width="22%" valign="top">&nbsp;</td>
-	<td width="78%"><span class="vexpl"><span class="red"><strong><?php echo gettext("Note: ") . "</strong></span></span>" . 
+	<td colspan="2" align="center" valign="middle"><span class="vexpl"><span class="red"><strong><?php echo gettext("Note: ") . "</strong></span></span>" . 
 		gettext("Please save your settings before you attempt to start Suricata."); ?>	
 	</td>
 </tr>
@@ -860,11 +826,11 @@ function enable_change(enable_change) {
 	document.iform.alertsystemlog.disabled = endis;
 	document.iform.externallistname.disabled = endis;
 	document.iform.homelistname.disabled = endis;
-	document.iform.whitelistname.disabled=endis;
+//	document.iform.whitelistname.disabled=endis;
 	document.iform.suppresslistname.disabled = endis;
 	document.iform.configpassthru.disabled = endis;
 	document.iform.btnHomeNet.disabled=endis;
-	document.iform.btnWhitelist.disabled=endis;
+//	document.iform.btnWhitelist.disabled=endis;
 	document.iform.btnSuppressList.disabled=endis;
 }
 
@@ -897,7 +863,7 @@ function viewList(id, elemID, elemType) {
 }
 
 enable_change(false);
-enable_blockoffenders();
+//enable_blockoffenders();
 toggle_stats_log();
 toggle_http_log();
 toggle_tls_log();

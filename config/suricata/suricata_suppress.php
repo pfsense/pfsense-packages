@@ -61,6 +61,28 @@ function suricata_suppresslist_used($supplist) {
 	return false;
 }
 
+function suricata_find_suppresslist_interface($supplist) {
+
+	/****************************************************************/
+	/* This function finds the first (if more than one) interface   */
+	/* configured to use the passed Suppress List and returns the   */
+	/* index of the interface in the ['rule'] config array.         */
+	/*                                                              */
+	/* Returns: index of interface in ['rule'] config array or      */
+	/*          FALSE if no interface found.                        */
+	/****************************************************************/
+
+	global $config;
+	$suricataconf = $config['installedpackages']['suricata']['rule'];
+	if (empty($suricataconf))
+		return false;
+	foreach ($suricataconf as $rule => $value) {
+		if ($value['suppresslistname'] == $supplist)
+			return $rule;
+	}
+	return false;
+}
+
 if ($_GET['act'] == "del") {
 	if ($a_suppress[$_GET['id']]) {
 		// make sure list is not being referenced by any Suricata-configured interface
@@ -108,54 +130,74 @@ if ($input_errors) {
 </td>
 </tr>
 <tr><td><div id="mainarea">
-<table id="maintable" class="tabcont" width="100%" border="0" cellpadding="0" cellspacing="0">
-<tr>
-	<td width="30%" class="listhdrr"><?php echo gettext("File Name"); ?></td>
-	<td width="60%" class="listhdr"><?php echo gettext("Description"); ?></td>
-	<td width="10%" class="list"></td>
-</tr>
-<?php $i = 0; foreach ($a_suppress as $list): ?>
-<tr>
-	<td class="listlr"
-		ondblclick="document.location='suricata_suppress_edit.php?id=<?=$i;?>';">
-		<?=htmlspecialchars($list['name']);?></td>
-	<td class="listbg"
-		ondblclick="document.location='suricata_suppress_edit.php?id=<?=$i;?>';">
-	<font color="#FFFFFF"> <?=htmlspecialchars($list['descr']);?>&nbsp;</font>
-	</td>
-
-	<td valign="middle" nowrap class="list">
-	<table border="0" cellspacing="0" cellpadding="1">
-		<tr>
-			<td valign="middle"><a
-				href="suricata_suppress_edit.php?id=<?=$i;?>"><img
-				src="/themes/<?= $g['theme']; ?>/images/icons/icon_e.gif"
-				width="17" height="17" border="0" title="<?php echo gettext("edit Suppress List"); ?>"></a></td>
-			<td><a
-				href="/suricata/suricata_suppress.php?act=del&id=<?=$i;?>"
-				onclick="return confirm('<?php echo gettext("Do you really want to delete this Suppress List?"); ?>')"><img
-				src="/themes/<?= $g['theme']; ?>/images/icons/icon_x.gif"
-				width="17" height="17" border="0" title="<?php echo gettext("delete Suppress List"); ?>"></a></td>
-		</tr>
+	<table id="maintable" class="tabcont" width="100%" border="0" cellpadding="0" cellspacing="0">
+		<thead>
+			<tr>
+				<th width="30%" class="listhdrr"><?php echo gettext("Suppress List Name"); ?></th>
+				<th width="60%" class="listhdr"><?php echo gettext("Description"); ?></th>
+				<th width="10%" class="list"></th>
+			</tr>
+		</thead>
+		<tbody>
+		<?php $i = 0; foreach ($a_suppress as $list): ?>
+			<?php
+				if (suricata_suppresslist_used($list['name'])) {
+					$icon = "<img src=\"/themes/{$g['theme']}/images/icons/icon_frmfld_pwd.png\" " . 
+						"width=\"16\" height=\"16\" border=\"0\" title=\"" . gettext("List is in use by an instance") . "\"/>";
+				}
+				else
+					$icon = "";
+			 ?>
+			<tr>
+				<td height="20px" class="listlr"
+					ondblclick="document.location='suricata_suppress_edit.php?id=<?=$i;?>';">
+					<?=htmlspecialchars($list['name']);?>&nbsp;<?=$icon;?></td>
+				<td height="20px" class="listbg"
+					ondblclick="document.location='suricata_suppress_edit.php?id=<?=$i;?>';">
+				<font color="#FFFFFF"> <?=htmlspecialchars($list['descr']);?>&nbsp;</font>
+				</td>
+				<td height="20px" valign="middle" nowrap class="list">
+					<table border="0" cellspacing="0" cellpadding="1">
+						<tr>
+							<td valign="middle"><a
+							href="suricata_suppress_edit.php?id=<?=$i;?>"><img
+							src="/themes/<?= $g['theme']; ?>/images/icons/icon_e.gif" 
+							width="17" height="17" border="0" title="<?php echo gettext("edit Suppress List"); ?>"></a></td>
+						<?php if (suricata_suppresslist_used($list['name'])) : ?>
+							<td><img src="/themes/<?=$g['theme'];?>/images/icons/icon_x_d.gif" 
+							width="17" height="17" border="0" title="<?php echo gettext("Assigned Suppress Lists cannot be deleted");?>"/></td>
+							<td><a href="/suricata/suricata_interfaces_edit.php?id=<?=suricata_find_suppresslist_interface($list['name']);?>">
+							<img src="/themes/<?=$g['theme'];?>/images/icons/icon_right.gif" 
+							width="17" height="17" border="0" title="<?php echo gettext("Goto first instance associated with this Suppress List");?>"/></a>
+							</td>
+						<?php else : ?>
+							<td><a href="/suricata/suricata_suppress.php?act=del&id=<?=$i;?>"
+							onclick="return confirm('<?php echo gettext("Do you really want to delete this Suppress List?"); ?>')"><img
+							src="/themes/<?=$g['theme'];?>/images/icons/icon_x.gif" 
+							width="17" height="17" border="0" title="<?php echo gettext("delete Suppress List"); ?>"></a></td>
+							<td>&nbsp;</td>
+						<?php endif; ?>
+						</tr>
+					</table>
+				</td>
+			</tr>
+		<?php $i++; endforeach; ?>
+			<tr>
+				<td class="list" colspan="2"></td>
+				<td  class="list">
+					<table border="0" cellspacing="0" cellpadding="1">
+						<tr>
+							<td valign="middle" width="17">&nbsp;</td>
+							<td valign="middle"><a
+							href="suricata_suppress_edit.php?id=<?php echo $id_gen;?> "><img
+							src="/themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif"
+							width="17" height="17" border="0" title="<?php echo gettext("add a new list"); ?>"></a></td>
+						</tr>
+					</table>
+				</td>
+			</tr>
+		</tbody>
 	</table>
-	</td>
-</tr>
-<?php $i++; endforeach; ?>
-<tr>
-	<td class="list" colspan="2"></td>
-	<td  class="list">
-	<table border="0" cellspacing="0" cellpadding="1">
-		<tr>
-			<td valign="middle" width="17">&nbsp;</td>
-			<td valign="middle"><a
-				href="suricata_suppress_edit.php?id=<?php echo $id_gen;?> "><img
-				src="/themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif"
-				width="17" height="17" border="0" title="<?php echo gettext("add a new list"); ?>"></a></td>
-		</tr>
-	</table>
-	</td>
-</tr>
-</table>
 </div>
 </td></tr>
 <tr>
@@ -163,7 +205,10 @@ if ($input_errors) {
 	<p><?php echo gettext("Here you can create event filtering and " .
 	"suppression for your Suricata package rules."); ?><br/><br/>
 	<?php echo gettext("Please note that you must restart a running Interface so that changes can " .
-	"take effect."); ?></p></span></td>
+	"take effect."); ?><br/><br/>
+	<?php echo gettext("You cannot delete a Suppress List that is currently assigned to a Suricata interface (instance).") . "<br/>" . 
+	gettext("You must first unassign the Suppress List on the Interface Edit tab."); ?>
+	</p></span></td>
 </tr>
 </table>
 </form>
