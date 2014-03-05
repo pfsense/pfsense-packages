@@ -80,6 +80,12 @@ if (isset($_GET['dup']))
 
 $id = get_frontend_id($id);
 
+if (!is_numeric($id))
+{
+	//default value for new items.
+	$pconfig['ssloffloadacl'] = "yes";
+}
+
 $servercerts = get_certificates_server();
 
 $fields_sslCertificates=array();
@@ -227,17 +233,13 @@ $pfSversion = str_replace("\n", "", file_get_contents("/etc/version"));
 if(strstr($pfSversion, "1.2"))
 	$one_two = true;
 
-if (!$id)
-{
-	//default value for new items.
-	$pconfig['ssloffloadacl'] = "yes";
-}
-
 $closehead = false;
 $pgtitle = "HAProxy: Frontend: Edit";
 include("head.inc");
 
-$primaryfrontends = get_haproxy_frontends($pconfig['name']);
+if (!isset($_GET['dup']))
+	$excludefrontent = $pconfig['name'];
+$primaryfrontends = get_haproxy_frontends($excludefrontent);
 $interfaces = haproxy_get_bindable_interfaces();
 
 ?>
