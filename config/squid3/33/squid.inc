@@ -5,7 +5,7 @@
 	Copyright (C) 2006-2009 Scott Ullrich
 	Copyright (C) 2006 Fernando Lemos
 	Copyright (C) 2012 Martin Fuchs	
-	Copyright (C) 2012-2013 Marcello Coutinho
+	Copyright (C) 2012-2014 Marcello Coutinho
 	Copyright (C) 2013 Gekkenhuis
 	All rights reserved.
 
@@ -95,6 +95,15 @@ function squid_chown_recursive($dir, $user, $group) {
 	}
 }
 
+function squid_check_clamav_user($user)
+	{
+		exec("/usr/sbin/pw usershow {$user}",$sq_ex_output,$sq_ex_return);
+		$user_arg=($sq_ex_return == 0?"mod":"add");
+		exec("/usr/sbin/pw user{$user_arg} {$user} -G wheel -u 9595 -s /sbin/nologin",$sq_ex_output,$sq_ex_return);
+		if ($sq_ex_return != 0)
+			log_error("Squid - Could not change clamav user settings. ".serialize($sq_ex_output));
+	}
+		
 /* setup cache */
 function squid_dash_z() {
 	global $config;
@@ -1310,8 +1319,27 @@ function squid_resync_antivirus(){
 		if (preg_match("/fr/i",$squid_config['error_language']))
 			$clwarn="clwarn.cgi.fr_FR";
 		if (preg_match("/pt_br/i",$squid_config['error_language']))
-			$clwarn="clwarn.cgi.pt_BR";	
-		copy(SQUID_LOCALBASE."/libexec/squidclamav/{$clwarn}","/usr/local/www/clwarn.cgi");
+			$clwarn="clwarn.cgi.pt_BR";
+		$clwarn_file="/usr/local/www/clwarn.cgi";
+		copy(SQUID_LOCALBASE."/libexec/squidclamav/{$clwarn}",$clwarn_file);
+
+		#fix perl path on clwarn.cgi
+		$clwarn_file_new=file_get_contents($clwarn_file);
+		$c_pattern[]="@/usr/\S+/perl@";
+		$c_replacement[]=SQUID_LOCALBASE."/bin/perl";
+		/*$c_pattern[]="@redirect \S+/clwarn.cgi@";
+		$gui_proto=$config['system']['webgui']['protocol'];
+		$gui_port=$config['system']['webgui']['port'];
+		if($gui_port == "") {
+			$gui_port($gui_proto == "http"?"80":"443");
+			}
+		$c_replacement[]=SQUID_LOCALBASE."redirect {$gui_proto}://127.0.0.1:{$gui_port}/clwarn.cgi";
+		*/
+		$clwarn_file_new=preg_replace($c_pattern, $c_replacement,$clwarn_file_new);
+		file_put_contents($clwarn_file, $clwarn_file_new,LOCK_EX);
+		
+		#fix clwarn.cgi file permission
+		chmod($clwarn_file,0755);
 		
 		$conf = <<< EOF
 icap_enable on
@@ -1346,7 +1374,7 @@ EOF;
 		if (!isset($clamav_clamd_enable))	
 			$rc_file.='clamav_clamd_enable="YES"'."\n";
 		file_put_contents("/etc/rc.conf.local",$rc_file,LOCK_EX);
-		
+		squid_check_clamav_user('clamav');
 		#patch sample files to pfsense dirs
 		#squidclamav.conf
 		if (!file_exists(SQUID_LOCALBASE."/etc/c-icap/squidclamav.conf.sample"))
@@ -1391,9 +1419,13 @@ EOF;
 		foreach ($dirs as $dir_path => $dir_user){
 		if (!is_dir($dir_path))
 			make_dirs($dir_path);
-		squid_chown_recursive($dir_path, $dir_user, $dir_user);
+		squid_chown_recursive($dir_path, $dir_user, "wheel");
 		}
-		
+		#Check clamav database
+		if (count(glob("/var/db/clamav/*d"))==0){
+			log_error("Squid - Missing /var/db/clamav/*.cvd or *.cld files. Running freshclam on background.");
+			mwexec_bg(SQUID_LOCALBASE."/bin/freshclam");
+		}
 		#check startup scripts on pfsense > 2.1
 		if (preg_match("/usr.pbi/",SQUID_LOCALBASE)){
 			$rcd_files = scandir(SQUID_LOCALBASE."/etc/rc.d");
@@ -1410,7 +1442,7 @@ EOF;
 		#check antivirus daemons
 		#check icap
 		if (is_process_running("c-icap")){
-			mwexec('/bin/echo -n "reconfigure" > /var/run/c-icap/c-icap.ctl');
+			mwexec_bg('/bin/echo -n "reconfigure" > /var/run/c-icap/c-icap.ctl');
 			}
 		else{
 			#check c-icap user on startup file
@@ -1421,13 +1453,13 @@ EOF;
 				$cicapr[0]='c_icap_user="clamav"}';
 				file_put_contents($c_icap_rcfile,preg_replace($cicapm,$cicapr,$sample_file),LOCK_EX);
 				}
-			mwexec("/usr/local/etc/rc.d/c-icap start");
+			mwexec_bg("/usr/local/etc/rc.d/c-icap start");
 			}
 		#check clamav
 		if (is_process_running("clamd"))
 			mwexec_bg("/usr/local/etc/rc.d/clamav-clamd reload");
 		else
-			mwexec("/usr/local/etc/rc.d/clamav-clamd start");
+			mwexec_bg("/usr/local/etc/rc.d/clamav-clamd start");
 		}
 return $conf;
 }
@@ -1533,12 +1565,12 @@ include('/usr/local/pkg/squid_reverse.inc');
 
 function squid_resync_auth() {
 	global $config, $valid_acls;
-
-	if (is_array($config['installedpackages']['squidauth']['config']))
-		$settings = $config['installedpackages']['squidauth']['config'][0];
-	else
-		$settings = array();
-		
+	$write_config=0;
+	if (!is_array($config['installedpackages']['squidauth']['config'])){
+		$config['installedpackages']['squidauth']['config'][]=array('auth_method'=> "none");
+		$write_config++;
+		}
+	$settings = $config['installedpackages']['squidauth']['config'][0];
 	if (is_array($config['installedpackages']['squidnac']['config']))
 		$settingsnac = $config['installedpackages']['squidnac']['config'][0];
 	else
@@ -1548,6 +1580,9 @@ function squid_resync_auth() {
 		$settingsconfig = $config['installedpackages']['squid']['config'][0];
 	else
 		$settingsconfig = array();
+	
+	if ($write_config > 0)
+		write_config();
 	
 	$conf = '';
 	
