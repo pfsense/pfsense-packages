@@ -36,6 +36,8 @@ require_once("haproxy_utils.inc");
 require_once("globals.inc");
 require_once("pkg_haproxy_tabs.inc");
 
+$simplefields = array('localstats_refreshtime','localstats_sticktable_refreshtime');
+
 if (!is_array($config['installedpackages']['haproxy'])) 
 	$config['installedpackages']['haproxy'] = array();
 
@@ -68,7 +70,13 @@ if ($_POST) {
 			$input_errors[] = "The maximum number of connections should be numeric.";
 			
 		if ($_POST['localstatsport'] && (!is_numeric($_POST['localstatsport']))) 
-			$input_errors[] = "The local stats port should be numeric.";
+			$input_errors[] = "The local stats port should be numeric or empty.";
+			
+		if ($_POST['localstats_refreshtime'] && (!is_numeric($_POST['localstats_refreshtime']))) 
+			$input_errors[] = "The local stats refresh time should be numeric or empty.";
+
+		if ($_POST['localstats_sticktable_refreshtime'] && (!is_numeric($_POST['localstats_sticktable_refreshtime']))) 
+			$input_errors[] = "The local stats sticktable refresh time should be numeric or empty.";
 
 		/*if($_POST['synchost1'] && !is_ipaddr($_POST['synchost1']))
 			$input_errors[] = "Synchost1 needs to be an IPAddress.";
@@ -93,6 +101,8 @@ if ($_POST) {
 			$config['installedpackages']['haproxy']['localstatsport'] = $_POST['localstatsport'] ? $_POST['localstatsport'] : false;
 			$config['installedpackages']['haproxy']['advanced'] = $_POST['advanced'] ? base64_encode($_POST['advanced']) : false;
 			$config['installedpackages']['haproxy']['nbproc'] = $_POST['nbproc'] ? $_POST['nbproc'] : false;			
+			foreach($simplefields as $stat)
+				$config['installedpackages']['haproxy'][$stat] = $_POST[$stat];
 			touch($d_haproxyconfdirty_path);
 			write_config();
 		}
@@ -114,6 +124,8 @@ $pconfig['carpdev'] = $config['installedpackages']['haproxy']['carpdev'];
 $pconfig['localstatsport'] = $config['installedpackages']['haproxy']['localstatsport'];
 $pconfig['advanced'] = base64_decode($config['installedpackages']['haproxy']['advanced']);
 $pconfig['nbproc'] = $config['installedpackages']['haproxy']['nbproc'];
+foreach($simplefields as $stat)
+	$pconfig[$stat] = $config['installedpackages']['haproxy'][$stat];
 
 // defaults
 if (!$pconfig['logfacility'])
@@ -349,6 +361,18 @@ function enable_change(enable_change) {
 					Sets the internal port to be used for the stats tab.
 					This is bound to 127.0.0.1 so will not be directly exposed on any LAN/WAN/other interface. It is used to internally pass through the stats page.
 					Leave this setting empty to remove the "HAProxyLocalStats" item from the stats page and save a little on recources.
+				</td>
+			</tr>
+			<tr>
+				<td width="22%" valign="top" class="vncell">Internal stats refresh rate</td>
+				<td class="vtable">
+					<input name="localstats_refreshtime" type="text" <?if(isset($pconfig['localstats_refreshtime'])) echo "value=\"{$pconfig['localstats_refreshtime']}\"";?> size="10" maxlength="5" /> Seconds, Leave this setting empty to not refresh the page automatically. EXAMPLE: 10
+				</td>
+			</tr>
+			<tr>
+				<td width="22%" valign="top" class="vncell">Sticktable page refresh rate</td>
+				<td class="vtable">
+					<input name="localstats_sticktable_refreshtime" type="text" <?if(isset($pconfig['localstats_sticktable_refreshtime'])) echo "value=\"{$pconfig['localstats_sticktable_refreshtime']}\"";?> size="10" maxlength="5" /> Seconds, Leave this setting empty to not refresh the page automatically. EXAMPLE: 10
 				</td>
 			</tr>
 			<tr>
