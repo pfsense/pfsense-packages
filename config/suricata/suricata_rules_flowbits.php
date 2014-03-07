@@ -43,8 +43,8 @@ $a_nat = &$config['installedpackages']['suricata']['rule'];
 
 if (isset($_POST['id']))
 	$id = $_POST['id'];
-elseif (isset($_GET['id']))
-	$id = $_GET['id'];
+elseif (isset($_GET['id']) && is_numericint($_GET['id']))
+	$id = htmlspecialchars($_GET['id']);
 
 if (is_null($id)) {
 	header("Location: /suricata/suricata_interfaces.php");
@@ -283,7 +283,6 @@ if ($savemsg)
 		<td align="center" valign="middle">
 			<input id="cancel" name="cancel" type="submit" class="formbtn" <?php 
 			echo "value=\"" . gettext("Return") . "\" title=\"" . gettext("Return to previous page") . "\""; ?>/>
-			<input name="id" type="hidden" value="<?=$id;?>" />
 		</td>
 	</tr>
 	<?php endif; ?>

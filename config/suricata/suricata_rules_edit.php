@@ -33,31 +33,22 @@ require_once("/usr/local/pkg/suricata/suricata.inc");
 $flowbit_rules_file = FLOWBITS_FILENAME;
 $suricatadir = SURICATADIR;
 
+if (isset($_GET['id']) && is_numericint($_GET['id']))
+	$id = htmlspecialchars($_GET['id']);
+
+if (is_null($id))
+	exit;
+
 if (!is_array($config['installedpackages']['suricata']['rule'])) {
 	$config['installedpackages']['suricata']['rule'] = array();
 }
+
 $a_rule = &$config['installedpackages']['suricata']['rule'];
 
-$id = $_GET['id'];
-if (is_null($id)) {
-	header("Location: /suricata/suricata_interfaces.php");
-	exit;
-}
-
-if (isset($id) && $a_rule[$id]) {
-	$pconfig['enable'] = $a_rule[$id]['enable'];
-	$pconfig['interface'] = $a_rule[$id]['interface'];
-	$pconfig['rulesets'] = $a_rule[$id]['rulesets'];
-}
-else {
-	header("Location: /suricata/suricata_interfaces.php");
-	exit;
-}
-
-/* convert fake interfaces to real */
-$if_real = get_real_interface($pconfig['interface']);
+$if_real = get_real_interface($a_rule[$id]['interface']);
 $suricata_uuid = $a_rule[$id]['uuid'];
-$suricatacfgdir = "{$suricatadir}suricata_{$suricata_uuid}_{$if_real}";
+$suricatacfgdir = "{$suricatadir}suricata_{$suricata_uuid}_{$if_real}/";
+
 $file = htmlspecialchars($_GET['openruleset'], ENT_QUOTES | ENT_HTML401);
 $contents = '';
 $wrap_flag = "off";
@@ -73,13 +64,13 @@ else
 // a standard rules file, or a complete file name.
 // Test for the special case of an IPS Policy file.
 if (substr($file, 0, 10) == "IPS Policy") {
-	$rules_map = suricata_load_vrt_policy($a_rule[$id]['ips_policy']);
-	if (isset($_GET['ids'])) {
-		$contents = $rules_map[$_GET['gid']][trim($_GET['ids'])]['rule'];
+	$rules_map = suricata_load_vrt_policy(strtolower(trim(substr($file, strpos($file, "-")+1))));
+	if (isset($_GET['sid']) && is_numericint($_GET['sid']) && isset($_GET['gid']) && is_numericint($_GET['gid'])) {
+		$contents = $rules_map[$_GET['gid']][trim($_GET['sid'])]['rule'];
 		$wrap_flag = "soft";
 	}
 	else {
-		$contents = "# Suricata IPS Policy - " . ucfirst($a_rule[$id]['ips_policy']) . "\n\n";
+		$contents = "# Snort IPS Policy - " . ucfirst(trim(substr($file, strpos($file, "-")+1))) . "\n\n";
 		foreach (array_keys($rules_map) as $k1) {
 			foreach (array_keys($rules_map[$k1]) as $k2) {
 				$contents .= "# Category: " . $rules_map[$k1][$k2]['category'] . "   SID: {$k2}\n";
@@ -90,7 +81,7 @@ if (substr($file, 0, 10) == "IPS Policy") {
 	unset($rules_map);
 }
 // Is it a SID to load the rule text from?
-elseif (isset($_GET['sid']) && is_numeric(trim($_GET['sid']))) {
+elseif (isset($_GET['sid']) && is_numericint($_GET['sid']) && isset($_GET['gid']) && is_numericint($_GET['gid'])) {
 	// If flowbit rule, point to interface-specific file
 	if ($file == "Auto-Flowbit Rules")
 		$rules_map = suricata_load_rules_map("{$suricatacfgdir}rules/" . FLOWBITS_FILENAME);
