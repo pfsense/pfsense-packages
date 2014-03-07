@@ -70,7 +70,7 @@ if (substr($file, 0, 10) == "IPS Policy") {
 		$wrap_flag = "soft";
 	}
 	else {
-		$contents = "# Snort IPS Policy - " . ucfirst(trim(substr($file, strpos($file, "-")+1))) . "\n\n";
+		$contents = "# Suricata IPS Policy - " . ucfirst(trim(substr($file, strpos($file, "-")+1))) . "\n\n";
 		foreach (array_keys($rules_map) as $k1) {
 			foreach (array_keys($rules_map[$k1]) as $k2) {
 				$contents .= "# Category: " . $rules_map[$k1][$k2]['category'] . "   SID: {$k2}\n";
