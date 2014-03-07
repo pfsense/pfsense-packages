@@ -134,9 +134,11 @@ function suricata_widget_get_alerts() {
 					$suricata_alerts[$counter]['timestamp'] = strval(date_timestamp_get($event_tm));
 					$suricata_alerts[$counter]['timeonly'] = date_format($event_tm, "H:i:s");
 					$suricata_alerts[$counter]['dateonly'] = date_format($event_tm, "M d");
-					$suricata_alerts[$counter]['src'] = $fields[9];
+					// Add zero-width space as soft-break opportunity after each colon in any IPv6 address
+					$suricata_alerts[$counter]['src'] = str_replace(":", ":&#8203;", $fields[9]);
 					$suricata_alerts[$counter]['srcport'] = $fields[10];
-					$suricata_alerts[$counter]['dst'] = $fields[11];
+					// Add zero-width space as soft-break opportunity after each colon in any IPv6 address
+					$suricata_alerts[$counter]['dst'] = str_replace(":", ":&#8203;", $fields[11]);
 					$suricata_alerts[$counter]['dstport'] = $fields[12];
 					$suricata_alerts[$counter]['priority'] = $fields[7];
 					$suricata_alerts[$counter]['category'] = $fields[6];
