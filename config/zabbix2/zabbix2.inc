@@ -193,7 +193,7 @@ function sync_package_zabbix2(){
 		$zbproxy_config = $config['installedpackages']['zabbixproxy']['config'][0];
 		if ($zbproxy_config['proxyenabled']=="on"){
 			$Mode=(is_numericint($zbproxy_config['proxymode'])?$zbproxy_config['proxymode'] : 0);
-                        $AdvancedParams=base64_decode($zbagent_config['advancedparams']);
+			$AdvancedParams=base64_decode($zbproxy_config['advancedparams']);
 		
 			$zbproxy_conf_file = <<< EOF
 Server={$zbproxy_config['server']}
