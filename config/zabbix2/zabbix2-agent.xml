@@ -41,7 +41,7 @@
 	<name>zabbixagent</name>
 	<title>Services: Zabbix-2 Agent</title>
 	<category>Monitoring</category>
-	<version>0.8_0</version>
+	<version>0.8_1</version>
 	<include_file>/usr/local/pkg/zabbix2.inc</include_file>
 	<addedit_string>Zabbix Agent has been created/modified.</addedit_string>
 	<delete_string>Zabbix Agent has been deleted.</delete_string>
