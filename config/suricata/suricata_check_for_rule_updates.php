@@ -239,7 +239,7 @@ function suricata_check_rule_md5($file_url, $file_dst, $desc = "") {
 	/*           error occurred.                              */
 	/**********************************************************/
 
-	global $pkg_interface, $suricata_rules_upd_log, $last_curl_error;
+	global $pkg_interface, $suricata_rules_upd_log, $last_curl_error, $update_errors;
 
 	$suricatadir = SURICATADIR;
 	$filename_md5 = basename($file_dst);
@@ -284,6 +284,7 @@ function suricata_check_rule_md5($file_url, $file_dst, $desc = "") {
 		if ($pkg_interface == "console")
 			error_log(gettext("\tServer error message was: {$last_curl_error}\n"), 3, $suricata_rules_upd_log);
 		error_log(gettext("\t{$desc} will not be updated.\n"), 3, $suricata_rules_upd_log);
+		$update_errors = true;
 		return false;
 	}
 }
@@ -307,7 +308,7 @@ function suricata_fetch_new_rules($file_url, $file_dst, $file_md5, $desc = "") {
 	/*           FALSE if download was not successful.        */
 	/**********************************************************/
 
-	global $pkg_interface, $suricata_rules_upd_log, $last_curl_error;
+	global $pkg_interface, $suricata_rules_upd_log, $last_curl_error, $update_errors;
 
 	$suricatadir = SURICATADIR;
 	$filename = basename($file_dst);
@@ -337,6 +338,7 @@ function suricata_fetch_new_rules($file_url, $file_dst, $file_md5, $desc = "") {
 			error_log(gettext("\tDownloaded {$desc} file MD5: " . md5_file($file_dst) . "\n"), 3, $suricata_rules_upd_log);
 			error_log(gettext("\tExpected {$desc} file MD5: {$file_md5}\n"), 3, $suricata_rules_upd_log);
 			error_log(gettext("\t{$desc} file download failed.  {$desc} will not be updated.\n"), 3, $suricata_rules_upd_log);
+			$update_errors = true;
 			return false;
 		}
 		return true;
@@ -349,6 +351,7 @@ function suricata_fetch_new_rules($file_url, $file_dst, $file_md5, $desc = "") {
 		if ($pkg_interface == "console")
 			error_log(gettext("\tThe error text was: {$last_curl_error}\n"), 3, $suricata_rules_upd_log);
 		error_log(gettext("\t{$desc} will not be updated.\n"), 3, $suricata_rules_upd_log);
+		$update_errors = true;
 		return false;
 	}
 
@@ -375,6 +378,7 @@ if (file_exists($suricata_rules_upd_log)) {
 /* Log start time for this rules update */
 error_log(gettext("Starting rules update...  Time: " . date("Y-m-d H:i:s") . "\n"), 3, $suricata_rules_upd_log);
 $last_curl_error = "";
+$update_errors = false;
 
 /*  Check for and download any new Emerging Threats Rules sigs */
 if ($emergingthreats == 'on') {
@@ -714,5 +718,13 @@ conf_mount_ro();
 
 // Restore the state of $pkg_interface
 $pkg_interface = $pkg_interface_orig;
+
+/* Save this update status to the configuration file */
+if ($update_errors)
+	$config['installedpackages']['suricata']['config'][0]['last_rule_upd_status'] = gettext("failed");
+else
+	$config['installedpackages']['suricata']['config'][0]['last_rule_upd_status'] = gettext("success");
+$config['installedpackages']['suricata']['config'][0]['last_rule_upd_time'] = gettext(date("M-d Y H:i"));
+write_config();
 
 ?>
