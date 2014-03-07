@@ -77,16 +77,12 @@ function suricata_generate_id() {
 }
 
 function suricata_is_running($suricata_uuid, $if_real, $type = 'suricata') {
-	global $config, $g;
-
-	if (isvalidpid("{$g['varrun_path']}/{$type}_{$if_real}{$suricata_uuid}.pid"))
-		return true;
-	else
-		return false;
+	global $g;
+	return isvalidpid("{$g['varrun_path']}/{$type}_{$if_real}{$suricata_uuid}.pid");
 }
 
 function suricata_barnyard_stop($suricatacfg, $if_real) {
-	global $config, $g;
+	global $g;
 
 	$suricata_uuid = $suricatacfg['uuid'];
 	if (isvalidpid("{$g['varrun_path']}/barnyard2_{$if_real}{$suricata_uuid}.pid")) {
@@ -96,13 +92,13 @@ function suricata_barnyard_stop($suricatacfg, $if_real) {
 }
 
 function suricata_stop($suricatacfg, $if_real) {
-	global $config, $g;
+	global $g;
 
 	$suricata_uuid = $suricatacfg['uuid'];
 	if (isvalidpid("{$g['varrun_path']}/suricata_{$if_real}{$suricata_uuid}.pid")) {
 		log_error("[Suricata] Suricata STOP for {$suricatacfg['descr']}({$if_real})...");
 		killbypid("{$g['varrun_path']}/suricata_{$if_real}{$suricata_uuid}.pid");
-		sleep(2);
+		sleep(1);
 
 		// For some reason Suricata seems to need a double TERM signal to actually shutdown
 		if (isvalidpid("{$g['varrun_path']}/suricata_{$if_real}{$suricata_uuid}.pid"))
@@ -113,7 +109,7 @@ function suricata_stop($suricatacfg, $if_real) {
 }
 
 function suricata_barnyard_start($suricatacfg, $if_real) {
-	global $config, $g;
+	global $g;
 
 	$suricata_uuid = $suricatacfg['uuid'];
 	$suricatadir = SURICATADIR . "suricata_{$suricata_uuid}_{$if_real}";
@@ -121,19 +117,19 @@ function suricata_barnyard_start($suricatacfg, $if_real) {
 
 	if ($suricatacfg['barnyard_enable'] == 'on') {
 		log_error("[Suricata] Barnyard2 START for {$suricatacfg['descr']}({$if_real})...");
-		exec("/usr/local/bin/barnyard2 -r {$suricata_uuid} -f unified2.alert --pid-path {$g['varrun_path']} --nolock-pidfile -c {$suricatadir}/barnyard2.conf -d {$suricatalogdir} -D -q");
+		mwexec_bg("/usr/local/bin/barnyard2 -r {$suricata_uuid} -f unified2.alert --pid-path {$g['varrun_path']} --nolock-pidfile -c {$suricatadir}/barnyard2.conf -d {$suricatalogdir} -D -q");
 	}
 }
 
 function suricata_start($suricatacfg, $if_real) {
-	global $config, $g;
+	global $g;
 
 	$suricatadir = SURICATADIR;
 	$suricata_uuid = $suricatacfg['uuid'];
 
 	if ($suricatacfg['enable'] == 'on') {
 		log_error("[Suricata] Suricata START for {$suricatacfg['descr']}({$if_real})...");
-		exec("/usr/local/bin/suricata -i {$if_real} -D -c {$suricatadir}suricata_{$suricata_uuid}_{$if_real}/suricata.yaml --pidfile {$g['varrun_path']}/suricata_{$if_real}{$suricata_uuid}.pid");
+		mwexec_bg("/usr/local/bin/suricata -i {$if_real} -D -c {$suricatadir}suricata_{$suricata_uuid}_{$if_real}/suricata.yaml --pidfile {$g['varrun_path']}/suricata_{$if_real}{$suricata_uuid}.pid");
 	}
 	else
 		return;
@@ -154,7 +150,7 @@ function suricata_reload_config($suricatacfg, $signal="USR2") {
 	/*                                                            */
 	/*  $signal = USR2 (default) parses and reloads config.       */
 	/**************************************************************/
-	global $config, $g;
+	global $g;
 
 	$suricatadir = SURICATADIR;
 	$suricata_uuid = $suricatacfg['uuid'];
@@ -166,8 +162,8 @@ function suricata_reload_config($suricatacfg, $signal="USR2") {
 	/******************************************************/
 	if (isvalidpid("{$g['varrun_path']}/suricata_{$if_real}{$suricata_uuid}.pid")) {
 		log_error("[Suricata] Suricata LIVE RULE RELOAD initiated for {$suricatacfg['descr']} ({$if_real})...");
-		sigkillbypid("{$g['varrun_path']}/suricata_{$if_real}{$suricata_uuid}.pid", $signal);
-//		exec("/bin/pkill -{$signal} -F {$g['varrun_path']}/suricata_{$if_real}{$suricata_uuid}.pid 2>&1 &");
+//		sigkillbypid("{$g['varrun_path']}/suricata_{$if_real}{$suricata_uuid}.pid", $signal);
+		mwexec_bg("/bin/pkill -{$signal} -F {$g['varrun_path']}/suricata_{$if_real}{$suricata_uuid}.pid");
 	}
 }
 
@@ -183,7 +179,7 @@ function suricata_barnyard_reload_config($suricatacfg, $signal="HUP") {
 	/*                                                            */
 	/*  $signal = HUP (default) parses and reloads config.        */
 	/**************************************************************/
-	global $config, $g;
+	global $g;
 
 	$suricatadir = SURICATADIR;
 	$suricata_uuid = $suricatacfg['uuid'];
@@ -195,8 +191,8 @@ function suricata_barnyard_reload_config($suricatacfg, $signal="HUP") {
 	/******************************************************/
 	if (isvalidpid("{$g['varrun_path']}/barnyard2_{$if_real}{$suricata_uuid}.pid")) {
 		log_error("[Suricata] Barnyard2 CONFIG RELOAD initiated for {$suricatacfg['descr']} ({$if_real})...");
-		sigkillbypid("{$g['varrun_path']}/barnyard2_{$if_real}{$suricata_uuid}.pid", $signal);
-//		exec("/bin/pkill -{$signal} -F {$g['varrun_path']}/barnyard2_{$if_real}{$suricata_uuid}.pid 2>&1 &");
+//		sigkillbypid("{$g['varrun_path']}/barnyard2_{$if_real}{$suricata_uuid}.pid", $signal);
+		mwexec_bg("/bin/pkill -{$signal} -F {$g['varrun_path']}/barnyard2_{$if_real}{$suricata_uuid}.pid");
 	}
 }
 
@@ -698,16 +694,28 @@ function suricata_build_sid_msg_map($rules_path, $sid_file) {
 	/*************************************************************/
 	/* This function reads all the rules file in the passed      */
 	/* $rules_path variable and produces a properly formatted    */
-	/* sid-msg.map file for use by Suricata and/or barnyard2.    */
+	/* sid-msg.map v2 file for use by Suricata and barnyard2.    */
+	/*                                                           */
+	/* This function produces the new v2 format sid-msg.map      */
+	/* with the field layout as follows:                         */
+	/*                                                           */
+	/*  GID || SID || REV || CLASSTYPE || PRI || MSG || REF ...  */
+	/*                                                           */
+	/*  On Entry: $rules_path --> array or directory of files    */
+	/*                            or a single file containing    */
+	/*                            the rules to read.             */
+	/*              $sid_file --> the complete destination path  */
+	/*                            and filename for the output    */
+	/*                            sid-msg.map file.              */
 	/*************************************************************/
 
 	$sidMap = array();
 	$rule_files = array();
 
-	// First check if we were passed a directory, a single file
-	// or an array of filenames to read. Set our $rule_files
-	// variable accordingly. If we can't figure it out, return
-	// and don't write a sid_msg_map file.
+	/* First check if we were passed a directory, a single file  */
+	/* or an array of filenames to read. Set our $rule_files     */
+	/* variable accordingly. If we can't figure it out, return   */
+	/* and don't write a sid-msg.map file.                       */
 	if (is_string($rules_path)) {
 		if (is_dir($rules_path))
 			$rule_files = glob($rules_path . "*.rules");
@@ -719,14 +727,14 @@ function suricata_build_sid_msg_map($rules_path, $sid_file) {
 	else
 		return;
 
-	// Read the rule files into an array, then iterate the list
+	/* Read the rule files into an array, then iterate the list */
 	foreach ($rule_files as $file) {
 
-		// Don't process files with "deleted" in the filename
+		/* Don't process files with "deleted" in the filename */
 		if (stristr($file, "deleted"))
 			continue;
 
-		// Read the file into an array, skipping missing files.
+		/* Read the file into an array, skipping missing files. */
 		if (!file_exists($file))
 			continue;
 
@@ -734,24 +742,24 @@ function suricata_build_sid_msg_map($rules_path, $sid_file) {
 		$record = "";
 		$b_Multiline = false;
 
-		// Read and process each line from the rules in the current file
+		/* Read and process each line from the rules in the current file */
 		foreach ($rules_array as $rule) {
 
-			// Skip any non-rule lines unless we're in multiline mode.
+			/* Skip any non-rule lines unless we're in multiline mode. */
 			if (!preg_match('/^\s*#*\s*(alert|drop|pass)/i', $rule) && !$b_Multiline)
 				continue;
 
-			// Test for a multi-line rule, and reassemble the
-			// pieces back into a single line.
+			/* Test for a multi-line rule, and reassemble the  */
+			/* pieces back into a single line.                 */
 			if (preg_match('/\\\\s*[\n]$/m', $rule)) {
 				$rule = substr($rule, 0, strrpos($rule, '\\'));
 				$record .= $rule;
 				$b_Multiline = true;
 				continue;
 			}
-			// If the last segment of a multiline rule, then
-			// append it onto the previous parts to form a
-			// single-line rule for further processing below.
+			/* If the last segment of a multiline rule, then   */
+			/* append it onto the previous parts to form a     */
+			/* single-line rule for further processing below.  */
 			elseif (!preg_match('/\\\\s*[\n]$/m', $rule) && $b_Multiline) {
 				$record .= $rule;
 				$rule = $record;
@@ -759,8 +767,12 @@ function suricata_build_sid_msg_map($rules_path, $sid_file) {
 			$b_Multiline = false;
 			$record = "";
 
-			// Parse the rule to find sid and any references.
+			/* Parse the rule to find sid and any references.  */
+			$gid = '1';             // default to 1 for regular rules
 			$sid = '';
+			$rev = '';
+			$classtype = 'NOCLASS'; // required default for v2 format
+			$priority = '0';        // required default for v2 format
 			$msg = '';
 			$matches = '';
 			$sidEntry = '';
@@ -768,23 +780,32 @@ function suricata_build_sid_msg_map($rules_path, $sid_file) {
 				$msg = trim($matches[1]);
 			if (preg_match('/\bsid\s*:\s*(\d+)\s*;/i', $rule, $matches))
 				$sid = trim($matches[1]);
-			if (!empty($sid) && !empty($msg)) {
-				$sidEntry = $sid . ' || ' . $msg;
+			if (preg_match('/\bgid\s*:\s*(\d+)\s*;/i', $rule, $matches))
+				$gid = trim($matches[1]);
+			if (preg_match('/\brev\s*:\s*([^\;]+)/i', $rule, $matches))
+				$rev = trim($matches[1]);
+			if (preg_match('/\bclasstype\s*:\s*([^\;]+)/i', $rule, $matches))
+				$classtype = trim($matches[1]);
+			if (preg_match('/\bpriority\s*:\s*([^\;]+)/i', $rule, $matches))
+				$priority = trim($matches[1]);
+
+			if (!empty($gid) && !empty($sid) && !empty($msg)) {
+				$sidEntry = $gid . ' || ' . $sid . ' || ' . $rev . ' || ' . $classtype . ' || ';
+				$sidEntry .= $priority . ' || ' . $msg;
 				preg_match_all('/\breference\s*:\s*([^\;]+)/i', $rule, $matches);
 				foreach ($matches[1] as $ref)
 					$sidEntry .= " || " . trim($ref);
 				$sidEntry .= "\n";
-				if (!is_array($sidMap[$sid]))
-					$sidMap[$sid] = array();
-				$sidMap[$sid] = $sidEntry;
+				$sidMap[] = $sidEntry;
 			}
 		}
         }
-	// Sort the generated sid-msg map by sid
-	ksort($sidMap);
+	/* Sort the generated sid-msg map */
+	natcasesort($sidMap);
 
-	// Now print the result to the supplied file
-	@file_put_contents($sid_file, array_values($sidMap));
+	/* Now print the result to the supplied file */
+	@file_put_contents($sid_file, "#v2\n# sid-msg.map file auto-generated by Snort.\n\n");
+	@file_put_contents($sid_file, array_values($sidMap), FILE_APPEND);
 }
 
 function suricata_merge_reference_configs($cfg_in, $cfg_out) {
@@ -1688,27 +1709,18 @@ function suricata_create_rc() {
 		$start_barnyard = <<<EOE
 
 	if [ ! -f {$g['varrun_path']}/barnyard2_{$if_real}{$suricata_uuid}.pid ]; then
-		pid=`/bin/pgrep -f "barnyard2 -r {$suricata_uuid} "`
+		pid=`/bin/pgrep -fn "barnyard2 -r {$suricata_uuid} "`
 	else
 		pid=`/bin/pgrep -F {$g['varrun_path']}/barnyard2_{$if_real}{$suricata_uuid}.pid`
 	fi
+
 	if [ ! -z \$pid ]; then
-		/usr/bin/logger -p daemon.info -i -t SuricataStartup "Barnyard2 STOP for {$value['descr']}({$suricata_uuid}_{$if_real})..."
-		/bin/pkill -TERM \$pid
-		time=0 timeout=30
-		while /bin/kill -TERM \$pid 2>/dev/null; do
-			sleep 1
-			time=\$((time+1))
-			if [ \$time -gt \$timeout ]; then
-				break
-			fi
-		done
-		if [ -f /var/run/barnyard2_{$if_real}{$suricata_uuid}.pid ]; then
-			/bin/rm /var/run/barnyard2_{$if_real}{$suricata_uuid}.pid
-		fi
+		/usr/bin/logger -p daemon.info -i -t SuricataStartup "Barnyard2 SOFT RESTART for {$value['descr']}({$suricata_uuid}_{$if_real})..."
+		/bin/pkill -HUP \$pid
+	else
+		/usr/bin/logger -p daemon.info -i -t SuricataStartup "Barnyard2 START for {$value['descr']}({$suricata_uuid}_{$if_real})..."
+		/usr/local/bin/barnyard2 -r {$suricata_uuid} -f unified2.alert --pid-path {$g['varrun_path']} --nolock-pidfile -c {$suricatadir}suricata_{$suricata_uuid}_{$if_real}/barnyard2.conf -d {$suricatalogdir}suricata_{$if_real}{$suricata_uuid} -D -q
 	fi
-	/usr/bin/logger -p daemon.info -i -t SuricataStartup "Barnyard2 START for {$value['descr']}({$suricata_uuid}_{$if_real})..."
-	/usr/local/bin/barnyard2 -r {$suricata_uuid} -f unified2.alert --pid-path {$g['varrun_path']} --nolock-pidfile -c {$suricatadir}suricata_{$suricata_uuid}_{$if_real}/barnyard2.conf -d {$suricatalogdir}suricata_{$if_real}{$suricata_uuid} -D -q
 
 EOE;
 		$stop_barnyard2 = <<<EOE
@@ -1729,9 +1741,9 @@ EOE;
 			/bin/rm /var/run/barnyard2_{$if_real}{$suricata_uuid}.pid
 		fi
 	else
-		pid=`/bin/pgrep -f "barnyard2 -r {$suricata_uuid} "`
+		pid=`/bin/pgrep -fn "barnyard2 -r {$suricata_uuid} "`
 		if [ ! -z \$pid ]; then
-			/bin/pkill -TERM -f "barnyard2 -r {$suricata_uuid} "
+			/bin/pkill -TERM -fn "barnyard2 -r {$suricata_uuid} "
 			time=0 timeout=30
 			while /bin/kill -TERM \$pid 2>/dev/null; do
 				sleep 1
@@ -1754,7 +1766,7 @@ EOE;
 ###### For Each Iface
 	# Start suricata and barnyard2
 	if [ ! -f {$g['varrun_path']}/suricata_{$if_real}{$suricata_uuid}.pid ]; then
-		pid=`/bin/pgrep -f "suricata -i {$if_real} "`
+		pid=`/bin/pgrep -fn "suricata -i {$if_real} "`
 	else
 		pid=`/bin/pgrep -F {$g['varrun_path']}/suricata_{$if_real}{$suricata_uuid}.pid`
 	fi
@@ -1790,10 +1802,10 @@ EOE;
 			/bin/rm /var/run/suricata_{$if_real}{$suricata_uuid}.pid
 		fi
 	else
-		pid=`/bin/pgrep -f "suricata -i {$if_real} "`
+		pid=`/bin/pgrep -fn "suricata -i {$if_real} "`
 		if [ ! -z \$pid ]; then
 			/usr/bin/logger -p daemon.info -i -t SuricataStartup "Suricata STOP for {$value['descr']}({$suricata_uuid}_{$if_real})..."
-			/bin/pkill -TERM -f "suricata -i {$if_real} "
+			/bin/pkill -TERM -fn "suricata -i {$if_real} "
 			time=0 timeout=30
 			while /bin/kill -TERM \$pid 2>/dev/null; do
 				sleep 1
