@@ -40,10 +40,11 @@ if (!is_array($config['installedpackages']['suricata']['rule']))
 	$config['installedpackages']['suricata']['rule'] = array();
 $a_rule = &$config['installedpackages']['suricata']['rule'];
 
-if ($_GET['id']);
-	$id = htmlspecialchars($_GET['id'], ENT_QUOTES | ENT_HTML401);
 if ($_POST['id'])
 	$id = $_POST['id'];
+elseif ($_GET['id']);
+	$id = htmlspecialchars($_GET['id'], ENT_QUOTES | ENT_HTML401);
+
 if (is_null($id))
 	$id = 0;
 
@@ -71,8 +72,8 @@ if (isset($id) && $a_rule[$id]) {
 	if (empty($pconfig['uuid']))
 		$pconfig['uuid'] = $suricata_uuid;
 }
-// Must be a new interface, so try to pick next available physical interface to use
 elseif (isset($id) && !isset($a_rule[$id])) {
+	// Must be a new interface, so try to pick next available physical interface to use
 	$ifaces = get_configured_interface_list();
 	$ifrules = array();
 	foreach($a_rule as $r)
@@ -95,8 +96,6 @@ if (empty($pconfig['blockoffendersip']))
 	$pconfig['blockoffendersip'] = "both";
 if (empty($pconfig['max_pending_packets']))
 	$pconfig['max_pending_packets'] = "1024";
-if (empty($pconfig['inspect_recursion_limit']))
-	$pconfig['inspect_recursion_limit'] = "3000";
 if (empty($pconfig['detect_eng_profile']))
 	$pconfig['detect_eng_profile'] = "medium";
 if (empty($pconfig['mpm_algo']))
@@ -127,17 +126,49 @@ if (empty($pconfig['max_pcap_log_files']))
 	$pconfig['max_pcap_log_files'] = "1000";
 
 if ($_POST["save"]) {
-	if (!$_POST['interface'])
+	// If the interface is not enabled, stop any running Suricata
+	// instance on it, save the new state and exit.
+	if (!isset($_POST['enable'])) {
+		if (isset($id) && $a_rule[$id]) {
+			$a_rule[$id]['enable'] = 'off';
+			$a_rule[$id]['interface'] = htmlspecialchars($_POST['interface']);
+			$a_rule[$id]['descr'] = htmlspecialchars($_POST['descr']);
+			suricata_stop($a_rule[$id], get_real_interface($a_rule[$id]['interface']));
+
+			// Save configuration changes
+			write_config();
+
+			// Update suricata.conf and suricata.sh files for this interface
+			sync_suricata_package_config();
+
+			header( 'Expires: Sat, 26 Jul 1997 05:00:00 GMT' );
+			header( 'Last-Modified: ' . gmdate( 'D, d M Y H:i:s' ) . ' GMT' );
+			header( 'Cache-Control: no-store, no-cache, must-revalidate' );
+			header( 'Cache-Control: post-check=0, pre-check=0', false );
+			header( 'Pragma: no-cache' );
+			header("Location: /suricata/suricata_interfaces.php");
+			exit;
+		}
+	}
+
+	// Validate inputs
+	if (!isset($_POST['interface']))
 		$input_errors[] = gettext("Choosing an Interface is mandatory!");
+
+	if (isset($_POST['stats_upd_interval']) && !is_numericint($_POST['stats_upd_interval']))
+		$input_errors[] = gettext("The value for Stats Update Interval must contain only digits and evaluate to an integer.");
 
 	if ($_POST['max_pending_packets'] < 1 || $_POST['max_pending_packets'] > 65000)
 		$input_errors[] = gettext("The value for Maximum-Pending-Packets must be between 1 and 65,000!");
 
-	if (!empty($_POST['max_pcap_log_size']) && !is_numeric($_POST['max_pcap_log_size']))
+	if (isset($_POST['max_pcap_log_size']) && !is_numeric($_POST['max_pcap_log_size']))
 		$input_errors[] = gettext("The value for 'Max Packet Log Size' must be numbers only.  Do not include any alphabetic characters."); 
 
-	if (!empty($_POST['max_pcap_log_files']) && !is_numeric($_POST['max_pcap_log_files']))
-		$input_errors[] = gettext("The value for 'Max Packet Log Files' must be numbers only."); 
+	if (isset($_POST['max_pcap_log_files']) && !is_numeric($_POST['max_pcap_log_files']))
+		$input_errors[] = gettext("The value for 'Max Packet Log Files' must be numbers only.");
+
+	if (!empty($_POST['inspect_recursion_limit']) && !is_numeric($_POST['inspect_recursion_limit']))
+		$input_errors[] = gettext("The value for Inspect Recursion Limit can either be blank or contain only digits evaluating to an integer greater than or equal to 0.");
 
 	// if no errors write to suricata.yaml
 	if (!$input_errors) {
@@ -146,12 +177,12 @@ if ($_POST["save"]) {
 		$natent['enable'] = $_POST['enable'] ? 'on' : 'off';
 		$natent['uuid'] = $pconfig['uuid'];
 
-		if ($_POST['descr']) $natent['descr'] =  $_POST['descr']; else $natent['descr'] = strtoupper($natent['interface']);
+		if ($_POST['descr']) $natent['descr'] =  htmlspecialchars($_POST['descr']); else $natent['descr'] = strtoupper($natent['interface']);
 		if ($_POST['max_pcap_log_size']) $natent['max_pcap_log_size'] = $_POST['max_pcap_log_size']; else unset($natent['max_pcap_log_size']);
 		if ($_POST['max_pcap_log_files']) $natent['max_pcap_log_files'] = $_POST['max_pcap_log_files']; else unset($natent['max_pcap_log_files']);
 		if ($_POST['enable_stats_log'] == "on") { $natent['enable_stats_log'] = 'on'; }else{ $natent['enable_stats_log'] = 'off'; }
 		if ($_POST['append_stats_log'] == "on") { $natent['append_stats_log'] = 'on'; }else{ $natent['append_stats_log'] = 'off'; }
-		if ($_POST['stats_upd_interval']) $natent['stats_upd_interval'] = $_POST['stats_upd_interval']; else $natent['stats_upd_interval'] = "10";
+		if ($_POST['stats_upd_interval'] >= 1) $natent['stats_upd_interval'] = $_POST['stats_upd_interval']; else $natent['stats_upd_interval'] = "10";
 		if ($_POST['enable_http_log'] == "on") { $natent['enable_http_log'] = 'on'; }else{ $natent['enable_http_log'] = 'off'; }
 		if ($_POST['append_http_log'] == "on") { $natent['append_http_log'] = 'on'; }else{ $natent['append_http_log'] = 'off'; }
 		if ($_POST['enable_tls_log'] == "on") { $natent['enable_tls_log'] = 'on'; }else{ $natent['enable_tls_log'] = 'off'; }
@@ -163,7 +194,7 @@ if ($_POST["save"]) {
 		if ($_POST['enable_tracked_files_md5'] == "on") { $natent['enable_tracked_files_md5'] = 'on'; }else{ $natent['enable_tracked_files_md5'] = 'off'; }
 		if ($_POST['enable_file_store'] == "on") { $natent['enable_file_store'] = 'on'; }else{ $natent['enable_file_store'] = 'off'; }
 		if ($_POST['max_pending_packets']) $natent['max_pending_packets'] = $_POST['max_pending_packets']; else unset($natent['max_pending_packets']);
-		if ($_POST['inspect_recursion_limit']) $natent['inspect_recursion_limit'] = $_POST['inspect_recursion_limit']; else unset($natent['inspect_recursion_limit']);
+		if ($_POST['inspect_recursion_limit'] >= '0') $natent['inspect_recursion_limit'] = $_POST['inspect_recursion_limit']; else unset($natent['inspect_recursion_limit']);
 		if ($_POST['detect_eng_profile']) $natent['detect_eng_profile'] = $_POST['detect_eng_profile']; else unset($natent['detect_eng_profile']);
 		if ($_POST['mpm_algo']) $natent['mpm_algo'] = $_POST['mpm_algo']; else unset($natent['mpm_algo']);
 		if ($_POST['sgh_mpm_context']) $natent['sgh_mpm_context'] = $_POST['sgh_mpm_context']; else unset($natent['sgh_mpm_context']);
@@ -347,7 +378,7 @@ if ($savemsg) {
 		<td width="22%" valign="top" class="vncellreq"><?php echo gettext("Description"); ?></td>
 		<td width="78%" class="vtable"><input name="descr" type="text" 
 		class="formfld unknown" id="descr" size="40" value="<?=htmlspecialchars($pconfig['descr']); ?>"/> <br/>
-		<span class="vexpl"><?php echo gettext("Enter a meaningful description here for your reference."); ?></span><br/></td>
+		<span class="vexpl"><?php echo gettext("Enter a meaningful description here for your reference.  The default is the interface name."); ?></span><br/></td>
 	</tr>
 <tr>
 	<td colspan="2" class="listtopic"><?php echo gettext("Logging Settings"); ?></td>
