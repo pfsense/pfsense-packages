@@ -80,8 +80,8 @@ if (isset($_GET['getNewAlerts'])) {
 	$suri_alerts = suricata_widget_get_alerts();
 	$counter = 0;
 	foreach ($suri_alerts as $a) {
-		$response .= $a['instanceid'] . " " . $a['dateonly'] . "||" . $a['timeonly'] . "||" . $a['src'] . ":" . $a['srcport'] . "||";
-		$response .= $a['dst'] . ":" . $a['dstport'] . "||" . $a['priority'] . "||" . $a['category'] . "\n";
+		$response .= $a['instanceid'] . " " . $a['dateonly'] . "||" . $a['timeonly'] . "||" . $a['src'] . "||";
+		$response .= $a['dst'] . "||" . $a['priority'] . "||" . $a['category'] . "\n";
 		$counter++;
 		if($counter >= $suri_nentries)
 			break;
@@ -134,18 +134,22 @@ function suricata_widget_get_alerts() {
 					$suricata_alerts[$counter]['timestamp'] = strval(date_timestamp_get($event_tm));
 					$suricata_alerts[$counter]['timeonly'] = date_format($event_tm, "H:i:s");
 					$suricata_alerts[$counter]['dateonly'] = date_format($event_tm, "M d");
-					// Add zero-width space as soft-break opportunity after each colon in any IPv6 address
-					if (is_ipaddrv6($fields[9]) && !empty($fields[10]))
-						$suricata_alerts[$counter]['src'] = "[" . str_replace(":", ":&#8203;", $fields[9]) . "]";
+					// Add square brackets around any IPv6 address
+					if (is_ipaddrv6($fields[9]))
+						$suricata_alerts[$counter]['src'] = "[" . $fields[9] . "]";
 					else
 						$suricata_alerts[$counter]['src'] = $fields[9];
-					$suricata_alerts[$counter]['srcport'] = $fields[10];
-					// Add zero-width space as soft-break opportunity after each colon in any IPv6 address
-					if (is_ipaddrv6($fields[11]) && !empty($fields[12]))
-						$suricata_alerts[$counter]['dst'] = "[" . str_replace(":", ":&#8203;", $fields[11]) . "]";
+					// Add the SRC PORT if not null
+					if (!empty($fields[10]))					
+						$suricata_alerts[$counter]['src'] .= ":" . $fields[10];
+					// Add square brackets around any IPv6 address
+					if (is_ipaddrv6($fields[11]))
+						$suricata_alerts[$counter]['dst'] = "[" . $fields[11] . "]";
 					else
 						$suricata_alerts[$counter]['dst'] = $fields[11];
-					$suricata_alerts[$counter]['dstport'] = $fields[12];
+					// Add the SRC PORT if not null
+					if (!empty($fields[12]))
+						$suricata_alerts[$counter]['dst'] .= ":" . $fields[12];
 					$suricata_alerts[$counter]['priority'] = $fields[7];
 					$suricata_alerts[$counter]['category'] = $fields[6];
 					$counter++;
@@ -187,15 +191,15 @@ var suri_nentries = <?php echo $suri_nentries; ?>;
 
 <table width="100%" border="0" cellspacing="0" cellpadding="0" style="table-layout: fixed;">
 	<colgroup>
-		<col style='width: 22%;' />
-		<col style='width: 39%;' />
-		<col style='width: 39%;' />
+		<col style="width: 24%;" />
+		<col style="width: 38%;" />
+		<col style="width: 38%;" />
 	</colgroup>
 	<thead>
-		<tr class="suricata-alert-header">
-			<th class="listhdrr" align="center">IF/Date</th>
-			<th class="listhdrr" align="center">Src/Dst</th>
-			<th class="listhdrr" align="center">Details</th>
+		<tr>
+			<th class="listhdrr"><?=gettext("IF/Date");?></th>
+			<th class="listhdrr"><?=gettext("Src/Dst Address");?></th>
+			<th class="listhdrr"><?=gettext("Classification");?></th>
 		</tr>
 	</thead>
 	<tbody id="suricata-alert-entries">
@@ -206,9 +210,9 @@ var suri_nentries = <?php echo $suri_nentries; ?>;
 			foreach ($suricata_alerts as $alert) {
 				$evenRowClass = $counter % 2 ? " listMReven" : " listMRodd";
 				echo("	<tr class='" . $evenRowClass . "'>
-				<td class='listMRr' nowrap>" . $alert['instanceid'] . " " . $alert['dateonly'] . "<br/>" . $alert['timeonly'] . "</td>		
-				<td class='listMRr'>" . $alert['src'] . ":" . $alert['srcport'] . "<br>" . $alert['dst'] . ":" . $alert['dstport'] . "</td>
-				<td class='listMRr'>Pri: " . $alert['priority'] . "&nbsp;" . $alert['category'] . "</td></tr>");
+				<td class='listMRr'>" . $alert['instanceid'] . " " . $alert['dateonly'] . "<br/>" . $alert['timeonly'] . "</td>		
+				<td class='listMRr ellipsis' nowrap><div style='display:inline;' title='" . $alert['src'] . "'>" . $alert['src'] . "</div><br/><div style='display:inline;' title='" . $alert['dst'] . "'>" . $alert['dst'] . "</div></td>
+				<td class='listMRr'>Pri: " . $alert['priority'] . " " . $alert['category'] . "</td></tr>");
 				$counter++;
 				if($counter >= $suri_nentries)
 					break;

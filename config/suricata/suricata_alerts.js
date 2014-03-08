@@ -14,9 +14,11 @@ function suricata_alerts_fetch_new_rules_callback(callback_data) {
 	for(var x=0; x<data_split.length-1; x++) {
 		row_split = data_split[x].split("||");
 		var line = '';
-		line = '<td class="listMRr" nowrap>' + row_split[0] + '<br/>' + row_split[1] + '</td>';		
-		line += '<td class="listMRr">' + row_split[2] + '<br/>' + row_split[3] + '</td>';
-		line += '<td class="listMRr">' + 'Pri: ' +  row_split[4] + '&nbsp;' + row_split[5] + '</td>';
+		line =  '<td class="listMRr">' + row_split[0] + '<br/>' + row_split[1] + '</td>';		
+		line += '<td class="listMRr ellipsis" nowrap><div style="display:inline;" title="';
+		line += row_split[2] + '">' + row_split[2] + '</div><br/><div style="display:inline;" title="';
+		line += row_split[3] + '">' + row_split[3] + '</div></td>';
+		line += '<td class="listMRr">' + 'Pri: ' +  row_split[4] + ' ' + row_split[5] + '</td>';
 		new_data_to_add[new_data_to_add.length] = line;
 	}
 	suricata_alerts_update_div_rows(new_data_to_add);
