@@ -374,7 +374,7 @@ if ($savemsg) {
 					$selected = "";
 					if ($id == $instanceid)
 						$selected = "selected";
-					echo "<option value='{$id}' {$selected}> (" . convert_friendly_interface_to_friendly_descr($instance['interface']) . "){$instance['descr']}</option>\n";
+					echo "<option value='{$id}' {$selected}> (" . convert_friendly_interface_to_friendly_descr($instance['interface']) . ") {$instance['descr']}</option>\n";
 				}
 			?>
 					</select>&nbsp;&nbsp;<?php echo gettext('Choose which instance alerts you want to inspect.'); ?>
@@ -407,31 +407,31 @@ if ($savemsg) {
 			</tr>
 	<tr>
 	<td width="100%" colspan="2">
-	<table id="myTable" style="table-layout: fixed;" width="100%" class="sortable" border="1" cellpadding="0" cellspacing="0">
+	<table id="myTable" style="table-layout: fixed;" width="100%" class="sortable" border="0" cellpadding="0" cellspacing="0">
 		<colgroup>
 			<col width="10%" align="center" axis="date">
-			<col width="41" align="center" axis="number">
-			<col width="64" align="center" axis="string">
+			<col width="40" align="center" axis="number">
+			<col width="52" align="center" axis="string">
 			<col width="10%" axis="string">
 			<col width="13%" align="center" axis="string">
-			<col width="8%" align="center" axis="string">
+			<col width="7%" align="center" axis="string">
 			<col width="13%" align="center" axis="string">
-			<col width="8%" align="center" axis="string">
-			<col width="9%" align="center" axis="number">
+			<col width="7%" align="center" axis="string">
+			<col width="10%" align="center" axis="number">
 			<col axis="string">
 		</colgroup>
 		<thead>
 		   <tr>
-			<th class="listhdrr" axis="date"><?php echo gettext("DATE"); ?></th>
-			<th class="listhdrr" axis="number"><?php echo gettext("PRI"); ?></th>
-			<th class="listhdrr" axis="string"><?php echo gettext("PROTO"); ?></th>
-			<th class="listhdrr" axis="string"><?php echo gettext("CLASS"); ?></th>
-			<th class="listhdrr" axis="string"><?php echo gettext("SRC"); ?></th>
-			<th class="listhdrr" axis="string"><?php echo gettext("SPORT"); ?></th>
-			<th class="listhdrr" axis="string"><?php echo gettext("DST"); ?></th>
-			<th class="listhdrr" axis="string"><?php echo gettext("DPORT"); ?></th>
+			<th class="listhdrr" axis="date"><?php echo gettext("Date"); ?></th>
+			<th class="listhdrr" axis="number"><?php echo gettext("Pri"); ?></th>
+			<th class="listhdrr" axis="string"><?php echo gettext("Proto"); ?></th>
+			<th class="listhdrr" axis="string"><?php echo gettext("Class"); ?></th>
+			<th class="listhdrr" axis="string"><?php echo gettext("Src"); ?></th>
+			<th class="listhdrr" axis="string"><?php echo gettext("SPort"); ?></th>
+			<th class="listhdrr" axis="string"><?php echo gettext("Dst"); ?></th>
+			<th class="listhdrr" axis="string"><?php echo gettext("DPort"); ?></th>
 			<th class="listhdrr" axis="number"><?php echo gettext("SID"); ?></th>
-			<th class="listhdrr" axis="string"><?php echo gettext("DESCRIPTION"); ?></th>
+			<th class="listhdrr" axis="string"><?php echo gettext("Description"); ?></th>
 		   </tr>
 		</thead>
 	<tbody>
@@ -554,16 +554,16 @@ if (file_exists("/var/log/suricata/suricata_{$if_real}{$suricata_uuid}/alerts.lo
 			$alert_class = $fields[6];
 
 			echo "<tr>
-				<td class='listr' align='center'>{$alert_date}<br/>{$alert_time}</td>
-				<td class='listr' align='center'>{$alert_priority}</td>
-				<td class='listr' align='center'>{$alert_proto}</td>
-				<td class='listr' style=\"word-wrap:break-word;\">{$alert_class}</td>
-				<td class='listr' align='center' sorttable_customkey='{$fields[9]}'>{$alert_ip_src}</td>
-				<td class='listr' align='center'>{$alert_src_p}</td>
-				<td class='listr' align='center' sorttable_customkey='{$fields[11]}'>{$alert_ip_dst}</td>
-				<td class='listr' align='center'>{$alert_dst_p}</td>
-				<td class='listr' align='center' sorttable_customkey='{$fields[3]}'>{$alert_sid_str}<br/>{$sidsupplink}&nbsp;&nbsp;{$sid_dsbl_link}</td>
-				<td class='listr' style=\"word-wrap:break-word;\">{$alert_descr}</td>
+				<td class='listlr' align='center'>{$alert_date}<br/>{$alert_time}</td>
+				<td class='listlr' align='center'>{$alert_priority}</td>
+				<td class='listlr' align='center'>{$alert_proto}</td>
+				<td class='listlr' style=\"word-wrap:break-word;\">{$alert_class}</td>
+				<td class='listlr' align='center' sorttable_customkey='{$fields[9]}'>{$alert_ip_src}</td>
+				<td class='listlr' align='center'>{$alert_src_p}</td>
+				<td class='listlr' align='center' sorttable_customkey='{$fields[11]}'>{$alert_ip_dst}</td>
+				<td class='listlr' align='center'>{$alert_dst_p}</td>
+				<td class='listlr' align='center' sorttable_customkey='{$fields[3]}'>{$alert_sid_str}<br/>{$sidsupplink}&nbsp;&nbsp;{$sid_dsbl_link}</td>
+				<td class='listbg' style=\"word-wrap:break-word;\">{$alert_descr}</td>
 				</tr>\n";
 
 			$counter++;
