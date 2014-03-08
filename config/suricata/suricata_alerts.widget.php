@@ -135,10 +135,16 @@ function suricata_widget_get_alerts() {
 					$suricata_alerts[$counter]['timeonly'] = date_format($event_tm, "H:i:s");
 					$suricata_alerts[$counter]['dateonly'] = date_format($event_tm, "M d");
 					// Add zero-width space as soft-break opportunity after each colon in any IPv6 address
-					$suricata_alerts[$counter]['src'] = str_replace(":", ":&#8203;", $fields[9]);
+					if (is_ipaddrv6($fields[9]) && !empty($fields[10]))
+						$suricata_alerts[$counter]['src'] = "[" . str_replace(":", ":&#8203;", $fields[9]) . "]";
+					else
+						$suricata_alerts[$counter]['src'] = $fields[9];
 					$suricata_alerts[$counter]['srcport'] = $fields[10];
 					// Add zero-width space as soft-break opportunity after each colon in any IPv6 address
-					$suricata_alerts[$counter]['dst'] = str_replace(":", ":&#8203;", $fields[11]);
+					if (is_ipaddrv6($fields[11]) && !empty($fields[12]))
+						$suricata_alerts[$counter]['dst'] = "[" . str_replace(":", ":&#8203;", $fields[11]) . "]";
+					else
+						$suricata_alerts[$counter]['dst'] = $fields[11];
 					$suricata_alerts[$counter]['dstport'] = $fields[12];
 					$suricata_alerts[$counter]['priority'] = $fields[7];
 					$suricata_alerts[$counter]['category'] = $fields[6];
@@ -179,12 +185,17 @@ var suri_nentries = <?php echo $suri_nentries; ?>;
     </form>
 </div>
 
-<table width="100%" border="0" cellspacing="0" cellpadding="0">
+<table width="100%" border="0" cellspacing="0" cellpadding="0" style="table-layout: fixed;">
+	<colgroup>
+		<col style='width: 22%;' />
+		<col style='width: 39%;' />
+		<col style='width: 39%;' />
+	</colgroup>
 	<thead>
 		<tr class="suricata-alert-header">
-			<td width="22%" class="widgetsubheader" align="center">IF/Date</td>
-			<td width="39%" class="widgetsubheader" align="center">Src/Dst</td>
-			<td width="39%" class="widgetsubheader" align="center">Details</td>
+			<th class="listhdrr" align="center">IF/Date</th>
+			<th class="listhdrr" align="center">Src/Dst</th>
+			<th class="listhdrr" align="center">Details</th>
 		</tr>
 	</thead>
 	<tbody id="suricata-alert-entries">
@@ -195,9 +206,9 @@ var suri_nentries = <?php echo $suri_nentries; ?>;
 			foreach ($suricata_alerts as $alert) {
 				$evenRowClass = $counter % 2 ? " listMReven" : " listMRodd";
 				echo("	<tr class='" . $evenRowClass . "'>
-				<td width='22%' class='listMRr' nowrap>" . $alert['instanceid'] . " " . $alert['dateonly'] . "<br/>" . $alert['timeonly'] . "</td>		
-				<td width='39%' class='listMRr'>" . $alert['src'] . ":" . $alert['srcport'] . "<br>" . $alert['dst'] . ":" . $alert['dstport'] . "</td>
-				<td width='39%' class='listMRr'>Pri: " . $alert['priority'] . "&nbsp;" . $alert['category'] . "</td></tr>");
+				<td class='listMRr' nowrap>" . $alert['instanceid'] . " " . $alert['dateonly'] . "<br/>" . $alert['timeonly'] . "</td>		
+				<td class='listMRr'>" . $alert['src'] . ":" . $alert['srcport'] . "<br>" . $alert['dst'] . ":" . $alert['dstport'] . "</td>
+				<td class='listMRr'>Pri: " . $alert['priority'] . "&nbsp;" . $alert['category'] . "</td></tr>");
 				$counter++;
 				if($counter >= $suri_nentries)
 					break;
