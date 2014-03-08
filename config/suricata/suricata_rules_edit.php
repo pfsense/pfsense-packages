@@ -36,8 +36,14 @@ $suricatadir = SURICATADIR;
 if (isset($_GET['id']) && is_numericint($_GET['id']))
 	$id = htmlspecialchars($_GET['id']);
 
-if (is_null($id))
+// If we were not passed a valid index ID, close the pop-up and exit
+if (is_null($id)) {
+	echo '<html><body link="#000000" vlink="#000000" alink="#000000">';
+	echo '<script language="javascript" type="text/javascript">';
+	echo 'window.close();</script>';
+	echo '</body></html>';
 	exit;
+}
 
 if (!is_array($config['installedpackages']['suricata']['rule'])) {
 	$config['installedpackages']['suricata']['rule'] = array();
