@@ -5,7 +5,7 @@
        <html>
            <head>
                <title>pfSense Open Source Firewall Distribution - Packages</title>
-               <link rel="shortcut icon" href="http://www.pfsense.org/images/favicon.ico"/>
+               <link rel="shortcut icon" href="https://www.pfsense.org/images/favicon.ico"/>
 
                <link rel="stylesheet" href="templates/modular_plazza/css/template_css.css" type="text/css"/>
                <link rel="stylesheet" href="templates/modular_plazza/css/sfish.css" type="text/css"/>
