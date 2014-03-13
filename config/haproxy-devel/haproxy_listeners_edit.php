@@ -238,8 +238,8 @@ $pgtitle = "HAProxy: Frontend: Edit";
 include("head.inc");
 
 if (!isset($_GET['dup']))
-	$excludefrontent = $pconfig['name'];
-$primaryfrontends = get_haproxy_frontends($excludefrontent);
+	$excludefrontend = $pconfig['name'];
+$primaryfrontends = get_haproxy_frontends($excludefrontend);
 $interfaces = haproxy_get_bindable_interfaces();
 
 ?>
