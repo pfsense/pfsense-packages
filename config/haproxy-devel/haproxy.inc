@@ -733,7 +733,8 @@ function haproxy_writeconf($configpath) {
 			fwrite ($fd, "\tbind 127.0.0.1:$localstatsport\n");
 			fwrite ($fd, "\tmode http\n");
 			fwrite ($fd, "\tstats enable\n");
-			fwrite ($fd, "\tstats refresh 10\n");
+			if (is_numeric($a_global['localstats_refreshtime']))
+				fwrite ($fd, "\tstats refresh {$a_global['localstats_refreshtime']}\n");
 			fwrite ($fd, "\tstats admin if TRUE\n");
 			fwrite ($fd, "\tstats uri /haproxy_stats.php?haproxystats=1\n");
 			fwrite ($fd, "\ttimeout client 5000\n");
