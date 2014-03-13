@@ -189,7 +189,7 @@ function haproxy_custom_php_install_command() {
 
 name="haproxy"
 rcvar=`set_rcvar`
-command="/usr/local/bin/haproxy"
+command="/usr/pbi/haproxy-devel-`uname -m`/sbin/haproxy"
 haproxy_enable=\${haproxy-"YES"}
 
 start_cmd="haproxy_start"
