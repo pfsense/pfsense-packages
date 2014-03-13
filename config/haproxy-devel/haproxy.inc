@@ -635,13 +635,11 @@ function write_backend($fd, $name, $pool, $frontend) {
 function haproxy_configure() {
 	global $g;
 	// reload haproxy
-	haproxy_writeconf("{$g['varetc_path']}/haproxy");
 	return haproxy_check_run(1);
 }
 
 function haproxy_check_and_run(&$messages, $reload) {
 	global $g;
-	$configpath = "{$g['varetc_path']}/haproxy";
 	$testpath = "{$g['varetc_path']}/haproxy_test";
 	haproxy_writeconf($testpath);
 	$retval = exec("haproxy -c -V -f $testpath/haproxy.cfg 2>&1", $output, $err);
@@ -659,7 +657,6 @@ function haproxy_check_and_run(&$messages, $reload) {
 	$ok = strstr($retval, "Configuration file is valid");
 	if ($ok && $reload) {
 		global $haproxy_run_message;
-		haproxy_writeconf($configpath);
 		rmdir_recursive($testpath);
 		$ok = haproxy_check_run(1) == 0;
 		$messages = $haproxy_run_message;
@@ -1134,8 +1131,12 @@ function load_ipfw_rules() {
 function haproxy_check_run($reload) {
 	global $config, $g, $haproxy_run_message;
 
+	$haproxylock = lock("haproxy", LOCK_EX);
 	$a_global = &$config['installedpackages']['haproxy'];
 	$configpath = "{$g['varetc_path']}/haproxy";
+	
+	if ($reload)
+		haproxy_writeconf($configpath);
 
 	if(isset($a_global['enable'])) {
 		if (isset($a_global['carpdev'])) {
@@ -1146,14 +1147,18 @@ function haproxy_check_run($reload) {
 					//exec("/bin/pkill -F /var/run/haproxy.pid haproxy");//doesnt work for multiple pid's in a pidfile
 					haproxy_kill();
 				}
+				unlock($haproxylock);
 				return (0);
 			} else if (haproxy_is_running() && $reload == 0) { 
+				unlock($haproxylock);
 				return (0);
 			}
 			log_error("Starting haproxy on CARP master.");
 			/* fallthrough */
-		} else if ($reload == 0)
+		} else if ($reload == 0){
+			unlock($haproxylock);
 			return (0);
+		}
 
 		if(use_transparent_clientip_proxying()) {
 			filter_configure();
@@ -1172,14 +1177,15 @@ function haproxy_check_run($reload) {
 		}
 		foreach($output as $line)
 			$haproxy_run_message .= "<br/>" . htmlspecialchars($line) . "\n";
-		return ($errcode);
 	} else {
 		if ($reload && haproxy_is_running()) {
 			//exec("/bin/pkill -F /var/run/haproxy.pid haproxy");//doesnt work for multiple pid's in a pidfile
 			haproxy_kill();
 		}
-		return (0);
+		$errcode = 0;
 	}
+	unlock($haproxylock);
+	return ($errcode);
 }
 
 function haproxy_kill($killimmediately = true) {
