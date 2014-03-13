@@ -59,9 +59,9 @@
 		<description>The Reliable, High Performance TCP/HTTP Load Balancer</description>
 	</service>	
 	<plugins>
-		<plugin>
+		<item>
 			<type>plugin_carp</type>
-		</plugin>
+		</item>
 	</plugins>
 	<configpath>installedpackages->haproxy->config</configpath>
 	<additional_files_needed>
