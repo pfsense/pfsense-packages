@@ -162,18 +162,11 @@ function haproxy_custom_php_deinstall_command() {
 	global $static_output;
 	$static_output .= "HAProxy, running haproxy_custom_php_deinstall_command()\n";
 	update_output_window($static_output);
-	$static_output .= "HAProxy, deleting haproxy package\n";
-	update_output_window($static_output);
-	exec("cd /var/db/pkg && pkg_delete `ls | grep haproxy`");
 	$static_output .= "HAProxy, deleting haproxy webgui\n";
 	update_output_window($static_output);
 	exec("rm /usr/local/pkg/haproxy*");
 	exec("rm /usr/local/www/haproxy*");
 	exec("rm /usr/local/etc/rc.d/haproxy.sh");
-	exec("rm /etc/devd/haproxy.conf");
-	$static_output .= "HAProxy, running /etc/rc.d/devd restart\n";
-	update_output_window($static_output);
-	exec("/etc/rc.d/devd restart");
 	$static_output .= "HAProxy, installing cron job if needed\n";
 	update_output_window($static_output);
 	haproxy_install_cron(false);
@@ -189,16 +182,6 @@ function haproxy_custom_php_install_command() {
 	$static_output .= "HAProxy, conf_mount_rw\n";
 	update_output_window($static_output);
 	conf_mount_rw();
-	
-	$freebsd_version = substr(trim(php_uname("r")), 0, 1);
-
-	if(!file_exists("/usr/bin/limits")) {
-		$static_output .= "HAProxy, downloading 'limits'\n";
-		update_output_window($static_output);
-
-		exec("fetch -q -o /usr/bin/limits http://files.pfsense.org/extras/{$freebsd_version}/limits");
-		exec("chmod a+rx /usr/bin/limits");
-	}
 	
 	$static_output .= "HAProxy, create '/usr/local/etc/rc.d/haproxy.sh'\n";
 	update_output_window($static_output);
@@ -265,30 +248,7 @@ EOD;
 	fclose($fd);
 	exec("chmod a+rx /usr/local/etc/rc.d/haproxy.sh");
 
-	$static_output .= "HAProxy, create '/etc/devd/haproxy.conf'\n";
-	update_output_window($static_output);
-	$devd = <<<EOD
-notify 0 {
-        match "system"          "IFNET";
-        match "subsystem"       "carp[0-9]+";
-        match "type"            "LINK_UP";
-        action "/usr/local/etc/rc.d/haproxy.sh check";
-};
-notify 0 {
-        match "system"          "IFNET";
-        match "subsystem"       "carp[0-9]+";
-        match "type"            "LINK_DOWN";
-        action "/usr/local/etc/rc.d/haproxy.sh check";
-};
 
-EOD;
-	exec("mkdir -p /etc/devd");
-	$fd = fopen("/etc/devd/haproxy.conf", "w");
-	fwrite($fd, $devd);
-	fclose($fd);
-	$static_output .= "HAProxy, running: /etc/rc.d/devd restart \n";
-	update_output_window($static_output);
-	exec("/etc/rc.d/devd restart");
 
 	$static_output .= "HAProxy, update configuration\n";
 	update_output_window($static_output);
@@ -1177,8 +1137,6 @@ function haproxy_check_run($reload) {
 
 	$a_global = &$config['installedpackages']['haproxy'];
 	$configpath = "{$g['varetc_path']}/haproxy";
-
-	exec("/usr/bin/limits -n 300014");
 
 	if(use_transparent_clientip_proxying()) {
 		filter_configure();
