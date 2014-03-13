@@ -199,11 +199,17 @@ function enable_change(enable_change) {
 					</table>
 					Sets the maximum per-process number of concurrent connections to X.<br/>
 					<strong>NOTE:</strong> setting this value too high will result in HAProxy not being able to allocate enough memory.<br/>
+					<p>
 				<?php
 					$memusage = trim(`ps auxw | grep haproxy | grep -v grep | awk '{ print $5 }'`);
 					if($memusage)
-						echo "<p>Current memory usage: {$memusage} K.</p>";
+						echo "Current memory usage: <b>{$memusage} kB.</b><br/>";
 				?>
+					Current <a href='/system_advanced_sysctl.php'>'System Tunables'</a> settings.<br/>
+					&nbsp;&nbsp;'kern.maxfiles': <b><?=`sysctl kern.maxfiles | awk '{ print $2 }'`?></b><br/> 
+					&nbsp;&nbsp;'kern.maxfilesperproc': <b><?=`sysctl kern.maxfilesperproc | awk '{ print $2 }'`?></b><br/>
+					</p>
+					Full memory usage will only show after all connections have actually been used.
 					</td><td>
 					<table style="border: 1px solid #000;">
 						<tr>
@@ -216,23 +222,29 @@ function enable_change(enable_change) {
 							</td>
 						</tr>
 						<tr>
-							<td align="right"><font size=-1>999</font></td>
-							<td><font size=-1>1888K</font></td>
+							<td align="right"><font size=-1>1</font></td>
+							<td><font size=-1>50 kB</font></td>
 						</tr>
 						<tr>
-							<td align="right"><font size=-1>99999</font></td>
-							<td><font size=-1>8032K</font></td>
+							<td align="right"><font size=-1>1.000</font></td>
+							<td><font size=-1>48 MB</font></td>
 						</tr>
 						<tr>
-							<td align="right"><font size=-1>999999</font></td>
-							<td><font size=-1>50016K</font></td>
+							<td align="right"><font size=-1>10.000</font></td>
+							<td><font size=-1>488 MB</font></td>
 						</tr>
 						<tr>
-							<td align="right"><font size=-1>9999999</font></td>
-							<td><font size=-1>467M</font></td>
+							<td align="right"><font size=-1>100.000</font></td>
+							<td><font size=-1>4,8 GB</font></td>
+						</tr>
+						<tr>
+							<td colspan="2" style="white-space: nowrap"><font size=-2>Calculated for plain HTTP connections,<br/>using ssl offloading will increase this.</font></td>
 						</tr>
 					</table>
 					</td></tr></table>
+					When setting a high amount of allowed simultaneous connections you will need to add and or increase the following two <b><a href='/system_advanced_sysctl.php'>'System Tunables'</a></b> kern.maxfiles and kern.maxfilesperproc.
+					For HAProxy alone set these to at least the number of allowed connections * 2 + 31. So for 100.000 connections these need to be 200.031 or more to avoid trouble, take into account that handles are also used by other processes when setting kern.maxfiles.
+					<br/>
 				</td>
 			</tr>
 			<tr>
