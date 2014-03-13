@@ -1132,6 +1132,17 @@ function load_ipfw_rules() {
 	mwexec("/sbin/ipfw -x $ipfw_zone_haproxy -q {$g['tmp_path']}/ipfw_{$ipfw_zone_haproxy}.haproxy.rules", true);
 }
 
+function haproxy_plugin_carp($pluginparams) {
+	// called by pfSense when a CARP interface changes its state (called multiple times when multiple interfaces change state)
+	// $pluginparams['type'] always 'carp'
+	// $pluginparams['event'] either 'rc.carpmaster' or 'rc.carpbackup'
+	// $pluginparams['interface'] contains the affected interface
+	$type = $pluginparams['type'];
+	$event = $pluginparams['event'];
+	$interface = $pluginparams['interface'];
+	haproxy_check_run(0);
+}
+
 function haproxy_check_run($reload) {
 	global $config, $g, $haproxy_run_message;
 
