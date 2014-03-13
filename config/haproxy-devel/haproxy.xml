@@ -58,6 +58,11 @@
 		<executable>haproxy</executable>
 		<description>The Reliable, High Performance TCP/HTTP Load Balancer</description>
 	</service>	
+	<plugins>
+		<plugin>
+			<type>plugin_carp</type>
+		</plugin>
+	</plugins>
 	<configpath>installedpackages->haproxy->config</configpath>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
