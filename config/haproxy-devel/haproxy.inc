@@ -158,6 +158,88 @@ $a_sticky_type['stick_rdp_cookie'] = array('name' => 'Stick on RDP-cookie',
 	'descr' => "Uses a RDP-Cookie send by the mstsc client, note that not all clients send this.",
 	'cookiedescr' => 'EXAMPLE: msts or mstshash');
 
+if(!function_exists('group_ports')){
+// function group_ports() is present in pfSense 2.2 in util.inc
+/* create ranges of sequential port numbers (200:215) and remove duplicates */
+function group_ports($ports) {
+	if (!is_array($ports) || empty($ports))
+		return;
+
+	$uniq = array();
+	foreach ($ports as $port) {
+		if (is_portrange($port)) {
+			list($begin, $end) = explode(":", $port);
+			if ($begin > $end) {
+				$aux = $begin;
+				$begin = $end;
+				$end = $aux;
+			}
+			for ($i = $begin; $i <= $end; $i++)
+				if (!in_array($i, $uniq))
+					$uniq[] = $i;
+		} else if (is_port($port)) {
+			if (!in_array($port, $uniq))
+				$uniq[] = $port;
+		}
+	}
+	sort($uniq, SORT_NUMERIC);
+
+	$result = array();
+	foreach ($uniq as $idx => $port) {
+		if ($idx == 0) {
+			$result[] = $port;
+			continue;
+		}
+
+		$last = end($result);
+		if (is_portrange($last))
+			list($begin, $end) = explode(":", $last);
+		else
+			$begin = $end = $last;
+
+		if ($port == ($end+1)) {
+			$end++;
+			$result[count($result)-1] = "{$begin}:{$end}";
+		} else {
+			$result[] = $port;
+		}
+	}
+
+	return $result;
+}
+}
+	
+function haproxy_portoralias_to_list($port_or_alias) {
+	// input: a port or aliasname: 80 https MyPortAlias
+	// returns: a array of ports and portranges 80 443 8000:8010
+	global $config;
+	$portresult = array();
+	if (is_alias($port_or_alias)) {
+		if (is_array($config['aliases']['alias'])) {
+			foreach ($config['aliases']['alias'] as $alias) {
+				if ($alias['name'] == $port_or_alias && preg_match("/port/i", $alias['type'])) {
+					$ports = explode(' ',$alias['address']);
+					foreach($ports as $port) {
+						$portresults = haproxy_portoralias_to_list($port);
+						$portresult = array_merge($portresult, $portresults);
+					}
+					return $portresult;
+				}
+			}
+		}
+	} else if (is_portrange($port_or_alias)) {
+		return (array)$port_or_alias;
+	} else if (is_port($port_or_alias)) {
+		if (getservbyname($port_or_alias, "tcp"))
+			return (array)getservbyname($port_or_alias, "tcp");
+		if (getservbyname($port_or_alias, "udp"))
+			return (array)getservbyname($port_or_alias, "udp");
+		return (array)$port_or_alias;
+	}
+	else 
+		return null;
+}
+
 function haproxy_custom_php_deinstall_command() {
 	exec("cd /var/db/pkg && pkg_delete `ls | grep haproxy`");
 	exec("rm /usr/local/pkg/haproxy*");
@@ -840,9 +922,13 @@ function haproxy_writeconf($configpath) {
 			// Process and add bind directives for ports
 			$ip = haproxy_interface_ip($bind['extaddr']);
 			if ($ip){
-				foreach($ports as $port) {
-					if($port) {
-						$listenip .=  "\tbind\t\t\t$ip:{$port} {$ssl_info} {$advanced_bind}\n";
+				foreach($ports as $alias_or_port) {
+					if($alias_or_port) {
+						$portsnumeric = group_ports(haproxy_portoralias_to_list($alias_or_port));
+						foreach($portsnumeric as $portnumeric) {
+							$portnumeric = str_replace(":","-",$portnumeric);
+							$listenip .=  "\tbind\t\t\t$ip:{$portnumeric} {$ssl_info} {$advanced_bind}\n";
+						}
 					}
 				}
 			}

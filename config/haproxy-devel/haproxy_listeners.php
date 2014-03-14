@@ -167,7 +167,7 @@ include("head.inc");
 					$acls = get_frontend_acls($frontend);
 					$isaclset = "";
 					foreach ($acls as $acl) {
-						$isaclset .= "&#10;" . $acl['descr'];
+						$isaclset .= "&#10;" . htmlspecialchars($acl['descr']);
 					}
 					if ($frontend['ssloffloadacl'])
 						$isaclset .= "&#10;" . "Certificate ACL";
@@ -178,7 +178,7 @@ include("head.inc");
 						echo "<img src=\"$img_acl\" title=\"" . gettext("acl's used") . ": {$isaclset}\" border=\"0\" />";
 						
 					$isadvset = "";
-					if ($frontend['advanced_bind']) $isadvset .= "Advanced bind: {$frontend['advanced_bind']}\r\n";
+					if ($frontend['advanced_bind']) $isadvset .= "Advanced bind: ".htmlspecialchars($frontend['advanced_bind'])."\r\n";
 					if ($frontend['advanced']) $isadvset .= "Advanced pass thru setting used\r\n";
 					if ($isadvset)
 						echo "<img src=\"$img_adv\" title=\"" . gettext("Advanced settings set") . ": {$isadvset}\" border=\"0\" />";

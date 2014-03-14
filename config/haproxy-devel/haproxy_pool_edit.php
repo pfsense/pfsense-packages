@@ -221,12 +221,8 @@ if ($_POST) {
 
 		$pool['ha_servers']['item']=$a_servers;
 
-		update_if_changed("name", $pool['name'], $_POST['name']);
-		update_if_changed("cookie", $pool['cookie'], $_POST['cookie']);
 		update_if_changed("advanced", $pool['advanced'], base64_encode($_POST['advanced']));
 		update_if_changed("advanced_backend", $pool['advanced_backend'], base64_encode($_POST['advanced_backend']));
-		update_if_changed("checkinter", $pool['checkinter'], $_POST['checkinter']);
-		update_if_changed("monitor_uri", $pool['monitor_uri'], $_POST['monitor_uri']);
 
 		global $simplefields;
 		foreach($simplefields as $stat)
@@ -523,7 +519,7 @@ foreach($simplefields as $field){
 		<tr align="left">
 			<td width="22%" valign="top" class="vncell">Per server pass thru</td>
 			<td width="78%" class="vtable" colspan="2">
-				<input type="text" name='advanced' id='advanced' value='<?php echo $pconfig['advanced']; ?>' size="64" />
+				<input type="text" name='advanced' id='advanced' value='<?php echo htmlspecialchars($pconfig['advanced']); ?>' size="64" />
 				<br/>
 				NOTE: paste text into this box that you would like to pass thru. Applied to each 'server' line.
 			</td>
@@ -533,7 +529,7 @@ foreach($simplefields as $field){
 			<td width="22%" valign="top" class="vncell">Backend pass thru</td>
 			<td width="78%" class="vtable" colspan="2">
 				<? $textrowcount = max(substr_count($pconfig['advanced_backend'],"\n"), 2) + 2; ?>
-				<textarea  rows="<?=$textrowcount;?>" cols="70" name='advanced_backend' id='advanced_backend'><?php echo $pconfig['advanced_backend']; ?></textarea>
+				<textarea  rows="<?=$textrowcount;?>" cols="70" name='advanced_backend' id='advanced_backend'><?php echo htmlspecialchars($pconfig['advanced_backend']); ?></textarea>
 				<br/>
 				NOTE: paste text into this box that you would like to pass thru. Applied to the backend section.
 			</td>
