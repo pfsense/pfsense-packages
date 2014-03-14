@@ -37,7 +37,7 @@ if(!isset($_GET['interface']) || $_GET['interface']=="default") {
 	$interface = convert_friendly_interface_to_real_interface_name($config['installedpackages']['arpwatch']['config'][0]['interface_array'][0]);
 } 
 else { 
-	$interface = $_GET['interface'];
+	$interface = htmlspecialchars($_GET['interface']);
 }
 
 $logfile = "/var/log/arp." . $interface . ".dat";
