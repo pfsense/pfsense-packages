@@ -173,13 +173,6 @@ function suricata_widget_get_alerts() {
 /* display the result */
 ?>
 
-<script type="text/javascript">
-//<![CDATA[
-var suricataupdateDelay = 10000; // update every 10 second
-var suri_nentries = <?php echo $suri_nentries; ?>;
-//]]>
-</script>
-
 <input type="hidden" id="suricata_alerts-config" name="suricata_alerts-config" value=""/>
 <div id="suricata_alerts-settings" class="widgetconfigdiv" style="display:none;">
 	<form action="/widgets/widgets/suricata_alerts.widget.php" method="post" name="iformd">
@@ -228,7 +221,6 @@ var suri_nentries = <?php echo $suri_nentries; ?>;
 	var suri_nentries = <?php echo $suri_nentries; ?>; // default is 5
 
 <!-- needed to display the widget settings menu -->
-//<![CDATA[
 	selectIntLink = "suricata_alerts-configure";
 	textlink = document.getElementById(selectIntLink);
 	textlink.style.display = "inline";
