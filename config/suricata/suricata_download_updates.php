@@ -42,7 +42,7 @@ $snortcommunityrules = $config['installedpackages']['suricata']['config'][0]['sn
 
 /* Get last update information if available */
 if (!empty($config['installedpackages']['suricata']['config'][0]['last_rule_upd_time']))
-	$last_rule_upd_time = htmlspecialchars($config['installedpackages']['suricata']['config'][0]['last_rule_upd_time']);
+	$last_rule_upd_time = date('M-d Y H:i', $config['installedpackages']['suricata']['config'][0]['last_rule_upd_time']);
 else
 	$last_rule_upd_time = gettext("Unknown");
 if (!empty($config['installedpackages']['suricata']['config'][0]['last_rule_upd_status']))

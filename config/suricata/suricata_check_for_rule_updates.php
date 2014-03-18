@@ -29,6 +29,7 @@
 
 require_once("functions.inc");
 require_once("service-utils.inc");
+require_once("guiconfig.inc");
 require_once("/usr/local/pkg/suricata/suricata.inc");
 
 global $g, $pkg_interface, $suricata_gui_include, $rebuild_rules;
@@ -95,6 +96,9 @@ $snort_community_rules_filename = GPLV2_DNLD_FILENAME;
 $snort_community_rules_filename_md5 = GPLV2_DNLD_FILENAME . ".md5";
 $snort_community_rules_url = GPLV2_DNLD_URL;
 
+/* Mount the Suricata conf directories R/W so we can modify files there */
+conf_mount_rw();
+
 /* Set up Emerging Threats rules filenames and URL */
 if ($etpro == "on") {
 	$emergingthreats_filename = ETPRO_DNLD_FILENAME;
@@ -137,24 +141,12 @@ function suricata_download_file_url($url, $file_out) {
 	/* It provides logging of returned CURL errors. */
 	/************************************************/
 
-	global $g, $config, $pkg_interface, $last_curl_error, $fout, $ch, $file_size, $downloaded, $first_progress_update;
+	global $g, $config, $pkg_interface, $last_curl_error, $fout, $ch, $file_size, $downloaded, $first_progress_update, $rfc2616;
 
 	// Initialize required variables for the pfSense "read_body()" function
 	$file_size  = 1;
 	$downloaded = 1;
 	$first_progress_update = TRUE;
-
-
-	// Array of message strings for HTTP Response Codes
-	$http_resp_msg = array( 200 => "OK", 202 => "Accepted", 204 => "No Content", 205 => "Reset Content", 
-				206 => "Partial Content", 301 => "Moved Permanently", 302 => "Found", 
-				305 => "Use Proxy", 307 => "Temporary Redirect", 400 => "Bad Request", 
-				401 => "Unauthorized", 402 => "Payment Required", 403 => "Forbidden", 
-				404 => "Not Found", 405 => "Method Not Allowed", 407 => "Proxy Authentication Required", 
-				408 => "Request Timeout", 410 => "Gone", 500 => "Internal Server Error", 
-				501 => "Not Implemented", 502 => "Bad Gateway", 503 => "Service Unavailable", 
-				504 => "Gateway Timeout", 505 => "HTTP Version Not Supported" );
-
 	$last_curl_error = "";
 
 	$fout = fopen($file_out, "wb");
@@ -204,8 +196,8 @@ function suricata_download_file_url($url, $file_out) {
 		if ($rc === false)
 			$last_curl_error = curl_error($ch);
 		$http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-		if (isset($http_resp_msg[$http_code]))
-			$last_curl_error = $http_resp_msg[$http_code];
+		if (is_rfc2616_code($http_code))
+			$last_curl_error = $rfc2616[$http_code];
 		curl_close($ch);
 		fclose($fout);
 
@@ -358,7 +350,6 @@ function suricata_fetch_new_rules($file_url, $file_dst, $file_md5, $desc = "") {
 }
 
 /* Start of main code */
-conf_mount_rw();
 
 /*  remove old $tmpfname files if present */
 if (is_dir("{$tmpfname}"))
@@ -430,10 +421,10 @@ if ($emergingthreats == 'on') {
 		/* Remove the old Emerging Threats rules files */
 		$eto_prefix = ET_OPEN_FILE_PREFIX;
 		$etpro_prefix = ET_PRO_FILE_PREFIX;
-		array_map('unlink', glob("{$suricatadir}rules/{$eto_prefix}*.rules"));
-		array_map('unlink', glob("{$suricatadir}rules/{$etpro_prefix}*.rules"));
-		array_map('unlink', glob("{$suricatadir}rules/{$eto_prefix}*ips.txt"));
-		array_map('unlink', glob("{$suricatadir}rules/{$etpro_prefix}*ips.txt"));
+		unlink_if_exists("{$suricatadir}rules/{$eto_prefix}*.rules");
+		unlink_if_exists("{$suricatadir}rules/{$etpro_prefix}*.rules");
+		unlink_if_exists("{$suricatadir}rules/{$eto_prefix}*ips.txt");
+		unlink_if_exists("{$suricatadir}rules/{$etpro_prefix}*ips.txt");
 
 		// The code below renames ET files with a prefix, so we
 		// skip renaming the Suricata default events rule files
@@ -492,7 +483,7 @@ if ($snortdownload == 'on') {
 	if (file_exists("{$tmpfname}/{$snort_filename}")) {
 		/* Remove the old Snort rules files */
 		$vrt_prefix = VRT_FILE_PREFIX;
-		array_map('unlink', glob("{$suricatadir}rules/{$vrt_prefix}*.rules"));
+		unlink_if_exists("{$suricatadir}rules/{$vrt_prefix}*.rules");
 
 		if ($pkg_interface <> "console") {
 			update_status(gettext("Extracting Snort VRT rules..."));
@@ -724,7 +715,7 @@ if ($update_errors)
 	$config['installedpackages']['suricata']['config'][0]['last_rule_upd_status'] = gettext("failed");
 else
 	$config['installedpackages']['suricata']['config'][0]['last_rule_upd_status'] = gettext("success");
-$config['installedpackages']['suricata']['config'][0]['last_rule_upd_time'] = gettext(date("M-d Y H:i"));
+$config['installedpackages']['suricata']['config'][0]['last_rule_upd_time'] = time();
 write_config();
 
 ?>
