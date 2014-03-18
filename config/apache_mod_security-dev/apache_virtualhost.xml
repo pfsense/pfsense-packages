@@ -52,77 +52,77 @@
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0644</chmod>
-		<item>http://www.pfsense.com/packages/config/apache_mod_security-dev/apache_mod_security.inc</item>
+		<item>https://packages.pfsense.org/packages/config/apache_mod_security-dev/apache_mod_security.inc</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0644</chmod>
-		<item>http://www.pfsense.com/packages/config/apache_mod_security-dev/apache_mod_security.template</item>
+		<item>https://packages.pfsense.org/packages/config/apache_mod_security-dev/apache_mod_security.template</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0644</chmod>
-		<item>http://www.pfsense.com/packages/config/apache_mod_security-dev/apache_mod_security_groups.xml</item>
+		<item>https://packages.pfsense.org/packages/config/apache_mod_security-dev/apache_mod_security_groups.xml</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0644</chmod>
-		<item>http://www.pfsense.com/packages/config/apache_mod_security-dev/apache_mod_security_settings.xml</item>
+		<item>https://packages.pfsense.org/packages/config/apache_mod_security-dev/apache_mod_security_settings.xml</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/www/</prefix>
 		<chmod>0644</chmod>
-		<item>http://www.pfsense.com/packages/config/apache_mod_security-dev/apache_mod_security_view_logs.php</item>
+		<item>https://packages.pfsense.org/packages/config/apache_mod_security-dev/apache_mod_security_view_logs.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0644</chmod>
-		<item>http://www.pfsense.com/packages/config/apache_mod_security-dev/apache.template</item>
+		<item>https://packages.pfsense.org/packages/config/apache_mod_security-dev/apache.template</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0644</chmod>
-		<item>http://www.pfsense.com/packages/config/apache_mod_security-dev/apache_balancer.template</item>
+		<item>https://packages.pfsense.org/packages/config/apache_mod_security-dev/apache_balancer.template</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0644</chmod>
-		<item>http://www.pfsense.com/packages/config/apache_mod_security-dev/apache_balancer.xml</item>
+		<item>https://packages.pfsense.org/packages/config/apache_mod_security-dev/apache_balancer.xml</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/www/</prefix>
 		<chmod>0644</chmod>
-		<item>http://www.pfsense.com/packages/config/apache_mod_security-dev/apache_logs_data.php</item>
+		<item>https://packages.pfsense.org/packages/config/apache_mod_security-dev/apache_logs_data.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0644</chmod>
-		<item>http://www.pfsense.com/packages/config/apache_mod_security-dev/apache_mod_security_manipulation.xml</item>
+		<item>https://packages.pfsense.org/packages/config/apache_mod_security-dev/apache_mod_security_manipulation.xml</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0644</chmod>
-		<item>http://www.pfsense.com/packages/config/apache_mod_security-dev/apache_mod_security_sync.xml</item>
+		<item>https://packages.pfsense.org/packages/config/apache_mod_security-dev/apache_mod_security_sync.xml</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0644</chmod>
-		<item>http://www.pfsense.com/packages/config/apache_mod_security-dev/apache_settings.xml</item>
+		<item>https://packages.pfsense.org/packages/config/apache_mod_security-dev/apache_settings.xml</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/www/</prefix>
 		<chmod>0644</chmod>
-		<item>http://www.pfsense.com/packages/config/apache_mod_security-dev/apache_view_logs.php</item>
+		<item>https://packages.pfsense.org/packages/config/apache_mod_security-dev/apache_view_logs.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/www/shortcuts/</prefix>
 		<chmod>0755</chmod>
-		<item>http://www.pfsense.org/packages/config/apache_mod_security-dev/pkg_apache.inc</item>
+		<item>https://packages.pfsense.org/packages/config/apache_mod_security-dev/pkg_apache.inc</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0755</chmod>
-		<item>http://www.pfsense.org/packages/config/apache_mod_security-dev/apache_location.xml</item>
+		<item>https://packages.pfsense.org/packages/config/apache_mod_security-dev/apache_location.xml</item>
 	</additional_files_needed>
 	<tabs>
 		<tab>

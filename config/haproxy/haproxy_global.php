@@ -2,7 +2,7 @@
 /* $Id: load_balancer_pool.php,v 1.5.2.6 2007/03/02 23:48:32 smos Exp $ */
 /*
 	haproxy_global.php
-	part of pfSense (http://www.pfsense.com/)
+	part of pfSense (https://www.pfsense.org/)
 	Copyright (C) 2009 Scott Ullrich <sullrich@pfsense.com>
 	Copyright (C) 2008 Remco Hoef <remcoverhoef@pfsense.com>
 	All rights reserved.

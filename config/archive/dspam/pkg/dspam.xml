@@ -104,32 +104,32 @@
 	<additional_files_needed>
 		<prefix>/usr/local/www/</prefix>
 		<chmod>0755</chmod>
-		<item>http://www.pfsense.com/packages/config/dspam/www/dspam.php</item>
+		<item>https://packages.pfsense.org/packages/config/dspam/www/dspam.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/www/</prefix>
 		<chmod>0755</chmod>
-		<item>http://www.pfsense.com/packages/config/dspam/www/dspam-perf.php</item>
+		<item>https://packages.pfsense.org/packages/config/dspam/www/dspam-perf.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/www/</prefix>
 		<chmod>0755</chmod>
-		<item>http://www.pfsense.com/packages/config/dspam/www/dspam-admin.php</item>
+		<item>https://packages.pfsense.org/packages/config/dspam/www/dspam-admin.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/www/</prefix>
 		<chmod>0755</chmod>
-		<item>http://www.pfsense.com/packages/config/dspam/www/dspam-admin-graph.php</item>
+		<item>https://packages.pfsense.org/packages/config/dspam/www/dspam-admin-graph.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/www/</prefix>
 		<chmod>0755</chmod>
-		<item>http://www.pfsense.com/packages/config/dspam/www/dspam-admin-prefs.php</item>
+		<item>https://packages.pfsense.org/packages/config/dspam/www/dspam-admin-prefs.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/www/</prefix>
 		<chmod>0755</chmod>
-		<item>http://www.pfsense.com/packages/config/dspam/www/dspam-admin-stats.php</item>
+		<item>https://packages.pfsense.org/packages/config/dspam/www/dspam-admin-stats.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
@@ -199,32 +199,32 @@
 	<additional_files_needed>
 		<prefix>/usr/local/www/</prefix>
 		<chmod>0755</chmod>
-		<item>http://www.pfsense.com/packages/config/dspam/www/dspam-prefs.php</item>
+		<item>https://packages.pfsense.org/packages/config/dspam/www/dspam-prefs.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/www/</prefix>
 		<chmod>0755</chmod>
-		<item>http://www.pfsense.com/packages/config/dspam/www/dspam-quarantine.php</item>
+		<item>https://packages.pfsense.org/packages/config/dspam/www/dspam-quarantine.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/www/</prefix>
 		<chmod>0755</chmod>
-		<item>http://www.pfsense.com/packages/config/dspam/www/dspam-analysis.php</item>
+		<item>https://packages.pfsense.org/packages/config/dspam/www/dspam-analysis.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/www/</prefix>
 		<chmod>0755</chmod>
-		<item>http://www.pfsense.com/packages/config/dspam/www/dspam-analysis-graph.php</item>
+		<item>https://packages.pfsense.org/packages/config/dspam/www/dspam-analysis-graph.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/www/</prefix>
 		<chmod>0755</chmod>
-		<item>http://www.pfsense.com/packages/config/dspam/www/dspam-hfragment.php</item>
+		<item>https://packages.pfsense.org/packages/config/dspam/www/dspam-hfragment.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/www/</prefix>
 		<chmod>0755</chmod>
-		<item>http://www.pfsense.com/packages/config/dspam/www/dspam-history.php</item>
+		<item>https://packages.pfsense.org/packages/config/dspam/www/dspam-history.php</item>
 	</additional_files_needed>
 	<!-- package files -->
 	<additional_files_needed>
@@ -235,93 +235,93 @@
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0755</chmod>
-		<item>http://www.pfsense.com/packages/config/dspam/pkg/dspam.inc</item>
+		<item>https://packages.pfsense.org/packages/config/dspam/pkg/dspam.inc</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0755</chmod>
-		<item>http://www.pfsense.com/packages/config/dspam/pkg/dspam-config.inc</item>
+		<item>https://packages.pfsense.org/packages/config/dspam/pkg/dspam-config.inc</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0755</chmod>
-		<item>http://www.pfsense.com/packages/config/dspam/pkg/dspam-guifunc.inc</item>
+		<item>https://packages.pfsense.org/packages/config/dspam/pkg/dspam-guifunc.inc</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0755</chmod>
-		<item>http://www.pfsense.com/packages/config/dspam/pkg/dspam-pkgfunc.inc</item>
+		<item>https://packages.pfsense.org/packages/config/dspam/pkg/dspam-pkgfunc.inc</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0755</chmod>
-		<item>http://www.pfsense.com/packages/config/dspam/pkg/dspam-utilfunc.inc</item>
+		<item>https://packages.pfsense.org/packages/config/dspam/pkg/dspam-utilfunc.inc</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0755</chmod>
-		<item>http://www.pfsense.com/packages/config/dspam/pkg/000.mysql.sh</item>
+		<item>https://packages.pfsense.org/packages/config/dspam/pkg/000.mysql.sh</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0755</chmod>
-		<item>http://www.pfsense.com/packages/config/dspam/pkg/010.clamav-clamd.sh</item>
+		<item>https://packages.pfsense.org/packages/config/dspam/pkg/010.clamav-clamd.sh</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0755</chmod>
-		<item>http://www.pfsense.com/packages/config/dspam/pkg/020.clamav-freshclam.sh</item>
+		<item>https://packages.pfsense.org/packages/config/dspam/pkg/020.clamav-freshclam.sh</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0755</chmod>
-		<item>http://www.pfsense.com/packages/config/dspam/pkg/030.p3scan.sh</item>
+		<item>https://packages.pfsense.org/packages/config/dspam/pkg/030.p3scan.sh</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0755</chmod>
-		<item>http://www.pfsense.com/packages/config/dspam/pkg/clamd.conf</item>
+		<item>https://packages.pfsense.org/packages/config/dspam/pkg/clamd.conf</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0755</chmod>
-		<item>http://www.pfsense.com/packages/config/dspam/pkg/default.prefs.sample</item>
+		<item>https://packages.pfsense.org/packages/config/dspam/pkg/default.prefs.sample</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0755</chmod>
-		<item>http://www.pfsense.com/packages/config/dspam/pkg/freshclam.conf</item>
+		<item>https://packages.pfsense.org/packages/config/dspam/pkg/freshclam.conf</item>
 	</additional_files_needed>
 	<!-- misc files -->
 	<additional_files_needed>
 		<prefix>/usr/local/www/wizards/</prefix>
 		<chmod>0755</chmod>
-		<item>http://www.pfsense.com/packages/config/dspam/www/wizards/dspam_wizard.xml</item>
+		<item>https://packages.pfsense.org/packages/config/dspam/www/wizards/dspam_wizard.xml</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/www/wizards/</prefix>
 		<chmod>0755</chmod>
-		<item>http://www.pfsense.com/packages/config/dspam/www/wizards/dspam-lda-proxy.png</item>
+		<item>https://packages.pfsense.org/packages/config/dspam/www/wizards/dspam-lda-proxy.png</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/www/wizards/</prefix>
 		<chmod>0755</chmod>
-		<item>http://www.pfsense.com/packages/config/dspam/www/wizards/dspam-pop-proxy.png</item>
+		<item>https://packages.pfsense.org/packages/config/dspam/www/wizards/dspam-pop-proxy.png</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/www/wizards/</prefix>
 		<chmod>0755</chmod>
-		<item>http://www.pfsense.com/packages/config/dspam/www/wizards/dspam-smtp-relay.png</item>
+		<item>https://packages.pfsense.org/packages/config/dspam/www/wizards/dspam-smtp-relay.png</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/www/</prefix>
 		<chmod>0755</chmod>
-		<item>http://www.pfsense.com/packages/config/dspam/pkg/verdana.ttf</item>
+		<item>https://packages.pfsense.org/packages/config/dspam/pkg/verdana.ttf</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/www/themes/metallic/</prefix>
 		<chmod>0755</chmod>
-		<item>http://www.pfsense.com/packages/config/dspam/www/themes/metallic/dspam.css</item>
+		<item>https://packages.pfsense.org/packages/config/dspam/www/themes/metallic/dspam.css</item>
 	</additional_files_needed>
 	<!--
     fields gets invoked when the user adds or edits a item. The following items

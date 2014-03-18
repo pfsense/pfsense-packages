@@ -85,27 +85,27 @@
 	<additional_files_needed>
 		<prefix>/root/</prefix>
 		<chmod>0755</chmod>
-		<item>http://files.pfsense.org/packages/avahi/avahi.tar.gz</item>
+		<item>https://files.pfsense.org/packages/avahi/avahi.tar.gz</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/root/</prefix>
 		<chmod>0755</chmod>
-		<item>http://files.pfsense.org/packages/avahi/avahi8.tar.gz</item>
+		<item>https://files.pfsense.org/packages/avahi/avahi8.tar.gz</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0755</chmod>
-		<item>http://www.pfsense.org/packages/config/avahi/avahi.inc</item>
+		<item>https://packages.pfsense.org/packages/config/avahi/avahi.inc</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/etc/avahi/</prefix>
 		<chmod>0755</chmod>
-		<item>http://www.pfsense.org/packages/config/avahi/services/ssh.service</item>
+		<item>https://packages.pfsense.org/packages/config/avahi/services/ssh.service</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/etc/avahi/</prefix>
 		<chmod>0755</chmod>
-		<item>http://www.pfsense.org/packages/config/avahi/services/sftp-ssh.service</item>
+		<item>https://packages.pfsense.org/packages/config/avahi/services/sftp-ssh.service</item>
 	</additional_files_needed>
 	<custom_php_resync_config_command>
 		avahi_sync();

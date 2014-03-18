@@ -95,62 +95,62 @@
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>077</chmod>
-		<item>http://www.pfsense.com/packages/config/tinydns/tinydns.inc</item>
+		<item>https://packages.pfsense.org/packages/config/tinydns/tinydns.inc</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/pf/</prefix>
 		<chmod>077</chmod>
-		<item>http://www.pfsense.com/packages/config/tinydns/tinydns_xmlrpc_sync.php</item>
+		<item>https://packages.pfsense.org/packages/config/tinydns/tinydns_xmlrpc_sync.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>077</chmod>
-		<item>http://www.pfsense.com/packages/config/tinydns/tinydns_domains.xml</item>
+		<item>https://packages.pfsense.org/packages/config/tinydns/tinydns_domains.xml</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/www/</prefix>
 		<chmod>077</chmod>
-		<item>http://www.pfsense.com/packages/config/tinydns/tinydns_status.php</item>
+		<item>https://packages.pfsense.org/packages/config/tinydns/tinydns_status.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/www/</prefix>
 		<chmod>077</chmod>
-		<item>http://www.pfsense.com/packages/config/tinydns/tinydns_dhcp_filter.php</item>
+		<item>https://packages.pfsense.org/packages/config/tinydns/tinydns_dhcp_filter.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/www/</prefix>
 		<chmod>077</chmod>
-		<item>http://www.pfsense.com/packages/config/tinydns/tinydns_filter.php</item>
+		<item>https://packages.pfsense.org/packages/config/tinydns/tinydns_filter.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>077</chmod>
-		<item>http://www.pfsense.com/packages/config/tinydns/tinydns_down.php</item>
+		<item>https://packages.pfsense.org/packages/config/tinydns/tinydns_down.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>077</chmod>
-		<item>http://www.pfsense.com/packages/config/tinydns/tinydns_up.php</item>
+		<item>https://packages.pfsense.org/packages/config/tinydns/tinydns_up.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>077</chmod>
-		<item>http://www.pfsense.com/packages/config/tinydns/tinydns_parse_logs.php</item>
+		<item>https://packages.pfsense.org/packages/config/tinydns/tinydns_parse_logs.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/www/</prefix>
 		<chmod>077</chmod>
-		<item>http://www.pfsense.com/packages/config/tinydns/tinydns_view_logs.php</item>
+		<item>https://packages.pfsense.org/packages/config/tinydns/tinydns_view_logs.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>077</chmod>
-		<item>http://www.pfsense.com/packages/config/tinydns/tinydns_sync.xml</item>
+		<item>https://packages.pfsense.org/packages/config/tinydns/tinydns_sync.xml</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/www/wizards/</prefix>
 		<chmod>077</chmod>
-		<item>http://www.pfsense.com/packages/config/tinydns/new_zone_wizard.xml</item>
+		<item>https://packages.pfsense.org/packages/config/tinydns/new_zone_wizard.xml</item>
 	</additional_files_needed>
 	<fields>
 		<field>

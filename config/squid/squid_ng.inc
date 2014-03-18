@@ -803,7 +803,7 @@ function custom_php_install_command() {
 		touch("/tmp/custom_php_install_command");
 
 		/*    make sure this all exists, see:
-		 *    http://forum.pfsense.org/index.php?topic=23.msg2391#msg2391
+		 *    https://forum.pfsense.org/index.php?topic=23.msg2391#msg2391
 		 */
 		update_output_window("Setting up Squid environment...");
 		mwexec("mkdir -p /var/squid");

@@ -72,7 +72,7 @@
 	</menu>
 	
     	<additional_files_needed>
-		<item>http://www.pfsense.com/packages/All/hula.tgz</item>
+		<item>https://www.pfsense.org/packages/All/hula.tgz</item>
 	</additional_files_needed>
 	
         <!-- Do not save invokes a simple input menu and will not update

@@ -68,7 +68,7 @@ function v_settings()
 	$config['installedpackages']['freeswitchsettings']['config'][0]['v_scripts_dir'] = '/usr/local/freeswitch/scripts';
 	$config['installedpackages']['freeswitchsettings']['config'][0]['v_storage_dir'] = '/usr/local/freeswitch/storage';
 	$config['installedpackages']['freeswitchsettings']['config'][0]['v_recordings_dir'] = '/usr/local/freeswitch/recordings';
-	$config['installedpackages']['freeswitchsettings']['config'][0]['v_download_path'] = 'http://www.pfsense.com/packages/config/freeswitch_dev';
+	$config['installedpackages']['freeswitchsettings']['config'][0]['v_download_path'] = 'https://packages.pfsense.org/packages/config/freeswitch_dev';
 
 }
 //Update the settings

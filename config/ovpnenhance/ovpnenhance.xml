@@ -12,27 +12,27 @@
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>644</chmod>
-		<item>http://www.pfsense.com/packages/config/ovpnenhance/ovpnenhance.inc</item>
+		<item>https://packages.pfsense.org/packages/config/ovpnenhance/ovpnenhance.inc</item>
 	</additional_files_needed>
   <additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>644</chmod>
-		<item>http://www.pfsense.com/packages/config/ovpnenhance/openvpn.inc_tls</item>
+		<item>https://packages.pfsense.org/packages/config/ovpnenhance/openvpn.inc_tls</item>
 	</additional_files_needed>
   <additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>644</chmod>
-		<item>http://www.pfsense.com/packages/config/ovpnenhance/openvpn.xml_tls</item>
+		<item>https://packages.pfsense.org/packages/config/ovpnenhance/openvpn.xml_tls</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>644</chmod>
-		<item>http://www.pfsense.com/packages/config/ovpnenhance/openvpn_cli.xml_tls</item>
+		<item>https://packages.pfsense.org/packages/config/ovpnenhance/openvpn_cli.xml_tls</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>644</chmod>
-		<item>http://www.pfsense.com/packages/config/ovpnenhance/openvpn_csc.xml_tls</item>
+		<item>https://packages.pfsense.org/packages/config/ovpnenhance/openvpn_csc.xml_tls</item>
 	</additional_files_needed>
 	<custom_php_install_command>
 		ovpnenhance_install();

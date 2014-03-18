@@ -55,12 +55,12 @@
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0644</chmod>
-		<item>http://www.pfsense.com/packages/config/stunnel/stunnel.inc</item>
+		<item>https://packages.pfsense.org/packages/config/stunnel/stunnel.inc</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0644</chmod>
-		<item>http://www.pfsense.com/packages/config/stunnel/stunnel_certs.xml</item>
+		<item>https://packages.pfsense.org/packages/config/stunnel/stunnel_certs.xml</item>
 	</additional_files_needed>
 	<!-- configpath gets expanded out automatically and config items will be
          stored in that location -->

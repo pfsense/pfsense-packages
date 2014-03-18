@@ -47,7 +47,7 @@
 	<delete_string>Zabbix Agent has been deleted.</delete_string>
 	<restart_command>/usr/local/etc/rc.d/zabbix2_agentd.sh restart</restart_command>
 	<additional_files_needed>
-		<item>http://www.pfsense.org/packages/config/zabbix2/zabbix2.inc</item>
+		<item>https://packages.pfsense.org/packages/config/zabbix2/zabbix2.inc</item>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0755</chmod>
 	</additional_files_needed>

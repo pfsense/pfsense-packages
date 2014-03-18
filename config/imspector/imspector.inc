@@ -1,7 +1,7 @@
 <?php
 /*
 	imspector.inc
-	part of pfSense (http://www.pfsense.com/)
+	part of pfSense (https://www.pfsense.org/)
 	Copyright (C) 2012 Marcello Coutinho.
 	Copyright (C) 2011 Scott Ullrich <sullrich@gmail.com>.
 	Copyright (C) 2011 Bill Marquette <billm@gmail.com>.

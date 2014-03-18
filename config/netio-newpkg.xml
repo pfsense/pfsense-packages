@@ -59,7 +59,7 @@
 		</file>
 		<file>
 			<type>configfile</type>
-			<location>http://www.pfsense.com/packages/config/netioserver-newpkg.xml</location>
+			<location>https://packages.pfsense.org/packages/config/netioserver-newpkg.xml</location>
 		</file>
 	</files>
 	<services>

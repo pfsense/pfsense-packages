@@ -1,7 +1,7 @@
 <?php
 /*
 	sarg_realtime.php
-	part of pfSense (http://www.pfsense.com/)
+	part of pfSense (https://www.pfsense.org/)
 	Copyright (C) 2012 Marcello Coutinho <marcellocoutinho@gmail.com>
 	All rights reserved.
 

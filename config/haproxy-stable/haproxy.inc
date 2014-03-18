@@ -445,7 +445,7 @@ function haproxy_configure() {
 
 	$freebsd_version = substr(trim(`uname -r`), 0, 1);
 	if(!file_exists("/usr/bin/limits")) {
-		exec("fetch -q -o /usr/bin/limits http://files.pfsense.org/extras/{$freebsd_version}/limits");
+		exec("fetch -q -o /usr/bin/limits https://files.pfsense.org/extras/{$freebsd_version}/limits");
 		exec("chmod a+rx /usr/bin/limits");
 	}
 

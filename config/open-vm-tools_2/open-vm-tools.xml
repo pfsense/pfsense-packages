@@ -47,7 +47,7 @@
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0644</chmod>
-		<item>http://www.pfsense.com/packages/config/open-vm-tools_2/open-vm-tools.inc</item>
+		<item>https://packages.pfsense.org/packages/config/open-vm-tools_2/open-vm-tools.inc</item>
 	</additional_files_needed>	
     <custom_add_php_command>
     </custom_add_php_command>

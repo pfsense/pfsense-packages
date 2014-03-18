@@ -54,27 +54,27 @@
                 <description>IGMP(multicast) proxy.</description>
         </service>
 	<additional_files_needed>
-            <item>http://www.pfsense.org/packages/config/igmpproxy/igmpproxy.inc</item>
+            <item>https://packages.pfsense.org/packages/config/igmpproxy/igmpproxy.inc</item>
             <prefix>/usr/local/pkg/</prefix>
             <chmod>0755</chmod>
         </additional_files_needed>
 	<additional_files_needed>
-            <item>http://files.pfsense.org/packages/igmpproxy</item>
+            <item>https://files.pfsense.org/packages/igmpproxy</item>
             <prefix>/usr/local/sbin/</prefix>
             <chmod>0755</chmod>
         </additional_files_needed>
 	<additional_files_needed>
-            <item>http://www.pfsense.org/packages/config/igmpproxy/firewall_rules_edit.tmp</item>
+            <item>https://packages.pfsense.org/packages/config/igmpproxy/firewall_rules_edit.tmp</item>
             <prefix>/tmp/</prefix>
             <chmod>0755</chmod>
         </additional_files_needed>
 	<additional_files_needed>
-            <item>http://www.pfsense.org/packages/config/igmpproxy/filter.tmp</item>
+            <item>https://packages.pfsense.org/packages/config/igmpproxy/filter.tmp</item>
             <prefix>/tmp/</prefix>
             <chmod>0755</chmod>
         </additional_files_needed>
 	<additional_files_needed>
-            <item>http://www.pfsense.org/packages/config/igmpproxy/igmpproxy.tbz</item>
+            <item>https://packages.pfsense.org/packages/config/igmpproxy/igmpproxy.tbz</item>
             <prefix>/usr/local/pkg/</prefix>
             <chmod>0755</chmod>
         </additional_files_needed>

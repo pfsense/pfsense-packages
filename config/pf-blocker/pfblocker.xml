@@ -53,62 +53,62 @@
 		<url>/pkg_edit.php?xml=pfblocker.xml</url>
 	</menu>
 	<additional_files_needed>
-		<item>http://www.pfsense.org/packages/config/pf-blocker/pfblocker.inc</item>
+		<item>https://packages.pfsense.org/packages/config/pf-blocker/pfblocker.inc</item>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0755</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
-		<item>http://www.pfsense.org/packages/config/pf-blocker/pfblocker.php</item>
+		<item>https://packages.pfsense.org/packages/config/pf-blocker/pfblocker.php</item>
 		<prefix>/usr/local/www/</prefix>
 		<chmod>0755</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
-		<item>http://www.pfsense.org/packages/config/pf-blocker/pfBlocker.widget.php</item>
+		<item>https://packages.pfsense.org/packages/config/pf-blocker/pfBlocker.widget.php</item>
 		<prefix>/usr/local/www/widgets/widgets/</prefix>
 		<chmod>0755</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
-		<item>http://www.pfsense.org/packages/config/pf-blocker/pfblocker_topspammers.xml</item>
+		<item>https://packages.pfsense.org/packages/config/pf-blocker/pfblocker_topspammers.xml</item>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0755</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
-		<item>http://www.pfsense.org/packages/config/pf-blocker/pfblocker_lists.xml</item>
+		<item>https://packages.pfsense.org/packages/config/pf-blocker/pfblocker_lists.xml</item>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0755</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
-		<item>http://www.pfsense.org/packages/config/pf-blocker/pfblocker_sync.xml</item>
+		<item>https://packages.pfsense.org/packages/config/pf-blocker/pfblocker_sync.xml</item>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0755</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
-		<item>http://www.pfsense.org/packages/config/pf-blocker/lists/Africa_cidr.txt</item>
+		<item>https://packages.pfsense.org/packages/config/pf-blocker/lists/Africa_cidr.txt</item>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0555</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
-		<item>http://www.pfsense.org/packages/config/pf-blocker/lists/Asia_cidr.txt</item>
+		<item>https://packages.pfsense.org/packages/config/pf-blocker/lists/Asia_cidr.txt</item>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0555</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
-		<item>http://www.pfsense.org/packages/config/pf-blocker/lists/Europe_cidr.txt</item>
+		<item>https://packages.pfsense.org/packages/config/pf-blocker/lists/Europe_cidr.txt</item>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0555</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
-		<item>http://www.pfsense.org/packages/config/pf-blocker/lists/North_America_cidr.txt</item>
+		<item>https://packages.pfsense.org/packages/config/pf-blocker/lists/North_America_cidr.txt</item>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0555</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
-		<item>http://www.pfsense.org/packages/config/pf-blocker/lists/Oceania_cidr.txt</item>
+		<item>https://packages.pfsense.org/packages/config/pf-blocker/lists/Oceania_cidr.txt</item>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0555</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
-		<item>http://www.pfsense.org/packages/config/pf-blocker/lists/South_America_cidr.txt</item>
+		<item>https://packages.pfsense.org/packages/config/pf-blocker/lists/South_America_cidr.txt</item>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0555</chmod>
 	</additional_files_needed>
@@ -224,13 +224,13 @@
 			<type>checkbox</type>
 			<description><![CDATA[Continent Lists are provided by <a target=_new href='http://www.countryipblocks.net/'>countryipblocks.net</a>.<br>
 									Dynamic rules can be found in <a target=_new href='http://www.iblocklist.com/'>I-Blocklist.com</a>.</br>
-									Created by <a target=_new href='http://forum.pfsense.org/index.php?action=profile;u=4710'>Marcello Coutinho</a> and <a target=_new href='http://www.tomschaefer.org/pfsense'>TomSchaefer</a>.<br>]]></description>
+									Created by <a target=_new href='https://forum.pfsense.org/index.php?action=profile;u=4710'>Marcello Coutinho</a> and <a target=_new href='http://www.tomschaefer.org/pfsense'>TomSchaefer</a>.<br>]]></description>
 		</field>
 		<field>
 			<fielddescr>Donation</fielddescr>
 			<fieldname>donation</fieldname>
 			<type>checkbox</type>
-			<description><![CDATA[If you like this package, please <a target=_new href='http://www.pfsense.org/index.php?option=com_content&task=view&id=47&Itemid=77'>donate to the pfSense project</a>.<br>
+			<description><![CDATA[If you like this package, please <a target=_new href='https://www.pfsense.org/index.php?option=com_content&task=view&id=47&Itemid=77'>donate to the pfSense project</a>.<br>
 								 If you want your donation to go to these package developers, make a note on the donation forwarding it to us.<br>]]></description>
 		</field>
 	</fields>

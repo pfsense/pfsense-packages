@@ -97,32 +97,32 @@
   <additional_files_needed>
     <prefix>/usr/local/pkg/</prefix>
     <chmod>0755</chmod>
-    <item>http://www.pfsense.com/packages/config/p3scan-pf-msg.xml</item>
+    <item>https://packages.pfsense.org/packages/config/p3scan-pf-msg.xml</item>
   </additional_files_needed>
   <additional_files_needed>
     <prefix>/usr/local/pkg/</prefix>
     <chmod>0755</chmod>
-    <item>http://www.pfsense.com/packages/config/p3scan-pf-emer.xml</item>
+    <item>https://packages.pfsense.org/packages/config/p3scan-pf-emer.xml</item>
   </additional_files_needed>
   <additional_files_needed>
     <prefix>/usr/local/pkg/</prefix>
     <chmod>0755</chmod>
-    <item>http://www.pfsense.com/packages/config/p3scan-pf-vir.xml</item>
+    <item>https://packages.pfsense.org/packages/config/p3scan-pf-vir.xml</item>
   </additional_files_needed>
   <additional_files_needed>
     <prefix>/usr/local/pkg/</prefix>
     <chmod>0755</chmod>
-    <item>http://www.pfsense.com/packages/config/p3scan-pf-spam.xml</item>
+    <item>https://packages.pfsense.org/packages/config/p3scan-pf-spam.xml</item>
   </additional_files_needed>
   <additional_files_needed>
     <prefix>/usr/local/www/</prefix>
     <chmod>0755</chmod>
-    <item>http://www.pfsense.com/packages/config/p3scan_rules.php</item>
+    <item>https://packages.pfsense.org/packages/config/p3scan_rules.php</item>
   </additional_files_needed>
   <additional_files_needed>
     <prefix>/usr/local/pkg/</prefix>
     <chmod>0755</chmod>
-    <item>http://www.pfsense.com/packages/config/p3scan.inc</item>
+    <item>https://packages.pfsense.org/packages/config/p3scan.inc</item>
   </additional_files_needed>
   <!--
     fields gets invoked when the user adds or edits a item. The following items

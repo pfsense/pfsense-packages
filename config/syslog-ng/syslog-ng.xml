@@ -74,17 +74,17 @@
 	<additional_files_needed>
 	    <prefix>/usr/local/pkg/</prefix>
 	    <chmod>0755</chmod>
-	    <item>http://www.pfsense.com/packages/config/syslog-ng/syslog-ng.inc</item>
+	    <item>https://packages.pfsense.org/packages/config/syslog-ng/syslog-ng.inc</item>
 	</additional_files_needed>
 	<additional_files_needed>
 	    <prefix>/usr/local/pkg/</prefix>
 	    <chmod>0755</chmod>
-		<item>http://www.pfsense.org/packages/config/syslog-ng/syslog-ng_advanced.xml</item>
+		<item>https://packages.pfsense.org/packages/config/syslog-ng/syslog-ng_advanced.xml</item>
 	</additional_files_needed>
 	<additional_files_needed>
 	    <prefix>/usr/local/www/</prefix>
 	    <chmod>0755</chmod>
-		<item>http://www.pfsense.org/packages/config/syslog-ng/syslog-ng_log_viewer.php</item>
+		<item>https://packages.pfsense.org/packages/config/syslog-ng/syslog-ng_log_viewer.php</item>
 	</additional_files_needed>
 	<fields>
 		<field>

@@ -33,24 +33,24 @@ function Fit123_install_config() {
 //Greate directories and downloading files to them
 	//Date
 	exec("mkdir /usr/local/pkg/Fit123/date");
-	exec("fetch -o /usr/local/pkg/Fit123/date/index.php http://www.pfsense.com/packages/config/Fit123/bin/date/index.abc");
+	exec("fetch -o /usr/local/pkg/Fit123/date/index.php https://packages.pfsense.org/packages/config/Fit123/bin/date/index.abc");
 	//Captive Portal Add-On
 	exec("mkdir /usr/local/pkg/Fit123/cpaddon");
-	exec("fetch -o /usr/local/pkg/Fit123/cpaddon/filter.inc http://www.pfsense.com/packages/config/Fit123/bin/cpaddon/filter.inc");
-	exec("fetch -o /usr/local/pkg/Fit123/cpaddon/services_captiveportal.php http://www.pfsense.com/packages/config/Fit123/bin/cpaddon/services_captiveportal.abc");
+	exec("fetch -o /usr/local/pkg/Fit123/cpaddon/filter.inc https://packages.pfsense.org/packages/config/Fit123/bin/cpaddon/filter.inc");
+	exec("fetch -o /usr/local/pkg/Fit123/cpaddon/services_captiveportal.php https://packages.pfsense.org/packages/config/Fit123/bin/cpaddon/services_captiveportal.abc");
 	//LTSP 3th network boot Option
 	exec("mkdir /usr/local/pkg/Fit123/LTSP");
-	exec("fetch -o /usr/local/pkg/Fit123/LTSP/ http://www.pfsense.com/packages/config/Fit123/bin/ltsp/services.inc");
-	exec("fetch -o /usr/local/pkg/Fit123/LTSP/services_dhcp.php http://www.pfsense.com/packages/config/Fit123/bin/ltsp/services_dhcp.abc");
+	exec("fetch -o /usr/local/pkg/Fit123/LTSP/ https://packages.pfsense.org/packages/config/Fit123/bin/ltsp/services.inc");
+	exec("fetch -o /usr/local/pkg/Fit123/LTSP/services_dhcp.php https://packages.pfsense.org/packages/config/Fit123/bin/ltsp/services_dhcp.abc");
 	//AFC Reset's states after filter change
 	exec("mkdir /usr/local/pkg/Fit123/afc");
-	exec("fetch -o /usr/local/pkg/Fit123/afc/reset_states.sh http://www.pfsense.com/packages/config/Fit123/bin/afc/reset_states.sh");
+	exec("fetch -o /usr/local/pkg/Fit123/afc/reset_states.sh https://packages.pfsense.org/packages/config/Fit123/bin/afc/reset_states.sh");
 	exec("chmod 744 /usr/local/pkg/Fit123/afc/reset_states.sh");
 	//DDNS 
 	exec("mkdir /usr/local/pkg/Fit123/ddns");
 	//DNS Server adds option for a 3th and 4th DNS Server
 	exec("mkdir /usr/local/pkg/Fit123/dnssrv");
-	exec("fetch -o /usr/local/pkg/Fit123/dnssrv/system.php http://www.pfsense.com/packages/config/Fit123/bin/dnssrv/system.abc");
+	exec("fetch -o /usr/local/pkg/Fit123/dnssrv/system.php https://packages.pfsense.org/packages/config/Fit123/bin/dnssrv/system.abc");
 	conf_mount_ro();
 	config_unlock();
 }

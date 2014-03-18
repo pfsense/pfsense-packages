@@ -126,430 +126,430 @@
   <additional_files_needed>
     <prefix>/usr/local/www/</prefix>
     <chmod>0755</chmod>
-    <item>http://www.pfsense.com/packages/config/freenas/www/disks_manage.php</item>
+    <item>https://packages.pfsense.org/packages/config/freenas/www/disks_manage.php</item>
   </additional_files_needed>
   <additional_files_needed>
     <prefix>/usr/local/www/</prefix>
     <chmod>0755</chmod>
-    <item>http://www.pfsense.com/packages/config/freenas/www/disks_manage_edit.php</item>
+    <item>https://packages.pfsense.org/packages/config/freenas/www/disks_manage_edit.php</item>
   </additional_files_needed>
   <additional_files_needed>
     <prefix>/usr/local/www/</prefix>
     <chmod>0755</chmod>
-    <item>http://www.pfsense.com/packages/config/freenas/www/disks_manage_init.php</item>
+    <item>https://packages.pfsense.org/packages/config/freenas/www/disks_manage_init.php</item>
   </additional_files_needed>
   <additional_files_needed>
     <prefix>/usr/local/www/</prefix>
     <chmod>0755</chmod>
-    <item>http://www.pfsense.com/packages/config/freenas/www/disks_manage_iscsi.php</item>
+    <item>https://packages.pfsense.org/packages/config/freenas/www/disks_manage_iscsi.php</item>
   </additional_files_needed>
   <additional_files_needed>
     <prefix>/usr/local/www/</prefix>
     <chmod>0755</chmod>
-    <item>http://www.pfsense.com/packages/config/freenas/www/disks_manage_tools.php</item>
+    <item>https://packages.pfsense.org/packages/config/freenas/www/disks_manage_tools.php</item>
   </additional_files_needed>
   <!-- PHP files  (RAID management) -->
   <additional_files_needed>
     <prefix>/usr/local/www/</prefix>
     <chmod>0755</chmod>
-    <item>http://www.pfsense.com/packages/config/freenas/www/disks_raid_gmirror.php</item>
+    <item>https://packages.pfsense.org/packages/config/freenas/www/disks_raid_gmirror.php</item>
   </additional_files_needed>
   <additional_files_needed>
     <prefix>/usr/local/www/</prefix>
     <chmod>0755</chmod>
-    <item>http://www.pfsense.com/packages/config/freenas/www/disks_raid_gmirror_edit.php</item>
+    <item>https://packages.pfsense.org/packages/config/freenas/www/disks_raid_gmirror_edit.php</item>
   </additional_files_needed>
   <additional_files_needed>
     <prefix>/usr/local/www/</prefix>
     <chmod>0755</chmod>
-    <item>http://www.pfsense.com/packages/config/freenas/www/disks_raid_gmirror_infos.php</item>
-  </additional_files_needed>
-  <!--
-  <additional_files_needed>
-    <prefix>/usr/local/www/</prefix>
-    <chmod>0755</chmod>
-    <item>http://www.pfsense.com/packages/config/freenas/www/disks_raid_gmirror_init.php</item>
-  </additional_files_needed>
-  -->
-  <additional_files_needed>
-    <prefix>/usr/local/www/</prefix>
-    <chmod>0755</chmod>
-    <item>http://www.pfsense.com/packages/config/freenas/www/disks_raid_gmirror_tools.php</item>
-  </additional_files_needed>
-  <additional_files_needed>
-    <prefix>/usr/local/www/</prefix>
-    <chmod>0755</chmod>
-    <item>http://www.pfsense.com/packages/config/freenas/www/disks_raid_gvinum.php</item>
-  </additional_files_needed>
-  <additional_files_needed>
-    <prefix>/usr/local/www/</prefix>
-    <chmod>0755</chmod>
-    <item>http://www.pfsense.com/packages/config/freenas/www/disks_raid_gvinum_edit.php</item>
-  </additional_files_needed>
-  <additional_files_needed>
-    <prefix>/usr/local/www/</prefix>
-    <chmod>0755</chmod>
-    <item>http://www.pfsense.com/packages/config/freenas/www/disks_raid_gvinum_infos.php</item>
+    <item>https://packages.pfsense.org/packages/config/freenas/www/disks_raid_gmirror_infos.php</item>
   </additional_files_needed>
   <!--
   <additional_files_needed>
     <prefix>/usr/local/www/</prefix>
     <chmod>0755</chmod>
-    <item>http://www.pfsense.com/packages/config/freenas/www/disks_raid_gvinum_init.php</item>
+    <item>https://packages.pfsense.org/packages/config/freenas/www/disks_raid_gmirror_init.php</item>
   </additional_files_needed>
   -->
   <additional_files_needed>
     <prefix>/usr/local/www/</prefix>
     <chmod>0755</chmod>
-    <item>http://www.pfsense.com/packages/config/freenas/www/disks_raid_gvinum_tools.php</item>
+    <item>https://packages.pfsense.org/packages/config/freenas/www/disks_raid_gmirror_tools.php</item>
   </additional_files_needed>
   <additional_files_needed>
     <prefix>/usr/local/www/</prefix>
     <chmod>0755</chmod>
-    <item>http://www.pfsense.com/packages/config/freenas/www/disks_raid_gconcat.php</item>
+    <item>https://packages.pfsense.org/packages/config/freenas/www/disks_raid_gvinum.php</item>
   </additional_files_needed>
   <additional_files_needed>
     <prefix>/usr/local/www/</prefix>
     <chmod>0755</chmod>
-    <item>http://www.pfsense.com/packages/config/freenas/www/disks_raid_gconcat_edit.php</item>
+    <item>https://packages.pfsense.org/packages/config/freenas/www/disks_raid_gvinum_edit.php</item>
   </additional_files_needed>
   <additional_files_needed>
     <prefix>/usr/local/www/</prefix>
     <chmod>0755</chmod>
-    <item>http://www.pfsense.com/packages/config/freenas/www/disks_raid_gconcat_infos.php</item>
+    <item>https://packages.pfsense.org/packages/config/freenas/www/disks_raid_gvinum_infos.php</item>
+  </additional_files_needed>
+  <!--
+  <additional_files_needed>
+    <prefix>/usr/local/www/</prefix>
+    <chmod>0755</chmod>
+    <item>https://packages.pfsense.org/packages/config/freenas/www/disks_raid_gvinum_init.php</item>
+  </additional_files_needed>
+  -->
+  <additional_files_needed>
+    <prefix>/usr/local/www/</prefix>
+    <chmod>0755</chmod>
+    <item>https://packages.pfsense.org/packages/config/freenas/www/disks_raid_gvinum_tools.php</item>
   </additional_files_needed>
   <additional_files_needed>
     <prefix>/usr/local/www/</prefix>
     <chmod>0755</chmod>
-    <item>http://www.pfsense.com/packages/config/freenas/www/disks_raid_gconcat_tools.php</item>
+    <item>https://packages.pfsense.org/packages/config/freenas/www/disks_raid_gconcat.php</item>
   </additional_files_needed>
   <additional_files_needed>
     <prefix>/usr/local/www/</prefix>
     <chmod>0755</chmod>
-    <item>http://www.pfsense.com/packages/config/freenas/www/disks_raid_gstripe.php</item>
+    <item>https://packages.pfsense.org/packages/config/freenas/www/disks_raid_gconcat_edit.php</item>
   </additional_files_needed>
   <additional_files_needed>
     <prefix>/usr/local/www/</prefix>
     <chmod>0755</chmod>
-    <item>http://www.pfsense.com/packages/config/freenas/www/disks_raid_gstripe_edit.php</item>
+    <item>https://packages.pfsense.org/packages/config/freenas/www/disks_raid_gconcat_infos.php</item>
   </additional_files_needed>
   <additional_files_needed>
     <prefix>/usr/local/www/</prefix>
     <chmod>0755</chmod>
-    <item>http://www.pfsense.com/packages/config/freenas/www/disks_raid_gstripe_infos.php</item>
+    <item>https://packages.pfsense.org/packages/config/freenas/www/disks_raid_gconcat_tools.php</item>
   </additional_files_needed>
   <additional_files_needed>
     <prefix>/usr/local/www/</prefix>
     <chmod>0755</chmod>
-    <item>http://www.pfsense.com/packages/config/freenas/www/disks_raid_gstripe_tools.php</item>
+    <item>https://packages.pfsense.org/packages/config/freenas/www/disks_raid_gstripe.php</item>
   </additional_files_needed>
   <additional_files_needed>
     <prefix>/usr/local/www/</prefix>
     <chmod>0755</chmod>
-    <item>http://www.pfsense.com/packages/config/freenas/www/disks_raid_graid5.php</item>
+    <item>https://packages.pfsense.org/packages/config/freenas/www/disks_raid_gstripe_edit.php</item>
   </additional_files_needed>
   <additional_files_needed>
     <prefix>/usr/local/www/</prefix>
     <chmod>0755</chmod>
-    <item>http://www.pfsense.com/packages/config/freenas/www/disks_raid_graid5_edit.php</item>
+    <item>https://packages.pfsense.org/packages/config/freenas/www/disks_raid_gstripe_infos.php</item>
   </additional_files_needed>
   <additional_files_needed>
     <prefix>/usr/local/www/</prefix>
     <chmod>0755</chmod>
-    <item>http://www.pfsense.com/packages/config/freenas/www/disks_raid_graid5_infos.php</item>
+    <item>https://packages.pfsense.org/packages/config/freenas/www/disks_raid_gstripe_tools.php</item>
   </additional_files_needed>
   <additional_files_needed>
     <prefix>/usr/local/www/</prefix>
     <chmod>0755</chmod>
-    <item>http://www.pfsense.com/packages/config/freenas/www/disks_raid_graid5_tools.php</item>
+    <item>https://packages.pfsense.org/packages/config/freenas/www/disks_raid_graid5.php</item>
+  </additional_files_needed>
+  <additional_files_needed>
+    <prefix>/usr/local/www/</prefix>
+    <chmod>0755</chmod>
+    <item>https://packages.pfsense.org/packages/config/freenas/www/disks_raid_graid5_edit.php</item>
+  </additional_files_needed>
+  <additional_files_needed>
+    <prefix>/usr/local/www/</prefix>
+    <chmod>0755</chmod>
+    <item>https://packages.pfsense.org/packages/config/freenas/www/disks_raid_graid5_infos.php</item>
+  </additional_files_needed>
+  <additional_files_needed>
+    <prefix>/usr/local/www/</prefix>
+    <chmod>0755</chmod>
+    <item>https://packages.pfsense.org/packages/config/freenas/www/disks_raid_graid5_tools.php</item>
   </additional_files_needed>
   <!-- PHP files  (mount management) -->
   <additional_files_needed>
     <prefix>/usr/local/www/</prefix>
     <chmod>0755</chmod>
-    <item>http://www.pfsense.com/packages/config/freenas/www/disks_mount.php</item>
+    <item>https://packages.pfsense.org/packages/config/freenas/www/disks_mount.php</item>
   </additional_files_needed>
   <additional_files_needed>
     <prefix>/usr/local/www/</prefix>
     <chmod>0755</chmod>
-    <item>http://www.pfsense.com/packages/config/freenas/www/disks_mount_edit.php</item>
+    <item>https://packages.pfsense.org/packages/config/freenas/www/disks_mount_edit.php</item>
   </additional_files_needed>
   <additional_files_needed>
     <prefix>/usr/local/www/</prefix>
     <chmod>0755</chmod>
-    <item>http://www.pfsense.com/packages/config/freenas/www/disks_mount_tools.php</item>
+    <item>https://packages.pfsense.org/packages/config/freenas/www/disks_mount_tools.php</item>
   </additional_files_needed>
   <!-- PHP files  (diagnostics) -->
   <additional_files_needed>
     <prefix>/usr/local/www/</prefix>
     <chmod>0755</chmod>
-    <item>http://www.pfsense.com/packages/config/freenas/www/diag_ad_infos.php</item>
+    <item>https://packages.pfsense.org/packages/config/freenas/www/diag_ad_infos.php</item>
   </additional_files_needed>
   <additional_files_needed>
     <prefix>/usr/local/www/</prefix>
     <chmod>0755</chmod>
-    <item>http://www.pfsense.com/packages/config/freenas/www/diag_ataidle_infos.php</item>
+    <item>https://packages.pfsense.org/packages/config/freenas/www/diag_ataidle_infos.php</item>
   </additional_files_needed>
   <additional_files_needed>
     <prefix>/usr/local/www/</prefix>
     <chmod>0755</chmod>
-    <item>http://www.pfsense.com/packages/config/freenas/www/diag_disk_infos.php</item>
+    <item>https://packages.pfsense.org/packages/config/freenas/www/diag_disk_infos.php</item>
   </additional_files_needed>
   <additional_files_needed>
     <prefix>/usr/local/www/</prefix>
     <chmod>0755</chmod>
-    <item>http://www.pfsense.com/packages/config/freenas/www/diag_iscsi_infos.php</item>
+    <item>https://packages.pfsense.org/packages/config/freenas/www/diag_iscsi_infos.php</item>
   </additional_files_needed>
   <additional_files_needed>
     <prefix>/usr/local/www/</prefix>
     <chmod>0755</chmod>
-    <item>http://www.pfsense.com/packages/config/freenas/www/diag_mounts_infos.php</item>
+    <item>https://packages.pfsense.org/packages/config/freenas/www/diag_mounts_infos.php</item>
   </additional_files_needed>
   <additional_files_needed>
     <prefix>/usr/local/www/</prefix>
     <chmod>0755</chmod>
-    <item>http://www.pfsense.com/packages/config/freenas/www/diag_part_infos.php</item>
+    <item>https://packages.pfsense.org/packages/config/freenas/www/diag_part_infos.php</item>
   </additional_files_needed>
   <additional_files_needed>
     <prefix>/usr/local/www/</prefix>
     <chmod>0755</chmod>
-    <item>http://www.pfsense.com/packages/config/freenas/www/diag_raid_infos.php</item>
+    <item>https://packages.pfsense.org/packages/config/freenas/www/diag_raid_infos.php</item>
   </additional_files_needed>
   <additional_files_needed>
     <prefix>/usr/local/www/</prefix>
     <chmod>0755</chmod>
-    <item>http://www.pfsense.com/packages/config/freenas/www/diag_smart_infos.php</item>
+    <item>https://packages.pfsense.org/packages/config/freenas/www/diag_smart_infos.php</item>
   </additional_files_needed>
   <additional_files_needed>
     <prefix>/usr/local/www/</prefix>
     <chmod>0755</chmod>
-    <item>http://www.pfsense.com/packages/config/freenas/www/diag_space_infos.php</item>
+    <item>https://packages.pfsense.org/packages/config/freenas/www/diag_space_infos.php</item>
   </additional_files_needed>
   <!-- PHP files  (logs) -->
   <additional_files_needed>
     <prefix>/usr/local/www/</prefix>
     <chmod>0755</chmod>
-    <item>http://www.pfsense.com/packages/config/freenas/www/diag_fn_logs_daemon.php</item>
+    <item>https://packages.pfsense.org/packages/config/freenas/www/diag_fn_logs_daemon.php</item>
   </additional_files_needed>
   <additional_files_needed>
     <prefix>/usr/local/www/</prefix>
     <chmod>0755</chmod>
-    <item>http://www.pfsense.com/packages/config/freenas/www/diag_fn_logs_ftp.php</item>
+    <item>https://packages.pfsense.org/packages/config/freenas/www/diag_fn_logs_ftp.php</item>
   </additional_files_needed>
   <additional_files_needed>
     <prefix>/usr/local/www/</prefix>
     <chmod>0755</chmod>
-    <item>http://www.pfsense.com/packages/config/freenas/www/diag_fn_logs_rsyncd.php</item>
+    <item>https://packages.pfsense.org/packages/config/freenas/www/diag_fn_logs_rsyncd.php</item>
   </additional_files_needed>
   <additional_files_needed>
     <prefix>/usr/local/www/</prefix>
     <chmod>0755</chmod>
-    <item>http://www.pfsense.com/packages/config/freenas/www/diag_fn_logs_samba.php</item>
+    <item>https://packages.pfsense.org/packages/config/freenas/www/diag_fn_logs_samba.php</item>
   </additional_files_needed>
   <additional_files_needed>
     <prefix>/usr/local/www/</prefix>
     <chmod>0755</chmod>
-    <item>http://www.pfsense.com/packages/config/freenas/www/diag_fn_logs_settings.php</item>
+    <item>https://packages.pfsense.org/packages/config/freenas/www/diag_fn_logs_settings.php</item>
   </additional_files_needed>
   <additional_files_needed>
     <prefix>/usr/local/www/</prefix>
     <chmod>0755</chmod>
-    <item>http://www.pfsense.com/packages/config/freenas/www/diag_fn_logs_smartd.php</item>
+    <item>https://packages.pfsense.org/packages/config/freenas/www/diag_fn_logs_smartd.php</item>
   </additional_files_needed>
   <additional_files_needed>
     <prefix>/usr/local/www/</prefix>
     <chmod>0755</chmod>
-    <item>http://www.pfsense.com/packages/config/freenas/www/diag_fn_logs_sshd.php</item>
+    <item>https://packages.pfsense.org/packages/config/freenas/www/diag_fn_logs_sshd.php</item>
   </additional_files_needed>
   <!-- PHP files  (services) -->
   <additional_files_needed>
     <prefix>/usr/local/www/</prefix>
     <chmod>0755</chmod>
-    <item>http://www.pfsense.com/packages/config/freenas/www/services_afp.php</item>
+    <item>https://packages.pfsense.org/packages/config/freenas/www/services_afp.php</item>
   </additional_files_needed>
   <additional_files_needed>
     <prefix>/usr/local/www/</prefix>
     <chmod>0755</chmod>
-    <item>http://www.pfsense.com/packages/config/freenas/www/services_ftp.php</item>
+    <item>https://packages.pfsense.org/packages/config/freenas/www/services_ftp.php</item>
   </additional_files_needed>
   <additional_files_needed>
     <prefix>/usr/local/www/</prefix>
     <chmod>0755</chmod>
-    <item>http://www.pfsense.com/packages/config/freenas/www/services_nfs.php</item>
+    <item>https://packages.pfsense.org/packages/config/freenas/www/services_nfs.php</item>
   </additional_files_needed>
   <additional_files_needed>
     <prefix>/usr/local/www/</prefix>
     <chmod>0755</chmod>
-    <item>http://www.pfsense.com/packages/config/freenas/www/services_nfs_export.php</item>
+    <item>https://packages.pfsense.org/packages/config/freenas/www/services_nfs_export.php</item>
   </additional_files_needed>
   <additional_files_needed>
     <prefix>/usr/local/www/</prefix>
     <chmod>0755</chmod>
-    <item>http://www.pfsense.com/packages/config/freenas/www/services_nfs_export_edit.php</item>
+    <item>https://packages.pfsense.org/packages/config/freenas/www/services_nfs_export_edit.php</item>
   </additional_files_needed>
   <additional_files_needed>
     <prefix>/usr/local/www/</prefix>
     <chmod>0755</chmod>
-    <item>http://www.pfsense.com/packages/config/freenas/www/services_rsyncd.php</item>
+    <item>https://packages.pfsense.org/packages/config/freenas/www/services_rsyncd.php</item>
   </additional_files_needed>
   <additional_files_needed>
     <prefix>/usr/local/www/</prefix>
     <chmod>0755</chmod>
-    <item>http://www.pfsense.com/packages/config/freenas/www/services_rsyncd_client.php</item>
+    <item>https://packages.pfsense.org/packages/config/freenas/www/services_rsyncd_client.php</item>
   </additional_files_needed>
   <additional_files_needed>
     <prefix>/usr/local/www/</prefix>
     <chmod>0755</chmod>
-    <item>http://www.pfsense.com/packages/config/freenas/www/services_rsyncd_local.php</item>
+    <item>https://packages.pfsense.org/packages/config/freenas/www/services_rsyncd_local.php</item>
   </additional_files_needed>
   <additional_files_needed>
     <prefix>/usr/local/www/</prefix>
     <chmod>0755</chmod>
-    <item>http://www.pfsense.com/packages/config/freenas/www/services_samba.php</item>
+    <item>https://packages.pfsense.org/packages/config/freenas/www/services_samba.php</item>
   </additional_files_needed>
   <additional_files_needed>
     <prefix>/usr/local/www/</prefix>
     <chmod>0755</chmod>
-    <item>http://www.pfsense.com/packages/config/freenas/www/services_samba_share.php</item>
+    <item>https://packages.pfsense.org/packages/config/freenas/www/services_samba_share.php</item>
   </additional_files_needed>
   <additional_files_needed>
     <prefix>/usr/local/www/</prefix>
     <chmod>0755</chmod>
-    <item>http://www.pfsense.com/packages/config/freenas/www/services_samba_edit.php</item>
+    <item>https://packages.pfsense.org/packages/config/freenas/www/services_samba_edit.php</item>
   </additional_files_needed>
   <additional_files_needed>
     <prefix>/usr/local/www/</prefix>
     <chmod>0755</chmod>
-    <item>http://www.pfsense.com/packages/config/freenas/www/services_unison.php</item>
+    <item>https://packages.pfsense.org/packages/config/freenas/www/services_unison.php</item>
   </additional_files_needed>
   <!-- PHP files  (misc) -->
   <additional_files_needed>
     <prefix>/usr/local/www/</prefix>
     <chmod>0755</chmod>
-    <item>http://www.pfsense.com/packages/config/freenas/www/status_disks.php</item>
+    <item>https://packages.pfsense.org/packages/config/freenas/www/status_disks.php</item>
   </additional_files_needed>
   <!-- package files -->
   <additional_files_needed>
     <prefix>/usr/local/pkg/</prefix>
     <chmod>0755</chmod>
-    <item>http://www.pfsense.com/packages/config/freenas/pkg/freenas.inc</item>
+    <item>https://packages.pfsense.org/packages/config/freenas/pkg/freenas.inc</item>
   </additional_files_needed>
   <additional_files_needed>
     <prefix>/usr/local/pkg/</prefix>
     <chmod>0755</chmod>
-    <item>http://www.pfsense.com/packages/config/freenas/pkg/freenas_disks.inc</item>
+    <item>https://packages.pfsense.org/packages/config/freenas/pkg/freenas_disks.inc</item>
   </additional_files_needed>
   <additional_files_needed>
     <prefix>/usr/local/pkg/</prefix>
     <chmod>0755</chmod>
-    <item>http://www.pfsense.com/packages/config/freenas/pkg/freenas_config.inc</item>
+    <item>https://packages.pfsense.org/packages/config/freenas/pkg/freenas_config.inc</item>
   </additional_files_needed>
   <additional_files_needed>
     <prefix>/usr/local/pkg/</prefix>
     <chmod>0755</chmod>
-    <item>http://www.pfsense.com/packages/config/freenas/pkg/freenas_functions.inc</item>
+    <item>https://packages.pfsense.org/packages/config/freenas/pkg/freenas_functions.inc</item>
   </additional_files_needed>
   <additional_files_needed>
     <prefix>/usr/local/pkg/</prefix>
     <chmod>0755</chmod>
-    <item>http://www.pfsense.com/packages/config/freenas/pkg/freenas_guiconfig.inc</item>
+    <item>https://packages.pfsense.org/packages/config/freenas/pkg/freenas_guiconfig.inc</item>
   </additional_files_needed>
   <additional_files_needed>
     <prefix>/usr/local/pkg/</prefix>
     <chmod>0755</chmod>
-    <item>http://www.pfsense.com/packages/config/freenas/pkg/freenas_services.inc</item>
+    <item>https://packages.pfsense.org/packages/config/freenas/pkg/freenas_services.inc</item>
   </additional_files_needed>
   <additional_files_needed>
     <prefix>/usr/local/pkg/</prefix>
     <chmod>0755</chmod>
-    <item>http://www.pfsense.com/packages/config/freenas/pkg/freenas_utils.inc</item>
+    <item>https://packages.pfsense.org/packages/config/freenas/pkg/freenas_utils.inc</item>
   </additional_files_needed>
   <additional_files_needed>
     <prefix>/usr/local/pkg/</prefix>
     <chmod>0755</chmod>
-    <item>http://www.pfsense.com/packages/config/freenas/pkg/freenas_system.inc</item>
+    <item>https://packages.pfsense.org/packages/config/freenas/pkg/freenas_system.inc</item>
   </additional_files_needed>
   <additional_files_needed>
     <prefix>/usr/local/pkg/</prefix>
     <chmod>0755</chmod>
-    <item>http://www.pfsense.com/packages/config/freenas/pkg/rc.freenas</item>
+    <item>https://packages.pfsense.org/packages/config/freenas/pkg/rc.freenas</item>
   </additional_files_needed>
   <!-- kernel binaries -->
   <additional_files_needed>
     <prefix>/usr/local/pkg/</prefix>
     <chmod>0755</chmod>
-    <item>http://www.pfsense.com/packages/config/freenas/bin/iscsi_initiator.ko</item>
+    <item>https://packages.pfsense.org/packages/config/freenas/bin/iscsi_initiator.ko</item>
   </additional_files_needed>
   <additional_files_needed>
     <prefix>/usr/local/pkg/</prefix>
     <chmod>0755</chmod>
-    <item>http://www.pfsense.com/packages/config/freenas/bin/ext2fs.ko</item>
+    <item>https://packages.pfsense.org/packages/config/freenas/bin/ext2fs.ko</item>
   </additional_files_needed>
   <additional_files_needed>
     <prefix>/usr/local/pkg/</prefix>
     <chmod>0755</chmod>
-    <item>http://www.pfsense.com/packages/config/freenas/bin/geom_concat.ko</item>
+    <item>https://packages.pfsense.org/packages/config/freenas/bin/geom_concat.ko</item>
   </additional_files_needed>
   <additional_files_needed>
     <prefix>/usr/local/pkg/</prefix>
     <chmod>0755</chmod>
-    <item>http://www.pfsense.com/packages/config/freenas/bin/geom_gpt.ko</item>
+    <item>https://packages.pfsense.org/packages/config/freenas/bin/geom_gpt.ko</item>
   </additional_files_needed>
   <additional_files_needed>
     <prefix>/usr/local/pkg/</prefix>
     <chmod>0755</chmod>
-    <item>http://www.pfsense.com/packages/config/freenas/bin/geom_mirror.ko</item>
+    <item>https://packages.pfsense.org/packages/config/freenas/bin/geom_mirror.ko</item>
   </additional_files_needed>
   <additional_files_needed>
     <prefix>/usr/local/pkg/</prefix>
     <chmod>0755</chmod>
-    <item>http://www.pfsense.com/packages/config/freenas/bin/geom_stripe.ko</item>
+    <item>https://packages.pfsense.org/packages/config/freenas/bin/geom_stripe.ko</item>
   </additional_files_needed>
   <additional_files_needed>
     <prefix>/usr/local/pkg/</prefix>
     <chmod>0755</chmod>
-    <item>http://www.pfsense.com/packages/config/freenas/bin/geom_vinum.ko</item>
+    <item>https://packages.pfsense.org/packages/config/freenas/bin/geom_vinum.ko</item>
   </additional_files_needed>
   <additional_files_needed>
     <prefix>/usr/local/pkg/</prefix>
     <chmod>0755</chmod>
-    <item>http://www.pfsense.com/packages/config/freenas/bin/kernel.gz</item>
+    <item>https://packages.pfsense.org/packages/config/freenas/bin/kernel.gz</item>
   </additional_files_needed>
   <additional_files_needed>
     <prefix>/usr/local/pkg/</prefix>
     <chmod>0755</chmod>
-    <item>http://www.pfsense.com/packages/config/freenas/bin/ntfs.ko</item>
+    <item>https://packages.pfsense.org/packages/config/freenas/bin/ntfs.ko</item>
   </additional_files_needed>
   <!-- misc binaries -->
   <additional_files_needed>
     <prefix>/usr/local/pkg/</prefix>
     <chmod>0755</chmod>
-    <item>http://www.pfsense.com/packages/config/freenas/bin/iscontrol</item>
+    <item>https://packages.pfsense.org/packages/config/freenas/bin/iscontrol</item>
   </additional_files_needed>
   <additional_files_needed>
     <prefix>/usr/local/pkg/</prefix>
     <chmod>0755</chmod>
-    <item>http://www.pfsense.com/packages/config/freenas/bin/mountd</item>
+    <item>https://packages.pfsense.org/packages/config/freenas/bin/mountd</item>
   </additional_files_needed>
   <additional_files_needed>
     <prefix>/usr/local/pkg/</prefix>
     <chmod>0755</chmod>
-    <item>http://www.pfsense.com/packages/config/freenas/bin/nfsd</item>
+    <item>https://packages.pfsense.org/packages/config/freenas/bin/nfsd</item>
   </additional_files_needed>
   <additional_files_needed>
     <prefix>/usr/local/pkg/</prefix>
     <chmod>0755</chmod>
-    <item>http://www.pfsense.com/packages/config/freenas/bin/rpcbind</item>
+    <item>https://packages.pfsense.org/packages/config/freenas/bin/rpcbind</item>
   </additional_files_needed>
   <additional_files_needed>
     <prefix>/usr/local/pkg/</prefix>
     <chmod>0755</chmod>
-    <item>http://www.pfsense.com/packages/config/freenas/bin/rpc.lockd</item>
+    <item>https://packages.pfsense.org/packages/config/freenas/bin/rpc.lockd</item>
   </additional_files_needed>
   <additional_files_needed>
     <prefix>/usr/local/pkg/</prefix>
     <chmod>0755</chmod>
-    <item>http://www.pfsense.com/packages/config/freenas/bin/rpc.statd</item>
+    <item>https://packages.pfsense.org/packages/config/freenas/bin/rpc.statd</item>
   </additional_files_needed>
   <!--
     fields gets invoked when the user adds or edits a item. The following items

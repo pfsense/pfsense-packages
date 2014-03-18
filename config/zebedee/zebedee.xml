@@ -62,52 +62,52 @@
 		<description>Tunneling Service</description>
 	</service>
 	<additional_files_needed>
-		<item>http://www.pfsense.org/packages/config/zebedee/zebedee.inc</item>
+		<item>https://packages.pfsense.org/packages/config/zebedee/zebedee.inc</item>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0755</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
-		<item>http://www.pfsense.org/packages/config/zebedee/zebedee_tunnels.xml</item>
+		<item>https://packages.pfsense.org/packages/config/zebedee/zebedee_tunnels.xml</item>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0755</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
-		<item>http://www.pfsense.org/packages/config/zebedee/zebedee_key_details.xml</item>
+		<item>https://packages.pfsense.org/packages/config/zebedee/zebedee_key_details.xml</item>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0755</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
-		<item>http://www.pfsense.org/packages/config/zebedee/zebedee_sync.xml</item>
+		<item>https://packages.pfsense.org/packages/config/zebedee/zebedee_sync.xml</item>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0755</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
-		<item>http://www.pfsense.org/packages/config/zebedee/zebedee_del_key.php</item>
+		<item>https://packages.pfsense.org/packages/config/zebedee/zebedee_del_key.php</item>
 		<prefix>/usr/local/www/</prefix>
 		<chmod>0755</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
-		<item>http://www.pfsense.org/packages/config/zebedee/zebedee_get_key.php</item>
+		<item>https://packages.pfsense.org/packages/config/zebedee/zebedee_get_key.php</item>
 		<prefix>/usr/local/www/</prefix>
 		<chmod>0755</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
-		<item>http://www.pfsense.org/packages/config/zebedee/zebedee_keys.php</item>
+		<item>https://packages.pfsense.org/packages/config/zebedee/zebedee_keys.php</item>
 		<prefix>/usr/local/www/</prefix>
 		<chmod>0755</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
-		<item>http://www.pfsense.org/packages/config/zebedee/zebedee_log.php</item>
+		<item>https://packages.pfsense.org/packages/config/zebedee/zebedee_log.php</item>
 		<prefix>/usr/local/www/</prefix>
 		<chmod>0755</chmod>
 	</additional_files_needed> 
 	<additional_files_needed>
-		<item>http://www.pfsense.org/packages/config/zebedee/zebedee_view_config.php</item>
+		<item>https://packages.pfsense.org/packages/config/zebedee/zebedee_view_config.php</item>
 		<prefix>/usr/local/www/</prefix>
 		<chmod>0755</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
-		<item>http://www.pfsense.org/packages/config/zebedee/zebedee.sh</item>
+		<item>https://packages.pfsense.org/packages/config/zebedee/zebedee.sh</item>
 		<prefix>/usr/local/etc/rc.d/</prefix>
 		<chmod>0755</chmod>
 	</additional_files_needed>

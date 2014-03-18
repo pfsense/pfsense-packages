@@ -64,12 +64,12 @@
 	<additional_files_needed>
 		<prefix>/usr/local/www/</prefix>
 		<chmod>0755</chmod>
-		<item>http://www.pfsense.org/packages/config/sshterm/diag_shell_head.php</item>
+		<item>https://packages.pfsense.org/packages/config/sshterm/diag_shell_head.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/www/</prefix>
 		<chmod>0755</chmod>
-		<item>http://www.pfsense.org/packages/config/sshterm/diag_shell_releng.php</item>
+		<item>https://packages.pfsense.org/packages/config/sshterm/diag_shell_releng.php</item>
 	</additional_files_needed>
 	<!--
     fields gets invoked when the user adds or edits a item.

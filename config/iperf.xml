@@ -73,7 +73,7 @@
 		</tab>
 	</tabs>
 	<additional_files_needed>
-		<item>http://www.pfsense.com/packages/config/iperfserver.xml</item>
+		<item>https://packages.pfsense.org/packages/config/iperfserver.xml</item>
 	</additional_files_needed>
 	<fields>
 		<field>

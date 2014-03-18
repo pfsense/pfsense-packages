@@ -61,7 +61,7 @@
                 <executable>perl</executable>
         </service>
     	<additional_files_needed>
-		<item>http://www.pfsense.com/packages/All/assp-1.0.tgz</item>
+		<item>https://www.pfsense.org/packages/All/assp-1.0.tgz</item>
 	</additional_files_needed>
 	<custom_php_install_command>
 	    $start = "/usr/bin/perl /usr/local/assp/assp.pl &amp;\necho $! > /var/run/assp.pid";

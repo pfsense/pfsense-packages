@@ -30,37 +30,37 @@
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0644</chmod>
-		<item>http://www.pfsense.com/packages/config/jailctl/jailctl_defaults.xml</item>
+		<item>https://packages.pfsense.org/packages/config/jailctl/jailctl_defaults.xml</item>
 	</additional_files_needed>	
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0644</chmod>
-		<item>http://www.pfsense.com/packages/config/jailctl/jailctl_settings.xml</item>
+		<item>https://packages.pfsense.org/packages/config/jailctl/jailctl_settings.xml</item>
 	</additional_files_needed>	
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0644</chmod>
-		<item>http://www.pfsense.com/packages/config/jailctl/jailctl.inc</item>
+		<item>https://packages.pfsense.org/packages/config/jailctl/jailctl.inc</item>
 	</additional_files_needed>	
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0644</chmod>
-		<item>http://www.pfsense.com/packages/config/jailctl/jailctl-utils.inc</item>
+		<item>https://packages.pfsense.org/packages/config/jailctl/jailctl-utils.inc</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0644</chmod>
-		<item>http://www.pfsense.com/packages/config/jailctl/jailctl_list.inc</item>
+		<item>https://packages.pfsense.org/packages/config/jailctl/jailctl_list.inc</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/sbin/</prefix>
 		<chmod>0755</chmod>
-		<item>http://www.pfsense.com/packages/config/jailctl/jailctl</item>
+		<item>https://packages.pfsense.org/packages/config/jailctl/jailctl</item>
 	</additional_files_needed>	
 	<additional_files_needed>
 		<prefix>/usr/sbin/</prefix>
 		<chmod>0755</chmod>
-		<item>http://www.pfsense.com/packages/config/jailctl/sysinstall</item>
+		<item>https://packages.pfsense.org/packages/config/jailctl/sysinstall</item>
 	</additional_files_needed>
 	
 	<tabs>

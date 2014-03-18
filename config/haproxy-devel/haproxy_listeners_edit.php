@@ -2,7 +2,7 @@
 /* $Id: load_balancer_pool_edit.php,v 1.24.2.23 2007/03/03 00:07:09 smos Exp $ */
 /*
 	haproxy_listeners_edit.php
-	part of pfSense (http://www.pfsense.com/)
+	part of pfSense (https://www.pfsense.org/)
 	Copyright (C) 2009 Scott Ullrich <sullrich@pfsense.com>
 	Copyright (C) 2008 Remco Hoef <remcoverhoef@pfsense.com>
 	Copyright (C) 2013 PiBa-NL merging (some of the) "haproxy-devel" changes from: Marcello Coutinho <marcellocoutinho@gmail.com>

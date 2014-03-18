@@ -91,42 +91,42 @@
         <additional_files_needed>
             <prefix>/usr/local/pkg/</prefix>
             <chmod>0755</chmod>
-                <item>http://www.pfsense.org/packages/config/bind/bind.xml</item>
+                <item>https://packages.pfsense.org/packages/config/bind/bind.xml</item>
         </additional_files_needed>
         <additional_files_needed>
             <prefix>/usr/local/pkg/</prefix>
             <chmod>0755</chmod>
-                <item>http://www.pfsense.org/packages/config/bind/bind_views.xml</item>
+                <item>https://packages.pfsense.org/packages/config/bind/bind_views.xml</item>
         </additional_files_needed>
         <additional_files_needed>
             <prefix>/usr/local/pkg/</prefix>
             <chmod>0755</chmod>
-                <item>http://www.pfsense.org/packages/config/bind/bind_zones.xml</item>
+                <item>https://packages.pfsense.org/packages/config/bind/bind_zones.xml</item>
         </additional_files_needed>
         <additional_files_needed>
             <prefix>/usr/local/pkg/</prefix>
             <chmod>0755</chmod>
-                <item>http://www.pfsense.org/packages/config/bind/bind_acls.xml</item>
+                <item>https://packages.pfsense.org/packages/config/bind/bind_acls.xml</item>
         </additional_files_needed>
         <additional_files_needed>
             <prefix>/usr/local/pkg/</prefix>
             <chmod>0755</chmod>
-                <item>http://www.pfsense.org/packages/config/bind/bind.inc</item>
+                <item>https://packages.pfsense.org/packages/config/bind/bind.inc</item>
         </additional_files_needed>
         <additional_files_needed>
             <prefix>/usr/local/pkg/</prefix>
             <chmod>0755</chmod>
-                <item>http://www.pfsense.org/packages/config/bind/bind_sync.xml</item>
+                <item>https://packages.pfsense.org/packages/config/bind/bind_sync.xml</item>
         </additional_files_needed>
         <additional_files_needed>
             <prefix>/usr/local/www/shortcuts/</prefix>
             <chmod>0755</chmod>
-                <item>http://www.pfsense.org/packages/config/bind/pkg_bind.inc</item>
+                <item>https://packages.pfsense.org/packages/config/bind/pkg_bind.inc</item>
         </additional_files_needed>
         <additional_files_needed>
             <prefix>/usr/local/www/widgets/widgets/</prefix>
             <chmod>0755</chmod>
-                <item>http://www.pfsense.org/packages/config/bind/bind.widget.php</item>
+                <item>https://packages.pfsense.org/packages/config/bind/bind.widget.php</item>
         </additional_files_needed>
         <fields>
                 <field>

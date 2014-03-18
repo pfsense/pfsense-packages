@@ -39,7 +39,7 @@
 		</copyright>
 	<description>Country Block</description>
 	<requirements>Active Internet</requirements>
-	<faq>http://forum.pfsense.org/index.php/topic,25732.0.html</faq>
+	<faq>https://forum.pfsense.org/index.php/topic,25732.0.html</faq>
 	<name>Country Block Settings</name>
 	<version>0.2.4</version>
 	<title>Settings</title>
@@ -62,112 +62,112 @@
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0755</chmod>
-		<item>http://www.pfsense.org/packages/config/countryblock/countryblock.xml</item>
+		<item>https://packages.pfsense.org/packages/config/countryblock/countryblock.xml</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0755</chmod>
-		<item>http://www.pfsense.org/packages/config/countryblock/countryblock.inc</item>
+		<item>https://packages.pfsense.org/packages/config/countryblock/countryblock.inc</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/tmp/</prefix>
 		<chmod>0755</chmod>
-		<item>http://www.pfsense.org/packages/config/countryblock/interfaces.txt</item>
+		<item>https://packages.pfsense.org/packages/config/countryblock/interfaces.txt</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/tmp/</prefix>
 		<chmod>0755</chmod>
-		<item>http://www.pfsense.org/packages/config/countryblock/countryblock.tmp</item>
+		<item>https://packages.pfsense.org/packages/config/countryblock/countryblock.tmp</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/tmp/</prefix>
 		<chmod>0755</chmod>
-		<item>http://www.pfsense.org/packages/config/countryblock/execute.sh</item>
+		<item>https://packages.pfsense.org/packages/config/countryblock/execute.sh</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/tmp/</prefix>
 		<chmod>0755</chmod>
-		<item>http://www.pfsense.org/packages/config/countryblock/countryblock.sh</item>
+		<item>https://packages.pfsense.org/packages/config/countryblock/countryblock.sh</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/tmp/</prefix>
 		<chmod>0755</chmod>
-		<item>http://www.pfsense.org/packages/config/countryblock/index.tmp</item>
+		<item>https://packages.pfsense.org/packages/config/countryblock/index.tmp</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/tmp/</prefix>
 		<chmod>0755</chmod>
-		<item>http://www.pfsense.org/packages/config/countryblock/ddaccordion.js</item>
+		<item>https://packages.pfsense.org/packages/config/countryblock/ddaccordion.js</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/tmp/</prefix>
 		<chmod>0755</chmod>
-		<item>http://www.pfsense.org/packages/config/countryblock/jquery.min.js</item>
+		<item>https://packages.pfsense.org/packages/config/countryblock/jquery.min.js</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/tmp/</prefix>
 		<chmod>0755</chmod>
-		<item>http://www.pfsense.org/packages/config/countryblock/public_smo_scripts.js</item>
+		<item>https://packages.pfsense.org/packages/config/countryblock/public_smo_scripts.js</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/tmp/</prefix>
 		<chmod>0755</chmod>
-		<item>http://www.pfsense.org/packages/config/countryblock/titlebar.png</item>
+		<item>https://packages.pfsense.org/packages/config/countryblock/titlebar.png</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/tmp/</prefix>
 		<chmod>0755</chmod>
-		<item>http://www.pfsense.org/packages/config/countryblock/titlebar-active.png</item>
+		<item>https://packages.pfsense.org/packages/config/countryblock/titlebar-active.png</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/tmp/</prefix>
 		<chmod>0755</chmod>
-		<item>http://www.pfsense.org/packages/config/countryblock/purge.tmp</item>
+		<item>https://packages.pfsense.org/packages/config/countryblock/purge.tmp</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/tmp/</prefix>
 		<chmod>0755</chmod>
-		<item>http://www.pfsense.org/packages/config/countryblock/whitelist.tmp</item>
+		<item>https://packages.pfsense.org/packages/config/countryblock/whitelist.tmp</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/tmp/</prefix>
 		<chmod>0755</chmod>
-		<item>http://www.pfsense.org/packages/config/countryblock/countryblock_if.tmp</item>
+		<item>https://packages.pfsense.org/packages/config/countryblock/countryblock_if.tmp</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/tmp/</prefix>
 		<chmod>0755</chmod>
-		<item>http://www.pfsense.org/packages/config/countryblock/firewall_shaper.tmp</item>
+		<item>https://packages.pfsense.org/packages/config/countryblock/firewall_shaper.tmp</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/tmp/</prefix>
 		<chmod>0755</chmod>
-		<item>http://www.pfsense.org/packages/config/countryblock/help.tmp</item>
+		<item>https://packages.pfsense.org/packages/config/countryblock/help.tmp</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/tmp/</prefix>
 		<chmod>0755</chmod>
-		<item>http://www.pfsense.org/packages/config/countryblock/settings.tmp</item>
+		<item>https://packages.pfsense.org/packages/config/countryblock/settings.tmp</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/tmp/</prefix>
 		<chmod>0755</chmod>
-		<item>http://www.pfsense.org/packages/config/countryblock/class.phpmailer.tmp</item>
+		<item>https://packages.pfsense.org/packages/config/countryblock/class.phpmailer.tmp</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/tmp/</prefix>
 		<chmod>0755</chmod>
-		<item>http://www.pfsense.org/packages/config/countryblock/class.smtp.tmp</item>
+		<item>https://packages.pfsense.org/packages/config/countryblock/class.smtp.tmp</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/tmp/</prefix>
 		<chmod>0755</chmod>
-		<item>http://www.pfsense.org/packages/config/countryblock/email.tmp</item>
+		<item>https://packages.pfsense.org/packages/config/countryblock/email.tmp</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/tmp/</prefix>
 		<chmod>0644</chmod>
-		<item>http://www.pfsense.org/packages/config/countryblock/countryblock_IPBlocklist.widget.tmp</item>
+		<item>https://packages.pfsense.org/packages/config/countryblock/countryblock_IPBlocklist.widget.tmp</item>
 	</additional_files_needed>
 	<fields>
 		<field>

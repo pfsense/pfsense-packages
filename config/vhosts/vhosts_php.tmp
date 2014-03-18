@@ -82,7 +82,7 @@ include("head.inc");
 				System -> Advanced -> Enable Secure Shell. Then SFTP can be used to access the files at /usr/local/vhosts.
 				After adding or updating an entry make sure to restart the <a href='/status_services.php'>service</a> to apply the settings.
 				<br /><br />
-				For more information see: <a href='http://doc.pfsense.org/index.php/vhosts'>http://doc.pfsense.org/index.php/vhosts</a>            
+				For more information see: <a href='https://doc.pfsense.org/index.php/vhosts'>https://doc.pfsense.org/index.php/vhosts</a>            
 				</p></td>
 			</tr>
 		</table>

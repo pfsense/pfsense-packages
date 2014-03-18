@@ -58,7 +58,7 @@
 	<additional_files_needed>
 		<prefix>/usr/bin/</prefix>
 		<chmod>077</chmod>
-		<item>http://www.pfsense.com/packages/config/bsdstats/bin/dig</item>
+		<item>https://packages.pfsense.org/packages/config/bsdstats/bin/dig</item>
 	</additional_files_needed>
 	<custom_php_install_command>
 		system("/bin/mkdir -p /usr/local/etc/periodic/monthly/");

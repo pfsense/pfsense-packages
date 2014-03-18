@@ -102,42 +102,42 @@
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0755</chmod>
-		<item>http://www.pfsense.com/packages/config/squid/squid_cache.xml</item>
+		<item>https://packages.pfsense.org/packages/config/squid/squid_cache.xml</item>
 	</additional_files_needed>
 	<additional_files_needed>
 	    <prefix>/usr/local/pkg/</prefix>
 	    <chmod>0755</chmod>
-	    <item>http://www.pfsense.com/packages/config/squid/squid_nac.xml</item>
+	    <item>https://packages.pfsense.org/packages/config/squid/squid_nac.xml</item>
 	</additional_files_needed>
 	<additional_files_needed>
 	    <prefix>/usr/local/pkg/</prefix>
 	    <chmod>0755</chmod>
-	    <item>http://www.pfsense.com/packages/config/squid/squid_ng.inc</item>
+	    <item>https://packages.pfsense.org/packages/config/squid/squid_ng.inc</item>
 	</additional_files_needed>
    	<additional_files_needed>
 	    <prefix>/usr/local/pkg/</prefix>
 	    <chmod>0755</chmod>
-	    <item>http://www.pfsense.com/packages/config/squid/squid_traffic.xml</item>
+	    <item>https://packages.pfsense.org/packages/config/squid/squid_traffic.xml</item>
 	</additional_files_needed>
 	<additional_files_needed>
 	    <prefix>/usr/local/pkg/</prefix>
 	    <chmod>0755</chmod>
-	    <item>http://www.pfsense.com/packages/config/squid/squid_upstream.xml</item>
+	    <item>https://packages.pfsense.org/packages/config/squid/squid_upstream.xml</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0755</chmod>
-		<item>http://www.pfsense.com/packages/config/squid/squid_auth.xml</item>
+		<item>https://packages.pfsense.org/packages/config/squid/squid_auth.xml</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0755</chmod>
-		<item>http://www.pfsense.com/packages/config/squid/squid_auth.inc</item>
+		<item>https://packages.pfsense.org/packages/config/squid/squid_auth.inc</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0755</chmod>
-		<item>http://www.pfsense.com/packages/config/squid/squid_extauth.xml</item>
+		<item>https://packages.pfsense.org/packages/config/squid/squid_extauth.xml</item>
 	</additional_files_needed>
 	<fields>	
 		<field>

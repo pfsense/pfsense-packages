@@ -12,7 +12,7 @@
 		<url>/pkg_edit.php?xml=blinkled.xml</url>
 	</menu>
 	<additional_files_needed>
-		<item>http://www.pfsense.org/packages/config/blinkled/blinkled.inc</item>
+		<item>https://packages.pfsense.org/packages/config/blinkled/blinkled.inc</item>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0755</chmod>
 	</additional_files_needed>

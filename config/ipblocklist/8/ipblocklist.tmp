@@ -128,7 +128,7 @@ if(isset($_POST['formSubmit']))
 	$tab_array[1] = array("Settings", false, "settings.php");
 	$tab_array[2] = array("Whitelist", false, "whitelist.php");
 	$tab_array[3] = array("Interfaces", false, "ipblocklist_if.php");
-	$tab_array[4] = array("Help", false, "http://doc.pfsense.org/index.php/IP_Blocklist");
+	$tab_array[4] = array("Help", false, "https://doc.pfsense.org/index.php/IP_Blocklist");
 	//$tab_array[5] = array("Email", false, "email.php");
 	display_top_tabs($tab_array);
 ?> 

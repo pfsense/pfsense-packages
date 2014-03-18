@@ -74,32 +74,32 @@
         <additional_files_needed>
                <prefix>/usr/local/pkg/</prefix>
                <chmod>0755</chmod>
-               <item>http://www.pfsense.org/packages/config/lightsquid/lightsquid.inc</item>
+               <item>https://packages.pfsense.org/packages/config/lightsquid/lightsquid.inc</item>
         </additional_files_needed>
         <additional_files_needed>
                <prefix>/var/tmp/</prefix>
                <chmod>0755</chmod>
-               <item>http://files.pfsense.org/packages/All/lightsquid_tpl.tbz</item>
+               <item>https://files.pfsense.org/packages/All/lightsquid_tpl.tbz</item>
         </additional_files_needed>
         <additional_files_needed>
                <prefix>/usr/local/www/sqstat/</prefix>
                <chmod>0644</chmod>
-               <item>http://www.pfsense.org/packages/config/lightsquid/sqstat.class.php</item>
+               <item>https://packages.pfsense.org/packages/config/lightsquid/sqstat.class.php</item>
         </additional_files_needed>
         <additional_files_needed>
                <prefix>/usr/local/www/sqstat/</prefix>
                <chmod>0644</chmod>
-               <item>http://www.pfsense.org/packages/config/lightsquid/sqstat.php</item>
+               <item>https://packages.pfsense.org/packages/config/lightsquid/sqstat.php</item>
         </additional_files_needed>
         <additional_files_needed>
                <prefix>/usr/local/www/sqstat/</prefix>
                <chmod>0644</chmod>
-               <item>http://www.pfsense.org/packages/config/lightsquid/sqstat.css</item>
+               <item>https://packages.pfsense.org/packages/config/lightsquid/sqstat.css</item>
         </additional_files_needed>
         <additional_files_needed>
                <prefix>/usr/local/www/sqstat/</prefix>
                <chmod>0644</chmod>
-               <item>http://www.pfsense.org/packages/config/lightsquid/zhabascript.js</item>
+               <item>https://packages.pfsense.org/packages/config/lightsquid/zhabascript.js</item>
         </additional_files_needed>
         <fields>
                 <field>

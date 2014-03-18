@@ -1,7 +1,7 @@
 <?php
 /*
 	haproxy_htmllist.php
-	part of pfSense (http://www.pfsense.com/)
+	part of pfSense (https://www.pfsense.org/)
 	Copyright (C) 2013 PiBa-NL
 	All rights reserved.
 

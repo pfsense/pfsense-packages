@@ -68,7 +68,7 @@
 		<description>A daemon that periodically updates the ClamAV virus database.</description>
 	</service>
 	<additional_files_needed>
-		<item>http://www.pfsense.org/packages/config/clamav.inc</item>
+		<item>https://packages.pfsense.org/packages/config/clamav.inc</item>
 	</additional_files_needed>
 	<fields>
 		<field>

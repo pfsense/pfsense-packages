@@ -60,167 +60,167 @@
 	<additional_files_needed>
 		<prefix>/etc/inc/priv/</prefix>
 		<chmod>077</chmod>
-		<item>http://www.pfsense.com/packages/config/suricata/suricata.priv.inc</item>
+		<item>https://packages.pfsense.org/packages/config/suricata/suricata.priv.inc</item>
 	</additional_files_needed>
 	<additional_files_needed>
-		<item>http://www.pfsense.com/packages/config/suricata/suricata.inc</item>
+		<item>https://packages.pfsense.org/packages/config/suricata/suricata.inc</item>
 		<prefix>/usr/local/pkg/suricata/</prefix>
 		<chmod>0755</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
-		<item>http://www.pfsense.com/packages/config/suricata/suricata_check_cron_misc.inc</item>
+		<item>https://packages.pfsense.org/packages/config/suricata/suricata_check_cron_misc.inc</item>
 		<prefix>/usr/local/pkg/suricata/</prefix>
 		<chmod>0755</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
-		<item>http://www.pfsense.com/packages/config/suricata/suricata_yaml_template.inc</item>
+		<item>https://packages.pfsense.org/packages/config/suricata/suricata_yaml_template.inc</item>
 		<prefix>/usr/local/pkg/suricata/</prefix>
 		<chmod>0755</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
-		<item>http://www.pfsense.com/packages/config/suricata/suricata_generate_yaml.php</item>
+		<item>https://packages.pfsense.org/packages/config/suricata/suricata_generate_yaml.php</item>
 		<prefix>/usr/local/www/suricata/</prefix>
 		<chmod>0755</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
-		<item>http://www.pfsense.com/packages/config/suricata/suricata_download_updates.php</item>
+		<item>https://packages.pfsense.org/packages/config/suricata/suricata_download_updates.php</item>
 		<prefix>/usr/local/www/suricata/</prefix>
 		<chmod>0755</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
-		<item>http://www.pfsense.com/packages/config/suricata/suricata_global.php</item>
+		<item>https://packages.pfsense.org/packages/config/suricata/suricata_global.php</item>
 		<prefix>/usr/local/www/suricata/</prefix>
 		<chmod>0755</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
-		<item>http://www.pfsense.com/packages/config/suricata/suricata_alerts.php</item>
+		<item>https://packages.pfsense.org/packages/config/suricata/suricata_alerts.php</item>
 		<prefix>/usr/local/www/suricata/</prefix>
 		<chmod>0755</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
-		<item>http://www.pfsense.com/packages/config/suricata/suricata_interfaces.php</item>
+		<item>https://packages.pfsense.org/packages/config/suricata/suricata_interfaces.php</item>
 		<prefix>/usr/local/www/suricata/</prefix>
 		<chmod>0755</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
-		<item>http://www.pfsense.com/packages/config/suricata/suricata_interfaces_edit.php</item>
+		<item>https://packages.pfsense.org/packages/config/suricata/suricata_interfaces_edit.php</item>
 		<prefix>/usr/local/www/suricata/</prefix>
 		<chmod>0755</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
-		<item>http://www.pfsense.com/packages/config/suricata/suricata_download_rules.php</item>
+		<item>https://packages.pfsense.org/packages/config/suricata/suricata_download_rules.php</item>
 		<prefix>/usr/local/www/suricata/</prefix>
 		<chmod>0755</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
-		<item>http://www.pfsense.com/packages/config/suricata/suricata_check_for_rule_updates.php</item>
+		<item>https://packages.pfsense.org/packages/config/suricata/suricata_check_for_rule_updates.php</item>
 		<prefix>/usr/local/www/suricata/</prefix>
 		<chmod>0755</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
-		<item>http://www.pfsense.com/packages/config/suricata/suricata_rules.php</item>
+		<item>https://packages.pfsense.org/packages/config/suricata/suricata_rules.php</item>
 		<prefix>/usr/local/www/suricata/</prefix>
 		<chmod>0755</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
-		<item>http://www.pfsense.com/packages/config/suricata/suricata_rulesets.php</item>
+		<item>https://packages.pfsense.org/packages/config/suricata/suricata_rulesets.php</item>
 		<prefix>/usr/local/www/suricata/</prefix>
 		<chmod>0755</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
-		<item>http://www.pfsense.com/packages/config/suricata/suricata_rules_flowbits.php</item>
+		<item>https://packages.pfsense.org/packages/config/suricata/suricata_rules_flowbits.php</item>
 		<prefix>/usr/local/www/suricata/</prefix>
 		<chmod>0755</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
-		<item>http://www.pfsense.com/packages/config/suricata/suricata_rules_edit.php</item>
+		<item>https://packages.pfsense.org/packages/config/suricata/suricata_rules_edit.php</item>
 		<prefix>/usr/local/www/suricata/</prefix>
 		<chmod>0755</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
-		<item>http://www.pfsense.com/packages/config/suricata/suricata_flow_stream.php</item>
+		<item>https://packages.pfsense.org/packages/config/suricata/suricata_flow_stream.php</item>
 		<prefix>/usr/local/www/suricata/</prefix>
 		<chmod>0755</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
-		<item>http://www.pfsense.com/packages/config/suricata/suricata_os_policy_engine.php</item>
+		<item>https://packages.pfsense.org/packages/config/suricata/suricata_os_policy_engine.php</item>
 		<prefix>/usr/local/www/suricata/</prefix>
 		<chmod>0755</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
-		<item>http://www.pfsense.com/packages/config/suricata/suricata_import_aliases.php</item>
+		<item>https://packages.pfsense.org/packages/config/suricata/suricata_import_aliases.php</item>
 		<prefix>/usr/local/www/suricata/</prefix>
 		<chmod>0755</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
-		<item>http://www.pfsense.com/packages/config/suricata/suricata_suppress.php</item>
+		<item>https://packages.pfsense.org/packages/config/suricata/suricata_suppress.php</item>
 		<prefix>/usr/local/www/suricata/</prefix>
 		<chmod>0755</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
-		<item>http://www.pfsense.com/packages/config/suricata/suricata_suppress_edit.php</item>
+		<item>https://packages.pfsense.org/packages/config/suricata/suricata_suppress_edit.php</item>
 		<prefix>/usr/local/www/suricata/</prefix>
 		<chmod>0755</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
-		<item>http://www.pfsense.com/packages/config/suricata/suricata_logs_browser.php</item>
+		<item>https://packages.pfsense.org/packages/config/suricata/suricata_logs_browser.php</item>
 		<prefix>/usr/local/www/suricata/</prefix>
 		<chmod>0755</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
-		<item>http://www.pfsense.com/packages/config/suricata/suricata_list_view.php</item>
+		<item>https://packages.pfsense.org/packages/config/suricata/suricata_list_view.php</item>
 		<prefix>/usr/local/www/suricata/</prefix>
 		<chmod>0755</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
-		<item>http://www.pfsense.com/packages/config/suricata/suricata_app_parsers.php</item>
+		<item>https://packages.pfsense.org/packages/config/suricata/suricata_app_parsers.php</item>
 		<prefix>/usr/local/www/suricata/</prefix>
 		<chmod>0755</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
-		<item>http://www.pfsense.com/packages/config/suricata/suricata_libhtp_policy_engine.php</item>
+		<item>https://packages.pfsense.org/packages/config/suricata/suricata_libhtp_policy_engine.php</item>
 		<prefix>/usr/local/www/suricata/</prefix>
 		<chmod>0755</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
-		<item>http://www.pfsense.com/packages/config/suricata/suricata_uninstall.php</item>
+		<item>https://packages.pfsense.org/packages/config/suricata/suricata_uninstall.php</item>
 		<prefix>/usr/local/www/suricata/</prefix>
 		<chmod>0755</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
-		<item>http://www.pfsense.com/packages/config/suricata/suricata_define_vars.php</item>
+		<item>https://packages.pfsense.org/packages/config/suricata/suricata_define_vars.php</item>
 		<prefix>/usr/local/www/suricata/</prefix>
 		<chmod>0755</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
-		<item>http://www.pfsense.com/packages/config/suricata/suricata_barnyard.php</item>
+		<item>https://packages.pfsense.org/packages/config/suricata/suricata_barnyard.php</item>
 		<prefix>/usr/local/www/suricata/</prefix>
 		<chmod>0755</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
-		<item>http://www.pfsense.com/packages/config/suricata/suricata_post_install.php</item>
+		<item>https://packages.pfsense.org/packages/config/suricata/suricata_post_install.php</item>
 		<prefix>/usr/local/www/suricata/</prefix>
 		<chmod>0755</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
-		<item>http://www.pfsense.com/packages/config/suricata/suricata_uninstall.php</item>
+		<item>https://packages.pfsense.org/packages/config/suricata/suricata_uninstall.php</item>
 		<prefix>/usr/local/www/suricata/</prefix>
 		<chmod>0755</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/www/widgets/javascript/</prefix>
 		<chmod>0644</chmod>
-		<item>http://www.pfsense.com/packages/config/suricata/suricata_alerts.js</item>
+		<item>https://packages.pfsense.org/packages/config/suricata/suricata_alerts.js</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/www/widgets/widgets/</prefix>
 		<chmod>0644</chmod>
-		<item>http://www.pfsense.com/packages/config/suricata/suricata_alerts.widget.php</item>
+		<item>https://packages.pfsense.org/packages/config/suricata/suricata_alerts.widget.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/www/widgets/include/</prefix>
 		<chmod>0644</chmod>
-		<item>http://www.pfsense.com/packages/config/suricata/widget-suricata.inc</item>
+		<item>https://packages.pfsense.org/packages/config/suricata/widget-suricata.inc</item>
 	</additional_files_needed>
 	<!-- configpath gets expanded out automatically and config items will be stored in that location -->
 	<configpath>['installedpackages']['suricata']</configpath>

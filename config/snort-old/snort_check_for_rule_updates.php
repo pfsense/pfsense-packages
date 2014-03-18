@@ -143,7 +143,7 @@ if (file_exists("{$tmpfname}/{$pfsense_rules_filename_md5}")) {
 } else {
     echo "Downloading pfsense md5 file...\n";
     ini_set('user_agent','Mozilla/4.0 (compatible; MSIE 6.0)');
-    $image = @file_get_contents("http://www.pfsense.com/packages/config/snort/pfsense_rules/pfsense_rules.tar.gz.md5");
+    $image = @file_get_contents("https://packages.pfsense.org/packages/config/snort/pfsense_rules/pfsense_rules.tar.gz.md5");
 //    $image = @file_get_contents("http://www.mtest.local/pub-bin/oinkmaster.cgi/{$oinkid}/pfsense_rules.tar.gz.md5");
     $f = fopen("{$tmpfname}/pfsense_rules.tar.gz.md5", 'w');
     fwrite($f, $image);
@@ -302,7 +302,7 @@ if (file_exists("{$tmpfname}/{$pfsense_rules_filename}")) {
     echo "There is a new set of Pfsense rules posted. Downloading...\n";
     echo "May take 4 to 10 min...\n";	
     ini_set('user_agent','Mozilla/4.0 (compatible; MSIE 6.0)');
-    $image = @file_get_contents("http://www.pfsense.com/packages/config/snort/pfsense_rules/pfsense_rules.tar.gz");
+    $image = @file_get_contents("https://packages.pfsense.org/packages/config/snort/pfsense_rules/pfsense_rules.tar.gz");
 //    $image = @file_get_contents("http://www.mtest.local/pub-bin/oinkmaster.cgi/{$oinkid}/pfsense_rules.tar.gz");
     $f = fopen("{$tmpfname}/pfsense_rules.tar.gz", 'w');
     fwrite($f, $image);

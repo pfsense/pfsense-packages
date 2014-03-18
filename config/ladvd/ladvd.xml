@@ -39,14 +39,14 @@
 	<include_file>/usr/local/pkg/ladvd.inc</include_file>
 	<aftersaveredirect>/pkg_edit.php?xml=ladvd.xml&amp;id=0</aftersaveredirect>
 	<additional_files_needed>
-		<item>http://www.pfsense.com/packages/config/ladvd/ladvd.inc</item>
+		<item>https://packages.pfsense.org/packages/config/ladvd/ladvd.inc</item>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0644</chmod>
 	</additional_files_needed>
         <additional_files_needed>
                 <prefix>/usr/local/www/</prefix>
                 <chmod>0755</chmod>
-                <item>http://www.pfsense.com/packages/config/ladvd/status_ladvd.php</item>
+                <item>https://packages.pfsense.org/packages/config/ladvd/status_ladvd.php</item>
         </additional_files_needed>
 	<menu>
 		<name>LADVD</name>

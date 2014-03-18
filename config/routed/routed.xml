@@ -3,7 +3,7 @@
 	<copyright>
 	/* $Id$ */
 	/*
-		part of pfSense (http://www.pfsense.org/)
+		part of pfSense (https://www.pfsense.org/)
 
 		Copyright (C) 2006 Bill Marquette - bill.marquette@gmail.com.
 		All rights reserved.
@@ -36,7 +36,7 @@
 	<include_file>/usr/local/pkg/routed.inc</include_file>
 
 	<additional_files_needed>
-		<item>http://www.pfsense.org/packages/config/routed/routed.inc</item>
+		<item>https://packages.pfsense.org/packages/config/routed/routed.inc</item>
 	</additional_files_needed>
 
 	<!-- Menu is where this packages menu will appear -->

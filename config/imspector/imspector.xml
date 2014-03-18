@@ -85,37 +85,37 @@
 	<additional_files_needed>
 	    <prefix>/usr/local/pkg/</prefix>
 		<chmod>0755</chmod>
-		<item>http://www.pfsense.org/packages/config/imspector/imspector_sync.xml</item>
+		<item>https://packages.pfsense.org/packages/config/imspector/imspector_sync.xml</item>
 	</additional_files_needed>
 	<additional_files_needed>
 	    <prefix>/usr/local/pkg/</prefix>
 		<chmod>0755</chmod>
-		<item>http://www.pfsense.org/packages/config/imspector/imspector_replacements.xml</item>
+		<item>https://packages.pfsense.org/packages/config/imspector/imspector_replacements.xml</item>
 	</additional_files_needed>
 	<additional_files_needed>
 	    <prefix>/usr/local/pkg/</prefix>
 		<chmod>0755</chmod>
-		<item>http://www.pfsense.org/packages/config/imspector/imspector_acls.xml</item>
+		<item>https://packages.pfsense.org/packages/config/imspector/imspector_acls.xml</item>
 	</additional_files_needed>
 	<additional_files_needed>
 	    <prefix>/usr/local/pkg/</prefix>
 		<chmod>0755</chmod>
-		<item>http://www.pfsense.org/packages/config/imspector/imspector.inc</item>
+		<item>https://packages.pfsense.org/packages/config/imspector/imspector.inc</item>
 	</additional_files_needed>
 	<additional_files_needed>
 	    <prefix>/usr/local/www/</prefix>
 		<chmod>0755</chmod>
-		<item>http://www.pfsense.org/packages/config/imspector/imspector_logs.php</item>
+		<item>https://packages.pfsense.org/packages/config/imspector/imspector_logs.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
 	    <prefix>/usr/local/www/</prefix>
 		<chmod>0755</chmod>
-		<item>http://www.pfsense.org/packages/config/imspector/services_imspector_logs.php</item>
+		<item>https://packages.pfsense.org/packages/config/imspector/services_imspector_logs.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
 	    <prefix>/usr/local/www/</prefix>
 		<chmod>0755</chmod>
-		<item>http://www.pfsense.org/packages/config/imspector/services_imspector_logs2.php</item>
+		<item>https://packages.pfsense.org/packages/config/imspector/services_imspector_logs2.php</item>
 	</additional_files_needed>
 	<fields>
 		<field>

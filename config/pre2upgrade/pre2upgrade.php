@@ -64,7 +64,7 @@ Config check output:
 <?php endif; ?>
 <br/><br/>
 Before proceeding with the upgrade, you should look over the upgrade guide on the doc wiki, which can be found here:<br/>
-<a href="http://doc.pfsense.org/index.php/Upgrade_Guide">http://doc.pfsense.org/index.php/Upgrade_Guide</a>.
+<a href="https://doc.pfsense.org/index.php/Upgrade_Guide">https://doc.pfsense.org/index.php/Upgrade_Guide</a>.
 </td></tr>
 </table>
 </div>

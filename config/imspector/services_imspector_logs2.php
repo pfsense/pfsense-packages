@@ -1,7 +1,7 @@
 <?php
 /*
 	services_imspector_logs.php
-	part of pfSense (http://www.pfsense.com/)
+	part of pfSense (https://www.pfsense.org/)
 
 	JavaScript Code is GPL Licensed from SmoothWall Express.
 

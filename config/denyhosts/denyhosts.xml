@@ -68,7 +68,7 @@
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0755</chmod>		
-		<item>http://www.pfsense.com/packages/config/denyhosts/denyhosts.inc</item>
+		<item>https://packages.pfsense.org/packages/config/denyhosts/denyhosts.inc</item>
 	</additional_files_needed>
 	<adddeleteeditpagefields>
 		<columnitem>

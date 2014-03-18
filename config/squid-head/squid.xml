@@ -95,30 +95,30 @@
 	</tabs>
 	<!-- Installation -->
 	<additional_files_needed>
-		<item>http://www.pfsense.org/packages/config/squid.inc</item>
+		<item>https://packages.pfsense.org/packages/config/squid.inc</item>
 	</additional_files_needed>
 	<additional_files_needed>
-		<item>http://www.pfsense.org/packages/config/squid_cache.xml</item>
+		<item>https://packages.pfsense.org/packages/config/squid_cache.xml</item>
 	</additional_files_needed>
 	<additional_files_needed>
-		<item>http://www.pfsense.org/packages/config/squid_nac.xml</item>
+		<item>https://packages.pfsense.org/packages/config/squid_nac.xml</item>
 	</additional_files_needed>
 	<additional_files_needed>
-		<item>http://www.pfsense.org/packages/config/squid_traffic.xml</item>
+		<item>https://packages.pfsense.org/packages/config/squid_traffic.xml</item>
 	</additional_files_needed>
 	<additional_files_needed>
-		<item>http://www.pfsense.org/packages/config/squid_upstream.xml</item>
+		<item>https://packages.pfsense.org/packages/config/squid_upstream.xml</item>
 	</additional_files_needed>
 	<additional_files_needed>
-		<item>http://www.pfsense.org/packages/config/squid_auth.xml</item>
+		<item>https://packages.pfsense.org/packages/config/squid_auth.xml</item>
 	</additional_files_needed>
 	<additional_files_needed>
-		<item>http://www.pfsense.org/packages/config/squid_users.xml</item>
+		<item>https://packages.pfsense.org/packages/config/squid_users.xml</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/bin/</prefix>
 		<chmod>0755</chmod>
-		<item>http://www.pfsense.org/packages/All/squid_monitor.sh</item>
+		<item>https://www.pfsense.org/packages/All/squid_monitor.sh</item>
 	</additional_files_needed>
 	<fields>
 		<field>

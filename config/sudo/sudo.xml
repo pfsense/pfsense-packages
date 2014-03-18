@@ -16,7 +16,7 @@
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>077</chmod>
-		<item>http://www.pfsense.com/packages/config/sudo/sudo.inc</item>
+		<item>https://packages.pfsense.org/packages/config/sudo/sudo.inc</item>
 	</additional_files_needed>
 	<fields>
 		<field>
