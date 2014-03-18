@@ -226,6 +226,16 @@ if ($suricatacfg['barnyard_enable'] == 'on')
 else
 	$barnyard2_enabled = "no";
 
+if (isset($suricatacfg['unified2_log_limit']))
+	$unified2_log_limit = "{$suricatacfg['unified2_log_limit']}mb";
+else
+	$unified2_log_limit = "32mb";
+
+if (isset($suricatacfg['barnyard_sensor_id']))
+	$unified2_sensor_id = $suricatacfg['barnyard_sensor_id'];
+else
+	$unified2_sensor_id = "0";
+
 // Add interface-specific IP defrag settings
 if (!empty($suricatacfg['frag_memcap']))
 	$frag_memcap = $suricatacfg['frag_memcap'];

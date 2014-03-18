@@ -55,6 +55,8 @@ if (isset($id) && $a_nat[$id]) {
 		$pconfig['barnyard_dbpwd'] = base64_decode($a_nat[$id]['barnyard_dbpwd']);
 	if (empty($a_nat[$id]['barnyard_show_year']))
 		$pconfig['barnyard_show_year'] = "on";
+	if (empty($a_nat[$id]['unified2_log_limit']))
+		$pconfig['unified2_log_limit'] = "32";
 	if (empty($a_nat[$id]['barnyard_archive_enable']))
 		$pconfig['barnyard_archive_enable'] = "on";
 	if (empty($a_nat[$id]['barnyard_obfuscate_ip']))
@@ -71,6 +73,8 @@ if (isset($id) && $a_nat[$id]) {
 		$pconfig['barnyard_syslog_priority'] = "LOG_INFO";
 	if (empty($a_nat[$id]['barnyard_bro_ids_dport']))
 		$pconfig['barnyard_bro_ids_dport'] = "47760";
+	if (empty($a_nat[$id]['barnyard_sensor_id']))
+		$pconfig['barnyard_sensor_id'] = "0";
 	if (empty($a_nat[$id]['barnyard_sensor_name']))
 		$pconfig['barnyard_sensor_name'] = php_uname("n");
 }
@@ -80,6 +84,18 @@ if ($_POST['save']) {
 	if ($_POST['barnyard_mysql_enable'] != 'on' && $_POST['barnyard_syslog_enable'] != 'on' &&
 	    $_POST['barnyard_bro_ids_enable'] != 'on' && $_POST['barnyard_enable'] == "on")
 		$input_errors[] = gettext("You must enable at least one output option when using Barnyard2.");
+
+	// Validate unified2 log file limit
+	if ($_POST['barnyard_enable'] == 'on') {
+		if (!is_numericint($_POST['unified2_log_limit']) || $_POST['unified2_log_limit'] < 1)
+			$input_errors[] = gettext("The value for 'Unified2 Log Limit' must be a valid integer greater than zero.");
+	}
+
+	// Validate Sensor ID is a valid integer
+	if ($_POST['barnyard_enable'] == 'on') {
+		if (!is_numericint($_POST['barnyard_sensor_id']) || $_POST['barnyard_sensor_id'] < 0)
+			$input_errors[] = gettext("The value for 'Sensor ID' must be a valid positive integer.");
+	}
 
 	// Validate inputs if MySQL database loggging enabled
 	if ($_POST['barnyard_mysql_enable'] == 'on' && $_POST['barnyard_enable'] == "on") {
@@ -126,7 +142,9 @@ if ($_POST['save']) {
 		$natent['barnyard_syslog_opmode'] = $_POST['barnyard_syslog_opmode'];
 		$natent['barnyard_syslog_proto'] = $_POST['barnyard_syslog_proto'];
 
+		if ($_POST['barnyard_sensor_id']) $natent['barnyard_sensor_id'] = $_POST['barnyard_sensor_id']; else $natent['barnyard_sensor_id'] = '0';
 		if ($_POST['barnyard_sensor_name']) $natent['barnyard_sensor_name'] = $_POST['barnyard_sensor_name']; else unset($natent['barnyard_sensor_name']);
+		if ($_POST['unified2_log_limit']) $natent['unified2_log_limit'] = $_POST['unified2_log_limit']; else unset($natent['unified2_log_limit']);
 		if ($_POST['barnyard_dbhost']) $natent['barnyard_dbhost'] = $_POST['barnyard_dbhost']; else unset($natent['barnyard_dbhost']);
 		if ($_POST['barnyard_dbname']) $natent['barnyard_dbname'] = $_POST['barnyard_dbname']; else unset($natent['barnyard_dbname']);
 		if ($_POST['barnyard_dbuser']) $natent['barnyard_dbuser'] = $_POST['barnyard_dbuser']; else unset($natent['barnyard_dbuser']);
@@ -266,6 +284,15 @@ include_once("head.inc");
 				</td>
 			</tr>
 			<tr>
+				<td width="22%" valign="top" class="vncell"><?php echo gettext("Unified2 Log Limit"); ?></td>
+				<td width="78%" class="vtable">
+					<input name="unified2_log_limit" type="text" class="formfld unknown" 
+					id="unified2_log_limit" size="25" value="<?=htmlspecialchars($pconfig['unified2_log_limit']);?>"/>
+					&nbsp;<?php echo gettext("Log file size limit in megabytes (MB). Default is "); ?><strong><?=gettext("32 MB.");?></strong><br/>
+					<?php echo gettext("This sets the maximum size for a unified2 log file before it is rotated and a new one created."); ?>
+				</td>
+			</tr>
+			<tr>
 				<td width="22%" valign="top" class="vncell"><?php echo gettext("Archive Unified2 Logs"); ?></td>
 				<td width="78%" class="vtable">
 					<input name="barnyard_archive_enable" type="checkbox" value="on" <?php if ($pconfig['barnyard_archive_enable'] == "on") echo "checked"; ?>/>
@@ -287,11 +314,19 @@ include_once("head.inc");
 					<?php echo gettext("Enable obfuscation of logged IP addresses.  Default value is ") . "<strong>" . gettext("Not Checked") . "</strong>"; ?>
 				</td>
 			<tr>
+				<td width="22%" valign="top" class="vncell"><?php echo gettext("Sensor ID"); ?></td>
+				<td width="78%" class="vtable">
+					<input name="barnyard_sensor_id" type="text" class="formfld unknown" 
+					id="barnyard_sensor_id" size="25" value="<?=htmlspecialchars($pconfig['barnyard_sensor_id']);?>"/>
+					&nbsp;<?php echo gettext("Sensor ID to use for this sensor. Default is ") . "<strong>" . gettext("0.") . "</strong>"; ?>
+				</td>
+			</tr>
+			<tr>
 				<td width="22%" valign="top" class="vncell"><?php echo gettext("Sensor Name"); ?></td>
 				<td width="78%" class="vtable">
 					<input name="barnyard_sensor_name" type="text" class="formfld unknown" 
 					id="barnyard_sensor_name" size="25" value="<?=htmlspecialchars($pconfig['barnyard_sensor_name']);?>"/>
-					&nbsp;<?php echo gettext("Unique name to use for this sensor."); ?>
+					&nbsp;<?php echo gettext("Unique name to use for this sensor. (Optional)"); ?>
 				</td>
 			</tr>
 			<tr>
@@ -555,10 +590,12 @@ function enable_change(enable_change) {
 	endis = !(document.iform.barnyard_enable.checked || enable_change);
 	// make sure a default answer is called if this is invoked.
 	endis2 = (document.iform.barnyard_enable);
+	document.iform.unified2_log_limit.disabled = endis;
 	document.iform.barnyard_archive_enable.disabled = endis;
 	document.iform.barnyard_show_year.disabled = endis;
 	document.iform.barnyard_dump_payload.disabled = endis;
 	document.iform.barnyard_obfuscate_ip.disabled = endis;
+	document.iform.barnyard_sensor_id.disabled = endis;
 	document.iform.barnyard_sensor_name.disabled = endis;
 	document.iform.barnyard_mysql_enable.disabled = endis;
 	document.iform.barnyard_dbhost.disabled = endis;
