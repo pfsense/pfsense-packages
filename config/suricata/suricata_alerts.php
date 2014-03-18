@@ -554,15 +554,15 @@ if (file_exists("/var/log/suricata/suricata_{$if_real}{$suricata_uuid}/alerts.lo
 			$alert_class = $fields[6];
 
 			echo "<tr>
-				<td class='listlr' align='center'>{$alert_date}<br/>{$alert_time}</td>
-				<td class='listlr' align='center'>{$alert_priority}</td>
-				<td class='listlr' align='center'>{$alert_proto}</td>
-				<td class='listlr' style=\"word-wrap:break-word;\">{$alert_class}</td>
-				<td class='listlr' align='center' sorttable_customkey='{$fields[9]}'>{$alert_ip_src}</td>
-				<td class='listlr' align='center'>{$alert_src_p}</td>
-				<td class='listlr' align='center' sorttable_customkey='{$fields[11]}'>{$alert_ip_dst}</td>
-				<td class='listlr' align='center'>{$alert_dst_p}</td>
-				<td class='listlr' align='center' sorttable_customkey='{$fields[3]}'>{$alert_sid_str}<br/>{$sidsupplink}&nbsp;&nbsp;{$sid_dsbl_link}</td>
+				<td class='listr' align='center'>{$alert_date}<br/>{$alert_time}</td>
+				<td class='listr' align='center'>{$alert_priority}</td>
+				<td class='listr' align='center'>{$alert_proto}</td>
+				<td class='listr' style=\"word-wrap:break-word;\">{$alert_class}</td>
+				<td class='listr' align='center' sorttable_customkey='{$fields[9]}'>{$alert_ip_src}</td>
+				<td class='listr' align='center'>{$alert_src_p}</td>
+				<td class='listr' align='center' sorttable_customkey='{$fields[11]}'>{$alert_ip_dst}</td>
+				<td class='listr' align='center'>{$alert_dst_p}</td>
+				<td class='listr' align='center' sorttable_customkey='{$fields[3]}'>{$alert_sid_str}<br/>{$sidsupplink}&nbsp;&nbsp;{$sid_dsbl_link}</td>
 				<td class='listbg' style=\"word-wrap:break-word;\">{$alert_descr}</td>
 				</tr>\n";
 

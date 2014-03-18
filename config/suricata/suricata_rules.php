@@ -615,27 +615,27 @@ if ($savemsg) {
 								src=\"../themes/{$g['theme']}/images/icons/{$iconb}\" width=\"11\" height=\"11\" border=\"0\"  
 								title='{$title}' name=\"toggle[]\"/></a>{$textse}
 							       </td>
-							       <td class=\"listlr\" style=\"text-align:center;\" ondblclick=\"wopen('suricata_rules_edit.php?id={$id}&openruleset={$currentruleset}&sid={$sid}&gid={$gid}','FileViewer',800,600);\">
+							       <td class=\"listr\" style=\"text-align:center;\" ondblclick=\"wopen('suricata_rules_edit.php?id={$id}&openruleset={$currentruleset}&sid={$sid}&gid={$gid}','FileViewer',800,600);\">
 									{$textss}{$gid}{$textse}
 							       </td>
-							       <td class=\"listlr\" style=\"text-align:center;\" ondblclick=\"wopen('suricata_rules_edit.php?id={$id}&openruleset={$currentruleset}&sid={$sid}&gid={$gid}','FileViewer',800,600);\">
+							       <td class=\"listr\" style=\"text-align:center;\" ondblclick=\"wopen('suricata_rules_edit.php?id={$id}&openruleset={$currentruleset}&sid={$sid}&gid={$gid}','FileViewer',800,600);\">
 									<a href=\"javascript: void(0)\" 
 									onclick=\"wopen('suricata_rules_edit.php?id={$id}&openruleset={$currentruleset}&sid={$sid}&gid={$gid}','FileViewer',800,600);\" 
 									title='{$sid_tooltip}'>{$textss}{$sid}{$textse}</a>
 							       </td>
-							       <td class=\"listlr\" style=\"text-align:center;\" ondblclick=\"wopen('suricata_rules_edit.php?id={$id}&openruleset={$currentruleset}&sid={$sid}&gid={$gid}','FileViewer',800,600);\">
+							       <td class=\"listr\" style=\"text-align:center;\" ondblclick=\"wopen('suricata_rules_edit.php?id={$id}&openruleset={$currentruleset}&sid={$sid}&gid={$gid}','FileViewer',800,600);\">
 									{$textss}{$protocol}{$textse}
 							       </td>
-							       <td class=\"listlr ellipsis\" nowrap style=\"text-align:center;\" ondblclick=\"wopen('suricata_rules_edit.php?id={$id}&openruleset={$currentruleset}&sid={$sid}&gid={$gid}','FileViewer',800,600);\">
+							       <td class=\"listr ellipsis\" nowrap style=\"text-align:center;\" ondblclick=\"wopen('suricata_rules_edit.php?id={$id}&openruleset={$currentruleset}&sid={$sid}&gid={$gid}','FileViewer',800,600);\">
 									{$srcspan}{$source}</span>
 							       </td>
-							       <td class=\"listlr ellipsis\" nowrap style=\"text-align:center;\" ondblclick=\"wopen('suricata_rules_edit.php?id={$id}&openruleset={$currentruleset}&sid={$sid}&gid={$gid}','FileViewer',800,600);\">
+							       <td class=\"listr ellipsis\" nowrap style=\"text-align:center;\" ondblclick=\"wopen('suricata_rules_edit.php?id={$id}&openruleset={$currentruleset}&sid={$sid}&gid={$gid}','FileViewer',800,600);\">
 									{$srcprtspan}{$source_port}</span>
 							       </td>
-							       <td class=\"listlr ellipsis\" nowrap style=\"text-align:center;\" ondblclick=\"wopen('suricata_rules_edit.php?id={$id}&openruleset={$currentruleset}&sid={$sid}&gid={$gid}','FileViewer',800,600);\">
+							       <td class=\"listr ellipsis\" nowrap style=\"text-align:center;\" ondblclick=\"wopen('suricata_rules_edit.php?id={$id}&openruleset={$currentruleset}&sid={$sid}&gid={$gid}','FileViewer',800,600);\">
 									{$dstspan}{$destination}</span>
 							       </td>
-							       <td class=\"listlr ellipsis\" nowrap style=\"text-align:center;\" ondblclick=\"wopen('suricata_rules_edit.php?id={$id}&openruleset={$currentruleset}&sid={$sid}&gid={$gid}','FileViewer',800,600);\">
+							       <td class=\"listr ellipsis\" nowrap style=\"text-align:center;\" ondblclick=\"wopen('suricata_rules_edit.php?id={$id}&openruleset={$currentruleset}&sid={$sid}&gid={$gid}','FileViewer',800,600);\">
 								       {$dstprtspan}{$destination_port}</span>
 							       </td>
 								<td class=\"listbg\" style=\"word-wrap:break-word; whitespace:pre-line;\" ondblclick=\"wopen('suricata_rules_edit.php?id={$id}&openruleset={$currentruleset}&sid={$sid}&gid={$gid}','FileViewer',800,600);\"> 
