@@ -190,7 +190,7 @@ include_once("head.inc");
 			<th class="list">&nbsp;</th>
 			<th class="listhdrr"><?php echo gettext("Interface"); ?></th>
 			<th class="listhdrr"><?php echo gettext("Suricata"); ?></th>
-			<th class="listhdrr"><?php echo gettext("Pattern Matcher"); ?></th>
+			<th class="listhdrr"><?php echo gettext("Pattern Match"); ?></th>
 			<th class="listhdrr"><?php echo gettext("Block"); ?></th>
 			<th class="listhdrr"><?php echo gettext("Barnyard2"); ?></th>
 			<th class="listhdr"><?php echo gettext("Description"); ?></th>
