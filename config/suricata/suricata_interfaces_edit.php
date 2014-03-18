@@ -890,6 +890,7 @@ function viewList(id, elemID, elemType) {
 	}
 	var url = "suricata_list_view.php?id=" + id + "&wlist=";
 	url = url + getSelectedValue(elemID) + "&type=" + elemType;
+	url = url + "&time=" + new Date().getTime();
 	wopen(url, 'WhitelistViewer', 640, 480);
 }
 
