@@ -226,8 +226,8 @@ if ($suricatacfg['barnyard_enable'] == 'on')
 else
 	$barnyard2_enabled = "no";
 
-if (isset($suricatacfg['unified2_log_limit']))
-	$unified2_log_limit = "{$suricatacfg['unified2_log_limit']}mb";
+if (isset($config['installedpackages']['suricata']['config'][0]['unified2_log_limit']))
+	$unified2_log_limit = "{$config['installedpackages']['suricata']['config'][0]['unified2_log_limit']}mb";
 else
 	$unified2_log_limit = "32mb";
 
