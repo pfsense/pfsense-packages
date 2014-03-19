@@ -30,10 +30,10 @@
 require_once("guiconfig.inc");
 require_once("/usr/local/pkg/suricata/suricata.inc");
 
-if ($_POST['instance'])
+if (isset($_POST['instance']) && is_numericint($_POST['instance']))
 	$instanceid = $_POST['instance'];
-if ($_GET['instance'])
-	$instanceid = $_GET['instance'];
+elseif (isset($_GET['instance']) && is_numericint($_GET['instance']))
+	$instanceid = htmlspecialchars($_GET['instance']);
 if (empty($instanceid))
 	$instanceid = 0;
 
@@ -131,6 +131,7 @@ if ($input_errors) {
 		$tab_array[] = array(gettext("Alerts"), false, "/suricata/suricata_alerts.php?instance={$instanceid}");
 		$tab_array[] = array(gettext("Suppress"), false, "/suricata/suricata_suppress.php");
 		$tab_array[] = array(gettext("Logs Browser"), true, "/suricata/suricata_logs_browser.php");
+		$tab_array[] = array(gettext("Logs Mgmt"), false, "/suricata/suricata_logs_mgmt.php");
 		display_top_tabs($tab_array);
 	?>
 	</td>

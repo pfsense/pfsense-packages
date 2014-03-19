@@ -121,11 +121,12 @@ function suricata_add_supplist_entry($suppress) {
 		return false;
 }
 
-if (is_numericint($_POST['instance']))
+if (isset($_POST['instance']) && is_numericint($_POST['instance']))
 	$instanceid = $_POST['instance'];
 // This is for the auto-refresh so we can  stay on the same interface
-if (is_numericint($_GET['instance']))
+elseif (isset($_GET['instance']) && is_numericint($_GET['instance']))
 	$instanceid = $_GET['instance'];
+
 if (is_null($instanceid))
 	$instanceid = 0;
 
@@ -355,7 +356,8 @@ if ($savemsg) {
 	$tab_array[] = array(gettext("Update Rules"), false, "/suricata/suricata_download_updates.php");
 	$tab_array[] = array(gettext("Alerts"), true, "/suricata/suricata_alerts.php");
 	$tab_array[] = array(gettext("Suppress"), false, "/suricata/suricata_suppress.php");
-	$tab_array[] = array(gettext("Logs Browser"), false, "/suricata/suricata_logs_browser.php");
+	$tab_array[] = array(gettext("Logs Browser"), false, "/suricata/suricata_logs_browser.php?instance={$instanceid}");
+	$tab_array[] = array(gettext("Logs Mgmt"), false, "/suricata/suricata_logs_mgmt.php");
 	display_top_tabs($tab_array);
 ?>
 </td></tr>

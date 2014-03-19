@@ -41,23 +41,15 @@ $pconfig['etprocode'] = $config['installedpackages']['suricata']['config'][0]['e
 $pconfig['enable_etopen_rules'] = $config['installedpackages']['suricata']['config'][0]['enable_etopen_rules'];
 $pconfig['enable_etpro_rules'] = $config['installedpackages']['suricata']['config'][0]['enable_etpro_rules'];
 $pconfig['rm_blocked'] = $config['installedpackages']['suricata']['config'][0]['rm_blocked'];
-$pconfig['suricataloglimit'] = $config['installedpackages']['suricata']['config'][0]['suricataloglimit'];
-$pconfig['suricataloglimitsize'] = $config['installedpackages']['suricata']['config'][0]['suricataloglimitsize'];
 $pconfig['autoruleupdate'] = $config['installedpackages']['suricata']['config'][0]['autoruleupdate'];
 $pconfig['autoruleupdatetime'] = $config['installedpackages']['suricata']['config'][0]['autoruleupdatetime'];
 $pconfig['live_swap_updates'] = $config['installedpackages']['suricata']['config'][0]['live_swap_updates'];
 $pconfig['log_to_systemlog'] = $config['installedpackages']['suricata']['config'][0]['log_to_systemlog'];
-$pconfig['clearlogs'] = $config['installedpackages']['suricata']['config'][0]['clearlogs'];
 $pconfig['forcekeepsettings'] = $config['installedpackages']['suricata']['config'][0]['forcekeepsettings'];
 $pconfig['snortcommunityrules'] = $config['installedpackages']['suricata']['config'][0]['snortcommunityrules'];
 
-if (empty($pconfig['suricataloglimit']))
-	$pconfig['suricataloglimit'] = 'on';
 if (empty($pconfig['autoruleupdatetime']))
 	$pconfig['autoruleupdatetime'] = '00:30';
-if (empty($pconfig['suricataloglimitsize']))
-	// Set limit to 20% of slice that is unused */
-	$pconfig['suricataloglimitsize'] = round(exec('df -k /var | grep -v "Filesystem" | awk \'{print $4}\'') * .20 / 1024);
 
 if ($_POST['autoruleupdatetime']) {
 	if (!preg_match('/^([01]?[0-9]|2[0-3]):?([0-5][0-9])$/', $_POST['autoruleupdatetime']))
@@ -116,18 +108,7 @@ if (!$input_errors) {
 
 		$config['installedpackages']['suricata']['config'][0]['oinkcode'] = $_POST['oinkcode'];
 		$config['installedpackages']['suricata']['config'][0]['etprocode'] = $_POST['etprocode'];
-
 		$config['installedpackages']['suricata']['config'][0]['rm_blocked'] = $_POST['rm_blocked'];
-		if ($_POST['suricataloglimitsize']) {
-			$config['installedpackages']['suricata']['config'][0]['suricataloglimit'] = $_POST['suricataloglimit'];
-			$config['installedpackages']['suricata']['config'][0]['suricataloglimitsize'] = $_POST['suricataloglimitsize'];
-		} else {
-			$config['installedpackages']['suricata']['config'][0]['suricataloglimit'] = 'on';
-
-			/* code will set limit to 21% of slice that is unused */
-			$suricataloglimitDSKsize = round(exec('df -k /var | grep -v "Filesystem" | awk \'{print $4}\'') * .22 / 1024);
-			$config['installedpackages']['suricata']['config'][0]['suricataloglimitsize'] = $suricataloglimitDSKsize;
-		}
 		$config['installedpackages']['suricata']['config'][0]['autoruleupdate'] = $_POST['autoruleupdate'];
 
 		/* Check and adjust format of Rule Update Starttime string to add colon and leading zero if necessary */
@@ -139,7 +120,6 @@ if (!$input_errors) {
 		$config['installedpackages']['suricata']['config'][0]['autoruleupdatetime'] = str_pad($_POST['autoruleupdatetime'], 4, "0", STR_PAD_LEFT);
 		$config['installedpackages']['suricata']['config'][0]['log_to_systemlog'] = $_POST['log_to_systemlog'] ? 'on' : 'off';
 		$config['installedpackages']['suricata']['config'][0]['live_swap_updates'] = $_POST['live_swap_updates'] ? 'on' : 'off';
-		$config['installedpackages']['suricata']['config'][0]['clearlogs'] = $_POST['clearlogs'] ? 'on' : 'off';
 		$config['installedpackages']['suricata']['config'][0]['forcekeepsettings'] = $_POST['forcekeepsettings'] ? 'on' : 'off';
 
 		$retval = 0;
@@ -190,6 +170,7 @@ if ($input_errors)
 	$tab_array[] = array(gettext("Alerts"), false, "/suricata/suricata_alerts.php");
 	$tab_array[] = array(gettext("Suppress"), false, "/suricata/suricata_suppress.php");
 	$tab_array[] = array(gettext("Logs Browser"), false, "/suricata/suricata_logs_browser.php");
+	$tab_array[] = array(gettext("Logs Mgmt"), false, "/suricata/suricata_logs_mgmt.php");
         display_top_tabs($tab_array);
 ?>
 </td></tr>
@@ -323,39 +304,6 @@ if ($input_errors)
 <tr>
 	<td colspan="2" valign="top" class="listtopic"><?php echo gettext("General Settings"); ?></td>
 </tr>
-<tr>
-<?php $suricatalogCurrentDSKsize = round(exec('df -k /var | grep -v "Filesystem" | awk \'{print $4}\'') / 1024); ?>
-	<td width="22%" valign="top" class="vncell"><?php echo gettext("Log Directory Size " .
-	"Limit"); ?><br/>
-	<br/>
-	<br/>
-	<span class="red"><strong><?php echo gettext("Note:"); ?></strong></span><br/>
-	<?php echo gettext("Available space is"); ?> <strong><?php echo $suricatalogCurrentDSKsize; ?>&nbsp;MB</strong></td>
-	<td width="78%" class="vtable">
-		<table cellpadding="0" cellspacing="0">
-			<tr>
-				<td colspan="2"><input name="suricataloglimit" type="radio" id="suricataloglimit" value="on" 
-					<?php if($pconfig['suricataloglimit']=='on') echo 'checked'; ?>/><span class="vexpl">
-					<strong><?php echo gettext("Enable"); ?></strong> <?php echo gettext("directory size limit"); ?> (<strong><?php echo gettext("Default"); ?></strong>)</span></td>
-			</tr>
-			<tr>
-				<td colspan="2"><input name="suricataloglimit" type="radio" id="suricataloglimit" value="off" 
-					<?php if($pconfig['suricataloglimit']=='off') echo 'checked'; ?>/> <span class="vexpl"><strong><?php echo gettext("Disable"); ?></strong>
-					<?php echo gettext("directory size limit"); ?></span><br/>
-				<br/>
-				<span class="red"><strong><?php echo gettext("Warning:"); ?></strong></span> <?php echo gettext("Nanobsd " .
-				"should use no more than 10MB of space."); ?></td>
-			</tr>
-		</table>
-		<table width="100%" border="0" cellpadding="2" cellspacing="0">
-			<tr>
-				<td class="vexpl"><?php echo gettext("Size in ") . "<strong>" . gettext("MB:") . "</strong>";?>&nbsp;
-				<input name="suricataloglimitsize" type="text" class="formfld unknown" id="suricataloglimitsize" size="10" value="<?=htmlspecialchars($pconfig['suricataloglimitsize']);?>"/>
-				&nbsp;<?php echo gettext("Default is ") . "<strong>" . gettext("20%") . "</strong>" . gettext(" of available space.");?></td>
-			</tr>
-		</table>
-	</td>
-</tr>
 <tr style="display:none;">
 	<td width="22%" valign="top" class="vncell"><?php echo gettext("Remove Blocked Hosts Interval"); ?></td>
 	<td width="78%" class="vtable">
@@ -376,12 +324,6 @@ if ($input_errors)
 	<td width="78%" class="vtable"><input name="log_to_systemlog" id="log_to_systemlog" type="checkbox" value="yes"
 	<?php if ($config['installedpackages']['suricata']['config'][0]['log_to_systemlog']=="on") echo " checked"; ?>/>&nbsp;
 	<?php echo gettext("Copy Suricata messages to the firewall system log."); ?></td>
-</tr>
-<tr>
-	<td width="22%" valign="top" class="vncell"><?php echo gettext("Remove Suricata Log Files After Deinstall"); ?></td>
-	<td width="78%" class="vtable"><input name="clearlogs" id="clearlogs" type="checkbox" value="yes"
-	<?php if ($config['installedpackages']['suricata']['config'][0]['clearlogs']=="on") echo " checked"; ?>/>&nbsp;
-	<?php echo gettext("Suricata log files will be removed during package deinstallation."); ?></td>
 </tr>
 <tr>
 	<td width="22%" valign="top" class="vncell"><?php echo gettext("Keep Suricata Settings After Deinstall"); ?></td>

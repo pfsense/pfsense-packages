@@ -33,9 +33,11 @@ require_once("/usr/local/pkg/suricata/suricata.inc");
 
 global $g, $rebuild_rules;
 
-$id = $_GET['id'];
-if (isset($_POST['id']))
+if (isset($_POST['id']) && is_numericint($_POST['id']))
 	$id = $_POST['id'];
+elseif (isset($_GET['id']) && is_numericint($_GET['id']))
+	$id = htmlspecialchars($_GET['id']);
+
 if (is_null($id)) {
         header("Location: /suricata/suricata_interfaces.php");
         exit;
@@ -55,8 +57,6 @@ if (isset($id) && $a_nat[$id]) {
 		$pconfig['barnyard_dbpwd'] = base64_decode($a_nat[$id]['barnyard_dbpwd']);
 	if (empty($a_nat[$id]['barnyard_show_year']))
 		$pconfig['barnyard_show_year'] = "on";
-	if (empty($a_nat[$id]['unified2_log_limit']))
-		$pconfig['unified2_log_limit'] = "32";
 	if (empty($a_nat[$id]['barnyard_archive_enable']))
 		$pconfig['barnyard_archive_enable'] = "on";
 	if (empty($a_nat[$id]['barnyard_obfuscate_ip']))
@@ -84,12 +84,6 @@ if ($_POST['save']) {
 	if ($_POST['barnyard_mysql_enable'] != 'on' && $_POST['barnyard_syslog_enable'] != 'on' &&
 	    $_POST['barnyard_bro_ids_enable'] != 'on' && $_POST['barnyard_enable'] == "on")
 		$input_errors[] = gettext("You must enable at least one output option when using Barnyard2.");
-
-	// Validate unified2 log file limit
-	if ($_POST['barnyard_enable'] == 'on') {
-		if (!is_numericint($_POST['unified2_log_limit']) || $_POST['unified2_log_limit'] < 1)
-			$input_errors[] = gettext("The value for 'Unified2 Log Limit' must be a valid integer greater than zero.");
-	}
 
 	// Validate Sensor ID is a valid integer
 	if ($_POST['barnyard_enable'] == 'on') {
@@ -144,7 +138,6 @@ if ($_POST['save']) {
 
 		if ($_POST['barnyard_sensor_id']) $natent['barnyard_sensor_id'] = $_POST['barnyard_sensor_id']; else $natent['barnyard_sensor_id'] = '0';
 		if ($_POST['barnyard_sensor_name']) $natent['barnyard_sensor_name'] = $_POST['barnyard_sensor_name']; else unset($natent['barnyard_sensor_name']);
-		if ($_POST['unified2_log_limit']) $natent['unified2_log_limit'] = $_POST['unified2_log_limit']; else unset($natent['unified2_log_limit']);
 		if ($_POST['barnyard_dbhost']) $natent['barnyard_dbhost'] = $_POST['barnyard_dbhost']; else unset($natent['barnyard_dbhost']);
 		if ($_POST['barnyard_dbname']) $natent['barnyard_dbname'] = $_POST['barnyard_dbname']; else unset($natent['barnyard_dbname']);
 		if ($_POST['barnyard_dbuser']) $natent['barnyard_dbuser'] = $_POST['barnyard_dbuser']; else unset($natent['barnyard_dbuser']);
@@ -201,6 +194,7 @@ if ($_POST['save']) {
 		$pconfig['barnyard_syslog_proto'] = $_POST['barnyard_syslog_proto'];
 		$pconfig['barnyard_bro_ids_enable'] = $_POST['barnyard_bro_ids_enable'];
 
+		$pconfig['barnyard_sensor_id'] = $_POST['barnyard_sensor_id'];
 		$pconfig['barnyard_sensor_name'] = $_POST['barnyard_sensor_name'];
 		$pconfig['barnyard_dbhost'] = $_POST['barnyard_dbhost'];
 		$pconfig['barnyard_dbname'] = $_POST['barnyard_dbname'];
@@ -247,6 +241,7 @@ include_once("head.inc");
 	$tab_array[] = array(gettext("Alerts"), false, "/suricata/suricata_alerts.php?instance={$id}");
 	$tab_array[] = array(gettext("Suppress"), false, "/suricata/suricata_suppress.php");
 	$tab_array[] = array(gettext("Logs Browser"), false, "/suricata/suricata_logs_browser.php?instance={$id}");
+	$tab_array[] = array(gettext("Logs Mgmt"), false, "/suricata/suricata_logs_mgmt.php");
 	display_top_tabs($tab_array);
 	echo '</td></tr>';
 	echo '<tr><td class="tabnavtbl">';
@@ -281,15 +276,6 @@ include_once("head.inc");
 				<td width="78%" class="vtable">
 					<input name="barnyard_show_year" type="checkbox" value="on" <?php if ($pconfig['barnyard_show_year'] == "on") echo "checked"; ?>/>
 					<?php echo gettext("Enable the year being shown in timestamps.  Default value is ") . "<strong>" . gettext("Checked") . "</strong>"; ?>
-				</td>
-			</tr>
-			<tr>
-				<td width="22%" valign="top" class="vncell"><?php echo gettext("Unified2 Log Limit"); ?></td>
-				<td width="78%" class="vtable">
-					<input name="unified2_log_limit" type="text" class="formfld unknown" 
-					id="unified2_log_limit" size="25" value="<?=htmlspecialchars($pconfig['unified2_log_limit']);?>"/>
-					&nbsp;<?php echo gettext("Log file size limit in megabytes (MB). Default is "); ?><strong><?=gettext("32 MB.");?></strong><br/>
-					<?php echo gettext("This sets the maximum size for a unified2 log file before it is rotated and a new one created."); ?>
 				</td>
 			</tr>
 			<tr>
@@ -590,7 +576,6 @@ function enable_change(enable_change) {
 	endis = !(document.iform.barnyard_enable.checked || enable_change);
 	// make sure a default answer is called if this is invoked.
 	endis2 = (document.iform.barnyard_enable);
-	document.iform.unified2_log_limit.disabled = endis;
 	document.iform.barnyard_archive_enable.disabled = endis;
 	document.iform.barnyard_show_year.disabled = endis;
 	document.iform.barnyard_dump_payload.disabled = endis;

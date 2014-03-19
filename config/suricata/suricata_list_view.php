@@ -34,9 +34,11 @@ global $g, $config;
 
 $contents = '';
 
-$id = $_GET['id'];
-$wlist = $_GET['wlist'];
-$type = $_GET['type'];
+if (isset($_GET['id']) && is_numericint($_GET['id']))
+	$id = htmlspecialchars($_GET['id']);
+
+$wlist = htmlspecialchars($_GET['wlist']);
+$type = htmlspecialchars($_GET['type']);
 
 if (isset($id) && isset($wlist)) {
 	$a_rule = $config['installedpackages']['suricata']['rule'][$id];
@@ -86,7 +88,7 @@ $pgtitle = array(gettext("Suricata"), gettext(ucfirst($type) . " Viewer"));
 		<tr>
 			<td colspan="2" valign="top" class="label">
 			<div style="background: #eeeeee; width:100%; height:100%;" id="textareaitem"><!-- NOTE: The opening *and* the closing textarea tag must be on the same line. -->
-			<textarea style="width:100%; height:100%;" readonly wrap="off" rows="25" cols="80" name="code2"><?=$contents;?></textarea>
+			<textarea style="width:100%; height:100%;" readonly wrap="off" rows="25" cols="80" name="code2"><?=htmlspecialchars($contents);?></textarea>
 			</div>
 			</td>
 		</tr>

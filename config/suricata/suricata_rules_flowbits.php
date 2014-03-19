@@ -41,7 +41,7 @@ if (!is_array($config['installedpackages']['suricata']['rule'])) {
 }
 $a_nat = &$config['installedpackages']['suricata']['rule'];
 
-if (isset($_POST['id']))
+if (isset($_POST['id']) && is_numericint($_POST['id']))
 	$id = $_POST['id'];
 elseif (isset($_GET['id']) && is_numericint($_GET['id']))
 	$id = htmlspecialchars($_GET['id']);

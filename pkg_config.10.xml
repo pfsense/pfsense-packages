@@ -1579,7 +1579,7 @@
 		<website>http://suricata-ids.org/</website>
 		<descr><![CDATA[Suricata is the OISF IDP engine, the open source Intrusion Detection and Prevention Engine.]]></descr>
 		<category>Security</category>
-		<version>1.4.6 pkg v0.2</version>
+		<version>1.4.6 pkg v0.3</version>
 		<status>BETA</status>
 		<required_version>2.2</required_version>
 		<config_file>https://packages.pfsense.org/packages/config/suricata/suricata.xml</config_file>

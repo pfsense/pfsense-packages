@@ -41,7 +41,7 @@ if (!is_array($config['installedpackages']['suricata']))
 
 // Define the binary and package build versions
 define('SURICATA_VER', '1.4.6');
-define('SURICATA_PKG_VER', 'v0.2-BETA');
+define('SURICATA_PKG_VER', 'v0.3-BETA');
 
 // Create some other useful defines
 define('SURICATADIR', '/usr/pbi/suricata-' . php_uname("m") . '/etc/suricata/');
@@ -1703,6 +1703,9 @@ function suricata_create_rc() {
 	// Loop thru each configured interface and build
 	// the shell script.
 	foreach ($suricataconf as $value) {
+		// Skip disabled Suricata interfaces
+		if ($value['enable'] <> 'on')
+			continue;
 		$suricata_uuid = $value['uuid'];
 		$if_real = get_real_interface($value['interface']);
 
