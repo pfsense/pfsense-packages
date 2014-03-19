@@ -37,6 +37,7 @@ require_once("haproxy_xmlrpcsyncclient.inc");
 
 $d_haproxyconfdirty_path = $g['varrun_path'] . "/haproxy.conf.dirty";
 
+global $a_acltypes;
 $a_acltypes = array();
 $a_acltypes["host_starts_with"] = array('name' => 'Host starts with',
 				'mode' => 'http', 'syntax' => 'hdr_beg(host) -i %1$s');
@@ -66,6 +67,7 @@ $a_acltypes["backendservercount"] = array('name' => 'Minimum count usable server
 $a_acltypes["ssl_sni_matches"] = array('name' => 'Server Name Indication TLS extension matches', 
 				'mode' => 'https', 'syntax' => 'req_ssl_sni -i %1$s', 'advancedoptions' => "tcp-request inspect-delay 5s\n\ttcp-request content accept if { req_ssl_hello_type 1 }");
 
+global $a_checktypes;
 $a_checktypes = array();
 $a_checktypes['none'] = array('name' => 'none', 'syntax' => '',
 	'descr' => 'No health checks will be performed.');
@@ -92,6 +94,7 @@ $a_checktypes['ESMTP'] = array('name' => 'ESMTP', 'syntax' => 'smtpchk EHLO',
 $a_checktypes['SSL'] = array('name' => 'SSL', 'syntax' => 'ssl-hello-chk',
 	'descr' => 'Use SSLv3 client hello health checks for server testing.');
 
+global $a_httpcheck_method;
 $a_httpcheck_method = array();
 $a_httpcheck_method['OPTIONS'] = array('name' => 'OPTIONS', 'syntax' => 'OPTIONS');
 $a_httpcheck_method['HEAD']    = array('name' => 'HEAD', 'syntax' => 'HEAD');
@@ -101,6 +104,7 @@ $a_httpcheck_method['PUT']     = array('name' => 'PUT', 'syntax' => 'PUT');
 $a_httpcheck_method['DELETE']  = array('name' => 'DELETE', 'syntax' => 'DELETE');
 $a_httpcheck_method['TRACE']   = array('name' => 'TRACE', 'syntax' => 'TRACE');
 
+global $a_closetypes;
 $a_closetypes = array();
 $a_closetypes['none'] = array('name' => 'none', 'syntax' => '',
 	'descr' => 'No close headers will be changed.');
@@ -113,6 +117,7 @@ $a_closetypes['forceclose'] = array('name' => 'forceclose', 'syntax' => 'forcecl
 $a_closetypes['http-keep-alive'] = array('name' => 'http-keep-alive', 'syntax' => 'http-keep-alive',
 	'descr' => 'By default, when a client communicates with a server, HAProxy will only analyze, log, and process the first request of each connection. Setting "option http-keep-alive" enables HTTP keep-alive mode on the client- and server- sides. This provides the lowest latency on the client side (slow network) and the fastest session reuse on the server side at the expense of maintaining idle connections to the servers. In general, it is possible with this option to achieve approximately twice the request rate that the "http-server-close" option achieves on small objects. There are mainly two situations where this option may be useful :   - when the server is non-HTTP compliant and authenticates the connection     instead of requests (eg: NTLM authentication)    - when the cost of establishing the connection to the server is significant     compared to the cost of retrieving the associated object from the server.');
 
+global $a_servermodes;
 $a_servermodes = array();
 $a_servermodes["active"]['name'] = "active";
 $a_servermodes["backup"]['name'] = "backup";
@@ -120,6 +125,7 @@ $a_servermodes["disabled"]['name'] = "disabled";
 $a_servermodes["inactive"]['name'] = "inactive";
 
 // http://www.exceliance.fr/sites/default/files/biblio/aloha_load_balancer_haproxy_cookie_persistence_methods_memo.pdf
+global $a_cookiemode;
 $a_cookiemode = array();
 $a_cookiemode['passive'] 				= array('name' => 'Passive', 'syntax' => 'cookie <cookie name>',
 	'descr' => 'Cookie is analysed on incoming request to choose server. HAProxy does not perform any insertion update or deletion on the Cookie or Set-Cookie. If the Cookie is not set, then the load-balancing algorithm is applied.');
@@ -142,6 +148,7 @@ $a_cookiemode['passive-session-prefix'] = array('name' => 'Passive-session-prefi
 foreach($a_cookiemode as &$cookiemode)
 	$cookiemode['descr'] = $cookiemode['descr'] . "\n\n" . $cookiemode['syntax'] . "";
 
+global $a_sticky_type;
 $a_sticky_type = array();
 $a_sticky_type['none'] = array('name' => 'none',
 	'descr' => "No stick-table will be used");
