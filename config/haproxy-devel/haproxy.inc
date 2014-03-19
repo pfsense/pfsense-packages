@@ -212,21 +212,16 @@ function group_ports($ports) {
 function haproxy_portoralias_to_list($port_or_alias) {
 	// input: a port or aliasname: 80 https MyPortAlias
 	// returns: a array of ports and portranges 80 443 8000:8010
-	global $config;
+	global $aliastable;
 	$portresult = array();
-	if (is_alias($port_or_alias)) {
-		if (is_array($config['aliases']['alias'])) {
-			foreach ($config['aliases']['alias'] as $alias) {
-				if ($alias['name'] == $port_or_alias && preg_match("/port/i", $alias['type'])) {
-					$ports = explode(' ',$alias['address']);
-					foreach($ports as $port) {
-						$portresults = haproxy_portoralias_to_list($port);
-						$portresult = array_merge($portresult, $portresults);
-					}
-					return $portresult;
-				}
-			}
+	if (alias_get_type($port_or_alias) == "port") {
+		$aliasports = $aliastable[$port_or_alias];
+		$ports = explode(' ',$aliasports);
+		foreach($ports as $port) {
+			$portresults = haproxy_portoralias_to_list($port);
+			$portresult = array_merge($portresult, $portresults);
 		}
+		return $portresult;
 	} else if (is_portrange($port_or_alias)) {
 		return (array)$port_or_alias;
 	} else if (is_port($port_or_alias)) {
@@ -436,9 +431,9 @@ EOD;
 	update_output_window($static_output);
 	conf_mount_ro();
 	
-	$static_output .= "HAProxy, calling: haproxy.sh start\n";
+	$static_output .= "HAProxy, starting haproxy (if previously enabled)\n";
 	update_output_window($static_output);
-	exec("/usr/local/etc/rc.d/haproxy.sh start");
+	haproxy_check_run(1);
 	
 	$static_output .= "HAProxy, running haproxy_custom_php_install_command() DONE\n";
 	update_output_window($static_output);
