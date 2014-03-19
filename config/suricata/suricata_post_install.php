@@ -50,14 +50,14 @@ if(is_process_running("suricata")) {
 	killbyname("suricata");
 	sleep(2);
 	// Delete any leftover suricata PID files in /var/run
-	array_map('@unlink', glob("/var/run/suricata_*.pid"));
+	unlink_if_exists("/var/run/suricata_*.pid");
 }
 // Hard kill any running Barnyard2 processes
 if(is_process_running("barnyard")) {
 	killbyname("barnyard2");
 	sleep(2);
 	// Delete any leftover barnyard2 PID files in /var/run
-	array_map('@unlink', glob("/var/run/barnyard2_*.pid"));
+	unlink_if_exists("/var/run/barnyard2_*.pid");
 }
 
 // Set flag for post-install in progress
@@ -110,7 +110,7 @@ if ($config['installedpackages']['suricata']['config'][0]['forcekeepsettings'] =
 	suricata_create_rc();
 
 	// Set Log Limit, Block Hosts Time and Rules Update Time
-	suricata_loglimit_install_cron($config['installedpackages']['suricata']['config'][0]['suricataloglimit'] == 'on' ? true : false);
+	suricata_loglimit_install_cron();
 //	suricata_rm_blocked_install_cron($config['installedpackages']['suricata']['config'][0]['rm_blocked'] != "never_b" ? true : false);
 	suricata_rules_up_install_cron($config['installedpackages']['suricata']['config'][0]['autoruleupdate'] != "never_up" ? true : false);
 
@@ -138,7 +138,7 @@ if ($config['installedpackages']['suricata']['config'][0]['forcekeepsettings'] =
 }
 
 // Update Suricata package version in configuration
-$config['installedpackages']['suricata']['config'][0]['suricata_config_ver'] = "v0.2-BETA";
+$config['installedpackages']['suricata']['config'][0]['suricata_config_ver'] = "v0.3-BETA";
 write_config();
 
 // Done with post-install, so clear flag
