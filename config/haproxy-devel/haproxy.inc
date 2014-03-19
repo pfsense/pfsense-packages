@@ -241,8 +241,6 @@ function haproxy_custom_php_deinstall_command() {
 	update_output_window($static_output);
 	$static_output .= "HAProxy, deleting haproxy webgui\n";
 	update_output_window($static_output);
-	exec("rm /usr/local/pkg/haproxy*");
-	exec("rm /usr/local/www/haproxy*");
 	exec("rm /usr/local/etc/rc.d/haproxy.sh");
 	$static_output .= "HAProxy, installing cron job if needed\n";
 	update_output_window($static_output);
