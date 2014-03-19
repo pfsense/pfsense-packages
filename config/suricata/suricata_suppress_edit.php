@@ -40,9 +40,10 @@ if (!is_array($config['installedpackages']['suricata']['suppress']['item']))
 	$config['installedpackages']['suricata']['suppress']['item'] = array();
 $a_suppress = &$config['installedpackages']['suricata']['suppress']['item'];
 
-$id = $_GET['id'];
-if (isset($_POST['id']))
+if (isset($_POST['id']) && is_numericint($_POST['id']))
 	$id = $_POST['id'];
+elseif (isset($_GET['id']) && is_numericint($_GET['id']))
+	$id = htmlspecialchars($_GET['id']);
 
 /* returns true if $name is a valid name for a whitelist file name or ip */
 function is_validwhitelistname($name) {
@@ -69,7 +70,7 @@ if (isset($id) && $a_suppress[$id]) {
 		$pconfig['uuid'] = uniqid();
 }
 
-if ($_POST['submit']) {
+if ($_POST['save']) {
 	unset($input_errors);
 	$pconfig = $_POST;
 
@@ -139,11 +140,13 @@ if ($savemsg)
 <tr><td>
 <?php
         $tab_array = array();
-	$tab_array[] = array(gettext("Interfaces"), false, "/suricata/suricata_interfaces.php");
+	$tab_array[] = array(gettext("Suricata Interfaces"), false, "/suricata/suricata_interfaces.php");
 	$tab_array[] = array(gettext("Global Settings"), false, "/suricata/suricata_global.php");
 	$tab_array[] = array(gettext("Update Rules"), false, "/suricata/suricata_download_updates.php");
 	$tab_array[] = array(gettext("Alerts"), false, "/suricata/suricata_alerts.php");
 	$tab_array[] = array(gettext("Suppress"), true, "/suricata/suricata_suppress.php");
+	$tab_array[] = array(gettext("Logs Browser"), false, "/suricata/suricata_logs_browser.php");
+	$tab_array[] = array(gettext("Logs Mgmt"), false, "/suricata/suricata_logs_mgmt.php");
         display_top_tabs($tab_array);
 ?>
 </td></tr>
@@ -193,7 +196,7 @@ if ($savemsg)
 	</td>
 </tr>
 <tr>
-	<td colspan="2"><input id="submit" name="submit" type="submit" 
+	<td colspan="2"><input id="save" name="save" type="submit" 
 		class="formbtn" value="Save" />&nbsp;&nbsp;<input id="cancelbutton" 
 		name="cancelbutton" type="button" class="formbtn" value="Cancel" 
 		onclick="history.back();"/> <?php if (isset($id) && $a_suppress[$id]): ?>
