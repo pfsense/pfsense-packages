@@ -40,6 +40,16 @@ $emergingthreats = $config['installedpackages']['suricata']['config'][0]['enable
 $etpro = $config['installedpackages']['suricata']['config'][0]['enable_etpro_rules'];
 $snortcommunityrules = $config['installedpackages']['suricata']['config'][0]['snortcommunityrules'];
 
+/* Get last update information if available */
+if (!empty($config['installedpackages']['suricata']['config'][0]['last_rule_upd_time']))
+	$last_rule_upd_time = date('M-d Y H:i', $config['installedpackages']['suricata']['config'][0]['last_rule_upd_time']);
+else
+	$last_rule_upd_time = gettext("Unknown");
+if (!empty($config['installedpackages']['suricata']['config'][0]['last_rule_upd_status']))
+	$last_rule_upd_status = htmlspecialchars($config['installedpackages']['suricata']['config'][0]['last_rule_upd_status']);
+else
+	$last_rule_upd_status = gettext("Unknown");
+
 $snort_rules_file = VRT_DNLD_FILENAME;
 $snort_community_rules_filename = GPLV2_DNLD_FILENAME;
 
@@ -211,6 +221,22 @@ include_once("head.inc");
 			</tr>
 			<tr>
 				<td align="center">
+					<table width="45%" border="0" cellpadding="0" cellspacing="0">
+						<tbody>
+						<tr>
+							<td class="list" align="right"><strong><?php echo gettext("Last Update:");?></strong></td>
+							<td class="list" align="left"><?php echo $last_rule_upd_time;?></td>
+						</tr>
+						<tr>
+							<td class="list" align="right"><strong><?php echo gettext("Result:");?></strong></td>
+							<td class="list" align="left"><?php echo $last_rule_upd_status;?></td>
+						</tr>
+						</tbody>
+					</table>
+				</td>
+			</tr>
+			<tr>
+				<td align="center">
 					<?php if ($snortdownload != 'on' && $emergingthreats != 'on' && $etpro != 'on'): ?>
 						<br/><button disabled="disabled"><?=gettext("Check");?></button>&nbsp;&nbsp;&nbsp;&nbsp;
 						<button disabled="disabled"><?=gettext("Force");?></button>
@@ -226,7 +252,7 @@ include_once("head.inc");
 						title="<?php echo gettext("Check for new updates to enabled rule sets"); ?>"/>&nbsp;&nbsp;&nbsp;&nbsp;
 						<input type="submit" value="<?=gettext("Force");?>" name="force" id="force" class="formbtn" 
 						title="<?=gettext("Force an update of all enabled rule sets");?>" 
-						onclick="return confirm('<?=gettext("This will zero-out the MD5 hashes to force a fresh download of enabled rule sets.  Click OK to continue or CANCEL to quit");?>');"/>
+						onclick="return confirm('<?=gettext("This will zero-out the MD5 hashes to force a fresh download of all enabled rule sets.  Click OK to continue or CANCEL to quit");?>');"/>
 						<br/><br/>
 					<?php endif; ?>
 				</td>

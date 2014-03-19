@@ -121,12 +121,12 @@ function suricata_add_supplist_entry($suppress) {
 		return false;
 }
 
-if ($_POST['instance'])
+if (is_numericint($_POST['instance']))
 	$instanceid = $_POST['instance'];
-// This is for the auto-refresh so wecan  stay on the same interface
-if (is_numeric($_GET['instance']))
+// This is for the auto-refresh so we can  stay on the same interface
+if (is_numericint($_GET['instance']))
 	$instanceid = $_GET['instance'];
-if (empty($instanceid))
+if (is_null($instanceid))
 	$instanceid = 0;
 
 if (!is_array($config['installedpackages']['suricata']['rule']))
@@ -186,12 +186,12 @@ if (($_POST['addsuppress_srcip'] || $_POST['addsuppress_dstip'] || $_POST['addsu
 				$suppress = "suppress gen_id {$_POST['gen_id']}, sig_id {$_POST['sidid']}\n";
 			else
 				$suppress = "#{$_POST['descr']}\nsuppress gen_id {$_POST['gen_id']}, sig_id {$_POST['sidid']}\n";
-			$success = gettext("An entry for 'suppress gen_id {$_GET['gen_id']}, sig_id {$_GET['sidid']}' has been added to the Suppress List.");
+			$success = gettext("An entry for 'suppress gen_id {$_POST['gen_id']}, sig_id {$_POST['sidid']}' has been added to the Suppress List.");
 			break;
 		case "by_src":
 		case "by_dst":
 			// Check for valid IP addresses, exit if not valid
-			if (is_ipaddr($_POST['ip']) || is_ipaddrv6($_POST['ip'])) {
+			if (is_ipaddr($_POST['ip'])) {
 				if (empty($_POST['descr']))
 					$suppress = "suppress gen_id {$_POST['gen_id']}, sig_id {$_POST['sidid']}, track {$method}, ip {$_POST['ip']}\n";
 				else  
@@ -212,6 +212,7 @@ if (($_POST['addsuppress_srcip'] || $_POST['addsuppress_dstip'] || $_POST['addsu
 	if (suricata_add_supplist_entry($suppress)) {
 		suricata_reload_config($a_instance[$instanceid]);
 		$savemsg = $success;
+		sleep(2);
 	}
 	else
 		$input_errors[] = gettext("Suppress List '{$a_instance[$instanceid]['suppresslistname']}' is defined for this interface, but it could not be found!");
@@ -269,8 +270,9 @@ if ($_POST['togglesid'] && is_numeric($_POST['sidid']) && is_numeric($_POST['gen
 
 	/* Signal Suricata to live-load the new rules */
 	suricata_reload_config($a_instance[$instanceid]);
+	sleep(2);
 
-	$savemsg = gettext("The state for rule {$gid}:{$sid} has been modified.  Suricata is 'live-reloading' the new rules list.  Please wait at least 30 secs for the process to complete before toggling additional rules.");
+	$savemsg = gettext("The state for rule {$gid}:{$sid} has been modified.  Suricata is 'live-reloading' the new rules list.  Please wait at least 15 secs for the process to complete before toggling additional rules.");
 }
 
 if ($_POST['delete']) {
@@ -372,7 +374,7 @@ if ($savemsg) {
 					$selected = "";
 					if ($id == $instanceid)
 						$selected = "selected";
-					echo "<option value='{$id}' {$selected}> (" . convert_friendly_interface_to_friendly_descr($instance['interface']) . "){$instance['descr']}</option>\n";
+					echo "<option value='{$id}' {$selected}> (" . convert_friendly_interface_to_friendly_descr($instance['interface']) . ") {$instance['descr']}</option>\n";
 				}
 			?>
 					</select>&nbsp;&nbsp;<?php echo gettext('Choose which instance alerts you want to inspect.'); ?>
@@ -380,22 +382,23 @@ if ($savemsg) {
 			<tr>
 				<td width="22%" class="vncell"><?php echo gettext('Save or Remove Logs'); ?></td>
 				<td width="78%" class="vtable">
-					<input name="download" type="submit" class="formbtns" value="Download"> <?php echo gettext('All ' .
-						'log files will be saved.'); ?>&nbsp;&nbsp;
-					<input name="delete" type="submit" class="formbtns" value="Clear"
-					onclick="return confirm('Do you really want to remove all instance logs?');">
-					<span class="red"><strong><?php echo gettext('Warning:'); ?></strong></span> <?php echo ' ' . gettext('all log files will be deleted.'); ?>
+					<input name="download" type="submit" class="formbtns" value="Download" 
+					title="<?=gettext("Download interface log files as a gzip archive");?>"/>
+					&nbsp;<?php echo gettext('All log files will be saved.');?>&nbsp;&nbsp;
+					<input name="delete" type="submit" class="formbtns" value="Clear" 
+					onclick="return confirm('Do you really want to remove all instance logs?')" title="<?=gettext("Clear all interface log files");?>"/>
+					&nbsp;<span class="red"><strong><?php echo gettext('Warning:'); ?></strong></span>&nbsp;<?php echo gettext('all log files will be deleted.'); ?>
 				</td>
 			</tr>
 			<tr>
 				<td width="22%" class="vncell"><?php echo gettext('Auto Refresh and Log View'); ?></td>
 				<td width="78%" class="vtable">
-					<input name="save" type="submit" class="formbtns" value="Save">
-					<?php echo gettext('Refresh'); ?> <input name="arefresh" type="checkbox" value="on"
-					<?php if ($config['installedpackages']['suricata']['alertsblocks']['arefresh']=="on") echo "checked"; ?>>
-						<?php printf(gettext('%sDefault%s is %sON%s.'), '<strong>', '</strong>', '<strong>', '</strong>'); ?>&nbsp;&nbsp;
-					<input name="alertnumber" type="text" class="formfld unknown" id="alertnumber" size="5" value="<?=htmlspecialchars($anentries);?>">
-					<?php printf(gettext('Enter number of log entries to view. %sDefault%s is %s250%s.'), '<strong>', '</strong>', '<strong>', '</strong>'); ?>
+					<input name="save" type="submit" class="formbtns" value=" Save " title="<?=gettext("Save auto-refresh and view settings");?>"/>
+					&nbsp;<?php echo gettext('Refresh');?>&nbsp;&nbsp;<input name="arefresh" type="checkbox" value="on" 
+					<?php if ($config['installedpackages']['snortglobal']['alertsblocks']['arefresh']=="on") echo "checked"; ?>/>
+					<?php printf(gettext('%sDefault%s is %sON%s.'), '<strong>', '</strong>', '<strong>', '</strong>'); ?>&nbsp;&nbsp;
+					<input name="alertnumber" type="text" class="formfld unknown" id="alertnumber" size="5" value="<?=htmlspecialchars($anentries);?>"/>
+					&nbsp;<?php printf(gettext('Enter number of log entries to view. %sDefault%s is %s250%s.'), '<strong>', '</strong>', '<strong>', '</strong>'); ?>
 				</td>
 			</tr>
 			<tr>
@@ -404,31 +407,31 @@ if ($savemsg) {
 			</tr>
 	<tr>
 	<td width="100%" colspan="2">
-	<table id="myTable" style="table-layout: fixed;" width="100%" class="sortable" border="1" cellpadding="0" cellspacing="0">
+	<table id="myTable" style="table-layout: fixed;" width="100%" class="sortable" border="0" cellpadding="0" cellspacing="0">
 		<colgroup>
 			<col width="10%" align="center" axis="date">
-			<col width="41" align="center" axis="number">
-			<col width="64" align="center" axis="string">
+			<col width="40" align="center" axis="number">
+			<col width="52" align="center" axis="string">
 			<col width="10%" axis="string">
 			<col width="13%" align="center" axis="string">
-			<col width="8%" align="center" axis="string">
+			<col width="7%" align="center" axis="string">
 			<col width="13%" align="center" axis="string">
-			<col width="8%" align="center" axis="string">
-			<col width="9%" align="center" axis="number">
+			<col width="7%" align="center" axis="string">
+			<col width="10%" align="center" axis="number">
 			<col axis="string">
 		</colgroup>
 		<thead>
 		   <tr>
-			<th class="listhdrr" axis="date"><?php echo gettext("DATE"); ?></th>
-			<th class="listhdrr" axis="number"><?php echo gettext("PRI"); ?></th>
-			<th class="listhdrr" axis="string"><?php echo gettext("PROTO"); ?></th>
-			<th class="listhdrr" axis="string"><?php echo gettext("CLASS"); ?></th>
-			<th class="listhdrr" axis="string"><?php echo gettext("SRC"); ?></th>
-			<th class="listhdrr" axis="string"><?php echo gettext("SPORT"); ?></th>
-			<th class="listhdrr" axis="string"><?php echo gettext("DST"); ?></th>
-			<th class="listhdrr" axis="string"><?php echo gettext("DPORT"); ?></th>
+			<th class="listhdrr" axis="date"><?php echo gettext("Date"); ?></th>
+			<th class="listhdrr" axis="number"><?php echo gettext("Pri"); ?></th>
+			<th class="listhdrr" axis="string"><?php echo gettext("Proto"); ?></th>
+			<th class="listhdrr" axis="string"><?php echo gettext("Class"); ?></th>
+			<th class="listhdrr" axis="string"><?php echo gettext("Src"); ?></th>
+			<th class="listhdrr" axis="string"><?php echo gettext("SPort"); ?></th>
+			<th class="listhdrr" axis="string"><?php echo gettext("Dst"); ?></th>
+			<th class="listhdrr" axis="string"><?php echo gettext("DPort"); ?></th>
 			<th class="listhdrr" axis="number"><?php echo gettext("SID"); ?></th>
-			<th class="listhdrr" axis="string"><?php echo gettext("DESCRIPTION"); ?></th>
+			<th class="listhdrr" axis="string"><?php echo gettext("Description"); ?></th>
 		   </tr>
 		</thead>
 	<tbody>
@@ -444,7 +447,7 @@ if (file_exists("/var/log/suricata/suricata_{$if_real}{$suricata_uuid}/alerts.lo
 		/* File format timestamp,action,sig_generator,sig_id,sig_rev,msg,classification,priority,proto,src,srcport,dst,dstport */
 		$fd = fopen("/tmp/alerts_suricata{$suricata_uuid}", "r");
 		while (($fields = fgetcsv($fd, 1000, ',', '"')) !== FALSE) {
-			if(count($fields) < 12)
+			if(count($fields) < 13)
 				continue;
 
 			// Create a DateTime object from the event timestamp that
@@ -468,7 +471,7 @@ if (file_exists("/var/log/suricata/suricata_{$if_real}{$suricata_uuid}/alerts.lo
 			/* Protocol */
 			$alert_proto = $fields[8];
 			/* IP SRC */
-			$alert_ip_src = inet_ntop(inet_pton($fields[9]));
+			$alert_ip_src = $fields[9];
 			/* Add zero-width space as soft-break opportunity after each colon if we have an IPv6 address */
 			$alert_ip_src = str_replace(":", ":&#8203;", $alert_ip_src);
 			/* Add Reverse DNS lookup icons */
@@ -497,7 +500,7 @@ if (file_exists("/var/log/suricata/suricata_{$if_real}{$suricata_uuid}/alerts.lo
 			/* IP SRC Port */
 			$alert_src_p = $fields[10];
 			/* IP Destination */
-			$alert_ip_dst = inet_ntop(inet_pton($fields[11]));
+			$alert_ip_dst = $fields[11];
 			/* Add zero-width space as soft-break opportunity after each colon if we have an IPv6 address */
 			$alert_ip_dst = str_replace(":", ":&#8203;", $alert_ip_dst);
 			/* Add Reverse DNS lookup icons */
@@ -520,8 +523,8 @@ if (file_exists("/var/log/suricata/suricata_{$if_real}{$suricata_uuid}/alerts.lo
 			}
 			/* Add icon for auto-removing from Blocked Table if required */
 //			if (isset($tmpblocked[$fields[11]])) {
-//				$alert_ip_src .= "&nbsp;<input type='image' name='unblock[]' onClick=\"document.getElementById('ip').value='{$fields[11]}';\" ";
-//				$alert_ip_src .= "title='" . gettext("Remove host from Blocked Table") . "' border='0' width='12' height='12' src=\"../themes/{$g['theme']}/images/icons/icon_x.gif\"/>"; 
+//				$alert_ip_dst .= "&nbsp;<input type='image' name='unblock[]' onClick=\"document.getElementById('ip').value='{$fields[11]}';\" ";
+//				$alert_ip_dst .= "title='" . gettext("Remove host from Blocked Table") . "' border='0' width='12' height='12' src=\"../themes/{$g['theme']}/images/icons/icon_x.gif\"/>"; 
 //			}
 			/* IP DST Port */
 			$alert_dst_p = $fields[12];
@@ -560,7 +563,7 @@ if (file_exists("/var/log/suricata/suricata_{$if_real}{$suricata_uuid}/alerts.lo
 				<td class='listr' align='center' sorttable_customkey='{$fields[11]}'>{$alert_ip_dst}</td>
 				<td class='listr' align='center'>{$alert_dst_p}</td>
 				<td class='listr' align='center' sorttable_customkey='{$fields[3]}'>{$alert_sid_str}<br/>{$sidsupplink}&nbsp;&nbsp;{$sid_dsbl_link}</td>
-				<td class='listr' style=\"word-wrap:break-word;\">{$alert_descr}</td>
+				<td class='listbg' style=\"word-wrap:break-word;\">{$alert_descr}</td>
 				</tr>\n";
 
 			$counter++;

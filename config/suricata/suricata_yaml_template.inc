@@ -40,9 +40,8 @@ outputs:
   - unified2-alert:
       enabled: {$barnyard2_enabled}
       filename: unified2.alert
-      limit: 32mb
-      # Sensor ID field of unified2 alerts.
-      sensor-id: 0
+      limit: {$unified2_log_limit}
+      sensor-id: {$unified2_sensor_id}
 
   - http-log:
       enabled: {$http_log_enabled}

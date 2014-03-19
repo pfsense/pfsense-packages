@@ -43,8 +43,8 @@ $a_nat = &$config['installedpackages']['suricata']['rule'];
 
 if (isset($_POST['id']))
 	$id = $_POST['id'];
-elseif (isset($_GET['id']))
-	$id = $_GET['id'];
+elseif (isset($_GET['id']) && is_numericint($_GET['id']))
+	$id = htmlspecialchars($_GET['id']);
 
 if (is_null($id)) {
 	header("Location: /suricata/suricata_interfaces.php");
@@ -205,13 +205,13 @@ if ($savemsg)
 	</tr>
 	<tr>
 		<td>
-		<table id="myTable" width="100%" class="sortable" border="1" cellpadding="0" cellspacing="0">
+		<table id="myTable" width="100%" class="sortable" style="table-layout: fixed;" border="0" cellpadding="0" cellspacing="0">
 			<colgroup>
 				<col width="11%" axis="number">
-				<col width="10%" axis="string">
+				<col width="52" axis="string">
 				<col width="14%" axis="string">
 				<col width="14%" axis="string">
-				<col width="20%" axis="string">
+				<col width="24%" axis="string">
 				<col axis="string">
 			</colgroup>
 			<thead>
@@ -263,11 +263,11 @@ if ($savemsg)
 							// Use "echo" to write the table HTML row-by-row.
 							echo "<tr>" . 
 								"<td class=\"listr\" sorttable_customkey=\"{$sid}\">{$sid}&nbsp;{$supplink}</td>" . 
-								"<td class=\"listr\">{$protocol}</td>" . 
-								"<td class=\"listr ellipsis\"><span title=\"{$rule_content[2]}\">{$source}</span></td>" . 
-								"<td class=\"listr ellipsis\"><span title=\"{$rule_content[5]}\">{$destination}</span></td>" . 
+								"<td class=\"listr\" style=\"text-align:center;\">{$protocol}</td>" . 
+								"<td class=\"listr ellipsis\" nowrap style=\"text-align:center;\"><span title=\"{$rule_content[2]}\">{$source}</span></td>" . 
+								"<td class=\"listr ellipsis\" nowrap style=\"text-align:center;\"><span title=\"{$rule_content[5]}\">{$destination}</span></td>" . 
 								"<td class=\"listr\" style=\"word-wrap:break-word; word-break:normal;\">{$flowbits}</td>" . 
-								"<td class=\"listr\" style=\"word-wrap:break-word; word-break:normal;\">{$message}</td>" . 
+								"<td class=\"listbg\" style=\"word-wrap:break-word; word-break:normal;\">{$message}</td>" . 
 							"</tr>";
 							$count++;
 						}
@@ -283,7 +283,6 @@ if ($savemsg)
 		<td align="center" valign="middle">
 			<input id="cancel" name="cancel" type="submit" class="formbtn" <?php 
 			echo "value=\"" . gettext("Return") . "\" title=\"" . gettext("Return to previous page") . "\""; ?>/>
-			<input name="id" type="hidden" value="<?=$id;?>" />
 		</td>
 	</tr>
 	<?php endif; ?>
