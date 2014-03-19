@@ -174,20 +174,6 @@ function enable_change(enable_change) {
 	<div id="mainarea">
 		<table class="tabcont" width="100%" border="0" cellpadding="6" cellspacing="0">
 			<tr>
-				<td colspan="2" valign="top" class="listtopic">Recalculate certificate chain.</td>
-			</tr>
-			<tr>
-				<td width="22%" valign="top" class="vncell">&nbsp;</td>
-				<td width="78%" class="vtable">
-					<input type="hidden" name="calculate_certificate_chain" id="calculate_certificate_chain" />
-					<input type="button" class="formbtn" value="Recalculate certificate chains" onclick="$('calculate_certificate_chain').value='true';document.iform.submit();" />
-					<br/>
-					This can be required after certificates have been created or imported. As pfSense 2.1.0 currently does not
-					always keep track of these dependencies which might be required to create a proper certificate chain when using SSLoffloading.
-				</td>
-			</tr>
-			
-			<tr>
 				<td colspan="2" valign="top" class="listtopic">General settings</td>
 			</tr>
 			<tr>
@@ -393,7 +379,8 @@ function enable_change(enable_change) {
 			<tr>
 				<td width="22%" valign="top" class="vncell">&nbsp;</td>
 				<td width="78%" class="vtable">
-					<textarea name='advanced' rows="4" cols="70" id='advanced'><?php echo $pconfig['advanced']; ?></textarea>
+					<? $textrowcount = max(substr_count($pconfig['advanced'],"\n"), 2) + 2; ?>
+					<textarea name='advanced' rows="<?=$textrowcount;?>" cols="70" id='advanced'><?php echo $pconfig['advanced']; ?></textarea>
 					<br/>
 					NOTE: paste text into this box that you would like to pass thru in the global settings area.
 				</td>
@@ -401,6 +388,19 @@ function enable_change(enable_change) {
 			<tr>
 				<td>
 					&nbsp;
+				</td>
+			</tr>
+			<tr>
+				<td colspan="2" valign="top" class="listtopic">Recalculate certificate chain.</td>
+			</tr>
+			<tr>
+				<td width="22%" valign="top" class="vncell">&nbsp;</td>
+				<td width="78%" class="vtable">
+					<input type="hidden" name="calculate_certificate_chain" id="calculate_certificate_chain" />
+					<input type="button" class="formbtn" value="Recalculate certificate chains" onclick="$('calculate_certificate_chain').value='true';document.iform.submit();" />(Other changes on this page will be lost)
+					<br/>
+					This can be required after certificates have been created or imported. As pfSense 2.1.0 currently does not
+					always keep track of these dependencies which might be required to create a proper certificate chain when using SSLoffloading.
 				</td>
 			</tr>
 			<tr>

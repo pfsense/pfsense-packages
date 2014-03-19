@@ -57,8 +57,6 @@ function haproxy_js_acl_select($mode) {
 	return $seltext;
 }
 
-$d_haproxyconfdirty_path = $g['varrun_path'] . "/haproxy.conf.dirty";
-
 if (!is_array($config['installedpackages']['haproxy']['ha_backends']['item'])) {
 	$config['installedpackages']['haproxy']['ha_backends']['item'] = array();
 }
@@ -157,8 +155,8 @@ if ($_POST) {
 
 		$ports = split(",", $_POST['port'] . ",");
 		foreach($ports as $port)
-			if ($port && !is_numeric($port))
-				$input_errors[] = "The field 'Port' value is not a number.";
+			if ($port && !is_numeric($port) && !is_portoralias($port))
+				$input_errors[] = "The field 'Port' value '".htmlspecialchars($port)."' is not a number or alias thereof.";
 
 		if ($_POST['client_timeout'] !== "" && !is_numeric($_POST['client_timeout']))
 			$input_errors[] = "The field 'Client timeout' value is not a number.";
@@ -249,6 +247,8 @@ $interfaces = haproxy_get_bindable_interfaces();
 	.haproxy_primary{}
 	.haproxy_secondary{display:none;}
   </style>
+  <script type="text/javascript" src="/javascript/suggestions.js"></script>
+  <script type="text/javascript" src="/javascript/autosuggest.js"></script>
 </head>
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">
 
@@ -256,7 +256,6 @@ $interfaces = haproxy_get_bindable_interfaces();
 <script type="text/javascript" src="/javascript/scriptaculous/prototype.js"></script>
 <script type="text/javascript" src="/javascript/scriptaculous/scriptaculous.js"></script>
 <?php endif; ?>
-
 
 <script type="text/javascript">
 	function htmllist_get_select_options(tableId) {
@@ -446,8 +445,8 @@ $interfaces = haproxy_get_bindable_interfaces();
 		<tr class="haproxy_primary" align="left">
 			<td width="22%" valign="top" class="vncellreq">External port</td>
 			<td width="78%" class="vtable" colspan="2">
-				<input name="port" type="text" <?if(isset($pconfig['port'])) echo "value=\"{$pconfig['port']}\"";?> size="10" maxlength="500" />
-				<div>The port to listen to.  To specify multiple ports, separate with a comma (,). EXAMPLE: 80,443</div>
+				<input name="port" id="port" type="text" <?if(isset($pconfig['port'])) echo "value=\"{$pconfig['port']}\"";?> size="10" maxlength="500" />
+				<div>The port to listen to. To specify multiple ports, separate with a comma (,). EXAMPLE: 80,8000</div>
 			</td>
 		</tr>
 		<tr class="haproxy_primary" align="left">
@@ -548,7 +547,8 @@ $interfaces = haproxy_get_bindable_interfaces();
 		<tr align="left">
 			<td width="22%" valign="top" class="vncell">Advanced pass thru</td>
 			<td width="78%" class="vtable" colspan="2">
-				<textarea name='advanced' rows="4" cols="70" id='advanced'><?php echo htmlspecialchars($pconfig['advanced']); ?></textarea>
+				<? $textrowcount = max(substr_count($pconfig['advanced'],"\n"), 2) + 2; ?>
+				<textarea name='advanced' rows="<?=$textrowcount;?>" cols="70" id='advanced'><?php echo htmlspecialchars($pconfig['advanced']); ?></textarea>
 				<br/>
 				NOTE: paste text into this box that you would like to pass thru.
 			</td>
@@ -599,7 +599,7 @@ $interfaces = haproxy_get_bindable_interfaces();
 		<tr class="haproxy_ssloffloading_enabled haproxy_primary" align="left">
 			<td width="22%" valign="top" class="vncell">Advanced ssl options</td>
 			<td width="78%" class="vtable" colspan="2">
-				<input type='text' name='dcertadv' size="64" id='dcertadv' <?if(isset($pconfig['dcertadv'])) echo "value=\"{$pconfig['dcertadv']}\"";?> maxlength="64" />
+				<input type='text' name='dcertadv' size="64" id='dcertadv' <?if(isset($pconfig['dcertadv'])) echo 'value="'.htmlspecialchars($pconfig['dcertadv']).'"';?> />
 				<br/>
 				NOTE: Paste additional ssl options(without commas) to include on ssl listening options.<br/>
 				some options: force-sslv3, force-tlsv10 force-tlsv11 force-tlsv12 no-sslv3 no-tlsv10 no-tlsv11 no-tlsv12 no-tls-tickets
@@ -640,6 +640,9 @@ $interfaces = haproxy_get_bindable_interfaces();
 <script type="text/javascript">
 	totalrows =  <?php echo $counter; ?>;
 	updatevisibility();
+	
+	var customarray  = <?= json_encode(get_alias_list(array("port", "url_ports", "urltable_ports"))) ?>;
+	var oTextbox1 = new AutoSuggestControl(document.getElementById("port"), new StateSuggestions(customarray));
 </script>
 <?php 
 haproxy_htmllist_js();
