@@ -896,10 +896,8 @@ function haproxy_writeconf($configpath) {
 			$default_backend = "";
 			$i = 0;
 			foreach ($bind['config'] as $frontend) {
-				$a_acl=&$frontend['ha_acls']['item'];
-				if(!is_array($a_acl)) 
-					$a_acl=array();
-			
+				$a_acl = get_frontend_acls($frontend);
+
 				$poolname = $frontend['backend_serverpool'] . "_" . strtolower($frontend['type']);
 
 				// Create different pools if the svrport is set
@@ -911,31 +909,6 @@ function haproxy_writeconf($configpath) {
 					$a_pendingpl[$poolname]['name'] = $poolname;
 					$a_pendingpl[$poolname]['frontend'] = $frontend;
 				}
-
-				if (strtolower($bind['type']) == "http" && $frontend['ssloffload']) {
-					$aclname = "SNI_" . $poolname;
-					if ($frontend['ssloffloadacl']){
-						$cert = lookup_cert($frontend['ssloffloadcert']);
-						$cert_cn = cert_get_cn($cert['crt']);
-						$descr = haproxy_escape_acl_name($cert['descr']);
-						$a_acl[] = array('name' => "{$aclname}_{$descr}",'expression' => 'host_matches', 'value' => $cert_cn);
-						unset($cert);
-					}
-					if ($frontend['ssloffloadacladditional']){
-						$certs = $frontend['ha_certificates']['item'];
-						if (is_array($certs)){
-							if (count($certs) > 0){
-								foreach($certs as $certref){
-									$cert = lookup_cert($certref['ssl_certificate']);
-									$cert_cn = cert_get_cn($cert['crt']);
-									$descr = haproxy_escape_acl_name($cert['descr']);
-									$a_acl[] = array('name' => "{$aclname}_{$descr}",'expression' => 'host_matches', 'value' => $cert_cn);
-									unset($cert);
-								}
-							}
-						}
-					}
-				}
 				
 				// Write this out once, and must be before any backend config text
 				if (($default_backend == "" || $frontend['secondary'] != 'yes') && count($a_acl) == 0 ) {
@@ -945,8 +918,8 @@ function haproxy_writeconf($configpath) {
 				// combine acl's with same name to allow for 'combined checks' to check for example hostname and fileextension together..
 				$a_acl_combine = array();
 				foreach ($a_acl as $entry) {
-					$name = $entry['name'];
-					$a_acl_combine[$name][] = $entry;
+					$name = $entry['ref']['name'];
+					$a_acl_combine[$name][] = $entry['ref'];
 				}
 				
 				foreach ($a_acl_combine as $a_usebackend) {
@@ -1352,6 +1325,43 @@ function get_frontend_acls($frontend) {
 			$acl_item['ref'] = $entry;
 			
 			$result[] = $acl_item;
+		}
+	}
+	
+	$mainfrontend = get_primaryfrontend($frontend);
+	if (strtolower($mainfrontend['type']) == "http" && $mainfrontend['ssloffload']) {
+		$a_acl = &$frontend['ha_acls']['item'];
+		if(!is_array($a_acl)) 
+			$a_acl=array();
+	
+		$poolname = $frontend['backend_serverpool'] . "_" . strtolower($frontend['type']);
+		$aclname = "SNI_" . $poolname;
+		if ($frontend['ssloffloadacl']){
+			$cert = lookup_cert($frontend['ssloffloadcert']);
+			$cert_cn = cert_get_cn($cert['crt']);
+			$descr = haproxy_escape_acl_name($cert['descr']);
+			unset($cert);
+			$acl_item = array();
+			$acl_item['descr'] = "Certificate ACL ".$cert_cn;
+			$acl_item['ref'] = array('name' => "{$aclname}_{$descr}",'expression' => 'host_matches', 'value' => $cert_cn);
+			$result[] = $acl_item;
+		}
+		if ($frontend['ssloffloadacladditional']){
+			$certs = $frontend['ha_certificates']['item'];
+			if (is_array($certs)){
+				if (count($certs) > 0){
+					foreach($certs as $certref){
+						$cert = lookup_cert($certref['ssl_certificate']);
+						$cert_cn = cert_get_cn($cert['crt']);
+						$descr = haproxy_escape_acl_name($cert['descr']);
+						unset($cert);
+						$acl_item = array();
+						$acl_item['descr'] = "Additional certificate ACLs: ".$cert_cn;
+						$acl_item['ref'] = array('name' => "{$aclname}_{$descr}",'expression' => 'host_matches', 'value' => $cert_cn);
+						$result[] = $acl_item;
+					}
+				}
+			}
 		}
 	}
 	return $result;

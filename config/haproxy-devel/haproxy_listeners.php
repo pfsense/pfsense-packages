@@ -169,10 +169,6 @@ include("head.inc");
 					foreach ($acls as $acl) {
 						$isaclset .= "&#10;" . $acl['descr'];
 					}
-					if ($frontend['ssloffloadacl'])
-						$isaclset .= "&#10;" . "Certificate ACL";
-					if ($frontend['ssloffloadacladditional'])
-						$isaclset .= "&#10;" . "Additional certificate ACLs";
 					
 					if ($isaclset) 
 						echo "<img src=\"$img_acl\" title=\"" . gettext("acl's used") . ": {$isaclset}\" border=\"0\" />";
