@@ -29,7 +29,6 @@
 
 require_once("functions.inc");
 require_once("service-utils.inc");
-require_once("guiconfig.inc");
 require_once("/usr/local/pkg/suricata/suricata.inc");
 
 global $g, $pkg_interface, $suricata_gui_include, $rebuild_rules;
@@ -141,7 +140,51 @@ function suricata_download_file_url($url, $file_out) {
 	/* It provides logging of returned CURL errors. */
 	/************************************************/
 
-	global $g, $config, $pkg_interface, $last_curl_error, $fout, $ch, $file_size, $downloaded, $first_progress_update, $rfc2616;
+	global $g, $config, $pkg_interface, $last_curl_error, $fout, $ch, $file_size, $downloaded, $first_progress_update;
+
+	$rfc2616 = array(
+			100 => "100 Continue",
+			101 => "101 Switching Protocols",
+			200 => "200 OK",
+			201 => "201 Created",
+			202 => "202 Accepted",
+			203 => "203 Non-Authoritative Information",
+			204 => "204 No Content",
+			205 => "205 Reset Content",
+			206 => "206 Partial Content",
+			300 => "300 Multiple Choices",
+			301 => "301 Moved Permanently",
+			302 => "302 Found",
+			303 => "303 See Other",
+			304 => "304 Not Modified",
+			305 => "305 Use Proxy",
+			306 => "306 (Unused)",
+			307 => "307 Temporary Redirect",
+			400 => "400 Bad Request",
+			401 => "401 Unauthorized",
+			402 => "402 Payment Required",
+			403 => "403 Forbidden",
+			404 => "404 Not Found",
+			405 => "405 Method Not Allowed",
+			406 => "406 Not Acceptable",
+			407 => "407 Proxy Authentication Required",
+			408 => "408 Request Timeout",
+			409 => "409 Conflict",
+			410 => "410 Gone",
+			411 => "411 Length Required",
+			412 => "412 Precondition Failed",
+			413 => "413 Request Entity Too Large",
+			414 => "414 Request-URI Too Long",
+			415 => "415 Unsupported Media Type",
+			416 => "416 Requested Range Not Satisfiable",
+			417 => "417 Expectation Failed",
+			500 => "500 Internal Server Error",
+			501 => "501 Not Implemented",
+			502 => "502 Bad Gateway",
+			503 => "503 Service Unavailable",
+			504 => "504 Gateway Timeout",
+			505 => "505 HTTP Version Not Supported"
+		);
 
 	// Initialize required variables for the pfSense "read_body()" function
 	$file_size  = 1;
@@ -196,7 +239,7 @@ function suricata_download_file_url($url, $file_out) {
 		if ($rc === false)
 			$last_curl_error = curl_error($ch);
 		$http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-		if (is_rfc2616_code($http_code))
+		if (isset($rfc2616[$http_code]))
 			$last_curl_error = $rfc2616[$http_code];
 		curl_close($ch);
 		fclose($fout);
