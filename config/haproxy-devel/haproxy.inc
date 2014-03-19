@@ -212,21 +212,16 @@ function group_ports($ports) {
 function haproxy_portoralias_to_list($port_or_alias) {
 	// input: a port or aliasname: 80 https MyPortAlias
 	// returns: a array of ports and portranges 80 443 8000:8010
-	global $config;
+	global $aliastable;
 	$portresult = array();
-	if (is_alias($port_or_alias)) {
-		if (is_array($config['aliases']['alias'])) {
-			foreach ($config['aliases']['alias'] as $alias) {
-				if ($alias['name'] == $port_or_alias && preg_match("/port/i", $alias['type'])) {
-					$ports = explode(' ',$alias['address']);
-					foreach($ports as $port) {
-						$portresults = haproxy_portoralias_to_list($port);
-						$portresult = array_merge($portresult, $portresults);
-					}
-					return $portresult;
-				}
-			}
+	if (alias_get_type($port_or_alias) == "port") {
+		$aliasports = $aliastable[$port_or_alias];
+		$ports = explode(' ',$aliasports);
+		foreach($ports as $port) {
+			$portresults = haproxy_portoralias_to_list($port);
+			$portresult = array_merge($portresult, $portresults);
 		}
+		return $portresult;
 	} else if (is_portrange($port_or_alias)) {
 		return (array)$port_or_alias;
 	} else if (is_port($port_or_alias)) {
@@ -241,25 +236,30 @@ function haproxy_portoralias_to_list($port_or_alias) {
 }
 
 function haproxy_custom_php_deinstall_command() {
-	exec("cd /var/db/pkg && pkg_delete `ls | grep haproxy`");
-	exec("rm /usr/local/pkg/haproxy*");
-	exec("rm /usr/local/www/haproxy*");
+	global $static_output;
+	$static_output .= "HAProxy, running haproxy_custom_php_deinstall_command()\n";
+	update_output_window($static_output);
+	$static_output .= "HAProxy, deleting haproxy webgui\n";
+	update_output_window($static_output);
 	exec("rm /usr/local/etc/rc.d/haproxy.sh");
-	exec("rm /etc/devd/haproxy.conf");
-	exec("/etc/rc.d/devd restart");
+	$static_output .= "HAProxy, installing cron job if needed\n";
+	update_output_window($static_output);
 	haproxy_install_cron(false);
+	$static_output .= "HAProxy, running haproxy_custom_php_deinstall_command() DONE\n";
+	update_output_window($static_output);
 }
 
 function haproxy_custom_php_install_command() {
-	global $g, $config;
-	conf_mount_rw();
-
-	$freebsd_version = substr(trim(`uname -r`), 0, 1);
-	if(!file_exists("/usr/bin/limits")) {
-		exec("fetch -q -o /usr/bin/limits https://files.pfsense.org/extras/{$freebsd_version}/limits");
-		exec("chmod a+rx /usr/bin/limits");
-	}
+	global $g, $config, $static_output;
+	$static_output .= "HAProxy, running haproxy_custom_php_install_command()\n";
+	update_output_window($static_output);
 	
+	$static_output .= "HAProxy, conf_mount_rw\n";
+	update_output_window($static_output);
+	conf_mount_rw();
+	
+	$static_output .= "HAProxy, create '/usr/local/etc/rc.d/haproxy.sh'\n";
+	update_output_window($static_output);
 	$haproxy = <<<EOD
 #!/bin/sh
 
@@ -323,27 +323,11 @@ EOD;
 	fclose($fd);
 	exec("chmod a+rx /usr/local/etc/rc.d/haproxy.sh");
 
-	$devd = <<<EOD
-notify 0 {
-        match "system"          "IFNET";
-        match "subsystem"       "carp[0-9]+";
-        match "type"            "LINK_UP";
-        action "/usr/local/etc/rc.d/haproxy.sh check";
-};
-notify 0 {
-        match "system"          "IFNET";
-        match "subsystem"       "carp[0-9]+";
-        match "type"            "LINK_DOWN";
-        action "/usr/local/etc/rc.d/haproxy.sh check";
-};
 
-EOD;
-	exec("mkdir -p /etc/devd");
-	$fd = fopen("/etc/devd/haproxy.conf", "w");
-	fwrite($fd, $devd);
-	fclose($fd);
-	exec("/etc/rc.d/devd restart");
 
+	$static_output .= "HAProxy, update configuration\n";
+	update_output_window($static_output);
+	
 	$writeconfigupdate = false;
 	/* Do XML upgrade from haproxy 0.31 to haproxy-dev */
 	if (is_array($config['installedpackages']['haproxy']['ha_servers'])) {
@@ -435,12 +419,22 @@ EOD;
 			}
 		}
 	}
-	if ($writeconfigupdate)
-		write_config("haproxy, update xml config version");
+	if ($writeconfigupdate) {
+		$static_output .= "HAProxy, write updated config\n";
+		update_output_window($static_output);
+		write_config("HAProxy, update xml config version");
+	}
 	
+	$static_output .= "HAProxy, conf_mount_ro\n";
+	update_output_window($static_output);
 	conf_mount_ro();
 	
-	exec("/usr/local/etc/rc.d/haproxy.sh start");
+	$static_output .= "HAProxy, starting haproxy (if previously enabled)\n";
+	update_output_window($static_output);
+	haproxy_check_run(1);
+	
+	$static_output .= "HAProxy, running haproxy_custom_php_install_command() DONE\n";
+	update_output_window($static_output);
 }
 
 function haproxy_install_cron($should_install) {
