@@ -1,7 +1,7 @@
 <?php
 /*
 	freeradius_view_config.php
-	part of pfSense (http://www.pfsense.com/)
+	part of pfSense (https://www.pfsense.org/)
 	Copyright (C) 2013 Alexander Wilke <nachtfalkeaw@web.de>
 	Copyright (C) 2011 Marcello Coutinho <marcellocoutinho@gmail.com>
 	based on postfix_view_config.php

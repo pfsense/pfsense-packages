@@ -57,7 +57,7 @@
 	<additional_files_needed>
 	    <prefix>/usr/local/www/</prefix>
     	<chmod>0755</chmod>
-		<item>http://www.pfsense.org/packages/config/diag_states_pt/diag_new_states.php</item>
+		<item>https://packages.pfsense.org/packages/config/diag_states_pt/diag_new_states.php</item>
 	</additional_files_needed>
 	<custom_php_deinstall_command>
 		mwexec("rm /usr/local/www/diag_new_states.php");

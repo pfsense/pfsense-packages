@@ -49,10 +49,11 @@ if ($pf_version > 2.0){
 			$dbhandle = sqlite_open("$dir/$file", 0666, $error);
 			if ($dbhandle){
 				$query = "select * from captiveportal";
-				$result = sqlite_query($dbhandle, $query);
+				$result = sqlite_array_query($dbhandle, $query, SQLITE_ASSOC);
 				if ($result){
-					$row = sqlite_fetch_array($result, SQLITE_ASSOC);
-					$cp_db[]=implode(",",$row);
+					foreach ($result as $rownum => $row){
+						$cp_db[$rownum]=implode(",",$row);
+						}
 					sqlite_close($dbhandle);
 					}
 				}

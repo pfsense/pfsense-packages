@@ -1,7 +1,7 @@
 <?
 /* $Id$ */
 /*
-	part of pfSense (http://www.pfsense.org/)
+	part of pfSense (https://www.pfsense.org/)
 
 	Copyright (C) 2006 Bill Marquette - bill.marquette@gmail.com.
 	All rights reserved.

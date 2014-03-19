@@ -62,32 +62,32 @@
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>077</chmod>
-		<item>http://www.pfsense.com/packages/config/haproxy/haproxy.inc</item>
+		<item>https://packages.pfsense.org/packages/config/haproxy/haproxy.inc</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/www/</prefix>
 		<chmod>077</chmod>
-		<item>http://www.pfsense.com/packages/config/haproxy/haproxy_listeners.php</item>
+		<item>https://packages.pfsense.org/packages/config/haproxy/haproxy_listeners.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/www/</prefix>
 		<chmod>077</chmod>
-		<item>http://www.pfsense.com/packages/config/haproxy/haproxy_listeners_edit.php</item>
+		<item>https://packages.pfsense.org/packages/config/haproxy/haproxy_listeners_edit.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/www/</prefix>
 		<chmod>077</chmod>
-		<item>http://www.pfsense.com/packages/config/haproxy/haproxy_global.php</item>
+		<item>https://packages.pfsense.org/packages/config/haproxy/haproxy_global.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/www/</prefix>
 		<chmod>077</chmod>
-		<item>http://www.pfsense.com/packages/config/haproxy/haproxy_pools.php</item>
+		<item>https://packages.pfsense.org/packages/config/haproxy/haproxy_pools.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/www/</prefix>
 		<chmod>077</chmod>
-		<item>http://www.pfsense.com/packages/config/haproxy/haproxy_pool_edit.php</item>
+		<item>https://packages.pfsense.org/packages/config/haproxy/haproxy_pool_edit.php</item>
 	</additional_files_needed>
 	<custom_delete_php_command>
 	</custom_delete_php_command>
@@ -100,7 +100,7 @@
 		included in package install
 		$freebsdv=trim(`uname -r | cut -d'.' -f1`);
 		conf_mount_rw();
-		`fetch -q -o /usr/local/sbin/ http://www.pfsense.org/packages/config/haproxy/binaries{$freebsdv}/haproxy`;
+		`fetch -q -o /usr/local/sbin/ https://packages.pfsense.org/packages/config/haproxy/binaries{$freebsdv}/haproxy`;
 		exec("chmod a+rx /usr/local/sbin/haproxy");
 		*/
 		haproxy_custom_php_install_command();

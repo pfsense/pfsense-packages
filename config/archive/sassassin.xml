@@ -77,13 +77,13 @@
 		</tab>
 	</tabs>
 	<additional_files_needed>
-		<item>http://www.pfsense.org/packages/config/sassassin_wl.xml</item>
+		<item>https://packages.pfsense.org/packages/config/sassassin_wl.xml</item>
 	</additional_files_needed>
 	<additional_files_needed>
-		<item>http://www.pfsense.org/packages/config/sassassin_bl.xml</item>
+		<item>https://packages.pfsense.org/packages/config/sassassin_bl.xml</item>
 	</additional_files_needed>
 	<additional_files_needed>
-		<item>http://www.pfsense.org/packages/config/sassassin.inc</item>
+		<item>https://packages.pfsense.org/packages/config/sassassin.inc</item>
 	</additional_files_needed>
 	<fields>
 		<field>

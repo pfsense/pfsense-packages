@@ -53,62 +53,62 @@
 		<url>/pkg_edit.php?xml=sarg.xml</url>
 	</menu>
 	<additional_files_needed>
-		<item>http://www.pfsense.org/packages/config/sarg/sarg.inc</item>
+		<item>https://packages.pfsense.org/packages/config/sarg/sarg.inc</item>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0755</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
-		<item>http://www.pfsense.org/packages/config/sarg/sarg_schedule.xml</item>
+		<item>https://packages.pfsense.org/packages/config/sarg/sarg_schedule.xml</item>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0755</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
-		<item>http://www.pfsense.org/packages/config/sarg/sarg_sync.xml</item>
+		<item>https://packages.pfsense.org/packages/config/sarg/sarg_sync.xml</item>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0755</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
-		<item>http://www.pfsense.org/packages/config/sarg/sarg_users.xml</item>
+		<item>https://packages.pfsense.org/packages/config/sarg/sarg_users.xml</item>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0755</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
-		<item>http://www.pfsense.org/packages/config/sarg/sarg_realtime.php</item>
+		<item>https://packages.pfsense.org/packages/config/sarg/sarg_realtime.php</item>
 		<prefix>/usr/local/www/</prefix>
 		<chmod>0755</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
-		<item>http://www.pfsense.org/packages/config/sarg/sarg_about.php</item>
+		<item>https://packages.pfsense.org/packages/config/sarg/sarg_about.php</item>
 		<prefix>/usr/local/www/</prefix>
 		<chmod>0755</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
-		<item>http://www.pfsense.org/packages/config/sarg/sarg.php</item>
+		<item>https://packages.pfsense.org/packages/config/sarg/sarg.php</item>
 		<prefix>/usr/local/www/</prefix>
 		<chmod>0755</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
-		<item>http://www.pfsense.org/packages/config/sarg/sarg_reports.php</item>
+		<item>https://packages.pfsense.org/packages/config/sarg/sarg_reports.php</item>
 		<prefix>/usr/local/www/</prefix>
 		<chmod>0755</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
-		<item>http://www.pfsense.org/packages/config/sarg/sarg_frame.php</item>
+		<item>https://packages.pfsense.org/packages/config/sarg/sarg_frame.php</item>
 		<prefix>/usr/local/www/</prefix>
 		<chmod>0755</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
-		<item>http://www.pfsense.org/packages/config/sarg/sarg_sorttable.js</item>
+		<item>https://packages.pfsense.org/packages/config/sarg/sarg_sorttable.js</item>
 		<prefix>/usr/local/www/</prefix>
 		<chmod>0755</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
-		<item>http://www.pfsense.org/packages/config/sarg/sarg.template</item>
+		<item>https://packages.pfsense.org/packages/config/sarg/sarg.template</item>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0755</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
-		<item>http://www.pfsense.org/packages/config/sarg/sarg.priv.inc</item>
+		<item>https://packages.pfsense.org/packages/config/sarg/sarg.priv.inc</item>
 		<prefix>/etc/inc/priv/</prefix>
 		<chmod>0755</chmod>
 	</additional_files_needed>

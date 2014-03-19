@@ -59,12 +59,12 @@
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>077</chmod>
-		<item>http://www.pfsense.com/packages/config/anyterm/anyterm.inc</item>
+		<item>https://packages.pfsense.org/packages/config/anyterm/anyterm.inc</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/www/</prefix>
 		<chmod>077</chmod>
-		<item>http://www.pfsense.com/packages/config/anyterm/access_anyterm.php</item>
+		<item>https://packages.pfsense.org/packages/config/anyterm/access_anyterm.php</item>
 	</additional_files_needed>
 	<tabs>
 		<tab>

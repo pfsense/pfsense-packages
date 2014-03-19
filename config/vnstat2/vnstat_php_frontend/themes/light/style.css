@@ -1,0 +1,159 @@
+body 
+{
+    margin: 0;
+    padding: 0;
+}
+
+#wrap
+{
+   xwidth: 868px;
+}
+
+#sidebar
+{
+    width: 160px;
+    border-right: 1px solid #99b;
+    border-collapse: collapse;
+    float: left;
+}
+
+#sidebar ul.iface
+{
+    margin: 0;
+    padding: 0;
+    border-top: 1px solid #99b;    
+    color: #000;
+    background-color: #eef;
+}
+
+#sidebar li.iface
+{
+    margin: 0;
+    padding: 0;
+    list-style-type: none;
+    font-family: 'Trebuchet MS', Verdana, sans-serif;
+    font-size: 1em;
+    font-weight: bold;
+    xborder-top: 1px solid #99b;
+    border-bottom: 1px solid #99b;
+}
+
+#sidebar a
+{
+    font-family: 'Trebuchet MS', Verdana, sans-serif;
+    font-size: 1em;
+    font-weight: bold;
+}
+
+#sidebar ul.page
+{
+    margin: 0;
+    padding: 0;
+    border-top: 1px solid #99b;
+}
+
+#sidebar li.page 
+{
+    margin: 0;
+    padding: 4px;
+    border: none;
+    list-style-type: none;
+    font-family: 'Trebuchet MS', Verdana, sans-serif;
+    font-size: 0.75em;
+    font-weight: normal;
+    text-align: right;
+    color: #000;    
+    background-color: #fff;
+}
+
+#content
+{
+    margin-left: 160px;
+    width: 720px;
+}
+
+
+#header
+{
+    padding: 0px 8px 0px 8px;
+    border-width: 1px;
+    border-style: solid solid solid solid;
+    border-color: #99b;
+    border-collapse: collapse;
+    color: #000;    
+    background-color: #eef;
+    font-family: 'Trebuchet MS', Verdana, sans-serif;
+    font-size: 1em;
+    font-weight: bold;    
+    text-align: center;
+}
+
+#footer
+{
+    padding: 2px 8px 2px 8px;
+    border: 1px solid #99b;
+    border-collapse: collapse;
+    color: #000;    
+    background-color: #eef;
+    font-family: 'Trebuchet MS', Verdana, sans-serif;
+    font-size: 0.65em;
+    font-weight: bold;    
+    text-align: center;
+}
+
+#main
+{
+    padding: 8px;
+    border-left: 1px solid #99b;
+    border-right: 1px solid #99b;    
+    border-collapse: collapse;
+}
+
+#main td
+{
+    font-family: 'Trebuchet MS', Verdana, sans-serif;
+    font-size: 0.8em;
+}
+
+#main td.numeric_odd
+{
+    text-align: right;
+    color: #000;
+    background-color: #eef;
+}
+
+#main td.numeric_even
+{
+    text-align: right;
+    color: #000;    
+    background-color: #fff;
+}
+
+#main td.label_odd
+{
+    color: #000;
+    background-color: #dde;
+}
+
+#main td.label_even
+{
+    color: #000;
+    background-color: #eee;
+}
+
+#main th.label
+{
+    font-family: 'Trebuchet MS', Verdana, sans-serif;
+    font-size: 1em;
+    font-weight: bold;
+    color: #000;    
+    background-color: #dde;
+}
+
+#main caption
+{
+    font-family: 'Trebuchet MS', Verdana, sans-serif;
+    font-size: 1.25em;
+    font-weight: bold;
+    padding: 4px;
+}

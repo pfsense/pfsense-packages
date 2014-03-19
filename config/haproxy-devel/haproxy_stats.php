@@ -1,7 +1,7 @@
 <?php
 /*
 	haproxy_stats.php
-	part of pfSense (http://www.pfsense.com/)
+	part of pfSense (https://www.pfsense.org/)
 	Copyright (C) 2013 PiBa-NL
 	All rights reserved.
 
@@ -65,7 +65,8 @@ if (isset($_GET['haproxystats']) || isset($_GET['scope']) || (isset($_POST) && i
 }
 require_once("guiconfig.inc");
 if (isset($_GET['showsticktablecontent'])){
-	header("Refresh: 2");
+	if (is_numeric($pconfig['localstats_sticktable_refreshtime']))
+		header("Refresh: {$pconfig['localstats_sticktable_refreshtime']}");
 }
 $shortcut_section = "haproxy";
 require_once("haproxy.inc");
@@ -163,7 +164,7 @@ include("head.inc");
 if (isset($_GET['showsticktablecontent'])){
 	$sticktablename = $_GET['showsticktablecontent'];
 echo "<td colspan='2'>";
-	echo "TESTJe<br/>";
+	echo "Contents of the sticktable: $sticktablename<br/>";
 	$res = haproxy_socket_command("show table $sticktablename");
 	foreach($res as $line){
 		echo "<br/>".print_r($line,true);

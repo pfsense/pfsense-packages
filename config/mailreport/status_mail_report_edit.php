@@ -33,8 +33,8 @@
 
 ##|+PRIV
 ##|*IDENT=page-status-mailreportsedit
-##|*NAME=Status: E-Mail Reports: Edit Report page
-##|*DESCR=Allow access to the 'Status: E-Mail Reports: Edit Report' page.
+##|*NAME=Status: Email Reports: Edit Report page
+##|*DESCR=Allow access to the 'Status: Email Reports: Edit Report' page.
 ##|*MATCH=status_mail_report_edit.php*
 ##|-PRIV
 
@@ -203,7 +203,7 @@ if ($_POST) {
 	return;
 }
 
-$pgtitle = array(gettext("Status"),gettext("Edit Mail Reports"));
+$pgtitle = array(gettext("Status"),gettext("Edit Email Reports"));
 include("head.inc");
 ?>
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">
@@ -235,7 +235,7 @@ include("head.inc");
 				<option value="<?php echo $freq; ?>" <?php if($pconfig["frequency"] === $freq) echo "selected"; ?>><?php echo ucwords($freq); ?></option>
 			<?php endforeach; ?>
 			</select>
-			<br/>Select the frequency for the report to be sent via e-mail.
+			<br/>Select the frequency for the report to be sent via email.
 			<br/>
 			</td>
 			<td></td>

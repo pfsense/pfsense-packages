@@ -49,12 +49,12 @@
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0755</chmod>
-		<item>http://www.pfsense.com/packages/config/filer/filer.inc</item>
+		<item>https://packages.pfsense.org/packages/config/filer/filer.inc</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0755</chmod>
-		<item>http://www.pfsense.com/packages/config/filer/filer_sync.xml</item>
+		<item>https://packages.pfsense.org/packages/config/filer/filer_sync.xml</item>
 	</additional_files_needed>
 	<menu>
 		<name>Filer</name>

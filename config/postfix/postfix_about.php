@@ -1,7 +1,7 @@
 <?php
 /*
 	postfix_about.php
-	part of pfSense (http://www.pfsense.com/)
+	part of pfSense (https://www.pfsense.org/)
 	Copyright (C) 2011-2013 Marcello Coutinho <marcellocoutinho@gmail.com>
 	based on varnish_view_config.
 	All rights reserved.
@@ -78,11 +78,11 @@ include("head.inc");
 						</tr>
 						<tr>
                         <td width="22%" valign="top" class="vncell"><?=gettext("Credits ");?></td>
-                        <td width="78%" class="vtable"><?=gettext("Package v2 Created by <a target=_new href='http://forum.pfsense.org/index.php?action=profile;u=4710'>Marcello Coutinho</a><br><br>");?></td>
+                        <td width="78%" class="vtable"><?=gettext("Package v2 Created by <a target=_new href='https://forum.pfsense.org/index.php?action=profile;u=4710'>Marcello Coutinho</a><br><br>");?></td>
                         </tr>
 						<tr>
                         <td width="22%" valign="top" class="vncell"><?=gettext("Donatios ");?></td>
-                        <td width="78%" class="vtable"><?=gettext("If you like this package, please <a target=_new href='http://www.pfsense.org/index.php?option=com_content&task=view&id=47&Itemid=77'>donate to pfSense project</a>.<br><br>
+                        <td width="78%" class="vtable"><?=gettext("If you like this package, please <a target=_new href='https://www.pfsense.org/index.php?option=com_content&task=view&id=47&Itemid=77'>donate to pfSense project</a>.<br><br>
 								 If you want that your donation goes to this package developer, make a note on donation forwarding it to me.<br><br>");?></td>
                         </tr>
 						</table>

@@ -41,13 +41,13 @@
 	<name>zabbixproxy</name>
 	<title>Services: Zabbix-2 Proxy</title>
 	<category>Monitoring</category>
-	<version>0.8_0</version>
+	<version>0.8_1</version>
 	<include_file>/usr/local/pkg/zabbix2.inc</include_file>
 	<addedit_string>Zabbix Proxy has been created/modified.</addedit_string>
 	<delete_string>Zabbix Proxy has been deleted.</delete_string>
 	<restart_command>/usr/local/etc/rc.d/zabbix2_proxy.sh restart</restart_command>
 	<additional_files_needed>
-		<item>http://www.pfsense.org/packages/config/zabbix2/zabbix2.inc</item>
+		<item>https://packages.pfsense.org/packages/config/zabbix2/zabbix2.inc</item>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0755</chmod>
 	</additional_files_needed>
@@ -128,6 +128,15 @@
 			<type>input</type>
 			<size>10</size>
 			<required>true</required>
+		</field>
+		<field>
+			<fielddescr>Advanced Parameters</fielddescr>
+			<fieldname>advancedparams</fieldname>
+			<encoding>base64</encoding>
+			<type>textarea</type>
+			<rows>5</rows>
+			<cols>50</cols>
+			<description>Advanced parameters. There are some rarely used parameters that sometimes need to be defined. Value has form, example: StartDiscoverers=10</description>
 		</field>
 	</fields>
 	<custom_php_install_command>sync_package_zabbix2();</custom_php_install_command>

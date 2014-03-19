@@ -59,12 +59,12 @@
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>077</chmod>
-		<item>http://www.pfsense.com/packages/config/frickin/frickin.inc</item>
+		<item>https://packages.pfsense.org/packages/config/frickin/frickin.inc</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/tmp/</prefix>
 		<chmod>077</chmod>
-		<item>http://www.pfsense.com/packages/config/frickin/bin/frickin2</item>
+		<item>https://packages.pfsense.org/packages/config/frickin/bin/frickin2</item>
 	</additional_files_needed>
 	<fields>
 		<field>

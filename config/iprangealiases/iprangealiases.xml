@@ -52,12 +52,12 @@
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>077</chmod>
-		<item>http://www.pfsense.com/packages/config/iprangealiases/iprangealiases.inc</item>
+		<item>https://packages.pfsense.org/packages/config/iprangealiases/iprangealiases.inc</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>077</chmod>
-		<item>http://www.pfsense.com/packages/config/iprangealiases/iprangealiases.patch</item>
+		<item>https://packages.pfsense.org/packages/config/iprangealiases/iprangealiases.patch</item>
 	</additional_files_needed>
 	<custom_php_install_command>
 		iprangealiases_install();

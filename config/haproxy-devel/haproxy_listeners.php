@@ -2,7 +2,7 @@
 /* $Id: load_balancer_virtual_server.php,v 1.6.2.1 2006/01/02 23:46:24 sullrich Exp $ */
 /*
 	haproxy_listeners.php
-	part of pfSense (http://www.pfsense.com/)
+	part of pfSense (https://www.pfsense.org/)
 	Copyright (C) 2013 PiBa-NL
 	Copyright (C) 2009 Scott Ullrich <sullrich@pfsense.com>
 	Copyright (C) 2008 Remco Hoef <remcoverhoef@pfsense.com>
@@ -167,18 +167,14 @@ include("head.inc");
 					$acls = get_frontend_acls($frontend);
 					$isaclset = "";
 					foreach ($acls as $acl) {
-						$isaclset .= "&#10;" . $acl['descr'];
+						$isaclset .= "&#10;" . htmlspecialchars($acl['descr']);
 					}
-					if ($frontend['ssloffloadacl'])
-						$isaclset .= "&#10;" . "Certificate ACL";
-					if ($frontend['ssloffloadacladditional'])
-						$isaclset .= "&#10;" . "Additional certificate ACLs";
 					
 					if ($isaclset) 
 						echo "<img src=\"$img_acl\" title=\"" . gettext("acl's used") . ": {$isaclset}\" border=\"0\" />";
 						
 					$isadvset = "";
-					if ($frontend['advanced_bind']) $isadvset .= "Advanced bind: {$frontend['advanced_bind']}\r\n";
+					if ($frontend['advanced_bind']) $isadvset .= "Advanced bind: ".htmlspecialchars($frontend['advanced_bind'])."\r\n";
 					if ($frontend['advanced']) $isadvset .= "Advanced pass thru setting used\r\n";
 					if ($isadvset)
 						echo "<img src=\"$img_adv\" title=\"" . gettext("Advanced settings set") . ": {$isadvset}\" border=\"0\" />";

@@ -209,11 +209,11 @@ function mail_report_send($headertext, $cmdtext, $logtext, $attachments) {
 
 	$mail->ContentType = 'text/html';
 	$mail->IsHTML(true);
-	$mail->AddReplyTo($config['notifications']['smtp']['fromaddress'], "Firewall Graph Report");
-	$mail->SetFrom($config['notifications']['smtp']['fromaddress'], "Firewall Graph Report");
+	$mail->AddReplyTo($config['notifications']['smtp']['fromaddress'], "Firewall Email Report");
+	$mail->SetFrom($config['notifications']['smtp']['fromaddress'], "Firewall Email Report");
 	$address = $config['notifications']['smtp']['notifyemailaddress'];
 	$mail->AddAddress($address, "Report Recipient");
-	$mail->Subject = "{$config['system']['hostname']}.{$config['system']['domain']} Graph Report: {$headertext}";
+	$mail->Subject = "{$config['system']['hostname']}.{$config['system']['domain']} Email Report: {$headertext}";
 	$mail->Body .= "This is a periodic report from your firewall, {$config['system']['hostname']}.{$config['system']['domain']}.<br /><br />Current report: {$headertext}<br />\n<br />\n";
 	if (!empty($cmdtext))
 		$mail->Body .= $cmdtext;

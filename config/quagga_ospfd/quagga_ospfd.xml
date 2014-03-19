@@ -7,22 +7,22 @@
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>644</chmod>
-		<item>http://www.pfsense.com/packages/config/quagga_ospfd/quagga_ospfd.inc</item>
+		<item>https://packages.pfsense.org/packages/config/quagga_ospfd/quagga_ospfd.inc</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>644</chmod>
-		<item>http://www.pfsense.com/packages/config/quagga_ospfd/quagga_ospfd_interfaces.xml</item>
+		<item>https://packages.pfsense.org/packages/config/quagga_ospfd/quagga_ospfd_interfaces.xml</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/www/</prefix>
 		<chmod>644</chmod>
-		<item>http://www.pfsense.com/packages/config/quagga_ospfd/status_ospfd.php</item>
+		<item>https://packages.pfsense.org/packages/config/quagga_ospfd/status_ospfd.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/bin/</prefix>
 		<chmod>777</chmod>
-		<item>http://www.pfsense.com/packages/config/quagga_ospfd/quaggactl</item>
+		<item>https://packages.pfsense.org/packages/config/quagga_ospfd/quaggactl</item>
 	</additional_files_needed>
 	<menu>
 		<name>Quagga OSPFd</name>

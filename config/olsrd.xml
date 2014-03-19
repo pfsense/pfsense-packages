@@ -24,7 +24,7 @@
 	<additional_files_needed>
             <prefix>/usr/local/pkg/</prefix>
             <chmod>0755</chmod>
-            <item>http://www.pfsense.com/packages/config/olsrd.inc</item>
+            <item>https://packages.pfsense.org/packages/config/olsrd.inc</item>
         </additional_files_needed>
 	<!-- configpath gets expanded out automatically and config items will be
          stored in that location -->

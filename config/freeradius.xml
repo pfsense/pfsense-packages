@@ -119,17 +119,17 @@
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0775</chmod>
-		<item>http://www.pfsense.org/packages/config/freeradiusclients.xml</item>
+		<item>https://packages.pfsense.org/packages/config/freeradiusclients.xml</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0775</chmod>
-		<item>http://www.pfsense.org/packages/config/freeradiussettings.xml</item>
+		<item>https://packages.pfsense.org/packages/config/freeradiussettings.xml</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0775</chmod>
-		<item>http://www.pfsense.org/packages/config/freeradius.inc</item>
+		<item>https://packages.pfsense.org/packages/config/freeradius.inc</item>
 	</additional_files_needed>
 	<fields>
 		<field>

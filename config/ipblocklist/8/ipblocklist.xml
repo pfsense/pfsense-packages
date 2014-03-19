@@ -39,7 +39,7 @@
 		</copyright>
 	<description>IP Blocklist</description>
 	<requirements>perl</requirements>
-	<faq>http://forum.pfsense.org/index.php/topic,24769.0.html</faq>
+	<faq>https://forum.pfsense.org/index.php/topic,24769.0.html</faq>
 	<name>IP Blocklist Settings</name>
 	<version>0.3.5</version>
 	<title>Settings</title>
@@ -62,102 +62,102 @@
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0755</chmod>
-		<item>http://www.pfsense.org/packages/config/ipblocklist/8/ipblocklist.xml</item>
+		<item>https://packages.pfsense.org/packages/config/ipblocklist/8/ipblocklist.xml</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0755</chmod>
-		<item>http://www.pfsense.org/packages/config/ipblocklist/8/ipblocklist.inc</item>
+		<item>https://packages.pfsense.org/packages/config/ipblocklist/8/ipblocklist.inc</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/tmp/</prefix>
 		<chmod>0755</chmod>
-		<item>http://www.pfsense.org/packages/config/ipblocklist/8/ipblocklist.tmp</item>
+		<item>https://packages.pfsense.org/packages/config/ipblocklist/8/ipblocklist.tmp</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/tmp/</prefix>
 		<chmod>0755</chmod>
-		<item>http://www.pfsense.org/packages/config/ipblocklist/8/interfaces.txt</item>
+		<item>https://packages.pfsense.org/packages/config/ipblocklist/8/interfaces.txt</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/tmp/</prefix>
 		<chmod>0755</chmod>
-		<item>http://www.pfsense.org/packages/config/ipblocklist/8/ipblocklist_list.tmp</item>
+		<item>https://packages.pfsense.org/packages/config/ipblocklist/8/ipblocklist_list.tmp</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/tmp/</prefix>
 		<chmod>0755</chmod>
-		<item>http://www.pfsense.org/packages/config/ipblocklist/8/ipblocklist_if.tmp</item>
+		<item>https://packages.pfsense.org/packages/config/ipblocklist/8/ipblocklist_if.tmp</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/tmp/</prefix>
 		<chmod>0755</chmod>
-		<item>http://www.pfsense.org/packages/config/ipblocklist/8/firewall_shaper.tmp</item>
+		<item>https://packages.pfsense.org/packages/config/ipblocklist/8/firewall_shaper.tmp</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/tmp/</prefix>
 		<chmod>0755</chmod>
-		<item>http://www.pfsense.org/packages/config/ipblocklist/8/convert.pl</item>
+		<item>https://packages.pfsense.org/packages/config/ipblocklist/8/convert.pl</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/tmp/</prefix>
 		<chmod>0755</chmod>
-		<item>http://www.pfsense.org/packages/config/ipblocklist/8/convert-execute.sh</item>
+		<item>https://packages.pfsense.org/packages/config/ipblocklist/8/convert-execute.sh</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/tmp/</prefix>
 		<chmod>0755</chmod>
-		<item>http://www.pfsense.org/packages/config/ipblocklist/8/purge.tmp</item>
+		<item>https://packages.pfsense.org/packages/config/ipblocklist/8/purge.tmp</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/tmp/</prefix>
 		<chmod>0755</chmod>
-		<item>http://www.pfsense.org/packages/config/ipblocklist/8/index.tmp</item>
+		<item>https://packages.pfsense.org/packages/config/ipblocklist/8/index.tmp</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/tmp/</prefix>
 		<chmod>0755</chmod>
-		<item>http://www.pfsense.org/packages/config/ipblocklist/8/whitelist.tmp</item>
+		<item>https://packages.pfsense.org/packages/config/ipblocklist/8/whitelist.tmp</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/tmp/</prefix>
 		<chmod>0755</chmod>
-		<item>http://www.pfsense.org/packages/config/ipblocklist/8/purgeip.tmp</item>
+		<item>https://packages.pfsense.org/packages/config/ipblocklist/8/purgeip.tmp</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/tmp/</prefix>
 		<chmod>0755</chmod>
-		<item>http://www.pfsense.org/packages/config/ipblocklist/8/IP-Blocklist.sh</item>
+		<item>https://packages.pfsense.org/packages/config/ipblocklist/8/IP-Blocklist.sh</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/tmp/</prefix>
 		<chmod>0755</chmod>
-		<item>http://www.pfsense.org/packages/config/ipblocklist/8/settings.tmp</item>
+		<item>https://packages.pfsense.org/packages/config/ipblocklist/8/settings.tmp</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/tmp/</prefix>
 		<chmod>0755</chmod>
-		<item>http://www.pfsense.org/packages/config/ipblocklist/8/class.phpmailer.tmp</item>
+		<item>https://packages.pfsense.org/packages/config/ipblocklist/8/class.phpmailer.tmp</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/tmp/</prefix>
 		<chmod>0755</chmod>
-		<item>http://www.pfsense.org/packages/config/ipblocklist/8/class.smtp.tmp</item>
+		<item>https://packages.pfsense.org/packages/config/ipblocklist/8/class.smtp.tmp</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/tmp/</prefix>
 		<chmod>0755</chmod>
-		<item>http://www.pfsense.org/packages/config/ipblocklist/8/email.tmp</item>
+		<item>https://packages.pfsense.org/packages/config/ipblocklist/8/email.tmp</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/tmp/</prefix>
 		<chmod>0755</chmod>
-		<item>http://www.pfsense.org/packages/config/ipblocklist/8/lists.txt</item>
+		<item>https://packages.pfsense.org/packages/config/ipblocklist/8/lists.txt</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/tmp/</prefix>
 		<chmod>0644</chmod>
-		<item>http://www.pfsense.org/packages/config/ipblocklist/8/countryblock_IPBlocklist.widget.tmp</item>
+		<item>https://packages.pfsense.org/packages/config/ipblocklist/8/countryblock_IPBlocklist.widget.tmp</item>
 	</additional_files_needed>
 	<fields>
 		<field>

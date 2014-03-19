@@ -849,9 +849,9 @@
       <version>0.1</version>
       <status>ALPHA</status>
       <maintainer>fernando@netfilter.com.br</maintainer>
-      <depends_on_package_base_url>http://www.pfsense.com/packages/All/</depends_on_package_base_url>
+      <depends_on_package_base_url>https://www.pfsense.org/packages/All/</depends_on_package_base_url>
       <depends_on_package>p3scan-pf-2.3.2.tbz</depends_on_package>
-      <config_file>http://www.pfsense.org/packages/config/p3scan-pf/p3scan-pf.xml</config_file>
+      <config_file>https://packages.pfsense.org/packages/config/p3scan-pf/p3scan-pf.xml</config_file>
       <configurationfile>p3scan-pf.xml</configurationfile>
     </package>
 		<package>
@@ -898,9 +898,9 @@
       <version>0.1</version>
       <status>ALPHA</status>
       <maintainer>me@daniel.stefan.haischt.name</maintainer>
-      <depends_on_package_base_url>http://www.pfsense.com/packages/All/</depends_on_package_base_url>
+      <depends_on_package_base_url>https://www.pfsense.org/packages/All/</depends_on_package_base_url>
       <depends_on_package>sshtools-0.2.2.tbz</depends_on_package>
-      <config_file>http://www.pfsense.org/packages/config/sshterm/sshterm.xml</config_file>
+      <config_file>https://packages.pfsense.org/packages/config/sshterm/sshterm.xml</config_file>
       <configurationfile>sshterm.xml</configurationfile>
     </package>
 		<menu>

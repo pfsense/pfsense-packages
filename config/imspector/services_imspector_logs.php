@@ -1,11 +1,12 @@
 <?php
 /*
 	services_imspector_logs.php
-	part of pfSense (http://www.pfsense.com/)
+	part of pfSense (https://www.pfsense.org/)
 
 	JavaScript Code is GPL Licensed from SmoothWall Express.
 
 	Copyright (C) 2007 Ryan Wagoner <rswagoner@gmail.com>.
+	Copyright (C) 2012 Marcello Coutinho
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
@@ -60,20 +61,30 @@ $convo_remote_bgcolor	= '#eeeeee';
 /* functions */
 
 function convert_dir_list ($topdir) {
-	if (!is_dir($topdir)) return;
+	global $config;
+	if (!is_dir($topdir)) 
+		return;
+	$imspector_config = $config['installedpackages']['imspector']['config'][0];
+	$limit=(preg_match("/\d+/",$imspector_config['reportlimit'])?$imspector_config['reportlimit']:"50");
+	$count=0;
 	if ($dh = opendir($topdir)) {
 		while (($file = readdir($dh)) !== false) {
-			if(!preg_match('/^\./', $file) == 0) continue;
-			if (is_dir("$topdir/$file")) {
+			if(!preg_match('/^\./', $file) == 0)
+				continue;
+			if (is_dir("$topdir/$file"))
 				$list .= convert_dir_list("$topdir/$file");
-			} else {
+			else
 				$list .= "$topdir/$file\n";
+			$count ++;
+		 	if($count >= $limit){
+		 		closedir($dh);
+		 		return $list;
+		 		}
 			}
-		}
 		closedir($dh);
-	}
+		}
 	return $list;
-}
+	}
 
 /* ajax response */
 if ($_POST['mode'] == "render") {
@@ -157,13 +168,18 @@ include("head.inc");
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
 <?php
 	$tab_array = array();
-	$tab_array[] = array(gettext("IMSpector Log Viewer "), true, "/services_imspector_logs.php");
-	$tab_array[] = array(gettext("IMSpector Settings "), false, "/pkg_edit.php?xml=imspector.xml&id=0");
+	$tab_array[] = array(gettext("Settings "), false, "/pkg_edit.php?xml=imspector.xml&id=0");
+	$tab_array[] = array(gettext("Replacements "), false, "/pkg_edit.php?xml=imspector_replacements.xml&id=0");
+	$tab_array[] = array(gettext("Access Lists "), false, "/pkg.php?xml=imspector_acls.xml");
+	$tab_array[] = array(gettext("Log "), true, "/imspector_logs.php");
+	$tab_array[] = array(gettext("Sync "), false, "/pkg_edit.php?xml=imspector_sync.xml&id=0");
+	
 	display_top_tabs($tab_array);
 ?>
 </table>
 
 <?php
+$csrf_token= csrf_get_tokens();
 $zz = <<<EOD
 <script type="text/javascript">
 var section = 'none';
@@ -180,7 +196,7 @@ function xmlhttpPost()
 	else if (window.ActiveXObject)
 		self.xmlHttpReq = new ActiveXObject("Microsoft.XMLHTTP");
 
-	self.xmlHttpReq.open('POST', 'services_imspector_logs.php', true);
+	self.xmlHttpReq.open('POST', 'imspector_logs.php', true);
 	self.xmlHttpReq.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
 
 	self.xmlHttpReq.onreadystatechange = function() {
@@ -189,7 +205,7 @@ function xmlhttpPost()
 	}
 
 	document.getElementById('im_status').style.display = "inline";
-	self.xmlHttpReq.send("mode=render&section=" + section);
+	self.xmlHttpReq.send("mode=render&section=" + section + "&__csrf_magic={$csrf_token}");
 }
 
 function updatepage(str)

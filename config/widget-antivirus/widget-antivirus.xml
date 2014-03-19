@@ -52,17 +52,17 @@
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>077</chmod>
-		<item>http://www.pfsense.com/packages/config/widget-antivirus/widget-antivirus.inc</item>
+		<item>https://packages.pfsense.org/packages/config/widget-antivirus/widget-antivirus.inc</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/www/widgets/include/</prefix>
 		<chmod>0644</chmod>
-		<item>http://www.pfsense.com/packages/config/widget-antivirus/antivirus_status.inc</item>
+		<item>https://packages.pfsense.org/packages/config/widget-antivirus/antivirus_status.inc</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/www/widgets/widgets/</prefix>
 		<chmod>0644</chmod>
-		<item>http://www.pfsense.com/packages/config/widget-antivirus/antivirus_status.widget.php</item>
+		<item>https://packages.pfsense.org/packages/config/widget-antivirus/antivirus_status.widget.php</item>
 	</additional_files_needed>
 	<custom_php_deinstall_command>
 		widget_antivirus_uninstall();

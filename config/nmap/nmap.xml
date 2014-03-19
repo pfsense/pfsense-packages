@@ -62,7 +62,7 @@
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>077</chmod>
-		<item>http://www.pfsense.org/packages/config/nmap/nmap.inc</item>
+		<item>https://packages.pfsense.org/packages/config/nmap/nmap.inc</item>
 	</additional_files_needed>
 	<fields>
 		<field>

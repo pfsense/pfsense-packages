@@ -7,6 +7,7 @@
  * Copyright (C) 2003-2004 Manuel Kasper <mk@neon1.net>.
  * Copyright (C) 2006 Scott Ullrich
  * Copyright (C) 2012 Ermal Luci
+ * Copyright (C) 2013,2014 Bill Meeks
  * All rights reserved.
  *
  * Modified for the Pfsense snort package v. 1.8+
@@ -141,6 +142,14 @@ $a_instance = &$config['installedpackages']['snortglobal']['rule'];
 $snort_uuid = $a_instance[$instanceid]['uuid'];
 $if_real = snort_get_real_interface($a_instance[$instanceid]['interface']);
 
+// Load up the arrays of force-enabled and force-disabled SIDs
+$enablesid = snort_load_sid_mods($a_instance[$instanceid]['rule_sid_on']);
+$disablesid = snort_load_sid_mods($a_instance[$instanceid]['rule_sid_off']);
+
+// Grab pfSense version so we can refer to it later on this page
+$pfs_version=substr(trim(file_get_contents("/etc/version")),0,3);
+
+$pconfig = array();
 if (is_array($config['installedpackages']['snortglobal']['alertsblocks'])) {
 	$pconfig['arefresh'] = $config['installedpackages']['snortglobal']['alertsblocks']['arefresh'];
 	$pconfig['alertnumber'] = $config['installedpackages']['snortglobal']['alertsblocks']['alertnumber'];
@@ -215,6 +224,64 @@ if (($_GET['act'] == "addsuppress_srcip" || $_GET['act'] == "addsuppress_dstip")
 		$input_errors[] = gettext("Suppress List '{$a_instance[$instanceid]['suppresslistname']}' is defined for this interface, but it could not be found!");
 }
 
+if ($_GET['act'] == "togglesid" && is_numeric($_GET['sidid']) && is_numeric($_GET['gen_id'])) {
+	// Get the GID tag embedded in the clicked rule icon.
+	$gid = $_GET['gen_id'];
+
+	// Get the SID tag embedded in the clicked rule icon.
+	$sid= $_GET['sidid'];
+
+	// See if the target SID is in our list of modified SIDs,
+	// and toggle it if present.
+	if (isset($enablesid[$gid][$sid]))
+		unset($enablesid[$gid][$sid]);
+	if (isset($disablesid[$gid][$sid]))
+		unset($disablesid[$gid][$sid]);
+	elseif (!isset($disablesid[$gid][$sid]))
+		$disablesid[$gid][$sid] = "disablesid";
+
+	// Write the updated enablesid and disablesid values to the config file.
+	$tmp = "";
+	foreach (array_keys($enablesid) as $k1) {
+		foreach (array_keys($enablesid[$k1]) as $k2)
+			$tmp .= "{$k1}:{$k2}||";
+	}
+	$tmp = rtrim($tmp, "||");
+
+	if (!empty($tmp))
+		$a_instance[$instanceid]['rule_sid_on'] = $tmp;
+	else				
+		unset($a_instance[$instanceid]['rule_sid_on']);
+
+	$tmp = "";
+	foreach (array_keys($disablesid) as $k1) {
+		foreach (array_keys($disablesid[$k1]) as $k2)
+			$tmp .= "{$k1}:{$k2}||";
+	}
+	$tmp = rtrim($tmp, "||");
+
+	if (!empty($tmp))
+		$a_instance[$instanceid]['rule_sid_off'] = $tmp;
+	else				
+		unset($a_instance[$instanceid]['rule_sid_off']);
+
+	/* Update the config.xml file. */
+	write_config();
+
+	/*************************************************/
+	/* Update the snort.conf file and rebuild the    */
+	/* rules for this interface.                     */
+	/*************************************************/
+	$rebuild_rules = true;
+	snort_generate_conf($a_instance[$instanceid]);
+	$rebuild_rules = false;
+
+	/* Soft-restart Snort to live-load the new rules */
+	snort_reload_config($a_instance[$instanceid]);
+
+	$savemsg = gettext("The state for rule {$gid}:{$sid} has been modified.  Snort is 'live-reloading' the new rules list.  Please wait at least 30 secs for the process to complete before toggling additional rules.");
+}
+
 if ($_GET['action'] == "clear" || $_POST['delete']) {
 	snort_post_delete_logs($snort_uuid);
 	$fd = @fopen("/var/log/snort/snort_{$if_real}{$snort_uuid}/alert", "w+");
@@ -264,16 +331,14 @@ include_once("head.inc");
 ?>
 
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">
-
+<script src="/javascript/filter_log.js" type="text/javascript"></script>
 <?php
 include_once("fbegin.inc");
 
 /* refresh every 60 secs */
 if ($pconfig['arefresh'] == 'on')
 	echo "<meta http-equiv=\"refresh\" content=\"60;url=/snort/snort_alerts.php?instance={$instanceid}\" />\n";
-?>
-
-<?php if($pfsense_stable == 'yes'){echo '<p class="pgtitle">' . $pgtitle . '</p>';}
+if($pfsense_stable == 'yes'){echo '<p class="pgtitle">' . $pgtitle . '</p>';}
 	/* Display Alert message */
 	if ($input_errors) {
 		print_input_errors($input_errors); // TODO: add checks
@@ -403,10 +468,17 @@ if (file_exists("/var/log/snort/snort_{$if_real}{$snort_uuid}/alert")) {
 			$alert_ip_src = $fields[6];
 			/* Add zero-width space as soft-break opportunity after each colon if we have an IPv6 address */
 			$alert_ip_src = str_replace(":", ":&#8203;", $alert_ip_src);
-			/* Add Reverse DNS lookup icon */
-			$alert_ip_src .= "<br/><a href='/diag_dns.php?host={$fields[6]}&instance={$instanceid}'>";
+			/* Add Reverse DNS lookup icons (two different links if pfSense version supports them) */
+			$alert_ip_src .= "<br/>";
+			if ($pfs_version > 2.0) {
+				$alert_ip_src .= "<a onclick=\"javascript:getURL('/diag_dns.php?host={$fields[6]}&dialog_output=true', outputrule);\">";
+				$alert_ip_src .= "<img src='../themes/{$g['theme']}/images/icons/icon_log_d.gif' width='11' height='11' border='0' ";
+				$alert_ip_src .= "title='" . gettext("Resolve host via reverse DNS lookup (quick pop-up)") . "' style=\"cursor: pointer;\"></a>&nbsp;";
+			}
+			$alert_ip_src .= "<a href='/diag_dns.php?host={$fields[6]}&instance={$instanceid}'>";
 			$alert_ip_src .= "<img src='../themes/{$g['theme']}/images/icons/icon_log.gif' width='11' height='11' border='0' ";
 			$alert_ip_src .= "title='" . gettext("Resolve host via reverse DNS lookup") . "'></a>";
+
 			/* Add icons for auto-adding to Suppress List if appropriate */
 			if (!snort_is_alert_globally_suppressed($supplist, $fields[1], $fields[2]) && 
 			    !isset($supplist[$fields[1]][$fields[2]]['by_src'][$fields[6]])) {
@@ -421,7 +493,7 @@ if (file_exists("/var/log/snort/snort_{$if_real}{$snort_uuid}/alert")) {
 			/* Add icon for auto-removing from Blocked Table if required */
 			if (isset($tmpblocked[$fields[6]])) {
 				$alert_ip_src .= "&nbsp;";
-				$alert_ip_src .= "<a href='?instance={$id}&todelete=" . trim(urlencode($fields[6])) . "'>
+				$alert_ip_src .= "<a href='?instance={$instanceid}&todelete=" . trim(urlencode($fields[6])) . "'>
 				<img title=\"" . gettext("Remove host from Blocked Table") . "\" border=\"0\" width='12' height='12' name='todelete' id='todelete' alt=\"Remove from Blocked Hosts\" src=\"../themes/{$g['theme']}/images/icons/icon_x.gif\"></a>"; 
 			}
 			/* IP SRC Port */
@@ -430,8 +502,14 @@ if (file_exists("/var/log/snort/snort_{$if_real}{$snort_uuid}/alert")) {
 			$alert_ip_dst = $fields[8];
 			/* Add zero-width space as soft-break opportunity after each colon if we have an IPv6 address */
 			$alert_ip_dst = str_replace(":", ":&#8203;", $alert_ip_dst);
-			/* Add Reverse DNS lookup icon */
-			$alert_ip_dst .= "<br/><a href='/diag_dns.php?host={$fields[8]}&instance={$instanceid}'>";
+			/* Add Reverse DNS lookup icons (two different links if pfSense version supports them) */
+			$alert_ip_dst .= "<br/>";
+			if ($pfs_version > 2.0) {
+				$alert_ip_dst .= "<a onclick=\"javascript:getURL('/diag_dns.php?host={$fields[8]}&dialog_output=true', outputrule);\">";
+				$alert_ip_dst .= "<img src='../themes/{$g['theme']}/images/icons/icon_log_d.gif' width='11' height='11' border='0' ";
+				$alert_ip_dst .= "title='" . gettext("Resolve host via reverse DNS lookup (quick pop-up)") . "' style=\"cursor: pointer;\"></a>&nbsp;";
+			}
+			$alert_ip_dst .= "<a href='/diag_dns.php?host={$fields[8]}&instance={$instanceid}'>";
 			$alert_ip_dst .= "<img src='../themes/{$g['theme']}/images/icons/icon_log.gif' width='11' height='11' border='0' ";
 			$alert_ip_dst .= "title='" . gettext("Resolve host via reverse DNS lookup") . "'></a>";	
 			/* Add icons for auto-adding to Suppress List if appropriate */
@@ -448,7 +526,7 @@ if (file_exists("/var/log/snort/snort_{$if_real}{$snort_uuid}/alert")) {
 			/* Add icon for auto-removing from Blocked Table if required */
 			if (isset($tmpblocked[$fields[8]])) {
 				$alert_ip_dst .= "&nbsp;";
-				$alert_ip_dst .= "<a href='?instance={$id}&todelete=" . trim(urlencode($fields[8])) . "'>
+				$alert_ip_dst .= "<a href='?instance={$instanceid}&todelete=" . trim(urlencode($fields[8])) . "'>
 				<img title=\"" . gettext("Remove host from Blocked Table") . "\" border=\"0\" width='12' height='12' name='todelete' id='todelete' alt=\"Remove from Blocked Hosts\" src=\"../themes/{$g['theme']}/images/icons/icon_x.gif\"></a>";
 			}
 			/* IP DST Port */
@@ -464,6 +542,18 @@ if (file_exists("/var/log/snort/snort_{$if_real}{$snort_uuid}/alert")) {
 				$sidsupplink = "<img src='../themes/{$g['theme']}/images/icons/icon_plus_d.gif' width='12' height='12' border='0' ";
 				$sidsupplink .= "title='" . gettext("This alert is already in the Suppress List") . "'/>";	
 			}
+			/* Add icon for toggling rule state */
+			if (isset($disablesid[$fields[1]][$fields[2]])) {
+				$sid_dsbl_link = "<a href='?instance={$instanceid}&act=togglesid&sidid={$fields[2]}&gen_id={$fields[1]}'>";
+				$sid_dsbl_link .= "<img src='../themes/{$g['theme']}/images/icons/icon_block_d.gif' width='11' height='11' border='0' ";
+				$sid_dsbl_link .= "title='" . gettext("Rule is forced to a disabled state. Click to remove the force-disable action.") . "'></a>";
+			}
+			else {
+				$sid_dsbl_link = "<a href='?instance={$instanceid}&act=togglesid&sidid={$fields[2]}&gen_id={$fields[1]}'>";
+				$sid_dsbl_link .= "<img src='../themes/{$g['theme']}/images/icons/icon_block.gif' width='11' height='11' border='0' ";
+				$sid_dsbl_link .= "title='" . gettext("Click to force-disable rule and remove from current rules set.") . "'></a>";
+			}
+			/* DESCRIPTION */
 			$alert_class = $fields[11];
 
 			echo "<tr>
@@ -475,7 +565,7 @@ if (file_exists("/var/log/snort/snort_{$if_real}{$snort_uuid}/alert")) {
 				<td class='listr' align='center'>{$alert_src_p}</td>
 				<td class='listr' align='center'>{$alert_ip_dst}</td>
 				<td class='listr' align='center'>{$alert_dst_p}</td>
-				<td class='listr' align='center'>{$alert_sid_str}<br/>{$sidsupplink}</td>
+				<td class='listr' align='center'>{$alert_sid_str}<br/>{$sidsupplink}&nbsp;&nbsp;{$sid_dsbl_link}</td>
 				<td class='listr' style=\"word-wrap:break-word;\">{$alert_descr}</td>
 				</tr>\n";
 

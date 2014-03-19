@@ -27,14 +27,14 @@ $CONFIG = array('DSPAM_HOME'          => '/var/db/dspam',
                 'AUTODETECT'          => 1,
                 'OPENSOURCE'          => 0,
                 /* Is there a website which provides dedicated infos? */
-                'PACKAGE_WEBSITE'     => 'http://www.pfsense.com/',
+                'PACKAGE_WEBSITE'     => 'https://www.pfsense.org/',
                 /* Is there a forum which provides dedicated infos? */
-                'PACKAGE_FORUM'       => 'http://www.pfsense.com/',
+                'PACKAGE_FORUM'       => 'https://www.pfsense.org/',
                 /*
                  * Is there a issue tracker which allows to fill a
                  * support request or a bug report?
                  */
-                'PACKAGE_TRACKER'     => 'http://www.pfsense.com/',
+                'PACKAGE_TRACKER'     => 'https://www.pfsense.org/',
                 /* 'DATE_FORMAT'        => '%d.%m.%Y %H:%M' */
                 'DATE_FORMAT'         => '%b %d %H:%M'
                );

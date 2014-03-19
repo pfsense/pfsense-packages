@@ -18,22 +18,22 @@
 		<description>Antivirus HTTP proxy Service</description>
         </service>
         <additional_files_needed>
-               <item>http://www.pfsense.com/packages/config/havp/havp.inc</item>
+               <item>https://packages.pfsense.org/packages/config/havp/havp.inc</item>
                <prefix>/usr/local/pkg/</prefix>
                <chmod>0755</chmod>
         </additional_files_needed>
         <!--additional_files_needed>
-               <item>http://www.pfsense.com/packages/config/havp/havp_fscan.xml</item>
+               <item>https://packages.pfsense.org/packages/config/havp/havp_fscan.xml</item>
                <prefix>/usr/local/pkg/</prefix>
                <chmod>0755</chmod>
         </additional_files_needed-->
         <additional_files_needed>
-               <item>http://www.pfsense.com/packages/config/havp/havp_avset.xml</item>
+               <item>https://packages.pfsense.org/packages/config/havp/havp_avset.xml</item>
                <prefix>/usr/local/pkg/</prefix>
                <chmod>0755</chmod>
         </additional_files_needed>
         <additional_files_needed>
-               <item>http://www.pfsense.com/packages/config/havp/antivirus.php</item>
+               <item>https://packages.pfsense.org/packages/config/havp/antivirus.php</item>
                <prefix>/usr/local/www/</prefix>
                <chmod>0755</chmod>
         </additional_files_needed>

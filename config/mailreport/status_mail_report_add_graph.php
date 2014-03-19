@@ -34,8 +34,8 @@
 
 ##|+PRIV
 ##|*IDENT=page-status-mailreportsaddgraph
-##|*NAME=Status: E-Mail Reports: Add Graph page
-##|*DESCR=Allow access to the 'Status: E-Mail Reports: Add Graph' page.
+##|*NAME=Status: Email Reports: Add Graph page
+##|*DESCR=Allow access to the 'Status: Email Reports: Add Graph' page.
 ##|*MATCH=status_mail_report_add_graph.php*
 ##|-PRIV
 
@@ -158,7 +158,7 @@ if ($_POST) {
 }
 
 
-$pgtitle = array(gettext("Status"),gettext("Add Mail Report Graph"));
+$pgtitle = array(gettext("Status"),gettext("Add Email Report Graph"));
 include("head.inc");
 ?>
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">

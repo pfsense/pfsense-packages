@@ -52,22 +52,22 @@
 	<additional_files_needed>
 		<prefix>/usr/local/www/</prefix>
 		<chmod>644</chmod>
-		<item>http://www.pfsense.com/packages/config/servicewatchdog/services_servicewatchdog.php</item>
+		<item>https://packages.pfsense.org/packages/config/servicewatchdog/services_servicewatchdog.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/www/</prefix>
 		<chmod>644</chmod>
-		<item>http://www.pfsense.com/packages/config/servicewatchdog/services_servicewatchdog_add.php</item>
+		<item>https://packages.pfsense.org/packages/config/servicewatchdog/services_servicewatchdog_add.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>755</chmod>
-		<item>http://www.pfsense.com/packages/config/servicewatchdog/servicewatchdog_cron.php</item>
+		<item>https://packages.pfsense.org/packages/config/servicewatchdog/servicewatchdog_cron.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>644</chmod>
-		<item>http://www.pfsense.com/packages/config/servicewatchdog/servicewatchdog.inc</item>
+		<item>https://packages.pfsense.org/packages/config/servicewatchdog/servicewatchdog.inc</item>
 	</additional_files_needed>
 	<custom_php_install_command>
 		servicewatchdog_cron_job();

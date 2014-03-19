@@ -10,32 +10,32 @@
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/mactovendor/</prefix>
 		<chmod>077</chmod>
-		<item>http://www.pfsense.com/packages/config/mactovendor/mactovendor.inc</item>
+		<item>https://packages.pfsense.org/packages/config/mactovendor/mactovendor.inc</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/mactovendor/</prefix>
 		<chmod>644</chmod>
-		<item>http://www.pfsense.com/packages/config/mactovendor/bin/diag_arp.php_</item>
+		<item>https://packages.pfsense.org/packages/config/mactovendor/bin/diag_arp.php_</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/mactovendor/</prefix>
 		<chmod>644</chmod>
-		<item>http://www.pfsense.com/packages/config/mactovendor/bin/status_dhcp_leases.php_</item>
+		<item>https://packages.pfsense.org/packages/config/mactovendor/bin/status_dhcp_leases.php_</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/mactovendor/</prefix>
 		<chmod>644</chmod>
-		<item>http://www.pfsense.com/packages/config/mactovendor/bin/status_interfaces.php_</item>
+		<item>https://packages.pfsense.org/packages/config/mactovendor/bin/status_interfaces.php_</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/mactovendor/</prefix>
 		<chmod>644</chmod>
-		<item>http://www.pfsense.com/packages/config/mactovendor/bin/status_wireless.php_</item>
+		<item>https://packages.pfsense.org/packages/config/mactovendor/bin/status_wireless.php_</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/mactovendor/</prefix>
 		<chmod>644</chmod>
-		<item>http://www.pfsense.com/packages/config/mactovendor/bin/mac-prefixes</item>
+		<item>https://packages.pfsense.org/packages/config/mactovendor/bin/mac-prefixes</item>
 	</additional_files_needed>
 	<custom_php_install_command>
 		mactovendor_custom_php_install_command();

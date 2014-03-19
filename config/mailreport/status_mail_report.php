@@ -33,8 +33,8 @@
 
 ##|+PRIV
 ##|*IDENT=page-status-mailreports
-##|*NAME=Status: E-Mail Reports page
-##|*DESCR=Allow access to the 'Status: E-Mail Reports' page.
+##|*NAME=Status: Email Reports page
+##|*DESCR=Allow access to the 'Status: Email Reports' page.
 ##|*MATCH=status_mail_report.php*
 ##|-PRIV
 
@@ -54,14 +54,14 @@ if ($_GET['act'] == "del") {
 		// Fix up cron job(s)
 		set_mail_report_cron_jobs($a_mailreports);
 
-		write_config("Removed Mail Report '{$name}'");
+		write_config("Removed Email Report '{$name}'");
 		configure_cron();
 		header("Location: status_mail_report.php");
 		exit;
 	}
 }
 
-$pgtitle = array(gettext("Status"),gettext("Mail Reports"));
+$pgtitle = array(gettext("Status"),gettext("Email Reports"));
 include("head.inc");
 ?>
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">
@@ -69,15 +69,15 @@ include("head.inc");
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
 	<tr><td><div id="mainarea">
 	<table class="tabcont" width="100%" border="0" cellpadding="0" cellspacing="0">
-		<tr><td colspan="4">Here you can define a list of reports to be sent by e-mail. </td></tr>
+		<tr><td colspan="4">Here you can define a list of reports to be sent by email. </td></tr>
 		<tr><td>&nbsp;</td></tr>
 		<tr>
-			<td width="35%" class="listhdr"><?=gettext("Description");?></td>
-			<td width="25%" class="listhdr"><?=gettext("Schedule");?></td>
-			<td width="10%" class="listhdr"><?=gettext("Cmds");?></td>
-			<td width="10%" class="listhdr"><?=gettext("Logs");?></td>
-			<td width="10%" class="listhdr"><?=gettext("Graphs");?></td>
-			<td width="10%" class="list"><a href="status_mail_report_edit.php"><img src="./themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif" width="17" height="17" border="0"></a></td>
+			<td width="34%" class="listhdr"><?=gettext("Description");?></td>
+			<td width="24%" class="listhdr"><?=gettext("Schedule");?></td>
+			<td width="12%" class="listhdr"><?=gettext("Commands");?></td>
+			<td width="12%" class="listhdr"><?=gettext("Logs");?></td>
+			<td width="12%" class="listhdr"><?=gettext("Graphs");?></td>
+			<td width="6%" class="list"><a href="status_mail_report_edit.php"><img src="./themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif" width="17" height="17" border="0"></a></td>
 		</tr>
 		<?php $i = 0; foreach ($a_mailreports as $mailreport): ?>
 		<tr ondblclick="document.location='status_mail_report_edit.php?id=<?=$i;?>'">

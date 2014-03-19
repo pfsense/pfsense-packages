@@ -108,7 +108,7 @@
 			<type>input</type>
 		</field>
                 <field>
-                        <fielddescr>Enter IP or range bloc network.</fielddescr>
+                        <fielddescr>Enter IP or range block network.</fielddescr>
                         <description>Leave blank to allow All</description>
                         <fieldname>none</fieldname>
                     <type>rowhelper</type>

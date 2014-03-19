@@ -224,7 +224,7 @@ if (file_exists("{$tmpfname}/{$pfsense_rules_filename_md5}")) {
 } else {
     update_status(gettext("Downloading pfsense md5 file..."));
     ini_set('user_agent','Mozilla/4.0 (compatible; MSIE 6.0)');
-    $image = @file_get_contents("http://www.pfsense.com/packages/config/snort/pfsense_rules/pfsense_rules.tar.gz.md5");
+    $image = @file_get_contents("https://packages.pfsense.org/packages/config/snort/pfsense_rules/pfsense_rules.tar.gz.md5");
 //    $image = @file_get_contents("http://www.mtest.local/pub-bin/oinkmaster.cgi/{$oinkid}/pfsense_rules.tar.gz.md5");
     $f = fopen("{$tmpfname}/pfsense_rules.tar.gz.md5", 'w');
     fwrite($f, $image);
@@ -396,7 +396,7 @@ if (file_exists("{$tmpfname}/{$pfsense_rules_filename}")) {
     update_status(gettext("There is a new set of Pfsense rules posted. Downloading..."));
     update_output_window(gettext("May take 4 to 10 min..."));
 //    download_file_with_progress_bar("http://www.mtest.local/pub-bin/oinkmaster.cgi/{$oinkid}/pfsense_rules.tar.gz", $tmpfname . "/{$pfsense_rules_filename}", "read_body_firmware");
-    download_file_with_progress_bar("http://www.pfsense.com/packages/config/snort/pfsense_rules/pfsense_rules.tar.gz", $tmpfname . "/{$pfsense_rules_filename}", "read_body_firmware");
+    download_file_with_progress_bar("https://packages.pfsense.org/packages/config/snort/pfsense_rules/pfsense_rules.tar.gz", $tmpfname . "/{$pfsense_rules_filename}", "read_body_firmware");
     update_all_status($static_output);
     update_status(gettext("Done downloading rules file."));
  }

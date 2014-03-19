@@ -14,12 +14,12 @@
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0755</chmod>
-		<item>http://www.pfsense.com/packages/config/jail_template/jail_template.inc</item>
+		<item>https://packages.pfsense.org/packages/config/jail_template/jail_template.inc</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/</prefix>
 		<chmod>0755</chmod>
-		<item>http://www.pfsense.com/packages/config/jail_template/jail_template.img.uzip</item>
+		<item>https://packages.pfsense.org/packages/config/jail_template/jail_template.img.uzip</item>
 	</additional_files_needed>
 	
 	<include_file>/usr/local/pkg/jail_template.inc</include_file>

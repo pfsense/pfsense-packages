@@ -40,23 +40,28 @@
 	<name>Apcupsd</name>
 	<title>Services: Apcupsd (General)</title>
 	<category>Monitoring</category>
-	<version>0.1</version>
+	<version>0.2</version>
 	<include_file>/usr/local/pkg/apcupsd.inc</include_file>
 	<addedit_string>Apcupsd has been created/modified.</addedit_string>
 	<delete_string>Apcupsd has been deleted.</delete_string>
 	<restart_command>/usr/local/etc/rc.d/apcupsd.sh restart</restart_command>
 	<additional_files_needed>
-		<item>http://www.pfsense.org/packages/config/apcupsd/apcupsd.inc</item>
+		<item>https://packages.pfsense.org/packages/config/apcupsd/apcupsd.inc</item>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0755</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
-		<item>http://www.pfsense.org/packages/config/apcupsd/apcupsd_status.php</item>
+		<item>https://packages.pfsense.org/packages/config/apcupsd/apcupsd_status.php</item>
 		<prefix>/usr/local/www/</prefix>
 		<chmod>0755</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
-		<item>http://www.pfsense.org/packages/config/apcupsd/apcupsd.conf.php</item>
+		<item>https://packages.pfsense.org/packages/config/apcupsd/apcupsd.conf.php</item>
+		<prefix>/usr/local/pkg/</prefix>
+		<chmod>0755</chmod>
+	</additional_files_needed>
+	<additional_files_needed>
+		<item>https://packages.pfsense.org/packages/config/apcupsd/apcupsd_mail.php</item>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0755</chmod>
 	</additional_files_needed>
@@ -152,12 +157,6 @@ UPSTYPE   DEVICE           Description <br>
                            catching; you usually want "APC". Port is usually
                            161. Community is usually "private".<br>
 <br>
-<strong>netsnmp   hostname:port:vendor:community</strong>
-                           OBSOLETE
-                           Same as SNMP above but requires use of the
-                           net-snmp library. Unless you have a specific need
-                           for this old driver, you should use 'snmp' instead.<br>
-<br>
 <strong>dumb      /dev/tty**</strong>       Old serial character device for use with
                            simple-signaling UPSes.<br>
 <br>
@@ -176,6 +175,13 @@ UPSTYPE   DEVICE           Description <br>
          <type>input</type>
          <size>60</size>
 			<required>true</required>
+		</field>
+		<field>
+			<fielddescr>Device</fielddescr>
+			<fieldname>device</fieldname>
+			<description></description>
+         <type>input</type>
+         <size>60</size>
 		</field>
 		<field>
 			<fielddescr>Poll Time</fielddescr>
@@ -322,7 +328,7 @@ UPSTYPE   DEVICE           Description <br>
 			</options>
 		</field>
 	</fields>
-	<custom_php_install_command>sync_package_apcupsd();</custom_php_install_command>
+	<custom_php_install_command>php_install_apcupsd();</custom_php_install_command>
 	<custom_php_command_before_form></custom_php_command_before_form>
 	<custom_php_after_head_command></custom_php_after_head_command>
 	<custom_php_after_form_command></custom_php_after_form_command>

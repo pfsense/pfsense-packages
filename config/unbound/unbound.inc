@@ -124,10 +124,8 @@ function unbound_rc_setup() {
 <?php
 	require_once(\"/usr/local/pkg/unbound.inc\");
 	echo \"Starting and configuring Unbound...\";
-	fetch_root_hints();
 	unbound_control(\"anchor_update\");
 	unbound_control(\"start\");
-	unbound_control(\"forward\");
 	unbound_control(\"restore_cache\");
 	echo \"done.\\n\";
 ?>
@@ -164,37 +162,6 @@ function unbound_control($action) {
 	$cache_dumpfile = "/var/tmp/unbound_cache";
 
 	switch ($action) {
-		case "forward":
-				/* Dont utilize forward cmd if Unbound is doing DNS queries directly
-				 * XXX: We could make this an option to then make pfSense use Unbound
-				 * as the recursive nameserver instead of upstream ones(?)
-				 */
-				if ($unbound_config['forwarding_mode'] == "on") {
-					// Get configured DNS servers and add them as forwarders
-					if (!isset($config['system']['dnsallowoverride'])) {
-						$ns = array_unique(get_nameservers());
-						foreach($ns as $nameserver) {
-							if($nameserver)
-								$dns_servers .= " $nameserver";
-						}
-					} else {
-						$ns = array_unique(get_dns_servers());
-						foreach($ns as $nameserver) {
-							if($nameserver)
-								$dns_servers .= " $nameserver";
-						}
-					}
-
-					if(is_service_running("unbound")) {
-						unbound_ctl_exec("forward $dns_servers");
-					} else {
-						unbound_control("start");
-						sleep(1);
-						unbound_control("forward");
-					}
-				}
-				break;
-
 		case "start":
 				//Start unbound
 				if($unbound_config['enable'] == "on") {
@@ -206,7 +173,6 @@ function unbound_control($action) {
 							mwexec("/bin/ln -s /var/run/unbound.pid /var/run/dnsmasq.pid");
 						}
 					mwexec_bg("/usr/local/bin/unbound_monitor.sh");
-					fetch_root_hints();
 				}
 				break;
 
@@ -456,7 +422,7 @@ function unbound_resync_config() {
 	}
 
 	// Private-address support for DNS Rebinding
-	if($unbound_config['private_address'] == "on") {
+	if ($unbound_config['private_address'] == "on") {
 		$pvt_addr = <<<EOF
 # For DNS Rebinding prevention
 private-address: 10.0.0.0/8
@@ -475,26 +441,26 @@ EOF;
 	//Setup optimization
 	$optimization = unbound_optimization();
 
-	$unbound_config = &$config['installedpackages']['unboundadvanced']['config'][0];
+	$adv_config = &$config['installedpackages']['unboundadvanced']['config'][0];
 	// Setup Advanced options
-	$log_verbosity = (isset($unbound_config['unbound_verbosity'])) ? $unbound_config['unbound_verbosity'] : "1";
-	$hide_id = ($unbound_config['hide_id'] == "on") ? "yes" : "no";
-	$hide_version = ($unbound_config['hide_version'] == "on") ? "yes" : "no";
-	$harden_glue = ($unbound_config['harden_glue'] == "on") ? "yes" : "no";
-	$harden_dnssec_stripped = ($unbound_config['harden_dnssec_stripped'] == "on") ? "yes" : "no";
-	$prefetch = ($unbound_config['prefetch'] == "on") ? "yes" : "no";
-	$prefetch_key = ($unbound_config['prefetch_key'] == "on") ? "yes" : "no";
-	$outgoing_num_tcp = (!empty($unbound_config['outgoing_num_tcp'])) ? $unbound_config['outgoing_num_tcp'] : "10";
-	$incoming_num_tcp = (!empty($unbound_config['incoming_num_tcp'])) ? $unbound_config['incoming_num_tcp'] : "10";
-	$edns_buffer_size = (!empty($unbound_config['edns_buffer_size'])) ? $unbound_config['edns_buffer_size'] : "4096";
-	$num_queries_per_thread = (!empty($unbound_config['num_queries_per_thread'])) ? $unbound_config['num_queries_per_thread'] : "4096";
-	$jostle_timeout = (!empty($unbound_config['jostle_timeout'])) ? $unbound_config['jostle_timeout'] : "200";
-	$cache_max_ttl = (!empty($unbound_config['cache_max_ttl'])) ? $unbound_config['cache_max_ttl'] : "86400";
-	$cache_min_ttl = (!empty($unbound_config['cache_min_ttl'])) ? $unbound_config['cache_min_ttl'] : "0";
-	$infra_host_ttl = (!empty($unbound_config['infra_host_ttl'])) ? $unbound_config['infra_host_ttl'] : "900";
-	$infra_lame_ttl = (!empty($unbound_config['infra_lame_ttl'])) ? $unbound_config['infra_lame_ttl'] : "900";
-	$infra_cache_numhosts = (!empty($unbound_config['infra_cache_numhosts'])) ? $unbound_config['infra_cache_numhosts'] : "10000";
-	$unwanted_reply_threshold = (!empty($unbound_config['unwanted_reply_threshold'])) ? $unbound_config['unwanted_reply_threshold'] : "0";
+	$log_verbosity = (isset($adv_config['unbound_verbosity'])) ? $adv_config['unbound_verbosity'] : "1";
+	$hide_id = ($adv_config['hide_id'] == "on") ? "yes" : "no";
+	$hide_version = ($adv_config['hide_version'] == "on") ? "yes" : "no";
+	$harden_glue = ($adv_config['harden_glue'] == "on") ? "yes" : "no";
+	$harden_dnssec_stripped = ($adv_config['harden_dnssec_stripped'] == "on") ? "yes" : "no";
+	$prefetch = ($adv_config['prefetch'] == "on") ? "yes" : "no";
+	$prefetch_key = ($adv_config['prefetch_key'] == "on") ? "yes" : "no";
+	$outgoing_num_tcp = isset($adv_config['outgoing_num_tcp']) ? $adv_config['outgoing_num_tcp'] : "10";
+	$incoming_num_tcp = isset($adv_config['incoming_num_tcp']) ? $adv_config['incoming_num_tcp'] : "10";
+	$edns_buffer_size = (!empty($adv_config['edns_buffer_size'])) ? $adv_config['edns_buffer_size'] : "4096";
+	$num_queries_per_thread = (!empty($adv_config['num_queries_per_thread'])) ? $adv_config['num_queries_per_thread'] : "4096";
+	$jostle_timeout = (!empty($adv_config['jostle_timeout'])) ? $adv_config['jostle_timeout'] : "200";
+	$cache_max_ttl = (!empty($adv_config['cache_max_ttl'])) ? $adv_config['cache_max_ttl'] : "86400";
+	$cache_min_ttl = (!empty($adv_config['cache_min_ttl'])) ? $adv_config['cache_min_ttl'] : "0";
+	$infra_host_ttl = (!empty($adv_config['infra_host_ttl'])) ? $adv_config['infra_host_ttl'] : "900";
+	$infra_lame_ttl = (!empty($adv_config['infra_lame_ttl'])) ? $adv_config['infra_lame_ttl'] : "900";
+	$infra_cache_numhosts = (!empty($adv_config['infra_cache_numhosts'])) ? $adv_config['infra_cache_numhosts'] : "10000";
+	$unwanted_reply_threshold = (!empty($adv_config['unwanted_reply_threshold'])) ? $adv_config['unwanted_reply_threshold'] : "0";
 
 
 	$unbound_conf = <<<EOD
@@ -510,7 +476,6 @@ chroot: ""
 username: "unbound"
 directory: "{$unbound_base}/etc/unbound"
 pidfile: "{$g['varrun_path']}/unbound.pid"
-root-hints: "root.hints"
 harden-referral-path: no
 prefetch: {$prefetch}
 prefetch-key: {$prefetch_key}
@@ -527,7 +492,8 @@ unwanted-reply-threshold: {$unwanted_reply_threshold}
 num-queries-per-thread: {$num_queries_per_thread}
 jostle-timeout: {$jostle_timeout}
 infra-host-ttl: {$infra_host_ttl}
-infra-lame-ttl: {$infra_lame_ttl}
+prefetch: {$prefetch}
+prefetch-key: {$prefetch_key}
 infra-cache-numhosts: {$infra_cache_numhosts}
 outgoing-num-tcp: {$outgoing_num_tcp}
 incoming-num-tcp: {$incoming_num_tcp}
@@ -538,6 +504,9 @@ statistics-cumulative: {$cumulative_stats}
 cache-max-ttl: {$cache_max_ttl}
 cache-min-ttl: {$cache_min_ttl}
 harden-dnssec-stripped: {$harden_dnssec_stripped}
+hide-identity: {$hide_id}
+hide-version: {$hide_version}
+harden-glue: {$harden_glue}
 {$optimization['number_threads']}
 {$optimization['msg_cache_slabs']}
 {$optimization['rrset_cache_slabs']}
@@ -548,6 +517,7 @@ harden-dnssec-stripped: {$harden_dnssec_stripped}
 outgoing-range: 8192
 {$optimization['so_rcvbuf']}
 {$optimization['so_sndbuf']}
+
 
 # Interface IP(s) to bind to
 {$unbound_bind_interfaces}
@@ -572,11 +542,38 @@ access-control: ::1 allow
 EOD;
 
 	# Handle custom options
-	if(!empty($unbound_config['custom_options'])) {
-		$custom_options = explode(";", ($unbound_config['custom_options']));
-		$unbound_conf .= "# Unbound Custom options\n";
-		foreach ($custom_options as $ent) {
+	if (!empty($adv_config['custom_options'])) {
+		$custom_options = explode(";", ($adv_config['custom_options']));
+		$unbound_conf .= "\n# Unbound Custom options\n";
+		foreach ($custom_options as $ent)
 			$unbound_conf .= $ent."\n";
+	}
+
+	// Set up forward-zones if configured
+	if ($unbound_config['forwarding_mode'] == "on") {
+		$dnsservers = array();
+		if (isset($config['system']['dnsallowoverride'])) {
+			$ns = array_unique(get_nameservers());
+			foreach($ns as $nameserver) {
+				if ($nameserver)
+					$dnsservers[] = $nameserver;
+				}
+		} else {
+			$ns = array_unique(get_dns_servers());
+			foreach($ns as $nameserver) {
+				if ($nameserver)
+					$dnsservers[] = $nameserver;
+			}
+		}
+
+		if (!empty($dnsservers)) {
+			$unbound_conf .=<<<EOD
+forward-zone:
+	name: "."
+
+EOD;
+			foreach($dnsservers as $dnsserver)
+				$unbound_conf .= "\tforward-addr: $dnsserver\n";
 		}
 	}
 
@@ -622,7 +619,7 @@ function unbound_optimization() {
 	// Set the number of threads equal to number of CPUs.
 	// Use 1 (disable threading) if for some reason this sysctl fails.
 	$numprocs = intval(trim(`/sbin/sysctl kern.smp.cpus | /usr/bin/cut -d" " -f2`));
-	if($numprocs > 1) {
+	if ($numprocs > 1) {
 		$optimization['number_threads'] = "num-threads: {$numprocs}";
 		$optimize_num = pow(2,floor(log($numprocs,2)));
 	} else {
@@ -669,32 +666,6 @@ function unbound_optimization() {
 	return $optimization;
 }
 
-function fetch_root_hints() {
-
-	$destination_file = UNBOUND_BASE . "/etc/unbound/root.hints";
-	if (filesize($destination_file) == 0 ) {
-		conf_mount_rw();
-		$fout = fopen($destination_file, "w");
-		$url = "ftp://ftp.internic.net/domain/named.cache";
-
-		$ch = curl_init();
-		curl_setopt($ch, CURLOPT_URL, $url);
-		curl_setopt($ch,CURLOPT_RETURNTRANSFER, 1);
-		curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, '25');
-		$http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-		$data = curl_exec($ch);
-		curl_close($ch);
-
-		fwrite($fout, $data);
-		fclose($fout);
-		conf_mount_ro();
-
-		return ($http_code == 200) ? true : $http_code;
-	} else {
-		return false;
-	}
-}
-
 function unbound_validate($post, $type=null) {
 	global $config, $input_errors;
 
@@ -728,8 +699,6 @@ function unbound_validate($post, $type=null) {
 			$input_errors[] = "You must enter a valid number in 'Minimum TTL for RRsets and messages'.";
 		if(!is_numeric($post['infra_host_ttl']))
 				$input_errors[] = "You must enter a valid number in 'TTL for Host cache entries'.";
-		if(!is_numeric($post['infra_lame_ttl']))
-				$input_errors[] = "You must enter a valid number in 'TTL for lame delegation'.";
 		if(!is_numeric($post['infra_cache_numhosts']))
 				$input_errors[] = "You must enter a valid number in 'Number of Hosts to cache'.";
 
@@ -746,19 +715,17 @@ function unbound_reconfigure() {
 	$unbound_config = $config['installedpackages']['unbound']['config'][0];
 
 	if ($unbound_config['enable'] != "on") {
-		if(is_service_running("unbound"))
+		if (is_service_running("unbound"))
 			unbound_control("termstop");
 	} else {
-		if(is_service_running("unbound")) {
+		if (is_service_running("unbound")) {
 			unbound_control("dump_cache");
 			unbound_control("termstop");
 		}
 		unbound_resync_config();
 		unbound_control("start");
-		if(is_service_running("unbound")) {
-			unbound_control("forward");
+		if (is_service_running("unbound"))
 			unbound_control("restore_cache");
-		}
 	}
 }
 

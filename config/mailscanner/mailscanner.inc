@@ -134,7 +134,7 @@ function sync_package_mailscanner($via_rpc=false) {
 	#General options
 	$info  =($mailscanner['orgname']?'%org-name% = '.$mailscanner['orgname']."\n":'%org-name% = Pfsense'."\n");
 	$info .=($mailscanner['longorgname']?'%org-long-name% = '.$mailscanner['longorgname']."\n":'%org-long-name% = Pfsense Inc.'."\n");
-	$info .=($mailscanner['website']?'%web-site% = '.$mailscanner['website']."\n":'%web-site% = www.pfsense.com'."\n");
+	$info .=($mailscanner['website']?'%web-site% = '.$mailscanner['website']."\n":'%web-site% = www.pfsense.org'."\n");
 	$max_children =($mailscanner['max_children']?$mailscanner['max_children']:'5');
 	$scan_messages=(preg_match('/ScanMessages/',$mailscanner['pim'])?"yes":"no");
 	$reject_message=(preg_match('/RejectMessage/',$mailscanner['pim'])?"yes":"no");

@@ -1,7 +1,7 @@
 <?php 
 /*
         Copyright 2013 Marcello Coutinho
-        Part of bind package for pfSense(www.pfsense.com)
+        Part of bind package for pfSense(www.pfsense.org)
 
         Redistribution and use in source and binary forms, with or without
         modification, are permitted provided that the following conditions are met:

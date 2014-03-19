@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<packagegui>
+<copyright>
+        <![CDATA[
+/* $Id$ */
+/* ========================================================================== */
+/*
+    imspector_acls.xml
+    part of pfSense (http://www.pfSense.com)
+    Copyright (C) 2012 Marcello Coutinho
+    All rights reserved.
+
+    Based on m0n0wall (http://m0n0.ch/wall)
+    Copyright (C) 2003-2006 Manuel Kasper <mk@neon1.net>.
+    All rights reserved.
+                                                                              */
+/* ========================================================================== */
+/*
+    Redistribution and use in source and binary forms, with or without
+    modification, are permitted provided that the following conditions are met:
+
+     1. Redistributions of source code must retain the above copyright notice,
+        this list of conditions and the following disclaimer.
+
+     2. Redistributions in binary form must reproduce the above copyright
+        notice, this list of conditions and the following disclaimer in the
+        documentation and/or other materials provided with the distribution.
+
+    THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
+    INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+    AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+    AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+    OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+    INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+    POSSIBILITY OF SUCH DAMAGE.
+                                                                              */
+/* ========================================================================== */
+        ]]>
+        </copyright>
+
+	<name>imspectoracls</name>
+	<version>20111108</version>
+	<title>Imspector acls</title>
+	<description>Imspectors Access Lists</description>
+	<savetext>Save</savetext>
+	<include_file>/usr/local/pkg/imspector.inc</include_file>
+
+	<menu>
+		<name>SSH Conditions</name>
+		<tooltiptext>Configure SSH conditional exceptions</tooltiptext>
+		<section>Services</section>
+		<url>/pkg.php?xml=sshdcond.xml</url>
+	</menu>
+	<configpath>installedpackages->package->sshdcond</configpath>
+
+	<additional_files_needed>
+		<prefix>/usr/local/pkg/</prefix>
+		<chmod>755</chmod>
+		<item>https://packages.pfsense.org/packages/config/sshdcond/sshdcond.inc</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/pkg/</prefix>
+		<chmod>755</chmod>
+		<item>https://packages.pfsense.org/packages/config/sshdcond/sshdcond_sync.xml</item>
+	</additional_files_needed>
+	<tabs>
+		<tab>
+			<text>Settings</text>
+			<url>/pkg_edit.php?xml=imspector.xml&amp;id=0</url>
+		</tab>
+		<tab>
+			<text>Replacements</text>
+			<url>/pkg_edit.php?xml=imspector_replacements.xml&amp;id=0</url>
+		</tab>
+		<tab>
+			<text>Access Lists</text>
+			<url>/pkg.php?xml=imspector_acls.xml</url>
+			<active/>
+		</tab>
+		<tab>
+			<text>Log</text>
+			<url>/imspector_logs.php</url>
+		</tab>
+		<tab>
+			<text>Sync</text>
+			<url>/pkg_edit.php?xml=imspector_sync.xml&amp;id=0</url>
+		</tab>
+	</tabs>
+	<adddeleteeditpagefields>
+		<columnitem>
+			<fielddescr>Status</fielddescr>
+			<fieldname>enable</fieldname>
+		</columnitem>
+		<columnitem>
+			<fielddescr>action</fielddescr>
+			<fieldname>action</fieldname>
+		</columnitem>
+		<columnitem>
+			<fielddescr>local ID</fielddescr>
+			<fieldname>localid</fieldname>
+		</columnitem>
+		<columnitem>
+			<fielddescr>Description</fielddescr>
+			<fieldname>description</fieldname>
+		</columnitem>
+	</adddeleteeditpagefields>
+	<fields>
+		<field>
+			<type>listtopic</type>
+			<name>Imspector Access Lists</name>
+			<fieldname>temp</fieldname>
+		</field>
+		<field>
+		<fielddescr>Enable</fielddescr>
+			<fieldname>enable</fieldname>
+			<type>checkbox</type>
+		<description><![CDATA[Enable this access list.<br>
+					Rules are processed in order, from top to bottom.]]></description>
+		</field>
+		<field>
+			<fielddescr>Action</fielddescr>
+			<fieldname>action</fieldname>
+			<description>Select action to take on this rule</description>
+			<type>select</type>
+			<options>
+				<option><name>allow</name><value>allow</value></option>
+				<option><name>deny</name><value>deny</value></option>
+			</options>
+			<required/>
+		</field>
+		<field>
+			<fielddescr>Description</fielddescr>
+			<fieldname>description</fieldname>
+			<description><![CDATA[Specify a description for this rule.]]></description>
+			<type>input</type>
+			<size>50</size>
+			<required/>
+		</field>
+		<field>
+			<fielddescr>Local ID</fielddescr>
+			<fieldname>localid</fieldname>
+			<description><![CDATA[Specify local id for this rule<br>
+			Local IDs can either be complete, such as <strong>user@company.com</strong>, partial like <strong>company.com</strong> or <strong>all</strong> to match any id.]]></description>
+			<type>input</type>
+			<size>50</size>
+			<required/>
+		</field>
+		<field>
+			<fielddescr>Remote ID</fielddescr>
+			<fieldname>remoteid</fieldname>
+			<description><![CDATA[Specify the list of remote ids(one per line) that localid can chat with.<br>
+			Remote IDs can be complete ids like <strong>user@company.com</strong>, partial <strong>company.com</strong>, <strong>all</strong> to match any id or <strong>groupchat</strong>.]]></description>
+			<type>textarea</type>
+			<rows>10</rows>
+			<cols>60</cols>
+			<encoding>base64</encoding>
+		</field>
+	</fields>
+
+	<custom_php_validation_command>
+		validate_form_imspector($_POST, &amp;$input_errors);
+	</custom_php_validation_command>
+	<custom_php_resync_config_command>
+		sync_package_imspector();
+	</custom_php_resync_config_command>    
+	<custom_php_deinstall_command>
+		deinstall_package_imspector();
+	</custom_php_deinstall_command>
+	<filter_rules_needed>imspector_generate_rules</filter_rules_needed>
+</packagegui>

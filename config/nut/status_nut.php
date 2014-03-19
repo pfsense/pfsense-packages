@@ -1,7 +1,7 @@
 <?php
 /*
 	status_nut.php
-	part of pfSense (http://www.pfsense.com/)
+	part of pfSense (https://www.pfsense.org/)
 
 	Copyright (C) 2007 Ryan Wagoner <rswagoner@gmail.com>.
 	All rights reserved.

@@ -2,17 +2,12 @@
 function vnstat_install_deinstall() {
 	conf_mount_rw();
 	global $config;
-// Remove Vnstat package and files
-        exec("cd /var/db/pkg/ && pkg_delete `ls | grep vnstat`");
+// Remove Vnstat package and files 
 	exec("rm -d -R /usr/local/www/vnstat2");
 	exec("rm -d -R /usr/local/www/vnstati");
-	exec("rm /usr/local/pkg/vnstat_php_frontend.xml");
-	exec("rm /usr/local/pkg/vnstat2.sh");
-	exec("rm /usr/local/etc/vnstat2.conf");
-	exec("rm /usr/local/www/diag_vnstat.php");
-	exec("rm /usr/local/www/diag_vnstat2.php");
-	exec("rm /usr/local/www/vnstati.php");
-	exec("rm /usr/local/www/vnstat2_img.php");
+	exec("rm -d -R /usr/local/pkg/vnstat2");
+	exec("rm /usr/local/etc/vnstat.conf");
+
 // Remove vnstat cron entry from config.xml
 	vnstat2_install_cron(false);
 	conf_mount_ro();
@@ -25,7 +20,7 @@ function vnstat2_install_cron($vnstat_cron_value) {
 		return;
 	$x=0;
 	foreach($config['cron']['item'] as $item) {
-		if(strstr($item['command'], "/usr/local/pkg/vnstat2.sh")) {
+		if(strstr($item['command'], "/usr/local/pkg/vnstat2/vnstat2.sh")) {
 			$is_installed = true;
 			break;
 		}
@@ -41,7 +36,7 @@ function vnstat2_install_cron($vnstat_cron_value) {
 	        		$cron_item['month']     = "*";
 	        		$cron_item['wday']      = "*";
 	        		$cron_item['who']       = "root";
-	        		$cron_item['command']   = "/usr/local/pkg/vnstat2.sh";
+	        		$cron_item['command']   = "/usr/local/pkg/vnstat2/vnstat2.sh";
 	        		$config['cron']['item'][] = $cron_item;		
 				write_config();
 				configure_cron();
@@ -70,10 +65,10 @@ function change_vnstat_conf(){
 	$no_vnstat_phpfrontend = $config['installedpackages']['vnstat2']['config'][0]['vnstat_phpfrontend'];
         if ($no_vnstat_phpfrontend == "on"){
  		vnstat_php_frontend();
-	}
+		}
 	else {
 	exec("[ -d /usr/local/www/vnstat2 ] && rm -d -R /usr/local/www/vnstat2");
-}
+	}
 	conf_mount_ro();
 }
 
@@ -149,16 +144,11 @@ function vnstat_install_config() {
 	conf_mount_rw();
 // Create vnstat database dir where it also will work for nanobsd
 //	exec("[ -d /var/db/vnstat ] && mv /var/db/vnstat /conf/vnstat");
-	exec("[ -d /usr/local/pkg/vnstat ] && mv /usr/local/pkg/vnstat /conf/vnstat");
+	exec("[ -d /usr/local/pkg/vnstat2/vnstat ] && mv /usr/local/pkg/vnstat2/vnstat /conf/vnstat");
 	exec("[ ! -d /conf/vnstat ] && mkdir /conf/vnstat");
 // Check for pbi install and arch type then create symlinks
 	if (file_exists('/usr/pbi/vnstat-i386')) { exec("ln -s /usr/local/etc/vnstat.conf /usr/pbi/vnstat-i386/etc/vnstat.conf"); }
 	if (file_exists('/usr/pbi/vnstat-amd64')) { exec("ln -s /usr/local/etc/vnstat.conf /usr/pbi/vnstat-amd64/etc/vnstat.conf"); }
-// Copy files to web dir
-	exec("[ ! -f /usr/local/www/diag_vnstat2.php ] && cp /usr/local/pkg/diag_vnstat2.abc /usr/local/www/diag_vnstat2.php");
-	exec("[ ! -f /usr/local/www/diag_vnstat.php ] && cp /usr/local/pkg/diag_vnstat.abc /usr/local/www/diag_vnstat.php");
-	exec("[ ! -f /usr/local/www/vnstati.php ] && cp /usr/local/pkg/vnstati.abc /usr/local/www/vnstati.php");
-	exec("[ ! -f /usr/local/www/vnstat2_img.php ] && cp /usr/local/pkg/vnstat2_img.abc /usr/local/www/vnstat2_img.php");
 // Add MonthRotate value to config.xml and write /usr/local/etc/vnstat.conf
 	$no_monthrotate = $config['installedpackages']['vnstat2']['config'][0]['monthrotate'];	
 	if ($no_monthrotate == ""){
@@ -197,10 +187,8 @@ function vnstat_install_config() {
 
 function vnstat_php_frontend(){
 	global $config;
-// Unpack and move Vnstat frontend 
-	exec("cd ..");
-	exec("tar -zxovf /usr/local/pkg/vnstat_php_frontend-1.5.1-updated.tar.gz");
-	exec("mv vnstat_php_frontend-1.5.1-updated /usr/local/www/vnstat2");
+// Copy vnstat_php_frontend to www 
+	exec("cp -a /usr/local/pkg/vnstat2/vnstat_php_frontend/. /usr/local/www/vnstat2/");
 // Find information to be writing in config.php 
 	// $iface_list_array_items
         exec("ls /conf/vnstat/ | grep -v '\.'", $vnstat_nic_in);
@@ -228,8 +216,8 @@ function vnstat_php_frontend(){
         $iface_title_array = implode($iface_title_array_items2);
 	// php in php static items
 	// added to new items for the front end version 1.5.1
-	$locale = "\$locale = 'en_US.UTF-8';";
-	$language = "\$language = 'en';";
+		$locale = "\$locale = 'en_US.UTF-8';";
+		$language = "\$language = 'en';";
         $vnstat_bin2 = "\$vnstat_bin = '/usr/local/bin/vnstat';";
         $data_dir2 = "\$data_dir = './dumps';";
         $graph_format2 ="\$graph_format='svg';";

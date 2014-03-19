@@ -34,8 +34,8 @@
 
 ##|+PRIV
 ##|*IDENT=page-status-mailreportsaddcmd
-##|*NAME=Status: E-Mail Reports: Add Command page
-##|*DESCR=Allow access to the 'Status: E-Mail Reports: Add Command' page.
+##|*NAME=Status: Email Reports: Add Command page
+##|*DESCR=Allow access to the 'Status: Email Reports: Add Command' page.
 ##|*MATCH=status_mail_report_add_cmd.php*
 ##|-PRIV
 
@@ -89,7 +89,7 @@ if ($_POST) {
 }
 
 
-$pgtitle = array(gettext("Status"),gettext("Add Mail Report Command"));
+$pgtitle = array(gettext("Status"),gettext("Add Email Report Command"));
 include("head.inc");
 ?>
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">

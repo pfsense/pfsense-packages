@@ -63,57 +63,57 @@
 	<additional_files_needed>
             <prefix>/usr/local/pkg/</prefix>
             <chmod>0755</chmod>
-            <item>http://www.pfsense.org/packages/config/squidGuard-devel/squidguard.inc</item>
+            <item>https://packages.pfsense.org/packages/config/squidGuard-devel/squidguard.inc</item>
 	</additional_files_needed>
 	<additional_files_needed>
                 <prefix>/usr/local/pkg/</prefix>
             <chmod>0755</chmod>
-                <item>http://www.pfsense.org/packages/config/squidGuard-devel/squidguard_configurator.inc</item>
+                <item>https://packages.pfsense.org/packages/config/squidGuard-devel/squidguard_configurator.inc</item>
 	</additional_files_needed>
 	<additional_files_needed>
             <prefix>/usr/local/pkg/</prefix>
             <chmod>0755</chmod>
-            <item>http://www.pfsense.org/packages/config/squidGuard-devel/squidguard_acl.xml</item>
+            <item>https://packages.pfsense.org/packages/config/squidGuard-devel/squidguard_acl.xml</item>
 	</additional_files_needed>
 	<additional_files_needed>
             <prefix>/usr/local/pkg/</prefix>
             <chmod>0755</chmod>
-            <item>http://www.pfsense.org/packages/config/squidGuard-devel/squidguard_default.xml</item>
+            <item>https://packages.pfsense.org/packages/config/squidGuard-devel/squidguard_default.xml</item>
 	</additional_files_needed>
 	<additional_files_needed>
             <prefix>/usr/local/pkg/</prefix>
             <chmod>0755</chmod>
-            <item>http://www.pfsense.org/packages/config/squidGuard-devel/squidguard_dest.xml</item>
+            <item>https://packages.pfsense.org/packages/config/squidGuard-devel/squidguard_dest.xml</item>
 	</additional_files_needed>
 	<additional_files_needed>
             <prefix>/usr/local/pkg/</prefix>
             <chmod>0755</chmod>
-            <item>http://www.pfsense.org/packages/config/squidGuard-devel/squidguard_rewr.xml</item>
+            <item>https://packages.pfsense.org/packages/config/squidGuard-devel/squidguard_rewr.xml</item>
 	</additional_files_needed>
 	<additional_files_needed>
             <prefix>/usr/local/pkg/</prefix>
             <chmod>0755</chmod>
-            <item>http://www.pfsense.org/packages/config/squidGuard-devel/squidguard_time.xml</item>
+            <item>https://packages.pfsense.org/packages/config/squidGuard-devel/squidguard_time.xml</item>
 	</additional_files_needed>
 	<additional_files_needed>
             <prefix>/usr/local/pkg/</prefix>
             <chmod>0755</chmod>
-            <item>http://www.pfsense.org/packages/config/squidGuard-devel/squidguard_sync.xml</item>
+            <item>https://packages.pfsense.org/packages/config/squidGuard-devel/squidguard_sync.xml</item>
 	</additional_files_needed>
 	<additional_files_needed>
             <prefix>/usr/local/www/squidGuard/</prefix>
             <chmod>0755</chmod>
-            <item>http://www.pfsense.org/packages/config/squidGuard-devel/squidguard_log.php</item>
+            <item>https://packages.pfsense.org/packages/config/squidGuard-devel/squidguard_log.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
             <prefix>/usr/local/www/squidGuard/</prefix>
             <chmod>0755</chmod>
-            <item>http://www.pfsense.org/packages/config/squidGuard-devel/squidguard_blacklist.php</item>
+            <item>https://packages.pfsense.org/packages/config/squidGuard-devel/squidguard_blacklist.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
             <prefix>/usr/local/www/</prefix>
             <chmod>0755</chmod>
-            <item>http://www.pfsense.org/packages/config/squidGuard-devel/sgerror.php</item>
+            <item>https://packages.pfsense.org/packages/config/squidGuard-devel/sgerror.php</item>
 	</additional_files_needed>
 	<fields>
                 <field>

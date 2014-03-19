@@ -52,12 +52,12 @@
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>077</chmod>
-		<item>http://www.pfsense.com/packages/config/urltables/urltables.inc</item>
+		<item>https://packages.pfsense.org/packages/config/urltables/urltables.inc</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>077</chmod>
-		<item>http://www.pfsense.com/packages/config/urltables/urltables.patch</item>
+		<item>https://packages.pfsense.org/packages/config/urltables/urltables.patch</item>
 	</additional_files_needed>
 	<custom_php_install_command>
 		urltables_install();

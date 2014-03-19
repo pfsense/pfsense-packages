@@ -47,12 +47,12 @@
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0755</chmod>
-		<item>http://www.pfsense.com/packages/config/checkmk-agent/checkmk.inc</item>
+		<item>https://packages.pfsense.org/packages/config/checkmk-agent/checkmk.inc</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0755</chmod>
-		<item>http://www.pfsense.com/packages/config/checkmk-agent/checkmk_sync.xml</item>
+		<item>https://packages.pfsense.org/packages/config/checkmk-agent/checkmk_sync.xml</item>
 	</additional_files_needed>
 	<menu>
 		<name>Check_mk Agent</name>

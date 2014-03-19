@@ -1,7 +1,7 @@
 <?php
 /*
 	zebedee_keys.php
-	part of pfSense (http://www.pfsense.com/)
+	part of pfSense (https://www.pfsense.org/)
 	Copyright (C) 2010 Scott Ullrich <sullrich@gmail.com>
 	Copyright (C) 2010 Marcello Coutinho
 	Copyright (C) 2010 Jorge Lustosa

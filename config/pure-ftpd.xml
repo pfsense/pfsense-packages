@@ -78,7 +78,7 @@
 	</adddeleteeditpagefields>
 	
 	<additional_files_needed>
-		<item>http://www.pfsense.com/packages/config/pure-ftpdsettings.xml</item>
+		<item>https://packages.pfsense.org/packages/config/pure-ftpdsettings.xml</item>
 	</additional_files_needed>
 
 	<!-- fields gets invoked when the user adds or edits a item.   the following items

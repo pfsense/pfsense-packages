@@ -4,6 +4,7 @@
  *
  * Copyright (C) 2004, 2005 Scott Ullrich
  * Copyright (C) 2011 Ermal Luci
+ * Copyright (C) 2014 Bill Meeks
  * All rights reserved.
  *
  * Adapted for FreeNAS by Volker Theile (votdev@gmx.de)
@@ -97,21 +98,29 @@ elseif (isset($_GET['ids'])) {
 	// If flowbit rule, point to interface-specific file
 	if ($file == "Auto-Flowbit Rules")
 		$rules_map = snort_load_rules_map("{$snortcfgdir}/rules/" . FLOWBITS_FILENAME);
+	elseif (file_exists("{$snortdir}/preproc_rules/{$file}"))
+		$rules_map = snort_load_rules_map("{$snortdir}/preproc_rules/{$file}");
 	else
 		$rules_map = snort_load_rules_map("{$snortdir}/rules/{$file}");
 	$contents = $rules_map[$_GET['gid']][trim($_GET['ids'])]['rule'];
 	$wrap_flag = "soft";
 }
-
 // Is it our special flowbit rules file?
 elseif ($file == "Auto-Flowbit Rules")
 	$contents = file_get_contents("{$snortcfgdir}/rules/{$flowbit_rules_file}");
 // Is it a rules file in the ../rules/ directory?
 elseif (file_exists("{$snortdir}/rules/{$file}"))
 	$contents = file_get_contents("{$snortdir}/rules/{$file}");
+// Is it a rules file in the ../preproc_rules/ directory?
+elseif (file_exists("{$snortdir}/preproc_rules/{$file}"))
+	$contents = file_get_contents("{$snortdir}/preproc_rules/{$file}");
 // Is it a fully qualified path and file?
-elseif (file_exists($file))
-	$contents = file_get_contents($file);
+elseif (file_exists($file)) {
+	if (substr(realpath($file), 0, strlen(SNORTLOGDIR)) != SNORTLOGDIR)
+		$contents = gettext("\n\nERROR -- File: {$file} can not be viewed!");
+	else
+		$contents = file_get_contents($file);
+}
 // It is not something we can display, so exit.
 else
 	$input_errors[] = gettext("Unable to open file: {$displayfile}");

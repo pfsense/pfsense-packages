@@ -2,7 +2,7 @@
 /* $Id: load_balancer_pool.php,v 1.5.2.6 2007/03/02 23:48:32 smos Exp $ */
 /*
 	haproxy_global.php
-	part of pfSense (http://www.pfsense.com/)
+	part of pfSense (https://www.pfsense.org/)
 	Copyright (C) 2013 PiBa-NL
 	Copyright (C) 2009 Scott Ullrich <sullrich@pfsense.com>
 	Copyright (C) 2008 Remco Hoef <remcoverhoef@pfsense.com>
@@ -36,6 +36,8 @@ require_once("haproxy_utils.inc");
 require_once("globals.inc");
 require_once("pkg_haproxy_tabs.inc");
 
+$simplefields = array('localstats_refreshtime','localstats_sticktable_refreshtime');
+
 if (!is_array($config['installedpackages']['haproxy'])) 
 	$config['installedpackages']['haproxy'] = array();
 
@@ -68,7 +70,13 @@ if ($_POST) {
 			$input_errors[] = "The maximum number of connections should be numeric.";
 			
 		if ($_POST['localstatsport'] && (!is_numeric($_POST['localstatsport']))) 
-			$input_errors[] = "The local stats port should be numeric.";
+			$input_errors[] = "The local stats port should be numeric or empty.";
+			
+		if ($_POST['localstats_refreshtime'] && (!is_numeric($_POST['localstats_refreshtime']))) 
+			$input_errors[] = "The local stats refresh time should be numeric or empty.";
+
+		if ($_POST['localstats_sticktable_refreshtime'] && (!is_numeric($_POST['localstats_sticktable_refreshtime']))) 
+			$input_errors[] = "The local stats sticktable refresh time should be numeric or empty.";
 
 		/*if($_POST['synchost1'] && !is_ipaddr($_POST['synchost1']))
 			$input_errors[] = "Synchost1 needs to be an IPAddress.";
@@ -93,6 +101,8 @@ if ($_POST) {
 			$config['installedpackages']['haproxy']['localstatsport'] = $_POST['localstatsport'] ? $_POST['localstatsport'] : false;
 			$config['installedpackages']['haproxy']['advanced'] = $_POST['advanced'] ? base64_encode($_POST['advanced']) : false;
 			$config['installedpackages']['haproxy']['nbproc'] = $_POST['nbproc'] ? $_POST['nbproc'] : false;			
+			foreach($simplefields as $stat)
+				$config['installedpackages']['haproxy'][$stat] = $_POST[$stat];
 			touch($d_haproxyconfdirty_path);
 			write_config();
 		}
@@ -114,6 +124,8 @@ $pconfig['carpdev'] = $config['installedpackages']['haproxy']['carpdev'];
 $pconfig['localstatsport'] = $config['installedpackages']['haproxy']['localstatsport'];
 $pconfig['advanced'] = base64_decode($config['installedpackages']['haproxy']['advanced']);
 $pconfig['nbproc'] = $config['installedpackages']['haproxy']['nbproc'];
+foreach($simplefields as $stat)
+	$pconfig[$stat] = $config['installedpackages']['haproxy'][$stat];
 
 // defaults
 if (!$pconfig['logfacility'])
@@ -162,20 +174,6 @@ function enable_change(enable_change) {
 	<div id="mainarea">
 		<table class="tabcont" width="100%" border="0" cellpadding="6" cellspacing="0">
 			<tr>
-				<td colspan="2" valign="top" class="listtopic">Recalculate certificate chain.</td>
-			</tr>
-			<tr>
-				<td width="22%" valign="top" class="vncell">&nbsp;</td>
-				<td width="78%" class="vtable">
-					<input type="hidden" name="calculate_certificate_chain" id="calculate_certificate_chain" />
-					<input type="button" class="formbtn" value="Recalculate certificate chains" onclick="$('calculate_certificate_chain').value='true';document.iform.submit();" />
-					<br/>
-					This can be required after certificates have been created or imported. As pfSense 2.1.0 currently does not
-					always keep track of these dependencies which might be required to create a proper certificate chain when using SSLoffloading.
-				</td>
-			</tr>
-			
-			<tr>
 				<td colspan="2" valign="top" class="listtopic">General settings</td>
 			</tr>
 			<tr>
@@ -199,11 +197,17 @@ function enable_change(enable_change) {
 					</table>
 					Sets the maximum per-process number of concurrent connections to X.<br/>
 					<strong>NOTE:</strong> setting this value too high will result in HAProxy not being able to allocate enough memory.<br/>
+					<p>
 				<?php
 					$memusage = trim(`ps auxw | grep haproxy | grep -v grep | awk '{ print $5 }'`);
 					if($memusage)
-						echo "<p>Current memory usage: {$memusage} K.</p>";
+						echo "Current memory usage: <b>{$memusage} kB.</b><br/>";
 				?>
+					Current <a href='/system_advanced_sysctl.php'>'System Tunables'</a> settings.<br/>
+					&nbsp;&nbsp;'kern.maxfiles': <b><?=`sysctl kern.maxfiles | awk '{ print $2 }'`?></b><br/> 
+					&nbsp;&nbsp;'kern.maxfilesperproc': <b><?=`sysctl kern.maxfilesperproc | awk '{ print $2 }'`?></b><br/>
+					</p>
+					Full memory usage will only show after all connections have actually been used.
 					</td><td>
 					<table style="border: 1px solid #000;">
 						<tr>
@@ -216,23 +220,29 @@ function enable_change(enable_change) {
 							</td>
 						</tr>
 						<tr>
-							<td align="right"><font size=-1>999</font></td>
-							<td><font size=-1>1888K</font></td>
+							<td align="right"><font size=-1>1</font></td>
+							<td><font size=-1>50 kB</font></td>
 						</tr>
 						<tr>
-							<td align="right"><font size=-1>99999</font></td>
-							<td><font size=-1>8032K</font></td>
+							<td align="right"><font size=-1>1.000</font></td>
+							<td><font size=-1>48 MB</font></td>
 						</tr>
 						<tr>
-							<td align="right"><font size=-1>999999</font></td>
-							<td><font size=-1>50016K</font></td>
+							<td align="right"><font size=-1>10.000</font></td>
+							<td><font size=-1>488 MB</font></td>
 						</tr>
 						<tr>
-							<td align="right"><font size=-1>9999999</font></td>
-							<td><font size=-1>467M</font></td>
+							<td align="right"><font size=-1>100.000</font></td>
+							<td><font size=-1>4,8 GB</font></td>
+						</tr>
+						<tr>
+							<td colspan="2" style="white-space: nowrap"><font size=-2>Calculated for plain HTTP connections,<br/>using ssl offloading will increase this.</font></td>
 						</tr>
 					</table>
 					</td></tr></table>
+					When setting a high amount of allowed simultaneous connections you will need to add and or increase the following two <b><a href='/system_advanced_sysctl.php'>'System Tunables'</a></b> kern.maxfiles and kern.maxfilesperproc.
+					For HAProxy alone set these to at least the number of allowed connections * 2 + 31. So for 100.000 connections these need to be 200.031 or more to avoid trouble, take into account that handles are also used by other processes when setting kern.maxfiles.
+					<br/>
 				</td>
 			</tr>
 			<tr>
@@ -352,12 +362,25 @@ function enable_change(enable_change) {
 				</td>
 			</tr>
 			<tr>
+				<td width="22%" valign="top" class="vncell">Internal stats refresh rate</td>
+				<td class="vtable">
+					<input name="localstats_refreshtime" type="text" <?if(isset($pconfig['localstats_refreshtime'])) echo "value=\"{$pconfig['localstats_refreshtime']}\"";?> size="10" maxlength="5" /> Seconds, Leave this setting empty to not refresh the page automatically. EXAMPLE: 10
+				</td>
+			</tr>
+			<tr>
+				<td width="22%" valign="top" class="vncell">Sticktable page refresh rate</td>
+				<td class="vtable">
+					<input name="localstats_sticktable_refreshtime" type="text" <?if(isset($pconfig['localstats_sticktable_refreshtime'])) echo "value=\"{$pconfig['localstats_sticktable_refreshtime']}\"";?> size="10" maxlength="5" /> Seconds, Leave this setting empty to not refresh the page automatically. EXAMPLE: 10
+				</td>
+			</tr>
+			<tr>
 				<td colspan="2" valign="top" class="listtopic">Global Advanced pass thru</td>
 			</tr>
 			<tr>
 				<td width="22%" valign="top" class="vncell">&nbsp;</td>
 				<td width="78%" class="vtable">
-					<textarea name='advanced' rows="4" cols="70" id='advanced'><?php echo $pconfig['advanced']; ?></textarea>
+					<? $textrowcount = max(substr_count($pconfig['advanced'],"\n"), 2) + 2; ?>
+					<textarea name='advanced' rows="<?=$textrowcount;?>" cols="70" id='advanced'><?php echo $pconfig['advanced']; ?></textarea>
 					<br/>
 					NOTE: paste text into this box that you would like to pass thru in the global settings area.
 				</td>
@@ -365,6 +388,19 @@ function enable_change(enable_change) {
 			<tr>
 				<td>
 					&nbsp;
+				</td>
+			</tr>
+			<tr>
+				<td colspan="2" valign="top" class="listtopic">Recalculate certificate chain.</td>
+			</tr>
+			<tr>
+				<td width="22%" valign="top" class="vncell">&nbsp;</td>
+				<td width="78%" class="vtable">
+					<input type="hidden" name="calculate_certificate_chain" id="calculate_certificate_chain" />
+					<input type="button" class="formbtn" value="Recalculate certificate chains" onclick="$('calculate_certificate_chain').value='true';document.iform.submit();" />(Other changes on this page will be lost)
+					<br/>
+					This can be required after certificates have been created or imported. As pfSense 2.1.0 currently does not
+					always keep track of these dependencies which might be required to create a proper certificate chain when using SSLoffloading.
 				</td>
 			</tr>
 			<tr>
