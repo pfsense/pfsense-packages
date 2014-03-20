@@ -445,35 +445,46 @@ EOD;
 							
 							$zone_conf .= "$hostname \t IN $hosttype $hostvalue \t$hostdst\n";
 						}
+
+						# Register DHCP static mappings
 						if (($zone[regdhcpstatic] == 'on') && is_array($config['dhcpd'])) {
-							foreach ($config['dhcpd'] as $dhcpif => $dhcpifconf)
-                        					if(is_array($dhcpifconf['staticmap']) && isset($dhcpifconf['enable']))
-                                					foreach ($dhcpifconf['staticmap'] as $host)
-                                        					if ($host['ipaddr'] && $host['hostname']) {
-											if($zonereverso == "on") {
-												$hostdomain = $dhcpifconf['domain'];
-												if(strlen($hostdomain) == 0) {
-													$hostdomain = $config['system']['domain'];
-												}
-												if(strlen($hostdomain) != 0) {
-													$hostdomain .= '.';
-												}
-												$zoneparts = array_reverse(explode('.',$zonename));
-												$addressparts = explode('.',$host['ipaddr']);
-												$addressstart = 0;
-												while($addressstart < count($zoneparts) && $addressstart < count($addressparts) && $zoneparts[$addressstart] == $addressparts[$addressstart]) {
-													 $addressstart++;
-												}
-												$shortaddress='';
-												for($addresspointer = count($addressparts)-1; $addresspointer >= $addressstart; $addresspointer--) {
-													$shortaddress .= (strlen($shortaddress) > 0 ? '.' : '') . $addressparts[$addresspointer];
-												}
-												$zone_conf .= "{$shortaddress}\tIN PTR\t{$host['hostname']}.{$hostdomain}\n";
-											} else {
-												$zone_conf .= "{$host['hostname']}\tIN A\t{$host['ipaddr']}\n";
-											}
-                                        					}
-    						}
+							$zoneparts = array_reverse(explode('.',$zonename));
+							foreach ($config['dhcpd'] as $dhcpif => $dhcpifconf) {
+								if (!isset($dhcpifconf['enable']) || !is_array($dhcpifconf['staticmap']))  {
+									continue;
+								}
+								foreach ($dhcpifconf['staticmap'] as $host) {
+									if (is_domain($host['domain'])) {
+										$domain = $host['domain'];
+									} elseif (is_domain($dhcpifconf['domain'])) {
+										$domain = $dhcpifconf['domain'];
+									} elseif (is_domain($config['system']['domain'])) {
+										$domain = $config['system']['domain'];
+									} else {
+										continue;
+									}
+									if (!is_hostname($host['hostname']) || !is_ipaddr($host['ipaddr']))  {
+										continue;
+									}
+									if ($zonereverso == "on") {
+										$parts = explode('.',$host['ipaddr']);
+										$intersect = array_intersect_assoc($parts,$zoneparts);
+										if (count($zoneparts) == count($intersect)) {
+											$diff = array_diff_assoc($parts,$zoneparts);
+											$shortaddr = implode('.',array_reverse($diff));
+											$zone_conf .= "{$shortaddr}\tIN PTR\t{$host['hostname']}.{$domain}.\n";
+										}
+									} else {
+										$parts = array_reverse(explode('.',$domain));
+										$diff = array_diff_assoc($parts,$zoneparts);
+										if (count($diff) == 0) {
+											$zone_conf .= "{$host['hostname']}\tIN A\t{$host['ipaddr']}\n";
+										}
+									}
+								}
+							}
+						}
+
 						if ($zone['customzonerecords']!=""){
 							$zone_conf .= "\n\n;\n;custom zone records\n;\n".base64_decode($zone['customzonerecords'])."\n";
 						}
