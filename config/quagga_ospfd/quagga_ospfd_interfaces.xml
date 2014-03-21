@@ -131,7 +131,7 @@
 			<type>input</type>
 		</field>
 		<field>
-			<fielddescr>&lt;b&gt;Fast Hello&lt;/b&gt;</fielddescr>
+			<fielddescr>Fast Hello</fielddescr>
 			<fieldname>enablefasthello</fieldname>
 			<type>checkbox</type>
 			<description>Enable Fast Hello (Dead Timer 1s, Hello Interval 20 - 500 ms).</description>
