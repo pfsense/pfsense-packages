@@ -648,7 +648,6 @@
 			<port>dns/djbdns</port>
 		</build_pbi>
 		<build_options>WITH_IPV6=true;WITH_SRV=true;WITHOUT_DUMPCACHE=true;WITHOUT_IGNOREIP=true;WITHOUT_JUMBO=true;WITHOUT_MAN=true;WITHOUT_PERSISTENT_MMAP=true</build_options>
-		<supportedbybsdperimeter>YES</supportedbybsdperimeter>
 	</package>
 	<package>
 		<name>Open-VM-Tools</name>
