@@ -607,10 +607,10 @@
 		<build_pbi>
 			<port>net/vnstat</port>
 		</build_pbi>
-		<version>1.10_2</version>
+	<version>1.11_2</version>
 		<status>Stable</status>
 		<required_version>2.2</required_version>
-		<maintainer>crazypark2@yahoo.dk</maintainer>
+		<maintainer>bryan.paradis@gmail.com</maintainer>
 		<config_file>http://www.pfsense.com/packages/config/vnstat2/vnstat2.xml</config_file>
 		<configurationfile>vnstat2.xml</configurationfile>
 		<after_install_info></after_install_info>
@@ -1018,14 +1018,14 @@
 	</package>
 	<package>
 		<name>arpwatch</name>
-		<descr>Arpwatch monitors ethernet/ip address pairings. It also logs certain changes to syslog.</descr>
+		<descr>Arpwatch monitors ethernet/ip address pairings. It also logs certain changes to syslog. Update v2.0.0 adds multiple interfaces and seperate reports and bugfix for certain email formats</descr>
 		<website>http://www-nrg.ee.lbl.gov/</website>
 		<category>Security</category>
 		<depends_on_package_pbi>arpwatch-2.1.a15_7-##ARCH##.pbi</depends_on_package_pbi>
 		<build_pbi>
 			<port>net-mgmt/arpwatch</port>
 		</build_pbi>
-		<version>2.1.a15_7 pkg v1.1.1</version>
+		<version>2.1.a15_7 pkg v2.0.0</version>
 		<status>ALPHA</status>
 		<required_version>2.2</required_version>
 		<config_file>http://www.pfsense.com/packages/config/arpwatch.xml</config_file>
