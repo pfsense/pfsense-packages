@@ -30,6 +30,8 @@
 
 require_once("/usr/local/pkg/suricata/suricata.inc");
 
+global $g, $config;
+
 function suricata_check_dir_size_limit($suricataloglimitsize) {
 
 	/********************************************************
@@ -41,6 +43,8 @@ function suricata_check_dir_size_limit($suricataloglimitsize) {
 	 * On Entry: $surictaaloglimitsize = dir size limit     *
 	 *                                   in megabytes       *
 	 ********************************************************/
+
+	global $config;
 	
 	// Convert Log Limit Size setting from MB to KB
 	$suricataloglimitsizeKB = round($suricataloglimitsize * 1024);
