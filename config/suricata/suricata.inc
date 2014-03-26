@@ -406,7 +406,7 @@ function suricata_build_list($suricatacfg, $listname = "", $whitelist = false) {
 	return $valresult;
 }
 
-function suricata_rules_up_install_cron($should_install) {
+function suricata_rules_up_install_cron($should_install=true) {
 	global $config, $g;
 
 	$command = "/usr/bin/nice -n20 /usr/local/bin/php -f /usr/local/www/suricata/suricata_check_for_rule_updates.php";
@@ -479,7 +479,7 @@ function suricata_rules_up_install_cron($should_install) {
 	install_cron_job($command, $should_install, $suricata_rules_up_min, $suricata_rules_up_hr, $suricata_rules_up_mday, $suricata_rules_up_month, $suricata_rules_up_wday, "root");
 }
 
-function suricata_loglimit_install_cron($should_install) {
+function suricata_loglimit_install_cron($should_install=true) {
 
 	install_cron_job("/usr/bin/nice -n20 /usr/local/bin/php -f /usr/local/pkg/suricata/suricata_check_cron_misc.inc", $should_install, "*/5");
 }
@@ -516,7 +516,7 @@ function sync_suricata_package_config() {
 
 	$suricataglob = $config['installedpackages']['suricata']['config'][0];
 	// setup the log directory size check job if enabled
-	suricata_loglimit_install_cron($suricataglob['suricataloglimit'] == 'on' ? true : false);
+	suricata_loglimit_install_cron();
 	// setup the suricata rules update job if enabled
 	suricata_rules_up_install_cron($suricataglob['autoruleupdate'] != "never_up" ? true : false);
 
