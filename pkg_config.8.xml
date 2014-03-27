@@ -523,8 +523,7 @@
 			<port>security/snort</port>
 			<ports_after>security/barnyard2</ports_after>
 		</build_pbi>
-		<!-- Use both styles for now, since our snort port isn't yet optionsng, but barnyard2 and others are. -->
-		<build_options>barnyard2_UNSET_FORCE=ODBC PGSQL PRELUDE;barnyard2_SET=GRE IPV6 MPLS MYSQL PORT_PCAP;snort_SET=TARGETBASED PERFPROFILE DECODERPRE FLEXRESP3 GRE IPV6 MPLS NORMALIZER ZLIB;perl_SET=THREADS;WITH_THREADS=yes;WITH_IPV6=true;WITH_MPLS=true;WITH_GRE=true;WITH_TARGETBASED=true;WITH_PERFPROFILE=true;WITH_DECODERPRE=true;WITH_ZLIB=true;WITH_NORMALIZER=true;WITH_REACT=true;WITH_FLEXRESP3=true;WITHOUT_ODBC=true;WITHOUT_POSTGRESQL=true;WITHOUT_PRELUDE=true;NOPORTDOCS=true</build_options>
+		<build_options>barnyard2_UNSET=ODBC PGSQL PRELUDE;barnyard2_SET=GRE IPV6 MPLS MYSQL PORT_PCAP;snort_SET=TARGETBASED PERFPROFILE SOURCEFIRE FLEXRESP3 GRE IPV6 MPLS NORMALIZER ZLIB;perl_SET=THREADS;NOPORTDOCS=true</build_options>
 		<config_file>https://packages.pfsense.org/packages/config/snort/snort.xml</config_file>
 		<version>2.9.5.6 pkg v3.0.4</version>
 		<required_version>2.0</required_version>
