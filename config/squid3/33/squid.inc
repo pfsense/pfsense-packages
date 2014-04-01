@@ -1603,8 +1603,8 @@ function squid_resync_auth() {
 		$conf.="# Package Integration\n".preg_replace($co_preg,$co_rep,$settingsconfig['custom_options'])."\n\n";
 		}
 	
-	// Custom User Options
-	$conf .= "# Custom options\n".sq_text_area_decode($settingsconfig['custom_options_squid3'])."\n\n";
+	// Custom User Options before authentication acls
+	$conf .= "# Custom options before auth\n".sq_text_area_decode($settingsconfig['custom_options_squid3'])."\n\n";
 
 	// Deny the banned guys before allowing the good guys
 	if(! empty($settingsnac['banned_hosts'])) {
@@ -1722,9 +1722,8 @@ function squid_resync_auth() {
 				$conf .= "auth_param basic program ". SQUID_LOCALBASE . "/libexec/squid/basic_radius_auth -w {$settings['radius_secret']} -h {$settings['auth_server']} $port\n";
 				break;
 			case 'cp':
-				$conf .= "external_acl_type check_filter children-startup={$processes} ttl={$auth_ttl} %SRC ". SQUID_LOCALBASE . "/libexec/squid/check_ip.php\n";
-				$conf .= "acl dgfilter external check_filter\n";
-				$conf .= "http_access allow dgfilter\n";
+				$conf .= "external_acl_type check_cp children-startup={$processes} ttl={$auth_ttl} %SRC ". SQUID_LOCALBASE . "/libexec/squid/check_ip.php\n";
+				$conf .= "acl password external check_cp\n";
 				break;
 			case 'msnt':
 				$conf .= "auth_param basic program ". SQUID_LOCALBASE . "/libexec/squid/basic_msnt_auth\n";
@@ -1740,6 +1739,9 @@ acl password proxy_auth REQUIRED
 
 EOD;
 		}
+		// Custom User Options after authentication definition
+		$conf .= "# Custom options after auth\n".sq_text_area_decode($settingsconfig['custom_options2_squid3'])."\n\n";
+		
 		// Onto the ACLs
 		$password = array('localnet', 'allowed_subnets');
 		$passwordless = array('unrestricted_hosts');
@@ -1756,7 +1758,7 @@ EOD;
 		foreach ($passwordless as $acl)
 			$conf .= "http_access allow $acl\n";
 
-		if ($auth_method != 'cp'){
+		//if ($auth_method != 'cp'){
 			// Include squidguard denied acl log in squid
 			if ($settingsconfig['log_sqd'])
 				$conf .="http_access deny password sglog\n";
@@ -1764,9 +1766,9 @@ EOD;
 			// Allow the other ACLs as long as they authenticate
 			foreach ($password as $acl)
 				$conf .= "http_access allow password $acl\n";
-			}
+		//	}
 	}
-
+	
 	$conf .= "# Default block all to be sure\n";
 	$conf .= "http_access deny allsrc\n";
 

@@ -528,9 +528,19 @@
 			<rows>5</rows>
 		</field>
 	    <field>
-			<fielddescr>Custom Options</fielddescr>
+			<fielddescr>Custom ACLS (Before_Auth)</fielddescr>
 			<fieldname>custom_options_squid3</fieldname>
-			<description><![CDATA[Put your own custom options here,one per line. They'll be added to the configuration.<br>
+			<description><![CDATA[Put your own custom options here,one per line. They'll be added to the configuration before authetication acls(if any).<br>
+						<strong>They need to be squid.conf native options, otherwise squid will NOT work.</strong>]]></description>
+			<type>textarea</type>
+			<encoding>base64</encoding>
+			<cols>78</cols>
+			<rows>10</rows>
+		</field>
+	    <field>
+			<fielddescr>Custom ACLS (After_Auth)</fielddescr>
+			<fieldname>custom_options2_squid3</fieldname>
+			<description><![CDATA[Put your own custom options here,one per line. They'll be added to the configuration after authetication definition(if any).<br>
 						<strong>They need to be squid.conf native options, otherwise squid will NOT work.</strong>]]></description>
 			<type>textarea</type>
 			<encoding>base64</encoding>
