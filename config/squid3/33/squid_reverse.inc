@@ -110,7 +110,7 @@ function squid_resync_reverse() {
  	 foreach ($reverse_peers as $rp){
  		if ($rp['enable'] =="on" && $rp['name'] !="" && $rp['ip'] !="" && $rp['port'] !=""){
  			$conf_peer = "#{$rp['description']}\n";
- 			$conf_peer .= "cache_peer {$rp['ip']} parent {$rp['port']} 0 proxy-only no-query no-digest originserver login=PASS ";
+ 			$conf_peer .= "cache_peer {$rp['ip']} parent {$rp['port']} 0 proxy-only no-query no-digest originserver login=PASS round-robin ";
  			if($rp['protocol'] == 'HTTPS')
 	            	$conf_peer .= "ssl sslflags=DONT_VERIFY_PEER front-end-https=auto ";
 			$conf_peer .= "name=rvp_{$rp['name']}\n\n";
