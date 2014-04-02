@@ -928,7 +928,7 @@ function squid_resync_general() {
 			$conf .= "http_port 127.0.0.1:{$port} intercept\n";
 		}
 	}
-	$icp_port = ($settings['icp_port'] ? $settings['icp_port'] : 7);
+	$icp_port = ($settings['icp_port'] ? $settings['icp_port'] : 0);
 	$dns_v4_first= ($settings['dns_v4_first'] == "on" ? "on" : "off" );
 	$pidfile = "{$g['varrun_path']}/squid.pid";
 	$language = ($settings['error_language'] ? $settings['error_language'] : 'en');
