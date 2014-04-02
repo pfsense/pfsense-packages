@@ -34,6 +34,8 @@
 require_once("guiconfig.inc");
 require_once("/usr/local/pkg/snort/snort.inc");
 
+$snortlogdir = SNORTLOGDIR;
+
 // Grab pfSense version so we can refer to it later on this page
 $pfs_version=substr(trim(file_get_contents("/etc/version")),0,3);
 
@@ -48,14 +50,14 @@ if (empty($pconfig['blertnumber']))
 else
 	$bnentries = $pconfig['blertnumber'];
 
-if ($_POST['todelete'] || $_GET['todelete']) {
+if ($_POST['todelete']) {
 	$ip = "";
-	if($_POST['todelete'])
-		$ip = $_POST['todelete'];
-	else if($_GET['todelete'])
-		$ip = $_GET['todelete'];
+	if ($_POST['ip'])
+		$ip = $_POST['ip'];
 	if (is_ipaddr($ip))
 		exec("/sbin/pfctl -t snort2c -T delete {$ip}");
+	else
+		$input_errors[] = gettext("An invalid IP address was provided as a parameter.");
 }
 
 if ($_POST['remove']) {
@@ -140,12 +142,19 @@ include_once("fbegin.inc");
 /* refresh every 60 secs */
 if ($pconfig['brefresh'] == 'on')
 	echo "<meta http-equiv=\"refresh\" content=\"60;url=/snort/snort_blocked.php\" />\n";
+
+/* Display Alert message */
+if ($input_errors) {
+	print_input_errors($input_errors); // TODO: add checks
+}
+if ($savemsg) {
+	print_info_box($savemsg);
+}
 ?>
 
-<?if($pfsense_stable == 'yes'){echo '<p class="pgtitle">' . $pgtitle . '</p>';}?>
-
-<?php if ($savemsg) print_info_box($savemsg); ?>
 <form action="/snort/snort_blocked.php" method="post">
+<input type="hidden" name="ip" id="ip" value=""/>
+
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
 <tr>
 	<td>
@@ -156,10 +165,11 @@ if ($pconfig['brefresh'] == 'on')
 		$tab_array[2] = array(gettext("Updates"), false, "/snort/snort_download_updates.php");
 		$tab_array[3] = array(gettext("Alerts"), false, "/snort/snort_alerts.php");
 		$tab_array[4] = array(gettext("Blocked"), true, "/snort/snort_blocked.php");
-		$tab_array[5] = array(gettext("Whitelists"), false, "/snort/snort_interfaces_whitelist.php");
+		$tab_array[5] = array(gettext("Pass Lists"), false, "/snort/snort_passlist.php");
 		$tab_array[6] = array(gettext("Suppress"), false, "/snort/snort_interfaces_suppress.php");
-	        $tab_array[7] = array(gettext("Sync"), false, "/pkg_edit.php?xml=snort/snort_sync.xml");
-		display_top_tabs($tab_array);
+		$tab_array[7] = array(gettext("IP Lists"), false, "/snort/snort_ip_list_mgmt.php");
+		$tab_array[8] = array(gettext("Sync"), false, "/pkg_edit.php?xml=snort/snort_sync.xml");
+		display_top_tabs($tab_array, true);
 		?>
 	</td>
 </tr>
@@ -172,22 +182,23 @@ if ($pconfig['brefresh'] == 'on')
 			<tr>
 				<td width="22%" class="vncell"><?php echo gettext("Save or Remove Hosts"); ?></td>
 				<td width="78%" class="vtable">
-					<input name="download" type="submit" class="formbtns" value="Download"> <?php echo gettext("All " .
-				"blocked hosts will be saved."); ?>&nbsp;&nbsp;<input name="remove" type="submit"
-					class="formbtns" value="Clear">&nbsp;<span class="red"><strong><?php echo gettext("Warning:"); ?></strong></span>
-				<?php echo gettext("all hosts will be removed."); ?>
+				<input name="download" type="submit" class="formbtns" value="Download" title="<?=gettext("Download list of blocked hosts as a gzip archive");?>"/>
+				&nbsp;<?php echo gettext("All blocked hosts will be saved."); ?>&nbsp;&nbsp;
+				<input name="remove" type="submit" class="formbtns" value="Clear" title="<?=gettext("Remove blocks for all listed hosts");?>" 
+				onClick="return confirm('<?=gettext("Are you sure you want to remove all blocked hosts?  Click OK to continue or CANCLE to quit.");?>');"/>&nbsp;
+				<span class="red"><strong><?php echo gettext("Warning:"); ?></strong></span>&nbsp;<?php echo gettext("all hosts will be removed."); ?>
 				</td>
 			</tr>
 			<tr>
 				<td width="22%" class="vncell"><?php echo gettext("Auto Refresh and Log View"); ?></td>
 				<td width="78%" class="vtable">
-					<input name="save" type="submit" class="formbtns" value="Save"> <?php echo gettext("Refresh"); ?> <input
-					name="brefresh" type="checkbox" value="on"
-					<?php if ($config['installedpackages']['snortglobal']['alertsblocks']['brefresh']=="on" || $config['installedpackages']['snortglobal']['alertsblocks']['brefresh']=='') echo "checked"; ?>>
-				<?php printf(gettext("%sDefault%s is %sON%s."), '<strong>', '</strong>', '<strong>', '</strong>'); ?>&nbsp;&nbsp;<input
-					name="blertnumber" type="text" class="formfld unknown" id="blertnumber"
-					size="5" value="<?=htmlspecialchars($bnentries);?>"> <?php printf(gettext("Enter the " .
-				"number of blocked entries to view. %sDefault%s is %s500%s."), '<strong>', '</strong>', '<strong>', '</strong>'); ?>
+				<input name="save" type="submit" class="formbtns" value=" Save " title="<?=gettext("Save auto-refresh and view settings");?>"/>
+				&nbsp;&nbsp;<?php echo gettext("Refresh"); ?>&nbsp;<input name="brefresh" type="checkbox" value="on" 
+				<?php if ($config['installedpackages']['snortglobal']['alertsblocks']['brefresh']=="on" || $config['installedpackages']['snortglobal']['alertsblocks']['brefresh']=='') echo "checked"; ?>/>
+				&nbsp;<?php printf(gettext("%sDefault%s is %sON%s."), '<strong>', '</strong>', '<strong>', '</strong>'); ?>&nbsp;&nbsp;
+				<input name="blertnumber" type="text" class="formfld unknown" id="blertnumber" 
+				size="5" value="<?=htmlspecialchars($bnentries);?>"/>&nbsp;<?php printf(gettext("Enter number of " .
+				"blocked entries to view. %sDefault%s is %s500%s."), '<strong>', '</strong>', '<strong>', '</strong>'); ?>
 				</td>
 			</tr>
 			<tr>
@@ -225,13 +236,13 @@ if ($pconfig['brefresh'] == 'on')
 		if (!empty($blocked_ips_array)) {
 			$tmpblocked = array_flip($blocked_ips_array);
 			$src_ip_list = array();
-			foreach (glob("/var/log/snort/*/alert") as $alertfile) {
+			foreach (glob("{$snortlogdir}/*/alert") as $alertfile) {
 				$fd = fopen($alertfile, "r");
 				if ($fd) {
 					/*                 0         1           2      3      4    5    6    7      8     9    10    11             12
 					/* File format timestamp,sig_generator,sig_id,sig_rev,msg,proto,src,srcport,dst,dstport,id,classification,priority */
 					while (($fields = fgetcsv($fd, 1000, ',', '"')) !== FALSE) {
-						if(count($fields) < 11)
+						if(count($fields) < 13)
 							continue;
 					
 						if (isset($tmpblocked[$fields[6]])) {
@@ -280,8 +291,9 @@ if ($pconfig['brefresh'] == 'on')
 						<td align=\"center\" valign=\"middle\" class=\"listr\">{$counter}</td>
 						<td align=\"center\" valign=\"middle\" class=\"listr\">{$tmp_ip}<br/>{$rdns_link}</td>
 						<td valign=\"middle\" class=\"listr\">{$blocked_desc}</td>
-						<td align=\"center\" valign=\"middle\" class=\"listr\"><a href='snort_blocked.php?todelete=" . trim(urlencode($blocked_ip)) . "'>
-						<img title=\"" . gettext("Delete host from Blocked Table") . "\" border=\"0\" name='todelete' id='todelete' alt=\"Delete host from Blocked Table\" src=\"../themes/{$g['theme']}/images/icons/icon_x.gif\"></a></td>
+						<td align=\"center\" valign=\"middle\" class=\"listr\" sorttable_customkey=\"\">
+						<input type=\"image\" name=\"todelete[]\" onClick=\"document.getElementById('ip').value='{$blocked_ip}';\" 
+						src=\"../themes/{$g['theme']}/images/icons/icon_x.gif\" title=\"" . gettext("Delete host from Blocked Table") . "\" border=\"0\" /></td>
 					</tr>\n";
 			}
 		}

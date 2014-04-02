@@ -46,7 +46,6 @@ if (!is_array($config['installedpackages']['snortglobal']['suppress']['item']))
 $a_suppress = &$config['installedpackages']['snortglobal']['suppress']['item'];
 $id_gen = count($config['installedpackages']['snortglobal']['suppress']['item']);
 
-
 function snort_suppresslist_used($supplist) {
 
 	/****************************************************************/
@@ -69,14 +68,14 @@ function snort_suppresslist_used($supplist) {
 	return false;
 }
 
-if ($_GET['act'] == "del") {
-	if ($a_suppress[$_GET['id']]) {
-		/* make sure rule is not being referenced by any nat or filter rules */
-		if (snort_suppresslist_used($a_suppress[$_GET['id']]['name'])) {
-			$input_errors[] = gettext("ERROR -- Suppress List is currently assigned to an interface and cannot be removed!");
+if ($_POST['del']) {
+	if ($a_suppress[$_POST['list_id']] && is_numericint($_POST['list_id'])) {
+		/* make sure list is not being referenced by any Snort interfaces */
+		if (snort_suppresslist_used($a_suppress[$_POST['list_id']]['name'])) {
+			$input_errors[] = gettext("ERROR -- Suppress List is currently assigned to a Snort interface and cannot be removed!  Unassign it from all Snort interfaces first.");
 		}
 		else {
-			unset($a_suppress[$_GET['id']]);
+			unset($a_suppress[$_POST['list_id']]);
 			write_config();
 			header("Location: /snort/snort_interfaces_suppress.php");
 			exit;
@@ -93,14 +92,16 @@ include_once("head.inc");
 
 <?php
 include_once("fbegin.inc");
-if($pfsense_stable == 'yes'){echo '<p class="pgtitle">' . $pgtitle . '</p>';}
 if ($input_errors) {
 	print_input_errors($input_errors);
 }
 
+if ($savemsg)
+	print_info_box($savemsg);
 ?>
 
-<form action="/snort/snort_interfaces_suppress.php" method="post"><?php if ($savemsg) print_info_box($savemsg); ?>
+<form action="/snort/snort_interfaces_suppress.php" method="post">
+<input type="hidden" name="list_id" id="list_id" value=""/>
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
 <tr><td>
 <?php
@@ -110,10 +111,11 @@ if ($input_errors) {
         $tab_array[2] = array(gettext("Updates"), false, "/snort/snort_download_updates.php");
         $tab_array[3] = array(gettext("Alerts"), false, "/snort/snort_alerts.php");
         $tab_array[4] = array(gettext("Blocked"), false, "/snort/snort_blocked.php");
-        $tab_array[5] = array(gettext("Whitelists"), false, "/snort/snort_interfaces_whitelist.php");
+	$tab_array[5] = array(gettext("Pass Lists"), false, "/snort/snort_passlist.php");
         $tab_array[6] = array(gettext("Suppress"), true, "/snort/snort_interfaces_suppress.php");
-        $tab_array[7] = array(gettext("Sync"), false, "/pkg_edit.php?xml=snort/snort_sync.xml");
-        display_top_tabs($tab_array);
+	$tab_array[7] = array(gettext("IP Lists"), false, "/snort/snort_ip_list_mgmt.php");
+	$tab_array[8] = array(gettext("Sync"), false, "/pkg_edit.php?xml=snort/snort_sync.xml");
+        display_top_tabs($tab_array, true);
 ?>
 </td>
 </tr>
@@ -137,15 +139,13 @@ if ($input_errors) {
 	<td valign="middle" nowrap class="list">
 	<table border="0" cellspacing="0" cellpadding="1">
 		<tr>
-			<td valign="middle"><a
-				href="snort_interfaces_suppress_edit.php?id=<?=$i;?>"><img
-				src="/themes/<?= $g['theme']; ?>/images/icons/icon_e.gif"
-				width="17" height="17" border="0" title="<?php echo gettext("edit Suppress List"); ?>"></a></td>
-			<td><a
-				href="/snort/snort_interfaces_suppress.php?act=del&id=<?=$i;?>"
-				onclick="return confirm('<?php echo gettext("Do you really want to delete this Suppress List?"); ?>')"><img
-				src="/themes/<?= $g['theme']; ?>/images/icons/icon_x.gif"
-				width="17" height="17" border="0" title="<?php echo gettext("delete Suppress List"); ?>"></a></td>
+			<td valign="middle"><a href="snort_interfaces_suppress_edit.php?id=<?=$i;?>">
+				<img src="/themes/<?= $g['theme']; ?>/images/icons/icon_e.gif" 
+				width="17" height="17" border="0" title="<?php echo gettext("Edit Suppress List"); ?>"></a></td>
+			<td><input type="image" name="del[]" 
+				onclick="document.getElementById('list_id').value='<?=$i;?>';return confirm('<?=gettext("Do you really want to delete this Suppress List?");?>');" 
+				src="/themes/<?= $g['theme']; ?>/images/icons/icon_x.gif" width="17" height="17" border="0" 
+				title="<?=gettext("Delete Suppress List");?>"/></td>
 		</tr>
 	</table>
 	</td>
@@ -160,7 +160,7 @@ if ($input_errors) {
 			<td valign="middle"><a
 				href="snort_interfaces_suppress_edit.php?id=<?php echo $id_gen;?> "><img
 				src="/themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif"
-				width="17" height="17" border="0" title="<?php echo gettext("add a new list"); ?>"></a></td>
+				width="17" height="17" border="0" title="<?php echo gettext("Add a new list"); ?>"></a></td>
 		</tr>
 	</table>
 	</td>

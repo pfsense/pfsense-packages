@@ -6,7 +6,7 @@
  * Copyright (C) 2003-2004 Manuel Kasper <mk@neon1.net>.
  * Copyright (C) 2008-2009 Robert Zelaya.
  * Copyright (C) 2011-2012 Ermal Luci
- * Copyright (C) 2013 Bill Meeks
+ * Copyright (C) 2013, 2014 Bill Meeks
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -38,9 +38,11 @@ require_once("/usr/local/pkg/snort/snort.inc");
 global $g, $rebuild_rules;
 $snortlogdir = SNORTLOGDIR;
 
-$id = $_GET['id'];
-if (isset($_POST['id']))
+if (isset($_POST['id']) && is_numericint($_POST['id']))
 	$id = $_POST['id'];
+elseif (isset($_GET['id']) && is_numericint($_GET['id']))
+	$id = htmlspecialchars($_GET['id']);
+
 if (is_null($id)) {
         header("Location: /snort/snort_interfaces.php");
         exit;
@@ -66,6 +68,8 @@ if (!is_array($config['installedpackages']['snortglobal']['rule'][$id]['ftp_clie
 $a_nat = &$config['installedpackages']['snortglobal']['rule'];
 
 $vrt_enabled = $config['installedpackages']['snortglobal']['snortdownload'];
+
+// Calculate the "next engine ID" to use for the multi-config engine arrays
 $frag3_engine_next_id = count($a_nat[$id]['frag3_engine']['item']);
 $stream5_tcp_engine_next_id = count($a_nat[$id]['stream5_tcp_engine']['item']);
 $http_inspect_engine_next_id = count($a_nat[$id]['http_inspect_engine']['item']);
@@ -73,169 +77,8 @@ $ftp_server_engine_next_id = count($a_nat[$id]['ftp_server_engine']['item']);
 $ftp_client_engine_next_id = count($a_nat[$id]['ftp_client_engine']['item']);
 
 $pconfig = array();
-if (isset($id) && $a_nat[$id]) {
+if (isset($id) && isset($a_nat[$id])) {
 	$pconfig = $a_nat[$id];
-
-	/* Get current values from config for page form fields */
-	$pconfig['perform_stat'] = $a_nat[$id]['perform_stat'];
-	$pconfig['host_attribute_table'] = $a_nat[$id]['host_attribute_table'];
-	$pconfig['host_attribute_data'] = $a_nat[$id]['host_attribute_data'];
-	$pconfig['max_attribute_hosts'] = $a_nat[$id]['max_attribute_hosts'];
-	$pconfig['max_attribute_services_per_host'] = $a_nat[$id]['max_attribute_services_per_host'];
-	$pconfig['max_paf'] = $a_nat[$id]['max_paf'];
-	$pconfig['other_preprocs'] = $a_nat[$id]['other_preprocs'];
-	$pconfig['ftp_preprocessor'] = $a_nat[$id]['ftp_preprocessor'];
-	$pconfig['ftp_telnet_inspection_type'] = $a_nat[$id]['ftp_telnet_inspection_type'];
-	$pconfig['ftp_telnet_alert_encrypted'] = $a_nat[$id]['ftp_telnet_alert_encrypted'];
-	$pconfig['ftp_telnet_check_encrypted'] = $a_nat[$id]['ftp_telnet_check_encrypted'];
-	$pconfig['ftp_telnet_normalize'] = $a_nat[$id]['ftp_telnet_normalize'];
-	$pconfig['ftp_telnet_detect_anomalies'] = $a_nat[$id]['ftp_telnet_detect_anomalies'];
-	$pconfig['ftp_telnet_ayt_attack_threshold'] = $a_nat[$id]['ftp_telnet_ayt_attack_threshold'];
-	$pconfig['smtp_preprocessor'] = $a_nat[$id]['smtp_preprocessor'];
-	$pconfig['sf_portscan'] = $a_nat[$id]['sf_portscan'];
-	$pconfig['pscan_protocol'] = $a_nat[$id]['pscan_protocol'];
-	$pconfig['pscan_type'] = $a_nat[$id]['pscan_type'];
-	$pconfig['pscan_sense_level'] = $a_nat[$id]['pscan_sense_level'];
-	$pconfig['pscan_memcap'] = $a_nat[$id]['pscan_memcap'];
-	$pconfig['pscan_ignore_scanners'] = $a_nat[$id]['pscan_ignore_scanners'];
-	$pconfig['dce_rpc_2'] = $a_nat[$id]['dce_rpc_2'];
-	$pconfig['dns_preprocessor'] = $a_nat[$id]['dns_preprocessor'];
-	$pconfig['sensitive_data'] = $a_nat[$id]['sensitive_data'];
-	$pconfig['sdf_alert_data_type'] = $a_nat[$id]['sdf_alert_data_type'];
-	$pconfig['sdf_alert_threshold'] = $a_nat[$id]['sdf_alert_threshold'];
-	$pconfig['sdf_mask_output'] = $a_nat[$id]['sdf_mask_output'];
-	$pconfig['ssl_preproc'] = $a_nat[$id]['ssl_preproc'];
-	$pconfig['pop_preproc'] = $a_nat[$id]['pop_preproc'];
-	$pconfig['imap_preproc'] = $a_nat[$id]['imap_preproc'];
-	$pconfig['sip_preproc'] = $a_nat[$id]['sip_preproc'];
-	$pconfig['dnp3_preproc'] = $a_nat[$id]['dnp3_preproc'];
-	$pconfig['modbus_preproc'] = $a_nat[$id]['modbus_preproc'];
-	$pconfig['gtp_preproc'] = $a_nat[$id]['gtp_preproc'];
-	$pconfig['ssh_preproc'] = $a_nat[$id]['ssh_preproc'];
-	$pconfig['preproc_auto_rule_disable'] = $a_nat[$id]['preproc_auto_rule_disable'];
-	$pconfig['protect_preproc_rules'] = $a_nat[$id]['protect_preproc_rules'];
-
-	// Frag3 global settings
-	$pconfig['frag3_detection'] = $a_nat[$id]['frag3_detection'];
-	$pconfig['frag3_max_frags'] = $a_nat[$id]['frag3_max_frags'];
-	$pconfig['frag3_memcap'] = $a_nat[$id]['frag3_memcap'];
-
-	// See if new Frag3 engine array is configured and use it;
-	// otherwise create a default engine configuration.
-	if (empty($pconfig['frag3_engine']['item'])) {
-		$default = array( "name" => "default", "bind_to" => "all", "policy" => "bsd", 
-				"timeout" => 60, "min_ttl" => 1, "detect_anomalies" => "on", 
-				"overlap_limit" => 0, "min_frag_len" => 0 );
-		$pconfig['frag3_engine']['item'] = array();
-		$pconfig['frag3_engine']['item'][] = $default;
-		if (!is_array($a_nat[$id]['frag3_engine']['item']))
-			$a_nat[$id]['frag3_engine']['item'] = array();
-		$a_nat[$id]['frag3_engine']['item'][] = $default;
-		write_config();
-		$frag3_engine_next_id++;
-	}
-	else
-		$pconfig['frag3_engine'] = $a_nat[$id]['frag3_engine'];
-
-	// Stream5 global settings
-	$pconfig['stream5_reassembly'] = $a_nat[$id]['stream5_reassembly'];
-	$pconfig['stream5_flush_on_alert'] = $a_nat[$id]['stream5_flush_on_alert'];
-	$pconfig['stream5_prune_log_max'] = $a_nat[$id]['stream5_prune_log_max'];
-	$pconfig['stream5_mem_cap'] = $a_nat[$id]['stream5_mem_cap'];
-	$pconfig['stream5_track_tcp'] = $a_nat[$id]['stream5_track_tcp'];
-	$pconfig['stream5_max_tcp'] = $a_nat[$id]['stream5_max_tcp'];
-	$pconfig['stream5_track_udp'] = $a_nat[$id]['stream5_track_udp'];
-	$pconfig['stream5_max_udp'] = $a_nat[$id]['stream5_max_udp'];
-	$pconfig['stream5_udp_timeout'] = $a_nat[$id]['stream5_udp_timeout'];
-	$pconfig['stream5_track_icmp'] = $a_nat[$id]['stream5_track_icmp'];
-	$pconfig['stream5_max_icmp'] = $a_nat[$id]['stream5_max_icmp'];
-	$pconfig['stream5_icmp_timeout'] = $a_nat[$id]['stream5_icmp_timeout'];
-
-	// See if new Stream5 engine array is configured and use it;
-	// otherwise create a default engine configuration.
-	if (empty($pconfig['stream5_tcp_engine']['item'])) {
-		$default = array( "name" => "default", "bind_to" => "all", "policy" => "bsd", "timeout" => 30, 
-				"max_queued_bytes" => 1048576, "detect_anomalies" => "off", "overlap_limit" => 0, 
-				"max_queued_segs" => 2621, "require_3whs" => "off", "startup_3whs_timeout" => 0, 
-				"no_reassemble_async" => "off", "max_window" => 0, "use_static_footprint_sizes" => "off", 
-				"check_session_hijacking" => "off", "dont_store_lg_pkts" => "off", "ports_client" => "default", 
-				"ports_both" => "default", "ports_server" => "none" );
-		$pconfig['stream5_tcp_engine']['item'] = array();
-		$pconfig['stream5_tcp_engine']['item'][] = $default;
-		if (!is_array($a_nat[$id]['stream5_tcp_engine']['item']))
-			$a_nat[$id]['stream5_tcp_engine']['item'] = array();
-		$a_nat[$id]['stream5_tcp_engine']['item'][] = $default;
-		write_config();
-		$stream5_tcp_engine_next_id++;
-	}
-	else
-		$pconfig['stream5_tcp_engine'] = $a_nat[$id]['stream5_tcp_engine'];
-
-	// HTTP_INSPECT global settings
-	$pconfig['http_inspect'] = $a_nat[$id]['http_inspect'];
-	$pconfig['http_inspect_memcap'] = $a_nat[$id]['http_inspect_memcap'];
-	$pconfig['http_inspect_proxy_alert'] = $a_nat[$id]['http_inspect_proxy_alert'];
-	$pconfig['http_inspect_max_gzip_mem'] = $a_nat[$id]['http_inspect_max_gzip_mem'];
-
-	// See if new HTTP_INSPECT engine array is configured and use it;
-	// otherwise create a default engine configuration.
-	if (empty($pconfig['http_inspect_engine']['item'])) {
-		$default = array( "name" => "default", "bind_to" => "all", "server_profile" => "all", "enable_xff" => "off", 
-				"log_uri" => "off", "log_hostname" => "off", "server_flow_depth" => 65535, "enable_cookie" => "on", 
-				"client_flow_depth" => 1460, "extended_response_inspection" => "on", "no_alerts" => "off", 
-				"unlimited_decompress" => "on", "inspect_gzip" => "on", "normalize_cookies" =>"on", 
-				"normalize_headers" => "on", "normalize_utf" => "on", "normalize_javascript" => "on", 
-				"allow_proxy_use" => "off", "inspect_uri_only" => "off", "max_javascript_whitespaces" => 200,
-				"post_depth" => -1, "max_headers" => 0, "max_spaces" => 0, "max_header_length" => 0, "ports" => "default" );
-		$pconfig['http_inspect_engine']['item'] = array();
-		$pconfig['http_inspect_engine']['item'][] = $default;
-		if (!is_array($a_nat[$id]['http_inspect_engine']['item']))
-			$a_nat[$id]['http_inspect_engine']['item'] = array();
-		$a_nat[$id]['http_inspect_engine']['item'][] = $default;
-		write_config();
-		$http_inspect_engine_next_id++;
-	}
-	else
-		$pconfig['http_inspect_engine'] = $a_nat[$id]['http_inspect_engine'];
-
-	// See if new FTP client engine array is configured and use it;
-	// otherwise create a default engine configuration..
-	if (empty($pconfig['ftp_client_engine']['item'])) {
-		$default = array( "name" => "default", "bind_to" => "all", "max_resp_len" => 256, 
-				  "telnet_cmds" => "no", "ignore_telnet_erase_cmds" => "yes", 
-				  "bounce" => "yes", "bounce_to_net" => "", "bounce_to_port" => "" );
-		$pconfig['ftp_client_engine']['item'] = array();
-		$pconfig['ftp_client_engine']['item'][] = $default;
-		if (!is_array($a_nat[$id]['ftp_client_engine']['item']))
-			$a_nat[$id]['ftp_client_engine']['item'] = array();
-		$a_nat[$id]['ftp_client_engine']['item'][] = $default;
-		write_config();
-		$ftp_client_engine_next_id++;
-	}
-	else
-		$pconfig['ftp_client_engine'] = $a_nat[$id]['ftp_client_engine'];
-
-	// See if new FTP server engine array is configured and use it;
-	// otherwise create a default engine configuration..
-	if (empty($pconfig['ftp_server_engine']['item'])) {
-		$default = array( "name" => "default", "bind_to" => "all", "ports" => "default", 
-				  "telnet_cmds" => "no", "ignore_telnet_erase_cmds" => "yes", 
-				  "ignore_data_chan" => "no", "def_max_param_len" => 100 );
-		$pconfig['ftp_server_engine']['item'] = array();
-		$pconfig['ftp_server_engine']['item'][] = $default;
-		if (!is_array($a_nat[$id]['ftp_server_engine']['item']))
-			$a_nat[$id]['ftp_server_engine']['item'] = array();
-		$a_nat[$id]['ftp_server_engine']['item'][] = $default;
-		write_config();
-		$ftp_server_engine_next_id++;
-	}
-	else
-		$pconfig['ftp_server_engine'] = $a_nat[$id]['ftp_server_engine'];
-
-	/* If not using the Snort VRT rules, then disable */
-	/* the Sensitive Data (sdf) preprocessor.         */
-	if ($vrt_enabled == "off")
-		$pconfig['sensitive_data'] = "off";
 
 	/************************************************************/
 	/* To keep new users from shooting themselves in the foot   */
@@ -264,12 +107,14 @@ if (isset($id) && $a_nat[$id]) {
 		$pconfig['ftp_telnet_detect_anomalies'] = 'on';
 	if (empty($pconfig['ftp_telnet_ayt_attack_threshold']) && $pconfig['ftp_telnet_ayt_attack_threshold'] <> 0)
 		$pconfig['ftp_telnet_ayt_attack_threshold'] = '20';
+
 	if (empty($pconfig['sdf_alert_data_type']))
 		$pconfig['sdf_alert_data_type'] = "Credit Card,Email Addresses,U.S. Phone Numbers,U.S. Social Security Numbers";
 	if (empty($pconfig['sdf_alert_threshold']))
 		$pconfig['sdf_alert_threshold'] = '25';
 	if (empty($pconfig['sdf_mask_output']))
 		$pconfig['sdf_mask_output'] = 'off';
+
 	if (empty($pconfig['smtp_preprocessor']))
 		$pconfig['smtp_preprocessor'] = 'on';
 	if (empty($pconfig['dce_rpc_2']))
@@ -340,36 +185,56 @@ if (isset($id) && $a_nat[$id]) {
 		$pconfig['pscan_sense_level'] = 'medium';
 }
 
+$if_friendly = convert_friendly_interface_to_friendly_descr($a_nat[$id]['interface']);
+
 /* Define the "disabled_preproc_rules.log" file for this interface */
-$iface = snort_get_friendly_interface($pconfig['interface']);
-$disabled_rules_log = "{$snortlogdir}/{$iface}_disabled_preproc_rules.log";
-
-if ($_GET['act'] && isset($_GET['eng_id'])) {
-
-	$natent = array();
-	$natent = $pconfig;
-
-	if ($_GET['act'] == "del_frag3")
-		unset($natent['frag3_engine']['item'][$_GET['eng_id']]);
-	elseif ($_GET['act'] == "del_stream5_tcp")
-		unset($natent['stream5_tcp_engine']['item'][$_GET['eng_id']]);
-	elseif ($_GET['act'] == "del_http_inspect")
-		unset($natent['http_inspect_engine']['item'][$_GET['eng_id']]);
-	elseif ($_GET['act'] == "del_ftp_server")
-		unset($natent['ftp_server_engine']['item'][$_GET['eng_id']]);
-
-	if (isset($id) && $a_nat[$id]) {
-		$a_nat[$id] = $natent;
-		write_config();
-	}
-
-	header("Location: snort_preprocessors.php?id=$id");
-	exit;
-}
+$disabled_rules_log = "{$if_friendly}_disabled_preproc_rules.log";
 
 // Check for returned "selected alias" if action is import
 if ($_GET['act'] == "import" && isset($_GET['varname']) && !empty($_GET['varvalue'])) {
-		$pconfig[$_GET['varname']] = $_GET['varvalue'];
+		$pconfig[$_GET['varname']] = htmlspecialchars($_GET['varvalue']);
+}
+
+// Handle deleting of any of the multiple configuration engines
+if ($_POST['del_http_inspect']) {
+	if (isset($_POST['eng_id']) && isset($id) && issset($a_nat[$id])) {
+		unset($a_nat[$id]['http_inspect_engine']['item'][$_POST['eng_id']]);
+		write_config();
+		header("Location: snort_preprocessors.php?id=$id#httpinspect_row");
+		exit;
+	}
+}
+elseif ($_POST['del_frag3']) {
+	if (isset($_POST['eng_id']) && isset($id) && isset($a_nat[$id])) {
+		unset($a_nat[$id]['frag3_engine']['item'][$_POST['eng_id']]);
+		write_config();
+		header("Location: snort_preprocessors.php?id=$id#frag3_row");
+		exit;
+	}
+}
+elseif ($_POST['del_stream5_tcp']) {
+	if (isset($_POST['eng_id']) && isset($id) && isset($a_nat[$id])) {
+		unset($a_nat[$id]['stream5_tcp_engine']['item'][$_POST['eng_id']]);
+		write_config();
+		header("Location: snort_preprocessors.php?id=$id#stream5_row");
+		exit;
+	}
+}
+elseif ($_POST['del_ftp_client']) {
+	if (isset($_POST['eng_id']) && isset($id) && isset($a_nat[$id])) {
+		unset($a_nat[$id]['ftp_client_engine']['item'][$_POST['eng_id']]);
+		write_config();
+		header("Location: snort_preprocessors.php?id=$id#ftp_telnet_row");
+		exit;
+	}
+}
+elseif ($_POST['del_ftp_server']) {
+	if (isset($_POST['eng_id']) && isset($id) && isset($a_nat[$id])) {
+		unset($a_nat[$id]['ftp_server_engine']['item'][$_POST['eng_id']]);
+		write_config();
+		header("Location: snort_preprocessors.php?id=$id#ftp_telnet_row");
+		exit;
+	}
 }
 
 if ($_POST['ResetAll']) {
@@ -434,7 +299,8 @@ if ($_POST['ResetAll']) {
 	/* Log a message at the top of the page to inform the user */
 	$savemsg = gettext("All preprocessor settings have been reset to their defaults.");
 }
-elseif ($_POST['Submit']) {
+
+if ($_POST['save']) {
 	$natent = array();
 	$natent = $pconfig;
 
@@ -509,7 +375,7 @@ elseif ($_POST['Submit']) {
 		$natent['stream5_track_udp'] = $_POST['stream5_track_udp'] ? 'on' : 'off';
 		$natent['stream5_track_icmp'] = $_POST['stream5_track_icmp'] ? 'on' : 'off';
 
-		if (isset($id) && $a_nat[$id]) {
+		if (isset($id) && isset($a_nat[$id])) {
 			$a_nat[$id] = $natent;
 			write_config();
 		}
@@ -524,7 +390,7 @@ elseif ($_POST['Submit']) {
 
 		/* If 'preproc_auto_rule_disable' is off, then clear log file */
 		if ($natent['preproc_auto_rule_disable'] == 'off')
-			@unlink("{$disabled_rules_log}");
+			unlink_if_exists("{$snortlogdir}/{$disabled_rules_log}");
 
 		/*******************************************************/
 		/* Signal Snort to reload Host Attribute Table if one  */
@@ -543,14 +409,19 @@ elseif ($_POST['Submit']) {
 		header("Location: snort_preprocessors.php?id=$id");
 		exit;
 	}
+	else
+		$pconfig = $_POST;
 }
-elseif ($_POST['btn_import']) {
+
+if ($_POST['btn_import']) {
 	if (is_uploaded_file($_FILES['host_attribute_file']['tmp_name'])) {
 		$data = file_get_contents($_FILES['host_attribute_file']['tmp_name']);
-		if ($data === false)
+		if ($data === false) {
 			$input_errors[] = gettext("Error uploading file {$_FILES['host_attribute_file']}!");
+			$pconfig = $_POST;
+		}
 		else {
-			if (isset($id) && $a_nat[$id]) {
+			if (isset($id) && isset($a_nat[$id])) {
 				$a_nat[$id]['host_attribute_table'] = "on";
 				$a_nat[$id]['host_attribute_data'] = base64_encode($data);
 				$pconfig['host_attribute_data'] = $a_nat[$id]['host_attribute_data'];
@@ -567,11 +438,14 @@ elseif ($_POST['btn_import']) {
 			exit;
 		}
 	}
-	else
+	else {
 		$input_errors[] = gettext("No filename specified for import!");
+		$pconfig = $_POST;
+	}
 }
-elseif ($_POST['btn_edit_hat']) {
-	if (isset($id) && $a_nat[$id]) {
+
+if ($_POST['btn_edit_hat']) {
+	if (isset($id) && isset($a_nat[$id])) {
 		$a_nat[$id]['host_attribute_table'] = "on";
 		$a_nat[$id]['max_attribute_hosts'] = $pconfig['max_attribute_hosts'];
 		$a_nat[$id]['max_attribute_services_per_host'] = $pconfig['max_attribute_services_per_host'];
@@ -586,26 +460,21 @@ elseif ($_POST['btn_edit_hat']) {
 if ($pconfig['host_attribute_table'] == 'on' && empty($pconfig['host_attribute_data']))
 	$input_errors[] = gettext("The Host Attribute Table option is enabled, but no Host Attribute data has been loaded.  Data may be entered manually or imported from a suitable file.");
 
-$if_friendly = snort_get_friendly_interface($pconfig['interface']);
 $pgtitle = gettext("Snort: Interface {$if_friendly} - Preprocessors and Flow");
 include_once("head.inc");
 ?>
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC" onload="enable_change_all()">
 
-<?php include("fbegin.inc"); ?>
-<?php if($pfsense_stable == 'yes'){echo '<p class="pgtitle">' . $pgtitle . '</p>';}
+<?php include("fbegin.inc");
 
+/* Display Alert message */
+if ($input_errors) {
+	print_input_errors($input_errors);
+}
 
-	/* Display Alert message */
-
-	if ($input_errors) {
-		print_input_errors($input_errors); // TODO: add checks
-	}
-
-	if ($savemsg) {
-		print_info_box($savemsg);
-	}
-
+if ($savemsg) {
+	print_info_box($savemsg);
+}
 ?>
 
 <script type="text/javascript" src="/javascript/autosuggest.js">
@@ -613,8 +482,9 @@ include_once("head.inc");
 <script type="text/javascript" src="/javascript/suggestions.js">
 </script>
 
-<form action="snort_preprocessors.php" method="post"
-	enctype="multipart/form-data" name="iform" id="iform">
+<form action="snort_preprocessors.php" method="post" enctype="multipart/form-data" name="iform" id="iform">
+<input name="id" type="hidden" value="<?=$id;?>"/>
+<input name="eng_id" id="eng_id" type="hidden" value=""/>
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
 <tr><td>
 <?php
@@ -622,23 +492,25 @@ include_once("head.inc");
 		$tab_array[0] = array(gettext("Snort Interfaces"), true, "/snort/snort_interfaces.php");
 		$tab_array[1] = array(gettext("Global Settings"), false, "/snort/snort_interfaces_global.php");
 		$tab_array[2] = array(gettext("Updates"), false, "/snort/snort_download_updates.php");
-		$tab_array[3] = array(gettext("Alerts"), false, "/snort/snort_alerts.php");
+		$tab_array[3] = array(gettext("Alerts"), false, "/snort/snort_alerts.php?instance={$id}");
 		$tab_array[4] = array(gettext("Blocked"), false, "/snort/snort_blocked.php");
-		$tab_array[5] = array(gettext("Whitelists"), false, "/snort/snort_interfaces_whitelist.php");
+		$tab_array[5] = array(gettext("Pass Lists"), false, "/snort/snort_passlist.php");
 		$tab_array[6] = array(gettext("Suppress"), false, "/snort/snort_interfaces_suppress.php");
-		$tab_array[7] = array(gettext("Sync"), false, "/pkg_edit.php?xml=snort/snort_sync.xml");
-		display_top_tabs($tab_array);
+		$tab_array[7] = array(gettext("IP Lists"), false, "/snort/snort_ip_list_mgmt.php");
+		$tab_array[8] = array(gettext("Sync"), false, "/pkg_edit.php?xml=snort/snort_sync.xml");
+		display_top_tabs($tab_array, true);
 		echo '</td></tr>';
 		echo '<tr><td>';
 		$menu_iface=($if_friendly?substr($if_friendly,0,5)." ":"Iface ");
-        $tab_array = array();
-        $tab_array[] = array($menu_iface . gettext("Settings"), false, "/snort/snort_interfaces_edit.php?id={$id}");
-        $tab_array[] = array($menu_iface . gettext("Categories"), false, "/snort/snort_rulesets.php?id={$id}");
-        $tab_array[] = array($menu_iface . gettext("Rules"), false, "/snort/snort_rules.php?id={$id}");
-        $tab_array[] = array($menu_iface . gettext("Variables"), false, "/snort/snort_define_servers.php?id={$id}");
-        $tab_array[] = array($menu_iface . gettext("Preprocessors"), true, "/snort/snort_preprocessors.php?id={$id}");
-        $tab_array[] = array($menu_iface . gettext("Barnyard2"), false, "/snort/snort_barnyard.php?id={$id}");
-        display_top_tabs($tab_array);
+		$tab_array = array();
+		$tab_array[] = array($menu_iface . gettext("Settings"), false, "/snort/snort_interfaces_edit.php?id={$id}");
+		$tab_array[] = array($menu_iface . gettext("Categories"), false, "/snort/snort_rulesets.php?id={$id}");
+		$tab_array[] = array($menu_iface . gettext("Rules"), false, "/snort/snort_rules.php?id={$id}");
+		$tab_array[] = array($menu_iface . gettext("Variables"), false, "/snort/snort_define_servers.php?id={$id}");
+		$tab_array[] = array($menu_iface . gettext("Preprocs"), true, "/snort/snort_preprocessors.php?id={$id}");
+		$tab_array[] = array($menu_iface . gettext("Barnyard2"), false, "/snort/snort_barnyard.php?id={$id}");
+		$tab_array[] = array($menu_iface . gettext("IP Rep"), false, "/snort/snort_ip_reputation.php?id={$id}");
+		display_top_tabs($tab_array, true);
 ?>
 </td></tr>
 <tr><td><div id="mainarea">
@@ -694,7 +566,7 @@ include_once("head.inc");
 					"disabled preprocessors, but can substantially compromise the level of protection by " .
 					"automatically disabling detection rules."); ?></td>
 				</tr>
-			<?php if (file_exists($disabled_rules_log) && filesize($disabled_rules_log) > 0): ?>
+			<?php if (file_exists("{$snortlogdir}/{$disabled_rules_log}") && filesize("{$snortlogdir}/{$disabled_rules_log}") > 0): ?>
 				<tr>
 					<td width="3%">&nbsp;</td>
 					<td class="vexpl"><input type="button" class="formbtn" value="View" onclick="wopen('snort_rules_edit.php?id=<?=$id;?>&openruleset=<?=$disabled_rules_log;?>','FileViewer',800,600);">
@@ -718,8 +590,8 @@ include_once("head.inc");
 	<tr id="host_attrib_table_data_row">
 		<td width="22%" valign="top" class="vncell"><?php echo gettext("Host Attribute Data"); ?></td>
 		<td width="78%" class="vtable"><strong><?php echo gettext("Import From File"); ?></strong><br/>
-			<input name="host_attribute_file" type="file" class="formfld file" value="on" id="host_attribute_file" size="40">&nbsp;&nbsp;
-			<input type="submit" name="btn_import" id="btn_import" value="Import" class="formbtn"><br/>
+			<input name="host_attribute_file" type="file" class="formfld file" value="on" id="host_attribute_file" size="40"/>&nbsp;&nbsp;
+			<input type="submit" name="btn_import" id="btn_import" value="Import" class="formbtn"/><br/>
 			<?php echo gettext("Choose the Host Attributes file to use for auto-configuration."); ?><br/><br/>
 			<span class="red"><strong><?php echo gettext("Warning: "); ?></strong></span>
 			<?php echo gettext("The Host Attributes file has a required format.  See the "); ?><a href="http://manual.snort.org/" target="_blank">
@@ -744,7 +616,7 @@ include_once("head.inc");
 		<table cellpadding="0" cellspacing="0">
 			<tr>
 				<td><input name="max_attribute_hosts" type="text" class="formfld unknown" id="max_attribute_hosts" size="9" 
-				value="<?=htmlspecialchars($pconfig['max_attribute_hosts']);?>">&nbsp;&nbsp;
+				value="<?=htmlspecialchars($pconfig['max_attribute_hosts']);?>"/>&nbsp;&nbsp;
 				<?php echo gettext("Max number of hosts to read from the Attribute Table.  Min is ") . 
 				"<strong>" . gettext("32") . "</strong>" . gettext(" and Max is ") . "<strong>" . 
 				gettext("524288") . "</strong>"; ?>.</td>
@@ -761,7 +633,7 @@ include_once("head.inc");
 		<table cellpadding="0" cellspacing="0">
 			<tr>
 				<td><input name="max_attribute_services_per_host" type="text" class="formfld unknown" id="max_attribute_services_per_host" size="9" 
-				value="<?=htmlspecialchars($pconfig['max_attribute_services_per_host']);?>">&nbsp;&nbsp;
+				value="<?=htmlspecialchars($pconfig['max_attribute_services_per_host']);?>"/>&nbsp;&nbsp;
 				<?php echo gettext("Max number of  per host services to read from the Attribute Table.  Min is ") . 
 				"<strong>" . gettext("1") . "</strong>" . gettext(" and Max is ") . "<strong>" . 
 				gettext("65535") . "</strong>"; ?>.</td>
@@ -868,10 +740,10 @@ include_once("head.inc");
 					<td class="listt" align="right"><a href="snort_httpinspect_engine.php?id=<?=$id;?>&eng_id=<?=$f;?>">
 					<img src="/themes/<?=$g['theme'];?>/images/icons/icon_e.gif"  
 					width="17" height="17" border="0" title="<?=gettext("Edit this server configuration");?>"></a>
-			<?php if ($v['bind_to'] <> "all") : ?> 
-					<a href="snort_preprocessors.php?id=<?=$id;?>&eng_id=<?=$f;?>&act=del_http_inspect" onclick="return confirm('Are you sure you want to delete this entry?');">
-					<img src="/themes/<?=$g['theme'];?>/images/icons/icon_x.gif" width="17" height="17" border="0" 
-					title="<?=gettext("Delete this server configuration");?>"></a>
+			<?php if ($v['bind_to'] <> "all") : ?>
+					<input type="image" name="del_http_inspect[]" onclick="document.getElementById('eng_id').value='<?=$f;?>'; return confirm('Are you sure you want to delete this entry?');" 
+					src="/themes/<?=$g['theme'];?>/images/icons/icon_x.gif" width="17" height="17" border="0" 
+					title="<?=gettext("Delete this server configuration");?>"/>
 			<?php else : ?>
 					<img src="/themes/<?=$g['theme'];?>/images/icons/icon_x_d.gif" width="17" height="17" border="0" 
 					title="<?=gettext("Default server configuration cannot be deleted");?>">
@@ -937,9 +809,9 @@ include_once("head.inc");
 					<img src="/themes/<?=$g['theme'];?>/images/icons/icon_e.gif"  
 					width="17" height="17" border="0" title="<?=gettext("Edit this engine configuration");?>"></a>
 			<?php if ($v['bind_to'] <> "all") : ?> 
-					<a href="snort_preprocessors.php?id=<?=$id;?>&eng_id=<?=$f;?>&act=del_frag3" onclick="return confirm('Are you sure you want to delete this entry?');">
-					<img src="/themes/<?=$g['theme'];?>/images/icons/icon_x.gif" width="17" height="17" border="0" 
-					title="<?=gettext("Delete this engine configuration");?>"></a>
+					<input type="image" name="del_frag3[]" onclick="document.getElementById('eng_id').value='<?=$f;?>'; return confirm('Are you sure you want to delete this entry?');" 
+					src="/themes/<?=$g['theme'];?>/images/icons/icon_x.gif" width="17" height="17" border="0" 
+					title="<?=gettext("Delete this engine configuration");?>"/>
 			<?php else : ?>
 					<img src="/themes/<?=$g['theme'];?>/images/icons/icon_x_d.gif" width="17" height="17" border="0" 
 					title="<?=gettext("Default engine configuration cannot be deleted");?>">
@@ -1094,9 +966,9 @@ include_once("head.inc");
 					<img src="/themes/<?=$g['theme'];?>/images/icons/icon_e.gif"  
 					width="17" height="17" border="0" title="<?=gettext("Edit this TCP engine configuration");?>"></a>
 			<?php if ($v['bind_to'] <> "all") : ?> 
-					<a href="snort_preprocessors.php?id=<?=$id;?>&eng_id=<?=$f;?>&act=del_stream5_tcp" onclick="return confirm('Are you sure you want to delete this entry?');">
-					<img src="/themes/<?=$g['theme'];?>/images/icons/icon_x.gif" width="17" height="17" border="0" 
-					title="<?=gettext("Delete this TCP engine configuration");?>"></a>
+					<input type="image" name="del_stream5_tcp[]" onclick="document.getElementById('eng_id').value='<?=$f;?>'; return confirm('Are you sure you want to delete this entry?');" 
+					src="/themes/<?=$g['theme'];?>/images/icons/icon_x.gif" width="17" height="17" border="0" 
+					title="<?=gettext("Delete this TCP engine configuration");?>"/>
 			<?php else : ?>
 					<img src="/themes/<?=$g['theme'];?>/images/icons/icon_x_d.gif" width="17" height="17" border="0" 
 					title="<?=gettext("Default engine configuration cannot be deleted");?>">
@@ -1329,9 +1201,9 @@ include_once("head.inc");
 					<img src="/themes/<?=$g['theme'];?>/images/icons/icon_e.gif"  
 					width="17" height="17" border="0" title="<?=gettext("Edit this FTP client configuration");?>"></a>
 			<?php if ($v['bind_to'] <> "all") : ?> 
-					<a href="snort_preprocessors.php?id=<?=$id;?>&eng_id=<?=$f;?>&act=del_ftp_server" onclick="return confirm('Are you sure you want to delete this entry?');">
-					<img src="/themes/<?=$g['theme'];?>/images/icons/icon_x.gif" width="17" height="17" border="0" 
-					title="<?=gettext("Delete this FTP client configuration");?>"></a>
+					<input type="image" name="del_ftp_client[]" onclick="document.getElementById('eng_id').value='<?=$f;?>'; return confirm('Are you sure you want to delete this entry?');" 
+					src="/themes/<?=$g['theme'];?>/images/icons/icon_x.gif" width="17" height="17" border="0" 
+					title="<?=gettext("Delete this FTP client configuration");?>"/>
 			<?php else : ?>
 					<img src="/themes/<?=$g['theme'];?>/images/icons/icon_x_d.gif" width="17" height="17" border="0" 
 					title="<?=gettext("Default client configuration cannot be deleted");?>">
@@ -1371,9 +1243,9 @@ include_once("head.inc");
 					<img src="/themes/<?=$g['theme'];?>/images/icons/icon_e.gif"  
 					width="17" height="17" border="0" title="<?=gettext("Edit this FTP server configuration");?>"></a>
 			<?php if ($v['bind_to'] <> "all") : ?> 
-					<a href="snort_preprocessors.php?id=<?=$id;?>&eng_id=<?=$f;?>&act=del_ftp_server" onclick="return confirm('Are you sure you want to delete this entry?');">
-					<img src="/themes/<?=$g['theme'];?>/images/icons/icon_x.gif" width="17" height="17" border="0" 
-					title="<?=gettext("Delete this FTP server configuration");?>"></a>
+					<input type="image" name="del_ftp_server[]" onclick="document.getElementById('eng_id').value='<?=$f;?>'; return confirm('Are you sure you want to delete this entry?');" 
+					src="/themes/<?=$g['theme'];?>/images/icons/icon_x.gif" width="17" height="17" border="0" 
+					title="<?=gettext("Delete this FTP server configuration");?>"/>
 			<?php else : ?>
 					<img src="/themes/<?=$g['theme'];?>/images/icons/icon_x_d.gif" width="17" height="17" border="0" 
 					title="<?=gettext("Default server configuration cannot be deleted");?>">
@@ -1399,7 +1271,7 @@ include_once("head.inc");
 			<?php echo gettext("Sensitive data searches for credit card numbers, Social Security numbers and e-mail addresses in data."); ?>
 		<br/>
 		<span class="red"><strong><?php echo gettext("Note: "); ?></strong></span><?php echo gettext("To enable this preprocessor, you must select the Snort VRT rules on the ") . 
-		"<a href=\"/snort/snort_interfaces_global.php\" title=\"" . gettext("Modify Snort global settings") . "\"/>" . gettext("Global Settings") . "</a>" . gettext(" tab."); ?>
+		"<a href=\"/snort/snort_interfaces_global.php\" title=\"" . gettext("Modify Snort global settings") . "\">" . gettext("Global Settings") . "</a>" . gettext(" tab."); ?>
 		</td>
 	</tr>
 	<tr id="sdf_alert_data_row">
@@ -1533,9 +1405,9 @@ include_once("head.inc");
 	<tr>
 		<td width="22%" valign="top">&nbsp;</td>
 		<td width="78%">
-			<input name="Submit" type="submit" class="formbtn" value="Save" title="<?php echo 
+			<input name="save" type="submit" class="formbtn" value="Save" title="<?php echo 
 			gettext("Save preprocessor settings"); ?>">
-			<input name="id" type="hidden" value="<?=$id;?>">&nbsp;&nbsp;&nbsp;&nbsp;
+			&nbsp;&nbsp;&nbsp;&nbsp;
 			<input name="ResetAll" type="submit" class="formbtn" value="Reset" title="<?php echo 
 			gettext("Reset all settings to defaults") . "\" onclick=\"return confirm('" . 
 			gettext("WARNING:  This will reset ALL preprocessor settings to their defaults.  Click OK to continue or CANCEL to quit.") . 
@@ -1582,8 +1454,6 @@ include_once("head.inc");
 function createAutoSuggest() {
 <?php
 	echo "objAlias = new AutoSuggestControl(document.getElementById('pscan_ignore_scanners'), new StateSuggestions(addressarray));\n";
-	echo "objAlias = new AutoSuggestControl(document.getElementById('ftp_telnet_bounce_to_net'), new StateSuggestions(addressarray));\n";
-	echo "objAlias = new AutoSuggestControl(document.getElementById('ftp_telnet_bounce_to_port'), new StateSuggestions(portsarray));\n";
 ?>
 }
 

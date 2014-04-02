@@ -41,28 +41,30 @@ require_once("/usr/local/pkg/snort/snort.inc");
 $flowbit_rules_file = FLOWBITS_FILENAME;
 $snortdir = SNORTDIR;
 
-if (!is_array($config['installedpackages']['snortglobal']['rule'])) {
-	$config['installedpackages']['snortglobal']['rule'] = array();
-}
-$a_rule = &$config['installedpackages']['snortglobal']['rule'];
+if (isset($_GET['id']) && is_numericint($_GET['id']))
+	$id = htmlspecialchars($_GET['id']);
 
-$id = $_GET['id'];
+// If we were not passed a valid index ID, close the pop-up and exit
 if (is_null($id)) {
-	header("Location: /snort/snort_interfaces.php");
+	echo '<html><body link="#000000" vlink="#000000" alink="#000000">';
+	echo '<script language="javascript" type="text/javascript">';
+	echo 'window.close();</script>';
+	echo '</body></html>';
 	exit;
 }
 
-if (isset($id) && $a_rule[$id]) {
-	$pconfig['enable'] = $a_rule[$id]['enable'];
-	$pconfig['interface'] = $a_rule[$id]['interface'];
-	$pconfig['rulesets'] = $a_rule[$id]['rulesets'];
+if (!is_array($config['installedpackages']['snortglobal']['rule'])) {
+	$config['installedpackages']['snortglobal']['rule'] = array();
 }
 
-/* convert fake interfaces to real */
-$if_real = snort_get_real_interface($pconfig['interface']);
+$a_rule = &$config['installedpackages']['snortglobal']['rule'];
+
+$if_real = get_real_interface($a_rule[$id]['interface']);
 $snort_uuid = $a_rule[$id]['uuid'];
-$snortcfgdir = "{$snortdir}/snort_{$snort_uuid}_{$if_real}";
-$file = $_GET['openruleset'];
+$snortlogdir = SNORTLOGDIR;
+$snortcfgdir = "{$snortdir}/snort_{$snort_uuid}_{$if_real}/";
+
+$file = htmlspecialchars($_GET['openruleset'], ENT_QUOTES | ENT_HTML401);
 $contents = '';
 $wrap_flag = "off";
 
@@ -77,13 +79,13 @@ else
 // a standard rules file, or a complete file name.
 // Test for the special case of an IPS Policy file.
 if (substr($file, 0, 10) == "IPS Policy") {
-	$rules_map = snort_load_vrt_policy($a_rule[$id]['ips_policy']);
-	if (isset($_GET['ids'])) {
-		$contents = $rules_map[$_GET['gid']][trim($_GET['ids'])]['rule'];
+	$rules_map = snort_load_vrt_policy(strtolower(trim(substr($file, strpos($file, "-")+1))));
+	if (isset($_GET['sid']) && is_numericint($_GET['sid']) && isset($_GET['gid']) && is_numericint($_GET['gid'])) {
+		$contents = $rules_map[$_GET['gid']][trim($_GET['sid'])]['rule'];
 		$wrap_flag = "soft";
 	}
 	else {
-		$contents = "# Snort IPS Policy - " . ucfirst($a_rule[$id]['ips_policy']) . "\n\n";
+		$contents = "# Snort IPS Policy - " . ucfirst(trim(substr($file, strpos($file, "-")+1))) . "\n\n";
 		foreach (array_keys($rules_map) as $k1) {
 			foreach (array_keys($rules_map[$k1]) as $k2) {
 				$contents .= "# Category: " . $rules_map[$k1][$k2]['category'] . "   SID: {$k2}\n";
@@ -94,7 +96,7 @@ if (substr($file, 0, 10) == "IPS Policy") {
 	unset($rules_map);
 }
 // Is it a SID to load the rule text from?
-elseif (isset($_GET['ids'])) {
+elseif (isset($_GET['sid']) && is_numericint($_GET['sid']) && isset($_GET['gid']) && is_numericint($_GET['gid'])) {
 	// If flowbit rule, point to interface-specific file
 	if ($file == "Auto-Flowbit Rules")
 		$rules_map = snort_load_rules_map("{$snortcfgdir}/rules/" . FLOWBITS_FILENAME);
@@ -102,7 +104,7 @@ elseif (isset($_GET['ids'])) {
 		$rules_map = snort_load_rules_map("{$snortdir}/preproc_rules/{$file}");
 	else
 		$rules_map = snort_load_rules_map("{$snortdir}/rules/{$file}");
-	$contents = $rules_map[$_GET['gid']][trim($_GET['ids'])]['rule'];
+	$contents = $rules_map[$_GET['gid']][trim($_GET['sid'])]['rule'];
 	$wrap_flag = "soft";
 }
 // Is it our special flowbit rules file?
@@ -114,16 +116,12 @@ elseif (file_exists("{$snortdir}/rules/{$file}"))
 // Is it a rules file in the ../preproc_rules/ directory?
 elseif (file_exists("{$snortdir}/preproc_rules/{$file}"))
 	$contents = file_get_contents("{$snortdir}/preproc_rules/{$file}");
-// Is it a fully qualified path and file?
-elseif (file_exists($file)) {
-	if (substr(realpath($file), 0, strlen(SNORTLOGDIR)) != SNORTLOGDIR)
-		$contents = gettext("\n\nERROR -- File: {$file} can not be viewed!");
-	else
-		$contents = file_get_contents($file);
-}
+// Is it a disabled preprocessor auto-rules-disable file?
+elseif (file_exists("{$snortlogdir}/{$file}"))
+	$contents = file_get_contents("{$snortlogdir}/{$file}");
 // It is not something we can display, so exit.
 else
-	$input_errors[] = gettext("Unable to open file: {$displayfile}");
+	$contents = gettext("Unable to open file: {$displayfile}");
 
 $pgtitle = array(gettext("Snort"), gettext("File Viewer"));
 ?>
@@ -131,10 +129,8 @@ $pgtitle = array(gettext("Snort"), gettext("File Viewer"));
 <?php include("head.inc");?>
 
 <body link="#000000" vlink="#000000" alink="#000000">
-<?php if ($savemsg) print_info_box($savemsg); ?>
 <?php // include("fbegin.inc");?>
 
-<form action="snort_rules_edit.php" method="post">
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
 <tr>
 	<td class="tabcont">
@@ -161,7 +157,6 @@ $pgtitle = array(gettext("Snort"), gettext("File Viewer"));
 	</td>
 </tr>
 </table>
-</form>
 <?php // include("fend.inc");?>
 </body>
 </html>

@@ -2,7 +2,7 @@
 /* $Id$ */
 /*
 	snort_select_alias.php
-	Copyright (C) 2013 Bill Meeks
+	Copyright (C) 2013, 2014 Bill Meeks
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
@@ -42,22 +42,29 @@ require_once("/usr/local/pkg/snort/snort.inc");
 // overwrite it on subsequent POST-BACKs to this page.
 if (!isset($_POST['org_querystr']))
 	$querystr = $_SERVER['QUERY_STRING'];
+else
+	$querystr = $_POST['org_querystr'];
 
 // Retrieve any passed QUERY STRING or POST variables
-$type = $_GET['type'];
-$varname = $_GET['varname'];
-$multi_ip = $_GET['multi_ip'];
-$referrer = urldecode($_GET['returl']);
 if (isset($_POST['type']))
 	$type = $_POST['type'];
+elseif (isset($_GET['type']))
+	$type = htmlspecialchars($_GET['type']);
+
 if (isset($_POST['varname']))
 	$varname = $_POST['varname'];
+elseif (isset($_GET['varname']))
+	$varname = htmlspecialchars($_GET['varname']);
+
 if (isset($_POST['multi_ip']))
 	$multi_ip = $_POST['multi_ip'];
+elseif (isset($_GET['multi_ip']))
+	$multi_ip = htmlspecialchars($_GET['multi_ip']);
+
 if (isset($_POST['returl']))
 	$referrer = urldecode($_POST['returl']);
-if (isset($_POST['org_querystr']))
-	$querystr = $_POST['org_querystr'];
+elseif (isset($_GET['returl']))
+	$referrer = urldecode($_GET['returl']);
 
 // Make sure we have a valid VARIABLE name
 // and ALIAS TYPE, or else bail out.
@@ -122,11 +129,11 @@ include("head.inc");
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">
 <?php include("fbegin.inc"); ?>
 <form action="snort_select_alias.php" method="post">
-<input type="hidden" name="varname" value="<?=$varname;?>">
-<input type="hidden" name="type" value="<?=$type;?>">
-<input type="hidden" name="multi_ip" value="<?=$multi_ip;?>">
-<input type="hidden" name="returl" value="<?=$referrer;?>">
-<input type="hidden" name="org_querystr" value="<?=$querystr;?>">
+<input type="hidden" name="varname" value="<?=$varname;?>"/>
+<input type="hidden" name="type" value="<?=$type;?>"/>
+<input type="hidden" name="multi_ip" value="<?=$multi_ip;?>"/>
+<input type="hidden" name="returl" value="<?=$referrer;?>"/>
+<input type="hidden" name="org_querystr" value="<?=$querystr;?>"/>
 <?php if ($input_errors) print_input_errors($input_errors); ?>
 <div id="boxarea">
 <table width="100%" border="0" cellpadding="0" cellspacing="0">

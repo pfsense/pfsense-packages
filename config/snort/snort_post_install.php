@@ -96,13 +96,15 @@ function snort_build_new_conf($snortcfg) {
 	if (!is_array($config['installedpackages']['snortglobal']['rule']))
 		return;
 
+	conf_mount_rw();
+
 	/* See if we should protect and not modify the preprocessor rules files */
 	if (!empty($snortcfg['protect_preproc_rules'])) 	
 		$protect_preproc_rules = $snortcfg['protect_preproc_rules'];
 	else
 		$protect_preproc_rules = "off";
 
-	$if_real = snort_get_real_interface($snortcfg['interface']);
+	$if_real = get_real_interface($snortcfg['interface']);
 	$snort_uuid = $snortcfg['uuid'];
 	$snortcfgdir = "{$snortdir}/snort_{$snort_uuid}_{$if_real}";
 
@@ -162,8 +164,18 @@ function snort_build_new_conf($snortcfg) {
 
 	/* define snortunifiedlog */
 	$snortunifiedlog_type = "";
-	if ($snortcfg['snortunifiedlog'] == "on")
-		$snortunifiedlog_type = "output unified2: filename snort_{$snort_uuid}_{$if_real}.u2, limit 128";
+	if ($snortcfg['barnyard_enable'] == "on") {
+		if (isset($snortcfg['unified2_log_limit']))
+			$u2_log_limit = "limit {$snortcfg['unified2_log_limit']}";
+		else
+			$u2_log_limit = "limit 128";
+
+		$snortunifiedlog_type = "output unified2: filename snort_{$snort_uuid}_{$if_real}.u2, {$u2_log_limit}";
+		if ($snortcfg['barnyard_log_vlan_events'] == 'on')
+			$snortunifiedlog_type .= ", vlan_event_types";
+		if ($snortcfg['barnyard_log_mpls_events'] == 'on')
+			$snortunifiedlog_type .= ", mpls_event_types";
+	}
 
 	/* define spoink */
 	$spoink_type = "";
@@ -721,6 +733,49 @@ preprocessor sensitive_data: \
 
 EOD;
 
+	/* define IP Reputation preprocessor */
+	if (is_array($snortcfg['blist_files']['item'])) {
+		$blist_files = "";
+		$bIsFirst = TRUE;
+		foreach ($snortcfg['blist_files']['item'] as $blist) {
+			if ($bIsFirst) {
+				$blist_files .= "blacklist " . IPREP_PATH . $blist;
+				$bIsFirst = FALSE;
+			}
+			else
+				$blist_files .= ", \\ \n\tblacklist " . IPREP_PATH . $blist;    
+		}
+	}
+	if (is_array($snortcfg['wlist_files']['item'])) {
+		$wlist_files = "";
+		$bIsFirst = TRUE;
+		foreach ($snortcfg['wlist_files']['item'] as $wlist) {
+			if ($bIsFirst) {
+				$wlist_files .= "whitelist " . IPREP_PATH . $wlist;
+				$bIsFirst = FALSE;
+			}
+			else
+				$wlist_files .= ", \\ \n\twhitelist " . IPREP_PATH . $wlist;    
+		}
+	}
+	if (!empty($blist_files))
+		$ip_lists = $blist_files;
+	if (!empty($wlist_files))
+		$ip_lists .= ", \\ \n" . $wlist_files;
+	if ($snortcfg['iprep_scan_local'] == 'on')
+		$ip_lists .= ", \\ \n\tscan_local";	
+
+	$reputation_preproc = <<<EOD
+# IP Reputation preprocessor #
+preprocessor reputation: \
+	memcap {$snortcfg['iprep_memcap']}, \
+	priority {$snortcfg['iprep_priority']}, \
+	nested_ip {$snortcfg['iprep_nested_ip']}, \
+	white {$snortcfg['iprep_white']}, \
+	{$ip_lists}
+
+EOD;
+
 	/* define servers as IP variables */
 	$snort_servers = array (
 		"dns_servers" => "\$HOME_NET", "smtp_servers" => "\$HOME_NET", "http_servers" => "\$HOME_NET",
@@ -751,11 +806,11 @@ EOD;
 		"ssl_preproc" => "ssl_preproc", "dnp3_preproc" => "dnp3_preproc", "modbus_preproc" => "modbus_preproc"
 	);
 	$snort_preproc = array (
-		"perform_stat", "other_preprocs", "ftp_preprocessor", "smtp_preprocessor", "ssl_preproc", "sip_preproc", "gtp_preproc", "ssh_preproc",
-		"sf_portscan", "dce_rpc_2", "dns_preprocessor", "sensitive_data", "pop_preproc", "imap_preproc", "dnp3_preproc", "modbus_preproc"
+		"perform_stat", "other_preprocs", "ftp_preprocessor", "smtp_preprocessor", "ssl_preproc", "sip_preproc", "gtp_preproc", "ssh_preproc", "sf_portscan", 
+		"dce_rpc_2", "dns_preprocessor", "sensitive_data", "pop_preproc", "imap_preproc", "dnp3_preproc", "modbus_preproc", "reputation_preproc"
 	);
 	$default_disabled_preprocs = array(
-		"sf_portscan", "gtp_preproc", "sensitive_data", "dnp3_preproc", "modbus_preproc"
+		"sf_portscan", "gtp_preproc", "sensitive_data", "dnp3_preproc", "modbus_preproc", "reputation_preproc", "perform_stat" 
 	);
 	$snort_preprocessors = "";
 	foreach ($snort_preproc as $preproc) {
@@ -1213,7 +1268,7 @@ EOD;
 ipvar HOME_NET [{$home_net}]
 ipvar EXTERNAL_NET [{$external_net}]
 
-# Define Rule Paths #
+# Define Rule Path #
 var RULE_PATH {$snortcfgdir}/rules
 
 # Define Servers #
@@ -1305,13 +1360,8 @@ output alert_csv: alert timestamp,sig_generator,sig_id,sig_rev,msg,proto,src,src
 EOD;
 
 	// Write out snort.conf file
-	$conf = fopen("{$snortcfgdir}/snort.conf", "w");
-	if(!$conf) {
-		log_error("Could not open {$snortcfgdir}/snort.conf for writing.");
-		return -1;
-	}
-	fwrite($conf, $snort_conf_text);
-	fclose($conf);
+	file_put_contents("{$snortcfgdir}/snort.conf", $snort_conf_text);
+	conf_mount_ro();
 	unset($snort_conf_text, $selected_rules_sections, $suppress_file_name, $snort_misc_include_rules, $spoink_type, $snortunifiedlog_type, $alertsystemlog_type);
 	unset($home_net, $external_net, $ipvardef, $portvardef);
 }
@@ -1326,14 +1376,14 @@ if(is_process_running("snort")) {
 	exec("/usr/bin/killall -z snort");
 	sleep(2);
 	// Delete any leftover snort PID files in /var/run
-	array_map('@unlink', glob("/var/run/snort_*.pid"));
+	unlink_if_exists("/var/run/snort_*.pid");
 }
 // Hard kill any running Barnyard2 processes
 if(is_process_running("barnyard")) {
 	exec("/usr/bin/killall -z barnyard2");
 	sleep(2);
 	// Delete any leftover barnyard2 PID files in /var/run
-	array_map('@unlink', glob("/var/run/barnyard2_*.pid"));
+	unlink_if_exists("/var/run/barnyard2_*.pid");
 }
 
 /* Set flag for post-install in progress */
@@ -1362,45 +1412,67 @@ foreach ($preproc_rules as $file) {
 @unlink("{$rcdir}/snort.sh");
 @unlink("{$rcdir}/barnyard2");
 
+/* Create required log and db directories in /var */
+safe_mkdir(SNORTLOGDIR);
+safe_mkdir(IPREP_PATH);
+
+/* If installed, absorb the Snort Dashboard Widget into this package */
+/* by removing it as a separately installed package.                 */
+$pkgid = get_pkg_id("Dashboard Widget: Snort");
+if ($pkgid >= 0) {
+	log_error(gettext("[Snort] Removing legacy 'Dashboard Widget: Snort' package because the widget is now part of the Snort package."));
+	unset($config['installedpackages']['package'][$pkgid]);
+	unlink_if_exists("/usr/local/pkg/widget-snort.xml");
+	write_config();
+}
+
+/* Define a default Dashboard Widget Container for Snort */
+$snort_widget_container = "snort_alerts-container:col2:close";
+
 /* remake saved settings */
 if ($config['installedpackages']['snortglobal']['forcekeepsettings'] == 'on') {
 	log_error(gettext("[Snort] Saved settings detected... rebuilding installation with saved settings..."));
 	update_status(gettext("Saved settings detected..."));
 	/* Do one-time settings migration for new multi-engine configurations */
-	update_output_window(gettext("Please wait... migrating settings to new multi-engine configuration..."));
-	include('/usr/local/pkg/snort/snort_migrate_config.php');
+	update_output_window(gettext("Please wait... migrating settings to new configuration..."));
+	include('/usr/local/www/snort/snort_migrate_config.php');
 	update_output_window(gettext("Please wait... rebuilding installation with saved settings..."));
 	log_error(gettext("[Snort] Downloading and updating configured rule types..."));
 	update_output_window(gettext("Please wait... downloading and updating configured rule types..."));
 	if ($pkg_interface <> "console")
 		$snort_gui_include = true;
-	include('/usr/local/pkg/snort/snort_check_for_rule_updates.php');
+	include('/usr/local/www/snort/snort_check_for_rule_updates.php');
 	update_status(gettext("Generating snort.conf configuration file from saved settings..."));
 	$rebuild_rules = true;
 
 	/* Create the snort.conf files for each enabled interface */
 	$snortconf = $config['installedpackages']['snortglobal']['rule'];
 	foreach ($snortconf as $value) {
-		$if_real = snort_get_real_interface($value['interface']);
+		$if_real = get_real_interface($value['interface']);
 
 		/* create a snort.conf file for interface */
 		snort_build_new_conf($value);
 
 		/* create barnyard2.conf file for interface */
 		if ($value['barnyard_enable'] == 'on')
-			snort_create_barnyard2_conf($value, $if_real);
+			snort_generate_barnyard2_conf($value, $if_real);
 	}
 
 	/* create snort bootup file snort.sh */
 	snort_create_rc();
 
 	/* Set Log Limit, Block Hosts Time and Rules Update Time */
-	snort_snortloglimit_install_cron($config['installedpackages']['snortglobal']['snortloglimit'] == 'on' ? true : false);
+	snort_snortloglimit_install_cron(true);
 	snort_rm_blocked_install_cron($config['installedpackages']['snortglobal']['rm_blocked'] != "never_b" ? true : false);
 	snort_rules_up_install_cron($config['installedpackages']['snortglobal']['autorulesupdate7'] != "never_up" ? true : false);
 
 	/* Add the recurring jobs created above to crontab */
 	configure_cron();
+
+	/* Restore the last Snort Dashboard Widget setting if none is set */
+	if (!empty($config['installedpackages']['snortglobal']['dashboard_widget']) && 
+	    stristr($config['widgets']['sequence'], "snort_alerts-container") === FALSE)
+		$config['widgets']['sequence'] .= "," . $config['installedpackages']['snortglobal']['dashboard_widget'];
 
 	$rebuild_rules = false;
 	update_output_window(gettext("Finished rebuilding Snort configuration files..."));
@@ -1416,8 +1488,13 @@ if ($config['installedpackages']['snortglobal']['forcekeepsettings'] == 'on') {
 	}
 }
 
+/* If an existing Snort Dashboard Widget container is not found, */
+/* then insert our default Widget Dashboard container.           */
+if (stristr($config['widgets']['sequence'], "snort_alerts-container") === FALSE)
+	$config['widgets']['sequence'] .= ",{$snort_widget_container}";
+
 /* Update Snort package version in configuration */
-$config['installedpackages']['snortglobal']['snort_config_ver'] = "3.0.4";
+$config['installedpackages']['snortglobal']['snort_config_ver'] = "3.0.5";
 write_config();
 
 /* Done with post-install, so clear flag */

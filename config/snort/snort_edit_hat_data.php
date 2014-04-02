@@ -3,6 +3,7 @@
  * snort_edit_hat_data.php
  * Copyright (C) 2004 Scott Ullrich
  * Copyright (C) 2011-2012 Ermal Luci
+ * Copyright (C) 2013-2014 Bill Meeks
  * All rights reserved.
  *
  * originially part of m0n0wall (http://m0n0.ch/wall)
@@ -47,9 +48,11 @@ if (!is_array($config['installedpackages']['snortglobal']['rule'])) {
 }
 $a_nat = &$config['installedpackages']['snortglobal']['rule'];
 
-$id = $_GET['id'];
-if (isset($_POST['id']))
+if (isset($_POST['id']) && is_numericint($_POST['id']))
 	$id = $_POST['id'];
+elseif (isset($_GET['id']) && is_numericint($_GET['id']))
+	$id = htmlspecialchars($_GET['id']);
+
 if (is_null($id)) {
 	header("Location: /snort/snort_interfaces.php");
 	exit;
@@ -62,24 +65,27 @@ else
 
 if ($_POST['clear']) {
 	unset($a_nat[$id]['host_attribute_data']);
+	$a_nat[$id]['host_attribute_table'] = 'off';
 	write_config();
 	$rebuild_rules = false;
 	snort_generate_conf($a_nat[$id]);
-	header("Location: /snort/snort_edit_hat_data.php?id={$id}");
-	exit;
+	$pconfig['host_attribute_data'] = "";
 }
 
-if ($_POST['host_attribute_data']) {
+if ($_POST['save']) {
 	$a_nat[$id]['host_attribute_data'] = base64_encode($_POST['host_attribute_data']);
+	if (strlen($_POST['host_attribute_data']) > 0)
+		$a_nat[$id]['host_attribute_table'] = 'on';
+	else
+		$a_nat[$id]['host_attribute_table'] = 'off';
 	write_config();
 	$rebuild_rules = false;
 	snort_generate_conf($a_nat[$id]);
-	header("Location: /snort/snort_preprocessors.php?id={$id}");
-	exit;
+	$pconfig['host_attribute_data'] = $_POST['host_attribute_data'];
 }
 
 
-$if_friendly = snort_get_friendly_interface($a_nat[$id]['interface']);
+$if_friendly = convert_friendly_interface_to_friendly_descr($a_nat[$id]['interface']);
 $pgtitle = gettext("Snort: Interface {$if_friendly} - Host Attribute Table Data");
 include_once("head.inc");
 
@@ -89,8 +95,8 @@ include_once("head.inc");
 
 <?php
 include("fbegin.inc");
-if($pfsense_stable == 'yes'){echo '<p class="pgtitle">' . $pgtitle . '</p>';}
-if ($input_errors) print_input_errors($input_errors);
+if ($input_errors)
+	print_input_errors($input_errors);
 if ($savemsg)
 	print_info_box($savemsg);
 ?>
@@ -106,11 +112,11 @@ if ($savemsg)
 	<tr>
 		<td>
 		<input type='hidden' name='id' value='<?=$id;?>'>
-		<textarea wrap="off" cols="80" rows="35" name="host_attribute_data" id="host_attribute_data" style="width:99%; height:100%;"><?=$pconfig['host_attribute_data'];?></textarea></td>
+		<textarea wrap="off" cols="80" rows="35" name="host_attribute_data" id="host_attribute_data" style="width:99%; height:100%;"><?=htmlspecialchars($pconfig['host_attribute_data']);?></textarea></td>
 	</tr>
 	<tr>
 		<td>
-			<input name="Submit" type="submit" class="formbtn" value="<?php echo gettext(" Save "); ?>" title=" <?php echo gettext("Save Host Attribute data"); ?>"/>&nbsp;&nbsp;
+			<input name="save" type="submit" class="formbtn" value="<?php echo gettext(" Save "); ?>" title=" <?php echo gettext("Save Host Attribute data"); ?>"/>&nbsp;&nbsp;
 			<input type="button" class="formbtn" value=" <?php echo gettext("Return"); ?>" onclick="parent.location='snort_preprocessors.php?id=<?=$id;?>'" title="<?php echo gettext("Return to Preprocessors tab"); ?>"/>&nbsp;&nbsp;
 			<input name="clear" type="submit" class="formbtn" id="clear" value="<?php echo gettext("Clear"); ?>" onclick="return confirm('<?php echo gettext("This will erase all Host Attribute data for the interface.  Are you sure?"); ?>')" title="<?php echo gettext("Deletes all Host Attribute data"); ?>"/>
 		</td>

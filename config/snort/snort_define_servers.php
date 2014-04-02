@@ -5,6 +5,7 @@
  *
  * Copyright (C) 2003-2004 Manuel Kasper <mk@neon1.net>.
  * Copyright (C) 2008-2009 Robert Zelaya.
+ * Copyright (C) 2014 Bill Meeks
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -35,12 +36,14 @@ require_once("/usr/local/pkg/snort/snort.inc");
 
 global $g, $rebuild_rules;
 
-$id = $_GET['id'];
-if (isset($_POST['id']))
+if (isset($_POST['id']) && is_numericint($_POST['id']))
 	$id = $_POST['id'];
+elseif (isset($_GET['id']) && is_numericint($_GET['id']))
+	$id = htmlspecialchars($_GET['id']);
+
 if (is_null($id)) {
-        header("Location: /snort/snort_interfaces.php");
-        exit;
+	header("Location: /snort/snort_interfaces.php");
+	exit;
 }
 
 if (!is_array($config['installedpackages']['snortglobal']['rule'])) {
@@ -87,20 +90,20 @@ $snort_ports = array(
 );
 
 // Sort our SERVERS and PORTS arrays to make values
-// easier to locate by the the user.
+// easier to locate for the user.
 ksort($snort_servers);
 ksort($snort_ports);
 
 $pconfig = $a_nat[$id];
 
 /* convert fake interfaces to real */
-$if_real = snort_get_real_interface($pconfig['interface']);
+$if_real = get_real_interface($pconfig['interface']);
 $snort_uuid = $config['installedpackages']['snortglobal']['rule'][$id]['uuid'];
 
 /* alert file */
 $d_snortconfdirty_path = "/var/run/snort_conf_{$snort_uuid}_{$if_real}.dirty";
 
-if ($_POST) {
+if ($_POST['save']) {
 
 	$natent = array();
 	$natent = $pconfig;
@@ -149,9 +152,11 @@ if ($_POST) {
 		header("Location: snort_define_servers.php?id=$id");
 		exit;
 	}
+	else
+		$pconfig = $_POST;
 }
 
-$if_friendly = snort_get_friendly_interface($pconfig['interface']);
+$if_friendly = convert_friendly_interface_to_friendly_descr($a_nat[$id]['interface']);
 $pgtitle = gettext("Snort: Interface {$if_friendly} Variables - Servers and Ports");
 include_once("head.inc");
 
@@ -160,7 +165,6 @@ include_once("head.inc");
 
 <?php 
 include("fbegin.inc"); 
-if($pfsense_stable == 'yes'){echo '<p class="pgtitle">' . $pgtitle . '</p>';}
 /* Display Alert message */
 if ($input_errors)
 	print_input_errors($input_errors); // TODO: add checks
@@ -180,23 +184,25 @@ if ($savemsg)
 		$tab_array[0] = array(gettext("Snort Interfaces"), true, "/snort/snort_interfaces.php");
 		$tab_array[1] = array(gettext("Global Settings"), false, "/snort/snort_interfaces_global.php");
 		$tab_array[2] = array(gettext("Updates"), false, "/snort/snort_download_updates.php");
-		$tab_array[3] = array(gettext("Alerts"), false, "/snort/snort_alerts.php");
+		$tab_array[3] = array(gettext("Alerts"), false, "/snort/snort_alerts.php?instance={$id}");
 		$tab_array[4] = array(gettext("Blocked"), false, "/snort/snort_blocked.php");
-		$tab_array[5] = array(gettext("Whitelists"), false, "/snort/snort_interfaces_whitelist.php");
+		$tab_array[5] = array(gettext("Pass Lists"), false, "/snort/snort_passlist.php");
 		$tab_array[6] = array(gettext("Suppress"), false, "/snort/snort_interfaces_suppress.php");
-		$tab_array[7] = array(gettext("Sync"), false, "/pkg_edit.php?xml=snort/snort_sync.xml");
-		display_top_tabs($tab_array);
+		$tab_array[7] = array(gettext("IP Lists"), false, "/snort/snort_ip_list_mgmt.php");
+		$tab_array[8] = array(gettext("Sync"), false, "/pkg_edit.php?xml=snort/snort_sync.xml");
+		display_top_tabs($tab_array, true);
 		echo '</td></tr>';
 		echo '<tr><td class="tabnavtbl">';
 		$menu_iface=($if_friendly?substr($if_friendly,0,5)." ":"Iface ");
-        $tab_array = array();
-        $tab_array[] = array($menu_iface . gettext(" Settings"), false, "/snort/snort_interfaces_edit.php?id={$id}");
-        $tab_array[] = array($menu_iface . gettext("Categories"), false, "/snort/snort_rulesets.php?id={$id}");
-        $tab_array[] = array($menu_iface . gettext("Rules"), false, "/snort/snort_rules.php?id={$id}");
-        $tab_array[] = array($menu_iface . gettext("Variables"), true, "/snort/snort_define_servers.php?id={$id}");
-        $tab_array[] = array($menu_iface . gettext("Preprocessors"), false, "/snort/snort_preprocessors.php?id={$id}");
-        $tab_array[] = array($menu_iface . gettext("Barnyard2"), false, "/snort/snort_barnyard.php?id={$id}");
-        display_top_tabs($tab_array);
+		$tab_array = array();
+		$tab_array[] = array($menu_iface . gettext(" Settings"), false, "/snort/snort_interfaces_edit.php?id={$id}");
+		$tab_array[] = array($menu_iface . gettext("Categories"), false, "/snort/snort_rulesets.php?id={$id}");
+		$tab_array[] = array($menu_iface . gettext("Rules"), false, "/snort/snort_rules.php?id={$id}");
+		$tab_array[] = array($menu_iface . gettext("Variables"), true, "/snort/snort_define_servers.php?id={$id}");
+		$tab_array[] = array($menu_iface . gettext("Preprocs"), false, "/snort/snort_preprocessors.php?id={$id}");
+		$tab_array[] = array($menu_iface . gettext("Barnyard2"), false, "/snort/snort_barnyard.php?id={$id}");
+		$tab_array[] = array($menu_iface . gettext("IP Rep"), false, "/snort/snort_ip_reputation.php?id={$id}");
+		display_top_tabs($tab_array, true);
 ?>
 </td></tr>
 <tr>
@@ -256,7 +262,7 @@ if ($savemsg)
 		<tr>
 			<td width="30%" valign="top">&nbsp;</td>
 			<td width="70%">
-				<input name="Submit" type="submit" class="formbtn" value="Save">
+				<input name="save" type="submit" class="formbtn" value="Save">
 				<input name="id" type="hidden" value="<?=$id;?>">
 			</td>
 		</tr>
@@ -276,9 +282,6 @@ if ($savemsg)
         if(isset($config['aliases']['alias']) && is_array($config['aliases']['alias']))
                 foreach($config['aliases']['alias'] as $alias_name) {
                         if ($alias_name['type'] == "host" || $alias_name['type'] == "network") {
-				// Skip any Aliases that resolve to an empty string
-				if (trim(filter_expand_alias($alias_name['name'])) == "")
-					continue;
 				if($addrisfirst == 1) $aliasesaddr .= ",";
 				$aliasesaddr .= "'" . $alias_name['name'] . "'";
 				$addrisfirst = 1;

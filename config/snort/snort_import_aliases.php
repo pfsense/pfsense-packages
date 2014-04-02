@@ -2,7 +2,7 @@
 /* $Id$ */
 /*
 	snort_import_aliases.php
-	Copyright (C) 2013 Bill Meeks
+	Copyright (C) 2013, 2014 Bill Meeks
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
@@ -32,12 +32,15 @@ require_once("functions.inc");
 require_once("/usr/local/pkg/snort/snort.inc");
 
 // Retrieve any passed QUERY STRING or POST variables
-$id = $_GET['id'];
-$eng = $_GET['eng'];
 if (isset($_POST['id']))
 	$id = $_POST['id'];
+elseif (isset($_GET['id']) && is_numericint($_GET['id']))
+	$id = htmlspecialchars($_GET['id']);
+
 if (isset($_POST['eng']))
 	$eng = $_POST['eng'];
+elseif (isset($_GET['eng']))
+	$eng = htmlspecialchars($_GET['eng']);
 
 // Make sure we have a valid rule ID and ENGINE name, or
 // else bail out to top-level menu. 
@@ -46,7 +49,10 @@ if (is_null($id) || is_null($eng)) {
 	exit;
 }
 
-// Used to track if any selectable Aliases are found
+// Used to track if any selectable Aliases are found. Selectable
+// means aliases matching the requirements of the configuration
+// engine we are importing into (e.g., single IP only or 
+// multiple IP alias).
 $selectablealias = false;
 
 // Initialize required array variables as necessary
@@ -89,7 +95,7 @@ switch ($eng) {
 		break;
 	case "stream5_tcp_engine":
 		$anchor = "#stream5_row";
-		$multi_ip = true;
+		$multi_ip = false;
 		$title = "Stream5 TCP Engine";
 		break;
 	case "ftp_server_engine":
@@ -269,7 +275,7 @@ include("head.inc");
 			?>
 			<?php if ($disable): ?>
 			<tr title="<?=$tooltip;?>">
-			  <td class="listlr" align="center"><img src="../themes/<?=$g['theme'];?>/images/icons/icon_block_d.gif" width="11" height"11" border="0"/>
+			  <td class="listlr" align="center" sorttable_customkey=""><img src="../themes/<?=$g['theme'];?>/images/icons/icon_block_d.gif" width="11" height="11" border="0"/>
 			<?php else: ?>
 			<tr>
 			  <td class="listlr" align="center"><input type="checkbox" name="toimport[]" value="<?=htmlspecialchars($alias['name']);?>" title="<?=$tooltip;?>"/></td>

@@ -4,6 +4,7 @@
  *
  * Copyright (C) 2008-2009 Robert Zelaya.
  * Copyright (C) 2011-2012 Ermal Luci
+ * Copyright (C) 2014 Bill Meeks
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -33,6 +34,9 @@ require_once("/usr/local/pkg/snort/snort.inc");
 
 global $g, $rebuild_rules;
 
+$snortdir = SNORTDIR;
+$snortlogdir = SNORTLOGDIR;
+
 if (!is_array($config['installedpackages']['snortglobal']))
 	$config['installedpackages']['snortglobal'] = array();
 $snortglob = $config['installedpackages']['snortglobal'];
@@ -41,9 +45,11 @@ if (!is_array($config['installedpackages']['snortglobal']['rule']))
 	$config['installedpackages']['snortglobal']['rule'] = array();
 $a_rule = &$config['installedpackages']['snortglobal']['rule'];
 
-$id = $_GET['id'];
-if (isset($_POST['id']))
+if (isset($_POST['id']) && is_numericint($_POST['id']))
 	$id = $_POST['id'];
+elseif (isset($_GET['id']) && is_numericint($_GET['id']))
+	$id = htmlspecialchars($_GET['id']);
+
 if (is_null($id)) {
         header("Location: /snort/snort_interfaces.php");
         exit;
@@ -63,13 +69,7 @@ else {
 $snort_uuid = $pconfig['uuid'];
 
 // Get the physical configured interfaces on the firewall
-if (function_exists('get_configured_interface_with_descr'))
-	$interfaces = get_configured_interface_with_descr();
-else {
-	$interfaces = array('wan' => 'WAN', 'lan' => 'LAN');
-	for ($i = 1; isset($config['interfaces']['opt' . $i]); $i++)
-		$interfaces['opt' . $i] = $config['interfaces']['opt' . $i]['descr'];
-}
+$interfaces = get_configured_interface_with_descr();
 
 // See if interface is already configured, and use its values
 if (isset($id) && $a_rule[$id]) {
@@ -89,6 +89,8 @@ elseif (isset($id) && !isset($a_rule[$id])) {
 	foreach ($ifaces as $i) {
 		if (!in_array($i, $ifrules)) {
 			$pconfig['interface'] = $i;
+			$pconfig['descr'] = strtoupper($i);
+			$pconfig['enable'] = 'on';
 			break;
 		}
 	}
@@ -99,18 +101,25 @@ elseif (isset($id) && !isset($a_rule[$id])) {
 	}
 }
 
-if (isset($_GET['dup']))
-	unset($id);
-
 // Set defaults for empty key parameters
 if (empty($pconfig['blockoffendersip']))
 	$pconfig['blockoffendersip'] = "both";
 if (empty($pconfig['performance']))
 	$pconfig['performance'] = "ac-bnfa";
 
-if ($_POST["Submit"]) {
-	if (!$_POST['interface'])
+if ($_POST["save"]) {
+	if (!isset($_POST['interface']))
 		$input_errors[] = "Interface is mandatory";
+
+	/* See if assigned interface is already in use */
+	if (isset($_POST['interface'])) {
+		foreach ($a_rule as $k => $v) {
+			if (($v['interface'] == $_POST['interface']) && ($id <> $k)) {
+				$input_errors[] = gettext("The '{$_POST['interface']}' interface is already assigned to another Snort instance.");
+				break;
+			}
+		}
+	}
 
 	/* if no errors write to conf */
 	if (!$input_errors) {
@@ -136,6 +145,8 @@ if ($_POST["Submit"]) {
 		if ($_POST['blockoffendersip']) $natent['blockoffendersip'] = $_POST['blockoffendersip']; else unset($natent['blockoffendersip']);
 		if ($_POST['whitelistname']) $natent['whitelistname'] =  $_POST['whitelistname']; else unset($natent['whitelistname']);
 		if ($_POST['homelistname']) $natent['homelistname'] =  $_POST['homelistname']; else unset($natent['homelistname']);
+		if ($_POST['alert_log_limit']) $natent['alert_log_limit'] =  $_POST['alert_log_limit']; else unset($natent['alert_log_limit']);
+		if ($_POST['alert_log_retention']) $natent['alert_log_retention'] =  $_POST['alert_log_retention']; else unset($natent['alert_log_retention']);
 		if ($_POST['externallistname']) $natent['externallistname'] =  $_POST['externallistname']; else unset($natent['externallistname']);
 		if ($_POST['suppresslistname']) $natent['suppresslistname'] =  $_POST['suppresslistname']; else unset($natent['suppresslistname']);
 		if ($_POST['alertsystemlog'] == "on") { $natent['alertsystemlog'] = 'on'; }else{ $natent['alertsystemlog'] = 'off'; }
@@ -145,14 +156,20 @@ if ($_POST["Submit"]) {
 		if ($_POST['fpm_search_optimize'] == "on") { $natent['fpm_search_optimize'] = 'on'; }else{ $natent['fpm_search_optimize'] = 'off'; }
 		if ($_POST['fpm_no_stream_inserts'] == "on") { $natent['fpm_no_stream_inserts'] = 'on'; }else{ $natent['fpm_no_stream_inserts'] = 'off'; }
 
-		$if_real = snort_get_real_interface($natent['interface']);
+		$if_real = get_real_interface($natent['interface']);
 		if (isset($id) && $a_rule[$id]) {
+			// See if moving an existing Snort instance to another physical interface
 			if ($natent['interface'] != $a_rule[$id]['interface']) {
-				$oif_real = snort_get_real_interface($a_rule[$id]['interface']);
-				snort_stop($a_rule[$id], $oif_real);
-				exec("rm -r /var/log/snort_{$oif_real}" . $a_rule[$id]['uuid']);
+				$oif_real = get_real_interface($a_rule[$id]['interface']);
+				if (snort_is_running($a_rule[$id]['uuid'], $oif_real)) {
+					snort_stop($a_rule[$id], $oif_real);
+					$snort_start = true;
+				}
+				else
+					$snort_start = false;
+				exec("mv -f {$snortlogdir}/snort_{$oif_real}{$a_rule[$id]['uuid']} {$snortlogdir}/snort_{$if_real}{$a_rule[$id]['uuid']}");
 				conf_mount_rw();
-				exec("mv -f {$snortdir}/snort_" . $a_rule[$id]['uuid'] . "_{$oif_real} {$snortdir}/snort_" . $a_rule[$id]['uuid'] . "_{$if_real}");
+				exec("mv -f {$snortdir}/snort_{$a_rule[$id]['uuid']}_{$oif_real} {$snortdir}/snort_{$a_rule[$id]['uuid']}_{$if_real}");
 				conf_mount_ro();
 			}
 			$a_rule[$id] = $natent;
@@ -264,6 +281,10 @@ if ($_POST["Submit"]) {
 		/* Update snort.conf and snort.sh files for this interface */
 		sync_snort_package_config();
 
+		/* See if we need to restart Snort after an interface re-assignment */
+		if ($snort_start == true)
+			snort_start($natent, $if_real);
+
 		/*******************************************************/
 		/* Signal Snort to reload configuration if we changed  */
 		/* HOME_NET, EXTERNAL_NET or Suppress list values.     */
@@ -284,21 +305,18 @@ if ($_POST["Submit"]) {
 		$pconfig = $_POST;
 }
 
-$if_friendly = snort_get_friendly_interface($pconfig['interface']);
+$if_friendly = convert_friendly_interface_to_friendly_descr($a_rule[$id]['interface']);
 $pgtitle = gettext("Snort: Interface {$if_friendly} - Edit Settings");
 include_once("head.inc");
 ?>
 
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">
 
-<?php include("fbegin.inc"); ?>
+<?php include("fbegin.inc");
 
-<?if($pfsense_stable == 'yes'){echo '<p class="pgtitle">' . $pgtitle . '</p>';}?>
-
-<?php
 	/* Display Alert message */
 	if ($input_errors) {
-		print_input_errors($input_errors); // TODO: add checks
+		print_input_errors($input_errors);
 	}
 
 	if ($savemsg) {
@@ -306,7 +324,8 @@ include_once("head.inc");
 	}
 ?>
 
-<form action="snort_interfaces_edit.php<?php echo "?id=$id";?>" method="post" name="iform" id="iform">
+<form action="snort_interfaces_edit.php" method="post" name="iform" id="iform">
+<input name="id" type="hidden" value="<?=$id;?>"/>
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
 <tr><td>
 <?php
@@ -314,12 +333,13 @@ include_once("head.inc");
 	$tab_array[0] = array(gettext("Snort Interfaces"), true, "/snort/snort_interfaces.php");
 	$tab_array[1] = array(gettext("Global Settings"), false, "/snort/snort_interfaces_global.php");
 	$tab_array[2] = array(gettext("Updates"), false, "/snort/snort_download_updates.php");
-	$tab_array[3] = array(gettext("Alerts"), false, "/snort/snort_alerts.php");
+	$tab_array[3] = array(gettext("Alerts"), false, "/snort/snort_alerts.php?instance={$id}");
 	$tab_array[4] = array(gettext("Blocked"), false, "/snort/snort_blocked.php");
-	$tab_array[5] = array(gettext("Whitelists"), false, "/snort/snort_interfaces_whitelist.php");
+	$tab_array[5] = array(gettext("Pass Lists"), false, "/snort/snort_passlist.php");
 	$tab_array[6] = array(gettext("Suppress"), false, "/snort/snort_interfaces_suppress.php");
-	$tab_array[7] = array(gettext("Sync"), false, "/pkg_edit.php?xml=snort/snort_sync.xml");
-	display_top_tabs($tab_array);
+	$tab_array[7] = array(gettext("IP Lists"), false, "/snort/snort_ip_list_mgmt.php");
+	$tab_array[8] = array(gettext("Sync"), false, "/pkg_edit.php?xml=snort/snort_sync.xml");
+	display_top_tabs($tab_array, true);
 	echo '</td></tr>';
 	echo '<tr><td class="tabnavtbl">';
 	$tab_array = array();
@@ -328,9 +348,10 @@ include_once("head.inc");
 	$tab_array[] = array($menu_iface . gettext("Categories"), false, "/snort/snort_rulesets.php?id={$id}");
 	$tab_array[] = array($menu_iface . gettext("Rules"), false, "/snort/snort_rules.php?id={$id}");
 	$tab_array[] = array($menu_iface . gettext("Variables"), false, "/snort/snort_define_servers.php?id={$id}");
-	$tab_array[] = array($menu_iface . gettext("Preprocessors"), false, "/snort/snort_preprocessors.php?id={$id}");
+	$tab_array[] = array($menu_iface . gettext("Preprocs"), false, "/snort/snort_preprocessors.php?id={$id}");
 	$tab_array[] = array($menu_iface . gettext("Barnyard2"), false, "/snort/snort_barnyard.php?id={$id}");
-	display_top_tabs($tab_array);
+	$tab_array[] = array($menu_iface . gettext("IP Rep"), false, "/snort/snort_ip_reputation.php?id={$id}");
+	display_top_tabs($tab_array, true);
 ?>
 </td></tr>
 <tr><td><div id="mainarea">
@@ -345,7 +366,7 @@ include_once("head.inc");
 		if ($pconfig['enable'] == "on")
 			$checked = "checked";
 		echo "
-			<input name=\"enable\" type=\"checkbox\" value=\"on\" $checked onClick=\"enable_change(false)\">
+			<input name=\"enable\" type=\"checkbox\" value=\"on\" $checked onClick=\"enable_change(false)\"/>
 			&nbsp;&nbsp;" . gettext("Enable or Disable") . "\n";
 	?>
 		<br/>
@@ -368,15 +389,15 @@ include_once("head.inc");
 	<tr>
 				<td width="22%" valign="top" class="vncellreq"><?php echo gettext("Description"); ?></td>
 				<td width="78%" class="vtable"><input name="descr" type="text" 
-				class="formfld unknown" id="descr" size="40" value="<?=htmlspecialchars($pconfig['descr']); ?>"> <br/>
+				class="formfld unknown" id="descr" size="40" value="<?=htmlspecialchars($pconfig['descr']); ?>"/><br/>
 				<span class="vexpl"><?php echo gettext("Enter a meaningful description here for your reference."); ?></span><br/></td>
 	</tr>
-<tr>
-	<td colspan="2" valign="top" class="listtopic"><?php echo gettext("Alert Settings"); ?></td>
-</tr>
+	<tr>
+		<td colspan="2" valign="top" class="listtopic"><?php echo gettext("Alert Settings"); ?></td>
+	</tr>
 	<tr>
 				<td width="22%" valign="top" class="vncell"><?php echo gettext("Send Alerts to System Logs"); ?></td>
-				<td width="78%" class="vtable"><input name="alertsystemlog" type="checkbox" value="on" <?php if ($pconfig['alertsystemlog'] == "on") echo "checked"; ?>>
+				<td width="78%" class="vtable"><input name="alertsystemlog" type="checkbox" value="on" <?php if ($pconfig['alertsystemlog'] == "on") echo "checked"; ?>/>
 				<?php echo gettext("Snort will send Alerts to the firewall's system logs."); ?></td>
 	</tr>
 	<tr>
@@ -384,14 +405,14 @@ include_once("head.inc");
 				<td width="78%" class="vtable">
 					<input name="blockoffenders7" id="blockoffenders7" type="checkbox" value="on"
 					<?php if ($pconfig['blockoffenders7'] == "on") echo "checked"; ?>
-					onClick="enable_blockoffenders()">
+					onClick="enable_blockoffenders();" />
 				<?php echo gettext("Checking this option will automatically block hosts that generate a " .
 				"Snort alert."); ?></td>
 	</tr>
 	<tr>
 				<td width="22%" valign="top" class="vncell"><?php echo gettext("Kill States"); ?></td>
 				<td width="78%" class="vtable">
-					<input name="blockoffenderskill" id="blockoffenderskill" type="checkbox" value="on" <?php if ($pconfig['blockoffenderskill'] == "on") echo "checked"; ?>>
+					<input name="blockoffenderskill" id="blockoffenderskill" type="checkbox" value="on" <?php if ($pconfig['blockoffenderskill'] == "on") echo "checked"; ?>/>
 					<?php echo gettext("Checking this option will kill firewall states for the blocked IP"); ?>
 				</td>
 	</tr>
@@ -410,12 +431,12 @@ include_once("head.inc");
 				?>
 					</select>&nbsp;&nbsp;
 				<?php echo gettext("Select which IP extracted from the packet you wish to block"); ?><br/>
-				<span class="red"><?php echo gettext("Hint:") . "</span>&nbsp;" . gettext("Choosing BOTH is suggested, and it is the default value."); ?></span><br/></td>
+				<span class="red"><?php echo gettext("Hint:") . "</span>&nbsp;" . gettext("Choosing BOTH is suggested, and it is the default value."); ?><br/>
 				</td>
 	</tr>
-<tr>
-	<td colspan="2" valign="top" class="listtopic"><?php echo gettext("Detection Performance Settings"); ?></td>
-</tr>
+	<tr>
+		<td colspan="2" valign="top" class="listtopic"><?php echo gettext("Detection Performance Settings"); ?></td>
+	</tr>
 	<tr>
 				<td width="22%" valign="top" class="vncell"><?php echo gettext("Search Method"); ?></td>
 				<td width="78%" class="vtable">
@@ -442,7 +463,7 @@ include_once("head.inc");
 	<tr>
 				<td width="22%" valign="top" class="vncell"><?php echo gettext("Split ANY-ANY"); ?></td>
 				<td width="78%" class="vtable">
-					<input name="fpm_split_any_any" id="fpm_split_any_any" type="checkbox" value="on" <?php if ($pconfig['fpm_split_any_any'] == "on") echo "checked"; ?>>
+					<input name="fpm_split_any_any" id="fpm_split_any_any" type="checkbox" value="on" <?php if ($pconfig['fpm_split_any_any'] == "on") echo "checked"; ?>/>
 					<?php echo gettext("Enable splitting of ANY-ANY port group.") . " <strong>" . gettext("Default") . "</strong>" . gettext(" is ") . 
 					"<strong>" . gettext("Not Checked") . "</strong>"; ?>.<br/>
 					<br/><?php echo gettext("This setting is a memory/performance trade-off.  It reduces memory footprint by not " . 
@@ -454,7 +475,7 @@ include_once("head.inc");
 	<tr>
 				<td width="22%" valign="top" class="vncell"><?php echo gettext("Search Optimize"); ?></td>
 				<td width="78%" class="vtable">
-					<input name="fpm_search_optimize" id="fpm_search_optimize" type="checkbox" value="on" <?php if ($pconfig['fpm_search_optimize'] == "on" || empty($pconfig['fpm_search_optimize'])) echo "checked"; ?>>
+					<input name="fpm_search_optimize" id="fpm_search_optimize" type="checkbox" value="on" <?php if ($pconfig['fpm_search_optimize'] == "on" || empty($pconfig['fpm_search_optimize'])) echo "checked"; ?>/>
 					<?php echo gettext("Enable search optimization.") . " <strong>" . gettext("Default") . "</strong>" . gettext(" is ") . 
 					"<strong>" . gettext("Checked") . "</strong>"; ?>.<br/>
 					<br/><?php echo gettext("This setting optimizes fast pattern memory when used with search-methods AC or AC-SPLIT " . 
@@ -465,7 +486,7 @@ include_once("head.inc");
 	<tr>
 				<td width="22%" valign="top" class="vncell"><?php echo gettext("Stream Inserts"); ?></td>
 				<td width="78%" class="vtable">
-					<input name="fpm_no_stream_inserts" id="fpm_no_stream_inserts" type="checkbox" value="on" <? if ($pconfig['fpm_no_stream_inserts'] == "on") echo "checked"; ?>>
+					<input name="fpm_no_stream_inserts" id="fpm_no_stream_inserts" type="checkbox" value="on" <? if ($pconfig['fpm_no_stream_inserts'] == "on") echo "checked"; ?>/>
 					<?php echo gettext("Do not evaluate stream inserted packets against the detection engine.") . " <strong>" . gettext("Default") . "</strong>" . gettext(" is ") . 
 					"<strong>" . gettext("Not Checked") . "</strong>"; ?>.<br/>
 					<br/><?php echo gettext("This is a potential performance improvement based on the idea the stream rebuilt packet " . 
@@ -475,15 +496,14 @@ include_once("head.inc");
 	<tr>
 				<td width="22%" valign="top" class="vncell"><?php echo gettext("Checksum Check Disable"); ?></td>
 				<td width="78%" class="vtable">
-					<input name="cksumcheck" id="cksumcheck" type="checkbox" value="on" <?php if ($pconfig['cksumcheck'] == "on") echo "checked"; ?>>
+					<input name="cksumcheck" id="cksumcheck" type="checkbox" value="on" <?php if ($pconfig['cksumcheck'] == "on") echo "checked"; ?>/>
 					<?php echo gettext("Disable checksum checking within Snort to improve performance."); ?>
 					<br><span class="red"><?php echo gettext("Hint: ") . "</span>" . 
 					gettext("Most of this is already done at the firewall/filter level, so it is usually safe to check this box."); ?>
 				</td>
 	</tr>
 	<tr>
-				<td colspan="2" valign="top" class="listtopic"><?php echo gettext("Choose the networks " .
-				"Snort should inspect and whitelist."); ?></td>
+				<td colspan="2" valign="top" class="listtopic"><?php echo gettext("Choose the networks Snort should inspect and whitelist"); ?></td>
 	</tr>
 	<tr>
 				<td width="22%" valign="top" class="vncell"><?php echo gettext("Home Net"); ?></td>
@@ -545,11 +565,11 @@ include_once("head.inc");
 				</td>
 	</tr>
 	<tr>
-		<td width="22%" valign="top" class="vncell"><?php echo gettext("Whitelist"); ?></td>
+		<td width="22%" valign="top" class="vncell"><?php echo gettext("Pass List"); ?></td>
 		<td width="78%" class="vtable">
 			<select name="whitelistname" class="formselect" id="whitelistname">
 			<?php
-				/* find whitelist names and filter by type, make sure to track by uuid */
+				/* find whitelist (Pass List) names and filter by type, make sure to track by uuid */
 				echo "<option value='default' >default</option>\n";
 				if (is_array($snortglob['whitelist']['item'])) {
 					foreach ($snortglob['whitelist']['item'] as $value) {
@@ -562,19 +582,19 @@ include_once("head.inc");
 				}
 			?>
 			</select>
-			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="button" class="formbtns" value="View List" onclick="viewList('<?=$id;?>','whitelistname','whitelist')" 
-			id="btnWhitelist" title="<?php echo gettext("Click to view currently selected Whitelist contents"); ?>"/>
+			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="button" class="formbtns" value="View List" onclick="viewList('<?=$id;?>','whitelistname','passlist')" 
+			id="btnWhitelist" title="<?php echo gettext("Click to view currently selected Pass List contents"); ?>"/>
 			<br/>
-			<span class="vexpl"><?php echo gettext("Choose the whitelist you want this interface to " .
+			<span class="vexpl"><?php echo gettext("Choose the Pass List you want this interface to " .
 			"use."); ?> </span><br/><br/>
 			<span class="red"><?php echo gettext("Note:"); ?></span>&nbsp;<?php echo gettext("This option will only be used when block offenders is on."); ?><br/>
-			<span class="red"><?php echo gettext("Hint:"); ?></span>&nbsp;<?php echo gettext("Default " .
-			"whitelist adds local networks, WAN IPs, Gateways, VPNs and VIPs.  Create an Alias to customize."); ?>
+			<span class="red"><?php echo gettext("Hint:"); ?></span>&nbsp;<?php echo gettext("The default " .
+			"Pass List adds local networks, WAN IPs, Gateways, VPNs and VIPs.  Create an Alias to customize."); ?>
 		</td>
 	</tr>
-<tr>
-	<td colspan="2" valign="top" class="listtopic"><?php echo gettext("Choose a suppression or filtering file if desired."); ?></td>
-</tr>
+	<tr>
+		<td colspan="2" valign="top" class="listtopic"><?php echo gettext("Choose a suppression or filtering file if desired"); ?></td>
+	</tr>
 	<tr>
 		<td width="22%" valign="top" class="vncell"><?php echo gettext("Alert Suppression and Filtering"); ?></td>
 		<td width="78%" class="vtable">
@@ -602,29 +622,28 @@ include_once("head.inc");
 		gettext("Default option disables suppression and filtering."); ?>
 		</td>
 	</tr>
-<tr>
-	<td colspan="2" valign="top" class="listtopic"><?php echo gettext("Arguments here will " .
-	"be automatically inserted into the Snort configuration."); ?></td>
-</tr>
-<tr>
-	<td width="22%" valign="top" class="vncell"><?php echo gettext("Advanced configuration pass-through"); ?></td>
-	<td width="78%" class="vtable">
-		<textarea style="width:98%; height:100%;" wrap="off" name="configpassthru" cols="60" rows="8" id="configpassthru"><?=htmlspecialchars($pconfig['configpassthru']);?></textarea>
-	</td>
-</tr>
-<tr>
-	<td width="22%" valign="top"></td>
-	<td width="78%"><input name="Submit" type="submit" class="formbtn" value="Save" title="<?php echo 
+	<tr>
+		<td colspan="2" valign="top" class="listtopic"><?php echo gettext("Arguments here will " .
+		"be automatically inserted into the Snort configuration."); ?></td>
+	</tr>
+	<tr>
+		<td width="22%" valign="top" class="vncell"><?php echo gettext("Advanced configuration pass-through"); ?></td>
+		<td width="78%" class="vtable">
+			<textarea style="width:98%; height:100%;" wrap="off" name="configpassthru" cols="60" rows="8" id="configpassthru"><?=htmlspecialchars($pconfig['configpassthru']);?></textarea>
+		</td>
+	</tr>
+	<tr>
+		<td width="22%" valign="top"></td>
+		<td width="78%"><input name="save" type="submit" class="formbtn" value="Save" title="<?php echo 
 			gettext("Click to save settings and exit"); ?>"/>
-			<input name="id" type="hidden" value="<?=$id;?>"/>
-	</td>
-</tr>
-<tr>
-	<td width="22%" valign="top">&nbsp;</td>
-	<td width="78%"><span class="vexpl"><span class="red"><strong><?php echo gettext("Note: ") . "</strong></span></span>" . 
-		gettext("Please save your settings before you attempt to start Snort."); ?>	
-	</td>
-</tr>
+		</td>
+	</tr>
+	<tr>
+		<td width="22%" valign="top">&nbsp;</td>
+		<td width="78%"><span class="vexpl"><span class="red"><strong><?php echo gettext("Note: ") . "</strong></span></span>" . 
+			gettext("Please save your settings before you attempt to start Snort."); ?>	
+		</td>
+	</tr>
 </table>
 </div>
 </td></tr>
@@ -684,11 +703,12 @@ function getSelectedValue(elemID) {
 
 function viewList(id, elemID, elemType) {
 	if (typeof elemType == "undefined") {
-		elemType = "whitelist";
+		elemType = "passlist";
 	}
 	var url = "snort_list_view.php?id=" + id + "&wlist=";
 	url = url + getSelectedValue(elemID) + "&type=" + elemType;
-	wopen(url, 'WhitelistViewer', 640, 480);
+	url = url + "&time=" + new Date().getTime();
+	wopen(url, 'PassListViewer', 640, 480);
 }
 
 enable_change(false);
