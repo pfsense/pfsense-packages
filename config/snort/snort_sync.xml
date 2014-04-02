@@ -47,7 +47,7 @@ POSSIBILITY OF SUCH DAMAGE.
 	<faq>Currently there are no FAQ items provided.</faq>
 	<name>snortsync</name>
 	<version>1.0</version>
-	<title>Snort: XMLRPC Sync (EXPERIMENTAL)</title>
+	<title>Snort: XMLRPC Sync</title>
 	<include_file>/usr/local/pkg/snort/snort.inc</include_file>
 	<tabs>
 		<tab>
@@ -71,12 +71,16 @@ POSSIBILITY OF SUCH DAMAGE.
 			<url>/snort/snort_blocked.php</url>
 		</tab>
 		<tab>
-			<text>Whitelists</text>
-			<url>/snort/snort_interfaces_whitelist.php</url>
+			<text>Pass Lists</text>
+			<url>/snort/snort_passlist.php</url>
 		</tab>
 		<tab>
 			<text>Suppress</text>
 			<url>/snort/snort_interfaces_suppress.php</url>
+		</tab>
+		<tab>
+			<text>IP Lists</text>
+			<url>/snort/snort_ip_list_mgmt.php</url>
 		</tab>
 		<tab>
 			<text>Sync</text>
@@ -179,10 +183,6 @@ POSSIBILITY OF SUCH DAMAGE.
 					<value>ON</value>
 				</rowhelperfield>
 			</rowhelper>
-		</field>
-		<field>
-			<name>WARNING:  This feature is considered experimental and not recommended for production use</name>
-			<type>listtopic</type>
 		</field>
 	</fields>
 	<custom_delete_php_command>
