@@ -504,6 +504,7 @@
 		<build_port_path>/usr/ports/net/libnet</build_port_path>
 		<build_port_path>/usr/ports/net/libpcap</build_port_path>
 		<build_port_path>/usr/ports/security/barnyard2</build_port_path>
+		<build_port_path>/usr/ports/security/pulledpork</build_port_path>
 		<build_port_path>/usr/ports/databases/mysql55-client</build_port_path>
 		<build_port_path>/usr/ports/security/snort</build_port_path>
 		<build_pbi>
