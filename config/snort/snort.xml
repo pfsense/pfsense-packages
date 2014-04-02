@@ -8,7 +8,7 @@
 /* ========================================================================== */
 /*
     authng.xml
-    part of pfSense (https://www.pfsense.org)
+    part of pfSense (https://packages.pfsense.org)
     Copyright (C) 2007 to whom it may belong
     All rights reserved.
 
@@ -46,12 +46,12 @@
 	<requirements>None</requirements>
 	<faq>Currently there are no FAQ items provided.</faq>
 	<name>Snort</name>
-	<version>2.9.5.6</version>
-	<title>Services:2.9.5.6 pkg v3.0.4</title>
+	<version>2.9.6.0</version>
+	<title>Services:2.9.6.0 pkg v3.0.5</title>
 	<include_file>/usr/local/pkg/snort/snort.inc</include_file>
 	<menu>
 		<name>Snort</name>
-		<tooltiptext>Setup snort specific settings</tooltiptext>
+		<tooltiptext>Set up snort specific settings</tooltiptext>
 		<section>Services</section>
 		<url>/snort/snort_interfaces.php</url>
 	</menu>
@@ -74,12 +74,12 @@
 		<item>https://packages.pfsense.org/packages/config/snort/snort_check_cron_misc.inc</item>
 	</additional_files_needed>
 	<additional_files_needed>
-		<prefix>/usr/local/pkg/snort/</prefix>
+		<prefix>/usr/local/www/snort/</prefix>
 		<chmod>077</chmod>
 		<item>https://packages.pfsense.org/packages/config/snort/snort_migrate_config.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
-		<prefix>/usr/local/pkg/snort/</prefix>
+		<prefix>/usr/local/www/snort/</prefix>
 		<chmod>077</chmod>
 		<item>https://packages.pfsense.org/packages/config/snort/snort_post_install.php</item>
 	</additional_files_needed>
@@ -119,7 +119,7 @@
 		<item>https://packages.pfsense.org/packages/config/snort/snort_download_updates.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
-		<prefix>/usr/local/pkg/snort/</prefix>
+		<prefix>/usr/local/www/snort/</prefix>
 		<chmod>077</chmod>
 		<item>https://packages.pfsense.org/packages/config/snort/snort_check_for_rule_updates.php</item>
 	</additional_files_needed>
@@ -161,12 +161,12 @@
 	<additional_files_needed>
 		<prefix>/usr/local/www/snort/</prefix>
 		<chmod>077</chmod>
-		<item>https://packages.pfsense.org/packages/config/snort/snort_interfaces_whitelist.php</item>
+		<item>https://packages.pfsense.org/packages/config/snort/snort_passlist.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/www/snort/</prefix>
 		<chmod>077</chmod>
-		<item>https://packages.pfsense.org/packages/config/snort/snort_interfaces_whitelist_edit.php</item>
+		<item>https://packages.pfsense.org/packages/config/snort/snort_passlist_edit.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/www/snort/</prefix>
@@ -177,11 +177,6 @@
 		<prefix>/usr/local/www/snort/</prefix>
 		<chmod>077</chmod>
 		<item>https://packages.pfsense.org/packages/config/snort/snort_interfaces_suppress_edit.php</item>
-	</additional_files_needed>
-	<additional_files_needed>
-		<prefix>/usr/local/www/snort/</prefix>
-		<chmod>077</chmod>
-		<item>https://packages.pfsense.org/packages/config/snort/snort_log_view.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/www/snort/</prefix>
@@ -238,19 +233,49 @@
 		<chmod>077</chmod>
 		<item>https://packages.pfsense.org/packages/config/snort/snort.priv.inc</item>
 	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/www/snort/</prefix>
+		<chmod>077</chmod>
+		<item>https://packages.pfsense.org/packages/config/snort/snort_ip_reputation.php</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/www/snort/</prefix>
+		<chmod>077</chmod>
+		<item>https://packages.pfsense.org/packages/config/snort/snort_ip_list_mgmt.php</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/www/snort/</prefix>
+		<chmod>077</chmod>
+		<item>https://packages.pfsense.org/packages/config/snort/snort_iprep_list_browser.php</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/www/widgets/javascript/</prefix>
+		<chmod>0644</chmod>
+		<item>https://packages.pfsense.org/packages/config/snort/snort_alerts.js</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/www/widgets/widgets/</prefix>
+		<chmod>0644</chmod>
+		<item>https://packages.pfsense.org/packages/config/snort/snort_alerts.widget.php</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/www/widgets/include/</prefix>
+		<chmod>0644</chmod>
+		<item>https://packages.pfsense.org/packages/config/snort/widget-snort.inc</item>
+	</additional_files_needed>
 	<fields>
 	</fields>
 	<custom_add_php_command>
 	</custom_add_php_command>
 	<custom_php_resync_config_command>
 		<![CDATA[
-		if ($GLOBALS['pfSense_snort_version'] == "3.0.4")
+		if ($GLOBALS['pfSense_snort_version'] == "3.0.5")
 		sync_snort_package_config();
 		]]>
 	</custom_php_resync_config_command>
 	<custom_php_install_command>
 		<![CDATA[
-		include_once("/usr/local/pkg/snort/snort_post_install.php");
+		include_once("/usr/local/www/snort/snort_post_install.php");
 		]]>
 	</custom_php_install_command>
 	<custom_php_deinstall_command>
