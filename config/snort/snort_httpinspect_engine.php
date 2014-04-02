@@ -1,7 +1,7 @@
 <?php
 /*
  * snort_httpinspect_engine.php
- * Copyright (C) 2013 Bill Meeks
+ * Copyright (C) 2013-2014 Bill Meeks
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -33,12 +33,15 @@ global $g;
 
 $snortdir = SNORTDIR;
 
-$id = $_GET['id'];
-$eng_id = $_GET['eng_id'];
-if (isset($_POST['id']))
+if (isset($_POST['id']) && is_numericint($_POST['id']))
 	$id = $_POST['id'];
-if (isset($_POST['eng_id']))
+elseif (isset($_GET['id']) && is_numericint($_GET['id']))
+	$id = htmlspecialchars($_GET['id']);
+
+if (isset($_POST['eng_id']) && isset($_POST['eng_id']))
 	$eng_id = $_POST['eng_id'];
+elseif (isset($_GET['eng_id']) && is_numericint($_GET['eng_id']))
+	$eng_id = htmlspecialchars($_GET['eng_id']);
 
 if (is_null($id)) {
 	// Clear and close out any session variable we created
@@ -137,7 +140,7 @@ if ($_GET['act'] == "import") {
 	session_start();
 	if (($_GET['varname'] == "bind_to" || $_GET['varname'] == "ports") 
 	     && !empty($_GET['varvalue'])) {
-		$pconfig[$_GET['varname']] = $_GET['varvalue'];
+		$pconfig[$_GET['varname']] = htmlspecialchars($_GET['varvalue']);
 			$_SESSION['http_inspect_import'] = array();
 
 		$_SESSION['http_inspect_import'][$_GET['varname']] = $_GET['varvalue'];
@@ -160,7 +163,7 @@ if ($_GET['act'] == "import") {
 	}
 }
 
-if ($_POST['Submit']) {
+if ($_POST['save']) {
 
 	// Clear and close out any session variable we created
 	session_start();
@@ -300,7 +303,7 @@ if ($_POST['Submit']) {
 	}
 }
 
-$if_friendly = snort_get_friendly_interface($config['installedpackages']['snortglobal']['rule'][$id]['interface']);
+$if_friendly = convert_friendly_interface_to_friendly_descr($config['installedpackages']['snortglobal']['rule'][$id]['interface']);
 $pgtitle = gettext("Snort: {$if_friendly} - HTTP_Inspect Preprocessor Engine");
 include_once("head.inc");
 
@@ -637,7 +640,7 @@ if ($savemsg)
 	<tr>
 		<td width="22%" valign="bottom">&nbsp;</td>
 		<td width="78%" valign="bottom">
-			<input name="Submit" id="submit" type="submit" class="formbtn" value=" Save " title="<?php echo 
+			<input name="save" id="save" type="submit" class="formbtn" value=" Save " title="<?php echo 
 			gettext("Save httpinspect engine settings and return to Preprocessors tab"); ?>">
 			&nbsp;&nbsp;&nbsp;&nbsp;
 			<input name="Cancel" id="cancel" type="submit" class="formbtn" value="Cancel" title="<?php echo 

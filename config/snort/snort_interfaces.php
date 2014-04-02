@@ -4,6 +4,7 @@
  *
  * Copyright (C) 2008-2009 Robert Zelaya.
  * Copyright (C) 2011-2012 Ermal Luci
+ * Copyright (C) 2014 Bill Meeks
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -28,56 +29,39 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-$nocsrf = true;
 require_once("guiconfig.inc");
 require_once("/usr/local/pkg/snort/snort.inc");
 
 global $g, $rebuild_rules;
 
 $snortdir = SNORTDIR;
+$snortlogdir = SNORTLOGDIR;
 $rcdir = RCFILEPREFIX;
-
-$id = $_GET['id'];
-if (isset($_POST['id']))
-	$id = $_POST['id'];
 
 if (!is_array($config['installedpackages']['snortglobal']['rule']))
 	$config['installedpackages']['snortglobal']['rule'] = array();
 $a_nat = &$config['installedpackages']['snortglobal']['rule'];
+
+// Calculate the index of the next added Snort interface
 $id_gen = count($config['installedpackages']['snortglobal']['rule']);
 
 if (isset($_POST['del_x'])) {
-	/* delete selected rules */
+	/* Delete selected Snort interfaces */
 	if (is_array($_POST['rule'])) {
 		conf_mount_rw();
 		foreach ($_POST['rule'] as $rulei) {
-			/* convert fake interfaces to real */
-			$if_real = snort_get_real_interface($a_nat[$rulei]['interface']);
+			$if_real = get_real_interface($a_nat[$rulei]['interface']);
 			$snort_uuid = $a_nat[$rulei]['uuid'];
 			snort_stop($a_nat[$rulei], $if_real);
-			exec("/bin/rm -r /var/log/snort/snort_{$if_real}{$snort_uuid}");
+			exec("/bin/rm -r {$snortlogdir}/snort_{$if_real}{$snort_uuid}");
 			exec("/bin/rm -r {$snortdir}/snort_{$snort_uuid}_{$if_real}");
-
-			// If interface had auto-generated Suppress List, then
-			// delete that along with the interface
-			$autolist = "{$a_nat[$rulei]['interface']}" . "suppress";
-			if (is_array($config['installedpackages']['snortglobal']['suppress']) && 
-			    is_array($config['installedpackages']['snortglobal']['suppress']['item'])) {
-				$a_suppress = &$config['installedpackages']['snortglobal']['suppress']['item'];
-				foreach ($a_suppress as $k => $i) {
-					if ($i['name'] == $autolist) {
-						unset($config['installedpackages']['snortglobal']['suppress']['item'][$k]);
-						break;
-					}
-				}
-			}
 
 			// Finally delete the interface's config entry entirely
 			unset($a_nat[$rulei]);
 		}
 		conf_mount_ro();
 	  
-		/* If all the Snort interfaces are removed, then unset the config array. */
+		/* If all the Snort interfaces are removed, then unset the interfaces config array. */
 		if (empty($a_nat))
 			unset($a_nat);
 
@@ -106,13 +90,13 @@ if (isset($_POST['del_x'])) {
 
 }
 
-/* start/stop snort */
-if ($_GET['act'] == 'bartoggle' && is_numeric($id)) {
-	$snortcfg = $config['installedpackages']['snortglobal']['rule'][$id];
-	$if_real = snort_get_real_interface($snortcfg['interface']);
-	$if_friendly = snort_get_friendly_interface($snortcfg['interface']);
+/* start/stop barnyard2 */
+if ($_POST['bartoggle'] && is_numericint($_POST['id'])) {
+	$snortcfg = $config['installedpackages']['snortglobal']['rule'][$_POST['id']];
+	$if_real = get_real_interface($snortcfg['interface']);
+	$if_friendly = convert_friendly_interface_to_friendly_descr($snortcfg['interface']);
 
-	if (snort_is_running($snortcfg['uuid'], $if_real, 'barnyard2') == 'no') {
+	if (!snort_is_running($snortcfg['uuid'], $if_real, 'barnyard2')) {
 		log_error("Toggle (barnyard starting) for {$if_friendly}({$snortcfg['descr']})...");
 		sync_snort_package_config();
 		snort_barnyard_start($snortcfg, $if_real);
@@ -120,27 +104,18 @@ if ($_GET['act'] == 'bartoggle' && is_numeric($id)) {
 		log_error("Toggle (barnyard stopping) for {$if_friendly}({$snortcfg['descr']})...");
 		snort_barnyard_stop($snortcfg, $if_real);
 	}
-
 	sleep(3); // So the GUI reports correctly
-	header("Location: /snort/snort_interfaces.php");
-	exit;
 }
 
 /* start/stop snort */
-if ($_GET['act'] == 'toggle' && is_numeric($id)) {
-	$snortcfg = $config['installedpackages']['snortglobal']['rule'][$id];
-	$if_real = snort_get_real_interface($snortcfg['interface']);
-	$if_friendly = snort_get_friendly_interface($snortcfg['interface']);
+if ($_POST['toggle'] && is_numericint($_POST['id'])) {
+	$snortcfg = $config['installedpackages']['snortglobal']['rule'][$_POST['id']];
+	$if_real = get_real_interface($snortcfg['interface']);
+	$if_friendly = convert_friendly_interface_to_friendly_descr($snortcfg['interface']);
 
-	if (snort_is_running($snortcfg['uuid'], $if_real) == 'yes') {
+	if (snort_is_running($snortcfg['uuid'], $if_real)) {
 		log_error("Toggle (snort stopping) for {$if_friendly}({$snortcfg['descr']})...");
 		snort_stop($snortcfg, $if_real);
-
-		header( 'Expires: Sat, 26 Jul 1997 05:00:00 GMT' );
-		header( 'Last-Modified: ' . gmdate( 'D, d M Y H:i:s' ) . ' GMT' );
-		header( 'Cache-Control: no-store, no-cache, must-revalidate' );
-		header( 'Cache-Control: post-check=0, pre-check=0', false );
-		header( 'Pragma: no-cache' );
 	} else {
 		log_error("Toggle (snort starting) for {$if_friendly}({$snortcfg['descr']})...");
 
@@ -149,16 +124,8 @@ if ($_GET['act'] == 'toggle' && is_numeric($id)) {
 		sync_snort_package_config();
 		$rebuild_rules = false;
 		snort_start($snortcfg, $if_real);
-
-		header( 'Expires: Sat, 26 Jul 1997 05:00:00 GMT' );
-		header( 'Last-Modified: ' . gmdate( 'D, d M Y H:i:s' ) . ' GMT' );
-		header( 'Cache-Control: no-store, no-cache, must-revalidate' );
-		header( 'Cache-Control: post-check=0, pre-check=0', false );
-		header( 'Pragma: no-cache' );
 	}
 	sleep(3); // So the GUI reports correctly
-	header("Location: /snort/snort_interfaces.php");
-	exit;
 }
 
 $pgtitle = "Services: $snort_package_version";
@@ -169,33 +136,17 @@ include_once("head.inc");
 
 <?php
 include_once("fbegin.inc");
-if ($pfsense_stable == 'yes')
-	echo '<p class="pgtitle">' . $pgtitle . '</p>';
-?>
 
-<form action="snort_interfaces.php" method="post" enctype="multipart/form-data" name="iform" id="iform">
-<?php
 	/* Display Alert message */
 	if ($input_errors)
-		print_input_errors($input_errors); // TODO: add checks
+		print_input_errors($input_errors);
 
 	if ($savemsg)
 		print_info_box($savemsg);
-
-	//if (file_exists($d_snortconfdirty_path)) {
-	if ($d_snortconfdirty_path_ls != '') {
-		echo '<p>';
-
-		if($savemsg)
-			print_info_box_np("{$savemsg}");
-		else {
-			print_info_box_np(gettext(
-			'The Snort configuration has changed for one or more interfaces.<br>' .
-			'You must apply the changes in order for them to take effect.<br>'
-			));
-		}
-	}
 ?>
+
+<form action="snort_interfaces.php" method="post" enctype="multipart/form-data" name="iform" id="iform">
+<input type="hidden" name="id" id="id" value="">
 
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
 <tr>
@@ -207,10 +158,11 @@ if ($pfsense_stable == 'yes')
 		$tab_array[2] = array(gettext("Updates"), false, "/snort/snort_download_updates.php");
 		$tab_array[3] = array(gettext("Alerts"), false, "/snort/snort_alerts.php");
 		$tab_array[4] = array(gettext("Blocked"), false, "/snort/snort_blocked.php");
-		$tab_array[5] = array(gettext("Whitelists"), false, "/snort/snort_interfaces_whitelist.php");
+		$tab_array[5] = array(gettext("Pass Lists"), false, "/snort/snort_passlist.php");
 		$tab_array[6] = array(gettext("Suppress"), false, "/snort/snort_interfaces_suppress.php");
-		$tab_array[7] = array(gettext("Sync"), false, "/pkg_edit.php?xml=snort/snort_sync.xml");
-		display_top_tabs($tab_array);
+		$tab_array[7] = array(gettext("IP Lists"), false, "/snort/snort_ip_list_mgmt.php");
+		$tab_array[8] = array(gettext("Sync"), false, "/pkg_edit.php?xml=snort/snort_sync.xml");
+		display_top_tabs($tab_array, true);
 	?>
 	</td>
 </tr>
@@ -257,11 +209,10 @@ if ($pfsense_stable == 'yes')
 		<?php
 
 			/* convert fake interfaces to real and check if iface is up */
-			/* There has to be a smarter way to do this */
-			$if_real = snort_get_real_interface($natent['interface']);
-			$natend_friendly= snort_get_friendly_interface($natent['interface']);
+			$if_real = get_real_interface($natent['interface']);
+			$natend_friendly = convert_friendly_interface_to_friendly_descr($natent['interface']);
 			$snort_uuid = $natent['uuid'];
-			if (snort_is_running($snort_uuid, $if_real) == 'no'){
+			if (!snort_is_running($snort_uuid, $if_real)){
 				$iconfn = 'block';
 				$iconfn_msg1 = 'Snort is not running on ';
 				$iconfn_msg2 = '. Click to start.';
@@ -271,7 +222,7 @@ if ($pfsense_stable == 'yes')
 				$iconfn_msg1 = 'Snort is running on ';
 				$iconfn_msg2 = '. Click to stop.';
 			}
-			if (snort_is_running($snort_uuid, $if_real, 'barnyard2') == 'no'){
+			if (!snort_is_running($snort_uuid, $if_real, 'barnyard2')){
 				$biconfn = 'block';
 				$biconfn_msg1 = 'Barnyard2 is not running on ';
 				$biconfn_msg2 = '. Click to start.';
@@ -312,14 +263,13 @@ if ($pfsense_stable == 'yes')
 			<?php
 			$check_snort_info = $config['installedpackages']['snortglobal']['rule'][$nnats]['enable'];
 			if ($check_snort_info == "on") {
-				echo strtoupper("enabled");
-				echo "<a href='?act=toggle&id={$i}'>
-					<img src='../themes/{$g['theme']}/images/icons/icon_{$iconfn}.gif'
-					width='13' height='13' border='0'
-					title='" . gettext($iconfn_msg1.$natend_friendly.$iconfn_msg2) . "'></a>";
+				echo gettext("ENABLED") . "&nbsp;";
+				echo "<input type='image' src='../themes/{$g['theme']}/images/icons/icon_{$iconfn}.gif' width='13' height='13' border='0' ";
+				echo "onClick='document.getElementById(\"id\").value=\"{$nnats}\";' name=\"toggle[]\" ";
+				echo "title='" . gettext($iconfn_msg1.$natend_friendly.$iconfn_msg2) . "'/>";
 				echo ($no_rules) ? "&nbsp;<img src=\"../themes/{$g['theme']}/images/icons/icon_frmfld_imp.png\" width=\"15\" height=\"15\" border=\"0\">" : "";
 			} else
-				echo strtoupper("disabled");
+				echo gettext("DISABLED");
 			?>
 			</td>
 			<td class="listr" 
@@ -353,13 +303,11 @@ if ($pfsense_stable == 'yes')
 			<?php
 			$check_snortbarnyardlog_info = $config['installedpackages']['snortglobal']['rule'][$nnats]['barnyard_enable'];
 			if ($check_snortbarnyardlog_info == "on") {
-				echo strtoupper("enabled");
-				echo "<a href='?act=bartoggle&id={$i}'>
-					<img src='../themes/{$g['theme']}/images/icons/icon_{$biconfn}.gif'
-					width='13' height='13' border='0'
-					title='" . gettext($biconfn_msg1.$natend_friendly.$biconfn_msg2) . "'></a>";
+				echo gettext("ENABLED") . "&nbsp;";
+				echo "<input type='image' name='bartoggle[]' src='../themes/{$g['theme']}/images/icons/icon_{$biconfn}.gif' width='13' height='13' border='0' ";
+				echo "onClick='document.getElementById(\"id\").value=\"{$nnats}\"'; title='" . gettext($biconfn_msg1.$natend_friendly.$biconfn_msg2) . "'/>";
 			} else
-				echo strtoupper("disabled");
+				echo gettext("DISABLED");
 			?>
 			</td>
 			<td class="listbg" 
@@ -393,8 +341,7 @@ if ($pfsense_stable == 'yes')
 						src="../themes/<?= $g['theme']; ?>/images/icons/icon_x_d.gif"
 						width="17" height="17" " border="0">
 						<?php else: ?>
-						<input name="del" type="image"
-						src="../themes/<?= $g['theme']; ?>/images/icons/icon_x.gif"
+						<input name="del" type="image" src="../themes/<?= $g['theme']; ?>/images/icons/icon_x.gif"
 						width="17" height="17" title="<?php echo gettext("Delete selected Snort interface mapping(s)"); ?>"
 						onclick="return intf_del()">
 						<?php endif; ?></td>
@@ -420,12 +367,8 @@ if ($pfsense_stable == 'yes')
 					</td>
 				</tr>
 				<tr>
-					<td colspan="3" class="vexpl"><br>
-					</td>
-				</tr>
-				<tr>
-					<td colspan="3" class="vexpl"><span class="red"><strong><?php echo gettext("Warning:"); ?></strong></span><br>
-						<strong><?php echo gettext("New settings will not take effect until interface restart."); ?></strong>
+					<td colspan="3" class="vexpl">
+						<?php echo gettext("New settings will not take effect until interface restart."); ?>
 					</td>
 				</tr>
 				<tr>
@@ -484,9 +427,9 @@ function intf_del() {
 		}
 	}
 	if (isSelected)
-		return confirm('Do you really want to delete the selected Snort mapping?');
+		return confirm('Do you really want to delete the selected Snort interface mapping(s)?');
 	else
-		alert("There is no Snort mapping selected for deletion.  Click the checkbox beside the Snort mapping(s) you wish to delete.");
+		alert("There is no Snort interface mapping selected for deletion.  Click the checkbox beside the Snort mapping(s) you wish to delete.");
 }
 
 </script>

@@ -24,10 +24,9 @@ $priv_list['page-services-snort']['match'][] = "snort/snort_interfaces_edit.php*
 $priv_list['page-services-snort']['match'][] = "snort/snort_interfaces_global.php*";
 $priv_list['page-services-snort']['match'][] = "snort/snort_interfaces_suppress.php*";
 $priv_list['page-services-snort']['match'][] = "snort/snort_interfaces_suppress_edit.php*";
-$priv_list['page-services-snort']['match'][] = "snort/snort_interfaces_whitelist.php*";
-$priv_list['page-services-snort']['match'][] = "snort/snort_interfaces_whitelist_edit.php*";
+$priv_list['page-services-snort']['match'][] = "snort/snort_passlist.php*";
+$priv_list['page-services-snort']['match'][] = "snort/snort_passlist_edit.php*";
 $priv_list['page-services-snort']['match'][] = "snort/snort_list_view.php*";
-$priv_list['page-services-snort']['match'][] = "snort/snort_log_view.php*";
 $priv_list['page-services-snort']['match'][] = "snort/snort_migrate_config.php*";
 $priv_list['page-services-snort']['match'][] = "snort/snort_post_install.php*";
 $priv_list['page-services-snort']['match'][] = "snort/snort_preprocessors.php*";
@@ -37,9 +36,14 @@ $priv_list['page-services-snort']['match'][] = "snort/snort_rules_flowbits.php*"
 $priv_list['page-services-snort']['match'][] = "snort/snort_rulesets.php*";
 $priv_list['page-services-snort']['match'][] = "snort/snort_select_alias.php*";
 $priv_list['page-services-snort']['match'][] = "snort/snort_stream5_engine.php*";
+$priv_list['page-services-snort']['match'][] = "snort/snort_ip_list_mgmt.php*";
+$priv_list['page-services-snort']['match'][] = "snort/snort_ip_reputation.php*";
+$priv_list['page-services-snort']['match'][] = "snort/snort_iprep_list_browser.php*";
+$priv_list['page-services-snort']['match'][] = "widgets/javascript/snort_alerts.js*";
+$priv_list['page-services-snort']['match'][] = "widgets/include/widget-snort.inc*";
+$priv_list['page-services-snort']['match'][] = "widgets/widgets/snort_alerts.widget.php*";
 $priv_list['page-services-snort']['match'][] = "pkg_edit.php?xml=snort_sync.xml*";
 $priv_list['page-services-snort']['match'][] = "pkg_edit.php?xml=snort/snort.xml*";
 $priv_list['page-services-snort']['match'][] = "snort/snort_check_cron_misc.inc*";
 $priv_list['page-services-snort']['match'][] = "snort/snort.inc*";
-
 ?>

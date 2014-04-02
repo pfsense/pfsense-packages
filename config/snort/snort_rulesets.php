@@ -5,6 +5,7 @@
  * Copyright (C) 2006 Scott Ullrich
  * Copyright (C) 2009 Robert Zelaya
  * Copyright (C) 2011 Ermal Luci
+ * Copyright (C) 2014 Bill Meeks
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -42,12 +43,14 @@ if (!is_array($config['installedpackages']['snortglobal']['rule'])) {
 }
 $a_nat = &$config['installedpackages']['snortglobal']['rule'];
 
-$id = $_GET['id'];
-if (isset($_POST['id']))
+if (isset($_POST['id']) && is_numericint($_POST['id']))
 	$id = $_POST['id'];
+elseif (isset($_GET['id']) && is_numericint($_GET['id']))
+	$id = htmlspecialchars($_GET['id']);
+
 if (is_null($id)) {
-	header("Location: /snort/snort_interfaces.php");
-	exit;
+        header("Location: /snort/snort_interfaces.php");
+        exit;
 }
 
 if (isset($id) && $a_nat[$id]) {
@@ -59,12 +62,12 @@ if (isset($id) && $a_nat[$id]) {
 	$pconfig['ips_policy'] = $a_nat[$id]['ips_policy'];
 }
 
-$if_real = snort_get_real_interface($pconfig['interface']);
+$if_real = get_real_interface($pconfig['interface']);
 $snort_uuid = $a_nat[$id]['uuid'];
-$snortdownload = $config['installedpackages']['snortglobal']['snortdownload'];
-$emergingdownload = $config['installedpackages']['snortglobal']['emergingthreats'];
-$etpro = $config['installedpackages']['snortglobal']['emergingthreats_pro'];
-$snortcommunitydownload = $config['installedpackages']['snortglobal']['snortcommunityrules'];
+$snortdownload = $config['installedpackages']['snortglobal']['snortdownload'] == 'on' ? 'on' : 'off';
+$emergingdownload = $config['installedpackages']['snortglobal']['emergingthreats'] == 'on' ? 'on' : 'off';
+$etpro = $config['installedpackages']['snortglobal']['emergingthreats_pro'] == 'on' ? 'on' : 'off';
+$snortcommunitydownload = $config['installedpackages']['snortglobal']['snortcommunityrules'] == 'on' ? 'on' : 'off';
 
 $no_emerging_files = false;
 $no_snort_files = false;
@@ -118,7 +121,12 @@ if ($a_nat[$id]['ips_policy_enable'] == 'on') {
 else
 	$disable_vrt_rules = "";
 
-if ($_POST["Submit"]) {
+if (!empty($a_nat[$id]['rulesets']))
+	$enabled_rulesets_array = explode("||", $a_nat[$id]['rulesets']);
+else
+	$enabled_rulesets_array = array();
+
+if ($_POST["save"]) {
 
 	if ($_POST['ips_policy_enable'] == "on") {
 		$a_nat[$id]['ips_policy_enable'] = 'on';
@@ -158,8 +166,10 @@ if ($_POST["Submit"]) {
 	/* Soft-restart Snort to live-load new rules */
 	snort_reload_config($a_nat[$id]);
 
-	header("Location: /snort/snort_rulesets.php?id=$id");
-	exit;
+	$pconfig = $_POST;
+	$enabled_rulesets_array = explode("||", $enabled_items);
+	if (snort_is_running($snort_uuid, $if_real))
+		$savemsg = gettext("Snort is 'live-reloading' the new rule set.");
 }
 
 if ($_POST['unselectall']) {
@@ -174,61 +184,47 @@ if ($_POST['unselectall']) {
 		unset($a_nat[$id]['ips_policy']);
 	}
 
-	write_config();
-	sync_snort_package_config();
+	$pconfig['autoflowbits'] = $_POST['autoflowbits'];
+	$pconfig['ips_policy_enable'] = $_POST['ips_policy_enable'];
+	$pconfig['ips_policy'] = $_POST['ips_policy'];
+	$enabled_rulesets_array = array();
 
-	header("Location: /snort/snort_rulesets.php?id=$id");
-	exit;
+	$savemsg = gettext("All rule categories have been de-selected.  ");
+	if ($a_nat[$id]['ips_policy_enable'] = 'on')
+		$savemsg .= gettext("Only the rules included in the selected IPS Policy will be used.");
+	else
+		$savemsg .= gettext("There currently are no inspection rules enabled for this Snort instance!");
 }
 
 if ($_POST['selectall']) {
-	$rulesets = array();
-
-	if ($_POST['ips_policy_enable'] == "on") {
-		$a_nat[$id]['ips_policy_enable'] = 'on';
-		$a_nat[$id]['ips_policy'] = $_POST['ips_policy'];
-	}
-	else {
-		$a_nat[$id]['ips_policy_enable'] = 'off';
-		unset($a_nat[$id]['ips_policy']);
-	}
+	$enabled_rulesets_array = array();
 
 	if ($emergingdownload == 'on') {
 		$files = glob("{$snortdir}/rules/" . ET_OPEN_FILE_PREFIX . "*.rules");
 		foreach ($files as $file)
-			$rulesets[] = basename($file);
+			$enabled_rulesets_array[] = basename($file);
 	}
 	elseif ($etpro == 'on') {
 		$files = glob("{$snortdir}/rules/" . ET_PRO_FILE_PREFIX . "*.rules");
 		foreach ($files as $file)
-			$rulesets[] = basename($file);
+			$enabled_rulesets_array[] = basename($file);
 	}
 
 	if ($snortcommunitydownload == 'on') {
 		$files = glob("{$snortdir}/rules/" . GPL_FILE_PREFIX . "community.rules");
 		foreach ($files as $file)
-			$rulesets[] = basename($file);
+			$enabled_rulesets_array[] = basename($file);
 	}
 
 	/* Include the Snort VRT rules only if enabled and no IPS policy is set */
 	if ($snortdownload == 'on' && $a_nat[$id]['ips_policy_enable'] == 'off') {
 		$files = glob("{$snortdir}/rules/" . VRT_FILE_PREFIX . "*.rules");
 		foreach ($files as $file)
-			$rulesets[] = basename($file);
+			$enabled_rulesets_array[] = basename($file);
 	}
-
-	$a_nat[$id]['rulesets'] = implode("||", $rulesets);
-
-	write_config();
-	sync_snort_package_config();
-
-	header("Location: /snort/snort_rulesets.php?id=$id");
-	exit;
 }
 
-$enabled_rulesets_array = explode("||", $a_nat[$id]['rulesets']);
-
-$if_friendly = snort_get_friendly_interface($pconfig['interface']);
+$if_friendly = convert_friendly_interface_to_friendly_descr($a_nat[$id]['interface']);
 $pgtitle = gettext("Snort: Interface {$if_friendly} - Categories");
 include_once("head.inc");
 ?>
@@ -237,11 +233,10 @@ include_once("head.inc");
 
 <?php
 include("fbegin.inc"); 
-if($pfsense_stable == 'yes'){echo '<p class="pgtitle">' . $pgtitle . '</p>';}
 
 /* Display message */
 if ($input_errors) {
-	print_input_errors($input_errors); // TODO: add checks
+	print_input_errors($input_errors);
 }
 
 if ($savemsg) {
@@ -259,12 +254,13 @@ if ($savemsg) {
 	$tab_array[0] = array(gettext("Snort Interfaces"), true, "/snort/snort_interfaces.php");
 	$tab_array[1] = array(gettext("Global Settings"), false, "/snort/snort_interfaces_global.php");
 	$tab_array[2] = array(gettext("Updates"), false, "/snort/snort_download_updates.php");
-	$tab_array[3] = array(gettext("Alerts"), false, "/snort/snort_alerts.php");
+	$tab_array[3] = array(gettext("Alerts"), false, "/snort/snort_alerts.php?instance={$id}");
 	$tab_array[4] = array(gettext("Blocked"), false, "/snort/snort_blocked.php");
-	$tab_array[5] = array(gettext("Whitelists"), false, "/snort/snort_interfaces_whitelist.php");
+	$tab_array[5] = array(gettext("Pass Lists"), false, "/snort/snort_passlist.php");
 	$tab_array[6] = array(gettext("Suppress"), false, "/snort/snort_interfaces_suppress.php");
-	$tab_array[7] = array(gettext("Sync"), false, "/pkg_edit.php?xml=snort/snort_sync.xml");
-	display_top_tabs($tab_array);
+	$tab_array[7] = array(gettext("IP Lists"), false, "/snort/snort_ip_list_mgmt.php");
+	$tab_array[8] = array(gettext("Sync"), false, "/pkg_edit.php?xml=snort/snort_sync.xml");
+	display_top_tabs($tab_array, true);
 	echo '</td></tr>';
 	echo '<tr><td class="tabnavtbl">';
 	$menu_iface=($if_friendly?substr($if_friendly,0,5)." ":"Iface ");
@@ -273,9 +269,10 @@ if ($savemsg) {
 	$tab_array[] = array($menu_iface . gettext("Categories"), true, "/snort/snort_rulesets.php?id={$id}");
 	$tab_array[] = array($menu_iface . gettext("Rules"), false, "/snort/snort_rules.php?id={$id}");
 	$tab_array[] = array($menu_iface . gettext("Variables"), false, "/snort/snort_define_servers.php?id={$id}");
-	$tab_array[] = array($menu_iface . gettext("Preprocessors"), false, "/snort/snort_preprocessors.php?id={$id}");
+	$tab_array[] = array($menu_iface . gettext("Preprocs"), false, "/snort/snort_preprocessors.php?id={$id}");
 	$tab_array[] = array($menu_iface . gettext("Barnyard2"), false, "/snort/snort_barnyard.php?id={$id}");
-	display_top_tabs($tab_array);
+	$tab_array[] = array($menu_iface . gettext("IP Rep"), false, "/snort/snort_ip_reputation.php?id={$id}");
+	display_top_tabs($tab_array, true);
 ?>
 </td></tr>
 <tr>
@@ -392,9 +389,9 @@ if ($savemsg) {
 				<td colspan="6">
 					<table width=90% align="center" border="0" cellpadding="2" cellspacing="0">
 						<tr height="45px">
-							<td valign="middle"><input value="Select All" class="formbtns" type="submit" name="selectall" id="selectall" title="<?php echo gettext("Add all to enforcing rules"); ?>"/></td>
-							<td valign="middle"><input value="Unselect All" class="formbtns" type="submit" name="unselectall" id="unselectall" title="<?php echo gettext("Remove all from enforcing rules"); ?>"/></td>
-							<td valign="middle"><input value=" Save " class="formbtns" type="submit" name="Submit" id="Submit" title="<?php echo gettext("Save changes to enforcing rules and rebuild"); ?>"/></td>
+							<td valign="middle"><input value="Select All" class="formbtns" type="submit" name="selectall" id="selectall" title="<?php echo gettext("Add all categories to enforcing rules"); ?>"/></td>
+							<td valign="middle"><input value="Unselect All" class="formbtns" type="submit" name="unselectall" id="unselectall" title="<?php echo gettext("Remove categories all from enforcing rules"); ?>"/></td>
+							<td valign="middle"><input value=" Save " class="formbtns" type="submit" name="save" id="save" title="<?php echo gettext("Save changes to enforcing rules and rebuild"); ?>"/></td>
 							<td valign="middle"><span class="vexpl"><?php echo gettext("Click to save changes and auto-resolve flowbit rules (if option is selected above)"); ?></span></td>
 						</tr>
 					</table>
@@ -426,14 +423,14 @@ if ($savemsg) {
 			<?php endif; ?>
 			<?php endif; ?>
 
-			<?php if ($no_emerging_files)
-				  $msg_emerging = "downloaded.";
+			<?php if ($no_emerging_files && ($emergingdownload == 'on' || $etpro == 'on'))
+				  $msg_emerging = "have not been downloaded.";
 			      else
-				  $msg_emerging = "enabled.";
-			      if ($no_snort_files)
-				  $msg_snort = "downloaded.";
+				  $msg_emerging = "are not enabled.";
+			      if ($no_snort_files && $snortdownload == 'on')
+				  $msg_snort = "have not been downloaded.";
 			      else
-				  $msg_snort = "enabled.";
+				  $msg_snort = "are not enabled.";
 			?>
 			<tr id="frheader">
 				<?php if ($emergingdownload == 'on' && !$no_emerging_files): ?>
@@ -443,7 +440,7 @@ if ($savemsg) {
 					<td width="5%" class="listhdrr" align="center"><?php echo gettext("Enabled"); ?></td>
 					<td width="25%" class="listhdrr"><?php echo gettext('Ruleset: ET Pro Rules');?></td>
 				<?php else: ?>
-					<td colspan="2" align="center" width="30%" class="listhdrr"><?php echo gettext("{$et_type} rules not {$msg_emerging}"); ?></td>
+					<td colspan="2" align="center" width="30%" class="listhdrr"><?php echo gettext("{$et_type} rules {$msg_emerging}"); ?></td>
 				<?php endif; ?>
 				<?php if ($snortdownload == 'on' && !$no_snort_files): ?>
 					<td width="5%" class="listhdrr" align="center"><?php echo gettext("Enabled"); ?></td>
@@ -451,7 +448,7 @@ if ($savemsg) {
 					<td width="5%" class="listhdrr" align="center"><?php echo gettext("Enabled"); ?></td>
 					<td width="25%" class="listhdrr"><?php echo gettext('Ruleset: Snort SO Rules');?></td>
 				<?php else: ?>
-					<td colspan="4" align="center" width="60%" class="listhdrr"><?php echo gettext("Snort VRT rules have not been {$msg_snort}"); ?></td>
+					<td colspan="4" align="center" width="60%" class="listhdrr"><?php echo gettext("Snort VRT rules {$msg_snort}"); ?></td>
 				<?php endif; ?>
 				</tr>
 			<?php
@@ -561,7 +558,7 @@ if ($savemsg) {
 </tr>
 			<tr>
 				<td colspan="6" align="center" valign="middle">
-				<input value="Save" type="submit" name="Submit" id="Submit" class="formbtn" title=" <?php echo gettext("Click to Save changes and rebuild rules"); ?>"/></td>
+				<input value="Save" type="submit" name="save" id="save" class="formbtn" title="<?php echo gettext("Click to Save changes and rebuild rules");?>"/></td>
 			</tr>
 <?php endif; ?>
 </table>

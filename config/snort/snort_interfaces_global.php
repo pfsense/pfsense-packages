@@ -5,6 +5,7 @@
  *
  * Copyright (C) 2003-2006 Manuel Kasper <mk@neon1.net>.
  * Copyright (C) 2011-2012 Ermal Luci
+ * Copyright (C) 2014 Bill Meeks
  * All rights reserved.
  *
  * Copyright (C) 2008-2009 Robert Zelaya
@@ -42,23 +43,26 @@ global $g;
 $snortdir = SNORTDIR;
 
 /* make things short  */
-$pconfig['snortdownload'] = $config['installedpackages']['snortglobal']['snortdownload'];
+$pconfig['snortdownload'] = $config['installedpackages']['snortglobal']['snortdownload'] == "on" ? 'on' : 'off';
 $pconfig['oinkmastercode'] = $config['installedpackages']['snortglobal']['oinkmastercode'];
 $pconfig['etpro_code'] = $config['installedpackages']['snortglobal']['etpro_code'];
-$pconfig['emergingthreats'] = $config['installedpackages']['snortglobal']['emergingthreats'];
-$pconfig['emergingthreats_pro'] = $config['installedpackages']['snortglobal']['emergingthreats_pro'];
+$pconfig['emergingthreats'] = $config['installedpackages']['snortglobal']['emergingthreats'] == "on" ? 'on' : 'off';
+$pconfig['emergingthreats_pro'] = $config['installedpackages']['snortglobal']['emergingthreats_pro'] == "on" ? 'on' : 'off';
 $pconfig['rm_blocked'] = $config['installedpackages']['snortglobal']['rm_blocked'];
 $pconfig['snortloglimit'] = $config['installedpackages']['snortglobal']['snortloglimit'];
 $pconfig['snortloglimitsize'] = $config['installedpackages']['snortglobal']['snortloglimitsize'];
 $pconfig['autorulesupdate7'] = $config['installedpackages']['snortglobal']['autorulesupdate7'];
 $pconfig['rule_update_starttime'] = $config['installedpackages']['snortglobal']['rule_update_starttime'];
-$pconfig['forcekeepsettings'] = $config['installedpackages']['snortglobal']['forcekeepsettings'];
-$pconfig['snortcommunityrules'] = $config['installedpackages']['snortglobal']['snortcommunityrules'];
+$pconfig['forcekeepsettings'] = $config['installedpackages']['snortglobal']['forcekeepsettings'] == "on" ? 'on' : 'off';
+$pconfig['snortcommunityrules'] = $config['installedpackages']['snortglobal']['snortcommunityrules'] == "on" ? 'on' : 'off';
+$pconfig['clearlogs'] = $config['installedpackages']['snortglobal']['clearlogs'] == "on" ? 'on' : 'off';
+$pconfig['clearblocks'] = $config['installedpackages']['snortglobal']['clearblocks'] == "on" ? 'on' : 'off';
 
+/* Set sensible values for any empty default params */
 if (empty($pconfig['snortloglimit']))
 	$pconfig['snortloglimit'] = 'on';
-if (empty($pconfig['rule_update_starttime']))
-	$pconfig['rule_update_starttime'] = '00:30';
+if (!isset($pconfig['rule_update_starttime']))
+	$pconfig['rule_update_starttime'] = '00:05';
 
 if ($_POST['rule_update_starttime']) {
 	if (!preg_match('/^([01]?[0-9]|2[0-3]):?([0-5][0-9])$/', $_POST['rule_update_starttime']))
@@ -73,12 +77,14 @@ if ($_POST['emergingthreats_pro'] == "on" && empty($_POST['etpro_code']))
 
 /* if no errors move foward with save */
 if (!$input_errors) {
-	if ($_POST["Submit"]) {
+	if ($_POST["save"]) {
 
 		$config['installedpackages']['snortglobal']['snortdownload'] = $_POST['snortdownload'] ? 'on' : 'off';
 		$config['installedpackages']['snortglobal']['snortcommunityrules'] = $_POST['snortcommunityrules'] ? 'on' : 'off';
 		$config['installedpackages']['snortglobal']['emergingthreats'] = $_POST['emergingthreats'] ? 'on' : 'off';
 		$config['installedpackages']['snortglobal']['emergingthreats_pro'] = $_POST['emergingthreats_pro'] ? 'on' : 'off';
+		$config['installedpackages']['snortglobal']['clearlogs'] = $_POST['clearlogs'] ? 'on' : 'off';
+		$config['installedpackages']['snortglobal']['clearblocks'] = $_POST['clearblocks'] ? 'on' : 'off';
 
 		// If any rule sets are being turned off, then remove them
 		// from the active rules section of each interface.  Start
@@ -187,10 +193,11 @@ if ($input_errors)
         $tab_array[2] = array(gettext("Updates"), false, "/snort/snort_download_updates.php");
         $tab_array[3] = array(gettext("Alerts"), false, "/snort/snort_alerts.php");
         $tab_array[4] = array(gettext("Blocked"), false, "/snort/snort_blocked.php");
-        $tab_array[5] = array(gettext("Whitelists"), false, "/snort/snort_interfaces_whitelist.php");
+	$tab_array[5] = array(gettext("Pass Lists"), false, "/snort/snort_passlist.php");
         $tab_array[6] = array(gettext("Suppress"), false, "/snort/snort_interfaces_suppress.php");
-        $tab_array[7] = array(gettext("Sync"), false, "/pkg_edit.php?xml=snort/snort_sync.xml");
-        display_top_tabs($tab_array);
+	$tab_array[7] = array(gettext("IP Lists"), false, "/snort/snort_ip_list_mgmt.php");
+	$tab_array[8] = array(gettext("Sync"), false, "/pkg_edit.php?xml=snort/snort_sync.xml");
+        display_top_tabs($tab_array, true);
 ?>
 </td></tr>
 <tr>
@@ -268,7 +275,7 @@ if ($input_errors)
 		<tr>
 			<td>&nbsp;</td>
 			<td class="vexpl"><?php echo "<span class='red'><strong>" . gettext("Note:") . "</strong></span>" . "&nbsp;" . 
-			gettext("The ETPro rules contain all of the ETOpen rules, so the ETOpen rules are not required and are disabled when the ETPro rules are selected."); ?></td>
+			gettext("The ETPro rules contain all of the ETOpen rules, so the ETOpen rules are not required and are automatically disabled when the ETPro rules are selected."); ?></td>
 		</tr>
 		</table>
 		<table id="etpro_code_tbl" width="100%" border="0" cellpadding="2" cellspacing="0">
@@ -310,11 +317,11 @@ if ($input_errors)
 <tr>
 	<td width="22%" valign="top" class="vncell"><?php echo gettext("Update Start Time"); ?></td>
 	<td width="78%" class="vtable"><input type="text" class="formfld time" name="rule_update_starttime" id="rule_update_starttime" size="4" 
-	maxlength="5" value="<?=$pconfig['rule_update_starttime'];?>" <?php if ($pconfig['autorulesupdate7'] == "never_up") {echo "disabled";} ?>><span class="vexpl">&nbsp;&nbsp;
+	maxlength="5" value="<?=htmlspecialchars($pconfig['rule_update_starttime']);?>" <?php if ($pconfig['autorulesupdate7'] == "never_up") {echo "disabled";} ?>><span class="vexpl">&nbsp;&nbsp;
 	<?php echo gettext("Enter the rule update start time in 24-hour format (HH:MM). ") . "<strong>" . 
-	gettext("Default") . "&nbsp;</strong>" . gettext("is ") . "<strong>" . gettext("00:03") . "</strong></span>"; ?>.<br/><br/>
+	gettext("Default") . "&nbsp;</strong>" . gettext("is ") . "<strong>" . gettext("00:05") . "</strong></span>"; ?>.<br/><br/>
 	<?php echo gettext("Rules will update at the interval chosen above starting at the time specified here. For example, using the default " . 
-	"start time of 00:03 and choosing 12 Hours for the interval, the rules will update at 00:03 and 12:03 each day."); ?></td>
+	"start time of 00:03 and choosing 12 Hours for the interval, the rules will update at 00:05 and 12:05 each day."); ?></td>
 </tr>
 <tr>
 	<td colspan="2" valign="top" class="listtopic"><?php echo gettext("General Settings"); ?></td>
@@ -322,7 +329,7 @@ if ($input_errors)
 <tr>
 <?php $snortlogCurrentDSKsize = round(exec('df -k /var | grep -v "Filesystem" | awk \'{print $4}\'') / 1024); ?>
 	<td width="22%" valign="top" class="vncell"><?php echo gettext("Log Directory Size " .
-	"Limit"); ?><br/>
+	"Limit"); ?><br/><br/>
 	<br/>
 	<br/>
 	<span class="red"><strong><?php echo gettext("Note:"); ?></strong></span><br/>
@@ -368,6 +375,18 @@ if ($input_errors)
 	<?php echo "<span class=\"red\"><strong>" . gettext("Hint:") . "</strong></span>" . gettext(" in most cases, 1 hour is a good choice.");?></td>
 </tr>
 <tr>
+	<td width="22%" valign="top" class="vncell"><?php echo gettext("Remove Blocked Hosts After Deinstall"); ?></td>
+	<td width="78%" class="vtable"><input name="clearblocks" id="clearblocks" type="checkbox" value="yes"
+	<?php if ($config['installedpackages']['snortglobal']['clearblocks']=="on") echo " checked"; ?>/>&nbsp;
+	<?php echo gettext("All blocked hosts added by Snort will be removed during package deinstallation."); ?></td>
+</tr>
+<tr>
+	<td width="22%" valign="top" class="vncell"><?php echo gettext("Remove Snort Log Files After Deinstall"); ?></td>
+	<td width="78%" class="vtable"><input name="clearlogs" id="clearlogs" type="checkbox" value="yes"
+	<?php if ($config['installedpackages']['snortglobal']['clearlogs']=="on") echo " checked"; ?>/>&nbsp;
+	<?php echo gettext("All Snort log files will be removed during package deinstallation."); ?></td>
+</tr>
+<tr>
 	<td width="22%" valign="top" class="vncell"><?php echo gettext("Keep Snort Settings After Deinstall"); ?></td>
 	<td width="78%" class="vtable"><input name="forcekeepsettings"
 		id="forcekeepsettings" type="checkbox" value="yes"
@@ -377,7 +396,7 @@ if ($input_errors)
 <tr>
 	<td width="22%" valign="top">
 	<td width="78%">
-		<input name="Submit" type="submit" class="formbtn" value="Save" >
+		<input name="save" type="submit" class="formbtn" value="Save" >
 	</td>
 </tr>
 <tr>
