@@ -943,6 +943,8 @@ function squid_resync_general() {
 		}
 	$logdir_cache = $logdir . '/cache.log';
 	$logdir_access = ($settings['log_enabled'] == 'on' ? $logdir . '/access.log' : '/dev/null');
+	$pinger_helper = ($settings['disable_pinger']) =='on' ? 'off' : 'on';
+	$pinger_program=SQUID_LOCALBASE."/libexec/squid/pinger";
 
 	$conf .= <<< EOD
 icp_port {$icp_port}
@@ -957,6 +959,9 @@ cache_mgr {$email}
 access_log {$logdir_access}
 cache_log {$logdir_cache}
 cache_store_log none
+netdb_filename {$logdir}/netdb.state
+pinger_enable {$pinger_helper}
+pinger_program {$pinger_program}
 {$interception_checks}
 
 EOD;
@@ -1661,10 +1666,10 @@ function squid_resync_auth() {
 	}
 
 	// SSL interception acl options part 2
-	if ($settingsconfig['ssl_proxy'] == "on"){
+	/*if ($settingsconfig['ssl_proxy'] == "on"){
 			$conf .= "always_direct allow all\n";
 			$conf .= "ssl_bump server-first all\n";
-		}
+		}*/
 
 	// Include squidguard denied acl log in squid
 	if ($settingsconfig['log_sqd'])
@@ -1742,6 +1747,11 @@ EOD;
 		// Custom User Options after authentication definition
 		$conf .= "# Custom options after auth\n".sq_text_area_decode($settingsconfig['custom_options2_squid3'])."\n\n";
 		
+		// SSL interception acl options part 2
+		if ($settingsconfig['ssl_proxy'] == "on"){
+			$conf .= "always_direct allow all\n";
+			$conf .= "ssl_bump server-first all\n";
+			}
 		// Onto the ACLs
 		$password = array('localnet', 'allowed_subnets');
 		$passwordless = array('unrestricted_hosts');

@@ -301,6 +301,12 @@
 			<type>checkbox</type>
 		</field>
 		<field>
+			<fielddescr>Disable ICMP</fielddescr>
+			<fieldname>disable_pinger</fieldname>
+			<description><![CDATA[Enable this option to disable squid ICMP pinger helper.]]></description>
+			<type>checkbox</type>
+		</field>
+		<field>
 			<fielddescr>Use alternate DNS-servers for the proxy-server</fielddescr>
 			<fieldname>dns_nameservers</fieldname>
 			<description>If you want to use other DNS-servers than the DNS-forwarder, enter the IPs here, separated by semi-colons (;).</description>
