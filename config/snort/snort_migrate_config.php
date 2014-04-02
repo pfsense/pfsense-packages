@@ -322,6 +322,42 @@ foreach ($rule as &$r) {
 		}
 	}
 
+	// Migrate any Barnyard2 settings to the new advanced fields.
+	// Parse the old DB connect string and find the "host", "user",
+	// "dbname" and "password" values and save them in the new
+	// MySQL field names in the config file.
+	if (!empty($pconfig['barnyard_mysql'])) {
+		if (preg_match_all('/(dbname|host|user|password)\s*\=\s*([^\s]*)/i', $pconfig['barnyard_mysql'], $matches)) {
+			foreach ($matches[1] as $k => $p) {
+				if (strcasecmp($p, 'dbname') == 0)
+					$pconfig['barnyard_dbname'] = $matches[2][$k];
+				elseif (strcasecmp($p, 'host') == 0)
+					$pconfig['barnyard_dbhost'] = $matches[2][$k];
+				elseif (strcasecmp($p, 'user') == 0)
+					$pconfig['barnyard_dbuser'] = $matches[2][$k];
+				elseif (strcasecmp($p, 'password') == 0)
+					$pconfig['barnyard_dbpwd'] = base64_encode($matches[2][$k]);
+			}
+			$pconfig['barnyard_mysql_enable'] = 'on';
+			$pconfig['barnyard_enable'] = 'on';
+			unset($pconfig['barnyard_mysql']);
+		}
+		// Since Barnyard2 was enabled, configure the new archived log settings
+		$pconfig['u2_archived_log_retention'] = '168';
+		$pconfig['barnyard_archive_enable'] = 'on';
+		$pconfig['unified2_log_limit'] = '32';
+		$updated_cfg = true;
+	}
+
+	// This setting is deprecated and replaced
+	// by 'barnyard_enable' since any Barnyard2
+	// chaining requires unified2 logging.
+	if (isset($pconfig['snortunifiedlog'])) {
+		unset($pconfig['snortunifiedlog']);
+		$pconfig['barnyard_enable'] = 'on';
+		$updated_cfg = true;
+	}
+
 	// Save the new configuration data into the $config array pointer
 	$r = $pconfig;
 }
@@ -330,7 +366,7 @@ unset($r);
 
 // Write out the new configuration to disk if we changed anything
 if ($updated_cfg) {
-	$config['installedpackages']['snortglobal']['snort_config_ver'] = "3.0.4";
+	$config['installedpackages']['snortglobal']['snort_config_ver'] = "3.0.5";
 	log_error("[Snort] Saving configuration settings in new format...");
 	write_config();
 	log_error("[Snort] Settings successfully migrated to new configuration format...");
