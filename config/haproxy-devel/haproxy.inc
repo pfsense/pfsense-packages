@@ -405,9 +405,8 @@ EOD;
 		$writeconfigupdate = true;
 	}
 	// update config to "haproxy-devel 1.5-dev19 pkg v0.5"
-	$a_backends = &$config['installedpackages']['haproxy']['ha_backends']['item'];
-	if(is_array($a_backends)) {
-		foreach ($a_backends as &$bind) {
+	if(is_array($config['installedpackages']['haproxy']['ha_backends']['item'])) {
+		foreach ($config['installedpackages']['haproxy']['ha_backends']['item'] as &$bind) {
 			if($bind['httpclose'] && $bind['httpclose'] == "yes" ) {
 				$bind['httpclose'] = "httpclose";
 				$writeconfigupdate = true;
