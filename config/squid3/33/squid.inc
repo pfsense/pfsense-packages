@@ -105,7 +105,7 @@ function squid_check_clamav_user($user)
 	}
 		
 /* setup cache */
-function squid_dash_z() {
+function squid_dash_z($cache_action='none') {
 	global $config;
 
 	//Do nothing if there is no cache config
@@ -119,7 +119,12 @@ function squid_dash_z() {
 		return;
 
 	$cachedir =($settings['harddisk_cache_location'] ? $settings['harddisk_cache_location'] : '/var/squid/cache');
-
+	
+	if ($cache_action=="clean"){
+		rename ($cachedir,"{$cachedir}.old");
+		mwexec_bg("/bin/rm -rf {$cachedir}.old");
+	}
+	
 	if(!is_dir($cachedir.'/')) {
 		log_error("Creating Squid cache dir $cachedir");
 		make_dirs($cachedir);
@@ -363,9 +368,9 @@ function squid_deinstall_command() {
 		$settings = array();
 	$cachedir =($settings['harddisk_cache_location'] ? $settings['harddisk_cache_location'] : '/var/squid/cache');
 	$logdir = ($settings['log_dir'] ? $settings['log_dir'] : '/var/squid/logs');
-	update_status("Removing swap.state ... One moment please...");
+	update_status("Removing cache ... One moment please...");
 	update_output_window("$plswait_txt");
-	mwexec('rm -rf $cachedir/swap.state');
+	mwexec_bg('rm -rf $cachedir');
 	mwexec('rm -rf $logdir');
 	update_status("Finishing package cleanup.");
 	mwexec("/usr/local/etc/rc.d/sqp_monitor.sh stop");
@@ -730,19 +735,26 @@ function squid_install_cron($should_install) {
 	$x=0;
 	$rotate_job_id=-1;
 	$swapstate_job_id=-1;
+	$cron_cmd=($settings['clear_cache']=='on' ?  "/usr/local/pkg/swapstate_check.php clean; " : "");
+	$cron_cmd .= SQUID_LOCALBASE."/sbin/squid -k rotate -f " . SQUID_CONFFILE;
+	$need_write = false;
 	foreach($config['cron']['item'] as $item) {
 		if(strstr($item['task_name'], "squid_rotate_logs")) {
 			$rotate_job_id = $x;
+			if ($item['command'] != $cron_cmd){
+				$config['cron']['item'][$x]['command']=$cron_cmd;
+				$need_write = true;
+			}
 		} elseif(strstr($item['task_name'], "squid_check_swapstate")) {
 	  		$swapstate_job_id = $x;
 		}
 		$x++;
 	}
-	$need_write = false;
 	switch($should_install) {
 		case true:
 			$cachedir =($settings['harddisk_cache_location'] ? $settings['harddisk_cache_location'] : '/var/squid/cache');
 			if($rotate_job_id < 0) {
+				$cron_item['command']=($settings['clear_cache']=='on' ?  "/usr/local/pkg/swapstate_check.php clean; " : "");
 				$cron_item = array();
 				$cron_item['task_name'] = "squid_rotate_logs";
 				$cron_item['minute'] = "0";
@@ -751,7 +763,7 @@ function squid_install_cron($should_install) {
 				$cron_item['month'] = "*";
 				$cron_item['wday'] = "*";
 				$cron_item['who'] = "root";
-				$cron_item['command'] = "/bin/rm {$cachedir}/swap.state; ". SQUID_LOCALBASE."/sbin/squid -k rotate -f " . SQUID_CONFFILE;
+				$cron_item['command'] .= $cron_cmd;
 				/* Add this cron_item as a new entry at the end of the item array. */
 				$config['cron']['item'][] = $cron_item;
 				$need_write = true;
@@ -967,10 +979,9 @@ pinger_program {$pinger_program}
 EOD;
 
 // Per squid docs, setting logfile_rotate to 0 is safe and causes a simple close/reopen.
-// Rotating also ensures that swap.state is rewritten, so is useful even if the logs
-//  are not being rotated.
 $rotate = empty($settings['log_rotate']) ? 0 : $settings['log_rotate'];
 $conf .= "logfile_rotate {$rotate}\n";
+$conf .= "debug_options rotate={$rotate}\n";
 squid_install_cron(true);
 
 	$conf .= <<< EOD
