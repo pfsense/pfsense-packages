@@ -2271,6 +2271,12 @@ EOD;
 {$squid_local_base}/sbin/squid -k shutdown -f {$squid_conffile_var}
 # Just to be sure...
 sleep 5
+		
+if [ -f /usr/bin/ipcs ];then
+# http://man.chinaunix.net/newsoft/squid/Squid_FAQ/FAQ-22.html#ss22.8
+ipcs | grep '^[mq]' | awk '{printf "ipcrm -%s %s\\n", $1, $2}' | /bin/sh
+fi
+		
 killall -9 squid 2>/dev/null
 killall pinger 2>/dev/null
 

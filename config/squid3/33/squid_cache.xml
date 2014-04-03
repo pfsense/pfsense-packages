@@ -166,7 +166,11 @@
 		<field>
 			<fielddescr>Hard disk cache system</fielddescr>
 			<fieldname>harddisk_cache_system</fieldname>
-			<description>This specifies the kind of storage system to use. &lt;p&gt; &lt;b&gt; ufs &lt;/b&gt; is the old well-known Squid storage format that has always been there. &lt;p&gt; &lt;b&gt; aufs &lt;/b&gt; uses POSIX-threads to avoid blocking the main Squid process on disk-I/O. (Formerly known as async-io.) &lt;p&gt; &lt;b&gt; diskd &lt;/b&gt; uses a separate process to avoid blocking the main Squid process on disk-I/O. &lt;p&gt; &lt;b&gt; null &lt;/b&gt; Does not use any storage. Ideal for Embedded/NanoBSD.</description>
+			<description><![CDATA[This specifies the kind of storage system to use.
+						<br><br><b>ufs</b> is the old well-known Squid storage format that has always been there.
+			 			<br><br><b>aufs</b> uses POSIX-threads to avoid blocking the main Squid process on disk-I/O. (Formerly known as async-io.)
+			 			<br><br><b>diskd</b> uses a separate process to avoid blocking the main Squid process on disk-I/O.<br>To use <b>ipcs</b> and <b>ipcrm</b> on squid, Download livefs.iso from ftp://ftp.freebsd.org/pub/FreeBSD/releases/ISO-IMAGES/8.3/ mount it and copy <b>/usr/bin/ipcs</b> and <b>/usr/bin/ipcrm</b> to your system and set them as executables.
+			 			<br><br><b>null</b> Does not use any storage. Ideal for Embedded/NanoBSD.]]></description>
 			<type>select</type>
 			<default_value>ufs</default_value>
 			<options>
