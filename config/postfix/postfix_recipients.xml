@@ -9,7 +9,7 @@
 /*
     postfix_recipients.xml
     part of the Postfix package for pfSense
-    Copyright (C) 2011 Marcello Coutinho
+    Copyright (C) 2011-2013 Marcello Coutinho
     All rights reserved.            
 */
 /* ========================================================================== */
@@ -51,75 +51,62 @@
 		<section>Services</section>
 		<url>pkg_edit.php?xml=postfix.xml&amp;id=0</url>
 	</menu>
-	<service>
-		<name>postfix</name>
-		<rcfile>postfix.sh</rcfile>
-		<executable>master</executable>
-	</service>
-	<additional_files_needed>
-		<item>http://www.pfsense.org/packages/config/postfix/postfix.inc</item>
-		<prefix>/usr/local/pkg/</prefix>
-		<chmod>0755</chmod>
-	</additional_files_needed>
-	<additional_files_needed>
-		<item>http://www.pfsense.org/packages/config/postfix/postfix_acl.xml</item>
-		<prefix>/usr/local/pkg/</prefix>
-		<chmod>0755</chmod>
-	</additional_files_needed>
-	<additional_files_needed>
-		<item>http://www.pfsense.org/packages/config/postfix/postfix_recipients.xml</item>
-		<prefix>/usr/local/pkg/</prefix>
-		<chmod>0755</chmod>
-	</additional_files_needed>
-	<additional_files_needed>
-		<item>http://www.pfsense.org/packages/config/postfix/postfix_antispam.xml</item>
-		<prefix>/usr/local/pkg/</prefix>
-		<chmod>0755</chmod>
-	</additional_files_needed>
-
-		<additional_files_needed>
-		<item>http://www.pfsense.org/packages/config/postfix/postfix_sync.xml</item>
-		<prefix>/usr/local/pkg/</prefix>
-		<chmod>0755</chmod>
-	</additional_files_needed>
-		<additional_files_needed>
-		<item>http://www.pfsense.org/packages/config/postfix/postfix_view_config.php</item>
-		<prefix>/usr/local/www/</prefix>
-		<chmod>0755</chmod>
-	</additional_files_needed>
-	<additional_files_needed>
-		<item>http://www.pfsense.org/packages/config/postfix/postfix_recipients.php</item>
-		<prefix>/usr/local/www/</prefix>
-		<chmod>0755</chmod>
-	</additional_files_needed>
 <tabs>
 		<tab>
 			<text>General</text>
 			<url>/pkg_edit.php?xml=postfix.xml&amp;id=0</url>
 		</tab>
 		<tab>
-			<text>ACLs / Filter Maps</text>
-			<url>/pkg_edit.php?xml=postfix_acl.xml&amp;id=0</url>
+			<text>Domains</text>
+			<url>/pkg_edit.php?xml=postfix_domains.xml&amp;id=0</url>
 		</tab>
 		<tab>
-			<text>Valid recipients</text>
+			<text>Recipients</text>
 			<url>/pkg_edit.php?xml=postfix_recipients.xml&amp;id=0</url>
 			<active/>
+		</tab>
+		<tab>
+			<text>Access Lists</text>
+			<url>/pkg_edit.php?xml=postfix_acl.xml&amp;id=0</url>
 		</tab>
 		<tab>
 			<text>Antispam</text>
 			<url>/pkg_edit.php?xml=postfix_antispam.xml&amp;id=0</url>
 		</tab>
 		<tab>
-			<text>XMLRPC Sync</text>
+			<text>Sync</text>
 			<url>/pkg_edit.php?xml=postfix_sync.xml&amp;id=0</url>
 		</tab>
 		<tab>
-			<text>View config files</text>
+			<text>View config</text>
 			<url>/postfix_view_config.php</url>
 		</tab>
+		<tab>
+			<text>Search mail</text>
+			<url>/postfix_search.php</url>
+		</tab>
+		<tab>
+			<text>Queue</text>
+			<url>/postfix_queue.php</url>
+		</tab>
+		<tab>
+			<text>About</text>
+			<url>/postfix_about.php</url>
+		</tab>
+	
 </tabs>
 	<fields>
+		<field>
+			<name>Get Valid recipients update frequency</name>
+			<type>listtopic</type>
+		</field>
+		<field>
+			<fielddescr>Frequency</fielddescr>
+			<fieldname>freq</fieldname>
+			<description>Wait time between each update HINT 30m(30 minutes), 1h(one hour), 1d(one day)</description>
+			<type>input</type>
+			<size>15</size>
+		</field>
 		<field>
 			<name>Get Valid recipients from Active Directory</name>
 			<type>listtopic</type>
@@ -132,50 +119,55 @@
 								Before using LDAP fetch you must install p5-perl-ldap package(hint: <strong>/usr/sbin/pkg_add -r p5-perl-ldap</strong>)]]></description>
 		</field>
 		<field>
-			<fielddescr>Frequency</fielddescr>
-			<fieldname>freq</fieldname>
-			<description>Wait time between each fetch HINT 30m(30 minutes), 1h(one hour), 1d(one day)</description>
-			<type>input</type>
-			<size>15</size>
-		</field>
-		<field>
-			<fielddescr><![CDATA[<strong>HINTS</strong><br>Hostname:<br>dc1.mysite.com<br><br>Domain:<br>dc=mysite,dc=com<br><br>Username:<br>cn=antispam,cn=Users<br>]]></fielddescr>
 			<fieldname>none</fieldname>
 			<type>rowhelper</type>
+			<dontdisplayname/>
+			<usecolspan2/>
+			<movable>on</movable>
 			<rowhelper>
 			<rowhelperfield>
 				<fielddescr>Hostname</fielddescr>
+				<description><![CDATA[<strong>Hostname Hint:</strong><br>dc1.mysite.com]]></description>
 				<fieldname>dc</fieldname>
 				<type>input</type>
-				<size>20</size>
+				<size>23</size>
 			</rowhelperfield>
 			<rowhelperfield>
 				<fielddescr>Domain</fielddescr>
+				<description><![CDATA[<strong>Domain Hint:</strong><br>dc=mysite,dc=com]]></description>
 				<fieldname>cn</fieldname>
 				<type>input</type>
-				<size>22</size>
+				<size>25</size>
 			</rowhelperfield>
 			<rowhelperfield>
 				<fielddescr>Username</fielddescr>
+				<description><![CDATA[<strong>Username Hint:</strong><br>Username:cn=antispam,cn=Users]]></description>
 				<fieldname>username</fieldname>
 				<type>input</type>
-				<size>20</size>
+				<size>24</size>
 			</rowhelperfield>
 			<rowhelperfield>
 				<fielddescr>Password</fielddescr>
 				<fieldname>password</fieldname>
 				<type>password</type>
-				<size>10</size>
+				<size>12</size>
 			</rowhelperfield>
 			</rowhelper>
 		</field>
 		<field>
-			<name>Get Valid recipients from local file</name>
+			<name>Get Valid recipients from a clear text url</name>
 			<type>listtopic</type>
 		</field>
 		<field>
-			<fielddescr>Location</fielddescr>
-			<name>location</name>
+			<fielddescr>Enable URL fetch</fielddescr>
+			<fieldname>enable_url</fieldname>
+			<type>checkbox</type>
+			<description><![CDATA[Extract valid email addresses from external URL.<br>
+								The file must return a list with valid emails in clear text format(hint: <strong>http://intranet.mycompany.com/valid_emails.txt</strong>)]]></description>
+		</field>
+		<field>
+			<fielddescr>URL</fielddescr>
+			<fieldname>custom_url</fieldname>
 			<type>input</type>
 			<size>80</size>
 		</field>
@@ -188,7 +180,7 @@
 			<fieldname>custom_recipients</fieldname>
 			<description><![CDATA[Paste your valid recipients here, one per line. <strong>HINT user@mycompany.com OK</strong>]]></description>
 			<type>textarea</type>
-			<cols>60</cols>
+			<cols>70</cols>
 			<rows>15</rows>
 			<encoding>base64</encoding>
 		</field>

@@ -35,7 +35,11 @@ function arping_package_reinstall() {
 }
 
 function arping_package_php_command() {
-	system("arping -c3 " . $_POST['hostip']);
+	require_once("util.inc");
+	if (is_ipaddr($_POST['hostip']) || is_hostname($_POST['hostip']) || is_macaddr($_POST['hostip']))
+		system("arping -c3 " . escapeshellarg($_POST['hostip']));
+	else
+		echo "Invalid input. Supplied address must be a valid IP or MAC address.";
 	exit;
 }
 

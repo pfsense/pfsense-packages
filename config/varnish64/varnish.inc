@@ -5,6 +5,7 @@
     part of pfSense (http://www.pfSense.com)
     Copyright (C) 2010 Scott Ullrich <sullrich@gmail.com>
     Copyright (C) 2011 Marcello Coutinho
+    Copyright (C) 2012 Marcio Carlos Antão
     All rights reserved.
                                                                               */
 /* ========================================================================== */
@@ -129,32 +130,51 @@ function varnish_get_url_mappings_txt() {
 			if($url['grace'])
   			$directo_grace_time.=($url['grace']=="0s"?"return(pass);":"set req.grace=".$url['grace'].";");
   			$fieldtype = ($url['fieldtype']?$url['fieldtype']:"==");
-  			$req=($url['directorurl2']?"url":"http.host");
-			$director_prefix=($url['directorurl'] && $url['directorurl2']?"^http://":"");
+  			$director_prefix=($url['directorurl'] && $url['directorurl2']?"^http://":"");
 			#check url
   			if ( $url['directorurl'] || $url['directorurl2'] || $catch_all == "unset" ){
 				if ( $url['directorurl']== "" && $url['directorurl2']== "" ){
 					#director with no host or url, so director for catch all traffic not specified in config
 					$lasturlmappings = "\telse\t{\n\t\tset req.backend = ".$url['directorname'].";\n\t\t}\n";
 					$catch_all = "set";
+					$isfirst = false;
 					}
-			else{
+			else{ 
+				
 				if(!$isfirst) 
 					$urlmappings .= "\telse ";
-				$urlmappings .= "if (req.$req $fieldtype ".'"'.$url['directorurl'].$url['directorurl2'].'") {'."\n";
-				#check failover
+				if(!$url['directorurl']) {
+					$urlmappings .= "if (req.url $fieldtype ".'"^'.$url['directorurl2'].'") {'."\n";
+				}
+				else if (!$url['directorurl2']) {
+					$urlmappings .= "if (req.http.host $fieldtype ".'"'.$url['directorurl'].'") {'."\n";
+				}
+				else {
+				        $urlmappings .= "if (req.http.host $fieldtype ".'"'.$url['directorurl'].'"'." && req.url $fieldtype ".'"^'.$url['directorurl2'].'") {'."\n";
+				}
+							
 				$urlbackend = "\t\t\tset req.backend = ".$url['directorname'].";";
+
+				#check rewrite
+                                if ($url['rewritehost']) {
+                                        $urlmappings .= "\t\t\tset req.http.host = regsub(req.http.host, ".'"'.$url['directorurl'].'",'.'"'.$url['rewritehost'].'")'.";\n";
+                                }
+                                if ($url['rewriteurl']) {
+                                        $urlmappings .= "\t\t\tset req.url = regsub(req.url, ".'"'.$url['directorurl2'].'",'.'"^'.$url['rewriteurl'].'")'.";\n";
+                                }
+				#check failover
 				if ($url['failover'] && $url['failover'] != $url['directorname']){
 					$tabs=($url['grace']?"\n\t\t\t":"");
 					$urlfailover = "\t\t\tset req.backend = ".$url['failover'].";";
 					$urlmappings .= "\t\tif (req.restarts == 0) {\n".$urlbackend.$tabs.$directo_grace_time.$tabs."}";
 					$urlmappings .= "\n\t\telse\t{\n".$urlfailover.$tabs.$directo_grace_time.$tabs."}\n\t\t}\n";
+					$isfirst = false;
 					}
 				else{
 					$tabs=($url['grace']?"\n\t\t":"");
 					$urlmappings .= $urlbackend.$tabs.$directo_grace_time."\n\t\t}\n";	
+					$isfirst = false;
 					}			
-				$isfirst = false;
 				}
   			}
   		}
@@ -376,7 +396,7 @@ EOFA;
 
 function sync_package_varnish() {
 	global $config, $g;
-	if($config['installedpackages']['varnishcustomvcl']['config'] != "") {
+	if(is_array($config['installedpackages']['varnishcustomvcl']['config'])) {
 		foreach($config['installedpackages']['varnishcustomvcl']['config'] as $vcl) {
 			if($vcl['vcl_recv_early']) 
 				$vcl_recv_early = text_area_decode($vcl['vcl_recv_early']);
@@ -395,7 +415,8 @@ function sync_package_varnish() {
 		$vcl_recv_set_basic='#BASIC VCL RULES SETTING'."\n";
 		$vcl_recv_action_basic='#BASIC VCL RULES ACTIONS'."\n";
 		#$plataform=posix_uname();
-		foreach($config['installedpackages']['varnishsettings']['config'] as $vcl) {
+		if (is_array($config['installedpackages']['varnishsettings']['config']))
+		  foreach($config['installedpackages']['varnishsettings']['config'] as $vcl) {
 			if($vcl['fixgzip']){
 				$vcl_recv_set_basic.="\t#Fix gzip compression\n";
 				$vcl_recv_set_basic.="\t".'if (req.http.Accept-Encoding) {'."\n";
@@ -466,10 +487,10 @@ function sync_package_varnish() {
 			#set static content var
 			$vcl_recv_static_sufix=($vcl['staticache']=='no'?"pass":"lookup");
 			$vcl_recv_static ="\t#Enable static cache\n";
-			$vcl_recv_static.="\t".'if (req.request=="GET" && req.url ~ "\.(css|js|txt|zip|pdf|rtf|flv|swf|html|htm)$") {'.$vcl_recv_static_prefix."\n\t\treturn($vcl_recv_static_sufix);\n\t\t}\n";
+			$vcl_recv_static.="\t".'if (req.request=="GET" && req.url ~ "\.(css|js|txt|zip|rtf|flv|swf|html|htm)$") {'.$vcl_recv_static_prefix."\n\t\treturn($vcl_recv_static_sufix);\n\t\t}\n";
 			$vcl_recv_static.="\t".'if (req.request=="GET" && req.url ~ "\.(gif|jpg|jpeg|bmp|png|ico|img|tga|wmf|mp3|ogg)$") {'.$vcl_recv_static_prefix."\n\t\treturn($vcl_recv_static_sufix);\n\t\t}\n";
 			$vcl_fetch_static ="#Enable static cache\n";
-			$vcl_fetch_static.='if (req.url ~ "\.(css|js|txt|zip|pdf|rtf|flv|swf|html|htm)$") {'."\n\tunset beresp.http.set-cookie;\n\t}\n";
+			$vcl_fetch_static.='if (req.url ~ "\.(css|js|txt|zip|rtf|flv|swf|html|htm)$") {'."\n\tunset beresp.http.set-cookie;\n\t}\n";
 			$vcl_fetch_static.='if (req.url ~ "\.(gif|jpg|jpeg|bmp|png|ico|img|tga|wmf|mp3|ogg)$") {'."\n\tunset beresp.http.set-cookie;\n\t}\n";
 			
 			switch ($vcl['staticache']){
@@ -721,7 +742,7 @@ function varnish_do_xmlrpc_sync($sync_to_ip, $password) {
 	$cli->setCredentials('admin', $password);
 	$resp = $cli->send($msg, "250");
 	if(!$resp) {
-		$error = "A communications error occurred while attempting varnish XMLRPC sync with {$url}:{$port} (pfsense.exec_php).";
+		$error = "A communications error occurred while attempting varnish XMLRPC sync with {$url}:{$port} (exec_php).";
 		log_error($error);
 		file_notice("sync_settings", $error, "varnish Settings Sync", "");
 	} elseif($resp->faultCode()) {
@@ -731,7 +752,7 @@ function varnish_do_xmlrpc_sync($sync_to_ip, $password) {
 		log_error($error);
 		file_notice("sync_settings", $error, "varnish Settings Sync", "");
 	} else {
-		log_error("varnish XMLRPC reload data success with {$url}:{$port} (pfsense.exec_php).");
+		log_error("varnish XMLRPC reload data success with {$url}:{$port} (exec_php).");
 	}
 	
 }

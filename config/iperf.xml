@@ -59,6 +59,7 @@
 	<service>
                 <name>iperf</name>
                 <executable>iperf</executable>
+		<description>iperf network performance testing daemon/client</description>
         </service>
 	<tabs>
 		<tab>
@@ -72,7 +73,7 @@
 		</tab>
 	</tabs>
 	<additional_files_needed>
-		<item>http://www.pfsense.com/packages/config/iperfserver.xml</item>
+		<item>https://packages.pfsense.org/packages/config/iperfserver.xml</item>
 	</additional_files_needed>
 	<fields>
 		<field>
@@ -132,7 +133,7 @@
 			<type>input</type>
 		</field>
 		<field>
-			<fielddescr>Socket buffer bize</fielddescr>
+			<fielddescr>Socket buffer size</fielddescr>
 			<fieldname>window</fieldname>
 			<description>Enter the desired socket buffer size, if needed.</description>
 			<type>input</type>

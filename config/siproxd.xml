@@ -70,19 +70,25 @@
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>077</chmod>
-		<item>http://www.pfsense.com/packages/config/siproxdusers.xml</item>
+		<item>https://packages.pfsense.org/packages/config/siproxdusers.xml</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>077</chmod>
-		<item>http://www.pfsense.com/packages/config/siproxd.inc</item>
+		<item>https://packages.pfsense.org/packages/config/siproxd.inc</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/www/</prefix>
 		<chmod>077</chmod>
-		<item>http://www.pfsense.com/packages/config/siproxd_registered_phones.php</item>
+		<item>https://packages.pfsense.org/packages/config/siproxd_registered_phones.php</item>
 	</additional_files_needed>
 	<fields>
+		<field>
+			<fielddescr>Enable siproxd</fielddescr>
+			<fieldname>sipenable</fieldname>
+			<description>Enable or disable siproxd</description>
+			<type>checkbox</type>
+		</field>
 		<field>
 			<fielddescr>Inbound interface</fielddescr>
 			<fieldname>if_inbound</fieldname>

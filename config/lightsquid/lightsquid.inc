@@ -33,7 +33,21 @@ require_once('pfsense-utils.inc');
 require_once('pkg-utils.inc');
 require_once('filter.inc');
 require_once('service-utils.inc');
-require_once('squid.inc');
+
+if (file_exists('squid.inc')) {
+  require_once('squid.inc');
+}
+else update_log("File 'squid.inc' not found.");
+
+$pfs_version = substr(trim(file_get_contents("/etc/version")),0,3);
+switch ($pfs_version) {
+	case "1.2":
+	case "2.0":
+		define('LIGHTSQUID_BASE','/usr/local');
+		break;
+	default:
+		define('LIGHTSQUID_BASE', '/usr/pbi/lightsquid-' . php_uname("m"));
+}
 
 define ('CMD_PKGDELETE', 'pkg_delete lightsquid-1.7.1');
 
@@ -42,19 +56,26 @@ define('LS_GUI_DEBUG', 'on');
 define('LS_LOG_FILE',  '/tmp/lightsquid_gui.log');
 
 // configuration settings !-- CHECK THIS --!
-define('LS_CONFIGPATH',			'/usr/local/etc/lightsquid');
+define('LS_CONFIGPATH',			LIGHTSQUID_BASE . '/etc/lightsquid');
 define('LS_CONFIGFILE',			'lightsquid.cfg');
 define('LS_CONFIGFILE_DIST',		'lightsquid.cfg.dist');
-define('LS_WWWPATH',			'/usr/local/www/lightsquid');
-define('LS_TEMPLATEPATH',		'/usr/local/www/lightsquid/tpl');
-define('LS_LANGPATH',			'/usr/local/share/lightsquid/lang');
+define('LS_WWWPATH',			LIGHTSQUID_BASE . '/www/lightsquid');
+define('LS_TEMPLATEPATH',		LIGHTSQUID_BASE . '/www/lightsquid/tpl');
+define('LS_LANGPATH',			LIGHTSQUID_BASE . '/share/lightsquid/lang');
 define('LS_REPORTPATH',			'/var/lightsquid/report');
-define('LS_SQUIDLOGPATH',		'/var/squid/log');
+
+global $config;
+if (isset($config['installedpackages']['squid']['config'][0])) {
+	if (!empty($config['installedpackages']['squid']['config'][0]['log_dir']))
+		define('LS_SQUIDLOGPATH', $config['installedpackages']['squid']['config'][0]['log_dir']);
+	else
+		define('LS_SQUIDLOGPATH', '/var/squid/logs');
+}
 define('LS_SQUIDLOG',			'access.log');
-define('LS_IP2NAMEPATH',		'/usr/local/libexec/lightsquid');
+define('LS_IP2NAMEPATH',		LIGHTSQUID_BASE . '/libexec/lightsquid');
 
 define('CRONTAB_FILE',			'/var/cron/tabs/root');
-define('CRONTAB_LS_TEMPLATE',		'/usr/bin/perl /usr/local/www/lightsquid/lightparser.pl');
+define('CRONTAB_LS_TEMPLATE',		'/usr/bin/perl ' . LIGHTSQUID_BASE . '/www/lightsquid/lightparser.pl');
 define('CRONTAB_LS_JOBKEY',		'/lightparser.pl');
 define('CRONTAB_SQUID_TEMPLATE',	'/usr/local/sbin/squid -k rotate > /dev/null');
 define('CRONTAB_SQUID_JOBKEY',		'/squid -k rotate');
@@ -119,11 +140,6 @@ function lightsquid_deinstall() {
 	// delete cron task's
 	ls_setup_cron("lightsquid_squid_rotate", "", "", false);
 	ls_setup_cron("lightsquid_parser", "", "", false);
-	// control shoot to head :)
-#	mwexec(CMD_PKGDELETE);
-	// remove '/usr/local/www/lightsquid' dir - any time can't be removed by templates
-#	if (file_exists(LS_WWWPATH))
-#		mwexec("rm -rf " . LS_WWWPATH);
 
 	update_log("lightsquid_deinstall: stopped");
 }
@@ -143,7 +159,7 @@ function lightsquid_resync() {
 		mwexec("mkdir -p " . LS_REPORTPATH);
 	}
 
-	mwexec("/bin/chmod -R u+w /usr/local/etc/lightsquid");
+	mwexec("/bin/chmod -R u+w " . LIGHTSQUID_BASE . "/etc/lightsquid");
 
 	// debug
 	$light_test = array();
@@ -213,10 +229,10 @@ function lightsquid_resync() {
 			foreach ($lsconf_var as $key => $val) {
 				for($i = 0; $i < count($lsconf); $i++) {
 					$s = trim($lsconf[$i]);
-					$e_key = "^[$]" . $key . "[ ]*[=]+";
-#					update_log("Regular: eregi(\"$e_key," . "'$s')"); // debug regular template
-					if (eregi($e_key, $s)) {
-#					update_log("Regular PASSED: eregi(\"$e_key," . "'$s')"); // debug regular template
+					$e_key = "/^[$]" . $key . "[ ]*[=]+/i";
+#					update_log("Regular: preg_match(\"$e_key," . "'$s')"); // debug regular template
+					if (preg_match($e_key, $s)) {
+#					update_log("Regular PASSED: preg_match(\"$e_key," . "'$s')"); // debug regular template
 						$lsconf[$i] = '$' . "$key = $val;";
 						update_log("Update config: $key=$val");
 					}
@@ -259,43 +275,34 @@ function lightsquid_resync() {
 			ls_setup_cron("lightsquid_parser_yesterday", "", "", false);
 		}
 	
-		// set shedule - squid rotate
-#		if ($tm_squid) {
-#			$on = false;
-#			$opt = array("0", "0", "*", "*", "*", "root", CRONTAB_SQUID_TEMPLATE);
-#			switch($tm_squid) {
-#				// day of month
-#				case 'lsr_none':$on = false;	break;
-#				case 'lsr_d1':  $on = true; $opt[2]= "*/1"; break;
-#				case 'lsr_d2':  $on = true; $opt[2]= "*/2";  break;
-#				case 'lsr_d3':  $on = true; $opt[2]= "*/3";  break;
-#				case 'lsr_d4':  $on = true; $opt[2]= "*/4";  break;
-#				case 'lsr_d5':  $on = true; $opt[2]= "*/5";  break;
-#				case 'lsr_d6':  $on = true; $opt[2]= "*/6";  break;
-#				case 'lsr_d10': $on = true; $opt[2]= "*/10"; break;
-#				case 'lsr_d15': $on = true; $opt[2]= "*/15"; break;
-#				case 'lsr_d20': $on = true; $opt[2]= "*/20"; break;
-#				case 'lsr_d25': $on = true; $opt[2]= "*/25"; break;
-#				case 'lsr_d30': $on = true; $opt[2]= "*/30"; break;
-#				// day of week
-#				case 'lsr_w1': $on = true; $opt[4]= "*/1"; break;
-#				case 'lsr_w2': $on = true; $opt[4]= "*/1"; break;
-#				case 'lsr_w3': $on = true; $opt[4]= "*/1"; break;
-#				case 'lsr_w4': $on = true; $opt[4]= "*/1"; break;
-#				case 'lsr_w5': $on = true; $opt[4]= "*/1"; break;
-#				case 'lsr_w6': $on = true; $opt[4]= "*/1"; break;
-#				case 'lsr_w7': $on = true; $opt[4]= "*/1"; break;
-#			}
-#			ls_setup_cron("lightsquid_squid_rotate", $opt, CRONTAB_SQUID_JOBKEY, $on);
-#		}  else
-			ls_setup_cron("lightsquid_squid_rotate", "", "", false);
+		ls_setup_cron("lightsquid_squid_rotate", "", "", false);
 
 		// update squid conf
 		if (isset($config['installedpackages']['squid']['config'][0])) {
-			$config['installedpackages']['squid']['config'][0]['log_enabled'] = 'on';
-			$config['installedpackages']['squid']['config'][0]['log_dir'] = LS_SQUIDLOGPATH;
-			write_config();
-			squid_resync();
+			$squid_settings = $config['installedpackages']['squid']['config'][0];
+			$squid_settings['log_enabled'] = 'on';
+			if (empty($squid_settings['log_dir']))
+				$squid_settings['log_dir'] = LS_SQUIDLOGPATH;
+			
+			# sqstat
+                     $ifmgr = "127.0.0.1;";
+			$iface = ($squid_settings['active_interface'] ? $squid_settings['active_interface'] : 'lan');
+			$iface = explode(",", $iface);
+			foreach ($iface as $i => $if) {
+				$realif = ls_get_real_interface_address($if);
+                            if ($realif[0]) 
+					$ifmgr = $ifmgr . $realif[0] . ";";
+			}
+
+			/* Only save and resync if we're actually making any changes. */
+			if (strpos($config['installedpackages']['squidnac']['config'][0]['ext_cachemanager'], $ifmgr) === FALSE) {
+				$config['installedpackages']['squidnac']['config'][0]['ext_cachemanager'] = $ifmgr;
+				write_config();
+				if (function_exists('squid_resync'))
+					squid_resync();
+				else
+					update_log("Function 'squid_resync' not found.");
+			}
 		}
 	}
 
@@ -416,6 +423,17 @@ function refresh_full() {
 			break;
 	}
 	update_log("refresh_full: stop");
+}
+
+function ls_get_real_interface_address($iface)
+{
+	global $config;
+
+	$iface = convert_friendly_interface_to_real_interface_name($iface);
+	$line = trim(shell_exec("ifconfig $iface | grep inet | grep -v inet6"));
+	list($dummy, $ip, $dummy2, $netmask) = explode(" ", $line);
+
+	return array($ip, long2ip(hexdec($netmask)));
 }
 
 ?>

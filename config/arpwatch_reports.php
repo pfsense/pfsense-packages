@@ -3,7 +3,7 @@
 /*
 	$Id$
 
-        diag_logs.php
+        arpwatch_reports.php
         Copyright (C) 2005 Colin Smith
         All rights reserved.
 
@@ -29,9 +29,10 @@
         POSSIBILITY OF SUCH DAMAGE.
 */
 
-require("guiconfig.inc");
+require_once("guiconfig.inc");
+require_once("service-utils.inc");
 
-$logfile = "/usr/local/arpwatch/arp.dat";
+$logfile = "/var/log/arp.dat";
 
 if ($_POST['clear']) {
         stop_service("arpwatch");

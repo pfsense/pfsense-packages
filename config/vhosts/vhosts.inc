@@ -736,31 +736,31 @@ function vhosts_install_command() {
 	if(stristr(php_uname('r'), '7.2') == TRUE) {
 		if (!file_exists('/usr/local/php5')) {
 			chdir('/usr/local/');
-			exec ("fetch http://www.pfsense.com/packages/config/vhosts/freebsd7.2/php5.tar.gz");
+			exec ("fetch https://files.pfsense.org/packages/7/vhosts/php5.tar.gz");
 			exec("tar zxvf /usr/local/php5.tar.gz -C /usr/local/");
 			exec("rm /usr/local/php5.tar.gz");
 		}
 		if (!file_exists('/usr/local/lib/libxml2.so.5')) {
 			chdir('/usr/local/lib/');
-			exec ("fetch http://www.pfsense.com/packages/config/vhosts/freebsd7.2/usr.local.lib/libxml2.so.5");
+			exec ("fetch https://files.pfsense.org/packages/7/vhosts/usr.local.lib/libxml2.so.5");
 		}
 		if (!file_exists('/usr/local/lib/libxml2.so')) {
 			chdir('/usr/local/lib/');
-			exec ("fetch http://www.pfsense.com/packages/config/vhosts/freebsd7.2/usr.local.lib/libxml2.so");
+			exec ("fetch https://files.pfsense.org/packages/7/vhosts/usr.local.lib/libxml2.so");
 		}
 		if (!file_exists('/usr/local/lib/libxml2.la')) {
 			chdir('/usr/local/lib/');
-			exec ("fetch http://www.pfsense.com/packages/config/vhosts/freebsd7.2/usr.local.lib/libxml2.la");
+			exec ("fetch https://files.pfsense.org/packages/7/vhosts/usr.local.lib/libxml2.la");
 		}
 		if (!file_exists('/usr/local/lib/libxml2.a')) {
 			chdir('/usr/local/lib/');
-			exec ("fetch http://www.pfsense.com/packages/config/vhosts/freebsd7.2/usr.local.lib/lib/libxml2.a");
+			exec ("fetch https://files.pfsense.org/packages/7/vhosts/usr.local.lib/lib/libxml2.a");
 		}
 	}
 	if(stristr(php_uname('r'), '8.1') == TRUE) {
 		if (!file_exists('/usr/local/php5')) {
 			chdir('/usr/local/');
-			exec ("fetch http://www.pfsense.com/packages/config/vhosts/freebsd8.0/php5.tar.gz");
+			exec ("fetch https://files.pfsense.org/packages/8/vhosts/php5.tar.gz");
 			exec("tar zxvf /usr/local/php5.tar.gz -C /usr/local/");
 			exec("rm /usr/local/php5.tar.gz");
 		}
@@ -774,7 +774,7 @@ function vhosts_install_command() {
 	unlink_if_exists("/tmp/vhosts_php_edit.tmp");
 
 	chdir('/tmp/');
-	exec ("fetch http://www.pfsense.com/packages/config/vhosts/system_advanced_create_certs.tmp");
+	exec ("fetch https://packages.pfsense.org/packages/config/vhosts/system_advanced_create_certs.tmp");
 	exec("cp /tmp/system_advanced_create_certs.tmp /usr/local/www/packages/vhosts/system_advanced_create_certs.php");
 	unlink_if_exists("/tmp/system_advanced_create_certs.tmp");
 

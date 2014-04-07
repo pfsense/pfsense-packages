@@ -12,19 +12,20 @@
 		<url>/pkg_edit.php?xml=gwled.xml&amp;id=0</url>
 	</menu>
 	<additional_files_needed>
-		<item>http://www.pfsense.org/packages/config/gwled/gwled.inc</item>
+		<item>https://packages.pfsense.org/packages/config/gwled/gwled.inc</item>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0644</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/bin/</prefix>
 		<chmod>0755</chmod>
-		<item>http://www.pfsense.com/packages/config/gwled/gwled.php</item>
+		<item>https://packages.pfsense.org/packages/config/gwled/gwled.php</item>
 	</additional_files_needed>
 	<service>
 		<name>gwled</name>
 		<rcfile>gwled.sh</rcfile>
 		<executable>gwled</executable>
+		<description>Gateway LED Indicator Daemon</description>
 	</service>
 	<fields>
 		<field>

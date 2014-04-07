@@ -41,7 +41,7 @@
     <requirements>Describe your package requirements here</requirements>
     <faq>Currently there are no FAQ items provided.</faq>
 	<name>Cron Settings</name>
-	<version>0.2</version>
+	<version>0.2.2</version>
 	<title>Settings</title>
 	<include_file>/usr/local/pkg/cron.inc</include_file>
 	<menu>
@@ -55,7 +55,7 @@
 		<name>cron</name>
 		<rcfile>cron.sh</rcfile>
 		<executable>cron</executable>
-		<description>The cron utility is used to manage commands on a schedule.</description>
+		<description>Scheduled commands daemon</description>
 	</service>
 	<tabs>
 		<tab>
@@ -68,27 +68,27 @@
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0755</chmod>		
-		<item>http://www.pfsense.com/packages/config/cron/cron.xml</item>
+		<item>https://packages.pfsense.org/packages/config/cron/cron.xml</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0755</chmod>		
-		<item>http://www.pfsense.com/packages/config/cron/cron.inc</item>
+		<item>https://packages.pfsense.org/packages/config/cron/cron.inc</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0755</chmod>		
-		<item>http://www.pfsense.com/packages/config/cron/cron.tmp</item>
+		<item>https://packages.pfsense.org/packages/config/cron/cron.tmp</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0755</chmod>		
-		<item>http://www.pfsense.com/packages/config/cron/cron_edit.tmp</item>
+		<item>https://packages.pfsense.org/packages/config/cron/cron_edit.tmp</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/www/packages/cron/</prefix>
 		<chmod>0755</chmod>		
-		<item>http://www.pfsense.com/packages/config/cron/index.php</item>
+		<item>https://packages.pfsense.org/packages/config/cron/index.php</item>
 	</additional_files_needed>
 	<fields>
 		<field>

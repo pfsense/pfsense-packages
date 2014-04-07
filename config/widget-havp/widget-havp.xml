@@ -52,32 +52,32 @@
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>077</chmod>
-		<item>http://www.pfsense.com/packages/config/widget-havp/widget-havp.inc</item>
+		<item>https://packages.pfsense.org/packages/config/widget-havp/widget-havp.inc</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/www/includes/</prefix>
 		<chmod>0644</chmod>
-		<item>http://www.pfsense.com/packages/config/widget-havp/havp_alerts.inc.php</item>
+		<item>https://packages.pfsense.org/packages/config/widget-havp/havp_alerts.inc.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/www/widgets/helpers/</prefix>
 		<chmod>0644</chmod>
-		<item>http://www.pfsense.com/packages/config/widget-havp/havp_alerts_helper.php</item>
+		<item>https://packages.pfsense.org/packages/config/widget-havp/havp_alerts_helper.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/www/widgets/include/</prefix>
 		<chmod>0644</chmod>
-		<item>http://www.pfsense.com/packages/config/widget-havp/havp_alerts.inc</item>
+		<item>https://packages.pfsense.org/packages/config/widget-havp/havp_alerts.inc</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/www/widgets/javascript/</prefix>
 		<chmod>0644</chmod>
-		<item>http://www.pfsense.com/packages/config/widget-havp/havp_alerts.js</item>
+		<item>https://packages.pfsense.org/packages/config/widget-havp/havp_alerts.js</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/www/widgets/widgets/</prefix>
 		<chmod>0644</chmod>
-		<item>http://www.pfsense.com/packages/config/widget-havp/havp_alerts.widget.php</item>
+		<item>https://packages.pfsense.org/packages/config/widget-havp/havp_alerts.widget.php</item>
 	</additional_files_needed>
 	<custom_php_deinstall_command>
 		widget_havp_uninstall();

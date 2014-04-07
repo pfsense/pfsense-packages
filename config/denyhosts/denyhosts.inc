@@ -38,7 +38,7 @@ function denyhosts_sync_package()
 
 }
     
-// bounty: http://forum.pfsense.org/index.php/topic,15791.0/topicseen.html
+// bounty: https://forum.pfsense.org/index.php/topic,15791.0/topicseen.html
 // pkg_add -r denyhosts
 // python /usr/local/share/denyhosts/denyhosts.py –file=/var/log/auth.log
 // /var/run/denyhosts.pid
@@ -60,7 +60,7 @@ function denyhosts_install_command()
 	   exec("mkdir /usr/local/www/packages/denyhosts/");
 	}
 
-	exec("pkg_add -r http://files.pfsense.com/packages/security/denyhosts-2.5.tbz");
+	exec("pkg_add -r https://files.pfsense.org/packages/security/denyhosts-2.5.tbz");
 
 	//misc files
 	if (!is_dir('/usr/local/www/edit_area/')) {
@@ -94,7 +94,7 @@ function denyhosts_install_command()
 		exec ('touch /var/log/denyhosts');
 	}
 
-	$download_path = 'http://www.pfsense.com/packages/config/denyhosts/';
+	$download_path = 'https://packages.pfsense.org/packages/config/denyhosts/';
 
 	//rename PHP files from .tmp to .php
 	chdir('/tmp/');

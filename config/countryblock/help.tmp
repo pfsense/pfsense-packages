@@ -91,7 +91,7 @@ To run countryblock as a cron job use /usr/local/etc/rc.d/countryblock.sh <br>
 
 <span style="color:red">Warning!</span> - Apply after every firewall change or state reset. Use at your own risk. 
 --->
-<a href="http://doc.pfsense.org/index.php/Country_Block">Please see wiki for help</a> or the <a href="http://forum.pfsense.org/index.php/topic,25732.0.html">Forum</a>
+<a href="https://doc.pfsense.org/index.php/Country_Block">Please see wiki for help</a> or the <a href="https://forum.pfsense.org/index.php/topic,25732.0.html">Forum</a>
 
 </div>
 

@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE packagegui SYSTEM "../schema/packages.dtd">
+<?xml-stylesheet type="text/xsl" href="../xsl/package.xsl"?>
+<packagegui>
+        <copyright>
+        <![CDATA[
+/* $Id$ */
+/* ========================================================================== */
+/*
+    apache_balancer.xml
+    part of pfSense (http://www.pfSense.com)
+    Copyright (C) 2012 Marcello Coutinho
+    All rights reserved.
+
+    Based on m0n0wall (http://m0n0.ch/wall)
+    Copyright (C) 2003-2006 Manuel Kasper <mk@neon1.net>.
+    All rights reserved.
+                                                                              */
+/* ========================================================================== */
+/*
+    Redistribution and use in source and binary forms, with or without
+    modification, are permitted provided that the following conditions are met:
+
+     1. Redistributions of source code MUST retain the above copyright notice,
+        this list of conditions and the following disclaimer.
+
+     2. Redistributions in binary form MUST reproduce the above copyright
+        notice, this list of conditions and the following disclaimer in the
+        documentation and/or other materials provided with the distribution.
+
+    THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
+    INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+    AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+    AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+    OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+    INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+    POSSIBILITY OF SUCH DAMAGE.
+                                                                              */
+/* ========================================================================== */
+        ]]>
+    </copyright>
+    <description>Describe your package here</description>
+    <requirements>Describe your package requirements here</requirements>
+    <faq>Currently there are no FAQ items provided.</faq>
+	<name>apachebalancer</name>
+	<version>none</version>
+	<title>Apache reverse proxy: Internal Web Servers Pool</title>
+	<include_file>/usr/local/pkg/apache_mod_security.inc</include_file>	
+	<tabs>
+		<tab>
+			<text>Apache</text>
+			<url>/pkg_edit.php?xml=apache_settings.xml&amp;id=0</url>
+			<active/>			
+		</tab>
+		<tab>
+			<text>ModSecurity</text>
+			<url>/pkg_edit.php?xml=apache_mod_security_settings.xml</url>
+		</tab>
+		<tab>
+			<text>Sync</text>
+			<url>/pkg_edit.php?xml=apache_mod_security_sync.xml</url>
+		</tab>
+		<tab>
+			<text>Daemon Options</text>
+			<url>/pkg_edit.php?xml=apache_settings.xml</url>
+			<tab_level>2</tab_level>
+		</tab>
+		<tab>
+			<text>Backends / Balancers</text>
+			<url>/pkg.php?xml=apache_balancer.xml</url>
+			<tab_level>2</tab_level>
+			<active/>
+		</tab>
+		<tab>
+			<text>Location(s)</text>
+			<url>/pkg.php?xml=apache_location.xml</url>
+			<tab_level>2</tab_level>
+		</tab>
+		<tab>
+			<text>Virtual Hosts</text>
+			<url>/pkg.php?xml=apache_virtualhost.xml</url>
+			<tab_level>2</tab_level>
+		</tab>
+		<tab>
+			<text>Logs</text>
+			<url>/apache_view_logs.php</url>
+			<tab_level>2</tab_level>
+		</tab>
+		
+	</tabs>
+	<adddeleteeditpagefields>
+		<columnitem>
+			<fielddescr>Status</fielddescr>
+			<fieldname>enable</fieldname>
+		</columnitem>
+		<columnitem>
+			<fielddescr>Alias</fielddescr>
+			<fieldname>name</fieldname>
+		</columnitem>
+		<columnitem>
+			<fielddescr>Protocol</fielddescr>
+			<fieldname>Proto</fieldname>
+		</columnitem>	
+		<columnitem>
+			<fielddescr>Description</fielddescr>
+			<fieldname>description</fieldname>
+		</columnitem>	
+		<movable>on</movable>
+	</adddeleteeditpagefields>
+	<fields>
+		<field>
+			<name>Apache Reverse Peer Mappings</name>
+			<type>listtopic</type>
+		</field>
+			<field>
+			<fielddescr>Enable</fielddescr>
+			<fieldname>enable</fieldname>
+			<description>If this field is checked, then this server pool will be available for Virtual Hosts configuration.</description>
+			<type>checkbox</type>
+		</field>
+		<field>
+			<fielddescr>Balancer name</fielddescr>
+			<fieldname>name</fieldname>
+			<description><![CDATA[Name to identify this peer in Apache configuration<br>
+						Example: www_site1]]></description>
+			<type>input</type>
+			<size>20</size>
+		</field>
+		<field>
+			<fielddescr>Description</fielddescr>
+			<fieldname>description</fieldname>
+			<description><![CDATA[Peer Description (optional)]]></description>
+			<type>input</type>
+			<size>60</size>
+		</field>
+		<field>
+			<fielddescr>Protocol</fielddescr>
+			<fieldname>proto</fieldname>
+			<description><![CDATA[Protocol used on the internal server(s).]]></description>
+			<type>select</type>
+			<options>
+				<option> <name>HTTP</name> <value>http</value> </option>
+				<option> <name>HTTPS</name> <value>https</value> </option>
+			</options>
+		</field>
+		<field>
+			<name><![CDATA[Internal Server(s)]]></name>
+			<type>listtopic</type>
+		</field>
+		<field>
+			<fielddescr><![CDATA[Internal Servers]]></fielddescr>
+			<fieldname>additionalparameters</fieldname>
+			<type>rowhelper</type>
+			<dontdisplayname/>
+			<usecolspan2/>
+			<movable>on</movable>
+			<rowhelper>
+				<rowhelperfield>
+					<fielddescr>FQDN or IP Address</fielddescr>
+					<fieldname>host</fieldname>
+					<description>Internal site IP or site hostname</description>
+					<type>input</type>
+					<size>27</size>
+				</rowhelperfield>
+				<rowhelperfield>
+					<fielddescr>Port</fielddescr>
+					<fieldname>port</fieldname>
+					<description>Internal site port</description>
+					<type>input</type>
+					<size>5</size>
+				</rowhelperfield>
+				<rowhelperfield>
+					<fielddescr>Route ID</fielddescr>
+					<fieldname>routeid</fieldname>
+					<description>ID to define sticky connections</description>
+					<type>input</type>
+					<size>6</size>
+				</rowhelperfield>
+				<rowhelperfield>
+					<fielddescr>Weight</fielddescr>
+					<fieldname>loadfactor</fieldname>
+					<description>Server weight</description>
+					<type>input</type>
+					<size>4</size>
+				</rowhelperfield>
+				<rowhelperfield>
+					<fielddescr>Ping</fielddescr>
+					<fieldname>ping</fieldname>
+					<description>Server ping test interval</description>
+					<type>input</type>
+					<size>6</size>
+				</rowhelperfield>
+				<rowhelperfield>
+					<fielddescr>TTL</fielddescr>
+					<fieldname>ttl</fieldname>
+					<description>Server ping TTL</description>
+					<type>input</type>
+					<size>6</size>
+				</rowhelperfield>
+		    </rowhelper>
+		</field>
+
+	</fields>
+	<custom_php_resync_config_command>
+		apache_mod_security_resync();
+	</custom_php_resync_config_command>
+</packagegui>

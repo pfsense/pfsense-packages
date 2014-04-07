@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE packagegui SYSTEM "./schema/packages.dtd">
+<?xml-stylesheet type="text/xsl" href="./xsl/package.xsl"?>
+<packagegui>
+        <copyright>
+        <![CDATA[
+/* ========================================================================== */
+/*
+    checkmk.xml
+    part of pfSense (http://www.pfSense.com)
+    Copyright (C) 2013 Marcello Coutinho
+    All rights reserved.                                                      
+*/
+/* ========================================================================== */
+/*
+    Redistribution and use in source and binary forms, with or without
+    modification, are permitted provided that the following conditions are met:
+
+     1. Redistributions of source code MUST retain the above copyright notice,
+        this list of conditions and the following disclaimer.
+
+     2. Redistributions in binary form MUST reproduce the above copyright
+        notice, this list of conditions and the following disclaimer in the
+        documentation and/or other materials provided with the distribution.
+
+    THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
+    INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+    AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+    AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+    OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+    INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+    POSSIBILITY OF SUCH DAMAGE.
+                                                                              */
+/* ========================================================================== */
+        ]]>
+        </copyright>
+    <description>Describe your package here</description>
+    <requirements>Describe your package requirements here</requirements>
+    <faq>Currently there are no FAQ items provided.</faq>
+	<name>checkmk</name>
+	<version>0.5</version>
+	<title>Check_mk Agent</title>
+	<include_file>/usr/local/pkg/checkmk.inc</include_file>
+	<additional_files_needed>
+		<prefix>/usr/local/pkg/</prefix>
+		<chmod>0755</chmod>
+		<item>https://packages.pfsense.org/packages/config/checkmk-agent/checkmk.inc</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/pkg/</prefix>
+		<chmod>0755</chmod>
+		<item>https://packages.pfsense.org/packages/config/checkmk-agent/checkmk_sync.xml</item>
+	</additional_files_needed>
+	<menu>
+		<name>Check_mk Agent</name>
+		<tooltiptext>checkmk</tooltiptext>
+		<section>Diagnostics</section>
+		<url>/pkg_edit.php?xml=checkmk.xml</url>
+	</menu>
+	<tabs>
+		<tab>
+			<text>Config</text>
+			<url>/pkg_edit.php?xml=checkmk.xml</url>
+			<active/>
+		</tab>
+		<tab>
+			<text>XMLRPC Sync</text>
+			<url>/pkg_edit.php?xml=checkmk_sync.xml</url>
+		</tab>
+	</tabs>
+
+	<fields>
+		<field>
+			<type>listtopic</type>
+			<fieldname>temp</fieldname>
+			<name>Check_mk agent configuration</name>
+		</field>
+		<field>
+			<fielddescr>Enable check_mk Agent</fielddescr>
+			<fieldname>checkmkenable</fieldname>
+			<type>checkbox</type>
+			<size>60</size>
+			<description><![CDATA[Enable check_mk Agent on this server. This will check all config options to run check_mk binary on your system.<br>
+						<strong>Reference:</strong><br>https://github.com/sileht/check_mk/tree/master/doc<br><br>
+						<strong>Latest check_mk version:</strong> fetch -o /usr/local/bin/check_mk_agent 'http://git.mathias-kettner.de/git/?p=check_mk.git;a=blob_plain;f=agents/check_mk_agent.freebsd;hb=HEAD']]></description>
+			<required/>
+		</field>
+		<field>
+			<fielddescr>Listen Port</fielddescr>
+			<fieldname>checkmkport</fieldname>
+			<type>input</type>
+			<size>10</size>
+			<description>Enter port to listen on. Leave empty to use Default prot 6556</description>
+			<required/>
+		</field>
+		<field>
+			<fielddescr>Hosts.allow</fielddescr>
+			<fieldname>checkmkhosts</fieldname>
+			<description>Enter hosts(comma separeted) that can communicate with this agent.</description>
+			<type>input</type>
+			<size>60</size>
+		</field>	
+	</fields>
+	<custom_php_install_command>
+		checkmk_install();
+	</custom_php_install_command>
+	<custom_php_command_before_form>
+	</custom_php_command_before_form>
+	<custom_php_validation_command>
+		checkmk_validate_input($_POST, &amp;$input_errors);
+	</custom_php_validation_command>
+	<custom_delete_php_command>
+		sync_package_checkmk();
+	</custom_delete_php_command>	
+	<custom_php_resync_config_command>
+		sync_package_checkmk();
+	</custom_php_resync_config_command>
+</packagegui>

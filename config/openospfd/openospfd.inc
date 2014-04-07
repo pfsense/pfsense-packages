@@ -26,6 +26,9 @@
 	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 	POSSIBILITY OF SUCH DAMAGE.
 */
+require_once("config.inc");
+require_once("functions.inc");
+require_once("service-utils.inc");
 
 function ospfd_display_friendlyiface () {
         global $evaledvar, $config, $g;
@@ -74,6 +77,8 @@ function ospfd_install_conf() {
 
 		if (is_array($ospfd_conf['row'])) {
 			foreach ($ospfd_conf['row'] as $redistr) {
+				if (empty($redistr['routevalue']))
+					continue;
 				if (isset($redistr['redistribute']))
 					$conffile .= "no ";
 				$conffile .= "redistribute {$redistr['routevalue']}\n";

@@ -90,47 +90,47 @@
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>077</chmod>
-		<item>http://www.pfsense.com/packages/config/snort/snort.inc</item>
+		<item>https://packages.pfsense.org/packages/config/snort/snort.inc</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/bin/</prefix>
 		<chmod>077</chmod>
-		<item>http://www.pfsense.com/packages/config/snort/bin/snort2c</item>
+		<item>https://packages.pfsense.org/packages/config/snort/bin/snort2c</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/www/</prefix>
 		<chmod>077</chmod>
-		<item>http://www.pfsense.com/packages/config/snort/snort_download_rules.php</item>
+		<item>https://packages.pfsense.org/packages/config/snort/snort_download_rules.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/www/</prefix>
 		<chmod>077</chmod>
-		<item>http://www.pfsense.com/packages/config/snort/snort_rulesets.php</item>
+		<item>https://packages.pfsense.org/packages/config/snort/snort_rulesets.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>077</chmod>
-		<item>http://www.pfsense.com/packages/config/snort/snort_whitelist.xml</item>
+		<item>https://packages.pfsense.org/packages/config/snort/snort_whitelist.xml</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/www/</prefix>
 		<chmod>077</chmod>
-		<item>http://www.pfsense.com/packages/config/snort/snort_blocked.php</item>
+		<item>https://packages.pfsense.org/packages/config/snort/snort_blocked.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>077</chmod>
-		<item>http://www.pfsense.com/packages/config/snort/snort_check_for_rule_updates.php</item>
+		<item>https://packages.pfsense.org/packages/config/snort/snort_check_for_rule_updates.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/www/</prefix>
 		<chmod>077</chmod>
-		<item>http://www.pfsense.com/packages/config/snort/snort_alerts.php</item>
+		<item>https://packages.pfsense.org/packages/config/snort/snort_alerts.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/pf/</prefix>
 		<chmod>077</chmod>
-		<item>http://www.pfsense.com/packages/config/snort/snort_dynamic_ip_reload.php</item>
+		<item>https://packages.pfsense.org/packages/config/snort/snort_dynamic_ip_reload.php</item>
 	</additional_files_needed>
 	<fields>
 		<field>

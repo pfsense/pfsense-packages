@@ -4,7 +4,8 @@
 /* ========================================================================== */
 /*
     package.xsl
-    part of pfSense (http://www.pfSense.com)
+    part of pfSense (https://www.pfsense.org)
+    Copyright (C) 2004-2014 Electric Sheep Fencing, LLC
     Copyright (C) 2007 Daniel S. Haischt <me@daniel.stefan.haischt.name>
     All rights reserved.
 
@@ -68,7 +69,6 @@
                 <meta name="DC.rights" content="All rights reserved" />
                 <meta http-equiv="Keywords" content="bsd license, altq, traffic shaping, packet, rule, Linux, OpenBSD, DragonFlyBSD, freebsd 5.3, vpn, stateful failover, carp, packet filter, m0n0wall, firewall" />
                 <style type="text/css">
-                    @import url('http://www.pfsense.com/assets/site/style.css');
                 </style>
                 <script type="text/javascript" language="utf-8">
                 //<![CDATA[
@@ -148,16 +148,14 @@
                 <table style="width: 802px; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="0" cellspacing="0">
                     <tbody>
                         <tr>
-                            <td style="background-image: url(http://www.pfsense.com/assets/images/header1.gif); width: 811px; text-align: left; vertical-align: bottom; background-color: transparent; height: 65px;"></td>
                         </tr>
                         <tr>
-                            <td style="background-image: url(http://www.pfsense.com/assets/images/header2.gif); height: 25px; width: 802px;">
                                 <font color="#ffffff"><span class="headers"></span></font>
                             </td>
                         </tr>
                         <tr>
                             <td>
-                                <table style="background-image: url(http://www.pfsense.com/assets/images/horizontal.gif); text-align: left; width: 802px;" border="0" cellpadding="0" cellspacing="0">
+                                <table style="text-align: left; width: 802px;" border="0" cellpadding="0" cellspacing="0">
                                     <tbody>
                                         <tr>
                                             <td style="width: 200px; text-align: center; vertical-align: top;">
@@ -168,7 +166,6 @@
                                                         </tr>
                                                         <tr style="padding: 0px; margin: 0px;">
                                                             <td height="100%" align="left" valign="top" class="navigation" style="padding: 0px; margin: 0px;">
-                                                                <img src="http://www.pfsense.com/manager/media/images/_tx_.gif" alt="" height="4" />
                                                                 <br />
                                                                 <a href='#' id="infoa" onclick="toggleContentItem('info-div');">Info</a>
                                                                 <a href='#' id="licensea" onclick="toggleContentItem('license-div');">License</a>
@@ -182,7 +179,6 @@
                                                                 <a href='#' id="rsynca" onclick="toggleContentItem('rsync-div');">custom_php_resync_config_command</a>
                                                                 <a href='#' id="installa" onclick="toggleContentItem('install-div');">custom_php_install_command</a>
                                                                 <a href='#' id="deinstalla" onclick="toggleContentItem('deinstall-div');">custom_php_deinstall_command</a>
-                                                                <img src="http://www.pfsense.com/manager/media/images/_tx_.gif" height="4" alt="" />
                                                             </td>
                                                         </tr>
                                                     </tbody>
@@ -300,11 +296,8 @@
                             </td>
                         </tr>
                         <tr style="color: rgb(255, 255, 255);">
-                            <td style="background-image: url(http://www.pfsense.com/assets/images/footer.gif); width: 802px; height: 60px; text-align: center; vertical-align: middle;">
-                                pfSense is (C) Copyright 2004, 2005, 2006 Scott Ullrich. All Rights Reserved.
+                                pfSense is Copyright 2004-2014 Electric Sheep Fencing LLC. All Rights Reserved.
                                 <br />
-                                MySQL: 0.0000 s, 0 request(s), PHP: 0.0052 s, total: 0.0052 s, document
-                                retrieved from cache.
                             </td>
                         </tr>
                     </tbody>

@@ -7,17 +7,17 @@
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>077</chmod>
-		<item>http://www.pfsense.com/packages/config/openospfd/openospfd.inc</item>
+		<item>https://packages.pfsense.org/packages/config/openospfd/openospfd.inc</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>077</chmod>
-		<item>http://www.pfsense.com/packages/config/openospfd/openospfd_interfaces.xml</item>
+		<item>https://packages.pfsense.org/packages/config/openospfd/openospfd_interfaces.xml</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/www/</prefix>
 		<chmod>077</chmod>
-		<item>http://www.pfsense.com/packages/config/openospfd/status_ospfd.php</item>
+		<item>https://packages.pfsense.org/packages/config/openospfd/status_ospfd.php</item>
 	</additional_files_needed>
 	<menu>
 		<name>OpenOSPFd</name>
@@ -45,6 +45,7 @@
 		<name>OpenOSPFd</name>
 		<rcfile>ospfd.sh</rcfile>
 		<executable>ospfd</executable>
+		<description>OpenBSD OSPF Daemon</description>
 	</service>
 	<fields>
 		<field>

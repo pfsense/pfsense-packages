@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE packagegui SYSTEM "./schema/packages.dtd">
+<?xml-stylesheet type="text/xsl" href="./xsl/package.xsl"?>
+<packagegui>
+        <copyright>
+        <![CDATA[
+/* $Id$ */
+/* ========================================================================== */
+/*
+    apache_mod_security_manipulation.xml
+	part of apache_mod_security package (http://www.pfSense.com)
+    Copyright (C) 2008, 2009, 2010 Scott Ullrich
+    Copyright (C) 2012 Marcello Coutinho
+    All rights reserved.
+                                                                              */
+/* ========================================================================== */
+/*
+    Redistribution and use in source and binary forms, with or without
+    modification, are permitted provided that the following conditions are met:
+
+     1. Redistributions of source code MUST retain the above copyright notice,
+        this list of conditions and the following disclaimer.
+
+     2. Redistributions in binary form MUST reproduce the above copyright
+        notice, this list of conditions and the following disclaimer in the
+        documentation and/or other materials provided with the distribution.
+
+    THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
+    INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+    AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+    AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+    OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+    INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+    POSSIBILITY OF SUCH DAMAGE.
+                                                                              */
+/* ========================================================================== */
+        ]]>
+        </copyright>
+	<name>apachemodsecuritymanipulation</name>
+	<version>1.0</version>
+	<title>Services: Mod_Security+Apache+Proxy: Settings</title>
+	<tabs>
+		<tab>
+			<text>Apache</text>
+			<url>/pkg_edit.php?xml=apache_settings.xml&amp;id=0</url>
+		</tab>
+		<tab>
+			<text>ModSecurity</text>
+			<url>/pkg_edit.php?xml=apache_mod_security_settings.xml</url>
+			<active/>			
+		</tab>
+		<tab>
+			<text>Sync</text>
+			<url>/pkg_edit.php?xml=apache_mod_security_sync.xml</url>
+		</tab>
+		<tab>
+			<text>Module options</text>
+			<url>/pkg_edit.php?xml=apache_mod_security_settings.xml</url>
+			<tab_level>2</tab_level>
+		</tab>
+		<tab>
+			<text>Rule Groups</text>
+			<url>/pkg.php?xml=apache_mod_security_groups.xml</url>
+			<tab_level>2</tab_level>
+		</tab>
+		<tab>
+			<text>Rule Manipulation</text>
+			<url>/pkg.php?xml=apache_mod_security_manipulation.xml</url>
+			<tab_level>2</tab_level>
+			<active/>
+		</tab>
+	</tabs>
+		<adddeleteeditpagefields>
+		<columnitem>
+			<fielddescr>Name</fielddescr>
+			<fieldname>name</fieldname>
+		</columnitem>
+		<columnitem>
+			<fielddescr>Description</fielddescr>
+			<fieldname>description</fieldname>
+		</columnitem>
+		<movable>on</movable>
+	</adddeleteeditpagefields>
+	<fields>
+		<field>
+			<name>Modsecurity group options</name>
+			<type>listtopic</type>
+		</field>
+		<field>
+			<fielddescr>Name</fielddescr>
+			<fieldname>name</fieldname>
+			<description>Enter group name</description>
+			<type>input</type>
+			<size>25</size>
+		</field>
+		<field>
+			<fielddescr>Description</fielddescr>
+			<fieldname>description</fieldname>
+			<description>Enter group description</description>
+			<type>input</type>
+			<size>45</size>
+		</field>
+			<field>
+			<fielddescr>
+				<![CDATA[Location(s)]]>
+			</fielddescr>
+			<fieldname>locations</fieldname>
+			<description><![CDATA[<br><strong>Rule Manipulation Samples:</strong><br><br>
+							SecRuleRemoveById 125<br>
+							SecRuleRemoveById 125-128<br>
+							SecRuleRemoveByMsg "Client error occurred"<br>
+							SecRuleUpdateActionById 125 pass<br>
+							SecRuleUpdateTargetsById 125 "!ARGS:username"]]></description>
+		    <type>rowhelper</type>
+		    <rowhelper>
+				<rowhelperfield>
+				    <fielddescr><![CDATA[Type]]></fielddescr>
+				    <fieldname>type</fieldname>
+				    <description><![CDATA[Select the type of change you want to apply on this group.]]></description>
+				   	<type>select</type>			
+					<options>
+			    	<option><name>Remove Rule By Id</name><value>SecRuleRemoveById</value></option>
+			    	<option><name>Remove Rule By Message</name><value>SecRuleRemoveByMsg</value></option>
+			    	<option><name>Update Action By Id</name><value>SecRuleUpdateActionById</value></option>
+			    	<option><name>Update Target By Id</name><value>SecRuleUpdateTargetsById</value></option>
+					</options>
+				</rowhelperfield>
+				<rowhelperfield>
+				    <fielddescr><![CDATA[Value]]></fielddescr>
+				    <fieldname>value</fieldname>
+				    <description><![CDATA[Input the change value you want to apply on selected action.]]></description>
+				    <type>input</type>
+				    <size>30</size>
+				</rowhelperfield>
+			</rowhelper>
+		</field>
+	</fields>
+	<custom_php_resync_config_command>
+		apache_mod_security_resync();
+	</custom_php_resync_config_command>
+	<include_file>/usr/local/pkg/apache_mod_security.inc</include_file>	
+</packagegui>

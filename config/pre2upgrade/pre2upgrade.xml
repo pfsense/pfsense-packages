@@ -41,7 +41,7 @@
 	<title>Diagnostics: Pre-2.0 Upgrade Check</title>
 	<additional_files_needed>
 		<prefix>/usr/local/www/</prefix>
-		<item>http://www.pfsense.com/packages/config/pre2upgrade/pre2upgrade.php</item>
+		<item>https://packages.pfsense.org/packages/config/pre2upgrade/pre2upgrade.php</item>
 	</additional_files_needed>
 	<menu>
 		<name>Pre-Upgrade Check</name>

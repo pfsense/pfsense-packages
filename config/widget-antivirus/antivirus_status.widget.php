@@ -2,7 +2,7 @@
 /*
         $Id: antivirus_statistics.widget.php 
         Copyright (C) 2010 Serg Dvoriancev <dv_serg@mail.ru>.
-        Part of pfSense widgets (www.pfsense.com)
+        Part of pfSense widgets (www.pfsense.org)
         originally based on m0n0wall (http://m0n0.ch/wall)
 
         Copyright (C) 2004-2005 T. Lechat <dev@lechat.org>, Manuel Kasper <mk@neon1.net>
@@ -36,7 +36,12 @@ require_once("pfsense-utils.inc");
 require_once("functions.inc");
 
 define('PATH_CLAMDB',   '/var/db/clamav');
-define('PATH_HAVPLOG',  '/var/log/havp/access.log');
+$pfSversion = str_replace("\s", "", file_get_contents("/etc/version"));
+if(preg_match("/^2.0/",$pfSversion))
+	define('PATH_HAVPLOG',  '/var/log/havp/access.log');
+else
+	define('PATH_HAVPLOG',  '/var/log/access.log');
+
 define('PATH_AVSTATUS', '/var/tmp/havp.status');
 
 

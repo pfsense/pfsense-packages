@@ -2,9 +2,12 @@
 include "rbfminc/config.php";
 //include "rbfminc/session.php";
 require_once('config.inc');
-	require("guiconfig.inc");
-	include("head.inc");
-	global $config;
+require("guiconfig.inc");
+
+$closehead = false;
+include("head.inc");
+
+global $config;
 if('ok' == 'ok'){
 	set_time_limit(1800); //30 min
 	include "rbfminc/functions.php";
@@ -155,28 +158,22 @@ if('ok' == 'ok'){
 		}
 		closedir($handle);
 	}else{
-		$error = "<h1 style='color:red' align='center'>Invalid directory</h1>";
+		$error = "<h1 style=\"color:red\" align=\"center\">Invalid directory</h1>";
 	}
 
-
 	$container .= "
-<table border=\"0\" cellspacing=\"1\" cellpadding=\"1\" class=\"list\" width=\"100%\">
+<table border=\"0\" cellspacing=\"1\" cellpadding=\"1\" class=\"list\" width=\"100%\" summary=\"file manager\">
 	<tr>
-		<th style='padding:0;width:18px'>&nbsp;</th>
+		<th style=\"padding:0;width:18px\">&nbsp;</th>
 		<th>Name</th>
-		<!--<th>&nbsp;</th>-->
-		<th>&nbsp;</th>
-		<th>&nbsp;</th>
-		<th>&nbsp;</th>
-		<th>&nbsp;</th>
-		<th>&nbsp;</th>
+		<th colspan=\"5\">&nbsp;</th>
 		<th>Ext.</th>
 		<th>Size</th>
 		<th>Date</th>
 		<th>Attributes</th>
 	</tr>
 	<tr>
-		<td style='padding:0;width:18px' title=\"UP one level\"><img width='16' height='16' src='rbfmimg/folder.png' alt='F'{$up_one_level} /></td>
+		<td style=\"padding:0;width:18px\" title=\"UP one level\"><img width=\"16\" height=\"16\" src=\"rbfmimg/folder.png\" alt=\"F\" {$up_one_level} /></td>
 		<td colspan=\"11\"><b title=\"UP one level\"{$up_one_level}>[..]</b></td>
 	</tr>
 ";
@@ -195,40 +192,40 @@ if('ok' == 'ok'){
 				$fileperms = GetFilePerms($current_folder.$v);
 
 				if($url_path){
-					$browser = "<a href='{$url_path}{$v}' target='_blank'><img src='rbfmimg/ico_open_as_web.png' border='0' width='16' height='16' alt='W' title='Open as web page' /></a>";
+					$browser = "<a href=\"{$url_path}{$v}\" target=\"_blank\"><img src=\"rbfmimg/ico_open_as_web.png\" border=\"0\" width=\"16\" height=\"16\" alt=\"W\" title=\"Open as web page\" /></a>";
 					if($url_field){
-						$use_url = "<img src='rbfmimg/ico_use_file.png' border='0' width='16' height='16' alt='U' title='Use URL ({$url_path}{$v})' onclick=\"window.opener.document.getElementById('{$url_field}').value='{$url_path}{$v}'; window.close()\" style='cursor: pointer' />";
+						$use_url = "<img src=\"rbfmimg/ico_use_file.png\" border=\"0\" width=\"16\" height=\"16\" alt=\"U\" title=\"Use URL ({$url_path}{$v})\" onclick=\"window.opener.document.getElementById('{$url_field}').value='{$url_path}{$v}'; window.close()\" style=\"cursor: pointer\" />";
 					}else{
-						$use_url = "<img src='rbfmimg/ico_use_file_inactive.png' border='0' width='16' height='16' alt='U' title='Use URL (Inactive!!!)' />";
+						$use_url = "<img src=\"rbfmimg/ico_use_file_inactive.png\" border=\"0\" width=\"16\" height=\"16\" alt=\"U\" title=\"Use URL (Inactive!!!)\" />";
 					}
 				}else{
 					$browser = "&nbsp;";
-					$use_url = "<img src='rbfmimg/ico_use_file_inactive.png' border='0' width='16' height='16' alt='U' title='Use URL (Inactive!!!)' />";
+					$use_url = "<img src=\"rbfmimg/ico_use_file_inactive.png\" border=\"0\" width=\"16\" height=\"16\" alt=\"U\" title=\"Use URL (Inactive!!!)\" />";
 				}
 
 
 				$container .= "
 			<tr>
-				<td style='padding:0;width:18px'>
-					<img width='16' height='16'
-						src='rbfmimg/folder.png'
-						alt='Folder'
+				<td style=\"padding:0;width:18px\">
+					<img width=\"16\" height=\"16\"
+						src=\"rbfmimg/folder.png\"
+						alt=\"Folder\"
 						ondblclick=\"document.location='{$_SERVER['PHP_SELF']}?p=".urlencode($current_folder.$vf)."'\"
 					/>
 				</td>
 				<td>
 					
-					<div style='padding-top:2px;'
-						id='f{$id}'
+					<div style=\"padding-top:2px;\"
+						id=\"f{$id}\"
 						ondblclick=\"document.location='{$_SERVER['PHP_SELF']}?p=".urlencode($current_folder.$vf)."'\"
 					>
 						{$v}
 					</div>
 					
 					<form 
-						class='rename_field'
-						id='r{$id}'
-						name=\"form{$id}\"
+						class=\"rename_field\"
+						id=\"r{$id}\"
+						name=\"r{$id}\"
 						method=\"post\"
 						action=\"rbfminc/rename.php\"
 						target=\"results\"
@@ -239,11 +236,11 @@ if('ok' == 'ok'){
 					>
 						
 						<input 
-							class='input_name rename_input'
+							class=\"input_name rename_input\"
 							name=\"n\"
-							type='text'
-							value='{$v}'
-							id='rf{$id}'
+							type=\"text\"
+							value=\"{$v}\"
+							id=\"rf{$id}\"
 							onblur=\"
 								document.form{$id}.submit();
 								document.getElementById('f{$id}').style.display = 'block';
@@ -256,16 +253,16 @@ if('ok' == 'ok'){
 						<input name=\"cf\" type=\"hidden\" value=\"{$current_folder}\" />
 						<input name=\"o\" type=\"hidden\" value=\"{$v}\" />
 						<input name=\"t\" type=\"hidden\" value=\"d\" />
-						<input name=\"submitS\" type=\"submit\" value=\"submitS\" style='display: none; width:0;height:0' onsubmit=\"this.n.blur(); return false\" />
+						<input name=\"submitS\" type=\"submit\" value=\"submitS\" style='display: none; width:0;height:0' />
 					</form>
 				</td>
 				<!--<td>{$use_url}</td>-->
 				<td>{$browser}</td>
 				<td>&nbsp;</td>
 				<td>
-					<img width='16' height='16'
-						src='rbfmimg/ico_rename.png'
-						alt='Rename' title='Rename'
+					<img width=\"16\" height=\"16\"
+						src=\"rbfmimg/ico_rename.png\"
+						alt=\"Rename\" title=\"Rename\"
 						onclick=\"
 							document.getElementById('r{$id}').style.display = 'block';
 							document.getElementById('f{$id}').style.display = 'none';
@@ -276,25 +273,25 @@ if('ok' == 'ok'){
 				</td>
 				<td>&nbsp;</td>
 				<td>
-					<img width='16' height='16'
-						src='rbfmimg/ico_delete.png'
-						alt='D'
-						title='Delete'
+					<img width=\"16\" height=\"16\"
+						src=\"rbfmimg/ico_delete.png\"
+						alt=\"D\"
+						title=\"Delete\"
 						onclick=\"
 							if(
-								confirm('Delete folder &quot;{$v}&quot;?') &&
-								confirm('You cannot undo this operation!!!') &&
+								confirm('Delete folder &quot;{$v}&quot;?') &amp;&amp;
+								confirm('You cannot undo this operation!!!') &amp;&amp;
 								confirm('To delete this folder &quot;{$v}&quot; press OK\\nTo cancel this operation press CANCEL')
 							){
-								document.location = 'file_manager.php?p=".urlencode($current_folder)."&do=delete&file=".urlencode($v)."&type=directory'
+								document.location = 'file_manager.php?p=".urlencode($current_folder)."&amp;do=delete&amp;file=".urlencode($v)."&amp;type=directory'
 							}
 						\"
 					/>
 				</td>
-				<td class='srow'>&nbsp;</td>
+				<td class=\"srow\">&nbsp;</td>
 				<td><b>&lt;DIR&gt;</b></td>
-				<td class='srow'>{$last_updated_time}</td>
-				<td class='fileperms'>{$fileperms}</td>
+				<td class=\"srow\">{$last_updated_time}</td>
+				<td class=\"fileperms\">{$fileperms}</td>
 			</tr>
 			";
 				$id++;
@@ -349,7 +346,7 @@ if('ok' == 'ok'){
 				$extension == 'css' or
 				$extension == 'CSS'
 				){
-					$edit_file_content = "<a href='file_manager.php?p=".urlencode($current_folder)."&f=".urlencode($v)."&do=edit#file_edit'><img width='16' height='16' src='rbfmimg/ico_script_edit.png' alt='Edit' title='View/Edit' border='0' /></a>";
+					$edit_file_content = "<a href=\"file_manager.php?p=".urlencode($current_folder)."&amp;f=".urlencode($v)."&amp;do=edit#file_edit\"><img width=\"16\" height=\"16\" src=\"rbfmimg/ico_script_edit.png\" alt=\"Edit\" title=\"View/Edit\" border=\"0\" /></a>";
 				}else{
 					$edit_file_content = "&nbsp;";
 				}
@@ -357,35 +354,35 @@ if('ok' == 'ok'){
 				$fileperms = GetFilePerms($current_folder.$v);
 
 				if($url_path){
-					$browser = "<a href='{$url_path}{$v}' target='_blank'><img src='rbfmimg/ico_open_as_web.png' border='0' width='16' height='16' alt='W' title='Open as web page' /></a>";
+					$browser = "<a href=\"{$url_path}{$v}\" target=\"_blank\"><img src=\"rbfmimg/ico_open_as_web.png\" border=\"0\" width=\"16\" height=\"16\" alt=\"W\" title=\"Open as web page\" /></a>";
 					if($url_field){
-						$use_url = "<img src='rbfmimg/ico_use_file.png' border='0' width='16' height='16' alt='U' title='Use URL ({$url_path}{$v})' onclick=\"window.opener.document.getElementById('{$url_field}').value='{$url_path}{$v}'; window.close()\" style='cursor: pointer' />";
+						$use_url = "<img src=\"rbfmimg/ico_use_file.png\" border=\"0\" width=\"16\" height=\"16\" alt=\"U\" title=\"Use URL ({$url_path}{$v})\" onclick=\"window.opener.document.getElementById('{$url_field}').value='{$url_path}{$v}'; window.close()\" style=\"cursor: pointer\" />";
 					}else{
-						$use_url = "<img src='rbfmimg/ico_use_file_inactive.png' border='0' width='16' height='16' alt='U' title='Use URL (Inactive!!!)' />";
+						$use_url = "<img src=\"rbfmimg/ico_use_file_inactive.png\" border=\"0\" width=\"16\" height=\"16\" alt=\"U\" title=\"Use URL (Inactive!!!)\" />";
 					}
 				}else{
 					$browser = "&nbsp;";
-					$use_url = "<img src='rbfmimg/ico_use_file_inactive.png' border='0' width='16' height='16' alt='U' title='Use URL (Inactive!!!)' />";
+					$use_url = "<img src=\"rbfmimg/ico_use_file_inactive.png\" border=\"0\" width=\"16\" height=\"16\" alt=\"U\" title=\"Use URL (Inactive!!!)\" />";
 				}
 
 
 				$container .= "
 			<tr>
-				<td style='padding:0;width:18px'>
-					<img width='16' height='16' src='rbfmimg/{$file_image}' alt='File' ondblclick=\"document.location = 'rbfminc/download.php?p=".urlencode($current_folder)."&file_name=".urlencode($v)."'\" />
+				<td style=\"padding:0;width:18px\">
+					<img width=\"16\" height=\"16\" src=\"rbfmimg/{$file_image}\" alt=\"File\" ondblclick=\"document.location = 'rbfminc/download.php?p=".urlencode($current_folder)."&amp;file_name=".urlencode($v)."'\" />
 				</td>
 				<td>
-					<div style='padding-top:2px;'
-						id='f{$id}'
-						ondblclick=\"document.location = 'rbfminc/download.php?p=".urlencode($current_folder)."&file_name=".urlencode($v)."'\"
+					<div style=\"padding-top:2px;\"
+						id=\"f{$id}\"
+						ondblclick=\"document.location = 'rbfminc/download.php?p=".urlencode($current_folder)."&amp;file_name=".urlencode($v)."'\"
 					>
 						{$v}
 					</div>
 					
 					<form
-						class='rename_field'
-						id='r{$id}'
-						name=\"form{$id}\"
+						class=\"rename_field\"
+						id=\"r{$id}\"
+						name=\"r{$id}\"
 						method=\"post\"
 						action=\"rbfminc/rename.php\"
 						target=\"results\"
@@ -395,11 +392,11 @@ if('ok' == 'ok'){
 						<input name=\"o\" type=\"hidden\" value=\"{$v}\" />
 						<input name=\"t\" type=\"hidden\" value=\"f\" />
 						<input
-							class='input_name'
+							class=\"input_name\"
 							name=\"n\"
-							type='text'
-							value='{$v}'
-							id='rf{$id}'
+							type=\"text\"
+							value=\"{$v}\"
+							id=\"rf{$id}\"
 							onblur=\"
 								document.form{$id}.submit();
 								document.getElementById('f{$id}').style.display = 'block';
@@ -408,24 +405,24 @@ if('ok' == 'ok'){
 								document.form{$id}.o.value = this.value;
 							\"
 						/>
-						<input name=\"submitS\" type=\"submit\" value=\"submitS\" style='display: none; width:0;height:0' onsubmit=\"this.n.blur(); return false\" />
+						<input name=\"submitS\" type=\"submit\" value=\"submitS\" style=\"display: none; width:0;height:0\" />
 					</form>
 				</td>
 				<!--<td>{$use_url}</td>-->
 				<td>{$browser}</td>
 				<td>
-					<a href='rbfminc/download.php?p=".urlencode($current_folder)."&file_name=".urlencode($v)."'><img width='16' height='16'
-						src='rbfmimg/ico_download.png'
-						alt='Download'
-						title='Download'
-						border='0'
+					<a href=\"rbfminc/download.php?p=".urlencode($current_folder)."&amp;file_name=".urlencode($v)."\"><img width=\"16\" height=\"16\"
+						src=\"rbfmimg/ico_download.png\"
+						alt=\"Download\"
+						title=\"Download\"
+						border=\"0\"
 					/></a>
 				</td>
 				<td>
-					<img width='16' height='16'
-						src='rbfmimg/ico_rename.png'
-						alt='Rename'
-						title='Rename'
+					<img width=\"16\" height=\"16\"
+						src=\"rbfmimg/ico_rename.png\"
+						alt=\"Rename\"
+						title=\"Rename\"
 						onclick=\"document.getElementById('f{$id}').style.display = 'none';
 						document.getElementById('r{$id}').style.display = 'block';
 						document.getElementById('rf{$id}').focus();
@@ -434,25 +431,25 @@ if('ok' == 'ok'){
 				</td>
 				<td>{$edit_file_content}</td>
 				<td>
-					<img width='16' height='16'
-						src='rbfmimg/ico_delete.png'
-						alt='D'
-						title='Delete'
+					<img width=\"16\" height=\"16\"
+						src=\"rbfmimg/ico_delete.png\"
+						alt=\"D\"
+						title=\"Delete\"
 						onclick=\"
 							if(
-								confirm('Delete file &quot;{$v}&quot;?') &&
-								confirm('You cannot undo this operation!!!') &&
+								confirm('Delete file &quot;{$v}&quot;?') &amp;&amp;
+								confirm('You cannot undo this operation!!!') &amp;&amp;
 								confirm('To delete this file &quot;{$v}&quot; press OK\\nTo cancel this operation press CANCEL')
 							){
-								document.location = 'file_manager.php?p=".urlencode($current_folder)."&do=delete&file=".urlencode($v)."&type=file'
+								document.location = 'file_manager.php?p=".urlencode($current_folder)."&amp;do=delete&amp;file=".urlencode($v)."&amp;type=file'
 							}
 						\"
 					/>
 				</td>
-				<td class='srow'>{$extension}</td>
+				<td class=\"srow\">{$extension}</td>
 				<td>{$file_size}</td>
-				<td class='srow'>{$last_updated_time}</td>
-				<td class='fileperms'>{$fileperms}</td>
+				<td class=\"srow\">{$last_updated_time}</td>
+				<td class=\"fileperms\">{$fileperms}</td>
 			</tr>
 			";
 				$id++;
@@ -466,28 +463,24 @@ if('ok' == 'ok'){
 
 ?>
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
-
-<head>
-<?php include("fbegin.inc"); ?>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<title>File editor</title>
-
 <link href="rbfminc/file_editor_style.css" rel="stylesheet" type="text/css" />
-
 </head>
+
 <body>
+
+
+<?php include("fbegin.inc"); ?>
+
 <?php echo $security_issues; ?>
 <div class="file_editor">
 	<div class="header">
 		
 	</div>
 	<form id="path" name="path" method="get" action="" class="path">
-		<input type="text" name="p" id="location" value="<?php echo $current_folder; ?>" />
-		<img src="rbfmimg/go.png" name="go" width="35" height="18" id="go" alt="go" title="go" />
+		<input name="p" type="text" id="location" value="<?php echo $current_folder; ?>" />
+		<input name="go" type="image" id="go" value="Go" src="rbfmimg/go.png" style="width:35;height:18" />
 	</form>
-	<div class="url_path">URL path: <a href='<?php echo $url_path; ?>' target="_blank"><?php echo $url_path; ?></a></div>
+	<div class="url_path"><br />URL path: <a href="/<?php echo $url_path; ?>" target="_blank"><?php echo $url_path; ?></a></div>
 	<div class="container"> <?php echo $container; ?> <?php echo $error; ?> </div>
 	<form action="" method="post" enctype="multipart/form-data" name="form_upload" id="form_upload" class="form_upload">
 		Upload a file in current folder:
@@ -498,26 +491,26 @@ if('ok' == 'ok'){
 		<input type="submit" name="upload" id="upload" value="Upload" />
 		<input name="upload_file" type="hidden" id="upload_file" value="upload_file" />
 	</form>
-	<form action="" method="post" enctype="multipart/form-data" name="form_upload" id="form_upload" class="form_upload">
-		Create new folder here; &nbsp; Folder name:
-		<input name="folder_name" type="text" style="width:290px" />
+	<form action="" method="post" enctype="multipart/form-data" name="form_create" id="form_create" class="form_create">
+		&nbsp;&nbsp;&nbsp;&nbsp;Create new folder here;&nbsp;Folder name:
+		<input name="folder_name" type="text" style="width:290" />
 		<input type="submit" name="create_folder" id="create_folder" value="Create folder" />
 	</form>
-	<iframe name="results", frameborder="0" scrolling="auto" class='results'></iframe>
-	<div align="center" style="margin-top:5px"> [ <img src="rbfmimg/ico_open_as_web.png" width="16" height="16" align="middle" /> OPEN IN BROWSER ] &nbsp; &nbsp; 
-		[ <img src="rbfmimg/ico_download.png" width="16" height="16" align="middle" /> DOWNLOAD ] &nbsp; &nbsp; 
-		[ <img src="rbfmimg/ico_rename.png" width="16" height="16" align="middle" /> RENAME ] &nbsp; &nbsp; 
-		[ <img src="rbfmimg/ico_script_edit.png" width="16" height="16" align="middle" /> VIEW/EDIT ] &nbsp; &nbsp; 
-		[ <img src="rbfmimg/ico_delete.png" width="16" height="16" align="middle" /> DELETE ] </div>
+	<iframe name="results" frameborder="0" scrolling="auto" class='results'></iframe>
+	<div align="center" style="margin-top:5px"> [ <img src="rbfmimg/ico_open_as_web.png" width="16" height="16" align="middle" alt="open" /> OPEN IN BROWSER ] &nbsp; &nbsp; 
+		[ <img src="rbfmimg/ico_download.png" width="16" height="16" align="middle" alt="download" /> DOWNLOAD ] &nbsp; &nbsp; 
+		[ <img src="rbfmimg/ico_rename.png" width="16" height="16" align="middle" alt="rename" /> RENAME ] &nbsp; &nbsp; 
+		[ <img src="rbfmimg/ico_script_edit.png" width="16" height="16" align="middle" alt="view" /> VIEW/EDIT ] &nbsp; &nbsp; 
+		[ <img src="rbfmimg/ico_delete.png" width="16" height="16" align="middle" alt="delete" /> DELETE ] </div>
 	<?php
 	if($_GET['do'] == 'edit'){
 
 		$file_content = file_get_contents($current_folder.$_GET['f']);
 		echo "
 <form id=\"form_edit\" name=\"form_edit\" method=\"post\" action=\"\" style='width: 670px;margin: 10px auto 0;border-top: 1px #999999 solid'>
-	<a name='file_edit'></a>
+	<a name=\"file_edit\"></a>
 	File: <b>{$current_folder}{$_GET['f']}</b><br />
-	<textarea name=\"file_content\" id=\"file_content\" cols=\"\" rows=\"\" style='width: 99%; height: 400px'>".htmlentities ($file_content)."</textarea><br />
+	<textarea name=\"file_content\" id=\"file_content\" cols=\"1\" rows=\"1\" style=\"width: 99%; height: 400px\">".htmlentities ($file_content)."</textarea><br />
 	<input name=\"save\" type=\"submit\" value=\"Save\" />
 	<input name=\"close\" type=\"button\" value=\"Close file editor\" onclick=\"document.location = 'file_manager.php?f=".urlencode($current_folder)."'\" />
 	<input name=\"save_file\" type=\"hidden\" value=\"save_file\" />
@@ -532,15 +525,19 @@ if('ok' == 'ok'){
 <?php
 if($alert_info){
 	echo "
-<script language=\"javascript\">
+<script type=\"text/javascript\">
+//<![CDATA[
 	alert('{$alert_info}');
+//]]>
 </script>
 	";
 }
 if($redirect){
 	echo "
-<script language=\"javascript\">
+<script type=\"text/javascript\">
+//<![CDATA[
 	document.location = '{$redirect}';
+//]]>
 </script>
 	";
 }
@@ -551,12 +548,14 @@ if($redirect){
 <?php
 }else{
 ?>
-<html xmlns="http://www.w3.org/1999/xhtml">
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <title>Login</title>
 <style type="text/css">
-<!--
+/*<![CDATA[*/
 body,td,th,input {
 	font-family: Arial, Helvetica, sans-serif;
 	font-size: 12px;
@@ -564,13 +563,13 @@ body,td,th,input {
 body {
 	background-color: #EEEEEE;
 }
--->
+/*]]>*/
 </style></head>
 <body><br /><br /><br /><br />
 <div class="login">
 	<div style="color:red" align="center"><?php echo $error_message; ?></div>
 	<form id="login_form" name="login_form" method="post" action="">
-		<table border="0" align="center" cellpadding="4" cellspacing="0" bgcolor="#FFFFFF" style="border:1px solid #999999; padding:10px">
+		<table border="0" align="center" cellpadding="4" cellspacing="0" bgcolor="#FFFFFF" style="border:1px solid #999999; padding:10px" summary="login">
 			<tr>
 				<td align="right">Username:</td>
 				<td><input type="text" name="username" id="username" class="login_input" style="width:230px" /></td>

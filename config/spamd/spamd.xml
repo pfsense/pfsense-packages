@@ -42,7 +42,7 @@
     <requirements>Describe your package requirements here</requirements>
     <faq>Currently there are no FAQ items provided.</faq>
 	<name>spamdsources</name>
-	<version>4.2</version>
+	<version>4.9.1 v1.1</version>
 	<title>SpamD: External Sources</title>
 	<include_file>/usr/local/pkg/spamd.inc</include_file>
 	<backup_file>/var/db/spamd</backup_file>
@@ -56,6 +56,7 @@
                 <name>spamd</name>
                 <rcfile>spamd.sh</rcfile>
                 <executable>spamd</executable>
+		<description>SPAMD Greylisting Daemon</description>
         </service>
 	<tabs>
 		<tab>
@@ -96,42 +97,42 @@
     	<additional_files_needed>
 	    <prefix>/usr/local/www/</prefix>
 	    <chmod>0755</chmod>
-	    <item>http://www.pfsense.com/packages/config/spamd/spamd_rules.php</item>
+	    <item>https://packages.pfsense.org/packages/config/spamd/spamd_rules.php</item>
 	</additional_files_needed>
     	<additional_files_needed>
 	    <prefix>/usr/local/pkg/</prefix>
 	    <chmod>0755</chmod>
-	    <item>http://www.pfsense.com/packages/config/spamd/spamd_whitelist.xml</item>
+	    <item>https://packages.pfsense.org/packages/config/spamd/spamd_whitelist.xml</item>
 	</additional_files_needed>
     	<additional_files_needed>
 	    <prefix>/usr/local/pkg/</prefix>
 	    <chmod>0755</chmod>
-	    <item>http://www.pfsense.com/packages/config/spamd/spamd_outlook.xml</item>
+	    <item>https://packages.pfsense.org/packages/config/spamd/spamd_outlook.xml</item>
 	</additional_files_needed>
     	<additional_files_needed>
 	    <prefix>/usr/local/pkg/</prefix>
 	    <chmod>0755</chmod>
-	    <item>http://www.pfsense.com/packages/config/spamd/spamd.inc</item>
+	    <item>https://packages.pfsense.org/packages/config/spamd/spamd.inc</item>
 	</additional_files_needed>
     	<additional_files_needed>
 	    <prefix>/usr/local/pkg/</prefix>
 	    <chmod>0755</chmod>
-	    <item>http://www.pfsense.com/packages/config/spamd/spamd_settings.xml</item>
+	    <item>https://packages.pfsense.org/packages/config/spamd/spamd_settings.xml</item>
 	</additional_files_needed>
     <additional_files_needed>
 	    <prefix>/usr/local/www/</prefix>
 	    <chmod>0755</chmod>
-	    <item>http://www.pfsense.com/packages/config/spamd/spamd_db.php</item>
+	    <item>https://packages.pfsense.org/packages/config/spamd/spamd_db.php</item>
 	</additional_files_needed>
     <additional_files_needed>
 	    <prefix>/usr/local/www/</prefix>
 	    <chmod>0755</chmod>
-	    <item>http://www.pfsense.com/packages/config/spamd/spamd_db_ext.php</item>
+	    <item>https://packages.pfsense.org/packages/config/spamd/spamd_db_ext.php</item>
 	</additional_files_needed>
     <additional_files_needed>
 	    <prefix>/usr/local/bin/</prefix>
 	    <chmod>0755</chmod>
-	    <item>http://www.pfsense.com/packages/config/spamd/spamd_gather_stats.php</item>
+	    <item>https://packages.pfsense.org/packages/config/spamd/spamd_gather_stats.php</item>
 	</additional_files_needed>	
 
 	<!-- fields gets invoked when the user adds or edits a item.   the following items

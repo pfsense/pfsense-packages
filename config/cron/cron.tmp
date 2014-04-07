@@ -44,29 +44,29 @@ if ($_GET['act'] == "del") {
     }
 }
 
+$pgtitle = array(gettext("Cron"),gettext("Settings"));
 include("head.inc");
 
 ?>
 
-
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">
 <?php include("fbegin.inc"); ?>
-<p class="pgtitle">Cron: Settings</p>
 
 <div id="mainlevel">
-<table width="100%" border="0" cellpadding="0" cellspacing="0">
+<table width="100%" border="0" cellpadding="0" cellspacing="0" summary="tabs">
 <tr><td class="tabnavtbl">
 <?php
 			
 	$tab_array = array();
 	$tab_array[] = array(gettext("Settings"), true, "/packages/cron/cron.php");
+	$tab_array[] = array(gettext("Edit"), false, "/packages/cron/cron_edit.php");
  	display_top_tabs($tab_array);
  	
 ?>
 </td></tr>
 </table>
 
-<table width="100%" border="0" cellpadding="0" cellspacing="0">
+<table width="100%" border="0" cellpadding="0" cellspacing="0" summary="content">
    <tr>
      <td class="tabcont" >
 
@@ -85,7 +85,7 @@ if ($config_change == 1) {
 //endif; 
 
 ?>
-  	<table width="100%" border="0" cellpadding="6" cellspacing="0">              
+  	<table width="100%" border="0" cellpadding="6" cellspacing="0" summary="title">              
       <tr>
         <td><p><!--<span class="vexpl"><span class="red"><strong>Cron<br></strong></span>-->
             Cron controls the scheduling of commands.
@@ -96,7 +96,7 @@ if ($config_change == 1) {
     </table>
     <br />
     
-    <table width="100%" border="0" cellpadding="0" cellspacing="0">
+    <table width="100%" border="0" cellpadding="0" cellspacing="0" summary="heading">
     <tr>
       <td width="5%" class="listhdrr">minute</td>
       <td width="5%" class="listhdrr">hour</td>
@@ -107,10 +107,10 @@ if ($config_change == 1) {
       <td width="60%" class="listhdr">command</td>
       <td width="10%" class="list">
 
-        <table border="0" cellspacing="0" cellpadding="1">
+        <table border="0" cellspacing="0" cellpadding="1" summary="icons">
           <tr>
             <td width="17"></td>
-            <td valign="middle"><a href="cron_edit.php"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif" width="17" height="17" border="0"></a></td>
+            <td valign="middle"><a href="cron_edit.php"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif" width="17" height="17" border="0" alt="edit" /></a></td>
           </tr>
         </table>
 
@@ -149,11 +149,11 @@ if ($config_change == 1) {
             <td class="listr" ondblclick="document.location='cron_edit.php?id=<?=$i;?>';">
               <?=$ent['command'];?>&nbsp;
             </td>
-            <td valign="middle" nowrap class="list">
-              <table border="0" cellspacing="0" cellpadding="1">
+            <td valign="middle" style="white-space:nowrap" class="list">
+              <table border="0" cellspacing="0" cellpadding="1" summary="edit delete">
                 <tr>
-                  <td valign="middle"><a href="cron_edit.php?id=<?=$i;?>"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_e.gif" width="17" height="17" border="0"></a></td>
-                  <td><a href="cron_edit.php?type=php&act=del&id=<?=$i;?>" onclick="return confirm('Do you really want to delete this?')"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_x.gif" width="17" height="17" border="0"></a></td>
+                  <td valign="middle"><a href="cron_edit.php?id=<?=$i;?>"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_e.gif" width="17" height="17" border="0" alt="edit" /></a></td>
+                  <td><a href="cron_edit.php?type=php&amp;act=del&amp;id=<?=$i;?>" onclick="return confirm('Do you really want to delete this?')"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_x.gif" width="17" height="17" border="0" alt="delete" /></a></td>
                 </tr>
              </table>
             </td>
@@ -168,10 +168,10 @@ if ($config_change == 1) {
     <tr>
       <td class="list" colspan="7"></td>
       <td class="list">          
-        <table border="0" cellspacing="0" cellpadding="1">
+        <table border="0" cellspacing="0" cellpadding="1" summary="add">
           <tr>
             <td width="17"></td>
-            <td valign="middle"><a href="cron_edit.php"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif" width="17" height="17" border="0"></a></td>
+            <td valign="middle"><a href="cron_edit.php"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif" width="17" height="17" border="0" alt="add" /></a></td>
           </tr>
         </table>
 		  </td>
@@ -187,14 +187,14 @@ if ($config_change == 1) {
 </form>
 
 
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
 
 </td>
 </tr>

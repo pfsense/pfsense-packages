@@ -98,7 +98,7 @@
     	<additional_files_needed>
 	    <prefix>/usr/local/www/</prefix>
 	    <chmod>0755</chmod>
-	    <item>http://www.pfsense.com/packages/config/pfstat.php</item>
+	    <item>https://packages.pfsense.org/packages/config/pfstat.php</item>
 	</additional_files_needed>	
 	<!-- modify system will modify a file and make sure the text needed to run the
          package is in place.  The following example edits /etc/crontab and adds the

@@ -10,9 +10,9 @@
 	<version>1.0</version>
 	<title>Vnstat2</title>
 	<aftersaveredirect>/pkg_edit.php?xml=vnstat2.xml&amp;id=0</aftersaveredirect>
-	<include_file>/usr/local/pkg/vnstat2.inc</include_file>
+	<include_file>/usr/local/pkg/vnstat2/vnstat2.inc</include_file>
 	<menu>
-		<name>vnstat2</name>
+		<name>Vnstat2</name>
 		<tooltiptext></tooltiptext>
 		<section>Status</section>
 		<url>/pkg_edit.php?xml=vnstat2.xml&amp;id=0</url>
@@ -41,49 +41,159 @@
 		</tab>
 	</tabs>
 	<additional_files_needed>
-		<prefix>/usr/local/pkg/</prefix>
+		<prefix>/usr/local/pkg/vnstat2/</prefix>
 		<chmod>0644</chmod>
-		<item>http://www.pfsense.com/packages/config/vnstat2/vnstat2.inc</item>
+		<item>https://packages.pfsense.org/packages/config/vnstat2/vnstat2.inc</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0644</chmod>
-		<item>http://www.pfsense.com/packages/config/vnstat2/bin/vnstat_php_frontend-1.4.1.tar.gz</item>
+		<item>https://packages.pfsense.org/packages/config/vnstat2/vnstati.xml</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0644</chmod>
-		<item>http://www.pfsense.com/packages/config/vnstat2/vnstati.xml</item>
+		<item>https://packages.pfsense.org/packages/config/vnstat2/vnstatoutput.xml</item>
 	</additional_files_needed>
 	<additional_files_needed>
-		<prefix>/usr/local/pkg/</prefix>
+		<prefix>/usr/local/pkg/vnstat2/</prefix>
 		<chmod>0744</chmod>
-		<item>http://www.pfsense.com/packages/config/vnstat2/vnstat2.sh</item>
+		<item>https://packages.pfsense.org/packages/config/vnstat2/vnstat2.sh</item>
 	</additional_files_needed>
 	<additional_files_needed>
-		<prefix>/usr/local/pkg/</prefix>
+		<prefix>/usr/local/www/</prefix>
 		<chmod>0644</chmod>
-		<item>http://www.pfsense.com/packages/config/vnstat2/vnstatoutput.xml</item>
+		<item>https://packages.pfsense.org/packages/config/vnstat2/www/diag_vnstat.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
-		<prefix>/usr/local/pkg/</prefix>
+		<prefix>/usr/local/www/</prefix>
 		<chmod>0644</chmod>
-		<item>http://www.pfsense.com/packages/config/vnstat2/bin/diag_vnstat.abc</item>
+		<item>https://packages.pfsense.org/packages/config/vnstat2/www/diag_vnstat2.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
-		<prefix>/usr/local/pkg/</prefix>
+		<prefix>/usr/local/www/</prefix>
 		<chmod>0644</chmod>
-		<item>http://www.pfsense.com/packages/config/vnstat2/bin/diag_vnstat2.abc</item>
+		<item>https://packages.pfsense.org/packages/config/vnstat2/www/vnstat2_img.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
-		<prefix>/usr/local/pkg/</prefix>
+		<prefix>/usr/local/www/</prefix>
 		<chmod>0644</chmod>
-		<item>http://www.pfsense.com/packages/config/vnstat2/bin/vnstat2_img.abc</item>
+		<item>https://packages.pfsense.org/packages/config/vnstat2/www/vnstati.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
-		<prefix>/usr/local/pkg/</prefix>
+		<prefix>/usr/local/pkg/vnstat2/vnstat_php_frontend/lang/</prefix>
 		<chmod>0644</chmod>
-		<item>http://www.pfsense.com/packages/config/vnstat2/bin/vnstati.abc</item>
+		<item>https://packages.pfsense.org/packages/config/vnstat2/vnstat_php_frontend/lang/cs.php</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/pkg/vnstat2/vnstat_php_frontend/lang/</prefix>
+		<chmod>0644</chmod>
+		<item>https://packages.pfsense.org/packages/config/vnstat2/vnstat_php_frontend/lang/en.php</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/pkg/vnstat2/vnstat_php_frontend/lang/</prefix>
+		<chmod>0644</chmod>
+		<item>https://packages.pfsense.org/packages/config/vnstat2/vnstat_php_frontend/lang/nl.php</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/pkg/vnstat2/vnstat_php_frontend/themes/dark/</prefix>
+		<chmod>0644</chmod>
+		<item>https://packages.pfsense.org/packages/config/vnstat2/vnstat_php_frontend/themes/dark/style.css</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/pkg/vnstat2/vnstat_php_frontend/themes/dark/</prefix>
+		<chmod>0644</chmod>
+		<item>https://packages.pfsense.org/packages/config/vnstat2/vnstat_php_frontend/themes/dark/theme.php</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/pkg/vnstat2/vnstat_php_frontend/themes/espresso/</prefix>
+		<chmod>0644</chmod>
+		<item>https://packages.pfsense.org/packages/config/vnstat2/vnstat_php_frontend/themes/espresso/style.css</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/pkg/vnstat2/vnstat_php_frontend/themes/espresso/</prefix>
+		<chmod>0644</chmod>
+		<item>https://packages.pfsense.org/packages/config/vnstat2/vnstat_php_frontend/themes/espresso/theme.php</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/pkg/vnstat2/vnstat_php_frontend/themes/light/</prefix>
+		<chmod>0644</chmod>
+		<item>https://packages.pfsense.org/packages/config/vnstat2/vnstat_php_frontend/themes/light/style.css</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/pkg/vnstat2/vnstat_php_frontend/themes/light/</prefix>
+		<chmod>0644</chmod>
+		<item>https://packages.pfsense.org/packages/config/vnstat2/vnstat_php_frontend/themes/light/theme.php</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/pkg/vnstat2/vnstat_php_frontend/themes/pfSense/</prefix>
+		<chmod>0644</chmod>
+		<item>https://packages.pfsense.org/packages/config/vnstat2/vnstat_php_frontend/themes/pfSense/style.css</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/pkg/vnstat2/vnstat_php_frontend/themes/pfSense/</prefix>
+		<chmod>0644</chmod>
+		<item>https://packages.pfsense.org/packages/config/vnstat2/vnstat_php_frontend/themes/pfSense/theme.php</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/pkg/vnstat2/vnstat_php_frontend/themes/red/</prefix>
+		<chmod>0644</chmod>
+		<item>https://packages.pfsense.org/packages/config/vnstat2/vnstat_php_frontend/themes/red/style.css</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/pkg/vnstat2/vnstat_php_frontend/themes/red/</prefix>
+		<chmod>0644</chmod>
+		<item>https://packages.pfsense.org/packages/config/vnstat2/vnstat_php_frontend/themes/red/theme.php</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/pkg/vnstat2/vnstat_php_frontend/</prefix>
+		<chmod>0644</chmod>
+		<item>https://packages.pfsense.org/packages/config/vnstat2/vnstat_php_frontend/config.php</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/pkg/vnstat2/vnstat_php_frontend/</prefix>
+		<chmod>0644</chmod>
+		<item>https://packages.pfsense.org/packages/config/vnstat2/vnstat_php_frontend/COPYING</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/pkg/vnstat2/vnstat_php_frontend/</prefix>
+		<chmod>0644</chmod>
+		<item>https://packages.pfsense.org/packages/config/vnstat2/vnstat_php_frontend/graph.php</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/pkg/vnstat2/vnstat_php_frontend/</prefix>
+		<chmod>0644</chmod>
+		<item>https://packages.pfsense.org/packages/config/vnstat2/vnstat_php_frontend/graph_svg.php</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/pkg/vnstat2/vnstat_php_frontend/</prefix>
+		<chmod>0644</chmod>
+		<item>https://packages.pfsense.org/packages/config/vnstat2/vnstat_php_frontend/index.php</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/pkg/vnstat2/vnstat_php_frontend/</prefix>
+		<chmod>0644</chmod>
+		<item>https://packages.pfsense.org/packages/config/vnstat2/vnstat_php_frontend/localize.php</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/pkg/vnstat2/vnstat_php_frontend/</prefix>
+		<chmod>0644</chmod>
+		<item>https://packages.pfsense.org/packages/config/vnstat2/vnstat_php_frontend/README</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/pkg/vnstat2/vnstat_php_frontend/</prefix>
+		<chmod>0644</chmod>
+		<item>https://packages.pfsense.org/packages/config/vnstat2/vnstat_php_frontend/vera_copyright.txt</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/pkg/vnstat2/vnstat_php_frontend/</prefix>
+		<chmod>0644</chmod>
+		<item>https://packages.pfsense.org/packages/config/vnstat2/vnstat_php_frontend/VeraBd.ttf</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/pkg/vnstat2/vnstat_php_frontend/</prefix>
+		<chmod>0644</chmod>
+		<item>https://packages.pfsense.org/packages/config/vnstat2/vnstat_php_frontend/vnstat.php</item>
 	</additional_files_needed>
 	<fields>
 		<field>
@@ -136,3 +246,4 @@
 	<custom_php_install_command>vnstat_install_config();</custom_php_install_command>
 	<custom_php_deinstall_command>vnstat_install_deinstall();</custom_php_deinstall_command>
 </packagegui>
+

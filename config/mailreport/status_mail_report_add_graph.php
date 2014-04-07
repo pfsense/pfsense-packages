@@ -1,9 +1,9 @@
 <?php
 /* $Id$ */
 /*
-	status_rrd_graph.php
+	status_mail_report_add_graph.php
 	Part of pfSense
-	Copyright (C) 2011 Jim Pingle <jimp@pfsense.org>
+	Copyright (C) 2011-2014 Jim Pingle <jimp@pfsense.org>
 	Portions Copyright (C) 2007-2011 Seth Mos <seth.mos@dds.nl>
 	All rights reserved.
 
@@ -33,10 +33,10 @@
 */
 
 ##|+PRIV
-##|*IDENT=page-status-rrdgraphs
-##|*NAME=Status: RRD Graphs page
-##|*DESCR=Allow access to the 'Status: RRD Graphs' page.
-##|*MATCH=status_rrd_graph.php*
+##|*IDENT=page-status-mailreportsaddgraph
+##|*NAME=Status: Email Reports: Add Graph page
+##|*DESCR=Allow access to the 'Status: Email Reports: Add Graph' page.
+##|*MATCH=status_mail_report_add_graph.php*
 ##|-PRIV
 
 require("guiconfig.inc");
@@ -50,13 +50,8 @@ if(! isset($config['rrd']['enable'])) {
 	header("Location: status_rrd_graph_settings.php");
 }
 
-$reportid = $_GET['reportid'];
-if (isset($_POST['reportid']))
-	$reportid = $_POST['reportid'];
-
-$id = $_GET['id'];
-if (isset($_POST['id']))
-	$id = $_POST['id'];
+$reportid = $_REQUEST['reportid'];
+$id = $_REQUEST['id'];
 
 if (!is_array($config['mailreports']['schedule']))
 	$config['mailreports']['schedule'] = array();
@@ -65,7 +60,7 @@ $a_mailreports = &$config['mailreports']['schedule'];
 
 if (!isset($reportid) || !isset($a_mailreports[$reportid])) {
 	header("Location: status_mail_report.php");
-	exit;
+	return;
 }
 
 if (!is_array($a_mailreports[$reportid]['row']))
@@ -80,7 +75,7 @@ if (isset($id) && $a_graphs[$id]) {
 
 if (isset($id) && !($a_graphs[$id])) {
 	header("Location: status_mail_report_edit.php?id={$reportid}");
-	exit;
+	return;
 }
 
 
@@ -159,11 +154,11 @@ if ($_POST) {
 
 	write_config();
 	header("Location: status_mail_report_edit.php?id={$reportid}");
-	exit;
+	return;
 }
 
 
-$pgtitle = array(gettext("Status"),gettext("Add Mail Report Graph"));
+$pgtitle = array(gettext("Status"),gettext("Add Email Report Graph"));
 include("head.inc");
 ?>
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">

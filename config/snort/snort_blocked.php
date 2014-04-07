@@ -1,38 +1,41 @@
 <?php
-/* $Id$ */
 /*
- snort_blocked.php
- Copyright (C) 2006 Scott Ullrich
- All rights reserved.
-
- Modified for the Pfsense snort package v. 1.8+
- Copyright (C) 2009 Robert Zelaya Sr. Developer
-
- Redistribution and use in source and binary forms, with or without
- modification, are permitted provided that the following conditions are met:
-
- 1. Redistributions of source code must retain the above copyright notice,
- this list of conditions and the following disclaimer.
-
- 2. Redistributions in binary form must reproduce the above copyright
- notice, this list of conditions and the following disclaimer in the
- documentation and/or other materials provided with the distribution.
-
- THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
- INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
- AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
- AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
- OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
- SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
- INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
- CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- POSSIBILITY OF SUCH DAMAGE.
+ * snort_blocked.php
+ *
+ * Copyright (C) 2006 Scott Ullrich
+ * All rights reserved.
+ *
+ * Modified for the Pfsense snort package v. 1.8+
+ * Copyright (C) 2009 Robert Zelaya Sr. Developer
+ * Copyright (C) 2014 Bill Meeks
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright notice,
+ * this list of conditions and the following disclaimer.
+ *
+ * 2. Redistributions in binary form must reproduce the above copyright
+ * notice, this list of conditions and the following disclaimer in the
+ * documentation and/or other materials provided with the distribution.
+ *
+ * THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
+ * INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+ * AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+ * AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+ * OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
  */
 
 require_once("guiconfig.inc");
-require_once("/usr/local/pkg/snort/snort_gui.inc");
 require_once("/usr/local/pkg/snort/snort.inc");
+
+// Grab pfSense version so we can refer to it later on this page
+$pfs_version=substr(trim(file_get_contents("/etc/version")),0,3);
 
 if (!is_array($config['installedpackages']['snortglobal']['alertsblocks']))
 	$config['installedpackages']['snortglobal']['alertsblocks'] = array();
@@ -40,385 +43,275 @@ if (!is_array($config['installedpackages']['snortglobal']['alertsblocks']))
 $pconfig['brefresh'] = $config['installedpackages']['snortglobal']['alertsblocks']['brefresh'];
 $pconfig['blertnumber'] = $config['installedpackages']['snortglobal']['alertsblocks']['blertnumber'];
 
-if ($pconfig['blertnumber'] == '' || $pconfig['blertnumber'] == '0')
-{
+if (empty($pconfig['blertnumber']))
 	$bnentries = '500';
-}else{
+else
 	$bnentries = $pconfig['blertnumber'];
-}
 
-if($_POST['todelete'] or $_GET['todelete']) {
+if ($_POST['todelete'] || $_GET['todelete']) {
+	$ip = "";
 	if($_POST['todelete'])
 		$ip = $_POST['todelete'];
-	if($_GET['todelete'])
+	else if($_GET['todelete'])
 		$ip = $_GET['todelete'];
-	exec("/sbin/pfctl -t snort2c -T delete {$ip}");
+	if (is_ipaddr($ip))
+		exec("/sbin/pfctl -t snort2c -T delete {$ip}");
 }
 
 if ($_POST['remove']) {
 	exec("/sbin/pfctl -t snort2c -T flush");
-	sleep(1);
 	header("Location: /snort/snort_blocked.php");
 	exit;
-
 }
 
 /* TODO: build a file with block ip and disc */
 if ($_POST['download'])
 {
-
-	ob_start(); //important or other posts will fail
-	$save_date = exec('/bin/date "+%Y-%m-%d-%H-%M-%S"');
-	$file_name = "snort_blocked_{$save_date}.tar.gz";
-	exec('/bin/mkdir /tmp/snort_blocked');
-	exec('/sbin/pfctl -t snort2c -T show > /tmp/snort_block.pf');
-
-	$blocked_ips_array_save = str_replace('   ', '', array_filter(explode("\n", file_get_contents('/tmp/snort_block.pf'))));
-
-	if ($blocked_ips_array_save[0] != '') {
-		/* build the list */
+	$blocked_ips_array_save = "";
+	exec('/sbin/pfctl -t snort2c -T show', $blocked_ips_array_save);
+	/* build the list */
+	if (is_array($blocked_ips_array_save) && count($blocked_ips_array_save) > 0) {
+		$save_date = exec('/bin/date "+%Y-%m-%d-%H-%M-%S"');
+		$file_name = "snort_blocked_{$save_date}.tar.gz";
+		exec('/bin/mkdir -p /tmp/snort_blocked');
 		file_put_contents("/tmp/snort_blocked/snort_block.pf", "");
-		foreach($blocked_ips_array_save as $counter => $fileline3)
-			file_put_contents("/tmp/snort_blocked/snort_block.pf", "{$fileline3}\n", FILE_APPEND);
-	}
+		foreach($blocked_ips_array_save as $counter => $fileline) {
+			if (empty($fileline))
+				continue;
+			$fileline = trim($fileline, " \n\t");
+			file_put_contents("/tmp/snort_blocked/snort_block.pf", "{$fileline}\n", FILE_APPEND);
+		}
 
-	exec("/usr/bin/tar cfz /tmp/snort_blocked_{$save_date}.tar.gz /tmp/snort_blocked");
+		// Create a tar gzip archive of blocked host IP addresses
+		exec("/usr/bin/tar -czf /tmp/{$file_name} -C/tmp/snort_blocked snort_block.pf");
 
-	if(file_exists("/tmp/snort_blocked_{$save_date}.tar.gz")) {
-		$file = "/tmp/snort_blocked_{$save_date}.tar.gz";
-		header("Expires: Mon, 26 Jul 1997 05:00:00 GMT\n");
-		header("Pragma: private"); // needed for IE
-		header("Cache-Control: private, must-revalidate"); // needed for IE
-		header('Content-type: application/force-download');
-		header('Content-Transfer-Encoding: Binary');
-		header("Content-length: ".filesize($file));
-		header("Content-disposition: attachment; filename = {$file_name}");
-		readfile("$file");
-		exec("/bin/rm /tmp/snort_blocked_{$save_date}.tar.gz");
-		exec("/bin/rm /tmp/snort_block.pf");
-		exec("/bin/rm /tmp/snort_blocked/snort_block.pf");
-		od_end_clean(); //importanr or other post will fail
+		// If we successfully created the archive, send it to the browser.
+		if(file_exists("/tmp/{$file_name}")) {
+			ob_start(); //important or other posts will fail
+			if (isset($_SERVER['HTTPS'])) {
+				header('Pragma: ');
+				header('Cache-Control: ');
+			} else {
+				header("Pragma: private");
+				header("Cache-Control: private, must-revalidate");
+			}
+			header("Content-Type: application/octet-stream");
+			header("Content-length: " . filesize("/tmp/{$file_name}"));
+			header("Content-disposition: attachment; filename = {$file_name}");
+			ob_end_clean(); //important or other post will fail
+			readfile("/tmp/{$file_name}");
+
+			// Clean up the temp files and directory
+			@unlink("/tmp/{$file_name}");
+			exec("/bin/rm -fr /tmp/snort_blocked");
+		} else
+			$savemsg = gettext("An error occurred while creating archive");
 	} else
-		echo 'Error no saved file.';
-
+		$savemsg = gettext("No content on snort block list");
 }
 
 if ($_POST['save'])
 {
-
-	/* input validation */
-	if ($_POST['save'])
-	{
-
-
-	}
-
 	/* no errors */
-	if (!$input_errors)
-	{
+	if (!$input_errors) {
 		$config['installedpackages']['snortglobal']['alertsblocks']['brefresh'] = $_POST['brefresh'] ? 'on' : 'off';
 		$config['installedpackages']['snortglobal']['alertsblocks']['blertnumber'] = $_POST['blertnumber'];
 
 		write_config();
 
 		header("Location: /snort/snort_blocked.php");
-
+		exit;
 	}
 
 }
 
-/* build filter funcs */
-function get_snort_alert_ip_src($fileline)
-{
-	/* SRC IP */
-	$re1='.*?';   # Non-greedy match on filler
-	$re2='((?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?))(?![\\d])'; # IPv4 IP Address 1
-
-	if ($c=preg_match_all ("/".$re1.$re2."/is", $fileline, $matches4))
-		$alert_ip_src = $matches4[1][0];
-
-	return $alert_ip_src;
-}
-
-function get_snort_alert_disc($fileline)
-{
-	/* disc */
-	if (preg_match("/\[\*\*\] (\[.*\]) (.*) (\[\*\*\])/", $fileline, $matches))
-		$alert_disc =  "$matches[2]";
-
-	return $alert_disc;
-}
-
-/* build sec filters */
-function get_snort_block_ip($fileline)
-{
-	/* ip */
-	if (preg_match("/\[\d+\.\d+\.\d+\.\d+\]/", $fileline, $matches))
-		$alert_block_ip =  "$matches[0]";
-
-	return $alert_block_ip;
-}
-
-function get_snort_block_disc($fileline)
-{
-	/* disc */
-	if (preg_match("/\]\s\[.+\]$/", $fileline, $matches))
-		$alert_block_disc =  "$matches[0]";
-
-	return $alert_block_disc;
-}
-
-/* tell the user what settings they have */
-$blockedtab_msg_chk = $config['installedpackages']['snortglobal']['rm_blocked'];
-if ($blockedtab_msg_chk == "1h_b") {
-	$blocked_msg = "hour";
-}
-if ($blockedtab_msg_chk == "3h_b") {
-	$blocked_msg = "3 hours";
-}
-if ($blockedtab_msg_chk == "6h_b") {
-	$blocked_msg = "6 hours";
-}
-if ($blockedtab_msg_chk == "12h_b") {
-	$blocked_msg = "12 hours";
-}
-if ($blockedtab_msg_chk == "1d_b") {
-	$blocked_msg = "day";
-}
-if ($blockedtab_msg_chk == "4d_b") {
-	$blocked_msg = "4 days";
-}
-if ($blockedtab_msg_chk == "7d_b") {
-	$blocked_msg = "7 days";
-}
-if ($blockedtab_msg_chk == "28d_b") {
-	$blocked_msg = "28 days";
-}
-
-if ($blockedtab_msg_chk != "never_b")
-{
-	$blocked_msg_txt = "Hosts are removed every <strong>$blocked_msg</strong>.";
-}else{
-	$blocked_msg_txt = "Settings are set to never <strong>remove</strong> hosts.";
-}
-
-$pgtitle = "Services: Snort Blocked Hosts";
+$pgtitle = gettext("Snort: Blocked Hosts");
 include_once("head.inc");
 
 ?>
 
 <body link="#000000" vlink="#000000" alink="#000000">
+<script src="/javascript/filter_log.js" type="text/javascript"></script>
 
 <?php
 
 include_once("fbegin.inc");
-echo $snort_general_css;
 
 /* refresh every 60 secs */
 if ($pconfig['brefresh'] == 'on')
 	echo "<meta http-equiv=\"refresh\" content=\"60;url=/snort/snort_blocked.php\" />\n";
 ?>
 
-<div class="body2"><?if($pfsense_stable == 'yes'){echo '<p class="pgtitle">' . $pgtitle . '</p>';}?>
+<?if($pfsense_stable == 'yes'){echo '<p class="pgtitle">' . $pgtitle . '</p>';}?>
 
 <?php if ($savemsg) print_info_box($savemsg); ?>
-<table width="99%" border="0" cellpadding="0" cellspacing="0">
-<tr><td>
-<?php
-        $tab_array = array();
-        $tab_array[0] = array(gettext("Snort Interfaces"), false, "/snort/snort_interfaces.php");
-        $tab_array[1] = array(gettext("Global Settings"), false, "/snort/snort_interfaces_global.php");
-        $tab_array[2] = array(gettext("Updates"), false, "/snort/snort_download_updates.php");
-        $tab_array[3] = array(gettext("Alerts"), false, "/snort/snort_alerts.php");
-        $tab_array[4] = array(gettext("Blocked"), true, "/snort/snort_blocked.php");
-        $tab_array[5] = array(gettext("Whitelists"), false, "/snort/snort_interfaces_whitelist.php");
-        $tab_array[6] = array(gettext("Suppress"), false, "/snort/snort_interfaces_suppress.php");
-        $tab_array[7] = array(gettext("Help"), false, "/snort/help_and_info.php");
-        display_top_tabs($tab_array);
-?>
-</td></tr>
-	<tr>
-		<td>
-		<div id="mainarea2">
-
-		<table id="maintable" class="tabcont" width="100%" border="0"
-			cellpadding="0" cellspacing="0">
+<form action="/snort/snort_blocked.php" method="post">
+<table width="100%" border="0" cellpadding="0" cellspacing="0">
+<tr>
+	<td>
+		<?php
+		$tab_array = array();
+		$tab_array[0] = array(gettext("Snort Interfaces"), false, "/snort/snort_interfaces.php");
+		$tab_array[1] = array(gettext("Global Settings"), false, "/snort/snort_interfaces_global.php");
+		$tab_array[2] = array(gettext("Updates"), false, "/snort/snort_download_updates.php");
+		$tab_array[3] = array(gettext("Alerts"), false, "/snort/snort_alerts.php");
+		$tab_array[4] = array(gettext("Blocked"), true, "/snort/snort_blocked.php");
+		$tab_array[5] = array(gettext("Whitelists"), false, "/snort/snort_interfaces_whitelist.php");
+		$tab_array[6] = array(gettext("Suppress"), false, "/snort/snort_interfaces_suppress.php");
+	        $tab_array[7] = array(gettext("Sync"), false, "/pkg_edit.php?xml=snort/snort_sync.xml");
+		display_top_tabs($tab_array);
+		?>
+	</td>
+</tr>
+<tr>
+	<td><div id="mainarea">
+		<table id="maintable" class="tabcont" width="100%" border="0" cellpadding="6" cellspacing="0">
 			<tr>
-				<td width="22%" colspan="0" class="listtopic">Last <?=$bnentries;?>
-				Blocked.</td>
-				<td width="78%" class="listtopic">This page lists hosts that have
-				been blocked by Snort.&nbsp;&nbsp;<?=$blocked_msg_txt;?></td>
+				<td colspan="2" class="listtopic"><?php echo gettext("Blocked Hosts Log View Settings"); ?></td>
 			</tr>
 			<tr>
-				<td width="22%" class="vncell">Save or Remove Hosts</td>
+				<td width="22%" class="vncell"><?php echo gettext("Save or Remove Hosts"); ?></td>
 				<td width="78%" class="vtable">
-				<form action="/snort/snort_blocked.php" method="post"><input
-					name="download" type="submit" class="formbtn" value="Download"> All
-				blocked hosts will be saved. <input name="remove" type="submit"
-					class="formbtn" value="Clear"> <span class="red"><strong>Warning:</strong></span>
-				all hosts will be removed.</form>
+					<input name="download" type="submit" class="formbtns" value="Download"> <?php echo gettext("All " .
+				"blocked hosts will be saved."); ?>&nbsp;&nbsp;<input name="remove" type="submit"
+					class="formbtns" value="Clear">&nbsp;<span class="red"><strong><?php echo gettext("Warning:"); ?></strong></span>
+				<?php echo gettext("all hosts will be removed."); ?>
 				</td>
 			</tr>
 			<tr>
-				<td width="22%" class="vncell">Auto Refresh and Log View</td>
+				<td width="22%" class="vncell"><?php echo gettext("Auto Refresh and Log View"); ?></td>
 				<td width="78%" class="vtable">
-				<form action="/snort/snort_blocked.php" method="post"><input
-					name="save" type="submit" class="formbtn" value="Save"> Refresh <input
+					<input name="save" type="submit" class="formbtns" value="Save"> <?php echo gettext("Refresh"); ?> <input
 					name="brefresh" type="checkbox" value="on"
 					<?php if ($config['installedpackages']['snortglobal']['alertsblocks']['brefresh']=="on" || $config['installedpackages']['snortglobal']['alertsblocks']['brefresh']=='') echo "checked"; ?>>
-				<strong>Default</strong> is <strong>ON</strong>. <input
-					name="blertnumber" type="text" class="formfld" id="blertnumber"
-					size="5" value="<?=htmlspecialchars($bnentries);?>"> Enter the
-				number of blocked entries to view. <strong>Default</strong> is <strong>500</strong>.
-				</form>
+				<?php printf(gettext("%sDefault%s is %sON%s."), '<strong>', '</strong>', '<strong>', '</strong>'); ?>&nbsp;&nbsp;<input
+					name="blertnumber" type="text" class="formfld unknown" id="blertnumber"
+					size="5" value="<?=htmlspecialchars($bnentries);?>"> <?php printf(gettext("Enter the " .
+				"number of blocked entries to view. %sDefault%s is %s500%s."), '<strong>', '</strong>', '<strong>', '</strong>'); ?>
 				</td>
 			</tr>
-		</table>
-		</div>
-		<br>
-		</td>
-	</tr>
-
-	<table class="tabcont" width="100%" border="0" cellspacing="0"
-		cellpadding="0">
-		<tr>
-			<td>
-			<table id="sortabletable1" class="sortable" width="100%" border="0"
-				cellpadding="0" cellspacing="0">
-				<tr id="frheader">
-					<td width="5%" class="listhdrr">Remove</td>
-					<td class="listhdrr">#</td>
-					<td class="listhdrr">IP</td>
-					<td class="listhdrr">Alert Description</td>
-				</tr>
-				<?php
-
-				/* set the arrays */
-				exec('/sbin/pfctl -t snort2c -T show > /tmp/snort_block.cache');
-				$alerts_array = array_reverse(array_filter(explode("\n\n", file_get_contents('/var/log/snort/alert'))));
-				$blocked_ips_array = str_replace('   ', '', array_filter(explode("\n", file_get_contents('/tmp/snort_block.cache'))));
-
-				$logent = $bnentries;
-
-				if ($blocked_ips_array[0] != '' && $alerts_array[0] != '')
-				{
-
-					/* build the list and compare blocks to alerts */
-					$counter = 0;
-					foreach($alerts_array as $fileline)
-					{
-
-						$counter++;
-
-						$alert_ip_src =  get_snort_alert_ip_src($fileline);
-						$alert_ip_disc = get_snort_alert_disc($fileline);
-						$alert_ip_src_array[] = get_snort_alert_ip_src($fileline);
-
-						if (in_array("$alert_ip_src", $blocked_ips_array))
-							$input[] = "[$alert_ip_src] " . "[$alert_ip_disc]\n";
-					}
-
-					foreach($blocked_ips_array as $alert_block_ip)
-					{
-
-						if (!in_array($alert_block_ip, $alert_ip_src_array))
-						{
-							$input[] = "[$alert_block_ip] " . "[N\A]\n";
-						}
-					}
-
-					/* reduce double occurrences */
-					$result = array_unique($input);
-
-					/* buil final list, preg_match, buld html */
-					$counter2 = 0;
-
-					foreach($result as $fileline2)
-					{
-						if($logent <= $counter2)
+			<tr>
+				<td colspan="2" class="listtopic"><?php printf(gettext("Last %s Hosts Blocked by Snort"), $bnentries); ?></td>
+			</tr>
+			<tr>
+				<td colspan="2">
+				<table id="sortabletable1" style="table-layout: fixed;" class="sortable" width="100%" border="0" cellpadding="2" cellspacing="0">
+					<colgroup>
+						<col width="5%" align="center" axis="number">
+						<col width="15%" align="center" axis="string">
+						<col width="70%" align="left" axis="string">
+						<col width="10%" align="center">
+					</colgroup>
+					<thead>
+					   <tr>
+						<th class="listhdrr" axis="number">#</th>
+						<th class="listhdrr" axis="string"><?php echo gettext("IP"); ?></th>
+						<th class="listhdrr" axis="string"><?php echo gettext("Alert Description"); ?></th>
+						<th class="listhdrr"><?php echo gettext("Remove"); ?></th>
+					   </tr>
+					</thead>
+				<tbody>
+			<?php
+			/* set the arrays */
+			$blocked_ips_array = array();
+			if (is_array($blocked_ips)) {
+				foreach ($blocked_ips as $blocked_ip) {
+					if (empty($blocked_ip))
 						continue;
-
-						$counter2++;
-
-						$alert_block_ip_str =  get_snort_block_ip($fileline2);
-
-						if($alert_block_ip_str != '')
-						{
-							$alert_block_ip_match = array('[',']');
-							$alert_block_ip = str_replace($alert_block_ip_match, '', "$alert_block_ip_str");
-						}else{
-							$alert_block_ip = 'empty';
-						}
-
-						$alert_block_disc_str = get_snort_block_disc($fileline2);
-
-						if($alert_block_disc_str != '')
-						{
-							$alert_block_disc_match = array('] [',']');
-							$alert_block_disc = str_replace($alert_block_disc_match, '', "$alert_block_disc_str");
-						}else{
-							$alert_block_disc = 'empty';
-						}
-
-						/* use one echo to do the magic*/
-						echo "<tr>
-			<td align=\"center\" valign=\"top\"'><a href='snort_blocked.php?todelete=" . trim(urlencode($alert_block_ip)) . "'>
-			<img title=\"Delete\" border=\"0\" name='todelete' id='todelete' alt=\"Delete\" src=\"../themes/{$g['theme']}/images/icons/icon_x.gif\"></a></td>
-			<td>&nbsp;{$counter2}</td>
-			<td>&nbsp;{$alert_block_ip}</td>
-			<td>&nbsp;{$alert_block_disc}</td>
-			</tr>\n";
-
-					}
-
-				}else{
-
-					/* if alerts file is empty and blocked table is not empty */
-					$counter2 = 0;
-
-					foreach($blocked_ips_array as $alert_block_ip)
-					{
-						if($logent <= $counter2)
-							continue;
-
-						$counter2++;
-
-						$alert_block_disc = 'N/A';
-
-						/* use one echo to do the magic*/
-						echo "<tr>
-			<td align=\"center\" valign=\"top\"'><a href='snort_blocked.php?todelete=" . trim(urlencode($alert_block_ip)) . "'>
-			<img title=\"Delete\" border=\"0\" name='todelete' id='todelete' alt=\"Delete\" src=\"../themes/{$g['theme']}/images/icons/icon_x.gif\"></a></td>
-			<td>&nbsp;{$counter2}</td>
-			<td>&nbsp;{$alert_block_ip}</td>
-			<td>&nbsp;{$alert_block_disc}</td>
-			</tr>\n";		
-					}
+					$blocked_ips_array[] = trim($blocked_ip, " \n\t");
 				}
+			}
+		$blocked_ips_array = snort_get_blocked_ips();
+		if (!empty($blocked_ips_array)) {
+			$tmpblocked = array_flip($blocked_ips_array);
+			$src_ip_list = array();
+			foreach (glob("/var/log/snort/*/alert") as $alertfile) {
+				$fd = fopen($alertfile, "r");
+				if ($fd) {
+					/*                 0         1           2      3      4    5    6    7      8     9    10    11             12
+					/* File format timestamp,sig_generator,sig_id,sig_rev,msg,proto,src,srcport,dst,dstport,id,classification,priority */
+					while (($fields = fgetcsv($fd, 1000, ',', '"')) !== FALSE) {
+						if(count($fields) < 11)
+							continue;
+					
+						if (isset($tmpblocked[$fields[6]])) {
+							if (!is_array($src_ip_list[$fields[6]]))
+								$src_ip_list[$fields[6]] = array();
+							$src_ip_list[$fields[6]][$fields[4]] = "{$fields[4]} - " . substr($fields[0], 0, -8);
+						}
+						if (isset($tmpblocked[$fields[8]])) {
+							if (!is_array($src_ip_list[$fields[8]]))
+								$src_ip_list[$fields[8]] = array();
+							$src_ip_list[$fields[8]][$fields[4]] = "{$fields[4]} - " . substr($fields[0], 0, -8);
+						}
+					}
+					fclose($fd);
+				}
+			}
 
-				echo '</table>' . "\n";
+			foreach($blocked_ips_array as $blocked_ip) {
+				if (is_ipaddr($blocked_ip) && !isset($src_ip_list[$blocked_ip]))
+					$src_ip_list[$blocked_ip] = array("N\A\n");
+			}
 
-				if (empty($blocked_ips_array[0]))
-					echo "\n<tr><td colspan='3' align=\"center\" valign=\"top\"><br><strong>There are currently no items being blocked by snort.</strong></td></tr>";
+			/* build final list, preg_match, build html */
+			$counter = 0;
+			foreach($src_ip_list as $blocked_ip => $blocked_msg) {
+				$blocked_desc = implode("<br/>", $blocked_msg);
+				if($counter > $bnentries)
+					break;
 				else
-					echo "\n<tr><td colspan='3' align=\"center\" valign=\"top\">{$counter2} items listed.</td></tr>";
+					$counter++;
 
-				?>
-				</td>
-				</tr>
-			</table>
+				/* Add zero-width space as soft-break opportunity after each colon if we have an IPv6 address */
+				$tmp_ip = str_replace(":", ":&#8203;", $blocked_ip);
+				/* Add reverse DNS lookup icons (two different links if pfSense version supports them) */
+				$rdns_link = "";
+				if ($pfs_version > 2.0) {
+					$rdns_link .= "<a onclick=\"javascript:getURL('/diag_dns.php?host={$blocked_ip}&dialog_output=true', outputrule);\">";
+					$rdns_link .= "<img src='../themes/{$g['theme']}/images/icons/icon_log_d.gif' width='11' height='11' border='0' ";
+					$rdns_link .= "title='" . gettext("Resolve host via reverse DNS lookup (quick pop-up)") . "' style=\"cursor: pointer;\"></a>&nbsp;";
+				}
+				$rdns_link .= "<a href='/diag_dns.php?host={$blocked_ip}'>";
+				$rdns_link .= "<img src='../themes/{$g['theme']}/images/icons/icon_log.gif' width='11' height='11' border='0' ";
+				$rdns_link .= "title='" . gettext("Resolve host via reverse DNS lookup") . "'></a>";
+				/* use one echo to do the magic*/
+					echo "<tr>
+						<td align=\"center\" valign=\"middle\" class=\"listr\">{$counter}</td>
+						<td align=\"center\" valign=\"middle\" class=\"listr\">{$tmp_ip}<br/>{$rdns_link}</td>
+						<td valign=\"middle\" class=\"listr\">{$blocked_desc}</td>
+						<td align=\"center\" valign=\"middle\" class=\"listr\"><a href='snort_blocked.php?todelete=" . trim(urlencode($blocked_ip)) . "'>
+						<img title=\"" . gettext("Delete host from Blocked Table") . "\" border=\"0\" name='todelete' id='todelete' alt=\"Delete host from Blocked Table\" src=\"../themes/{$g['theme']}/images/icons/icon_x.gif\"></a></td>
+					</tr>\n";
+			}
+		}
+		?>
+					</tbody>
+				</table>
+			</td>
+		</tr>
+		<tr>
+			<td colspan="2" class="vexpl" align="center">
+			<?php	if (!empty($blocked_ips_array)) {
+					if ($counter > 1)
+						echo "{$counter}" . gettext(" host IP addresses are currently being blocked.");
+					else
+						echo "{$counter}" . gettext(" host IP address is currently being blocked.");
+				}
+				else {
+					echo gettext("There are currently no hosts being blocked by Snort.");
+				}
+			?>
 			</td>
 		</tr>
 	</table>
 	</div>
-
-	<?php
-
-	include("fend.inc");
-
-echo $snort_custom_rnd_box;
-
+	</td>
+</tr>
+</table>
+</form>
+<?php
+include("fend.inc");
 ?>
-
 </body>
 </html>

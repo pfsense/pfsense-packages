@@ -57,7 +57,7 @@
 	<additional_files_needed>
 	    <prefix>/usr/local/etc/rc.d/</prefix>
 	    <chmod>0777</chmod>
-		<item>http://www.pfsense.org/packages/config/quagga/quagga.sh</item>
+		<item>https://packages.pfsense.org/packages/config/quagga/quagga.sh</item>
 	</additional_files_needed>
 	<custom_php_install_command>
 		mwexec("/usr/local/etc/rc.d/quagga.sh start");

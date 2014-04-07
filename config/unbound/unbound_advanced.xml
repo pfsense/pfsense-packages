@@ -40,7 +40,7 @@
 	<requirements/>
 	<faq/>
 	<name>unbound_advanced</name>
-	<version>1.4.8</version>
+	<version>1.4.14</version>
 	<title>Services: Unbound DNS Forwarder: Advanced Settings</title>
 	<include_file>/usr/local/pkg/unbound.inc</include_file>
 	<menu>
@@ -99,7 +99,7 @@
 		<field>
 			<fieldname>prefetch</fieldname>
 			<fielddescr>Prefetch Support</fielddescr>
-			<description>If enabled, the message cache elements are prefetched before they expire to keep the cache up to date. Enabling this option causes an increase of about 10 percent more traffic and load on the server, but popular items do not expire form the cache. Default is disabled.</description>
+			<description>If enabled, the message cache elements are prefetched before they expire to keep the cache up to date. Enabling this option causes an increase of about 10 percent more traffic and load on the server, but popular items do not expire from the cache. Default is disabled.</description>
 			<type>checkbox</type>
 			<default_value>off</default_value>
 			<advancedfield/>
@@ -123,7 +123,7 @@
 		<field>
 			<fieldname>harden_dnssec_stripped</fieldname>
 			<fielddescr>Harden DNSSEC data</fielddescr>
-			<description>If enabled, DNSSEC data is required for trust-anchored zones. If such data is absent, the zone is becomes bogus. If disabled then and no DNSSEC data is received, then the zone is made insecure. The default is enabled.</description>
+			<description>If enabled, DNSSEC data is required for trust-anchored zones. If such data is absent, the zone is considered bogus. If disabled and no DNSSEC data is received, then the zone is made insecure. The default is enabled.</description>
 			<type>checkbox</type>
 			<default_value>on</default_value>
 			<advancedfield/>
@@ -219,11 +219,12 @@
 			<fieldname>num_queries_per_thread</fieldname>
 			<description>The number of queries that every thread will service simultaneously. If more queries arrive that need to be serviced, and no queries can be jostled, then these queries are dropped.</description>
 			<type>select</type>
-			<default_value>1024</default_value>
+			<default_value>4096</default_value>
 			<options>
 				<option><name>512</name><value>512</value></option>
 				<option><name>1024</name><value>1024</value></option>
 				<option><name>2048</name><value>2048</value></option>
+				<option><name>4096</name><value>4096</value></option>
 			</options>
 			<advancedfield/>
 		</field>
@@ -261,16 +262,7 @@
 		<field>
 			<fielddescr>TTL for Host cache entries</fielddescr>
 			<fieldname>infra_host_ttl</fieldname>
-			<description>Time to live for entries in the host cache. The host cache contains roundtrip timing and EDNS support information. The default is 900 seconds.</description>
-			<type>input</type>
-			<size>5</size>
-			<default_value>900</default_value>
-			<advancedfield/>
-		</field>
-		<field>
-			<fielddescr>TTL for lame delegation</fielddescr>
-			<fieldname>infra_lame_ttl</fieldname>
-			<description>Time to live for when a delegation is considered to be lame. The default is 900 seconds.</description>
+			<description>Time to live for entries in the host cache. The host cache contains roundtrip timing, lameness and EDNS support information. The default is 900 seconds.</description>
 			<type>input</type>
 			<size>5</size>
 			<default_value>900</default_value>
@@ -305,7 +297,7 @@
 		<field>
 			<fielddescr>Custom Options</fielddescr>
 			<fieldname>custom_options</fieldname>
-			<description>You can put your own custom options here, separated by semi-colons (;). These configurations options will then be added to the configuration file. &lt;br/&gt; &lt;b&gt;Note:&lt;/b&gt; They need to be Unbound native configuration options, otherwise Unbound will &lt;b&gt;not&lt;/b&gt; work.</description>
+			<description>You can put your own custom options here, separated by semi-colons (;). These configuration options will then be added to the configuration file. &lt;br/&gt; &lt;b&gt;Note:&lt;/b&gt; They need to be Unbound native configuration options, otherwise Unbound will &lt;b&gt;not&lt;/b&gt; work.</description>
 			<type>textarea</type>
 			<cols>65</cols>
 			<rows>5</rows>

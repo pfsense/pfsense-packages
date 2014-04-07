@@ -1,0 +1,323 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE packagegui SYSTEM "./schema/packages.dtd">
+<?xml-stylesheet type="text/xsl" href="./xsl/package.xsl"?>
+<packagegui>
+        <copyright>
+        <![CDATA[
+/* $Id$ */
+/* ========================================================================== */
+/*
+    apache_mod_security_settings.xml
+	part of apache_mod_security package (http://www.pfSense.com)
+    Copyright (C) 2008, 2009, 2010 Scott Ullrich
+    Copyright (C) 2012-2013 Marcello Coutinho
+    All rights reserved.
+                                                                              */
+/* ========================================================================== */
+/*
+    Redistribution and use in source and binary forms, with or without
+    modification, are permitted provided that the following conditions are met:
+
+     1. Redistributions of source code MUST retain the above copyright notice,
+        this list of conditions and the following disclaimer.
+
+     2. Redistributions in binary form MUST reproduce the above copyright
+        notice, this list of conditions and the following disclaimer in the
+        documentation and/or other materials provided with the distribution.
+
+    THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
+    INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+    AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+    AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+    OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+    INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+    POSSIBILITY OF SUCH DAMAGE.
+                                                                              */
+/* ========================================================================== */
+        ]]>
+        </copyright>
+	<name>apachesettings</name>
+	<version>1.0</version>
+	<title>Apache reverse proxy: Settings</title>
+	<tabs>
+		<tab>
+			<text>Apache</text>
+			<url>/pkg_edit.php?xml=apache_settings.xml&amp;id=0</url>
+			<active/>			
+		</tab>
+		<tab>
+			<text>ModSecurity</text>
+			<url>/pkg_edit.php?xml=apache_mod_security_settings.xml</url>
+		</tab>
+		<tab>
+			<text>Sync</text>
+			<url>/pkg_edit.php?xml=apache_mod_security_sync.xml</url>
+		</tab>
+		<tab>
+			<text>Daemon Options</text>
+			<url>/pkg_edit.php?xml=apache_settings.xml</url>
+			<tab_level>2</tab_level>
+			<active/>
+		</tab>
+		<tab>
+			<text>Backends / Balancers</text>
+			<url>/pkg.php?xml=apache_balancer.xml</url>
+			<tab_level>2</tab_level>
+		</tab>
+		<tab>
+			<text>Location(s)</text>
+			<url>/pkg.php?xml=apache_location.xml</url>
+			<tab_level>2</tab_level>
+		</tab>
+		<tab>
+			<text>Virtual Hosts</text>
+			<url>/pkg.php?xml=apache_virtualhost.xml</url>
+			<tab_level>2</tab_level>
+		</tab>
+		<tab>
+			<text>Logs</text>
+			<url>/apache_view_logs.php</url>
+			<tab_level>2</tab_level>
+		</tab>
+	</tabs>
+	<fields>
+		<field>
+			<name>General</name>
+			<type>listtopic</type>
+		</field>
+		<field>
+			<fielddescr>Global site E-mail administrator</fielddescr>
+			<fieldname>globalsiteadminemail</fieldname>
+			<description>Enter the site administrators e-mail address</description>
+			<type>input</type>
+			<size>25</size>
+		</field>
+		<field>
+			<fielddescr>Server hostname</fielddescr>
+			<fieldname>hostname</fieldname>
+			<description>
+				<![CDATA[Enter the servers hostname<br>
+					NOTE: Leave blank to use this devices hostname.]]>
+			</description>
+			<type>input</type>
+			<size>25</size>
+		</field>
+		<field>
+			<fielddescr>Default Bind to IP Address</fielddescr>
+			<fieldname>globalbindtoipaddr</fieldname>
+			<description>
+				<![CDATA[This is the IP address the Proxy Server will listen on.]]>
+			</description>
+			<type>interfaces_selection</type>
+			<showlistenall/>
+			<showvirtualips/>
+			<showips/>
+		</field>
+		<field>
+			<fielddescr>Default Bind to port</fielddescr>
+			<fieldname>globalbindtoport</fieldname>
+			<description>
+				<![CDATA[This is the port the Proxy Server will listen on.<br>
+					NOTE: Leave blank to bind to 80]]>
+			</description>
+			<type>input</type>
+			<size>5</size>
+		</field>
+		<field>
+			<name>Performance</name>
+			<type>listtopic</type>
+		</field>
+		<field>
+			<fielddescr>Keep alive</fielddescr>
+			<fieldname>keepalive</fieldname>
+			<description>
+				<![CDATA[Whether or not to allow persistent connections (more than one request per connection).]]>
+			</description>
+			<type>select</type>	
+			<options>
+			    <option><name>On</name><value>On</value></option>
+			    <option><name>Off</name><value>Off</value></option>
+			</options>
+		</field>
+		<field>
+			<fielddescr>Max keep alive Requests</fielddescr>
+			<fieldname>maxkeepalivereq</fieldname>
+			<description>
+				<![CDATA[The maximum number of requests to allow during a persistent connection. Set to 0 to allow an unlimited amount.<br>
+						It's recommend to leave this number high, for maximum performance.<br>Leave empty to use apache defaults.]]>					
+			</description>
+			<type>input</type>
+			<size>5</size>
+		</field>
+		<field>
+			<fielddescr>keep alive timeout</fielddescr>
+			<fieldname>keepalivetimeout</fieldname>
+			<description><![CDATA[Number of seconds to wait for the next request from the same client on the same connection.<br>Leave empty to use apache defaults.]]></description>
+			<type>input</type>
+			<size>5</size>
+		</field>
+		<field>
+			<fielddescr>Servers Limit</fielddescr>
+			<fieldname>serverlimit</fieldname>
+			<description><![CDATA[For the prefork MPM, this directive sets the maximum configured value for MaxClients for the lifetime of the Apache process. For the worker MPM, this directive in combination with ThreadLimit sets the maximum configured value for MaxClients for the lifetime of the Apache process. Any attempts to change this directive during a restart will be ignored, but MaxClients can be modified during a restart.<br>Leave empty to use apache defaults.]]></description>
+			<type>input</type>
+			<size>5</size>
+		</field>
+		<field>
+			<fielddescr>Start Servers</fielddescr>
+			<fieldname>startservers</fieldname>
+			<description><![CDATA[The StartServers directive sets the number of child server processes created on startup. As the number of processes is dynamically controlled depending on the load, there is usually little reason to adjust this parameter.<br>Leave empty to use apache defaults.]]></description>
+			<type>input</type>
+			<size>5</size>
+		</field>
+		<field>
+			<fielddescr>Min Spare Threads</fielddescr>
+			<fieldname>minsparethreads</fieldname>
+			<description><![CDATA[Minimum number of idle threads available to handle request spikes.]]></description>
+			<type>input</type>
+			<size>5</size>
+		</field>
+		<field>
+			<fielddescr>Max Spare Threads</fielddescr>
+			<fieldname>maxsparethreads</fieldname>
+			<description><![CDATA[Maximum number of idle threads.]]></description>
+			<type>input</type>
+			<size>5</size>
+		</field>
+		<field>
+			<fielddescr>Threads Limit</fielddescr>
+			<fieldname>threadslimit</fieldname>
+			<description><![CDATA[This directive sets the maximum configured value for ThreadsPerChild for the lifetime of the Apache process. Any attempts to change this directive during a restart will be ignored, but ThreadsPerChild can be modified during a restart up to the value of this directive.<br>Leave empty to use apache defaults.]]></description>
+			<type>input</type>
+			<size>5</size>
+		</field>
+		<field>
+			<fielddescr>Thread Stack Size</fielddescr>
+			<fieldname>threadstacksize</fieldname>
+			<description><![CDATA[The ThreadStackSize directive sets the size of the stack (for autodata) of threads which handle client connections and call modules to help process those connections. In most cases the operating system default for stack size is reasonable.<br>Leave empty to use apache defaults.]]></description>
+			<type>input</type>
+			<size>5</size>
+		</field>
+		<field>
+			<fielddescr>threadsperchild</fielddescr>
+			<fieldname>threadsperchild</fieldname>
+			<description><![CDATA[This directive sets the number of threads created by each child process. The child creates these threads at startup and never creates more. The total number of threads should be high enough to handle the common load on the server.<br>Leave empty to use apache defaults.]]></description>
+			<type>input</type>
+			<size>5</size>
+		</field>
+		<field>
+			<fielddescr>MaxClients</fielddescr>
+			<fieldname>maxclients</fieldname>
+			<description><![CDATA[The MaxClients directive sets the limit on the number of simultaneous requests that will be served. Any connection attempts over the MaxClients limit will normally be queued, up to a number based on the ListenBacklog directive. Once a child process is freed at the end of a different request, the connection will then be serviced.<br>Leave empty to use apache defaults.]]></description>
+			<type>input</type>
+			<size>5</size>
+		</field>
+		<field>
+			<fielddescr>MaxRequestsPerChild</fielddescr>
+			<fieldname>maxrequestsperchild</fieldname>
+			<description><![CDATA[The MaxRequestsPerChild directive sets the limit on the number of requests that an individual child server process will handle. After MaxRequestsPerChild requests, the child process will die. If MaxRequestsPerChild is 0, then the process will never expire.<br>Leave empty to use apache defaults.]]></description>
+			<type>input</type>
+			<size>5</size>
+		</field>
+		<field>
+			<name>Cache settings</name>
+			<type>listtopic</type>
+		</field>
+		<field>
+			<fielddescr>Memory cache size</fielddescr>
+			<fieldname>memcachesize</fieldname>
+			<description>
+				<![CDATA[Sets the memory usage in megabytes.<br>Leave empty to use default value or 0 to disable memory cache.<br>
+					Enables mod_mem_cache which stores cached documents in memory.]]>
+			</description>
+			<type>input</type>
+			<size>10</size>
+		</field>
+		<field>
+			<fielddescr>Disk Cache Max File Size</fielddescr>
+			<fieldname>diskcachesize</fieldname>
+			<description>
+				<![CDATA[Set the maximum size (in bytes) of a document to be placed in the cache.<br>Leave empty to use default value or 0 to disable disk cache.<br>
+					mod_disk_cache implements a disk based storage manager. It is primarily of use in conjunction with mod_cache.]]>					
+			</description>
+			<type>input</type>
+			<size>10</size>
+		</field>
+		<field>
+			<name>Connection limits (DoS protection)</name>
+			<type>listtopic</type>
+		</field>
+		<field>
+			<fielddescr>header</fielddescr>
+			<fieldname>header_time_out</fieldname>
+			<description>
+				<![CDATA[Set header timeouts for requests in min,max,MinRate format. Leave empty to do not limit request headers.<br>
+						Sample: To allow at least 10 seconds to receive the request including the headers and increase the timeout by 1 second for every 500 bytes received but do not allow more than 30 seconds for the request including the headers:<br>
+						<strong>10,30,500</strong>]]>
+			</description>
+			<type>input</type>
+			<size>10</size>
+		</field>
+		<field>
+			<fielddescr>body</fielddescr>
+			<fieldname>body_time_out</fieldname>
+			<description>
+				<![CDATA[Set body timeouts for requests in min,max,MinRate format. Leave empty to do not limit request bodies.<br>
+						Sample: To allow at least 10 seconds to receive the request body and if the client sends data, increase the timeout by 1 second for every 1000 bytes received, with no upper limit for the timeout (exept for the limit given indirectly by LimitRequestBody):<br>
+						<strong>10,1000</strong>]]>
+			</description>
+			<type>input</type>
+			<size>10</size>
+		</field>
+		<field>
+			<fielddescr>Limit Request Body</fielddescr>
+			<fieldname>LimitRequestBody</fieldname>
+			<description>
+				<![CDATA[This directive specifies the number of bytes from 0 (meaning unlimited) to 2147483647 (2GB) that are allowed in a request body.<br>
+						The LimitRequestBody directive allows the user to set a limit on the allowed size of an HTTP request message body within the context in which the directive is given (server, per-directory, per-file or per-location). If the client request exceeds that limit, the server will return an error response instead of servicing the request.]]>
+			</description>
+			<type>input</type>
+			<size>10</size>
+		</field>
+		<field>
+			<name>Status Page</name>
+			<type>listtopic</type>
+		</field>
+		<field>
+			<fielddescr>Status Page</fielddescr>
+			<fieldname>statuspage</fieldname>
+			<description>
+				<![CDATA[Enable a status page for Apache and Mod_proxy. Access http://DefaultBindIP:DefaultBindPort/status-server]]>
+			</description>
+			<type>select</type>
+			<options>
+				<option><name>Disabled (Default)</name><value>off</value></option>
+				<option><name>Enabled</name><value>on</value></option>
+			</options>
+		</field>
+		<field>
+			<fielddescr>Extended Status</fielddescr>
+			<fieldname>extendedstatuspage</fieldname>
+			<description>
+				<![CDATA[Keep track of extended status information for each request]]>
+			</description>
+			<type>checkbox</type>
+		</field>
+		<field>
+			<fielddescr>Status Page ACL</fielddescr>
+			<fieldname>netaccessstatus</fieldname>
+			<description>
+				<![CDATA[Networks that can access apache status page. Ex: 172.16.1.0/24<br>
+					NOTE: Leave blank to allow access from any ip.(Not recommended for security reasons)]]>
+			</description>
+			<type>input</type>
+		</field>
+	</fields>
+	<custom_php_resync_config_command>
+		apache_mod_security_resync();
+	</custom_php_resync_config_command>
+	<include_file>/usr/local/pkg/apache_mod_security.inc</include_file>	
+</packagegui>

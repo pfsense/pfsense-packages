@@ -1,696 +1,767 @@
 <?php
 /*
- snort_check_for_rule_updates.php
- Copyright (C) 2006 Scott Ullrich
- Copyright (C) 2009 Robert Zelaya
- Copyright (C) 2011 Ermal Luci
- All rights reserved.
-
- Redistribution and use in source and binary forms, with or without
- modification, are permitted provided that the following conditions are met:
-
- 1. Redistributions of source code must retain the above copyright notice,
- this list of conditions and the following disclaimer.
-
- 2. Redistributions in binary form must reproduce the above copyright
- notice, this list of conditions and the following disclaimer in the
- documentation and/or other materials provided with the distribution.
-
- THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
- INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
- AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
- AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
- OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
- SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
- INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
- CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- POSSIBILITY OF SUCH DAMAGE.
+ * snort_check_for_rule_updates.php
+ *
+ * Copyright (C) 2006 Scott Ullrich
+ * Copyright (C) 2009 Robert Zelaya
+ * Copyright (C) 2011-2012 Ermal Luci
+ * Copyright (C) 2013 Bill Meeks
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright notice,
+ * this list of conditions and the following disclaimer.
+ *
+ * 2. Redistributions in binary form must reproduce the above copyright
+ * notice, this list of conditions and the following disclaimer in the
+ * documentation and/or other materials provided with the distribution.
+ *
+ * THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
+ * INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+ * AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+ * AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+ * OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
  */
 
-/* Setup enviroment */
-
-/* TODO: review if include files are needed */
 require_once("functions.inc");
 require_once("service-utils.inc");
-require_once("/usr/local/pkg/snort/snort.inc");
+require_once "/usr/local/pkg/snort/snort.inc";
 
-$pkg_interface = "console";
+global $g, $config, $pkg_interface, $snort_gui_include, $rebuild_rules;
 
-$tmpfname = "/usr/local/etc/snort/tmp/snort_rules_up";
-$snortdir = "/usr/local/etc/snort";
-$snortdir_wan = "/usr/local/etc/snort";
-$snort_filename_md5 = "snortrules-snapshot-2905.tar.gz.md5";
-$snort_filename = "snortrules-snapshot-2905.tar.gz";
-$emergingthreats_filename_md5 = "emerging.rules.tar.gz.md5";
-$emergingthreats_filename = "emerging.rules.tar.gz";
-$pfsense_rules_filename_md5 = "pfsense_rules.tar.gz.md5";
-$pfsense_rules_filename = "pfsense_rules.tar.gz";
+if (!defined("VRT_DNLD_URL"))
+	define("VRT_DNLD_URL", "https://www.snort.org/reg-rules/");
+if (!defined("ET_VERSION"))
+	define("ET_VERSION", "2.9.0");
+if (!defined("ET_BASE_DNLD_URL"))
+	define("ET_BASE_DNLD_URL", "http://rules.emergingthreats.net/"); 
+if (!defined("ETPRO_BASE_DNLD_URL"))
+	define("ETPRO_BASE_DNLD_URL", "https://rules.emergingthreatspro.com/"); 
+if (!defined("ET_DNLD_FILENAME"))
+	define("ET_DNLD_FILENAME", "emerging.rules.tar.gz");
+if (!defined("ETPRO_DNLD_FILENAME"))
+	define("ETPRO_DNLD_FILENAME", "etpro.rules.tar.gz");
+if (!defined("GPLV2_DNLD_FILENAME"))
+	define("GPLV2_DNLD_FILENAME", "community-rules.tar.gz");
+if (!defined("GPLV2_DNLD_URL"))
+	define("GPLV2_DNLD_URL", "https://s3.amazonaws.com/snort-org/www/rules/community/");
+if (!defined("RULES_UPD_LOGFILE"))
+	define("RULES_UPD_LOGFILE", SNORTLOGDIR . "/snort_rules_update.log");
+if (!defined("VRT_FILE_PREFIX"))
+	define("VRT_FILE_PREFIX", "snort_");
+if (!defined("GPL_FILE_PREFIX"))
+	define("GPL_FILE_PREFIX", "GPLv2_");
+if (!defined("ET_OPEN_FILE_PREFIX"))
+	define("ET_OPEN_FILE_PREFIX", "emerging-");
+if (!defined("ET_PRO_FILE_PREFIX"))
+	define("ET_PRO_FILE_PREFIX", "etpro-");
 
-/*  Time stamps define */
-$last_md5_download = $config['installedpackages']['snortglobal']['last_md5_download'];
-$last_rules_install = $config['installedpackages']['snortglobal']['last_rules_install'];
+$snortdir = SNORTDIR;
+$snortlibdir = SNORTLIBDIR;
+$snortlogdir = SNORTLOGDIR;
+$snort_rules_upd_log = RULES_UPD_LOGFILE;
 
-$up_date_time = date('l jS \of F Y h:i:s A');
-echo "\n";
-echo "#########################\n";
-echo "$up_date_time\n";
-echo "#########################\n";
-echo "\n\n";
+/* Save the state of $pkg_interface so we can restore it */
+$pkg_interface_orig = $pkg_interface;
+if ($snort_gui_include)
+	$pkg_interface = "";
+else
+	$pkg_interface = "console";
 
 /* define checks */
 $oinkid = $config['installedpackages']['snortglobal']['oinkmastercode'];
-$snortdownload = $config['installedpackages']['snortglobal']['snortdownload'];
-$emergingthreats = $config['installedpackages']['snortglobal']['emergingthreats'];
+$etproid = $config['installedpackages']['snortglobal']['etpro_code'];
+$snortdownload = $config['installedpackages']['snortglobal']['snortdownload'] == 'on' ? 'on' : 'off';
+$emergingthreats = $config['installedpackages']['snortglobal']['emergingthreats'] == 'on' ? 'on' : 'off';
+$etpro = $config['installedpackages']['snortglobal']['emergingthreats_pro'] == 'on' ? 'on' : 'off';
+$snortcommunityrules = $config['installedpackages']['snortglobal']['snortcommunityrules'] == 'on' ? 'on' : 'off';
+$vrt_enabled = $config['installedpackages']['snortglobal']['snortdownload'] == 'on' ? 'on' : 'off';
 
-if ($snortdownload == 'off' && $emergingthreats != 'on')
-{
-	$snort_emrging_info = 'stop';
-}
+/* Working directory for downloaded rules tarballs and extraction */
+$tmpfname = "/tmp/snort_rules_up";
 
-if ($oinkid == "" && $snortdownload != 'off')
-{
-	$snort_oinkid_info = 'stop';
-}
+/* Grab the Snort binary version programmatically and use it to construct */
+/* the proper Snort VRT rules tarball and md5 filenames. Fallback to a    */
+/* default in the event we fail.                                          */
+$snortver = array();
+exec("/usr/local/bin/snort -V 2>&1 |/usr/bin/grep Version | /usr/bin/cut -c20-26", $snortver);
+// Save the version with decimal delimiters for use in extracting the rules
+$snort_version = $snortver[0];
+if (empty($snort_version))
+	$snort_version = "2.9.5.6";
 
+// Create a collapsed version string for use in the tarball filename
+$snortver[0] = str_replace(".", "", $snortver[0]);
+$snort_filename = "snortrules-snapshot-{$snortver[0]}.tar.gz";
+$snort_filename_md5 = "{$snort_filename}.md5";
+$snort_rule_url = VRT_DNLD_URL;
 
-/* check if main rule directory is empty */
-$if_mrule_dir = "/usr/local/etc/snort/rules";
-$mfolder_chk = (count(glob("$if_mrule_dir/*")) === 0) ? 'empty' : 'full';
-
-
-if (file_exists('/var/run/snort.conf.dirty')) {
-	$snort_dirty_d = 'stop';
-}
-
-/* Start of code */
+/* Mount the Snort conf directories R/W so we can modify files there */
 conf_mount_rw();
 
-if (!is_dir('/usr/local/etc/snort/tmp')) {
-	exec('/bin/mkdir -p /usr/local/etc/snort/tmp');
+/* Set up Emerging Threats rules filenames and URL */
+if ($etpro == "on") {
+	$emergingthreats_filename = ETPRO_DNLD_FILENAME;
+	$emergingthreats_filename_md5 = ETPRO_DNLD_FILENAME . ".md5";
+	$emergingthreats_url = ETPRO_BASE_DNLD_URL;
+	$emergingthreats_url .= "{$etproid}/snort-" . ET_VERSION . "/";
+	$emergingthreats = "on";
+	$et_name = "Emerging Threats Pro";
+	$et_md5_remove = ET_DNLD_FILENAME . ".md5";
+	@unlink("{$snortdir}/{$et_md5_remove}");
+}
+else {
+	$emergingthreats_filename = ET_DNLD_FILENAME;
+	$emergingthreats_filename_md5 = ET_DNLD_FILENAME . ".md5";
+	$emergingthreats_url = ET_BASE_DNLD_URL;
+	// If using Sourcefire VRT rules with ET, then we should use the open-nogpl ET rules
+	$emergingthreats_url .= $vrt_enabled == "on" ? "open-nogpl/" : "open/";
+	$emergingthreats_url .= "snort-" . ET_VERSION . "/";
+	$et_name = "Emerging Threats Open";
+	$et_md5_remove = ETPRO_DNLD_FILENAME . ".md5";
+	@unlink("{$snortdir}/{$et_md5_remove}");
 }
 
-$snort_md5_check_ok = 'off';
-$emerg_md5_check_ok = 'off';
-$pfsense_md5_check_ok = 'off';
+/* Snort GPLv2 Community Rules filenames and URL */
+$snort_community_rules_filename = GPLV2_DNLD_FILENAME;
+$snort_community_rules_filename_md5 = GPLV2_DNLD_FILENAME . ".md5";
+$snort_community_rules_url = GPLV2_DNLD_URL;
 
-/* Set user agent to Mozilla */
-ini_set('user_agent','Mozilla/4.0 (compatible; MSIE 6.0)');
-ini_set("memory_limit","150M");
+function snort_download_file_url($url, $file_out) {
 
-/* mark the time update started */
-$config['installedpackages']['snortglobal']['last_md5_download'] = date("Y-M-jS-h:i-A");
+	/************************************************/
+	/* This function downloads the file specified   */
+	/* by $url using the CURL library functions and */
+	/* saves the content to the file specified by   */
+	/* $file.                                       */
+	/*                                              */
+	/* This is needed so console output can be      */
+	/* suppressed to prevent XMLRPC sync errors.    */
+	/*                                              */
+	/* It provides logging of returned CURL errors. */
+	/************************************************/
 
-/* send current buffer */
-ob_flush();
+	global $g, $config, $pkg_interface, $last_curl_error, $fout, $ch, $file_size, $downloaded, $first_progress_update;
 
-/* send current buffer */
-ob_flush();
+	// Initialize required variables for the pfSense "read_body()" function
+	$file_size  = 1;
+	$downloaded = 1;
+	$first_progress_update = TRUE;
 
-/*  remove old $tmpfname files */
-if (is_dir("{$tmpfname}")) {
-	update_status(gettext("Removing old tmp files..."));
+
+	// Array of message strings for HTTP Response Codes
+	$http_resp_msg = array( 200 => "OK", 202 => "Accepted", 204 => "No Content", 205 => "Reset Content", 
+				206 => "Partial Content", 301 => "Moved Permanently", 302 => "Found", 
+				305 => "Use Proxy", 307 => "Temporary Redirect", 400 => "Bad Request", 
+				401 => "Unauthorized", 402 => "Payment Required", 403 => "Forbidden", 
+				404 => "Not Found", 405 => "Method Not Allowed", 407 => "Proxy Authentication Required", 
+				408 => "Request Timeout", 410 => "Gone", 500 => "Internal Server Error", 
+				501 => "Not Implemented", 502 => "Bad Gateway", 503 => "Service Unavailable", 
+				504 => "Gateway Timeout", 505 => "HTTP Version Not Supported" );
+
+	$last_curl_error = "";
+
+	$fout = fopen($file_out, "wb");
+	if ($fout) {
+		$ch = curl_init($url);
+		if (!$ch)
+			return false;
+		curl_setopt($ch, CURLOPT_FILE, $fout);
+
+		// NOTE: required to suppress errors from XMLRPC due to progress bar output
+		if ($g['snort_sync_in_progress'])
+			curl_setopt($ch, CURLOPT_HEADER, false);
+		else {
+			curl_setopt($ch, CURLOPT_HEADERFUNCTION, 'read_header');
+			curl_setopt($ch, CURLOPT_WRITEFUNCTION, 'read_body');
+		}
+
+		curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+		curl_setopt($ch, CURLOPT_USERAGENT, "Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.1; Win64; x64; Trident/6.0)");
+		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+		curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 30);
+		curl_setopt($ch, CURLOPT_TIMEOUT, 0);
+
+		// Use the system proxy server setttings if configured
+		if (!empty($config['system']['proxyurl'])) {
+			curl_setopt($ch, CURLOPT_PROXY, $config['system']['proxyurl']);
+			if (!empty($config['system']['proxyport']))
+				curl_setopt($ch, CURLOPT_PROXYPORT, $config['system']['proxyport']);
+			if (!empty($config['system']['proxyuser']) && !empty($config['system']['proxypass'])) {
+				@curl_setopt($ch, CURLOPT_PROXYAUTH, CURLAUTH_ANY | CURLAUTH_ANYSAFE);
+				curl_setopt($ch, CURLOPT_PROXYUSERPWD, "{$config['system']['proxyuser']}:{$config['system']['proxypass']}");
+			}
+		}
+
+		$counter = 0;
+		$rc = true;
+		// Try up to 4 times to download the file before giving up
+		while ($counter < 4) {
+			$counter++;
+			$rc = curl_exec($ch);
+			if ($rc === true)
+				break;
+			log_error(gettext("[Snort] Rules download error: " . curl_error($ch)));
+			log_error(gettext("[Snort] Will retry in 15 seconds..."));
+			sleep(15);
+		}
+		if ($rc === false)
+			$last_curl_error = curl_error($ch);
+		$http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+		if (isset($http_resp_msg[$http_code]))
+			$last_curl_error = $http_resp_msg[$http_code];
+		curl_close($ch);
+		fclose($fout);
+
+		// If we had to try more than once, log it
+		if ($counter > 1)
+			log_error(gettext("File '" . basename($file_out) . "' download attempts: {$counter} ..."));
+		return ($http_code == 200) ? true : $http_code;
+	}
+	else {
+		$last_curl_error = gettext("Failed to create file " . $file_out);
+		log_error(gettext("[Snort] Failed to create file {$file_out} ..."));
+		return false;
+	}
+}
+
+function snort_check_rule_md5($file_url, $file_dst, $desc = "") {
+
+	/**********************************************************/
+	/* This function attempts to download the passed MD5 hash */
+	/* file and compare its contents to the currently stored  */
+	/* hash file to see if a new rules file has been posted.  */
+	/*                                                        */
+	/* On Entry: $file_url = URL for md5 hash file            */
+	/*           $file_dst = Temp destination to store the    */
+	/*                       downloaded hash file             */
+	/*           $desc     = Short text string used to label  */
+	/*                       log messages with rules type     */
+	/*                                                        */
+	/*  Returns: TRUE if new rule file download required.     */
+	/*           FALSE if rule download not required or an    */
+	/*           error occurred.                              */
+	/**********************************************************/
+
+	global $pkg_interface, $snort_rules_upd_log, $last_curl_error;
+
+	$snortdir = SNORTDIR;
+	$filename_md5 = basename($file_dst);
+
+	if ($pkg_interface <> "console")
+		update_status(gettext("Downloading {$desc} md5 file..."));
+	error_log(gettext("\tDownloading {$desc} md5 file {$filename_md5}...\n"), 3, $snort_rules_upd_log);
+	$rc = snort_download_file_url($file_url, $file_dst);
+
+	// See if download from URL was successful
+	if ($rc === true) {
+		if ($pkg_interface <> "console")
+			update_status(gettext("Done downloading {$filename_md5}."));
+		error_log("\tChecking {$desc} md5 file...\n", 3, $snort_rules_upd_log);
+
+		// check md5 hash in new file against current file to see if new download is posted
+		if (file_exists("{$snortdir}/{$filename_md5}")) {
+			$md5_check_new = file_get_contents($file_dst);
+			$md5_check_old = file_get_contents("{$snortdir}/{$filename_md5}");
+			if ($md5_check_new == $md5_check_old) {
+				if ($pkg_interface <> "console")
+					update_status(gettext("{$desc} are up to date..."));
+				log_error(gettext("[Snort] {$desc} are up to date..."));
+				error_log(gettext("\t{$desc} are up to date.\n"), 3, $snort_rules_upd_log);
+				return false;
+			}
+			else
+				return true;
+		}
+		return true;
+	}
+	else {
+		error_log(gettext("\t{$desc} md5 download failed.\n"), 3, $snort_rules_upd_log);
+		$snort_err_msg = gettext("Server returned error code {$rc}.");
+		if ($pkg_interface <> "console") {
+			update_status(gettext("{$desc} md5 error ... Server returned error code {$rc} ..."));
+			update_output_window(gettext("{$desc} will not be updated.\n\t{$snort_err_msg}")); 
+		}
+		log_error(gettext("[Snort] {$desc} md5 download failed..."));
+		log_error(gettext("[Snort] Server returned error code {$rc}..."));
+		error_log(gettext("\t{$snort_err_msg}\n"), 3, $snort_rules_upd_log);
+		if ($pkg_interface == "console")
+			error_log(gettext("\tServer error message was: {$last_curl_error}\n"), 3, $snort_rules_upd_log);
+		error_log(gettext("\t{$desc} will not be updated.\n"), 3, $snort_rules_upd_log);
+		return false;
+	}
+}
+
+function snort_fetch_new_rules($file_url, $file_dst, $file_md5, $desc = "") {
+
+	/**********************************************************/
+	/* This function downloads the passed rules file and      */
+	/* compares its computed md5 hash to the passed md5 hash  */
+	/* to verify the file's integrity.                        */
+	/*                                                        */
+	/* On Entry: $file_url = URL of rules file                */
+	/*           $file_dst = Temp destination to store the    */
+	/*                       downloaded rules file            */
+	/*           $file_md5 = Expected md5 hash for the new    */
+	/*                       downloaded rules file            */
+	/*           $desc     = Short text string for use in     */
+	/*                       log messages                     */
+	/*                                                        */
+	/*  Returns: TRUE if download was successful.             */
+	/*           FALSE if download was not successful.        */
+	/**********************************************************/
+
+	global $pkg_interface, $snort_rules_upd_log, $last_curl_error;
+
+	$snortdir = SNORTDIR;
+	$filename = basename($file_dst);
+
+	if ($pkg_interface <> "console")
+		update_status(gettext("There is a new set of {$desc} posted. Downloading..."));
+	log_error(gettext("[Snort] There is a new set of {$desc} posted. Downloading {$filename}..."));
+	error_log(gettext("\tThere is a new set of {$desc} posted.\n"), 3, $snort_rules_upd_log);
+	error_log(gettext("\tDownloading file '{$filename}'...\n"), 3, $snort_rules_upd_log);
+       	$rc = snort_download_file_url($file_url, $file_dst);
+
+	// See if the download from the URL was successful
+	if ($rc === true) {
+		if ($pkg_interface <> "console")
+			update_status(gettext("Done downloading {$desc} file."));
+		log_error("[Snort] {$desc} file update downloaded successfully");
+		error_log(gettext("\tDone downloading rules file.\n"),3, $snort_rules_upd_log);
+	
+		// Test integrity of the rules file.  Turn off update if file has wrong md5 hash
+		if ($file_md5 != trim(md5_file($file_dst))){
+			if ($pkg_interface <> "console")
+				update_output_window(gettext("{$desc} file MD5 checksum failed..."));
+			log_error(gettext("[Snort] {$desc} file download failed.  Bad MD5 checksum..."));
+        	        log_error(gettext("[Snort] Downloaded File MD5: " . md5_file($file_dst)));
+			log_error(gettext("[Snort] Expected File MD5: {$file_md5}"));
+			error_log(gettext("\t{$desc} file download failed.  Bad MD5 checksum.\n"), 3, $snort_rules_upd_log);
+			error_log(gettext("\tDownloaded {$desc} file MD5: " . md5_file($file_dst) . "\n"), 3, $snort_rules_upd_log);
+			error_log(gettext("\tExpected {$desc} file MD5: {$file_md5}\n"), 3, $snort_rules_upd_log);
+			error_log(gettext("\t{$desc} file download failed.  {$desc} will not be updated.\n"), 3, $snort_rules_upd_log);
+			return false;
+		}
+		return true;
+	}
+	else {
+		if ($pkg_interface <> "console")
+			update_output_window(gettext("{$desc} file download failed..."));
+		log_error(gettext("[Snort] {$desc} file download failed... server returned error '{$rc}'..."));
+		error_log(gettext("\t{$desc} file download failed.  Server returned error {$rc}.\n"), 3, $snort_rules_upd_log);
+		if ($pkg_interface == "console")
+			error_log(gettext("\tThe error text was: {$last_curl_error}\n"), 3, $snort_rules_upd_log);
+		error_log(gettext("\t{$desc} will not be updated.\n"), 3, $snort_rules_upd_log);
+		return false;
+	}
+
+}
+
+/**********************/
+/* Start of main code */
+/**********************/
+
+/*  remove any old $tmpfname files */
+if (is_dir("{$tmpfname}"))
 	exec("/bin/rm -r {$tmpfname}");
-	apc_clear_cache();
-}
 
-/*  Make shure snortdir exits */
-exec("/bin/mkdir -p {$snortdir}");
+/*  Make sure required snortdirs exsist */
 exec("/bin/mkdir -p {$snortdir}/rules");
 exec("/bin/mkdir -p {$snortdir}/signatures");
+exec("/bin/mkdir -p {$snortdir}/preproc_rules");
 exec("/bin/mkdir -p {$tmpfname}");
-exec("/bin/mkdir -p /usr/local/lib/snort/dynamicrules/");
+exec("/bin/mkdir -p {$snortlibdir}/dynamicrules");
+exec("/bin/mkdir -p {$snortlogdir}");
 
-/* send current buffer */
-ob_flush();
-
-$pfsensedownload = 'on';
-
-/*  download md5 sig from snort.org */
-if ($snortdownload == 'on')
-{
-	if (file_exists("{$tmpfname}/{$snort_filename_md5}") &&
-	filesize("{$tmpfname}/{$snort_filename_md5}") > 0) {
-		update_status(gettext("snort.org md5 temp file exists..."));
-	} else {
-		update_status(gettext("Downloading snort.org md5 file..."));
-		ini_set('user_agent','Mozilla/4.0 (compatible; MSIE 6.0)');
-
-		//$image = @file_get_contents("http://www.mtest.local/pub-bin/oinkmaster.cgi/{$oinkid}/{$snort_filename_md5}");
-		$image = @file_get_contents("http://www.snort.org/pub-bin/oinkmaster.cgi/{$oinkid}/{$snort_filename_md5}");
-		@file_put_contents("{$tmpfname}/{$snort_filename_md5}", $image);
-		update_status(gettext("Done downloading snort.org md5"));
-	}
+/* See if we need to automatically clear the Update Log based on 1024K size limit */
+if (file_exists($snort_rules_upd_log)) {
+	if (1048576 < filesize($snort_rules_upd_log))
+		exec("/bin/rm -r {$snort_rules_upd_log}");
 }
 
-/*  download md5 sig from emergingthreats.net */
-if ($emergingthreats == 'on')
-{
-	update_status(gettext("Downloading emergingthreats md5 file..."));
-	ini_set('user_agent','Mozilla/4.0 (compatible; MSIE 6.0)');
-	// $image = @file_get_contents("http://www.mtest.local/pub-bin/oinkmaster.cgi/{$oinkid}/version.txt");
-	$image = @file_get_contents('http://rules.emergingthreats.net/open/snort-2.9.0/emerging.rules.tar.gz.md5');
-	@file_put_contents("{$tmpfname}/{$emergingthreats_filename_md5}", $image);
-	update_status(gettext("Done downloading emergingthreats md5"));
-}
+/* Log start time for this rules update */
+error_log(gettext("Starting rules update...  Time: " . date("Y-m-d H:i:s") . "\n"), 3, $snort_rules_upd_log);
+$last_curl_error = "";
 
-/*  download md5 sig from pfsense.org */
-if (file_exists("{$tmpfname}/{$pfsense_rules_filename_md5}")) {
-	update_status(gettext("pfsense md5 temp file exists..."));
-} else {
-	update_status(gettext("Downloading pfsense md5 file..."));
-	ini_set('user_agent','Mozilla/4.0 (compatible; MSIE 6.0)');
-	//$image = @file_get_contents("http://www.mtest.local/pub-bin/oinkmaster.cgi/{$oinkid}/pfsense_rules.tar.gz.md5");
-	$image = @file_get_contents("http://www.pfsense.com/packages/config/snort/pfsense_rules/pfsense_rules.tar.gz.md5");
-	@file_put_contents("{$tmpfname}/pfsense_rules.tar.gz.md5", $image);
-	update_status(gettext("Done downloading pfsense md5."));
-}
-
-/* If md5 file is empty wait 15min exit */
-if ($snortdownload == 'on')
-{
-	if (0 == filesize("{$tmpfname}/{$snort_filename_md5}"))
-	{
-		update_status(gettext("Please wait... You may only check for New Rules every 15 minutes..."));
-		update_output_window(gettext("Rules are released every month from snort.org. You may download the Rules at any time."));
-		$snortdownload = 'off';
-	}
-}
-
-/* If pfsense md5 file is empty wait 15min exit */
-if (0 == filesize("{$tmpfname}/$pfsense_rules_filename_md5")){
-	update_status(gettext("Please wait... You may only check for New Pfsense Rules every 15 minutes..."));
-	update_output_window(gettext("Rules are released to support Pfsense packages."));
-	$pfsensedownload = 'off';
-}
-
-/* Check if were up to date snort.org */
-if ($snortdownload == 'on')
-{
-	if (file_exists("{$snortdir}/{$snort_filename_md5}"))
-	{
-		$md5_check_new_parse = file_get_contents("{$tmpfname}/{$snort_filename_md5}");
-		$md5_check_new = `/bin/echo "{$md5_check_new_parse}" | /usr/bin/awk '{ print $1 }'`;
-		$md5_check_old_parse = file_get_contents("{$snortdir}/{$snort_filename_md5}");
-		$md5_check_old = `/bin/echo "{$md5_check_old_parse}" | /usr/bin/awk '{ print $1 }'`;
-		if ($md5_check_new == $md5_check_old)
-		{
-			update_status(gettext("Your rules are up to date..."));
-			update_output_window(gettext("You may start Snort now, check update."));
-			$snort_md5_check_ok = 'on';
-		} else {
-			update_status(gettext("Your rules are not up to date..."));
-			$snort_md5_check_ok = 'off';
-		}
-	}
-}
-
-/* Check if were up to date emergingthreats.net */
-if ($emergingthreats == 'on')
-{
-	if (file_exists("{$snortdir}/{$emergingthreats_filename_md5}"))
-	{
-		$emerg_md5_check_new_parse = file_get_contents("{$tmpfname}/{$emergingthreats_filename_md5}");
-		$emerg_md5_check_new = `/bin/echo "{$emerg_md5_check_new_parse}" | /usr/bin/awk '{ print $1 }'`;
-		$emerg_md5_check_old_parse = file_get_contents("{$snortdir}/{$emergingthreats_filename_md5}");
-		$emerg_md5_check_old = `/bin/echo "{$emerg_md5_check_old_parse}" | /usr/bin/awk '{ print $1 }'`;
-		if ($emerg_md5_check_new == $emerg_md5_check_old)
-		{
-			$emerg_md5_check_ok = 'on';
-		} else
-			$emerg_md5_check_ok = 'off';
-	}
-}
-
-/* Check if were up to date pfsense.org */
-if ($pfsensedownload == 'on' && file_exists("{$snortdir}/pfsense_rules.tar.gz.md5"))
-{
-	$pfsense_check_new_parse = file_get_contents("{$tmpfname}/pfsense_rules.tar.gz.md5");
-	$pfsense_md5_check_new = `/bin/echo "{$pfsense_md5_check_new_parse}" | /usr/bin/awk '{ print $1 }'`;
-	$pfsense_md5_check_old_parse = file_get_contents("{$snortdir}/pfsense_rules.tar.gz.md5");
-	$pfsense_md5_check_old = `/bin/echo "{$pfsense_md5_check_old_parse}" | /usr/bin/awk '{ print $1 }'`;
-	if ($pfsense_md5_check_new == $pfsense_md5_check_old)
-	{
-		$pfsense_md5_check_ok = 'on';
-	} else
-		$pfsense_md5_check_ok = 'off';
-}
-
+/*  Check for and download any new Snort VRT sigs */
 if ($snortdownload == 'on') {
-	if ($snort_md5_check_ok == 'on')
-	{
-		update_status(gettext("Your snort.org rules are up to date..."));
-		update_output_window(gettext("You may start Snort now..."));
+	if (snort_check_rule_md5("{$snort_rule_url}{$snort_filename_md5}/{$oinkid}/", "{$tmpfname}/{$snort_filename_md5}", "Snort VRT rules")) {
+		/* download snortrules file */
+		$file_md5 = trim(file_get_contents("{$tmpfname}/{$snort_filename_md5}"));
+		if (!snort_fetch_new_rules("{$snort_rule_url}{$snort_filename}/{$oinkid}/", "{$tmpfname}/{$snort_filename}", $file_md5, "Snort VRT rules"))
+			$snortdownload = 'off';
+	}
+	else
 		$snortdownload = 'off';
-	}
 }
+
+/*  Check for and download any new Snort GPLv2 Community Rules sigs */
+if ($snortcommunityrules == 'on') {
+	if (snort_check_rule_md5("{$snort_community_rules_url}{$snort_community_rules_filename_md5}", "{$tmpfname}/{$snort_community_rules_filename_md5}", "Snort GPLv2 Community Rules")) {
+		/* download Snort GPLv2 Community Rules file */
+		$file_md5 = trim(file_get_contents("{$tmpfname}/{$snort_community_rules_filename_md5}"));
+		if (!snort_fetch_new_rules("{$snort_community_rules_url}{$snort_community_rules_filename}", "{$tmpfname}/{$snort_community_rules_filename}", $file_md5, "Snort GPLv2 Community Rules"))
+			$snortcommunityrules = 'off';
+	}
+	else
+		$snortcommunityrules = 'off';
+}
+
+/*  Check for and download any new Emerging Threats Rules sigs */
 if ($emergingthreats == 'on') {
-	if ($emerg_md5_check_ok == 'on')
-	{
-		update_status(gettext("Your Emergingthreats rules are up to date..."));
-		update_output_window(gettext("You may start Snort now..."));
-		$emergingthreats = 'off';
-	}
-}
-
-/* download snortrules file */
-if ($snortdownload == 'on')
-{
-	if ($snort_md5_check_ok != 'on') {
-		if (file_exists("{$tmpfname}/{$snort_filename}")) {
-			update_status(gettext("Snortrule tar file exists..."));
-		} else {
-			update_status(gettext("There is a new set of Snort.org rules posted. Downloading..."));
-			update_output_window(gettext("May take 4 to 10 min..."));
-			download_file_with_progress_bar("http://www.snort.org/pub-bin/oinkmaster.cgi/{$oinkid}/{$snort_filename}", "{$tmpfname}/{$snort_filename}");
-			update_all_status($static_output);
-			update_status(gettext("Done downloading rules file."));
-			if (300000 > filesize("{$tmpfname}/$snort_filename")){
-				update_status(gettext("Error with the snort rules download..."));
-				update_output_window(gettext("Snort rules file downloaded failed..."));
-				$snortdownload = 'off';
-			}
-		}
-	}
-}
-
-/* download emergingthreats rules file */
-if ($emergingthreats == "on")
-{
-	if ($emerg_md5_check_ok != 'on')
-	{
-		if (file_exists("{$tmpfname}/{$emergingthreats_filename}"))
-		{
-			update_status(gettext('Emergingthreats tar file exists...'));
-		}else{
-			update_status(gettext("There is a new set of Emergingthreats rules posted. Downloading..."));
-			update_output_window(gettext("May take 4 to 10 min..."));
-			download_file_with_progress_bar('http://rules.emergingthreats.net/open/snort-2.9.0/emerging.rules.tar.gz', "{$tmpfname}/{$emergingthreats_filename}");
-			update_status(gettext('Done downloading Emergingthreats rules file.'));
-		}
-	}
-}
-
-/* download pfsense rules file */
-if ($pfsensedownload == 'on' && $pfsense_md5_check_ok != 'on') {
-	if (file_exists("{$tmpfname}/{$pfsense_rules_filename}")) {
-		update_status(gettext("Snortrule tar file exists..."));
-	} else {
-		update_status(gettext("There is a new set of Pfsense rules posted. Downloading..."));
-		update_output_window(gettext("May take 4 to 10 min..."));
-		download_file_with_progress_bar("http://www.pfsense.com/packages/config/snort/pfsense_rules/pfsense_rules.tar.gz", $tmpfname . "/{$pfsense_rules_filename}");
-		update_all_status($static_output);
-		update_status(gettext("Done downloading rules file."));
-	}
-}
-
-/* Compair md5 sig to file sig */
-
-//$premium_url_chk = $config['installedpackages']['snort']['config'][0]['subscriber'];
-//if ($premium_url_chk == on) {
-//$md5 = file_get_contents("{$tmpfname}/{$snort_filename_md5}");
-//$file_md5_ondisk = `/sbin/md5 {$tmpfname}/{$snort_filename} | /usr/bin/awk '{ print $4 }'`;
-// if ($md5 == $file_md5_ondisk) {
-//    update_status(gettext("Valid md5 checksum pass..."));
-//} else {
-//    update_status(gettext("The downloaded file does not match the md5 file...P is ON"));
-//    update_output_window(gettext("Error md5 Mismatch..."));
-//    return;
-//  }
-//}
-
-//$premium_url_chk = $config['installedpackages']['snort']['config'][0]['subscriber'];
-//if ($premium_url_chk != on) {
-//$md55 = `/bin/cat {$tmpfname}/{$snort_filename_md5} | /usr/bin/awk '{ print $4 }'`;
-//$file_md5_ondisk2 = `/sbin/md5 {$tmpfname}/{$snort_filename} | /usr/bin/awk '{ print $4 }'`;
-// if ($md55 == $file_md5_ondisk2) {
-//    update_status(gettext("Valid md5 checksum pass..."));
-//} else {
-//    update_status(gettext("The downloaded file does not match the md5 file...Not P"));
-//    update_output_window(gettext("Error md5 Mismatch..."));
-//    return;
-//    }
-//}
-
-/* Untar snort rules file individually to help people with low system specs */
-if ($snortdownload == 'on')
-{
-	if ($snort_md5_check_ok != 'on') {
-		if (file_exists("{$tmpfname}/{$snort_filename}")) {
-
-			if ($pfsense_stable == 'yes')
-				$freebsd_version_so = 'FreeBSD-7-2';
-			else
-				$freebsd_version_so = 'FreeBSD-8-1';
-
-			update_status(gettext("Extracting Snort.org rules..."));
-			update_output_window(gettext("May take a while..."));
-			/* extract snort.org rules and  add prefix to all snort.org files*/
-			exec("/bin/rm -r {$snortdir}/rules");
-			sleep(2);
-			exec("/usr/bin/tar xzf {$tmpfname}/{$snort_filename} -C {$snortdir} rules/");
-			chdir ("/usr/local/etc/snort/rules");
-			sleep(2);
-			exec('/usr/local/bin/perl /usr/local/bin/snort_rename.pl s/^/snort_/ *.rules');
-
-			/* extract so rules */
-			exec('/bin/mkdir -p /usr/local/lib/snort/dynamicrules/');
-			if($snort_arch == 'x86'){
-				exec("/usr/bin/tar xzf {$tmpfname}/{$snort_filename} -C {$snortdir} so_rules/precompiled/$freebsd_version_so/i386/2.9.0.5/");
-				exec("/bin/mv -f {$snortdir}/so_rules/precompiled/$freebsd_version_so/i386/2.9.0.5/* /usr/local/lib/snort/dynamicrules/");
-			} else if ($snort_arch == 'x64') {
-				exec("/usr/bin/tar xzf {$tmpfname}/{$snort_filename} -C {$snortdir} so_rules/precompiled/$freebsd_version_so/x86-64/2.9.0.5/");
-				exec("/bin/mv -f {$snortdir}/so_rules/precompiled/$freebsd_version_so/x86-64/2.9.0.5/* /usr/local/lib/snort/dynamicrules/");
-                        }
-			/* extract so rules none bin and rename */
-			exec("/usr/bin/tar xzf {$tmpfname}/{$snort_filename} -C {$snortdir} so_rules/bad-traffic.rules/" .
-			" so_rules/chat.rules/" .
-			" so_rules/dos.rules/" .
-			" so_rules/exploit.rules/" .
-			" so_rules/icmp.rules/" .
-			" so_rules/imap.rules/" .
-			" so_rules/misc.rules/" .
-			" so_rules/multimedia.rules/" .
-			" so_rules/netbios.rules/" .
-			" so_rules/nntp.rules/" .
-			" so_rules/p2p.rules/" .
-			" so_rules/smtp.rules/" .
-			" so_rules/sql.rules/" .
-			" so_rules/web-activex.rules/" .
-			" so_rules/web-client.rules/" .
-			" so_rules/web-iis.rules/" .
-			" so_rules/web-misc.rules/");
-
-				exec("/bin/mv -f {$snortdir}/so_rules/bad-traffic.rules {$snortdir}/rules/snort_bad-traffic.so.rules");
-				exec("/bin/mv -f {$snortdir}/so_rules/chat.rules {$snortdir}/rules/snort_chat.so.rules");
-				exec("/bin/mv -f {$snortdir}/so_rules/dos.rules {$snortdir}/rules/snort_dos.so.rules");
-				exec("/bin/mv -f {$snortdir}/so_rules/exploit.rules {$snortdir}/rules/snort_exploit.so.rules");
-				exec("/bin/mv -f {$snortdir}/so_rules/icmp.rules {$snortdir}/rules/snort_icmp.so.rules");
-				exec("/bin/mv -f {$snortdir}/so_rules/imap.rules {$snortdir}/rules/snort_imap.so.rules");
-				exec("/bin/mv -f {$snortdir}/so_rules/misc.rules {$snortdir}/rules/snort_misc.so.rules");
-				exec("/bin/mv -f {$snortdir}/so_rules/multimedia.rules {$snortdir}/rules/snort_multimedia.so.rules");
-				exec("/bin/mv -f {$snortdir}/so_rules/netbios.rules {$snortdir}/rules/snort_netbios.so.rules");
-				exec("/bin/mv -f {$snortdir}/so_rules/nntp.rules {$snortdir}/rules/snort_nntp.so.rules");
-				exec("/bin/mv -f {$snortdir}/so_rules/p2p.rules {$snortdir}/rules/snort_p2p.so.rules");
-				exec("/bin/mv -f {$snortdir}/so_rules/smtp.rules {$snortdir}/rules/snort_smtp.so.rules");
-				exec("/bin/mv -f {$snortdir}/so_rules/sql.rules {$snortdir}/rules/snort_sql.so.rules");
-				exec("/bin/mv -f {$snortdir}/so_rules/web-activex.rules {$snortdir}/rules/snort_web-activex.so.rules");
-				exec("/bin/mv -f {$snortdir}/so_rules/web-client.rules {$snortdir}/rules/snort_web-client.so.rules");
-				exec("/bin/mv -f {$snortdir}/so_rules/web-iis.rules {$snortdir}/rules/snort_web-iis.so.rules");
-				exec("/bin/mv -f {$snortdir}/so_rules/web-misc.rules {$snortdir}/rules/snort_web-misc.so.rules");
-				exec("/bin/rm -r {$snortdir}/so_rules");
-			}
-
-			/* extract base etc files */
-			exec("/usr/bin/tar xzf {$tmpfname}/{$snort_filename} -C {$snortdir} etc/");
-			exec("/bin/mv -f {$snortdir}/etc/* {$snortdir}");
-			exec("/bin/rm -r {$snortdir}/etc");
-
-			update_status(gettext("Done extracting Snort.org Rules."));
-		}else{
-			update_status(gettext("Error extracting Snort.org Rules..."));
-			update_output_window(gettext("Error Line 755"));
-			$snortdownload = 'off';
-		}
-}
-
-/* Untar emergingthreats rules to tmp */
-if ($emergingthreats == 'on')
-{
-	if ($emerg_md5_check_ok != 'on')
-	{
-		if (file_exists("{$tmpfname}/{$emergingthreats_filename}"))
-		{
-			update_status(gettext("Extracting rules..."));
-			update_output_window(gettext("May take a while..."));
-			exec("/usr/bin/tar xzf {$tmpfname}/{$emergingthreats_filename} -C {$snortdir} rules/");
-		}
-	}
-}
-
-/* Untar Pfsense rules to tmp */
-if ($pfsensedownload == 'on' && $pfsense_md5_check_ok != 'on') {
-	if (file_exists("{$tmpfname}/{$pfsense_rules_filename}")) {
-		update_status(gettext("Extracting Pfsense rules..."));
-		update_output_window(gettext("May take a while..."));
-		exec("/usr/bin/tar xzf {$tmpfname}/{$pfsense_rules_filename} -C {$snortdir} rules/");
-	}
-}
-
-/* Untar snort signatures */
-if ($snortdownload == 'on' && $snort_md5_check_ok != 'on') {
-	if (file_exists("{$tmpfname}/{$snort_filename}")) {
-		$signature_info_chk = $config['installedpackages']['snortglobal']['signatureinfo'];
-		if ($premium_url_chk == 'on') {
-			update_status(gettext("Extracting Signatures..."));
-			update_output_window(gettext("May take a while..."));
-			exec("/usr/bin/tar xzf {$tmpfname}/{$snort_filename} -C {$snortdir} doc/signatures/");
-			update_status(gettext("Done extracting Signatures."));
-		}
-	}
-}
-
-/*  Copy md5 sig to snort dir */
-if ($snortdownload == 'on')
-{
-	if ($snort_md5_check_ok != 'on') {
-		if (file_exists("{$tmpfname}/$snort_filename_md5")) {
-			update_status(gettext("Copying md5 sig to snort directory..."));
-			exec("/bin/cp {$tmpfname}/$snort_filename_md5 {$snortdir}/$snort_filename_md5");
-		}else{
-			update_status(gettext("The md5 file does not exist..."));
-			update_output_window(gettext("Error copying config..."));
-			$snortdownload = 'off';
-		}
-	}
-}
-
-/*  Copy emergingthreats md5 sig to snort dir */
-if ($emergingthreats == "on")
-{
-	if ($emerg_md5_check_ok != 'on')
-	{
-		if (file_exists("{$tmpfname}/$emergingthreats_filename_md5"))
-		{
-			update_status(gettext("Copying md5 sig to snort directory..."));
-			exec("/bin/cp {$tmpfname}/$emergingthreats_filename_md5 {$snortdir}/$emergingthreats_filename_md5");
-		}else{
-			update_status(gettext("The emergingthreats md5 file does not exist..."));
-			update_output_window(gettext("Error copying config..."));
+	if (snort_check_rule_md5("{$emergingthreats_url}{$emergingthreats_filename_md5}", "{$tmpfname}/{$emergingthreats_filename_md5}", "{$et_name} rules")) {
+		/* download Emerging Threats rules file */
+		$file_md5 = trim(file_get_contents("{$tmpfname}/{$emergingthreats_filename_md5}"));
+		if (!snort_fetch_new_rules("{$emergingthreats_url}{$emergingthreats_filename}", "{$tmpfname}/{$emergingthreats_filename}", $file_md5, "{$et_name} rules"))
 			$emergingthreats = 'off';
+	}
+	else
+		$emergingthreats = 'off';
+}
+
+/* Untar Snort rules file to tmp and install the rules */
+if ($snortdownload == 'on') {
+	if (file_exists("{$tmpfname}/{$snort_filename}")) {
+		/* Currently, only FreeBSD-8-1 and FreeBSD-9-0 precompiled SO rules exist from Snort.org */
+		/* Default to FreeBSD 8.1, and then test for FreeBSD 9.x */
+		$freebsd_version_so = 'FreeBSD-8-1';
+		if (substr(php_uname("r"), 0, 1) == '9')
+			$freebsd_version_so = 'FreeBSD-9-0';
+
+		/* Remove the old Snort rules files */
+		$vrt_prefix = VRT_FILE_PREFIX;
+		array_map('unlink', glob("{$snortdir}/rules/{$vrt_prefix}*.rules"));
+
+		if ($pkg_interface <> "console") {
+			update_status(gettext("Extracting Snort VRT rules..."));
+			update_output_window(gettext("Installing Sourcefire VRT rules..."));
 		}
-	}
-}
-
-/*  Copy Pfsense md5 sig to snort dir */
-if ($pfsensedownload == 'on' && $pfsense_md5_check_ok != 'on') {
-	if (file_exists("{$tmpfname}/$pfsense_rules_filename_md5")) {
-		update_status(gettext("Copying Pfsense md5 sig to snort directory..."));
-		exec("/bin/cp {$tmpfname}/$pfsense_rules_filename_md5 {$snortdir}/$pfsense_rules_filename_md5");
-	} else {
-		update_status(gettext("The Pfsense md5 file does not exist..."));
-		update_output_window(gettext("Error copying config..."));
-		$pfsensedownload = 'off';
-	}
-}
-
-/*  Copy signatures dir to snort dir */
-if ($snortdownload == 'on')
-{
-	if ($snort_md5_check_ok != 'on')
-	{
-		$signature_info_chk = $config['installedpackages']['snortglobal']['signatureinfo'];
-		if ($premium_url_chk == 'on')
-		{
-			if (file_exists("{$snortdir}/doc/signatures")) {
-				update_status(gettext("Copying signatures..."));
-				update_output_window(gettext("May take a while..."));
-				exec("/bin/mv -f {$snortdir}/doc/signatures {$snortdir}/signatures");
-				exec("/bin/rm -r {$snortdir}/doc/signatures");
-				update_status(gettext("Done copying signatures."));
-			}else{
-				update_status(gettext("Directory signatures exist..."));
-				update_output_window(gettext("Error copying signature..."));
-				$snortdownload = 'off';
+		error_log(gettext("\tExtracting and installing Snort VRT rules...\n"), 3, $snort_rules_upd_log);
+		/* extract snort.org rules and add VRT_FILE_PREFIX prefix to all snort.org files */
+		safe_mkdir("{$tmpfname}/snortrules");
+		exec("/usr/bin/tar xzf {$tmpfname}/{$snort_filename} -C {$tmpfname}/snortrules rules/");
+		$files = glob("{$tmpfname}/snortrules/rules/*.rules");
+		foreach ($files as $file) {
+			$newfile = basename($file);
+			@copy($file, "{$snortdir}/rules/" . VRT_FILE_PREFIX . "{$newfile}");
+		}
+		/* Extract any IP lists */
+		$files = glob("{$tmpfname}/snortrules/rules/*.txt");
+		foreach ($files as $file) {
+			$newfile = basename($file);
+			@copy($file, "{$snortdir}/rules/{$newfile}");
+		}
+		exec("rm -r {$tmpfname}/snortrules");
+		/* Extract the Snort preprocessor rules */
+		if ($pkg_interface <> "console")
+			update_output_window(gettext("Extracting preprocessor rules files..."));
+		exec("/usr/bin/tar xzf {$tmpfname}/{$snort_filename} -C {$tmpfname} preproc_rules/");
+		$files = glob("{$tmpfname}/preproc_rules/*.rules");
+		foreach ($files as $file) {
+			$newfile = basename($file);
+			@copy($file, "{$snortdir}/preproc_rules/{$newfile}");
+		}
+		exec("rm -r {$tmpfname}/preproc_rules");
+		/* extract so rules */
+		if ($pkg_interface <> "console") {
+			update_status(gettext("Extracting Snort VRT Shared Objects rules..."));
+			update_output_window(gettext("Installing precompiled Shared Objects rules for {$freebsd_version_so}..."));
+		}
+		exec("/bin/mkdir -p {$snortlibdir}/dynamicrules/");
+		error_log(gettext("\tUsing Snort VRT precompiled SO rules for {$freebsd_version_so} ...\n"), 3, $snort_rules_upd_log);
+		$snort_arch = php_uname("m");
+		$nosorules = false;
+		if ($snort_arch  == 'i386'){
+			exec("/usr/bin/tar xzf {$tmpfname}/{$snort_filename} -C {$tmpfname} so_rules/precompiled/{$freebsd_version_so}/i386/{$snort_version}/");
+			exec("/bin/cp {$tmpfname}/so_rules/precompiled/{$freebsd_version_so}/i386/{$snort_version}/*.so {$snortlibdir}/dynamicrules/");
+		} elseif ($snort_arch == 'amd64') {
+			exec("/usr/bin/tar xzf {$tmpfname}/{$snort_filename} -C {$tmpfname} so_rules/precompiled/{$freebsd_version_so}/x86-64/{$snort_version}/");
+			exec("/bin/cp {$tmpfname}/so_rules/precompiled/{$freebsd_version_so}/x86-64/{$snort_version}/*.so {$snortlibdir}/dynamicrules/");
+		} else
+			$nosorules = true;
+		exec("rm -r {$tmpfname}/so_rules");
+		if ($nosorules == false) {
+			/* extract Shared Object stub rules, rename and copy to the rules folder. */
+			if ($pkg_interface <> "console")
+			        update_status(gettext("Copying Snort VRT Shared Objects rules..."));
+			exec("/usr/bin/tar xzf {$tmpfname}/{$snort_filename} -C {$tmpfname} --exclude precompiled/ --exclude src/ so_rules/");
+			$files = glob("{$tmpfname}/so_rules/*.rules");
+			foreach ($files as $file) {
+				$newfile = basename($file, ".rules");
+				@copy($file, "{$snortdir}/rules/" . VRT_FILE_PREFIX . "{$newfile}.so.rules");
 			}
+			exec("rm -r {$tmpfname}/so_rules");
 		}
+		/* extract base etc files */
+		if ($pkg_interface <> "console") {
+		        update_status(gettext("Extracting Snort VRT config and map files..."));
+			update_output_window(gettext("Copying config and map files..."));
+		}
+		exec("/usr/bin/tar xzf {$tmpfname}/{$snort_filename} -C {$tmpfname} etc/");
+		foreach (array("classification.config", "reference.config", "gen-msg.map", "unicode.map") as $file) {
+			if (file_exists("{$tmpfname}/etc/{$file}"))
+				@copy("{$tmpfname}/etc/{$file}", "{$tmpfname}/VRT_{$file}");
+		}
+		exec("rm -r {$tmpfname}/etc");
+		if (file_exists("{$tmpfname}/{$snort_filename_md5}")) {
+			if ($pkg_interface <> "console")
+				update_status(gettext("Copying md5 signature to snort directory..."));
+			@copy("{$tmpfname}/{$snort_filename_md5}", "{$snortdir}/{$snort_filename_md5}");
+		}
+		if ($pkg_interface <> "console") {
+			update_status(gettext("Extraction of Snort VRT rules completed..."));
+			update_output_window(gettext("Installation of Sourcefire VRT rules completed..."));
+		}
+		error_log(gettext("\tInstallation of Snort VRT rules completed.\n"), 3, $snort_rules_upd_log);
 	}
 }
 
-/* double make shure cleanup emerg rules that dont belong */
-if (file_exists("/usr/local/etc/snort/rules/emerging-botcc-BLOCK.rules")) {
-	apc_clear_cache();
-	@unlink("/usr/local/etc/snort/rules/emerging-botcc-BLOCK.rules");
-	@unlink("/usr/local/etc/snort/rules/emerging-botcc.rules");
-	@unlink("/usr/local/etc/snort/rules/emerging-compromised-BLOCK.rules");
-	@unlink("/usr/local/etc/snort/rules/emerging-drop-BLOCK.rules");
-	@unlink("/usr/local/etc/snort/rules/emerging-dshield-BLOCK.rules");
-	@unlink("/usr/local/etc/snort/rules/emerging-rbn-BLOCK.rules");
-	@unlink("/usr/local/etc/snort/rules/emerging-tor-BLOCK.rules");
-}
-
-if (file_exists("/usr/local/lib/snort/dynamicrules/lib_sfdynamic_example_rule.so")) {
-	exec("/bin/rm /usr/local/lib/snort/dynamicrules/lib_sfdynamic_example_rule.so");
-	exec("/bin/rm /usr/local/lib/snort/dynamicrules/lib_sfdynamic_example\*");
-}
-
-/* make shure default rules are in the right format */
-exec("/usr/local/bin/perl -pi -e 's/#alert/# alert/g' /usr/local/etc/snort/rules/*.rules");
-exec("/usr/local/bin/perl -pi -e 's/##alert/# alert/g' /usr/local/etc/snort/rules/*.rules");
-exec("/usr/local/bin/perl -pi -e 's/## alert/# alert/g' /usr/local/etc/snort/rules/*.rules");
-
-/* create a msg-map for snort  */
-update_status(gettext("Updating Alert Messages..."));
-update_output_window(gettext("Please Wait..."));
-exec("/usr/local/bin/perl /usr/local/bin/create-sidmap.pl /usr/local/etc/snort/rules > /usr/local/etc/snort/sid-msg.map");
-
-
-//////////////////
-/* open oinkmaster_conf for writing" function */
-function oinkmaster_conf($id, $if_real, $iface_uuid)
-{
-	global $config, $g, $snort_md5_check_ok, $emerg_md5_check_ok, $pfsense_md5_check_ok;
-
-	@unlink("/usr/local/etc/snort/snort_{$iface_uuid}_{$if_real}/oinkmaster_{$iface_uuid}_{$if_real}.conf");
-
-	/*  enable disable setting will carry over with updates */
-	/*  TODO carry signature changes with the updates */
-	if ($snort_md5_check_ok != 'on' || $emerg_md5_check_ok != 'on' || $pfsense_md5_check_ok != 'on') {
-
-		$selected_sid_on_section = "";
-		$selected_sid_off_sections = "";
-
-		if (!empty($config['installedpackages']['snortglobal']['rule'][$id]['rule_sid_on'])) {
-			$enabled_sid_on = trim($config['installedpackages']['snortglobal']['rule'][$id]['rule_sid_on']);
-			$enabled_sid_on_array = split('\|\|', $enabled_sid_on);
-			foreach($enabled_sid_on_array as $enabled_item_on)
-				$selected_sid_on_sections .= "$enabled_item_on\n";
+/* Untar Snort GPLv2 Community rules file to tmp and install the rules */
+if ($snortcommunityrules == 'on') {
+	safe_mkdir("{$tmpfname}/community");
+	if (file_exists("{$tmpfname}/{$snort_community_rules_filename}")) {
+		if ($pkg_interface <> "console") {
+			update_status(gettext("Extracting Snort GPLv2 Community Rules..."));
+			update_output_window(gettext("Installing Snort GPLv2 Community Rules..."));
 		}
+		error_log(gettext("\tExtracting and installing Snort GPLv2 Community Rules...\n"), 3, $snort_rules_upd_log);
+		exec("/usr/bin/tar xzf {$tmpfname}/{$snort_community_rules_filename} -C {$tmpfname}/community/");
 
-		if (!empty($config['installedpackages']['snortglobal']['rule'][$id]['rule_sid_off'])) {
-			$enabled_sid_off = trim($config['installedpackages']['snortglobal']['rule'][$id]['rule_sid_off']);
-			$enabled_sid_off_array = split('\|\|', $enabled_sid_off);
-			foreach($enabled_sid_off_array as $enabled_item_off)
-				$selected_sid_off_sections .= "$enabled_item_off\n";
+		$files = glob("{$tmpfname}/community/community-rules/*.rules");
+		foreach ($files as $file) {
+			$newfile = basename($file);
+			@copy($file, "{$snortdir}/rules/" . GPL_FILE_PREFIX . "{$newfile}");
 		}
-
-		if (!empty($selected_sid_off_sections) || !empty($selected_sid_on_section)) {
-			$snort_sid_text = <<<EOD
-
-###########################################
-#                                         #
-# this is auto generated on snort updates #
-#                                         #
-###########################################
-
-path = /bin:/usr/bin:/usr/local/bin
-
-update_files = \.rules$|\.config$|\.conf$|\.txt$|\.map$
-
-url = dir:///usr/local/etc/snort/rules
-
-$selected_sid_on_sections
-
-$selected_sid_off_sections
-
-EOD;
-
-			/* open snort's oinkmaster.conf for writing */
-			@file_put_contents("/usr/local/etc/snort/snort_{$iface_uuid}_{$if_real}/oinkmaster_{$iface_uuid}_{$if_real}.conf", $snort_sid_text);
+                /* base etc files for Snort GPLv2 Community rules */
+		foreach (array("classification.config", "reference.config", "gen-msg.map", "unicode.map") as $file) {
+			if (file_exists("{$tmpfname}/community/community-rules/{$file}"))
+				@copy("{$tmpfname}/community/community-rules/{$file}", "{$tmpfname}/" . GPL_FILE_PREFIX . "{$file}");
 		}
+		/*  Copy snort community md5 sig to snort dir */
+		if (file_exists("{$tmpfname}/{$snort_community_rules_filename_md5}")) {
+			if ($pkg_interface <> "console")
+				update_status(gettext("Copying md5 signature to snort directory..."));
+			@copy("{$tmpfname}/{$snort_community_rules_filename_md5}", "{$snortdir}/{$snort_community_rules_filename_md5}");
+		}
+		if ($pkg_interface <> "console") {
+			update_status(gettext("Extraction of Snort GPLv2 Community Rules completed..."));
+			update_output_window(gettext("Installation of Snort GPLv2 Community Rules file completed..."));
+		}
+		error_log(gettext("\tInstallation of Snort GPLv2 Community Rules completed.\n"), 3, $snort_rules_upd_log);
+		exec("rm -r {$tmpfname}/community");
 	}
 }
 
-/*  Run oinkmaster to snort_wan and cp configs */
-/*  If oinkmaster is not needed cp rules normally */
-/*  TODO add per interface settings here */
-function oinkmaster_run($id, $if_real, $iface_uuid)
-{
-	global $config, $g, $snortdir_wan, $snortdir, $snort_md5_check_ok, $emerg_md5_check_ok, $pfsense_md5_check_ok;
+/* Untar Emerging Threats rules file to tmp and install the rules */
+if ($emergingthreats == 'on') {
+	safe_mkdir("{$tmpfname}/emerging");
+	if (file_exists("{$tmpfname}/{$emergingthreats_filename}")) {
+		if ($pkg_interface <> "console") {
+			update_status(gettext("Extracting {$et_name} rules..."));
+			update_output_window(gettext("Installing {$et_name} rules..."));
+		}
+		error_log(gettext("\tExtracting and installing {$et_name} rules...\n"), 3, $snort_rules_upd_log);
+		exec("/usr/bin/tar xzf {$tmpfname}/{$emergingthreats_filename} -C {$tmpfname}/emerging rules/");
 
-	if ($snort_md5_check_ok != 'on' || $emerg_md5_check_ok != 'on' || $pfsense_md5_check_ok != 'on') {
-		if (empty($config['installedpackages']['snortglobal']['rule'][$id]['rule_sid_on']) && empty($config['installedpackages']['snortglobal']['rule'][$id]['rule_sid_off'])) { 
-			update_status(gettext("Your first set of rules are being copied..."));
-			update_output_window(gettext("May take a while..."));
-			exec("/bin/cp {$snortdir}/rules/* {$snortdir_wan}/snort_{$iface_uuid}_{$if_real}/rules/");
-			exec("/bin/cp {$snortdir}/classification.config {$snortdir_wan}/snort_{$iface_uuid}_{$if_real}");
-			exec("/bin/cp {$snortdir}/gen-msg.map {$snortdir_wan}/snort_{$iface_uuid}_{$if_real}");
-			exec("/bin/cp {$snortdir}/generators {$snortdir_wan}/snort_{$iface_uuid}_{$if_real}");
-			exec("/bin/cp {$snortdir}/reference.config {$snortdir_wan}/snort_{$iface_uuid}_{$if_real}");
-			exec("/bin/cp {$snortdir}/sid {$snortdir_wan}/snort_{$iface_uuid}_{$if_real}");
-			exec("/bin/cp {$snortdir}/sid-msg.map {$snortdir_wan}/snort_{$iface_uuid}_{$if_real}");
-			exec("/bin/cp {$snortdir}/unicode.map {$snortdir_wan}/snort_{$iface_uuid}_{$if_real}");
-		} else {
-			update_status(gettext("Your enable and disable changes are being applied to your fresh set of rules..."));
-			update_output_window(gettext("May take a while..."));
-			exec("/bin/cp {$snortdir}/rules/* {$snortdir_wan}/snort_{$iface_uuid}_{$if_real}/rules/");
-			exec("/bin/cp {$snortdir}/classification.config {$snortdir_wan}/snort_{$iface_uuid}_{$if_real}");
-			exec("/bin/cp {$snortdir}/gen-msg.map {$snortdir_wan}/snort_{$iface_uuid}_{$if_real}");
-			exec("/bin/cp {$snortdir}/generators {$snortdir_wan}/snort_{$iface_uuid}_{$if_real}");
-			exec("/bin/cp {$snortdir}/reference.config {$snortdir_wan}/snort_{$iface_uuid}_{$if_real}");
-			exec("/bin/cp {$snortdir}/sid {$snortdir_wan}/snort_{$iface_uuid}_{$if_real}");
-			exec("/bin/cp {$snortdir}/sid-msg.map {$snortdir_wan}/snort_{$iface_uuid}_{$if_real}");
-			exec("/bin/cp {$snortdir}/unicode.map {$snortdir_wan}/snort_{$iface_uuid}_{$if_real}");
+		/* Remove the old Emerging Threats rules files */
+		$eto_prefix = ET_OPEN_FILE_PREFIX;
+		$etpro_prefix = ET_PRO_FILE_PREFIX;
+		array_map('unlink', glob("{$snortdir}/rules/{$eto_prefix}*.rules"));
+		array_map('unlink', glob("{$snortdir}/rules/{$etpro_prefix}*.rules"));
+		array_map('unlink', glob("{$snortdir}/rules/{$eto_prefix}*ips.txt"));
+		array_map('unlink', glob("{$snortdir}/rules/{$etpro_prefix}*ips.txt"));
 
-			/*  might have to add a sleep for 3sec for flash drives or old drives */
-			exec("/usr/local/bin/perl /usr/local/bin/oinkmaster.pl -C /usr/local/etc/snort/snort_{$iface_uuid}_{$if_real}/oinkmaster_{$iface_uuid}_{$if_real}.conf -o /usr/local/etc/snort/snort_{$iface_uuid}_{$if_real}/rules > /usr/local/etc/snort/oinkmaster_{$iface_uuid}_{$if_real}.log");
+		$files = glob("{$tmpfname}/emerging/rules/*.rules");
+		foreach ($files as $file) {
+			$newfile = basename($file);
+			if ($etpro == "on")
+				@copy($file, "{$snortdir}/rules/" . ET_PRO_FILE_PREFIX . "{$newfile}");
+			else
+				@copy($file, "{$snortdir}/rules/{$newfile}");
+		}
+		/* IP lists for Emerging Threats rules */
+		$files = glob("{$tmpfname}/emerging/rules/*ips.txt");
+		foreach ($files as $file) {
+			$newfile = basename($file);
+			if ($etpro == "on")
+				@copy($file, "{$snortdir}/rules/" . ET_PRO_FILE_PREFIX . "{$newfile}");
+			else
+				@copy($file, "{$snortdir}/rules/" . ET_OPEN_FILE_PREFIX . "{$newfile}");
+		}
+                /* base etc files for Emerging Threats rules */
+		foreach (array("classification.config", "reference.config", "gen-msg.map", "unicode.map") as $file) {
+			if (file_exists("{$tmpfname}/emerging/rules/{$file}"))
+				@copy("{$tmpfname}/emerging/rules/{$file}", "{$tmpfname}/ET_{$file}");
+		}
 
+		/*  Copy emergingthreats md5 sig to snort dir */
+		if (file_exists("{$tmpfname}/{$emergingthreats_filename_md5}")) {
+			if ($pkg_interface <> "console")
+				update_status(gettext("Copying md5 signature to snort directory..."));
+			@copy("{$tmpfname}/{$emergingthreats_filename_md5}", "{$snortdir}/{$emergingthreats_filename_md5}");
+		}
+		if ($pkg_interface <> "console") {
+			update_status(gettext("Extraction of {$et_name} rules completed..."));
+			update_output_window(gettext("Installation of {$et_name} rules completed..."));
+		}
+		error_log(gettext("\tInstallation of {$et_name} rules completed.\n"), 3, $snort_rules_upd_log);
+		exec("rm -r {$tmpfname}/emerging");
+	}
+}
+
+function snort_apply_customizations($snortcfg, $if_real) {
+
+	global $vrt_enabled;
+	$snortdir = SNORTDIR;
+
+	/* Update the Preprocessor rules from the master configuration for the interface if Snort */
+	/* VRT rules are in use and the interface's preprocessor rules are not protected.         */
+	if ($vrt_enabled == 'on' && $snortcfg['protect_preproc_rules'] != 'on') {
+		$preproc_files = glob("{$snortdir}/preproc_rules/*.rules");
+		foreach ($preproc_files as $file) {
+			$newfile = basename($file);
+			@copy($file, "{$snortdir}/snort_{$snortcfg['uuid']}_{$if_real}/preproc_rules/{$newfile}");
 		}
 	}
+
+	snort_prepare_rule_files($snortcfg, "{$snortdir}/snort_{$snortcfg['uuid']}_{$if_real}");
+
+	/* Copy the master config and map files to the interface directory */
+	@copy("{$snortdir}/classification.config", "{$snortdir}/snort_{$snortcfg['uuid']}_{$if_real}/classification.config");
+	@copy("{$snortdir}/reference.config", "{$snortdir}/snort_{$snortcfg['uuid']}_{$if_real}/reference.config");
+	@copy("{$snortdir}/gen-msg.map", "{$snortdir}/snort_{$snortcfg['uuid']}_{$if_real}/gen-msg.map");
+	@copy("{$snortdir}/unicode.map", "{$snortdir}/snort_{$snortcfg['uuid']}_{$if_real}/unicode.map");
 }
 
-/* Start the proccess for every interface rule */
-/* TODO: try to make the code smother */
-if (is_array($config['installedpackages']['snortglobal']['rule']))
-{
-	foreach ($config['installedpackages']['snortglobal']['rule'] as $id => $value) {
-		$result_lan = $value['interface'];
-		$if_real = snort_get_real_interface($result_lan);
-		$iface_uuid = $value['uuid'];
+if ($snortdownload == 'on' || $emergingthreats == 'on' || $snortcommunityrules == 'on') {
 
-		/* make oinkmaster.conf for each interface rule */
-		oinkmaster_conf($id, $if_real, $iface_uuid);
+	if ($pkg_interface <> "console")
+		update_status(gettext('Copying new config and map files...'));
+	error_log(gettext("\tCopying new config and map files...\n"), 3, $snort_rules_upd_log);
 
-		/* run oinkmaster for each interface rule */
-		oinkmaster_run($id, $if_real, $iface_uuid);
+	/******************************************************************/
+	/* Build the classification.config and reference.config files     */
+	/* using the ones from all the downloaded rules plus the default  */
+	/* files installed with Snort.                                    */
+	/******************************************************************/
+	$cfgs = glob("{$tmpfname}/*reference.config");
+	$cfgs[] = "{$snortdir}/reference.config";
+	snort_merge_reference_configs($cfgs, "{$snortdir}/reference.config");
+	$cfgs = glob("{$tmpfname}/*classification.config");
+	$cfgs[] = "{$snortdir}/classification.config";
+	snort_merge_classification_configs($cfgs, "{$snortdir}/classification.config");
+
+	/*******************************************************************/
+        /* Determine which map files set to use for the master copy.  If   */
+        /* the Snort VRT rules are not enabled, then use Emerging Threats  */
+	/* or Snort Community Rules, in that order, if either is enabled.  */
+	/*******************************************************************/
+	if ($snortdownload == 'on' || $vrt_enabled == 'on')
+		$prefix = "VRT_";
+	elseif ($emergingthreats == 'on')
+		$prefix = "ET_";
+	elseif ($snortcommunityrules == 'on')
+		$prefix = GPL_FILE_PREFIX;
+	if (file_exists("{$tmpfname}/{$prefix}unicode.map"))
+		@copy("{$tmpfname}/{$prefix}unicode.map", "{$snortdir}/unicode.map");
+	if (file_exists("{$tmpfname}/{$prefix}gen-msg.map"))
+		@copy("{$tmpfname}/{$prefix}gen-msg.map", "{$snortdir}/gen-msg.map");
+
+	/* Start the rules rebuild proccess for each configured interface */
+	if (is_array($config['installedpackages']['snortglobal']['rule']) &&
+	    !empty($config['installedpackages']['snortglobal']['rule'])) {
+
+		/* Set the flag to force rule rebuilds since we downloaded new rules,    */
+		/* except when in post-install mode.  Post-install does its own rebuild. */
+		if ($g['snort_postinstall'])
+			$rebuild_rules = false;
+		else
+			$rebuild_rules = true;
+
+		/* Create configuration for each active Snort interface */
+		foreach ($config['installedpackages']['snortglobal']['rule'] as $id => $value) {
+			$if_real = snort_get_real_interface($value['interface']);
+			$tmp = "Updating rules configuration for: " . snort_get_friendly_interface($value['interface']) . " ...";
+			if ($pkg_interface <> "console"){
+				update_status(gettext($tmp));
+				update_output_window(gettext("Please wait while Snort interface files are being updated..."));
+			}
+
+			// Make sure the interface subdirectory and required sub-directories exists.
+			// We need to re-create them during a pkg reinstall for the intial rules set
+			// download and configuration done as part of restoring saved settings.
+			if (!is_dir("{$snortdir}/snort_{$value['uuid']}_{$if_real}"))
+				safe_mkdir("{$snortdir}/snort_{$value['uuid']}_{$if_real}");
+			if (!is_dir("{$snortdir}/snort_{$value['uuid']}_{$if_real}/rules"))
+				safe_mkdir("{$snortdir}/snort_{$value['uuid']}_{$if_real}/rules");
+			if (!is_dir("{$snortdir}/snort_{$value['uuid']}_{$if_real}/preproc_rules"))
+				safe_mkdir("{$snortdir}/snort_{$value['uuid']}_{$if_real}/preproc_rules");
+			if (!is_dir("{$snortdir}/snort_{$value['uuid']}_{$if_real}/dynamicpreprocessor"))
+				safe_mkdir("{$snortdir}/snort_{$value['uuid']}_{$if_real}/dynamicpreprocessor");
+
+			snort_apply_customizations($value, $if_real);
+
+			/*  Log a message in Update Log if protecting customized preprocessor rules. */
+			$tmp = "\t" . $tmp . "\n";
+			if ($value['protect_preproc_rules'] == 'on') {
+				$tmp .= gettext("\tPreprocessor text rules flagged as protected and not updated for ");
+				$tmp .= snort_get_friendly_interface($value['interface']) . "...\n";
+			}
+			error_log($tmp, 3, $snort_rules_upd_log);
+		}
+	}
+	else {
+		if ($pkg_interface <> "console") {
+		        update_output_window(gettext("Warning:  No interfaces configured for Snort were found..."));
+			update_output_window(gettext("No interfaces currently have Snort configured and enabled on them..."));
+		}
+		error_log(gettext("\tWarning:  No interfaces configured for Snort were found...\n"), 3, $snort_rules_upd_log);
+	}
+
+	/* Clear the rebuild rules flag.  */
+	$rebuild_rules = false;
+
+	/*  remove old $tmpfname files */
+	if (is_dir("{$tmpfname}")) {
+		if ($pkg_interface <> "console")
+			update_status(gettext("Cleaning up after rules extraction..."));
+		exec("/bin/rm -r {$tmpfname}");
+	}
+
+	/* Restart snort if already running and we are not rebooting to pick up the new rules. */
+       	if (is_process_running("snort") && !$g['booting']) {
+		if ($pkg_interface <> "console") {
+			update_status(gettext('Restarting Snort to activate the new set of rules...'));
+			update_output_window(gettext("Please wait ... restarting Snort will take some time..."));
+		}
+		error_log(gettext("\tRestarting Snort to activate the new set of rules...\n"), 3, $snort_rules_upd_log);
+       		restart_service("snort");
+		if ($pkg_interface <> "console")
+		        update_output_window(gettext("Snort has restarted with your new set of rules..."));
+       		log_error(gettext("[Snort] Snort has restarted with your new set of rules..."));
+		error_log(gettext("\tSnort has restarted with your new set of rules.\n"), 3, $snort_rules_upd_log);
+	}
+	else {
+		if ($pkg_interface <> "console")
+			update_output_window(gettext("The rules update task is complete..."));
 	}
 }
 
-//////////////
-
-/* mark the time update finnished */
-$config['installedpackages']['snortglobal']['last_rules_install'] = date("Y-M-jS-h:i-A");
-
-/*  remove old $tmpfname files */
-if (is_dir('/usr/local/etc/snort/tmp')) {
-	update_status(gettext("Cleaning up..."));
-	exec("/bin/rm -r /usr/local/etc/snort/tmp/snort_rules_up");
-	sleep(2);
-	exec("/bin/rm -r /usr/local/etc/snort/tmp/rules_bk");
-}
-
-/* make all dirs snorts */
-mwexec("/usr/sbin/chown -R snort:snort /var/log/snort", true);
-mwexec("/usr/sbin/chown -R snort:snort /usr/local/etc/snort", true);
-mwexec("/usr/sbin/chown -R snort:snort /usr/local/lib/snort", true);
-mwexec("/bin/chmod -R 755  /var/log/snort", true);
-mwexec("/bin/chmod -R 755  /usr/local/etc/snort", true);
-mwexec("/bin/chmod -R 755  /usr/local/lib/snort", true);
-
-if ($snortdownload == 'off' && $emergingthreats == 'off' && $pfsensedownload == 'off')
-	update_output_window(gettext("Finished..."));
-else if ($snort_md5_check_ok == 'on' && $emerg_md5_check_ok == 'on' && $pfsense_md5_check_ok == 'on')
-	update_output_window(gettext("Finished..."));
-else {
-	/* You are Not Up to date, always stop snort when updating rules for low end machines */;
-	update_status(gettext("You are NOT up to date..."));
-	exec("/bin/sh /usr/local/etc/rc.d/snort.sh start");
-	update_status(gettext("The Rules update finished..."));
-	update_output_window(gettext("Snort has restarted with your new set of rules..."));
-	exec("/bin/rm /tmp/snort_download_halt.pid");
-}
-
-update_status(gettext("The Rules update finished..."));
+if ($pkg_interface <> "console")
+	update_status(gettext("The Rules update has finished..."));
+log_error(gettext("[Snort] The Rules update has finished."));
+error_log(gettext("The Rules update has finished.  Time: " . date("Y-m-d H:i:s"). "\n\n"), 3, $snort_rules_upd_log);
 conf_mount_ro();
+
+/* Restore the state of $pkg_interface */
+$pkg_interface = $pkg_interface_orig;
 
 ?>

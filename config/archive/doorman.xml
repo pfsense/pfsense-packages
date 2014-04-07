@@ -74,7 +74,7 @@
         </tabs>
 	<configpath>installedpackages->package->$packagename->configuration->settings</configpath>
 	<additional_files_needed>
-		<item>http://www.pfsense.com/packages/config/doormanusers.xml</item>
+		<item>https://packages.pfsense.org/packages/config/doormanusers.xml</item>
 	</additional_files_needed>
 	<fields>
 		<field>

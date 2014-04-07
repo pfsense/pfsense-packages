@@ -91,7 +91,7 @@ if ($config_change == 1) {
             Is command line PHP designed to run PHP as a Service. The custom PHP code that is defined below is run over and over again inside a continuous loop. There are many possible uses such as monitoring CPU, Memory, File System Space, interacting with Snort, and many others uses that are yet to be discovered. 
             It can send events to the sylog that will can be viewed from the system log or remote syslog server. example: exec("logger This is a test");
             <br /><br />
-            For more information see: <a href='http://doc.pfsense.org/index.php/PHPService'>http://doc.pfsense.org/index.php/PHPService</a>            
+            For more information see: <a href='https://doc.pfsense.org/index.php/PHPService'>https://doc.pfsense.org/index.php/PHPService</a>            
             </p></td>
       </tr>
     </table>

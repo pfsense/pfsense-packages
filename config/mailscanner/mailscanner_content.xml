@@ -1,0 +1,242 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE packagegui SYSTEM "./schema/packages.dtd">
+<?xml-stylesheet type="text/xsl" href="./xsl/package.xsl"?>
+<packagegui>
+	<copyright>
+	<![CDATA[
+/* $Id$ */
+/* ========================================================================== */
+/*
+    mailscanner_contents.xml
+    part of the mailscaner package for pfSense
+    Copyright (C) 2011-2013 Marcello Coutinho
+    All rights reserved.            
+                                                                  */
+/* ========================================================================== */
+/*
+    Redistribution and use in source and binary forms, with or without
+    modification, are permitted provided that the following conditions are met:
+
+     1. Redistributions of source code must retain the above copyright notice,
+        this list of conditions and the following disclaimer.
+
+     2. Redistributions in binary form must reproduce the above copyright
+        notice, this list of conditions and the following disclaimer in the
+        documentation and/or other materials provided with the distribution.
+
+    THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
+    INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+    AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+    AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+    OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+    INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+    POSSIBILITY OF SUCH DAMAGE.
+                                                                              */
+/* ========================================================================== */
+	]]>
+	</copyright>
+	<description>Describe your package here</description>
+	<requirements>Describe your package requirements here</requirements>
+	<faq>Currently there are no FAQ items provided.</faq>
+	<name>mscontent</name>
+	<version>1.1</version>
+	<title>Services: MailScanner</title>
+	<include_file>/usr/local/pkg/mailscanner.inc</include_file>
+<tabs>
+		<tab>
+			<text>General</text>
+			<url>/pkg_edit.php?xml=mailscanner.xml&amp;id=0</url>
+		</tab>
+		<tab>
+			<text>Attachments</text>
+			<url>/pkg_edit.php?xml=mailscanner_attachments.xml&amp;id=0</url>
+		</tab>
+		<tab>
+			<text>Antivirus</text>
+			<url>/pkg_edit.php?xml=mailscanner_antivirus.xml&amp;id=0</url>
+		</tab>
+		<tab>
+			<text>Content</text>
+			<url>/pkg_edit.php?xml=mailscanner_content.xml&amp;id=0</url>
+			<active/>
+		</tab>
+		<tab>
+			<text>AntiSpam</text>
+			<url>/pkg_edit.php?xml=mailscanner_antispam.xml&amp;id=0</url>
+		</tab>
+		<tab>
+			<text>Alerts</text>
+			<url>/pkg_edit.php?xml=mailscanner_alerts.xml&amp;id=0</url>
+		</tab>
+			<tab>
+			<text>Reporting</text>
+			<url>/pkg_edit.php?xml=mailscanner_report.xml&amp;id=0</url>
+		</tab>
+		<tab>
+			<text>XMLRPC Sync</text>
+			<url>/pkg_edit.php?xml=mailscanner_sync.xml&amp;id=0</url>
+		</tab>
+		<tab>
+			<text>Help</text>
+			<url>/mailscanner_about.php</url>
+		</tab>
+</tabs>
+	<fields>
+		<field>
+			<name>Removing/Logging dangerous or potentially offensive content</name>
+			<type>listtopic</type>
+		</field>
+		<field>
+			<fielddescr>Contents</fielddescr>
+			<fieldname>checks</fieldname>
+			<description>
+			<![CDATA[Strings listed here will be searched for in the output of the virus scanners.<br>It is used to list which viruses should be handled differently from other viruses.<br>
+					Mailscanner default options are in (&nbsp;).]]>
+			</description>
+	    	<type>select</type>
+ 				<options>
+				<option><name>Dangerous Content Scanning (yes)</name><value>DangerousContentScanning</value></option>
+				<option><name>Allow Partial Messages (no)</name><value>AllowPartialMessages</value></option>
+				<option><name>Allow External Message Bodies (no)</name><value>AllowExternalMessageBodies</value></option>
+				<option><name>Find Phishing Fraud (yes)</name><value>FindPhishingFraud</value></option>
+				<option><name>Also Find Numeric Phishing (yes)</name><value>AlsoFindNumericPhishing</value></option>
+				<option><name>Use Stricter Phishing Net (yes)</name><value>UseStricterPhishingNet</value></option>
+				<option><name>Highlight Phishing Fraud (yes)</name><value>HighlightPhishingFraud</value></option>
+				<option><name>Convert Dangerous HTML To Text (no)</name><value>ConvertDangerousHTMLToText</value></option>
+				<option><name>Convert HTML To Text (no)</name><value>ConvertHTMLToText</value></option>
+				 
+				
+				</options>
+				<size>10</size>
+				<multiple/>
+		</field>
+		<field>
+			<fielddescr>IFrame Tags</fielddescr>
+			<fieldname>iframe_tags</fieldname>
+			<type>select</type>
+ 				<options>
+ 				<option><name>Disarm</name><value>disarm</value></option>
+				<option><name>Allow</name><value>yes</value></option>
+				<option><name>Deny</name><value>no</value></option>
+				</options>
+			<description><![CDATA[Do you want to allow 'IFrame' tags in email messages?<br>
+					This is not a good idea as it allows various Microsoft Outlook security vulnerabilities to remain unprotected, but if you have a load of mailing lists sending them,
+# then you will want to allow them to keep your users happy.]]>
+			</description>
+		</field>
+			<field>
+			<fielddescr>Form Tags</fielddescr>
+			<fieldname>form_tags</fieldname>
+			<type>select</type>
+ 				<options>
+ 				<option><name>disarm</name><value>disarm</value></option>
+				<option><name>Allow</name><value>yes</value></option>
+				<option><name>Deny</name><value>no</value></option>
+				</options>
+			<description><![CDATA[Do you want to allow 'Form' tags in email messages?<br>
+								This is a bad idea as these are used as scams to pursuade people to part with credit card information and other personal data.]]>
+			</description>
+		</field>
+			<field>
+			<fielddescr>Script Tags</fielddescr>
+			<fieldname>script_tags</fieldname>
+			<type>select</type>
+ 				<options>
+ 				<option><name>Disarm</name><value>disarm</value></option>
+				<option><name>Allow</name><value>yes</value></option>
+				<option><name>Deny</name><value>no</value></option>
+				</options>
+			<description><![CDATA[Do you want to allow 'Script' tags in email messages?<br>
+								This is a bad idea as these are used to exploit vulnerabilities in email applications and web browsers.]]>
+			</description>
+		</field>
+			<field>
+			<fielddescr>Web bugs</fielddescr>
+			<fieldname>web_bugs</fieldname>
+			<type>select</type>
+ 				<options>
+ 				<option><name>Disarm</name><value>disarm</value></option>
+				<option><name>Allow</name><value>yes</value></option>
+				<option><name>Deny</name><value>no</value></option>
+				</options>
+			<description><![CDATA[Do you want to allow 'Img' tags with very small images in email messages?<br>
+								This is a bad idea as these are used as 'web bugs' to find out if a message	has been read.<br>
+								It is not dangerous, it is just used to make you give away information.]]>
+			</description>
+		</field>
+			<field>
+			<fielddescr>Object Codebase Tags</fielddescr>
+			<fieldname>codebase_tags</fieldname>
+			<type>select</type>
+ 				<options>
+ 				<option><name>disarm</name><value>disarm</value></option>
+				<option><name>allow</name><value>yes</value></option>
+				<option><name>deny</name><value>no</value></option>
+				</options>
+			<description><![CDATA[Do you want to allow <strong>'Object Codebase=...' or 'Object Data=...'</strong> tags in email messages?<br>
+								This is a bad idea as it leaves you unprotected against various	Microsoft-specific security vulnerabilities.<br>
+								But if your users demandit, you can do it.]]>
+			</description>
+		</field>
+		<field>
+			<name>phishing.safe.sites.conf</name>
+			<type>listtopic</type>
+		</field>
+		<field>
+			<fielddescr>phishing.safe.sites.conf</fielddescr>
+			<fieldname>phishing_safe</fieldname>
+			<dontdisplayname/>
+			<usecolspan2/>
+			<description><![CDATA[phishing.safe.sites.conf config file.<br>Leave this field blank to load sample file.]]></description>
+			<type>textarea</type>
+			<cols>90</cols>
+			<rows>15</rows>
+			<encoding>base64</encoding>
+		</field>
+		<field>
+			<name>phishing.bad.sites.conf</name>
+			<type>listtopic</type>
+		</field>
+		<field>
+			<fielddescr>phishing.bad.sites.conf</fielddescr>
+			<fieldname>phishing_bad</fieldname>
+			<dontdisplayname/>
+			<usecolspan2/>
+			<description><![CDATA[phishing.bad.sites.conf config file.<br>Leave this field blank to load sample file.]]></description>
+			<type>textarea</type>
+			<cols>90</cols>
+			<rows>15</rows>
+			<encoding>base64</encoding>
+		</field>
+		<field>
+			<name>country.domains.conf</name>
+			<type>listtopic</type>
+		</field>
+		<field>
+			<fielddescr>country.domains.conf</fielddescr>
+			<fieldname>country_domains</fieldname>
+			<dontdisplayname/>
+			<usecolspan2/>
+			<description><![CDATA[country.domains.conf config file.<br>Leave this field blank to load sample file.]]></description>
+			<type>textarea</type>
+			<cols>90</cols>
+			<rows>15</rows>
+			<encoding>base64</encoding>
+		</field>
+	</fields>
+	<custom_php_install_command>
+		mailscanner_php_install_command();
+	</custom_php_install_command>
+	<custom_php_deinstall_command>
+		mailscanner_php_deinstall_command();
+	</custom_php_deinstall_command>
+	<custom_php_validation_command>
+		mailscanner_validate_input($_POST, &amp;$input_errors);
+	</custom_php_validation_command>	
+	<custom_php_resync_config_command>
+		sync_package_mailscanner();
+	</custom_php_resync_config_command>
+</packagegui>

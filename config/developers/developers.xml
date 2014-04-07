@@ -51,7 +51,7 @@
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>077</chmod>
-		<item>http://www.pfsense.com/~sullrich/extra/developer_pkg.tgz</item>
+		<item>https://www.pfsense.org/~sullrich/extra/developer_pkg.tgz</item>
 	</additional_files_needed>
     <custom_php_install_command>
 	update_status("Extracing Developers package contents... This will take a bit!");

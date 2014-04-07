@@ -1,180 +1,159 @@
 <?php
 /*
- snort_rules_edit.php
- Copyright (C) 2004, 2005 Scott Ullrich
- Copyright (C) 2011 Ermal Luci
- All rights reserved.
-
- Adapted for FreeNAS by Volker Theile (votdev@gmx.de)
- Copyright (C) 2006-2009 Volker Theile
-
- Adapted for Pfsense Snort package by Robert Zelaya
- Copyright (C) 2008-2009 Robert Zelaya
-
- Using dp.SyntaxHighlighter for syntax highlighting
- http://www.dreamprojections.com/SyntaxHighlighter
- Copyright (C) 2004-2006 Alex Gorbatchev. All rights reserved.
-
- Redistribution and use in source and binary forms, with or without
- modification, are permitted provided that the following conditions are met:
-
- 1. Redistributions of source code must retain the above copyright notice,
- this list of conditions and the following disclaimer.
-
- 2. Redistributions in binary form must reproduce the above copyright
- notice, this list of conditions and the following disclaimer in the
- documentation and/or other materials provided with the distribution.
-
- THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
- INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
- AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
- AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
- OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
- SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
- INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
- CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- POSSIBILITY OF SUCH DAMAGE.
+ * snort_rules_edit.php
+ *
+ * Copyright (C) 2004, 2005 Scott Ullrich
+ * Copyright (C) 2011 Ermal Luci
+ * Copyright (C) 2014 Bill Meeks
+ * All rights reserved.
+ *
+ * Adapted for FreeNAS by Volker Theile (votdev@gmx.de)
+ * Copyright (C) 2006-2009 Volker Theile
+ *
+ * Adapted for Pfsense Snort package by Robert Zelaya
+ * Copyright (C) 2008-2009 Robert Zelaya
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright notice,
+ * this list of conditions and the following disclaimer.
+ *
+ * 2. Redistributions in binary form must reproduce the above copyright
+ * notice, this list of conditions and the following disclaimer in the
+ * documentation and/or other materials provided with the distribution.
+ *
+ * THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
+ * INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+ * AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+ * AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+ * OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
  */
 
 require_once("guiconfig.inc");
 require_once("/usr/local/pkg/snort/snort.inc");
-require_once("/usr/local/pkg/snort/snort_gui.inc");
+
+$flowbit_rules_file = FLOWBITS_FILENAME;
+$snortdir = SNORTDIR;
 
 if (!is_array($config['installedpackages']['snortglobal']['rule'])) {
 	$config['installedpackages']['snortglobal']['rule'] = array();
 }
-$a_nat = &$config['installedpackages']['snortglobal']['rule'];
+$a_rule = &$config['installedpackages']['snortglobal']['rule'];
 
 $id = $_GET['id'];
-if (isset($_POST['id']))
-	$id = $_POST['id'];
-
-$ids = $_GET['ids'];
-if (isset($_POST['ids']))
-	$ids = $_POST['ids'];
-
-if (isset($id) && $a_nat[$id]) {
-	$pconfig['enable'] = $a_nat[$id]['enable'];
-	$pconfig['interface'] = $a_nat[$id]['interface'];
-	$pconfig['rulesets'] = $a_nat[$id]['rulesets'];
+if (is_null($id)) {
+	header("Location: /snort/snort_interfaces.php");
+	exit;
 }
 
-//get rule id
-$lineid = $_GET['ids'];
-if (isset($_POST['ids']))
-	$lineid = $_POST['ids'];
+if (isset($id) && $a_rule[$id]) {
+	$pconfig['enable'] = $a_rule[$id]['enable'];
+	$pconfig['interface'] = $a_rule[$id]['interface'];
+	$pconfig['rulesets'] = $a_rule[$id]['rulesets'];
+}
 
+/* convert fake interfaces to real */
+$if_real = snort_get_real_interface($pconfig['interface']);
+$snort_uuid = $a_rule[$id]['uuid'];
+$snortcfgdir = "{$snortdir}/snort_{$snort_uuid}_{$if_real}";
 $file = $_GET['openruleset'];
-if (isset($_POST['openruleset']))
-	$file = $_POST['openruleset'];
-
-//read file into string, and get filesize also chk for empty files
 $contents = '';
-if (filesize($file) > 0 )
-	$contents = file_get_contents($file);
+$wrap_flag = "off";
 
-//delimiter for each new rule is a new line
-$delimiter = "\n";
+// Correct displayed file title if necessary
+if ($file == "Auto-Flowbit Rules")
+	$displayfile = FLOWBITS_FILENAME;
+else
+	$displayfile = $file;
 
-//split the contents of the string file into an array using the delimiter
-$splitcontents = explode($delimiter, $contents);
-$findme = "# alert"; //find string for disabled alerts
-$highlight = "yes";
-if (strstr($splitcontents[$lineid], $findme))
-	$highlight = "no";
-if ($highlight == "no")
-	$splitcontents[$lineid] = substr($splitcontents[$lineid], 2);
-
-if (!function_exists('get_middle')) {
-	function get_middle($source, $beginning, $ending, $init_pos) {
-		$beginning_pos = strpos($source, $beginning, $init_pos);
-		$middle_pos = $beginning_pos + strlen($beginning);
-		$ending_pos = strpos($source, $ending, $beginning_pos);
-		$middle = substr($source, $middle_pos, $ending_pos - $middle_pos);
-		return $middle;
+// Read the contents of the argument passed to us.
+// It may be an IPS policy string, an individual SID,
+// a standard rules file, or a complete file name.
+// Test for the special case of an IPS Policy file.
+if (substr($file, 0, 10) == "IPS Policy") {
+	$rules_map = snort_load_vrt_policy($a_rule[$id]['ips_policy']);
+	if (isset($_GET['ids'])) {
+		$contents = $rules_map[$_GET['gid']][trim($_GET['ids'])]['rule'];
+		$wrap_flag = "soft";
 	}
-}
-
-if ($_POST) {
-	if ($_POST['save']) {
-
-		//copy string into file array for writing
-		if ($_POST['highlight'] == "yes")
-			$splitcontents[$lineid] = $_POST['code'];
-		else
-			$splitcontents[$lineid] = "# " . $_POST['code'];
-
-		//write disable/enable sid to config.xml
-		$sid = get_middle($splitcontents[$lineid], 'sid:', ';', 0);
-		if (is_numeric($sid)) {
-			// rule_sid_on registers
-			if (!empty($a_nat[$id]['rule_sid_on']))
-				$a_nat[$id]['rule_sid_on'] = str_replace("||enablesid $sid", "", $a_nat[$id]['rule_sid_on']);
-			if (!empty($a_nat[$id]['rule_sid_on']))
-				$a_nat[$id]['rule_sid_off'] = str_replace("||disablesid $sid", "", $a_nat[$id]['rule_sid_off']);
-			if ($_POST['highlight'] == "yes")
-				$a_nat[$id]['rule_sid_on'] = "||enablesid $sid" . $a_nat[$id]['rule_sid_on'];
-			else
-				$a_nat[$id]['rule_sid_off'] = "||disablesid $sid" . $a_nat[$id]['rule_sid_off'];
+	else {
+		$contents = "# Snort IPS Policy - " . ucfirst($a_rule[$id]['ips_policy']) . "\n\n";
+		foreach (array_keys($rules_map) as $k1) {
+			foreach (array_keys($rules_map[$k1]) as $k2) {
+				$contents .= "# Category: " . $rules_map[$k1][$k2]['category'] . "   SID: {$k2}\n";
+				$contents .= $rules_map[$k1][$k2]['rule'] . "\n";
+			}
 		}
-
-		//write the new .rules file
-		@file_put_contents($file, implode($delimiter, $splitcontents));
-
-		write_config();
-
-		echo "<script> opener.window.location.reload(); window.close(); </script>";
-		exit;
 	}
+	unset($rules_map);
 }
+// Is it a SID to load the rule text from?
+elseif (isset($_GET['ids'])) {
+	// If flowbit rule, point to interface-specific file
+	if ($file == "Auto-Flowbit Rules")
+		$rules_map = snort_load_rules_map("{$snortcfgdir}/rules/" . FLOWBITS_FILENAME);
+	elseif (file_exists("{$snortdir}/preproc_rules/{$file}"))
+		$rules_map = snort_load_rules_map("{$snortdir}/preproc_rules/{$file}");
+	else
+		$rules_map = snort_load_rules_map("{$snortdir}/rules/{$file}");
+	$contents = $rules_map[$_GET['gid']][trim($_GET['ids'])]['rule'];
+	$wrap_flag = "soft";
+}
+// Is it our special flowbit rules file?
+elseif ($file == "Auto-Flowbit Rules")
+	$contents = file_get_contents("{$snortcfgdir}/rules/{$flowbit_rules_file}");
+// Is it a rules file in the ../rules/ directory?
+elseif (file_exists("{$snortdir}/rules/{$file}"))
+	$contents = file_get_contents("{$snortdir}/rules/{$file}");
+// Is it a rules file in the ../preproc_rules/ directory?
+elseif (file_exists("{$snortdir}/preproc_rules/{$file}"))
+	$contents = file_get_contents("{$snortdir}/preproc_rules/{$file}");
+// Is it a fully qualified path and file?
+elseif (file_exists($file)) {
+	if (substr(realpath($file), 0, strlen(SNORTLOGDIR)) != SNORTLOGDIR)
+		$contents = gettext("\n\nERROR -- File: {$file} can not be viewed!");
+	else
+		$contents = file_get_contents($file);
+}
+// It is not something we can display, so exit.
+else
+	$input_errors[] = gettext("Unable to open file: {$displayfile}");
 
-$pgtitle = array(gettext("Advanced"), gettext("File Editor"));
-
+$pgtitle = array(gettext("Snort"), gettext("File Viewer"));
 ?>
 
 <?php include("head.inc");?>
 
 <body link="#000000" vlink="#000000" alink="#000000">
+<?php if ($savemsg) print_info_box($savemsg); ?>
+<?php // include("fbegin.inc");?>
+
 <form action="snort_rules_edit.php" method="post">
-	<?php if ($savemsg) print_info_box($savemsg); ?>
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
 <tr>
 	<td class="tabcont">
-
-
-		<table width="100%" cellpadding="9" cellspacing="9" bgcolor="#eeeeee">
+		<table width="100%" cellpadding="0" cellspacing="6" bgcolor="#eeeeee">
 		<tr>
-			<td>
-				<input name="save" type="submit" class="formbtn" id="save" value="save" />
-				<input type='hidden' name='id' value='<?=$id;?>' />
-				<input type='hidden' name='ids' value='<?=$ids;?>' />
-				<input type='hidden' name='openruleset' value='<?=$file;?>' />
-				<input type="button" class="formbtn" value="Cancel" onclick="window.close()">
-				<hr noshade="noshade" />
-				Disable original rule :<br/>
-
-				<input id="highlighting_enabled" name="highlight2" type="radio" value="yes" <?php if($highlight == "yes") echo " checked=\"checked\""; ?> />
-				<label for="highlighting_enabled"><?=gettext("Enabled");?> </label>
-				<input id="highlighting_disabled" name="highlight2" type="radio" value="no" <?php if($highlight == "no") echo " checked=\"checked\""; ?> />
-				<label for="highlighting_disabled"> <?=gettext("Disabled");?></label>
+			<td class="pgtitle" colspan="2">Snort: Rules Viewer</td>
+		</tr>
+		<tr>
+			<td width="20%">
+				<input type="button" class="formbtn" value="Return" onclick="window.close()">
+			</td>
+			<td align="right">
+				<b><?php echo gettext("Rules File: ") . '</b>&nbsp;' . $displayfile; ?>&nbsp;&nbsp;&nbsp;&nbsp;
 			</td>
 		</tr>
-		<tr> 
-			<td valign="top" class="label"> 
-			<textarea wrap="off" style="width: 98%; margin: 7px;" 
-			class="<?php echo $language; ?>:showcolumns" rows="3" 
-			cols="66" name="code"><?=$splitcontents[$lineid];?></textarea>
-			</div> 
-			</td> 
-		</tr> 
 		<tr>
-			<td valign="top" class="label">
-			<div style="background: #eeeeee;" id="textareaitem"><!-- NOTE: The opening *and* the closing textarea tag must be on the same line. -->
-			<textarea disabled
-				wrap="off" style="width: 98%; margin: 7px;"
-				class="<?php echo $language; ?>:showcolumns" rows="33"
-				cols="66" name="code2"><?=$contents;?></textarea>
+			<td valign="top" class="label" colspan="2">
+			<div style="background: #eeeeee; width:100%; height:100%;" id="textareaitem"><!-- NOTE: The opening *and* the closing textarea tag must be on the same line. -->
+			<textarea style="width:100%; height:100%;" wrap="<?=$wrap_flag?>" rows="33" cols="80" name="code2"><?=$contents;?></textarea>
 			</div>
 			</td>
 		</tr>
@@ -183,6 +162,6 @@ $pgtitle = array(gettext("Advanced"), gettext("File Editor"));
 </tr>
 </table>
 </form>
-<?php include("fend.inc");?>
+<?php // include("fend.inc");?>
 </body>
 </html>

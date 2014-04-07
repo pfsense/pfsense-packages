@@ -29,6 +29,7 @@
 	POSSIBILITY OF SUCH DAMAGE.
 */
 
+require_once("globals.inc");
 require_once("config.inc");
 require_once("filter.inc");
 require_once("rrd.inc");
@@ -41,6 +42,28 @@ $graph_length = array(
 	"quarter" => 8035200,
 	"year" => 31622400,
 	"4year" => 126489600);
+
+$logfile_friendly = array(
+	"dhcpd"      => "DHCP",
+	"filter"     => "Firewall (raw)",
+	"gateways"   => "Gateway Events",
+	"installer"  => "Installation",
+	"ipsec"      => "IPsec VPN",
+	"l2tps"      => "L2TP Server (raw)",
+	"lighttpd"   => "Web Server (lighttpd)",
+	"ntpd"       => "NTP",
+	"openvpn"    => "OpenVPN",
+	"poes"       => "PPPoE Server (raw)",
+	"portalauth" => "Captive Portal Authentication",
+	"ppp"        => "PPP",
+	"pptps"      => "PPTP Server (raw)",
+	"relayd"     => "Load Balancer (relayd)",
+	"resolver"   => "DNS Resolver",
+	"routing"    => "Routing",
+	"system"     => "System",
+	"vpn"        => "PPTP/L2TP/PPPoE Server Login Events",
+	"wireless"   => "Wireless"
+);
 
 function get_dates($curperiod, $graph) {
 	global $graph_length;
@@ -162,7 +185,7 @@ function set_mail_report_cron_jobs($a_mailreports) {
 
 include('phpmailer/class.phpmailer.php');
 
-function mail_report_send($headertext, $attachments) {
+function mail_report_send($headertext, $cmdtext, $logtext, $attachments) {
 	global $config, $g;
 
 	if (empty($config['notifications']['smtp']['ipaddress']))
@@ -171,11 +194,13 @@ function mail_report_send($headertext, $attachments) {
 	$mail = new PHPMailer();
 	$mail->IsSMTP();
 	$mail->Host = $config['notifications']['smtp']['ipaddress'];
+	$mail->Port = empty($config['notifications']['smtp']['port']) ? 25 : $config['notifications']['smtp']['port'];
 
-	if ($config['notifications']['smtp']['ssl'] == "checked")
+	if ((isset($config['notifications']['smtp']['ssl']) && $config['notifications']['smtp']['ssl'] != "unchecked") || $config['notifications']['smtp']['ssl'] == "checked")
 		$mail->SMTPSecure =  "ssl";
 
-	$mail->Port = empty($config['notifications']['smtp']['port']) ? 25 : $config['notifications']['smtp']['port'];
+	if ((isset($config['notifications']['smtp']['tls']) && $config['notifications']['smtp']['tls'] != "unchecked") || $config['notifications']['smtp']['tls'] == "checked")
+		$mail->SMTPSecure =  "tls";
 
 	if($config['notifications']['smtp']['username'] &&
 	   $config['notifications']['smtp']['password']) {
@@ -186,22 +211,26 @@ function mail_report_send($headertext, $attachments) {
 
 	$mail->ContentType = 'text/html';
 	$mail->IsHTML(true);
-	$mail->AddReplyTo($config['notifications']['smtp']['fromaddress'], "Firewall Graph Report");
-	$mail->SetFrom($config['notifications']['smtp']['fromaddress'], "Firewall Graph Report");
+	$mail->AddReplyTo($config['notifications']['smtp']['fromaddress'], "Firewall Email Report");
+	$mail->SetFrom($config['notifications']['smtp']['fromaddress'], "Firewall Email Report");
 	$address = $config['notifications']['smtp']['notifyemailaddress'];
 	$mail->AddAddress($address, "Report Recipient");
-	$mail->Subject = "{$config['system']['hostname']}.{$config['system']['domain']} Graph Report: {$headertext}";
+	$mail->Subject = "{$config['system']['hostname']}.{$config['system']['domain']} Email Report: {$headertext}";
+	$mail->Body .= "This is a periodic report from your firewall, {$config['system']['hostname']}.{$config['system']['domain']}.<br /><br />Current report: {$headertext}<br />\n<br />\n";
+	if (!empty($cmdtext))
+		$mail->Body .= $cmdtext;
+	if (!empty($logtext))
+		$mail->Body .= $logtext;
 	if(is_array($attachments)) {
 		foreach($attachments as $filename) {
-			$mail->AddAttachment("$filename", basename($filename));
+			$shortname = basename($filename);
+			$mail->AddEmbeddedImage($filename, $shortname, $shortname);
+			$mail->Body .= "<br/><br/>{$shortname}<br/><img src=\"cid:{$shortname}\" />\n";
 		}
 	}
-	$mail->Body .= "This is a periodic graph report from your firewall, {$config['system']['hostname']}.{$config['system']['domain']}.<br/><br/>Current report: {$headertext}";
 
 	if(!$mail->Send()) {
 		echo "Mailer Error: " . $mail->ErrorInfo;
-	} else {
-		echo "<strong>Message sent to {$userid}!</strong>\n";
 	}
 }
 
@@ -211,6 +240,7 @@ function mail_report_generate_graph($database, $style, $graph, $start, $end) {
 	require_once("filter.inc");
 	require_once("shaper.inc");
 	require_once("rrd.inc");
+	global $g;
 
 	$pgtitle = array(gettext("System"),gettext("RRD Graphs"),gettext("Image viewer"));
 
@@ -1196,6 +1226,33 @@ function timeDiff($time, $opt = array()) {
 	}
 	$opt['distance'] && $str .= ($str && $opt['to'] >= $time) ? ' ago' : ' away';
 	return $str;
+}
+
+function mail_report_get_log($logfile, $tail, $grepfor) {
+	global $g, $config;
+	$logfile = "{$g['varlog_path']}/{$logfile}";
+	$logarr = "";
+	$grepline = "  ";
+	if(is_array($grepfor))
+		$grepline = " | /usr/bin/egrep " . escapeshellarg(implode("|", $grepfor));
+	if($config['system']['disablesyslogclog']) {
+		exec("cat {$logfile}{$grepline} | /usr/bin/tail -n {$tail}", $logarr);
+	} else {
+		if(isset($config['system']['usefifolog'])) {
+			exec("/usr/sbin/fifolog_reader {$logfile}{$grepline} | /usr/bin/tail -n {$tail}", $logarr);
+		} else {
+			exec("/usr/sbin/clog {$logfile}{$grepline}| grep -v \"CLOG\" | grep -v \"\033\" | /usr/bin/tail -n {$tail}", $logarr);
+		}
+	}
+	return($logarr);
+}
+
+function get_friendly_log_name($logfile) {
+	global $logfile_friendly;
+	$friendly = str_replace(".log", "", $logfile);
+	if (!empty($logfile_friendly[$friendly]))
+		$friendly = $logfile_friendly[$friendly];
+	return $friendly;
 }
 
 ?>

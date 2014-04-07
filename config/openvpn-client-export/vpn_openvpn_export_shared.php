@@ -3,7 +3,7 @@
 	vpn_openvpn_export.php
 
 	Copyright (C) 2008 Shrew Soft Inc.
-	Copyright (C) 2010 Ermal Luçi
+	Copyright (C) 2010 Ermal LuÃ§i
 	All rights reserved. 
 
 	Redistribution and use in source and binary forms, with or without
@@ -98,6 +98,7 @@ if(($act == "skconf") || ($act == "skzipconf")) {
 			$input_errors[] = "You need to specify a port for the proxy ip.";
 		} else
 			$proxy['port'] = $_GET['proxy_port'];
+		$proxy['proxy_type'] = $_GET['proxy_type'];
 		$proxy['proxy_authtype'] = $_GET['proxy_authtype'];
 		if ($_GET['proxy_authtype'] != "none") {
 			if (empty($_GET['proxy_user'])) {
@@ -151,9 +152,9 @@ include("head.inc");
 
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">
 <?php include("fbegin.inc"); ?>
-<script language="JavaScript">
-	var viscosityAvailable = false;
-<!--
+<script type="text/javascript">
+//<![CDATA[
+var viscosityAvailable = false;
 
 var servers = new Array();
 <?php	foreach ($ras_server as $sindex => $server): ?>
@@ -193,6 +194,8 @@ function download_begin(act) {
 		if (document.getElementById("useproxypass").value != 'none')
 			useproxypass = 1;
 
+		var proxytype = document.getElementById("useproxytype").value;
+
 		var proxyauth = document.getElementById("useproxypass").value;
 		var proxyuser = document.getElementById("proxyuser").value;
 		var proxypass = document.getElementById("proxypass").value;
@@ -218,6 +221,7 @@ function download_begin(act) {
 	dlurl += "&srvid=" + servers[index][0];
 	dlurl += "&useaddr=" + useaddr;
 	if (useproxy) {
+		dlurl += "&proxy_type=" + escape(proxytype);
 		dlurl += "&proxy_addr=" + proxyaddr;
 		dlurl += "&proxy_port=" + proxyport;
 		dlurl += "&proxy_authtype=" + proxyauth;
@@ -245,9 +249,9 @@ function server_changed() {
 		cell0.className = "listlr";
 		cell0.innerHTML = "Other Shared Key OS Client";
 		cell1.className = "listr";
-		cell1.innerHTML = "<a href='javascript:download_begin(\"skconf\")'>Configuration</a>";
-		cell1.innerHTML += "<br/>";
-		cell1.innerHTML += "<a href='javascript:download_begin(\"skzipconf\")'>Configuration archive</a>";
+		cell1.innerHTML = "<a href='javascript:download_begin(\"skconf\")'>Configuration<\/a>";
+		cell1.innerHTML += "<br\/>";
+		cell1.innerHTML += "<a href='javascript:download_begin(\"skzipconf\")'>Configuration archive<\/a>";
 	}
 }
 
@@ -263,13 +267,13 @@ function useaddr_changed(obj) {
 function useproxy_changed(obj) {
 
 	if ((obj.id == "useproxy" && obj.checked) ||
-		$(obj.id + 'pass').value != 'none') {
+		(obj.id == "useproxypass" && (obj.value != 'none'))) {
 		$(obj.id + '_opts').show();
 	} else {
 		$(obj.id + '_opts').hide();
 	}
 }
-//-->
+//]]>
 </script>
 <?php
 	if ($input_errors)
@@ -277,7 +281,7 @@ function useproxy_changed(obj) {
 	if ($savemsg)
 		print_info_box($savemsg);
 ?>
-<table width="100%" border="0" cellpadding="0" cellspacing="0">
+<table width="100%" border="0" cellpadding="0" cellspacing="0" summary="openvpn export shared">
  	<tr>
 		<td>
 			<?php 
@@ -295,11 +299,11 @@ function useproxy_changed(obj) {
 	<tr>
 		<td id="mainarea">
 			<div class="tabcont">
-				<table width="100%" border="0" cellpadding="6" cellspacing="0">
+				<table width="100%" border="0" cellpadding="6" cellspacing="0" summary="main area">
 					<tr>
 						<td width="22%" valign="top" class="vncellreq">Shared Key Server</td>
 						<td width="78%" class="vtable">
-							<select name="server" id="server" class="formselect" onChange="server_changed()">
+							<select name="server" id="server" class="formselect" onchange="server_changed()">
 								<?php foreach($ras_server as & $server): ?>
 								<option value="<?=$server['sindex'];?>"><?=$server['name'];?></option>
 								<?php endforeach; ?>
@@ -309,10 +313,10 @@ function useproxy_changed(obj) {
 					<tr>
 						<td width="22%" valign="top" class="vncell">Host Name Resolution</td>
 						<td width="78%" class="vtable">
-							<table border="0" cellpadding="2" cellspacing="0">
+							<table border="0" cellpadding="2" cellspacing="0" summary="host name resolution">
 								<tr>
 									<td>
-										<select name="useaddr" id="useaddr" class="formselect" onChange="useaddr_changed(this)">
+										<select name="useaddr" id="useaddr" class="formselect" onchange="useaddr_changed(this)">
 											<option value="serveraddr" >Interface IP Address</option>
 											<option value="serverhostname" >Installation hostname</option>
 											<?php if (is_array($config['dyndnses']['dyndns'])): ?>
@@ -323,8 +327,8 @@ function useproxy_changed(obj) {
 											<option value="other">Other</option>
 										</select>
 										<br />
-										<div style="display:none;" name="HostName" id="HostName">
-											<input name="useaddr_hostname" id="useaddr_hostname" />
+										<div style="display:none;" id="HostName">
+											<input name="useaddr_hostname" id="useaddr_hostname" size="40" />
 											<span class="vexpl">
 												Enter the hostname or IP address the client will use to connect to this server.
 											</span>
@@ -335,57 +339,70 @@ function useproxy_changed(obj) {
 						</td>
 					</tr>
 					<tr>
-						<td width="22%" valign="top" class="vncell">Use HTTP Proxy</td>
+						<td width="22%" valign="top" class="vncell">Use Proxy</td>
 						<td width="78%" class="vtable">
-							 <table border="0" cellpadding="2" cellspacing="0">
+							 <table border="0" cellpadding="2" cellspacing="0" summary="http proxy">
 								<tr>
 									<td>
-										<input name="useproxy" id="useproxy" type="checkbox" value="yes" onClick="useproxy_changed(this)">
+										<input name="useproxy" id="useproxy" type="checkbox" value="yes" onclick="useproxy_changed(this)" />
 
 									</td>
 									<td>
 										<span class="vexpl">
-											Use HTTP proxy to communicate with the server.
+											Use proxy to communicate with the server.
 										</span>
 									</td>
 								</tr>
 							</table>
-							<table border="0" cellpadding="2" cellspacing="0" id="useproxy_opts" style="display:none">
+							<table border="0" cellpadding="2" cellspacing="0" id="useproxy_opts" style="display:none" summary="user options">
 								<tr>
-									<td align="right" width='25%'>
+									<td align="right" width="25%">
+										<span class="vexpl">
+											 &nbsp;     Type :&nbsp;
+										</span>
+									</td>
+									<td>
+										<select name="useproxytype" id="useproxytype" class="formselect">
+											<option value="http">HTTP</option>
+											<option value="socks">Socks</option>
+										</select>
+									</td>
+								</tr>
+								<tr>
+									<td align="right" width="25%">
 										<span class="vexpl">
 											 &nbsp;     IP Address :&nbsp;
 										</span>
 									</td>
 									<td>
-										<input name="proxyaddr" id="proxyaddr" class="formfld unknown" size="20" value="" />
+										<input name="proxyaddr" id="proxyaddr" class="formfld unknown" size="30" value="" />
 									</td>
 								</tr>
 								<tr>
-									<td align="right" width='25%'>
+									<td align="right" width="25%">
 										<span class="vexpl">
 											 &nbsp;      Port :&nbsp;
 										</span>
+									</td>
 														<td>
 										<input name="proxyport" id="proxyport" class="formfld unknown" size="5" value="" />
 									</td>
 								</tr>
-							<br />
 								<tr>
 									<td width="25%">
-
+							<br />
 									</td>
 									<td>
-										<select name="useproxypass" id="useproxypass" class="formselect" onChange="useproxy_changed(this)">
+										<select name="useproxypass" id="useproxypass" class="formselect" onchange="useproxy_changed(this)">
 											<option value="none">none</option>
 											<option value="basic">basic</option>
 											<option value="ntlm">ntlm</option>
 										</select>
 										<span class="vexpl">
-											Choose HTTP proxy authentication if any.
+											Choose proxy authentication if any.
 										</span>
 							<br />
-							<table border="0" cellpadding="2" cellspacing="0" id="useproxypass_opts" style="display:none">
+							<table border="0" cellpadding="2" cellspacing="0" id="useproxypass_opts" style="display:none" summary="name and password">
 								<tr>
 									<td align="right" width="25%">
 										<span class="vexpl">
@@ -411,6 +428,7 @@ function useproxy_changed(obj) {
 										<span class="vexpl">
 											 &nbsp;Confirm :&nbsp;
 										</span>
+									</td>
 														<td>
 										<input name="proxyconf" id="proxyconf" type="password" class="formfld pwd" size="20" value="" />
 									</td>
@@ -428,26 +446,27 @@ function useproxy_changed(obj) {
 						<td colspan="2" valign="top" class="listtopic">Client Configuration Packages</td>
 					</tr>
 				</table>
-				<table width="100%" id="clients" width="100%" border="0" cellpadding="0" cellspacing="0">
+				<table width="100%" id="clients" border="0" cellpadding="0" cellspacing="0" summary="heading">
 					<tr>
 						<td width="25%" class="listhdrr"><?=gettext("Client Type");?></td>
 						<td width="50%" class="listhdrr"><?=gettext("Export");?></td>
 					</tr>
 				</table>
-				<table width="100%" width="100%" border="0" cellpadding="5" cellspacing="10">
+				<table width="100%" border="0" cellpadding="5" cellspacing="10" summary="note">
 					<tr>
 						<td align="right" valign="top" width="5%"><?= gettext("NOTE:") ?></td>
-						<td><?= gettext("NOTE: These are shared key configurations for use in site-to-site tunnels with other routers. Shared key tunnels are not normally used for remote access connections to end users.") ?></td>
+						<td><?= gettext("These are shared key configurations for use in site-to-site tunnels with other routers. Shared key tunnels are not normally used for remote access connections to end users.") ?></td>
 					</tr>
 				</table>
 			</div>
 		</td>
 	</tr>
 </table>
-<script language="JavaScript">
-<!--
+<script type="text/javascript">
+//<![CDATA[
 server_changed();
-//-->
+//]]>
 </script>
-</body>
 <?php include("fend.inc"); ?>
+</body>
+</html>

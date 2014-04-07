@@ -2,12 +2,12 @@
 <!DOCTYPE packagegui SYSTEM "../schema/packages.dtd">
 <?xml-stylesheet type="text/xsl" href="../xsl/package.xsl"?>
 <packagegui>
-        <copyright>
-        <![CDATA[
+	<copyright>
+	<![CDATA[
 /* $Id$ */
 /* ========================================================================== */
 /*
-    authng.xml
+    bandwidthd.xml
     part of pfSense (http://www.pfSense.com)
     Copyright (C) 2007 to whom it may belong
     All rights reserved.
@@ -40,13 +40,13 @@
     POSSIBILITY OF SUCH DAMAGE.
                                                                               */
 /* ========================================================================== */
-        ]]>
-        </copyright>
-    <description>Describe your package here</description>
-    <requirements>Describe your package requirements here</requirements>
-    <faq>Currently there are no FAQ items provided.</faq>
+	]]>
+	</copyright>
+	<description>Describe your package here</description>
+	<requirements>Describe your package requirements here</requirements>
+	<faq>Currently there are no FAQ items provided.</faq>
 	<name>bandwidthd</name>
-	<version>1.0</version>
+	<version>2.0.1_5 pkg v.0.3</version>
 	<title>Bandwidthd</title>
 	<aftersaveredirect>/pkg_edit.php?xml=bandwidthd.xml&amp;id=0</aftersaveredirect>
 	<include_file>/usr/local/pkg/bandwidthd.inc</include_file>
@@ -60,7 +60,8 @@
 			<name>bandwidthd</name>
 			<rcfile>bandwidthd.sh</rcfile>
 			<executable>bandwidthd</executable>
-    </service>
+			<description>BandwidthD bandwidth monitoring daemon</description>
+	</service>
 	<tabs>
 		<tab>
 			<text>BandwidthD</text>
@@ -69,82 +70,137 @@
 		</tab>
 		<tab>
 			<text>Access BandwidthD</text>
-			<url>/bandwidthd</url>
+			<url>/bandwidthd/index.html" target="_blank</url>
 		</tab>
 	</tabs>
 	<configpath>installedpackages->package->bandwidthd</configpath>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0677</chmod>
-		<item>http://www.pfsense.com/packages/config/bandwidthd/bandwidthd.inc</item>
+		<item>https://packages.pfsense.org/packages/config/bandwidthd/bandwidthd.inc</item>
 	</additional_files_needed>
 	<fields>
 		<field>
-			<fielddescr>interface</fielddescr>
+			<fielddescr>Enable bandwidthd</fielddescr>
+			<fieldname>enable</fieldname>
+			<type>checkbox</type>
+			<description></description>
+		</field>
+		<field>
+			<fielddescr>Interface</fielddescr>
 			<fieldname>active_interface</fieldname>
 			<description>The interface that bandwidthd will bind to.</description>
 			<type>interfaces_selection</type>
 			<required/>
 			<default_value>lan</default_value>
-		</field>	
+		</field>
 		<field>
-                        <fielddescr>Subnet</fielddescr>
-                        <fieldname>subnets_custom</fieldname>
-                        <description>The subnet(s) on which bandwidthd will report. (separate with ';' for multiple subnets, e.g. 192.168.1.0/24;10.0.0.0/24)</description>
-                        <type>input</type>
+			<fielddescr>Subnet</fielddescr>
+			<fieldname>subnets_custom</fieldname>
+			<description>The subnet(s) on which bandwidthd will report. (separate with ';' for multiple subnets, e.g. 192.168.1.0/24;10.0.0.0/24) The ordinary subnet for the selected interface/s is automatically put in the config, do not specify it here.</description>
+			<type>input</type>
 		</field>
 		<field>
 			<fielddescr>Skip intervals</fielddescr>
 			<fieldname>skipintervals</fieldname>
-			<description></description>
+			<description>Number of intervals to skip between graphing. Default 0. Each interval is 200 seconds = 3 min 20 sec.</description>
 			<type>input</type>
-			<value>1024</value>
 		</field>
 		<field>
 			<fielddescr>Graph cutoff</fielddescr>
 			<fieldname>graphcutoff</fieldname>
-			<description>Graph cutoff is how many KB must be transferred by an IP before it is graphed</description>
+			<description>Graph cutoff is how many KB must be transferred by an IP before it is graphed. Default 1024.</description>
 			<type>input</type>
-			<value>1024</value>
 		</field>
 		<field>
-			<fielddescr>promiscuous</fielddescr>
+			<fielddescr>Promiscuous</fielddescr>
 			<fieldname>promiscuous</fieldname>
-			<description>Put interface in promiscuous mode to score to traffic that may not be routing through the host machine.</description>
+			<description>Put interface in promiscuous mode to see traffic that may not be routing through the host machine.&lt;br&gt;
+			Note: If the interface is connected to a switch then the interface will only see the traffic on its port.</description>
 			<type>checkbox</type>
 		</field>
 		<field>
 			<fielddescr>output_cdf</fielddescr>
 			<fieldname>outputcdf</fieldname>
-			<description>Log data to cdf file htdocs/log.cdf</description>
+			<description>Log data to cdf files log*.cdf</description>
 			<type>checkbox</type>
 		</field>
 		<field>
 			<fielddescr>recover_cdf</fielddescr>
 			<fieldname>recovercdf</fieldname>
-			<description>Read back the cdf file on startup</description>
+			<description>Read back the cdf files on startup</description>
 			<type>checkbox</type>
 		</field>
 		<field>
-			<fielddescr>filter</fielddescr>
+			<fielddescr>output PostgreSQL</fielddescr>
+			<fieldname>outputpostgresql</fieldname>
+			<description>Log data to a PostgreSQL database.&lt;br&gt;
+			Get the postgreSQL schema and PHP files to display the results from: &lt;a target="_new" href="https://github.com/individual-it/bandwidthd-pSQL-frontend"&gt;https://github.com/individual-it/bandwidthd-pSQL-frontend&lt;/a&gt;</description>
+			<type>checkbox</type>
+		</field>
+		<field>
+			<fielddescr>Database host</fielddescr>
+			<fieldname>postgresqlhost</fieldname>
+			<description>Hostname of the postgreSQL database server.</description>
+			<type>input</type>
+		</field>
+		<field>
+			<fielddescr>Database name</fielddescr>
+			<fieldname>postgresqldatabase</fieldname>
+			<description>Database on the postgreSQL database server.</description>
+			<type>input</type>
+		</field>
+		<field>
+			<fielddescr>Database Username</fielddescr>
+			<fieldname>postgresqlusername</fieldname>
+			<description>Username of the postgreSQL database server.</description>
+			<type>input</type>
+		</field>
+		<field>
+			<fielddescr>Database Password</fielddescr>
+			<fieldname>postgresqlpassword</fieldname>
+			<description>Password of the postgreSQL database server.</description>
+			<type>password</type>
+		</field>
+		<field>
+			<fielddescr>sensor_id</fielddescr>
+			<fieldname>sensorid</fieldname>
+			<description>Arbitrary sensor name, I recommend the sensors fully qualified domain name.</description>
+			<type>input</type>
+		</field>
+		<field>
+			<fielddescr>Filter</fielddescr>
 			<fieldname>filter</fieldname>
 			<description>Libpcap format filter string used to control what bandwidthd sees.  Please always include "ip" in the string to avoid strange problems.</description>
 			<type>input</type>
-			<value>ip</value>
 		</field>
 		<field>
 			<fielddescr>Draw Graphs</fielddescr>
 			<fieldname>drawgraphs</fieldname>
 			<description>This defaults to true to graph the traffic bandwidthd is recording. Set this to false if you only want cdf output or you are using the database output option. Bandwidthd will use very little RAM and CPU if this is set to false.</description>
 			<type>checkbox</type>
-			<value>checked</value>
+			<default_value>on</default_value>
 		</field>
 		<field>
 			<fielddescr>Meta Refresh</fielddescr>
 			<fieldname>meta_refresh</fieldname>
-			<description>Set META REFRESH seconds (default 150, use 0 to disable).</description>
+			<description>Sets the interval (seconds) at which the browser graph display refreshes (default 150, use 0 to disable).</description>
 			<type>input</type>
-			<value>150</value>
+		</field>
+		<field>
+			<fielddescr>Graph and Log Info</fielddescr>
+			<fieldname>graph_log_info</fieldname>
+			<description>If draw graphs is on, then the daily report and graph html data is regenerated every (skip intervals + 1) * 200 seconds. The data volumes in the report are for the same period as the span of the graph.&lt;br&gt;
+			If output_cdf is on, then a cron job is added to rotate the log files at 00:01 each day. 6 log files are kept for each log frequency (daily, weekly, monthly, yearly). At the respective rotation intervals, the oldest log is deleted, the others are shuffled back and a new log is created.&lt;br&gt;
+			&lt;table cellpadding=1 cellspacing=0 style=&quot;text-align: left;&quot;&gt; &lt;tbody&gt;
+			&lt;tr&gt;&lt;th&gt;  &lt;/th&gt;&lt;th&gt; Data Interval &lt;/th&gt;&lt;th&gt; Graph Span &lt;/th&gt;&lt;th&gt; Log Rotation &lt;/th&gt;&lt;th&gt; Log File Name &lt;/th&gt;&lt;/tr&gt;
+			&lt;tr&gt;&lt;th&gt; Daily &lt;/th&gt;&lt;td&gt; 200 seconds &lt;/td&gt;&lt;td&gt; 2 days &lt;/td&gt;&lt;td&gt; 1 day &lt;/td&gt;&lt;td&gt; log.1.[0-5].cdf &lt;/td&gt;&lt;/tr&gt;
+			&lt;tr&gt;&lt;th&gt; Weekly &lt;/th&gt;&lt;td&gt; 10 minutes &lt;/td&gt;&lt;td&gt; 7 days &lt;/td&gt;&lt;td&gt; 7 days &lt;/td&gt;&lt;td&gt; log.2.[0-5].cdf &lt;/td&gt;&lt;/tr&gt;
+			&lt;tr&gt;&lt;th&gt; Monthly &lt;/th&gt;&lt;td&gt; 1 hour &lt;/td&gt;&lt;td&gt; 35 days &lt;/td&gt;&lt;td&gt; 35 days &lt;/td&gt;&lt;td&gt; log.3.[0-5].cdf &lt;/td&gt;&lt;/tr&gt;
+			&lt;tr&gt;&lt;th&gt; Yearly &lt;/th&gt;&lt;td&gt; 12 hours &lt;/td&gt;&lt;td&gt; 412.5 days &lt;/td&gt;&lt;td&gt; 412.5 days &lt;/td&gt;&lt;td&gt; log.4.[0-5].cdf &lt;/td&gt;&lt;/tr&gt;
+			&lt;/tbody&gt; &lt;/table&gt;
+			</description>
+			<type>info</type>
 		</field>
 	</fields>
 	<custom_php_resync_config_command>

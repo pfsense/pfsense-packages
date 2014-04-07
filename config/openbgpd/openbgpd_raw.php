@@ -2,7 +2,7 @@
 /* $Id$ */
 /*
 	openbgpd_raw.php
-	part of pfSense (http://www.pfsense.com/)
+	part of pfSense (https://www.pfsense.org/)
     Copyright (C) 2009 Aarno Aukia (aarnoaukia@gmail.com)
 	All rights reserved.
 

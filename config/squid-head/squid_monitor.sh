@@ -47,7 +47,7 @@ while [ /bin/true ]; do
                         /usr/local/etc/rc.d/squid.sh start
                         sleep 3
                         echo "Reconfiguring filter..." | logger -p daemon.info -i -t Squid_Alarm
-                        /etc/rc.filter_configure_sync
+                        /etc/rc.filter_configure
                         touch /var/run/squid_alarm
                 fi
         fi
@@ -56,7 +56,7 @@ while [ /bin/true ]; do
                 if [ -f /var/run/squid_alarm ]; then
                         echo "Squid has resumed. Reconfiguring filter." | \
                                 logger -p daemon.info -i -t Squid_Alarm
-						/etc/rc.filter_configure_sync
+						/etc/rc.filter_configure
                         rm /var/run/squid_alarm
                 fi
         fi

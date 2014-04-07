@@ -105,19 +105,19 @@ function apache_mod_security_resync() {
 	global $config, $g;
 	apache_mod_security_install();
 	if(!file_exists(rules_directory . "/10_asl_rules.conf"))
-		exec("/usr/bin/fetch -q -o " . rules_directory . "/10_asl_rules.conf http://www.pfsense.com/packages/config/apache_mod_security/rules/10_asl_rules.conf");
+		exec("/usr/bin/fetch -q -o " . rules_directory . "/10_asl_rules.conf https://packages.pfsense.org/packages/config/apache_mod_security/rules/10_asl_rules.conf");
 	if(!file_exists(rules_directory . "/a_exclude.conf"))
-		exec("/usr/bin/fetch -q -o " . rules_directory . "/a_exclude.conf http://www.pfsense.com/packages/config/apache_mod_security/rules/a_exclude.conf");
+		exec("/usr/bin/fetch -q -o " . rules_directory . "/a_exclude.conf https://packages.pfsense.org/packages/config/apache_mod_security/rules/a_exclude.conf");
 	if(!file_exists(rules_directory . "/blacklist.conf"))
-		exec("/usr/bin/fetch -q -o " . rules_directory . "/blacklist.conf http://www.pfsense.com/packages/config/apache_mod_security/rules/blacklist.conf");
+		exec("/usr/bin/fetch -q -o " . rules_directory . "/blacklist.conf https://packages.pfsense.org/packages/config/apache_mod_security/rules/blacklist.conf");
 	if(!file_exists(rules_directory . "/default.conf"))
-		exec("/usr/bin/fetch -q -o " . rules_directory . "/rules/default.conf http://www.pfsense.com/packages/config/apache_mod_security/rules/default.conf");
+		exec("/usr/bin/fetch -q -o " . rules_directory . "/rules/default.conf https://packages.pfsense.org/packages/config/apache_mod_security/rules/default.conf");
 	if(!file_exists(rules_directory . "/recons.conf"))
-		exec("/usr/bin/fetch -q -o " . rules_directory . "/recons.conf http://www.pfsense.com/packages/config/apache_mod_security/rules/recons.conf");
+		exec("/usr/bin/fetch -q -o " . rules_directory . "/recons.conf https://packages.pfsense.org/packages/config/apache_mod_security/rules/recons.conf");
 	if(!file_exists(rules_directory . "/rootkits.conf"))
-		exec("/usr/bin/fetch -q -o " . rules_directory . "/rootkits.conf http://www.pfsense.com/packages/config/apache_mod_security/rules/rootkits.conf");
+		exec("/usr/bin/fetch -q -o " . rules_directory . "/rootkits.conf https://packages.pfsense.org/packages/config/apache_mod_security/rules/rootkits.conf");
 	if(!file_exists(rules_directory . "/useragents.conf"))
-		exec("/usr/bin/fetch -q -o " . rules_directory . "/useragents.conf http://www.pfsense.com/packages/config/apache_mod_security/rules/useragents.conf");
+		exec("/usr/bin/fetch -q -o " . rules_directory . "/useragents.conf https://packages.pfsense.org/packages/config/apache_mod_security/rules/useragents.conf");
 	apache_mod_security_checkconfig();
 	apache_mod_security_restart();
 }

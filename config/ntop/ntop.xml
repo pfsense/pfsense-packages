@@ -45,7 +45,7 @@
 	<additional_files_needed>
 	    <prefix>/usr/local/lib/</prefix>
 	    <chmod>0755</chmod>
-		<item>http://www.pfsense.com/packages/config/ntop/bin/librrd_th.so.2</item>
+		<item>https://packages.pfsense.org/packages/config/ntop/bin/librrd_th.so.2</item>
 	</additional_files_needed>	
 	<menu>
 		<name>ntop Settings</name>
@@ -64,6 +64,7 @@
 		<name>ntop</name>
 		<rcfile>ntop.sh</rcfile>
 		<executable>ntop</executable>
+		<description>NTOP bandwidth monitoring/graphing</description>
 	</service>
 	<tabs>
 		<tab>

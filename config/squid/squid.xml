@@ -7,7 +7,7 @@
 /* $Id$ */
 /* ========================================================================== */
 /*
-    authng.xml
+    squid.xml
     part of pfSense (http://www.pfSense.com)
     Copyright (C) 2007 to whom it may belong
     All rights reserved.
@@ -96,52 +96,57 @@
 	<additional_files_needed>
 	    <prefix>/usr/local/pkg/</prefix>
 	    <chmod>0755</chmod>
-		<item>http://www.pfsense.org/packages/config/squid/squid.inc</item>
+		<item>https://packages.pfsense.org/packages/config/squid/squid.inc</item>
 	</additional_files_needed>
 	<additional_files_needed>
 	    <prefix>/usr/local/pkg/</prefix>
 	    <chmod>0755</chmod>
-		<item>http://www.pfsense.org/packages/config/squid/squid_cache.xml</item>
+		<item>https://packages.pfsense.org/packages/config/squid/squid_cache.xml</item>
 	</additional_files_needed>
 	<additional_files_needed>
 	    <prefix>/usr/local/pkg/</prefix>
 	    <chmod>0755</chmod>
-		<item>http://www.pfsense.org/packages/config/squid/squid_nac.xml</item>
+		<item>https://packages.pfsense.org/packages/config/squid/squid_nac.xml</item>
 	</additional_files_needed>
 	<additional_files_needed>
 	    <prefix>/usr/local/pkg/</prefix>
 	    <chmod>0755</chmod>
-		<item>http://www.pfsense.org/packages/config/squid/squid_ng.xml</item>
+		<item>https://packages.pfsense.org/packages/config/squid/squid_ng.xml</item>
 	</additional_files_needed>
 	<additional_files_needed>
 	    <prefix>/usr/local/pkg/</prefix>
 	    <chmod>0755</chmod>
-		<item>http://www.pfsense.org/packages/config/squid/squid_traffic.xml</item>
+		<item>https://packages.pfsense.org/packages/config/squid/squid_traffic.xml</item>
 	</additional_files_needed>
 	<additional_files_needed>
 	    <prefix>/usr/local/pkg/</prefix>
 	    <chmod>0755</chmod>
-		<item>http://www.pfsense.org/packages/config/squid/squid_upstream.xml</item>
+		<item>https://packages.pfsense.org/packages/config/squid/squid_upstream.xml</item>
 	</additional_files_needed>
 	<additional_files_needed>
 	    <prefix>/usr/local/pkg/</prefix>
 	    <chmod>0755</chmod>
-		<item>http://www.pfsense.org/packages/config/squid/squid_auth.xml</item>
+		<item>https://packages.pfsense.org/packages/config/squid/squid_auth.xml</item>
 	</additional_files_needed>
 	<additional_files_needed>
 	    <prefix>/usr/local/pkg/</prefix>
 	    <chmod>0755</chmod>
-		<item>http://www.pfsense.org/packages/config/squid/squid_users.xml</item>
-	</additional_files_needed>
-	<additional_files_needed>
-	    <prefix>/usr/local/etc/rc.d/</prefix>
-	    <chmod>0755</chmod>
-		<item>http://www.pfsense.org/packages/config/squid/proxy_monitor.sh</item>
+		<item>https://packages.pfsense.org/packages/config/squid/squid_users.xml</item>
 	</additional_files_needed>
 	<additional_files_needed>
 	    <prefix>/usr/local/pkg/</prefix>
 	    <chmod>0755</chmod>
-		<item>http://www.pfsense.org/packages/config/squid/squid_cache.xml</item>
+		<item>https://packages.pfsense.org/packages/config/squid/sqpmon.sh</item>
+	</additional_files_needed>
+	<additional_files_needed>
+	    <prefix>/usr/local/pkg/</prefix>
+	    <chmod>0755</chmod>
+		<item>https://packages.pfsense.org/packages/config/squid/squid_cache.xml</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/pkg/</prefix>
+		<chmod>0755</chmod>
+		<item>https://packages.pfsense.org/packages/config/squid/swapstate_check.php</item>
 	</additional_files_needed>
 	<fields>
 		<field>
@@ -190,7 +195,7 @@
 		<size>80</size>
 		</field>
 		<field>
-			<fielddescr>Enabled logging</fielddescr>
+			<fielddescr>Enable logging</fielddescr>
 			<fieldname>log_enabled</fieldname>
 			<description>This will enable the access log. Don't switch this on if you don't have much disk space left.</description>
 			<type>checkbox</type>

@@ -49,31 +49,32 @@
     <name>bgpd</name>
     <rcfile>bgpd.sh</rcfile>
     <executable>bgpd</executable>
+	<description>OpenBSD BGP Daemon</description>
   </service>	
 	<additional_files_needed>
 		<prefix>/usr/local/www/</prefix>
 		<chmod>077</chmod>
-		<item>http://www.pfsense.com/packages/config/openbgpd/openbgpd_status.php</item>
+		<item>https://packages.pfsense.org/packages/config/openbgpd/openbgpd_status.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/www/</prefix>
 		<chmod>077</chmod>
-		<item>http://www.pfsense.com/packages/config/openbgpd/openbgpd_raw.php</item>
+		<item>https://packages.pfsense.org/packages/config/openbgpd/openbgpd_raw.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>077</chmod>
-		<item>http://www.pfsense.com/packages/config/openbgpd/openbgpd.inc</item>
+		<item>https://packages.pfsense.org/packages/config/openbgpd/openbgpd.inc</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>077</chmod>
-		<item>http://www.pfsense.com/packages/config/openbgpd/openbgpd_groups.xml</item>
+		<item>https://packages.pfsense.org/packages/config/openbgpd/openbgpd_groups.xml</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>077</chmod>
-		<item>http://www.pfsense.com/packages/config/openbgpd/openbgpd_neighbors.xml</item>
+		<item>https://packages.pfsense.org/packages/config/openbgpd/openbgpd_neighbors.xml</item>
 	</additional_files_needed>
 	<menu>
 		<name>OpenBGPD</name>
@@ -151,7 +152,7 @@
 		    <description></description>
 		    <rowhelper>
 				<rowhelperfield>
-				    <fielddescr>Announce the specified network as belonging to our AS.  If set to connected, routes to directly attached networks will be announced.  If set to static, all static routes will be announced.</fielddescr>
+				    <fielddescr>Announce the specified network as belonging to our AS.  If set to "(inet|inet6)connected", inet or inet6 routes to directly attached networks will be announced.  If set to "(inet|inet6) static", all inet or inet6 static routes will be announced.</fielddescr>
 				    <fieldname>networks</fieldname>
 				    <description>Network that you would like to advertise</description>
 				    <type>input</type>

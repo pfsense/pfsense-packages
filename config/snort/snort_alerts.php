@@ -1,570 +1,593 @@
 <?php
-/* $Id$ */
 /*
- snort_alerts.php
- part of pfSense
-
- Copyright (C) 2005 Bill Marquette <bill.marquette@gmail.com>.
- Copyright (C) 2003-2004 Manuel Kasper <mk@neon1.net>.
- Copyright (C) 2006 Scott Ullrich
- All rights reserved.
-
- Modified for the Pfsense snort package v. 1.8+
- Copyright (C) 2009 Robert Zelaya Sr. Developer
-
- Redistribution and use in source and binary forms, with or without
- modification, are permitted provided that the following conditions are met:
-
- 1. Redistributions of source code must retain the above copyright notice,
- this list of conditions and the following disclaimer.
-
- 2. Redistributions in binary form must reproduce the above copyright
- notice, this list of conditions and the following disclaimer in the
- documentation and/or other materials provided with the distribution.
-
- THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
- INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
- AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
- AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
- OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
- SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
- INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
- CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- POSSIBILITY OF SUCH DAMAGE.
+ * snort_alerts.php
+ * part of pfSense
+ *
+ * Copyright (C) 2005 Bill Marquette <bill.marquette@gmail.com>.
+ * Copyright (C) 2003-2004 Manuel Kasper <mk@neon1.net>.
+ * Copyright (C) 2006 Scott Ullrich
+ * Copyright (C) 2012 Ermal Luci
+ * Copyright (C) 2013,2014 Bill Meeks
+ * All rights reserved.
+ *
+ * Modified for the Pfsense snort package v. 1.8+
+ * Copyright (C) 2009 Robert Zelaya Sr. Developer
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright notice,
+ * this list of conditions and the following disclaimer.
+ *
+ * 2. Redistributions in binary form must reproduce the above copyright
+ * notice, this list of conditions and the following disclaimer in the
+ * documentation and/or other materials provided with the distribution.
+ *
+ * THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
+ * INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+ * AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+ * AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+ * OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
  */
 
 require_once("guiconfig.inc");
-require_once("/usr/local/pkg/snort/snort_gui.inc");
 require_once("/usr/local/pkg/snort/snort.inc");
 
-/* load only javascript that is needed */
-$snort_load_sortabletable = 'yes';
-$snort_load_mootools = 'yes';
-
 $snortalertlogt = $config['installedpackages']['snortglobal']['snortalertlogtype'];
-$snort_logfile = '/var/log/snort/alert';
+$supplist = array();
 
+function snort_is_alert_globally_suppressed($list, $gid, $sid) {
+
+	/************************************************/
+	/* Checks the passed $gid:$sid to see if it has */
+	/* been globally suppressed.  If true, then any */
+	/* "track by_src" or "track by_dst" options are */
+	/* disabled since they are overridden by the    */
+	/* global suppression of the $gid:$sid.         */
+	/************************************************/
+
+	/* If entry has a child array, then it's by src or dst ip. */
+	/* So if there is a child array or the keys are not set,   */
+	/* then this gid:sid is not globally suppressed.           */
+	if (is_array($list[$gid][$sid]))
+		return false;
+	elseif (!isset($list[$gid][$sid]))
+		return false;
+	else
+		return true;
+}
+
+function snort_add_supplist_entry($suppress) {
+
+	/************************************************/
+	/* Adds the passed entry to the Suppress List   */
+	/* for the active interface.  If a Suppress     */
+	/* List is defined for the interface, it is     */
+	/* used.  If no list is defined, a new default  */
+	/* list is created using the interface name.    */
+	/*                                              */
+	/* On Entry:                                    */
+	/*   $suppress --> suppression entry text       */
+	/*                                              */
+	/* Returns:                                     */
+	/*   TRUE if successful or FALSE on failure     */
+	/************************************************/
+
+	global $config, $a_instance, $instanceid;
+
+	if (!is_array($config['installedpackages']['snortglobal']['suppress']))
+		$config['installedpackages']['snortglobal']['suppress'] = array();
+	if (!is_array($config['installedpackages']['snortglobal']['suppress']['item']))
+		$config['installedpackages']['snortglobal']['suppress']['item'] = array();
+	$a_suppress = &$config['installedpackages']['snortglobal']['suppress']['item'];
+
+	$found_list = false;
+
+	/* If no Suppress List is set for the interface, then create one with the interface name */
+	if (empty($a_instance[$instanceid]['suppresslistname']) || $a_instance[$instanceid]['suppresslistname'] == 'default') {
+		$s_list = array();
+		$s_list['uuid'] = uniqid();
+		$s_list['name'] = $a_instance[$instanceid]['interface'] . "suppress" . "_" . $s_list['uuid'];
+		$s_list['descr']  =  "Auto-generated list for Alert suppression";
+		$s_list['suppresspassthru'] = base64_encode($suppress);
+		$a_suppress[] = $s_list;
+		$a_instance[$instanceid]['suppresslistname'] = $s_list['name'];
+		$found_list = true;
+	} else {
+		/* If we get here, a Suppress List is defined for the interface so see if we can find it */
+		foreach ($a_suppress as $a_id => $alist) {
+			if ($alist['name'] == $a_instance[$instanceid]['suppresslistname']) {
+				$found_list = true;
+				if (!empty($alist['suppresspassthru'])) {
+					$tmplist = base64_decode($alist['suppresspassthru']);
+					$tmplist .= "\n{$suppress}";
+					$alist['suppresspassthru'] = base64_encode($tmplist);
+					$a_suppress[$a_id] = $alist;
+				}
+				else {
+					$alist['suppresspassthru'] = base64_encode($suppress);
+					$a_suppress[$a_id] = $alist;
+				}
+			}
+		}
+	}
+
+	/* If we created a new list or updated an existing one, save the change, */
+	/* tell Snort to load it, and return true; otherwise return false.       */
+	if ($found_list) {
+		write_config();
+		sync_snort_package_config();
+		snort_reload_config($a_instance[$instanceid]);
+		return true;
+	}
+	else
+		return false;
+}
+
+if ($_GET['instance'])
+	$instanceid = $_GET['instance'];
+if ($_POST['instance'])
+	$instanceid = $_POST['instance'];
+if (empty($instanceid))
+	$instanceid = 0;
+
+if (!is_array($config['installedpackages']['snortglobal']['rule']))
+	$config['installedpackages']['snortglobal']['rule'] = array();
+$a_instance = &$config['installedpackages']['snortglobal']['rule'];
+$snort_uuid = $a_instance[$instanceid]['uuid'];
+$if_real = snort_get_real_interface($a_instance[$instanceid]['interface']);
+
+// Load up the arrays of force-enabled and force-disabled SIDs
+$enablesid = snort_load_sid_mods($a_instance[$instanceid]['rule_sid_on']);
+$disablesid = snort_load_sid_mods($a_instance[$instanceid]['rule_sid_off']);
+
+// Grab pfSense version so we can refer to it later on this page
+$pfs_version=substr(trim(file_get_contents("/etc/version")),0,3);
+
+$pconfig = array();
 if (is_array($config['installedpackages']['snortglobal']['alertsblocks'])) {
 	$pconfig['arefresh'] = $config['installedpackages']['snortglobal']['alertsblocks']['arefresh'];
 	$pconfig['alertnumber'] = $config['installedpackages']['snortglobal']['alertsblocks']['alertnumber'];
-	$anentries = $pconfig['alertnumber'];
-} else {
-	$anentries = '250';
-	$pconfig['alertnumber'] = '250';
-	$pconfig['arefresh'] = 'off';
 }
 
-if ($_POST['save'])
-{
-	//unset($input_errors);
-	//$pconfig = $_POST;
+if (empty($pconfig['alertnumber']))
+	$pconfig['alertnumber'] = '250';
+if (empty($pconfig['arefresh']))
+	$pconfig['arefresh'] = 'off';
+$anentries = $pconfig['alertnumber'];
 
-	/* input validation */
-	if ($_POST['save'])
-	{
+if ($_POST['save']) {
+	if (!is_array($config['installedpackages']['snortglobal']['alertsblocks']))
+		$config['installedpackages']['snortglobal']['alertsblocks'] = array();
+	$config['installedpackages']['snortglobal']['alertsblocks']['arefresh'] = $_POST['arefresh'] ? 'on' : 'off';
+	$config['installedpackages']['snortglobal']['alertsblocks']['alertnumber'] = $_POST['alertnumber'];
 
-		//	if (($_POST['radiusacctport'] && !is_port($_POST['radiusacctport']))) {
-		//		$input_errors[] = "A valid port number must be specified. [".$_POST['radiusacctport']."]";
-		//	}
+	write_config();
 
+	header("Location: /snort/snort_alerts.php?instance={$instanceid}");
+	exit;
+}
+
+if ($_POST['todelete'] || $_GET['todelete']) {
+	$ip = "";
+	if($_POST['todelete'])
+		$ip = $_POST['todelete'];
+	else if($_GET['todelete'])
+		$ip = $_GET['todelete'];
+	if (is_ipaddr($ip)) {
+		exec("/sbin/pfctl -t snort2c -T delete {$ip}");
+		$savemsg = gettext("Host IP address {$ip} has been removed from the Blocked Table.");
 	}
+}
 
-	/* no errors */
-	if (!$input_errors) {
-		if (!is_array($config['installedpackages']['snortglobal']['alertsblocks']))
-			$config['installedpackages']['snortglobal']['alertsblocks'] = array();
-		$config['installedpackages']['snortglobal']['alertsblocks']['arefresh'] = $_POST['arefresh'] ? 'on' : 'off';
-		$config['installedpackages']['snortglobal']['alertsblocks']['alertnumber'] = $_POST['alertnumber'];
+if ($_GET['act'] == "addsuppress" && is_numeric($_GET['sidid']) && is_numeric($_GET['gen_id'])) {
+	if (empty($_GET['descr']))
+		$suppress = "suppress gen_id {$_GET['gen_id']}, sig_id {$_GET['sidid']}\n";
+	else
+		$suppress = "#{$_GET['descr']}\nsuppress gen_id {$_GET['gen_id']}, sig_id {$_GET['sidid']}";
 
-		write_config();
+	/* Add the new entry to the Suppress List */
+	if (snort_add_supplist_entry($suppress))
+		$savemsg = gettext("An entry for 'suppress gen_id {$_GET['gen_id']}, sig_id {$_GET['sidid']}' has been added to the Suppress List.");
+	else
+		$input_errors[] = gettext("Suppress List '{$a_instance[$instanceid]['suppresslistname']}' is defined for this interface, but it could not be found!");
+}
 
-		header("Location: /snort/snort_alerts.php");
+if (($_GET['act'] == "addsuppress_srcip" || $_GET['act'] == "addsuppress_dstip") && is_numeric($_GET['sidid']) && is_numeric($_GET['gen_id'])) {
+	if ($_GET['act'] == "addsuppress_srcip")
+		$method = "by_src";
+	else
+		$method = "by_dst";
+
+	/* Check for valid IP addresses, exit if not valid */
+	if (is_ipaddr($_GET['ip']) || is_ipaddrv6($_GET['ip'])) {
+		if (empty($_GET['descr']))
+			$suppress = "suppress gen_id {$_GET['gen_id']}, sig_id {$_GET['sidid']}, track {$method}, ip {$_GET['ip']}\n";
+		else  
+			$suppress = "#{$_GET['descr']}\nsuppress gen_id {$_GET['gen_id']}, sig_id {$_GET['sidid']}, track {$method}, ip {$_GET['ip']}\n";
+	}
+	else {
+		header("Location: /snort/snort_alerts.php?instance={$instanceid}");
 		exit;
 	}
 
+	/* Add the new entry to the Suppress List */
+	if (snort_add_supplist_entry($suppress))
+		$savemsg = gettext("An entry for 'suppress gen_id {$_GET['gen_id']}, sig_id {$_GET['sidid']}, track {$method}, ip {$_GET['ip']}' has been added to the Suppress List.");
+	else
+		/* We did not find the defined list, so notify the user with an error */
+		$input_errors[] = gettext("Suppress List '{$a_instance[$instanceid]['suppresslistname']}' is defined for this interface, but it could not be found!");
 }
 
-if ($_GET['clear'])
-{
-	if(file_exists('/var/log/snort/alert'))
-	{
-		conf_mount_rw();
-		@file_put_content("/var/log/snort/alert", "");
-		post_delete_logs();
-		mwexec('/usr/sbin/chown snort:snort /var/log/snort/*', true);
-		mwexec('/bin/chmod 660 /var/log/snort/*', true);
-		mwexec('/usr/bin/killall -HUP snort', true);
-		conf_mount_ro();
+if ($_GET['act'] == "togglesid" && is_numeric($_GET['sidid']) && is_numeric($_GET['gen_id'])) {
+	// Get the GID tag embedded in the clicked rule icon.
+	$gid = $_GET['gen_id'];
+
+	// Get the SID tag embedded in the clicked rule icon.
+	$sid= $_GET['sidid'];
+
+	// See if the target SID is in our list of modified SIDs,
+	// and toggle it if present.
+	if (isset($enablesid[$gid][$sid]))
+		unset($enablesid[$gid][$sid]);
+	if (isset($disablesid[$gid][$sid]))
+		unset($disablesid[$gid][$sid]);
+	elseif (!isset($disablesid[$gid][$sid]))
+		$disablesid[$gid][$sid] = "disablesid";
+
+	// Write the updated enablesid and disablesid values to the config file.
+	$tmp = "";
+	foreach (array_keys($enablesid) as $k1) {
+		foreach (array_keys($enablesid[$k1]) as $k2)
+			$tmp .= "{$k1}:{$k2}||";
 	}
-	header("Location: /snort/snort_alerts.php");
+	$tmp = rtrim($tmp, "||");
+
+	if (!empty($tmp))
+		$a_instance[$instanceid]['rule_sid_on'] = $tmp;
+	else				
+		unset($a_instance[$instanceid]['rule_sid_on']);
+
+	$tmp = "";
+	foreach (array_keys($disablesid) as $k1) {
+		foreach (array_keys($disablesid[$k1]) as $k2)
+			$tmp .= "{$k1}:{$k2}||";
+	}
+	$tmp = rtrim($tmp, "||");
+
+	if (!empty($tmp))
+		$a_instance[$instanceid]['rule_sid_off'] = $tmp;
+	else				
+		unset($a_instance[$instanceid]['rule_sid_off']);
+
+	/* Update the config.xml file. */
+	write_config();
+
+	/*************************************************/
+	/* Update the snort.conf file and rebuild the    */
+	/* rules for this interface.                     */
+	/*************************************************/
+	$rebuild_rules = true;
+	snort_generate_conf($a_instance[$instanceid]);
+	$rebuild_rules = false;
+
+	/* Soft-restart Snort to live-load the new rules */
+	snort_reload_config($a_instance[$instanceid]);
+
+	$savemsg = gettext("The state for rule {$gid}:{$sid} has been modified.  Snort is 'live-reloading' the new rules list.  Please wait at least 30 secs for the process to complete before toggling additional rules.");
+}
+
+if ($_GET['action'] == "clear" || $_POST['delete']) {
+	snort_post_delete_logs($snort_uuid);
+	$fd = @fopen("/var/log/snort/snort_{$if_real}{$snort_uuid}/alert", "w+");
+	if ($fd)
+		fclose($fd);
+	/* XXX: This is needed if snort is run as snort user */
+	mwexec('/bin/chmod 660 /var/log/snort/*', true);
+	if (file_exists("{$g['varrun_path']}/snort_{$if_real}{$snort_uuid}.pid"))
+		mwexec("/bin/pkill -HUP -F {$g['varrun_path']}/snort_{$if_real}{$snort_uuid}.pid -a");
+	header("Location: /snort/snort_alerts.php?instance={$instanceid}");
 	exit;
 }
 
-if ($_POST['download'])
-{
-
+if ($_POST['download']) {
 	$save_date = exec('/bin/date "+%Y-%m-%d-%H-%M-%S"');
-	$file_name = "snort_logs_{$save_date}.tar.gz";
-	exec("/usr/bin/tar cfz /tmp/{$file_name} /var/log/snort");
+	$file_name = "snort_logs_{$save_date}_{$if_real}.tar.gz";
+	exec("cd /var/log/snort/snort_{$if_real}{$snort_uuid} && /usr/bin/tar -czf /tmp/{$file_name} *");
 
 	if (file_exists("/tmp/{$file_name}")) {
-		$file = "/tmp/snort_logs_{$save_date}.tar.gz";
-		header("Expires: Mon, 26 Jul 1997 05:00:00 GMT\n");
-		header("Pragma: private"); // needed for IE
-		header("Cache-Control: private, must-revalidate"); // needed for IE
-		header('Content-type: application/force-download');
-		header('Content-Transfer-Encoding: Binary');
-		header("Content-length: ".filesize($file));
+		ob_start(); //important or other posts will fail
+		if (isset($_SERVER['HTTPS'])) {
+			header('Pragma: ');
+			header('Cache-Control: ');
+		} else {
+			header("Pragma: private");
+			header("Cache-Control: private, must-revalidate");
+		}
+		header("Content-Type: application/octet-stream");
+		header("Content-length: " . filesize("/tmp/{$file_name}"));
 		header("Content-disposition: attachment; filename = {$file_name}");
-		readfile("$file");
-		exec("/bin/rm /tmp/{$file_name}");
+		ob_end_clean(); //important or other post will fail
+		readfile("/tmp/{$file_name}");
+
+		// Clean up the temp file
+		@unlink("/tmp/{$file_name}");
 	}
-
-	header("Location: /snort/snort_alerts.php");
-	exit;
+	else
+		$savemsg = gettext("An error occurred while creating archive");
 }
 
+/* Load up an array with the current Suppression List GID,SID values */
+$supplist = snort_load_suppress_sigs($a_instance[$instanceid], true);
 
-/* WARNING: took me forever to figure reg expression, dont lose */
-// $fileline = '12/09-18:12:02.086733  [**] [122:6:0] (portscan) TCP Filtered Decoy Portscan [**] [Priority: 3] {PROTO:255} 125.135.214.166 -> 70.61.243.50';
-function get_snort_alert_date($fileline)
-{
-	/* date full date \d+\/\d+-\d+:\d+:\d+\.\d+\s */
-	if (preg_match("/\d+\/\d+-\d+:\d+:\d\d/", $fileline, $matches1))
-		$alert_date =  "$matches1[0]";
-
-	return $alert_date;
-}
-
-function get_snort_alert_disc($fileline)
-{
-	/* disc */
-	if (preg_match("/\[\*\*\] (\[.*\]) (.*) (\[\*\*\])/", $fileline, $matches))
-		$alert_disc =  "$matches[2]";
-
-	return $alert_disc;
-}
-
-function get_snort_alert_class($fileline)
-{
-	/* class */
-	if (preg_match('/\[Classification:\s.+[^\d]\]/', $fileline, $matches2))
-		$alert_class = "$matches2[0]";
-
-	return $alert_class;
-}
-
-function get_snort_alert_priority($fileline)
-{
-	/* Priority */
-	if (preg_match('/Priority:\s\d/', $fileline, $matches3))
-		$alert_priority = "$matches3[0]";
-
-	return $alert_priority;
-}
-
-function get_snort_alert_proto($fileline)
-{
-	/* Priority */
-	if (preg_match('/\{.+\}/', $fileline, $matches3))
-		$alert_proto = "$matches3[0]";
-
-	return $alert_proto;
-}
-
-function get_snort_alert_proto_full($fileline)
-{
-	/* Protocal full */
-	if (preg_match('/.+\sTTL/', $fileline, $matches2))
-		$alert_proto_full = "$matches2[0]";
-
-	return $alert_proto_full;
-}
-
-function get_snort_alert_ip_src($fileline)
-{
-	/* SRC IP */
-	$re1='.*?';   # Non-greedy match on filler
-	$re2='((?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?))(?![\\d])'; # IPv4 IP Address 1
-
-	if ($c=preg_match_all ("/".$re1.$re2."/is", $fileline, $matches4))
-		$alert_ip_src = $matches4[1][0];
-
-	return $alert_ip_src;
-}
-
-function get_snort_alert_src_p($fileline)
-{
-	/* source port */
-	if (preg_match('/:\d+\s-/', $fileline, $matches5))
-		$alert_src_p = "$matches5[0]";
-
-	return $alert_src_p;
-}
-
-function get_snort_alert_flow($fileline)
-{
-	/* source port */
-	if (preg_match('/(->|<-)/', $fileline, $matches5))
-		$alert_flow = "$matches5[0]";
-
-	return $alert_flow;
-}
-
-function get_snort_alert_ip_dst($fileline)
-{
-	/* DST IP */
-	$re1dp='.*?';   # Non-greedy match on filler
-	$re2dp='(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)(?![\\d])';   # Uninteresting: ipaddress
-	$re3dp='.*?';   # Non-greedy match on filler
-	$re4dp='((?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?))(?![\\d])'; # IPv4 IP Address 1
-
-	if ($c=preg_match_all ("/".$re1dp.$re2dp.$re3dp.$re4dp."/is", $fileline, $matches6))
-		$alert_ip_dst = $matches6[1][0];
-
-	return $alert_ip_dst;
-}
-
-function get_snort_alert_dst_p($fileline)
-{
-	/* dst port */
-	if (preg_match('/:\d+$/', $fileline, $matches7))
-		$alert_dst_p = "$matches7[0]";
-
-	return $alert_dst_p;
-}
-
-function get_snort_alert_dst_p_full($fileline)
-{
-	/* dst port full */
-	if (preg_match('/:\d+\n[A-Z]+\sTTL/', $fileline, $matches7))
-		$alert_dst_p = "$matches7[0]";
-
-	return $alert_dst_p;
-}
-
-function get_snort_alert_sid($fileline)
-{
-	/* SID */
-	if (preg_match('/\[\d+:\d+:\d+\]/', $fileline, $matches8))
-		$alert_sid = "$matches8[0]";
-
-	return $alert_sid;
-}
-
-$pgtitle = "Services: Snort: Snort Alerts";
+$pgtitle = gettext("Snort: Snort Alerts");
 include_once("head.inc");
 
 ?>
 
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">
-
+<script src="/javascript/filter_log.js" type="text/javascript"></script>
 <?php
-
 include_once("fbegin.inc");
-echo $snort_general_css;
 
 /* refresh every 60 secs */
 if ($pconfig['arefresh'] == 'on')
-	echo "<meta http-equiv=\"refresh\" content=\"60;url=/snort/snort_alerts.php\" />\n";
+	echo "<meta http-equiv=\"refresh\" content=\"60;url=/snort/snort_alerts.php?instance={$instanceid}\" />\n";
+if($pfsense_stable == 'yes'){echo '<p class="pgtitle">' . $pgtitle . '</p>';}
+	/* Display Alert message */
+	if ($input_errors) {
+		print_input_errors($input_errors); // TODO: add checks
+	}
+	if ($savemsg) {
+		print_info_box($savemsg);
+	}
 ?>
-
-<div class="body2"><?if($pfsense_stable == 'yes'){echo '<p class="pgtitle">' . $pgtitle . '</p>';}?>
-
+<form action="/snort/snort_alerts.php" method="post" id="formalert">
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
 <tr><td>
 <?php
-        $tab_array = array();
-        $tab_array[0] = array(gettext("Snort Interfaces"), false, "/snort/snort_interfaces.php");
-        $tab_array[1] = array(gettext("Global Settings"), false, "/snort/snort_interfaces_global.php");
-        $tab_array[2] = array(gettext("Updates"), false, "/snort/snort_download_updates.php");
-        $tab_array[3] = array(gettext("Alerts"), true, "/snort/snort_alerts.php");
-        $tab_array[4] = array(gettext("Blocked"), false, "/snort/snort_blocked.php");
-        $tab_array[5] = array(gettext("Whitelists"), false, "/snort/snort_interfaces_whitelist.php");
-        $tab_array[6] = array(gettext("Suppress"), false, "/snort/snort_interfaces_suppress.php");
-        $tab_array[7] = array(gettext("Help"), false, "/snort/help_and_info.php");
-        display_top_tabs($tab_array);
+	$tab_array = array();
+	$tab_array[0] = array(gettext("Snort Interfaces"), false, "/snort/snort_interfaces.php");
+	$tab_array[1] = array(gettext("Global Settings"), false, "/snort/snort_interfaces_global.php");
+	$tab_array[2] = array(gettext("Updates"), false, "/snort/snort_download_updates.php");
+	$tab_array[3] = array(gettext("Alerts"), true, "/snort/snort_alerts.php?instance={$instanceid}");
+	$tab_array[4] = array(gettext("Blocked"), false, "/snort/snort_blocked.php");
+	$tab_array[5] = array(gettext("Whitelists"), false, "/snort/snort_interfaces_whitelist.php");
+	$tab_array[6] = array(gettext("Suppress"), false, "/snort/snort_interfaces_suppress.php");
+	$tab_array[7] = array(gettext("Sync"), false, "/pkg_edit.php?xml=snort/snort_sync.xml");
+	display_top_tabs($tab_array);
 ?>
 </td></tr>
 <tr>
-	<td>
-		<div id="mainarea2">
-		<table class="tabcont" width="100%" border="1" cellspacing="0"
-			cellpadding="0">
+	<td><div id="mainarea">
+		<table id="maintable" class="tabcont" width="100%" border="0" cellspacing="0" cellpadding="6">
 			<tr>
-				<td width="22%" colspan="0" class="listtopic">Last <?=$anentries;?>
-				Alert Entries.</td>
-				<td width="78%" class="listtopic">Latest Alert Entries Are Listed
-				First.</td>
+				<td colspan="2" class="listtopic"><?php echo gettext("Alert Log View Settings"); ?></td>
 			</tr>
 			<tr>
-				<td width="22%" class="vncell">Save or Remove Logs</td>
+				<td width="22%" class="vncell"><?php echo gettext('Instance to inspect'); ?></td>
 				<td width="78%" class="vtable">
-				<form action="/snort/snort_alerts.php" method="post"><input
-					name="download" type="submit" class="formbtn" value="Download"> All
-				log files will be saved. <a href="/snort/snort_alerts.php?action=clear"><input name="delete" type="button"
-					class="formbtn" value="Clear"
-					onclick="return confirm('Do you really want to remove all your logs ? All snort rule interfces may have to be restarted.')"></a>
-				<span class="red"><strong>Warning:</strong></span> all log files
-				will be deleted.</form>
+					<select name="instance" id="instance" class="formselect" onChange="document.getElementById('formalert').method='get';document.getElementById('formalert').submit()">
+			<?php
+				foreach ($a_instance as $id => $instance) {
+					$selected = "";
+					if ($id == $instanceid)
+						$selected = "selected";
+					echo "<option value='{$id}' {$selected}> (" . snort_get_friendly_interface($instance['interface']) . "){$instance['descr']}</option>\n";
+				}
+			?>
+					</select>&nbsp;&nbsp;<?php echo gettext('Choose which instance alerts you want to inspect.'); ?>
+				</td>
+			<tr>
+				<td width="22%" class="vncell"><?php echo gettext('Save or Remove Logs'); ?></td>
+				<td width="78%" class="vtable">
+					<input name="download" type="submit" class="formbtns" value="Download"> <?php echo gettext('All ' .
+						'log files will be saved.'); ?>&nbsp;&nbsp;<a href="/snort/snort_alerts.php?action=clear&instance=<?=$instanceid;?>">
+					<input name="delete" type="submit" class="formbtns" value="Clear"
+					onclick="return confirm('Do you really want to remove all instance logs?')"></a>
+					<span class="red"><strong><?php echo gettext('Warning:'); ?></strong></span> <?php echo ' ' . gettext('all log files will be deleted.'); ?>
 				</td>
 			</tr>
 			<tr>
-				<td width="22%" class="vncell">Auto Refresh and Log View</td>
+				<td width="22%" class="vncell"><?php echo gettext('Auto Refresh and Log View'); ?></td>
 				<td width="78%" class="vtable">
-				<form action="/snort/snort_alerts.php" method="post"><input
-					name="save" type="submit" class="formbtn" value="Save"> Refresh <input
-					name="arefresh" type="checkbox" value="on"
+					<input name="save" type="submit" class="formbtns" value="Save">
+					<?php echo gettext('Refresh'); ?> <input name="arefresh" type="checkbox" value="on"
 					<?php if ($config['installedpackages']['snortglobal']['alertsblocks']['arefresh']=="on") echo "checked"; ?>>
-				<strong>Default</strong> is <strong>ON</strong>. <input
-					name="alertnumber" type="text" class="formfld" id="alertnumber"
-					size="5" value="<?=htmlspecialchars($anentries);?>"> Enter the
-				number of log entries to view. <strong>Default</strong> is <strong>250</strong>.
-				</form>
+						<?php printf(gettext('%sDefault%s is %sON%s.'), '<strong>', '</strong>', '<strong>', '</strong>'); ?>&nbsp;&nbsp;
+					<input name="alertnumber" type="text" class="formfld unknown" id="alertnumber" size="5" value="<?=htmlspecialchars($anentries);?>">
+					<?php printf(gettext('Enter number of log entries to view. %sDefault%s is %s250%s.'), '<strong>', '</strong>', '<strong>', '</strong>'); ?>
 				</td>
 			</tr>
-		</table>
-		</div>
-		</td>
-	</tr>
-</table>
-<table width="100%" border="0" cellpadding="0" cellspacing="0">
-	<td width="100%"><br>
-	<div class="tableFilter">
-	<form id="tableFilter"
-		onsubmit="myTable.filter(this.id); return false;">Filter: <select
-		id="column">
-		<option value="1">PRIORITY</option>
-		<option value="2">PROTO</option>
-		<option value="3">DESCRIPTION</option>
-		<option value="4">CLASS</option>
-		<option value="5">SRC</option>
-		<option value="6">SRC PORT</option>
-		<option value="7">FLOW</option>
-		<option value="8">DST</option>
-		<option value="9">DST PORT</option>
-		<option value="10">SID</option>
-		<option value="11">Date</option>
-	</select> <input type="text" id="keyword" /> <input type="submit"
-		value="Submit" /> <input type="reset" value="Clear" /></form>
-	</div>
-	<table class="allRow" id="myTable" width="100%" border="2"
-		cellpadding="1" cellspacing="1">
+			<tr>
+				<td colspan="2" class="listtopic"><?php printf(gettext("Last %s Alert Entries"), $anentries); ?>&nbsp;&nbsp;
+				<?php echo gettext("(Most recent entries are listed first)"); ?></td>
+			</tr>
+	<tr>
+	<td width="100%" colspan="2">
+	<table id="myTable" style="table-layout: fixed;" width="100%" class="sortable" border="1" cellpadding="0" cellspacing="0">
+		<colgroup>
+			<col width="9%" align="center" axis="date">
+			<col width="45" align="center" axis="number">
+			<col width="65" align="center" axis="string">
+			<col width="10%" axis="string">
+			<col width="13%" align="center" axis="string">
+			<col width="8%" align="center" axis="string">
+			<col width="13%" align="center" axis="string">
+			<col width="8%" align="center" axis="string">
+			<col width="9%" align="center" axis="number">
+			<col axis="string">
+		</colgroup>
 		<thead>
-			<th axis="number">#</th>
-			<th axis="string">PRI</th>
-			<th axis="string">PROTO</th>
-			<th axis="string">DESCRIPTION</th>
-			<th axis="string">CLASS</th>
-			<th axis="string">SRC</th>
-			<th axis="string">SPORT</th>
-			<th axis="string">FLOW</th>
-			<th axis="string">DST</th>
-			<th axis="string">DPORT</th>
-			<th axis="string">SID</th>
-			<th axis="date">Date</th>
+		   <tr>
+			<th class="listhdrr" axis="date"><?php echo gettext("DATE"); ?></th>
+			<th class="listhdrr" axis="number"><?php echo gettext("PRI"); ?></th>
+			<th class="listhdrr" axis="string"><?php echo gettext("PROTO"); ?></th>
+			<th class="listhdrr" axis="string"><?php echo gettext("CLASS"); ?></th>
+			<th class="listhdrr" axis="string"><?php echo gettext("SRC"); ?></th>
+			<th class="listhdrr" axis="string"><?php echo gettext("SPORT"); ?></th>
+			<th class="listhdrr" axis="string"><?php echo gettext("DST"); ?></th>
+			<th class="listhdrr" axis="string"><?php echo gettext("DPORT"); ?></th>
+			<th class="listhdrr" axis="number"><?php echo gettext("SID"); ?></th>
+			<th class="listhdrr" axis="string"><?php echo gettext("DESCRIPTION"); ?></th>
+		   </tr>
 		</thead>
-		<tbody>
-		<?php
+	<tbody>
+	<?php
 
-		/* make sure alert file exists */
-		if(!file_exists('/var/log/snort/alert'))
-			exec('/usr/bin/touch /var/log/snort/alert');
-
-		$logent = $anentries;
-
-		/* detect the alert file type */
-		if ($snortalertlogt == 'full')
-			$alerts_array = array_reverse(array_filter(explode("\n\n", file_get_contents('/var/log/snort/alert'))));
-		else
-			$alerts_array = array_reverse(array_filter(split("\n", file_get_contents('/var/log/snort/alert'))));
-
-
-
-		if (is_array($alerts_array)) {
-
-			$counter = 0;
-			foreach($alerts_array as $fileline)
-			{
-
-				if($logent <= $counter)
+/* make sure alert file exists */
+if (file_exists("/var/log/snort/snort_{$if_real}{$snort_uuid}/alert")) {
+	exec("tail -{$anentries} -r /var/log/snort/snort_{$if_real}{$snort_uuid}/alert > /tmp/alert_{$snort_uuid}");
+	if (file_exists("/tmp/alert_{$snort_uuid}")) {
+		$tmpblocked = array_flip(snort_get_blocked_ips());
+		$counter = 0;
+		/*                 0         1           2      3      4    5    6    7      8     9    10    11             12    */
+		/* File format timestamp,sig_generator,sig_id,sig_rev,msg,proto,src,srcport,dst,dstport,id,classification,priority */
+		$fd = fopen("/tmp/alert_{$snort_uuid}", "r");
+		while (($fields = fgetcsv($fd, 1000, ',', '"')) !== FALSE) {
+			if(count($fields) < 11)
 				continue;
 
-				$counter++;
-
-				/* Date */
-				$alert_date_str = get_snort_alert_date($fileline);
-
-				if($alert_date_str != '')
-				{
-					$alert_date = $alert_date_str;
-				}else{
-					$alert_date = 'empty';
-				}
-
-				/* Discription */
-				$alert_disc_str = get_snort_alert_disc($fileline);
-
-				if($alert_disc_str != '')
-				{
-					$alert_disc = $alert_disc_str;
-				}else{
-					$alert_disc = 'empty';
-				}
-
-				/* Classification */
-				$alert_class_str = get_snort_alert_class($fileline);
-
-				if($alert_class_str != '')
-				{
-
-					$alert_class_match = array('[Classification:',']');
-					$alert_class = str_replace($alert_class_match, '', "$alert_class_str");
-				}else{
-					$alert_class = 'Prep';
-				}
-					
-				/* Priority */
-				$alert_priority_str = get_snort_alert_priority($fileline);
-
-				if($alert_priority_str != '')
-				{
-					$alert_priority_match = array('Priority: ',']');
-					$alert_priority = str_replace($alert_priority_match, '', "$alert_priority_str");
-				}else{
-					$alert_priority = 'empty';
-				}
-
-				/* Protocol */
-				/* Detect alert file type */
-				if ($snortalertlogt == 'full')
-				{
-					$alert_proto_str = get_snort_alert_proto_full($fileline);
-				}else{
-					$alert_proto_str = get_snort_alert_proto($fileline);
-				}
-
-				if($alert_proto_str != '')
-				{
-					$alert_proto_match = array(" TTL",'{','}');
-					$alert_proto = str_replace($alert_proto_match, '', "$alert_proto_str");
-				}else{
-					$alert_proto = 'empty';
-				}
-					
-				/* IP SRC */
-				$alert_ip_src_str = get_snort_alert_ip_src($fileline);
-
-				if($alert_ip_src_str != '')
-				{
-					$alert_ip_src = $alert_ip_src_str;
-				}else{
-					$alert_ip_src = 'empty';
-				}
-					
-				/* IP SRC Port */
-				$alert_src_p_str = get_snort_alert_src_p($fileline);
-					
-				if($alert_src_p_str != '')
-				{
-					$alert_src_p_match = array(' -',':');
-					$alert_src_p = str_replace($alert_src_p_match, '', "$alert_src_p_str");
-				}else{
-					$alert_src_p = 'empty';
-				}
-
-				/* Flow */
-				$alert_flow_str = get_snort_alert_flow($fileline);
-
-				if($alert_flow_str != '')
-				{
-					$alert_flow = $alert_flow_str;
-				}else{
-					$alert_flow = 'empty';
-				}
-
-				/* IP Destination */
-				$alert_ip_dst_str = get_snort_alert_ip_dst($fileline);
-
-				if($alert_ip_dst_str != '')
-				{
-					$alert_ip_dst = $alert_ip_dst_str;
-				}else{
-					$alert_ip_dst = 'empty';
-				}
-
-				/* IP DST Port */
-				if ($snortalertlogt == 'full')
-				{
-					$alert_dst_p_str = get_snort_alert_dst_p_full($fileline);
-				}else{
-					$alert_dst_p_str = get_snort_alert_dst_p($fileline);
-				}
-
-				if($alert_dst_p_str != '')
-				{
-					$alert_dst_p_match = array(':',"\n"," TTL");
-					$alert_dst_p_str2 = str_replace($alert_dst_p_match, '', "$alert_dst_p_str");
-					$alert_dst_p_match2 = array('/[A-Z]/');
-					$alert_dst_p = preg_replace($alert_dst_p_match2, '', "$alert_dst_p_str2");
-				}else{
-					$alert_dst_p = 'empty';
-				}
-
-				/* SID */
-				$alert_sid_str = get_snort_alert_sid($fileline);
-
-				if($alert_sid_str != '')
-				{
-					$alert_sid_match = array('[',']');
-					$alert_sid = str_replace($alert_sid_match, '', "$alert_sid_str");
-				}else{
-					$alert_sid_str = 'empty';
-				}
-
-				/* NOTE: using one echo improves performance by 2x */
-				if ($alert_disc != 'empty')
-				{
-					echo "<tr id=\"{$counter}\">
-				<td class=\"centerAlign\">{$counter}</td>
-				<td class=\"centerAlign\">{$alert_priority}</td>
-				<td class=\"centerAlign\">{$alert_proto}</td>
-				<td>{$alert_disc}</td>
-				<td class=\"centerAlign\">{$alert_class}</td>
-				<td>{$alert_ip_src}</td>
-				<td class=\"centerAlign\">{$alert_src_p}</td>
-				<td class=\"centerAlign\">{$alert_flow}</td>
-				<td>{$alert_ip_dst}</td>
-				<td class=\"centerAlign\">{$alert_dst_p}</td>
-				<td class=\"centerAlign\">{$alert_sid}</td>
-				<td>{$alert_date}</td>
-				</tr>\n";
-				}
-
-				//		<script type="text/javascript">
-				//			var myTable = {};
-				//			window.addEvent('domready', function(){
-				//				myTable = new sortableTable('myTable', {overCls: 'over', onClick: function(){alert(this.id)}});
-				//			});
-				//		</script>
-
+			/* Time */
+			$alert_time = substr($fields[0], strpos($fields[0], '-')+1, -8);
+			/* Date */
+			$alert_date = substr($fields[0], 0, strpos($fields[0], '-'));
+			/* Description */
+			$alert_descr = $fields[4];
+			$alert_descr_url = urlencode($fields[4]);
+			/* Priority */
+			$alert_priority = $fields[12];
+			/* Protocol */
+			$alert_proto = $fields[5];
+			/* IP SRC */
+			$alert_ip_src = $fields[6];
+			/* Add zero-width space as soft-break opportunity after each colon if we have an IPv6 address */
+			$alert_ip_src = str_replace(":", ":&#8203;", $alert_ip_src);
+			/* Add Reverse DNS lookup icons (two different links if pfSense version supports them) */
+			$alert_ip_src .= "<br/>";
+			if ($pfs_version > 2.0) {
+				$alert_ip_src .= "<a onclick=\"javascript:getURL('/diag_dns.php?host={$fields[6]}&dialog_output=true', outputrule);\">";
+				$alert_ip_src .= "<img src='../themes/{$g['theme']}/images/icons/icon_log_d.gif' width='11' height='11' border='0' ";
+				$alert_ip_src .= "title='" . gettext("Resolve host via reverse DNS lookup (quick pop-up)") . "' style=\"cursor: pointer;\"></a>&nbsp;";
 			}
-		}
+			$alert_ip_src .= "<a href='/diag_dns.php?host={$fields[6]}&instance={$instanceid}'>";
+			$alert_ip_src .= "<img src='../themes/{$g['theme']}/images/icons/icon_log.gif' width='11' height='11' border='0' ";
+			$alert_ip_src .= "title='" . gettext("Resolve host via reverse DNS lookup") . "'></a>";
 
-		?>
+			/* Add icons for auto-adding to Suppress List if appropriate */
+			if (!snort_is_alert_globally_suppressed($supplist, $fields[1], $fields[2]) && 
+			    !isset($supplist[$fields[1]][$fields[2]]['by_src'][$fields[6]])) {
+				$alert_ip_src .= "&nbsp;&nbsp;<a href='?instance={$instanceid}&act=addsuppress_srcip&sidid={$fields[2]}&gen_id={$fields[1]}&descr={$alert_descr_url}&ip=" . trim(urlencode($fields[6])) . "'>";
+				$alert_ip_src .= "<img src='../themes/{$g['theme']}/images/icons/icon_plus.gif' width='12' height='12' border='0' ";
+				$alert_ip_src .= "title='" . gettext("Add this alert to the Suppress List and track by_src IP") . "'></a>";	
+			}
+			elseif (isset($supplist[$fields[1]][$fields[2]]['by_src'][$fields[6]])) {
+				$alert_ip_src .= "&nbsp;&nbsp;<img src='../themes/{$g['theme']}/images/icons/icon_plus_d.gif' width='12' height='12' border='0' ";
+				$alert_ip_src .= "title='" . gettext("This alert track by_src IP is already in the Suppress List") . "'/>";	
+			}
+			/* Add icon for auto-removing from Blocked Table if required */
+			if (isset($tmpblocked[$fields[6]])) {
+				$alert_ip_src .= "&nbsp;";
+				$alert_ip_src .= "<a href='?instance={$instanceid}&todelete=" . trim(urlencode($fields[6])) . "'>
+				<img title=\"" . gettext("Remove host from Blocked Table") . "\" border=\"0\" width='12' height='12' name='todelete' id='todelete' alt=\"Remove from Blocked Hosts\" src=\"../themes/{$g['theme']}/images/icons/icon_x.gif\"></a>"; 
+			}
+			/* IP SRC Port */
+			$alert_src_p = $fields[7];
+			/* IP Destination */
+			$alert_ip_dst = $fields[8];
+			/* Add zero-width space as soft-break opportunity after each colon if we have an IPv6 address */
+			$alert_ip_dst = str_replace(":", ":&#8203;", $alert_ip_dst);
+			/* Add Reverse DNS lookup icons (two different links if pfSense version supports them) */
+			$alert_ip_dst .= "<br/>";
+			if ($pfs_version > 2.0) {
+				$alert_ip_dst .= "<a onclick=\"javascript:getURL('/diag_dns.php?host={$fields[8]}&dialog_output=true', outputrule);\">";
+				$alert_ip_dst .= "<img src='../themes/{$g['theme']}/images/icons/icon_log_d.gif' width='11' height='11' border='0' ";
+				$alert_ip_dst .= "title='" . gettext("Resolve host via reverse DNS lookup (quick pop-up)") . "' style=\"cursor: pointer;\"></a>&nbsp;";
+			}
+			$alert_ip_dst .= "<a href='/diag_dns.php?host={$fields[8]}&instance={$instanceid}'>";
+			$alert_ip_dst .= "<img src='../themes/{$g['theme']}/images/icons/icon_log.gif' width='11' height='11' border='0' ";
+			$alert_ip_dst .= "title='" . gettext("Resolve host via reverse DNS lookup") . "'></a>";	
+			/* Add icons for auto-adding to Suppress List if appropriate */
+			if (!snort_is_alert_globally_suppressed($supplist, $fields[1], $fields[2]) && 
+			    !isset($supplist[$fields[1]][$fields[2]]['by_dst'][$fields[8]])) {
+				$alert_ip_dst .= "&nbsp;&nbsp;<a href='?instance={$instanceid}&act=addsuppress_dstip&sidid={$fields[2]}&gen_id={$fields[1]}&descr={$alert_descr_url}&ip=" . trim(urlencode($fields[8])) . "'>";
+				$alert_ip_dst .= "<img src='../themes/{$g['theme']}/images/icons/icon_plus.gif' width='12' height='12' border='0' ";
+				$alert_ip_dst .= "title='" . gettext("Add this alert to the Suppress List and track by_dst IP") . "'></a>";	
+			}
+			elseif (isset($supplist[$fields[1]][$fields[2]]['by_dst'][$fields[8]])) {
+				$alert_ip_dst .= "&nbsp;&nbsp;<img src='../themes/{$g['theme']}/images/icons/icon_plus_d.gif' width='12' height='12' border='0' ";
+				$alert_ip_dst .= "title='" . gettext("This alert track by_dst IP is already in the Suppress List") . "'/>";	
+			}
+			/* Add icon for auto-removing from Blocked Table if required */
+			if (isset($tmpblocked[$fields[8]])) {
+				$alert_ip_dst .= "&nbsp;";
+				$alert_ip_dst .= "<a href='?instance={$instanceid}&todelete=" . trim(urlencode($fields[8])) . "'>
+				<img title=\"" . gettext("Remove host from Blocked Table") . "\" border=\"0\" width='12' height='12' name='todelete' id='todelete' alt=\"Remove from Blocked Hosts\" src=\"../themes/{$g['theme']}/images/icons/icon_x.gif\"></a>";
+			}
+			/* IP DST Port */
+			$alert_dst_p = $fields[9];
+			/* SID */
+			$alert_sid_str = "{$fields[1]}:{$fields[2]}";
+			if (!snort_is_alert_globally_suppressed($supplist, $fields[1], $fields[2])) {
+				$sidsupplink = "<a href='?instance={$instanceid}&act=addsuppress&sidid={$fields[2]}&gen_id={$fields[1]}&descr={$alert_descr_url}'>";
+				$sidsupplink .= "<img src='../themes/{$g['theme']}/images/icons/icon_plus.gif' width='12' height='12' border='0' ";
+				$sidsupplink .= "title='" . gettext("Add this alert to the Suppress List") . "'></a>";	
+			}
+			else {
+				$sidsupplink = "<img src='../themes/{$g['theme']}/images/icons/icon_plus_d.gif' width='12' height='12' border='0' ";
+				$sidsupplink .= "title='" . gettext("This alert is already in the Suppress List") . "'/>";	
+			}
+			/* Add icon for toggling rule state */
+			if (isset($disablesid[$fields[1]][$fields[2]])) {
+				$sid_dsbl_link = "<a href='?instance={$instanceid}&act=togglesid&sidid={$fields[2]}&gen_id={$fields[1]}'>";
+				$sid_dsbl_link .= "<img src='../themes/{$g['theme']}/images/icons/icon_block_d.gif' width='11' height='11' border='0' ";
+				$sid_dsbl_link .= "title='" . gettext("Rule is forced to a disabled state. Click to remove the force-disable action.") . "'></a>";
+			}
+			else {
+				$sid_dsbl_link = "<a href='?instance={$instanceid}&act=togglesid&sidid={$fields[2]}&gen_id={$fields[1]}'>";
+				$sid_dsbl_link .= "<img src='../themes/{$g['theme']}/images/icons/icon_block.gif' width='11' height='11' border='0' ";
+				$sid_dsbl_link .= "title='" . gettext("Click to force-disable rule and remove from current rules set.") . "'></a>";
+			}
+			/* DESCRIPTION */
+			$alert_class = $fields[11];
+
+			echo "<tr>
+				<td class='listr' align='center'>{$alert_date}<br/>{$alert_time}</td>
+				<td class='listr' align='center'>{$alert_priority}</td>
+				<td class='listr' align='center'>{$alert_proto}</td>
+				<td class='listr' style=\"word-wrap:break-word;\">{$alert_class}</td>
+				<td class='listr' align='center'>{$alert_ip_src}</td>
+				<td class='listr' align='center'>{$alert_src_p}</td>
+				<td class='listr' align='center'>{$alert_ip_dst}</td>
+				<td class='listr' align='center'>{$alert_dst_p}</td>
+				<td class='listr' align='center'>{$alert_sid_str}<br/>{$sidsupplink}&nbsp;&nbsp;{$sid_dsbl_link}</td>
+				<td class='listr' style=\"word-wrap:break-word;\">{$alert_descr}</td>
+				</tr>\n";
+
+			$counter++;
+		}
+		fclose($fd);
+		@unlink("/tmp/alert_{$snort_uuid}");
+	}
+}
+?>
 		</tbody>
 	</table>
 	</td>
+</tr>
 </table>
-
 </div>
-
+</td></tr>
+</table>
+</form>
 <?php
 include("fend.inc");
-
-echo $snort_custom_rnd_box;
-
 ?>
+
 </body>
 </html>

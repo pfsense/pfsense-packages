@@ -52,12 +52,12 @@
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>077</chmod>
-		<item>http://www.pfsense.com/packages/config/dashboard/dashboard.inc</item>
+		<item>https://packages.pfsense.org/packages/config/dashboard/dashboard.inc</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>077</chmod>
-		<item>http://www.pfsense.com/packages/config/dashboard/binaries/widgets.tgz</item>
+		<item>https://files.pfsense.org/packages/widgets.tgz</item>
 	</additional_files_needed>
 	<custom_php_install_command>
 		dashboard_install();

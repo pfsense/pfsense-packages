@@ -43,10 +43,9 @@
     <requirements>Describe your package requirements here</requirements>
     <faq>Currently there are no FAQ items provided.</faq>
 	<name>imspector</name>
-	<version>0.9</version>
+	<version>20111108</version>
 	<title>Services: IMSpector</title>
-	<savetext>Change</savetext>
-	<aftersaveredirect>/services_imspector_logs.php</aftersaveredirect>
+	<savetext>Save</savetext>
 	<include_file>/usr/local/pkg/imspector.inc</include_file>
 	<menu>
 		<name>IMSpector</name>
@@ -58,38 +57,81 @@
 		<name>imspector</name>
 		<rcfile>imspector.sh</rcfile>
 		<executable>imspector</executable>
+		<description><![CDATA[Instant Messenger transparent proxy]]></description>
 	</service>
 	<tabs>
 		<tab>
-			<text>IMSpector Log Viewer</text>
-			<url>/services_imspector_logs.php</url>
-		</tab>
-		<tab>
-			<text>IMSpector Settings</text>
+			<text>Settings</text>
 			<url>/pkg_edit.php?xml=imspector.xml&amp;id=0</url>
 			<active/>
+		</tab>
+		<tab>
+			<text>Replacements</text>
+			<url>/pkg_edit.php?xml=imspector_replacements.xml&amp;id=0</url>
+		</tab>
+		<tab>
+			<text>Access Lists</text>
+			<url>/pkg.php?xml=imspector_acls.xml</url>
+		</tab>
+		<tab>
+			<text>Log</text>
+			<url>/imspector_logs.php</url>
+		</tab>
+		<tab>
+			<text>Sync</text>
+			<url>/pkg_edit.php?xml=imspector_sync.xml</url>
 		</tab>
 	</tabs>
 	<additional_files_needed>
 	    <prefix>/usr/local/pkg/</prefix>
 		<chmod>0755</chmod>
-		<item>http://www.pfsense.org/packages/config/imspector/imspector.inc</item>
+		<item>https://packages.pfsense.org/packages/config/imspector/imspector_sync.xml</item>
+	</additional_files_needed>
+	<additional_files_needed>
+	    <prefix>/usr/local/pkg/</prefix>
+		<chmod>0755</chmod>
+		<item>https://packages.pfsense.org/packages/config/imspector/imspector_replacements.xml</item>
+	</additional_files_needed>
+	<additional_files_needed>
+	    <prefix>/usr/local/pkg/</prefix>
+		<chmod>0755</chmod>
+		<item>https://packages.pfsense.org/packages/config/imspector/imspector_acls.xml</item>
+	</additional_files_needed>
+	<additional_files_needed>
+	    <prefix>/usr/local/pkg/</prefix>
+		<chmod>0755</chmod>
+		<item>https://packages.pfsense.org/packages/config/imspector/imspector.inc</item>
 	</additional_files_needed>
 	<additional_files_needed>
 	    <prefix>/usr/local/www/</prefix>
 		<chmod>0755</chmod>
-		<item>http://www.pfsense.org/packages/config/imspector/services_imspector_logs.php</item>
+		<item>https://packages.pfsense.org/packages/config/imspector/imspector_logs.php</item>
+	</additional_files_needed>
+	<additional_files_needed>
+	    <prefix>/usr/local/www/</prefix>
+		<chmod>0755</chmod>
+		<item>https://packages.pfsense.org/packages/config/imspector/services_imspector_logs.php</item>
+	</additional_files_needed>
+	<additional_files_needed>
+	    <prefix>/usr/local/www/</prefix>
+		<chmod>0755</chmod>
+		<item>https://packages.pfsense.org/packages/config/imspector/services_imspector_logs2.php</item>
 	</additional_files_needed>
 	<fields>
+		<field>
+			<name>General Settings</name>
+			<type>listtopic</type>
+		</field>
 		<field>
 			<fielddescr>Enable IMSpector</fielddescr>
 			<fieldname>enable</fieldname>
 			<type>checkbox</type>
 		</field>
 		<field>
-			<fielddescr>Interfaces (generally LAN)</fielddescr>
+			<fielddescr>Interfaces</fielddescr>
 			<fieldname>iface_array</fieldname>
-			<description>You can use the CTRL or COMMAND key to select multiple interfaces.</description>
+			<description><![CDATA[<strong>Generally select internal interface(s) like LAN</strong><br>
+							You can use the CTRL or COMMAND key to select multiple interfaces.]]></description>
 			<type>interfaces_selection</type>
 			<size>3</size>
 			<required/>
@@ -99,84 +141,21 @@
 		<field>
 			<fielddescr>Listen on protocols</fielddescr>
 			<fieldname>proto_array</fieldname>
-			<description>You can use the CTRL or COMMAND key to select multiple protocols.  NOTE: Gtalk/Jabber-SSL requires SSL certificates.</description>
+			<description><![CDATA[<strong>NOTE: Gtalk/Jabber-SSL requires SSL certificates.</strong><br>
+			You can use the CTRL or COMMAND key to select multiple protocols.]]></description>
 			<type>select</type>
 			<size>7</size>
 			<required/>
 			<multiple>true</multiple>
  			<options>
- 				<option>
- 					<name>MSN</name>
- 					<value>msn</value>
- 				</option>
- 				<option>
-					<name>ICQ/AIM</name>
- 					<value>icq</value>
-				</option>
- 				<option>
-					<name>Yahoo</name>
- 					<value>yahoo</value>
-				</option>
- 				<option>
-					<name>IRC</name>
- 					<value>irc</value>
- 				</option>			
- 				<option>
-					<name>Jabber</name>
- 					<value>jabber</value>
- 				</option>			
- 				<option>
-					<name>Gtalk/Jabber-SSL</name>
- 					<value>jabber-ssl</value>
- 				</option>			
- 				<option>
-					<name>Gadu-Gadu</name>
- 					<value>gadu-gadu</value>
- 				</option>
+ 				<option><name>MSN</name><value>msn</value></option>
+ 				<option><name>ICQ/AIM</name><value>icq</value></option>
+ 				<option><name>Yahoo</name><value>yahoo</value></option>
+ 				<option><name>IRC</name><value>irc</value></option>			
+ 				<option><name>Jabber</name><value>jabber</value></option>			
+ 				<option><name>Gtalk/Jabber-SSL</name><value>jabber-ssl</value></option>			
+ 				<option><name>Gadu-Gadu</name><value>gadu-gadu</value></option>
 			</options>
-		</field>
-		<field>
-			<fielddescr>Enable file logging</fielddescr>
-			<fieldname>log_file</fieldname>
-			<description>Log files stored in /var/imspector.</description>
-			<type>checkbox</type>
-		</field>
-		<field>
-			<fielddescr>Enable mySQL logging</fielddescr>
-			<fieldname>log_mysql</fieldname>
-			<description>Make sure to specify your MySQL credentials below.</description>
-			<type>checkbox</type>
-		</field>
-		<field>
-			<fielddescr>mySQL server</fielddescr>
-			<fieldname>mysql_server</fieldname>
-			<type>input</type>
-		</field>
-		<field>
-			<fielddescr>mySQL database</fielddescr>
-			<fieldname>mysql_database</fieldname>
-			<type>input</type>
-		</field>
-		<field>
-			<fielddescr>mySQL username</fielddescr>
-			<fieldname>mysql_username</fieldname>
-			<type>input</type>
-		</field>
-		<field>
-			<fielddescr>mySQL password</fielddescr>
-			<fieldname>mysql_password</fieldname>
-			<type>password</type>
-		</field>
-		<field>
-			<fielddescr>SSL Certificate</fielddescr>
-			<fieldname>ssl_server_cert</fieldname>
-			<description>
-				Choose the SSL Server Certificate here.
-			</description>
-			<type>select_source</type>
-			<source><![CDATA[imspector_get_server_certs()]]></source>
-			<source_name>descr</source_name>
-			<source_value>refid</source_value>
 		</field>
 		<field>
 			<fielddescr>SSL CA Certificate</fielddescr>
@@ -190,112 +169,73 @@
 			<source_value>refid</source_value>
 		</field>
 		<field>
-			<fielddescr>Enable bad word filtering</fielddescr>
-			<fieldname>filter_badwords</fieldname>
-			<description>Replace characters of matched bad word with *.</description>
+			<fielddescr>SSL Certificate</fielddescr>
+			<fieldname>ssl_server_cert</fieldname>
+			<description>
+				Choose the SSL Server Certificate here.
+			</description>
+			<type>select_source</type>
+			<source><![CDATA[imspector_get_server_certs()]]></source>
+			<source_name>descr</source_name>
+			<source_value>refid</source_value>
+		</field>
+		<field>
+			<name>Logging</name>
+			<type>listtopic</type>
+		</field>
+		<field>
+			<fielddescr>Enable file logging</fielddescr>
+			<fieldname>log_file</fieldname>
+			<description>Log files stored in /var/imspector.</description>
 			<type>checkbox</type>
 		</field>
 		<field>
-			<fielddescr>Enable response messages</fielddescr>
-			<fieldname>resonder</fieldname>
-			<description> 
-				Inform the users (both local and remote) that the conversation they are having is being recorded. This might be needed for legal reasons.  
-				Inform the sender that a file (or message) was blocked. This is useful because the sender will know a block occured, instead of the transfer simply failing.</description>
-			<type>checkbox</type>
-		</field>
-		<field>
-			<fielddescr>Notification frequency</fielddescr>
-			<fieldname>notice_days</fieldname>
+			<fielddescr>Report limit</fielddescr>
+			<fieldname>reportlimit</fieldname>
+			<description>Max entries to fetch from log dir(s). Default is 50</description>
 			<type>input</type>
-			<description>Frequency in number of days for notifying users they are being logged.  Default 1 day if responses are enabled, set to 0 to disable</description>
-		</field>		
+			<size>10</size>
+		</field>
 		<field>
-			<fielddescr>Filtered frequency</fielddescr>
-			<fieldname>filtered_minutes</fieldname>
+			<fielddescr>Report template</fielddescr>
+			<fieldname>template</fieldname>
+			<description>Template to use on reports</description>
+			<type>select</type>
+			<required/>
+ 			<options>
+ 				<option><name>Default Template</name><value>services_imspector_logs.php</value></option>
+ 				<option><name>0guzcan Template</name><value>services_imspector_logs2.php</value></option>
+			</options>
+		</field>
+		<field>
+			<fielddescr>Enable mySQL logging</fielddescr>
+			<fieldname>log_mysql</fieldname>
+			<description>Make sure to specify your MySQL credentials below.</description>
+			<type>checkbox</type>
+		</field>
+		<field>
+			<fielddescr>mySQL server</fielddescr>
+			<fieldname>mysql_server</fieldname>
 			<type>input</type>
-			<description>The time between sending "filtered" in minutes. Default 15 minutes if responses are enabled, set to 0 to disable</description>
+			<size>35</size>
 		</field>
 		<field>
-			<fielddescr>Custom message prefix</fielddescr>
-			<fieldname>prefix_message</fieldname>
-			<description>
-				Message to prepend to all IMSpector generated messages.  The default is "Message from IMSpector"
-			</description>
-			<type>textarea</type>
-			<encoding>base64</encoding>
-			<rows>5</rows>
-			<cols>40</cols>
+			<fielddescr>mySQL database</fielddescr>
+			<fieldname>mysql_database</fieldname>
+			<type>input</type>
+			<size>35</size>
 		</field>
 		<field>
-			<fielddescr>Custom recorded message response</fielddescr>
-			<fieldname>recorded_message</fieldname>
-			<description>
-				Message to send to users to let them know they are being recorded.  The default is "Your activities are being logged"
-			</description>
-			<type>textarea</type>
-			<encoding>base64</encoding>
-			<rows>5</rows>
-			<cols>40</cols>
+			<fielddescr>mySQL username</fielddescr>
+			<fieldname>mysql_username</fieldname>
+			<type>input</type>
+			<size>35</size>
 		</field>
 		<field>
-			<fielddescr>Custom filtered message response</fielddescr>
-			<fieldname>filtered_message</fieldname>
-			<description>
-				Message to send to users to let them know about filtered messages.
-			</description>
-			<type>textarea</type>
-			<encoding>base64</encoding>
-			<rows>5</rows>
-			<cols>40</cols>
-		</field>
-		
-		<field>
-			<fielddescr>Bad words list</fielddescr>
-			<fieldname>badwords_list</fieldname>
-			<description>
-				Place one word or phrase to match per line.&lt;br /&gt;
-				If left blank the default list in /usr/local/etc/imspector/badwords.txt will be used.
-			</description>
-			<type>textarea</type>
-			<encoding>base64</encoding>
-			<rows>5</rows>
-			<cols>40</cols>
-		</field>
-		<field>
-			<fielddescr>Block file transfers</fielddescr>
-			<fieldname>block_files</fieldname>
-			<description>Block file transfers on supported protocols.</description>
-			<type>checkbox</type>
-		</field>
-		<field>
-			<fielddescr>Block non ACL defined</fielddescr>
-			<fieldname>block_unlisted</fieldname>
-			<description>Overide the default of allowing user's not defined the whitelist or blacklist ACLs.</description>
-			<type>checkbox</type>
-		</field>
-		<field>
-			<fielddescr>ACL whitelist</fielddescr>
-			<fieldname>acl_whitelist</fieldname>
-			<description>
-				Example (allow specific access): localuser: remoteuser1 remoteuser2&lt;br /&gt;
-				Example (allow full access): localuser:
-			</description>
-			<type>textarea</type>
-			<encoding>base64</encoding>
-			<rows>5</rows>
-			<cols>40</cols>
-		</field>
-		<field>
-			<fielddescr>ACL blacklist</fielddescr>
-			<fieldname>acl_blacklist</fieldname>
-			<description>
-				Example (block specifc access): localuser: remoteuser1 remoteuser2&lt;br /&gt;
-				Example (block all access): localuser:
-			</description>
-			<type>textarea</type>
-			<encoding>base64</encoding>
-			<rows>5</rows>
-			<cols>40</cols>
+			<fielddescr>mySQL password</fielddescr>
+			<fieldname>mysql_password</fieldname>
+			<type>password</type>
+			<size>35</size>
 		</field>
 	</fields>
 	<custom_php_validation_command>

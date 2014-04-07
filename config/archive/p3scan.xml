@@ -56,16 +56,16 @@
 		<description>POP3 virus/spam scanner.</description>
 	</service>
 	<additional_files_needed>
-		<item>http://www.pfsense.org/packages/config/p3scan.inc</item>
+		<item>https://packages.pfsense.org/packages/config/p3scan.inc</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/bin/</prefix>
 		<chmod>0755</chmod>
-		<item>http://www.pfsense.org/packages/All/p3scan</item>
+		<item>https://www.pfsense.org/packages/All/p3scan</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/etc/</prefix>
-		<item>http://www.pfsense.org/packages/config/p3scan.mail</item>
+		<item>https://packages.pfsense.org/packages/config/p3scan.mail</item>
 	</additional_files_needed>
 	<custom_php_install_command>
 		p3scan_install_command();

@@ -50,10 +50,10 @@
     <title>none</title>
 	<include_file>viralator.inc</include_file>
 	<additional_files_needed>
-		<item>http://www.pfsense.org/packages/config/viralator.inc</item>
+		<item>https://packages.pfsense.org/packages/config/viralator.inc</item>
 	</additional_files_needed>
 	<additional_files_needed>
-		<item>http://www.pfsense.org/packages/All/viralator.tgz</item>
+		<item>https://www.pfsense.org/packages/All/viralator.tgz</item>
 	</additional_files_needed>
 	<custom_php_install_command>
 		viralator_install_command();

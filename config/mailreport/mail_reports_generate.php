@@ -53,17 +53,54 @@ if (!$config['mailreports']['schedule'][$id])
 	exit;
 
 $thisreport = $config['mailreports']['schedule'][$id];
-$graphs = $thisreport['row'];
 
-// No graphs on the report, bail!
-if (!is_array($graphs) || !(count($graphs) > 0))
-	exit;
+if (is_array($thisreport['cmd']) && is_array($thisreport['cmd']['row']))
+	$cmds = $thisreport['cmd']['row'];
+else
+	$cmds = array();
+
+if (is_array($thisreport['log']) && is_array($thisreport['log']['row']))
+	$logs = $thisreport['log']['row'];
+else
+	$logs = array();
+
+if (is_array($thisreport['row']))
+	$graphs = $thisreport['row'];
+else
+	$graphs = array();
+
+// If there is nothing to do, bail!
+if ((!is_array($cmds) || !(count($cmds) > 0))
+	&& (!is_array($logs) || !(count($logs) > 0))
+	&& (!is_array($graphs) || !(count($graphs) > 0)))
+	return;
 
 // Print report header
 
+// Print command output
+$cmdtext = "";
+foreach ($cmds as $cmd) {
+	$output = "";
+	$cmdtext .= "Command output: {$cmd['descr']} (" . htmlspecialchars($cmd['detail']) . ")<br />\n";
+	exec($cmd['detail'], $output);
+	$cmdtext .= "<pre>\n";
+	$cmdtext .= implode("\n", $output);
+	$cmdtext .= "\n</pre>";
+}
+
+// Print log output
+$logtext = "";
+foreach ($logs as $log) {
+	$lines = empty($log['lines']) ? 50 : $log['lines'];
+	$filter = empty($log['detail']) ? null : array($log['detail']);
+	$logtext .= "Log output: " . get_friendly_log_name($log['logfile']) . " ({$log['logfile']})<br />\n";
+	$logtext .= "<pre>\n";
+	$logtext .= implode("\n", mail_report_get_log($log['logfile'], $lines, $filter));
+	$logtext .= "\n</pre>";
+}
+
 // For each graph, print a header and the graph
 $attach = array();
-$idx=0;
 foreach ($graphs as $thisgraph) {
 	$dates = get_dates($thisgraph['period'], $thisgraph['timespan']);
 	$start = $dates['start'];
@@ -71,6 +108,6 @@ foreach ($graphs as $thisgraph) {
 	$attach[] = mail_report_generate_graph($thisgraph['graph'], $thisgraph['style'], $thisgraph['timespan'], $start, $end);
 }
 
-mail_report_send($thisreport['descr'], $attach);
+mail_report_send($thisreport['descr'], $cmdtext, $logtext, $attach);
 
 ?>

@@ -46,38 +46,23 @@
 	<requirements>Dashboard package and Snort</requirements>
 	<faq>Currently there are no FAQ	items provided.</faq>
 	<name>widget-snort</name>
-	<version>0.2</version>
+	<version>0.3.6</version>
 	<title>Widget - Snort</title>
-	<include_file>/usr/local/pkg/widget-snort.inc</include_file>
-	<additional_files_needed>
-		<prefix>/usr/local/pkg/</prefix>
-		<chmod>077</chmod>
-		<item>http://www.pfsense.com/packages/config/widget-snort/widget-snort.inc</item>
-	</additional_files_needed>
-	<additional_files_needed>
-		<prefix>/usr/local/www/includes/</prefix>
-		<chmod>0644</chmod>
-		<item>http://www.pfsense.com/packages/config/widget-snort/snort_alerts.inc.php</item>
-	</additional_files_needed>
-	<additional_files_needed>
-		<prefix>/usr/local/www/widgets/helpers/</prefix>
-		<chmod>0644</chmod>
-		<item>http://www.pfsense.com/packages/config/widget-snort/snort_alerts_helper.php</item>
-	</additional_files_needed>
-	<additional_files_needed>
-		<prefix>/usr/local/www/widgets/include/</prefix>
-		<chmod>0644</chmod>
-		<item>http://www.pfsense.com/packages/config/widget-snort/snort_alerts.inc</item>
-	</additional_files_needed>
+	<include_file>/usr/local/www/widgets/include/widget-snort.inc</include_file>
 	<additional_files_needed>
 		<prefix>/usr/local/www/widgets/javascript/</prefix>
 		<chmod>0644</chmod>
-		<item>http://www.pfsense.com/packages/config/widget-snort/snort_alerts.js</item>
+		<item>https://packages.pfsense.org/packages/config/widget-snort/snort_alerts.js</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/www/widgets/widgets/</prefix>
 		<chmod>0644</chmod>
-		<item>http://www.pfsense.com/packages/config/widget-snort/snort_alerts.widget.php</item>
+		<item>https://packages.pfsense.org/packages/config/widget-snort/snort_alerts.widget.php</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/www/widgets/include/</prefix>
+		<chmod>0644</chmod>
+		<item>https://packages.pfsense.org/packages/config/widget-snort/widget-snort.inc</item>
 	</additional_files_needed>
 	<custom_php_deinstall_command>
 		widget_snort_uninstall();

@@ -77,7 +77,13 @@ define('HVDEF_MAXSCANSIZE',             '5000000'); # [bytes] ! do not enter 0 o
 define('HVDEF_MAXARCSCANSIZE',          '5000000'); # [bytes] ! do not enter 0 or big size !
 define('HVDEF_PID_FILE',                '/var/run/havp.pid');
 define('HVDEF_WORK_DIR',                '/usr/local/etc/havp');
-define('HVDEF_LOG_DIR',                 '/var/log/havp');
+
+$pfSversion = str_replace("\s", "", file_get_contents("/etc/version"));
+if(preg_match("/^2./",$pfSversion))
+	define('HVDEF_LOG_DIR',			'/var/log/havp');
+else
+	define('HVDEF_LOG_DIR',			'/var/log');
+
 define('HVDEF_TEMP_DIR',                '/var/tmp');
 define('HVDEF_HAVPTEMP_DIR',            HVDEF_TEMP_DIR.'/havp');
 define('HVDEF_RAMTEMP_DIR',             HVDEF_TEMP_DIR.'/havpRAM');
@@ -97,7 +103,12 @@ define('HVDEF_HAVP_MAXSRV',             '100');
 # Clam
 #define('HVDEF_CLAM_RUNDIR',             '/var/run/clamav');
 define('HVDEF_CLAM_RUNDIR',             '/var/run');
-define('HVDEF_AVLOG_DIR',               '/var/log/clamav');
+define('HVDEF_CLAM_DBDIR',              '/var/db/clamav');
+if(preg_match("/^2./",$pfSversion))
+	define('HVDEF_AVLOG_DIR',               '/var/log/clamav');
+else
+	define('HVDEF_AVLOG_DIR',               '/var/log');
+
 define('HVDEF_CLAM_SOCKET',             HVDEF_CLAM_RUNDIR.'/clamd.sock');
 define('HVDEF_CLAM_PID',                HVDEF_CLAM_RUNDIR.'/clamd.pid');
 define('HVDEF_CLAM_LOG',                HVDEF_AVLOG_DIR . '/clamd.log');
@@ -160,6 +171,7 @@ define('F_SCANIMG',             'scanimg');
 define('F_SCANARC',             'scanarc');
 define('F_SCANSTREAM',          'scanstream');
 define('F_SCANARCMAXSIZE',      'scanarcmaxsize');
+define('F_SCANBROKENEXE',       'scanbrokenexe');
 # antivirus options
 define('F_HAVPUPDATE',        'havpavupdate');
 define('F_DBREGION',          'dbregion');
@@ -344,8 +356,8 @@ function havp_resync()
     havp_reconfigure_freshclam();
     havp_reconfigure_cron();
 
-    # configure system filter
-    if (pfsense_version_() == '1') filter_configure();
+    # configure system filter for 2.xx
+    if (pfsense_version_() !== '1') filter_configure();
 
 }
 # ------------------------------------------------------------------------------
@@ -369,7 +381,12 @@ function havp_check_system()
     $grp = exec('pw group show ' . HVDEF_GROUP);
     if (strpos($grp, HVDEF_GROUP) !== 0) {
         exec('pw group add ' . HVDEF_GROUP);
-    	 log_error("Antivirus: Username '" . HVDEF_GROUP . "' was added.");
+    	 log_error("Antivirus: Group '" . HVDEF_GROUP . "' was added.");
+    }
+    $usr = exec('pw usershow -n ' . HVDEF_USER);
+    if (strpos($usr, HVDEF_USER) !== 0) {
+        exec('pw useradd ' . HVDEF_USER . ' -g ' . HVDEF_GROUP . ' -h - -s "/sbin/nologin" -d "/nonexistent" -c "havp daemon"');
+    	 log_error("Antivirus: User '" . HVDEF_USER . "' was added.");
     }
 
     # workdir permissions
@@ -379,6 +396,11 @@ function havp_check_system()
     if (!file_exists(HVDEF_HAVPTEMP_DIR))
     	mwexec("mkdir -p " . HVDEF_HAVPTEMP_DIR);
     havp_set_file_access(HVDEF_HAVPTEMP_DIR, HVDEF_USER, '');
+
+    # clamav dbdir
+    if (!file_exists(HVDEF_CLAM_DBDIR))
+	mwexec("mkdir -p " . HVDEF_CLAM_DBDIR);
+    havp_set_file_access(HVDEF_CLAM_DBDIR, HVDEF_AVUSER, '');
 
     # RAM tempdir
     if (!file_exists(HVDEF_RAMTEMP_DIR))
@@ -391,6 +413,10 @@ function havp_check_system()
     havp_set_file_access(HVDEF_TEMPLATES,    HVDEF_USER, '');
     havp_set_file_access(HVDEF_TEMPLATES_EX, HVDEF_USER, '');
 
+    # havp log dir
+    if (!file_exists(HVDEF_LOG_DIR))
+    	mwexec("mkdir -p " . HVDEF_LOG_DIR);
+    havp_set_file_access(HVDEF_LOG_DIR, HVDEF_USER, '');
     # log files exists ?
     if (!file_exists(HVDEF_HAVP_ACCESSLOG)) file_put_contents(HVDEF_HAVP_ACCESSLOG, '');
     if (!file_exists(HVDEF_HAVP_ERRORLOG))  file_put_contents(HVDEF_HAVP_ERRORLOG,  '');
@@ -405,10 +431,16 @@ function havp_check_system()
     if (!file_exists(HVDEF_FRESHCLAM_CONF)) file_put_contents(HVDEF_FRESHCLAM_CONF, '');
     havp_set_file_access(HVDEF_FRESHCLAM_CONF, HVDEF_AVUSER, '0664');
 
+    # clam log dir
+    if (!file_exists(HVDEF_AVLOG_DIR))
+    	mwexec("mkdir -p " . HVDEF_AVLOG_DIR);
+    havp_set_file_access(HVDEF_AVLOG_DIR, HVDEF_USER, '');
     # log files exists ?
     if (!file_exists(HVDEF_CLAM_LOG))      file_put_contents(HVDEF_CLAM_LOG, '');
     if (!file_exists(HVDEF_FRESHCLAM_LOG)) file_put_contents(HVDEF_FRESHCLAM_LOG, '');
     # log dir permissions
+    # if (!file_exists(HVDEF_AVLOG_DIR))
+    #    mwexec("mkdir -p " . HVDEF_AVLOG_DIR);
     havp_set_file_access(HVDEF_AVLOG_DIR, HVDEF_USER, '0777');
 
     # =-= ClamAV =-=
@@ -539,6 +571,7 @@ function havp_convert_pfxml_xml()
     $havp_config[F_SCANIMG]         = ( $pfconf[F_SCANIMG]    === 'on' ? 'true' : 'false' );
     $havp_config[F_SCANARC]         = ( $pfconf[F_SCANARC]    === 'on' ? 'true' : 'false' );
     $havp_config[F_SCANSTREAM]      = ( $pfconf[F_SCANSTREAM] === 'on' ? 'true' : 'false' );
+	$havp_config[F_SCANBROKENEXE]   = ( $pfconf[F_SCANBROKENEXE] === 'on' ? 'true' : 'false' );
     $havp_config[F_SCANARCMAXSIZE]  = ( is_numeric($pfconf[F_SCANARCMAXSIZE]) ? $pfconf[F_SCANARCMAXSIZE] : HVDEF_MAXARCSCANSIZE );
     # log
     $havp_config[F_SYSLOG]          = ( $pfconf[F_SYSLOG]      === 'on' ? 'true' : 'false' );
@@ -751,9 +784,13 @@ function havp_config_clam()
     $conf[] = "DetectPUA                 no";    # possible unwanted applications
     $conf[] = "AlgorithmicDetection      yes";
     $conf[] = "# executable";
+	if ($havp_config[F_SCANBROKENEXE] === 'true')
+	{$conf[] = "DetectBrokenExecutables   yes";}
+	else
+	{$conf[] = "DetectBrokenExecutables   no";}	
+	#
     $conf[] = "ScanPE                    yes";
     $conf[] = "ScanELF                   yes";
-    $conf[] = "DetectBrokenExecutables   yes";
     $conf[] = "# documents";
     $conf[] = "ScanOLE2                  yes";
     $conf[] = "ScanPDF                   yes";
@@ -830,7 +867,7 @@ function havp_config_freshclam()
     $conf[] = "PidFile /var/run/clamav/freshclam.pid";
 
     $conf[] = "\n# db";
-    $conf[] = "DatabaseOwner            clamav";
+    $conf[] = "DatabaseOwner            havp";
     $conf[] = "AllowSupplementaryGroups yes";
     $conf[] = "DNSDatabaseInfo          current.cvd.clamav.net";
 
@@ -857,7 +894,7 @@ function havp_config_freshclam()
 			case 'sa': $conf[] = "DatabaseMirror clamav.dial-up.net"; break;      # south africa
 			case 'tw': $conf[] = "DatabaseMirror clamav.cs.pu.edu.tw"; break;     # taiwan
 			case 'uk': $conf[] = "DatabaseMirror clamav.oucs.ox.ac.uk"; break;    # united kingdom
-			case 'us': $conf[] = "DatabaseMirror clamav.catt.com "; break;        # united states
+			case 'us': $conf[] = "DatabaseMirror db.us.clamav.net "; break;        # united states
 			default: break;
 		}
 	}
@@ -1140,6 +1177,11 @@ function havp_generate_rules($type = 'filter')
     global $config, $havp_config;
     $rules = array();
 
+    # no rules if havp disabled
+    if ($havp_config[F_ENABLE] !== 'true') {
+        return '';
+    }
+
     $proxymode = $havp_config[F_PROXYMODE];
     # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     # =-= HAVP always listen 127.0.0.1:port =-=
@@ -1288,14 +1330,17 @@ function havp_startup_script()
 {
     global $havp_config;
     $pid = HVDEF_PID_FILE;
-    $havpchk  = "ps auxw | grep \"[h]avp  -c\"|awk '{print $2}'";
+    $havpchk  = "ps auxw | grep \"[h]avp -c\"|awk '{print $2}'";
     $clamdchk = "ps auxw | grep \"[c]lamd -c\"|awk '{print $2}'";
 
     # rc script
     $rc = array();
     $rc['file'] = basename(HVDEF_HAVP_STARTUP_SCRIPT);
 
-    $s[] = "# start";
+    $s[] = "\t# init";
+    $s[] = "\techo 'Starting ..' > " . HVDEF_HAVP_STATUS_FILE;
+
+    $s[] = "\t# start";
     $s[] = "\tif [ -z \"`{$havpchk}`\" ];then";
     if (HV_USE_CLAMD === 'true') {
         $clampid_dir = HVDEF_CLAM_RUNDIR;
@@ -1319,8 +1364,15 @@ function havp_startup_script()
     }
     $s[] = "\t\t/usr/local/sbin/havp -c " . HVDEF_HAVP_CONFIG . " 2>/dev/null";
     $s[] = "\t\twait";
+    $s[] = "\tfi";
+
+    $s[] = "\t# Status";
+    $s[] = "\tif [ -z \"`{$havpchk}`\" ];then";
+    $s[] = "\t\techo 'Stopped' > " . HVDEF_HAVP_STATUS_FILE;
+    $s[] = "\telse";
     $s[] = "\t\techo 'Started' > " . HVDEF_HAVP_STATUS_FILE;
     $s[] = "\tfi";
+
     $s[] = "";
     $rc['start'] = implode("\n", $s);
     unset($s);
@@ -1543,7 +1595,7 @@ function havp_fscan_html()
 <hr>
 <span onClick="document.getElementById('scanfilepath').value = '/var/squid';" style="cursor: pointer;">
     <img src='./themes/{$g['theme']}/images/icons/icon_pass.gif' title='Click here'>
-        <font size='-1'><u>&nbsp;Squid cache path (scan you squid cache now).</u></font>
+        <font size='-1'><u>&nbsp;Squid cache path (scan your squid cache now).</u></font>
     </img>
 </span>
 <br>

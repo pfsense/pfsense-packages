@@ -1,0 +1,52 @@
+0. WHAT IS IT?
+
+This is a PHP frontend end to vnstat, a network traffic logger.
+Since vnstat is console mode only I created this script to
+make a 'nice' report of the data collected by vnstat.
+For more information about vnstat check out http://humdi.net/vnstat/
+For updates to this script check http://www.sqweek.com
+
+
+1. REQUIREMENTS 
+
+- vnstat setup and collecting data
+- webserver with PHP
+- php-gd extension installed for PNG graphs
+
+
+2. INSTALL
+
+Installation should be really straightforward:
+
+Put the files from this package somewhere inside the webroot of
+your webserver. Then edit the few configuration options in config.php
+to suit your situation and your good to go. The various options are
+explained in config.php.
+
+
+3. LICENSE
+
+vnstat PHP frontend 1.5.1
+Copyright (c)2006-2008  Bjorge Dijkstra (bjd@jooz.net)
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+
+NOTE:
+  The Truetype font file VeraBd.ttf is copyright by Bitstream Inc. 
+  See vera_copyright.txt for more information.
+
+
+

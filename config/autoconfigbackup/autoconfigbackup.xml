@@ -34,10 +34,10 @@
 		*/
         ]]>
 	</copyright>
-    <description>Automatically backs up your pfSense configuration.  All contents are encrypted on the server.  Requires pfSense Premium Support Portal Subscription from https://portal.pfsense.org</description>
-    <requirements>pfSense Premium Support Portal</requirements>
+    <description>Automatically backs up your pfSense configuration.  All contents are encrypted on the server.  Requires Gold or Support Subscription from https://portal.pfsense.org</description>
+    <requirements>pfSense Portal subscription</requirements>
 	<name>AutoConfigBackup</name>
-	<version>1.0</version>
+	<version>1.21</version>
 	<title>Diagnostics: Auto Configuration Backup</title>
 	<savetext>Change</savetext>
 	<include_file>/usr/local/pkg/autoconfigbackup.inc</include_file>
@@ -51,37 +51,37 @@
 	<additional_files_needed>
 	    <prefix>/usr/local/pkg/write_config/</prefix>
 	    <chmod>0755</chmod>
-		<item>http://www.pfsense.com/packages/config/autoconfigbackup/parse_config_upload.inc</item>
+		<item>https://packages.pfsense.org/packages/config/autoconfigbackup/parse_config_upload.inc</item>
 	</additional_files_needed>
 	<additional_files_needed>
 	    <prefix>/usr/local/www/</prefix>
 	    <chmod>0755</chmod>
-		<item>http://www.pfsense.com/packages/config/autoconfigbackup/autoconfigbackup.php</item>
+		<item>https://packages.pfsense.org/packages/config/autoconfigbackup/autoconfigbackup.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
 	    <prefix>/usr/local/pkg/</prefix>
 	    <chmod>0755</chmod>
-		<item>http://www.pfsense.com/packages/config/autoconfigbackup/autoconfigbackup.inc</item>
+		<item>https://packages.pfsense.org/packages/config/autoconfigbackup/autoconfigbackup.inc</item>
 	</additional_files_needed>
 	<additional_files_needed>
 	    <prefix>/etc/inc/</prefix>
 	    <chmod>0755</chmod>
-		<item>http://www.pfsense.com/packages/config/autoconfigbackup/crypt_acb.php</item>
+		<item>https://packages.pfsense.org/packages/config/autoconfigbackup/crypt_acb.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
 	    <prefix>/usr/local/www/</prefix>
 	    <chmod>0755</chmod>
-		<item>http://www.pfsense.com/packages/config/autoconfigbackup/autoconfigbackup_backup.php</item>
+		<item>https://packages.pfsense.org/packages/config/autoconfigbackup/autoconfigbackup_backup.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
 	    <prefix>/usr/local/pkg/write_config/</prefix>
 	    <chmod>0755</chmod>
-		<item>http://www.pfsense.com/packages/config/autoconfigbackup/parse_config_upload.php</item>
+		<item>https://packages.pfsense.org/packages/config/autoconfigbackup/parse_config_upload.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
 	    <prefix>/usr/local/www/</prefix>
 	    <chmod>0755</chmod>
-		<item>http://www.pfsense.com/packages/config/autoconfigbackup/autoconfigbackup_stats.php</item>
+		<item>https://packages.pfsense.org/packages/config/autoconfigbackup/autoconfigbackup_stats.php</item>
 	</additional_files_needed>
 	<tabs>
 		<tab>
@@ -122,7 +122,7 @@
 		</field>
 		<field>
 			<fielddescr>Encryption Password</fielddescr>
-			<description>This password will be used to encrypt config.xml before sending to portal.pfsense.org.  Do not share the password and keep it safe!</description>
+			<description>This password will be used to encrypt config.xml before uploading. We recommend not setting this to the same thing as your portal.pfsense.org account. Keep record of this password in a safe place - without it, your configurations will be impossible to restore.</description>
 			<fieldname>crypto_password</fieldname>
 			<type>password</type>
 		</field>

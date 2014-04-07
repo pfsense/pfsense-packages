@@ -83,7 +83,7 @@
   <additional_files_needed>
     <prefix>/usr/local/pkg/</prefix>
     <chmod>0755</chmod>
-    <item>http://www.pfsense.com/packages/config/dyntables/www/php/diag_dhcp_leases.php</item>
+    <item>https://packages.pfsense.org/packages/config/dyntables/www/php/diag_dhcp_leases.php</item>
   </additional_files_needed>
   <!--
     |
@@ -93,7 +93,7 @@
   <additional_files_needed>
     <prefix>/usr/local/pkg/</prefix>
     <chmod>0755</chmod>
-    <item>http://www.pfsense.com/packages/config/dyntables/www/js/dyntables.js</item>
+    <item>https://packages.pfsense.org/packages/config/dyntables/www/js/dyntables.js</item>
   </additional_files_needed>
   <!--
     |
@@ -103,12 +103,12 @@
   <additional_files_needed>
     <prefix>/usr/local/pkg/</prefix>
     <chmod>0755</chmod>
-    <item>http://www.pfsense.com/packages/config/dyntables/pkg/dyntables.inc</item>
+    <item>https://packages.pfsense.org/packages/config/dyntables/pkg/dyntables.inc</item>
   </additional_files_needed>
   <additional_files_needed>
     <prefix>/usr/local/pkg/</prefix>
     <chmod>0755</chmod>
-    <item>http://www.pfsense.com/packages/config/dyntables/pkg/dyntables_classdefs.inc</item>
+    <item>https://packages.pfsense.org/packages/config/dyntables/pkg/dyntables_classdefs.inc</item>
   </additional_files_needed>
   <!--
     |
@@ -118,7 +118,7 @@
   <additional_files_needed>
     <prefix>/usr/local/lib/php/extensions/no-debug-non-zts-20020429/</prefix>
     <chmod>0755</chmod>
-    <item>http://www.pfsense.com/packages/config/dyntables/bin/json.so</item>
+    <item>https://packages.pfsense.org/packages/config/dyntables/bin/json.so</item>
   </additional_files_needed>
   <!--
     fields gets invoked when the user adds or edits a item. The following items

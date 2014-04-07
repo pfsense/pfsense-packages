@@ -4,7 +4,7 @@
 	$Id$
 	avahi.inc
 	part of pfSense (http://www.pfSense.com)
-	Copyright (C) 2009 Scott Ullrich, Jim Pingle
+	Copyright (C) 2009-2012 Scott Ullrich, Jim Pingle
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
@@ -29,6 +29,16 @@
 	POSSIBILITY OF SUCH DAMAGE.
 */
 
+$pfs_version = substr(trim(file_get_contents("/etc/version")),0,3);
+switch ($pfs_version) {
+	case "1.2":
+	case "2.0":
+		define('AVAHI_BASE','/usr/local');
+		break;
+	default:
+		define('AVAHI_BASE', '/usr/pbi/avahi-' . php_uname("m"));
+}
+
 function avahi_start() {
 	 mwexec_bg("/usr/local/etc/rc.d/avahi-daemon.sh start");
 }
@@ -41,17 +51,17 @@ function avahi_install() {
 	global $g, $config;
 	conf_mount_rw();
 
+	// This old hacky install code should only happen on 1.x
 	if (php_uname("m") == "i386")
-		$archive = (substr(trim(file_get_contents("/etc/version")),0,1) == "2") ? "avahi8.tar.gz" : "avahi.tar.gz";
-
+		$archive = (substr(trim(file_get_contents("/etc/version")),0,1) == "1") ? "avahi.tar.gz" : "";
 	// Extract out libraries and avahi-daemon
 	if(!empty($archive) && file_exists("/root/{$archive}")) {
-		exec("mkdir -p /usr/local/etc/avahi/services/");
-		exec("mv /usr/local/etc/avahi/*.service /usr/local/etc/avahi/services/");
+		exec("mkdir -p " . AVAHI_BASE . "/etc/avahi/services/");
+		exec("mv " . AVAHI_BASE . "/etc/avahi/*.service " . AVAHI_BASE . "/etc/avahi/services/");
 		exec("/usr/bin/tar xzPUf /root/{$archive} -C /");
 		unlink("/root/{$archive}");
 		// Make sure everthing was extracted
-		if(!file_exists("/usr/local/sbin/avahi-daemon")) {
+		if(!file_exists(AVAHI_BASE . "/sbin/avahi-daemon")) {
 			log_error("Sorry, something went wrong while extract avahi binaries.  Please try the operation again");
 			return;
 		}
@@ -76,6 +86,8 @@ function avahi_write_config() {
 	$enable = $config['installedpackages']['avahi']['config'][0]['enable'];
 	$browsedomains = $config['installedpackages']['avahi']['config'][0]['browsedomains'];
 	$denyif = $config['installedpackages']['avahi']['config'][0]['denyinterfaces'];
+	$useipv4 = ($config['installedpackages']['avahi']['config'][0]['disable_ipv4']) ? "no" : "yes";
+	$useipv6 = ($config['installedpackages']['avahi']['config'][0]['disable_ipv6']) ? "no" : "yes";
 
 	// No supplied domains?  Use the defaults.
 	if(!$browsedomains)
@@ -86,7 +98,7 @@ function avahi_write_config() {
 
 	// Process interfaces defined by user to deny.
 	if($denyif) {
-		$if = split(",", $denyif);
+		$if = explode(",", $denyif);
 		foreach($if as $i) {
 			$ifreal = convert_friendly_interface_to_real_interface_name($i);
 			if($ifreal)
@@ -104,15 +116,15 @@ function avahi_write_config() {
 [server]
 host-name={$hostname}
 domain-name={$domain}
-browse-domains={$browsedomains}
+browse-domains="{$browsedomains}"
 deny-interfaces={$denyinterfaces}
-use-ipv4=yes
-use-ipv6=no
+use-ipv4={$useipv4}
+use-ipv6={$useipv6}
 enable-dbus=no
 #check-response-ttl=no
 #use-iff-running=no
 #disallow-other-stacks=no
-#allow-point-to-point=no
+allow-point-to-point=yes
 
 [wide-area]
 enable-wide-area=yes
@@ -146,8 +158,8 @@ rlimit-nproc=3
 EOF;
 
 	/* Write out .conf file */
-	safe_mkdir("/usr/local/etc/avahi");
-	$fd = fopen("/usr/local/etc/avahi/avahi-daemon.conf", "w");
+	safe_mkdir(AVAHI_BASE . "/etc/avahi");
+	$fd = fopen(AVAHI_BASE . "/etc/avahi/avahi-daemon.conf", "w");
 	fwrite($fd, $avahiconfig);
 	fclose($fd);
 	/* Write out rc.d startup file */
@@ -156,9 +168,22 @@ EOF;
 	$start .= "	mkdir -p /proc\n";
 	$start .= "	mount -t procfs procfs /proc\n";
 	$start .= "fi\n";
-	$start .= "/usr/local/sbin/avahi-daemon -D\n";
+	$start .= "/usr/bin/killall avahi-daemon\n";
+	if (file_exists(AVAHI_BASE . "/etc/rc.d/dbus")) {
+		$start .= "/usr/bin/killall dbus-daemon\n";
+		$start .= "rm /var/run/dbus/dbus.pid\n";
+		$start .= AVAHI_BASE . "/etc/rc.d/dbus onestart\n";
+	}
+	$start .= "sleep 5\n";
+	$start .= AVAHI_BASE . "/sbin/avahi-daemon -D\n";
 	$start .= "/etc/rc.conf_mount_ro\n";
-	$stop = "/usr/bin/killall avahi-daemon";
+
+	$stop = "/usr/bin/killall avahi-daemon\n";
+	if (file_exists(AVAHI_BASE . "/etc/rc.d/dbus")) {
+		$stop .= AVAHI_BASE . "/etc/rc.d/dbus onestop\n";
+		$stop .= "rm /var/run/dbus/dbus.pid\n";
+	}
+
 	write_rcfile(array(
 		"file" => "avahi-daemon.sh",
 		"start" => $start,

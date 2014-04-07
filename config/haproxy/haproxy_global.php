@@ -2,7 +2,7 @@
 /* $Id: load_balancer_pool.php,v 1.5.2.6 2007/03/02 23:48:32 smos Exp $ */
 /*
 	haproxy_global.php
-	part of pfSense (http://www.pfsense.com/)
+	part of pfSense (https://www.pfsense.org/)
 	Copyright (C) 2009 Scott Ullrich <sullrich@pfsense.com>
 	Copyright (C) 2008 Remco Hoef <remcoverhoef@pfsense.com>
 	All rights reserved.
@@ -56,6 +56,9 @@ if ($_POST) {
 			$reqdfieldsn = explode(",", "Maximum connections");		
 		}
 
+		if ($_POST['carpdev'] == "disabled")
+			unset($_POST['carpdev']);
+
 		do_input_validation($_POST, $reqdfields, $reqdfieldsn, &$input_errors);
 
 		if ($_POST['maxconn'] && (!is_numeric($_POST['maxconn']))) 
@@ -76,11 +79,21 @@ if ($_POST) {
 			$config['installedpackages']['haproxy']['synchost2'] = $_POST['synchost2'] ? $_POST['synchost2'] : false;
 			$config['installedpackages']['haproxy']['synchost2'] = $_POST['synchost3'] ? $_POST['synchost3'] : false;
 			$config['installedpackages']['haproxy']['remotesyslog'] = $_POST['remotesyslog'] ? $_POST['remotesyslog'] : false;
+			$config['installedpackages']['haproxy']['logfacility'] = $_POST['logfacility'] ? $_POST['logfacility'] : false;
+			$config['installedpackages']['haproxy']['loglevel'] = $_POST['loglevel'] ? $_POST['loglevel'] : false;
+			$config['installedpackages']['haproxy']['carpdev'] = $_POST['carpdev'] ? $_POST['carpdev'] : false;
+			$config['installedpackages']['haproxy']['syncusername'] = $_POST['syncusername'] ? $_POST['syncusername'] : false;
 			$config['installedpackages']['haproxy']['syncpassword'] = $_POST['syncpassword'] ? $_POST['syncpassword'] : false;
-			$config['installedpackages']['haproxy']['advanced'] = base64_encode($_POST['advanced']) ? $_POST['advanced'] : false;
+			$config['installedpackages']['haproxy']['advanced'] = $_POST['advanced'] ? base64_encode($_POST['advanced']) : false;
 			$config['installedpackages']['haproxy']['nbproc'] = $_POST['nbproc'] ? $_POST['nbproc'] : false;			
 			touch($d_haproxyconfdirty_path);
 			write_config();
+		}
+
+		if ($_POST['Submit'] == "Save and Check Config") {
+			$check_output = haproxy_check_config();
+			if (empty($check_output))
+				$check_output = "No output.";
 		}
 	}
 	
@@ -89,13 +102,23 @@ if ($_POST) {
 $pconfig['enable'] = isset($config['installedpackages']['haproxy']['enable']);
 $pconfig['maxconn'] = $config['installedpackages']['haproxy']['maxconn'];
 $pconfig['enablesync'] = isset($config['installedpackages']['haproxy']['enablesync']);
+$pconfig['syncusername'] = $config['installedpackages']['haproxy']['syncusername'];
 $pconfig['syncpassword'] = $config['installedpackages']['haproxy']['syncpassword'];
 $pconfig['synchost1'] = $config['installedpackages']['haproxy']['synchost1'];
 $pconfig['synchost2'] = $config['installedpackages']['haproxy']['synchost2'];
 $pconfig['synchost3'] = $config['installedpackages']['haproxy']['synchost3'];
 $pconfig['remotesyslog'] = $config['installedpackages']['haproxy']['remotesyslog'];
+$pconfig['logfacility'] = $config['installedpackages']['haproxy']['logfacility'];
+$pconfig['loglevel'] = $config['installedpackages']['haproxy']['loglevel'];
+$pconfig['carpdev'] = $config['installedpackages']['haproxy']['carpdev'];
 $pconfig['advanced'] = base64_decode($config['installedpackages']['haproxy']['advanced']);
 $pconfig['nbproc'] = $config['installedpackages']['haproxy']['nbproc'];
+
+// defaults
+if (!$pconfig['logfacility'])
+	$pconfig['logfacility'] = 'local0';
+if (!$pconfig['loglevel'])
+	$pconfig['loglevel'] = 'info';
 
 $pfSversion = str_replace("\n", "", file_get_contents("/etc/version"));
 if(strstr($pfSversion, "1.2"))
@@ -133,8 +156,8 @@ function enable_change(enable_change) {
 	/* active tabs */
 	$tab_array = array();
 	$tab_array[] = array("Settings", true, "haproxy_global.php");
-	$tab_array[] = array("Frontends", false, "haproxy_frontends.php");	
-	$tab_array[] = array("Servers", false, "haproxy_servers.php");	
+	$tab_array[] = array("Listener", false, "haproxy_listeners.php");	
+	$tab_array[] = array("Server Pool", false, "haproxy_pools.php");	
 	display_top_tabs($tab_array);
 	?>
 	</td></tr>
@@ -142,6 +165,14 @@ function enable_change(enable_change) {
 	<td>
 	<div id="mainarea">
 		<table class="tabcont" width="100%" border="0" cellpadding="6" cellspacing="0">
+		<?php if ($_POST['Submit'] == "Save and Check Config"): ?>
+			<tr><td colspan="2" valign="top" class="vncell">
+Configuration check output:
+<pre>
+<?= $check_output; ?>
+</pre>
+		</td></tr>
+		<?php endif; ?>
 			<tr>
 				<td colspan="2" valign="top" class="listtopic">General settings</td>
 			</tr>
@@ -221,6 +252,75 @@ function enable_change(enable_change) {
 				</td>
 			</tr>
 			<tr>
+				<td valign="top" class="vncell">
+					Syslog facility
+				</td>
+				<td class="vtable">
+					<select name="logfacility" class="formfld">
+				<?php
+					$facilities = array("kern", "user", "mail", "daemon", "auth", "syslog", "lpr",
+						"news", "uucp", "cron", "auth2", "ftp", "ntp", "audit", "alert", "cron2",
+					       	"local0", "local1", "local2", "local3", "local4", "local5", "local6", "local7");
+					foreach ($facilities as $f): 
+				?>
+					<option value="<?=$f;?>" <?php if ($f == $pconfig['logfacility']) echo "selected"; ?>>
+						<?=$f;?>
+					</option>
+				<?php
+					endforeach;
+				?>
+					</select>
+				</td>
+			</tr>
+			<tr>
+				<td valign="top" class="vncell">
+					Syslog level
+				</td>
+				<td class="vtable">
+					<select name="loglevel" class="formfld">
+				<?php
+					$levels = array("emerg", "alert", "crit", "err", "warning", "notice", "info", "debug");
+					foreach ($levels as $l): 
+				?>
+					<option value="<?=$l;?>" <?php if ($l == $pconfig['loglevel']) echo "selected"; ?>>
+						<?=$l;?>
+					</option>
+				<?php
+					endforeach;
+				?>
+					</select>
+				</td>
+			</tr>
+			<tr>
+				<td valign="top" class="vncell">
+					Carp monitor
+				</td>
+				<td class="vtable">
+					<select name="carpdev" class="formfld">
+					<option value="disabled" <?php if (!isset($pconfig['carpdev'])) echo "selected"; ?>>
+						disabled
+					</option>
+				<?php
+					if(is_array($config['virtualip']['vip'])) {
+					foreach($config['virtualip']['vip'] as $carp):
+						if ($carp['mode'] != "carp") continue;
+						$ipaddress = $carp['subnet'];
+						$carp_int = trim(find_carp_interface($ipaddress));
+				?>
+					<option value="<?=$carp_int;?>"
+					 <?php if (isset($pconfig['carpdev']) && $carp_int == $pconfig['carpdev']) echo "selected"; ?>>
+						<?=$carp_int;?> (<?=$ipaddress;?>)
+					</option>
+				<?php
+					endforeach;
+					}
+				?>
+					</select>
+					<br/>
+					Monitor carp interface and only run haproxy on the firewall which is MASTER.
+				</td>
+			</tr>
+			<tr>
 				<td>
 					&nbsp;
 				</td>
@@ -249,6 +349,14 @@ function enable_change(enable_change) {
 				<td width="78%" class="vtable">
 					<input name="enablesync" type="checkbox" value="yes" <?php if ($pconfig['enablesync']) echo "checked"; ?>>
 					<strong>Sync HAProxy configuration to backup CARP members via XMLRPC.</strong>
+				</td>
+			</tr>
+			<tr>
+				<td width="22%" valign="top" class="vncell">Synchronization username</td>
+				<td width="78%" class="vtable">
+					<input name="syncusername" type="text" value="<?= empty($pconfig['syncusername']) ? 'admin' : $pconfig['syncusername'];?>">
+					<br/>
+					<strong>Enter the username that will be used during configuration synchronization.  This is generally "admin" or an admin-level privileged account on the target system.</strong>
 				</td>
 			</tr>
 			<tr>
@@ -292,6 +400,7 @@ function enable_change(enable_change) {
 				<td width="22%" valign="top">&nbsp;</td>
 					<td width="78%">
 						<input name="Submit" type="submit" class="formbtn" value="Save" onClick="enable_change(true)">
+						<input name="Submit" type="submit" class="formbtn" value="Save and Check Config" onClick="enable_change(true)">
 					</td>
 				</td>
 			</tr>

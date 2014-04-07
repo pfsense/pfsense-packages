@@ -1,0 +1,316 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE packagegui SYSTEM "../schema/packages.dtd">
+<?xml-stylesheet type="text/xsl" href="../xsl/package.xsl"?>
+<packagegui>
+        <copyright>
+        <![CDATA[
+/* $Id$ */
+/* ========================================================================== */
+/*
+    bind.xml
+    part of pfSense (http://www.pfSense.com)
+    part of the Bind package for pfSense
+    Copyright (C) 2013 Juliano Oliveira/Adriano Brancher
+    All rights reserved.
+
+    Based on m0n0wall (http://m0n0.ch/wall)
+    Copyright (C) 2003-2006 Manuel Kasper <mk@neon1.net>.
+    All rights reserved.
+                                                                              */
+/* ========================================================================== */
+/*
+    Redistribution and use in source and binary forms, with or without
+    modification, are permitted provided that the following conditions are met:
+
+     1. Redistributions of source code must retain the above copyright notice,
+        this list of conditions and the following disclaimer.
+
+     2. Redistributions in binary form must reproduce the above copyright
+        notice, this list of conditions and the following disclaimer in the
+        documentation and/or other materials provided with the distribution.
+
+    THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
+    INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+    AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+    AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+    OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+    INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+    POSSIBILITY OF SUCH DAMAGE.
+                                                                              */
+/* ========================================================================== */
+        ]]>
+
+        </copyright>
+    <description>Describe your package here</description>
+    <requirements>Describe your package requirements here</requirements>
+    <faq>Currently there are no FAQ items provided.</faq>
+        <name>bind</name>
+        <version>1.0</version>
+        <title>Bind: Domain Named Settings</title>
+        <include_file>/usr/local/pkg/bind.inc</include_file>
+        <menu>
+                <name>Bind Server</name>
+                <tooltiptext>Modify Bind settings</tooltiptext>
+                <section>Services</section>
+                <url>/pkg_edit.php?xml=bind.xml</url>
+        </menu>
+        <service>
+                <name>named</name>
+                <rcfile>named.sh</rcfile>
+                <executable>named</executable>
+                <description>Domain Name Service</description>
+        </service>
+        <tabs>
+                <tab>
+                        <text>Settings</text>
+                        <url>/pkg_edit.php?xml=bind.xml</url>
+                        <active/>
+                </tab>
+                <tab>
+                        <text>ACLs</text>
+                        <url>/pkg.php?xml=bind_acls.xml</url>
+                </tab>
+                <tab>
+                        <text>Views</text>
+                        <url>/pkg.php?xml=bind_views.xml</url>
+                </tab>
+                <tab>
+                        <text>Zones</text>
+                         <url>/pkg.php?xml=bind_zones.xml</url>
+                </tab>
+                <tab>
+                        <text>Sync</text>
+                         <url>/pkg_edit.php?xml=bind_sync.xml</url>
+                </tab>
+
+        </tabs>
+        <!-- Installation -->
+        <additional_files_needed>
+            <prefix>/usr/local/pkg/</prefix>
+            <chmod>0755</chmod>
+                <item>https://packages.pfsense.org/packages/config/bind/bind.xml</item>
+        </additional_files_needed>
+        <additional_files_needed>
+            <prefix>/usr/local/pkg/</prefix>
+            <chmod>0755</chmod>
+                <item>https://packages.pfsense.org/packages/config/bind/bind_views.xml</item>
+        </additional_files_needed>
+        <additional_files_needed>
+            <prefix>/usr/local/pkg/</prefix>
+            <chmod>0755</chmod>
+                <item>https://packages.pfsense.org/packages/config/bind/bind_zones.xml</item>
+        </additional_files_needed>
+        <additional_files_needed>
+            <prefix>/usr/local/pkg/</prefix>
+            <chmod>0755</chmod>
+                <item>https://packages.pfsense.org/packages/config/bind/bind_acls.xml</item>
+        </additional_files_needed>
+        <additional_files_needed>
+            <prefix>/usr/local/pkg/</prefix>
+            <chmod>0755</chmod>
+                <item>https://packages.pfsense.org/packages/config/bind/bind.inc</item>
+        </additional_files_needed>
+        <additional_files_needed>
+            <prefix>/usr/local/pkg/</prefix>
+            <chmod>0755</chmod>
+                <item>https://packages.pfsense.org/packages/config/bind/bind_sync.xml</item>
+        </additional_files_needed>
+        <additional_files_needed>
+            <prefix>/usr/local/www/shortcuts/</prefix>
+            <chmod>0755</chmod>
+                <item>https://packages.pfsense.org/packages/config/bind/pkg_bind.inc</item>
+        </additional_files_needed>
+        <additional_files_needed>
+            <prefix>/usr/local/www/widgets/widgets/</prefix>
+            <chmod>0755</chmod>
+                <item>https://packages.pfsense.org/packages/config/bind/bind.widget.php</item>
+        </additional_files_needed>
+        <fields>
+                <field>
+                        <type>listtopic</type>
+                        <name>Daemon Settings</name>
+                        <fieldname>temp01</fieldname>
+                </field>
+                <field>
+                        <fielddescr>Enable Bind</fielddescr>
+                        <fieldname>enable_bind</fieldname>
+                        <description><![CDATA[Enable DNS Bind on Server<br>
+                        	Disable Dns forwarder service on selected interfaces before enabling bind.]]></description>
+                        <type>checkbox</type>
+                        <required/>
+                </field>
+              <field>
+                        <fielddescr>Listen-on</fielddescr>
+                        <fieldname>listenon</fieldname>
+                        <description><![CDATA[Enable Named to listen on.]]></description>
+                        <type>interfaces_selection</type>
+                        <showlistenall/>
+                        <showvirtualips/>
+                        <multiple/>
+                </field>
+                <field>
+                        <fielddescr>Enable Notify</fielddescr>
+                        <fieldname>bind_notify</fieldname>
+                        <description>Notify slave server after any update on master.</description>
+                        <type>checkbox</type>
+                </field>
+                <field>
+                        <fielddescr>Hide Version</fielddescr>
+                        <fieldname>bind_hide_version</fieldname>
+                        <description>Hide the version of BIND (do not process queries to version.bind at all). This makes it more difficult to exploit the server.</description>
+                        <type>checkbox</type>
+                </field>
+                <field>
+					<fielddescr>Limit Memory use</fielddescr>
+					<fieldname>bind_ram_limit</fieldname>
+					<description>Limits RAM use for DNS server, recommend 256M</description>
+					<type>input</type>
+                	<size>10</size>
+					<default_value>256M</default_value>
+               	</field>
+                <field>
+                        <type>listtopic</type>
+                        <name>Logging options</name>
+                        <fieldname>temp01</fieldname>
+                </field>
+                <field>
+                        <fielddescr>Enable logging</fielddescr>
+                        <fieldname>bind_logging</fieldname>
+                        <description><![CDATA[Enable Bind logs on status-> system logs -> resolver menu.]]></description>
+                        <type>checkbox</type>
+                </field>
+				<field>
+					<fielddescr>Loggin serverity</fielddescr>
+					<fieldname>log_severity</fieldname>
+					<description><![CDATA[Select logging levels for selected categories.<BR>
+								use CTRL+click to select/unselect.<br>
+								The value 'dynamic' means assume the global level defined by either the command line parameter -d or by running rndc trace.]]></description>
+					<type>select</type>
+						<options>
+							<option><name>Critital</name><value>critical</value></option>
+							<option><name>Error</name><value>error</value></option>
+							<option><name>Warning</name><value>warning</value></option>
+							<option><name>Notice</name><value>Notice</value></option>
+							<option><name>info</name><value>info</value></option>
+							<option><name>Debug level 1</name><value>debug 1</value></option>
+							<option><name>Debug level 3</name><value>debug 3</value></option>
+							<option><name>Debug level 5</name><value>debug 5</value></option>
+							<option><name>Dynamic</name><value>dynamic</value></option>
+						</options>
+				</field>
+				<field>
+					<fielddescr>Loggin options</fielddescr>
+					<fieldname>log_options</fieldname>
+					<description><![CDATA[Select categories to log.<BR>
+								use CTRL+click to select/unselect.]]></description>
+					<type>select</type>
+						<options>
+							<option><name>Default-if this is the only category selected, it will log all categories except queries</name><value>default</value></option>
+							<option><name>General-Anything that is not classified as any other item in this list defaults to this category</name><value>general</value></option>
+							<option><name>Database-The value 'dynamic' means assume the global level defined by either the command line parameter -d or by running rndc trace</name><value>database</value></option>
+							<option><name>Security-Approval and denial of requests</name><value>security</value></option>
+							<option><name>Config-Configuration file parsing and processing</name><value>config</value></option>
+							<option><name>Resolver-Name resolution including recursive lookups</name><value>resolver</value></option>
+							<option><name>Xfer-in-Details of zone transfers the server is receiving.</name><value>xfer-in</value></option>
+							<option><name>Xfer-out-Details of zone transfers the server is sending.</name><value>xfer-out</value></option>
+							<option><name>Notify-Logs all NOTIFY operations.</name><value>notify</value></option>
+							<option><name>Client-Processing of client requests</name><value>client</value></option>
+							<option><name>Unmatched-No matching view clause or unrecognized class value.</name><value>unmatched</value></option>
+							<option><name>Queries-Logs all query transactions</name><value>queries</value></option>
+							<option><name>Network-Logs all network operations</name><value>network</value></option>
+							<option><name>Update-Logging of all dynamic update (DDNS) transactions</name><value>update</value></option>
+							<option><name>Dispatch-Dispatching of incoming packets to the server modules</name><value>dispatch</value></option>
+							<option><name>DNSSEC-DNSSEC and TSIG protocol processing</name><value>dnssec</value></option>
+							<option><name>lame-servers-Mis-configuration in the delegation of domains discovered by BIND</name><value>lame-servers</value></option>
+						</options>
+						<multiple/>
+						<size>18</size>
+				</field>
+                <field>
+                        <type>listtopic</type>
+                        <name>Response Rate Limit</name>
+                        <fieldname>temp01</fieldname>
+                </field>
+                <field>
+                        <fielddescr>Rate limit</fielddescr>
+                        <fieldname>rate_enabled</fieldname>
+                        <description><![CDATA[<a target=_new href='https://kb.isc.org/article/AA-01000/189/A-Quick-Introduction-to-Response-Rate-Limiting.html?utm_source=isc&utm_medium=website&utm_term=rrl-kb&utm_content=kbarticle&utm_campaign=bind994_release_091913'>
+                        Limit/rate response queries</a> to prevent DOS attack.]]></description>
+                        <type>checkbox</type>
+                        <enablefields>rate_limit,log_only</enablefields>
+                </field>
+				<field>
+					<fielddescr>Limit Action</fielddescr>
+					<fieldname>log_only</fieldname>
+					<description>Select what to do when a query reaches a limit.</description>
+					<type>select</type>
+						<options>
+							<option><name>Deny query</name><value>no</value></option>
+							<option><name>Log only</name><value>yes</value></option>
+						</options>
+				</field>
+				<field>
+					<fielddescr>limit</fielddescr>
+					<fieldname>rate_limit</fieldname>
+					<description>Set rate limit. Default to 15.</description>
+					<type>input</type>
+                	<size>10</size>
+                </field>
+
+                <field>
+                        <type>listtopic</type>
+                        <name>Forwarder Config</name>
+                        <fieldname>temp01</fieldname>
+                </field>
+                <field>
+                        <fielddescr>Forwarder</fielddescr>
+                        <fieldname>bind_forwarder</fieldname>
+                        <description>Forwardes enable DNS Bind on Server.</description>
+                        <type>checkbox</type>
+                        <enablefields>bind_forwarder_ips</enablefields>
+                </field>
+                <field>
+                        <fielddescr>Forwarder IPs</fielddescr>
+                        <fieldname>bind_forwarder_ips</fieldname>
+                        <description>Enter IPs to forward. Separate by semi-colons (;). [Applies only to Forwarder mode]</description>
+                        <type>input</type>
+                	<size>80</size>
+                </field>
+                <field>
+                        <type>listtopic</type>
+                        <name>custom Options</name>
+                        <fieldname>temp01</fieldname>
+                </field>
+    		<field>
+                        <fielddescr>Custom Options</fielddescr>
+                        <fieldname>bind_custom_options</fieldname>
+                        <description><![CDATA[You can put your own custom options here, one per line.<br>
+                        			They'll be added to the configuration. They need to be named.conf native options.]]>
+                       	</description>
+                        <type>textarea</type>
+                        <cols>65</cols>
+                        <rows>5</rows>
+                        <encoding>base64</encoding>
+                </field>
+        </fields>
+    	<custom_php_after_head_command>
+    	</custom_php_after_head_command>
+        <custom_php_command_before_form>
+        </custom_php_command_before_form>
+        <custom_add_php_command>
+        </custom_add_php_command>
+    	<custom_php_validation_command>
+    	</custom_php_validation_command>
+        <custom_php_resync_config_command>
+        	bind_sync();
+        </custom_php_resync_config_command>
+        <custom_php_install_command>
+       		bind_write_rcfile();
+	</custom_php_install_command>
+        <custom_php_deinstall_command>
+        </custom_php_deinstall_command>
+        <filter_rules_needed></filter_rules_needed>
+</packagegui>

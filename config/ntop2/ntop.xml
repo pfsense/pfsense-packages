@@ -60,6 +60,7 @@
 		<name>ntop</name>
 		<rcfile>ntop.sh</rcfile>
 		<executable>ntop</executable>
+		<description>NTOP bandwidth monitoring/graphing</description>
 	</service>
 	<tabs>
 		<tab>
@@ -97,11 +98,6 @@
 			<fieldname>allowmerge</fieldname>
 			<type>checkbox</type>
 		</field>
-		<field>
-			<fielddescr>Track all traffic&lt;br&gt;(Def: IPv4 only)</fielddescr>
-			<fieldname>alltraffic</fieldname>
-			<type>checkbox</type>
-		</field>
 	</fields>
 	<custom_php_global_functions>
 	<![CDATA[
@@ -125,7 +121,6 @@
 		system("/bin/cp -Rp /usr/local/lib/X11/fonts/webfonts/ /usr/local/lib/X11/fonts/TTF/");
 		$first = 0;
 		$mergeifs = ($ntop_config['allowmerge'] == "on") ? "" : "-M";
-		$alltraffic = ($ntop_config['alltraffic'] == "on") ? "" : "--ipv4";
 		foreach($ntop_config['interface_array'] as $iface) {
 		$if = convert_friendly_interface_to_real_interface_name($iface);
 		if($if) {
@@ -135,7 +130,7 @@
 			$first = 1;
 		}
 		}
-		$start = "/usr/local/bin/ntop -i {$ifaces_final} -u root -d {$alltraffic} {$mergeifs} -x 8102 -X 8192 &";
+		$start = "/usr/local/bin/ntop -i {$ifaces_final} -u root -d -4 {$mergeifs} -x 8102 -X 8192 &";
 		write_rcfile(array(
 					"file" => "ntop.sh",
 					"start" => $start,

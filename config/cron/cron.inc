@@ -81,8 +81,8 @@ function cron_install_command()
 
 	write_rcfile(array(
 		"file" => "cron.sh",
-		"start" => "/usr/sbin/cron -s &",
-		"stop" => "kill -9 `cat /var/run/cron.pid`"
+		"start" => "[ `/bin/pgrep -f 'cron -s' | wc -l` -eq 0 ] && /usr/sbin/cron -s &",
+		"stop" => "[ -f \"/var/run/cron.pid\" ] && kill -9 `cat /var/run/cron.pid`; rm -f /var/run/cron.pid; /bin/pkill -f 'cron -s'"
 		)
 	);
 

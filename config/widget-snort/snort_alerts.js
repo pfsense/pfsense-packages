@@ -1,63 +1,10 @@
 
-snortlastsawtime = '<?php echo time(); ?>';
 var snortlines = Array();
 var snorttimer;
-var snortupdateDelay = 25500;
+var snortupdateDelay = 22000;
 var snortisBusy = false;
 var snortisPaused = false;
 
-<?php
-	if(isset($config['syslog']['reverse']))
-		echo "var isReverse = true;\n";
-	else
-		echo "var isReverse = false;\n";
-?>
-
-if (typeof getURL == 'undefined') {
-	getURL = function(url, callback) {
-		if (!url)
-			throw 'No URL for getURL';
-		try {
-			if (typeof callback.operationComplete == 'function')
-				callback = callback.operationComplete;
-		} catch (e) {}
-			if (typeof callback != 'function')
-				throw 'No callback function for getURL';
-		var http_request = null;
-		if (typeof XMLHttpRequest != 'undefined') {
-		    http_request = new XMLHttpRequest();
-		}
-		else if (typeof ActiveXObject != 'undefined') {
-			try {
-				http_request = new ActiveXObject('Msxml2.XMLHTTP');
-			} catch (e) {
-				try {
-					http_request = new ActiveXObject('Microsoft.XMLHTTP');
-				} catch (e) {}
-			}
-		}
-		if (!http_request)
-			throw 'Both getURL and XMLHttpRequest are undefined';
-		http_request.onreadystatechange = function() {
-			if (http_request.readyState == 4) {
-				callback( { success : true,
-				  content : http_request.responseText,
-				  contentType : http_request.getResponseHeader("Content-Type") } );
-			}
-		}
-		http_request.open('GET', url, true);
-		http_request.send(null);
-	}
-}
-
-function snort_alerts_fetch_new_rules() {
-	if(snortisPaused)
-		return;
-	if(snortisBusy)
-		return;
-	snortisBusy = true;
-	getURL('widgets/helpers/snort_alerts_helper.php?lastsawtime=' + snortlastsawtime, snort_alerts_fetch_new_rules_callback);
-}
 function snort_alerts_fetch_new_rules_callback(callback_data) {
 	if(snortisPaused)
 		return;
@@ -75,8 +22,6 @@ function snort_alerts_fetch_new_rules_callback(callback_data) {
 		line = '<td width="30%"  class="listr" >' + row_split[6]  + '<br>' + row_split[7]+ '</td>';		
 		line += '<td width="40%"  class="listr" >' + row_split[3] + '<br>' + row_split[4] + '</td>';
 		line += '<td width="40%" class="listr" >' + 'Pri : ' +  row_split[1] + '<br>' + 'Cat : ' + row_split[2] + '</td>';
-		snortlastsawtime = row_split[5];
-		//alert(row_split[0]);
 		new_data_to_add[new_data_to_add.length] = line;
 	}
 	snort_alerts_update_div_rows(new_data_to_add);
@@ -131,7 +76,7 @@ function snort_alerts_update_div_rows(data) {
 		}
 	}
 	/* rechedule AJAX interval */
-	//snorttimer = setInterval('snort_alerts_fetch_new_rules()', snortupdateDelay);
+	snorttimer = setInterval('snort_alerts_fetch_new_rules()', snortupdateDelay);
 }
 function snort_alerts_toggle_pause() {
 	if(snortisPaused) {

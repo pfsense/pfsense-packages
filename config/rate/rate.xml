@@ -52,17 +52,17 @@
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>077</chmod>
-		<item>http://www.pfsense.com/packages/config/rate/rate.inc</item>
+		<item>https://packages.pfsense.org/packages/config/rate/rate.inc</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>077</chmod>
-		<item>http://www.pfsense.com/packages/config/rate/bandwidth_by_ip.php</item>
+		<item>https://packages.pfsense.org/packages/config/rate/bandwidth_by_ip.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>077</chmod>
-		<item>http://www.pfsense.com/packages/config/rate/status_graph.php</item>
+		<item>https://packages.pfsense.org/packages/config/rate/status_graph.php</item>
 	</additional_files_needed>
 	<custom_php_install_command>
 		rate_install();

@@ -50,17 +50,17 @@
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0644</chmod>
-		<item>http://www.pfsense.com/packages/config/apache_mod_security/apache_mod_security.inc</item>
+		<item>https://packages.pfsense.org/packages/config/apache_mod_security/apache_mod_security.inc</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0644</chmod>
-		<item>http://www.pfsense.com/packages/config/apache_mod_security/apache_mod_security_settings.xml</item>
+		<item>https://packages.pfsense.org/packages/config/apache_mod_security/apache_mod_security_settings.xml</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/www/</prefix>
 		<chmod>0644</chmod>
-		<item>http://www.pfsense.com/packages/config/apache_mod_security/apache_mod_security_view_logs.php</item>
+		<item>https://packages.pfsense.org/packages/config/apache_mod_security/apache_mod_security_view_logs.php</item>
 	</additional_files_needed>
 	<tabs>
 		<tab>
@@ -219,8 +219,9 @@
 	</fields>
 	<service>
 		<name>apache_mod_security</name>
-		<rcfile>/usr/local/etc/rc.d/apache_mod_security.sh</rcfile>
+		<rcfile>apache_mod_security.sh</rcfile>
 		<executable>httpd</executable>
+		<description>HTTP Daemon with mod_security</description>
 	</service>
 	<custom_php_resync_config_command>
 		apache_mod_security_resync();

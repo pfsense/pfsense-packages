@@ -1,0 +1,445 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE packagegui SYSTEM "./schema/packages.dtd">
+<?xml-stylesheet type="text/xsl" href="./xsl/package.xsl"?>
+<packagegui>
+        <copyright>
+        <![CDATA[
+/* $Id$ */
+/* ========================================================================== */
+/*
+    bind_zone.xml
+    part of pfSense (http://www.pfSense.com)
+    part of the Bind package for pfSense
+    Copyright (C) 2013 Juliano Oliveira/Adriano Brancher
+    All rights reserved.
+
+    Based on m0n0wall (http://m0n0.ch/wall)
+    Copyright (C) 2003-2006 Manuel Kasper <mk@neon1.net>.
+    All rights reserved.
+                                                                              */
+/* ========================================================================== */
+/*
+    Redistribution and use in source and binary forms, with or without
+    modification, are permitted provided that the following conditions are met:
+
+     1. Redistributions of source code must retain the above copyright notice,
+        this list of conditions and the following disclaimer.
+
+     2. Redistributions in binary form must reproduce the above copyright
+        notice, this list of conditions and the following disclaimer in the
+        documentation and/or other materials provided with the distribution.
+
+    THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
+    INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+    AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+    AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+    OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+    INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+    POSSIBILITY OF SUCH DAMAGE.
+                                                                              */
+/* ========================================================================== */
+        ]]>
+        </copyright>
+    <description>Describe your package here</description>
+    <requirements>Describe your package requirements here</requirements>
+    <faq>Currently there are no FAQ items provided.</faq>
+	<name>bindzone</name>
+	<version>none</version>
+	<title>Bind: Zones Settings</title>
+	<include_file>/usr/local/pkg/bind.inc</include_file>
+	<menu>
+		<name>Bind Server</name>
+		<tooltiptext></tooltiptext>
+		<section>Services</section>
+		<configfile>bind.xml</configfile>
+	</menu>
+        <tabs>
+                <tab>
+                        <text>Settings</text>
+                        <url>/pkg_edit.php?xml=bind.xml</url>
+                </tab>
+                <tab>
+                        <text>ACLs</text>
+                        <url>/pkg.php?xml=bind_acls.xml</url>
+                </tab>
+                <tab>
+                        <text>Views</text>
+                        <url>/pkg.php?xml=bind_views.xml</url>
+                </tab>
+                <tab>
+                        <text>Zones</text>
+                        <url>/pkg.php?xml=bind_zones.xml&amp;id=0</url>
+                        <active/>
+                </tab>
+                <tab>
+                        <text>Sync</text>
+                         <url>/pkg_edit.php?xml=bind_sync.xml</url>
+                </tab>
+        </tabs>
+	<configpath>['installedpackages']['bindzone']['config']</configpath>
+	<adddeleteeditpagefields>
+		<columnitem>
+			<fielddescr>status</fielddescr>
+			<fieldname>disabled</fieldname>
+			<listmodeon>Disabled</listmodeon>
+			<listmodeoff>Enabled</listmodeoff>
+		</columnitem>
+		<columnitem>
+			<fielddescr>Zone Name</fielddescr>
+			<fieldname>name</fieldname>
+		</columnitem>
+		<columnitem>
+			<fielddescr>Zone Type</fielddescr>
+			<fieldname>type</fieldname>
+		</columnitem>
+		<columnitem>
+			<fielddescr>View Name</fielddescr>
+			<fieldname>view</fieldname>
+		</columnitem>
+		<columnitem>
+			<fielddescr>Serial</fielddescr>
+			<fieldname>serial</fieldname>
+		</columnitem>
+		<columnitem>
+			<fielddescr>Description</fielddescr>
+			<fieldname>description</fieldname>
+		</columnitem>
+		<movable>on</movable>
+	</adddeleteeditpagefields>
+	<fields>
+		<field>
+		        <type>listtopic</type>
+                        <name>Domain Zone Configuration</name>
+                        <fieldname>temp01</fieldname>
+		</field>
+		<field>
+			<fielddescr>Disable this zone</fielddescr>
+			<fieldname>disabled</fieldname>
+			<description><![CDATA[Do not Include this zone on bind config files.]]></description>
+			<type>checkbox</type>
+		</field>
+		<field>
+			<fielddescr>Zone Name</fielddescr>
+			<fieldname>name</fieldname>
+			<description><![CDATA[Enter the name for zone (ex:mydomain.com)<br>
+						For reverse zones, include zone ip in reverse order or following your provider instructions.(Ex: 1.168.192)<br>
+						IN-ADDR.ARPA will be automaticaly included on conf files when reverse zone option is checked.]]></description>
+			<type>input</type>
+			<required/>
+		</field>
+		<field>
+			<fielddescr>Description</fielddescr>
+			<fieldname>description</fieldname>
+			<description>Enter the description for this zone.</description>
+			<type>input</type>
+			<size>70</size>
+		</field>
+		<field>
+			<fielddescr>Zone Type</fielddescr>
+			<fieldname>type</fieldname>
+			<description><![CDATA[Select zone type.]]></description>
+		        <type>select</type>
+					<options>
+						<option><name>Master</name><value>master</value><enablefields>description</enablefields></option>
+						<option><name>Slave</name><value>slave</value><enablefields>ttl</enablefields></option>
+						<option><name>Forward</name><value>forward</value><enablefields>forward</enablefields></option>
+						<option><name>Redirect</name><value>redirect</value><enablefields>redirect</enablefields></option>
+					</options>
+                       <onchange>on_type_zone_changed()</onchange>
+			<required/>
+		</field>
+		<field>
+			<fielddescr>View</fielddescr>
+			<fieldname>view</fieldname>
+			<description><![CDATA[Select the View that this area will belong.]]></description>
+	    	<type>select_source</type>
+			<source><![CDATA[$config['installedpackages']['bindviews']['config']]]></source>
+			<source_name>name</source_name>
+			<source_value>name</source_value>
+		</field>
+		<field>
+			<fielddescr>Reverse Zone</fielddescr>
+			<fieldname>reverso</fieldname>
+			<description>Enable if this is a reverse zone.</description>
+			<type>checkbox</type>
+		</field>
+		<field>
+			<fielddescr>custom Option</fielddescr>
+			<fieldname>custom</fieldname>
+			<description>You can put your own custom options here.</description>
+			<type>textarea</type>
+			<cols>75</cols>
+			<rows>5</rows>
+			<encoding>base64</encoding>
+		</field>
+		<field>
+			<type>listtopic</type>
+			<name>DNSSEC</name>
+			<fieldname>temp04</fieldname>
+		</field>
+		<field>
+			<fielddescr>Inline Signing</fielddescr>
+			<fieldname>dnssec</fieldname>
+			<enablefields>backupkeys</enablefields>
+			<description><![CDATA[<a target=_new href='https://kb.isc.org/article/AA-00626/109/Inline-Signing-in-ISC-BIND-9.9.0-Examples.html'>Enable inline DNSSEC Signing</a> afor this zones.]]></description>
+			<type>checkbox</type>
+		</field>
+		<field>
+			<fielddescr>backup keys</fielddescr>
+			<fieldname>backupkeys</fieldname>
+			<description><![CDATA[Enable this option to include all DNSSEC key files on XML.]]></description>
+			<type>checkbox</type>
+		</field>
+		<field>
+			<fielddescr>DS set</fielddescr>
+			<fieldname>dsset</fieldname>
+			<description><![CDATA[Digest fingerprint of the Key Signing KeyResulting for this zone.<br>
+						Upload this ds set to your domain root server.]]></description>
+			<type>textarea</type>
+			<cols>75</cols>
+			<rows>3</rows>
+			<encoding>base64</encoding>
+		</field>
+		<field>
+		        <type>listtopic</type>
+                        <name>Slave Zone Configuration </name>
+                        <fieldname>temp04</fieldname>
+		</field>
+		<field>
+			<fielddescr>Master Zone IP</fielddescr>
+			<fieldname>slaveip</fieldname>
+			<description>If zone is slave, enter the IP address of the master DNS zone.</description>
+			<type>input</type>
+		</field>
+		<field>
+		        <type>listtopic</type>
+                        <name>Forward Zone Configuration </name>
+                        <fieldname>temp04</fieldname>
+		</field>
+		<field>
+			<fielddescr>Forwarders</fielddescr>
+			<fieldname>forwarders</fieldname>
+			<description>Enter forwarders IPs for this domain. Separate by semi-colons (;).</description>
+			<type>input</type>
+			<size>70</size>
+		</field>
+
+		<field>
+		        <type>listtopic</type>
+                        <name>Master Zone Configuration </name>
+                        <fieldname>temp03</fieldname>
+		</field>
+		<field>
+			<fielddescr>TLL</fielddescr>
+			<fieldname>tll</fieldname>
+			<description>Default expiration time of all resource records without their own TTL value</description>
+			<type>input</type>
+		</field>
+		<field>
+			<fielddescr>Name Server</fielddescr>
+			<fieldname>nameserver</fieldname>
+			<description>Enter nameserver for this zone</description>
+			<type>input</type>
+		</field>
+		<field>
+			<fielddescr>Base Domain ip</fielddescr>
+			<fieldname>ipns</fieldname>
+			<description>Enter ip address for base domain lookup. Ex: nslookup mydomain.com</description>
+			<type>input</type>
+		</field>
+		<field>
+			<fielddescr>Mail Admin Zone</fielddescr>
+			<fieldname>mail</fieldname>
+			<description>Enter mail admin zone.</description>
+			<type>input</type>
+		</field>
+		<field>
+			<fielddescr>Serial</fielddescr>
+			<fieldname>serial</fieldname>
+			<description>Parsed value for the slave to update the DNS Zone</description>
+			<type>input</type>
+		</field>
+		<field>
+			<fielddescr>Refresh</fielddescr>
+			<fieldname>refresh</fieldname>
+			<description>Slave refresh (1 day)</description>
+			<type>input</type>
+	                	<default_value>1d</default_value>
+		</field>
+		<field>
+			<fielddescr>Retry</fielddescr>
+			<fieldname>retry</fieldname>
+			<description>Slave retry time in case of a problem (2 hours)</description>
+			<type>input</type>
+	                	<default_value>2h</default_value>
+		</field>
+		<field>
+			<fielddescr>Expire</fielddescr>
+			<fieldname>expire</fieldname>
+			<description>Slave expiration time (4 weeks)</description>
+			<type>input</type>
+	                	<default_value>4w</default_value>
+		</field>
+		<field>
+			<fielddescr>Minimum</fielddescr>
+			<fieldname>minimum</fieldname>
+			<description>Maximum caching time in case of failed lookups (1 hour)</description>
+			<type>input</type>
+	                	<default_value>1h</default_value>
+		</field>
+		<field>
+			<fielddescr>Allow-update</fielddescr>
+			<fieldname>allowupdate</fieldname>
+			<description><![CDATA[Select(CTRL+click) who are allowed to send updates to this zone.<br>
+						Allow-update defines a match list eg IP address(es) that are allowed to submit dynamic updates for 'master' zones ie it enables Dynamic DNS (DDNS).]]></description>
+	    	<type>select_source</type>
+			<source><![CDATA[$config['installedpackages']['bindacls']['config']]]></source>
+			<source_name>name</source_name>
+			<source_value>name</source_value>
+			<multiple/>
+			<size>03</size>
+		</field>
+		<field>
+			<fielddescr>Allow-query</fielddescr>
+			<fieldname>allowquery</fieldname>
+			<description><![CDATA[Select(CTRL+click) who are allowed to query this zone.<br>
+			Allow-query defines an match list of IP address(es) which are allowed to issue queries to the server.]]></description>
+			<type>select_source</type>
+			<source><![CDATA[$config['installedpackages']['bindacls']['config']]]></source>
+			<source_name>name</source_name>
+			<source_value>name</source_value>
+			<multiple/>
+			<size>03</size>
+		</field>
+		<field>
+			<fielddescr>Allow-transfer</fielddescr>
+			<fieldname>allowtransfer</fieldname>
+			<description><![CDATA[Select(CTRL+click) who are allowed to copy this zone.<br>
+						Allow-transfer defines a match list eg IP address(es) that are allowed to transfer (copy) the zone information from the server (master or slave for the zone). While on its face this may seem an excessively friendly default, DNS data is essentially public (that's why its there) and the bad guys can get all of it anyway. However if the thought of anyone being able to transfer your precious zone file is repugnant, or (and this is far more significant) you are concerned about possible DoS attack initiated by XFER requests, then use the following policy.]]></description>
+				    	<type>select_source</type>
+			<source><![CDATA[$config['installedpackages']['bindacls']['config']]]></source>
+			<source_name>name</source_name>
+			<source_value>name</source_value>
+			<multiple/>
+			<size>03</size>
+		</field>
+		<field>
+		        <type>listtopic</type>
+                        <name>Zone Domain records</name>
+                        <fieldname>temp02</fieldname>
+		</field>
+                <field>
+                        <fielddescr>Enter Domain records.</fielddescr>
+                        <description><![CDATA[<b>"Record"</b> is the name or last octec of ip. Sample: www or pop<br>
+                        		 <b>"Type"</b> is the type of the record Sample: A CNAME MX NS<br>
+                        		 <b>"Priority"</b> in used only in mx records to define its priority<br>
+                        		 <b>"Alias or IP address"</b> is the destination host or ip address.<br><br>
+                        		 You can order elements on this list with drag and drop between columns.]]></description>
+                        <fieldname>none</fieldname>
+                    <type>rowhelper</type>
+                    <rowhelper>
+                        <rowhelperfield>
+                            <fielddescr>Record</fielddescr>
+                            <fieldname>hostname</fieldname>
+                            <description>Enter the Host Name (ex: www)</description>
+                            <type>input</type>
+                            <size>10</size>
+                        </rowhelperfield>
+                        <rowhelperfield>
+			<fielddescr>Type</fielddescr>
+			<fieldname>hosttype</fieldname>
+			<description>Select Type Host</description>
+		        <type>select</type>
+                        	<options>
+                                <option><name>A</name><value>A</value></option>
+                                <option><name>AAAA</name><value>AAAA</value></option>
+                                <option><name>DNAME</name><value>DNAME</value></option>
+                                <option><name>MX</name><value>MX</value></option>
+                                <option><name>CNAME</name><value>CNAME</value></option>
+                                <option><name>NS</name><value>NS</value></option>
+                                <option><name>LOC</name><value>LOC</value></option>
+                                <option><name>SRV</name><value>SRV</value></option>
+                                <option><name>PTR</name><value>PTR</value></option>
+                                <option><name>TXT</name><value>TXT</value></option>
+                                <option><name>SPF</name><value>SPF</value></option>
+                        </options>
+                        </rowhelperfield>
+                        <rowhelperfield>
+                            <fielddescr>Priority</fielddescr>
+                            <fieldname>hostvalue</fieldname>
+                            <description>MX 10 or 20</description>
+                            <type>input</type>
+                            <size>3</size>
+                        </rowhelperfield>
+                        <rowhelperfield>
+                            <fielddescr>Alias or IP address</fielddescr>
+                            <fieldname>hostdst</fieldname>
+                            <description>Enter the IP address or CNAME destination for Domain (ex: 10.31.11.1 or mail.example.com)</description>
+                            <type>input</type>
+                            <size>35</size>
+                        </rowhelperfield>
+                        <movable>on</movable>
+                    </rowhelper>
+                </field>
+		<field>
+			<fieldname>regdhcpstatic</fieldname>
+			<fielddescr>Register DHCP static mappings</fielddescr>
+			<description>If this option is set, then DHCP static mappings will be registered in DNS, so that their name can be resolved.</description>
+			<type>checkbox</type>
+        </field>
+		<field>
+			<type>listtopic</type>
+			<name>Custom Zone Domain records</name>
+			<fieldname>temp02</fieldname>
+		</field>
+		<field>
+			<fielddescr></fielddescr>
+			<fieldname>customzonerecords</fieldname>
+			<description><![CDATA[Paste any custom zone records to include on this zone.<br>
+							This can be used for a fast migration setup.]]></description>
+	                <type>textarea</type>
+                        <cols>84</cols>
+                        <rows>10</rows>
+		<encoding>base64</encoding>
+		<dontdisplayname/>
+		<usecolspan2/>
+		</field>
+		<field>
+			<type>listtopic</type>
+			<name>Resulting Zone config file</name>
+		</field>
+		<field>
+			<fielddescr></fielddescr>
+			<fieldname>resultconfig</fieldname>
+			<description>Resulting bind config file for this zone.</description>
+	                <type>textarea</type>
+                        <cols>84</cols>
+                        <rows>15</rows>
+		<encoding>base64</encoding>
+		<dontdisplayname/>
+		<usecolspan2/>
+		</field>
+	</fields>
+        <custom_php_after_form_command>
+                bind_print_javascript_type_zone2();
+        </custom_php_after_form_command>
+        <custom_php_after_head_command>
+                bind_print_javascript_type_zone();
+        </custom_php_after_head_command>
+        <custom_php_command_before_form>
+        </custom_php_command_before_form>
+	<custom_php_validation_command>
+		if ($_POST['type']=="master")
+			$_POST['serial']=(date("U")+ 1000000000);
+		bind_zone_validate($_POST, &amp;$input_errors);
+	</custom_php_validation_command>
+	<custom_delete_php_command>
+	        bind_sync();
+	</custom_delete_php_command>	
+        <custom_php_resync_config_command>
+	        bind_sync();
+        </custom_php_resync_config_command>
+</packagegui>

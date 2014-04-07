@@ -1,0 +1,354 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE packagegui SYSTEM "./schema/packages.dtd">
+<?xml-stylesheet type="text/xsl" href="./xsl/package.xsl"?>
+<packagegui>
+        <copyright>
+        <![CDATA[
+/* $Id$ */
+/* ========================================================================== */
+/*
+    apache_virtualhost.xml
+    part of apache_mod_security package (http://www.pfSense.com)
+    Copyright (C)2009, 2010 Scott Ullrich
+    Copyright (C)2012 Marcello Coutinho
+    Copyright (C)2013 Stephane Lapie <stephane.lapie@asahinet.com>
+    All rights reserved.
+*/
+/* ========================================================================== */
+/*
+    Redistribution and use in source and binary forms, with or without
+    modification, are permitted provided that the following conditions are met:
+
+     1. Redistributions of source code MUST retain the above copyright notice,
+        this list of conditions and the following disclaimer.
+
+     2. Redistributions in binary form MUST reproduce the above copyright
+        notice, this list of conditions and the following disclaimer in the
+        documentation and/or other materials provided with the distribution.
+
+    THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
+    INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+    AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+    AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+    OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+    INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+    POSSIBILITY OF SUCH DAMAGE.
+*/
+/* ========================================================================== */
+]]>
+        </copyright>
+	<name>apachevirtualhost</name>
+	<version>1.0</version>
+	<title>Apache reverse proxy: Site Proxies</title>
+	<menu>
+		<name>Mod_Security+Apache+Proxy</name>
+		<tooltiptext></tooltiptext>
+		<section>Services</section>
+		<configfile>apache_virtualhost.xml</configfile>
+	</menu>
+	<additional_files_needed>
+		<prefix>/usr/local/pkg/</prefix>
+		<chmod>0644</chmod>
+		<item>https://packages.pfsense.org/packages/config/apache_mod_security-dev/apache_mod_security.inc</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/pkg/</prefix>
+		<chmod>0644</chmod>
+		<item>https://packages.pfsense.org/packages/config/apache_mod_security-dev/apache_mod_security.template</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/pkg/</prefix>
+		<chmod>0644</chmod>
+		<item>https://packages.pfsense.org/packages/config/apache_mod_security-dev/apache_mod_security_groups.xml</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/pkg/</prefix>
+		<chmod>0644</chmod>
+		<item>https://packages.pfsense.org/packages/config/apache_mod_security-dev/apache_mod_security_settings.xml</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/www/</prefix>
+		<chmod>0644</chmod>
+		<item>https://packages.pfsense.org/packages/config/apache_mod_security-dev/apache_mod_security_view_logs.php</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/pkg/</prefix>
+		<chmod>0644</chmod>
+		<item>https://packages.pfsense.org/packages/config/apache_mod_security-dev/apache.template</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/pkg/</prefix>
+		<chmod>0644</chmod>
+		<item>https://packages.pfsense.org/packages/config/apache_mod_security-dev/apache_balancer.template</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/pkg/</prefix>
+		<chmod>0644</chmod>
+		<item>https://packages.pfsense.org/packages/config/apache_mod_security-dev/apache_balancer.xml</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/www/</prefix>
+		<chmod>0644</chmod>
+		<item>https://packages.pfsense.org/packages/config/apache_mod_security-dev/apache_logs_data.php</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/pkg/</prefix>
+		<chmod>0644</chmod>
+		<item>https://packages.pfsense.org/packages/config/apache_mod_security-dev/apache_mod_security_manipulation.xml</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/pkg/</prefix>
+		<chmod>0644</chmod>
+		<item>https://packages.pfsense.org/packages/config/apache_mod_security-dev/apache_mod_security_sync.xml</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/pkg/</prefix>
+		<chmod>0644</chmod>
+		<item>https://packages.pfsense.org/packages/config/apache_mod_security-dev/apache_settings.xml</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/www/</prefix>
+		<chmod>0644</chmod>
+		<item>https://packages.pfsense.org/packages/config/apache_mod_security-dev/apache_view_logs.php</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/www/shortcuts/</prefix>
+		<chmod>0755</chmod>
+		<item>https://packages.pfsense.org/packages/config/apache_mod_security-dev/pkg_apache.inc</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/pkg/</prefix>
+		<chmod>0755</chmod>
+		<item>https://packages.pfsense.org/packages/config/apache_mod_security-dev/apache_location.xml</item>
+	</additional_files_needed>
+	<tabs>
+		<tab>
+			<text>Apache</text>
+			<url>/pkg_edit.php?xml=apache_settings.xml&amp;id=0</url>
+			<active/>			
+		</tab>
+		<tab>
+			<text>ModSecurity</text>
+			<url>/pkg_edit.php?xml=apache_mod_security_settings.xml</url>
+		</tab>
+		<tab>
+			<text>Sync</text>
+			<url>/pkg_edit.php?xml=apache_mod_security_sync.xml</url>
+		</tab>
+		<tab>
+			<text>Daemon Options</text>
+			<url>/pkg_edit.php?xml=apache_settings.xml</url>
+			<tab_level>2</tab_level>
+		</tab>
+		<tab>
+			<text>Backends / Balancers</text>
+			<url>/pkg.php?xml=apache_balancer.xml</url>
+			<tab_level>2</tab_level>
+		</tab>
+		<tab>
+			<text>Location(s)</text>
+			<url>/pkg.php?xml=apache_location.xml</url>
+			<tab_level>2</tab_level>
+		</tab>
+		<tab>
+			<text>Virtual Hosts</text>
+			<url>/pkg.php?xml=apache_virtualhost.xml</url>
+			<tab_level>2</tab_level>
+			<active/>
+		</tab>
+		<tab>
+			<text>Logs</text>
+			<url>/apache_view_logs.php</url>
+			<tab_level>2</tab_level>
+		</tab>
+	</tabs>
+	<adddeleteeditpagefields>
+		<movable>on</movable>
+		<columnitem>
+			<fielddescr>Status</fielddescr>
+			<fieldname>enable</fieldname>
+			<listmodeon>Enabled</listmodeon>
+			<listmodeoff>Disabled</listmodeoff>
+		</columnitem>
+		<columnitem>
+			<fielddescr>Iface</fielddescr>
+			<fieldname>interface</fieldname>
+		</columnitem>
+		<columnitem>
+			<fielddescr>protocol</fielddescr>
+			<fieldname>proto</fieldname>
+		</columnitem>
+		<columnitem>
+			<fielddescr>Server name(s)</fielddescr>
+			<fieldname>primarysitehostname</fieldname>
+			<encoding>base64</encoding>
+		</columnitem>
+		<columnitem>
+			<fielddescr>port</fielddescr>
+			<fieldname>port</fieldname>
+		</columnitem>
+		<columnitem>
+			<fielddescr>Description</fielddescr>
+			<fieldname>description</fieldname>
+		</columnitem>
+	</adddeleteeditpagefields>
+	<fields>
+		<field>
+			<name>Listening Options</name>
+			<type>listtopic</type>
+		</field>
+		<field>
+			<fielddescr>Enable</fielddescr>
+			<fieldname>enable</fieldname>
+			<description>Enable this virtual host</description>
+			<type>checkbox</type>
+		</field>
+		<field>
+			<fielddescr>Protocol(s)</fielddescr>
+			<fieldname>proto</fieldname>
+			<description>Select protocols that this virtual host will accept connections</description>
+			<type>select</type>			
+			<options>
+				<option><name>HTTP</name><value>http</value></option>
+				<option><name>HTTPS</name><value>https</value></option>
+			</options>
+		</field>
+		<field>
+			<fielddescr>Server Name(s)</fielddescr>
+			<fieldname>primarysitehostname</fieldname>
+			<description><![CDATA[Enter hostnames one per line in FQDN format for this website (e.g. www.example.com)<br/>Leave blank and define the IP Address / port above for IP site proxy (i.e. not named site proxy)]]></description>
+			<cols>40</cols>
+			<rows>2</rows>
+			<type>textarea</type>
+			<encoding>base64</encoding>
+		</field>
+		<field>
+			<fielddescr>Inbound Interface(s)</fielddescr>
+			<fieldname>interface</fieldname>
+			<description><![CDATA[Default: <strong>WAN</strong><br>Select interface(s) that this virtualhost will listen on.]]></description>
+			<type>interfaces_selection</type>
+			<showlistenall/>
+			<showvirtualips/>
+			<showips/>
+			<required/>
+		</field>
+		<field>
+			<fielddescr>Port</fielddescr>
+			<fieldname>port</fieldname>
+			<description>Leave blank to use the default global port.</description>
+			<size>10</size>
+			<type>input</type>
+		</field>
+		<field>
+			<fielddescr>Site Webmaster E-Mail address</fielddescr>
+			<fieldname>siteemail</fieldname>
+			<size>50</size>
+			<description><![CDATA[Enter the Webmaster E-Mail address for this site.]]></description>
+			<type>input</type>
+		</field>
+		<field>
+			<fielddescr>Site description</fielddescr>
+			<fieldname>description</fieldname>
+			<size>50</size>
+			<description><![CDATA[Enter a site description]]></description>
+			<type>input</type>
+		</field>
+		<field>
+			<fielddescr>HTTPS SSL certificate</fielddescr>
+			<fieldname>ssl_cert</fieldname>
+			<description>Choose the SSL Server Certificate here.</description>
+			<type>select_source</type>
+			<source><![CDATA[$config['cert']]]></source>
+			<source_name>descr</source_name>
+			<source_value>refid</source_value>
+			<show_disable_value>none</show_disable_value>
+		</field>
+		<field>
+			<fielddescr>HTTPS SSL certificate chain</fielddescr>
+			<fieldname>ssl_cert_chain</fieldname>
+			<description>Select intermediate CA assigned to server certificate. Not all certificates require this.</description>
+			<type>select_source</type>
+			<source><![CDATA[$config['ca']]]></source>
+			<source_name>descr</source_name>
+			<source_value>refid</source_value>
+			<show_disable_value>none</show_disable_value>
+		</field>
+		<field>
+			<fielddescr>Client certificates CA (optional)</fielddescr>
+			<fieldname>reverse_int_ca</fieldname>
+			<description>Select CA assigned to client certificates.</description>
+			<type>select_source</type>
+			<source><![CDATA[$config['ca']]]></source>
+			<source_name>descr</source_name>
+			<source_value>refid</source_value>
+			<show_disable_value>none</show_disable_value>
+		</field>
+		<field>
+			<fielddescr>
+				<![CDATA[Location(s)]]>
+			</fielddescr>
+			<fieldname>locations</fieldname>
+			<type>rowhelper</type>
+			<rowhelper>
+				<rowhelperfield>
+					<fielddescr><![CDATA[Location]]></fielddescr>
+					<fieldname>location</fieldname>
+					<description>Server Location</description>
+					<source><![CDATA[$config['installedpackages']['apachelocation']['config']]]></source>
+					<source_name>name</source_name>
+					<source_value>name</source_value>
+					<show_disable_value>none</show_disable_value>
+					<type>select_source</type>
+				</rowhelperfield>
+			</rowhelper>
+		</field>
+		<field>
+			<name>Logging</name>
+			<type>listtopic</type>
+		</field>
+		<field>
+			<fielddescr>Preserve Proxy hostname</fielddescr>
+			<fieldname>preserveproxyhostname</fieldname>
+			<description><![CDATA[When enabled, this option will pass the Host: line from the incoming request to the proxied host, instead of the backend IP address.]]></description>
+			<type>checkbox</type>
+		</field>
+			<field>
+			<fielddescr>Log file</fielddescr>
+			<fieldname>logfile</fieldname>
+			<description><![CDATA[Enable access and error log for this virtual host.]]></description>
+			<type>select</type>			
+			<options>
+				<option><name>Log to default apache log file</name><value>default</value></option>
+				<option><name>Create a log file for this site</name><value>create</value></option>
+				<option><name>Do not log this website</name><value>disabled</value></option>
+			</options>
+		</field>
+		<field>
+			<name>Custom Options</name>
+			<type>listtopic</type>
+		</field>
+		<field>
+			<fielddescr>Custom Options</fielddescr>
+			<fieldname>custom</fieldname>
+			<description>Pass extra Apache config for this VirtualHost. This is useful for Rewrite rules for example.</description>
+			<type>textarea</type>
+			<cols>90</cols>
+			<rows>10</rows>
+			<encoding>base64</encoding>
+			<dontdisplayname/>
+			<usecolspan2/>
+		</field>
+	</fields>
+	<service>
+		<name>apache_mod_security</name>
+		<rcfile>apache_mod_security.sh</rcfile>
+		<executable>httpd</executable>
+	</service>
+	<custom_php_resync_config_command>
+		apache_mod_security_resync();
+	</custom_php_resync_config_command>
+	<include_file>/usr/local/pkg/apache_mod_security.inc</include_file>	
+</packagegui>

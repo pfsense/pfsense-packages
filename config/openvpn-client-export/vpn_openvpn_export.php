@@ -1,21 +1,21 @@
-<?php 
+<?php
 /*
 	vpn_openvpn_export.php
 
 	Copyright (C) 2008 Shrew Soft Inc.
-	Copyright (C) 2010 Ermal Lu�i
-	All rights reserved. 
+	Copyright (C) 2010 Ermal Luçi
+	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
 	modification, are permitted provided that the following conditions are met:
-	
+
 	1. Redistributions of source code must retain the above copyright notice,
 	   this list of conditions and the following disclaimer.
-	
+
 	2. Redistributions in binary form must reproduce the above copyright
 	   notice, this list of conditions and the following disclaimer in the
 	   documentation and/or other materials provided with the distribution.
-	
+
 	THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
 	INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
 	AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
@@ -59,7 +59,7 @@ foreach($a_server as $sindex => $server) {
 	$ras_certs = array();
 	if (stripos($server['mode'], "server") === false)
 		continue;
-	if ($server['authmode'] == "Local Database" && ($server['mode'] != "server_user")) {
+	if (($server['mode'] == "server_tls_user") && ($server['authmode'] == "Local Database")) {
 		foreach($a_user as $uindex => $user) {
 			if (!is_array($user['cert']))
 				continue;
@@ -67,7 +67,7 @@ foreach($a_server as $sindex => $server) {
 				// If $cert is not an array, it's a certref not a cert.
 				if (!is_array($cert))
 					$cert = lookup_cert($cert);
-	
+
 				if ($cert['caref'] != $server['caref'])
 					continue;
 				$ras_userent = array();
@@ -78,9 +78,9 @@ foreach($a_server as $sindex => $server) {
 				$ras_user[] = $ras_userent;
 			}
 		}
-	} elseif ((!empty($server['authmode']) && ($server['mode'] != "server_user")) || ($server['mode'] == "server_tls")) {
+	} elseif (($server['mode'] == "server_tls") || (($server['mode'] == "server_tls_user") && ($server['authmode'] != "Local Database"))) {
 		foreach($a_cert as $cindex => $cert) {
-			if ($cert['caref'] != $server['caref'])
+			if (($cert['caref'] != $server['caref']) || ($cert['refid'] == $server['certref']))
 				continue;
 			$ras_cert_entry['cindex'] = $cindex;
 			$ras_cert_entry['certname'] = $cert['descr'];
@@ -112,8 +112,8 @@ $act = $_GET['act'];
 if (isset($_POST['act']))
 	$act = $_POST['act'];
 
-$error = false;
-if($act == "conf" || $act == "confall") {
+if (!empty($act)) {
+
 	$srvid = $_GET['srvid'];
 	$usrid = $_GET['usrid'];
 	$crtid = $_GET['crtid'];
@@ -132,14 +132,19 @@ if($act == "conf" || $act == "confall") {
 		$nokeys = false;
 
 	if (empty($_GET['useaddr'])) {
-		$error = true;
 		$input_errors[] = "You need to specify an IP or hostname.";
 	} else
 		$useaddr = $_GET['useaddr'];
-		
 	$advancedoptions = $_GET['advancedoptions'];
+	$openvpnmanager = $_GET['openvpnmanager'];
 
+	$verifyservercn = $_GET['verifyservercn'];
+	$randomlocalport = $_GET['randomlocalport'];
 	$usetoken = $_GET['usetoken'];
+	if ($usetoken && (substr($act, 0, 10) == "confinline"))
+		$input_errors[] = "You cannot use Microsoft Certificate Storage with an Inline configuration.";
+	if ($usetoken && (($act == "conf_yealink_t28") || ($act == "conf_yealink_t38g") || ($act == "conf_yealink_t38g2") || ($act == "conf_snom")))
+		$input_errors[] = "You cannot use Microsoft Certificate Storage with a Yealink or SNOM configuration.";
 	$password = "";
 	if ($_GET['password'])
 		$password = $_GET['password'];
@@ -148,206 +153,101 @@ if($act == "conf" || $act == "confall") {
 	if (!empty($_GET['proxy_addr']) || !empty($_GET['proxy_port'])) {
 		$proxy = array();
 		if (empty($_GET['proxy_addr'])) {
-			$error = true;
 			$input_errors[] = "You need to specify an address for the proxy port.";
 		} else
 			$proxy['ip'] = $_GET['proxy_addr'];
 		if (empty($_GET['proxy_port'])) {
-			$error = true;
 			$input_errors[] = "You need to specify a port for the proxy ip.";
 		} else
 			$proxy['port'] = $_GET['proxy_port'];
+		$proxy['proxy_type'] = $_GET['proxy_type'];
 		$proxy['proxy_authtype'] = $_GET['proxy_authtype'];
 		if ($_GET['proxy_authtype'] != "none") {
 			if (empty($_GET['proxy_user'])) {
-				$error = true;
 				$input_errors[] = "You need to specify a username with the proxy config.";
 			} else
 				$proxy['user'] = $_GET['proxy_user'];
 			if (!empty($_GET['proxy_user']) && empty($_GET['proxy_password'])) {
-				$error = true;
 				$input_errors[] = "You need to specify a password with the proxy user.";
 			} else
 				$proxy['password'] = $_GET['proxy_password'];
 		}
 	}
 
-	$exp_name = openvpn_client_export_prefix($srvid);
-	if ($act == "confall")
-		$zipconf = true;
-	$exp_data = openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $usetoken, $nokeys, $proxy, $zipconf, $password, false, false, $advancedoptions);
-	if (!$exp_data) {
-		$input_errors[] = "Failed to export config files!";
-		$error = true;
+	$exp_name = openvpn_client_export_prefix($srvid, $usrid, $crtid);
+
+	if(substr($act, 0, 4) == "conf") {
+		switch ($act) {
+			case "confzip":
+				$exp_name = urlencode($exp_name."-config.zip");
+				$expformat = "zip";
+				break;
+			case "conf_yealink_t28":
+				$exp_name = urlencode("client.tar");
+				$expformat = "yealink_t28";
+				break;
+			case "conf_yealink_t38g":
+				$exp_name = urlencode("client.tar");
+				$expformat = "yealink_t38g";
+				break;
+			case "conf_yealink_t38g2":
+				$exp_name = urlencode("client.tar");
+				$expformat = "yealink_t38g2";
+				break;
+			case "conf_snom":
+				$exp_name = urlencode("vpnclient.tar");
+				$expformat = "snom";
+				break;
+			case "confinline":
+				$exp_name = urlencode($exp_name."-config.ovpn");
+				$expformat = "inline";
+				break;
+			case "confinlinedroid":
+				$exp_name = urlencode($exp_name."-android-config.ovpn");
+				$expformat = "inlinedroid";
+				break;
+			case "confinlineios":
+				$exp_name = urlencode($exp_name."-ios-config.ovpn");
+				$expformat = "inlineios";
+				break;
+			default:
+				$exp_name = urlencode($exp_name."-config.ovpn");
+				$expformat = "baseconf";
+		}
+		$exp_path = openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $verifyservercn, $randomlocalport, $usetoken, $nokeys, $proxy, $expformat, $password, false, false, $openvpnmanager, $advancedoptions);
 	}
-	if (!$error) {
-		if ($act == "confall") {
-			$exp_name = urlencode($exp_data);
-			$exp_size = filesize("{$g['tmp_path']}/{$exp_data}");
+
+	if($act == "visc") {
+		$exp_name = urlencode($exp_name."-Viscosity.visc.zip");
+		$exp_path = viscosity_openvpn_client_config_exporter($srvid, $usrid, $crtid, $useaddr, $verifyservercn, $randomlocalport, $usetoken, $password, $proxy, $openvpnmanager, $advancedoptions);
+	}
+
+	if(substr($act, 0, 4) == "inst") {
+		$exp_name = urlencode($exp_name."-install.exe");
+		$exp_path = openvpn_client_export_installer($srvid, $usrid, $crtid, $useaddr, $verifyservercn, $randomlocalport, $usetoken, $password, $proxy, $openvpnmanager, $advancedoptions, substr($act, 5));
+	}
+
+	if (!$exp_path) {
+		$input_errors[] = "Failed to export config files!";
+	}
+
+	if (empty($input_errors)) {
+		if (($act == "conf") || (substr($act, 0, 10) == "confinline")) {
+			$exp_size = strlen($exp_path);
 		} else {
-			$exp_name = urlencode($exp_name."-config.ovpn");
-			$exp_size = strlen($exp_data);
+			$exp_size = filesize($exp_path);
 		}
-
 		header('Pragma: ');
 		header('Cache-Control: ');
 		header("Content-Type: application/octet-stream");
 		header("Content-Disposition: attachment; filename={$exp_name}");
 		header("Content-Length: $exp_size");
-		if ($act == "confall")
-			readfile("{$g['tmp_path']}/{$exp_data}");
-		else
-			echo $exp_data;
-
-		@unlink($exp_data);
-		exit;
-	}
-}
-
-if($act == "visc") {
-	$srvid = $_GET['srvid'];
-	$usrid = $_GET['usrid'];
-	$crtid = $_GET['crtid'];
-	if ($srvid === false) {
-		pfSenseHeader("vpn_openvpn_export.php");
-		exit;
-	} else if (($config['openvpn']['openvpn-server'][$srvid]['mode'] != "server_user") &&
-		(($usrid === false) || ($crtid === false))) {
-		pfSenseHeader("vpn_openvpn_export.php");
-		exit;
-	}
-	if (empty($_GET['useaddr'])) {
-		$error = true;
-		$input_errors[] = "You need to specify an IP or hostname.";
-	} else
-		$useaddr = $_GET['useaddr'];
-
-	$advancedoptions = $_GET['advancedoptions'];
-		
-	$usetoken = $_GET['usetoken'];
-	$password = "";
-	if ($_GET['password'])
-		$password = $_GET['password'];
-
-	$proxy = "";
-	if (!empty($_GET['proxy_addr']) || !empty($_GET['proxy_port'])) {
-		$proxy = array();
-		if (empty($_GET['proxy_addr'])) {
-			$error = true;
-			$input_errors[] = "You need to specify an address for the proxy port.";
-		} else
-			$proxy['ip'] = $_GET['proxy_addr'];
-		if (empty($_GET['proxy_port'])) {
-			$error = true;
-			$input_errors[] = "You need to specify a port for the proxy ip.";
-		} else
-			$proxy['port'] = $_GET['proxy_port'];
-		$proxy['proxy_authtype'] = $_GET['proxy_authtype'];
-		if ($_GET['proxy_authtype'] != "none") {
-			if (empty($_GET['proxy_user'])) {
-				$error = true;
-				$input_errors[] = "You need to specify a username with the proxy config.";
-			} else
-				$proxy['user'] = $_GET['proxy_user'];
-			if (!empty($_GET['proxy_user']) && empty($_GET['proxy_password'])) {
-				$error = true;
-				$input_errors[] = "You need to specify a password with the proxy user.";
-			} else
-				$proxy['password'] = $_GET['proxy_password'];
+		if (($act == "conf") || (substr($act, 0, 10) == "confinline")) {
+			echo $exp_path;
+		} else {
+			readfile($exp_path);
+			@unlink($exp_path);
 		}
-	}
-
-	$exp_name = openvpn_client_export_prefix($srvid);
-	$exp_name = urlencode($exp_name."-Viscosity.visc.zip");
-	$exp_path = viscosity_openvpn_client_config_exporter($srvid, $usrid, $crtid, $useaddr, $usetoken, $password, $proxy,  $advancedoptions);
-	if (!$exp_path) {
-		$input_errors[] = "Failed to export config files!";
-		$error = true;
-	}
-	if (!$error) {
-		$exp_size = filesize($exp_path);
-
-		header('Pragma: ');
-		header('Cache-Control: ');
-		header("Content-Type: application/octet-stream");
-		header("Content-Disposition: attachment; filename={$exp_name}");
-		header("Content-Length: $exp_size");
-		readfile($exp_path);
-		//unlink($exp_path);
-		exit;
-	}
-}
-
-if($act == "inst") {
-	$srvid = $_GET['srvid'];
-	$usrid = $_GET['usrid'];
-	$crtid = $_GET['crtid'];
-	if ($srvid === false) {
-		pfSenseHeader("vpn_openvpn_export.php");
-		exit;
-	} else if (($config['openvpn']['openvpn-server'][$srvid]['mode'] != "server_user") &&
-		(($usrid === false) || ($crtid === false))) {
-		pfSenseHeader("vpn_openvpn_export.php");
-		exit;
-	}
-	if (empty($_GET['useaddr'])) {
-		$error = true;
-		$input_errors[] = "You need to specify an IP or hostname.";
-	} else
-		$useaddr = $_GET['useaddr'];
-
-	$advancedoptions = $_GET['advancedoptions'];
-	
-	$usetoken = $_GET['usetoken'];
-	$password = "";
-	if ($_GET['password'])
-		$password = $_GET['password'];
-
-	$proxy = "";
-	if (!empty($_GET['proxy_addr']) || !empty($_GET['proxy_port'])) {
-		$proxy = array();
-		if (empty($_GET['proxy_addr'])) {
-			$error = true;
-			$input_errors[] = "You need to specify an address for the proxy port.";
-		} else
-			$proxy['ip'] = $_GET['proxy_addr'];
-		if (empty($_GET['proxy_port'])) {
-			$error = true;
-			$input_errors[] = "You need to specify a port for the proxy ip.";
-		} else
-			$proxy['port'] = $_GET['proxy_port'];
-		$proxy['proxy_authtype'] = $_GET['proxy_authtype'];
-		if ($_GET['proxy_authtype'] != "none") {
-			if (empty($_GET['proxy_user'])) {
-				$error = true;
-				$input_errors[] = "You need to specify a username with the proxy config.";
-			} else
-				$proxy['user'] = $_GET['proxy_user'];
-			if (!empty($_GET['proxy_user']) && empty($_GET['proxy_password'])) {
-				$error = true;
-				$input_errors[] = "You need to specify a password with the proxy user.";
-			} else
-				$proxy['password'] = $_GET['proxy_password'];
-		}
-	}
-
-	$exp_name = openvpn_client_export_prefix($srvid);
-	$exp_name = urlencode($exp_name."-install.exe");
-	$exp_path = openvpn_client_export_installer($srvid, $usrid, $crtid, $useaddr, $usetoken, $password, $proxy, $advancedoptions);
-	if (!$exp_path) {
-		$input_errors[] = "Failed to export config files!";
-		$error = true;
-	}
-	if (!$error) {
-		$exp_size = filesize($exp_path);
-
-		header('Pragma: ');
-		header('Cache-Control: ');
-		header("Content-Type: application/octet-stream");
-		header("Content-Disposition: attachment; filename={$exp_name}");
-		header("Content-Length: $exp_size");
-		readfile($exp_path);
-		unlink($exp_path);
 		exit;
 	}
 }
@@ -358,9 +258,9 @@ include("head.inc");
 
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">
 <?php include("fbegin.inc"); ?>
-<script language="JavaScript">
-	var viscosityAvailable = false;
-<!--
+<script type="text/javascript">
+//<![CDATA[
+var viscosityAvailable = false;
 
 var servers = new Array();
 <?php foreach ($ras_server as $sindex => $server): ?>
@@ -391,7 +291,7 @@ function download_begin(act, i, j) {
 	var users = servers[index][1];
 	var certs = servers[index][3];
 	var useaddr;
-	
+
 	var advancedoptions;
 
 	if (document.getElementById("useaddr").value == "other") {
@@ -402,19 +302,28 @@ function download_begin(act, i, j) {
 		useaddr = document.getElementById("useaddr_hostname").value;
 	} else
 		useaddr = document.getElementById("useaddr").value;
-		
+
 	advancedoptions = document.getElementById("advancedoptions").value;
 
+	var verifyservercn;
+	verifyservercn = document.getElementById("verifyservercn").value;
+
+	var randomlocalport = 0;
+	if (document.getElementById("randomlocalport").checked)
+		randomlocalport = 1;
 	var usetoken = 0;
 	if (document.getElementById("usetoken").checked)
 		usetoken = 1;
 	var usepass = 0;
 	if (document.getElementById("usepass").checked)
 		usepass = 1;
+	var openvpnmanager = 0;
+	if (document.getElementById("openvpnmanager").checked)
+		openvpnmanager = 1;
 
 	var pass = document.getElementById("pass").value;
 	var conf = document.getElementById("conf").value;
-	if (usepass && (act == "inst")) {
+	if (usepass && (act.substring(0,4) == "inst")) {
 		if (!pass || !conf) {
 			alert("The password or confirm field is empty");
 			return;
@@ -440,6 +349,8 @@ function download_begin(act, i, j) {
 
 		if (document.getElementById("useproxypass").value != 'none')
 			useproxypass = 1;
+
+		var proxytype = document.getElementById("useproxytype").value;
 
 		var proxyauth = document.getElementById("useproxypass").value;
 		var proxyuser = document.getElementById("proxyuser").value;
@@ -473,10 +384,14 @@ function download_begin(act, i, j) {
 		dlurl += "&crtid=" + escape(certs[j][0]);
 	}
 	dlurl += "&useaddr=" + escape(useaddr);
+	dlurl += "&verifyservercn=" + escape(verifyservercn);
+	dlurl += "&randomlocalport=" + escape(randomlocalport);
+	dlurl += "&openvpnmanager=" + escape(openvpnmanager);
 	dlurl += "&usetoken=" + escape(usetoken);
 	if (usepass)
 		dlurl += "&password=" + escape(pass);
 	if (useproxy) {
+		dlurl += "&proxy_type=" + escape(proxytype);
 		dlurl += "&proxy_addr=" + escape(proxyaddr);
 		dlurl += "&proxy_port=" + escape(proxyport);
 		dlurl += "&proxy_authtype=" + escape(proxyauth);
@@ -485,7 +400,7 @@ function download_begin(act, i, j) {
 			dlurl += "&proxy_password=" + escape(proxypass);
 		}
 	}
-	
+
 	dlurl += "&advancedoptions=" + escape(advancedoptions);
 
 	window.open(dlurl,"_self");
@@ -510,13 +425,26 @@ function server_changed() {
 		cell1.className = "listr";
 		cell1.innerHTML = users[i][3];
 		cell2.className = "listr";
-		cell2.innerHTML = "<a href='javascript:download_begin(\"conf\"," + i + ", -1)'>Configuration</a>";
-		cell2.innerHTML += "<br/>";
-		cell2.innerHTML += "<a href='javascript:download_begin(\"confall\"," + i + ", -1)'>Configuration archive</a>";
-		cell2.innerHTML += "<br/>";
-		cell2.innerHTML += "<a href='javascript:download_begin(\"inst\"," + i + ", -1)'>Windows Installer</a>";
-		cell2.innerHTML += "<br/>";
-		cell2.innerHTML += "<a href='javascript:download_begin(\"visc\"," + i + ", -1)'>Viscosity Bundle</a>";
+		cell2.innerHTML = "- Standard Configurations:<br\/>";
+		cell2.innerHTML += "&nbsp;&nbsp; ";
+		cell2.innerHTML += "<a href='javascript:download_begin(\"confzip\"," + i + ", -1)'>Archive<\/a>";
+		cell2.innerHTML += "&nbsp;&nbsp; ";
+		cell2.innerHTML += "<a href='javascript:download_begin(\"conf\"," + i + ", -1)'>Config Only<\/a>";
+		cell2.innerHTML += "<br\/>- Inline Configurations:<br\/>";
+		cell2.innerHTML += "&nbsp;&nbsp; ";
+		cell2.innerHTML += "<a href='javascript:download_begin(\"confinlinedroid\"," + i + ", -1)'>Android<\/a>";
+		cell2.innerHTML += "&nbsp;&nbsp; ";
+		cell2.innerHTML += "<a href='javascript:download_begin(\"confinlineios\"," + i + ", -1)'>OpenVPN Connect (iOS/Android)<\/a>";
+		cell2.innerHTML += "&nbsp;&nbsp; ";
+		cell2.innerHTML += "<a href='javascript:download_begin(\"confinline\"," + i + ", -1)'>Others<\/a>";
+		cell2.innerHTML += "<br\/>- Windows Installers:<br\/>";
+		cell2.innerHTML += "&nbsp;&nbsp; ";
+		cell2.innerHTML += "<a href='javascript:download_begin(\"inst-2.3-x86\"," + i + ", -1)'>2.3-x86<\/a>";
+		cell2.innerHTML += "&nbsp;&nbsp; ";
+		cell2.innerHTML += "<a href='javascript:download_begin(\"inst-2.3-x64\"," + i + ", -1)'>2.3-x64<\/a>";
+		cell2.innerHTML += "<br\/>- Mac OSX:<br\/>";
+		cell2.innerHTML += "&nbsp;&nbsp; ";
+		cell2.innerHTML += "<a href='javascript:download_begin(\"visc\"," + i + ", -1)'>Viscosity Bundle<\/a>";
 	}
 	for (j=0; j < certs.length; j++) {
 		var row = table.insertRow(table.rows.length);
@@ -532,13 +460,37 @@ function server_changed() {
 		cell1.className = "listr";
 		cell1.innerHTML = certs[j][1];
 		cell2.className = "listr";
-		cell2.innerHTML = "<a href='javascript:download_begin(\"conf\", -1," + j + ")'>Configuration</a>";
-		cell2.innerHTML += "<br/>";
-		cell2.innerHTML += "<a href='javascript:download_begin(\"confall\", -1," + j + ")'>Configuration archive</a>";
-		cell2.innerHTML += "<br/>";
-		cell2.innerHTML += "<a href='javascript:download_begin(\"inst\", -1," + j + ")'>Windows Installer</a>";
-		cell2.innerHTML += "<br/>";
-		cell2.innerHTML += "<a href='javascript:download_begin(\"visc\", -1," + j + ")'>Viscosity Bundle</a>";
+		cell2.innerHTML = "- Standard Configurations:<br\/>";
+		cell2.innerHTML += "&nbsp;&nbsp; ";
+		cell2.innerHTML += "<a href='javascript:download_begin(\"confzip\", -1," + j + ")'>Archive<\/a>";
+		cell2.innerHTML += "&nbsp;&nbsp; ";
+		cell2.innerHTML += "<a href='javascript:download_begin(\"conf\", -1," + j + ")'>File Only<\/a>";
+		cell2.innerHTML += "<br\/>- Inline Configurations:<br\/>";
+		cell2.innerHTML += "&nbsp;&nbsp; ";
+		cell2.innerHTML += "<a href='javascript:download_begin(\"confinlinedroid\", -1," + j + ")'>Android<\/a>";
+		cell2.innerHTML += "&nbsp;&nbsp; ";
+		cell2.innerHTML += "<a href='javascript:download_begin(\"confinlineios\", -1," + j + ")'>OpenVPN Connect (iOS/Android)<\/a>";
+		cell2.innerHTML += "&nbsp;&nbsp; ";
+		cell2.innerHTML += "<a href='javascript:download_begin(\"confinline\", -1," + j + ")'>Others<\/a>";
+		cell2.innerHTML += "<br\/>- Windows Installers:<br\/>";
+		cell2.innerHTML += "&nbsp;&nbsp; ";
+		cell2.innerHTML += "<a href='javascript:download_begin(\"inst-2.3-x86\", -1," + j + ")'>2.3-x86<\/a>";
+		cell2.innerHTML += "&nbsp;&nbsp; ";
+		cell2.innerHTML += "<a href='javascript:download_begin(\"inst-2.3-x64\", -1," + j + ")'>2.3-x64<\/a>";
+		cell2.innerHTML += "<br\/>- Mac OSX:<br\/>";
+		cell2.innerHTML += "&nbsp;&nbsp; ";
+		cell2.innerHTML += "<a href='javascript:download_begin(\"visc\", -1," + j + ")'>Viscosity Bundle<\/a>";
+		if (servers[index][2] == "server_tls") {
+			cell2.innerHTML += "<br\/>- Yealink SIP Handsets: <br\/>";
+			cell2.innerHTML += "&nbsp;&nbsp; ";
+			cell2.innerHTML += "<a href='javascript:download_begin(\"conf_yealink_t28\", -1," + j + ")'>T28<\/a>";
+			cell2.innerHTML += "&nbsp;&nbsp; ";
+			cell2.innerHTML += "<a href='javascript:download_begin(\"conf_yealink_t38g\", -1," + j + ")'>T38G (1)<\/a>";
+			cell2.innerHTML += "&nbsp;&nbsp; ";
+			cell2.innerHTML += "<a href='javascript:download_begin(\"conf_yealink_t38g2\", -1," + j + ")'>T38G (2)<\/a>";
+			cell2.innerHTML += "<br\/>";
+			cell2.innerHTML += "- <a href='javascript:download_begin(\"conf_snom\", -1," + j + ")'>SNOM SIP Handset<\/a>";
+		}
 	}
 	if (servers[index][2] == 'server_user') {
 		var row = table.insertRow(table.rows.length);
@@ -550,13 +502,26 @@ function server_changed() {
 		cell1.className = "listr";
 		cell1.innerHTML = "none";
 		cell2.className = "listr";
-		cell2.innerHTML = "<a href='javascript:download_begin(\"conf\"," + i + ")'>Configuration</a>";
-		cell2.innerHTML += "<br/>";
-		cell2.innerHTML += "<a href='javascript:download_begin(\"confall\"," + i + ")'>Configuration archive</a>";
-		cell2.innerHTML += "<br/>";
-		cell2.innerHTML += "<a href='javascript:download_begin(\"inst\"," + i + ")'>Windows Installer</a>";
-		cell2.innerHTML += "<br/>";
-		cell2.innerHTML += "<a href='javascript:download_begin(\"visc\"," + i + ")'>Viscosity Bundle</a>";
+		cell2.innerHTML = "- Standard Configurations:<br\/>";
+		cell2.innerHTML += "&nbsp;&nbsp; ";
+		cell2.innerHTML += "<a href='javascript:download_begin(\"confzip\"," + i + ")'>Archive<\/a>";
+		cell2.innerHTML += "&nbsp;&nbsp; ";
+		cell2.innerHTML += "<a href='javascript:download_begin(\"conf\"," + i + ")'>File Only<\/a>";
+		cell2.innerHTML += "<br\/>- Inline Configurations:<br\/>";
+		cell2.innerHTML += "&nbsp;&nbsp; ";
+		cell2.innerHTML += "<a href='javascript:download_begin(\"confinlinedroid\"," + i + ")'>Android<\a>";
+		cell2.innerHTML += "&nbsp;&nbsp; ";
+		cell2.innerHTML += "<a href='javascript:download_begin(\"confinlineios\"," + i + ")'>OpenVPN Connect (iOS/Android)<\/a>";
+		cell2.innerHTML += "&nbsp;&nbsp; ";
+		cell2.innerHTML += "<a href='javascript:download_begin(\"confinline\"," + i + ")'>Others<\/a>";
+		cell2.innerHTML += "<br\/>- Windows Installers:<br\/>";
+		cell2.innerHTML += "&nbsp;&nbsp; ";
+		cell2.innerHTML += "<a href='javascript:download_begin(\"inst-2.3-x86\"," + i + ")'>2.3-x86<\/a>";
+		cell2.innerHTML += "&nbsp;&nbsp; ";
+		cell2.innerHTML += "<a href='javascript:download_begin(\"inst-2.3-x64\"," + i + ")'>2.3-x64<\/a>";
+		cell2.innerHTML += "<br\/>- Mac OSX:<br\/>";
+		cell2.innerHTML += "&nbsp;&nbsp; ";
+		cell2.innerHTML += "<a href='javascript:download_begin(\"visc\"," + i + ")'>Viscosity Bundle<\/a>";
 	}
 }
 
@@ -566,7 +531,7 @@ function useaddr_changed(obj) {
 		$('HostName').show();
 	else
 		$('HostName').hide();
-	
+
 }
 
 function usepass_changed() {
@@ -580,13 +545,13 @@ function usepass_changed() {
 function useproxy_changed(obj) {
 
 	if ((obj.id == "useproxy" && obj.checked) ||
-		$(obj.id + 'pass').value != 'none') {
+		(obj.id == "useproxypass" && (obj.value != 'none'))) {
 		$(obj.id + '_opts').show();
 	} else {
 		$(obj.id + '_opts').hide();
 	}
 }
-//-->
+//]]>
 </script>
 <?php
 	if ($input_errors)
@@ -594,10 +559,10 @@ function useproxy_changed(obj) {
 	if ($savemsg)
 		print_info_box($savemsg);
 ?>
-<table width="100%" border="0" cellpadding="0" cellspacing="0">
+<table width="100%" border="0" cellpadding="0" cellspacing="0" summary="openvpn export">
  	<tr>
 		<td>
-			<?php 
+			<?php
 				$tab_array = array();
 				$tab_array[] = array(gettext("Server"), false, "vpn_openvpn_server.php");
 				$tab_array[] = array(gettext("Client"), false, "vpn_openvpn_client.php");
@@ -612,11 +577,11 @@ function useproxy_changed(obj) {
 	<tr>
 		<td id="mainarea">
 			<div class="tabcont">
-				<table width="100%" border="0" cellpadding="6" cellspacing="0">
+				<table width="100%" border="0" cellpadding="6" cellspacing="0" summary="main area">
 					<tr>
 						<td width="22%" valign="top" class="vncellreq">Remote Access Server</td>
 						<td width="78%" class="vtable">
-							<select name="server" id="server" class="formselect" onChange="server_changed()">
+							<select name="server" id="server" class="formselect" onchange="server_changed()">
 								<?php foreach($ras_server as & $server): ?>
 								<option value="<?=$server['sindex'];?>"><?=$server['name'];?></option>
 								<?php endforeach; ?>
@@ -626,22 +591,29 @@ function useproxy_changed(obj) {
 					<tr>
 						<td width="22%" valign="top" class="vncell">Host Name Resolution</td>
 						<td width="78%" class="vtable">
-							<table border="0" cellpadding="2" cellspacing="0">
+							<table border="0" cellpadding="2" cellspacing="0" summary="name resolution">
 								<tr>
 									<td>
-										<select name="useaddr" id="useaddr" class="formselect" onChange="useaddr_changed(this)">
+										<select name="useaddr" id="useaddr" class="formselect" onchange="useaddr_changed(this)">
 											<option value="serveraddr" >Interface IP Address</option>
+											<option value="servermagic" >Automagic Multi-WAN IPs (port forward targets)</option>
+											<option value="servermagichost" >Automagic Multi-WAN DDNS Hostnames (port forward targets)</option>
 											<option value="serverhostname" >Installation hostname</option>
 											<?php if (is_array($config['dyndnses']['dyndns'])): ?>
 												<?php foreach ($config['dyndnses']['dyndns'] as $ddns): ?>
 													<option value="<?php echo $ddns["host"] ?>">DynDNS: <?php echo $ddns["host"] ?></option>
 												<?php endforeach; ?>
 											<?php endif; ?>
+											<?php if (is_array($config['dnsupdates']['dnsupdate'])): ?>
+												<?php foreach ($config['dnsupdates']['dnsupdate'] as $ddns): ?>
+													<option value="<?php echo $ddns["host"] ?>">DynDNS: <?php echo $ddns["host"] ?></option>
+												<?php endforeach; ?>
+											<?php endif; ?>
 											<option value="other">Other</option>
 										</select>
 										<br />
-										<div style="display:none;" name="HostName" id="HostName">
-											<input name="useaddr_hostname" id="useaddr_hostname" />
+										<div style="display:none;" id="HostName">
+											<input name="useaddr_hostname" id="useaddr_hostname" size="40" />
 											<span class="vexpl">
 												Enter the hostname or IP address the client will use to connect to this server.
 											</span>
@@ -652,12 +624,56 @@ function useproxy_changed(obj) {
 						</td>
 					</tr>
 					<tr>
-						<td width="22%" valign="top" class="vncell">Certificate Export Options</td>
+						<td width="22%" valign="top" class="vncell">Verify Server CN</td>
 						<td width="78%" class="vtable">
-							<table border="0" cellpadding="2" cellspacing="0">
+							<table border="0" cellpadding="2" cellspacing="0" summary="verify server cn">
 								<tr>
 									<td>
-										<input name="usetoken" id="usetoken" type="checkbox" value="yes">
+										<select name="verifyservercn" id="verifyservercn" class="formselect">
+											<option value="auto">Automatic - Use verify-x509-name (OpenVPN 2.3+) where possible</option>
+											<option value="tls-remote">Use tls-remote (Deprecated, use only on old clients &lt;= OpenVPN 2.2.x)</option>
+											<option value="tls-remote-quote">Use tls-remote and quote the server CN</option>
+											<option value="none">Do not verify the server CN</option>
+										</select>
+										<br/>
+										<span class="vexpl">
+											Optionally verify the server certificate Common Name (CN) when the client connects. Current clients, including the most recent versions of Windows, Viscosity, Tunnelblick, OpenVPN on iOS and Android and so on should all work at the default automatic setting.
+											<br/><br/>Only use tls-remote if you must use an older client that you cannot control. The option has been deprecated by OpenVPN and will be removed in the next major version.
+											<br/><br/>With tls-remote the server CN may optionally be enclosed in quotes. This can help if the server CN contains spaces and certain clients cannot parse the server CN. Some clients have problems parsing the CN with quotes. Use only as needed.
+										</span>
+									</td>
+								</tr>
+							</table>
+						</td>
+					</tr>
+					<tr>
+						<td width="22%" valign="top" class="vncell">Use Random Local Port</td>
+						<td width="78%" class="vtable">
+							 <table border="0" cellpadding="2" cellspacing="0" summary="random local port">
+								<tr>
+									<td>
+										<input name="randomlocalport" id="randomlocalport" type="checkbox" value="yes" checked="CHECKED" />
+									</td>
+									<td>
+										<span class="vexpl">
+											Use a random local source port (lport) for traffic from the client. Without this set, two clients may not run concurrently.
+										</span>
+									</td>
+								</tr>
+								<tr>
+									<td colspan="2">
+										<span class="vexpl"><br/>NOTE: Not supported on older clients. Automatically disabled for Yealink and Snom configurations.</span>
+									</td>
+								</tr>
+							</table>
+					</tr>
+					<tr>
+						<td width="22%" valign="top" class="vncell">Certificate Export Options</td>
+						<td width="78%" class="vtable">
+							<table border="0" cellpadding="2" cellspacing="0" summary="export options">
+								<tr>
+									<td>
+										<input name="usetoken" id="usetoken" type="checkbox" value="yes" />
 									</td>
 									<td>
 										<span class="vexpl">
@@ -666,19 +682,19 @@ function useproxy_changed(obj) {
 									</td>
 								</tr>
 							</table>
-							<table border="0" cellpadding="2" cellspacing="0">
+							<table border="0" cellpadding="2" cellspacing="0" summary="checkbox for password">
 								<tr>
 									<td>
-										<input name="usepass" id="usepass" type="checkbox" value="yes" onClick="usepass_changed()">
+										<input name="usepass" id="usepass" type="checkbox" value="yes" onclick="usepass_changed()" />
 									</td>
 									<td>
 										<span class="vexpl">
-											Use a password to protect the pkcs12 file contents.
+											Use a password to protect the pkcs12 file contents or key in Viscosity bundle.
 										</span>
 									</td>
 								</tr>
 							</table>
-							<table border="0" cellpadding="2" cellspacing="0" id="usepass_opts" style="display:none">
+							<table border="0" cellpadding="2" cellspacing="0" id="usepass_opts" style="display:none" summary="password">
 								<tr>
 									<td align="right">
 										<span class="vexpl">
@@ -703,57 +719,70 @@ function useproxy_changed(obj) {
 						</td>
 					</tr>
 					<tr>
-						<td width="22%" valign="top" class="vncell">Use HTTP Proxy</td>
+						<td width="22%" valign="top" class="vncell">Use Proxy</td>
 						<td width="78%" class="vtable">
-							 <table border="0" cellpadding="2" cellspacing="0">
+							 <table border="0" cellpadding="2" cellspacing="0" summary="http proxy">
 								<tr>
 									<td>
-										<input name="useproxy" id="useproxy" type="checkbox" value="yes" onClick="useproxy_changed(this)">
+										<input name="useproxy" id="useproxy" type="checkbox" value="yes" onclick="useproxy_changed(this)" />
 
 									</td>
 									<td>
 										<span class="vexpl">
-											Use HTTP proxy to communicate with the server.
+											Use proxy to communicate with the server.
 										</span>
 									</td>
 								</tr>
 							</table>
-							<table border="0" cellpadding="2" cellspacing="0" id="useproxy_opts" style="display:none">
+							<table border="0" cellpadding="2" cellspacing="0" id="useproxy_opts" style="display:none" summary="user options">
 								<tr>
-									<td align="right" width='25%'>
+									<td align="right" width="25%">
+										<span class="vexpl">
+											 &nbsp;     Type :&nbsp;
+										</span>
+									</td>
+									<td>
+										<select name="useproxytype" id="useproxytype" class="formselect">
+											<option value="http">HTTP</option>
+											<option value="socks">Socks</option>
+										</select>
+									</td>
+								</tr>
+								<tr>
+									<td align="right" width="25%">
 										<span class="vexpl">
 											 &nbsp;     IP Address :&nbsp;
 										</span>
 									</td>
 									<td>
-										<input name="proxyaddr" id="proxyaddr" class="formfld unknown" size="20" value="" />
+										<input name="proxyaddr" id="proxyaddr" class="formfld unknown" size="30" value="" />
 									</td>
 								</tr>
 								<tr>
-									<td align="right" width='25%'>
+									<td align="right" width="25%">
 										<span class="vexpl">
 											 &nbsp;      Port :&nbsp;
 										</span>
+									</td>
 														<td>
 										<input name="proxyport" id="proxyport" class="formfld unknown" size="5" value="" />
 									</td>
 								</tr>
-							<br />
 								<tr>
 									<td width="25%">
-
+							<br />
 									</td>
 									<td>
-										<select name="useproxypass" id="useproxypass" class="formselect" onChange="useproxy_changed(this)">
+										<select name="useproxypass" id="useproxypass" class="formselect" onchange="useproxy_changed(this)">
 											<option value="none">none</option>
 											<option value="basic">basic</option>
 											<option value="ntlm">ntlm</option>
 										</select>
 										<span class="vexpl">
-											Choose HTTP proxy authentication if any.
+											Choose proxy authentication if any.
 										</span>
 							<br />
-							<table border="0" cellpadding="2" cellspacing="0" id="useproxypass_opts" style="display:none">
+							<table border="0" cellpadding="2" cellspacing="0" id="useproxypass_opts" style="display:none" summary="name and password">
 								<tr>
 									<td align="right" width="25%">
 										<span class="vexpl">
@@ -779,6 +808,7 @@ function useproxy_changed(obj) {
 										<span class="vexpl">
 											 &nbsp;Confirm :&nbsp;
 										</span>
+									</td>
 														<td>
 										<input name="proxyconf" id="proxyconf" type="password" class="formfld pwd" size="20" value="" />
 									</td>
@@ -790,12 +820,36 @@ function useproxy_changed(obj) {
 						</td>
 					</tr>
 					<tr>
+						<td width="22%" valign="top" class="vncell">Management&nbsp;Interface<br/>OpenVPNManager</td>
+						<td width="78%" class="vtable">
+							<table border="0" cellpadding="2" cellspacing="0" summary="openvpn manager">
+								<tr>
+									<td>
+										<input name="openvpnmanager" id="openvpnmanager" type="checkbox" value="yes" />
+									</td>
+									<td>
+										<span class="vexpl">
+											 This will change the generated .ovpn configuration to allow for usage of the management interface.
+											 And include the OpenVPNManager program in the "Windows Installers". With this OpenVPN can be used also by non-administrator users.
+											 This is also useful for Windows Vista/7/8 systems where elevated permissions are needed to add routes to the system.
+										</span>
+									</td>
+								</tr>
+								<tr>
+									<td colspan="2">
+										<span class="vexpl"><br/>NOTE: This is not currently compatible with the 64-bit OpenVPN installer. It will work with the 32-bit installer on a 64-bit system.</span>
+									</td>
+								</tr>
+							</table>
+						</td>
+					</tr>
+					<tr>
 						<td colspan="2" class="list" height="12">&nbsp;</td>
 					</tr>
 					<tr>
 						<td width="22%" valign="top" class="vncell">Additional configuration options</td>
 						<td width="78%" class="vtable">
-							<textarea rows="6" cols="78" name="advancedoptions" id="advancedoptions"></textarea><br/>
+							<textarea rows="6" cols="68" name="advancedoptions" id="advancedoptions"></textarea><br/>
 							<?=gettext("Enter any additional options you would like to add to the OpenVPN client export configuration here, separated by a line break or semicolon"); ?><br/>
 							<?=gettext("EXAMPLE: remote-random"); ?>;
 						</td>
@@ -804,27 +858,43 @@ function useproxy_changed(obj) {
 						<td colspan="2" valign="top" class="listtopic">Client Install Packages</td>
 					</tr>
 				</table>
-				<table width="100%" id="users" width="100%" border="0" cellpadding="0" cellspacing="0">
+				<table width="100%" id="users" border="0" cellpadding="0" cellspacing="0" summary="heading">
 					<tr>
 						<td width="25%" class="listhdrr"><?=gettext("User");?></td>
-						<td width="50%" class="listhdrr"><?=gettext("Certificate Name");?></td>
-						<td width="25%" class="listhdrr"><?=gettext("Export");?></td>
+						<td width="35%" class="listhdrr"><?=gettext("Certificate Name");?></td>
+						<td width="40%" class="listhdrr"><?=gettext("Export");?></td>
 					</tr>
 				</table>
-				<table width="100%" width="100%" border="0" cellpadding="5" cellspacing="10">
+				<table width="100%" border="0" cellpadding="0" cellspacing="5" summary="note">
 					<tr>
 						<td align="right" valign="top" width="5%"><?= gettext("NOTE:") ?></td>
 						<td><?= gettext("If you expect to see a certain client in the list but it is not there, it is usually due to a CA mismatch between the OpenVPN server instance and the client certificates found in the User Manager.") ?></td>
+					</tr>
+					<tr>
+						<td colspan="2"><br/><strong><?= gettext("Links to OpenVPN clients for various platforms:") ?></strong></td>
+					</tr>
+					<tr>
+						<td>&nbsp;</td>
+						<td>
+						<a href="http://openvpn.net/index.php/open-source/downloads.html"><?= gettext("OpenVPN Community Client") ?></a> - <?=gettext("Binaries for Windows, Source for other platforms. Packaged above in the Windows Installers")?>
+						<br/><a href="https://play.google.com/store/apps/details?id=de.blinkt.openvpn"><?= gettext("OpenVPN For Android") ?></a> - <?=gettext("Recommended client for Android")?>
+						<br/><a href="http://www.featvpn.com/"><?= gettext("FEAT VPN For Android") ?></a> - <?=gettext("For older versions of Android")?>
+						<br/><?= gettext("OpenVPN Connect") ?>: <a href="https://play.google.com/store/apps/details?id=net.openvpn.openvpn"><?=gettext("Android (Google Play)")?></a> or <a href="https://itunes.apple.com/us/app/openvpn-connect/id590379981"><?=gettext("iOS (App Store)")?></a> - <?= gettext("Recommended client for iOS") ?>
+						<br/><a href="http://www.sparklabs.com/viscosity/"><?= gettext("Viscosity") ?></a> - <?= gettext("Recommended client for Mac OSX") ?>
+						<br/><a href="http://code.google.com/p/tunnelblick/"><?= gettext("Tunnelblick") ?></a> - <?= gettext("Free client for OSX") ?>
+						</td>
 					</tr>
 				</table>
 			</div>
 		</td>
 	</tr>
 </table>
-<script language="JavaScript">
-<!--
+<script type="text/javascript">
+//<![CDATA[
 server_changed();
-//-->
+//]]>
 </script>
-</body>
+
 <?php include("fend.inc"); ?>
+</body>
+</html>

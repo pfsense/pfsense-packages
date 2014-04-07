@@ -6,7 +6,7 @@
 </head>
 <a href="ipblocklist_list.php"><img src="../../themes/nervecenter/images/icons/icon_alias_url_reload.gif" ALT="Manual" ALIGN=RIGHT></a>
 
-<span style="color:red">Experimental!</span> - This uses a different process to block IPs (uses IPFW) <a href="http://forum.pfsense.org/index.php/topic,24822.0.html" target="_blank"><img src="../../themes/nervecenter/images/icons/icon_log.gif"></a>
+<span style="color:red">Experimental!</span> - This uses a different process to block IPs (uses IPFW) <a href="https://forum.pfsense.org/index.php/topic,24822.0.html" target="_blank"><img src="../../themes/nervecenter/images/icons/icon_log.gif"></a>
   <br/>Enter in IP format (xx.xx.xx.xx) or CIDR format (xx.xx.xx.xx/xx)
 <br/><form method="post" action="">
 <input name="content" type="text" />

@@ -23,37 +23,37 @@
 		<url>/pkg_edit.php?xml=lcdproc.xml&amp;id=0</url>
 	</menu>
 	<additional_files_needed>
-		<item>http://www.pfsense.org/packages/config/lcdproc/lcdproc.inc</item>
+		<item>https://packages.pfsense.org/packages/config/lcdproc/lcdproc.inc</item>
 	    <prefix>/usr/local/pkg/</prefix>
 	    <chmod>0755</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
-		<item>http://www.pfsense.org/packages/config/lcdproc/lcdproc_screens.xml</item>
+		<item>https://packages.pfsense.org/packages/config/lcdproc/lcdproc_screens.xml</item>
 	    <prefix>/usr/local/pkg/</prefix>
 	    <chmod>0755</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
-		<item>http://www.pfsense.org/packages/config/lcdproc/lcdproc_client.php</item>
+		<item>https://packages.pfsense.org/packages/config/lcdproc/lcdproc_client.php</item>
 	    <prefix>/usr/local/pkg/</prefix>
 	    <chmod>0755</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
-		<item>http://www.pfsense.org/packages/config/lcdproc/bin/nexcom.so</item>
+		<item>https://files.pfsense.org/packages/lcdproc/nexcom.so</item>
 	    <prefix>/usr/local/lib/lcdproc/</prefix>
 	    <chmod>0755</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
-		<item>http://www.pfsense.org/packages/config/lcdproc/bin/SureElec.so</item>
+		<item>https://files.pfsense.org/packages/lcdproc/SureElec.so</item>
 	    <prefix>/usr/local/lib/lcdproc/</prefix>
 	    <chmod>0755</chmod>
 	</additional_files_needed>	
 	<additional_files_needed>
-		<item>http://www.pfsense.org/packages/config/lcdproc/bin/picolcd.so</item>
+		<item>https://files.pfsense.org/packages/lcdproc/picolcd.so</item>
 	    <prefix>/usr/local/lib/lcdproc/</prefix>
 	    <chmod>0755</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
-		<item>http://www.pfsense.org/packages/config/lcdproc/bin/libusb.so.2</item>
+		<item>https://files.pfsense.org/packages/lcdproc/libusb.so.2</item>
 	    <prefix>/usr/local/lib/lcdproc/</prefix>
 	    <chmod>0755</chmod>
 	</additional_files_needed>

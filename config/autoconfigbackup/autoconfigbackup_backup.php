@@ -35,28 +35,7 @@ $pfSversion = str_replace("\n", "", file_get_contents("/etc/version"));
 if(strstr($pfSversion, "1.2")) 
 	require("crypt_acb.php");
 
-// Seperator used during client / server communications
-$oper_sep			= "\|\|";
-
-// Encryption password 
-$decrypt_password 	= $config['installedpackages']['autoconfigbackup']['config'][0]['crypto_password'];
-
-// Defined username
-$username			= $config['installedpackages']['autoconfigbackup']['config'][0]['username'];
-
-// Defined password
-$password			= $config['installedpackages']['autoconfigbackup']['config'][0]['password'];
-
-// URL to restore.php
-$get_url			= "https://{$username}:{$password}@portal.pfsense.org/pfSconfigbackups/restore.php";
-
-// URL to delete.php
-$del_url			= "https://{$username}:{$password}@portal.pfsense.org/pfSconfigbackups/delete.php";
-
-// Set hostname
-$hostname			= $config['system']['hostname'] . "." . $config['system']['domain'];
-
-if(!$username) {
+if(!$config['installedpackages']['autoconfigbackup']['config'][0]['username']) {
 	Header("Location: /pkg_edit.php?xml=autoconfigbackup.xml&id=0&savemsg=Please+setup+Auto+Config+Backup");
 	exit;
 }

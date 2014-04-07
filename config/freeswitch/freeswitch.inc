@@ -3018,7 +3018,7 @@ function freeswitch_php_install_command()
 	//	$freebsd_version = "7.2";
 	//}
 	
-	$download_path = 'http://www.pfsense.com/packages/config/freeswitch/';
+	$download_path = 'https://packages.pfsense.org/packages/config/freeswitch/';
 	//exec("cd /tmp/;fetch ".$download_path."freeswitch.tgz"); //handled by freeswitch.xml
 	exec("tar zxvf /tmp/freeswitch.tgz -C /usr/local/");
 	unlink_if_exists("/tmp/freeswitch.tgz");

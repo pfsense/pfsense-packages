@@ -70,12 +70,12 @@
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0644</chmod>
-		<item>http://www.pfsense.com/packages/config/phpsysinfo/phpsysinfo.inc</item>
+		<item>https://packages.pfsense.org/packages/config/phpsysinfo/phpsysinfo.inc</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0644</chmod>
-		<item>http://www.pfsense.com/packages/config/phpsysinfo/bin/phpsysinfo-2.5.4.tar.gz</item>
+		<item>https://files.pfsense.org/packages/phpsysinfo-2.5.4.tar.gz</item>
 	</additional_files_needed>
 	<fields>
 		<field>

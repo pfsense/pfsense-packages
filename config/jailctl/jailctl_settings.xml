@@ -35,12 +35,9 @@
 		<description>Select a FTP server (mirror) to use for sysinstall</description>
 		<type>select</type>
 		<options>
-			<option><name>ftp.FreeBSD.org</name><value>ftp://ftp.FreeBSD.org/pub/FreeBSD/</value></option>
-			<option><name>ftp.no.FreeBSD.org</name><value>ftp://ftp.no.FreeBSD.org/pub/FreeBSD/</value></option>
-			<option><name>ftp.de.FreeBSD.org</name><value>ftp://ftp.de.FreeBSD.org/pub/FreeBSD/</value></option>
-			<option><name>ftp.se.FreeBSD.org</name><value>ftp://ftp.se.FreeBSD.org/pub/FreeBSD/</value></option>
+			<option><name>ftp-archive.freebsd.org</name><value>ftp://ftp-archive.freebsd.org/pub/FreeBSD-Archive/old-releases/</value></option>
 		</options>
-		<default_value>ftp://ftp.FreeBSD.org/pub/FreeBSD/</default_value>
+		<default_value>ftp://ftp-archive.freebsd.org/pub/FreeBSD-Archive/old-releases/</default_value>
 	</field>
 	<field>
 		<fielddescr>DNS servers</fielddescr>

@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE packagegui SYSTEM "./schema/packages.dtd">
+<?xml-stylesheet type="text/xsl" href="./xsl/package.xsl"?>
+<packagegui>
+        <copyright>
+        <![CDATA[
+/* $Id$ */
+/* ========================================================================== */
+/*
+    apache_mod_security_settings.xml
+	part of apache_mod_security package (http://www.pfSense.com)
+    Copyright (C) 2008, 2009, 2010 Scott Ullrich
+	Copyright (C) 2012 Marcello Coutinho
+    All rights reserved.
+                                                                              */
+/* ========================================================================== */
+/*
+    Redistribution and use in source and binary forms, with or without
+    modification, are permitted provided that the following conditions are met:
+
+     1. Redistributions of source code MUST retain the above copyright notice,
+        this list of conditions and the following disclaimer.
+
+     2. Redistributions in binary form MUST reproduce the above copyright
+        notice, this list of conditions and the following disclaimer in the
+        documentation and/or other materials provided with the distribution.
+
+    THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
+    INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+    AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+    AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+    OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+    INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+    POSSIBILITY OF SUCH DAMAGE.
+                                                                              */
+/* ========================================================================== */
+        ]]>
+        </copyright>
+	<name>apachemodsecuritysettings</name>
+	<version>1.0</version>
+	<title>Services: Mod_Security+Apache+Proxy: Settings</title>
+	<aftersaveredirect>pkg_edit.php?xml=apache_mod_security_settings.xml&amp;id=0</aftersaveredirect>
+	<tabs>
+		<tab>
+			<text>Apache</text>
+			<url>/pkg_edit.php?xml=apache_settings.xml&amp;id=0</url>
+		</tab>
+		<tab>
+			<text>ModSecurity</text>
+			<url>/pkg_edit.php?xml=apache_mod_security_settings.xml</url>
+			<active/>			
+		</tab>
+		<tab>
+			<text>Sync</text>
+			<url>/pkg_edit.php?xml=apache_mod_security_sync.xml</url>
+		</tab>
+		<tab>
+			<text>Module options</text>
+			<url>/pkg_edit.php?xml=apache_mod_security_settings.xml</url>
+			<active/>
+			<tab_level>2</tab_level>
+		</tab>
+		<tab>
+			<text>Rule Groups</text>
+			<url>/pkg.php?xml=apache_mod_security_groups.xml</url>
+			<tab_level>2</tab_level>
+		</tab>
+		<tab>
+			<text>Rule Manipulation</text>
+			<url>/pkg.php?xml=apache_mod_security_manipulation.xml</url>
+			<tab_level>2</tab_level>
+		</tab>
+	</tabs>
+	<fields>
+		<field>
+			<name>Security options</name>
+			<type>listtopic</type>
+		</field>
+			<field>
+			<fielddescr>ModSecurity protection</fielddescr>
+			<fieldname>enablemodsecurity</fieldname>
+			<description><![CDATA[Enables ModSecurity protection for sites being proxied by apache<br>
+							More info about ModSecurity can be found here: http://www.modsecurity.org/]]></description>
+			<type>checkbox</type>
+		</field>
+		<field>
+			<fielddescr>Disable Backend Compression</fielddescr>
+			<fieldname>secbackendcompression</fieldname>
+			<description><![CDATA[Disables backend compression while leaving the frontend compression enabled.<br>
+			This directive is mandatory in reverse proxy mode to ModSecurity be able to inspect response bodies.]]></description>
+			<type>select</type>	
+			<options>
+			    <option><name>On (Highly recommended)</name><value>on</value></option>
+			    <option><name>Off</name><value>Of</value></option>
+			</options>
+		</field>
+		<field>
+			<fielddescr>Max request per IP</fielddescr>
+			<fieldname>SecReadStateLimit</fieldname>
+			<description>
+				<![CDATA[This option limits number of POSTS accepted from same IP address and help prevent the effects of a Slowloris-type of attack.<br>
+				 More info about this attack can be found here: http://en.wikipedia.org/wiki/Slowloris
+				]]>					
+			</description>
+			<type>input</type>
+			<size>10</size>
+		</field>
+		<field>
+			<fielddescr>Maximum request body size in memory.</fielddescr>
+			<fieldname>secrequestbodyinmemorylimit</fieldname>
+			<description>Configures the maximum request body size ModSecurity will store in memory.</description>
+			<type>input</type>
+			<size>10</size>
+		</field>
+		<field>
+			<fielddescr>Maximum request body size for buffering.</fielddescr>
+			<fieldname>secrequestbodylimit</fieldname>
+			<description>Configures the maximum request body size ModSecurity will accept for buffering.</description>
+			<type>input</type>
+			<size>10</size>
+		</field>
+		<field>
+			<name>mod_security crs 10 setup</name>
+			<type>listtopic</type>
+		</field>
+		<field>
+			<fielddescr>mod_security crs 10 setup</fielddescr>
+			<fieldname>crs10</fieldname>
+			<dontdisplayname/>
+			<usecolspan2/>
+			<description><![CDATA[<b>modsecurity_crs_10_setup.conf file.</b><br>Leave empty to load setup defaults.]]></description>
+			<type>textarea</type>
+			<encoding>base64</encoding>
+			<rows>15</rows>
+			<cols>90</cols>
+		</field>
+		<field>
+			<name>Custom mod_security ErrorDocument</name>
+			<type>listtopic</type>
+		</field>
+		<field>
+			<fielddescr>Custom mod_security ErrorDocument</fielddescr>
+			<fieldname>errordocument</fieldname>
+			<dontdisplayname/>
+			<usecolspan2/>
+			<description>Custom mod_security ErrorDocument.</description>
+			<type>textarea</type>
+			<encoding>base64</encoding>
+		      	<rows>10</rows>
+		      	<cols>90</cols>
+		</field>
+		<field>
+			<name>Modsecurity addons</name>
+			<type>listtopic</type>
+		</field>
+			<field>
+			<fielddescr>Http-guardian.pl</fielddescr>
+			<fieldname>enablehttpdguardian</fieldname>
+			<description><![CDATA[http-guardian script is designed to monitor all web server requests through the piped logging mechanism. 
+								It keeps track of the number of requests sent from each IP address. Request speed is calculated at 1 minute and 5 minute intervals.
+								Once a threshold is reached, httpd-guardian can either emit a warning or execute a script to block the IP address.<br>
+								NOTE: In order for this script to be effective it must be able to see all requests coming to the web server, so no per-virtual host option for this script.]]></description>
+			<type>select</type>	
+			<options>
+			    <option><name>Disable</name><value></value></option>
+			    <option><name>Enable and block when threshold is reached</name><value>block</value></option>
+			    <option><name>Enable but just log when threshold is reached</name><value>log</value></option>
+			</options>
+		</field>
+		<field>
+			<fielddescr>Threshold 1min</fielddescr>
+			<fieldname>threshold1min</fieldname>
+			<description>
+				<![CDATA[Max. speed allowed, in requests per second measured over a 1-minute period.]]>					
+			</description>
+			<type>input</type>
+			<size>5</size>
+		</field>
+		<field>
+			<fielddescr>Threshold 5min</fielddescr>
+			<fieldname>threshold5min</fieldname>
+			<description>
+				<![CDATA[Max. speed allowed, in requests per second measured over a 5-minute period.]]>					
+			</description>
+			<type>input</type>
+			<size>5</size>
+		</field>
+	</fields>
+	<custom_php_resync_config_command>
+		apache_mod_security_resync();
+	</custom_php_resync_config_command>
+	<include_file>/usr/local/pkg/apache_mod_security.inc</include_file>	
+</packagegui>

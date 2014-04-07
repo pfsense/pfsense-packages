@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE packagegui SYSTEM "./schema/packages.dtd">
+<?xml-stylesheet type="text/xsl" href="./xsl/package.xsl"?>
+<packagegui>
+        <copyright>
+        <![CDATA[
+/* $Id$ */
+/* ========================================================================== */
+/*
+    bind_zone.xml
+    part of pfSense (http://www.pfSense.com)
+    part of the Bind package for pfSense
+    Copyright (C) 2013 Juliano Oliveira/Adriano Brancher
+    All rights reserved.
+
+    Based on m0n0wall (http://m0n0.ch/wall)
+    Copyright (C) 2003-2006 Manuel Kasper <mk@neon1.net>.
+    All rights reserved.
+                                                                              */
+/* ========================================================================== */
+/*
+    Redistribution and use in source and binary forms, with or without
+    modification, are permitted provided that the following conditions are met:
+
+     1. Redistributions of source code must retain the above copyright notice,
+        this list of conditions and the following disclaimer.
+
+     2. Redistributions in binary form must reproduce the above copyright
+        notice, this list of conditions and the following disclaimer in the
+        documentation and/or other materials provided with the distribution.
+
+    THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
+    INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+    AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+    AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+    OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+    INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+    POSSIBILITY OF SUCH DAMAGE.
+                                                                              */
+/* ========================================================================== */
+        ]]>
+        </copyright>
+    <description>Describe your package here</description>
+    <requirements>Describe your package requirements here</requirements>
+    <faq>Currently there are no FAQ items provided.</faq>
+	<name>bindviews</name>
+	<version>0.1.0</version>
+	<title>Bind: Views Settings</title>
+	<include_file>/usr/local/pkg/bind.inc</include_file>
+	<menu>
+		<name>Bind Server</name>
+		<tooltiptext></tooltiptext>
+		<section>Services</section>
+		<configfile>bind.xml</configfile>
+	</menu>
+	        <tabs>
+                <tab>
+                        <text>Settings</text>
+                        <url>/pkg_edit.php?xml=bind.xml</url>
+                </tab>
+                <tab>
+                        <text>ACLs</text>
+                        <url>/pkg.php?xml=bind_acls.xml</url>
+                </tab>
+                <tab>
+                        <text>Views</text>
+                        <url>/pkg.php?xml=bind_views.xml</url>
+                        <active/>
+                </tab>
+                <tab>
+                        <text>Zones</text>
+                        <url>/pkg.php?xml=bind_zones.xml</url>
+                </tab>
+                <tab>
+                        <text>Sync</text>
+                         <url>/pkg_edit.php?xml=bind_sync.xml</url>
+                </tab>
+        </tabs>
+	<configpath>['installedpackages']['bindviews']['config']</configpath>
+	<adddeleteeditpagefields>
+		<columnitem>
+			<fielddescr>View</fielddescr>
+			<fieldname>name</fieldname>
+		</columnitem>
+		<columnitem>
+			<fielddescr>Description</fielddescr>
+			<fieldname>description</fieldname>
+		</columnitem>
+		<movable>on</movable>
+	</adddeleteeditpagefields>
+	<fields>
+		<field>
+			<fielddescr>View Name</fielddescr>
+			<fieldname>name</fieldname>
+			<description>Enter the name of the View.</description>
+			<type>input</type>
+			<required/>
+		</field>
+		<field>
+			<fielddescr>Description</fielddescr>
+			<fieldname>description</fieldname>
+			<description>Enter a description of the View.</description>
+			<type>input</type>
+		</field>
+		<field>
+           <fielddescr>Recursion</fielddescr>
+           <fieldname>recursion</fieldname>
+           <description>A recursive query occurs when your DNS server is queried for a domain that it currently knows nothing about, in which case it will try to resolve the given host by performing further queries (eg by starting at the root servers and working out, or by simply passing the request to yet another DNS server).</description>
+           <type>select</type>
+	       <options>
+			<option><name>No</name><value>no</value></option>
+			<option><name>Yes</name><value>yes</value></option>
+		   </options>
+		</field>
+		<field>
+			<fielddescr>Match-clients</fielddescr>
+			<fieldname>match-clients</fieldname>
+			<description>If either or both of match-clients are missing they default to any (all hosts match). The match-clients statement defines the address_match_list for the source IP address of the incoming messages.</description>
+			<type>select_source</type>
+			<source><![CDATA[$config['installedpackages']['bindacls']['config']]]></source>
+			<source_name>name</source_name>
+			<source_value>name</source_value>
+			<multiple/>
+			<size>03</size>
+		</field>
+		<field>
+			<fielddescr>Allow-recursion</fielddescr>
+			<fieldname>allow-recursion</fieldname>
+			<description>For example, if you have one DNS server serving your local network, you may want all of your local computers to use your DNS server.</description>
+	    	<type>select_source</type>
+			<source><![CDATA[$config['installedpackages']['bindacls']['config']]]></source>
+			<source_name>name</source_name>
+			<source_value>name</source_value>
+			<multiple/>
+			<size>03</size>
+		</field>
+		<field>
+                        <type>listtopic</type>
+                        <name>Custom Views </name>
+                        <fieldname>temp</fieldname>
+                </field>
+	        <field>
+                        <fielddescr>Custom Options</fielddescr>
+                        <fieldname>bind_custom_options</fieldname>
+                        <description>You can put your own custom options here, separated by semi-colons (;).</description>
+                        <type>textarea</type>
+                        <cols>65</cols>
+                        <rows>8</rows>
+                        <encoding>base64</encoding>
+                </field>
+	</fields>
+        <custom_php_command_before_form>
+        </custom_php_command_before_form>
+	<custom_delete_php_command>
+	</custom_delete_php_command>	
+        <custom_php_resync_config_command>
+	        bind_sync();
+        </custom_php_resync_config_command>
+</packagegui>

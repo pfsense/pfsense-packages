@@ -1,0 +1,255 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE packagegui SYSTEM "./schema/packages.dtd">
+<?xml-stylesheet type="text/xsl" href="./xsl/package.xsl"?>
+<packagegui>
+        <copyright>
+        <![CDATA[
+/* ========================================================================== */
+/*
+    pfblocker_lists.xml
+    part of pfSense (http://www.pfSense.com)
+    Copyright (C) 2010 Scott Ullrich <sullrich@gmail.com>
+    Copyright (C) 2011 Marcello Coutinho
+    
+    All rights reserved.                                                      
+*/
+/* ========================================================================== */
+/*
+    Redistribution and use in source and binary forms, with or without
+    modification, are permitted provided that the following conditions are met:
+
+
+     1. Redistributions of source code must retain the above copyright notice,
+        this list of conditions and the following disclaimer.
+
+
+     2. Redistributions in binary form must reproduce the above copyright
+        notice, this list of conditions and the following disclaimer in the
+        documentation and/or other materials provided with the distribution.
+
+
+    THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
+    INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+    AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+    AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+    OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+    INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+    POSSIBILITY OF SUCH DAMAGE.
+                                                                              */
+/* ========================================================================== */
+        ]]>
+        </copyright>
+    <description>Describe your package here</description>
+    <requirements>Describe your package requirements here</requirements>
+    <faq>Currently there are no FAQ items provided.</faq>
+	<name>pfblockerlists</name>
+	<version>1.0</version>
+	<title>Firewall: pfBlocker</title>
+	<include_file>/usr/local/pkg/pfblocker.inc</include_file>
+	<menu>
+		<name>pfBlocker </name>
+		<tooltiptext></tooltiptext>
+		<section>Firewall</section>
+		<configfile>pfblocker_lists.xml</configfile>
+	</menu>
+<tabs>
+		<tab>
+			<text>General</text>
+			<url>/pkg_edit.php?xml=pfblocker.xml&amp;id=0</url>
+		</tab>
+		<tab>
+			<text>Lists</text>
+			<url>/pkg.php?xml=pfblocker_lists.xml</url>
+			<active/>
+		</tab>
+
+
+		<tab>
+			<text>Top Spammers</text>
+			<url>/pkg_edit.php?xml=pfblocker_topspammers.xml&amp;id=0</url>
+		</tab>
+
+
+		<tab>
+			<text>Africa</text>
+			<url>/pkg_edit.php?xml=pfblocker_Africa.xml&amp;id=0</url>
+
+
+		</tab>
+		<tab>
+			<text>Asia</text>
+			<url>/pkg_edit.php?xml=pfblocker_Asia.xml&amp;id=0</url>
+
+
+		</tab>
+		<tab>
+			<text>Europe</text>
+			<url>/pkg_edit.php?xml=pfblocker_Europe.xml&amp;id=0</url>
+		</tab>
+		<tab>
+			<text>North America</text>
+			<url>/pkg_edit.php?xml=pfblocker_NorthAmerica.xml&amp;id=0</url>
+		</tab>
+		<tab>
+			<text>Oceania</text>
+			<url>/pkg_edit.php?xml=pfblocker_Oceania.xml&amp;id=0</url>
+		</tab>
+		<tab>
+			<text>South America</text>
+			<url>/pkg_edit.php?xml=pfblocker_SouthAmerica.xml&amp;id=0</url>
+		</tab>
+		<tab>
+			<text>XMLRPC Sync</text>
+			<url>/pkg_edit.php?xml=pfblocker_sync.xml&amp;id=0</url>
+		</tab>
+</tabs>
+	<adddeleteeditpagefields>
+		<columnitem>
+			<fielddescr>Alias</fielddescr>
+			<fieldname>aliasname</fieldname>
+		</columnitem>	
+		<columnitem>
+			<fielddescr>Description</fielddescr>
+			<fieldname>description</fieldname>
+		</columnitem>	
+
+
+		<columnitem>
+			<fielddescr>Action</fielddescr>
+			<fieldname>action</fieldname>
+		</columnitem>
+				<columnitem>
+			<fielddescr>Update Frequency</fielddescr>
+			<fieldname>cron</fieldname>
+		</columnitem>
+	</adddeleteeditpagefields>
+	<fields>
+		<field>
+			<name>Network ranges / CIDR lists</name>
+			<type>listtopic</type>
+	</field>
+			<field>
+			<fielddescr>Alias Name</fielddescr>
+			<fieldname>aliasname</fieldname>
+			<description><![CDATA[Enter lists Alias Names.<br>	
+								  Example: Badguys<br>
+								  Do not include pfBlocker name, it's done by package.<br>
+								  <strong>International, special or space characters will be ignored in firewall alias names.</strong><br>]]></description>
+			<type>input</type>
+			<size>20</size>
+		</field>	
+			<field>
+			<fielddescr>List Description</fielddescr>
+			<fieldname>description</fieldname>
+			<type>input</type>
+			<size>90</size>
+		</field>	
+		<field>
+			<fielddescr><![CDATA[Lists]]></fielddescr>
+			<fieldname>none</fieldname>
+			<description><![CDATA['Format' - Choose the file format that URL will retrieve or local file format.<br>
+								  'URL or local file' - Add direct link to list (Example: <a target=_new href='http://list.iblocklist.com/?list=bt_ads&fileformat=p2p&archiveformat=gz'>Ads</a>,
+																	<a target=_new href='http://list.iblocklist.com/?list=bt_spyware&fileformat=p2p&archiveformat=gz'>Spyware</a>,
+																	<a target=_new href='http://list.iblocklist.com/?list=bt_proxy&fileformat=p2p&archiveformat=gz'>Proxies</a> )<br> 
+									<br><strong>Note: </strong><br>
+									Compressed lists must be in gz format.<br>
+									Downloaded or local file must have only one network per line and could follows PeerBlock syntax	or this below:<br>
+									Network ranges: <strong>172.16.1.0-172.16.1.255</strong><br>
+									IP Address: <strong>172.16.1.10</strong><br>
+									CIDR: <strong>172.16.1.0/24</strong>
+								   ]]></description>
+			<type>rowhelper</type>
+			<rowhelper>
+			<rowhelperfield>
+			<fielddescr>Format</fielddescr>
+			<fieldname>format</fieldname>
+	    	<type>select</type>
+ 				<options>
+				<option><name>gz</name><value>gz</value></option>
+				<option><name>txt</name><value>txt</value></option>
+				</options>
+			</rowhelperfield>	
+			<rowhelperfield>
+				<fielddescr>URL or localfile</fielddescr>
+				<fieldname>url</fieldname>
+				<type>input</type>
+				<size>75</size>
+			</rowhelperfield>
+			</rowhelper>
+		</field>
+			<field>
+			<fielddescr>List Action</fielddescr>
+		<description><![CDATA[Default:<strong>Deny Inbound</strong><br>
+						Select action for network on lists you have selected.<br><br>
+						<strong>'Deny' Rules:</strong><br>
+						'Deny' rules create high priority 'block' or 'reject' rules on the stated interfaces. They don't change the 'pass' rules on other interfaces. Typical uses of 'Deny' rules are:<br>
+						<ul><li><strong>Deny Both</strong> - blocks all traffic in both directions, if the source or destination IP is in the block list</li>
+						<li><strong>Deny Inbound/Deny Outbound</strong> - blocks all traffic in one direction <u>unless</u> it is part of a session started by traffic sent in the other direction. Does not affect traffic in the other direction. </li>
+						<li>One way 'Deny' rules can be used to selectively block <u>unsolicited</u> incoming (new session) packets in one direction, while still allowing <u>deliberate</u> outgoing sessions to be created in the other direction.</li></ul>
+						<strong>'Permit' Rules:</strong><br>
+						'Permit' rules create high priority 'pass' rules on the stated interfaces. They are not the opposite of Deny rules, and don't create any 'blocking' effect anywhere. They have priority over all Deny rules. Typical uses of 'Permit' rules are:<br>
+						<ul><li><strong>To ensure</strong> that traffic to/from the listed IPs will <u>always</u> be allowed in the stated directions. They override <u>almost all other</u> Firewall rules on the stated interfaces.</li>
+						<li><strong>To act as a whitelist</strong> for Deny rule exceptions, for example if a large IP range or pre-created blocklist blocks a few IPs that should be accessible.</li></ul>
+						<strong>'Alias' and 'Disabled' Rules:</strong><br>
+						<ul><li><strong>'Alias'</strong> rules create an <a href="/firewall_aliases.php">alias</a> for the list (and do nothing else). This enables a Pfblocker list to be used by name, in any firewall rule or Pfsense function, as desired.</li>
+						<li><strong>'Disabled'</strong> rules are kept for future use, but nothing is done with them.</li></ul><br>
+						<strong>While creating rules with this list, keep aliasname in the beginning of rule description and do not end description with 'rule'.</strong> Custom rules with 'Aliasname something rule' description will be removed by package.]]></description>
+			<fieldname>action</fieldname>
+	    	<type>select</type>
+ 				<options>
+				<option><name>Deny Inbound</name><value>Deny_Inbound</value></option>
+				<option><name>Deny Outbound</name><value>Deny_Outbound</value></option>
+				<option><name>Deny Both</name><value>Deny_Both</value></option>
+				<option><name>Permit Inbound</name><value>Permit_Inbound</value></option>
+				<option><name>Permit Outbound</name><value>Permit_Outbound</value></option>
+				<option><name>Permit Both</name><value>Permit_Both</value></option>
+				<option><name>Alias only</name><value>Alias_only</value></option>			
+				<option><name>Disabled</name><value>Disabled</value></option>
+				</options>
+			</field>
+			<field>
+			<fielddescr>Update frequency</fielddescr>
+			<fieldname>cron</fieldname>
+			<description><![CDATA[Default:<strong>Never</strong><br>
+							Select how often List files will be downloaded]]></description>
+	    	<type>select</type>
+ 				<options>
+ 				<option><name>Never</name><value>Never</value></option>
+ 				<option><name>Every Hour</name><value>01hour</value></option>
+				<option><name>Every 4 Hours</name><value>04hours</value></option>
+				<option><name>Every 12 Hours</name><value>12hours</value></option>
+				<option><name>Once a day</name><value>EveryDay</value></option>
+				</options>
+		</field>
+			<field>
+			<name>Custom list</name>
+			<type>listtopic</type>
+		</field>
+		<field>
+			<fielddescr>CIDR</fielddescr>
+			<fieldname>custom</fieldname>
+			<description><![CDATA[Enter networks you want to include in this alias. One network per line in CIDR format.<br>	
+								  Example: 192.168.1.0/24]]></description>
+			<type>textarea</type>
+			<cols>50</cols>
+			<rows>10</rows>
+			<encoding>base64</encoding>
+		</field>
+		</fields>
+	<custom_php_install_command>
+		pfblocker_php_install_command();
+	</custom_php_install_command>
+	<custom_php_deinstall_command>
+		pfblocker_php_deinstall_command();
+	</custom_php_deinstall_command>
+	<custom_php_validation_command>
+		pfblocker_validate_input($_POST, &amp;$input_errors);
+	</custom_php_validation_command>	
+	<custom_php_resync_config_command>
+		sync_package_pfblocker();
+	</custom_php_resync_config_command>	
+</packagegui>
+

@@ -103,7 +103,7 @@ if($_POST['spamtrapemail'] <> "") {
 }
 
 if($_GET['getstatus'] <> "") {
-	$status = exec("/usr/local/sbin/spamdb | grep \"{$_GET['getstatus']}\"");
+	$status = exec("/usr/local/sbin/spamdb | grep " . escapeshellarg($_GET['getstatus']));
 	if(stristr($status, "WHITE") == true) {
 		echo "WHITE";
 	} else if(stristr($status, "TRAPPED") == true) {

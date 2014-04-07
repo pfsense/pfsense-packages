@@ -5,11 +5,11 @@
 	<copyright>
 	<![CDATA[
 /* $Id$ */
-/* ========================================================================== */
+/* ========================================================================== */post	
 /*
     postfix.xml
     part of the Postfix package for pfSense
-    Copyright (C) 2010 Marcello Coutinho
+    Copyright (C) 2011-2013 Marcello Coutinho
     All rights reserved.            
                                                                   */
 /* ========================================================================== */
@@ -17,10 +17,10 @@
     Redistribution and use in source and binary forms, with or without
     modification, are permitted provided that the following conditions are met:
 
-     1. Redistributions of source code must retain the above copyright notice,
+     1. Redistributions of source code MUST retain the above copyright notice,
         this list of conditions and the following disclaimer.
 
-     2. Redistributions in binary form must reproduce the above copyright
+     2. Redistributions in binary form MUST reproduce the above copyright
         notice, this list of conditions and the following disclaimer in the
         documentation and/or other materials provided with the distribution.
 
@@ -51,73 +51,49 @@
 		<section>Services</section>
 		<url>pkg_edit.php?xml=postfix.xml&amp;id=0</url>
 	</menu>
-	<service>
-		<name>postfix</name>
-		<rcfile>postfix.sh</rcfile>
-		<executable>master</executable>
-	</service>
-	<additional_files_needed>
-		<item>http://www.pfsense.org/packages/config/postfix/postfix.inc</item>
-		<prefix>/usr/local/pkg/</prefix>
-		<chmod>0755</chmod>
-	</additional_files_needed>
-	<additional_files_needed>
-		<item>http://www.pfsense.org/packages/config/postfix/postfix_acl.xml</item>
-		<prefix>/usr/local/pkg/</prefix>
-		<chmod>0755</chmod>
-	</additional_files_needed>
-	<additional_files_needed>
-		<item>http://www.pfsense.org/packages/config/postfix/postfix_recipients.xml</item>
-		<prefix>/usr/local/pkg/</prefix>
-		<chmod>0755</chmod>
-	</additional_files_needed>
-	<additional_files_needed>
-		<item>http://www.pfsense.org/packages/config/postfix/postfix_antispam.xml</item>
-		<prefix>/usr/local/pkg/</prefix>
-		<chmod>0755</chmod>
-	</additional_files_needed>
-
-		<additional_files_needed>
-		<item>http://www.pfsense.org/packages/config/postfix/postfix_sync.xml</item>
-		<prefix>/usr/local/pkg/</prefix>
-		<chmod>0755</chmod>
-	</additional_files_needed>
-		<additional_files_needed>
-		<item>http://www.pfsense.org/packages/config/postfix/postfix_view_config.php</item>
-		<prefix>/usr/local/www/</prefix>
-		<chmod>0755</chmod>
-	</additional_files_needed>
-	<additional_files_needed>
-		<item>http://www.pfsense.org/packages/config/postfix/postfix_recipients.php</item>
-		<prefix>/usr/local/www/</prefix>
-		<chmod>0755</chmod>
-	</additional_files_needed>
-		<tabs>
+<tabs>
 		<tab>
 			<text>General</text>
 			<url>/pkg_edit.php?xml=postfix.xml&amp;id=0</url>
 		</tab>
 		<tab>
-			<text>ACLs / Filter Maps</text>
-			<url>/pkg_edit.php?xml=postfix_acl.xml&amp;id=0</url>
-			<active/>
+			<text>Domains</text>
+			<url>/pkg_edit.php?xml=postfix_domains.xml&amp;id=0</url>
 		</tab>
 		<tab>
-			<text>Valid recipients</text>
+			<text>Recipients</text>
 			<url>/pkg_edit.php?xml=postfix_recipients.xml&amp;id=0</url>
+		</tab>
+		<tab>
+			<text>Access Lists</text>
+			<url>/pkg_edit.php?xml=postfix_acl.xml&amp;id=0</url>
+			<active/>
 		</tab>
 		<tab>
 			<text>Antispam</text>
 			<url>/pkg_edit.php?xml=postfix_antispam.xml&amp;id=0</url>
 		</tab>
 		<tab>
-			<text>XMLRPC Sync</text>
+			<text>Sync</text>
 			<url>/pkg_edit.php?xml=postfix_sync.xml&amp;id=0</url>
 		</tab>		
 		<tab>
-			<text>View config files</text>
+			<text>View config</text>
 			<url>/postfix_view_config.php</url>
 		</tab>
+		<tab>
+			<text>Search mail</text>
+			<url>/postfix_search.php</url>
+		</tab>
+		<tab>
+			<text>Queue</text>
+			<url>/postfix_queue.php</url>
+		</tab>
+		<tab>
+			<text>About</text>
+			<url>/postfix_about.php</url>
+		</tab>
+		
 	</tabs>
 	<fields>
 		<field>
@@ -134,7 +110,39 @@
 								See http://www.postfix.org/header_checks.5.html for more help]]>
 			</description>
 			<type>textarea</type>
-			<cols>83</cols>
+			<cols>80</cols>
+			<rows>15</rows>
+			<encoding>base64</encoding>
+		</field>
+		<field>
+			<fielddescr>Helo</fielddescr>
+			<fieldname>helo_maps</fieldname>
+			<description><![CDATA[<strong>PCRE filters</strong><a href=http://www.postfix.org/pcre_table.5.html> that are applied to initial message helo info. Hint:<br>
+								/^tmpstr.*/ REJECT<br>
+								/^myserver.local/ REJECT external server with local domain info<br>
+								/^trusted_network.local/ DUNNO trusted remote misconfigured server<br>
+								See http://www.postfix.org/postconf.5.html#smtpd_helo_restrictions for more help]]>
+			</description>
+			<type>textarea</type>
+			<cols>80</cols>
+			<rows>15</rows>
+			<encoding>base64</encoding>
+		</field>
+		<field>
+			<fielddescr>Sender</fielddescr>
+			<fieldname>sender_access</fieldname>
+			<description><![CDATA[<strong>HASH filters</strong> that implements whitelisting and blacklisting of full or partial email addresses and domains as specified in the MAIL FROM field :<br>
+									myfriend@example.com    DUNNO<br>
+									junk@spam.com           REJECT<br>
+									marketing@              REJECT<br>
+									theboss@                DUNNO<br>
+									deals.marketing.com     REJECT<br>
+									somedomain.com          DUNNO<br><br>
+								See http://www.postfix.org/postconf.5.html#smtpd_sender_restrictions for more help<br>
+								<strong>Note: a result of "OK" in this field is not allowed/wanted for safety reasons(it may accept forged senders as it will not do other spam checks). Instead, use DUNNO in order to exclude specific hosts from blacklists.</strong>]]>
+			</description>
+			<type>textarea</type>
+			<cols>80</cols>
 			<rows>15</rows>
 			<encoding>base64</encoding>
 		</field>
@@ -146,7 +154,7 @@
 								/^Content-(Disposition|Type):\s+.+?(?:file)?name="?.+?\.(386|ad[ept]|drv|em(ai)?l|ex[_e]|xms|\{[\da-f]{8}(?:-[\da-f]{4}){3}-[\da-f]{12}\})\b/ REJECT ".$2" file attachment types not allowed]]>
 			</description>
 			<type>textarea</type>
-			<cols>83</cols>
+			<cols>80</cols>
 			<rows>15</rows>
 			<encoding>base64</encoding>
 		</field>
@@ -158,7 +166,7 @@
        							~^[[:alnum:]+/]{60,}$~          OK]]>
 			</description>
 			<type>textarea</type>
-			<cols>83</cols>
+			<cols>80</cols>
 			<rows>15</rows>
 			<encoding>base64</encoding>
 		</field>
@@ -168,6 +176,19 @@
 			<type>listtopic</type>
 		</field>
 		<field>
+			<fielddescr>MyNetworks</fielddescr>
+			<fieldname>mynetworks</fieldname>
+			<description><![CDATA[<a href='http://www.postfix.org/postconf.5.html#mynetworks'>Paste the list of "trusted" SMTP clients that have more privileges than "strangers" one per line.</a><br>
+								In particular, "trusted" SMTP clients are allowed to relay mail through Postfix. See the smtpd_recipient_restrictions parameter description in the postconf(5) manual.Hint:<br>192.168.0.3<br>
+								192.168.1.0/24]]>
+			</description>
+			<type>textarea</type>
+			<cols>60</cols>
+			<rows>10</rows>
+			<encoding>base64</encoding>
+		</field>
+
+		<field>
 			<fielddescr>CIDR</fielddescr>
 			<fieldname>cal_cidr</fieldname>
 			<description><![CDATA[Paste your client access list in CIDR format(standard ip/domain and action) one per line.<br>
@@ -175,8 +196,8 @@
 								192.168.3.2 OK<br>spammer.junkdomain.com REJECT]]>
 			</description>
 			<type>textarea</type>
-			<cols>83</cols>
-			<rows>15</rows>
+			<cols>60</cols>
+			<rows>10</rows>
 			<encoding>base64</encoding>
 		</field>
 		<field>
@@ -188,8 +209,8 @@
   							/.*\.adsl\..*/ REJECT DSLs not allowed]]>
 			</description>
 			<type>textarea</type>
-			<cols>83</cols>
-			<rows>15</rows>
+			<cols>70</cols>
+			<rows>10</rows>
 			<encoding>base64</encoding>
 		</field>
 	</fields>

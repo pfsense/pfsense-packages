@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE packagegui SYSTEM "./schema/packages.dtd">
+<?xml-stylesheet type="text/xsl" href="./xsl/package.xsl"?>
+<packagegui>
+        <copyright>
+        <![CDATA[
+/* $Id$ */
+/* ========================================================================== */
+/*
+    tinc.xml
+    part of pfSense (http://www.pfSense.com)
+    Copyright (C) 2007-2008 Scott Ullrich
+    All rights reserved.
+                                                                              */
+/* ========================================================================== */
+/*
+    Redistribution and use in source and binary forms, with or without
+    modification, are permitted provided that the following conditions are met:
+
+     1. Redistributions of source code must retain the above copyright notice,
+        this list of conditions and the following disclaimer.
+
+     2. Redistributions in binary form must reproduce the above copyright
+        notice, this list of conditions and the following disclaimer in the
+        documentation and/or other materials provided with the distribution.
+
+    THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
+    INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+    AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+    AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+    OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+    INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+    POSSIBILITY OF SUCH DAMAGE.
+                                                                              */
+/* ========================================================================== */
+        ]]>
+        </copyright>
+    <description>A self-contained VPN solution designed to connect multiple sites together in a secure way.</description>
+    <requirements>Describe your package requirements here</requirements>
+    <faq>Currently there are no FAQ items provided.</faq>
+	<name>tinc</name>
+	<version>1.0.21 v1.1</version>
+	<title>VPN: tinc</title>
+	<!-- Menu is where this packages menu will appear -->
+	<menu>
+		<name>tinc</name>
+		<tooltiptext>tinc is a mesh VPN daemon.</tooltiptext>
+		<section>VPN</section>
+		<configfile>tinc_config.xml</configfile>
+		<url>/pkg_edit.php?xml=tinc_config.xml</url>
+	</menu>
+	<menu>
+		<name>tincd</name>
+		<tooltiptext>Status of tinc VPN Daemon</tooltiptext>
+		<section>Status</section>
+		<url>/status_tinc.php</url>
+	</menu>
+	
+	<additional_files_needed>
+		<prefix>/usr/local/pkg/</prefix>
+		<chmod>0644</chmod>
+		<item>https://packages.pfsense.org/packages/config/tinc/tinc.inc</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/pkg/</prefix>
+		<chmod>0644</chmod>
+		<item>https://packages.pfsense.org/packages/config/tinc/tinc_config.xml</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/pkg/</prefix>
+		<chmod>0644</chmod>
+		<item>https://packages.pfsense.org/packages/config/tinc/tinc_hosts.xml</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/www/</prefix>
+		<chmod>0755</chmod>
+		<item>https://packages.pfsense.org/packages/config/tinc/status_tinc.php</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/www/shortcuts/</prefix>
+		<chmod>0644</chmod>
+		<item>https://packages.pfsense.org/packages/config/tinc/pkg_tinc.inc</item>
+	</additional_files_needed>
+         
+	<service>
+	  <name>tinc</name>
+	  <rcfile>tinc.sh</rcfile>
+	  <executable>tincd</executable>
+	  <description>tinc mesh VPN</description>
+	</service>
+	<include_file>/usr/local/pkg/tinc.inc</include_file>
+
+	<custom_php_install_command>
+		tinc_install();
+	</custom_php_install_command>
+	<custom_php_deinstall_command>
+		tinc_deinstall();
+	</custom_php_deinstall_command>
+
+</packagegui>

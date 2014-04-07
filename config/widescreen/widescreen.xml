@@ -10,57 +10,57 @@
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/widescreen/</prefix>
 		<chmod>077</chmod>
-		<item>http://www.pfsense.org/packages/config/widescreen/widescreen.inc</item>
+		<item>https://packages.pfsense.org/packages/config/widescreen/widescreen.inc</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/widescreen/</prefix>
 		<chmod>644</chmod>
-		<item>http://www.pfsense.org/packages/config/widescreen/bin/all.css_</item>
+		<item>https://packages.pfsense.org/packages/config/widescreen/bin/all.css_</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/widescreen/</prefix>
 		<chmod>644</chmod>
-		<item>http://www.pfsense.org/packages/config/widescreen/bin/fbegin.inc_</item>
+		<item>https://packages.pfsense.org/packages/config/widescreen/bin/fbegin.inc_</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/widescreen/</prefix>
 		<chmod>644</chmod>
-		<item>http://www.pfsense.org/packages/config/widescreen/bin/fend.inc_</item>
+		<item>https://packages.pfsense.org/packages/config/widescreen/bin/fend.inc_</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/widescreen/</prefix>
 		<chmod>644</chmod>
-		<item>http://www.pfsense.org/packages/config/widescreen/bin/footer-left.png</item>
+		<item>https://packages.pfsense.org/packages/config/widescreen/bin/footer-left.png</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/widescreen/</prefix>
 		<chmod>644</chmod>
-		<item>http://www.pfsense.org/packages/config/widescreen/bin/footer-middle.png</item>
+		<item>https://packages.pfsense.org/packages/config/widescreen/bin/footer-middle.png</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/widescreen/</prefix>
 		<chmod>644</chmod>
-		<item>http://www.pfsense.org/packages/config/widescreen/bin/footer-right.png</item>
+		<item>https://packages.pfsense.org/packages/config/widescreen/bin/footer-right.png</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/widescreen/</prefix>
 		<chmod>644</chmod>
-		<item>http://www.pfsense.org/packages/config/widescreen/bin/header-mid.png</item>
+		<item>https://packages.pfsense.org/packages/config/widescreen/bin/header-mid.png</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/widescreen/</prefix>
 		<chmod>644</chmod>
-		<item>http://www.pfsense.org/packages/config/widescreen/bin/horiz-left.png</item>
+		<item>https://packages.pfsense.org/packages/config/widescreen/bin/horiz-left.png</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/widescreen/</prefix>
 		<chmod>644</chmod>
-		<item>http://www.pfsense.org/packages/config/widescreen/bin/horiz-right.png</item>
+		<item>https://packages.pfsense.org/packages/config/widescreen/bin/horiz-right.png</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/widescreen/</prefix>
 		<chmod>644</chmod>
-		<item>http://www.pfsense.org/packages/config/widescreen/bin/index.php_</item>
+		<item>https://packages.pfsense.org/packages/config/widescreen/bin/index.php_</item>
 	</additional_files_needed>
 	<custom_php_install_command>
 		widescreen_custom_php_install_command();

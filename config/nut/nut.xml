@@ -7,7 +7,7 @@
 /* $Id$ */
 /* ========================================================================== */
 /*
-    authng.xml
+    nut.xml
     part of pfSense (http://www.pfSense.com)
     Copyright (C) 2007 to whom it may belong
     All rights reserved.
@@ -46,7 +46,7 @@
     <requirements>Describe your package requirements here</requirements>
     <faq>Currently there are no FAQ items provided.</faq>
 	<name>nut</name>
-	<version>2.0.4</version>
+	<version>2.6.4 pkg 2.0</version>
 	<title>Services: NUT</title>
 	<savetext>Change</savetext>
 	<aftersaveredirect>/status_nut.php</aftersaveredirect>
@@ -61,6 +61,7 @@
 		<name>nut</name>
 		<rcfile>nut.sh</rcfile>
 		<executable>upsmon</executable>
+		<description>UPS monitoring daemon</description>
 	</service>
 	<tabs>
 		<tab>
@@ -76,12 +77,12 @@
 	<additional_files_needed>
 	    <prefix>/usr/local/pkg/</prefix>
 	    <chmod>0755</chmod>
-		<item>http://www.pfsense.com/packages/config/nut/nut.inc</item>
+		<item>https://packages.pfsense.org/packages/config/nut/nut.inc</item>
 	</additional_files_needed>
 	<additional_files_needed>
 	    <prefix>/usr/local/www/</prefix>
 	    <chmod>0755</chmod>
-		<item>http://www.pfsense.com/packages/config/nut/status_nut.php</item>
+		<item>https://packages.pfsense.org/packages/config/nut/status_nut.php</item>
 	</additional_files_needed>
 	<fields>
 		<field>
@@ -122,7 +123,8 @@
 			<type>listtopic</type>
 		</field>
 		<field>
-			<fielddescr>Remote Access Address &lt;br&gt;(ex: 192.168.1.0/24)</fielddescr>
+			<fielddescr>Remote Access Address</fielddescr>
+			<description>&lt;strong&gt;NOTE: Previous versions of NUT supported internal ACLs, these no longer work. The new default is to bind to localhost ONLY - you should add NAT rules for the NUT port (3493) to allow remote access. This field no longer has any effect, but was left intact for reference.&lt;/strong&gt;</description>
 			<fieldname>allowaddr</fieldname>
 			<type>input</type>
 		</field>
@@ -295,6 +297,10 @@
 				<option>
 					<name>Fiskars 9200 UPS Information Unit</name>
 					<value>upscode204</value>
+				</option>
+				<option>
+					<name>Generic USB UPS (Blazer)</name>
+					<value>blazer_usb01</value>
 				</option>
 				<option>
 					<name>Inform GUARD Line Interactive</name>
@@ -597,6 +603,10 @@
 				<option>
 					<name>pw</name>
 					<value>pw</value>
+				</option>
+				<option>
+					<name>cyberpower</name>
+					<value>cyberpower</value>
 				</option>
 			</options>
 		</field>

@@ -57,7 +57,7 @@
 	<additional_files_needed>
 		<prefix>/usr/local/www/</prefix>
 		<chmod>077</chmod>
-		<item>http://www.pfsense.com/packages/config/rrd-summary/status_rrd_summary.php</item>
+		<item>https://packages.pfsense.org/packages/config/rrd-summary/status_rrd_summary.php</item>
 	</additional_files_needed>
 	<custom_php_deinstall_command>
 		<![CDATA[

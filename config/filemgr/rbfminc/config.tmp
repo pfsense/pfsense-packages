@@ -89,7 +89,7 @@ if( !get_magic_quotes_gpc() ){
 //END Protect against GLOBALS tricks
 /***********************************/
 //if($username == 'admin' and $password == 'admin'){
-	//$security_issues = "<div align='center' style='color: red;'><b>Security issue</b>: Please change your username or password</div>";
+	//$security_issues = "<div align=\"center\" style=\"color: red;\"><b>Security issue</b>: Please change your username or password</div>";
 //}
 $security_issues = "<br />";
 ?>

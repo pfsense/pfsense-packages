@@ -9,7 +9,7 @@
 		    part of the Unbound package for pfSense (http://www.pfSense.com)
 		    Copyright (C) 2011 Warren Baker
 		    All rights reserved.
-		                                                       						  */
+		*/
 		/* ========================================================================== */
 		/*
 		    Redistribution and use in source and binary forms, with or without
@@ -34,13 +34,13 @@
 		    POSSIBILITY OF SUCH DAMAGE.
 		                                                                              */
 		/* ========================================================================== */
-		        ]]>
+		]]>
 	</copyright>
 	<description>Unbound is a validating, recursive, and caching DNS resolver.</description>
 	<requirements/>
 	<faq/>
 	<name>unbound</name>
-	<version>1.4.8</version>
+	<version>1.4.20_5</version>
 	<title>Services: Unbound DNS Forwarder: Basic Settings</title>
 	<include_file>/usr/local/pkg/unbound.inc</include_file>
 	<menu>
@@ -58,24 +58,31 @@
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0644</chmod>
-		<item>http://www.pfsense.org/packages/config/unbound/unbound.inc</item>
+		<item>https://packages.pfsense.org/packages/config/unbound/unbound.inc</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/www/</prefix>
 		<chmod>0644</chmod>
-		<item>http://www.pfsense.org/packages/config/unbound/unbound_status.php</item>
+		<item>https://packages.pfsense.org/packages/config/unbound/unbound_status.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/www/</prefix>
 		<chmod>0644</chmod>
-		<item>http://www.pfsense.org/packages/config/unbound/unbound_acls.php</item>
+		<item>https://packages.pfsense.org/packages/config/unbound/unbound_acls.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0644</chmod>
-		<item>http://www.pfsense.org/packages/config/unbound/unbound_advanced.xml</item>
+		<item>https://packages.pfsense.org/packages/config/unbound/unbound_advanced.xml</item>
 	</additional_files_needed>
-	
+	<additional_files_needed>
+		<prefix>/usr/local/bin/</prefix>
+		<chmod>0755</chmod>
+		<item>https://packages.pfsense.org/packages/config/unbound/unbound_monitor.sh</item>
+	</additional_files_needed>
+	<system_services>
+		<dns/>
+	</system_services>
 	<tabs>
 		<tab>
 			<text>Unbound DNS Settings</text>
@@ -102,7 +109,7 @@
 			<type>listtopic</type>
 		</field>
 		<field>
-			<fieldname>unbound_status</fieldname>
+			<fieldname>enable</fieldname>
 			<fielddescr>Enable Unbound</fielddescr>
 			<description>Enable the use of Unbound as your DNS forwarder.</description>
 			<type>checkbox</type>
@@ -110,9 +117,19 @@
 		<field>
 			<fielddescr>Network interface</fielddescr>
 			<fieldname>active_interface</fieldname>
-			<description>The network interface(s) the Unbound DNS server will query from.</description>
+			<description>The network interface(s) the Unbound DNS server will listen on.</description>
 			<type>interfaces_selection</type>
 			<required/>
+			<default_value>wan</default_value>
+			<multiple/>
+		</field>
+		<field>
+			<fielddescr>Query interfaces</fielddescr>
+			<fieldname>query_interface</fieldname>
+			<description>Utilize different network interface(s) that Unbound DNS server will use to send queries to authoritative servers and receive their replies. &lt;br/&gt;
+				&lt;b&gt;Note:&lt;/b&gt; If a query interface is not selected then the default of all interfaces will be used.
+				</description>
+			<type>interfaces_selection</type>
 			<default_value>wan</default_value>
 			<multiple/>
 		</field>
@@ -128,7 +145,7 @@
 			<fieldname>forwarding_mode</fieldname>
 			<fielddescr>Enable forwarding mode</fielddescr>
 			<description>Configure the server to make use of the DNS servers configured in &lt;a href="system.php"&gt;System: General setup&lt;/a&gt;. &lt;br/&gt;
-						&lt;b&gt;Note:&lt;/b&gt; Disabling this will cause Unbound to perform DNS queries without 
+						&lt;b&gt;Note:&lt;/b&gt; Disabling this will cause Unbound to perform DNS queries without
 						using the upstream configured DNS servers.</description>
 			<type>checkbox</type>
 			<default_value>on</default_value>

@@ -47,7 +47,7 @@ function global_write_squid_config()
     $active_interface      = $config['installedpackages']['squid']['config'][0]['active_interface'];
     $transparent_proxy     = $config['installedpackages']['squid']['config'][0]['transparent_proxy'];
     $log_enabled           = $config['installedpackages']['squid']['config'][0]['log_enabled'];
-    $urlfier_enable        = $config['installedpackages']['squid']['config'][0]['urlfilter_enable'];
+    $urlfilter_enable      = $config['installedpackages']['squid']['config'][0]['urlfilter_enable'];
     $accesslog_disabled    = $config['installedpackages']['squid']['config'][0]['accesslog_disabled'];
     $log_query_terms       = $config['installedpackages']['squid']['config'][0]['log_query_terms'];
     $log_user_agents       = $config['installedpackages']['squid']['config'][0]['log_user_agents'];
@@ -560,7 +560,7 @@ function global_write_squid_config()
 
 		$config_array[] = 'acl pf_banned_ip src "/usr/local/etc/squid/advanced/acls/src_banned_ip.acl"' . "\n";
 	}
-	unset($banned_ip_addr);
+	unset($banned_ip_array);
 	unset($banned_ip_addr);
 	unset($ind_banned_ip);
 
@@ -803,7 +803,7 @@ function custom_php_install_command() {
 		touch("/tmp/custom_php_install_command");
 
 		/*    make sure this all exists, see:
-		 *    http://forum.pfsense.org/index.php?topic=23.msg2391#msg2391
+		 *    https://forum.pfsense.org/index.php?topic=23.msg2391#msg2391
 		 */
 		update_output_window("Setting up Squid environment...");
 		mwexec("mkdir -p /var/squid");

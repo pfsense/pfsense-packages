@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE packagegui SYSTEM "./schema/packages.dtd">
+<?xml-stylesheet type="text/xsl" href="./xsl/package.xsl"?>
+<packagegui>
+        <copyright>
+        <![CDATA[
+/* $Id$ */
+/* ========================================================================== */
+/*
+    apache_mod_security_settings.xml
+	part of apache_mod_security package (http://www.pfSense.com)
+    Copyright (C) 2008, 2009, 2010 Scott Ullrich
+    Copyright (C) 2012 Marcello Coutinho
+    All rights reserved.
+                                                                              */
+/* ========================================================================== */
+/*
+    Redistribution and use in source and binary forms, with or without
+    modification, are permitted provided that the following conditions are met:
+
+     1. Redistributions of source code MUST retain the above copyright notice,
+        this list of conditions and the following disclaimer.
+
+     2. Redistributions in binary form MUST reproduce the above copyright
+        notice, this list of conditions and the following disclaimer in the
+        documentation and/or other materials provided with the distribution.
+
+    THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
+    INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+    AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+    AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+    OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+    INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+    POSSIBILITY OF SUCH DAMAGE.
+                                                                              */
+/* ========================================================================== */
+        ]]>
+        </copyright>
+	<name>apachemodsecuritygroups</name>
+	<version>1.0</version>
+	<title>Services: Mod_Security+Apache+Proxy: Settings</title>
+	<tabs>
+		<tab>
+			<text>Apache</text>
+			<url>/pkg_edit.php?xml=apache_settings.xml&amp;id=0</url>
+		</tab>
+		<tab>
+			<text>ModSecurity</text>
+			<url>/pkg_edit.php?xml=apache_mod_security_settings.xml</url>
+			<active/>			
+		</tab>
+		<tab>
+			<text>Sync</text>
+			<url>/pkg_edit.php?xml=apache_mod_security_sync.xml</url>
+		</tab>
+		<tab>
+			<text>Module options</text>
+			<url>/pkg_edit.php?xml=apache_mod_security_settings.xml</url>
+			<tab_level>2</tab_level>
+		</tab>
+		<tab>
+			<text>Rule Groups</text>
+			<url>/pkg.php?xml=apache_mod_security_groups.xml</url>
+			<tab_level>2</tab_level>
+			<active/>
+		</tab>
+		<tab>
+			<text>Rule Manipulation</text>
+			<url>/pkg.php?xml=apache_mod_security_manipulation.xml</url>
+			<tab_level>2</tab_level>
+		</tab>
+	</tabs>
+	<adddeleteeditpagefields>
+		<movable>on</movable>
+		<columnitem>
+			<fielddescr>Name</fielddescr>
+			<fieldname>name</fieldname>
+		</columnitem>
+		<columnitem>
+			<fielddescr>Logging</fielddescr>
+			<fieldname>secauditengine</fieldname>
+		</columnitem>
+		<columnitem>
+			<fielddescr>Description</fielddescr>
+			<fieldname>description</fieldname>
+		</columnitem>
+
+	</adddeleteeditpagefields>
+	<fields>
+		<field>
+			<name>Modsecurity group options</name>
+			<type>listtopic</type>
+		</field>
+		<field>
+			<fielddescr>Name</fielddescr>
+			<fieldname>name</fieldname>
+			<description>Enter group name</description>
+			<type>input</type>
+			<size>25</size>
+			<required/>
+		</field>
+		<field>
+			<fielddescr>Description</fielddescr>
+			<fieldname>description</fieldname>
+			<description>Enter group description</description>
+			<type>input</type>
+			<size>45</size>
+		</field>
+
+		<field>
+			<fielddescr>Base Rules</fielddescr>
+			<fieldname>baserules</fieldname>
+			<description><![CDATA[Select Modsecurity Base rules to apply (all are recommended)<br>
+							Use CTRL + click to select.]]></description>
+	    	<type>select_source</type>
+			<source><![CDATA[$config['installedpackages']['modsecurityfilesbase']['config']]]></source>
+			<source_name>file</source_name>
+			<source_value>file</source_value>
+			<multiple/>
+			<size>10</size>
+		</field>
+		<field>
+			<fielddescr>Optional Rules</fielddescr>
+			<fieldname>optionalrules</fieldname>
+			<description><![CDATA[Select Modsecurity Optional rules to apply<br>
+							Use CTRL + click to select.]]></description>
+	    	<type>select_source</type>
+			<source><![CDATA[$config['installedpackages']['modsecurityfilesoptional']['config']]]></source>
+			<source_name>file</source_name>
+			<source_value>file</source_value>
+			<multiple/>
+			<size>10</size>
+		</field>
+		<field>
+			<fielddescr>SLR Rules</fielddescr>
+			<fieldname>slrrules</fieldname>
+			<description><![CDATA[Select Modsecurity SLR rules to apply<br>
+							Use CTRL + click to select.]]></description>
+	    	<type>select_source</type>
+			<source><![CDATA[$config['installedpackages']['modsecurityfilesslr']['config']]]></source>
+			<source_name>file</source_name>
+			<source_value>file</source_value>
+			<multiple/>
+			<size>10</size>
+		</field>
+		<field>
+			<fielddescr>Experimental Rules</fielddescr>
+			<fieldname>experimentalrules</fieldname>
+			<description><![CDATA[Select Modsecurity Experimental rules to apply<br>
+							Use CTRL + click to select.]]></description>
+	    	<type>select_source</type>
+			<source><![CDATA[$config['installedpackages']['modsecurityfilesexperimental']['config']]]></source>
+			<source_name>file</source_name>
+			<source_value>file</source_value>
+			<multiple/>
+			<size>10</size>
+		</field>
+		<field>
+			<name>Modsecurity Logging options</name>
+			<type>listtopic</type>
+		</field>
+		<field>
+			<fielddescr>Logging engine.</fielddescr>
+			<fieldname>secauditengine</fieldname>
+			<description>Configures ModSecurity audit logging engine.</description>
+			<type>select</type>	
+			<options>
+			    <option><name>RelevantOnly</name><value>RelevantOnly</value></option>
+			    <option><name>All</name><value>On</value></option>
+			    <option><name>Off</name><value>Off</value></option>
+			</options>
+		</field>
+		<field>
+			<fielddescr>Debug log file.</fielddescr>
+			<fieldname>SecDebugLogLevel</fieldname>
+			<description><![CDATA[Configures the verboseness of the debug log data.<br>
+							High logging levels are not recommended in production as it affects performance.]]>
+			</description>
+			<type>select</type>	
+			<options>
+			    <option><name>No logging (Default for performance)</name><value>0</value></option>
+			    <option><name>Errors (intercepted requests) only</name><value>1</value></option>
+			    <option><name>Warnings</name><value>2</value></option>
+			    <option><name>Notices (Recommended for logging)</name><value>3</value></option>
+			    <option><name>Details of how transactions are handled</name><value>4</value></option>
+			    <option><name>As above, but including information about each piece of information handled</name><value>5</value></option>
+			    <option><name>log everything, including very detailed debugging information</name><value>9</value></option>
+			</options>
+		</field>
+		<field>
+			<name>Custom mod_security rules</name>
+			<type>listtopic</type>
+		</field>
+		<field>
+			<fielddescr>Custom mod_security rules</fielddescr>
+			<fieldname>modsecuritycustom</fieldname>
+			<dontdisplayname/>
+			<usecolspan2/>
+			<description>Paste any custom mod_security rules that you would like to use</description>
+			<type>textarea</type>
+			<encoding>base64</encoding>
+		      	<rows>10</rows>
+		      	<cols>90</cols>
+		</field>
+	</fields>
+	<custom_php_resync_config_command>
+		apache_mod_security_resync();
+	</custom_php_resync_config_command>
+	<include_file>/usr/local/pkg/apache_mod_security.inc</include_file>	
+</packagegui>

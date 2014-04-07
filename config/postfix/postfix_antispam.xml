@@ -52,59 +52,22 @@
 		<section>Services</section>
 		<url>pkg_edit.php?xml=postfix_antispam.xml&amp;id=0</url>
 	</menu>
-	<service>
-		<name>postfix</name>
-		<rcfile>postfix.sh</rcfile>
-		<executable>master</executable>
-	</service>
-	<additional_files_needed>
-		<item>http://www.pfsense.org/packages/config/postfix/postfix.inc</item>
-		<prefix>/usr/local/pkg/</prefix>
-		<chmod>0755</chmod>
-	</additional_files_needed>
-	<additional_files_needed>
-		<item>http://www.pfsense.org/packages/config/postfix/postfix_acl.xml</item>
-		<prefix>/usr/local/pkg/</prefix>
-		<chmod>0755</chmod>
-	</additional_files_needed>
-	<additional_files_needed>
-		<item>http://www.pfsense.org/packages/config/postfix/postfix_recipients.xml</item>
-		<prefix>/usr/local/pkg/</prefix>
-		<chmod>0755</chmod>
-	</additional_files_needed>
-	<additional_files_needed>
-		<item>http://www.pfsense.org/packages/config/postfix/postfix_antispam.xml</item>
-		<prefix>/usr/local/pkg/</prefix>
-		<chmod>0755</chmod>
-	</additional_files_needed>
-
-		<additional_files_needed>
-		<item>http://www.pfsense.org/packages/config/postfix/postfix_sync.xml</item>
-		<prefix>/usr/local/pkg/</prefix>
-		<chmod>0755</chmod>
-	</additional_files_needed>
-		<additional_files_needed>
-		<item>http://www.pfsense.org/packages/config/postfix/postfix_view_config.php</item>
-		<prefix>/usr/local/www/</prefix>
-		<chmod>0755</chmod>
-	</additional_files_needed>
-	<additional_files_needed>
-		<item>http://www.pfsense.org/packages/config/postfix/postfix_recipients.php</item>
-		<prefix>/usr/local/www/</prefix>
-		<chmod>0755</chmod>
-	</additional_files_needed>
 <tabs>
 		<tab>
 			<text>General</text>
 			<url>/pkg_edit.php?xml=postfix.xml&amp;id=0</url>
 		</tab>
 		<tab>
-			<text>ACLs / Filter Maps</text>
-			<url>/pkg_edit.php?xml=postfix_acl.xml&amp;id=0</url>
+			<text>Domains</text>
+			<url>/pkg_edit.php?xml=postfix_domains.xml&amp;id=0</url>
 		</tab>
 		<tab>
-			<text>Valid recipients</text>
+			<text>Recipients</text>
 			<url>/pkg_edit.php?xml=postfix_recipients.xml&amp;id=0</url>
+		</tab>
+		<tab>
+			<text>Access Lists</text>
+			<url>/pkg_edit.php?xml=postfix_acl.xml&amp;id=0</url>
 		</tab>
 		<tab>
 			<text>Antispam</text>
@@ -112,13 +75,26 @@
 			<active/>
 		</tab>
 		<tab>
-			<text>XMLRPC Sync</text>
+			<text>Sync</text>
 			<url>/pkg_edit.php?xml=postfix_sync.xml&amp;id=0</url>
 		</tab>
 		<tab>
-			<text>View config files</text>
+			<text>View config</text>
 			<url>/postfix_view_config.php</url>
 		</tab>
+		<tab>
+			<text>Search mail</text>
+			<url>/postfix_search.php</url>
+		</tab>
+		<tab>
+			<text>Queue</text>
+			<url>/postfix_queue.php</url>
+		</tab>
+		<tab>
+			<text>About</text>
+			<url>/postfix_about.php</url>
+		</tab>
+
 </tabs>
 	<fields>
 		<field>
@@ -133,13 +109,21 @@
 				<option><name>Strong</name><value>strong</value></option>
 				<option><name>Basic</name><value>basic</value></option>
 			</options>
-			<description>Enable sender, client, recipients and rfc verification</description>
+			<description><![CDATA[<strong>Default: Strong</strong><br>
+								Enable sender, client, recipients and rfc verification.<br>]]></description>
+		</field>
+		<field>
+			<fielddescr>Helo Hostname</fielddescr>
+			<fieldname>reject_unknown_helo_hostname</fieldname>
+			<type>checkbox</type>
+			<description><![CDATA[<strong>Default: Checked</strong><br>
+								Reject unknow helo hostname during smtp communication.]]></description>
 		</field>
 		<field>
 			<fielddescr>Zombie blocker</fielddescr>
 			<fieldname>zombie_blocker</fieldname>
 			<description>
-			<![CDATA[<a target=_new href='http://www.postfix.org/POSTSCREEN_README.html'>Use postfix 2.8 Postscreen feature to detect zombie spammers</a>]]>
+			<![CDATA[<strong>Default: Enabled with enforce</strong><br><a target=_new href='http://www.postfix.org/POSTSCREEN_README.html'>Use postfix 2.8 Postscreen feature to detect zombie spammers</a>]]>
 			</description>
 	    	<type>select</type>
  				<options>
@@ -154,7 +138,7 @@
 			<fieldname>greet_time</fieldname>
 			<type>input</type>
 			<size>10</size>
-			<description><![CDATA[<strong>syntax: 2,6s&nbsp;&nbsp;&nbsp;</strong>(default: up to 2 seconds under stress, up to 6 seconds otherwise)<br>
+			<description><![CDATA[<strong>Default: up to 2 seconds under stress, up to 6 seconds otherwises</strong><br>syntax: 2,6s<br>
 								The amount of time that postscreen will wait for an SMTP client to send a command before its turn, and for DNS blocklist lookup results to arrive .<br>
 								Specify a non-zero time value (an integral value plus an optional one-letter suffix that specifies the time unit).<br>
 								Time units: s (seconds), m (minutes), h (hours), d (days), w (weeks).]]>
@@ -186,9 +170,21 @@
 				<option><name>Enabled</name><value>enabled</value></option>
 				<option><name>Disabled</name><value>disabled</value></option>
 				</options>
-			<description><![CDATA[Safety net to keep mail queued that would otherwise be returned to the sender.<br>
+			<description><![CDATA[<strong>Default: Enabled only in postscreen</strong><br>Safety net to keep mail queued that would otherwise be returned to the sender.<br>
 								This parameter disables locally-generated bounces, and prevents the Postfix SMTP server from rejecting mail permanently, by changing 5xx reply codes into 4xx.<br>
 								However, soft_bounce is no cure for address rewriting mistakes or mail routing mistakes.]]>
+			</description>
+		</field>
+		<field>
+			<fielddescr>Anvil Daemon</fielddescr>
+			<fieldname>anvil</fieldname>
+			<type>select</type>
+ 				<options>
+				<option><name>Enabled only when using postscreen</name><value>postscreen</value></option>
+ 				<option><name>Enabled</name><value>enabled</value></option>
+				<option><name>Disabled</name><value>disabled</value></option>
+				</options>
+			<description><![CDATA[anvil - <a href='http://www.postfix.org/anvil.8.html'>Postfix session count and request rate control.</a><br>You can disable it if your server relays mail from internal clients to internet.]]>
 			</description>
 		</field>
 		<field>
@@ -196,7 +192,7 @@
 			<fieldname>rbl_servers</fieldname>
 			<description><![CDATA[
                         <strong>THIS IS JUST AN EXAMPLE, CHECK IF ANY LIST YOU CHOOSE IS PAID OR FREE!</strong><BR>
-			ex: dnsbl.sorbs.net, bl.spamcop.net*2, dnslb.local*-5, b.barracudacentral.org, dnsbl.invaluement.com<BR>
+			ex: dnsbl.sorbs.net, bl.spamcop.net*2, dnslb.local*-5, cbl.abuseat.org, b.barracudacentral.org<BR>
 			Check some rbl servers at http://www.anti-abuse.org/multi-rbl-check/<br><br>
 			You can also create a local rbl dns server to whitelist some hosts/domains<br>
 			See how it works in http://www.postfix.org/postconf.5.html#postscreen_dnsbl_sites]]>
@@ -208,7 +204,7 @@
 		<field>
 			<fielddescr>RBL threshold</fielddescr>
 			<fieldname>rbl_threshold</fieldname>
-			<description>How many RBL Lists Postscreen must find clien's ip address to block sender.</description>
+			<description><![CDATA[<strong>Default: 2</strong><br>How many RBL Lists Postscreen must find clien's ip address to block sender.]]></description>
 	    	<type>select</type>
  				<options>
 				<option><name>1</name><value>1</value></option>
@@ -223,13 +219,13 @@
 			<fieldname>postfix_spf</fieldname>
 			<type>select</type>
  				<options>
-				<option><name>REJECT the mail when the sender credentials FAILS (Recomended)</name><value>reject_spf_invalid_sender</value></option>
+				<option><name>REJECT the mail when the sender credentials FAILS</name><value>reject_spf_invalid_sender</value></option>
 				<option><name>PERMIT the mail when the sender credentials SUCCEED</name><value>permit_spf_valid_sender</value></option>
 				<option><name>Just show in header that the mail failed the test</name><value>spf_mark_only</value></option>
 				<option><name>Do not check SPF records</name><value>disable</value></option>
 				</options>
 			<description>
-			<![CDATA[<a target=_new href='http://www.openspf.org/Introduction'>The Sender Policy Framework (SPF) is an open standard specifying a technical method to prevent sender address forgery.</a>]]>
+			<![CDATA[<strong>Default: REJECT the mail when the sender credentials FAILS</strong><br><a target=_new href='http://www.openspf.org/Introduction'>The Sender Policy Framework (SPF) is an open standard specifying a technical method to prevent sender address forgery.</a>]]>
 			</description>
 		</field>
 		<field>
@@ -241,6 +237,22 @@
 			<fieldname>antispam_enabled</fieldname>
 			<type>checkbox</type>
 			<description></description>
+		</field>
+		<field>
+			<fielddescr>Message Hold mode</fielddescr>
+			<fieldname>hold_mode</fieldname>
+			<description><![CDATA[Select how postfix will hold messages to mailscanner.<br>
+								When using auto mode, postfix will hold all messages.<br>
+								When using manual mode, include options like this in acl headers:<br>
+								/^to:.*admin@mydomain.com/ OK<br>
+								/^from:.*user@extdomain.com/ OK<br>
+								/^from:/ HOLD<br>
+								/^to:.*@mydomain.com/ HOLD]]></description>
+	    	<type>select</type>
+ 				<options>
+				<option><name>Auto mode</name><value>auto</value></option>
+				<option><name>Manual mode using ACLs</name><value>manual</value></option>
+				</options>
 		</field>
 		<field>
 			<fielddescr>Software</fielddescr>

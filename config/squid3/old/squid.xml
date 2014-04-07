@@ -1,0 +1,342 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE packagegui SYSTEM "../schema/packages.dtd">
+<?xml-stylesheet type="text/xsl" href="../xsl/package.xsl"?>
+<packagegui>
+        <copyright>
+        <![CDATA[
+/* $Id$ */
+/* ========================================================================== */
+/*
+    authng.xml
+    part of pfSense (http://www.pfSense.com)
+    Copyright (C) 2007 to whom it may belong
+    All rights reserved.
+
+    Based on m0n0wall (http://m0n0.ch/wall)
+    Copyright (C) 2003-2006 Manuel Kasper <mk@neon1.net>.
+    All rights reserved.
+                                                                              */
+/* ========================================================================== */
+/*
+    Redistribution and use in source and binary forms, with or without
+    modification, are permitted provided that the following conditions are met:
+
+     1. Redistributions of source code must retain the above copyright notice,
+        this list of conditions and the following disclaimer.
+
+     2. Redistributions in binary form must reproduce the above copyright
+        notice, this list of conditions and the following disclaimer in the
+        documentation and/or other materials provided with the distribution.
+
+    THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
+    INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+    AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+    AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+    OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+    INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+    POSSIBILITY OF SUCH DAMAGE.
+                                                                              */
+/* ========================================================================== */
+        ]]>
+        </copyright>
+    <description>Describe your package here</description>
+    <requirements>Describe your package requirements here</requirements>
+    <faq>Currently there are no FAQ items provided.</faq>
+	<name>squid</name>
+	<version>2.6.STABLE18</version>
+	<title>Proxy server: General settings</title>
+	<include_file>/usr/local/pkg/squid.inc</include_file>
+	<menu>
+		<name>Proxy server</name>
+		<tooltiptext>Modify the proxy server's settings</tooltiptext>
+		<section>Services</section>
+		<url>/pkg_edit.php?xml=squid.xml&amp;id=0</url>
+	</menu>
+	<service>
+		<name>squid</name>
+		<rcfile>squid.sh</rcfile>
+		<executable>squid</executable>
+		<description>Proxy server Service</description>
+	</service>
+	<tabs>
+		<tab>
+			<text>General</text>
+			<url>/pkg_edit.php?xml=squid.xml&amp;id=0</url>
+			<active/>
+		</tab>
+		<tab>
+			<text>Upstream Proxy</text>
+			<url>/pkg_edit.php?xml=squid_upstream.xml&amp;id=0</url>
+		</tab>
+		<tab>
+			<text>Cache Mgmt</text>
+			<url>/pkg_edit.php?xml=squid_cache.xml&amp;id=0</url>
+		</tab>
+		<tab>
+			<text>Access Control</text>
+			<url>/pkg_edit.php?xml=squid_nac.xml&amp;id=0</url>
+		</tab>
+		<tab>
+			<text>Traffic Mgmt</text>
+			<url>/pkg_edit.php?xml=squid_traffic.xml&amp;id=0</url>
+		</tab>
+		<tab>
+			<text>Auth Settings</text>
+			<url>/pkg_edit.php?xml=squid_auth.xml&amp;id=0</url>
+		</tab>
+		<tab>
+			<text>Local Users</text>
+			<url>/pkg.php?xml=squid_users.xml</url>
+		</tab>
+	</tabs>
+	<!-- Installation -->
+	<additional_files_needed>
+	    <prefix>/usr/local/pkg/</prefix>
+	    <chmod>0755</chmod>
+		<item>https://packages.pfsense.org/packages/config/squid3/squid.inc</item>
+	</additional_files_needed>
+	<additional_files_needed>
+	    <prefix>/usr/local/pkg/</prefix>
+	    <chmod>0755</chmod>
+		<item>https://packages.pfsense.org/packages/config/squid3/squid_cache.xml</item>
+	</additional_files_needed>
+	<additional_files_needed>
+	    <prefix>/usr/local/pkg/</prefix>
+	    <chmod>0755</chmod>
+		<item>https://packages.pfsense.org/packages/config/squid3/squid_nac.xml</item>
+	</additional_files_needed>
+	<additional_files_needed>
+	    <prefix>/usr/local/pkg/</prefix>
+	    <chmod>0755</chmod>
+		<item>https://packages.pfsense.org/packages/config/squid3/squid_ng.xml</item>
+	</additional_files_needed>
+	<additional_files_needed>
+	    <prefix>/usr/local/pkg/</prefix>
+	    <chmod>0755</chmod>
+		<item>https://packages.pfsense.org/packages/config/squid3/squid_traffic.xml</item>
+	</additional_files_needed>
+	<additional_files_needed>
+	    <prefix>/usr/local/pkg/</prefix>
+	    <chmod>0755</chmod>
+		<item>https://packages.pfsense.org/packages/config/squid3/squid_upstream.xml</item>
+	</additional_files_needed>
+	<additional_files_needed>
+	    <prefix>/usr/local/pkg/</prefix>
+	    <chmod>0755</chmod>
+		<item>https://packages.pfsense.org/packages/config/squid3/squid_auth.xml</item>
+	</additional_files_needed>
+	<additional_files_needed>
+	    <prefix>/usr/local/pkg/</prefix>
+	    <chmod>0755</chmod>
+		<item>https://packages.pfsense.org/packages/config/squid3/squid_users.xml</item>
+	</additional_files_needed>
+	<additional_files_needed>
+	    <prefix>/usr/local/etc/rc.d/</prefix>
+	    <chmod>0755</chmod>
+		<item>https://packages.pfsense.org/packages/config/squid3/proxy_monitor.sh</item>
+	</additional_files_needed>
+	<additional_files_needed>
+	    <prefix>/usr/local/pkg/</prefix>
+	    <chmod>0755</chmod>
+		<item>https://packages.pfsense.org/packages/config/squid3/squid_cache.xml</item>
+	</additional_files_needed>
+	<fields>
+		<field>
+			<fielddescr>Proxy interface</fielddescr>
+			<fieldname>active_interface</fieldname>
+			<description>The interface(s) the proxy server will bind to.</description>
+			<type>interfaces_selection</type>
+			<required/>
+			<default_value>lan</default_value>
+			<multiple/>
+		</field>
+		<field>
+			<fielddescr>Allow users on interface</fielddescr>
+			<fieldname>allow_interface</fieldname>
+			<description>If this field is checked, the users connected to the interface selected in the 'Proxy interface' field will be allowed to use the proxy, i.e., there will be no need to add the interface's subnet to the list of allowed subnets. This is just a shortcut.</description>
+			<type>checkbox</type>
+			<required/>
+			<default_value>on</default_value>
+		</field>
+		<field>
+			<fielddescr>Transparent proxy</fielddescr>
+			<fieldname>transparent_proxy</fieldname>
+			<description>If transparent mode is enabled, all requests for destination port 80 will be forwarded to the proxy server without any additional configuration necessary.</description>
+			<type>checkbox</type>
+			<enablefields>private_subnet_proxy_off,defined_ip_proxy_off,defined_ip_proxy_off_dest</enablefields>			
+			<required/>
+		</field>
+		<field>
+			<fielddescr>Bypass proxy for Private Address Space (RFC 1918) destination</fielddescr>
+			<fieldname>private_subnet_proxy_off</fieldname>
+			<description>Do not forward traffic to Private Address Space (RFC 1918) &lt;b&gt;destination&lt;/b&gt; through the proxy server but directly through the firewall.</description>
+			<type>checkbox</type>
+		</field>
+		<field>
+			<fielddescr>Bypass proxy for these source IPs</fielddescr>
+			<fieldname>defined_ip_proxy_off</fieldname>
+			<description>Do not forward traffic from these &lt;b&gt;source&lt;/b&gt; IPs, hostnames, or aliases through the proxy server but directly through the firewall. Separate by semi-colons (;). [Applies only to transparent mode]</description>
+			<type>input</type>
+  		<size>80</size>
+		</field>
+		<field>
+			<fielddescr>Bypass proxy for these destination IPs</fielddescr>
+			<fieldname>defined_ip_proxy_off_dest</fieldname>
+			<description>Do not proxy traffic going to these &lt;b&gt;destination&lt;/b&gt; IPs, hostnames, or aliases, but let it pass directly through the firewall. Separate by semi-colons (;). [Applies only to transparent mode]</description>
+			<type>input</type>
+		<size>80</size>
+		</field>
+		<field>
+			<fielddescr>Enabled logging</fielddescr>
+			<fieldname>log_enabled</fieldname>
+			<description>This will enable the access log. Don't switch this on if you don't have much disk space left.</description>
+			<type>checkbox</type>
+			<enablefields>log_query_terms,log_user_agents</enablefields>
+		</field>
+		<field>
+			<fielddescr>Log store directory</fielddescr>
+			<fieldname>log_dir</fieldname>
+			<description>The directory where the log will be stored (note: do not end with a / mark)</description>
+			<type>input</type>
+			<size>60</size>
+			<required/>
+			<default_value>/var/squid/logs</default_value>
+		</field>
+		<field>
+			<fielddescr>Log rotate</fielddescr>
+			<fieldname>log_rotate</fieldname>
+			<description>Defines how many days of logfiles will be kept. Rotation is disabled if left empty.</description>
+			<type>input</type>
+			<size>5</size>
+		</field>
+		<field>
+			<fielddescr>Proxy port</fielddescr>
+			<fieldname>proxy_port</fieldname>
+			<description>This is the port the proxy server will listen on.</description>
+			<type>input</type>
+			<size>5</size>
+			<required/>
+			<default_value>3128</default_value>
+		</field>
+		<field>
+			<fielddescr>ICP port</fielddescr>
+			<fieldname>icp_port</fieldname>
+			<description>This is the port the Proxy Server will send and receive ICP queries to and from neighbor caches. Leave this blank if you don't want the proxy server to communicate with neighbor caches through ICP.</description>
+			<type>input</type>
+			<size>5</size>
+		</field>
+		<field>
+			<fielddescr>Visible hostname</fielddescr>
+			<fieldname>visible_hostname</fieldname>
+			<description>This is the URL to be displayed in proxy server error messages.</description>
+			<type>input</type>
+			<size>60</size>
+			<default_value>localhost</default_value>
+		</field>
+		<field>
+			<fielddescr>Administrator email</fielddescr>
+			<fieldname>admin_email</fieldname>
+			<description>This is the email address displayed in error messages to the users.</description>
+			<type>input</type>
+			<size>60</size>
+			<default_value>admin@localhost</default_value>
+		</field>
+		<field>
+			<fielddescr>Language</fielddescr>
+			<fieldname>error_language</fieldname>
+			<description>Select the language in which the proxy server will display error messages to users.</description>
+			<type>select</type>
+			<default_value>en</default_value>
+		</field>
+		<field>
+			<fielddescr>Disable X-Forward</fielddescr>
+			<fieldname>disable_xforward</fieldname>
+			<description>If not set, Squid will include your system's IP address or name in the HTTP requests it forwards.</description>
+			<type>checkbox</type>
+		</field>
+		<field>
+			<fielddescr>Disable VIA</fielddescr>
+			<fieldname>disable_via</fieldname>
+			<description>If not set, Squid will include a Via header in requests and replies as required by RFC2616.</description>
+			<type>checkbox</type>
+		</field>
+		<field>
+			<fielddescr>What to do with requests that have whitespace characters in the	URI</fielddescr>
+			<fieldname>uri_whitespace</fieldname>
+      <description>&lt;b&gt; strip:&lt;/b&gt; The whitespace characters are stripped out of the URL. This is the behavior recommended by RFC2396. &lt;p&gt; &lt;b&gt; deny:&lt;/b&gt; The request is denied. The user receives an "Invalid Request" message.&lt;p&gt; &lt;b&gt; allow:&lt;/b&gt; The request is allowed and the URI is not changed. The whitespace characters remain in the URI.&lt;p&gt; &lt;b&gt; encode:&lt;/b&gt; The request is allowed and the whitespace characters are encoded according to RFC1738.&lt;p&gt; &lt;b&gt; chop:&lt;/b&gt;	The request is allowed and the URI is chopped at the first whitespace.</description>
+  		<type>select</type>
+			<default_value>strip</default_value>
+			<options>
+				<option>
+					<name>strip</name>
+					<value>strip</value>
+				</option>
+				<option>
+					<name>deny</name>
+				<value>deny</value>
+				</option>
+				<option>
+					<name>allow</name>
+					<value>allow</value>
+				</option>
+				<option>
+					<name>encode</name>
+					<value>encode</value>
+				</option>
+				<option>
+					<name>chop</name>
+					<value>chop</value>
+				</option>
+			</options>
+		</field>
+		<field>
+			<fielddescr>Use alternate DNS-servers for the proxy-server</fielddescr>
+			<fieldname>dns_nameservers</fieldname>
+			<description>If you want to use other DNS-servers than the DNS-forwarder, enter the IPs here, separated by semi-colons (;).</description>
+			<type>input</type>
+			<size>60</size>
+		</field>
+		<field>
+			<fielddescr>Suppress Squid Version</fielddescr>
+			<fieldname>disable_squidversion</fieldname>
+			<description>If set, suppress Squid version string info in HTTP headers and HTML error pages.</description>
+			<type>checkbox</type>
+		</field>
+    <field>
+			<fielddescr>Custom Options</fielddescr>
+			<fieldname>custom_options</fieldname>
+			<description>You can put your own custom options here, separated by semi-colons (;). They'll be added to the configuration. They need to be squid.conf native options, otherwise squid will NOT work.</description>
+			<type>textarea</type>
+			<cols>65</cols>
+			<rows>5</rows>
+		</field>
+	</fields>
+	<custom_php_command_before_form>
+		squid_before_form_general(&amp;$pkg);
+	</custom_php_command_before_form>
+	<custom_add_php_command>
+		squid_resync();
+	</custom_add_php_command>
+	<custom_php_validation_command>
+		squid_validate_general($_POST, &amp;$input_errors);
+	</custom_php_validation_command>
+	<custom_php_resync_config_command>
+		squid_resync();
+		exec("/bin/rm -f /usr/local/etc/rc.d/squid");
+	</custom_php_resync_config_command>
+	<custom_php_install_command>
+		update_status("Checking Squid cache... One moment please...");
+		update_output_window("This operation may take quite some time, please be patient.  Do not press stop or attempt to navigate away from this page during this process.");
+		squid_install_command();
+		squid_resync();
+		exec("/bin/rm -f /usr/local/etc/rc.d/squid");
+	</custom_php_install_command>
+	<custom_php_deinstall_command>
+		squid_deinstall_command();
+		exec("/bin/rm -f /usr/local/etc/rc.d/squid*");
+	</custom_php_deinstall_command>
+	<filter_rules_needed>squid_generate_rules</filter_rules_needed>
+</packagegui>

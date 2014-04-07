@@ -20,12 +20,12 @@
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0644</chmod>
-		<item>http://www.pfsense.com/packages/config/vnstat/vnstat.inc</item>
+		<item>https://packages.pfsense.org/packages/config/vnstat/vnstat.inc</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0644</chmod>
-		<item>http://www.pfsense.com/packages/config/vnstat/bin/vnstat_php_frontend-1.4.1.tar.gz</item>
+		<item>https://files.pfsense.org/packages/7/vnstat/vnstat_php_frontend-1.4.1.tar.gz</item>
 	</additional_files_needed>
 	<custom_php_resync_config_command></custom_php_resync_config_command>
 	<custom_php_install_command>vnstat_install_config();</custom_php_install_command>

@@ -54,8 +54,6 @@ foreach($config['installedpackages']['spamdoutlook']['config'] as $outlook) {
 	}
 }
 
-exec("echo {$_GET['action']} > /tmp/tmp");
-
 /* handle AJAX operations */
 if($_GET['action'] or $_POST['action']) {
 	if($_GET['action'])

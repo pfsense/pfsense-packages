@@ -1,0 +1,290 @@
+diff --git /etc/inc/openvpn.inc.orig /etc/inc/openvpn.inc
+index 777b395..701a032 100644
+--- a/etc/inc/openvpn.inc
++++ b/etc/inc/openvpn.inc
+@@ -394,19 +394,37 @@ function openvpn_reconfigure($mode, $settings) {
+ 				// If the CIDR is less than a /30, OpenVPN will complain if you try to
+ 				//  use the server directive. It works for a single client without it.
+ 				//  See ticket #1417
+-				if ($cidr < 30) {
++				if (!empty($ip) && !empty($mask) && ($cidr < 30)) {
+ 					$conf .= "server {$ip} {$mask}\n";
+ 					$conf .= "client-config-dir {$g['varetc_path']}/openvpn-csc\n";
+ 				}
+ 			case 'p2p_shared_key':
+-				list($ip1, $ip2) = openvpn_get_interface_ip($ip, $mask);
+-				$conf .= "ifconfig $ip1 $ip2\n";
++				if (!empty($ip) && !empty($mask)) {
++					list($ip1, $ip2) = openvpn_get_interface_ip($ip, $mask);
++					$conf .= "ifconfig $ip1 $ip2\n";
++				}
+ 				break;
+ 			case 'server_tls':
+ 			case 'server_user':
+ 			case 'server_tls_user':
+-				$conf .= "server {$ip} {$mask}\n";
+-				$conf .= "client-config-dir {$g['varetc_path']}/openvpn-csc\n";
++				if (!empty($ip) && !empty($mask)) {
++					$conf .= "server {$ip} {$mask}\n";
++					$conf .= "client-config-dir {$g['varetc_path']}/openvpn-csc\n";
++				} else {
++					if ($settings['serverbridge_dhcp']) {
++						if ((!empty($settings['serverbridge_interface'])) && (strcmp($settings['serverbridge_interface'], "none"))) {
++							$biface_ip=get_interface_ip($settings['serverbridge_interface']);
++							$biface_sm=gen_subnet_mask(get_interface_subnet($settings['serverbridge_interface']));
++							if (is_ipaddr($biface_ip) && is_ipaddr($settings['serverbridge_dhcp_start']) && is_ipaddr($settings['serverbridge_dhcp_end'])) {
++								$conf .= "server-bridge {$biface_ip} {$biface_sm} {$settings['serverbridge_dhcp_start']} {$settings['serverbridge_dhcp_end']}\n";
++							} else {
++								$conf .= "mode server\n";
++							}
++						} else {
++							$conf .= "mode server\n";
++						}
++					}
++				}
+ 				break;
+ 		}
+
+@@ -452,7 +452,9 @@ function openvpn_reconfigure($mode, $settings) {
+                        case 'server_user':
+                                $conf .= "client-cert-not-required\n";
+                        case 'server_tls_user':
+-                               $conf .= "username-as-common-name\n";
++                               /* username-as-common-name is not compatible with server-bridge */
++                               if (stristr($conf, "server-bridge") === false)
++                                       $conf .= "username-as-common-name\n";
+                                if (!empty($settings['authmode'])) {
+                                        $authcfgs = explode(",", $settings['authmode']);
+                                        $sed = "\$authmodes=array(";
+ 
+diff --git /usr/local/www/vpn_openvpn_server.php.orig /usr/local/www/vpn_openvpn_server.php
+index 0ef67a7..bd9f527 100644
+--- a/usr/local/www/vpn_openvpn_server.php
++++ b/usr/local/www/vpn_openvpn_server.php
+@@ -147,6 +147,11 @@ if($_GET['act']=="edit"){
+ 		$pconfig['dynamic_ip'] = $a_server[$id]['dynamic_ip'];
+ 		$pconfig['pool_enable'] = $a_server[$id]['pool_enable'];
+ 
++		$pconfig['serverbridge_dhcp'] = $a_server[$id]['serverbridge_dhcp'];
++		$pconfig['serverbridge_interface'] = $a_server[$id]['serverbridge_interface'];
++		$pconfig['serverbridge_dhcp_start'] = $a_server[$id]['serverbridge_dhcp_start'];
++		$pconfig['serverbridge_dhcp_end'] = $a_server[$id]['serverbridge_dhcp_end'];
++
+ 		$pconfig['dns_domain'] = $a_server[$id]['dns_domain'];
+ 		if ($pconfig['dns_domain'])
+ 			$pconfig['dns_domain_enable'] = true;
+@@ -188,7 +193,6 @@ if($_GET['act']=="edit"){
+ 		$pconfig['duplicate_cn'] = isset($a_server[$id]['duplicate_cn']);
+ 	}
+ }
+-
+ if ($_POST) {
+ 
+ 	unset($input_errors);
+@@ -284,9 +288,22 @@ if ($_POST) {
+ 		$reqdfieldsn = array(gettext('Shared key'));
+ 	}
+ 
+-	$reqdfields[] = 'tunnel_network';
+-	$reqdfieldsn[] = gettext('Tunnel network');
+-
++	if ($pconfig['dev_mode'] != "tap") {
++		$reqdfields[] = 'tunnel_network';
++		$reqdfieldsn[] = gettext('Tunnel network');
++	} else {
++		if ($pconfig['serverbridge_dhcp'] && $pconfig['tunnel_network'])
++			$input_errors[] = gettext("Using a tunnel network and server bridge settings together is not allowed.");
++		if (($pconfig['serverbridge_dhcp_start'] && !$pconfig['serverbridge_dhcp_end']) 
++		|| (!$pconfig['serverbridge_dhcp_start'] && $pconfig['serverbridge_dhcp_end']))
++			$input_errors[] = gettext("Server Bridge DHCP Start and End must both be empty, or defined.");
++		if (($pconfig['serverbridge_dhcp_start'] && !is_ipaddr($pconfig['serverbridge_dhcp_start'])))
++			$input_errors[] = gettext("Server Bridge DHCP Start must be an IPv4 address.");
++		if (($pconfig['serverbridge_dhcp_end'] && !is_ipaddr($pconfig['serverbridge_dhcp_end'])))
++			$input_errors[] = gettext("Server Bridge DHCP End must be an IPv4 address.");
++		if (ip2ulong($pconfig['serverbridge_dhcp_start']) > ip2ulong($pconfig['serverbridge_dhcp_end']))
++			$input_errors[] = gettext("The Server Bridge DHCP range is invalid (start higher than end).");
++	}
+ 	do_input_validation($_POST, $reqdfields, $reqdfieldsn, &$input_errors);
+ 	
+ 	if (!$input_errors) {
+@@ -341,6 +358,11 @@ if ($_POST) {
+ 		$server['dynamic_ip'] = $pconfig['dynamic_ip'];
+ 		$server['pool_enable'] = $pconfig['pool_enable'];
+ 
++		$server['serverbridge_dhcp'] = $pconfig['serverbridge_dhcp'];
++		$server['serverbridge_interface'] = $pconfig['serverbridge_interface'];
++		$server['serverbridge_dhcp_start'] = $pconfig['serverbridge_dhcp_start'];
++		$server['serverbridge_dhcp_end'] = $pconfig['serverbridge_dhcp_end'];
++
+ 		if ($pconfig['dns_domain_enable'])
+ 			$server['dns_domain'] = $pconfig['dns_domain'];
+ 
+@@ -559,6 +581,56 @@ function netbios_change() {
+ 	}
+ }
+ 
++function tuntap_change() {
++
++	mindex = document.iform.mode.selectedIndex;
++	mvalue = document.iform.mode.options[mindex].value;
++
++	switch(mvalue) {
++		case "p2p_tls":
++		case "p2p_shared_key":
++			p2p = true;
++			break;
++		default:
++			p2p = false;
++			break;
++	}
++
++	index = document.iform.dev_mode.selectedIndex;
++	value = document.iform.dev_mode.options[index].value;
++	switch(value) {
++		case "tun":
++			document.getElementById("ipv4_tunnel_network").className="vncellreq";
++			document.getElementById("serverbridge_dhcp").style.display="none";
++			document.getElementById("serverbridge_interface").style.display="none";
++			document.getElementById("serverbridge_dhcp_start").style.display="none";
++			document.getElementById("serverbridge_dhcp_end").style.display="none";
++			break;
++		case "tap":
++			document.getElementById("ipv4_tunnel_network").className="vncell";
++			if (!p2p) {
++				document.getElementById("serverbridge_dhcp").style.display="";
++				document.getElementById("serverbridge_interface").style.display="";
++				document.getElementById("serverbridge_dhcp_start").style.display="";
++				document.getElementById("serverbridge_dhcp_end").style.display="";
++				if (document.iform.serverbridge_dhcp.checked) {
++					document.iform.serverbridge_interface.disabled = false;
++					document.iform.serverbridge_dhcp_start.disabled = false;
++					document.iform.serverbridge_dhcp_end.disabled = false;
++				} else {
++					document.iform.serverbridge_interface.disabled = true;
++					document.iform.serverbridge_dhcp_start.disabled = true;
++					document.iform.serverbridge_dhcp_end.disabled = true;
++				}
++			} else {
++				document.iform.serverbridge_dhcp.disabled = true;
++				document.iform.serverbridge_interface.disabled = true;
++				document.iform.serverbridge_dhcp_start.disabled = true;
++				document.iform.serverbridge_dhcp_end.disabled = true;
++			}
++			break;
++	}
++}
+ //-->
+ </script>
+ <?php
+@@ -619,7 +691,7 @@ if ($savemsg)
+ 					<tr>
+ 						<td width="22%" valign="top" class="vncellreq"><?=gettext("Server Mode");?></td>
+ 							<td width="78%" class="vtable">
+-							<select name='mode' id='mode' class="formselect" onchange='mode_change()'>
++							<select name='mode' id='mode' class="formselect" onchange='mode_change(); tuntap_change()'>
+ 							<?php
+ 								foreach ($openvpn_server_modes as $name => $desc):
+ 									$selected = "";
+@@ -666,7 +738,7 @@ if ($savemsg)
+ 					<tr>
+ 						<td width="22%" valign="top" class="vncellreq"><?=gettext("Device Mode"); ?></td>
+ 						<td width="78%" class="vtable">
+-							<select name="dev_mode" class="formselect">
++							<select name="dev_mode" class="formselect" onchange='tuntap_change()'>
+                                                         <?php
+                                                                 foreach ($openvpn_dev_mode as $device):
+                                                                        $selected = "";
+@@ -976,7 +1048,7 @@ if ($savemsg)
+ 						<td colspan="2" valign="top" class="listtopic"><?=gettext("Tunnel Settings"); ?></td>
+ 					</tr>
+ 					<tr>
+-						<td width="22%" valign="top" class="vncellreq"><?=gettext("Tunnel Network"); ?></td>
++						<td width="22%" valign="top" class="vncellreq" id="ipv4_tunnel_network"><?=gettext("Tunnel Network"); ?></td>
+ 						<td width="78%" class="vtable">
+ 							<input name="tunnel_network" type="text" class="formfld unknown" size="20" value="<?=htmlspecialchars($pconfig['tunnel_network']);?>">
+ 							<br>
+@@ -989,6 +1061,76 @@ if ($savemsg)
+ 							"to connecting clients. (see Address Pool)"); ?>
+ 						</td>
+ 					</tr>
++					<tr id="serverbridge_dhcp">
++						<td width="22%" valign="top" class="vncell"><?=gettext("Bridge DHCP"); ?></td>
++						<td width="78%" class="vtable">
++							<table border="0" cellpadding="2" cellspacing="0">
++								<tr>
++									<td>
++										<?php set_checked($pconfig['serverbridge_dhcp'],$chk); ?>
++										<input name="serverbridge_dhcp" type="checkbox" value="yes" <?=$chk;?> onchange='tuntap_change()' />
++									</td>
++									<td>
++										<span class="vexpl">
++											<?=gettext("Allow clients on the bridge to obtain DHCP."); ?><br>
++										</span>
++									</td>
++								</tr>
++							</table>
++						</td>
++					</tr>
++					<tr id="serverbridge_interface">
++						<td width="22%" valign="top" class="vncell"><?=gettext("Bridge Interface"); ?></td>
++						<td width="78%" class="vtable">
++							<select name="serverbridge_interface" class="formselect">
++								<?php
++									$serverbridge_interface['none'] = "none";
++									$serverbridge_interface = array_merge($serverbridge_interface, get_configured_interface_with_descr());
++									$carplist = get_configured_carp_interface_list();
++									foreach ($carplist as $cif => $carpip)
++										$serverbridge_interface[$cif.'|'.$carpip] = $carpip." (".get_vip_descr($carpip).")";
++									$aliaslist = get_configured_ip_aliases_list();
++									foreach ($aliaslist as $aliasip => $aliasif)
++										$serverbridge_interface[$aliasif.'|'.$aliasip] = $aliasip." (".get_vip_descr($aliasip).")";
++									foreach ($serverbridge_interface as $iface => $ifacename):
++										$selected = "";
++										if ($iface == $pconfig['serverbridge_interface'])
++											$selected = "selected";
++								?>
++									<option value="<?=$iface;?>" <?=$selected;?>>
++										<?=htmlspecialchars($ifacename);?>
++									</option>
++								<?php endforeach; ?>
++							</select> <br>
++							<?=gettext("The interface to which this tap instance will be, " .
++							"bridged. This is not done automatically. You must assign this " .
++							"interface and create the bridge separately. " .
++							"This setting controls which existing IP address and subnet " .
++							"mask are used by OpenVPN for the bridge. Setting this to " .
++							"'none' will cause the Server Bridge DHCP settings below to be ignored."); ?>
++						</td>
++					</tr>
++					<tr id="serverbridge_dhcp_start">
++						<td width="22%" valign="top" class="vncell"><?=gettext("Server Bridge DHCP Start"); ?></td>
++						<td width="78%" class="vtable">
++							<input name="serverbridge_dhcp_start" type="text" class="formfld unknown" size="20" value="<?=htmlspecialchars($pconfig['serverbridge_dhcp_start']);?>">
++							<br>
++							<?=gettext("When using tap mode as multi-point server, " .
++							"you may optionally supply a DHCP range to use on the " .
++							"interface to which this tap instance is bridged. " .
++							"If these settings are left blank, DHCP will be passed " .
++							"through to the LAN, and the interface setting above " .
++							"will be ignored."); ?>
++						</td>
++					</tr>
++					<tr id="serverbridge_dhcp_end">
++						<td width="22%" valign="top" class="vncell"><?=gettext("Server Bridge DHCP End"); ?></td>
++						<td width="78%" class="vtable">
++							<input name="serverbridge_dhcp_end" type="text" class="formfld unknown" size="20" value="<?=htmlspecialchars($pconfig['serverbridge_dhcp_end']);?>">
++							<br>
++							<?=gettext(""); ?>
++						</td>
++					</tr>
+ 					<tr id="gwredir_opts">
+ 						<td width="22%" valign="top" class="vncell"><?=gettext("Redirect Gateway"); ?></td>
+ 						<td width="78%" class="vtable">
+@@ -1486,6 +1628,7 @@ dns_server_change();
+ wins_server_change();
+ ntp_server_change();
+ netbios_change();
++tuntap_change();
+ //-->
+ </script>
+ </body>

@@ -18,22 +18,22 @@
 		<description>Antivirus HTTP proxy Service</description>
         </service>
         <additional_files_needed>
-               <item>http://www.pfsense.com/packages/config/havp/havp.inc</item>
+               <item>https://packages.pfsense.org/packages/config/havp/havp.inc</item>
                <prefix>/usr/local/pkg/</prefix>
                <chmod>0755</chmod>
         </additional_files_needed>
         <!--additional_files_needed>
-               <item>http://www.pfsense.com/packages/config/havp/havp_fscan.xml</item>
+               <item>https://packages.pfsense.org/packages/config/havp/havp_fscan.xml</item>
                <prefix>/usr/local/pkg/</prefix>
                <chmod>0755</chmod>
         </additional_files_needed-->
         <additional_files_needed>
-               <item>http://www.pfsense.com/packages/config/havp/havp_avset.xml</item>
+               <item>https://packages.pfsense.org/packages/config/havp/havp_avset.xml</item>
                <prefix>/usr/local/pkg/</prefix>
                <chmod>0755</chmod>
         </additional_files_needed>
         <additional_files_needed>
-               <item>http://www.pfsense.com/packages/config/havp/antivirus.php</item>
+               <item>https://packages.pfsense.org/packages/config/havp/antivirus.php</item>
                <prefix>/usr/local/www/</prefix>
                <chmod>0755</chmod>
         </additional_files_needed>
@@ -70,8 +70,8 @@
 				Select interface mode: &lt;br&gt;
 				&lt;b&gt; standard &lt;/b&gt; - client(s) bind to the 'proxy port' on selected interface(s); &lt;br&gt;
 				&lt;b&gt; parent for squid &lt;/b&gt; - configure HAVP as parent for Squid proxy;&lt;br&gt;
-				&lt;b&gt; transparent &lt;/b&gt; - all 'http' requests on interface(s) will be translated to the HAVP proxy server without any client(s) additional configuration necessary (worked as 'parent for squid' with 'transparent' Squid proxy); &lt;br&gt;
-				&lt;b&gt; internal &lt;/b&gt; - HAVP listen internal interface (127.0.0.1) on 'proxy port', use you own traffic forwarding rules.&lt;br&gt;
+				&lt;b&gt; transparent &lt;/b&gt; - all HTTP requests on interface(s) will be directed to the HAVP proxy server without any client configuration necessary (works as parent for squid with transparent Squid proxy); &lt;br&gt;
+				&lt;b&gt; internal &lt;/b&gt; - HAVP will listen on the loopback (127.0.0.1) on configured 'proxy port.' Use you own traffic forwarding rules.&lt;br&gt;
 			</description>
                         <type>select</type>
                         <default_value>standard</default_value>
@@ -85,7 +85,7 @@
                 <field>
                         <fielddescr>Proxy interface(s)</fielddescr>
                         <fieldname>proxyinterface</fieldname>
-                        <description>The interface(s) for client connections to the proxy. Use 'Ctrl' + L.Click for multiple selection.</description>
+                        <description>The interface(s) for client connections to the proxy. Use 'Ctrl' + L. Click for multiple selection.</description>
                         <type>interfaces_selection</type>
                         <required/>
                         <multiple/>
@@ -125,7 +125,7 @@
                         <fielddescr>Enable Forwarded IP</fielddescr>
                         <fieldname>enableforwardedip</fieldname>
                         <description>
-				If HAVP is used as parent proxy by some other proxy, this allows to write the real users IP to log, instead of proxy IP.
+				If HAVP is used as a parent proxy for some other proxy, this allows writing the real user's IP to log, instead of the proxy IP.
                         </description>
                         <type>checkbox</type>
                 </field>
@@ -150,7 +150,7 @@
                 <field>
                         <fielddescr>Max download size, Bytes</fielddescr>
                         <fieldname>maxdownloadsize</fieldname>
-                        <description>Enter value (in Bytes) or leave empty. Downloads larger, than 'Max download size' will be blocked. Only if not Whitelisted!</description>
+                        <description>Enter value (in Bytes) or leave empty. Downloads larger than 'Max download size' will be blocked if not whitelisted.</description>
                         <type>input</type>
                         <size>10</size>
                         <default_value></default_value>
@@ -169,8 +169,8 @@
                         <fielddescr>Whitelist</fielddescr>
                         <fieldname>whitelist</fieldname>
                         <description>
-                            Enter each destination url on a new line that will be accessable to the users without scanning.
-                            Use '*' symbol for mask. Example: *.pfsense.com/*, *sourceforge.net/*clamav-*, */*.xml, */*.inc
+                            Enter each destination URL on a new line that will be accessable to the users without scanning.
+                            Use '*' symbol for mask. Example: *.github.com/*, *sourceforge.net/*clamav-*, */*.xml, */*.inc
                         </description>
                         <type>textarea</type>
                         <cols>60</cols>
@@ -196,10 +196,10 @@
                         <fielddescr>Enable RAM Disk</fielddescr>
                         <fieldname>enableramdisk</fieldname>
                         <description>
-				This option allow use RAM Disk for HAVP temp files for more quick traffic scan.
-				Ram Disc size depend from 'ScanMax file size and avialable memory.
-				This option can be ignored in VMVare or on 'low system memory'.
-				( RAM Disk size calculated as [1/4 avialable system memory] > [Scan max file size] * 100 )
+				This option allow use RAM disk for HAVP temp files for more quick traffic scan.
+				RAM disk size depends on 'ScanMax' file size and available memory.
+				This option can be ignored on systems with low memory.
+				( RAM disk size calculated as [1/4 available system memory] > [Scan max file size] * 100 )
                         </description>
                         <type>checkbox</type>
                 </field>
@@ -209,7 +209,7 @@
                         <description>
                                 Select this value for limit maximum file size or leave '---(5M)'.
                                 Files larger than this limit won't be scanned.
-                                Small values increace scan speed and maximum new connections per second and allow RAM Disk use.
+                                Small values increace scan speed and maximum new connections per second and allow RAM disk use.
                                 &lt;br&gt;
                                 NOTE: Setting limit is a security risk, because some archives like
                                 ZIP need all the data to be scanned properly! Use this only if you
@@ -266,6 +266,13 @@
                         <description>Check this for scan media (audio/video) stream. Use this for additional scan exploits for players.</description>
                         <type>checkbox</type>
                 </field>
+                <field>
+                        <fielddescr>Scan Broken Executables</fielddescr>
+                        <fieldname>scanbrokenexe</fieldname>
+                        <description>Check this to enable the Heuristic Broken Executable scan.</description>
+                        <type>checkbox</type>
+						<default_value>on</default_value>
+                </field>				
                 <field>
                         <fielddescr>Log</fielddescr>
                         <fieldname>log</fieldname>

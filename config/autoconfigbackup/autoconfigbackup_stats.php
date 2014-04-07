@@ -48,13 +48,13 @@ $username			= $config['installedpackages']['autoconfigbackup']['config'][0]['use
 $password			= $config['installedpackages']['autoconfigbackup']['config'][0]['password'];
 
 // URL to restore.php
-$get_url			= "https://{$username}:{$password}@portal.pfsense.org/pfSconfigbackups/restore.php";
+$get_url			= "https://portal.pfsense.org/pfSconfigbackups/restore.php";
 
 // URL to delete.php
-$del_url			= "https://{$username}:{$password}@portal.pfsense.org/pfSconfigbackups/delete.php";
+$del_url			= "https://portal.pfsense.org/pfSconfigbackups/delete.php";
 
 // URL to stats.php
-$stats_url			= "https://{$username}:{$password}@portal.pfsense.org/pfSconfigbackups/showstats.php";
+$stats_url			= "https://portal.pfsense.org/pfSconfigbackups/showstats.php";
 
 // Set hostname
 $hostname			= $config['system']['hostname'] . "." . $config['system']['domain'];
@@ -67,6 +67,7 @@ if(!$username) {
 if($_REQUEST['delhostname']) {
 	$curl_session = curl_init();
 	curl_setopt($curl_session, CURLOPT_URL, $del_url);
+	curl_setopt($curl_session, CURLOPT_HTTPHEADER, array("Authorization: Basic " . base64_encode("{$username}:{$password}")));
 	curl_setopt($curl_session, CURLOPT_POST, 2);				
 	curl_setopt($curl_session, CURLOPT_SSL_VERIFYPEER, 0);	
 	curl_setopt($curl_session, CURLOPT_RETURNTRANSFER, 1);	
@@ -138,6 +139,7 @@ include("head.inc");
 	// Populate available backups
 	$curl_session = curl_init();
 	curl_setopt($curl_session, CURLOPT_URL, $stats_url);  
+	curl_setopt($curl_session, CURLOPT_HTTPHEADER, array("Authorization: Basic " . base64_encode("{$username}:{$password}")));
 	curl_setopt($curl_session, CURLOPT_SSL_VERIFYPEER, 0);	
 	curl_setopt($curl_session, CURLOPT_POST, 1);
 	curl_setopt($curl_session, CURLOPT_RETURNTRANSFER, 1);

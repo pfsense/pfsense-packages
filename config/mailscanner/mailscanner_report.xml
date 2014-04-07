@@ -1,0 +1,532 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE packagegui SYSTEM "./schema/packages.dtd">
+<?xml-stylesheet type="text/xsl" href="./xsl/package.xsl"?>
+<packagegui>
+	<copyright>
+	<![CDATA[
+/* $Id$ */
+/* ========================================================================== */
+/*
+    mailscanner_report.xml
+    part of the mailscaner package for pfSense
+    Copyright (C) 2011-2013 Marcello Coutinho
+    All rights reserved.            
+                                                                  */
+/* ========================================================================== */
+/*
+    Redistribution and use in source and binary forms, with or without
+    modification, are permitted provided that the following conditions are met:
+
+     1. Redistributions of source code must retain the above copyright notice,
+        this list of conditions and the following disclaimer.
+
+     2. Redistributions in binary form must reproduce the above copyright
+        notice, this list of conditions and the following disclaimer in the
+        documentation and/or other materials provided with the distribution.
+
+    THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
+    INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+    AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+    AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+    OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+    INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+    POSSIBILITY OF SUCH DAMAGE.
+                                                                              */
+/* ========================================================================== */
+	]]>
+	</copyright>
+	<description>Describe your package here</description>
+	<requirements>Describe your package requirements here</requirements>
+	<faq>Currently there are no FAQ items provided.</faq>
+	<name>>msreport</name>
+	<version>1.1</version>
+	<title>Services: MailScanner</title>
+	<include_file>/usr/local/pkg/mailscanner.inc</include_file>
+<tabs>
+		<tab>
+			<text>General</text>
+			<url>/pkg_edit.php?xml=mailscanner.xml&amp;id=0</url>
+		</tab>
+		<tab>
+			<text>Attachments</text>
+			<url>/pkg_edit.php?xml=mailscanner_attachments.xml&amp;id=0</url>
+		</tab>
+		<tab>
+			<text>Antivirus</text>
+			<url>/pkg_edit.php?xml=mailscanner_antivirus.xml&amp;id=0</url>
+		</tab>
+		<tab>
+			<text>Content</text>
+			<url>/pkg_edit.php?xml=mailscanner_content.xml&amp;id=0</url>
+		</tab>
+		<tab>
+			<text>AntiSpam</text>
+			<url>/pkg_edit.php?xml=mailscanner_antispam.xml&amp;id=0</url>
+		</tab>
+		<tab>
+			<text>Alerts</text>
+			<url>/pkg_edit.php?xml=mailscanner_alerts.xml&amp;id=0</url>
+		</tab>
+			<tab>
+			<text>Reporting</text>
+			<url>/pkg_edit.php?xml=mailscanner_report.xml&amp;id=0</url>
+			<active/>
+		</tab>
+		<tab>
+			<text>XMLRPC Sync</text>
+			<url>/pkg_edit.php?xml=mailscanner_sync.xml&amp;id=0</url>
+		</tab>
+		<tab>
+			<text>Help</text>
+			<url>/mailscanner_about.php</url>
+		</tab>
+</tabs>
+	<fields>
+		<field>
+			<name>Reports and Responses</name>
+			<type>listtopic</type>
+		</field>
+		<field>
+			<fielddescr>Language</fielddescr>
+			<fieldname>language</fieldname>
+			<description>
+			<![CDATA[Select report language.]]>
+			</description>
+	    	<type>select</type>
+ 				<options>
+ 				<option><name>EN (Default)</name><value>en</value></option>
+				<option><name>CA</name><value>ca</value></option>
+				<option><name>CY+EN</name><value>cy+en</value></option>
+				<option><name>CZ</name><value>cz</value></option>
+				<option><name>DE</name><value>de</value></option>
+				<option><name>DK</name><value>dk</value></option>
+				<option><name>ES</name><value>es</value></option>
+				<option><name>FR</name><value>fr</value></option>
+				<option><name>HU</name><value>hu</value></option>
+				<option><name>IT</name><value>it</value></option>
+				<option><name>NL</name><value>nl</value></option>
+				<option><name>PT_BR</name><value>pt_br</value></option>
+				<option><name>RO</name><value>ro</value></option>
+				<option><name>SE</name><value>se</value></option>
+				<option><name>SK</name><value>sk</value></option>
+				</options>
+		</field>
+		<field>
+			<fielddescr>Reports</fielddescr>
+			<fieldname>features</fieldname>
+			<description>
+			<![CDATA[Select virus scanner tests to enable. Mailscanner default options are in (&nbsp;).]]>
+			</description>
+	    	<type>select</type>
+ 				<options>
+				<option><name>Quarantine Infections (no)</name><value>QuarantineInfections</value></option>
+				<option><name>Quarantine Silent Viruses (no)</name><value>QuarantineSilentViruses</value></option>
+				<option><name>Quarantine Modified Body (no)</name><value>QuarantineModifiedBody</value></option>
+				<option><name>Quarantine Whole Message (no)</name><value>QuarantineWholeMessage</value></option>
+				<option><name>Quarantine Whole Messages As Queue Files (no)</name><value>QuarantineWholeMessagesAsQueueFiles</value></option>
+				<option><name>Keep Spam And MCP Archive Clean (no)</name><value>KeepSpamAndMCPArchiveClean</value></option>
+				<option><name>Hide Incoming Work Dir (yes)</name><value>HideIncomingWorkDir</value></option>
+				<option><name>Include Scanner Name In Reports (yes)</name><value>IncludeScannerNameInReports</value></option> 
+				
+				</options>
+				<size>09</size>
+				<multiple/>
+		</field>
+		<field>
+			<name>Notifications to Sender</name>
+			<type>listtopic</type>
+		</field>
+
+		<field>
+			<fielddescr>Notificatios</fielddescr>
+			<fieldname>notification</fieldname>
+			<description>
+			<![CDATA[Select virus scanner tests to enable. Mailscanner default options are in (&nbsp;).]]>
+			</description>
+	    	<type>select</type>
+ 				<options>
+				<option><name>Notify Senders (no)</name><value>NotifySenders</value></option>
+				<option><name>Notify Senders of Viruses (no)</name><value>NotifySendersofVirusese</value></option>
+				<option><name>Notify Senders of Blocked Filenames or Filetypes (yes)</name><value>NotifySendersofBlockedFilenamesorFiletypes</value></option>
+				<option><name>Notify Senders of Blocked Size Attachments (no)</name><value>NotifySendersofBlockedSizeAttachments</value></option>
+				<option><name>Notify Senders of Blocked Content (yes)</name><value>NotifySendersofBlockedContent</value></option>
+				</options>
+				<size>06</size>
+				<multiple/>
+		</field>
+		<field>
+			<name>Notices to System Administrators</name>
+			<type>listtopic</type>
+		</field>
+		<field>
+			<fielddescr>System Notificatios</fielddescr>
+			<fieldname>system</fieldname>
+			<description>
+			<![CDATA[Select what to send to System Administrators. Mailscanner default options are in (&nbsp;).]]>
+			</description>
+	    	<type>select</type>
+ 				<options>
+				<option><name>Send Notices (no)</name><value>SendNotices</value></option>
+				<option><name>Notices Include Full Headers (yes)</name><value>NoticesIncludeFullHeaders</value></option>
+				<option><name>Hide Incoming Work Dir in Notices (no)</name><value>HideIncomingWorkDirinNotices</value></option>
+				</options>
+				<size>04</size>
+				<multiple/>
+		</field>
+		<field>
+		<fielddescr>Notice Signature</fielddescr>
+				<fieldname>notice_signature</fieldname>
+				<description><![CDATA[What signature to add to the bottom of the notices.<br>
+								To insert a line-break in there, use the sequence "\n".ssed to SpamAssassin, listing all the "spam-viruses" that were found as a comma-separated list.<br>
+								<strong>Default is -- \nMailScanner\nEmail Virus Scanner\nwww.mailscanner.info</strong>]]></description>
+				<type>input</type>
+				<size>30</size>
+		</field>
+		<field>
+		<fielddescr>Notice from</fielddescr>
+				<fieldname>notice_from</fieldname>
+				<description><![CDATA[The visible part of the email address used in the "From:" line of the notices. The <user@domain> part of the email address is set to the  "Local Postmaster" setting.<br>
+								<strong>Default is MailScanner]]></description>
+				<type>input</type>
+				<size>20</size>
+		</field>
+		<field>
+		<fielddescr>Notice to</fielddescr>
+				<fieldname>notice_to</fieldname>
+				<description><![CDATA[Where to send the notices.<br>
+								<strong>Default is Postmaster]]></description>
+				<type>input</type>
+				<size>20</size>
+		</field>
+		<field>
+			<name>Deleted Bad Content</name>
+			<type>listtopic</type>
+		</field>
+		<field>
+			<fielddescr>Deleted Bad Content</fielddescr>
+			<fieldname>deletedbadcontent</fieldname>
+			<dontdisplayname/>
+			<usecolspan2/>
+			<description><![CDATA[Edit deleted.content.message.txt file here.<br>Leave this field blank to load sample file.]]></description>
+			<type>textarea</type>
+			<cols>90</cols>
+			<rows>15</rows>
+			<encoding>base64</encoding>
+		</field>
+		<field>
+			<name>Deleted Bad Filename</name>
+			<type>listtopic</type>
+		</field>
+		<field>
+			<fielddescr>Deleted Bad Filename</fielddescr>
+			<fieldname>deletedbadfilename</fieldname>
+			<dontdisplayname/>
+			<usecolspan2/>
+			<description><![CDATA[Edit deleted.filename.message.txt file here.<br>Leave this field blank to load sample file.]]></description>
+			<type>textarea</type>
+			<cols>90</cols>
+			<rows>15</rows>
+			<encoding>base64</encoding>
+		</field>
+		<field>
+			<name>Deleted Virus</name>
+			<type>listtopic</type>
+		</field>
+		<field>
+			<fielddescr>Deleted Virus</fielddescr>
+			<fieldname>deletedvirus</fieldname>
+			<dontdisplayname/>
+			<usecolspan2/>
+			<description><![CDATA[Edit deleted.virus.message.txt file here.<br>Leave this field blank to load sample file.]]></description>
+			<type>textarea</type>
+			<cols>90</cols>
+			<rows>15</rows>
+			<encoding>base64</encoding>
+		</field>
+		<field>
+			<name>Deleted Size</name>
+			<type>listtopic</type>
+		</field>
+		<field>
+			<fielddescr>Deleted Size</fielddescr>
+			<fieldname>deletedsize</fieldname>
+			<dontdisplayname/>
+			<usecolspan2/>
+			<description><![CDATA[Edit deleted.size.message.txt file here.<br>Leave this field blank to load sample file.]]></description>
+			<type>textarea</type>
+			<cols>90</cols>
+			<rows>15</rows>
+			<encoding>base64</encoding>
+		</field>
+		<field>
+			<name>Stored Bad Content</name>
+			<type>listtopic</type>
+		</field>
+		<field>
+			<fielddescr>Stored Bad Content</fielddescr>
+			<fieldname>storedbadcontent</fieldname>
+			<dontdisplayname/>
+			<usecolspan2/>
+			<description><![CDATA[Edit stored.content.message.txt file here.<br>Leave this field blank to load sample file.]]></description>
+			<type>textarea</type>
+			<cols>90</cols>
+			<rows>15</rows>
+			<encoding>base64</encoding>
+		</field>
+		<field>
+			<name>Stored Bad Filename</name>
+			<type>listtopic</type>
+		</field>
+		<field>
+			<fielddescr>Stored Bad Filename</fielddescr>
+			<fieldname>storedbadfilename</fieldname>
+			<dontdisplayname/>
+			<usecolspan2/>
+			<description><![CDATA[Edit stored.filename.message.txt file here.<br>Leave this field blank to load sample file.]]></description>
+			<type>textarea</type>
+			<cols>90</cols>
+			<rows>15</rows>
+			<encoding>base64</encoding>
+		</field>
+		<field>
+			<name>Stored Virus</name>
+			<type>listtopic</type>
+		</field>
+		<field>
+			<fielddescr>Stored Virus</fielddescr>
+			<fieldname>storedvirus</fieldname>
+			<dontdisplayname/>
+			<usecolspan2/>
+			<description><![CDATA[Edit stored.virus.message.txt file here.<br>Leave this field blank to load sample file.]]></description>
+			<type>textarea</type>
+			<cols>90</cols>
+			<rows>15</rows>
+			<encoding>base64</encoding>
+		</field>
+		<field>
+			<name>Disinfected Report</name>
+			<type>listtopic</type>
+		</field>
+		<field>
+			<fielddescr>Disinfected Report</fielddescr>
+			<fieldname>disinfected</fieldname>
+			<dontdisplayname/>
+			<usecolspan2/>
+			<description><![CDATA[Edit stored.size.message.txt file here.<br>Leave this field blank to load sample file.]]></description>
+			<type>textarea</type>
+			<cols>90</cols>
+			<rows>15</rows>
+			<encoding>base64</encoding>
+		</field>
+		<field>
+			<name>Stored Size</name>
+			<type>listtopic</type>
+		</field>
+		<field>
+			<fielddescr>Stored Size</fielddescr>
+			<fieldname>storedsize</fieldname>
+			<dontdisplayname/>
+			<usecolspan2/>
+			<description><![CDATA[Edit disinfected.report.txt file here.<br>Leave this field blank to load sample file.]]></description>
+			<type>textarea</type>
+			<cols>90</cols>
+			<rows>15</rows>
+			<encoding>base64</encoding>
+		</field>
+		<field>
+			<name>Sender content</name>
+			<type>listtopic</type>
+		</field>
+		<field>
+			<fielddescr>Sender content</fielddescr>
+			<fieldname>sendercontent</fieldname>
+			<dontdisplayname/>
+			<usecolspan2/>
+			<description><![CDATA[Edit sender.content.message.txt file here.<br>Leave this field blank to load sample file.]]></description>
+			<type>textarea</type>
+			<cols>90</cols>
+			<rows>15</rows>
+			<encoding>base64</encoding>
+		</field>
+		<field>
+			<name>Sender Error</name>
+			<type>listtopic</type>
+		</field>
+		<field>
+			<fielddescr>Sender Error</fielddescr>
+			<fieldname>sendererror</fieldname>
+			<dontdisplayname/>
+			<usecolspan2/>
+			<description><![CDATA[Edit sender.error.report.txt file here.<br>Leave this field blank to load sample file.]]></description>
+			<type>textarea</type>
+			<cols>90</cols>
+			<rows>15</rows>
+			<encoding>base64</encoding>
+		</field>
+		<field>
+			<name>Sender Bad Filename</name>
+			<type>listtopic</type>
+		</field>
+		<field>
+			<fielddescr>Sender Bad Filename</fielddescr>
+			<fieldname>senderbadfilename</fieldname>
+			<dontdisplayname/>
+			<usecolspan2/>
+			<description><![CDATA[Edit sender.filename.report.txt file here.<br>Leave this field blank to load sample file.]]></description>
+			<type>textarea</type>
+			<cols>90</cols>
+			<rows>15</rows>
+			<encoding>base64</encoding>
+		</field>
+		<field>
+			<name>Sender Virus Report</name>
+			<type>listtopic</type>
+		</field>
+		<field>
+			<fielddescr>Sender Virus Report</fielddescr>
+			<fieldname>sendervirus</fieldname>
+			<dontdisplayname/>
+			<usecolspan2/>
+			<description><![CDATA[Edit sender.virus.report.txt file here.<br>Leave this field blank to load sample file.]]></description>
+			<type>textarea</type>
+			<cols>90</cols>
+			<rows>15</rows>
+			<encoding>base64</encoding>
+		</field>
+		<field>
+			<name>Sender Size Report</name>
+			<type>listtopic</type>
+		</field>
+		<field>
+			<fielddescr>Sender Size Report</fielddescr>
+			<fieldname>sendersize</fieldname>
+			<dontdisplayname/>
+			<usecolspan2/>
+			<description><![CDATA[Edit sender.size.report.txt file here.<br>Leave this field blank to load sample file.]]></description>
+			<type>textarea</type>
+			<cols>90</cols>
+			<rows>15</rows>
+			<encoding>base64</encoding>
+		</field>
+		<field>
+			<name>Sender Spam report</name>
+			<type>listtopic</type>
+		</field>
+		<field>
+			<fielddescr>Sender Spam report</fielddescr>
+			<fieldname>senderspam</fieldname>
+			<dontdisplayname/>
+			<usecolspan2/>
+			<description><![CDATA[Edit sender.spam.report.txt file here.<br>Leave this field blank to load sample file.]]></description>
+			<type>textarea</type>
+			<cols>90</cols>
+			<rows>15</rows>
+			<encoding>base64</encoding>
+		</field>
+		<field>
+			<name>Sender SPam RBL report</name>
+			<type>listtopic</type>
+		</field>
+		<field>
+			<fielddescr>Sender SPam RBL report</fielddescr>
+			<fieldname>senderrbl</fieldname>
+			<dontdisplayname/>
+			<usecolspan2/>
+			<description><![CDATA[Edit sender.spam.rbl.report.txt file here.<br>Leave this field blank to load sample file.]]></description>
+			<type>textarea</type>
+			<cols>90</cols>
+			<rows>15</rows>
+			<encoding>base64</encoding>
+		</field>
+		<field>
+			<name>Sender Spam SA report</name>
+			<type>listtopic</type>
+		</field>
+		<field>
+			<fielddescr>Sender Spam SA report</fielddescr>
+			<fieldname>sendersa</fieldname>
+			<dontdisplayname/>
+			<usecolspan2/>
+			<description><![CDATA[Edit sender.spam.sa.report.txt file here.<br>Leave this field blank to load sample file.]]></description>
+			<type>textarea</type>
+			<cols>90</cols>
+			<rows>15</rows>
+			<encoding>base64</encoding>
+		</field>
+		<field>
+			<name>Sender Spam MCP report</name>
+			<type>listtopic</type>
+		</field>
+		<field>
+			<fielddescr>Sender Spam MCP report</fielddescr>
+			<fieldname>sendermcp</fieldname>
+			<dontdisplayname/>
+			<usecolspan2/>
+			<description><![CDATA[Edit sender.mcp.report.txt file here.<br>Leave this field blank to load sample file.]]></description>
+			<type>textarea</type>
+			<cols>90</cols>
+			<rows>15</rows>
+			<encoding>base64</encoding>
+		</field>
+		<field>
+			<name>Recipients Spam report</name>
+			<type>listtopic</type>
+		</field>
+		<field>
+			<fielddescr>Recipients Spam report</fielddescr>
+			<fieldname>recipientspam</fieldname>
+			<dontdisplayname/>
+			<usecolspan2/>
+			<description><![CDATA[Edit recipient.spam.report.txt file here.<br>Leave this field blank to load sample file.]]></description>
+			<type>textarea</type>
+			<cols>90</cols>
+			<rows>15</rows>
+			<encoding>base64</encoding>
+		</field>
+		<field>
+			<name>Recipients MCP report</name>
+			<type>listtopic</type>
+		</field>
+		<field>
+			<fielddescr>Recipients MCP report</fielddescr>
+			<fieldname>recipientmcp</fieldname>
+			<dontdisplayname/>
+			<usecolspan2/>
+			<description><![CDATA[Edit recipient.mcp.report.txt file here.<br>Leave this field blank to load sample file.]]></description>
+			<type>textarea</type>
+			<cols>90</cols>
+			<rows>15</rows>
+			<encoding>base64</encoding>
+		</field>
+		<field>
+			<name>Rejection Report</name>
+			<type>listtopic</type>
+		</field>
+		<field>
+			<fielddescr>Rejection Report</fielddescr>
+			<fieldname>rejection</fieldname>
+			<dontdisplayname/>
+			<usecolspan2/>
+			<description><![CDATA[Edit rejection.report.txt file here.<br>Leave this field blank to load sample file.]]></description>
+			<type>textarea</type>
+			<cols>90</cols>
+			<rows>15</rows>
+			<encoding>base64</encoding>
+		</field>
+	</fields>
+	<custom_php_install_command>
+		mailscanner_php_install_command();
+	</custom_php_install_command>
+	<custom_php_deinstall_command>
+		mailscanner_php_deinstall_command();
+	</custom_php_deinstall_command>
+	<custom_php_validation_command>
+		mailscanner_validate_input($_POST, &amp;$input_errors);
+	</custom_php_validation_command>	
+	<custom_php_resync_config_command>
+		sync_package_mailscanner();
+	</custom_php_resync_config_command>
+</packagegui>

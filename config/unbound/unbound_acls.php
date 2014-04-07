@@ -2,7 +2,7 @@
 /* $Id$ */
 /*
 	unbound_acls.php
-	part of pfSense (http://www.pfsense.com/)
+	part of pfSense (https://www.pfsense.org/)
 
 	Copyright (C) 2011 Warren Baker <warren@decoy.co.za>
 	All rights reserved.
@@ -83,7 +83,7 @@ if ($_POST) {
 			if (!is_ipaddr($networkacl[$x]['acl_network']))
 				$input_errors[] = gettext("You must enter a valid network IP address for {$networkacl[$x]['acl_network']}.");
 
-			if (is_ipaddrv4($networkacl[$x]['acl_network'])) {
+			if (is_ipaddr($networkacl[$x]['acl_network'])) {
 				if (!is_subnet($networkacl[$x]['acl_network']."/".$networkacl[$x]['mask']))
 					$input_errors[] = gettext("You must enter a valid IPv4 netmask for {$networkacl[$x]['acl_network']}/{$networkacl[$x]['mask']}.");
 			} else if (function_exists("is_ipaddrv6")) {
@@ -95,25 +95,35 @@ if ($_POST) {
 				$input_errors[] = gettext("You must enter a valid IPv4 address for {$networkacl[$x]['acl_network']}.");
 		}
 	}
-	
+
 	if (!$input_errors) {
 
-		if(!$a_acls[$id])
-			$a_acls[$id]['aclid'] = $id;
+		if ($pconfig['Submit'] == gettext("Save")) {
+			if(!$a_acls[$id])
+				$a_acls[$id]['aclid'] = $id;
 
-		if (isset($id) && $a_acls[$id]) {
-			$a_acls[$id]['aclid'] = $pconfig['aclid'];
-			$a_acls[$id]['aclname'] = $pconfig['aclname'];
-			$a_acls[$id]['aclaction'] = $pconfig['aclaction'];
-			$a_acls[$id]['description'] = $pconfig['description'];
-			$a_acls[$id]['row'] = array();
-			foreach ($networkacl as $acl)
-				$a_acls[$id]['row'][] = $acl;
-			write_config();
-			unbound_reconfigure();
+			if (isset($id) && $a_acls[$id]) {
+				$a_acls[$id]['aclid'] = $pconfig['aclid'];
+				$a_acls[$id]['aclname'] = $pconfig['aclname'];
+				$a_acls[$id]['aclaction'] = $pconfig['aclaction'];
+				$a_acls[$id]['description'] = $pconfig['description'];
+				$a_acls[$id]['row'] = array();
+				foreach ($networkacl as $acl)
+					$a_acls[$id]['row'][] = $acl;
+				write_config();
+				mark_subsystem_dirty("unbound");
+				//unbound_reconfigure();
+			}
+			pfSenseHeader("/unbound_acls.php");
+			exit;
 		}
-		header("Location: unbound_acls.php");
-		exit;
+
+		if ($pconfig['apply']) {
+				clear_subsystem_dirty("unbound");
+				$retval = 0;
+				$retval = unbound_reconfigure();
+				$savemsg = get_std_save_message($retval);
+		}
 	}
 }
 
@@ -129,7 +139,8 @@ include("head.inc");
 <script type="text/javascript">
 	function mask_field(fieldname, fieldsize, n) {
 		return '<select name="' + fieldname + n + '" class="formselect" id="' + fieldname + n + '"><?php
-			for ($i = 128; $i >= 0; $i--) {
+			$start = 24; if (function_exists("is_ipaddrv6")) $start = "128";
+			for ($i = $start; $i >= 0; $i--) {
 					echo "<option value=\"$i\">$i</option>";
 			}
 		?></select>';
@@ -148,6 +159,7 @@ include("head.inc");
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">
 
 <?php include("fbegin.inc"); ?>
+<form action="unbound_acls.php" method="post" name="iform" id="iform">
 <?php
 if (!$savemsg)
 	$savemsg = "";
@@ -157,9 +169,12 @@ if ($input_errors)
 
 if ($savemsg)
 	print_info_box($savemsg);
+
+if (is_subsystem_dirty("unbound"))
+		print_info_box_np(gettext("The settings for Unbound DNS has changed. You must apply the configuration to take affect."));
 ?>
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
- 	<tr>
+	<tr>
 		<td class="tabnavtbl">
 			<ul id="tabnav">
 			<?php
@@ -172,13 +187,13 @@ if ($savemsg)
 			?>
 			</ul>
 		</td>
-	</tr>    
+	</tr>
 	<tr>
 		<td class="tabcont">
 
 			<?php if($act=="new" || $act=="edit"): ?>
 
-			<form action="unbound_acls.php" method="post" name="iform" id="iform">
+
 			<input name="aclid" type="hidden" value="<?=$id;?>">
 			<input name="act" type="hidden" value="<?=$act;?>">
 
@@ -207,10 +222,10 @@ if ($savemsg)
 							<br/>
 							<span class="vexpl">
 								<?=gettext("Choose what to do with DNS requests that match the criteria specified below.");?> <br/>
-								<?=gettext("<b>Deny:</b> This actions stops queries from hosts within the netblock defined below.");?> <br/>
-								<?=gettext("<b>Refuse:</b> This actions also stops queries from hosts within the netblock defined below, but sends back DNS rcode REFUSED error message back tot eh client.");?> <br/>
-								<?=gettext("<b>Allow:</b> This actions allows queries from hosts within the netblock defined below.");?> <br/>
-								<?=gettext("<b>Allow Snoop:</b> This actions allows recursive and nonrecursive access from hosts within the netblock defined below. Used for cache snooping and ideally should only be configured for your administrative host.");?> <br/>
+								<?=gettext("<b>Deny:</b> This action stops queries from hosts within the netblock defined below.");?> <br/>
+								<?=gettext("<b>Refuse:</b> This action also stops queries from hosts within the netblock defined below, but sends a DNS rcode REFUSED error message back to the client.");?> <br/>
+								<?=gettext("<b>Allow:</b> This action allows queries from hosts within the netblock defined below.");?> <br/>
+								<?=gettext("<b>Allow Snoop:</b> This action allows recursive and nonrecursive access from hosts within the netblock defined below. Used for cache snooping and ideally should only be configured for your administrative host.");?> <br/>
 							</span>
 						</td>
 					</tr>
@@ -362,5 +377,3 @@ if ($savemsg)
 </table>
 </body>
 <?php include("fend.inc"); ?>
-
-?>

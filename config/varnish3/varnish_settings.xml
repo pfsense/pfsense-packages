@@ -1,0 +1,285 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE packagegui SYSTEM "./schema/packages.dtd">
+<?xml-stylesheet type="text/xsl" href="./xsl/package.xsl"?>
+<packagegui>
+        <copyright>
+        <![CDATA[
+/* ========================================================================== */
+/*
+    varnish_settings.xml
+    part of pfSense (http://www.pfSense.com)
+    Copyright (C) 2010 Scott Ullrich <sullrich@gmail.com>
+    Copyright (C) 2011 Marcello Coutinho
+    All rights reserved.
+                                                                              */
+/* ========================================================================== */
+/*
+    Redistribution and use in source and binary forms, with or without
+    modification, are permitted provided that the following conditions are met:
+
+     1. Redistributions of source code must retain the above copyright notice,
+        this list of conditions and the following disclaimer.
+
+     2. Redistributions in binary form must reproduce the above copyright
+        notice, this list of conditions and the following disclaimer in the
+        documentation and/or other materials provided with the distribution.
+
+    THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
+    INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+    AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+    AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+    OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+    INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+    POSSIBILITY OF SUCH DAMAGE.
+                                                                              */
+/* ========================================================================== */
+        ]]>
+        </copyright>
+    <description>Describe your package here</description>
+    <requirements>Describe your package requirements here</requirements>
+    <faq>Currently there are no FAQ items provided.</faq>
+	<name>varnishsettings</name>
+	<version>0.0.6</version>
+	<title>Varnish Settings</title>
+	<aftersaveredirect>pkg_edit.php?xml=varnish_settings.xml&amp;id=0</aftersaveredirect>
+	<include_file>/usr/local/pkg/varnish.inc</include_file>
+	<tabs>
+		<tab>
+			<text>Backends</text>
+			<url>/pkg.php?xml=varnish_backends.xml</url>
+		</tab>
+		<tab>
+			<text>Settings</text>
+			<url>/pkg_edit.php?xml=varnish_settings.xml&amp;id=0</url>
+			<active/>
+		</tab>
+		<tab>
+			<text>Custom VCL</text>
+			<url>/pkg_edit.php?xml=varnish_custom_vcl.xml&amp;id=0</url>
+		</tab>
+		<tab>
+			<text>LB Directors</text>
+			<url>/pkg.php?xml=varnish_lb_directors.xml</url>
+		</tab>
+		<tab>
+			<text>XMLRPC Sync</text>
+			<url>/pkg_edit.php?xml=varnish_sync.xml&amp;id=0</url>
+		</tab>
+		<tab>
+			<text>View Configuration</text>
+			<url>/varnish_view_config.php</url>
+		</tab>
+		<tab>
+			<text>VarnishSTAT</text>
+			<url>/varnishstat.php</url>
+		</tab>
+	</tabs>
+	<fields>
+		<field>
+			<fielddescr>Listening</fielddescr>
+			<type>listtopic</type>
+			<name>Daemon options</name>
+		</field>
+		<field>
+			<fielddescr>Enable Varnish</fielddescr>
+			<fieldname>enablevarnish</fieldname>
+			<type>checkbox</type>
+		</field>
+		<field>
+			<fielddescr>Listening port</fielddescr>
+			<fieldname>listeningport</fieldname>
+			<description><![CDATA[Enter the port you would like varnish to listen on.  Defaults to 80.<BR><BR><strong>Before listening on port 80, you must check 'Disable webConfigurator redirect rule' in system advanced options.</strong>]]></description>
+			<type>input</type>
+		</field>
+		<field>
+			<fielddescr>Managment interface</fielddescr>
+			<fieldname>managment</fieldname>
+			<description>Enter the Ip address and port for managment interface. HINT 127.0.0.1:81</description>
+			<type>input</type>
+		</field>
+		<field>
+			<fielddescr>Advanced startup options</fielddescr>
+			<fieldname>advancedstartup</fieldname>
+			<description>Enter advanced startup options to include in rc.d file</description>
+			<type>textarea</type>
+			<cols>70</cols>
+			<rows>2</rows>
+			<encoding>base64</encoding>
+		</field>
+		<field>
+			<fielddescr>StorageTypeLT</fielddescr>
+			<type>listtopic</type>
+			<name>Storage type</name>
+		</field>
+		<field>
+			<fielddescr>Storage type</fielddescr>
+			<fieldname>storagetype</fieldname>
+			<description>Select which storage type you would like to use.</description>
+			<type>select</type>
+			<options>
+				<option><name>Memory</name><value>malloc</value></option>
+				<option><name>Disk</name><value>ondisk</value></option>
+			</options>
+		</field>
+		<field>
+			<fielddescr>Cache storage size in megabytes</fielddescr>
+			<fieldname>storagesize</fieldname>
+			<description>Enter the size of the varnish cache in megabytes.  HINT: 1024 == 1 Gigabyte</description>
+			<type>input</type>
+		</field>
+
+		<field>
+			<fielddescr>WorkerThreadLT</fielddescr>
+			<type>listtopic</type>
+			<name>Worker thread configuration</name>
+		</field>
+		<field>
+			<fielddescr>Minimum worker threads</fielddescr>
+			<fieldname>minworkers</fieldname>
+			<description>Enter the minimum number of varnish worker threads.</description>
+			<type>input</type>
+		</field>
+		<field>
+			<fielddescr>Maximum worker threads</fielddescr>
+			<fieldname>maxworkers</fieldname>
+			<description>Enter the maximum number of varnish worker threads.</description>
+			<type>input</type>
+		</field>
+		<field>
+			<fielddescr>Worker thread timeout</fielddescr>
+			<fieldname>timeoutworkers</fieldname>
+			<description>Enter the timeout time for the worker threads.</description>
+			<type>input</type>
+		</field>
+		<field>
+			<fielddescr>BasicVCLLT</fielddescr>
+			<type>listtopic</type>
+			<name>General VCL Settings</name>
+		</field>
+		<field>
+			<fielddescr>Client identity method</fielddescr>
+			<fieldname>clientbalance</fieldname>
+			<description><![CDATA[Select how varnish will balance clients when using client Load Balance method.]]></description>
+			<type>select</type>
+			<options>
+				<option><name>IP address (keep sessions working)</name><value>ip</value></option>
+				<option><name>Requested url</name><value>url</value></option>
+				<option><name>User Agent</name><value>agent</value></option>
+			</options>
+		</field>
+		<field>
+			<fielddescr>Don't cache posts</fielddescr>
+			<fieldname>postcache</fieldname>
+			<description>Don't cache posts</description>
+			<type>checkbox</type>
+		</field>
+		<field>
+			<fielddescr>streaming support</fielddescr>
+			<fieldname>streaming</fieldname>
+			<description>Enable streaming support</description>
+			<type>checkbox</type>
+		</field>
+		<field>
+			<fielddescr>Session Cache</fielddescr>
+			<fieldname>sessioncache</fieldname>
+			<description><![CDATA[<strong>Never</strong> Don't cache anything with JSESSION,PHPSESSID set.<br>
+								<strong>Per User</strong><a href="https://www.varnish-cache.org/trac/wiki/VCLExampleCacheCookies"> This causes a lookup for a given object to include the Cookie.</a><br><br>								
+								Note: <strong>no-cache no-store private</strong> header directives are respected by default.]]></description>
+			<type>select</type>
+			<options>
+				<option><name>Never</name><value>never</value></option>
+				<option><name>Per User</name><value>user</value></option>
+			</options>
+		</field>
+		<field>
+			<fielddescr>Cache static content</fielddescr>
+			<fieldname>staticache</fieldname>
+			<description><![CDATA[cache images, css and javascript files (.css .js .txt .gif .jpg .jpeg .bmp .png .ico .img .tga and .wmf .mp3 .ogg)<BR>
+									<strong>Always</strong><a href="https://www.varnish-cache.org/trac/wiki/VCLExampleCacheCookies"> Cache all static content. When cookies are present, varnish will unset it from object before caching.</a><br>
+									<strong>Never</strong> Do not cache static content.<br>
+									<strong>When possible</strong> Cache only static content and per user objects when session cache is set to it.<br>]]></description>
+			<type>select</type>
+			<options>
+				<option><name>When Possible</name><value>yes</value></option>
+				<option><name>Always</name><value>all</value></option>
+				<option><name>Never</name><value>no</value></option>
+			</options>
+		</field>
+		<field>
+			<fielddescr>Fix gzip compression</fielddescr>
+			<fieldname>fixgzip</fieldname>
+			<description>Ignore compression for images files and unknow compression algorithm</description>
+			<type>checkbox</type>
+		</field>
+		<field>
+			<fielddescr>Be RFC2616 compliant</fielddescr>
+			<fieldname>rfc2616</fieldname>
+			<description>Ignore request different form GET HEAD PUT POST TRACE OPTIONS DELETE</description>
+			<type>checkbox</type>
+		</field>
+		<field>
+			<fielddescr>Foward client IP</fielddescr>
+			<fieldname>xforward</fieldname>
+			<description>Select how to forward clients real IP.</description>
+			<type>select</type>
+			<options>
+				<option><name>set X-Forwarded-For</name><value>set</value></option>
+				<option><name>append X-Forwarded-For</name><value>append</value></option>
+				<option><name>set X-Forwarded-Varnish</name><value>create</value></option>
+				<option><name>Unset</name><value>unset</value></option>
+			</options>
+		</field>
+		<field>
+			<fielddescr>Fetch Grace</fielddescr>
+			<fieldname>grace</fieldname>
+			<description><![CDATA[<a href="https://www.varnish-cache.org/trac/wiki/VCLExampleGrace">How many time varnish will keep cached objects.</a> HINT 60s, 30m, 1h]]></description>
+	    	<type>input</type>
+	    	<size>5</size>
+ 			</field>
+		<field>
+			<fielddescr>ErrorVCLLT</fielddescr>
+			<type>listtopic</type>
+			<name>Error Settings</name>
+		</field>
+		 <field>
+			<fielddescr>Retries</fielddescr>
+			<fieldname>restarts</fieldname>
+			<description><![CDATA[<a href="https://www.varnish-cache.org/trac/wiki/VCLExampleRestarts">How many times restart loop until Error messages.</a>]]></description>
+	    	<type>select</type>
+ 				<options>
+				<option><name>1</name><value>1</value></option>
+				<option><name>2</name><value>2</value></option>
+				<option><name>3</name><value>3</value></option>
+				<option><name>4</name><value>4</value></option>
+				<option><name>5</name><value>5</value></option>
+				</options>
+		</field>
+		<field>
+			<fielddescr>Saintmode</fielddescr>
+			<fieldname>saint</fieldname>
+			<description><![CDATA[<a href="https://www.varnish-cache.org/trac/wiki/VCLExampleSaintMode">How many time varnish will send cached objects from a down backend to client.</a> HINT 60s, 30m, 1h]]></description>
+	    	<type>input</type>
+	    	<size>5</size>
+ 			</field>
+		<field>
+			<fielddescr>Custom Html error message</fielddescr>
+			<fieldname>htmlerror</fieldname>
+			<description>Paste your custom html error page code here.</description>
+			<type>textarea</type>
+			<cols>70</cols>
+			<rows>10</rows>
+			<encoding>base64</encoding>
+		</field>
+	</fields>
+	<custom_php_resync_config_command>
+		sync_package_varnish();
+		create_varnish_rcd_file();
+		varnish_start();
+	</custom_php_resync_config_command>
+	<custom_php_validation_command>
+		varnish_settings_post_validate($_POST, &amp;$input_errors);
+	</custom_php_validation_command>
+</packagegui>

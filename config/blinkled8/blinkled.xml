@@ -2,7 +2,7 @@
 <packagegui>
 	<title>Interfaces: Assign LEDs</title>
 	<name>blinkled</name>
-	<version>20090710</version>
+	<version>0.4</version>
 	<savetext>Save</savetext>
 	<include_file>/usr/local/pkg/blinkled.inc</include_file>
 	<menu>
@@ -12,19 +12,20 @@
 		<url>/pkg_edit.php?xml=blinkled.xml&amp;id=0</url>
 	</menu>
 	<additional_files_needed>
-		<item>http://www.pfsense.org/packages/config/blinkled8/blinkled.inc</item>
+		<item>https://packages.pfsense.org/packages/config/blinkled8/blinkled.inc</item>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0755</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/bin/</prefix>
 		<chmod>0755</chmod>
-		<item>http://www.pfsense.com/packages/config/blinkled8/binaries/blinkled</item>
+		<item>https://packages.pfsense.org/packages/config/blinkled8/binaries/blinkled</item>
 	</additional_files_needed>
 	<service>
 		<name>blinkled</name>
 		<rcfile>blinkled.sh</rcfile>
 		<executable>blinkled</executable>
+		<description>Blinks LEDs to indicate network activity</description>
 	</service>
 	<fields>
 		<field>

@@ -12,19 +12,15 @@
 		<url>/pkg_edit.php?xml=blinkled.xml</url>
 	</menu>
 	<additional_files_needed>
-		<item>http://www.pfsense.org/packages/config/blinkled/blinkled.inc</item>
+		<item>https://packages.pfsense.org/packages/config/blinkled/blinkled.inc</item>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0755</chmod>
-	</additional_files_needed>
-	<additional_files_needed>
-		<prefix>/usr/local/bin/</prefix>
-		<chmod>0755</chmod>
-		<item>http://www.pfsense.com/packages/config/blinkled/binaries/blinkled</item>
 	</additional_files_needed>
 	<service>
 		<name>blinkled</name>
 		<rcfile>blinkled.sh</rcfile>
 		<executable>blinkled</executable>
+		<description>Blinks LEDs to indicate network activity</description>
 	</service>
 	<fields>
 		<field>

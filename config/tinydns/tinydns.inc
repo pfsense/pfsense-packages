@@ -53,33 +53,13 @@ function tinydns_custom_php_install_command() {
 		log_error("Could not open /usr/local/etc/rc.d/svscan.sh for writing.");
 		return;
 	}
-	
+
 	// Ensure svscan.sh has a+rx
 	exec("chmod a+rx /usr/local/etc/rc.d/svscan.sh");
-	
+
 	$ipaddress = $config['installedpackages']['tinydns']['config'][0]['ipaddress'];
 
-	$minsegment = "10240";
-	$maxfilesize = "10240";
-	$maxsegment  = "20480";
-	$maxfd = "100";
-	$maxchild = "40";
-
-	if($config['installedpackages']['tinydns']['config'][0]['minsegment'])
-		$minsegment = $config['installedpackages']['tinydns']['config'][0]['minsegment'];
-
-	if($config['installedpackages']['tinydns']['config'][0]['maxfilesize'])
-		$maxfilesize = $config['installedpackages']['tinydns']['config'][0]['maxfilesize'];
-
-	if($config['installedpackages']['tinydns']['config'][0]['maxsegment'])
-		$maxsegment = $config['installedpackages']['tinydns']['config'][0]['maxsegment'];
-
-	if($config['installedpackages']['tinydns']['config'][0]['maxfd'])
-		$maxfd = $config['installedpackages']['tinydns']['config'][0]['maxfd'];
-
-	if($config['installedpackages']['tinydns']['config'][0]['maxchild'])
-		$maxchild = $config['installedpackages']['tinydns']['config'][0]['maxchild'];
-
+	$enableipmonitoring = $config['installedpackages']['tinydns']['config'][0]['enableipmonitoring'];
 	if($config['installedpackages']['tinydns']['config'][0]['refreshinterval'])
 		$refreshinterval = $config['installedpackages']['tinydns']['config'][0]['refreshinterval'];
 
@@ -97,6 +77,7 @@ rcvar=`set_rcvar`
 command="/usr/local/bin/svscan"
 svscan_enable=\${svscan_enable-"YES"}
 svscan_servicedir=\${svscan_servicedir-"{$g['varrun_path']}/service"}
+logdir="/var/log/svscan"
 
 start_cmd="svscan_start"
 stop_postcmd="svscan_stop_post"
@@ -107,10 +88,18 @@ required_dirs="\${svscan_servicedir}"
 
 svscan_start () {
         echo "Starting svscan."
+        mkdir -p \$logdir
         /usr/bin/env \
         PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin \
-        /usr/sbin/daemon -f /bin/sh -c "\$command \$svscan_servicedir 2>&1 | /usr/local/bin/readproctitle service errors: ................................................................................................................................................................................................................................................................................................................................................................................................................ &" > /dev/null
+        /usr/sbin/daemon -f /bin/sh -c "\$command \$svscan_servicedir 2>&1 | /usr/local/bin/multilog t \$logdir" > /dev/null
+EOD;
+if ($enableipmonitoring) {
+	$svscan .= <<<EOD
         minicron {$refreshinterval} {$g['varrun_path']}/ping_hosts.pid "/etc/ping_hosts.sh; cd {$g['varetc_path']}/tinydns/root && /usr/local/bin/tinydns-data"
+EOD;
+}
+$svscan .= <<<EOD
+
 }
 
 svscan_stop_post () {
@@ -130,9 +119,11 @@ EOD;
 <?php
 	require_once(\"/usr/local/pkg/tinydns.inc\");
 	tinydns_custom_php_changeip_command();
-	tinydns_create_zone_file();
-	tinydns_setup_ping_items();
-?>
+	tinydns_create_zone_file();\n";
+	if ($enableipmonitoring) {
+		$start .= "tinydns_setup_ping_items();\n";
+	}
+	$start .= "?>
 ENDPHP\n";
 
 	$stop = "";
@@ -169,10 +160,11 @@ function tinydns_custom_php_deinstall_command() {
 
 	conf_mount_rw();
 	/* destroy all daemontools items */
+	exec("/usr/local/bin/svc -xk {$g['varetc_path']}/tinydns*");
+	exec("/usr/local/bin/svc -xk {$g['varetc_path']}/dnscache*");
 	exec("/usr/local/etc/rc.d/tinydns.sh stop");
 	exec("/usr/local/etc/rc.d/svscan.sh stop");
 	exec("/usr/bin/killall supervise");
-	exec("/usr/bin/killall tinydns");	
 	exec("/usr/sbin/pw groupdel Gtinydns");
 	exec("/usr/sbin/pw groupdel Gdnscache");
 	exec("/usr/sbin/pw groupdel Gdnslog");
@@ -231,13 +223,11 @@ function tinydns_custom_php_changeip_command() {
 	}
 
 	exec("echo {$dnsserverip} > {$g['varetc_path']}/tinydns/env/IP");
-	exec("/usr/bin/killall -9 tinydns");
+	exec("/usr/local/bin/svc -xk {$g['varrun_path']}/service/tinydns");
+		
 
 	if(!empty($config['installedpackages']['tinydns']['config'][0]['enableforwarding'])) {
 		$interfaces = explode(",", $config['installedpackages']['tinydns']['config'][0]['interface']);
-		exec("/bin/cp {$g['varetc_path']}/resolv.conf {$g['varetc_path']}/resolv.conf.original");
-		exec("/bin/cp {$g['varetc_path']}/resolv.conf {$g['varetc_path']}/resolv.conf.dnscache");
-		exec("echo domain {$config['system']['domain']} > {$g['varetc_path']}/resolv.conf");
 		exec("rm -rf {$g['varetc_path']}/dnscache* {$g['varrun_path']}/service/dnscache*");
 		foreach ($interfaces as $dnsidx => $dnsif) {
 			$dnscacheif = convert_friendly_interface_to_real_interface_name($dnsif);
@@ -260,28 +250,47 @@ function tinydns_custom_php_changeip_command() {
 			$dnsuserip = $arr[0];
 			//exec("/bin/mkdir -p {$g['varetc_path']}/dnscache{$dnsidx}");
 			exec("/usr/local/bin/dnscache-conf Gdnscache Gdnslog {$g['varetc_path']}/dnscache{$dnsidx} {$dnscacheip}");
-			exec("/bin/ln -s {$g['varetc_path']}/dnscache{$dnsidx} {$g['varrun_path']}/service/");
+
 			if (!is_dir("{$g['varetc_path']}/dnscache{$dnsidx}/env"))
 				exec("/bin/mkdir -p {$g['varetc_path']}/dnscache{$dnsidx}/env");
 			exec("echo {$dnscacheip} > {$g['varetc_path']}/dnscache{$dnsidx}/env/IP");
 			tinydns_dnscache_forwarding_servers($dnsidx);
 			if (!is_dir("{$g['varetc_path']}/dnscache{$dnsidx}/root/ip"))
 				exec("/bin/mkdir -p {$g['varetc_path']}/dnscache{$dnsidx}/root/ip");
-			exec("/usr/bin/touch {$g['varetc_path']}/dnscache{$dnsidx}/root/ip/{$dnsuserip}");
+
+			/* tell dnscache to answer queries */
+			if ( $config['installedpackages']['tinydns']['config'][0]['dnscache_listen'] != "" ) {
+				$dnscache_listen_ips = explode (" ", $config['installedpackages']['tinydns']['config'][0]['dnscache_listen']);
+
+				foreach ($dnscache_listen_ips as $dnscache_listen_ip) {
+					exec("/usr/bin/touch {$g['varetc_path']}/dnscache{$dnsidx}/root/ip/{$dnscache_listen_ip}");
+				}
+
+			} else {
+				exec("/usr/bin/touch {$g['varetc_path']}/dnscache{$dnsidx}/root/ip/{$dnscacheip}");
+			}
+
 			tinydns_create_soa_domain_list($dnsserverip, $dnsidx);
-			exec("echo nameserver {$dnscacheip} >> {$g['varetc_path']}/resolv.conf");
+
+			/* setup symlink to start dnscache */
+			exec("/bin/ln -s {$g['varetc_path']}/dnscache{$dnsidx} {$g['varrun_path']}/service/");
+			
+			exec("/usr/local/bin/svc -xk {$g['varetc_path']}/dnscache{$dnsidx}");
 		}
-		exec("/usr/bin/killall -9 dnscache");
 	} else {
-		if(file_exists("{$g['varetc_path']}/resolv.conf.original"))
-			exec("/bin/cp {$g['varetc_path']}/resolv.conf.original {$g['varetc_path']}/resolv.conf");
 		$interfaces = explode(",", $$config['installedpackages']['tinydns']['config'][0]['interface']);
 		foreach ($interfaces as $dnsidx => $dnsif) {
 			if(is_dir("{$g['varetc_path']}/dnscache{$dnsidx}"))
 				dnscache_use_root_servers($dnsidx);
 		}
-		exec("/usr/bin/killall -9 dnscache");
+		exec("/usr/local/bin/svc -xk {$g['varetc_path']}/dnscache*");
 	}
+
+	/* a wee bit of magic - something seems to start up a broken dnscache, the below kills it, and svc restarts it correctly. */ 
+	exec ("ps aux | grep multilog |  awk '{print $2}' | xargs -n1 kill -9");
+	exec ("ps aux | grep dnscache |  awk '{print $2}' | xargs -n1 kill -9");
+	exec ("ps aux | grep tinydns |  awk '{print $2}' | xargs -n1 kill -9");
+
 	conf_mount_ro();
 	filter_configure();
 }
@@ -618,7 +627,9 @@ function tinydns_sync_on_changes() {
 			tinydns_do_xmlrpc_sync($sync_to_ip, $password);
 	}
 	tinydns_create_zone_file();
-	tinydns_setup_ping_items();
+	if ($config['installedpackages']['tinydns']['config'][0]['enableipmonitoring']) {
+		tinydns_setup_ping_items();
+	}
 	log_error("[tinydns] tinydns_xmlrpc_sync.php is ending.");
 }
 
@@ -686,7 +697,9 @@ function tinydns_do_xmlrpc_sync($sync_to_ip, $password) {
 	$execcmd  = "require_once('/usr/local/pkg/tinydns.inc');\n";
 	$execcmd .= "tinydns_custom_php_changeip_command();\n";
 	$execcmd .= "tinydns_create_zone_file();\n";
-	$execcmd .= "tinydns_setup_ping_items();\n";
+	if ($config['installedpackages']['tinydns']['config'][0]['enableipmonitoring']) {
+		$execcmd .= "tinydns_setup_ping_items();\n";
+	}
 	
 	/* assemble xmlrpc payload */
 	$params = array(
@@ -1121,7 +1134,17 @@ function tinydns_dnscache_forwarding_servers($index) {
 		exec("rm -R {$g['varetc_path']}/dnscache/root/servers/");
 	exec("/bin/mkdir -p {$g['varetc_path']}/dnscache{$index}/root/servers/");
 	if (intval($config['version']) >= 6)
-		exec("/bin/cat {$g['varetc_path']}/nameserver_* > {$g['varetc_path']}/dnscache{$index}/root/servers/@");
+		if (file_exists("{$g['varetc_path']}/nameserver_*")) {
+			exec("/bin/cat {$g['varetc_path']}/nameserver_* > {$g['varetc_path']}/dnscache{$index}/root/servers/@");
+		} else {
+			$fw = fopen("{$g['varetc_path']}/dnscache{$index}/root/servers/@", "w");
+			if (! $fw) {
+				printf("Error: cannot open dnscache/root/servers/@ in tinydns_register_forwarding_servers().\n");
+				return 1;
+			}
+			fwrite($fw, $config['system']['dnsserver'][0]);
+			fclose($fw);
+		}
 	else {
 		$fr = fopen("{$g['varetc_path']}/resolv.conf.dnscache", "r");
 		if (! $fr) {
@@ -1186,42 +1209,6 @@ function tinydns_create_soa_domain_list($dnsserverip, $index = 0) {
 			}
 		}	
 	}	
-}
-
-/* This function is not called */
-/* At the moment there is no tagging of DNSroute to a WAN port. It needs to be added  */
-function tinydns_register_forwarding_servers() {
-	global $g;
-
-	$fr = fopen("{$g['varetc_path']}/resolv.conf", "r");
-	if (! $fr) {
-		printf("Error: cannot open resolv.conf in tinydns_register_forwarding_servers().\n");
-		return 1;
-	}
-	$lip = strlen("nameserver") + 1;
-	$j = 0;
-	$nsrecords = "";
-	$arecords = "";
-	while (!feof($fr)) {
-		$routers = fgets($fr, 4096);
-		$discard = ($routers[0] == "\n"); 
-		if(!$discard) {
-			if ($routerip = strstr($routers,"nameserver")) {
-				$routerip = substr($routerip,$lip);
-				if($routerip) {
-					$j += 1;
-					$routerfqdn = "DNSroute-{$j}.wan{$j}";
-					$routerns = "&::{$routerfqdn}";
-					$routera = "={$routerfqdn}:{$routerip}";
-					$nsrecords .= $routerns . "\n";
-					$arecords .= $routera;
-				}	
-			}
-		}	
-	}
-	fclose($fr);
-	$dnsroutes ="{$nsrecords}{$arecords}";
-	return $dnsroutes;
 }
 
 function tinydns_register_root_servers() {

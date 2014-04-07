@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE packagegui SYSTEM "./schema/packages.dtd">
+<?xml-stylesheet type="text/xsl" href="./xsl/package.xsl"?>
+<packagegui>
+        <copyright>
+        <![CDATA[
+/* $Id$ */
+/* ========================================================================== */
+/*
+    tinc_hosts.xml
+    part of pfSense (http://www.pfSense.com)
+    Copyright (C) 2007-2009 Scott Ullrich
+    All rights reserved.
+                                                                              */
+/* ========================================================================== */
+/*
+    Redistribution and use in source and binary forms, with or without
+    modification, are permitted provided that the following conditions are met:
+
+     1. Redistributions of source code must retain the above copyright notice,
+        this list of conditions and the following disclaimer.
+
+     2. Redistributions in binary form must reproduce the above copyright
+        notice, this list of conditions and the following disclaimer in the
+        documentation and/or other materials provided with the distribution.
+
+    THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
+    INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+    AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+    AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+    OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+    INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+    POSSIBILITY OF SUCH DAMAGE.
+                                                                              */
+/* ========================================================================== */
+        ]]>
+        </copyright>
+    <description>tinc Hosts</description>
+    <requirements></requirements>
+    <faq>Currently there are no FAQ items provided.</faq>
+	<name>tinchosts</name>
+	<version>1.0.19</version>
+	<title>VPN: tinc - Hosts</title>
+	<!-- configpath gets expanded out automatically and config items will be
+         stored in that location -->
+	<configpath>['installedpackages']['package']['$packagename']['config']</configpath>
+
+	<tabs>
+		<tab>
+			<text>Config</text>
+			<url>/pkg_edit.php?xml=tinc_config.xml</url>
+		</tab>
+		<tab>
+			<text>Hosts</text>
+			<url>/pkg.php?xml=tinc_hosts.xml</url>
+			<active/>
+		</tab>
+	</tabs>
+	<advanced_options>enabled</advanced_options>
+
+	<!-- adddeleteeditpagefields items will appear on the first page where you can add / delete or edit
+         items.  An example of this would be the nat page where you add new nat redirects -->
+	<adddeleteeditpagefields>
+		<columnitem>
+			<fielddescr>Name</fielddescr>
+			<fieldname>name</fieldname>
+		</columnitem>
+		<columnitem>
+			<fielddescr>Address</fielddescr>
+			<fieldname>address</fieldname>
+		</columnitem>
+		<columnitem>
+			<fielddescr>Subnet</fielddescr>
+			<fieldname>subnet</fieldname>
+		</columnitem>
+		<columnitem>
+			<fielddescr>Connect at Startup</fielddescr>
+			<fieldname>connect</fieldname>
+			<type>checkbox</type>
+		</columnitem>
+
+	</adddeleteeditpagefields>
+	<!-- fields gets invoked when the user adds or edits a item.   the following items
+         will be parsed and rendered for the user as a gui with input, and selectboxes. -->
+	<fields>
+		<field>
+			<fielddescr>Name</fielddescr>
+			<fieldname>name</fieldname>
+			<description>Name of this host.</description>
+			<type>input</type>
+		</field>
+		<field>
+			<fielddescr>Address</fielddescr>
+			<fieldname>address</fieldname>
+			<description>IP address or hostname of server.</description>
+			<type>input</type>
+		</field>
+		<field>
+			<fielddescr>Subnet</fielddescr>
+			<fieldname>subnet</fieldname>
+			<description>Subnet behind host (like 192.168.254.0/24)</description>
+			<type>input</type>
+			<size>50</size>
+		</field>
+		<field>
+			<fielddescr>Connect at Startup</fielddescr>
+			<fieldname>connect</fieldname>
+			<description>Try to connect to this host when tinc starts.</description>
+			<type>checkbox</type>
+		</field>
+		<field>
+			<fielddescr>RSA public key</fielddescr>
+			<fieldname>cert_pub</fieldname>
+			<description>RSA public key used for this host. Include the BEGIN and END lines.&lt;br&gt;</description>
+			<type>textarea</type>
+			<encoding>base64</encoding>
+			<rows>7</rows>
+			<cols>65</cols>
+		</field>
+		<field>
+			<fielddescr>Extra Parameters</fielddescr>
+			<fieldname>extra</fieldname>
+			<description>Anything entered here will be added just prior to the public certiciate in the host configuration file. &lt;br&gt;</description>
+			<type>textarea</type>
+			<encoding>base64</encoding>
+			<rows>8</rows>
+			<cols>65</cols>
+			<advancedfield/>
+		</field>
+		<field>
+			<fielddescr>Host Up Script</fielddescr>
+			<fieldname>host_up</fieldname>
+			<description>This script will be run when this host becomes reachable. &lt;br&gt;</description>
+			<type>textarea</type>
+			<encoding>base64</encoding>
+			<rows>8</rows>
+			<cols>65</cols>
+			<advancedfield/>
+		</field>
+		<field>
+			<fielddescr>Host Down Script</fielddescr>
+			<fieldname>host_down</fieldname>
+			<description>This script will be run when this host becomes unreachable. &lt;br&gt;</description>
+			<type>textarea</type>
+			<encoding>base64</encoding>
+			<rows>8</rows>
+			<cols>65</cols>
+			<advancedfield/>
+		</field>
+	</fields>	
+	<include_file>/usr/local/pkg/tinc.inc</include_file>
+	<custom_add_php_command>
+	</custom_add_php_command>
+	<custom_php_resync_config_command>
+		tinc_save();
+	</custom_php_resync_config_command>
+	<custom_php_command_before_form>
+	</custom_php_command_before_form>
+	<custom_php_after_form_command>
+	</custom_php_after_form_command>
+	<custom_delete_php_command>
+		tinc_save();
+	</custom_delete_php_command>
+</packagegui>

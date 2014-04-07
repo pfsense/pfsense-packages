@@ -34,7 +34,7 @@
 	</copyright>
 	<title>Services: Avahi</title>
 	<name>avahi</name>
-	<version>1.0</version>
+	<version>0.6.29 pkg v1.01</version>
 	<savetext>Save</savetext>
 	<include_file>/usr/local/pkg/avahi.inc</include_file>
 	<menu>
@@ -47,6 +47,7 @@
 		<name>avahi</name>
 		<rcfile>avahi-daemon.sh</rcfile>
 		<executable>avahi-daemon</executable>
+		<description>Avahi zeroconf/mDNS daemon</description>
 	</service>
 	<fields>
 		<field>
@@ -58,7 +59,7 @@
 		<field>
 			<fielddescr>Browse domains (comma separated)</fielddescr>
 			<fieldname>browsedomains</fieldname>
-			<description>Enter the domains that you would like proxied. (example: local, pfsense.org, mydomain.com)</description>
+			<description>Enter the domains that you would like proxied. (example: .local, pfsense.org, mydomain.com)</description>
 			<type>input</type>
 		</field>
 		<field>
@@ -68,31 +69,43 @@
 			<type>interfaces_selection</type>
 			<multiple>true</multiple>
 		</field>
+		<field>
+			<fielddescr>Disable IPv6</fielddescr>
+			<fieldname>disable_ipv6</fieldname>
+			<description>Disable IPv6 support in Avahi</description>
+			<type>checkbox</type>
+		</field>
+		<field>
+			<fielddescr>Disable IPv4</fielddescr>
+			<fieldname>disable_ipv4</fieldname>
+			<description>Disable IPv4 support in Avahi</description>
+			<type>checkbox</type>
+		</field>
 	</fields>
 	<additional_files_needed>
 		<prefix>/root/</prefix>
 		<chmod>0755</chmod>
-		<item>http://www.pfsense.org/packages/config/avahi/binaries/avahi.tar.gz</item>
+		<item>https://files.pfsense.org/packages/avahi/avahi.tar.gz</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/root/</prefix>
 		<chmod>0755</chmod>
-		<item>http://www.pfsense.org/packages/config/avahi/binaries/avahi8.tar.gz</item>
+		<item>https://files.pfsense.org/packages/avahi/avahi8.tar.gz</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0755</chmod>
-		<item>http://www.pfsense.org/packages/config/avahi/avahi.inc</item>
+		<item>https://packages.pfsense.org/packages/config/avahi/avahi.inc</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/etc/avahi/</prefix>
 		<chmod>0755</chmod>
-		<item>http://www.pfsense.org/packages/config/avahi/services/ssh.service</item>
+		<item>https://packages.pfsense.org/packages/config/avahi/services/ssh.service</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/etc/avahi/</prefix>
 		<chmod>0755</chmod>
-		<item>http://www.pfsense.org/packages/config/avahi/services/sftp-ssh.service</item>
+		<item>https://packages.pfsense.org/packages/config/avahi/services/sftp-ssh.service</item>
 	</additional_files_needed>
 	<custom_php_resync_config_command>
 		avahi_sync();
@@ -102,6 +115,7 @@
 	</custom_php_install_command>
 	<custom_php_deinstall_command>
 		unlink_if_exists("/usr/local/etc/rc.d/avahi-daemon.sh");
-		exec("killall avahi-daemon");
+		exec("killall -9 avahi-daemon");
+		exec("killall -9 dbus-daemon");
 	</custom_php_deinstall_command>
 </packagegui>
