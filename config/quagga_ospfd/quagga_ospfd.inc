@@ -76,7 +76,7 @@ function quagga_ospfd_install_conf() {
 	$noaccept = "";
 	
 	// generate ospfd.conf based on the assistant
-	if($config['installedpackages']['quaggaospfd']['config'])
+	if(is_array($config['installedpackages']['quaggaospfd']['config']))
 		$ospfd_conf = &$config['installedpackages']['quaggaospfd']['config'][0];
 	else {
 		log_error("Quagga OSPFd: No config data found.");
@@ -100,7 +100,7 @@ function quagga_ospfd_install_conf() {
 		$passive_interfaces = array();
 		$interface_networks = array();
 
-		if ($config['installedpackages']['quaggaospfdinterfaces']['config']) {
+		if (is_array($config['installedpackages']['quaggaospfdinterfaces']['config'])) {
 			foreach ($config['installedpackages']['quaggaospfdinterfaces']['config'] as $conf) {
 				$realif = get_real_interface($conf['interface']);
 				$conffile .= "interface {$realif}\n" ;
