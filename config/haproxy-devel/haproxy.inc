@@ -504,27 +504,17 @@ function write_backend($fd, $name, $pool, $frontend) {
 	global $a_checktypes, $a_cookiemode;
 		
 	$a_servers = &$pool['ha_servers']['item'];
-	$frontendtype = strtolower($frontend['type']);
-
-	unset($sslserverpresent);
-	if (is_array($a_servers))
-	{
-		foreach($a_servers as $be) {
-			if (!$be['status'] == "inactive")
-				continue;
-			if ($be['ssl'])
-				$sslserverpresent = true;
-		}
-	}
+	$frontendtype = $frontend['type'];
+	$frontend_ip = haproxy_interface_ip($frontend['extaddr']);
 	
 	fwrite ($fd, "backend " . $name . "\n");
 	// https is an alias for tcp for clarity purposes
-	if(strtolower($frontend['type']) == "https") {
-		$backend_type = "tcp";
+	if($frontendtype == "https") {
+		$backend_mode = "tcp";
 	} else {
-		$backend_type = $frontend['type'];
+		$backend_mode = $frontendtype;
 	}
-	fwrite ($fd, "\tmode\t\t\t" . $backend_type . "\n");
+	fwrite ($fd, "\tmode\t\t\t" . $backend_mode . "\n");
 
 	if ($frontendtype == "http") {
 		if ($pool["persist_cookie_enabled"] == "yes") {
@@ -702,7 +692,7 @@ function write_backend($fd, $name, $pool, $frontend) {
 			$ssl = "";
 			if ($be['ssl'] == 'yes')
 			{
-				$ssl = $backend_type == "http" ? ' ssl' : ' check-ssl';
+				$ssl = $frontendtype == "http" ? ' ssl' : ' check-ssl';
 			}
 			$weight = "";
 			if (is_numeric($be['weight'])){
@@ -837,11 +827,11 @@ function haproxy_writeconf($configpath) {
 				unlink_if_exists("var/etc/{$frontend['name']}.{$frontend['port']}.crt");
 				continue;
 			}
-			
+			$primaryfrontend = get_primaryfrontend($frontend);
 			$bname = get_frontend_ipport($frontend);
 
 			//check ssl info
-			if (strtolower($frontend['type']) == "http" && $frontend['ssloffload']){
+			if (strtolower($primaryfrontend['type']) == "http" && $frontend['ssloffload']){
 				//ssl crt ./server.pem ca-file ./ca.crt verify optional crt-ignore-err all crl-file ./ca_crl.pem
 				$filename = "$configpath/{$frontend['name']}.{$frontend['port']}.pem";
 				$ssl_crt = " crt $filename";
@@ -866,7 +856,6 @@ function haproxy_writeconf($configpath) {
 				$a_bind[$bname] = array();
 				$a_bind[$bname]['config'] = array();
 				// Settings which are used only from the primary frontend
-				$primaryfrontend = get_primaryfrontend($frontend);
 				$a_bind[$bname]['name']            = $primaryfrontend['name'];
 				$a_bind[$bname]['extaddr']         = $primaryfrontend['extaddr'];
 				$a_bind[$bname]['port']            = $primaryfrontend['port'];
@@ -883,7 +872,7 @@ function haproxy_writeconf($configpath) {
 			
 			if (($frontend['secondary'] != 'yes') && ($frontend['name'] != $b['name'])) {
 				// only 1 frontend can be the primary for a set of frontends that share 1 address:port.
-					$input_errors[] = "Multiple primary frondends for $bname";
+					$input_errors[] = "Multiple primary frontends for $bname use the 'Shared Frontend' option instead";
 			}
 			
 			if ($ssl_crt != "") {
@@ -912,8 +901,15 @@ function haproxy_writeconf($configpath) {
 			// Prepare ports for processing by splitting
 			$portss = "{$bind['port']},";
 			$ports = split(",", $portss);
-			$ssl_info = $bind['ssl_info'];
-			$advanced_bind = $bind['advanced_bind'];
+			
+			if($bind['type'] == "http") {
+				// ssl offloading is only possible in http mode.
+				$ssl_info = $bind['ssl_info'];
+				$advanced_bind = $bind['advanced_bind'];
+			} else {
+				$ssl_info = "";
+				$advanced_bind = "";
+			}
 			// Initialize variable
 			$listenip = "";
 			
@@ -944,7 +940,7 @@ function haproxy_writeconf($configpath) {
 				}
 			}
 
-			// https is an alias for tcp for clarity purpouses
+			// https is an alias for tcp for clarity purposes
 			if($bind['type'] == "https") {
 				$backend_type = "tcp";
 			} else {
@@ -984,16 +980,13 @@ function haproxy_writeconf($configpath) {
 			foreach ($bind['config'] as $frontend) {
 				$a_acl = get_frontend_acls($frontend);
 
-				$poolname = $frontend['backend_serverpool'] . "_" . strtolower($frontend['type']);
-
-				// Create different pools if the svrport is set
-				if ($frontend['svrport'] > 0)
-					$poolname .= "_" . $frontend['svrport'];
+				$poolname = $frontend['backend_serverpool'] . "_" . strtolower($bind['type']);
 
 				if (!isset($a_pendingpl[$poolname])) {
 					$a_pendingpl[$poolname] = array();
 					$a_pendingpl[$poolname]['name'] = $poolname;
-					$a_pendingpl[$poolname]['frontend'] = $frontend;
+					$a_pendingpl[$poolname]['backend'] = $frontend['backend_serverpool'];
+					$a_pendingpl[$poolname]['frontend'] = $bind;
 				}
 				
 				// Write this out once, and must be before any backend config text
@@ -1044,7 +1037,7 @@ function haproxy_writeconf($configpath) {
 	if (is_array($a_pendingpl) && is_array($a_backends)) {
 		foreach ($a_pendingpl as $pending) {
 			foreach ($a_backends as $pool) {
-				if ($pending['frontend']['backend_serverpool'] == $pool['name']) {
+				if ($pending['backend'] == $pool['name']) {
 					write_backend($fd, $pending['name'], $pool, $pending['frontend']);
 				}
 			}
@@ -1339,7 +1332,7 @@ function get_primaryfrontend($frontend) {
 
 function get_frontend_ipport($frontend,$userfriendly=false) {
 	$mainfrontend = get_primaryfrontend($frontend);
-	$result = haproxy_interface_ip($mainfrontend['extaddr'],$userfriendly);
+	$result = haproxy_interface_ip($mainfrontend['extaddr'], $userfriendly);
 	if ($userfriendly and is_ipaddrv6($result))
 		$result = "[{$result}]";
 	return $result . ":" . $mainfrontend['port'];
@@ -1393,6 +1386,7 @@ function get_haproxy_frontends($excludeitem="") {
 }
 
 function get_frontend_acls($frontend) {
+	$mainfrontend = get_primaryfrontend($frontend);
 	$result = array();
 	$a_acl = &$frontend['ha_acls']['item'];
 	if (is_array($a_acl))
@@ -1403,7 +1397,7 @@ function get_frontend_acls($frontend) {
 				continue;
 
 			// Filter out acls for different modes
-			if ($acl['mode'] != '' && $acl['mode'] != strtolower($frontend['type']))
+			if ($acl['mode'] != '' && $acl['mode'] != strtolower($mainfrontend['type']))
 				continue;
 			
 			$acl_item = array();
@@ -1414,7 +1408,6 @@ function get_frontend_acls($frontend) {
 		}
 	}
 	
-	$mainfrontend = get_primaryfrontend($frontend);
 	if (strtolower($mainfrontend['type']) == "http" && $mainfrontend['ssloffload']) {
 		$a_acl = &$frontend['ha_acls']['item'];
 		if(!is_array($a_acl)) 
@@ -1435,17 +1428,15 @@ function get_frontend_acls($frontend) {
 		if ($frontend['ssloffloadacladditional']){
 			$certs = $frontend['ha_certificates']['item'];
 			if (is_array($certs)){
-				if (count($certs) > 0){
-					foreach($certs as $certref){
-						$cert = lookup_cert($certref['ssl_certificate']);
-						$cert_cn = cert_get_cn($cert['crt']);
-						$descr = haproxy_escape_acl_name($cert['descr']);
-						unset($cert);
-						$acl_item = array();
-						$acl_item['descr'] = "Additional certificate ACLs: ".$cert_cn;
-						$acl_item['ref'] = array('name' => "{$aclname}_{$descr}",'expression' => 'host_matches', 'value' => $cert_cn);
-						$result[] = $acl_item;
-					}
+				foreach($certs as $certref){
+					$cert = lookup_cert($certref['ssl_certificate']);
+					$cert_cn = cert_get_cn($cert['crt']);
+					$descr = haproxy_escape_acl_name($cert['descr']);
+					unset($cert);
+					$acl_item = array();
+					$acl_item['descr'] = "Additional certificate ACLs: ".$cert_cn;
+					$acl_item['ref'] = array('name' => "{$aclname}_{$descr}",'expression' => 'host_matches', 'value' => $cert_cn);
+					$result[] = $acl_item;
 				}
 			}
 		}
@@ -1456,11 +1447,12 @@ function get_frontend_acls($frontend) {
 function get_backend($name) {
 	global $config;
 	$a_backend = &$config['installedpackages']['haproxy']['ha_pools']['item'];
-	foreach($a_backend as $key => $backend)
-	{
-		if ($backend['name'] == $name)
-			return $backend;
-	}
+	if(is_array($a_backend))
+		foreach($a_backend as $key => $backend)
+		{
+			if ($backend['name'] == $name)
+				return $backend;
+		}
 	return null;
 }
 
