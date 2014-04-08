@@ -123,8 +123,10 @@ include("head.inc");
 		
 		$a_frontend_grouped = array();
 		foreach($a_frontend as &$frontend2) {
+			$mainfrontend = get_primaryfrontend($frontend2);
 			$ipport = get_frontend_ipport($frontend2, true);
 			$frontend2['ipport'] = $ipport;
+			$frontend2['type'] = $mainfrontend['type'];
 			$a_frontend_grouped[$ipport][] = $frontend2;
 		}
 		ksort($a_frontend_grouped);
@@ -181,11 +183,13 @@ include("head.inc");
 					
 					$backend_serverpool = $frontend['backend_serverpool'];
 					$backend = get_backend($backend_serverpool );
-					$servers = $backend['ha_servers']['item'];
-					$backend_serverpool_hint = gettext("Servers in pool:");
-					if (is_array($servers)){
-						foreach($servers as $server){
-							$backend_serverpool_hint .= "\n".$server['address'].":".$server['port'];
+					if ($backend && is_array($backend['ha_servers']['item'])){
+						$servers = $backend['ha_servers']['item'];
+						$backend_serverpool_hint = gettext("Servers in pool:");
+						if (is_array($servers)){
+							foreach($servers as $server){
+								$backend_serverpool_hint .= "\n".$server['address'].":".$server['port'];
+							}
 						}
 					}
 					?>
