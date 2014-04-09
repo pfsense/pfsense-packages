@@ -1703,6 +1703,13 @@ function squid_resync_auth() {
 			$conf .="http_access deny sglog\n";
 	}
 	if ($auth_method == 'none'  ) {
+		// SSL interception acl options part 2 without authentication
+		$ssl_action=($settingsconfig['interception_action'] != "" ? $settingsconfig['interception_action']: "server-first");
+		if ($settingsconfig['ssl_proxy'] == "on"){
+			$conf .= "always_direct allow all\n";
+			$conf .= "ssl_bump {$ssl_action} all\n";
+			}
+
 		$conf .="# Setup allowed acls\n";
 		$allowed = array('allowed_subnets');
 		if ($settingsconfig['allow_interface'] == 'on') {
@@ -1758,11 +1765,11 @@ EOD;
 		// Custom User Options after authentication definition
 		$conf .= "# Custom options after auth\n".sq_text_area_decode($settingsconfig['custom_options2_squid3'])."\n\n";
 
-		// SSL interception acl options part 2
+		// SSL interception acl options part 2 with authentication set
 		$ssl_action=($settingsconfig['interception_action'] != "" ? $settingsconfig['interception_action']: "server-first");
 		if ($settingsconfig['ssl_proxy'] == "on"){
 			$conf .= "always_direct allow all\n";
-			$conf .= "ssl_bump {$ssl_action} all\n";
+			$conf .= "ssl_bump {$ssl_action} password all\n";
 			}
 		// Onto the ACLs
 		$password = array('localnet', 'allowed_subnets');
