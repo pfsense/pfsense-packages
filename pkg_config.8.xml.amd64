@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- pfSense packages -->
 <pfsensepkgs>
-<copy_packages_to_host_ssh_port>222</copy_packages_to_host_ssh_port>
+<copy_packages_to_host_ssh_port>22</copy_packages_to_host_ssh_port>
 <copy_packages_to_host_ssh>packagecopy@files.pfsense.org</copy_packages_to_host_ssh>
 <copy_packages_to_folder_ssh>/usr/local/www/files/packages/amd64/8/All/</copy_packages_to_folder_ssh>
 <packages>
