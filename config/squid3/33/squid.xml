@@ -357,7 +357,7 @@
 		<size>70</size>
 		</field>
 		<field>
-			<name>SSL man in the middle Filtering</name>
+			<name>SSL Filtering/proxy</name>
 			<type>listtopic</type>
 		</field>
 		<field>
@@ -375,6 +375,23 @@
 			<required/>
 			<default_value>lan</default_value>
 			<multiple/>
+		</field>
+		<field>
+			<fielddescr>HTTPS/SSL intercept action</fielddescr>
+			<fieldname>interception_action</fieldname>
+			<description><![CDATA[Select ssl interception action<br><br>
+					<b>client-first</b>	Allow bumping of the connection. Establish a secure connection with the client first, then connect to the server.<br>
+						 This old mode does not allow Squid to mimic server SSL certificate and does not work with intercepted SSL connections.<br><br>
+					<b>server-first</b> Allow bumping of the connection. Establish a secure connection with the server first, then establish a secure connection with
+						the client, using a mimicked server certificate.Works with both CONNECT requests and intercepted SSL connections.<br><br>
+					<b>none</b>	Become a TCP tunnel without decoding the connection. Works with both CONNECT requests and intercepted SSL
+						connections.<br>This is the default behavior when no ssl_bump option is given or no ssl_bump ACLs match.]]></description>
+		<type>select</type>
+		<options>
+				<option><name>Server-First</name><value>server-first</value></option>
+				<option><name>Client-First</name><value>client-first</value></option>
+				<option><name>None</name><value>none</value></option>
+		</options>
 		</field>
 		<field>
 			<fielddescr>SSL Proxy port</fielddescr>
