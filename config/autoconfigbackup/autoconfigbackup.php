@@ -29,8 +29,8 @@
 
 require("guiconfig.inc");
 
-$pfSversion = str_replace("\n", "", file_get_contents("/etc/version"));
-if(strstr($pfSversion, "1.2")) 
+$pf_version=substr(trim(file_get_contents("/etc/version")),0,3);
+if ($pf_version < 2.0)
 	require("crypt_acb.php");
 
 // Seperator used during client / server communications
@@ -115,7 +115,7 @@ function get_hostnames() {
 <script src="/javascript/scriptaculous/prototype.js" type="text/javascript"></script>
 <?php
 	include("fbegin.inc"); 
-	if(strstr($pfSversion, "1.2")) 
+	if ($pf_version < 2.0)
 		echo "<p class=\"pgtitle\">{$pgtitle}</p>";
 	if($savemsg) {
 		echo "<div id='savemsg'>";
