@@ -67,8 +67,8 @@ if ($_REQUEST['file']!=""){
 	get_file($_REQUEST['file']);
 	}
 else{
-	$pfSversion = str_replace("\n", "", file_get_contents("/etc/version"));
-	if(strstr($pfSversion, "1.2"))
+	$pf_version=substr(trim(file_get_contents("/etc/version")),0,3);
+	if ($pf_version < 2.0)
 		$one_two = true;
 	
 	$pgtitle = "FreeRADIUS: View Configuration";
