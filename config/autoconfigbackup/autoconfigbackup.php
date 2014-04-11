@@ -194,7 +194,7 @@ function get_hostnames() {
 						"&revision=" . urlencode($_REQUEST['newver']));
 					$data = curl_exec($curl_session);
 					$data_split = split("\+\+\+\+", $data);
-					$sha256 = $data_split[0];	// sha256
+					$sha256 = trim($data_split[0]);	// sha256
 					$data = $data_split[1];
 					if (!tagfile_deformat($data, $data, "config.xml")) 
 						$input_errors[] = "The downloaded file does not appear to contain an encrypted pfSense configuration.";
