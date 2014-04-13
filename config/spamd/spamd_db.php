@@ -205,7 +205,6 @@ $blacklist_items = $blacklist_items + $spamdb_black;
 <script src="/javascript/scriptaculous/prototype.js" type="text/javascript"></script>
 <script src="/javascript/scriptaculous/scriptaculous.js" type="text/javascript"></script>
 <script type="text/javascript" language="javascript" src="row_toggle.js"></script>
-<script src="/javascript/sorttable.js"></script>
 <script language="javascript">
 function outputrule(req) {
 	if(req.content != '') {
@@ -314,6 +313,9 @@ if (typeof getURL == 'undefined') {
 					<td class="listhdrr">IP</td>
 					<td class="listhdrr">From</td>
 					<td class="listhdrr">To</td>
+					<td class="listhdrr">First</td>
+					<td class="listhdrr">Pass</td>
+					<td class="listhdrr">Expire</td>
 					<td class="listhdr">Attempts</td>
 					<td class="list"></td>
 				</tr>
@@ -386,6 +388,9 @@ if (typeof getURL == 'undefined') {
 				$srcip = htmlentities($pkgdb_split[1]);
 				$fromaddress = htmlentities($pkgdb_split[3]);
 				$toaddress = htmlentities($pkgdb_split[4]);
+				$first = "";
+				$pass = "";
+				$expire = "";
 				$attempts = htmlentities($pkgdb_split[8]);			
 				break;			
 			case "TRAPPED":
@@ -393,6 +398,9 @@ if (typeof getURL == 'undefined') {
 				$srcip = htmlentities($pkgdb_split[1]);
 				$fromaddress = "";
 				$toaddress = "";
+				$first = "";
+				$pass = "";
+				$expire = htmlentities($pkgdb_split[2]);
 				$attempts = "";
 				break;
 			case "GREY":
@@ -400,6 +408,9 @@ if (typeof getURL == 'undefined') {
 				$srcip = htmlentities($pkgdb_split[1]);
 				$fromaddress = htmlentities($pkgdb_split[3]);
 				$toaddress = htmlentities($pkgdb_split[4]);
+				$first = htmlentities($pkgdb_split[5]);
+				$pass = htmlentities($pkgdb_split[6]);
+				$expire = htmlentities($pkgdb_split[7]);
 				$attempts = htmlentities($pkgdb_split[8]);			
 				break;
 			case "WHITE":
@@ -407,6 +418,9 @@ if (typeof getURL == 'undefined') {
 				$srcip = htmlentities($pkgdb_split[1]);
 				$fromaddress = "";
 				$toaddress = "";
+				$first = htmlentities($pkgdb_split[4]);
+				$pass = htmlentities($pkgdb_split[5]);
+				$expire = htmlentities($pkgdb_split[6]);
 				$attempts = htmlentities($pkgdb_split[8]);			
 				break;
 		}
@@ -417,6 +431,9 @@ if (typeof getURL == 'undefined') {
 		echo "<td class=\"listr\">{$srcip}</td>";
 		echo "<td class=\"listr\">{$fromaddress}</td>";		
 		echo "<td class=\"listr\">{$toaddress}</td>";
+		echo "<td class=\"listr\"><span style='white-space: nowrap;'>" . gmdate("Y-m-d", $first) . "<br/>" . gmdate("H:i:s", $first) . "</span></td>";
+		echo "<td class=\"listr\"><span style='white-space: nowrap;'>" . gmdate("Y-m-d", $pass) . "<br/>" . gmdate("H:i:s", $pass) . "</span></td>";
+		echo "<td class=\"listr\"><span style='white-space: nowrap;'>" . gmdate("Y-m-d", $expire) . "<br/>" . gmdate("H:i:s", $expire) . "</span></td>";
 		echo "<td class=\"listr\">{$attempts}</td>";
 		echo "<td>";
 		$rowtext = "<NOBR><a href='javascript:toggle_on(\"w{$rows}\", \"/themes/{$g['theme']}/images/icons/icon_plus_p.gif\"); getURL(\"spamd_db.php?buttonid=w{$rows}&srcip={$srcip}&action=whitelist\", outputrule);'><img title=\"Add to whitelist\" name='w{$rows}' id='w{$rows}' border=\"0\" alt=\"Add to whitelist\" src=\"/themes/{$g['theme']}/images/icons/icon_plus.gif\"></a> ";
