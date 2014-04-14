@@ -648,7 +648,7 @@ function snort_post_delete_logs($snort_uuid = 0) {
 
 			/* Clean-up stats file if enabled */
 			if ($value['perform_stat'] == 'on')
-				file_put_contents("{$snort_log_dir}/{$if_real}.stats", "");
+				@file_put_contents("{$snort_log_dir}/{$if_real}.stats", "");
 		}
 	}
 }
@@ -1628,7 +1628,7 @@ function snort_write_enforcing_rules_file($rule_map, $rule_path) {
 
 	/* If the $rule_map array is empty, then exit.  */
 	if (empty($rule_map)) {
-		file_put_contents($rule_file, "");
+		@file_put_contents($rule_file, "");
 		return;
 	}
 
@@ -2199,7 +2199,7 @@ function snort_prepare_rule_files($snortcfg, $snortcfgdir) {
 			$sd_tmp_new_file="";
 			foreach ($sd_tmp_file as $sd_tmp_line)
 				$sd_tmp_new_file.=preg_match("/$sdf_alert_pattern/i",$sd_tmp_line) ? $sd_tmp_line : "";
-			file_put_contents("{$snortcfgdir}/preproc_rules/sensitive-data.rules",$sd_tmp_new_file,LOCK_EX);
+			@file_put_contents("{$snortcfgdir}/preproc_rules/sensitive-data.rules",$sd_tmp_new_file,LOCK_EX);
 		}
 	}
 	elseif ($snortcfg['sensitive_data'] != 'on' && $snortcfg['protect_preproc_rules'] != 'on') {
@@ -3541,7 +3541,7 @@ EOD;
 	// Check for and configure Host Attribute Table if enabled
 	$host_attrib_config = "";
 	if ($snortcfg['host_attribute_table'] == "on" && !empty($snortcfg['host_attribute_data'])) {
-		file_put_contents("{$snortcfgdir}/host_attributes", base64_decode($snortcfg['host_attribute_data']));
+		@file_put_contents("{$snortcfgdir}/host_attributes", base64_decode($snortcfg['host_attribute_data']));
 		$host_attrib_config = "# Host Attribute Table #\n";
 		$host_attrib_config .= "attribute_table filename {$snortcfgdir}/host_attributes\n";
 		if (!empty($snortcfg['max_attribute_hosts']))
@@ -3778,7 +3778,7 @@ output alert_csv: alert timestamp,sig_generator,sig_id,sig_rev,msg,proto,src,src
 EOD;
 
 	// Write out snort.conf file
-	file_put_contents("{$snortcfgdir}/snort.conf", $snort_conf_text);
+	@file_put_contents("{$snortcfgdir}/snort.conf", $snort_conf_text);
 	conf_mount_ro();
 	unset($snort_conf_text, $selected_rules_sections, $suppress_file_name, $snort_misc_include_rules, $spoink_type, $snortunifiedlog_type, $alertsystemlog_type);
 	unset($home_net, $external_net, $ipvardef, $portvardef);
