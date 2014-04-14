@@ -54,7 +54,7 @@ if (empty($snort_version))
 	$snort_version = "2.9.6.0";
 
 /* package version */
-$pfSense_snort_version = "3.0.5";
+$pfSense_snort_version = "3.0.7";
 $snort_package_version = "Snort {$snort_version} pkg v{$pfSense_snort_version}";
 
 // Define SNORTDIR and SNORTLIBDIR constants according to pfSense version
@@ -2109,7 +2109,7 @@ function snort_deinstall() {
 			}
 		}
 		$config['widgets']['sequence'] = implode(",", $widgetlist);
-		write_config();
+		write_config("Snort pkg: remove Snort Dashboard Widget on package deinstall.");
 	}
 
 	/* See if we are to clear blocked hosts on uninstall */
