@@ -76,7 +76,7 @@ if ($_POST['del']) {
 		}
 		else {
 			unset($a_suppress[$_POST['list_id']]);
-			write_config();
+			write_config("Snort pkg: deleted a Suppress List.");
 			header("Location: /snort/snort_interfaces_suppress.php");
 			exit;
 		}

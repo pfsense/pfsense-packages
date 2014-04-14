@@ -163,7 +163,7 @@ if ($_POST['save']) {
 		if ($_POST['barnconfigpassthru']) $natent['barnconfigpassthru'] = base64_encode($_POST['barnconfigpassthru']); else unset($natent['barnconfigpassthru']);
 
 		$a_nat[$id] = $natent;
-		write_config();
+		write_config("Snort pkg: modified Barnyard2 settings.");
 
 		// No need to rebuild rules for Barnyard2 changes
 		$rebuild_rules = false;

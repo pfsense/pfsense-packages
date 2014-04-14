@@ -134,7 +134,7 @@ if ($_POST['save']) {
 
 		$a_nat[$id] = $natent;
 
-		write_config();
+		write_config("Snort pkg: modified settings for VARIABLES tab.");
 
 		/* Update the snort conf file for this interface. */
 		$rebuild_rules = false;

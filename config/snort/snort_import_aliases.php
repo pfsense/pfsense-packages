@@ -206,7 +206,7 @@ if ($_POST['save']) {
 		}
 
 		// Now write the new engine array to conf and return
-		write_config();
+		write_config("Snort pkg: imported new host or network alias.");
 
 		header("Location: /snort/snort_preprocessors.php?id={$id}{$anchor}");
 		exit;

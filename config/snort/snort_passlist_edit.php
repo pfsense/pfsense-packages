@@ -156,7 +156,7 @@ if ($_POST['save']) {
 		else
 			$a_passlist[] = $w_list;
 
-		write_config();
+		write_config("Snort pkg: modified PASS LIST {$w_list['name']}.");
 
 		/* create pass list and homenet file, then sync files */
 		sync_snort_package_config();

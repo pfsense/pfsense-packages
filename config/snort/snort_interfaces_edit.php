@@ -273,7 +273,7 @@ if ($_POST["save"]) {
 			snort_stop($natent, $if_real);
 
 		/* Save configuration changes */
-		write_config();
+		write_config("Snort pkg: modified interface configuration for {$natent['interface']}.");
 
 		/* Most changes don't require a rules rebuild, so default to "off" */
 		$rebuild_rules = false;
