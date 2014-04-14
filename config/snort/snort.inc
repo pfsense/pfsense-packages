@@ -44,7 +44,7 @@ require_once("filter.inc");
 ini_set("memory_limit", "192M");
 
 // Explicitly declare this as global so it works through function call includes 
-global $rebuild_rules, $pfSense_snort_version;
+global $rebuild_rules;
 
 // Grab the Snort binary version programmatically, but if that fails use a safe default
 $snortver = array();
@@ -53,9 +53,8 @@ $snort_version = $snortver[0];
 if (empty($snort_version))
 	$snort_version = "2.9.6.0";
 
-/* package version */
-$pfSense_snort_version = "3.0.7";
-$snort_package_version = "Snort {$snort_version} pkg v{$pfSense_snort_version}";
+/* get installed package version for display */
+$snort_package_version = "Snort {$config['installedpackages']['package'][get_pkg_id("snort")]['version']}";
 
 // Define SNORTDIR and SNORTLIBDIR constants according to pfSense version
 $pfs_version=substr(trim(file_get_contents("/etc/version")),0,3);
