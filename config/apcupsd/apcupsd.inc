@@ -163,6 +163,9 @@ function sync_package_apcupsd(){
 	$apcupsd_rcfile="/usr/local/etc/rc.d/apcupsd.sh";
 	if (is_array($apcupsd_config) && $apcupsd_config['apcupsdenabled']=="on"){
 		$apcupsd_start = "echo \"Starting APC UPS Daemon...\"\n";
+		$apcupsd_start .= "	if [ -f /var/spool/lock/LCK.. ]; then \n";
+		$apcupsd_start .= "		/bin/rm -f /var/spool/lock/LCK.. \n";
+		$apcupsd_start .= "	fi \n";
 		if ($apcupsd_config['killonpowerfail']=="on"){
 			$apcupsd_start .= "	" . APCUPSD_BASE . "/sbin/apcupsd --kill-on-powerfail";
 		}else{
