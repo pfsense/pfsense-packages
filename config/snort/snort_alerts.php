@@ -99,11 +99,13 @@ function snort_add_supplist_entry($suppress) {
 		$a_suppress[] = $s_list;
 		$a_instance[$instanceid]['suppresslistname'] = $s_list['name'];
 		$found_list = true;
+		$list_name = $s_list['name'];
 	} else {
 		/* If we get here, a Suppress List is defined for the interface so see if we can find it */
 		foreach ($a_suppress as $a_id => $alist) {
 			if ($alist['name'] == $a_instance[$instanceid]['suppresslistname']) {
 				$found_list = true;
+				$list_name = $alist['name'];
 				if (!empty($alist['suppresspassthru'])) {
 					$tmplist = base64_decode($alist['suppresspassthru']);
 					$tmplist .= "\n{$suppress}";
@@ -121,7 +123,7 @@ function snort_add_supplist_entry($suppress) {
 	/* If we created a new list or updated an existing one, save the change, */
 	/* tell Snort to load it, and return true; otherwise return false.       */
 	if ($found_list) {
-		write_config();
+		write_config("Snort pkg: modified Suppress List {$list_name}.");
 		sync_snort_package_config();
 		snort_reload_config($a_instance[$instanceid]);
 		return true;
@@ -168,7 +170,7 @@ if ($_POST['save']) {
 	$config['installedpackages']['snortglobal']['alertsblocks']['arefresh'] = $_POST['arefresh'] ? 'on' : 'off';
 	$config['installedpackages']['snortglobal']['alertsblocks']['alertnumber'] = $_POST['alertnumber'];
 
-	write_config();
+	write_config("Snort pkg: updated ALERTS tab settings.");
 
 	header("Location: /snort/snort_alerts.php?instance={$instanceid}");
 	exit;
@@ -274,7 +276,7 @@ if ($_POST['togglesid'] && is_numeric($_POST['sidid']) && is_numeric($_POST['gen
 		unset($a_instance[$instanceid]['rule_sid_off']);
 
 	/* Update the config.xml file. */
-	write_config();
+	write_config("Snort pkg: modified state for rule {$gid}:{$sid}");
 
 	/*************************************************/
 	/* Update the snort.conf file and rebuild the    */

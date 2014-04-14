@@ -196,7 +196,7 @@ if ($_POST['toggle'] && is_numeric($_POST['sid']) && is_numeric($_POST['gid']) &
 		unset($a_rule[$id]['rule_sid_off']);
 
 	/* Update the config.xml file. */
-	write_config();
+	write_config("Snort pkg: modified state for rule {$gid}:{$sid} on {$a_rule[$id]['interface']}.");
 
 	$anchor = "rule_{$gid}_{$sid}";
 }
@@ -236,7 +236,7 @@ elseif ($_POST['disable_all'] && !empty($rules_map)) {
 	else				
 		unset($a_rule[$id]['rule_sid_off']);
 
-	write_config();
+	write_config("Snort pkg: disabled all rules in category {$currentruleset} for {$a_rule[$id]['interface']}.");
 }
 elseif ($_POST['enable_all'] && !empty($rules_map)) {
 
@@ -273,7 +273,7 @@ elseif ($_POST['enable_all'] && !empty($rules_map)) {
 	else				
 		unset($a_rule[$id]['rule_sid_off']);
 
-	write_config();
+	write_config("Snort pkg: enable all rules in category {$currentruleset} for {$a_rule[$id]['interface']}.");
 }
 elseif ($_POST['resetcategory'] && !empty($rules_map)) {
 
@@ -312,7 +312,7 @@ elseif ($_POST['resetcategory'] && !empty($rules_map)) {
 	else				
 		unset($a_rule[$id]['rule_sid_off']);
 
-	write_config();
+	write_config("Snort pkg: remove enablesid/disablesid changes for category {$currentruleset} on {$a_rule[$id]['interface']}.");
 }
 elseif ($_POST['resetall'] && !empty($rules_map)) {
 
@@ -321,14 +321,14 @@ elseif ($_POST['resetall'] && !empty($rules_map)) {
 	unset($a_rule[$id]['rule_sid_off']);
 
 	/* Update the config.xml file. */
-	write_config();
+	write_config("Snort pkg: remove all enablesid/disablesid changes for {$a_rule[$id]['interface']}.");
 }
 else if ($_POST['cancel']) {
 	$pconfig['customrules'] = base64_decode($a_rule[$id]['customrules']);
 }
 elseif ($_POST['clear']) {
 	unset($a_rule[$id]['customrules']);
-	write_config();
+	write_config("Snort pkg: clear all custom rules for {$a_rule[$id]['interface']}.");
 	$rebuild_rules = true;
 	snort_generate_conf($a_rule[$id]);
 	$rebuild_rules = false;
@@ -340,7 +340,7 @@ elseif ($_POST['save']) {
 		$a_rule[$id]['customrules'] = base64_encode($_POST['customrules']);
 	else
 		unset($a_rule[$id]['customrules']);
-	write_config();
+	write_config("Snort pkg: save modified custom rules for {$a_rule[$id]['interface']}.");
 	$rebuild_rules = true;
 	snort_generate_conf($a_rule[$id]);
 	$rebuild_rules = false;
@@ -364,7 +364,7 @@ elseif ($_POST['save']) {
 }
 else if ($_POST['apply']) {
 	/* Save new configuration */
-	write_config();
+	write_config("Snort pkg: save new rules configuration for {$a_rule[$id]['interface']}.");
 
 	/*************************************************/
 	/* Update the snort conf file and rebuild the    */

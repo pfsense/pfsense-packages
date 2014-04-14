@@ -65,7 +65,7 @@ if (isset($_POST['del_x'])) {
 		if (empty($a_nat))
 			unset($a_nat);
 
-		write_config();
+		write_config("Snort pkg: deleted one or more Snort interfaces.");
 		sleep(2);
 	  
 		/* if there are no ifaces remaining do not create snort.sh */
