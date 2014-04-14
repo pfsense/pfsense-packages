@@ -38,8 +38,8 @@ require_once("/etc/inc/functions.inc");
 require_once("/etc/inc/pkg-utils.inc");
 require_once("/etc/inc/globals.inc");
 require_once("guiconfig.inc");
-$pfSversion = str_replace("\n", "", file_get_contents("/etc/version"));
-if(strstr($pfSversion, "1.2"))
+$pf_version=substr(trim(file_get_contents("/etc/version")),0,3);
+if ($pf_version < 2.0)
         $one_two = true;
 
 $pgtitle = "Status: Apache VirtualHost Logs";

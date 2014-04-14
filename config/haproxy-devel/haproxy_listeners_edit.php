@@ -227,8 +227,8 @@ if ($_POST) {
 	}
 }
 
-$pfSversion = str_replace("\n", "", file_get_contents("/etc/version"));
-if(strstr($pfSversion, "1.2"))
+$pf_version=substr(trim(file_get_contents("/etc/version")),0,3);
+if ($pf_version < 2.0)
 	$one_two = true;
 
 $closehead = false;
@@ -261,7 +261,14 @@ $interfaces = haproxy_get_bindable_interfaces();
 	function htmllist_get_select_options(tableId) {
 		var seltext;
 		seltext = "";
-		var type = d.getElementById("type").value;
+		var type;
+		var secondary = d.getElementById("secondary");
+		var primary_frontend = d.getElementById("primary_frontend");		
+		if ((secondary !== null) && (secondary.checked))
+			type = primaryfrontends[primary_frontend.value]['ref']['type'];
+		else
+			type = d.getElementById("type").value;
+		
 		if (tableId == 'tableA_acltable'){	
 			if (type == 'health')
 				seltext = "<?php echo haproxy_js_acl_select('health');?>";
@@ -297,10 +304,10 @@ $interfaces = haproxy_get_bindable_interfaces();
 	function updatevisibility()	{
 		d = document;
 		ssloffload = d.getElementById("ssloffload");
-		type = d.getElementById("type");
-		secondary = d.getElementById("secondary");
-		primary_frontend = d.getElementById("primary_frontend");
 		
+		var type;
+		var secondary = d.getElementById("secondary");
+		var primary_frontend = d.getElementById("primary_frontend");		
 		if ((secondary !== null) && (secondary.checked))
 			type = primaryfrontends[primary_frontend.value]['ref']['type'];
 		else

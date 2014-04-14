@@ -1,7 +1,0 @@
-# ----------------
-# LOCAL RULES
-# ----------------
-# This file intentionally does not come with signatures.  Put your local
-# additions here. Pfsense first install rule. Rule edit tabe fails with out this file.
-#
-#
