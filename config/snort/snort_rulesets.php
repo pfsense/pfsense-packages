@@ -153,7 +153,7 @@ if ($_POST["save"]) {
 			@unlink("{$snortdir}/snort_{$snort_uuid}_{$if_real}/rules/{$flowbit_rules_file}");
 	}
 
-	write_config();
+	write_config("Snort pkg: save enabled rule categories for {$a_nat[$id]['interface']}.");
 
 	/*************************************************/
 	/* Update the snort conf file and rebuild the    */

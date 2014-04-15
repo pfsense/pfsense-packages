@@ -119,7 +119,7 @@ if ($_POST['save'])
 		$config['installedpackages']['snortglobal']['alertsblocks']['brefresh'] = $_POST['brefresh'] ? 'on' : 'off';
 		$config['installedpackages']['snortglobal']['alertsblocks']['blertnumber'] = $_POST['blertnumber'];
 
-		write_config();
+		write_config("Snort pkg: updated BLOCKED tab settings.");
 
 		header("Location: /snort/snort_blocked.php");
 		exit;

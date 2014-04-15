@@ -328,7 +328,7 @@ if ($_POST['save']) {
 		}
 
 		/* Now write the new engine array to conf */
-		write_config();
+		write_config("Snort pkg: save modified stream5 engine.");
 
 		header("Location: /snort/snort_preprocessors.php?id={$id}#stream5_row");
 		exit;
