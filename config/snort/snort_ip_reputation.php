@@ -75,13 +75,23 @@ if ($_POST['mode'] == 'blist_add' && isset($_POST['iplist'])) {
 
 	// Test the supplied IP List file to see if it exists
 	if (file_exists($_POST['iplist'])) {
-		$a_nat[$id]['blist_files']['item'][] = basename($_POST['iplist']);
-		write_config();
-		$pconfig['blist_files'] = $a_nat[$id]['blist_files'];
-		$pconfig['wlist_files'] = $a_nat[$id]['wlist_files'];
+		// See if the file is already assigned to the interface
+		foreach ($a_nat[$id]['blist_files']['item'] as $f) {
+			if ($f == basename($_POST['iplist'])) {
+				$input_errors[] = gettext("The file {$f} is already assigned as a blacklist file.");
+				break;
+			}
+		}
+		if (!$input_errors) {
+			$a_nat[$id]['blist_files']['item'][] = basename($_POST['iplist']);
+			write_config("Snort pkg: added new blacklist file for IP REPUTATION preprocessor.");
+		}
 	}
 	else
 		$input_errors[] = gettext("The file '{$_POST['iplist']}' could not be found.");
+
+	$pconfig['blist_files'] = $a_nat[$id]['blist_files'];
+	$pconfig['wlist_files'] = $a_nat[$id]['wlist_files'];
 }
 
 if ($_POST['mode'] == 'wlist_add' && isset($_POST['iplist'])) {
@@ -89,19 +99,29 @@ if ($_POST['mode'] == 'wlist_add' && isset($_POST['iplist'])) {
 
 	// Test the supplied IP List file to see if it exists
 	if (file_exists($_POST['iplist'])) {
-		$a_nat[$id]['wlist_files']['item'][] = basename($_POST['iplist']);
-		write_config();
-		$pconfig['wlist_files'] = $a_nat[$id]['wlist_files'];
-		$pconfig['blist_files'] = $a_nat[$id]['blist_files'];
+		// See if the file is already assigned to the interface
+		foreach ($a_nat[$id]['wlist_files']['item'] as $f) {
+			if ($f == basename($_POST['iplist'])) {
+				$input_errors[] = gettext("The file {$f} is already assigned as a whitelist file.");
+				break;
+			}
+		}
+		if (!$input_errors) {
+			$a_nat[$id]['wlist_files']['item'][] = basename($_POST['iplist']);
+			write_config("Snort pkg: added new whitelist file for IP REPUTATION preprocessor.");
+		}
 	}
 	else
 		$input_errors[] = gettext("The file '{$_POST['iplist']}' could not be found.");
+
+	$pconfig['blist_files'] = $a_nat[$id]['blist_files'];
+	$pconfig['wlist_files'] = $a_nat[$id]['wlist_files'];
 }
 
 if ($_POST['blist_del'] && is_numericint($_POST['list_id'])) {
 	$pconfig = $_POST;
 	unset($a_nat[$id]['blist_files']['item'][$_POST['list_id']]);
-	write_config();
+	write_config("Snort pkg: deleted blacklist file for IP REPUTATION preprocessor.");
 	$pconfig['blist_files'] = $a_nat[$id]['blist_files'];
 	$pconfig['wlist_files'] = $a_nat[$id]['wlist_files'];
 }
@@ -109,7 +129,7 @@ if ($_POST['blist_del'] && is_numericint($_POST['list_id'])) {
 if ($_POST['wlist_del'] && is_numericint($_POST['list_id'])) {
 	$pconfig = $_POST;
 	unset($a_nat[$id]['wlist_files']['item'][$_POST['list_id']]);
-	write_config();
+	write_config("Snort pkg: deleted whitelist file for IP REPUTATION preprocessor.");
 	$pconfig['wlist_files'] = $a_nat[$id]['wlist_files'];
 	$pconfig['blist_files'] = $a_nat[$id]['blist_files'];
 }
@@ -134,7 +154,7 @@ if ($_POST['save']) {
 
 		$a_nat[$id] = $natent;
 
-		write_config();
+		write_config("Snort pkg: modified IP REPUTATION preprocessor settings for {$a_nat[$id]['interface']}.");
 
 		// Update the snort conf file for this interface
 		$rebuild_rules = false;
