@@ -339,7 +339,6 @@ foreach ($rule as &$r) {
 					$pconfig['barnyard_dbpwd'] = base64_encode($matches[2][$k]);
 			}
 			$pconfig['barnyard_mysql_enable'] = 'on';
-			$pconfig['barnyard_enable'] = 'on';
 			unset($pconfig['barnyard_mysql']);
 		}
 		// Since Barnyard2 was enabled, configure the new archived log settings
@@ -366,9 +365,9 @@ unset($r);
 
 // Write out the new configuration to disk if we changed anything
 if ($updated_cfg) {
-	$config['installedpackages']['snortglobal']['snort_config_ver'] = "3.0.5";
+	$config['installedpackages']['snortglobal']['snort_config_ver'] = "3.0.7";
 	log_error("[Snort] Saving configuration settings in new format...");
-	write_config();
+	write_config("Snort pkg: migrate existing settings to new format as part of package upgrade.");
 	log_error("[Snort] Settings successfully migrated to new configuration format...");
 }
 else

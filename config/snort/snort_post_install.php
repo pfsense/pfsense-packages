@@ -1423,7 +1423,7 @@ if ($pkgid >= 0) {
 	log_error(gettext("[Snort] Removing legacy 'Dashboard Widget: Snort' package because the widget is now part of the Snort package."));
 	unset($config['installedpackages']['package'][$pkgid]);
 	unlink_if_exists("/usr/local/pkg/widget-snort.xml");
-	write_config();
+	write_config("Snort pkg: removed legacy Snort Dashboard Widget.");
 }
 
 /* Define a default Dashboard Widget Container for Snort */
@@ -1494,8 +1494,8 @@ if (stristr($config['widgets']['sequence'], "snort_alerts-container") === FALSE)
 	$config['widgets']['sequence'] .= ",{$snort_widget_container}";
 
 /* Update Snort package version in configuration */
-$config['installedpackages']['snortglobal']['snort_config_ver'] = "3.0.5";
-write_config();
+$config['installedpackages']['snortglobal']['snort_config_ver'] = "3.0.7";
+write_config("Snort pkg: post-install configuration saved.");
 
 /* Done with post-install, so clear flag */
 unset($g['snort_postinstall']);
