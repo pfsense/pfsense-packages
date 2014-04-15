@@ -109,7 +109,6 @@ if ($_POST['save']) {
 		}
 	}
 
-
 	if (!$input_errors) {
 		$s_list = array();
 		$s_list['name'] = $_POST['name'];
@@ -125,7 +124,7 @@ if ($_POST['save']) {
 		else
 			$a_suppress[] = $s_list;
 
-		write_config();
+		write_config("Snort pkg: modified Suppress List {$s_list['name']}.");
 		sync_snort_package_config();
 
 		header("Location: /snort/snort_interfaces_suppress.php");
@@ -142,14 +141,14 @@ include_once("head.inc");
 
 <?php
 include("fbegin.inc");
-if($pfsense_stable == 'yes'){echo '<p class="pgtitle">' . $pgtitle . '</p>';}
-
-if ($input_errors) print_input_errors($input_errors);
+if ($input_errors)
+	print_input_errors($input_errors);
 if ($savemsg)
 	print_info_box($savemsg);
 
 ?>
 <form action="/snort/snort_interfaces_suppress_edit.php" name="iform" id="iform" method="post">
+<input name="id" type="hidden" value="<?=$id;?>"/>
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
 <tr><td>
 <?php
@@ -215,8 +214,7 @@ if ($savemsg)
 	<td colspan="2"><input id="save" name="save" type="submit" 
 		class="formbtn" value="Save" />&nbsp;&nbsp;<input id="cancelbutton" 
 		name="cancelbutton" type="button" class="formbtn" value="Cancel" 
-		onclick="history.back();"/> <?php if (isset($id) && $a_suppress[$id]): ?>
-		<input name="id" type="hidden" value="<?=$id;?>"/> <?php endif; ?>
+		onclick="history.back();"/>
 	</td>
 </tr>
 </table>
