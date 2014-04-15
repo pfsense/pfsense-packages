@@ -296,7 +296,7 @@ if ($_POST['save']) {
 		}
 
 		// Now write the new engine array to conf
-		write_config();
+		write_config("Snort pkg: modified http_inspect engine settings.");
 
 		header("Location: /snort/snort_preprocessors.php?id={$id}#httpinspect_row");
 		exit;

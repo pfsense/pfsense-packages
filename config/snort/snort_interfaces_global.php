@@ -151,7 +151,7 @@ if (!$input_errors) {
 		/* create whitelist and homenet file  then sync files */
 		sync_snort_package_config();
 
-		write_config();
+		write_config("Snort pkg: modified global settings.");
 
 		/* forces page to reload new settings */
 		header( 'Expires: Sat, 26 Jul 1997 05:00:00 GMT' );
