@@ -31,8 +31,8 @@ require("globals.inc");
 require("guiconfig.inc");
 require("/usr/local/pkg/autoconfigbackup.inc");
 
-$pfSversion = str_replace("\n", "", file_get_contents("/etc/version"));
-if(strstr($pfSversion, "1.2")) 
+$pf_version=substr(trim(file_get_contents("/etc/version")),0,3);
+if ($pf_version < 2.0)
 	require("crypt_acb.php");
 
 if(!$config['installedpackages']['autoconfigbackup']['config'][0]['username']) {
@@ -63,7 +63,7 @@ include("head.inc");
 <div id='maincontent'>
 <?php
 	include("fbegin.inc"); 
-	if(strstr($pfSversion, "1.2")) 
+	if ($pf_version < 2.0)
 		echo "<p class=\"pgtitle\">{$pgtitle}</p>";
 	if($savemsg) {
 		print_info_box($savemsg);

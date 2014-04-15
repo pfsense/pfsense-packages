@@ -251,7 +251,7 @@
 		<website>http://www.avahi.org/</website>
 		<descr>Avahi is a system which facilitates service discovery on a local network. This means that you can plug your laptop or computer into a network and instantly be able to view other people who you can chat with, find printers to print to or find files being shared. This kind of technology is already found in Apple MacOS X (branded Rendezvous, Bonjour and sometimes Zeroconf) and is very convenient. Avahi is mainly based on Lennart Poettering's flexmdns mDNS implementation for Linux which has been discontinued in favour of Avahi.</descr>
 		<category>Network Management</category>
-		<build_options>avahi_UNSET_FORCE=GTK</build_options>
+		<build_options>avahi_UNSET_FORCE=GTK;cairo_UNSET_FORCE=X11 XCB</build_options>
 		<build_pbi>
 			<port>net/avahi</port>
 		</build_pbi>
@@ -670,7 +670,7 @@
 		<descr>Automatically backs up your pfSense configuration.  All contents are encrypted on the server.  Requires pfSense Premium Support Portal Subscription from https://portal.pfsense.org</descr>
 		<website>https://portal.pfsense.org</website>
 		<category>Services</category>
-		<version>1.21</version>
+		<version>1.23</version>
 		<status>Stable</status>
 		<required_version>2.2</required_version>
 		<pkginfolink>https://doc.pfsense.org/index.php/AutoConfigBackup</pkginfolink>
@@ -1023,7 +1023,7 @@
 		<build_pbi>
 			<port>net-mgmt/arpwatch</port>
 		</build_pbi>
-		<version>2.1.a15_8 pkg v1.1.1</version>
+		<version>2.1.a15_8 pkg v1.1.2</version>
 		<status>ALPHA</status>
 		<required_version>2.2</required_version>
 		<config_file>https://packages.pfsense.org/packages/config/arpwatch.xml</config_file>
@@ -1096,7 +1096,7 @@
 		<depends_on_package_pbi>zip-3.0-##ARCH##.pbi p7zip-9.20.1_2-##ARCH##.pbi</depends_on_package_pbi>
 		<build_port_path>/usr/ports/archivers/p7zip</build_port_path>
 		<build_port_path>/usr/ports/archivers/zip</build_port_path>
-		<version>1.2.4</version>
+		<version>1.2.5</version>
 		<status>RELEASE</status>
 		<required_version>2.2</required_version>
 		<config_file>https://packages.pfsense.org/packages/config/openvpn-client-export/openvpn-client-export.xml</config_file>

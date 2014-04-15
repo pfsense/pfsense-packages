@@ -43,7 +43,7 @@ global $config;
 $aaaa = $config['installedpackages']['vnstat2']['config'][0]['vnstat_interface2'];
 $bbbb = convert_real_interface_to_friendly_descr($aaaa);
 
-$pfSversion = str_replace("\n", "", file_get_contents("/etc/version"));
+$pf_version=substr(trim(file_get_contents("/etc/version")),0,3);
 $pgtitle = gettext("Vnstat2 info for $bbbb ($aaaa)");
 
 if($_REQUEST['getactivity']) {
@@ -87,7 +87,7 @@ else
 <div id='maincontent'>
 <?php
 	include("fbegin.inc"); 
-	if(strstr($pfSversion, "1.2")) 
+	if ($pf_version < 2.0)
 		echo "<p class=\"pgtitle\">{$pgtitle}</p>";
 		echo "<a href=$myurl/pkg_edit.php?xml=vnstatoutput.xml&id=0>Go Back</a><br />";
 	if($savemsg) {
