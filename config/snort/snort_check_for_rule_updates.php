@@ -68,6 +68,7 @@ if (!defined("IPREP_PATH"))
 $snortdir = SNORTDIR;
 $snortlibdir = SNORTLIBDIR;
 $snortlogdir = SNORTLOGDIR;
+$snortiprepdir = IPREP_PATH;
 $snort_rules_upd_log = RULES_UPD_LOGFILE;
 
 /* Save the state of $pkg_interface so we can restore it */
@@ -415,7 +416,7 @@ safe_mkdir("{$snortdir}/preproc_rules");
 safe_mkdir("{$tmpfname}");
 safe_mkdir("{$snortlibdir}/dynamicrules");
 safe_mkdir("{$snortlogdir}");
-safe_mkdir(IPREP_PATH);
+safe_mkdir("{$snortiprepdir}");
 
 /* See if we need to automatically clear the Update Log based on 1024K size limit */
 if (file_exists($snort_rules_upd_log)) {
@@ -812,5 +813,5 @@ if ($update_errors)
 else
 	$config['installedpackages']['snortglobal']['last_rule_upd_status'] = gettext("success");
 $config['installedpackages']['snortglobal']['last_rule_upd_time'] = time();
-write_config();
+write_config("Snort pkg: updated status for updated rules package(s) check.");
 ?>
