@@ -1678,8 +1678,8 @@ function squid_resync_auth() {
 
 	// SSL interception acl options part 2
 	/*if ($settingsconfig['ssl_proxy'] == "on"){
-			$conf .= "always_direct allow all\n";
-			$conf .= "ssl_bump server-first all\n";
+			$conf .= "always_direct allow HTTPS\n";
+			$conf .= "ssl_bump server-first SSL_ports\n";
 		}*/
 
 	// Include squidguard denied acl log in squid
@@ -1706,8 +1706,8 @@ function squid_resync_auth() {
 		// SSL interception acl options part 2 without authentication
 		$ssl_action=($settingsconfig['interception_action'] != "" ? $settingsconfig['interception_action']: "server-first");
 		if ($settingsconfig['ssl_proxy'] == "on"){
-			$conf .= "always_direct allow all\n";
-			$conf .= "ssl_bump {$ssl_action} all\n";
+			$conf .= "always_direct allow SSL_ports\n";
+			$conf .= "ssl_bump {$ssl_action} SSL_ports\n";
 			}
 
 		$conf .="# Setup allowed acls\n";
@@ -1768,8 +1768,8 @@ EOD;
 		// SSL interception acl options part 2 with authentication set
 		$ssl_action=($settingsconfig['interception_action'] != "" ? $settingsconfig['interception_action']: "server-first");
 		if ($settingsconfig['ssl_proxy'] == "on"){
-			$conf .= "always_direct allow all\n";
-			$conf .= "ssl_bump {$ssl_action} password all\n";
+			$conf .= "always_direct allow SSL_ports\n";
+			$conf .= "ssl_bump {$ssl_action} password SSL_ports\n";
 			}
 		// Onto the ACLs
 		$password = array('localnet', 'allowed_subnets');
