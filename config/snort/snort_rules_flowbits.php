@@ -125,7 +125,7 @@ if ($_POST['addsuppress'] && is_numeric($_POST['sid']) && is_numeric($_POST['gid
 		}
 	}
 	if ($found_list) {
-		write_config();
+		write_config("Snort pkg: modified Suppress List for {$a_nat[$id]['interface']}.");
 		$rebuild_rules = false;
 		sync_snort_package_config();
 		snort_reload_config($a_nat[$id]);
