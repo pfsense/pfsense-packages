@@ -629,7 +629,7 @@ function viscosity_openvpn_client_config_exporter($srvid, $usrid, $crtid, $usead
 		file_put_contents("{$tempdir}/{$proxy['passwdfile']}", $pwdfle);
 	}
 
-	$conf = openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $verifyservercn, $randomlocalport, $usetoken, true, $proxy, "baseconf", "", true, $openvpnmanager, $advancedoptions);
+	$conf = openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $verifyservercn, $randomlocalport, $usetoken, true, $proxy, "baseconf", $outpass, false, true, $openvpnmanager, $advancedoptions);
 	if (!$conf)
 		return false;
 
