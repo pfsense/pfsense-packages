@@ -85,6 +85,7 @@ if ($_POST['mode'] == 'blist_add' && isset($_POST['iplist'])) {
 		if (!$input_errors) {
 			$a_nat[$id]['blist_files']['item'][] = basename($_POST['iplist']);
 			write_config("Snort pkg: added new blacklist file for IP REPUTATION preprocessor.");
+			mark_subsystem_dirty('snort_iprep');
 		}
 	}
 	else
@@ -109,6 +110,7 @@ if ($_POST['mode'] == 'wlist_add' && isset($_POST['iplist'])) {
 		if (!$input_errors) {
 			$a_nat[$id]['wlist_files']['item'][] = basename($_POST['iplist']);
 			write_config("Snort pkg: added new whitelist file for IP REPUTATION preprocessor.");
+			mark_subsystem_dirty('snort_iprep');
 		}
 	}
 	else
@@ -122,6 +124,7 @@ if ($_POST['blist_del'] && is_numericint($_POST['list_id'])) {
 	$pconfig = $_POST;
 	unset($a_nat[$id]['blist_files']['item'][$_POST['list_id']]);
 	write_config("Snort pkg: deleted blacklist file for IP REPUTATION preprocessor.");
+	mark_subsystem_dirty('snort_iprep');
 	$pconfig['blist_files'] = $a_nat[$id]['blist_files'];
 	$pconfig['wlist_files'] = $a_nat[$id]['wlist_files'];
 }
@@ -130,11 +133,12 @@ if ($_POST['wlist_del'] && is_numericint($_POST['list_id'])) {
 	$pconfig = $_POST;
 	unset($a_nat[$id]['wlist_files']['item'][$_POST['list_id']]);
 	write_config("Snort pkg: deleted whitelist file for IP REPUTATION preprocessor.");
+	mark_subsystem_dirty('snort_iprep');
 	$pconfig['wlist_files'] = $a_nat[$id]['wlist_files'];
 	$pconfig['blist_files'] = $a_nat[$id]['blist_files'];
 }
 
-if ($_POST['save']) {
+if ($_POST['save'] || $_POST['apply']) {
 
 	$natent = array();
 	$natent = $pconfig;
@@ -163,6 +167,9 @@ if ($_POST['save']) {
 		// Soft-restart Snort to live-load new variables
 		snort_reload_config($a_nat[$id]);
 		$pconfig = $natent;
+
+		// We have saved changes and done a soft restart, so clear "dirty" flag
+		clear_subsystem_dirty('snort_iprep');
 	}
 	else
 		$pconfig = $_POST;
@@ -189,6 +196,11 @@ if ($savemsg)
 <input type="hidden" id="mode" name="mode" value="" />
 <input name="iplist" id="iplist" type="hidden" value="" />
 <input name="list_id" id="list_id" type="hidden" value="" />
+
+<?php if (is_subsystem_dirty('snort_iprep')): ?><p>
+<?php print_info_box_np(gettext("A change has been made to blacklist or whitelist file assignments.") . "<br/>" . gettext("You must apply the changes in order for them to take effect."));?>
+<?php endif; ?>
+
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
 	<tr>
 		<td>
@@ -399,7 +411,6 @@ if ($savemsg)
 		</td>
 	</tr>
 </table>
-</form>
 
 <script type="text/javascript">
 Event.observe(
@@ -489,6 +500,7 @@ function wlistComplete(req) {
 
 </script>
 
+</form>
 <?php include("fend.inc"); ?>
 </body>
 </html>
