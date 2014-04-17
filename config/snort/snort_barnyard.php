@@ -144,6 +144,7 @@ if ($_POST['save']) {
 		$natent['barnyard_syslog_enable'] = $_POST['barnyard_syslog_enable'] ? 'on' : 'off';
 		$natent['barnyard_syslog_local'] = $_POST['barnyard_syslog_local'] ? 'on' : 'off';
 		$natent['barnyard_bro_ids_enable'] = $_POST['barnyard_bro_ids_enable'] ? 'on' : 'off';
+		$natent['barnyard_disable_sig_ref_tbl'] = $_POST['barnyard_disable_sig_ref_tbl'] ? 'on' : 'off';
 		$natent['barnyard_syslog_opmode'] = $_POST['barnyard_syslog_opmode'];
 		$natent['barnyard_syslog_proto'] = $_POST['barnyard_syslog_proto'];
 
@@ -378,6 +379,14 @@ include_once("head.inc");
 					&nbsp;<?php echo gettext("Password for the MySQL database user"); ?>
 				</td>
 			</tr>
+			<tr>
+				<td width="22%" valign="top" class="vncell"><?php echo gettext("Disable Signature Reference Table"); ?></td>
+				<td width="78%" class="vtable">
+					<input name="barnyard_disable_sig_ref_tbl" type="checkbox" value="on" <?php if ($pconfig['barnyard_disable_sig_ref_tbl'] == "on") echo "checked"; ?>/>
+					<?php echo gettext("Disable synchronization of sig_reference table in schema.  Default value is ") . "<strong>" . gettext("Not Checked") . "</strong>"; ?><br/>
+					<br/><?php echo gettext("This option will speedup the process when checked, plus it can help work around a 'duplicate entry' error when running multiple Snort instances."); ?>
+				</td>
+			</tr>
 			</tbody>
 			<tr>
 				<td colspan="2" valign="top" class="listtopic"><?php echo gettext("Syslog Output Settings"); ?></td>
@@ -608,6 +617,7 @@ function enable_change(enable_change) {
 	document.iform.barnyard_dbname.disabled = endis;
 	document.iform.barnyard_dbuser.disabled = endis;
 	document.iform.barnyard_dbpwd.disabled = endis;
+	document.iform.barnyard_disable_sig_ref_tbl.disabled = endis;
 	document.iform.barnyard_syslog_enable.disabled = endis;
 	document.iform.barnyard_syslog_local.disabled = endis;
 	document.iform.barnyard_syslog_opmode_default.disabled = endis;
