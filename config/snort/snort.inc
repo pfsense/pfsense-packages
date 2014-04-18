@@ -1986,12 +1986,13 @@ function snort_generate_barnyard2_conf($snortcfg, $if_real) {
 	if ($snortcfg['barnyard_mysql_enable'] == 'on') {
 		$by2_dbpwd = base64_decode($snortcfg['barnyard_dbpwd']);
 		$snortbarnyardlog_output_plugins .= "# database: log to a MySQL DB\noutput database: log, mysql, ";
-		if (isset($snortcfg['barnyard_sensor_name']) && strlen($snortcfg['barnyard_sensor_name']) > 0)
-			$snortbarnyardlog_output_plugins .= "sensor_name={$snortcfg['barnyard_sensor_name']} ";
-		if ($snortcfg['barnyard_disable_sig_ref_tbl'] == 'on')
-			$snortbarnyardlog_output_plugins .= "disable_signature_reference_table ";
 		$snortbarnyardlog_output_plugins .= "user={$snortcfg['barnyard_dbuser']} password={$by2_dbpwd} ";
-		$snortbarnyardlog_output_plugins .= "dbname={$snortcfg['barnyard_dbname']} host={$snortcfg['barnyard_dbhost']}\n\n";
+		$snortbarnyardlog_output_plugins .= "dbname={$snortcfg['barnyard_dbname']} host={$snortcfg['barnyard_dbhost']}";
+		if (isset($snortcfg['barnyard_sensor_name']) && strlen($snortcfg['barnyard_sensor_name']) > 0)
+			$snortbarnyardlog_output_plugins .= " sensor_name={$snortcfg['barnyard_sensor_name']}";
+		if ($snortcfg['barnyard_disable_sig_ref_tbl'] == 'on')
+			$snortbarnyardlog_output_plugins .= " disable_signature_reference_table";
+		$snortbarnyardlog_output_plugins .= "\n\n";
 	}
 	if ($snortcfg['barnyard_syslog_enable'] == 'on') {
 		$snortbarnyardlog_output_plugins .= "# syslog_full: log to a syslog receiver\noutput alert_syslog_full: ";
