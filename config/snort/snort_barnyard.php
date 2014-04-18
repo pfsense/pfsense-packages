@@ -548,6 +548,7 @@ function toggle_mySQL() {
 	document.iform.barnyard_dbname.disabled = endis;
 	document.iform.barnyard_dbuser.disabled = endis;
 	document.iform.barnyard_dbpwd.disabled = endis;
+	document.iform.barnyard_disable_sig_ref_tbl.disabled = endis;
 
 	if (endis)
 		document.getElementById("mysql_config_rows").style.display = "none";
