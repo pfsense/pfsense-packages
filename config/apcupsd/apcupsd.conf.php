@@ -122,7 +122,7 @@ POLLTIME {$polltime}
 
 # LOCKFILE <path to lockfile>
 #   Path for device lock file. Not used on Win32.
-LOCKFILE /var/spool/lock
+LOCKFILE {$lockfile}
 
 # SCRIPTDIR <path to script directory>
 #   Directory in which apccontrol and event scripts are located.

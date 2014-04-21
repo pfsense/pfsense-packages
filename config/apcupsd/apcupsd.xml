@@ -40,7 +40,7 @@
 	<name>Apcupsd</name>
 	<title>Services: Apcupsd (General)</title>
 	<category>Monitoring</category>
-	<version>0.2</version>
+	<version>0.3</version>
 	<include_file>/usr/local/pkg/apcupsd.inc</include_file>
 	<addedit_string>Apcupsd has been created/modified.</addedit_string>
 	<delete_string>Apcupsd has been deleted.</delete_string>
@@ -196,6 +196,13 @@ UPSTYPE   DEVICE           Description <br>
 			<fieldname>killonpowerfail</fieldname>
 			<description>Hibernate UPS on powerfail</description>
 			<type>checkbox</type>
+		</field>
+		<field>
+			<fielddescr>Lock File</fielddescr>
+			<fieldname>lockfile</fieldname>
+			<description>Path for device lock file. Default is /var/tmp</description>
+         <type>input</type>
+         <size>60</size>
 		</field>
 		<field>
 			<name>Configuration parameters used during power failures</name>
