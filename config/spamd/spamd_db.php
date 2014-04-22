@@ -431,9 +431,9 @@ if (typeof getURL == 'undefined') {
 		echo "<td class=\"listr\">{$srcip}</td>";
 		echo "<td class=\"listr\">{$fromaddress}</td>";		
 		echo "<td class=\"listr\">{$toaddress}</td>";
-		echo "<td class=\"listr\"><span style='white-space: nowrap;'>" . gmdate("Y-m-d", $first) . "<br/>" . gmdate("H:i:s", $first) . "</span></td>";
-		echo "<td class=\"listr\"><span style='white-space: nowrap;'>" . gmdate("Y-m-d", $pass) . "<br/>" . gmdate("H:i:s", $pass) . "</span></td>";
-		echo "<td class=\"listr\"><span style='white-space: nowrap;'>" . gmdate("Y-m-d", $expire) . "<br/>" . gmdate("H:i:s", $expire) . "</span></td>";
+		echo "<td class=\"listr\"><span style='white-space: nowrap;'>" . date("Y-m-d", $first) . "<br/>" . date("H:i:s", $first) . "</span></td>";
+		echo "<td class=\"listr\"><span style='white-space: nowrap;'>" . date("Y-m-d", $pass) . "<br/>" . date("H:i:s", $pass) . "</span></td>";
+		echo "<td class=\"listr\"><span style='white-space: nowrap;'>" . date("Y-m-d", $expire) . "<br/>" . date("H:i:s", $expire) . "</span></td>";
 		echo "<td class=\"listr\">{$attempts}</td>";
 		echo "<td>";
 		$rowtext = "<NOBR><a href='javascript:toggle_on(\"w{$rows}\", \"/themes/{$g['theme']}/images/icons/icon_plus_p.gif\"); getURL(\"spamd_db.php?buttonid=w{$rows}&srcip={$srcip}&action=whitelist\", outputrule);'><img title=\"Add to whitelist\" name='w{$rows}' id='w{$rows}' border=\"0\" alt=\"Add to whitelist\" src=\"/themes/{$g['theme']}/images/icons/icon_plus.gif\"></a> ";
