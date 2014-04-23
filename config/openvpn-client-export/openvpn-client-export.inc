@@ -344,7 +344,7 @@ function openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $verifys
 		$conf .= "management-hold{$nl}";
 		$conf .= "# query management channel for user/pass{$nl}";
 		$conf .= "management-query-passwords{$nl}";
-		$conf .= "# disconnect VPN when managment program connection is closed{$nl}";
+		$conf .= "# disconnect VPN when management program connection is closed{$nl}";
 		$conf .= "management-signal{$nl}";
 		$conf .= "# forget password when management disconnects{$nl}";
 		$conf .= "management-forget-disconnect{$nl}";
