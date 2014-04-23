@@ -818,7 +818,7 @@
 		<status>RC1</status>
 		<required_version>2.2</required_version>
 		<maintainer>nachtfalkeaw@web.de</maintainer>
-		<depends_on_package_pbi>freeradius-2.2.3_1-##ARCH##.pbi</depends_on_package_pbi>
+		<depends_on_package_pbi>freeradius-2.2.4_2-##ARCH##.pbi</depends_on_package_pbi>
 		<config_file>https://packages.pfsense.org/packages/config/freeradius2/freeradius.xml</config_file>
 		<configurationfile>freeradius.xml</configurationfile>
 		<after_install_info>Please visit Services: FreeRADIUS</after_install_info>
@@ -1042,7 +1042,7 @@
 		<version>1.4_4 pkg v.1.9.5</version>
 		<status>Beta</status>
 		<required_version>2.2</required_version>
-		<depends_on_package_pbi>squidguard-1.4_4-##ARCH##.pbi</depends_on_package_pbi>
+		<depends_on_package_pbi>squidguard-1.4_7-##ARCH##.pbi</depends_on_package_pbi>
 		<build_pbi>
 			<ports_before>databases/db41 security/cyrus-sasl2</ports_before>
 			<port>www/squidguard</port>
