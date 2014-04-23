@@ -662,7 +662,7 @@
 		<build_pbi>
 			<port>emulators/open-vm-tools-nox11</port>
 		</build_pbi>
-		<depends_on_package_pbi>open-vm-tools-nox11-1280544_4-##ARCH##.pbi</depends_on_package_pbi>
+		<depends_on_package_pbi>open-vm-tools-1280544_4-##ARCH##.pbi</depends_on_package_pbi>
 	</package>
 	<package>
 		<name>AutoConfigBackup</name>
