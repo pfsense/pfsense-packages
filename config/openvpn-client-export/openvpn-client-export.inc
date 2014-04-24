@@ -236,7 +236,8 @@ function openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $verifys
 
 	if (!empty($proxy)) {
 		if ($proxy['proxy_type'] == "http") {
-			if ($proto == "udp") {
+
+			if (strtoupper(substr($settings['protocol'], 0, 3)) == "UDP") {
 				$input_errors[] = "This server uses UDP protocol and cannot communicate with HTTP proxy.";
 				return;
 			}
@@ -733,7 +734,10 @@ function openvpn_client_export_sharedkey_config($srvid, $useaddr, $proxy, $zipco
 		} else {
 			if (!$interface)
 				$interface = "wan";
-			$server_host = get_interface_ip($interface);
+			if (in_array(strtolower($settings['protocol']), array("udp6", "tcp6")))
+				$server_host = get_interface_ipv6($interface);
+			else
+				$server_host = get_interface_ip($interface);
 		}
 	} else if ($useaddr == "serverhostname" || empty($useaddr)) {
 		$server_host = empty($config['system']['hostname']) ? "" : "{$config['system']['hostname']}.";
@@ -742,7 +746,10 @@ function openvpn_client_export_sharedkey_config($srvid, $useaddr, $proxy, $zipco
 		$server_host = $useaddr;
 
 	$server_port = $settings['local_port'];
-	$proto = (strtoupper($settings['protocol']) == 'UDP' ? 'udp' : "tcp-client");
+
+	$proto = strtolower($settings['protocol']);
+	if (strtolower(substr($settings['protocol'], 0, 3)) == "tcp")
+		$proto .= "-client";
 
 	$cipher = $settings['crypto'];
 	$digest = !empty($settings['digest']) ? $settings['digest'] : "SHA1";
@@ -837,7 +844,10 @@ function openvpn_client_export_build_remote_lines($settings, $useaddr, $interfac
 		} else {
 			if (!$interface || ($interface == "any"))
 				$interface = "wan";
-			$server_host = get_interface_ip($interface);
+			if (in_array(strtolower($settings['protocol']), array("udp6", "tcp6")))
+				$server_host = get_interface_ipv6($interface);
+			else
+				$server_host = get_interface_ip($interface);
 		}
 	} else if ($useaddr == "serverhostname" || empty($useaddr)) {
 		$server_host = empty($config['system']['hostname']) ? "" : "{$config['system']['hostname']}.";
@@ -845,7 +855,10 @@ function openvpn_client_export_build_remote_lines($settings, $useaddr, $interfac
 	} else
 		$server_host = $useaddr;
 
-	$proto = (strtoupper($settings['protocol']) == 'UDP' ? 'udp' : "tcp");
+	$proto = strtolower($settings['protocol']);
+	if (strtolower(substr($settings['protocol'], 0, 3)) == "tcp")
+		$proto .= "-client";
+
 	if (($expformat == "inlineios") && ($proto == "tcp-client"))
 		$proto = "tcp";
 
