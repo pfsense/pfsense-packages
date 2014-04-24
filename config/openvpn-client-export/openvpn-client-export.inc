@@ -867,6 +867,9 @@ function openvpn_client_export_find_port_forwards($targetip, $targetport, $targe
 		filter_generate_optcfg_array();
 	$destinations = array();
 
+	if (!is_array($config['nat']) || !is_array($config['nat']['rule']))
+		return $destinations;
+
 	foreach ($config['nat']['rule'] as $natent) {
 		$dest = array();
 		if (!isset($natent['disabled'])
