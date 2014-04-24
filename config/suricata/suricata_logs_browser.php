@@ -129,10 +129,12 @@ if ($input_errors) {
 		$tab_array[] = array(gettext("Global Settings"), false, "/suricata/suricata_global.php");
 		$tab_array[] = array(gettext("Update Rules"), false, "/suricata/suricata_download_updates.php");
 		$tab_array[] = array(gettext("Alerts"), false, "/suricata/suricata_alerts.php?instance={$instanceid}");
+		$tab_array[] = array(gettext("Blocked"), false, "/suricata/suricata_blocked.php");
+		$tab_array[] = array(gettext("Pass Lists"), false, "/suricata/suricata_passlist.php");
 		$tab_array[] = array(gettext("Suppress"), false, "/suricata/suricata_suppress.php");
 		$tab_array[] = array(gettext("Logs Browser"), true, "/suricata/suricata_logs_browser.php");
 		$tab_array[] = array(gettext("Logs Mgmt"), false, "/suricata/suricata_logs_mgmt.php");
-		display_top_tabs($tab_array);
+		display_top_tabs($tab_array, true);
 	?>
 	</td>
 	</tr>
