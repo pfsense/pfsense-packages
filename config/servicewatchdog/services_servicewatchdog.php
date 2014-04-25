@@ -56,8 +56,33 @@ if ($_GET['act'] == "del") {
 		servicewatchdog_cron_job();
 		write_config();
 		header("Location: services_servicewatchdog.php");
-		exit;
+		return;
 	}
+}
+
+if (isset($_POST['Update'])) {
+	/* update selected services */
+	if (is_array($_POST['notifies']) && count($_POST['notifies'])) {
+		/* Check each service and set the notify flag only for those chosen, remove those that are unset. */
+		foreach ($a_pwservices as $idx => $thisservice) {
+			if (!is_array($thisservice))
+				continue;
+			if (in_array($idx, $_POST['notifies'])) {
+				$a_pwservices[$idx]['notify'] = true;
+			} else {
+				if (isset($a_pwservices[$idx]['notify']))
+					unset($a_pwservices[$idx]['notify']);
+			}
+		}
+	} else { /* No notifies selected, remove them all. */
+		foreach ($a_pwservices as $idx => $thisservice) {
+			unset($a_pwservices[$idx]['notify']);
+		}
+	}
+	servicewatchdog_cron_job();
+	write_config();
+	header("Location: services_servicewatchdog.php");
+	return;
 }
 
 if (isset($_POST['del_x'])) {
@@ -69,7 +94,7 @@ if (isset($_POST['del_x'])) {
 		servicewatchdog_cron_job();
 		write_config();
 		header("Location: services_servicewatchdog.php");
-		exit;
+		return;
 	}
 } else {
 	/* yuck - IE won't send value attributes for image buttons, while Mozilla does - so we use .x/.y to find move button clicks instead... */
@@ -141,6 +166,7 @@ include("head.inc");
 </td></tr>
 <tr id="frheader">
 <td width="5%" class="list">&nbsp;</td>
+<td width="5%" class="listhdrr">Notify</td>
 <td width="30%" class="listhdrr"><?=gettext("Service Name");?></td>
 <td width="60%" class="listhdrr"><?=gettext("Description");?></td>
 <td width="5%" class="list">
@@ -164,7 +190,8 @@ foreach ($a_pwservices as $thisservice):
 ?>
 	<tr valign="top" id="fr<?=$nservices;?>">
 	<td class="listt"><input type="checkbox" id="frc<?=$nservices;?>" name="pwservices[]" value="<?=$i;?>" onClick="fr_bgcolor('<?=$nservices;?>')" style="margin: 0; padding: 0; width: 15px; height: 15px;" /></td>
-	<td class="listlr" onclick="fr_toggle(<?=$nservices;?>)" id="frd<?=$nservices;?>" ondblclick="document.location='services_servicewatchdog_add.php?id=<?=$nservices;?>';">
+	<td class="listlr"><input type="checkbox" id="notify<?=$nservices;?>" name="notifies[]" value="<?=$i;?>" style="margin: 0; padding: 0; width: 15px; height: 15px;" <?PHP if (isset($thisservice['notify'])) echo 'checked="CHECKED"';?>/></td>
+	<td class="listr" onclick="fr_toggle(<?=$nservices;?>)" id="frd<?=$nservices;?>" ondblclick="document.location='services_servicewatchdog_add.php?id=<?=$nservices;?>';">
 		<?=$thisservice['name'];?>
 	</td>
 	<td class="listr" onclick="fr_toggle(<?=$nservices;?>)" id="frd<?=$nservices;?>" ondblclick="document.location='services_servicewatchdog_add.php?id=<?=$nservices;?>';">
@@ -180,7 +207,7 @@ foreach ($a_pwservices as $thisservice):
 	</td></tr>
 <?php $i++; $nservices++; endforeach; ?>
 	<tr>
-	<td class="list" colspan="3"></td>
+	<td class="list" colspan="4"></td>
 	<td class="list" valign="middle" nowrap>
 	<table border="0" cellspacing="0" cellpadding="1" summary="add">
 	<tr>
@@ -199,7 +226,14 @@ foreach ($a_pwservices as $thisservice):
 	</table>
 	</td>
 	</tr>
-	<tr><td></td><td colspan="3">
+	<tr><td></td><td colspan="4">
+	<?php echo gettext("Check Notify next to services to perform an e-mail notification when the service is restarted. Configure e-mail notifications to receive the alerts."); ?>
+	<br/>
+	<input name="Update" type="submit" class="formbtn" value="<?=gettext("Update Notification Settings"); ?>" />
+	<br/>
+	<br/>
+	</td><td></td></tr>
+	<tr><td></td><td colspan="4">
 	<?php echo gettext("Click to select a service and use the arrows to re-order them in the list. Higher services are checked first."); ?>
 	</td><td></td></tr>
 	</table>

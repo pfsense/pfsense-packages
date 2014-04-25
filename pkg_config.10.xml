@@ -1505,9 +1505,9 @@
 		<name>Service Watchdog</name>
 		<descr>Monitors for stopped services and restarts them.</descr>
 		<maintainer>jimp@pfsense.org</maintainer>
-		<version>1.5</version>
+		<version>1.6</version>
 		<category>Services</category>
-		<status>BETA</status>
+		<status>Release</status>
 		<config_file>https://packages.pfsense.org/packages/config/servicewatchdog/servicewatchdog.xml</config_file>
 		<pkginfolink></pkginfolink>
 		<required_version>2.2</required_version>
