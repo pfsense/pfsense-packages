@@ -44,6 +44,8 @@ $pconfig['suricataloglimit'] = $config['installedpackages']['suricata']['config'
 $pconfig['suricataloglimitsize'] = $config['installedpackages']['suricata']['config'][0]['suricataloglimitsize'];
 $pconfig['alert_log_limit_size'] = $config['installedpackages']['suricata']['config'][0]['alert_log_limit_size'];
 $pconfig['alert_log_retention'] = $config['installedpackages']['suricata']['config'][0]['alert_log_retention'];
+$pconfig['block_log_limit_size'] = $config['installedpackages']['suricata']['config'][0]['block_log_limit_size'];
+$pconfig['block_log_retention'] = $config['installedpackages']['suricata']['config'][0]['block_log_retention'];
 $pconfig['files_json_log_limit_size'] = $config['installedpackages']['suricata']['config'][0]['files_json_log_limit_size'];
 $pconfig['files_json_log_retention'] = $config['installedpackages']['suricata']['config'][0]['files_json_log_retention'];
 $pconfig['http_log_limit_size'] = $config['installedpackages']['suricata']['config'][0]['http_log_limit_size'];
@@ -77,6 +79,8 @@ if (empty($pconfig['suricataloglimitsize'])) {
 // Set default retention periods for rotated logs
 if (empty($pconfig['alert_log_retention']))
 	$pconfig['alert_log_retention'] = "336";
+if (empty($pconfig['block_log_retention']))
+	$pconfig['block_log_retention'] = "336";
 if (empty($pconfig['files_json_log_retention']))
 	$pconfig['files_json_log_retention'] = "168";
 if (empty($pconfig['http_log_retention']))
@@ -91,6 +95,8 @@ if (empty($pconfig['u2_archive_log_retention']))
 // Set default log file size limits
 if (empty($pconfig['alert_log_limit_size']))
 	$pconfig['alert_log_limit_size'] = "500";
+if (empty($pconfig['block_log_limit_size']))
+	$pconfig['block_log_limit_size'] = "500";
 if (empty($pconfig['files_json_log_limit_size']))
 	$pconfig['files_json_log_limit_size'] = "1000";
 if (empty($pconfig['http_log_limit_size']))
@@ -119,6 +125,8 @@ if ($_POST["save"]) {
 		$config['installedpackages']['suricata']['config'][0]['suricataloglimitsize'] = $_POST['suricataloglimitsize'];
 		$config['installedpackages']['suricata']['config'][0]['alert_log_limit_size'] = $_POST['alert_log_limit_size'];
 		$config['installedpackages']['suricata']['config'][0]['alert_log_retention'] = $_POST['alert_log_retention'];
+		$config['installedpackages']['suricata']['config'][0]['block_log_limit_size'] = $_POST['block_log_limit_size'];
+		$config['installedpackages']['suricata']['config'][0]['block_log_retention'] = $_POST['block_log_retention'];
 		$config['installedpackages']['suricata']['config'][0]['files_json_log_limit_size'] = $_POST['files_json_log_limit_size'];
 		$config['installedpackages']['suricata']['config'][0]['files_json_log_retention'] = $_POST['files_json_log_retention'];
 		$config['installedpackages']['suricata']['config'][0]['http_log_limit_size'] = $_POST['http_log_limit_size'];
@@ -278,6 +286,26 @@ if ($input_errors)
 					<td class="listbg"><?=gettext("Suricata alerts and event details");?></td>
 				</tr>
 				<tr>
+					<td class="listbg">block</td>
+					<td class="listr" align="center"><select name="block_log_limit_size" class="formselect" id="block_log_limit_size">
+						<?php foreach ($log_sizes as $k => $l): ?>
+							<option value="<?=$k;?>"
+							<?php if ($k == $pconfig['block_log_limit_size']) echo "selected"; ?>>
+								<?=htmlspecialchars($l);?></option>
+						<?php endforeach; ?>
+						</select>
+					</td>
+					<td class="listr" align="center"><select name="block_log_retention" class="formselect" id="block_log_retention">
+						<?php foreach ($retentions as $k => $p): ?>
+							<option value="<?=$k;?>"
+							<?php if ($k == $pconfig['block_log_retention']) echo "selected"; ?>>
+								<?=htmlspecialchars($p);?></option>
+						<?php endforeach; ?>
+						</select>
+					</td>
+					<td class="listbg"><?=gettext("Suricata blocked IPs and event details");?></td>
+				</tr>
+				<tr>
 					<td class="listbg">files-json</td>
 					<td class="listr" align="center"><select name="files_json_log_limit_size" class="formselect" id="files_json_log_limit_size">
 						<?php foreach ($log_sizes as $k => $l): ?>
@@ -404,6 +432,8 @@ function enable_change() {
 	var endis = !(document.iform.enable_log_mgmt.checked);
 	document.iform.alert_log_limit_size.disabled = endis;
 	document.iform.alert_log_retention.disabled = endis;
+	document.iform.block_log_limit_size.disabled = endis;
+	document.iform.block_log_retention.disabled = endis;
 	document.iform.files_json_log_limit_size.disabled = endis;
 	document.iform.files_json_log_retention.disabled = endis;
 	document.iform.http_log_limit_size.disabled = endis;
