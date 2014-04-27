@@ -215,38 +215,28 @@ if ($savemsg) {
 					   </tr>
 					</thead>
 				<tbody>
-			<?php
-			/* set the arrays */
-			$blocked_ips_array = array();
-			if (is_array($blocked_ips)) {
-				foreach ($blocked_ips as $blocked_ip) {
-					if (empty($blocked_ip))
-						continue;
-					$blocked_ips_array[] = trim($blocked_ip, " \n\t");
-				}
-			}
+		<?php
+
+		/* set the arrays */
 		$blocked_ips_array = suricata_get_blocked_ips();
 		if (!empty($blocked_ips_array)) {
+			foreach ($blocked_ips_array as &$ip)
+				$ip = inet_pton($ip);
 			$tmpblocked = array_flip($blocked_ips_array);
 			$src_ip_list = array();
-			foreach (glob("{$suricatalogdir}*/alerts.log") as $alertfile) {
+			foreach (glob("{$suricatalogdir}*/block.log*") as $alertfile) {
 				$fd = fopen($alertfile, "r");
 				if ($fd) {
-					/*		0         1      2             3      4       5   6              7        8     9   10      11  12      */
-					/* File format timestamp,action,sig_generator,sig_id,sig_rev,msg,classification,priority,proto,src,srcport,dst,dstport */
+					/*	       0         1      2             3      4       5   6              7        8     9  10   */
+					/* File format timestamp,action,sig_generator,sig_id,sig_rev,msg,classification,priority,proto,ip,port */
 					while (($fields = fgetcsv($fd, 1000, ',', '"')) !== FALSE) {
-						if(count($fields) < 13)
+						if(count($fields) < 11)
 							continue;
-					
+						$fields[9] = inet_pton($fields[9]);
 						if (isset($tmpblocked[$fields[9]])) {
 							if (!is_array($src_ip_list[$fields[9]]))
 								$src_ip_list[$fields[9]] = array();
 							$src_ip_list[$fields[9]][$fields[5]] = "{$fields[5]} - " . substr($fields[0], 0, -7);
-						}
-						if (isset($tmpblocked[$fields[11]])) {
-							if (!is_array($src_ip_list[$fields[11]]))
-								$src_ip_list[$fields[11]] = array();
-							$src_ip_list[$fields[11]][$fields[5]] = "{$fields[5]} - " . substr($fields[0], 0, -7);
 						}
 					}
 					fclose($fd);
@@ -258,7 +248,7 @@ if ($savemsg) {
 					$src_ip_list[$blocked_ip] = array("N\A\n");
 			}
 
-			/* build final list, preg_match, build html */
+			/* build final list, build html */
 			$counter = 0;
 			foreach($src_ip_list as $blocked_ip => $blocked_msg) {
 				$blocked_desc = implode("<br/>", $blocked_msg);
@@ -267,14 +257,15 @@ if ($savemsg) {
 				else
 					$counter++;
 
+				$block_ip_str = inet_ntop($blocked_ip);
 				/* Add zero-width space as soft-break opportunity after each colon if we have an IPv6 address */
-				$tmp_ip = str_replace(":", ":&#8203;", $blocked_ip);
-				/* Add reverse DNS lookup icons (two different links if pfSense version supports them) */
+				$tmp_ip = str_replace(":", ":&#8203;", $block_ip_str);
+				/* Add reverse DNS lookup icons */
 				$rdns_link = "";
-				$rdns_link .= "<a onclick=\"javascript:getURL('/diag_dns.php?host={$blocked_ip}&dialog_output=true', outputrule);\">";
+				$rdns_link .= "<a onclick=\"javascript:getURL('/diag_dns.php?host={$block_ip_str}&dialog_output=true', outputrule);\">";
 				$rdns_link .= "<img src='../themes/{$g['theme']}/images/icons/icon_log_d.gif' width='11' height='11' border='0' ";
 				$rdns_link .= "title='" . gettext("Resolve host via reverse DNS lookup (quick pop-up)") . "' style=\"cursor: pointer;\"></a>&nbsp;";
-				$rdns_link .= "<a href='/diag_dns.php?host={$blocked_ip}'>";
+				$rdns_link .= "<a href='/diag_dns.php?host={$block_ip_str}'>";
 				$rdns_link .= "<img src='../themes/{$g['theme']}/images/icons/icon_log.gif' width='11' height='11' border='0' ";
 				$rdns_link .= "title='" . gettext("Resolve host via reverse DNS lookup") . "'></a>";
 				/* use one echo to do the magic*/
@@ -283,7 +274,7 @@ if ($savemsg) {
 						<td align=\"center\" valign=\"middle\" class=\"listr\">{$tmp_ip}<br/>{$rdns_link}</td>
 						<td valign=\"middle\" class=\"listr\">{$blocked_desc}</td>
 						<td align=\"center\" valign=\"middle\" class=\"listr\" sorttable_customkey=\"\">
-						<input type=\"image\" name=\"todelete[]\" onClick=\"document.getElementById('ip').value='{$blocked_ip}';\" 
+						<input type=\"image\" name=\"todelete[]\" onClick=\"document.getElementById('ip').value='{$block_ip_str}';\" 
 						src=\"../themes/{$g['theme']}/images/icons/icon_x.gif\" title=\"" . gettext("Delete host from Blocked Table") . "\" border=\"0\" /></td>
 					</tr>\n";
 			}
