@@ -56,6 +56,7 @@ $pconfig['tls_log_limit_size'] = $config['installedpackages']['suricata']['confi
 $pconfig['tls_log_retention'] = $config['installedpackages']['suricata']['config'][0]['tls_log_retention'];
 $pconfig['unified2_log_limit'] = $config['installedpackages']['suricata']['config'][0]['unified2_log_limit'];
 $pconfig['u2_archive_log_retention'] = $config['installedpackages']['suricata']['config'][0]['u2_archive_log_retention'];
+$pconfig['file_store_retention'] = $config['installedpackages']['suricata']['config'][0]['file_store_retention'];
 
 // Load up some arrays with selection values (we use these later).
 // The keys in the $retentions array are the retention period
@@ -91,6 +92,8 @@ if (empty($pconfig['tls_log_retention']))
 	$pconfig['tls_log_retention'] = "336";
 if (empty($pconfig['u2_archive_log_retention']))
 	$pconfig['u2_archive_log_retention'] = "168";
+if (empty($pconfig['file_store_retention']))
+	$pconfig['file_store_retention'] = "168";
 
 // Set default log file size limits
 if (empty($pconfig['alert_log_limit_size']))
@@ -137,6 +140,7 @@ if ($_POST["save"]) {
 		$config['installedpackages']['suricata']['config'][0]['tls_log_retention'] = $_POST['tls_log_retention'];
 		$config['installedpackages']['suricata']['config'][0]['unified2_log_limit'] = $_POST['unified2_log_limit'];
 		$config['installedpackages']['suricata']['config'][0]['u2_archive_log_retention'] = $_POST['u2_archive_log_retention'];
+		$config['installedpackages']['suricata']['config'][0]['file_store_retention'] = $_POST['file_store_retention'];
 
 		write_config();
 		sync_suricata_package_config();
@@ -416,6 +420,19 @@ if ($input_errors)
 	</td>
 </tr>
 <tr>
+	<td class="vncell" width="22%" valign="top"><?=gettext("Captured Files Retention Period");?></td>
+	<td width="78%" class="vtable"><select name="file_store_retention" class="formselect" id="file_store_retention">
+		<?php foreach ($retentions as $k => $p): ?>
+			<option value="<?=$k;?>"
+			<?php if ($k == $pconfig['file_store_retention']) echo "selected"; ?>>
+				<?=htmlspecialchars($p);?></option>
+		<?php endforeach; ?>
+		</select>&nbsp;<?=gettext("Choose retention period for captured files in File Store. Default is ") . "<strong>" . gettext("7 days."). "</strong>";?><br/><br/>
+		<?=gettext("When file capture and store is enabled, Suricata captures downloaded files from HTTP sessions and stores them, along with metadata, ") . 
+		gettext("for later analysis.  This setting determines how long files remain in the File Store folder before they are automatically deleted.");?>
+	</td>
+</tr>
+<tr>
 	<td width="22%"></td>
 	<td width="78%" class="vexpl"><input name="save" type="submit" class="formbtn" value="Save"/><br/>
 	<br/><span class="red"><strong><?php echo gettext("Note:");?></strong>&nbsp;
@@ -444,6 +461,7 @@ function enable_change() {
 	document.iform.tls_log_retention.disabled = endis;
 	document.iform.unified2_log_limit.disabled = endis;
 	document.iform.u2_archive_log_retention.disabled = endis;
+	document.iform.file_store_retention.disabled = endis;
 }
 
 function enable_change_dirSize() {
