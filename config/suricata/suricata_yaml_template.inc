@@ -107,7 +107,7 @@ outputs:
       force-md5: {$json_log_md5}
 
 # Magic file. The extension .mgc is added to the value here.
-magic-file: {$suricatacfgdir}/magic
+magic-file: /usr/share/misc/magic
 
 # Specify a threshold config file
 threshold-file: {$suricatacfgdir}/threshold.config
