@@ -502,6 +502,97 @@ function suricata_loglimit_install_cron($should_install=true) {
 	install_cron_job("/usr/bin/nice -n20 /usr/local/bin/php -f /usr/local/pkg/suricata/suricata_check_cron_misc.inc", $should_install, "*/5");
 }
 
+function suricata_rm_blocked_install_cron($should_install) {
+	global $config, $g;
+	$suri_pf_table = SURICATA_PF_TABLE;
+
+	$suricata_rm_blocked_info_ck = $config['installedpackages']['suricata']['config'][0]['rm_blocked'];
+
+	if ($suricata_rm_blocked_info_ck == "15m_b") {
+		$suricata_rm_blocked_min = "*/1";
+		$suricata_rm_blocked_hr = "*";
+		$suricata_rm_blocked_mday = "*";
+		$suricata_rm_blocked_month = "*";
+		$suricata_rm_blocked_wday = "*";
+		$suricata_rm_blocked_expire = "900";
+	}
+	if ($suricata_rm_blocked_info_ck == "30m_b") {
+		$suricata_rm_blocked_min = "*/5";
+		$suricata_rm_blocked_hr = "*";
+		$suricata_rm_blocked_mday = "*";
+		$suricata_rm_blocked_month = "*";
+		$suricata_rm_blocked_wday = "*";
+		$suricata_rm_blocked_expire = "1800";
+	}
+	if ($suricata_rm_blocked_info_ck == "1h_b") {
+		$suricata_rm_blocked_min = "*/5";
+		$suricata_rm_blocked_hr = "*";
+		$suricata_rm_blocked_mday = "*";
+		$suricata_rm_blocked_month = "*";
+		$suricata_rm_blocked_wday = "*";
+		$suricata_rm_blocked_expire = "3600";
+	}
+	if ($suricata_rm_blocked_info_ck == "3h_b") {
+		$suricata_rm_blocked_min = "*/5";
+		$suricata_rm_blocked_hr = "*";
+		$suricata_rm_blocked_mday = "*";
+		$suricata_rm_blocked_month = "*";
+		$suricata_rm_blocked_wday = "*";
+		$suricata_rm_blocked_expire = "10800";
+	}
+	if ($suricata_rm_blocked_info_ck == "6h_b") {
+		$suricata_rm_blocked_min = "*/5";
+		$suricata_rm_blocked_hr = "*";
+		$suricata_rm_blocked_mday = "*";
+		$suricata_rm_blocked_month = "*";
+		$suricata_rm_blocked_wday = "*";
+		$suricata_rm_blocked_expire = "21600";
+	}
+	if ($suricata_rm_blocked_info_ck == "12h_b") {
+		$suricata_rm_blocked_min = "*/5";
+		$suricata_rm_blocked_hr = "*";
+		$suricata_rm_blocked_mday = "*";
+		$suricata_rm_blocked_month = "*";
+		$suricata_rm_blocked_wday = "*";
+		$suricata_rm_blocked_expire = "43200";
+	}
+	if ($suricata_rm_blocked_info_ck == "1d_b") {
+		$suricata_rm_blocked_min = "*/5";
+		$suricata_rm_blocked_hr = "*";
+		$suricata_rm_blocked_mday = "*";
+		$suricata_rm_blocked_month = "*";
+		$suricata_rm_blocked_wday = "*";
+		$suricata_rm_blocked_expire = "86400";
+	}
+	if ($suricata_rm_blocked_info_ck == "4d_b") {
+		$suricata_rm_blocked_min = "*/5";
+		$suricata_rm_blocked_hr = "*";
+		$suricata_rm_blocked_mday = "*";
+		$suricata_rm_blocked_month = "*";
+		$suricata_rm_blocked_wday = "*";
+		$suricata_rm_blocked_expire = "345600";
+	}
+	if ($suricata_rm_blocked_info_ck == "7d_b") {
+		$suricata_rm_blocked_min = "*/5";
+		$suricata_rm_blocked_hr = "*";
+		$suricata_rm_blocked_mday = "*";
+		$suricata_rm_blocked_month = "*";
+		$suricata_rm_blocked_wday = "*";
+		$suricata_rm_blocked_expire = "604800";
+	}
+	if ($suricata_rm_blocked_info_ck == "28d_b") {
+		$suricata_rm_blocked_min = "*/5";
+		$suricata_rm_blocked_hr = "*";
+		$suricata_rm_blocked_mday = "*";
+		$suricata_rm_blocked_month = "*";
+		$suricata_rm_blocked_wday = "*";
+		$suricata_rm_blocked_expire = "2419200";
+	}
+
+	$command = "/usr/bin/nice -n20 /sbin/pfctl -t {$suri_pf_table} -T expire {$suricata_rm_blocked_expire}";
+	install_cron_job($command, $should_install, $suricata_rm_blocked_min, $suricata_rm_blocked_hr, $suricata_rm_blocked_mday, $suricata_rm_blocked_month, $suricata_rm_blocked_wday, "root");
+}
+
 function sync_suricata_package_config() {
 	global $config, $g;
 
@@ -534,9 +625,11 @@ function sync_suricata_package_config() {
 
 	$suricataglob = $config['installedpackages']['suricata']['config'][0];
 	// setup the log directory size check job if enabled
-	suricata_loglimit_install_cron();
+	suricata_loglimit_install_cron(true);
 	// setup the suricata rules update job if enabled
-	suricata_rules_up_install_cron($suricataglob['autoruleupdate'] != "never_up" ? true : false);
+	suricata_rules_up_install_cron($config['installedpackages']['suricata']['config'][0]['autoruleupdate'] != "never_up" ? true : false);
+	// set the suricata blocked hosts time
+	suricata_rm_blocked_install_cron($config['installedpackages']['suricata']['config'][0]['rm_blocked'] != "never_b" ? true : false);
 
 	write_config();
 	configure_cron();
