@@ -39,9 +39,14 @@ global $g, $config;
 if (!is_array($config['installedpackages']['suricata']))
 	$config['installedpackages']['suricata'] = array();
 
-// Define the binary and package build versions
-define('SURICATA_VER', '1.4.6');
-define('SURICATA_PKG_VER', 'v0.3-BETA');
+/* Get installed package version for display */
+$suricata_package_version = "Suricata {$config['installedpackages']['package'][get_pkg_id("suricata")]['version']}";
+
+// Define the installed package version
+define('SURICATA_PKG_VER', $suricata_package_version);
+
+// Define the name of the pf table used for IP blocks
+define('SURICATA_PF_TABLE', 'snort2c');
 
 // Create some other useful defines
 define('SURICATADIR', '/usr/pbi/suricata-' . php_uname("m") . '/etc/suricata/');
@@ -198,13 +203,26 @@ function suricata_barnyard_reload_config($suricatacfg, $signal="HUP") {
 
 function suricata_get_blocked_ips() {
 
-	// This is a placeholder function for later use.
-	// Blocking is not currently enabled in Suricata.
-	return array();
+	$suri_pf_table = SURICATA_PF_TABLE;
+	$blocked_ips = "";
+
+	exec("/sbin/pfctl -t {$suri_pf_table} -T show", $blocked_ips);
+
+	$blocked_ips_array = array();
+	if (!empty($blocked_ips)) {
+		if (is_array($blocked_ips)) {
+			foreach ($blocked_ips as $blocked_ip) {
+				if (empty($blocked_ip))
+					continue;
+				$blocked_ips_array[] = trim($blocked_ip, " \n\t");
+			}
+		}
+	}
+	return $blocked_ips_array;
 }
 
-/* func builds custom white lists */
-function suricata_find_list($find_name, $type = 'whitelist') {
+/* func builds custom Pass Lists */
+function suricata_find_list($find_name, $type = 'passlist') {
 	global $config;
 
 	$suricataglob = $config['installedpackages']['suricata'];
@@ -221,11 +239,11 @@ function suricata_find_list($find_name, $type = 'whitelist') {
 	return array();
 }
 
-function suricata_build_list($suricatacfg, $listname = "", $whitelist = false) {
+function suricata_build_list($suricatacfg, $listname = "", $passlist = false) {
 
 	/***********************************************************/
 	/* The default is to build a HOME_NET variable unless      */
-	/* '$whitelist' is set to 'true' when calling.             */
+	/* '$passlist' is set to 'true' when calling.             */
 	/***********************************************************/
 
 	global $config, $g, $aliastable, $filterdns;
@@ -247,7 +265,7 @@ function suricata_build_list($suricatacfg, $listname = "", $whitelist = false) {
 			$home_net = explode(" ", trim(filter_expand_alias($list['address'])));
 	}
 
-	// Always add loopback to HOME_NET and whitelist (ftphelper)
+	// Always add loopback to HOME_NET and passlist (ftphelper)
 	if (!in_array("127.0.0.1", $home_net))
 		$home_net[] = "127.0.0.1";
 
@@ -255,8 +273,8 @@ function suricata_build_list($suricatacfg, $listname = "", $whitelist = false) {
 	/* Always put the interface running Suricata in HOME_NET and        */
 	/* whitelist unless it's the WAN.  WAN options are handled further  */
 	/* down.  If the user specifically chose not to include LOCAL_NETS  */
-	/* in the WHITELIST, then do not include the Suricata interface     */
-	/* subnet in the WHITELIST. We do include the actual LAN interface  */
+	/* in the PASS LIST, then do not include the Suricata interface     */
+	/* subnet in the PASS LIST. We do include the actual LAN interface  */
 	/* IP for Suricata, though, to prevent locking out the firewall.    */
 	/********************************************************************/
 	$suricataip = get_interface_ip($suricatacfg['interface']);
@@ -297,8 +315,8 @@ function suricata_build_list($suricatacfg, $listname = "", $whitelist = false) {
 
 	if (!$whitelist || $localnet == 'yes' || empty($localnet)) {		
 		/*************************************************************************/
-		/*  Iterate through the interface list and write out whitelist items and */
-		/*  also compile a HOME_NET list of all the local interfaces for suricata.  */
+		/*  Iterate through the interface list and write out pass list items and */
+		/*  also compile a HOME_NET list of all local interfaces for suricata.   */
 		/*  Skip the WAN interface as we do not typically want that whole subnet */
 		/*  whitelisted (just the i/f IP itself which was handled earlier).      */
 		/*************************************************************************/
@@ -365,7 +383,7 @@ function suricata_build_list($suricatacfg, $listname = "", $whitelist = false) {
 	}
 
 	if($vips == 'yes') {
-		// iterate all vips and add to whitelist
+		// iterate all vips and add to passlist
 		if (is_array($config['virtualip']) && is_array($config['virtualip']['vip'])) {
 			foreach($config['virtualip']['vip'] as $vip) {
 				if ($vip['subnet'] && $vip['mode'] != 'proxyarp') {
@@ -484,6 +502,97 @@ function suricata_loglimit_install_cron($should_install=true) {
 	install_cron_job("/usr/bin/nice -n20 /usr/local/bin/php -f /usr/local/pkg/suricata/suricata_check_cron_misc.inc", $should_install, "*/5");
 }
 
+function suricata_rm_blocked_install_cron($should_install) {
+	global $config, $g;
+	$suri_pf_table = SURICATA_PF_TABLE;
+
+	$suricata_rm_blocked_info_ck = $config['installedpackages']['suricata']['config'][0]['rm_blocked'];
+
+	if ($suricata_rm_blocked_info_ck == "15m_b") {
+		$suricata_rm_blocked_min = "*/1";
+		$suricata_rm_blocked_hr = "*";
+		$suricata_rm_blocked_mday = "*";
+		$suricata_rm_blocked_month = "*";
+		$suricata_rm_blocked_wday = "*";
+		$suricata_rm_blocked_expire = "900";
+	}
+	if ($suricata_rm_blocked_info_ck == "30m_b") {
+		$suricata_rm_blocked_min = "*/5";
+		$suricata_rm_blocked_hr = "*";
+		$suricata_rm_blocked_mday = "*";
+		$suricata_rm_blocked_month = "*";
+		$suricata_rm_blocked_wday = "*";
+		$suricata_rm_blocked_expire = "1800";
+	}
+	if ($suricata_rm_blocked_info_ck == "1h_b") {
+		$suricata_rm_blocked_min = "*/5";
+		$suricata_rm_blocked_hr = "*";
+		$suricata_rm_blocked_mday = "*";
+		$suricata_rm_blocked_month = "*";
+		$suricata_rm_blocked_wday = "*";
+		$suricata_rm_blocked_expire = "3600";
+	}
+	if ($suricata_rm_blocked_info_ck == "3h_b") {
+		$suricata_rm_blocked_min = "*/5";
+		$suricata_rm_blocked_hr = "*";
+		$suricata_rm_blocked_mday = "*";
+		$suricata_rm_blocked_month = "*";
+		$suricata_rm_blocked_wday = "*";
+		$suricata_rm_blocked_expire = "10800";
+	}
+	if ($suricata_rm_blocked_info_ck == "6h_b") {
+		$suricata_rm_blocked_min = "*/5";
+		$suricata_rm_blocked_hr = "*";
+		$suricata_rm_blocked_mday = "*";
+		$suricata_rm_blocked_month = "*";
+		$suricata_rm_blocked_wday = "*";
+		$suricata_rm_blocked_expire = "21600";
+	}
+	if ($suricata_rm_blocked_info_ck == "12h_b") {
+		$suricata_rm_blocked_min = "*/5";
+		$suricata_rm_blocked_hr = "*";
+		$suricata_rm_blocked_mday = "*";
+		$suricata_rm_blocked_month = "*";
+		$suricata_rm_blocked_wday = "*";
+		$suricata_rm_blocked_expire = "43200";
+	}
+	if ($suricata_rm_blocked_info_ck == "1d_b") {
+		$suricata_rm_blocked_min = "*/5";
+		$suricata_rm_blocked_hr = "*";
+		$suricata_rm_blocked_mday = "*";
+		$suricata_rm_blocked_month = "*";
+		$suricata_rm_blocked_wday = "*";
+		$suricata_rm_blocked_expire = "86400";
+	}
+	if ($suricata_rm_blocked_info_ck == "4d_b") {
+		$suricata_rm_blocked_min = "*/5";
+		$suricata_rm_blocked_hr = "*";
+		$suricata_rm_blocked_mday = "*";
+		$suricata_rm_blocked_month = "*";
+		$suricata_rm_blocked_wday = "*";
+		$suricata_rm_blocked_expire = "345600";
+	}
+	if ($suricata_rm_blocked_info_ck == "7d_b") {
+		$suricata_rm_blocked_min = "*/5";
+		$suricata_rm_blocked_hr = "*";
+		$suricata_rm_blocked_mday = "*";
+		$suricata_rm_blocked_month = "*";
+		$suricata_rm_blocked_wday = "*";
+		$suricata_rm_blocked_expire = "604800";
+	}
+	if ($suricata_rm_blocked_info_ck == "28d_b") {
+		$suricata_rm_blocked_min = "*/5";
+		$suricata_rm_blocked_hr = "*";
+		$suricata_rm_blocked_mday = "*";
+		$suricata_rm_blocked_month = "*";
+		$suricata_rm_blocked_wday = "*";
+		$suricata_rm_blocked_expire = "2419200";
+	}
+
+	$command = "/usr/bin/nice -n20 /sbin/pfctl -t {$suri_pf_table} -T expire {$suricata_rm_blocked_expire}";
+	install_cron_job($command, $should_install, $suricata_rm_blocked_min, $suricata_rm_blocked_hr, $suricata_rm_blocked_mday, $suricata_rm_blocked_month, $suricata_rm_blocked_wday, "root");
+}
+
 function sync_suricata_package_config() {
 	global $config, $g;
 
@@ -516,9 +625,11 @@ function sync_suricata_package_config() {
 
 	$suricataglob = $config['installedpackages']['suricata']['config'][0];
 	// setup the log directory size check job if enabled
-	suricata_loglimit_install_cron();
+	suricata_loglimit_install_cron(true);
 	// setup the suricata rules update job if enabled
-	suricata_rules_up_install_cron($suricataglob['autoruleupdate'] != "never_up" ? true : false);
+	suricata_rules_up_install_cron($config['installedpackages']['suricata']['config'][0]['autoruleupdate'] != "never_up" ? true : false);
+	// set the suricata blocked hosts time
+	suricata_rm_blocked_install_cron($config['installedpackages']['suricata']['config'][0]['rm_blocked'] != "never_b" ? true : false);
 
 	write_config();
 	configure_cron();
@@ -1911,7 +2022,12 @@ function suricata_generate_barnyard2_conf($suricatacfg, $if_real) {
 		$by2_dbpwd = base64_decode($suricatacfg['barnyard_dbpwd']);
 		$suricatabarnyardlog_output_plugins .= "# database: log to a MySQL DB\noutput database: alert, mysql, ";
 		$suricatabarnyardlog_output_plugins .= "user={$suricatacfg['barnyard_dbuser']} password={$by2_dbpwd} ";
-		$suricatabarnyardlog_output_plugins .= "dbname={$suricatacfg['barnyard_dbname']} host={$suricatacfg['barnyard_dbhost']}\n\n";
+		$suricatabarnyardlog_output_plugins .= "dbname={$suricatacfg['barnyard_dbname']} host={$suricatacfg['barnyard_dbhost']}";
+		if (isset($suricatacfg['barnyard_sensor_name']) && strlen($suricatacfg['barnyard_sensor_name']) > 0)
+			$suricatabarnyardlog_output_plugins .= " sensor_name={$suricatacfg['barnyard_sensor_name']}";
+		if ($suricatacfg['barnyard_disable_sig_ref_tbl'] == 'on')
+			$suricatabarnyardlog_output_plugins .= " disable_signature_reference_table";
+		$suricatabarnyardlog_output_plugins .= "\n\n";
 	}
 	if ($suricatacfg['barnyard_syslog_enable'] == 'on') {
 		$suricatabarnyardlog_output_plugins .= "# syslog_full: log to a syslog receiver\n";

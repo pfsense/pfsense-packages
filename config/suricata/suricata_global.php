@@ -124,7 +124,7 @@ if (!$input_errors) {
 
 		$retval = 0;
 
-		/* create whitelist and homenet file, then sync files */
+		/* create passlist and homenet file, then sync files */
 		sync_suricata_package_config();
 
 		write_config();
@@ -168,10 +168,12 @@ if ($input_errors)
         $tab_array[] = array(gettext("Global Settings"), true, "/suricata/suricata_global.php");
 	$tab_array[] = array(gettext("Update Rules"), false, "/suricata/suricata_download_updates.php");
 	$tab_array[] = array(gettext("Alerts"), false, "/suricata/suricata_alerts.php");
+	$tab_array[] = array(gettext("Blocked"), false, "/suricata/suricata_blocked.php");
+	$tab_array[] = array(gettext("Pass Lists"), false, "/suricata/suricata_passlist.php");
 	$tab_array[] = array(gettext("Suppress"), false, "/suricata/suricata_suppress.php");
 	$tab_array[] = array(gettext("Logs Browser"), false, "/suricata/suricata_logs_browser.php");
 	$tab_array[] = array(gettext("Logs Mgmt"), false, "/suricata/suricata_logs_mgmt.php");
-        display_top_tabs($tab_array);
+        display_top_tabs($tab_array, true);
 ?>
 </td></tr>
 <tr>
@@ -304,18 +306,18 @@ if ($input_errors)
 <tr>
 	<td colspan="2" valign="top" class="listtopic"><?php echo gettext("General Settings"); ?></td>
 </tr>
-<tr style="display:none;">
+<tr>
 	<td width="22%" valign="top" class="vncell"><?php echo gettext("Remove Blocked Hosts Interval"); ?></td>
 	<td width="78%" class="vtable">
 		<select name="rm_blocked" class="formselect" id="rm_blocked">
 		<?php
 		$interfaces3 = array('never_b' => gettext('NEVER'), '15m_b' => gettext('15 MINS'), '30m_b' => gettext('30 MINS'), '1h_b' => gettext('1 HOUR'), '3h_b' => gettext('3 HOURS'), '6h_b' => gettext('6 HOURS'), '12h_b' => gettext('12 HOURS'), '1d_b' => gettext('1 DAY'), '4d_b' => gettext('4 DAYS'), '7d_b' => gettext('7 DAYS'), '28d_b' => gettext('28 DAYS'));
 		foreach ($interfaces3 as $iface3 => $ifacename3): ?>
-		<option value="<?=$iface3;?>"
-		<?php if ($iface3 == $pconfig['rm_blocked']) echo "selected"; ?>>
-			<?=htmlspecialchars($ifacename3);?></option>
-			<?php endforeach; ?>
-	</select>&nbsp;
+			<option value="<?=$iface3;?>"
+			<?php if ($iface3 == $pconfig['rm_blocked']) echo "selected"; ?>>
+				<?=htmlspecialchars($ifacename3);?></option>
+		<?php endforeach; ?>
+		</select>&nbsp;
 	<?php echo gettext("Please select the amount of time you would like hosts to be blocked."); ?><br/><br/>
 	<?php echo "<span class=\"red\"><strong>" . gettext("Hint:") . "</strong></span>" . gettext(" in most cases, 1 hour is a good choice.");?></td>
 </tr>

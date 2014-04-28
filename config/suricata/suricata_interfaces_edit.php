@@ -32,6 +32,9 @@ require_once("/usr/local/pkg/suricata/suricata.inc");
 
 global $g, $rebuild_rules;
 
+$suricatadir = SURICATADIR;
+$suricatalogdir = SURICATALOGDIR;
+
 if (!is_array($config['installedpackages']['suricata']))
 	$config['installedpackages']['suricata'] = array();
 $suricataglob = $config['installedpackages']['suricata'];
@@ -173,6 +176,16 @@ if ($_POST["save"]) {
 	if (!empty($_POST['inspect_recursion_limit']) && !is_numeric($_POST['inspect_recursion_limit']))
 		$input_errors[] = gettext("The value for Inspect Recursion Limit can either be blank or contain only digits evaluating to an integer greater than or equal to 0.");
 
+	/* See if assigned interface is already in use */
+	if (isset($_POST['interface'])) {
+		foreach ($a_rule as $k => $v) {
+			if (($v['interface'] == $_POST['interface']) && ($id <> $k)) {
+				$input_errors[] = gettext("The '{$_POST['interface']}' interface is already assigned to another Suricata instance.");
+				break;
+			}
+		}
+	}
+
 	// if no errors write to suricata.yaml
 	if (!$input_errors) {
 		$natent = $a_rule[$id];
@@ -204,7 +217,7 @@ if ($_POST["save"]) {
 		if ($_POST['blockoffenders'] == "on") $natent['blockoffenders'] = 'on'; else $natent['blockoffenders'] = 'off';
 		if ($_POST['blockoffenderskill'] == "on") $natent['blockoffenderskill'] = 'on'; else unset($natent['blockoffenderskill']);
 		if ($_POST['blockoffendersip']) $natent['blockoffendersip'] = $_POST['blockoffendersip']; else unset($natent['blockoffendersip']);
-		if ($_POST['whitelistname']) $natent['whitelistname'] =  $_POST['whitelistname']; else unset($natent['whitelistname']);
+		if ($_POST['passlistname']) $natent['passlistname'] =  $_POST['passlistname']; else unset($natent['passlistname']);
 		if ($_POST['homelistname']) $natent['homelistname'] =  $_POST['homelistname']; else unset($natent['homelistname']);
 		if ($_POST['externallistname']) $natent['externallistname'] =  $_POST['externallistname']; else unset($natent['externallistname']);
 		if ($_POST['suppresslistname']) $natent['suppresslistname'] =  $_POST['suppresslistname']; else unset($natent['suppresslistname']);
@@ -213,14 +226,20 @@ if ($_POST["save"]) {
 
 		$if_real = get_real_interface($natent['interface']);
 		if (isset($id) && $a_rule[$id]) {
+			// See if moving an existing Suricata instance to another physical interface
 			if ($natent['interface'] != $a_rule[$id]['interface']) {
 				$oif_real = get_real_interface($a_rule[$id]['interface']);
-				suricata_stop($a_rule[$id], $oif_real);
-				exec("rm -r /var/log/suricata_{$oif_real}" . $a_rule[$id]['uuid']);
-				exec("mv -f {$suricatadir}/suricata_" . $a_rule[$id]['uuid'] . "_{$oif_real} {$suricatadir}/suricata_" . $a_rule[$id]['uuid'] . "_{$if_real}");
+				if (suricata_is_running($a_rule[$id]['uuid'], $oif_real)) {
+					suricata_stop($a_rule[$id], $oif_real);
+					$suricata_start = true;
+				}
+				else
+					$suricata_start = false;
+				exec("mv -f {$suricatalogdir}suricata_{$oif_real}" . $a_rule[$id]['uuid'] . " {$suricatalogdir}suricata_{$if_real}" . $a_rule[$id]['uuid']);
+				conf_mount_rw();
+				exec("mv -f {$suricatadir}suricata_" . $a_rule[$id]['uuid'] . "_{$oif_real} {$suricatadir}suricata_" . $a_rule[$id]['uuid'] . "_{$if_real}");
+				conf_mount_ro();
 			}
-			// Edits don't require a rules rebuild, so turn it "off"
-			$rebuild_rules = false;
 			$a_rule[$id] = $natent;
 		} else {
 			// Adding new interface, so set interface configuration parameter defaults
@@ -330,14 +349,16 @@ if ($savemsg) {
 <tr><td>
 <?php
     $tab_array = array();
-	$tab_array[] = array(gettext("Suricata Interfaces"), true, "/suricata/suricata_interfaces.php");
+	$tab_array[] = array(gettext("Suricata Interfaces"), false, "/suricata/suricata_interfaces.php");
 	$tab_array[] = array(gettext("Global Settings"), false, "/suricata/suricata_global.php");
 	$tab_array[] = array(gettext("Update Rules"), false, "/suricata/suricata_download_updates.php");
 	$tab_array[] = array(gettext("Alerts"), false, "/suricata/suricata_alerts.php?instance={$id}");
+	$tab_array[] = array(gettext("Blocked"), false, "/suricata/suricata_blocked.php");
+	$tab_array[] = array(gettext("Pass Lists"), false, "/suricata/suricata_passlist.php");
 	$tab_array[] = array(gettext("Suppress"), false, "/suricata/suricata_suppress.php");
 	$tab_array[] = array(gettext("Logs Browser"), false, "/suricata/suricata_logs_browser.php?instance={$id}");
 	$tab_array[] = array(gettext("Logs Mgmt"), false, "/suricata/suricata_logs_mgmt.php");
-	display_top_tabs($tab_array);
+	display_top_tabs($tab_array, true);
 	echo '</td></tr>';
 	echo '<tr><td class="tabnavtbl">';
 	$tab_array = array();
@@ -349,7 +370,7 @@ if ($savemsg) {
 	$tab_array[] = array($menu_iface . gettext("App Parsers"), false, "/suricata/suricata_app_parsers.php?id={$id}");
 	$tab_array[] = array($menu_iface . gettext("Variables"), false, "/suricata/suricata_define_vars.php?id={$id}");
 	$tab_array[] = array($menu_iface . gettext("Barnyard2"), false, "/suricata/suricata_barnyard.php?id={$id}");
-	display_top_tabs($tab_array);
+	display_top_tabs($tab_array, true);
 ?>
 </td></tr>
 <tr><td><div id="mainarea">
@@ -490,8 +511,6 @@ if ($savemsg) {
 			<?php echo gettext("Enter maximum number of packet log files to maintain.  Default is ") . "<strong>" . 
 			gettext("1000") . "</strong>."; ?><br/><br/><?php echo gettext("When the number of packet log files reaches the set limit, the oldest file will be overwritten.") ?></td>
 	</tr>
-
-<!-- ### Blocking not yet enabled, so hide the controls ###
 <tr>
 	<td colspan="2" class="listtopic"><?php echo gettext("Alert Settings"); ?></td>
 </tr>
@@ -527,9 +546,6 @@ if ($savemsg) {
 			<span class="red"><?php echo gettext("Hint:") . "</span>&nbsp;" . gettext("Choosing BOTH is suggested, and it is the default value."); ?></span><br/></td>
 		</td>
 	</tr>
-  ### End of Blocking controls ###
--->
-
 <tr>
 	<td colspan="2" class="listtopic"><?php echo gettext("Detection Engine Settings"); ?></td>
 </tr>
@@ -666,17 +682,16 @@ if ($savemsg) {
 			"setting at default.  Create an Alias for custom External Net settings."); ?><br/>
 		</td>
 	</tr>
-<!--
 	<tr>
-		<td width="22%" valign="top" class="vncell"><?php echo gettext("Whitelist"); ?></td>
+		<td width="22%" valign="top" class="vncell"><?php echo gettext("Pass List"); ?></td>
 		<td width="78%" class="vtable">
-			<select name="whitelistname" class="formselect" id="whitelistname">
+			<select name="passlistname" class="formselect" id="passlistname">
 			<?php
-				/* find whitelist names and filter by type, make sure to track by uuid */
+				/* find passlist names and filter by type, make sure to track by uuid */
 				echo "<option value='default' >default</option>\n";
-				if (is_array($suricataglob['whitelist']['item'])) {
-					foreach ($suricataglob['whitelist']['item'] as $value) {
-						if ($value['name'] == $pconfig['whitelistname'])
+				if (is_array($suricataglob['passlist']['item'])) {
+					foreach ($suricataglob['passlist']['item'] as $value) {
+						if ($value['name'] == $pconfig['passlistname'])
 							echo "<option value='{$value['name']}' selected>";
 						else
 							echo "<option value='{$value['name']}'>";
@@ -685,17 +700,15 @@ if ($savemsg) {
 				}
 			?>
 			</select>
-			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="button" class="formbtns" value="View List" onclick="viewList('<?=$id;?>','whitelistname','whitelist')" 
-			id="btnWhitelist" title="<?php echo gettext("Click to view currently selected Whitelist contents"); ?>"/>
+			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="button" class="formbtns" value="View List" onclick="viewList('<?=$id;?>','passlistname','passlist')" 
+			id="btnPasslist" title="<?php echo gettext("Click to view currently selected Pass List contents"); ?>"/>
 			<br/>
-			<?php echo gettext("Choose the whitelist you want this interface to " .
-			"use."); ?> <br/><br/>
+			<?php echo gettext("Choose the Pass List you want this interface to use."); ?> <br/><br/>
 			<span class="red"><?php echo gettext("Note:"); ?></span>&nbsp;<?php echo gettext("This option will only be used when block offenders is on."); ?><br/>
 			<span class="red"><?php echo gettext("Hint:"); ?></span>&nbsp;<?php echo gettext("Default " .
-			"whitelist adds local networks, WAN IPs, Gateways, VPNs and VIPs.  Create an Alias to customize."); ?>
+			"Pass List adds local networks, WAN IPs, Gateways, VPNs and VIPs.  Create an Alias to customize."); ?>
 		</td>
 	</tr>
--->
 <tr>
 	<td colspan="2" class="listtopic"><?php echo gettext("Alert Suppression and Filtering"); ?></td>
 </tr>
@@ -756,11 +769,11 @@ if ($savemsg) {
 <script language="JavaScript">
 
 function enable_blockoffenders() {
-//	var endis = !(document.iform.blockoffenders.checked);
-//	document.iform.blockoffenderskill.disabled=endis;
-//	document.iform.blockoffendersip.disabled=endis;
-//	document.iform.whitelistname.disabled=endis;
-//	document.iform.btnWhitelist.disabled=endis;
+	var endis = !(document.iform.blockoffenders.checked);
+	document.iform.blockoffenderskill.disabled=endis;
+	document.iform.blockoffendersip.disabled=endis;
+	document.iform.passlistname.disabled=endis;
+	document.iform.btnPasslist.disabled=endis;
 }
 
 function toggle_stats_log() {
@@ -855,17 +868,17 @@ function enable_change(enable_change) {
 	document.iform.mpm_algo.disabled = endis;
 	document.iform.sgh_mpm_context.disabled = endis;
 	document.iform.inspect_recursion_limit.disabled = endis;
-//	document.iform.blockoffenders.disabled = endis;
-//	document.iform.blockoffendersip.disabled=endis;
-//	document.iform.blockoffenderskill.disabled=endis;
+	document.iform.blockoffenders.disabled = endis;
+	document.iform.blockoffendersip.disabled=endis;
+	document.iform.blockoffenderskill.disabled=endis;
 	document.iform.alertsystemlog.disabled = endis;
 	document.iform.externallistname.disabled = endis;
 	document.iform.homelistname.disabled = endis;
-//	document.iform.whitelistname.disabled=endis;
+	document.iform.passlistname.disabled=endis;
 	document.iform.suppresslistname.disabled = endis;
 	document.iform.configpassthru.disabled = endis;
 	document.iform.btnHomeNet.disabled=endis;
-//	document.iform.btnWhitelist.disabled=endis;
+	document.iform.btnPasslist.disabled=endis;
 	document.iform.btnSuppressList.disabled=endis;
 }
 
@@ -890,12 +903,12 @@ function getSelectedValue(elemID) {
 
 function viewList(id, elemID, elemType) {
 	if (typeof elemType == "undefined") {
-		elemType = "whitelist";
+		elemType = "passlist";
 	}
 	var url = "suricata_list_view.php?id=" + id + "&wlist=";
 	url = url + getSelectedValue(elemID) + "&type=" + elemType;
 	url = url + "&time=" + new Date().getTime();
-	wopen(url, 'WhitelistViewer', 640, 480);
+	wopen(url, 'PassListViewer', 640, 480);
 }
 
 enable_change(false);
