@@ -153,6 +153,7 @@ function sync_package_apcupsd(){
 			$nisport=($apcupsd_config['nisport'] != ''? $apcupsd_config['nisport'] : "3551");
 			$upsclass=$apcupsd_config['upsclass'];
 			$upsmode=$apcupsd_config['upsmode'];
+			$lockfile=($apcupsd_config['lockfile'] != ''? $apcupsd_config['lockfile'] : "/var/tmp");
 	
 			include("/usr/local/pkg/apcupsd.conf.php");
 			file_put_contents(APCUPSD_BASE . "/etc/apcupsd/apcupsd.conf", $apcupsdconf, LOCK_EX);
@@ -163,6 +164,12 @@ function sync_package_apcupsd(){
 	$apcupsd_rcfile="/usr/local/etc/rc.d/apcupsd.sh";
 	if (is_array($apcupsd_config) && $apcupsd_config['apcupsdenabled']=="on"){
 		$apcupsd_start = "echo \"Starting APC UPS Daemon...\"\n";
+		$apcupsd_start .= "	if [ ! -d {$lockfile} ]; then \n";
+		$apcupsd_start .= "		/bin/mkdir -p {$lockfile} \n";
+		$apcupsd_start .= "	fi \n";
+		$apcupsd_start .= "	if [ -f {$lockfile}/LCK.. ]; then \n";
+		$apcupsd_start .= "		/bin/rm -f {$lockfile}/LCK.. \n";
+		$apcupsd_start .= "	fi \n";
 		if ($apcupsd_config['killonpowerfail']=="on"){
 			$apcupsd_start .= "	" . APCUPSD_BASE . "/sbin/apcupsd --kill-on-powerfail";
 		}else{
