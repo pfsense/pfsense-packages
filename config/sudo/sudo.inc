@@ -165,7 +165,7 @@ function sudo_get_users($list_all_user = false) {
 /* Make sure commands passed in are valid executables to help ensure a valid sudoers file and expected behavior.
    This also forces the user to give full paths to executables, which they should be doing anyhow.
  */
-function sudo_validate_commands($input_errors) {
+function sudo_validate_commands(&$input_errors) {
 	$idx = 0;
 	while(isset($_POST["cmdlist{$idx}"])) {
 		$commands = $_POST["cmdlist" . $idx++];
