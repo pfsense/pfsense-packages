@@ -46,7 +46,7 @@
 	<requirements>Describe your package requirements here</requirements>
 	<faq>Currently there are no FAQ items provided.</faq>
 	<name>nmap</name>
-	<version>6.01</version>
+	<version>6.40_2 pkg v1.2.1</version>
 	<title>Diagnostics: NMap</title>
 	<savetext>Scan</savetext>
 	<preoutput>yes</preoutput>
@@ -120,6 +120,6 @@
 		nmap_custom_add_php_command();
 	</custom_add_php_command>
 	<custom_php_validation_command>
-		nmap_custom_php_validation_command($_POST, &amp;$input_errors);
+		nmap_custom_php_validation_command($_POST, $input_errors);
 	</custom_php_validation_command>
 </packagegui>
