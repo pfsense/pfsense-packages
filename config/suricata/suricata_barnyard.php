@@ -133,6 +133,7 @@ if ($_POST['save']) {
 		$natent['barnyard_syslog_enable'] = $_POST['barnyard_syslog_enable'] ? 'on' : 'off';
 		$natent['barnyard_syslog_local'] = $_POST['barnyard_syslog_local'] ? 'on' : 'off';
 		$natent['barnyard_bro_ids_enable'] = $_POST['barnyard_bro_ids_enable'] ? 'on' : 'off';
+		$natent['barnyard_disable_sig_ref_tbl'] = $_POST['barnyard_disable_sig_ref_tbl'] ? 'on' : 'off';
 		$natent['barnyard_syslog_opmode'] = $_POST['barnyard_syslog_opmode'];
 		$natent['barnyard_syslog_proto'] = $_POST['barnyard_syslog_proto'];
 
@@ -167,50 +168,21 @@ if ($_POST['save']) {
 		elseif ($a_nat[$id]['barnyard_enable'] == "on") {
 			if (suricata_is_running($a_nat[$id]['uuid'], get_real_interface($a_nat[$id]['interface']), "barnyard2"))
 				suricata_barnyard_reload_config($a_nat[$id], "HUP");
-			else
-				suricata_barnyard_start($a_nat[$id], get_real_interface($a_nat[$id]['interface']));
+			else {
+				// Notify user a Suricata restart is required if enabling Barnyard2 for the first time	
+				$savemsg = gettext("NOTE: you must restart Suricata on this interface to activate unified2 logging for Barnyard2.");
+			}
 		}
 
-		// after click go to this page
-		header( 'Expires: Sat, 26 Jul 1997 05:00:00 GMT' );
-		header( 'Last-Modified: ' . gmdate( 'D, d M Y H:i:s' ) . ' GMT' );
-		header( 'Cache-Control: no-store, no-cache, must-revalidate' );
-		header( 'Cache-Control: post-check=0, pre-check=0', false );
-		header( 'Pragma: no-cache' );
-		header("Location: suricata_barnyard.php?id=$id");
-		exit;
+		$pconfig = $natent;
 	}
 	else {
-		// We had errors, so save incoming field data to prevent retyping
-		$pconfig['barnyard_enable'] = $_POST['barnyard_enable'];
-		$pconfig['barnyard_show_year'] = $_POST['barnyard_show_year'];
-		$pconfig['barnyard_archive_enable'] = $_POST['barnyard_archive_enable'];
-		$pconfig['barnyard_dump_payload'] = $_POST['barnyard_dump_payload'];
-		$pconfig['barnyard_obfuscate_ip'] = $_POST['barnyard_obfuscate_ip'];
-		$pconfig['barnyard_mysql_enable'] = $_POST['barnyard_mysql_enable'];
-		$pconfig['barnyard_syslog_enable'] = $_POST['barnyard_syslog_enable'];
-		$pconfig['barnyard_syslog_local'] = $_POST['barnyard_syslog_local'];
-		$pconfig['barnyard_syslog_opmode'] = $_POST['barnyard_syslog_opmode'];
-		$pconfig['barnyard_syslog_proto'] = $_POST['barnyard_syslog_proto'];
-		$pconfig['barnyard_bro_ids_enable'] = $_POST['barnyard_bro_ids_enable'];
-
-		$pconfig['barnyard_sensor_id'] = $_POST['barnyard_sensor_id'];
-		$pconfig['barnyard_sensor_name'] = $_POST['barnyard_sensor_name'];
-		$pconfig['barnyard_dbhost'] = $_POST['barnyard_dbhost'];
-		$pconfig['barnyard_dbname'] = $_POST['barnyard_dbname'];
-		$pconfig['barnyard_dbuser'] = $_POST['barnyard_dbuser'];
-		$pconfig['barnyard_dbpwd'] = $_POST['barnyard_dbpwd'];
-		$pconfig['barnyard_syslog_rhost'] = $_POST['barnyard_syslog_rhost'];
-		$pconfig['barnyard_syslog_dport'] = $_POST['barnyard_syslog_dport'];
-		$pconfig['barnyard_syslog_facility'] = $_POST['barnyard_syslog_facility'];
-		$pconfig['barnyard_syslog_priority'] = $_POST['barnyard_syslog_priority'];
-		$pconfig['barnyard_bro_ids_rhost'] = $_POST['barnyard_bro_ids_rhost'];
-		$pconfig['barnyard_bro_ids_dport'] = $_POST['barnyard_bro_ids_dport'];
-		$pconfig['barnconfigpassthru'] = $_POST['barnconfigpassthru'];
+		// We had errors, so save previous field data to prevent retyping
+		$pconfig = $_POST;
 	}
 }
 
-$if_friendly = convert_friendly_interface_to_friendly_descr($pconfig['interface']);
+$if_friendly = convert_friendly_interface_to_friendly_descr($a_nat[$id]['interface']);
 $pgtitle = gettext("Suricata: Interface {$if_friendly} - Barnyard2 Settings");
 include_once("head.inc");
 
@@ -221,7 +193,7 @@ include_once("head.inc");
 
 	/* Display Alert message */
 	if ($input_errors) {
-		print_input_errors($input_errors); // TODO: add checks
+		print_input_errors($input_errors);
 	}
 
 	if ($savemsg) {
@@ -235,14 +207,16 @@ include_once("head.inc");
 <tr><td>
 <?php
     $tab_array = array();
-	$tab_array[] = array(gettext("Suricata Interfaces"), true, "/suricata/suricata_interfaces.php");
+	$tab_array[] = array(gettext("Suricata Interfaces"), false, "/suricata/suricata_interfaces.php");
 	$tab_array[] = array(gettext("Global Settings"), false, "/suricata/suricata_global.php");
 	$tab_array[] = array(gettext("Update Rules"), false, "/suricata/suricata_download_updates.php");
 	$tab_array[] = array(gettext("Alerts"), false, "/suricata/suricata_alerts.php?instance={$id}");
+	$tab_array[] = array(gettext("Blocked"), false, "/suricata/suricata_blocked.php");
+	$tab_array[] = array(gettext("Pass Lists"), false, "/suricata/suricata_passlist.php");
 	$tab_array[] = array(gettext("Suppress"), false, "/suricata/suricata_suppress.php");
 	$tab_array[] = array(gettext("Logs Browser"), false, "/suricata/suricata_logs_browser.php?instance={$id}");
 	$tab_array[] = array(gettext("Logs Mgmt"), false, "/suricata/suricata_logs_mgmt.php");
-	display_top_tabs($tab_array);
+	display_top_tabs($tab_array, true);
 	echo '</td></tr>';
 	echo '<tr><td class="tabnavtbl">';
 	$tab_array = array();
@@ -254,7 +228,7 @@ include_once("head.inc");
 	$tab_array[] = array($menu_iface . gettext("App Parsers"), false, "/suricata/suricata_app_parsers.php?id={$id}");
 	$tab_array[] = array($menu_iface . gettext("Variables"), false, "/suricata/suricata_define_vars.php?id={$id}");
 	$tab_array[] = array($menu_iface . gettext("Barnyard2"), true, "/suricata/suricata_barnyard.php?id={$id}");
-        display_top_tabs($tab_array);
+        display_top_tabs($tab_array, true);
 ?>
 </td></tr>
 	<tr>
@@ -356,6 +330,14 @@ include_once("head.inc");
 					<input name="barnyard_dbpwd" type="password" class="formfld pwd" 
 					id="barnyard_dbpwd" size="25" value="<?=htmlspecialchars($pconfig['barnyard_dbpwd']);?>"/>
 					&nbsp;<?php echo gettext("Password for the MySQL database user"); ?>
+				</td>
+			</tr>
+			<tr>
+				<td width="22%" valign="top" class="vncell"><?php echo gettext("Disable Signature Reference Table"); ?></td>
+				<td width="78%" class="vtable">
+					<input name="barnyard_disable_sig_ref_tbl" type="checkbox" value="on" <?php if ($pconfig['barnyard_disable_sig_ref_tbl'] == "on") echo "checked"; ?>/>
+					<?php echo gettext("Disable synchronization of sig_reference table in schema.  Default value is ") . "<strong>" . gettext("Not Checked") . "</strong>"; ?><br/>
+					<br/><?php echo gettext("This option will speedup the process when checked, plus it can help work around a 'duplicate entry' error when running multiple Suricata instances."); ?>
 				</td>
 			</tr>
 			</tbody>
@@ -521,6 +503,7 @@ function toggle_mySQL() {
 	document.iform.barnyard_dbname.disabled = endis;
 	document.iform.barnyard_dbuser.disabled = endis;
 	document.iform.barnyard_dbpwd.disabled = endis;
+	document.iform.barnyard_disable_sig_ref_tbl.disabled = endis;
 
 	if (endis)
 		document.getElementById("mysql_config_rows").style.display = "none";
@@ -587,6 +570,7 @@ function enable_change(enable_change) {
 	document.iform.barnyard_dbname.disabled = endis;
 	document.iform.barnyard_dbuser.disabled = endis;
 	document.iform.barnyard_dbpwd.disabled = endis;
+	document.iform.barnyard_disable_sig_ref_tbl.disabled = endis;
 	document.iform.barnyard_syslog_enable.disabled = endis;
 	document.iform.barnyard_syslog_local.disabled = endis;
 	document.iform.barnyard_syslog_opmode_default.disabled = endis;

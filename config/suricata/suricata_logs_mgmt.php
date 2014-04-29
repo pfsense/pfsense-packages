@@ -44,6 +44,8 @@ $pconfig['suricataloglimit'] = $config['installedpackages']['suricata']['config'
 $pconfig['suricataloglimitsize'] = $config['installedpackages']['suricata']['config'][0]['suricataloglimitsize'];
 $pconfig['alert_log_limit_size'] = $config['installedpackages']['suricata']['config'][0]['alert_log_limit_size'];
 $pconfig['alert_log_retention'] = $config['installedpackages']['suricata']['config'][0]['alert_log_retention'];
+$pconfig['block_log_limit_size'] = $config['installedpackages']['suricata']['config'][0]['block_log_limit_size'];
+$pconfig['block_log_retention'] = $config['installedpackages']['suricata']['config'][0]['block_log_retention'];
 $pconfig['files_json_log_limit_size'] = $config['installedpackages']['suricata']['config'][0]['files_json_log_limit_size'];
 $pconfig['files_json_log_retention'] = $config['installedpackages']['suricata']['config'][0]['files_json_log_retention'];
 $pconfig['http_log_limit_size'] = $config['installedpackages']['suricata']['config'][0]['http_log_limit_size'];
@@ -54,6 +56,7 @@ $pconfig['tls_log_limit_size'] = $config['installedpackages']['suricata']['confi
 $pconfig['tls_log_retention'] = $config['installedpackages']['suricata']['config'][0]['tls_log_retention'];
 $pconfig['unified2_log_limit'] = $config['installedpackages']['suricata']['config'][0]['unified2_log_limit'];
 $pconfig['u2_archive_log_retention'] = $config['installedpackages']['suricata']['config'][0]['u2_archive_log_retention'];
+$pconfig['file_store_retention'] = $config['installedpackages']['suricata']['config'][0]['file_store_retention'];
 
 // Load up some arrays with selection values (we use these later).
 // The keys in the $retentions array are the retention period
@@ -77,6 +80,8 @@ if (empty($pconfig['suricataloglimitsize'])) {
 // Set default retention periods for rotated logs
 if (empty($pconfig['alert_log_retention']))
 	$pconfig['alert_log_retention'] = "336";
+if (empty($pconfig['block_log_retention']))
+	$pconfig['block_log_retention'] = "336";
 if (empty($pconfig['files_json_log_retention']))
 	$pconfig['files_json_log_retention'] = "168";
 if (empty($pconfig['http_log_retention']))
@@ -87,10 +92,14 @@ if (empty($pconfig['tls_log_retention']))
 	$pconfig['tls_log_retention'] = "336";
 if (empty($pconfig['u2_archive_log_retention']))
 	$pconfig['u2_archive_log_retention'] = "168";
+if (empty($pconfig['file_store_retention']))
+	$pconfig['file_store_retention'] = "168";
 
 // Set default log file size limits
 if (empty($pconfig['alert_log_limit_size']))
 	$pconfig['alert_log_limit_size'] = "500";
+if (empty($pconfig['block_log_limit_size']))
+	$pconfig['block_log_limit_size'] = "500";
 if (empty($pconfig['files_json_log_limit_size']))
 	$pconfig['files_json_log_limit_size'] = "1000";
 if (empty($pconfig['http_log_limit_size']))
@@ -119,6 +128,8 @@ if ($_POST["save"]) {
 		$config['installedpackages']['suricata']['config'][0]['suricataloglimitsize'] = $_POST['suricataloglimitsize'];
 		$config['installedpackages']['suricata']['config'][0]['alert_log_limit_size'] = $_POST['alert_log_limit_size'];
 		$config['installedpackages']['suricata']['config'][0]['alert_log_retention'] = $_POST['alert_log_retention'];
+		$config['installedpackages']['suricata']['config'][0]['block_log_limit_size'] = $_POST['block_log_limit_size'];
+		$config['installedpackages']['suricata']['config'][0]['block_log_retention'] = $_POST['block_log_retention'];
 		$config['installedpackages']['suricata']['config'][0]['files_json_log_limit_size'] = $_POST['files_json_log_limit_size'];
 		$config['installedpackages']['suricata']['config'][0]['files_json_log_retention'] = $_POST['files_json_log_retention'];
 		$config['installedpackages']['suricata']['config'][0]['http_log_limit_size'] = $_POST['http_log_limit_size'];
@@ -129,6 +140,7 @@ if ($_POST["save"]) {
 		$config['installedpackages']['suricata']['config'][0]['tls_log_retention'] = $_POST['tls_log_retention'];
 		$config['installedpackages']['suricata']['config'][0]['unified2_log_limit'] = $_POST['unified2_log_limit'];
 		$config['installedpackages']['suricata']['config'][0]['u2_archive_log_retention'] = $_POST['u2_archive_log_retention'];
+		$config['installedpackages']['suricata']['config'][0]['file_store_retention'] = $_POST['file_store_retention'];
 
 		write_config();
 		sync_suricata_package_config();
@@ -169,10 +181,12 @@ if ($input_errors)
         $tab_array[] = array(gettext("Global Settings"), false, "/suricata/suricata_global.php");
 	$tab_array[] = array(gettext("Update Rules"), false, "/suricata/suricata_download_updates.php");
 	$tab_array[] = array(gettext("Alerts"), false, "/suricata/suricata_alerts.php");
+	$tab_array[] = array(gettext("Blocked"), false, "/suricata/suricata_blocked.php");
+	$tab_array[] = array(gettext("Pass Lists"), false, "/suricata/suricata_passlist.php");
 	$tab_array[] = array(gettext("Suppress"), false, "/suricata/suricata_suppress.php");
 	$tab_array[] = array(gettext("Logs Browser"), false, "/suricata/suricata_logs_browser.php");
 	$tab_array[] = array(gettext("Logs Mgmt"), true, "/suricata/suricata_logs_mgmt.php");
-        display_top_tabs($tab_array);
+        display_top_tabs($tab_array, true);
 ?>
 </td></tr>
 <tr>
@@ -274,6 +288,26 @@ if ($input_errors)
 						</select>
 					</td>
 					<td class="listbg"><?=gettext("Suricata alerts and event details");?></td>
+				</tr>
+				<tr>
+					<td class="listbg">block</td>
+					<td class="listr" align="center"><select name="block_log_limit_size" class="formselect" id="block_log_limit_size">
+						<?php foreach ($log_sizes as $k => $l): ?>
+							<option value="<?=$k;?>"
+							<?php if ($k == $pconfig['block_log_limit_size']) echo "selected"; ?>>
+								<?=htmlspecialchars($l);?></option>
+						<?php endforeach; ?>
+						</select>
+					</td>
+					<td class="listr" align="center"><select name="block_log_retention" class="formselect" id="block_log_retention">
+						<?php foreach ($retentions as $k => $p): ?>
+							<option value="<?=$k;?>"
+							<?php if ($k == $pconfig['block_log_retention']) echo "selected"; ?>>
+								<?=htmlspecialchars($p);?></option>
+						<?php endforeach; ?>
+						</select>
+					</td>
+					<td class="listbg"><?=gettext("Suricata blocked IPs and event details");?></td>
 				</tr>
 				<tr>
 					<td class="listbg">files-json</td>
@@ -386,6 +420,19 @@ if ($input_errors)
 	</td>
 </tr>
 <tr>
+	<td class="vncell" width="22%" valign="top"><?=gettext("Captured Files Retention Period");?></td>
+	<td width="78%" class="vtable"><select name="file_store_retention" class="formselect" id="file_store_retention">
+		<?php foreach ($retentions as $k => $p): ?>
+			<option value="<?=$k;?>"
+			<?php if ($k == $pconfig['file_store_retention']) echo "selected"; ?>>
+				<?=htmlspecialchars($p);?></option>
+		<?php endforeach; ?>
+		</select>&nbsp;<?=gettext("Choose retention period for captured files in File Store. Default is ") . "<strong>" . gettext("7 days."). "</strong>";?><br/><br/>
+		<?=gettext("When file capture and store is enabled, Suricata captures downloaded files from HTTP sessions and stores them, along with metadata, ") . 
+		gettext("for later analysis.  This setting determines how long files remain in the File Store folder before they are automatically deleted.");?>
+	</td>
+</tr>
+<tr>
 	<td width="22%"></td>
 	<td width="78%" class="vexpl"><input name="save" type="submit" class="formbtn" value="Save"/><br/>
 	<br/><span class="red"><strong><?php echo gettext("Note:");?></strong>&nbsp;
@@ -402,6 +449,8 @@ function enable_change() {
 	var endis = !(document.iform.enable_log_mgmt.checked);
 	document.iform.alert_log_limit_size.disabled = endis;
 	document.iform.alert_log_retention.disabled = endis;
+	document.iform.block_log_limit_size.disabled = endis;
+	document.iform.block_log_retention.disabled = endis;
 	document.iform.files_json_log_limit_size.disabled = endis;
 	document.iform.files_json_log_retention.disabled = endis;
 	document.iform.http_log_limit_size.disabled = endis;
@@ -412,6 +461,7 @@ function enable_change() {
 	document.iform.tls_log_retention.disabled = endis;
 	document.iform.unified2_log_limit.disabled = endis;
 	document.iform.u2_archive_log_retention.disabled = endis;
+	document.iform.file_store_retention.disabled = endis;
 }
 
 function enable_change_dirSize() {

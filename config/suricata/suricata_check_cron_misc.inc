@@ -173,19 +173,31 @@ if ($config['installedpackages']['suricata']['config'][0]['enable_log_mgmt'] == 
 		$suricata_log_dir = SURICATALOGDIR . "suricata_{$if_real}{$value['uuid']}";
 		foreach ($logs as $k => $p)
 			suricata_check_rotate_log("{$suricata_log_dir}/{$k}", $p['limit']*1024, $p['retention']);
-	}
 
-	// Prune any aged-out Barnyard2 archived logs if any exist
-	if (is_dir("{$suricata_log_dir}/barnyard2/archive") &&
-	    $config['installedpackages']['suricata']['config'][0]['u2_archive_log_retention'] > 0) {
-		$now = time();
-		$files = glob("{$suricata_log_dir}/barnyard2/archive/unified2.alert.*");
-		foreach ($files as $f) {
-			if (($now - filemtime($f)) > ($config['installedpackages']['suricata']['config'][0]['u2_archive_log_retention'] * 3600))
-				unlink_if_exists($f);
+		// Prune any aged-out Barnyard2 archived logs if any exist
+		if (is_dir("{$suricata_log_dir}/barnyard2/archive") &&
+		    $config['installedpackages']['suricata']['config'][0]['u2_archive_log_retention'] > 0) {
+			$now = time();
+			$files = glob("{$suricata_log_dir}/barnyard2/archive/unified2.alert.*");
+			foreach ($files as $f) {
+				if (($now - filemtime($f)) > ($config['installedpackages']['suricata']['config'][0]['u2_archive_log_retention'] * 3600))
+					unlink_if_exists($f);
+			}
 		}
+		unset($files);
+
+		// Prune aged-out File Store files if any exist
+		if (is_dir("{$suricata_log_dir}/files") &&
+		    $config['installedpackages']['suricata']['config'][0]['file_store_retention'] > 0) {
+			$now = time();
+			$files = glob("{$suricata_log_dir}/files/file.*");
+			foreach ($files as $f) {
+				if (($now - filemtime($f)) > ($config['installedpackages']['suricata']['config'][0]['file_store_retention'] * 3600))
+					unlink_if_exists($f);
+			}
+		}
+		unset($files);
 	}
-	unset($files);
 }
 
 // Check the overall log directory limit (if enabled) and prune if necessary
