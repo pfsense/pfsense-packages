@@ -32,6 +32,7 @@ require_once("guiconfig.inc");
 require_once("/usr/local/pkg/suricata/suricata.inc");
 
 $supplist = array();
+$suri_pf_table = SURICATA_PF_TABLE;
 
 function suricata_is_alert_globally_suppressed($list, $gid, $sid) {
 
@@ -165,12 +166,12 @@ if ($_POST['save']) {
 	exit;
 }
 
-//if ($_POST['unblock'] && $_POST['ip']) {
-//	if (is_ipaddr($_POST['ip'])) {
-//		exec("/sbin/pfctl -t snort2c -T delete {$_POST['ip']}");
-//		$savemsg = gettext("Host IP address {$_POST['ip']} has been removed from the Blocked Table.");
-//	}
-//}
+if ($_POST['unblock'] && $_POST['ip']) {
+	if (is_ipaddr($_POST['ip'])) {
+		exec("/sbin/pfctl -t {$suri_pf_table} -T delete {$_POST['ip']}");
+		$savemsg = gettext("Host IP address {$_POST['ip']} has been removed from the Blocked Table.");
+	}
+}
 
 if (($_POST['addsuppress_srcip'] || $_POST['addsuppress_dstip'] || $_POST['addsuppress']) && is_numeric($_POST['sidid']) && is_numeric($_POST['gen_id'])) {
 	if ($_POST['addsuppress_srcip'])
@@ -355,10 +356,12 @@ if ($savemsg) {
 	$tab_array[] = array(gettext("Global Settings"), false, "/suricata/suricata_global.php");
 	$tab_array[] = array(gettext("Update Rules"), false, "/suricata/suricata_download_updates.php");
 	$tab_array[] = array(gettext("Alerts"), true, "/suricata/suricata_alerts.php");
+	$tab_array[] = array(gettext("Blocked"), false, "/suricata/suricata_blocked.php");
+	$tab_array[] = array(gettext("Pass Lists"), false, "/suricata/suricata_passlist.php");
 	$tab_array[] = array(gettext("Suppress"), false, "/suricata/suricata_suppress.php");
 	$tab_array[] = array(gettext("Logs Browser"), false, "/suricata/suricata_logs_browser.php?instance={$instanceid}");
 	$tab_array[] = array(gettext("Logs Mgmt"), false, "/suricata/suricata_logs_mgmt.php");
-	display_top_tabs($tab_array);
+	display_top_tabs($tab_array, true);
 ?>
 </td></tr>
 <tr>
@@ -495,10 +498,10 @@ if (file_exists("/var/log/suricata/suricata_{$if_real}{$suricata_uuid}/alerts.lo
 				$alert_ip_src .= "title='" . gettext("This alert track by_src IP is already in the Suppress List") . "'/>";	
 			}
 			/* Add icon for auto-removing from Blocked Table if required */
-//			if (isset($tmpblocked[$fields[9]])) {
-//				$alert_ip_src .= "&nbsp;<input type='image' name='unblock[]' onClick=\"document.getElementById('ip').value='{$fields[9]}';\" ";
-//				$alert_ip_src .= "title='" . gettext("Remove host from Blocked Table") . "' border='0' width='12' height='12' src=\"../themes/{$g['theme']}/images/icons/icon_x.gif\"/>"; 
-//			}
+			if (isset($tmpblocked[$fields[9]])) {
+				$alert_ip_src .= "&nbsp;<input type='image' name='unblock[]' onClick=\"document.getElementById('ip').value='{$fields[9]}';\" ";
+				$alert_ip_src .= "title='" . gettext("Remove host from Blocked Table") . "' border='0' width='12' height='12' src=\"../themes/{$g['theme']}/images/icons/icon_x.gif\"/>"; 
+			}
 			/* IP SRC Port */
 			$alert_src_p = $fields[10];
 			/* IP Destination */
@@ -524,10 +527,10 @@ if (file_exists("/var/log/suricata/suricata_{$if_real}{$suricata_uuid}/alerts.lo
 				$alert_ip_dst .= "title='" . gettext("This alert track by_dst IP is already in the Suppress List") . "'/>";	
 			}
 			/* Add icon for auto-removing from Blocked Table if required */
-//			if (isset($tmpblocked[$fields[11]])) {
-//				$alert_ip_dst .= "&nbsp;<input type='image' name='unblock[]' onClick=\"document.getElementById('ip').value='{$fields[11]}';\" ";
-//				$alert_ip_dst .= "title='" . gettext("Remove host from Blocked Table") . "' border='0' width='12' height='12' src=\"../themes/{$g['theme']}/images/icons/icon_x.gif\"/>"; 
-//			}
+			if (isset($tmpblocked[$fields[11]])) {
+				$alert_ip_dst .= "&nbsp;<input type='image' name='unblock[]' onClick=\"document.getElementById('ip').value='{$fields[11]}';\" ";
+				$alert_ip_dst .= "title='" . gettext("Remove host from Blocked Table") . "' border='0' width='12' height='12' src=\"../themes/{$g['theme']}/images/icons/icon_x.gif\"/>"; 
+			}
 			/* IP DST Port */
 			$alert_dst_p = $fields[12];
 			/* SID */

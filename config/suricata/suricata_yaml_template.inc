@@ -29,6 +29,14 @@ default-log-dir: {$suricatalogdir}suricata_{$if_real}{$suricata_uuid}
 # Configure the type of alert (and other) logging.
 outputs:
 
+  # alert_pf blocking plugin
+  - alert-pf:
+      enabled: {$suri_blockoffenders}
+      kill-state: {$suri_killstates}
+      pass-list: {$suri_passlist}
+      block-ip: {$suri_blockip}
+      pf-table: {$suri_pf_table}
+
   # a line based alerts log similar to Snort's fast.log
   - fast:
       enabled: yes
@@ -99,7 +107,7 @@ outputs:
       force-md5: {$json_log_md5}
 
 # Magic file. The extension .mgc is added to the value here.
-magic-file: {$suricatacfgdir}/magic
+magic-file: /usr/share/misc/magic
 
 # Specify a threshold config file
 threshold-file: {$suricatacfgdir}/threshold.config

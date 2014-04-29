@@ -64,6 +64,11 @@ if (!empty($suricatacfg['externallistname']) && $suricatacfg['externallistname']
 	$external_net = trim($external_net);
 }
 
+// Set the PASS LIST and write its contents to disk
+$plist = suricata_build_list($suricatacfg, $suricatacfg['passlistname'], true);
+@file_put_contents("{$suricatacfgdir}/passlist", implode("\n", $plist));
+$suri_passlist = "{$suricatacfgdir}/passlist";
+
 // Set default and user-defined variables for SERVER_VARS and PORT_VARS
 $suricata_servers = array (
 	"dns_servers" => "\$HOME_NET", "smtp_servers" => "\$HOME_NET", "http_servers" => "\$HOME_NET",
@@ -136,6 +141,26 @@ if (!empty($suricatacfg['inspect_recursion_limit']) || $suricatacfg['inspect_rec
 	$inspection_recursion_limit = $suricatacfg['inspect_recursion_limit'];
 else
 	$inspection_recursion_limit = "";
+
+// Add interface-specific blocking settings
+if ($suricatacfg['blockoffenders'] == 'on')
+	$suri_blockoffenders = "yes";
+else
+	$suri_blockoffenders = "no";
+
+if ($suricatacfg['blockoffenderskill'] == 'on')
+	$suri_killstates = "yes";
+else
+	$suri_killstates = "no";
+
+if ($suricatacfg['blockoffendersip'] == 'src')
+	$suri_blockip = 'SRC';
+elseif ($suricatacfg['blockoffendersip'] == 'dst')
+	$suri_blockip = 'DST';
+else
+	$suri_blockip = 'BOTH';
+
+$suri_pf_table = SURICATA_PF_TABLE;
 
 // Add interface-specific logging settings
 if ($suricatacfg['alertsystemlog'] == 'on')

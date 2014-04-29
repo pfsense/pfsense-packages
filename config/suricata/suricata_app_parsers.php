@@ -379,7 +379,7 @@ include_once("head.inc");
 <?php include("fbegin.inc");
 	/* Display error or save message */
 	if ($input_errors) {
-		print_input_errors($input_errors); // TODO: add checks
+		print_input_errors($input_errors);
 	}
 	if ($savemsg) {
 		print_info_box($savemsg);
@@ -393,14 +393,16 @@ include_once("head.inc");
 <tr><td>
 <?php
 	$tab_array = array();
-	$tab_array[] = array(gettext("Suricata Interfaces"), true, "/suricata/suricata_interfaces.php");
+	$tab_array[] = array(gettext("Suricata Interfaces"), false, "/suricata/suricata_interfaces.php");
 	$tab_array[] = array(gettext("Global Settings"), false, "/suricata/suricata_global.php");
 	$tab_array[] = array(gettext("Update Rules"), false, "/suricata/suricata_download_updates.php");
 	$tab_array[] = array(gettext("Alerts"), false, "/suricata/suricata_alerts.php?instance={$id}");
+	$tab_array[] = array(gettext("Blocked"), false, "/suricata/suricata_blocked.php");
+	$tab_array[] = array(gettext("Pass Lists"), false, "/suricata/suricata_passlist.php");
 	$tab_array[] = array(gettext("Suppress"), false, "/suricata/suricata_suppress.php");
 	$tab_array[] = array(gettext("Logs Browser"), false, "/suricata/suricata_logs_browser.php?instance={$id}");
 	$tab_array[] = array(gettext("Logs Mgmt"), false, "/suricata/suricata_logs_mgmt.php");
-	display_top_tabs($tab_array);
+	display_top_tabs($tab_array, true);
 	echo '</td></tr>';
 	echo '<tr><td>';
 	$menu_iface=($if_friendly?substr($if_friendly,0,5)." ":"Iface ");
@@ -412,7 +414,7 @@ include_once("head.inc");
 	$tab_array[] = array($menu_iface . gettext("App Parsers"), true, "/suricata/suricata_app_parsers.php?id={$id}");
 	$tab_array[] = array($menu_iface . gettext("Variables"), false, "/suricata/suricata_define_vars.php?id={$id}");
 	$tab_array[] = array($menu_iface . gettext("Barnyard2"), false, "/suricata/suricata_barnyard.php?id={$id}");
-	display_top_tabs($tab_array);
+	display_top_tabs($tab_array, true);
 ?>
 </td></tr>
 <tr><td><div id="mainarea">
