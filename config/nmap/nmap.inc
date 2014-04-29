@@ -28,7 +28,7 @@
 	POSSIBILITY OF SUCH DAMAGE.
 */
 
-function nmap_custom_php_validation_command($post, $input_errors) {
+function nmap_custom_php_validation_command($post, & $input_errors) {
 	global $_POST, $savemsg, $config;
 	if (empty($_POST['hostname'])) {
 		$input_errors[] = gettext("You must enter an IP address to scan.");
