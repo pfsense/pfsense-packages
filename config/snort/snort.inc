@@ -54,7 +54,7 @@ if (empty($snort_version))
 	$snort_version = "2.9.6.0";
 
 /* Used to indicate latest version of this include file has been loaded */
-$pfSense_snort_version = "3.0.7";
+$pfSense_snort_version = "3.0.8";
 
 /* get installed package version for display */
 $snort_package_version = "Snort {$config['installedpackages']['package'][get_pkg_id("snort")]['version']}";
@@ -755,8 +755,24 @@ function snort_rm_blocked_install_cron($should_install) {
 		$snort_rm_blocked_expire = "2419200";
 	}
 
-	$command = "/usr/bin/nice -n20 /usr/local/sbin/expiretable -t $snort_rm_blocked_expire snort2c";
-	install_cron_job($command, $should_install, $snort_rm_blocked_min, $snort_rm_blocked_hr, $snort_rm_blocked_mday, $snort_rm_blocked_month, $snort_rm_blocked_wday, "root");
+	// First remove any existing "expiretable" jobs for Snort.  We
+	// have to remove them because otherwise install_cron_job() will
+	// think we are installing a different job if the 'expire seconds'
+	// parameter differs from the old one when we call the function.
+	$result = array();
+	$result = preg_grep('/expiretable\b\s*-t\s*(\d+)\s*snort2c\b/i', file('/etc/crontab'));
+	if (count($result) > 0) {
+		foreach($result as $job) {
+			install_cron_job(trim(substr($job, strpos($job, "/usr/bin/nice"))), FALSE);
+		}
+	}
+
+	// Now either install the new or updated cron job, 
+	// or return if "rm_blocked" is disabled
+	if ($should_install) {
+		$command = "/usr/bin/nice -n20 /usr/local/sbin/expiretable -t $snort_rm_blocked_expire snort2c";
+		install_cron_job($command, $should_install, $snort_rm_blocked_min, $snort_rm_blocked_hr, $snort_rm_blocked_mday, $snort_rm_blocked_month, $snort_rm_blocked_wday, "root");
+	}
 }
 
 /* func to install snort update */
