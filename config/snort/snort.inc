@@ -755,17 +755,8 @@ function snort_rm_blocked_install_cron($should_install) {
 		$snort_rm_blocked_expire = "2419200";
 	}
 
-	// First remove any existing "expiretable" jobs for Snort.  We
-	// have to remove them because otherwise install_cron_job() will
-	// think we are installing a different job if the 'expire seconds'
-	// parameter differs from the old one when we call the function.
-	$result = array();
-	$result = preg_grep('/expiretable\b\s*-t\s*(\d+)\s*snort2c\b/i', file('/etc/crontab'));
-	if (count($result) > 0) {
-		foreach($result as $job) {
-			install_cron_job(trim(substr($job, strpos($job, "/usr/bin/nice"))), FALSE);
-		}
-	}
+	// First remove any existing "expiretable" jobs for Snort.
+	install_cron_job("snort2c", false);
 
 	// Now either install the new or updated cron job, 
 	// or return if "rm_blocked" is disabled
