@@ -35,6 +35,7 @@ $suricatadir = SURICATADIR;
 $suricatalogdir = SURICATALOGDIR;
 $rcdir = RCFILEPREFIX;
 $suricata_rules_upd_log = RULES_UPD_LOGFILE;
+$suri_pf_table = SURICATA_PF_TABLE;
 
 log_error(gettext("[Suricata] Suricata package uninstall in progress..."));
 
@@ -64,6 +65,7 @@ mwexec('/usr/sbin/pw userdel suricata; /usr/sbin/pw groupdel suricata', true);
 /* Remove the Suricata cron jobs. */
 install_cron_job("/usr/bin/nice -n20 /usr/local/bin/php -f /usr/local/www/suricata/suricata_check_for_rule_updates.php", false);
 install_cron_job("/usr/bin/nice -n20 /usr/local/bin/php -f /usr/local/pkg/suricata/suricata_check_cron_misc.inc", false);
+install_cron_job("pfctl -t {$suri_pf_table} -T expire" , false);
 
 /* See if we are to keep Suricata log files on uninstall */
 if ($config['installedpackages']['suricata']['config'][0]['clearlogs'] == 'on') {

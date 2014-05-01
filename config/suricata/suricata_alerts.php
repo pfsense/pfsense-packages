@@ -110,12 +110,11 @@ function suricata_add_supplist_entry($suppress) {
 		}
 	}
 
-	/* If we created a new list or updated an existing one, save the change, */
-	/* tell Snort to load it, and return true; otherwise return false.       */
+	/* If we created a new list or updated an existing one, save the change */
+	/* and return true; otherwise return false.                             */
 	if ($found_list) {
 		write_config();
 		sync_suricata_package_config();
-		suricata_reload_config($a_instance[$instanceid]);
 		return true;
 	}
 	else

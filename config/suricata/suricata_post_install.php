@@ -110,8 +110,8 @@ if ($config['installedpackages']['suricata']['config'][0]['forcekeepsettings'] =
 	suricata_create_rc();
 
 	// Set Log Limit, Block Hosts Time and Rules Update Time
-	suricata_loglimit_install_cron();
-//	suricata_rm_blocked_install_cron($config['installedpackages']['suricata']['config'][0]['rm_blocked'] != "never_b" ? true : false);
+	suricata_loglimit_install_cron(true);
+	suricata_rm_blocked_install_cron($config['installedpackages']['suricata']['config'][0]['rm_blocked'] != "never_b" ? true : false);
 	suricata_rules_up_install_cron($config['installedpackages']['suricata']['config'][0]['autoruleupdate'] != "never_up" ? true : false);
 
 	// Add the recurring jobs created above to crontab
@@ -138,7 +138,7 @@ if ($config['installedpackages']['suricata']['config'][0]['forcekeepsettings'] =
 }
 
 // Update Suricata package version in configuration
-$config['installedpackages']['suricata']['config'][0]['suricata_config_ver'] = "v0.3-BETA";
+$config['installedpackages']['suricata']['config'][0]['suricata_config_ver'] = "v1.0.1";
 write_config();
 
 // Done with post-install, so clear flag

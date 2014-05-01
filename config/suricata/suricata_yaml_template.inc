@@ -117,7 +117,7 @@ detect-engine:
   - sgh-mpm-context: {$sgh_mpm_ctx}
   - inspection-recursion-limit: {$inspection_recursion_limit}
   - rule-reload: true
-  - delayed-detect: yes
+  - delayed-detect: {$delayed_detect}
 
 # Suricata is multi-threaded. Here the threading can be influenced.
 threading:
