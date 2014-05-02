@@ -222,6 +222,7 @@ if ($_POST["save"]) {
 		if ($_POST['externallistname']) $natent['externallistname'] =  $_POST['externallistname']; else unset($natent['externallistname']);
 		if ($_POST['suppresslistname']) $natent['suppresslistname'] =  $_POST['suppresslistname']; else unset($natent['suppresslistname']);
 		if ($_POST['alertsystemlog'] == "on") { $natent['alertsystemlog'] = 'on'; }else{ $natent['alertsystemlog'] = 'off'; }
+		if ($_POST['delayed_detect'] == "on") { $natent['delayed_detect'] = 'on'; }else{ $natent['delayed_detect'] = 'off'; }
 		if ($_POST['configpassthru']) $natent['configpassthru'] = base64_encode($_POST['configpassthru']); else unset($natent['configpassthru']);
 
 		$if_real = get_real_interface($natent['interface']);
@@ -281,6 +282,7 @@ if ($_POST["save"]) {
 			$natent['reassembly_to_client_chunk'] = '2560';
 			$natent['enable_midstream_sessions'] = 'off';
 			$natent['enable_async_sessions'] = 'off';
+			$natent['delayed_detect'] = 'off';
 
 			$natent['asn1_max_frames'] = '256';
 
@@ -622,6 +624,14 @@ if ($savemsg) {
 			gettext("3000") . "</strong>."; ?><br/><br/><?php echo gettext("When set to 0 an internal default is used.  When left blank there is no recursion limit.") ?></td>
 	</tr>
 	<tr>
+		<td width="22%" valign="top" class="vncell"><?php echo gettext("Delayed Detect"); ?></td>
+		<td width="78%" class="vtable">
+			<input name="delayed_detect" id="delayed_detect" type="checkbox" value="on"
+			<?php if ($pconfig['delayed_detect'] == "on") echo " checked"; ?>/>
+			<?php echo gettext("Suricata will build list of signatures after packet capture threads have started.  Default is ") . 
+			"<strong>" . gettext("Not Checked") . "</strong>."; ?></td>
+	</tr>
+	<tr>
 		<td colspan="2" class="listtopic"><?php echo gettext("Networks " . "Suricata Should Inspect and Protect"); ?></td>
 	</tr>
 	<tr>
@@ -880,7 +890,8 @@ function enable_change(enable_change) {
 	document.iform.btnHomeNet.disabled=endis;
 	document.iform.btnPasslist.disabled=endis;
 	document.iform.btnSuppressList.disabled=endis;
-}
+}	document.iform.delayed_detect.disabled=endis;
+
 
 function wopen(url, name, w, h) {
 	// Fudge factors for window decoration space.

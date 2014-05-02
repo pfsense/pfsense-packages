@@ -142,6 +142,11 @@ if (!empty($suricatacfg['inspect_recursion_limit']) || $suricatacfg['inspect_rec
 else
 	$inspection_recursion_limit = "";
 
+if ($suricatacfg['delayed_detect'] == 'on')
+	$delayed_detect = "yes";
+else
+	$delayed_detect = "no";
+
 // Add interface-specific blocking settings
 if ($suricatacfg['blockoffenders'] == 'on')
 	$suri_blockoffenders = "yes";

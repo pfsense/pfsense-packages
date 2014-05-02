@@ -589,8 +589,15 @@ function suricata_rm_blocked_install_cron($should_install) {
 		$suricata_rm_blocked_expire = "2419200";
 	}
 
-	$command = "/usr/bin/nice -n20 /sbin/pfctl -t {$suri_pf_table} -T expire {$suricata_rm_blocked_expire}";
-	install_cron_job($command, $should_install, $suricata_rm_blocked_min, $suricata_rm_blocked_hr, $suricata_rm_blocked_mday, $suricata_rm_blocked_month, $suricata_rm_blocked_wday, "root");
+	// First, remove any existing cron task for "rm_blocked" hosts
+	install_cron_job("pfctl -t {$suri_pf_table} -T expire" , false);
+
+	// Now add or update the cron task for "rm_blocked" hosts
+	// if enabled.
+	if ($should_install) {
+		$command = "/usr/bin/nice -n20 /sbin/pfctl -t {$suri_pf_table} -T expire {$suricata_rm_blocked_expire}";
+		install_cron_job($command, $should_install, $suricata_rm_blocked_min, $suricata_rm_blocked_hr, $suricata_rm_blocked_mday, $suricata_rm_blocked_month, $suricata_rm_blocked_wday, "root");
+	}
 }
 
 function sync_suricata_package_config() {
