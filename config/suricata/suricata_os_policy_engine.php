@@ -1,12 +1,24 @@
 <?php
 /*
  * suricata_os_policy_engine.php
+ *
+ * Portions of this code are based on original work done for the
+ * Snort package for pfSense from the following contributors:
+ * 
+ * Copyright (C) 2005 Bill Marquette <bill.marquette@gmail.com>.
+ * Copyright (C) 2003-2004 Manuel Kasper <mk@neon1.net>.
+ * Copyright (C) 2006 Scott Ullrich
+ * Copyright (C) 2009 Robert Zelaya Sr. Developer
+ * Copyright (C) 2012 Ermal Luci
+ * All rights reserved.
+ *
+ * Adapted for Suricata by:
  * Copyright (C) 2014 Bill Meeks
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- *
+
  * 1. Redistributions of source code must retain the above copyright notice,
  * this list of conditions and the following disclaimer.
  *
