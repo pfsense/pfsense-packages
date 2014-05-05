@@ -4,7 +4,7 @@
 	squid.inc
 	Copyright (C) 2006-2009 Scott Ullrich
 	Copyright (C) 2006 Fernando Lemos
-	Copyright (C) 2012 Martin Fuchs	
+	Copyright (C) 2012 Martin Fuchs
 	Copyright (C) 2012-2014 Marcello Coutinho
 	Copyright (C) 2013 Gekkenhuis
 	All rights reserved.
@@ -38,7 +38,7 @@ require_once('pfsense-utils.inc');
 require_once('pkg-utils.inc');
 require_once('service-utils.inc');
 
-if(!function_exists("filter_configure")) 
+if(!function_exists("filter_configure"))
 	require_once("filter.inc");
 
 $shortcut_section = "squid";
@@ -47,7 +47,7 @@ if ($pf_version > 2.0)
 	define('SQUID_LOCALBASE', '/usr/pbi/squid-' . php_uname("m"));
 else
   define('SQUID_LOCALBASE','/usr/local');
-  
+
 define('SQUID_CONFBASE', SQUID_LOCALBASE .'/etc/squid');
 define('SQUID_CONFFILE', SQUID_CONFBASE . '/squid.conf');
 define('SQUID_BASE', '/var/squid/');
@@ -63,7 +63,7 @@ if ($uname['machine']=='amd64')
         ini_set('memory_limit', '250M');
 
         function sq_text_area_decode($text){
-	return preg_replace('/\r\n/', "\n",base64_decode($text));	
+	return preg_replace('/\r\n/', "\n",base64_decode($text));
 }
 
 
@@ -103,7 +103,7 @@ function squid_check_clamav_user($user)
 		if ($sq_ex_return != 0)
 			log_error("Squid - Could not change clamav user settings. ".serialize($sq_ex_output));
 	}
-		
+
 /* setup cache */
 function squid_dash_z($cache_action='none') {
 	global $config;
@@ -111,7 +111,7 @@ function squid_dash_z($cache_action='none') {
 	//Do nothing if there is no cache config
 	if (!is_array($config['installedpackages']['squidcache']['config']))
 		return;
-		
+
 	$settings = $config['installedpackages']['squidcache']['config'][0];
 
 	// If the cache system is null, there is no need to initialize the (irrelevant) cache dir.
@@ -119,12 +119,12 @@ function squid_dash_z($cache_action='none') {
 		return;
 
 	$cachedir =($settings['harddisk_cache_location'] ? $settings['harddisk_cache_location'] : '/var/squid/cache');
-	
+
 	if ($cache_action=="clean"){
 		rename ($cachedir,"{$cachedir}.old");
 		mwexec_bg("/bin/rm -rf {$cachedir}.old");
 	}
-	
+
 	if(!is_dir($cachedir.'/')) {
 		log_error("Creating Squid cache dir $cachedir");
 		make_dirs($cachedir);
@@ -242,25 +242,25 @@ function squid_install_command() {
 			$config['installedpackages']['squidnac']['config'][0]['blacklist'] = $settingsnac['blacklist'];
 		}
 	}
-	
+
 	if(! empty($settingsnac['block_user_agent'])) {
 		if(strstr($settingsnac['block_user_agent'], ",")) {
 			$settingsnac['block_user_agent'] = base64_encode(implode("\n", explode(",", $settingsnac['block_user_agent'])));
 			$config['installedpackages']['squidnac']['config'][0]['block_user_agent'] = $settingsnac['block_user_agent'];
 		}
 	}
-	
+
 	if(! empty($settingsnac['block_reply_mime_type'])) {
 		if(strstr($settingsnac['block_reply_mime_type'], ",")) {
 			$settingsnac['block_reply_mime_type'] = base64_encode(implode("\n", explode(",", $settingsnac['block_reply_mime_type'])));
 			$config['installedpackages']['squidnac']['config'][0]['block_reply_mime_type'] = $settingsnac['block_reply_mime_type'];
 		}
 	}
-		
+
 	/*Migrate reverse settings*/
 	if (is_array($config['installedpackages']['squidreverse'])){
 		$old_reverse_settings=$config['installedpackages']['squidreverse']['config'][0];
-		
+
 		//Settings
 		if (!is_array($config['installedpackages']['squidreversegeneral'])){
 			$config['installedpackages']['squidreversegeneral']['config'][0]=$old_reverse_settings;
@@ -268,7 +268,7 @@ function squid_install_command() {
 			unset ($config['installedpackages']['squidreversegeneral']['config'][0]['reverse_uri']);
 			unset ($config['installedpackages']['squidreversegeneral']['config'][0]['reverse_acl']);
 			}
-			
+
 		//PEERS
 		if (!is_array($config['installedpackages']['squidreversepeer'])){
 			foreach (explode("\n",sq_text_area_decode($old_reverse_settings['reverse_cache_peer'])) as $cache_peers)
@@ -279,7 +279,7 @@ function squid_install_command() {
 																					'port'=> $cache_peer[1],
 																					'protocol' => $cache_peer[2]);
 			}
-			
+
 		//MAPPINGS
 		if (!is_array($config['installedpackages']['squidreverseuri'])){
 			foreach (explode("\n",sq_text_area_decode($old_reverse_settings['reverse_acl'])) as $acls){
@@ -298,9 +298,9 @@ function squid_install_command() {
 				}
 			}
 	}
-			
+
 	update_status("Writing configuration... One moment please...");
-	
+
 	write_config();
 
 	/* create cache */
@@ -447,7 +447,7 @@ function squid_validate_general($post, $input_errors) {
 	if (($post['ssl_proxy'] == 'on') && ( $post['dca'] == '')) {
 		$input_errors[] = "SSL interception cannot be enabled without a CA.";
 	}
-	
+
 	foreach (array('defined_ip_proxy_off') as $hosts) {
 		foreach (explode(";", $post[$hosts]) as $host) {
 			$host = trim($host);
@@ -515,10 +515,10 @@ function squid_validate_cache($post, $input_errors) {
 	  $input_errors[] = 'You must enter a valid value for \'Low-water-mark\'';
 	}
 
-  if (!empty($post['cache_swap_high'])) {		
+  if (!empty($post['cache_swap_high'])) {
 	 $value = trim($post['cache_swap_high']);
 	 if (!is_numeric($value) || ($value > 100))
-		$input_errors[] = 'You must enter a valid value for \'High-water-mark\'';		
+		$input_errors[] = 'You must enter a valid value for \'High-water-mark\'';
   }
 
 	if ($post['donotcache'] != "") {
@@ -542,7 +542,7 @@ function squid_validate_nac($post, $input_errors) {
 	}
 
 	foreach (array(	'unrestricted_hosts', 'banned_hosts') as $hosts) {
-		
+
 		if (preg_match_all("@([0-9.]+)(/[0-9.]+|)@",$_POST[$hosts],$matches)){
 			for ($x=0;$x < count($matches[1]);$x++){
 				if ($matches[2][$x] == ""){
@@ -591,23 +591,23 @@ function squid_validate_traffic($post, $input_errors) {
 			$input_errors[] = "The field '$name' must contain a positive number";
 	}
 
-  if (!empty($post['quick_abort_min'])) {		
+  if (!empty($post['quick_abort_min'])) {
 	 $value = trim($post['quick_abort_min']);
      if (!is_numeric($value))
-	   $input_errors[] = "The field 'Finish when remaining KB' must contain a positive number";	
-  }	
-  
-  if (!empty($post['quick_abort_max'])) {		
+	   $input_errors[] = "The field 'Finish when remaining KB' must contain a positive number";
+  }
+
+  if (!empty($post['quick_abort_max'])) {
 	 $value = trim($post['quick_abort_max']);
      if (!is_numeric($value))
-	   $input_errors[] = "The field 'Abort when remaining KB' must contain a positive number";	
-  }	
-		
-  if (!empty($post['quick_abort_pct'])) {		
+	   $input_errors[] = "The field 'Abort when remaining KB' must contain a positive number";
+  }
+
+  if (!empty($post['quick_abort_pct'])) {
 	 $value = trim($post['quick_abort_pct']);
      if (!is_numeric($value) || ($value > 100))
-	   $input_errors[] = "The field 'Finish when remaining %' must contain a percentage";	
-  }	
+	   $input_errors[] = "The field 'Finish when remaining %' must contain a percentage";
+  }
 }
 
 function squid_validate_reverse($post, $input_errors) {
@@ -618,8 +618,8 @@ function squid_validate_reverse($post, $input_errors) {
 		if (!is_ipaddr($reip))
 			$input_errors[] = 'You must enter a valid IP address in the \'User-defined reverse-proxy IPs\' field';
 			break;
-	}}	
-		
+	}}
+
 	$fqdn = trim($post['reverse_external_fqdn']);
 	if (!empty($fqdn) && !is_domain($fqdn))
 		$input_errors[] = 'The field \'external FQDN\' must contain a valid domain name';
@@ -648,13 +648,13 @@ function squid_validate_reverse($post, $input_errors) {
 	if (!empty($rowa) && !is_ipaddr($rowa))
 		$input_errors[] = 'The field \'OWA frontend IP address\' must contain a valid IP address';
 
-	
+
     $contents = $post['reverse_cache_peer'];
     if(!empty($contents)) {
       $defs = explode("\r\n", ($contents));
         foreach ($defs as $def) {
           $cfg = explode(";",($def));
-            if (!is_ipaddr($cfg[1])) 
+            if (!is_ipaddr($cfg[1]))
               $input_errors[] = "please choose a valid IP in the cache peer configuration.";
             if (!is_port($cfg[2]))
               $input_errors[] = "please choose a valid port in the cache peer configuration.";
@@ -719,19 +719,19 @@ function squid_validate_auth($post, $input_errors) {
 
 function squid_install_cron($should_install) {
 	global $config, $g;
-	if($g['booting']==true) 
+	if($g['booting']==true)
 		return;
 	$rotate_is_installed = false;
 	$swapstate_is_installed = false;
 
 	if(!$config['cron']['item'])
 		return;
-		
-	if (is_array($config['installedpackages']['squidcache']))	
+
+	if (is_array($config['installedpackages']['squidcache']))
 		$settings = $config['installedpackages']['squidcache']['config'][0];
 	else
 		$settings = array();
-	
+
 	$x=0;
 	$rotate_job_id=-1;
 	$swapstate_job_id=-1;
@@ -782,7 +782,7 @@ function squid_install_cron($should_install) {
 				$config['cron']['item'][] = $cron_item;
 				$need_write = true;
 			}
-			if ($need_write) {		
+			if ($need_write) {
 				parse_config(true);
 				write_config("Adding Squid Cron Jobs");
 			}
@@ -807,7 +807,7 @@ function squid_install_cron($should_install) {
 
 function squid_check_ca_hashes(){
 	global $config,$g;
-	
+
 	#check certificates
 	$cert_count=0;
 	if (is_dir(SQUID_LOCALBASE. '/share/certs'))
@@ -886,10 +886,10 @@ function squid_resync_general() {
 	}
 	$port = ($settings['proxy_port'] ? $settings['proxy_port'] : 3128);
 	$ssl_port = ($settings['ssl_proxy_port'] ? $settings['ssl_proxy_port'] : 3127);
-	
+
 #Read assigned interfaces
 	$real_ifaces = array();
-	
+
 	if($settings['active_interface'])
 		$proxy_ifaces = explode(",", $settings['active_interface']);
 	else
@@ -906,7 +906,7 @@ function squid_resync_general() {
 	else{
 		$transparent_ifaces=array();
 	}
-	
+
 	if ($settings['ssl_proxy']=="on"){
 		$ssl_ifaces = explode(",", $settings['ssl_active_interface']);
 		foreach ($ssl_ifaces as $s_iface){
@@ -930,7 +930,7 @@ function squid_resync_general() {
 				$conf .= "http_port {$iface_ip[0]}:{$port}\n";
 			}
 		}
-			
+
 	if (($settings['transparent_proxy'] == 'on')) {
 		if ($settings['ssl_proxy'] == "on" && count($ssl_ifaces)>0){
 			$conf .= "http_port 127.0.0.1:{$port} intercept {$ssl_interception}\n";
@@ -1016,7 +1016,7 @@ EOD;
 	 }
 //  $conf .= "\n";  //Kill blank line after DNS-Servers
    }
-	
+
   return $conf;
 }
 
@@ -1110,7 +1110,7 @@ refresh_pattern personal.avira-update.com/.*\.(cab|exe|dll|msi|gz) 10080 100% 43
 EOC;
 	}
 	$refresh_conf=<<< EOC
-	
+
 # Add any of your own refresh_pattern entries above these.
 refresh_pattern ^ftp:    1440  20%  10080
 refresh_pattern ^gopher:  1440  0%  1440
@@ -1122,9 +1122,9 @@ EOC;
 
 	If ($settings['custom_refresh_patterns'] !="")
 		$conf .= sq_text_area_decode($settings['custom_refresh_patterns'])."\n";
-		
+
 	$conf .= <<< EOD
-	
+
 cache_mem $memory_cache_size MB
 maximum_object_size_in_memory {$max_objsize_in_mem} KB
 memory_replacement_policy {$memory_policy}
@@ -1279,9 +1279,9 @@ EOD;
 	 		$conf .= "http_access allow manager ext_manager\n";
 			}
 		}
-	
+
   $conf .= <<< EOD
-  
+
 http_access deny manager
 http_access allow purge localhost
 http_access deny purge
@@ -1289,7 +1289,7 @@ http_access deny !safeports
 http_access deny CONNECT !sslports
 
 # Always allow localhost connections
-# From 3.2 further configuration cleanups have been done to make things easier and safer. 
+# From 3.2 further configuration cleanups have been done to make things easier and safer.
 # The manager, localhost, and to_localhost ACL definitions are now built-in.
 # http_access allow localhost
 
@@ -1305,7 +1305,7 @@ function squid_resync_antivirus(){
 		$antivirus_config = $config['installedpackages']['squidantivirus']['config'][0];
 	else
 		$antivirus_config = array();
-		
+
 	if ($antivirus_config['enable']=="on"){
 		switch ($antivirus_config['client_info']){
 			case "both":
@@ -1353,14 +1353,14 @@ function squid_resync_antivirus(){
 		*/
 		$clwarn_file_new=preg_replace($c_pattern, $c_replacement,$clwarn_file_new);
 		file_put_contents($clwarn_file, $clwarn_file_new,LOCK_EX);
-		
+
 		#fix clwarn.cgi file permission
 		chmod($clwarn_file,0755);
-		
+
 		$conf = <<< EOF
 icap_enable on
 icap_send_client_ip {$icap_send_client_ip}
-icap_send_client_username {$icap_send_client_username} 
+icap_send_client_username {$icap_send_client_username}
 icap_client_username_encode off
 icap_client_username_header X-Authenticated-User
 icap_preview_enable on
@@ -1387,7 +1387,7 @@ EOF;
 		}
 		if (!isset($c_icap_enable))
 			$rc_file.='c_icap_enable="YES"'."\n";
-		if (!isset($clamav_clamd_enable))	
+		if (!isset($clamav_clamd_enable))
 			$rc_file.='clamav_clamd_enable="YES"'."\n";
 		file_put_contents("/etc/rc.conf.local",$rc_file,LOCK_EX);
 		squid_check_clamav_user('clamav');
@@ -1406,7 +1406,7 @@ EOF;
 				$sample_file=file_get_contents(SQUID_LOCALBASE."/etc/c-icap/c-icap.conf.default");
 				if (! preg_match ("/squidclamav/"))
 					$sample_file.="\nService squidclamav squidclamav.so\n";
-					
+
 				file_put_contents(SQUID_LOCALBASE."/etc/c-icap/c-icap.conf.sample",$sample_file,LOCK_EX);
 			}
 		$loadsample=0;
@@ -1424,7 +1424,7 @@ EOF;
 		}
 		if($loadsample > 0){
 			write_config();
-			$antivirus_config = $config['installedpackages']['squidantivirus']['config'][0];		
+			$antivirus_config = $config['installedpackages']['squidantivirus']['config'][0];
 		}
 		#check dirs
 		$dirs=array("/var/run/c-icap" => "clamav",
@@ -1449,12 +1449,12 @@ EOF;
 				if (!file_exists("/usr/local/etc/rc.d/{$rcd_file}"))
 					symlink (SQUID_LOCALBASE."/etc/rc.d/{$rcd_file}","/usr/local/etc/rc.d/{$rcd_file}");
 		}
-		
+
 		#write advanced icap config files
 		file_put_contents(SQUID_LOCALBASE."/etc/c-icap/squidclamav.conf",base64_decode($antivirus_config['squidclamav']),LOCK_EX);
 		file_put_contents(SQUID_LOCALBASE."/etc/c-icap/c-icap.conf",base64_decode($antivirus_config['c-icap_conf']),LOCK_EX);
 		file_put_contents(SQUID_LOCALBASE."/etc/c-icap/c-icap.magic",base64_decode($antivirus_config['c-icap_magic']),LOCK_EX);
-		
+
 		#check antivirus daemons
 		#check icap
 		if (is_process_running("c-icap")){
@@ -1489,22 +1489,22 @@ function squid_resync_traffic() {
 		$settings = $config['installedpackages']['squidtraffic']['config'][0];
 	else
 		$settings = array();
-		
+
 	$conf = '';
 	if (!empty($settings['quick_abort_min']) || ($settings['quick_abort_min']) == "0")
 		$conf .= "quick_abort_min {$settings['quick_abort_min']} KB\n";
 	if (!empty($settings['quick_abort_max']) || ($settings['quick_abort_max']) == "0")
 		$conf .= "quick_abort_max {$settings['quick_abort_max']} KB\n";
 	if (!empty($settings['quick_abort_pct']))
-		$conf .= "quick_abort_pct {$settings['quick_abort_pct']}\n";	
+		$conf .= "quick_abort_pct {$settings['quick_abort_pct']}\n";
 
 	$up_limit = ($settings['max_upload_size'] ? $settings['max_upload_size'] : 0);
 	$down_limit = ($settings['max_download_size'] ? $settings['max_download_size'] : 0);
 	$conf .= "request_body_max_size $up_limit KB\n";
 	if ($down_limit != 0)
-		$conf .= 'reply_body_max_size ' . $down_limit . " KB allsrc \n";			
+		$conf .= 'reply_body_max_size ' . $down_limit . " KB allsrc \n";
 
-	
+
 	// Only apply throttling past 10MB
 	// XXX: Should this really be hardcoded?
 	$threshold = 10 * 1024 * 1024;
@@ -1574,7 +1574,7 @@ function squid_get_server_certs() {
 		$cert_arr[] = array('refid' => $cert['refid'], 'descr' => $cert['descr']);
 	}
 	return $cert_arr;
-}	
+}
 
 #squid reverse
 include('/usr/local/pkg/squid_reverse.inc');
@@ -1591,23 +1591,23 @@ function squid_resync_auth() {
 		$settingsnac = $config['installedpackages']['squidnac']['config'][0];
 	else
 		$settingsnac = array();
-		
+
 	if (is_array($config['installedpackages']['squid']['config']))
 		$settingsconfig = $config['installedpackages']['squid']['config'][0];
 	else
 		$settingsconfig = array();
-	
+
 	if ($write_config > 0)
 		write_config();
-	
+
 	$conf = '';
-	
+
 	// SSL interception acl options part 1
 	if ($settingsconfig['ssl_proxy'] == "on" && ! empty($settingsnac['whitelist'])){
 		$conf .= "always_direct allow whitelist\n";
 		$conf .= "ssl_bump none whitelist\n";
 		}
-		
+
 	// Package integration
 	if(!empty($settingsconfig['custom_options'])){
 		$co_preg[0]='/;/';
@@ -1618,7 +1618,7 @@ function squid_resync_auth() {
 		$co_rep[2]="url_rewrite_bypass";
 		$conf.="# Package Integration\n".preg_replace($co_preg,$co_rep,$settingsconfig['custom_options'])."\n\n";
 		}
-	
+
 	// Custom User Options before authentication acls
 	$conf .= "# Custom options before auth\n".sq_text_area_decode($settingsconfig['custom_options_squid3'])."\n\n";
 
@@ -1678,8 +1678,8 @@ function squid_resync_auth() {
 
 	// SSL interception acl options part 2
 	/*if ($settingsconfig['ssl_proxy'] == "on"){
-			$conf .= "always_direct allow all\n";
-			$conf .= "ssl_bump server-first all\n";
+			$conf .= "always_direct allow HTTPS\n";
+			$conf .= "ssl_bump server-first SSL_ports\n";
 		}*/
 
 	// Include squidguard denied acl log in squid
@@ -1703,6 +1703,13 @@ function squid_resync_auth() {
 			$conf .="http_access deny sglog\n";
 	}
 	if ($auth_method == 'none'  ) {
+		// SSL interception acl options part 2 without authentication
+		$ssl_action=($settingsconfig['interception_action'] != "" ? $settingsconfig['interception_action']: "server-first");
+		if ($settingsconfig['ssl_proxy'] == "on"){
+			$conf .= "always_direct allow SSL_ports\n";
+			$conf .= "ssl_bump {$ssl_action} SSL_ports\n";
+			}
+
 		$conf .="# Setup allowed acls\n";
 		$allowed = array('allowed_subnets');
 		if ($settingsconfig['allow_interface'] == 'on') {
@@ -1757,11 +1764,12 @@ EOD;
 		}
 		// Custom User Options after authentication definition
 		$conf .= "# Custom options after auth\n".sq_text_area_decode($settingsconfig['custom_options2_squid3'])."\n\n";
-		
-		// SSL interception acl options part 2
+
+		// SSL interception acl options part 2 with authentication set
+		$ssl_action=($settingsconfig['interception_action'] != "" ? $settingsconfig['interception_action']: "server-first");
 		if ($settingsconfig['ssl_proxy'] == "on"){
-			$conf .= "always_direct allow all\n";
-			$conf .= "ssl_bump server-first all\n";
+			$conf .= "always_direct allow SSL_ports\n";
+			$conf .= "ssl_bump {$ssl_action} password SSL_ports\n";
 			}
 		// Onto the ACLs
 		$password = array('localnet', 'allowed_subnets');
@@ -1783,13 +1791,13 @@ EOD;
 			// Include squidguard denied acl log in squid
 			if ($settingsconfig['log_sqd'])
 				$conf .="http_access deny password sglog\n";
-			
+
 			// Allow the other ACLs as long as they authenticate
 			foreach ($password as $acl)
 				$conf .= "http_access allow password $acl\n";
 		//	}
 	}
-	
+
 	$conf .= "# Default block all to be sure\n";
 	$conf .= "http_access deny allsrc\n";
 
@@ -1828,7 +1836,7 @@ function squid_resync_msnt() {
 
 function squid_resync($via_rpc="no") {
 	global $config;
-	
+
 	# detect boot process
 	if (is_array($_POST)){
 		if (preg_match("/\w+/",$_POST['__csrf_magic']))
@@ -1836,12 +1844,12 @@ function squid_resync($via_rpc="no") {
 		else
 			$boot_process="on";
 	}
-	
+
 	log_error("[Squid] - Squid_resync function call pr:".is_process_running('squid')." bp:".isset($boot_process)." rpc:".$via_rpc);
-	
+
 	if (is_process_running('squid') && isset($boot_process) && $via_rpc=="no")
 		return;
-	
+
 	conf_mount_rw();
 	foreach (array(	SQUID_CONFBASE,
 			SQUID_ACLDIR,
@@ -1859,22 +1867,22 @@ function squid_resync($via_rpc="no") {
 	$conf .= squid_resync_upstream() . "\n";
 	$conf .= squid_resync_nac() . "\n";
 	$conf .= squid_resync_traffic() . "\n";
-	$conf .= squid_resync_reverse() . "\n";	
+	$conf .= squid_resync_reverse() . "\n";
 	$conf .= squid_resync_auth()."\n";
 	$conf .= squid_resync_antivirus();
 	squid_resync_users();
 	squid_write_rcfile();
-		
+
 	if(!isset($boot_process) || $via_rpc="yes")
 		squid_sync_on_changes();
-	
+
 	#write config file
 	file_put_contents(SQUID_CONFBASE . '/squid.conf', $conf);
-		
+
 	/* make sure pinger is executable */
 	if(file_exists(SQUID_LOCALBASE . "/libexec/squid/pinger"))
 		exec("chmod a+x " . SQUID_LOCALBASE . "/libexec/squid/pinger");
-	
+
 	$log_dir="";
 	#check if squid is enabled
 	if (is_array($config['installedpackages']['squid']['config'])){
@@ -1893,20 +1901,20 @@ function squid_resync($via_rpc="no") {
 			make_dirs($log_dir);
 			squid_chown_recursive($log_dir, 'proxy', 'proxy');
 			}
-	
+
 		squid_dash_z();
-		
+
 		if (!is_service_running('squid')) {
 			log_error("Starting Squid");
 			mwexec(SQUID_LOCALBASE . "/sbin/squid -f " . SQUID_CONFFILE);
-			} 
+			}
 		else {
 			if (!isset($boot_process)){
 				log_error("Reloading Squid for configuration sync");
 				mwexec(SQUID_LOCALBASE . "/sbin/squid -k reconfigure -f " . SQUID_CONFFILE);
 				}
 		}
-	
+
 		// Sleep for a couple seconds to give squid a chance to fire up fully.
 		for ($i=0; $i < 10; $i++) {
 			if (!is_service_running('squid'))
@@ -2087,7 +2095,7 @@ function squid_generate_rules($type) {
 				$found_rule++;
 				$new_line ="";
 				}
-				
+
 			if (substr($pfsense_version,0,3) > 2.0){
 				if (preg_match('/255.255.255.255/',$line) && $squid_conf['patch_cp']){
 					$found_rule++;
@@ -2096,7 +2104,7 @@ function squid_generate_rules($type) {
 					}
 			}
 			else{
-				//add squid patch option based on current config	            
+				//add squid patch option based on current config
 				if (preg_match('/set 1 pass ip from any to/',$line) && $squid_conf['patch_cp']){
 					$found_rule++;
 					$new_line = "\t".'$cprules .= "add {$rulenum} set 1 skipto 65314 ip from any to {$ips} '.$port.' in\n";'."\n";
@@ -2142,20 +2150,20 @@ function squid_generate_rules($type) {
 	else{
 		$ssl_ifaces=array();
 	}
-		
+
 	$port = ($squid_conf['proxy_port'] ? $squid_conf['proxy_port'] : 3128);
 	$ssl_port = ($squid_conf['ssl_proxy_port'] ? $squid_conf['ssl_proxy_port'] : 3127);
 
 	$fw_aliases = filter_generate_aliases();
 	if(strstr($fw_aliases, "pptp ="))
 		$PPTP_ALIAS = "\$pptp";
-	else 
+	else
 		$PPTP_ALIAS = "\$PPTP";
 	if(strstr($fw_aliases, "PPPoE ="))
 		$PPPOE_ALIAS = "\$PPPoE";
-	else 
+	else
 		$PPPOE_ALIAS = "\$pppoe";
-		
+
 	#define ports based on transparent options and ssl filtering
 	$pf_rule_port=($squid_conf['ssl_proxy'] == "on" ? "{80,443}" : "80");
 	switch($type) {
@@ -2251,8 +2259,8 @@ function squid_generate_rules($type) {
 				$rules .= "\n";
 			};
 			if($config['pppoe']['mode'] == "server" && $config['pppoe']['localip']) {
-				$rules .= "pass in quick on $PPPOE_ALIAS proto tcp from any to !127.0.0.1 port {$port} flags S/SA keep state\n";			
-			}			
+				$rules .= "pass in quick on $PPPOE_ALIAS proto tcp from any to !127.0.0.1 port {$port} flags S/SA keep state\n";
+			}
 			if($config['pptpd']['mode'] == "server" && $config['pptpd']['localip']) {
 				$rules .= "pass in quick on $PPTP_ALIAS proto tcp from any to !127.0.0.1 port {$port} flags S/SA keep state\n";
 			}
@@ -2282,12 +2290,12 @@ EOD;
 {$squid_local_base}/sbin/squid -k shutdown -f {$squid_conffile_var}
 # Just to be sure...
 sleep 5
-		
+
 if [ -f /usr/bin/ipcs ];then
 # http://man.chinaunix.net/newsoft/squid/Squid_FAQ/FAQ-22.html#ss22.8
 ipcs | grep '^[mq]' | awk '{printf "ipcrm -%s %s\\n", $1, $2}' | /bin/sh
 fi
-		
+
 killall -9 squid 2>/dev/null
 killall pinger 2>/dev/null
 
@@ -2333,7 +2341,7 @@ function squid_sync_on_changes() {
 						log_error("[squid] xmlrpc sync is enabled but there is no system backup hosts to push squid config.");
 						return;
 					}
-				break;			
+				break;
 			default:
 				return;
 			break;
@@ -2360,7 +2368,7 @@ function squid_do_xmlrpc_sync($sync_to_ip, $username, $password, $synctimeout) {
 
 	if(!$username)
 		return;
-		
+
 	if(!$password)
 		return;
 
@@ -2369,8 +2377,8 @@ function squid_do_xmlrpc_sync($sync_to_ip, $username, $password, $synctimeout) {
 
 	if(!$synctimeout)
 		$synctimeout=250;
-		
-		
+
+
 	$xmlrpc_sync_neighbor = $sync_to_ip;
     if($config['system']['webgui']['protocol'] != "") {
 		$synchronizetoip = $config['system']['webgui']['protocol'];
@@ -2379,9 +2387,9 @@ function squid_do_xmlrpc_sync($sync_to_ip, $username, $password, $synctimeout) {
     $port = $config['system']['webgui']['port'];
     /* if port is empty lets rely on the protocol selection */
     if($port == "") {
-		if($config['system']['webgui']['protocol'] == "http") 
+		if($config['system']['webgui']['protocol'] == "http")
 			$port = "80";
-		else 
+		else
 			$port = "443";
     }
 	$synchronizetoip .= $sync_to_ip;
@@ -2429,7 +2437,7 @@ function squid_do_xmlrpc_sync($sync_to_ip, $username, $password, $synctimeout) {
 	} else {
 		log_error("[Squid] XMLRPC sync successfully completed with {$url}:{$port}.");
 	}
-	
+
 	/* tell squid to reload our settings on the destination sync host. */
 	$method = 'pfsense.exec_php';
 	$execcmd  = "require_once('/usr/local/pkg/squid.inc');\n";
@@ -2439,7 +2447,7 @@ function squid_do_xmlrpc_sync($sync_to_ip, $username, $password, $synctimeout) {
 		XML_RPC_encode($password),
 		XML_RPC_encode($execcmd)
 	);
-	
+
 	log_error("[Squid] XMLRPC reload data {$url}:{$port}.");
 	$msg = new XML_RPC_Message($method, $params);
 	$cli = new XML_RPC_Client('/xmlrpc.php', $url, $port);
@@ -2458,6 +2466,6 @@ function squid_do_xmlrpc_sync($sync_to_ip, $username, $password, $synctimeout) {
 	} else {
 		log_error("squid XMLRPC reload data success with {$url}:{$port} (pfsense.exec_php).");
 	}
-	
+
 }
 ?>
