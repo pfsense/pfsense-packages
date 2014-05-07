@@ -270,7 +270,7 @@ function sync_package_siproxd() {
 
 }
 
-function validate_form_siproxd($post, $input_errors) {
+function validate_form_siproxd($post, &$input_errors) {
 	if ($post['port'] && !is_port($post['port']))
 		$input_errors[] = 'Invalid port entered for "Listening Port"';
 	if ($post['rtplower'] && !is_port($post['rtplower']))
