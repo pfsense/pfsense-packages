@@ -240,7 +240,9 @@ function mail_report_generate_graph($database, $style, $graph, $start, $end) {
 	require_once("filter.inc");
 	require_once("shaper.inc");
 	require_once("rrd.inc");
+	require_once("util.inc");
 	global $g;
+	$g['theme'] = get_current_theme();
 
 	$pgtitle = array(gettext("System"),gettext("RRD Graphs"),gettext("Image viewer"));
 
