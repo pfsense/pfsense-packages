@@ -67,7 +67,7 @@ if ($_GET['act'] == "del") {
 }
 
 if (($_GET['act'] == "fetch") && ($a_patches[$_GET['id']])) {
-	$savemsg = patch_fetch(& $a_patches[$_GET['id']]) ? gettext("Patch Fetched Successfully") : gettext("Patch Fetch Failed");
+	$savemsg = patch_fetch($a_patches[$_GET['id']]) ? gettext("Patch Fetched Successfully") : gettext("Patch Fetch Failed");
 }
 if (($_GET['act'] == "test") && ($a_patches[$_GET['id']])) {
 	$savemsg = patch_test_apply($a_patches[$_GET['id']]) ? gettext("Patch can be applied cleanly") : gettext("Patch can NOT be applied cleanly");
