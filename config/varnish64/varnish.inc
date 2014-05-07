@@ -33,7 +33,7 @@
                                                                               */
 /* ========================================================================== */
 
-function varnish_settings_post_validate($post, $input_errors) {
+function varnish_settings_post_validate($post, &$input_errors) {
 	if($post['storagesize'] && !is_numeric($post['storagesize'])) 
 		$input_errors[] = "A valid number is required for the field 'Storage size'";	
 	if($post['listeningport'] && !is_numeric($post['listeningport'])) 
@@ -56,7 +56,7 @@ function varnish_settings_post_validate($post, $input_errors) {
 		
 }
 
-function varnish_lb_directors_post_validate($post, $input_errors) {
+function varnish_lb_directors_post_validate($post, &$input_errors) {
 	if (preg_match("/[^a-zA-Z0-9]/", $post['directorname']))
 		$input_errors[] = "The directorname name must only contain the characters a-Z or 0-9";
 	if(stristr($post['directorurl'], 'http'))
@@ -65,7 +65,7 @@ function varnish_lb_directors_post_validate($post, $input_errors) {
 		$input_errors[] = "A valid number with a time reference is required for the field 'Req grace'";
 }
 
-function varnish_backends_post_validate($post, $input_errors) {
+function varnish_backends_post_validate($post, &$input_errors) {
  	if (!$post['backendname'] || preg_match("/[^a-zA-Z0-9]/", $post['backendname']))
 		$input_errors[] = "The backend name must only contain the characters a-Z or 0-9";
 	if(!is_ipaddr($post['ipaddress'])) 

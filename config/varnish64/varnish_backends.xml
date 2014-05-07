@@ -281,6 +281,6 @@
 		varnish_start();
 	</custom_php_resync_config_command>
 	<custom_php_validation_command>
-		varnish_backends_post_validate($_POST, &amp;$input_errors);
+		varnish_backends_post_validate($_POST, $input_errors);
 	</custom_php_validation_command>
 </packagegui>

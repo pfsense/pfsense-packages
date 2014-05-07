@@ -779,7 +779,7 @@
 		<website>http://varnish-cache.org</website>
 		<pkginfolink>https://doc.pfsense.org/index.php/Varnish_package</pkginfolink>
 		<category>Services</category>
-		<version>2.1.5 pkg v.1.0</version>
+		<version>2.1.5 pkg v.1.0.1</version>
 		<status>Release</status>
 		<required_version>2.0</required_version>
 		<config_file>https://packages.pfsense.org/packages/config/varnish64/varnish_backends.xml</config_file>
