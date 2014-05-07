@@ -46,7 +46,7 @@
     <requirements>Describe your package requirements here</requirements>
     <faq>Currently there are no FAQ items provided.</faq>
 	<name>nut</name>
-	<version>2.6.4 pkg 2.0</version>
+	<version>2.6.5_1 pkg 2.0.1</version>
 	<title>Services: NUT</title>
 	<savetext>Change</savetext>
 	<aftersaveredirect>/status_nut.php</aftersaveredirect>
@@ -646,10 +646,10 @@
 		</field>
 	</fields>
 	<custom_php_command_before_form>
-		before_form_nut(&amp;$pkg);
+		before_form_nut($pkg);
 	</custom_php_command_before_form>
 	<custom_php_validation_command>
-		validate_form_nut($_POST, &amp;$input_errors);
+		validate_form_nut($_POST, $input_errors);
 	</custom_php_validation_command>
 	<custom_php_resync_config_command>
 		sync_package_nut();	

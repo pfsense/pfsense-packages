@@ -97,7 +97,7 @@
 		return true;
 	}
 	
-	function before_form_nut($pkg) {
+	function before_form_nut(&$pkg) {
 		/* return available serial ports */
 		
 		$serial_types = array("sio", "cua", "tty");
@@ -136,7 +136,7 @@
 			$field['options']['option'][] = array('name' => $names[$i], 'value' => $values[$i]);
 	}
 
-	function validate_form_nut($post, $input_errors) {
+	function validate_form_nut($post, &$input_errors) {
 		global $config;
 
 		/* monitor remote validation */
