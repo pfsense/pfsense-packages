@@ -99,7 +99,7 @@ function php_deinstall_zabbix2_proxy(){
    conf_mount_ro();
 }
 
-function validate_input_zabbix2($post,&$input_errors){
+function validate_input_zabbix2($post, &$input_errors){
 
 	if  (isset($post['proxyenabled'])){
 		if (!is_numericint($post['serverport'])) {
