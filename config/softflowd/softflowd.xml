@@ -1,6 +1,6 @@
 <packagegui>
 	<name>softflowd</name>
-	<version>0.9.8</version>
+	<version>0.9.8 pkg v1.0.1</version>
 	<title>softflowd: Settings</title>
 	<aftersaveredirect>pkg_edit.php?xml=softflowd.xml&amp;id=0</aftersaveredirect>
 	<menu>
@@ -103,7 +103,7 @@
 			config_unlock();
 		}
 
-		function validate_form_softflowd($post, $input_errors) {
+		function validate_form_softflowd($post, &$input_errors) {
 			if (($post['host'] == "") || !is_ipaddr($post['host']))
 				$input_errors[] = 'You must specify a valid ip address in the \'Host\' field';
 			if (($post['port'] == "") || !is_port($post['port']))
@@ -129,7 +129,7 @@
 		sync_package_softflowd();
 	</custom_php_resync_config_command>
 	<custom_php_validation_command>
-		validate_form_softflowd($_POST, &amp;$input_errors);
+		validate_form_softflowd($_POST, $input_errors);
 	</custom_php_validation_command>
 	<custom_php_command_before_form>
 		cleanup_config_softflowd();
