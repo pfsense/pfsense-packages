@@ -234,11 +234,11 @@ function havp_deinstall()
 # ==============================================================================
 # before form
 # ------------------------------------------------------------------------------
-function havp_before_form($pkg)
+function havp_before_form(&$pkg)
 {
 }
 # ------------------------------------------------------------------------------
-function havp_fscan_before_form($pkg)
+function havp_fscan_before_form(&$pkg)
 {
     if(is_array($pkg['fields']['field'])) {
         foreach($pkg['fields']['field'] as $key => $field) {
@@ -252,7 +252,7 @@ function havp_fscan_before_form($pkg)
 # ------------------------------------------------------------------------------
 # validation
 # ------------------------------------------------------------------------------
-function havp_validate_settings($post, $input_errors)
+function havp_validate_settings($post, &$input_errors)
 {
     $submit = isset($_GET['submit']) ? $_GET['submit'] : $_POST['submit'];
 

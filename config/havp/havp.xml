@@ -3,7 +3,7 @@
         <name>havp</name>
         <title>Antivirus: HTTP proxy (havp + clamav)</title>
         <category>Status</category>
-        <version>0.88_03</version>
+        <version>1.02</version>
         <include_file>/usr/local/pkg/havp.inc</include_file>
         <menu>
                 <name>Antivirus</name>
@@ -288,10 +288,10 @@
                 </field>
         </fields>
         <custom_php_command_before_form>
-            havp_before_form(&amp;$pkg);
+            havp_before_form($pkg);
         </custom_php_command_before_form>
         <custom_php_validation_command>
-            havp_validate_settings($_POST, &amp;$input_errors);
+            havp_validate_settings($_POST, $input_errors);
         </custom_php_validation_command>
         <custom_php_resync_config_command>
             havp_resync();
