@@ -37,7 +37,7 @@
     <description>Automatically backs up your pfSense configuration.  All contents are encrypted on the server.  Requires Gold or Support Subscription from https://portal.pfsense.org</description>
     <requirements>pfSense Portal subscription</requirements>
 	<name>AutoConfigBackup</name>
-	<version>1.22</version>
+	<version>1.24</version>
 	<title>Diagnostics: Auto Configuration Backup</title>
 	<savetext>Change</savetext>
 	<include_file>/usr/local/pkg/autoconfigbackup.inc</include_file>
@@ -140,7 +140,7 @@
 		</field>
     </fields>
 	<custom_php_validation_command>
-		custom_php_validation_command($_POST, &amp;$input_errors);
+		custom_php_validation_command($_POST, $input_errors);
 	</custom_php_validation_command>
 	<custom_php_resync_config_command>
         <![CDATA[		

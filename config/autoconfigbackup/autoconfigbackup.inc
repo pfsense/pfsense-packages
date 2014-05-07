@@ -40,7 +40,7 @@ if(file_exists("/usr/local/pkg/parse_config/parse_config_upload.php"))
 	unlink("/usr/local/pkg/parse_config/parse_config_upload.php");
 
 /* ensures patches match */
-function custom_php_validation_command($post, $input_errors) {
+function custom_php_validation_command($post, &$input_errors) {
 	global $_POST, $savemsg, $config;
 
 	if($post['password'] <> $post['passwordagain']) 
