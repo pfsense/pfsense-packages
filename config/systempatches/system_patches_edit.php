@@ -88,7 +88,7 @@ if ($_POST) {
 
 	$pf_version=substr(trim(file_get_contents("/etc/version")),0,3);
 	if ($pf_version < 2.1)
-		do_input_validation($_POST, $reqdfields, $reqdfieldsn, $input_errors);
+		do_input_validation($_POST, $reqdfields, $reqdfieldsn, &$input_errors);
 	else
 		do_input_validation($_POST, $reqdfields, $reqdfieldsn, $input_errors);
 
