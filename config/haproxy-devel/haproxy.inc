@@ -1186,6 +1186,36 @@ function haproxy_plugin_carp($pluginparams) {
 	haproxy_check_run(0);
 }
 
+function haproxy_plugin_certificates($pluginparams) {
+	global $config;
+	$result = array();
+	if ($pluginparams['type'] == 'certificates' && $pluginparams['event'] == 'used_certificates') {
+		$result['pkgname'] = "HAProxy";
+		$result['certificatelist'] = array();
+		// return a array of used certificates.
+		foreach($config['installedpackages']['haproxy']['ha_backends']['item'] as &$frontend) {
+			$mainfrontend = get_primaryfrontend($frontend);
+			if (strtolower($mainfrontend['type']) == "http" && $mainfrontend['ssloffload']) {
+				if ($frontend['ssloffloadacl']){
+					$item = array();
+					$cert = $frontend['ssloffloadcert'];
+					$item['usedby'] = $frontend['name'];
+					$result['certificatelist'][$cert][] = $item;
+				}
+				if ($frontend['ssloffloadacladditional']){
+					foreach($frontend['ha_certificates']['item'] as $certref){
+						$item = array();
+						$cert = $certref['ssl_certificate'];
+						$item['usedby'] = $frontend['name'];
+						$result['certificatelist'][$cert][] = $item;
+					}
+				}
+			}
+		}
+	}
+	return $result;
+}
+
 function haproxy_check_run($reload) {
 	global $config, $g, $haproxy_run_message;
 
