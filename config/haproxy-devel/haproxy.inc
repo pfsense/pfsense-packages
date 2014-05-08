@@ -818,15 +818,9 @@ function haproxy_writeconf($configpath) {
 	if(is_array($a_frontends)) {
 		foreach ($a_frontends as $frontend) {
 			if($frontend['status'] != 'active')
-			{
-				unlink_if_exists("var/etc/{$frontend['name']}.{$frontend['port']}.crt");
 				continue;
-			}
 			if(!$frontend['backend_serverpool'])
-			{
-				unlink_if_exists("var/etc/{$frontend['name']}.{$frontend['port']}.crt");
 				continue;
-			}
 			$primaryfrontend = get_primaryfrontend($frontend);
 			$bname = get_frontend_ipport($frontend);
 
