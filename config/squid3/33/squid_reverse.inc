@@ -173,8 +173,6 @@ function squid_resync_reverse() {
 					array_push($owa_dirs,'Microsoft-Server-ActiveSync');
 			if($settings['reverse_owa_rpchttp'])	
 					array_push($owa_dirs,'rpc/rpcproxy.dll','rpcwithcert/rpcproxy.dll');
-			if($settings['reverse_owa_autodiscover'])
-					array_push($owa_dirs,'autodiscover');
 			if($settings['reverse_owa_webservice']){
 					array_push($owa_dirs,'EWS');
 					//$conf .= "ignore_expect_100 on\n"; Obsolete on 3.3
@@ -183,7 +181,12 @@ function squid_resync_reverse() {
 		if (is_array($owa_dirs))
 		  foreach ($owa_dirs as $owa_dir)
 			$conf .= "acl OWA_URI_pfs url_regex -i ^https://{$settings['reverse_external_fqdn']}/$owa_dir.*$\n";
-		}	
+			
+		if (($settings['reverse_owa'] == 'on') && (!empty($settings['reverse_owa_ip'])) && ($settings['reverse_owa_autodiscover'] == 'on')) {
+			$reverse_external_domain = strstr($settings['reverse_external_fqdn'], '.');
+			$conf .= "acl OWA_URI_pfs url_regex -i ^https://autodiscover$reverse_external_domain/AutoDiscover/AutoDiscover.xml\n";
+		}
+			}	
 	//$conf .= "ssl_unclean_shutdown on";
 	if (is_array($reverse_maps))
 	 foreach ($reverse_maps as $rm){
