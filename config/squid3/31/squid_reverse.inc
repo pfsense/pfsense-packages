@@ -182,8 +182,8 @@ function squid_resync_reverse() {
 		if (($settings['reverse_owa'] == 'on') && (!empty($settings['reverse_owa_ip'])) && ($settings['reverse_owa_autodiscover'] == 'on')) {
 			$reverse_external_domain = strstr($settings['reverse_external_fqdn'], '.');
 			$conf .= "acl OWA_URI_pfs url_regex -i ^https://autodiscover{$reverse_external_domain}/AutoDiscover/AutoDiscover.xml\n";
-		}
 			}
+		}
 	//$conf .= "ssl_unclean_shutdown on";
 	if (is_array($reverse_maps))
 	 foreach ($reverse_maps as $rm){
