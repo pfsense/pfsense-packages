@@ -59,6 +59,20 @@ function custom_php_validation_command($post, &$input_errors) {
 	unset($_POST['testconnection']);
 }
 
+function configure_proxy($config) {
+        $ret = array();
+        if (!empty($config['system']['proxyurl'])) {
+                $ret[CURLOPT_PROXY] = $config['system']['proxyurl'];
+                if (!empty($config['system']['proxyport']))
+                        $ret[CURLOPT_PROXYPORT] = $config['system']['proxyport'];
+                if (!empty($config['system']['proxyuser']) && !empty($config['system']['proxypass'])) {
+                        $ret[CURLOPT_PROXYAUTH] = CURLAUTH_ANY | CURLAUTH_ANYSAFE;
+                        $ret[CURLOPT_PROXYUSERPWD] = "{$config['system']['proxyuser']}:{$config['system']['proxypass']}";
+                }
+        }
+        return $ret;
+}
+
 function test_connection($post) {
 	global $savemsg, $config, $g;
 
@@ -93,6 +107,9 @@ function test_connection($post) {
 	curl_setopt($curl_session, CURLOPT_RETURNTRANSFER, 1);
 	curl_setopt($curl_session, CURLOPT_CONNECTTIMEOUT, 55);
 	curl_setopt($curl_session, CURLOPT_TIMEOUT, 30);
+	curl_setopt($curl_session, CURLOPT_USERAGENT, $g['product_name'] . '/' . rtrim(file_get_contents("/etc/version")));
+	// Proxy
+	curl_setopt_array($curl_session, configure_proxy($config));
 
 	curl_setopt($curl_session, CURLOPT_POSTFIELDS, "action=showbackups&hostname={$hostname}");
 	$data = curl_exec($curl_session);
@@ -202,7 +219,10 @@ function upload_config($reasonm = "") {
 				curl_setopt($curl_session, CURLOPT_SSL_VERIFYPEER, 0);
 				curl_setopt($curl_session, CURLOPT_CONNECTTIMEOUT, 55);
 				curl_setopt($curl_session, CURLOPT_TIMEOUT, 30);
-
+				curl_setopt($curl_session, CURLOPT_USERAGENT, $g['product_name'] . '/' . rtrim(file_get_contents("/etc/version")));
+				// Proxy
+				curl_setopt_array($curl_session, configure_proxy($config));
+				
 				$data = curl_exec($curl_session);
 				if (curl_errno($curl_session)) {
 					$fd = fopen("/tmp/backupdebug.txt", "w");
