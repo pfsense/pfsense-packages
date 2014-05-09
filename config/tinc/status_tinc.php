@@ -6,7 +6,15 @@ require("guiconfig.inc");
 function tinc_status_1() {
         exec("/usr/local/sbin/tincd --config=/usr/local/etc/tinc -kUSR1");
 	usleep(500000);
-        exec("/usr/sbin/clog /var/log/tinc.log | sed -e 's/.*tinc\[.*\]: //'",$result);
+	$clog_path = "";
+	$result = array();
+	if (is_executable("/usr/local/sbin/clog")) {
+		$clog_path = "/usr/local/sbin/clog";
+	} elseif (is_executable("/usr/sbin/clog")) {
+		$clog_path = "/usr/sbin/clog";
+
+	if (!empty($clog_path))
+		exec("{$clog_path} /var/log/tinc.log | sed -e 's/.*tinc\[.*\]: //'",$result);
         $i=0;
         foreach($result as $line)
         {
@@ -30,7 +38,15 @@ function tinc_status_1() {
 function tinc_status_2() {
         exec("/usr/local/sbin/tincd --config=/usr/local/etc/tinc -kUSR2");
 	usleep(500000);
-        exec("/usr/sbin/clog /var/log/tinc.log | sed -e 's/.*tinc\[.*\]: //'",$result);
+	$clog_path = "";
+	$result = array();
+	if (is_executable("/usr/local/sbin/clog")) {
+		$clog_path = "/usr/local/sbin/clog";
+	} elseif (is_executable("/usr/sbin/clog")) {
+		$clog_path = "/usr/sbin/clog";
+
+	if (!empty($clog_path))
+		exec("{$clog_path} /var/log/tinc.log | sed -e 's/.*tinc\[.*\]: //'",$result);
         $i=0;
         foreach($result as $line)
         {
