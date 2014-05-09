@@ -130,4 +130,3 @@
 		return strpos(strtolower($str), strtolower($needle));
 	}
 
-?>
