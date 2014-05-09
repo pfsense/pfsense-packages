@@ -1245,7 +1245,7 @@ function mail_report_get_log($logfile, $tail, $grepfor) {
 		} else {
 			if (is_executable("/usr/local/sbin/clog")) {
 				exec("/usr/local/sbin/clog {$logfile}{$grepline}| grep -v \"CLOG\" | grep -v \"\033\" | /usr/bin/tail -n {$tail}", $logarr);
-			} elseif (is_executable("/usr/local/sbin/clog")) {
+			} elseif (is_executable("/usr/sbin/clog")) {
 				exec("/usr/sbin/clog {$logfile}{$grepline}| grep -v \"CLOG\" | grep -v \"\033\" | /usr/bin/tail -n {$tail}", $logarr);
 			} else {
 				$logarr = array("Cannot locate clog which is required for reading log files.");
