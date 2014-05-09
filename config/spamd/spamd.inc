@@ -324,7 +324,7 @@ function spamd_install_cron($should_install) {
 	}
 }
 
-function spamd_validate_input($post, $input_errors) {
+function spamd_validate_input($post, &$input_errors) {
 	global $config, $g;
 	$nextmta = str_replace("$", "", $post['nextmta']);
 	if(stristr($nextmta, "{")) {
