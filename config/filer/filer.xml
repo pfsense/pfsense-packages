@@ -43,7 +43,7 @@
     <requirements>Describe your package requirements here</requirements>
     <faq>Currently there are no FAQ items provided.</faq>
 	<name>filer</name>
-	<version>0.5</version>
+	<version>0.60.1</version>
 	<title>Filer</title>
 	<include_file>/usr/local/pkg/filer.inc</include_file>
 	<additional_files_needed>
@@ -156,7 +156,7 @@
 	<custom_php_command_before_form>
 	</custom_php_command_before_form>
 	<custom_php_validation_command>
-		filer_validate_input($_POST, &amp;$input_errors);
+		filer_validate_input($_POST, $input_errors);
 	</custom_php_validation_command>
 	<custom_delete_php_command>
 		sync_package_filer();
