@@ -46,7 +46,7 @@
 	<requirements>Describe your package requirements here</requirements>
 	<faq>Currently there are no FAQ items provided.</faq>
 	<name>zebedee</name>
-	<version>0.1</version>
+	<version>1.2.1</version>
 	<title>Zebedee Tunneling</title>
 	<include_file>/usr/local/pkg/zebedee.inc</include_file>
 	<menu>
@@ -296,7 +296,7 @@
 		zebedee_php_deinstall_command();
 	</custom_php_deinstall_command>
 	<custom_php_validation_command>
-		zebedee_validate_input($_POST, &amp;$input_errors);
+		zebedee_validate_input($_POST, $input_errors);
 	</custom_php_validation_command>	
 	<custom_php_resync_config_command>
 		sync_package_zebedee();
