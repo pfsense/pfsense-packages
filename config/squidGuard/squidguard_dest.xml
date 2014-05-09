@@ -172,10 +172,10 @@
 				</field>
 				</fields>
 	<custom_php_command_before_form>
-				squidguard_before_form_dest(&amp;$pkg);
+				squidguard_before_form_dest($pkg);
 	</custom_php_command_before_form>
 	<custom_php_validation_command>
-				squidguard_validate_destination($_POST, &amp;$input_errors);
+				squidguard_validate_destination($_POST, $input_errors);
 	</custom_php_validation_command>
 	<custom_php_resync_config_command>
 				squidguard_resync_dest();
