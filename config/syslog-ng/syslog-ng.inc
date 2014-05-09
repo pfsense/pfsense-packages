@@ -61,7 +61,7 @@ function syslogng_deinstall_command() {
 	filter_configure();
 }
 
-function syslogng_validate_general($post, $input_errors) {
+function syslogng_validate_general($post, &$input_errors) {
 	global $config;
 	
 	$objects = $config['installedpackages']['syslogngadvanced']['config'];
@@ -100,7 +100,7 @@ function syslogng_validate_general($post, $input_errors) {
 		$input_errors[] = "Syslog-ng syntax test failed:\n" . $errors;
 }
 
-function syslogng_validate_advanced($post, $input_errors) {
+function syslogng_validate_advanced($post, &$input_errors) {
 	global $config;
 	
 	$objects = $config['installedpackages']['syslogngadvanced']['config'];

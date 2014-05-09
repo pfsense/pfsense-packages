@@ -42,7 +42,7 @@
     <requirements>Describe your package requirements here</requirements>
     <faq>Currently there are no FAQ items provided.</faq>
 	<name>Syslog-ng</name>
-	<version>3.3.4_1</version>
+	<version>3.5.4.1_1 pkg.v.1.0.1</version>
 	<title>Services: Syslog-ng</title>
 	<include_file>/usr/local/pkg/syslog-ng.inc</include_file>
 	<menu>
@@ -177,7 +177,7 @@
 		</field>
     </fields>
 	<custom_php_validation_command>
-		syslogng_validate_general($_POST, &amp;$input_errors);
+		syslogng_validate_general($_POST, $input_errors);
 	</custom_php_validation_command>
 	<custom_php_resync_config_command>
 		syslogng_resync();
