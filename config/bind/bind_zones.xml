@@ -434,7 +434,7 @@
 	<custom_php_validation_command>
 		if ($_POST['type']=="master")
 			$_POST['serial']=(date("U")+ 1000000000);
-		bind_zone_validate($_POST, &amp;$input_errors);
+		bind_zone_validate($_POST, $input_errors);
 	</custom_php_validation_command>
 	<custom_delete_php_command>
 	        bind_sync();
