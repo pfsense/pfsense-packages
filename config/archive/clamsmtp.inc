@@ -20,7 +20,7 @@ function clamsmtp_install_command() {
 	clamsmtp_resync();
 }
 
-function clamsmtp_validate_input($post, $input_errors) {
+function clamsmtp_validate_input($post, &$input_errors) {
 	if (!is_ipaddr(trim($post['smtp_server'])))
 		$input_errors[] = 'The field \'SMTP server\' must contain a valid IP address.';
 	$port = trim($post['smtp_port']);
