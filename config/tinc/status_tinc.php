@@ -12,8 +12,9 @@ function tinc_status_1() {
 		$clog_path = "/usr/local/sbin/clog";
 	} elseif (is_executable("/usr/sbin/clog")) {
 		$clog_path = "/usr/sbin/clog";
+	}
 
-	if (!empty($clog_path))
+	if (!empty($clog_path)) {
 		exec("{$clog_path} /var/log/tinc.log | sed -e 's/.*tinc\[.*\]: //'",$result);
         $i=0;
         foreach($result as $line)
@@ -32,7 +33,8 @@ function tinc_status_1() {
                         $output .= $line . "\n";
                 $i++;
         }
-        return $output;
+	}
+	return $output;
 }
 
 function tinc_status_2() {
@@ -44,8 +46,9 @@ function tinc_status_2() {
 		$clog_path = "/usr/local/sbin/clog";
 	} elseif (is_executable("/usr/sbin/clog")) {
 		$clog_path = "/usr/sbin/clog";
+	}
 
-	if (!empty($clog_path))
+	if (!empty($clog_path)) {
 		exec("{$clog_path} /var/log/tinc.log | sed -e 's/.*tinc\[.*\]: //'",$result);
         $i=0;
         foreach($result as $line)
@@ -64,7 +67,8 @@ function tinc_status_2() {
                         $output .= $line . "\n";
                 $i++;
         }
-        return $output;
+	}
+	return $output;
 }
 
 $shortcut_section = "tinc";
