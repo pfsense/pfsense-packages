@@ -60,7 +60,12 @@ define('SURICATA_PKG_VER', $suricata_package_version);
 define('SURICATA_PF_TABLE', 'snort2c');
 
 // Create some other useful defines
-define('SURICATADIR', '/usr/pbi/suricata-' . php_uname("m") . '/etc/suricata/');
+$pf_version=substr(trim(file_get_contents("/etc/version")),0,3);
+if ($pf_version >= 2.2)
+	define('SURICATADIR', '/usr/pbi/suricata-' . php_uname("m") . '/local/etc/suricata/');
+else
+	define('SURICATADIR', '/usr/pbi/suricata-' . php_uname("m") . '/etc/suricata/');
+
 define('SURICATALOGDIR', '/var/log/suricata/');
 define('RULES_UPD_LOGFILE', SURICATALOGDIR . 'suricata_rules_update.log');
 define('ENFORCING_RULES_FILENAME', 'suricata.rules');
