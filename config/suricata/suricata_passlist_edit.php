@@ -114,7 +114,12 @@ if ($_POST['save']) {
 	/* input validation */
 	$reqdfields = explode(" ", "name");
 	$reqdfieldsn = explode(",", "Name");
-	do_input_validation($_POST, $reqdfields, $reqdfieldsn, &$input_errors);
+
+	$pf_version=substr(trim(file_get_contents("/etc/version")),0,3);
+	if ($pf_version < 2.1)
+		$input_errors = eval('do_input_validation($_POST, $reqdfields, $reqdfieldsn, &$input_errors); return $input_errors;');
+	else
+		do_input_validation($_POST, $reqdfields, $reqdfieldsn, $input_errors);
 
 	if(strtolower($_POST['name']) == "defaultpasslist")
 		$input_errors[] = gettext("Pass List file names may not be named defaultpasslist.");
