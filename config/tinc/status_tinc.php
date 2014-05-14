@@ -14,25 +14,24 @@ function tinc_status_1() {
 		$clog_path = "/usr/sbin/clog";
 	}
 
-	if (!empty($clog_path)) {
+	if (!empty($clog_path))
 		exec("{$clog_path} /var/log/tinc.log | sed -e 's/.*tinc\[.*\]: //'",$result);
-        $i=0;
-        foreach($result as $line)
-        {
-                if(preg_match("/Connections:/",$line))
-                        $begin=$i;
-                if(preg_match("/End of connections./",$line))
-                        $end=$i;
-                $i++;
-        }
-        $output="";
-        $i=0;
-        foreach($result as $line)
-        {
-                if($i >= $begin && $i<= $end)
-                        $output .= $line . "\n";
-                $i++;
-        }
+	$i=0;
+	foreach($result as $line)
+	{
+		if(preg_match("/Connections:/",$line))
+			$begin=$i;
+		if(preg_match("/End of connections./",$line))
+			$end=$i;
+		$i++;
+	}
+	$output="";
+	$i=0;
+	foreach($result as $line)
+	{
+		if($i >= $begin && $i<= $end)
+			$output .= $line . "\n";
+		$i++;
 	}
 	return $output;
 }
@@ -48,25 +47,24 @@ function tinc_status_2() {
 		$clog_path = "/usr/sbin/clog";
 	}
 
-	if (!empty($clog_path)) {
+	if (!empty($clog_path))
 		exec("{$clog_path} /var/log/tinc.log | sed -e 's/.*tinc\[.*\]: //'",$result);
-        $i=0;
-        foreach($result as $line)
-        {
-                if(preg_match("/Statistics for Generic BSD tun device/",$line))
-                        $begin=$i;
-                if(preg_match("/End of subnet list./",$line))
-                        $end=$i;
-                $i++;
-        }
-        $output="";
-        $i=0;
-        foreach($result as $line)
-        {
-                if($i >= $begin && $i<= $end)
-                        $output .= $line . "\n";
-                $i++;
-        }
+	$i=0;
+	foreach($result as $line)
+	{
+		if(preg_match("/Statistics for Generic BSD tun device/",$line))
+			$begin=$i;
+		if(preg_match("/End of subnet list./",$line))
+			$end=$i;
+		$i++;
+	}
+	$output="";
+	$i=0;
+	foreach($result as $line)
+	{
+		if($i >= $begin && $i<= $end)
+			$output .= $line . "\n";
+		$i++;
 	}
 	return $output;
 }
