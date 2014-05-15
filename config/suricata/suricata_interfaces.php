@@ -57,6 +57,10 @@ if (!is_array($config['installedpackages']['suricata']['rule']))
 $a_nat = &$config['installedpackages']['suricata']['rule'];
 $id_gen = count($config['installedpackages']['suricata']['rule']);
 
+// Get list of configured firewall interfaces
+$ifaces = get_configured_interface_list();
+
+
 if ($_POST['del_x']) {
 	/* delete selected interfaces */
 	if (is_array($_POST['rule'])) {
@@ -207,9 +211,22 @@ include_once("head.inc");
 			<th class="listhdrr"><?php echo gettext("Block"); ?></th>
 			<th class="listhdrr"><?php echo gettext("Barnyard2"); ?></th>
 			<th class="listhdr"><?php echo gettext("Description"); ?></th>
-			<th class="list"><a href="suricata_interfaces_edit.php?id=<?php echo $id_gen;?>">
-				<img src="../themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif"
-				width="17" height="17" border="0" title="<?php echo gettext('Add Suricata interface mapping');?>"></a>
+			<th class="list">
+				<?php if ($id_gen < count($ifaces)): ?>
+					<a href="suricata_interfaces_edit.php?id=<?php echo $id_gen;?>">
+					<img src="../themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif"
+					width="17" height="17" border="0" title="<?php echo gettext('Add Suricata interface mapping');?>"></a>
+				<?php else: ?>
+					<img src="../themes/<?= $g['theme']; ?>/images/icons/icon_plus_d.gif" width="17" height="17" border="0" 
+					title="<?php echo gettext('No available interfaces for a new Suricata mapping');?>">
+				<?php endif; ?>
+				<?php if ($id_gen == 0): ?>
+					<img src="../themes/<?= $g['theme']; ?>/images/icons/icon_x_d.gif" width="17" height="17" " border="0">
+				<?php else: ?>
+					<input name="del" type="image" src="../themes/<?= $g['theme']; ?>/images/icons/icon_x.gif" 
+					width="17" height="17" title="<?php echo gettext("Delete selected Suricata interface mapping(s)"); ?>"
+					onclick="return intf_del()">
+				<?php endif; ?>
 			</th>
 		</tr>
 		</thead>
@@ -342,7 +359,15 @@ include_once("head.inc");
 			<td valign="middle" class="list" nowrap>
 				<a href="suricata_interfaces_edit.php?id=<?=$i;?>">
 				<img src="/themes/<?= $g['theme']; ?>/images/icons/icon_e.gif"
-				width="17" height="17" border="0" title="<?php echo gettext('Edit Suricata interface mapping'); ?>"></a>
+				width="17" height="17" border="0" title="<?php echo gettext('Edit this Suricata interface mapping'); ?>"></a>
+				<?php if ($id_gen < count($ifaces)): ?>
+					<a href="suricata_interfaces_edit.php?id=<?=$i;?>&action=dup">
+					<img src="/themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif"
+					width="17" height="17" border="0" title="<?php echo gettext('Add new interface mapping based on this one'); ?>"></a>
+				<?php else: ?>
+					<img src="/themes/<?= $g['theme']; ?>/images/icons/icon_plus_d.gif" width="17" height="17" border="0" 
+					title="<?php echo gettext('No available interfaces for a new Suricata mapping');?>">
+				<?php endif; ?>
 			</td>	
 		</tr>
 		<?php $i++; $nnats++; endforeach; ob_end_flush(); ?>
@@ -354,8 +379,16 @@ include_once("head.inc");
 				<?php else: ?>&nbsp;
 				<?php endif; ?>					 
 			</td>
-			<td class="list" valign="middle" nowrap>
-				<?php if ($nnats == 0): ?>
+			<td class="list">
+				<?php if ($id_gen < count($ifaces)): ?>
+					<a href="suricata_interfaces_edit.php?id=<?php echo $id_gen;?>">
+					<img src="../themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif"
+					width="17" height="17" border="0" title="<?php echo gettext('Add Suricata interface mapping');?>"></a>
+				<?php else: ?>
+					<img src="../themes/<?= $g['theme']; ?>/images/icons/icon_plus_d.gif" width="17" height="17" border="0" 
+					title="<?php echo gettext('No available interfaces for a new Suricata mapping');?>">
+				<?php endif; ?>
+				<?php if ($id_gen == 0): ?>
 					<img src="../themes/<?= $g['theme']; ?>/images/icons/icon_x_d.gif" width="17" height="17" " border="0">
 				<?php else: ?>
 					<input name="del" type="image" src="../themes/<?= $g['theme']; ?>/images/icons/icon_x.gif" 
