@@ -54,7 +54,7 @@ if (empty($snort_version))
 	$snort_version = "2.9.6.0";
 
 /* Used to indicate latest version of this include file has been loaded */
-$pfSense_snort_version = "3.0.8";
+$pfSense_snort_version = "3.0.9";
 
 /* get installed package version for display */
 $snort_package_version = "Snort {$config['installedpackages']['package'][get_pkg_id("snort")]['version']}";
