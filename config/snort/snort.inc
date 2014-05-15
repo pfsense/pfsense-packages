@@ -61,13 +61,17 @@ $snort_package_version = "Snort {$config['installedpackages']['package'][get_pkg
 
 // Define SNORTDIR and SNORTLIBDIR constants according to pfSense version
 $pfs_version=substr(trim(file_get_contents("/etc/version")),0,3);
-if ($pfs_version > 2.0) {
-	define("SNORTDIR", "/usr/pbi/snort-" . php_uname("m") . "/etc/snort");
-	define("SNORTLIBDIR", "/usr/pbi/snort-" . php_uname("m") . "/lib/snort");
-}
-else {
+if ($pfs_version < 2.1) {
 	define("SNORTDIR", "/usr/local/etc/snort");
 	define("SNORTLIBDIR", "/usr/local/lib/snort");
+}
+elseif ($pfs_version >= 2.2) {
+	define("SNORTDIR", "/usr/pbi/snort-" . php_uname("m") . "/local/etc/snort");
+	define("SNORTLIBDIR", "/usr/pbi/snort-" . php_uname("m") . "/local/lib/snort");
+}
+else {
+	define("SNORTDIR", "/usr/pbi/snort-" . php_uname("m") . "/etc/snort");
+	define("SNORTLIBDIR", "/usr/pbi/snort-" . php_uname("m") . "/lib/snort");
 }
 
 /* Define some useful constants for Snort */
