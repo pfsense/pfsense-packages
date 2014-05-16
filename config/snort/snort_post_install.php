@@ -488,14 +488,35 @@ preprocessor ftp_telnet_protocol: telnet \
 EOD;
 
 	$pop_ports = str_replace(",", " ", snort_expand_port_range($snort_ports['pop3_ports']));
+	if (isset($snortcfg['pop_memcap']))
+		$pop_memcap = $snortcfg['pop_memcap'];
+	else
+		$pop_memcap = "838860";
+	if (isset($snortcfg['pop_qp_decode_depth']))
+		$pop_qp_decode_depth = $snortcfg['pop_qp_decode_depth'];
+	else
+		$pop_qp_decode_depth = "0";
+	if (isset($snortcfg['pop_b64_decode_depth']))
+		$pop_b64_decode_depth = $snortcfg['pop_b64_decode_depth'];
+	else
+		$pop_b64_decode_depth = "0";
+	if (isset($snortcfg['pop_bitenc_decode_depth']))
+		$pop_bitenc_decode_depth = $snortcfg['pop_bitenc_decode_depth'];
+	else
+		$pop_bitenc_decode_depth = "0";
+	if (isset($snortcfg['pop_uu_decode_depth']))
+		$pop_uu_decode_depth = $snortcfg['pop_uu_decode_depth'];
+	else
+		$pop_uu_decode_depth = "0";
 	$pop_preproc = <<<EOD
 # POP preprocessor #
 preprocessor pop: \
 	ports { {$pop_ports} } \
-	memcap 1310700 \
-	qp_decode_depth 0 \
-	b64_decode_depth 0 \
-	bitenc_decode_depth 0
+	memcap {$pop_memcap} \
+	qp_decode_depth {$pop_qp_decode_depth} \
+	b64_decode_depth {$pop_b64_decode_depth} \
+	bitenc_decode_depth {$pop_bitenc_decode_depth} \
+	uu_decode_depth {$pop_uu_decode_depth}
 
 EOD;
 

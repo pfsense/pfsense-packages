@@ -357,6 +357,28 @@ foreach ($rule as &$r) {
 		$updated_cfg = true;
 	}
 
+	// Migrate new POP3 preprocessor parameter settings
+	if (empty($pconfig['pop_memcap'])) {
+		$pconfig['pop_memcap'] = "838860";
+		$updated_cfg = true;
+	}
+	if (empty($pconfig['pop_b64_decode_depth']) && $pconfig['pop_b64_decode_depth'] != '0') {
+		$pconfig['pop_b64_decode_depth'] = "0";
+		$updated_cfg = true;
+	}
+	if (empty($pconfig['pop_qp_decode_depth']) && $pconfig['pop_qp_decode_depth'] != '0') {
+		$pconfig['pop_qp_decode_depth'] = "0";
+		$updated_cfg = true;
+	}
+	if (empty($pconfig['pop_bitenc_decode_depth']) && $pconfig['pop_bitenc_decode_depth'] != '0') {
+		$pconfig['pop_bitenc_decode_depth'] = "0";
+		$updated_cfg = true;
+	}
+	if (empty($pconfig['pop_uu_decode_depth']) && $pconfig['pop_uu_decode_depth'] != '0') {
+		$pconfig['pop_uu_decode_depth'] = "0";
+		$updated_cfg = true;
+	}
+
 	// Save the new configuration data into the $config array pointer
 	$r = $pconfig;
 }

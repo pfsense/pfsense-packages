@@ -269,6 +269,11 @@ if ($_POST["save"] && !$input_errors) {
 			$natent['dns_preprocessor'] = 'on';
 			$natent['ssl_preproc'] = 'on';
 			$natent['pop_preproc'] = 'on';
+			$natent['pop_memcap'] = "838860";
+			$natent['pop_b64_decode_depth'] = "0";
+			$natent['pop_qp_decode_depth'] = "0";
+			$natent['pop_bitenc_decode_depth'] = "0";
+			$natent['pop_uu_decode_depth'] = "0";
 			$natent['imap_preproc'] = 'on';
 			$natent['sip_preproc'] = 'on';
 			$natent['other_preprocs'] = 'on';
