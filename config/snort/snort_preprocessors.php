@@ -139,6 +139,17 @@ if (isset($id) && isset($a_nat[$id])) {
 
 	if (empty($pconfig['imap_preproc']))
 		$pconfig['imap_preproc'] = 'on';
+	if (empty($pconfig['imap_memcap']))
+		$pconfig['imap_memcap'] = "838860";
+	if (empty($pconfig['imap_b64_decode_depth']))
+		$pconfig['imap_b64_decode_depth'] = "0";
+	if (empty($pconfig['imap_qp_decode_depth']))
+		$pconfig['imap_qp_decode_depth'] = "0";
+	if (empty($pconfig['imap_bitenc_decode_depth']))
+		$pconfig['imap_bitenc_decode_depth'] = "0";
+	if (empty($pconfig['imap_uu_decode_depth']))
+		$pconfig['imap_uu_decode_depth'] = "0";
+
 	if (empty($pconfig['sip_preproc']))
 		$pconfig['sip_preproc'] = 'on';
 	if (empty($pconfig['other_preprocs']))
@@ -302,6 +313,11 @@ if ($_POST['ResetAll']) {
 	$pconfig['pop_bitenc_decode_depth'] = "0";
 	$pconfig['pop_uu_decode_depth'] = "0";
 	$pconfig['imap_preproc'] = "on";
+	$pconfig['imap_memcap'] = "838860";
+	$pconfig['imap_b64_decode_depth'] = "0";
+	$pconfig['imap_qp_decode_depth'] = "0";
+	$pconfig['imap_bitenc_decode_depth'] = "0";
+	$pconfig['imap_uu_decode_depth'] = "0";
 	$pconfig['sip_preproc'] = "on";
 	$pconfig['dnp3_preproc'] = "off";
 	$pconfig['modbus_preproc'] = "off";
@@ -343,6 +359,20 @@ if ($_POST['save']) {
 			$input_errors[] = gettext("The value for POP3 Decoder Unix-to-Unix (UU) Decode Depth must be between -1 and 65,535.");
 	}
 
+	// Validate IMAP parameter values if IMAP Decoder is enabled
+	if ($_POST['imap_preproc'] == 'on') {
+		if ($_POST['imap_memcap'] < 3276 || $_POST['imap_memcap'] > 104857600)
+			$input_errors[] = gettext("The value for IMAP Decoder Memory Cap must be between 3,276 and 104,857,600.");
+		if ($_POST['imap_b64_decode_depth'] < -1 || $_POST['imap_b64_decode_depth'] > 65535)
+			$input_errors[] = gettext("The value for IMAP Decoder Base64 Decode Depth must be between -1 and 65,535.");
+		if ($_POST['imap_qp_decode_depth'] < -1 || $_POST['imap_qp_decode_depth'] > 65535)
+			$input_errors[] = gettext("The value for IMAP Decoder Quoted-Printable (QP) Decode Depth must be between -1 and 65,535.");
+		if ($_POST['imap_bitenc_decode_depth'] < -1 || $_POST['imap_bitenc_decode_depth'] > 65535)
+			$input_errors[] = gettext("The value for IMAP Decoder Non-Encoded MIME Extraction Depth must be between -1 and 65,535.");
+		if ($_POST['imap_uu_decode_depth'] < -1 || $_POST['imap_uu_decode_depth'] > 65535)
+			$input_errors[] = gettext("The value for IMAP Decoder Unix-to-Unix (UU) Decode Depth must be between -1 and 65,535.");
+	}
+
 	/* if no errors write to conf */
 	if (!$input_errors) {
 		/* post new options */
@@ -373,6 +403,11 @@ if ($_POST['save']) {
 		if ($_POST['pop_qp_decode_depth'] != "") { $natent['pop_qp_decode_depth'] = $_POST['pop_qp_decode_depth']; }else{ $natent['pop_qp_decode_depth'] = "0"; }
 		if ($_POST['pop_bitenc_decode_depth'] != "") { $natent['pop_bitenc_decode_depth'] = $_POST['pop_bitenc_decode_depth']; }else{ $natent['pop_bitenc_decode_depth'] = "0"; }
 		if ($_POST['pop_uu_decode_depth'] != "") { $natent['pop_uu_decode_depth'] = $_POST['pop_uu_decode_depth']; }else{ $natent['pop_uu_decode_depth'] = "0"; }
+		if ($_POST['imap_memcap'] != "") { $natent['imap_memcap'] = $_POST['imap_memcap']; }else{ $natent['imap_memcap'] = "838860"; }
+		if ($_POST['imap_b64_decode_depth'] != "") { $natent['imap_b64_decode_depth'] = $_POST['imap_b64_decode_depth']; }else{ $natent['imap_b64_decode_depth'] = "0"; }
+		if ($_POST['imap_qp_decode_depth'] != "") { $natent['imap_qp_decode_depth'] = $_POST['imap_qp_decode_depth']; }else{ $natent['imap_qp_decode_depth'] = "0"; }
+		if ($_POST['imap_bitenc_decode_depth'] != "") { $natent['imap_bitenc_decode_depth'] = $_POST['imap_bitenc_decode_depth']; }else{ $natent['imap_bitenc_decode_depth'] = "0"; }
+		if ($_POST['imap_uu_decode_depth'] != "") { $natent['imap_uu_decode_depth'] = $_POST['imap_uu_decode_depth']; }else{ $natent['imap_uu_decode_depth'] = "0"; }
 
 		// Set SDF inspection types
 		$natent['sdf_alert_data_type'] = implode(",",$_POST['sdf_alert_data_type']);
@@ -1362,8 +1397,9 @@ if ($savemsg) {
 			<?php echo gettext("Maximum memory in bytes to use for decoding attachments.  ") . 
 			gettext("Default is ") . "<strong>" . gettext("838860") . "</strong>" . 
 			gettext(" bytes."); ?><br/><br/>
-		<?php echo gettext("The minimum value is ") . "<strong>" . gettext("3276") . "</strong>" . gettext(" bytes and the maximum is ") . 
-		"<strong>" . gettext("100 MB") . "</strong>" . gettext(" (104857600)."); ?>
+			<?php echo gettext("The minimum value is ") . "<strong>" . gettext("3276") . "</strong>" . gettext(" bytes and the maximum is ") . 
+			"<strong>" . gettext("100 MB") . "</strong>" . gettext(" (104857600). An IMAP preprocessor alert with sid 3 is ") . 
+			gettext("generated (when enabled) if this limit is exceeded."); ?>
 		</td>
 	</tr>
 	<tr>
@@ -1395,8 +1431,7 @@ if ($savemsg) {
 			<?php echo gettext("Allowable values range from ") . "<strong>" . gettext("-1") . "</strong>" . gettext(" to ") . "<strong>" . gettext("65535") . "</strong>" . 
 			gettext(". A value of ") . "<strong>" . gettext("-1") . "</strong>" . gettext(" turns off the extraction of non-encoded MIME attachments. ") . 
 			gettext("A value of ") . "<strong>" . gettext("0") . "</strong>" . gettext(" sets the extraction of non-encoded MIME attachments to unlimited. ") . 
-			gettext("A value other than 0 or -1 restricts the extraction of non-encoded MIME attachments, and applies per attachment. A POP preprocessor alert with sid 6 ") . 
-			gettext("is generated (if enabled) when the extraction fails.");?>
+			gettext("A value other than 0 or -1 restricts the extraction of non-encoded MIME attachments, and applies per attachment.");?>
 		</td>
 	</tr>
 	<tr>
@@ -1412,6 +1447,75 @@ if ($savemsg) {
 	</tr>
 	</tbody>
 	<tr>
+		<td colspan="2" valign="top" class="listtopic"><?php echo gettext("IMAP Decoder Settings"); ?></td>
+	</tr>
+	<tr>
+		<td width="22%" valign="top" class="vncell"><?php echo gettext("Enable IMAP Normalizer"); ?></td>
+		<td width="78%" class="vtable"><input name="imap_preproc" type="checkbox" value="on" 
+			<?php if ($pconfig['imap_preproc']=="on") echo "checked"; ?> onclick="imap_enable_change();"/>
+			<?php echo gettext("Normalize/Decode IMAP protocol for enforcement and buffer overflows.  Default is ") . 
+			"<strong>" . gettext("Checked") . "</strong>."; ?>
+		</td>
+	</tr>
+	<tbody id="imap_setting_rows">
+	<tr>
+		<td width="22%" valign="top" class="vncell"><?php echo gettext("Memory Cap"); ?></td>
+		<td width="78%" class="vtable">
+			<input name="imap_memcap" type="text" class="formfld unknown" id="imap_memcap" size="9" 
+			value="<?=htmlspecialchars($pconfig['imap_memcap']);?>">
+			<?php echo gettext("Maximum memory in bytes to use for decoding attachments.  ") . 
+			gettext("Default is ") . "<strong>" . gettext("838860") . "</strong>" . 
+			gettext(" bytes."); ?><br/><br/>
+			<?php echo gettext("The minimum value is ") . "<strong>" . gettext("3276") . "</strong>" . gettext(" bytes and the maximum is ") . 
+			"<strong>" . gettext("100 MB") . "</strong>" . gettext(" (104857600). An IMAP preprocessor alert with sid 3 is ") . 
+			gettext("generated (when enabled) if this limit is exceeded."); ?>
+		</td>
+	</tr>
+	<tr>
+		<td width="22%" valign="top" class="vncell"><?php echo gettext("Base64 Decoding Depth"); ?></td>
+		<td width="78%" class="vtable"><input name="imap_b64_decode_depth" type="text" class="formfld unknown" id="imap_b64_decode_depth" size="9" value="<?=htmlspecialchars($pconfig['imap_b64_decode_depth']);?>">
+			<?php echo gettext("Depth in bytes to decode base64 encoded MIME attachments.  Default is ") . "<strong>" . gettext("0") . "</strong>" . gettext(" (unlimited)");?>.<br/><br/>
+			<?php echo gettext("Allowable values range from ") . "<strong>" . gettext("-1") . "</strong>" . gettext(" to ") . "<strong>" . gettext("65535") . "</strong>" . 
+			gettext(". A value of ") . "<strong>" . gettext("-1") . "</strong>" . gettext(" turns off the base64 decoding of MIME attachments. ") . 
+			gettext("A value of ") . "<strong>" . gettext("0") . "</strong>" . gettext(" sets the decoding of base64 encoded MIME attachments to unlimited. ") . 
+			gettext("A value other than 0 or -1 restricts the decoding of base64 MIME attachments, and applies per attachment. An IMAP preprocessor alert with sid 4 ") . 
+			gettext("is generated (if enabled) when the decoding fails.");?>
+		</td>
+	</tr>
+	<tr>
+		<td width="22%" valign="top" class="vncell"><?php echo gettext("Quoted Printable Decoding Depth"); ?></td>
+		<td width="78%" class="vtable"><input name="imap_qp_decode_depth" type="text" class="formfld unknown" id="imap_qp_decode_depth" size="9" value="<?=htmlspecialchars($pconfig['imap_qp_decode_depth']);?>">
+			<?php echo gettext("Byte depth to decode Quoted Printable (QP) encoded MIME attachments.  Default is ") . "<strong>" . gettext("0") . "</strong>" . gettext(" (unlimited)");?>.<br/><br/>
+			<?php echo gettext("Allowable values range from ") . "<strong>" . gettext("-1") . "</strong>" . gettext(" to ") . "<strong>" . gettext("65535") . "</strong>" . 
+			gettext(". A value of ") . "<strong>" . gettext("-1") . "</strong>" . gettext(" turns off the QP decoding of MIME attachments. ") . 
+			gettext("A value of ") . "<strong>" . gettext("0") . "</strong>" . gettext(" sets the decoding of QP encoded MIME attachments to unlimited. ") . 
+			gettext("A value other than 0 or -1 restricts the decoding of QP MIME attachments, and applies per attachment. An IMAP preprocessor alert with sid 5 ") . 
+			gettext("is generated (if enabled) when the decoding fails.");?>
+		</td>
+	</tr>
+	<tr>
+		<td width="22%" valign="top" class="vncell"><?php echo gettext("Non-Encoded MIME Extraction Depth"); ?></td>
+		<td width="78%" class="vtable"><input name="imap_bitenc_decode_depth" type="text" class="formfld unknown" id="imap_bitenc_decode_depth" size="9" value="<?=htmlspecialchars($pconfig['imap_bitenc_decode_depth']);?>">
+			<?php echo gettext("Depth in bytes to extract non-encoded MIME attachments.  Default is ") . "<strong>" . gettext("0") . "</strong>" . gettext(" (unlimited)");?>.<br/><br/>
+			<?php echo gettext("Allowable values range from ") . "<strong>" . gettext("-1") . "</strong>" . gettext(" to ") . "<strong>" . gettext("65535") . "</strong>" . 
+			gettext(". A value of ") . "<strong>" . gettext("-1") . "</strong>" . gettext(" turns off the extraction of non-encoded MIME attachments. ") . 
+			gettext("A value of ") . "<strong>" . gettext("0") . "</strong>" . gettext(" sets the extraction of non-encoded MIME attachments to unlimited. ") . 
+			gettext("A value other than 0 or -1 restricts the extraction of non-encoded MIME attachments, and applies per attachment.");?>
+		</td>
+	</tr>
+	<tr>
+		<td width="22%" valign="top" class="vncell"><?php echo gettext("Unix-to-Unix Decoding Depth"); ?></td>
+		<td width="78%" class="vtable"><input name="imap_uu_decode_depth" type="text" class="formfld unknown" id="imap_uu_decode_depth" size="9" value="<?=htmlspecialchars($pconfig['imap_uu_decode_depth']);?>">
+			<?php echo gettext("Depth in bytes to decode Unix-to-Unix (UU) encoded MIME attachments.  Default is ") . "<strong>" . gettext("0") . "</strong>" . gettext(" (unlimited)");?>.<br/><br/>
+			<?php echo gettext("Allowable values range from ") . "<strong>" . gettext("-1") . "</strong>" . gettext(" to ") . "<strong>" . gettext("65535") . "</strong>" . 
+			gettext(". A value of ") . "<strong>" . gettext("-1") . "</strong>" . gettext(" turns off the UU decoding of MIME attachments. ") . 
+			gettext("A value of ") . "<strong>" . gettext("0") . "</strong>" . gettext(" sets the decoding of UU encoded MIME attachments to unlimited. ") . 
+			gettext("A value other than 0 or -1 restricts the decoding of UU MIME attachments, and applies per attachment. An IMAP preprocessor alert with sid 7 ") . 
+			gettext("is generated (if enabled) when the decoding fails.");?>
+		</td>
+	</tr>
+	</tbody>
+	<tr>
 		<td colspan="2" valign="top" class="listtopic"><?php echo gettext("General Preprocessors"); ?></td>
 	</tr>
 	<tr>
@@ -1419,13 +1523,6 @@ if ($savemsg) {
 		<td width="78%" class="vtable"><input name="other_preprocs" type="checkbox" value="on" 
 			<?php if ($pconfig['other_preprocs']=="on") echo "checked"; ?>>
 		<?php echo gettext("Normalize/Decode RPC traffic and detects Back Orifice traffic on the network.  Default is ") . 
-		"<strong>" . gettext("Checked") . "</strong>"; ?>.</td>
-	</tr>
-	<tr>
-		<td width="22%" valign="top" class="vncell"><?php echo gettext("Enable IMAP Normalizer"); ?></td>
-		<td width="78%" class="vtable"><input name="imap_preproc" type="checkbox" value="on" 
-			<?php if ($pconfig['imap_preproc']=="on") echo "checked"; ?>>
-		<?php echo gettext("Normalize/Decode IMAP protocol for enforcement and buffer overflows.  Default is ") . 
 		"<strong>" . gettext("Checked") . "</strong>"; ?>.</td>
 	</tr>
 	<tr>
@@ -1799,6 +1896,16 @@ function pop_enable_change() {
 		document.getElementById("pop_setting_rows").style.display = "";
 }
 
+function imap_enable_change() {
+	var endis = !(document.iform.imap_preproc.checked);
+
+	// Hide IMAP configuration rows if IMAP preprocessor disabled
+	if (endis)
+		document.getElementById("imap_setting_rows").style.display = "none";
+	else
+		document.getElementById("imap_setting_rows").style.display = "";
+}
+
 function enable_change_all() {
 	http_inspect_enable_change();
 	sf_portscan_enable_change();
@@ -1854,6 +1961,7 @@ function enable_change_all() {
 	ftp_telnet_enable_change();
 	sensitive_data_enable_change();
 	pop_enable_change();
+	imap_enable_change();
 }
 
 function wopen(url, name, w, h)

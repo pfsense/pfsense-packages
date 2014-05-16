@@ -379,6 +379,28 @@ foreach ($rule as &$r) {
 		$updated_cfg = true;
 	}
 
+	// Migrate new IMAP preprocessor parameter settings
+	if (empty($pconfig['imap_memcap'])) {
+		$pconfig['imap_memcap'] = "838860";
+		$updated_cfg = true;
+	}
+	if (empty($pconfig['imap_b64_decode_depth']) && $pconfig['imap_b64_decode_depth'] != '0') {
+		$pconfig['imap_b64_decode_depth'] = "0";
+		$updated_cfg = true;
+	}
+	if (empty($pconfig['imap_qp_decode_depth']) && $pconfig['imap_qp_decode_depth'] != '0') {
+		$pconfig['imap_qp_decode_depth'] = "0";
+		$updated_cfg = true;
+	}
+	if (empty($pconfig['imap_bitenc_decode_depth']) && $pconfig['imap_bitenc_decode_depth'] != '0') {
+		$pconfig['imap_bitenc_decode_depth'] = "0";
+		$updated_cfg = true;
+	}
+	if (empty($pconfig['imap_uu_decode_depth']) && $pconfig['imap_uu_decode_depth'] != '0') {
+		$pconfig['imap_uu_decode_depth'] = "0";
+		$updated_cfg = true;
+	}
+
 	// Save the new configuration data into the $config array pointer
 	$r = $pconfig;
 }

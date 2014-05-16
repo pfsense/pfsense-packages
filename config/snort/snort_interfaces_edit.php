@@ -275,6 +275,11 @@ if ($_POST["save"] && !$input_errors) {
 			$natent['pop_bitenc_decode_depth'] = "0";
 			$natent['pop_uu_decode_depth'] = "0";
 			$natent['imap_preproc'] = 'on';
+			$natent['imap_memcap'] = "838860";
+			$natent['imap_b64_decode_depth'] = "0";
+			$natent['imap_qp_decode_depth'] = "0";
+			$natent['imap_bitenc_decode_depth'] = "0";
+			$natent['imap_uu_decode_depth'] = "0";
 			$natent['sip_preproc'] = 'on';
 			$natent['other_preprocs'] = 'on';
 

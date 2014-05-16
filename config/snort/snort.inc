@@ -2955,14 +2955,35 @@ preprocessor pop: \
 EOD;
 
 	$imap_ports = str_replace(",", " ", snort_expand_port_range($snort_ports['imap_ports']));
+	if (isset($snortcfg['imap_memcap']))
+		$imap_memcap = $snortcfg['imap_memcap'];
+	else
+		$imap_memcap = "838860";
+	if (isset($snortcfg['imap_qp_decode_depth']))
+		$imap_qp_decode_depth = $snortcfg['imap_qp_decode_depth'];
+	else
+		$imap_qp_decode_depth = "0";
+	if (isset($snortcfg['imap_b64_decode_depth']))
+		$imap_b64_decode_depth = $snortcfg['imap_b64_decode_depth'];
+	else
+		$imap_b64_decode_depth = "0";
+	if (isset($snortcfg['imap_bitenc_decode_depth']))
+		$imap_bitenc_decode_depth = $snortcfg['imap_bitenc_decode_depth'];
+	else
+		$imap_bitenc_decode_depth = "0";
+	if (isset($snortcfg['imap_uu_decode_depth']))
+		$imap_uu_decode_depth = $snortcfg['imap_uu_decode_depth'];
+	else
+		$imap_uu_decode_depth = "0";
 	$imap_preproc = <<<EOD
 # IMAP preprocessor #
 preprocessor imap: \
 	ports { {$imap_ports} } \
-	memcap 1310700 \
-	qp_decode_depth 0 \
-	b64_decode_depth 0 \
-	bitenc_decode_depth 0
+	memcap {$imap_memcap} \
+	qp_decode_depth {$imap_qp_decode_depth} \
+	b64_decode_depth {$imap_b64_decode_depth} \
+	bitenc_decode_depth {$imap_bitenc_decode_depth} \
+	uu_decode_depth {$imap_uu_decode_depth}
 
 EOD;
 
