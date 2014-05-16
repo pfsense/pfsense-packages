@@ -401,6 +401,56 @@ foreach ($rule as &$r) {
 		$updated_cfg = true;
 	}
 
+	// Migrate new SMTP preprocessor parameter settings
+	if (empty($pconfig['smtp_memcap'])) {
+		$pconfig['smtp_memcap'] = "838860";
+		$updated_cfg = true;
+	}
+	if (empty($pconfig['smtp_max_mime_mem'])) {
+		$pconfig['smtp_max_mime_mem'] = "838860";
+		$updated_cfg = true;
+	}
+	if (empty($pconfig['smtp_b64_decode_depth'])) {
+		$pconfig['smtp_b64_decode_depth'] = "0";
+		$updated_cfg = true;
+	}
+	if (empty($pconfig['smtp_qp_decode_depth'])) {
+		$pconfig['smtp_qp_decode_depth'] = "0";
+		$updated_cfg = true;
+	}
+	if (empty($pconfig['smtp_bitenc_decode_depth'])) {
+		$pconfig['smtp_bitenc_decode_depth'] = "0";
+		$updated_cfg = true;
+	}
+	if (empty($pconfig['smtp_uu_decode_depth'])) {
+		$pconfig['smtp_uu_decode_depth'] = "0";
+		$updated_cfg = true;
+	}
+	if (empty($pconfig['smtp_email_hdrs_log_depth']) && $pconfig['smtp_email_hdrs_log_depth'] != '0') {
+		$pconfig['smtp_email_hdrs_log_depth'] = "1464";
+		$updated_cfg = true;
+	}
+	if (empty($pconfig['smtp_ignore_tls_data'])) {
+		$pconfig['smtp_ignore_tls_data'] = 'on';
+		$updated_cfg = true;
+	}
+	if (empty($pconfig['smtp_log_mail_from'])) {
+		$pconfig['smtp_log_mail_from'] = 'on';
+		$updated_cfg = true;
+	}
+	if (empty($pconfig['smtp_log_rcpt_to'])) {
+		$pconfig['smtp_log_rcpt_to'] = 'on';
+		$updated_cfg = true;
+	}
+	if (empty($pconfig['smtp_log_filename'])) {
+		$pconfig['smtp_log_filename'] = 'on';
+		$updated_cfg = true;
+	}
+	if (empty($pconfig['smtp_log_email_hdrs'])) {
+		$pconfig['smtp_log_email_hdrs'] = 'on';
+		$updated_cfg = true;
+	}
+
 	// Save the new configuration data into the $config array pointer
 	$r = $pconfig;
 }

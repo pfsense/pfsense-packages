@@ -117,6 +117,31 @@ if (isset($id) && isset($a_nat[$id])) {
 
 	if (empty($pconfig['smtp_preprocessor']))
 		$pconfig['smtp_preprocessor'] = 'on';
+	if (empty($pconfig['smtp_memcap']))
+		$pconfig['smtp_memcap'] = "838860";
+	if (empty($pconfig['smtp_max_mime_mem']))
+		$pconfig['smtp_max_mime_mem'] = "838860";
+	if (empty($pconfig['smtp_b64_decode_depth']))
+		$pconfig['smtp_b64_decode_depth'] = "0";
+	if (empty($pconfig['smtp_qp_decode_depth']))
+		$pconfig['smtp_qp_decode_depth'] = "0";
+	if (empty($pconfig['smtp_bitenc_decode_depth']))
+		$pconfig['smtp_bitenc_decode_depth'] = "0";
+	if (empty($pconfig['smtp_uu_decode_depth']))
+		$pconfig['smtp_uu_decode_depth'] = "0";
+	if (empty($pconfig['smtp_email_hdrs_log_depth']) && $pconfig['smtp_email_hdrs_log_depth'] != '0')
+		$pconfig['smtp_email_hdrs_log_depth'] = "1464";
+	if (empty($pconfig['smtp_ignore_tls_data']))
+		$pconfig['smtp_ignore_tls_data'] = 'on';
+	if (empty($pconfig['smtp_log_mail_from']))
+		$pconfig['smtp_log_mail_from'] = 'on';
+	if (empty($pconfig['smtp_log_rcpt_to']))
+		$pconfig['smtp_log_rcpt_to'] = 'on';
+	if (empty($pconfig['smtp_log_filename']))
+		$pconfig['smtp_log_filename'] = 'on';
+	if (empty($pconfig['smtp_log_email_hdrs']))
+		$pconfig['smtp_log_email_hdrs'] = 'on';
+
 	if (empty($pconfig['dce_rpc_2']))
 		$pconfig['dce_rpc_2'] = 'on';
 	if (empty($pconfig['dns_preprocessor']))
@@ -293,6 +318,19 @@ if ($_POST['ResetAll']) {
 	$pconfig['ftp_telnet_detect_anomalies'] = "on";
 	$pconfig['ftp_telnet_ayt_attack_threshold'] = "20";
 	$pconfig['smtp_preprocessor'] = "on";
+	$pconfig['smtp_memcap'] = "838860";
+	$pconfig['smtp_max_mime_mem'] = "838860";
+	$pconfig['smtp_b64_decode_depth'] = "0";
+	$pconfig['smtp_qp_decode_depth'] = "0";
+	$pconfig['smtp_bitenc_decode_depth'] = "0";
+	$pconfig['smtp_uu_decode_depth'] = "0";
+	$pconfig['smtp_email_hdrs_log_depth'] = "1464";
+	$pconfig['smtp_ignore_data'] = 'off';
+	$pconfig['smtp_ignore_tls_data'] = 'on';
+	$pconfig['smtp_log_mail_from'] = 'on';
+	$pconfig['smtp_log_rcpt_to'] = 'on';
+	$pconfig['smtp_log_filename'] = 'on';
+	$pconfig['smtp_log_email_hdrs'] = 'on';
 	$pconfig['sf_portscan'] = "off";
 	$pconfig['pscan_protocol'] = "all";
 	$pconfig['pscan_type'] = "all";
@@ -373,6 +411,24 @@ if ($_POST['save']) {
 			$input_errors[] = gettext("The value for IMAP Decoder Unix-to-Unix (UU) Decode Depth must be between -1 and 65,535.");
 	}
 
+	// Validate SMTP parameter values if SMTP Decoder is enabled
+	if ($_POST['smtp_preprocessor'] == 'on') {
+		if ($_POST['smtp_memcap'] < 3276 || $_POST['smtp_memcap'] > 104857600)
+			$input_errors[] = gettext("The value for SMTP Decoder Memory Cap must be between 3,276 and 104,857,600.");
+		if ($_POST['smtp_max_mime_mem'] < 3276 || $_POST['smtp_max_mime_mem'] > 104857600)
+			$input_errors[] = gettext("The value for SMTP Decoder Maximum MIME Memory must be between 3,276 and 104,857,600.");
+		if ($_POST['smtp_b64_decode_depth'] < -1 || $_POST['smtp_b64_decode_depth'] > 65535)
+			$input_errors[] = gettext("The value for SMTP Decoder Base64 Decode Depth must be between -1 and 65,535.");
+		if ($_POST['smtp_qp_decode_depth'] < -1 || $_POST['smtp_qp_decode_depth'] > 65535)
+			$input_errors[] = gettext("The value for SMTP Decoder Quoted-Printable (QP) Decode Depth must be between -1 and 65,535.");
+		if ($_POST['smtp_bitenc_decode_depth'] < -1 || $_POST['smtp_bitenc_decode_depth'] > 65535)
+			$input_errors[] = gettext("The value for SMTP Decoder Non-Encoded MIME Extraction Depth must be between -1 and 65,535.");
+		if ($_POST['smtp_uu_decode_depth'] < -1 || $_POST['smtp_uu_decode_depth'] > 65535)
+			$input_errors[] = gettext("The value for SMTP Decoder Unix-to-Unix (UU) Decode Depth must be between -1 and 65,535.");
+		if ($_POST['smtp_email_hdrs_log_depth'] < 0 || $_POST['smtp_email_hdrs_log_depth'] > 20480)
+			$input_errors[] = gettext("The value for SMTP Decoder E-Mail Headers Log Depth must be between 0 and 20,480.");
+	}
+
 	/* if no errors write to conf */
 	if (!$input_errors) {
 		/* post new options */
@@ -408,6 +464,13 @@ if ($_POST['save']) {
 		if ($_POST['imap_qp_decode_depth'] != "") { $natent['imap_qp_decode_depth'] = $_POST['imap_qp_decode_depth']; }else{ $natent['imap_qp_decode_depth'] = "0"; }
 		if ($_POST['imap_bitenc_decode_depth'] != "") { $natent['imap_bitenc_decode_depth'] = $_POST['imap_bitenc_decode_depth']; }else{ $natent['imap_bitenc_decode_depth'] = "0"; }
 		if ($_POST['imap_uu_decode_depth'] != "") { $natent['imap_uu_decode_depth'] = $_POST['imap_uu_decode_depth']; }else{ $natent['imap_uu_decode_depth'] = "0"; }
+		if ($_POST['smtp_memcap'] != "") { $natent['smtp_memcap'] = $_POST['smtp_memcap']; }else{ $natent['smtp_memcap'] = "838860"; }
+		if ($_POST['smtp_max_mime_mem'] != "") { $natent['smtp_max_mime_mem'] = $_POST['smtp_max_mime_mem']; }else{ $natent['smtp_max_mime_mem'] = "838860"; }
+		if ($_POST['smtp_b64_decode_depth'] != "") { $natent['smtp_b64_decode_depth'] = $_POST['smtp_b64_decode_depth']; }else{ $natent['smtp_b64_decode_depth'] = "0"; }
+		if ($_POST['smtp_qp_decode_depth'] != "") { $natent['smtp_qp_decode_depth'] = $_POST['smtp_qp_decode_depth']; }else{ $natent['smtp_qp_decode_depth'] = "0"; }
+		if ($_POST['smtp_bitenc_decode_depth'] != "") { $natent['smtp_bitenc_decode_depth'] = $_POST['smtp_bitenc_decode_depth']; }else{ $natent['smtp_bitenc_decode_depth'] = "0"; }
+		if ($_POST['smtp_uu_decode_depth'] != "") { $natent['smtp_uu_decode_depth'] = $_POST['smtp_uu_decode_depth']; }else{ $natent['smtp_uu_decode_depth'] = "0"; }
+		if ($_POST['smtp_email_hdrs_log_depth'] != "") { $natent['smtp_email_hdrs_log_depth'] = $_POST['smtp_email_hdrs_log_depth']; }else{ $natent['smtp_email_hdrs_log_depth'] = "1464"; }
 
 		// Set SDF inspection types
 		$natent['sdf_alert_data_type'] = implode(",",$_POST['sdf_alert_data_type']);
@@ -423,6 +486,13 @@ if ($_POST['save']) {
 		$natent['ftp_telnet_normalize'] = $_POST['ftp_telnet_normalize'] ? 'on' : 'off';
 		$natent['ftp_telnet_detect_anomalies'] = $_POST['ftp_telnet_detect_anomalies'] ? 'on' : 'off';
 		$natent['smtp_preprocessor'] = $_POST['smtp_preprocessor'] ? 'on' : 'off';
+		$natent['smtp_ignore_data'] = $_POST['smtp_ignore_data'] ? 'on' : 'off';
+		$natent['smtp_ignore_tls_data'] = $_POST['smtp_ignore_tls_data'] ? 'on' : 'off';
+		$natent['smtp_log_mail_from'] = $_POST['smtp_log_mail_from'] ? 'on' : 'off';
+		$natent['smtp_log_rcpt_to'] = $_POST['smtp_log_rcpt_to'] ? 'on' : 'off';
+		$natent['smtp_log_filename'] = $_POST['smtp_log_filename'] ? 'on' : 'off';
+		$natent['smtp_log_email_hdrs'] = $_POST['smtp_log_email_hdrs'] ? 'on' : 'off';
+
 		$natent['sf_portscan'] = $_POST['sf_portscan'] ? 'on' : 'off';
 		$natent['dce_rpc_2'] = $_POST['dce_rpc_2'] ? 'on' : 'off';
 		$natent['dns_preprocessor'] = $_POST['dns_preprocessor'] ? 'on' : 'off';
@@ -1450,7 +1520,7 @@ if ($savemsg) {
 		<td colspan="2" valign="top" class="listtopic"><?php echo gettext("IMAP Decoder Settings"); ?></td>
 	</tr>
 	<tr>
-		<td width="22%" valign="top" class="vncell"><?php echo gettext("Enable IMAP Normalizer"); ?></td>
+		<td width="22%" valign="top" class="vncell"><?php echo gettext("Enable IMAP Decoder"); ?></td>
 		<td width="78%" class="vtable"><input name="imap_preproc" type="checkbox" value="on" 
 			<?php if ($pconfig['imap_preproc']=="on") echo "checked"; ?> onclick="imap_enable_change();"/>
 			<?php echo gettext("Normalize/Decode IMAP protocol for enforcement and buffer overflows.  Default is ") . 
@@ -1515,6 +1585,156 @@ if ($savemsg) {
 		</td>
 	</tr>
 	</tbody>
+
+	<tr>
+		<td colspan="2" valign="top" class="listtopic"><?php echo gettext("SMTP Decoder Settings"); ?></td>
+	</tr>
+	<tr>
+		<td width="22%" valign="top" class="vncell"><?php echo gettext("Enable SMTP Decoder"); ?></td>
+		<td width="78%" class="vtable"><input name="smtp_preprocessor" type="checkbox" value="on" 
+			<?php if ($pconfig['smtp_preprocessor']=="on") echo "checked"; ?> onclick="smtp_enable_change();"/>
+			<?php echo gettext("Normalize/Decode SMTP protocol for enforcement and buffer overflows.  Default is ") . 
+			"<strong>" . gettext("Checked") . "</strong>."; ?>
+		</td>
+	</tr>
+	<tbody id="smtp_setting_rows">
+	<tr>
+		<td width="22%" valign="top" class="vncell"><?php echo gettext("Memory Cap"); ?></td>
+		<td width="78%" class="vtable">
+			<input name="smtp_memcap" type="text" class="formfld unknown" id="smtp_memcap" size="9" 
+			value="<?=htmlspecialchars($pconfig['smtp_memcap']);?>"/>
+			<?php echo gettext("Max memory in bytes used to log filename, addresses and headers.  ") . 
+			gettext("Default is ") . "<strong>" . gettext("838860") . "</strong>" . gettext(" bytes."); ?><br/><br/>
+			<?php echo gettext("The minimum value is ") . "<strong>" . gettext("3276") . "</strong>" . gettext(" bytes and the maximum is ") . 
+			"<strong>" . gettext("100 MB") . "</strong>" . gettext(" (104857600).  When this memcap is reached, ") . 
+			gettext("SMTP will stop logging the filename, MAIL FROM address, RCPT TO addresses and email headers until memory becomes available."); ?>
+		</td>
+	</tr>
+	<tr>
+		<td width="22%" valign="top" class="vncell"><?php echo gettext("Ignore Data"); ?></td>
+		<td width="78%" class="vtable"><input name="smtp_ignore_data" type="checkbox" value="on" 
+			<?php if ($pconfig['smtp_ignore_data']=="on") echo "checked"; ?>/>
+			<?php echo gettext("Ignore data section of mail (except for mail headers) when processing rules.  Default is ") . 
+			"<strong>" . gettext("Not Checked") . "</strong>."; ?>
+		</td>
+	</tr>
+	<tr>
+		<td width="22%" valign="top" class="vncell"><?php echo gettext("Ignore TLS Data"); ?></td>
+		<td width="78%" class="vtable"><input name="smtp_ignore_tls_data" type="checkbox" value="on" 
+			<?php if ($pconfig['smtp_ignore_tls_data']=="on") echo "checked"; ?>/>
+			<?php echo gettext("Ignore TLS-encrypted data when processing rules.  Default is ") . 
+			"<strong>" . gettext("Checked") . "</strong>."; ?>
+		</td>
+	</tr>
+	<tr>
+		<td width="22%" valign="top" class="vncell"><?php echo gettext("Log Mail From"); ?></td>
+		<td width="78%" class="vtable"><input name="smtp_log_mail_from" type="checkbox" value="on" 
+			<?php if ($pconfig['smtp_log_mail_from']=="on") echo "checked"; ?>/>
+			<?php echo gettext("Log sender’s email address extracted from ”MAIL FROM” command.  Default is ") . 
+			"<strong>" . gettext("Checked") . "</strong>."; ?><br/>
+			<span class="red"><strong><?php echo gettext("Note: "); ?></strong></span>
+			<?php echo gettext("this is logged only with the unified2 (Barnyard2) output enabled."); ?>
+		</td>
+	</tr>
+	<tr>
+		<td width="22%" valign="top" class="vncell"><?php echo gettext("Log Receipt To"); ?></td>
+		<td width="78%" class="vtable"><input name="smtp_log_rcpt_to" type="checkbox" value="on" 
+			<?php if ($pconfig['smtp_log_rcpt_to']=="on") echo "checked"; ?>/>
+			<?php echo gettext("Log recipient’s email addresses extracted from ”RCPT TO” command.  Default is ") . 
+			"<strong>" . gettext("Checked") . "</strong>."; ?><br/>
+			<span class="red"><strong><?php echo gettext("Note: "); ?></strong></span>
+			<?php echo gettext("this is logged only with the unified2 (Barnyard2) output enabled."); ?>
+		</td>
+	</tr>
+	<tr>
+		<td width="22%" valign="top" class="vncell"><?php echo gettext("Log Filename"); ?></td>
+		<td width="78%" class="vtable"><input name="smtp_log_filename" type="checkbox" value="on" 
+			<?php if ($pconfig['smtp_log_filename']=="on") echo "checked"; ?>/>
+			<?php echo gettext("Log MIME attachment filenames extracted from Content-Disposition header.  Default is ") . 
+			"<strong>" . gettext("Checked") . "</strong>."; ?><br/>
+			<span class="red"><strong><?php echo gettext("Note: "); ?></strong></span>
+			<?php echo gettext("this is logged only with the unified2 (Barnyard2) output enabled."); ?>
+		</td>
+	</tr>
+	<tr>
+		<td width="22%" valign="top" class="vncell"><?php echo gettext("Log E-Mail Headers"); ?></td>
+		<td width="78%" class="vtable"><input name="smtp_log_email_hdrs" type="checkbox" value="on" 
+			<?php if ($pconfig['smtp_log_email_hdrs']=="on") echo "checked"; ?>/>
+			<?php echo gettext("Log SMTP email headers extracted from SMTP data.  Default is ") . 
+			"<strong>" . gettext("Checked") . "</strong>."; ?><br/>
+			<span class="red"><strong><?php echo gettext("Note: "); ?></strong></span>
+			<?php echo gettext("this is logged only with the unified2 (Barnyard2) output enabled."); ?>
+		</td>
+	</tr>
+	<tr>
+		<td width="22%" valign="top" class="vncell"><?php echo gettext("E-Mail Headers Log Depth"); ?></td>
+		<td width="78%" class="vtable">
+			<input name="smtp_email_hdrs_log_depth" type="text" class="formfld unknown" id="smtp_email_hdrs_log_depth" size="9" 
+			value="<?=htmlspecialchars($pconfig['smtp_email_hdrs_log_depth']);?>"/>
+			<?php echo gettext("Memory in bytes to use for logging e-mail headers.  ") . 
+			gettext("Default is ") . "<strong>" . gettext("1464") . "</strong>" . gettext(" bytes."); ?><br/><br/>
+			<?php echo gettext("Allowable values range from ") . "<strong>" . gettext("0") . "</strong>" . gettext(" to ") . 
+			"<strong>" . gettext("20480") . "</strong>" . gettext(".  A value of ") . "<strong>" . gettext("0") . "</strong>" . 
+			gettext(" will disable e-mail headers logging."); ?>
+		</td>
+	</tr>
+	<tr>
+		<td width="22%" valign="top" class="vncell"><?php echo gettext("Maximum MIME Memory"); ?></td>
+		<td width="78%" class="vtable">
+			<input name="smtp_max_mime_mem" type="text" class="formfld unknown" id="smtp_max_mime_mem" size="9" 
+			value="<?=htmlspecialchars($pconfig['smtp_max_mime_mem']);?>"/>
+			<?php echo gettext("Maximum memory in bytes to use for decoding attachments.  ") . 
+			gettext("Default is ") . "<strong>" . gettext("838860") . "</strong>" . gettext(" bytes."); ?><br/><br/>
+			<?php echo gettext("The minimum value is ") . "<strong>" . gettext("3276") . "</strong>" . gettext(" bytes and the maximum is ") . 
+			"<strong>" . gettext("100 MB") . "</strong>" . gettext(" (104857600)."); ?>
+		</td>
+	</tr>
+	<tr>
+		<td width="22%" valign="top" class="vncell"><?php echo gettext("Base64 Decoding Depth"); ?></td>
+		<td width="78%" class="vtable"><input name="smtp_b64_decode_depth" type="text" class="formfld unknown" id="smtp_b64_decode_depth" size="9" value="<?=htmlspecialchars($pconfig['smtp_b64_decode_depth']);?>">
+			<?php echo gettext("Depth in bytes to decode base64 encoded MIME attachments.  Default is ") . "<strong>" . gettext("0") . "</strong>" . gettext(" (unlimited)");?>.<br/><br/>
+			<?php echo gettext("Allowable values range from ") . "<strong>" . gettext("-1") . "</strong>" . gettext(" to ") . "<strong>" . gettext("65535") . "</strong>" . 
+			gettext(". A value of ") . "<strong>" . gettext("-1") . "</strong>" . gettext(" turns off the base64 decoding of MIME attachments. ") . 
+			gettext("A value of ") . "<strong>" . gettext("0") . "</strong>" . gettext(" sets the decoding of base64 encoded MIME attachments to unlimited. ") . 
+			gettext("A value other than 0 or -1 restricts the decoding of base64 MIME attachments, and applies per attachment. An SMTP preprocessor alert with sid 10 ") . 
+			gettext("is generated when the decoding fails.");?>
+		</td>
+	</tr>
+	<tr>
+		<td width="22%" valign="top" class="vncell"><?php echo gettext("Quoted Printable Decoding Depth"); ?></td>
+		<td width="78%" class="vtable"><input name="smtp_qp_decode_depth" type="text" class="formfld unknown" id="smtp_qp_decode_depth" size="9" value="<?=htmlspecialchars($pconfig['smtp_qp_decode_depth']);?>">
+			<?php echo gettext("Byte depth to decode Quoted Printable (QP) encoded MIME attachments.  Default is ") . "<strong>" . gettext("0") . "</strong>" . gettext(" (unlimited)");?>.<br/><br/>
+			<?php echo gettext("Allowable values range from ") . "<strong>" . gettext("-1") . "</strong>" . gettext(" to ") . "<strong>" . gettext("65535") . "</strong>" . 
+			gettext(". A value of ") . "<strong>" . gettext("-1") . "</strong>" . gettext(" turns off the QP decoding of MIME attachments. ") . 
+			gettext("A value of ") . "<strong>" . gettext("0") . "</strong>" . gettext(" sets the decoding of QP encoded MIME attachments to unlimited. ") . 
+			gettext("A value other than 0 or -1 restricts the decoding of QP MIME attachments, and applies per attachment. An SMTP preprocessor alert with sid 11 ") . 
+			gettext("is generated when the decoding fails.");?>
+		</td>
+	</tr>
+	<tr>
+		<td width="22%" valign="top" class="vncell"><?php echo gettext("Non-Encoded MIME Extraction Depth"); ?></td>
+		<td width="78%" class="vtable"><input name="smtp_bitenc_decode_depth" type="text" class="formfld unknown" id="smtp_bitenc_decode_depth" size="9" value="<?=htmlspecialchars($pconfig['smtp_bitenc_decode_depth']);?>">
+			<?php echo gettext("Depth in bytes to extract non-encoded MIME attachments.  Default is ") . "<strong>" . gettext("0") . "</strong>" . gettext(" (unlimited)");?>.<br/><br/>
+			<?php echo gettext("Allowable values range from ") . "<strong>" . gettext("-1") . "</strong>" . gettext(" to ") . "<strong>" . gettext("65535") . "</strong>" . 
+			gettext(". A value of ") . "<strong>" . gettext("-1") . "</strong>" . gettext(" turns off the extraction of non-encoded MIME attachments. ") . 
+			gettext("A value of ") . "<strong>" . gettext("0") . "</strong>" . gettext(" sets the extraction of non-encoded MIME attachments to unlimited. ") . 
+			gettext("A value other than 0 or -1 restricts the extraction of non-encoded MIME attachments, and applies per attachment.");?>
+		</td>
+	</tr>
+	<tr>
+		<td width="22%" valign="top" class="vncell"><?php echo gettext("Unix-to-Unix Decoding Depth"); ?></td>
+		<td width="78%" class="vtable"><input name="smtp_uu_decode_depth" type="text" class="formfld unknown" id="smtp_uu_decode_depth" size="9" value="<?=htmlspecialchars($pconfig['smtp_uu_decode_depth']);?>">
+			<?php echo gettext("Depth in bytes to decode Unix-to-Unix (UU) encoded MIME attachments.  Default is ") . "<strong>" . gettext("0") . "</strong>" . gettext(" (unlimited)");?>.<br/><br/>
+			<?php echo gettext("Allowable values range from ") . "<strong>" . gettext("-1") . "</strong>" . gettext(" to ") . "<strong>" . gettext("65535") . "</strong>" . 
+			gettext(". A value of ") . "<strong>" . gettext("-1") . "</strong>" . gettext(" turns off the UU decoding of MIME attachments. ") . 
+			gettext("A value of ") . "<strong>" . gettext("0") . "</strong>" . gettext(" sets the decoding of UU encoded MIME attachments to unlimited. ") . 
+			gettext("A value other than 0 or -1 restricts the decoding of UU MIME attachments, and applies per attachment. An SMTP preprocessor alert with sid 13 ") . 
+			gettext("is generated (if enabled) when the decoding fails.");?>
+		</td>
+	</tr>
+	</tbody>
+
+
 	<tr>
 		<td colspan="2" valign="top" class="listtopic"><?php echo gettext("General Preprocessors"); ?></td>
 	</tr>
@@ -1523,13 +1743,6 @@ if ($savemsg) {
 		<td width="78%" class="vtable"><input name="other_preprocs" type="checkbox" value="on" 
 			<?php if ($pconfig['other_preprocs']=="on") echo "checked"; ?>>
 		<?php echo gettext("Normalize/Decode RPC traffic and detects Back Orifice traffic on the network.  Default is ") . 
-		"<strong>" . gettext("Checked") . "</strong>"; ?>.</td>
-	</tr>
-	<tr>
-		<td width="22%" valign="top" class="vncell"><?php echo gettext("Enable SMTP Normalizer"); ?></td>
-		<td width="78%" class="vtable"><input name="smtp_preprocessor" type="checkbox" value="on" 
-			<?php if ($pconfig['smtp_preprocessor']=="on") echo "checked"; ?>>
-		<?php echo gettext("Normalize/Decode SMTP protocol for enforcement and buffer overflows.  Default is ") . 
 		"<strong>" . gettext("Checked") . "</strong>"; ?>.</td>
 	</tr>
 	<tr>
@@ -1906,6 +2119,16 @@ function imap_enable_change() {
 		document.getElementById("imap_setting_rows").style.display = "";
 }
 
+function smtp_enable_change() {
+	var endis = !(document.iform.smtp_preprocessor.checked);
+
+	// Hide SMTP configuration rows if SMTP preprocessor disabled
+	if (endis)
+		document.getElementById("smtp_setting_rows").style.display = "none";
+	else
+		document.getElementById("smtp_setting_rows").style.display = "";
+}
+
 function enable_change_all() {
 	http_inspect_enable_change();
 	sf_portscan_enable_change();
@@ -1962,6 +2185,7 @@ function enable_change_all() {
 	sensitive_data_enable_change();
 	pop_enable_change();
 	imap_enable_change();
+	smtp_enable_change();
 }
 
 function wopen(url, name, w, h)

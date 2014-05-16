@@ -265,6 +265,20 @@ if ($_POST["save"] && !$input_errors) {
 			$natent['ftp_server_engine']['item'][] = $ftp_server_eng;
 
 			$natent['smtp_preprocessor'] = 'on';
+			$natent['smtp_memcap'] = "838860";
+			$natent['smtp_max_mime_mem'] = "838860";
+			$natent['smtp_b64_decode_depth'] = "0";
+			$natent['smtp_qp_decode_depth'] = "0";
+			$natent['smtp_bitenc_decode_depth'] = "0";
+			$natent['smtp_uu_decode_depth'] = "0";
+			$natent['smtp_email_hdrs_log_depth'] = "1464";
+			$natent['smtp_ignore_data'] = 'off';
+			$natent['smtp_ignore_tls_data'] = 'on';
+			$natent['smtp_log_mail_from'] = 'on';
+			$natent['smtp_log_rcpt_to'] = 'on';
+			$natent['smtp_log_filename'] = 'on';
+			$natent['smtp_log_email_hdrs'] = 'on';
+
 			$natent['dce_rpc_2'] = 'on';
 			$natent['dns_preprocessor'] = 'on';
 			$natent['ssl_preproc'] = 'on';
