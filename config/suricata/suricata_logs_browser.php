@@ -55,21 +55,22 @@ $suricata_uuid = $a_instance[$instanceid]['uuid'];
 $if_real = get_real_interface($a_instance[$instanceid]['interface']);
 
 // Construct a pointer to the instance's logging subdirectory
-$suricatalogdir = SURICATALOGDIR . "suricata_{$if_real}{$suricata_uuid}";
+$suricatalogdir = SURICATALOGDIR . "suricata_{$if_real}{$suricata_uuid}/";
 
-$logfile = $_POST['file'];
+// Limit all file access to just the currently selected interface's logging subdirectory
+$logfile = htmlspecialchars($suricatalogdir . basename($_POST['file']));
 
 if ($_POST['action'] == 'load') {
-	if(!is_file($_POST['file'])) {
+	if(!is_file($logfile)) {
 		echo "|3|" . gettext("Log file does not exist or that logging feature is not enabled") . ".|";
 	}
 	else {
-		$data = file_get_contents($_POST['file']);
+		$data = file_get_contents($logfile);
 		if($data === false) {
 			echo "|1|" . gettext("Failed to read log file") . ".|";
 		} else {
 			$data = base64_encode($data);
-			echo "|0|{$_POST['file']}|{$data}|";	
+			echo "|0|{$logfile}|{$data}|";	
 		}
 	}
 	exit;
@@ -101,7 +102,7 @@ if ($input_errors) {
 		jQuery.ajax(
 			"<?=$_SERVER['SCRIPT_NAME'];?>", {
 				type: 'POST',
-				data: "action=load&file=" + jQuery("#logFile").val(),
+				data: "instance=" + jQuery("#instance").val() + "&action=load&file=" + jQuery("#logFile").val(),
 				complete: loadComplete
 			}
 		);
@@ -180,7 +181,7 @@ if ($input_errors) {
 					$selected = "";
 					if ($log == basename($logfile))
 						$selected = "selected";
-					echo "<option value='{$suricatalogdir}/{$log}' {$selected}>" . $log . "</option>\n";
+					echo "<option value='{$suricatalogdir}{$log}' {$selected}>" . $log . "</option>\n";
 				}
 			?>
 					</select>&nbsp;&nbsp;<?php echo gettext('Choose which log you want to view.'); ?>
@@ -222,7 +223,7 @@ if ($input_errors) {
 </table>
 </form>
 
-<?php if(empty($logfile)): ?>
+<?php if(empty($_POST['file'])): ?>
 <script type="text/javascript">
 	document.getElementById("logFile").selectedIndex=-1;
 </script>

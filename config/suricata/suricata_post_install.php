@@ -60,14 +60,14 @@ if(is_process_running("suricata")) {
 	killbyname("suricata");
 	sleep(2);
 	// Delete any leftover suricata PID files in /var/run
-	unlink_if_exists("/var/run/suricata_*.pid");
+	unlink_if_exists("{$g['varrun_path']}/suricata_*.pid");
 }
 // Hard kill any running Barnyard2 processes
 if(is_process_running("barnyard")) {
 	killbyname("barnyard2");
 	sleep(2);
 	// Delete any leftover barnyard2 PID files in /var/run
-	unlink_if_exists("/var/run/barnyard2_*.pid");
+	unlink_if_exists("{$g['varrun_path']}/barnyard2_*.pid");
 }
 
 // Set flag for post-install in progress
@@ -148,7 +148,7 @@ if ($config['installedpackages']['suricata']['config'][0]['forcekeepsettings'] =
 }
 
 // Update Suricata package version in configuration
-$config['installedpackages']['suricata']['config'][0]['suricata_config_ver'] = "v1.0.1";
+$config['installedpackages']['suricata']['config'][0]['suricata_config_ver'] = "v1.0.2";
 write_config();
 
 // Done with post-install, so clear flag

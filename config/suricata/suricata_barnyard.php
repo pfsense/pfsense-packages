@@ -86,8 +86,6 @@ if (isset($id) && $a_nat[$id]) {
 		$pconfig['barnyard_bro_ids_dport'] = "47760";
 	if (empty($a_nat[$id]['barnyard_sensor_id']))
 		$pconfig['barnyard_sensor_id'] = "0";
-	if (empty($a_nat[$id]['barnyard_sensor_name']))
-		$pconfig['barnyard_sensor_name'] = php_uname("n");
 }
 
 if ($_POST['save']) {

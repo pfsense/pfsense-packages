@@ -58,7 +58,7 @@ killbyname("suricata");
 sleep(1);
 
 // Delete any leftover suricata PID files in /var/run
-array_map('@unlink', glob("/var/run/suricata_*.pid"));
+unlink_if_exists("{$g['varrun_path']}/suricata_*.pid");
 
 /* Make sure all active Barnyard2 processes are terminated */
 /* Log a message only if a running process is detected     */
@@ -68,10 +68,7 @@ killbyname("barnyard2");
 sleep(1);
 
 // Delete any leftover barnyard2 PID files in /var/run
-array_map('@unlink', glob("/var/run/barnyard2_*.pid"));
-
-/* Remove the suricata user and group */
-mwexec('/usr/sbin/pw userdel suricata; /usr/sbin/pw groupdel suricata', true);
+unlink_if_exists("{$g['varrun_path']}/barnyard2_*.pid");
 
 /* Remove the Suricata cron jobs. */
 install_cron_job("/usr/bin/nice -n20 /usr/local/bin/php -f /usr/local/www/suricata/suricata_check_for_rule_updates.php", false);
