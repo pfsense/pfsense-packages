@@ -48,8 +48,6 @@ elseif (isset($_GET['instance']) && is_numericint($_GET['instance']))
 if (empty($instanceid))
 	$instanceid = 0;
 
-log_error("Instance ID: {$instanceid}");
-
 if (!is_array($config['installedpackages']['suricata']['rule']))
 	$config['installedpackages']['suricata']['rule'] = array();
 $a_instance = $config['installedpackages']['suricata']['rule'];
