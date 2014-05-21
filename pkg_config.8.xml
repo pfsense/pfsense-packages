@@ -97,7 +97,7 @@
 	<package>
 		<name>Strikeback</name>
 		<descr>Detect port scans with iplog and strikeback</descr>
-		<website></website>
+		<website/>
 		<pkginfolink>https://forum.pfsense.org/index.php/topic,37225.0.html</pkginfolink>
 		<category>Services</category>
 		<version>0.1</version>
@@ -623,7 +623,7 @@
 	<package>
 		<name>mailscanner</name>
 		<internal_name>mailscanner</internal_name>
-		<website>www.mailscanner.info</website>
+		<website>http://www.mailscanner.info</website>
 		<descr><![CDATA[MailScanner is an e-mail security and anti-spam package for e-mail gateway systems.<br />
 						This is a level3 mail scanning tool with high CPU load.]]></descr>
 		<category>Services</category>
@@ -1616,7 +1616,7 @@
 	<package>
 		<name>widescreen</name>
 		<descr>The package makes pfSense adapt to browser's current width. It is particularly convenient for Status->Dashboard page that allocates columns for widgets according to browser's current width. ATTENTION: the package heavily modifies pfsense_ng theme and affects other's themes appearance. Please REFRESH your browser's window after installing/uninstalling this package.</descr>
-		<website></website>
+		<website/>
 		<pkginfolink></pkginfolink>
 		<category>Enhancements</category>
 		<version>0.2</version>
@@ -1702,7 +1702,7 @@
 		<category>Services</category>
 		<version>1.2.1</version>
 		<status>BETA</status>
-		<website>www.winton.org.uk/zebedee/</website>
+		<website>http://www.winton.org.uk/zebedee/</website>
 		<maintainer>jorgelustosa@gmail.com marcellocoutinho@gmail.com</maintainer>
 		<required_version>2.0</required_version>
 		<depends_on_package_base_url>https://files.pfsense.org/packages/8/All/</depends_on_package_base_url>

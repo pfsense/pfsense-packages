@@ -94,7 +94,7 @@
 	<package>
 		<name>Strikeback</name>
 		<descr>Detect port scans with iplog and strikeback</descr>
-		<website></website>
+		<website/>
 		<pkginfolink>https://forum.pfsense.org/index.php/topic,37225.0.html</pkginfolink>
 		<category>Services</category>
 		<version>0.1</version>
@@ -466,9 +466,9 @@
 		<!-- NOTE: Distfile must be fetched manually from http://dansguardian.org/downloads/2/Alpha/dansguardian-2.12.0.0.tar.gz -->
 	</package>
 	<package>
-		<name>jailscanner</name>
+		<name>mailscanner</name>
 		<internal_name>mailscanner</internal_name>
-		<website>www.mailscanner.info</website>
+		<website>http://www.mailscanner.info</website>
 		<descr><![CDATA[MailScanner is an e-mail security and anti-spam package for e-mail gateway systems.<br />
 						This is a level3 mail scanning tool with high CPU load.]]></descr>
 		<category>Services</category>
@@ -1285,7 +1285,7 @@
 		<category>Services</category>
 		<version>1.2.1</version>
 		<status>BETA</status>
-		<website>www.winton.org.uk/zebedee/</website>
+		<website>http://www.winton.org.uk/zebedee/</website>
 		<maintainer>jorgelustosa@gmail.com marcellocoutinho@gmail.com</maintainer>
 		<required_version>2.2</required_version>
 		<depends_on_package_pbi>zebedee-2.5.3-##ARCH##.pbi</depends_on_package_pbi>
