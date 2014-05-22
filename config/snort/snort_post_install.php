@@ -562,7 +562,7 @@ EOD;
 		$smtp_max_mime_mem = $snortcfg['smtp_max_mime_mem'];
 	else
 		$smtp_max_mime_mem = "838860";
-	if (isset($snortcfg['imap_qp_decode_depth']))
+	if (isset($snortcfg['smtp_qp_decode_depth']))
 		$smtp_qp_decode_depth = $snortcfg['smtp_qp_decode_depth'];
 	else
 		$smtp_qp_decode_depth = "0";
