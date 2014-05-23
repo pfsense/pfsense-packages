@@ -176,7 +176,6 @@ function nrpe2_custom_php_write_config() {
 log_facility=daemon
 pid_file=/var/run/nrpe2.pid
 server_port={$server_port}
-server_address={$server_address}
 nrpe_user=nagios
 nrpe_group=nagios
 allowed_hosts={$allowed_hosts}
