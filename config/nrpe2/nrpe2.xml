@@ -52,9 +52,8 @@
 		<field>
 			<fielddescr>Bind IP Address</fielddescr>
 			<fieldname>server_address</fieldname>
-			<description>Set this to the IP address of the interface you want the daemon to listen on.</description>
+			<description>Set this to the IP address of the interface you want the daemon to listen on. (optional)</description>
 			<type>input</type>
-			<required/>
 		</field>
 		<field>
 			<fielddescr>Nagios Server(s)</fielddescr>
