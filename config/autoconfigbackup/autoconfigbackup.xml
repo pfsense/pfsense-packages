@@ -144,7 +144,9 @@
 	</custom_php_validation_command>
 	<custom_php_resync_config_command>
         <![CDATA[		
+			conf_mount_rw();
 			exec("echo > /cf/conf/lastpfSbackup.txt");
+			conf_mount_ro();
 			if(!function_exists("filter_configure")) 
 				require_once("filter.inc");
 			filter_configure();
