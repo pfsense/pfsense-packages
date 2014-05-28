@@ -48,7 +48,9 @@ if($_POST) {
 	else 
 		write_config("Backup invoked via Auto Config Backup.");
 	$config = parse_config(true);
+	conf_mount_rw();
 	file_put_contents("/cf/conf/lastpfSbackup.txt", "");
+	conf_mount_ro();
 	upload_config($_REQUEST['reason']);
 	$savemsg = "Backup completed successfully.";
 	$donotshowheader=true;
