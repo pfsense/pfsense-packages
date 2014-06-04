@@ -217,9 +217,9 @@
 			<enablefields>reverse_owa_ip,reverse_owa_activesync,reverse_owa_rpchttp,reverse_owa_mapihttp,reverse_owa_webservice,reverse_owa_autodiscover</enablefields>		
 		</field>
 		<field>
-			<fielddescr>OWA frontend IP address</fielddescr>
+			<fielddescr>CAS-Array / OWA frontend IP address</fielddescr>
 			<fieldname>reverse_owa_ip</fieldname>
-			<description>This is the internal IP Address of the OWA frontend server.</description>
+			<description>This is the internal IP Address of the CAS-Array / OWA frontend server.</description>
 			<type>input</type>
 			<size>15</size>
 		</field>		
