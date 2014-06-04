@@ -170,7 +170,9 @@ function squid_resync_reverse() {
 					array_push($owa_dirs,'Microsoft-Server-ActiveSync');
 			if($settings['reverse_owa_rpchttp'])	
 					array_push($owa_dirs,'rpc/rpcproxy.dll','rpcwithcert/rpcproxy.dll');
-			if($settings['reverse_owa_webservice']){
+			if($settings['reverse_owa_mapihttp'])	
+					array_push($owa_dirs,'mapi');
+					if($settings['reverse_owa_webservice']){
 					array_push($owa_dirs,'EWS');
 					$conf .= "ignore_expect_100 on\n";
 					}	
