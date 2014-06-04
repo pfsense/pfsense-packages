@@ -190,24 +190,26 @@ function openbgpd_install_conf() {
 
 	// Create rc.d file
 	$create_bgpd_sh = <<<EOF
+#!/bin/sh
+
 rc_start() {
-	if [ `pw groupshow {$pkg_group} 2>&1 | grep -c "pw: unknown group"` -gt 0 ]; then
+if [ `pw groupshow {$pkg_group} 2>&1 | grep -c "pw: unknown group"` -gt 0 ]; then
 		/usr/sbin/pw groupadd {$pkg_group} -g {$pkg_gid}
-	fi
-	if [ `pw usershow {$pkg_login} 2>&1 | grep -c "pw: no such user"` -gt 0 ]; then
+fi
+if [ `pw usershow {$pkg_login} 2>&1 | grep -c "pw: no such user"` -gt 0 ]; then
 		/usr/sbin/pw useradd {$pkg_login} -u {$pkg_uid} -g {$pkg_gid} -c "{$pkg_gecos}" -d {$pkg_homedir} -s {$pkg_shell}
-	fi
+fi
 
-	/bin/mkdir -p {$bgpd_config_base}
-	/usr/sbin/chown -R root:wheel {$bgpd_config_base}
-	/bin/chmod 0600  {$bgpd_config_base}/bgpd.conf
+/bin/mkdir -p {$bgpd_config_base}
+/usr/sbin/chown -R root:wheel {$bgpd_config_base}
+/bin/chmod 0600  {$bgpd_config_base}/bgpd.conf
 
-	NUMBGPD=`ps auxw | grep -c '[b]gpd.*parent'`
-	if [ \${NUMBGPD} -lt 1 ] ; then
+NUMBGPD=`ps auxw | grep -c '[b]gpd.*parent'`
+if [ \${NUMBGPD} -lt 1 ] ; then
 		{$pkg_bin}/bgpd -f {$bgpd_config_base}/bgpd.conf
-	else
+else
 		{$pkg_bin}/bgpctl reload
-	fi
+fi
 }
 
 rc_stop() {
