@@ -100,7 +100,7 @@ function squid_resync_reverse() {
 
 	//PEERS
  	if (($settings['reverse_owa'] == 'on') && (!empty($settings['reverse_owa_ip'])))
- 		$conf .= "cache_peer {$settings['reverse_owa_ip']} parent 443 0 proxy-only no-query originserver login=PASS connection-auth=on ssl sslflags=DONT_VERIFY_PEER front-end-https=on name=OWA_HOST_pfs\n";
+ 		$conf .= "cache_peer {$settings['reverse_owa_ip']} parent 443 0 proxy-only no-query originserver login=PASSTHRU connection-auth=on ssl sslflags=DONT_VERIFY_PEER front-end-https=on name=OWA_HOST_pfs\n";
 
  	$active_peers=array();
  	if (is_array($reverse_peers))
