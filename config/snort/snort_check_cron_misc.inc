@@ -116,7 +116,7 @@ foreach ($config['installedpackages']['snortglobal']['rule'] as $value) {
 		}
 		unset($files);
 		if ($prune_count > 0)
-			log_error(gettext("[Snort] Barnyard2 archived logs cleanup job removed {$prune_count} file(s)..."));
+			log_error(gettext("[Snort] Barnyard2 archived logs cleanup job removed {$prune_count} file(s) from {$snort_log_dir}/barnyard2/archive/..."));
 	}
 }
 
