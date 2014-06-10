@@ -354,7 +354,7 @@ function sync_package_sarg() {
 			else
 				$new_cron['item'][]=$cron;
 			}
-		$cron_cmd="/usr/local/bin/php /usr/local/www/sarg.php";
+		$cron_cmd="/usr/local/bin/php --no-header /usr/local/www/sarg.php";
 		$sarg_schedule_id=0;
 		if (is_array($config['installedpackages']['sargschedule']['config']))
 			foreach ($config['installedpackages']['sargschedule']['config'] as $sarg_schedule){

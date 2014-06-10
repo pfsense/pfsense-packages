@@ -818,15 +818,9 @@ function haproxy_writeconf($configpath) {
 	if(is_array($a_frontends)) {
 		foreach ($a_frontends as $frontend) {
 			if($frontend['status'] != 'active')
-			{
-				unlink_if_exists("var/etc/{$frontend['name']}.{$frontend['port']}.crt");
 				continue;
-			}
 			if(!$frontend['backend_serverpool'])
-			{
-				unlink_if_exists("var/etc/{$frontend['name']}.{$frontend['port']}.crt");
 				continue;
-			}
 			$primaryfrontend = get_primaryfrontend($frontend);
 			$bname = get_frontend_ipport($frontend);
 
@@ -1190,6 +1184,36 @@ function haproxy_plugin_carp($pluginparams) {
 	$event = $pluginparams['event'];
 	$interface = $pluginparams['interface'];
 	haproxy_check_run(0);
+}
+
+function haproxy_plugin_certificates($pluginparams) {
+	global $config;
+	$result = array();
+	if ($pluginparams['type'] == 'certificates' && $pluginparams['event'] == 'used_certificates') {
+		$result['pkgname'] = "HAProxy";
+		$result['certificatelist'] = array();
+		// return a array of used certificates.
+		foreach($config['installedpackages']['haproxy']['ha_backends']['item'] as &$frontend) {
+			$mainfrontend = get_primaryfrontend($frontend);
+			if (strtolower($mainfrontend['type']) == "http" && $mainfrontend['ssloffload']) {
+				if ($frontend['ssloffloadacl']){
+					$item = array();
+					$cert = $frontend['ssloffloadcert'];
+					$item['usedby'] = $frontend['name'];
+					$result['certificatelist'][$cert][] = $item;
+				}
+				if ($frontend['ssloffloadacladditional']){
+					foreach($frontend['ha_certificates']['item'] as $certref){
+						$item = array();
+						$cert = $certref['ssl_certificate'];
+						$item['usedby'] = $frontend['name'];
+						$result['certificatelist'][$cert][] = $item;
+					}
+				}
+			}
+		}
+	}
+	return $result;
 }
 
 function haproxy_check_run($reload) {

@@ -47,7 +47,7 @@ else
 
 define('CHROOT_LOCALBASE','/cf/named');
 
-function bind_zone_validate($post, $input_errors){
+function bind_zone_validate($post, &$input_errors){
 	if (key_exists("mail",$_POST))
 		$_POST['mail']=preg_replace("/@/",".",$post['mail']);
 		

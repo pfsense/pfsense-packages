@@ -130,13 +130,11 @@ function upload_config($reasonm = "") {
 	}
 
 	// Define some needed variables
-	if(!file_exists("/cf/conf/lastpfSbackup.txt")) {
-		conf_mount_rw();
-		touch("/cf/conf/lastpfSbackup.txt");
-		conf_mount_ro();
-	}
+	if(file_exists("/cf/conf/lastpfSbackup.txt"))
+		$last_backup_date = str_replace("\n", "", file_get_contents("/cf/conf/lastpfSbackup.txt"));
+	else
+		$last_backup_date = "";
 
-	$last_backup_date 	= str_replace("\n", "", file_get_contents("/cf/conf/lastpfSbackup.txt"));
 	$last_config_change = $config['revision']['time'];
 	$hostname  			= $config['system']['hostname'] . "." . $config['system']['domain'];
 	if($reasonm)

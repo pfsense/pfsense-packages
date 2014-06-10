@@ -62,6 +62,13 @@ elseif (isset($_GET['id']) && is_numericint($_GET['id']));
 if (is_null($id))
 	$id = 0;
 
+if (isset($_POST['action']))
+	$action = htmlspecialchars($_POST['action'], ENT_QUOTES | ENT_HTML401);
+elseif (isset($_GET['action']))
+	$action = htmlspecialchars($_GET['action'], ENT_QUOTES | ENT_HTML401);
+else
+	$action = "";
+
 $pconfig = array();
 if (empty($suricataglob['rule'][$id]['uuid'])) {
 	/* Adding new interface, so flag rules to build. */
@@ -142,7 +149,37 @@ if (empty($pconfig['max_pcap_log_size']))
 if (empty($pconfig['max_pcap_log_files']))
 	$pconfig['max_pcap_log_files'] = "1000";
 
-if ($_POST["save"]) {
+// See if creating a new interface by duplicating an existing one
+if (strcasecmp($action, 'dup') == 0) {
+
+	// Try to pick the next available physical interface to use
+	$ifaces = get_configured_interface_list();
+	$ifrules = array();
+	foreach($a_rule as $r)
+		$ifrules[] = $r['interface'];
+	foreach ($ifaces as $i) {
+		if (!in_array($i, $ifrules)) {
+			$pconfig['interface'] = $i;
+			$pconfig['enable'] = 'on';
+			$pconfig['descr'] = strtoupper($i);
+			$pconfig['inspect_recursion_limit'] = '3000';
+			break;
+		}
+	}
+	if (count($ifrules) == count($ifaces)) {
+		$input_errors[] = gettext("No more available interfaces to configure for Suricata!");
+		$interfaces = array();
+		$pconfig = array();
+	}
+
+	// Set Home Net, External Net, Suppress List and Pass List to defaults
+	unset($pconfig['suppresslistname']);
+	unset($pconfig['passlistname']);
+	unset($pconfig['homelistname']);
+	unset($pconfig['externallistname']);
+}
+
+if ($_POST["save"] && !$input_errors) {
 	// If the interface is not enabled, stop any running Suricata
 	// instance on it, save the new state and exit.
 	if (!isset($_POST['enable'])) {
@@ -237,7 +274,7 @@ if ($_POST["save"]) {
 		if ($_POST['configpassthru']) $natent['configpassthru'] = base64_encode($_POST['configpassthru']); else unset($natent['configpassthru']);
 
 		$if_real = get_real_interface($natent['interface']);
-		if (isset($id) && $a_rule[$id]) {
+		if (isset($id) && $a_rule[$id] && $action == '') {
 			// See if moving an existing Suricata instance to another physical interface
 			if ($natent['interface'] != $a_rule[$id]['interface']) {
 				$oif_real = get_real_interface($a_rule[$id]['interface']);
@@ -253,7 +290,15 @@ if ($_POST["save"]) {
 				conf_mount_ro();
 			}
 			$a_rule[$id] = $natent;
-		} else {
+		}
+		elseif (strcasecmp($action, 'dup') == 0) {
+			// Duplicating a new interface, so set flag to build new rules
+			$rebuild_rules = true;
+
+			// Add the new duplicated interface configuration to the [rule] array in config
+			$a_rule[] = $natent;
+		}
+		else {
 			// Adding new interface, so set interface configuration parameter defaults
 			$natent['ip_max_frags'] = "65535";
 			$natent['ip_frag_timeout'] = "60";
@@ -358,6 +403,9 @@ if ($savemsg) {
 ?>
 
 <form action="suricata_interfaces_edit.php<?php echo "?id=$id";?>" method="post" name="iform" id="iform">
+<input name="id" type="hidden" value="<?=$id;?>"/>
+<input name="action" type="hidden" value="<?=$action;?>"/>
+
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
 <tr><td>
 <?php
@@ -773,7 +821,6 @@ if ($savemsg) {
 <tr>
 	<td colspan="2" align="center" valign="middle"><input name="save" type="submit" class="formbtn" value="Save" title="<?php echo 
 			gettext("Click to save settings and exit"); ?>"/>
-			<input name="id" type="hidden" value="<?=$id;?>"/>
 	</td>
 </tr>
 <tr>

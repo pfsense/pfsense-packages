@@ -108,7 +108,7 @@ EOD;
 	}
 }
 
-function clamav_before_form($pkg) {
+function clamav_before_form(&$pkg) {
 	global $config;
 
 	if (is_package_installed('p3scan')) {
@@ -203,15 +203,15 @@ function clamav_before_form($pkg) {
 	}
 }
 
-function clamav_validate_input($post, $input_errors) {
+function clamav_validate_input($post, &$input_errors) {
 	if ($post['scan_smtp'] == 'on') {
 		require_once('clamsmtp.inc');
-		clamsmtp_validate_input($post, &$input_errors);
+		clamsmtp_validate_input($post, $input_errors);
 	}
 
 	if (is_package_installed('viralator')) {
 		require_once('viralator.inc');
-		viralator_validate_input($post, &$input_errors);
+		viralator_validate_input($post, $input_errors);
 	}
 }
 

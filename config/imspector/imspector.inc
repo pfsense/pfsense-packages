@@ -91,7 +91,7 @@
 		}
 	}
 
-	function validate_form_imspector($post, $input_errors) {
+	function validate_form_imspector($post, &$input_errors) {
 		if($post['iface_array'])
 			foreach($post['iface_array'] as $iface)
 				if($iface == 'wanx')

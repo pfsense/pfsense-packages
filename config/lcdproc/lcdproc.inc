@@ -72,7 +72,7 @@
 		chmod($file, 0755);
 	}
 
-	function before_form_lcdproc($pkg) {
+	function before_form_lcdproc(&$pkg) {
 		global $config;
 
 		config_lock();		
@@ -80,7 +80,7 @@
 		config_unlock();
 	}
 
-	function before_form_lcdproc_screens($pkg) {
+	function before_form_lcdproc_screens(&$pkg) {
 		global $config;
 
 		config_lock();		
@@ -88,7 +88,7 @@
 		config_unlock();
 	}
 
-	function validate_form_lcdproc($post, $input_errors) {
+	function validate_form_lcdproc($post, &$input_errors) {
 		if($post['comport']) {
 			switch($post['comport']) {
 				case "none":
@@ -155,7 +155,7 @@
 			}
 		}
 	}
-	function validate_form_lcdproc_screens($post, $input_errors) {
+	function validate_form_lcdproc_screens($post, &$input_errors) {
 		// No validation required ?!
 	}
 

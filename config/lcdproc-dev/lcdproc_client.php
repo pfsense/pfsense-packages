@@ -513,6 +513,7 @@
 			1  = All gateway up  */
 		global $g;
 		global $config;
+		$a_gateways = return_gateways_array();
 		$gateways_status = array();
 		$gateways_status = return_gateways_status(true);
 		foreach ($a_gateways as $gname => $gateway)

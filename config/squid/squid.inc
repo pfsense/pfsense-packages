@@ -299,7 +299,7 @@ function squid_before_form_general($pkg) {
 		$field['options']['option'][] = array('name' => $names[$i], 'value' => $values[$i]);
 }
 
-function squid_validate_general($post, $input_errors) {
+function squid_validate_general($post, &$input_errors) {
 	global $config;
 	$settings = $config['installedpackages']['squid']['config'][0];
 	$port = ($settings['proxy_port'] ? $settings['proxy_port'] : 3128);
@@ -356,7 +356,7 @@ function squid_validate_general($post, $input_errors) {
 	 }}
 }
 
-function squid_validate_upstream($post, $input_errors) {
+function squid_validate_upstream($post, &$input_errors) {
 	if ($post['proxy_forwarding'] == 'on') {
 		$addr = trim($post['proxy_addr']);
 		if (empty($addr))
@@ -378,7 +378,7 @@ function squid_validate_upstream($post, $input_errors) {
 	}
 }
 
-function squid_validate_cache($post, $input_errors) {
+function squid_validate_cache($post, &$input_errors) {
 	$num_fields = array(	'harddisk_cache_size' => 'Hard disk cache size',
 				'memory_cache_size' => 'Memory cache size',
 				'maximum_object_size' => 'Maximum object size',
@@ -417,7 +417,7 @@ function squid_validate_cache($post, $input_errors) {
 
 }
 
-function squid_validate_nac($post, $input_errors) {
+function squid_validate_nac($post, &$input_errors) {
 	$allowed_subnets = explode("\n", $post['allowed_subnets']);
 	foreach ($allowed_subnets as $subnet) {
 		$subnet = trim($subnet);
@@ -456,7 +456,7 @@ function squid_validate_nac($post, $input_errors) {
 	}
 }
 
-function squid_validate_traffic($post, $input_errors) {
+function squid_validate_traffic($post, &$input_errors) {
 	$num_fields = array(	'max_download_size' => 'Maximum download size',
 				'max_upload_size' => 'Maximum upload size',
 				'perhost_throttling' => 'Per-host bandwidth throttling',
@@ -488,7 +488,7 @@ function squid_validate_traffic($post, $input_errors) {
 
 }
 
-function squid_validate_auth($post, $input_errors) {
+function squid_validate_auth($post, &$input_errors) {
 	$num_fields = array(	array('auth_processes', 'Authentication processes', 1),
 				array('auth_ttl', 'Authentication TTL', 0),
 	);

@@ -24,7 +24,7 @@ EOD;
 		make_dirs(VIRALATOR_DOWNLOADDIR);
 }
 
-function viralator_validate_input($post, $input_errors) {
+function viralator_validate_input($post, &$input_errors) {
 	if (trim($post['http_otherexts'])) {
 		foreach (explode(',', $post['http_otherexts']) as $ext) {
 			$ext = trim($ext);

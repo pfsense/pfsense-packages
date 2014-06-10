@@ -62,6 +62,9 @@
 		<item>
 			<type>plugin_carp</type>
 		</item>
+		<item>
+			<type>plugin_certificates</type>
+		</item>
 	</plugins>
 	<configpath>installedpackages->haproxy->config</configpath>
 	<additional_files_needed>

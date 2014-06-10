@@ -169,7 +169,6 @@ function nrpe2_custom_php_write_config() {
 	$commands = implode($cmds);
 
 	$server_port = $config['installedpackages']['nrpe2']['config'][0]['server_port'];
-	$server_address = $config['installedpackages']['nrpe2']['config'][0]['server_address'];
 	$allowed_hosts = $config['installedpackages']['nrpe2']['config'][0]['allowed_hosts'];
 
 	$fd = fopen(NRPE_CONFIG_DIR . '/nrpe.cfg', 'w');
@@ -177,7 +176,6 @@ function nrpe2_custom_php_write_config() {
 log_facility=daemon
 pid_file=/var/run/nrpe2.pid
 server_port={$server_port}
-server_address={$server_address}
 nrpe_user=nagios
 nrpe_group=nagios
 allowed_hosts={$allowed_hosts}
@@ -187,6 +185,10 @@ command_timeout=60
 connection_timeout=300
 {$commands}
 EOD;
+	if (defined($config['installedpackages']['nrpe2']['config'][0]['server_address'])) {
+                $server_address = $config['installedpackages']['nrpe2']['config'][0]['server_address'];
+                $nrpe_cfg .= "server_address={$server_address}";
+        }
 	fwrite($fd, $nrpe_cfg);
 	fclose($fd);
 	conf_mount_ro();

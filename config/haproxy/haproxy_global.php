@@ -59,7 +59,11 @@ if ($_POST) {
 		if ($_POST['carpdev'] == "disabled")
 			unset($_POST['carpdev']);
 
-		do_input_validation($_POST, $reqdfields, $reqdfieldsn, &$input_errors);
+		$pf_version=substr(trim(file_get_contents("/etc/version")),0,3);
+		if ($pf_version < 2.1)
+			$input_errors = eval('do_input_validation($_POST, $reqdfields, $reqdfieldsn, &$input_errors); return $input_errors;');
+		else
+			do_input_validation($_POST, $reqdfields, $reqdfieldsn, $input_errors);
 
 		if ($_POST['maxconn'] && (!is_numeric($_POST['maxconn']))) 
 			$input_errors[] = "The maximum number of connections should be numeric.";

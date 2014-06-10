@@ -53,7 +53,7 @@
 		<descr><![CDATA[The most widely used name server software]]></descr>
 		<website>http://www.isc.org/downloads/BIND/</website>
 		<category>Services</category>
-		<version>9.9.5_12 pkg v 0.3.2</version>
+		<version>9.9.5_12 pkg v 0.3.3</version>
 		<status>RC</status>
 		<required_version>2.1</required_version>
 		<config_file>https://packages.pfsense.org/packages/config/bind/bind.xml</config_file>
@@ -74,7 +74,7 @@
 		<category>File Management</category>
 		<pkginfolink>https://doc.pfsense.org/index.php/Filer_package</pkginfolink>
 		<config_file>https://packages.pfsense.org/packages/config/filer/filer.xml</config_file>
-		<version>0.60</version>
+		<version>0.60.1</version>
 		<status>Beta</status>
 		<required_version>2.0</required_version>
 		<maintainer>bscholer@cshl.edu</maintainer>
@@ -144,7 +144,7 @@
 				Supports acl's for smart backend switching.]]></descr>
 		<website>http://haproxy.1wt.eu/</website>
 		<category>Services</category>
-		<version>1.4.24 pkg v 1.2.4</version>
+		<version>1.4.24 pkg v 1.2.5</version>
 		<status>Release</status>
 		<required_version>2.0</required_version>
 		<config_file>https://packages.pfsense.org/packages/config/haproxy/haproxy.xml</config_file>
@@ -162,7 +162,7 @@
 				(Legacy version)]]></descr>
 		<website>http://haproxy.1wt.eu/</website>
 		<category>Services</category>
-		<version>1.4.24 pkg v 1.1</version>
+		<version>1.4.24 pkg v 1.1.1</version>
 		<status>Release</status>
 		<required_version>2.0</required_version>
 		<config_file>https://packages.pfsense.org/packages/config/haproxy-legacy/haproxy.xml</config_file>
@@ -553,7 +553,7 @@
 		<depends_on_package_base_url>https://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
 		<depends_on_package>spamd-4.9.1.tbz</depends_on_package>
 		<depends_on_package_pbi>spamd-4.9.1-amd64.pbi</depends_on_package_pbi>
-		<version>4.9.1 v1.1</version>
+		<version>4.9.1 v1.1.1</version>
 		<status>Beta</status>
 		<required_version>1.2.1</required_version>
 		<configurationfile>spamd.xml</configurationfile>
@@ -578,7 +578,7 @@
 		<depends_on_package_pbi>postfix-2.10.2-amd64.pbi</depends_on_package_pbi>
 		<version>2.10.2 pkg v.2.3.7</version>
 		<status>Release</status>
-		<required_version>2.0</required_version>
+		<required_version>2.1</required_version>
 		<configurationfile>postfix.xml</configurationfile>
 		<build_port_path>/usr/ports/mail/postfix</build_port_path>
 		<build_options>WITH_PCRE=true;WITH_SPF=true;WITH_SASL2=true;WITH_TLS=true</build_options>
@@ -610,7 +610,7 @@
 	<package>
 		<name>mailscanner</name>
 		<internal_name>mailscanner</internal_name>
-		<website>www.mailscanner.info</website>
+		<website>http://www.mailscanner.info</website>
 		<descr><![CDATA[MailScanner is an e-mail security and anti-spam package for e-mail gateway systems.<br />
 						This is a level3 mail scanning tool with high CPU load.]]></descr>
 		<category>Services</category>
@@ -908,7 +908,7 @@
 		<descr>Automatically backs up your pfSense configuration.  All contents are encrypted on the server.  Requires pfSense Premium Support Portal Subscription from https://portal.pfsense.org</descr>
 		<website>https://portal.pfsense.org</website>
 		<category>Services</category>
-		<version>1.24</version>
+		<version>1.25</version>
 		<status>Stable</status>
 		<required_version>1.2</required_version>
 		<pkginfolink>https://doc.pfsense.org/index.php/AutoConfigBackup</pkginfolink>
@@ -955,7 +955,7 @@
 		<website>http://www.imspector.org/</website>
 		<category>Network Management</category>
 		<maintainer>marcellocoutinho@gmail.com</maintainer>
-		<version>20111108 pkg v 0.3.1</version>
+		<version>20111108 pkg v 0.3.2</version>
 		<required_version>2.0</required_version>
 		<status>BETA</status>
 		<pkginfolink>https://doc.pfsense.org/index.php/IMSpector_package</pkginfolink>
@@ -1101,7 +1101,7 @@
 		<website>http://bandwidthd.sourceforge.net/</website>
 		<descr>BandwidthD tracks usage of TCP/IP network subnets and builds html files with graphs to display utilization. Charts are built by individual IPs, and by default display utilization over 2 day, 8 day, 40 day, and 400 day periods. Furthermore, each ip address's utilization can be logged out at intervals of 3.3 minutes, 10 minutes, 1 hour or 12 hours in cdf format, or to a backend database server. HTTP, TCP, UDP, ICMP, VPN, and P2P traffic are color coded.</descr>
 		<category>System</category>
-		<version>2.0.1_5 pkg v.0.3</version>
+		<version>2.0.1_5 pkg v.0.4</version>
 		<status>BETA</status>
 		<required_version>1.2.1</required_version>
 		<depends_on_package_base_url>https://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
@@ -1190,7 +1190,7 @@
 		<descr>High performance web proxy cache.</descr>
 		<website>http://www.squid-cache.org/</website>
 		<category>Network</category>
-		<version>2.7.9 pkg v.4.3.3</version>
+		<version>2.7.9 pkg v.4.3.4</version>
 		<status>Stable</status>
 		<required_version>2</required_version>
 		<maintainer>fernando@netfilter.com.br seth.mos@dds.nl mfuchs77@googlemail.com jimp@pfsense.org</maintainer>
@@ -1274,7 +1274,7 @@
 		<descr>LCD display driver</descr>
 		<website>http://www.lcdproc.org/</website>
 		<category>Utility</category>
-		<version>lcdproc-0.5.5</version>
+		<version>lcdproc-0.5.5 pkg.v.1.0.1</version>
 		<status>BETA</status>
 		<required_version>1.2.1</required_version>
 		<maintainer>seth.mos@dds.nl</maintainer>
@@ -1292,7 +1292,7 @@
 		<descr>LCD display driver - Development version</descr>
 		<website>http://www.lcdproc.org/</website>
 		<category>Utility</category>
-		<version>lcdproc-0.5.6 pkg v. 0.9.7</version>
+		<version>lcdproc-0.5.6 pkg v. 0.9.9</version>
 		<status>BETA</status>
 		<required_version>2.0</required_version>
 		<maintainer>michele@nt2.it</maintainer>
@@ -1331,7 +1331,7 @@
 		<website>http://www.squidGuard.org/</website>
 		<maintainer>dv_serg@mail.ru</maintainer>
 		<category>Network Management</category>
-		<version>1.4_4 pkg v.1.9.5</version>
+		<version>1.4_4 pkg v.1.9.6</version>
 		<status>Beta</status>
 		<required_version>1.1</required_version>
 		<depends_on_package_base_url>https://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
@@ -1440,7 +1440,7 @@
 		<depends_on_package_pbi>zip-3.0-amd64.pbi p7zip-9.20.1-amd64.pbi</depends_on_package_pbi>
 		<build_port_path>/usr/ports/archivers/p7zip</build_port_path>
 		<build_port_path>/usr/ports/archivers/zip</build_port_path>
-		<version>1.2.9</version>
+		<version>1.2.11</version>
 		<status>RELEASE</status>
 		<required_version>2.0</required_version>
 		<config_file>https://packages.pfsense.org/packages/config/openvpn-client-export/openvpn-client-export.xml</config_file>
@@ -1464,32 +1464,6 @@
 		<configurationfile>havp.xml</configurationfile>
 		<maintainer>dv_serg@mail.ru</maintainer>
 		<after_install_info>Please check the HAVP settings.</after_install_info>
-	</package>
-	<package>
-		<name>pfJailctl</name>
-		<descr>pfSense wrapper for jailctl - a jail management tool. Allows you to run jails on pfSense.</descr>
-		<website>http://anduin.net/jailctl/</website>
-		<category>System</category>
-		<version>0.51</version>
-		<required_version>1.2.3</required_version>
-		<status>BETA</status>
-		<pkginfolink>https://doc.pfsense.org/index.php/PfJailctl_package</pkginfolink>
-		<config_file>https://packages.pfsense.org/packages/config/jailctl.xml</config_file>
-		<configurationfile>jailctl.xml</configurationfile>
-		<maintainer>ltning-jailctl@anduin.net</maintainer>
-	</package>
-	<package>
-		<name>jail_template</name>
-		<descr>Basic template for jails, probably requires pfJailctl to be useful. Includes 'base' and 'manpages' dists.</descr>
-		<website>http://anduin.net/jailctl/</website>
-		<category>System</category>
-		<version>0.2</version>
-		<required_version>1.2.3</required_version>
-		<status>BETA</status>
-		<pkginfolink>https://doc.pfsense.org/index.php/PfJailctl_package</pkginfolink>
-		<config_file>https://packages.pfsense.org/packages/config/jail_template.xml</config_file>
-		<configurationfile>jail_template.xml</configurationfile>
-		<maintainer>ltning-jailctl@anduin.net</maintainer>
 	</package>
 	<package>
 		<name>blinkled</name>
@@ -1603,7 +1577,7 @@
 	<package>
 		<name>widescreen</name>
 		<descr>The package makes pfSense adapt to browser's current width. It is particularly convenient for Status->Dashboard page that allocates columns for widgets according to browser's current width. ATTENTION: the package heavily modifies pfsense_ng theme and affects other's themes appearance. Please REFRESH your browser's window after installing/uninstalling this package.</descr>
-		<website></website>
+		<website/>
 		<pkginfolink></pkginfolink>
 		<category>Enhancements</category>
 		<version>0.2</version>
@@ -1653,7 +1627,7 @@
 		</build_pbi>
 		<build_options></build_options>
 		<config_file>https://packages.pfsense.org/packages/config/checkmk-agent/checkmk.xml</config_file>
-		<version>v0.1</version>
+		<version>v0.1.1</version>
 		<status>RC1</status>
 		<required_version>2.0</required_version>
 		<maintainer>marcellocoutinho@gmail.com</maintainer>
@@ -1675,7 +1649,7 @@
 		<name>mailreport</name>
 		<descr>Allows you to setup periodic e-mail reports containing command output, log file contents, and RRD graphs.</descr>
 		<category>Network Management</category>
-		<version>2.0.11</version>
+		<version>2.0.12</version>
 		<status>Stable</status>
 		<required_version>2.0</required_version>
 		<config_file>https://packages.pfsense.org/packages/config/mailreport/mailreport.xml</config_file>
@@ -1687,9 +1661,9 @@
 				This allows traffic such as telnet, ftp and X to be protected from snooping as well as potentially gaining performance over low-bandwidth networks from compression.]]>
 		</descr>
 		<category>Services</category>
-		<version>1.2</version>
+		<version>1.2.1</version>
 		<status>BETA</status>
-		<website>www.winton.org.uk/zebedee/</website>
+		<website>http://www.winton.org.uk/zebedee/</website>
 		<maintainer>jorgelustosa@gmail.com marcellocoutinho@gmail.com</maintainer>
 		<required_version>2.0</required_version>
 		<depends_on_package_base_url>https://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
@@ -1713,7 +1687,7 @@
 		<name>Quagga OSPF</name>
 		<descr>OSPF routing protocol using Quagga -- WARNING! Installs files to the same place as OpenOSPFD and OpenBGPD. Installing both will break things.</descr>
 		<maintainer>jimp@pfsense.org</maintainer>
-		<version>0.99.22.3 v0.6.1</version>
+		<version>0.99.22.3 v0.6.2</version>
 		<category>Routing</category>
 		<status>BETA</status>
 		<depends_on_package_base_url>https://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
@@ -1729,7 +1703,7 @@
 		<name>System Patches</name>
 		<descr>A package to apply and maintain custom system patches.</descr>
 		<maintainer>jimp@pfsense.org</maintainer>
-		<version>1.0.1</version>
+		<version>1.0.2</version>
 		<category>System</category>
 		<status>RELEASE</status>
 		<config_file>https://packages.pfsense.org/packages/config/systempatches/systempatches.xml</config_file>
@@ -1826,7 +1800,7 @@
 			<port>security/tinc</port>
 		</build_pbi>
 		<build_options></build_options>
-		<version>1.0.23 v1.2</version>
+		<version>1.0.23 v1.2.1</version>
 		<status>ALPHA</status>
 		<pkginfolink>https://doc.pfsense.org/index.php/tinc_package</pkginfolink>
 		<required_version>2.1</required_version>
@@ -1843,7 +1817,7 @@
 		<website>http://www.balabit.com/network-security/syslog-ng/</website>
 		<descr>Syslog-ng syslog server. This service is not intended to replace the default pfSense syslog server but rather acts as an independent syslog server.</descr>
 		<category>Services</category>
-		<version>3.5.4.1_1</version>
+		<version>3.5.4.1_1 pkg.v.1.0.1</version>
 		<status>ALPHA</status>
 		<required_version>2.1</required_version>
 		<depends_on_package_base_url>https://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
@@ -1968,7 +1942,7 @@
 		<descr>Set of programs for controlling APC UPS.</descr>
 		<category>Services</category>
 		<config_file>https://packages.pfsense.org/packages/config/apcupsd/apcupsd.xml</config_file>
-		<version>apcupsd-3.14.10_1 pkg v0.3</version>
+		<version>apcupsd-3.14.10_1 pkg v0.3.1</version>
 		<status>BETA</status>
 		<required_version>2.0</required_version>
 		<configurationfile>apcupsd.xml</configurationfile>
@@ -2003,7 +1977,7 @@
 		<website>http://suricata-ids.org/</website>
 		<descr><![CDATA[Suricata is the OISF IDP engine, the open source Intrusion Detection and Prevention Engine.]]></descr>
 		<category>Security</category>
-		<version>1.4.6 pkg v1.0.1</version>
+		<version>1.4.6 pkg v1.0.2</version>
 		<status>Stable</status>
 		<required_version>2.1</required_version>
 		<config_file>https://packages.pfsense.org/packages/config/suricata/suricata.xml</config_file>

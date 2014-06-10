@@ -29,7 +29,7 @@ default-log-dir: {$suricatalogdir}suricata_{$if_real}{$suricata_uuid}
 # Configure the type of alert (and other) logging.
 outputs:
 
-  # alert_pf blocking plugin
+  # alert-pf blocking plugin
   - alert-pf:
       enabled: {$suri_blockoffenders}
       kill-state: {$suri_killstates}
