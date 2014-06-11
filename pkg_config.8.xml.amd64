@@ -512,7 +512,7 @@
 		</build_pbi>
 		<build_options>barnyard2_UNSET=ODBC PGSQL PRELUDE;barnyard2_SET=GRE IPV6 MPLS MYSQL PORT_PCAP;snort_SET=TARGETBASED PERFPROFILE SOURCEFIRE FLEXRESP3 GRE IPV6 MPLS NORMALIZER ZLIB;snort_UNSET=PULLEDPORK;perl_SET=THREADS;NOPORTDOCS=true</build_options>
 		<config_file>https://packages.pfsense.org/packages/config/snort/snort.xml</config_file>
-		<version>2.9.6.0 pkg v3.0.9</version>
+		<version>2.9.6.0 pkg v3.0.10</version>
 		<required_version>2.0</required_version>
 		<status>Stable</status>
 		<configurationfile>/snort.xml</configurationfile>
