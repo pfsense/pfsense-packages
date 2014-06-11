@@ -34,14 +34,14 @@
 		<descr><![CDATA[Asterisk is an open source framework for building communications applications.<br />Asterisk turns an ordinary computer into a communications server.]]></descr>
 		<website>http://www.asterisk.org/</website>
 		<category>Services</category>
-		<version>1.8.26.1_1 pkg v0.3.2</version>
+		<version>1.8.26.1 pkg v0.3.3</version>
 		<status>Beta</status>
 		<required_version>2.0</required_version>
 		<config_file>https://packages.pfsense.org/packages/config/asterisk/asterisk.xml</config_file>
 		<depends_on_package_base_url>https://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
 		<depends_on_package>asterisk18-1.8.25.0.tbz</depends_on_package>
 		<depends_on_package>openldap-client-2.4.38.tbz</depends_on_package>
-		<depends_on_package_pbi>asterisk-1.8.26.1_1-i386.pbi</depends_on_package_pbi>
+		<depends_on_package_pbi>asterisk-1.8.26.1-i386.pbi</depends_on_package_pbi>
 		<build_port_path>/usr/ports/net/asterisk</build_port_path>
 		<maintainer>marcellocoutinho@gmail.com robreg@zsurob.hu</maintainer>
 		<configurationfile>asterisk.xml</configurationfile>
@@ -53,13 +53,13 @@
 		<descr><![CDATA[The most widely used name server software]]></descr>
 		<website>http://www.isc.org/downloads/BIND/</website>
 		<category>Services</category>
-		<version>9.9.5_12 pkg v 0.3.3</version>
+		<version>9.9.5_10 pkg v 0.3.4</version>
 		<status>RC</status>
 		<required_version>2.1</required_version>
 		<config_file>https://packages.pfsense.org/packages/config/bind/bind.xml</config_file>
 		<configurationfile>bind.xml</configurationfile>
 		<depends_on_package_base_url>https://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
-		<depends_on_package_pbi>bind-9.9.5_12-i386.pbi</depends_on_package_pbi>
+		<depends_on_package_pbi>bind-9.9.5_10-i386.pbi</depends_on_package_pbi>
 		<build_port_path>/usr/ports/dns/bind99</build_port_path>
 		<build_pbi>
 			<custom_name>bind</custom_name>
@@ -192,14 +192,14 @@
 				Supports acl's for smart backend switching.]]></descr>
 		<website>http://haproxy.1wt.eu/</website>
 		<category>Services</category>
-		<version>1.5-dev24 pkg v 0.8</version>
+		<version>1.5-dev22 pkg v 0.9</version>
 		<status>Release</status>
 		<required_version>2.1</required_version>
 		<config_file>https://packages.pfsense.org/packages/config/haproxy-devel/haproxy.xml</config_file>
 		<configurationfile>haproxy.xml</configurationfile>
 		<depends_on_package_base_url>https://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
 		<depends_on_package>haproxy-1.4.22.tbz</depends_on_package>
-		<depends_on_package_pbi>haproxy-devel-1.5-dev24-i386.pbi</depends_on_package_pbi>
+		<depends_on_package_pbi>haproxy-devel-1.5-dev22-i386.pbi</depends_on_package_pbi>
 		<build_port_path>/usr/ports/net/haproxy-devel</build_port_path>
 		<build_pbi>
 			<ports_before>security/openssl</ports_before>
@@ -217,7 +217,7 @@
 			In addition this package allows URL forwarding which can be convenient for hosting multiple websites behind pfSense using 1 IP address.<br>
 			<b>Backup your location config before updating from 0.2.x to 0.3 package version.</b>]]></descr>
 		<category>Network Management</category>
-		<version>2.4.9_2 pkg v0.3</version>
+		<version>2.4.9 pkg v0.4</version>
 		<status>ALPHA</status>
 		<required_version>2.0</required_version>
 		<config_file>https://packages.pfsense.org/packages/config/apache_mod_security-dev/apache_virtualhost.xml</config_file>
@@ -228,7 +228,7 @@
 		<depends_on_package>ap22-mod_memcache-0.1.0_4.tbz</depends_on_package>
 		<depends_on_package>apache-2.2.22_5.tbz</depends_on_package>
 		<depends_on_package>ap22-mod_security-2.6.5_1.tbz</depends_on_package>
-		<depends_on_package_pbi>proxy_mod_security-2.4.9_2-i386.pbi git-1.9.2-i386.pbi</depends_on_package_pbi>
+		<depends_on_package_pbi>proxy_mod_security-2.4.9-i386.pbi git-1.9.0_1-i386.pbi</depends_on_package_pbi>
 		<configurationfile>apache_virtualhost.xml</configurationfile>
 		<build_port_path>/usr/ports/devel/gettext</build_port_path>
 		<build_port_path>/usr/ports/misc/help2man</build_port_path>
@@ -263,7 +263,7 @@
 		<website>http://www.modsecurity.org/</website>
 		<descr>ModSecurity is a web application firewall that can work either embedded or as a reverse proxy. It provides protection from a range of attacks against web applications and allows for HTTP traffic monitoring, logging and real-time analysis. In addition this package allows URL forwarding which can be convenient for hosting multiple websites behind pfSense using 1 IP address.</descr>
 		<category>Network Management</category>
-		<version>0.1.5</version>
+		<version>0.1.6</version>
 		<status>ALPHA</status>
 		<required_version>2.0</required_version>
 		<config_file>https://packages.pfsense.org/packages/config/apache_mod_security/apache_mod_security.xml</config_file>
@@ -274,7 +274,7 @@
 		<depends_on_package>ap22-mod_memcache-0.1.0_4.tbz</depends_on_package>
 		<depends_on_package>apache-2.2.22_5.tbz</depends_on_package>
 		<depends_on_package>ap22-mod_security-2.6.5_1.tbz</depends_on_package>
-		<depends_on_package_pbi>proxy_mod_security-2.2.27_2-i386.pbi</depends_on_package_pbi>
+		<depends_on_package_pbi>proxy_mod_security-2.2.27-i386.pbi</depends_on_package_pbi>
 		<configurationfile>apache_mod_security.xml</configurationfile>
 		<build_port_path>/usr/ports/devel/gettext</build_port_path>
 		<build_port_path>/usr/ports/misc/help2man</build_port_path>
@@ -339,7 +339,7 @@
 		</build_pbi>
 		<depends_on_package>avahi-app-0.6.29_1.tbz</depends_on_package>
 		<depends_on_package_pbi>avahi-0.6.31-i386.pbi</depends_on_package_pbi>
-		<version>0.6.31 pkg v1.03</version>
+		<version>0.6.31 pkg v1.04</version>
 		<status>ALPHA</status>
 		<required_version>1.2.3</required_version>
 		<config_file>https://packages.pfsense.org/packages/config/avahi/avahi.xml</config_file>
@@ -352,7 +352,7 @@
 		<descr>ntop is a network probe that shows network usage in a way similar to what top does for processes. In interactive mode, it displays the network status on the user's terminal. In Web mode it acts as a Web server, creating an HTML dump of the network status. It sports a NetFlow/sFlow emitter/collector, an HTTP-based client interface for creating ntop-centric monitoring applications, and RRD for persistently storing traffic statistics.</descr>
 		<category>Network Management</category>
 		<depends_on_package_base_url>https://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
-		<depends_on_package_pbi>ntop-5.0.1_1-i386.pbi</depends_on_package_pbi>
+		<depends_on_package_pbi>ntop-5.0.1-i386.pbi</depends_on_package_pbi>
 		<depends_on_package>rrdtool-1.2.30_2.tbz</depends_on_package>
 		<depends_on_package>gdbm-1.9.1.tbz</depends_on_package>
 		<depends_on_package>perl-5.14.2_2.tbz</depends_on_package>
@@ -373,7 +373,7 @@
 			<port>net/ntop</port>
 		</build_pbi>
 		<build_options>WITH_PCAP_PORT=true;WITH_XMLDUMP=true;WITHOUT_JUMBO_FRAMES=true;WITH_MAKO=true;WITHOUT_DEJAVU=true;WITH_JSON=true;WITH_MMAP=true;WITHOUT_PERL_MODULE=true;WITHOUT_PYTHON_MODULE=true;WITHOUT_RUBY_MODULE=true;WITHOUT_EXAMPLES=true;WITHOUT_FPECTL=true;WITH_IPV6=true;WITH_NLS=true;WITHOUT_PTH=true;WITH_PYMALLOC=true;WITHOUT_SEM=true;WITH_THREADS=true;WITHOUT_UCS2=true;WITH_UCS4=true;WITH_FONTCONFIG=true;WITH_ICONV=true;WITHOUT_XPM=true;WITHOUT_DAG=true;WITHOUT_DIGCOLA=true;WITHOUT_IPSEPCOLA=true;WITHOUT_PANGOCAIRO=true;WITHOUT_GTK=true;WITHOUT_XCB=true</build_options>
-		<version>5.0.1_1 v2.4</version>
+		<version>5.0.1 v2.5</version>
 		<status>BETA</status>
 		<required_version>2.0</required_version>
 		<config_file>https://packages.pfsense.org/packages/config/ntop2/ntop.xml</config_file>
@@ -525,7 +525,7 @@
 		</build_pbi>
 		<build_options>barnyard2_UNSET=ODBC PGSQL PRELUDE;barnyard2_SET=GRE IPV6 MPLS MYSQL PORT_PCAP BRO;snort_SET=TARGETBASED PERFPROFILE SOURCEFIRE FLEXRESP3 GRE IPV6 MPLS NORMALIZER ZLIB;snort_UNSET=PULLEDPORK;perl_SET=THREADS;NOPORTDOCS=true</build_options>
 		<config_file>https://packages.pfsense.org/packages/config/snort/snort.xml</config_file>
-		<version>2.9.6.0 pkg v3.0.8</version>
+		<version>2.9.6.0 pkg v3.0.9</version>
 		<required_version>2.0</required_version>
 		<status>Stable</status>
 		<configurationfile>/snort.xml</configurationfile>
@@ -611,7 +611,7 @@
 		<depends_on_package>dansguardian-2.12.0.3.tbz</depends_on_package>
 		<depends_on_package>ca_root_nss-3.14.1.tbz</depends_on_package>
 		<depends_on_package_pbi>dansguardian-2.12.0.3_2-i386.pbi</depends_on_package_pbi>
-		<version>2.12.0.3_2 pkg v.0.1.9</version>
+		<version>2.12.0.3_2 pkg v.0.1.10</version>
 		<status>beta</status>
 		<required_version>2.0</required_version>
 		<configurationfile>dansguardian.xml</configurationfile>
@@ -637,7 +637,7 @@
 		<depends_on_package>p5-IP-Country-2.28.tbz</depends_on_package>
 		<depends_on_package>MailScanner-4.84.5_3.tbz</depends_on_package>
 		<depends_on_package_pbi>mailscanner-4.84.6-i386.pbi</depends_on_package_pbi>
-		<version>4.84.6 pkg v.0.2.5</version>
+		<version>4.84.6 pkg v.0.2.6</version>
 		<status>beta</status>
 		<required_version>2.0</required_version>
 		<configurationfile>mailscanner.xml</configurationfile>
@@ -952,9 +952,9 @@
 		<depends_on_package_base_url>https://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
 		<depends_on_package>lua-5.1.5_4.tbz</depends_on_package>
 		<depends_on_package>nmap-6.25_1.tbz</depends_on_package>
-		<depends_on_package_pbi>nmap-6.46-i386.pbi</depends_on_package_pbi>
+		<depends_on_package_pbi>nmap-6.40_2-i386.pbi</depends_on_package_pbi>
 		<config_file>https://packages.pfsense.org/packages/config/nmap/nmap.xml</config_file>
-		<version>nmap-6.46 pkg v1.2.1</version>
+		<version>nmap-6.40_2 pkg v1.2.2</version>
 		<status>Stable</status>
 		<pkginfolink>https://doc.pfsense.org/index.php/Nmap_package</pkginfolink>
 		<required_version>2.0</required_version>
@@ -985,7 +985,7 @@
 		<descr>Network UPS Tools</descr>
 		<website>http://www.networkupstools.org/</website>
 		<category>Network Management</category>
-		<version>2.6.5_1 pkg 2.0.1</version>
+		<version>2.6.5_1 pkg 2.0.2</version>
 		<status>BETA</status>
 		<required_version>2.0</required_version>
 		<maintainer>rswagoner@gmail.com</maintainer>
@@ -1089,13 +1089,13 @@
 					On pfSense docs there is a how-to which could help you on porting users.]]></descr>
 		<pkginfolink>https://doc.pfsense.org/index.php/FreeRADIUS_2.x_package</pkginfolink>
 		<category>System</category>
-		<version>2.1.12_1/2.2.5 pkg v1.6.7_2</version>
+		<version>2.1.12_1/2.2.4 pkg v1.6.7_3</version>
 		<status>RC1</status>
 		<required_version>2.0</required_version>
 		<maintainer>nachtfalkeaw@web.de</maintainer>
 		<depends_on_package_base_url>https://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
 		<depends_on_package>freeradius-2.1.12_1.tbz</depends_on_package>
-		<depends_on_package_pbi>freeradius-2.2.5-i386.pbi</depends_on_package_pbi>
+		<depends_on_package_pbi>freeradius-2.2.4-i386.pbi</depends_on_package_pbi>
 		<depends_on_package>mysql-client-5.1.63.tbz</depends_on_package>
 		<depends_on_package>postgresql-client-8.4.12.tbz</depends_on_package>
 		<depends_on_package>openldap-sasl-client-2.4.23.tbz</depends_on_package>
@@ -1190,7 +1190,7 @@
 		<depends_on_package_base_url>https://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
 		<depends_on_package>mtr-nox11-0.82.tbz</depends_on_package>
 		<depends_on_package_pbi>mtr-0.85_1-i386.pbi</depends_on_package_pbi>
-		<version>0.85_2</version>
+		<version>0.85_1.1</version>
 		<status>Stable</status>
 		<required_version>2.0</required_version>
 		<config_file>https://packages.pfsense.org/packages/config/mtr-nox11.xml</config_file>
@@ -1369,7 +1369,7 @@
 		<website>http://www.squidGuard.org/</website>
 		<maintainer>gugabsd@mundounix.com.br</maintainer>
 		<category>Network Management</category>
-		<version>1.5_3 beta</version>
+		<version>1.5_1.1 beta</version>
 		<status>Beta</status>
 		<required_version>2.1</required_version>
 		<depends_on_package_base_url>https://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
@@ -1674,7 +1674,7 @@
 				This allows traffic such as telnet, ftp and X to be protected from snooping as well as potentially gaining performance over low-bandwidth networks from compression.]]>
 		</descr>
 		<category>Services</category>
-		<version>1.2.1</version>
+		<version>1.2.2</version>
 		<status>BETA</status>
 		<website>http://www.winton.org.uk/zebedee/</website>
 		<maintainer>jorgelustosa@gmail.com marcellocoutinho@gmail.com</maintainer>
@@ -1730,7 +1730,7 @@
 		<descr><![CDATA[Bacula is a set of Open Source, computer programs that permit you (or the system administrator) to manage backup, recovery, and verification of computer data across a network of computers of different kinds.]]></descr>
 		<website>http://www.bacula.org/</website>
 		<category>Services</category>
-		<version>5.2.12_4 pkg v 1.0.2</version>
+		<version>5.2.12_3 pkg v 1.0.3</version>
 		<status>Stable</status>
 		<required_version>2.0</required_version>
 		<config_file>https://packages.pfsense.org/packages/config/bacula-client/bacula-client.xml</config_file>
@@ -1788,7 +1788,7 @@
 		<pkginfolink>https://forum.pfsense.org/</pkginfolink>
 		<descr><![CDATA[GIT Source Code Management (console/shell only)]]></descr>
 		<category>Services</category>
-		<version>1.9.2</version>
+		<version>1.9.0_1.1</version>
 		<status>Beta</status>
 		<required_version>2.1</required_version>
 		<config_file>https://packages.pfsense.org/packages/config/git/git.xml</config_file>
@@ -1800,7 +1800,7 @@
 			<port>devel/git</port>
 		</build_pbi>
 		<depends_on_package_base_url>https://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
-		<depends_on_package_pbi>git-1.9.2-i386.pbi</depends_on_package_pbi>
+		<depends_on_package_pbi>git-1.9.0_1-i386.pbi</depends_on_package_pbi>
 	</package>
 	<package>
 		<name>tinc</name>
@@ -1813,7 +1813,7 @@
 			<port>security/tinc</port>
 		</build_pbi>
 		<build_options></build_options>
-		<version>1.0.23 v1.2.1</version>
+		<version>1.0.23 v1.2.2</version>
 		<status>ALPHA</status>
 		<pkginfolink>https://doc.pfsense.org/index.php/tinc_package</pkginfolink>
 		<required_version>2.1</required_version>
@@ -1830,7 +1830,7 @@
 		<website>http://www.balabit.com/network-security/syslog-ng/</website>
 		<descr>Syslog-ng syslog server. This service is not intended to replace the default pfSense syslog server but rather acts as an independent syslog server.</descr>
 		<category>Services</category>
-		<version>3.5.4.1_1 pkg.v.1.0.1</version>
+		<version>3.5.4.1 pkg.v.1.0.2</version>
 		<status>ALPHA</status>
 		<required_version>2.1</required_version>
 		<depends_on_package_base_url>https://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
@@ -1849,7 +1849,7 @@
 		<descr>Monitoring agent.</descr>
 		<category>Services</category>
 		<config_file>https://packages.pfsense.org/packages/config/zabbix2/zabbix2-agent.xml</config_file>
-		<version>zabbix2-agent-2.2.2_1 pkg v0.8.1</version>
+		<version>zabbix2-agent-2.2.2 pkg v0.8.2</version>
 		<status>BETA</status>
 		<required_version>2.0</required_version>
 		<configurationfile>zabbix2-agent.xml</configurationfile>
@@ -1861,14 +1861,14 @@
 		</build_pbi>
 		<depends_on_package_base_url>https://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
 		<depends_on_package>zabbix22-agent-2.2.2.tbz</depends_on_package>
-		<depends_on_package_pbi>zabbix22-agent-2.2.2_1-i386.pbi</depends_on_package_pbi>
+		<depends_on_package_pbi>zabbix22-agent-2.2.2-i386.pbi</depends_on_package_pbi>
 	</package>
 	<package>
 		<name>Zabbix-2 Proxy</name>
 		<descr>Monitoring agent proxy.</descr>
 		<category>Services</category>
 		<config_file>https://packages.pfsense.org/packages/config/zabbix2/zabbix2-proxy.xml</config_file>
-		<version>zabbix2-proxy-2.2.2_1 pkg v0.8.1</version>
+		<version>zabbix2-proxy-2.2.2 pkg v0.8.2</version>
 		<status>BETA</status>
 		<required_version>2.0</required_version>
 		<configurationfile>zabbix2-proxy.xml</configurationfile>
@@ -1881,7 +1881,7 @@
 		<build_options>OPTIONS_SET+= SQLITE IPV6;OPTIONS_UNSET+= MYSQL JABBER GSSAPI</build_options>
 		<depends_on_package_base_url>https://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
 		<depends_on_package>zabbix22-proxy-2.2.2.tbz</depends_on_package>
-		<depends_on_package_pbi>zabbix22-proxy-2.2.2_1-i386.pbi</depends_on_package_pbi>
+		<depends_on_package_pbi>zabbix22-proxy-2.2.2-i386.pbi</depends_on_package_pbi>
 	</package>
 	<package>
 		<!-- This does not exist yet, this is here to trigger a PBI build -->
@@ -1889,7 +1889,7 @@
 		<pkginfolink>https://forum.pfsense.org/</pkginfolink>
 		<descr><![CDATA[IPMI Tools for local/remote data retrieval and control (Console only, no GUI)]]></descr>
 		<category>Services</category>
-		<version>1.8.12_6</version>
+		<version>1.8.12_5.1</version>
 		<status>Beta</status>
 		<required_version>2.1</required_version>
 		<config_file>https://packages.pfsense.org/packages/config/ipmitool/ipmitool.xml</config_file>
@@ -1990,7 +1990,7 @@
 		<website>http://suricata-ids.org/</website>
 		<descr><![CDATA[Suricata is the OISF IDP engine, the open source Intrusion Detection and Prevention Engine.]]></descr>
 		<category>Security</category>
-		<version>1.4.6 pkg v1.0.2</version>
+		<version>1.4.6 pkg v1.0.3</version>
 		<status>Stable</status>
 		<required_version>2.1</required_version>
 		<config_file>https://packages.pfsense.org/packages/config/suricata/suricata.xml</config_file>
