@@ -100,8 +100,17 @@ function squid_resync_reverse() {
 
 	//PEERS
  	if (($settings['reverse_owa'] == 'on') && (!empty($settings['reverse_owa_ip'])))
- 		$conf .= "cache_peer {$settings['reverse_owa_ip']} parent 443 0 proxy-only no-query originserver login=PASS connection-auth=on ssl sslflags=DONT_VERIFY_PEER front-end-https=on name=OWA_HOST_pfs\n";
+		
+		if(!empty($settings['reverse_owa_ip'])) {
+			$reverse_owa_ip = explode(";", ($settings['reverse_owa_ip']));
+			$casnr = 0;
+			foreach ($reverse_owa_ip as $reowaip) {
+				$casnr++;
+				$conf .= "cache_peer {$reowaip} parent 443 0 proxy-only no-query originserver login=PASS round-robin ssl sslflags=DONT_VERIFY_PEER front-end-https=on name=OWA_HOST_{$casnr}_pfs\n";
 
+			}
+		}
+		
  	$active_peers=array();
  	if (is_array($reverse_peers))
  	 foreach ($reverse_peers as $rp){
@@ -211,8 +220,13 @@ function squid_resync_reverse() {
 
 	//ACCESS
   	if ($settings['reverse_owa'] == 'on' && !empty($settings['reverse_owa_ip']) && $settings['reverse_https'] =="on") {
-		$conf .= "cache_peer_access OWA_HOST_pfs allow OWA_URI_pfs\n";
-		$conf .= "cache_peer_access OWA_HOST_pfs deny allsrc\n";
+		
+		for($cascnt=1;$cascnt<$casnr+1;$cascnt++)
+		{
+			$conf .= "cache_peer_access OWA_HOST_{$cascnt}_pfs allow OWA_URI_pfs\n";
+			$conf .= "cache_peer_access OWA_HOST_{$cascnt}_pfs deny allsrc\n";
+		}
+		
 		$conf .= "never_direct allow OWA_URI_pfs\n";
 		$conf .= "http_access allow OWA_URI_pfs\n";        
 		}
