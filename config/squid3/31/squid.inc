@@ -402,6 +402,7 @@ function squid_validate_general($post, $input_errors) {
 	if (!empty($icp_port) && !is_port($icp_port))
 		$input_errors[] = 'You must enter a valid port number in the \'ICP port\' field';
 
+
 	if (substr($post['log_dir'], -1, 1) == '/')
 		$input_errors[] = 'You may not end log location with an / mark';
 
@@ -594,9 +595,8 @@ function squid_validate_reverse($post, $input_errors) {
 	if(!empty($post['reverse_ip'])) {
 		$reverse_ip = explode(";", ($post['reverse_ip']));
 		foreach ($reverse_ip as $reip) {
-		if (!is_ipaddr($reip))
-			$input_errors[] = 'You must enter a valid IP address in the \'User-defined reverse-proxy IPs\' field';
-			break;
+		if (!is_ipaddr(trim($reip)))
+			$input_errors[] = 'You must enter a valid IP address in the \'User-defined reverse-proxy IPs\' field'.' -> \''.$reip.'\' is invalid.';
 	}}	
 		
 	$fqdn = trim($post['reverse_external_fqdn']);
@@ -618,15 +618,12 @@ function squid_validate_reverse($post, $input_errors) {
       $input_errors[] = "You have to enable reverse HTTPS before enabling OWA support.";
       }
 
-/*
-		if (!is_cert($post['reverse_int_ca']))
- 			$input_errors[] = 'A valid certificate for the external interface must be selected';
-*/
-
-	$rowa = trim($post['reverse_owa_ip']);
-	if (!empty($rowa) && !is_ipaddr($rowa))
-		$input_errors[] = 'The field \'OWA frontend IP address\' must contain a valid IP address';
-
+	if(!empty($post['reverse_owa_ip'])) {
+		$reverse_owa_ip = explode(";", ($post['reverse_owa_ip']));
+		foreach ($reverse_owa_ip as $reowaip) {
+		if (!is_ipaddr(trim($reowaip)))
+			$input_errors[] = 'You must enter a valid IP address in the \'CAS-Array / OWA frontend IP address\' field'.' -> \''.$reowaip.'\' is invalid.';
+	}}	
 	
     $contents = $post['reverse_cache_peer'];
     if(!empty($contents)) {
