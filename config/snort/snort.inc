@@ -1978,7 +1978,7 @@ function snort_generate_barnyard2_conf($snortcfg, $if_real) {
 	$snortbarnyard_hostname_info = php_uname("n");
 
 	// Set general config parameters
-	$gen_configs = "config quiet\nconfig daemon\nconfig decode_data_link\nconfig alert_with_interface_name\nconfig event_cache_size:    8192";
+	$gen_configs = "config quiet\nconfig daemon\nconfig decode_data_link\nconfig alert_with_interface_name";
 	if ($snortcfg['barnyard_show_year'] == 'on')
 		$gen_configs .= "\nconfig show_year";
 	if ($snortcfg['barnyard_obfuscate_ip'] == 'on')
