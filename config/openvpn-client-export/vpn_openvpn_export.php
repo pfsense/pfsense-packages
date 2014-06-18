@@ -131,10 +131,14 @@ if (!empty($act)) {
 	else
 		$nokeys = false;
 
-	if (empty($_GET['useaddr'])) {
+	$useaddr = '';
+	if (isset($_GET['useaddr']) && !empty($_GET['useaddr']))
+		$useaddr = trim($_GET['useaddr']);
+
+	if (!(is_ipaddr($useaddr) || is_hostname($useaddr) ||
+	    in_array($useaddr, array("serveraddr", "servermagic", "servermagichost", "serverhostname"))))
 		$input_errors[] = "You need to specify an IP or hostname.";
-	} else
-		$useaddr = $_GET['useaddr'];
+
 	$advancedoptions = $_GET['advancedoptions'];
 	$openvpnmanager = $_GET['openvpnmanager'];
 
