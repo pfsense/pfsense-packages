@@ -241,7 +241,7 @@
 			<fielddescr>Enable AutoDiscover</fielddescr>
 			<fieldname>reverse_owa_autodiscover</fieldname>
 			<description><![CDATA[If this field is checked, AutoDiscover will be enabled.<br>
-								<strong>You also should set up a DNS-A-record to point to you WAN-IP.</strong>]]></description>
+								<strong>You also should set up the autodiscover DNS-record to point to you WAN-IP.</strong>]]></description>
 			<type>checkbox</type>
 		</field>
 	</fields>
