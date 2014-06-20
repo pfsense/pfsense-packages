@@ -128,16 +128,27 @@ if ($_POST) {
 	
 	$reqdfields = explode(" ", "name");
 	$reqdfieldsn = explode(",", "Name");		
-	do_input_validation($_POST, $reqdfields, $reqdfieldsn, &$input_errors);
+
+	$pf_version=substr(trim(file_get_contents("/etc/version")),0,3);
+	if ($pf_version < 2.1)
+		$input_errors = eval('do_input_validation($_POST, $reqdfields, $reqdfieldsn, &$input_errors); return $input_errors;');
+	else
+		do_input_validation($_POST, $reqdfields, $reqdfieldsn, $input_errors);
 
 	if ($_POST['stats_enabled']) {
 		$reqdfields = explode(" ", "name stats_uri");
 		$reqdfieldsn = explode(",", "Name,Stats Uri");		
-		do_input_validation($_POST, $reqdfields, $reqdfieldsn, &$input_errors);
+		if ($pf_version < 2.1)
+			$input_errors = eval('do_input_validation($_POST, $reqdfields, $reqdfieldsn, &$input_errors); return $input_errors;');
+		else
+			do_input_validation($_POST, $reqdfields, $reqdfieldsn, $input_errors);
 		if ($_POST['stats_username']) {
 			$reqdfields = explode(" ", "stats_password stats_realm");
 			$reqdfieldsn = explode(",", "Stats Password,Stats Realm");		
-			do_input_validation($_POST, $reqdfields, $reqdfieldsn, &$input_errors);
+			if ($pf_version < 2.1)
+				$input_errors = eval('do_input_validation($_POST, $reqdfields, $reqdfieldsn, &$input_errors); return $input_errors;');
+			else
+				do_input_validation($_POST, $reqdfields, $reqdfieldsn, $input_errors);
 		}
 	}
 	
