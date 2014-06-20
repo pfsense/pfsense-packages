@@ -112,7 +112,7 @@ function squid_deinstall_command() {
 	mwexec('rm -rf ' . SQUID_CACHEDIR);
 }
 
-function squid_before_form_general($pkg) {
+function squid_before_form_general(&$pkg) {
 	$values = get_dir(SQUID_CONFBASE . '/errors/');
 	// Get rid of '..' and '.'
 	array_shift($values);
@@ -133,7 +133,7 @@ function squid_before_form_general($pkg) {
 		$field['options']['option'][] = array('name' => $names[$i], 'value' => $values[$i]);
 }
 
-function squid_validate_general($post, $input_errors) {
+function squid_validate_general($post, &$input_errors) {
 	$icp_port = trim($post['icp_port']);
 	if (!empty($icp_port) && !is_port($icp_port))
 		$input_errors[] = 'You must enter a valid port number in the \'ICP port\' field';
@@ -143,7 +143,7 @@ function squid_validate_general($post, $input_errors) {
 		$input_errors[] = 'You must enter a valid number for the \'Redirect children\' field';
 }
 
-function squid_validate_upstream($post, $input_errors) {
+function squid_validate_upstream($post, &$input_errors) {
 	if ($post['proxy_forwarding'] == 'on') {
 		$addr = trim($post['proxy_addr']);
 		if (empty($addr))
@@ -165,7 +165,7 @@ function squid_validate_upstream($post, $input_errors) {
 	}
 }
 
-function squid_validate_cache($post, $input_errors) {
+function squid_validate_cache($post, &$input_errors) {
 	$num_fields = array(	'harddisk_cache_size' => 'Hard disk cache size',
 				'memory_cache_size' => 'Memory cache size',
 				'maximum_object_size' => 'Maximum object size',
@@ -187,7 +187,7 @@ function squid_validate_cache($post, $input_errors) {
 	}
 }
 
-function squid_validate_nac($post, $input_errors) {
+function squid_validate_nac($post, &$input_errors) {
 	$allowed_subnets = explode(',', trim($post['allowed_subnets']));
 	foreach ($allowed_subnets as $subnet) {
 		$subnet = trim($subnet);
@@ -222,7 +222,7 @@ function squid_validate_nac($post, $input_errors) {
 	}
 }
 
-function squid_validate_traffic($post, $input_errors) {
+function squid_validate_traffic($post, &$input_errors) {
 	$num_fields = array(
 		'max_download_size' => 'Maximum download size',
 		'max_upload_size' => 'Maximum upload size',
@@ -239,7 +239,7 @@ function squid_validate_traffic($post, $input_errors) {
 	}
 }
 
-function squid_validate_auth($post, $input_errors) {
+function squid_validate_auth($post, &$input_errors) {
 	$num_fields = array(	array('auth_processes', 'Authentication processes', 1),
 				array('auth_ttl', 'Authentication TTL', 0),
 	);

@@ -278,7 +278,7 @@ function squid_deinstall_command() {
 	filter_configure();
 }
 
-function squid_before_form_general($pkg) {
+function squid_before_form_general(&$pkg) {
 	$values = get_dir(SQUID_CONFBASE . '/errors/');
 	// Get rid of '..' and '.'
 	array_shift($values);

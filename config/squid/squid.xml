@@ -320,7 +320,7 @@
 		</field>
 	</fields>
 	<custom_php_command_before_form>
-		squid_before_form_general(&amp;$pkg);
+		squid_before_form_general($pkg);
 	</custom_php_command_before_form>
 	<custom_add_php_command>
 		squid_resync();
