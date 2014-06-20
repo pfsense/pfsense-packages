@@ -128,7 +128,7 @@
 		<category>Firewall</category>
 		<pkginfolink>https://forum.pfsense.org/index.php/topic,42543.0.html</pkginfolink>
 		<config_file>https://packages.pfsense.org/packages/config/pf-blocker/pfblocker.xml</config_file>
-		<version>1.0.2</version>
+		<version>1.0.3</version>
 		<status>Release</status>
 		<required_version>2.2</required_version>
 		<maintainer>tom@tomschaefer.org marcellocoutinho@gmail.com</maintainer>
@@ -187,7 +187,7 @@
 				Supports acl's for smart backend switching.]]></descr>
 		<website>http://haproxy.1wt.eu/</website>
 		<category>Services</category>
-		<version>1.5-dev26 pkg v 0.7</version>
+		<version>1.5-dev26 pkg v 0.8</version>
 		<status>Release</status>
 		<required_version>2.2</required_version>
 		<config_file>https://packages.pfsense.org/packages/config/haproxy-devel/haproxy.xml</config_file>
@@ -371,7 +371,7 @@
 		</build_pbi>
 		<build_options>barnyard2_UNSET=ODBC PGSQL PRELUDE;barnyard2_SET=GRE IPV6 MPLS MYSQL PORT_PCAP;snort_SET=TARGETBASED PERFPROFILE SOURCEFIRE FLEXRESP3 GRE IPV6 MPLS NORMALIZER ZLIB;snort_UNSET=PULLEDPORK;perl_SET=THREADS;NOPORTDOCS=true</build_options>
 		<config_file>https://packages.pfsense.org/packages/config/snort/snort.xml</config_file>
-		<version>2.9.6.0 pkg v3.0.11</version>
+		<version>2.9.6.0 pkg v3.0.12</version>
 		<required_version>2.2</required_version>
 		<status>Stable</status>
 		<configurationfile>/snort.xml</configurationfile>
@@ -432,7 +432,7 @@
 		<pkginfolink>https://forum.pfsense.org/index.php/topic,40622.0.html</pkginfolink>
 		<config_file>https://packages.pfsense.org/packages/config/postfix/postfix.xml</config_file>
 		<depends_on_package_pbi>postfix-2.11.0-##ARCH##.pbi</depends_on_package_pbi>
-		<version>2.10.2 pkg v.2.3.7</version>
+		<version>2.10.2 pkg v.2.3.8</version>
 		<status>Release</status>
 		<required_version>2.2</required_version>
 		<configurationfile>postfix.xml</configurationfile>
@@ -453,7 +453,7 @@
 		<config_file>https://packages.pfsense.org/packages/config/dansguardian/dansguardian.xml</config_file>
 		<pkginfolink>https://forum.pfsense.org/index.php/topic,43786.0.html</pkginfolink>
 		<depends_on_package_pbi>dansguardian-2.12.0.3_2-##ARCH##.pbi</depends_on_package_pbi>
-		<version>2.12.0.3_2 pkg v.0.1.10</version>
+		<version>2.12.0.3_2 pkg v.0.1.11</version>
 		<status>beta</status>
 		<required_version>2.2</required_version>
 		<configurationfile>dansguardian.xml</configurationfile>
@@ -475,7 +475,7 @@
 		<config_file>https://packages.pfsense.org/packages/config/mailscanner/mailscanner.xml</config_file>
 		<pkginfolink>https://forum.pfsense.org/index.php/topic,43687.0.html</pkginfolink>
 		<depends_on_package_pbi>mailscanner-4.84.6-##ARCH##.pbi</depends_on_package_pbi>
-		<version>4.84.6 pkg v.0.2.6</version>
+		<version>4.84.6 pkg v.0.2.7</version>
 		<status>beta</status>
 		<required_version>2.2</required_version>
 		<configurationfile>mailscanner.xml</configurationfile>
@@ -545,7 +545,7 @@
 		<config_file>https://packages.pfsense.org/packages/config/sarg/sarg.xml</config_file>
 		<pkginfolink>https://forum.pfsense.org/index.php/topic,47765.0.html</pkginfolink>
 		<depends_on_package_pbi>sarg-2.3.6_2-##ARCH##.pbi</depends_on_package_pbi>
-		<version>2.3.6_2 pkg v.0.6.3</version>
+		<version>2.3.6_2 pkg v.0.6.4</version>
 		<status>Release</status>
 		<required_version>2.2</required_version>
 		<configurationfile>sarg.xml</configurationfile>
@@ -916,7 +916,7 @@
 		<descr>High performance web proxy cache.</descr>
 		<website>http://www.squid-cache.org/</website>
 		<category>Network</category>
-		<version>2.7.9 pkg v.4.3.4</version>
+		<version>2.7.9 pkg v.4.3.5</version>
 		<status>Stable</status>
 		<required_version>2.2</required_version>
 		<maintainer>fernando@netfilter.com.br seth.mos@dds.nl mfuchs77@googlemail.com jimp@pfsense.org</maintainer>
@@ -939,7 +939,7 @@
 		<pkginfolink>https://forum.pfsense.org/index.php/topic,48347.0.html</pkginfolink>
 		<website>http://www.squid-cache.org/</website>
 		<category>Network</category>
-		<version>3.1.20 pkg 2.1.0</version>
+		<version>3.1.20 pkg 2.1.1</version>
 		<status>beta</status>
 		<required_version>2.2</required_version>
 		<maintainer>marcellocoutinho@gmail.com fernando@netfilter.com.br seth.mos@dds.nl mfuchs77@googlemail.com jimp@pfsense.org</maintainer>
@@ -963,7 +963,7 @@
 		<pkginfolink>https://forum.pfsense.org/index.php/topic,48347.0.html</pkginfolink>
 		<website>http://www.squid-cache.org/</website>
 		<category>Network</category>
-		<version>3.3.10 pkg 2.2.6</version>
+		<version>3.3.10 pkg 2.2.7</version>
 		<status>beta</status>
 		<required_version>2.2</required_version>
 		<maintainer>marcellocoutinho@gmail.com fernando@netfilter.com.br seth.mos@dds.nl mfuchs77@googlemail.com jimp@pfsense.org</maintainer>
@@ -1057,7 +1057,7 @@
 		<website>http://www.squidGuard.org/</website>
 		<maintainer>gugabsd@mundounix.com.br</maintainer>
 		<category>Network Management</category>
-		<version>1.5_1.4 beta</version>
+		<version>1.5_1.5 beta</version>
 		<status>Beta</status>
 		<required_version>2.2</required_version>
 		<depends_on_package_pbi>squidguard-devel-1.5_1-##ARCH##.pbi</depends_on_package_pbi>
@@ -1125,7 +1125,7 @@
 		<name>blinkled</name>
 		<descr>Allows you to use LEDs for network activity on supported platforms (ALIX, WRAP, Soekris, etc)</descr>
 		<category>System</category>
-		<version>0.4.1</version>
+		<version>0.4.2</version>
 		<status>Beta</status>
 		<maintainer>jimp@pfsense.org</maintainer>
 		<required_version>2.2</required_version>
