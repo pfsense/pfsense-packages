@@ -55,6 +55,13 @@ if (is_null($id)) {
         exit;
 }
 
+if (isset($_POST['action']))
+	$action = htmlspecialchars($_POST['action'], ENT_QUOTES | ENT_HTML401);
+elseif (isset($_GET['action']))
+	$action = htmlspecialchars($_GET['action'], ENT_QUOTES | ENT_HTML401);
+else
+	$action = "";
+
 $pconfig = array();
 if (empty($snortglob['rule'][$id]['uuid'])) {
 	/* Adding new interface, so flag rules to build. */
@@ -107,7 +114,36 @@ if (empty($pconfig['blockoffendersip']))
 if (empty($pconfig['performance']))
 	$pconfig['performance'] = "ac-bnfa";
 
-if ($_POST["save"]) {
+// See if creating a new interface by duplicating an existing one
+if (strcasecmp($action, 'dup') == 0) {
+
+	// Try to pick the next available physical interface to use
+	$ifaces = get_configured_interface_list();
+	$ifrules = array();
+	foreach($a_rule as $r)
+		$ifrules[] = $r['interface'];
+	foreach ($ifaces as $i) {
+		if (!in_array($i, $ifrules)) {
+			$pconfig['interface'] = $i;
+			$pconfig['enable'] = 'on';
+			$pconfig['descr'] = strtoupper($i);
+			break;
+		}
+	}
+	if (count($ifrules) == count($ifaces)) {
+		$input_errors[] = gettext("No more available interfaces to configure for Snort!");
+		$interfaces = array();
+		$pconfig = array();
+	}
+
+	// Set Home Net, External Net, Suppress List and Pass List to defaults
+	unset($pconfig['suppresslistname']);
+	unset($pconfig['whitelistname']);
+	unset($pconfig['homelistname']);
+	unset($pconfig['externallistname']);
+}
+
+if ($_POST["save"] && !$input_errors) {
 	if (!isset($_POST['interface']))
 		$input_errors[] = "Interface is mandatory";
 
@@ -174,7 +210,7 @@ if ($_POST["save"]) {
 		if ($_POST['fpm_no_stream_inserts'] == "on") { $natent['fpm_no_stream_inserts'] = 'on'; }else{ $natent['fpm_no_stream_inserts'] = 'off'; }
 
 		$if_real = get_real_interface($natent['interface']);
-		if (isset($id) && $a_rule[$id]) {
+		if (isset($id) && $a_rule[$id] && $action == '') {
 			// See if moving an existing Snort instance to another physical interface
 			if ($natent['interface'] != $a_rule[$id]['interface']) {
 				$oif_real = get_real_interface($a_rule[$id]['interface']);
@@ -190,7 +226,15 @@ if ($_POST["save"]) {
 				conf_mount_ro();
 			}
 			$a_rule[$id] = $natent;
-		} else {
+		}
+		elseif (strcasecmp($action, 'dup') == 0) {
+			// Duplicating a new interface, so set flag to build new rules
+			$rebuild_rules = true;
+
+			// Add the new duplicated interface configuration to the [rule] array in config
+			$a_rule[] = $natent;
+		}
+		else {
 			// Adding new interface, so set required interface configuration defaults
 			$frag3_eng = array( "name" => "default", "bind_to" => "all", "policy" => "bsd", 
 					    "timeout" => 60, "min_ttl" => 1, "detect_anomalies" => "on", 
@@ -343,6 +387,7 @@ include_once("head.inc");
 
 <form action="snort_interfaces_edit.php" method="post" name="iform" id="iform">
 <input name="id" type="hidden" value="<?=$id;?>"/>
+<input name="action" type="hidden" value="<?=$action;?>"/>
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
 <tr><td>
 <?php
