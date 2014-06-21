@@ -61,9 +61,9 @@ if (isset($_POST['multi_ip']))
 elseif (isset($_GET['multi_ip']))
 	$multi_ip = htmlspecialchars($_GET['multi_ip']);
 
-if (isset($_POST['returl'])) && substr($_POST['returl'], 0, 1) == '/')
+if (isset($_POST['returl']) && substr($_POST['returl'], 0, 1) == '/')
 	$referrer = urldecode($_POST['returl']);
-elseif (isset($_GET['returl'])) && substr($_GET['returl'], 0, 1) == '/')
+elseif (isset($_GET['returl']) && substr($_GET['returl'], 0, 1) == '/')
 	$referrer = urldecode($_GET['returl']);
 else
 	$referrer = $_SERVER['HTTP_REFERER'];
