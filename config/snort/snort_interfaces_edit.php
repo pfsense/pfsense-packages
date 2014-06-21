@@ -121,6 +121,23 @@ if ($_POST["save"]) {
 		}
 	}
 
+	// If Snort is disabled on this interface, stop any running instance,
+	// save the change, and exit.
+	if ($_POST['enable'] != 'on') {
+		$a_rule[$id]['enable'] = $_POST['enable'] ? 'on' : 'off';
+		snort_stop($a_rule[$id], get_real_interface($a_rule[$id]['interface']));
+		write_config("Snort pkg: modified interface configuration for {$a_rule[$id]['interface']}.");
+		$rebuild_rules = false;
+		sync_snort_package_config();
+		header( 'Expires: Sat, 26 Jul 1997 05:00:00 GMT' );
+		header( 'Last-Modified: ' . gmdate( 'D, d M Y H:i:s' ) . ' GMT' );
+		header( 'Cache-Control: no-store, no-cache, must-revalidate' );
+		header( 'Cache-Control: post-check=0, pre-check=0', false );
+		header( 'Pragma: no-cache' );
+		header("Location: /snort/snort_interfaces.php");
+		exit;
+	}
+
 	/* if no errors write to conf */
 	if (!$input_errors) {
 		$natent = $a_rule[$id];
