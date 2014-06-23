@@ -249,7 +249,7 @@ $xml= <<<EOF
 		pfblocker_php_deinstall_command();
 	</custom_php_deinstall_command>
 	<custom_php_validation_command>
-		pfblocker_validate_input(\$_POST, &amp;\$input_errors);
+		pfblocker_validate_input(\$_POST, \$input_errors);
 	</custom_php_validation_command>	
 	<custom_php_resync_config_command>
 		sync_package_pfblocker();

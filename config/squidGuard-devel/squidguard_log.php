@@ -77,14 +77,14 @@ function squidguard_log_AJAX_response( $request )
               $res = squidguard_prep_textareacont($cont);
               break;
         case 'guilog':
-              $res = squidguard_logrep(squidguard_guidump( &$offset, 50, true));
+              $res = squidguard_logrep(squidguard_guidump( $offset, 50, true));
               break;
         case 'filterlog':
-              $res = squidguard_logrep(squidguard_filterdump( &$offset, 50, true));
+              $res = squidguard_logrep(squidguard_filterdump( $offset, 50, true));
               break;
         case "blocked":
         default:
-              $res = squidguard_logrep(squidguard_blockdump( &$offset, 50, true));
+              $res = squidguard_logrep(squidguard_blockdump( $offset, 50, true));
               break;
     }
 

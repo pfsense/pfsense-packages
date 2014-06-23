@@ -65,7 +65,7 @@ if (is_null($id)) {
 
 // Set who called us so we can return to the correct page with
 // the RETURN ('cancel') button.
-if ($_POST['referrer'])
+if (isset($_POST['referrer']) && strpos($_POST['referrer'], '://'.$_SERVER['SERVER_NAME'].'/') !== FALSE)
 	$referrer = $_POST['referrer'];
 else
 	$referrer = $_SERVER['HTTP_REFERER'];

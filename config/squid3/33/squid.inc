@@ -382,7 +382,7 @@ function squid_deinstall_command() {
 	filter_configure();
 }
 
-function squid_before_form_general($pkg) {
+function squid_before_form_general(&$pkg) {
 	$values = get_dir(SQUID_CONFBASE . '/errors/');
 	// Get rid of '..' and '.' and ...
 	array_shift($values);
@@ -406,7 +406,7 @@ function squid_before_form_general($pkg) {
 		$field['options']['option'][] = array('name' => $names[$i], 'value' => $values[$i]);
 }
 
-function squid_validate_general($post, $input_errors) {
+function squid_validate_general($post, &$input_errors) {
 	global $config;
 	if (is_array($config['installedpackages']['squid']))
 		$settings = $config['installedpackages']['squid']['config'][0];
@@ -472,7 +472,7 @@ function squid_validate_general($post, $input_errors) {
 	 }}
 }
 
-function squid_validate_upstream($post, $input_errors) {
+function squid_validate_upstream($post, &$input_errors) {
 	if ($post['enabled'] == 'on') {
 		$addr = trim($post['proxyaddr']);
 		if (empty($addr))
@@ -494,7 +494,7 @@ function squid_validate_upstream($post, $input_errors) {
 	}
 }
 
-function squid_validate_cache($post, $input_errors) {
+function squid_validate_cache($post, &$input_errors) {
 	$num_fields = array(	'harddisk_cache_size' => 'Hard disk cache size',
 				'memory_cache_size' => 'Memory cache size',
 				'maximum_object_size' => 'Maximum object size',
@@ -533,7 +533,7 @@ function squid_validate_cache($post, $input_errors) {
 
 }
 
-function squid_validate_nac($post, $input_errors) {
+function squid_validate_nac($post, &$input_errors) {
 	$allowed_subnets = explode("\n", $post['allowed_subnets']);
 	foreach ($allowed_subnets as $subnet) {
 		$subnet = trim($subnet);
@@ -579,7 +579,7 @@ function squid_validate_nac($post, $input_errors) {
 	 }}
 }
 
-function squid_validate_traffic($post, $input_errors) {
+function squid_validate_traffic($post, &$input_errors) {
 	$num_fields = array(	'max_download_size' => 'Maximum download size',
 				'max_upload_size' => 'Maximum upload size',
 				'perhost_throttling' => 'Per-host bandwidth throttling',
@@ -610,14 +610,13 @@ function squid_validate_traffic($post, $input_errors) {
   }	
 }
 
-function squid_validate_reverse($post, $input_errors) {
+function squid_validate_reverse($post, &$input_errors) {
 
 	if(!empty($post['reverse_ip'])) {
 		$reverse_ip = explode(";", ($post['reverse_ip']));
 		foreach ($reverse_ip as $reip) {
-		if (!is_ipaddr($reip))
-			$input_errors[] = 'You must enter a valid IP address in the \'User-defined reverse-proxy IPs\' field';
-			break;
+		if (!is_ipaddr(trim($reip)))
+			$input_errors[] = 'You must enter a valid IP address in the \'User-defined reverse-proxy IPs\' field'.' -> \''.$reip.'\' is invalid.';
 	}}	
 		
 	$fqdn = trim($post['reverse_external_fqdn']);
@@ -639,15 +638,12 @@ function squid_validate_reverse($post, $input_errors) {
       $input_errors[] = "You have to enable reverse HTTPS before enabling OWA support.";
       }
 
-/*
-		if (!is_cert($post['reverse_int_ca']))
- 			$input_errors[] = 'A valid certificate for the external interface must be selected';
-*/
-
-	$rowa = trim($post['reverse_owa_ip']);
-	if (!empty($rowa) && !is_ipaddr($rowa))
-		$input_errors[] = 'The field \'OWA frontend IP address\' must contain a valid IP address';
-
+	if(!empty($post['reverse_owa_ip'])) {
+		$reverse_owa_ip = explode(";", ($post['reverse_owa_ip']));
+		foreach ($reverse_owa_ip as $reowaip) {
+		if (!is_ipaddr(trim($reowaip)))
+			$input_errors[] = 'You must enter a valid IP address in the \'CAS-Array / OWA frontend IP address\' field'.' -> \''.$reowaip.'\' is invalid.';
+	}}	
 	
     $contents = $post['reverse_cache_peer'];
     if(!empty($contents)) {
@@ -665,7 +661,7 @@ function squid_validate_reverse($post, $input_errors) {
 
 }
 
-function squid_validate_auth($post, $input_errors) {
+function squid_validate_auth($post, &$input_errors) {
 	$num_fields = array(	array('auth_processes', 'Authentication processes', 1),
 				array('auth_ttl', 'Authentication TTL', 0),
 	);
