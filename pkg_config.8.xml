@@ -617,7 +617,7 @@
 		<configurationfile>dansguardian.xml</configurationfile>
 		<build_port_path>/usr/ports/www/dansguardian-devel</build_port_path>
 		<build_port_path>/usr/ports/security/ca_root_nss</build_port_path>
-		<build_options>dansguardian-devel_UNSET_FORCE=APACHE;dansguardian-devel_SET=TRICKLE CLAMD ICAP NTLM SSL</build_options>
+		<build_options>dansguardian_UNSET_FORCE=APACHE;dansguardian_SET=TRICKLE CLAMD ICAP NTLM SSL</build_options>
 		<!-- NOTE: Distfile must be fetched manually from http://dansguardian.org/downloads/2/Alpha/dansguardian-2.12.0.0.tar.gz -->
 	</package>
 	<package>
