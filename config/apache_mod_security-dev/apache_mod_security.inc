@@ -39,10 +39,7 @@ if ($pf_version > 2.0)
 else
 	define('APACHEDIR', '/usr/local');
 
-if (file_exists(APACHEDIR . "/libexec/apache22"))
-	define('APACHEVERSION', 'apache22');
-if (file_exists(APACHEDIR . "/libexec/apache24"))
-	define('APACHEVERSION', 'apache24');
+define('APACHEVERSION', 'apache24');
 
 // End of system check
 define ('MODSECURITY_DIR','crs');
