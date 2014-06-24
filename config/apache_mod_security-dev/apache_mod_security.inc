@@ -39,10 +39,7 @@ if ($pf_version > 2.0)
 else
 	define('APACHEDIR', '/usr/local');
 
-if (file_exists(APACHEDIR . "/libexec/apache22"))
-	define('APACHEVERSION', 'apache22');
-if (file_exists(APACHEDIR . "/libexec/apache24"))
-	define('APACHEVERSION', 'apache24');
+define('APACHEVERSION', 'apache24');
 
 // End of system check
 define ('MODSECURITY_DIR','crs');
@@ -453,30 +450,6 @@ function generate_apache_configuration() {
 		#load conf template
 		include("/usr/local/pkg/apache_balancer.template");
 
-		if (APACHEVERSION == 'apache22') { # Only define this here for apache22
-			#check balancer members
-			foreach ($config['installedpackages']['apachebalancer']['config'] as $balancer){
-				if (is_array($balancer['row']) && $balancer['enable'] == 'on'){
-					$balancer_config.="# {$balancer['description']}\n";
-					$balancer_config.="<Proxy balancer://{$balancer['name']}>\n";
-					foreach($balancer['row'] as $server){
-						$options =($server['port'] ? ":{$server['port']}" : "");
-						$options.=($server['routeid'] ? " route={$server['routeid']}" : "");
-						$options.=($server['loadfactor'] ? " loadfactor={$server['loadfactor']}" : "");
-						if (isset($server['ping']) && $server['ping']!=""){
-							$options.= " ping={$server['ping']}";
-							$options.=($server['ttl'] ? " ttl={$server['ttl']}" : "");
-						}
-					$balancer_config.="  BalancerMember {$balancer['proto']}://{$server['host']}{$options}\n"; 
-					}
-					#check if stick connections are set
-					if ($balancer['row'][0]['routeid'] !="")
-						$balancer_config.="  ProxySet stickysession=ROUTEID\n";
-					$balancer_config.="</Proxy>\n\n";
-				}
-			}
-		}
-
 		//write balancer conf
 		file_put_contents(APACHEDIR."/etc/" . APACHEVERSION . "/Includes/balancers.conf",$balancer_config,LOCK_EX);
 	}
@@ -602,28 +575,26 @@ EOF;
 						$backend=$apache_location[$be['location']];
 
 						$vh_config.="# {$backend['name']}\n";
-						if (APACHEVERSION == 'apache24') { # Only define this here for apache24
-							foreach ($config['installedpackages']['apachebalancer']['config'] as $balancer){
-								if (is_array($balancer['row']) && $balancer['enable'] == 'on' && $balancer['name'] == $backend['balancer']){
-									$vh_config.="# {$balancer['description']}\n";
-									$vh_config.=" <Proxy balancer://{$balancer['name']}>\n";
-									foreach($balancer['row'] as $balancer_server){
-										$balancer_options =($balancer_server['port'] ? ":{$balancer_server['port']}" : "");
+						foreach ($config['installedpackages']['apachebalancer']['config'] as $balancer){
+							if (is_array($balancer['row']) && $balancer['enable'] == 'on' && $balancer['name'] == $backend['balancer']){
+								$vh_config.="# {$balancer['description']}\n";
+								$vh_config.=" <Proxy balancer://{$balancer['name']}>\n";
+								foreach($balancer['row'] as $balancer_server){
+									$balancer_options =($balancer_server['port'] ? ":{$balancer_server['port']}" : "");
 
-										$balancer_options.=($balancer_server['routeid'] ? " route={$balancer_server['routeid']}" : "");
-										$balancer_options.=($balancer_server['loadfactor'] ? " loadfactor={$balancer_server['loadfactor']}" : "");
-										if (isset($balancer_server['ping']) && $balancer_server['ping']!=""){
-											$balancer_options.= " ping={$balancer_server['ping']}";
-											$balancer_options.=($server['ttl'] ? " ttl={$balancer_server['ttl']}" : "");
-										}
-										$vh_config.="  BalancerMember {$balancer['proto']}://{$balancer_server['host']}{$balancer_options}\n";
+									$balancer_options.=($balancer_server['routeid'] ? " route={$balancer_server['routeid']}" : "");
+									$balancer_options.=($balancer_server['loadfactor'] ? " loadfactor={$balancer_server['loadfactor']}" : "");
+									if (isset($balancer_server['ping']) && $balancer_server['ping']!=""){
+										$balancer_options.= " ping={$balancer_server['ping']}";
+										$balancer_options.=($server['ttl'] ? " ttl={$balancer_server['ttl']}" : "");
 									}
-									#check if stick connections are set
-									if ($balancer['row'][0]['routeid'] !="")
-										$vh_config.="  ProxySet stickysession=ROUTEID\n";
-									$vh_config.=" </Proxy>\n\n";
-									break;
+									$vh_config.="  BalancerMember {$balancer['proto']}://{$balancer_server['host']}{$balancer_options}\n";
 								}
+								#check if stick connections are set
+								if ($balancer['row'][0]['routeid'] !="")
+									$vh_config.="  ProxySet stickysession=ROUTEID\n";
+								$vh_config.=" </Proxy>\n\n";
+								break;
 							}
 						}
 	
