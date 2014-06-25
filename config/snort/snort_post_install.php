@@ -488,30 +488,120 @@ preprocessor ftp_telnet_protocol: telnet \
 EOD;
 
 	$pop_ports = str_replace(",", " ", snort_expand_port_range($snort_ports['pop3_ports']));
+	if (!isset($pop_ports) || empty($pop_ports))
+		$pop_ports = "110";
+	if (isset($snortcfg['pop_memcap']))
+		$pop_memcap = $snortcfg['pop_memcap'];
+	else
+		$pop_memcap = "838860";
+	if (isset($snortcfg['pop_qp_decode_depth']))
+		$pop_qp_decode_depth = $snortcfg['pop_qp_decode_depth'];
+	else
+		$pop_qp_decode_depth = "0";
+	if (isset($snortcfg['pop_b64_decode_depth']))
+		$pop_b64_decode_depth = $snortcfg['pop_b64_decode_depth'];
+	else
+		$pop_b64_decode_depth = "0";
+	if (isset($snortcfg['pop_bitenc_decode_depth']))
+		$pop_bitenc_decode_depth = $snortcfg['pop_bitenc_decode_depth'];
+	else
+		$pop_bitenc_decode_depth = "0";
+	if (isset($snortcfg['pop_uu_decode_depth']))
+		$pop_uu_decode_depth = $snortcfg['pop_uu_decode_depth'];
+	else
+		$pop_uu_decode_depth = "0";
 	$pop_preproc = <<<EOD
 # POP preprocessor #
 preprocessor pop: \
 	ports { {$pop_ports} } \
-	memcap 1310700 \
-	qp_decode_depth 0 \
-	b64_decode_depth 0 \
-	bitenc_decode_depth 0
+	memcap {$pop_memcap} \
+	qp_decode_depth {$pop_qp_decode_depth} \
+	b64_decode_depth {$pop_b64_decode_depth} \
+	bitenc_decode_depth {$pop_bitenc_decode_depth} \
+	uu_decode_depth {$pop_uu_decode_depth}
 
 EOD;
 
 	$imap_ports = str_replace(",", " ", snort_expand_port_range($snort_ports['imap_ports']));
+	if (!isset($imap_ports) || empty($imap_ports))
+		$imap_ports = "143";
+	if (isset($snortcfg['imap_memcap']))
+		$imap_memcap = $snortcfg['imap_memcap'];
+	else
+		$imap_memcap = "838860";
+	if (isset($snortcfg['imap_qp_decode_depth']))
+		$imap_qp_decode_depth = $snortcfg['imap_qp_decode_depth'];
+	else
+		$imap_qp_decode_depth = "0";
+	if (isset($snortcfg['imap_b64_decode_depth']))
+		$imap_b64_decode_depth = $snortcfg['imap_b64_decode_depth'];
+	else
+		$imap_b64_decode_depth = "0";
+	if (isset($snortcfg['imap_bitenc_decode_depth']))
+		$imap_bitenc_decode_depth = $snortcfg['imap_bitenc_decode_depth'];
+	else
+		$imap_bitenc_decode_depth = "0";
+	if (isset($snortcfg['imap_uu_decode_depth']))
+		$imap_uu_decode_depth = $snortcfg['imap_uu_decode_depth'];
+	else
+		$imap_uu_decode_depth = "0";
 	$imap_preproc = <<<EOD
 # IMAP preprocessor #
 preprocessor imap: \
 	ports { {$imap_ports} } \
-	memcap 1310700 \
-	qp_decode_depth 0 \
-	b64_decode_depth 0 \
-	bitenc_decode_depth 0
+	memcap {$imap_memcap} \
+	qp_decode_depth {$imap_qp_decode_depth} \
+	b64_decode_depth {$imap_b64_decode_depth} \
+	bitenc_decode_depth {$imap_bitenc_decode_depth} \
+	uu_decode_depth {$imap_uu_decode_depth}
 
 EOD;
 
 	$smtp_ports = str_replace(",", " ", snort_expand_port_range($snort_ports['mail_ports']));
+	if (!isset($smtp_ports) || empty($smtp_ports))
+		$smtp_ports = "25 465 587 69";
+	if (isset($snortcfg['smtp_memcap']))
+		$smtp_memcap = $snortcfg['smtp_memcap'];
+	else
+		$smtp_memcap = "838860";
+	if (isset($snortcfg['smtp_max_mime_mem']))
+		$smtp_max_mime_mem = $snortcfg['smtp_max_mime_mem'];
+	else
+		$smtp_max_mime_mem = "838860";
+	if (isset($snortcfg['smtp_qp_decode_depth']))
+		$smtp_qp_decode_depth = $snortcfg['smtp_qp_decode_depth'];
+	else
+		$smtp_qp_decode_depth = "0";
+	if (isset($snortcfg['smtp_b64_decode_depth']))
+		$smtp_b64_decode_depth = $snortcfg['smtp_b64_decode_depth'];
+	else
+		$smtp_b64_decode_depth = "0";
+	if (isset($snortcfg['smtp_bitenc_decode_depth']))
+		$smtp_bitenc_decode_depth = $snortcfg['smtp_bitenc_decode_depth'];
+	else
+		$smtp_bitenc_decode_depth = "0";
+	if (isset($snortcfg['smtp_uu_decode_depth']))
+		$smtp_uu_decode_depth = $snortcfg['smtp_uu_decode_depth'];
+	else
+		$smtp_uu_decode_depth = "0";
+	if (isset($snortcfg['smtp_email_hdrs_log_depth']) && $snortcfg['smtp_email_hdrs_log_depth'] != '0')
+		$smtp_email_hdrs_log_depth = $snortcfg['smtp_email_hdrs_log_depth'];
+	else
+		$smtp_email_hdrs_log_depth = "0";
+	$smtp_boolean_params = "";
+	if ($snortcfg['smtp_ignore_data'] == 'on')
+		$smtp_boolean_params .= "\tignore_data \\\n";
+	if ($snortcfg['smtp_ignore_tls_data'] == 'on')
+		$smtp_boolean_params .= "\tignore_tls_data \\\n";
+	if ($snortcfg['smtp_log_mail_from'] == 'on')
+		$smtp_boolean_params .= "\tlog_mailfrom \\\n";
+	if ($snortcfg['smtp_log_rcpt_to'] == 'on')
+		$smtp_boolean_params .= "\tlog_rcptto \\\n";
+	if ($snortcfg['smtp_log_filename'] == 'on')
+		$smtp_boolean_params .= "\tlog_filename \\\n";
+	if ($snortcfg['smtp_log_email_hdrs'] == 'on')
+		$smtp_boolean_params .= "\tlog_email_hdrs\\\n";
+	$smtp_boolean_params = trim($smtp_boolean_params, "\t\n\\");
 	/* def smtp_preprocessor */
 	$smtp_preprocessor = <<<EOD
 # SMTP preprocessor #
@@ -519,7 +609,8 @@ preprocessor SMTP: \
 	ports { {$smtp_ports} } \
 	inspection_type stateful \
 	normalize cmds \
-	ignore_tls_data \
+	memcap {$smtp_memcap} \
+	max_mime_mem {$smtp_max_mime_mem} \
 	valid_cmds { MAIL RCPT HELP HELO ETRN EHLO EXPN VRFY ATRN SIZE BDAT DEBUG EMAL ESAM ESND ESOM EVFY IDENT \
 		     NOOP RSET SEND SAML SOML AUTH TURN ETRN PIPELINING CHUNKING DATA DSN RSET QUIT ONEX QUEU \
 		     STARTTLS TICK TIME TURNME VERB X-EXPS X-LINK2STATE XADR XAUTH XCIR XEXCH50 XGEN XLICENSE \
@@ -538,15 +629,12 @@ preprocessor SMTP: \
 	alt_max_command_line_len 246 { QUEU STARTTLS TICK TIME TURNME VERB X-EXPS X-LINK2STATE XADR } \
 	alt_max_command_line_len 246 { XAUTH XCIR XEXCH50 XGEN XLICENSE XQUEU XSTA XTRN XUSR } \
 	xlink2state { enable } \
-	log_mailfrom \
-	log_rcptto \
-	log_email_hdrs \
-	email_hdrs_log_depth 1464 \
-	log_filename \
-	qp_decode_depth 0 \
-	b64_decode_depth 0 \
-	bitenc_decode_depth 0 \
-	uu_decode_depth 0
+	{$smtp_boolean_params} \
+	email_hdrs_log_depth {$smtp_email_hdrs_log_depth} \
+	qp_decode_depth {$smtp_qp_decode_depth} \
+	b64_decode_depth {$smtp_b64_decode_depth} \
+	bitenc_decode_depth {$smtp_bitenc_decode_depth} \
+	uu_decode_depth {$smtp_uu_decode_depth}
 
 EOD;
 
