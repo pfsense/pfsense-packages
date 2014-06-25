@@ -269,8 +269,8 @@ EOF;
 						"&hostname=" . urlencode($hostname) . 
 						"&revision=" . urlencode($_REQUEST['download']));
 					curl_setopt($curl_session, CURLOPT_USERAGENT, $g['product_name'] . '/' . rtrim(file_get_contents("/etc/version")));
-        				// Proxy
-        				curl_setopt_array($curl_session, configure_proxy($config));
+					// Proxy
+					curl_setopt_array($curl_session, configure_proxy($config));
 					$data = curl_exec($curl_session);
 					if (!tagfile_deformat($data, $data1, "config.xml")) 
 						$input_errors[] = "The downloaded file does not appear to contain an encrypted pfSense configuration.";
@@ -322,8 +322,8 @@ EOF;
 				curl_setopt($curl_session, CURLOPT_RETURNTRANSFER, 1);
 				curl_setopt($curl_session, CURLOPT_POSTFIELDS, "action=showbackups&hostname={$hostname}");
 				curl_setopt($curl_session, CURLOPT_USERAGENT, $g['product_name'] . '/' . rtrim(file_get_contents("/etc/version")));
-        			// Proxy
-        			curl_setopt_array($curl_session, configure_proxy($config));
+				// Proxy
+				curl_setopt_array($curl_session, configure_proxy($config));
 
 				$data = curl_exec($curl_session);
 				if (curl_errno($curl_session)) {
