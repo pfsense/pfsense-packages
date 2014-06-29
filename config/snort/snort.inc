@@ -765,7 +765,7 @@ function snort_rm_blocked_install_cron($should_install) {
 	// Now either install the new or updated cron job, 
 	// or return if "rm_blocked" is disabled
 	if ($should_install) {
-		$command = "/usr/bin/nice -n20 /sbin/pfctl -t snort2c -T expire {$snort_rm_blocked_expire}";
+		$command = "/usr/bin/nice -n20 /sbin/pfctl -q -t snort2c -T expire {$snort_rm_blocked_expire}";
 		install_cron_job($command, $should_install, $snort_rm_blocked_min, $snort_rm_blocked_hr, $snort_rm_blocked_mday, $snort_rm_blocked_month, $snort_rm_blocked_wday, "root");
 	}
 }
