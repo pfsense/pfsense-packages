@@ -666,11 +666,11 @@
 	</package>
 	<package>
 		<name>AutoConfigBackup</name>
-		<maintainer>portal@bsdperimeter.com</maintainer>
-		<descr>Automatically backs up your pfSense configuration.  All contents are encrypted on the server.  Requires pfSense Premium Support Portal Subscription from https://portal.pfsense.org</descr>
+		<maintainer>coreteam@pfsense.org</maintainer>
+		<descr>Automatically backs up your pfSense configuration.  All contents are encrypted before being sent to the server.  Requires Gold Subscription from https://portal.pfsense.org</descr>
 		<website>https://portal.pfsense.org</website>
 		<category>Services</category>
-		<version>1.25</version>
+		<version>1.26</version>
 		<status>Stable</status>
 		<required_version>2.2</required_version>
 		<pkginfolink>https://doc.pfsense.org/index.php/AutoConfigBackup</pkginfolink>

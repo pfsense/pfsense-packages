@@ -43,8 +43,17 @@ if(file_exists("/usr/local/pkg/parse_config/parse_config_upload.php"))
 function custom_php_validation_command($post, &$input_errors) {
 	global $_POST, $savemsg, $config;
 
+	if(!$post['username'])
+		$input_errors[] = "Username is required.";
+
+	if(!$post['password'] or !$post['passwordagain'])
+		$input_errors[] = "The subscription password is required.";
+
+	if(!$post['crypto_password'] or !$post['crypto_password2'])
+		$input_errors[] = "The encryption password is required.";
+
 	if($post['password'] <> $post['passwordagain']) 
-		$input_errors[] = "Sorry, the entered passwords do not match.";
+		$input_errors[] = "Sorry, the entered portal.pfsense.org passwords do not match.";
 
 	if($post['crypto_password'] <> $post['crypto_password2']) 
 		$input_errors[] = "Sorry, the entered encryption passwords do not match.";
