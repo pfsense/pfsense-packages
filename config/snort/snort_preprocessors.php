@@ -1630,7 +1630,7 @@ if ($savemsg) {
 		<td width="22%" valign="top" class="vncell"><?php echo gettext("Log Mail From"); ?></td>
 		<td width="78%" class="vtable"><input name="smtp_log_mail_from" type="checkbox" value="on" 
 			<?php if ($pconfig['smtp_log_mail_from']=="on") echo "checked"; ?>/>
-			<?php echo gettext("Log sender’s email address extracted from ”MAIL FROM” command.  Default is ") . 
+			<?php echo gettext("Log sender email address extracted from MAIL FROM command.  Default is ") . 
 			"<strong>" . gettext("Checked") . "</strong>."; ?><br/>
 			<span class="red"><strong><?php echo gettext("Note: "); ?></strong></span>
 			<?php echo gettext("this is logged only with the unified2 (Barnyard2) output enabled."); ?>
@@ -1640,7 +1640,7 @@ if ($savemsg) {
 		<td width="22%" valign="top" class="vncell"><?php echo gettext("Log Receipt To"); ?></td>
 		<td width="78%" class="vtable"><input name="smtp_log_rcpt_to" type="checkbox" value="on" 
 			<?php if ($pconfig['smtp_log_rcpt_to']=="on") echo "checked"; ?>/>
-			<?php echo gettext("Log recipient’s email addresses extracted from ”RCPT TO” command.  Default is ") . 
+			<?php echo gettext("Log recipient email addresses extracted from RCPT TO command.  Default is ") . 
 			"<strong>" . gettext("Checked") . "</strong>."; ?><br/>
 			<span class="red"><strong><?php echo gettext("Note: "); ?></strong></span>
 			<?php echo gettext("this is logged only with the unified2 (Barnyard2) output enabled."); ?>
