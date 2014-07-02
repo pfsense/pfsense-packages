@@ -65,7 +65,7 @@
 		<field>
 			<fielddescr>Deny interfaces</fielddescr>
 			<fieldname>denyinterfaces</fieldname>
-			<description>Interfaces that you do NOT want Avahi to listen on.  NOTE: WAN is disabled by default.</description>
+			<description>Interfaces that you do NOT want Avahi to listen on.  NOTE: WAN is always disabled.</description>
 			<type>interfaces_selection</type>
 			<multiple>true</multiple>
 		</field>
