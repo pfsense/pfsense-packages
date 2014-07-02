@@ -59,7 +59,7 @@
 		<field>
 			<fielddescr>Browse domains (comma separated)</fielddescr>
 			<fieldname>browsedomains</fieldname>
-			<description>Enter the domains that you would like proxied. (example: .local, pfsense.org, mydomain.com)</description>
+			<description>Enter the domains that you would like proxied. (example: local, pfsense.org, mydomain.com)</description>
 			<type>input</type>
 		</field>
 		<field>
