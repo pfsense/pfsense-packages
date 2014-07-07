@@ -113,13 +113,13 @@ if ($config['installedpackages']['snortglobal']['forcekeepsettings'] == 'on') {
 	update_status(gettext("Saved settings detected..."));
 	/* Do one-time settings migration for new multi-engine configurations */
 	update_output_window(gettext("Please wait... migrating settings to new configuration..."));
-	include('/usr/local/www/snort/snort_migrate_config.php');
+	include('/usr/local/pkg/snort/snort_migrate_config.php');
 	update_output_window(gettext("Please wait... rebuilding installation with saved settings..."));
 	log_error(gettext("[Snort] Downloading and updating configured rule types..."));
 	update_output_window(gettext("Please wait... downloading and updating configured rule types..."));
 	if ($pkg_interface <> "console")
 		$snort_gui_include = true;
-	include('/usr/local/www/snort/snort_check_for_rule_updates.php');
+	include('/usr/local/pkg/snort/snort_check_for_rule_updates.php');
 	update_status(gettext("Generating snort.conf configuration file from saved settings..."));
 	$rebuild_rules = true;
 

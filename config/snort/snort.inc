@@ -65,10 +65,6 @@ if ($pfs_version < 2.1) {
 	define("SNORTDIR", "/usr/local/etc/snort");
 	define("SNORTLIBDIR", "/usr/local/lib/snort");
 }
-elseif ($pfs_version >= 2.2) {
-	define("SNORTDIR", "/usr/pbi/snort-" . php_uname("m") . "/local/etc/snort");
-	define("SNORTLIBDIR", "/usr/pbi/snort-" . php_uname("m") . "/local/lib/snort");
-}
 else {
 	define("SNORTDIR", "/usr/pbi/snort-" . php_uname("m") . "/etc/snort");
 	define("SNORTLIBDIR", "/usr/pbi/snort-" . php_uname("m") . "/lib/snort");
@@ -2545,7 +2541,7 @@ function snort_generate_conf($snortcfg) {
 	conf_mount_rw();
 
 	// Pull in the PHP code that generates required string variables
-	include("/usr/local/www/snort/snort_generate_conf.php");
+	include("/usr/local/pkg/snort/snort_generate_conf.php");
 
 	// Pull in the boilerplate template for the snort.conf
 	// configuration file.  The contents of the template along

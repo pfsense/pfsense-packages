@@ -91,7 +91,7 @@ include("head.inc");
 <?php
 
 $snort_gui_include = true;
-include("/usr/local/www/snort/snort_check_for_rule_updates.php");
+include("/usr/local/pkg/snort/snort_check_for_rule_updates.php");
 
 /* hide progress bar and lets end this party */
 echo "\n<script type=\"text/javascript\">document.progressbar.style.visibility='hidden';\n</script>";
