@@ -67,6 +67,9 @@ if(is_process_running("barnyard")) {
 /* Set flag for post-install in progress */
 $g['snort_postinstall'] = true;
 
+/* Set Snort conf partition to read-write so we can make changes there */
+conf_mount_rw();
+
 /* cleanup default files */
 @rename("{$snortdir}/snort.conf-sample", "{$snortdir}/snort.conf");
 @rename("{$snortdir}/threshold.conf-sample", "{$snortdir}/threshold.conf");
@@ -165,6 +168,9 @@ if ($config['installedpackages']['snortglobal']['forcekeepsettings'] == 'on') {
 		update_output_window(gettext("Snort has been started using the rebuilt configuration..."));
 	}
 }
+
+/* We're finished with conf partition mods, return to read-only */
+conf_mount_ro();
 
 /* If an existing Snort Dashboard Widget container is not found, */
 /* then insert our default Widget Dashboard container.           */

@@ -2537,9 +2537,6 @@ function snort_generate_conf($snortcfg) {
 	$snort_uuid = $snortcfg['uuid'];
 	$snortcfgdir = "{$snortdir}/snort_{$snort_uuid}_{$if_real}";
 
-	// Set the configuration partition to read/write
-	conf_mount_rw();
-
 	// Pull in the PHP code that generates required string variables
 	include("/usr/local/pkg/snort/snort_generate_conf.php");
 
@@ -2554,9 +2551,6 @@ function snort_generate_conf($snortcfg) {
 
 	// Create the actual rules files and save them in the interface directory
 	snort_prepare_rule_files($snortcfg, $snortcfgdir);
-
-	// Set the configuration partition back to read-only
-	conf_mount_ro();
 
 	// Clean up variables we no longer need and free memory
 	unset($snort_conf_text, $selected_rules_sections, $suppress_file_name, $snort_misc_include_rules, $spoink_type, $snortunifiedlog_type, $alertsystemlog_type);
