@@ -79,19 +79,6 @@
 		<configurationfile>filer.xml</configurationfile>
 	</package>
 	<package>
-		<name>Country Block</name>
-		<website/>
-		<descr>Block countries - This has been replaced by pfblocker. &lt;u&gt;This is a legacy app&lt;/u&gt;</descr>
-		<category>Firewall</category>
-		<pkginfolink>https://forum.pfsense.org/index.php/topic,25732.0.html</pkginfolink>
-		<config_file>https://packages.pfsense.org/packages/config/countryblock/countryblock.xml</config_file>
-		<version>0.2.4</version>
-		<status>Beta</status>
-		<required_version>2.2</required_version>
-		<maintainer>tom@tomschaefer.org</maintainer>
-		<configurationfile>countryblock.xml</configurationfile>
-	</package>
-	<package>
 		<name>Strikeback</name>
 		<descr>Detect port scans with iplog and strikeback</descr>
 		<website/>

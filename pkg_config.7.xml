@@ -29,20 +29,6 @@
 		<configurationfile>filemgr.xml</configurationfile>
       </package>
       <package>
-		<name>Country Block</name>
-		<website/>
-		<descr>Block countries</descr>
-		<category>Firewall</category>
-		<pkginfolink>https://forum.pfsense.org/index.php/topic,25732.0.html</pkginfolink>
-		<config_file>http://packages.pfsense.org/packages/config/countryblock/countryblock.xml</config_file>
-		<depends_on_package_base_url>http://files.pfsense.org/packages/7/All/</depends_on_package_base_url>
-		<version>0.2.4</version>
-		<status>Beta</status>
-		<required_version>1.2.2</required_version>
-		<maintainer>tom@tomschaefer.org</maintainer>
-		<configurationfile>countryblock.xml</configurationfile>
-      </package>
-      <package>
 		<name>IP-Blocklist</name>
 		<website/>
 		<descr>IP-Blocklist is the new PeerBlock. IP lists are used to add deny/allow rules to the firewall for in &amp; out traffic.</descr>
