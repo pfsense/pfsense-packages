@@ -106,8 +106,8 @@ function squid_resync_reverse() {
 			$casnr = 0;
 			foreach ($reverse_owa_ip as $reowaip) {
 				$casnr++;
-				$conf .= "cache_peer {$reowaip} parent 443 0 proxy-only no-query originserver login=PASS ssl sslflags=DONT_VERIFY_PEER front-end-https=on name=OWA_HOST_443_{$casnr}_pfs\n";
-				$conf .= "cache_peer {$reowaip} parent 80 0 proxy-only no-query originserver login=PASS name=OWA_HOST_80_{$casnr}_pfs\n";
+				$conf .= "cache_peer {$reowaip} parent 443 0 proxy-only no-query no-digest originserver login=PASS ssl sslflags=DONT_VERIFY_PEER front-end-https=on name=OWA_HOST_443_{$casnr}_pfs\n";
+				$conf .= "cache_peer {$reowaip} parent 80 0 proxy-only no-query no-digest originserver login=PASS name=OWA_HOST_80_{$casnr}_pfs\n";
 			}
 		}
 		
