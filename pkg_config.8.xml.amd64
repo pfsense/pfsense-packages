@@ -665,28 +665,6 @@
 		<depends_on_package_pbi>openbgpd-5.2.20121209-amd64.pbi</depends_on_package_pbi>
 	</package>
 	<package>
-		<name>OpenOSPFD</name>
-		<descr>This package is now considered deprecated. Please use the Quagga OSPF instead. -- WARNING! Installs files to the same place as Quagga OSPF. Installing both will result in a broken state, remove this package before installing Quagga OSPF.</descr>
-		<maintainer>cmb@pfsense.org</maintainer>
-		<version>0.5.2</version>
-		<category>Routing</category>
-		<status>DEPRECATED</status>
-		<depends_on_package_base_url>https://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
-		<depends_on_package>openospfd-4.6.tbz</depends_on_package>
-		<depends_on_package_pbi>openospfd-4.6-amd64.pbi</depends_on_package_pbi>
-		<config_file>https://packages.pfsense.org/packages/config/openospfd/openospfd.xml</config_file>
-		<build_port_path>/usr/ports/net/openospfd</build_port_path>
-		<build_port_path>/usr/ports/devel/libevent</build_port_path>
-		<build_pbi>
-			<ports_before>devel/libevent</ports_before>
-			<port>net/openospfd</port>
-		</build_pbi>
-		<pkginfolink></pkginfolink>
-		<required_version>1.2.1</required_version>
-		<configurationfile>openospfd.xml</configurationfile>
-		<depends_on_package>libevent-1.4.14b_1.tbz</depends_on_package>
-	</package>
-	<package>
 		<name>Lightsquid</name>
 		<descr>High perfomance web proxy report (LightSquid). Proxy realtime stat (SQStat). Requires squid HTTP proxy.</descr>
 		<website>http://lightsquid.sf.net/</website>
@@ -1676,7 +1654,7 @@
 	</package>
 	<package>
 		<name>Quagga OSPF</name>
-		<descr>OSPF routing protocol using Quagga -- WARNING! Installs files to the same place as OpenOSPFD and OpenBGPD. Installing both will break things.</descr>
+		<descr>OSPF routing protocol using Quagga -- WARNING! Installs files to the same place as OpenBGPD. Installing both will break things.</descr>
 		<maintainer>jimp@pfsense.org</maintainer>
 		<version>0.99.22.3 v0.6.2</version>
 		<category>Routing</category>
