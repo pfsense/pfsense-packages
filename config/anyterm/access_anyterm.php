@@ -27,18 +27,31 @@
     POSSIBILITY OF SUCH DAMAGE.
 */
 
-require("guiconfig.inc");
+require_once("guiconfig.inc");
+require_once("filter.inc");  // needs filter_expand_alias() in case anyterm port is an alias
 
 if($config['installedpackages']['anyterm']['config'][0]['stunnelport']) {
 	$port = $config['installedpackages']['anyterm']['config'][0]['stunnelport'];
 	$httpors = "https";
-} else {
+} elseif ($config['installedpackages']['anyterm']['config'][0]['port']) {
 	$port = $config['installedpackages']['anyterm']['config'][0]['port'];
 	$httpors = "http";
+} else {
+	/* No ports defined, redirect to Anyterm settings for now */
+	Header("/pkg_edit.php?xml=anyterm.xml&id=0");
 }
 
-$location = "{$_SERVER['SERVER_ADDR']}:{$port}/anyterm.html";
+if (is_alias($port) && alias_get_type($port) == "port")
+	$port = intval(filter_expand_alias($port)); 
+	/* Alias name + 3 digit port seemed to add unexpected spaces => alias not numeric => error.
+	   Issue is in alias handling, can't be fixed here, for now work around using intval() */
 
-Header("Location: {$httpors}://{$location}");
+if (is_numericint($port) && $port <= 65535) {
+	$location = "{$_SERVER['SERVER_ADDR']}:{$port}/anyterm.html";
+	Header("Location: {$httpors}://{$location}");
+} else {
+	/* Port defined but not valid, redirect to Anyterm settings for now */
+	Header("/pkg_edit.php?xml=anyterm.xml&id=0");
+}
 
 ?>
