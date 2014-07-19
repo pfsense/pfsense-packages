@@ -32,13 +32,23 @@ require("guiconfig.inc");
 if($config['installedpackages']['anyterm']['config'][0]['stunnelport']) {
 	$port = $config['installedpackages']['anyterm']['config'][0]['stunnelport'];
 	$httpors = "https";
-} else {
+} elseif ($config['installedpackages']['anyterm']['config'][0]['port']) {
 	$port = $config['installedpackages']['anyterm']['config'][0]['port'];
 	$httpors = "http";
+} else {
+	/* No port defined, redirect to Anyterm settings for now */
+	Header("/pkg_edit.php?xml=anyterm.xml&id=0");
 }
 
-$location = "{$_SERVER['SERVER_ADDR']}:{$port}/anyterm.html";
+if (is_alias($port) && alias_get_type($name) == "port")
+	$port = alias_expand($port);
 
-Header("Location: {$httpors}://{$location}");
+if (is_numericint($port) && $port <= 65535) {
+	$location = "{$_SERVER['SERVER_ADDR']}:{$port}/anyterm.html";
+	Header("Location: {$httpors}://{$location}");
+} else {
+	/* Port defined but not valid, redirect to Anyterm settings for now */
+	Header("/pkg_edit.php?xml=anyterm.xml&id=0");
+}
 
 ?>
