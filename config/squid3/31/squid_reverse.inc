@@ -78,7 +78,7 @@ function squid_resync_reverse() {
 		$real_ifaces[] = squid_get_real_interface_address($iface);
 		if($real_ifaces[$i][0]) {
 		      //HTTP
-		      if (!empty($settings['reverse_http']))
+		      if (!empty($settings['reverse_http']) OR ($settings['reverse_owa_autodiscover'] == 'on'))
 		      		$conf .= "http_port {$real_ifaces[$i][0]}:{$http_port} accel defaultsite={$http_defsite} vhost\n";
 		      //HTTPS
 		      if (!empty($settings['reverse_https']))
@@ -90,7 +90,7 @@ function squid_resync_reverse() {
 		$reverse_ip = explode(";", ($settings['reverse_ip']));
 		foreach ($reverse_ip as $reip) {
 		      //HTTP
-		      if (!empty($settings['reverse_http']))
+		      if (!empty($settings['reverse_http']) OR ($settings['reverse_owa_autodiscover'] == 'on'))
 		      		$conf .= "http_port {$reip}:{$http_port} accel defaultsite={$http_defsite} vhost\n";
 		      //HTTPS
 		      if (!empty($settings['reverse_https']))
