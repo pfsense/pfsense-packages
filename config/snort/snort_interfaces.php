@@ -45,6 +45,9 @@ $a_nat = &$config['installedpackages']['snortglobal']['rule'];
 // Calculate the index of the next added Snort interface
 $id_gen = count($config['installedpackages']['snortglobal']['rule']);
 
+// Get list of configured firewall interfaces
+$ifaces = get_configured_interface_list();
+
 if (isset($_POST['del_x'])) {
 	/* Delete selected Snort interfaces */
 	if (is_array($_POST['rule'])) {
@@ -73,7 +76,7 @@ if (isset($_POST['del_x'])) {
 			snort_create_rc();
 		else {
 			conf_mount_rw();
-			@unlink("{$rcdir}/snort.sh");
+			@unlink("{$rcdir}snort.sh");
 			conf_mount_ro();
 		}
 	  
@@ -173,18 +176,33 @@ include_once("fbegin.inc");
 		<tr id="frheader">
 			<td width="3%" class="list">&nbsp;</td>
 			<td width="10%" class="listhdrr"><?php echo gettext("Interface"); ?></td>
-			<td width="13%" class="listhdrr"><?php echo gettext("Snort"); ?></td>
+			<td width="14%" class="listhdrr"><?php echo gettext("Snort"); ?></td>
 			<td width="10%" class="listhdrr"><?php echo gettext("Performance"); ?></td>
 			<td width="10%" class="listhdrr"><?php echo gettext("Block"); ?></td>
 			<td width="12%" class="listhdrr"><?php echo gettext("Barnyard2"); ?></td>
-			<td width="30%" class="listhdr"><?php echo gettext("Description"); ?></td>
-			<td width="3%" class="list">
+			<td width="32%" class="listhdr"><?php echo gettext("Description"); ?></td>
+			<td class="list">
 			<table border="0" cellspacing="0" cellpadding="0">
 				<tr>
-					<td></td>
-					<td align="center" valign="middle"><a href="snort_interfaces_edit.php?id=<?php echo $id_gen;?>"><img
-					src="../themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif"
-					width="17" height="17" border="0" title="<?php echo gettext('Add Snort interface mapping');?>"></a></td>
+					<td class="list" valign="middle">
+						<?php if ($id_gen < count($ifaces)): ?>
+							<a href="snort_interfaces_edit.php?id=<?php echo $id_gen;?>">
+							<img src="../themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif"
+							width="17" height="17" border="0" title="<?php echo gettext('Add Snort interface mapping');?>"></a>
+						<?php else: ?>
+							<img src="../themes/<?= $g['theme']; ?>/images/icons/icon_plus_d.gif" width="17" height="17" border="0" 
+							title="<?php echo gettext('No available interfaces for a new Snort mapping');?>">
+						<?php endif; ?>
+					</td>
+					<td class="list" valign="middle">
+						<?php if ($id_gen == 0): ?>
+							<img src="../themes/<?= $g['theme']; ?>/images/icons/icon_x_d.gif" width="17" height="17" " border="0">
+						<?php else: ?>
+							<input name="del" type="image" src="../themes/<?= $g['theme']; ?>/images/icons/icon_x.gif" 
+							width="17" height="17" title="<?php echo gettext("Delete selected Snort interface mapping(s)"); ?>"
+							onclick="return intf_del()">
+						<?php endif; ?>
+					</td>
 				</tr>
 			</table>
 			</td>
@@ -317,9 +335,19 @@ include_once("fbegin.inc");
 			<td valign="middle" class="list" nowrap>
 			<table border="0" cellspacing="0" cellpadding="0">
 				<tr>
-					<td><a href="snort_interfaces_edit.php?id=<?=$i;?>"><img
+					<td class="list" valign="middle"><a href="snort_interfaces_edit.php?id=<?=$i;?>"><img
 						src="/themes/<?= $g['theme']; ?>/images/icons/icon_e.gif"
 						width="17" height="17" border="0" title="<?php echo gettext('Edit Snort interface mapping'); ?>"></a>
+					</td>
+					<td class="list" valign="middle">
+						<?php if ($id_gen < count($ifaces)): ?>
+							<a href="snort_interfaces_edit.php?id=<?=$i;?>&action=dup">
+							<img src="/themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif"
+							width="17" height="17" border="0" title="<?php echo gettext('Add new interface mapping based on this one'); ?>"></a>
+						<?php else: ?>
+							<img src="/themes/<?= $g['theme']; ?>/images/icons/icon_plus_d.gif" width="17" height="17" border="0" 
+							title="<?php echo gettext('No available interfaces for a new Snort mapping');?>">
+						<?php endif; ?>
 					</td>
 				</tr>
 			</table>
@@ -337,14 +365,25 @@ include_once("fbegin.inc");
 			<td class="list" valign="middle" nowrap>
 				<table border="0" cellspacing="0" cellpadding="0">
 					<tr>
-						<td><?php if ($nnats == 0): ?><img
-						src="../themes/<?= $g['theme']; ?>/images/icons/icon_x_d.gif"
-						width="17" height="17" " border="0">
-						<?php else: ?>
-						<input name="del" type="image" src="../themes/<?= $g['theme']; ?>/images/icons/icon_x.gif"
-						width="17" height="17" title="<?php echo gettext("Delete selected Snort interface mapping(s)"); ?>"
-						onclick="return intf_del()">
-						<?php endif; ?></td>
+						<td class="list">
+							<?php if ($id_gen < count($ifaces)): ?>
+								<a href="snort_interfaces_edit.php?id=<?php echo $id_gen;?>">
+								<img src="../themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif"
+								width="17" height="17" border="0" title="<?php echo gettext('Add Snort interface mapping');?>"></a>
+							<?php else: ?>
+								<img src="../themes/<?= $g['theme']; ?>/images/icons/icon_plus_d.gif" width="17" height="17" border="0" 
+								title="<?php echo gettext('No available interfaces for a new Snort mapping');?>">
+							<?php endif; ?>
+						</td>
+						<td class="list">
+							<?php if ($id_gen == 0): ?>
+								<img src="../themes/<?= $g['theme']; ?>/images/icons/icon_x_d.gif" width="17" height="17" " border="0">
+							<?php else: ?>
+								<input name="del" type="image" src="../themes/<?= $g['theme']; ?>/images/icons/icon_x.gif" 
+								width="17" height="17" title="<?php echo gettext("Delete selected Snort interface mapping(s)"); ?>"
+								onclick="return intf_del()">
+							<?php endif; ?>
+						</td>
 					</tr>
 				</table>
 			</td>

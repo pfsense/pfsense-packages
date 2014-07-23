@@ -283,7 +283,9 @@ if ($_POST['togglesid'] && is_numeric($_POST['sidid']) && is_numeric($_POST['gen
 	/* rules for this interface.                     */
 	/*************************************************/
 	$rebuild_rules = true;
+	conf_mount_rw();
 	snort_generate_conf($a_instance[$instanceid]);
+	conf_mount_ro();
 	$rebuild_rules = false;
 
 	/* Soft-restart Snort to live-load the new rules */

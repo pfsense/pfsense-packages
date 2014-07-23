@@ -162,7 +162,9 @@ if ($_POST['save'] || $_POST['apply']) {
 
 		// Update the snort conf file for this interface
 		$rebuild_rules = false;
+		conf_mount_rw();
 		snort_generate_conf($a_nat[$id]);
+		conf_mount_ro();
 
 		// Soft-restart Snort to live-load new variables
 		snort_reload_config($a_nat[$id]);

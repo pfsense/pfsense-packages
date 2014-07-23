@@ -68,7 +68,9 @@ if ($_POST['clear']) {
 	$a_nat[$id]['host_attribute_table'] = 'off';
 	write_config("Snort pkg: cleared Host Attribute Table data for {$a_nat[$id]['interface']}.");
 	$rebuild_rules = false;
+	conf_mount_rw();
 	snort_generate_conf($a_nat[$id]);
+	conf_mount_ro();
 	$pconfig['host_attribute_data'] = "";
 }
 
@@ -80,7 +82,9 @@ if ($_POST['save']) {
 		$a_nat[$id]['host_attribute_table'] = 'off';
 	write_config("Snort pkg: modified Host Attribute Table data for {$a_nat[$id]['interface']}.");
 	$rebuild_rules = false;
+	conf_mount_rw();
 	snort_generate_conf($a_nat[$id]);
+	conf_mount_ro();
 	$pconfig['host_attribute_data'] = $_POST['host_attribute_data'];
 }
 
