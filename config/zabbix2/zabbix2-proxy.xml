@@ -6,7 +6,7 @@
 /* ========================================================================== */
 /*
     zabbix2-proxy.xml
-    part of the Zebedee package for pfSense
+    part of the Zabbix package for pfSense
     Copyright (C) 2013 Danilo G. Baio
     Copyright (C) 2013 Marcello Coutinho
 
@@ -41,7 +41,7 @@
 	<name>zabbixproxy</name>
 	<title>Services: Zabbix-2 Proxy</title>
 	<category>Monitoring</category>
-	<version>0.8.1</version>
+	<version>0.8.3</version>
 	<include_file>/usr/local/pkg/zabbix2.inc</include_file>
 	<addedit_string>Zabbix Proxy has been created/modified.</addedit_string>
 	<delete_string>Zabbix Proxy has been deleted.</delete_string>
