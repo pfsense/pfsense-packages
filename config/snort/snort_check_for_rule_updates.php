@@ -39,7 +39,7 @@ global $g, $config, $pkg_interface, $snort_gui_include, $rebuild_rules;
 if (!defined("VRT_DNLD_URL"))
 	define("VRT_DNLD_URL", "https://www.snort.org/rules/");
 if (!defined("SNORT_BIN_VERSION"))
-	define("SNORT_BIN_VERSION", "2.9.6.1");
+	define("SNORT_BIN_VERSION", "2.9.6.2");
 if (!defined("ET_VERSION"))
 	define("ET_VERSION", "2.9.0");
 if (!defined("ET_BASE_DNLD_URL"))
