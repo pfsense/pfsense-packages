@@ -129,11 +129,12 @@ function openbgpd_install_conf() {
 									$conffile .= "\t\t{$row['parameters']} {$row['parmvalue']} \n";
 								}
 							}
-							if ($setlocaladdr == true)
+							if ($setlocaladdr == true) {
 								if (!empty($openbgpd_conf['listenip']))
 									$conffile .= "\t\tlocal-address {$openbgpd_conf['listenip']}\n";
 								else
 									$conffile .= "\t\tlocal-address 0.0.0.0\n";
+							}
 								
 							$conffile .= "}\n";
 						}
