@@ -37,7 +37,9 @@ require_once "/usr/local/pkg/snort/snort.inc";
 global $g, $config, $pkg_interface, $snort_gui_include, $rebuild_rules;
 
 if (!defined("VRT_DNLD_URL"))
-	define("VRT_DNLD_URL", "https://www.snort.org/reg-rules/");
+	define("VRT_DNLD_URL", "https://www.snort.org/rules/");
+if (!defined("SNORT_BIN_VERSION"))
+	define("SNORT_BIN_VERSION", "2.9.6.2");
 if (!defined("ET_VERSION"))
 	define("ET_VERSION", "2.9.0");
 if (!defined("ET_BASE_DNLD_URL"))
@@ -98,7 +100,7 @@ exec("/usr/local/bin/snort -V 2>&1 |/usr/bin/grep Version | /usr/bin/cut -c20-26
 // Save the version with decimal delimiters for use in extracting the rules
 $snort_version = $snortver[0];
 if (empty($snort_version))
-	$snort_version = "2.9.6.0";
+	$snort_version = SNORT_BIN_VERSION;
 
 // Create a collapsed version string for use in the tarball filename
 $snortver[0] = str_replace(".", "", $snortver[0]);
@@ -431,10 +433,10 @@ $update_errors = false;
 
 /*  Check for and download any new Snort VRT sigs */
 if ($snortdownload == 'on') {
-	if (snort_check_rule_md5("{$snort_rule_url}{$snort_filename_md5}/{$oinkid}/", "{$tmpfname}/{$snort_filename_md5}", "Snort VRT rules")) {
+	if (snort_check_rule_md5("{$snort_rule_url}{$snort_filename_md5}?oinkcode={$oinkid}", "{$tmpfname}/{$snort_filename_md5}", "Snort VRT rules")) {
 		/* download snortrules file */
 		$file_md5 = trim(file_get_contents("{$tmpfname}/{$snort_filename_md5}"));
-		if (!snort_fetch_new_rules("{$snort_rule_url}{$snort_filename}/{$oinkid}/", "{$tmpfname}/{$snort_filename}", $file_md5, "Snort VRT rules"))
+		if (!snort_fetch_new_rules("{$snort_rule_url}{$snort_filename}?oinkcode={$oinkid}", "{$tmpfname}/{$snort_filename}", $file_md5, "Snort VRT rules"))
 			$snortdownload = 'off';
 	}
 	else
