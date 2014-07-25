@@ -477,21 +477,7 @@
 		<descr>Snort is an open source network intrusion prevention and detection system (IDS/IPS). Combining the benefits of signature, protocol, and anomaly-based inspection.</descr>
 		<category>Security</category>
 		<depends_on_package_base_url>https://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
-		<depends_on_package>mysql55-client-5.5.35.tbz</depends_on_package>
-		<depends_on_package>barnyard2-1.13.tbz</depends_on_package>
-		<depends_on_package>libnet-1.1.6_1,1.tbz </depends_on_package>
-		<depends_on_package>libdnet-1.11_3.tbz</depends_on_package>
-		<depends_on_package>libpcap-1.5.2.tbz</depends_on_package>
-		<depends_on_package>daq-2.0.1.tbz</depends_on_package>
-		<depends_on_package>snort-2.9.6.2.tbz</depends_on_package>
 		<depends_on_package_pbi>snort-2.9.6.2-amd64.pbi</depends_on_package_pbi>
-		<build_port_path>/usr/ports/devel/pcre</build_port_path>
-		<build_port_path>/usr/ports/net/daq</build_port_path>
-		<build_port_path>/usr/ports/net/libnet</build_port_path>
-		<build_port_path>/usr/ports/net/libpcap</build_port_path>
-		<build_port_path>/usr/ports/security/barnyard2</build_port_path>
-		<build_port_path>/usr/ports/databases/mysql55-client</build_port_path>
-		<build_port_path>/usr/ports/security/snort</build_port_path>
 		<build_pbi>
 			<port>security/snort</port>
 			<ports_after>security/barnyard2</ports_after>
