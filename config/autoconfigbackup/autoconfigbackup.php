@@ -28,7 +28,7 @@
 */
 
 require("guiconfig.inc");
-require("/usr/local/pkg/autoconfigbackup.inc");
+require("autoconfigbackup.inc");
 
 $pf_version=substr(trim(file_get_contents("/etc/version")),0,3);
 if ($pf_version < 2.0)
@@ -91,7 +91,7 @@ function get_hostnames() {
 	curl_setopt($curl_session, CURLOPT_POSTFIELDS, "action=showstats");
 	curl_setopt($curl_session, CURLOPT_USERAGENT, $g['product_name'] . '/' . rtrim(file_get_contents("/etc/version")));
 	// Proxy
-	curl_setopt_array($curl_session, configure_proxy($config));
+	curl_setopt_array($curl_session, configure_proxy());
 	
 	$data = curl_exec($curl_session);
 	if (curl_errno($curl_session)) {
@@ -172,7 +172,7 @@ function get_hostnames() {
 						"&revision=" . urlencode($_REQUEST['rmver']));
 					curl_setopt($curl_session, CURLOPT_USERAGENT, $g['product_name'] . '/' . rtrim(file_get_contents("/etc/version")));
 					// Proxy
-					curl_setopt_array($curl_session, configure_proxy($config));
+					curl_setopt_array($curl_session, configure_proxy());
 					
 					$data = curl_exec($curl_session);
 					if (curl_errno($curl_session)) {
@@ -203,7 +203,7 @@ function get_hostnames() {
 						"&revision=" . urlencode($_REQUEST['newver']));
 					curl_setopt($curl_session, CURLOPT_USERAGENT, $g['product_name'] . '/' . rtrim(file_get_contents("/etc/version")));
 					// Proxy
-					curl_setopt_array($curl_session, configure_proxy($config));
+					curl_setopt_array($curl_session, configure_proxy());
 					$data = curl_exec($curl_session);
 					$data_split = split("\+\+\+\+", $data);
 					$sha256 = trim($data_split[0]);	// sha256
@@ -270,7 +270,7 @@ EOF;
 						"&revision=" . urlencode($_REQUEST['download']));
 					curl_setopt($curl_session, CURLOPT_USERAGENT, $g['product_name'] . '/' . rtrim(file_get_contents("/etc/version")));
 					// Proxy
-					curl_setopt_array($curl_session, configure_proxy($config));
+					curl_setopt_array($curl_session, configure_proxy());
 					$data = curl_exec($curl_session);
 					if (!tagfile_deformat($data, $data1, "config.xml")) 
 						$input_errors[] = "The downloaded file does not appear to contain an encrypted pfSense configuration.";
@@ -323,7 +323,7 @@ EOF;
 				curl_setopt($curl_session, CURLOPT_POSTFIELDS, "action=showbackups&hostname={$hostname}");
 				curl_setopt($curl_session, CURLOPT_USERAGENT, $g['product_name'] . '/' . rtrim(file_get_contents("/etc/version")));
 				// Proxy
-				curl_setopt_array($curl_session, configure_proxy($config));
+				curl_setopt_array($curl_session, configure_proxy());
 
 				$data = curl_exec($curl_session);
 				if (curl_errno($curl_session)) {
