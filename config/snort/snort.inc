@@ -831,7 +831,7 @@ function snort_rules_up_install_cron($should_install) {
 		$snort_rules_up_wday = "*";
 	}
 
-	$command = "/usr/bin/nice -n20 /usr/local/bin/php -f /usr/local/www/snort/snort_check_for_rule_updates.php";
+	$command = "/usr/bin/nice -n20 /usr/local/bin/php -f /usr/local/pkg/snort/snort_check_for_rule_updates.php";
 	install_cron_job($command, $should_install, $snort_rules_up_min, $snort_rules_up_hr, $snort_rules_up_mday, $snort_rules_up_month, $snort_rules_up_wday, "root");
 }
 
