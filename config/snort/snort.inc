@@ -768,6 +768,13 @@ function snort_rm_blocked_install_cron($should_install) {
 function snort_rules_up_install_cron($should_install) {
 	global $config, $g;
 
+	// Remove any existing job first
+	install_cron_job("snort_check_for_rule_updates.php", false);
+
+	// If called with FALSE as argument, then we're done
+	if ($should_install == FALSE)
+		return;
+
 	$snort_rules_up_info_ck = $config['installedpackages']['snortglobal']['autorulesupdate7'];
 
 	/* See if a customized start time has been set for rule file updates */
