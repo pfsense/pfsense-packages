@@ -51,7 +51,7 @@ $snortver = array();
 exec("/usr/local/bin/snort -V 2>&1 |/usr/bin/grep Version | /usr/bin/cut -c20-26", $snortver);
 
 /* Used to indicate latest version of this include file has been loaded */
-$pfSense_snort_version = "3.1";
+$pfSense_snort_version = "3.1.1";
 
 /* get installed package version for display */
 $snort_package_version = "Snort {$config['installedpackages']['package'][get_pkg_id("snort")]['version']}";
@@ -768,6 +768,13 @@ function snort_rm_blocked_install_cron($should_install) {
 function snort_rules_up_install_cron($should_install) {
 	global $config, $g;
 
+	// Remove any existing job first
+	install_cron_job("snort_check_for_rule_updates.php", false);
+
+	// If called with FALSE as argument, then we're done
+	if ($should_install == FALSE)
+		return;
+
 	$snort_rules_up_info_ck = $config['installedpackages']['snortglobal']['autorulesupdate7'];
 
 	/* See if a customized start time has been set for rule file updates */
@@ -831,7 +838,7 @@ function snort_rules_up_install_cron($should_install) {
 		$snort_rules_up_wday = "*";
 	}
 
-	$command = "/usr/bin/nice -n20 /usr/local/bin/php -f /usr/local/www/snort/snort_check_for_rule_updates.php";
+	$command = "/usr/bin/nice -n20 /usr/local/bin/php -f /usr/local/pkg/snort/snort_check_for_rule_updates.php";
 	install_cron_job($command, $should_install, $snort_rules_up_min, $snort_rules_up_hr, $snort_rules_up_mday, $snort_rules_up_month, $snort_rules_up_wday, "root");
 }
 
