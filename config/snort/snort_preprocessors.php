@@ -240,7 +240,17 @@ $disabled_rules_log = "{$if_friendly}_disabled_preproc_rules.log";
 
 // Check for returned "selected alias" if action is import
 if ($_GET['act'] == "import" && isset($_GET['varname']) && !empty($_GET['varvalue'])) {
-		$pconfig[$_GET['varname']] = htmlspecialchars($_GET['varvalue']);
+
+	// Retrieve previously typed values we passed to SELECT ALIAS page
+	$pconfig['sf_portscan'] = htmlspecialchars($_GET['sf_portscan'])? 'on' : 'off';
+	$pconfig['pscan_ignore_scanners'] = htmlspecialchars($_GET['pscan_ignore_scanners']);
+	$pconfig['pscan_protocol'] = htmlspecialchars($_GET['pscan_protocol']);
+	$pconfig['pscan_type'] = htmlspecialchars($_GET['pscan_type']);
+	$pconfig['pscan_memcap'] = htmlspecialchars($_GET['pscan_memcap']);
+	$pconfig['pscan_sense_level'] = htmlspecialchars($_GET['pscan_sense_level']);
+
+	// Now retrieve the "selected alias" returned from SELECT ALIAS page
+	$pconfig[$_GET['varname']] = htmlspecialchars($_GET['varvalue']);
 }
 
 // Handle deleting of any of the multiple configuration engines
@@ -1237,7 +1247,7 @@ if ($savemsg) {
 					value="<?=$pconfig['pscan_ignore_scanners'];?>" title="<?=trim(filter_expand_alias($pconfig['pscan_ignore_scanners']));?>">&nbsp;&nbsp;<?php echo gettext("Leave blank for default.  ") . 
 					gettext("Default value is ") . "<strong>" . gettext("\$HOME_NET") . "</strong>"; ?>.</td>
 					<td class="vexpl" align="right">
-						<input type="button" class="formbtns" value="Aliases" onclick="parent.location='snort_select_alias.php?id=<?=$id;?>&type=host|network&varname=pscan_ignore_scanners&act=import&multi_ip=yes&returl=<?=urlencode($_SERVER['PHP_SELF']);?>'"  
+						<input type="button" class="formbtns" value="Aliases" onclick="selectAlias();"  
 						title="<?php echo gettext("Select an existing IP alias");?>"/></td>
 				</tr>
 				<tr>
@@ -2203,6 +2213,29 @@ function wopen(url, name, w, h)
        'status=no, toolbar=no, scrollbars=yes, resizable=yes');
     win.resizeTo(w, h);
     win.focus();
+}
+
+function selectAlias() {
+
+	var loc;
+	var fields = [ "sf_portscan", "pscan_protocol", "pscan_type", "pscan_sense_level", "pscan_memcap", "pscan_ignore_scanners" ];
+
+	// Scrape current form field values and add to
+	// the select alias URL as a query string.
+	var loc = 'snort_select_alias.php?id=<?=$id;?>&act=import&type=host|network';
+	loc = loc + '&varname=pscan_ignore_scanners&multi_ip=yes';
+	loc = loc + '&returl=<?=urlencode($_SERVER['PHP_SELF']);?>';
+	loc = loc + '&uuid=<?=$passlist_uuid;?>';
+
+	// Iterate over just the specific form fields we want to pass to
+	// the select alias URL.
+	fields.forEach(function(entry) {
+		var tmp = $(entry).serialize();
+		if (tmp.length > 0)
+			loc = loc + '&' + tmp;
+	});
+	
+	window.parent.location = loc; 
 }
 
 // Set initial state of form controls
