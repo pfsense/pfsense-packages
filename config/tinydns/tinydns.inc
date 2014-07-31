@@ -91,7 +91,8 @@ svscan_start () {
         mkdir -p \$logdir
         /usr/bin/env \
         PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin \
-        /usr/sbin/daemon -f /bin/sh -c "\$command \$svscan_servicedir 2>&1 | /usr/local/bin/multilog t \$logdir" > /dev/null \n
+        /usr/sbin/daemon -f /bin/sh -c "\$command \$svscan_servicedir 2>&1 | /usr/local/bin/multilog t \$logdir" > /dev/null
+
 EOD;
 if ($enableipmonitoring) {
 	$svscan .= <<<EOD
