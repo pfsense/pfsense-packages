@@ -176,6 +176,9 @@ if ($_POST["save"] && !$input_errors) {
 
 	/* if no errors write to conf */
 	if (!$input_errors) {
+		/* Most changes don't require a rules rebuild, so default to "off" */
+		$rebuild_rules = false;
+
 		$natent = $a_rule[$id];
 		$natent['interface'] = $_POST['interface'];
 		$natent['enable'] = $_POST['enable'] ? 'on' : 'off';
@@ -359,9 +362,6 @@ if ($_POST["save"] && !$input_errors) {
 
 		/* Save configuration changes */
 		write_config("Snort pkg: modified interface configuration for {$natent['interface']}.");
-
-		/* Most changes don't require a rules rebuild, so default to "off" */
-		$rebuild_rules = false;
 
 		/* Update snort.conf and snort.sh files for this interface */
 		sync_snort_package_config();
