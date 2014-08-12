@@ -269,6 +269,23 @@
 		<noembedded>true</noembedded>
 	</package>
 	<package>
+		<name>ntopng</name>
+		<website>http://www.ntop.org/</website>
+		<descr>ntopng (replaces ntop) is a network probe that shows network usage in a way similar to what top does for processes. In interactive mode, it displays the network status on the user's terminal. In Web mode it acts as a Web server, creating an HTML dump of the network status. It sports a NetFlow/sFlow emitter/collector, an HTTP-based client interface for creating ntop-centric monitoring applications, and RRD for persistently storing traffic statistics.</descr>
+		<category>Network Management</category>
+		<depends_on_package_pbi>ntopng-1.1_2-##ARCH##.pbi</depends_on_package_pbi>
+		<build_pbi>
+			<port>net/ntopng</port>
+		</build_pbi>
+		<version>1.1 v0.1</version>
+		<status>ALPHA</status>
+		<!-- Only here to build binaries, not used yet -->
+		<required_version>3.0</required_version>
+		<config_file>https://packages.pfsense.org/packages/config/ntopng/ntopng.xml</config_file>
+		<configurationfile>ntopng.xml</configurationfile>
+		<noembedded>true</noembedded>
+	</package>
+	<package>
 		<name>Notes</name>
 		<website/>
 		<descr>Track things you want to note for this system.</descr>
