@@ -7,9 +7,9 @@
 /* $Id$ */
 /* ========================================================================== */
 /*
-	authng.xml
+	ntopng.xml
 	part of pfSense (http://www.pfSense.com)
-	Copyright (C) 2008 Scott Ullrich
+	Copyright (C) 2014 ESF, LLC
 	All rights reserved.
 */
 /* ========================================================================== */
@@ -38,50 +38,50 @@
 /* ========================================================================== */
 	]]>
 	</copyright>
-	<name>ntop</name>
-	<version>3.0</version>
-	<title>Diagnostics: ntop Settings</title>
+	<name>ntopng</name>
+	<version>1.1 v0.1</version>
+	<title>Diagnostics: ntopng Settings</title>
 	<savetext>Change</savetext>
-	<aftersaveredirect>pkg_edit.php?xml=ntop.xml&amp;id=0</aftersaveredirect>
+	<aftersaveredirect>pkg_edit.php?xml=ntopng.xml</aftersaveredirect>
 	<menu>
-		<name>ntop Settings</name>
-		<tooltiptext>Set ntop settings such as password and port.</tooltiptext>
+		<name>ntopng Settings</name>
+		<tooltiptext>Set ntopng settings such as password and port.</tooltiptext>
 		<section>Diagnostics</section>
-		<url>/pkg_edit.php?xml=ntop.xml&amp;id=0</url>
+		<url>/pkg_edit.php?xml=ntopng.xml&amp;id=0</url>
 	</menu>
 	<menu>
-		<name>ntop</name>
-		<tooltiptext>Access ntop</tooltiptext>
+		<name>ntopng</name>
+		<tooltiptext>Access ntopng</tooltiptext>
 		<section>Diagnostics</section>
-		<url>http://$myurl:3000</url>
-		<depends_on_service>ntop</depends_on_service>
+		<url>https://$myurl:3001</url>
+		<depends_on_service>ntopng</depends_on_service>
 	</menu>
 	<service>
-		<name>ntop</name>
-		<rcfile>ntop.sh</rcfile>
-		<executable>ntop</executable>
-		<description>NTOP bandwidth monitoring/graphing</description>
+		<name>ntopng</name>
+		<rcfile>ntopng.sh</rcfile>
+		<executable>ntopng</executable>
+		<description>ntopng bandwidth monitoring/graphing</description>
 	</service>
 	<tabs>
 		<tab>
-			<text>ntop Settings</text>
+			<text>ntopng Settings</text>
 			<url>/pkg_edit.php?xml=ntop.xml&amp;id=0</url>
 			<active/>
 		</tab>
 		<tab>
-			<text>Access ntop</text>
-			<url>http://$myurl:3000</url>
+			<text>Access ntopng</text>
+			<url>https://$myurl:3001</url>
 		</tab>
 	</tabs>
 	<fields>
 		<field>
-			<fielddescr>ntop Admin Password</fielddescr>
+			<fielddescr>ntopng Admin Password</fielddescr>
 			<fieldname>password</fieldname>
-			<description>Enter the password for the NTOP Web GUI.  Minimum 5 characters.</description>
+			<description>Enter the password for the ntopng GUI.  Minimum 5 characters, defaults to admin.</description>
 			<type>password</type>
 		</field>
 		<field>
-			<fielddescr>ntop Admin Password AGAIN</fielddescr>
+			<fielddescr>Confirm ntopng Admin Password</fielddescr>
 			<fieldname>passwordagain</fieldname>
 			<type>password</type>
 		</field>
@@ -93,83 +93,78 @@
 			<value>lan</value>
 			<multiple>true</multiple>
 		</field>
-		<field>
-			<fielddescr>Allow merging interfaces&lt;br&gt;(Def: Do not merge)</fielddescr>
-			<fieldname>allowmerge</fieldname>
-			<type>checkbox</type>
-		</field>
 	</fields>
 	<custom_php_global_functions>
 	<![CDATA[
-	function sync_package_ntop() {
+	function sync_package_ntopng() {
 		conf_mount_rw();
 		config_lock();
 		global $config;
 		global $input_errors;
 		if ($_POST) {
-			$config['installedpackages']['ntop']['config'] = array();
-			$config['installedpackages']['ntop']['config'][0] = $_POST;
+			$config['installedpackages']['ntopng']['config'] = array();
+			$config['installedpackages']['ntopng']['config'][0] = $_POST;
 		}
-		$ntop_config =& $config['installedpackages']['ntop']['config'][0];
+		$ntopng_config =& $config['installedpackages']['ntopng']['config'][0];
 		$if_final = "";
 		$ifaces_final = "";
-		system("/bin/mkdir -p /var/db/ntop");
-		system("/bin/mkdir -p /var/db/ntop/rrd");
-		system("/bin/mkdir -p /var/db/ntop/rrd/graphics");
-		system("/bin/chmod -R 755 /var/db/ntop");
-		system("/usr/sbin/chown -R nobody:nobody /var/db/ntop");
+		system("/bin/mkdir -p /var/db/ntopng");
+		system("/bin/mkdir -p /var/db/ntopng/rrd");
+		system("/bin/mkdir -p /var/db/ntopng/rrd/graphics");
+		system("/bin/chmod -R 755 /var/db/ntopng");
+		system("/usr/sbin/chown -R nobody:nobody /var/db/ntopng");
 		system("/bin/cp -Rp /usr/local/lib/X11/fonts/webfonts/ /usr/local/lib/X11/fonts/TTF/");
 		$first = 0;
-		$mergeifs = ($ntop_config['allowmerge'] == "on") ? "" : "-M";
-		foreach($ntop_config['interface_array'] as $iface) {
-		$if = convert_friendly_interface_to_real_interface_name($iface);
-		if($if) {
-			if($first == 1)
-			$ifaces_final .= ",";
-			$ifaces_final .= $if;
-			$first = 1;
+		foreach($ntopng_config['interface_array'] as $iface) {
+			$if = convert_friendly_interface_to_real_interface_name($iface);
+			if ($if) {
+				$ifaces .= " " . escapeshellarg("-i {$if}");
+			}
 		}
-		}
-		$start = "/usr/local/bin/ntop -i {$ifaces_final} -u root -d -4 {$mergeifs} -x 8102 -X 8192 &";
+		// TODO:
+		//  Add support for --dns-mode (0/1/2/3), --data-dir /somewhere, --httpdocs-dir /somewhereelse,
+		//  --dump-timeline (on/off), --enable-aggregations (0/1/2), --local-networks, 
+		//  --http-port, --https-port
+		$start = "/usr/local/bin/ntopng -s -e {$ifaces} &";
 		write_rcfile(array(
-					"file" => "ntop.sh",
+					"file" => "ntopng.sh",
 					"start" => $start,
-					"stop" => "/usr/bin/killall ntop"
+					"stop" => "/usr/bin/killall ntopng"
 				)
 		);
-		if (is_service_running("ntop")) {
-			stop_service("ntop");
-			// Wait for ntop to shut down cleanly.
+		if (is_service_running("ntopng")) {
+			stop_service("ntopng");
+			// Wait for ntopng to shut down cleanly.
 			sleep(20);
 		}
-		if (empty($ntop_config['password']))
-			$ntop_config['password'] = "admin";
-		unlink_if_exists("/var/db/ntop/ntop_pw.db");
-		exec("/usr/local/bin/ntop --set-admin-password={$ntop_config['password']}");
+		if (empty($ntopng_config['password']))
+			$ntopng_config['password'] = "admin";
+		$password = md5($ntopng_config['password']);
+		exec("/usr/local/bin/redis-cli SET user.admin.password " . escapeshellarg($password));
 		sleep(2);
-		start_service("ntop");
+		start_service("ntopng");
 		conf_mount_ro();
 		config_unlock();
 	}
 	]]>
 	</custom_php_global_functions>
 	<custom_add_php_command>
-		sync_package_ntop();
+		sync_package_ntopng();
 	</custom_add_php_command>
 	<custom_php_resync_config_command>
-		sync_package_ntop();
+		sync_package_ntopng();
 	</custom_php_resync_config_command>
 	<custom_php_install_command>
-		sync_package_ntop();
+		sync_package_ntopng();
 	</custom_php_install_command>
 	<custom_php_deinstall_command>
-		exec("rm /usr/local/etc/rc.d/ntop*");
+		exec("rm /usr/local/etc/rc.d/ntopng*");
 	</custom_php_deinstall_command>
 	<custom_php_validation_command>
 	<![CDATA[
 	if ($_POST) {
 		if (empty($_POST['password']) || empty($_POST['passwordagain']))
-			$input_errors[] = "You must provide (and confirm) ntop's password.";
+			$input_errors[] = "You must provide (and confirm) ntopng's password.";
 		if ($_POST['password'] != $_POST['passwordagain'])
 			$input_errors[] = "The provided passwords did not match.";
 	}
