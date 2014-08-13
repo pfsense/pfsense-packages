@@ -183,7 +183,7 @@
 		<build_pbi>
 			<ports_before>security/openssl</ports_before>
 			<custom_name>haproxy-devel</custom_name>
-			<port>/usr/ports/net/haproxy-devel</port>
+			<port>/usr/ports/net/haproxy</port>
 		</build_pbi>
 		<build_options>WITH_OPENSSL_PORT=yes;OPTIONS_UNSET_FORCE=PCRE DPCRE;OPTIONS_SET_FORCE=OPENSSL SPCRE</build_options>
 	</package>
