@@ -53,7 +53,7 @@
 		<name>ntopng</name>
 		<tooltiptext>Access ntopng</tooltiptext>
 		<section>Diagnostics</section>
-		<url>https://$myurl:3001</url>
+		<url>http://$myurl:3000</url>
 		<depends_on_service>ntopng</depends_on_service>
 	</menu>
 	<service>
@@ -65,12 +65,12 @@
 	<tabs>
 		<tab>
 			<text>ntopng Settings</text>
-			<url>/pkg_edit.php?xml=ntop.xml&amp;id=0</url>
+			<url>/pkg_edit.php?xml=ntopng.xml&amp;id=0</url>
 			<active/>
 		</tab>
 		<tab>
 			<text>Access ntopng</text>
-			<url>https://$myurl:3001</url>
+			<url>http://$myurl:3000</url>
 		</tab>
 	</tabs>
 	<fields>
@@ -92,6 +92,31 @@
 			<size>3</size>
 			<value>lan</value>
 			<multiple>true</multiple>
+		</field>
+		<field>
+			<fielddescr>DNS Mode</fielddescr>
+			<fieldname>dns_mode</fieldname>
+			<description>Configures how name resolution is handled</description>
+			<type>select</type>
+			<default_value>0</default_value>
+			<options>
+				<option><value>0</value><name>Decode DNS responses and resolve local numeric IPs only (default)</name></option>
+				<option><value>1</value><name>Decode DNS responses and resolve all numeric IPs</name></option>
+				<option><value>2</value><name>Decode DNS responses and don't resolve numeric IPs</name></option>
+				<option><value>3</value><name>Don't decode DNS responses and don't resolve numeric IPs</name></option>
+			</options>
+		</field>
+		<field>
+			<fielddescr>Local Networks</fielddescr>
+			<fieldname>local_networks</fieldname>
+			<description>Configures how Local Networks are defined</description>
+			<type>select</type>
+			<default_value>rfc1918</default_value>
+			<options>
+				<option><value>rfc1918</value><name>Consider all RFC1918 networks local</name></option>
+				<option><value>selected</value><name>Consider selected interface networks local</name></option>
+				<option><value>lanonly</value><name>Consider only LAN interface local</name></option>
+			</options>
 		</field>
 	</fields>
 	<custom_php_global_functions>
@@ -118,18 +143,49 @@
 		foreach($ntopng_config['interface_array'] as $iface) {
 			$if = convert_friendly_interface_to_real_interface_name($iface);
 			if ($if) {
-				$ifaces .= " " . escapeshellarg("-i {$if}");
+				$ifaces .= " -i " . escapeshellarg("{$if}");
 			}
 		}
+
+		// DNS Mode
+		if (is_numeric($ntopng_config['dns_mode']) && ($ntopng_config['dns_mode'] >= 0) && ($ntopng_config['dns_mode'] <= 3)) {
+			$dns_mode = "--dns-mode " . escapeshellarg($ntopng_config['dns_mode']);
+		}
+
+		// Local Networks >
+		switch ($ntopng_config['local_networks']) {
+			case "selected":
+				$nets = array();
+				foreach ($ntopng_config['interface_array'] as $iface) {
+					if (is_ipaddr(get_interface_ip($iface))) {
+						$nets[] = gen_subnet(get_interface_ip($iface),get_interface_subnet($iface)) . '/' . get_interface_subnet($iface);
+					}
+				}
+				if (!empty($nets))
+					$local_networks = "--local-networks " . escapeshellarg(implode(",", $nets));
+				break;
+			case "lanonly":
+				if (is_ipaddr(get_interface_ip('lan'))) {
+					$local_networks = "--local-networks " . escapeshellarg(gen_subnet(get_interface_ip('lan'),get_interface_subnet('lan')) . '/' . get_interface_subnet('lan'));
+				}
+				break;
+			case "rfc1918":
+			default:
+				$local_networks = "--local-networks '192.168.0.0/16,172.16.0.0/12,10.0.0.0/8'";
+				break;
+		}
+
+		$start = "ldconfig -m /usr/pbi/ntopng-i386/lib\n";
+		$start .= "\t/usr/pbi/ntopng-" . php_uname("m") . "/bin/redis-server &\n";
 		// TODO:
-		//  Add support for --dns-mode (0/1/2/3), --data-dir /somewhere, --httpdocs-dir /somewhereelse,
-		//  --dump-timeline (on/off), --enable-aggregations (0/1/2), --local-networks, 
-		//  --http-port, --https-port
-		$start = "/usr/local/bin/ntopng -s -e {$ifaces} &";
+		//  Add support for --data-dir /somewhere, --httpdocs-dir /somewhereelse,
+		//  --dump-timeline (on/off) --http-port, --https-port
+
+		$start .= "\t/usr/local/bin/ntopng -s -e {$ifaces} {$dns_mode} {$aggregations} {$local_networks} &";
 		write_rcfile(array(
 					"file" => "ntopng.sh",
 					"start" => $start,
-					"stop" => "/usr/bin/killall ntopng"
+					"stop" => "/usr/bin/killall ntopng redis-cli redis-server"
 				)
 		);
 		if (is_service_running("ntopng")) {
@@ -137,12 +193,13 @@
 			// Wait for ntopng to shut down cleanly.
 			sleep(20);
 		}
+		start_service("ntopng");
+		sleep(2);
+
 		if (empty($ntopng_config['password']))
 			$ntopng_config['password'] = "admin";
 		$password = md5($ntopng_config['password']);
-		exec("/usr/local/bin/redis-cli SET user.admin.password " . escapeshellarg($password));
-		sleep(2);
-		start_service("ntopng");
+		mwexec_bg("/usr/pbi/ntopng-" . php_uname("m") . "/bin/redis-cli SET user.admin.password " . escapeshellarg($password));
 		conf_mount_ro();
 		config_unlock();
 	}
