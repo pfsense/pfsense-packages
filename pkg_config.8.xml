@@ -379,8 +379,7 @@
 		</build_pbi>
 		<version>1.1 v0.1</version>
 		<status>ALPHA</status>
-		<!-- Only here to build binaries, not used yet -->
-		<required_version>3.0</required_version>
+		<required_version>2.1.4</required_version>
 		<config_file>https://packages.pfsense.org/packages/config/ntopng/ntopng.xml</config_file>
 		<configurationfile>ntopng.xml</configurationfile>
 		<noembedded>true</noembedded>
