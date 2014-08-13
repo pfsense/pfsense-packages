@@ -213,7 +213,7 @@
 	</custom_php_resync_config_command>
 	<custom_php_install_command>
 	<![CDATA[
-		mwexec_bg("/usr/local/bin/geoipupdate.sh");
+		mwexec_bg("/usr/pbi/ntopng-" . php_uname("m") . "/bin/geoipupdate.sh");
 		sync_package_ntopng();
 	]]>
 	</custom_php_install_command>
