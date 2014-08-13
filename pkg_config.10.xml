@@ -275,6 +275,7 @@
 		<category>Network Management</category>
 		<depends_on_package_pbi>ntopng-1.1_2-##ARCH##.pbi</depends_on_package_pbi>
 		<build_pbi>
+			<ports_before>databases/redis databases/gdbm net/GeoIP x11-fonts/font-util x11-fonts/webfonts graphics/graphviz</ports_before>
 			<port>net/ntopng</port>
 		</build_pbi>
 		<version>1.1 v0.1</version>
