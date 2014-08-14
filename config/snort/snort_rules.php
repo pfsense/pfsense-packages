@@ -157,8 +157,8 @@ if ($_POST['toggle'] && is_numeric($_POST['sid']) && is_numeric($_POST['gid']) &
 	$sid = $_POST['sid'];
 
 	// See if the target SID is in our list of modified SIDs,
-	// and toggle it back to default if present; otherwise,
-	// add it to the appropriate modified SID list.
+	// and toggle if present; otherwise, add it to the
+	// appropriate modified SID list.
 	if (isset($enablesid[$gid][$sid])) {
 		unset($enablesid[$gid][$sid]);
 		$disablesid[$gid][$sid] = "disablesid";
@@ -600,8 +600,8 @@ if ($savemsg) {
 							<col axis="string">
 						</colgroup>
 						<thead>
-						   <tr>
-							<th class="list">&nbsp;</th>
+						   <tr class="sortableHeaderRowIdentifier">
+							<th class="list sorttable_nosort">&nbsp;</th>
 							<th class="listhdrr"><?php echo gettext("GID"); ?></th>
 							<th class="listhdrr"><?php echo gettext("SID"); ?></th>
 							<th class="listhdrr"><?php echo gettext("Proto"); ?></th>
@@ -668,7 +668,7 @@ if ($savemsg) {
 								$message = snort_get_msg($v['rule']); // description field
 								$sid_tooltip = gettext("View the raw text for this rule");
 
-								echo "<tr><td class=\"listt\" align=\"left\" valign=\"middle\" sorttable_customkey=\"\">{$textss}
+								echo "<tr><td class=\"listt\" align=\"left\" valign=\"middle\">{$textss}
 								<a id=\"rule_{$gid}_{$sid}\" href=''><input type=\"image\" onClick=\"document.getElementById('sid').value='{$sid}';
 								document.getElementById('gid').value='{$gid}';\" 
 								src=\"../themes/{$g['theme']}/images/icons/{$iconb}\" width=\"11\" height=\"11\" border=\"0\"  
@@ -723,8 +723,8 @@ if ($savemsg) {
 							<col align="left" axis="string">
 						</colgroup>
 						<thead>
-						   <tr>
-							<th class="list">&nbsp;</th>
+						   <tr class="sortableHeaderRowIdentifier">
+							<th class="list" sorttable_nosort>&nbsp;</th>
 							<th class="listhdrr"><?php echo gettext("GID"); ?></th>
 							<th class="listhdrr"><?php echo gettext("SID"); ?></th>
 							<th class="listhdrr"><?php echo gettext("Classification"); ?></th>
@@ -777,7 +777,7 @@ if ($savemsg) {
 										else
 											$policy = "none";
 
-										echo "<tr><td class=\"listt\" align=\"left\" valign=\"middle\" sorttable_customkey=\"\">{$textss}
+										echo "<tr><td class=\"listt\" align=\"left\" valign=\"middle\">{$textss}
 										<input type=\"image\" onClick=\"document.getElementById('sid').value='{$sid}';
 										document.getElementById('gid').value='{$gid}';\" 
 										src=\"../themes/{$g['theme']}/images/icons/{$iconb}\" width=\"11\" height=\"11\" border=\"0\"  

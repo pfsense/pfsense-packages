@@ -7,6 +7,7 @@
  * Copyright (C) 2003-2004 Manuel Kasper <mk@neon1.net>.
  * Copyright (C) 2006 Scott Ullrich
  * Copyright (C) 2012 Ermal Luci
+ * Copyright (C) 2014 Jim Pingle jim@pingle.org
  * Copyright (C) 2013,2014 Bill Meeks
  * All rights reserved.
  *
@@ -163,6 +164,21 @@ if (empty($pconfig['alertnumber']))
 if (empty($pconfig['arefresh']))
 	$pconfig['arefresh'] = 'off';
 $anentries = $pconfig['alertnumber'];
+
+# --- AJAX REVERSE DNS RESOLVE Start ---
+if (isset($_POST['resolve'])) {
+	$ip = strtolower($_POST['resolve']);
+	$res = (is_ipaddr($ip) ? gethostbyaddr($ip) : '');
+	
+	if ($res && $res != $ip)
+		$response = array('resolve_ip' => $ip, 'resolve_text' => $res);
+	else
+		$response = array('resolve_ip' => $ip, 'resolve_text' => gettext("Cannot resolve"));
+	
+	echo json_encode(str_replace("\\","\\\\", $response)); // single escape chars can break JSON decode
+	exit;
+}
+# --- AJAX REVERSE DNS RESOLVE End ---
 
 if ($_POST['save']) {
 	if (!is_array($config['installedpackages']['snortglobal']['alertsblocks']))
@@ -344,7 +360,6 @@ include_once("head.inc");
 ?>
 
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">
-<script src="/javascript/filter_log.js" type="text/javascript"></script>
 <?php
 include_once("fbegin.inc");
 
@@ -444,7 +459,7 @@ if ($savemsg) {
 			<col axis="string">
 		</colgroup>
 		<thead>
-		   <tr>
+		   <tr class="sortableHeaderRowIdentifier">
 			<th class="listhdrr" axis="date"><?php echo gettext("Date"); ?></th>
 			<th class="listhdrr" axis="number"><?php echo gettext("Pri"); ?></th>
 			<th class="listhdrr" axis="string"><?php echo gettext("Proto"); ?></th>
@@ -488,16 +503,12 @@ if (file_exists("{$snortlogdir}/snort_{$if_real}{$snort_uuid}/alert")) {
 			$alert_ip_src = $fields[6];
 			/* Add zero-width space as soft-break opportunity after each colon if we have an IPv6 address */
 			$alert_ip_src = str_replace(":", ":&#8203;", $alert_ip_src);
+
 			/* Add Reverse DNS lookup icons (two different links if pfSense version supports them) */
 			$alert_ip_src .= "<br/>";
-			if ($pfs_version > 2.0) {
-				$alert_ip_src .= "<a onclick=\"javascript:getURL('/diag_dns.php?host={$fields[6]}&dialog_output=true', outputrule);\">";
-				$alert_ip_src .= "<img src='../themes/{$g['theme']}/images/icons/icon_log_d.gif' width='11' height='11' border='0' ";
-				$alert_ip_src .= "title='" . gettext("Resolve host via reverse DNS lookup (quick pop-up)") . "' style=\"cursor: pointer;\"></a>&nbsp;";
-			}
-			$alert_ip_src .= "<a href='/diag_dns.php?host={$fields[6]}&instance={$instanceid}'>";
-			$alert_ip_src .= "<img src='../themes/{$g['theme']}/images/icons/icon_log.gif' width='11' height='11' border='0' ";
-			$alert_ip_src .= "title='" . gettext("Resolve host via reverse DNS lookup") . "'></a>";
+			$alert_ip_src .= "<img onclick=\"javascript:resolve_with_ajax('{$fields[6]}');\" title=\"";
+			$alert_ip_src .= gettext("Resolve host via reverse DNS lookup") . "\" border=\"0\" src=\"/themes/{$g['theme']}/images/icons/icon_log.gif\" alt=\"Icon Reverse Resolve with DNS\" ";
+			$alert_ip_src .= " style=\"cursor: pointer;\"/>";
 
 			/* Add icons for auto-adding to Suppress List if appropriate */
 			if (!snort_is_alert_globally_suppressed($supplist, $fields[1], $fields[2]) && 
@@ -521,16 +532,13 @@ if (file_exists("{$snortlogdir}/snort_{$if_real}{$snort_uuid}/alert")) {
 			$alert_ip_dst = $fields[8];
 			/* Add zero-width space as soft-break opportunity after each colon if we have an IPv6 address */
 			$alert_ip_dst = str_replace(":", ":&#8203;", $alert_ip_dst);
+
 			/* Add Reverse DNS lookup icons (two different links if pfSense version supports them) */
 			$alert_ip_dst .= "<br/>";
-			if ($pfs_version > 2.0) {
-				$alert_ip_dst .= "<a onclick=\"javascript:getURL('/diag_dns.php?host={$fields[8]}&dialog_output=true', outputrule);\">";
-				$alert_ip_dst .= "<img src='../themes/{$g['theme']}/images/icons/icon_log_d.gif' width='11' height='11' border='0' ";
-				$alert_ip_dst .= "title='" . gettext("Resolve host via reverse DNS lookup (quick pop-up)") . "' style=\"cursor: pointer;\"></a>&nbsp;";
-			}
-			$alert_ip_dst .= "<a href='/diag_dns.php?host={$fields[8]}&instance={$instanceid}'>";
-			$alert_ip_dst .= "<img src='../themes/{$g['theme']}/images/icons/icon_log.gif' width='11' height='11' border='0' ";
-			$alert_ip_dst .= "title='" . gettext("Resolve host via reverse DNS lookup") . "'></a>";	
+			$alert_ip_dst .= "<img onclick=\"javascript:resolve_with_ajax('{$fields[8]}');\" title=\"";
+			$alert_ip_dst .= gettext("Resolve host via reverse DNS lookup") . "\" border=\"0\" src=\"/themes/{$g['theme']}/images/icons/icon_log.gif\" alt=\"Icon Reverse Resolve with DNS\" ";
+			$alert_ip_dst .= " style=\"cursor: pointer;\"/>";
+
 			/* Add icons for auto-adding to Suppress List if appropriate */
 			if (!snort_is_alert_globally_suppressed($supplist, $fields[1], $fields[2]) && 
 			    !isset($supplist[$fields[1]][$fields[2]]['by_dst'][$fields[8]])) {
@@ -580,11 +588,11 @@ if (file_exists("{$snortlogdir}/snort_{$if_real}{$snort_uuid}/alert")) {
 				<td class='listr' align='center'>{$alert_priority}</td>
 				<td class='listr' align='center'>{$alert_proto}</td>
 				<td class='listr' style=\"word-wrap:break-word;\">{$alert_class}</td>
-				<td class='listr' align='center' sorttable_customkey='{$fields[6]}'>{$alert_ip_src}</td>
+				<td class='listr' align='center' style=\"sorttable_customkey:{$fields[6]};\" sorttable_customkey=\"{$fields[6]}\">{$alert_ip_src}</td>
 				<td class='listr' align='center'>{$alert_src_p}</td>
-				<td class='listr' align='center' sorttable_customkey='{$fields[8]}'>{$alert_ip_dst}</td>
+				<td class='listr' align='center' style=\"sorttable_customkey:{$fields[8]};\" sorttable_customkey=\"{$fields[8]}\">{$alert_ip_dst}</td>
 				<td class='listr' align='center'>{$alert_dst_p}</td>
-				<td class='listr' align='center' sorttable_customkey='{$fields[2]}'>{$alert_sid_str}<br/>{$sidsupplink}&nbsp;&nbsp;{$sid_dsbl_link}</td>
+				<td class='listr' align='center' style=\"sorttable_customkey:{$fields[2]};\" sorttable_customkey=\"{$fields[2]}\">{$alert_sid_str}<br/>{$sidsupplink}&nbsp;&nbsp;{$sid_dsbl_link}</td>
 				<td class='listbg' style=\"word-wrap:break-word;\">{$alert_descr}</td>
 				</tr>\n";
 			$counter++;
@@ -622,5 +630,38 @@ function encRuleSig(rulegid,rulesid,srcip,ruledescr) {
 	document.getElementById("descr").value = ruledescr;
 }
 </script>
+
+<!-- The following AJAX code was borrowed from the diag_logs_filter.php -->
+<!-- file in pfSense.  See copyright info at top of this page.          -->
+<script type="text/javascript">
+//<![CDATA[
+function resolve_with_ajax(ip_to_resolve) {
+	var url = "/snort/snort_alerts.php";
+
+	jQuery.ajax(
+		url,
+		{
+			type: 'post',
+			dataType: 'json',
+			data: {
+				resolve: ip_to_resolve,
+				},
+			complete: resolve_ip_callback
+		});
+}
+
+function resolve_ip_callback(transport) {
+	var response = jQuery.parseJSON(transport.responseText);
+	var msg = 'IP address "' + response.resolve_ip + '" resolves to\n';
+	alert(msg + 'host "' + htmlspecialchars(response.resolve_text) + '"');
+}
+
+// From http://stackoverflow.com/questions/5499078/fastest-method-to-escape-html-tags-as-html-entities
+function htmlspecialchars(str) {
+    return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&apos;');
+}
+//]]>
+</script>
+
 </body>
 </html>
