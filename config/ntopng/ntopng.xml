@@ -175,8 +175,15 @@
 				break;
 		}
 
+		$pf_version=substr(trim(file_get_contents("/etc/version")),0,3);
+		if ($pf_version >= 2.2) {
+			$redis_path = "/usr/pbi/ntopng-" . php_uname("m") . "/local/bin";
+		} else {
+			$redis_path = "/usr/pbi/ntopng-" . php_uname("m") . "/bin";
+		}
+
 		$start = "ldconfig -m /usr/pbi/ntopng-i386/lib\n";
-		$start .= "\t/usr/pbi/ntopng-" . php_uname("m") . "/bin/redis-server &\n";
+		$start .= "\t{$redis_path}/redis-server &\n";
 		// TODO:
 		//  Add support for --data-dir /somewhere, --httpdocs-dir /somewhereelse,
 		//  --dump-timeline (on/off) --http-port, --https-port
@@ -199,7 +206,7 @@
 		if (empty($ntopng_config['password']))
 			$ntopng_config['password'] = "admin";
 		$password = md5($ntopng_config['password']);
-		mwexec_bg("/usr/pbi/ntopng-" . php_uname("m") . "/bin/redis-cli SET user.admin.password " . escapeshellarg($password));
+		mwexec_bg("{$redis_path}/redis-cli SET user.admin.password " . escapeshellarg($password));
 		conf_mount_ro();
 		config_unlock();
 	}
