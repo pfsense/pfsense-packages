@@ -83,6 +83,10 @@
 			<fieldname>recordtype</fieldname>
 		</columnitem>
 		<columnitem>
+			<fielddescr>Prio</fielddescr>
+			<fieldname>dist</fieldname>
+		</columnitem>
+		<columnitem>
 			<fielddescr>rDNS</fielddescr>
 			<fieldname>rdns</fieldname>
 		</columnitem>
@@ -93,6 +97,10 @@
 		<columnitem>
 			<fielddescr>TTL</fielddescr>
 			<fieldname>ttl</fieldname>
+		</columnitem>
+		<columnitem>
+			<fielddescr>monitoring</fielddescr>
+			<fieldname>monitorip</fieldname>
 		</columnitem>
 	</adddeleteeditpagefields>
 	<fields>
@@ -250,6 +258,13 @@
 			<size>35</size>
 		</field>
 		<field>
+			<fielddescr>Interface</fielddescr>
+			<description>interface to ping via</description>
+			<fieldname>interface</fieldname>
+			<type>interfaces_selection</type>
+			<size>1</size>
+		</field>
+		<field>
 			<fielddescr>Failover hold time</fielddescr>
 			<description>Time in minutes before DNS switches to backup host</description>
 			<fieldname>threshhold</fieldname>
@@ -294,6 +309,13 @@
 				    <description>When the WAN MS ping time is surpassed, item will failover to next host</description>
 				    <type>input</type>
 				    <size>15</size>
+				</rowhelperfield>
+				<rowhelperfield>
+				    <fielddescr>interface</fielddescr>
+				    <fieldname>interface</fieldname>
+				    <description>interface to ping via</description>
+				    <type>interfaces_selection</type>
+				    <size>1</size>
 				</rowhelperfield>
 		    </rowhelper>
 		</field>
