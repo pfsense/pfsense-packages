@@ -30,7 +30,7 @@
 */
 
 require("guiconfig.inc");
-require("/usr/local/pkg/tinydns.inc");
+require("tinydns.inc");
 
 /* Defaults to this page but if no settings are present, redirect to setup page */
 if(!$config['installedpackages']['tinydnsdomains']['config'])
