@@ -92,10 +92,11 @@ svscan_start () {
         /usr/bin/env \
         PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin \
         /usr/sbin/daemon -f /bin/sh -c "\$command \$svscan_servicedir 2>&1 | /usr/local/bin/multilog t \$logdir" > /dev/null
+
 EOD;
 if ($enableipmonitoring) {
 	$svscan .= <<<EOD
-        minicron {$refreshinterval} {$g['varrun_path']}/ping_hosts.pid "/etc/ping_hosts.sh; cd {$g['varetc_path']}/tinydns/root && /usr/local/bin/tinydns-data"
+       /usr/local/bin/minicron {$refreshinterval} {$g['varrun_path']}/ping_hosts.pid "/usr/local/bin/ping_hosts.sh"
 EOD;
 }
 $svscan .= <<<EOD
@@ -105,6 +106,7 @@ $svscan .= <<<EOD
 svscan_stop_post () {
         echo "Stopping svscan."
         find -L "\$svscan_servicedir" -mindepth 1 -maxdepth 2 -type d \( \! -path "\$svscan_servicedir/*/*" -or -name 'log' \) -print0 | xargs -0 /usr/local/bin/svc -dx
+		/bin/pkill -F /var/run/ping_hosts.pid
 }
 
 run_rc_command "\$1"
@@ -117,11 +119,12 @@ EOD;
 	$filename = "tinydns.sh";
 	$start = "/usr/local/bin/php -q -d auto_prepend_file=config.inc <<ENDPHP
 <?php
+	require_once(\"functions.inc\");
 	require_once(\"/usr/local/pkg/tinydns.inc\");
 	tinydns_custom_php_changeip_command();
 	tinydns_create_zone_file();\n";
 	if ($enableipmonitoring) {
-		$start .= "tinydns_setup_ping_items();\n";
+		$start .= 	"tinydns_setup_ping_items();\n";
 	}
 	$start .= "?>
 ENDPHP\n";
@@ -140,7 +143,6 @@ ENDPHP\n";
 	/bin/rm -rf {$g['varetc_path']}/dnscache* 2>/dev/null
 	/bin/rm -rf {$g['varetc_path']}/axfrdns 2>/dev/null
 	/bin/rm -rf {$g['varrun_path']}/axfrdns 2>/dev/null
-	/bin/pkill -F /var/run/ping_hosts.pid
 
 ENDSH;
 
@@ -359,16 +361,16 @@ function tinydns_get_record_status($record, $pingthreshold = "", $wanpingthresho
 	return "UP";
 }
 
-function tinydns_get_backup_record($record) {
+function tinydns_get_backup_record($record, $recordtype) {
 	global $g, $config;
 	if($config['installedpackages']['tinydnsdomains']) {
 		foreach($config['installedpackages']['tinydnsdomains']['config'] as $domain) {
-			if($domain['ipaddress'] == $record) {
-				/* if no failover host exists, simply return original record */
+			if($domain['hostname'] == $record && $domain['recordtype'] == $recordtype) {
+				/* if no failover host exists, simply return original ipaddress */
 				if(!$domain['row'])
-					return $record;
+					return $domain['ipaddress'];
 				foreach($domain['row'] as $row) {
-					$status = tinydns_get_record_status($row['failoverip']);
+					$status = tinydns_get_record_status($row['monitorip']);
 					if($status == "UP")
 						return $row['failoverip'];
 				}
@@ -398,39 +400,60 @@ function tinydns_setup_ping_items() {
 	 *   status and create a database of the status information that we can use.
 	 */
 	foreach($config['installedpackages']['tinydnsdomains']['config'] as $domain) {
-		if(!in_array($domain['ipaddress'], $processed)) {
-			fwrite($fd, $ip . "|" . $domain['ipaddress'] . "|1|/usr/local/pkg/tinydns_down.php|/usr/local/pkg/tinydns_up.php\n");
-			$processed[] = $domain['ipaddress'];
-		}
-		if($domain['monitorip'] <> "")
-			$monitorip = $domain['monitorip'];
+		if(!$domain['monitorip'])
+			continue;
+		if($domain['recordtype'] == "AAAA")
+			$inet = "inet6";
+		else
+			$inet = "";
+		$monitorip = $domain['monitorip'];
+		$interface = $domain['interface'];
 		if($domain['row']) {
 			foreach($domain['row'] as $row) {
 				if($row['pingthreshold'])
 					$pingthreshold = $row['pingthreshold'];
 				else
-					$row['pingthreshold'] = "";
+					$pingthreshold = "";
+				
+				if($row['wanpingthreshold'])
+					$wanpingthreshold = $row['wanpingthreshold'];
+				else
+					$wanpingthreshold = "";
+				
+				$info = get_interface_info($row['interface']);
+				if($domain['recordtype'] == "AAAA")					
+					$ip = $info['ipaddrv6'];
+				else
+					$ip = $info['ipaddr'];
+				
 				if($row['monitorip']) {
 					if(!in_array($row['monitorip'], $processed)) {
-						fwrite($fd, $ip . "|" . $row['monitorip'] . "|1|/usr/local/pkg/tinydns_down.php|/usr/local/pkg/tinydns_up.php|{$pingthreshold}\n");
+						fwrite($fd, $ip . "|" . $row['monitorip'] . "|1|/usr/local/pkg/tinydns_down.php|/usr/local/pkg/tinydns_up.php|{$pingthreshold}|{$wanpingthreshold}|{$inet}\n");
 						$processed[] = $row['monitorip'];
 					}
 				} else {
 					if(!in_array($monitorip, $processed)) {
-						fwrite($fd, $ip . "|" . $monitorip . "|1|/usr/local/pkg/tinydns_down.php|/usr/local/pkg/tinydns_up.php|{$pingthreshold}\n");
+						fwrite($fd, $ip . "|" . $monitorip . "|1|/usr/local/pkg/tinydns_down.php|/usr/local/pkg/tinydns_up.php|{$pingthreshold}|{$wanpingthreshold}|{$inet}\n");
 						$processed[] = $monitorip;
 					}
 				}
 			}
 		}
+		
+		$info = get_interface_info($domain['interface']);
+		if($domain['recordtype'] == "AAAA") 			
+			$ip = $info['ipaddrv6'];
+		else
+			$ip = $info['ipaddr'];
+			
 		if($domain['monitorip']) {
 			if(!in_array($domain['monitorip'], $processed)) {
-				fwrite($fd, $ip . "|" . $domain['monitorip'] . "|1|/usr/local/pkg/tinydns_down.php|/usr/local/pkg/tinydns_up.php|{$pingthreshold}\n");
+				fwrite($fd, $ip . "|" . $domain['monitorip'] . "|1|/usr/local/pkg/tinydns_down.php|/usr/local/pkg/tinydns_up.php|{$pingthreshold}|{$wanpingthreshold}|{$inet}\n");
 				$processed[] = $domain['monitorip'];
 			}
 		} else {
 			if(!in_array($row['failoverip'], $processed)) {
-				fwrite($fd, $ip . "|" . $row['failoverip'] . "|1|/usr/local/pkg/tinydns_down.php|/usr/local/pkg/tinydns_up.php|{$pingthreshold}\n");
+				fwrite($fd, $ip . "|" . $row['failoverip'] . "|1|/usr/local/pkg/tinydns_down.php|/usr/local/pkg/tinydns_up.php|{$pingthreshold}|{$wanpingthreshold}|{$inet}\n");
 				$processed[] = $row['failoverip'];
 			}
 		}
@@ -535,7 +558,9 @@ function tinydns_create_zone_file() {
 		for($x=0; $x< count($config['installedpackages']['tinydnsdomains']['config']); $x++) {
 			$domain = $config['installedpackages']['tinydnsdomains']['config'][$x];
 			$record_data = "";
+			$monitorip = "";
 			$hostname = $domain['hostname'];
+			$recordtype = $domain['recordtype'];
 			$ipaddress = $domain['ipaddress'];
 			$ttl = $domain['ttl'];
 			$dist = $domain['dist'];
@@ -549,9 +574,9 @@ function tinydns_create_zone_file() {
 				if($status == "DOWN") {
 					if($debug)
 						log_error("$ipaddress monitor ip $monitorip is offline.");
-					$ipaddress = tinydns_get_backup_record($ipaddress);
+					$ipaddress = tinydns_get_backup_record($hostname, $recordtype);
 					if($debug)
-						log_error("tinydns_get_backup_record returned $ipaddress ");
+						log_error("tinydns_get_backup_record for $hostname returned $ipaddress ");
 				}
 			}
 			$record_data = tinydns_get_rowline_data($ipaddress, $domain['recordtype'], $ttl, $hostname, $domain['rdns'], $dist, $domain['src_port'], $domain['src_weight'], $domain['src_priority'], $domain['src_timestamp']);
@@ -694,7 +719,8 @@ function tinydns_do_xmlrpc_sync($sync_to_ip, $password) {
 	
 	/* tell tinydns to reload our settings on the destionation sync host. */
 	$method = 'pfsense.exec_php';
-	$execcmd  = "require_once('/usr/local/pkg/tinydns.inc');\n";
+	$execcmd  = "require_once('functions.inc');\n";
+	$execcmd .= "require_once('/usr/local/pkg/tinydns.inc');\n";
 	$execcmd .= "tinydns_custom_php_changeip_command();\n";
 	$execcmd .= "tinydns_create_zone_file();\n";
 	if ($config['installedpackages']['tinydns']['config'][0]['enableipmonitoring']) {
@@ -1098,6 +1124,9 @@ function tinydns_get_dns_record_type($tinydnsrecord) {
 			break;
 		case($tinydnsrecord[0] == "+"):
 			$rtype = "A";
+			break;
+		case($tinydnsrecord[0] == ":"):
+			$rtype = "AAAA";
 			break;
 		case($tinydnsrecord[0] == "@"):
 			$rtype = "MX";
