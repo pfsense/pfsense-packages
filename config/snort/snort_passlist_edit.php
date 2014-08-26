@@ -39,6 +39,8 @@
 require_once("guiconfig.inc");
 require_once("/usr/local/pkg/snort/snort.inc");
 
+$pconfig = array();
+
 if ($_POST['cancel']) {
 	header("Location: /snort/snort_passlist.php");
 	exit;
@@ -52,43 +54,20 @@ $a_passlist = &$config['installedpackages']['snortglobal']['whitelist']['item'];
 
 if (isset($_POST['id']) && is_numericint($_POST['id']))
 	$id = $_POST['id'];
-elseif (isset($_GET['id']) && is_numericint($_GET['id']))
+elseif (isset($_GET['id']) && is_numericint($_GET['id'])) {
 	$id = htmlspecialchars($_GET['id']);
+}
 
 /* Should never be called without identifying list index, so bail */
 if (is_null($id)) {
-	header("Location: /snort/snort_interfaces_whitelist.php");
+	header("Location: /snort/snort_passlist.php");
 	exit;
 }
 
-/* If no entry for this passlist, then create a UUID and treat it like a new list */
-if (!isset($a_passlist[$id]['uuid'])) {
-	$passlist_uuid = 0;
-	while ($passlist_uuid > 65535 || $passlist_uuid == 0) {
-		$passlist_uuid = mt_rand(1, 65535);
-		$pconfig['uuid'] = $passlist_uuid;
-		$pconfig['name'] = "passlist_{$passlist_uuid}";
-	}
-} else
-	$passlist_uuid = $a_passlist[$id]['uuid'];
-
-/* returns true if $name is a valid name for a pass list file name or ip */
-function is_validpasslistname($name) {
-	if (!is_string($name))
-		return false;
-
-	if (!preg_match("/[^a-zA-Z0-9\_\.\/]/", $name))
-		return true;
-
-	return false;
-}
-
-if (isset($id) && $a_passlist[$id]) {
-	/* old settings */
-	$pconfig = array();
+if (isset($id) && isset($a_passlist[$id])) {
+	/* Retrieve saved settings */
 	$pconfig['name'] = $a_passlist[$id]['name'];
 	$pconfig['uuid'] = $a_passlist[$id]['uuid'];
-	$pconfig['detail'] = $a_passlist[$id]['detail'];
 	$pconfig['address'] = $a_passlist[$id]['address'];
 	$pconfig['descr'] = html_entity_decode($a_passlist[$id]['descr']);
 	$pconfig['localnets'] = $a_passlist[$id]['localnets'];
@@ -101,8 +80,48 @@ if (isset($id) && $a_passlist[$id]) {
 
 // Check for returned "selected alias" if action is import
 if ($_GET['act'] == "import") {
+
+	// Retrieve previously typed values we passed to SELECT ALIAS page
+	$pconfig['name'] = htmlspecialchars($_GET['name']);
+	$pconfig['uuid'] = htmlspecialchars($_GET['uuid']);
+	$pconfig['address'] = htmlspecialchars($_GET['address']);
+	$pconfig['descr'] = htmlspecialchars($_GET['descr']);
+	$pconfig['localnets'] = htmlspecialchars($_GET['localnets'])? 'yes' : 'no';
+	$pconfig['wanips'] = htmlspecialchars($_GET['wanips'])? 'yes' : 'no';
+	$pconfig['wangateips'] = htmlspecialchars($_GET['wangateips'])? 'yes' : 'no';
+	$pconfig['wandnsips'] = htmlspecialchars($_GET['wandnsips'])? 'yes' : 'no';
+	$pconfig['vips'] = htmlspecialchars($_GET['vips'])? 'yes' : 'no';
+	$pconfig['vpnips'] = htmlspecialchars($_GET['vpnips'])? 'yes' : 'no';
+
+	// Now retrieve the "selected alias" returned from SELECT ALIAS page
 	if ($_GET['varname'] == "address" && isset($_GET['varvalue']))
 		$pconfig[$_GET['varname']] = htmlspecialchars($_GET['varvalue']);
+}
+
+/* If no entry for this passlist, then create a UUID and treat it like a new list */
+if (!isset($a_passlist[$id]['uuid']) && empty($pconfig['uuid'])) {
+	$passlist_uuid = 0;
+	while ($passlist_uuid > 65535 || $passlist_uuid == 0) {
+		$passlist_uuid = mt_rand(1, 65535);
+		$pconfig['uuid'] = $passlist_uuid;
+		$pconfig['name'] = "passlist_{$passlist_uuid}";
+	}
+}
+elseif (!empty($pconfig['uuid'])) {
+	$passlist_uuid = $pconfig['uuid'];	
+}
+else
+	$passlist_uuid = $a_passlist[$id]['uuid'];
+
+/* returns true if $name is a valid name for a pass list file name or ip */
+function is_validpasslistname($name) {
+	if (!is_string($name))
+		return false;
+
+	if (!preg_match("/[^a-zA-Z0-9\_\.\/]/", $name))
+		return true;
+
+	return false;
 }
 
 if ($_POST['save']) {
@@ -126,11 +145,11 @@ if ($_POST['save']) {
 		$input_errors[] = gettext("Pass List file name may only consist of the characters \"a-z, A-Z, 0-9 and _\". Note: No Spaces or dashes. Press Cancel to reset.");
 
 	/* check for name conflicts */
-	foreach ($a_passlist as $w_list) {
-		if (isset($id) && ($a_passlist[$id]) && ($a_passlist[$id] === $w_list))
+	foreach ($a_passlist as $p_list) {
+		if (isset($id) && ($a_passlist[$id]) && ($a_passlist[$id] === $p_list))
 			continue;
 
-		if ($w_list['name'] == $_POST['name']) {
+		if ($p_list['name'] == $_POST['name']) {
 			$input_errors[] = gettext("A Pass List file name with this name already exists.");
 			break;
 		}
@@ -141,27 +160,25 @@ if ($_POST['save']) {
 			$input_errors[] = gettext("A valid alias must be provided");
 
 	if (!$input_errors) {
-		$w_list = array();
+		$p_list = array();
 		/* post user input */
-		$w_list['name'] = $_POST['name'];
-		$w_list['uuid'] = $passlist_uuid;
-		$w_list['localnets'] = $_POST['localnets']? 'yes' : 'no';
-		$w_list['wanips'] = $_POST['wanips']? 'yes' : 'no';
-		$w_list['wangateips'] = $_POST['wangateips']? 'yes' : 'no';
-		$w_list['wandnsips'] = $_POST['wandnsips']? 'yes' : 'no';
-		$w_list['vips'] = $_POST['vips']? 'yes' : 'no';
-		$w_list['vpnips'] = $_POST['vpnips']? 'yes' : 'no';
-
-		$w_list['address'] = $_POST['address'];
-		$w_list['descr']  =  mb_convert_encoding($_POST['descr'],"HTML-ENTITIES","auto");
-		$w_list['detail'] = $final_address_details;
+		$p_list['name'] = $_POST['name'];
+		$p_list['uuid'] = $passlist_uuid;
+		$p_list['localnets'] = $_POST['localnets']? 'yes' : 'no';
+		$p_list['wanips'] = $_POST['wanips']? 'yes' : 'no';
+		$p_list['wangateips'] = $_POST['wangateips']? 'yes' : 'no';
+		$p_list['wandnsips'] = $_POST['wandnsips']? 'yes' : 'no';
+		$p_list['vips'] = $_POST['vips']? 'yes' : 'no';
+		$p_list['vpnips'] = $_POST['vpnips']? 'yes' : 'no';
+		$p_list['address'] = $_POST['address'];
+		$p_list['descr']  =  mb_convert_encoding($_POST['descr'],"HTML-ENTITIES","auto");
 
 		if (isset($id) && $a_passlist[$id])
-			$a_passlist[$id] = $w_list;
+			$a_passlist[$id] = $p_list;
 		else
-			$a_passlist[] = $w_list;
+			$a_passlist[] = $p_list;
 
-		write_config("Snort pkg: modified PASS LIST {$w_list['name']}.");
+		write_config("Snort pkg: modified PASS LIST {$p_list['name']}.");
 
 		/* create pass list and homenet file, then sync files */
 		sync_snort_package_config();
@@ -284,8 +301,8 @@ if ($savemsg)
 		</td>
 		<td width="78%" class="vtable">
 		<input autocomplete="off" name="address" type="text" class="formfldalias" id="address" size="30" value="<?=htmlspecialchars($pconfig['address']);?>"
-		title="<?=trim(filter_expand_alias($pconfig['address']));?>"/>
-		&nbsp;&nbsp;&nbsp;&nbsp;<input type="button" class="formbtns" value="Aliases" onclick="parent.location='snort_select_alias.php?id=0&type=host|network&varname=address&act=import&multi_ip=yes&returl=<?=urlencode($_SERVER['PHP_SELF']);?>'" 
+		title="<?=trim(filter_expand_alias($pconfig['address']));?>"/>&nbsp;&nbsp;&nbsp;&nbsp;
+		<input type="button" class="formbtns" value="Aliases" onclick="selectAlias();" 
 		title="<?php echo gettext("Select an existing IP alias");?>"/>
 		</td>
 	</tr>
@@ -325,6 +342,29 @@ function createAutoSuggest() {
 }
 
 setTimeout("createAutoSuggest();", 500);
+
+function selectAlias() {
+
+	var loc;
+	var fields = [ "name", "descr", "localnets", "wanips", "wangateips", "wandnsips", "vips", "vpnips", "address" ];
+
+	// Scrape current form field values and add to
+	// the select alias URL as a query string.
+	var loc = 'snort_select_alias.php?id=<?=$id;?>&act=import&type=host|network';
+	loc = loc + '&varname=address&multi_ip=yes';
+	loc = loc + '&returl=<?=urlencode($_SERVER['PHP_SELF']);?>';
+	loc = loc + '&uuid=<?=$passlist_uuid;?>';
+
+	// Iterate over just the specific form fields we want to pass to
+	// the select alias URL.
+	fields.forEach(function(entry) {
+		var tmp = $(entry).serialize();
+		if (tmp.length > 0)
+			loc = loc + '&' + tmp;
+	});
+	
+	window.parent.location = loc; 
+}
 
 </script>
 <?php include("fend.inc"); ?>

@@ -216,7 +216,7 @@ if ($savemsg)
 				<col axis="string">
 			</colgroup>
 			<thead>
-			   <tr>
+			   <tr class="sortableHeaderRowIdentifier">
 				<th class="listhdrr" axis="number"><?php echo gettext("SID"); ?></th>
 				<th class="listhdrr" axis="string"><?php echo gettext("Proto"); ?></th>
 				<th class="listhdrr" axis="string"><?php echo gettext("Source"); ?></th>
@@ -263,7 +263,7 @@ if ($savemsg)
 
 							// Use "echo" to write the table HTML row-by-row.
 							echo "<tr>" . 
-								"<td class=\"listr\" sorttable_customkey=\"{$sid}\">{$sid}&nbsp;{$supplink}</td>" . 
+								"<td class=\"listr\" style=\"sorttable_customkey:{$sid};\" sorttable_customkey=\"{$sid}\">{$sid}&nbsp;{$supplink}</td>" . 
 								"<td class=\"listr\" style=\"text-align:center;\">{$protocol}</td>" . 
 								"<td class=\"listr\" style=\"overflow: hidden; text-overflow: ellipsis; text-align:center;\" nowrap><span title=\"{$rule_content[2]}\">{$source}</span></td>" . 
 								"<td class=\"listr\" style=\"overflow: hidden; text-overflow: ellipsis; text-align:center;\" nowrap><span title=\"{$rule_content[5]}\">{$destination}</span></td>" . 

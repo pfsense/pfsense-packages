@@ -178,7 +178,7 @@ if (stristr($config['widgets']['sequence'], "snort_alerts-container") === FALSE)
 	$config['widgets']['sequence'] .= ",{$snort_widget_container}";
 
 /* Update Snort package version in configuration */
-$config['installedpackages']['snortglobal']['snort_config_ver'] = "3.1.1";
+$config['installedpackages']['snortglobal']['snort_config_ver'] = "3.1.2";
 write_config("Snort pkg: post-install configuration saved.");
 
 /* Done with post-install, so clear flag */

@@ -51,7 +51,7 @@ $snortver = array();
 exec("/usr/local/bin/snort -V 2>&1 |/usr/bin/grep Version | /usr/bin/cut -c20-26", $snortver);
 
 /* Used to indicate latest version of this include file has been loaded */
-$pfSense_snort_version = "3.1.1";
+$pfSense_snort_version = "3.1.2";
 
 /* get installed package version for display */
 $snort_package_version = "Snort {$config['installedpackages']['package'][get_pkg_id("snort")]['version']}";
@@ -333,9 +333,11 @@ function snort_build_list($snortcfg, $listname = "", $whitelist = false) {
 			$home_net = explode(" ", trim(filter_expand_alias($list['address'])));
 	}
 
-	/* Always add loopback to HOME_NET and whitelist (ftphelper) */
+	/* Always add loopback addresses to HOME_NET and whitelist */
 	if (!in_array("127.0.0.1", $home_net))
 		$home_net[] = "127.0.0.1";
+	if (!in_array("::1", $home_net))
+		$home_net[] = "::1";
 
 	/********************************************************************/
 	/* Always put the interface running Snort in HOME_NET and whitelist */
@@ -363,25 +365,35 @@ function snort_build_list($snortcfg, $listname = "", $whitelist = false) {
 		}
 	}
 
-	/* Handle IPv6 if available (2.1 and higher) */
-	if (function_exists('get_interface_ipv6')) {
-		$snortip = get_interface_ipv6($snortcfg['interface']);
-		if (!$whitelist || $localnet == 'yes' || empty($localnet)) {
-			if (is_ipaddrv6($snortip)) {
-				if ($snortcfg['interface'] <> "wan") {
-					$sn = get_interface_subnetv6($snortcfg['interface']);
-					$ip = gen_subnetv6($snortip, $sn). "/{$sn}";
-					if (!in_array($ip, $home_net))
-						$home_net[] = $ip;
-				}
+	$snortip = get_interface_ipv6($snortcfg['interface']);
+	if (!$whitelist || $localnet == 'yes' || empty($localnet)) {
+		if (is_ipaddrv6($snortip)) {
+			if ($snortcfg['interface'] <> "wan") {
+				$sn = get_interface_subnetv6($snortcfg['interface']);
+				$ip = gen_subnetv6($snortip, $sn). "/{$sn}";
+				if (!in_array($ip, $home_net))
+					$home_net[] = $ip;
 			}
 		}
-		else {
-			if (is_ipaddrv6($snortip)) {
-				if (!in_array($snortip, $home_net))
-					$home_net[] = $snortip;
-			}
+	}
+	else {
+		if (is_ipaddrv6($snortip)) {
+			// Trim off the interface designation (e.g., %em1) if present
+			if (strpos($snortip, "%") !== FALSE)
+				$snortip = substr($snortip, 0, strpos($snortip, "%"));
+			if (!in_array($snortip, $home_net))
+				$home_net[] = $snortip;
 		}
+	}
+
+	// Add link-local address
+	$snortip = get_interface_linklocal($snortcfg['interface']);
+	if (!empty($snortip)) {
+		// Trim off the interface designation (e.g., %em1) if present
+		if (strpos($snortip, "%") !== FALSE)
+			$snortip = substr($snortip, 0, strpos($snortip, "%"));
+		if (!in_array($snortip, $home_net))
+			$home_net[] = $snortip;
 	}
 
 	if (!$whitelist || $localnet == 'yes' || empty($localnet)) {		
@@ -402,16 +414,23 @@ function snort_build_list($snortcfg, $listname = "", $whitelist = false) {
 				if (!in_array($ip, $home_net))
 					$home_net[] = $ip;
 			}
-			if (function_exists("get_interface_ipv6")) {
-				if ($int == "wan")
-					continue;
-				$subnet = get_interface_ipv6($int);
-				if (is_ipaddrv6($subnet)) {
-					$sn = get_interface_subnetv6($int);
-					$ip = gen_subnetv6($subnet, $sn). "/{$sn}";
-					if (!in_array($ip, $home_net))
-						$home_net[] = $ip;
-				}
+
+			$subnet = get_interface_ipv6($int);
+			if (is_ipaddrv6($subnet)) {
+				$sn = get_interface_subnetv6($int);
+				$ip = gen_subnetv6($subnet, $sn). "/{$sn}";
+				if (!in_array($ip, $home_net))
+					$home_net[] = $ip;
+			}
+
+			// Add link-local address
+			$snortip = get_interface_linklocal($int);
+			if (!empty($snortip)) {
+				// Trim off the interface designation (e.g., %em1) if present
+				if (strpos($snortip, "%") !== FALSE)
+					$snortip = substr($snortip, 0, strpos($snortip, "%"));
+				if (!in_array($snortip, $home_net))
+					$home_net[] = $snortip;
 			}
 		}
 	}
@@ -422,12 +441,23 @@ function snort_build_list($snortcfg, $listname = "", $whitelist = false) {
 			if (!in_array($ip, $home_net))
 				$home_net[] = $ip;
 		}
-		if (function_exists("get_interface_ipv6")) {
-			$ip = get_interface_ipv6("wan");
-			if (is_ipaddrv6($ip)) {
-				if (!in_array($ip, $home_net))
-					$home_net[] = $ip;
-			}
+		$ip = get_interface_ipv6("wan");
+		if (is_ipaddrv6($ip)) {
+			// Trim off the interface designation (e.g., %em1) if present
+			if (strpos($ip, "%") !== FALSE)
+				$ip = substr($ip, 0, strpos($ip, "%"));
+			if (!in_array($ip, $home_net))
+				$home_net[] = $ip;
+		}
+
+		// Add link-local address
+		$snortip = get_interface_linklocal("wan");
+		if (!empty($snortip)) {
+			// Trim off the interface designation (e.g., %em1) if present
+			if (strpos($snortip, "%") !== FALSE)
+				$snortip = substr($snortip, 0, strpos($snortip, "%"));
+			if (!in_array($snortip, $home_net))
+				$home_net[] = $snortip;
 		}
 	}
 
@@ -441,11 +471,12 @@ function snort_build_list($snortcfg, $listname = "", $whitelist = false) {
 		$gw = get_interface_gateway($snortcfg['interface']);
 		if (is_ipaddr($gw) && !in_array($gw, $home_net))
 			$home_net[] = $gw;
-		if (function_exists("get_interface_gateway_v6")) {
-			$gw = get_interface_gateway_v6($snortcfg['interface']);
-			if (is_ipaddrv6($gw) && !in_array($gw, $home_net))
-				$home_net[] = $gw;
-		}
+		$gw = get_interface_gateway_v6($snortcfg['interface']);
+		// Trim off the interface designation (e.g., %em1) if present
+		if (strpos($gw, "%") !== FALSE)
+			$gw = substr($gw, 0, strpos($gw, "%"));
+		if (is_ipaddrv6($gw) && !in_array($gw, $home_net))
+			$home_net[] = $gw;
 	}
 
 	if ($wandns == 'yes') {

@@ -7,6 +7,7 @@
  *
  * Modified for the Pfsense snort package v. 1.8+
  * Copyright (C) 2009 Robert Zelaya Sr. Developer
+ * Copyright (C) 2014 Jim Pingle jim@pingle.org
  * Copyright (C) 2014 Bill Meeks
  *
  * Redistribution and use in source and binary forms, with or without
@@ -49,6 +50,21 @@ if (empty($pconfig['blertnumber']))
 	$bnentries = '500';
 else
 	$bnentries = $pconfig['blertnumber'];
+
+# --- AJAX REVERSE DNS RESOLVE Start ---
+if (isset($_POST['resolve'])) {
+	$ip = strtolower($_POST['resolve']);
+	$res = (is_ipaddr($ip) ? gethostbyaddr($ip) : '');
+	
+	if ($res && $res != $ip)
+		$response = array('resolve_ip' => $ip, 'resolve_text' => $res);
+	else
+		$response = array('resolve_ip' => $ip, 'resolve_text' => gettext("Cannot resolve"));
+	
+	echo json_encode(str_replace("\\","\\\\", $response)); // single escape chars can break JSON decode
+	exit;
+}
+# --- AJAX REVERSE DNS RESOLVE End ---
 
 if ($_POST['todelete']) {
 	$ip = "";
@@ -133,7 +149,6 @@ include_once("head.inc");
 ?>
 
 <body link="#000000" vlink="#000000" alink="#000000">
-<script src="/javascript/filter_log.js" type="text/javascript"></script>
 
 <?php
 
@@ -214,11 +229,11 @@ if ($savemsg) {
 						<col width="10%" align="center">
 					</colgroup>
 					<thead>
-					   <tr>
+					   <tr class="sortableHeaderRowIdentifier">
 						<th class="listhdrr" axis="number">#</th>
 						<th class="listhdrr" axis="string"><?php echo gettext("IP"); ?></th>
 						<th class="listhdrr" axis="string"><?php echo gettext("Alert Description"); ?></th>
-						<th class="listhdrr"><?php echo gettext("Remove"); ?></th>
+						<th class="listhdrr sorttable_nosort"><?php echo gettext("Remove"); ?></th>
 					   </tr>
 					</thead>
 				<tbody>
@@ -278,20 +293,16 @@ if ($savemsg) {
 				$tmp_ip = str_replace(":", ":&#8203;", $blocked_ip);
 				/* Add reverse DNS lookup icons (two different links if pfSense version supports them) */
 				$rdns_link = "";
-				if ($pfs_version > 2.0) {
-					$rdns_link .= "<a onclick=\"javascript:getURL('/diag_dns.php?host={$blocked_ip}&dialog_output=true', outputrule);\">";
-					$rdns_link .= "<img src='../themes/{$g['theme']}/images/icons/icon_log_d.gif' width='11' height='11' border='0' ";
-					$rdns_link .= "title='" . gettext("Resolve host via reverse DNS lookup (quick pop-up)") . "' style=\"cursor: pointer;\"></a>&nbsp;";
-				}
-				$rdns_link .= "<a href='/diag_dns.php?host={$blocked_ip}'>";
-				$rdns_link .= "<img src='../themes/{$g['theme']}/images/icons/icon_log.gif' width='11' height='11' border='0' ";
-				$rdns_link .= "title='" . gettext("Resolve host via reverse DNS lookup") . "'></a>";
+				$rdns_link .= "<img onclick=\"javascript:resolve_with_ajax('{$blocked_ip}');\" title=\"";
+				$rdns_link .= gettext("Resolve host via reverse DNS lookup") . "\" border=\"0\" src=\"/themes/{$g['theme']}/images/icons/icon_log.gif\" alt=\"Icon Reverse Resolve with DNS\" ";
+				$rdns_link.= " style=\"cursor: pointer;\"/>";
+
 				/* use one echo to do the magic*/
 					echo "<tr>
 						<td align=\"center\" valign=\"middle\" class=\"listr\">{$counter}</td>
 						<td align=\"center\" valign=\"middle\" class=\"listr\">{$tmp_ip}<br/>{$rdns_link}</td>
 						<td valign=\"middle\" class=\"listr\">{$blocked_desc}</td>
-						<td align=\"center\" valign=\"middle\" class=\"listr\" sorttable_customkey=\"\">
+						<td align=\"center\" valign=\"middle\" class=\"listr\">
 						<input type=\"image\" name=\"todelete[]\" onClick=\"document.getElementById('ip').value='{$blocked_ip}';\" 
 						src=\"../themes/{$g['theme']}/images/icons/icon_x.gif\" title=\"" . gettext("Delete host from Blocked Table") . "\" border=\"0\" /></td>
 					</tr>\n";
@@ -325,5 +336,38 @@ if ($savemsg) {
 <?php
 include("fend.inc");
 ?>
+
+<!-- The following AJAX code was borrowed from the diag_logs_filter.php -->
+<!-- file in pfSense.  See copyright info at top of this page.          -->
+<script type="text/javascript">
+//<![CDATA[
+function resolve_with_ajax(ip_to_resolve) {
+	var url = "/snort/snort_blocked.php";
+
+	jQuery.ajax(
+		url,
+		{
+			type: 'post',
+			dataType: 'json',
+			data: {
+				resolve: ip_to_resolve,
+				},
+			complete: resolve_ip_callback
+		});
+}
+
+function resolve_ip_callback(transport) {
+	var response = jQuery.parseJSON(transport.responseText);
+	var msg = 'IP address "' + response.resolve_ip + '" resolves to\n';
+	alert(msg + 'host "' + htmlspecialchars(response.resolve_text) + '"');
+}
+
+// From http://stackoverflow.com/questions/5499078/fastest-method-to-escape-html-tags-as-html-entities
+function htmlspecialchars(str) {
+    return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&apos;');
+}
+//]]>
+</script>
+
 </body>
 </html>
