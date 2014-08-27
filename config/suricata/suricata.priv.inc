@@ -25,6 +25,7 @@ $priv_list['page-services-suricata']['match'][] = "suricata/suricata_select_alia
 $priv_list['page-services-suricata']['match'][] = "suricata/suricata_list_view.php*";
 $priv_list['page-services-suricata']['match'][] = "suricata/suricata_logs_browser.php*";
 $priv_list['page-services-suricata']['match'][] = "suricata/suricata_logs_mgmt.php*";
+$priv_list['page-services-suricata']['match'][] = "suricata/suricata_sid_mgmt.php*";
 $priv_list['page-services-suricata']['match'][] = "suricata/suricata_passlist.php*";
 $priv_list['page-services-suricata']['match'][] = "suricata/suricata_passlist_edit.php*";
 $priv_list['page-services-suricata']['match'][] = "suricata/suricata_post_install.php*";

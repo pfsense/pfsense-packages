@@ -67,6 +67,12 @@ $pconfig['tls_log_retention'] = $config['installedpackages']['suricata']['config
 $pconfig['unified2_log_limit'] = $config['installedpackages']['suricata']['config'][0]['unified2_log_limit'];
 $pconfig['u2_archive_log_retention'] = $config['installedpackages']['suricata']['config'][0]['u2_archive_log_retention'];
 $pconfig['file_store_retention'] = $config['installedpackages']['suricata']['config'][0]['file_store_retention'];
+$pconfig['dns_log_limit_size'] = $config['installedpackages']['suricata']['config'][0]['dns_log_limit_size'];
+$pconfig['dns_log_retention'] = $config['installedpackages']['suricata']['config'][0]['dns_log_retention'];
+$pconfig['eve_log_limit_size'] = $config['installedpackages']['suricata']['config'][0]['eve_log_limit_size'];
+$pconfig['eve_log_retention'] = $config['installedpackages']['suricata']['config'][0]['eve_log_retention'];
+$pconfig['sid_changes_log_limit_size'] = $config['installedpackages']['suricata']['config'][0]['sid_changes_log_limit_size'];
+$pconfig['sid_changes_log_retention'] = $config['installedpackages']['suricata']['config'][0]['sid_changes_log_retention'];
 
 // Load up some arrays with selection values (we use these later).
 // The keys in the $retentions array are the retention period
@@ -88,40 +94,97 @@ if (empty($pconfig['suricataloglimitsize'])) {
 }
 
 // Set default retention periods for rotated logs
-if (empty($pconfig['alert_log_retention']))
+if (!isset($pconfig['alert_log_retention']))
 	$pconfig['alert_log_retention'] = "336";
-if (empty($pconfig['block_log_retention']))
+if (!isset($pconfig['block_log_retention']))
 	$pconfig['block_log_retention'] = "336";
-if (empty($pconfig['files_json_log_retention']))
+if (!isset($pconfig['files_json_log_retention']))
 	$pconfig['files_json_log_retention'] = "168";
-if (empty($pconfig['http_log_retention']))
+if (!isset($pconfig['http_log_retention']))
 	$pconfig['http_log_retention'] = "168";
-if (empty($pconfig['stats_log_retention']))
+if (!isset($pconfig['dns_log_retention']))
+	$pconfig['dns_log_retention'] = "168";
+if (!isset($pconfig['stats_log_retention']))
 	$pconfig['stats_log_retention'] = "168";
-if (empty($pconfig['tls_log_retention']))
+if (!isset($pconfig['tls_log_retention']))
 	$pconfig['tls_log_retention'] = "336";
-if (empty($pconfig['u2_archive_log_retention']))
+if (!isset($pconfig['u2_archive_log_retention']))
 	$pconfig['u2_archive_log_retention'] = "168";
-if (empty($pconfig['file_store_retention']))
+if (!isset($pconfig['file_store_retention']))
 	$pconfig['file_store_retention'] = "168";
+if (!isset($pconfig['eve_log_retention']))
+	$pconfig['eve_log_retention'] = "168";
+if (!isset($pconfig['sid_changes_log_retention']))
+	$pconfig['sid_changes_log_retention'] = "336";
 
 // Set default log file size limits
-if (empty($pconfig['alert_log_limit_size']))
+if (!isset($pconfig['alert_log_limit_size']))
 	$pconfig['alert_log_limit_size'] = "500";
-if (empty($pconfig['block_log_limit_size']))
+if (!isset($pconfig['block_log_limit_size']))
 	$pconfig['block_log_limit_size'] = "500";
-if (empty($pconfig['files_json_log_limit_size']))
+if (!isset($pconfig['files_json_log_limit_size']))
 	$pconfig['files_json_log_limit_size'] = "1000";
-if (empty($pconfig['http_log_limit_size']))
+if (!isset($pconfig['http_log_limit_size']))
 	$pconfig['http_log_limit_size'] = "1000";
-if (empty($pconfig['stats_log_limit_size']))
+if (!isset($pconfig['dns_log_limit_size']))
+	$pconfig['dns_log_limit_size'] = "750";
+if (!isset($pconfig['stats_log_limit_size']))
 	$pconfig['stats_log_limit_size'] = "500";
-if (empty($pconfig['tls_log_limit_size']))
+if (!isset($pconfig['tls_log_limit_size']))
 	$pconfig['tls_log_limit_size'] = "500";
-if (empty($pconfig['unified2_log_limit']))
+if (!isset($pconfig['unified2_log_limit']))
 	$pconfig['unified2_log_limit'] = "32";
+if (!isset($pconfig['eve_log_limit_size']))
+	$pconfig['eve_log_limit_size'] = "5000";
+if (!isset($pconfig['sid_changes_log_limit_size']))
+	$pconfig['sid_changes_log_limit_size'] = "250";
 
-if ($_POST["save"]) {
+if ($_POST['ResetAll']) {
+
+	// Reset all settings to their defaults
+	$pconfig['alert_log_retention'] = "336";
+	$pconfig['block_log_retention'] = "336";
+	$pconfig['files_json_log_retention'] = "168";
+	$pconfig['http_log_retention'] = "168";
+	$pconfig['dns_log_retention'] = "168";
+	$pconfig['stats_log_retention'] = "168";
+	$pconfig['tls_log_retention'] = "336";
+	$pconfig['u2_archive_log_retention'] = "168";
+	$pconfig['file_store_retention'] = "168";
+	$pconfig['eve_log_retention'] = "168";
+	$pconfig['sid_changes_log_retention'] = "336";
+
+	$pconfig['alert_log_limit_size'] = "500";
+	$pconfig['block_log_limit_size'] = "500";
+	$pconfig['files_json_log_limit_size'] = "1000";
+	$pconfig['http_log_limit_size'] = "1000";
+	$pconfig['dns_log_limit_size'] = "750";
+	$pconfig['stats_log_limit_size'] = "500";
+	$pconfig['tls_log_limit_size'] = "500";
+	$pconfig['unified2_log_limit'] = "32";
+	$pconfig['eve_log_limit_size'] = "5000";
+	$pconfig['sid_changes_log_limit_size'] = "250";
+
+	/* Log a message at the top of the page to inform the user */
+	$savemsg = gettext("All log management settings on this page have been reset to their defaults.  Click APPLY if you wish to keep these new settings.");
+}
+
+if ($_POST["save"] || $_POST['apply']) {
+	if ($_POST['enable_log_mgmt'] != 'on') {
+		$config['installedpackages']['suricata']['config'][0]['enable_log_mgmt'] = $_POST['enable_log_mgmt'] ? 'on' :'off';
+		write_config("Suricata pkg: saved updated configuration for LOGS MGMT.");
+		sync_suricata_package_config();
+
+		/* forces page to reload new settings */
+		header( 'Expires: Sat, 26 Jul 1997 05:00:00 GMT' );
+		header( 'Last-Modified: ' . gmdate( 'D, d M Y H:i:s' ) . ' GMT' );
+		header( 'Cache-Control: no-store, no-cache, must-revalidate' );
+		header( 'Cache-Control: post-check=0, pre-check=0', false );
+		header( 'Pragma: no-cache' );
+		header("Location: /suricata/suricata_logs_mgmt.php");
+		exit;
+	} 
+
 	if ($_POST['suricataloglimit'] == 'on') {
 		if (!is_numericint($_POST['suricataloglimitsize']) || $_POST['suricataloglimitsize'] < 1)
 			$input_errors[] = gettext("The 'Log Directory Size Limit' must be an integer value greater than zero.");
@@ -151,8 +214,14 @@ if ($_POST["save"]) {
 		$config['installedpackages']['suricata']['config'][0]['unified2_log_limit'] = $_POST['unified2_log_limit'];
 		$config['installedpackages']['suricata']['config'][0]['u2_archive_log_retention'] = $_POST['u2_archive_log_retention'];
 		$config['installedpackages']['suricata']['config'][0]['file_store_retention'] = $_POST['file_store_retention'];
+		$config['installedpackages']['suricata']['config'][0]['dns_log_limit_size'] = $_POST['dns_log_limit_size'];
+		$config['installedpackages']['suricata']['config'][0]['dns_log_retention'] = $_POST['dns_log_retention'];
+		$config['installedpackages']['suricata']['config'][0]['eve_log_limit_size'] = $_POST['eve_log_limit_size'];
+		$config['installedpackages']['suricata']['config'][0]['eve_log_retention'] = $_POST['eve_log_retention'];
+		$config['installedpackages']['suricata']['config'][0]['sid_changes_log_limit_size'] = $_POST['sid_changes_log_limit_size'];
+		$config['installedpackages']['suricata']['config'][0]['sid_changes_log_retention'] = $_POST['sid_changes_log_retention'];
 
-		write_config();
+		write_config("Suricata pkg: saved updated configuration for LOGS MGMT.");
 		sync_suricata_package_config();
 
 		/* forces page to reload new settings */
@@ -179,23 +248,32 @@ include_once("fbegin.inc");
 /* Display Alert message, under form tag or no refresh */
 if ($input_errors)
 	print_input_errors($input_errors);
-
 ?>
 
 <form action="suricata_logs_mgmt.php" method="post" enctype="multipart/form-data" name="iform" id="iform">
+
+<?php
+if ($savemsg) {
+	/* Display save message */
+	print_info_box($savemsg);
+}
+?>
+
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
 <tr><td>
 <?php
         $tab_array = array();
-        $tab_array[] = array(gettext("Suricata Interfaces"), false, "/suricata/suricata_interfaces.php");
+        $tab_array[] = array(gettext("Interfaces"), false, "/suricata/suricata_interfaces.php");
         $tab_array[] = array(gettext("Global Settings"), false, "/suricata/suricata_global.php");
-	$tab_array[] = array(gettext("Update Rules"), false, "/suricata/suricata_download_updates.php");
+	$tab_array[] = array(gettext("Updates"), false, "/suricata/suricata_download_updates.php");
 	$tab_array[] = array(gettext("Alerts"), false, "/suricata/suricata_alerts.php");
-	$tab_array[] = array(gettext("Blocked"), false, "/suricata/suricata_blocked.php");
+	$tab_array[] = array(gettext("Blocks"), false, "/suricata/suricata_blocked.php");
 	$tab_array[] = array(gettext("Pass Lists"), false, "/suricata/suricata_passlist.php");
 	$tab_array[] = array(gettext("Suppress"), false, "/suricata/suricata_suppress.php");
-	$tab_array[] = array(gettext("Logs Browser"), false, "/suricata/suricata_logs_browser.php");
+	$tab_array[] = array(gettext("Logs View"), false, "/suricata/suricata_logs_browser.php");
 	$tab_array[] = array(gettext("Logs Mgmt"), true, "/suricata/suricata_logs_mgmt.php");
+	$tab_array[] = array(gettext("SID Mgmt"), false, "/suricata/suricata_sid_mgmt.php");
+	$tab_array[] = array(gettext("Sync"), false, "/pkg_edit.php?xml=suricata/suricata_sync.xml");
         display_top_tabs($tab_array, true);
 ?>
 </td></tr>
@@ -267,7 +345,7 @@ if ($input_errors)
 			<colgroup>
 				<col style="width: 15%;">
 				<col style="width: 18%;">
-				<col style="width: 20%;">
+				<col style="width: 18%;">
 				<col>
 			</colgroup>
 			<thead>
@@ -320,6 +398,46 @@ if ($input_errors)
 					<td class="listbg"><?=gettext("Suricata blocked IPs and event details");?></td>
 				</tr>
 				<tr>
+					<td class="listbg">dns</td>
+					<td class="listr" align="center"><select name="dns_log_limit_size" class="formselect" id="dns_log_limit_size">
+						<?php foreach ($log_sizes as $k => $l): ?>
+							<option value="<?=$k;?>"
+							<?php if ($k == $pconfig['dns_log_limit_size']) echo "selected"; ?>>
+								<?=htmlspecialchars($l);?></option>
+						<?php endforeach; ?>
+						</select>
+					</td>
+					<td class="listr" align="center"><select name="dns_log_retention" class="formselect" id="dns_log_retention">
+						<?php foreach ($retentions as $k => $p): ?>
+							<option value="<?=$k;?>"
+							<?php if ($k == $pconfig['dns_log_retention']) echo "selected"; ?>>
+								<?=htmlspecialchars($p);?></option>
+						<?php endforeach; ?>
+						</select>
+					</td>
+					<td class="listbg"><?=gettext("DNS request/reply details");?></td>
+				</tr>
+				<tr>
+					<td class="listbg">eve-json</td>
+					<td class="listr" align="center"><select name="eve_log_limit_size" class="formselect" id="eve_log_limit_size">
+						<?php foreach ($log_sizes as $k => $l): ?>
+							<option value="<?=$k;?>"
+							<?php if ($k == $pconfig['eve_log_limit_size']) echo "selected"; ?>>
+								<?=htmlspecialchars($l);?></option>
+						<?php endforeach; ?>
+						</select>
+					</td>
+					<td class="listr" align="center"><select name="eve_log_retention" class="formselect" id="eve_log_retention">
+						<?php foreach ($retentions as $k => $p): ?>
+							<option value="<?=$k;?>"
+							<?php if ($k == $pconfig['eve_log_retention']) echo "selected"; ?>>
+								<?=htmlspecialchars($p);?></option>
+						<?php endforeach; ?>
+						</select>
+					</td>
+					<td class="listbg"><?=gettext("Eve-JSON (JavaScript Object Notation) data");?></td>
+				</tr>
+				<tr>
 					<td class="listbg">files-json</td>
 					<td class="listr" align="center"><select name="files_json_log_limit_size" class="formselect" id="files_json_log_limit_size">
 						<?php foreach ($log_sizes as $k => $l): ?>
@@ -359,6 +477,28 @@ if ($input_errors)
 					</td>
 					<td class="listbg"><?=gettext("Captured HTTP events and session info");?></td>
 				</tr>
+
+				<tr>
+					<td class="listbg">sid_changes</td>
+					<td class="listr" align="center"><select name="sid_changes_log_limit_size" class="formselect" id="sid_changes_log_limit_size">
+						<?php foreach ($log_sizes as $k => $l): ?>
+							<option value="<?=$k;?>"
+							<?php if ($k == $pconfig['sid_changes_log_limit_size']) echo "selected"; ?>>
+								<?=htmlspecialchars($l);?></option>
+						<?php endforeach; ?>
+						</select>
+					</td>
+					<td class="listr" align="center"><select name="sid_changes_log_retention" class="formselect" id="sid_changes_log_retention">
+						<?php foreach ($retentions as $k => $p): ?>
+							<option value="<?=$k;?>"
+							<?php if ($k == $pconfig['sid_changes_log_retention']) echo "selected"; ?>>
+								<?=htmlspecialchars($p);?></option>
+						<?php endforeach; ?>
+						</select>
+					</td>
+					<td class="listbg"><?=gettext("Log of SID changes made by SID Mgmt conf files");?></td>
+				</tr>
+
 				<tr>
 					<td class="listbg">stats</td>
 					<td class="listr" align="center"><select name="stats_log_limit_size" class="formselect" id="stats_log_limit_size">
@@ -444,7 +584,11 @@ if ($input_errors)
 </tr>
 <tr>
 	<td width="22%"></td>
-	<td width="78%" class="vexpl"><input name="save" type="submit" class="formbtn" value="Save"/><br/>
+	<td width="78%" class="vexpl"><input name="save" type="submit" class="formbtn" value="Save"/>
+		&nbsp;&nbsp;&nbsp;&nbsp;<input name="ResetAll" type="submit" class="formbtn" value="Reset" title="<?php echo 
+		gettext("Reset all settings to defaults") . "\" onclick=\"return confirm('" . 
+		gettext("WARNING:  This will reset ALL Log Management settings to their defaults.  Click OK to continue or CANCEL to quit.") . 
+		"');\""; ?>/><br/>
 	<br/><span class="red"><strong><?php echo gettext("Note:");?></strong>&nbsp;
 	</span><?php echo gettext("Changing any settings on this page will affect all Suricata-configured interfaces.");?></td>
 </tr>
@@ -472,6 +616,12 @@ function enable_change() {
 	document.iform.unified2_log_limit.disabled = endis;
 	document.iform.u2_archive_log_retention.disabled = endis;
 	document.iform.file_store_retention.disabled = endis;
+	document.iform.dns_log_retention.disabled = endis;
+	document.iform.dns_log_limit_size.disabled = endis;
+	document.iform.eve_log_retention.disabled = endis;
+	document.iform.eve_log_limit_size.disabled = endis;
+	document.iform.sid_changes_log_retention.disabled = endis;
+	document.iform.sid_changes_log_limit_size.disabled = endis;
 }
 
 function enable_change_dirSize() {

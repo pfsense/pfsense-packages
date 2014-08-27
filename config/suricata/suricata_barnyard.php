@@ -79,7 +79,7 @@ if (isset($id) && $a_nat[$id]) {
 	if (empty($a_nat[$id]['barnyard_syslog_opmode']))
 		$pconfig['barnyard_syslog_opmode'] = "default";
 	if (empty($a_nat[$id]['barnyard_syslog_facility']))
-		$pconfig['barnyard_syslog_facility'] = "LOG_USER";
+		$pconfig['barnyard_syslog_facility'] = "LOG_LOCAL1";
 	if (empty($a_nat[$id]['barnyard_syslog_priority']))
 		$pconfig['barnyard_syslog_priority'] = "LOG_INFO";
 	if (empty($a_nat[$id]['barnyard_bro_ids_dport']))
@@ -213,18 +213,21 @@ include_once("head.inc");
 
 <form action="suricata_barnyard.php" method="post" name="iform" id="iform">
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
+<tbody>
 <tr><td>
 <?php
     $tab_array = array();
-	$tab_array[] = array(gettext("Suricata Interfaces"), false, "/suricata/suricata_interfaces.php");
+	$tab_array[] = array(gettext("Interfaces"), true, "/suricata/suricata_interfaces.php");
 	$tab_array[] = array(gettext("Global Settings"), false, "/suricata/suricata_global.php");
-	$tab_array[] = array(gettext("Update Rules"), false, "/suricata/suricata_download_updates.php");
+	$tab_array[] = array(gettext("Updates"), false, "/suricata/suricata_download_updates.php");
 	$tab_array[] = array(gettext("Alerts"), false, "/suricata/suricata_alerts.php?instance={$id}");
-	$tab_array[] = array(gettext("Blocked"), false, "/suricata/suricata_blocked.php");
+	$tab_array[] = array(gettext("Blocks"), false, "/suricata/suricata_blocked.php");
 	$tab_array[] = array(gettext("Pass Lists"), false, "/suricata/suricata_passlist.php");
 	$tab_array[] = array(gettext("Suppress"), false, "/suricata/suricata_suppress.php");
-	$tab_array[] = array(gettext("Logs Browser"), false, "/suricata/suricata_logs_browser.php?instance={$id}");
+	$tab_array[] = array(gettext("Logs View"), false, "/suricata/suricata_logs_browser.php?instance={$id}");
 	$tab_array[] = array(gettext("Logs Mgmt"), false, "/suricata/suricata_logs_mgmt.php");
+	$tab_array[] = array(gettext("SID Mgmt"), false, "/suricata/suricata_sid_mgmt.php");
+	$tab_array[] = array(gettext("Sync"), false, "/pkg_edit.php?xml=suricata/suricata_sync.xml");
 	display_top_tabs($tab_array, true);
 	echo '</td></tr>';
 	echo '<tr><td class="tabnavtbl">';
@@ -243,6 +246,7 @@ include_once("head.inc");
 	<tr>
 		<td><div id="mainarea">
 		<table id="maintable" class="tabcont" width="100%" border="0" cellpadding="6" cellspacing="0">
+			<tbody>
 			<tr>
 				<td colspan="2" valign="top" class="listtopic"><?php echo gettext("General Barnyard2 " .
 				"Settings"); ?></td>
@@ -414,8 +418,8 @@ include_once("head.inc");
 				<td width="78%" class="vtable">
 					<select name="barnyard_syslog_facility" id="barnyard_syslog_facility" class="formselect">
 					<?php
-						$log_facility = array(  "LOG_AUTH", "LOG_AUTHPRIV", "LOG_DAEMON", "LOG_KERN", "LOG_SYSLOG", "LOG_USER", "LOG_LOCAL1",
-									"LOG_LOCAL2", "LOG_LOCAL3", "LOG_LOCAL4", "LOG_LOCAL5", "LOG_LOCAL6", "LOG_LOCAL7" );
+						$log_facility = array(  "LOG_AUTH", "LOG_AUTHPRIV", "LOG_DAEMON", "LOG_KERN", "LOG_SYSLOG", "LOG_USER", "LOG_LOCAL0",
+									"LOG_LOCAL1", "LOG_LOCAL2", "LOG_LOCAL3", "LOG_LOCAL4", "LOG_LOCAL5", "LOG_LOCAL6", "LOG_LOCAL7" );
 						foreach ($log_facility as $facility) {
 							$selected = "";
 							if ($facility == $pconfig['barnyard_syslog_facility'])
@@ -423,7 +427,7 @@ include_once("head.inc");
 							echo "<option value='{$facility}'{$selected}>" . $facility . "</option>\n";
 						}
 					?></select>&nbsp;&nbsp;
-					<?php echo gettext("Select Syslog Facility to use for remote reporting.  Default is ") . "<strong>" . gettext("LOG_USER") . "</strong>."; ?>
+					<?php echo gettext("Select Syslog Facility to use for remote reporting.  Default is ") . "<strong>" . gettext("LOG_LOCAL1") . "</strong>."; ?>
 				</td>
 			</tr>
 			<tr>
@@ -431,7 +435,7 @@ include_once("head.inc");
 				<td width="78%" class="vtable">
 					<select name="barnyard_syslog_priority" id="barnyard_syslog_priority" class="formselect">
 					<?php
-						$log_priority = array( "LOG_EMERG", "LOG_ALERT", "LOG_CRIT", "LOG_ERR", "LOG_WARNING", "LOG_NOTICE", "LOG_INFO" );
+						$log_priority = array( "LOG_EMERG", "LOG_CRIT", "LOG_ALERT", "LOG_ERR", "LOG_WARNING", "LOG_NOTICE", "LOG_INFO" );
 						foreach ($log_priority as $priority) {
 							$selected = "";
 							if ($priority == $pconfig['barnyard_syslog_priority'])
@@ -496,10 +500,12 @@ include_once("head.inc");
 				<br/>
 				<?php echo gettext("Please save your settings before you click start."); ?> </td>
 			</tr>
+			</tbody>
 		</table>
 		</div>
 		</td>
 	</tr>
+	</tbody>
 </table>
 </form>
 
@@ -547,8 +553,6 @@ function toggle_local_syslog() {
 		document.iform.barnyard_syslog_dport.disabled = endis;
 		document.iform.barnyard_syslog_proto_udp.disabled = endis;
 		document.iform.barnyard_syslog_proto_tcp.disabled = endis;
-		document.iform.barnyard_syslog_facility.disabled = endis;
-		document.iform.barnyard_syslog_priority.disabled = endis;
 	}
 }
 

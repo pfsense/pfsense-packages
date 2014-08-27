@@ -45,7 +45,7 @@ require_once("/usr/local/pkg/suricata/suricata.inc");
 global $g, $pkg_interface, $suricata_gui_include, $rebuild_rules;
 
 if (!defined("VRT_DNLD_URL"))
-	define("VRT_DNLD_URL", "https://www.snort.org/reg-rules/");
+	define("VRT_DNLD_URL", "https://www.snort.org/rules/");
 if (!defined("ET_VERSION"))
 	define("ET_VERSION", "2.9.0");
 if (!defined("ET_BASE_DNLD_URL"))
@@ -56,8 +56,6 @@ if (!defined("ET_DNLD_FILENAME"))
 	define("ET_DNLD_FILENAME", "emerging.rules.tar.gz");
 if (!defined("ETPRO_DNLD_FILENAME"))
 	define("ETPRO_DNLD_FILENAME", "etpro.rules.tar.gz");
-if (!defined("VRT_DNLD_FILENAME"))
-	define("VRT_DNLD_FILENAME", "snortrules-snapshot-edge.tar.gz");
 if (!defined("GPLV2_DNLD_FILENAME"))
 	define("GPLV2_DNLD_FILENAME", "community-rules.tar.gz");
 if (!defined("GPLV2_DNLD_URL"))
@@ -86,6 +84,7 @@ else
 
 /* define checks */
 $oinkid = $config['installedpackages']['suricata']['config'][0]['oinkcode'];
+$snort_filename = $config['installedpackages']['suricata']['config'][0]['snort_rules_file'];
 $etproid = $config['installedpackages']['suricata']['config'][0]['etprocode'];
 $snortdownload = $config['installedpackages']['suricata']['config'][0]['enable_vrt_rules'] == 'on' ? 'on' : 'off';
 $etpro = $config['installedpackages']['suricata']['config'][0]['enable_etpro_rules'] == 'on' ? 'on' : 'off';
@@ -96,8 +95,7 @@ $snortcommunityrules = $config['installedpackages']['suricata']['config'][0]['sn
 /* Working directory for downloaded rules tarballs */
 $tmpfname = "/tmp/suricata_rules_up";
 
-/* Snort Edge VRT Rules filenames and URL */
-$snort_filename = VRT_DNLD_FILENAME;
+/* Snort VRT Rules filenames and URL */
 $snort_filename_md5 = "{$snort_filename}.md5";
 $snort_rule_url = VRT_DNLD_URL;
 
@@ -439,10 +437,15 @@ if ($emergingthreats == 'on') {
 
 /*  Check for and download any new Snort VRT sigs */
 if ($snortdownload == 'on') {
-	if (suricata_check_rule_md5("{$snort_rule_url}{$snort_filename_md5}/{$oinkid}/", "{$tmpfname}/{$snort_filename_md5}", "Snort VRT rules")) {
+	if (empty($snort_filename)) {
+		log_error(gettext("No snortrules-snapshot filename has been set on Snort pkg GLOBAL SETTINGS tab.  Snort VRT rules cannot be updated."));
+		error_log(gettext("\tWARNING-- No snortrules-snapshot filename set on GLOBAL SETTINGS tab. Snort VRT rules cannot be updated!\n"), 3, $suricata_rules_upd_log);
+		$snortdownload = 'off';
+	}
+	elseif (suricata_check_rule_md5("{$snort_rule_url}{$snort_filename_md5}?oinkcode={$oinkid}", "{$tmpfname}/{$snort_filename_md5}", "Snort VRT rules")) {
 		/* download snortrules file */
 		$file_md5 = trim(file_get_contents("{$tmpfname}/{$snort_filename_md5}"));
-		if (!suricata_fetch_new_rules("{$snort_rule_url}{$snort_filename}/{$oinkid}/", "{$tmpfname}/{$snort_filename}", $file_md5, "Snort VRT rules"))
+		if (!suricata_fetch_new_rules("{$snort_rule_url}{$snort_filename}?oinkcode={$oinkid}", "{$tmpfname}/{$snort_filename}", $file_md5, "Snort VRT rules"))
 			$snortdownload = 'off';
 	}
 	else
@@ -770,6 +773,6 @@ if ($update_errors)
 else
 	$config['installedpackages']['suricata']['config'][0]['last_rule_upd_status'] = gettext("success");
 $config['installedpackages']['suricata']['config'][0]['last_rule_upd_time'] = time();
-write_config();
+write_config("Suricata pkg: updated status for updated rules package(s) check.");
 
 ?>
