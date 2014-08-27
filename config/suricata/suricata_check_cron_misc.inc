@@ -72,7 +72,7 @@ function suricata_check_dir_size_limit($suricataloglimitsize) {
 		}
 
 		// Initialize an array of the log files we want to prune
-		$logs = array ( "alerts.log", "block.log", "dns.log", "eve.json", "http.log", "files-json.log", "sid_changes.log" "stats.log", "tls.log" );
+		$logs = array ( "alerts.log", "block.log", "dns.log", "eve.json", "http.log", "files-json.log", "sid_changes.log", "stats.log", "tls.log" );
 
 		// Clean-up the logs for each configured Suricata instance
 		foreach ($config['installedpackages']['suricata']['rule'] as $value) {
