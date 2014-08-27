@@ -68,11 +68,11 @@ foreach ($suricata_files as $file) {
 $home_net_list = suricata_build_list($suricatacfg, $suricatacfg['homelistname']);
 $home_net = implode(",", $home_net_list);
 $home_net = trim($home_net);
-$external_net = '!$HOME_NET';
+$external_net = 'any';
 if (!empty($suricatacfg['externallistname']) && $suricatacfg['externallistname'] != 'default') {
-	$external_net_list = suricata_build_list($suricatacfg, $suricatacfg['externallistname']);
+	$external_net_list = suricata_build_list($suricatacfg, $suricatacfg['externallistname'], false, true);
 	$external_net = implode(",", $external_net_list);
-	$external_net = trim($external_net);
+	$external_net = '[' . trim($external_net) . ']';
 }
 
 // Set the PASS LIST and write its contents to disk

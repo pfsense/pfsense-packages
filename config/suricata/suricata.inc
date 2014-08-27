@@ -257,7 +257,7 @@ function suricata_find_list($find_name, $type = 'passlist') {
 	return array();
 }
 
-function suricata_build_list($suricatacfg, $listname = "", $passlist = false) {
+function suricata_build_list($suricatacfg, $listname = "", $passlist = false, $externallist = false) {
 
 	/***********************************************************/
 	/* The default is to build a HOME_NET variable unless      */
@@ -267,9 +267,13 @@ function suricata_build_list($suricatacfg, $listname = "", $passlist = false) {
 	global $config, $g, $aliastable, $filterdns;
 	$home_net = array();
 
-	if ($listname == 'default' || empty($listname)) {
+	if (!$externallist && ($listname == 'default' || empty($listname))) {
 		$localnet = 'yes'; $wanip = 'yes'; $wangw = 'yes'; $wandns = 'yes'; $vips = 'yes'; $vpns = 'yes';
-	} else {
+	}
+	elseif ($externallist && $listname == 'default') {
+		return array( "any" );
+	}
+	else {
                 $list = suricata_find_list($listname);
                 if (empty($list))
                         return $list;
@@ -283,11 +287,13 @@ function suricata_build_list($suricatacfg, $listname = "", $passlist = false) {
 			$home_net = explode(" ", trim(filter_expand_alias($list['address'])));
 	}
 
-	// Always add loopback to HOME_NET and passlist (ftphelper)
-	if (!in_array("127.0.0.1", $home_net))
-		$home_net[] = "127.0.0.1";
-	if (!in_array("::1", $home_net))
-		$home_net[] = "::1";
+	// Always add loopback to HOME_NET and passlist
+	if (!externallist) {
+		if (!in_array("127.0.0.1", $home_net))
+			$home_net[] = "127.0.0.1";
+		if (!in_array("::1", $home_net))
+			$home_net[] = "::1";
+	}
 
 	/********************************************************************/
 	/* Always put the interface running Suricata in HOME_NET and        */
@@ -298,7 +304,7 @@ function suricata_build_list($suricatacfg, $listname = "", $passlist = false) {
 	/* IP for Suricata, though, to prevent locking out the firewall.    */
 	/********************************************************************/
 	$suricataip = get_interface_ip($suricatacfg['interface']);
-	if (!$passlist || $localnet == 'yes' || empty($localnet)) {
+	if (($externallist && $localnet == 'yes') || (!externallist && (!$passlist || $localnet == 'yes' || empty($localnet)))) {
 		if (is_ipaddr($suricataip)) {
 			if ($suricatacfg['interface'] <> "wan") {
 				$sn = get_interface_subnet($suricatacfg['interface']);
@@ -308,7 +314,7 @@ function suricata_build_list($suricatacfg, $listname = "", $passlist = false) {
 			}
 		}
 	}
-	else {
+	elseif (!externallist && $localnet != 'yes') {
 		if (is_ipaddr($suricataip)) {
 			if (!in_array($suricataip, $home_net))
 				$home_net[] = $suricataip;
@@ -319,7 +325,7 @@ function suricata_build_list($suricatacfg, $listname = "", $passlist = false) {
 	// Trim off the interface designation (e.g., %em1) if present
 	if (strpos($suricataip, "%") !== FALSE)
 		$suricataip = substr($suricataip, 0, strpos($suricataip, "%"));
-	if (!$passlist || $localnet == 'yes' || empty($localnet)) {
+	if (($externallist && $localnet == 'yes') || (!externallist && (!$passlist || $localnet == 'yes' || empty($localnet)))) {
 		if (is_ipaddrv6($suricataip)) {
 			if ($suricatacfg['interface'] <> "wan") {
 				$sn = get_interface_subnetv6($suricatacfg['interface']);
@@ -329,16 +335,16 @@ function suricata_build_list($suricatacfg, $listname = "", $passlist = false) {
 			}
 		}
 	}
-	else {
+	elseif (!externallist && $localnet != 'yes') {
 		if (is_ipaddrv6($suricataip)) {
 			if (!in_array($suricataip, $home_net))
 				$home_net[] = $suricataip;
 		}
 	}
 
-	// Add link-local address
+	// Add link-local address if user included locally-attached networks
 	$suricataip = get_interface_linklocal($suricatacfg['interface']);
-	if (!empty($suricataip)) {
+	if (!empty($suricataip) && $localnet == 'yes') {
 		// Trim off the interface designation (e.g., %em1) if present
 		if (strpos($suricataip, "%") !== FALSE)
 			$suricataip = substr($suricataip, 0, strpos($suricataip, "%"));
@@ -346,7 +352,7 @@ function suricata_build_list($suricatacfg, $listname = "", $passlist = false) {
 			$home_net[] = $suricataip;
 	}
 
-	if (!$passlist || $localnet == 'yes' || empty($localnet)) {		
+	if (($externallist && $localnet == 'yes') || (!externallist && (!$passlist || $localnet == 'yes' || empty($localnet)))) {		
 		/*************************************************************************/
 		/*  Iterate through the interface list and write out pass list items and */
 		/*  also compile a HOME_NET list of all local interfaces for suricata.   */

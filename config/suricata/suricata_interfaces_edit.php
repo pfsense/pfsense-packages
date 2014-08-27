@@ -937,7 +937,11 @@ if ($savemsg) {
 						}
 					}
 				?>
-			</select>&nbsp;&nbsp;
+			</select>
+			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="button" class="formbtns" value="View List"  
+			onclick="viewList('<?=$id;?>','externallistname','externalnet')" id="btnExternalNet" 
+			title="<?php echo gettext("Click to view currently selected External Net contents"); ?>"/>
+			<br/>
 			<?php echo gettext("Choose the External Net you want this interface " .
 			"to use."); ?>&nbsp;<br/><br/>
 			<span class="red"><?php echo gettext("Note:"); ?></span>&nbsp;<?php echo gettext("Default " .

@@ -58,6 +58,11 @@ if (isset($id) && isset($wlist)) {
 		$contents = str_replace("\r", "", base64_decode($list['suppresspassthru']));
 		$title = "Suppress List";
 	}
+	elseif ($type == "externalnet") {
+		$list = suricata_build_list($a_rule, $wlist, false, true);
+		$contents = implode("\n", $list);
+		$title = "EXTERNAL_NET";
+	}
 	else
 		$contents = gettext("\n\nERROR -- Requested List Type entity is not valid!");
 }
