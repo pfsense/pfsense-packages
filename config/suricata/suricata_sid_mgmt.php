@@ -96,7 +96,7 @@ function suricata_is_sidmodslist_active($sidlist) {
 if (isset($_POST['upload'])) {
 	if ($_FILES["sidmods_fileup"]["error"] == UPLOAD_ERR_OK) {
 		$tmp_name = $_FILES["sidmods_fileup"]["tmp_name"];
-		$name = $_FILES["sidmods_fileup"]["name"];
+		$name = basename($_FILES["sidmods_fileup"]["name"]);
 		move_uploaded_file($tmp_name, "{$sidmods_path}{$name}");
 	}
 	else
@@ -104,8 +104,8 @@ if (isset($_POST['upload'])) {
 }
 
 if (isset($_POST['sidlist_delete']) && isset($_POST['sidlist_fname'])) {
-	if (!suricata_is_sidmodslist_active($_POST['sidlist_fname']))
-		unlink_if_exists("{$sidmods_path}{$_POST['sidlist_fname']}");
+	if (!suricata_is_sidmodslist_active(basename($_POST['sidlist_fname'])))
+		unlink_if_exists($sidmods_path . basename($_POST['sidlist_fname']));
 	else
 		$input_errors[] = gettext("This SID Mods List is currently assigned to an interface and cannot be deleted.");
 }
