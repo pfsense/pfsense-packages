@@ -288,7 +288,7 @@ function suricata_build_list($suricatacfg, $listname = "", $passlist = false, $e
 	}
 
 	// Always add loopback to HOME_NET and passlist
-	if (!externallist) {
+	if (!$externallist) {
 		if (!in_array("127.0.0.1", $home_net))
 			$home_net[] = "127.0.0.1";
 		if (!in_array("::1", $home_net))
@@ -314,7 +314,7 @@ function suricata_build_list($suricatacfg, $listname = "", $passlist = false, $e
 			}
 		}
 	}
-	elseif (!externallist && $localnet != 'yes') {
+	elseif (!$externallist && $localnet != 'yes') {
 		if (is_ipaddr($suricataip)) {
 			if (!in_array($suricataip, $home_net))
 				$home_net[] = $suricataip;
@@ -325,7 +325,7 @@ function suricata_build_list($suricatacfg, $listname = "", $passlist = false, $e
 	// Trim off the interface designation (e.g., %em1) if present
 	if (strpos($suricataip, "%") !== FALSE)
 		$suricataip = substr($suricataip, 0, strpos($suricataip, "%"));
-	if (($externallist && $localnet == 'yes') || (!externallist && (!$passlist || $localnet == 'yes' || empty($localnet)))) {
+	if (($externallist && $localnet == 'yes') || (!$externallist && (!$passlist || $localnet == 'yes' || empty($localnet)))) {
 		if (is_ipaddrv6($suricataip)) {
 			if ($suricatacfg['interface'] <> "wan") {
 				$sn = get_interface_subnetv6($suricatacfg['interface']);
@@ -335,7 +335,7 @@ function suricata_build_list($suricatacfg, $listname = "", $passlist = false, $e
 			}
 		}
 	}
-	elseif (!externallist && $localnet != 'yes') {
+	elseif (!$externallist && $localnet != 'yes') {
 		if (is_ipaddrv6($suricataip)) {
 			if (!in_array($suricataip, $home_net))
 				$home_net[] = $suricataip;
@@ -352,7 +352,7 @@ function suricata_build_list($suricatacfg, $listname = "", $passlist = false, $e
 			$home_net[] = $suricataip;
 	}
 
-	if (($externallist && $localnet == 'yes') || (!externallist && (!$passlist || $localnet == 'yes' || empty($localnet)))) {		
+	if (($$externallist && $localnet == 'yes') || (!$externallist && (!$passlist || $localnet == 'yes' || empty($localnet)))) {		
 		/*************************************************************************/
 		/*  Iterate through the interface list and write out pass list items and */
 		/*  also compile a HOME_NET list of all local interfaces for suricata.   */
