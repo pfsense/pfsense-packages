@@ -68,7 +68,7 @@ foreach ($suricata_files as $file) {
 $home_net_list = suricata_build_list($suricatacfg, $suricatacfg['homelistname']);
 $home_net = implode(",", $home_net_list);
 $home_net = trim($home_net);
-$external_net = 'any';
+$external_net = '!$HOME_NET';
 if (!empty($suricatacfg['externallistname']) && $suricatacfg['externallistname'] != 'default') {
 	$external_net_list = suricata_build_list($suricatacfg, $suricatacfg['externallistname'], false, true);
 	$external_net = implode(",", $external_net_list);

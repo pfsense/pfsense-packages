@@ -271,7 +271,7 @@ function suricata_build_list($suricatacfg, $listname = "", $passlist = false, $e
 		$localnet = 'yes'; $wanip = 'yes'; $wangw = 'yes'; $wandns = 'yes'; $vips = 'yes'; $vpns = 'yes';
 	}
 	elseif ($externallist && $listname == 'default') {
-		return array( "any" );
+		return array( "!\$HOME_NET" );
 	}
 	else {
                 $list = suricata_find_list($listname);
