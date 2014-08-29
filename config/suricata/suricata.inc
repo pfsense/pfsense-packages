@@ -304,7 +304,7 @@ function suricata_build_list($suricatacfg, $listname = "", $passlist = false, $e
 	/* IP for Suricata, though, to prevent locking out the firewall.    */
 	/********************************************************************/
 	$suricataip = get_interface_ip($suricatacfg['interface']);
-	if (($externallist && $localnet == 'yes') || (!externallist && (!$passlist || $localnet == 'yes' || empty($localnet)))) {
+	if (($externallist && $localnet == 'yes') || (!$externallist && (!$passlist || $localnet == 'yes' || empty($localnet)))) {
 		if (is_ipaddr($suricataip)) {
 			if ($suricatacfg['interface'] <> "wan") {
 				$sn = get_interface_subnet($suricatacfg['interface']);
