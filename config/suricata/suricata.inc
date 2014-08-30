@@ -270,9 +270,6 @@ function suricata_build_list($suricatacfg, $listname = "", $passlist = false, $e
 	if (!$externallist && ($listname == 'default' || empty($listname))) {
 		$localnet = 'yes'; $wanip = 'yes'; $wangw = 'yes'; $wandns = 'yes'; $vips = 'yes'; $vpns = 'yes';
 	}
-	elseif ($externallist && $listname == 'default') {
-		return array( "!\$HOME_NET" );
-	}
 	else {
                 $list = suricata_find_list($listname);
                 if (empty($list))
@@ -289,10 +286,10 @@ function suricata_build_list($suricatacfg, $listname = "", $passlist = false, $e
 
 	// Always add loopback to HOME_NET and passlist
 	if (!$externallist) {
-		if (!in_array("127.0.0.1", $home_net))
-			$home_net[] = "127.0.0.1";
-		if (!in_array("::1", $home_net))
-			$home_net[] = "::1";
+		if (!in_array("127.0.0.1/32", $home_net))
+			$home_net[] = "127.0.0.1/32";
+		if (!in_array("::1/128", $home_net))
+			$home_net[] = "::1/128";
 	}
 
 	/********************************************************************/
@@ -305,7 +302,7 @@ function suricata_build_list($suricatacfg, $listname = "", $passlist = false, $e
 	/********************************************************************/
 	$suricataip = get_interface_ip($suricatacfg['interface']);
 	if (($externallist && $localnet == 'yes') || (!$externallist && (!$passlist || $localnet == 'yes' || empty($localnet)))) {
-		if (is_ipaddr($suricataip)) {
+		if (is_ipaddrv4($suricataip)) {
 			if ($suricatacfg['interface'] <> "wan") {
 				$sn = get_interface_subnet($suricatacfg['interface']);
 				$ip = gen_subnet($suricataip, $sn) . "/{$sn}";
@@ -315,12 +312,13 @@ function suricata_build_list($suricatacfg, $listname = "", $passlist = false, $e
 		}
 	}
 	elseif (!$externallist && $localnet != 'yes') {
-		if (is_ipaddr($suricataip)) {
-			if (!in_array($suricataip, $home_net))
-				$home_net[] = $suricataip;
+		if (is_ipaddrv4($suricataip)) {
+			if (!in_array($suricataip . "/32", $home_net))
+				$home_net[] = $suricataip . "/32";
 		}
 	}
 
+	// Grab the IPv6 address if we have one assigned
 	$suricataip = get_interface_ipv6($suricatacfg['interface']);
 	// Trim off the interface designation (e.g., %em1) if present
 	if (strpos($suricataip, "%") !== FALSE)
@@ -337,8 +335,8 @@ function suricata_build_list($suricatacfg, $listname = "", $passlist = false, $e
 	}
 	elseif (!$externallist && $localnet != 'yes') {
 		if (is_ipaddrv6($suricataip)) {
-			if (!in_array($suricataip, $home_net))
-				$home_net[] = $suricataip;
+			if (!in_array($suricataip . "/128", $home_net))
+				$home_net[] = $suricataip . "/128";
 		}
 	}
 
@@ -348,8 +346,8 @@ function suricata_build_list($suricatacfg, $listname = "", $passlist = false, $e
 		// Trim off the interface designation (e.g., %em1) if present
 		if (strpos($suricataip, "%") !== FALSE)
 			$suricataip = substr($suricataip, 0, strpos($suricataip, "%"));
-		if (!in_array($suricataip, $home_net))
-			$home_net[] = $suricataip;
+		if (!in_array($suricataip . "/128", $home_net))
+			$home_net[] = $suricataip . "/128";
 	}
 
 	if (($$externallist && $localnet == 'yes') || (!$externallist && (!$passlist || $localnet == 'yes' || empty($localnet)))) {		
@@ -364,7 +362,7 @@ function suricata_build_list($suricatacfg, $listname = "", $passlist = false, $e
 			if ($int == "wan")
 				continue;
 			$subnet = get_interface_ip($int);
-			if (is_ipaddr($subnet)) {
+			if (is_ipaddrv4($subnet)) {
 				$sn = get_interface_subnet($int);
 				$ip = gen_subnet($subnet, $sn) . "/{$sn}";
 				if (!in_array($ip, $home_net))
@@ -388,25 +386,25 @@ function suricata_build_list($suricatacfg, $listname = "", $passlist = false, $e
 				// Trim off the interface designation (e.g., %em1) if present
 				if (strpos($suricataip, "%") !== FALSE)
 					$suricataip = substr($suricataip, 0, strpos($suricataip, "%"));
-				if (!in_array($suricataip, $home_net))
-					$home_net[] = $suricataip;
+				if (!in_array($suricataip . "/128", $home_net))
+					$home_net[] = $suricataip . "/128";
 			}
 		}
 	}
 
 	if ($wanip == 'yes') {
 		$ip = get_interface_ip("wan");
-		if (is_ipaddr($ip)) {
-			if (!in_array($ip, $home_net))
-				$home_net[] = $ip;
+		if (is_ipaddrv4($ip)) {
+			if (!in_array($ip . "/32", $home_net))
+				$home_net[] = $ip . "/32";
 		}
 		$ip = get_interface_ipv6("wan");
 		// Trim off the interface designation (e.g., %em1) if present
 		if (strpos($ip, "%") !== FALSE)
 			$ip = substr($ip, 0, strpos($ip, "%"));
 		if (is_ipaddrv6($ip)) {
-			if (!in_array($ip, $home_net))
-				$home_net[] = $ip;
+			if (!in_array($ip . "/128", $home_net))
+				$home_net[] = $ip . "/128";
 		}
 		// Explicitly grab the WAN Link-Local address
 		$ip = get_interface_linklocal("wan");
@@ -414,35 +412,39 @@ function suricata_build_list($suricatacfg, $listname = "", $passlist = false, $e
 			// Trim off the interface designation (e.g., %em1) if present
 			if (strpos($ip, "%") !== FALSE)
 				$ip = substr($ip, 0, strpos($ip, "%"));
-			if (!in_array($ip, $home_net))
-				$home_net[] = $ip;
+			if (!in_array($ip . "/128", $home_net))
+				$home_net[] = $ip . "/128";
 		}
 	}
 
 	if ($wangw == 'yes') {
 		// Grab the default gateway if set
 		$default_gw = exec("/sbin/route -n get default |grep 'gateway:' | /usr/bin/awk '{ print $2 }'");
-		if (is_ipaddr($default_gw) && !in_array($default_gw, $home_net))
-			$home_net[] = $default_gw;
-		if (is_ipaddrv6($default_gw) && !in_array($default_gw, $home_net))
-			$home_net[] = $default_gw;
+		if (is_ipaddrv4($default_gw) && !in_array($default_gw . "/32", $home_net))
+			$home_net[] = $default_gw . "/32";
+		if (is_ipaddrv6($default_gw) && !in_array($default_gw . "/128", $home_net))
+			$home_net[] = $default_gw . "/128";
 
 		// Get any other interface gateway and put in $HOME_NET if not there already
 		$gw = get_interface_gateway($suricatacfg['interface']);
-		if (is_ipaddr($gw) && !in_array($gw, $home_net))
-			$home_net[] = $gw;
+		if (is_ipaddrv4($gw) && !in_array($gw . "/32", $home_net))
+			$home_net[] = $gw . "/32";
 		$gw = get_interface_gateway_v6($suricatacfg['interface']);
 		// Trim off the interface designation (e.g., %em1) if present
 		if (strpos($gw, "%") !== FALSE)
 			$gw = substr($gw, 0, strpos($gw, "%"));
-		if (is_ipaddrv6($gw) && !in_array($gw, $home_net))
-			$home_net[] = $gw;
+		if (is_ipaddrv6($gw) && !in_array($gw . "/128", $home_net))
+			$home_net[] = $gw . "/128";
 	}
 
 	if ($wandns == 'yes') {
 		// Add DNS server for WAN interface to Pass List
 		$dns_servers = get_dns_servers();
 		foreach ($dns_servers as $dns) {
+			if (is_ipaddrv4($dns))
+				$dns .= "/32";
+			elseif (is_addrv6($dns))
+				$dns .= "/128";
 			if ($dns && !in_array($dns, $home_net))
 				$home_net[] = $dns;
 		}
@@ -460,7 +462,7 @@ function suricata_build_list($suricatacfg, $listname = "", $passlist = false, $e
 		}
 	}
 
-	// grab a list of vpns and whitelist if user desires
+	// Grab a list of vpns enabled - these come back as CIDR mask networks
 	if ($vpns == 'yes') {
 		$vpns_list = filter_get_vpns_list();
 		if (!empty($vpns_list)) {
