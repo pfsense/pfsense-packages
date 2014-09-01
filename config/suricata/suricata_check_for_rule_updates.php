@@ -486,7 +486,7 @@ if ($emergingthreats == 'on') {
 		// The code below renames ET files with a prefix, so we
 		// skip renaming the Suricata default events rule files
 		// that are also bundled in the ET rules.
-		$default_rules = array( "decoder-events.rules", "files.rules", "http-events.rules", "smtp-events.rules", "stream-events.rules", "tls-events.rules" );
+		$default_rules = array( "decoder-events.rules", "dns-events.rules", "files.rules", "http-events.rules", "smtp-events.rules", "stream-events.rules", "tls-events.rules" );
 		$files = glob("{$tmpfname}/emerging/rules/*.rules");
 		// Determine the correct prefix to use based on which
 		// Emerging Threats rules package is enabled.

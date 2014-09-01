@@ -116,6 +116,14 @@ foreach ($rule as &$r) {
 	}
 
 	/***********************************************************/
+	/* Add the new 'dns-events.rules' file to the rulesets.    */
+	/***********************************************************/
+	if (strpos("dns-events.rules", $pconfig['rulesets']) === FALSE) {
+		$pconfig['rulesets'] = rtrim($pconfig['rulesets'], "||") . "||dns-events.rules";	
+		$updated_cfg = true;
+	}
+
+	/***********************************************************/
 	/* Add new HTTP Log Extended Info setting if not present   */
 	/***********************************************************/
 	if (!isset($pconfig['http_log_extended'])) {

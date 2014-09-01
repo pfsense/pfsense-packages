@@ -47,7 +47,7 @@ $suricatadir = SURICATADIR;
 $flowbit_rules_file = FLOWBITS_FILENAME;
 
 // Array of default events rules for Suricata
-$default_rules = array( "decoder-events.rules", "files.rules", "http-events.rules", 
+$default_rules = array( "decoder-events.rules", "dns-events.rules", "files.rules", "http-events.rules", 
 			"smtp-events.rules", "stream-events.rules", "tls-events.rules" );
 
 if (!is_array($config['installedpackages']['suricata']['rule'])) {
