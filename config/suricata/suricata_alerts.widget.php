@@ -238,7 +238,7 @@ function suricata_widget_get_alerts() {
 		<tr>
 			<th class="listhdrr"><?=gettext("IF/Date");?></th>
 			<th class="listhdrr"><?=gettext("Src/Dst Address");?></th>
-			<th class="listhdrr"><?=gettext("Classification");?></th>
+			<th class="listhdrr"><?=gettext("Priority/Rule Name");?></th>
 		</tr>
 	</thead>
 	<tbody id="suricata-alert-entries">
