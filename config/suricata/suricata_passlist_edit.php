@@ -171,7 +171,7 @@ if ($_POST['save']) {
 		$p_list['vpnips'] = $_POST['vpnips']? 'yes' : 'no';
 
 		$p_list['address'] = $_POST['address'];
-		$p_list['descr']  =  mb_convert_encoding($_POST['descr'],"HTML-ENTITIES","auto");
+		$p_list['descr']  =  mb_convert_encoding(str_replace("\r\n", "\n", $_POST['descr']),"HTML-ENTITIES","auto");
 		$p_list['detail'] = $final_address_details;
 
 		if (isset($id) && $a_passlist[$id])
