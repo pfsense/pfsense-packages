@@ -117,7 +117,7 @@ safe_mkdir(IPREP_PATH);
 if (!file_exists(SURICATADIR . "rules/dns-events.rules"))
 	@copy("/usr/local/pkg/suricata/dns-events.rules", SURICATADIR . "rules/dns-events.rules");
 
-// remake saved settings
+// remake saved settings if previously flagged
 if ($config['installedpackages']['suricata']['config'][0]['forcekeepsettings'] == 'on') {
 	log_error(gettext("[Suricata] Saved settings detected... rebuilding installation with saved settings..."));
 	update_status(gettext("Saved settings detected..."));
@@ -193,6 +193,11 @@ if ($config['installedpackages']['suricata']['config'][0]['forcekeepsettings'] =
 		update_output_window(gettext("Suricata has been started using the rebuilt configuration..."));
 	}
 }
+
+// If this is first install and "forcekeepsettings" is empty,
+// then default it to 'on'.
+if (empty($config['installedpackages']['suricata']['config'][0]['forcekeepsettings']))
+	$config['installedpackages']['suricata']['config'][0]['forcekeepsettings'] = 'on';
 
 // Finished with file system mods, so remount it read-only
 conf_mount_ro();
