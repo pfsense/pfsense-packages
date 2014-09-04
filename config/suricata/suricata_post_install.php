@@ -141,7 +141,7 @@ if ($config['installedpackages']['suricata']['config'][0]['forcekeepsettings'] =
 		$suricatacfgdir = "{$suricatadir}suricata_{$suricata_uuid}_{$if_real}";
 
 		// Pull in the PHP code that generates the suricata.yaml file
-		// variables that will be substitued further down below.
+		// variables that will be substituted further down below.
 		include("/usr/local/pkg/suricata/suricata_generate_yaml.php");
 
 		// Pull in the boilerplate template for the suricata.yaml
