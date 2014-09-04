@@ -256,6 +256,7 @@ logging:
 pcap:
   - interface: {$if_real}
     checksum-checks: auto
+    promisc: {$intf_promisc_mode}
 
 # For FreeBSD ipfw(8) divert(4) support.
 #   ipfw add 100 divert 8000 ip from any to any

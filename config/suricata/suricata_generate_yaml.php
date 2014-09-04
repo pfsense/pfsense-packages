@@ -165,6 +165,11 @@ if ($suricatacfg['delayed_detect'] == 'on')
 else
 	$delayed_detect = "no";
 
+if ($suricatacfg['intf_promisc_mode'] == 'on')
+	$intf_promisc_mode = "yes";
+else
+	$intf_promisc_mode = "no";
+
 // Add interface-specific blocking settings
 if ($suricatacfg['blockoffenders'] == 'on')
 	$suri_blockoffenders = "yes";

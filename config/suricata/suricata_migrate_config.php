@@ -124,6 +124,14 @@ foreach ($rule as &$r) {
 	}
 
 	/***********************************************************/
+	/* Add new interface promisc mode value and default 'on'.  */
+	/***********************************************************/
+	if (empty($pconfig['intf_promisc_mode'])) {
+		$pconfig['intf_promisc_mode'] = "on";
+		$updated_cfg = true;
+	}
+
+	/***********************************************************/
 	/* Add new HTTP Log Extended Info setting if not present   */
 	/***********************************************************/
 	if (!isset($pconfig['http_log_extended'])) {
