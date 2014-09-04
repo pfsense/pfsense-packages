@@ -1191,6 +1191,12 @@ function enable_change(enable_change) {
 	document.iform.max_pcap_log_files.disabled = endis;
 	document.iform.eve_output_type.disabled = endis;
 	document.iform.enable_eve_log.disabled = endis;
+	document.iform.eve_log_alerts.disabled = endis;
+	document.iform.eve_log_http.disabled = endis;
+	document.iform.eve_log_dns.disabled = endis;
+	document.iform.eve_log_tls.disabled = endis;
+	document.iform.eve_log_files.disabled = endis;
+	document.iform.eve_log_ssh.disabled = endis;
 	document.iform.max_pending_packets.disabled = endis;
 	document.iform.detect_eng_profile.disabled = endis;
 	document.iform.mpm_algo.disabled = endis;
