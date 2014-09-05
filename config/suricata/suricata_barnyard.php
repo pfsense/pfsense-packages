@@ -384,7 +384,7 @@ include_once("head.inc");
 					<input name="barnyard_syslog_local" type="checkbox" value="on" <?php if ($pconfig['barnyard_syslog_local'] == "on") echo "checked"; ?> 
 					onClick="toggle_local_syslog()"/>
 					<?php echo gettext("Enable logging of alerts to the local system only"); ?><br/>
-					<?php echo gettext("This will send alert data to the local system only and overrides the host, port, protocol, facility and priority values below."); ?></td>
+					<?php echo gettext("This will send alert data to the local system only and overrides the host, port and protocol values below."); ?></td>
 			</tr>
 			<tr>
 				<td width="22%" valign="top" class="vncell"><?php echo gettext("Remote Host"); ?></td>
