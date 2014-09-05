@@ -73,7 +73,7 @@ else
 
 $pconfig = array();
 if (empty($suricataglob['rule'][$id]['uuid'])) {
-	/* Adding new interface, so flag rules to build. */
+	/* Adding new interface, so generate a new UUID and flag rules to build. */
 	$pconfig['uuid'] = suricata_generate_id();
 	$rebuild_rules = true;
 }
@@ -324,8 +324,11 @@ if ($_POST["save"] && !$input_errors) {
 			$a_rule[$id] = $natent;
 		}
 		elseif (strcasecmp($action, 'dup') == 0) {
-			// Duplicating a new interface, so set flag to build new rules
+			// Duplicating an existing interface to a new interface, so set flag to build new rules
 			$rebuild_rules = true;
+
+			// Duplicating an interface, so need to generate a new UUID for the cloned interface
+			$natent['uuid'] = suricata_generate_id();
 
 			// Add the new duplicated interface configuration to the [rule] array in config
 			$a_rule[] = $natent;
