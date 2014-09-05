@@ -572,10 +572,17 @@ if ($savemsg) {
 					</table>
 				</td>
 			</tr>
+		<?php if ($filterlogentries) : ?>
+			<tr>
+				<td colspan="2" class="listtopic"><?php printf(gettext("Last %s Alert Entries"), $anentries); ?>&nbsp;&nbsp;
+				<?php echo gettext("(Most recent listed first)  ** FILTERED VIEW **  clear filter to see all entries"); ?></td>
+			</tr>
+		<?php else: ?>
 			<tr>
 				<td colspan="2" class="listtopic"><?php printf(gettext("Last %s Alert Entries"), $anentries); ?>&nbsp;&nbsp;
 				<?php echo gettext("(Most recent entries are listed first)"); ?></td>
 			</tr>
+		<?php endif; ?>
 	<tr>
 	<td width="100%" colspan="2">
 	<table id="myTable" style="table-layout: fixed;" width="100%" class="sortable" border="0" cellpadding="0" cellspacing="0">
