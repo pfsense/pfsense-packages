@@ -94,6 +94,12 @@ if ($_POST['save']) {
 	    $_POST['barnyard_bro_ids_enable'] != 'on' && $_POST['barnyard_enable'] == "on")
 		$input_errors[] = gettext("You must enable at least one output option when using Barnyard2.");
 
+	// Validate Sensor Name contains no spaces
+	if ($_POST['barnyard_enable'] == 'on') {
+		if (!empty(trim($_POST['barnyard_sensor_name'])) && strpos(trim($_POST['barnyard_sensor_name']), " ") !== FALSE)
+			$input_errors[] = gettext("The value for 'Sensor Name' cannot contain spaces.");
+	}
+
 	// Validate Sensor ID is a valid integer
 	if ($_POST['barnyard_enable'] == 'on') {
 		if (!is_numericint($_POST['barnyard_sensor_id']) || $_POST['barnyard_sensor_id'] < 0)
@@ -147,7 +153,7 @@ if ($_POST['save']) {
 		$natent['barnyard_syslog_proto'] = $_POST['barnyard_syslog_proto'];
 
 		if ($_POST['barnyard_sensor_id']) $natent['barnyard_sensor_id'] = $_POST['barnyard_sensor_id']; else $natent['barnyard_sensor_id'] = '0';
-		if ($_POST['barnyard_sensor_name']) $natent['barnyard_sensor_name'] = $_POST['barnyard_sensor_name']; else unset($natent['barnyard_sensor_name']);
+		if ($_POST['barnyard_sensor_name']) $natent['barnyard_sensor_name'] = trim($_POST['barnyard_sensor_name']); else unset($natent['barnyard_sensor_name']);
 		if ($_POST['barnyard_dbhost']) $natent['barnyard_dbhost'] = $_POST['barnyard_dbhost']; else unset($natent['barnyard_dbhost']);
 		if ($_POST['barnyard_dbname']) $natent['barnyard_dbname'] = $_POST['barnyard_dbname']; else unset($natent['barnyard_dbname']);
 		if ($_POST['barnyard_dbuser']) $natent['barnyard_dbuser'] = $_POST['barnyard_dbuser']; else unset($natent['barnyard_dbuser']);
