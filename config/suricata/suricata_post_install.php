@@ -112,11 +112,6 @@ safe_mkdir(SURICATALOGDIR);
 safe_mkdir(SID_MODS_PATH);
 safe_mkdir(IPREP_PATH);
 
-// Copy the new dns-events.rules file to the
-// Suricata directory if not already present.
-if (!file_exists(SURICATADIR . "rules/dns-events.rules"))
-	@copy("/usr/local/pkg/suricata/dns-events.rules", SURICATADIR . "rules/dns-events.rules");
-
 // remake saved settings if previously flagged
 if ($config['installedpackages']['suricata']['config'][0]['forcekeepsettings'] == 'on') {
 	log_error(gettext("[Suricata] Saved settings detected... rebuilding installation with saved settings..."));

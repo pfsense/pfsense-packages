@@ -108,11 +108,6 @@
 		<chmod>0755</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
-		<item>https://packages.pfsense.org/packages/config/suricata/dns-events.rules</item>
-		<prefix>/usr/local/pkg/suricata/</prefix>
-		<chmod>0755</chmod>
-	</additional_files_needed>
-	<additional_files_needed>
 		<item>https://packages.pfsense.org/packages/config/suricata/suricata_download_updates.php</item>
 		<prefix>/usr/local/www/suricata/</prefix>
 		<chmod>0755</chmod>
