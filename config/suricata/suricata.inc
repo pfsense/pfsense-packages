@@ -443,7 +443,7 @@ function suricata_build_list($suricatacfg, $listname = "", $passlist = false, $e
 		foreach ($dns_servers as $dns) {
 			if (is_ipaddrv4($dns))
 				$dns .= "/32";
-			elseif (is_addrv6($dns))
+			elseif (is_ipaddrv6($dns))
 				$dns .= "/128";
 			if ($dns && !in_array($dns, $home_net))
 				$home_net[] = $dns;
