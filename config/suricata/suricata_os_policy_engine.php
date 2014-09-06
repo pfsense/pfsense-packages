@@ -62,6 +62,7 @@
 ?>
 
 <table class="tabcont" width="100%" border="0" cellpadding="6" cellspacing="0">
+	<tbody>
 	<tr>
 		<td colspan="2" align="center" class="listtopic"><?php echo gettext("Suricata Target-Based Host OS Policy Engine Configuration"); ?></td>
 	</tr>
@@ -69,7 +70,7 @@
 		<td valign="top" class="vncell"><?php echo gettext("Policy Name"); ?></td>
 		<td class="vtable">
 			<input name="policy_name" type="text" class="formfld unknown" id="policy_name" size="25" maxlength="25" 
-			value="<?=htmlspecialchars($pengcfg['name']);?>"<?php if (htmlspecialchars($pengcfg['name']) == "default") echo "readonly";?>/>&nbsp;
+			value="<?=htmlspecialchars($pengcfg['name']);?>"<?php if (htmlspecialchars($pengcfg['name']) == " default") echo " readonly";?>/>&nbsp;
 			<?php if (htmlspecialchars($pengcfg['name']) <> "default") 
 					echo gettext("Name or description for this engine.  (Max 25 characters)");
 				else
@@ -83,6 +84,7 @@
 		<td class="vtable">
 		<?php if ($pengcfg['name'] <> "default") : ?>
 			<table width="95%" border="0" cellpadding="2" cellspacing="0">
+				<tbody>
 				<tr>
 					<td class="vexpl"><input name="policy_bind_to" type="text" class="formfldalias" id="policy_bind_to" size="32" 
 					value="<?=htmlspecialchars($pengcfg['bind_to']);?>" title="<?=trim(filter_expand_alias($pengcfg['bind_to']));?>" autocomplete="off"/>&nbsp;
@@ -93,6 +95,7 @@
 				<tr>
 					<td class="vexpl" colspan="2"><?php echo gettext("This policy will apply for packets with destination addresses contained within this IP List.");?></td>
 				</tr>
+				</tbody>
 			</table>
 			<span class="red"><strong><?php echo gettext("Note: ") . "</strong></span>" . gettext("Supplied value must be a pre-configured Alias or the keyword 'all'.");?>
 			&nbsp;&nbsp;&nbsp;&nbsp;
@@ -129,6 +132,7 @@
 			<input name="cancel_os_policy" id="cancel_os_policy" type="submit" class="formbtn" value="Cancel" title="<?php echo 
 			gettext("Cancel changes and return to Flow/Stream tab"); ?>"></td>
 	</tr>
+	</tbody>
 </table>
 <script type="text/javascript" src="/javascript/autosuggest.js">
 </script>

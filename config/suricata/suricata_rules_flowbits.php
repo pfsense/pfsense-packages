@@ -159,7 +159,6 @@ include_once("head.inc");
 ?>
 
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC" >
-
 <?php
 include("fbegin.inc");
 if ($input_errors) print_input_errors($input_errors);
@@ -227,7 +226,7 @@ if ($savemsg)
 				<col axis="string">
 			</colgroup>
 			<thead>
-			   <tr>
+			   <tr class="sortableHeaderRowIdentifier">
 				<th class="listhdrr" axis="number"><?php echo gettext("SID"); ?></th>
 				<th class="listhdrr" axis="string"><?php echo gettext("Proto"); ?></th>
 				<th class="listhdrr" axis="string"><?php echo gettext("Source"); ?></th>
@@ -274,7 +273,7 @@ if ($savemsg)
 
 							// Use "echo" to write the table HTML row-by-row.
 							echo "<tr>" . 
-								"<td class=\"listr\" sorttable_customkey=\"{$sid}\">{$sid}&nbsp;{$supplink}</td>" . 
+								"<td class=\"listr\" style=\"sorttable_customkey:{$sid};\" sorttable_customkey=\"{$sid}\">{$sid}&nbsp;{$supplink}</td>" . 
 								"<td class=\"listr\" style=\"text-align:center;\">{$protocol}</td>" . 
 								"<td class=\"listr ellipsis\" nowrap style=\"text-align:center;\"><span title=\"{$rule_content[2]}\">{$source}</span></td>" . 
 								"<td class=\"listr ellipsis\" nowrap style=\"text-align:center;\"><span title=\"{$rule_content[5]}\">{$destination}</span></td>" . 

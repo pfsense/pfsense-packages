@@ -1948,9 +1948,9 @@
 	<package>
 		<name>suricata</name>
 		<website>http://suricata-ids.org/</website>
-		<descr><![CDATA[Suricata is the OISF IDP engine, the open source Intrusion Detection and Prevention Engine.]]></descr>
+		<descr><![CDATA[High Performance Network IDS, IPS and Security Monitoring engine by OISF.]]></descr>
 		<category>Security</category>
-		<version>1.4.6 pkg v1.0.6</version>
+		<version>2.0.3 pkg v2.0</version>
 		<status>Stable</status>
 		<required_version>2.1</required_version>
 		<config_file>https://packages.pfsense.org/packages/config/suricata/suricata.xml</config_file>
@@ -1962,7 +1962,7 @@
 		<build_options>barnyard2_UNSET=ODBC PGSQL PRELUDE;barnyard2_SET=GRE IPV6 MPLS MYSQL PORT_PCAP BRO;suricata_SET=IPFW PORTS_PCAP TESTS;suricata_UNSET=PRELUDE</build_options>
 		<build_port_path>/usr/ports/security/suricata</build_port_path>
 		<depends_on_package_base_url>https://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
-		<depends_on_package_pbi>suricata-1.4.6-amd64.pbi</depends_on_package_pbi>
+		<depends_on_package_pbi>suricata-2.0.3-amd64.pbi</depends_on_package_pbi>
 	</package>
 </packages>
 </pfsensepkgs>

@@ -73,6 +73,8 @@ $wrap_flag = "off";
 // Correct displayed file title if necessary
 if ($file == "Auto-Flowbit Rules")
 	$displayfile = FLOWBITS_FILENAME;
+elseif ($file == "suricata.rules")
+	$displayfile = "Currently Active Rules";
 else
 	$displayfile = $file;
 
@@ -102,6 +104,8 @@ elseif (isset($_GET['sid']) && is_numericint($_GET['sid']) && isset($_GET['gid']
 	// If flowbit rule, point to interface-specific file
 	if ($file == "Auto-Flowbit Rules")
 		$rules_map = suricata_load_rules_map("{$suricatacfgdir}rules/" . FLOWBITS_FILENAME);
+	elseif ($file == "suricata.rules")
+		$rules_map = suricata_load_rules_map("{$suricatacfgdir}rules/suricata.rules");
 	else
 		$rules_map = suricata_load_rules_map("{$suricatadir}rules/{$file}");
 	$contents = $rules_map[$_GET['gid']][trim($_GET['sid'])]['rule'];
