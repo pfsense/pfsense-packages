@@ -208,7 +208,7 @@ if ($savemsg) {
 				<input name="download" type="submit" class="formbtns" value="Download" title="<?=gettext("Download list of blocked hosts as a gzip archive");?>"/>
 				&nbsp;<?php echo gettext("All blocked hosts will be saved."); ?>&nbsp;&nbsp;
 				<input name="remove" type="submit" class="formbtns" value="Clear" title="<?=gettext("Remove blocks for all listed hosts");?>" 
-				onClick="return confirm('<?=gettext("Are you sure you want to remove all blocked hosts?  Click OK to continue or CANCLE to quit.");?>');"/>&nbsp;
+				onClick="return confirm('<?=gettext("Are you sure you want to remove all blocked hosts?  Click OK to continue or CANCEL to quit.");?>');"/>&nbsp;
 				<span class="red"><strong><?php echo gettext("Warning:"); ?></strong></span>&nbsp;<?php echo gettext("all hosts will be removed."); ?>
 				</td>
 			</tr>
@@ -260,8 +260,11 @@ if ($savemsg) {
 					/*	       0         1      2             3      4       5   6              7        8     9  10   */
 					/* File format timestamp,action,sig_generator,sig_id,sig_rev,msg,classification,priority,proto,ip,port */
 					while (($fields = fgetcsv($fd, 1000, ',', '"')) !== FALSE) {
-						if(count($fields) < 11)
+						if(count($fields) != 11) {
+							log_error("[suricata] ERROR: block.log entry failed to parse correctly with too many or not enough CSV entities, skipping this entry...");
+							log_error("[suricata] Failed block.log entry fields are: " . print_r($fields, true));
 							continue;
+						}
 						$fields[9] = inet_pton($fields[9]);
 						if (isset($tmpblocked[$fields[9]])) {
 							if (!is_array($src_ip_list[$fields[9]]))
