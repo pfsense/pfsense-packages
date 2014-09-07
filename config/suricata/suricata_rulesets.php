@@ -165,6 +165,9 @@ if ($_POST["save"]) {
 	$enabled_rulesets_array = explode("||", $enabled_items);
 	if (suricata_is_running($suricata_uuid, $if_real))
 		$savemsg = gettext("Suricata is 'live-loading' the new rule set on this interface.");
+
+	// Sync to configured CARP slaves if any are enabled
+	suricata_sync_on_changes();
 }
 elseif ($_POST['unselectall']) {
 	// Remove all but the default events and files rules

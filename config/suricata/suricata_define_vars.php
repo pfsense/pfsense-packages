@@ -135,6 +135,9 @@ if ($_POST) {
 		/* Soft-restart Suricaa to live-load new variables. */
 		suricata_reload_config($a_nat[$id]);
 
+		/* Sync to configured CARP slaves if any are enabled */
+		suricata_sync_on_changes();
+
 		/* after click go to this page */
 		header( 'Expires: Sat, 26 Jul 1997 05:00:00 GMT' );
 		header( 'Last-Modified: ' . gmdate( 'D, d M Y H:i:s' ) . ' GMT' );

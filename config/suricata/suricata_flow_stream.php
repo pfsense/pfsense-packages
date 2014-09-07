@@ -319,6 +319,9 @@ elseif ($_POST['save'] || $_POST['apply']) {
 			conf_mount_rw();
 			suricata_generate_yaml($natent);
 			conf_mount_ro();
+
+			// Sync to configured CARP slaves if any are enabled
+			suricata_sync_on_changes();
 		}
 
 		header( 'Expires: Sat, 26 Jul 1997 05:00:00 GMT' );

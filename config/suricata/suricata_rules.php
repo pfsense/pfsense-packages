@@ -375,6 +375,9 @@ elseif ($_POST['clear']) {
 	conf_mount_ro();
 	$rebuild_rules = false;
 	$pconfig['customrules'] = '';
+
+	// Sync to configured CARP slaves if any are enabled
+	suricata_sync_on_changes();
 }
 elseif ($_POST['cancel']) {
 	$pconfig['customrules'] = base64_decode($a_rule[$id]['customrules']);
@@ -395,6 +398,9 @@ elseif ($_POST['save']) {
 	/* Signal Suricata to "live reload" the rules */
 	suricata_reload_config($a_rule[$id]);
 	clear_subsystem_dirty('suricata_rules');
+
+	// Sync to configured CARP slaves if any are enabled
+	suricata_sync_on_changes();
 }
 elseif ($_POST['apply']) {
 
@@ -416,6 +422,9 @@ elseif ($_POST['apply']) {
 
 	// We have saved changes and done a soft restart, so clear "dirty" flag
 	clear_subsystem_dirty('suricata_rules');
+
+	// Sync to configured CARP slaves if any are enabled
+	suricata_sync_on_changes();
 }
 
 include_once("head.inc");

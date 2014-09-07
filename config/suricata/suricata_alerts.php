@@ -294,6 +294,9 @@ if (($_POST['addsuppress_srcip'] || $_POST['addsuppress_dstip'] || $_POST['addsu
 	if (suricata_add_supplist_entry($suppress)) {
 		suricata_reload_config($a_instance[$instanceid]);
 		$savemsg = $success;
+
+		// Sync to configured CARP slaves if any are enabled
+		suricata_sync_on_changes();
 		sleep(2);
 	}
 	else
@@ -354,6 +357,9 @@ if ($_POST['togglesid'] && is_numeric($_POST['sidid']) && is_numeric($_POST['gen
 
 	/* Signal Suricata to live-load the new rules */
 	suricata_reload_config($a_instance[$instanceid]);
+
+	// Sync to configured CARP slaves if any are enabled
+	suricata_sync_on_changes();
 	sleep(2);
 
 	$savemsg = gettext("The state for rule {$gid}:{$sid} has been modified.  Suricata is 'live-reloading' the new rules list.  Please wait at least 15 secs for the process to complete before toggling additional rules.");
