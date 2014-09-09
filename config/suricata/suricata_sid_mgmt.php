@@ -188,6 +188,9 @@ if (isset($_POST['save_auto_sid_conf'])) {
 			$intf_msg .= convert_friendly_interface_to_friendly_descr($a_nat[$k]['interface']) . ", ";
 		}
 		$savemsg = gettext("Changes were applied to these interfaces: " . trim($intf_msg, ' ,') . " and Suricata signaled to live-load the new rules.");
+
+		// Sync to configured CARP slaves if any are enabled
+		suricata_sync_on_changes();
 	}
 }
 

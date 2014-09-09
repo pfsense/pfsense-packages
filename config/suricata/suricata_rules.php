@@ -375,6 +375,9 @@ elseif ($_POST['clear']) {
 	conf_mount_ro();
 	$rebuild_rules = false;
 	$pconfig['customrules'] = '';
+
+	// Sync to configured CARP slaves if any are enabled
+	suricata_sync_on_changes();
 }
 elseif ($_POST['cancel']) {
 	$pconfig['customrules'] = base64_decode($a_rule[$id]['customrules']);
@@ -395,6 +398,9 @@ elseif ($_POST['save']) {
 	/* Signal Suricata to "live reload" the rules */
 	suricata_reload_config($a_rule[$id]);
 	clear_subsystem_dirty('suricata_rules');
+
+	// Sync to configured CARP slaves if any are enabled
+	suricata_sync_on_changes();
 }
 elseif ($_POST['apply']) {
 
@@ -416,6 +422,9 @@ elseif ($_POST['apply']) {
 
 	// We have saved changes and done a soft restart, so clear "dirty" flag
 	clear_subsystem_dirty('suricata_rules');
+
+	// Sync to configured CARP slaves if any are enabled
+	suricata_sync_on_changes();
 }
 
 include_once("head.inc");
@@ -632,7 +641,7 @@ if ($savemsg) {
 						<tbody>
 
 					<?php
-						$counter = $enable_cnt = $disable_cnt = $managed_count = 0;
+						$counter = $enable_cnt = $disable_cnt = $user_enable_cnt = $user_disable_cnt = $managed_count = 0;
 						foreach ($rules_map as $k1 => $rulem) {
 							foreach ($rulem as $k2 => $v) {
 								$sid = suricata_get_sid($v['rule']);
@@ -660,6 +669,7 @@ if ($savemsg) {
 									$textse = "</span>";
 									$iconb = "icon_reject_d.gif";
 									$disable_cnt++;
+									$user_disable_cnt++;
 									$title = gettext("Disabled by user. Click to toggle to enabled state");
 								}
 								elseif (($v['disabled'] == 1) && (!isset($enablesid[$gid][$sid]))) {
@@ -673,6 +683,7 @@ if ($savemsg) {
 									$textss = $textse = "";
 									$iconb = "icon_reject.gif";
 									$enable_cnt++;
+									$user_enable_cnt++;
 									$title = gettext("Enabled by user. Click to toggle to disabled state");
 								}
 								else {
@@ -762,6 +773,8 @@ if ($savemsg) {
 							gettext("Total Rules: {$counter}") . "&nbsp;&nbsp;&nbsp;&nbsp;" . 
 							gettext("Enabled: {$enable_cnt}") . "&nbsp;&nbsp;&nbsp;&nbsp;" . 
 							gettext("Disabled: {$disable_cnt}") . "&nbsp;&nbsp;&nbsp;&nbsp;" . 
+							gettext("User Enabled: {$user_enable_cnt}") . "&nbsp;&nbsp;&nbsp;&nbsp;" . 
+							gettext("User Disabled: {$user_disable_cnt}") . "&nbsp;&nbsp;&nbsp;&nbsp;" . 
 							gettext("Auto-Managed: {$managed_count}"); ?></td>
 						</tr>
 						<tr>

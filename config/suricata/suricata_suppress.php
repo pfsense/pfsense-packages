@@ -94,15 +94,16 @@ function suricata_find_suppresslist_interface($supplist) {
 	return false;
 }
 
-if ($_GET['act'] == "del") {
-	if ($a_suppress[$_GET['id']]) {
+if ($_POST['del'] && is_numericint($_POST['list_id'])) {
+	if ($a_suppress[$_POST['list_id']]) {
 		// make sure list is not being referenced by any Suricata-configured interface
-		if (suricata_suppresslist_used($a_suppress[$_GET['id']]['name'])) {
+		if (suricata_suppresslist_used($a_suppress[$_POST['list_id']]['name'])) {
 			$input_errors[] = gettext("ERROR -- Suppress List is currently assigned to an interface and cannot be removed!");
 		}
 		else {
-			unset($a_suppress[$_GET['id']]);
-			write_config();
+			unset($a_suppress[$_POST['list_id']]);
+			write_config("Suricata pkg: deleted SUPPRESS LIST.");
+			sync_suricata_package_config();
 			header("Location: /suricata/suricata_suppress.php");
 			exit;
 		}
@@ -126,6 +127,7 @@ if ($input_errors) {
 ?>
 
 <form action="/suricata/suricata_suppress.php" method="post"><?php if ($savemsg) print_info_box($savemsg); ?>
+<input type="hidden" name="list_id" id="list_id" value=""/>
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
 <tbody>
 <tr><td>
@@ -189,10 +191,8 @@ if ($input_errors) {
 							width="17" height="17" border="0" title="<?php echo gettext("Goto first instance associated with this Suppress List");?>"/></a>
 							</td>
 						<?php else : ?>
-							<td><a href="/suricata/suricata_suppress.php?act=del&id=<?=$i;?>"
-							onclick="return confirm('<?php echo gettext("Do you really want to delete this Suppress List?"); ?>')"><img
-							src="/themes/<?=$g['theme'];?>/images/icons/icon_x.gif" 
-							width="17" height="17" border="0" title="<?php echo gettext("delete Suppress List"); ?>"></a></td>
+							<td><input type="image" name="del[]" onclick="document.getElementById('list_id').value='<?=$i;?>';return confirm('<?=gettext("Do you really want to delete this Suppress List?");?>');" 
+							src="/themes/<?=$g['theme'];?>/images/icons/icon_x.gif" width="17" height="17" border="0" title="<?=gettext("delete Suppress List");?>"/></td>
 							<td>&nbsp;</td>
 						<?php endif; ?>
 						</tr>
