@@ -206,7 +206,7 @@ if ($_POST["save"] && !$input_errors) {
 		if ($_POST['externallistname']) $natent['externallistname'] =  $_POST['externallistname']; else unset($natent['externallistname']);
 		if ($_POST['suppresslistname']) $natent['suppresslistname'] =  $_POST['suppresslistname']; else unset($natent['suppresslistname']);
 		if ($_POST['alertsystemlog'] == "on") { $natent['alertsystemlog'] = 'on'; }else{ $natent['alertsystemlog'] = 'off'; }
-		if ($_POST['configpassthru']) $natent['configpassthru'] = base64_encode($_POST['configpassthru']); else unset($natent['configpassthru']);
+		if ($_POST['configpassthru']) $natent['configpassthru'] = base64_encode(str_replace("\r\n", "\n", $_POST['configpassthru'])); else unset($natent['configpassthru']);
 		if ($_POST['cksumcheck']) $natent['cksumcheck'] = 'on'; else $natent['cksumcheck'] = 'off';
 		if ($_POST['fpm_split_any_any'] == "on") { $natent['fpm_split_any_any'] = 'on'; }else{ $natent['fpm_split_any_any'] = 'off'; }
 		if ($_POST['fpm_search_optimize'] == "on") { $natent['fpm_search_optimize'] = 'on'; }else{ $natent['fpm_search_optimize'] = 'off'; }
@@ -223,9 +223,9 @@ if ($_POST["save"] && !$input_errors) {
 				}
 				else
 					$snort_start = false;
-				exec("mv -f {$snortlogdir}/snort_{$oif_real}{$a_rule[$id]['uuid']} {$snortlogdir}/snort_{$if_real}{$a_rule[$id]['uuid']}");
+				@rename("{$snortlogdir}/snort_{$oif_real}{$a_rule[$id]['uuid']}", "{$snortlogdir}/snort_{$if_real}{$a_rule[$id]['uuid']}");
 				conf_mount_rw();
-				exec("mv -f {$snortdir}/snort_{$a_rule[$id]['uuid']}_{$oif_real} {$snortdir}/snort_{$a_rule[$id]['uuid']}_{$if_real}");
+				@rename("{$snortdir}/snort_{$a_rule[$id]['uuid']}_{$oif_real}", "{$snortdir}/snort_{$a_rule[$id]['uuid']}_{$if_real}");
 				conf_mount_ro();
 			}
 			$a_rule[$id] = $natent;
@@ -233,6 +233,9 @@ if ($_POST["save"] && !$input_errors) {
 		elseif (strcasecmp($action, 'dup') == 0) {
 			// Duplicating a new interface, so set flag to build new rules
 			$rebuild_rules = true;
+
+			// Duplicating an interface, so need to generate a new UUID for the cloned interface
+			$natent['uuid'] = snort_generate_id();
 
 			// Add the new duplicated interface configuration to the [rule] array in config
 			$a_rule[] = $natent;

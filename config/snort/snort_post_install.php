@@ -45,6 +45,7 @@ require_once("/usr/local/pkg/snort/snort.inc");
 global $config, $g, $rebuild_rules, $pkg_interface, $snort_gui_include;
 
 $snortdir = SNORTDIR;
+$snortlogdir = SNORTLOGDIR;
 $snortlibdir = SNORTLIBDIR;
 $rcdir = RCFILEPREFIX;
 
@@ -114,6 +115,41 @@ $snort_widget_container = "snort_alerts-container:col2:close";
 if ($config['installedpackages']['snortglobal']['forcekeepsettings'] == 'on') {
 	log_error(gettext("[Snort] Saved settings detected... rebuilding installation with saved settings..."));
 	update_status(gettext("Saved settings detected..."));
+
+	/****************************************************************/
+	/* Do test and fix for duplicate UUIDs if this install was      */
+	/* impacted by the DUP (clone) bug that generated a duplicate   */
+	/* UUID for the cloned interface.                               */
+	/****************************************************************/
+	if (count($config['installedpackages']['snortglobal']['rule']) > 0) {
+		$uuids = array();
+		$snortconf = &$config['installedpackages']['snortglobal']['rule'];
+		foreach ($snortconf as &$snortcfg) {
+			// Check for and fix a duplicate UUID
+			$if_real = get_real_interface($snortcfg['interface']);
+			if (!isset($uuids[$snortcfg['uuid']])) {
+				$uuids[$snortcfg['uuid']] = $if_real;
+				continue;
+			}
+			else {
+				// Found a duplicate UUID, so generate a
+				// new one for the affected interface.
+				$old_uuid = $snortcfg['uuid'];
+				$new_uuid = snort_generate_id();
+				if (file_exists("{$snortlogdir}snort_{$if_real}{$old_uuid}/"))
+					@rename("{$snortlogdir}snort_{$if_real}{$old_uuid}/", "{$snortlogdir}snort_{$if_real}{$new_uuid}/");
+				$snortcfg['uuid'] = $new_uuid;
+				$uuids[$new_uuid] = $if_real;
+				log_error(gettext("[Snort] updated UUID for interface " . convert_friendly_interface_to_friendly_descr($snortcfg['interface']) . " from {$old_uuid} to {$new_uuid}."));
+			}
+		}
+		write_config("Snort pkg: updated interface UUIDs to eliminate duplicates.");
+		unset($uuids, $rulesets);
+	}
+	/****************************************************************/
+	/* End of duplicate UUID bug fix.                               */
+	/****************************************************************/
+
 	/* Do one-time settings migration for new multi-engine configurations */
 	update_output_window(gettext("Please wait... migrating settings to new configuration..."));
 	include('/usr/local/pkg/snort/snort_migrate_config.php');
