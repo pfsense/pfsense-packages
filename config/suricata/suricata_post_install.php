@@ -148,7 +148,7 @@ if ($config['installedpackages']['suricata']['config'][0]['forcekeepsettings'] =
 				log_error(gettext("[Suricata] updated UUID for interface " . convert_friendly_interface_to_friendly_descr($suricatacfg['interface']) . " from {$old_uuid} to {$new_uuid}."));
 			}
 		}
-		write_config("Suricata pkg: updated interface UUIDs to eliminated duplicates.");
+		write_config("Suricata pkg: updated interface UUIDs to eliminate duplicates.");
 		unset($uuids, $rulesets);
 	}
 	/****************************************************************/
@@ -237,7 +237,7 @@ if (empty($config['installedpackages']['suricata']['config'][0]['forcekeepsettin
 conf_mount_ro();
 
 // Update Suricata package version in configuration
-$config['installedpackages']['suricata']['config'][0]['suricata_config_ver'] = "2.0";
+$config['installedpackages']['suricata']['config'][0]['suricata_config_ver'] = "2.0.2";
 write_config("Suricata pkg: updated GUI package version number.");
 
 // Done with post-install, so clear flag
