@@ -55,6 +55,13 @@ if (is_null($id)) {
         exit;
 }
 
+if (isset($_POST['action']))
+	$action = htmlspecialchars($_POST['action'], ENT_QUOTES | ENT_HTML401);
+elseif (isset($_GET['action']))
+	$action = htmlspecialchars($_GET['action'], ENT_QUOTES | ENT_HTML401);
+else
+	$action = "";
+
 $pconfig = array();
 if (empty($snortglob['rule'][$id]['uuid'])) {
 	/* Adding new interface, so flag rules to build. */
@@ -107,7 +114,36 @@ if (empty($pconfig['blockoffendersip']))
 if (empty($pconfig['performance']))
 	$pconfig['performance'] = "ac-bnfa";
 
-if ($_POST["save"]) {
+// See if creating a new interface by duplicating an existing one
+if (strcasecmp($action, 'dup') == 0) {
+
+	// Try to pick the next available physical interface to use
+	$ifaces = get_configured_interface_list();
+	$ifrules = array();
+	foreach($a_rule as $r)
+		$ifrules[] = $r['interface'];
+	foreach ($ifaces as $i) {
+		if (!in_array($i, $ifrules)) {
+			$pconfig['interface'] = $i;
+			$pconfig['enable'] = 'on';
+			$pconfig['descr'] = strtoupper($i);
+			break;
+		}
+	}
+	if (count($ifrules) == count($ifaces)) {
+		$input_errors[] = gettext("No more available interfaces to configure for Snort!");
+		$interfaces = array();
+		$pconfig = array();
+	}
+
+	// Set Home Net, External Net, Suppress List and Pass List to defaults
+	unset($pconfig['suppresslistname']);
+	unset($pconfig['whitelistname']);
+	unset($pconfig['homelistname']);
+	unset($pconfig['externallistname']);
+}
+
+if ($_POST["save"] && !$input_errors) {
 	if (!isset($_POST['interface']))
 		$input_errors[] = "Interface is mandatory";
 
@@ -121,8 +157,28 @@ if ($_POST["save"]) {
 		}
 	}
 
+	// If Snort is disabled on this interface, stop any running instance,
+	// save the change, and exit.
+	if ($_POST['enable'] != 'on') {
+		$a_rule[$id]['enable'] = $_POST['enable'] ? 'on' : 'off';
+		snort_stop($a_rule[$id], get_real_interface($a_rule[$id]['interface']));
+		write_config("Snort pkg: modified interface configuration for {$a_rule[$id]['interface']}.");
+		$rebuild_rules = false;
+		sync_snort_package_config();
+		header( 'Expires: Sat, 26 Jul 1997 05:00:00 GMT' );
+		header( 'Last-Modified: ' . gmdate( 'D, d M Y H:i:s' ) . ' GMT' );
+		header( 'Cache-Control: no-store, no-cache, must-revalidate' );
+		header( 'Cache-Control: post-check=0, pre-check=0', false );
+		header( 'Pragma: no-cache' );
+		header("Location: /snort/snort_interfaces.php");
+		exit;
+	}
+
 	/* if no errors write to conf */
 	if (!$input_errors) {
+		/* Most changes don't require a rules rebuild, so default to "off" */
+		$rebuild_rules = false;
+
 		$natent = $a_rule[$id];
 		$natent['interface'] = $_POST['interface'];
 		$natent['enable'] = $_POST['enable'] ? 'on' : 'off';
@@ -157,7 +213,7 @@ if ($_POST["save"]) {
 		if ($_POST['fpm_no_stream_inserts'] == "on") { $natent['fpm_no_stream_inserts'] = 'on'; }else{ $natent['fpm_no_stream_inserts'] = 'off'; }
 
 		$if_real = get_real_interface($natent['interface']);
-		if (isset($id) && $a_rule[$id]) {
+		if (isset($id) && $a_rule[$id] && $action == '') {
 			// See if moving an existing Snort instance to another physical interface
 			if ($natent['interface'] != $a_rule[$id]['interface']) {
 				$oif_real = get_real_interface($a_rule[$id]['interface']);
@@ -173,7 +229,15 @@ if ($_POST["save"]) {
 				conf_mount_ro();
 			}
 			$a_rule[$id] = $natent;
-		} else {
+		}
+		elseif (strcasecmp($action, 'dup') == 0) {
+			// Duplicating a new interface, so set flag to build new rules
+			$rebuild_rules = true;
+
+			// Add the new duplicated interface configuration to the [rule] array in config
+			$a_rule[] = $natent;
+		}
+		else {
 			// Adding new interface, so set required interface configuration defaults
 			$frag3_eng = array( "name" => "default", "bind_to" => "all", "policy" => "bsd", 
 					    "timeout" => 60, "min_ttl" => 1, "detect_anomalies" => "on", 
@@ -221,11 +285,35 @@ if ($_POST["save"]) {
 			$natent['ftp_server_engine']['item'][] = $ftp_server_eng;
 
 			$natent['smtp_preprocessor'] = 'on';
+			$natent['smtp_memcap'] = "838860";
+			$natent['smtp_max_mime_mem'] = "838860";
+			$natent['smtp_b64_decode_depth'] = "0";
+			$natent['smtp_qp_decode_depth'] = "0";
+			$natent['smtp_bitenc_decode_depth'] = "0";
+			$natent['smtp_uu_decode_depth'] = "0";
+			$natent['smtp_email_hdrs_log_depth'] = "1464";
+			$natent['smtp_ignore_data'] = 'off';
+			$natent['smtp_ignore_tls_data'] = 'on';
+			$natent['smtp_log_mail_from'] = 'on';
+			$natent['smtp_log_rcpt_to'] = 'on';
+			$natent['smtp_log_filename'] = 'on';
+			$natent['smtp_log_email_hdrs'] = 'on';
+
 			$natent['dce_rpc_2'] = 'on';
 			$natent['dns_preprocessor'] = 'on';
 			$natent['ssl_preproc'] = 'on';
 			$natent['pop_preproc'] = 'on';
+			$natent['pop_memcap'] = "838860";
+			$natent['pop_b64_decode_depth'] = "0";
+			$natent['pop_qp_decode_depth'] = "0";
+			$natent['pop_bitenc_decode_depth'] = "0";
+			$natent['pop_uu_decode_depth'] = "0";
 			$natent['imap_preproc'] = 'on';
+			$natent['imap_memcap'] = "838860";
+			$natent['imap_b64_decode_depth'] = "0";
+			$natent['imap_qp_decode_depth'] = "0";
+			$natent['imap_bitenc_decode_depth'] = "0";
+			$natent['imap_uu_decode_depth'] = "0";
 			$natent['sip_preproc'] = 'on';
 			$natent['other_preprocs'] = 'on';
 
@@ -275,9 +363,6 @@ if ($_POST["save"]) {
 		/* Save configuration changes */
 		write_config("Snort pkg: modified interface configuration for {$natent['interface']}.");
 
-		/* Most changes don't require a rules rebuild, so default to "off" */
-		$rebuild_rules = false;
-
 		/* Update snort.conf and snort.sh files for this interface */
 		sync_snort_package_config();
 
@@ -326,6 +411,7 @@ include_once("head.inc");
 
 <form action="snort_interfaces_edit.php" method="post" name="iform" id="iform">
 <input name="id" type="hidden" value="<?=$id;?>"/>
+<input name="action" type="hidden" value="<?=$action;?>"/>
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
 <tr><td>
 <?php

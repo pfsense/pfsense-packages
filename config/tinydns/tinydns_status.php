@@ -30,6 +30,7 @@
 */
 
 require("guiconfig.inc");
+require("tinydns.inc");
 
 /* Defaults to this page but if no settings are present, redirect to setup page */
 if(!$config['installedpackages']['tinydnsdomains']['config'])
@@ -79,10 +80,11 @@ if ($pf_version < 2.0)
     <td class="tabcont" >
       <table width="100%" border="0" cellpadding="0" cellspacing="0">
 	<tr>
-          <td width="55%" class="listhdrr">IP</td>
-          <td width="15%" class="listhdrr">Status</td>
+          <td width="45%" class="listhdrr">IP</td>
+          <td width="10%" class="listhdrr">Status</td>
           <td width="15%" class="listhdrr">In Service</td>
-          <td width="25%" class="listhdrr">Response time</td>
+		  <td width="15%" class="listhdrr">Monitor ip</td>
+          <td width="15%" class="listhdrr">Response time</td>
 		</tr>
 
 <?php
@@ -104,7 +106,8 @@ foreach($config['installedpackages']['tinydnsdomains']['config'] as $ping) {
 		$status = file_get_contents("/var/db/pingstatus/$monitorip");
 	else
 		$status = "N/A";
-	if(stristr($tinydns_data, "+{$hostname}:{$ipaddress}"))
+	$ip6 = tinydns_get_ip6_format($ipaddress);
+	if(stristr($tinydns_data, "+{$hostname}:{$ipaddress}") || stristr($tinydns_data, "={$hostname}:{$ipaddress}") || stristr($tinydns_data, ":{$hostname}:28:{$ip6}"))
 		$inservice = "<FONT COLOR='GREEN'>YES</FONT>";
 	else
 		$inservice = "<FONT COLOR='BLUE'>NO</FONT>";
@@ -115,8 +118,10 @@ foreach($config['installedpackages']['tinydnsdomains']['config'] as $ping) {
 	echo "<td class=\"listlr\">";
 	if(stristr($status,"DOWN"))
 		echo "<FONT COLOR='red'>DOWN</FONT>";
-	else
+	else if(stristr($status,"UP"))
 		echo "UP";
+	else
+		echo "N/A";
 	echo "</td>";
 
 	echo "<td class=\"listlr\">";
@@ -130,7 +135,16 @@ foreach($config['installedpackages']['tinydnsdomains']['config'] as $ping) {
 		$msstatus = file_get_contents("/var/db/pingmsstatus/$monitorip");
 	else
 		$msstatus = "N/A";
-	echo "<!-- " . $monitorip . " -->" . $msstatus;
+	echo $monitorip;
+	echo "</td>";
+	echo "<td class=\"listlr\">";
+	if(!$monitorip)
+		$monitorip = $ipaddress;
+	if(file_exists("/var/db/pingmsstatus/$monitorip"))
+		$msstatus = file_get_contents("/var/db/pingmsstatus/$monitorip");
+	else
+		$msstatus = "N/A";
+	echo $msstatus;
 	echo "</td>";
 	echo "</tr>";
 
@@ -146,7 +160,8 @@ foreach($config['installedpackages']['tinydnsdomains']['config'] as $ping) {
 		echo $ipaddress;
 		if($row['loadbalance'])
 			echo " (LB)";
-		if(stristr($tinydns_data, "+{$hostname}:{$row['failoverip']}"))
+		$ip6 = tinydns_get_ip6_format($row['failoverip']);
+		if(stristr($tinydns_data, "+{$hostname}:{$row['failoverip']}") || stristr($tinydns_data, "={$hostname}:{$row['failoverip']}") || stristr($tinydns_data, ":{$hostname}:28:{$ip6}"))
 			$inservice = "<FONT COLOR='GREEN'>YES</FONT>";
 		else
 			$inservice = "<FONT COLOR='BLUE'>NO</FONT>";
@@ -154,8 +169,11 @@ foreach($config['installedpackages']['tinydnsdomains']['config'] as $ping) {
 		echo "<td class=\"listlr\">";
 		if(stristr($status,"DOWN"))
 			echo "<FONT COLOR='red'>DOWN</FONT>";
-		else
+		else if(stristr($status,"UP"))
 			echo "UP";
+		else
+			echo "N/A";
+
 		echo "</td>";
 
 		echo "<td class=\"listlr\">";
@@ -169,8 +187,17 @@ foreach($config['installedpackages']['tinydnsdomains']['config'] as $ping) {
 			$msstatus = file_get_contents("/var/db/pingmsstatus/$monitorip");
 		else
 			$msstatus = "N/A";
+		echo $monitorip;
+		echo "</td>";
+		echo "<td class=\"listlr\">";
+		if(!$monitorip)
+			$monitorip = $ipaddress;
+		if(file_exists("/var/db/pingmsstatus/$monitorip"))
+			$msstatus = file_get_contents("/var/db/pingmsstatus/$monitorip");
+		else
+			$msstatus = "N/A";
 
-		echo "<!-- " . $monitorip . " -->" . $msstatus;
+		echo $msstatus;
 		echo "</td>";
 		echo "</tr>";
 	}

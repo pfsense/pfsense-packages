@@ -29,7 +29,7 @@
 
 require("globals.inc");
 require("guiconfig.inc");
-require("/usr/local/pkg/autoconfigbackup.inc");
+require("autoconfigbackup.inc");
 
 $pf_version=substr(trim(file_get_contents("/etc/version")),0,3);
 if ($pf_version < 2.0)
@@ -72,6 +72,10 @@ if($_REQUEST['delhostname']) {
 	curl_setopt($curl_session, CURLOPT_SSL_VERIFYPEER, 0);	
 	curl_setopt($curl_session, CURLOPT_RETURNTRANSFER, 1);	
 	curl_setopt($curl_session, CURLOPT_POSTFIELDS, "action=deletehostname&delhostname=" . urlencode($_REQUEST['delhostname']));
+	curl_setopt($curl_session, CURLOPT_USERAGENT, $g['product_name'] . '/' . rtrim(file_get_contents("/etc/version")));
+	// Proxy
+	curl_setopt_array($curl_session, configure_proxy());
+	
 	$data = curl_exec($curl_session);
 	if (curl_errno($curl_session)) {
 		$fd = fopen("/tmp/acb_deletedebug.txt", "w");
@@ -144,6 +148,10 @@ include("head.inc");
 	curl_setopt($curl_session, CURLOPT_POST, 1);
 	curl_setopt($curl_session, CURLOPT_RETURNTRANSFER, 1);
 	curl_setopt($curl_session, CURLOPT_POSTFIELDS, "action=showstats");
+	curl_setopt($curl_session, CURLOPT_USERAGENT, $g['product_name'] . '/' . rtrim(file_get_contents("/etc/version")));
+        // Proxy
+        curl_setopt_array($curl_session, configure_proxy());
+
 	$data = curl_exec($curl_session);
 	if (curl_errno($curl_session)) {
 		$fd = fopen("/tmp/acb_statsdebug.txt", "w");

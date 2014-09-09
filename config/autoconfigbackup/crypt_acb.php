@@ -31,14 +31,17 @@
 
 	function crypt_data($val, $pass, $opt) {
 		$file = tempnam("/tmp", "php-encrypt");
-		$fd = fopen("$file.dec", "w");
-		fwrite($fd, $val);
-		fclose($fd);
-		exec("/usr/bin/openssl enc {$opt} -aes-256-cbc -in $file.dec -out $file.enc -k {$pass}");
-		$result = file_get_contents("$file.enc");
-		exec("rm $file");
-		exec("rm $file.dec");
-		exec("rm $file.enc");
+		file_put_contents("{$file}.dec", $val);
+		exec("/usr/bin/openssl enc {$opt} -aes-256-cbc -in {$file}.dec -out {$file}.enc -k " . escapeshellarg($pass));
+		if (file_exists("{$file}.enc"))
+			$result = file_get_contents("{$file}.enc");
+		else {
+			$result = "";
+			log_error("Failed to encrypt/decrypt data!");
+		}
+		@unlink($file);
+		@unlink("{$file}.dec");
+		@unlink("{$file}.enc");
 		return $result;
 	}
 
@@ -130,4 +133,3 @@
 		return strpos(strtolower($str), strtolower($needle));
 	}
 
-?>

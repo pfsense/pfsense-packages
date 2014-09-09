@@ -79,8 +79,8 @@
 				<col width="35%" align="left" axis="string">
 			</colgroup>
 			<thead>
-			   <tr>
-				<th class="listhdrr"></th>
+			   <tr class="sortableHeaderRowIdentifier">
+				<th class="listhdrr sorttable_nosort"></th>
 				<th class="listhdrr" axis="string"><?=gettext("Alias Name"); ?></th>
 				<th class="listhdrr" axis="string"><?=gettext("Values"); ?></th>
 				<th class="listhdrr" axis="string"><?=gettext("Description"); ?></th>

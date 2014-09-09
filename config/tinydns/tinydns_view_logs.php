@@ -32,7 +32,7 @@
 require("guiconfig.inc");
 
 if($_REQUEST['getactivity']) {
-	$tinydnslogs = `cat /var/run/service/tinydns/log/main/current | /usr/local/bin/tai64nlocal | php -f /usr/local/pkg/tinydns_parse_logs.php | grep -v ":0"`;
+	$tinydnslogs = `cat /var/run/service/tinydns/log/main/current | /usr/local/bin/tai64nlocal | php -f /usr/local/pkg/tinydns_parse_logs.php | grep -v ":0 "`;
 	echo "TinyDNS Server logs as of " . date("D M j G:i:s T Y")  . "\n\n";
 	echo $tinydnslogs;
 	exit;
@@ -53,8 +53,9 @@ include("head.inc");
 
 /* NEED TO FIX */
 if ($_POST['clear']) {
-//	exec("rm /etc/tinydns/log/main/current");
-//	exec("touch /etc/tinydns/log/main/current");
+	exec("rm /var/etc/tinydns/log/main/current");
+	exec("touch /var/etc/tinydns/log/main/current");
+	exec("chown Gdnslog /var/etc/tinydns/log/main/current");
 }
 
 ?>

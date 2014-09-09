@@ -47,7 +47,7 @@ $snort_rules_upd_log = RULES_UPD_LOGFILE;
 $snortver = array();
 exec("/usr/local/bin/snort -V 2>&1 |/usr/bin/grep Version | /usr/bin/cut -c20-26", $snortver);
 if (empty($snortver[0]))
-	$snortver[0] = "2.9.5.5";
+	$snortver[0] = SNORT_BIN_VERSION;
 $snortver[0] = str_replace(".", "", $snortver[0]);
 
 $snort_rules_file = "snortrules-snapshot-{$snortver[0]}.tar.gz";
@@ -251,7 +251,7 @@ include_once("head.inc");
 						<p style="text-align:center;" class="vexpl">
 						<font class="red"><b><?php echo gettext("WARNING:");?></b></font>&nbsp;
 						<?php echo gettext('No rule types have been selected for download. ') . 
-						gettext('Visit the ') . '<a href="/snort/snort_global.php">Global Settings Tab</a>' . gettext(' to select rule types.'); ?>
+						gettext('Visit the ') . '<a href="/snort/snort_interfaces_global.php">Global Settings Tab</a>' . gettext(' to select rule types.'); ?>
 						<br/></p>
 					<?php else: ?>
 						<br/>

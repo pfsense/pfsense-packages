@@ -63,6 +63,8 @@ if (empty($pconfig['snortloglimit']))
 	$pconfig['snortloglimit'] = 'on';
 if (!isset($pconfig['rule_update_starttime']))
 	$pconfig['rule_update_starttime'] = '00:05';
+if (!isset($config['installedpackages']['snortglobal']['forcekeepsettings']))
+	$pconfig['forcekeepsettings'] = 'on';
 
 if ($_POST['rule_update_starttime']) {
 	if (!preg_match('/^([01]?[0-9]|2[0-3]):?([0-5][0-9])$/', $_POST['rule_update_starttime']))
@@ -217,8 +219,8 @@ if ($input_errors)
 			<td><span class="vexpl"><?php echo gettext("Snort VRT free Registered User or paid Subscriber rules"); ?></span></td>
 		<tr>
 			<td>&nbsp;</td>
-			<td><a href="https://www.snort.org/signup" target="_blank"><?php echo gettext("Sign Up for a free Registered User Rule Account"); ?> </a><br/>
-			<a href="http://www.snort.org/vrt/buy-a-subscription" target="_blank">
+			<td><a href="https://www.snort.org/users/sign_up" target="_blank"><?php echo gettext("Sign Up for a free Registered User Rule Account"); ?> </a><br/>
+			<a href="https://www.snort.org/products" target="_blank">
 			<?php echo gettext("Sign Up for paid Sourcefire VRT Certified Subscriber Rules"); ?></a></td>
 		</tr>
 		</table>
@@ -390,7 +392,7 @@ if ($input_errors)
 	<td width="22%" valign="top" class="vncell"><?php echo gettext("Keep Snort Settings After Deinstall"); ?></td>
 	<td width="78%" class="vtable"><input name="forcekeepsettings"
 		id="forcekeepsettings" type="checkbox" value="yes"
-		<?php if ($config['installedpackages']['snortglobal']['forcekeepsettings']=="on") echo "checked"; ?>
+		<?php if ($pconfig['forcekeepsettings']=="on") echo "checked"; ?>
 		>&nbsp;&nbsp;<?php echo gettext("Settings will not be removed during package deinstallation."); ?></td>
 </tr>
 <tr>

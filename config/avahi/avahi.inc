@@ -115,12 +115,12 @@ function avahi_write_config() {
 
 [server]
 host-name={$hostname}
-domain-name={$domain}
-browse-domains="{$browsedomains}"
+domain-name=local
+browse-domains={$browsedomains}
 deny-interfaces={$denyinterfaces}
 use-ipv4={$useipv4}
 use-ipv6={$useipv6}
-enable-dbus=no
+enable-dbus=yes
 #check-response-ttl=no
 #use-iff-running=no
 #disallow-other-stacks=no

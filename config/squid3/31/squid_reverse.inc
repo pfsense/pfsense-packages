@@ -78,7 +78,7 @@ function squid_resync_reverse() {
 		$real_ifaces[] = squid_get_real_interface_address($iface);
 		if($real_ifaces[$i][0]) {
 		      //HTTP
-		      if (!empty($settings['reverse_http']))
+		      if (!empty($settings['reverse_http']) OR ($settings['reverse_owa_autodiscover'] == 'on'))
 		      		$conf .= "http_port {$real_ifaces[$i][0]}:{$http_port} accel defaultsite={$http_defsite} vhost\n";
 		      //HTTPS
 		      if (!empty($settings['reverse_https']))
@@ -90,7 +90,7 @@ function squid_resync_reverse() {
 		$reverse_ip = explode(";", ($settings['reverse_ip']));
 		foreach ($reverse_ip as $reip) {
 		      //HTTP
-		      if (!empty($settings['reverse_http']))
+		      if (!empty($settings['reverse_http']) OR ($settings['reverse_owa_autodiscover'] == 'on'))
 		      		$conf .= "http_port {$reip}:{$http_port} accel defaultsite={$http_defsite} vhost\n";
 		      //HTTPS
 		      if (!empty($settings['reverse_https']))
@@ -106,8 +106,8 @@ function squid_resync_reverse() {
 			$casnr = 0;
 			foreach ($reverse_owa_ip as $reowaip) {
 				$casnr++;
-				$conf .= "cache_peer {$reowaip} parent 443 0 proxy-only no-query originserver login=PASS ssl sslflags=DONT_VERIFY_PEER front-end-https=on name=OWA_HOST_443_{$casnr}_pfs\n";
-				$conf .= "cache_peer {$reowaip} parent 80 0 proxy-only no-query originserver login=PASS name=OWA_HOST_80_{$casnr}_pfs\n";
+				$conf .= "cache_peer {$reowaip} parent 443 0 proxy-only no-query no-digest originserver login=PASS ssl sslflags=DONT_VERIFY_PEER front-end-https=on name=OWA_HOST_443_{$casnr}_pfs\n";
+				$conf .= "cache_peer {$reowaip} parent 80 0 proxy-only no-query no-digest originserver login=PASS name=OWA_HOST_80_{$casnr}_pfs\n";
 			}
 		}
 		

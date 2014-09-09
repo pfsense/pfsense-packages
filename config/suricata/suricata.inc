@@ -47,6 +47,9 @@ require_once("filter.inc");
 
 global $g, $config;
 
+// Suricata GUI needs some extra PHP memory space to manipulate large rules arrays
+ini_set("memory_limit", "256M");
+
 if (!is_array($config['installedpackages']['suricata']))
 	$config['installedpackages']['suricata'] = array();
 
@@ -70,11 +73,12 @@ define('SURICATALOGDIR', '/var/log/suricata/');
 define('RULES_UPD_LOGFILE', SURICATALOGDIR . 'suricata_rules_update.log');
 define('ENFORCING_RULES_FILENAME', 'suricata.rules');
 define('FLOWBITS_FILENAME', 'flowbit-required.rules');
+define('SID_MODS_PATH', '/var/db/suricata/sidmods/');
+define('IPREP_PATH', '/var/db/suricata/iprep/');
 
 // Rule set download filenames and prefixes
 define('ET_DNLD_FILENAME', 'emerging.rules.tar.gz');
 define('ETPRO_DNLD_FILENAME', 'etpro.rules.tar.gz');
-define('VRT_DNLD_FILENAME', 'snortrules-snapshot-edge.tar.gz');
 define('GPLV2_DNLD_FILENAME', 'community-rules.tar.gz');
 define('VRT_FILE_PREFIX', 'snort_');
 define('GPL_FILE_PREFIX', 'GPLv2_');
@@ -183,7 +187,6 @@ function suricata_reload_config($suricatacfg, $signal="USR2") {
 	/******************************************************/
 	if (isvalidpid("{$g['varrun_path']}/suricata_{$if_real}{$suricata_uuid}.pid")) {
 		log_error("[Suricata] Suricata LIVE RULE RELOAD initiated for {$suricatacfg['descr']} ({$if_real})...");
-//		sigkillbypid("{$g['varrun_path']}/suricata_{$if_real}{$suricata_uuid}.pid", $signal);
 		mwexec_bg("/bin/pkill -{$signal} -F {$g['varrun_path']}/suricata_{$if_real}{$suricata_uuid}.pid");
 	}
 }
@@ -212,7 +215,6 @@ function suricata_barnyard_reload_config($suricatacfg, $signal="HUP") {
 	/******************************************************/
 	if (isvalidpid("{$g['varrun_path']}/barnyard2_{$if_real}{$suricata_uuid}.pid")) {
 		log_error("[Suricata] Barnyard2 CONFIG RELOAD initiated for {$suricatacfg['descr']} ({$if_real})...");
-//		sigkillbypid("{$g['varrun_path']}/barnyard2_{$if_real}{$suricata_uuid}.pid", $signal);
 		mwexec_bg("/bin/pkill -{$signal} -F {$g['varrun_path']}/barnyard2_{$if_real}{$suricata_uuid}.pid");
 	}
 }
@@ -255,7 +257,7 @@ function suricata_find_list($find_name, $type = 'passlist') {
 	return array();
 }
 
-function suricata_build_list($suricatacfg, $listname = "", $passlist = false) {
+function suricata_build_list($suricatacfg, $listname = "", $passlist = false, $externallist = false) {
 
 	/***********************************************************/
 	/* The default is to build a HOME_NET variable unless      */
@@ -265,9 +267,10 @@ function suricata_build_list($suricatacfg, $listname = "", $passlist = false) {
 	global $config, $g, $aliastable, $filterdns;
 	$home_net = array();
 
-	if ($listname == 'default' || empty($listname)) {
+	if (!$externallist && ($listname == 'default' || empty($listname))) {
 		$localnet = 'yes'; $wanip = 'yes'; $wangw = 'yes'; $wandns = 'yes'; $vips = 'yes'; $vpns = 'yes';
-	} else {
+	}
+	else {
                 $list = suricata_find_list($listname);
                 if (empty($list))
                         return $list;
@@ -281,21 +284,25 @@ function suricata_build_list($suricatacfg, $listname = "", $passlist = false) {
 			$home_net = explode(" ", trim(filter_expand_alias($list['address'])));
 	}
 
-	// Always add loopback to HOME_NET and passlist (ftphelper)
-	if (!in_array("127.0.0.1", $home_net))
-		$home_net[] = "127.0.0.1";
+	// Always add loopback to HOME_NET and passlist
+	if (!$externallist) {
+		if (!in_array("127.0.0.1/32", $home_net))
+			$home_net[] = "127.0.0.1/32";
+		if (!in_array("::1/128", $home_net))
+			$home_net[] = "::1/128";
+	}
 
 	/********************************************************************/
 	/* Always put the interface running Suricata in HOME_NET and        */
-	/* whitelist unless it's the WAN.  WAN options are handled further  */
+	/* pass list unless it's the WAN.  WAN options are handled further  */
 	/* down.  If the user specifically chose not to include LOCAL_NETS  */
 	/* in the PASS LIST, then do not include the Suricata interface     */
 	/* subnet in the PASS LIST. We do include the actual LAN interface  */
 	/* IP for Suricata, though, to prevent locking out the firewall.    */
 	/********************************************************************/
 	$suricataip = get_interface_ip($suricatacfg['interface']);
-	if (!$whitelist || $localnet == 'yes' || empty($localnet)) {
-		if (is_ipaddr($suricataip)) {
+	if (($externallist && $localnet == 'yes') || (!$externallist && (!$passlist || $localnet == 'yes' || empty($localnet)))) {
+		if (is_ipaddrv4($suricataip)) {
 			if ($suricatacfg['interface'] <> "wan") {
 				$sn = get_interface_subnet($suricatacfg['interface']);
 				$ip = gen_subnet($suricataip, $sn) . "/{$sn}";
@@ -304,15 +311,19 @@ function suricata_build_list($suricatacfg, $listname = "", $passlist = false) {
 			}
 		}
 	}
-	else {
-		if (is_ipaddr($suricataip)) {
-			if (!in_array($suricataip, $home_net))
-				$home_net[] = $suricataip;
+	elseif (!$externallist && $localnet != 'yes') {
+		if (is_ipaddrv4($suricataip)) {
+			if (!in_array($suricataip . "/32", $home_net))
+				$home_net[] = $suricataip . "/32";
 		}
 	}
 
+	// Grab the IPv6 address if we have one assigned
 	$suricataip = get_interface_ipv6($suricatacfg['interface']);
-	if (!$whitelist || $localnet == 'yes' || empty($localnet)) {
+	// Trim off the interface designation (e.g., %em1) if present
+	if (strpos($suricataip, "%") !== FALSE)
+		$suricataip = substr($suricataip, 0, strpos($suricataip, "%"));
+	if (($externallist && $localnet == 'yes') || (!$externallist && (!$passlist || $localnet == 'yes' || empty($localnet)))) {
 		if (is_ipaddrv6($suricataip)) {
 			if ($suricatacfg['interface'] <> "wan") {
 				$sn = get_interface_subnetv6($suricatacfg['interface']);
@@ -322,14 +333,24 @@ function suricata_build_list($suricatacfg, $listname = "", $passlist = false) {
 			}
 		}
 	}
-	else {
+	elseif (!$externallist && $localnet != 'yes') {
 		if (is_ipaddrv6($suricataip)) {
-			if (!in_array($suricataip, $home_net))
-				$home_net[] = $suricataip;
+			if (!in_array($suricataip . "/128", $home_net))
+				$home_net[] = $suricataip . "/128";
 		}
 	}
 
-	if (!$whitelist || $localnet == 'yes' || empty($localnet)) {		
+	// Add link-local address if user included locally-attached networks
+	$suricataip = get_interface_linklocal($suricatacfg['interface']);
+	if (!empty($suricataip) && $localnet == 'yes') {
+		// Trim off the interface designation (e.g., %em1) if present
+		if (strpos($suricataip, "%") !== FALSE)
+			$suricataip = substr($suricataip, 0, strpos($suricataip, "%"));
+		if (!in_array($suricataip . "/128", $home_net))
+			$home_net[] = $suricataip . "/128";
+	}
+
+	if (($$externallist && $localnet == 'yes') || (!$externallist && (!$passlist || $localnet == 'yes' || empty($localnet)))) {		
 		/*************************************************************************/
 		/*  Iterate through the interface list and write out pass list items and */
 		/*  also compile a HOME_NET list of all local interfaces for suricata.   */
@@ -341,58 +362,89 @@ function suricata_build_list($suricatacfg, $listname = "", $passlist = false) {
 			if ($int == "wan")
 				continue;
 			$subnet = get_interface_ip($int);
-			if (is_ipaddr($subnet)) {
+			if (is_ipaddrv4($subnet)) {
 				$sn = get_interface_subnet($int);
 				$ip = gen_subnet($subnet, $sn) . "/{$sn}";
 				if (!in_array($ip, $home_net))
 					$home_net[] = $ip;
 			}
-			if ($int == "wan")
-				continue;
+
 			$subnet = get_interface_ipv6($int);
+			// Trim off the interface designation (e.g., %em1) if present
+			if (strpos($subnet, "%") !== FALSE)
+				$subnet = substr($subnet, 0, strpos($subnet, "%"));
 			if (is_ipaddrv6($subnet)) {
 				$sn = get_interface_subnetv6($int);
 				$ip = gen_subnetv6($subnet, $sn). "/{$sn}";
 				if (!in_array($ip, $home_net))
 					$home_net[] = $ip;
 			}
+
+			// Add link-local address
+			$suricataip = get_interface_linklocal($int);
+			if (!empty($suricataip)) {
+				// Trim off the interface designation (e.g., %em1) if present
+				if (strpos($suricataip, "%") !== FALSE)
+					$suricataip = substr($suricataip, 0, strpos($suricataip, "%"));
+				if (!in_array($suricataip . "/128", $home_net))
+					$home_net[] = $suricataip . "/128";
+			}
 		}
 	}
 
 	if ($wanip == 'yes') {
 		$ip = get_interface_ip("wan");
-		if (is_ipaddr($ip)) {
-			if (!in_array($ip, $home_net))
-				$home_net[] = $ip;
+		if (is_ipaddrv4($ip)) {
+			if (!in_array($ip . "/32", $home_net))
+				$home_net[] = $ip . "/32";
 		}
 		$ip = get_interface_ipv6("wan");
+		// Trim off the interface designation (e.g., %em1) if present
+		if (strpos($ip, "%") !== FALSE)
+			$ip = substr($ip, 0, strpos($ip, "%"));
 		if (is_ipaddrv6($ip)) {
-			if (!in_array($ip, $home_net))
-				$home_net[] = $ip;
+			if (!in_array($ip . "/128", $home_net))
+				$home_net[] = $ip . "/128";
+		}
+		// Explicitly grab the WAN Link-Local address
+		$ip = get_interface_linklocal("wan");
+		if (!empty($ip)) {
+			// Trim off the interface designation (e.g., %em1) if present
+			if (strpos($ip, "%") !== FALSE)
+				$ip = substr($ip, 0, strpos($ip, "%"));
+			if (!in_array($ip . "/128", $home_net))
+				$home_net[] = $ip . "/128";
 		}
 	}
 
 	if ($wangw == 'yes') {
 		// Grab the default gateway if set
 		$default_gw = exec("/sbin/route -n get default |grep 'gateway:' | /usr/bin/awk '{ print $2 }'");
-		if (is_ipaddr($default_gw) && !in_array($default_gw, $home_net))
-			$home_net[] = $default_gw;
-		if (is_ipaddrv6($default_gw) && !in_array($default_gw, $home_net))
-			$home_net[] = $default_gw;
+		if (is_ipaddrv4($default_gw) && !in_array($default_gw . "/32", $home_net))
+			$home_net[] = $default_gw . "/32";
+		if (is_ipaddrv6($default_gw) && !in_array($default_gw . "/128", $home_net))
+			$home_net[] = $default_gw . "/128";
 
 		// Get any other interface gateway and put in $HOME_NET if not there already
 		$gw = get_interface_gateway($suricatacfg['interface']);
-		if (is_ipaddr($gw) && !in_array($gw, $home_net))
-			$home_net[] = $gw;
+		if (is_ipaddrv4($gw) && !in_array($gw . "/32", $home_net))
+			$home_net[] = $gw . "/32";
 		$gw = get_interface_gateway_v6($suricatacfg['interface']);
-		if (is_ipaddrv6($gw) && !in_array($gw, $home_net))
-			$home_net[] = $gw;
+		// Trim off the interface designation (e.g., %em1) if present
+		if (strpos($gw, "%") !== FALSE)
+			$gw = substr($gw, 0, strpos($gw, "%"));
+		if (is_ipaddrv6($gw) && !in_array($gw . "/128", $home_net))
+			$home_net[] = $gw . "/128";
 	}
 
 	if ($wandns == 'yes') {
-		// Add DNS server for WAN interface to whitelist
+		// Add DNS server for WAN interface to Pass List
 		$dns_servers = get_dns_servers();
 		foreach ($dns_servers as $dns) {
+			if (is_ipaddrv4($dns))
+				$dns .= "/32";
+			elseif (is_ipaddrv6($dns))
+				$dns .= "/128";
 			if ($dns && !in_array($dns, $home_net))
 				$home_net[] = $dns;
 		}
@@ -410,7 +462,7 @@ function suricata_build_list($suricatacfg, $listname = "", $passlist = false) {
 		}
 	}
 
-	// grab a list of vpns and whitelist if user desires
+	// Grab a list of vpns enabled - these come back as CIDR mask networks
 	if ($vpns == 'yes') {
 		$vpns_list = filter_get_vpns_list();
 		if (!empty($vpns_list)) {
@@ -443,7 +495,14 @@ function suricata_build_list($suricatacfg, $listname = "", $passlist = false) {
 function suricata_rules_up_install_cron($should_install=true) {
 	global $config, $g;
 
-	$command = "/usr/bin/nice -n20 /usr/local/bin/php -f /usr/local/www/suricata/suricata_check_for_rule_updates.php";
+	// Remove any existing job first
+	install_cron_job("suricata_check_for_rule_updates.php", false);
+
+	// If called with FALSE as argument, then we're done
+	if ($should_install == FALSE)
+		return;
+
+	$command = "/usr/bin/nice -n20 /usr/local/bin/php -f /usr/local/pkg/suricata/suricata_check_for_rule_updates.php";
 
 	// Get auto-rule update parameter from configuration
 	$suricata_rules_up_info_ck = $config['installedpackages']['suricata']['config'][0]['autoruleupdate'];
@@ -606,12 +665,12 @@ function suricata_rm_blocked_install_cron($should_install) {
 	}
 
 	// First, remove any existing cron task for "rm_blocked" hosts
-	install_cron_job("pfctl -t {$suri_pf_table} -T expire" , false);
+	install_cron_job("{$suri_pf_table}", false);
 
 	// Now add or update the cron task for "rm_blocked" hosts
 	// if enabled.
 	if ($should_install) {
-		$command = "/usr/bin/nice -n20 /sbin/pfctl -t {$suri_pf_table} -T expire {$suricata_rm_blocked_expire}";
+		$command = "/usr/bin/nice -n20 /sbin/pfctl -q -t {$suri_pf_table} -T expire {$suricata_rm_blocked_expire}";
 		install_cron_job($command, $should_install, $suricata_rm_blocked_min, $suricata_rm_blocked_hr, $suricata_rm_blocked_mday, $suricata_rm_blocked_month, $suricata_rm_blocked_wday, "root");
 	}
 }
@@ -626,7 +685,7 @@ function sync_suricata_package_config() {
 
 	// Do not start config build if there are no Suricata-configured interfaces
 	if (!is_array($config['installedpackages']['suricata']) || !is_array($config['installedpackages']['suricata']['rule'])) {
-		@unlink("{$rcdir}/suricata.sh");
+		@unlink("{$rcdir}suricata.sh");
 		conf_mount_ro();
 		return;
 	}
@@ -646,7 +705,6 @@ function sync_suricata_package_config() {
 	// create suricata bootup file suricata.sh
 	suricata_create_rc();
 
-	$suricataglob = $config['installedpackages']['suricata']['config'][0];
 	// setup the log directory size check job if enabled
 	suricata_loglimit_install_cron(true);
 	// setup the suricata rules update job if enabled
@@ -654,12 +712,11 @@ function sync_suricata_package_config() {
 	// set the suricata blocked hosts time
 	suricata_rm_blocked_install_cron($config['installedpackages']['suricata']['config'][0]['rm_blocked'] != "never_b" ? true : false);
 
-	write_config();
 	configure_cron();
 	
 	// Do not attempt package sync if reinstalling package or booting
-//	if (!$g['suricata_postinstall'] && !$g['booting'])
-//		suricata_sync_on_changes();
+	if (!isset($g['suricata_postinstall']) && !$g['booting'])
+		suricata_sync_on_changes();
 	
 	conf_mount_ro();
 }
@@ -1052,11 +1109,11 @@ function suricata_load_rules_map($rules_path) {
 	if (empty($rules_path))
 		return $map_ref;
 
-	/***************************************************************
+	/************************************************************************************
 	 * Read all the rules into the map array.
 	 * The structure of the map array is:
 	 *
-	 *  map[gid][sid]['rule']['category']['disabled']['flowbits']
+	 *  map[gid][sid]['rule']['category']['action']['disabled']['managed']['flowbits']
 	 *
 	 *  where:
 	 *   gid      = Generator ID from rule, or 1 if general text 
@@ -1067,9 +1124,11 @@ function suricata_load_rules_map($rules_path) {
 	 *   action   = alert, drop, reject or pass
 	 *   disabled = 1 if rule is disabled (commented out), 0 if 
 	 *              rule is enabled
+	 *    managed = 1 if rule is auto-managed by SID MGMT process,
+	 *              0 if not auto-managed 
 	 *   flowbits = Array of applicable flowbits if rule contains 
 	 *              flowbits options
-	 ***************************************************************/
+	 ************************************************************************************/
 
 	// First check if we were passed a directory, a single file
 	// or an array of filenames to read. Set our $rule_files
@@ -1542,6 +1601,854 @@ function suricata_load_vrt_policy($policy, $all_rules=null) {
 	return $vrt_policy_rules;
 }
 
+function suricata_parse_sidconf_file($sidconf_file) {
+
+	/**********************************************/
+	/* This function loads and processes the file */
+	/* specified by '$sidconf_file'.  The file is */
+	/* assumed to contain valid instructions for  */
+	/* matching rule SIDs as supported by the     */
+	/* Oinkmaster and PulledPork utilities.       */
+	/*                                            */
+	/*  $sidconf_file ==> full path and name of   */
+	/*                    file to process         */
+	/*                                            */
+	/*        Returns ==> an array containing     */
+	/*                    SID modifier tokens     */
+	/**********************************************/
+
+	$buf = "";
+	$sid_mods = array();
+
+	$fd = fopen("{$sidconf_file}", "r");
+	if ($fd == FALSE) {
+		log_error("[Suricata] Failed to open SID MGMT file '{$sidconf_file}' for processing.");
+		return $sid_mods;
+	}
+
+	// Read and parse the conf file line-by-line
+	while (($buf = fgets($fd)) !== FALSE) {
+		$line = array();
+
+		// Skip any lines that may be just spaces.
+		if (trim($buf, " \r\n") == "")
+			continue;
+
+		// Skip line with leading "#" since it's a comment
+		if (preg_match('/^\s*#/', $buf))
+			continue;
+
+		// Trim off any trailing comment
+		$line = explode("#", $buf);
+
+		// Trim leading and trailing spaces plus newline and any carriage returns
+		$buf = trim($line[0], ' \r\n');
+
+		// Now split the SID mod arguments at the commas, if more than one
+		// per line, and add to our $sid_mods array.
+		$line = explode(",", $buf);
+		foreach ($line as $ent)
+			$sid_mods[] = trim($ent);
+	}
+
+	// Close the file, release unneeded memory and return
+	// the array of SID mod tokens parsed from the file.
+	fclose($fd);
+	unset($line, $buf);
+	return $sid_mods;
+}
+
+function suricata_sid_mgmt_auto_categories($suricatacfg, $log_results = FALSE) {
+
+	/****************************************************/
+	/* This function parses any auto-SID conf files     */
+	/* configured for the interface and returns an      */
+	/* array of rule categories adjusted from the       */
+	/* ['enabled_rulesets'] element in the config for   */
+	/* the interface in accordance with the contents    */
+	/* of the SID Mgmt conf files.                      */
+	/*                                                  */
+	/* The returned array shows which files should be   */
+	/* removed and which should be added to the list    */
+	/* used when building the enforcing ruleset.        */
+	/*                                                  */
+	/*  $suricatacfg ==> pointer to interface           */
+	/*                   configuration info             */
+	/*  $log_results ==> [optional] log results to      */
+	/*                   'sid_changes.log' in the       */
+	/*                   interface directory in         */
+	/*                   /var/log/suricata when TRUE    */
+	/*                                                  */
+	/*       Returns ==> array of category file names   */
+	/*                   for the interface.  The keys   */
+	/*                   are category file names and    */
+	/*                   the corresponding values show  */
+	/*                   if the file should be added    */
+	/*                   or removed from the enabled    */
+	/*                   rulesets list.                 */
+	/*                                                  */
+	/*                    Example -                     */
+	/*                      $changes[file] = 'enabled'  */
+	/*                                                  */
+	/****************************************************/
+
+	global $config;
+	$suricata_sidmods_dir = SID_MODS_PATH;
+	$sid_mods = array();
+	$enables = array();
+	$disables = array();
+
+	// Check if auto-mgmt of SIDs is enabled, exit if not
+	if ($config['installedpackages']['suricata']['config'][0]['auto_manage_sids'] != 'on')
+		return array();
+	if (empty($suricatacfg['disable_sid_file']) && empty($suricatacfg['enable_sid_file']))
+		return array();
+
+	// Configure the interface's logging subdirectory if log results is enabled
+	if ($log_results == TRUE)
+		$log_file = SURICATALOGDIR . $suricatalogdir . "suricata_" . get_real_interface($suricatacfg['interface']) . "{$suricatacfg['uuid']}/sid_changes.log";
+	else
+		$log_file = NULL;
+
+	// Get the list of currently enabled categories for the interface
+	if (!empty($suricatacfg['rulesets']))
+		$enabled_cats = explode("||", $suricatacfg['rulesets']);
+
+	if ($log_results == TRUE) {
+		error_log(gettext("********************************************************\n"), 3, $log_file);
+		error_log(gettext("Starting auto RULE CATEGORY management for " . convert_friendly_interface_to_friendly_descr($suricatacfg['interface']) ."\n"), 3, $log_file);
+		error_log(gettext("Start Time: " . date("Y-m-d H:i:s") . "\n"), 3, $log_file);
+	}
+
+	switch ($suricatacfg['sid_state_order']) {
+		case "disable_enable":
+			if (!empty($suricatacfg['disable_sid_file'])) {
+				if ($log_results == TRUE)
+					error_log(gettext("Processing disable_sid file: {$suricatacfg['disable_sid_file']}\n"), 3, $log_file);
+
+				// Attempt to open the 'disable_sid_file' for the interface
+				if (!file_exists("{$suricata_sidmods_dir}{$suricatacfg['disable_sid_file']}")) {
+					log_error(gettext("[Suricata] Error - unable to open 'disable_sid_file' \"{$suricatacfg['disable_sid_file']}\" specified for " . convert_friendly_interface_to_friendly_descr($suricatacfg['interface'])));
+					if ($log_results == TRUE)
+						error_log(gettext("Unable to open disable_sid file \"{$suricatacfg['disable_sid_file']}\".\n"), 3, $log_file);
+				}
+				else
+					$sid_mods = suricata_parse_sidconf_file("{$suricata_sidmods_dir}{$suricatacfg['disable_sid_file']}");
+
+				if (!empty($sid_mods))
+					$disables = suricata_get_auto_category_mods($enabled_cats, $sid_mods, "disable", $log_results, $log_file);
+				elseif ($log_results == TRUE && !empty($log_file)) {
+					error_log(gettext("WARNING: no valid SID match tokens found in file \"{$suricatacfg['disable_sid_file']}\".\n"), 3, $log_file);
+				}
+			}
+			if (!empty($suricatacfg['enable_sid_file'])) {
+				if ($log_results == TRUE)
+					error_log(gettext("Processing enable_sid file: {$suricatacfg['enable_sid_file']}\n"), 3, $log_file);
+
+				// Attempt to open the 'enable_sid_file' for the interface
+				if (!file_exists("{$suricata_sidmods_dir}{$suricatacfg['enable_sid_file']}")) {
+					log_error(gettext("[Suricata] Error - unable to open 'enable_sid_file' \"{$suricatacfg['enable_sid_file']}\" specified for " . convert_friendly_interface_to_friendly_descr($suricatacfg['interface'])));
+					if ($log_results == TRUE)
+						error_log(gettext("Unable to open enable_sid file \"{$suricatacfg['enable_sid_file']}\".\n"), 3, $log_file);
+				}
+				else
+					$sid_mods = suricata_parse_sidconf_file("{$suricata_sidmods_dir}{$suricatacfg['enable_sid_file']}");
+
+				if (!empty($sid_mods))
+					$enables = suricata_get_auto_category_mods($enabled_cats, $sid_mods, "enable", $log_results, $log_file);
+				elseif ($log_results == TRUE && !empty($log_file)) {
+					error_log(gettext("WARNING: no valid SID match tokens found in file \"{$suricatacfg['enable_sid_file']}\".\n"), 3, $log_file);
+				}
+			}
+			break;
+
+		case "enable_disable":
+			if (!empty($suricatacfg['enable_sid_file'])) {
+				if ($log_results == TRUE)
+					error_log(gettext("Processing enable_sid file: {$suricatacfg['enable_sid_file']}\n"), 3, $log_file);
+
+				// Attempt to open the 'enable_sid_file' for the interface
+				if (!file_exists("{$suricata_sidmods_dir}{$suricatacfg['enable_sid_file']}")) {
+					log_error(gettext("[Suricata] Error - unable to open 'enable_sid_file' \"{$suricatacfg['enable_sid_file']}\" specified for " . convert_friendly_interface_to_friendly_descr($suricatacfg['interface'])));
+					if ($log_results == TRUE)
+						error_log(gettext("Unable to open enable_sid file \"{$suricatacfg['enable_sid_file']}\".\n"), 3, $log_file);
+				}
+				else
+					$sid_mods = suricata_parse_sidconf_file("{$suricata_sidmods_dir}{$suricatacfg['enable_sid_file']}");
+
+				if (!empty($sid_mods))
+					$enables = suricata_get_auto_category_mods($enabled_cats, $sid_mods, "enable", $log_results, $log_file);
+				elseif ($log_results == TRUE && !empty($log_file)) {
+					error_log(gettext("WARNING: no valid SID match tokens found in file \"{$suricatacfg['enable_sid_file']}\".\n"), 3, $log_file);
+				}
+			}
+			if (!empty($suricatacfg['disable_sid_file'])) {
+				if ($log_results == TRUE)
+					error_log(gettext("Processing disable_sid file: {$suricatacfg['disable_sid_file']}\n"), 3, $log_file);
+
+				// Attempt to open the 'disable_sid_file' for the interface
+				if (!file_exists("{$suricata_sidmods_dir}{$suricatacfg['disable_sid_file']}")) {
+					log_error(gettext("[Suricata] Error - unable to open 'disable_sid_file' \"{$suricatacfg['disable_sid_file']}\" specified for " . convert_friendly_interface_to_friendly_descr($suricatacfg['interface'])));
+					if ($log_results == TRUE)
+						error_log(gettext("Unable to open disable_sid file \"{$suricatacfg['disable_sid_file']}\".\n"), 3, $log_file);
+				}
+				else
+					$sid_mods = suricata_parse_sidconf_file("{$suricata_sidmods_dir}{$suricatacfg['disable_sid_file']}");
+
+				if (!empty($sid_mods))
+					$disables = suricata_get_auto_category_mods($enabled_cats, $sid_mods, "disable", $log_results, $log_file);
+				elseif ($log_results == TRUE && !empty($log_file)) {
+					error_log(gettext("WARNING: no valid SID match tokens found in file \"{$suricatacfg['disable_sid_file']}\".\n"), 3, $log_file);
+				}
+			}
+			break;
+
+		default:
+			log_error(gettext("[Suricata] Unrecognized 'sid_state_order' value.  Skipping auto CATEGORY mgmt step for " . convert_friendly_interface_to_friendly_descr($suricatacfg['interface'])));
+			if ($log_results == TRUE) {
+				error_log(gettext("ERROR: unrecognized 'sid_state_order' value.  Skipping auto CATEGORY mgmt step for ") . convert_friendly_interface_to_friendly_descr($suricatacfg['interface']). ".\n", 3, $log_file);
+			}
+	}
+
+	if ($log_results == TRUE) {
+		error_log(gettext("End Time: " . date("Y-m-d H:i:s") . "\n"), 3, $log_file);
+		error_log(gettext("********************************************************\n\n"), 3, $log_file);
+	}
+
+	// Return the required rule category modifications as an array;
+	return array_merge($enables, $disables);
+}
+
+function suricata_get_auto_category_mods($categories, $sid_mods, $action, $log_results = FALSE, $log_file = NULL) {
+
+	/****************************************************/
+	/* This function parses the provided SID mod tokens */
+	/* in $sid_mods and returns an array of category    */
+	/* files that must be added ('enabled') or removed  */
+	/* ('disabled') from the provided $categories list  */
+	/* of enabled rule categories as determined by the  */
+	/* content of the SID Mgmt tokens in $sid_mods.     */
+	/*                                                  */
+	/* The returned array shows which files should be   */
+	/* removed and which should be added to the list    */
+	/* used when building the enforcing ruleset.        */
+	/*                                                  */
+	/*   $categories ==> array of currently enabled     */
+	/*                   ruleset categories             */
+	/*     $sid_mods ==> array of SID modification      */
+	/*                   tokens                         */
+	/*       $action ==> modification action for        */
+	/*                   matching category targets:     */
+	/*                   'enable' or 'disable'          */
+	/*  $log_results ==> [optional] 'yes' to log        */
+	/*                   results to $log_file           */
+	/*     $log_file ==> full path and filename of log  */
+	/*                   file to write to               */
+	/*                                                  */
+	/*       Returns ==> array of category file names   */
+	/*                   for the interface.  The keys   */
+	/*                   are category file names and    */
+	/*                   the corresponding values show  */
+	/*                   if the file should be added    */
+	/*                   or removed from the enabled    */
+	/*                   rulesets list.                 */
+	/*                                                  */
+	/*                    Example -                     */
+	/*                      $changes[file] = 'enabled'  */
+	/*                                                  */
+	/****************************************************/
+
+	$suricatadir = SURICATADIR;
+	$all_cats = array();
+	$changes = array();
+	$counter = 0;
+	$matchcount = 0;
+
+	// Get a list of all possible categories by loading all rules files
+	foreach (array( VRT_FILE_PREFIX, ET_OPEN_FILE_PREFIX, ET_PRO_FILE_PREFIX, GPL_FILE_PREFIX ) as $prefix) {
+		$files = glob("{$suricatadir}rules/{$prefix}*.rules");
+		foreach ($files as $file)
+			$all_cats[] = basename($file);
+	}
+
+	// Walk the SID mod tokens and decode looking for rule
+	// category enable/disable changes.
+	foreach ($sid_mods as $tok) {
+		$matches = array();
+		// Test the SID token for a GID:SID range and skip if true
+		if (preg_match('/^(\d+):(\d+)-\1:(\d+)/', $tok))
+			continue;
+		// Test the token for a single GID:SID and skip if true
+		elseif (preg_match('/^(\d+):(\d+)$/', $tok))
+			continue;
+		// Test the token for the PCRE: keyword and skip if true
+		elseif (preg_match('/(^pcre\:)(.+)/i', $tok))
+			continue;
+		// Test the token for the MS reference keyword and skip if true
+		elseif (preg_match('/^MS\d+-.+/i', $tok))
+			continue;
+		// Test the token for other keywords delimited with a colon and skip if true
+		elseif (preg_match('/^[a-xA-X]+\:.+/', $tok))
+			continue;
+		// Test the SID token for a rule category name.  Anything that
+		// failed to match above is considered a potential category name.
+		elseif (preg_match('/[a-xA-X]+(-|\w).*/', $tok, $matches)) {
+			$counter++;
+			$regex = "/" . preg_quote(trim($matches[0]), '/') . "/i";
+			// Search through the $all_cats array for any matches to the regex
+			$matches = preg_grep($regex, $all_cats);
+
+			// See if any matches are in the $categories array
+			foreach ($matches as $cat) {
+				switch ($action) {
+					case 'enable':
+						if (!isset($changes[$cat])) {
+							$changes[$cat] = 'enabled';
+							if ($log_results == TRUE && !empty($log_file))
+								error_log(gettext("    Enabled rule category: {$cat}\n"), 3, $log_file);
+							$matchcount++;
+						}
+						break;
+
+					case 'disable':
+						if (!isset($changes[$cat])) {
+							$changes[$cat] = 'disabled';
+							if ($log_results == TRUE && !empty($log_file))
+								error_log(gettext("    Disabled rule category: {$cat}\n"), 3, $log_file);
+							$matchcount++;
+						}
+						break;
+
+					default:
+						break;
+				}
+			}
+		}
+		else {
+			if ($log_results == TRUE && !empty($log_file))
+				error_log(gettext("WARNING: unrecognized token '{$tok}' encountered while processing an automatic SID MGMT file.\n"), 3, $log_file);
+		}
+	}
+
+	if ($log_results == TRUE && !empty($log_file)) {
+		error_log(gettext("    Parsed {$counter} potential Rule Categories to match from the list of tokens.\n"), 3, $log_file);
+		error_log(gettext("    " . ucfirst($action) . "d {$matchcount} matching Rule Categories.\n"), 3, $log_file);
+	}
+
+	// Release memory no longer needed
+	unset($all_cats, $matches);
+
+	// Return array of rule category file changes
+	return $changes;
+}
+
+function suricata_modify_sid_state(&$rule_map, $sid_mods, $action, $log_results = FALSE, $log_file = NULL) {
+
+	/**********************************************/
+	/* This function walks the provided array of  */
+	/* SID modification tokens and locates the    */
+	/* target SID or SIDs in the $rule_map array. */
+	/* It then performs the change specified by   */
+	/* $action on the target SID or SIDs.         */
+	/*                                            */
+	/*    $rule_map ==> reference to array of     */
+	/*                  current rules             */
+	/*    $sid_mods ==> array of SID modification */
+	/*                  tokens                    */
+	/*      $action ==> modification action for   */
+	/*                  matching SID targets:     */
+	/*                  'enable' or 'disable'     */
+	/* $log_results ==> [optional] 'yes' to log   */
+	/*                   results to $log_file     */
+	/*    $log_file ==> full path and filename    */
+	/*                  of log file to write to   */
+	/*                                            */
+	/*    On Return ==> $rule_map array modified  */
+	/*                  by changing state for     */
+	/*                  matching SIDs.            */
+	/*                                            */
+	/*                  Returns a two-dimension   */
+	/*                  array of matching GID:SID */
+	/*                  pairs.                    */
+	/**********************************************/
+
+	$sids = array();
+
+	// If no rules in $rule_map or mods in $sid_mods,
+	// then nothing to do.
+	if (empty($rule_map) || empty($sid_mods))
+		return $sids;
+
+	// Validate the action keyword as we only accept
+	// 'enable' and 'disable' as valid.
+	switch ($action) {
+
+		case "enable":
+			break;
+
+		case "disable":
+			break;
+
+		default:
+			log_error(gettext("[Suricata] Error - unknown action '{$action}' supplied to suricata_modify_sid_state() function...no SIDs modified."));
+			return $sids;
+	}
+
+	// Walk the SID mod tokens and decode each one
+	foreach ($sid_mods as $tok) {
+		$matches = array();
+		// Test the SID token for a GID:SID range
+		if (preg_match('/^(\d+):(\d+)-\1:(\d+)/', $tok, $matches)) {
+			// It was a range, so find all the intervening SIDs
+			$gid = trim($matches[1]);
+			$lsid = trim($matches[2]);
+			$usid = trim($matches[3]);
+			$sids[$gid][$lsid] = $action;
+			while ($lsid < $usid) {
+				$lsid++;
+				$sids[$gid][$lsid] = $action;
+			}
+		}
+		// Test the SID token for a single GID:SID
+		elseif (preg_match('/^(\d+):(\d+)$/', $tok, $matches)) {
+			// It's a single GID:SID, so grab it
+			$sids[$matches[1]][$matches[2]] = $action;
+		}
+		// Test the SID token for the PCRE: keyword
+		elseif (preg_match('/(^pcre\:)(.+)/i', $tok, $matches)) {
+			$regex = '/' . preg_quote($matches[2], '/') . '/i';
+
+			// Now search through the $rule_map in the 'rule'
+			// element for any matches to the regex and get
+			// the GID:SID.
+			foreach ($rule_map as $k1 => $rulem) {
+				foreach ($rulem as $k2 => $v) {
+					if (preg_match($regex, $v['rule'])) {
+						$sids[$k1][$k2] = $action;
+					}
+				}
+			}
+		}
+		// Test the SID token for the MS reference keyword
+		elseif (preg_match('/^MS\d+-.+/i', $tok, $matches)) {
+			$regex = "/" . preg_quote($matches[0], '/') . "/i";
+
+			// Now search through the $rule_map in the 'rule'
+			// element for any matches to the regex and get
+			// the GID:SID.
+			foreach ($rule_map as $k1 => $rulem) {
+				foreach ($rulem as $k2 => $v) {
+					if (preg_match($regex, $v['rule'])) {
+						$sids[$k1][$k2] = $action;
+					}
+				}
+			}
+		}
+		// Test the SID token for other keywords delimited with a colon
+		elseif (preg_match('/^[a-xA-X]+\:.+/', $tok, $matches)) {
+			$regex = "/" . str_replace(':', ",", preg_quote($matches[0], '/')) . "/i";
+
+			// Now search through the $rule_map in the 'rule'
+			// element for any matches to the regex and get
+			// the GID:SID.
+			foreach ($rule_map as $k1 => $rulem) {
+				foreach ($rulem as $k2 => $v) {
+					if (preg_match($regex, $v['rule'])) {
+						$sids[$k1][$k2] = $action;
+					}
+				}
+			}
+		}
+		// Test the SID token for a rule category name.  Anything that
+		// failed to match above is considered a potential category name.
+		elseif (preg_match('/[a-xA-X]+(-|\w).*/', $tok, $matches)) {
+			$regex = "/" . preg_quote(trim($matches[0]), '/') . "/i";
+			// Now search through the $rule_map in the 'category'
+			// element for any matches to the regex and get
+			// the GID:SID.
+			foreach ($rule_map as $k1 => $rulem) {
+				foreach ($rulem as $k2 => $v) {
+					if (preg_match($regex, $v['category'] . ".rules")) {
+						$sids[$k1][$k2] = $action;
+					}
+				}
+			}
+		}
+		else {
+			if ($log_results == TRUE && !empty($log_file))
+				error_log(gettext("WARNING: unrecognized token '{$tok}' encountered while processing an automatic SID MGMT file.\n"), 3, $log_file);
+		}
+	}
+
+	// Change state of all the matching GID:SID pairs we found
+	// above in the $rule_map array passed to us.
+	$modcount = $changecount = 0;
+	$counter = count($sids, COUNT_RECURSIVE) - count($sids);
+
+	if ($log_results == TRUE && !empty($log_file))
+		error_log(gettext("    Parsed {$counter} potential SIDs to match from the provided list of tokens.\n"), 3, $log_file);
+
+	foreach (array_keys($sids) as $k1) {
+		foreach (array_keys($sids[$k1]) as $k2) {
+			if (isset($rule_map[$k1][$k2])) {
+				if ($action == 'enable' && $rule_map[$k1][$k2]['disabled'] == 1) {
+					$rule_map[$k1][$k2]['rule'] = ltrim($rule_map[$k1][$k2]['rule'], " \t#");
+					$rule_map[$k1][$k2]['disabled'] = 0;
+					$rule_map[$k1][$k2]['managed'] = 1;
+					$changecount++;
+					$modcount++;
+				}
+				elseif ($action == 'disable' && $rule_map[$k1][$k2]['disabled'] == 0) {
+					$rule_map[$k1][$k2]['rule'] = "# " . $rule_map[$k1][$k2]['rule'];
+					$rule_map[$k1][$k2]['disabled'] = 1;
+					$rule_map[$k1][$k2]['managed'] = 1;
+					$changecount++;
+					$modcount++;
+				}
+			}
+		}
+	}
+
+	if ($log_results == TRUE && !empty($log_file)) {
+		error_log(gettext("    Found {$modcount} matching SIDs in the active rules.\n"), 3, $log_file);
+		error_log(gettext("    Changed state for {$changecount} SIDs to '{$action}d'.\n"), 3, $log_file);
+	}
+
+	// Return the array of matching SIDs
+	return $sids;
+}
+
+function suricata_modify_sid_content(&$rule_map, $sid_mods, $log_results = FALSE, $log_file = NULL) {
+
+	/************************************************/
+	/* This function walks the provided array of    */
+	/* SID modification tokens and locates the      */
+	/* target SID or SIDs in the $rule_map array.   */
+	/* It then modifies the content of the target   */
+	/* SID or SIDs. Modifications are only valid    */
+	/* for normal GID=1 text rules.                 */
+	/*                                              */
+	/*     $rule_map ==> reference to array of      */
+	/*                   current rules              */
+	/*     $sid_mods ==> array of SID modification  */
+	/*                   tokens                     */
+	/*  $log_results ==> [optional] 'yes' to log    */
+	/*                   results to $log_file       */
+	/*     $log_file ==> full path and filename     */
+	/*                   of log file to write to    */
+	/*                                              */
+	/*     On Return ==> $rule_map array modified   */
+	/*                   by changing content for    */
+	/*                   matching SIDs.             */
+	/*                                              */
+	/*                   Returns a two-dimension    */
+	/*                   array of matching          */
+	/*                   GID:SID pairs.             */
+	/************************************************/
+
+	$sids = array();
+	$tokencounter = $modcount = $modifiedcount = 0;
+
+	// If no rules in $rule_map or mods in $sid_mods,
+	// then nothing to do.
+	if (empty($rule_map) || empty($sid_mods))
+		return $sids;
+
+	// Walk the SID mod tokens and decode each one
+	foreach ($sid_mods as $tok) {
+		$matches = array();
+		if (preg_match('/([\d+|,|\*]*)\s+"(.+)"\s+"(.*)"/', $tok, $matches)) {
+			$tokencounter++;
+			$sidlist = explode(",", $matches[1]);
+			$from = '/' . preg_quote($matches[2], '/') . '/';
+			$to = $matches[3];
+			$count = 0;
+
+			// Now walk the provided rule map and make the modifications
+			if ($matches[1] == "*") {
+				// If wildcard '*' provided for SID, then check them all
+				foreach ($rule_map[1] as $rulem) {
+					foreach ($rulem as $k2 => $v) {
+						$modcount++;
+						$rule_map[1][$k2]['rule'] = preg_replace($from, $to, $v['rule'], -1, $count);
+						if ($count > 0) {
+							$rule_map[1][$k2]['managed'] = 1;
+							$sids[1][$k2] = 'modify';
+							$modifiedcount++;
+						}
+					}
+				}
+			}
+			else {
+				// Otherwise just check the provided SIDs
+				foreach ($sidlist as $sid) {
+					if (isset($rule_map[1][$sid])) {
+						$modcount++;
+						$rule_map[1][$sid]['rule'] = preg_replace($from, $to, $rule_map[1][$sid]['rule'], -1, $count);
+						if ($count > 0) {
+							$rule_map[1][$sid]['managed'] = 1;
+							$sids[1][$sid] = 'modify';
+							$modifiedcount++;
+						}
+					}
+				}
+			}
+		}
+		else {
+			if ($log_results == TRUE && !empty($log_file))
+				error_log(gettext("WARNING: unrecognized token '{$tok}' encountered while processing an automatic SID MGMT file.\n"), 3, $log_file);
+		}
+	}
+
+	if ($log_results == TRUE && !empty($log_file)) {
+		error_log(gettext("    Parsed {$tokencounter} potential SIDs to match from the provided list of tokens.\n"), 3, $log_file);
+		error_log(gettext("    Found {$modcount} matching SIDs in the active rules.\n"), 3, $log_file);
+		error_log(gettext("    Modified rule text for {$modifiedcount} SIDs.\n"), 3, $log_file);
+	}
+
+	// Return the array of matching SIDs
+	return $sids;
+}
+
+function suricata_process_enablesid(&$rule_map, $suricatacfg, $log_results = FALSE, $log_file = NULL) {
+
+	/**********************************************/
+	/* This function loads and processes the file */
+	/* specified by 'enable_sid_file' for the     */
+	/* interface.  The file is assumed to be a    */
+	/* valid enablesid.conf file containing       */
+	/* instructions for enabling matching rule    */
+	/* SIDs.                                      */
+	/*                                            */
+	/*     $rule_map ==> reference to array of    */
+	/*                   current rules            */
+	/*  $suricatacfg ==> interface config params  */
+	/*  $log_results ==> [optional] 'yes' to log  */
+	/*                   results to $log_file     */
+	/*     $log_file ==> full path and filename   */
+	/*                   of log file to write to  */
+	/*                                            */
+	/*     On Return ==> suitably modified        */
+	/*                   $rule_map array          */
+	/**********************************************/
+
+	$suricata_sidmods_dir = SID_MODS_PATH;
+	$suricatalogdir = SURICATALOGDIR;
+	$sid_mods = array();
+
+	// If no rules in $rule_map, then nothing to do
+	if (empty($rule_map))
+		return;
+
+	// Attempt to open the 'enable_sid_file' for the interface
+	if (!file_exists("{$suricata_sidmods_dir}{$suricatacfg['enable_sid_file']}")) {
+		log_error(gettext("[Suricata] Error - unable to open 'enable_sid_file' \"{$suricatacfg['enable_sid_file']}\" specified for " . convert_friendly_interface_to_friendly_descr($suricatacfg['interface'])));
+		return;
+	}
+	else
+		$sid_mods = suricata_parse_sidconf_file("{$suricata_sidmods_dir}{$suricatacfg['enable_sid_file']}");
+
+	if (!empty($sid_mods))
+		suricata_modify_sid_state($rule_map, $sid_mods, "enable", $log_results, $log_file);
+	elseif ($log_results == TRUE && !empty($log_file)) {
+		error_log(gettext("WARNING: no valid SID match tokens found in file \"{$suricatacfg['enable_sid_file']}\".\n"), 3, $log_file);
+	}
+
+	unset($sid_mods);
+}
+
+function suricata_process_disablesid(&$rule_map, $suricatacfg, $log_results = FALSE, $log_file = NULL) {
+
+	/**********************************************/
+	/* This function loads and processes the file */
+	/* specified by 'disable_sid_file' for the    */
+	/* interface.  The file is assumed to be a    */
+	/* valid disablesid.conf file containing      */
+	/* instructions for disabling matching rule   */
+	/* SIDs.                                      */
+	/*                                            */
+	/*     $rule_map ==> reference to array of    */
+	/*                   current rules            */
+	/*  $suricatacfg ==> interface config params  */
+	/*  $log_results ==> [optional] 'yes' to log  */
+	/*                   results to $log_file     */
+	/*     $log_file ==> full path and filename   */
+	/*                   of log file to write to  */
+	/*                                            */
+	/*     On Return ==> suitably modified        */
+	/*                   $rule_map array          */
+	/**********************************************/
+
+	$suricata_sidmods_dir = SID_MODS_PATH;
+	$suricatalogdir = SURICATALOGDIR;
+	$sid_mods = array();
+
+	// If no rules in $rule_map, then nothing to do
+	if (empty($rule_map))
+		return;
+
+	// Attempt to open the 'disable_sid_file' for the interface
+	if (!file_exists("{$suricata_sidmods_dir}{$suricatacfg['disable_sid_file']}")) {
+		log_error(gettext("[Suricata] Error - unable to open 'disable_sid_file' \"{$suricatacfg['disable_sid_file']}\" specified for " . convert_friendly_interface_to_friendly_descr($suricatacfg['interface'])));
+		return;
+	}
+	else
+		$sid_mods = suricata_parse_sidconf_file("{$suricata_sidmods_dir}{$suricatacfg['disable_sid_file']}");
+
+	if (!empty($sid_mods))
+		suricata_modify_sid_state($rule_map, $sid_mods, "disable", $log_results, $log_file);
+	elseif ($log_results == TRUE && !empty($log_file)) {
+		error_log(gettext("WARNING: no valid SID match tokens found in file \"{$suricatacfg['disable_sid_file']}\".\n"), 3, $log_file);
+	}
+
+	unset($sid_mods);
+}
+
+function suricata_process_modifysid(&$rule_map, $suricatacfg, $log_results = FALSE, $log_file = NULL) {
+
+	/**********************************************/
+	/* This function loads and processes the file */
+	/* specified by 'modify_sid_file' for the     */
+	/* interface.  The file is assumed to be a    */
+	/* valid modifysid.conf file containing       */
+	/* instructions for modifying matching rule   */
+	/* SIDs.                                      */
+	/*                                            */
+	/*     $rule_map ==> reference to array of    */
+	/*                   current rules            */
+	/*  $suricatacfg ==> interface config params  */
+	/*  $log_results ==> [optional] 'yes' to log  */
+	/*                   results to $log_file     */
+	/*     $log_file ==> full path and filename   */
+	/*                   of log file to write to  */
+	/*                                            */
+	/*     On Return ==> suitably modified        */
+	/*                   $rule_map array          */
+	/**********************************************/
+
+	$suricata_sidmods_dir = SID_MODS_PATH;
+	$suricatalogdir = SURICATALOGDIR;
+	$sid_mods = array();
+
+	// If no rules in $rule_map, then nothing to do
+	if (empty($rule_map))
+		return;
+
+	// Attempt to open the 'modify_sid_file' for the interface
+	if (!file_exists("{$suricata_sidmods_dir}{$suricatacfg['modify_sid_file']}")) {
+		log_error(gettext("[Suricata] Error - unable to open 'modify_sid_file' \"{$suricatacfg['modify_sid_file']}\" specified for " . convert_friendly_interface_to_friendly_descr($suricatacfg['interface'])));
+		return;
+	}
+	else
+		$sid_mods = suricata_parse_sidconf_file("{$suricata_sidmods_dir}{$suricatacfg['modify_sid_file']}");
+
+	if (!empty($sid_mods))
+		suricata_modify_sid_content($rule_map, $sid_mods, $log_results, $log_file);
+	elseif ($log_results == TRUE && !empty($log_file)) {
+		error_log(gettext("WARNING: no valid SID match tokens found in file \"{$suricatacfg['modify_sid_file']}\".\n"), 3, $log_file);
+	}
+
+	unset($sid_mods);
+}
+
+function suricata_auto_sid_mgmt(&$rule_map, $suricatacfg, $log_results = FALSE) {
+
+	/**************************************************/
+	/* This function modifies the rules in the        */
+	/* passed rule_map array based on values in the   */
+	/* files 'enable_sid_file', 'disable_sid_file'    */
+	/* and 'modify_sid_file' for the interface.       */
+	/*                                                */
+	/* If auto-mgmt of SIDs is enabled via the        */
+	/* settings on the UPDATE RULES tab, then the     */
+	/* rules are processed against these settings.    */
+	/*                                                */
+	/*     $rule_map ==> array of current rules       */
+	/*  $suricatacfg ==> interface config settings    */
+	/*  $log_results ==> [optional] log results to    */
+	/*                   'sid_changes.log' in the     */
+	/*                   interface directory in       */
+	/*                   /var/log/suricata when TRUE  */
+	/*                                                */
+	/*       Returns ==> TRUE if rules were changed;  */
+	/*                   otherwise FALSE              */
+	/**************************************************/
+
+	global $config;
+	$result = FALSE;
+
+	// Configure the interface's logging subdirectory if log results is enabled
+	if ($log_results == TRUE)
+		$log_file = SURICATALOGDIR . $suricatalogdir . "suricata_" . get_real_interface($suricatacfg['interface']) . "{$suricatacfg['uuid']}/sid_changes.log";
+	else
+		$log_file = NULL;
+
+	// Check if auto-mgmt of SIDs is enabled and files are specified
+	// for the interface.
+	if ($config['installedpackages']['suricata']['config'][0]['auto_manage_sids'] == 'on' &&
+	    (!empty($suricatacfg['disable_sid_file']) || !empty($suricatacfg['enable_sid_file']) || 
+	    !empty($suricatacfg['modify_sid_file']))) {
+		if ($log_results == TRUE) {
+			error_log(gettext("********************************************************\n"), 3, $log_file);
+			error_log(gettext("Starting auto SID management for " . convert_friendly_interface_to_friendly_descr($suricatacfg['interface']) ."\n"), 3, $log_file);
+			error_log(gettext("Start Time: " . date("Y-m-d H:i:s") . "\n"), 3, $log_file);
+		}
+
+		switch ($suricatacfg['sid_state_order']) {
+			case "disable_enable":
+				if (!empty($suricatacfg['disable_sid_file'])) {
+					if ($log_results == TRUE)
+						error_log(gettext("Processing disable_sid file: {$suricatacfg['disable_sid_file']}\n"), 3, $log_file);
+					suricata_process_disablesid($rule_map, $suricatacfg, $log_results, $log_file);
+				}
+				if (!empty($suricatacfg['enable_sid_file'])) {
+					if ($log_results == TRUE)
+						error_log(gettext("Processing enable_sid file: {$suricatacfg['enable_sid_file']}\n"), 3, $log_file);
+					suricata_process_enablesid($rule_map, $suricatacfg, $log_results, $log_file);
+				}
+				if (!empty($suricatacfg['modify_sid_file'])) {
+					if ($log_results == TRUE)
+						error_log(gettext("Processing modify_sid file: {$suricatacfg['modify_sid_file']}\n"), 3, $log_file);
+					suricata_process_modifysid($rule_map, $suricatacfg, $log_results, $log_file);
+				}
+				$result = TRUE;
+				break;
+
+			case "enable_disable":
+				if (!empty($suricatacfg['enable_sid_file'])) {
+					if ($log_results == TRUE)
+						error_log(gettext("Processing enable_sid file: {$suricatacfg['enable_sid_file']}\n"), 3, $log_file);
+					suricata_process_enablesid($rule_map, $suricatacfg, $log_results, $log_file);
+				}
+				if (!empty($suricatacfg['disable_sid_file'])) {
+					if ($log_results == TRUE)
+						error_log(gettext("Processing disable_sid file: {$suricatacfg['disable_sid_file']}\n"), 3, $log_file);
+					suricata_process_disablesid($rule_map, $suricatacfg, $log_results, $log_file);
+				}
+				if (!empty($suricatacfg['modify_sid_file'])) {
+					if ($log_results == TRUE)
+						error_log(gettext("Processing modify_sid file: {$suricatacfg['modify_sid_file']}\n"), 3, $log_file);
+					suricata_process_modifysid($rule_map, $suricatacfg, $log_results, $log_file);
+				}
+				$result = TRUE;
+				break;
+
+			default:
+				log_error(gettext("[Suricata] Unrecognized 'sid_state_order' value.  Skipping auto SID mgmt step for " . convert_friendly_interface_to_friendly_descr($suricatacfg['interface'])));
+				if ($log_results == TRUE) {
+					error_log(gettext("ERROR: unrecognized 'sid_state_order' value.  Skipping auto SID mgmt step for ") . convert_friendly_interface_to_friendly_descr($suricatacfg['interface']). ".\n", 3, $log_file);
+				}
+				$result = FALSE;
+		}
+
+		if ($log_results == TRUE) {
+			error_log(gettext("End Time: " . date("Y-m-d H:i:s") . "\n"), 3, $log_file);
+			error_log(gettext("********************************************************\n\n"), 3, $log_file);
+		}
+	}
+	return $result;
+}
+
 function suricata_load_sid_mods($sids) {
 
 	/*****************************************/
@@ -1577,15 +2484,15 @@ function suricata_load_sid_mods($sids) {
 
 function suricata_modify_sids(&$rule_map, $suricatacfg) {
 
-	/*****************************************/
-	/* This function modifies the rules in   */
-	/* the passed rules_map array based on   */
-	/* values in the enablesid/disablesid    */
-	/* configuration parameters.             */
-	/*                                       */
-	/*  $rule_map = array of current rules   */
-	/*  $suricatacfg = config settings       */
-	/*****************************************/
+	/***********************************************/
+	/* This function modifies the rules in the     */
+	/* passed rules_map array based on values in   */
+	/* the enablesid/disablesid configuration      */
+	/* parameters for the interface.               */
+	/*                                             */
+	/*  $rule_map = array of current rules         */
+	/*  $suricatacfg = interface config settings   */
+	/***********************************************/
 
 	if (!isset($suricatacfg['rule_sid_on']) && 
 	    !isset($suricatacfg['rule_sid_off']))
@@ -1639,11 +2546,15 @@ function suricata_prepare_rule_files($suricatacfg, $suricatacfgdir) {
 	/*                  to be written.                         */
 	/***********************************************************/
 
-	global $rebuild_rules;
+	global $config, $rebuild_rules;
 
 	$suricatadir = SURICATADIR;
 	$flowbit_rules_file = FLOWBITS_FILENAME;
 	$suricata_enforcing_rules_file = ENFORCING_RULES_FILENAME;
+	$enabled_rules = array();
+	$enabled_files = array();
+	$all_rules = array();
+	$cat_mods = array();
 	$no_rules_defined = true;
 
 	// If there is no reason to rebuild the rules, exit to save time.
@@ -1653,11 +2564,12 @@ function suricata_prepare_rule_files($suricatacfg, $suricatacfgdir) {
 	// Log a message for rules rebuild in progress
 	log_error(gettext("[Suricata] Updating rules configuration for: " . convert_friendly_interface_to_friendly_descr($suricatacfg['interface']) . " ..."));
 
+	// Get any automatic rule category enable/disable modifications
+	// if auto-SID Mgmt is enabled and conf files exist for the interface.
+	$cat_mods = suricata_sid_mgmt_auto_categories($suricatacfg, TRUE);
+
 	// Only rebuild rules if some are selected or an IPS Policy is enabled
-	if (!empty($suricatacfg['rulesets']) || $suricatacfg['ips_policy_enable'] == 'on') {
-		$enabled_rules = array();
-		$enabled_files = array();
-		$all_rules = array();
+	if (!empty($suricatacfg['rulesets']) || $suricatacfg['ips_policy_enable'] == 'on' || !empty($cat_mods)) {
 		$no_rules_defined = false;
 
 		// Load up all the rules into a Rules Map array.
@@ -1665,12 +2577,37 @@ function suricata_prepare_rule_files($suricatacfg, $suricatacfgdir) {
 
 		// Create an array with the filenames of the enabled
 		// rule category files if we have any.
-		if (!empty($suricatacfg['rulesets'])) {
-			foreach (explode("||", $suricatacfg['rulesets']) as $file){
-					$category = basename($file, ".rules");
-					if (!is_array($enabled_files[$category]))
-						$enabled_files[$category] = array();
-					$enabled_files[$category] = $file;
+		if (!empty($suricatacfg['rulesets']) || !empty($cat_mods)) {
+			// First get all the user-enabled category files
+			if (!empty($suricatacfg['rulesets'])) {
+				foreach (explode("||", $suricatacfg['rulesets']) as $file){
+						$category = basename($file, ".rules");
+						if (!is_array($enabled_files[$category]))
+							$enabled_files[$category] = array();
+						$enabled_files[$category] = $file;
+				}
+			}
+
+			// Now adjust the list using any required changes as
+			// determined by auto-SID Mgmt policy files.
+			if (!empty($cat_mods)) {
+				foreach ($cat_mods as $k => $action) {
+					$key = basename($k, ".rules");
+					switch ($action) {
+						case 'enabled':
+							if (!isset($enabled_files[$key]))
+								$enabled_files[$key] = $k;
+							break;
+
+						case 'disabled':
+							if (isset($enabled_files[$key]))
+								unset($enabled_files[$key]);
+							break;
+
+						default:
+							break;
+					}
+				}
 			}
 
 			/****************************************************/
@@ -1694,7 +2631,7 @@ function suricata_prepare_rule_files($suricatacfg, $suricatacfgdir) {
 			}
 
 			// Release memory we no longer need.
-			unset($enabled_files, $rulem, $v);
+			unset($enabled_files, $cat_mods, $rulem, $v);
 		}
 
 		// Check if a pre-defined Snort VRT policy is selected. If so,
@@ -1717,6 +2654,8 @@ function suricata_prepare_rule_files($suricatacfg, $suricatacfgdir) {
 		}
 
 		// Process any enablesid or disablesid modifications for the selected rules.
+		// Do the auto-SID managment first, if enabled, then do any manual SID state changes.
+		suricata_auto_sid_mgmt($enabled_rules, $suricatacfg, TRUE);
 		suricata_modify_sids($enabled_rules, $suricatacfg);
 
 		// Write the enforcing rules file to the Suricata interface's "rules" directory.
@@ -1735,7 +2674,45 @@ function suricata_prepare_rule_files($suricatacfg, $suricatacfgdir) {
 		} else
 			// Just put an empty file to always have the file present
 			suricata_write_flowbit_rules_file(array(), "{$suricatacfgdir}/rules/{$flowbit_rules_file}");
-	} else {
+		unset($all_rules);
+	}
+	// If no rule categories were enabled, then use auto-SID management if enabled, since it may enable some rules
+	elseif ($config['installedpackages']['suricata']['config'][0]['auto_manage_sids'] == 'on' &&
+		(!empty($suricatacfg['disable_sid_file']) || !empty($suricatacfg['enable_sid_file']) || 
+		!empty($suricatacfg['modify_sid_file']))) {
+
+		suricata_auto_sid_mgmt($enabled_rules, $suricatacfg, TRUE);
+		if (!empty($enabled_rules)) {
+			// Auto-SID management generated some rules, so use them
+			$no_rules_defined = false;
+			suricata_modify_sids($enabled_rules, $suricatacfg);
+
+			// Write the enforcing rules file to the Suricata interface's "rules" directory.
+			suricata_write_enforcing_rules_file($enabled_rules, "{$suricatacfgdir}/rules/{$suricata_enforcing_rules_file}");
+
+			// If auto-flowbit resolution is enabled, generate the dependent flowbits rules file.
+			if ($suricatacfg['autoflowbitrules'] == 'on') {
+				log_error('[Suricata] Enabling any flowbit-required rules for: ' . convert_friendly_interface_to_friendly_descr($suricatacfg['interface']) . '...');
+
+				// Load up all rules into a Rules Map array for flowbits assessment
+				$all_rules = suricata_load_rules_map("{$suricatadir}rules/");
+				$fbits = suricata_resolve_flowbits($all_rules, $enabled_rules);
+
+				// Check for and disable any flowbit-required rules the
+				// user has manually forced to a disabled state.
+				suricata_modify_sids($fbits, $suricatacfg);
+				suricata_write_flowbit_rules_file($fbits, "{$suricatacfgdir}/rules/{$flowbit_rules_file}");
+				unset($all_rules, $fbits);
+			} else
+				// Just put an empty file to always have the file present
+			suricata_write_flowbit_rules_file(array(), "{$suricatacfgdir}/rules/{$flowbit_rules_file}");
+		}
+		else {
+			suricata_write_enforcing_rules_file(array(), "{$suricatacfgdir}/rules/{$suricata_enforcing_rules_file}");
+			suricata_write_flowbit_rules_file(array(), "{$suricatacfgdir}/rules/{$flowbit_rules_file}");
+		}
+	}
+	 else {
 		suricata_write_enforcing_rules_file(array(), "{$suricatacfgdir}/rules/{$suricata_enforcing_rules_file}");
 		suricata_write_flowbit_rules_file(array(), "{$suricatacfgdir}/rules/{$flowbit_rules_file}");
 	}
@@ -1753,7 +2730,7 @@ function suricata_prepare_rule_files($suricatacfg, $suricatacfgdir) {
 
 	// Build a new sid-msg.map file from the enabled
 	// rules and copy it to the interface directory.
-	log_error(gettext("[Suricata] Building new sig-msg.map file for " . convert_friendly_interface_to_friendly_descr($suricatacfg['interface']) . "..."));
+	log_error(gettext("[Suricata] Building new sid-msg.map file for " . convert_friendly_interface_to_friendly_descr($suricatacfg['interface']) . "..."));
 	suricata_build_sid_msg_map("{$suricatacfgdir}/rules/", "{$suricatacfgdir}/sid-msg.map");
 }
 
@@ -1994,8 +2971,8 @@ esac
 EOD;
 
 	// Write out the suricata.sh script file
-	@file_put_contents("{$rcdir}/suricata.sh", $suricata_sh_text);
-	@chmod("{$rcdir}/suricata.sh", 0755);
+	@file_put_contents("{$rcdir}suricata.sh", $suricata_sh_text);
+	@chmod("{$rcdir}suricata.sh", 0755);
 	unset($suricata_sh_text);
 }
 
@@ -2056,7 +3033,7 @@ function suricata_generate_barnyard2_conf($suricatacfg, $if_real) {
 		$suricatabarnyardlog_output_plugins .= "# syslog_full: log to a syslog receiver\n";
 		$suricatabarnyardlog_output_plugins .= "output alert_syslog_full: sensor_name {$suricatabarnyardlog_hostname_info_chk}, ";
 		if ($suricatacfg['barnyard_syslog_local'] == 'on')
-			$suricatabarnyardlog_output_plugins .= "local, log_facility LOG_AUTH, log_priority LOG_INFO\n\n";
+			$suricatabarnyardlog_output_plugins .= "local, log_facility {$suricatacfg['barnyard_syslog_facility']}, log_priority {$suricatacfg['barnyard_syslog_priority']}\n\n";
 		else {
 			$suricatabarnyardlog_output_plugins .= "server {$suricatacfg['barnyard_syslog_rhost']}, protocol {$suricatacfg['barnyard_syslog_proto']}, ";
 			$suricatabarnyardlog_output_plugins .= "port {$suricatacfg['barnyard_syslog_dport']}, operation_mode {$suricatacfg['barnyard_syslog_opmode']}, ";
@@ -2136,25 +3113,289 @@ function suricata_generate_yaml($suricatacfg) {
 	$suricata_uuid = $suricatacfg['uuid'];
 	$suricatacfgdir = "{$suricatadir}suricata_{$suricata_uuid}_{$if_real}";
 
-	conf_mount_rw();
-
 	if (!is_array($config['installedpackages']['suricata']['rule']))
 		return;
 
 	// Pull in the PHP code that generates the suricata.yaml file
 	// variables that will be substitued further down below.
-	include("/usr/local/www/suricata/suricata_generate_yaml.php");
+	include("/usr/local/pkg/suricata/suricata_generate_yaml.php");
 
 	// Pull in the boilerplate template for the suricata.yaml
 	// configuration file.  The contents of the template along
-	// with substituted variables is stored in $suricata_conf_text
+	// with substituted variables are stored in $suricata_conf_text
 	// (which is defined in the included file).
 	include("/usr/local/pkg/suricata/suricata_yaml_template.inc");
 
 	// Now write out the conf file using $suricata_conf_text contents
 	@file_put_contents("{$suricatacfgdir}/suricata.yaml", $suricata_conf_text); 
 	unset($suricata_conf_text);
-	conf_mount_ro();
+}
+
+/* Uses XMLRPC to synchronize the changes to a remote node */
+function suricata_sync_on_changes() {
+	global $config, $g;
+
+	/* Do not attempt a package sync while booting up or installing package */
+	if ($g['booting'] || $g['suricata_postinstall'] == TRUE) {
+		log_error("[suricata] No xmlrpc sync to CARP targets when booting up or during package reinstallation.");
+		return;
+	}
+
+	if (is_array($config['installedpackages']['suricatasync']['config'])){
+		$suricata_sync=$config['installedpackages']['suricatasync']['config'][0];
+		$synconchanges = $suricata_sync['varsynconchanges'];
+		$synctimeout = $suricata_sync['varsynctimeout'];
+		$syncdownloadrules = $suricata_sync['vardownloadrules'];
+		switch ($synconchanges){
+			case "manual":
+				if (is_array($suricata_sync[row])){
+					$rs=$suricata_sync[row];
+				}
+				else{
+					log_error("[suricata] xmlrpc CARP sync is enabled but there are no hosts configured as replication targets.");
+					return;
+				}
+				break;
+			case "auto":
+					if (is_array($config['installedpackages']['carpsettings']) && is_array($config['installedpackages']['carpsettings']['config'])){
+						$system_carp=$config['installedpackages']['carpsettings']['config'][0];
+						$rs[0]['varsyncipaddress']=$system_carp['synchronizetoip'];
+						$rs[0]['varsyncusername']=$system_carp['username'];
+						$rs[0]['varsyncpassword']=$system_carp['password'];
+						$rs[0]['varsyncsuricatastart']="no";
+						if ($system_carp['synchronizetoip'] ==""){
+							log_error("[suricata] xmlrpc CARP sync is enabled but there are no system backup hosts configured as replication targets.");
+							return;
+						}
+					}
+					else{
+						log_error("[suricata] xmlrpc CARP sync is enabled but there are no system backup hosts configured as replication targets.");
+						return;
+					}
+				break;			
+			default:
+				return;
+			break;
+		}
+		if (is_array($rs)){
+			log_error("[suricata] Suricata pkg xmlrpc CARP sync is starting.");
+			foreach($rs as $sh){
+				if ($sh['varsyncsuricatastart'])
+					$syncstartsuricata = $sh['varsyncsuricatastart'];
+				else
+					$syncstartsuricata = "OFF";
+				$sync_to_ip = $sh['varsyncipaddress'];
+				$port = $sh['varsyncport'];
+				$password = $sh['varsyncpassword'];
+				if($sh['varsyncusername'])
+					$username = $sh['varsyncusername'];
+				else
+					$username = 'admin';
+				if($password && $sync_to_ip)
+					suricata_do_xmlrpc_sync($syncdownloadrules, $sync_to_ip, $port, $username, $password, $synctimeout, $syncstartsuricata);
+			}
+			log_error("[suricata] Suricata pkg xmlrpc CARP sync completed.");
+		}
+ 	}
+}
+
+/* Do the actual XMLRPC sync */
+function suricata_do_xmlrpc_sync($syncdownloadrules, $sync_to_ip, $port, $username, $password, $synctimeout = 150, $syncstartsuricata) {
+	global $config, $g;
+
+	/* Do not attempt a package sync while booting up or installing package */
+	if ($g['booting'] || isset($g['suricata_postinstall'])) {
+		log_error("[suricata] No xmlrpc sync to CARP targets when booting up or during package reinstallation.");
+		return;
+	}
+
+	if($username == "" || $password == "" || $sync_to_ip == "") {
+		log_error("[suricata] A required XMLRPC CARP sync parameter (user, host IP or password) is empty ... aborting pkg sync");
+		return;
+	}
+
+	/* Test key variables and set defaults if empty */
+	if(!$synctimeout)
+		$synctimeout=150;
+
+	$xmlrpc_sync_neighbor = $sync_to_ip;
+	if($config['system']['webgui']['protocol'] != "") {
+		$synchronizetoip = $config['system']['webgui']['protocol'];
+		$synchronizetoip .= "://";
+	}
+	$port = $config['system']['webgui']['port'];
+	/* if port is empty lets rely on the protocol selection */
+	if($port == "") {
+		if($config['system']['webgui']['protocol'] == "http") 
+			$port = "80";
+		else 
+			$port = "443";
+	}
+	$synchronizetoip .= $sync_to_ip;
+	$url = $synchronizetoip;
+
+	/*************************************************/
+	/* Send over any auto-SID management files       */
+	/*************************************************/
+	$sid_files = glob(SID_MODS_PATH . '*');
+	foreach ($sid_files as $file) {
+		$content = base64_encode(file_get_contents($file));
+		$payload = "@file_put_contents('{$file}', base64_decode('{$content}'));";
+
+		/* assemble xmlrpc payload */
+		$method = 'pfsense.exec_php';
+		$params = array( XML_RPC_encode($password), XML_RPC_encode($payload) );
+	
+		log_error("[suricata] Suricata XMLRPC CARP sync sending auto-SID conf files to {$url}:{$port}.");
+		$msg = new XML_RPC_Message($method, $params);
+		$cli = new XML_RPC_Client('/xmlrpc.php', $url, $port);
+		$cli->setCredentials($username, $password);
+		$resp = $cli->send($msg, $synctimeout);
+		$error = "";
+		if(!$resp) {
+			$error = "A communications error occurred while attempting Suricata XMLRPC CARP sync with {$url}:{$port}.  Failed to transfer file: " . basename($file);
+			log_error($error);
+			file_notice("sync_settings", $error, "Suricata Settings Sync", "");
+		} elseif($resp->faultCode()) {
+			$error = "An error code was received while attempting Suricata XMLRPC CARP sync with {$url}:{$port}. Failed to transfer file: " . basename($file) . " - Code " . $resp->faultCode() . ": " . $resp->faultString();
+			log_error($error);
+			file_notice("sync_settings", $error, "Suricata Settings Sync", "");
+		}
+	}
+
+	if (!empty($sid_files) && $error == "")
+		log_error("[suricata] Suricata pkg XMLRPC CARP sync auto-SID conf files success with {$url}:{$port} (pfsense.exec_php).");
+
+	/**************************************************/
+	/* Send over the <suricata> portion of config.xml */
+	/* $xml will hold the section to sync.            */
+	/**************************************************/
+	$xml = array();
+	$xml['suricata'] = $config['installedpackages']['suricata'];
+	/* assemble xmlrpc payload */
+	$params = array(
+		XML_RPC_encode($password),
+		XML_RPC_encode($xml)
+	);
+
+	log_error("[suricata] Beginning Suricata pkg configuration XMLRPC sync to {$url}:{$port}.");
+	$method = 'pfsense.merge_installedpackages_section_xmlrpc';
+	$msg = new XML_RPC_Message($method, $params);
+	$cli = new XML_RPC_Client('/xmlrpc.php', $url, $port);
+	$cli->setCredentials($username, $password);
+
+	/* send our XMLRPC message and timeout after defined sync timeout value*/
+	$resp = $cli->send($msg, $synctimeout);
+	if(!$resp) {
+		$error = "A communications error occurred while attempting Suricata XMLRPC CARP sync with {$url}:{$port}.";
+		log_error($error);
+		file_notice("sync_settings", $error, "Suricata Settings Sync", "");
+	} elseif($resp->faultCode()) {
+		$error = "An error code was received while attempting Suricata XMLRPC CARP sync with {$url}:{$port} - Code " . $resp->faultCode() . ": " . $resp->faultString();
+		log_error($error);
+		file_notice("sync_settings", $error, "Suricata Settings Sync", "");
+	} else {
+		log_error("[suricata] Suricata pkg configuration XMLRPC CARP sync successfully completed with {$url}:{$port}.");
+	}
+
+	$downloadrulescmd = "";
+	if ($syncdownloadrules == "yes") {
+		$downloadrulescmd = "log_error(gettext(\"[suricata] XMLRPC pkg CARP sync: Update of downloaded rule sets requested...\"));\n";
+		$downloadrulescmd .= "\tinclude_once(\"/usr/local/pkg/suricata/suricata_check_for_rule_updates.php\");\n";
+	}
+	$suricatastart = "";
+	if ($syncstartsuricata == "ON") {
+		$suricatastart = "log_error(gettext(\"[suricata] XMLRPC pkg CARP sync: Checking Suricata status...\"));\n";
+		$suricatastart .= "\tif (!is_process_running(\"suricata\")) {\n";
+		$suricatastart .= "\t\tlog_error(gettext(\"[suricata] XMLRPC pkg CARP sync: Suricata not running. Sending a start command...\"));\n";
+		$suricatastart .= "\t\t\$sh_script = RCFILEPREFIX . \"suricata.sh\";\n";
+		$suricatastart .= "\t\tmwexec_bg(\"{\$sh_script} start\");\n\t}\n";
+		$suricatastart .= "\telse {\n\t\tlog_error(gettext(\"[suricata] XMLRPC pkg CARP sync: Suricata is running...\"));\n\t}\n";
+	}
+
+	/*************************************************/
+	/* Build a series of commands as a PHP file for  */
+	/* the secondary host to execute to load the new */
+	/* settings.                                     */
+	/*************************************************/
+	$suricata_sync_cmd = <<<EOD
+	<?php
+	require_once("/usr/local/pkg/suricata/suricata.inc");
+	require_once("service-utils.inc");
+	global \$g, \$rebuild_rules, \$suricata_gui_include, \$pkg_interface;
+	\$orig_pkg_interface = \$pkg_interface;
+	\$g["suricata_postinstall"] = true;
+	\$g["suricata_sync_in_progress"] = true;
+	\$suricata_gui_include = false;
+	\$pkg_interface = "console";
+	{$downloadrulescmd}
+	unset(\$g["suricata_postinstall"]);
+	log_error(gettext("[suricata] XMLRPC pkg CARP sync: Generating suricata.yaml file using Master Host settings..."));
+	\$rebuild_rules = true;
+	sync_suricata_package_config();
+	\$rebuild_rules = false;
+	{$suricatastart}
+	log_error(gettext("[suricata] XMLRPC pkg CARP sync process on this host is complete..."));
+	\$pkg_interface = \$orig_pkg_interface;
+	unset(\$g["suricata_sync_in_progress"]);
+	return true;
+	?>
+
+EOD;
+
+	/*************************************************/
+	/* First, have target host write the commands    */ 
+	/* to a PHP file in the /tmp directory.          */
+	/*************************************************/
+	$execcmd = "file_put_contents('/tmp/suricata_sync_cmds.php', '{$suricata_sync_cmd}');";
+
+	/* assemble xmlrpc payload */
+	$method = 'pfsense.exec_php';
+	$params = array(
+		XML_RPC_encode($password),
+		XML_RPC_encode($execcmd)
+	);
+	
+	log_error("[suricata] Suricata XMLRPC CARP sync sending reload configuration cmd set as a file to {$url}:{$port}.");
+	$msg = new XML_RPC_Message($method, $params);
+	$cli = new XML_RPC_Client('/xmlrpc.php', $url, $port);
+	$cli->setCredentials($username, $password);
+	$resp = $cli->send($msg, $synctimeout);
+	if(!$resp) {
+		$error = "A communications error occurred while attempting Suricata XMLRPC CARP sync with {$url}:{$port} (pfsense.exec_php).";
+		log_error($error);
+		file_notice("sync_settings", $error, "Suricata Settings Sync", "");
+	} elseif($resp->faultCode()) {
+		$error = "An error code was received while attempting Suricata XMLRPC CARP sync with {$url}:{$port} - Code " . $resp->faultCode() . ": " . $resp->faultString();
+		log_error($error);
+		file_notice("sync_settings", $error, "Suricata Settings Sync", "");
+	} else {
+		log_error("[suricata] Suricata pkg XMLRPC CARP sync reload configuration success with {$url}:{$port} (pfsense.exec_php).");
+	}
+
+	/*************************************************/
+	/* Now assemble a command to execute the         */
+	/* previously sent PHP file in the background.   */
+	/*************************************************/
+	$execcmd = "exec(\"/usr/local/bin/php -f '/tmp/suricata_sync_cmds.php' > /dev/null 2>&1 &\");";
+	$params2 = array(
+		XML_RPC_encode($password),
+		XML_RPC_encode($execcmd)
+	);
+	log_error("[suricata] Suricata XMLRPC CARP sync sending {$url}:{$port} cmd to execute configuration reload.");
+	$msg2 = new XML_RPC_Message($method, $params2);
+	$resp = $cli->send($msg2, $synctimeout);
+	if(!$resp) {
+		$error = "A communications error occurred while attempting Suricata XMLRPC CARP sync with {$url}:{$port} (pfsense.exec_php).";
+		log_error($error);
+		file_notice("sync_settings", $error, "Suricata Settings Sync", "");
+	} elseif($resp->faultCode()) {
+		$error = "An error code was received while attempting Suricata XMLRPC CARP sync with {$url}:{$port} - Code " . $resp->faultCode() . ": " . $resp->faultString();
+		log_error($error);
+		file_notice("sync_settings", $error, "Suricata Settings Sync", "");
+	} else {
+		log_error("[suricata] Suricata pkg XMLRPC CARP sync reload configuration success with {$url}:{$port} (pfsense.exec_php).");
+	}
 }
 
 ?>
