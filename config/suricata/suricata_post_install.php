@@ -144,11 +144,11 @@ if ($config['installedpackages']['suricata']['config'][0]['forcekeepsettings'] =
 				$new_uuid = suricata_generate_id();
 				exec("mv -f {$suricatalogdir}suricata_{$if_real}" . $old_uuid . " {$suricatalogdir}suricata_{$if_real}" . $new_uuid);
 				$suricatacfg['uuid'] = $new_uuid;
-				write_config("Suricata pkg: updated UUID for interface " . convert_friendly_interface_to_friendly_descr($suricatacfg['interface']) . ".");
 				$uuids[$new_uuid] = $if_real;
 				log_error(gettext("[Suricata] updated UUID for interface " . convert_friendly_interface_to_friendly_descr($suricatacfg['interface']) . " from {$old_uuid} to {$new_uuid}."));
 			}
 		}
+		write_config("Suricata pkg: updated interface UUIDs to eliminated duplicates.");
 		unset($uuids, $rulesets);
 	}
 	/****************************************************************/
