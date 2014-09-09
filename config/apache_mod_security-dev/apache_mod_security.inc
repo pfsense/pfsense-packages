@@ -541,10 +541,14 @@ EOF;
 
 				#check ssl
 				if(isset($virtualhost["ssl_cert"]) && $virtualhost["ssl_cert"] !="none" && $virtualhost["proto"] == "https") {
-					$vh_config.= " SSLEngine on\n SSLProtocol all -SSLv2\n SSLProxyEngine on\n SSLProxyVerify none\n";
-					$vh_config.= " SSLCipherSuite ALL:!ADH:!EXPORT56:RC4+RSA:+HIGH:+MEDIUM:+LOW:+SSLv2:+EXP:+eNULL\n";
+					$vh_config.= " SSLEngine on\n";
+					$vh_config.= " SSLProtocol ". ($virtualhost['ssl_protocol'] ? $virtualhost['ssl_protocol'] : "all -SSLv2") ."\n";
+					$vh_config.= " SSLProxyEngine ". ($virtualhost['ssl_proxy_engine'] ? "on" : "off") ."\n";
+					$vh_config.= " SSLProxyVerify ". ($virtualhost['ssl_proxy_verify'] ? $virtualhost['ssl_proxy_verify'] : "none") ."\n";
+					$vh_config.= " SSLCipherSuite ". ($virtualhost['ssl_cipher_suite'] ? $virtualhost['ssl_cipher_suite'] : "ALL:!ADH:!EXPORT56:RC4+RSA:+HIGH:+MEDIUM:+LOW:+SSLv2:+EXP:+eNULL") ."\n";
+					$vh_config.= " SSLHonorCipherOrder ". ($virtualhost['ssl_honor_cipher_order'] ? "on" : "off") ."\n";
 					
-    				$svr_cert = lookup_cert($virtualhost["ssl_cert"]);
+					$svr_cert = lookup_cert($virtualhost["ssl_cert"]);
 					if ($svr_cert != false) {
 						if(base64_decode($svr_cert['crt'])) {
 							file_put_contents(APACHEDIR . "/etc/" . APACHEVERSION . "/{$virtualhost["ssl_cert"]}.crt",apache_textarea_decode($svr_cert['crt']),LOCK_EX);
@@ -565,7 +569,7 @@ EOF;
 							file_put_contents(APACHEDIR . "/etc/" . APACHEVERSION . "/{$virtualhost["reverse_int_ca"]}.crt",apache_textarea_decode($cli_ca['crt']),LOCK_EX);
 							$vh_config.= " SSLCACertificateFile ". APACHEDIR . "/etc/" . APACHEVERSION . "/{$virtualhost["reverse_int_ca"]}.crt\n";
 							}
-					}
+				}
 				#Custom Options
 				$vh_config.= apache_textarea_decode($virtualhost['custom'])."\n\n";
 
