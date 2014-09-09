@@ -106,6 +106,12 @@ if ($_POST['save']) {
 			$input_errors[] = gettext("You must provide a DB user login name when logging to a MySQL database.");
 	}
 
+	// Validate Sensor Name contains no spaces
+	if ($_POST['barnyard_enable'] == 'on') {
+		if (!empty($_POST['barnyard_sensor_name']) && strpos($_POST['barnyard_sensor_name'], " ") !== FALSE)
+			$input_errors[] = gettext("The value for 'Sensor Name' cannot contain spaces.");
+	}
+
 	// Validate inputs if syslog output enabled
 	if ($_POST['barnyard_syslog_enable'] == 'on' && $_POST['barnyard_enable'] == "on") {
 		if ($_POST['barnyard_log_vlan_events'] == 'on' || $_POST['barnyard_log_mpls_events'] == 'on')
