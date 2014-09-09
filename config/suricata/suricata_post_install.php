@@ -116,6 +116,45 @@ safe_mkdir(IPREP_PATH);
 if ($config['installedpackages']['suricata']['config'][0]['forcekeepsettings'] == 'on') {
 	log_error(gettext("[Suricata] Saved settings detected... rebuilding installation with saved settings..."));
 	update_status(gettext("Saved settings detected..."));
+
+	/****************************************************************/
+	/* Do test and fix for duplicate UUIDs if this install was      */
+	/* impacted by the DUP (clone) bug that generated a duplicate   */
+	/* UUID for the cloned interface.  Also fix any duplicate       */
+	/* entries in ['rulesets'] for "dns-events.rules".              */
+	/****************************************************************/
+	if (count($config['installedpackages']['suricata']['rule']) > 0) {
+		$uuids = array();
+		$suriconf = &$config['installedpackages']['suricata']['rule'];
+		foreach ($suriconf as &$suricatacfg) {
+			// Remove any duplicate ruleset names from earlier bug
+			$rulesets = explode("||", $suricatacfg['rulesets']);
+			$suricatacfg['rulesets'] = implode("||", array_keys(array_flip($rulesets)));
+
+			// Now check for and fix a duplicate UUID
+			$if_real = get_real_interface($suricatacfg['interface']);
+			if (!isset($uuids[$suricatacfg['uuid']])) {
+				$uuids[$suricatacfg['uuid']] = $if_real;
+				continue;
+			}
+			else {
+				// Found a duplicate UUID, so generate a
+				// new one for the affected interface.
+				$old_uuid = $suricatacfg['uuid'];
+				$new_uuid = suricata_generate_id();
+				exec("mv -f {$suricatalogdir}suricata_{$if_real}" . $old_uuid . " {$suricatalogdir}suricata_{$if_real}" . $new_uuid);
+				$suricatacfg['uuid'] = $new_uuid;
+				write_config("Suricata pkg: updated UUID for interface " . convert_friendly_interface_to_friendly_descr($suricatacfg['interface']) . ".");
+				$uuids[$new_uuid] = $if_real;
+				log_error(gettext("[Suricata] updated UUID for interface " . convert_friendly_interface_to_friendly_descr($suricatacfg['interface']) . " from {$old_uuid} to {$new_uuid}."));
+			}
+		}
+		unset($uuids, $rulesets);
+	}
+	/****************************************************************/
+	/* End of duplicate UUID and "dns-events.rules" bug fix.        */
+	/****************************************************************/
+
 	/* Do one-time settings migration for new version configuration */
 	update_output_window(gettext("Please wait... migrating settings to new configuration..."));
 	include('/usr/local/pkg/suricata/suricata_migrate_config.php');
