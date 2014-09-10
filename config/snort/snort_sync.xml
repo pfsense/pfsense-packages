@@ -83,6 +83,10 @@ POSSIBILITY OF SUCH DAMAGE.
 			<url>/snort/snort_ip_list_mgmt.php</url>
 		</tab>
 		<tab>
+			<text>SID Mgmt</text>
+			<url>/snort/snort_sid_mgmt.php</url>
+		</tab>
+		<tab>
 			<text>Sync</text>
 			<url>/pkg_edit.php?xml=snort/snort_sync.xml</url>
 			<active/>
