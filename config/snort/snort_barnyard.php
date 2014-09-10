@@ -167,7 +167,7 @@ if ($_POST['save']) {
 		if ($_POST['barnyard_syslog_priority']) $natent['barnyard_syslog_priority'] = $_POST['barnyard_syslog_priority']; else $natent['barnyard_syslog_priority'] = 'LOG_INFO';
 		if ($_POST['barnyard_bro_ids_rhost']) $natent['barnyard_bro_ids_rhost'] = $_POST['barnyard_bro_ids_rhost']; else unset($natent['barnyard_bro_ids_rhost']);
 		if ($_POST['barnyard_bro_ids_dport']) $natent['barnyard_bro_ids_dport'] = $_POST['barnyard_bro_ids_dport']; else $natent['barnyard_bro_ids_dport'] = '47760';
-		if ($_POST['barnconfigpassthru']) $natent['barnconfigpassthru'] = base64_encode($_POST['barnconfigpassthru']); else unset($natent['barnconfigpassthru']);
+		if ($_POST['barnconfigpassthru']) $natent['barnconfigpassthru'] = base64_encode(str_replace("\r\n", "\n", $_POST['barnconfigpassthru'])); else unset($natent['barnconfigpassthru']);
 
 		$a_nat[$id] = $natent;
 		write_config("Snort pkg: modified Barnyard2 settings.");

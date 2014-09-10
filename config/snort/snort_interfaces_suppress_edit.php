@@ -121,7 +121,7 @@ if ($_POST['save']) {
 		$s_list['descr']  =  mb_convert_encoding($_POST['descr'],"HTML-ENTITIES","auto");
 		if ($_POST['suppresspassthru']) {
 			$s_list['suppresspassthru'] = str_replace("&#8203;", "", $s_list['suppresspassthru']);
-			$s_list['suppresspassthru'] = base64_encode($_POST['suppresspassthru']);
+			$s_list['suppresspassthru'] = base64_encode(str_replace("\r\n", "\n", $_POST['suppresspassthru']));
 		}
 
 		if (isset($id) && $a_suppress[$id])

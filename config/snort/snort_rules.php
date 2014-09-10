@@ -389,7 +389,7 @@ elseif ($_POST['clear']) {
 elseif ($_POST['save']) {
 	$pconfig['customrules'] = $_POST['customrules'];
 	if ($_POST['customrules'])
-		$a_rule[$id]['customrules'] = base64_encode($_POST['customrules']);
+		$a_rule[$id]['customrules'] = base64_encode(str_replace("\r\n", "\n", $_POST['customrules']));
 	else
 		unset($a_rule[$id]['customrules']);
 	write_config("Snort pkg: save modified custom rules for {$a_rule[$id]['interface']}.");
