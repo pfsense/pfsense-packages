@@ -254,6 +254,11 @@
 		<item>https://packages.pfsense.org/packages/config/snort/snort_iprep_list_browser.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
+		<prefix>/usr/local/www/snort/</prefix>
+		<chmod>077</chmod>
+		<item>https://packages.pfsense.org/packages/config/snort/snort_interface_logs.php</item>
+	</additional_files_needed>
+	<additional_files_needed>
 		<prefix>/usr/local/pkg/snort/</prefix>
 		<chmod>077</chmod>
 		<item>https://packages.pfsense.org/packages/config/snort/snort_generate_conf.php</item>
