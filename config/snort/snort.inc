@@ -41,7 +41,7 @@ require_once("pkg-utils.inc");
 require_once("filter.inc");
 
 // Snort GUI needs some extra PHP memory space to manipulate large rules arrays
-ini_set("memory_limit", "192M");
+ini_set("memory_limit", "256M");
 
 // Explicitly declare this as global so it works through function call includes 
 global $rebuild_rules, $pfSense_snort_version;
@@ -82,6 +82,7 @@ define("GPL_FILE_PREFIX", "GPLv2_");
 define("ET_OPEN_FILE_PREFIX", "emerging-");
 define("ET_PRO_FILE_PREFIX", "etpro-");
 define("IPREP_PATH", "/var/db/snort/iprep/");
+define('SID_MODS_PATH', '/var/db/snort/sidmods/');
 
 /* Rebuild Rules Flag -- if "true", rebuild enforcing rules and flowbit-rules files */
 $rebuild_rules = false;
@@ -1157,11 +1158,11 @@ function snort_load_rules_map($rules_path) {
 	if (empty($rules_path))
 		return $map_ref;
 
-	/***************************************************************
+	/************************************************************************************
 	 * Read all the rules into the map array.
 	 * The structure of the map array is:
 	 *
-	 *  map[gid][sid]['rule']['category']['disabled']['action']['flowbits']
+	 *  map[gid][sid]['rule']['category']['action']['disabled']['managed']['flowbits']
 	 *
 	 *  where:
 	 *   gid      = Generator ID from rule, or 1 if general text 
@@ -1169,12 +1170,14 @@ function snort_load_rules_map($rules_path) {
 	 *   sid      = Signature ID from rule
          *   rule     = Complete rule text
 	 *   category = File name of file containing the rule
+	 *   action   = alert, drop, reject or pass
 	 *   disabled = 1 if rule is disabled (commented out), 0 if 
 	 *              rule is enabled
-	 *   action   = alert|log|pass|drop|reject|sdrop 
+	 *    managed = 1 if rule is auto-managed by SID MGMT process,
+	 *              0 if not auto-managed 
 	 *   flowbits = Array of applicable flowbits if rule contains 
 	 *              flowbits options
-	 ***************************************************************/
+	 ************************************************************************************/
 
 	/* First check if we were passed a directory, a single file   */
 	/* or an array of filenames to read. Set our $rule_files      */
@@ -1695,6 +1698,854 @@ function snort_write_enforcing_rules_file($rule_map, $rule_path) {
 		}
 		fclose($fp);
 	}
+}
+
+function snort_parse_sidconf_file($sidconf_file) {
+
+	/**********************************************/
+	/* This function loads and processes the file */
+	/* specified by '$sidconf_file'.  The file is */
+	/* assumed to contain valid instructions for  */
+	/* matching rule SIDs as supported by the     */
+	/* Oinkmaster and PulledPork utilities.       */
+	/*                                            */
+	/*  $sidconf_file ==> full path and name of   */
+	/*                    file to process         */
+	/*                                            */
+	/*        Returns ==> an array containing     */
+	/*                    SID modifier tokens     */
+	/**********************************************/
+
+	$buf = "";
+	$sid_mods = array();
+
+	$fd = fopen("{$sidconf_file}", "r");
+	if ($fd == FALSE) {
+		log_error("[Snort] Failed to open SID MGMT file '{$sidconf_file}' for processing.");
+		return $sid_mods;
+	}
+
+	// Read and parse the conf file line-by-line
+	while (($buf = fgets($fd)) !== FALSE) {
+		$line = array();
+
+		// Skip any lines that may be just spaces.
+		if (trim($buf, " \r\n") == "")
+			continue;
+
+		// Skip line with leading "#" since it's a comment
+		if (preg_match('/^\s*#/', $buf))
+			continue;
+
+		// Trim off any trailing comment
+		$line = explode("#", $buf);
+
+		// Trim leading and trailing spaces plus newline and any carriage returns
+		$buf = trim($line[0], ' \r\n');
+
+		// Now split the SID mod arguments at the commas, if more than one
+		// per line, and add to our $sid_mods array.
+		$line = explode(",", $buf);
+		foreach ($line as $ent)
+			$sid_mods[] = trim($ent);
+	}
+
+	// Close the file, release unneeded memory and return
+	// the array of SID mod tokens parsed from the file.
+	fclose($fd);
+	unset($line, $buf);
+	return $sid_mods;
+}
+
+function snort_sid_mgmt_auto_categories($snortcfg, $log_results = FALSE) {
+
+	/****************************************************/
+	/* This function parses any auto-SID conf files     */
+	/* configured for the interface and returns an      */
+	/* array of rule categories adjusted from the       */
+	/* ['enabled_rulesets'] element in the config for   */
+	/* the interface in accordance with the contents    */
+	/* of the SID Mgmt conf files.                      */
+	/*                                                  */
+	/* The returned array shows which files should be   */
+	/* removed and which should be added to the list    */
+	/* used when building the enforcing ruleset.        */
+	/*                                                  */
+	/*  $snortcfg ==> pointer to interface              */
+	/*                   configuration info             */
+	/*  $log_results ==> [optional] log results to      */
+	/*                   'sid_changes.log' in the       */
+	/*                   interface directory in         */
+	/*                   /var/log/snort when TRUE       */
+	/*                                                  */
+	/*       Returns ==> array of category file names   */
+	/*                   for the interface.  The keys   */
+	/*                   are category file names and    */
+	/*                   the corresponding values show  */
+	/*                   if the file should be added    */
+	/*                   or removed from the enabled    */
+	/*                   rulesets list.                 */
+	/*                                                  */
+	/*                    Example -                     */
+	/*                      $changes[file] = 'enabled'  */
+	/*                                                  */
+	/****************************************************/
+
+	global $config;
+	$snort_sidmods_dir = SID_MODS_PATH;
+	$sid_mods = array();
+	$enables = array();
+	$disables = array();
+
+	// Check if auto-mgmt of SIDs is enabled, exit if not
+	if ($config['installedpackages']['snortglobal']['auto_manage_sids'] != 'on')
+		return array();
+	if (empty($snortcfg['disable_sid_file']) && empty($snortcfg['enable_sid_file']))
+		return array();
+
+	// Configure the interface's logging subdirectory if log results is enabled
+	if ($log_results == TRUE)
+		$log_file = SNORTLOGDIR . "/snort_" . get_real_interface($snortcfg['interface']) . "{$snortcfg['uuid']}/sid_changes.log";
+	else
+		$log_file = NULL;
+
+	// Get the list of currently enabled categories for the interface
+	if (!empty($snortcfg['rulesets']))
+		$enabled_cats = explode("||", $snortcfg['rulesets']);
+
+	if ($log_results == TRUE) {
+		error_log(gettext("********************************************************\n"), 3, $log_file);
+		error_log(gettext("Starting auto RULE CATEGORY management for " . convert_friendly_interface_to_friendly_descr($snortcfg['interface']) ."\n"), 3, $log_file);
+		error_log(gettext("Start Time: " . date("Y-m-d H:i:s") . "\n"), 3, $log_file);
+	}
+
+	switch ($snortcfg['sid_state_order']) {
+		case "disable_enable":
+			if (!empty($snortcfg['disable_sid_file'])) {
+				if ($log_results == TRUE)
+					error_log(gettext("Processing disable_sid file: {$snortcfg['disable_sid_file']}\n"), 3, $log_file);
+
+				// Attempt to open the 'disable_sid_file' for the interface
+				if (!file_exists("{$snort_sidmods_dir}{$snortcfg['disable_sid_file']}")) {
+					log_error(gettext("[Snort] Error - unable to open 'disable_sid_file' \"{$snortcfg['disable_sid_file']}\" specified for " . convert_friendly_interface_to_friendly_descr($snortcfg['interface'])));
+					if ($log_results == TRUE)
+						error_log(gettext("Unable to open disable_sid file \"{$snortcfg['disable_sid_file']}\".\n"), 3, $log_file);
+				}
+				else
+					$sid_mods = snort_parse_sidconf_file("{$snort_sidmods_dir}{$snortcfg['disable_sid_file']}");
+
+				if (!empty($sid_mods))
+					$disables = snort_get_auto_category_mods($enabled_cats, $sid_mods, "disable", $log_results, $log_file);
+				elseif ($log_results == TRUE && !empty($log_file)) {
+					error_log(gettext("WARNING: no valid SID match tokens found in file \"{$snortcfg['disable_sid_file']}\".\n"), 3, $log_file);
+				}
+			}
+			if (!empty($snortcfg['enable_sid_file'])) {
+				if ($log_results == TRUE)
+					error_log(gettext("Processing enable_sid file: {$snortcfg['enable_sid_file']}\n"), 3, $log_file);
+
+				// Attempt to open the 'enable_sid_file' for the interface
+				if (!file_exists("{$snort_sidmods_dir}{$snortcfg['enable_sid_file']}")) {
+					log_error(gettext("[Snort] Error - unable to open 'enable_sid_file' \"{$snortcfg['enable_sid_file']}\" specified for " . convert_friendly_interface_to_friendly_descr($snortcfg['interface'])));
+					if ($log_results == TRUE)
+						error_log(gettext("Unable to open enable_sid file \"{$snortcfg['enable_sid_file']}\".\n"), 3, $log_file);
+				}
+				else
+					$sid_mods = snort_parse_sidconf_file("{$snort_sidmods_dir}{$snortcfg['enable_sid_file']}");
+
+				if (!empty($sid_mods))
+					$enables = snort_get_auto_category_mods($enabled_cats, $sid_mods, "enable", $log_results, $log_file);
+				elseif ($log_results == TRUE && !empty($log_file)) {
+					error_log(gettext("WARNING: no valid SID match tokens found in file \"{$snortcfg['enable_sid_file']}\".\n"), 3, $log_file);
+				}
+			}
+			break;
+
+		case "enable_disable":
+			if (!empty($snortcfg['enable_sid_file'])) {
+				if ($log_results == TRUE)
+					error_log(gettext("Processing enable_sid file: {$snortcfg['enable_sid_file']}\n"), 3, $log_file);
+
+				// Attempt to open the 'enable_sid_file' for the interface
+				if (!file_exists("{$snort_sidmods_dir}{$snortcfg['enable_sid_file']}")) {
+					log_error(gettext("[Snort] Error - unable to open 'enable_sid_file' \"{$snortcfg['enable_sid_file']}\" specified for " . convert_friendly_interface_to_friendly_descr($snortcfg['interface'])));
+					if ($log_results == TRUE)
+						error_log(gettext("Unable to open enable_sid file \"{$snortcfg['enable_sid_file']}\".\n"), 3, $log_file);
+				}
+				else
+					$sid_mods = snort_parse_sidconf_file("{$snort_sidmods_dir}{$snortcfg['enable_sid_file']}");
+
+				if (!empty($sid_mods))
+					$enables = snort_get_auto_category_mods($enabled_cats, $sid_mods, "enable", $log_results, $log_file);
+				elseif ($log_results == TRUE && !empty($log_file)) {
+					error_log(gettext("WARNING: no valid SID match tokens found in file \"{$snortcfg['enable_sid_file']}\".\n"), 3, $log_file);
+				}
+			}
+			if (!empty($snortcfg['disable_sid_file'])) {
+				if ($log_results == TRUE)
+					error_log(gettext("Processing disable_sid file: {$snortcfg['disable_sid_file']}\n"), 3, $log_file);
+
+				// Attempt to open the 'disable_sid_file' for the interface
+				if (!file_exists("{$snort_sidmods_dir}{$snortcfg['disable_sid_file']}")) {
+					log_error(gettext("[Snort] Error - unable to open 'disable_sid_file' \"{$snortcfg['disable_sid_file']}\" specified for " . convert_friendly_interface_to_friendly_descr($snortcfg['interface'])));
+					if ($log_results == TRUE)
+						error_log(gettext("Unable to open disable_sid file \"{$snortcfg['disable_sid_file']}\".\n"), 3, $log_file);
+				}
+				else
+					$sid_mods = snort_parse_sidconf_file("{$snort_sidmods_dir}{$snortcfg['disable_sid_file']}");
+
+				if (!empty($sid_mods))
+					$disables = snort_get_auto_category_mods($enabled_cats, $sid_mods, "disable", $log_results, $log_file);
+				elseif ($log_results == TRUE && !empty($log_file)) {
+					error_log(gettext("WARNING: no valid SID match tokens found in file \"{$snortcfg['disable_sid_file']}\".\n"), 3, $log_file);
+				}
+			}
+			break;
+
+		default:
+			log_error(gettext("[Snort] Unrecognized 'sid_state_order' value.  Skipping auto CATEGORY mgmt step for " . convert_friendly_interface_to_friendly_descr($snortcfg['interface'])));
+			if ($log_results == TRUE) {
+				error_log(gettext("ERROR: unrecognized 'sid_state_order' value.  Skipping auto CATEGORY mgmt step for ") . convert_friendly_interface_to_friendly_descr($snortcfg['interface']). ".\n", 3, $log_file);
+			}
+	}
+
+	if ($log_results == TRUE) {
+		error_log(gettext("End Time: " . date("Y-m-d H:i:s") . "\n"), 3, $log_file);
+		error_log(gettext("********************************************************\n\n"), 3, $log_file);
+	}
+
+	// Return the required rule category modifications as an array;
+	return array_merge($enables, $disables);
+}
+
+function snort_get_auto_category_mods($categories, $sid_mods, $action, $log_results = FALSE, $log_file = NULL) {
+
+	/****************************************************/
+	/* This function parses the provided SID mod tokens */
+	/* in $sid_mods and returns an array of category    */
+	/* files that must be added ('enabled') or removed  */
+	/* ('disabled') from the provided $categories list  */
+	/* of enabled rule categories as determined by the  */
+	/* content of the SID Mgmt tokens in $sid_mods.     */
+	/*                                                  */
+	/* The returned array shows which files should be   */
+	/* removed and which should be added to the list    */
+	/* used when building the enforcing ruleset.        */
+	/*                                                  */
+	/*   $categories ==> array of currently enabled     */
+	/*                   ruleset categories             */
+	/*     $sid_mods ==> array of SID modification      */
+	/*                   tokens                         */
+	/*       $action ==> modification action for        */
+	/*                   matching category targets:     */
+	/*                   'enable' or 'disable'          */
+	/*  $log_results ==> [optional] 'yes' to log        */
+	/*                   results to $log_file           */
+	/*     $log_file ==> full path and filename of log  */
+	/*                   file to write to               */
+	/*                                                  */
+	/*       Returns ==> array of category file names   */
+	/*                   for the interface.  The keys   */
+	/*                   are category file names and    */
+	/*                   the corresponding values show  */
+	/*                   if the file should be added    */
+	/*                   or removed from the enabled    */
+	/*                   rulesets list.                 */
+	/*                                                  */
+	/*                    Example -                     */
+	/*                      $changes[file] = 'enabled'  */
+	/*                                                  */
+	/****************************************************/
+
+	$snortdir = SNORTDIR;
+	$all_cats = array();
+	$changes = array();
+	$counter = 0;
+	$matchcount = 0;
+
+	// Get a list of all possible categories by loading all rules files
+	foreach (array( VRT_FILE_PREFIX, ET_OPEN_FILE_PREFIX, ET_PRO_FILE_PREFIX, GPL_FILE_PREFIX ) as $prefix) {
+		$files = glob("{$snortdir}/rules/{$prefix}*.rules");
+		foreach ($files as $file)
+			$all_cats[] = basename($file);
+	}
+
+	// Walk the SID mod tokens and decode looking for rule
+	// category enable/disable changes.
+	foreach ($sid_mods as $tok) {
+		$matches = array();
+		// Test the SID token for a GID:SID range and skip if true
+		if (preg_match('/^(\d+):(\d+)-\1:(\d+)/', $tok))
+			continue;
+		// Test the token for a single GID:SID and skip if true
+		elseif (preg_match('/^(\d+):(\d+)$/', $tok))
+			continue;
+		// Test the token for the PCRE: keyword and skip if true
+		elseif (preg_match('/(^pcre\:)(.+)/i', $tok))
+			continue;
+		// Test the token for the MS reference keyword and skip if true
+		elseif (preg_match('/^MS\d+-.+/i', $tok))
+			continue;
+		// Test the token for other keywords delimited with a colon and skip if true
+		elseif (preg_match('/^[a-xA-X]+\:.+/', $tok))
+			continue;
+		// Test the SID token for a rule category name.  Anything that
+		// failed to match above is considered a potential category name.
+		elseif (preg_match('/[a-xA-X]+(-|\w).*/', $tok, $matches)) {
+			$counter++;
+			$regex = "/" . preg_quote(trim($matches[0]), '/') . "/i";
+			// Search through the $all_cats array for any matches to the regex
+			$matches = preg_grep($regex, $all_cats);
+
+			// See if any matches are in the $categories array
+			foreach ($matches as $cat) {
+				switch ($action) {
+					case 'enable':
+						if (!isset($changes[$cat])) {
+							$changes[$cat] = 'enabled';
+							if ($log_results == TRUE && !empty($log_file))
+								error_log(gettext("    Enabled rule category: {$cat}\n"), 3, $log_file);
+							$matchcount++;
+						}
+						break;
+
+					case 'disable':
+						if (!isset($changes[$cat])) {
+							$changes[$cat] = 'disabled';
+							if ($log_results == TRUE && !empty($log_file))
+								error_log(gettext("    Disabled rule category: {$cat}\n"), 3, $log_file);
+							$matchcount++;
+						}
+						break;
+
+					default:
+						break;
+				}
+			}
+		}
+		else {
+			if ($log_results == TRUE && !empty($log_file))
+				error_log(gettext("WARNING: unrecognized token '{$tok}' encountered while processing an automatic SID MGMT file.\n"), 3, $log_file);
+		}
+	}
+
+	if ($log_results == TRUE && !empty($log_file)) {
+		error_log(gettext("    Parsed {$counter} potential Rule Categories to match from the list of tokens.\n"), 3, $log_file);
+		error_log(gettext("    " . ucfirst($action) . "d {$matchcount} matching Rule Categories.\n"), 3, $log_file);
+	}
+
+	// Release memory no longer needed
+	unset($all_cats, $matches);
+
+	// Return array of rule category file changes
+	return $changes;
+}
+
+function snort_modify_sid_state(&$rule_map, $sid_mods, $action, $log_results = FALSE, $log_file = NULL) {
+
+	/**********************************************/
+	/* This function walks the provided array of  */
+	/* SID modification tokens and locates the    */
+	/* target SID or SIDs in the $rule_map array. */
+	/* It then performs the change specified by   */
+	/* $action on the target SID or SIDs.         */
+	/*                                            */
+	/*    $rule_map ==> reference to array of     */
+	/*                  current rules             */
+	/*    $sid_mods ==> array of SID modification */
+	/*                  tokens                    */
+	/*      $action ==> modification action for   */
+	/*                  matching SID targets:     */
+	/*                  'enable' or 'disable'     */
+	/* $log_results ==> [optional] 'yes' to log   */
+	/*                   results to $log_file     */
+	/*    $log_file ==> full path and filename    */
+	/*                  of log file to write to   */
+	/*                                            */
+	/*    On Return ==> $rule_map array modified  */
+	/*                  by changing state for     */
+	/*                  matching SIDs.            */
+	/*                                            */
+	/*                  Returns a two-dimension   */
+	/*                  array of matching GID:SID */
+	/*                  pairs.                    */
+	/**********************************************/
+
+	$sids = array();
+
+	// If no rules in $rule_map or mods in $sid_mods,
+	// then nothing to do.
+	if (empty($rule_map) || empty($sid_mods))
+		return $sids;
+
+	// Validate the action keyword as we only accept
+	// 'enable' and 'disable' as valid.
+	switch ($action) {
+
+		case "enable":
+			break;
+
+		case "disable":
+			break;
+
+		default:
+			log_error(gettext("[Snort] Error - unknown action '{$action}' supplied to snort_modify_sid_state() function...no SIDs modified."));
+			return $sids;
+	}
+
+	// Walk the SID mod tokens and decode each one
+	foreach ($sid_mods as $tok) {
+		$matches = array();
+		// Test the SID token for a GID:SID range
+		if (preg_match('/^(\d+):(\d+)-\1:(\d+)/', $tok, $matches)) {
+			// It was a range, so find all the intervening SIDs
+			$gid = trim($matches[1]);
+			$lsid = trim($matches[2]);
+			$usid = trim($matches[3]);
+			$sids[$gid][$lsid] = $action;
+			while ($lsid < $usid) {
+				$lsid++;
+				$sids[$gid][$lsid] = $action;
+			}
+		}
+		// Test the SID token for a single GID:SID
+		elseif (preg_match('/^(\d+):(\d+)$/', $tok, $matches)) {
+			// It's a single GID:SID, so grab it
+			$sids[$matches[1]][$matches[2]] = $action;
+		}
+		// Test the SID token for the PCRE: keyword
+		elseif (preg_match('/(^pcre\:)(.+)/i', $tok, $matches)) {
+			$regex = '/' . preg_quote($matches[2], '/') . '/i';
+
+			// Now search through the $rule_map in the 'rule'
+			// element for any matches to the regex and get
+			// the GID:SID.
+			foreach ($rule_map as $k1 => $rulem) {
+				foreach ($rulem as $k2 => $v) {
+					if (preg_match($regex, $v['rule'])) {
+						$sids[$k1][$k2] = $action;
+					}
+				}
+			}
+		}
+		// Test the SID token for the MS reference keyword
+		elseif (preg_match('/^MS\d+-.+/i', $tok, $matches)) {
+			$regex = "/" . preg_quote($matches[0], '/') . "/i";
+
+			// Now search through the $rule_map in the 'rule'
+			// element for any matches to the regex and get
+			// the GID:SID.
+			foreach ($rule_map as $k1 => $rulem) {
+				foreach ($rulem as $k2 => $v) {
+					if (preg_match($regex, $v['rule'])) {
+						$sids[$k1][$k2] = $action;
+					}
+				}
+			}
+		}
+		// Test the SID token for other keywords delimited with a colon
+		elseif (preg_match('/^[a-xA-X]+\:.+/', $tok, $matches)) {
+			$regex = "/" . str_replace(':', ",", preg_quote($matches[0], '/')) . "/i";
+
+			// Now search through the $rule_map in the 'rule'
+			// element for any matches to the regex and get
+			// the GID:SID.
+			foreach ($rule_map as $k1 => $rulem) {
+				foreach ($rulem as $k2 => $v) {
+					if (preg_match($regex, $v['rule'])) {
+						$sids[$k1][$k2] = $action;
+					}
+				}
+			}
+		}
+		// Test the SID token for a rule category name.  Anything that
+		// failed to match above is considered a potential category name.
+		elseif (preg_match('/[a-xA-X]+(-|\w).*/', $tok, $matches)) {
+			$regex = "/" . preg_quote(trim($matches[0]), '/') . "/i";
+			// Now search through the $rule_map in the 'category'
+			// element for any matches to the regex and get
+			// the GID:SID.
+			foreach ($rule_map as $k1 => $rulem) {
+				foreach ($rulem as $k2 => $v) {
+					if (preg_match($regex, $v['category'] . ".rules")) {
+						$sids[$k1][$k2] = $action;
+					}
+				}
+			}
+		}
+		else {
+			if ($log_results == TRUE && !empty($log_file))
+				error_log(gettext("WARNING: unrecognized token '{$tok}' encountered while processing an automatic SID MGMT file.\n"), 3, $log_file);
+		}
+	}
+
+	// Change state of all the matching GID:SID pairs we found
+	// above in the $rule_map array passed to us.
+	$modcount = $changecount = 0;
+	$counter = count($sids, COUNT_RECURSIVE) - count($sids);
+
+	if ($log_results == TRUE && !empty($log_file))
+		error_log(gettext("    Parsed {$counter} potential SIDs to match from the provided list of tokens.\n"), 3, $log_file);
+
+	foreach (array_keys($sids) as $k1) {
+		foreach (array_keys($sids[$k1]) as $k2) {
+			if (isset($rule_map[$k1][$k2])) {
+				if ($action == 'enable' && $rule_map[$k1][$k2]['disabled'] == 1) {
+					$rule_map[$k1][$k2]['rule'] = ltrim($rule_map[$k1][$k2]['rule'], " \t#");
+					$rule_map[$k1][$k2]['disabled'] = 0;
+					$rule_map[$k1][$k2]['managed'] = 1;
+					$changecount++;
+					$modcount++;
+				}
+				elseif ($action == 'disable' && $rule_map[$k1][$k2]['disabled'] == 0) {
+					$rule_map[$k1][$k2]['rule'] = "# " . $rule_map[$k1][$k2]['rule'];
+					$rule_map[$k1][$k2]['disabled'] = 1;
+					$rule_map[$k1][$k2]['managed'] = 1;
+					$changecount++;
+					$modcount++;
+				}
+			}
+		}
+	}
+
+	if ($log_results == TRUE && !empty($log_file)) {
+		error_log(gettext("    Found {$modcount} matching SIDs in the active rules.\n"), 3, $log_file);
+		error_log(gettext("    Changed state for {$changecount} SIDs to '{$action}d'.\n"), 3, $log_file);
+	}
+
+	// Return the array of matching SIDs
+	return $sids;
+}
+
+function snort_modify_sid_content(&$rule_map, $sid_mods, $log_results = FALSE, $log_file = NULL) {
+
+	/************************************************/
+	/* This function walks the provided array of    */
+	/* SID modification tokens and locates the      */
+	/* target SID or SIDs in the $rule_map array.   */
+	/* It then modifies the content of the target   */
+	/* SID or SIDs. Modifications are only valid    */
+	/* for normal GID=1 text rules.                 */
+	/*                                              */
+	/*     $rule_map ==> reference to array of      */
+	/*                   current rules              */
+	/*     $sid_mods ==> array of SID modification  */
+	/*                   tokens                     */
+	/*  $log_results ==> [optional] 'yes' to log    */
+	/*                   results to $log_file       */
+	/*     $log_file ==> full path and filename     */
+	/*                   of log file to write to    */
+	/*                                              */
+	/*     On Return ==> $rule_map array modified   */
+	/*                   by changing content for    */
+	/*                   matching SIDs.             */
+	/*                                              */
+	/*                   Returns a two-dimension    */
+	/*                   array of matching          */
+	/*                   GID:SID pairs.             */
+	/************************************************/
+
+	$sids = array();
+	$tokencounter = $modcount = $modifiedcount = 0;
+
+	// If no rules in $rule_map or mods in $sid_mods,
+	// then nothing to do.
+	if (empty($rule_map) || empty($sid_mods))
+		return $sids;
+
+	// Walk the SID mod tokens and decode each one
+	foreach ($sid_mods as $tok) {
+		$matches = array();
+		if (preg_match('/([\d+|,|\*]*)\s+"(.+)"\s+"(.*)"/', $tok, $matches)) {
+			$tokencounter++;
+			$sidlist = explode(",", $matches[1]);
+			$from = '/' . preg_quote($matches[2], '/') . '/';
+			$to = $matches[3];
+			$count = 0;
+
+			// Now walk the provided rule map and make the modifications
+			if ($matches[1] == "*") {
+				// If wildcard '*' provided for SID, then check them all
+				foreach ($rule_map[1] as $rulem) {
+					foreach ($rulem as $k2 => $v) {
+						$modcount++;
+						$rule_map[1][$k2]['rule'] = preg_replace($from, $to, $v['rule'], -1, $count);
+						if ($count > 0) {
+							$rule_map[1][$k2]['managed'] = 1;
+							$sids[1][$k2] = 'modify';
+							$modifiedcount++;
+						}
+					}
+				}
+			}
+			else {
+				// Otherwise just check the provided SIDs
+				foreach ($sidlist as $sid) {
+					if (isset($rule_map[1][$sid])) {
+						$modcount++;
+						$rule_map[1][$sid]['rule'] = preg_replace($from, $to, $rule_map[1][$sid]['rule'], -1, $count);
+						if ($count > 0) {
+							$rule_map[1][$sid]['managed'] = 1;
+							$sids[1][$sid] = 'modify';
+							$modifiedcount++;
+						}
+					}
+				}
+			}
+		}
+		else {
+			if ($log_results == TRUE && !empty($log_file))
+				error_log(gettext("WARNING: unrecognized token '{$tok}' encountered while processing an automatic SID MGMT file.\n"), 3, $log_file);
+		}
+	}
+
+	if ($log_results == TRUE && !empty($log_file)) {
+		error_log(gettext("    Parsed {$tokencounter} potential SIDs to match from the provided list of tokens.\n"), 3, $log_file);
+		error_log(gettext("    Found {$modcount} matching SIDs in the active rules.\n"), 3, $log_file);
+		error_log(gettext("    Modified rule text for {$modifiedcount} SIDs.\n"), 3, $log_file);
+	}
+
+	// Return the array of matching SIDs
+	return $sids;
+}
+
+function snort_process_enablesid(&$rule_map, $snortcfg, $log_results = FALSE, $log_file = NULL) {
+
+	/**********************************************/
+	/* This function loads and processes the file */
+	/* specified by 'enable_sid_file' for the     */
+	/* interface.  The file is assumed to be a    */
+	/* valid enablesid.conf file containing       */
+	/* instructions for enabling matching rule    */
+	/* SIDs.                                      */
+	/*                                            */
+	/*     $rule_map ==> reference to array of    */
+	/*                   current rules            */
+	/*  $snortcfg ==> interface config params     */
+	/*  $log_results ==> [optional] 'yes' to log  */
+	/*                   results to $log_file     */
+	/*     $log_file ==> full path and filename   */
+	/*                   of log file to write to  */
+	/*                                            */
+	/*     On Return ==> suitably modified        */
+	/*                   $rule_map array          */
+	/**********************************************/
+
+	$snort_sidmods_dir = SID_MODS_PATH;
+	$snortlogdir = SNORTLOGDIR;
+	$sid_mods = array();
+
+	// If no rules in $rule_map, then nothing to do
+	if (empty($rule_map))
+		return;
+
+	// Attempt to open the 'enable_sid_file' for the interface
+	if (!file_exists("{$snort_sidmods_dir}{$snortcfg['enable_sid_file']}")) {
+		log_error(gettext("[Snort] Error - unable to open 'enable_sid_file' \"{$snortcfg['enable_sid_file']}\" specified for " . convert_friendly_interface_to_friendly_descr($snortcfg['interface'])));
+		return;
+	}
+	else
+		$sid_mods = snort_parse_sidconf_file("{$snort_sidmods_dir}{$snortcfg['enable_sid_file']}");
+
+	if (!empty($sid_mods))
+		snort_modify_sid_state($rule_map, $sid_mods, "enable", $log_results, $log_file);
+	elseif ($log_results == TRUE && !empty($log_file)) {
+		error_log(gettext("WARNING: no valid SID match tokens found in file \"{$snortcfg['enable_sid_file']}\".\n"), 3, $log_file);
+	}
+
+	unset($sid_mods);
+}
+
+function snort_process_disablesid(&$rule_map, $snortcfg, $log_results = FALSE, $log_file = NULL) {
+
+	/**********************************************/
+	/* This function loads and processes the file */
+	/* specified by 'disable_sid_file' for the    */
+	/* interface.  The file is assumed to be a    */
+	/* valid disablesid.conf file containing      */
+	/* instructions for disabling matching rule   */
+	/* SIDs.                                      */
+	/*                                            */
+	/*     $rule_map ==> reference to array of    */
+	/*                   current rules            */
+	/*  $snortcfg ==> interface config params     */
+	/*  $log_results ==> [optional] 'yes' to log  */
+	/*                   results to $log_file     */
+	/*     $log_file ==> full path and filename   */
+	/*                   of log file to write to  */
+	/*                                            */
+	/*     On Return ==> suitably modified        */
+	/*                   $rule_map array          */
+	/**********************************************/
+
+	$snort_sidmods_dir = SID_MODS_PATH;
+	$snortlogdir = SNORTLOGDIR;
+	$sid_mods = array();
+
+	// If no rules in $rule_map, then nothing to do
+	if (empty($rule_map))
+		return;
+
+	// Attempt to open the 'disable_sid_file' for the interface
+	if (!file_exists("{$snort_sidmods_dir}{$snortcfg['disable_sid_file']}")) {
+		log_error(gettext("[Snort] Error - unable to open 'disable_sid_file' \"{$snortcfg['disable_sid_file']}\" specified for " . convert_friendly_interface_to_friendly_descr($snortcfg['interface'])));
+		return;
+	}
+	else
+		$sid_mods = snort_parse_sidconf_file("{$snort_sidmods_dir}{$snortcfg['disable_sid_file']}");
+
+	if (!empty($sid_mods))
+		snort_modify_sid_state($rule_map, $sid_mods, "disable", $log_results, $log_file);
+	elseif ($log_results == TRUE && !empty($log_file)) {
+		error_log(gettext("WARNING: no valid SID match tokens found in file \"{$snortcfg['disable_sid_file']}\".\n"), 3, $log_file);
+	}
+
+	unset($sid_mods);
+}
+
+function snort_process_modifysid(&$rule_map, $snortcfg, $log_results = FALSE, $log_file = NULL) {
+
+	/**********************************************/
+	/* This function loads and processes the file */
+	/* specified by 'modify_sid_file' for the     */
+	/* interface.  The file is assumed to be a    */
+	/* valid modifysid.conf file containing       */
+	/* instructions for modifying matching rule   */
+	/* SIDs.                                      */
+	/*                                            */
+	/*     $rule_map ==> reference to array of    */
+	/*                   current rules            */
+	/*  $snortcfg ==> interface config params     */
+	/*  $log_results ==> [optional] 'yes' to log  */
+	/*                   results to $log_file     */
+	/*     $log_file ==> full path and filename   */
+	/*                   of log file to write to  */
+	/*                                            */
+	/*     On Return ==> suitably modified        */
+	/*                   $rule_map array          */
+	/**********************************************/
+
+	$snort_sidmods_dir = SID_MODS_PATH;
+	$snortlogdir = SNORTLOGDIR;
+	$sid_mods = array();
+
+	// If no rules in $rule_map, then nothing to do
+	if (empty($rule_map))
+		return;
+
+	// Attempt to open the 'modify_sid_file' for the interface
+	if (!file_exists("{$snort_sidmods_dir}{$snortcfg['modify_sid_file']}")) {
+		log_error(gettext("[Snort] Error - unable to open 'modify_sid_file' \"{$snortcfg['modify_sid_file']}\" specified for " . convert_friendly_interface_to_friendly_descr($snortcfg['interface'])));
+		return;
+	}
+	else
+		$sid_mods = snort_parse_sidconf_file("{$snort_sidmods_dir}{$snortcfg['modify_sid_file']}");
+
+	if (!empty($sid_mods))
+		snort_modify_sid_content($rule_map, $sid_mods, $log_results, $log_file);
+	elseif ($log_results == TRUE && !empty($log_file)) {
+		error_log(gettext("WARNING: no valid SID match tokens found in file \"{$snortcfg['modify_sid_file']}\".\n"), 3, $log_file);
+	}
+
+	unset($sid_mods);
+}
+
+function snort_auto_sid_mgmt(&$rule_map, $snortcfg, $log_results = FALSE) {
+
+	/**************************************************/
+	/* This function modifies the rules in the        */
+	/* passed rule_map array based on values in the   */
+	/* files 'enable_sid_file', 'disable_sid_file'    */
+	/* and 'modify_sid_file' for the interface.       */
+	/*                                                */
+	/* If auto-mgmt of SIDs is enabled via the        */
+	/* settings on the UPDATE RULES tab, then the     */
+	/* rules are processed against these settings.    */
+	/*                                                */
+	/*     $rule_map ==> array of current rules       */
+	/*  $snortcfg ==> interface config settings       */
+	/*  $log_results ==> [optional] log results to    */
+	/*                   'sid_changes.log' in the     */
+	/*                   interface directory in       */
+	/*                   /var/log/snort when TRUE     */
+	/*                                                */
+	/*       Returns ==> TRUE if rules were changed;  */
+	/*                   otherwise FALSE              */
+	/**************************************************/
+
+	global $config;
+	$result = FALSE;
+
+	// Configure the interface's logging subdirectory if log results is enabled
+	if ($log_results == TRUE)
+		$log_file = SNORTLOGDIR . "/snort_" . get_real_interface($snortcfg['interface']) . "{$snortcfg['uuid']}/sid_changes.log";
+	else
+		$log_file = NULL;
+
+	// Check if auto-mgmt of SIDs is enabled and files are specified
+	// for the interface.
+	if ($config['installedpackages']['snortglobal']['auto_manage_sids'] == 'on' &&
+	    (!empty($snortcfg['disable_sid_file']) || !empty($snortcfg['enable_sid_file']) || 
+	    !empty($snortcfg['modify_sid_file']))) {
+		if ($log_results == TRUE) {
+			error_log(gettext("********************************************************\n"), 3, $log_file);
+			error_log(gettext("Starting auto SID management for " . convert_friendly_interface_to_friendly_descr($snortcfg['interface']) ."\n"), 3, $log_file);
+			error_log(gettext("Start Time: " . date("Y-m-d H:i:s") . "\n"), 3, $log_file);
+		}
+
+		switch ($snortcfg['sid_state_order']) {
+			case "disable_enable":
+				if (!empty($snortcfg['disable_sid_file'])) {
+					if ($log_results == TRUE)
+						error_log(gettext("Processing disable_sid file: {$snortcfg['disable_sid_file']}\n"), 3, $log_file);
+					snort_process_disablesid($rule_map, $snortcfg, $log_results, $log_file);
+				}
+				if (!empty($snortcfg['enable_sid_file'])) {
+					if ($log_results == TRUE)
+						error_log(gettext("Processing enable_sid file: {$snortcfg['enable_sid_file']}\n"), 3, $log_file);
+					snort_process_enablesid($rule_map, $snortcfg, $log_results, $log_file);
+				}
+				if (!empty($snortcfg['modify_sid_file'])) {
+					if ($log_results == TRUE)
+						error_log(gettext("Processing modify_sid file: {$snortcfg['modify_sid_file']}\n"), 3, $log_file);
+					snort_process_modifysid($rule_map, $snortcfg, $log_results, $log_file);
+				}
+				$result = TRUE;
+				break;
+
+			case "enable_disable":
+				if (!empty($snortcfg['enable_sid_file'])) {
+					if ($log_results == TRUE)
+						error_log(gettext("Processing enable_sid file: {$snortcfg['enable_sid_file']}\n"), 3, $log_file);
+					snort_process_enablesid($rule_map, $snortcfg, $log_results, $log_file);
+				}
+				if (!empty($snortcfg['disable_sid_file'])) {
+					if ($log_results == TRUE)
+						error_log(gettext("Processing disable_sid file: {$snortcfg['disable_sid_file']}\n"), 3, $log_file);
+					snort_process_disablesid($rule_map, $snortcfg, $log_results, $log_file);
+				}
+				if (!empty($snortcfg['modify_sid_file'])) {
+					if ($log_results == TRUE)
+						error_log(gettext("Processing modify_sid file: {$snortcfg['modify_sid_file']}\n"), 3, $log_file);
+					snort_process_modifysid($rule_map, $snortcfg, $log_results, $log_file);
+				}
+				$result = TRUE;
+				break;
+
+			default:
+				log_error(gettext("[Snort] Unrecognized 'sid_state_order' value.  Skipping auto SID mgmt step for " . convert_friendly_interface_to_friendly_descr($snortcfg['interface'])));
+				if ($log_results == TRUE) {
+					error_log(gettext("ERROR: unrecognized 'sid_state_order' value.  Skipping auto SID mgmt step for ") . convert_friendly_interface_to_friendly_descr($snortcfg['interface']). ".\n", 3, $log_file);
+				}
+				$result = FALSE;
+		}
+
+		if ($log_results == TRUE) {
+			error_log(gettext("End Time: " . date("Y-m-d H:i:s") . "\n"), 3, $log_file);
+			error_log(gettext("********************************************************\n\n"), 3, $log_file);
+		}
+	}
+	return $result;
 }
 
 function snort_load_sid_mods($sids) {
@@ -2226,6 +3077,9 @@ function snort_prepare_rule_files($snortcfg, $snortcfgdir) {
 	$snortdir = SNORTDIR;
 	$flowbit_rules_file = FLOWBITS_FILENAME;
 	$snort_enforcing_rules_file = ENFORCING_RULES_FILENAME;
+	$enabled_files = array();
+	$all_rules = array();
+	$cat_mods = array();
 	$no_rules_defined = true;
 	$enabled_rules = array();
 
@@ -2235,6 +3089,10 @@ function snort_prepare_rule_files($snortcfg, $snortcfgdir) {
 
 	/* Log a message for rules rebuild in progress */
 	log_error(gettext("[Snort] Updating rules configuration for: " . convert_friendly_interface_to_friendly_descr($snortcfg['interface']) . " ..."));
+
+	// Get any automatic rule category enable/disable modifications
+	// if auto-SID Mgmt is enabled and conf files exist for the interface.
+	$cat_mods = snort_sid_mgmt_auto_categories($snortcfg, TRUE);
 
 	/* Enable all, some or none of the SDF rules depending on setting. */
 	if ($snortcfg['sensitive_data'] == 'on' && $snortcfg['protect_preproc_rules'] != 'on') {
@@ -2262,8 +3120,6 @@ function snort_prepare_rule_files($snortcfg, $snortcfgdir) {
 
 	/* Only rebuild rules if some are selected or an IPS Policy is enabled  */
 	if (!empty($snortcfg['rulesets']) || $snortcfg['ips_policy_enable'] == 'on') {
-		$enabled_files = array();
-		$all_rules = array();
 		$no_rules_defined = false;
 
 		/* Load up all the text rules into a Rules Map array. */
@@ -2277,6 +3133,28 @@ function snort_prepare_rule_files($snortcfg, $snortcfgdir) {
 					if (!is_array($enabled_files[$category]))
 						$enabled_files[$category] = array();
 					$enabled_files[$category] = $file;
+			}
+
+			// Now adjust the list using any required changes as
+			// determined by auto-SID Mgmt policy files.
+			if (!empty($cat_mods)) {
+				foreach ($cat_mods as $k => $action) {
+					$key = basename($k, ".rules");
+					switch ($action) {
+						case 'enabled':
+							if (!isset($enabled_files[$key]))
+								$enabled_files[$key] = $k;
+							break;
+
+						case 'disabled':
+							if (isset($enabled_files[$key]))
+								unset($enabled_files[$key]);
+							break;
+
+						default:
+							break;
+					}
+				}
 			}
 
 			/****************************************************/
@@ -2301,7 +3179,7 @@ function snort_prepare_rule_files($snortcfg, $snortcfgdir) {
 			}
 
 			/* Release memory we no longer need. */
-			unset($enabled_files, $rulem, $v);
+			unset($enabled_files, $cat_mods, $rulem, $v);
 		}
 
 		/* Check if a pre-defined Snort VRT policy is selected. If so, */
@@ -2324,7 +3202,9 @@ function snort_prepare_rule_files($snortcfg, $snortcfgdir) {
 			unset($policy_rules, $policy, $p);
 		}
 
-		/* Process any enablesid or disablesid modifications for the selected rules. */
+		// Process any enablesid or disablesid modifications for the selected rules.
+		// Do the auto-SID managment first, if enabled, then do any manual SID state changes.
+		snort_auto_sid_mgmt($enabled_rules, $snortcfg, TRUE);
 		snort_modify_sids($enabled_rules, $snortcfg);
 
 		/* Check for and disable any rules dependent upon disabled preprocessors if  */
@@ -2357,7 +3237,45 @@ function snort_prepare_rule_files($snortcfg, $snortcfgdir) {
 		} else
 			/* Just put an empty file to always have the file present */
 			snort_write_flowbit_rules_file(array(), "{$snortcfgdir}/rules/{$flowbit_rules_file}");
-	} else {
+		unset($all_rules);
+	}
+	// If no rule categories were enabled, then use auto-SID management if enabled, since it may enable some rules
+	elseif ($config['installedpackages']['snortglobal']['auto_manage_sids'] == 'on' &&
+		(!empty($snortcfg['disable_sid_file']) || !empty($snortcfg['enable_sid_file']) || 
+		!empty($snortcfg['modify_sid_file']))) {
+
+		snort_auto_sid_mgmt($enabled_rules, $snortcfg, TRUE);
+		if (!empty($enabled_rules)) {
+			// Auto-SID management generated some rules, so use them
+			$no_rules_defined = false;
+			snort_modify_sids($enabled_rules, $snortcfg);
+
+			// Write the enforcing rules file to the Suricata interface's "rules" directory.
+			snort_write_enforcing_rules_file($enabled_rules, "{$snortcfgdir}/rules/{$snort_enforcing_rules_file}");
+
+			// If auto-flowbit resolution is enabled, generate the dependent flowbits rules file.
+			if ($snortcfg['autoflowbitrules'] == 'on') {
+				log_error('[Suricata] Enabling any flowbit-required rules for: ' . convert_friendly_interface_to_friendly_descr($snortcfg['interface']) . '...');
+
+				// Load up all rules into a Rules Map array for flowbits assessment
+				$all_rules = snort_load_rules_map("{$snortdir}/rules/");
+				$fbits = snort_resolve_flowbits($all_rules, $enabled_rules);
+
+				// Check for and disable any flowbit-required rules the
+				// user has manually forced to a disabled state.
+				snort_modify_sids($fbits, $snortcfg);
+				snort_write_flowbit_rules_file($fbits, "{$snortcfgdir}/rules/{$flowbit_rules_file}");
+				unset($all_rules, $fbits);
+			} else
+				// Just put an empty file to always have the file present
+			snort_write_flowbit_rules_file(array(), "{$snortcfgdir}/rules/{$flowbit_rules_file}");
+		}
+		else {
+			snort_write_enforcing_rules_file(array(), "{$snortcfgdir}/rules/{$snort_enforcing_rules_file}");
+			snort_write_flowbit_rules_file(array(), "{$snortcfgdir}/rules/{$flowbit_rules_file}");
+		}
+	}
+	else {
 		/* No regular rules or policy were selected, so just use the decoder and preproc rules */
 		snort_write_enforcing_rules_file($enabled_rules, "{$snortcfgdir}/rules/{$snort_enforcing_rules_file}");
 		snort_write_flowbit_rules_file(array(), "{$snortcfgdir}/rules/{$flowbit_rules_file}");

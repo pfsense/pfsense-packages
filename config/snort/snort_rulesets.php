@@ -172,6 +172,9 @@ if ($_POST["save"]) {
 	$enabled_rulesets_array = explode("||", $enabled_items);
 	if (snort_is_running($snort_uuid, $if_real))
 		$savemsg = gettext("Snort is 'live-reloading' the new rule set.");
+
+	// Sync to configured CARP slaves if any are enabled
+	snort_sync_on_changes();
 }
 
 if ($_POST['unselectall']) {
@@ -226,6 +229,10 @@ if ($_POST['selectall']) {
 	}
 }
 
+// Get any automatic rule category enable/disable modifications
+// if auto-SID Mgmt is enabled.
+$cat_mods = snort_sid_mgmt_auto_categories($a_nat[$id], FALSE);
+
 $if_friendly = convert_friendly_interface_to_friendly_descr($a_nat[$id]['interface']);
 $pgtitle = gettext("Snort: Interface {$if_friendly} - Categories");
 include_once("head.inc");
@@ -261,7 +268,8 @@ if ($savemsg) {
 	$tab_array[5] = array(gettext("Pass Lists"), false, "/snort/snort_passlist.php");
 	$tab_array[6] = array(gettext("Suppress"), false, "/snort/snort_interfaces_suppress.php");
 	$tab_array[7] = array(gettext("IP Lists"), false, "/snort/snort_ip_list_mgmt.php");
-	$tab_array[8] = array(gettext("Sync"), false, "/pkg_edit.php?xml=snort/snort_sync.xml");
+	$tab_array[8] = array(gettext("SID Mgmt"), false, "/snort/snort_sid_mgmt.php");
+	$tab_array[9] = array(gettext("Sync"), false, "/pkg_edit.php?xml=snort/snort_sync.xml");
 	display_top_tabs($tab_array, true);
 	echo '</td></tr>';
 	echo '<tr><td class="tabnavtbl">';
@@ -389,14 +397,25 @@ if ($savemsg) {
 			</tr>
 			<tr>
 				<td colspan="6">
-					<table width=90% align="center" border="0" cellpadding="2" cellspacing="0">
-						<tr height="45px">
-							<td valign="middle"><input value="Select All" class="formbtns" type="submit" name="selectall" id="selectall" title="<?php echo gettext("Add all categories to enforcing rules"); ?>"/></td>
-							<td valign="middle"><input value="Unselect All" class="formbtns" type="submit" name="unselectall" id="unselectall" title="<?php echo gettext("Remove categories all from enforcing rules"); ?>"/></td>
-							<td valign="middle"><input value=" Save " class="formbtns" type="submit" name="save" id="save" title="<?php echo gettext("Save changes to enforcing rules and rebuild"); ?>"/></td>
-							<td valign="middle"><span class="vexpl"><?php echo gettext("Click to save changes and auto-resolve flowbit rules (if option is selected above)"); ?></span></td>
+					<table width="95%" style="margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="0">
+						<tbody>
+						<tr height="32px">
+							<td style="vertical-align: middle;"><input value="Select All" class="formbtns" type="submit" name="selectall" id="selectall" title="<?php echo gettext("Add all to enforcing rules"); ?>"/></td>
+							<td style="vertical-align: middle;"><input value="Unselect All" class="formbtns" type="submit" name="unselectall" id="unselectall" title="<?php echo gettext("Remove all from enforcing rules"); ?>"/></td>
+							<td style="vertical-align: middle;"><input value=" Save " class="formbtns" type="submit" name="save" id="save" title="<?php echo gettext("Save changes to enforcing rules and rebuild"); ?>"/></td>
+							<td style="vertical-align: middle;"><span class="vexpl"><?php echo gettext("Click to save changes and auto-resolve flowbit rules (if option is selected above)"); ?></span></td>
 						</tr>
+					<?php if (!empty($cat_mods)): ?>
+						<tr height="20px">
+							<td colspan="4" style="vertical-align: middle;"><img style="vertical-align: text-top;" src="../themes/<?=$g['theme'];?>/images/icons/icon_advanced.gif" width="11" height="11" border="0" />
+							<?=gettext("- Category is auto-enabled by SID Mgmt conf files");?>&nbsp;&nbsp;&nbsp;
+							<img style="opacity: 0.4; filter: alpha(opacity=40); vertical-align: text-top;" src="../themes/<?=$g['theme'];?>/images/icons/icon_advanced.gif" width="11" height="11" border="0" />
+							<?=gettext("- Category is auto-disabled by SID Mgmt conf files");?></td>
+						</tr>
+					<?php endif; ?>
+						</tbody>
 					</table>
+				</td>
 			</tr>
 			<?php if ($no_community_files)
 				$msg_community = "NOTE: Snort Community Rules have not been downloaded.  Perform a Rules Update to enable them.";
@@ -409,22 +428,34 @@ if ($savemsg) {
 				<td width="5%" class="listhdrr"><?php echo gettext("Enabled"); ?></td>
 				<td colspan="5" class="listhdrr"><?php echo gettext('Ruleset: Snort GPLv2 Community Rules');?></td>
 			</tr>
-			<?php if (in_array($community_rules_file, $enabled_rulesets_array)): ?>
+			<?php if (isset($cat_mods[$community_rules_file])): ?>
+				<?php if ($cat_mods[$community_rules_file] == 'enabled') : ?>
+					<tr>
+						<td width="5%" class="listr" style="text-align: center;">
+						<img src="../themes/<?=$g['theme'];?>/images/icons/icon_advanced.gif" width="11" height="11" border="0" title="<?=gettext("Auto-managed by settings on SID Mgmt tab");?>" /></td>
+						<td colspan="5" class="listr"><a href='suricata_rules.php?id=<?=$id;?>&openruleset=<?=$community_rules_file;?>'><?=gettext("{$msg_community}");?></a></td>
+					</tr>
+				<?php else: ?>
+					<tr>
+						<td width="5%" class="listr" style="text-align: center;">
+						<img style="opacity: 0.4; filter: alpha(opacity=40);" src="../themes/<?=$g['theme'];?>/images/icons/icon_advanced.gif" width="11" height="11" border="0" title="<?=gettext("Auto-managed by settings on SID Mgmt tab");?>" /></td>
+						<td colspan="5" class="listr"><?=gettext("{$msg_community}"); ?></td>
+					</tr>
+				<?php endif; ?>
+			<?php elseif (in_array($community_rules_file, $enabled_rulesets_array)): ?>
 			<tr>
-				<td width="5" class="listr" align="center" valign="top">
+				<td width="5%" class="listr" style="text-align: center;">
 				<input type="checkbox" name="toenable[]" value="<?=$community_rules_file;?>" checked="checked"/></td>
-				<td colspan="5" class="listr"><a href='snort_rules.php?id=<?=$id;?>&openruleset=<?=$community_rules_file;?>'><?php echo gettext("{$msg_community}"); ?></a></td>
+				<td colspan="5" class="listr"><a href='suricata_rules.php?id=<?=$id;?>&openruleset=<?=$community_rules_file;?>'><?php echo gettext("{$msg_community}"); ?></a></td>
 			</tr>
 			<?php else: ?>
 			<tr>
-				<td width="5" class="listr" align="center" valign="top">
+				<td width="5%" class="listr" style="text-align: center;">
 				<input type="checkbox" name="toenable[]" value="<?=$community_rules_file;?>" <?php if ($snortcommunitydownload == 'off') echo "disabled"; ?>/></td>
 				<td colspan="5" class="listr"><?php echo gettext("{$msg_community}"); ?></td>
 			</tr>
-
 			<?php endif; ?>
 			<?php endif; ?>
-
 			<?php if ($no_emerging_files && ($emergingdownload == 'on' || $etpro == 'on'))
 				  $msg_emerging = "have not been downloaded.";
 			      else
@@ -489,15 +520,28 @@ if ($savemsg) {
 					echo "<tr>\n";
 					if (!empty($emergingrules[$j])) {
 						$file = $emergingrules[$j];
-						echo "<td width='5%' class='listr' align=\"center\" valign=\"top\">";
+						echo "<td width='5%' class='listr' align=\"center\">";
 						if(is_array($enabled_rulesets_array)) {
-							if(in_array($file, $enabled_rulesets_array))
+							if(in_array($file, $enabled_rulesets_array) && !isset($cat_mods[$file]))
 								$CHECKED = " checked=\"checked\"";
 							else
 								$CHECKED = "";
 						} else
 							$CHECKED = "";
-						echo "	\n<input type='checkbox' name='toenable[]' value='$file' {$CHECKED} />\n";
+						if (isset($cat_mods[$file])) {
+							if (in_array($file, $enabled_rulesets_array))
+								echo "<input type='hidden' name='toenable[]' value='{$file}' />\n";
+							if ($cat_mods[$file] == 'enabled') {
+								$CHECKED = "enabled";
+								echo "	\n<img src=\"../themes/{$g['theme']}/images/icons/icon_advanced.gif\" width=\"11\" height=\"11\" border=\"0\" title=\"" . gettext("Auto-enabled by settings on SID Mgmt tab") . "\" />\n";
+							}
+							else {
+								echo "	\n<img style=\"opacity: 0.4; filter: alpha(opacity=40);\" src=\"../themes/{$g['theme']}/images/icons/icon_advanced.gif\" width=\"11\" height=\"11\" border=\"0\" title=\"" . gettext("Auto-disabled by settings on SID Mgmt tab") . "\" />\n";
+							}
+						}
+						else {
+							echo "	\n<input type='checkbox' name='toenable[]' value='{$file}' {$CHECKED} />\n";
+						}
 						echo "</td>\n";
 						echo "<td class='listr' width='25%' >\n";
 						if (empty($CHECKED))
@@ -510,17 +554,30 @@ if ($savemsg) {
 
 					if (!empty($snortrules[$j])) {
 						$file = $snortrules[$j];
-						echo "<td class='listr' width='5%' align=\"center\" valign=\"top\">";
+						echo "<td class='listr' width='5%' align=\"center\">";
 						if(is_array($enabled_rulesets_array)) {
 							if (!empty($disable_vrt_rules))
 								$CHECKED = $disable_vrt_rules;
-							elseif(in_array($file, $enabled_rulesets_array))
+							elseif(in_array($file, $enabled_rulesets_array) && !isset($cat_mods[$file]))
 								$CHECKED = " checked=\"checked\"";
 							else
 								$CHECKED = "";
 						} else
 							$CHECKED = "";
-						echo "	\n<input type='checkbox' name='toenable[]' value='{$file}' {$CHECKED} />\n";
+						if (isset($cat_mods[$file])) {
+							if (in_array($file, $enabled_rulesets_array))
+								echo "<input type='hidden' name='toenable[]' value='{$file}' />\n";
+							if ($cat_mods[$file] == 'enabled') {
+								$CHECKED = "enabled";
+								echo "	\n<img src=\"../themes/{$g['theme']}/images/icons/icon_advanced.gif\" width=\"11\" height=\"11\" border=\"0\" title=\"" . gettext("Auto-enabled by settings on SID Mgmt tab") . "\" />\n";
+							}
+							else {
+								echo "	\n<img style=\"opacity: 0.4; filter: alpha(opacity=40);\" src=\"../themes/{$g['theme']}/images/icons/icon_advanced.gif\" width=\"11\" height=\"11\" border=\"0\" title=\"" . gettext("Auto-disabled by settings on SID Mgmt tab") . "\" />\n";
+							}
+						}
+						else {
+							echo "	\n<input type='checkbox' name='toenable[]' value='{$file}' {$CHECKED} />\n";
+						}
 						echo "</td>\n";
 						echo "<td class='listr' width='25%' >\n";
 						if (empty($CHECKED) || $CHECKED == "disabled")
@@ -530,22 +587,39 @@ if ($savemsg) {
 						echo "</td>\n";
 					} else
 						echo "<td class='listbggrey' width='30%' colspan='2'><br/></td>\n";
+
 					if (!empty($snortsorules[$j])) {
 						$file = $snortsorules[$j];
 						echo "<td class='listr' width='5%' align=\"center\" valign=\"top\">";
 						if(is_array($enabled_rulesets_array)) {
 							if (!empty($disable_vrt_rules))
 								$CHECKED = $disable_vrt_rules;
-							elseif(in_array($file, $enabled_rulesets_array))
+							elseif(in_array($file, $enabled_rulesets_array) && !isset($cat_mods[$file]))
 								$CHECKED = " checked=\"checked\"";
 							else
 								$CHECKED = "";
 						} else
 							$CHECKED = "";
-						echo "	\n<input type='checkbox' name='toenable[]' value='{$file}' {$CHECKED} />\n";
+						if (isset($cat_mods[$file])) {
+							if (in_array($file, $enabled_rulesets_array))
+								echo "<input type='hidden' name='toenable[]' value='{$file}' />\n";
+							if ($cat_mods[$file] == 'enabled') {
+								$CHECKED = "enabled";
+								echo "	\n<img src=\"../themes/{$g['theme']}/images/icons/icon_advanced.gif\" width=\"11\" height=\"11\" border=\"0\" title=\"" . gettext("Auto-enabled by settings on SID Mgmt tab") . "\" />\n";
+							}
+							else {
+								echo "	\n<img style=\"opacity: 0.4; filter: alpha(opacity=40);\" src=\"../themes/{$g['theme']}/images/icons/icon_advanced.gif\" width=\"11\" height=\"11\" border=\"0\" title=\"" . gettext("Auto-disabled by settings on SID Mgmt tab") . "\" />\n";
+							}
+						}
+						else {
+							echo "	\n<input type='checkbox' name='toenable[]' value='{$file}' {$CHECKED} />\n";
+						}
 						echo "</td>\n";
 						echo "<td class='listr' width='25%' >\n";
+						if (empty($CHECKED) || $CHECKED == "disabled")
 							echo $file;
+						else
+							echo "<a href='snort_rules.php?id={$id}&openruleset=" . urlencode($file) . "'>{$file}</a>\n";
 						echo "</td>\n";
 					} else
 						echo "<td class='listbggrey' width='30%' colspan='2'><br/></td>\n";
