@@ -89,8 +89,17 @@ foreach ($snort_files as $file) {
 
 /* define alertsystemlog */
 $alertsystemlog_type = "";
-if ($snortcfg['alertsystemlog'] == "on")
-	$alertsystemlog_type = "output alert_syslog: log_alert";
+if ($snortcfg['alertsystemlog'] == "on") {
+	$alertsystemlog_type = "output alert_syslog: ";
+	if (!empty($snortcfg['alertsystemlog_facility']))
+		$alertsystemlog_type .= strtoupper($snortcfg['alertsystemlog_facility']) . " ";
+	else
+		$alertsystemlog_type .= "LOG_AUTH ";
+	if (!empty($snortcfg['alertsystemlog_priority']))
+		$alertsystemlog_type .= strtoupper($snortcfg['alertsystemlog_priority']) . " ";
+	else
+		$alertsystemlog_type .= "LOG_ALERT ";
+}
 
 /* define snortunifiedlog */
 $snortunifiedlog_type = "";

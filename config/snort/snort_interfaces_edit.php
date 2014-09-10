@@ -113,6 +113,10 @@ if (empty($pconfig['blockoffendersip']))
 	$pconfig['blockoffendersip'] = "both";
 if (empty($pconfig['performance']))
 	$pconfig['performance'] = "ac-bnfa";
+if (empty($pconfig['alertsystemlog_facility']))
+	$pconfig['alertsystemlog_facility'] = "log_auth";
+if (empty($pconfig['alertsystemlog_priority']))
+	$pconfig['alertsystemlog_priority'] = "log_alert";
 
 // See if creating a new interface by duplicating an existing one
 if (strcasecmp($action, 'dup') == 0) {
@@ -206,6 +210,8 @@ if ($_POST["save"] && !$input_errors) {
 		if ($_POST['externallistname']) $natent['externallistname'] =  $_POST['externallistname']; else unset($natent['externallistname']);
 		if ($_POST['suppresslistname']) $natent['suppresslistname'] =  $_POST['suppresslistname']; else unset($natent['suppresslistname']);
 		if ($_POST['alertsystemlog'] == "on") { $natent['alertsystemlog'] = 'on'; }else{ $natent['alertsystemlog'] = 'off'; }
+		if ($_POST['alertsystemlog_facility']) $natent['alertsystemlog_facility'] = $_POST['alertsystemlog_facility'];
+		if ($_POST['alertsystemlog_priority']) $natent['alertsystemlog_priority'] = $_POST['alertsystemlog_priority'];
 		if ($_POST['configpassthru']) $natent['configpassthru'] = base64_encode(str_replace("\r\n", "\n", $_POST['configpassthru'])); else unset($natent['configpassthru']);
 		if ($_POST['cksumcheck']) $natent['cksumcheck'] = 'on'; else $natent['cksumcheck'] = 'off';
 		if ($_POST['fpm_split_any_any'] == "on") { $natent['fpm_split_any_any'] = 'on'; }else{ $natent['fpm_split_any_any'] = 'off'; }
@@ -355,6 +361,8 @@ if ($_POST["save"] && !$input_errors) {
 			if (!is_array($natent['stream5_tcp_engine']['item']))
 				$natent['stream5_tcp_engine']['item'] = array();
 			$natent['stream5_tcp_engine']['item'][] = $stream5_eng;
+			$natent['alertsystemlog_facility'] = "log_auth";
+			$natent['alertsystemlog_priority'] = "log_alert";
 
 			$a_rule[] = $natent;
 		}
@@ -488,9 +496,44 @@ include_once("head.inc");
 	</tr>
 	<tr>
 				<td width="22%" valign="top" class="vncell"><?php echo gettext("Send Alerts to System Logs"); ?></td>
-				<td width="78%" class="vtable"><input name="alertsystemlog" type="checkbox" value="on" <?php if ($pconfig['alertsystemlog'] == "on") echo "checked"; ?>/>
+				<td width="78%" class="vtable"><input name="alertsystemlog" type="checkbox" value="on" onclick="toggle_system_log();" <?php if ($pconfig['alertsystemlog'] == "on") echo " checked"; ?>/>
 				<?php echo gettext("Snort will send Alerts to the firewall's system logs."); ?></td>
 	</tr>
+	<tbody id="alertsystemlog_rows">
+		<tr>
+			<td width="22%" valign="top" class="vncell"><?php echo gettext("System Log Facility"); ?></td>
+			<td width="78%" class="vtable">
+				<select name="alertsystemlog_facility" id="alertsystemlog_facility" class="formselect">
+				<?php
+					$log_facility = array(  "log_auth", "log_authpriv", "log_daemon", "log_user", "log_local0", "log_local1",
+								"log_local2", "log_local3", "log_local4", "log_local5", "log_local6", "log_local7" );
+					foreach ($log_facility as $facility) {
+						$selected = "";
+						if ($facility == $pconfig['alertsystemlog_facility'])
+							$selected = " selected";
+						echo "<option value='{$facility}'{$selected}>" . $facility . "</option>\n";
+					}
+				?></select>&nbsp;&nbsp;
+				<?php echo gettext("Select system log Facility to use for reporting.  Default is ") . "<strong>" . gettext("log_auth") . "</strong>."; ?>
+			</td>
+		</tr>
+		<tr>
+			<td width="22%" valign="top" class="vncell"><?php echo gettext("System Log Priority"); ?></td>
+			<td width="78%" class="vtable">
+				<select name="alertsystemlog_priority" id="alertsystemlog_priority" class="formselect">
+				<?php
+					$log_priority = array( "log_emerg", "log_crit", "log_alert", "log_err", "log_warning", "log_notice", "log_info", "log_debug" );
+					foreach ($log_priority as $priority) {
+						$selected = "";
+						if ($priority == $pconfig['alertsystemlog_priority'])
+							$selected = " selected";
+						echo "<option value='{$priority}'{$selected}>" . $priority . "</option>\n";
+					}
+				?></select>&nbsp;&nbsp;
+				<?php echo gettext("Select system log Priority (Level) to use for reporting.  Default is ") . "<strong>" . gettext("log_alert") . "</strong>."; ?>
+			</td>
+		</tr>
+	</tbody>
 	<tr>
 				<td width="22%" valign="top" class="vncell"><?php echo gettext("Block Offenders"); ?></td>
 				<td width="78%" class="vtable">
@@ -750,6 +793,14 @@ function enable_blockoffenders() {
 	document.iform.btnWhitelist.disabled=endis;
 }
 
+function toggle_system_log() {
+	var endis = !(document.iform.alertsystemlog.checked);
+	if (endis)
+		document.getElementById("alertsystemlog_rows").style.display="none";
+	else
+		document.getElementById("alertsystemlog_rows").style.display="";
+}
+
 function enable_change(enable_change) {
 	endis = !(document.iform.enable.checked || enable_change);
 	// make sure a default answer is called if this is invoked.
@@ -804,6 +855,7 @@ function viewList(id, elemID, elemType) {
 
 enable_change(false);
 enable_blockoffenders();
+toggle_system_log();
 
 //-->
 </script>
