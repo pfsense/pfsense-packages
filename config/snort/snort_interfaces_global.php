@@ -49,18 +49,13 @@ $pconfig['etpro_code'] = $config['installedpackages']['snortglobal']['etpro_code
 $pconfig['emergingthreats'] = $config['installedpackages']['snortglobal']['emergingthreats'] == "on" ? 'on' : 'off';
 $pconfig['emergingthreats_pro'] = $config['installedpackages']['snortglobal']['emergingthreats_pro'] == "on" ? 'on' : 'off';
 $pconfig['rm_blocked'] = $config['installedpackages']['snortglobal']['rm_blocked'];
-$pconfig['snortloglimit'] = $config['installedpackages']['snortglobal']['snortloglimit'];
-$pconfig['snortloglimitsize'] = $config['installedpackages']['snortglobal']['snortloglimitsize'];
 $pconfig['autorulesupdate7'] = $config['installedpackages']['snortglobal']['autorulesupdate7'];
 $pconfig['rule_update_starttime'] = $config['installedpackages']['snortglobal']['rule_update_starttime'];
 $pconfig['forcekeepsettings'] = $config['installedpackages']['snortglobal']['forcekeepsettings'] == "on" ? 'on' : 'off';
 $pconfig['snortcommunityrules'] = $config['installedpackages']['snortglobal']['snortcommunityrules'] == "on" ? 'on' : 'off';
-$pconfig['clearlogs'] = $config['installedpackages']['snortglobal']['clearlogs'] == "on" ? 'on' : 'off';
 $pconfig['clearblocks'] = $config['installedpackages']['snortglobal']['clearblocks'] == "on" ? 'on' : 'off';
 
 /* Set sensible values for any empty default params */
-if (empty($pconfig['snortloglimit']))
-	$pconfig['snortloglimit'] = 'on';
 if (!isset($pconfig['rule_update_starttime']))
 	$pconfig['rule_update_starttime'] = '00:05';
 if (!isset($config['installedpackages']['snortglobal']['forcekeepsettings']))
@@ -85,7 +80,6 @@ if (!$input_errors) {
 		$config['installedpackages']['snortglobal']['snortcommunityrules'] = $_POST['snortcommunityrules'] ? 'on' : 'off';
 		$config['installedpackages']['snortglobal']['emergingthreats'] = $_POST['emergingthreats'] ? 'on' : 'off';
 		$config['installedpackages']['snortglobal']['emergingthreats_pro'] = $_POST['emergingthreats_pro'] ? 'on' : 'off';
-		$config['installedpackages']['snortglobal']['clearlogs'] = $_POST['clearlogs'] ? 'on' : 'off';
 		$config['installedpackages']['snortglobal']['clearblocks'] = $_POST['clearblocks'] ? 'on' : 'off';
 
 		// If any rule sets are being turned off, then remove them
@@ -127,16 +121,6 @@ if (!$input_errors) {
 		$config['installedpackages']['snortglobal']['etpro_code'] = $_POST['etpro_code'];
 
 		$config['installedpackages']['snortglobal']['rm_blocked'] = $_POST['rm_blocked'];
-		if ($_POST['snortloglimitsize']) {
-			$config['installedpackages']['snortglobal']['snortloglimit'] = $_POST['snortloglimit'];
-			$config['installedpackages']['snortglobal']['snortloglimitsize'] = $_POST['snortloglimitsize'];
-		} else {
-			$config['installedpackages']['snortglobal']['snortloglimit'] = 'on';
-
-			/* code will set limit to 21% of slice that is unused */
-			$snortloglimitDSKsize = round(exec('df -k /var | grep -v "Filesystem" | awk \'{print $4}\'') * .22 / 1024);
-			$config['installedpackages']['snortglobal']['snortloglimitsize'] = $snortloglimitDSKsize;
-		}
 		$config['installedpackages']['snortglobal']['autorulesupdate7'] = $_POST['autorulesupdate7'];
 
 		/* Check and adjust format of Rule Update Starttime string to add colon and leading zero if necessary */
@@ -199,7 +183,8 @@ if ($input_errors)
         $tab_array[6] = array(gettext("Suppress"), false, "/snort/snort_interfaces_suppress.php");
 	$tab_array[7] = array(gettext("IP Lists"), false, "/snort/snort_ip_list_mgmt.php");
 	$tab_array[8] = array(gettext("SID Mgmt"), false, "/snort/snort_sid_mgmt.php");
-	$tab_array[9] = array(gettext("Sync"), false, "/pkg_edit.php?xml=snort/snort_sync.xml");
+	$tab_array[9] = array(gettext("Log Mgmt"), false, "/snort/snort_log_mgmt.php");
+	$tab_array[10] = array(gettext("Sync"), false, "/pkg_edit.php?xml=snort/snort_sync.xml");
         display_top_tabs($tab_array, true);
 ?>
 </td></tr>
@@ -330,39 +315,6 @@ if ($input_errors)
 	<td colspan="2" valign="top" class="listtopic"><?php echo gettext("General Settings"); ?></td>
 </tr>
 <tr>
-<?php $snortlogCurrentDSKsize = round(exec('df -k /var | grep -v "Filesystem" | awk \'{print $4}\'') / 1024); ?>
-	<td width="22%" valign="top" class="vncell"><?php echo gettext("Log Directory Size " .
-	"Limit"); ?><br/><br/>
-	<br/>
-	<br/>
-	<span class="red"><strong><?php echo gettext("Note:"); ?></strong></span><br/>
-	<?php echo gettext("Available space is"); ?> <strong><?php echo $snortlogCurrentDSKsize; ?>&nbsp;MB</strong></td>
-	<td width="78%" class="vtable">
-		<table cellpadding="0" cellspacing="0">
-			<tr>
-				<td colspan="2"><input name="snortloglimit" type="radio" id="snortloglimit" value="on" 
-					<?php if($pconfig['snortloglimit']=='on') echo 'checked'; ?>><span class="vexpl">
-					<strong><?php echo gettext("Enable"); ?></strong> <?php echo gettext("directory size limit"); ?> (<strong><?php echo gettext("Default"); ?></strong>)</span></td>
-			</tr>
-			<tr>
-				<td colspan="2"><input name="snortloglimit" type="radio" id="snortloglimit" value="off" 
-					<?php if($pconfig['snortloglimit']=='off') echo 'checked'; ?>> <span class="vexpl"><strong><?php echo gettext("Disable"); ?></strong>
-					<?php echo gettext("directory size limit"); ?></span><br/>
-				<br/>
-				<span class="red"><strong><?php echo gettext("Warning:"); ?></strong></span> <?php echo gettext("Nanobsd " .
-				"should use no more than 10MB of space."); ?></td>
-			</tr>
-		</table>
-		<table width="100%" border="0" cellpadding="2" cellspacing="0">
-			<tr>
-				<td class="vexpl"><?php echo gettext("Size in ") . "<strong>" . gettext("MB:") . "</strong>";?>&nbsp;
-				<input name="snortloglimitsize" type="text" class="formfld unknown" id="snortloglimitsize" size="10" value="<?=htmlspecialchars($pconfig['snortloglimitsize']);?>">
-				&nbsp;<?php echo gettext("Default is ") . "<strong>" . gettext("20%") . "</strong>" . gettext(" of available space.");?></td>
-			</tr>
-		</table>
-	</td>
-</tr>
-<tr>
 	<td width="22%" valign="top" class="vncell"><?php echo gettext("Remove Blocked Hosts Interval"); ?></td>
 	<td width="78%" class="vtable">
 		<select name="rm_blocked" class="formselect" id="rm_blocked">
@@ -382,12 +334,6 @@ if ($input_errors)
 	<td width="78%" class="vtable"><input name="clearblocks" id="clearblocks" type="checkbox" value="yes"
 	<?php if ($config['installedpackages']['snortglobal']['clearblocks']=="on") echo " checked"; ?>/>&nbsp;
 	<?php echo gettext("All blocked hosts added by Snort will be removed during package deinstallation."); ?></td>
-</tr>
-<tr>
-	<td width="22%" valign="top" class="vncell"><?php echo gettext("Remove Snort Log Files After Deinstall"); ?></td>
-	<td width="78%" class="vtable"><input name="clearlogs" id="clearlogs" type="checkbox" value="yes"
-	<?php if ($config['installedpackages']['snortglobal']['clearlogs']=="on") echo " checked"; ?>/>&nbsp;
-	<?php echo gettext("All Snort log files will be removed during package deinstallation."); ?></td>
 </tr>
 <tr>
 	<td width="22%" valign="top" class="vncell"><?php echo gettext("Keep Snort Settings After Deinstall"); ?></td>
