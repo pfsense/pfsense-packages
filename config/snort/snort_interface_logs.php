@@ -177,7 +177,7 @@ if ($input_errors) {
 				<td width="78%" class="vtable">
 					<select name="logFile" id="logFile" class="formselect" onChange="loadFile();">
 			<?php
-				$logs = array( "alert", "sid_changes.log" );
+				$logs = array( "alert", "{$if_real}.stats" , "sid_changes.log" );
 				foreach ($logs as $log) {
 					$selected = "";
 					if ($log == basename($logfile))
