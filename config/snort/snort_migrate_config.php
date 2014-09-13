@@ -491,7 +491,7 @@ unset($r);
 
 // Write out the new configuration to disk if we changed anything
 if ($updated_cfg) {
-	$config['installedpackages']['snortglobal']['snort_config_ver'] = "3.1.2";
+	$config['installedpackages']['snortglobal']['snort_config_ver'] = "3.1.3";
 	log_error("[Snort] Saving configuration settings in new format...");
 	write_config("Snort pkg: migrate existing settings to new format as part of package upgrade.");
 	log_error("[Snort] Settings successfully migrated to new configuration format...");
