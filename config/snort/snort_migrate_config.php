@@ -70,6 +70,30 @@ if (empty($config['installedpackages']['snortglobal']['snort_config_ver']) &&
 	$updated_cfg = true;
 }
 
+/**********************************************************/
+/* Create new Auto SID Mgmt settings if not set           */
+/**********************************************************/
+	if (empty($config['installedpackages']['snortglobal']['auto_manage_sids'])) {
+		$config['installedpackages']['snortglobal']['auto_manage_sids'] = "off";
+		$config['installedpackages']['snortglobal']['sid_changes_log_limit_size'] = "250";
+		$config['installedpackages']['snortglobal']['sid_changes_log_retention'] = "336";
+		$updated_cfg = true;
+	}
+
+/**********************************************************/
+/* Create new LOG MGMT settings if not set                */
+/**********************************************************/
+	if (empty($config['installedpackages']['snortglobal']['enable_log_mgmt'])) {
+		$config['installedpackages']['snortglobal']['enable_log_mgmt'] = "on";
+		$config['installedpackages']['snortglobal']['alert_log_limit_size'] = "500";
+		$config['installedpackages']['snortglobal']['alert_log_retention'] = "336";
+		$config['installedpackages']['snortglobal']['stats_log_limit_size'] = "500";
+		$config['installedpackages']['snortglobal']['stats_log_retention'] = "168";
+		$config['installedpackages']['snortglobal']['event_pkts_log_limit_size'] = "0";
+		$config['installedpackages']['snortglobal']['event_pkts_log_retention'] = "336";
+		$updated_cfg = true;
+}
+
 foreach ($rule as &$r) {
 	// Initialize arrays for supported preprocessors if necessary
 	if (!is_array($r['frag3_engine']['item']))
@@ -344,7 +368,7 @@ foreach ($rule as &$r) {
 		// Since Barnyard2 was enabled, configure the new archived log settings
 		$pconfig['u2_archived_log_retention'] = '168';
 		$pconfig['barnyard_archive_enable'] = 'on';
-		$pconfig['unified2_log_limit'] = '32';
+		$pconfig['unified2_log_limit'] = '32M';
 		$updated_cfg = true;
 	}
 
@@ -448,6 +472,14 @@ foreach ($rule as &$r) {
 	}
 	if (empty($pconfig['smtp_log_email_hdrs'])) {
 		$pconfig['smtp_log_email_hdrs'] = 'on';
+		$updated_cfg = true;
+	}
+
+
+	// Migrate any BY2 limit for unified2 logs to new format
+	if (!empty($pconfig['unified2_log_limit']) && 
+	    !preg_match('/^\d+[g|k|m|G|K|M]/', $pconfig['unified2_log_limit'])) {
+		$pconfig['unified2_log_limit'] .= "M";
 		$updated_cfg = true;
 	}
 

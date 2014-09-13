@@ -57,8 +57,8 @@ $retentions = array( '0' => gettext('KEEP ALL'), '24' => gettext('1 DAY'), '168'
 		     '720' => gettext('30 DAYS'), '1080' => gettext("45 DAYS"), '2160' => gettext('90 DAYS'), '4320' => gettext('180 DAYS'), 
 		     '8766' => gettext('1 YEAR'), '26298' => gettext("3 YEARS") );
 
-$log_sizes = array( '0' => gettext('NO LIMIT'), '8' => gettext('8 MB'), '16' => gettext('16 MB'), '32' => gettext('32 MB'), 
-		    '64' => gettext('64 MB'), '128' => gettext('128 MB'), '256' => gettext('256 MB') );
+$log_sizes = array( '0' => gettext('NO LIMIT'), '128K' => '128 KB', '256K' => '256 KB', '512K' => '512 KB', '1M' => '1 MB', '4M' => '4 MB', '8M' => gettext('8 MB'), 
+		    '16M' => gettext('16 MB'), '32M' => gettext('32 MB'), '64M' => gettext('64 MB'), '128M' => gettext('128 MB'), '256M' => gettext('256 MB') );
 
 if (isset($id) && $a_nat[$id]) {
 	$pconfig = $a_nat[$id];
@@ -69,7 +69,7 @@ if (isset($id) && $a_nat[$id]) {
 	if (empty($a_nat[$id]['barnyard_show_year']))
 		$pconfig['barnyard_show_year'] = "on";
 	if (empty($a_nat[$id]['unified2_log_limit']))
-		$pconfig['unified2_log_limit'] = "32";
+		$pconfig['unified2_log_limit'] = "128K";
 	if (empty($a_nat[$id]['barnyard_archive_enable']))
 		$pconfig['barnyard_archive_enable'] = "on";
 	if (empty($a_nat[$id]['u2_archived_log_retention']))
@@ -284,7 +284,7 @@ include_once("head.inc");
 						<?php if ($k == $pconfig['unified2_log_limit']) echo "selected"; ?>>
 							<?=htmlspecialchars($p);?></option>
 					<?php endforeach; ?>
-					</select>&nbsp;<?php echo gettext("Choose a Unified2 Log file size limit in megabytes (MB). Default is "); ?><strong><?=gettext("32 MB.");?></strong><br/><br/>
+					</select>&nbsp;<?php echo gettext("Choose a Unified2 Log file size limit. Default is "); ?><strong><?=gettext("128 KB.");?></strong><br/><br/>
 					<?php echo gettext("This sets the maximum size for a Unified2 Log file before it is rotated and a new one created."); ?>
 				</td>
 			</tr>

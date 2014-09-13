@@ -44,10 +44,32 @@ require_once("/usr/local/pkg/snort/snort.inc");
 
 global $config, $g, $rebuild_rules, $pkg_interface, $snort_gui_include;
 
+/****************************************
+ * Define any new constants here that   *
+ * may not be yet defined in the old    *
+ * "snort.inc" include file that might  *
+ * be cached and used by the package    *
+ * manager installation code.           *
+ *                                      *
+ * This is a hack to work around the    *
+ * fact the old version of suricata.inc *
+ * is cached and used instead of the    *
+ * updated version icluded with the     *
+ * updated GUI package.                 *
+ ****************************************/
+if (!defined('SID_MODS_PATH'))
+	define('SID_MODS_PATH', '/var/db/snort/sidmods/');
+
+/****************************************
+ * End of PHP caching workaround        *
+ ****************************************/
+
 $snortdir = SNORTDIR;
 $snortlogdir = SNORTLOGDIR;
 $snortlibdir = SNORTLIBDIR;
 $rcdir = RCFILEPREFIX;
+$flowbit_rules_file = FLOWBITS_FILENAME;
+$snort_enforcing_rules_file = ENFORCING_RULES_FILENAME;
 
 /* Hard kill any running Snort processes that may have been started by any   */
 /* of the pfSense scripts such as check_reload_status() or rc.start_packages */
@@ -97,6 +119,7 @@ foreach ($preproc_rules as $file) {
 /* Create required log and db directories in /var */
 safe_mkdir(SNORTLOGDIR);
 safe_mkdir(IPREP_PATH);
+safe_mkdir(SID_MODS_PATH);
 
 /* If installed, absorb the Snort Dashboard Widget into this package */
 /* by removing it as a separately installed package.                 */
@@ -164,15 +187,35 @@ if ($config['installedpackages']['snortglobal']['forcekeepsettings'] == 'on') {
 
 	/* Create the snort.conf files for each enabled interface */
 	$snortconf = $config['installedpackages']['snortglobal']['rule'];
-	foreach ($snortconf as $value) {
-		$if_real = get_real_interface($value['interface']);
+	foreach ($snortconf as $snortcfg) {
+		$if_real = get_real_interface($snortcfg['interface']);
+		$snort_uuid = $snortcfg['uuid'];
+		$snortcfgdir = "{$snortdir}/snort_{$snort_uuid}_{$if_real}";
 
-		/* create a snort.conf file for interface */
-		snort_generate_conf($value);
+		// Pull in the PHP code that generates the snort.conf file
+		// variables that will be substituted further down below.
+		include("/usr/local/pkg/snort/snort_generate_conf.php");
 
-		/* create barnyard2.conf file for interface */
-		if ($value['barnyard_enable'] == 'on')
-			snort_generate_barnyard2_conf($value, $if_real);
+		// Pull in the boilerplate template for the snort.conf
+		// configuration file.  The contents of the template along
+		// with substituted variables are stored in $snort_conf_text
+		// (which is defined in the included file).
+		include("/usr/local/pkg/snort/snort_conf_template.inc");
+
+		// Now write out the conf file using $snort_conf_text contents
+		@file_put_contents("{$snortcfgdir}/snort.conf", $snort_conf_text); 
+		unset($snort_conf_text);
+
+		// Create the actual rules files and save them in the interface directory
+		snort_prepare_rule_files($snortcfg, $snortcfgdir);
+
+		// Clean up variables we no longer need and free memory
+		unset($snort_conf_text, $selected_rules_sections, $suppress_file_name, $snort_misc_include_rules, $spoink_type, $snortunifiedlog_type, $alertsystemlog_type);
+		unset($home_net, $external_net, $ipvardef, $portvardef);
+
+		// create barnyard2.conf file for interface
+		if ($snortcfg['barnyard_enable'] == 'on')
+			snort_generate_barnyard2_conf($snortcfg, $if_real);
 	}
 
 	/* create snort bootup file snort.sh */

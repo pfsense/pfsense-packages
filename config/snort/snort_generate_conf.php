@@ -87,6 +87,12 @@ foreach ($snort_files as $file) {
 	}
 }
 
+/* define alert log limit */
+if (!empty($config['installedpackages']['snortglobal']['alert_log_limit_size']) && $config['installedpackages']['snortglobal']['alert_log_limit_size'] != "0")
+	$alert_log_limit_size = $config['installedpackages']['snortglobal']['alert_log_limit_size'] . "K";
+else
+	$alert_log_limit_size = "";
+
 /* define alertsystemlog */
 $alertsystemlog_type = "";
 if ($snortcfg['alertsystemlog'] == "on") {
@@ -107,7 +113,7 @@ if ($snortcfg['barnyard_enable'] == "on") {
 	if (isset($snortcfg['unified2_log_limit']))
 		$u2_log_limit = "limit {$snortcfg['unified2_log_limit']}";
 	else
-		$u2_log_limit = "limit 128";
+		$u2_log_limit = "limit 128K";
 
 	$snortunifiedlog_type = "output unified2: filename snort_{$snort_uuid}_{$if_real}.u2, {$u2_log_limit}";
 	if ($snortcfg['barnyard_log_vlan_events'] == 'on')
@@ -201,9 +207,13 @@ $stream5_ports_both .= "\t           55555 56712";
 
 /* def perform_stat */
 
+if (!empty($config['installedpackages']['snortglobal']['stats_log_limit_size']) && $config['installedpackages']['snortglobal']['stats_log_limit_size'] != "0")
+	$stats_log_limit = "max_file_size " . $config['installedpackages']['snortglobal']['stats_log_limit_size'] * 1000;
+else
+	$stats_log_limit = "";
 $perform_stat = <<<EOD
 # Performance Statistics #
-preprocessor perfmonitor: time 300 file {$snortlogdir}/snort_{$if_real}{$snort_uuid}/{$if_real}.stats pktcnt 10000
+preprocessor perfmonitor: time 300 file {$snortlogdir}/snort_{$if_real}{$snort_uuid}/{$if_real}.stats pktcnt 10000 {$stats_log_limit}
 	
 EOD;
 
