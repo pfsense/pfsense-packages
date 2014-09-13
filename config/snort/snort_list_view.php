@@ -66,6 +66,20 @@ if (isset($id) && isset($wlist)) {
 		$contents = str_replace("\r", "", base64_decode($list['suppresspassthru']));
 		$title = "Suppress List";
 	}
+	elseif ($type == "externalnet") {
+		if ($wlist == "default") {
+			$list = snort_build_list($a_rule, $a_rule['homelistname']);
+			$contents = "";
+			foreach ($list as $ip)
+				$contents .= "!{$ip}\n";
+			$contents = trim($contents, "\n");
+		}
+		else {
+			$list = snort_build_list($a_rule, $wlist, false, true);
+			$contents = implode("\n", $list);
+		}
+		$title = "EXTERNAL_NET";
+	}
 	else
 		$contents = gettext("\n\nERROR -- Requested List Type entity is not valid!");
 }

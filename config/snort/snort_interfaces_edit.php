@@ -690,13 +690,17 @@ include_once("head.inc");
 							}
 						}
 					?>
-					</select>&nbsp;&nbsp;
-					<span class="vexpl"><?php echo gettext("Choose the External Net you want this interface " .
-					"to use."); ?></span>&nbsp;<br/><br/>
+					</select>
+					&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="button" class="formbtns" value="View List"  
+					onclick="viewList('<?=$id;?>','externallistname','externalnet')" id="btnExternalNet" 
+					title="<?php echo gettext("Click to view currently selected External Net contents"); ?>"/>
+					<br/>
+					<?php echo gettext("Choose the External Net you want this interface " .
+					"to use."); ?>&nbsp;<br/><br/>
 					<span class="red"><?php echo gettext("Note:"); ?></span>&nbsp;<?php echo gettext("Default " .
-					"External Net is networks that are not Home Net."); ?><br/>
-					<span class="red"><?php echo gettext("Hint:"); ?></span>&nbsp;<?php echo gettext("Most users should leave this " .
-					"setting at default.  Create an Alias for custom External Net settings."); ?><br/>
+					"External Net is networks that are not Home Net.  Most users should leave this setting at default."); ?><br/>
+					<span class="red"><?php echo gettext("Hint:"); ?></span>&nbsp;
+					<?php echo gettext("Create a Pass List and add an Alias to it, and then assign the Pass List here for custom External Net settings."); ?><br/>
 				</td>
 	</tr>
 	<tr>

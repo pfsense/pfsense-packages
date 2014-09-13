@@ -41,11 +41,17 @@
 /* Custom home nets */
 $home_net_list = snort_build_list($snortcfg, $snortcfg['homelistname']);
 $home_net = implode(",", $home_net_list);
-
-$external_net = '!$HOME_NET';
+$home_net = trim($home_net);
+$external_net = "";
 if (!empty($snortcfg['externallistname']) && $snortcfg['externallistname'] != 'default') {
-	$external_net_list = snort_build_list($snortcfg, $snortcfg['externallistname']);
+	$external_net_list = snort_build_list($snortcfg, $snortcfg['externallistname'], false, true);
 	$external_net = implode(",", $external_net_list);
+	$external_net = "[" . trim($external_net) . "]";
+}
+else {
+	foreach ($home_net_list as $ip)
+		$external_net .= "!{$ip},";
+	$external_net = trim($external_net, ', ');
 }
 
 /* User added custom configuration arguments */
