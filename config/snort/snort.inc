@@ -3513,8 +3513,10 @@ function snort_sync_on_changes() {
 	global $config, $g;
 
 	/* Do not attempt a package sync while booting up or installing package */
-	if ($g['booting'] || $g['snort_postinstall'])
+	if ($g['booting'] || $g['snort_postinstall']) {
+		log_error("[snort] No xmlrpc sync to CARP targets when booting up or during package reinstallation.");
 		return;
+	}
 
 	if (is_array($config['installedpackages']['snortsync']['config'])){
 		$snort_sync=$config['installedpackages']['snortsync']['config'][0];
@@ -3560,13 +3562,14 @@ function snort_sync_on_changes() {
 				else
 					$syncstartsnort = "OFF";
 				$sync_to_ip = $sh['varsyncipaddress'];
+				$port = $sh['varsyncport'];
 				$password = $sh['varsyncpassword'];
 				if($sh['varsyncusername'])
 					$username = $sh['varsyncusername'];
 				else
 					$username = 'admin';
 				if($password && $sync_to_ip)
-					snort_do_xmlrpc_sync($syncdownloadrules, $sync_to_ip, $username, $password, $synctimeout, $syncstartsnort);
+					snort_do_xmlrpc_sync($syncdownloadrules, $sync_to_ip, $port, $username, $password, $synctimeout, $syncstartsnort);
 			}
 			log_error("[snort] Snort pkg xmlrpc sync completed.");
 		}
@@ -3574,12 +3577,14 @@ function snort_sync_on_changes() {
 }
 
 /* Do the actual XMLRPC sync */
-function snort_do_xmlrpc_sync($syncdownloadrules, $sync_to_ip, $username, $password, $synctimeout, $syncstartsnort) {
+function snort_do_xmlrpc_sync($syncdownloadrules, $sync_to_ip, $port, $username, $password, $synctimeout, $syncstartsnort) {
 	global $config, $g;
 
 	/* Do not attempt a package sync while booting up or installing package */
-	if ($g['booting'] || $g['snort_postinstall'])
+	if ($g['booting'] || $g['snort_postinstall']) {
+		log_error("[snort] No xmlrpc sync to CARP targets when booting up or during package reinstallation.");
 		return;
+	}
 
 	if(!$username || !$password || !$sync_to_ip) {
 		log_error("[snort] A required XMLRPC sync parameter (user, host IP or password) is empty ... aborting pkg sync");
@@ -3595,8 +3600,9 @@ function snort_do_xmlrpc_sync($syncdownloadrules, $sync_to_ip, $username, $passw
 		$synchronizetoip = $config['system']['webgui']['protocol'];
 		$synchronizetoip .= "://";
 	}
-	$port = $config['system']['webgui']['port'];
-	/* if port is empty lets rely on the protocol selection */
+	if ($port == "")
+		$port = $config['system']['webgui']['port'];
+	/* if port is empty let's rely on the protocol selection */
 	if($port == "") {
 		if($config['system']['webgui']['protocol'] == "http") 
 			$port = "80";
@@ -3604,8 +3610,44 @@ function snort_do_xmlrpc_sync($syncdownloadrules, $sync_to_ip, $username, $passw
 			$port = "443";
 	}
 	$synchronizetoip .= $sync_to_ip;
+	$url = $synchronizetoip;
 
-	/* xml will hold the sections to sync */
+	/*************************************************/
+	/* Send over any auto-SID management files       */
+	/*************************************************/
+	$sid_files = glob(SID_MODS_PATH . '*');
+	foreach ($sid_files as $file) {
+		$content = base64_encode(file_get_contents($file));
+		$payload = "@file_put_contents('{$file}', base64_decode('{$content}'));";
+
+		/* assemble xmlrpc payload */
+		$method = 'pfsense.exec_php';
+		$params = array( XML_RPC_encode($password), XML_RPC_encode($payload) );
+	
+		log_error("[snort] Snort XMLRPC CARP sync sending auto-SID conf files to {$url}:{$port}.");
+		$msg = new XML_RPC_Message($method, $params);
+		$cli = new XML_RPC_Client('/xmlrpc.php', $url, $port);
+		$cli->setCredentials($username, $password);
+		$resp = $cli->send($msg, $synctimeout);
+		$error = "";
+		if(!$resp) {
+			$error = "A communications error occurred while attempting Snort XMLRPC CARP sync with {$url}:{$port}.  Failed to transfer file: " . basename($file);
+			log_error($error);
+			file_notice("sync_settings", $error, "Snort Settings Sync", "");
+		} elseif($resp->faultCode()) {
+			$error = "An error code was received while attempting Snort XMLRPC CARP sync with {$url}:{$port}. Failed to transfer file: " . basename($file) . " - Code " . $resp->faultCode() . ": " . $resp->faultString();
+			log_error($error);
+			file_notice("sync_settings", $error, "Snort Settings Sync", "");
+		}
+	}
+
+	if (!empty($sid_files) && $error == "")
+		log_error("[suricata] Snort pkg XMLRPC CARP sync auto-SID conf files success with {$url}:{$port} (pfsense.exec_php).");
+
+	/**************************************************/
+	/* Send over the <snortglobal> portion of the     */
+	/* config.xml.  $xml will hold section to sync.   */
+	/**************************************************/
 	$xml = array();
 	$xml['snortglobal'] = $config['installedpackages']['snortglobal'];
 	/* assemble xmlrpc payload */
@@ -3614,8 +3656,6 @@ function snort_do_xmlrpc_sync($syncdownloadrules, $sync_to_ip, $username, $passw
 		XML_RPC_encode($xml)
 	);
 
-	/* set a few variables needed for sync code borrowed from filter.inc */
-	$url = $synchronizetoip;
 	log_error("[snort] Beginning Snort pkg configuration XMLRPC sync to {$url}:{$port}.");
 	$method = 'pfsense.merge_installedpackages_section_xmlrpc';
 	$msg = new XML_RPC_Message($method, $params);
@@ -3639,18 +3679,23 @@ function snort_do_xmlrpc_sync($syncdownloadrules, $sync_to_ip, $username, $passw
 	$downloadrulescmd = "";
 	if ($syncdownloadrules == "yes") {
 		$downloadrulescmd = "log_error(gettext(\"[snort] XMLRPC pkg sync: Update of downloaded rule sets requested...\"));\n";
-		$downloadrulescmd .= "include_once(\"/usr/local/pkg/snort/snort_check_for_rule_updates.php\");\n";
+		$downloadrulescmd .= "\tinclude_once(\"/usr/local/pkg/snort/snort_check_for_rule_updates.php\");\n";
 	}
 	$snortstart = "";
 	if ($syncstartsnort == "ON") {
 		$snortstart = "log_error(gettext(\"[snort] XMLRPC pkg sync: Checking Snort status...\"));\n";
-		$snortstart .= "if (!is_process_running(\"snort\")) {\n";
-		$snortstart .= "log_error(gettext(\"[snort] XMLRPC pkg sync: Snort not running. Sending a start command...\"));\n";
-		$snortstart .= "exec(\"/usr/local/etc/rc.d/snort.sh start 2>&1 &\");\n}\n";
-		$snortstart .= "else {log_error(gettext(\"[snort] XMLRPC pkg sync: Snort is running...\"));\n}\n";
+		$snortstart .= "\tif (!is_process_running(\"snort\")) {\n";
+		$snortstart .= "\t\tlog_error(gettext(\"[snort] XMLRPC pkg sync: Snort not running. Sending a start command...\"));\n";
+		$snortstart .= "\t\t\$sh_script = RCFILEPREFIX . \"snort.sh\";\n";
+		$snortstart .= "\t\tmwexec_bg(\"{\$sh_script} start\");\n\t}\n";
+		$snortstart .= "\telse {\n\t\tlog_error(gettext(\"[snort] XMLRPC pkg CARP sync: Snort is running...\"));\n\t}\n";
 	}
 
-	/* Build a series of commands as a PHP file for the secondary host to execute to load the new settings. */
+	/*************************************************/
+	/* Build a series of commands as a PHP file for  */
+	/* the secondary host to execute to load the new */
+	/* settings.                                     */
+	/*************************************************/
 	$snort_sync_cmd = <<<EOD
 	<?php
 	require_once("/usr/local/pkg/snort/snort.inc");
@@ -3676,7 +3721,10 @@ function snort_do_xmlrpc_sync($syncdownloadrules, $sync_to_ip, $username, $passw
 
 EOD;
 
-	/* First, have the target host write the commands to a PHP file in the /tmp directory */
+	/*************************************************/
+	/* First, have target host write the commands    */ 
+	/* to a PHP file in the /tmp directory.          */
+	/*************************************************/
 	$execcmd = "file_put_contents('/tmp/snort_sync_cmds.php', '{$snort_sync_cmd}');";
 
 	/* assemble xmlrpc payload */
@@ -3703,7 +3751,10 @@ EOD;
 		log_error("[snort] Snort pkg XMLRPC reload configuration success with {$url}:{$port} (pfsense.exec_php).");
 	}
 
-	/* Now assemble a command to execute the previously sent PHP file in the background */
+	/*************************************************/
+	/* Now assemble a command to execute the         */
+	/* previously sent PHP file in the background.   */
+	/*************************************************/
 	$execcmd = "exec(\"/usr/local/bin/php -f '/tmp/snort_sync_cmds.php' > /dev/null 2>&1 &\");";
 	$params2 = array(
 		XML_RPC_encode($password),
