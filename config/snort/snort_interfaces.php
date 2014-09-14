@@ -257,9 +257,11 @@ include_once("fbegin.inc");
 			$no_rules = true;
 			if (isset($natent['customrules']) && !empty($natent['customrules']))
 				$no_rules = false;
-			if (isset($natent['rulesets']) && !empty($natent['rulesets']))
+			elseif (isset($natent['rulesets']) && !empty($natent['rulesets']))
 				$no_rules = false;
-			if (isset($natent['ips_policy']) && !empty($natent['ips_policy']))
+			elseif (isset($natent['ips_policy']) && !empty($natent['ips_policy']))
+				$no_rules = false;
+			elseif ($config['installedpackages']['snortglobal']['auto_manage_sids'] == 'on' && !empty($natent['enable_sid_file']))
 				$no_rules = false;
 			/* Do not display the "no rules" warning if interface disabled */
 			if ($natent['enable'] == "off")
