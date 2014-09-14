@@ -599,8 +599,12 @@ function write_backend($fd, $name, $pool, $frontend) {
 		$pool['retries'] = 3;
 	fwrite ($fd, "\tretries\t\t\t" . $pool['retries'] . "\n");
 
-	if ($pool['transparent_clientip'])
-		fwrite ($fd, "\tsource 0.0.0.0 usesrc clientip\n");
+	if ($pool['transparent_clientip']) {
+		if (is_ipaddrv4($frontend_ip))
+			fwrite ($fd, "\tsource 0.0.0.0 usesrc clientip\n");
+		else
+			fwrite ($fd, "\tsource ipv6@ usesrc clientip\n");
+	}
 		
 	if($pool['stats_enabled']=='yes') {
 		fwrite ($fd, "\tstats\t\t\tenable\n");
@@ -714,7 +718,7 @@ function haproxy_check_and_run(&$messages, $reload) {
 	global $g;
 	$testpath = "{$g['varetc_path']}/haproxy_test";
 	haproxy_writeconf($testpath);
-	$retval = exec("haproxy -c -V -f $testpath/haproxy.cfg 2>&1", $output, $err);
+	$retval = exec("/usr/local/sbin/haproxy -c -V -f $testpath/haproxy.cfg 2>&1", $output, $err);
 	$messages = "";
 	if ($err > 1)
 		$messages = "<h2><strong>FATAL ERROR CODE: $err while starting haproxy</strong></h2>";
@@ -1065,8 +1069,8 @@ function haproxy_is_running() {
 }
 
 function haproxy_load_modules() {
-	// On FreeBSD 8 ipfw is needed to allow 'transparent' proxying (getting reply's to a non-local ip to pass back to the client-socket)..
-	// On FreeBSD 9 it is probably possible to do the same with the pf option "divert-reply"
+	// On FreeBSD 8 ipfw is needed to allow 'transparent' proxying (getting reply's to a non-local ip to pass back to the client-socket).
+	// On FreeBSD 9 it should have been possible to do the same with the pf option "divert-reply" (if it was actually implemented.)
 	mute_kernel_msgs();
         if (!is_module_loaded("ipfw.ko")) {
                 mwexec("/sbin/kldload ipfw");
@@ -1124,6 +1128,45 @@ function haproxy_get_transparent_backends(){
 }
 
 function haproxy_generate_rules($type) {
+	// called by pfSense when rules are generated.
+	global $config;
+	if(!isset($config['installedpackages']['haproxy']['enable']))
+		return "# HAProxy $type\n";
+
+	if(get_freebsd_version() >= 10)
+		return "# HAProxy $type\n".haproxy_generate_rules_pf($type);// uses: pf rule: divert-reply
+	else
+		return "# HAProxy $type\n".haproxy_generate_rules_pf_ipfw($type);// uses: pf rule state ( sloppy ) , combined with ipfws: fwd localhost
+}
+
+function haproxy_generate_rules_pf($type) {
+	// called by filter.inc when pfSense rules generation happens
+	global $g, $config;
+	$rules = "";
+	switch($type) {
+	case 'pfearly':
+		$transparent_backends = haproxy_get_transparent_backends();
+		$rules .= "# HAProxy tag forwarded connections to NOT get handled by outgoing diver-reply rule\n";
+		foreach($transparent_backends as $tb){
+			$inet = is_ipaddrv4($tb['address']) ? "inet" : "inet6";
+			$rules .= "pass in $inet proto tcp from any to {$tb['address']} port {$tb['port']} tag SKIP_DIVERTER label \"HAPROXY_transparent_rule_{$tb['name']}\"\n";
+		}		
+		$rules .= "\n";
+		break;
+	case 'filter':
+		$transparent_backends = haproxy_get_transparent_backends();
+		$rules .= "# HAProxy use divert-reply for transparent proxy reply packets\n";
+		foreach($transparent_backends as $tb){
+			$inet = is_ipaddrv4($tb['address']) ? "inet" : "inet6";
+			$rules .= "pass  out  quick  on {$tb['interface']} $inet proto tcp from any to {$tb['address']} port {$tb['port']} keep state divert-reply !tagged SKIP_DIVERTER label \"HAPROXY_transparent_rule_{$tb['name']}\"\n";
+		}
+		$rules .= "\n";
+		break;
+	}
+	return $rules;
+}
+
+function haproxy_generate_rules_pf_ipfw($type) {
 	// called by filter.inc when pfSense rules generation happens
 	global $g, $config;
 	$rules = "";
@@ -1248,11 +1291,14 @@ function haproxy_check_run($reload) {
 			return (0);
 		}
 
-		if(use_transparent_clientip_proxying()) {
-			filter_configure();
-			load_ipfw_rules();
-		} else
-			mwexec("/usr/local/sbin/ipfw_context -d haproxy", true);
+		$use_transparent = use_transparent_clientip_proxying();
+		if(get_freebsd_version() < 10) {
+			if($use_transparent)
+				load_ipfw_rules();
+			else
+				mwexec("/usr/local/sbin/ipfw_context -d haproxy", true);
+		}
+		filter_configure();
 		
 		if (haproxy_is_running()) {
 			if (isset($a_global['terminate_on_reload']))
