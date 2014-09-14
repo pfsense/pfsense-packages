@@ -51,7 +51,7 @@ $snortver = array();
 exec("/usr/local/bin/snort -V 2>&1 |/usr/bin/grep Version | /usr/bin/cut -c20-26", $snortver);
 
 /* Used to indicate latest version of this include file has been loaded */
-$pfSense_snort_version = "3.1.3";
+$pfSense_snort_version = "3.1.2";
 
 /* get installed package version for display */
 $snort_package_version = "Snort {$config['installedpackages']['package'][get_pkg_id("snort")]['version']}";
@@ -2963,6 +2963,7 @@ function snort_deinstall() {
 	$rcdir = RCFILEPREFIX;
 	$snort_rules_upd_log = RULES_UPD_LOGFILE;
 	$iprep_path = IPREP_PATH;
+	$sidmods_path = SID_MODS_PATH;
 
 	log_error(gettext("[Snort] Snort package uninstall in progress..."));
 
@@ -3061,6 +3062,7 @@ function snort_deinstall() {
 		mwexec("/sbin/pfctl -t snort2c -T flush");
 		mwexec("/bin/rm -rf {$snortlogdir}");
 		mwexec("/bin/rm -rf {$iprep_path}");
+		mwexec("/bin/rm -rf {$sidmods_path}");
 		log_error(gettext("[Snort] The package has been removed from this system..."));
 	}
 }
