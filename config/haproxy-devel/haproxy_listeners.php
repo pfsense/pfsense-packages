@@ -151,6 +151,14 @@ include("head.inc");
 				  </td>
 				  <td class="listlr" ondblclick="document.location='haproxy_listeners_edit.php?id=<?=$frontendname;?>';">
 					<? 
+					$acls = get_frontend_acls($frontend);
+					$isaclset = "";
+					foreach ($acls as $acl) {
+						$isaclset .= "&#10;" . htmlspecialchars($acl['descr']);
+					}
+					if ($isaclset) 
+						echo "<img src=\"$img_acl\" title=\"" . gettext("acl's used") . ": {$isaclset}\" border=\"0\" />";
+						
 					if (strtolower($frontend['type']) == "http" && $frontend['ssloffload']) {
 						$cert = lookup_cert($frontend['ssloffloadcert']);
 						$descr = htmlspecialchars($cert['descr']);
@@ -166,15 +174,6 @@ include("head.inc");
 						echo '<img src="'.$img_cert.'" title="SSL offloading cert: '.$descr.'" alt="SSL offloading" border="0" height="16" width="16" />';
 					}
 					
-					$acls = get_frontend_acls($frontend);
-					$isaclset = "";
-					foreach ($acls as $acl) {
-						$isaclset .= "&#10;" . htmlspecialchars($acl['descr']);
-					}
-					
-					if ($isaclset) 
-						echo "<img src=\"$img_acl\" title=\"" . gettext("acl's used") . ": {$isaclset}\" border=\"0\" />";
-						
 					$isadvset = "";
 					if ($frontend['advanced_bind']) $isadvset .= "Advanced bind: ".htmlspecialchars($frontend['advanced_bind'])."\r\n";
 					if ($frontend['advanced']) $isadvset .= "Advanced pass thru setting used\r\n";
@@ -188,7 +187,10 @@ include("head.inc");
 						$backend_serverpool_hint = gettext("Servers in pool:");
 						if (is_array($servers)){
 							foreach($servers as $server){
-								$backend_serverpool_hint .= "\n".$server['address'].":".$server['port'];
+								if ($server['forwardto'] && $server['forwardto'] != "")
+									$backend_serverpool_hint .= "\n[".$server['forwardto']."]";
+								else								
+									$backend_serverpool_hint .= "\n".$server['address'].":".$server['port'];
 							}
 						}
 					}
@@ -208,7 +210,9 @@ include("head.inc");
 				  </td>
 				  <td class="listlr" ondblclick="document.location='haproxy_listeners_edit.php?id=<?=$frontendname;?>';">
 					<div title='<?=$backend_serverpool_hint;?>'>
+					<a href="haproxy_pool_edit.php?id=<?=$frontend['backend_serverpool']?>">
 					<?=$frontend['backend_serverpool']?>
+					</a>
 					</div>
 				  </td>
 				  <td class="listlr" ondblclick="document.location='haproxy_listeners_edit.php?id=<?=$frontendname;?>';">
