@@ -48,7 +48,7 @@ $a_patches = &$config['installedpackages']['patches']['item'];
 
 /* if a custom message has been passed along, lets process it */
 if ($_GET['savemsg'])
-	$savemsg = $_GET['savemsg'];
+	$savemsg = htmlspecialchars($_GET['savemsg']);
 
 if ($_POST) {
 	$pconfig = $_POST;

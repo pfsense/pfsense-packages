@@ -1,7 +1,7 @@
 <?php
 /*
 	system_patches.php
-	Copyright (C) 2012 Jim Pingle
+	Copyright (C) 2013 PiBa-NL
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
@@ -48,7 +48,7 @@ $patches_config = &$config['installedpackages']['patches'];
 
 /* if a custom message has been passed along, lets process it */
 if ($_GET['savemsg'])
-	$savemsg = $_GET['savemsg'];
+	$savemsg = htmlspecialchars($_GET['savemsg']);
 
 if ($_POST) {
 	$pconfig = $_POST;
