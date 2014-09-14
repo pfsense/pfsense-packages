@@ -70,7 +70,7 @@ class squidstat{
         $this->squidhost = '127.0.0.1';
         $this->squidport = '3128';
 
-        $This->group_by        = 'host';
+        $this->group_by        = 'host';
         $this->resolveip       = true;
         $this->hosts_file      = '';
 	    $this->autorefresh     = 0;
