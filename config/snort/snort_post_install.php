@@ -146,6 +146,7 @@ if ($config['installedpackages']['snortglobal']['forcekeepsettings'] == 'on') {
 	/****************************************************************/
 	if (count($config['installedpackages']['snortglobal']['rule']) > 0) {
 		$uuids = array();
+		$fixed_duplicate = FALSE;
 		$snortconf = &$config['installedpackages']['snortglobal']['rule'];
 		foreach ($snortconf as &$snortcfg) {
 			// Check for and fix a duplicate UUID
@@ -164,10 +165,12 @@ if ($config['installedpackages']['snortglobal']['forcekeepsettings'] == 'on') {
 				$snortcfg['uuid'] = $new_uuid;
 				$uuids[$new_uuid] = $if_real;
 				log_error(gettext("[Snort] updated UUID for interface " . convert_friendly_interface_to_friendly_descr($snortcfg['interface']) . " from {$old_uuid} to {$new_uuid}."));
+				$fixed_duplicate = TRUE;
 			}
 		}
-		write_config("Snort pkg: updated interface UUIDs to eliminate duplicates.");
-		unset($uuids, $rulesets);
+		if ($fixed_duplicate)
+			write_config("Snort pkg: updated interface UUIDs to eliminate duplicates.");
+		unset($uuids);
 	}
 	/****************************************************************/
 	/* End of duplicate UUID bug fix.                               */
@@ -178,7 +181,7 @@ if ($config['installedpackages']['snortglobal']['forcekeepsettings'] == 'on') {
 	include('/usr/local/pkg/snort/snort_migrate_config.php');
 	update_output_window(gettext("Please wait... rebuilding installation with saved settings..."));
 	log_error(gettext("[Snort] Downloading and updating configured rule types..."));
-	update_output_window(gettext("Please wait... downloading and updating configured rule types..."));
+	update_output_window(gettext("Please wait... downloading and updating configured rule sets..."));
 	if ($pkg_interface <> "console")
 		$snort_gui_include = true;
 	include('/usr/local/pkg/snort/snort_check_for_rule_updates.php');
@@ -191,6 +194,7 @@ if ($config['installedpackages']['snortglobal']['forcekeepsettings'] == 'on') {
 		$if_real = get_real_interface($snortcfg['interface']);
 		$snort_uuid = $snortcfg['uuid'];
 		$snortcfgdir = "{$snortdir}/snort_{$snort_uuid}_{$if_real}";
+		update_output_window(gettext("Generating configuration for " . convert_friendly_interface_to_friendly_descr($snortcfg['interface'])));
 
 		// Pull in the PHP code that generates the snort.conf file
 		// variables that will be substituted further down below.
