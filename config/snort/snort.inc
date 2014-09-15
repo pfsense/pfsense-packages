@@ -702,14 +702,72 @@ function snort_Getdirsize($node) {
 	return substr( $blah, 0, strpos($blah, 9) );
 }
 
+function snort_cron_job_exists($crontask, $minute="0", $hour="*", $monthday="*", $month="*", $weekday="*", $who="root") {
+
+	/************************************************************
+	 * This function iterates the cron[] array in the config    *
+	 * to determine if the passed $crontask entry exists.  It   *
+	 * returns TRUE if the exact $crontask already exists and   *
+	 * the time and $who parameters match, or FALSE if there    *
+	 * is no exact match.                                       *
+	 *                                                          *
+	 * We use this to prevent unneccessary config writes if     *
+	 * the $crontask already exists.                            *
+	 ************************************************************/
+
+	global $config, $g;
+
+	if (!is_array($config['cron']))
+		$config['cron'] = array();
+	if (!is_array($config['cron']['item']))
+		$config['cron']['item'] = array();
+
+	foreach($config['cron']['item'] as $item) {
+		if(strpos($item['command'], $crontask) !== FALSE) {
+			if ($item['minute'] != $minute)
+				return FALSE;
+			if ($item['hour'] != $hour)
+				return FALSE;
+			if ($item['mday'] != $monthday)
+				return FALSE;
+			if ($item['month'] != $month)
+				return FALSE;
+			if ($item['wday'] != $weekday)
+				return FALSE;
+			if ($item['who'] != $who)
+				return FALSE;
+			return TRUE;
+		}
+	}
+	return FALSE;
+}
+
 function snort_snortloglimit_install_cron($should_install=TRUE) {
 
+	// See if simply removing existing "loglimit" job for Snort
+	if ($should_install == FALSE) {
+		install_cron_job("snort_check_cron_misc.inc", false);
+		return;
+	}
+
+	// If there are no changes in the cron job command string from the existing job, then exit.
+	if ($should_install && snort_cron_job_exists("/usr/local/pkg/snort/snort_check_cron_misc.inc", "*/5"))
+		return;
+
+	// Else install the new or updated cron job
 	install_cron_job("/usr/bin/nice -n20 /usr/local/bin/php -f /usr/local/pkg/snort/snort_check_cron_misc.inc", $should_install, "*/5");
 }
 
 function snort_rm_blocked_install_cron($should_install) {
 	global $config, $g;
 
+	// See if simply removing existing "expiretable" job for Snort
+	if ($should_install == FALSE) {
+		install_cron_job("snort2c", false);
+		return;
+	}
+
+	// Grab the configured interval from our configuration
 	$snort_rm_blocked_info_ck = $config['installedpackages']['snortglobal']['rm_blocked'];
 
 	if ($snort_rm_blocked_info_ck == "15m_b") {
@@ -793,13 +851,15 @@ function snort_rm_blocked_install_cron($should_install) {
 		$snort_rm_blocked_expire = "2419200";
 	}
 
-	// First remove any existing "expiretable" jobs for Snort.
-	install_cron_job("snort2c", false);
+	// Construct the basic cron command task
+	$command = "/usr/bin/nice -n20 /sbin/pfctl -q -t snort2c -T expire {$snort_rm_blocked_expire}";
 
-	// Now either install the new or updated cron job, 
-	// or return if "rm_blocked" is disabled
+	// If there are no changes in the cron job command string from the existing job, then exit.
+	if (snort_cron_job_exists($command, $snort_rm_blocked_min, $snort_rm_blocked_hr, $snort_rm_blocked_mday, $snort_rm_blocked_month, $snort_rm_blocked_wday, "root"))
+		return;
+
+	// Else install the new or updated cron job
 	if ($should_install) {
-		$command = "/usr/bin/nice -n20 /sbin/pfctl -q -t snort2c -T expire {$snort_rm_blocked_expire}";
 		install_cron_job($command, $should_install, $snort_rm_blocked_min, $snort_rm_blocked_hr, $snort_rm_blocked_mday, $snort_rm_blocked_month, $snort_rm_blocked_wday, "root");
 	}
 }
@@ -808,13 +868,14 @@ function snort_rm_blocked_install_cron($should_install) {
 function snort_rules_up_install_cron($should_install) {
 	global $config, $g;
 
-	// Remove any existing job first
-	install_cron_job("snort_check_for_rule_updates.php", false);
-
-	// If called with FALSE as argument, then we're done
-	if ($should_install == FALSE)
+	// If called with FALSE as argument, then we're removing 
+	// the existing job.
+	if ($should_install == FALSE) {
+		install_cron_job("snort_check_for_rule_updates.php", false);
 		return;
+	}
 
+	// Grab the configured update interval from our configuration
 	$snort_rules_up_info_ck = $config['installedpackages']['snortglobal']['autorulesupdate7'];
 
 	/* See if a customized start time has been set for rule file updates */
@@ -878,8 +939,16 @@ function snort_rules_up_install_cron($should_install) {
 		$snort_rules_up_wday = "*";
 	}
 
+	// Construct the basic cron command task
 	$command = "/usr/bin/nice -n20 /usr/local/bin/php -f /usr/local/pkg/snort/snort_check_for_rule_updates.php";
-	install_cron_job($command, $should_install, $snort_rules_up_min, $snort_rules_up_hr, $snort_rules_up_mday, $snort_rules_up_month, $snort_rules_up_wday, "root");
+
+	// If there are no changes in the cron job command string from the existing job, then exit
+	if (snort_cron_job_exists($command, $snort_rules_up_min, $snort_rules_up_hr, $snort_rules_up_mday, $snort_rules_up_month, $snort_rules_up_wday, "root"))
+		return;
+
+	// Else install the new or updated cron job
+	if ($should_install)
+		install_cron_job($command, $should_install, $snort_rules_up_min, $snort_rules_up_hr, $snort_rules_up_mday, $snort_rules_up_month, $snort_rules_up_wday, "root");
 }
 
 /* Only run when all ifaces needed to sync. Expects filesystem rw */
