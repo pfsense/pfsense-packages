@@ -36,7 +36,7 @@ require_once("haproxy_utils.inc");
 require_once("globals.inc");
 require_once("pkg_haproxy_tabs.inc");
 
-$simplefields = array('localstats_refreshtime','localstats_sticktable_refreshtime');
+$simplefields = array('localstats_refreshtime','localstats_sticktable_refreshtime','log-send-hostname','ssldefaultdhparam');
 
 if (!is_array($config['installedpackages']['haproxy'])) 
 	$config['installedpackages']['haproxy'] = array();
@@ -268,55 +268,6 @@ function enable_change(enable_change) {
 			</tr>
 			<tr>
 				<td valign="top" class="vncell">
-					Remote syslog host
-				</td>
-				<td class="vtable">
-					<input name="remotesyslog" type="text" class="formfld" id="remotesyslog" size="18" value="<?=htmlspecialchars($pconfig['remotesyslog']);?>" /><br/>
-					To log to the local pfSense systemlog fill the host with the value <b>/var/run/log</b>, however if a lot of messages are generated logging is likely to be incomplete. (Also currently no informational logging gets shown in the systemlog.)
-				</td>
-			</tr>
-			<tr>
-				<td valign="top" class="vncell">
-					Syslog facility
-				</td>
-				<td class="vtable">
-					<select name="logfacility" class="formfld">
-				<?php
-					$facilities = array("kern", "user", "mail", "daemon", "auth", "syslog", "lpr",
-						"news", "uucp", "cron", "auth2", "ftp", "ntp", "audit", "alert", "cron2",
-					       	"local0", "local1", "local2", "local3", "local4", "local5", "local6", "local7");
-					foreach ($facilities as $f): 
-				?>
-					<option value="<?=$f;?>" <?php if ($f == $pconfig['logfacility']) echo "selected"; ?>>
-						<?=$f;?>
-					</option>
-				<?php
-					endforeach;
-				?>
-					</select>
-				</td>
-			</tr>
-			<tr>
-				<td valign="top" class="vncell">
-					Syslog level
-				</td>
-				<td class="vtable">
-					<select name="loglevel" class="formfld">
-				<?php
-					$levels = array("emerg", "alert", "crit", "err", "warning", "notice", "info", "debug");
-					foreach ($levels as $l): 
-				?>
-					<option value="<?=$l;?>" <?php if ($l == $pconfig['loglevel']) echo "selected"; ?>>
-						<?=$l;?>
-					</option>
-				<?php
-					endforeach;
-				?>
-					</select>
-				</td>
-			</tr>
-			<tr>
-				<td valign="top" class="vncell">
 					Carp monitor
 				</td>
 				<td class="vtable">
@@ -371,6 +322,77 @@ function enable_change(enable_change) {
 				<td width="22%" valign="top" class="vncell">Sticktable page refresh rate</td>
 				<td class="vtable">
 					<input name="localstats_sticktable_refreshtime" type="text" <?if(isset($pconfig['localstats_sticktable_refreshtime'])) echo "value=\"{$pconfig['localstats_sticktable_refreshtime']}\"";?> size="10" maxlength="5" /> Seconds, Leave this setting empty to not refresh the page automatically. EXAMPLE: 10
+				</td>
+			</tr>
+			<tr>
+				<td colspan="2" valign="top" class="listtopic">Logging</td>
+			</tr>
+			<tr>
+				<td valign="top" class="vncell">
+					Remote syslog host
+				</td>
+				<td class="vtable">
+					<input name="remotesyslog" type="text" class="formfld" id="remotesyslog" size="18" value="<?=htmlspecialchars($pconfig['remotesyslog']);?>" /><br/>
+					To log to the local pfSense systemlog fill the host with the value <b>/var/run/log</b>, however if a lot of messages are generated logging is likely to be incomplete. (Also currently no informational logging gets shown in the systemlog.)
+				</td>
+			</tr>
+			<tr>
+				<td valign="top" class="vncell">
+					Syslog facility
+				</td>
+				<td class="vtable">
+					<select name="logfacility" class="formfld">
+				<?php
+					$facilities = array("kern", "user", "mail", "daemon", "auth", "syslog", "lpr",
+						"news", "uucp", "cron", "auth2", "ftp", "ntp", "audit", "alert", "cron2",
+					       	"local0", "local1", "local2", "local3", "local4", "local5", "local6", "local7");
+					foreach ($facilities as $f): 
+				?>
+					<option value="<?=$f;?>" <?php if ($f == $pconfig['logfacility']) echo "selected"; ?>>
+						<?=$f;?>
+					</option>
+				<?php
+					endforeach;
+				?>
+					</select>
+				</td>
+			</tr>
+			<tr>
+				<td valign="top" class="vncell">
+					Syslog level
+				</td>
+				<td class="vtable">
+					<select name="loglevel" class="formfld">
+				<?php
+					$levels = array("emerg", "alert", "crit", "err", "warning", "notice", "info", "debug");
+					foreach ($levels as $l): 
+				?>
+					<option value="<?=$l;?>" <?php if ($l == $pconfig['loglevel']) echo "selected"; ?>>
+						<?=$l;?>
+					</option>
+				<?php
+					endforeach;
+				?>
+					</select>
+				</td>
+			</tr>
+			<tr>
+				<td width="22%" valign="top" class="vncell">Log hostname</td>
+				<td width="78%" class="vtable">
+					<input name="log-send-hostname" type="text" <?if(isset($pconfig['log-send-hostname'])) echo "value=\"{$pconfig['log-send-hostname']}\"";?> size="18" maxlength="50" /> EXAMPLE: HaproxyMasterNode<br/>Sets the hostname field in the syslog header. If empty defaults to the system hostname.
+				</td>
+			</tr>
+			<tr>
+				<td colspan="2" valign="top" class="listtopic">Tuning</td>
+			</tr>
+			<tr>
+				<td width="22%" valign="top" class="vncell">Max SSL Diffie-Hellman size</td>
+				<td width="78%" class="vtable">
+					<input name="ssldefaultdhparam" type="text" <?if(isset($pconfig['ssldefaultdhparam'])) echo "value=\"{$pconfig['ssldefaultdhparam']}\"";?> size="10" maxlength="5" /> EXAMPLE: 2048<br/>Sets the maximum size of the Diffie-Hellman parameters used for generating
+the ephemeral/temporary Diffie-Hellman key in case of DHE key exchange.
+Minimum and default value is: 1024, bigger values might increase CPU usage.<br/>
+					For more information about the <b>"tune.ssl.default-dh-param"</b> option please see <b><a href='http://cbonte.github.io/haproxy-dconv/configuration-1.5.html#3.2-tune.ssl.default-dh-param' target='_blank'>HAProxy Documentation</a></b><br/>
+					NOTE: HAProxy will emit a warning when starting when this setting is used but not configured.
 				</td>
 			</tr>
 			<tr>
