@@ -225,7 +225,7 @@ function haproxy_htmllist_js(){
 		var items;
 		var i = tableId.lastIndexOf('_');
 		var items_name = prefix+"_"+tableId.substr(i+1);
-		items = eval(items_name);
+		items = eval("typeof "+items_name+" !== 'undefined' ? "+items_name+" : {}");
 		return items;
 	}
 
