@@ -51,16 +51,16 @@ $snortver = array();
 exec("/usr/local/bin/snort -V 2>&1 |/usr/bin/grep Version | /usr/bin/cut -c20-26", $snortver);
 
 /* Used to indicate latest version of this include file has been loaded */
-$pfSense_snort_version = "3.1.2";
+$pfSense_snort_version = "3.1.3";
 
 /* get installed package version for display */
 $snort_package_version = "Snort {$config['installedpackages']['package'][get_pkg_id("snort")]['version']}";
 
 // Define SNORTDIR and SNORTLIBDIR constants according to pfSense version
 $pfs_version=substr(trim(file_get_contents("/etc/version")),0,3);
-if ($pfs_version < 2.1) {
-	define("SNORTDIR", "/usr/local/etc/snort");
-	define("SNORTLIBDIR", "/usr/local/lib/snort");
+if ($pfs_version >= 2.2) {
+	define("SNORTDIR", "/usr/pbi/snort-" . php_uname("m") . "/local/etc/snort");
+	define("SNORTLIBDIR", "/usr/pbi/snort-" . php_uname("m") . "/local/lib/snort");
 }
 else {
 	define("SNORTDIR", "/usr/pbi/snort-" . php_uname("m") . "/etc/snort");
@@ -3027,7 +3027,7 @@ function snort_deinstall() {
 	if ($config['installedpackages']['snortglobal']['clearlogs'] == 'on') {
 		log_error(gettext("[Snort] Clearing all Snort-related log files..."));
 		unlink_if_exists("{$snort_rules_upd_log}");
-		mwexec("/bin/rm -rf {$snortlogdir}");
+		rmdir_recursive($snortlogdir);
 	}
 
 	/**********************************************************/
@@ -3043,13 +3043,11 @@ function snort_deinstall() {
 	/**********************************************************/
 	if (file_exists("/tmp/pkg_libs.tgz") || file_exists("/tmp/pkg_bins.tgz")) {
 		log_error(gettext("[Snort] Package deletion requested... removing all files..."));
-		mwexec("/bin/rm -rf {$snortdir}");
-		mwexec("/bin/rm -rf {$snortlibdir}/dynamicrules");
-		mwexec("/bin/rm -f {$rcdir}snort.sh");
-		mwexec("/bin/rm -rf /usr/local/pkg/snort");
-		mwexec("/bin/rm -rf /usr/local/www/snort");
-		mwexec("/bin/rm -rf /usr/local/etc/snort");
-		mwexec("/bin/rm -rf /usr/local/lib/snort");
+		unlink_if_exists("{$rcdir}snort.sh");
+		rmdir_recursive("/usr/local/pkg/snort/");
+		rmdir_recursive("/usr/local/www/snort/");
+		rmdir_recursive("/usr/local/etc/snort/");
+		rmdir_recursive("/usr/local/lib/snort/");
 	}
 
 	/* Keep this as a last step */
@@ -3060,9 +3058,9 @@ function snort_deinstall() {
 		unlink_if_exists("{$snort_rules_upd_log}");
 		log_error(gettext("[Snort] Flushing <snort2c> firewall table to remove addresses blocked by Snort..."));
 		mwexec("/sbin/pfctl -t snort2c -T flush");
-		mwexec("/bin/rm -rf {$snortlogdir}");
-		mwexec("/bin/rm -rf {$iprep_path}");
-		mwexec("/bin/rm -rf {$sidmods_path}");
+		rmdir_recursive($snortlogdir);
+		rmdir_recursive($iprep_path);
+		rmdir_recursive($sidmods_path);
 		log_error(gettext("[Snort] The package has been removed from this system..."));
 	}
 }
@@ -3082,7 +3080,7 @@ function snort_prepare_rule_files($snortcfg, $snortcfgdir) {
 	/*                  to be written.                         */
 	/***********************************************************/
 
-	global $g, $rebuild_rules;
+	global $g, $config, $rebuild_rules;
 
 	$snortdir = SNORTDIR;
 	$flowbit_rules_file = FLOWBITS_FILENAME;
@@ -3260,12 +3258,12 @@ function snort_prepare_rule_files($snortcfg, $snortcfgdir) {
 			$no_rules_defined = false;
 			snort_modify_sids($enabled_rules, $snortcfg);
 
-			// Write the enforcing rules file to the Suricata interface's "rules" directory.
+			// Write the enforcing rules file to the Snort interface's "rules" directory.
 			snort_write_enforcing_rules_file($enabled_rules, "{$snortcfgdir}/rules/{$snort_enforcing_rules_file}");
 
 			// If auto-flowbit resolution is enabled, generate the dependent flowbits rules file.
 			if ($snortcfg['autoflowbitrules'] == 'on') {
-				log_error('[Suricata] Enabling any flowbit-required rules for: ' . convert_friendly_interface_to_friendly_descr($snortcfg['interface']) . '...');
+				log_error('[Snort] Enabling any flowbit-required rules for: ' . convert_friendly_interface_to_friendly_descr($snortcfg['interface']) . '...');
 
 				// Load up all rules into a Rules Map array for flowbits assessment
 				$all_rules = snort_load_rules_map("{$snortdir}/rules/");
@@ -3652,7 +3650,7 @@ function snort_do_xmlrpc_sync($syncdownloadrules, $sync_to_ip, $port, $username,
 	}
 
 	if (!empty($sid_files) && $error == "")
-		log_error("[suricata] Snort pkg XMLRPC CARP sync auto-SID conf files success with {$url}:{$port} (pfsense.exec_php).");
+		log_error("[snort] Snort pkg XMLRPC CARP sync auto-SID conf files success with {$url}:{$port} (pfsense.exec_php).");
 
 	/**************************************************/
 	/* Send over the <snortglobal> portion of the     */

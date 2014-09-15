@@ -409,7 +409,7 @@ function snort_fetch_new_rules($file_url, $file_dst, $file_md5, $desc = "") {
 
 /*  remove any old $tmpfname files */
 if (is_dir("{$tmpfname}"))
-	exec("/bin/rm -rf {$tmpfname}");
+	rmdir_recursive($tmpfname);
 
 /*  Make sure required snortdirs exsist */
 safe_mkdir("{$snortdir}/rules");
@@ -529,7 +529,7 @@ if ($snortdownload == 'on') {
 			exec("/bin/cp {$tmpfname}/so_rules/precompiled/{$freebsd_version_so}/x86-64/{$snort_version}/*.so {$snortlibdir}/dynamicrules/");
 		} else
 			$nosorules = true;
-		exec("rm -rf {$tmpfname}/so_rules");
+		rmdir_recursive("{$tmpfname}/so_rules/");
 		if ($nosorules == false) {
 			/* extract Shared Object stub rules, rename and copy to the rules folder. */
 			if ($pkg_interface <> "console")
@@ -540,7 +540,7 @@ if ($snortdownload == 'on') {
 				$newfile = basename($file, ".rules");
 				@copy($file, "{$snortdir}/rules/" . VRT_FILE_PREFIX . "{$newfile}.so.rules");
 			}
-			exec("rm -rf {$tmpfname}/so_rules");
+			rmdir_recursive("{$tmpfname}/so_rules/");
 		}
 		/* extract base etc files */
 		if ($pkg_interface <> "console") {
@@ -598,7 +598,7 @@ if ($snortcommunityrules == 'on') {
 			update_output_window(gettext("Installation of Snort GPLv2 Community Rules file completed..."));
 		}
 		error_log(gettext("\tInstallation of Snort GPLv2 Community Rules completed.\n"), 3, $snort_rules_upd_log);
-		exec("rm -rf {$tmpfname}/community");
+		rmdir_recursive("{$tmpfname}/community/");
 	}
 }
 
@@ -659,7 +659,7 @@ if ($emergingthreats == 'on') {
 			update_output_window(gettext("Installation of {$et_name} rules completed..."));
 		}
 		error_log(gettext("\tInstallation of {$et_name} rules completed.\n"), 3, $snort_rules_upd_log);
-		exec("rm -rf {$tmpfname}/emerging");
+		rmdir_recursive("{$tmpfname}/emerging/");
 	}
 }
 
@@ -797,7 +797,7 @@ if ($snortdownload == 'on' || $emergingthreats == 'on' || $snortcommunityrules =
 
 /*  remove $tmpfname files */
 if (is_dir("{$tmpfname}")) {
-	exec("/bin/rm -rf {$tmpfname}");
+	rmdir_recursive($tmpfname);
 }
 
 if ($pkg_interface <> "console")
