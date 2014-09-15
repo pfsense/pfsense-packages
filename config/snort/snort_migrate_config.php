@@ -75,8 +75,6 @@ if (empty($config['installedpackages']['snortglobal']['snort_config_ver']) &&
 /**********************************************************/
 	if (empty($config['installedpackages']['snortglobal']['auto_manage_sids'])) {
 		$config['installedpackages']['snortglobal']['auto_manage_sids'] = "off";
-		$config['installedpackages']['snortglobal']['sid_changes_log_limit_size'] = "250";
-		$config['installedpackages']['snortglobal']['sid_changes_log_retention'] = "336";
 		$updated_cfg = true;
 	}
 
@@ -87,10 +85,12 @@ if (empty($config['installedpackages']['snortglobal']['snort_config_ver']) &&
 		$config['installedpackages']['snortglobal']['enable_log_mgmt'] = "on";
 		$config['installedpackages']['snortglobal']['alert_log_limit_size'] = "500";
 		$config['installedpackages']['snortglobal']['alert_log_retention'] = "336";
-		$config['installedpackages']['snortglobal']['stats_log_limit_size'] = "500";
-		$config['installedpackages']['snortglobal']['stats_log_retention'] = "168";
 		$config['installedpackages']['snortglobal']['event_pkts_log_limit_size'] = "0";
 		$config['installedpackages']['snortglobal']['event_pkts_log_retention'] = "336";
+		$config['installedpackages']['snortglobal']['sid_changes_log_limit_size'] = "250";
+		$config['installedpackages']['snortglobal']['sid_changes_log_retention'] = "336";
+		$config['installedpackages']['snortglobal']['stats_log_limit_size'] = "500";
+		$config['installedpackages']['snortglobal']['stats_log_retention'] = "168";
 		$updated_cfg = true;
 }
 
