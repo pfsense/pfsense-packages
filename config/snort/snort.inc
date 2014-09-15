@@ -3031,17 +3031,14 @@ function snort_deinstall() {
 	}
 
 	/**********************************************************/
-	/* Test for existence of library backup tarballs in /tmp. */
-	/* If these are present, then a package "delete"          */
+	/* Test for existence of the snort directory in the PBI   */
+	/* path.  If not present, then a package "delete"         */
 	/* operation is in progress and we need to wipe out the   */
 	/* configuration files.  Otherwise we leave the binary-   */
 	/* side configuration intact since only a GUI files       */
 	/* deinstall and reinstall operation is in progress.      */
-	/*							  */
-	/* XXX: hopefully a better method presents itself in      */
-	/*      future versions of pfSense.                       */
 	/**********************************************************/
-	if (file_exists("/tmp/pkg_libs.tgz") || file_exists("/tmp/pkg_bins.tgz")) {
+	if (!is_dir("{$snortdir}")) {
 		log_error(gettext("[Snort] Package deletion requested... removing all files..."));
 		unlink_if_exists("{$rcdir}snort.sh");
 		rmdir_recursive("/usr/local/pkg/snort/");
