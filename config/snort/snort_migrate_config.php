@@ -434,23 +434,23 @@ foreach ($rule as &$r) {
 		$pconfig['smtp_max_mime_mem'] = "838860";
 		$updated_cfg = true;
 	}
-	if (empty($pconfig['smtp_b64_decode_depth'])) {
+	if (empty($pconfig['smtp_b64_decode_depth']) && $pconfig['smtp_b64_decode_depth'] != "0") {
 		$pconfig['smtp_b64_decode_depth'] = "0";
 		$updated_cfg = true;
 	}
-	if (empty($pconfig['smtp_qp_decode_depth'])) {
+	if (empty($pconfig['smtp_qp_decode_depth']) && $pconfig['smtp_qp_decode_depth'] != "0") {
 		$pconfig['smtp_qp_decode_depth'] = "0";
 		$updated_cfg = true;
 	}
-	if (empty($pconfig['smtp_bitenc_decode_depth'])) {
+	if (empty($pconfig['smtp_bitenc_decode_depth']) && $pconfig['smtp_bitenc_decode_depth'] != "0") {
 		$pconfig['smtp_bitenc_decode_depth'] = "0";
 		$updated_cfg = true;
 	}
-	if (empty($pconfig['smtp_uu_decode_depth'])) {
+	if (empty($pconfig['smtp_uu_decode_depth']) && $pconfig['smtp_uu_decode_depth'] != "0") {
 		$pconfig['smtp_uu_decode_depth'] = "0";
 		$updated_cfg = true;
 	}
-	if (empty($pconfig['smtp_email_hdrs_log_depth']) && $pconfig['smtp_email_hdrs_log_depth'] != '0') {
+	if (empty($pconfig['smtp_email_hdrs_log_depth'])) {
 		$pconfig['smtp_email_hdrs_log_depth'] = "1464";
 		$updated_cfg = true;
 	}
@@ -474,7 +474,6 @@ foreach ($rule as &$r) {
 		$pconfig['smtp_log_email_hdrs'] = 'on';
 		$updated_cfg = true;
 	}
-
 
 	// Migrate any BY2 limit for unified2 logs to new format
 	if (!empty($pconfig['unified2_log_limit']) && 
