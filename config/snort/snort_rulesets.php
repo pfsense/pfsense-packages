@@ -93,17 +93,6 @@ if (!file_exists("{$snortdir}/rules/" . GPL_FILE_PREFIX . "community.rules"))
 if (($snortdownload == 'off') || ($a_nat[$id]['ips_policy_enable'] != 'on'))
 	$policy_select_disable = "disabled";
 
-if ($a_nat[$id]['autoflowbitrules'] == 'on') {
-	if (file_exists("{$snortdir}/snort_{$snort_uuid}_{$if_real}/rules/{$flowbit_rules_file}") &&
-	    filesize("{$snortdir}/snort_{$snort_uuid}_{$if_real}/rules/{$flowbit_rules_file}") > 0) {
-		$btn_view_flowb_rules = " title=\"" . gettext("View flowbit-required rules") . "\"";
-	}
-	else
-		$btn_view_flowb_rules = " disabled";
-}
-else
-	$btn_view_flowb_rules = " disabled";
-
 // If a Snort VRT policy is enabled and selected, remove all Snort VRT
 // rules from the configured rule sets to allow automatic selection.
 if ($a_nat[$id]['ips_policy_enable'] == 'on') {
@@ -232,6 +221,18 @@ if ($_POST['selectall']) {
 // Get any automatic rule category enable/disable modifications
 // if auto-SID Mgmt is enabled.
 $cat_mods = snort_sid_mgmt_auto_categories($a_nat[$id], FALSE);
+
+// Enable the VIEW button for auto-flowbits file if we have a valid flowbits file
+if ($a_nat[$id]['autoflowbitrules'] == 'on') {
+	if (file_exists("{$snortdir}/snort_{$snort_uuid}_{$if_real}/rules/{$flowbit_rules_file}") &&
+	    filesize("{$snortdir}/snort_{$snort_uuid}_{$if_real}/rules/{$flowbit_rules_file}") > 0) {
+		$btn_view_flowb_rules = " title=\"" . gettext("View flowbit-required rules") . "\"";
+	}
+	else
+		$btn_view_flowb_rules = " disabled";
+}
+else
+	$btn_view_flowb_rules = " disabled";
 
 $if_friendly = convert_friendly_interface_to_friendly_descr($a_nat[$id]['interface']);
 $pgtitle = gettext("Snort: Interface {$if_friendly} - Categories");
