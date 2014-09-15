@@ -207,6 +207,6 @@ POSSIBILITY OF SUCH DAMAGE.
 	<custom_delete_php_command>
 	</custom_delete_php_command>	
 	<custom_php_resync_config_command>
-		write_config();snort_sync_on_changes();
+		write_config("Snort pkg: saved changes to XMLRPC sync configuration.");snort_sync_on_changes();
 	</custom_php_resync_config_command>
 </packagegui>
