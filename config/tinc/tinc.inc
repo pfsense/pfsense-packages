@@ -1,5 +1,7 @@
 <?php
 
+include_once('guiconfig.inc'); // needed for clear_log_file() during package installation while booting
+
 function tinc_save() {
 	global $config;
 	conf_mount_rw();
