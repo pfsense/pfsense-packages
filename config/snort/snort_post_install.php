@@ -230,9 +230,6 @@ if ($config['installedpackages']['snortglobal']['forcekeepsettings'] == 'on') {
 	snort_rm_blocked_install_cron($config['installedpackages']['snortglobal']['rm_blocked'] != "never_b" ? true : false);
 	snort_rules_up_install_cron($config['installedpackages']['snortglobal']['autorulesupdate7'] != "never_up" ? true : false);
 
-	/* Add the recurring jobs created above to crontab */
-	configure_cron();
-
 	/* Restore the last Snort Dashboard Widget setting if none is set */
 	if (!empty($config['installedpackages']['snortglobal']['dashboard_widget']) && 
 	    stristr($config['widgets']['sequence'], "snort_alerts-container") === FALSE)
