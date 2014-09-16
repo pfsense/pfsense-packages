@@ -702,14 +702,17 @@ function snort_Getdirsize($node) {
 	return substr( $blah, 0, strpos($blah, 9) );
 }
 
-function snort_cron_job_exists($crontask, $minute="0", $hour="*", $monthday="*", $month="*", $weekday="*", $who="root") {
+function snort_cron_job_exists($crontask, $match_time=FALSE, $minute="0", $hour="*", $monthday="*", $month="*", $weekday="*", $who="root") {
 
 	/************************************************************
 	 * This function iterates the cron[] array in the config    *
 	 * to determine if the passed $crontask entry exists.  It   *
-	 * returns TRUE if the exact $crontask already exists and   *
-	 * the time and $who parameters match, or FALSE if there    *
-	 * is no exact match.                                       *
+	 * returns TRUE if the $crontask already exists, or FALSE   *
+	 * if there is no match.                                    *
+	 *                                                          *
+	 * The $match_time flag, when set, causes a test of the     *
+	 * configured task execution times along with the task      *
+	 * when checking for a match.                               *
 	 *                                                          *
 	 * We use this to prevent unneccessary config writes if     *
 	 * the $crontask already exists.                            *
@@ -724,18 +727,20 @@ function snort_cron_job_exists($crontask, $minute="0", $hour="*", $monthday="*",
 
 	foreach($config['cron']['item'] as $item) {
 		if(strpos($item['command'], $crontask) !== FALSE) {
-			if ($item['minute'] != $minute)
-				return FALSE;
-			if ($item['hour'] != $hour)
-				return FALSE;
-			if ($item['mday'] != $monthday)
-				return FALSE;
-			if ($item['month'] != $month)
-				return FALSE;
-			if ($item['wday'] != $weekday)
-				return FALSE;
-			if ($item['who'] != $who)
-				return FALSE;
+			if ($match_time) {
+				if ($item['minute'] != $minute)
+					return FALSE;
+				if ($item['hour'] != $hour)
+					return FALSE;
+				if ($item['mday'] != $monthday)
+					return FALSE;
+				if ($item['month'] != $month)
+					return FALSE;
+				if ($item['wday'] != $weekday)
+					return FALSE;
+				if ($item['who'] != $who)
+					return FALSE;
+			}
 			return TRUE;
 		}
 	}
@@ -746,12 +751,13 @@ function snort_snortloglimit_install_cron($should_install=TRUE) {
 
 	// See if simply removing existing "loglimit" job for Snort
 	if ($should_install == FALSE) {
-		install_cron_job("snort_check_cron_misc.inc", false);
+		if (snort_cron_job_exists("snort/snort_check_cron_misc.inc", FALSE))
+			install_cron_job("snort_check_cron_misc.inc", false);
 		return;
 	}
 
 	// If there are no changes in the cron job command string from the existing job, then exit.
-	if ($should_install && snort_cron_job_exists("/usr/local/pkg/snort/snort_check_cron_misc.inc", "*/5"))
+	if ($should_install && snort_cron_job_exists("/usr/local/pkg/snort/snort_check_cron_misc.inc", TRUE, "*/5"))
 		return;
 
 	// Else install the new or updated cron job
@@ -763,7 +769,8 @@ function snort_rm_blocked_install_cron($should_install) {
 
 	// See if simply removing existing "expiretable" job for Snort
 	if ($should_install == FALSE) {
-		install_cron_job("snort2c", false);
+		if (snort_cron_job_exists("snort2c", FALSE))
+			install_cron_job("snort2c", false);
 		return;
 	}
 
@@ -855,7 +862,7 @@ function snort_rm_blocked_install_cron($should_install) {
 	$command = "/usr/bin/nice -n20 /sbin/pfctl -q -t snort2c -T expire {$snort_rm_blocked_expire}";
 
 	// If there are no changes in the cron job command string from the existing job, then exit.
-	if (snort_cron_job_exists($command, $snort_rm_blocked_min, $snort_rm_blocked_hr, $snort_rm_blocked_mday, $snort_rm_blocked_month, $snort_rm_blocked_wday, "root"))
+	if (snort_cron_job_exists($command, TRUE, $snort_rm_blocked_min, $snort_rm_blocked_hr, $snort_rm_blocked_mday, $snort_rm_blocked_month, $snort_rm_blocked_wday, "root"))
 		return;
 
 	// Else install the new or updated cron job
@@ -871,7 +878,8 @@ function snort_rules_up_install_cron($should_install) {
 	// If called with FALSE as argument, then we're removing 
 	// the existing job.
 	if ($should_install == FALSE) {
-		install_cron_job("snort_check_for_rule_updates.php", false);
+		if (snort_cron_job_exists("snort_check_for_rule_updates.php", FALSE))
+			install_cron_job("snort_check_for_rule_updates.php", false);
 		return;
 	}
 
@@ -943,7 +951,7 @@ function snort_rules_up_install_cron($should_install) {
 	$command = "/usr/bin/nice -n20 /usr/local/bin/php -f /usr/local/pkg/snort/snort_check_for_rule_updates.php";
 
 	// If there are no changes in the cron job command string from the existing job, then exit
-	if (snort_cron_job_exists($command, $snort_rules_up_min, $snort_rules_up_hr, $snort_rules_up_mday, $snort_rules_up_month, $snort_rules_up_wday, "root"))
+	if (snort_cron_job_exists($command, TRUE, $snort_rules_up_min, $snort_rules_up_hr, $snort_rules_up_mday, $snort_rules_up_month, $snort_rules_up_wday, "root"))
 		return;
 
 	// Else install the new or updated cron job
@@ -993,8 +1001,6 @@ function sync_snort_package_config() {
 	/* set the snort rules update time */
 	snort_rules_up_install_cron($snortglob['autorulesupdate7'] != "never_up" ? true : false);
 
-	configure_cron();
-	
 	/* Do not attempt package sync if reinstalling package or booting */
 	if (!$g['snort_postinstall'] && !$g['booting'])
 		snort_sync_on_changes();
@@ -2969,7 +2975,7 @@ function snort_generate_barnyard2_conf($snortcfg, $if_real) {
 		else
 			$snortbarnyardlog_output_plugins .= "sensor_name {$snortbarnyard_hostname_info}, ";
 		if ($snortcfg['barnyard_syslog_local'] == 'on')
-			$snortbarnyardlog_output_plugins .= "local, log_facility LOG_AUTH, log_priority LOG_INFO\n\n";
+			$snortbarnyardlog_output_plugins .= "local, log_facility {$snortcfg['barnyard_syslog_facility']}, log_priority {$snortcfg['barnyard_syslog_priority']}\n\n";
 		else {
 			$snortbarnyardlog_output_plugins .= "server {$snortcfg['barnyard_syslog_rhost']}, protocol {$snortcfg['barnyard_syslog_proto']}, ";
 			$snortbarnyardlog_output_plugins .= "port {$snortcfg['barnyard_syslog_dport']}, operation_mode {$snortcfg['barnyard_syslog_opmode']}, ";
@@ -3061,11 +3067,13 @@ function snort_deinstall() {
 	/* Remove the snort user and group */
 	mwexec('/usr/sbin/pw userdel snort; /usr/sbin/pw groupdel snort', true);
 
-	/* Remove all the Snort cron jobs. */
-	install_cron_job("snort2c", false);
-	install_cron_job("snort_check_for_rule_updates.php", false);
-	install_cron_job("snort_check_cron_misc.inc", false);
-	configure_cron();
+	/* Remove all the existing Snort cron jobs. */
+	if (snort_cron_job_exists("snort2c", FALSE))
+		install_cron_job("snort2c", false);
+	if (snort_cron_job_exists("snort_check_for_rule_updates.php", FALSE))
+		install_cron_job("snort_check_for_rule_updates.php", false);
+	if (snort_cron_job_exists("snort_check_cron_misc.inc", FALSE))
+		install_cron_job("snort_check_cron_misc.inc", false);
 
 	/* Remove our associated Dashboard widget config.  If  */
 	/* "save settings" is enabled, then save old widget    */

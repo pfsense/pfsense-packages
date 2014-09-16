@@ -427,7 +427,7 @@ include_once("head.inc");
 					<input name="barnyard_syslog_local" type="checkbox" value="on" <?php if ($pconfig['barnyard_syslog_local'] == "on") echo "checked"; ?> 
 					onClick="toggle_local_syslog()"/>
 					<?php echo gettext("Enable logging of alerts to the local system only"); ?><br/>
-					<?php echo gettext("This will send alert data to the local system only and overrides the host, port, protocol, facility and priority values below."); ?></td>
+					<?php echo gettext("This will send alert data to the local system only and overrides the host, port, and protocol values below."); ?></td>
 			</tr>
 			<tr>
 				<td width="22%" valign="top" class="vncell"><?php echo gettext("Remote Host"); ?></td>
@@ -470,7 +470,7 @@ include_once("head.inc");
 							echo "<option value='{$facility}'{$selected}>" . $facility . "</option>\n";
 						}
 					?></select>&nbsp;&nbsp;
-					<?php echo gettext("Select Syslog Facility to use for remote reporting.  Default is ") . "<strong>" . gettext("LOG_USER") . "</strong>."; ?>
+					<?php echo gettext("Select Syslog Facility to use for reporting.  Default is ") . "<strong>" . gettext("LOG_USER") . "</strong>."; ?>
 				</td>
 			</tr>
 			<tr>
@@ -486,7 +486,7 @@ include_once("head.inc");
 							echo "<option value='{$priority}'{$selected}>" . $priority . "</option>\n";
 						}
 					?></select>&nbsp;&nbsp;
-					<?php echo gettext("Select Syslog Priority (Level) to use for remote reporting.  Default is ") . "<strong>" . gettext("LOG_INFO") . "</strong>."; ?>
+					<?php echo gettext("Select Syslog Priority (Level) to use for reporting.  Default is ") . "<strong>" . gettext("LOG_INFO") . "</strong>."; ?>
 				</td>
 			</tr>
 			</tbody>
@@ -592,8 +592,6 @@ function toggle_local_syslog() {
 		document.iform.barnyard_syslog_dport.disabled = endis;
 		document.iform.barnyard_syslog_proto_udp.disabled = endis;
 		document.iform.barnyard_syslog_proto_tcp.disabled = endis;
-		document.iform.barnyard_syslog_facility.disabled = endis;
-		document.iform.barnyard_syslog_priority.disabled = endis;
 	}
 }
 
