@@ -91,6 +91,27 @@ if (isset($id) && $a_nat[$id]) {
 }
 
 if ($_POST['save']) {
+
+	// If disabling Barnyard2 on the interface, stop any
+	// currently running instance, then save the disabled
+	// state and exit.
+	if ($_POST['barnyard_enable'] != 'on') {
+		$a_nat[$id]['barnyard_enable'] = 'off';
+		write_config("Snort pkg: modified Barnyard2 settings.");
+		snort_barnyard_stop($a_nat[$id], get_real_interface($a_nat[$id]['interface']));
+
+		// No need to rebuild rules for Barnyard2 changes
+		$rebuild_rules = false;
+		sync_snort_package_config();
+		header( 'Expires: Sat, 26 Jul 1997 05:00:00 GMT' );
+		header( 'Last-Modified: ' . gmdate( 'D, d M Y H:i:s' ) . ' GMT' );
+		header( 'Cache-Control: no-store, no-cache, must-revalidate' );
+		header( 'Cache-Control: post-check=0, pre-check=0', false );
+		header( 'Pragma: no-cache' );
+		header("Location: /snort/snort_barnyard.php");
+		exit;
+	}
+
 	// Check that at least one output plugin is enabled
 	if ($_POST['barnyard_mysql_enable'] != 'on' && $_POST['barnyard_syslog_enable'] != 'on' &&
 	    $_POST['barnyard_bro_ids_enable'] != 'on' && $_POST['barnyard_enable'] == "on")
