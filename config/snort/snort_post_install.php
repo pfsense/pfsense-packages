@@ -220,10 +220,51 @@ if ($config['installedpackages']['snortglobal']['forcekeepsettings'] == 'on') {
 		// create barnyard2.conf file for interface
 		if ($snortcfg['barnyard_enable'] == 'on')
 			snort_generate_barnyard2_conf($snortcfg, $if_real);
+
+		if ($snortcfg['enable'] != 'on')
+			continue;
+
+		// Create a custom <service> entry for each enabled interface
+		$snort_found = FALSE;
+		$barnyard_found = FALSE;
+		foreach ($config['installedpackages']['service'] as $service) {
+			if (isset($service['uuid']) && $service['uuid'] == $snortcfg['uuid'] &&
+			    $service['name'] == "snort_" . strtolower(convert_friendly_interface_to_friendly_descr($snortcfg['interface']))) {
+				$snort_found = TRUE;
+			}
+			if (isset($service['uuid']) && $service['uuid'] == $snortcfg['uuid'] &&
+			    $service['name'] == "barnyard2_" . strtolower(convert_friendly_interface_to_friendly_descr($snortcfg['interface']))) {
+				$barnyard_found = TRUE;
+			}
+		}
+		if (!$snort_found) {
+			$service = array();
+			$service['name'] = "snort_" . strtolower(convert_friendly_interface_to_friendly_descr($snortcfg['interface']));
+			$service['description'] = "Snort IDS/IPS - " . convert_friendly_interface_to_friendly_descr($snortcfg['interface']);
+			$service['uuid'] = $snortcfg['uuid'];
+			$service['startcmd'] = "\$action='start';\$service='snort';\$uuid={$snortcfg['uuid']};\$rc = include '/usr/local/pkg/snort/snort_service_utils.php';";
+			$service['stopcmd'] = "\$action='stop';\$service='snort';\$uuid={$snortcfg['uuid']};\$rc = include '/usr/local/pkg/snort/snort_service_utils.php';";
+			$service['restartcmd'] = "\$action='restart';\$service='snort';\$uuid={$snortcfg['uuid']};\$rc = include '/usr/local/pkg/snort/snort_service_utils.php';";
+			$service['custom_php_service_status_command'] = "\$action='status';\$service='snort';\$uuid={$snortcfg['uuid']};\$rc = include '/usr/local/pkg/snort/snort_service_utils.php';";
+			$config['installedpackages']['service'][] = $service;
+			$is_dirty = TRUE;
+		}
+		if (!$barnyard_found && $snortcfg['barnyard_enable'] == 'on') {
+			$service = array();
+			$service['name'] = "barnyard2_" . strtolower(convert_friendly_interface_to_friendly_descr($snortcfg['interface']));
+			$service['description'] = "Barnyard2 Logging - " . convert_friendly_interface_to_friendly_descr($snortcfg['interface']);
+			$service['uuid'] = $snortcfg['uuid'];
+			$service['startcmd'] = "\$action='start';\$service='barnyard2';\$uuid={$snortcfg['uuid']};\$rc = include '/usr/local/pkg/snort/snort_service_utils.php';";
+			$service['stopcmd'] = "\$action='stop';\$service='barnyard2';\$uuid={$snortcfg['uuid']};\$rc = include '/usr/local/pkg/snort/snort_service_utils.php';";
+			$service['restartcmd'] = "\$action='restart';\$service='barnyard2';\$uuid={$snortcfg['uuid']};\$rc = include '/usr/local/pkg/snort/snort_service_utils.php';";
+			$service['custom_php_service_status_command'] = "\$action='status';\$service='barnyard2';\$uuid={$snortcfg['uuid']};\$rc = include '/usr/local/pkg/snort/snort_service_utils.php';";
+			$config['installedpackages']['service'][] = $service;
+			$is_dirty = TRUE;
+		}
 	}
 
 	/* create snort bootup file snort.sh */
-	snort_create_rc();
+//	snort_create_rc();
 
 	/* Set Log Limit, Block Hosts Time and Rules Update Time */
 	snort_snortloglimit_install_cron(true);
@@ -244,8 +285,19 @@ if ($config['installedpackages']['snortglobal']['forcekeepsettings'] == 'on') {
 		update_status(gettext("Starting Snort using rebuilt configuration..."));
 		update_output_window(gettext("Please wait... while Snort is started..."));
 		log_error(gettext("[Snort] Starting Snort using rebuilt configuration..."));
-		mwexec_bg("{$rcdir}snort.sh start");
-		update_output_window(gettext("Snort is starting using the rebuilt configuration..."));
+//		mwexec_bg("{$rcdir}snort.sh start");
+		foreach ($config['installedpackages']['snortglobal']['rule'] as $snortcfg) {
+			if ($snortcfg['enable'] != 'on')
+				continue;
+			$if_real = get_real_interface($snortcfg['interface']);
+			$snort_uuid = $snortcfg['uuid'];
+			update_output_window(gettext("Snort starting on " . convert_friendly_interface_to_friendly_descr($snortcfg['interface'])));
+			log_error("[Snort] Snort START for " . convert_friendly_interface_to_friendly_descr($snortcfg['interface']) . "({$if_real})...");
+			mwexec_bg("/usr/local/bin/snort -R {$snort_uuid} -D -q -l {$snortlogdir}/snort_{$if_real}{$snort_uuid} --pid-path {$g['varrun_path']} --nolock-pidfile -G {$snort_uuid} -c {$snortdir}/snort_{$snort_uuid}_{$if_real}/snort.conf -i {$if_real}");
+			if ($snortcfg['barnyard_enable'] == 'on')
+				mwexec_bg("/usr/local/bin/barnyard2 -r {$snort_uuid} -f \"snort_{$snort_uuid}_{$if_real}.u2\" --pid-path {$g['varrun_path']} --nolock-pidfile -c {$snortdir}/snort_{$snort_uuid}_{$if_real}/barnyard2.conf -d {$snortlogdir}/snort_{$if_real}{$snort_uuid} -D -q");
+		}
+		update_output_window(gettext("Snort has started using the rebuilt configuration..."));
 	}
 }
 

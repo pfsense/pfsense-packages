@@ -551,7 +551,7 @@ function snort_barnyard_stop($snortcfg, $if_real) {
 
 	$snort_uuid = $snortcfg['uuid'];
 	if (isvalidpid("{$g['varrun_path']}/barnyard2_{$if_real}{$snort_uuid}.pid")) {
-		log_error("[Snort] Barnyard2 STOP for {$snortcfg['descr']}({$if_real})...");
+		log_error("[Snort] Barnyard2 STOP for " . convert_real_interface_to_friendly_descr($if_real) . "({$if_real})...");
 		killbypid("{$g['varrun_path']}/barnyard2_{$if_real}{$snort_uuid}.pid");
 	}
 }
@@ -561,28 +561,35 @@ function snort_stop($snortcfg, $if_real) {
 
 	$snort_uuid = $snortcfg['uuid'];
 	if (isvalidpid("{$g['varrun_path']}/snort_{$if_real}{$snort_uuid}.pid")) {
-		log_error("[Snort] Snort STOP for {$snortcfg['descr']}({$if_real})...");
+		log_error("[Snort] Snort STOP for " . convert_real_interface_to_friendly_descr($if_real) . "({$if_real})...");
 		killbypid("{$g['varrun_path']}/snort_{$if_real}{$snort_uuid}.pid");
 	}
 
 	snort_barnyard_stop($snortcfg, $if_real);
 }
 
-function snort_barnyard_start($snortcfg, $if_real) {
+function snort_barnyard_start($snortcfg, $if_real, $background=FALSE) {
 	global $config, $g;
 
 	$snortdir = SNORTDIR;
 	$snortlogdir = SNORTLOGDIR;
 	$snort_uuid = $snortcfg['uuid'];
 
-	/* define snortbarnyardlog_chk */
 	if ($snortcfg['barnyard_enable'] == 'on') {
-		log_error("[Snort] Barnyard2 START for {$snortcfg['descr']}({$if_real})...");
-		mwexec("/usr/local/bin/barnyard2 -r {$snort_uuid} -f \"snort_{$snort_uuid}_{$if_real}.u2\" --pid-path {$g['varrun_path']} --nolock-pidfile -c {$snortdir}/snort_{$snort_uuid}_{$if_real}/barnyard2.conf -d {$snortlogdir}/snort_{$if_real}{$snort_uuid} -D -q");
+		if (isvalidpid("{$g['varrun_path']}/barnyard2_{$if_real}{$snort_uuid}.pid")) {
+			snort_barnyard_reload_config($snortcfg, "HUP");
+		}
+		else {
+			log_error("[Snort] Barnyard2 START for " . convert_real_interface_to_friendly_descr($if_real) . "({$if_real})...");
+			if ($background)
+				mwexec_bg("/usr/local/bin/barnyard2 -r {$snort_uuid} -f \"snort_{$snort_uuid}_{$if_real}.u2\" --pid-path {$g['varrun_path']} --nolock-pidfile -c {$snortdir}/snort_{$snort_uuid}_{$if_real}/barnyard2.conf -d {$snortlogdir}/snort_{$if_real}{$snort_uuid} -D -q");
+			else
+				mwexec("/usr/local/bin/barnyard2 -r {$snort_uuid} -f \"snort_{$snort_uuid}_{$if_real}.u2\" --pid-path {$g['varrun_path']} --nolock-pidfile -c {$snortdir}/snort_{$snort_uuid}_{$if_real}/barnyard2.conf -d {$snortlogdir}/snort_{$if_real}{$snort_uuid} -D -q");
+		}
 	}
 }
 
-function snort_start($snortcfg, $if_real) {
+function snort_start($snortcfg, $if_real, $background=FALSE) {
 	global $config, $g;
 
 	$snortdir = SNORTDIR;
@@ -590,27 +597,56 @@ function snort_start($snortcfg, $if_real) {
 	$snort_uuid = $snortcfg['uuid'];
 
 	if ($snortcfg['enable'] == 'on') {
-		log_error("[Snort] Snort START for {$snortcfg['descr']}({$if_real})...");
-		mwexec("/usr/local/bin/snort -R {$snort_uuid} -D -q -l {$snortlogdir}/snort_{$if_real}{$snort_uuid} --pid-path {$g['varrun_path']} --nolock-pidfile -G {$snort_uuid} -c {$snortdir}/snort_{$snort_uuid}_{$if_real}/snort.conf -i {$if_real}");
+		if (isvalidpid("{$g['varrun_path']}/snort_{$if_real}{$snort_uuid}.pid")) {
+			snort_reload_config($snortcfg, "SIGHUP");
+			snort_barnyard_start($snortcfg, $if_real, $background);
+		}
+		else {
+			log_error("[Snort] Snort START for " . convert_real_interface_to_friendly_descr($if_real) . "({$if_real})...");
+			if ($background)
+				mwexec_bg("/usr/local/bin/snort -R {$snort_uuid} -D -q -l {$snortlogdir}/snort_{$if_real}{$snort_uuid} --pid-path {$g['varrun_path']} --nolock-pidfile -G {$snort_uuid} -c {$snortdir}/snort_{$snort_uuid}_{$if_real}/snort.conf -i {$if_real}");
+			else
+				mwexec("/usr/local/bin/snort -R {$snort_uuid} -D -q -l {$snortlogdir}/snort_{$if_real}{$snort_uuid} --pid-path {$g['varrun_path']} --nolock-pidfile -G {$snort_uuid} -c {$snortdir}/snort_{$snort_uuid}_{$if_real}/snort.conf -i {$if_real}");
+			snort_barnyard_start($snortcfg, $if_real, $background);
+		}
 	}
 	else
 		return;
-
-	snort_barnyard_start($snortcfg, $if_real);
 }
 
-/**************************************************************/
-/* This function sends the passed SIGNAL to the Snort         */
-/* instance on the passed interface to cause Snort to reload  */
-/* and parse the running configuration without stopping       */
-/* packet processing.  It also executes the reload as a       */
-/* background process and returns control immediately to the  */
-/* caller.                                                    */
-/*                                                            */
-/*  $signal = SIGHUP (default) parses and reloads config.     */
-/*            SIGURG updates Host Attribute Table.            */
-/**************************************************************/
+function snort_start_all_interfaces($background=FALSE) {
+
+	/*************************************************************/
+	/* This function starts all configured and enabled Snort     */
+	/* interfaces.                                               */
+	/*************************************************************/
+
+	global $g, $config;
+
+	/* do nothing if no Snort interfaces active */
+	if (!is_array($config['installedpackages']['snortglobal']['rule']))
+		return;
+
+	foreach ($config['installedpackages']['snortglobal']['rule'] as $snortcfg) {
+		if ($snortcfg['enable'] != 'on')
+			continue;
+		snort_start($snortcfg, get_real_interface($snortcfg['interface']), $background);
+	}
+}
+
 function snort_reload_config($snortcfg, $signal="SIGHUP") {
+
+	/*************************************************************/
+	/* This function sends the passed SIGNAL to the Snort        */
+	/* instance on the passed interface to cause Snort to        */
+	/* reload and parse the running configuration without        */
+	/* stopping packet processing.  It also executes the         */
+	/* the reload as a background process and returns control    */
+	/* immediately to the caller.                                */
+	/*                                                           */
+	/*  $signal = SIGHUP (default) parses and reloads config.    */
+	/*            SIGURG updates Host Attribute Table.           */
+	/*************************************************************/
 	global $config, $g;
 
 	$snortdir = SNORTDIR;
@@ -622,23 +658,23 @@ function snort_reload_config($snortcfg, $signal="SIGHUP") {
 	/* can find a valid PID for the process.              */
 	/******************************************************/
 	if (isvalidpid("{$g['varrun_path']}/snort_{$if_real}{$snort_uuid}.pid")) {
-		log_error("[Snort] Snort RELOAD CONFIG for {$snortcfg['descr']} ({$if_real})...");
+		log_error("[Snort] Snort RELOAD CONFIG for " . convert_real_interface_to_friendly_descr($if_real) . "({$if_real})...");
 		mwexec_bg("/bin/pkill -{$signal} -F {$g['varrun_path']}/snort_{$if_real}{$snort_uuid}.pid");
 	}
 }
 
 function snort_barnyard_reload_config($snortcfg, $signal="HUP") {
 
-	/**************************************************************/
-	/* This function sends the passed SIGNAL to the Barnyard2     */
-	/* instance on the passed interface to cause Barnyard to      */
-	/* reload and parse the running configuration without         */
-	/* impacting packet processing.  It also executes the reload  */
-	/* as a background process and returns control immediately    */
-	/* to the caller.                                             */
-	/*                                                            */
-	/*  $signal = HUP (default) parses and reloads config.        */
-	/**************************************************************/
+	/*************************************************************/
+	/* This function sends the passed SIGNAL to the Barnyard2    */
+	/* instance on the passed interface to cause Barnyard to     */
+	/* reload and parse the running configuration without        */
+	/* impacting packet processing.  It also executes the reload */
+	/* as a background process and returns control immediately   */
+	/* to the caller.                                            */
+	/*                                                           */
+	/*  $signal = HUP (default) parses and reloads config.       */
+	/*************************************************************/
 	global $g;
 
 	$snortdir = SNORTDIR;
@@ -650,7 +686,7 @@ function snort_barnyard_reload_config($snortcfg, $signal="HUP") {
 	/* we can find a valid PID for the process.           */
 	/******************************************************/
 	if (isvalidpid("{$g['varrun_path']}/barnyard2_{$if_real}{$snort_uuid}.pid")) {
-		log_error("[Snort] Barnyard2 CONFIG RELOAD initiated for {$snortcfg['descr']} ({$if_real})...");
+		log_error("[Snort] Barnyard2 CONFIG RELOAD initiated for " . convert_real_interface_to_friendly_descr($if_real) . "({$if_real})...");
 		mwexec_bg("/bin/pkill -{$signal} -F {$g['varrun_path']}/barnyard2_{$if_real}{$snort_uuid}.pid");
 	}
 }
@@ -971,25 +1007,104 @@ function sync_snort_package_config() {
 
 	/* do not start config build if rules is empty or there are no Snort settings */
 	if (!is_array($config['installedpackages']['snortglobal']) || !is_array($config['installedpackages']['snortglobal']['rule'])) {
-		@unlink("{$rcdir}snort.sh");
 		conf_mount_ro();
+
+		// Make sure no lingering <service> entries exist for Snort interfaces
+		$is_dirty = FALSE;
+		if (!is_array($config['installedpackges']['service']))
+			$config['installedpackages']['service'] = array();
+		foreach ($config['installedpackages']['service'] as $key => $service) {
+			if (strpos($service['name'], "snort_") !== FALSE) {
+				unset($config['installedpackages']['service'][$key]);
+				$is_dirty = TRUE;
+			}
+			if (strpos($service['name'], "barnyard2_") !== FALSE) {
+				unset($config['installedpackages']['service'][$key]);
+				$is_dirty = TRUE;
+			}
+		}
+		if ($is_dirty)
+			write_config("Snort pkg: removed snort interface service entry.");
 		return;
 	}
 
 	$snortconf = $config['installedpackages']['snortglobal']['rule'];
+	$is_dirty = FALSE;
 	foreach ($snortconf as $value) {
+		/* Skip configuration of any disabled interface */
+		/* after removing its custom service entry.     */
+		if ($value['enable'] != 'on') {
+			foreach ($config['installedpackages']['service'] as $key => $service) {
+				if (isset($service['uuid']) && $service['uuid'] == $value['uuid'] &&
+				    $service['name'] == "snort_" . strtolower(convert_friendly_interface_to_friendly_descr($value['interface']))) {
+					unset($config['installedpackages']['service'][$key]);
+					unlink_if_exists("{$g['varrun_path']}/snort_{$uuid}.disabled");
+					$is_dirty = TRUE;
+				}
+				if (isset($service['uuid']) && $service['uuid'] == $value['uuid'] &&
+				    $service['name'] == "barnyard2_" . strtolower(convert_friendly_interface_to_friendly_descr($value['interface']))) {
+					unset($config['installedpackages']['service'][$key]);
+					unlink_if_exists("{$g['varrun_path']}/barnyard2_{$uuid}.disabled");
+					$is_dirty = TRUE;
+				}
+			}
+			continue;
+		}
+
 		$if_real = get_real_interface($value['interface']);
 
-		/* create a snort.conf file for interface           */
+		/* create a snort.conf file for interface       */
 		snort_generate_conf($value);
 
-		/* create barnyard2.conf file for interface         */
+		/* create barnyard2.conf file for interface     */
 		if ($value['barnyard_enable'] == 'on')
 			snort_generate_barnyard2_conf($value, $if_real);
+
+		/* create a <service> entry for interface       */
+		$snort_found = FALSE;
+		$barnyard_found = FALSE;
+		foreach ($config['installedpackages']['service'] as $service) {
+			if (isset($service['uuid']) && $service['uuid'] == $value['uuid'] &&
+			    $service['name'] == "snort_" . strtolower(convert_friendly_interface_to_friendly_descr($value['interface']))) {
+				$snort_found = TRUE;
+			}
+			if (isset($service['uuid']) && $service['uuid'] == $value['uuid'] &&
+			    $service['name'] == "barnyard2_" . strtolower(convert_friendly_interface_to_friendly_descr($value['interface']))) {
+				$barnyard_found = TRUE;
+			}
+		}
+		if (!$snort_found) {
+			$service = array();
+			$service['name'] = "snort_" . strtolower(convert_friendly_interface_to_friendly_descr($value['interface']));
+			$service['description'] = "Snort IDS/IPS - " . convert_friendly_interface_to_friendly_descr($value['interface']);
+			$service['uuid'] = $value['uuid'];
+			$service['startcmd'] = "\$action='start';\$service='snort';\$uuid={$value['uuid']};\$rc = include '/usr/local/pkg/snort/snort_service_utils.php';";
+			$service['stopcmd'] = "\$action='stop';\$service='snort';\$uuid={$value['uuid']};\$rc = include '/usr/local/pkg/snort/snort_service_utils.php';";
+			$service['restartcmd'] = "\$action='restart';\$service='snort';\$uuid={$value['uuid']};\$rc = include '/usr/local/pkg/snort/snort_service_utils.php';";
+			$service['custom_php_service_status_command'] = "\$action='status';\$service='snort';\$uuid={$value['uuid']};\$rc = include '/usr/local/pkg/snort/snort_service_utils.php';";
+			$config['installedpackages']['service'][] = $service;
+			$is_dirty = TRUE;
+		}
+		if (!$barnyard_found && $value['barnyard_enable'] == 'on') {
+			$service = array();
+			$service['name'] = "barnyard2_" . strtolower(convert_friendly_interface_to_friendly_descr($value['interface']));
+			$service['description'] = "Barnyard2 Logging - " . convert_friendly_interface_to_friendly_descr($value['interface']);
+			$service['uuid'] = $value['uuid'];
+			$service['startcmd'] = "\$action='start';\$service='barnyard2';\$uuid={$value['uuid']};\$rc = include '/usr/local/pkg/snort/snort_service_utils.php';";
+			$service['stopcmd'] = "\$action='stop';\$service='barnyard2';\$uuid={$value['uuid']};\$rc = include '/usr/local/pkg/snort/snort_service_utils.php';";
+			$service['restartcmd'] = "\$action='restart';\$service='barnyard2';\$uuid={$value['uuid']};\$rc = include '/usr/local/pkg/snort/snort_service_utils.php';";
+			$service['custom_php_service_status_command'] = "\$action='status';\$service='barnyard2';\$uuid={$value['uuid']};\$rc = include '/usr/local/pkg/snort/snort_service_utils.php';";
+			$config['installedpackages']['service'][] = $service;
+			$is_dirty = TRUE;
+		}
 	}
 
+	// Call write_config() if we made any updates up above
+	if ($is_dirty)
+		write_config("Snort pkg: updated snort service entry configuration.");
+
 	/* create snort bootup file snort.sh only create once */
-	snort_create_rc();
+//	snort_create_rc();
 
 	$snortglob = $config['installedpackages']['snortglobal'];
 
@@ -3067,6 +3182,26 @@ function snort_deinstall() {
 	/* Remove the snort user and group */
 	mwexec('/usr/sbin/pw userdel snort; /usr/sbin/pw groupdel snort', true);
 
+	/* Remove our custom <service> entries from config */
+	$is_dirty = FALSE;
+	if (!is_array($config['installedpackges']['service']))
+		$config['installedpackages']['service'] = array();
+	foreach ($config['installedpackages']['service'] as $key => $service) {
+		if (strpos($service['name'], "snort_") !== FALSE) {
+			unset($config['installedpackages']['service'][$key]);
+			unlink_if_exists("{$g['varrun_path']}/snort_{$service['uuid']}.disabled");
+			$is_dirty = TRUE;
+			continue;
+		}
+		if (strpos($service['name'], "barnyard2_") !== FALSE) {
+			unset($config['installedpackages']['service'][$key]);
+			unlink_if_exists("{$g['varrun_path']}/barnyard2_{$service['uuid']}.disabled");
+			$is_dirty = TRUE;
+		}
+	}
+	if ($is_dirty)
+		write_config("Snort pkg: removed all snort interface services.");
+
 	/* Remove all the existing Snort cron jobs. */
 	if (snort_cron_job_exists("snort2c", FALSE))
 		install_cron_job("snort2c", false);
@@ -3765,12 +3900,8 @@ function snort_do_xmlrpc_sync($syncdownloadrules, $sync_to_ip, $port, $username,
 	}
 	$snortstart = "";
 	if ($syncstartsnort == "ON") {
-		$snortstart = "log_error(gettext(\"[snort] XMLRPC pkg sync: Checking Snort status...\"));\n";
-		$snortstart .= "\tif (!is_process_running(\"snort\")) {\n";
-		$snortstart .= "\t\tlog_error(gettext(\"[snort] XMLRPC pkg sync: Snort not running. Sending a start command...\"));\n";
-		$snortstart .= "\t\t\$sh_script = RCFILEPREFIX . \"snort.sh\";\n";
-		$snortstart .= "\t\tmwexec_bg(\"{\$sh_script} start\");\n\t}\n";
-		$snortstart .= "\telse {\n\t\tlog_error(gettext(\"[snort] XMLRPC pkg CARP sync: Snort is running...\"));\n\t}\n";
+		$snortstart = "log_error(gettext(\"[snort] XMLRPC pkg sync: Starting Snort if not running...\"));\n";
+		$snortstart .= "\tsnort_start_all_interfaces(TRUE);\n";
 	}
 
 	/*************************************************/

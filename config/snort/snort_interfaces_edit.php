@@ -224,6 +224,7 @@ if ($_POST["save"] && !$input_errors) {
 			if ($natent['interface'] != $a_rule[$id]['interface']) {
 				$oif_real = get_real_interface($a_rule[$id]['interface']);
 				if (snort_is_running($a_rule[$id]['uuid'], $oif_real)) {
+					touch("{$g['varrun_path']}/snort_{$a_rule[$id]['uuid']}.disabled");
 					snort_stop($a_rule[$id], $oif_real);
 					$snort_start = true;
 				}
@@ -378,8 +379,10 @@ if ($_POST["save"] && !$input_errors) {
 		sync_snort_package_config();
 
 		/* See if we need to restart Snort after an interface re-assignment */
-		if ($snort_start == true)
+		if ($snort_start == true) {
 			snort_start($natent, $if_real);
+			unlink_if_exists("{$g['varrun_path']}/snort_{$natent['uuid']}.disabled");
+		}
 
 		/*******************************************************/
 		/* Signal Snort to reload configuration if we changed  */
