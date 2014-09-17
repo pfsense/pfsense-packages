@@ -32,7 +32,7 @@
 require_once("guiconfig.inc");
 require_once("/usr/local/pkg/snort/snort.inc");
 
-global $g, $rebuild_rules;
+global $g, $config, $rebuild_rules;
 
 $snortdir = SNORTDIR;
 $snortlogdir = SNORTLOGDIR;
@@ -230,6 +230,19 @@ if ($_POST["save"] && !$input_errors) {
 				}
 				else
 					$snort_start = false;
+				// Need to rename the service entries when moving instance to another interface
+				foreach ($config['installedpackages']['service'] as &$service) {
+					if (isset($service['uuid']) && $service['uuid'] == $a_rule[$id]['uuid'] &&
+					    $service['name'] == "snort_" . strtolower(convert_friendly_interface_to_friendly_descr($a_rule[$id]['interface']))) {
+						$service['name'] = "snort_" . strtolower(convert_friendly_interface_to_friendly_descr($natent['interface']));
+						$service['description'] = "Snort IDS/IPS - " . convert_friendly_interface_to_friendly_descr($natent['interface']);
+					}
+					if (isset($service['uuid']) && $service['uuid'] == $a_rule[$id]['uuid'] &&
+					    $service['name'] == "barnyard2_" . strtolower(convert_friendly_interface_to_friendly_descr($a_rule[$id]['interface']))) {
+						$service['name'] = "barnyard2_" . strtolower(convert_friendly_interface_to_friendly_descr($natent['interface']));
+						$service['description'] = "Barnyard2 Logging - " . convert_friendly_interface_to_friendly_descr($natent['interface']);
+					}
+				}
 				@rename("{$snortlogdir}/snort_{$oif_real}{$a_rule[$id]['uuid']}", "{$snortlogdir}/snort_{$if_real}{$a_rule[$id]['uuid']}");
 				conf_mount_rw();
 				@rename("{$snortdir}/snort_{$a_rule[$id]['uuid']}_{$oif_real}", "{$snortdir}/snort_{$a_rule[$id]['uuid']}_{$if_real}");
