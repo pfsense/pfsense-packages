@@ -68,8 +68,8 @@ if (isset($_POST['del_x'])) {
 				}
 			}
 			snort_stop($a_nat[$rulei], $if_real);
-			exec("/bin/rm -r {$snortlogdir}/snort_{$if_real}{$snort_uuid}");
-			exec("/bin/rm -r {$snortdir}/snort_{$snort_uuid}_{$if_real}");
+			rmdir_recursive("{$snortlogdir}/snort_{$if_real}{$snort_uuid}");
+			rmdir_recursive("{$snortdir}/snort_{$snort_uuid}_{$if_real}");
 
 			// Finally delete the interface's config entry entirely
 			unset($a_nat[$rulei]);

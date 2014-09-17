@@ -119,8 +119,7 @@ if (file_exists("{$snortdir}/{$snort_community_rules_filename}.md5") && $snortco
 
 /* Check for postback to see if we should clear the update log file. */
 if (isset($_POST['clear'])) {
-	if (file_exists("{$snort_rules_upd_log}"))
-		mwexec("/bin/rm -f {$snort_rules_upd_log}");
+	unlink_if_exists($snort_rules_upd_log);
 }
 
 if (isset($_POST['check'])) {
@@ -133,12 +132,9 @@ if ($_POST['force']) {
 	conf_mount_rw();
 
 	// Remove the existing MD5 signature files to force a download
-	if (file_exists("{$snortdir}/{$emergingthreats_filename}.md5"))
-		@unlink("{$snortdir}/{$emergingthreats_filename}.md5");
-	if (file_exists("{$snortdir}/{$snort_community_rules_filename}.md5"))
-		@unlink("{$snortdir}/{$snort_community_rules_filename}.md5");
-	if (file_exists("{$snortdir}/{$snort_rules_file}.md5"))
-		@unlink("{$snortdir}/{$snort_rules_file}.md5");
+	unlink_if_exists("{$snortdir}/{$emergingthreats_filename}.md5");
+	unlink_if_exists("{$snortdir}/{$snort_community_rules_filename}.md5");
+	unlink_if_exists("{$snortdir}/{$snort_rules_file}.md5");
 
 	// Revert file system to R/O.
 	conf_mount_ro();
