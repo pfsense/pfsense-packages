@@ -3018,9 +3018,6 @@ function snort_deinstall() {
 	// Delete any leftover barnyard2 PID files in /var/run
 	unlink_if_exists("/var/run/barnyard2_*.pid");
 
-	/* Remove the snort user and group */
-	mwexec('/usr/sbin/pw userdel snort; /usr/sbin/pw groupdel snort', true);
-
 	/* Remove our custom <service> entries from config */
 	$is_dirty = FALSE;
 	if (!is_array($config['installedpackges']['service']))
