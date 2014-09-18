@@ -776,14 +776,31 @@ if ($snortdownload == 'on' || $emergingthreats == 'on' || $snortcommunityrules =
 	/* Clear the rebuild rules flag.  */
 	$rebuild_rules = false;
 
-	/* Restart snort if already running and we are not rebooting to pick up the new rules. */
-       	if (is_process_running("snort") && !$g['booting']) {
+	/* Restart snort if running, and we are not in post-install */
+	/* and not rebooting, so as to pick up the new rules.       */
+       	if (!$g['snort_postinstall'] && !$g['booting'] && !file_exists("{$g['varrun_path']}/booting")) {
 		if ($pkg_interface <> "console") {
 			update_status(gettext('Restarting Snort to activate the new set of rules...'));
 			update_output_window(gettext("Please wait ... restarting Snort will take some time..."));
 		}
 		error_log(gettext("\tRestarting Snort to activate the new set of rules...\n"), 3, $snort_rules_upd_log);
-       		restart_service("snort");
+		foreach ($config['installedpackages']['snortglobal']['rule'] as $snortcfg) {
+			if ($snortcfg['enable'] != "on")
+				continue;
+			$if_real = get_real_interface($snortcfg['interface']);
+			if (snort_is_running($snortcfg['uuid'], $if_real, 'snort')) {
+				touch("{$g['varrun_path']}/snort_{$snortcfg['uuid']}.disabled");
+				touch("{$g['varrun_path']}/barnyard2_{$snortcfg['uuid']}.disabled");
+				snort_stop($snortcfg, $if_real);
+				sleep(1);
+				if ($pkg_interface <> "console")
+					snort_start($snortcfg, $if_real, FALSE);
+				else
+					snort_start($snortcfg, $if_real, TRUE);
+				unlink_if_exists("{$g['varrun_path']}/snort_{$snortcfg['uuid']}.disabled");
+				unlink_if_exists("{$g['varrun_path']}/barnyard2_{$snortcfg['uuid']}.disabled");
+			}
+		}
 		if ($pkg_interface <> "console")
 		        update_output_window(gettext("Snort has restarted with your new set of rules..."));
        		log_error(gettext("[Snort] Snort has restarted with your new set of rules..."));

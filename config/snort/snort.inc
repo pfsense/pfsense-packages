@@ -634,6 +634,40 @@ function snort_start_all_interfaces($background=FALSE) {
 	}
 }
 
+function snort_stop_all_interfaces() {
+
+	/*************************************************************/
+	/* This function stops all configured Snort interfaces.      */
+	/*************************************************************/
+
+	global $g, $config;
+
+	/* do nothing if no Snort interfaces active */
+	if (!is_array($config['installedpackages']['snortglobal']['rule']))
+		return;
+
+	foreach ($config['installedpackages']['snortglobal']['rule'] as $snortcfg) {
+		snort_stop($snortcfg, get_real_interface($snortcfg['interface']));
+	}
+}
+
+function snort_restart_all_interfaces() {
+
+	/*************************************************************/
+	/* This function stops all configured Snort interfaces and   */
+	/* restarts enabled Snort interfaces.                        */
+	/*************************************************************/
+
+	global $g, $config;
+
+	/* do nothing if no Snort interfaces active */
+	if (!is_array($config['installedpackages']['snortglobal']['rule']))
+		return;
+
+	snort_stop_all_interfaces();
+	snort_start_all_interfaces(TRUE);
+}
+
 function snort_reload_config($snortcfg, $signal="SIGHUP") {
 
 	/*************************************************************/
