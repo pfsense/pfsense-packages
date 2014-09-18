@@ -120,7 +120,7 @@ if ($etpro == "on") {
 	$emergingthreats = "on";
 	$et_name = "Emerging Threats Pro";
 	$et_md5_remove = ET_DNLD_FILENAME . ".md5";
-	@unlink("{$snortdir}/{$et_md5_remove}");
+	unlink_if_exists("{$snortdir}/{$et_md5_remove}");
 }
 else {
 	$emergingthreats_filename = ET_DNLD_FILENAME;
@@ -131,7 +131,7 @@ else {
 	$emergingthreats_url .= "snort-" . ET_VERSION . "/";
 	$et_name = "Emerging Threats Open";
 	$et_md5_remove = ETPRO_DNLD_FILENAME . ".md5";
-	@unlink("{$snortdir}/{$et_md5_remove}");
+	unlink_if_exists("{$snortdir}/{$et_md5_remove}");
 }
 
 /* Snort GPLv2 Community Rules filenames and URL */
@@ -423,7 +423,7 @@ safe_mkdir("{$snortiprepdir}");
 /* See if we need to automatically clear the Update Log based on 1024K size limit */
 if (file_exists($snort_rules_upd_log)) {
 	if (1048576 < filesize($snort_rules_upd_log))
-		@unlink("{$snort_rules_upd_log}");
+		unlink_if_exists("{$snort_rules_upd_log}");
 }
 
 /* Log start time for this rules update */
