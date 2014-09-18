@@ -96,7 +96,7 @@ elseif (isset($id) && !isset($a_rule[$id])) {
 	foreach ($ifaces as $i) {
 		if (!in_array($i, $ifrules)) {
 			$pconfig['interface'] = $i;
-			$pconfig['descr'] = strtoupper($i);
+			$pconfig['descr'] = convert_friendly_interface_to_friendly_descr($i);
 			$pconfig['enable'] = 'on';
 			break;
 		}
@@ -130,7 +130,7 @@ if (strcasecmp($action, 'dup') == 0) {
 		if (!in_array($i, $ifrules)) {
 			$pconfig['interface'] = $i;
 			$pconfig['enable'] = 'on';
-			$pconfig['descr'] = strtoupper($i);
+			$pconfig['descr'] = convert_friendly_interface_to_friendly_descr($i);
 			break;
 		}
 	}
@@ -197,7 +197,7 @@ if ($_POST["save"] && !$input_errors) {
 		if ($_POST['suppresslistname'] && ($_POST['suppresslistname'] <> $natent['suppresslistname']))
 			$snort_reload = true;
 
-		if ($_POST['descr']) $natent['descr'] =  $_POST['descr']; else $natent['descr'] = strtoupper($natent['interface']);
+		if ($_POST['descr']) $natent['descr'] =  $_POST['descr']; else $natent['descr'] = convert_friendly_interface_to_friendly_descr($natent['interface']);
 		if ($_POST['performance']) $natent['performance'] = $_POST['performance']; else  unset($natent['performance']);
 		/* if post = on use on off or rewrite the conf */
 		if ($_POST['blockoffenders7'] == "on") $natent['blockoffenders7'] = 'on'; else $natent['blockoffenders7'] = 'off';
@@ -233,14 +233,20 @@ if ($_POST["save"] && !$input_errors) {
 				// Need to rename the service entries when moving instance to another interface
 				foreach ($config['installedpackages']['service'] as &$service) {
 					if (isset($service['uuid']) && $service['uuid'] == $a_rule[$id]['uuid'] &&
-					    $service['name'] == "snort_" . strtolower(convert_friendly_interface_to_friendly_descr($a_rule[$id]['interface']))) {
-						$service['name'] = "snort_" . strtolower(convert_friendly_interface_to_friendly_descr($natent['interface']));
-						$service['description'] = "Snort IDS/IPS - " . convert_friendly_interface_to_friendly_descr($natent['interface']);
+					    $service['name'] == "snort_" . strtolower($a_rule[$id]['interface'])) {
+						$service['name'] = "snort_" . strtolower($natent['interface']);
+						if (!empty($natent['descr']))
+							$service['description'] = "Snort IDS - " . $natent['descr'];
+						else
+							$service['description'] = "Snort IDS - " . convert_friendly_interface_to_friendly_descr($natent['interface']);
 					}
 					if (isset($service['uuid']) && $service['uuid'] == $a_rule[$id]['uuid'] &&
-					    $service['name'] == "barnyard2_" . strtolower(convert_friendly_interface_to_friendly_descr($a_rule[$id]['interface']))) {
-						$service['name'] = "barnyard2_" . strtolower(convert_friendly_interface_to_friendly_descr($natent['interface']));
-						$service['description'] = "Barnyard2 Logging - " . convert_friendly_interface_to_friendly_descr($natent['interface']);
+					    $service['name'] == "barnyard2_" . strtolower($a_rule[$id]['interface'])) {
+						$service['name'] = "barnyard2_" . strtolower($natent['interface']);
+						if (!empty($natent['descr']))
+							$service['description'] = "Barnyard2 Logging - " . $natent['descr'];
+						else
+							$service['description'] = "Barnyard2 Logging - " . convert_friendly_interface_to_friendly_descr($natent['interface']);
 					}
 				}
 				@rename("{$snortlogdir}/snort_{$oif_real}{$a_rule[$id]['uuid']}", "{$snortlogdir}/snort_{$if_real}{$a_rule[$id]['uuid']}");

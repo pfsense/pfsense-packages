@@ -229,18 +229,21 @@ if ($config['installedpackages']['snortglobal']['forcekeepsettings'] == 'on') {
 		$barnyard_found = FALSE;
 		foreach ($config['installedpackages']['service'] as $service) {
 			if (isset($service['uuid']) && $service['uuid'] == $snortcfg['uuid'] &&
-			    $service['name'] == "snort_" . strtolower(convert_friendly_interface_to_friendly_descr($snortcfg['interface']))) {
+			    $service['name'] == "snort_" . strtolower($snortcfg['interface'])) {
 				$snort_found = TRUE;
 			}
 			if (isset($service['uuid']) && $service['uuid'] == $snortcfg['uuid'] &&
-			    $service['name'] == "barnyard2_" . strtolower(convert_friendly_interface_to_friendly_descr($snortcfg['interface']))) {
+			    $service['name'] == "barnyard2_" . strtolower($snortcfg['interface'])) {
 				$barnyard_found = TRUE;
 			}
 		}
 		if (!$snort_found) {
 			$service = array();
-			$service['name'] = "snort_" . strtolower(convert_friendly_interface_to_friendly_descr($snortcfg['interface']));
-			$service['description'] = "Snort IDS/IPS - " . convert_friendly_interface_to_friendly_descr($snortcfg['interface']);
+			$service['name'] = "snort_" . strtolower($snortcfg['interface']);
+			if (!empty($snortcfg['descr']))
+				$service['description'] = "Snort IDS - " . $snortcfg['descr'];
+			else
+				$service['description'] = "Snort IDS - " . convert_friendly_interface_to_friendly_descr($snortcfg['interface']);
 			$service['uuid'] = $snortcfg['uuid'];
 			$service['startcmd'] = "\$action='start';\$service='snort';\$uuid={$snortcfg['uuid']};\$rc = include '/usr/local/pkg/snort/snort_service_utils.php';";
 			$service['stopcmd'] = "\$action='stop';\$service='snort';\$uuid={$snortcfg['uuid']};\$rc = include '/usr/local/pkg/snort/snort_service_utils.php';";
@@ -251,8 +254,11 @@ if ($config['installedpackages']['snortglobal']['forcekeepsettings'] == 'on') {
 		}
 		if (!$barnyard_found && $snortcfg['barnyard_enable'] == 'on') {
 			$service = array();
-			$service['name'] = "barnyard2_" . strtolower(convert_friendly_interface_to_friendly_descr($snortcfg['interface']));
-			$service['description'] = "Barnyard2 Logging - " . convert_friendly_interface_to_friendly_descr($snortcfg['interface']);
+			$service['name'] = "barnyard2_" . strtolower($snortcfg['interface']);
+			if (!empty($snortcfg['descr']))
+				$service['description'] = "Barnyard2 Logging - " . $snortcfg['descr'];
+			else
+				$service['description'] = "Barnyard2 Logging - " . convert_friendly_interface_to_friendly_descr($snortcfg['interface']);
 			$service['uuid'] = $snortcfg['uuid'];
 			$service['startcmd'] = "\$action='start';\$service='barnyard2';\$uuid={$snortcfg['uuid']};\$rc = include '/usr/local/pkg/snort/snort_service_utils.php';";
 			$service['stopcmd'] = "\$action='stop';\$service='barnyard2';\$uuid={$snortcfg['uuid']};\$rc = include '/usr/local/pkg/snort/snort_service_utils.php';";

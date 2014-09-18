@@ -57,12 +57,12 @@ if (isset($_POST['del_x'])) {
 			$snort_uuid = $a_nat[$rulei]['uuid'];
 			foreach ($config['installedpackages']['service'] as $key => $service) {
 				if (isset($service['uuid']) && $service['uuid'] == $snort_uuid &&
-				    $service['name'] == "snort_" . strtolower(convert_friendly_interface_to_friendly_descr($a_nat[$rulei]['interface']))) {
+				    $service['name'] == "snort_" . strtolower($a_nat[$rulei]['interface'])) {
 					unset($config['installedpackages']['service'][$key]);
 					unlink_if_exists("{$g['varrun_path']}/snort_{$snort_uuid}.disabled");
 				}
 				if (isset($service['uuid']) && $service['uuid'] == $snort_uuid &&
-				    $service['name'] == "barnyard2_" . strtolower(convert_friendly_interface_to_friendly_descr($a_nat[$rulei]['interface']))) {
+				    $service['name'] == "barnyard2_" . strtolower($a_nat[$rulei]['interface'])) {
 					unset($config['installedpackages']['service'][$key]);
 					unlink_if_exists("{$g['varrun_path']}/barnyard2_{$snort_uuid}.disabled");
 				}
