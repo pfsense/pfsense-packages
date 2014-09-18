@@ -112,9 +112,9 @@ foreach ($preproc_rules as $file) {
 }
 
 /* Remove any previously installed scripts since we rebuild them */
-@unlink("{$snortdir}/sid");
-@unlink("{$rcdir}snort.sh");
-@unlink("{$rcdir}barnyard2");
+unlink_if_exists("{$snortdir}/sid");
+unlink_if_exists("{$rcdir}snort.sh");
+unlink_if_exists("{$rcdir}barnyard2");
 
 /* Create required log and db directories in /var */
 safe_mkdir(SNORTLOGDIR);
@@ -217,10 +217,12 @@ if ($config['installedpackages']['snortglobal']['forcekeepsettings'] == 'on') {
 		unset($snort_conf_text, $selected_rules_sections, $suppress_file_name, $snort_misc_include_rules, $spoink_type, $snortunifiedlog_type, $alertsystemlog_type);
 		unset($home_net, $external_net, $ipvardef, $portvardef);
 
-		// create barnyard2.conf file for interface
+		// Create barnyard2.conf file for interface
 		if ($snortcfg['barnyard_enable'] == 'on')
 			snort_generate_barnyard2_conf($snortcfg, $if_real);
 
+		// If this interface is not enabled, we're done with it so
+		// loop to the next one.
 		if ($snortcfg['enable'] != 'on')
 			continue;
 
@@ -269,9 +271,6 @@ if ($config['installedpackages']['snortglobal']['forcekeepsettings'] == 'on') {
 		}
 	}
 
-	/* create snort bootup file snort.sh */
-//	snort_create_rc();
-
 	/* Set Log Limit, Block Hosts Time and Rules Update Time */
 	snort_snortloglimit_install_cron(true);
 	snort_rm_blocked_install_cron($config['installedpackages']['snortglobal']['rm_blocked'] != "never_b" ? true : false);
@@ -291,7 +290,6 @@ if ($config['installedpackages']['snortglobal']['forcekeepsettings'] == 'on') {
 		update_status(gettext("Starting Snort using rebuilt configuration..."));
 		update_output_window(gettext("Please wait... while Snort is started..."));
 		log_error(gettext("[Snort] Starting Snort using rebuilt configuration..."));
-//		mwexec_bg("{$rcdir}snort.sh start");
 		foreach ($config['installedpackages']['snortglobal']['rule'] as $snortcfg) {
 			if ($snortcfg['enable'] != 'on')
 				continue;
