@@ -305,6 +305,9 @@ if ($config['installedpackages']['snortglobal']['forcekeepsettings'] == 'on') {
 	}
 }
 
+/* Move our startup shell script to the RC directory (usually /usr/local/etc/rc.d) */
+@rename("/usr/local/pkg/snort/snort_pkg.sh", "{$rcdir}snort_pkg.sh" );
+
 /* We're finished with conf partition mods, return to read-only */
 conf_mount_ro();
 

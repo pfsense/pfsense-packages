@@ -65,6 +65,12 @@ foreach ($config['installedpackages']['snortglobal']['rule'] as $rule) {
 	if ($rule['uuid'] == $uuid) {
 		$if_real = get_real_interface($rule['interface']);
 
+		// Block changes when package is being started from shell script
+		if (file_exists("{$g['varrun_path']}/snort_pkg_starting.lck") {
+			log_error(gettext("[Snort] interface service start/stop commands locked-out during package start/restart."));
+			return TRUE;
+		}
+
 		// If interface is manually stopped, then don't try to start it
 		if (($action == 'start' || $action == 'restart') && file_exists("{$g['varrun_path']}/{$service}_{$uuid}.disabled")) {
 			log_error(gettext("[Snort] auto-start locked out by previous manual shutdown...must be started using Snort INTERFACES tab."));

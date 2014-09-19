@@ -2996,10 +2996,16 @@ function snort_deinstall() {
 
 	log_error(gettext("[Snort] Snort package uninstall in progress..."));
 
+	/* Remove our rc.d startup shell script */
+	unlink_if_exists("{$rcdir}snort_pkg.sh");
+
 	/* Make sure all active Snort processes are terminated */
 	/* Log a message only if a running process is detected */
-	if (is_service_running("snort"))
+	if (is_process_running("snort")) {
 		log_error(gettext("[Snort] Snort STOP for all interfaces..."));
+		snort_stop_all_interfaces();
+	}
+	sleep(2);
 	mwexec('/usr/bin/killall -z snort', true);
 	sleep(2);
 	mwexec('/usr/bin/killall -9 snort', true);
@@ -3009,7 +3015,7 @@ function snort_deinstall() {
 
 	/* Make sure all active Barnyard2 processes are terminated */
 	/* Log a message only if a running process is detected     */
-	if (is_service_running("barnyard2"))
+	if (is_process_running("barnyard2"))
 		log_error(gettext("[Snort] Barnyard2 STOP for all interfaces..."));
 	mwexec('/usr/bin/killall -z barnyard2', true);
 	sleep(2);
