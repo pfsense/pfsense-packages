@@ -50,11 +50,11 @@ function snort_alerts_fetch_new_events_callback(callback_data) {
 	for(var x=0; x<data_split.length-1; x++) {
 		row_split = data_split[x].split("||");
 		var line = '';
-		line =  '<td class="' + snortWidgetColClass + '">' + row_split[0] + '<br/>' + row_split[1] + '</td>';		
-		line += '<td class="' + snortWidgetColClass + '" style="overflow: hidden; text-overflow: ellipsis;" nowrap>';
+		line =  '<td class="listMRr">' + row_split[0] + '<br/>' + row_split[1] + '</td>';		
+		line += '<td class="listMRr" style="overflow: hidden; text-overflow: ellipsis;" nowrap>';
 		line += '<div style="display:inline;" title="' + row_split[2] + '">' + row_split[2] + '</div><br/>';
 		line += '<div style="display:inline;" title="' + row_split[3] + '">' + row_split[3] + '</div></td>';
-		line += '<td class="' + snortWidgetColClass + '">' + 'Priority: ' +  row_split[4] + ' ' + row_split[5] + '</td>';
+		line += '<td class="listMRr"><div style="display: fixed; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; line-height: 1.2em; max-height: 2.4em; overflow: hidden; text-overflow: ellipsis;" title="' + row_split[4] + '">' + row_split[4] + '</div></td>';
 		new_data_to_add[new_data_to_add.length] = line;
 	}
 	snort_alerts_update_div_rows(new_data_to_add);
