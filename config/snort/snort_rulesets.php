@@ -139,7 +139,7 @@ if ($_POST["save"]) {
 	else {
 		$a_nat[$id]['autoflowbitrules'] = 'off';
 		if (file_exists("{$snortdir}/snort_{$snort_uuid}_{$if_real}/rules/{$flowbit_rules_file}"))
-			@unlink("{$snortdir}/snort_{$snort_uuid}_{$if_real}/rules/{$flowbit_rules_file}");
+			unlink_if_exists("{$snortdir}/snort_{$snort_uuid}_{$if_real}/rules/{$flowbit_rules_file}");
 	}
 
 	write_config("Snort pkg: save enabled rule categories for {$a_nat[$id]['interface']}.");
