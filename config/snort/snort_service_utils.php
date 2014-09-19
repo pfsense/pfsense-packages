@@ -66,7 +66,7 @@ foreach ($config['installedpackages']['snortglobal']['rule'] as $rule) {
 		$if_real = get_real_interface($rule['interface']);
 
 		// Block changes when package is being started from shell script
-		if (file_exists("{$g['varrun_path']}/snort_pkg_starting.lck") {
+		if (file_exists("{$g['varrun_path']}/snort_pkg_starting.lck")) {
 			log_error(gettext("[Snort] interface service start/stop commands locked-out during package start/restart."));
 			return TRUE;
 		}
