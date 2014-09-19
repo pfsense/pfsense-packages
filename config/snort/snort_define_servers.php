@@ -100,9 +100,6 @@ $pconfig = $a_nat[$id];
 $if_real = get_real_interface($pconfig['interface']);
 $snort_uuid = $config['installedpackages']['snortglobal']['rule'][$id]['uuid'];
 
-/* alert file */
-$d_snortconfdirty_path = "/var/run/snort_conf_{$snort_uuid}_{$if_real}.dirty";
-
 if ($_POST['save']) {
 
 	$natent = array();
