@@ -3011,7 +3011,7 @@ function snort_deinstall() {
 	mwexec('/usr/bin/killall -9 snort', true);
 	sleep(2);
 	// Delete any leftover snort PID files in /var/run
-	unlink_if_exists("/var/run/snort_*.pid");
+	unlink_if_exists("{$g['varrun_path']}/snort_*.pid");
 
 	/* Make sure all active Barnyard2 processes are terminated */
 	/* Log a message only if a running process is detected     */
@@ -3022,7 +3022,7 @@ function snort_deinstall() {
 	mwexec('/usr/bin/killall -9 barnyard2', true);
 	sleep(2);
 	// Delete any leftover barnyard2 PID files in /var/run
-	unlink_if_exists("/var/run/barnyard2_*.pid");
+	unlink_if_exists("{$g['varrun_path']}/barnyard2_*.pid");
 
 	/* Remove our custom <service> entries from config */
 	$is_dirty = FALSE;

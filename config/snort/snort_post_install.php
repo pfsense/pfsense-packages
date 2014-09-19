@@ -77,14 +77,14 @@ if(is_process_running("snort")) {
 	exec("/usr/bin/killall -z snort");
 	sleep(2);
 	// Delete any leftover snort PID files in /var/run
-	unlink_if_exists("/var/run/snort_*.pid");
+	unlink_if_exists("{$g['varrun_path']}/snort_*.pid");
 }
 // Hard kill any running Barnyard2 processes
 if(is_process_running("barnyard")) {
 	exec("/usr/bin/killall -z barnyard2");
 	sleep(2);
 	// Delete any leftover barnyard2 PID files in /var/run
-	unlink_if_exists("/var/run/barnyard2_*.pid");
+	unlink_if_exists("{$g['varrun_path']}/barnyard2_*.pid");
 }
 
 /* Set flag for post-install in progress */
