@@ -381,7 +381,7 @@ if ($_POST['delete']) {
 }
 
 if ($_POST['download']) {
-	$save_date = exec('/bin/date "+%Y-%m-%d-%H-%M-%S"');
+	$save_date = date("Y-m-d-H-i-s");
 	$file_name = "snort_logs_{$save_date}_{$if_real}.tar.gz";
 	exec("cd {$snortlogdir}/snort_{$if_real}{$snort_uuid} && /usr/bin/tar -czf /tmp/{$file_name} *");
 
