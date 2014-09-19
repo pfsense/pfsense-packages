@@ -36,6 +36,7 @@ function anyterm_deinstall() {
 }
 
 function anyterm_install() {
+	require_once("filter.inc");
 	global $g, $config;
 
 	conf_mount_rw();
@@ -45,11 +46,20 @@ function anyterm_install() {
 	`fetch -q -o /usr/local/sbin/ https://packages.pfsense.org/packages/config/anyterm/binaries{$freebsdv}/anytermd`;
 	exec("chmod a+rx /usr/local/sbin/anytermd");
 
-	if($config['installedpackages']['anyterm']['config'][0]['username']) 
-		$port = " --port {$config['installedpackages']['anyterm']['config'][0]['port']}";
+	if($config['installedpackages']['anyterm']['config'][0]['username']) {
+		$port = $config['installedpackages']['anyterm']['config'][0]['port'];
+		if (is_alias($port) && alias_get_type($port) == "port")
+			$port = intval(filter_expand_alias($port)); 
+			/* Alias name + 3 digit port seemed to add unexpected spaces => alias not numeric => error.
+			   Issue is in alias handling, can't be fixed here, for now work around using intval() */
+		if (!is_numericint($port) || $port > 65535) {
+			/* Port defined but not valid, redirect to Anyterm settings for now */
+			Header("/pkg_edit.php?xml=anyterm.xml&id=0");
+		}
+	}
 
 	// This will bring up the pfSense style menu
-	$anytermd_command = "anytermd --user root --command '/etc/rc.initial' --auth trivial $port";
+	$anytermd_command = "anytermd --user root --command '/etc/rc.initial' --auth trivial --port $port";
 
 			$anyterm = <<<EOD
 #!/bin/sh
