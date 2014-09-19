@@ -73,7 +73,7 @@ include("head.inc");
 						</tr>
 						<tr>
                         <td width="22%" valign="top" class="vncell"><?=gettext("Sarg Site");?></td>
-						<td width="78%" class="vtable"><?=gettext("<a target=_new href='http://sarg.sourceforge.net/welcome.php'>Squid Analysis Report Generator</a><br><br>");?>
+						<td width="78%" class="vtable"><?=gettext("<a target=_new href='http://sarg.sourceforge.net/'>Squid Analysis Report Generator</a><br><br>");?>
                         </tr>
                         <tr>
 						<td colspan="2" valign="top" class="listtopic"><?=gettext("About sarg package"); ?></td>
@@ -83,7 +83,7 @@ include("head.inc");
                         <td width="78%" class="vtable"><?=gettext("Package Created by <a target=_new href='https://forum.pfsense.org/index.php?action=profile;u=4710'>Marcello Coutinho</a><br><br>");?></td>
                         </tr>
 						<tr>
-                        <td width="22%" valign="top" class="vncell"><?=gettext("Donatios ");?></td>
+                        <td width="22%" valign="top" class="vncell"><?=gettext("Donations ");?></td>
                         <td width="78%" class="vtable"><?=gettext("If you like this package, please <a target=_new href='https://www.pfsense.org/index.php?option=com_content&task=view&id=47&Itemid=77'>donate to pfSense project</a>.<br><br>
 								 If you want that your donation goes to this package developer, make a note on donation forwarding it to me.<br><br>");?></td>
                         </tr>
