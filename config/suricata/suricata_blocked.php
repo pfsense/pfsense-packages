@@ -126,7 +126,7 @@ if ($_POST['download'])
 
 			// Clean up the temp files and directory
 			@unlink("/tmp/{$file_name}");
-			exec("/bin/rm -fr /tmp/suricata_blocked");
+			rmdir_recursive("/tmp/suricata_blocked");
 		} else
 			$savemsg = gettext("An error occurred while creating archive");
 	} else

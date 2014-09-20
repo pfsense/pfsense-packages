@@ -81,15 +81,15 @@ install_cron_job("{$suri_pf_table}" , false);
 if ($config['installedpackages']['suricata']['config'][0]['clearlogs'] == 'on') {
 	log_error(gettext("[Suricata] Clearing all Suricata-related log files..."));
 	@unlink("{$suricata_rules_upd_log}");
-	mwexec("/bin/rm -rf {$suricatalogdir}");
+	rmdir_recursive("{$suricatalogdir}");
 }
 
 // Mount filesystem read-write to remove our files
 conf_mount_rw();
 
 /* Remove the Suricata GUI app directories */
-mwexec("/bin/rm -rf /usr/local/pkg/suricata");
-mwexec("/bin/rm -rf /usr/local/www/suricata");
+rmdir_recursive("/usr/local/pkg/suricata");
+rmdir_recursive("/usr/local/www/suricata");
 
 /* Remove our associated Dashboard widget config and files. */
 /* If "save settings" is enabled, then save old widget      */
@@ -125,9 +125,9 @@ if ($config['installedpackages']['suricata']['config'][0]['forcekeepsettings'] !
 	unset($config['installedpackages']['suricata']);
 	unset($config['installedpackages']['suricatasync']);
 	@unlink("{$suricata_rules_upd_log}");
-	mwexec("/bin/rm -rf {$suricatalogdir}");
-	mwexec("/bin/rm -rf {$sidmodspath}");
-	mwexec("/bin/rm -rf {$iprep_path}");
+	rmdir_recursive("{$suricatalogdir}");
+	rmdir_recursive("{$sidmodspath}");
+	rmdir_recursive("{$iprep_path}");
 	log_error(gettext("[Suricata] The package has been removed from this system..."));
 }
 
