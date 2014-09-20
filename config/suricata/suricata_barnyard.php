@@ -89,6 +89,27 @@ if (isset($id) && $a_nat[$id]) {
 }
 
 if ($_POST['save']) {
+
+	// If disabling Barnyard2 on the interface, stop any
+	// currently running instance, then save the disabled
+	// state and exit so as to preserve settings.
+	if ($_POST['barnyard_enable'] != 'on') {
+		$a_nat[$id]['barnyard_enable'] = 'off';
+		write_config("Suricata pkg: modified Barnyard2 settings.");
+		suricata_barnyard_stop($a_nat[$id], get_real_interface($a_nat[$id]['interface']));
+
+		// No need to rebuild rules for Barnyard2 changes
+		$rebuild_rules = false;
+		sync_suricata_package_config();
+		header( 'Expires: Sat, 26 Jul 1997 05:00:00 GMT' );
+		header( 'Last-Modified: ' . gmdate( 'D, d M Y H:i:s' ) . ' GMT' );
+		header( 'Cache-Control: no-store, no-cache, must-revalidate' );
+		header( 'Cache-Control: post-check=0, pre-check=0', false );
+		header( 'Pragma: no-cache' );
+		header("Location: /suricata/suricata_barnyard.php");
+		exit;
+	}
+
 	// Check that at least one output plugin is enabled
 	if ($_POST['barnyard_mysql_enable'] != 'on' && $_POST['barnyard_syslog_enable'] != 'on' &&
 	    $_POST['barnyard_bro_ids_enable'] != 'on' && $_POST['barnyard_enable'] == "on")
@@ -606,11 +627,11 @@ function enable_change(enable_change) {
 	document.iform.barnconfigpassthru.disabled = endis;
 }
 
-enable_change(false);
 toggle_mySQL();
 toggle_syslog();
 toggle_local_syslog();
 toggle_bro_ids();
+enable_change(false);
 
 </script>
 
