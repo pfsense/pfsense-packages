@@ -70,11 +70,11 @@ else
 	define('SURICATADIR', '/usr/pbi/suricata-' . php_uname("m") . '/etc/suricata/');
 
 define('SURICATALOGDIR', '/var/log/suricata/');
-define('RULES_UPD_LOGFILE', SURICATALOGDIR . 'suricata_rules_update.log');
-define('ENFORCING_RULES_FILENAME', 'suricata.rules');
+define('SURICATA_RULES_UPD_LOGFILE', SURICATALOGDIR . 'suricata_rules_update.log');
+define('SURICATA_ENFORCING_RULES_FILENAME', 'suricata.rules');
 define('FLOWBITS_FILENAME', 'flowbit-required.rules');
-define('SID_MODS_PATH', '/var/db/suricata/sidmods/');
-define('IPREP_PATH', '/var/db/suricata/iprep/');
+define('SURICATA_SID_MODS_PATH', '/var/db/suricata/sidmods/');
+define('SURICATA_IPREP_PATH', '/var/db/suricata/iprep/');
 
 // Rule set download filenames and prefixes
 define('ET_DNLD_FILENAME', 'emerging.rules.tar.gz');
@@ -1693,7 +1693,7 @@ function suricata_sid_mgmt_auto_categories($suricatacfg, $log_results = FALSE) {
 	/****************************************************/
 
 	global $config;
-	$suricata_sidmods_dir = SID_MODS_PATH;
+	$suricata_sidmods_dir = SURICATA_SID_MODS_PATH;
 	$sid_mods = array();
 	$enables = array();
 	$disables = array();
@@ -2232,7 +2232,7 @@ function suricata_process_enablesid(&$rule_map, $suricatacfg, $log_results = FAL
 	/*                   $rule_map array          */
 	/**********************************************/
 
-	$suricata_sidmods_dir = SID_MODS_PATH;
+	$suricata_sidmods_dir = SURICATA_SID_MODS_PATH;
 	$suricatalogdir = SURICATALOGDIR;
 	$sid_mods = array();
 
@@ -2279,7 +2279,7 @@ function suricata_process_disablesid(&$rule_map, $suricatacfg, $log_results = FA
 	/*                   $rule_map array          */
 	/**********************************************/
 
-	$suricata_sidmods_dir = SID_MODS_PATH;
+	$suricata_sidmods_dir = SURICATA_SID_MODS_PATH;
 	$suricatalogdir = SURICATALOGDIR;
 	$sid_mods = array();
 
@@ -2326,7 +2326,7 @@ function suricata_process_modifysid(&$rule_map, $suricatacfg, $log_results = FAL
 	/*                   $rule_map array          */
 	/**********************************************/
 
-	$suricata_sidmods_dir = SID_MODS_PATH;
+	$suricata_sidmods_dir = SURICATA_SID_MODS_PATH;
 	$suricatalogdir = SURICATALOGDIR;
 	$sid_mods = array();
 
@@ -2550,7 +2550,7 @@ function suricata_prepare_rule_files($suricatacfg, $suricatacfgdir) {
 
 	$suricatadir = SURICATADIR;
 	$flowbit_rules_file = FLOWBITS_FILENAME;
-	$suricata_enforcing_rules_file = ENFORCING_RULES_FILENAME;
+	$suricata_enforcing_rules_file = SURICATA_ENFORCING_RULES_FILENAME;
 	$enabled_rules = array();
 	$enabled_files = array();
 	$all_rules = array();
@@ -2749,7 +2749,7 @@ function suricata_write_enforcing_rules_file($rule_map, $rule_path) {
 	/*                rules file will be written.   */
 	/************************************************/
 
-	$rule_file = "/" . ENFORCING_RULES_FILENAME;
+	$rule_file = "/" . SURICATA_ENFORCING_RULES_FILENAME;
 
 	// See if we were passed a directory or full
 	// filename to write the rules to, and adjust
@@ -3108,7 +3108,7 @@ function suricata_generate_yaml($suricatacfg) {
 	$suricatadir = SURICATADIR;
 	$suricatalogdir = SURICATALOGDIR;
 	$flowbit_rules_file = FLOWBITS_FILENAME;
-	$suricata_enforcing_rules_file = ENFORCING_RULES_FILENAME;
+	$suricata_enforcing_rules_file = SURICATA_ENFORCING_RULES_FILENAME;
 	$if_real = get_real_interface($suricatacfg['interface']);
 	$suricata_uuid = $suricatacfg['uuid'];
 	$suricatacfgdir = "{$suricatadir}suricata_{$suricata_uuid}_{$if_real}";
@@ -3237,7 +3237,7 @@ function suricata_do_xmlrpc_sync($syncdownloadrules, $sync_to_ip, $port, $userna
 	/*************************************************/
 	/* Send over any auto-SID management files       */
 	/*************************************************/
-	$sid_files = glob(SID_MODS_PATH . '*');
+	$sid_files = glob(SURICATA_SID_MODS_PATH . '*');
 	foreach ($sid_files as $file) {
 		$content = base64_encode(file_get_contents($file));
 		$payload = "@file_put_contents('{$file}', base64_decode('{$content}'));";

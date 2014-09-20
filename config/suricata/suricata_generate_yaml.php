@@ -705,15 +705,15 @@ else
 	$http_parser_memcap = "67108864";
 
 /* Configure the IP REP section */
-$iprep_path = rtrim(IPREP_PATH, '/');
+$iprep_path = rtrim(SURICATA_IPREP_PATH, '/');
 
 // Create the rules files and save in the interface directory
 suricata_prepare_rule_files($suricatacfg, $suricatacfgdir);
 
 // Check and configure only non-empty rules files for the interface
 $rules_files = "";
-if (filesize("{$suricatacfgdir}/rules/".ENFORCING_RULES_FILENAME) > 0)
-	$rules_files .= ENFORCING_RULES_FILENAME;
+if (filesize("{$suricatacfgdir}/rules/".SURICATA_ENFORCING_RULES_FILENAME) > 0)
+	$rules_files .= SURICATA_ENFORCING_RULES_FILENAME;
 if (filesize("{$suricatacfgdir}/rules/".FLOWBITS_FILENAME) > 0)
 	$rules_files .= "\n - " . FLOWBITS_FILENAME;
 if (filesize("{$suricatacfgdir}/rules/custom.rules") > 0)
