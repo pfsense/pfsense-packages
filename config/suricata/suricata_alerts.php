@@ -233,6 +233,7 @@ if ($_POST['filterlogentries_submit']) {
 
 if ($_POST['filterlogentries_clear']) {
 	$filterfieldsarray = array();
+	$filterlogentries = TRUE;
 }
 
 if ($_POST['save']) {
