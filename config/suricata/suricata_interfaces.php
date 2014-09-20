@@ -86,7 +86,7 @@ if ($_POST['del_x']) {
 			suricata_create_rc();
 		else {
 			conf_mount_rw();
-			@unlink("{$rcdir}suricata.sh");
+			unlink_if_exists("{$rcdir}suricata.sh");
 			conf_mount_ro();
 		}
 	  

@@ -399,7 +399,7 @@ if ($_POST['download']) {
 		readfile("/tmp/{$file_name}");
 
 		// Clean up the temp file
-		@unlink("/tmp/{$file_name}");
+		unlink_if_exists("/tmp/{$file_name}");
 	}
 	else
 		$savemsg = gettext("An error occurred while creating archive");
@@ -836,7 +836,7 @@ if (file_exists("{$g['varlog_path']}/suricata/suricata_{$if_real}{$suricata_uuid
 		}
 		unset($fields, $buf, $tmp);
 		fclose($fd);
-		@unlink("/tmp/alerts_suricata{$suricata_uuid}");
+		unlink_if_exists("/tmp/alerts_suricata{$suricata_uuid}");
 	}
 }
 ?>

@@ -236,7 +236,7 @@ if (isset($_POST['sidlist_dnload_all_x'])) {
 		readfile("/tmp/{$file_name}");
 
 		// Clean up the temp file
-		@unlink("/tmp/{$file_name}");
+		unlink_if_exists("/tmp/{$file_name}");
 	}
 	else
 		$savemsg = gettext("An error occurred while creating the gzip archive!");

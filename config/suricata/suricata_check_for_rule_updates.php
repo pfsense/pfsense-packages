@@ -115,7 +115,7 @@ if ($etpro == "on") {
 	$emergingthreats_url .= "{$etproid}/suricata/";
 	$et_name = "Emerging Threats Pro";
 	$et_md5_remove = ET_DNLD_FILENAME . ".md5";
-	@unlink("{$suricatadir}{$et_md5_remove}");
+	unlink_if_exists("{$suricatadir}{$et_md5_remove}");
 }
 else {
 	$emergingthreats_filename = ET_DNLD_FILENAME;
@@ -126,7 +126,7 @@ else {
 	$emergingthreats_url .= "suricata/";
 	$et_name = "Emerging Threats Open";
 	$et_md5_remove = ETPRO_DNLD_FILENAME . ".md5";
-	@unlink("{$suricatadir}{$et_md5_remove}");
+	unlink_if_exists("{$suricatadir}{$et_md5_remove}");
 }
 
 // Set a common flag for all Emerging Threats rules (open and pro).

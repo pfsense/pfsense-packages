@@ -103,7 +103,7 @@ $g['suricata_postinstall'] = true;
 conf_mount_rw();
 
 // Remove any previously installed script since we rebuild it
-@unlink("{$rcdir}suricata.sh");
+unlink_if_exists("{$rcdir}suricata.sh");
 
 // Create the top-tier log directory
 safe_mkdir(SURICATALOGDIR);
