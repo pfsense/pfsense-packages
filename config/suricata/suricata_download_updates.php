@@ -116,7 +116,7 @@ if ($snortcommunityrules == 'on' && file_exists("{$suricatadir}{$snort_community
 /* Check for postback to see if we should clear the update log file. */
 if ($_POST['clear']) {
 	if (file_exists("{$suricata_rules_upd_log}"))
-		mwexec("/bin/rm -f {$suricata_rules_upd_log}");
+		unlink_if_exists("{$suricata_rules_upd_log}");
 }
 
 if ($_POST['update']) {

@@ -405,7 +405,7 @@ function suricata_fetch_new_rules($file_url, $file_dst, $file_md5, $desc = "") {
 
 /*  remove old $tmpfname files if present */
 if (is_dir("{$tmpfname}"))
-	exec("/bin/rm -r {$tmpfname}");
+	rmdir_recursive("{$tmpfname}");
 
 /*  Make sure required suricatadirs exsist */
 exec("/bin/mkdir -p {$suricatadir}rules");
@@ -415,7 +415,7 @@ exec("/bin/mkdir -p {$suricatalogdir}");
 /* See if we need to automatically clear the Update Log based on 1024K size limit */
 if (file_exists($suricata_rules_upd_log)) {
 	if (1048576 < filesize($suricata_rules_upd_log))
-		exec("/bin/rm -r {$suricata_rules_upd_log}");
+		unlink_if_exists("{$suricata_rules_upd_log}");
 }
 
 /* Log start time for this rules update */
@@ -753,7 +753,7 @@ if (is_dir("{$tmpfname}")) {
 		update_status(gettext("Cleaning up after rules extraction..."));
 		update_output_window(gettext("Removing {$tmpfname} directory..."));
 	}
-	exec("/bin/rm -r {$tmpfname}");
+	rmdir_recursive("{$tmpfname}");
 }
 
 if ($pkg_interface <> "console") {

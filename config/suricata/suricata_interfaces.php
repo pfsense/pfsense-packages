@@ -68,8 +68,8 @@ if ($_POST['del_x']) {
 			$if_real = get_real_interface($a_nat[$rulei]['interface']);
 			$suricata_uuid = $a_nat[$rulei]['uuid'];
 			suricata_stop($a_nat[$rulei], $if_real);
-			exec("/bin/rm -r {$suricatalogdir}suricata_{$if_real}{$suricata_uuid}");
-			exec("/bin/rm -r {$suricatadir}suricata_{$suricata_uuid}_{$if_real}");
+			rmdir_recursive("{$suricatalogdir}suricata_{$if_real}{$suricata_uuid}");
+			rmdir_recursive("{$suricatadir}suricata_{$suricata_uuid}_{$if_real}");
 			unset($a_nat[$rulei]);
 		}
 		conf_mount_ro();
