@@ -69,12 +69,12 @@ if ($pf_version >= 2.2)
 else
 	define('SURICATADIR', '/usr/pbi/suricata-' . php_uname("m") . '/etc/suricata/');
 
-define('SURICATALOGDIR', '/var/log/suricata/');
+define('SURICATALOGDIR', "{$g['varlog_path']}/suricata/");
 define('SURICATA_RULES_UPD_LOGFILE', SURICATALOGDIR . 'suricata_rules_update.log');
 define('SURICATA_ENFORCING_RULES_FILENAME', 'suricata.rules');
 define('FLOWBITS_FILENAME', 'flowbit-required.rules');
-define('SURICATA_SID_MODS_PATH', '/var/db/suricata/sidmods/');
-define('SURICATA_IPREP_PATH', '/var/db/suricata/iprep/');
+define('SURICATA_SID_MODS_PATH', "{$g['vardb_path']}/suricata/sidmods/");
+define('SURICATA_IPREP_PATH', "{$g['vardb_path']}/suricata/iprep/");
 
 // Rule set download filenames and prefixes
 define('ET_DNLD_FILENAME', 'emerging.rules.tar.gz');
