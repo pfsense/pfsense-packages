@@ -43,6 +43,7 @@
 require_once("guiconfig.inc");
 require_once("/usr/local/pkg/suricata/suricata.inc");
 
+global $g, $config;
 $supplist = array();
 $suri_pf_table = SURICATA_PF_TABLE;
 $filterlogentries = FALSE;
@@ -622,8 +623,8 @@ if ($savemsg) {
 	<?php
 
 /* make sure alert file exists */
-if (file_exists("/var/log/suricata/suricata_{$if_real}{$suricata_uuid}/alerts.log")) {
-	exec("tail -{$anentries} -r /var/log/suricata/suricata_{$if_real}{$suricata_uuid}/alerts.log > /tmp/alerts_suricata{$suricata_uuid}");
+if (file_exists("{$g['varlog_path']}/suricata/suricata_{$if_real}{$suricata_uuid}/alerts.log")) {
+	exec("tail -{$anentries} -r {$g['varlog_path']}/suricata/suricata_{$if_real}{$suricata_uuid}/alerts.log > /tmp/alerts_suricata{$suricata_uuid}");
 	if (file_exists("/tmp/alerts_suricata{$suricata_uuid}")) {
 		$tmpblocked = array_flip(suricata_get_blocked_ips());
 		$counter = 0;
