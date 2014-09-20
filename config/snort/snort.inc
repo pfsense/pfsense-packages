@@ -576,16 +576,11 @@ function snort_barnyard_start($snortcfg, $if_real, $background=FALSE) {
 	$snort_uuid = $snortcfg['uuid'];
 
 	if ($snortcfg['barnyard_enable'] == 'on') {
-		if (isvalidpid("{$g['varrun_path']}/barnyard2_{$if_real}{$snort_uuid}.pid")) {
-			snort_barnyard_reload_config($snortcfg, "HUP");
-		}
-		else {
-			log_error("[Snort] Barnyard2 START for " . convert_real_interface_to_friendly_descr($if_real) . "({$if_real})...");
-			if ($background)
-				mwexec_bg("/usr/local/bin/barnyard2 -r {$snort_uuid} -f \"snort_{$snort_uuid}_{$if_real}.u2\" --pid-path {$g['varrun_path']} --nolock-pidfile -c {$snortdir}/snort_{$snort_uuid}_{$if_real}/barnyard2.conf -d {$snortlogdir}/snort_{$if_real}{$snort_uuid} -D -q");
-			else
-				mwexec("/usr/local/bin/barnyard2 -r {$snort_uuid} -f \"snort_{$snort_uuid}_{$if_real}.u2\" --pid-path {$g['varrun_path']} --nolock-pidfile -c {$snortdir}/snort_{$snort_uuid}_{$if_real}/barnyard2.conf -d {$snortlogdir}/snort_{$if_real}{$snort_uuid} -D -q");
-		}
+		log_error("[Snort] Barnyard2 START for " . convert_real_interface_to_friendly_descr($if_real) . "({$if_real})...");
+		if ($background)
+			mwexec_bg("/usr/local/bin/barnyard2 -r {$snort_uuid} -f \"snort_{$snort_uuid}_{$if_real}.u2\" --pid-path {$g['varrun_path']} --nolock-pidfile -c {$snortdir}/snort_{$snort_uuid}_{$if_real}/barnyard2.conf -d {$snortlogdir}/snort_{$if_real}{$snort_uuid} -D -q");
+		else
+			mwexec("/usr/local/bin/barnyard2 -r {$snort_uuid} -f \"snort_{$snort_uuid}_{$if_real}.u2\" --pid-path {$g['varrun_path']} --nolock-pidfile -c {$snortdir}/snort_{$snort_uuid}_{$if_real}/barnyard2.conf -d {$snortlogdir}/snort_{$if_real}{$snort_uuid} -D -q");
 	}
 }
 
@@ -597,21 +592,13 @@ function snort_start($snortcfg, $if_real, $background=FALSE) {
 	$snort_uuid = $snortcfg['uuid'];
 
 	if ($snortcfg['enable'] == 'on') {
-		if (isvalidpid("{$g['varrun_path']}/snort_{$if_real}{$snort_uuid}.pid")) {
-			snort_reload_config($snortcfg, "SIGHUP");
-			snort_barnyard_start($snortcfg, $if_real, $background);
-		}
-		else {
-			log_error("[Snort] Snort START for " . convert_real_interface_to_friendly_descr($if_real) . "({$if_real})...");
-			if ($background)
-				mwexec_bg("/usr/local/bin/snort -R {$snort_uuid} -D -q -l {$snortlogdir}/snort_{$if_real}{$snort_uuid} --pid-path {$g['varrun_path']} --nolock-pidfile -G {$snort_uuid} -c {$snortdir}/snort_{$snort_uuid}_{$if_real}/snort.conf -i {$if_real}");
-			else
-				mwexec("/usr/local/bin/snort -R {$snort_uuid} -D -q -l {$snortlogdir}/snort_{$if_real}{$snort_uuid} --pid-path {$g['varrun_path']} --nolock-pidfile -G {$snort_uuid} -c {$snortdir}/snort_{$snort_uuid}_{$if_real}/snort.conf -i {$if_real}");
-			snort_barnyard_start($snortcfg, $if_real, $background);
-		}
+		log_error("[Snort] Snort START for " . convert_real_interface_to_friendly_descr($if_real) . "({$if_real})...");
+		if ($background)
+			mwexec_bg("/usr/local/bin/snort -R {$snort_uuid} -D -q -l {$snortlogdir}/snort_{$if_real}{$snort_uuid} --pid-path {$g['varrun_path']} --nolock-pidfile -G {$snort_uuid} -c {$snortdir}/snort_{$snort_uuid}_{$if_real}/snort.conf -i {$if_real}");
+		else
+			mwexec("/usr/local/bin/snort -R {$snort_uuid} -D -q -l {$snortlogdir}/snort_{$if_real}{$snort_uuid} --pid-path {$g['varrun_path']} --nolock-pidfile -G {$snort_uuid} -c {$snortdir}/snort_{$snort_uuid}_{$if_real}/snort.conf -i {$if_real}");
+		snort_barnyard_start($snortcfg, $if_real, $background);
 	}
-	else
-		return;
 }
 
 function snort_start_all_interfaces($background=FALSE) {
