@@ -580,7 +580,7 @@ if ($savemsg) {
 					</table>
 				</td>
 			</tr>
-		<?php if ($filterlogentries) : ?>
+		<?php if ($filterlogentries && count($filterfieldsarray)) : ?>
 			<tr>
 				<td colspan="2" class="listtopic"><?php printf(gettext("Last %s Alert Entries"), $anentries); ?>&nbsp;&nbsp;
 				<?php echo gettext("(Most recent listed first)  ** FILTERED VIEW **  clear filter to see all entries"); ?></td>
