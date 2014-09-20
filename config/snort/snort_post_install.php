@@ -194,7 +194,7 @@ if ($config['installedpackages']['snortglobal']['forcekeepsettings'] == 'on') {
 		$if_real = get_real_interface($snortcfg['interface']);
 		$snort_uuid = $snortcfg['uuid'];
 		$snortcfgdir = "{$snortdir}/snort_{$snort_uuid}_{$if_real}";
-		update_output_window(gettext("Generating configuration for " . convert_friendly_interface_to_friendly_descr($snortcfg['interface'])));
+		update_output_window(gettext("Generating configuration for " . convert_friendly_interface_to_friendly_descr($snortcfg['interface']) . "..."));
 
 		// Pull in the PHP code that generates the snort.conf file
 		// variables that will be substituted further down below.
@@ -295,7 +295,7 @@ if ($config['installedpackages']['snortglobal']['forcekeepsettings'] == 'on') {
 				continue;
 			$if_real = get_real_interface($snortcfg['interface']);
 			$snort_uuid = $snortcfg['uuid'];
-			update_output_window(gettext("Snort starting on " . convert_friendly_interface_to_friendly_descr($snortcfg['interface'])));
+			update_output_window(gettext("Snort starting on " . convert_friendly_interface_to_friendly_descr($snortcfg['interface']) . "..."));
 			log_error("[Snort] Snort START for " . convert_friendly_interface_to_friendly_descr($snortcfg['interface']) . "({$if_real})...");
 			mwexec_bg("/usr/local/bin/snort -R {$snort_uuid} -D -q -l {$snortlogdir}/snort_{$if_real}{$snort_uuid} --pid-path {$g['varrun_path']} --nolock-pidfile -G {$snort_uuid} -c {$snortdir}/snort_{$snort_uuid}_{$if_real}/snort.conf -i {$if_real}");
 			if ($snortcfg['barnyard_enable'] == 'on')

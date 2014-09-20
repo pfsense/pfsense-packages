@@ -52,18 +52,21 @@ if (isset($_POST['del_x'])) {
 	/* Delete selected Snort interfaces */
 	if (is_array($_POST['rule'])) {
 		conf_mount_rw();
+		$pkg_serv = &$config['installedpackages']['service'];
+		if (!is_array($pkg_serv))
+			$pkg_serv = array();
 		foreach ($_POST['rule'] as $rulei) {
 			$if_real = get_real_interface($a_nat[$rulei]['interface']);
 			$snort_uuid = $a_nat[$rulei]['uuid'];
-			foreach ($config['installedpackages']['service'] as $key => $service) {
+			foreach ($pkg_serv as $key => $service) {
 				if (isset($service['uuid']) && $service['uuid'] == $snort_uuid &&
 				    $service['name'] == "snort_" . strtolower($a_nat[$rulei]['interface'])) {
-					unset($config['installedpackages']['service'][$key]);
+					unset($pkg_serv[$key]);
 					unlink_if_exists("{$g['varrun_path']}/snort_{$snort_uuid}.disabled");
 				}
 				if (isset($service['uuid']) && $service['uuid'] == $snort_uuid &&
 				    $service['name'] == "barnyard2_" . strtolower($a_nat[$rulei]['interface'])) {
-					unset($config['installedpackages']['service'][$key]);
+					unset($pkg_serv[$key]);
 					unlink_if_exists("{$g['varrun_path']}/barnyard2_{$snort_uuid}.disabled");
 				}
 			}

@@ -1039,21 +1039,23 @@ function sync_snort_package_config() {
 
 	conf_mount_rw();
 
+	$pkg_serv = &$config['installedpackages']['service'];
+	if (!is_array($pkg_serv))
+		$pkg_serv = array();
+
 	/* do not start config build if rules is empty or there are no Snort settings */
 	if (!is_array($config['installedpackages']['snortglobal']) || !is_array($config['installedpackages']['snortglobal']['rule'])) {
 		conf_mount_ro();
 
 		// Make sure no lingering <service> entries exist for Snort interfaces
 		$is_dirty = FALSE;
-		if (!is_array($config['installedpackges']['service']))
-			$config['installedpackages']['service'] = array();
-		foreach ($config['installedpackages']['service'] as $key => $service) {
+		foreach ($pkg_serv as $key => $service) {
 			if (strpos($service['name'], "snort_") !== FALSE) {
-				unset($config['installedpackages']['service'][$key]);
+				unset($pkg_serv[$key]);
 				$is_dirty = TRUE;
 			}
 			if (strpos($service['name'], "barnyard2_") !== FALSE) {
-				unset($config['installedpackages']['service'][$key]);
+				unset($pkg_serv[$key]);
 				$is_dirty = TRUE;
 			}
 		}
@@ -1068,16 +1070,16 @@ function sync_snort_package_config() {
 		/* Skip configuration of any disabled interface */
 		/* after removing its custom service entry.     */
 		if ($value['enable'] != 'on') {
-			foreach ($config['installedpackages']['service'] as $key => $service) {
+			foreach ($pkg_serv as $key => $service) {
 				if (isset($service['uuid']) && $service['uuid'] == $value['uuid'] &&
 				    $service['name'] == "snort_" . strtolower($value['interface'])) {
-					unset($config['installedpackages']['service'][$key]);
+					unset($pkg_serv[$key]);
 					unlink_if_exists("{$g['varrun_path']}/snort_{$uuid}.disabled");
 					$is_dirty = TRUE;
 				}
 				if (isset($service['uuid']) && $service['uuid'] == $value['uuid'] &&
 				    $service['name'] == "barnyard2_" . strtolower($value['interface'])) {
-					unset($config['installedpackages']['service'][$key]);
+					unset($pkg_serv[$key]);
 					unlink_if_exists("{$g['varrun_path']}/barnyard2_{$uuid}.disabled");
 					$is_dirty = TRUE;
 				}
@@ -1097,7 +1099,7 @@ function sync_snort_package_config() {
 		/* create a <service> entry for interface       */
 		$snort_found = FALSE;
 		$barnyard_found = FALSE;
-		foreach ($config['installedpackages']['service'] as $service) {
+		foreach ($pkg_serv as $key => $service) {
 			if (isset($service['uuid']) && $service['uuid'] == $value['uuid'] &&
 			    $service['name'] == "snort_" . strtolower($value['interface'])) {
 				$snort_found = TRUE;
@@ -1105,8 +1107,20 @@ function sync_snort_package_config() {
 			if (isset($service['uuid']) && $service['uuid'] == $value['uuid'] &&
 			    $service['name'] == "barnyard2_" . strtolower($value['interface'])) {
 				$barnyard_found = TRUE;
+				$byid = $key;
 			}
 		}
+
+		// If we found a configured Barnyard2 service for this interface, 
+		// but Barnyard2 is disabled, remove the Barnyard2 service entry.
+		if ($barnyard_found && $value['barnyard_enable'] != "on") {
+			unset($pkg_serv[$byid]);
+			unlink_if_exists("{$g['varrun_path']}/barnyard2_{$uuid}.disabled");
+			$is_dirty = TRUE;
+		}
+
+		// If we did not find configured services for enabled Snort and
+		// Barnyard2 interfaces, then create them.
 		if (!$snort_found) {
 			$service = array();
 			$service['name'] = "snort_" . strtolower($value['interface']);
@@ -3026,17 +3040,18 @@ function snort_deinstall() {
 
 	/* Remove our custom <service> entries from config */
 	$is_dirty = FALSE;
-	if (!is_array($config['installedpackges']['service']))
-		$config['installedpackages']['service'] = array();
-	foreach ($config['installedpackages']['service'] as $key => $service) {
+	$pkg_serv = &$config['installedpackages']['service'];
+	if (!is_array($pkg_serv))
+		$pkg_serv = array();
+	foreach ($pkg_serv as $key => $service) {
 		if (strpos($service['name'], "snort_") !== FALSE) {
-			unset($config['installedpackages']['service'][$key]);
+			unset($pkg_serv[$key]);
 			unlink_if_exists("{$g['varrun_path']}/snort_{$service['uuid']}.disabled");
 			$is_dirty = TRUE;
 			continue;
 		}
 		if (strpos($service['name'], "barnyard2_") !== FALSE) {
-			unset($config['installedpackages']['service'][$key]);
+			unset($pkg_serv[$key]);
 			unlink_if_exists("{$g['varrun_path']}/barnyard2_{$service['uuid']}.disabled");
 			$is_dirty = TRUE;
 		}

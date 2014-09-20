@@ -98,6 +98,7 @@ if ($_POST['save']) {
 	if ($_POST['barnyard_enable'] != 'on') {
 		$a_nat[$id]['barnyard_enable'] = 'off';
 		write_config("Snort pkg: modified Barnyard2 settings.");
+		touch("{$g['varrun_path']}/barnyard2_{$uuid}.disabled");
 		snort_barnyard_stop($a_nat[$id], get_real_interface($a_nat[$id]['interface']));
 
 		// No need to rebuild rules for Barnyard2 changes

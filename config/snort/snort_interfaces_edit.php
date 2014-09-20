@@ -165,6 +165,8 @@ if ($_POST["save"] && !$input_errors) {
 	// save the change, and exit.
 	if ($_POST['enable'] != 'on') {
 		$a_rule[$id]['enable'] = $_POST['enable'] ? 'on' : 'off';
+		touch("{$g['varrun_path']}/snort_{$a_rule[$id]['uuid']}.disabled");
+		touch("{$g['varrun_path']}/barnyard2_{$a_rule[$id]['uuid']}.disabled");
 		snort_stop($a_rule[$id], get_real_interface($a_rule[$id]['interface']));
 		write_config("Snort pkg: modified interface configuration for {$a_rule[$id]['interface']}.");
 		$rebuild_rules = false;
@@ -225,6 +227,7 @@ if ($_POST["save"] && !$input_errors) {
 				$oif_real = get_real_interface($a_rule[$id]['interface']);
 				if (snort_is_running($a_rule[$id]['uuid'], $oif_real)) {
 					touch("{$g['varrun_path']}/snort_{$a_rule[$id]['uuid']}.disabled");
+					touch("{$g['varrun_path']}/barnyard2_{$a_rule[$id]['uuid']}.disabled");
 					snort_stop($a_rule[$id], $oif_real);
 					$snort_start = true;
 				}
@@ -401,6 +404,7 @@ if ($_POST["save"] && !$input_errors) {
 		if ($snort_start == true) {
 			snort_start($natent, $if_real);
 			unlink_if_exists("{$g['varrun_path']}/snort_{$natent['uuid']}.disabled");
+			unlink_if_exists("{$g['varrun_path']}/barnyard2_{$natent['uuid']}.disabled");
 		}
 
 		/*******************************************************/
