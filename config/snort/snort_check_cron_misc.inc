@@ -57,9 +57,9 @@ function snort_check_dir_size_limit($snortloglimitsize) {
 		conf_mount_rw();
 
 		// Truncate the Rules Update Log file if it exists
-		if (file_exists(RULES_UPD_LOGFILE)) {
+		if (file_exists(SNORT_RULES_UPD_LOGFILE)) {
 			log_error(gettext("[Snort] Truncating the Rules Update Log file..."));
-			@file_put_contents(RULES_UPD_LOGFILE, "");
+			@file_put_contents(SNORT_RULES_UPD_LOGFILE, "");
 		}
 
 		// Clean-up the logs for each configured Snort instance

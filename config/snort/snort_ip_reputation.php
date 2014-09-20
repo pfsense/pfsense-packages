@@ -56,7 +56,7 @@ if (!is_array($config['installedpackages']['snortglobal']['rule'][$id]['blist_fi
 $a_nat = &$config['installedpackages']['snortglobal']['rule'];
 
 $pconfig = $a_nat[$id];
-$iprep_path = IPREP_PATH;
+$iprep_path = SNORT_IPREP_PATH;
 $if_real = get_real_interface($a_nat[$id]['interface']);
 $snort_uuid = $config['installedpackages']['snortglobal']['rule'][$id]['uuid'];
 

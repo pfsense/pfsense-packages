@@ -852,11 +852,11 @@ if (is_array($snortcfg['blist_files']['item'])) {
 	$bIsFirst = TRUE;
 	foreach ($snortcfg['blist_files']['item'] as $blist) {
 		if ($bIsFirst) {
-			$blist_files .= "blacklist " . IPREP_PATH . $blist;
+			$blist_files .= "blacklist " . SNORT_IPREP_PATH . $blist;
 			$bIsFirst = FALSE;
 		}
 		else
-			$blist_files .= ", \\ \n\tblacklist " . IPREP_PATH . $blist;    
+			$blist_files .= ", \\ \n\tblacklist " . SNORT_IPREP_PATH . $blist;    
 	}
 }
 if (is_array($snortcfg['wlist_files']['item'])) {
@@ -864,11 +864,11 @@ if (is_array($snortcfg['wlist_files']['item'])) {
 	$bIsFirst = TRUE;
 	foreach ($snortcfg['wlist_files']['item'] as $wlist) {
 		if ($bIsFirst) {
-			$wlist_files .= "whitelist " . IPREP_PATH . $wlist;
+			$wlist_files .= "whitelist " . SNORT_IPREP_PATH . $wlist;
 			$bIsFirst = FALSE;
 		}
 		else
-			$wlist_files .= ", \\ \n\twhitelist " . IPREP_PATH . $wlist;    
+			$wlist_files .= ", \\ \n\twhitelist " . SNORT_IPREP_PATH . $wlist;    
 	}
 }
 if (!empty($blist_files))

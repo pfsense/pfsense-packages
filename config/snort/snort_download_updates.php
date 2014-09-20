@@ -38,7 +38,7 @@ require_once("/usr/local/pkg/snort/snort.inc");
 
 /* Define some locally required variables from Snort constants */
 $snortdir = SNORTDIR;
-$snort_rules_upd_log = RULES_UPD_LOGFILE;
+$snort_rules_upd_log = SNORT_RULES_UPD_LOGFILE;
 
 /* Grab the Snort binary version programmatically and */
 /* use it to construct the proper Snort VRT rules     */
@@ -51,7 +51,7 @@ if (empty($snortver[0]))
 $snortver[0] = str_replace(".", "", $snortver[0]);
 
 $snort_rules_file = "snortrules-snapshot-{$snortver[0]}.tar.gz";
-$snort_community_rules_filename = GPLV2_DNLD_FILENAME;
+$snort_community_rules_filename = SNORT_GPLV2_DNLD_FILENAME;
 
 $snortdownload = $config['installedpackages']['snortglobal']['snortdownload'];
 $emergingthreats = $config['installedpackages']['snortglobal']['emergingthreats'];
@@ -69,11 +69,11 @@ else
 	$last_rule_upd_status = gettext("Unknown");
 
 if ($etpro == "on") {
-	$emergingthreats_filename = ETPRO_DNLD_FILENAME;
+	$emergingthreats_filename = SNORT_ETPRO_DNLD_FILENAME;
 	$et_name = "Emerging Threats Pro Rules";
 }
 else {
-	$emergingthreats_filename = ET_DNLD_FILENAME;
+	$emergingthreats_filename = SNORT_ET_DNLD_FILENAME;
 	$et_name = "Emerging Threats Open Rules";
 }
 

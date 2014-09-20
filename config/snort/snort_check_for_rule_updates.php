@@ -46,16 +46,16 @@ if (!defined("ET_BASE_DNLD_URL"))
 	define("ET_BASE_DNLD_URL", "http://rules.emergingthreats.net/"); 
 if (!defined("ETPRO_BASE_DNLD_URL"))
 	define("ETPRO_BASE_DNLD_URL", "https://rules.emergingthreatspro.com/"); 
-if (!defined("ET_DNLD_FILENAME"))
-	define("ET_DNLD_FILENAME", "emerging.rules.tar.gz");
-if (!defined("ETPRO_DNLD_FILENAME"))
-	define("ETPRO_DNLD_FILENAME", "etpro.rules.tar.gz");
-if (!defined("GPLV2_DNLD_FILENAME"))
-	define("GPLV2_DNLD_FILENAME", "community-rules.tar.gz");
+if (!defined("SNORT_ET_DNLD_FILENAME"))
+	define("SNORT_ET_DNLD_FILENAME", "emerging.rules.tar.gz");
+if (!defined("SNORT_ETPRO_DNLD_FILENAME"))
+	define("SNORT_ETPRO_DNLD_FILENAME", "etpro.rules.tar.gz");
+if (!defined("SNORT_GPLV2_DNLD_FILENAME"))
+	define("SNORT_GPLV2_DNLD_FILENAME", "community-rules.tar.gz");
 if (!defined("GPLV2_DNLD_URL"))
 	define("GPLV2_DNLD_URL", "https://s3.amazonaws.com/snort-org/www/rules/community/");
-if (!defined("RULES_UPD_LOGFILE"))
-	define("RULES_UPD_LOGFILE", SNORTLOGDIR . "/snort_rules_update.log");
+if (!defined("SNORT_RULES_UPD_LOGFILE"))
+	define("SNORT_RULES_UPD_LOGFILE", SNORTLOGDIR . "/snort_rules_update.log");
 if (!defined("VRT_FILE_PREFIX"))
 	define("VRT_FILE_PREFIX", "snort_");
 if (!defined("GPL_FILE_PREFIX"))
@@ -64,14 +64,14 @@ if (!defined("ET_OPEN_FILE_PREFIX"))
 	define("ET_OPEN_FILE_PREFIX", "emerging-");
 if (!defined("ET_PRO_FILE_PREFIX"))
 	define("ET_PRO_FILE_PREFIX", "etpro-");
-if (!defined("IPREP_PATH"))
-	define("IPREP_PATH", "/var/db/snort/iprep/");
+if (!defined("SNORT_IPREP_PATH"))
+	define("SNORT_IPREP_PATH", "/var/db/snort/iprep/");
 
 $snortdir = SNORTDIR;
 $snortlibdir = SNORTLIBDIR;
 $snortlogdir = SNORTLOGDIR;
-$snortiprepdir = IPREP_PATH;
-$snort_rules_upd_log = RULES_UPD_LOGFILE;
+$snortiprepdir = SNORT_IPREP_PATH;
+$snort_rules_upd_log = SNORT_RULES_UPD_LOGFILE;
 
 /* Save the state of $pkg_interface so we can restore it */
 $pkg_interface_orig = $pkg_interface;
@@ -113,30 +113,30 @@ conf_mount_rw();
 
 /* Set up Emerging Threats rules filenames and URL */
 if ($etpro == "on") {
-	$emergingthreats_filename = ETPRO_DNLD_FILENAME;
-	$emergingthreats_filename_md5 = ETPRO_DNLD_FILENAME . ".md5";
+	$emergingthreats_filename = SNORT_ETPRO_DNLD_FILENAME;
+	$emergingthreats_filename_md5 = SNORT_ETPRO_DNLD_FILENAME . ".md5";
 	$emergingthreats_url = ETPRO_BASE_DNLD_URL;
 	$emergingthreats_url .= "{$etproid}/snort-" . ET_VERSION . "/";
 	$emergingthreats = "on";
 	$et_name = "Emerging Threats Pro";
-	$et_md5_remove = ET_DNLD_FILENAME . ".md5";
+	$et_md5_remove = SNORT_ET_DNLD_FILENAME . ".md5";
 	unlink_if_exists("{$snortdir}/{$et_md5_remove}");
 }
 else {
-	$emergingthreats_filename = ET_DNLD_FILENAME;
-	$emergingthreats_filename_md5 = ET_DNLD_FILENAME . ".md5";
+	$emergingthreats_filename = SNORT_ET_DNLD_FILENAME;
+	$emergingthreats_filename_md5 = SNORT_ET_DNLD_FILENAME . ".md5";
 	$emergingthreats_url = ET_BASE_DNLD_URL;
 	// If using Sourcefire VRT rules with ET, then we should use the open-nogpl ET rules
 	$emergingthreats_url .= $vrt_enabled == "on" ? "open-nogpl/" : "open/";
 	$emergingthreats_url .= "snort-" . ET_VERSION . "/";
 	$et_name = "Emerging Threats Open";
-	$et_md5_remove = ETPRO_DNLD_FILENAME . ".md5";
+	$et_md5_remove = SNORT_ETPRO_DNLD_FILENAME . ".md5";
 	unlink_if_exists("{$snortdir}/{$et_md5_remove}");
 }
 
 /* Snort GPLv2 Community Rules filenames and URL */
-$snort_community_rules_filename = GPLV2_DNLD_FILENAME;
-$snort_community_rules_filename_md5 = GPLV2_DNLD_FILENAME . ".md5";
+$snort_community_rules_filename = SNORT_GPLV2_DNLD_FILENAME;
+$snort_community_rules_filename_md5 = SNORT_GPLV2_DNLD_FILENAME . ".md5";
 $snort_community_rules_url = GPLV2_DNLD_URL;
 
 function snort_download_file_url($url, $file_out) {
@@ -634,11 +634,11 @@ if ($emergingthreats == 'on') {
 		foreach ($files as $file) {
 			$newfile = basename($file);
 			if ($etpro == "on") {
-				@copy($file, IPREP_PATH . ET_PRO_FILE_PREFIX . "{$newfile}");
+				@copy($file, SNORT_IPREP_PATH . ET_PRO_FILE_PREFIX . "{$newfile}");
 				@copy($file, "{$snortdir}/rules/" . ET_PRO_FILE_PREFIX . "{$newfile}");
 			}
 			else {
-				@copy($file, IPREP_PATH . ET_OPEN_FILE_PREFIX . "{$newfile}");
+				@copy($file, SNORT_IPREP_PATH . ET_OPEN_FILE_PREFIX . "{$newfile}");
 				@copy($file, "{$snortdir}/rules/" . ET_OPEN_FILE_PREFIX . "{$newfile}");
 			}
 		}
@@ -792,7 +792,7 @@ if ($snortdownload == 'on' || $emergingthreats == 'on' || $snortcommunityrules =
 				touch("{$g['varrun_path']}/snort_{$snortcfg['uuid']}.disabled");
 				touch("{$g['varrun_path']}/barnyard2_{$snortcfg['uuid']}.disabled");
 				snort_stop($snortcfg, $if_real);
-				sleep(1);
+				sleep(2);
 				if ($pkg_interface <> "console") {
 					update_output_window(gettext("Starting Snort on " . convert_friendly_interface_to_friendly_descr($snortcfg['interface']) . "..."));
 					snort_start($snortcfg, $if_real, FALSE);

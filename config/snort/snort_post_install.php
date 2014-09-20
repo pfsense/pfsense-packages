@@ -57,8 +57,8 @@ global $config, $g, $rebuild_rules, $pkg_interface, $snort_gui_include;
  * updated version icluded with the     *
  * updated GUI package.                 *
  ****************************************/
-if (!defined('SID_MODS_PATH'))
-	define('SID_MODS_PATH', '/var/db/snort/sidmods/');
+if (!defined('SNORT_SID_MODS_PATH'))
+	define('SNORT_SID_MODS_PATH', '/var/db/snort/sidmods/');
 
 /****************************************
  * End of PHP caching workaround        *
@@ -69,7 +69,7 @@ $snortlogdir = SNORTLOGDIR;
 $snortlibdir = SNORTLIBDIR;
 $rcdir = RCFILEPREFIX;
 $flowbit_rules_file = FLOWBITS_FILENAME;
-$snort_enforcing_rules_file = ENFORCING_RULES_FILENAME;
+$snort_enforcing_rules_file = SNORT_ENFORCING_RULES_FILENAME;
 
 /* Hard kill any running Snort processes that may have been started by any   */
 /* of the pfSense scripts such as check_reload_status() or rc.start_packages */
@@ -118,8 +118,8 @@ unlink_if_exists("{$rcdir}barnyard2");
 
 /* Create required log and db directories in /var */
 safe_mkdir(SNORTLOGDIR);
-safe_mkdir(IPREP_PATH);
-safe_mkdir(SID_MODS_PATH);
+safe_mkdir(SNORT_IPREP_PATH);
+safe_mkdir(SNORT_SID_MODS_PATH);
 
 /* If installed, absorb the Snort Dashboard Widget into this package */
 /* by removing it as a separately installed package.                 */

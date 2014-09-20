@@ -43,7 +43,7 @@ if (!is_array($config['installedpackages']['snortglobal']['rule']))
 
 // Hard-code the path where IP Lists are stored
 // and disregard any user-supplied path element.
-$iprep_path = IPREP_PATH;
+$iprep_path = SNORT_IPREP_PATH;
 
 // Set default to not show IP List editor controls
 $iplist_edit_style = "display: none;";

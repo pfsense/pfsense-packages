@@ -52,7 +52,7 @@ $pconfig['auto_manage_sids'] = $config['installedpackages']['snortglobal']['auto
 
 // Hard-code the path where SID Mods Lists are stored
 // and disregard any user-supplied path element.
-$sidmods_path = SID_MODS_PATH;
+$sidmods_path = SNORT_SID_MODS_PATH;
 
 // Set default to not show SID modification lists editor controls
 $sidmodlist_edit_style = "display: none;";

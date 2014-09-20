@@ -71,18 +71,23 @@ else {
 /* Be sure to include trailing slash on the URL defines */
 define("SNORTLOGDIR", "/var/log/snort");
 define("SNORT_BIN_VERSION", "2.9.6.2");
-define("ET_DNLD_FILENAME", "emerging.rules.tar.gz");
-define("ETPRO_DNLD_FILENAME", "etpro.rules.tar.gz");
-define("GPLV2_DNLD_FILENAME", "community-rules.tar.gz");
-define("FLOWBITS_FILENAME", "flowbit-required.rules");
-define("ENFORCING_RULES_FILENAME", "snort.rules");
-define("RULES_UPD_LOGFILE", SNORTLOGDIR . "/snort_rules_update.log");
-define("VRT_FILE_PREFIX", "snort_");
-define("GPL_FILE_PREFIX", "GPLv2_");
-define("ET_OPEN_FILE_PREFIX", "emerging-");
-define("ET_PRO_FILE_PREFIX", "etpro-");
-define("IPREP_PATH", "/var/db/snort/iprep/");
-define('SID_MODS_PATH', '/var/db/snort/sidmods/');
+define("SNORT_ET_DNLD_FILENAME", "emerging.rules.tar.gz");
+define("SNORT_ETPRO_DNLD_FILENAME", "etpro.rules.tar.gz");
+define("SNORT_GPLV2_DNLD_FILENAME", "community-rules.tar.gz");
+define("SNORT_ENFORCING_RULES_FILENAME", "snort.rules");
+define("SNORT_RULES_UPD_LOGFILE", SNORTLOGDIR . "/snort_rules_update.log");
+define("SNORT_IPREP_PATH", "/var/db/snort/iprep/");
+define('SNORT_SID_MODS_PATH', '/var/db/snort/sidmods/');
+if (!defined("FLOWBITS_FILENAME"))
+	define("FLOWBITS_FILENAME", "flowbit-required.rules");
+if (!defined("VRT_FILE_PREFIX"))
+	define("VRT_FILE_PREFIX", "snort_");
+if (!defined("GPL_FILE_PREFIX"))
+	define("GPL_FILE_PREFIX", "GPLv2_");
+if (!defined("ET_OPEN_FILE_PREFIX"))
+	define("ET_OPEN_FILE_PREFIX", "emerging-");
+if (!defined("ET_PRO_FILE_PREFIX"))
+	define("ET_PRO_FILE_PREFIX", "etpro-");
 
 /* Rebuild Rules Flag -- if "true", rebuild enforcing rules and flowbit-rules files */
 $rebuild_rules = false;
@@ -579,7 +584,7 @@ function snort_barnyard_start($snortcfg, $if_real, $background=FALSE) {
 		log_error("[Snort] Barnyard2 START for " . convert_real_interface_to_friendly_descr($if_real) . "({$if_real})...");
 		if ($background)
 			mwexec_bg("/usr/local/bin/barnyard2 -r {$snort_uuid} -f \"snort_{$snort_uuid}_{$if_real}.u2\" --pid-path {$g['varrun_path']} --nolock-pidfile -c {$snortdir}/snort_{$snort_uuid}_{$if_real}/barnyard2.conf -d {$snortlogdir}/snort_{$if_real}{$snort_uuid} -D -q");
-		else
+	else
 			mwexec("/usr/local/bin/barnyard2 -r {$snort_uuid} -f \"snort_{$snort_uuid}_{$if_real}.u2\" --pid-path {$g['varrun_path']} --nolock-pidfile -c {$snortdir}/snort_{$snort_uuid}_{$if_real}/barnyard2.conf -d {$snortlogdir}/snort_{$if_real}{$snort_uuid} -D -q");
 	}
 }
@@ -652,6 +657,7 @@ function snort_restart_all_interfaces() {
 		return;
 
 	snort_stop_all_interfaces();
+	sleep(2);
 	snort_start_all_interfaces(TRUE);
 }
 
@@ -1900,7 +1906,7 @@ function snort_write_enforcing_rules_file($rule_map, $rule_path) {
 	/*                rules file will be written.   */
 	/************************************************/
 
-	$rule_file = "/" . ENFORCING_RULES_FILENAME;
+	$rule_file = "/" . SNORT_ENFORCING_RULES_FILENAME;
 
 	/* See if we were passed a directory or full    */
 	/* filename to write the rules to, and adjust   */
@@ -2028,7 +2034,7 @@ function snort_sid_mgmt_auto_categories($snortcfg, $log_results = FALSE) {
 	/****************************************************/
 
 	global $config;
-	$snort_sidmods_dir = SID_MODS_PATH;
+	$snort_sidmods_dir = SNORT_SID_MODS_PATH;
 	$sid_mods = array();
 	$enables = array();
 	$disables = array();
@@ -2567,7 +2573,7 @@ function snort_process_enablesid(&$rule_map, $snortcfg, $log_results = FALSE, $l
 	/*                   $rule_map array          */
 	/**********************************************/
 
-	$snort_sidmods_dir = SID_MODS_PATH;
+	$snort_sidmods_dir = SNORT_SID_MODS_PATH;
 	$snortlogdir = SNORTLOGDIR;
 	$sid_mods = array();
 
@@ -2614,7 +2620,7 @@ function snort_process_disablesid(&$rule_map, $snortcfg, $log_results = FALSE, $
 	/*                   $rule_map array          */
 	/**********************************************/
 
-	$snort_sidmods_dir = SID_MODS_PATH;
+	$snort_sidmods_dir = SNORT_SID_MODS_PATH;
 	$snortlogdir = SNORTLOGDIR;
 	$sid_mods = array();
 
@@ -2661,7 +2667,7 @@ function snort_process_modifysid(&$rule_map, $snortcfg, $log_results = FALSE, $l
 	/*                   $rule_map array          */
 	/**********************************************/
 
-	$snort_sidmods_dir = SID_MODS_PATH;
+	$snort_sidmods_dir = SNORT_SID_MODS_PATH;
 	$snortlogdir = SNORTLOGDIR;
 	$sid_mods = array();
 
@@ -2991,9 +2997,9 @@ function snort_deinstall() {
 	$snortlibdir = SNORTLIBDIR;
 	$snortlogdir = SNORTLOGDIR;
 	$rcdir = RCFILEPREFIX;
-	$snort_rules_upd_log = RULES_UPD_LOGFILE;
-	$iprep_path = IPREP_PATH;
-	$sidmods_path = SID_MODS_PATH;
+	$snort_rules_upd_log = SNORT_RULES_UPD_LOGFILE;
+	$iprep_path = SNORT_IPREP_PATH;
+	$sidmods_path = SNORT_SID_MODS_PATH;
 
 	log_error(gettext("[Snort] Snort package uninstall in progress..."));
 
@@ -3137,7 +3143,7 @@ function snort_prepare_rule_files($snortcfg, $snortcfgdir) {
 
 	$snortdir = SNORTDIR;
 	$flowbit_rules_file = FLOWBITS_FILENAME;
-	$snort_enforcing_rules_file = ENFORCING_RULES_FILENAME;
+	$snort_enforcing_rules_file = SNORT_ENFORCING_RULES_FILENAME;
 	$enabled_files = array();
 	$all_rules = array();
 	$cat_mods = array();
@@ -3543,7 +3549,7 @@ function snort_generate_conf($snortcfg) {
 	$snortlibdir = SNORTLIBDIR;
 	$snortlogdir = SNORTLOGDIR;
 	$flowbit_rules_file = FLOWBITS_FILENAME;
-	$snort_enforcing_rules_file = ENFORCING_RULES_FILENAME;
+	$snort_enforcing_rules_file = SNORT_ENFORCING_RULES_FILENAME;
 
 	$if_real = get_real_interface($snortcfg['interface']);
 	$snort_uuid = $snortcfg['uuid'];
@@ -3676,7 +3682,7 @@ function snort_do_xmlrpc_sync($syncdownloadrules, $sync_to_ip, $port, $username,
 	/*************************************************/
 	/* Send over any auto-SID management files       */
 	/*************************************************/
-	$sid_files = glob(SID_MODS_PATH . '*');
+	$sid_files = glob(SNORT_SID_MODS_PATH . '*');
 	foreach ($sid_files as $file) {
 		$content = base64_encode(file_get_contents($file));
 		$payload = "@file_put_contents('{$file}', base64_decode('{$content}'));";
