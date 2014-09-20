@@ -130,12 +130,9 @@ if ($_POST['force']) {
 	conf_mount_rw();
 
 	// Remove the existing MD5 signature files to force a download
-	if (file_exists("{$suricatadir}{$emergingthreats_filename}.md5"))
-		@unlink("{$suricatadir}{$emergingthreats_filename}.md5");
-	if (file_exists("{$suricatadir}{$snort_community_rules_filename}.md5"))
-		@unlink("{$suricatadir}{$snort_community_rules_filename}.md5");
-	if (file_exists("{$suricatadir}{$snort_rules_file}.md5"))
-		@unlink("{$suricatadir}{$snort_rules_file}.md5");
+	unlink_if_exists("{$suricatadir}{$emergingthreats_filename}.md5");
+	unlink_if_exists("{$suricatadir}{$snort_community_rules_filename}.md5");
+	unlink_if_exists("{$suricatadir}{$snort_rules_file}.md5");
 
 	// Revert file system to R/O.
 	conf_mount_ro();

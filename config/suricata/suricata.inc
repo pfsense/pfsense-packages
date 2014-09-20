@@ -685,7 +685,7 @@ function sync_suricata_package_config() {
 
 	// Do not start config build if there are no Suricata-configured interfaces
 	if (!is_array($config['installedpackages']['suricata']) || !is_array($config['installedpackages']['suricata']['rule'])) {
-		@unlink("{$rcdir}suricata.sh");
+		unlink_if_exists("{$rcdir}suricata.sh");
 		conf_mount_ro();
 		return;
 	}
@@ -853,19 +853,19 @@ function suricata_post_delete_logs($suricata_uuid = 0) {
 			// Keep most recent file
 			unset($filelist[count($filelist) - 1]);
 			foreach ($filelist as $file)
-				@unlink($file);
+				unlink_if_exists($file);
 
 			/* Clean-up Barnyard2 archived files if any exist */
 			$filelist = glob("{$suricata_log_dir}/barnyard2/archive/unified2.alert.*");
 			foreach ($filelist as $file)
-				@unlink($file);
+				unlink_if_exists($file);
 
 			/* Clean-up packet capture files if any exist */
 			$filelist = glob("{$suricata_log_dir}/log.pcap.*");
 			// Keep most recent file
 			unset($filelist[count($filelist) - 1]);
 			foreach ($filelist as $file)
-				@unlink($file);
+				unlink_if_exists($file);
 			unset($filelist);
 		}
 	}

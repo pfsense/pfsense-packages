@@ -142,8 +142,7 @@ if ($_POST["save"]) {
 		$a_nat[$id]['autoflowbitrules'] = 'on';
 	else {
 		$a_nat[$id]['autoflowbitrules'] = 'off';
-		if (file_exists("{$suricatadir}suricata_{$suricata_uuid}_{$if_real}/rules/{$flowbit_rules_file}"))
-			@unlink("{$suricatadir}suricata_{$suricata_uuid}_{$if_real}/rules/{$flowbit_rules_file}");
+		unlink_if_exists("{$suricatadir}suricata_{$suricata_uuid}_{$if_real}/rules/{$flowbit_rules_file}");
 	}
 
 	write_config("Suricata pkg: save enabled rule categories for {$a_nat[$id]['interface']}.");

@@ -80,7 +80,7 @@ install_cron_job("{$suri_pf_table}" , false);
 /* See if we are to keep Suricata log files on uninstall */
 if ($config['installedpackages']['suricata']['config'][0]['clearlogs'] == 'on') {
 	log_error(gettext("[Suricata] Clearing all Suricata-related log files..."));
-	@unlink("{$suricata_rules_upd_log}");
+	unlink_if_exists("{$suricata_rules_upd_log}");
 	rmdir_recursive("{$suricatalogdir}");
 }
 
@@ -112,9 +112,9 @@ if (!empty($widgets)) {
 	$config['widgets']['sequence'] = implode(",", $widgetlist);
 	write_config("Suricata pkg: remove Suricata Dashboard Widget on package deinstall.");
 }
-@unlink("/usr/local/www/widgets/include/widget-suricata.inc");
-@unlink("/usr/local/www/widgets/widgets/suricata_alerts.widget.php");
-@unlink("/usr/local/www/widgets/javascript/suricata_alerts.js");
+unlink_if_exists("/usr/local/www/widgets/include/widget-suricata.inc");
+unlink_if_exists("/usr/local/www/widgets/widgets/suricata_alerts.widget.php");
+unlink_if_exists("/usr/local/www/widgets/javascript/suricata_alerts.js");
 
 // Finished with filesystem mods so remount it read-only
 conf_mount_ro();
@@ -124,7 +124,7 @@ if ($config['installedpackages']['suricata']['config'][0]['forcekeepsettings'] !
 	log_error(gettext("Not saving settings... all Suricata configuration info and logs deleted..."));
 	unset($config['installedpackages']['suricata']);
 	unset($config['installedpackages']['suricatasync']);
-	@unlink("{$suricata_rules_upd_log}");
+	unlink_if_exists("{$suricata_rules_upd_log}");
 	rmdir_recursive("{$suricatalogdir}");
 	rmdir_recursive("{$sidmodspath}");
 	rmdir_recursive("{$iprep_path}");
