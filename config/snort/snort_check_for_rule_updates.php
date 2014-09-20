@@ -670,7 +670,7 @@ function snort_apply_customizations($snortcfg, $if_real) {
 
 	/* Update the Preprocessor rules from the master configuration for the interface if Snort */
 	/* VRT rules are in use and the interface's preprocessor rules are not protected.         */
-	if ($vrt_enabled == 'on' && $snortcfg['protect_preproc_rules'] != 'on') {
+	if ($vrt_enabled == 'on' && ($snortcfg['protect_preproc_rules'] != 'on' || $g['snort_postinstall'])) {
 		$preproc_files = glob("{$snortdir}/preproc_rules/*.rules");
 		foreach ($preproc_files as $file) {
 			$newfile = basename($file);
@@ -793,8 +793,10 @@ if ($snortdownload == 'on' || $emergingthreats == 'on' || $snortcommunityrules =
 				touch("{$g['varrun_path']}/barnyard2_{$snortcfg['uuid']}.disabled");
 				snort_stop($snortcfg, $if_real);
 				sleep(1);
-				if ($pkg_interface <> "console")
+				if ($pkg_interface <> "console") {
+					update_output_window(gettext("Starting Snort on " . convert_friendly_interface_to_friendly_descr($snortcfg['interface']) . "..."));
 					snort_start($snortcfg, $if_real, FALSE);
+				}
 				else
 					snort_start($snortcfg, $if_real, TRUE);
 				unlink_if_exists("{$g['varrun_path']}/snort_{$snortcfg['uuid']}.disabled");
