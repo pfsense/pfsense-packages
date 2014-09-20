@@ -60,8 +60,8 @@ if (!defined("GPLV2_DNLD_FILENAME"))
 	define("GPLV2_DNLD_FILENAME", "community-rules.tar.gz");
 if (!defined("GPLV2_DNLD_URL"))
 	define("GPLV2_DNLD_URL", "https://s3.amazonaws.com/snort-org/www/rules/community/");
-if (!defined("RULES_UPD_LOGFILE"))
-	define("RULES_UPD_LOGFILE", SURICATALOGDIR . "/suricata_rules_update.log");
+if (!defined("SURICATA_RULES_UPD_LOGFILE"))
+	define("SURICATA_RULES_UPD_LOGFILE", SURICATALOGDIR . "/suricata_rules_update.log");
 if (!defined("VRT_FILE_PREFIX"))
 	define("VRT_FILE_PREFIX", "snort_");
 if (!defined("GPL_FILE_PREFIX"))
@@ -73,7 +73,7 @@ if (!defined("ET_PRO_FILE_PREFIX"))
 
 $suricatadir = SURICATADIR;
 $suricatalogdir = SURICATALOGDIR;
-$suricata_rules_upd_log = RULES_UPD_LOGFILE;
+$suricata_rules_upd_log = SURICATA_RULES_UPD_LOGFILE;
 
 /* Save the state of $pkg_interface so we can restore it */
 $pkg_interface_orig = $pkg_interface;

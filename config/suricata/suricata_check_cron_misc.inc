@@ -66,9 +66,9 @@ function suricata_check_dir_size_limit($suricataloglimitsize) {
 		conf_mount_rw();
 
 		// Truncate the Rules Update Log file if it exists
-		if (file_exists(RULES_UPD_LOGFILE)) {
+		if (file_exists(SURICATA_RULES_UPD_LOGFILE)) {
 			log_error(gettext("[Suricata] Truncating the Rules Update Log file..."));
-			@file_put_contents(RULES_UPD_LOGFILE, "");
+			@file_put_contents(SURICATA_RULES_UPD_LOGFILE, "");
 		}
 
 		// Initialize an array of the log files we want to prune

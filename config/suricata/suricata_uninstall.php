@@ -44,10 +44,10 @@ global $config, $g;
 
 $suricatadir = SURICATADIR;
 $suricatalogdir = SURICATALOGDIR;
-$sidmodspath = SID_MODS_PATH;
-$iprep_path = IPREP_PATH;
+$sidmodspath = SURICATA_SID_MODS_PATH;
+$iprep_path = SURICATA_IPREP_PATH;
 $rcdir = RCFILEPREFIX;
-$suricata_rules_upd_log = RULES_UPD_LOGFILE;
+$suricata_rules_upd_log = SURICATA_RULES_UPD_LOGFILE;
 $suri_pf_table = SURICATA_PF_TABLE;
 
 log_error(gettext("[Suricata] Suricata package uninstall in progress..."));

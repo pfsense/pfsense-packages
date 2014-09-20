@@ -64,10 +64,10 @@ global $config, $g, $rebuild_rules, $pkg_interface, $suricata_gui_include;
  * updated version icluded with the     *
  * updated GUI package.                 *
  ****************************************/
-if (!defined('SID_MODS_PATH'))
-	define('SID_MODS_PATH', '/var/db/suricata/sidmods/');
-if (!defined('IPREP_PATH'))
-	define('IPREP_PATH', '/var/db/suricata/iprep/');
+if (!defined('SURICATA_SID_MODS_PATH'))
+	define('SURICATA_SID_MODS_PATH', '/var/db/suricata/sidmods/');
+if (!defined('SURICATA_IPREP_PATH'))
+	define('SURICATA_IPREP_PATH', '/var/db/suricata/iprep/');
 
 /****************************************
  * End of PHP cachine workaround        *
@@ -77,7 +77,7 @@ if (!defined('IPREP_PATH'))
 $suricatadir = SURICATADIR;
 $suricatalogdir = SURICATALOGDIR;
 $flowbit_rules_file = FLOWBITS_FILENAME;
-$suricata_enforcing_rules_file = ENFORCING_RULES_FILENAME;
+$suricata_enforcing_rules_file = SURICATA_ENFORCING_RULES_FILENAME;
 $rcdir = RCFILEPREFIX;
 
 // Hard kill any running Suricata process that may have been started by any
@@ -109,8 +109,8 @@ conf_mount_rw();
 safe_mkdir(SURICATALOGDIR);
 
 // Create the IP Rep and SID Mods lists directory
-safe_mkdir(SID_MODS_PATH);
-safe_mkdir(IPREP_PATH);
+safe_mkdir(SURICATA_SID_MODS_PATH);
+safe_mkdir(SURICATA_IPREP_PATH);
 
 // remake saved settings if previously flagged
 if ($config['installedpackages']['suricata']['config'][0]['forcekeepsettings'] == 'on') {

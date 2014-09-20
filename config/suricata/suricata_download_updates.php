@@ -44,7 +44,7 @@ require_once("/usr/local/pkg/suricata/suricata.inc");
 
 /* Define some locally required variables from Suricata constants */
 $suricatadir = SURICATADIR;
-$suricata_rules_upd_log = RULES_UPD_LOGFILE;
+$suricata_rules_upd_log = SURICATA_RULES_UPD_LOGFILE;
 
 $snortdownload = $config['installedpackages']['suricata']['config'][0]['enable_vrt_rules'];
 $emergingthreats = $config['installedpackages']['suricata']['config'][0]['enable_etopen_rules'];
