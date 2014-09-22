@@ -32,6 +32,7 @@
 require_once("functions.inc");
 require_once("pkg-utils.inc");
 require_once("notices.inc");
+require_once("filter.inc");
 require_once("haproxy_utils.inc");
 require_once("haproxy_xmlrpcsyncclient.inc");
 
@@ -66,7 +67,7 @@ $a_acltypes["ssl_c_verify"] = array('name' => 'SSL Client certificate valid.',
 				'mode' => 'http', 'syntax' => 'ssl_fc_has_crt ssl_c_verify 0 ');
 $a_acltypes["ssl_c_ca_commonname"] = array('name' => 'SSL Client issued by CA common-name:',
 				'mode' => 'http', 'syntax' => 'ssl_c_i_dn(CN) %1$s');
-$a_acltypes["source_ip"] = array('name' => 'Source IP:',
+$a_acltypes["source_ip"] = array('name' => 'Source IP matches IP or Alias:',
 				'mode' => '', 'syntax' => 'src %1$s');
 $a_acltypes["backendservercount"] = array('name' => 'Minimum count usable servers:',
 				'mode' => '', 'syntax' => 'nbsrv(%2$s) ge %1$d', 'parameters' => 'value,backendname');
@@ -78,11 +79,13 @@ $a_acltypes["traffic_is_ssl"] = array('name' => 'Traffic is ssl (no value needed
 $a_acltypes["ssl_sni_matches"] = array('name' => 'Server Name Indication TLS extension matches:', 'inspect-delay' => '5',
 				'mode' => 'https', 'syntax' => 'req.ssl_sni -i %1$s', 'advancedoptions' => "tcp-request content accept if { req.ssl_hello_type 1 }");
 $a_acltypes["ssl_sni_contains"] = array('name' => 'Server Name Indication TLS extension contains:', 'inspect-delay' => '5',
-				'mode' => 'https', 'syntax' => 'req.ssl_sni -m sub -i example %1$s', 'advancedoptions' => "tcp-request content accept if { req.ssl_hello_type 1 }");
+				'mode' => 'https', 'syntax' => 'req.ssl_sni -m sub -i %1$s', 'advancedoptions' => "tcp-request content accept if { req.ssl_hello_type 1 }");
 $a_acltypes["ssl_sni_starts_with"] = array('name' => 'Server Name Indication TLS extension starts with:', 'inspect-delay' => '5',
-				'mode' => 'https', 'syntax' => 'req.ssl_sni -m beg -i example %1$s', 'advancedoptions' => "tcp-request content accept if { req.ssl_hello_type 1 }");
+				'mode' => 'https', 'syntax' => 'req.ssl_sni -m beg -i %1$s', 'advancedoptions' => "tcp-request content accept if { req.ssl_hello_type 1 }");
 $a_acltypes["ssl_sni_ends_with"] = array('name' => 'Server Name Indication TLS extension ends with:', 'inspect-delay' => '5',
-				'mode' => 'https', 'syntax' => 'req.ssl_sni -m end -i example %1$s', 'advancedoptions' => "tcp-request content accept if { req.ssl_hello_type 1 }");
+				'mode' => 'https', 'syntax' => 'req.ssl_sni -m end -i %1$s', 'advancedoptions' => "tcp-request content accept if { req.ssl_hello_type 1 }");
+$a_acltypes["custom"] = array('name' => 'Custom acl:',
+				'mode' => '', 'syntax' => '%1$s');
 
 global $a_checktypes;
 $a_checktypes = array();
@@ -95,7 +98,7 @@ $a_checktypes['HTTP'] = array('name' => 'HTTP', 'syntax' => 'httpchk',
 // 'Agent' was added in HAProxy1.5dev18, and removed in 1.5dev20, in favor of the seperate agent-check option.
 $a_checktypes['Agent'] = array('name' => 'Agent', 'syntax' => 'lb-agent-chk', 'usedifferenport' => 'yes', 
 	'descr' => 'Use a TCP connection to read an ASCII string of the form 100%,75%,drain,down (others in haproxy manual)',
-	deprecated => true);
+	'deprecated' => true);
 $a_checktypes['LDAP'] = array('name' => 'LDAP', 'syntax' => 'ldap-check',
 	'descr' => 'Use LDAPv3 health checks for server testing');
 $a_checktypes['MySQL'] = array('name' => 'MySQL', 'syntax' => 'mysql-check',
@@ -259,6 +262,16 @@ function haproxy_portoralias_to_list($port_or_alias) {
 	}
 	else 
 		return null;
+}
+
+function haproxy_hostoralias_to_list($host_or_alias) {
+	if (is_alias($host_or_alias)){
+		$result = filter_expand_alias_array($host_or_alias);
+	} else {
+		$result = array();
+		$result[] = $host_or_alias;
+	}
+	return $result;
 }
 
 function haproxy_custom_php_deinstall_command() {
@@ -1144,8 +1157,16 @@ function haproxy_writeconf($configpath) {
 						// Filter out acls for different modes
 						if ($acl['mode'] != '' && $acl['mode'] != strtolower($bind['type']))
 							continue;
-
-						$expr = sprintf($acl['syntax'],$entry['value'],$poolname);
+						if (($entry['expression'] == "source_ip") && is_alias($entry['value'])) {
+							$filename = "$configpath/ipalias_{$entry['value']}.lst";
+							$listitems = haproxy_hostoralias_to_list($entry['value']);
+							$fd_alias = fopen("$filename", "w");
+							foreach($listitems as $item)
+								fwrite($fd_alias, $item."\r\n");
+							fclose($fd_alias);
+							$expr = "src -f $filename";
+						} else
+							$expr = sprintf($acl['syntax'],$entry['value'],$poolname);
 
 						$aclname = $i . "_" . $entry['name'];
 						$aclnames .= $aclname." ";
@@ -1560,31 +1581,6 @@ function get_haproxy_frontends($excludeitem="") {
 	return $result;
 }
 
-function explode_ports($ports_list) {
-	$ports_list = split(",", $ports_list);
-	$result = array();
-	foreach($ports_list as $port){
-		//$result = array_merge($result,haproxy_portoralias_to_list($port));
-		$items = haproxy_portoralias_to_list($port);
-		foreach($items as $item){
-			if (is_portrange($item)) {
-				$portrange = explode(":", $item);
-				for($i=$portrange[0];$i<=$portrange[1];$i++)
-					$result[] = $i;
-			} else if (is_port($item)) // in pfSense 2.1 is_port returns true for a portrange also..
-				$result[] = $item;
-		}
-	}
-	//$result = group_ports($result); << deze maakt er weer portranges van.. maar zoekt wel de unieke. wat dan wel weer handig was.
-	return $result;
-}
-
-function get_frontend_ports($mainfrontend) {
-
-	$ports = $mainfrontend['port'];	
-	return explode_ports($ports);
-}
-
 function generate_cert_acl($crt, $defaultport, $nondefaultport){
 	// The host header send by a browser will contain the portnumber when a nondefault port is used for the server side.
 
@@ -1620,19 +1616,18 @@ function get_frontend_acls($frontend) {
 	
 		$poolname = $frontend['backend_serverpool'] . "_" . strtolower($frontend['type']);
 		$aclname = "SNI_" . $poolname;
-		//$ports = get_frontend_ports($mainfrontend);
 		
-		if ($frontend['ssloffloadacl'] || $frontend['ssloffloadaclnondefault']) {
+		if (isset($frontend['ssloffloadacl']) || isset($frontend['ssloffloadaclnondefault'])) {
 			$cert = lookup_cert($frontend['ssloffloadcert']);
 			$cert_cn = cert_get_cn($cert['crt']);
 			$descr = haproxy_escape_acl_name($cert['descr']);
 			unset($cert);
 			
 			$acl_item = array();
-			if ($frontend['ssloffloadacl'] && $frontend['ssloffloadaclnondefault']) {
+			if (isset($frontend['ssloffloadacl']) && isset($frontend['ssloffloadaclnondefault'])) {
 				$acl_item['descr'] = "Certificate ACL match regex: ^{$cert_cn}(:([0-9]){1,5})?$";
 				$acl_item['ref'] = array('name' => "{$aclname}_{$descr}",'expression' => 'host_regex', 'value' => "^{$cert_cn}(:([0-9]){1,5})?$");
-			} elseif ($frontend['ssloffloadaclnondefault']) {
+			} elseif (isset($frontend['ssloffloadaclnondefault'])) {
 				$acl_item['descr'] = "Certificate ACL starts with: {$cert_cn}:";
 				$acl_item['ref'] = array('name' => "{$aclname}_{$descr}",'expression' => 'host_starts_with', 'value' => $cert_cn.":");
 			} else {
@@ -1641,7 +1636,7 @@ function get_frontend_acls($frontend) {
 			}
 			$result[] = $acl_item;
 		}
-		if ($frontend['ssloffloadacladditional'] || $frontend['ssloffloadacladditionalnondefault']) {
+		if (isset($frontend['ssloffloadacladditional']) || isset($frontend['ssloffloadacladditionalnondefault'])) {
 			$certs = $frontend['ha_certificates']['item'];
 			if (is_array($certs)){
 				foreach($certs as $certref){
@@ -1651,10 +1646,10 @@ function get_frontend_acls($frontend) {
 					unset($cert);
 					
 					$acl_item = array();
-					if ($frontend['ssloffloadacladditional'] && $frontend['ssloffloadacladditionalnondefault']) {
+					if (isset($frontend['ssloffloadacladditional']) && isset($frontend['ssloffloadacladditionalnondefault'])) {
 						$acl_item['descr'] = "Certificate ACL match regex: ^{$cert_cn}(:([0-9]){1,5})?$";
 						$acl_item['ref'] = array('name' => "{$aclname}_{$descr}",'expression' => 'host_regex', 'value' => "^({$cert_cn}(($)|(:.*)))");
-					} elseif ($frontend['ssloffloadacladditionalnondefault']) {
+					} elseif (isset($frontend['ssloffloadacladditionalnondefault'])) {
 						$acl_item['descr'] = "Certificate ACL starts with: {$cert_cn}:";
 						$acl_item['ref'] = array('name' => "{$aclname}_{$descr}",'expression' => 'host_starts_with', 'value' => $cert_cn.":");
 					} else {

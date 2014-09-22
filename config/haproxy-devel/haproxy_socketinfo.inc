@@ -122,6 +122,8 @@ function haproxy_get_clients($show_traffic = false){// "show sess"
 	$clients=array();
 	$sessions = haproxy_socket_command("show sess");
 	foreach($sessions as $line) {
+		if (trim($line) == "")
+			continue;
 		list($sessid,$proto,$src,$fe,$be,$srv,$ts,$age,$calls,$rq,$rp,$s0,$s1,$exp) = explode(" ", $line);
 		#Retrieve data
 		$sessid = explode(":", $sessid);
@@ -149,10 +151,10 @@ function haproxy_get_clients($show_traffic = false){// "show sess"
 			$session_data = haproxy_socket_command("show sess {$client['sessid']}");
 			$client['session_data'] = $session_data;
 			
-			$req = explode(" ",$session_data[13]);
+			$req = explode(" ",$session_data[12]);
 			$x = explode("=",$req[7]);
 			$client['session_datareq'] = $x[1];
-			$res = explode(" ",$session_data[16]);
+			$res = explode(" ",$session_data[15]);
 			$x = explode("=",$res[7]);
 			$client['session_datares'] = $x[1];
 		}
