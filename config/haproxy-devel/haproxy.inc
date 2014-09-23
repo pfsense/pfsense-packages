@@ -1417,15 +1417,29 @@ function haproxy_check_run($reload) {
 		} else
 			mwexec("/usr/local/sbin/ipfw_context -d haproxy", true);
 		
+		if (file_exists('/var/run/haproxy.pid')){
+			$old_pid = file_get_contents('/var/run/haproxy.pid');
+		} else
+			$old_pid = 'none';
+		
 		if (haproxy_is_running()) {
 			if (isset($a_global['terminate_on_reload']))
 				$sf_st = "-st";//terminate old process as soon as the new process is listening
 			else
 				$sf_st = "-sf";//finish serving existing connections exit when done, and the new process is listening
+			
+			syslog(LOG_NOTICE, "haproxy: reload old pid:$old_pid");
 			exec("/usr/local/sbin/haproxy -f {$configpath}/haproxy.cfg -p /var/run/haproxy.pid $sf_st `cat /var/run/haproxy.pid` 2>&1", $output, $errcode);
 		} else {
+			syslog(LOG_NOTICE, "haproxy: starting old pid:$old_pid");
 			exec("/usr/local/sbin/haproxy -f {$configpath}/haproxy.cfg -p /var/run/haproxy.pid -D 2>&1", $output, $errcode);
 		}
+		if (file_exists('/var/run/haproxy.pid')){
+			$new_pid = file_get_contents('/var/run/haproxy.pid');
+		} else
+			$new_pid = 'none';
+		syslog(LOG_NOTICE, "haproxy: started new pid:$new_pid");
+		
 		foreach($output as $line)
 			$haproxy_run_message .= "<br/>" . htmlspecialchars($line) . "\n";
 	} else {
@@ -1617,17 +1631,17 @@ function get_frontend_acls($frontend) {
 		$poolname = $frontend['backend_serverpool'] . "_" . strtolower($frontend['type']);
 		$aclname = "SNI_" . $poolname;
 		
-		if (isset($frontend['ssloffloadacl']) || isset($frontend['ssloffloadaclnondefault'])) {
+		if (ifset($frontend['ssloffloadacl']) == 'yes' || ifset($frontend['ssloffloadaclnondefault']) == 'yes') {
 			$cert = lookup_cert($frontend['ssloffloadcert']);
 			$cert_cn = cert_get_cn($cert['crt']);
 			$descr = haproxy_escape_acl_name($cert['descr']);
 			unset($cert);
 			
 			$acl_item = array();
-			if (isset($frontend['ssloffloadacl']) && isset($frontend['ssloffloadaclnondefault'])) {
+			if (ifset($frontend['ssloffloadacl']) == 'yes' && ifset($frontend['ssloffloadaclnondefault']) == 'yes') {
 				$acl_item['descr'] = "Certificate ACL match regex: ^{$cert_cn}(:([0-9]){1,5})?$";
 				$acl_item['ref'] = array('name' => "{$aclname}_{$descr}",'expression' => 'host_regex', 'value' => "^{$cert_cn}(:([0-9]){1,5})?$");
-			} elseif (isset($frontend['ssloffloadaclnondefault'])) {
+			} elseif (ifset($frontend['ssloffloadaclnondefault']) == 'yes') {
 				$acl_item['descr'] = "Certificate ACL starts with: {$cert_cn}:";
 				$acl_item['ref'] = array('name' => "{$aclname}_{$descr}",'expression' => 'host_starts_with', 'value' => $cert_cn.":");
 			} else {
@@ -1636,7 +1650,7 @@ function get_frontend_acls($frontend) {
 			}
 			$result[] = $acl_item;
 		}
-		if (isset($frontend['ssloffloadacladditional']) || isset($frontend['ssloffloadacladditionalnondefault'])) {
+		if (ifset($frontend['ssloffloadacladditional']) == 'yes' || ifset($frontend['ssloffloadacladditionalnondefault']) == 'yes') {
 			$certs = $frontend['ha_certificates']['item'];
 			if (is_array($certs)){
 				foreach($certs as $certref){
@@ -1646,10 +1660,10 @@ function get_frontend_acls($frontend) {
 					unset($cert);
 					
 					$acl_item = array();
-					if (isset($frontend['ssloffloadacladditional']) && isset($frontend['ssloffloadacladditionalnondefault'])) {
+					if (ifset($frontend['ssloffloadacladditional']) == 'yes' && ifset($frontend['ssloffloadacladditionalnondefault']) == 'yes') {
 						$acl_item['descr'] = "Certificate ACL match regex: ^{$cert_cn}(:([0-9]){1,5})?$";
 						$acl_item['ref'] = array('name' => "{$aclname}_{$descr}",'expression' => 'host_regex', 'value' => "^({$cert_cn}(($)|(:.*)))");
-					} elseif (isset($frontend['ssloffloadacladditionalnondefault'])) {
+					} elseif (ifset($frontend['ssloffloadacladditionalnondefault']) == 'yes') {
 						$acl_item['descr'] = "Certificate ACL starts with: {$cert_cn}:";
 						$acl_item['ref'] = array('name' => "{$aclname}_{$descr}",'expression' => 'host_starts_with', 'value' => $cert_cn.":");
 					} else {
@@ -1721,13 +1735,17 @@ function haproxy_find_create_certificate($certificatename) {
 	$cert = array();
 	$cert['refid'] = uniqid();
 	$cert['descr'] = gettext($certificatename);
-	mwexec("/usr/local/bin/openssl genrsa 1024 > {$g['tmp_path']}/ssl.key");
-	mwexec("/usr/local/bin/openssl req -new -x509 -nodes -sha256 -days 2000 -key {$g['tmp_path']}/ssl.key > {$g['tmp_path']}/ssl.crt");
-	$crt = file_get_contents("{$g['tmp_path']}/ssl.crt");
-	$key = file_get_contents("{$g['tmp_path']}/ssl.key");
-	unlink("{$g['tmp_path']}/ssl.key");
-	unlink("{$g['tmp_path']}/ssl.crt");
-	cert_import($cert, $crt, $key);
+	
+	$new_cert = array();
+	$dn = array(
+		"organizationName" => "haproxy-pfsense",
+		"commonName"       => "haproxy-pfsense"
+	);
+	$new_cert = array();
+	ca_create($new_cert, 1024, 2000, $dn);
+	$crt = base64_decode($new_cert['crt']);
+	$prv = base64_decode($new_cert['prv']);
+	cert_import($cert, $crt, $prv);
 	$a_cert[] = $cert;
 	return $cert;
 }

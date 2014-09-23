@@ -33,6 +33,12 @@
 
 require_once("config.inc");
 
+if(!function_exists('ifset')){
+	function ifset(&$var, $default = ''){
+		return isset($var) ? $var : $default;
+	};
+}
+
 function haproxy_compareByName($a, $b) {
 	return strcasecmp($a['name'], $b['name']);
 }
@@ -291,24 +297,28 @@ function haproxy_get_certificates($type = 'server,user', $get_includeWebCert=fal
 	$type = ",$type,";
 	$certificates = array();
 	if (strpos($type,',server,') !== false || strpos($type,',user,') !== false ) {
-		$a_cert = &$config['cert'];
-		foreach ($a_cert as $cert) {
-			$purpose = cert_get_purpose($cert['crt']);
-			
-			$ok = false;
-			$ok |= stristr($type,',server,') && $purpose['server'] == 'Yes';
-			$ok |= stristr($type,',user,') && $purpose['server'] != 'Yes';
-			if (!$ok)
-				continue;
-			if ($get_includeWebCert == false && is_webgui_cert($cert['refid']))
-				continue;
-			$certificates[$cert['refid']]['name'] = haproxy_get_certificate_descriptivename($cert);
+		if (is_array($config['cert'])) {
+			$a_cert = &$config['cert'];
+			foreach ($a_cert as $cert) {
+				$purpose = cert_get_purpose($cert['crt']);
+				
+				$ok = false;
+				$ok |= stristr($type,',server,') && $purpose['server'] == 'Yes';
+				$ok |= stristr($type,',user,') && $purpose['server'] != 'Yes';
+				if (!$ok)
+					continue;
+				if ($get_includeWebCert == false && is_webgui_cert($cert['refid']))
+					continue;
+				$certificates[$cert['refid']]['name'] = haproxy_get_certificate_descriptivename($cert);
+			}
 		}
 	}
 	if (strpos($type,',ca,') !== false) {
-		$a_cert = &$config['ca'];
-		foreach ($a_cert as $cert) {
-			$certificates[$cert['refid']]['name'] = haproxy_get_certificate_descriptivename($cert);
+		if (is_array($config['ca'])) {
+			$a_cert = &$config['ca'];
+			foreach ($a_cert as $cert) {
+				$certificates[$cert['refid']]['name'] = haproxy_get_certificate_descriptivename($cert);
+			}
 		}
 	}
 	uasort($certificates, haproxy_compareByName);
@@ -318,13 +328,15 @@ function haproxy_get_certificates($type = 'server,user', $get_includeWebCert=fal
 function haproxy_get_crls() {
 	global $config;
 	$certificates=array();
-	foreach ($config['crl'] as $crl) {
-		$caname = "";
-		$ca = lookup_ca($crl['caref']);
-		if ($ca)
-			$caname = " (CA: {$ca['descr']})";
-	
-		$certificates[$crl['refid']]['name'] = $crl['descr'] . $caname;
+	if (is_array($config['crl'])) {
+		foreach ($config['crl'] as $crl) {
+			$caname = "";
+			$ca = lookup_ca($crl['caref']);
+			if ($ca)
+				$caname = " (CA: {$ca['descr']})";
+		
+			$certificates[$crl['refid']]['name'] = $crl['descr'] . $caname;
+		}
 	}
 	uasort($certificates, haproxy_compareByName);
 	return $certificates;
