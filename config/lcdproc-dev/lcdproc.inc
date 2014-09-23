@@ -308,7 +308,7 @@
 					$config_text .= "[{$lcdproc_config['driver']}]\n";
 					$config_text .= "driverpath=/usr/local/lib/lcdproc/\n";
 					$config_text .= "ConnectionType={$lcdproc_config['connection_type']}\n";
-					if($realport != "none")
+					if($lcdproc_config['comport'] != "none")
 						$config_text .= "Device={$realport}\n";
 					$config_text .= "Port=0x378\n"; 
 					$config_text .= "Speed=0\n";
