@@ -31,7 +31,7 @@
 	<requirements>none</requirements>
 	<faq>https://forum.pfsense.org/index.php/topic,26974.0.html</faq>
 	<name>File Manager</name>
-	<version>0.1.2</version>
+	<version>0.1.4</version>
 	<title>Settings</title>
 	<include_file>/usr/local/pkg/filemgr.inc</include_file>
 	<menu>
