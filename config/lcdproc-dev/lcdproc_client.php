@@ -554,11 +554,11 @@
 	  /* format speed in bits/sec, input: bytes/sec 
 	  Code from: graph.php ported to PHP*/	  
 	  if ($speed < 125000)
-		{return sprintf("%3d.1 Kbps", $speed / 125);}		
+		{return sprintf("%5.1f Kbps", $speed / 125);}		
 	  if ($speed < 125000000)
-		{return sprintf("%3d.1 Mbps", $speed / 125000);}
+		{return sprintf("%5.1f Mbps", $speed / 125000);}
 	  // else
-	  return sprintf("%3d.1 Gbps", $speed / 125000000);
+	  return sprintf("%5.1f Gbps", $speed / 125000000);
 	}
 	
 	function add_summary_declaration(&$lcd_cmds, $name) {
