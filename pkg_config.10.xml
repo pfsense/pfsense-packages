@@ -134,39 +134,6 @@
 		<configurationfile>anyterm.xml</configurationfile>
 	</package>
 	<package>
-		<name>haproxy</name>
-		<pkginfolink>https://doc.pfsense.org/index.php/haproxy_package</pkginfolink>
-		<descr><![CDATA[The Reliable, High Performance TCP/HTTP Load Balancer<br />
-				This package implements both TCP and HTTP balance features from Haproxy.<br />
-				Supports acl's for smart backend switching.]]></descr>
-		<website>http://haproxy.1wt.eu/</website>
-		<category>Services</category>
-		<version>1.4.24_1 pkg v 1.2.5</version>
-		<status>Release</status>
-		<required_version>2.2</required_version>
-		<config_file>https://packages.pfsense.org/packages/config/haproxy/haproxy.xml</config_file>
-		<configurationfile>haproxy.xml</configurationfile>
-		<depends_on_package_pbi>haproxy-1.4.24_1-##ARCH##.pbi</depends_on_package_pbi>
-		<build_pbi>
-			<port>net/haproxy</port>
-		</build_pbi>
-	</package>
-	<package>
-		<name>haproxy-full</name>
-		<pkginfolink>https://doc.pfsense.org/index.php/haproxy_package</pkginfolink>
-		<descr><![CDATA[The Reliable, High Performance TCP/HTTP Load Balancer<br />
-				This package implements both TCP and HTTP balance features from Haproxy.<br />
-				(Legacy version)]]></descr>
-		<website>http://haproxy.1wt.eu/</website>
-		<category>Services</category>
-		<version>1.4.24_1 pkg v 1.1.1</version>
-		<status>Release</status>
-		<required_version>2.2</required_version>
-		<config_file>https://packages.pfsense.org/packages/config/haproxy-legacy/haproxy.xml</config_file>
-		<configurationfile>haproxy.xml</configurationfile>
-		<depends_on_package_pbi>haproxy-1.4.24_1-##ARCH##.pbi</depends_on_package_pbi>
-	</package>
-	<package>
 		<name>haproxy-devel</name>
 		<pkginfolink>https://doc.pfsense.org/index.php/haproxy_package</pkginfolink>
 		<descr><![CDATA[The Reliable, High Performance TCP/HTTP(s) Load Balancer<br />
@@ -174,12 +141,12 @@
 				Supports acl's for smart backend switching.]]></descr>
 		<website>http://haproxy.1wt.eu/</website>
 		<category>Services</category>
-		<version>1.5-dev26 pkg v 0.8</version>
+		<version>1.5.3 pkg v 0.11</version>
 		<status>Release</status>
 		<required_version>2.2</required_version>
 		<config_file>https://packages.pfsense.org/packages/config/haproxy-devel/haproxy.xml</config_file>
 		<configurationfile>haproxy.xml</configurationfile>
-		<depends_on_package_pbi>haproxy-devel-1.5-dev26-##ARCH##.pbi</depends_on_package_pbi>
+		<depends_on_package_pbi>haproxy-devel-1.5.3-##ARCH##.pbi</depends_on_package_pbi>
 		<build_pbi>
 			<ports_before>security/openssl</ports_before>
 			<custom_name>haproxy-devel</custom_name>

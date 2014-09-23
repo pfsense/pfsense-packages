@@ -134,10 +134,12 @@ include("head.inc");
 		$img_cert = "/themes/{$g['theme']}/images/icons/icon_frmfld_cert.png";
 		$img_adv = "/themes/{$g['theme']}/images/icons/icon_advanced.gif";
 		$img_acl = "/themes/{$g['theme']}/images/icons/icon_ts_rule.gif";
+		$textgray = "";
+		$first = true;		
 		$last_frontend_shared = false;
 		foreach ($a_frontend_grouped as $a_frontend) {
 			usort($a_frontend,'sort_sharedfrontends');
-			if (count($a_frontend) > 1 || $last_frontend_shared) {
+			if ((count($a_frontend) > 1 || $last_frontend_shared) && !$first) {
 				?> <tr class="<?=$textgray?>"><td colspan="7">&nbsp;</td></tr> <?	
 			}
 			$last_frontend_shared = count($a_frontend) > 1;
@@ -162,8 +164,8 @@ include("head.inc");
 					if (strtolower($frontend['type']) == "http" && $frontend['ssloffload']) {
 						$cert = lookup_cert($frontend['ssloffloadcert']);
 						$descr = htmlspecialchars($cert['descr']);
-						$certs = $frontend['ha_certificates']['item'];
-						if (is_array($certs)){
+						if (is_array($frontend['ha_certificates']) && is_array($frontend['ha_certificates']['item'])) {
+							$certs = $frontend['ha_certificates']['item'];
 							if (count($certs) > 0){
 								foreach($certs as $certitem){
 									$cert = lookup_cert($certitem['ssl_certificate']);
@@ -182,12 +184,12 @@ include("head.inc");
 					
 					$backend_serverpool = $frontend['backend_serverpool'];
 					$backend = get_backend($backend_serverpool );
-					if ($backend && is_array($backend['ha_servers']['item'])){
+					if ($backend && is_array($backend['ha_servers']) && is_array($backend['ha_servers']['item'])){
 						$servers = $backend['ha_servers']['item'];
 						$backend_serverpool_hint = gettext("Servers in pool:");
 						if (is_array($servers)){
 							foreach($servers as $server){
-								if ($server['forwardto'] && $server['forwardto'] != "")
+								if (isset($server['forwardto']) && $server['forwardto'] != "")
 									$backend_serverpool_hint .= "\n[".$server['forwardto']."]";
 								else								
 									$backend_serverpool_hint .= "\n".$server['address'].":".$server['port'];

@@ -196,26 +196,16 @@ if ($_POST) {
 	$reqdfields = explode(" ", "name");
 	$reqdfieldsn = explode(",", "Name");		
 
-	$pf_version=substr(trim(file_get_contents("/etc/version")),0,3);
-	if ($pf_version < 2.1)
-		$input_errors = eval('do_input_validation($_POST, $reqdfields, $reqdfieldsn, &$input_errors); return $input_errors;');
-	else
-		do_input_validation($_POST, $reqdfields, $reqdfieldsn, $input_errors);
+	do_input_validation($_POST, $reqdfields, $reqdfieldsn, $input_errors);
 
 	if ($_POST['stats_enabled']) {
 		$reqdfields = explode(" ", "name stats_uri");
 		$reqdfieldsn = explode(",", "Name,Stats Uri");		
-		if ($pf_version < 2.1)
-			$input_errors = eval('do_input_validation($_POST, $reqdfields, $reqdfieldsn, &$input_errors); return $input_errors;');
-		else
-			do_input_validation($_POST, $reqdfields, $reqdfieldsn, $input_errors);
+		do_input_validation($_POST, $reqdfields, $reqdfieldsn, $input_errors);
 		if ($_POST['stats_username']) {
 			$reqdfields = explode(" ", "stats_password stats_realm");
 			$reqdfieldsn = explode(",", "Stats Password,Stats Realm");		
-			if ($pf_version < 2.1)
-				$input_errors = eval('do_input_validation($_POST, $reqdfields, $reqdfieldsn, &$input_errors); return $input_errors;');
-			else
-				do_input_validation($_POST, $reqdfields, $reqdfieldsn, $input_errors);
+			do_input_validation($_POST, $reqdfields, $reqdfieldsn, $input_errors);
 		}
 	}
 	
@@ -317,7 +307,7 @@ if ($_POST) {
 		} else {
 			$a_pools[] = $pool;
 		}
-	if (!$input_errors) {
+	if (!isset($input_errors)) {
 		if ($changecount > 0) {
 			touch($d_haproxyconfdirty_path);
 			write_config($changedesc);			
@@ -333,10 +323,6 @@ if ($_POST) {
 	}
 	$pconfig['a_servers']=&$a_pools[$id]['ha_servers']['item'];	
 }
-
-$pf_version=substr(trim(file_get_contents("/etc/version")),0,3);
-if ($pf_version < 2.0)
-	$one_two = true;
 
 $closehead = false;
 $pgtitle = "HAProxy: Backend server pool: Edit";
@@ -453,10 +439,7 @@ foreach($simplefields as $field){
 	}
 </script>
 <?php include("fbegin.inc"); ?>
-<?php if ($input_errors) print_input_errors($input_errors); ?>
-<?php if($one_two): ?>
-<p class="pgtitle"><?=$pgtitle?></p>
-<?php endif; ?>
+<?php if (isset($input_errors)) print_input_errors($input_errors); ?>
 	<form action="haproxy_pool_edit.php" method="post" name="iform" id="iform">
 	
 	<table width="100%" border="0" cellpadding="0" cellspacing="0">
