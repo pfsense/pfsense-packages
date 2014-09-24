@@ -6,14 +6,15 @@ if($user_login == 'ok'){
 
 	include "functions.php";
 
-?><html>
+?>
+<html>
 <head>
 <title>Rename</title>
 </head>
 <body>
 <script type="text/javascript">
 //<![CDATA[
-<?
+<?php
 //print_r($_POST);
 if($_POST['o'] != $_POST['n']){
 	if(@rename($_POST['cf'].$_POST['o'], $_POST['cf'].$_POST['n'])){
