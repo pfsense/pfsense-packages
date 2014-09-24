@@ -93,6 +93,10 @@ function suricata_check_dir_size_limit($suricataloglimitsize) {
 				}
 			}
 
+			// Cleanup any rotated logs
+			log_error(gettext("[Suricata] Deleting any rotated log files for {$value['descr']} ({$if_real})..."));
+			unlink_if_exists("{$suricata_log_dir}/*.log.*");
+
 			// Check for any captured stored files and clean them up
 			unlink_if_exists("{$suricata_log_dir}/files/*");
 
