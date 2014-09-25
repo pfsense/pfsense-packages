@@ -1230,17 +1230,21 @@ function haproxy_is_running() {
 }
 
 function haproxy_load_modules() {
-	// On FreeBSD 8 ipfw is needed to allow 'transparent' proxying (getting reply's to a non-local ip to pass back to the client-socket)..
-	// On FreeBSD 9 it is probably possible to do the same with the pf option "divert-reply"
+	// On FreeBSD 8 ipfw is needed to allow 'transparent' proxying (getting reply's to a non-local ip to pass back to the client-socket).
+	// On FreeBSD 9 and 10 it should have been possible to do the same with the pf(4) option "divert-reply" however that is not implemented.
+	// FreeBSD 10 patch proposal: http://lists.freebsd.org/pipermail/freebsd-bugs/2014-April/055823.html
+	
 	mute_kernel_msgs();
-        if (!is_module_loaded("ipfw.ko")) {
-                mwexec("/sbin/kldload ipfw");
-                /* make sure ipfw is not on pfil hooks */
-                mwexec("/sbin/sysctl net.inet.ip.pfil.inbound=\"pf\" net.inet6.ip6.pfil.inbound=\"pf\"" .
-                        " net.inet.ip.pfil.outbound=\"pf\" net.inet6.ip6.pfil.outbound=\"pf\"");
-        }
+	if (!is_module_loaded("ipfw.ko")) {
+		mwexec("/sbin/kldload ipfw");
+		/* make sure ipfw is not on pfil hooks */
+		mwexec("/sbin/sysctl net.inet.ip.pfil.inbound=\"pf\" net.inet6.ip6.pfil.inbound=\"pf\"" .
+				" net.inet.ip.pfil.outbound=\"pf\" net.inet6.ip6.pfil.outbound=\"pf\"");
+	}
+	
 	/* Activate layer2 filtering */
-	mwexec("/sbin/sysctl net.link.ether.ipfw=1");
+	mwexec("/sbin/sysctl net.link.ether.ipfw=1 /sbin/net.inet.ip.fw.one_pass=1");
+	
 	unmute_kernel_msgs();
 }
 
@@ -1306,7 +1310,11 @@ function haproxy_generate_rules($type) {
 function load_ipfw_rules() {
 	// On FreeBSD 8 pf does not support "divert-reply" so ipfw is needed.
 	global $g, $config;
-	$ipfw_zone_haproxy = "haproxy";
+	if (haproxy_utils::$pf_version < 2.2) {
+		$ipfw_zone_haproxy = "haproxy";
+	} else {
+		$ipfw_zone_haproxy = "4000"; // seems that 4000 is a safe zone number to avoid conflicts with captive portal.. and 4095 is the max?
+	}
 	
 	$a_backends = &$config['installedpackages']['haproxy']['ha_pools']['item'];
 	
@@ -1319,10 +1327,20 @@ function load_ipfw_rules() {
 		$interface = $transparent_backend['interface'];
 		$transparent_interfaces[$interface] = 1;
 	}
-	mwexec("/usr/local/sbin/ipfw_context -a $ipfw_zone_haproxy", true);
 	
-	foreach($transparent_interfaces as $transparent_if => $value) {
-		mwexec("/usr/local/sbin/ipfw_context -a $ipfw_zone_haproxy -n $transparent_if", true);
+	if (haproxy_utils::$pf_version < 2.2) {
+		// pfSense 2.1 FreeBSD 8.3
+		mwexec("/usr/local/sbin/ipfw_context -a $ipfw_zone_haproxy", true);
+		
+		foreach($transparent_interfaces as $transparent_if => $value) {
+			mwexec("/usr/local/sbin/ipfw_context -a $ipfw_zone_haproxy -n $transparent_if", true);
+		}
+	} else {
+		// pfSense 2.2 FreeBSD 10
+		mwexec("/sbin/ipfw zone $ipfw_zone_haproxy create", true);
+		foreach($transparent_interfaces as $transparent_if => $value) {
+			mwexec("/sbin/ipfw zone $ipfw_zone_haproxy madd $transparent_if", true);
+		}
 	}
 	
 	$rulenum = 64000; // why that high? captiveportal.inc also does it...
@@ -1414,8 +1432,14 @@ function haproxy_check_run($reload) {
 		if(use_transparent_clientip_proxying()) {
 			filter_configure();
 			load_ipfw_rules();
-		} else
-			mwexec("/usr/local/sbin/ipfw_context -d haproxy", true);
+		} else {
+			if (haproxy_utils::$pf_version < 2.2) {
+				mwexec("/usr/local/sbin/ipfw_context -d haproxy", true);
+			} else {			
+				$ipfw_zone_haproxy = 4000;
+				mwexec("/sbin/ipfw zone $ipfw_zone_haproxy destroy", true);
+			}
+		}
 		
 		if (file_exists('/var/run/haproxy.pid')){
 			$old_pid = file_get_contents('/var/run/haproxy.pid');
