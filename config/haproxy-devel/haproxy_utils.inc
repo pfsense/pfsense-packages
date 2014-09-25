@@ -33,6 +33,11 @@
 
 require_once("config.inc");
 
+class haproxy_utils {
+	public static $pf_version;
+}
+haproxy_utils::$pf_version = substr(trim(file_get_contents("/etc/version")),0,3);
+
 if(!function_exists('ifset')){
 	function ifset(&$var, $default = ''){
 		return isset($var) ? $var : $default;
