@@ -1037,7 +1037,6 @@
 		<build_pbi>
 			<ports_before>devel/libltdl</ports_before>
 			<port>net/freeradius</port>
-			<ports_after>shells/bash</ports_before>
 		</build_pbi>
 		<after_install_info>Please visit Services: freeRADIUS</after_install_info>
 	</package>
@@ -1067,6 +1066,7 @@
 		<build_pbi>
 			<ports_before>security/krb5</ports_before>
 			<port>net/freeradius2</port>
+			<ports_after>shells/bash</ports_after>
 		</build_pbi>
 		<build_options>freeradius_SET=KERBEROS MYSQL PGSQL PERL PYTHON LDAP SSL_PORT</build_options>
 	</package>
