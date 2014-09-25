@@ -1037,6 +1037,7 @@
 		<build_pbi>
 			<ports_before>devel/libltdl</ports_before>
 			<port>net/freeradius</port>
+			<ports_after>shells/bash</ports_before>
 		</build_pbi>
 		<after_install_info>Please visit Services: freeRADIUS</after_install_info>
 	</package>
