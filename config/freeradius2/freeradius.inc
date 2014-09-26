@@ -81,10 +81,15 @@ function freeradius_install_command() {
 	conf_mount_rw();
 	
 	// We create here different folders for different counters.
-	if (!file_exists("/var/log/radacct/datacounter/")) { exec("mkdir /var/log/radacct/datacounter && mkdir /var/log/radacct/datacounter/daily && mkdir /var/log/radacct/datacounter/weekly && mkdir /var/log/radacct/datacounter/monthly && mkdir /var/log/radacct/datacounter/forever"); }
-	if (!file_exists("/var/log/radacct/timecounter/")) { exec("mkdir /var/log/radacct/timecounter");	}
-	
-	exec("mkdir " . FREERADIUS_ETC . "/raddb/scripts");
+	@mkdir("/var/log/radacct/datacounter/daily", 0755, true);
+	@mkdir("/var/log/radacct/datacounter/weekly", 0755, true);
+	@mkdir("/var/log/radacct/datacounter/monthly", 0755, true);
+	@mkdir("/var/log/radacct/datacounter/forever", 0755, true);
+	@mkdir("/var/log/radacct/timecounter", 0755, true);
+	@mkdir(FREERADIUS_ETC . "/raddb/scripts", 0755, true);
+
+	unlink_if_exists("/usr/local/etc/raddb");
+	@symlink(FREERADIUS_ETC . "/raddb", "/usr/local/etc/raddb");
 	if (!file_exists("/var/log/radutmp")) { exec("touch /var/log/radutmp");	}
 	if (!file_exists("/var/log/radwtmp")) {	exec("touch /var/log/radwtmp");	}
 	exec("chown -R root:wheel " . FREERADIUS_ETC . "/raddb && chown -R root:wheel {$frlib} && chown -R root:wheel /var/log/radacct");
