@@ -679,8 +679,12 @@ function write_backend($configpath, $fd, $name, $pool, $frontend) {
 		$pool['retries'] = 3;
 	fwrite ($fd, "\tretries\t\t\t" . $pool['retries'] . "\n");
 
-	if ($pool['transparent_clientip'])
-		fwrite ($fd, "\tsource 0.0.0.0 usesrc clientip\n");
+	if ($pool['transparent_clientip']) {
+		if (is_ipaddrv4($frontend_ip))
+			fwrite ($fd, "\tsource 0.0.0.0 usesrc clientip\n");
+		else
+			fwrite ($fd, "\tsource ipv6@ usesrc clientip\n");
+	}
 
 	$uri = $pool['monitor_uri'];
 	if ($pool['monitor_uri'])
@@ -1296,12 +1300,19 @@ function haproxy_generate_rules($type) {
 	$rules = "";
 	switch($type) {
 	case 'filter':
+		// Sloppy pf rules are needed because of ipfw is used to 'catch' return traffic, and pf would otherwise terminate the connection after a few packets..
 		$transparent_backends = haproxy_get_transparent_backends();
-		foreach($transparent_backends as $tb){
-			// This sloppy rule is needed because of ipfw is used to 'catch' return traffic.
+		if (count($transparent_backends) > 0) {
 			$rules .= "# allow HAProxy transparent traffic\n";
-			$rules .= "pass  out  quick  on {$tb['interface']} inet proto tcp  from any to {$tb['address']} port {$tb['port']} flags S/SA keep state ( sloppy )  label \"HAPROXY_transparent_rule_{$tb['name']}\"\n";
-		}		
+			foreach($transparent_backends as $tb){
+				if (is_ipaddrv4($tb['address']))
+					$rules .= "pass  out  quick  on {$tb['interface']} inet proto tcp  from any to {$tb['address']} port {$tb['port']} flags S/SA keep state ( sloppy )  label \"HAPROXY_transparent_rule_{$tb['name']}\"\n";
+				if (is_ipaddrv6($tb['address'])) {
+					list ($addr, $scope) = explode("%", $tb['address']);
+					$rules .= "pass  out  quick  on {$tb['interface']} inet6 proto tcp  from any to {$addr} port {$tb['port']} flags S/SA keep state ( sloppy )  label \"HAPROXY_transparent_rule_{$tb['name']}\"\n";
+				}
+			}
+		}
 		break;
 	}
 	return $rules;
@@ -1346,13 +1357,20 @@ function load_ipfw_rules() {
 	$rulenum = 64000; // why that high? captiveportal.inc also does it...
 	$rules = "flush\n";
 	foreach($transparent_backends as $transparent_be) {
-		$rules .= "add $rulenum fwd localhost tcp from {$transparent_be["address"]} {$transparent_be["port"]} to any in recv {$transparent_be["interface"]}\n";
+		if (is_ipaddrv4($transparent_be["address"]))
+			$rules .= "add $rulenum fwd localhost tcp from {$transparent_be["address"]} {$transparent_be["port"]} to any in recv {$transparent_be["interface"]}\n";
+		else if (is_ipaddrv6($transparent_be["address"])) {
+			list ($addr, $scope) = explode("%", $transparent_be['address']);
+			$rules .= "add $rulenum fwd ::1 tcp from {$addr} {$transparent_be["port"]} to any in recv {$transparent_be["interface"]}\n";
+		}
+		
 		$rulenum++;
 	}
 	
 
 	file_put_contents("{$g['tmp_path']}/ipfw_{$ipfw_zone_haproxy}.haproxy.rules", $rules);
-	mwexec("/usr/local/sbin/ipfw_context -s $ipfw_zone_haproxy", true);
+	if (haproxy_utils::$pf_version < 2.2)
+		mwexec("/usr/local/sbin/ipfw_context -s $ipfw_zone_haproxy", true);
 	mwexec("/sbin/ipfw -x $ipfw_zone_haproxy -q {$g['tmp_path']}/ipfw_{$ipfw_zone_haproxy}.haproxy.rules", true);
 }
 
