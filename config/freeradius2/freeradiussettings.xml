@@ -316,7 +316,7 @@
 		<field>
 			<fielddescr>Enable Mobile-One-Time-Password</fielddescr>
 			<fieldname>varsettingsmotpenable</fieldname>
-			<description><![CDATA[This enables the possibility to authenticate against an username and an one-time-password. The client which generates OTP can be installed on various mobile device plattforms like Android and more. If you enable this the first time we need to download and install package "bash-4.1.7" so the process will need some time. (Default: unchecked)]]></description>
+			<description><![CDATA[This enables the possibility to authenticate against an username and an one-time-password. The client which generates OTP can be installed on various mobile device plattforms like Android and more. (Default: unchecked)]]></description>
 			<type>checkbox</type>
 			<enablefields>varsettingsmotptimespan,varsettingsmotppasswordattempts,varsettingsmotpchecksumtype,varsettingsmotptokenlength</enablefields>
 		</field>
