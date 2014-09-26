@@ -77,7 +77,7 @@ function freeradius_deinstall_command() {
 }
 
 function freeradius_install_command() {
-	global $config;
+	global $config, $frlib;
 	conf_mount_rw();
 	
 	// We create here different folders for different counters.
