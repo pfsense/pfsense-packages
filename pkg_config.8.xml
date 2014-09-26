@@ -124,18 +124,6 @@
 		<configurationfile>pfblocker.xml</configurationfile>
 	</package>
 	<package>
-		<name>anyterm</name>
-		<descr>Ajax Interactive Shell - Have you ever wanted SSH or telnet access to your system from an internet desert - from behind a strict firewall, from an internet cafe, or even from a mobile phone? Anyterm is a combination of a web page and a process that runs on your web server that provides this access. WARNING!  We suggest using Stunnel in combination with this package!</descr>
-		<website>http://anyterm.org/</website>
-		<pkginfolink>https://doc.pfsense.org/index.php/AnyTerm_package</pkginfolink>
-		<category>Diagnostics</category>
-		<version>0.5</version>
-		<status>BETA</status>
-		<required_version>1.2.3</required_version>
-		<config_file>https://packages.pfsense.org/packages/config/anyterm/anyterm.xml</config_file>
-		<configurationfile>anyterm.xml</configurationfile>
-	</package>
-	<package>
 		<name>haproxy</name>
 		<pkginfolink>https://doc.pfsense.org/index.php/haproxy_package</pkginfolink>
 		<descr><![CDATA[The Reliable, High Performance TCP/HTTP Load Balancer<br />
@@ -382,40 +370,6 @@
 		<required_version>2.1.4</required_version>
 		<config_file>https://packages.pfsense.org/packages/config/ntopng/ntopng.xml</config_file>
 		<configurationfile>ntopng.xml</configurationfile>
-		<noembedded>true</noembedded>
-	</package>
-	<package>
-		<name>FreeSWITCH</name>
-		<website>http://www.freeswitch.org/</website>
-		<descr>FreeSWITCH is an open source telephony platform designed to facilitate the creation of voice and chat driven products scaling from a soft-phone up to a soft-switch.  It can be used as a simple switching engine, a PBX, a media gateway or a media server to host IVR applications using simple scripts or XML to control the callflow. </descr>
-		<category>Services</category>
-		<pkginfolink>https://doc.pfsense.org/index.php/FreeSWITCH</pkginfolink>
-		<config_file>https://packages.pfsense.org/packages/config/freeswitch/freeswitch.xml</config_file>
-		<depends_on_package_base_url>https://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
-		<depends_on_package_pbi>freeswitch-1.0.6_1-i386.pbi</depends_on_package_pbi>
-		<build_port_path>/usr/ports/net/freeswitch</build_port_path>
-		<version>0.8.3.6</version>
-		<status>Beta</status>
-		<required_version>1.2.1</required_version>
-		<maintainer>markjcrane@gmail.com</maintainer>
-		<configurationfile>freeswitch.xml</configurationfile>
-		<noembedded>true</noembedded>
-	</package>
-	<package>
-		<name>FreeSWITCH Dev</name>
-		<internal_name>FreeSWITCH</internal_name>
-		<website>http://www.freeswitch.org/</website>
-		<descr>FreeSWITCH package development version.</descr>
-		<category>Services</category>
-		<pkginfolink>https://doc.pfsense.org/index.php/FreeSWITCH</pkginfolink>
-		<config_file>https://packages.pfsense.org/packages/config/freeswitch_dev/freeswitch.xml</config_file>
-		<depends_on_package_base_url>https://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
-		<build_port_path>/usr/ports/net/freeswitch</build_port_path>
-		<version>0.9.7.26</version>
-		<status>Beta</status>
-		<required_version>1.2.3</required_version>
-		<maintainer>markjcrane@gmail.com</maintainer>
-		<configurationfile>freeswitch.xml</configurationfile>
 		<noembedded>true</noembedded>
 	</package>
 	<package>

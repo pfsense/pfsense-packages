@@ -122,18 +122,6 @@
 		<configurationfile>pfblocker.xml</configurationfile>
 	</package>
 	<package>
-		<name>anyterm</name>
-		<descr>Ajax Interactive Shell - Have you ever wanted SSH or telnet access to your system from an internet desert - from behind a strict firewall, from an internet cafe, or even from a mobile phone? Anyterm is a combination of a web page and a process that runs on your web server that provides this access. WARNING!  We suggest using Stunnel in combination with this package!</descr>
-		<website>http://anyterm.org/</website>
-		<pkginfolink>https://doc.pfsense.org/index.php/AnyTerm_package</pkginfolink>
-		<category>Diagnostics</category>
-		<version>0.5</version>
-		<status>BETA</status>
-		<required_version>2.2</required_version>
-		<config_file>https://packages.pfsense.org/packages/config/anyterm/anyterm.xml</config_file>
-		<configurationfile>anyterm.xml</configurationfile>
-	</package>
-	<package>
 		<name>haproxy-devel</name>
 		<pkginfolink>https://doc.pfsense.org/index.php/haproxy_package</pkginfolink>
 		<descr><![CDATA[The Reliable, High Performance TCP/HTTP(s) Load Balancer<br />
