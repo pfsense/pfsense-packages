@@ -30,6 +30,10 @@
  
 require("guiconfig.inc");
 
+$pf_version=substr(trim(file_get_contents("/etc/version")),0,3);
+if ($pf_version < 2.0)
+	$one_two = true;
+
 if($_POST['filter'])
 	$filter = $_POST['filter'];
 if($_POST['not'])
@@ -53,8 +57,10 @@ if($_GET['action'] or $_POST['action']) {
 		$srcip = $_GET['srcip'];
 	if($_POST['srcip'])
 		$srcip = $_POST['srcip'];
-	if($_POST['toaddress']) 
-		$toaddress = escapeshellarg($_POST['toaddress']);
+	if($_GET['spamtrapemail']) 
+		$spamtrapemail = escapeshellarg($_GET['spamtrapemail']);
+	if($_POST['spamtrapemail']) 
+		$spamtrapemail = escapeshellarg($_POST['spamtrapemail']);
 	$srcip = str_replace("<","",$srcip);
 	$srcip = str_replace(">","",$srcip);
 	$srcip = str_replace(" ","",$srcip);
@@ -62,7 +68,6 @@ if($_GET['action'] or $_POST['action']) {
 	$srcip = escapeshellarg($srcip);
 	/* execute spamdb command */
 	if($action == "'whitelist'") {
-		exec("/usr/local/sbin/spamdb -d {$srcip}");
 		exec("/usr/local/sbin/spamdb -d {$srcip} -T");
 		exec("/usr/local/sbin/spamdb -d {$srcip} -t");
 		delete_from_blacklist($srcip);
@@ -76,14 +81,13 @@ if($_GET['action'] or $_POST['action']) {
 		delete_from_blacklist($srcip);
 		mwexec("/sbin/pfctl -q -t spamd -T delete $srcip");
 		mwexec("/sbin/pfctl -q -t blacklist -T replace -f /var/db/blacklist.txt");		
-	} else if($action == "'spamtrap'") {
-		exec("/usr/local/sbin/spamdb -d {$srcip}");
-		exec("/usr/local/sbin/spamdb -d {$srcip} -T");
-		exec("/usr/local/sbin/spamdb -d {$srcip} -t");
-		exec("/usr/local/sbin/spamdb -a {$srcip} -T");
 	} else if($action == "'trapped'") {
-		exec("/usr/local/sbin/spamdb -T -d {$toaddress}");
-		exec("/usr/local/sbin/spamdb -T -a '{$toaddress}'");	
+		exec("/usr/local/sbin/spamdb -d {$srcip}");
+		exec("/usr/local/sbin/spamdb -d {$srcip}");
+		exec("/usr/local/sbin/spamdb -d -t {$srcip}");
+		exec("/usr/local/sbin/spamdb -a -t {$srcip}");
+	} else if($action == "'spamtrap'") {
+		exec("/usr/local/sbin/spamdb -a -T {$spamtrapemail}");
 	}
 	/* signal a reload for real time effect. */
 	mwexec("killall -HUP spamlogd");
@@ -144,7 +148,7 @@ if($_GET['whitelist'] <> "") {
 
 function delete_from_blacklist($srcip) {
 	config_lock();
-	$blacklist = split("\n", file_get_contents("/var/db/blacklist.txt"));
+	$blacklist = explode("\n", file_get_contents("/var/db/blacklist.txt"));
 	$fd = fopen("/var/db/blacklist.txt", "w");
 	foreach($blacklist as $bl) {
 		if($bl <> "")
@@ -159,7 +163,7 @@ function delete_from_blacklist($srcip) {
 
 function delete_from_whitelist($srcip) {
 	config_lock();
-	$whitelist = split("\n", file_get_contents("/var/db/whitelist.txt"));
+	$whitelist = explode("\n", file_get_contents("/var/db/whitelist.txt"));
 	$fd = fopen("/var/db/whitelist.txt", "w");
 	foreach($whitelist as $wl) {
 		if($wl <> "")
@@ -200,7 +204,9 @@ $blacklist_items = $blacklist_items + $spamdb_black;
 ?>
 <body link="#000000" vlink="#000000" alink="#000000">
 <?php include("fbegin.inc"); ?>
+<?php if($one_two): ?>
 <p class="pgtitle"><?=$pgtitle?></font></p>
+<?php endif; ?>
 <form action="spamd_db.php" method="post" name="iform">
 <script src="/javascript/scriptaculous/prototype.js" type="text/javascript"></script>
 <script src="/javascript/scriptaculous/scriptaculous.js" type="text/javascript"></script>
@@ -326,10 +332,10 @@ if (typeof getURL == 'undefined') {
 			$cmd = "/usr/local/sbin/spamdb | grep -v \"" . escapeshellarg($filter) . "\" | tail -n {$limit}";
 			fwrite($fd, $cmd);
 			fclose($fd);
-			$pkgdb = split("\n", `$cmd`);
+			$pkgdb = explode("\n", `$cmd`);
 			if(file_exists("/var/db/blacklist.txt")) {
 				$cmd = "cat /var/db/blacklist.txt | grep -v \"" . escapeshellarg($filter) . "\" ";
-				$pkgdba = split("\n", `$cmd`);
+				$pkgdba = explode("\n", `$cmd`);
 				foreach($pkgdba as $pkg) {
 					$pkgdb[] = "TRAPPED|{$pkg}|1149324397";	
 				}				
@@ -338,10 +344,10 @@ if (typeof getURL == 'undefined') {
 			
 			$cmd = "/usr/local/sbin/spamdb | grep " . escapeshellarg($filter) . " | tail -n {$limit}";
 
-			$pkgdb = split("\n", `$cmd`);
+			$pkgdb = explode("\n", `$cmd`);
 			if(file_exists("/var/db/blacklist.txt")) {
 				$cmd = "cat /var/db/blacklist.txt | grep " . escapeshellarg($filter);
-				$pkgdba = split("\n", `$cmd`);
+				$pkgdba = explode("\n", `$cmd`);
 				foreach($pkgdba as $pkg) {
 					$pkgdb[] = "TRAPPED|{$pkg}|1149324397";
 				}
@@ -349,7 +355,7 @@ if (typeof getURL == 'undefined') {
 			}
 		}
 	} else {
-		$pkgdb = split("\n", `/usr/local/sbin/spamdb | tail -n {$limit}`);
+		$pkgdb = explode("\n", `/usr/local/sbin/spamdb | tail -n {$limit}`);
 	}
 	$rows = 0;
 	$lastseenip = "";
@@ -361,7 +367,7 @@ if (typeof getURL == 'undefined') {
 		$dontdisplay = false;
 		if(!$pkgdb_row) 
 			continue;
-		$pkgdb_split = split("\|", $pkgdb_row);
+		$pkgdb_split = explode("|", $pkgdb_row);
 
 		/*
 

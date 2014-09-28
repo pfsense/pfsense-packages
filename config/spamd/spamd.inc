@@ -34,6 +34,13 @@ if(!function_exists("filter_configure"))
 
 function sync_package_spamd() {
 	global $config, $g;
+	$pf_version = substr(trim(file_get_contents("/etc/version")),0,3);
+	if ($pf_version < 2.2) {
+		$localpath = "/usr/local";
+	} else {
+		$ARCH = php_uname("m");
+		$localpath = "/usr/pbi/spamd-$ARCH/local";
+	}
 	
 	conf_mount_rw();
 	config_lock();
@@ -130,8 +137,8 @@ function sync_package_spamd() {
 		 "fi\n" .
 	     "/usr/local/sbin/spamd-setup -d &\n" .
 		 "/sbin/pflogd &\n" .
-		 "/usr/local/libexec/spamd {$greyparms}{$identifier}{$greylisting}{$maxcon}{$maxblack}{$window}{$replysmtperror} 127.0.0.1 &\n" .
-		 "/usr/local/libexec/spamlogd\n";
+		 "$localpath/libexec/spamd {$greyparms}{$identifier}{$greylisting}{$maxcon}{$maxblack}{$window}{$replysmtperror} 127.0.0.1 &\n" .
+		 "$localpath/libexec/spamlogd\n";
 	$stop  = "/usr/bin/killall spamd-setup\n" .
 		 "/usr/bin/killall spamlogd\n" .
 		 "/usr/bin/killall spamd\n" .
@@ -153,8 +160,9 @@ function sync_package_spamd() {
 	log_error("Restart cron");	
 	mwexec("killall -HUP cron");
 	log_error("Setting up spamd.conf symlink");	
-	mwexec("rm -f /usr/local/etc/spamd/spamd.conf");
-	mwexec("ln -s /etc/spamd.conf /usr/local/etc/spamd/spamd.conf");
+	mwexec("rm -f $localpath/etc/spamd/spamd.conf");
+	mwexec("ln -s /etc/spamd.conf $localpath/etc/spamd/spamd.conf");
+	
 	log_error("Stopping spamd");
 	mwexec("/usr/local/etc/rc.d/spamd.sh stop");
 	sleep(1);
