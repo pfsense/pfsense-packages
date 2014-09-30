@@ -160,8 +160,8 @@ function sync_package_spamd() {
 	log_error("Restart cron");	
 	mwexec("killall -HUP cron");
 	log_error("Setting up spamd.conf symlink");	
-	mwexec("rm -f $localpath/etc/spamd/spamd.conf");
-	mwexec("ln -s /etc/spamd.conf $localpath/etc/spamd/spamd.conf");
+	unlink_if_exists("$localpath/etc/spamd/spamd.conf");
+	symlink("/etc/spamd.conf", "$localpath/etc/spamd/spamd.conf");
 	
 	log_error("Stopping spamd");
 	mwexec("/usr/local/etc/rc.d/spamd.sh stop");
