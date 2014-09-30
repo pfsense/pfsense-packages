@@ -1004,20 +1004,15 @@
 					On pfSense docs there is a how-to which could help you on porting users.]]></descr>
 		<pkginfolink>https://doc.pfsense.org/index.php/FreeRADIUS_2.x_package</pkginfolink>
 		<category>System</category>
-		<version>2.1.12_1/2.2.5_3 pkg v1.6.9</version>
+		<version>2.1.12_1/2.2.5_3 pkg v1.6.10</version>
 		<status>RC1</status>
-		<required_version>2.0</required_version>
+		<required_version>2.1</required_version>
 		<maintainer>nachtfalkeaw@web.de</maintainer>
 		<depends_on_package_base_url>https://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
-		<depends_on_package>freeradius-2.1.12_1.tbz</depends_on_package>
 		<depends_on_package_pbi>freeradius-2.2.5_3-amd64.pbi</depends_on_package_pbi>
-		<depends_on_package>mysql-client-5.1.63.tbz</depends_on_package>
-		<depends_on_package>postgresql-client-9.0.8.tbz</depends_on_package>
-		<depends_on_package>openldap-sasl-client-2.4.31_1.tbz</depends_on_package>
 		<config_file>https://packages.pfsense.org/packages/config/freeradius2/freeradius.xml</config_file>
 		<configurationfile>freeradius.xml</configurationfile>
 		<after_install_info>Please visit Services: FreeRADIUS</after_install_info>
-		<!-- Try to use the new PBI build syntax here, it may help it pick up the right libs inside the single PBI rather than using multiple. -->
 		<build_pbi>
 			<ports_before>security/krb5</ports_before>
 			<port>net/freeradius2</port>
