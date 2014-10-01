@@ -33,15 +33,16 @@ require("globals.inc");
 #require("guiconfig.inc");
 
 $pf_version=substr(trim(file_get_contents("/etc/version")),0,3);
-if ($pf_version > 2.0)
-	define('MAILSCANNER_LOCALBASE', '/usr/pbi/mailscanner-' . php_uname("m"));
+define('MAILSCANNER_PREFIX', '/usr/pbi/mailscanner-' . php_uname("m"));
+if ($pf_version != "2.1")
+	define('MAILSCANNER_LOCALBASE', MAILSCANNER_PREFIX);
 else
-  define('MAILSCANNER_LOCALBASE','/usr/local');
+	define('MAILSCANNER_LOCALBASE', MAILSCANNER_PREFIX . '/local');
 
 $uname=posix_uname();
 if ($uname['machine']=='amd64')
         ini_set('memory_limit', '250M');
-        
+
 function ms_text_area_decode($text){
 	return preg_replace('/\r\n/', "\n",base64_decode($text));	
 }
@@ -311,8 +312,7 @@ Language Strings = %report-dir%/languages.conf
 		$load_samples++;
 	}
 	
-	//$report_dir=MAILSCANNER_LOCALBASE."/share/MailScanner/reports/".strtolower($report['language']);
-	$report_dir="/usr/local/share/MailScanner/reports/".strtolower($report['language']);
+	$report_dir=MAILSCANNER_LOCALBASE."/share/MailScanner/reports/".strtolower($report['language']);
 	#CHECK REPORT FILES
 	$report_files= array('deletedbadcontent' => 'deleted.content.message.txt',
 						'deletedbadfilename' => 'deleted.filename.message.txt',
@@ -381,7 +381,7 @@ Phishing Bad Sites File = %etc-dir%/phishing.bad.sites.conf
 Country Sub-Domains List = %etc-dir%/country.domains.conf
 */
 	#get mailscanner version
-	$msc_bin=MAILSCANNER_LOCALBASE. "/sbin/mailscanner";
+	$msc_bin=MAILSCANNER_PREFIX. "/sbin/mailscanner";
 	if (file_exists($msc_bin)){
 		$msc_bin_file=file_get_contents($msc_bin);
 		if (preg_match("/MailScannerVersion = '(\S+)'/",$msc_bin_file,$msv_matches))
@@ -443,12 +443,12 @@ Country Sub-Domains List = %etc-dir%/country.domains.conf
 	if (preg_match('/use_pyzor/',$antispam['safeatures'])){
 		$pattern[]='/#pyzor_path/';
 		$pattern[]="/\S+yzor_disabled/";
-		$pattern[]='/usr.bin.pyzor/';
+		$pattern[]='/\/usr.bin.pyzor/';
 		$pattern[]='/use_pyzor/';
 		$pattern[]="/\S+o_not_use_pyzor/";
 		$replacement[]="pyzor_path";
 		$replacement[]="pyzor_path";
-		$replacement[]="usr/local/bin/pyzor";
+		$replacement[]=MAILSCANNER_PREFIX . "/bin/pyzor";
 		$replacement[]="use_pyzor";
 		$replacement[]="use_pyzor";
 		}
@@ -681,29 +681,29 @@ Country Sub-Domains List = %etc-dir%/country.domains.conf
 	$script=MAILSCANNER_LOCALBASE. '/etc/rc.d/mailscanner';
 
 	#fix MIME::ToolUtils deprecated function and usecure dependency calls in /usr/local/sbin/mailscanner
-	$cconf=MAILSCANNER_LOCALBASE. "/sbin/mailscanner";
+	$cconf=MAILSCANNER_PREFIX. "/sbin/mailscanner";
 	if (file_exists($cconf)){
 		
 		$perl_bin="perl_mailscanner";
-		if(file_exists(MAILSCANNER_LOCALBASE . '/bin/perl') && !file_exists(MAILSCANNER_LOCALBASE . "/bin/{$perl_bin}")){
-		 	link(MAILSCANNER_LOCALBASE . '/bin/perl',MAILSCANNER_LOCALBASE . '/bin/perl_mailscanner');
+		if(file_exists(MAILSCANNER_PREFIX . '/bin/perl') && !file_exists(MAILSCANNER_PREFIX . "/bin/{$perl_bin}")){
+		 	link(MAILSCANNER_PREFIX . '/bin/perl',MAILSCANNER_PREFIX . "/bin/{$perl_bin}");
 		}
-		if (file_exists(MAILSCANNER_LOCALBASE . "/bin/{$perl_bin}")){
+		if (file_exists(MAILSCANNER_PREFIX . "/bin/{$perl_bin}")){
 			$cconf_file=file_get_contents($cconf);
 			$pattern2[0]='@#!/usr\S+bin/perl.*I@';
 			//$pattern2[1]='/\smy .current = config MIME::ToolUtils/';
-			$replacement2[0]='#!'.MAILSCANNER_LOCALBASE. "/bin/{$perl_bin} -U -I";
+			$replacement2[0]='#!'.MAILSCANNER_PREFIX. "/bin/{$perl_bin} -U -I";
 			//$replacement2[1]=' #my $current = config MIME::ToolUtils';
 			if (preg_match('@#!/usr\S+bin/perl.*I@',$cconf_file)){
 				$cconf_file=preg_replace($pattern2,$replacement2,$cconf_file);
 				file_put_contents($cconf, $cconf_file, LOCK_EX);
-				}
+			}
 		}
 			
 	}
 
 	#check spam assassin rules
-	$saupdate="/usr/local/bin/sa-update";
+	$saupdate=MAILSCANNER_PREFIX . "/bin/sa-update";
 	if (file_exists($saupdate)){
 		$rules_found=0;
 		if (file_exists("/var/db/spamassassin")){
