@@ -441,7 +441,7 @@
 		<build_pbi>
 			<ports_before>mail/pyzor mail/p5-Mail-SPF net/p5-IP-Country mail/dcc-dccd</ports_before>
 			<port>mail/mailscanner</port>
-			<ports_after>shells/bash</ports_after>
+			<ports_after>shells/bash mail/pyzor mail/dcc-dccd security/clamav mail/spamassassin</ports_after>
 		</build_pbi>
 		<build_options>mailscanner_UNSET_FORCE=BDC CLAMAVMODULE;mailscanner_SET_FORCE=SPAMASSASSIN CLAMAV;p5-Mail-SpamAssassin_SET_FORCE=DCC</build_options>
 	</package>
