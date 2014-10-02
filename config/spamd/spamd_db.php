@@ -43,6 +43,13 @@ if($_POST['limit'])
 else
 	$limit = "25";
 	
+if($_GET['spamtrapemail']) 
+	$spamtrapemail = $_GET['spamtrapemail'];
+if($_POST['spamtrapemail']) 
+	$spamtrapemail = $_POST['spamtrapemail'];
+if ($spamtrapemail)
+	$spamtrapemailarg = escapeshellarg($spamtrapemail);
+	
 /* handle AJAX operations */
 if($_GET['action'] or $_POST['action']) {
 	/*    echo back buttonid so it can be turned
@@ -50,60 +57,52 @@ if($_GET['action'] or $_POST['action']) {
 	 */
 	echo $_GET['buttonid'] . "|";
 	if($_GET['action'])
-		$action = escapeshellarg($_GET['action']);
+		$action = $_GET['action'];
 	if($_POST['action'])
-		$action = escapeshellarg($_POST['action']);
+		$action = $_POST['action'];
 	if($_GET['srcip'])
 		$srcip = $_GET['srcip'];
 	if($_POST['srcip'])
 		$srcip = $_POST['srcip'];
-	if($_GET['spamtrapemail']) 
-		$spamtrapemail = escapeshellarg($_GET['spamtrapemail']);
-	if($_POST['spamtrapemail']) 
-		$spamtrapemail = escapeshellarg($_POST['spamtrapemail']);
 	$srcip = str_replace("<","",$srcip);
 	$srcip = str_replace(">","",$srcip);
 	$srcip = str_replace(" ","",$srcip);
 	// Make input safe
 	$srcip = escapeshellarg($srcip);
 	/* execute spamdb command */
-	if($action == "'whitelist'") {
+	if($action == "whitelist") {
 		exec("/usr/local/sbin/spamdb -d {$srcip} -T");
 		exec("/usr/local/sbin/spamdb -d {$srcip} -t");
 		delete_from_blacklist($srcip);
 		mwexec("/sbin/pfctl -q -t blacklist -T replace -f /var/db/blacklist.txt");
 		exec("echo spamdb -a {$srcip} > /tmp/tmp");
 		exec("/usr/local/sbin/spamdb -a {$srcip}");
-	} else if($action == "'delete'") {
+	} else if($action == "delete") {
 		exec("/usr/local/sbin/spamdb -d {$srcip}");
 		exec("/usr/local/sbin/spamdb -d {$srcip} -T");
 		exec("/usr/local/sbin/spamdb -d {$srcip} -t");
 		delete_from_blacklist($srcip);
 		mwexec("/sbin/pfctl -q -t spamd -T delete $srcip");
 		mwexec("/sbin/pfctl -q -t blacklist -T replace -f /var/db/blacklist.txt");		
-	} else if($action == "'trapped'") {
+	} else if($action == "trapped") {
 		exec("/usr/local/sbin/spamdb -d {$srcip}");
 		exec("/usr/local/sbin/spamdb -d {$srcip}");
 		exec("/usr/local/sbin/spamdb -d -t {$srcip}");
 		exec("/usr/local/sbin/spamdb -a -t {$srcip}");
-	} else if($action == "'spamtrap'") {
-		exec("/usr/local/sbin/spamdb -a -T {$spamtrapemail}");
+	} else if($action == "spamtrap") {
+		exec("/usr/local/sbin/spamdb -a -T {$spamtrapemailarg}");
 	}
 	/* signal a reload for real time effect. */
 	mwexec("killall -HUP spamlogd");
 	exit;
 }
 
-/* spam trap e-mail address */
-if($_POST['spamtrapemail'] <> "") {
-	$spamtrapemail = escapeshellarg($_POST['spamtrapemail']);
-	exec("/usr/local/sbin/spamdb -d {$spamtrapemail}");
-	exec("/usr/local/sbin/spamdb -d -T {$spamtrapemail}");
-	exec("/usr/local/sbin/spamdb -d -t {$spamtrapemail}");
-	exec("/usr/local/sbin/spamdb -T -a '{$toaddress}'");	
 
+/* spam trap e-mail address */
+if($spamtrapemail <> "") {
+	exec("spamdb -T -a {$spamtrapemailarg}");
 	mwexec("killall -HUP spamlogd");
-	$savemsg = htmlentities($_POST['spamtrapemail']) . " added to spam trap database.";
+	$savemsg = htmlentities($spamtrapemail) . " added to spam trap database.";
 }
 
 if($_GET['getstatus'] <> "") {
@@ -124,8 +123,7 @@ if($_GET['getstatus'] <> "") {
 
 /* spam trap e-mail address */
 if($_GET['spamtrapemail'] <> "") {
-	$spamtrapemail = escapeshellarg($_GET['spamtrapemail']);
-	$status = exec("spamdb -T -a {$spamtrapemail}");
+	$status = exec("spamdb -T -a {$spamtrapemailarg}");
 	mwexec("killall -HUP spamlogd");
 	if($status)
 		echo $status;
@@ -329,25 +327,23 @@ if (typeof getURL == 'undefined') {
 	if($filter) {
 		if($not) {
 			$fd = fopen("/tmp/spamdb", "w");
-			$cmd = "/usr/local/sbin/spamdb | grep -v \"" . escapeshellarg($filter) . "\" | tail -n {$limit}";
+			$cmd = "/usr/local/sbin/spamdb | grep -v " . escapeshellarg($filter) . " | tail -n {$limit}";
 			fwrite($fd, $cmd);
 			fclose($fd);
-			$pkgdb = explode("\n", `$cmd`);
+			exec($cmd, $pkgdb);
 			if(file_exists("/var/db/blacklist.txt")) {
 				$cmd = "cat /var/db/blacklist.txt | grep -v \"" . escapeshellarg($filter) . "\" ";
-				$pkgdba = explode("\n", `$cmd`);
+				exec($cmd, $pkgdba);
 				foreach($pkgdba as $pkg) {
 					$pkgdb[] = "TRAPPED|{$pkg}|1149324397";	
 				}				
 			}			
 		} else {
-			
 			$cmd = "/usr/local/sbin/spamdb | grep " . escapeshellarg($filter) . " | tail -n {$limit}";
-
-			$pkgdb = explode("\n", `$cmd`);
+			exec($cmd, $pkgdb);
 			if(file_exists("/var/db/blacklist.txt")) {
 				$cmd = "cat /var/db/blacklist.txt | grep " . escapeshellarg($filter);
-				$pkgdba = explode("\n", `$cmd`);
+				exec($cmd, $pkgdba);
 				foreach($pkgdba as $pkg) {
 					$pkgdb[] = "TRAPPED|{$pkg}|1149324397";
 				}
@@ -355,7 +351,7 @@ if (typeof getURL == 'undefined') {
 			}
 		}
 	} else {
-		$pkgdb = explode("\n", `/usr/local/sbin/spamdb | tail -n {$limit}`);
+		exec("/usr/local/sbin/spamdb | tail -n {$limit}", $pkgdb);
 	}
 	$rows = 0;
 	$lastseenip = "";
