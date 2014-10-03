@@ -93,7 +93,7 @@ $vrt_enabled = $config['installedpackages']['suricata']['config'][0]['enable_vrt
 $snortcommunityrules = $config['installedpackages']['suricata']['config'][0]['snortcommunityrules'] == 'on' ? 'on' : 'off';
 
 /* Working directory for downloaded rules tarballs */
-$tmpfname = "/tmp/suricata_rules_up";
+$tmpfname = "{$g['tmp_path']}/suricata_rules_up";
 
 /* Snort VRT Rules filenames and URL */
 $snort_filename_md5 = "{$snort_filename}.md5";
