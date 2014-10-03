@@ -138,11 +138,6 @@ UseHysteresis	no
 
 LinkQualityLevel	{$olsrd['enablelqe']}
 
-# Link quality window size
-# Defaults to 10
-
-LinkQualityWinSize	10
-
 # Polling rate in seconds(float).
 # Default value 0.05 sec
 
