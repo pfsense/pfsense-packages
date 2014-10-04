@@ -707,8 +707,8 @@ if ($snortdownload == 'on' || $emergingthreats == 'on' || $snortcommunityrules =
 	/* Clear the rebuild rules flag.  */
 	$rebuild_rules = false;
 
-	/* Restart Suricata if already running and we are not rebooting to pick up the new rules. */
-       	if (is_process_running("suricata") && !$g['booting'] &&
+	/* Restart Suricata if already running and we are not in post-install, so as to pick up the new rules. */
+       	if (is_process_running("suricata") && !$g['suricata_postinstall'] &&
 	    !empty($config['installedpackages']['suricata']['rule'])) {
 
 		// See if "Live Reload" is configured and signal each Suricata instance
