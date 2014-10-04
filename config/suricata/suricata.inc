@@ -163,6 +163,61 @@ function suricata_start($suricatacfg, $if_real) {
 	suricata_barnyard_start($suricatacfg, $if_real);
 }
 
+function suricata_start_all_interfaces($background=FALSE) {
+
+	/*************************************************************/
+	/* This function starts all configured and enabled Suricata  */
+	/* interfaces.                                               */
+	/*************************************************************/
+
+	global $g, $config;
+
+	/* do nothing if no Suricata interfaces active */
+	if (!is_array($config['installedpackages']['suricata']['rule']))
+		return;
+
+	foreach ($config['installedpackages']['suricata']['rule'] as $suricatacfg) {
+		if ($suricatacfg['enable'] != 'on')
+			continue;
+		suricata_start($suricatacfg, get_real_interface($suricatacfg['interface']));
+	}
+}
+
+function suricata_stop_all_interfaces() {
+
+	/*************************************************************/
+	/* This function stops all configured Suricata interfaces.   */
+	/*************************************************************/
+
+	global $g, $config;
+
+	/* do nothing if no Suricata interfaces active */
+	if (!is_array($config['installedpackages']['suricata']['rule']))
+		return;
+
+	foreach ($config['installedpackages']['suricata']['rule'] as $suricatacfg) {
+		suricata_stop($suricatacfg, get_real_interface($suricatacfg['interface']));
+	}
+}
+
+function suricata_restart_all_interfaces() {
+
+	/*************************************************************/
+	/* This function stops all configured Suricata interfaces    */
+	/* and restarts enabled Suricata interfaces.                 */
+	/*************************************************************/
+
+	global $g, $config;
+
+	/* do nothing if no Suricata interfaces active */
+	if (!is_array($config['installedpackages']['suricata']['rule']))
+		return;
+
+	suricata_stop_all_interfaces();
+	sleep(2);
+	suricata_start_all_interfaces(TRUE);
+}
+
 function suricata_reload_config($suricatacfg, $signal="USR2") {
 
 	/**************************************************************/
@@ -2851,8 +2906,8 @@ EOE;
 				break
 			fi
 		done
-		if [ -f /var/run/barnyard2_{$if_real}{$suricata_uuid}.pid ]; then
-			/bin/rm /var/run/barnyard2_{$if_real}{$suricata_uuid}.pid
+		if [ -f {$g['varrun_path']}/barnyard2_{$if_real}{$suricata_uuid}.pid ]; then
+			/bin/rm {$g['varrun_path']}/barnyard2_{$if_real}{$suricata_uuid}.pid
 		fi
 	else
 		pid=`/bin/pgrep -fn "barnyard2 -r {$suricata_uuid} "`
@@ -2912,8 +2967,8 @@ EOE;
 				break
 			fi
 		done
-		if [ -f /var/run/suricata_{$if_real}{$suricata_uuid}.pid ]; then
-			/bin/rm /var/run/suricata_{$if_real}{$suricata_uuid}.pid
+		if [ -f {$g['varrun_path']}/suricata_{$if_real}{$suricata_uuid}.pid ]; then
+			/bin/rm {$g['varrun_path']}/suricata_{$if_real}{$suricata_uuid}.pid
 		fi
 	else
 		pid=`/bin/pgrep -fn "suricata -i {$if_real} "`
@@ -2948,7 +3003,11 @@ EOE;
 ######## Start of main suricata.sh
 
 rc_start() {
+	/usr/bin/touch {$g['varrun_path']}/suricata_pkg_starting.lck
 	{$rc_start}
+	if [ -f {$g['varrun_path']}/suricata_pkg_starting.lck ]; then
+		/bin/rm {$g['varrun_path']}/suricata_pkg_starting.lck
+	fi
 }
 
 rc_stop() {
@@ -2957,7 +3016,9 @@ rc_stop() {
 
 case $1 in
 	start)
-		rc_start
+		if [ ! -f {$g['varrun_path']}/suricata_pkg_starting.lck ]; then
+			rc_start
+		fi
 		;;
 	stop)
 		rc_stop
