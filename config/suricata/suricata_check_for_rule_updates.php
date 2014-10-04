@@ -209,7 +209,9 @@ function suricata_download_file_url($url, $file_out) {
 		curl_setopt($ch, CURLOPT_FILE, $fout);
 
 		// NOTE: required to suppress errors from XMLRPC due to progress bar output
-		if ($g['suricata_sync_in_progress'])
+		// and to prevent useless spam from rules update cron job execution.  This
+		// prevents progress bar output during package sync and rules update cron task. 
+		if ($g['suricata_sync_in_progress'] || $pkg_interface == "console")
 			curl_setopt($ch, CURLOPT_HEADER, false);
 		else {
 			curl_setopt($ch, CURLOPT_HEADERFUNCTION, 'read_header');
