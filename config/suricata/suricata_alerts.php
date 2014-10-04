@@ -381,9 +381,9 @@ if ($_POST['delete']) {
 if ($_POST['download']) {
 	$save_date = exec('/bin/date "+%Y-%m-%d-%H-%M-%S"');
 	$file_name = "suricata_logs_{$save_date}_{$if_real}.tar.gz";
-	exec("cd {$suricatalogdir}suricata_{$if_real}{$suricata_uuid} && /usr/bin/tar -czf /tmp/{$file_name} *");
+	exec("cd {$suricatalogdir}suricata_{$if_real}{$suricata_uuid} && /usr/bin/tar -czf {$g['tmp_path']}/{$file_name} *");
 
-	if (file_exists("/tmp/{$file_name}")) {
+	if (file_exists("{$g['tmp_path']}/{$file_name}")) {
 		ob_start(); //important or other posts will fail
 		if (isset($_SERVER['HTTPS'])) {
 			header('Pragma: ');
@@ -393,13 +393,13 @@ if ($_POST['download']) {
 			header("Cache-Control: private, must-revalidate");
 		}
 		header("Content-Type: application/octet-stream");
-		header("Content-length: " . filesize("/tmp/{$file_name}"));
+		header("Content-length: " . filesize("{$g['tmp_path']}/{$file_name}"));
 		header("Content-disposition: attachment; filename = {$file_name}");
 		ob_end_clean(); //important or other post will fail
-		readfile("/tmp/{$file_name}");
+		readfile("{$g['tmp_path']}/{$file_name}");
 
 		// Clean up the temp file
-		unlink_if_exists("/tmp/{$file_name}");
+		unlink_if_exists("{$g['tmp_path']}/{$file_name}");
 	}
 	else
 		$savemsg = gettext("An error occurred while creating archive");
@@ -625,8 +625,8 @@ if ($savemsg) {
 
 /* make sure alert file exists */
 if (file_exists("{$g['varlog_path']}/suricata/suricata_{$if_real}{$suricata_uuid}/alerts.log")) {
-	exec("tail -{$anentries} -r {$g['varlog_path']}/suricata/suricata_{$if_real}{$suricata_uuid}/alerts.log > /tmp/alerts_suricata{$suricata_uuid}");
-	if (file_exists("/tmp/alerts_suricata{$suricata_uuid}")) {
+	exec("tail -{$anentries} -r {$g['varlog_path']}/suricata/suricata_{$if_real}{$suricata_uuid}/alerts.log > {$g['tmp_path']}/alerts_suricata{$suricata_uuid}");
+	if (file_exists("{$g['tmp_path']}/alerts_suricata{$suricata_uuid}")) {
 		$tmpblocked = array_flip(suricata_get_blocked_ips());
 		$counter = 0;
 
@@ -640,7 +640,7 @@ if (file_exists("{$g['varlog_path']}/suricata/suricata_{$if_real}{$suricata_uuid
 		/*              0          1           2   3   4    5                         6                 7                                       */
 		/************** *************************************************************************************************************************/
 
-		$fd = fopen("/tmp/alerts_suricata{$suricata_uuid}", "r");
+		$fd = fopen("{$g['tmp_path']}/alerts_suricata{$suricata_uuid}", "r");
 		$buf = "";
 		while (($buf = fgets($fd)) !== FALSE) {
 			$fields = array();
@@ -836,7 +836,7 @@ if (file_exists("{$g['varlog_path']}/suricata/suricata_{$if_real}{$suricata_uuid
 		}
 		unset($fields, $buf, $tmp);
 		fclose($fd);
-		unlink_if_exists("/tmp/alerts_suricata{$suricata_uuid}");
+		unlink_if_exists("{$g['tmp_path']}/alerts_suricata{$suricata_uuid}");
 	}
 }
 ?>
