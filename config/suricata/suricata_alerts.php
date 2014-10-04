@@ -379,7 +379,7 @@ if ($_POST['delete']) {
 }
 
 if ($_POST['download']) {
-	$save_date = exec('/bin/date "+%Y-%m-%d-%H-%M-%S"');
+	$save_date = date("Y-m-d-H-i-s");
 	$file_name = "suricata_logs_{$save_date}_{$if_real}.tar.gz";
 	exec("cd {$suricatalogdir}suricata_{$if_real}{$suricata_uuid} && /usr/bin/tar -czf {$g['tmp_path']}/{$file_name} *");
 

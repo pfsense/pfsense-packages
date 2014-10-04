@@ -216,7 +216,7 @@ if (isset($_POST['sidlist_dnload']) && isset($_POST['sidlist_fname'])) {
 }
 
 if (isset($_POST['sidlist_dnload_all_x'])) {
-	$save_date = exec('/bin/date "+%Y-%m-%d-%H-%M-%S"');
+	$save_date = date("Y-m-d-H-i-s");
 	$file_name = "suricata_sid_conf_files_{$save_date}.tar.gz";
 	exec("cd {$sidmods_path} && /usr/bin/tar -czf /tmp/{$file_name} *");
 

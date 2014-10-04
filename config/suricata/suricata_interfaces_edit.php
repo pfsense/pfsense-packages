@@ -316,9 +316,9 @@ if ($_POST["save"] && !$input_errors) {
 				}
 				else
 					$suricata_start = false;
-				exec("mv -f {$suricatalogdir}suricata_{$oif_real}" . $a_rule[$id]['uuid'] . " {$suricatalogdir}suricata_{$if_real}" . $a_rule[$id]['uuid']);
+				@rename("{$suricatalogdir}suricata_{$oif_real}{$a_rule[$id]['uuid']}", "{$suricatalogdir}suricata_{$if_real}{$a_rule[$id]['uuid']}");
 				conf_mount_rw();
-				exec("mv -f {$suricatadir}suricata_" . $a_rule[$id]['uuid'] . "_{$oif_real} {$suricatadir}suricata_" . $a_rule[$id]['uuid'] . "_{$if_real}");
+				@rename("{$suricatadir}suricata_{$a_rule[$id]['uuid']}_{$oif_real}", "{$suricatadir}suricata_{$a_rule[$id]['uuid']}_{$if_real}");
 				conf_mount_ro();
 			}
 			$a_rule[$id] = $natent;
