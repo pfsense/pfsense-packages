@@ -408,9 +408,9 @@ if (is_dir("{$tmpfname}"))
 	rmdir_recursive("{$tmpfname}");
 
 /*  Make sure required suricatadirs exsist */
-exec("/bin/mkdir -p {$suricatadir}rules");
-exec("/bin/mkdir -p {$tmpfname}");
-exec("/bin/mkdir -p {$suricatalogdir}");
+safe_mkdir("{$suricatadir}rules");
+safe_mkdir("{$tmpfname}");
+safe_mkdir("{$suricatalogdir}");
 
 /* See if we need to automatically clear the Update Log based on 1024K size limit */
 if (file_exists($suricata_rules_upd_log)) {
@@ -531,7 +531,7 @@ if ($emergingthreats == 'on') {
 			update_output_window(gettext("Installation of {$et_name} rules completed..."));
 		}
 		error_log(gettext("\tInstallation of {$et_name} rules completed.\n"), 3, $suricata_rules_upd_log);
-		exec("rm -r {$tmpfname}/emerging");
+		rmdir_recursive("{$tmpfname}/emerging");
 	}
 }
 
@@ -563,7 +563,7 @@ if ($snortdownload == 'on') {
 			$newfile = basename($file);
 			@copy($file, "{$suricatadir}rules/{$newfile}");
 		}
-		exec("rm -r {$tmpfname}/snortrules");
+		rmdir_recursive("{$tmpfname}/snortrules");
 
 		/* extract base etc files */
 		if ($pkg_interface <> "console") {
@@ -575,7 +575,7 @@ if ($snortdownload == 'on') {
 			if (file_exists("{$tmpfname}/etc/{$file}"))
 				@copy("{$tmpfname}/etc/{$file}", "{$tmpfname}/VRT_{$file}");
 		}
-		exec("rm -r {$tmpfname}/etc");
+		rmdir_recursive("{$tmpfname}/etc");
 		if (file_exists("{$tmpfname}/{$snort_filename_md5}")) {
 			if ($pkg_interface <> "console")
 				update_status(gettext("Copying md5 signature to Suricata directory..."));
@@ -621,7 +621,7 @@ if ($snortcommunityrules == 'on') {
 			update_output_window(gettext("Installation of Snort GPLv2 Community Rules file completed..."));
 		}
 		error_log(gettext("\tInstallation of Snort GPLv2 Community Rules completed.\n"), 3, $suricata_rules_upd_log);
-		exec("rm -r {$tmpfname}/community");
+		rmdir_recursive("{$tmpfname}/community");
 	}
 }
 

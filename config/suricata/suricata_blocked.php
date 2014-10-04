@@ -96,9 +96,9 @@ if ($_POST['download'])
 	exec("/sbin/pfctl -t {$suri_pf_table} -T show", $blocked_ips_array_save);
 	/* build the list */
 	if (is_array($blocked_ips_array_save) && count($blocked_ips_array_save) > 0) {
-		$save_date = exec('/bin/date "+%Y-%m-%d-%H-%M-%S"');
+		$save_date = date("Y-m-d-H-i-s");
 		$file_name = "suricata_blocked_{$save_date}.tar.gz";
-		exec("/bin/mkdir -p {$g['tmp_path']}/suricata_blocked");
+		safe_mkdir("{$g['tmp_path']}/suricata_blocked");
 		file_put_contents("{$g['tmp_path']}/suricata_blocked/suricata_block.pf", "");
 		foreach($blocked_ips_array_save as $counter => $fileline) {
 			if (empty($fileline))
