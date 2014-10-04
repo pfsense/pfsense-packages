@@ -344,7 +344,7 @@ unset($r);
 
 // Write out the new configuration to disk if we changed anything
 if ($updated_cfg) {
-	$config['installedpackages']['suricata']['config'][0]['suricata_config_ver'] = "2.0.2";
+	$config['installedpackages']['suricata']['config'][0]['suricata_config_ver'] = "2.0.3";
 	log_error("[Suricata] Saving configuration settings in new format...");
 	write_config("Suricata pkg: migrate existing settings to new format during package upgrade.");
 	log_error("[Suricata] Settings successfully migrated to new configuration format...");

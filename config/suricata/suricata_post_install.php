@@ -238,7 +238,7 @@ if (empty($config['installedpackages']['suricata']['config'][0]['forcekeepsettin
 conf_mount_ro();
 
 // Update Suricata package version in configuration
-$config['installedpackages']['suricata']['config'][0]['suricata_config_ver'] = "2.0.2";
+$config['installedpackages']['suricata']['config'][0]['suricata_config_ver'] = "2.0.3";
 write_config("Suricata pkg: updated GUI package version number.");
 
 // Done with post-install, so clear flag
