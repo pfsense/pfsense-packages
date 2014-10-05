@@ -1,6 +1,6 @@
 <?php 
 /*
-	vpn_openvpn_export.php
+	vpn_openvpn_export_shared.php
 
 	Copyright (C) 2008 Shrew Soft Inc.
 	Copyright (C) 2010 Ermal Luçi
@@ -202,7 +202,7 @@ function download_begin(act) {
 		var proxyconf = document.getElementById("proxyconf").value;
 		if (useproxypass) {
 			if (!proxyuser) {
-				alert("Please fill the proxy username and passowrd.");
+				alert("Please fill the proxy username and password.");
 				return;
 			}
 			if (!proxypass || !proxyconf) {
