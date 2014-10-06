@@ -60,6 +60,9 @@ global $config, $g, $rebuild_rules, $pkg_interface, $snort_gui_include;
 if (!defined('SNORT_SID_MODS_PATH'))
 	define('SNORT_SID_MODS_PATH', "{$g['vardb_path']}/snort/sidmods/");
 
+if (!defined('SNORT_ENFORCING_RULES_FILENAME'))
+	define("SNORT_ENFORCING_RULES_FILENAME", "snort.rules");
+
 /****************************************
  * End of PHP caching workaround        *
  ****************************************/
