@@ -823,6 +823,11 @@ if ($pkg_interface <> "console")
 	update_status(gettext("The Rules update has finished..."));
 log_error(gettext("[Snort] The Rules update has finished."));
 error_log(gettext("The Rules update has finished.  Time: " . date("Y-m-d H:i:s"). "\n\n"), 3, $snort_rules_upd_log);
+
+// Remount filesystem read-only unless we are in package post-install.
+// The post-install code will remount read-only when it completes.
+if (!$g['snort_postinstall'])
+	conf_mount_ro();
 conf_mount_ro();
 
 /* Restore the state of $pkg_interface */
