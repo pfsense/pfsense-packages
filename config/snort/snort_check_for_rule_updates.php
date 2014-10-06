@@ -213,7 +213,9 @@ function snort_download_file_url($url, $file_out) {
 		curl_setopt($ch, CURLOPT_FILE, $fout);
 
 		// NOTE: required to suppress errors from XMLRPC due to progress bar output
-		if ($g['snort_sync_in_progress'])
+		// and to prevent useless spam from rules update cron job execution.  This
+		// prevents progress bar output during package sync and rules update cron task. 
+		if ($g['snort_sync_in_progress'] || $pkg_interface == "console")
 			curl_setopt($ch, CURLOPT_HEADER, false);
 		else {
 			curl_setopt($ch, CURLOPT_HEADERFUNCTION, 'read_header');
@@ -784,13 +786,12 @@ if ($snortdownload == 'on' || $emergingthreats == 'on' || $snortcommunityrules =
 			update_output_window(gettext("Please wait ... restarting Snort will take some time..."));
 		}
 		error_log(gettext("\tRestarting Snort to activate the new set of rules...\n"), 3, $snort_rules_upd_log);
+		touch("{$g['varrun_path']}/snort_pkg_starting.lck");
 		foreach ($config['installedpackages']['snortglobal']['rule'] as $snortcfg) {
 			if ($snortcfg['enable'] != "on")
 				continue;
 			$if_real = get_real_interface($snortcfg['interface']);
 			if (snort_is_running($snortcfg['uuid'], $if_real, 'snort')) {
-				touch("{$g['varrun_path']}/snort_{$snortcfg['uuid']}.disabled");
-				touch("{$g['varrun_path']}/barnyard2_{$snortcfg['uuid']}.disabled");
 				snort_stop($snortcfg, $if_real);
 				sleep(2);
 				if ($pkg_interface <> "console") {
@@ -799,10 +800,9 @@ if ($snortdownload == 'on' || $emergingthreats == 'on' || $snortcommunityrules =
 				}
 				else
 					snort_start($snortcfg, $if_real, TRUE);
-				unlink_if_exists("{$g['varrun_path']}/snort_{$snortcfg['uuid']}.disabled");
-				unlink_if_exists("{$g['varrun_path']}/barnyard2_{$snortcfg['uuid']}.disabled");
 			}
 		}
+		unlink_if_exists("{$g['varrun_path']}/snort_pkg_starting.lck");
 		if ($pkg_interface <> "console")
 		        update_output_window(gettext("Snort has restarted with your new set of rules..."));
        		log_error(gettext("[Snort] Snort has restarted with your new set of rules..."));
