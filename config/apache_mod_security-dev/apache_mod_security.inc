@@ -450,30 +450,6 @@ function generate_apache_configuration() {
 		#load conf template
 		include("/usr/local/pkg/apache_balancer.template");
 
-		if (APACHEVERSION == 'apache22') { # Only define this here for apache22
-			#check balancer members
-			foreach ($config['installedpackages']['apachebalancer']['config'] as $balancer){
-				if (is_array($balancer['row']) && $balancer['enable'] == 'on'){
-					$balancer_config.="# {$balancer['description']}\n";
-					$balancer_config.="<Proxy balancer://{$balancer['name']}>\n";
-					foreach($balancer['row'] as $server){
-						$options =($server['port'] ? ":{$server['port']}" : "");
-						$options.=($server['routeid'] ? " route={$server['routeid']}" : "");
-						$options.=($server['loadfactor'] ? " loadfactor={$server['loadfactor']}" : "");
-						if (isset($server['ping']) && $server['ping']!=""){
-							$options.= " ping={$server['ping']}";
-							$options.=($server['ttl'] ? " ttl={$server['ttl']}" : "");
-						}
-					$balancer_config.="  BalancerMember {$balancer['proto']}://{$server['host']}{$options}\n"; 
-					}
-					#check if stick connections are set
-					if ($balancer['row'][0]['routeid'] !="")
-						$balancer_config.="  ProxySet stickysession=ROUTEID\n";
-					$balancer_config.="</Proxy>\n\n";
-				}
-			}
-		}
-
 		//write balancer conf
 		file_put_contents(APACHEDIR."/etc/" . APACHEVERSION . "/Includes/balancers.conf",$balancer_config,LOCK_EX);
 	}
@@ -565,10 +541,14 @@ EOF;
 
 				#check ssl
 				if(isset($virtualhost["ssl_cert"]) && $virtualhost["ssl_cert"] !="none" && $virtualhost["proto"] == "https") {
-					$vh_config.= " SSLEngine on\n SSLProtocol all -SSLv2\n SSLProxyEngine on\n SSLProxyVerify none\n";
-					$vh_config.= " SSLCipherSuite ALL:!ADH:!EXPORT56:RC4+RSA:+HIGH:+MEDIUM:+LOW:+SSLv2:+EXP:+eNULL\n";
+					$vh_config.= " SSLEngine on\n";
+					$vh_config.= " SSLProtocol ". ($virtualhost['ssl_protocol'] ? $virtualhost['ssl_protocol'] : "all -SSLv2") ."\n";
+					$vh_config.= " SSLProxyEngine ". ($virtualhost['ssl_proxy_engine'] ? "on" : "off") ."\n";
+					$vh_config.= " SSLProxyVerify ". ($virtualhost['ssl_proxy_verify'] ? $virtualhost['ssl_proxy_verify'] : "none") ."\n";
+					$vh_config.= " SSLCipherSuite ". ($virtualhost['ssl_cipher_suite'] ? $virtualhost['ssl_cipher_suite'] : "ALL:!ADH:!EXPORT56:RC4+RSA:+HIGH:+MEDIUM:+LOW:+SSLv2:+EXP:+eNULL") ."\n";
+					$vh_config.= " SSLHonorCipherOrder ". ($virtualhost['ssl_honor_cipher_order'] ? "on" : "off") ."\n";
 					
-    				$svr_cert = lookup_cert($virtualhost["ssl_cert"]);
+					$svr_cert = lookup_cert($virtualhost["ssl_cert"]);
 					if ($svr_cert != false) {
 						if(base64_decode($svr_cert['crt'])) {
 							file_put_contents(APACHEDIR . "/etc/" . APACHEVERSION . "/{$virtualhost["ssl_cert"]}.crt",apache_textarea_decode($svr_cert['crt']),LOCK_EX);
@@ -589,7 +569,7 @@ EOF;
 							file_put_contents(APACHEDIR . "/etc/" . APACHEVERSION . "/{$virtualhost["reverse_int_ca"]}.crt",apache_textarea_decode($cli_ca['crt']),LOCK_EX);
 							$vh_config.= " SSLCACertificateFile ". APACHEDIR . "/etc/" . APACHEVERSION . "/{$virtualhost["reverse_int_ca"]}.crt\n";
 							}
-					}
+				}
 				#Custom Options
 				$vh_config.= apache_textarea_decode($virtualhost['custom'])."\n\n";
 
@@ -599,28 +579,26 @@ EOF;
 						$backend=$apache_location[$be['location']];
 
 						$vh_config.="# {$backend['name']}\n";
-						if (APACHEVERSION == 'apache24') { # Only define this here for apache24
-							foreach ($config['installedpackages']['apachebalancer']['config'] as $balancer){
-								if (is_array($balancer['row']) && $balancer['enable'] == 'on' && $balancer['name'] == $backend['balancer']){
-									$vh_config.="# {$balancer['description']}\n";
-									$vh_config.=" <Proxy balancer://{$balancer['name']}>\n";
-									foreach($balancer['row'] as $balancer_server){
-										$balancer_options =($balancer_server['port'] ? ":{$balancer_server['port']}" : "");
+						foreach ($config['installedpackages']['apachebalancer']['config'] as $balancer){
+							if (is_array($balancer['row']) && $balancer['enable'] == 'on' && $balancer['name'] == $backend['balancer']){
+								$vh_config.="# {$balancer['description']}\n";
+								$vh_config.=" <Proxy balancer://{$balancer['name']}>\n";
+								foreach($balancer['row'] as $balancer_server){
+									$balancer_options =($balancer_server['port'] ? ":{$balancer_server['port']}" : "");
 
-										$balancer_options.=($balancer_server['routeid'] ? " route={$balancer_server['routeid']}" : "");
-										$balancer_options.=($balancer_server['loadfactor'] ? " loadfactor={$balancer_server['loadfactor']}" : "");
-										if (isset($balancer_server['ping']) && $balancer_server['ping']!=""){
-											$balancer_options.= " ping={$balancer_server['ping']}";
-											$balancer_options.=($server['ttl'] ? " ttl={$balancer_server['ttl']}" : "");
-										}
-										$vh_config.="  BalancerMember {$balancer['proto']}://{$balancer_server['host']}{$balancer_options}\n";
+									$balancer_options.=($balancer_server['routeid'] ? " route={$balancer_server['routeid']}" : "");
+									$balancer_options.=($balancer_server['loadfactor'] ? " loadfactor={$balancer_server['loadfactor']}" : "");
+									if (isset($balancer_server['ping']) && $balancer_server['ping']!=""){
+										$balancer_options.= " ping={$balancer_server['ping']}";
+										$balancer_options.=($server['ttl'] ? " ttl={$balancer_server['ttl']}" : "");
 									}
-									#check if stick connections are set
-									if ($balancer['row'][0]['routeid'] !="")
-										$vh_config.="  ProxySet stickysession=ROUTEID\n";
-									$vh_config.=" </Proxy>\n\n";
-									break;
+									$vh_config.="  BalancerMember {$balancer['proto']}://{$balancer_server['host']}{$balancer_options}\n";
 								}
+								#check if stick connections are set
+								if ($balancer['row'][0]['routeid'] !="")
+									$vh_config.="  ProxySet stickysession=ROUTEID\n";
+								$vh_config.=" </Proxy>\n\n";
+								break;
 							}
 						}
 	
