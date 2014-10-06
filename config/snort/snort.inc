@@ -44,7 +44,7 @@ require_once("filter.inc");
 ini_set("memory_limit", "256M");
 
 // Explicitly declare this as global so it works through function call includes 
-global $rebuild_rules, $pfSense_snort_version;
+global $g, $config, $rebuild_rules, $pfSense_snort_version;
 
 // Grab the Snort binary version programmatically, but if that fails use a safe default
 $snortver = array();
@@ -69,15 +69,15 @@ else {
 
 /* Define some useful constants for Snort */
 /* Be sure to include trailing slash on the URL defines */
-define("SNORTLOGDIR", "/var/log/snort");
+define("SNORTLOGDIR", "{$g['varlog_path']}/snort");
 define("SNORT_BIN_VERSION", "2.9.6.2");
 define("SNORT_ET_DNLD_FILENAME", "emerging.rules.tar.gz");
 define("SNORT_ETPRO_DNLD_FILENAME", "etpro.rules.tar.gz");
 define("SNORT_GPLV2_DNLD_FILENAME", "community-rules.tar.gz");
 define("SNORT_ENFORCING_RULES_FILENAME", "snort.rules");
 define("SNORT_RULES_UPD_LOGFILE", SNORTLOGDIR . "/snort_rules_update.log");
-define("SNORT_IPREP_PATH", "/var/db/snort/iprep/");
-define('SNORT_SID_MODS_PATH', '/var/db/snort/sidmods/');
+define("SNORT_IPREP_PATH", "{$g['vardb_path']}/snort/iprep/");
+define('SNORT_SID_MODS_PATH', "{$g['vardb_path']}/snort/sidmods/");
 if (!defined("FLOWBITS_FILENAME"))
 	define("FLOWBITS_FILENAME", "flowbit-required.rules");
 if (!defined("VRT_FILE_PREFIX"))
@@ -557,7 +557,18 @@ function snort_barnyard_stop($snortcfg, $if_real) {
 	$snort_uuid = $snortcfg['uuid'];
 	if (isvalidpid("{$g['varrun_path']}/barnyard2_{$if_real}{$snort_uuid}.pid")) {
 		log_error("[Snort] Barnyard2 STOP for " . convert_real_interface_to_friendly_descr($if_real) . "({$if_real})...");
+		touch("{$g['varrun_path']}/barnyard2_{$if_real}{$snort_uuid}.stopping");
 		killbypid("{$g['varrun_path']}/barnyard2_{$if_real}{$snort_uuid}.pid");
+
+		// Now wait up to 5 seconds for Barnyard2 to actually stop and clear its PID file
+		$count = 0;
+		do {
+			if (!isvalidpid("{$g['varrun_path']}/barnyard2_{$if_real}{$snort_uuid}.pid"))
+				break;
+			sleep(1);
+			$count++;
+		} while ($count < 5);
+		unlink_if_exists("{$g['varrun_path']}/barnyard2_{$if_real}{$snort_uuid}.stopping");
 	}
 }
 
@@ -567,7 +578,18 @@ function snort_stop($snortcfg, $if_real) {
 	$snort_uuid = $snortcfg['uuid'];
 	if (isvalidpid("{$g['varrun_path']}/snort_{$if_real}{$snort_uuid}.pid")) {
 		log_error("[Snort] Snort STOP for " . convert_real_interface_to_friendly_descr($if_real) . "({$if_real})...");
+		touch("{$g['varrun_path']}/snort_{$if_real}{$snort_uuid}.stopping");
 		killbypid("{$g['varrun_path']}/snort_{$if_real}{$snort_uuid}.pid");
+
+		// Now wait up to 10 seconds for Snort to actually stop and clear its PID file
+		$count = 0;
+		do {
+			if (!isvalidpid("{$g['varrun_path']}/snort_{$if_real}{$snort_uuid}.pid"))
+				break;
+			sleep(1);
+			$count++;
+		} while ($count < 10);
+		unlink_if_exists("{$g['varrun_path']}/snort_{$if_real}{$snort_uuid}.stopping");
 	}
 
 	snort_barnyard_stop($snortcfg, $if_real);

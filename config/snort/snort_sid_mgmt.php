@@ -215,9 +215,9 @@ if (isset($_POST['sidlist_dnload']) && isset($_POST['sidlist_fname'])) {
 if (isset($_POST['sidlist_dnload_all_x'])) {
 	$save_date = date("Y-m-d-H-i-s");
 	$file_name = "snort_sid_conf_files_{$save_date}.tar.gz";
-	exec("cd {$sidmods_path} && /usr/bin/tar -czf /tmp/{$file_name} *");
+	exec("cd {$sidmods_path} && /usr/bin/tar -czf {$g['tmp_path']}/{$file_name} *");
 
-	if (file_exists("/tmp/{$file_name}")) {
+	if (file_exists("{$g['tmp_path']}/{$file_name}")) {
 		ob_start(); //important or other posts will fail
 		if (isset($_SERVER['HTTPS'])) {
 			header('Pragma: ');
@@ -227,13 +227,13 @@ if (isset($_POST['sidlist_dnload_all_x'])) {
 			header("Cache-Control: private, must-revalidate");
 		}
 		header("Content-Type: application/octet-stream");
-		header("Content-length: " . filesize("/tmp/{$file_name}"));
+		header("Content-length: " . filesize("{$g['tmp_path']}/{$file_name}"));
 		header("Content-disposition: attachment; filename = {$file_name}");
 		ob_end_clean(); //important or other post will fail
-		readfile("/tmp/{$file_name}");
+		readfile("{$g['tmp_path']}/{$file_name}");
 
 		// Clean up the temp file
-		unlink_if_exists("/tmp/{$file_name}");
+		unlink_if_exists("{$g['tmp_path']}/{$file_name}");
 	}
 	else
 		$savemsg = gettext("An error occurred while creating the gzip archive!");

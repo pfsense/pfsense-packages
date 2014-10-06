@@ -91,20 +91,20 @@ if ($_POST['download'])
 	if (is_array($blocked_ips_array_save) && count($blocked_ips_array_save) > 0) {
 		$save_date = date("Y-m-d-H-i-s");
 		$file_name = "snort_blocked_{$save_date}.tar.gz";
-		safe_mkdir("/tmp/snort_blocked");
-		file_put_contents("/tmp/snort_blocked/snort_block.pf", "");
+		safe_mkdir("{$g['tmp_path']}/snort_blocked");
+		file_put_contents("{$g['tmp_path']}/snort_blocked/snort_block.pf", "");
 		foreach($blocked_ips_array_save as $counter => $fileline) {
 			if (empty($fileline))
 				continue;
 			$fileline = trim($fileline, " \n\t");
-			file_put_contents("/tmp/snort_blocked/snort_block.pf", "{$fileline}\n", FILE_APPEND);
+			file_put_contents("{$g['tmp_path']}/snort_blocked/snort_block.pf", "{$fileline}\n", FILE_APPEND);
 		}
 
 		// Create a tar gzip archive of blocked host IP addresses
-		exec("/usr/bin/tar -czf /tmp/{$file_name} -C/tmp/snort_blocked snort_block.pf");
+		exec("/usr/bin/tar -czf {$g['tmp_path']}/{$file_name} -C{$g['tmp_path']}/snort_blocked snort_block.pf");
 
 		// If we successfully created the archive, send it to the browser.
-		if(file_exists("/tmp/{$file_name}")) {
+		if(file_exists("{$g['tmp_path']}/{$file_name}")) {
 			ob_start(); //important or other posts will fail
 			if (isset($_SERVER['HTTPS'])) {
 				header('Pragma: ');
@@ -114,14 +114,14 @@ if ($_POST['download'])
 				header("Cache-Control: private, must-revalidate");
 			}
 			header("Content-Type: application/octet-stream");
-			header("Content-length: " . filesize("/tmp/{$file_name}"));
+			header("Content-length: " . filesize("{$g['tmp_path']}/{$file_name}"));
 			header("Content-disposition: attachment; filename = {$file_name}");
 			ob_end_clean(); //important or other post will fail
-			readfile("/tmp/{$file_name}");
+			readfile("{$g['tmp_path']}/{$file_name}");
 
 			// Clean up the temp files and directory
-			unlink_if_exists("/tmp/{$file_name}");
-			rmdir_recursive("/tmp/snort_blocked");
+			unlink_if_exists("{$g['tmp_path']}/{$file_name}");
+			rmdir_recursive("{$g['tmp_path']}/snort_blocked");
 		} else
 			$savemsg = gettext("An error occurred while creating archive");
 	} else
