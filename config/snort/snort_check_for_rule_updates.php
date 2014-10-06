@@ -65,7 +65,7 @@ if (!defined("ET_OPEN_FILE_PREFIX"))
 if (!defined("ET_PRO_FILE_PREFIX"))
 	define("ET_PRO_FILE_PREFIX", "etpro-");
 if (!defined("SNORT_IPREP_PATH"))
-	define("SNORT_IPREP_PATH", "/var/db/snort/iprep/");
+	define("SNORT_IPREP_PATH", "{$g['vardb_path']}/snort/iprep/");
 
 $snortdir = SNORTDIR;
 $snortlibdir = SNORTLIBDIR;
@@ -90,7 +90,7 @@ $snortcommunityrules = $config['installedpackages']['snortglobal']['snortcommuni
 $vrt_enabled = $config['installedpackages']['snortglobal']['snortdownload'] == 'on' ? 'on' : 'off';
 
 /* Working directory for downloaded rules tarballs and extraction */
-$tmpfname = "/tmp/snort_rules_up";
+$tmpfname = "{$g['tmp_path']}/snort_rules_up";
 
 /* Grab the Snort binary version programmatically and use it to construct */
 /* the proper Snort VRT rules tarball and md5 filenames. Fallback to a    */
