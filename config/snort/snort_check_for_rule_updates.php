@@ -787,21 +787,8 @@ if ($snortdownload == 'on' || $emergingthreats == 'on' || $snortcommunityrules =
 		}
 		error_log(gettext("\tRestarting Snort to activate the new set of rules...\n"), 3, $snort_rules_upd_log);
 		touch("{$g['varrun_path']}/snort_pkg_starting.lck");
-		foreach ($config['installedpackages']['snortglobal']['rule'] as $snortcfg) {
-			if ($snortcfg['enable'] != "on")
-				continue;
-			$if_real = get_real_interface($snortcfg['interface']);
-			if (snort_is_running($snortcfg['uuid'], $if_real, 'snort')) {
-				snort_stop($snortcfg, $if_real);
-				sleep(2);
-				if ($pkg_interface <> "console") {
-					update_output_window(gettext("Starting Snort on " . convert_friendly_interface_to_friendly_descr($snortcfg['interface']) . "..."));
-					snort_start($snortcfg, $if_real, FALSE);
-				}
-				else
-					snort_start($snortcfg, $if_real, TRUE);
-			}
-		}
+		snort_start_all_interfaces(TRUE);
+		sleep(3);
 		unlink_if_exists("{$g['varrun_path']}/snort_pkg_starting.lck");
 		if ($pkg_interface <> "console")
 		        update_output_window(gettext("Snort has restarted with your new set of rules..."));
