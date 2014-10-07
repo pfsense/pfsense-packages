@@ -2833,19 +2833,16 @@ function snort_create_rc() {
 
 		$start_barnyard = <<<EOE
 
+	sleep 2
 	if [ ! -f {$g['varrun_path']}/barnyard2_{$if_real}{$snort_uuid}.pid ]; then
 		pid=`/bin/pgrep -fn "barnyard2 -r {$snort_uuid} "`
 	else
 		pid=`/bin/pgrep -F {$g['varrun_path']}/barnyard2_{$if_real}{$snort_uuid}.pid`
 	fi
-	if [ ! -z \$pid ]; then
-		/usr/bin/logger -p daemon.info -i -t SnortStartup "Barnyard2 SOFT RESTART for {$value['descr']}({$snort_uuid}_{$if_real})..."
-		/bin/pkill -HUP \$pid
-	else
+	if [ -z \$pid ]; then
 		/usr/bin/logger -p daemon.info -i -t SnortStartup "Barnyard2 START for {$value['descr']}({$snort_uuid}_{$if_real})..."
 		/usr/local/bin/barnyard2 -r {$snort_uuid} -f snort_{$snort_uuid}_{$if_real}.u2 --pid-path {$g['varrun_path']} --nolock-pidfile -c {$snortdir}/snort_{$snort_uuid}_{$if_real}/barnyard2.conf -d {$snortlogdir}/snort_{$if_real}{$snort_uuid} -D -q
 	fi
-
 EOE;
 		$stop_barnyard2 = <<<EOE
 
@@ -2878,7 +2875,6 @@ EOE;
 			done
 		fi
         fi
-
 EOE;
 		if ($value['barnyard_enable'] == 'on')
 			$start_barnyard2 = $start_barnyard;
@@ -2887,29 +2883,24 @@ EOE;
 
 		$start_snort_iface_start[] = <<<EOE
 
-###### For Each Iface
-	# Start snort and barnyard2
+	# Start snort and barnyard2 for {$value['descr']}
 	if [ ! -f {$g['varrun_path']}/snort_{$if_real}{$snort_uuid}.pid ]; then
 		pid=`/bin/pgrep -fn "snort -R {$snort_uuid} "`
 	else
 		pid=`/bin/pgrep -F {$g['varrun_path']}/snort_{$if_real}{$snort_uuid}.pid`
 	fi
 
-	if [ ! -z \$pid ]; then
-		/usr/bin/logger -p daemon.info -i -t SnortStartup "Snort SOFT RESTART for {$value['descr']}({$snort_uuid}_{$if_real})..."
-		/bin/pkill -HUP \$pid
-	else
+	if [ -z \$pid ]; then
 		/usr/bin/logger -p daemon.info -i -t SnortStartup "Snort START for {$value['descr']}({$snort_uuid}_{$if_real})..."
 		/usr/local/bin/snort -R {$snort_uuid} -D -q -l {$snortlogdir}/snort_{$if_real}{$snort_uuid} --pid-path {$g['varrun_path']} --nolock-pidfile -G {$snort_uuid} -c {$snortdir}/snort_{$snort_uuid}_{$if_real}/snort.conf -i {$if_real}
 	fi
 
-	sleep 2
 	{$start_barnyard2}
-
 EOE;
 
 		$start_snort_iface_stop[] = <<<EOE
 
+	# Stop snort and barnyard2 for {$value['descr']}
 	if [ -f {$g['varrun_path']}/snort_{$if_real}{$snort_uuid}.pid ]; then
 		pid=`/bin/pgrep -F {$g['varrun_path']}/snort_{$if_real}{$snort_uuid}.pid`
 		/usr/bin/logger -p daemon.info -i -t SnortStartup "Snort STOP for {$value['descr']}({$snort_uuid}_{$if_real})..."
@@ -2941,9 +2932,8 @@ EOE;
 		fi
 	fi
 
-	sleep 2
+	sleep 1
 	{$stop_barnyard2}
-
 EOE;
 	}
 
@@ -2955,11 +2945,18 @@ EOE;
 ########
 # This file was automatically generated
 # by the pfSense service handler.
-# Code added to protect from double starts on pfSense bootup
 ######## Start of main snort.sh
 
 rc_start() {
+
+	### Lock out other start signals until we are done
+	/usr/bin/touch {$g['varrun_path']}/snort_pkg_starting.lck
 	{$rc_start}
+
+	### Remove the lock since we have started all interfaces
+	if [ -f {$g['varrun_path']}/snort_pkg_starting.lck ]; then
+		/bin/rm {$g['varrun_path']}/snort_pkg_starting.lck
+	fi
 }
 
 rc_stop() {
@@ -2968,7 +2965,9 @@ rc_stop() {
 
 case $1 in
 	start)
-		rc_start
+		if [ ! -f {$g['varrun_path']}/snort_pkg_starting.lck ]; then
+			rc_start
+		fi
 		;;
 	stop)
 		rc_stop
