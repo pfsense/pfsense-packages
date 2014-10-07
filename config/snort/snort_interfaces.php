@@ -52,24 +52,9 @@ if (isset($_POST['del_x'])) {
 	/* Delete selected Snort interfaces */
 	if (is_array($_POST['rule'])) {
 		conf_mount_rw();
-		$pkg_serv = &$config['installedpackages']['service'];
-		if (!is_array($pkg_serv))
-			$pkg_serv = array();
 		foreach ($_POST['rule'] as $rulei) {
 			$if_real = get_real_interface($a_nat[$rulei]['interface']);
 			$snort_uuid = $a_nat[$rulei]['uuid'];
-			foreach ($pkg_serv as $key => $service) {
-				if (isset($service['uuid']) && $service['uuid'] == $snort_uuid &&
-				    $service['name'] == "snort_" . strtolower($a_nat[$rulei]['interface'])) {
-					unset($pkg_serv[$key]);
-					unlink_if_exists("{$g['varrun_path']}/snort_{$snort_uuid}.disabled");
-				}
-				if (isset($service['uuid']) && $service['uuid'] == $snort_uuid &&
-				    $service['name'] == "barnyard2_" . strtolower($a_nat[$rulei]['interface'])) {
-					unset($pkg_serv[$key]);
-					unlink_if_exists("{$g['varrun_path']}/barnyard2_{$snort_uuid}.disabled");
-				}
-			}
 			snort_stop($a_nat[$rulei], $if_real);
 			rmdir_recursive("{$snortlogdir}/snort_{$if_real}{$snort_uuid}");
 			rmdir_recursive("{$snortdir}/snort_{$snort_uuid}_{$if_real}");
@@ -109,10 +94,8 @@ if ($_POST['bartoggle'] && is_numericint($_POST['id'])) {
 		log_error("Toggle (barnyard starting) for {$if_friendly}({$if_real})...");
 		sync_snort_package_config();
 		snort_barnyard_start($snortcfg, $if_real);
-		unlink_if_exists("{$g['varrun_path']}/barnyard2_{$snortcfg['uuid']}.disabled");
 	} else {
 		log_error("Toggle (barnyard stopping) for {$if_friendly}({$if_real})...");
-		touch("{$g['varrun_path']}/barnyard2_{$snortcfg['uuid']}.disabled");
 		snort_barnyard_stop($snortcfg, $if_real);
 	}
 	sleep(3); // So the GUI reports correctly
@@ -126,7 +109,6 @@ if ($_POST['toggle'] && is_numericint($_POST['id'])) {
 
 	if (snort_is_running($snortcfg['uuid'], $if_real)) {
 		log_error("Toggle (snort stopping) for {$if_friendly}({$if_real})...");
-		touch("{$g['varrun_path']}/snort_{$snortcfg['uuid']}.disabled");
 		snort_stop($snortcfg, $if_real);
 	} else {
 		log_error("Toggle (snort starting) for {$if_friendly}({$if_real})...");
@@ -136,7 +118,6 @@ if ($_POST['toggle'] && is_numericint($_POST['id'])) {
 		sync_snort_package_config();
 		$rebuild_rules = false;
 		snort_start($snortcfg, $if_real);
-		unlink_if_exists("{$g['varrun_path']}/snort_{$snortcfg['uuid']}.disabled");
 	}
 	sleep(3); // So the GUI reports correctly
 }

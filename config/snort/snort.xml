@@ -56,6 +56,10 @@
 		<url>/snort/snort_interfaces.php</url>
 	</menu>
 	<service>
+		<name>snort</name>
+		<rcfile>snort.sh</rcfile>
+		<executable>snort</executable>
+		<description>Snort IDS/IPS Daemon</description>
 	</service>
 	<tabs>
 	</tabs>

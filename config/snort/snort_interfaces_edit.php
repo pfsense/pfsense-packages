@@ -226,32 +226,11 @@ if ($_POST["save"] && !$input_errors) {
 			if ($natent['interface'] != $a_rule[$id]['interface']) {
 				$oif_real = get_real_interface($a_rule[$id]['interface']);
 				if (snort_is_running($a_rule[$id]['uuid'], $oif_real)) {
-					touch("{$g['varrun_path']}/snort_{$a_rule[$id]['uuid']}.disabled");
-					touch("{$g['varrun_path']}/barnyard2_{$a_rule[$id]['uuid']}.disabled");
 					snort_stop($a_rule[$id], $oif_real);
 					$snort_start = true;
 				}
 				else
 					$snort_start = false;
-				// Need to rename the service entries when moving instance to another interface
-				foreach ($config['installedpackages']['service'] as &$service) {
-					if (isset($service['uuid']) && $service['uuid'] == $a_rule[$id]['uuid'] &&
-					    $service['name'] == "snort_" . strtolower($a_rule[$id]['interface'])) {
-						$service['name'] = "snort_" . strtolower($natent['interface']);
-						if (!empty($natent['descr']))
-							$service['description'] = "Snort IDS - " . $natent['descr'];
-						else
-							$service['description'] = "Snort IDS - " . convert_friendly_interface_to_friendly_descr($natent['interface']);
-					}
-					if (isset($service['uuid']) && $service['uuid'] == $a_rule[$id]['uuid'] &&
-					    $service['name'] == "barnyard2_" . strtolower($a_rule[$id]['interface'])) {
-						$service['name'] = "barnyard2_" . strtolower($natent['interface']);
-						if (!empty($natent['descr']))
-							$service['description'] = "Barnyard2 Logging - " . $natent['descr'];
-						else
-							$service['description'] = "Barnyard2 Logging - " . convert_friendly_interface_to_friendly_descr($natent['interface']);
-					}
-				}
 				@rename("{$snortlogdir}/snort_{$oif_real}{$a_rule[$id]['uuid']}", "{$snortlogdir}/snort_{$if_real}{$a_rule[$id]['uuid']}");
 				conf_mount_rw();
 				@rename("{$snortdir}/snort_{$a_rule[$id]['uuid']}_{$oif_real}", "{$snortdir}/snort_{$a_rule[$id]['uuid']}_{$if_real}");
@@ -403,8 +382,6 @@ if ($_POST["save"] && !$input_errors) {
 		/* See if we need to restart Snort after an interface re-assignment */
 		if ($snort_start == true) {
 			snort_start($natent, $if_real);
-			unlink_if_exists("{$g['varrun_path']}/snort_{$natent['uuid']}.disabled");
-			unlink_if_exists("{$g['varrun_path']}/barnyard2_{$natent['uuid']}.disabled");
 		}
 
 		/*******************************************************/

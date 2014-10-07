@@ -5,7 +5,7 @@
  * Copyright (C) 2006 Scott Ullrich
  * Copyright (C) 2009-2010 Robert Zelaya
  * Copyright (C) 2011-2012 Ermal Luci
- * Copyright (C) 2013 Bill Meeks
+ * Copyright (C) 2013-2014 Bill Meeks
  * part of pfSense
  * All rights reserved.
  *
@@ -223,56 +223,10 @@ if ($config['installedpackages']['snortglobal']['forcekeepsettings'] == 'on') {
 		// Create barnyard2.conf file for interface
 		if ($snortcfg['barnyard_enable'] == 'on')
 			snort_generate_barnyard2_conf($snortcfg, $if_real);
-
-		// If this interface is not enabled, we're done with it so
-		// loop to the next one.
-		if ($snortcfg['enable'] != 'on')
-			continue;
-
-		// Create a custom <service> entry for each enabled interface
-		$snort_found = FALSE;
-		$barnyard_found = FALSE;
-		foreach ($config['installedpackages']['service'] as $service) {
-			if (isset($service['uuid']) && $service['uuid'] == $snortcfg['uuid'] &&
-			    $service['name'] == "snort_" . strtolower($snortcfg['interface'])) {
-				$snort_found = TRUE;
-			}
-			if (isset($service['uuid']) && $service['uuid'] == $snortcfg['uuid'] &&
-			    $service['name'] == "barnyard2_" . strtolower($snortcfg['interface'])) {
-				$barnyard_found = TRUE;
-			}
-		}
-		if (!$snort_found) {
-			$service = array();
-			$service['name'] = "snort_" . strtolower($snortcfg['interface']);
-			if (!empty($snortcfg['descr']))
-				$service['description'] = "Snort IDS - " . $snortcfg['descr'];
-			else
-				$service['description'] = "Snort IDS - " . convert_friendly_interface_to_friendly_descr($snortcfg['interface']);
-			$service['uuid'] = $snortcfg['uuid'];
-			$service['startcmd'] = "\$action='start';\$service='snort';\$uuid={$snortcfg['uuid']};\$rc = include '/usr/local/pkg/snort/snort_service_utils.php';";
-			$service['stopcmd'] = "\$action='stop';\$service='snort';\$uuid={$snortcfg['uuid']};\$rc = include '/usr/local/pkg/snort/snort_service_utils.php';";
-			$service['restartcmd'] = "\$action='restart';\$service='snort';\$uuid={$snortcfg['uuid']};\$rc = include '/usr/local/pkg/snort/snort_service_utils.php';";
-			$service['custom_php_service_status_command'] = "\$action='status';\$service='snort';\$uuid={$snortcfg['uuid']};\$rc = include '/usr/local/pkg/snort/snort_service_utils.php';";
-			$config['installedpackages']['service'][] = $service;
-			$is_dirty = TRUE;
-		}
-		if (!$barnyard_found && $snortcfg['barnyard_enable'] == 'on') {
-			$service = array();
-			$service['name'] = "barnyard2_" . strtolower($snortcfg['interface']);
-			if (!empty($snortcfg['descr']))
-				$service['description'] = "Barnyard2 Logging - " . $snortcfg['descr'];
-			else
-				$service['description'] = "Barnyard2 Logging - " . convert_friendly_interface_to_friendly_descr($snortcfg['interface']);
-			$service['uuid'] = $snortcfg['uuid'];
-			$service['startcmd'] = "\$action='start';\$service='barnyard2';\$uuid={$snortcfg['uuid']};\$rc = include '/usr/local/pkg/snort/snort_service_utils.php';";
-			$service['stopcmd'] = "\$action='stop';\$service='barnyard2';\$uuid={$snortcfg['uuid']};\$rc = include '/usr/local/pkg/snort/snort_service_utils.php';";
-			$service['restartcmd'] = "\$action='restart';\$service='barnyard2';\$uuid={$snortcfg['uuid']};\$rc = include '/usr/local/pkg/snort/snort_service_utils.php';";
-			$service['custom_php_service_status_command'] = "\$action='status';\$service='barnyard2';\$uuid={$snortcfg['uuid']};\$rc = include '/usr/local/pkg/snort/snort_service_utils.php';";
-			$config['installedpackages']['service'][] = $service;
-			$is_dirty = TRUE;
-		}
 	}
+
+	/* create snort bootup file snort.sh */
+	snort_create_rc();
 
 	/* Set Log Limit, Block Hosts Time and Rules Update Time */
 	snort_snortloglimit_install_cron(true);

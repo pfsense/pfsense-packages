@@ -43,7 +43,6 @@ $priv_list['page-services-snort']['match'][] = "snort/snort_iprep_list_browser.p
 $priv_list['page-services-snort']['match'][] = "snort/snort_generate_conf.php*";
 $priv_list['page-services-snort']['match'][] = "snort/snort_interface_logs.php*";
 $priv_list['page-services-snort']['match'][] = "snort/snort_log_mgmt.php*";
-$priv_list['page-services-snort']['match'][] = "snort/snort_service_utils.php*";
 $priv_list['page-services-snort']['match'][] = "widgets/javascript/snort_alerts.js*";
 $priv_list['page-services-snort']['match'][] = "widgets/include/widget-snort.inc*";
 $priv_list['page-services-snort']['match'][] = "widgets/widgets/snort_alerts.widget.php*";
