@@ -239,31 +239,21 @@ if ($config['installedpackages']['snortglobal']['forcekeepsettings'] == 'on') {
 		$config['widgets']['sequence'] .= "," . $config['installedpackages']['snortglobal']['dashboard_widget'];
 
 	$rebuild_rules = false;
-	update_output_window(gettext("Finished rebuilding Snort configuration files..."));
+	if ($pkg_interface <> "console")
+		update_output_window(gettext("Finished rebuilding Snort configuration files..."));
 	log_error(gettext("[Snort] Finished rebuilding installation from saved settings..."));
 
 	/* Only try to start Snort if not in reboot */
 	if (!($g['booting'])) {
-		update_status(gettext("Starting Snort using rebuilt configuration..."));
-		update_output_window(gettext("Please wait... while Snort is started..."));
-		log_error(gettext("[Snort] Starting Snort using rebuilt configuration..."));
-		foreach ($config['installedpackages']['snortglobal']['rule'] as $snortcfg) {
-			if ($snortcfg['enable'] != 'on')
-				continue;
-			$if_real = get_real_interface($snortcfg['interface']);
-			$snort_uuid = $snortcfg['uuid'];
-			update_output_window(gettext("Snort starting on " . convert_friendly_interface_to_friendly_descr($snortcfg['interface']) . "..."));
-			log_error("[Snort] Snort START for " . convert_friendly_interface_to_friendly_descr($snortcfg['interface']) . "({$if_real})...");
-			mwexec_bg("/usr/local/bin/snort -R {$snort_uuid} -D -q -l {$snortlogdir}/snort_{$if_real}{$snort_uuid} --pid-path {$g['varrun_path']} --nolock-pidfile -G {$snort_uuid} -c {$snortdir}/snort_{$snort_uuid}_{$if_real}/snort.conf -i {$if_real}");
-			if ($snortcfg['barnyard_enable'] == 'on')
-				mwexec_bg("/usr/local/bin/barnyard2 -r {$snort_uuid} -f \"snort_{$snort_uuid}_{$if_real}.u2\" --pid-path {$g['varrun_path']} --nolock-pidfile -c {$snortdir}/snort_{$snort_uuid}_{$if_real}/barnyard2.conf -d {$snortlogdir}/snort_{$if_real}{$snort_uuid} -D -q");
+		if ($pkg_interface <> "console") {
+			update_status(gettext("Starting Snort using rebuilt configuration..."));
+			update_output_window(gettext("Please wait while Snort is started..."));
 		}
-		update_output_window(gettext("Snort has started using the rebuilt configuration..."));
+		mwexec_bg("{$rcdir}snort.sh start");
+		if ($pkg_interface <> "console")
+			update_output_window(gettext("Snort has been started using the rebuilt configuration..."));
 	}
 }
-
-/* Move our startup shell script to the RC directory (usually /usr/local/etc/rc.d) */
-@rename("/usr/local/pkg/snort/snort_pkg.sh", "{$rcdir}snort_pkg.sh" );
 
 /* We're finished with conf partition mods, return to read-only */
 conf_mount_ro();
