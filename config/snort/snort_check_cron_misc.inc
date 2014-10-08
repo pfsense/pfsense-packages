@@ -75,6 +75,16 @@ function snort_check_dir_size_limit($snortloglimitsize) {
 				@file_put_contents("{$snort_log_dir}/alert", "");
 			}
 
+			// Cleanup any rotated perfmon stats logs
+			$files = array();
+			$list = glob("{$snort_log_dir}/*");
+			foreach ($list as $file) {
+				if (preg_match('/(^\d{4}-\d{2}-\d{2}[\.]?[\d+]?)/', basename($file), $matches))
+					$files[] = $snort_log_dir . "/" . $matches[1];
+			}
+			foreach ($files as $file)
+				unlink_if_exists($file);
+
 			// This is needed if snort is run as snort user
 			mwexec('/bin/chmod 660 {$snort_log_dir}/*', true);
 
@@ -196,6 +206,27 @@ if ($config['installedpackages']['snortglobal']['enable_log_mgmt'] == 'on') {
 			unset($files);
 			if ($prune_count > 0)
 				log_error(gettext("[Snort] Barnyard2 archived logs cleanup job removed {$prune_count} file(s) from {$snort_log_dir}/barnyard2/archive/..."));
+		}
+
+		// Prune aged-out perfmon stats logs if any exist
+		if ($value['stats_log_retention'] > 0) {
+			$now = time();
+			$files = array();
+			$list = glob("{$snort_log_dir}/*");
+			foreach ($list as $file) {
+				if (preg_match('/(^\d{4}-\d{2}-\d{2}[\.]?[\d+]?)/', basename($file), $matches))
+					$files[] = $snort_log_dir . "/" . $matches[1];
+			}
+			$prune_count = 0;
+			foreach ($files as $f) {
+				if (($now - filemtime($f)) > ($value['stats_log_retention'] * 3600)) {
+					$prune_count++;
+					unlink_if_exists($f);
+				}
+			}
+			unset($list, $files);
+			if ($prune_count > 0)
+				log_error(gettext("[Snort] perfmon stats logs cleanup job removed {$prune_count} file(s) from {$snort_log_dir}/..."));
 		}
 	}
 }
