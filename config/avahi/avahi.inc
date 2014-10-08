@@ -54,7 +54,7 @@ function avahi_stop() {
 }
 
 function avahi_install() {
-	global $g, $config;
+	global $g, $config, $pfs_version;
 	conf_mount_rw();
 
 	// This old hacky install code should only happen on 1.x
@@ -71,6 +71,10 @@ function avahi_install() {
 			log_error("Sorry, something went wrong while extract avahi binaries.  Please try the operation again");
 			return;
 		}
+	}
+
+	if ($pfs_version >= 2.2 && !file_exists('/usr/local/etc/gnome.subr')) {
+		@symlink(AVAHI_LOCALBASE . '/etc/gnome.subr', '/usr/local/etc/gnome.subr');
 	}
 
 	// Add needed users and groups
@@ -174,20 +178,20 @@ EOF;
 	$start .= "	mkdir -p /proc\n";
 	$start .= "	mount -t procfs procfs /proc\n";
 	$start .= "fi\n";
-	$start .= "/usr/bin/killall avahi-daemon\n";
+	$start .= "/usr/bin/killall avahi-daemon >/dev/null 2>&1\n";
 	if (file_exists(AVAHI_LOCALBASE . "/etc/rc.d/dbus")) {
-		$start .= "/usr/bin/killall dbus-daemon\n";
-		$start .= "rm /var/run/dbus/dbus.pid\n";
+		$start .= AVAHI_LOCALBASE . "/etc/rc.d/dbus onestop\n";
+		$start .= "rm /var/run/dbus/dbus.pid >/dev/null 2>&1\n";
 		$start .= AVAHI_LOCALBASE . "/etc/rc.d/dbus onestart\n";
 	}
 	$start .= "sleep 5\n";
 	$start .= AVAHI_BASE . "/sbin/avahi-daemon -D\n";
 	$start .= "/etc/rc.conf_mount_ro\n";
 
-	$stop = "/usr/bin/killall avahi-daemon\n";
+	$stop = "/usr/bin/killall avahi-daemon >/dev/null 2>&1\n";
 	if (file_exists(AVAHI_LOCALBASE . "/etc/rc.d/dbus")) {
 		$stop .= AVAHI_LOCALBASE . "/etc/rc.d/dbus onestop\n";
-		$stop .= "rm /var/run/dbus/dbus.pid\n";
+		$stop .= "rm /var/run/dbus/dbus.pid >/dev/null 2>&1\n";
 	}
 
 	write_rcfile(array(
