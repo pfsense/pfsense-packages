@@ -2967,6 +2967,8 @@ case $1 in
 	start)
 		if [ ! -f {$g['varrun_path']}/snort_pkg_starting.lck ]; then
 			rc_start
+		else
+			/usr/bin/logger -p daemon.info -i -t SnortStartup "Ignoring additional START command since Snort is already starting..."
 		fi
 		;;
 	stop)
@@ -3112,8 +3114,6 @@ function snort_deinstall() {
 	$snortlogdir = SNORTLOGDIR;
 	$rcdir = RCFILEPREFIX;
 	$snort_rules_upd_log = SNORT_RULES_UPD_LOGFILE;
-	$iprep_path = SNORT_IPREP_PATH;
-	$sidmods_path = SNORT_SID_MODS_PATH;
 
 	log_error(gettext("[Snort] Snort package uninstall in progress..."));
 
@@ -3217,10 +3217,10 @@ function snort_deinstall() {
 	if (!is_dir("{$snortdir}")) {
 		log_error(gettext("[Snort] Package deletion requested... removing all files..."));
 		unlink_if_exists("{$rcdir}snort.sh");
-		rmdir_recursive("/usr/local/pkg/snort/");
-		rmdir_recursive("/usr/local/www/snort/");
-		rmdir_recursive("/usr/local/etc/snort/");
-		rmdir_recursive("/usr/local/lib/snort/");
+		rmdir_recursive("/usr/local/pkg/snort");
+		rmdir_recursive("/usr/local/www/snort");
+		rmdir_recursive("/usr/local/etc/snort");
+		rmdir_recursive("/usr/local/lib/snort");
 	}
 
 	/* Keep this as a last step */
@@ -3231,9 +3231,8 @@ function snort_deinstall() {
 		unlink_if_exists("{$snort_rules_upd_log}");
 		log_error(gettext("[Snort] Flushing <snort2c> firewall table to remove addresses blocked by Snort..."));
 		mwexec("/sbin/pfctl -t snort2c -T flush");
-		rmdir_recursive($snortlogdir);
-		rmdir_recursive($iprep_path);
-		rmdir_recursive($sidmods_path);
+		rmdir_recursive("{$snortlogdir}");
+		rmdir_recursive("{$g['vardb_path']}/snort");
 		log_error(gettext("[Snort] The package has been removed from this system..."));
 	}
 }
