@@ -209,7 +209,7 @@ if ($config['installedpackages']['snortglobal']['enable_log_mgmt'] == 'on') {
 		}
 
 		// Prune aged-out perfmon stats logs if any exist
-		if ($value['stats_log_retention'] > 0) {
+		if ($config['installedpackages']['snortglobal']['stats_log_retention'] > 0) {
 			$now = time();
 			$files = array();
 			$list = glob("{$snort_log_dir}/*");
@@ -219,7 +219,7 @@ if ($config['installedpackages']['snortglobal']['enable_log_mgmt'] == 'on') {
 			}
 			$prune_count = 0;
 			foreach ($files as $f) {
-				if (($now - filemtime($f)) > ($value['stats_log_retention'] * 3600)) {
+				if (($now - filemtime($f)) > ($config['installedpackages']['snortglobal']['stats_log_retention'] * 3600)) {
 					$prune_count++;
 					unlink_if_exists($f);
 				}
