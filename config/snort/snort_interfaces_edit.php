@@ -170,7 +170,9 @@ if ($_POST["save"] && !$input_errors) {
 		snort_stop($a_rule[$id], get_real_interface($a_rule[$id]['interface']));
 		write_config("Snort pkg: modified interface configuration for {$a_rule[$id]['interface']}.");
 		$rebuild_rules = false;
+		conf_mount_rw();
 		sync_snort_package_config();
+		conf_mount_ro();
 		header( 'Expires: Sat, 26 Jul 1997 05:00:00 GMT' );
 		header( 'Last-Modified: ' . gmdate( 'D, d M Y H:i:s' ) . ' GMT' );
 		header( 'Cache-Control: no-store, no-cache, must-revalidate' );
@@ -377,7 +379,9 @@ if ($_POST["save"] && !$input_errors) {
 		write_config("Snort pkg: modified interface configuration for {$natent['interface']}.");
 
 		/* Update snort.conf and snort.sh files for this interface */
+		conf_mount_rw();
 		sync_snort_package_config();
+		conf_mount_ro();
 
 		/* See if we need to restart Snort after an interface re-assignment */
 		if ($snort_start == true) {

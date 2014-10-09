@@ -134,8 +134,10 @@ if (!$input_errors) {
 
 		$retval = 0;
 
-		/* create whitelist and homenet file  then sync files */
+		/* create whitelist and homenet file, then sync files */
+		conf_mount_rw();
 		sync_snort_package_config();
+		conf_mount_ro();
 
 		write_config("Snort pkg: modified global settings.");
 

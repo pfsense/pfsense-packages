@@ -116,7 +116,9 @@ if ($_POST["save"] || $_POST['apply']) {
 	if ($_POST['enable_log_mgmt'] != 'on') {
 		$config['installedpackages']['snortglobal']['enable_log_mgmt'] = $_POST['enable_log_mgmt'] ? 'on' :'off';
 		write_config("Snort pkg: saved updated configuration for LOGS MGMT.");
+		conf_mount_rw();
 		sync_snort_package_config();
+		conf_mount_ro();
 
 		/* forces page to reload new settings */
 		header( 'Expires: Sat, 26 Jul 1997 05:00:00 GMT' );
@@ -148,7 +150,9 @@ if ($_POST["save"] || $_POST['apply']) {
 		$config['installedpackages']['snortglobal']['event_pkts_log_retention'] = $_POST['event_pkts_log_retention'];
 
 		write_config("Snort pkg: saved updated configuration for LOGS MGMT.");
+		conf_mount_rw();
 		sync_snort_package_config();
+		conf_mount_ro();
 
 		/* forces page to reload new settings */
 		header( 'Expires: Sat, 26 Jul 1997 05:00:00 GMT' );

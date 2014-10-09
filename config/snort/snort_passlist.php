@@ -86,7 +86,9 @@ if ($_POST['del'] && is_numericint($_POST['list_id'])) {
 		if (!$input_errors) {
 			unset($a_passlist[$_POST['list_id']]);
 			write_config("Snort pkg: deleted PASS LIST.");
+			conf_mount_rw();
 			sync_snort_package_config();
+			conf_mount_ro();
 			header("Location: /snort/snort_passlist.php");
 			exit;
 		}

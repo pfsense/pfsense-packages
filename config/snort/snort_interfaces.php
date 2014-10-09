@@ -62,7 +62,6 @@ if (isset($_POST['del_x'])) {
 			// Finally delete the interface's config entry entirely
 			unset($a_nat[$rulei]);
 		}
-		conf_mount_ro();
 	  
 		/* If all the Snort interfaces are removed, then unset the interfaces config array. */
 		if (empty($a_nat))
@@ -70,9 +69,8 @@ if (isset($_POST['del_x'])) {
 
 		write_config("Snort pkg: deleted one or more Snort interfaces.");
 		sleep(2);
-	  
 		sync_snort_package_config();
-	  
+		conf_mount_ro();	  
 		header( 'Expires: Sat, 26 Jul 1997 05:00:00 GMT' );
 		header( 'Last-Modified: ' . gmdate( 'D, d M Y H:i:s' ) . ' GMT' );
 		header( 'Cache-Control: no-store, no-cache, must-revalidate' );
@@ -92,7 +90,9 @@ if ($_POST['bartoggle'] && is_numericint($_POST['id'])) {
 
 	if (!snort_is_running($snortcfg['uuid'], $if_real, 'barnyard2')) {
 		log_error("Toggle (barnyard starting) for {$if_friendly}({$if_real})...");
+		conf_mount_rw();
 		sync_snort_package_config();
+		conf_mount_ro();
 		snort_barnyard_start($snortcfg, $if_real);
 	} else {
 		log_error("Toggle (barnyard stopping) for {$if_friendly}({$if_real})...");
@@ -115,7 +115,9 @@ if ($_POST['toggle'] && is_numericint($_POST['id'])) {
 
 		/* set flag to rebuild interface rules before starting Snort */
 		$rebuild_rules = true;
+		conf_mount_rw();
 		sync_snort_package_config();
+		conf_mount_ro();
 		$rebuild_rules = false;
 		snort_start($snortcfg, $if_real);
 	}
