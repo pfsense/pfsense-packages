@@ -1055,8 +1055,6 @@ function sync_snort_package_config() {
 		return;
 	}
 
-	conf_mount_rw();
-
 	$snortconf = $config['installedpackages']['snortglobal']['rule'];
 	foreach ($snortconf as $value) {
 		/* Skip configuration of any disabled interface */
@@ -1087,8 +1085,6 @@ function sync_snort_package_config() {
 	/* Do not attempt package sync if reinstalling package or booting */
 	if (!$g['snort_postinstall'] && !$g['booting'])
 		snort_sync_on_changes();
-	
-	conf_mount_ro();
 }
 
 function snort_build_sid_msg_map($rules_path, $sid_file) {
