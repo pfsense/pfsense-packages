@@ -124,12 +124,15 @@ if (!$input_errors) {
 		$config['installedpackages']['snortglobal']['autorulesupdate7'] = $_POST['autorulesupdate7'];
 
 		/* Check and adjust format of Rule Update Starttime string to add colon and leading zero if necessary */
-		$pos = strpos($_POST['rule_update_starttime'], ":");
-		if ($pos === false) {
-			$tmp = str_pad($_POST['rule_update_starttime'], 4, "0", STR_PAD_LEFT);
-			$_POST['rule_update_starttime'] = substr($tmp, 0, 2) . ":" . substr($tmp, -2);
+		if ($_POST['rule_update_starttime']) {
+			$pos = strpos($_POST['rule_update_starttime'], ":");
+			if ($pos === false) {
+				$tmp = str_pad($_POST['rule_update_starttime'], 4, "0", STR_PAD_LEFT);
+				$_POST['rule_update_starttime'] = substr($tmp, 0, 2) . ":" . substr($tmp, -2);
+			}
+			$config['installedpackages']['snortglobal']['rule_update_starttime'] = str_pad($_POST['rule_update_starttime'], 4, "0", STR_PAD_LEFT);
 		}
-		$config['installedpackages']['snortglobal']['rule_update_starttime'] = str_pad($_POST['rule_update_starttime'], 4, "0", STR_PAD_LEFT);
+
 		$config['installedpackages']['snortglobal']['forcekeepsettings'] = $_POST['forcekeepsettings'] ? 'on' : 'off';
 
 		$retval = 0;
@@ -311,7 +314,7 @@ if ($input_errors)
 	<?php echo gettext("Enter the rule update start time in 24-hour format (HH:MM). ") . "<strong>" . 
 	gettext("Default") . "&nbsp;</strong>" . gettext("is ") . "<strong>" . gettext("00:05") . "</strong></span>"; ?>.<br/><br/>
 	<?php echo gettext("Rules will update at the interval chosen above starting at the time specified here. For example, using the default " . 
-	"start time of 00:03 and choosing 12 Hours for the interval, the rules will update at 00:05 and 12:05 each day."); ?></td>
+	"start time of 00:05 and choosing 12 Hours for the interval, the rules will update at 00:05 and 12:05 each day."); ?></td>
 </tr>
 <tr>
 	<td colspan="2" valign="top" class="listtopic"><?php echo gettext("General Settings"); ?></td>
