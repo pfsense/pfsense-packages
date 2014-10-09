@@ -121,6 +121,10 @@ function freeradius_install_command() {
 	freeradius_modulesdatacounter_resync();
 	freeradius_datacounter_acct_resync();
 	freeradius_datacounter_auth_resync();
+	
+	// Install the Google Authenticator files
+	if (!file_exists("FREERADIUS_ETC . "/raddb/scripts/googleauth.py")) { copy("googleauth.py, FREERADIUS_ETC . "/raddb/scripts/");}
+	if (!file_exists("FREERADIUS_ETC . "/raddb/modules/googleauth")) { copy("googleauth, FREERADIUS_ETC . "/raddb/modules/");}
 
 	// Some initial module configuration
 	freeradius_modulesmschap_resync();
