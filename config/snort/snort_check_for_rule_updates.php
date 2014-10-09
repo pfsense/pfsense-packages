@@ -778,9 +778,8 @@ if ($snortdownload == 'on' || $emergingthreats == 'on' || $snortcommunityrules =
 	/* Clear the rebuild rules flag.  */
 	$rebuild_rules = false;
 
-	/* Restart snort if running, and we are not in post-install */
-	/* and not rebooting, so as to pick up the new rules.       */
-       	if (!$g['snort_postinstall'] && !$g['booting'] && !file_exists("{$g['varrun_path']}/booting")) {
+	/* Restart snort if running, and not in post-install, so as to pick up the new rules. */
+       	if (!$g['snort_postinstall'] && is_service_running("snort") && count($config['installedpackages']['snortglobal']['rule']) > 0) {
 		if ($pkg_interface <> "console") {
 			update_status(gettext('Restarting Snort to activate the new set of rules...'));
 			update_output_window(gettext("Please wait ... restarting Snort will take some time..."));
