@@ -69,6 +69,7 @@ if (isset($_POST['del_x'])) {
 
 		write_config("Snort pkg: deleted one or more Snort interfaces.");
 		sleep(2);
+		conf_mount_rw();
 		sync_snort_package_config();
 		conf_mount_ro();	  
 		header( 'Expires: Sat, 26 Jul 1997 05:00:00 GMT' );

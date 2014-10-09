@@ -73,7 +73,6 @@ $snortlibdir = SNORTLIBDIR;
 $rcdir = RCFILEPREFIX;
 $flowbit_rules_file = FLOWBITS_FILENAME;
 $snort_enforcing_rules_file = SNORT_ENFORCING_RULES_FILENAME;
-$mounted_rw = FALSE;
 
 /* Hard kill any running Snort processes that may have been started by any   */
 /* of the pfSense scripts such as check_reload_status() or rc.start_packages */
@@ -94,11 +93,8 @@ if(is_process_running("barnyard")) {
 /* Set flag for post-install in progress */
 $g['snort_postinstall'] = true;
 
-/* If not already, set Snort conf partition to read-write so we can make changes there */
-if (!is_subsystem_dirty('mount')) {
-	conf_mount_rw();
-	$mounted_rw = TRUE;
-}
+/* Set conf partition to read-write so we can make changes there */
+conf_mount_rw();
 
 /* cleanup default files */
 @rename("{$snortdir}/snort.conf-sample", "{$snortdir}/snort.conf");
@@ -135,7 +131,6 @@ if ($pkgid >= 0) {
 	log_error(gettext("[Snort] Removing legacy 'Dashboard Widget: Snort' package because the widget is now part of the Snort package."));
 	unset($config['installedpackages']['package'][$pkgid]);
 	unlink_if_exists("/usr/local/pkg/widget-snort.xml");
-	write_config("Snort pkg: removed legacy Snort Dashboard Widget.");
 }
 
 /* Define a default Dashboard Widget Container for Snort */
@@ -175,8 +170,6 @@ if ($config['installedpackages']['snortglobal']['forcekeepsettings'] == 'on') {
 				$fixed_duplicate = TRUE;
 			}
 		}
-		if ($fixed_duplicate)
-			write_config("Snort pkg: updated interface UUIDs to eliminate duplicates.");
 		unset($uuids);
 	}
 	/****************************************************************/
@@ -194,6 +187,7 @@ if ($config['installedpackages']['snortglobal']['forcekeepsettings'] == 'on') {
 	include('/usr/local/pkg/snort/snort_check_for_rule_updates.php');
 	update_status(gettext("Generating snort.conf configuration file from saved settings..."));
 	$rebuild_rules = true;
+	conf_mount_rw();
 
 	/* Create the snort.conf files for each enabled interface */
 	$snortconf = $config['installedpackages']['snortglobal']['rule'];
@@ -259,9 +253,8 @@ if ($config['installedpackages']['snortglobal']['forcekeepsettings'] == 'on') {
 	}
 }
 
-/* We're finished with conf partition mods, return to read-only if we changed it */
-if ($mounted_rw == TRUE)
-	conf_mount_ro();
+/* We're finished with conf partition mods, return to read-only */
+conf_mount_ro();
 
 /* If an existing Snort Dashboard Widget container is not found, */
 /* then insert our default Widget Dashboard container.           */
@@ -270,7 +263,7 @@ if (stristr($config['widgets']['sequence'], "snort_alerts-container") === FALSE)
 
 /* Update Snort package version in configuration */
 $config['installedpackages']['snortglobal']['snort_config_ver'] = "3.1.3";
-write_config("Snort pkg: post-install configuration saved.");
+write_config("Snort pkg v3.1.3: post-install configuration saved.");
 
 /* Done with post-install, so clear flag */
 unset($g['snort_postinstall']);
