@@ -72,6 +72,7 @@ $snortlibdir = SNORTLIBDIR;
 $snortlogdir = SNORTLOGDIR;
 $snortiprepdir = SNORT_IPREP_PATH;
 $snort_rules_upd_log = SNORT_RULES_UPD_LOGFILE;
+$mounted_rw = FALSE;
 
 /* Save the state of $pkg_interface so we can restore it */
 $pkg_interface_orig = $pkg_interface;
@@ -108,8 +109,11 @@ $snort_filename = "snortrules-snapshot-{$snortver[0]}.tar.gz";
 $snort_filename_md5 = "{$snort_filename}.md5";
 $snort_rule_url = VRT_DNLD_URL;
 
-/* Mount the Snort conf directories R/W so we can modify files there */
-conf_mount_rw();
+/* Mount the Snort conf directories R/W, if not already, so we can modify files there */
+if (!is_subsystem_dirty('mount')) {
+	conf_mount_rw();
+	$mounted_rw = TRUE;
+}
 
 /* Set up Emerging Threats rules filenames and URL */
 if ($etpro == "on") {
@@ -810,11 +814,9 @@ if ($pkg_interface <> "console")
 log_error(gettext("[Snort] The Rules update has finished."));
 error_log(gettext("The Rules update has finished.  Time: " . date("Y-m-d H:i:s"). "\n\n"), 3, $snort_rules_upd_log);
 
-// Remount filesystem read-only unless we are in package post-install.
-// The post-install code will remount read-only when it completes.
-if (!$g['snort_postinstall'])
+/* Remount filesystem read-only if we changed it in this module */
+if ($mounted_rw == TRUE)
 	conf_mount_ro();
-conf_mount_ro();
 
 /* Restore the state of $pkg_interface */
 $pkg_interface = $pkg_interface_orig;
