@@ -3110,6 +3110,7 @@ function snort_deinstall() {
 	$snortlogdir = SNORTLOGDIR;
 	$rcdir = RCFILEPREFIX;
 	$snort_rules_upd_log = SNORT_RULES_UPD_LOGFILE;
+	$mounted_rw = FALSE;
 
 	log_error(gettext("[Snort] Snort package uninstall in progress..."));
 
@@ -3141,27 +3142,6 @@ function snort_deinstall() {
 	// Delete any leftover barnyard2 PID files in /var/run
 	unlink_if_exists("{$g['varrun_path']}/barnyard2_*.pid");
 
-	/* Remove our custom <service> entries from config */
-	$is_dirty = FALSE;
-	$pkg_serv = &$config['installedpackages']['service'];
-	if (!is_array($pkg_serv))
-		$pkg_serv = array();
-	foreach ($pkg_serv as $key => $service) {
-		if (strpos($service['name'], "snort_") !== FALSE) {
-			unset($pkg_serv[$key]);
-			unlink_if_exists("{$g['varrun_path']}/snort_{$service['uuid']}.disabled");
-			$is_dirty = TRUE;
-			continue;
-		}
-		if (strpos($service['name'], "barnyard2_") !== FALSE) {
-			unset($pkg_serv[$key]);
-			unlink_if_exists("{$g['varrun_path']}/barnyard2_{$service['uuid']}.disabled");
-			$is_dirty = TRUE;
-		}
-	}
-	if ($is_dirty)
-		write_config("Snort pkg: removed all snort interface services.");
-
 	/* Remove all the existing Snort cron jobs. */
 	if (snort_cron_job_exists("snort2c", FALSE))
 		install_cron_job("snort2c", false);
@@ -3186,7 +3166,6 @@ function snort_deinstall() {
 			}
 		}
 		$config['widgets']['sequence'] = implode(",", $widgetlist);
-		write_config("Snort pkg: remove Snort Dashboard Widget on package deinstall.");
 	}
 
 	/* See if we are to clear blocked hosts on uninstall */
@@ -3200,6 +3179,15 @@ function snort_deinstall() {
 		log_error(gettext("[Snort] Clearing all Snort-related log files..."));
 		unlink_if_exists("{$snort_rules_upd_log}");
 		rmdir_recursive($snortlogdir);
+	}
+
+	/**********************************************************/
+	/* If not already, set Snort conf partition to read-write */
+	/* so we can make changes there                           */
+	/**********************************************************/
+	if (!is_subsystem_dirty('mount')) {
+		conf_mount_rw();
+		$mounted_rw = TRUE;
 	}
 
 	/**********************************************************/
@@ -3231,6 +3219,13 @@ function snort_deinstall() {
 		rmdir_recursive("{$g['vardb_path']}/snort");
 		log_error(gettext("[Snort] The package has been removed from this system..."));
 	}
+
+	/**********************************************************/
+	/* We're finished with conf partition mods, return to     */
+	/* read-only if we changed it                             */
+	/**********************************************************/
+	if ($mounted_rw == TRUE)
+		conf_mount_ro();
 }
 
 function snort_prepare_rule_files($snortcfg, $snortcfgdir) {
