@@ -73,6 +73,7 @@ $snortlibdir = SNORTLIBDIR;
 $rcdir = RCFILEPREFIX;
 $flowbit_rules_file = FLOWBITS_FILENAME;
 $snort_enforcing_rules_file = SNORT_ENFORCING_RULES_FILENAME;
+$mounted_rw = FALSE;
 
 /* Hard kill any running Snort processes that may have been started by any   */
 /* of the pfSense scripts such as check_reload_status() or rc.start_packages */
@@ -93,8 +94,11 @@ if(is_process_running("barnyard")) {
 /* Set flag for post-install in progress */
 $g['snort_postinstall'] = true;
 
-/* Set Snort conf partition to read-write so we can make changes there */
-conf_mount_rw();
+/* If not already, set Snort conf partition to read-write so we can make changes there */
+if (!is_subsystem_dirty('mount')) {
+	conf_mount_rw();
+	$mounted_rw = TRUE;
+}
 
 /* cleanup default files */
 @rename("{$snortdir}/snort.conf-sample", "{$snortdir}/snort.conf");
@@ -255,8 +259,9 @@ if ($config['installedpackages']['snortglobal']['forcekeepsettings'] == 'on') {
 	}
 }
 
-/* We're finished with conf partition mods, return to read-only */
-conf_mount_ro();
+/* We're finished with conf partition mods, return to read-only if we changed it */
+if ($mounted_rw == TRUE)
+	conf_mount_ro();
 
 /* If an existing Snort Dashboard Widget container is not found, */
 /* then insert our default Widget Dashboard container.           */
