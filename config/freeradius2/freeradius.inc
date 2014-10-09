@@ -491,6 +491,10 @@ if (is_array($arrusers) && !empty($arrusers)) {
 	$varuserscheckitem = '';
 	$varusersreplyitem = '';
 	
+	//Authentication method variable
+	$varusersauthmethod = $users['varusersauthmethod'];
+
+	
 		// check if mobile otp is disabled
 		if ($users['varusersmotpenable'] == '') {
 			// If someone does not want to use username/password but entry "DEFAULT" instead then we can disable this
@@ -505,7 +509,7 @@ if (is_array($arrusers) && !empty($arrusers)) {
 	
 		// if otp is enabled we need to set Auth-Type to accept because password will be checked when the otp script gets executed in reply-item list
 		else {
-			$varuserscheckitem = '"' . $varusersusername . '"' . " Auth-Type = motp";
+			$varuserscheckitem = '"' . $varusersusername . '"' . " Auth-Type = " . '"' . $varusersauthmethod . '"';
 		}
 	
 	// Add additional CHECK-ITEMS here. Different formatting in "users" file needed.
@@ -1751,6 +1755,12 @@ authenticate {
 	#  Mobile-One-Time-Password (MOTP) authentication.
 	Auth-Type MOTP {
 		motp
+	}
+	
+	#
+	# Google-Authenticator authentication.
+	Auth-Type GOOGLEAUTH {
+	       googleauth
 	}
 	
 	#
