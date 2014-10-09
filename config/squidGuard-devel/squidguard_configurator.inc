@@ -206,6 +206,7 @@ define('SQUIDGUARD_GUILOG_LEVEL',           SQUIDGUARD_INFO);     # log level
 define('SQUIDGUARD_GUILOG_MAXCOUNT',        500);                 # log max lines
 define('SQUIDGUARD_GUILOG_ENABLE',          true);                # on/off gui log - option override GUI settings
 define('SQUIDGUARD_LOG_ENABLE',             true);                # on/off SG  log - option override GUI settings
+define('SQUIDGUARD_LOGROTATE_MAXCOUNT',     1000);                # logrotate max lines
 
 #
 define('FLT_DEFAULT_ALL', 'all');
@@ -1921,6 +1922,7 @@ function acl_remove_blacklist_items(&$items)
 # -----------------------------------------------------------------------------
 function sg_script_logrotate()
 {
+	$lines = SQUIDGUARD_LOGROTATE_MAXCOUNT;
 
 	global $squidguard_config;
 
