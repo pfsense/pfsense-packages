@@ -827,5 +827,5 @@ if ($update_errors)
 else
 	$config['installedpackages']['snortglobal']['last_rule_upd_status'] = gettext("success");
 $config['installedpackages']['snortglobal']['last_rule_upd_time'] = time();
-write_config("Snort pkg: updated status for updated rules package(s) check.");
+write_config("Snort pkg: updated status for updated rules package(s) check.", FALSE);
 ?>
