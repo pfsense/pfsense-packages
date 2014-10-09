@@ -313,7 +313,7 @@
 		</build_pbi>
 		<depends_on_package>avahi-app-0.6.29_1.tbz</depends_on_package>
 		<depends_on_package_pbi>avahi-0.6.31-i386.pbi</depends_on_package_pbi>
-		<version>0.6.31 pkg v1.05</version>
+		<version>0.6.31 pkg v1.06</version>
 		<status>ALPHA</status>
 		<required_version>1.2.3</required_version>
 		<config_file>https://packages.pfsense.org/packages/config/avahi/avahi.xml</config_file>
