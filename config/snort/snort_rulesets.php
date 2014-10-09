@@ -57,8 +57,11 @@ if (isset($id) && $a_nat[$id]) {
 	$pconfig['enable'] = $a_nat[$id]['enable'];
 	$pconfig['interface'] = $a_nat[$id]['interface'];
 	$pconfig['rulesets'] = $a_nat[$id]['rulesets'];
-	$pconfig['autoflowbitrules'] = $a_nat[$id]['autoflowbitrules'];
-	$pconfig['ips_policy_enable'] = $a_nat[$id]['ips_policy_enable'];
+	if (empty($a_nat[$id]['autoflowbitrules']))
+		$pconfig['autoflowbitrules'] = 'on';
+	else
+		$pconfig['autoflowbitrules'] = $a_nat[$id]['autoflowbitrules'] == 'on' ? 'on' : 'off';;
+	$pconfig['ips_policy_enable'] = $a_nat[$id]['ips_policy_enable'] == 'on' ? 'on' : 'off';;
 	$pconfig['ips_policy'] = $a_nat[$id]['ips_policy'];
 }
 
@@ -184,13 +187,26 @@ if ($_POST['unselectall']) {
 	$enabled_rulesets_array = array();
 
 	$savemsg = gettext("All rule categories have been de-selected.  ");
-	if ($a_nat[$id]['ips_policy_enable'] = 'on')
+	if ($pconfig['ips_policy_enable'] == 'on')
 		$savemsg .= gettext("Only the rules included in the selected IPS Policy will be used.");
 	else
 		$savemsg .= gettext("There currently are no inspection rules enabled for this Snort instance!");
 }
 
 if ($_POST['selectall']) {
+	if ($_POST['ips_policy_enable'] == "on") {
+		$a_nat[$id]['ips_policy_enable'] = 'on';
+		$a_nat[$id]['ips_policy'] = $_POST['ips_policy'];
+	}
+	else {
+		$a_nat[$id]['ips_policy_enable'] = 'off';
+		unset($a_nat[$id]['ips_policy']);
+	}
+
+	$pconfig['autoflowbits'] = $_POST['autoflowbits'];
+	$pconfig['ips_policy_enable'] = $_POST['ips_policy_enable'];
+	$pconfig['ips_policy'] = $_POST['ips_policy'];
+
 	$enabled_rulesets_array = array();
 
 	if ($emergingdownload == 'on') {
@@ -329,7 +345,7 @@ if ($savemsg) {
 					   <tr>
 						<td width="15%" class="listn"><?php echo gettext("Resolve Flowbits"); ?></td>
 						<td width="85%"><input name="autoflowbits" id="autoflowbitrules" type="checkbox" value="on" 
-						<?php if ($a_nat[$id]['autoflowbitrules'] == "on" || empty($a_nat[$id]['autoflowbitrules'])) echo "checked"; ?>/>
+						<?php if ($pconfig['autoflowbitrules'] == "on") echo "checked"; ?>/>
 						&nbsp;&nbsp;<span class="vexpl"><?php echo gettext("If checked, Snort will auto-enable rules required for checked flowbits.  ");
 						echo gettext("The Default is "); ?><strong><?php echo gettext("Checked."); ?></strong></span></td>
 					   </tr>
@@ -355,21 +371,21 @@ if ($savemsg) {
 				</td>
 			</tr>
 			<tr>
-				<td colspan="6" class="listtopic"><?php echo gettext("Snort IPS Policy selection"); ?><br/></td>
+				<td colspan="6" class="listtopic"><?php echo gettext("Snort VRT IPS Policy selection"); ?><br/></td>
 			</tr>
 			<tr>
 				<td colspan="6" valign="center" class="listn">
 					<table width="100%" border="0" cellpadding="2" cellspacing="0">
 					   <tr>
 						<td width="15%" class="listn"><?php echo gettext("Use IPS Policy"); ?></td>
-						<td width="85%"><input name="ips_policy_enable" id="ips_policy_enable" type="checkbox" value="on" <?php if ($a_nat[$id]['ips_policy_enable'] == "on") echo "checked"; ?>
-						<?php if ($snortdownload == "off") echo "disabled" ?> onClick="enable_change()"/>&nbsp;&nbsp;<span class="vexpl">
+						<td width="85%"><input name="ips_policy_enable" id="ips_policy_enable" type="checkbox" value="on" <?php if ($pconfig['ips_policy_enable'] == "on") echo "checked "; ?>
+						<?php if ($snortdownload == "off") echo "disabled " ?> onClick="enable_change()"/>&nbsp;&nbsp;<span class="vexpl">
 						<?php echo gettext("If checked, Snort will use rules from one of three pre-defined IPS policies."); ?></span></td>
 					   </tr>
 					   <tr>
 						<td width="15%" class="vncell" id="ips_col1">&nbsp;</td>
 						<td width="85%" class="vtable" id="ips_col2">
-  						<?php echo "<span class=\"red\"><strong>" . gettext("Note:  ") . "</strong></span>" . gettext("You must be using the Snort VRT rules to use this option."); ?>
+  						<?php echo "<span class=\"red\"><strong>" . gettext("Note:  ") . "</strong></span>" . gettext("You must enable download of the Snort VRT rules to enable and use this option."); ?>
 						<?php echo gettext("Selecting this option disables manual selection of Snort VRT categories in the list below, " .
 						"although Emerging Threats categories may still be selected if enabled on the Global Settings tab.  " .
 						"These will be added to the pre-defined Snort IPS policy rules from the Snort VRT."); ?><br/></td>
@@ -427,7 +443,7 @@ if ($savemsg) {
 			      $community_rules_file = GPL_FILE_PREFIX . "community.rules";
 			?>
 			<?php if ($snortcommunitydownload == 'on'): ?>
-			<tr id="frheader">
+			<tr>
 				<td width="5%" class="listhdrr"><?php echo gettext("Enabled"); ?></td>
 				<td colspan="5" class="listhdrr"><?php echo gettext('Ruleset: Snort GPLv2 Community Rules');?></td>
 			</tr>
@@ -468,7 +484,7 @@ if ($savemsg) {
 			      else
 				  $msg_snort = "are not enabled.";
 			?>
-			<tr id="frheader">
+			<tr>
 				<?php if ($emergingdownload == 'on' && !$no_emerging_files): ?>
 					<td width="5%" class="listhdrr" align="center"><?php echo gettext("Enabled"); ?></td>
 					<td width="25%" class="listhdrr"><?php echo gettext('Ruleset: ET Open Rules');?></td>
