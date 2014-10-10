@@ -140,12 +140,14 @@ if (!$input_errors) {
 		$config['installedpackages']['suricata']['config'][0]['autoruleupdate'] = $_POST['autoruleupdate'];
 
 		/* Check and adjust format of Rule Update Starttime string to add colon and leading zero if necessary */
-		$pos = strpos($_POST['autoruleupdatetime'], ":");
-		if ($pos === false) {
-			$tmp = str_pad($_POST['autoruleupdatetime'], 4, "0", STR_PAD_LEFT);
-			$_POST['autoruleupdatetime'] = substr($tmp, 0, 2) . ":" . substr($tmp, -2);
+		if ($_POST['autoruleupdatetime']) {
+			$pos = strpos($_POST['autoruleupdatetime'], ":");
+			if ($pos === false) {
+				$tmp = str_pad($_POST['autoruleupdatetime'], 4, "0", STR_PAD_LEFT);
+				$_POST['autoruleupdatetime'] = substr($tmp, 0, 2) . ":" . substr($tmp, -2);
+			}
+			$config['installedpackages']['suricata']['config'][0]['autoruleupdatetime'] = str_pad($_POST['autoruleupdatetime'], 4, "0", STR_PAD_LEFT);
 		}
-		$config['installedpackages']['suricata']['config'][0]['autoruleupdatetime'] = str_pad($_POST['autoruleupdatetime'], 4, "0", STR_PAD_LEFT);
 		$config['installedpackages']['suricata']['config'][0]['log_to_systemlog'] = $_POST['log_to_systemlog'] ? 'on' : 'off';
 		$config['installedpackages']['suricata']['config'][0]['log_to_systemlog_facility'] = $_POST['log_to_systemlog_facility'];
 		$config['installedpackages']['suricata']['config'][0]['live_swap_updates'] = $_POST['live_swap_updates'] ? 'on' : 'off';
