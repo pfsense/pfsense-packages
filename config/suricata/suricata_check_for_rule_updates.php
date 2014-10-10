@@ -74,6 +74,7 @@ if (!defined("ET_PRO_FILE_PREFIX"))
 $suricatadir = SURICATADIR;
 $suricatalogdir = SURICATALOGDIR;
 $suricata_rules_upd_log = SURICATA_RULES_UPD_LOGFILE;
+$mounted_rw = FALSE;
 
 /* Save the state of $pkg_interface so we can restore it */
 $pkg_interface_orig = $pkg_interface;
@@ -105,7 +106,10 @@ $snort_community_rules_filename_md5 = GPLV2_DNLD_FILENAME . ".md5";
 $snort_community_rules_url = GPLV2_DNLD_URL;
 
 /* Mount the Suricata conf directories R/W so we can modify files there */
-conf_mount_rw();
+if (!is_subsystem_dirty('mount')) {
+	conf_mount_rw();
+	$mounted_rw = TRUE;
+}
 
 /* Set up Emerging Threats rules filenames and URL */
 if ($etpro == "on") {
@@ -711,19 +715,18 @@ if ($snortdownload == 'on' || $emergingthreats == 'on' || $snortcommunityrules =
 
 	/* Restart Suricata if already running and we are not in post-install, so as to pick up the new rules. */
        	if (is_process_running("suricata") && !$g['suricata_postinstall'] &&
-	    !empty($config['installedpackages']['suricata']['rule'])) {
+	    count($config['installedpackages']['suricata']['rule']) > 0) {
 
 		// See if "Live Reload" is configured and signal each Suricata instance
 		// if enabled, else just do a hard restart of all the instances.
 		if ($config['installedpackages']['suricata']['config'][0]['live_swap_updates'] == 'on') {
 			if ($pkg_interface <> "console") {
-				update_status(gettext('Signalling Suricata to live-load the new set of rules...'));
+				update_status(gettext('Signaling Suricata to live-load the new set of rules...'));
 				update_output_window(gettext("Please wait ... the process should complete in a few seconds..."));
 			}
 			log_error(gettext("[Suricata] Live-Reload of rules from auto-update is enabled..."));
 			error_log(gettext("\tLive-Reload of updated rules is enabled...\n"), 3, $suricata_rules_upd_log);
 			foreach ($config['installedpackages']['suricata']['rule'] as $value) {
-				$if_real = get_real_interface($value['interface']);
 				suricata_reload_config($value);
 				error_log(gettext("\tLive swap of updated rules requested for " . convert_friendly_interface_to_friendly_descr($value['interface']) . ".\n"), 3, $suricata_rules_upd_log);
 			}
@@ -765,9 +768,8 @@ if ($pkg_interface <> "console") {
 log_error(gettext("[Suricata] The Rules update has finished."));
 error_log(gettext("The Rules update has finished.  Time: " . date("Y-m-d H:i:s"). "\n\n"), 3, $suricata_rules_upd_log);
 
-// Remount filesystem read-only unless we are in package post-install.
-// The post-install code will remount read-only when it completes.
-if (!$g['suricata_postinstall'])
+/* Remount filesystem read-only if we changed it in this module */
+if ($mounted_rw == TRUE)
 	conf_mount_ro();
 
 // Restore the state of $pkg_interface
@@ -779,6 +781,6 @@ if ($update_errors)
 else
 	$config['installedpackages']['suricata']['config'][0]['last_rule_upd_status'] = gettext("success");
 $config['installedpackages']['suricata']['config'][0]['last_rule_upd_time'] = time();
-write_config("Suricata pkg: updated status for updated rules package(s) check.");
+write_config("Suricata pkg: updated status for updated rules package(s) check.", FALSE);
 
 ?>
