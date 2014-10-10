@@ -128,7 +128,9 @@ function suricata_add_supplist_entry($suppress) {
 	/* and return true; otherwise return false.                             */
 	if ($found_list) {
 		write_config();
+		conf_mount_rw();
 		sync_suricata_package_config();
+		conf_mount_ro();
 		return true;
 	}
 	else

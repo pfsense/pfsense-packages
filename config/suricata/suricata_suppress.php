@@ -103,7 +103,9 @@ if ($_POST['del'] && is_numericint($_POST['list_id'])) {
 		else {
 			unset($a_suppress[$_POST['list_id']]);
 			write_config("Suricata pkg: deleted SUPPRESS LIST.");
+			conf_mount_rw();
 			sync_suricata_package_config();
+			conf_mount_ro();
 			header("Location: /suricata/suricata_suppress.php");
 			exit;
 		}

@@ -81,16 +81,9 @@ if ($_POST['del_x']) {
 		write_config("Suricata pkg: deleted one or more Suricata interfaces.");
 		sleep(2);
 	  
-		/* if there are no ifaces remaining do not create suricata.sh */
-		if (!empty($config['installedpackages']['suricata']['rule']))
-			suricata_create_rc();
-		else {
-			conf_mount_rw();
-			unlink_if_exists("{$rcdir}suricata.sh");
-			conf_mount_ro();
-		}
-	  
+		conf_mount_rw();
 		sync_suricata_package_config();
+		conf_mount_ro();
 	  
 		header( 'Expires: Sat, 26 Jul 1997 05:00:00 GMT' );
 		header( 'Last-Modified: ' . gmdate( 'D, d M Y H:i:s' ) . ' GMT' );
@@ -110,7 +103,9 @@ if ($_POST['bartoggle']) {
 
 	if (!suricata_is_running($suricatacfg['uuid'], $if_real, 'barnyard2')) {
 		log_error("Toggle (barnyard starting) for {$if_friendly}({$suricatacfg['descr']})...");
+		conf_mount_rw();
 		sync_suricata_package_config();
+		conf_mount_ro();
 		suricata_barnyard_start($suricatacfg, $if_real);
 	} else {
 		log_error("Toggle (barnyard stopping) for {$if_friendly}({$suricatacfg['descr']})...");
@@ -135,7 +130,9 @@ if ($_POST['toggle']) {
 		log_error("Toggle (suricata starting) for {$if_friendly}({$suricatacfg['descr']})...");
 		// set flag to rebuild interface rules before starting Snort
 		$rebuild_rules = true;
+		conf_mount_rw();
 		sync_suricata_package_config();
+		conf_mount_ro();
 		$rebuild_rules = false;
 		suricata_start($suricatacfg, $if_real);
 	}
