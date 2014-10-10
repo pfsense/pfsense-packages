@@ -149,7 +149,6 @@ if ($config['installedpackages']['suricata']['config'][0]['forcekeepsettings'] =
 				log_error(gettext("[Suricata] updated UUID for interface " . convert_friendly_interface_to_friendly_descr($suricatacfg['interface']) . " from {$old_uuid} to {$new_uuid}."));
 			}
 		}
-		write_config("Suricata pkg: updated interface UUIDs to eliminate duplicates.");
 		unset($uuids, $rulesets);
 	}
 	/****************************************************************/
@@ -221,11 +220,14 @@ if ($config['installedpackages']['suricata']['config'][0]['forcekeepsettings'] =
 
 	// Only try to start Suricata if not in reboot
 	if (!$g['booting']) {
-		update_status(gettext("Starting Suricata using rebuilt configuration..."));
-		update_output_window(gettext("Please wait... while Suricata is started..."));
-		log_error(gettext("[Suricata] Starting Suricata using rebuilt configuration..."));
-		mwexec_bg("{$rcdir}suricata.sh start");
-		update_output_window(gettext("Suricata has been started using the rebuilt configuration..."));
+		if ($pkg_interface <> "console") {
+			update_status(gettext("Starting Suricata using rebuilt configuration..."));
+			update_output_window(gettext("Please wait while Suricata is started..."));
+			mwexec("{$rcdir}suricata.sh start");
+			update_output_window(gettext("Suricata has been started using the rebuilt configuration..."));
+		}
+		else
+			mwexec_bg("{$rcdir}suricata.sh start");
 	}
 }
 
@@ -239,7 +241,7 @@ conf_mount_ro();
 
 // Update Suricata package version in configuration
 $config['installedpackages']['suricata']['config'][0]['suricata_config_ver'] = "2.0.3";
-write_config("Suricata pkg: updated GUI package version number.");
+write_config("Suricata pkg v2.0.3: post-install configuration saved.");
 
 // Done with post-install, so clear flag
 unset($g['suricata_postinstall']);
