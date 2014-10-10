@@ -49,6 +49,7 @@ $iprep_path = SURICATA_IPREP_PATH;
 $rcdir = RCFILEPREFIX;
 $suricata_rules_upd_log = SURICATA_RULES_UPD_LOGFILE;
 $suri_pf_table = SURICATA_PF_TABLE;
+$mounted_rw = FALSE;
 
 log_error(gettext("[Suricata] Suricata package uninstall in progress..."));
 
@@ -84,8 +85,14 @@ if ($config['installedpackages']['suricata']['config'][0]['clearlogs'] == 'on') 
 	rmdir_recursive("{$suricatalogdir}");
 }
 
-// Mount filesystem read-write to remove our files
-conf_mount_rw();
+/**************************************************/
+/* If not already, set Suricata conf partition to */
+/* read-write so we can make changes there        */
+/**************************************************/
+if (!is_subsystem_dirty('mount')) {
+	conf_mount_rw();
+	$mounted_rw = TRUE;
+}
 
 /* Remove the Suricata GUI app directories */
 rmdir_recursive("/usr/local/pkg/suricata");
@@ -110,14 +117,17 @@ if (!empty($widgets)) {
 		}
 	}
 	$config['widgets']['sequence'] = implode(",", $widgetlist);
-	write_config("Suricata pkg: remove Suricata Dashboard Widget on package deinstall.");
 }
 unlink_if_exists("/usr/local/www/widgets/include/widget-suricata.inc");
 unlink_if_exists("/usr/local/www/widgets/widgets/suricata_alerts.widget.php");
 unlink_if_exists("/usr/local/www/widgets/javascript/suricata_alerts.js");
 
-// Finished with filesystem mods so remount it read-only
-conf_mount_ro();
+/*******************************************************/
+/* We're finished with conf partition mods, return to  */
+/* read-only if we changed it                          */
+/*******************************************************/
+if ($mounted_rw == TRUE)
+	conf_mount_ro();
 
 /* Keep this as a last step */
 if ($config['installedpackages']['suricata']['config'][0]['forcekeepsettings'] != 'on') {
@@ -126,8 +136,7 @@ if ($config['installedpackages']['suricata']['config'][0]['forcekeepsettings'] !
 	unset($config['installedpackages']['suricatasync']);
 	unlink_if_exists("{$suricata_rules_upd_log}");
 	rmdir_recursive("{$suricatalogdir}");
-	rmdir_recursive("{$sidmodspath}");
-	rmdir_recursive("{$iprep_path}");
+	rmdir_recursive("{$g['vardb_path']}/suricata");
 	log_error(gettext("[Suricata] The package has been removed from this system..."));
 }
 
