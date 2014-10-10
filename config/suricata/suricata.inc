@@ -809,12 +809,9 @@ function sync_suricata_package_config() {
 	$suricatadir = SURICATADIR;
 	$rcdir = RCFILEPREFIX;
 
-	conf_mount_rw();
-
 	// Do not start config build if there are no Suricata-configured interfaces
-	if (!is_array($config['installedpackages']['suricata']) || !is_array($config['installedpackages']['suricata']['rule'])) {
+	if (!is_array($config['installedpackages']['suricata']['rule']) || count($config['installedpackages']['suricata']['rule']) < 1) {
 		unlink_if_exists("{$rcdir}suricata.sh");
-		conf_mount_ro();
 		return;
 	}
 
@@ -845,8 +842,6 @@ function sync_suricata_package_config() {
 	// Do not attempt package sync if reinstalling package or booting
 	if (!isset($g['suricata_postinstall']) && !$g['booting'])
 		suricata_sync_on_changes();
-	
-	conf_mount_ro();
 }
 
 function suricata_load_suppress_sigs($suricatacfg, $track_by=false) {
@@ -3472,7 +3467,9 @@ function suricata_do_xmlrpc_sync($syncdownloadrules, $sync_to_ip, $port, $userna
 	unset(\$g["suricata_postinstall"]);
 	log_error(gettext("[suricata] XMLRPC pkg CARP sync: Generating suricata.yaml file using Master Host settings..."));
 	\$rebuild_rules = true;
+	conf_mount_rw();
 	sync_suricata_package_config();
+	conf_mount_ro();
 	\$rebuild_rules = false;
 	{$suricatastart}
 	log_error(gettext("[suricata] XMLRPC pkg CARP sync process on this host is complete..."));
