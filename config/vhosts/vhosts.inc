@@ -491,7 +491,6 @@ function vhosts_sync_package_php()
 					$tmp .= "\n";
 					$tmp .= "## modules to load\n";
 					$tmp .= "server.modules =   (\n";
-					$tmp .= "				  \"mod_accesslog\",\n";
 					$tmp .= "				  \"mod_access\", \"mod_accesslog\",\n";
 					$tmp .= "                  \"mod_fastcgi\", \"mod_cgi\",\"mod_rewrite\"\n";
 					$tmp .= "				)\n";
