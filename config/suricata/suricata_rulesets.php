@@ -169,17 +169,43 @@ if ($_POST["save"]) {
 	suricata_sync_on_changes();
 }
 elseif ($_POST['unselectall']) {
+	if ($_POST['ips_policy_enable'] == "on") {
+		$a_nat[$id]['ips_policy_enable'] = 'on';
+		$a_nat[$id]['ips_policy'] = $_POST['ips_policy'];
+	}
+	else {
+		$a_nat[$id]['ips_policy_enable'] = 'off';
+		unset($a_nat[$id]['ips_policy']);
+	}
+
+	$pconfig['autoflowbits'] = $_POST['autoflowbits'];
+	$pconfig['ips_policy_enable'] = $_POST['ips_policy_enable'];
+	$pconfig['ips_policy'] = $_POST['ips_policy'];
+
 	// Remove all but the default events and files rules
 	$enabled_rulesets_array = array();
 	$enabled_rulesets_array = implode("||", $default_rules);
 
 	$savemsg = gettext("All rule categories have been de-selected.  ");
-	if ($_POST['ips_policy_enable'])
+	if ($_POST['ips_policy_enable'] == "on")
 		$savemsg .= gettext("Only the rules included in the selected IPS Policy will be used.");
 	else
 		$savemsg .= gettext("There currently are no inspection rules enabled for this Suricata instance!");
 }
 elseif ($_POST['selectall']) {
+	if ($_POST['ips_policy_enable'] == "on") {
+		$a_nat[$id]['ips_policy_enable'] = 'on';
+		$a_nat[$id]['ips_policy'] = $_POST['ips_policy'];
+	}
+	else {
+		$a_nat[$id]['ips_policy_enable'] = 'off';
+		unset($a_nat[$id]['ips_policy']);
+	}
+
+	$pconfig['autoflowbits'] = $_POST['autoflowbits'];
+	$pconfig['ips_policy_enable'] = $_POST['ips_policy_enable'];
+	$pconfig['ips_policy'] = $_POST['ips_policy'];
+
 	// Start with the required default events and files rules
 	$enabled_rulesets_array = $default_rules;
 
