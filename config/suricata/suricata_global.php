@@ -154,7 +154,9 @@ if (!$input_errors) {
 		$retval = 0;
 
 		/* create passlist and homenet file, then sync files */
+		conf_mount_rw();
 		sync_suricata_package_config();
+		conf_mount_ro();
 
 		write_config("Suricata pkg: modified global settings.");
 

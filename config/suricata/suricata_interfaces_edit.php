@@ -223,7 +223,9 @@ if ($_POST["save"] && !$input_errors) {
 		suricata_stop($a_rule[$id], get_real_interface($a_rule[$id]['interface']));
 		write_config("Suricata pkg: disabled Suricata on " . convert_friendly_interface_to_friendly_descr($a_rule[$id]['interface']));
 		$rebuild_rules = false;
+		conf_mount_rw();
 		sync_suricata_package_config();
+		conf_mount_ro();
 		header( 'Expires: Sat, 26 Jul 1997 05:00:00 GMT' );
 		header( 'Last-Modified: ' . gmdate( 'D, d M Y H:i:s' ) . ' GMT' );
 		header( 'Cache-Control: no-store, no-cache, must-revalidate' );
@@ -423,7 +425,9 @@ if ($_POST["save"] && !$input_errors) {
 		write_config("Suricata pkg: modified interface configuration for " . convert_friendly_interface_to_friendly_descr($natent['interface']));
 
 		// Update suricata.conf and suricata.sh files for this interface
+		conf_mount_rw();
 		sync_suricata_package_config();
+		conf_mount_ro();
 
 		header( 'Expires: Sat, 26 Jul 1997 05:00:00 GMT' );
 		header( 'Last-Modified: ' . gmdate( 'D, d M Y H:i:s' ) . ' GMT' );
