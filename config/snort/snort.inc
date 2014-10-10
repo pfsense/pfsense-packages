@@ -600,7 +600,7 @@ function snort_barnyard_start($snortcfg, $if_real, $background=FALSE) {
 	$snortlogdir = SNORTLOGDIR;
 	$snort_uuid = $snortcfg['uuid'];
 
-	if ($snortcfg['barnyard_enable'] == 'on' && !file_exists("{$g['varrun_path']}/barnyard2_{$if_real}{$snort_uuid}.pid")) {
+	if ($snortcfg['barnyard_enable'] == 'on' && !isvalidpid("{$g['varrun_path']}/barnyard2_{$if_real}{$snort_uuid}.pid")) {
 		log_error("[Snort] Barnyard2 START for " . convert_real_interface_to_friendly_descr($if_real) . "({$if_real})...");
 		if ($background)
 			mwexec_bg("/usr/local/bin/barnyard2 -r {$snort_uuid} -f \"snort_{$snort_uuid}_{$if_real}.u2\" --pid-path {$g['varrun_path']} --nolock-pidfile -c {$snortdir}/snort_{$snort_uuid}_{$if_real}/barnyard2.conf -d {$snortlogdir}/snort_{$if_real}{$snort_uuid} -D -q");
@@ -616,7 +616,7 @@ function snort_start($snortcfg, $if_real, $background=FALSE) {
 	$snortlogdir = SNORTLOGDIR;
 	$snort_uuid = $snortcfg['uuid'];
 
-	if ($snortcfg['enable'] == 'on' && !file_exists("{$g['varrun_path']}/snort_{$if_real}{$snort_uuid}.pid")) {
+	if ($snortcfg['enable'] == 'on' && !isvalidpid("{$g['varrun_path']}/snort_{$if_real}{$snort_uuid}.pid")) {
 		log_error("[Snort] Snort START for " . convert_real_interface_to_friendly_descr($if_real) . "({$if_real})...");
 		if ($background)
 			mwexec_bg("/usr/local/bin/snort -R {$snort_uuid} -D -q -l {$snortlogdir}/snort_{$if_real}{$snort_uuid} --pid-path {$g['varrun_path']} --nolock-pidfile -G {$snort_uuid} -c {$snortdir}/snort_{$snort_uuid}_{$if_real}/snort.conf -i {$if_real}");
