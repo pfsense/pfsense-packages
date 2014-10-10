@@ -547,17 +547,61 @@ function suricata_build_list($suricatacfg, $listname = "", $passlist = false, $e
 	return $valresult;
 }
 
+function suricata_cron_job_exists($crontask, $match_time=FALSE, $minute="0", $hour="*", $monthday="*", $month="*", $weekday="*", $who="root") {
+
+	/************************************************************
+	 * This function iterates the cron[] array in the config    *
+	 * to determine if the passed $crontask entry exists.  It   *
+	 * returns TRUE if the $crontask already exists, or FALSE   *
+	 * if there is no match.                                    *
+	 *                                                          *
+	 * The $match_time flag, when set, causes a test of the     *
+	 * configured task execution times along with the task      *
+	 * when checking for a match.                               *
+	 *                                                          *
+	 * We use this to prevent unneccessary config writes if     *
+	 * the $crontask already exists.                            *
+	 ************************************************************/
+
+	global $config, $g;
+
+	if (!is_array($config['cron']))
+		$config['cron'] = array();
+	if (!is_array($config['cron']['item']))
+		$config['cron']['item'] = array();
+
+	foreach($config['cron']['item'] as $item) {
+		if(strpos($item['command'], $crontask) !== FALSE) {
+			if ($match_time) {
+				if ($item['minute'] != $minute)
+					return FALSE;
+				if ($item['hour'] != $hour)
+					return FALSE;
+				if ($item['mday'] != $monthday)
+					return FALSE;
+				if ($item['month'] != $month)
+					return FALSE;
+				if ($item['wday'] != $weekday)
+					return FALSE;
+				if ($item['who'] != $who)
+					return FALSE;
+			}
+			return TRUE;
+		}
+	}
+	return FALSE;
+}
+
 function suricata_rules_up_install_cron($should_install=true) {
 	global $config, $g;
 
-	// Remove any existing job first
-	install_cron_job("suricata_check_for_rule_updates.php", false);
-
-	// If called with FALSE as argument, then we're done
-	if ($should_install == FALSE)
+	// If called with FALSE as argument, then we're removing 
+	// the existing job.
+	if ($should_install == FALSE) {
+		if (suricata_cron_job_exists("suricata_check_for_rule_updates.php", FALSE))
+			install_cron_job("suricata_check_for_rule_updates.php", false);
 		return;
-
-	$command = "/usr/bin/nice -n20 /usr/local/bin/php -f /usr/local/pkg/suricata/suricata_check_for_rule_updates.php";
+	}
 
 	// Get auto-rule update parameter from configuration
 	$suricata_rules_up_info_ck = $config['installedpackages']['suricata']['config'][0]['autoruleupdate'];
@@ -623,18 +667,45 @@ function suricata_rules_up_install_cron($should_install=true) {
 		$suricata_rules_up_wday = "*";
 	}
 
-	// System call to manage the cron job.
-	install_cron_job($command, $should_install, $suricata_rules_up_min, $suricata_rules_up_hr, $suricata_rules_up_mday, $suricata_rules_up_month, $suricata_rules_up_wday, "root");
+	// Construct the basic cron command task
+	$command = "/usr/bin/nice -n20 /usr/local/bin/php -f /usr/local/pkg/suricata/suricata_check_for_rule_updates.php";
+
+	// If there are no changes in the cron job command string from the existing job, then exit
+	if (suricata_cron_job_exists($command, TRUE, $suricata_rules_up_min, $suricata_rules_up_hr, $suricata_rules_up_mday, $suricata_rules_up_month, $suricata_rules_up_wday, "root"))
+		return;
+
+	// Else install the new or updated cron job
+	if ($should_install)
+		install_cron_job($command, $should_install, $suricata_rules_up_min, $suricata_rules_up_hr, $suricata_rules_up_mday, $suricata_rules_up_month, $suricata_rules_up_wday, "root");
 }
 
 function suricata_loglimit_install_cron($should_install=true) {
 
+	// See if simply removing existing "loglimit" job for Suricata
+	if ($should_install == FALSE) {
+		if (suricata_cron_job_exists("suricata/suricata_check_cron_misc.inc", FALSE))
+			install_cron_job("suricata_check_cron_misc.inc", false);
+		return;
+	}
+
+	// If there are no changes in the cron job command string from the existing job, then exit.
+	if ($should_install && suricata_cron_job_exists("/usr/local/pkg/suricata/suricata_check_cron_misc.inc", TRUE, "*/5"))
+		return;
+
+	// Else install the new or updated cron job
 	install_cron_job("/usr/bin/nice -n20 /usr/local/bin/php -f /usr/local/pkg/suricata/suricata_check_cron_misc.inc", $should_install, "*/5");
 }
 
 function suricata_rm_blocked_install_cron($should_install) {
 	global $config, $g;
 	$suri_pf_table = SURICATA_PF_TABLE;
+
+	// See if simply removing existing "expiretable" job for Suricata
+	if ($should_install == FALSE) {
+		if (suricata_cron_job_exists("{$suri_pf_table}", FALSE))
+			install_cron_job("{$suri_pf_table}", false);
+		return;
+	}
 
 	$suricata_rm_blocked_info_ck = $config['installedpackages']['suricata']['config'][0]['rm_blocked'];
 
@@ -719,13 +790,15 @@ function suricata_rm_blocked_install_cron($should_install) {
 		$suricata_rm_blocked_expire = "2419200";
 	}
 
-	// First, remove any existing cron task for "rm_blocked" hosts
-	install_cron_job("{$suri_pf_table}", false);
+	// Construct the basic cron command task
+	$command = "/usr/bin/nice -n20 /sbin/pfctl -q -t {$suri_pf_table} -T expire {$suricata_rm_blocked_expire}";
 
-	// Now add or update the cron task for "rm_blocked" hosts
-	// if enabled.
+	// If there are no changes in the cron job command string from the existing job, then exit.
+	if (suricata_cron_job_exists($command, TRUE, $suricata_rm_blocked_min, $suricata_rm_blocked_hr, $suricata_rm_blocked_mday, $suricata_rm_blocked_month, $suricata_rm_blocked_wday, "root"))
+		return;
+
+	// Else install the new or updated cron job
 	if ($should_install) {
-		$command = "/usr/bin/nice -n20 /sbin/pfctl -q -t {$suri_pf_table} -T expire {$suricata_rm_blocked_expire}";
 		install_cron_job($command, $should_install, $suricata_rm_blocked_min, $suricata_rm_blocked_hr, $suricata_rm_blocked_mday, $suricata_rm_blocked_month, $suricata_rm_blocked_wday, "root");
 	}
 }
@@ -3003,8 +3076,12 @@ EOE;
 ######## Start of main suricata.sh
 
 rc_start() {
+
+	### Lock out other start signals until we are done
 	/usr/bin/touch {$g['varrun_path']}/suricata_pkg_starting.lck
 	{$rc_start}
+
+	### Remove the lock since we have started all interfaces
 	if [ -f {$g['varrun_path']}/suricata_pkg_starting.lck ]; then
 		/bin/rm {$g['varrun_path']}/suricata_pkg_starting.lck
 	fi
@@ -3018,6 +3095,8 @@ case $1 in
 	start)
 		if [ ! -f {$g['varrun_path']}/suricata_pkg_starting.lck ]; then
 			rc_start
+		else
+			/usr/bin/logger -p daemon.info -i -t SuricataStartup "Ignoring additional START command since Suricata is already starting..."
 		fi
 		;;
 	stop)
