@@ -678,10 +678,14 @@ if ($snortdownload == 'on' || $emergingthreats == 'on' || $snortcommunityrules =
 
 	/* Start the rules rebuild proccess for each configured interface */
 	if (is_array($config['installedpackages']['suricata']['rule']) &&
-	    !empty($config['installedpackages']['suricata']['rule'])) {
+	    count($config['installedpackages']['suricata']['rule']) > 0) {
 
-		/* Set the flag to force rule rebuilds since we downloaded new rules */
-		$rebuild_rules = true;
+		/* Set the flag to force rule rebuilds since we downloaded new rules,    */
+		/* except when in post-install mode.  Post-install does its own rebuild. */
+		if ($g['suricata_postinstall'])
+			$rebuild_rules = false;
+		else
+			$rebuild_rules = true;
 
 		/* Create configuration for each active Suricata interface */
 		foreach ($config['installedpackages']['suricata']['rule'] as $value) {
