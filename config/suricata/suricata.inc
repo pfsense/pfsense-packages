@@ -810,21 +810,21 @@ function sync_suricata_package_config() {
 	$rcdir = RCFILEPREFIX;
 
 	// Do not start config build if there are no Suricata-configured interfaces
-	if (!is_array($config['installedpackages']['suricata']['rule']) || count($config['installedpackages']['suricata']['rule']) < 1) {
-		unlink_if_exists("{$rcdir}suricata.sh");
+	if (!is_array($config['installedpackages']['suricata']['rule']) || count($config['installedpackages']['suricata']['rule']) < 1)
 		return;
-	}
 
 	$suricataconf = $config['installedpackages']['suricata']['rule'];
 	foreach ($suricataconf as $value) {
-		$if_real = get_real_interface($value['interface']);
+		/* Skip configuration of any disabled interface */
+		if ($value['enable'] != 'on')
+			continue;
 
 		// create a suricata.yaml file for interface
 		suricata_generate_yaml($value);
 
 		// create barnyard2.conf file for interface
 		if ($value['barnyard_enable'] == 'on')
-			suricata_generate_barnyard2_conf($value, $if_real);
+			suricata_generate_barnyard2_conf($value, get_real_interface($value['interface']));
 	}
 
 	// create suricata bootup file suricata.sh
@@ -832,13 +832,13 @@ function sync_suricata_package_config() {
 
 	// setup the log directory size check job if enabled
 	suricata_loglimit_install_cron(true);
+
 	// setup the suricata rules update job if enabled
 	suricata_rules_up_install_cron($config['installedpackages']['suricata']['config'][0]['autoruleupdate'] != "never_up" ? true : false);
+
 	// set the suricata blocked hosts time
 	suricata_rm_blocked_install_cron($config['installedpackages']['suricata']['config'][0]['rm_blocked'] != "never_b" ? true : false);
 
-	configure_cron();
-	
 	// Do not attempt package sync if reinstalling package or booting
 	if (!isset($g['suricata_postinstall']) && !$g['booting'])
 		suricata_sync_on_changes();
@@ -2938,7 +2938,7 @@ function suricata_create_rc() {
 	// the shell script.
 	foreach ($suricataconf as $value) {
 		// Skip disabled Suricata interfaces
-		if ($value['enable'] <> 'on')
+		if ($value['enable'] != 'on')
 			continue;
 		$suricata_uuid = $value['uuid'];
 		$if_real = get_real_interface($value['interface']);
@@ -2951,14 +2951,10 @@ function suricata_create_rc() {
 		pid=`/bin/pgrep -F {$g['varrun_path']}/barnyard2_{$if_real}{$suricata_uuid}.pid`
 	fi
 
-	if [ ! -z \$pid ]; then
-		/usr/bin/logger -p daemon.info -i -t SuricataStartup "Barnyard2 SOFT RESTART for {$value['descr']}({$suricata_uuid}_{$if_real})..."
-		/bin/pkill -HUP \$pid
-	else
+	if [ -z \$pid ]; then
 		/usr/bin/logger -p daemon.info -i -t SuricataStartup "Barnyard2 START for {$value['descr']}({$suricata_uuid}_{$if_real})..."
-		/usr/local/bin/barnyard2 -r {$suricata_uuid} -f unified2.alert --pid-path {$g['varrun_path']} --nolock-pidfile -c {$suricatadir}suricata_{$suricata_uuid}_{$if_real}/barnyard2.conf -d {$suricatalogdir}suricata_{$if_real}{$suricata_uuid} -D -q
+		/usr/local/bin/barnyard2 -r {$suricata_uuid} -f unified2.alert --pid-path {$g['varrun_path']} --nolock-pidfile -c {$suricatadir}suricata_{$suricata_uuid}_{$if_real}/barnyard2.conf -d {$suricatalogdir}suricata_{$if_real}{$suricata_uuid} -D -q > /dev/null 2>&1
 	fi
-
 EOE;
 		$stop_barnyard2 = <<<EOE
 
@@ -2991,7 +2987,6 @@ EOE;
 			done
 		fi
         fi
-
 EOE;
 		if ($value['barnyard_enable'] == 'on')
 			$start_barnyard2 = $start_barnyard;
@@ -3000,25 +2995,20 @@ EOE;
 
 		$start_suricata_iface_start[] = <<<EOE
 
-###### For Each Iface
-	# Start suricata and barnyard2
+	## Start suricata on {$value['descr']} ({$if_real}) ##
 	if [ ! -f {$g['varrun_path']}/suricata_{$if_real}{$suricata_uuid}.pid ]; then
 		pid=`/bin/pgrep -fn "suricata -i {$if_real} "`
 	else
 		pid=`/bin/pgrep -F {$g['varrun_path']}/suricata_{$if_real}{$suricata_uuid}.pid`
 	fi
 
-	if [ ! -z \$pid ]; then
-		/usr/bin/logger -p daemon.info -i -t SuricataStartup "Suricata SOFT RESTART for {$value['descr']}({$suricata_uuid}_{$if_real})..."
-		/bin/pkill -USR2 \$pid
-	else
+	if [ -z \$pid ]; then
 		/usr/bin/logger -p daemon.info -i -t SuricataStartup "Suricata START for {$value['descr']}({$suricata_uuid}_{$if_real})..."
-		/usr/local/bin/suricata -i {$if_real} -D -c {$suricatadir}suricata_{$suricata_uuid}_{$if_real}/suricata.yaml --pidfile {$g['varrun_path']}/suricata_{$if_real}{$suricata_uuid}.pid
+		/usr/local/bin/suricata -i {$if_real} -D -c {$suricatadir}suricata_{$suricata_uuid}_{$if_real}/suricata.yaml --pidfile {$g['varrun_path']}/suricata_{$if_real}{$suricata_uuid}.pid > /dev/null 2>&1
 	fi
 
-	sleep 2
+	sleep 1
 	{$start_barnyard2}
-
 EOE;
 
 		$start_suricata_iface_stop[] = <<<EOE
@@ -3054,9 +3044,8 @@ EOE;
 		fi
 	fi
 
-	sleep 2
+	sleep 1
 	{$stop_barnyard2}
-
 EOE;
 	}
 
