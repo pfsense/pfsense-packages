@@ -53,13 +53,6 @@ foreach ($config_files as $file) {
 		@copy("{$suricatadir}{$file}", "{$suricatacfgdir}/{$file}");
 }
 
-// Create required files if they don't exist
-$suricata_files = array( "{$suricatacfgdir}/magic" );
-foreach ($suricata_files as $file) {
-	if (!file_exists($file))
-		file_put_contents($file, "\n");
-}
-
 // Read the configuration parameters for the passed interface
 // and construct appropriate string variables for use in the
 // suricata.yaml template include file.
@@ -540,9 +533,10 @@ else
 
 // Add the OS-specific host policies if configured, otherwise
 // just set default to BSD for all networks.
+$host_os_policy = "";
 if (!is_array($suricatacfg['host_os_policy']['item']))
 	$suricatacfg['host_os_policy']['item'] = array();
-if (empty($suricatacfg['host_os_policy']['item']))
+if (count($suricatacfg['host_os_policy']['item']) < 1)
 	$host_os_policy = "bsd: [0.0.0.0/0]";
 else {
 	foreach ($suricatacfg['host_os_policy']['item'] as $k => $v) {
@@ -580,9 +574,10 @@ else {
 
 // Add the HTTP Server-specific policies if configured, otherwise
 // just set default to IDS for all networks.
+$http_hosts_default_policy = "";
 if (!is_array($suricatacfg['libhtp_policy']['item']))
 	$suricatacfg['libhtp_policy']['item'] = array();
-if (empty($suricatacfg['libhtp_policy']['item'])) {
+if (count($suricatacfg['libhtp_policy']['item']) < 1) {
 	$http_hosts_default_policy = "default-config:\n     personality: IDS\n     request-body-limit: 4096\n     response-body-limit: 4096\n";
 	$http_hosts_default_policy .= "     double-decode-path: no\n     double-decode-query: no\n     uri-include-all: no\n";
 }
