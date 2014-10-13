@@ -97,6 +97,7 @@ if (!is_subsystem_dirty('mount')) {
 /* Remove the Suricata GUI app directories */
 rmdir_recursive("/usr/local/pkg/suricata");
 rmdir_recursive("/usr/local/www/suricata");
+rmdir_recursive("/usr/local/etc/suricata");
 
 /* Remove our associated Dashboard widget config and files. */
 /* If "save settings" is enabled, then save old widget      */
