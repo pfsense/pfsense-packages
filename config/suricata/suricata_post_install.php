@@ -166,6 +166,7 @@ if ($config['installedpackages']['suricata']['config'][0]['forcekeepsettings'] =
 	include('/usr/local/pkg/suricata/suricata_check_for_rule_updates.php');
 	update_status(gettext("Generating suricata.yaml configuration file from saved settings..."));
 	$rebuild_rules = true;
+	conf_mount_rw();
 
 	// Create the suricata.yaml files for each enabled interface
 	$suriconf = $config['installedpackages']['suricata']['rule'];
@@ -173,6 +174,7 @@ if ($config['installedpackages']['suricata']['config'][0]['forcekeepsettings'] =
 		$if_real = get_real_interface($suricatacfg['interface']);
 		$suricata_uuid = $suricatacfg['uuid'];
 		$suricatacfgdir = "{$suricatadir}suricata_{$suricata_uuid}_{$if_real}";
+		update_output_window(gettext("Generating configuration for " . convert_friendly_interface_to_friendly_descr($suricatacfg['interface']) . "..."));
 
 		// Pull in the PHP code that generates the suricata.yaml file
 		// variables that will be substituted further down below.
@@ -201,9 +203,6 @@ if ($config['installedpackages']['suricata']['config'][0]['forcekeepsettings'] =
 	suricata_rm_blocked_install_cron($config['installedpackages']['suricata']['config'][0]['rm_blocked'] != "never_b" ? true : false);
 	suricata_rules_up_install_cron($config['installedpackages']['suricata']['config'][0]['autoruleupdate'] != "never_up" ? true : false);
 
-	// Add the recurring jobs created above to crontab
-	configure_cron();
-
 	// Restore the Dashboard Widget if it was previously enabled and saved
 	if (!empty($config['installedpackages']['suricata']['config'][0]['dashboard_widget']) && !empty($config['widgets']['sequence'])) {
 		if (strpos($config['widgets']['sequence'], "suricata_alerts-container") === FALSE)
@@ -215,7 +214,8 @@ if ($config['installedpackages']['suricata']['config'][0]['forcekeepsettings'] =
 	}
 
 	$rebuild_rules = false;
-	update_output_window(gettext("Finished rebuilding Suricata configuration files..."));
+	if ($pkg_interface <> "console")
+		update_output_window(gettext("Finished rebuilding Suricata configuration files..."));
 	log_error(gettext("[Suricata] Finished rebuilding installation from saved settings..."));
 
 	// Only try to start Suricata if not in reboot
