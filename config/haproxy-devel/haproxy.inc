@@ -1247,7 +1247,7 @@ function haproxy_load_modules() {
 	}
 	
 	/* Activate layer2 filtering */
-	mwexec("/sbin/sysctl net.link.ether.ipfw=1 /sbin/net.inet.ip.fw.one_pass=1");
+	mwexec("/sbin/sysctl net.link.ether.ipfw=1 net.inet.ip.fw.one_pass=1");
 	
 	unmute_kernel_msgs();
 }
