@@ -44,6 +44,24 @@ if(!function_exists('ifset')){
 	};
 }
 
+if(!function_exists('is_arrayset')){
+	function is_arrayset(&$array, $items){
+		if (!isset($array))
+			return false;
+		$item = $array;
+		$arg = func_get_args();
+		for($i = 1; $i < count($arg); $i++) {
+
+			$itemindex = $arg[$i];
+			if (!isset($item[$itemindex]) || !is_array($item[$itemindex]))
+				return false;
+			$item = $item[$itemindex];
+
+		}
+		return true;
+	}
+}
+
 function haproxy_compareByName($a, $b) {
 	return strcasecmp($a['name'], $b['name']);
 }
