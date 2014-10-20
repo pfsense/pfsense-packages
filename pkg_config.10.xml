@@ -312,7 +312,7 @@
 		<category>Services</category>
 		<pkginfolink>https://doc.pfsense.org/index.php/vhosts</pkginfolink>
 		<config_file>https://packages.pfsense.org/packages/config/vhosts/vhosts.xml</config_file>
-		<version>0.7.4</version>
+		<version>0.7.5</version>
 		<status>Stable</status>
 		<required_version>2.2</required_version>
 		<maintainer>markjcrane@gmail.com</maintainer>
