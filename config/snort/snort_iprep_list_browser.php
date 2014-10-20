@@ -23,7 +23,7 @@ function get_content($dir) {
 	return $files;
 }
 
-$path = IPREP_PATH;
+$path = SNORT_IPREP_PATH;
 $container = htmlspecialchars($_GET['container']);
 $target = htmlspecialchars($_GET['target']);
 

@@ -56,13 +56,12 @@ if (isset($_POST['del_x'])) {
 			$if_real = get_real_interface($a_nat[$rulei]['interface']);
 			$snort_uuid = $a_nat[$rulei]['uuid'];
 			snort_stop($a_nat[$rulei], $if_real);
-			exec("/bin/rm -r {$snortlogdir}/snort_{$if_real}{$snort_uuid}");
-			exec("/bin/rm -r {$snortdir}/snort_{$snort_uuid}_{$if_real}");
+			rmdir_recursive("{$snortlogdir}/snort_{$if_real}{$snort_uuid}");
+			rmdir_recursive("{$snortdir}/snort_{$snort_uuid}_{$if_real}");
 
 			// Finally delete the interface's config entry entirely
 			unset($a_nat[$rulei]);
 		}
-		conf_mount_ro();
 	  
 		/* If all the Snort interfaces are removed, then unset the interfaces config array. */
 		if (empty($a_nat))
@@ -70,18 +69,9 @@ if (isset($_POST['del_x'])) {
 
 		write_config("Snort pkg: deleted one or more Snort interfaces.");
 		sleep(2);
-	  
-		/* if there are no ifaces remaining do not create snort.sh */
-		if (!empty($config['installedpackages']['snortglobal']['rule']))
-			snort_create_rc();
-		else {
-			conf_mount_rw();
-			@unlink("{$rcdir}snort.sh");
-			conf_mount_ro();
-		}
-	  
+		conf_mount_rw();
 		sync_snort_package_config();
-	  
+		conf_mount_ro();	  
 		header( 'Expires: Sat, 26 Jul 1997 05:00:00 GMT' );
 		header( 'Last-Modified: ' . gmdate( 'D, d M Y H:i:s' ) . ' GMT' );
 		header( 'Cache-Control: no-store, no-cache, must-revalidate' );
@@ -100,11 +90,13 @@ if ($_POST['bartoggle'] && is_numericint($_POST['id'])) {
 	$if_friendly = convert_friendly_interface_to_friendly_descr($snortcfg['interface']);
 
 	if (!snort_is_running($snortcfg['uuid'], $if_real, 'barnyard2')) {
-		log_error("Toggle (barnyard starting) for {$if_friendly}({$snortcfg['descr']})...");
+		log_error("Toggle (barnyard starting) for {$if_friendly}({$if_real})...");
+		conf_mount_rw();
 		sync_snort_package_config();
+		conf_mount_ro();
 		snort_barnyard_start($snortcfg, $if_real);
 	} else {
-		log_error("Toggle (barnyard stopping) for {$if_friendly}({$snortcfg['descr']})...");
+		log_error("Toggle (barnyard stopping) for {$if_friendly}({$if_real})...");
 		snort_barnyard_stop($snortcfg, $if_real);
 	}
 	sleep(3); // So the GUI reports correctly
@@ -117,14 +109,16 @@ if ($_POST['toggle'] && is_numericint($_POST['id'])) {
 	$if_friendly = convert_friendly_interface_to_friendly_descr($snortcfg['interface']);
 
 	if (snort_is_running($snortcfg['uuid'], $if_real)) {
-		log_error("Toggle (snort stopping) for {$if_friendly}({$snortcfg['descr']})...");
+		log_error("Toggle (snort stopping) for {$if_friendly}({$if_real})...");
 		snort_stop($snortcfg, $if_real);
 	} else {
-		log_error("Toggle (snort starting) for {$if_friendly}({$snortcfg['descr']})...");
+		log_error("Toggle (snort starting) for {$if_friendly}({$if_real})...");
 
 		/* set flag to rebuild interface rules before starting Snort */
 		$rebuild_rules = true;
+		conf_mount_rw();
 		sync_snort_package_config();
+		conf_mount_ro();
 		$rebuild_rules = false;
 		snort_start($snortcfg, $if_real);
 	}
@@ -164,7 +158,9 @@ include_once("fbegin.inc");
 		$tab_array[5] = array(gettext("Pass Lists"), false, "/snort/snort_passlist.php");
 		$tab_array[6] = array(gettext("Suppress"), false, "/snort/snort_interfaces_suppress.php");
 		$tab_array[7] = array(gettext("IP Lists"), false, "/snort/snort_ip_list_mgmt.php");
-		$tab_array[8] = array(gettext("Sync"), false, "/pkg_edit.php?xml=snort/snort_sync.xml");
+		$tab_array[8] = array(gettext("SID Mgmt"), false, "/snort/snort_sid_mgmt.php");
+		$tab_array[9] = array(gettext("Log Mgmt"), false, "/snort/snort_log_mgmt.php");
+		$tab_array[10] = array(gettext("Sync"), false, "/pkg_edit.php?xml=snort/snort_sync.xml");
 		display_top_tabs($tab_array, true);
 	?>
 	</td>
@@ -255,9 +251,11 @@ include_once("fbegin.inc");
 			$no_rules = true;
 			if (isset($natent['customrules']) && !empty($natent['customrules']))
 				$no_rules = false;
-			if (isset($natent['rulesets']) && !empty($natent['rulesets']))
+			elseif (isset($natent['rulesets']) && !empty($natent['rulesets']))
 				$no_rules = false;
-			if (isset($natent['ips_policy']) && !empty($natent['ips_policy']))
+			elseif (isset($natent['ips_policy']) && !empty($natent['ips_policy']))
+				$no_rules = false;
+			elseif ($config['installedpackages']['snortglobal']['auto_manage_sids'] == 'on' && !empty($natent['enable_sid_file']))
 				$no_rules = false;
 			/* Do not display the "no rules" warning if interface disabled */
 			if ($natent['enable'] == "off")

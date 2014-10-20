@@ -70,6 +70,30 @@ if (empty($config['installedpackages']['snortglobal']['snort_config_ver']) &&
 	$updated_cfg = true;
 }
 
+/**********************************************************/
+/* Create new Auto SID Mgmt settings if not set           */
+/**********************************************************/
+	if (empty($config['installedpackages']['snortglobal']['auto_manage_sids'])) {
+		$config['installedpackages']['snortglobal']['auto_manage_sids'] = "off";
+		$updated_cfg = true;
+	}
+
+/**********************************************************/
+/* Create new LOG MGMT settings if not set                */
+/**********************************************************/
+	if (empty($config['installedpackages']['snortglobal']['enable_log_mgmt'])) {
+		$config['installedpackages']['snortglobal']['enable_log_mgmt'] = "on";
+		$config['installedpackages']['snortglobal']['alert_log_limit_size'] = "500";
+		$config['installedpackages']['snortglobal']['alert_log_retention'] = "336";
+		$config['installedpackages']['snortglobal']['event_pkts_log_limit_size'] = "0";
+		$config['installedpackages']['snortglobal']['event_pkts_log_retention'] = "336";
+		$config['installedpackages']['snortglobal']['sid_changes_log_limit_size'] = "250";
+		$config['installedpackages']['snortglobal']['sid_changes_log_retention'] = "336";
+		$config['installedpackages']['snortglobal']['stats_log_limit_size'] = "500";
+		$config['installedpackages']['snortglobal']['stats_log_retention'] = "168";
+		$updated_cfg = true;
+}
+
 foreach ($rule as &$r) {
 	// Initialize arrays for supported preprocessors if necessary
 	if (!is_array($r['frag3_engine']['item']))
@@ -344,7 +368,7 @@ foreach ($rule as &$r) {
 		// Since Barnyard2 was enabled, configure the new archived log settings
 		$pconfig['u2_archived_log_retention'] = '168';
 		$pconfig['barnyard_archive_enable'] = 'on';
-		$pconfig['unified2_log_limit'] = '32';
+		$pconfig['unified2_log_limit'] = '32M';
 		$updated_cfg = true;
 	}
 
@@ -410,23 +434,23 @@ foreach ($rule as &$r) {
 		$pconfig['smtp_max_mime_mem'] = "838860";
 		$updated_cfg = true;
 	}
-	if (empty($pconfig['smtp_b64_decode_depth'])) {
+	if (empty($pconfig['smtp_b64_decode_depth']) && $pconfig['smtp_b64_decode_depth'] != "0") {
 		$pconfig['smtp_b64_decode_depth'] = "0";
 		$updated_cfg = true;
 	}
-	if (empty($pconfig['smtp_qp_decode_depth'])) {
+	if (empty($pconfig['smtp_qp_decode_depth']) && $pconfig['smtp_qp_decode_depth'] != "0") {
 		$pconfig['smtp_qp_decode_depth'] = "0";
 		$updated_cfg = true;
 	}
-	if (empty($pconfig['smtp_bitenc_decode_depth'])) {
+	if (empty($pconfig['smtp_bitenc_decode_depth']) && $pconfig['smtp_bitenc_decode_depth'] != "0") {
 		$pconfig['smtp_bitenc_decode_depth'] = "0";
 		$updated_cfg = true;
 	}
-	if (empty($pconfig['smtp_uu_decode_depth'])) {
+	if (empty($pconfig['smtp_uu_decode_depth']) && $pconfig['smtp_uu_decode_depth'] != "0") {
 		$pconfig['smtp_uu_decode_depth'] = "0";
 		$updated_cfg = true;
 	}
-	if (empty($pconfig['smtp_email_hdrs_log_depth']) && $pconfig['smtp_email_hdrs_log_depth'] != '0') {
+	if (empty($pconfig['smtp_email_hdrs_log_depth'])) {
 		$pconfig['smtp_email_hdrs_log_depth'] = "1464";
 		$updated_cfg = true;
 	}
@@ -451,17 +475,23 @@ foreach ($rule as &$r) {
 		$updated_cfg = true;
 	}
 
+	// Migrate any BY2 limit for unified2 logs to new format
+	if (!empty($pconfig['unified2_log_limit']) && 
+	    !preg_match('/^\d+[g|k|m|G|K|M]/', $pconfig['unified2_log_limit'])) {
+		$pconfig['unified2_log_limit'] .= "M";
+		$updated_cfg = true;
+	}
+
 	// Save the new configuration data into the $config array pointer
 	$r = $pconfig;
 }
 // Release reference to final array element
 unset($r);
 
-// Write out the new configuration to disk if we changed anything
+// Log a message if we changed anything
 if ($updated_cfg) {
-	$config['installedpackages']['snortglobal']['snort_config_ver'] = "3.1.2";
+	$config['installedpackages']['snortglobal']['snort_config_ver'] = "3.1.3";
 	log_error("[Snort] Saving configuration settings in new format...");
-	write_config("Snort pkg: migrate existing settings to new format as part of package upgrade.");
 	log_error("[Snort] Settings successfully migrated to new configuration format...");
 }
 else

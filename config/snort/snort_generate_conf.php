@@ -41,11 +41,17 @@
 /* Custom home nets */
 $home_net_list = snort_build_list($snortcfg, $snortcfg['homelistname']);
 $home_net = implode(",", $home_net_list);
-
-$external_net = '!$HOME_NET';
+$home_net = trim($home_net);
+$external_net = "";
 if (!empty($snortcfg['externallistname']) && $snortcfg['externallistname'] != 'default') {
-	$external_net_list = snort_build_list($snortcfg, $snortcfg['externallistname']);
+	$external_net_list = snort_build_list($snortcfg, $snortcfg['externallistname'], false, true);
 	$external_net = implode(",", $external_net_list);
+	$external_net = "[" . trim($external_net) . "]";
+}
+else {
+	foreach ($home_net_list as $ip)
+		$external_net .= "!{$ip},";
+	$external_net = trim($external_net, ', ');
 }
 
 /* User added custom configuration arguments */
@@ -87,10 +93,25 @@ foreach ($snort_files as $file) {
 	}
 }
 
+/* define alert log limit */
+if (!empty($config['installedpackages']['snortglobal']['alert_log_limit_size']) && $config['installedpackages']['snortglobal']['alert_log_limit_size'] != "0")
+	$alert_log_limit_size = $config['installedpackages']['snortglobal']['alert_log_limit_size'] . "K";
+else
+	$alert_log_limit_size = "";
+
 /* define alertsystemlog */
 $alertsystemlog_type = "";
-if ($snortcfg['alertsystemlog'] == "on")
-	$alertsystemlog_type = "output alert_syslog: log_alert";
+if ($snortcfg['alertsystemlog'] == "on") {
+	$alertsystemlog_type = "output alert_syslog: ";
+	if (!empty($snortcfg['alertsystemlog_facility']))
+		$alertsystemlog_type .= strtoupper($snortcfg['alertsystemlog_facility']) . " ";
+	else
+		$alertsystemlog_type .= "LOG_AUTH ";
+	if (!empty($snortcfg['alertsystemlog_priority']))
+		$alertsystemlog_type .= strtoupper($snortcfg['alertsystemlog_priority']) . " ";
+	else
+		$alertsystemlog_type .= "LOG_ALERT ";
+}
 
 /* define snortunifiedlog */
 $snortunifiedlog_type = "";
@@ -98,7 +119,7 @@ if ($snortcfg['barnyard_enable'] == "on") {
 	if (isset($snortcfg['unified2_log_limit']))
 		$u2_log_limit = "limit {$snortcfg['unified2_log_limit']}";
 	else
-		$u2_log_limit = "limit 128";
+		$u2_log_limit = "limit 128K";
 
 	$snortunifiedlog_type = "output unified2: filename snort_{$snort_uuid}_{$if_real}.u2, {$u2_log_limit}";
 	if ($snortcfg['barnyard_log_vlan_events'] == 'on')
@@ -192,9 +213,13 @@ $stream5_ports_both .= "\t           55555 56712";
 
 /* def perform_stat */
 
+if (!empty($config['installedpackages']['snortglobal']['stats_log_limit_size']) && $config['installedpackages']['snortglobal']['stats_log_limit_size'] != "0")
+	$stats_log_limit = "max_file_size " . $config['installedpackages']['snortglobal']['stats_log_limit_size'] * 1000;
+else
+	$stats_log_limit = "";
 $perform_stat = <<<EOD
 # Performance Statistics #
-preprocessor perfmonitor: time 300 file {$snortlogdir}/snort_{$if_real}{$snort_uuid}/{$if_real}.stats pktcnt 10000
+preprocessor perfmonitor: time 300 file {$snortlogdir}/snort_{$if_real}{$snort_uuid}/{$if_real}.stats pktcnt 10000 {$stats_log_limit}
 	
 EOD;
 
@@ -827,11 +852,11 @@ if (is_array($snortcfg['blist_files']['item'])) {
 	$bIsFirst = TRUE;
 	foreach ($snortcfg['blist_files']['item'] as $blist) {
 		if ($bIsFirst) {
-			$blist_files .= "blacklist " . IPREP_PATH . $blist;
+			$blist_files .= "blacklist " . SNORT_IPREP_PATH . $blist;
 			$bIsFirst = FALSE;
 		}
 		else
-			$blist_files .= ", \\ \n\tblacklist " . IPREP_PATH . $blist;    
+			$blist_files .= ", \\ \n\tblacklist " . SNORT_IPREP_PATH . $blist;    
 	}
 }
 if (is_array($snortcfg['wlist_files']['item'])) {
@@ -839,11 +864,11 @@ if (is_array($snortcfg['wlist_files']['item'])) {
 	$bIsFirst = TRUE;
 	foreach ($snortcfg['wlist_files']['item'] as $wlist) {
 		if ($bIsFirst) {
-			$wlist_files .= "whitelist " . IPREP_PATH . $wlist;
+			$wlist_files .= "whitelist " . SNORT_IPREP_PATH . $wlist;
 			$bIsFirst = FALSE;
 		}
 		else
-			$wlist_files .= ", \\ \n\twhitelist " . IPREP_PATH . $wlist;    
+			$wlist_files .= ", \\ \n\twhitelist " . SNORT_IPREP_PATH . $wlist;    
 	}
 }
 if (!empty($blist_files))
