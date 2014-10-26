@@ -46,8 +46,8 @@
 	<requirements>None</requirements>
 	<faq>Currently there are no FAQ items provided.</faq>
 	<name>Snort</name>
-	<version>2.9.6.2</version>
-	<title>Services:2.9.6.2 pkg v3.1.3</title>
+	<version>2.9.7.0</version>
+	<title>Services:2.9.7.0 pkg v3.2</title>
 	<include_file>/usr/local/pkg/snort/snort.inc</include_file>
 	<menu>
 		<name>Snort</name>
@@ -309,7 +309,7 @@
 	</custom_add_php_command>
 	<custom_php_resync_config_command>
 		<![CDATA[
-		if ($GLOBALS['pfSense_snort_version'] == "3.1.3")
+		if ($GLOBALS['pfSense_snort_version'] == "3.2")
 		sync_snort_package_config();
 		]]>
 	</custom_php_resync_config_command>

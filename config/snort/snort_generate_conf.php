@@ -64,9 +64,9 @@ $snort_dirs = array( $snortdir, $snortcfgdir, "{$snortcfgdir}/rules",
 	"{$snortlogdir}/snort_{$if_real}{$snort_uuid}",
 	"{$snortlogdir}/snort_{$if_real}{$snort_uuid}/barnyard2", 
 	"{$snortcfgdir}/preproc_rules", 
-	"dynamicrules" => "{$snortlibdir}/dynamicrules",
-	"dynamicengine" => "{$snortlibdir}/dynamicengine",
-	"dynamicpreprocessor" => "{$snortcfgdir}/dynamicpreprocessor"
+	"dynamicrules" => "{$snortlibdir}/snort_dynamicrules",
+	"dynamicengine" => "{$snortlibdir}/snort_dynamicengine",
+	"dynamicpreprocessor" => "{$snortcfgdir}/snort_dynamicpreprocessor"
 );
 foreach ($snort_dirs as $dir) {
 	if (!is_dir($dir))
@@ -82,7 +82,7 @@ foreach ($snort_dirs as $dir) {
 /* put in place by the rules update process.                        */
 /********************************************************************/
 $snort_files = array("gen-msg.map", "classification.config", "reference.config", "attribute_table.dtd", 
-		"sid-msg.map", "unicode.map", "threshold.conf", "preproc_rules/preprocessor.rules",
+		"sid-msg.map", "unicode.map", "file_magic.conf", "threshold.conf", "preproc_rules/preprocessor.rules",
 		"preproc_rules/decoder.rules", "preproc_rules/sensitive-data.rules"
 	);
 foreach ($snort_files as $file) {
@@ -941,8 +941,8 @@ foreach ($snort_preproc as $preproc) {
 		if (!empty($snort_preproc_libs[$preproc])) {
 			$preproclib = "libsf_" . $snort_preproc_libs[$preproc];
 			if (!file_exists($snort_dirs['dynamicpreprocessor'] . "{$preproclib}.so")) {
-				if (file_exists("{$snortlibdir}/dynamicpreprocessor/{$preproclib}.so")) {
-					@copy("{$snortlibdir}/dynamicpreprocessor/{$preproclib}.so", "{$snort_dirs['dynamicpreprocessor']}/{$preproclib}.so");
+				if (file_exists("{$snortlibdir}/snort_dynamicpreprocessor/{$preproclib}.so")) {
+					@copy("{$snortlibdir}/snort_dynamicpreprocessor/{$preproclib}.so", "{$snort_dirs['dynamicpreprocessor']}/{$preproclib}.so");
 					$snort_preprocessors .= $$preproc;
 					$snort_preprocessors .= "\n";
 				} else

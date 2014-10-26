@@ -69,7 +69,7 @@ if (!defined('SNORT_ENFORCING_RULES_FILENAME'))
 
 $snortdir = SNORTDIR;
 $snortlogdir = SNORTLOGDIR;
-$snortlibdir = SNORTLIBDIR;
+$snortlibdir = "/usr/pbi/snort-" . php_uname("m") . "/lib";
 $rcdir = RCFILEPREFIX;
 $flowbit_rules_file = FLOWBITS_FILENAME;
 $snort_enforcing_rules_file = SNORT_ENFORCING_RULES_FILENAME;
@@ -101,6 +101,7 @@ conf_mount_rw();
 @rename("{$snortdir}/threshold.conf-sample", "{$snortdir}/threshold.conf");
 @rename("{$snortdir}/sid-msg.map-sample", "{$snortdir}/sid-msg.map");
 @rename("{$snortdir}/unicode.map-sample", "{$snortdir}/unicode.map");
+@rename("{$snortdir}/file_magic.conf-sample", "{$snortdir}/file_magic.conf");
 @rename("{$snortdir}/classification.config-sample", "{$snortdir}/classification.config");
 @rename("{$snortdir}/generators-sample", "{$snortdir}/generators");
 @rename("{$snortdir}/reference.config-sample", "{$snortdir}/reference.config");
@@ -263,8 +264,8 @@ if (stristr($config['widgets']['sequence'], "snort_alerts-container") === FALSE)
 	$config['widgets']['sequence'] .= ",{$snort_widget_container}";
 
 /* Update Snort package version in configuration */
-$config['installedpackages']['snortglobal']['snort_config_ver'] = "3.1.3";
-write_config("Snort pkg v3.1.3: post-install configuration saved.");
+$config['installedpackages']['snortglobal']['snort_config_ver'] = "3.2";
+write_config("Snort pkg v3.2: post-install configuration saved.");
 
 /* Done with post-install, so clear flag */
 unset($g['snort_postinstall']);

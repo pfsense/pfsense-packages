@@ -39,7 +39,7 @@ global $g, $config, $pkg_interface, $snort_gui_include, $rebuild_rules;
 if (!defined("VRT_DNLD_URL"))
 	define("VRT_DNLD_URL", "https://www.snort.org/rules/");
 if (!defined("SNORT_BIN_VERSION"))
-	define("SNORT_BIN_VERSION", "2.9.6.2");
+	define("SNORT_BIN_VERSION", "2.9.7.0");
 if (!defined("ET_VERSION"))
 	define("ET_VERSION", "2.9.0");
 if (!defined("ET_BASE_DNLD_URL"))
@@ -68,7 +68,7 @@ if (!defined("SNORT_IPREP_PATH"))
 	define("SNORT_IPREP_PATH", "{$g['vardb_path']}/snort/iprep/");
 
 $snortdir = SNORTDIR;
-$snortlibdir = SNORTLIBDIR;
+$snortlibdir = "/usr/pbi/snort-" . php_uname("m") . "/lib";
 $snortlogdir = SNORTLOGDIR;
 $snortiprepdir = SNORT_IPREP_PATH;
 $snort_rules_upd_log = SNORT_RULES_UPD_LOGFILE;
@@ -422,7 +422,7 @@ safe_mkdir("{$snortdir}/rules");
 safe_mkdir("{$snortdir}/signatures");
 safe_mkdir("{$snortdir}/preproc_rules");
 safe_mkdir("{$tmpfname}");
-safe_mkdir("{$snortlibdir}/dynamicrules");
+safe_mkdir("{$snortlibdir}/snort_dynamicrules");
 safe_mkdir("{$snortlogdir}");
 safe_mkdir("{$snortiprepdir}");
 
@@ -507,7 +507,7 @@ if ($snortdownload == 'on') {
 			$newfile = basename($file);
 			@copy($file, "{$snortdir}/rules/{$newfile}");
 		}
-		exec("rm -r {$tmpfname}/snortrules");
+		rmdir_recursive("{$tmpfname}/snortrules");
 		/* Extract the Snort preprocessor rules */
 		if ($pkg_interface <> "console")
 			update_output_window(gettext("Extracting preprocessor rules files..."));
@@ -517,22 +517,21 @@ if ($snortdownload == 'on') {
 			$newfile = basename($file);
 			@copy($file, "{$snortdir}/preproc_rules/{$newfile}");
 		}
-		exec("rm -r {$tmpfname}/preproc_rules");
+		rmdir_recursive("{$tmpfname}/preproc_rules");
 		/* extract so rules */
 		if ($pkg_interface <> "console") {
 			update_status(gettext("Extracting Snort VRT Shared Objects rules..."));
 			update_output_window(gettext("Installing precompiled Shared Objects rules for {$freebsd_version_so}..."));
 		}
-		exec("/bin/mkdir -p {$snortlibdir}/dynamicrules/");
 		error_log(gettext("\tUsing Snort VRT precompiled SO rules for {$freebsd_version_so} ...\n"), 3, $snort_rules_upd_log);
 		$snort_arch = php_uname("m");
 		$nosorules = false;
 		if ($snort_arch  == 'i386'){
 			exec("/usr/bin/tar xzf {$tmpfname}/{$snort_filename} -C {$tmpfname} so_rules/precompiled/{$freebsd_version_so}/i386/{$snort_version}/");
-			exec("/bin/cp {$tmpfname}/so_rules/precompiled/{$freebsd_version_so}/i386/{$snort_version}/*.so {$snortlibdir}/dynamicrules/");
+			exec("/bin/cp {$tmpfname}/so_rules/precompiled/{$freebsd_version_so}/i386/{$snort_version}/*.so {$snortlibdir}/snort_dynamicrules/");
 		} elseif ($snort_arch == 'amd64') {
 			exec("/usr/bin/tar xzf {$tmpfname}/{$snort_filename} -C {$tmpfname} so_rules/precompiled/{$freebsd_version_so}/x86-64/{$snort_version}/");
-			exec("/bin/cp {$tmpfname}/so_rules/precompiled/{$freebsd_version_so}/x86-64/{$snort_version}/*.so {$snortlibdir}/dynamicrules/");
+			exec("/bin/cp {$tmpfname}/so_rules/precompiled/{$freebsd_version_so}/x86-64/{$snort_version}/*.so {$snortlibdir}/snort_dynamicrules/");
 		} else
 			$nosorules = true;
 		rmdir_recursive("{$tmpfname}/so_rules/");
@@ -558,7 +557,7 @@ if ($snortdownload == 'on') {
 			if (file_exists("{$tmpfname}/etc/{$file}"))
 				@copy("{$tmpfname}/etc/{$file}", "{$tmpfname}/VRT_{$file}");
 		}
-		exec("rm -r {$tmpfname}/etc");
+		rmdir_recursive("{$tmpfname}/etc");
 		if (file_exists("{$tmpfname}/{$snort_filename_md5}")) {
 			if ($pkg_interface <> "console")
 				update_status(gettext("Copying md5 signature to snort directory..."));
@@ -757,8 +756,8 @@ if ($snortdownload == 'on' || $emergingthreats == 'on' || $snortcommunityrules =
 				safe_mkdir("{$snortdir}/snort_{$value['uuid']}_{$if_real}/rules");
 			if (!is_dir("{$snortdir}/snort_{$value['uuid']}_{$if_real}/preproc_rules"))
 				safe_mkdir("{$snortdir}/snort_{$value['uuid']}_{$if_real}/preproc_rules");
-			if (!is_dir("{$snortdir}/snort_{$value['uuid']}_{$if_real}/dynamicpreprocessor"))
-				safe_mkdir("{$snortdir}/snort_{$value['uuid']}_{$if_real}/dynamicpreprocessor");
+			if (!is_dir("{$snortdir}/snort_{$value['uuid']}_{$if_real}/snort_dynamicpreprocessor"))
+				safe_mkdir("{$snortdir}/snort_{$value['uuid']}_{$if_real}/snort_dynamicpreprocessor");
 
 			snort_apply_customizations($value, $if_real);
 

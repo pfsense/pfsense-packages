@@ -36,8 +36,6 @@ require_once("config.inc");
 require_once("functions.inc");
 require_once("service-utils.inc");
 require_once("pkg-utils.inc");
-
-// Needed on 2.0 because of filter_get_vpns_list()
 require_once("filter.inc");
 
 // Snort GUI needs some extra PHP memory space to manipulate large rules arrays
@@ -51,26 +49,16 @@ $snortver = array();
 exec("/usr/local/bin/snort -V 2>&1 |/usr/bin/grep Version | /usr/bin/cut -c20-26", $snortver);
 
 /* Used to indicate latest version of this include file has been loaded */
-$pfSense_snort_version = "3.1.3";
+$pfSense_snort_version = "3.2";
 
 /* get installed package version for display */
 $snort_package_version = "Snort {$config['installedpackages']['package'][get_pkg_id("snort")]['version']}";
 
-// Define SNORTDIR and SNORTLIBDIR constants according to pfSense version
-$pfs_version=substr(trim(file_get_contents("/etc/version")),0,3);
-if ($pfs_version >= 2.2) {
-	define("SNORTDIR", "/usr/pbi/snort-" . php_uname("m") . "/local/etc/snort");
-	define("SNORTLIBDIR", "/usr/pbi/snort-" . php_uname("m") . "/local/lib/snort");
-}
-else {
-	define("SNORTDIR", "/usr/pbi/snort-" . php_uname("m") . "/etc/snort");
-	define("SNORTLIBDIR", "/usr/pbi/snort-" . php_uname("m") . "/lib/snort");
-}
-
 /* Define some useful constants for Snort */
 /* Be sure to include trailing slash on the URL defines */
+define("SNORTDIR", "/usr/pbi/snort-" . php_uname("m") . "/etc/snort");
 define("SNORTLOGDIR", "{$g['varlog_path']}/snort");
-define("SNORT_BIN_VERSION", "2.9.6.2");
+define("SNORT_BIN_VERSION", "2.9.7.0");
 define("SNORT_ET_DNLD_FILENAME", "emerging.rules.tar.gz");
 define("SNORT_ETPRO_DNLD_FILENAME", "etpro.rules.tar.gz");
 define("SNORT_GPLV2_DNLD_FILENAME", "community-rules.tar.gz");
@@ -619,9 +607,9 @@ function snort_start($snortcfg, $if_real, $background=FALSE) {
 	if ($snortcfg['enable'] == 'on' && !isvalidpid("{$g['varrun_path']}/snort_{$if_real}{$snort_uuid}.pid")) {
 		log_error("[Snort] Snort START for " . convert_real_interface_to_friendly_descr($if_real) . "({$if_real})...");
 		if ($background)
-			mwexec_bg("/usr/local/bin/snort -R {$snort_uuid} -D -q -l {$snortlogdir}/snort_{$if_real}{$snort_uuid} --pid-path {$g['varrun_path']} --nolock-pidfile -G {$snort_uuid} -c {$snortdir}/snort_{$snort_uuid}_{$if_real}/snort.conf -i {$if_real}");
+			mwexec_bg("/usr/local/bin/snort -R {$snort_uuid} -D -q -l {$snortlogdir}/snort_{$if_real}{$snort_uuid} --pid-path {$g['varrun_path']} --suppress-config-log --nolock-pidfile -G {$snort_uuid} -c {$snortdir}/snort_{$snort_uuid}_{$if_real}/snort.conf -i {$if_real}");
 		else
-			mwexec("/usr/local/bin/snort -R {$snort_uuid} -D -q -l {$snortlogdir}/snort_{$if_real}{$snort_uuid} --pid-path {$g['varrun_path']} --nolock-pidfile -G {$snort_uuid} -c {$snortdir}/snort_{$snort_uuid}_{$if_real}/snort.conf -i {$if_real}");
+			mwexec("/usr/local/bin/snort -R {$snort_uuid} -D -q -l {$snortlogdir}/snort_{$if_real}{$snort_uuid} --pid-path {$g['varrun_path']} --suppress-config-log --nolock-pidfile -G {$snort_uuid} -c {$snortdir}/snort_{$snort_uuid}_{$if_real}/snort.conf -i {$if_real}");
 		snort_barnyard_start($snortcfg, $if_real, $background);
 	}
 }
@@ -2888,7 +2876,7 @@ EOE;
 
 	if [ -z \$pid ]; then
 		/usr/bin/logger -p daemon.info -i -t SnortStartup "Snort START for {$value['descr']}({$snort_uuid}_{$if_real})..."
-		/usr/local/bin/snort -R {$snort_uuid} -D -q -l {$snortlogdir}/snort_{$if_real}{$snort_uuid} --pid-path {$g['varrun_path']} --nolock-pidfile -G {$snort_uuid} -c {$snortdir}/snort_{$snort_uuid}_{$if_real}/snort.conf -i {$if_real} > /dev/null 2>&1
+		/usr/local/bin/snort -R {$snort_uuid} -D -q -l {$snortlogdir}/snort_{$if_real}{$snort_uuid} --pid-path {$g['varrun_path']} --suppress-config-log --nolock-pidfile -G {$snort_uuid} -c {$snortdir}/snort_{$snort_uuid}_{$if_real}/snort.conf -i {$if_real} > /dev/null 2>&1
 	fi
 
 	{$start_barnyard2}
@@ -3106,7 +3094,7 @@ function snort_deinstall() {
 	global $config, $g;
 
 	$snortdir = SNORTDIR;
-	$snortlibdir = SNORTLIBDIR;
+	$snortlibdir = "/usr/pbi/snort-" . php_uname("m") . "/lib";
 	$snortlogdir = SNORTLOGDIR;
 	$rcdir = RCFILEPREFIX;
 	$snort_rules_upd_log = SNORT_RULES_UPD_LOGFILE;
@@ -3205,6 +3193,8 @@ function snort_deinstall() {
 		rmdir_recursive("/usr/local/www/snort");
 		rmdir_recursive("/usr/local/etc/snort");
 		rmdir_recursive("/usr/local/lib/snort");
+		rmdir_recursive("/usr/local/lib/snort_dynamicengine");
+		rmdir_recursive("/usr/local/lib/snort_dynamicpreprocessor");
 	}
 
 	/* Keep this as a last step */
@@ -3650,7 +3640,7 @@ function snort_generate_conf($snortcfg) {
 		return;
 
 	$snortdir = SNORTDIR;
-	$snortlibdir = SNORTLIBDIR;
+	$snortlibdir = "/usr/pbi/snort-" . php_uname("m") . "/lib";
 	$snortlogdir = SNORTLOGDIR;
 	$flowbit_rules_file = FLOWBITS_FILENAME;
 	$snort_enforcing_rules_file = SNORT_ENFORCING_RULES_FILENAME;
