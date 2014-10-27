@@ -412,8 +412,7 @@ elseif ($_POST['save']) {
 	else {
 		/* Soft-restart Snort to live-load new rules */
 		snort_reload_config($a_rule[$id]);
-		$savemsg = gettext("Custom rules validated successfully and have been saved to the Snort configuration files. ");
-		$savemsg .= gettext("Any active Snort process on this interface has been signalled to live-load the new rules.");
+		$savemsg = gettext("Custom rules validated successfully and any active Snort process on this interface has been signalled to live-load the new rules.");
 	}
 
 	clear_subsystem_dirty('snort_rules');
