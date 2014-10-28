@@ -94,6 +94,17 @@ if (empty($config['installedpackages']['snortglobal']['snort_config_ver']) &&
 		$updated_cfg = true;
 }
 
+/**********************************************************/
+/* Create new VERBOSE_LOGGING setting if not set          */
+/**********************************************************/
+	if (empty($config['installedpackages']['snortglobal']['verbose_logging'])) {
+		$config['installedpackages']['snortglobal']['verbose_logging'] = "off";
+		$updated_cfg = true;
+	}
+
+/**********************************************************/
+/* Migrate per interface settings if required.            */
+/**********************************************************/
 foreach ($rule as &$r) {
 	// Initialize arrays for supported preprocessors if necessary
 	if (!is_array($r['frag3_engine']['item']))

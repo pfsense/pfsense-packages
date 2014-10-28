@@ -604,12 +604,17 @@ function snort_start($snortcfg, $if_real, $background=FALSE) {
 	$snortlogdir = SNORTLOGDIR;
 	$snort_uuid = $snortcfg['uuid'];
 
+	if ($config['installedpackages']['snortglobal']['verbose_logging'] == "on")
+		$quiet = "";
+	else
+		$quiet = "-q --suppress-config-log";
+
 	if ($snortcfg['enable'] == 'on' && !isvalidpid("{$g['varrun_path']}/snort_{$if_real}{$snort_uuid}.pid")) {
 		log_error("[Snort] Snort START for " . convert_real_interface_to_friendly_descr($if_real) . "({$if_real})...");
 		if ($background)
-			mwexec_bg("/usr/local/bin/snort -R {$snort_uuid} -D -q -l {$snortlogdir}/snort_{$if_real}{$snort_uuid} --pid-path {$g['varrun_path']} --suppress-config-log --nolock-pidfile -G {$snort_uuid} -c {$snortdir}/snort_{$snort_uuid}_{$if_real}/snort.conf -i {$if_real}");
+			mwexec_bg("/usr/local/bin/snort -R {$snort_uuid} -D {$quiet} -l {$snortlogdir}/snort_{$if_real}{$snort_uuid} --pid-path {$g['varrun_path']} --nolock-pidfile -G {$snort_uuid} -c {$snortdir}/snort_{$snort_uuid}_{$if_real}/snort.conf -i {$if_real}");
 		else
-			mwexec("/usr/local/bin/snort -R {$snort_uuid} -D -q -l {$snortlogdir}/snort_{$if_real}{$snort_uuid} --pid-path {$g['varrun_path']} --suppress-config-log --nolock-pidfile -G {$snort_uuid} -c {$snortdir}/snort_{$snort_uuid}_{$if_real}/snort.conf -i {$if_real}");
+			mwexec("/usr/local/bin/snort -R {$snort_uuid} -D {$quiet} -l {$snortlogdir}/snort_{$if_real}{$snort_uuid} --pid-path {$g['varrun_path']} --nolock-pidfile -G {$snort_uuid} -c {$snortdir}/snort_{$snort_uuid}_{$if_real}/snort.conf -i {$if_real}");
 		snort_barnyard_start($snortcfg, $if_real, $background);
 	}
 }
@@ -2802,6 +2807,12 @@ function snort_create_rc() {
 		return;
 	}
 
+	// See whether or not to enable detailed startup logging
+	if ($config['installedpackages']['snortglobal']['verbose_logging'] == "on")
+		$quiet = "";
+	else
+		$quiet = "-q --suppress-config-log";
+
 	// At least one interface is configured, so OK
 	$start_snort_iface_start = array();
 	$start_snort_iface_stop = array();
@@ -2876,7 +2887,7 @@ EOE;
 
 	if [ -z \$pid ]; then
 		/usr/bin/logger -p daemon.info -i -t SnortStartup "Snort START for {$value['descr']}({$snort_uuid}_{$if_real})..."
-		/usr/local/bin/snort -R {$snort_uuid} -D -q -l {$snortlogdir}/snort_{$if_real}{$snort_uuid} --pid-path {$g['varrun_path']} --suppress-config-log --nolock-pidfile -G {$snort_uuid} -c {$snortdir}/snort_{$snort_uuid}_{$if_real}/snort.conf -i {$if_real} > /dev/null 2>&1
+		/usr/local/bin/snort -R {$snort_uuid} -D {$quiet} -l {$snortlogdir}/snort_{$if_real}{$snort_uuid} --pid-path {$g['varrun_path']} --nolock-pidfile -G {$snort_uuid} -c {$snortdir}/snort_{$snort_uuid}_{$if_real}/snort.conf -i {$if_real} > /dev/null 2>&1
 	fi
 
 	{$start_barnyard2}

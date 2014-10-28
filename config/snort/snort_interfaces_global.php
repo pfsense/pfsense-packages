@@ -54,6 +54,7 @@ $pconfig['rule_update_starttime'] = $config['installedpackages']['snortglobal'][
 $pconfig['forcekeepsettings'] = $config['installedpackages']['snortglobal']['forcekeepsettings'] == "on" ? 'on' : 'off';
 $pconfig['snortcommunityrules'] = $config['installedpackages']['snortglobal']['snortcommunityrules'] == "on" ? 'on' : 'off';
 $pconfig['clearblocks'] = $config['installedpackages']['snortglobal']['clearblocks'] == "on" ? 'on' : 'off';
+$pconfig['verbose_logging'] = $config['installedpackages']['snortglobal']['verbose_logging'] == "on" ? 'on' : 'off';
 
 /* Set sensible values for any empty default params */
 if (!isset($pconfig['rule_update_starttime']))
@@ -81,6 +82,7 @@ if (!$input_errors) {
 		$config['installedpackages']['snortglobal']['emergingthreats'] = $_POST['emergingthreats'] ? 'on' : 'off';
 		$config['installedpackages']['snortglobal']['emergingthreats_pro'] = $_POST['emergingthreats_pro'] ? 'on' : 'off';
 		$config['installedpackages']['snortglobal']['clearblocks'] = $_POST['clearblocks'] ? 'on' : 'off';
+		$config['installedpackages']['snortglobal']['verbose_logging'] = $_POST['verbose_logging'] ? 'on' : 'off';
 
 		// If any rule sets are being turned off, then remove them
 		// from the active rules section of each interface.  Start
@@ -336,16 +338,24 @@ if ($input_errors)
 </tr>
 <tr>
 	<td width="22%" valign="top" class="vncell"><?php echo gettext("Remove Blocked Hosts After Deinstall"); ?></td>
-	<td width="78%" class="vtable"><input name="clearblocks" id="clearblocks" type="checkbox" value="yes"
+	<td width="78%" class="vtable"><input name="clearblocks" id="clearblocks" type="checkbox" value="yes" 
 	<?php if ($config['installedpackages']['snortglobal']['clearblocks']=="on") echo " checked"; ?>/>&nbsp;
 	<?php echo gettext("All blocked hosts added by Snort will be removed during package deinstallation."); ?></td>
 </tr>
 <tr>
 	<td width="22%" valign="top" class="vncell"><?php echo gettext("Keep Snort Settings After Deinstall"); ?></td>
 	<td width="78%" class="vtable"><input name="forcekeepsettings"
-		id="forcekeepsettings" type="checkbox" value="yes"
+		id="forcekeepsettings" type="checkbox" value="yes" 
 		<?php if ($pconfig['forcekeepsettings']=="on") echo "checked"; ?>
 		>&nbsp;&nbsp;<?php echo gettext("Settings will not be removed during package deinstallation."); ?></td>
+</tr>
+<tr>
+	<td width="22%" valign="top" class="vncell"><?php echo gettext("Startup/Shutdown Logging"); ?></td>
+	<td width="78%" class="vtable"><input name="verbose_logging"
+		id="verbose_logging" type="checkbox" value="yes" 
+		<?php if ($pconfig['verbose_logging']=="on") echo "checked"; ?>
+		>&nbsp;&nbsp;<?php echo gettext("Output detailed messages to the system log when Snort is starting and stopping.  Default is ") . 
+		"<strong>" . gettext("Not Checked") . "</strong>" . gettext("."); ?></td>
 </tr>
 <tr>
 	<td width="22%" valign="top">
