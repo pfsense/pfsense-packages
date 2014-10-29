@@ -35,7 +35,7 @@
 	<version>1.0.2</version>
 	<category>Network Management</category>
 	<title>Services: LADVD</title>
-	<savetext>ladvd</savetext>
+	<savetext>Save</savetext>
 	<include_file>/usr/local/pkg/ladvd.inc</include_file>
 	<aftersaveredirect>/pkg_edit.php?xml=ladvd.xml&amp;id=0</aftersaveredirect>
 	<additional_files_needed>

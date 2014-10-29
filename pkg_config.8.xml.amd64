@@ -1883,7 +1883,7 @@
 	</package>
 	<package>
 		<name>LADVD</name>
-		<descr>Send and decode link layer advertisements</descr>
+			<descr>Send and decode link layer advertisements. Support for LLDP (Link Layer Discovery Protocol), CDP (Cisco Discovery Protocol), EDP (Extreme Discovery Protocol) and NDP (Nortel Discovery Protocol).</descr>
 		<website>https://code.google.com/p/ladvd/</website>
 		<category>Network Management</category>
 		<version>1.0.4</version>
