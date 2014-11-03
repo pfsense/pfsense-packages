@@ -62,10 +62,12 @@ define("SNORT_BIN_VERSION", "2.9.7.0");
 define("SNORT_ET_DNLD_FILENAME", "emerging.rules.tar.gz");
 define("SNORT_ETPRO_DNLD_FILENAME", "etpro.rules.tar.gz");
 define("SNORT_GPLV2_DNLD_FILENAME", "community-rules.tar.gz");
+define("SNORT_OPENAPPID_DNLD_FILENAME", "snort-openappid.tar.gz");
 define("SNORT_ENFORCING_RULES_FILENAME", "snort.rules");
 define("SNORT_RULES_UPD_LOGFILE", SNORTLOGDIR . "/snort_rules_update.log");
 define("SNORT_IPREP_PATH", "{$g['vardb_path']}/snort/iprep/");
 define('SNORT_SID_MODS_PATH', "{$g['vardb_path']}/snort/sidmods/");
+define('SNORT_APPID_ODP_PATH', "{$g['vardb_path']}/snort/app/");
 if (!defined("FLOWBITS_FILENAME"))
 	define("FLOWBITS_FILENAME", "flowbit-required.rules");
 if (!defined("VRT_FILE_PREFIX"))
@@ -3519,10 +3521,9 @@ function snort_filter_preproc_rules($snortcfg, &$active_rules, $persist_log = fa
 	 * Format of array is:                             *
 	 *    "rule_option" => "dependent_preprocessor"    *
 	 *                                                 *
-	 * Last Update: 04/05/2013                         *
+	 * Last Update: 10/30/2014                         *
 	 *                                                 *
-	 * Added: http_inspect content modifiers and       *
-	 *        various "service" metadata values.       *
+	 * Added: appid: detection option                  *
 	 *                                                 *
 	 ***************************************************/
 	$rule_opts_preprocs = array("ssl_version:" => "ssl_preproc","ssl_state:" => "ssl_preproc",
@@ -3545,7 +3546,8 @@ function snort_filter_preproc_rules($snortcfg, &$active_rules, $persist_log = fa
 				    "uricontent:" => "http_inspect", "urilen:" => "http_inspect",
 				    "http_encode;" => "http_inspect", "service http" => "http_inspect",
 				    "service imap" => "imap_preproc", "service pop2" => "pop_preproc",
-				    "service pop3" => "pop_preproc", "service smtp" => "smtp_preprocessor");
+				    "service pop3" => "pop_preproc", "service smtp" => "smtp_preprocessor", 
+				    "appid:" => "appid_preproc" );
 
 	/***************************************************
 	 * Iterate the enabled rules, and check for rule   *

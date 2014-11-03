@@ -59,9 +59,12 @@ global $config, $g, $rebuild_rules, $pkg_interface, $snort_gui_include;
  ****************************************/
 if (!defined('SNORT_SID_MODS_PATH'))
 	define('SNORT_SID_MODS_PATH', "{$g['vardb_path']}/snort/sidmods/");
-
 if (!defined('SNORT_ENFORCING_RULES_FILENAME'))
 	define("SNORT_ENFORCING_RULES_FILENAME", "snort.rules");
+if (!defined('SNORT_APPID_ODP_PATH'))
+	define('SNORT_APPID_ODP_PATH', "{$g['vardb_path']}/snort/app/");
+if (!defined('SNORT_OPENAPPID_DNLD_FILENAME'))
+	define("SNORT_OPENAPPID_DNLD_FILENAME", "snort-openappid.tar.gz");
 
 /****************************************
  * End of PHP caching workaround        *
@@ -124,6 +127,7 @@ unlink_if_exists("{$rcdir}barnyard2");
 safe_mkdir(SNORTLOGDIR);
 safe_mkdir(SNORT_IPREP_PATH);
 safe_mkdir(SNORT_SID_MODS_PATH);
+safe_mkdir(SNORT_APPID_ODP_PATH);
 
 /* If installed, absorb the Snort Dashboard Widget into this package */
 /* by removing it as a separately installed package.                 */

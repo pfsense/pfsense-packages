@@ -126,6 +126,10 @@ if ($snortcfg['barnyard_enable'] == "on") {
 		$snortunifiedlog_type .= ", vlan_event_types";
 	if ($snortcfg['barnyard_log_mpls_events'] == 'on')
 		$snortunifiedlog_type .= ", mpls_event_types";
+
+	// If AppID detector is enabled, add it to unified2 logging
+	if ($snortcfg['appid_preproc'] == 'on' )
+		$snortunifiedlog_type .= ", appid_event_types";
 }
 
 /* define spoink */
@@ -889,6 +893,23 @@ preprocessor reputation: \
 
 EOD;
 
+/* def AppID preprocessor */
+$appid_memcap = $snortcfg['sf_appid_mem_cap'] * 1024 * 1024;
+$appid_params = "app_detector_dir " . SNORT_APPID_ODP_PATH . ", \\\n\tmemcap {$appid_memcap}";
+if ($snortcfg['sf_appid_statslog'] == "on") {
+	$appid_params .= ", \\\n\tapp_stats_filename app-stats.log";
+	$appid_params .= ", \\\n\tapp_stats_period {$snortcfg['sf_appid_stats_period']}";
+	$appid_params .= ", \\\n\tapp_stats_rollover_size " . strval($config['installedpackages']['snortglobal']['appid_stats_log_limit_size'] * 1024);
+	$appid_params .= ", \\\n\tapp_stats_rollover_time 86400";
+}
+
+$appid_preproc = <<<EOD
+# AppID preprocessor #
+preprocessor appid: \
+	{$appid_params}
+
+EOD;
+
 /***************************************/
 /* end of preprocessor string var code */
 /***************************************/
@@ -920,14 +941,14 @@ $snort_preproc_libs = array(
 	"dce_rpc_2" => "dce2_preproc", "dns_preprocessor" => "dns_preproc", "ftp_preprocessor" => "ftptelnet_preproc", "imap_preproc" => "imap_preproc",
 	"pop_preproc" => "pop_preproc", "reputation_preproc" => "reputation_preproc", "sensitive_data" => "sdf_preproc", 
 	"sip_preproc" => "sip_preproc", "gtp_preproc" => "gtp_preproc", "smtp_preprocessor" => "smtp_preproc", "ssh_preproc" => "ssh_preproc", 
-	"ssl_preproc" => "ssl_preproc", "dnp3_preproc" => "dnp3_preproc", "modbus_preproc" => "modbus_preproc"
+	"ssl_preproc" => "ssl_preproc", "dnp3_preproc" => "dnp3_preproc", "modbus_preproc" => "modbus_preproc", "appid_preproc" => "appid_preproc"
 );
 $snort_preproc = array (
 	"perform_stat", "other_preprocs", "ftp_preprocessor", "smtp_preprocessor", "ssl_preproc", "sip_preproc", "gtp_preproc", "ssh_preproc", "sf_portscan", 
-	"dce_rpc_2", "dns_preprocessor", "sensitive_data", "pop_preproc", "imap_preproc", "dnp3_preproc", "modbus_preproc", "reputation_preproc"
+	"dce_rpc_2", "dns_preprocessor", "sensitive_data", "pop_preproc", "imap_preproc", "dnp3_preproc", "modbus_preproc", "reputation_preproc", "appid_preproc"
 );
 $default_disabled_preprocs = array(
-	"sf_portscan", "gtp_preproc", "sensitive_data", "dnp3_preproc", "modbus_preproc", "reputation_preproc", "perform_stat" 
+	"sf_portscan", "gtp_preproc", "sensitive_data", "dnp3_preproc", "modbus_preproc", "reputation_preproc", "perform_stat", "appid_preproc"
 );
 $snort_preprocessors = "";
 foreach ($snort_preproc as $preproc) {

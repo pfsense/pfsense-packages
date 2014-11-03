@@ -58,11 +58,22 @@ $snortlogdir = SNORTLOGDIR . "/snort_{$if_real}{$snort_uuid}/";
 $logfile = htmlspecialchars($snortlogdir . basename($_POST['file']));
 
 if ($_POST['action'] == 'load') {
+	// If viewing the app-stats log, then grab only the most recent one
+	if (strpos(basename($logfile), "app-stats.log") !== FALSE) {
+		$appid_statlogs = glob("{$snortlogdir}app-stats.log.*");
+		$logfile = array_pop($appid_statlogs);
+	}
+
 	if(!is_file($logfile)) {
 		echo "|3|" . gettext("Log file does not exist or that logging feature is not enabled") . ".|";
 	}
 	else {
-		$data = file_get_contents($logfile);
+		// Test for special unified2 format app-stats file because
+		// we have to use a Snort binary tool to display its contents.
+		if (strpos(basename($_POST['file']), "app-stats.log") !== FALSE)
+			$data = shell_exec("/usr/local/bin/u2openappid {$logfile} 2>&1");
+		else 
+			$data = file_get_contents($logfile);
 		if($data === false) {
 			echo "|1|" . gettext("Failed to read log file") . ".|";
 		} else {
@@ -178,7 +189,7 @@ if ($input_errors) {
 				<td width="78%" class="vtable">
 					<select name="logFile" id="logFile" class="formselect" onChange="loadFile();">
 			<?php
-				$logs = array( "alert", "{$if_real}.stats" , "sid_changes.log" );
+				$logs = array( "alert", "app-stats.log", "{$if_real}.stats" , "sid_changes.log" );
 				foreach ($logs as $log) {
 					$selected = "";
 					if ($log == basename($logfile))

@@ -341,6 +341,10 @@ if ($_POST['ResetAll']) {
 	$pconfig['smtp_log_rcpt_to'] = 'on';
 	$pconfig['smtp_log_filename'] = 'on';
 	$pconfig['smtp_log_email_hdrs'] = 'on';
+	$pconfig['appid_preproc'] = "off";
+	$pconfig['sf_appid_mem_cap'] = "256";
+	$pconfig['sf_appid_statslog'] = "on";
+	$pconfig['sf_appid_stats_period'] = "300";
 	$pconfig['sf_portscan'] = "off";
 	$pconfig['pscan_protocol'] = "all";
 	$pconfig['pscan_type'] = "all";
@@ -439,6 +443,14 @@ if ($_POST['save']) {
 			$input_errors[] = gettext("The value for SMTP Decoder E-Mail Headers Log Depth must be between 0 and 20,480.");
 	}
 
+	// Validate AppID parameter values if AppID Detector is enabled
+	if ($_POST['appid_preproc'] == 'on') {
+		if ($_POST['sf_appid_mem_cap'] < 32 || $_POST['sf_appid_mem_cap'] > 3000)
+			$input_errors[] = gettext("The value for Application ID Memory Cap must be between 32 and 3000.");
+		if ($_POST['sf_appid_stats_period'] < 60 || $_POST['sf_appid_stats_period'] > 3600)
+			$input_errors[] = gettext("The value for Application ID Stats Period must be between 60 and 3600.");
+	}
+
 	/* if no errors write to conf */
 	if (!$input_errors) {
 		/* post new options */
@@ -481,6 +493,8 @@ if ($_POST['save']) {
 		if ($_POST['smtp_bitenc_decode_depth'] != "") { $natent['smtp_bitenc_decode_depth'] = $_POST['smtp_bitenc_decode_depth']; }else{ $natent['smtp_bitenc_decode_depth'] = "0"; }
 		if ($_POST['smtp_uu_decode_depth'] != "") { $natent['smtp_uu_decode_depth'] = $_POST['smtp_uu_decode_depth']; }else{ $natent['smtp_uu_decode_depth'] = "0"; }
 		if ($_POST['smtp_email_hdrs_log_depth'] != "") { $natent['smtp_email_hdrs_log_depth'] = $_POST['smtp_email_hdrs_log_depth']; }else{ $natent['smtp_email_hdrs_log_depth'] = "1464"; }
+		if ($_POST['sf_appid_mem_cap'] != "") { $natent['sf_appid_mem_cap'] = $_POST['sf_appid_mem_cap']; }else{ $natent['sf_appid_mem_cap'] = "256"; }
+		if ($_POST['sf_appid_stats_period'] != "") { $natent['sf_appid_stats_period'] = $_POST['sf_appid_stats_period']; }else{ $natent['sf_appid_stats_period'] = "300"; }
 
 		// Set SDF inspection types
 		$natent['sdf_alert_data_type'] = implode(",",$_POST['sdf_alert_data_type']);
@@ -525,6 +539,8 @@ if ($_POST['save']) {
 		$natent['stream5_track_tcp'] = $_POST['stream5_track_tcp'] ? 'on' : 'off';
 		$natent['stream5_track_udp'] = $_POST['stream5_track_udp'] ? 'on' : 'off';
 		$natent['stream5_track_icmp'] = $_POST['stream5_track_icmp'] ? 'on' : 'off';
+		$natent['appid_preproc'] = $_POST['appid_preproc'] ? 'on' : 'off';
+		$natent['sf_appid_statslog'] = $_POST['sf_appid_statslog'] ? 'on' : 'off';
 
 		if (isset($id) && isset($a_nat[$id])) {
 			$a_nat[$id] = $natent;
@@ -685,14 +701,14 @@ if ($savemsg) {
 	<tr>
 		<td width="22%" valign="top" class="vncell"><?php echo gettext("Enable Performance Stats"); ?></td>
 		<td width="78%" class="vtable"><input name="perform_stat" type="checkbox" value="on" 
-			<?php if ($pconfig['perform_stat']=="on") echo "checked"; ?>>
+			<?php if ($pconfig['perform_stat']=="on") echo "checked"; ?>/>
 			<?php echo gettext("Collect Performance Statistics for this interface."); ?></td>
 	</tr>
 	<tr>
 		<td width="22%" valign="top" class="vncell"><?php echo gettext("Protect Customized Preprocessor Rules"); ?></td>
 		<td width="78%" class="vtable"><input name="protect_preproc_rules" type="checkbox" value="on" 
 			<?php if ($pconfig['protect_preproc_rules']=="on") echo "checked "; 
-			if ($vrt_enabled <> 'on') echo "disabled"; ?>>
+			if ($vrt_enabled <> 'on') echo "disabled"; ?>/>
 			<?php echo gettext("Check this box if you maintain customized preprocessor text rules files for this interface."); ?>
 			<table width="100%" border="0" cellpadding="2" cellpadding="2">
 				<tr>
@@ -709,7 +725,7 @@ if ($savemsg) {
 	<tr>
 		<td width="22%" valign="top" class="vncell"><?php echo gettext("Auto Rule Disable"); ?></td>
 		<td width="78%" class="vtable"><input name="preproc_auto_rule_disable" type="checkbox" value="on" 
-			<?php if ($pconfig['preproc_auto_rule_disable']=="on") echo "checked"; ?>>
+			<?php if ($pconfig['preproc_auto_rule_disable']=="on") echo "checked"; ?>/>
 			<?php echo gettext("Auto-disable text rules dependent on disabled preprocessors for this interface.  "); 
 			echo gettext("Default is ") . '<strong>' . gettext("Not Checked"); ?></strong>.<br/>
 			<table width="100%" border="0" cellpadding="2" cellpadding="2">
@@ -739,7 +755,7 @@ if ($savemsg) {
 		<td width="22%" valign="top" class="vncell"><?php echo gettext("Enable"); ?></td>
 		<td width="78%" class="vtable"><input name="host_attribute_table"
 			type="checkbox" value="on" id="host_attribute_table" onclick="host_attribute_table_enable_change();" 
-			<?php if ($pconfig['host_attribute_table']=="on") echo "checked"; ?>>
+			<?php if ($pconfig['host_attribute_table']=="on") echo "checked"; ?>/>
 			<?php echo gettext("Use a Host Attribute Table file to auto-configure applicable preprocessors.  " .
 				"Default is "); ?><strong><?php echo gettext("Not Checked"); ?></strong>.</td>
 	</tr>
@@ -823,7 +839,7 @@ if ($savemsg) {
 		<td width="22%" valign="top" class="vncell"><?php echo gettext("Enable"); ?></td>
 		<td width="78%" class="vtable"><input name="http_inspect" 
 			type="checkbox" value="on" id="http_inspect" onclick="http_inspect_enable_change();" 
-			<?php if ($pconfig['http_inspect']=="on" || empty($pconfig['http_inspect'])) echo "checked";?>>
+			<?php if ($pconfig['http_inspect']=="on" || empty($pconfig['http_inspect'])) echo "checked";?>/>
 			<?php echo gettext("Use HTTP Inspect to Normalize/Decode and detect HTTP traffic and protocol anomalies.  Default is ");?>
 			<strong><?php echo gettext("Checked"); ?></strong>.</td>
 	</tr>
@@ -831,7 +847,7 @@ if ($savemsg) {
 		<td width="22%" valign="top" class="vncell"><?php echo gettext("Proxy Alert"); ?></td>
 		<td width="78%" class="vtable"><input name="http_inspect_proxy_alert" 
 			type="checkbox" value="on" id="http_inspect_proxy_alert"  
-			<?php if ($pconfig['http_inspect_proxy_alert']=="on") echo "checked";?>>
+			<?php if ($pconfig['http_inspect_proxy_alert']=="on") echo "checked";?>/>
 			<?php echo gettext("Enable global alerting on HTTP server proxy usage.  Default is ");?>
 			<strong><?php echo gettext("Not Checked"); ?></strong>.<br/><br/><span class="red"><strong>
 			<?php echo gettext("Note: ") . "</strong></span>" . gettext("By adding Server Configurations below and enabling " . 
@@ -916,7 +932,7 @@ if ($savemsg) {
 	<tr>
 		<td width="22%" valign="top" class="vncell"><?php echo gettext("Enable");?></td>
 		<td width="78%" class="vtable"><input name="frag3_detection" type="checkbox" value="on" onclick="frag3_enable_change();" 
-		<?php if ($pconfig['frag3_detection']=="on") echo "checked";?>>
+		<?php if ($pconfig['frag3_detection']=="on") echo "checked";?>/>
 		<?php echo gettext("Use Frag3 Engine to detect IDS evasion attempts via target-based IP packet fragmentation.  Default is ") . 
 		"<strong>" . gettext("Checked") . "</strong>.";?></td>
 	</tr>
@@ -984,14 +1000,14 @@ if ($savemsg) {
 	<tr>
 		<td width="22%" valign="top" class="vncell"><?php echo gettext("Enable"); ?></td>
 		<td width="78%" class="vtable"><input name="stream5_reassembly" type="checkbox" value="on" onclick="stream5_enable_change();"  
-			<?php if ($pconfig['stream5_reassembly']=="on") echo "checked"; ?>>
+			<?php if ($pconfig['stream5_reassembly']=="on") echo "checked"; ?>/>
 		<?php echo gettext("Use Stream5 session reassembly for TCP, UDP and/or ICMP traffic.  Default is ") . 
 		"<strong>" . gettext("Checked") . "</strong>"; ?>.</td>
 	</tr>
 	<tr id="stream5_flushonalert_row">
 		<td width="22%" valign="top" class="vncell"><?php echo gettext("Flush On Alert"); ?></td>
 		<td width="78%" class="vtable"><input name="stream5_flush_on_alert" type="checkbox" value="on"   
-			<?php if ($pconfig['stream5_flush_on_alert']=="on") echo "checked"; ?>>
+			<?php if ($pconfig['stream5_flush_on_alert']=="on") echo "checked"; ?>/>
 		<?php echo gettext("Flush a TCP stream when an alert is generated on that stream.  Default is ") . 
 		"<strong>" . gettext("Not Checked") . "</strong><br/><span class=\"red\"><strong>" . 
 		gettext("Note:  ") . "</strong></span>" . gettext("This parameter is for backwards compatibility.");?></td>
@@ -1135,6 +1151,53 @@ if ($savemsg) {
 			</table>
 		</td>
 	</tr>
+
+	<tr>
+		<td colspan="2" valign="top" class="listtopic"><?php echo gettext("Application ID Detection"); ?></td>
+	</tr>
+	<tr>
+		<td width="22%" valign="top" class="vncell"><?php echo gettext("Enable"); ?></td>
+		<td width="78%" class="vtable"><input name="appid_preproc" onclick="appid_preproc_enable_change();" 
+			type="checkbox" value="on" id="appid_preproc"  
+			<?php if ($pconfig['appid_preproc']=="on") echo "checked"; ?>/>
+		<?php echo gettext("Use OpenAppID to detect various applications.  Default is ") . 
+		"<strong>" . gettext("Not Checked") . "</strong>"; ?>.</td>
+	</tr>
+	<tbody id="appid_rows">
+	<tr>
+		<td valign="top" class="vncell"><?php echo gettext("Memory Cap"); ?></td>
+		<td class="vtable">
+			<input name="sf_appid_mem_cap" type="text" class="formfld unknown" id="sf_appid_mem_cap" size="9" 
+			value="<?=htmlspecialchars($pconfig['sf_appid_mem_cap']);?>">
+			<?php echo gettext("Memory for App ID structures.  Min is ") . "<strong>" . gettext("32") . "</strong>" .
+			gettext(" (32 MB) and Max is ") . "<strong>" . gettext("3000") . "</strong>" .
+			gettext(" (3 GB) bytes.");?><br/>
+			<?php echo gettext("The memory cap in megabytes used by AppID internal structures " .
+			"in RAM. Default value is ") . "<strong>" . gettext("256") . "</strong>" . gettext(" (256 MB)."); ?><br/>
+		</td>
+	</tr>
+	<tr>
+		<td width="22%" valign="top" class="vncell"><?php echo gettext("AppID Stats Logging"); ?></td>
+		<td width="78%" class="vtable">
+			<input name="sf_appid_statslog" type="checkbox" value="on" id="sf_appid_statslog" 
+			<?php if ($pconfig['sf_appid_statslog']=="on") echo "checked"; ?>/>
+		<?php echo gettext("Enable OpenAppID statistics logging.  Default is ") . 
+		"<strong>" . gettext("Checked") . "</strong>" . gettext("."); ?><br/><br/>
+		<span class="red"><strong><?php echo gettext("Note: ") . "</strong></span>" . gettext("log size and retention limits for AppID Stats Logging") . 
+		gettext(" can be set on the ") . "<a href='/snort/snort_log_mgmt.php'>" . gettext("LOG MGMT") . "</a>" . gettext(" tab.");?> </td>
+	</tr>
+	<tr>
+		<td valign="top" class="vncell"><?php echo gettext("AppID Stats Period"); ?></td>
+		<td class="vtable">
+			<input name="sf_appid_stats_period" type="text" class="formfld unknown" id="sf_appid_stats_period" size="9" 
+			value="<?=htmlspecialchars($pconfig['sf_appid_stats_period']);?>">
+			<?php echo gettext("Bucket size in seconds for AppID stats.  Min is ") . "<strong>" . gettext("60") . "</strong>" .
+			gettext(" (1 minute) and Max is ") . "<strong>" . gettext("3600") . "</strong>" . gettext(" (1 hour).");?><br/>
+			<?php echo gettext("The bucket size in seconds used to collecxt AppID statistics. " .
+			"Default value is ") . "<strong>" . gettext("300") . "</strong>" . gettext(" (5 minutes)."); ?><br/>
+		</td>
+	</tr>
+	</tbody>
 	<tr>
 		<td colspan="2" valign="top" class="listtopic"><?php echo gettext("Portscan Detection"); ?></td>
 	</tr>
@@ -1142,7 +1205,7 @@ if ($savemsg) {
 		<td width="22%" valign="top" class="vncell"><?php echo gettext("Enable"); ?></td>
 		<td width="78%" class="vtable"><input name="sf_portscan" onclick="sf_portscan_enable_change();" 
 			type="checkbox" value="on" id="sf_portscan"   
-			<?php if ($pconfig['sf_portscan']=="on") echo "checked"; ?>>
+			<?php if ($pconfig['sf_portscan']=="on") echo "checked"; ?>/>
 		<?php echo gettext("Use Portscan Detection to detect various types of port scans and sweeps.  Default is ") . 
 		"<strong>" . gettext("Not Checked") . "</strong>"; ?>.</td>
 	</tr>
@@ -1154,7 +1217,7 @@ if ($savemsg) {
 			$protos = array('all', 'tcp', 'udp', 'icmp', 'ip');
 			foreach ($protos as $val): ?>
 			<option value="<?=$val;?>"
-			<?php if ($val == $pconfig['pscan_protocol']) echo "selected"; ?>> 
+			<?php if ($val == $pconfig['pscan_protocol']) echo "selected"; ?>/> 
 				<?=gettext($val);?></option>
 				<?php endforeach; ?>
 			</select>&nbsp;&nbsp;<?php echo gettext("Choose the Portscan protocol type to alert for (all, tcp, udp, icmp or ip).  Default is ") . 
@@ -1169,7 +1232,7 @@ if ($savemsg) {
 			$protos = array('all', 'portscan', 'portsweep', 'decoy_portscan', 'distributed_portscan');
 			foreach ($protos as $val): ?>
 			<option value="<?=$val;?>"
-			<?php if ($val == $pconfig['pscan_type']) echo "selected"; ?>> 
+			<?php if ($val == $pconfig['pscan_type']) echo "selected"; ?>/> 
 				<?=gettext($val);?></option>
 				<?php endforeach; ?>
 			</select>&nbsp;&nbsp;<?php echo gettext("Choose the Portscan scan type to alert for.  Default is ") . 
@@ -1201,7 +1264,7 @@ if ($savemsg) {
 			$levels = array('low', 'medium', 'high');
 			foreach ($levels as $val): ?>
 			<option value="<?=$val;?>"
-			<?php if ($val == $pconfig['pscan_sense_level']) echo "selected"; ?>> 
+			<?php if ($val == $pconfig['pscan_sense_level']) echo "selected"; ?>/> 
 				<?=gettext(ucfirst($val));?></option>
 				<?php endforeach; ?>
 			</select>&nbsp;&nbsp;<?php echo gettext("Choose the Portscan sensitivity level (Low, Medium, High).  Default is ") . 
@@ -1277,7 +1340,7 @@ if ($savemsg) {
 			$values = array('stateful', 'stateless');
 			foreach ($values as $val): ?>
 			<option value="<?=$val;?>"
-			<?php if ($val == $pconfig['ftp_telnet_inspection_type']) echo "selected"; ?>> 
+			<?php if ($val == $pconfig['ftp_telnet_inspection_type']) echo "selected"; ?>/> 
 				<?=gettext($val);?></option>
 				<?php endforeach; ?>
 			</select>&nbsp;&nbsp;<?php echo gettext("Choose to operate in stateful or stateless mode.  Default is ") . 
@@ -1287,14 +1350,14 @@ if ($savemsg) {
 	<tr id="ftp_telnet_row_encrypted_check">
 		<td width="22%" valign="top" class="vncell"><?php echo gettext("Check Encrypted Traffic"); ?></td>
 		<td width="78%" class="vtable"><input name="ftp_telnet_check_encrypted" type="checkbox" value="on" 
-			<?php if ($pconfig['ftp_telnet_check_encrypted']=="on") echo "checked"; ?>>
+			<?php if ($pconfig['ftp_telnet_check_encrypted']=="on") echo "checked"; ?>/>
 		<?php echo gettext("Continue to check an encrypted session for subsequent command to cease encryption.  Default is ") . 
 		"<strong>" . gettext("Checked") . "</strong>"; ?>.</td>
 	</tr>
 	<tr id="ftp_telnet_row_encrypted_alert">
 		<td width="22%" valign="top" class="vncell"><?php echo gettext("Alert on Encrypted Commands"); ?></td>
 		<td width="78%" class="vtable"><input name="ftp_telnet_alert_encrypted" type="checkbox" value="on" 
-			<?php if ($pconfig['ftp_telnet_alert_encrypted']=="on") echo "checked"; ?>>
+			<?php if ($pconfig['ftp_telnet_alert_encrypted']=="on") echo "checked"; ?>/>
 		<?php echo gettext("Alert on encrypted FTP and Telnet command channels.  Default is ") . 
 		"<strong>" . gettext("Not Checked") . "</strong>"; ?>.</td>
 	</tr>
@@ -1304,14 +1367,14 @@ if ($savemsg) {
 	<tr id="ftp_telnet_row_normalize">
 		<td width="22%" valign="top" class="vncell"><?php echo gettext("Normalization"); ?></td>
 		<td width="78%" class="vtable"><input name="ftp_telnet_normalize" type="checkbox" value="on" 
-			<?php if ($pconfig['ftp_telnet_normalize']=="on") echo "checked"; ?>>
+			<?php if ($pconfig['ftp_telnet_normalize']=="on") echo "checked"; ?>/>
 		<?php echo gettext("Normalize Telnet traffic by eliminating Telnet escape sequences.  Default is ") . 
 		"<strong>" . gettext("Checked") . "</strong>"; ?>.</td>
 	</tr>
 	<tr id="ftp_telnet_row_detect_anomalies">
 		<td width="22%" valign="top" class="vncell"><?php echo gettext("Detect Anomalies"); ?></td>
 		<td width="78%" class="vtable"><input name="ftp_telnet_detect_anomalies" type="checkbox" value="on" 
-			<?php if ($pconfig['ftp_telnet_detect_anomalies']=="on") echo "checked"; ?>>
+			<?php if ($pconfig['ftp_telnet_detect_anomalies']=="on") echo "checked"; ?>/>
 		<?php echo gettext("Alert on Telnet subnegotiation begin without corresponding subnegotiation end.  Default is ") . 
 		"<strong>" . gettext("Checked") . "</strong>"; ?>.</td>
 	</tr>
@@ -1423,7 +1486,7 @@ if ($savemsg) {
 				 echo "checked";
 			      elseif ($vrt_enabled == "off")
 				 echo "disabled";
-			?>>
+			?>/>
 			<?php echo gettext("Sensitive data searches for credit card numbers, Social Security numbers and e-mail addresses in data."); ?>
 		<br/>
 		<span class="red"><strong><?php echo gettext("Note: "); ?></strong></span><?php echo gettext("To enable this preprocessor, you must select the Snort VRT rules on the ") . 
@@ -1438,7 +1501,7 @@ if ($savemsg) {
 			$values = array('Credit Card', 'Email Addresses', 'U.S. Phone Numbers', 'U.S. Social Security Numbers');
 			foreach ($values as $val): ?>
 			<option value="<?=$val;?>"
-			<?php if (preg_match("/$val/",$pconfig['sdf_alert_data_type'])) echo "selected"; ?>> 
+			<?php if (preg_match("/$val/",$pconfig['sdf_alert_data_type'])) echo "selected"; ?>/> 
 				<?=gettext($val);?></option>
 				<?php endforeach; ?>
 			</select><br/><?php echo gettext("Choose which types of sensitive data to detect.  Use CTRL + Click for multiple selections."); ?><br/>
@@ -1458,7 +1521,7 @@ if ($savemsg) {
 			<input name="sdf_mask_output" type="checkbox" value="on" 
 			<?php if ($pconfig['sdf_mask_output'] == "on")
 				 echo "checked";
-			?>>
+			?>/>
 			<?php echo gettext("Replace all but last 4 digits of PII with \"X\"s on credit card and Social Security Numbers. ") . 
 			gettext("Default is ") . "<strong>" . gettext("Not Checked") . "</strong>."; ?>
 		</td>
@@ -1756,40 +1819,40 @@ if ($savemsg) {
 	<tr>
 		<td width="22%" valign="top" class="vncell"><?php echo gettext("Enable RPC Decode and Back Orifice detector"); ?></td>
 		<td width="78%" class="vtable"><input name="other_preprocs" type="checkbox" value="on" 
-			<?php if ($pconfig['other_preprocs']=="on") echo "checked"; ?>>
+			<?php if ($pconfig['other_preprocs']=="on") echo "checked"; ?>/>
 		<?php echo gettext("Normalize/Decode RPC traffic and detects Back Orifice traffic on the network.  Default is ") . 
 		"<strong>" . gettext("Checked") . "</strong>"; ?>.</td>
 	</tr>
 	<tr>
 		<td width="22%" valign="top" class="vncell"><?php echo gettext("Enable DCE/RPC2 Detection"); ?></td>
 		<td width="78%" class="vtable"><input name="dce_rpc_2" type="checkbox" value="on" 
-			<?php if ($pconfig['dce_rpc_2']=="on") echo "checked"; ?>>
+			<?php if ($pconfig['dce_rpc_2']=="on") echo "checked"; ?>/>
 		<?php echo gettext("The DCE/RPC preprocessor detects and decodes SMB and DCE/RPC traffic.  Default is ") . 
 		"<strong>" . gettext("Checked") . "</strong>"; ?>.</td>
 	</tr>
 	<tr>
 		<td width="22%" valign="top" class="vncell"><?php echo gettext("Enable SIP Detection"); ?></td>
 		<td width="78%" class="vtable"><input name="sip_preproc" type="checkbox" value="on" 
-			<?php if ($pconfig['sip_preproc']=="on") echo "checked"; ?>>
+			<?php if ($pconfig['sip_preproc']=="on") echo "checked"; ?>/>
 		<?php echo gettext("The SIP preprocessor decodes SIP traffic and detects vulnerabilities.  Default is ") . 
 		"<strong>" . gettext("Checked") . "</strong>"; ?>.</td>
 	</tr>
 	<tr>
 		<td width="22%" valign="top" class="vncell"><?php echo gettext("Enable GTP Detection"); ?></td>
 		<td width="78%" class="vtable"><input name="gtp_preproc" type="checkbox" value="on" 
-			<?php if ($pconfig['gtp_preproc']=="on") echo "checked"; ?>>
+			<?php if ($pconfig['gtp_preproc']=="on") echo "checked"; ?>/>
 		<?php echo gettext("The GTP preprocessor decodes GPRS Tunneling Protocol traffic and detects intrusion attempts."); ?></td>
 	</tr>
 	<tr>
 		<td width="22%" valign="top" class="vncell"><?php echo gettext("Enable SSH Detection"); ?></td>
 		<td width="78%" class="vtable"><input name="ssh_preproc" type="checkbox" value="on" 
-			<?php if ($pconfig['ssh_preproc']=="on") echo "checked"; ?>>
+			<?php if ($pconfig['ssh_preproc']=="on") echo "checked"; ?>/>
 		<?php echo gettext("The SSH preprocessor detects various Secure Shell exploit attempts."); ?></td>
 	</tr>
 	<tr>
 		<td width="22%" valign="top" class="vncell"><?php echo gettext("Enable DNS Detection"); ?></td>
 		<td width="78%" class="vtable"><input name="dns_preprocessor" type="checkbox" value="on" 
-			<?php if ($pconfig['dns_preprocessor']=="on") echo "checked"; ?>>
+			<?php if ($pconfig['dns_preprocessor']=="on") echo "checked"; ?>/>
 		<?php echo gettext("The DNS preprocessor decodes DNS response traffic and detects vulnerabilities.  Default is ") . 
 		"<strong>" . gettext("Checked") . "</strong>"; ?>.</td>
 	</tr>
@@ -1797,7 +1860,7 @@ if ($savemsg) {
 		<td width="22%" valign="top" class="vncell"><?php echo gettext("Enable SSL Data"); ?></td>
 		<td width="78%" class="vtable">
 			<input name="ssl_preproc" type="checkbox" value="on"  
-			<?php if ($pconfig['ssl_preproc']=="on") echo "checked"; ?>>
+			<?php if ($pconfig['ssl_preproc']=="on") echo "checked"; ?>/>
 		<?php echo gettext("SSL data searches for irregularities during SSL protocol exchange.  Default is ") . 
 		"<strong>" . gettext("Checked") . "</strong>"; ?>.</td>	
 	</tr>
@@ -1808,7 +1871,7 @@ if ($savemsg) {
 		<td width="22%" valign="top" class="vncell"><?php echo gettext("Enable Modbus Detection"); ?></td>
 		<td width="78%" class="vtable">
 			<input name="modbus_preproc" type="checkbox" value="on" 
-			<?php if ($pconfig['modbus_preproc']=="on") echo "checked"; ?>>
+			<?php if ($pconfig['modbus_preproc']=="on") echo "checked"; ?>/>
 			<?php echo gettext("Modbus is a protocol used in SCADA networks.  The default port is TCP 502.") . "<br/>" . 
 		  	"<span class=\"red\"><strong>" . gettext("Note: ") . "</strong></span>" . 
 			gettext("If your network does not contain Modbus-enabled devices, you can leave this preprocessor disabled."); ?>
@@ -1818,7 +1881,7 @@ if ($savemsg) {
 		<td width="22%" valign="top" class="vncell"><?php echo gettext("Enable DNP3 Detection"); ?></td>
 		<td width="78%" class="vtable">
 			<input name="dnp3_preproc" type="checkbox" value="on" 
-			<?php if ($pconfig['dnp3_preproc']=="on") echo "checked"; ?>>
+			<?php if ($pconfig['dnp3_preproc']=="on") echo "checked"; ?>/>
 			<?php echo gettext("DNP3 is a protocol used in SCADA networks.  The default port is TCP 20000.") . "<br/>" . 
 		  	"<span class=\"red\"><strong>" . gettext("Note: ") . "</strong></span>" . 
 			gettext("If your network does not contain DNP3-enabled devices, you can leave this preprocessor disabled."); ?>
@@ -1833,7 +1896,7 @@ if ($savemsg) {
 			<input name="ResetAll" type="submit" class="formbtn" value="Reset" title="<?php echo 
 			gettext("Reset all settings to defaults") . "\" onclick=\"return confirm('" . 
 			gettext("WARNING:  This will reset ALL preprocessor settings to their defaults.  Click OK to continue or CANCEL to quit.") . 
-			"');\""; ?>></td>
+			"');\""; ?>/></td>
 	</tr>
 	<tr>
 		<td width="22%" valign="top">&nbsp;</td>
@@ -1978,12 +2041,20 @@ function http_inspect_enable_change() {
 	var endis = !(document.iform.http_inspect.checked);
 	document.iform.http_inspect_memcap.disabled=endis;
 
-	// Hide the "icmp session timeout " row if stream5_track_icmp disabled
-	if (endis) {
-		document.getElementById("httpinspect_memcap_row").style.display="none";
-		document.getElementById("httpinspect_maxgzipmem_row").style.display="none";
-		document.getElementById("httpinspect_proxyalert_row").style.display="none";
-		document.getElementById("httpinspect_engconf_row").style.display="none";
+	if (!document.iform.http_inspect.checked) {
+		var msg = "WARNING:  Disabling the http_inspect preprocessor is not recommended!\n\n";
+		msg = msg + "Snort may fail to start because of other dependent preprocessors or ";
+		msg = msg + "rule options.  Are you sure you want to disable it?\n\n";
+		msg = msg + "Click OK to disable http_inspect, or CANCEL to quit.";
+		if (!confirm(msg)) {
+			document.iform.http_inspect.checked=true;
+		}
+		else {
+			document.getElementById("httpinspect_memcap_row").style.display="none";
+			document.getElementById("httpinspect_maxgzipmem_row").style.display="none";
+			document.getElementById("httpinspect_proxyalert_row").style.display="none";
+			document.getElementById("httpinspect_engconf_row").style.display="none";
+		}
 	}
 	else {
 		document.getElementById("httpinspect_memcap_row").style.display="table-row";
@@ -2013,6 +2084,16 @@ function sf_portscan_enable_change() {
 	}
 }
 
+function appid_preproc_enable_change() {
+	var endis = !(document.iform.appid_preproc.checked);
+
+	// Hide the AppID configuration rows if appid_preproc disabled
+	if (endis)
+		document.getElementById("appid_rows").style.display="none";
+	else
+		document.getElementById("appid_rows").style.display="";
+}
+
 function stream5_enable_change() {
 	if (!document.iform.stream5_reassembly.checked) {
 		var msg = "WARNING:  Stream5 is a critical preprocessor, and disabling it is not recommended!  ";
@@ -2020,7 +2101,8 @@ function stream5_enable_change() {
 		msg = msg + "    SMTP\t\tPOP\t\tSIP\n";
 		msg = msg + "    SENSITIVE_DATA\tSF_PORTSCAN\tDCE/RPC 2\n";
 		msg = msg + "    IMAP\t\tDNS\t\tSSL\n";
-		msg = msg + "    GTP\t\tDNP3\t\tMODBUS\n\n";
+		msg = msg + "    GTP\t\tDNP3\t\tMODBUS\n";
+		msg = msg + "    APP_ID\n\n";
 		msg = msg + "Snort may fail to start because of other preprocessors or rule options dependent on Stream5.  ";
 		msg = msg + "Are you sure you want to disable it?\n\n";
 		msg = msg + "Click OK to disable Stream5, or CANCEL to quit.";
@@ -2039,6 +2121,7 @@ function stream5_enable_change() {
 			document.iform.dns_preprocessor.checked=false;
 			document.iform.modbus_preproc.checked=false;
 			document.iform.dnp3_preproc.checked=false;
+			document.iform.appid_preproc.checked=false;
 			document.iform.sf_portscan.checked=false;
 			sf_portscan_enable_change();
 		}
@@ -2147,6 +2230,7 @@ function smtp_enable_change() {
 function enable_change_all() {
 	http_inspect_enable_change();
 	sf_portscan_enable_change();
+	appid_preproc_enable_change();
 
 	// -- Enable/Disable Host Attribute Table settings --
 	host_attribute_table_enable_change();
