@@ -790,7 +790,7 @@ if ($snortdownload == 'on' || $emergingthreats == 'on' || $snortcommunityrules =
 		}
 		error_log(gettext("\tRestarting Snort to activate the new set of rules...\n"), 3, $snort_rules_upd_log);
 		touch("{$g['varrun_path']}/snort_pkg_starting.lck");
-		snort_start_all_interfaces(TRUE);
+		snort_restart_all_interfaces(TRUE);
 		sleep(3);
 		unlink_if_exists("{$g['varrun_path']}/snort_pkg_starting.lck");
 		if ($pkg_interface <> "console")
