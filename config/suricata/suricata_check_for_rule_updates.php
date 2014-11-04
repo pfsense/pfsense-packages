@@ -59,7 +59,7 @@ if (!defined("ETPRO_DNLD_FILENAME"))
 if (!defined("GPLV2_DNLD_FILENAME"))
 	define("GPLV2_DNLD_FILENAME", "community-rules.tar.gz");
 if (!defined("GPLV2_DNLD_URL"))
-	define("GPLV2_DNLD_URL", "https://s3.amazonaws.com/snort-org/www/rules/community/");
+	define("GPLV2_DNLD_URL", "https://www.snort.org/downloads/community/");
 if (!defined("SURICATA_RULES_UPD_LOGFILE"))
 	define("SURICATA_RULES_UPD_LOGFILE", SURICATALOGDIR . "/suricata_rules_update.log");
 if (!defined("VRT_FILE_PREFIX"))
@@ -460,7 +460,7 @@ if ($snortdownload == 'on') {
 
 /*  Check for and download any new Snort GPLv2 Community Rules sigs */
 if ($snortcommunityrules == 'on') {
-	if (suricata_check_rule_md5("{$snort_community_rules_url}{$snort_community_rules_filename_md5}", "{$tmpfname}/{$snort_community_rules_filename_md5}", "Snort GPLv2 Community Rules")) {
+	if (suricata_check_rule_md5("{$snort_community_rules_url}{$snort_community_rules_filename}/md5", "{$tmpfname}/{$snort_community_rules_filename_md5}", "Snort GPLv2 Community Rules")) {
 		/* download Snort GPLv2 Community Rules file */
 		$file_md5 = trim(file_get_contents("{$tmpfname}/{$snort_community_rules_filename_md5}"));
 		if (!suricata_fetch_new_rules("{$snort_community_rules_url}{$snort_community_rules_filename}", "{$tmpfname}/{$snort_community_rules_filename}", $file_md5, "Snort GPLv2 Community Rules"))
