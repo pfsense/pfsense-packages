@@ -1554,7 +1554,7 @@
 			<port>security/suricata</port>
 			<ports_after>security/barnyard2</ports_after>
 		</build_pbi>
-		<build_options>barnyard2_UNSET=ODBC PGSQL PRELUDE;barnyard2_SET=GRE IPV6 MPLS MYSQL PORT_PCAP BRO;suricata_SET=IPFW PORTS_PCAP;suricata_UNSET=PRELUDE TESTS</build_options>
+		<build_options>barnyard2_UNSET=ODBC PGSQL PRELUDE;barnyard2_SET=GRE IPV6 MPLS MYSQL PORT_PCAP BRO;suricata_SET=IPFW PORTS_PCAP GEOIP JSON BARNYARD;suricata_UNSET=PRELUDE TESTS HTP_PORT</build_options>
 		<depends_on_package_pbi>suricata-2.0.4-##ARCH##.pbi</depends_on_package_pbi>
 	</package>
 </packages>
