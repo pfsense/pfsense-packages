@@ -329,7 +329,7 @@
 			<port>security/snort</port>
 			<ports_after>security/barnyard2</ports_after>
 		</build_pbi>
-		<build_options>barnyard2_UNSET=ODBC PGSQL PRELUDE;barnyard2_SET=GRE IPV6 MPLS MYSQL PORT_PCAP;snort_SET=TARGETBASED PERFPROFILE SOURCEFIRE GRE IPV6 MPLS NORMALIZER APPID FILEINSPECT;snort_UNSET=PULLEDPORK;perl_SET=THREADS</build_options>
+		<build_options>barnyard2_UNSET=ODBC PGSQL PRELUDE;barnyard2_SET=GRE IPV6 MPLS MYSQL PORT_PCAP;snort_SET=PERFPROFILE SOURCEFIRE GRE IPV6 NORMALIZER APPID REACT;snort_UNSET=PULLEDPORK FILEINSPECT;perl_SET=THREADS</build_options>
 		<config_file>https://packages.pfsense.org/packages/config/snort/snort.xml</config_file>
 		<version>2.9.7.0 pkg v3.2</version>
 		<required_version>2.2</required_version>
