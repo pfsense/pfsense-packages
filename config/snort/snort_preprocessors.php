@@ -255,7 +255,7 @@ if ($_GET['act'] == "import" && isset($_GET['varname']) && !empty($_GET['varvalu
 
 // Handle deleting of any of the multiple configuration engines
 if ($_POST['del_http_inspect']) {
-	if (isset($_POST['eng_id']) && isset($id) && issset($a_nat[$id])) {
+	if (isset($_POST['eng_id']) && isset($id) && isset($a_nat[$id])) {
 		unset($a_nat[$id]['http_inspect_engine']['item'][$_POST['eng_id']]);
 		write_config("Snort pkg: deleted http_inspect engine for {$a_nat[$id]['interface']}.");
 		header("Location: snort_preprocessors.php?id=$id#httpinspect_row");
