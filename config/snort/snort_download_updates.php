@@ -137,7 +137,7 @@ if (isset($_POST['clear'])) {
 	unlink_if_exists($snort_rules_upd_log);
 }
 
-if (isset($_POST['check'])) {
+if (isset($_POST['update'])) {
 	header("Location: /snort/snort_download_rules.php");
 	exit;
 }
@@ -274,8 +274,8 @@ include_once("head.inc");
 						<br/></p>
 					<?php else: ?>
 						<br/>
-						<input type="submit" value="<?=gettext("Check");?>" name="check" id="check" class="formbtn" 
-						title="<?php echo gettext("Check for new updates to enabled rule sets"); ?>"/>&nbsp;&nbsp;&nbsp;&nbsp;
+						<input type="submit" value="<?=gettext("Update");?>" name="update" id="update" class="formbtn" 
+						title="<?php echo gettext("Check for and apply new update to enabled rule sets"); ?>"/>&nbsp;&nbsp;&nbsp;&nbsp;
 						<input type="submit" value="<?=gettext("Force");?>" name="force" id="force" class="formbtn" 
 						title="<?=gettext("Force an update of all enabled rule sets");?>" 
 						onclick="return confirm('<?=gettext("This will zero-out the MD5 hashes to force a fresh download of enabled rule sets.  Click OK to continue or CANCEL to quit");?>');"/>
