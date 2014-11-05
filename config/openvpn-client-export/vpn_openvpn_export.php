@@ -364,7 +364,7 @@ function download_begin(act, i, j) {
 		var proxyconf = document.getElementById("proxyconf").value;
 		if (useproxypass) {
 			if (!proxyuser) {
-				alert("Please fill the proxy username and passowrd.");
+				alert("Please fill the proxy username and password.");
 				return;
 			}
 			if (!proxypass || !proxyconf) {
