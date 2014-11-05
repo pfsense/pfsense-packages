@@ -108,24 +108,24 @@ if (file_exists("{$snortdir}/{$emergingthreats_filename}.md5") && ($etpro == "on
 
 if ($snortcommunityrules == 'on') {
 	$snort_community_sig_chk_local = gettext("Not Downloaded");
-	$snort_community_sig_sig_date = gettext("Not Downloaded");
+	$snort_community_sig_date = gettext("Not Downloaded");
 }
 else {
 	$snort_community_sig_chk_local = gettext("Not Enabled");
-	$snort_community_sig_sig_date = gettext("Not Enabled");
+	$snort_community_sig_date = gettext("Not Enabled");
 }
 if (file_exists("{$snortdir}/{$snort_community_rules_filename}.md5") && $snortcommunityrules == 'on') {
 	$snort_community_sig_chk_local = file_get_contents("{$snortdir}/{$snort_community_rules_filename}.md5");
-	$snort_community_sig_sig_date = date(DATE_RFC850, filemtime("{$snortdir}/{$snort_community_rules_filename}.md5"));
+	$snort_community_sig_date = date(DATE_RFC850, filemtime("{$snortdir}/{$snort_community_rules_filename}.md5"));
 }
 
 if ($openappid_detectors == 'on') {
 	$openappid_detectors_sig_chk_local = gettext("Not Downloaded");
-	$openappid_detectors_sig_sig_date = gettext("Not Downloaded");
+	$openappid_detectors_sig_date = gettext("Not Downloaded");
 }
 else {
 	$openappid_detectors_sig_chk_local = gettext("Not Enabled");
-	$openappid_detectors_sig_sig_date = gettext("Not Enabled");
+	$openappid_detectors_sig_date = gettext("Not Enabled");
 }
 if (file_exists("{$snortdir}/{$snort_openappid_filename}.md5") && $openappid_detectors == 'on') {
 	$openappid_detectors_sig_chk_local = file_get_contents("{$snortdir}/{$snort_openappid_filename}.md5");
@@ -227,7 +227,7 @@ include_once("head.inc");
 					<tr>
 						<td align="center" class="vncell vexpl"><b><?=gettext("Snort GPLv2 Community Rules");?></b></td>
 						<td align="center" class="vncell vexpl"><? echo trim($snort_community_sig_chk_local);?></td>
-						<td align="center" class="vncell vexpl"><?php echo gettext($snort_community_sig_sig_date);?></td>
+						<td align="center" class="vncell vexpl"><?php echo gettext($snort_community_sig_date);?></td>
 					</tr>
 					<tr>
 						<td align="center" class="vncell vexpl"><b><?=$et_name;?></b></td>
