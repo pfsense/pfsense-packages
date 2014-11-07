@@ -33,16 +33,30 @@ switch ($pfs_version) {
 	case "1.2":
 	case "2.0":
 		define('SUDO_BASE','/usr/local');
+		define('SUDO_LIBEXEC_DIR', '/usr/local/libexec/sudo');
+		break;
+	case "2.1":
+		// Hackish way to detect if someone manually did pkg_add rather than use pbi.
+		if (is_dir('/usr/pbi/sudo-' . php_uname("m"))) {
+			define('SUDO_BASE', '/usr/pbi/sudo-' . php_uname("m"));
+			define('SUDO_LIBEXEC_DIR', '/usr/local/libexec/');
+		} else {
+			define('SUDO_BASE','/usr/local');
+			define('SUDO_LIBEXEC_DIR', '/usr/local/libexec/sudo');
+		}
 		break;
 	default:
+		define('SUDO_BASE','/usr/local');
 		// Hackish way to detect if someone manually did pkg_add rather than use pbi.
-		if (is_dir('/usr/pbi/sudo-' . php_uname("m")))
-			define('SUDO_BASE', '/usr/pbi/sudo-' . php_uname("m"));
-		else
-			define('SUDO_BASE','/usr/local');
+		if (is_dir('/usr/pbi/sudo-' . php_uname("m"))) {
+			define('SUDO_LIBEXEC_DIR', '/usr/pbi/sudo-' . php_uname("m") . '/local/libexec/sudo');
+		} else {
+			define('SUDO_LIBEXEC_DIR', '/usr/local/libexec/sudo');
+		}
 }
 
 define('SUDO_CONFIG_DIR', SUDO_BASE . '/etc');
+define('SUDO_CONF', SUDO_CONFIG_DIR . '/sudo.conf');
 define('SUDO_SUDOERS', SUDO_CONFIG_DIR . '/sudoers');
 
 function sudo_install() {
@@ -73,6 +87,12 @@ function sudo_write_config() {
 	global $config;
 	$sudoers = "";
 	conf_mount_rw();
+
+	$sudoconf = "Plugin sudoers_policy " . SUDO_LIBEXEC_DIR . "/sudoers.so\n";
+	$sudoconf .= "Plugin sudoers_io " . SUDO_LIBEXEC_DIR . "/sudoers.so\n";
+	$sudoconf .= "Path noexec " . SUDO_LIBEXEC_DIR . "/sudo_noexec.so\n";
+	file_put_contents(SUDO_CONF, $sudoconf);
+
 	if (!is_array($config['installedpackages']['sudo']['config'][0]['row'])) {
 		/* No config, wipe sudoers file and bail. */
 		unlink(SUDO_SUDOERS);
