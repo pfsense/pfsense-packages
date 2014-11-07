@@ -1435,7 +1435,7 @@
 		<build_pbi>
 			<port>security/sudo</port>
 		</build_pbi>
-		<depends_on_package_pbi>sudo-1.8.10p3-##ARCH##.pbi</depends_on_package_pbi>
+		<depends_on_package_pbi>sudo-1.8.10p3_1-##ARCH##.pbi</depends_on_package_pbi>
 	</package>
 	<package>
 		<name>Service Watchdog</name>
