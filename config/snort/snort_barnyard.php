@@ -57,8 +57,8 @@ $retentions = array( '0' => gettext('KEEP ALL'), '24' => gettext('1 DAY'), '168'
 		     '720' => gettext('30 DAYS'), '1080' => gettext("45 DAYS"), '2160' => gettext('90 DAYS'), '4320' => gettext('180 DAYS'), 
 		     '8766' => gettext('1 YEAR'), '26298' => gettext("3 YEARS") );
 
-$log_sizes = array( '0' => gettext('NO LIMIT'), '8' => gettext('8 MB'), '16' => gettext('16 MB'), '32' => gettext('32 MB'), 
-		    '64' => gettext('64 MB'), '128' => gettext('128 MB'), '256' => gettext('256 MB') );
+$log_sizes = array( '0' => gettext('NO LIMIT'), '128K' => '128 KB', '256K' => '256 KB', '512K' => '512 KB', '1M' => '1 MB', '4M' => '4 MB', '8M' => gettext('8 MB'), 
+		    '16M' => gettext('16 MB'), '32M' => gettext('32 MB'), '64M' => gettext('64 MB'), '128M' => gettext('128 MB'), '256M' => gettext('256 MB') );
 
 if (isset($id) && $a_nat[$id]) {
 	$pconfig = $a_nat[$id];
@@ -69,7 +69,7 @@ if (isset($id) && $a_nat[$id]) {
 	if (empty($a_nat[$id]['barnyard_show_year']))
 		$pconfig['barnyard_show_year'] = "on";
 	if (empty($a_nat[$id]['unified2_log_limit']))
-		$pconfig['unified2_log_limit'] = "32";
+		$pconfig['unified2_log_limit'] = "128K";
 	if (empty($a_nat[$id]['barnyard_archive_enable']))
 		$pconfig['barnyard_archive_enable'] = "on";
 	if (empty($a_nat[$id]['u2_archived_log_retention']))
@@ -91,6 +91,30 @@ if (isset($id) && $a_nat[$id]) {
 }
 
 if ($_POST['save']) {
+
+	// If disabling Barnyard2 on the interface, stop any
+	// currently running instance, then save the disabled
+	// state and exit.
+	if ($_POST['barnyard_enable'] != 'on') {
+		$a_nat[$id]['barnyard_enable'] = 'off';
+		write_config("Snort pkg: modified Barnyard2 settings.");
+		touch("{$g['varrun_path']}/barnyard2_{$uuid}.disabled");
+		snort_barnyard_stop($a_nat[$id], get_real_interface($a_nat[$id]['interface']));
+
+		// No need to rebuild rules for Barnyard2 changes
+		$rebuild_rules = false;
+		conf_mount_rw();
+		sync_snort_package_config();
+		conf_mount_ro();
+		header( 'Expires: Sat, 26 Jul 1997 05:00:00 GMT' );
+		header( 'Last-Modified: ' . gmdate( 'D, d M Y H:i:s' ) . ' GMT' );
+		header( 'Cache-Control: no-store, no-cache, must-revalidate' );
+		header( 'Cache-Control: post-check=0, pre-check=0', false );
+		header( 'Pragma: no-cache' );
+		header("Location: /snort/snort_barnyard.php");
+		exit;
+	}
+
 	// Check that at least one output plugin is enabled
 	if ($_POST['barnyard_mysql_enable'] != 'on' && $_POST['barnyard_syslog_enable'] != 'on' &&
 	    $_POST['barnyard_bro_ids_enable'] != 'on' && $_POST['barnyard_enable'] == "on")
@@ -104,6 +128,12 @@ if ($_POST['save']) {
 			$input_errors[] = gettext("You must provide a DB instance name when logging to a MySQL database.");
 		if (empty($_POST['barnyard_dbuser']))
 			$input_errors[] = gettext("You must provide a DB user login name when logging to a MySQL database.");
+	}
+
+	// Validate Sensor Name contains no spaces
+	if ($_POST['barnyard_enable'] == 'on') {
+		if (!empty($_POST['barnyard_sensor_name']) && strpos($_POST['barnyard_sensor_name'], " ") !== FALSE)
+			$input_errors[] = gettext("The value for 'Sensor Name' cannot contain spaces.");
 	}
 
 	// Validate inputs if syslog output enabled
@@ -161,14 +191,16 @@ if ($_POST['save']) {
 		if ($_POST['barnyard_syslog_priority']) $natent['barnyard_syslog_priority'] = $_POST['barnyard_syslog_priority']; else $natent['barnyard_syslog_priority'] = 'LOG_INFO';
 		if ($_POST['barnyard_bro_ids_rhost']) $natent['barnyard_bro_ids_rhost'] = $_POST['barnyard_bro_ids_rhost']; else unset($natent['barnyard_bro_ids_rhost']);
 		if ($_POST['barnyard_bro_ids_dport']) $natent['barnyard_bro_ids_dport'] = $_POST['barnyard_bro_ids_dport']; else $natent['barnyard_bro_ids_dport'] = '47760';
-		if ($_POST['barnconfigpassthru']) $natent['barnconfigpassthru'] = base64_encode($_POST['barnconfigpassthru']); else unset($natent['barnconfigpassthru']);
+		if ($_POST['barnconfigpassthru']) $natent['barnconfigpassthru'] = base64_encode(str_replace("\r\n", "\n", $_POST['barnconfigpassthru'])); else unset($natent['barnconfigpassthru']);
 
 		$a_nat[$id] = $natent;
 		write_config("Snort pkg: modified Barnyard2 settings.");
 
 		// No need to rebuild rules for Barnyard2 changes
 		$rebuild_rules = false;
+		conf_mount_rw();
 		sync_snort_package_config();
+		conf_mount_ro();
 
 		// If disabling Barnyard2 on the interface, stop any
 		// currently running instance.  If an instance is
@@ -230,7 +262,9 @@ include_once("head.inc");
 		$tab_array[5] = array(gettext("Pass Lists"), false, "/snort/snort_passlist.php");
 		$tab_array[6] = array(gettext("Suppress"), false, "/snort/snort_interfaces_suppress.php");
 		$tab_array[7] = array(gettext("IP Lists"), false, "/snort/snort_ip_list_mgmt.php");
-		$tab_array[8] = array(gettext("Sync"), false, "/pkg_edit.php?xml=snort/snort_sync.xml");
+		$tab_array[8] = array(gettext("SID Mgmt"), false, "/snort/snort_sid_mgmt.php");
+		$tab_array[9] = array(gettext("Log Mgmt"), false, "/snort/snort_log_mgmt.php");
+		$tab_array[10] = array(gettext("Sync"), false, "/pkg_edit.php?xml=snort/snort_sync.xml");
 		display_top_tabs($tab_array, true);
 		echo '</td></tr>';
 		echo '<tr><td>';
@@ -243,6 +277,7 @@ include_once("head.inc");
 		$tab_array[] = array($menu_iface . gettext("Preprocs"), false, "/snort/snort_preprocessors.php?id={$id}");
 		$tab_array[] = array($menu_iface . gettext("Barnyard2"), true, "/snort/snort_barnyard.php?id={$id}");
 		$tab_array[] = array($menu_iface . gettext("IP Rep"), false, "/snort/snort_ip_reputation.php?id={$id}");
+		$tab_array[] = array($menu_iface . gettext("Logs"), false, "/snort/snort_interface_logs.php?id={$id}");
 		display_top_tabs($tab_array, true);
 ?>
 </td></tr>
@@ -275,7 +310,7 @@ include_once("head.inc");
 						<?php if ($k == $pconfig['unified2_log_limit']) echo "selected"; ?>>
 							<?=htmlspecialchars($p);?></option>
 					<?php endforeach; ?>
-					</select>&nbsp;<?php echo gettext("Choose a Unified2 Log file size limit in megabytes (MB). Default is "); ?><strong><?=gettext("32 MB.");?></strong><br/><br/>
+					</select>&nbsp;<?php echo gettext("Choose a Unified2 Log file size limit. Default is "); ?><strong><?=gettext("128 KB.");?></strong><br/><br/>
 					<?php echo gettext("This sets the maximum size for a Unified2 Log file before it is rotated and a new one created."); ?>
 				</td>
 			</tr>
@@ -418,7 +453,7 @@ include_once("head.inc");
 					<input name="barnyard_syslog_local" type="checkbox" value="on" <?php if ($pconfig['barnyard_syslog_local'] == "on") echo "checked"; ?> 
 					onClick="toggle_local_syslog()"/>
 					<?php echo gettext("Enable logging of alerts to the local system only"); ?><br/>
-					<?php echo gettext("This will send alert data to the local system only and overrides the host, port, protocol, facility and priority values below."); ?></td>
+					<?php echo gettext("This will send alert data to the local system only and overrides the host, port, and protocol values below."); ?></td>
 			</tr>
 			<tr>
 				<td width="22%" valign="top" class="vncell"><?php echo gettext("Remote Host"); ?></td>
@@ -461,7 +496,7 @@ include_once("head.inc");
 							echo "<option value='{$facility}'{$selected}>" . $facility . "</option>\n";
 						}
 					?></select>&nbsp;&nbsp;
-					<?php echo gettext("Select Syslog Facility to use for remote reporting.  Default is ") . "<strong>" . gettext("LOG_USER") . "</strong>."; ?>
+					<?php echo gettext("Select Syslog Facility to use for reporting.  Default is ") . "<strong>" . gettext("LOG_USER") . "</strong>."; ?>
 				</td>
 			</tr>
 			<tr>
@@ -477,7 +512,7 @@ include_once("head.inc");
 							echo "<option value='{$priority}'{$selected}>" . $priority . "</option>\n";
 						}
 					?></select>&nbsp;&nbsp;
-					<?php echo gettext("Select Syslog Priority (Level) to use for remote reporting.  Default is ") . "<strong>" . gettext("LOG_INFO") . "</strong>."; ?>
+					<?php echo gettext("Select Syslog Priority (Level) to use for reporting.  Default is ") . "<strong>" . gettext("LOG_INFO") . "</strong>."; ?>
 				</td>
 			</tr>
 			</tbody>
@@ -583,8 +618,6 @@ function toggle_local_syslog() {
 		document.iform.barnyard_syslog_dport.disabled = endis;
 		document.iform.barnyard_syslog_proto_udp.disabled = endis;
 		document.iform.barnyard_syslog_proto_tcp.disabled = endis;
-		document.iform.barnyard_syslog_facility.disabled = endis;
-		document.iform.barnyard_syslog_priority.disabled = endis;
 	}
 }
 

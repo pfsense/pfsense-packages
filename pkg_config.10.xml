@@ -124,12 +124,12 @@
 	<package>
 		<name>haproxy-devel</name>
 		<pkginfolink>https://doc.pfsense.org/index.php/haproxy_package</pkginfolink>
-		<descr><![CDATA[The Reliable, High Performance TCP/HTTP(s) Load Balancer<br />
-				This package implements TCP, HTTP and HTTPS balance features from Haproxy.<br />
-				Supports acl's for smart backend switching.]]></descr>
+		<descr><![CDATA[The Reliable, High Performance TCP/HTTP(S) Load Balancer<br />
+				This package implements the TCP, HTTP and HTTPS balancing features from haproxy.<br />
+				Supports ACLs for smart backend switching.]]></descr>
 		<website>http://haproxy.1wt.eu/</website>
 		<category>Services</category>
-		<version>1.5.3 pkg v 0.11</version>
+		<version>1.5.3 pkg v 0.12</version>
 		<status>Release</status>
 		<required_version>2.2</required_version>
 		<config_file>https://packages.pfsense.org/packages/config/haproxy-devel/haproxy.xml</config_file>
@@ -312,7 +312,7 @@
 		<category>Services</category>
 		<pkginfolink>https://doc.pfsense.org/index.php/vhosts</pkginfolink>
 		<config_file>https://packages.pfsense.org/packages/config/vhosts/vhosts.xml</config_file>
-		<version>0.7.4</version>
+		<version>0.7.5</version>
 		<status>Stable</status>
 		<required_version>2.2</required_version>
 		<maintainer>markjcrane@gmail.com</maintainer>
@@ -331,7 +331,7 @@
 		</build_pbi>
 		<build_options>barnyard2_UNSET=ODBC PGSQL PRELUDE;barnyard2_SET=GRE IPV6 MPLS MYSQL PORT_PCAP;snort_SET=TARGETBASED PERFPROFILE SOURCEFIRE GRE IPV6 MPLS NORMALIZER ZLIB;snort_UNSET=PULLEDPORK;perl_SET=THREADS</build_options>
 		<config_file>https://packages.pfsense.org/packages/config/snort/snort.xml</config_file>
-		<version>2.9.6.2 pkg v3.1.2</version>
+		<version>2.9.6.2 pkg v3.1.4</version>
 		<required_version>2.2</required_version>
 		<status>Stable</status>
 		<configurationfile>/snort.xml</configurationfile>
@@ -500,8 +500,8 @@
 	<package>
 		<name>Sarg</name>
 		<website>http://www.dansguardian.org/</website>
-		<descr><![CDATA[Sarg - Squid Analysis Report Generator is a tool that allow you to view "where" your users are going to on the Internet.<br />
-						Sarg provides many informations about Proxy(squid,squidguard or dansguardian) users activities: times, bytes, sites, etc...]]></descr>
+		<descr><![CDATA[Sarg - Squid Analysis Report Generator - is a tool that generates reports about where your users are going on the Internet.<br />
+						Sarg provides information about proxy users' activities: times, bytes, sites, etc. for those using Squid, Squidguard or dansguardian.]]></descr>
 		<category>Network Report</category>
 		<config_file>https://packages.pfsense.org/packages/config/sarg/sarg.xml</config_file>
 		<pkginfolink>https://forum.pfsense.org/index.php/topic,47765.0.html</pkginfolink>
@@ -540,7 +540,7 @@
 		<name>Varnish3</name>
 		<internal_name>varnish</internal_name>
 		<descr><![CDATA[Varnish is a state-of-the-art, high-performance HTTP accelerator.<br />
-						It uses the advanced features in FreeBSD 6/7/8 to achieve its high performance.<br />
+						It uses the advanced features in FreeBSD to achieve its high performance.<br />
 						Version 3 includes streaming support]]></descr>
 		<website>http://varnish-cache.org</website>
 		<pkginfolink>https://doc.pfsense.org/index.php/Varnish_package</pkginfolink>
@@ -901,7 +901,7 @@
 		<pkginfolink>https://forum.pfsense.org/index.php/topic,48347.0.html</pkginfolink>
 		<website>http://www.squid-cache.org/</website>
 		<category>Network</category>
-		<version>3.1.20 pkg 2.1.1</version>
+		<version>3.1.20 pkg 2.1.2</version>
 		<status>beta</status>
 		<required_version>2.2</required_version>
 		<maintainer>marcellocoutinho@gmail.com fernando@netfilter.com.br seth.mos@dds.nl mfuchs77@googlemail.com jimp@pfsense.org</maintainer>
@@ -925,7 +925,7 @@
 		<pkginfolink>https://forum.pfsense.org/index.php/topic,48347.0.html</pkginfolink>
 		<website>http://www.squid-cache.org/</website>
 		<category>Network</category>
-		<version>3.3.11_1 pkg 2.2.7</version>
+		<version>3.3.11_1 pkg 2.2.8</version>
 		<status>beta</status>
 		<required_version>2.2</required_version>
 		<maintainer>marcellocoutinho@gmail.com fernando@netfilter.com.br seth.mos@dds.nl mfuchs77@googlemail.com jimp@pfsense.org</maintainer>
@@ -978,7 +978,7 @@
 	</package>
 	<package>
 		<name>arpwatch</name>
-		<descr>Arpwatch monitors ethernet/ip address pairings. It also logs certain changes to syslog.</descr>
+		<descr>Arpwatch monitors Ethernet to IP address pairings. It logs certain changes to syslog.</descr>
 		<website>http://www-nrg.ee.lbl.gov/</website>
 		<category>Security</category>
 		<depends_on_package_pbi>arpwatch-2.1.a15_8-##ARCH##.pbi</depends_on_package_pbi>
@@ -1058,7 +1058,7 @@
 		<depends_on_package_pbi>zip-3.0-##ARCH##.pbi p7zip-9.20.1_2-##ARCH##.pbi</depends_on_package_pbi>
 		<build_port_path>/usr/ports/archivers/p7zip</build_port_path>
 		<build_port_path>/usr/ports/archivers/zip</build_port_path>
-		<version>1.2.13</version>
+		<version>1.2.14</version>
 		<status>RELEASE</status>
 		<required_version>2.2</required_version>
 		<config_file>https://packages.pfsense.org/packages/config/openvpn-client-export/openvpn-client-export.xml</config_file>
@@ -1484,7 +1484,7 @@
 	</package>
 	<package>
 		<name>LADVD</name>
-		<descr>Send and decode link layer advertisements</descr>
+		<descr>Send and decode link layer advertisements. Support for LLDP (Link Layer Discovery Protocol), CDP (Cisco Discovery Protocol), EDP (Extreme Discovery Protocol) and NDP (Nortel Discovery Protocol).</descr>
 		<website>https://code.google.com/p/ladvd/</website>
 		<category>Network Management</category>
 		<version>1.0.4</version>

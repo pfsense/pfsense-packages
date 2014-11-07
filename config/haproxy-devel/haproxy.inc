@@ -362,8 +362,6 @@ EOD;
 	fclose($fd);
 	exec("chmod a+rx /usr/local/etc/rc.d/haproxy.sh");
 
-
-
 	$static_output .= "HAProxy, update configuration\n";
 	update_output_window($static_output);
 	
@@ -418,7 +416,7 @@ EOD;
 	}
 	
 	/* XML update to: pkg v1.3 and 'pool' changed to 'backend_serverpool' because 'pool' was added to listtags() in xmlparse.inc */
-	if (is_array($config['installedpackages']['haproxy']['ha_backends']['item'][0]['pool'])) {
+	if (is_arrayset($config,'installedpackages','haproxy','ha_backends','item',0,'pool')) {
 		$static_output .= "HAProxy, Do XML upgrade, change to backend_serverpool from pool array\n";
 		update_output_window($static_output);
 	
@@ -431,7 +429,8 @@ EOD;
 		$writeconfigupdate = true;
 	}
 	//also move setting for existing 2.0 installations as only the new variable is used 
-	if (isset($config['installedpackages']['haproxy']['ha_backends']['item'][0]['pool'])) {
+	if (is_arrayset($config,'installedpackages','haproxy','ha_backends','item',0) &&
+		isset($config['installedpackages']['haproxy']['ha_backends']['item'][0]['pool'])) {
 		$static_output .= "HAProxy, Do XML upgrade, change to backend_serverpool from pool\n";
 		update_output_window($static_output);
 		foreach($config['installedpackages']['haproxy']['ha_backends']['item'] as &$frontend)
@@ -443,7 +442,7 @@ EOD;
 		$writeconfigupdate = true;
 	}
 	// update config to "haproxy-devel 1.5-dev19 pkg v0.5"
-	if(is_array($config['installedpackages']['haproxy']['ha_backends']['item'])) {
+	if(is_arrayset($config,'installedpackages','haproxy','ha_backends','item')) {
 		$static_output .= "HAProxy, Do XML upgrade, update frontend options\n";
 		update_output_window($static_output);
 		foreach ($config['installedpackages']['haproxy']['ha_backends']['item'] as &$bind) {
@@ -1247,7 +1246,7 @@ function haproxy_load_modules() {
 	}
 	
 	/* Activate layer2 filtering */
-	mwexec("/sbin/sysctl net.link.ether.ipfw=1 /sbin/net.inet.ip.fw.one_pass=1");
+	mwexec("/sbin/sysctl net.link.ether.ipfw=1 net.inet.ip.fw.one_pass=1");
 	
 	unmute_kernel_msgs();
 }

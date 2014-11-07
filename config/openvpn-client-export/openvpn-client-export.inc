@@ -38,6 +38,10 @@ require_once("shaper.inc");
 require_once("util.inc");
 require_once("pfsense-utils.inc");
 
+global $current_openvpn_version, $current_openvpn_version_rev;
+$current_openvpn_version     = "2.3.5";
+$current_openvpn_version_rev = "01";
+
 function openvpn_client_export_install() {
 	conf_mount_rw();
 	$tarpath = "/usr/local/pkg/openvpn-client-export.tgz";
@@ -478,19 +482,25 @@ function openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $verifys
 	}
 }
 
-function openvpn_client_export_installer($srvid, $usrid, $crtid, $useaddr, $verifyservercn, $randomlocalport, $usetoken, $outpass, $proxy, $openvpnmanager, $advancedoptions, $openvpn_version = "2.1") {
-	global $config, $g, $input_errors;
+function openvpn_client_export_installer($srvid, $usrid, $crtid, $useaddr, $verifyservercn, $randomlocalport, $usetoken, $outpass, $proxy, $openvpnmanager, $advancedoptions, $openvpn_version = "x86-xp") {
+	global $config, $g, $input_errors, $current_openvpn_version, $current_openvpn_version_rev;
 	$uname_p = trim(exec("uname -p"));
 
 	switch ($openvpn_version) {
-		case "2.3-x86":
-			$client_install_exe = "openvpn-install-2.3-i686.exe";
+		case "x86-xp":
+			$client_install_exe = "openvpn-install-{$current_openvpn_version}-I0{$current_openvpn_version_rev}-i686.exe";
 			break;
-		case "2.3-x64":
-			$client_install_exe = "openvpn-install-2.3-x86_64.exe";
+		case "x64-xp":
+			$client_install_exe = "openvpn-install-{$current_openvpn_version}-I0{$current_openvpn_version_rev}-x86_64.exe";
+			break;
+		case "x86-win6":
+			$client_install_exe = "openvpn-install-{$current_openvpn_version}-I6{$current_openvpn_version_rev}-i686.exe";
+			break;
+		case "x64-win6":
+			$client_install_exe = "openvpn-install-{$current_openvpn_version}-I6{$current_openvpn_version_rev}-x86_64.exe";
 			break;
 		default:
-			$client_install_exe = "openvpn-install-2.3-i686.exe";
+			$client_install_exe = "openvpn-install-{$current_openvpn_version}-I0{$current_openvpn_version_rev}-i686.exe";
 	}
 
 	$ovpndir = "/usr/local/share/openvpn";

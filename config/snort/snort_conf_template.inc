@@ -89,7 +89,7 @@ dynamicdetection directory {$snort_dirs['dynamicrules']}
 {$host_attrib_config}
 
 # Snort Output Logs #
-output alert_csv: alert timestamp,sig_generator,sig_id,sig_rev,msg,proto,src,srcport,dst,dstport,id,classification,priority
+output alert_csv: alert timestamp,sig_generator,sig_id,sig_rev,msg,proto,src,srcport,dst,dstport,id,classification,priority {$alert_log_limit_size}
 {$alertsystemlog_type}
 {$snortunifiedlog_type}
 {$spoink_type}
