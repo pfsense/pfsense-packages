@@ -79,7 +79,7 @@ function snort_check_dir_size_limit($snortloglimitsize) {
 			$files = array();
 			$list = glob("{$snort_log_dir}/*");
 			foreach ($list as $file) {
-				if (preg_match('/(^\d{4}-\d{2}-\d{2}[\.]?[\d+]?)/', basename($file), $matches))
+				if (preg_match('/(^\d{4}-\d{2}-\d{2}[\.\d+]*)/', basename($file), $matches))
 					$files[] = $snort_log_dir . "/" . $matches[1];
 			}
 			foreach ($files as $file)
@@ -219,7 +219,7 @@ if ($config['installedpackages']['snortglobal']['enable_log_mgmt'] == 'on') {
 			$files = array();
 			$list = glob("{$snort_log_dir}/*");
 			foreach ($list as $file) {
-				if (preg_match('/(^\d{4}-\d{2}-\d{2}[\.]?[\d+]?)/', basename($file), $matches))
+				if (preg_match('/(^\d{4}-\d{2}-\d{2}[\.\d+]*)/', basename($file), $matches))
 					$files[] = $snort_log_dir . "/" . $matches[1];
 			}
 			$prune_count = 0;
