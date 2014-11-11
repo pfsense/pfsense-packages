@@ -309,7 +309,6 @@
 	</custom_add_php_command>
 	<custom_php_resync_config_command>
 		<![CDATA[
-		if ($GLOBALS['pfSense_snort_version'] == "3.2")
 		sync_snort_package_config();
 		]]>
 	</custom_php_resync_config_command>
