@@ -193,6 +193,33 @@
 			<type>checkbox</type>  
 			<default_value>on</default_value>
 		</field>
+                <field>
+			<fielddescr>Check Client certificate</fielddescr>
+			<fieldname>reverse_check_clientca</fieldname>
+			<description>If this field is checked, Client certificate will be checked.</description>
+			<type>checkbox</type>  
+			<default_value>off</default_value>
+		</field>
+
+                <field>
+			<fielddescr>CA Client certificate</fielddescr>
+			<fieldname>reverse_ssl_clientca</fieldname>
+			<description>Choose CA certificate to authenticate clients.</description>
+	    	<type>select_source</type>
+			<source><![CDATA[$config['ca']]]></source>
+			<source_name>descr</source_name>
+			<source_value>refid</source_value>
+		</field>
+                <field>
+			<fielddescr>Revocation List</fielddescr>
+			<fieldname>reverse_ssl_clientcrl</fieldname>
+			<description>Choose CRL.</description>
+	    	<type>select_source</type>
+			<source><![CDATA[$config['crl']]]></source>
+			<source_name>descr</source_name>
+			<source_value>refid</source_value>
+		</field>
+
 		<field>
 			<name>OWA Reverse proxy General Settings</name>
 			<type>listtopic</type>
