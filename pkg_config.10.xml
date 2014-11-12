@@ -122,28 +122,6 @@
 		<configurationfile>pfblocker.xml</configurationfile>
 	</package>
 	<package>
-		<name>pfBlockerNG</name>
-		<website/>
-		<descr><![CDATA[pfBlockerNG is the Next Generation of pfBlocker.<br />
-				Manage IPv4/v6 List Sources into 'Deny,Permit or Match' formats<br />
-				Country Blocking Database by Maxmind Inc (GeoLite Free version).<br />
-				De-Duplication, Suppression, and Reputation enhancements.<br />
-				Provision to download from diverse List formats. Advanced Integration<br />
-				for Emerging Threats IQRisk IP Reputation threat Sources.]]></descr>
-		<category>Firewall</category>
-		<pkginfolink></pkginfolink>
-		<config_file>https://packages.pfsense.org/packages/config/pfblockerng/pfblockerng.xml</config_file>
-		<version>0.99</version>
-		<status>Beta</status>
-		<required_version>3.0</required_version>
-		<maintainer>BBCan177@gmail.com</maintainer>
-		<configurationfile>pfblockerng.xml</configurationfile>
-		<build_pbi>
-			<port>net/GeoIP</port>
-			<port>net-mgmt/grepcidr</port>
-		</build_pbi>
-	</package>
-	<package>
 		<name>anyterm</name>
 		<descr>Ajax Interactive Shell - Have you ever wanted SSH or telnet access to your system from an internet desert - from behind a strict firewall, from an internet cafe, or even from a mobile phone? Anyterm is a combination of a web page and a process that runs on your web server that provides this access. WARNING!  We suggest using Stunnel in combination with this package!</descr>
 		<website>http://anyterm.org/</website>
