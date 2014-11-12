@@ -122,6 +122,49 @@
 		<configurationfile>pfblocker.xml</configurationfile>
 	</package>
 	<package>
+
+		<name>pfBlockerNG</name>
+
+		<website/>
+
+		<descr><![CDATA[pfBlockerNG is the Next Generation of pfBlocker.<br />
+
+				Manage IPv4/v6 List Sources into 'Deny, Permit or Match' formats<br />
+
+				Country Blocking Database by MaxMind Inc. (GeoLite Free version).<br />
+
+				De-Duplication, Suppression, and Reputation enhancements.<br />
+
+				Provision to download from diverse List formats. Advanced Integration<br />
+
+				for Emerging Threats IQRisk IP Reputation Threat Sources.]]></descr>
+
+		<category>Firewall</category>
+
+		<pkginfolink></pkginfolink>
+
+		<config_file>https://packages.pfsense.org/packages/config/pfblockerng/pfblockerng.xml</config_file>
+
+		<version>0.99</version>
+
+		<status>Beta</status>
+
+		<required_version>3.0</required_version>
+
+		<maintainer>BBCan177@gmail.com</maintainer>
+
+		<configurationfile>pfblockerng.xml</configurationfile>
+
+		<build_pbi>
+
+			<port>net/GeoIP</port>
+
+			<port>net-mgmt/grepcidr</port>
+
+		</build_pbi>
+
+	</package>
+	<package>
 		<name>haproxy-devel</name>
 		<pkginfolink>https://doc.pfsense.org/index.php/haproxy_package</pkginfolink>
 		<descr><![CDATA[The Reliable, High Performance TCP/HTTP(S) Load Balancer<br />
