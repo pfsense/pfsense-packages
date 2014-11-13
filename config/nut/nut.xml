@@ -84,6 +84,7 @@
 	    <chmod>0755</chmod>
 		<item>https://packages.pfsense.org/packages/config/nut/status_nut.php</item>
 	</additional_files_needed>
+	<advanced_options>enabled</advanced_options>
 	<fields>
 		<field>
 			<name>General Settings</name>
@@ -118,6 +119,42 @@
 			<fieldname>powerdown</fieldname>
 			<type>checkbox</type>
 		</field>
+		<field>
+			<fielddescr>ups.conf options</fielddescr>
+			<fieldname>custom_upsconf</fieldname>
+			<description>Write there any custom options for ups.conf. All options must be separated by semi-colons (;).</description>
+			<type>textarea</type>
+			<cols>65</cols>
+			<rows>5</rows>
+			<advancedfield/>
+		</field>
+		<field>
+			<fielddescr>upsd.conf options</fielddescr>
+			<fieldname>custom_upsdconf</fieldname>
+			<description>Write there any custom options for upsd.conf. All options must be separated by semi-colons (;).</description>
+			<type>textarea</type>
+			<cols>65</cols>
+			<rows>5</rows>
+			<advancedfield/>
+		</field>
+		<field>
+			<fielddescr>upsd.users options</fielddescr>
+			<fieldname>custom_upsdusers</fieldname>
+			<description>Write there any custom options for upsd.users. All options must be separated by semi-colons (;).</description>
+			<type>textarea</type>
+			<cols>65</cols>
+			<rows>5</rows>
+			<advancedfield/>
+		</field>
+		<field>
+			<fielddescr>upsmon.conf options</fielddescr>
+			<fieldname>custom_upsmonconf</fieldname>
+			<description>Write there any custom options for upsmon.conf. All options must be separated by semi-colons (;).</description>
+			<type>textarea</type>
+			<cols>65</cols>
+			<rows>5</rows>
+			<advancedfield/>
+		</field>		
 		<field>
 			<name>Remote Access Settings - Used for Local and SNMP Types to allow access</name>
 			<type>listtopic</type>
