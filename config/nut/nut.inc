@@ -184,6 +184,7 @@
 		$remoteuser = nut_config('remoteuser');
 		$remotepass = nut_config('remotepass');
 		$shutdownflag  = (nut_config('powerdown') == 'on') ? '-p' : '-h';
+		$custom_upsmonconf = str_replace(";", "\n", nut_config('custom_upsmonconf'));
 
 		if(!($remotename && $remoteaddr && $remoteuser && $remotepass))
 			return false;
@@ -194,6 +195,7 @@ MONITOR {$remotename}@{$remoteaddr} 1 {$remoteuser} {$remotepass} slave
 MINSUPPLIES 1
 SHUTDOWNCMD "/sbin/shutdown {$shutdownflag} +0"
 POWERDOWNFLAG /etc/killpower
+{$custom_upsmonconf}
 EOD;
 	
 		$stop = <<<EOD
@@ -230,6 +232,10 @@ EOD;
 		$allowuser = nut_config('allowuser');
 		$allowpass = nut_config('allowpass');
 		$shutdownflag  = (nut_config('powerdown') == 'on') ? '-p' : '-h';
+		$custom_upsconf = str_replace(";", "\n", nut_config('custom_upsconf'));
+		$custom_upsdconf = str_replace(";", "\n", nut_config('custom_upsdconf'));
+		$custom_upsdusers = str_replace(";", "\n", nut_config('custom_upsdusers'));
+		$custom_upsmonconf = str_replace(";", "\n", nut_config('custom_upsmonconf'));
 
 
 		if(!($name && $driver && $port))
@@ -262,10 +268,12 @@ EOD;
 			$ups_conf .= "cable={$cable}\n";
 		if($upstype)
 			$ups_conf .= "upstype={$upstype}\n";
+		$ups_conf .= "{$custom_upsconf}";
 
 		/* upsd.conf */
 		$upsd_conf = "LISTEN 127.0.0.1\n";
 		$upsd_conf .= "LISTEN ::1\n";
+		$upsd_conf .= "{$custom_upsdconf}";
 
 		$password = uniqid("nut");
 		/* upsd.users */
@@ -277,6 +285,7 @@ EOD;
 			$upsd_users .= "password = $allowpass\n";
 			$upsd_users .= "upsmon master\n";
 		}
+		$upsd_users .= "{$custom_upsdusers}";
 
 		/* upsmon.conf */
 		$upsmon_conf = <<<EOD
@@ -284,6 +293,7 @@ MONITOR {$name}@localhost 1 monuser {$password} master
 MINSUPPLIES 1
 SHUTDOWNCMD "/sbin/shutdown {$shutdownflag} +0"
 POWERDOWNFLAG /etc/killpower
+{$custom_upsmonconf}
 EOD;
 
 		$stop = <<<EOD
@@ -358,6 +368,10 @@ EOD;
 		$snmpdisabletransfer = (nut_config('snmpdisabletransfer') == 'on');
 		$allowuser = nut_config('allowuser');
 		$allowpass = nut_config('allowpass');
+		$custom_upsconf = str_replace(";", "\n", nut_config('custom_upsconf'));
+		$custom_upsdconf = str_replace(";", "\n", nut_config('custom_upsdconf'));
+		$custom_upsdusers = str_replace(";", "\n", nut_config('custom_upsdusers'));
+		$custom_upsmonconf = str_replace(";", "\n", nut_config('custom_upsmonconf'));
 
 		if(!($name && $driver && $port))
 			return false;
@@ -378,10 +392,12 @@ EOD;
 			$ups_conf .= "pollfreq={$snmpfreq}\n";
 		if($snmpdisabletransfer)
 			$ups_conf .= "notransferoids=true\n";
+		$ups_conf .= "{$custom_upsconf}";
 
 		/* upsd.conf */
 		$upsd_conf = "LISTEN 127.0.0.1\n";
 		$upsd_conf .= "LISTEN ::1\n";
+		$upsd_conf .= "{$custom_upsdconf}";
 
 		$password = uniqid("nut");
 		/* upsd.users */
@@ -393,6 +409,7 @@ EOD;
 			$upsd_users .= "password = $allowpass\n";
 			$upsd_users .= "upsmon master\n";
 		}
+		$upsd_users .= "{$custom_upsdusers}";
 
 		/* upsmon.conf */
 		$upsmon_conf = <<<EOD
@@ -400,6 +417,7 @@ MONITOR {$name}@localhost 1 monuser {$password} master
 MINSUPPLIES 1
 SHUTDOWNCMD "/sbin/shutdown {$shutdownflag} +0"
 POWERDOWNFLAG /etc/killpower
+{$custom_upsmonconf}
 EOD;
 
 		$stop = <<<EOD
