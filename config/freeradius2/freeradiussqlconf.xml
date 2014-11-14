@@ -117,7 +117,7 @@
 			<type>select</type>
 			<default_value>Disable</default_value>
 					<options>
-						<option><name>Disbale</name><value>Disable</value></option>
+						<option><name>Disable</name><value>Disable</value></option>
 						<option><name>Enable</name><value>Enable</value></option>
 					</options>
 		</field>
@@ -129,7 +129,7 @@
 			<type>select</type>
 			<default_value>Disable</default_value>
 					<options>
-						<option><name>Disbale</name><value>Disable</value></option>
+						<option><name>Disable</name><value>Disable</value></option>
 						<option><name>Enable</name><value>Enable</value></option>
 					</options>
 		</field>
@@ -141,7 +141,7 @@
 			<type>select</type>
 			<default_value>Disable</default_value>
 					<options>
-						<option><name>Disbale</name><value>Disable</value></option>
+						<option><name>Disable</name><value>Disable</value></option>
 						<option><name>Enable</name><value>Enable</value></option>
 					</options>
 		</field>
@@ -153,7 +153,7 @@
 			<type>select</type>
 			<default_value>Disable</default_value>
 					<options>
-						<option><name>Disbale</name><value>Disable</value></option>
+						<option><name>Disable</name><value>Disable</value></option>
 						<option><name>Enable</name><value>Enable</value></option>
 					</options>
 		</field>
@@ -385,7 +385,7 @@
 			<type>select</type>
 			<default_value>Disable</default_value>
 					<options>
-						<option><name>Disbale</name><value>Disable</value></option>
+						<option><name>Disable</name><value>Disable</value></option>
 						<option><name>Enable</name><value>Enable</value></option>
 					</options>
 		</field>
@@ -397,7 +397,7 @@
 			<type>select</type>
 			<default_value>Disable</default_value>
 					<options>
-						<option><name>Disbale</name><value>Disable</value></option>
+						<option><name>Disable</name><value>Disable</value></option>
 						<option><name>Enable</name><value>Enable</value></option>
 					</options>
 		</field>
@@ -409,7 +409,7 @@
 			<type>select</type>
 			<default_value>Disable</default_value>
 					<options>
-						<option><name>Disbale</name><value>Disable</value></option>
+						<option><name>Disable</name><value>Disable</value></option>
 						<option><name>Enable</name><value>Enable</value></option>
 					</options>
 		</field>
@@ -421,7 +421,7 @@
 			<type>select</type>
 			<default_value>Disable</default_value>
 					<options>
-						<option><name>Disbale</name><value>Disable</value></option>
+						<option><name>Disable</name><value>Disable</value></option>
 						<option><name>Enable</name><value>Enable</value></option>
 					</options>
 		</field>
