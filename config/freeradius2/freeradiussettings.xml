@@ -8,7 +8,8 @@
 /* ========================================================================== */
 /*
 	freeradiussettings.xml
-	part of pfSense (http://www.pfSense.com)
+	part of pfSense (https://www.pfsense.org)
+	Copyright (C) 2014 Electric Sheep Fencing, LP 
 	Copyright (C) 2013 Alexander Wilke <nachtfalkeaw@web.de>
 	All rights reserved.
 
@@ -162,7 +163,7 @@
 		<field>
 			<fielddescr>Logging Destination of RADIUS</fielddescr>
 			<fieldname>varsettingslogdir</fieldname>
-			<description><![CDATA[Choose the destination where freeRADIUS should log. This will log if service started or failed but no authentication information. (Default: radius.log)]]></description>
+			<description><![CDATA[Choose the destination where freeRADIUS will log. This will log general service information, but no authentication information. (Default: radius.log)]]></description>
 			<type>select</type>
 			<default_value>syslog</default_value>
 					<options>
@@ -316,7 +317,7 @@
 		<field>
 			<fielddescr>Enable Mobile-One-Time-Password</fielddescr>
 			<fieldname>varsettingsmotpenable</fieldname>
-			<description><![CDATA[This enables the possibility to authenticate against an username and an one-time-password. The client which generates OTP can be installed on various mobile device plattforms like Android and more. (Default: unchecked)]]></description>
+			<description><![CDATA[This enables the possibility to authenticate using a username and one-time-password. The client which generates OTP can be installed on various mobile device plattforms like Android and more. (Default: unchecked)]]></description>
 			<type>checkbox</type>
 			<enablefields>varsettingsmotptimespan,varsettingsmotppasswordattempts,varsettingsmotpchecksumtype,varsettingsmotptokenlength</enablefields>
 		</field>
@@ -330,14 +331,14 @@
 		<field>
 			<fielddescr>Number of invalid password attempts</fielddescr>
 			<fieldname>varsettingsmotppasswordattempts</fieldname>
-			<description><![CDATA[After this the user will be locked out until the admin unlocks the user. (Default: 5)]]></description>
+			<description><![CDATA[After this many failed attempts, the user will be locked out until an admin unlocks the user. (Default: 5)]]></description>
 			<type>input</type>
 			<default_value>5</default_value>
 		</field>
 		<field>
 			<fielddescr>Hash algorithm</fielddescr>
 			<fieldname>varsettingsmotpchecksumtype</fieldname>
-			<description><![CDATA[We build a hash of "EPOCHTIME+INIT-SECRET+PIN" and then use the digits as password. Perhaps there are some other/hardware tokens which use other hash types so you can perhaps adjust this here. But this <b>must</b> be equal on bothe sites!  (Default: md5)]]></description>
+			<description><![CDATA[We build a hash of "EPOCHTIME+INIT-SECRET+PIN" and then use the digits as password. Perhaps there are some other/hardware tokens which use other hash types so you can perhaps adjust this here. This <b>must</b> be equal on both sides!  (Default: md5)]]></description>
 			<type>select</type>
 			<default_value>md5</default_value>
 					<options>
@@ -349,12 +350,12 @@
 		<field>
 			<fielddescr>Token Password length</fielddescr>
 			<fieldname>varsettingsmotptokenlength</fieldname>
-			<description><![CDATA[We build a hash of "EPOCHTIME+INIT-SECRET+PIN" and then use the digits 1 to 6 as password. Perhaps there are some other/hardware tokens which use other digits so you can perhaps adjust this here. But this <b>must</b> be equal on bothe sites! (Default: 1-6)]]></description>
+			<description><![CDATA[We build a hash of "EPOCHTIME+INIT-SECRET+PIN" and then use the digits 1 to 6 as password. Perhaps there are some other/hardware tokens which use other digits so you can perhaps adjust this here. This <b>must</b> be equal on both sides! (Default: 1-6)]]></description>
 			<type>input</type>
 			<default_value>1-6</default_value>
 		</field>
 		<field>
-			<name>MISCELLANEOUS CONFIGURATION</name>
+			<name>Miscellaneous Configuration</name>
 			<type>listtopic</type>
 		</field>
 		<field>

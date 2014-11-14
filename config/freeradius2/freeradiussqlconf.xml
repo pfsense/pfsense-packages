@@ -331,7 +331,7 @@
 		<field>
 			<fielddescr>Read Clients from Database</fielddescr>
 			<fieldname>varsqlconfreadclients</fieldname>
-			<description><![CDATA[Set to <b>yes</b> to read radius clients from the database ('nas' table). Clients will only be read on server startup. (Default: yes)]]></description>
+			<description><![CDATA[Set to <b>yes</b> to read RADIUS clients from the database ('nas' table). Clients will only be read on server startup. (Default: yes)]]></description>
 			<type>select</type>
 			<default_value>yes</default_value>
 					<options>
@@ -599,7 +599,7 @@
 		<field>
 			<fielddescr>Read Clients from Database</fielddescr>
 			<fieldname>varsqlconf2readclients</fieldname>
-			<description><![CDATA[Set to <b>yes</b> to read radius clients from the database ('nas' table). Clients will only be read on server startup. (Default: yes)]]></description>
+			<description><![CDATA[Set to <b>yes</b> to read RADIUS clients from the database ('nas' table). Clients will only be read on server startup. (Default: yes)]]></description>
 			<type>select</type>
 			<default_value>yes</default_value>
 					<options>
