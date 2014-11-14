@@ -132,7 +132,7 @@
 	</adddeleteeditpagefields>
 	<fields>
 		<field>
-			<name>GENERAL CONFIGURATION</name>
+			<name>General Configuration</name>
 			<type>listtopic</type>
 		</field>	
 		<field>
@@ -168,7 +168,7 @@
 			<required/>
 		</field>
 		<field>
-			<name>MISCELLANEOUS CONFIGURATION</name>
+			<name>Miscellaneous Configuration</name>
 			<type>listtopic</type>
 		</field>		
 		<field>

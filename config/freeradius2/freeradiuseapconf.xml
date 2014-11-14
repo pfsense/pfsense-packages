@@ -161,7 +161,7 @@
 			<default_value>4096</default_value>
 		</field>
 		<field>
-			<name>CERTIFICATES FOR TLS</name>
+			<name>Certificates for TLS</name>
 			<type>listtopic</type>
 		</field>
 		<field>
@@ -306,7 +306,7 @@
 		
 		
 		<field>
-			<name>EAP-TLS - ENABLE CACHE</name>
+			<name>EAP-TLS - Enable Cache</name>
 			<type>listtopic</type>
 		</field>
 		<field>

@@ -98,7 +98,7 @@
 	</tabs>
 	<fields>
 		<field>
-			<name>ENABLE SQL DATABASE - SERVER 1</name>
+			<name>Enable SQL Database- Server 1</name>
 			<type>listtopic</type>
 		</field>
 		<field>
@@ -158,7 +158,7 @@
 					</options>
 		</field>
 		<field>
-			<name>SQL DATABASE CONFIGURATION - SERVER 1</name>
+			<name>SQL Database Configuration - Server 1</name>
 			<type>listtopic</type>
 		</field>
 		<field>
@@ -347,7 +347,7 @@
 			<default_value>nas</default_value>
 		</field>
 		<field>
-			<name>ENABLE REDUNDANT SQL DATABASE SUPPORT</name>
+			<name>Enable Redundant SQL Database Support</name>
 			<type>listtopic</type>
 		</field>
 		<field>
@@ -366,7 +366,7 @@
 					</options>
 		</field>
 		<field>
-			<name>ENABLE SQL DATABASE - SERVER 2</name>
+			<name>Enable SQL Database - Server 2</name>
 			<type>listtopic</type>
 		</field>
 		<field>
@@ -426,7 +426,7 @@
 					</options>
 		</field>
 		<field>
-			<name>SQL DATABASE CONFIGURATION - SERVER 2</name>
+			<name>SQL Database Configuration - Server 2</name>
 			<type>listtopic</type>
 		</field>
 		<field>

@@ -200,7 +200,7 @@
 	</adddeleteeditpagefields>
 	<fields>
 		<field>
-			<name>GENERAL CONFIGURATION</name>
+			<name>General Configuration</name>
 			<type>listtopic</type>
 		</field>
 		<field>
@@ -227,13 +227,13 @@
 			<type>input</type>
 		</field>
 		<field>
-			<name>MISCELLANEOUS CONFIGURATION</name>
+			<name>Miscellaneous Configuration</name>
 			<type>listtopic</type>
 		</field>		
 		<field>
 			<fielddescr>Redirection URL</fielddescr>
 			<fieldname>varmacsswisprredirectionurl</fieldname>			
-			<description><![CDATA[Enter the URL the MAC should be redirected to after successfull login. (e.g.: http://www.google.com)]]></description>
+			<description><![CDATA[Enter the URL the MAC should be redirected to after successful login. (e.g.: http://www.google.com)]]></description>
 			<type>input</type>
 		</field>
 		<field>
@@ -250,7 +250,7 @@
 			<type>input</type>
 		</field>
 		<field>
-			<name>NETWORK CONFIGURATION</name>
+			<name>Network Configuration</name>
 			<type>listtopic</type>
 		</field>
 		<field>
@@ -287,7 +287,7 @@
 			<type>input</type>
 		</field>		
 		<field>
-			<name>TIME CONFIGURATION</name>
+			<name>Time Configuration</name>
 			<type>listtopic</type>
 		</field>
 		<field>
@@ -331,7 +331,7 @@
 				</options>
 		</field>
 		<field>
-			<name>TRAFFIC AND BANDWIDTH</name>
+			<name>Traffic and Bandwidth</name>
 			<type>listtopic</type>
 		</field>
 		<field>
@@ -372,7 +372,7 @@
 			<type>input</type>
 		</field>
 		<field>
-			<name>ADVANCED CONFIGURATION</name>
+			<name>Advanced Configuration</name>
 			<type>listtopic</type>
 		</field>		
 		<field>
