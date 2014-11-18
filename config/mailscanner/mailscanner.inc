@@ -1,8 +1,8 @@
 <?php
 /*
-	postfix.inc
+	mailscanner.inc
 	part of the Postfix package for pfSense
-	Copyright (C) 2011-2013 Marcello Coutinho
+	Copyright (C) 2011-2014 Marcello Coutinho
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
@@ -33,10 +33,11 @@ require("globals.inc");
 #require("guiconfig.inc");
 
 $pf_version=substr(trim(file_get_contents("/etc/version")),0,3);
-if ($pf_version > 2.0)
-	define('MAILSCANNER_PREFIX', '/usr/pbi/mailscanner-' . php_uname("m"));
+define('MAILSCANNER_PREFIX', '/usr/pbi/mailscanner-' . php_uname("m"));
+if ($pf_version == "2.1")
+	define('MAILSCANNER_LOCALBASE', MAILSCANNER_PREFIX);
 else
-  define('MAILSCANNER_PREFIX','/usr/local');
+	define('MAILSCANNER_LOCALBASE', MAILSCANNER_PREFIX . '/local');
 
 $uname=posix_uname();
 if ($uname['machine']=='amd64')
