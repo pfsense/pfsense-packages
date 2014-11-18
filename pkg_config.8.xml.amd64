@@ -573,7 +573,7 @@
 		<depends_on_package>p5-IP-Country-2.28.tbz</depends_on_package>
 		<depends_on_package>MailScanner-4.84.5_3.tbz</depends_on_package>
 		<depends_on_package_pbi>mailscanner-4.84.6-amd64.pbi</depends_on_package_pbi>
-		<version>4.84.6 pkg v.0.2.10</version>
+		<version>4.84.6 pkg v.0.2.11</version>
 		<status>beta</status>
 		<required_version>2.0</required_version>
 		<configurationfile>mailscanner.xml</configurationfile>
