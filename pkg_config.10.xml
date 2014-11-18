@@ -140,7 +140,7 @@
 		<configurationfile>pfblockerng.xml</configurationfile>
 		<build_pbi>
 			<port>net/GeoIP</port>
-			<ports_after>net-mgmt/grepcidr</port>
+			<ports_after>net-mgmt/grepcidr</ports_after>
 		</build_pbi>
 	</package>
 	<package>
