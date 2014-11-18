@@ -2,7 +2,7 @@
 /*
 	postfix_view_config.php
 	part of pfSense (https://www.pfsense.org/)
-	Copyright (C) 2011-2013 Marcello Coutinho <marcellocoutinho@gmail.com>
+	Copyright (C) 2011-2014 Marcello Coutinho <marcellocoutinho@gmail.com>
 	based on varnish_view_config.
 	All rights reserved.
 
@@ -39,7 +39,7 @@ if ($pf_version > 2.0)
 	define('POSTFIX_LOCALBASE', '/usr/pbi/postfix-' . php_uname("m"));
 else
   define('POSTFIX_LOCALBASE','/usr/local');
-  
+
 function get_cmd(){
 	if ($_REQUEST['cmd'] =='mailq'){
 		#exec("/usr/local/bin/mailq" . escapeshellarg('^'.$m.$j." ".$hour.".*".$grep)." /var/log/maillog", $lists);
@@ -67,13 +67,13 @@ function get_cmd(){
 			elseif (preg_match("/\s+(\w+.*)/",$line,$matches) && $sid !=""){
 				print $td.$matches[1].'</td></tr>';
 				$sid="";
-			}		
+			}
 		}
 		print '</table>';
 	}
 	if ($_REQUEST['cmd'] =='qshape'){
 		if ($_REQUEST['qshape']!="")
-			exec(POSTFIX_LOCALBASE."/bin/qshape -".preg_replace("/\W/","",$_REQUEST['type'])." ". preg_replace("/\W/","",$_REQUEST['qshape']), $qshape);			
+			exec(POSTFIX_LOCALBASE."/bin/qshape -".preg_replace("/\W/","",$_REQUEST['type'])." ". preg_replace("/\W/","",$_REQUEST['qshape']), $qshape);
 		else
 			exec(POSTFIX_LOCALBASE."/bin/qshape", $qshape);
 		print '<table class="tabcont" width="100%" border="0" cellpadding="8" cellspacing="0">';
@@ -107,22 +107,22 @@ else{
 	$pf_version=substr(trim(file_get_contents("/etc/version")),0,3);
 	if ($pf_version < 2.0)
 		$one_two = true;
-	
+
 	$pgtitle = "Status: Postfix Mail Queue";
 	include("head.inc");
-	
+
 	?>
 	<body link="#0000CC" vlink="#0000CC" alink="#0000CC">
 	<?php include("fbegin.inc"); ?>
-	
+
 	<?php if($one_two): ?>
 	<p class="pgtitle"><?=$pgtitle?></font></p>
 	<?php endif; ?>
-	
+
 	<?php if ($savemsg) print_info_box($savemsg); ?>
-	
+
 	<form action="postfix_view_config.php" method="post">
-		
+
 	<div id="mainlevel">
 		<table width="100%" border="0" cellpadding="0" cellspacing="0">
 			<tr><td>
@@ -167,7 +167,7 @@ else{
 							<option value="1" selected>Never</option>
 						</select><br><?=gettext("Select how often queue cmd will run.");?></td>
 					</tr>
-					<tr>					
+					<tr>
                         <td width="22%" valign="top" class="vncell"><?=gettext("qshape Report flags: ");?></td>
                         <td width="78%" class="vtable">
                         <select name="drop3" id="qshape" multiple="multiple" size="5">
@@ -178,7 +178,7 @@ else{
 							<option value="maildrop">maildrop</option>
 						</select><br><?=gettext("Select how often queue will be queried.");?></td>
 					</tr>
-					<tr>					
+					<tr>
                         <td width="22%" valign="top" class="vncell"><?=gettext("qshape Report type: ");?></td>
                         <td width="78%" class="vtable">
                         <select name="drop3" id="qtype">
@@ -201,7 +201,7 @@ else{
 								<tr>
 	     						<td class="tabcont" >
 	     						<div id="file_div"></div>
-									
+
 								</td>
 							</tr>
 						</table>
@@ -223,7 +223,7 @@ else{
 	  }
 	  return(selectedArray);
 	}
-		
+
 	function get_queue(loop) {
 			//prevent multiple instances
 			if ($('run').value=="show queue" || loop== 'running'){
@@ -255,7 +255,7 @@ else{
 			}
 		}
 	</script>
-	<?php 
+	<?php
 	include("fend.inc");
 	}
 	?>
