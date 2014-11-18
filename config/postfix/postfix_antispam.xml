@@ -7,9 +7,9 @@
 /* $Id$ */
 /* ========================================================================== */
 /*
-    postfix.xml
+    postfix_antispam.xml
     part of the Postfix package for pfSense
-    Copyright (C) 2011 Marcello Coutinho
+    Copyright (C) 2011-2014 Marcello Coutinho
 
     All rights reserved.            
 			                                                                  */
