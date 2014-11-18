@@ -141,6 +141,7 @@
 		<build_pbi>
 			<port>net/GeoIP</port>
 			<ports_after>net-mgmt/grepcidr</ports_after>
+			<custom_name>pfblockerng</custom_name>
 		</build_pbi>
 	</package>
 	<package>
