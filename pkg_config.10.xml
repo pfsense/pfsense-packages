@@ -414,8 +414,8 @@
 		<category>Services</category>
 		<pkginfolink>https://forum.pfsense.org/index.php/topic,40622.0.html</pkginfolink>
 		<config_file>https://packages.pfsense.org/packages/config/postfix/postfix.xml</config_file>
-		<depends_on_package_pbi>postfix-2.11.0-##ARCH##.pbi</depends_on_package_pbi>
-		<version>2.10.2 pkg v.2.3.8</version>
+		<depends_on_package_pbi>postfix-2.11.1-##ARCH##.pbi</depends_on_package_pbi>
+		<version>2.11.1 pkg v.2.3.8</version>
 		<status>Release</status>
 		<required_version>2.2</required_version>
 		<configurationfile>postfix.xml</configurationfile>
