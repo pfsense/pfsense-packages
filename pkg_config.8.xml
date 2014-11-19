@@ -546,7 +546,7 @@
 		<descr><![CDATA[DansGuardian is an award winning Open Source web content filter.<br />
 						It filters the actual content of pages based on many methods including phrase matching, PICS filtering and URL filtering.<br />
 						It does not purely filter based on a banned list of sites like lesser totally commercial filters.<br />
-						For all non-commercial it's free, without cost.<br />
+						For all non-commercial its free, without cost.<br />
 						For all commercial use visit dansguardian website to get a licence.]]></descr>
 		<category>Services</category>
 		<config_file>https://packages.pfsense.org/packages/config/dansguardian/dansguardian.xml</config_file>
@@ -1152,7 +1152,7 @@
 		<name>squid3</name>
 		<internal_name>squid</internal_name>
 		<descr><![CDATA[High performance web proxy cache.<br />
-			It combines squid as a proxy server with it's capabilities of acting as a HTTP / HTTPS reverse proxy.<br />
+			It combines squid as a proxy server with its capabilities of acting as a HTTP / HTTPS reverse proxy.<br />
 			It includes an Exchange-Web-Access (OWA) Assistant.]]></descr>
 		<pkginfolink>https://forum.pfsense.org/index.php/topic,48347.0.html</pkginfolink>
 		<website>http://www.squid-cache.org/</website>
@@ -1179,7 +1179,7 @@
 		<name>squid3-dev</name>
 		<internal_name>squid</internal_name>
 		<descr><![CDATA[High performance web proxy cache.<br />
-			It combines squid as a proxy server with it's capabilities of acting as a HTTP / HTTPS reverse proxy.<br />
+			It combines squid as a proxy server with its capabilities of acting as a HTTP / HTTPS reverse proxy.<br />
 			It includes an Exchange-Web-Access (OWA) Assistant, ssl filtering and antivirus integration via i-cap]]></descr>
 		<pkginfolink>https://forum.pfsense.org/index.php/topic,48347.0.html</pkginfolink>
 		<website>http://www.squid-cache.org/</website>
