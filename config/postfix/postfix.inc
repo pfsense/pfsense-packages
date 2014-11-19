@@ -35,12 +35,15 @@ require_once("functions.inc");
 require_once("pkg-utils.inc");
 require_once("globals.inc");
 
-$pf_version=substr(trim(file_get_contents("/etc/version")),0,3);
-if ($pf_version > 2.0)
-	define('POSTFIX_LOCALBASE', '/usr/pbi/postfix-' . php_uname("m"));
-else
-  define('POSTFIX_LOCALBASE','/usr/local');
-
+$pfs_version = substr(trim(file_get_contents("/etc/version")),0,3);
+if (is_dir('/usr/pbi/postfix-' . php_uname("m"))) {
+	if ($pfs_version == 2.2)
+		define('POSTFIX_LOCALBASE', '/usr/pbi/postfix-' . php_uname("m")."/local");
+	else
+		define('POSTFIX_LOCALBASE', '/usr/pbi/postfix-' . php_uname("m"));
+} else {
+	define('POSTFIX_LOCALBASE','/usr/local');
+}
 
 $uname=posix_uname();
 if ($uname['machine']=='amd64')
