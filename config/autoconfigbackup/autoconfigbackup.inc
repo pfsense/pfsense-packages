@@ -2,7 +2,7 @@
 /* $Id$ */
 /*
     autoconfigbackup.inc
-    Copyright (C) 2008 Scott Ullrich
+    Copyright (C) 2008-2014 Electric Sheep Fencing LP  
 
     Redistribution and use in source and binary forms, with or without
     modification, are permitted provided that the following conditions are met:
@@ -144,9 +144,6 @@ function upload_config($reasonm = "") {
 	 *   This file plugs into config.inc (/usr/local/pkg/parse_config)
 	 *   and runs every time the running firewall filter changes.
 	 * 
-	 *   Written by Scott Ullrich
-	 *   (C) 2008 BSD Perimeter LLC 
-	 *
 	 */
 	
 	if(file_exists("/tmp/acb_nooverwrite")) {

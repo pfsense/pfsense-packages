@@ -7,8 +7,8 @@
 		/* $Id$ */
 		/*
 		   autoconfigbackup.xml 
-		   part of pfSense (http://www.pfSense.com)
-		   Copyright (C) 2008 BSD Perimeter
+		   part of pfSense (https://www.pfsense.org)
+		   Copyright (C) 2008-2014 Electric Sheep Fencing LP 
 		   All rights reserved.
 
 		   Redistribution and use in source and binary forms, with or without
@@ -131,12 +131,6 @@
 			<description>Enter the encryption password again.</description>
 			<fieldname>crypto_password2</fieldname>
 			<type>password</type>
-		</field>
-		<field>
-			<fielddescr>Test connection</fielddescr>
-			<description>Check this box to test the connection to portal.pfsense.org.</description>
-			<fieldname>testconnection</fieldname>
-			<type>checkbox</type>
 		</field>
     </fields>
 	<custom_php_validation_command>
