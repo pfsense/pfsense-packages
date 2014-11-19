@@ -327,9 +327,12 @@ function haproxy_htmllist_js(){
 		var view = document.getElementById("tr_view_" + rowId);
 		var viewdetail = document.getElementById("tr_viewdetail_" + rowId);
 		var edit = document.getElementById("tr_edit_" + rowId);
-		view.parentNode.removeChild(view);
-		viewdetail.parentNode.removeChild(viewdetail);
-		edit.parentNode.removeChild(edit);
+		if (view)
+			view.parentNode.removeChild(view);
+		if (viewdetail)
+			viewdetail.parentNode.removeChild(viewdetail);
+		if (edit)
+			edit.parentNode.removeChild(edit);
 	}
 	function removeRow(el) {
 		var cel;
