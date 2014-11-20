@@ -418,7 +418,7 @@
     </package>
     <package>
       <name>Lightsquid</name>
-      <descr>High perfomance web proxy report. Requires squid.</descr>
+      <descr>High performance web proxy report. Requires squid.</descr>
       <website>http://lightsquid.sf.net/</website>
       <category>Network</category>
       <version>1.7.1 pkg v.1.2</version>
@@ -790,7 +790,7 @@
     </package>
     <package>
       <name>squidGuard</name>
-      <descr>High perfomance web proxy URL filter. Requires proxy Squid package.</descr>
+      <descr>High performance web proxy URL filter. Requires proxy Squid package.</descr>
       <website>http://www.squidGuard.org/</website>
       <maintainer>dv_serg@mail.ru</maintainer>
       <category>Network Management</category>

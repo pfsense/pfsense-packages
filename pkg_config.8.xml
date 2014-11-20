@@ -638,7 +638,7 @@
 	</package>
 	<package>
 		<name>Lightsquid</name>
-		<descr>High perfomance web proxy report (LightSquid). Proxy realtime stat (SQStat). Requires squid HTTP proxy.</descr>
+		<descr>High performance web proxy report (LightSquid). Proxy realtime stat (SQStat). Requires squid HTTP proxy.</descr>
 		<website>http://lightsquid.sf.net/</website>
 		<category>Network Report</category>
 		<version>1.8.2 pkg v.2.33</version>
@@ -1264,7 +1264,7 @@
 	</package>
 	<package>
 		<name>squidGuard</name>
-		<descr>High perfomance web proxy URL filter. Requires proxy Squid 2.x package.</descr>
+		<descr>High performance web proxy URL filter. Requires proxy Squid 2.x package.</descr>
 		<website>http://www.squidGuard.org/</website>
 		<maintainer>dv_serg@mail.ru</maintainer>
 		<category>Network Management</category>
@@ -1289,7 +1289,7 @@
 	</package>
 	<package>
 		<name>squidGuard-devel</name>
-		<descr>High perfomance web proxy URL filter. Requires proxy Squid 2.x package.</descr>
+		<descr>High performance web proxy URL filter. Requires proxy Squid 2.x package.</descr>
 		<website>http://www.squidGuard.org/</website>
 		<maintainer>gugabsd@mundounix.com.br</maintainer>
 		<category>Network Management</category>
@@ -1309,7 +1309,7 @@
 	</package>
 	<package>
 		<name>squidGuard-squid3</name>
-		<descr>High perfomance web proxy URL filter. Requires proxy Squid 3.x package.</descr>
+		<descr>High performance web proxy URL filter. Requires proxy Squid 3.x package.</descr>
 		<website>http://www.squidGuard.org/</website>
 		<maintainer>dv_serg@mail.ru</maintainer>
 		<category>Network Management</category>
