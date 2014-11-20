@@ -138,11 +138,44 @@ $fields_aclSelectionList[2]['colwidth']="35%";
 $fields_aclSelectionList[2]['type']="textbox";
 $fields_aclSelectionList[2]['size']="35";
 
+$interfaces = haproxy_get_bindable_interfaces();
+$interfaces_custom['']['name']="Use custom address:";
+$interfaces = $interfaces_custom + $interfaces;
+
+$fields_externalAddress=array();
+$fields_externalAddress[0]['name']="extaddr";
+$fields_externalAddress[0]['columnheader']="Listen address";
+$fields_externalAddress[0]['colwidth']="25%";
+$fields_externalAddress[0]['type']="select";
+$fields_externalAddress[0]['size']="200px";
+$fields_externalAddress[0]['items']=&$interfaces;
+$fields_externalAddress[1]['name']="extaddr_custom";
+$fields_externalAddress[1]['columnheader']="Custom address";
+$fields_externalAddress[1]['colwidth']="25%";
+$fields_externalAddress[1]['type']="textbox";
+$fields_externalAddress[1]['size']="30";
+$fields_externalAddress[2]['name']="extaddr_port";
+$fields_externalAddress[2]['columnheader']="Port";
+$fields_externalAddress[2]['colwidth']="5%";
+$fields_externalAddress[2]['type']="textbox";
+$fields_externalAddress[2]['size']="5";
+$fields_externalAddress[3]['name']="extaddr_ssl";
+$fields_externalAddress[3]['columnheader']="SSL Offloading";
+$fields_externalAddress[3]['colwidth']="10%";
+$fields_externalAddress[3]['type']="checkbox";
+$fields_externalAddress[3]['size']="50px";
+$fields_externalAddress[4]['name']="extaddr_advanced";
+$fields_externalAddress[4]['columnheader']="Advanced";
+$fields_externalAddress[4]['colwidth']="20%";
+$fields_externalAddress[4]['type']="textbox";
+$fields_externalAddress[4]['size']="30";
+
 if (isset($id) && $a_backend[$id]) {
 	$pconfig['a_acl']=&$a_backend[$id]['ha_acls']['item'];	
 	$pconfig['a_certificates']=&$a_backend[$id]['ha_certificates']['item'];
 	$pconfig['clientcert_ca']=&$a_backend[$id]['clientcert_ca']['item'];
 	$pconfig['clientcert_crl']=&$a_backend[$id]['clientcert_crl']['item'];
+	$pconfig['a_extaddr']=&$a_backend[$id]['a_extaddr']['item'];
 	$pconfig['advanced'] = base64_decode($a_backend[$id]['advanced']);
 	foreach($simplefields as $stat)
 		$pconfig[$stat] = $a_backend[$id][$stat];
@@ -208,6 +241,10 @@ if ($_POST) {
 	$a_acl = haproxy_htmllist_get_values($fields_aclSelectionList);
 	$pconfig['a_acl'] = $a_acl;
 	
+	$a_extaddr = haproxy_htmllist_get_values($fields_externalAddress);
+	$pconfig['a_extaddr'] = $a_extaddr;
+	
+	
 	foreach($a_acl as $acl) {
 		$acl_name = $acl['name'];
 		$acl_value = $acl['value'];
@@ -247,6 +284,7 @@ if ($_POST) {
 		$backend['ha_certificates']['item'] = $a_certificates;
 		$backend['clientcert_ca']['item'] = $a_clientcert_ca;
 		$backend['clientcert_crl']['item'] = $a_clientcert_crl;
+		$backend['a_extaddr']['item'] = $a_extaddr;
 
 		if (isset($id) && $a_backend[$id]) {
 			$a_backend[$id] = $backend;
@@ -275,7 +313,6 @@ include("head.inc");
 if (!isset($_GET['dup']))
 	$excludefrontend = $pconfig['name'];
 $primaryfrontends = get_haproxy_frontends($excludefrontend);
-$interfaces = haproxy_get_bindable_interfaces();
 
 ?>
   <style type="text/css">
@@ -328,6 +365,9 @@ $interfaces = haproxy_get_bindable_interfaces();
 		}
 		if (tableId == 'table_clientcert_crl'){
 			seltext = "<?=haproxy_js_select_options($certs_crl);?>";
+		}
+		if (tableId == 'table_extaddr'){
+			seltext = "<?=haproxy_js_select_options($interfaces);?>";
 		}
 		return seltext;
 	}
@@ -485,6 +525,12 @@ $interfaces = haproxy_get_bindable_interfaces();
 				echo_html_select('extaddr', $interfaces, $pconfig['extaddr']);
 				?>
 				<br />
+			<?
+			$counter=0;
+			$a_extaddr = $pconfig['a_extaddr'];
+			haproxy_htmllist("table_extaddr", $a_extaddr, $fields_externalAddress, true);
+			?>
+				<br />
 				<span class="vexpl">
 					If you want this rule to apply to another IP address than the IP address of the interface chosen above,
 					select it here (you need to define <a href="firewall_virtual_ip.php">Virtual IP</a> addresses on the first).  
@@ -541,7 +587,6 @@ $interfaces = haproxy_get_bindable_interfaces();
 			<td width="22%" valign="top" class="vncell">Access Control lists</td>
 			<td width="78%" class="vtable" colspan="2" valign="top">
 			<?
-			$counter=0;
 			$a_acl = $pconfig['a_acl'];
 			haproxy_htmllist("tableA_acltable", $a_acl, $fields_aclSelectionList, true);
 			?>
@@ -754,6 +799,7 @@ $interfaces = haproxy_get_bindable_interfaces();
 	phparray_to_javascriptarray($fields_caCertificates,"fields_ca",Array('/*','/*/name','/*/type','/*/size','/*/items','/*/items/*','/*/items/*/*','/*/items/*/*/name'));
 	phparray_to_javascriptarray($fields_crlCertificates,"fields_crl",Array('/*','/*/name','/*/type','/*/size','/*/items','/*/items/*','/*/items/*/*','/*/items/*/*/name'));
 	phparray_to_javascriptarray($fields_aclSelectionList,"fields_acltable",Array('/*','/*/name','/*/type','/*/size','/*/items','/*/items/*','/*/items/*/*','/*/items/*/*/name'));
+	phparray_to_javascriptarray($fields_externalAddress,"fields_extaddr",Array('/*','/*/name','/*/type','/*/size','/*/items','/*/items/*','/*/items/*/*','/*/items/*/*/name'));
 ?>
 </script>
 <script type="text/javascript">

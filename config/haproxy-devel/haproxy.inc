@@ -1061,7 +1061,28 @@ function haproxy_writeconf($configpath) {
 			}
 			
 			fwrite ($fd, "{$frontendinfo}");
+			
+			if (isset($bind['a_extaddr'])) {
+				foreach($bind['a_extaddr']['item'] as $extaddr) {
+					if (isset($extaddr['extaddr']) && $extaddr['extaddr'] != "") {
+						$ip = haproxy_interface_ip($extaddr['extaddr']);
+					} else
+						$ip = $extaddr['extaddr_custom'];
+					
+					if ($extaddr['extaddr_ssl'] == 'yes')
+						$ssl = $ssl_info;
+					else
+						$ssl = "";
+					
+					$portsnumeric = group_ports(haproxy_portoralias_to_list($extaddr['extaddr_port']));
+					foreach($portsnumeric as $portnumeric) {
+						$portnumeric = str_replace(":","-",$portnumeric);
+						$listenip .=  "\tbind\t\t\t$ip:{$portnumeric} {$ssl} {$advanced_bind} {$extaddr['extaddr_advanced']}\n";
+					}
+				}
+			}
 			fwrite ($fd, "{$listenip}");
+			
 			if (use_frontend_as_unixsocket($bind['name'])){
 				fwrite ($fd, "\tbind /tmp/haproxy_chroot/{$bind['name']}.socket accept-proxy {$ssl_info} {$advanced_bind}\n");
 			}
