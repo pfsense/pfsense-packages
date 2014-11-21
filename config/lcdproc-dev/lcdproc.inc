@@ -308,7 +308,8 @@
 					$config_text .= "[{$lcdproc_config['driver']}]\n";
 					$config_text .= "driverpath=/usr/local/lib/lcdproc/\n";
 					$config_text .= "ConnectionType={$lcdproc_config['connection_type']}\n";
-					$config_text .= "Device={$realport}\n";
+					if($lcdproc_config['comport'] != "none")
+						$config_text .= "Device={$realport}\n";
 					$config_text .= "Port=0x378\n"; 
 					$config_text .= "Speed=0\n";
 					$config_text .= "Keypad=yes\n";
@@ -502,7 +503,7 @@ EOD;
 				restart_service(LCDPROC_SERVICE_NAME);
 			}			
 		}
-		if((! $lcdproc_config['driver']) || ($lcdproc_config['comport'] == "none")) {
+		if((! $lcdproc_config['driver']) || (! $lcdproc_config['comport'])) {
 			/* no parameters user does not want lcdproc running */
 			/* lets stop the service and remove the rc file */
 			if(file_exists(LCDPROC_RCFILE)) {

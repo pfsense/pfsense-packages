@@ -348,7 +348,9 @@ cd -
 EOD;
 		} else {
 			$rc['start'] = <<<EOD
-/usr/local/bandwidthd/bandwidthd
+cd {$bandwidthd_base_dir}
+{$bandwidthd_runtime_library_env} {$bandwidthd_base_dir}/bandwidthd
+cd -
 EOD;
 		}
 	} else {

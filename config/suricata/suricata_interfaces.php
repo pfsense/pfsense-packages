@@ -60,7 +60,6 @@ $id_gen = count($config['installedpackages']['suricata']['rule']);
 // Get list of configured firewall interfaces
 $ifaces = get_configured_interface_list();
 
-
 if ($_POST['del_x']) {
 	/* delete selected interfaces */
 	if (is_array($_POST['rule'])) {
@@ -79,7 +78,7 @@ if ($_POST['del_x']) {
 		if (empty($a_nat))
 			unset($a_nat);
 
-		write_config();
+		write_config("Suricata pkg: deleted one or more Suricata interfaces.");
 		sleep(2);
 	  
 		/* if there are no ifaces remaining do not create suricata.sh */
@@ -87,7 +86,7 @@ if ($_POST['del_x']) {
 			suricata_create_rc();
 		else {
 			conf_mount_rw();
-			@unlink("{$rcdir}/suricata.sh");
+			@unlink("{$rcdir}suricata.sh");
 			conf_mount_ro();
 		}
 	  
@@ -170,19 +169,22 @@ include_once("head.inc");
 ?>
 
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
+<tbody>
 <tr>
 	<td>
 	<?php
 		$tab_array = array();
-		$tab_array[] = array(gettext("Suricata Interfaces"), true, "/suricata/suricata_interfaces.php");
+		$tab_array[] = array(gettext("Interfaces"), true, "/suricata/suricata_interfaces.php");
 		$tab_array[] = array(gettext("Global Settings"), false, "/suricata/suricata_global.php");
-		$tab_array[] = array(gettext("Update Rules"), false, "/suricata/suricata_download_updates.php");
+		$tab_array[] = array(gettext("Updates"), false, "/suricata/suricata_download_updates.php");
 		$tab_array[] = array(gettext("Alerts"), false, "/suricata/suricata_alerts.php");
-		$tab_array[] = array(gettext("Blocked"), false, "/suricata/suricata_blocked.php");
+		$tab_array[] = array(gettext("Blocks"), false, "/suricata/suricata_blocked.php");
 		$tab_array[] = array(gettext("Pass Lists"), false, "/suricata/suricata_passlist.php");
 		$tab_array[] = array(gettext("Suppress"), false, "/suricata/suricata_suppress.php");
-		$tab_array[] = array(gettext("Logs Browser"), false, "/suricata/suricata_logs_browser.php");
+		$tab_array[] = array(gettext("Logs View"), false, "/suricata/suricata_logs_browser.php");
 		$tab_array[] = array(gettext("Logs Mgmt"), false, "/suricata/suricata_logs_mgmt.php");
+		$tab_array[] = array(gettext("SID Mgmt"), false, "/suricata/suricata_sid_mgmt.php");
+		$tab_array[] = array(gettext("Sync"), false, "/pkg_edit.php?xml=suricata/suricata_sync.xml");
 		display_top_tabs($tab_array, true);
 	?>
 	</td>
@@ -191,7 +193,6 @@ include_once("head.inc");
 	<td>
 	<div id="mainarea">
 	<table id="maintable" class="tabcont" width="100%" border="0" cellpadding="0" cellspacing="0">
-
 		<colgroup>
 			<col width="3%" align="center">
 			<col width="12%">
@@ -230,6 +231,7 @@ include_once("head.inc");
 			</th>
 		</tr>
 		</thead>
+		<tbody>
 		<?php $nnats = $i = 0;
 
 		// Turn on buffering to speed up rendering
@@ -404,6 +406,7 @@ include_once("head.inc");
 			<td>&nbsp;</td>
 			<td colspan="6">
 			<table class="tabcont" width="100%" border="0" cellpadding="1" cellspacing="0">
+				<tbody>
 				<tr>
 					<td colspan="3" class="vexpl"><span class="red"><strong><?php echo gettext("Note:"); ?></strong></span> <br>
 						<?php echo gettext("This is the ") . "<strong>" . gettext("Suricata Menu ") . 
@@ -456,14 +459,17 @@ include_once("head.inc");
 						delete an interface and settings.
 					</td>
 				</tr>
+				</tbody>
 			</table>
 			</td>
 			<td>&nbsp;</td>
 		</tr>
+		</tbody>
 	</table>
 	</div>
 	</td>
 </tr>
+</tbody>
 </table>
 </form>
 

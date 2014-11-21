@@ -64,7 +64,7 @@ $suricata_servers = array (
 	"dns_servers" => "\$HOME_NET", "smtp_servers" => "\$HOME_NET", "http_servers" => "\$HOME_NET",
 	"sql_servers" => "\$HOME_NET", "telnet_servers" => "\$HOME_NET", "dnp3_server" => "\$HOME_NET",
 	"dnp3_client" => "\$HOME_NET", "modbus_server" => "\$HOME_NET", "modbus_client" => "\$HOME_NET",
-	"enip_server" => "\$HOME_NET", "enip_client" => "\$HOME_NET",
+	"enip_server" => "\$HOME_NET", "enip_client" => "\$HOME_NET", "ftp_servers" => "\$HOME_NET", "ssh_servers" => "\$HOME_NET", 
 	"aim_servers" => "64.12.24.0/23,64.12.28.0/23,64.12.161.0/24,64.12.163.0/24,64.12.200.0/24,205.188.3.0/24,205.188.5.0/24,205.188.7.0/24,205.188.9.0/24,205.188.153.0/24,205.188.179.0/24,205.188.248.0/24"
 );
 
@@ -74,6 +74,7 @@ if(is_array($config['system']['ssh']) && isset($config['system']['ssh']['port'])
 else
         $ssh_port = "22";
 $suricata_ports = array(
+	"ftp_ports" => "21", 
 	"http_ports" => "80", 
 	"oracle_ports" => "1521", 
 	"ssh_ports" => $ssh_port, 
@@ -127,10 +128,15 @@ if ($_POST) {
 
 		/* Update the suricata.yaml file for this interface. */
 		$rebuild_rules = false;
+		conf_mount_rw();
 		suricata_generate_yaml($a_nat[$id]);
+		conf_mount_ro();
 
 		/* Soft-restart Suricaa to live-load new variables. */
 		suricata_reload_config($a_nat[$id]);
+
+		/* Sync to configured CARP slaves if any are enabled */
+		suricata_sync_on_changes();
 
 		/* after click go to this page */
 		header( 'Expires: Sat, 26 Jul 1997 05:00:00 GMT' );
@@ -166,18 +172,21 @@ if ($savemsg)
 </script>
 <form action="suricata_define_vars.php" method="post" name="iform" id="iform">
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
+<tbody>
 <tr><td>
 <?php
 	$tab_array = array();
-	$tab_array[] = array(gettext("Suricata Interfaces"), false, "/suricata/suricata_interfaces.php");
+	$tab_array[] = array(gettext("Interfaces"), true, "/suricata/suricata_interfaces.php");
 	$tab_array[] = array(gettext("Global Settings"), false, "/suricata/suricata_global.php");
-	$tab_array[] = array(gettext("Update Rules"), false, "/suricata/suricata_download_updates.php");
+	$tab_array[] = array(gettext("Updates"), false, "/suricata/suricata_download_updates.php");
 	$tab_array[] = array(gettext("Alerts"), false, "/suricata/suricata_alerts.php?instance={$id}");
-	$tab_array[] = array(gettext("Blocked"), false, "/suricata/suricata_blocked.php");
+	$tab_array[] = array(gettext("Blocks"), false, "/suricata/suricata_blocked.php");
 	$tab_array[] = array(gettext("Pass Lists"), false, "/suricata/suricata_passlist.php");
 	$tab_array[] = array(gettext("Suppress"), false, "/suricata/suricata_suppress.php");
-	$tab_array[] = array(gettext("Logs Browser"), false, "/suricata/suricata_logs_browser.php?instance={$id}");
+	$tab_array[] = array(gettext("Logs View"), false, "/suricata/suricata_logs_browser.php?instance={$id}");
 	$tab_array[] = array(gettext("Logs Mgmt"), false, "/suricata/suricata_logs_mgmt.php");
+	$tab_array[] = array(gettext("SID Mgmt"), false, "/suricata/suricata_sid_mgmt.php");
+	$tab_array[] = array(gettext("Sync"), false, "/pkg_edit.php?xml=suricata/suricata_sync.xml");
 	display_top_tabs($tab_array, true);
 	echo '</td></tr>';
 	echo '<tr><td class="tabnavtbl">';
@@ -196,6 +205,7 @@ if ($savemsg)
 <tr>
 		<td><div id="mainarea">
 		<table id="maintable" class="tabcont" width="100%" border="0" cellpadding="6" cellspacing="0">
+		<tbody>
 		<tr>
 			<td colspan="2" valign="top" class="listtopic"><?php echo gettext("Define Servers (IP variables)"); ?></td>
 		</tr>
@@ -254,9 +264,10 @@ if ($savemsg)
 				<input name="id" type="hidden" value="<?=$id;?>">
 			</td>
 		</tr>
+		</tbody>
 	</table>
 </div>
-</td></tr>
+</td></tr></tbody>
 </table>
 </form>
 <script type="text/javascript">

@@ -63,6 +63,13 @@
 			<required/>
 		</field>
 		<field>
+			<fielddescr>Allow Arguments (dont_blame_nrpe)</fielddescr>
+			<fieldname>dont_blame_nrpe</fieldname>
+			<description>Check this to enable accept NRPE arguments (Default: 0)</description>
+			<type>checkbox</type>
+		</field>
+
+		<field>
 			<type>listtopic</type>
 			<name>Commands</name>
 			<fieldname>temp</fieldname>
@@ -109,7 +116,7 @@
 					<required/>
 				</rowhelperfield>
 				<rowhelperfield>
-					<fielddescr>Extra Options</fielddescr>
+					<fielddescr>Extra Options (Example: -s Z \$ARG1\$ \$ARG2\$)</fielddescr>
 					<fieldname>extra</fieldname>
 					<description>Warning! Use at your own risk, incorrect settings here may prevent NRPE from starting!</description>
 					<type>input</type>

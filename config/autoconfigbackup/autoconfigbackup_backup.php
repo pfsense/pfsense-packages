@@ -29,7 +29,7 @@
 
 require("globals.inc");
 require("guiconfig.inc");
-require("/usr/local/pkg/autoconfigbackup.inc");
+require("autoconfigbackup.inc");
 
 $pf_version=substr(trim(file_get_contents("/etc/version")),0,3);
 if ($pf_version < 2.0)

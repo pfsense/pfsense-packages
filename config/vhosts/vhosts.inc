@@ -331,7 +331,7 @@ function vhosts_sync_package_php()
 					if (strlen($rowhelper['certificate']) > 0 && strlen($rowhelper['privatekey']) > 0) {
 						$pem_file = "/var/etc/cert-vhosts-".$ipaddress."-".$port.".pem";
 						$fout = fopen($pem_file,"w");
-						fwrite($fout, $certificate.$privatekey);
+						fwrite($fout, $certificate.PHP_EOL.$privatekey);
 						fclose($fout);
 						$tmp .= "		ssl.pemfile = \"".$pem_file."\"\n";
 						$tmp .= "		ssl.engine = \"enable\"\n";
@@ -491,7 +491,6 @@ function vhosts_sync_package_php()
 					$tmp .= "\n";
 					$tmp .= "## modules to load\n";
 					$tmp .= "server.modules =   (\n";
-					$tmp .= "				  \"mod_accesslog\",\n";
 					$tmp .= "				  \"mod_access\", \"mod_accesslog\",\n";
 					$tmp .= "                  \"mod_fastcgi\", \"mod_cgi\",\"mod_rewrite\"\n";
 					$tmp .= "				)\n";
@@ -615,7 +614,7 @@ function vhosts_sync_package_php()
 						$pem_file = "/var/etc/cert-vhosts-".$ipaddress."-".$port.".pem";
 						$fout = fopen($pem_file,"w");
 						//echo $certificate; //exit;
-						fwrite($fout, $certificate.$privatekey);
+						fwrite($fout, $certificate.PHP_EOL.$privatekey);
 						fclose($fout);
 						$tmp .= "## ssl configuration\n";
 						$tmp .= "ssl.pemfile = \"".$pem_file."\"\n";

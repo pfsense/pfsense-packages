@@ -44,6 +44,8 @@ global $config, $g;
 
 $suricatadir = SURICATADIR;
 $suricatalogdir = SURICATALOGDIR;
+$sidmodspath = SID_MODS_PATH;
+$iprep_path = IPREP_PATH;
 $rcdir = RCFILEPREFIX;
 $suricata_rules_upd_log = RULES_UPD_LOGFILE;
 $suri_pf_table = SURICATA_PF_TABLE;
@@ -71,9 +73,9 @@ sleep(1);
 unlink_if_exists("{$g['varrun_path']}/barnyard2_*.pid");
 
 /* Remove the Suricata cron jobs. */
-install_cron_job("/usr/bin/nice -n20 /usr/local/bin/php -f /usr/local/www/suricata/suricata_check_for_rule_updates.php", false);
-install_cron_job("/usr/bin/nice -n20 /usr/local/bin/php -f /usr/local/pkg/suricata/suricata_check_cron_misc.inc", false);
-install_cron_job("pfctl -t {$suri_pf_table} -T expire" , false);
+install_cron_job("suricata_check_for_rule_updates.php", false);
+install_cron_job("suricata_check_cron_misc.inc", false);
+install_cron_job("{$suri_pf_table}" , false);
 
 /* See if we are to keep Suricata log files on uninstall */
 if ($config['installedpackages']['suricata']['config'][0]['clearlogs'] == 'on') {
@@ -81,6 +83,9 @@ if ($config['installedpackages']['suricata']['config'][0]['clearlogs'] == 'on') 
 	@unlink("{$suricata_rules_upd_log}");
 	mwexec("/bin/rm -rf {$suricatalogdir}");
 }
+
+// Mount filesystem read-write to remove our files
+conf_mount_rw();
 
 /* Remove the Suricata GUI app directories */
 mwexec("/bin/rm -rf /usr/local/pkg/suricata");
@@ -105,11 +110,14 @@ if (!empty($widgets)) {
 		}
 	}
 	$config['widgets']['sequence'] = implode(",", $widgetlist);
-	write_config();
+	write_config("Suricata pkg: remove Suricata Dashboard Widget on package deinstall.");
 }
 @unlink("/usr/local/www/widgets/include/widget-suricata.inc");
 @unlink("/usr/local/www/widgets/widgets/suricata_alerts.widget.php");
 @unlink("/usr/local/www/widgets/javascript/suricata_alerts.js");
+
+// Finished with filesystem mods so remount it read-only
+conf_mount_ro();
 
 /* Keep this as a last step */
 if ($config['installedpackages']['suricata']['config'][0]['forcekeepsettings'] != 'on') {
@@ -118,6 +126,8 @@ if ($config['installedpackages']['suricata']['config'][0]['forcekeepsettings'] !
 	unset($config['installedpackages']['suricatasync']);
 	@unlink("{$suricata_rules_upd_log}");
 	mwexec("/bin/rm -rf {$suricatalogdir}");
+	mwexec("/bin/rm -rf {$sidmodspath}");
+	mwexec("/bin/rm -rf {$iprep_path}");
 	log_error(gettext("[Suricata] The package has been removed from this system..."));
 }
 

@@ -9,49 +9,40 @@
 /*
     suricata.xml
     part of the Suricata package for pfSense
+    Copyright (C) 2014 Bill meeks
 
-   Significant portions are based on original work done for the Snort
-   package for pfSense from the following contributors:
-   
-   Copyright (C) 2005 Bill Marquette <bill.marquette@gmail.com>.
-   Copyright (C) 2003-2004 Manuel Kasper <mk@neon1.net>.
-   Copyright (C) 2006 Scott Ullrich
-   Copyright (C) 2009 Robert Zelaya Sr. Developer
-   Copyright (C) 2012 Ermal Luci
-   All rights reserved.
-  
-   Adapted for Suricata by:
-   Copyright (C) 2014 Bill Meeks
-   All rights reserved.
-  
-   Redistribution and use in source and binary forms, with or without
-   modification, are permitted provided that the following conditions are met:
-
-   1. Redistributions of source code must retain the above copyright notice,
-   this list of conditions and the following disclaimer.
-  
-   2. Redistributions in binary form must reproduce the above copyright
-   notice, this list of conditions and the following disclaimer in the
-   documentation and/or other materials provided with the distribution.
-  
-   THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
-   INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
-   AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
-   AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
-   OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-   SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-   INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-   CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-   ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-   POSSIBILITY OF SUCH DAMAGE.
+    All rights reserved.            
 			                                                      */
+/* ========================================================================== */
+/*
+    Redistribution and use in source and binary forms, with or without
+    modification, are permitted provided that the following conditions are met:
+
+     1. Redistributions of source code MUST retain the above copyright notice,
+        this list of conditions and the following disclaimer.
+
+     2. Redistributions in binary form must reproduce the above copyright
+        notice, this list of conditions and the following disclaimer in the
+        documentation and/or other materials provided with the distribution.
+
+    THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
+    INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+    AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+    AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+    OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+    INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+    POSSIBILITY OF SUCH DAMAGE.
+                                                                              */
 /* ========================================================================== */
 	]]>
 	</copyright>
 	<description>Suricata IDS/IPS Package</description>
 	<requirements>None</requirements>
 	<name>suricata</name>
-	<version>1.4.6 pkg v1.0.2</version>
+	<version>2.0.3 pkg v2.0.2</version>
 	<title>Services: Suricata IDS</title>
 	<include_file>/usr/local/pkg/suricata/suricata.inc</include_file>
 	<menu>
@@ -77,7 +68,17 @@
 		<chmod>0755</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
+		<item>https://packages.pfsense.org/packages/config/suricata/suricata_sync.xml</item>
+		<prefix>/usr/local/pkg/suricata/</prefix>
+		<chmod>0755</chmod>
+	</additional_files_needed>
+	<additional_files_needed>
 		<item>https://packages.pfsense.org/packages/config/suricata/suricata_check_cron_misc.inc</item>
+		<prefix>/usr/local/pkg/suricata/</prefix>
+		<chmod>0755</chmod>
+	</additional_files_needed>
+	<additional_files_needed>
+		<item>https://packages.pfsense.org/packages/config/suricata/suricata_check_for_rule_updates.php</item>
 		<prefix>/usr/local/pkg/suricata/</prefix>
 		<chmod>0755</chmod>
 	</additional_files_needed>
@@ -88,7 +89,22 @@
 	</additional_files_needed>
 	<additional_files_needed>
 		<item>https://packages.pfsense.org/packages/config/suricata/suricata_generate_yaml.php</item>
-		<prefix>/usr/local/www/suricata/</prefix>
+		<prefix>/usr/local/pkg/suricata/</prefix>
+		<chmod>0755</chmod>
+	</additional_files_needed>
+	<additional_files_needed>
+		<item>https://packages.pfsense.org/packages/config/suricata/suricata_migrate_config.php</item>
+		<prefix>/usr/local/pkg/suricata/</prefix>
+		<chmod>0755</chmod>
+	</additional_files_needed>
+	<additional_files_needed>
+		<item>https://packages.pfsense.org/packages/config/suricata/suricata_post_install.php</item>
+		<prefix>/usr/local/pkg/suricata/</prefix>
+		<chmod>0755</chmod>
+	</additional_files_needed>
+	<additional_files_needed>
+		<item>https://packages.pfsense.org/packages/config/suricata/suricata_uninstall.php</item>
+		<prefix>/usr/local/pkg/suricata/</prefix>
 		<chmod>0755</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
@@ -118,11 +134,6 @@
 	</additional_files_needed>
 	<additional_files_needed>
 		<item>https://packages.pfsense.org/packages/config/suricata/suricata_download_rules.php</item>
-		<prefix>/usr/local/www/suricata/</prefix>
-		<chmod>0755</chmod>
-	</additional_files_needed>
-	<additional_files_needed>
-		<item>https://packages.pfsense.org/packages/config/suricata/suricata_check_for_rule_updates.php</item>
 		<prefix>/usr/local/www/suricata/</prefix>
 		<chmod>0755</chmod>
 	</additional_files_needed>
@@ -182,6 +193,11 @@
 		<chmod>0755</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
+		<item>https://packages.pfsense.org/packages/config/suricata/suricata_sid_mgmt.php</item>
+		<prefix>/usr/local/www/suricata/</prefix>
+		<chmod>0755</chmod>
+	</additional_files_needed>
+	<additional_files_needed>
 		<item>https://packages.pfsense.org/packages/config/suricata/suricata_list_view.php</item>
 		<prefix>/usr/local/www/suricata/</prefix>
 		<chmod>0755</chmod>
@@ -197,11 +213,6 @@
 		<chmod>0755</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
-		<item>https://packages.pfsense.org/packages/config/suricata/suricata_uninstall.php</item>
-		<prefix>/usr/local/www/suricata/</prefix>
-		<chmod>0755</chmod>
-	</additional_files_needed>
-	<additional_files_needed>
 		<item>https://packages.pfsense.org/packages/config/suricata/suricata_define_vars.php</item>
 		<prefix>/usr/local/www/suricata/</prefix>
 		<chmod>0755</chmod>
@@ -212,9 +223,19 @@
 		<chmod>0755</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
-		<item>https://packages.pfsense.org/packages/config/suricata/suricata_post_install.php</item>
-		<prefix>/usr/local/www/suricata/</prefix>
-		<chmod>0755</chmod>
+		<prefix>/usr/local/www/widgets/javascript/</prefix>
+		<chmod>0644</chmod>
+		<item>https://packages.pfsense.org/packages/config/suricata/suricata_alerts.js</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/www/widgets/widgets/</prefix>
+		<chmod>0644</chmod>
+		<item>https://packages.pfsense.org/packages/config/suricata/suricata_alerts.widget.php</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/www/widgets/include/</prefix>
+		<chmod>0644</chmod>
+		<item>https://packages.pfsense.org/packages/config/suricata/widget-suricata.inc</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/www/suricata/</prefix>
@@ -237,19 +258,19 @@
 		<item>https://packages.pfsense.org/packages/config/suricata/suricata_select_alias.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
-		<prefix>/usr/local/www/widgets/javascript/</prefix>
+		<prefix>/var/db/suricata/sidmods/</prefix>
 		<chmod>0644</chmod>
-		<item>https://packages.pfsense.org/packages/config/suricata/suricata_alerts.js</item>
+		<item>https://packages.pfsense.org/packages/config/suricata/disablesid-sample.conf</item>
 	</additional_files_needed>
 	<additional_files_needed>
-		<prefix>/usr/local/www/widgets/widgets/</prefix>
+		<prefix>/var/db/suricata/sidmods/</prefix>
 		<chmod>0644</chmod>
-		<item>https://packages.pfsense.org/packages/config/suricata/suricata_alerts.widget.php</item>
+		<item>https://packages.pfsense.org/packages/config/suricata/enablesid-sample.conf</item>
 	</additional_files_needed>
 	<additional_files_needed>
-		<prefix>/usr/local/www/widgets/include/</prefix>
+		<prefix>/var/db/suricata/sidmods/</prefix>
 		<chmod>0644</chmod>
-		<item>https://packages.pfsense.org/packages/config/suricata/widget-suricata.inc</item>
+		<item>https://packages.pfsense.org/packages/config/suricata/modifysid-sample.conf</item>
 	</additional_files_needed>
 	<!-- configpath gets expanded out automatically and config items will be stored in that location -->
 	<configpath>['installedpackages']['suricata']</configpath>
@@ -259,12 +280,12 @@
 	</fields>
 	<custom_php_install_command>
 		<![CDATA[
-		include_once("/usr/local/www/suricata/suricata_post_install.php");
+		include_once("/usr/local/pkg/suricata/suricata_post_install.php");
 		]]>
 	</custom_php_install_command>
 	<custom_php_deinstall_command>
 		<![CDATA[
-		include_once("/usr/local/www/suricata/suricata_uninstall.php");
+		include_once("/usr/local/pkg/suricata/suricata_uninstall.php");
 		]]>
 	</custom_php_deinstall_command>
 	<custom_php_resync_config_command>

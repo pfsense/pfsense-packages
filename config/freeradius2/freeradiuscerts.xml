@@ -98,7 +98,7 @@
 	</tabs>
 	<fields>
 		<field>
-			<name>GENERAL CONFIGURATION</name>
+			<name>General Configuration</name>
 			<type>listtopic</type>
 		</field>
 		<field>

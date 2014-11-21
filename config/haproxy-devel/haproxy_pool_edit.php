@@ -46,6 +46,10 @@ if (isset($_POST['id']))
 	$id = $_POST['id'];
 else
 	$id = $_GET['id'];
+	
+$tmp = get_backend_id($id);
+if (is_numeric($tmp))
+	$id = $tmp;
 
 if (isset($_GET['dup']))
 	$id = $_GET['dup'];
@@ -53,57 +57,120 @@ if (isset($_GET['dup']))
 global $simplefields;
 $simplefields = array(
 "name","balance","transparent_clientip","transparent_interface",
-"check_type","checkinter","httpcheck_method","monitor_uri","monitor_httpversion","monitor_username","monitor_domain","monitor_agentport",
+"check_type","checkinter","log-health-checks","httpcheck_method","monitor_uri","monitor_httpversion","monitor_username","monitor_domain","monitor_agentport",
 "agent_check","agent_port","agent_inter",
 "connection_timeout","server_timeout","retries",
 "stats_enabled","stats_username","stats_password","stats_uri","stats_scope","stats_realm","stats_admin","stats_node","stats_desc","stats_refresh",
 "persist_stick_expire","persist_stick_tablesize","persist_stick_length","persist_stick_cookiename","persist_sticky_type",
 "persist_cookie_enabled","persist_cookie_name","persist_cookie_mode","persist_cookie_cachable",
-"strict_transport_security"
+"strict_transport_security","cookie_attribute_secure"
 );
+
+$primaryfrontends = get_haproxy_frontends();
+$none = array();
+$none['']['name']="Address+Port:";
+$primaryfrontends = $none + $primaryfrontends;
 
 $fields_servers=array();
 $fields_servers[0]['name']="status";
 $fields_servers[0]['columnheader']="Mode";
 $fields_servers[0]['colwidth']="5%";
 $fields_servers[0]['type']="select";
-$fields_servers[0]['size']="5";
+$fields_servers[0]['size']="70px";
 $fields_servers[0]['items']=&$a_servermodes;
 $fields_servers[1]['name']="name";
 $fields_servers[1]['columnheader']="Name";
 $fields_servers[1]['colwidth']="20%";
 $fields_servers[1]['type']="textbox";
 $fields_servers[1]['size']="30";
-$fields_servers[2]['name']="address";
-$fields_servers[2]['columnheader']="Address";
-$fields_servers[2]['colwidth']="10%";
-$fields_servers[2]['type']="textbox";
-$fields_servers[2]['size']="20";
-$fields_servers[3]['name']="port";
-$fields_servers[3]['columnheader']="Port";
-$fields_servers[3]['colwidth']="5%";
+$fields_servers[2]['name']="forwardto";
+$fields_servers[2]['columnheader']="Forwardto";
+$fields_servers[2]['colwidth']="15%";
+$fields_servers[2]['type']="select";
+$fields_servers[2]['size']="100px";
+$fields_servers[2]['items']=&$primaryfrontends;
+$fields_servers[3]['name']="address";
+$fields_servers[3]['columnheader']="Address";
+$fields_servers[3]['colwidth']="10%";
 $fields_servers[3]['type']="textbox";
-$fields_servers[3]['size']="5";
-$fields_servers[4]['name']="ssl";
-$fields_servers[4]['columnheader']="SSL";
+$fields_servers[3]['size']="20";
+$fields_servers[4]['name']="port";
+$fields_servers[4]['columnheader']="Port";
 $fields_servers[4]['colwidth']="5%";
-$fields_servers[4]['type']="checkbox";
-$fields_servers[4]['size']="30";
-$fields_servers[5]['name']="weight";
-$fields_servers[5]['columnheader']="Weight";
-$fields_servers[5]['colwidth']="8%";
-$fields_servers[5]['type']="textbox";
-$fields_servers[5]['size']="5";
-$fields_servers[6]['name']="cookie";
-$fields_servers[6]['columnheader']="Cookie";
-$fields_servers[6]['colwidth']="10%";
+$fields_servers[4]['type']="textbox";
+$fields_servers[4]['size']="5";
+$fields_servers[5]['name']="ssl";
+$fields_servers[5]['columnheader']="SSL";
+$fields_servers[5]['colwidth']="5%";
+$fields_servers[5]['type']="checkbox";
+$fields_servers[5]['size']="30";
+$fields_servers[6]['name']="weight";
+$fields_servers[6]['columnheader']="Weight";
+$fields_servers[6]['colwidth']="8%";
 $fields_servers[6]['type']="textbox";
-$fields_servers[6]['size']="10";
-$fields_servers[7]['name']="advanced";
-$fields_servers[7]['columnheader']="Advanced";
-$fields_servers[7]['colwidth']="15%";
-$fields_servers[7]['type']="textbox";
-$fields_servers[7]['size']="20";
+$fields_servers[6]['size']="5";
+
+$listitem_none['']['name']="None";
+
+$certs_ca = haproxy_get_certificates('ca');
+$certs_ca = $listitem_none + $certs_ca;
+$certs_client = haproxy_get_certificates('server,user');
+$certs_client = $listitem_none + $certs_client;
+$certs_crl = haproxy_get_crls();
+$certs_crl = $listitem_none + $certs_crl;
+
+$fields_servers_details=array();
+$fields_servers_details[0]['name']="sslserververify";
+$fields_servers_details[0]['columnheader']="Check certificate";
+$fields_servers_details[0]['description']="SSL servers only, The server certificate will be verified against the CA and CRL certificate configured below.";
+$fields_servers_details[0]['colwidth']="5%";
+$fields_servers_details[0]['type']="checkbox";
+$fields_servers_details[0]['size']="5";
+$fields_servers_details[1]['name']="verifyhost";
+$fields_servers_details[1]['columnheader']="Certificate check CN";
+$fields_servers_details[1]['description']="SSL servers only, when set, must match the hostnames in the subject and subjectAlternateNames of the certificate provided by the server.";
+$fields_servers_details[1]['colwidth']="5%";
+$fields_servers_details[1]['type']="textbox";
+$fields_servers_details[1]['size']="50";
+$fields_servers_details[2]['name']="ssl-server-ca";
+$fields_servers_details[2]['columnheader']="CA";
+$fields_servers_details[2]['description']="SSL servers only, Select the CA authority to check the server certificate against.";
+$fields_servers_details[2]['colwidth']="15%";
+$fields_servers_details[2]['type']="select";
+$fields_servers_details[2]['size']="200px";
+$fields_servers_details[2]['items']=$certs_ca;
+$fields_servers_details[3]['name']="ssl-server-crl";
+$fields_servers_details[3]['columnheader']="CRL";
+$fields_servers_details[3]['description']="SSL servers only, Select the CRL to check revoked certificates.";
+$fields_servers_details[3]['colwidth']="15%";
+$fields_servers_details[3]['type']="select";
+$fields_servers_details[3]['size']="200px";
+$fields_servers_details[3]['items']=$certs_crl;
+$fields_servers_details[4]['name']="ssl-server-clientcert";
+$fields_servers_details[4]['columnheader']="Client certificate";
+$fields_servers_details[4]['description']="SSL servers only, This certificate will be sent if the server send a client certificate request.";
+$fields_servers_details[4]['colwidth']="15%";
+$fields_servers_details[4]['type']="select";
+$fields_servers_details[4]['size']="200px";
+$fields_servers_details[4]['items']=$certs_client;
+$fields_servers_details[5]['name']="cookie";
+$fields_servers_details[5]['columnheader']="Cookie";
+$fields_servers_details[5]['description']="Persistence only, Used to identify server when cookie persistence is configured for the backend.";
+$fields_servers_details[5]['colwidth']="10%";
+$fields_servers_details[5]['type']="textbox";
+$fields_servers_details[5]['size']="10";
+$fields_servers_details[6]['name']="maxconn";
+$fields_servers_details[6]['columnheader']="Max conn";
+$fields_servers_details[6]['description']="Tuning, If the number of incoming concurrent requests goes higher than this value, they will be queued";
+$fields_servers_details[6]['colwidth']="15%";
+$fields_servers_details[6]['type']="textbox";
+$fields_servers_details[6]['size']="10";
+$fields_servers_details[7]['name']="advanced";
+$fields_servers_details[7]['columnheader']="Advanced";
+$fields_servers_details[7]['description']="Advanced, Allows for adding custom HAProxy settings to the server. These are passed as written, use escaping where needed.";
+$fields_servers_details[7]['colwidth']="15%";
+$fields_servers_details[7]['type']="textbox";
+$fields_servers_details[7]['size']="80";
 
 if (isset($id) && $a_pools[$id]) {
 	$pconfig['advanced'] = base64_decode($a_pools[$id]['advanced']);
@@ -128,16 +195,17 @@ if ($_POST) {
 	
 	$reqdfields = explode(" ", "name");
 	$reqdfieldsn = explode(",", "Name");		
-	do_input_validation($_POST, $reqdfields, $reqdfieldsn, &$input_errors);
+
+	do_input_validation($_POST, $reqdfields, $reqdfieldsn, $input_errors);
 
 	if ($_POST['stats_enabled']) {
 		$reqdfields = explode(" ", "name stats_uri");
 		$reqdfieldsn = explode(",", "Name,Stats Uri");		
-		do_input_validation($_POST, $reqdfields, $reqdfieldsn, &$input_errors);
+		do_input_validation($_POST, $reqdfields, $reqdfieldsn, $input_errors);
 		if ($_POST['stats_username']) {
 			$reqdfields = explode(" ", "stats_password stats_realm");
 			$reqdfieldsn = explode(",", "Stats Password,Stats Realm");		
-			do_input_validation($_POST, $reqdfields, $reqdfieldsn, &$input_errors);
+			do_input_validation($_POST, $reqdfields, $reqdfieldsn, $input_errors);
 		}
 	}
 	
@@ -172,7 +240,7 @@ if ($_POST) {
 		if (($_POST['name'] == $config['installedpackages']['haproxy']['ha_pools']['item'][$i]['name']) && ($i != $id))
 			$input_errors[] = "This pool name has already been used.  Pool names must be unique.";
 
-	$a_servers = haproxy_htmllist_get_values($fields_servers);
+	$a_servers = haproxy_htmllist_get_values(array_merge($fields_servers,$fields_servers_details));
 	foreach($a_servers as $server){
 		$server_name    = $server['name'];
 		$server_address = $server['address'];
@@ -182,8 +250,14 @@ if ($_POST) {
 		if (preg_match("/[^a-zA-Z0-9\.\-_]/", $server_name))
 			$input_errors[] = "The field 'Name' contains invalid characters.";
 
-		if (!is_ipaddr($server_address) && !is_hostname($server_address))
-			$input_errors[] = "The field 'Address' is not a valid ip address or hostname.";
+		if (!isset($server['forwardto']) || $server['forwardto'] == "") {
+			if (!is_ipaddr($server_address) && !is_hostname($server_address) && !haproxy_is_frontendname($server_address))
+				$input_errors[] = "The field 'Address' for server $server_name is not a valid ip address or hostname." . $server_address;
+		} else {
+			if ( ($server_address && $server_address != "") || ($server_port && !is_numeric($server_port))) {
+				$input_errors[] = "'Address' and 'port' should be empty when a 'Forwardto' frontend is chosen other than 'Address+Port'.";
+			}
+		}
 
 		if (!preg_match("/.{2,}/", $server_name))
 			$input_errors[] = "The field 'Name' is required (and must be at least 2 characters).";
@@ -198,7 +272,7 @@ if ($_POST) {
 	if ($_POST['strict_transport_security'] !== "" && !is_numeric($_POST['strict_transport_security']))
 		$input_errors[] = "The field 'Strict-Transport-Security' is not empty or a number.";
 
-	if (!$input_errors) {
+//	if (!$input_errors) {
 		$pool = array();
 		if(isset($id) && $a_pools[$id])
 			$pool = $a_pools[$id];
@@ -233,7 +307,7 @@ if ($_POST) {
 		} else {
 			$a_pools[] = $pool;
 		}
-
+	if (!isset($input_errors)) {
 		if ($changecount > 0) {
 			touch($d_haproxyconfdirty_path);
 			write_config($changedesc);			
@@ -250,10 +324,6 @@ if ($_POST) {
 	$pconfig['a_servers']=&$a_pools[$id]['ha_servers']['item'];	
 }
 
-$pf_version=substr(trim(file_get_contents("/etc/version")),0,3);
-if ($pf_version < 2.0)
-	$one_two = true;
-
 $closehead = false;
 $pgtitle = "HAProxy: Backend server pool: Edit";
 include("head.inc");
@@ -265,6 +335,7 @@ foreach($simplefields as $field){
 
 ?>
   <style type="text/css">
+	.tableA_servers_details_visible{display:none;}
 	.haproxy_stats_visible{display:none;}
 	.haproxy_check_enabled{display:none;}
 	.haproxy_check_http{display:none;}
@@ -281,8 +352,11 @@ foreach($simplefields as $field){
 </head>
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">
 <script type="text/javascript">
-	function htmllist_get_select_options(tableId) {
-		return "<?=haproxy_js_select_options($a_servermodes);?>";
+	function htmllist_get_select_options(tableId, fieldname) {
+		if (fieldname == 'forwardto')
+			return "<?=haproxy_js_select_options($primaryfrontends);?>";
+		else
+			return "<?=haproxy_js_select_options($a_servermodes);?>";
 	}
 	
 	function clearcombo(){
@@ -320,6 +394,7 @@ foreach($simplefields as $field){
 	function updatevisibility()
 	{
 		d = document;
+		setCSSdisplay(".tableA_servers_details_visible", server_advanced_options_visible.checked);
 		setCSSdisplay(".haproxy_stats_visible", stats_enabled.checked);
 		setCSSdisplay(".haproxy_cookie_visible", persist_cookie_enabled.checked);
 		
@@ -364,10 +439,7 @@ foreach($simplefields as $field){
 	}
 </script>
 <?php include("fbegin.inc"); ?>
-<?php if ($input_errors) print_input_errors($input_errors); ?>
-<?php if($one_two): ?>
-<p class="pgtitle"><?=$pgtitle?></p>
-<?php endif; ?>
+<?php if (isset($input_errors)) print_input_errors($input_errors); ?>
 	<form action="haproxy_pool_edit.php" method="post" name="iform" id="iform">
 	
 	<table width="100%" border="0" cellpadding="0" cellspacing="0">
@@ -390,14 +462,14 @@ foreach($simplefields as $field){
 			</td>
 		</tr>
 		<tr align="left">
-			<td class="vncell" colspan="3"><strong>Server list</strong>
+			<td class="vncell" colspan="3"><strong>Server list</strong><input id="server_advanced_options_visible" name="server_advanced_options_visible" type='checkbox' onclick="updatevisibility();">Show advanced options(servers need to first be saved to configure these settings)</input>
 			<span style="float:right;">
 			Toggle serverlist help. <a onclick="toggleCSSdisplay('.haproxy_help_serverlist');" title="<?php echo gettext("Help"); ?>"><img style="vertical-align:middle" src="/themes/<?php echo $g['theme']; ?>/images/icons/icon_help.gif" border="0" alt="help" /></a>
 			</span>
 			<?
 			$counter=0;
 			$a_servers = $pconfig['a_servers'];
-			haproxy_htmllist("tableA_servers", $a_servers, $fields_servers);
+			haproxy_htmllist("tableA_servers", $a_servers, $fields_servers, null, $fields_servers_details);
 			?>
 			<table class="haproxy_help_serverlist" style="border:1px dashed green" cellspacing="0">
 			<tr><td class="vncell">
@@ -510,10 +582,11 @@ foreach($simplefields as $field){
 				</div>
 				<br/>
 				Connect transparently to the backend server's so the connection seams to come straight from the client ip address.
-				For proper workings this requires the reply's traffic to pass through pfSense by means of correct routing.
-				(uses the option "source 0.0.0.0 usesrc clientip")
+				To work properly this requires the reply traffic to pass through pfSense by means of correct routing.<br/>
+				When using IPv6 only routable ip addresses can be used, host names or link-local addresses (FE80) will not work.<br/>				
+				(uses the option "source 0.0.0.0 usesrc clientip" or "source ipv6@ usesrc clientip")
 				<br/><br/>
-				Note : When this is enabled for a single backend HAProxy will run as 'root' instead of chrooting to a lower privileged user, this reduces security in case of a a bit.
+				Note : When this is enabled for any backend HAProxy will run as 'root' instead of chrooting to a lower privileged user, this reduces security in case a vulnerability is found.
 			</td>
 		</tr>
 		<tr align="left">
@@ -552,6 +625,15 @@ foreach($simplefields as $field){
 			<td width="78%" class="vtable" colspan="2">
 				<input name="checkinter" type="text" <?if(isset($pconfig['checkinter'])) echo "value=\"{$pconfig['checkinter']}\"";?> size="20" /> milliseconds
 				<br/>For HTTP/HTTPS defaults to 1000 if left blank. For TCP no check will be performed if left empty.
+			</td>
+		</tr>
+		<tr align="left" class="haproxy_check_enabled">
+			<td width="22%" valign="top" class="vncell">Log checks</td>
+			<td width="78%" class="vtable" colspan="2">
+				<input id="log-health-checks" name="log-health-checks" type="checkbox" value="yes" <?php if ($pconfig['log-health-checks']=='yes') echo "checked"; ?> onclick='updatevisibility();' />
+				When this option is enabled, any change of the health check status or to the server's health will be logged.
+				<br/>
+				By default, failed health check are logged if server is UP and successful health checks are logged if server is DOWN, so the amount of additional information is limited.
 			</td>
 		</tr>
 		<tr align="left" class="haproxy_check_http">
@@ -763,6 +845,7 @@ set by the 'retries' parameter.</div>
 			<td width="22%" valign="top" class="vncell">Stats Enabled</td>
 			<td width="78%" class="vtable" colspan="2">
 				<input id="stats_enabled" name="stats_enabled" type="checkbox" value="yes" <?php if ($pconfig['stats_enabled']=='yes') echo "checked"; ?> onclick='updatevisibility();' />
+				Enables the haproxy statistics page (only used on 'http' frontends)
 			</td>
 		</tr>
 		<tr class="haproxy_stats_visible" align="left" id='stats_uri_row'>
@@ -842,12 +925,20 @@ set by the 'retries' parameter.</div>
 		<tr class="" align="left" id='Strict-Transport-Security'>
 			<td width="22%" valign="top" class="vncell">Strict-Transport-Security</td>
 			<td width="78%" class="vtable" colspan="2">
-				When configured enables "HTTP Strict Transport Security" leave empty to disable.<br/>
+				When configured enables "HTTP Strict Transport Security" leave empty to disable. (only used on 'http' frontends)<br/>
 				<b>WARNING! the domain will only work over https with a valid certificate!</b><br/>
 				<input id="strict_transport_security" name="strict_transport_security" type="text" <?if(isset($pconfig['strict_transport_security'])) echo "value=\"{$pconfig['strict_transport_security']}\"";?> size="20" /> Seconds<br/>
 				If configured clients that requested the page with this setting active will not be able to visit this domain over a unencrypted http connection.
 				So make sure you understand the consequence of this setting or start with a really low value.<br/>
 				EXAMPLE: 60 for testing if you are absolutely sure you want this 31536000 (12 months) would be good for production.
+			</td>
+		</tr>
+		<tr class="" align="left">
+			<td width="22%" valign="top" class="vncell">Cookie protection.</td>
+			<td width="78%" class="vtable" colspan="2">
+				<input id="cookie_attribute_secure" name="cookie_attribute_secure" type="checkbox" value="yes" <?php if ($pconfig['cookie_attribute_secure']=='yes') echo "checked"; ?> onclick='updatevisibility();' />
+				Set 'secure' attribure on cookies (only used on 'http' frontends)<br/>
+				This configuration option sets up the Secure attribute on cookies if it has not been setup by the application server while the client was browsing the application over a ciphered connection.
 			</td>
 		</tr>
 		<tr><td>&nbsp;</td></tr>
@@ -869,6 +960,7 @@ set by the 'retries' parameter.</div>
 <script type="text/javascript">
 <?
 	phparray_to_javascriptarray($fields_servers,"fields_servers",Array('/*','/*/name','/*/type','/*/size','/*/items','/*/items/*','/*/items/*/*','/*/items/*/*/name'));
+	phparray_to_javascriptarray($fields_servers_details,"fields_details_servers",Array('/*','/*/name','/*/type'));
 	phparray_to_javascriptarray($a_checktypes,"checktypes",Array('/*','/*/name','/*/descr'));
 	phparray_to_javascriptarray($a_cookiemode,"cookiemode",Array('/*','/*/name','/*/descr'));
 	phparray_to_javascriptarray($a_sticky_type,"sticky_type",Array('/*','/*/descr','/*/cookiedescr'));

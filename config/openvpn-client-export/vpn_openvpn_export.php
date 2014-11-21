@@ -34,6 +34,8 @@ require("globals.inc");
 require("guiconfig.inc");
 require("openvpn-client-export.inc");
 
+global $current_openvpn_version, $current_openvpn_version_rev;
+
 $pgtitle = array("OpenVPN", "Client Export Utility");
 
 if (!is_array($config['openvpn']['openvpn-server']))
@@ -131,10 +133,14 @@ if (!empty($act)) {
 	else
 		$nokeys = false;
 
-	if (empty($_GET['useaddr'])) {
+	$useaddr = '';
+	if (isset($_GET['useaddr']) && !empty($_GET['useaddr']))
+		$useaddr = trim($_GET['useaddr']);
+
+	if (!(is_ipaddr($useaddr) || is_hostname($useaddr) ||
+	    in_array($useaddr, array("serveraddr", "servermagic", "servermagichost", "serverhostname"))))
 		$input_errors[] = "You need to specify an IP or hostname.";
-	} else
-		$useaddr = $_GET['useaddr'];
+
 	$advancedoptions = $_GET['advancedoptions'];
 	$openvpnmanager = $_GET['openvpnmanager'];
 
@@ -358,7 +364,7 @@ function download_begin(act, i, j) {
 		var proxyconf = document.getElementById("proxyconf").value;
 		if (useproxypass) {
 			if (!proxyuser) {
-				alert("Please fill the proxy username and passowrd.");
+				alert("Please fill the proxy username and password.");
 				return;
 			}
 			if (!proxypass || !proxyconf) {
@@ -437,11 +443,15 @@ function server_changed() {
 		cell2.innerHTML += "<a href='javascript:download_begin(\"confinlineios\"," + i + ", -1)'>OpenVPN Connect (iOS/Android)<\/a>";
 		cell2.innerHTML += "&nbsp;&nbsp; ";
 		cell2.innerHTML += "<a href='javascript:download_begin(\"confinline\"," + i + ", -1)'>Others<\/a>";
-		cell2.innerHTML += "<br\/>- Windows Installers:<br\/>";
+		cell2.innerHTML += "<br\/>- Windows Installers (<?php echo $current_openvpn_version . '-Ix' . $current_openvpn_version_rev;?>):<br\/>";
 		cell2.innerHTML += "&nbsp;&nbsp; ";
-		cell2.innerHTML += "<a href='javascript:download_begin(\"inst-2.3-x86\"," + i + ", -1)'>2.3-x86<\/a>";
+		cell2.innerHTML += "<a href='javascript:download_begin(\"inst-x86-xp\"," + i + ", -1)'>x86-xp<\/a>";
 		cell2.innerHTML += "&nbsp;&nbsp; ";
-		cell2.innerHTML += "<a href='javascript:download_begin(\"inst-2.3-x64\"," + i + ", -1)'>2.3-x64<\/a>";
+		cell2.innerHTML += "<a href='javascript:download_begin(\"inst-x64-xp\"," + i + ", -1)'>x64-xp<\/a>";
+		cell2.innerHTML += "&nbsp;&nbsp; ";
+		cell2.innerHTML += "<a href='javascript:download_begin(\"inst-x86-win6\"," + i + ", -1)'>x86-win6<\/a>";
+		cell2.innerHTML += "&nbsp;&nbsp; ";
+		cell2.innerHTML += "<a href='javascript:download_begin(\"inst-x64-win6\"," + i + ", -1)'>x64-win6<\/a>";
 		cell2.innerHTML += "<br\/>- Mac OSX:<br\/>";
 		cell2.innerHTML += "&nbsp;&nbsp; ";
 		cell2.innerHTML += "<a href='javascript:download_begin(\"visc\"," + i + ", -1)'>Viscosity Bundle<\/a>";
@@ -472,11 +482,15 @@ function server_changed() {
 		cell2.innerHTML += "<a href='javascript:download_begin(\"confinlineios\", -1," + j + ")'>OpenVPN Connect (iOS/Android)<\/a>";
 		cell2.innerHTML += "&nbsp;&nbsp; ";
 		cell2.innerHTML += "<a href='javascript:download_begin(\"confinline\", -1," + j + ")'>Others<\/a>";
-		cell2.innerHTML += "<br\/>- Windows Installers:<br\/>";
+		cell2.innerHTML += "<br\/>- Windows Installers (<?php echo $current_openvpn_version . '-Ix' . $current_openvpn_version_rev;?>):<br\/>";
 		cell2.innerHTML += "&nbsp;&nbsp; ";
-		cell2.innerHTML += "<a href='javascript:download_begin(\"inst-2.3-x86\", -1," + j + ")'>2.3-x86<\/a>";
+		cell2.innerHTML += "<a href='javascript:download_begin(\"inst-x86-xp\", -1," + j + ")'>x86-xp<\/a>";
 		cell2.innerHTML += "&nbsp;&nbsp; ";
-		cell2.innerHTML += "<a href='javascript:download_begin(\"inst-2.3-x64\", -1," + j + ")'>2.3-x64<\/a>";
+		cell2.innerHTML += "<a href='javascript:download_begin(\"inst-x64-xp\", -1," + j + ")'>x64-xp<\/a>";
+		cell2.innerHTML += "&nbsp;&nbsp; ";
+		cell2.innerHTML += "<a href='javascript:download_begin(\"inst-x86-win6\", -1," + j + ")'>x86-win6<\/a>";
+		cell2.innerHTML += "&nbsp;&nbsp; ";
+		cell2.innerHTML += "<a href='javascript:download_begin(\"inst-x64-win6\", -1," + j + ")'>x64-win6<\/a>";
 		cell2.innerHTML += "<br\/>- Mac OSX:<br\/>";
 		cell2.innerHTML += "&nbsp;&nbsp; ";
 		cell2.innerHTML += "<a href='javascript:download_begin(\"visc\", -1," + j + ")'>Viscosity Bundle<\/a>";
@@ -514,11 +528,15 @@ function server_changed() {
 		cell2.innerHTML += "<a href='javascript:download_begin(\"confinlineios\"," + i + ")'>OpenVPN Connect (iOS/Android)<\/a>";
 		cell2.innerHTML += "&nbsp;&nbsp; ";
 		cell2.innerHTML += "<a href='javascript:download_begin(\"confinline\"," + i + ")'>Others<\/a>";
-		cell2.innerHTML += "<br\/>- Windows Installers:<br\/>";
+		cell2.innerHTML += "<br\/>- Windows Installers (<?php echo $current_openvpn_version . '-Ix' . $current_openvpn_version_rev;?>):<br\/>";
 		cell2.innerHTML += "&nbsp;&nbsp; ";
-		cell2.innerHTML += "<a href='javascript:download_begin(\"inst-2.3-x86\"," + i + ")'>2.3-x86<\/a>";
+		cell2.innerHTML += "<a href='javascript:download_begin(\"inst-x86-xp\"," + i + ")'>x86-xp<\/a>";
 		cell2.innerHTML += "&nbsp;&nbsp; ";
-		cell2.innerHTML += "<a href='javascript:download_begin(\"inst-2.3-x64\"," + i + ")'>2.3-x64<\/a>";
+		cell2.innerHTML += "<a href='javascript:download_begin(\"inst-x64-xp\"," + i + ")'>x64-xp<\/a>";
+		cell2.innerHTML += "&nbsp;&nbsp; ";
+		cell2.innerHTML += "<a href='javascript:download_begin(\"inst-x86-win6\"," + i + ")'>x86-win6<\/a>";
+		cell2.innerHTML += "&nbsp;&nbsp; ";
+		cell2.innerHTML += "<a href='javascript:download_begin(\"inst-x64-win6\"," + i + ")'>x64-win6<\/a>";
 		cell2.innerHTML += "<br\/>- Mac OSX:<br\/>";
 		cell2.innerHTML += "&nbsp;&nbsp; ";
 		cell2.innerHTML += "<a href='javascript:download_begin(\"visc\"," + i + ")'>Viscosity Bundle<\/a>";
@@ -867,7 +885,11 @@ function useproxy_changed(obj) {
 				</table>
 				<table width="100%" border="0" cellpadding="0" cellspacing="5" summary="note">
 					<tr>
-						<td align="right" valign="top" width="5%"><?= gettext("NOTE:") ?></td>
+						<td align="right" valign="top" width="5%"><?= gettext("NOTES:") ?></td>
+						<td><?= gettext("The &quot;XP&quot; Windows installers work on Windows XP and later versions. The &quot;win6&quot; Windows installers include a new tap-windows6 driver that works only on Windows Vista and later.") ?></td>
+					</tr>
+					<tr>
+						<td>&nbsp;</td>
 						<td><?= gettext("If you expect to see a certain client in the list but it is not there, it is usually due to a CA mismatch between the OpenVPN server instance and the client certificates found in the User Manager.") ?></td>
 					</tr>
 					<tr>

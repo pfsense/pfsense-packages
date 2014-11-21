@@ -38,7 +38,7 @@ require_once("/usr/local/pkg/snort/snort.inc");
 
 /* Define some locally required variables from Snort constants */
 $snortdir = SNORTDIR;
-$snort_rules_upd_log = RULES_UPD_LOGFILE;
+$snort_rules_upd_log = SNORT_RULES_UPD_LOGFILE;
 
 /* Grab the Snort binary version programmatically and */
 /* use it to construct the proper Snort VRT rules     */
@@ -47,11 +47,11 @@ $snort_rules_upd_log = RULES_UPD_LOGFILE;
 $snortver = array();
 exec("/usr/local/bin/snort -V 2>&1 |/usr/bin/grep Version | /usr/bin/cut -c20-26", $snortver);
 if (empty($snortver[0]))
-	$snortver[0] = "2.9.5.5";
+	$snortver[0] = SNORT_BIN_VERSION;
 $snortver[0] = str_replace(".", "", $snortver[0]);
 
 $snort_rules_file = "snortrules-snapshot-{$snortver[0]}.tar.gz";
-$snort_community_rules_filename = GPLV2_DNLD_FILENAME;
+$snort_community_rules_filename = SNORT_GPLV2_DNLD_FILENAME;
 
 $snortdownload = $config['installedpackages']['snortglobal']['snortdownload'];
 $emergingthreats = $config['installedpackages']['snortglobal']['emergingthreats'];
@@ -69,11 +69,11 @@ else
 	$last_rule_upd_status = gettext("Unknown");
 
 if ($etpro == "on") {
-	$emergingthreats_filename = ETPRO_DNLD_FILENAME;
+	$emergingthreats_filename = SNORT_ETPRO_DNLD_FILENAME;
 	$et_name = "Emerging Threats Pro Rules";
 }
 else {
-	$emergingthreats_filename = ET_DNLD_FILENAME;
+	$emergingthreats_filename = SNORT_ET_DNLD_FILENAME;
 	$et_name = "Emerging Threats Open Rules";
 }
 
@@ -119,8 +119,7 @@ if (file_exists("{$snortdir}/{$snort_community_rules_filename}.md5") && $snortco
 
 /* Check for postback to see if we should clear the update log file. */
 if (isset($_POST['clear'])) {
-	if (file_exists("{$snort_rules_upd_log}"))
-		mwexec("/bin/rm -f {$snort_rules_upd_log}");
+	unlink_if_exists($snort_rules_upd_log);
 }
 
 if (isset($_POST['check'])) {
@@ -133,12 +132,9 @@ if ($_POST['force']) {
 	conf_mount_rw();
 
 	// Remove the existing MD5 signature files to force a download
-	if (file_exists("{$snortdir}/{$emergingthreats_filename}.md5"))
-		@unlink("{$snortdir}/{$emergingthreats_filename}.md5");
-	if (file_exists("{$snortdir}/{$snort_community_rules_filename}.md5"))
-		@unlink("{$snortdir}/{$snort_community_rules_filename}.md5");
-	if (file_exists("{$snortdir}/{$snort_rules_file}.md5"))
-		@unlink("{$snortdir}/{$snort_rules_file}.md5");
+	unlink_if_exists("{$snortdir}/{$emergingthreats_filename}.md5");
+	unlink_if_exists("{$snortdir}/{$snort_community_rules_filename}.md5");
+	unlink_if_exists("{$snortdir}/{$snort_rules_file}.md5");
 
 	// Revert file system to R/O.
 	conf_mount_ro();
@@ -184,7 +180,9 @@ include_once("head.inc");
 	$tab_array[5] = array(gettext("Pass Lists"), false, "/snort/snort_passlist.php");
         $tab_array[6] = array(gettext("Suppress"), false, "/snort/snort_interfaces_suppress.php");
 	$tab_array[7] = array(gettext("IP Lists"), false, "/snort/snort_ip_list_mgmt.php");
-	$tab_array[8] = array(gettext("Sync"), false, "/pkg_edit.php?xml=snort/snort_sync.xml");
+	$tab_array[8] = array(gettext("SID Mgmt"), false, "/snort/snort_sid_mgmt.php");
+	$tab_array[9] = array(gettext("Log Mgmt"), false, "/snort/snort_log_mgmt.php");
+	$tab_array[10] = array(gettext("Sync"), false, "/pkg_edit.php?xml=snort/snort_sync.xml");
         display_top_tabs($tab_array, true);
 ?>
 </td></tr>
@@ -251,7 +249,7 @@ include_once("head.inc");
 						<p style="text-align:center;" class="vexpl">
 						<font class="red"><b><?php echo gettext("WARNING:");?></b></font>&nbsp;
 						<?php echo gettext('No rule types have been selected for download. ') . 
-						gettext('Visit the ') . '<a href="/snort/snort_global.php">Global Settings Tab</a>' . gettext(' to select rule types.'); ?>
+						gettext('Visit the ') . '<a href="/snort/snort_interfaces_global.php">Global Settings Tab</a>' . gettext(' to select rule types.'); ?>
 						<br/></p>
 					<?php else: ?>
 						<br/>

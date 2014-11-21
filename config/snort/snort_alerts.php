@@ -7,6 +7,7 @@
  * Copyright (C) 2003-2004 Manuel Kasper <mk@neon1.net>.
  * Copyright (C) 2006 Scott Ullrich
  * Copyright (C) 2012 Ermal Luci
+ * Copyright (C) 2014 Jim Pingle jim@pingle.org
  * Copyright (C) 2013,2014 Bill Meeks
  * All rights reserved.
  *
@@ -41,6 +42,7 @@ require_once("/usr/local/pkg/snort/snort.inc");
 $snortalertlogt = $config['installedpackages']['snortglobal']['snortalertlogtype'];
 $supplist = array();
 $snortlogdir = SNORTLOGDIR;
+$filterlogentries = FALSE;
 
 function snort_is_alert_globally_suppressed($list, $gid, $sid) {
 
@@ -124,13 +126,41 @@ function snort_add_supplist_entry($suppress) {
 	/* tell Snort to load it, and return true; otherwise return false.       */
 	if ($found_list) {
 		write_config("Snort pkg: modified Suppress List {$list_name}.");
+		conf_mount_rw();
 		sync_snort_package_config();
+		conf_mount_ro();
 		snort_reload_config($a_instance[$instanceid]);
 		return true;
 	}
 	else
 		return false;
 }
+
+function snort_escape_filter_regex($filtertext) {
+	/* If the caller (user) has not already put a backslash before a slash, to escape it in the regex, */
+	/* then this will do it. Take out any "\/" already there, then turn all ordinary "/" into "\/".  */
+	return str_replace('/', '\/', str_replace('\/', '/', $filtertext));
+}
+
+function snort_match_filter_field($flent, $fields) {
+	foreach ($fields as $key => $field) {
+		if ($field == null)
+			continue;
+		if ((strpos($field, '!') === 0)) {
+			$field = substr($field, 1);
+			$field_regex = snort_escape_filter_regex($field);
+			if (@preg_match("/{$field_regex}/i", $flent[$key]))
+				return false;
+		}
+		else {
+			$field_regex = snort_escape_filter_regex($field);
+			if (!@preg_match("/{$field_regex}/i", $flent[$key]))
+				return false;
+		}
+	}
+	return true;
+}
+
 
 if (isset($_POST['instance']) && is_numericint($_POST['instance']))
 	$instanceid = $_POST['instance'];
@@ -163,6 +193,50 @@ if (empty($pconfig['alertnumber']))
 if (empty($pconfig['arefresh']))
 	$pconfig['arefresh'] = 'off';
 $anentries = $pconfig['alertnumber'];
+
+# --- AJAX REVERSE DNS RESOLVE Start ---
+if (isset($_POST['resolve'])) {
+	$ip = strtolower($_POST['resolve']);
+	$res = (is_ipaddr($ip) ? gethostbyaddr($ip) : '');
+	
+	if ($res && $res != $ip)
+		$response = array('resolve_ip' => $ip, 'resolve_text' => $res);
+	else
+		$response = array('resolve_ip' => $ip, 'resolve_text' => gettext("Cannot resolve"));
+	
+	echo json_encode(str_replace("\\","\\\\", $response)); // single escape chars can break JSON decode
+	exit;
+}
+# --- AJAX REVERSE DNS RESOLVE End ---
+
+if ($_POST['filterlogentries_submit']) {
+	// Set flag for filtering alert entries
+	$filterlogentries = TRUE;
+
+	// -- IMPORTANT --
+	// Note the order of these fields must match the order decoded from the alerts log
+	$filterfieldsarray = array();
+	$filterfieldsarray[0] = $_POST['filterlogentries_time'] ? $_POST['filterlogentries_time'] : null;
+	$filterfieldsarray[1] = $_POST['filterlogentries_gid'] ? $_POST['filterlogentries_gid'] : null;
+	$filterfieldsarray[2] = $_POST['filterlogentries_sid'] ? $_POST['filterlogentries_sid'] : null;
+	$filterfieldsarray[3] = null;
+	$filterfieldsarray[4] = $_POST['filterlogentries_description'] ? $_POST['filterlogentries_description'] : null;
+	$filterfieldsarray[5] = $_POST['filterlogentries_protocol'] ? $_POST['filterlogentries_protocol'] : null;
+	// Remove any zero-length spaces added to the IP address that could creep in from a copy-paste operation
+	$filterfieldsarray[6] = $_POST['filterlogentries_sourceipaddress'] ? str_replace("\xE2\x80\x8B", "", $_POST['filterlogentries_sourceipaddress']) : null;
+	$filterfieldsarray[7] = $_POST['filterlogentries_sourceport'] ? $_POST['filterlogentries_sourceport'] : null;
+	// Remove any zero-length spaces added to the IP address that could creep in from a copy-paste operation
+	$filterfieldsarray[8] = $_POST['filterlogentries_destinationipaddress'] ? str_replace("\xE2\x80\x8B", "", $_POST['filterlogentries_destinationipaddress']) : null;
+	$filterfieldsarray[9] = $_POST['filterlogentries_destinationport'] ? $_POST['filterlogentries_destinationport'] : null;
+	$filterfieldsarray[10] = null;
+	$filterfieldsarray[11] = $_POST['filterlogentries_classification'] ? $_POST['filterlogentries_classification'] : null;
+	$filterfieldsarray[12] = $_POST['filterlogentries_priority'] ? $_POST['filterlogentries_priority'] : null;
+}
+
+if ($_POST['filterlogentries_clear']) {
+	$filterlogentries = TRUE;
+	$filterfieldsarray = array();
+}
 
 if ($_POST['save']) {
 	if (!is_array($config['installedpackages']['snortglobal']['alertsblocks']))
@@ -283,7 +357,9 @@ if ($_POST['togglesid'] && is_numeric($_POST['sidid']) && is_numeric($_POST['gen
 	/* rules for this interface.                     */
 	/*************************************************/
 	$rebuild_rules = true;
+	conf_mount_rw();
 	snort_generate_conf($a_instance[$instanceid]);
+	conf_mount_ro();
 	$rebuild_rules = false;
 
 	/* Soft-restart Snort to live-load the new rules */
@@ -307,11 +383,11 @@ if ($_POST['delete']) {
 }
 
 if ($_POST['download']) {
-	$save_date = exec('/bin/date "+%Y-%m-%d-%H-%M-%S"');
+	$save_date = date("Y-m-d-H-i-s");
 	$file_name = "snort_logs_{$save_date}_{$if_real}.tar.gz";
-	exec("cd {$snortlogdir}/snort_{$if_real}{$snort_uuid} && /usr/bin/tar -czf /tmp/{$file_name} *");
+	exec("cd {$snortlogdir}/snort_{$if_real}{$snort_uuid} && /usr/bin/tar -czf {$g['tmp_path']}/{$file_name} *");
 
-	if (file_exists("/tmp/{$file_name}")) {
+	if (file_exists("{$g['tmp_path']}/{$file_name}")) {
 		ob_start(); //important or other posts will fail
 		if (isset($_SERVER['HTTPS'])) {
 			header('Pragma: ');
@@ -321,13 +397,13 @@ if ($_POST['download']) {
 			header("Cache-Control: private, must-revalidate");
 		}
 		header("Content-Type: application/octet-stream");
-		header("Content-length: " . filesize("/tmp/{$file_name}"));
+		header("Content-length: " . filesize("{$g['tmp_path']}/{$file_name}"));
 		header("Content-disposition: attachment; filename = {$file_name}");
 		ob_end_clean(); //important or other post will fail
-		readfile("/tmp/{$file_name}");
+		readfile("{$g['tmp_path']}/{$file_name}");
 
 		// Clean up the temp file
-		@unlink("/tmp/{$file_name}");
+		unlink_if_exists("{$g['tmp_path']}/{$file_name}");
 	}
 	else
 		$savemsg = gettext("An error occurred while creating archive");
@@ -342,7 +418,6 @@ include_once("head.inc");
 ?>
 
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">
-<script src="/javascript/filter_log.js" type="text/javascript"></script>
 <?php
 include_once("fbegin.inc");
 
@@ -376,7 +451,9 @@ if ($savemsg) {
 	$tab_array[5] = array(gettext("Pass Lists"), false, "/snort/snort_passlist.php");
 	$tab_array[6] = array(gettext("Suppress"), false, "/snort/snort_interfaces_suppress.php");
 	$tab_array[7] = array(gettext("IP Lists"), false, "/snort/snort_ip_list_mgmt.php");
-	$tab_array[8] = array(gettext("Sync"), false, "/pkg_edit.php?xml=snort/snort_sync.xml");
+	$tab_array[8] = array(gettext("SID Mgmt"), false, "/snort/snort_sid_mgmt.php");
+	$tab_array[9] = array(gettext("Log Mgmt"), false, "/snort/snort_log_mgmt.php");
+	$tab_array[10] = array(gettext("Sync"), false, "/pkg_edit.php?xml=snort/snort_sync.xml");
 	display_top_tabs($tab_array, true);
 ?>
 </td></tr>
@@ -423,9 +500,97 @@ if ($savemsg) {
 				</td>
 			</tr>
 			<tr>
+				<td colspan="2" class="listtopic"><?php echo gettext("Alert Log View Filter"); ?></td>
+			</tr>
+			<tr id="filter_enable_row" style="display:<?php if (!$filterlogentries) {echo "table-row;";} else {echo "none;";} ?>">
+				<td width="22%" class="vncell"><?php echo gettext('Alert Log Filter Options'); ?></td>
+				<td width="78%" class="vtable">
+					<input name="show_filter" id="show_filter" type="button" class="formbtns" value="<?=gettext("Show Filter");?>" onclick="enable_showFilter();" />
+					&nbsp;&nbsp;<?=gettext("Click to display advanced filtering options dialog");?>
+				</td>
+			</tr>
+			<tr id="filter_options_row" style="display:<?php if (!$filterlogentries) {echo "none;";} else {echo "table-row;";} ?>">
+				<td colspan="2">
+					<table width="100%" border="0" cellpadding="0" cellspacing="1" summary="action">
+						<tr>
+							<td valign="top">
+								<div align="center"><?=gettext("Date");?></div>
+								<div align="center"><input id="filterlogentries_time" name="filterlogentries_time" class="formfld search" type="text" size="10" value="<?= $filterfieldsarray[0] ?>" /></div>
+							</td>
+							<td valign="top">
+								<div align="center"><?=gettext("Source IP Address");?></div>
+								<div align="center"><input id="filterlogentries_sourceipaddress" name="filterlogentries_sourceipaddress" class="formfld search" type="text" size="28" value="<?= $filterfieldsarray[6] ?>" /></div>
+							</td>
+							<td valign="top">
+								<div align="center"><?=gettext("Source Port");?></div>
+								<div align="center"><input id="filterlogentries_sourceport" name="filterlogentries_sourceport" class="formfld search" type="text" size="5" value="<?= $filterfieldsarray[7] ?>" /></div>
+							</td>
+							<td valign="top">
+								<div align="center"><?=gettext("Description");?></div>
+								<div align="center"><input id="filterlogentries_description" name="filterlogentries_description" class="formfld search" type="text" size="28" value="<?= $filterfieldsarray[4] ?>" /></div>
+							</td>
+							<td valign="top">
+								<div align="center"><?=gettext("GID");?></div>
+								<div align="center"><input id="filterlogentries_gid" name="filterlogentries_gid" class="formfld search" type="text" size="6" value="<?= $filterfieldsarray[1] ?>" /></div>
+							</td>
+						</tr>
+						<tr>
+							<td valign="top">
+								<div align="center"><?=gettext("Priority");?></div>
+								<div align="center"><input id="filterlogentries_priority" name="filterlogentries_priority" class="formfld search" type="text" size="10" value="<?= $filterfieldsarray[12] ?>" /></div>
+							</td>
+							<td valign="top">
+								<div align="center"><?=gettext("Destination IP Address");?></div>
+								<div align="center"><input id="filterlogentries_destinationipaddress" name="filterlogentries_destinationipaddress" class="formfld search" type="text" size="28" value="<?= $filterfieldsarray[8] ?>" /></div>
+							</td>
+							<td valign="top">
+								<div align="center"><?=gettext("Destination Port");?></div>
+								<div align="center"><input id="filterlogentries_destinationport" name="filterlogentries_destinationport" class="formfld search" type="text" size="5" value="<?= $filterfieldsarray[9] ?>" /></div>
+							</td>
+							<td valign="top">
+								<div align="center"><?=gettext("Classification");?></div>
+								<div align="center"><input id="filterlogentries_classification" name="filterlogentries_classification" class="formfld search" type="text" size="28" value="<?= $filterfieldsarray[11] ?>" /></div>
+							</td>
+							<td valign="top">
+								<div align="center"><?=gettext("SID");?></div>
+								<div align="center"><input id="filterlogentries_sid" name="filterlogentries_sid" class="formfld search" type="text" size="6" value="<?= $filterfieldsarray[2] ?>" /></div>
+							</td>
+						</tr>
+						<tr>
+							<td valign="top">
+								<div align="center"><?=gettext("Protocol");?></div>
+								<div align="center"><input id="filterlogentries_protocol" name="filterlogentries_protocol" class="formfld search" type="text" size="10" value="<?= $filterfieldsarray[5] ?>" /></div>
+							</td>
+							<td valign="top">
+							</td>
+							<td valign="top">
+							</td>
+							<td colspan="2" style="vertical-align:bottom">
+								<div align="right"><input id="filterlogentries_submit" name="filterlogentries_submit" type="submit" class="formbtns" value="<?=gettext("Filter");?>" title="<?=gettext("Apply filter"); ?>" />
+								&nbsp;&nbsp;&nbsp;<input id="filterlogentries_clear" name="filterlogentries_clear" type="submit" class="formbtns" value="<?=gettext("Clear");?>" title="<?=gettext("Remove filter");?>" />
+								&nbsp;&nbsp;&nbsp;<input id="filterlogentries_hide" name="filterlogentries_hide" type="button" class="formbtns" value="<?=gettext("Hide");?>" onclick="enable_hideFilter();" title="<?=gettext("Hide filter options");?>" /></div>
+							</td>
+						</tr>
+						<tr>
+							<td colspan="5" style="vertical-align:bottom">
+								&nbsp;<?printf(gettext('Matches %1$s regular expression%2$s.'), '<a target="_blank" href="http://www.php.net/manual/en/book.pcre.php">', '</a>');?>&nbsp;&nbsp;
+								<?=gettext("Precede with exclamation (!) as first character to exclude match.");?>&nbsp;&nbsp;
+							</td>
+						</tr>
+					</table>
+				</td>
+			</tr>
+		<?php if ($filterlogentries) : ?>
+			<tr>
+				<td colspan="2" class="listtopic"><?php printf(gettext("Last %s Alert Entries"), $anentries); ?>&nbsp;&nbsp;
+				<?php echo gettext("(Most recent listed first)  ** FILTERED VIEW **  clear filter to see all entries"); ?></td>
+			</tr>
+		<?php else: ?>
+			<tr>
 				<td colspan="2" class="listtopic"><?php printf(gettext("Last %s Alert Entries"), $anentries); ?>&nbsp;&nbsp;
 				<?php echo gettext("(Most recent entries are listed first)"); ?></td>
 			</tr>
+		<?php endif; ?>
 	<tr>
 	<td width="100%" colspan="2">
 	<table id="myTable" style="table-layout: fixed;" width="100%" class="sortable" border="0" cellpadding="0" cellspacing="0">
@@ -442,7 +607,7 @@ if ($savemsg) {
 			<col axis="string">
 		</colgroup>
 		<thead>
-		   <tr>
+		   <tr class="sortableHeaderRowIdentifier">
 			<th class="listhdrr" axis="date"><?php echo gettext("Date"); ?></th>
 			<th class="listhdrr" axis="number"><?php echo gettext("Pri"); ?></th>
 			<th class="listhdrr" axis="string"><?php echo gettext("Proto"); ?></th>
@@ -460,16 +625,20 @@ if ($savemsg) {
 
 /* make sure alert file exists */
 if (file_exists("{$snortlogdir}/snort_{$if_real}{$snort_uuid}/alert")) {
-	exec("tail -{$anentries} -r {$snortlogdir}/snort_{$if_real}{$snort_uuid}/alert > /tmp/alert_{$snort_uuid}");
-	if (file_exists("/tmp/alert_{$snort_uuid}")) {
+	exec("tail -{$anentries} -r {$snortlogdir}/snort_{$if_real}{$snort_uuid}/alert > {$g['tmp_path']}/alert_{$snort_uuid}");
+	if (file_exists("{$g['tmp_path']}/alert_{$snort_uuid}")) {
 		$tmpblocked = array_flip(snort_get_blocked_ips());
 		$counter = 0;
 		/*                 0         1           2      3      4    5    6    7      8     9    10    11             12    */
 		/* File format timestamp,sig_generator,sig_id,sig_rev,msg,proto,src,srcport,dst,dstport,id,classification,priority */
-		$fd = fopen("/tmp/alert_{$snort_uuid}", "r");
+		$fd = fopen("{$g['tmp_path']}/alert_{$snort_uuid}", "r");
 		while (($fields = fgetcsv($fd, 1000, ',', '"')) !== FALSE) {
 			if(count($fields) < 13)
 				continue;
+
+			if ($filterlogentries && !snort_match_filter_field($fields, $filterfieldsarray)) {
+				continue;
+			}
 
 			/* Time */
 			$alert_time = substr($fields[0], strpos($fields[0], '-')+1, -8);
@@ -486,16 +655,12 @@ if (file_exists("{$snortlogdir}/snort_{$if_real}{$snort_uuid}/alert")) {
 			$alert_ip_src = $fields[6];
 			/* Add zero-width space as soft-break opportunity after each colon if we have an IPv6 address */
 			$alert_ip_src = str_replace(":", ":&#8203;", $alert_ip_src);
+
 			/* Add Reverse DNS lookup icons (two different links if pfSense version supports them) */
 			$alert_ip_src .= "<br/>";
-			if ($pfs_version > 2.0) {
-				$alert_ip_src .= "<a onclick=\"javascript:getURL('/diag_dns.php?host={$fields[6]}&dialog_output=true', outputrule);\">";
-				$alert_ip_src .= "<img src='../themes/{$g['theme']}/images/icons/icon_log_d.gif' width='11' height='11' border='0' ";
-				$alert_ip_src .= "title='" . gettext("Resolve host via reverse DNS lookup (quick pop-up)") . "' style=\"cursor: pointer;\"></a>&nbsp;";
-			}
-			$alert_ip_src .= "<a href='/diag_dns.php?host={$fields[6]}&instance={$instanceid}'>";
-			$alert_ip_src .= "<img src='../themes/{$g['theme']}/images/icons/icon_log.gif' width='11' height='11' border='0' ";
-			$alert_ip_src .= "title='" . gettext("Resolve host via reverse DNS lookup") . "'></a>";
+			$alert_ip_src .= "<img onclick=\"javascript:resolve_with_ajax('{$fields[6]}');\" title=\"";
+			$alert_ip_src .= gettext("Resolve host via reverse DNS lookup") . "\" border=\"0\" src=\"/themes/{$g['theme']}/images/icons/icon_log.gif\" alt=\"Icon Reverse Resolve with DNS\" ";
+			$alert_ip_src .= " style=\"cursor: pointer;\"/>";
 
 			/* Add icons for auto-adding to Suppress List if appropriate */
 			if (!snort_is_alert_globally_suppressed($supplist, $fields[1], $fields[2]) && 
@@ -519,16 +684,13 @@ if (file_exists("{$snortlogdir}/snort_{$if_real}{$snort_uuid}/alert")) {
 			$alert_ip_dst = $fields[8];
 			/* Add zero-width space as soft-break opportunity after each colon if we have an IPv6 address */
 			$alert_ip_dst = str_replace(":", ":&#8203;", $alert_ip_dst);
+
 			/* Add Reverse DNS lookup icons (two different links if pfSense version supports them) */
 			$alert_ip_dst .= "<br/>";
-			if ($pfs_version > 2.0) {
-				$alert_ip_dst .= "<a onclick=\"javascript:getURL('/diag_dns.php?host={$fields[8]}&dialog_output=true', outputrule);\">";
-				$alert_ip_dst .= "<img src='../themes/{$g['theme']}/images/icons/icon_log_d.gif' width='11' height='11' border='0' ";
-				$alert_ip_dst .= "title='" . gettext("Resolve host via reverse DNS lookup (quick pop-up)") . "' style=\"cursor: pointer;\"></a>&nbsp;";
-			}
-			$alert_ip_dst .= "<a href='/diag_dns.php?host={$fields[8]}&instance={$instanceid}'>";
-			$alert_ip_dst .= "<img src='../themes/{$g['theme']}/images/icons/icon_log.gif' width='11' height='11' border='0' ";
-			$alert_ip_dst .= "title='" . gettext("Resolve host via reverse DNS lookup") . "'></a>";	
+			$alert_ip_dst .= "<img onclick=\"javascript:resolve_with_ajax('{$fields[8]}');\" title=\"";
+			$alert_ip_dst .= gettext("Resolve host via reverse DNS lookup") . "\" border=\"0\" src=\"/themes/{$g['theme']}/images/icons/icon_log.gif\" alt=\"Icon Reverse Resolve with DNS\" ";
+			$alert_ip_dst .= " style=\"cursor: pointer;\"/>";
+
 			/* Add icons for auto-adding to Suppress List if appropriate */
 			if (!snort_is_alert_globally_suppressed($supplist, $fields[1], $fields[2]) && 
 			    !isset($supplist[$fields[1]][$fields[2]]['by_dst'][$fields[8]])) {
@@ -578,17 +740,17 @@ if (file_exists("{$snortlogdir}/snort_{$if_real}{$snort_uuid}/alert")) {
 				<td class='listr' align='center'>{$alert_priority}</td>
 				<td class='listr' align='center'>{$alert_proto}</td>
 				<td class='listr' style=\"word-wrap:break-word;\">{$alert_class}</td>
-				<td class='listr' align='center' sorttable_customkey='{$fields[6]}'>{$alert_ip_src}</td>
+				<td class='listr' align='center' style=\"sorttable_customkey:{$fields[6]};\" sorttable_customkey=\"{$fields[6]}\">{$alert_ip_src}</td>
 				<td class='listr' align='center'>{$alert_src_p}</td>
-				<td class='listr' align='center' sorttable_customkey='{$fields[8]}'>{$alert_ip_dst}</td>
+				<td class='listr' align='center' style=\"sorttable_customkey:{$fields[8]};\" sorttable_customkey=\"{$fields[8]}\">{$alert_ip_dst}</td>
 				<td class='listr' align='center'>{$alert_dst_p}</td>
-				<td class='listr' align='center' sorttable_customkey='{$fields[2]}'>{$alert_sid_str}<br/>{$sidsupplink}&nbsp;&nbsp;{$sid_dsbl_link}</td>
+				<td class='listr' align='center' style=\"sorttable_customkey:{$fields[2]};\" sorttable_customkey=\"{$fields[2]}\">{$alert_sid_str}<br/>{$sidsupplink}&nbsp;&nbsp;{$sid_dsbl_link}</td>
 				<td class='listbg' style=\"word-wrap:break-word;\">{$alert_descr}</td>
 				</tr>\n";
 			$counter++;
 		}
 		fclose($fd);
-		@unlink("/tmp/alert_{$snort_uuid}");
+		unlink_if_exists("{$g['tmp_path']}/alert_{$snort_uuid}");
 	}
 }
 ?>
@@ -619,6 +781,50 @@ function encRuleSig(rulegid,rulesid,srcip,ruledescr) {
 	document.getElementById("ip").value = srcip;
 	document.getElementById("descr").value = ruledescr;
 }
+
+function enable_showFilter() {
+	document.getElementById("filter_enable_row").style.display="none";
+	document.getElementById("filter_options_row").style.display="table-row";
+}
+
+function enable_hideFilter() {
+	document.getElementById("filter_enable_row").style.display="table-row";
+	document.getElementById("filter_options_row").style.display="none";
+}
+
 </script>
+
+<!-- The following AJAX code was borrowed from the diag_logs_filter.php -->
+<!-- file in pfSense.  See copyright info at top of this page.          -->
+<script type="text/javascript">
+//<![CDATA[
+function resolve_with_ajax(ip_to_resolve) {
+	var url = "/snort/snort_alerts.php";
+
+	jQuery.ajax(
+		url,
+		{
+			type: 'post',
+			dataType: 'json',
+			data: {
+				resolve: ip_to_resolve,
+				},
+			complete: resolve_ip_callback
+		});
+}
+
+function resolve_ip_callback(transport) {
+	var response = jQuery.parseJSON(transport.responseText);
+	var msg = 'IP address "' + response.resolve_ip + '" resolves to\n';
+	alert(msg + 'host "' + htmlspecialchars(response.resolve_text) + '"');
+}
+
+// From http://stackoverflow.com/questions/5499078/fastest-method-to-escape-html-tags-as-html-entities
+function htmlspecialchars(str) {
+    return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&apos;');
+}
+//]]>
+</script>
+
 </body>
 </html>

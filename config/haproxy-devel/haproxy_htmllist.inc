@@ -50,7 +50,30 @@ function haproxy_htmllist_get_values($html_list){
 	return $values;
 }
 
-function haproxy_htmllist($tablename,$values,$items,$editstate=false){
+function haproxy_htmllist_drawcell($item, $itemvalue, $editable, $itemnamenr = "") {
+	$itemtype = $item['type'];
+	if ($editable) {
+		$itemtype = $item['type'];
+		if ($itemtype == "select"){
+			echo_html_select($itemnamenr, $item['items'], $itemvalue,"","updatevisibility();", "width:{$item['size']}");
+		} else
+		if ($itemtype == "checkbox"){
+			$checked = $itemvalue=='yes' ? " checked" : "";
+			echo "<input name='$itemnamenr' id='$itemnamenr' type='checkbox'$checked value='yes' size='{$item['size']}' />";
+		}  else
+			echo "<input name='$itemnamenr' id='$itemnamenr' type='text' value='{$itemvalue}' size='{$item['size']}' />";
+	} else {
+		if ($itemtype == "select"){
+			echo $item['items'][$itemvalue]['name'];
+		} else
+		if ($itemtype == "checkbox"){
+			echo $itemvalue=='yes' ? gettext('yes') : gettext('no');
+		} else
+			echo $itemvalue;
+	}
+}
+
+function haproxy_htmllist($tablename,$rowvalues,$items,$editstate=false,$itemdetails=null){
 	global $g, $counter;
 	echo "<table class='' width='100%' cellpadding='0' cellspacing='0' id='$tablename'>
 	<tr>";
@@ -59,24 +82,20 @@ function haproxy_htmllist($tablename,$values,$items,$editstate=false){
 	}
 	echo "<td width='5%' class=''></td>
 	</tr>";
-	if (is_array($values)){
-		foreach($values as $value){
+	if (is_array($rowvalues)){
+		foreach($rowvalues as $value){
 			if (!$editstate) {
 				echo "<tr id='tr_view_$counter' ondblclick='editRow($counter); return false;' >";
 				$leftitem = true;
-				foreach($items as $item){
+				foreach($items as $item) {
 					$tdclass = $leftitem ? "vtable listlr" : "vtable listr";
 					echo "<td class='$tdclass'>";
 					$itemname = $item['name'];
-					$itemtype = $item['type'];
 					$itemvalue = $value[$itemname];
-					if ($itemtype == "select"){
-						echo $item['items'][$itemvalue]['name'];
+					if (isset($item['customdrawcell'])) {
+						$item['customdrawcell']($item, $itemvalue, false);
 					} else
-					if ($itemtype == "checkbox"){
-						echo $itemvalue=='yes' ? gettext('yes') : gettext('no');
-					} else
-						echo $itemvalue;
+						haproxy_htmllist_drawcell($item, $itemvalue, false);
 					echo "</td>";
 					$leftitem = false;
 				}
@@ -94,24 +113,18 @@ function haproxy_htmllist($tablename,$values,$items,$editstate=false){
 			</td></tr></table>
 		</td>";
 				echo "</tr>";
-			}			
+			}
 			$displaystyle = $editstate ? "" : "display: none;";
 			echo "<tr id='tr_edit_$counter' style='$displaystyle'>";
 			foreach($items as $item){
 				$itemname = $item['name'];
-				$itemtype = $item['type'];
 				$itemvalue = $value[$itemname];
-				$itemnamenr = $itemname.$counter;
+				$itemnamenr = $itemname . $counter;
 				echo "<td class='vtable'>";
-				if ($itemtype == "select"){
-					echo_html_select($itemnamenr, $item['items'], $itemvalue,"","updatevisibility();", "width:{$item['size']}");
+				if (isset($item['customdrawcell'])) {
+					$item['customdrawcell']($item, $itemvalue, true, $itemnamenr);
 				} else
-				if ($itemtype == "checkbox"){
-					$checked = $itemvalue=='yes' ? " checked" : "";
-					echo "<input name='$itemnamenr' id='$itemnamenr' type='checkbox'$checked value='yes' size='{$item['size']}' />";
-					
-				}  else
-					echo "<input name='$itemnamenr' id='$itemnamenr' type='text' value='{$itemvalue}' size='{$item['size']}' />";
+					haproxy_htmllist_drawcell($item, $itemvalue, true, $itemnamenr);
 				echo "</td>";
 			}
 			echo "
@@ -125,6 +138,78 @@ function haproxy_htmllist($tablename,$values,$items,$editstate=false){
 		</td></tr></table>
 	</td>";
 			echo "</tr>";
+				if (isset($itemdetails)) {
+					$colspan = count($items)-1;
+					echo "<tr id='tr_viewdetail_$counter'>";
+					?>
+						<td class='vtable listlr' style='border-bottom-width: medium;vertical-align:top;'>
+						<div style="position:relative;float:right;width:11px;height:11px;">
+						<a onclick="htmltable_toggle_details('<?="htmltable_{$tablename}_{$counter}_details"?>')">
+							<img id="htmltable_<?="{$tablename}_{$counter}"?>_details_off" alt="Expand advanced server settings" 
+							src="tree/plus.gif" style="clip:rect(19px 13px 30px 2px); top:-19px;position:absolute;"/>
+						</a>
+						</div>
+						</td>
+					<?
+					echo "<td class='vtable listr' colspan='$colspan' style='border-bottom-width: medium;'>";
+					$itemnr = 0;
+					echo "<div id='htmltable_{$tablename}_{$counter}_details_view'>";
+					$itemcount = count($itemdetails);
+					foreach($itemdetails as $item) {
+						echo "<div style='float: left;padding-right: 2px;'>";
+						$tdclass = "";//$leftitem ? "vtable listlr" : "vtable listr";
+						echo $item['columnheader'] . ": ";
+						$itemname = $item['name'];
+						$itemvalue = $value[$itemname];
+						if (isset($item['customdrawcell'])) {
+							$item['customdrawcell']($item, $itemvalue, false);
+						} else
+							haproxy_htmllist_drawcell($item, $itemvalue, false);
+						$leftitem = false;
+						$itemnr++;
+						if ($itemcount != $itemnr)
+							echo ", ";
+						echo "</div>";
+					}
+					echo "</div>";
+					echo "<div id='htmltable_{$tablename}_{$counter}_details_edit' style='display:none;'>";
+					echo "<table class='tabcont' style='border-collapse:collapse' border='1' cellspacing='0' >";
+					$leftitem = true;
+					foreach($itemdetails as $item) {
+					echo "<tr id='tr_edititemdetails_$counter' ondblclick='editRow($counter); return false;'>";
+						$tdclass = "";//$leftitem ? "vtable listlr" : "vtable listr";
+						echo "<td style='border-right:0' class='$tdclass'>";
+						echo "{$item['columnheader']}: ";
+						echo "</td>";
+						echo "<td style='border-left:0' class='$tdclass'>";
+						$itemname = $item['name'];
+						$itemvalue = $value[$itemname];
+						$itemnamenr = $itemname . $counter;
+						echo "{$item['description']}<br/>";
+						if (isset($item['customdrawcell'])) {
+							$item['customdrawcell']($item, $itemvalue, true, $itemnamenr);
+						} else
+							haproxy_htmllist_drawcell($item, $itemvalue, true, $itemnamenr);
+						echo "</td>";
+						$leftitem = false;
+					echo "</tr>";
+					}
+					echo "</table>";
+					echo "</div>";
+					echo "</td>";
+					echo "</tr>";
+				}
+				if (isset($itemdetails)) {
+					$colspan = count($items)-1;
+					echo "<tr id='htmltable_{$tablename}_{$counter}_details' style='$displaystyle' >";
+					echo "<td class='vtable listlr' style='border-bottom-width: medium;'> </td>";
+					echo "<td class='vtable listr' colspan='$colspan' style='border-bottom-width: medium;'>";
+					echo "</td>";
+					echo "</tr>";
+				}
+			
+			
+			
 			$counter++;
 		}
 	}
@@ -136,11 +221,11 @@ function haproxy_htmllist($tablename,$values,$items,$editstate=false){
 
 function haproxy_htmllist_js(){
 ?><script type="text/javascript">	
-	function htmllist_get_select_items(tableId) {
+	function htmllist_get_select_items(prefix,tableId) {
 		var items;
 		var i = tableId.lastIndexOf('_');
-		var items_name = "fields_"+tableId.substr(i+1);
-		items = eval(items_name);
+		var items_name = prefix+"_"+tableId.substr(i+1);
+		items = eval("typeof "+items_name+" !== 'undefined' ? "+items_name+" : {}");
 		return items;
 	}
 
@@ -150,8 +235,7 @@ function haproxy_htmllist_js(){
 		var btable, btbody, btr, btd;
 		d = document;
 		
-		items = htmllist_get_select_items(tableId);
-		seltext = htmllist_get_select_options(tableId);
+		items = htmllist_get_select_items('fields',tableId);
 
 		tbody = d.getElementById(tableId).getElementsByTagName("tbody").item(0);
 		tr = d.createElement("tr");
@@ -165,6 +249,7 @@ function haproxy_htmllist_js(){
 				"' id='" + items[i]['name'] + totalrows +
 				"'><\/input> ";
 			} else if(items[i]['type'] == 'select') {
+				seltext = htmllist_get_select_options(tableId, items[i]['name']);
 				td.innerHTML="<select style='width:" + items[i]['size'] + "'  name='" + items[i]['name'] + totalrows + 
 				"' id='" + items[i]['name'] + totalrows +
 				"'>" + seltext + "<\/select> ";
@@ -178,6 +263,13 @@ function haproxy_htmllist_js(){
 		td.rowSpan = "1";
 		td.setAttribute("class","list");
 
+		items = htmllist_get_select_items('fields_details',tableId);
+		for (var i in items) {
+			td.innerHTML=td.innerHTML+"<input type='hidden' name='" + items[i]['name'] + totalrows +
+				"' id='" + items[i]['name'] + totalrows +
+				"'><\/input> ";
+		}
+		
 		// Recreate the button table.
 		btable = document.createElement("table");
 		btable.setAttribute("border", "0");
@@ -204,13 +296,23 @@ function haproxy_htmllist_js(){
 		var dupEl;
 		var newEl;
 		addRowTo(tableId);
-		items = htmllist_get_select_items(tableId);
+		items = htmllist_get_select_items('fields',tableId);
 		for (var i in items) {
 			dupEl = document.getElementById(items[i]['name'] + rowId);
 			newEl = document.getElementById(items[i]['name'] + totalrows);
 			if (dupEl && newEl)
 				if(items[i]['type'] == 'checkbox')
 					newEl.checked = dupEl.checked;
+				else
+					newEl.value = dupEl.value;
+		}
+		items = htmllist_get_select_items('fields_details',tableId);
+		for (var i in items) {
+			dupEl = document.getElementById(items[i]['name'] + rowId);
+			newEl = document.getElementById(items[i]['name'] + totalrows);
+			if (dupEl && newEl)
+				if(items[i]['type'] == 'checkbox')
+					newEl.value = dupEl.checked ? 'yes' : '';
 				else
 					newEl.value = dupEl.value;
 		}
@@ -223,8 +325,10 @@ function haproxy_htmllist_js(){
 	}
 	function deleteRow(rowId, tableId) {
 		var view = document.getElementById("tr_view_" + rowId);
+		var viewdetail = document.getElementById("tr_viewdetail_" + rowId);
 		var edit = document.getElementById("tr_edit_" + rowId);
 		view.parentNode.removeChild(view);
+		viewdetail.parentNode.removeChild(viewdetail);
 		edit.parentNode.removeChild(edit);
 	}
 	function removeRow(el) {
@@ -239,6 +343,16 @@ function haproxy_htmllist_js(){
 			cel = el.getElementsByTagName("td").item(0);
 			el.parentNode.removeChild(el);
 		}
+	}
+	
+	function htmltable_toggle_details(table_row_detail_id) {
+		tredit = document.getElementById(table_row_detail_id+'_off');
+		trviewdetail = document.getElementById(table_row_detail_id+'_edit');
+		treditdetail = document.getElementById(table_row_detail_id+'_view');
+		current_on = tredit.style.display == 'none';
+		tredit.style.display=current_on ? '' : 'none';
+		trviewdetail.style.display=current_on ? 'none' : '';
+		treditdetail.style.display=current_on ? '' : 'none';
 	}
 </script><?
 }

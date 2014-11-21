@@ -52,7 +52,7 @@ function haproxy_js_acl_select($mode) {
 	$seltext = '';
 	foreach ($a_acltypes as $key => $expr) {
 		if ($expr['mode'] == '' || $expr['mode'] == $mode)
-			$seltext .= "<option value='" . $key . "'>" . $expr['name'] .":<\/option>";
+			$seltext .= "<option value='" . $key . "'>" . $expr['name'] ."<\/option>";
 	}
 	return $seltext;
 }
@@ -63,10 +63,13 @@ if (!is_array($config['installedpackages']['haproxy']['ha_backends']['item'])) {
 
 $a_backend = &$config['installedpackages']['haproxy']['ha_backends']['item'];
 $a_pools = &$config['installedpackages']['haproxy']['ha_pools']['item'];
+uasort($a_pools, haproxy_compareByName);
 
 global $simplefields;
 $simplefields = array('name','desc','status','secondary','primary_frontend','type','forwardfor','httpclose','extaddr','backend_serverpool',
-	'max_connections','client_timeout','port','ssloffloadcert','dcertadv','ssloffload','ssloffloadacl','advanced_bind','ssloffloadacladditional');
+	'max_connections','client_timeout','port','ssloffloadcert','dcertadv','ssloffload','ssloffloadacl','ssloffloadaclnondefault','advanced_bind',
+	'ssloffloadacladditional','ssloffloadacladditionalnondefault',
+	'dontlognull','dontlog-normal','log-separate-errors','log-detailed');
 
 if (isset($_POST['id']))
 	$id = $_POST['id'];
@@ -84,8 +87,7 @@ if (!is_numeric($id))
 	$pconfig['ssloffloadacl'] = "yes";
 }
 
-$servercerts = get_certificates_server();
-
+$servercerts = haproxy_get_certificates('server,user');
 $fields_sslCertificates=array();
 $fields_sslCertificates[0]['name']="ssl_certificate";
 $fields_sslCertificates[0]['columnheader']="Certificates";
@@ -93,6 +95,28 @@ $fields_sslCertificates[0]['colwidth']="95%";
 $fields_sslCertificates[0]['type']="select";
 $fields_sslCertificates[0]['size']="500px";
 $fields_sslCertificates[0]['items']=&$servercerts;
+
+$certs_ca = haproxy_get_certificates('ca');
+$ca_none['']['name']="None";
+$certs_ca = $ca_none + $certs_ca;
+$fields_caCertificates=array();
+$fields_caCertificates[0]['name']="cert_ca";
+$fields_caCertificates[0]['columnheader']="Certificates authorities";
+$fields_caCertificates[0]['colwidth']="95%";
+$fields_caCertificates[0]['type']="select";
+$fields_caCertificates[0]['size']="500px";
+$fields_caCertificates[0]['items']=&$certs_ca;
+
+$certs_crl = haproxy_get_crls();
+$ca_none['']['name']="None";
+$certs_crl = $ca_none + $certs_crl;
+$fields_crlCertificates=array();
+$fields_crlCertificates[0]['name']="cert_crl";
+$fields_crlCertificates[0]['columnheader']="Certificate revocation lists";
+$fields_crlCertificates[0]['colwidth']="95%";
+$fields_crlCertificates[0]['type']="select";
+$fields_crlCertificates[0]['size']="500px";
+$fields_crlCertificates[0]['items']=&$certs_crl;
 
 $fields_aclSelectionList=array();
 $fields_aclSelectionList[0]['name']="name";
@@ -114,17 +138,21 @@ $fields_aclSelectionList[2]['colwidth']="35%";
 $fields_aclSelectionList[2]['type']="textbox";
 $fields_aclSelectionList[2]['size']="35";
 
-
 if (isset($id) && $a_backend[$id]) {
 	$pconfig['a_acl']=&$a_backend[$id]['ha_acls']['item'];	
 	$pconfig['a_certificates']=&$a_backend[$id]['ha_certificates']['item'];
+	$pconfig['clientcert_ca']=&$a_backend[$id]['clientcert_ca']['item'];
+	$pconfig['clientcert_crl']=&$a_backend[$id]['clientcert_crl']['item'];
 	$pconfig['advanced'] = base64_decode($a_backend[$id]['advanced']);
 	foreach($simplefields as $stat)
 		$pconfig[$stat] = $a_backend[$id][$stat];
 }
 
-if (isset($_GET['dup']))
+if (isset($_GET['dup'])) {
 	unset($id);
+	if ($pconfig['secondary'] != 'yes')
+		$pconfig['primary_frontend'] = $pconfig['name'];
+}
 
 $changedesc = "Services: HAProxy: Frontend";
 $changecount = 0;
@@ -135,7 +163,6 @@ if ($_POST) {
 	unset($input_errors);
 	$pconfig = $_POST;
 	
-	
 	if ($pconfig['secondary'] != "yes") {
 		$reqdfields = explode(" ", "name type port");
 		$reqdfieldsn = explode(",", "Name,Type,Port");
@@ -144,7 +171,11 @@ if ($_POST) {
 		$reqdfieldsn = explode(",", "Name");
 	}
 	
-	do_input_validation($_POST, $reqdfields, $reqdfieldsn, &$input_errors);
+	$pf_version=substr(trim(file_get_contents("/etc/version")),0,3);
+	if ($pf_version < 2.1)
+		$input_errors = eval('do_input_validation($_POST, $reqdfields, $reqdfieldsn, &$input_errors); return $input_errors;');
+	else
+		do_input_validation($_POST, $reqdfields, $reqdfieldsn, $input_errors);
 
 	if (preg_match("/[^a-zA-Z0-9\.\-_]/", $_POST['name']))
 		$input_errors[] = "The field 'Name' contains invalid characters.";
@@ -169,6 +200,10 @@ if ($_POST) {
 
 	$a_certificates = haproxy_htmllist_get_values($fields_sslCertificates);
 	$pconfig['a_certificates'] = $a_certificates;
+	$a_clientcert_ca = haproxy_htmllist_get_values($fields_caCertificates);
+	$pconfig['a_clientcert_ca'] = $a_clientcert_ca;
+	$a_clientcert_crl = haproxy_htmllist_get_values($fields_crlCertificates);
+	$pconfig['a_clientcert_crl'] = $a_clientcert_crl;
 	
 	$a_acl = haproxy_htmllist_get_values($fields_aclSelectionList);
 	$pconfig['a_acl'] = $a_acl;
@@ -210,6 +245,8 @@ if ($_POST) {
 		update_if_changed("advanced", $backend['advanced'], base64_encode($_POST['advanced']));
 		$backend['ha_acls']['item'] = $a_acl;
 		$backend['ha_certificates']['item'] = $a_certificates;
+		$backend['clientcert_ca']['item'] = $a_clientcert_ca;
+		$backend['clientcert_crl']['item'] = $a_clientcert_crl;
 
 		if (isset($id) && $a_backend[$id]) {
 			$a_backend[$id] = $backend;
@@ -258,7 +295,7 @@ $interfaces = haproxy_get_bindable_interfaces();
 <?php endif; ?>
 
 <script type="text/javascript">
-	function htmllist_get_select_options(tableId) {
+	function htmllist_get_select_options(tableId, fieldname) {
 		var seltext;
 		seltext = "";
 		var type;
@@ -285,6 +322,12 @@ $interfaces = haproxy_get_bindable_interfaces();
 		}
 		if (tableId == 'tableA_sslCertificates'){
 			seltext = "<?=haproxy_js_select_options($servercerts);?>";
+		}
+		if (tableId == 'table_clientcert_ca'){
+			seltext = "<?=haproxy_js_select_options($certs_ca);?>";
+		}
+		if (tableId == 'table_clientcert_crl'){
+			seltext = "<?=haproxy_js_select_options($certs_crl);?>";
 		}
 		return seltext;
 	}
@@ -507,6 +550,48 @@ $interfaces = haproxy_get_bindable_interfaces();
 			For more information about ACL's please see <a href='http://haproxy.1wt.eu/download/1.5/doc/configuration.txt' target='_blank'>HAProxy Documentation</a> Section 7 - Using ACL's
 			</td>
 		</tr>
+		<tr class="haproxy_primary"><td>&nbsp;</td></tr>
+		<tr class="haproxy_primary">
+			<td colspan="2" valign="top" class="listtopic">Logging options</td>
+		</tr>
+		<tr class="haproxy_primary" align="left">
+			<td width="22%" valign="top" class="vncell">Dont log null</td>
+			<td width="78%" class="vtable" colspan="2">
+				<input id="dontlognull" name="dontlognull" type="checkbox" value="yes" <?php if ($pconfig['dontlognull']=='yes') echo "checked"; ?> onclick='updatevisibility();' />
+				A connection on which no data has been transferred will not be logged.
+				<div>To skip logging probes from monitoring systems that otherwise would pollute the logging. (It is generally recommended not to use this option in uncontrolled environments (eg: internet), otherwise scans and other malicious activities would not be logged.)</div>
+			</td>
+		</tr>
+		<tr class="haproxy_primary" align="left">
+			<td width="22%" valign="top" class="vncell">Dont log normal</td>
+			<td width="78%" class="vtable" colspan="2">
+				<input id="dontlog-normal" name="dontlog-normal" type="checkbox" value="yes" <?php if ($pconfig['dontlog-normal']=='yes') echo "checked"; ?> onclick='updatevisibility();' />
+				Don't log connections in which no anomalies are found.
+				<div>Setting this option ensures that
+				normal connections, those which experience no error, no timeout, no retry nor
+				redispatch, will not be logged.</div>
+			</td>
+		</tr>
+		<tr class="haproxy_primary" align="left">
+			<td width="22%" valign="top" class="vncell">Raise level for errors</td>
+			<td width="78%" class="vtable" colspan="2">
+				<input id="log-separate-errors" name="log-separate-errors" type="checkbox" value="yes" <?php if ($pconfig['log-separate-errors']=='yes') echo "checked"; ?> onclick='updatevisibility();' />
+				Change the level changes from "info" to "err" for potentially interesting information.
+				<div>This option makes haproxy raise the level of logs containing potentially interesting information such
+				as errors, timeouts, retries, redispatches, or HTTP status codes 5xx. </div>
+			</td>
+		</tr>
+		<tr class="haproxy_primary" align="left">
+			<td width="22%" valign="top" class="vncell">Detailed logging</td>
+			<td width="78%" class="vtable" colspan="2">
+				<input id="log-detailed" name="log-detailed" type="checkbox" value="yes" <?php if ($pconfig['log-detailed']=='yes') echo "checked"; ?> onclick='updatevisibility();' />
+				If checked provides more detailed logging.
+				<div>Each log line turns into a much richer format including, but
+				not limited to, the connection timers, the session status, the connections
+				numbers, the frontend, backend and server name, and of course the source
+				address and ports. In http mode also the HTTP request and captured headers and cookies will be logged.</div>
+			</td>
+		</tr>
 	</table>
 	<br/>&nbsp;<br/>
 	<table class="haproxy_primary" width="100%" border="0" cellpadding="6" cellspacing="0">
@@ -588,7 +673,8 @@ $interfaces = haproxy_get_bindable_interfaces();
 				<br/>
 				NOTE: choose the cert to use on this frontend.
 				<br/>
-				<input id="ssloffloadacl" name="ssloffloadacl" type="checkbox" value="yes" <?php if ($pconfig['ssloffloadacl']=='yes') echo "checked";?> onclick="updatevisibility();" />Add ACL for certificate CommonName.
+				<input id="ssloffloadacl" name="ssloffloadacl" type="checkbox" value="yes" <?php if ($pconfig['ssloffloadacl']=='yes') echo "checked";?> onclick="updatevisibility();" />Add ACL for certificate CommonName. (host header matches 'CN')<br/>
+				<input id="ssloffloadaclnondefault" name="ssloffloadaclnondefault" type="checkbox" value="yes" <?php if ($pconfig['ssloffloadaclnondefault']=='yes') echo "checked";?> onclick="updatevisibility();" />Add ACL for certificate CommonName for nondefault ports. (host header starts with 'CN:')
 			</td>
 		</tr>
 		<tr class="haproxy_ssloffloading_enabled">
@@ -600,7 +686,8 @@ $interfaces = haproxy_get_bindable_interfaces();
 			haproxy_htmllist("tableA_sslCertificates", $a_certificates, $fields_sslCertificates);
 			?>
 				<br/>
-				<input id="ssloffloadacladditional" name="ssloffloadacladditional" type="checkbox" value="yes" <?php if ($pconfig['ssloffloadacladditional']=='yes') echo "checked";?> onclick="updatevisibility();" />Add ACL for certificate CommonName.
+				<input id="ssloffloadacladditional" name="ssloffloadacladditional" type="checkbox" value="yes" <?php if ($pconfig['ssloffloadacladditional']=='yes') echo "checked";?> onclick="updatevisibility();" />Add ACL for certificate CommonName. (host header matches 'CN')<br/>
+				<input id="ssloffloadacladditionalnondefault" name="ssloffloadacladditionalnondefault" type="checkbox" value="yes" <?php if ($pconfig['ssloffloadacladditionalnondefault']=='yes') echo "checked";?> onclick="updatevisibility();" />Add ACL for certificate CommonName for nondefault ports. (host header starts with 'CN:')
 			</td>
 		</tr>
 		<tr class="haproxy_ssloffloading_enabled haproxy_primary" align="left">
@@ -610,6 +697,29 @@ $interfaces = haproxy_get_bindable_interfaces();
 				<br/>
 				NOTE: Paste additional ssl options(without commas) to include on ssl listening options.<br/>
 				some options: force-sslv3, force-tlsv10 force-tlsv11 force-tlsv12 no-sslv3 no-tlsv10 no-tlsv11 no-tlsv12 no-tls-tickets
+			</td>
+		</tr>
+		<tr class="haproxy_ssloffloading_enabled haproxy_primary">
+			<td class="vncell" colspan="2"><b>Client certificate verification options, leave this empty if you do want to ask for a client certificate</b></td>
+		</tr>
+		<tr class="haproxy_ssloffloading_enabled haproxy_primary">
+			<td width="22%" valign="top" class="vncell">Client verification CA certificates</td>
+			<td width="78%" class="vtable" colspan="2" valign="top">
+			Client certificate will be verified against these CA certificates.
+			<?
+			$a_certificates = $pconfig['clientcert_ca'];
+			haproxy_htmllist("table_clientcert_ca", $a_certificates, $fields_caCertificates);
+			?>
+			</td>
+		</tr>
+		<tr class="haproxy_ssloffloading_enabled haproxy_primary">
+			<td width="22%" valign="top" class="vncell">Client verification CRL</td>
+			<td width="78%" class="vtable" colspan="2" valign="top">
+			Client certificate will be verified against these CRL revocation lists.
+			<?
+			$a_certificates = $pconfig['clientcert_crl'];
+			haproxy_htmllist("table_clientcert_crl", $a_certificates, $fields_crlCertificates);
+			?>
 			</td>
 		</tr>
 		<tr>
@@ -641,6 +751,8 @@ $interfaces = haproxy_get_bindable_interfaces();
 	phparray_to_javascriptarray($primaryfrontends,"primaryfrontends",Array('/*','/*/name','/*/ref','/*/ref/type','/*/ref/ssloffload'));
 	phparray_to_javascriptarray($a_closetypes,"closetypes",Array('/*','/*/name','/*/descr'));
 	phparray_to_javascriptarray($fields_sslCertificates,"fields_sslCertificates",Array('/*','/*/name','/*/type','/*/size','/*/items','/*/items/*','/*/items/*/*','/*/items/*/*/name'));
+	phparray_to_javascriptarray($fields_caCertificates,"fields_ca",Array('/*','/*/name','/*/type','/*/size','/*/items','/*/items/*','/*/items/*/*','/*/items/*/*/name'));
+	phparray_to_javascriptarray($fields_crlCertificates,"fields_crl",Array('/*','/*/name','/*/type','/*/size','/*/items','/*/items/*','/*/items/*/*','/*/items/*/*/name'));
 	phparray_to_javascriptarray($fields_aclSelectionList,"fields_acltable",Array('/*','/*/name','/*/type','/*/size','/*/items','/*/items/*','/*/items/*/*','/*/items/*/*/name'));
 ?>
 </script>

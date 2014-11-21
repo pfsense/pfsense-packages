@@ -134,10 +134,12 @@ include("head.inc");
 		$img_cert = "/themes/{$g['theme']}/images/icons/icon_frmfld_cert.png";
 		$img_adv = "/themes/{$g['theme']}/images/icons/icon_advanced.gif";
 		$img_acl = "/themes/{$g['theme']}/images/icons/icon_ts_rule.gif";
+		$textgray = "";
+		$first = true;		
 		$last_frontend_shared = false;
 		foreach ($a_frontend_grouped as $a_frontend) {
 			usort($a_frontend,'sort_sharedfrontends');
-			if (count($a_frontend) > 1 || $last_frontend_shared) {
+			if ((count($a_frontend) > 1 || $last_frontend_shared) && !$first) {
 				?> <tr class="<?=$textgray?>"><td colspan="7">&nbsp;</td></tr> <?	
 			}
 			$last_frontend_shared = count($a_frontend) > 1;
@@ -151,11 +153,19 @@ include("head.inc");
 				  </td>
 				  <td class="listlr" ondblclick="document.location='haproxy_listeners_edit.php?id=<?=$frontendname;?>';">
 					<? 
+					$acls = get_frontend_acls($frontend);
+					$isaclset = "";
+					foreach ($acls as $acl) {
+						$isaclset .= "&#10;" . htmlspecialchars($acl['descr']);
+					}
+					if ($isaclset) 
+						echo "<img src=\"$img_acl\" title=\"" . gettext("acl's used") . ": {$isaclset}\" border=\"0\" />";
+						
 					if (strtolower($frontend['type']) == "http" && $frontend['ssloffload']) {
 						$cert = lookup_cert($frontend['ssloffloadcert']);
 						$descr = htmlspecialchars($cert['descr']);
-						$certs = $frontend['ha_certificates']['item'];
-						if (is_array($certs)){
+						if (is_array($frontend['ha_certificates']) && is_array($frontend['ha_certificates']['item'])) {
+							$certs = $frontend['ha_certificates']['item'];
 							if (count($certs) > 0){
 								foreach($certs as $certitem){
 									$cert = lookup_cert($certitem['ssl_certificate']);
@@ -166,15 +176,6 @@ include("head.inc");
 						echo '<img src="'.$img_cert.'" title="SSL offloading cert: '.$descr.'" alt="SSL offloading" border="0" height="16" width="16" />';
 					}
 					
-					$acls = get_frontend_acls($frontend);
-					$isaclset = "";
-					foreach ($acls as $acl) {
-						$isaclset .= "&#10;" . htmlspecialchars($acl['descr']);
-					}
-					
-					if ($isaclset) 
-						echo "<img src=\"$img_acl\" title=\"" . gettext("acl's used") . ": {$isaclset}\" border=\"0\" />";
-						
 					$isadvset = "";
 					if ($frontend['advanced_bind']) $isadvset .= "Advanced bind: ".htmlspecialchars($frontend['advanced_bind'])."\r\n";
 					if ($frontend['advanced']) $isadvset .= "Advanced pass thru setting used\r\n";
@@ -183,12 +184,15 @@ include("head.inc");
 					
 					$backend_serverpool = $frontend['backend_serverpool'];
 					$backend = get_backend($backend_serverpool );
-					if ($backend && is_array($backend['ha_servers']['item'])){
+					if ($backend && is_array($backend['ha_servers']) && is_array($backend['ha_servers']['item'])){
 						$servers = $backend['ha_servers']['item'];
 						$backend_serverpool_hint = gettext("Servers in pool:");
 						if (is_array($servers)){
 							foreach($servers as $server){
-								$backend_serverpool_hint .= "\n".$server['address'].":".$server['port'];
+								if (isset($server['forwardto']) && $server['forwardto'] != "")
+									$backend_serverpool_hint .= "\n[".$server['forwardto']."]";
+								else								
+									$backend_serverpool_hint .= "\n".$server['address'].":".$server['port'];
 							}
 						}
 					}
@@ -208,7 +212,9 @@ include("head.inc");
 				  </td>
 				  <td class="listlr" ondblclick="document.location='haproxy_listeners_edit.php?id=<?=$frontendname;?>';">
 					<div title='<?=$backend_serverpool_hint;?>'>
+					<a href="haproxy_pool_edit.php?id=<?=$frontend['backend_serverpool']?>">
 					<?=$frontend['backend_serverpool']?>
+					</a>
 					</div>
 				  </td>
 				  <td class="listlr" ondblclick="document.location='haproxy_listeners_edit.php?id=<?=$frontendname;?>';">

@@ -136,7 +136,7 @@
 		squidGuard_print_javascript();
 	</custom_php_after_form_command>
 	<custom_php_validation_command>
-		squidguard_validate_times(&amp;$_POST, &amp;$input_errors);
+		squidguard_validate_times($_POST, $input_errors);
 	</custom_php_validation_command>
 	<custom_php_resync_config_command>
 //		squidguard_resync_time();

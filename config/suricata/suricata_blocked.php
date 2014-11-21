@@ -10,6 +10,7 @@
  * Copyright (C) 2006 Scott Ullrich
  * Copyright (C) 2009 Robert Zelaya Sr. Developer
  * Copyright (C) 2012 Ermal Luci
+ * Copyright (C) 2014 Jim Pingle jim@pingle.org
  * All rights reserved.
  *
  * Adapted for Suricata by:
@@ -54,6 +55,21 @@ if (empty($pconfig['blertnumber']))
 	$bnentries = '500';
 else
 	$bnentries = $pconfig['blertnumber'];
+
+# --- AJAX REVERSE DNS RESOLVE Start ---
+if (isset($_POST['resolve'])) {
+	$ip = strtolower($_POST['resolve']);
+	$res = (is_ipaddr($ip) ? gethostbyaddr($ip) : '');
+	
+	if ($res && $res != $ip)
+		$response = array('resolve_ip' => $ip, 'resolve_text' => $res);
+	else
+		$response = array('resolve_ip' => $ip, 'resolve_text' => gettext("Cannot resolve"));
+	
+	echo json_encode(str_replace("\\","\\\\", $response)); // single escape chars can break JSON decode
+	exit;
+}
+# --- AJAX REVERSE DNS RESOLVE End ---
 
 if ($_POST['todelete']) {
 	$ip = "";
@@ -138,8 +154,6 @@ include_once("head.inc");
 ?>
 
 <body link="#000000" vlink="#000000" alink="#000000">
-<script src="/javascript/filter_log.js" type="text/javascript"></script>
-
 <?php
 
 include_once("fbegin.inc");
@@ -161,19 +175,22 @@ if ($savemsg) {
 <input type="hidden" name="ip" id="ip" value=""/>
 
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
+<tbody>
 <tr>
 	<td>
 	<?php
 	$tab_array = array();
-	$tab_array[] = array(gettext("Suricata Interfaces"), false, "/suricata/suricata_interfaces.php");
+	$tab_array[] = array(gettext("Interfaces"), false, "/suricata/suricata_interfaces.php");
 	$tab_array[] = array(gettext("Global Settings"), false, "/suricata/suricata_global.php");
-	$tab_array[] = array(gettext("Update Rules"), false, "/suricata/suricata_download_updates.php");
+	$tab_array[] = array(gettext("Updates"), false, "/suricata/suricata_download_updates.php");
 	$tab_array[] = array(gettext("Alerts"), false, "/suricata/suricata_alerts.php");
-	$tab_array[] = array(gettext("Blocked"), true, "/suricata/suricata_blocked.php");
+	$tab_array[] = array(gettext("Blocks"), true, "/suricata/suricata_blocked.php");
 	$tab_array[] = array(gettext("Pass Lists"), false, "/suricata/suricata_passlist.php");
 	$tab_array[] = array(gettext("Suppress"), false, "/suricata/suricata_suppress.php");
-	$tab_array[] = array(gettext("Logs Browser"), false, "/suricata/suricata_logs_browser.php?instance={$instanceid}");
+	$tab_array[] = array(gettext("Logs View"), false, "/suricata/suricata_logs_browser.php?instance={$instanceid}");
 	$tab_array[] = array(gettext("Logs Mgmt"), false, "/suricata/suricata_logs_mgmt.php");
+	$tab_array[] = array(gettext("SID Mgmt"), false, "/suricata/suricata_sid_mgmt.php");
+	$tab_array[] = array(gettext("Sync"), false, "/pkg_edit.php?xml=suricata/suricata_sync.xml");
 	display_top_tabs($tab_array, true);
 	?>
 	</td>
@@ -181,6 +198,7 @@ if ($savemsg) {
 <tr>
 	<td><div id="mainarea">
 		<table id="maintable" class="tabcont" width="100%" border="0" cellpadding="6" cellspacing="0">
+			<tbody>
 			<tr>
 				<td colspan="2" class="listtopic"><?php echo gettext("Blocked Hosts Log View Settings"); ?></td>
 			</tr>
@@ -190,7 +208,7 @@ if ($savemsg) {
 				<input name="download" type="submit" class="formbtns" value="Download" title="<?=gettext("Download list of blocked hosts as a gzip archive");?>"/>
 				&nbsp;<?php echo gettext("All blocked hosts will be saved."); ?>&nbsp;&nbsp;
 				<input name="remove" type="submit" class="formbtns" value="Clear" title="<?=gettext("Remove blocks for all listed hosts");?>" 
-				onClick="return confirm('<?=gettext("Are you sure you want to remove all blocked hosts?  Click OK to continue or CANCLE to quit.");?>');"/>&nbsp;
+				onClick="return confirm('<?=gettext("Are you sure you want to remove all blocked hosts?  Click OK to continue or CANCEL to quit.");?>');"/>&nbsp;
 				<span class="red"><strong><?php echo gettext("Warning:"); ?></strong></span>&nbsp;<?php echo gettext("all hosts will be removed."); ?>
 				</td>
 			</tr>
@@ -219,11 +237,11 @@ if ($savemsg) {
 						<col width="10%" align="center">
 					</colgroup>
 					<thead>
-					   <tr>
+					   <tr class="sortableHeaderRowIdentifier">
 						<th class="listhdrr" axis="number">#</th>
 						<th class="listhdrr" axis="string"><?php echo gettext("IP"); ?></th>
 						<th class="listhdrr" axis="string"><?php echo gettext("Alert Description"); ?></th>
-						<th class="listhdrr"><?php echo gettext("Remove"); ?></th>
+						<th class="listhdrr sorttable_nosort"><?php echo gettext("Remove"); ?></th>
 					   </tr>
 					</thead>
 				<tbody>
@@ -242,8 +260,11 @@ if ($savemsg) {
 					/*	       0         1      2             3      4       5   6              7        8     9  10   */
 					/* File format timestamp,action,sig_generator,sig_id,sig_rev,msg,classification,priority,proto,ip,port */
 					while (($fields = fgetcsv($fd, 1000, ',', '"')) !== FALSE) {
-						if(count($fields) < 11)
+						if(count($fields) != 11) {
+							log_error("[suricata] ERROR: block.log entry failed to parse correctly with too many or not enough CSV entities, skipping this entry...");
+							log_error("[suricata] Failed block.log entry fields are: " . print_r($fields, true));
 							continue;
+						}
 						$fields[9] = inet_pton($fields[9]);
 						if (isset($tmpblocked[$fields[9]])) {
 							if (!is_array($src_ip_list[$fields[9]]))
@@ -274,18 +295,15 @@ if ($savemsg) {
 				$tmp_ip = str_replace(":", ":&#8203;", $block_ip_str);
 				/* Add reverse DNS lookup icons */
 				$rdns_link = "";
-				$rdns_link .= "<a onclick=\"javascript:getURL('/diag_dns.php?host={$block_ip_str}&dialog_output=true', outputrule);\">";
-				$rdns_link .= "<img src='../themes/{$g['theme']}/images/icons/icon_log_d.gif' width='11' height='11' border='0' ";
-				$rdns_link .= "title='" . gettext("Resolve host via reverse DNS lookup (quick pop-up)") . "' style=\"cursor: pointer;\"></a>&nbsp;";
-				$rdns_link .= "<a href='/diag_dns.php?host={$block_ip_str}'>";
-				$rdns_link .= "<img src='../themes/{$g['theme']}/images/icons/icon_log.gif' width='11' height='11' border='0' ";
-				$rdns_link .= "title='" . gettext("Resolve host via reverse DNS lookup") . "'></a>";
+				$rdns_link .= "<img onclick=\"javascript:resolve_with_ajax('{$block_ip_str}');\" title=\"";
+				$rdns_link .= gettext("Resolve host via reverse DNS lookup") . "\" border=\"0\" src=\"/themes/{$g['theme']}/images/icons/icon_log.gif\" alt=\"Icon Reverse Resolve with DNS\" ";
+				$rdns_link.= " style=\"cursor: pointer;\"/>";
 				/* use one echo to do the magic*/
 					echo "<tr>
 						<td align=\"center\" valign=\"middle\" class=\"listr\">{$counter}</td>
 						<td align=\"center\" valign=\"middle\" class=\"listr\">{$tmp_ip}<br/>{$rdns_link}</td>
 						<td valign=\"middle\" class=\"listr\">{$blocked_desc}</td>
-						<td align=\"center\" valign=\"middle\" class=\"listr\" sorttable_customkey=\"\">
+						<td align=\"center\" valign=\"middle\" class=\"listr\">
 						<input type=\"image\" name=\"todelete[]\" onClick=\"document.getElementById('ip').value='{$block_ip_str}';\" 
 						src=\"../themes/{$g['theme']}/images/icons/icon_x.gif\" title=\"" . gettext("Delete host from Blocked Table") . "\" border=\"0\" /></td>
 					</tr>\n";
@@ -310,14 +328,49 @@ if ($savemsg) {
 			?>
 			</td>
 		</tr>
+		</tbody>
 	</table>
 	</div>
 	</td>
 </tr>
+</tbody>
 </table>
 </form>
 <?php
 include("fend.inc");
 ?>
+
+<!-- The following AJAX code was borrowed from the diag_logs_filter.php -->
+<!-- file in pfSense.  See copyright info at top of this page.          -->
+<script type="text/javascript">
+//<![CDATA[
+function resolve_with_ajax(ip_to_resolve) {
+	var url = "/suricata/suricata_blocked.php";
+
+	jQuery.ajax(
+		url,
+		{
+			type: 'post',
+			dataType: 'json',
+			data: {
+				resolve: ip_to_resolve,
+				},
+			complete: resolve_ip_callback
+		});
+}
+
+function resolve_ip_callback(transport) {
+	var response = jQuery.parseJSON(transport.responseText);
+	var msg = 'IP address "' + response.resolve_ip + '" resolves to\n';
+	alert(msg + 'host "' + htmlspecialchars(response.resolve_text) + '"');
+}
+
+// From http://stackoverflow.com/questions/5499078/fastest-method-to-escape-html-tags-as-html-entities
+function htmlspecialchars(str) {
+    return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&apos;');
+}
+//]]>
+</script>
+
 </body>
 </html>

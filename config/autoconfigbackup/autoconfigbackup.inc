@@ -2,7 +2,7 @@
 /* $Id$ */
 /*
     autoconfigbackup.inc
-    Copyright (C) 2008 Scott Ullrich
+    Copyright (C) 2008-2014 Electric Sheep Fencing LP  
 
     Redistribution and use in source and binary forms, with or without
     modification, are permitted provided that the following conditions are met:
@@ -43,8 +43,17 @@ if(file_exists("/usr/local/pkg/parse_config/parse_config_upload.php"))
 function custom_php_validation_command($post, &$input_errors) {
 	global $_POST, $savemsg, $config;
 
+	if(!$post['username'])
+		$input_errors[] = "Username is required.";
+
+	if(!$post['password'] or !$post['passwordagain'])
+		$input_errors[] = "The subscription password is required.";
+
+	if(!$post['crypto_password'] or !$post['crypto_password2'])
+		$input_errors[] = "The encryption password is required.";
+
 	if($post['password'] <> $post['passwordagain']) 
-		$input_errors[] = "Sorry, the entered passwords do not match.";
+		$input_errors[] = "Sorry, the entered portal.pfsense.org passwords do not match.";
 
 	if($post['crypto_password'] <> $post['crypto_password2']) 
 		$input_errors[] = "Sorry, the entered encryption passwords do not match.";
@@ -57,6 +66,21 @@ function custom_php_validation_command($post, &$input_errors) {
 	
 	// We do not need to store this value.
 	unset($_POST['testconnection']);
+}
+
+function configure_proxy() {
+	global $config;
+	$ret = array();
+	if (!empty($config['system']['proxyurl'])) {
+		$ret[CURLOPT_PROXY] = $config['system']['proxyurl'];
+		if (!empty($config['system']['proxyport']))
+			$ret[CURLOPT_PROXYPORT] = $config['system']['proxyport'];
+		if (!empty($config['system']['proxyuser']) && !empty($config['system']['proxypass'])) {
+			$ret[CURLOPT_PROXYAUTH] = CURLAUTH_ANY | CURLAUTH_ANYSAFE;
+			$ret[CURLOPT_PROXYUSERPWD] = "{$config['system']['proxyuser']}:{$config['system']['proxypass']}";
+		}
+	}
+	return $ret;
 }
 
 function test_connection($post) {
@@ -93,6 +117,9 @@ function test_connection($post) {
 	curl_setopt($curl_session, CURLOPT_RETURNTRANSFER, 1);
 	curl_setopt($curl_session, CURLOPT_CONNECTTIMEOUT, 55);
 	curl_setopt($curl_session, CURLOPT_TIMEOUT, 30);
+	curl_setopt($curl_session, CURLOPT_USERAGENT, $g['product_name'] . '/' . rtrim(file_get_contents("/etc/version")));
+	// Proxy
+	curl_setopt_array($curl_session, configure_proxy());
 
 	curl_setopt($curl_session, CURLOPT_POSTFIELDS, "action=showbackups&hostname={$hostname}");
 	$data = curl_exec($curl_session);
@@ -117,9 +144,6 @@ function upload_config($reasonm = "") {
 	 *   This file plugs into config.inc (/usr/local/pkg/parse_config)
 	 *   and runs every time the running firewall filter changes.
 	 * 
-	 *   Written by Scott Ullrich
-	 *   (C) 2008 BSD Perimeter LLC 
-	 *
 	 */
 	
 	if(file_exists("/tmp/acb_nooverwrite")) {
@@ -200,7 +224,10 @@ function upload_config($reasonm = "") {
 				curl_setopt($curl_session, CURLOPT_SSL_VERIFYPEER, 0);
 				curl_setopt($curl_session, CURLOPT_CONNECTTIMEOUT, 55);
 				curl_setopt($curl_session, CURLOPT_TIMEOUT, 30);
-
+				curl_setopt($curl_session, CURLOPT_USERAGENT, $g['product_name'] . '/' . rtrim(file_get_contents("/etc/version")));
+				// Proxy
+				curl_setopt_array($curl_session, configure_proxy());
+				
 				$data = curl_exec($curl_session);
 				if (curl_errno($curl_session)) {
 					$fd = fopen("/tmp/backupdebug.txt", "w");
@@ -239,4 +266,3 @@ function upload_config($reasonm = "") {
 	}	
 }
 
-?>

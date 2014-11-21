@@ -50,6 +50,7 @@ $snortdownload = $config['installedpackages']['suricata']['config'][0]['enable_v
 $emergingthreats = $config['installedpackages']['suricata']['config'][0]['enable_etopen_rules'];
 $etpro = $config['installedpackages']['suricata']['config'][0]['enable_etpro_rules'];
 $snortcommunityrules = $config['installedpackages']['suricata']['config'][0]['snortcommunityrules'];
+$snort_rules_file = $config['installedpackages']['suricata']['config'][0]['snort_rules_file'];
 
 /* Get last update information if available */
 if (!empty($config['installedpackages']['suricata']['config'][0]['last_rule_upd_time']))
@@ -61,7 +62,6 @@ if (!empty($config['installedpackages']['suricata']['config'][0]['last_rule_upd_
 else
 	$last_rule_upd_status = gettext("Unknown");
 
-$snort_rules_file = VRT_DNLD_FILENAME;
 $snort_community_rules_filename = GPLV2_DNLD_FILENAME;
 
 if ($etpro == "on") {
@@ -82,7 +82,7 @@ else {
 	$snort_org_sig_chk_local = 'Not Enabled';
 	$snort_org_sig_date = 'Not Enabled';
 }
-if (file_exists("{$suricatadir}{$snort_rules_file}.md5")){
+if ($snortdownload == 'on' && file_exists("{$suricatadir}{$snort_rules_file}.md5")){
 	$snort_org_sig_chk_local = file_get_contents("{$suricatadir}{$snort_rules_file}.md5");
 	$snort_org_sig_date = date(DATE_RFC850, filemtime("{$suricatadir}{$snort_rules_file}.md5"));
 }
@@ -95,7 +95,7 @@ else {
 	$emergingt_net_sig_chk_local = 'Not Enabled';
 	$emergingt_net_sig_date = 'Not Enabled';
 }
-if (file_exists("{$suricatadir}{$emergingthreats_filename}.md5")) {
+if (($etpro == "on" || $emergingthreats == "on") && file_exists("{$suricatadir}{$emergingthreats_filename}.md5")) {
 	$emergingt_net_sig_chk_local = file_get_contents("{$suricatadir}{$emergingthreats_filename}.md5");
 	$emergingt_net_sig_date = date(DATE_RFC850, filemtime("{$suricatadir}{$emergingthreats_filename}.md5"));
 }
@@ -108,7 +108,7 @@ else {
 	$snort_community_sig_chk_local = 'Not Enabled';
 	$snort_community_sig_sig_date = 'Not Enabled';
 }
-if (file_exists("{$suricatadir}{$snort_community_rules_filename}.md5")) {
+if ($snortcommunityrules == 'on' && file_exists("{$suricatadir}{$snort_community_rules_filename}.md5")) {
 	$snort_community_sig_chk_local = file_get_contents("{$suricatadir}{$snort_community_rules_filename}.md5");
 	$snort_community_sig_sig_date = date(DATE_RFC850, filemtime("{$suricatadir}{$snort_community_rules_filename}.md5"));
 }
@@ -119,7 +119,7 @@ if ($_POST['clear']) {
 		mwexec("/bin/rm -f {$suricata_rules_upd_log}");
 }
 
-if ($_POST['check']) {
+if ($_POST['update']) {
 	// Go see if new updates for rule sets are available
 	header("Location: /suricata/suricata_download_rules.php");
 	exit;
@@ -177,21 +177,24 @@ include_once("head.inc");
 		print_info_box($savemsg);
 	}
 ?>
-<form action="suricata_download_updates.php" method="post" name="iform" id="iform">
+<form action="suricata_download_updates.php" enctype="multipart/form-data" method="post" name="iform" id="iform">
 
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
+<tbody>
 <tr><td>
 <?php
         $tab_array = array();
-        $tab_array[] = array(gettext("Suricata Interfaces"), false, "/suricata/suricata_interfaces.php");
+        $tab_array[] = array(gettext("Interfaces"), false, "/suricata/suricata_interfaces.php");
         $tab_array[] = array(gettext("Global Settings"), false, "/suricata/suricata_global.php");
-        $tab_array[] = array(gettext("Update Rules"), true, "/suricata/suricata_download_updates.php");
+        $tab_array[] = array(gettext("Updates"), true, "/suricata/suricata_download_updates.php");
 	$tab_array[] = array(gettext("Alerts"), false, "/suricata/suricata_alerts.php");
-	$tab_array[] = array(gettext("Blocked"), false, "/suricata/suricata_blocked.php");
+	$tab_array[] = array(gettext("Blocks"), false, "/suricata/suricata_blocked.php");
 	$tab_array[] = array(gettext("Pass Lists"), false, "/suricata/suricata_passlist.php");
 	$tab_array[] = array(gettext("Suppress"), false, "/suricata/suricata_suppress.php");
-	$tab_array[] = array(gettext("Logs Browser"), false, "/suricata/suricata_logs_browser.php");
+	$tab_array[] = array(gettext("Logs View"), false, "/suricata/suricata_logs_browser.php");
 	$tab_array[] = array(gettext("Logs Mgmt"), false, "/suricata/suricata_logs_mgmt.php");
+	$tab_array[] = array(gettext("SID Mgmt"), false, "/suricata/suricata_sid_mgmt.php");
+	$tab_array[] = array(gettext("Sync"), false, "/pkg_edit.php?xml=suricata/suricata_sync.xml");
         display_top_tabs($tab_array, true);
 ?>
 </td></tr>
@@ -199,6 +202,7 @@ include_once("head.inc");
 	<td>
 		<div id="mainarea">
 		<table id="maintable4" class="tabcont" width="100%" border="0" cellpadding="0" cellspacing="0">
+			<tbody>
 			<tr>
 				<td valign="top" class="listtopic" align="center"><?php echo gettext("INSTALLED RULE SET MD5 SIGNATURE");?></td>
 			</tr>
@@ -212,6 +216,7 @@ include_once("head.inc");
 							<th class="listhdrr"><?=gettext("MD5 Signature Date");?></th>
 						</tr>
 					</thead>
+					<tbody>
 					<tr>
 						<td align="center" class="vncell vexpl"><b><?=$et_name;?></b></td>
 						<td align="center" class="vncell vexpl"><? echo trim($emergingt_net_sig_chk_local);?></td>
@@ -227,6 +232,7 @@ include_once("head.inc");
 						<td align="center" class="vncell vexpl"><? echo trim($snort_community_sig_chk_local);?></td>
 						<td align="center" class="vncell vexpl"><?php echo gettext($snort_community_sig_sig_date);?></td>
 					</tr>
+					</tbody>
 				</table><br/>
 				</td>
 			</tr>
@@ -262,8 +268,8 @@ include_once("head.inc");
 						<br/></p>
 					<?php else: ?>
 						<br/>
-						<input type="submit" value="<?=gettext("Check");?>" name="check" id="check" class="formbtn" 
-						title="<?php echo gettext("Check for new updates to enabled rule sets"); ?>"/>&nbsp;&nbsp;&nbsp;&nbsp;
+						<input type="submit" value="<?=gettext("Update");?>" name="update" id="update" class="formbtn" 
+						title="<?php echo gettext("Check for and apply new update to enabled rule sets"); ?>"/>&nbsp;&nbsp;&nbsp;&nbsp;
 						<input type="submit" value="<?=gettext("Force");?>" name="force" id="force" class="formbtn" 
 						title="<?=gettext("Force an update of all enabled rule sets");?>" 
 						onclick="return confirm('<?=gettext("This will zero-out the MD5 hashes to force a fresh download of all enabled rule sets.  Click OK to continue or CANCEL to quit");?>');"/>
@@ -271,7 +277,6 @@ include_once("head.inc");
 					<?php endif; ?>
 				</td>
 			</tr>
-
 			<tr>
 				<td valign="top" class="listtopic" align="center"><?php echo gettext("MANAGE RULE SET LOG");?></td>
 			</tr>
@@ -318,10 +323,12 @@ include_once("head.inc");
 					gettext(" will go down from time to time. Please be patient."); ?></span><br/>
 				</td>
 			</tr>
+			</tbody>
 		</table>
 		</div>
 	</td>
 </tr>
+</tbody>
 </table>
 <!-- end of final table -->
 </form>

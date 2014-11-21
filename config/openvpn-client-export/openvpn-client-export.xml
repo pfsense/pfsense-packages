@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <packagegui>
 	<name>OpenVPN Client Export</name>
-	<version>1.2.11</version>
+	<version>1.2.14</version>
 	<title>OpenVPN Client Export</title>
 	<include_file>/usr/local/pkg/openvpn-client-export.inc</include_file>
 	<backup_file></backup_file>

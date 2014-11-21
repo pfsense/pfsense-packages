@@ -63,34 +63,10 @@ if (is_null($id)) {
 	exit;
 }
 
-/* If no entry for this passlist, then create a UUID and treat it like a new list */
-if (!isset($a_passlist[$id]['uuid'])) {
-	$passlist_uuid = 0;
-	while ($passlist_uuid > 65535 || $passlist_uuid == 0) {
-		$passlist_uuid = mt_rand(1, 65535);
-		$pconfig['uuid'] = $passlist_uuid;
-		$pconfig['name'] = "passlist_{$passlist_uuid}";
-	}
-} else
-	$passlist_uuid = $a_passlist[$id]['uuid'];
-
-/* returns true if $name is a valid name for a pass list file name or ip */
-function is_validpasslistname($name) {
-	if (!is_string($name))
-		return false;
-
-	if (!preg_match("/[^a-zA-Z0-9\_\.\/]/", $name))
-		return true;
-
-	return false;
-}
-
-if (isset($id) && $a_passlist[$id]) {
-	/* old settings */
-	$pconfig = array();
+if (isset($id) && isset($a_passlist[$id])) {
+	/* Retrieve saved settings */
 	$pconfig['name'] = $a_passlist[$id]['name'];
 	$pconfig['uuid'] = $a_passlist[$id]['uuid'];
-	$pconfig['detail'] = $a_passlist[$id]['detail'];
 	$pconfig['address'] = $a_passlist[$id]['address'];
 	$pconfig['descr'] = html_entity_decode($a_passlist[$id]['descr']);
 	$pconfig['localnets'] = $a_passlist[$id]['localnets'];
@@ -103,8 +79,48 @@ if (isset($id) && $a_passlist[$id]) {
 
 // Check for returned "selected alias" if action is import
 if ($_GET['act'] == "import") {
+
+	// Retrieve previously typed values we passed to SELECT ALIAS page
+	$pconfig['name'] = htmlspecialchars($_GET['name']);
+	$pconfig['uuid'] = htmlspecialchars($_GET['uuid']);
+	$pconfig['address'] = htmlspecialchars($_GET['address']);
+	$pconfig['descr'] = htmlspecialchars($_GET['descr']);
+	$pconfig['localnets'] = htmlspecialchars($_GET['localnets'])? 'yes' : 'no';
+	$pconfig['wanips'] = htmlspecialchars($_GET['wanips'])? 'yes' : 'no';
+	$pconfig['wangateips'] = htmlspecialchars($_GET['wangateips'])? 'yes' : 'no';
+	$pconfig['wandnsips'] = htmlspecialchars($_GET['wandnsips'])? 'yes' : 'no';
+	$pconfig['vips'] = htmlspecialchars($_GET['vips'])? 'yes' : 'no';
+	$pconfig['vpnips'] = htmlspecialchars($_GET['vpnips'])? 'yes' : 'no';
+
+	// Now retrieve the "selected alias" returned from SELECT ALIAS page
 	if ($_GET['varname'] == "address" && isset($_GET['varvalue']))
 		$pconfig[$_GET['varname']] = htmlspecialchars($_GET['varvalue']);
+}
+
+/* If no entry for this passlist, then create a UUID and treat it like a new list */
+if (!isset($a_passlist[$id]['uuid']) && empty($pconfig['uuid'])) {
+	$passlist_uuid = 0;
+	while ($passlist_uuid > 65535 || $passlist_uuid == 0) {
+		$passlist_uuid = mt_rand(1, 65535);
+		$pconfig['uuid'] = $passlist_uuid;
+		$pconfig['name'] = "passlist_{$passlist_uuid}";
+	}
+}
+elseif (!empty($pconfig['uuid'])) {
+	$passlist_uuid = $pconfig['uuid'];	
+}
+else
+	$passlist_uuid = $a_passlist[$id]['uuid'];
+
+/* returns true if $name is a valid name for a pass list file name or ip */
+function is_validpasslistname($name) {
+	if (!is_string($name))
+		return false;
+
+	if (!preg_match("/[^a-zA-Z0-9\_\.\/]/", $name))
+		return true;
+
+	return false;
 }
 
 if ($_POST['save']) {
@@ -128,11 +144,11 @@ if ($_POST['save']) {
 		$input_errors[] = gettext("Pass List file name may only consist of the characters \"a-z, A-Z, 0-9 and _\". Note: No Spaces or dashes. Press Cancel to reset.");
 
 	/* check for name conflicts */
-	foreach ($a_passlist as $w_list) {
-		if (isset($id) && ($a_passlist[$id]) && ($a_passlist[$id] === $w_list))
+	foreach ($a_passlist as $p_list) {
+		if (isset($id) && ($a_passlist[$id]) && ($a_passlist[$id] === $p_list))
 			continue;
 
-		if ($w_list['name'] == $_POST['name']) {
+		if ($p_list['name'] == $_POST['name']) {
 			$input_errors[] = gettext("A Pass List file name with this name already exists.");
 			break;
 		}
@@ -143,27 +159,27 @@ if ($_POST['save']) {
 			$input_errors[] = gettext("A valid alias must be provided");
 
 	if (!$input_errors) {
-		$w_list = array();
+		$p_list = array();
 		/* post user input */
-		$w_list['name'] = $_POST['name'];
-		$w_list['uuid'] = $passlist_uuid;
-		$w_list['localnets'] = $_POST['localnets']? 'yes' : 'no';
-		$w_list['wanips'] = $_POST['wanips']? 'yes' : 'no';
-		$w_list['wangateips'] = $_POST['wangateips']? 'yes' : 'no';
-		$w_list['wandnsips'] = $_POST['wandnsips']? 'yes' : 'no';
-		$w_list['vips'] = $_POST['vips']? 'yes' : 'no';
-		$w_list['vpnips'] = $_POST['vpnips']? 'yes' : 'no';
+		$p_list['name'] = $_POST['name'];
+		$p_list['uuid'] = $passlist_uuid;
+		$p_list['localnets'] = $_POST['localnets']? 'yes' : 'no';
+		$p_list['wanips'] = $_POST['wanips']? 'yes' : 'no';
+		$p_list['wangateips'] = $_POST['wangateips']? 'yes' : 'no';
+		$p_list['wandnsips'] = $_POST['wandnsips']? 'yes' : 'no';
+		$p_list['vips'] = $_POST['vips']? 'yes' : 'no';
+		$p_list['vpnips'] = $_POST['vpnips']? 'yes' : 'no';
 
-		$w_list['address'] = $_POST['address'];
-		$w_list['descr']  =  mb_convert_encoding($_POST['descr'],"HTML-ENTITIES","auto");
-		$w_list['detail'] = $final_address_details;
+		$p_list['address'] = $_POST['address'];
+		$p_list['descr']  =  mb_convert_encoding(str_replace("\r\n", "\n", $_POST['descr']),"HTML-ENTITIES","auto");
+		$p_list['detail'] = $final_address_details;
 
 		if (isset($id) && $a_passlist[$id])
-			$a_passlist[$id] = $w_list;
+			$a_passlist[$id] = $p_list;
 		else
-			$a_passlist[] = $w_list;
+			$a_passlist[] = $p_list;
 
-		write_config("Snort pkg: modified PASS LIST {$w_list['name']}.");
+		write_config("Suricata pkg: modified PASS LIST {$p_list['name']}.");
 
 		/* create pass list and homenet file, then sync files */
 		sync_suricata_package_config();
@@ -193,24 +209,28 @@ if ($savemsg)
 <form action="suricata_passlist_edit.php" method="post" name="iform" id="iform">
 <input name="id" type="hidden" value="<?=$id;?>" />
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
+<tbody>
 <tr><td>
 <?php
 	$tab_array = array();
-	$tab_array[] = array(gettext("Suricata Interfaces"), false, "/suricata/suricata_interfaces.php");
+	$tab_array[] = array(gettext("Interfaces"), false, "/suricata/suricata_interfaces.php");
 	$tab_array[] = array(gettext("Global Settings"), false, "/suricata/suricata_global.php");
-	$tab_array[] = array(gettext("Update Rules"), false, "/suricata/suricata_download_updates.php");
+	$tab_array[] = array(gettext("Updates"), false, "/suricata/suricata_download_updates.php");
 	$tab_array[] = array(gettext("Alerts"), false, "/suricata/suricata_alerts.php");
-	$tab_array[] = array(gettext("Blocked"), false, "/suricata/suricata_blocked.php");
+	$tab_array[] = array(gettext("Blocks"), false, "/suricata/suricata_blocked.php");
 	$tab_array[] = array(gettext("Pass Lists"), true, "/suricata/suricata_passlist.php");
 	$tab_array[] = array(gettext("Suppress"), false, "/suricata/suricata_suppress.php");
-	$tab_array[] = array(gettext("Logs Browser"), false, "/suricata/suricata_logs_browser.php?instance={$instanceid}");
+	$tab_array[] = array(gettext("Logs View"), false, "/suricata/suricata_logs_browser.php?instance={$instanceid}");
 	$tab_array[] = array(gettext("Logs Mgmt"), false, "/suricata/suricata_logs_mgmt.php");
+	$tab_array[] = array(gettext("SID Mgmt"), false, "/suricata/suricata_sid_mgmt.php");
+	$tab_array[] = array(gettext("Sync"), false, "/pkg_edit.php?xml=suricata/suricata_sync.xml");
 	display_top_tabs($tab_array, true);
 ?>
 	</td>
 </tr>
 <tr><td><div id="mainarea">
 <table id="maintable" class="tabcont" width="100%" border="0" cellpadding="6" cellspacing="0">
+	<tbody>
 	<tr>
 		<td colspan="2" valign="top" class="listtopic"><?php echo gettext("Add the name and " .
 		"description of the file."); ?></td>
@@ -286,8 +306,8 @@ if ($savemsg)
 		</td>
 		<td width="78%" class="vtable">
 		<input autocomplete="off" name="address" type="text" class="formfldalias" id="address" size="30" value="<?=htmlspecialchars($pconfig['address']);?>"
-		title="<?=trim(filter_expand_alias($pconfig['address']));?>"/>
-		&nbsp;&nbsp;&nbsp;&nbsp;<input type="button" class="formbtns" value="Aliases" onclick="parent.location='suricata_select_alias.php?id=0&type=host|network&varname=address&act=import&multi_ip=yes&returl=<?=urlencode($_SERVER['PHP_SELF']);?>'" 
+		title="<?=trim(filter_expand_alias($pconfig['address']));?>"/>&nbsp;&nbsp;&nbsp;&nbsp;
+		<input type="button" class="formbtns" value="Aliases" onclick="selectAlias();" 
 		title="<?php echo gettext("Select an existing IP alias");?>"/>
 		</td>
 	</tr>
@@ -298,9 +318,10 @@ if ($savemsg)
 			<input id="cancel" name="cancel" type="submit" class="formbtn" value="Cancel" />
 		</td>
 	</tr>
+	</tbody>
 </table>
 </div>
-</td></tr>
+</td></tr></tbody>
 </table>
 </form>
 <script type="text/javascript">
@@ -324,6 +345,29 @@ function createAutoSuggest() {
 <?php
 	echo "objAlias = new AutoSuggestControl(document.getElementById('address'), new StateSuggestions(addressarray));\n";
 ?>
+}
+
+function selectAlias() {
+
+	var loc;
+	var fields = [ "name", "descr", "localnets", "wanips", "wangateips", "wandnsips", "vips", "vpnips", "address" ];
+
+	// Scrape current form field values and add to
+	// the select alias URL as a query string.
+	var loc = '/suricata/suricata_select_alias.php?id=<?=$id;?>&act=import&type=host|network';
+	loc = loc + '&varname=address&multi_ip=yes';
+	loc = loc + '&returl=<?=urlencode($_SERVER['PHP_SELF']);?>';
+	loc = loc + '&uuid=<?=$passlist_uuid;?>';
+
+	// Iterate over just the specific form fields we want to pass to
+	// the select alias URL.
+	fields.forEach(function(entry) {
+		var tmp = $(entry).serialize();
+		if (tmp.length > 0)
+			loc = loc + '&' + tmp;
+	});
+	
+	window.parent.location = loc; 
 }
 
 setTimeout("createAutoSuggest();", 500);

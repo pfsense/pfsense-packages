@@ -47,6 +47,7 @@ function nrpe2_custom_php_install_command() {
 		$config['installedpackages']['nrpe2']['config'][0]['server_address'] = $ip;
 		$config['installedpackages']['nrpe2']['config'][0]['server_port'] = 5666;
 		$config['installedpackages']['nrpe2']['config'][0]['allowed_hosts'] = "127.0.0.1";
+		$config['installedpackages']['nrpe2']['config'][0]['dont_blame_nrpe'] = "on";
 	}
 
 	if (!is_array($config['installedpackages']['nrpe2']['config'][0]['row'])) {
@@ -170,6 +171,12 @@ function nrpe2_custom_php_write_config() {
 
 	$server_port = $config['installedpackages']['nrpe2']['config'][0]['server_port'];
 	$allowed_hosts = $config['installedpackages']['nrpe2']['config'][0]['allowed_hosts'];
+	$dont_blame_nrpe = $config['installedpackages']['nrpe2']['config'][0]['dont_blame_nrpe'];
+	if ($config['installedpackages']['nrpe2']['config'][0]['dont_blame_nrpe'] == "on") {
+		$dont_blame_nrpe = 1;
+	} else {
+		$dont_blame_nrpe = 0;
+	}
 
 	$fd = fopen(NRPE_CONFIG_DIR . '/nrpe.cfg', 'w');
 	$nrpe_cfg = <<<EOD
@@ -179,7 +186,7 @@ server_port={$server_port}
 nrpe_user=nagios
 nrpe_group=nagios
 allowed_hosts={$allowed_hosts}
-dont_blame_nrpe=0
+dont_blame_nrpe={$dont_blame_nrpe}
 debug=0
 command_timeout=60
 connection_timeout=300

@@ -11,6 +11,7 @@
  * Copyright (C) 2006 Scott Ullrich
  * Copyright (C) 2009 Robert Zelaya Sr. Developer
  * Copyright (C) 2012 Ermal Luci
+ * Copyright (C) 2014 Jim Pingle jim@pingle.org
  * All rights reserved.
  *
  * Adapted for Suricata by:
@@ -44,6 +45,7 @@ require_once("/usr/local/pkg/suricata/suricata.inc");
 
 $supplist = array();
 $suri_pf_table = SURICATA_PF_TABLE;
+$filterlogentries = FALSE;
 
 function suricata_is_alert_globally_suppressed($list, $gid, $sid) {
 
@@ -132,6 +134,31 @@ function suricata_add_supplist_entry($suppress) {
 		return false;
 }
 
+function suricata_escape_filter_regex($filtertext) {
+	/* If the caller (user) has not already put a backslash before a slash, to escape it in the regex, */
+	/* then this will do it. Take out any "\/" already there, then turn all ordinary "/" into "\/".  */
+	return str_replace('/', '\/', str_replace('\/', '/', $filtertext));
+}
+
+function suricata_match_filter_field($flent, $fields) {
+	foreach ($fields as $key => $field) {
+		if ($field == null)
+			continue;
+		if ((strpos($field, '!') === 0)) {
+			$field = substr($field, 1);
+			$field_regex = suricata_escape_filter_regex($field);
+			if (@preg_match("/{$field_regex}/i", $flent[$key]))
+				return false;
+		}
+		else {
+			$field_regex = suricata_escape_filter_regex($field);
+			if (!@preg_match("/{$field_regex}/i", $flent[$key]))
+				return false;
+		}
+	}
+	return true;
+}
+
 if (isset($_POST['instance']) && is_numericint($_POST['instance']))
 	$instanceid = $_POST['instance'];
 // This is for the auto-refresh so we can  stay on the same interface
@@ -163,6 +190,49 @@ if (empty($pconfig['alertnumber']))
 if (empty($pconfig['arefresh']))
 	$pconfig['arefresh'] = 'off';
 $anentries = $pconfig['alertnumber'];
+
+# --- AJAX REVERSE DNS RESOLVE Start ---
+if (isset($_POST['resolve'])) {
+	$ip = strtolower($_POST['resolve']);
+	$res = (is_ipaddr($ip) ? gethostbyaddr($ip) : '');
+	
+	if ($res && $res != $ip)
+		$response = array('resolve_ip' => $ip, 'resolve_text' => $res);
+	else
+		$response = array('resolve_ip' => $ip, 'resolve_text' => gettext("Cannot resolve"));
+	
+	echo json_encode(str_replace("\\","\\\\", $response)); // single escape chars can break JSON decode
+	exit;
+}
+# --- AJAX REVERSE DNS RESOLVE End ---
+
+if ($_POST['filterlogentries_submit']) {
+	// Set flag for filtering alert entries
+	$filterlogentries = TRUE;
+
+	// -- IMPORTANT --
+	// Note the order of these fields must match the order decoded from the alerts log
+	$filterfieldsarray = array();
+	$filterfieldsarray['time'] = $_POST['filterlogentries_time'] ? $_POST['filterlogentries_time'] : null;
+	$filterfieldsarray['action'] = null;
+	$filterfieldsarray['gid'] = $_POST['filterlogentries_gid'] ? $_POST['filterlogentries_gid'] : null;
+	$filterfieldsarray['sid'] = $_POST['filterlogentries_sid'] ? $_POST['filterlogentries_sid'] : null;
+	$filterfieldsarray['rev'] = null;
+	$filterfieldsarray['msg'] = $_POST['filterlogentries_description'] ? $_POST['filterlogentries_description'] : null;
+	$filterfieldsarray['class'] = $_POST['filterlogentries_classification'] ? $_POST['filterlogentries_classification'] : null;
+	$filterfieldsarray['priority'] = $_POST['filterlogentries_priority'] ? $_POST['filterlogentries_priority'] : null;
+	$filterfieldsarray['proto'] = $_POST['filterlogentries_protocol'] ? $_POST['filterlogentries_protocol'] : null;
+	// Remove any zero-length spaces added to the IP address that could creep in from a copy-paste operation
+	$filterfieldsarray['src'] = $_POST['filterlogentries_sourceipaddress'] ? str_replace("\xE2\x80\x8B", "", $_POST['filterlogentries_sourceipaddress']) : null;
+	$filterfieldsarray['sport'] = $_POST['filterlogentries_sourceport'] ? $_POST['filterlogentries_sourceport'] : null;
+	// Remove any zero-length spaces added to the IP address that could creep in from a copy-paste operation
+	$filterfieldsarray['dst'] = $_POST['filterlogentries_destinationipaddress'] ? str_replace("\xE2\x80\x8B", "", $_POST['filterlogentries_destinationipaddress']) : null;
+	$filterfieldsarray['dport'] = $_POST['filterlogentries_destinationport'] ? $_POST['filterlogentries_destinationport'] : null;
+}
+
+if ($_POST['filterlogentries_clear']) {
+	$filterfieldsarray = array();
+}
 
 if ($_POST['save']) {
 	if (!is_array($config['installedpackages']['suricata']['alertsblocks']))
@@ -224,6 +294,9 @@ if (($_POST['addsuppress_srcip'] || $_POST['addsuppress_dstip'] || $_POST['addsu
 	if (suricata_add_supplist_entry($suppress)) {
 		suricata_reload_config($a_instance[$instanceid]);
 		$savemsg = $success;
+
+		// Sync to configured CARP slaves if any are enabled
+		suricata_sync_on_changes();
 		sleep(2);
 	}
 	else
@@ -277,11 +350,16 @@ if ($_POST['togglesid'] && is_numeric($_POST['sidid']) && is_numeric($_POST['gen
 	/* rules for this interface.                     */
 	/*************************************************/
 	$rebuild_rules = true;
+	conf_mount_rw();
 	suricata_generate_yaml($a_instance[$instanceid]);
+	conf_mount_ro();
 	$rebuild_rules = false;
 
 	/* Signal Suricata to live-load the new rules */
 	suricata_reload_config($a_instance[$instanceid]);
+
+	// Sync to configured CARP slaves if any are enabled
+	suricata_sync_on_changes();
 	sleep(2);
 
 	$savemsg = gettext("The state for rule {$gid}:{$sid} has been modified.  Suricata is 'live-reloading' the new rules list.  Please wait at least 15 secs for the process to complete before toggling additional rules.");
@@ -334,7 +412,6 @@ include_once("head.inc");
 ?>
 
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">
-<script src="/javascript/filter_log.js" type="text/javascript"></script>
 <?php
 include_once("fbegin.inc");
 
@@ -359,24 +436,28 @@ if ($savemsg) {
 <input type="hidden" name="descr" id="descr" value=""/>
 
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
+<tbody>
 <tr><td>
 <?php
 	$tab_array = array();
-	$tab_array[] = array(gettext("Suricata Interfaces"), false, "/suricata/suricata_interfaces.php");
+	$tab_array[] = array(gettext("Interfaces"), false, "/suricata/suricata_interfaces.php");
 	$tab_array[] = array(gettext("Global Settings"), false, "/suricata/suricata_global.php");
-	$tab_array[] = array(gettext("Update Rules"), false, "/suricata/suricata_download_updates.php");
+	$tab_array[] = array(gettext("Updates"), false, "/suricata/suricata_download_updates.php");
 	$tab_array[] = array(gettext("Alerts"), true, "/suricata/suricata_alerts.php");
-	$tab_array[] = array(gettext("Blocked"), false, "/suricata/suricata_blocked.php");
+	$tab_array[] = array(gettext("Blocks"), false, "/suricata/suricata_blocked.php");
 	$tab_array[] = array(gettext("Pass Lists"), false, "/suricata/suricata_passlist.php");
 	$tab_array[] = array(gettext("Suppress"), false, "/suricata/suricata_suppress.php");
-	$tab_array[] = array(gettext("Logs Browser"), false, "/suricata/suricata_logs_browser.php?instance={$instanceid}");
+	$tab_array[] = array(gettext("Logs View"), false, "/suricata/suricata_logs_browser.php?instance={$instanceid}");
 	$tab_array[] = array(gettext("Logs Mgmt"), false, "/suricata/suricata_logs_mgmt.php");
+	$tab_array[] = array(gettext("SID Mgmt"), false, "/suricata/suricata_sid_mgmt.php");
+	$tab_array[] = array(gettext("Sync"), false, "/pkg_edit.php?xml=suricata/suricata_sync.xml");
 	display_top_tabs($tab_array, true);
 ?>
 </td></tr>
 <tr>
 	<td><div id="mainarea">
 		<table id="maintable" class="tabcont" width="100%" border="0" cellspacing="0" cellpadding="6">
+			<tbody>
 			<tr>
 				<td colspan="2" class="listtopic"><?php echo gettext("Alert Log View Settings"); ?></td>
 			</tr>
@@ -417,9 +498,97 @@ if ($savemsg) {
 				</td>
 			</tr>
 			<tr>
+				<td colspan="2" class="listtopic"><?php echo gettext("Alert Log View Filter"); ?></td>
+			</tr>
+			<tr id="filter_enable_row" style="display:<?php if (!$filterlogentries) {echo "table-row;";} else {echo "none;";} ?>">
+				<td width="22%" class="vncell"><?php echo gettext('Alert Log Filter Options'); ?></td>
+				<td width="78%" class="vtable">
+					<input name="show_filter" id="show_filter" type="button" class="formbtns" value="<?=gettext("Show Filter");?>" onclick="enable_showFilter();" />
+					&nbsp;&nbsp;<?=gettext("Click to display advanced filtering options dialog");?>
+				</td>
+			</tr>
+			<tr id="filter_options_row" style="display:<?php if (!$filterlogentries) {echo "none;";} else {echo "table-row;";} ?>">
+				<td colspan="2">
+					<table width="100%" border="0" cellpadding="0" cellspacing="1" summary="action">
+						<tr>
+							<td valign="top">
+								<div align="center"><?=gettext("Date");?></div>
+								<div align="center"><input id="filterlogentries_time" name="filterlogentries_time" class="formfld search" type="text" size="10" value="<?= $filterfieldsarray['time'] ?>" /></div>
+							</td>
+							<td valign="top">
+								<div align="center"><?=gettext("Source IP Address");?></div>
+								<div align="center"><input id="filterlogentries_sourceipaddress" name="filterlogentries_sourceipaddress" class="formfld search" type="text" size="28" value="<?= $filterfieldsarray['src'] ?>" /></div>
+							</td>
+							<td valign="top">
+								<div align="center"><?=gettext("Source Port");?></div>
+								<div align="center"><input id="filterlogentries_sourceport" name="filterlogentries_sourceport" class="formfld search" type="text" size="5" value="<?= $filterfieldsarray['sport'] ?>" /></div>
+							</td>
+							<td valign="top">
+								<div align="center"><?=gettext("Description");?></div>
+								<div align="center"><input id="filterlogentries_description" name="filterlogentries_description" class="formfld search" type="text" size="28" value="<?= $filterfieldsarray['msg'] ?>" /></div>
+							</td>
+							<td valign="top">
+								<div align="center"><?=gettext("GID");?></div>
+								<div align="center"><input id="filterlogentries_gid" name="filterlogentries_gid" class="formfld search" type="text" size="6" value="<?= $filterfieldsarray['gid'] ?>" /></div>
+							</td>
+						</tr>
+						<tr>
+							<td valign="top">
+								<div align="center"><?=gettext("Priority");?></div>
+								<div align="center"><input id="filterlogentries_priority" name="filterlogentries_priority" class="formfld search" type="text" size="10" value="<?= $filterfieldsarray['priority'] ?>" /></div>
+							</td>
+							<td valign="top">
+								<div align="center"><?=gettext("Destination IP Address");?></div>
+								<div align="center"><input id="filterlogentries_destinationipaddress" name="filterlogentries_destinationipaddress" class="formfld search" type="text" size="28" value="<?= $filterfieldsarray['dst'] ?>" /></div>
+							</td>
+							<td valign="top">
+								<div align="center"><?=gettext("Destination Port");?></div>
+								<div align="center"><input id="filterlogentries_destinationport" name="filterlogentries_destinationport" class="formfld search" type="text" size="5" value="<?= $filterfieldsarray['dport'] ?>" /></div>
+							</td>
+							<td valign="top">
+								<div align="center"><?=gettext("Classification");?></div>
+								<div align="center"><input id="filterlogentries_classification" name="filterlogentries_classification" class="formfld search" type="text" size="28" value="<?= $filterfieldsarray['class'] ?>" /></div>
+							</td>
+							<td valign="top">
+								<div align="center"><?=gettext("SID");?></div>
+								<div align="center"><input id="filterlogentries_sid" name="filterlogentries_sid" class="formfld search" type="text" size="6" value="<?= $filterfieldsarray['sid'] ?>" /></div>
+							</td>
+						</tr>
+						<tr>
+							<td valign="top">
+								<div align="center"><?=gettext("Protocol");?></div>
+								<div align="center"><input id="filterlogentries_protocol" name="filterlogentries_protocol" class="formfld search" type="text" size="10" value="<?= $filterfieldsarray['proto'] ?>" /></div>
+							</td>
+							<td valign="top">
+							</td>
+							<td valign="top">
+							</td>
+							<td colspan="2" style="vertical-align:bottom">
+								<div align="right"><input id="filterlogentries_submit" name="filterlogentries_submit" type="submit" class="formbtns" value="<?=gettext("Filter");?>" title="<?=gettext("Apply filter"); ?>" />
+								&nbsp;&nbsp;&nbsp;<input id="filterlogentries_clear" name="filterlogentries_clear" type="submit" class="formbtns" value="<?=gettext("Clear");?>" title="<?=gettext("Remove filter");?>" />
+								&nbsp;&nbsp;&nbsp;<input id="filterlogentries_hide" name="filterlogentries_hide" type="button" class="formbtns" value="<?=gettext("Hide");?>" onclick="enable_hideFilter();" title="<?=gettext("Hide filter options");?>" /></div>
+							</td>
+						</tr>
+						<tr>
+							<td colspan="5" style="vertical-align:bottom">
+								&nbsp;<?printf(gettext('Matches %1$s regular expression%2$s.'), '<a target="_blank" href="http://www.php.net/manual/en/book.pcre.php">', '</a>');?>&nbsp;&nbsp;
+								<?=gettext("Precede with exclamation (!) as first character to exclude match.");?>&nbsp;&nbsp;
+							</td>
+						</tr>
+					</table>
+				</td>
+			</tr>
+		<?php if ($filterlogentries) : ?>
+			<tr>
+				<td colspan="2" class="listtopic"><?php printf(gettext("Last %s Alert Entries"), $anentries); ?>&nbsp;&nbsp;
+				<?php echo gettext("(Most recent listed first)  ** FILTERED VIEW **  clear filter to see all entries"); ?></td>
+			</tr>
+		<?php else: ?>
+			<tr>
 				<td colspan="2" class="listtopic"><?php printf(gettext("Last %s Alert Entries"), $anentries); ?>&nbsp;&nbsp;
 				<?php echo gettext("(Most recent entries are listed first)"); ?></td>
 			</tr>
+		<?php endif; ?>
 	<tr>
 	<td width="100%" colspan="2">
 	<table id="myTable" style="table-layout: fixed;" width="100%" class="sortable" border="0" cellpadding="0" cellspacing="0">
@@ -436,7 +605,7 @@ if ($savemsg) {
 			<col axis="string">
 		</colgroup>
 		<thead>
-		   <tr>
+		   <tr class="sortableHeaderRowIdentifier">
 			<th class="listhdrr" axis="date"><?php echo gettext("Date"); ?></th>
 			<th class="listhdrr" axis="number"><?php echo gettext("Pri"); ?></th>
 			<th class="listhdrr" axis="string"><?php echo gettext("Proto"); ?></th>
@@ -445,7 +614,7 @@ if ($savemsg) {
 			<th class="listhdrr" axis="string"><?php echo gettext("SPort"); ?></th>
 			<th class="listhdrr" axis="string"><?php echo gettext("Dst"); ?></th>
 			<th class="listhdrr" axis="string"><?php echo gettext("DPort"); ?></th>
-			<th class="listhdrr" axis="number"><?php echo gettext("SID"); ?></th>
+			<th class="listhdrr" axis="number"><?php echo gettext("GID:SID"); ?></th>
 			<th class="listhdrr" axis="string"><?php echo gettext("Description"); ?></th>
 		   </tr>
 		</thead>
@@ -458,95 +627,175 @@ if (file_exists("/var/log/suricata/suricata_{$if_real}{$suricata_uuid}/alerts.lo
 	if (file_exists("/tmp/alerts_suricata{$suricata_uuid}")) {
 		$tmpblocked = array_flip(suricata_get_blocked_ips());
 		$counter = 0;
-		/*             0         1      2             3      4       5   6              7        8     9   10      11  12      */
-		/* File format timestamp,action,sig_generator,sig_id,sig_rev,msg,classification,priority,proto,src,srcport,dst,dstport */
+
+		/*************** FORMAT without CSV patch -- ALERT -- ***********************************************************************************/
+		/* Line format: timestamp  action[**] [gid:sid:rev] msg [**] [Classification: class] [Priority: pri] {proto} src:srcport -> dst:dstport */
+		/*             0          1           2   3   4    5                         6                 7     8      9   10         11  12       */
+		/****************************************************************************************************************************************/
+
+		/**************** FORMAT without CSV patch -- DECODER EVENT -- **************************************************************************/
+		/* Line format: timestamp  action[**] [gid:sid:rev] msg [**] [Classification: class] [Priority: pri] [**] [Raw pkt: ...]                */
+		/*              0          1           2   3   4    5                         6                 7                                       */
+		/************** *************************************************************************************************************************/
+
 		$fd = fopen("/tmp/alerts_suricata{$suricata_uuid}", "r");
-		while (($fields = fgetcsv($fd, 1000, ',', '"')) !== FALSE) {
-			if(count($fields) < 13)
-				continue;
+		$buf = "";
+		while (($buf = fgets($fd)) !== FALSE) {
+			$fields = array();
+			$tmp = array();
+			$decoder_event = FALSE;
+
+			/**************************************************************/
+			/* Parse alert log entry to find the parts we want to display */
+			/**************************************************************/
+
+			// Field 0 is the event timestamp
+			$fields['time'] = substr($buf, 0, strpos($buf, '  '));
+
+			// Field 1 is currently not used, so set to NULL
+			$fields['action'] = null;
+
+			// The regular expression match below returns an array as follows:
+			// [2] => GID, [3] => SID, [4] => REV, [5] => MSG, [6] => CLASSIFICATION, [7] = PRIORITY
+			preg_match('/\[\*{2}\]\s\[((\d+):(\d+):(\d+))\]\s(.*)\[\*{2}\]\s\[Classification:\s(.*)\]\s\[Priority:\s(\d+)\]\s/', $buf, $tmp);
+			$fields['gid'] = trim($tmp[2]);
+			$fields['sid'] = trim($tmp[3]);
+			$fields['rev'] = trim($tmp[4]);
+			$fields['msg'] = trim($tmp[5]);
+			$fields['class'] = trim($tmp[6]);
+			$fields['priority'] = trim($tmp[7]);
+
+			// The regular expression match below looks for the PROTO, SRC and DST fields
+			// and returns an array as follows:
+			// [1] = PROTO, [2] => SRC:SPORT [3] => DST:DPORT
+			if (preg_match('/\{(.*)\}\s(.*)\s->\s(.*)/', $buf, $tmp)) {
+				// Get PROTO
+				$fields['proto'] = trim($tmp[1]);
+
+				// Get SRC
+				$fields['src'] = trim(substr($tmp[2], 0, strrpos($tmp[2], ':')));
+				if (is_ipaddrv6($fields['src']))
+					$fields['src'] = inet_ntop(inet_pton($fields['src']));
+
+				// Get SPORT
+				$fields['sport'] = trim(substr($tmp[2], strrpos($tmp[2], ':') + 1));
+
+				// Get DST
+				$fields['dst'] = trim(substr($tmp[3], 0, strrpos($tmp[3], ':')));
+				if (is_ipaddrv6($fields['dst']))
+					$fields['dst'] = inet_ntop(inet_pton($fields['dst']));
+
+				// Get DPORT
+				$fields['dport'] = trim(substr($tmp[3], strrpos($tmp[3], ':') + 1));
+			}
+			else {
+				// If no PROTO nor IP ADDR, then this is a DECODER EVENT
+				$decoder_event = TRUE;
+				$fields['proto'] = gettext("n/a");
+				$fields['sport'] = gettext("n/a");
+				$fields['dport'] = gettext("n/a");
+			}
 
 			// Create a DateTime object from the event timestamp that
 			// we can use to easily manipulate output formats.
-			$event_tm = date_create_from_format("m/d/Y-H:i:s.u", $fields[0]);
+			$event_tm = date_create_from_format("m/d/Y-H:i:s.u", $fields['time']);
 
 			// Check the 'CATEGORY' field for the text "(null)" and
 			// substitute "Not Assigned".
-			if ($fields[6] == "(null)")
-				$fields[6] = "Not Assigned";
+			if ($fields['class'] == "(null)")
+				$fields['class'] = gettext("Not Assigned");
+
+			$fields['time'] = date_format($event_tm, "m/d/Y") . " " . date_format($event_tm, "H:i:s");
+			if ($filterlogentries && !suricata_match_filter_field($fields, $filterfieldsarray)) {
+				continue;
+			}
 
 			/* Time */
 			$alert_time = date_format($event_tm, "H:i:s");
 			/* Date */
 			$alert_date = date_format($event_tm, "m/d/Y");
 			/* Description */
-			$alert_descr = $fields[5];
-			$alert_descr_url = urlencode($fields[5]);
+			$alert_descr = $fields['msg'];
+			$alert_descr_url = urlencode($fields['msg']);
 			/* Priority */
-			$alert_priority = $fields[7];
+			$alert_priority = $fields['priority'];
 			/* Protocol */
-			$alert_proto = $fields[8];
+			$alert_proto = $fields['proto'];
+
 			/* IP SRC */
-			$alert_ip_src = $fields[9];
-			/* Add zero-width space as soft-break opportunity after each colon if we have an IPv6 address */
-			$alert_ip_src = str_replace(":", ":&#8203;", $alert_ip_src);
-			/* Add Reverse DNS lookup icons */
-			$alert_ip_src .= "<br/><a onclick=\"javascript:getURL('/diag_dns.php?host={$fields[9]}&dialog_output=true', outputrule);\">";
-			$alert_ip_src .= "<img src='../themes/{$g['theme']}/images/icons/icon_log_d.gif' width='11' height='11' border='0' ";
-			$alert_ip_src .= "title='" . gettext("Resolve host via reverse DNS lookup (quick pop-up)") . "' style=\"cursor: pointer;\"></a>&nbsp;";
-			$alert_ip_src .= "<a href='/diag_dns.php?host={$fields[9]}&instance={$instanceid}'>";
-			$alert_ip_src .= "<img src='../themes/{$g['theme']}/images/icons/icon_log.gif' width='11' height='11' border='0' ";
-			$alert_ip_src .= "title='" . gettext("Resolve host via reverse DNS lookup") . "'></a>";
-			/* Add icons for auto-adding to Suppress List if appropriate */
-			if (!suricata_is_alert_globally_suppressed($supplist, $fields[2], $fields[3]) && 
-			    !isset($supplist[$fields[2]][$fields[3]]['by_src'][$fields[9]])) {
-				$alert_ip_src .= "&nbsp;&nbsp;<input type='image' name='addsuppress_srcip[]' onClick=\"encRuleSig('{$fields[2]}','{$fields[3]}','{$fields[9]}','{$alert_descr}');\" ";
-				$alert_ip_src .= "src='../themes/{$g['theme']}/images/icons/icon_plus.gif' width='12' height='12' border='0' ";
-				$alert_ip_src .= "title='" . gettext("Add this alert to the Suppress List and track by_src IP") . "'/>";	
+			if ($decoder_event == FALSE) {
+				$alert_ip_src = $fields['src'];
+				/* Add zero-width space as soft-break opportunity after each colon if we have an IPv6 address */
+				$alert_ip_src = str_replace(":", ":&#8203;", $alert_ip_src);
+				/* Add Reverse DNS lookup icon */
+				$alert_ip_src .= "<br/><img onclick=\"javascript:resolve_with_ajax('{$fields['src']}');\" title=\"";
+				$alert_ip_src .= gettext("Resolve host via reverse DNS lookup") . "\" border=\"0\" src=\"/themes/{$g['theme']}/images/icons/icon_log.gif\" alt=\"Icon Reverse Resolve with DNS\" ";
+				$alert_ip_src .= " style=\"cursor: pointer;\"/>";
+				/* Add icons for auto-adding to Suppress List if appropriate */
+				if (!suricata_is_alert_globally_suppressed($supplist, $fields['gid'], $fields['sid']) && 
+				    !isset($supplist[$fields['gid']][$fields['sid']]['by_src'][$fields['src']])) {
+					$alert_ip_src .= "&nbsp;&nbsp;<input type='image' name='addsuppress_srcip[]' onClick=\"encRuleSig('{$fields['gid']}','{$fields['sid']}','{$fields['src']}','{$alert_descr}');\" ";
+					$alert_ip_src .= "src='../themes/{$g['theme']}/images/icons/icon_plus.gif' width='12' height='12' border='0' ";
+					$alert_ip_src .= "title='" . gettext("Add this alert to the Suppress List and track by_src IP") . "'/>";	
+				}
+				elseif (isset($supplist[$fields['gid']][$fields['sid']]['by_src'][$fields['src']])) {
+					$alert_ip_src .= "&nbsp;&nbsp;<img src='../themes/{$g['theme']}/images/icons/icon_plus_d.gif' width='12' height='12' border='0' ";
+					$alert_ip_src .= "title='" . gettext("This alert track by_src IP is already in the Suppress List") . "'/>";	
+				}
+				/* Add icon for auto-removing from Blocked Table if required */
+				if (isset($tmpblocked[$fields['src']])) {
+					$alert_ip_src .= "&nbsp;<input type='image' name='unblock[]' onClick=\"document.getElementById('ip').value='{$fields['src']}';\" ";
+					$alert_ip_src .= "title='" . gettext("Remove host from Blocked Table") . "' border='0' width='12' height='12' src=\"../themes/{$g['theme']}/images/icons/icon_x.gif\"/>"; 
+				}
 			}
-			elseif (isset($supplist[$fields[2]][$fields[3]]['by_src'][$fields[9]])) {
-				$alert_ip_src .= "&nbsp;&nbsp;<img src='../themes/{$g['theme']}/images/icons/icon_plus_d.gif' width='12' height='12' border='0' ";
-				$alert_ip_src .= "title='" . gettext("This alert track by_src IP is already in the Suppress List") . "'/>";	
+			else {
+				if (preg_match('/\s\[Raw pkt:(.*)\]/', $buf, $tmp))
+					$alert_ip_src = "<div title='[Raw pkt: {$tmp[1]}]'>" . gettext("Decoder Event") . "</div>";
+				else
+					$alert_ip_src = gettext("Decoder Event");
 			}
-			/* Add icon for auto-removing from Blocked Table if required */
-			if (isset($tmpblocked[$fields[9]])) {
-				$alert_ip_src .= "&nbsp;<input type='image' name='unblock[]' onClick=\"document.getElementById('ip').value='{$fields[9]}';\" ";
-				$alert_ip_src .= "title='" . gettext("Remove host from Blocked Table") . "' border='0' width='12' height='12' src=\"../themes/{$g['theme']}/images/icons/icon_x.gif\"/>"; 
-			}
+
 			/* IP SRC Port */
-			$alert_src_p = $fields[10];
-			/* IP Destination */
-			$alert_ip_dst = $fields[11];
-			/* Add zero-width space as soft-break opportunity after each colon if we have an IPv6 address */
-			$alert_ip_dst = str_replace(":", ":&#8203;", $alert_ip_dst);
-			/* Add Reverse DNS lookup icons */
-			$alert_ip_dst .= "<br/><a onclick=\"javascript:getURL('/diag_dns.php?host={$fields[11]}&dialog_output=true', outputrule);\">";
-			$alert_ip_dst .= "<img src='../themes/{$g['theme']}/images/icons/icon_log_d.gif' width='11' height='11' border='0' ";
-			$alert_ip_dst .= "title='" . gettext("Resolve host via reverse DNS lookup (quick pop-up)") . "' style=\"cursor: pointer;\"></a>&nbsp;";
-			$alert_ip_dst .= "<a href='/diag_dns.php?host={$fields[11]}&instance={$instanceid}'>";
-			$alert_ip_dst .= "<img src='../themes/{$g['theme']}/images/icons/icon_log.gif' width='11' height='11' border='0' ";
-			$alert_ip_dst .= "title='" . gettext("Resolve host via reverse DNS lookup") . "'></a>";	
-			/* Add icons for auto-adding to Suppress List if appropriate */
-			if (!suricata_is_alert_globally_suppressed($supplist, $fields[2], $fields[3]) && 
-			    !isset($supplist[$fields[2]][$fields[3]]['by_dst'][$fields[11]])) {
-				$alert_ip_dst .= "&nbsp;&nbsp;<input type='image' name='addsuppress_dstip[]' onClick=\"encRuleSig('{$fields[2]}','{$fields[3]}','{$fields[11]}','{$alert_descr}');\" ";
-				$alert_ip_dst .= "src='../themes/{$g['theme']}/images/icons/icon_plus.gif' width='12' height='12' border='0' ";
-				$alert_ip_dst .= "title='" . gettext("Add this alert to the Suppress List and track by_dst IP") . "'/>";	
+			$alert_src_p = $fields['sport'];
+
+			/* IP DST */
+			if ($decoder_event == FALSE) {
+				$alert_ip_dst = $fields['dst'];
+				/* Add zero-width space as soft-break opportunity after each colon if we have an IPv6 address */
+				$alert_ip_dst = str_replace(":", ":&#8203;", $alert_ip_dst);
+				/* Add Reverse DNS lookup icons */
+				$alert_ip_dst .= "<br/><img onclick=\"javascript:resolve_with_ajax('{$fields['dst']}');\" title=\"";
+				$alert_ip_dst .= gettext("Resolve host via reverse DNS lookup") . "\" border=\"0\" src=\"/themes/{$g['theme']}/images/icons/icon_log.gif\" alt=\"Icon Reverse Resolve with DNS\" ";
+				$alert_ip_dst .= " style=\"cursor: pointer;\"/>";
+				/* Add icons for auto-adding to Suppress List if appropriate */
+				if (!suricata_is_alert_globally_suppressed($supplist, $fields['gid'], $fields['sid']) && 
+				    !isset($supplist[$fields['gid']][$fields['sid']]['by_dst'][$fields['dst']])) {
+					$alert_ip_dst .= "&nbsp;&nbsp;<input type='image' name='addsuppress_dstip[]' onClick=\"encRuleSig('{$fields['gid']}','{$fields['sid']}','{$fields['dst']}','{$alert_descr}');\" ";
+					$alert_ip_dst .= "src='../themes/{$g['theme']}/images/icons/icon_plus.gif' width='12' height='12' border='0' ";
+					$alert_ip_dst .= "title='" . gettext("Add this alert to the Suppress List and track by_dst IP") . "'/>";	
+				}
+				elseif (isset($supplist[$fields['gid']][$fields['sid']]['by_dst'][$fields['dst']])) {
+					$alert_ip_dst .= "&nbsp;&nbsp;<img src='../themes/{$g['theme']}/images/icons/icon_plus_d.gif' width='12' height='12' border='0' ";
+					$alert_ip_dst .= "title='" . gettext("This alert track by_dst IP is already in the Suppress List") . "'/>";	
+				}
+
+				/* Add icon for auto-removing from Blocked Table if required */
+				if (isset($tmpblocked[$fields['dst']])) {
+					$alert_ip_dst .= "&nbsp;<input type='image' name='unblock[]' onClick=\"document.getElementById('ip').value='{$fields['dst']}';\" ";
+					$alert_ip_dst .= "title='" . gettext("Remove host from Blocked Table") . "' border='0' width='12' height='12' src=\"../themes/{$g['theme']}/images/icons/icon_x.gif\"/>"; 
+				}
 			}
-			elseif (isset($supplist[$fields[2]][$fields[3]]['by_dst'][$fields[11]])) {
-				$alert_ip_dst .= "&nbsp;&nbsp;<img src='../themes/{$g['theme']}/images/icons/icon_plus_d.gif' width='12' height='12' border='0' ";
-				$alert_ip_dst .= "title='" . gettext("This alert track by_dst IP is already in the Suppress List") . "'/>";	
+			else {
+				$alert_ip_dst = gettext("n/a");
 			}
-			/* Add icon for auto-removing from Blocked Table if required */
-			if (isset($tmpblocked[$fields[11]])) {
-				$alert_ip_dst .= "&nbsp;<input type='image' name='unblock[]' onClick=\"document.getElementById('ip').value='{$fields[11]}';\" ";
-				$alert_ip_dst .= "title='" . gettext("Remove host from Blocked Table") . "' border='0' width='12' height='12' src=\"../themes/{$g['theme']}/images/icons/icon_x.gif\"/>"; 
-			}
+
 			/* IP DST Port */
-			$alert_dst_p = $fields[12];
+			$alert_dst_p = $fields['dport'];
+
 			/* SID */
-			$alert_sid_str = "{$fields[2]}:{$fields[3]}";
-			if (!suricata_is_alert_globally_suppressed($supplist, $fields[2], $fields[3])) {
-				$sidsupplink = "<input type='image' name='addsuppress[]' onClick=\"encRuleSig('{$fields[2]}','{$fields[3]}','','{$alert_descr}');\" ";
+			$alert_sid_str = "{$fields['gid']}:{$fields['sid']}";
+			if (!suricata_is_alert_globally_suppressed($supplist, $fields['gid'], $fields['sid'])) {
+				$sidsupplink = "<input type='image' name='addsuppress[]' onClick=\"encRuleSig('{$fields['gid']}','{$fields['sid']}','','{$alert_descr}');\" ";
 				$sidsupplink .= "src='../themes/{$g['theme']}/images/icons/icon_plus.gif' width='12' height='12' border='0' ";
 				$sidsupplink .= "title='" . gettext("Add this alert to the Suppress List") . "'/>";	
 			}
@@ -555,34 +804,35 @@ if (file_exists("/var/log/suricata/suricata_{$if_real}{$suricata_uuid}/alerts.lo
 				$sidsupplink .= "title='" . gettext("This alert is already in the Suppress List") . "'/>";	
 			}
 			/* Add icon for toggling rule state */
-			if (isset($disablesid[$fields[2]][$fields[3]])) {
-				$sid_dsbl_link = "<input type='image' name='togglesid[]' onClick=\"encRuleSig('{$fields[2]}','{$fields[3]}','','');\" ";
+			if (isset($disablesid[$fields['gid']][$fields['sid']])) {
+				$sid_dsbl_link = "<input type='image' name='togglesid[]' onClick=\"encRuleSig('{$fields['gid']}','{$fields['sid']}','','');\" ";
 				$sid_dsbl_link .= "src='../themes/{$g['theme']}/images/icons/icon_reject.gif' width='11' height='11' border='0' ";
 				$sid_dsbl_link .= "title='" . gettext("Rule is forced to a disabled state. Click to remove the force-disable action from this rule.") . "'/>";
 			}
 			else {
-				$sid_dsbl_link = "<input type='image' name='togglesid[]' onClick=\"encRuleSig('{$fields[2]}','{$fields[3]}','','');\" ";
+				$sid_dsbl_link = "<input type='image' name='togglesid[]' onClick=\"encRuleSig('{$fields['gid']}','{$fields['sid']}','','');\" ";
 				$sid_dsbl_link .= "src='../themes/{$g['theme']}/images/icons/icon_block.gif' width='11' height='11' border='0' ";
 				$sid_dsbl_link .= "title='" . gettext("Force-disable this rule and remove it from current rules set.") . "'/>";
 			}
 			/* DESCRIPTION */
-			$alert_class = $fields[6];
+			$alert_class = $fields['class'];
 
 			echo "<tr>
 				<td class='listr' align='center'>{$alert_date}<br/>{$alert_time}</td>
 				<td class='listr' align='center'>{$alert_priority}</td>
 				<td class='listr' align='center'>{$alert_proto}</td>
 				<td class='listr' style=\"word-wrap:break-word;\">{$alert_class}</td>
-				<td class='listr' align='center' sorttable_customkey='{$fields[9]}'>{$alert_ip_src}</td>
+				<td class='listr' style=\"sorttable_customkey:{$fields['src']};\" sorttable_customkey=\"{$fields['src']}\" align='center'>{$alert_ip_src}</td>
 				<td class='listr' align='center'>{$alert_src_p}</td>
-				<td class='listr' align='center' sorttable_customkey='{$fields[11]}'>{$alert_ip_dst}</td>
+				<td class='listr' align='center' style=\"sorttable_customkey:{$fields['dst']};\" sorttable_customkey=\"{$fields['dst']}\">{$alert_ip_dst}</td>
 				<td class='listr' align='center'>{$alert_dst_p}</td>
-				<td class='listr' align='center' sorttable_customkey='{$fields[3]}'>{$alert_sid_str}<br/>{$sidsupplink}&nbsp;&nbsp;{$sid_dsbl_link}</td>
+				<td class='listr' align='center' style=\"sorttable_customkey:{$fields['sid']};\" sorttable_customkey=\"{$fields['sid']}\">{$alert_sid_str}<br/>{$sidsupplink}&nbsp;&nbsp;{$sid_dsbl_link}</td>
 				<td class='listbg' style=\"word-wrap:break-word;\">{$alert_descr}</td>
 				</tr>\n";
 
 			$counter++;
 		}
+		unset($fields, $buf, $tmp);
 		fclose($fd);
 		@unlink("/tmp/alerts_suricata{$suricata_uuid}");
 	}
@@ -591,10 +841,10 @@ if (file_exists("/var/log/suricata/suricata_{$if_real}{$suricata_uuid}/alerts.lo
 		</tbody>
 	</table>
 	</td>
-</tr>
+</tr></tbody>
 </table>
 </div>
-</td></tr>
+</td></tr></tbody>
 </table>
 </form>
 <?php
@@ -615,6 +865,50 @@ function encRuleSig(rulegid,rulesid,srcip,ruledescr) {
 	document.getElementById("ip").value = srcip;
 	document.getElementById("descr").value = ruledescr;
 }
+
+function enable_showFilter() {
+	document.getElementById("filter_enable_row").style.display="none";
+	document.getElementById("filter_options_row").style.display="table-row";
+}
+
+function enable_hideFilter() {
+	document.getElementById("filter_enable_row").style.display="table-row";
+	document.getElementById("filter_options_row").style.display="none";
+}
+
 </script>
+
+<!-- The following AJAX code was borrowed from the diag_logs_filter.php -->
+<!-- file in pfSense.  See copyright info at top of this page.          -->
+<script type="text/javascript">
+//<![CDATA[
+function resolve_with_ajax(ip_to_resolve) {
+	var url = "/suricata/suricata_alerts.php";
+
+	jQuery.ajax(
+		url,
+		{
+			type: 'post',
+			dataType: 'json',
+			data: {
+				resolve: ip_to_resolve,
+				},
+			complete: resolve_ip_callback
+		});
+}
+
+function resolve_ip_callback(transport) {
+	var response = jQuery.parseJSON(transport.responseText);
+	var msg = 'IP address "' + response.resolve_ip + '" resolves to\n';
+	alert(msg + 'host "' + htmlspecialchars(response.resolve_text) + '"');
+}
+
+// From http://stackoverflow.com/questions/5499078/fastest-method-to-escape-html-tags-as-html-entities
+function htmlspecialchars(str) {
+    return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&apos;');
+}
+//]]>
+</script>
+
 </body>
 </html>

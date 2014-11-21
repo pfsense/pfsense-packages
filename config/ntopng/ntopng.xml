@@ -1,0 +1,240 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE packagegui SYSTEM "./schema/packages.dtd">
+<?xml-stylesheet type="text/xsl" href="./xsl/package.xsl"?>
+<packagegui>
+	<copyright>
+	<![CDATA[
+/* $Id$ */
+/* ========================================================================== */
+/*
+	ntopng.xml
+	part of pfSense (http://www.pfSense.com)
+	Copyright (C) 2014 ESF, LLC
+	All rights reserved.
+*/
+/* ========================================================================== */
+/*
+	Redistribution and use in source and binary forms, with or without
+	modification, are permitted provided that the following conditions are met:
+
+	 1. Redistributions of source code must retain the above copyright notice,
+		this list of conditions and the following disclaimer.
+
+	 2. Redistributions in binary form must reproduce the above copyright
+		notice, this list of conditions and the following disclaimer in the
+		documentation and/or other materials provided with the distribution.
+
+	THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
+	INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+	AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+	AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+	OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+	SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+	INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+	POSSIBILITY OF SUCH DAMAGE.
+*/
+/* ========================================================================== */
+	]]>
+	</copyright>
+	<name>ntopng</name>
+	<version>1.1 v0.1</version>
+	<title>Diagnostics: ntopng Settings</title>
+	<savetext>Change</savetext>
+	<aftersaveredirect>pkg_edit.php?xml=ntopng.xml</aftersaveredirect>
+	<menu>
+		<name>ntopng Settings</name>
+		<tooltiptext>Set ntopng settings such as password and port.</tooltiptext>
+		<section>Diagnostics</section>
+		<url>/pkg_edit.php?xml=ntopng.xml&amp;id=0</url>
+	</menu>
+	<menu>
+		<name>ntopng</name>
+		<tooltiptext>Access ntopng</tooltiptext>
+		<section>Diagnostics</section>
+		<url>http://$myurl:3000</url>
+		<depends_on_service>ntopng</depends_on_service>
+	</menu>
+	<service>
+		<name>ntopng</name>
+		<rcfile>ntopng.sh</rcfile>
+		<executable>ntopng</executable>
+		<description>ntopng bandwidth monitoring/graphing</description>
+	</service>
+	<tabs>
+		<tab>
+			<text>ntopng Settings</text>
+			<url>/pkg_edit.php?xml=ntopng.xml&amp;id=0</url>
+			<active/>
+		</tab>
+		<tab>
+			<text>Access ntopng</text>
+			<url>http://$myurl:3000</url>
+		</tab>
+	</tabs>
+	<fields>
+		<field>
+			<fielddescr>ntopng Admin Password</fielddescr>
+			<fieldname>password</fieldname>
+			<description>Enter the password for the ntopng GUI.  Minimum 5 characters, defaults to admin.</description>
+			<type>password</type>
+		</field>
+		<field>
+			<fielddescr>Confirm ntopng Admin Password</fielddescr>
+			<fieldname>passwordagain</fieldname>
+			<type>password</type>
+		</field>
+		<field>
+			<fielddescr>Interface</fielddescr>
+			<fieldname>interface_array</fieldname>
+			<type>interfaces_selection</type>
+			<size>3</size>
+			<value>lan</value>
+			<multiple>true</multiple>
+		</field>
+		<field>
+			<fielddescr>DNS Mode</fielddescr>
+			<fieldname>dns_mode</fieldname>
+			<description>Configures how name resolution is handled</description>
+			<type>select</type>
+			<default_value>0</default_value>
+			<options>
+				<option><value>0</value><name>Decode DNS responses and resolve local numeric IPs only (default)</name></option>
+				<option><value>1</value><name>Decode DNS responses and resolve all numeric IPs</name></option>
+				<option><value>2</value><name>Decode DNS responses and don't resolve numeric IPs</name></option>
+				<option><value>3</value><name>Don't decode DNS responses and don't resolve numeric IPs</name></option>
+			</options>
+		</field>
+		<field>
+			<fielddescr>Local Networks</fielddescr>
+			<fieldname>local_networks</fieldname>
+			<description>Configures how Local Networks are defined</description>
+			<type>select</type>
+			<default_value>rfc1918</default_value>
+			<options>
+				<option><value>rfc1918</value><name>Consider all RFC1918 networks local</name></option>
+				<option><value>selected</value><name>Consider selected interface networks local</name></option>
+				<option><value>lanonly</value><name>Consider only LAN interface local</name></option>
+			</options>
+		</field>
+	</fields>
+	<custom_php_global_functions>
+	<![CDATA[
+	function sync_package_ntopng() {
+		conf_mount_rw();
+		config_lock();
+		global $config;
+		global $input_errors;
+		if ($_POST) {
+			$config['installedpackages']['ntopng']['config'] = array();
+			$config['installedpackages']['ntopng']['config'][0] = $_POST;
+		}
+		$ntopng_config =& $config['installedpackages']['ntopng']['config'][0];
+		$if_final = "";
+		$ifaces_final = "";
+		system("/bin/mkdir -p /var/db/ntopng");
+		system("/bin/mkdir -p /var/db/ntopng/rrd");
+		system("/bin/mkdir -p /var/db/ntopng/rrd/graphics");
+		system("/bin/chmod -R 755 /var/db/ntopng");
+		system("/usr/sbin/chown -R nobody:nobody /var/db/ntopng");
+		system("/bin/cp -Rp /usr/local/lib/X11/fonts/webfonts/ /usr/local/lib/X11/fonts/TTF/");
+		$first = 0;
+		foreach($ntopng_config['interface_array'] as $iface) {
+			$if = convert_friendly_interface_to_real_interface_name($iface);
+			if ($if) {
+				$ifaces .= " -i " . escapeshellarg("{$if}");
+			}
+		}
+
+		// DNS Mode
+		if (is_numeric($ntopng_config['dns_mode']) && ($ntopng_config['dns_mode'] >= 0) && ($ntopng_config['dns_mode'] <= 3)) {
+			$dns_mode = "--dns-mode " . escapeshellarg($ntopng_config['dns_mode']);
+		}
+
+		// Local Networks >
+		switch ($ntopng_config['local_networks']) {
+			case "selected":
+				$nets = array();
+				foreach ($ntopng_config['interface_array'] as $iface) {
+					if (is_ipaddr(get_interface_ip($iface))) {
+						$nets[] = gen_subnet(get_interface_ip($iface),get_interface_subnet($iface)) . '/' . get_interface_subnet($iface);
+					}
+				}
+				if (!empty($nets))
+					$local_networks = "--local-networks " . escapeshellarg(implode(",", $nets));
+				break;
+			case "lanonly":
+				if (is_ipaddr(get_interface_ip('lan'))) {
+					$local_networks = "--local-networks " . escapeshellarg(gen_subnet(get_interface_ip('lan'),get_interface_subnet('lan')) . '/' . get_interface_subnet('lan'));
+				}
+				break;
+			case "rfc1918":
+			default:
+				$local_networks = "--local-networks '192.168.0.0/16,172.16.0.0/12,10.0.0.0/8'";
+				break;
+		}
+
+		$pf_version=substr(trim(file_get_contents("/etc/version")),0,3);
+		if ($pf_version >= 2.2) {
+			$redis_path = "/usr/pbi/ntopng-" . php_uname("m") . "/local/bin";
+		} else {
+			$redis_path = "/usr/pbi/ntopng-" . php_uname("m") . "/bin";
+		}
+
+		$start = "ldconfig -m /usr/pbi/ntopng-i386/lib\n";
+		$start .= "\t{$redis_path}/redis-server &\n";
+		// TODO:
+		//  Add support for --data-dir /somewhere, --httpdocs-dir /somewhereelse,
+		//  --dump-timeline (on/off) --http-port, --https-port
+
+		$start .= "\t/usr/local/bin/ntopng -s -e {$ifaces} {$dns_mode} {$aggregations} {$local_networks} &";
+		write_rcfile(array(
+					"file" => "ntopng.sh",
+					"start" => $start,
+					"stop" => "/usr/bin/killall ntopng redis-cli redis-server"
+				)
+		);
+		if (is_service_running("ntopng")) {
+			stop_service("ntopng");
+			// Wait for ntopng to shut down cleanly.
+			sleep(20);
+		}
+		start_service("ntopng");
+		sleep(2);
+
+		if (empty($ntopng_config['password']))
+			$ntopng_config['password'] = "admin";
+		$password = md5($ntopng_config['password']);
+		mwexec_bg("{$redis_path}/redis-cli SET user.admin.password " . escapeshellarg($password));
+		conf_mount_ro();
+		config_unlock();
+	}
+	]]>
+	</custom_php_global_functions>
+	<custom_add_php_command>
+		sync_package_ntopng();
+	</custom_add_php_command>
+	<custom_php_resync_config_command>
+		sync_package_ntopng();
+	</custom_php_resync_config_command>
+	<custom_php_install_command>
+	<![CDATA[
+		mwexec_bg("/usr/pbi/ntopng-" . php_uname("m") . "/bin/geoipupdate.sh");
+		sync_package_ntopng();
+	]]>
+	</custom_php_install_command>
+	<custom_php_deinstall_command>
+		exec("rm /usr/local/etc/rc.d/ntopng*");
+	</custom_php_deinstall_command>
+	<custom_php_validation_command>
+	<![CDATA[
+	if ($_POST) {
+		if (empty($_POST['password']) || empty($_POST['passwordagain']))
+			$input_errors[] = "You must provide (and confirm) ntopng's password.";
+		if ($_POST['password'] != $_POST['passwordagain'])
+			$input_errors[] = "The provided passwords did not match.";
+	}
+	]]>
+	</custom_php_validation_command>
+</packagegui>

@@ -33,6 +33,39 @@
 
 require_once("config.inc");
 
+class haproxy_utils {
+	public static $pf_version;
+}
+haproxy_utils::$pf_version = substr(trim(file_get_contents("/etc/version")),0,3);
+
+if(!function_exists('ifset')){
+	function ifset(&$var, $default = ''){
+		return isset($var) ? $var : $default;
+	};
+}
+
+if(!function_exists('is_arrayset')){
+	function is_arrayset(&$array, $items){
+		if (!isset($array))
+			return false;
+		$item = $array;
+		$arg = func_get_args();
+		for($i = 1; $i < count($arg); $i++) {
+
+			$itemindex = $arg[$i];
+			if (!isset($item[$itemindex]) || !is_array($item[$itemindex]))
+				return false;
+			$item = $item[$itemindex];
+
+		}
+		return true;
+	}
+}
+
+function haproxy_compareByName($a, $b) {
+	return strcasecmp($a['name'], $b['name']);
+}
+
 function haproxy_interface_ip($interfacebindname,$userfriendly=false){
 	$list = haproxy_get_bindable_interfaces();
 	$item = $list[$interfacebindname];
@@ -203,20 +236,11 @@ function haproxy_cert_signed_by($cert, $signedbycert) {
 	return $authoritykeyid == $subjectid;
 }
 
-function haproxy_get_certificates(){
-	global $config;
-	$allcerts = array();
-	foreach($config['cert'] as &$cert)
-		$allcerts[] = &$cert;
-	foreach($config['ca'] as &$cert)
-		$allcerts[] = &$cert;
-	return $allcerts;
-}
 function haproxy_recalculate_certifcate_chain(){
 	// and set "selfsigned" for certificates that where used to sign themselves
 	// recalculate the "caref" for all certificates where it is currently unkown.
 	
-	$allcertificates = haproxy_get_certificates();
+	$allcertificates = haproxy_get_certificates('ca,server,user',true);
 	$items_recalculated = 0;
 	foreach($allcertificates as &$cert){
 		$recalculate=false;
@@ -251,7 +275,7 @@ function get_certificat_usage($refid) {
 	$usage = array();
 	$cert = lookup_cert($refid);
 	if (is_cert_revoked($cert))
-		$usage[] = "Revoked";
+		$usage[] = "*Revoked";
 	if (is_webgui_cert($refid))
 		$usage[] = "webConfigurator";
 	if (is_user_cert($refid))
@@ -260,55 +284,86 @@ function get_certificat_usage($refid) {
 		$usage[] = "OpenVPN Server";
 	if (is_openvpn_client_cert($refid))
 		$usage[] = "OpenVPN Client";
-	if (is_ipsec_cert($cert['refid']))
+	if (is_ipsec_cert($refid))
 		$usage[] = "IPsec Tunnel";
 	if (function_exists("is_captiveportal_cert"))
 		if (is_captiveportal_cert($refid))
 			$usage[] = "Captive Portal";
-	
 	return $usage;
 }
-function get_certificates_server($get_includeWebCert=false) {
+
+function haproxy_get_certificate_descriptivename($cert) {
+	$usage = get_certificat_usage($cert['crt']);
+	foreach($usage as $use){
+		$usagestr .= " " . $use;
+	}		
+	if ($usagestr != "")
+		$usagestr = " (".trim($usagestr).")";
+
+	$purpose = cert_get_purpose($cert['crt']);
+	$certserverpurpose = $purpose['server'] == 'Yes' ? " [Server cert]" : "";
+		
+	$caname = "";
+	$ca = lookup_ca($cert['caref']);
+	if ($ca)
+		$caname = " (CA: {$ca['descr']})";
+	
+	return $cert['descr'] . $caname . $certserverpurpose . $usagestr;
+}
+
+function haproxy_get_certificates($type = 'server,user', $get_includeWebCert=false) {
+	// $type one or multiple of these separated by a comma:  ca,server,user
+	// $get_includeWebCert if the webgui certificate may be included.
+
 	// This function (is intended to) provide a uniform way to retrieve a list of server certificates
 	global $config;
-	$certificates=array();
-	$a_cert = &$config['cert'];
-	foreach ($a_cert as $cert)
-	{
-		if ($get_ca == false && is_webgui_cert($cert['refid']))
-			continue;
-
-		$purpose = cert_get_purpose($cert['crt']);
-		//$certserverpurpose = $purpose['server'] == 'Yes' ? " [Server certificate]" : "";
-		$certserverpurpose = "";
-
-		$selected = "";
-		$caname = "";
-		$inuse = "";
-		$revoked = "";
-		$ca = lookup_ca($cert['caref']);
-		if ($ca)
-			$caname = " (CA: {$ca['descr']})";
-		if ($pconfig['certref'] == $cert['refid'])
-			$selected = "selected";
-		if (cert_in_use($cert['refid']))
-			$inuse = " *In Use";
-		if (is_cert_revoked($cert))
-		$revoked = " *Revoked";
-		
-		$usagestr="";
-		$usage = get_certificat_usage($cert['refid']);
-		foreach($usage as $use){
-			$usagestr .= " " . $use;
-		}		
-		if ($usagestr != "")
-			$usagestr = " (".trim($usagestr).")";
-		
-		$certificates[$cert['refid']]['name'] = $cert['descr'] . $caname . $certserverpurpose . $inuse . $revoked . $usagestr;
+	$type = ",$type,";
+	$certificates = array();
+	if (strpos($type,',server,') !== false || strpos($type,',user,') !== false ) {
+		if (is_array($config['cert'])) {
+			$a_cert = &$config['cert'];
+			foreach ($a_cert as $cert) {
+				$purpose = cert_get_purpose($cert['crt']);
+				
+				$ok = false;
+				$ok |= stristr($type,',server,') && $purpose['server'] == 'Yes';
+				$ok |= stristr($type,',user,') && $purpose['server'] != 'Yes';
+				if (!$ok)
+					continue;
+				if ($get_includeWebCert == false && is_webgui_cert($cert['refid']))
+					continue;
+				$certificates[$cert['refid']]['name'] = haproxy_get_certificate_descriptivename($cert);
+			}
+		}
 	}
+	if (strpos($type,',ca,') !== false) {
+		if (is_array($config['ca'])) {
+			$a_cert = &$config['ca'];
+			foreach ($a_cert as $cert) {
+				$certificates[$cert['refid']]['name'] = haproxy_get_certificate_descriptivename($cert);
+			}
+		}
+	}
+	uasort($certificates, haproxy_compareByName);
 	return $certificates;
 }
 
+function haproxy_get_crls() {
+	global $config;
+	$certificates=array();
+	if (is_array($config['crl'])) {
+		foreach ($config['crl'] as $crl) {
+			$caname = "";
+			$ca = lookup_ca($crl['caref']);
+			if ($ca)
+				$caname = " (CA: {$ca['descr']})";
+		
+			$certificates[$crl['refid']]['name'] = $crl['descr'] . $caname;
+		}
+	}
+	uasort($certificates, haproxy_compareByName);
+	return $certificates;
+}
 
 function phparray_to_javascriptarray_recursive($nestID, $path, $items, $nodeName, $includeitems) {
 	$offset = str_repeat('  ',$nestID);

@@ -3,7 +3,7 @@
 /* ========================================================================== */
 /*
     zabbix2-proxy.inc
-    part of the Zebedee package for pfSense
+    part of the Zabbix package for pfSense
     Copyright (C) 2013 Danilo G. Baio
 	Copyright (C) 2013 Marcello Coutinho
 

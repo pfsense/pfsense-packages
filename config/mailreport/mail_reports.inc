@@ -35,13 +35,13 @@ require_once("filter.inc");
 require_once("rrd.inc");
 
 $graph_length = array(
-	"8hour" => 28800,
+	"eighthour" => 28800,
 	"day" => 86400,
 	"week" => 604800,
 	"month" => 2764800,
 	"quarter" => 8035200,
 	"year" => 31622400,
-	"4year" => 126489600);
+	"fouryear" => 126489600);
 
 $logfile_friendly = array(
 	"dhcpd"      => "DHCP",
@@ -88,6 +88,7 @@ function get_dates($curperiod, $graph) {
 				$offset = 0;
 		}
 		switch($graph) {
+			case "eighthour":
 			case "8hour":
 				if($curhour < 24)
 					$starthour = 16;
@@ -142,6 +143,7 @@ function get_dates($curperiod, $graph) {
 				if($offset != 0)
 					$end = mktime(0, 0, 0, 1, 0, (($curyear + $offset) +1));
 				break;
+			case "fouryear":
 			case "4year":
 				$start = mktime(0, 0, 0, 1, 0, (($curyear - 3) + $offset));
 				if($offset != 0)
@@ -1261,6 +1263,17 @@ function get_friendly_log_name($logfile) {
 	if (!empty($logfile_friendly[$friendly]))
 		$friendly = $logfile_friendly[$friendly];
 	return $friendly;
+}
+
+function fixup_graph_timespan($timespan) {
+	switch ($timespan) {
+		case "8hour":
+			return "eighthour";
+		case "4year":
+			return "fouryear";
+		default:
+			return $timespan;
+	}
 }
 
 ?>

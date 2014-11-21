@@ -1,8 +1,8 @@
 <?php
 /*
-	postfix.inc
+	mailscanner.inc
 	part of the Postfix package for pfSense
-	Copyright (C) 2011-2013 Marcello Coutinho
+	Copyright (C) 2011-2014 Marcello Coutinho
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
@@ -33,17 +33,18 @@ require("globals.inc");
 #require("guiconfig.inc");
 
 $pf_version=substr(trim(file_get_contents("/etc/version")),0,3);
-if ($pf_version > 2.0)
-	define('MAILSCANNER_LOCALBASE', '/usr/pbi/mailscanner-' . php_uname("m"));
+define('MAILSCANNER_PREFIX', '/usr/pbi/mailscanner-' . php_uname("m"));
+if ($pf_version == "2.1")
+	define('MAILSCANNER_LOCALBASE', MAILSCANNER_PREFIX);
 else
-  define('MAILSCANNER_LOCALBASE','/usr/local');
+	define('MAILSCANNER_LOCALBASE', MAILSCANNER_PREFIX . '/local');
 
 $uname=posix_uname();
 if ($uname['machine']=='amd64')
         ini_set('memory_limit', '250M');
-        
+
 function ms_text_area_decode($text){
-	return preg_replace('/\r\n/', "\n",base64_decode($text));	
+	return preg_replace('/\r\n/', "\n",base64_decode($text));
 }
 
 function sync_package_mailscanner($via_rpc=false) {
@@ -62,7 +63,7 @@ function sync_package_mailscanner($via_rpc=false) {
 
 	#check default config
 	$load_samples=0;
-	
+
 	#assign xml arrays
 	if (!is_array($config['installedpackages']['mailscanner'])){
 		$config['installedpackages']['mailscanner']['config'][0]=array(	'max_children'=> '5',
@@ -130,7 +131,7 @@ function sync_package_mailscanner($via_rpc=false) {
 	$antispam=$config['installedpackages']['msantispam']['config'][0];
 	if (is_array($config['installedpackages']['msalerts']))
 		$alert=$config['installedpackages']['msalerts']['config'][0];
-		
+
 	#General options
 	$info  =($mailscanner['orgname']?'%org-name% = '.$mailscanner['orgname']."\n":'%org-name% = Pfsense'."\n");
 	$info .=($mailscanner['longorgname']?'%org-long-name% = '.$mailscanner['longorgname']."\n":'%org-long-name% = Pfsense Inc.'."\n");
@@ -165,7 +166,7 @@ function sync_package_mailscanner($via_rpc=false) {
 
 	#Attachment options
 	$max_size=($attachments['max_sizes']?$attachments['max_sizes']:'-1');
-	$archive_depth=($attachments['archive_depth']?$attachments['archive_depth']:'8');	
+	$archive_depth=($attachments['archive_depth']?$attachments['archive_depth']:'8');
 	$expand_tnef=(preg_match('/ExpandTNEF/',$attachments['features'])?"yes":"no");
 	$deliver_tnef=(preg_match('/DeliverUnparsableTNEF/',$attachments['features'])?"yes":"no");
 	$find_archive=(preg_match('/FindArchiveByContent/',$attachments['features'])?"yes":"no");
@@ -188,7 +189,7 @@ function sync_package_mailscanner($via_rpc=false) {
 	$allow_password=(preg_match('/AllowPassword-ProtectedArchives/',$antivirus['features'])?"yes":"no");
 	$check_filenames=(preg_match('/CheckFilenamesInPassword-ProtectedArchives/',$antivirus['features'])?"yes":"no");
 	$custom_antivirus_options=ms_text_area_decode($antivirus['custom']);
-	
+
 	#content
 	$dangerous_content=(preg_match('/DangerousContentScanning/',$content['checks'])?"yes":"no");
 	$partial_messages=(preg_match('/AllowPartialMessages/',$content['checks'])?"yes":"no");
@@ -199,7 +200,7 @@ function sync_package_mailscanner($via_rpc=false) {
 	$highlight_phishing=(preg_match('/HighlightPhishingFraud/',$content['checks'])?"yes":"no");
 	$dangerous_html=(preg_match('/ConvertDangerousHTMLToText/',$content['checks'])?"yes":"no");
 	$html_to_text=(preg_match('/ConvertHTMLToText/',$content['checks'])?"yes":"no");
-	
+
 	#reports and responses
 	$include_scanner_name=(preg_match('/IncludeScannerNameInReports/',$report['features'])?"yes":"no");
 	$hide_incoming_work_dir=(preg_match('/HideIncomingWorkDir/',$report['features'])?"yes":"no");
@@ -225,7 +226,7 @@ function sync_package_mailscanner($via_rpc=false) {
 	$notice_from=($report['notice_from']?$report['notice_from']:"MailScanner");
 	$notice_to=($report['notice_to']?$report['notice_to']:"MailScanner");
 	$notice_signature=($report['notice_signature']?$report['notice_signature']:'-- \nMailScanner\nEmail Virus Scanner\nwww.mailscanner.info');
-	
+
 	#antispa- spam assassin
 	$use_sa=(preg_match('/use_sa/',$antispam['safeatures'])?"yes":"no");
 	$sa_auto_whitelist=(preg_match('/sa_auto_whitelist/',$antispam['safeatures'])?"yes":"no");
@@ -248,7 +249,7 @@ function sync_package_mailscanner($via_rpc=false) {
 	$is_not_mcp=(preg_match('/is_not_mcp/',$antispam['mcp_features'])?"yes":"no");
 	$mcp_is_high_score=(preg_match('/mcp_is_high_score/',$antispam['mcp_features'])?"yes":"no");
 	$include_mcp_report=(preg_match('/include_mcp_report/',$antispam['mcp_features'])?"yes":"no");
-	$detailled_mcp_report=(preg_match('/detailled_mcp_report/',$antispam['mcp_features'])?"yes":"no");				
+	$detailled_mcp_report=(preg_match('/detailled_mcp_report/',$antispam['mcp_features'])?"yes":"no");
 	$score_mcp_report=(preg_match('/score_mcp_report/',$antispam['mcp_features'])?"yes":"no");
 	$log_mcp=(preg_match('/log_mcp/',$antispam['mcp_features'])?"yes":"no");
 	$mcp_score=($antispam['mcp_score']?$antispam['mcp_score']:"1");
@@ -256,14 +257,14 @@ function sync_package_mailscanner($via_rpc=false) {
 	$mcp_action=($antispam['mcp_action']?preg_replace("/,/"," ",$antispam['mcp_action']):"deliver");
 	$mcp_hi_action=($antispam['mcp_hi_action']?preg_replace("/,/"," ",$antispam['mcp_hi_action']):"delete");
 	$mcp_max=($antispam['mcp_max']?$antispam['mcp_max']:"200k");
-		
+
 	/*
 Language Strings = %report-dir%/languages.conf
 */
 
 	#check files
 	$mailscanner_dir=MAILSCANNER_LOCALBASE ."/etc/MailScanner";
-	
+
 	if($attachments['filename_rules'] == ""){
 		$config['installedpackages']['msattachments']['config'][0]['filename_rules']=base64_encode(file_get_contents($mailscanner_dir.'/archives.filename.rules.conf.sample'));
 		$load_samples++;
@@ -279,7 +280,7 @@ Language Strings = %report-dir%/languages.conf
 	if($content['phishing_bad'] == ""){
 		$config['installedpackages']['mscontent']['config'][0]['phishing_bad']=base64_encode(file_get_contents($mailscanner_dir.'/phishing.bad.sites.conf.sample'));
 		$load_samples++;
-	}	
+	}
 	if($content['country_domains'] == ""){
 		$config['installedpackages']['mscontent']['config'][0]['country_domains']=base64_encode(file_get_contents($mailscanner_dir.'/country.domains.conf.sample'));
 		$load_samples++;
@@ -310,9 +311,8 @@ Language Strings = %report-dir%/languages.conf
 		$config['installedpackages']['msantispam']['config'][0]['max_message_size']=base64_encode(file_get_contents($mailscanner_dir.'/rules/max.message.size.rules.sample'));
 		$load_samples++;
 	}
-	
-	//$report_dir=MAILSCANNER_LOCALBASE."/share/MailScanner/reports/".strtolower($report['language']);
-	$report_dir="/usr/local/share/MailScanner/reports/".strtolower($report['language']);
+
+	$report_dir=MAILSCANNER_LOCALBASE."/share/MailScanner/reports/".strtolower($report['language']);
 	#CHECK REPORT FILES
 	$report_files= array('deletedbadcontent' => 'deleted.content.message.txt',
 						'deletedbadfilename' => 'deleted.filename.message.txt',
@@ -335,7 +335,7 @@ Language Strings = %report-dir%/languages.conf
 						'recipientmcp'=>'recipient.mcp.report.txt',
 						'recipientspam'=>'recipient.spam.report.txt',
 						'rejection' =>'rejection.report.txt');
-	
+
 	foreach ($report_files as $key_r => $file_r){
 		if ($report[$key_r] == ""){
 			#$input_errors[]= $key;
@@ -346,7 +346,7 @@ Language Strings = %report-dir%/languages.conf
 				}
 			}
 		#print $key_r ."X $file_r X". base64_encode(file_get_contents($report_dir.'/'.$file_r.'.sample')) ."<br>";
-		
+
 		if ($alert['sig']){
 			if($alert['sig_html'] == ""){
 				$config['installedpackages']['msalerts']['config'][0]['sig_html']=base64_encode(file_get_contents($report_dir.'/inline.sig.html'));
@@ -368,8 +368,8 @@ Language Strings = %report-dir%/languages.conf
 				$load_samples++;
 				}
 			}
-			
-			
+
+
 	}
 	#exit;
 	if($load_samples > 0)
@@ -381,7 +381,7 @@ Phishing Bad Sites File = %etc-dir%/phishing.bad.sites.conf
 Country Sub-Domains List = %etc-dir%/country.domains.conf
 */
 	#get mailscanner version
-	$msc_bin=MAILSCANNER_LOCALBASE. "/sbin/mailscanner";
+	$msc_bin=MAILSCANNER_PREFIX. "/sbin/mailscanner";
 	if (file_exists($msc_bin)){
 		$msc_bin_file=file_get_contents($msc_bin);
 		if (preg_match("/MailScannerVersion = '(\S+)'/",$msc_bin_file,$msv_matches))
@@ -404,23 +404,23 @@ Country Sub-Domains List = %etc-dir%/country.domains.conf
 		}
 	if (is_dir('/var/spool/postfix'))
 		chown ('/var/spool/postfix','postfix');
-	
+
 	$mlang=strtolower($report['language']);
 	$mfiles[]= MAILSCANNER_LOCALBASE. "/etc/MailScanner/virus.scanners.conf";
 	$mfiles[]= MAILSCANNER_LOCALBASE. "/share/MailScanner/reports/{$mlang}/inline.spam.warning.txt";
 	$mfiles[]= MAILSCANNER_LOCALBASE. "/share/MailScanner/reports/{$mlang}/languages.conf";
-	
+
 	foreach ($mfiles as $mfile)
 		if (! file_exists ($mfile) && file_exists($mfile.".sample"))
 			copy($mfile.".sample",$mfile);
-			
+
 
 	#update spam.assassin.prefs.conf
 	$sa_temp=ms_text_area_decode($config['installedpackages']['msantispam']['config'][0]['sa_pref_file']);
 	$pattern[]='/#ifplugin/';
 	$pattern[]='/#dcc_path/';
 	$pattern[]='/#endif/';
-	
+
 	$replacement[]="ifplugin";
 	$replacement[]="dcc_path";
 	$replacement[]="endif";
@@ -443,12 +443,12 @@ Country Sub-Domains List = %etc-dir%/country.domains.conf
 	if (preg_match('/use_pyzor/',$antispam['safeatures'])){
 		$pattern[]='/#pyzor_path/';
 		$pattern[]="/\S+yzor_disabled/";
-		$pattern[]='/usr.bin.pyzor/';
+		$pattern[]='/\/usr.bin.pyzor/';
 		$pattern[]='/use_pyzor/';
 		$pattern[]="/\S+o_not_use_pyzor/";
 		$replacement[]="pyzor_path";
 		$replacement[]="pyzor_path";
-		$replacement[]="usr/local/bin/pyzor";
+		$replacement[]=MAILSCANNER_PREFIX . "/bin/pyzor";
 		$replacement[]="use_pyzor";
 		$replacement[]="use_pyzor";
 		}
@@ -494,13 +494,13 @@ Country Sub-Domains List = %etc-dir%/country.domains.conf
 	$replacement[]="bayes_ignore_header ".($mailscanner['orgname']!=""?$mailscanner['orgname']:"Pfsense")."-MailScanner";
 	$pattern[]='/envelope_sender_header X([a-zA-Z0-9_.-]+)MailScanner-From/';
 	$replacement[]="envelope_sender_header X-".($mailscanner['orgname']!=""?$mailscanner['orgname']:"Pfsense")."-MailScanner-From";
-	
-	
+
+
 	$sa_temp=preg_replace($pattern,$replacement,$sa_temp);
 	#rint "pre".$sa_temp;exit;
 	$config['installedpackages']['msantispam']['config'][0]['sa_pref_file']=base64_encode($sa_temp);
 	write_config();
-	
+
 	file_put_contents($mailscanner_dir."/MailScanner.conf", $mc, LOCK_EX);
 	file_put_contents($mailscanner_dir."/filename.rules.conf",ms_text_area_decode($config['installedpackages']['msattachments']['config'][0]['filename_rules']),LOCK_EX);
 	file_put_contents($mailscanner_dir."/filetype.rules.conf",ms_text_area_decode($config['installedpackages']['msattachments']['config'][0]['filetype_rules']),LOCK_EX);
@@ -515,10 +515,10 @@ Country Sub-Domains List = %etc-dir%/country.domains.conf
 	file_put_contents($mailscanner_dir.'/rules/bounce.rules',ms_text_area_decode($config['installedpackages']['msantispam']['config'][0]['bounce']),LOCK_EX);
 	file_put_contents($mailscanner_dir.'/rules/max.message.size.rules',ms_text_area_decode($config['installedpackages']['msantispam']['config'][0]['max_message_size']),LOCK_EX);
 	file_put_contents($mailscanner_dir.'/rules/spam.whitelist.rules',ms_text_area_decode($config['installedpackages']['msantispam']['config'][0]['spam_whitelist']),LOCK_EX);
-	
+
 	foreach ($report_files as $key_r => $file_r)
 		file_put_contents($report_dir.'/'.$file_r,ms_text_area_decode($config['installedpackages']['msreport']['config'][0][$key_r]),LOCK_EX);
-		
+
 	if ($alert['sig']){
 		$sig_html=ms_text_area_decode($config['installedpackages']['msalerts']['config'][0]['sig_html']);
 		$sig_txt=ms_text_area_decode($config['installedpackages']['msalerts']['config'][0]['sig_txt']);}
@@ -536,7 +536,7 @@ Country Sub-Domains List = %etc-dir%/country.domains.conf
 		$warning_txt="";}
 	file_put_contents($report_dir.'/inline.warning.txt',$warning_txt,LOCK_EX);
 	file_put_contents($report_dir.'/inline.warning.html',$warning_html,LOCK_EX);
-	
+
 	#check virus_scanner options
 	$libexec_dir=MAILSCANNER_LOCALBASE. "/libexec/MailScanner/";
 	if ($virus_scanning == "yes"){
@@ -562,7 +562,7 @@ Country Sub-Domains List = %etc-dir%/country.domains.conf
 			chmod ($libexec_dir.'clamav-autoupdate',0755);
 			copy($libexec_dir.'clamav-wrapper.sample',$libexec_dir.'clamav-wrapper');
 			chmod ($libexec_dir.'clamav-autoupdate',0755);
-							
+
 			#clamav-wrapper file
 			$cconf=$libexec_dir."clamav-wrapper";
 			if (file_exists($cconf)){
@@ -572,7 +572,7 @@ Country Sub-Domains List = %etc-dir%/country.domains.conf
 					file_put_contents($cconf, $cconf_file, LOCK_EX);
 					}
 				}
-				
+
 			#freshclam conf file
 			$cconf=MAILSCANNER_LOCALBASE. "/etc/freshclam.conf";
 			if (file_exists($cconf)){
@@ -582,7 +582,7 @@ Country Sub-Domains List = %etc-dir%/country.domains.conf
 					file_put_contents($cconf, $cconf_file, LOCK_EX);
 					}
 				}
-				
+
 			#clamd conf file
 			$cconf=MAILSCANNER_LOCALBASE. "/etc/clamd.conf";
 			if (file_exists($cconf)){
@@ -617,7 +617,7 @@ Country Sub-Domains List = %etc-dir%/country.domains.conf
 					else{
 						log_error("Starting clamav-clamd daemon");
 						mwexec_bg("$script start");
-						}	
+						}
 				}
 				else{
 					if (is_process_running('clamd')){
@@ -626,20 +626,20 @@ Country Sub-Domains List = %etc-dir%/country.domains.conf
 						}
 					}
 				}
-				
+
 				#check clamav database
 				if (!file_exists('/var/db/clamav/main.cvd')){
 				log_error('No clamav database found, running freshclam in background.');
 				mwexec_bg(MAILSCANNER_LOCALBASE. '/bin/freshclam --config-file='.MAILSCANNER_LOCALBASE.'/etc/freshclam.conf --user=root');
 				}
-				
+
 		}
 	}
 	else{
 		unlink_if_exists($libexec_dir.'clamav-autoupdate');
 		unlink_if_exists($libexec_dir.'clamav-wrapper');
 	}
-	
+
 	#check dcc config file
 			$script=MAILSCANNER_LOCALBASE. '/dcc/dcc_conf';
 			if (file_exists($script)){
@@ -649,7 +649,7 @@ Country Sub-Domains List = %etc-dir%/country.domains.conf
 					file_put_contents($script, $script_file, LOCK_EX);
 					}
 				}
-	
+
 	#check dcc startup script
 			$script=MAILSCANNER_LOCALBASE. '/etc/rc.d/dccifd';
 			if (file_exists($script)){
@@ -659,21 +659,21 @@ Country Sub-Domains List = %etc-dir%/country.domains.conf
 					file_put_contents($script, $script_file, LOCK_EX);
 					chmod ($script,0755);
 					}
-				
+
 				if($config['installedpackages']['mailscanner']['config'][0]['enable']){
 					if(is_process_running('dccifd')){
 						log_error("Restarting dccifd");
-						mwexec("$script restart");	
+						mwexec("$script restart");
 						}
 					else{
 						log_error("Starting dccifd");
 						mwexec("$script start");
-						}	
+						}
 					}
 				else{
 					if(is_process_running('dccifd')){
 						log_error("Stopping dccifd");
-						mwexec("$script stop");	
+						mwexec("$script stop");
 						}
 					}
 				}
@@ -681,29 +681,29 @@ Country Sub-Domains List = %etc-dir%/country.domains.conf
 	$script=MAILSCANNER_LOCALBASE. '/etc/rc.d/mailscanner';
 
 	#fix MIME::ToolUtils deprecated function and usecure dependency calls in /usr/local/sbin/mailscanner
-	$cconf=MAILSCANNER_LOCALBASE. "/sbin/mailscanner";
+	$cconf=MAILSCANNER_PREFIX. "/sbin/mailscanner";
 	if (file_exists($cconf)){
-		
+
 		$perl_bin="perl_mailscanner";
-		if(file_exists(MAILSCANNER_LOCALBASE . '/bin/perl') && !file_exists(MAILSCANNER_LOCALBASE . "/bin/{$perl_bin}")){
-		 	link(MAILSCANNER_LOCALBASE . '/bin/perl',MAILSCANNER_LOCALBASE . '/bin/perl_mailscanner');
+		if(file_exists(MAILSCANNER_PREFIX . '/bin/perl') && !file_exists(MAILSCANNER_PREFIX . "/bin/{$perl_bin}")){
+		 	link(MAILSCANNER_PREFIX . '/bin/perl',MAILSCANNER_PREFIX . "/bin/{$perl_bin}");
 		}
-		if (file_exists(MAILSCANNER_LOCALBASE . "/bin/{$perl_bin}")){
+		if (file_exists(MAILSCANNER_PREFIX . "/bin/{$perl_bin}")){
 			$cconf_file=file_get_contents($cconf);
 			$pattern2[0]='@#!/usr\S+bin/perl.*I@';
 			//$pattern2[1]='/\smy .current = config MIME::ToolUtils/';
-			$replacement2[0]='#!'.MAILSCANNER_LOCALBASE. "/bin/{$perl_bin} -U -I";
+			$replacement2[0]='#!'.MAILSCANNER_PREFIX. "/bin/{$perl_bin} -U -I";
 			//$replacement2[1]=' #my $current = config MIME::ToolUtils';
 			if (preg_match('@#!/usr\S+bin/perl.*I@',$cconf_file)){
 				$cconf_file=preg_replace($pattern2,$replacement2,$cconf_file);
 				file_put_contents($cconf, $cconf_file, LOCK_EX);
-				}
+			}
 		}
-			
+
 	}
 
 	#check spam assassin rules
-	$saupdate="/usr/local/bin/sa-update";
+	$saupdate=MAILSCANNER_PREFIX . "/bin/sa-update";
 	if (file_exists($saupdate)){
 		$rules_found=0;
 		if (file_exists("/var/db/spamassassin")){
@@ -714,7 +714,7 @@ Country Sub-Domains List = %etc-dir%/country.domains.conf
  			log_error("Mailscanner- No spamassassin rules found, forcing sa-update.");
  			mwexec($saupdate);
  		}
-	}	
+	}
 
 	if (file_exists($script)){
 		$script_file=file_get_contents($script);
@@ -765,8 +765,8 @@ Country Sub-Domains List = %etc-dir%/country.domains.conf
 					}
 				break;
 			case "auto":
-					if (is_array($config['installedpackages']['carpsettings']) && is_array($config['installedpackages']['carpsettings']['config'])){
-						$system_carp=$config['installedpackages']['carpsettings']['config'][0];
+					if (is_array($config['hasync'])){
+						$system_carp=$config['hasync'];
 						$rs[0]['ipaddress']=$system_carp['synchronizetoip'];
 						$rs[0]['username']=$system_carp['username'];
 						$rs[0]['password']=$system_carp['password'];
@@ -780,7 +780,7 @@ Country Sub-Domains List = %etc-dir%/country.domains.conf
 						log_error("[Mailscanner] xmlrpc sync is enabled but there is no system backup hosts to push mailscanner config.");
 						return;
 					}
-				break;			
+				break;
 			default:
 				return;
 			break;
@@ -846,7 +846,7 @@ function mailscanner_do_xmlrpc_sync($sync_to_ip,$username,$password,$sync_type,$
 
 	if(!$synctimeout)
 		$synctimeout=120;
-		
+
 	$xmlrpc_sync_neighbor = $sync_to_ip;
     if($config['system']['webgui']['protocol'] != "") {
 		$synchronizetoip = $config['system']['webgui']['protocol'];
@@ -855,9 +855,9 @@ function mailscanner_do_xmlrpc_sync($sync_to_ip,$username,$password,$sync_type,$
     $port = $config['system']['webgui']['port'];
     /* if port is empty lets rely on the protocol selection */
     if($port == "") {
-		if($config['system']['webgui']['protocol'] == "http") 
+		if($config['system']['webgui']['protocol'] == "http")
 			$port = "80";
-		else 
+		else
 			$port = "443";
     }
 	$synchronizetoip .= $sync_to_ip;
@@ -868,6 +868,7 @@ function mailscanner_do_xmlrpc_sync($sync_to_ip,$username,$password,$sync_type,$
 	if ($sync_xml){
 		log_error("Include mailscanner config");
 		$xml['mailscanner'] = $config['installedpackages']['mailscanner'];
+		$xml['msattachments'] = $config['installedpackages']['msattachments'];
 		$xml['msreport'] = $config['installedpackages']['msreport'];
 		$xml['mscontent'] = $config['installedpackages']['mscontent'];
 		$xml['msantivirus'] = $config['installedpackages']['msantivirus'];
@@ -880,7 +881,7 @@ function mailscanner_do_xmlrpc_sync($sync_to_ip,$username,$password,$sync_type,$
 			XML_RPC_encode($password),
 			XML_RPC_encode($xml)
 		);
-	
+
 		/* set a few variables needed for sync code borrowed from filter.inc */
 		$url = $synchronizetoip;
 		log_error("Beginning mailscanner XMLRPC sync to {$url}:{$port}.");
@@ -905,18 +906,18 @@ function mailscanner_do_xmlrpc_sync($sync_to_ip,$username,$password,$sync_type,$
 		} else {
 			log_error("mailscanner XMLRPC sync successfully completed with {$url}:{$port}.");
 		}
-		
+
 		/* tell postfix to reload our settings on the destionation sync host. */
 		$method = 'pfsense.exec_php';
 		$execcmd  = "require_once('/usr/local/pkg/mailscanner.inc');\n";
 		$execcmd .= "sync_package_mailscanner(true);";
-		
+
 		/* assemble xmlrpc payload */
 		$params = array(
 			XML_RPC_encode($password),
 			XML_RPC_encode($execcmd)
 		);
-	
+
 		log_error("mailscanner XMLRPC reload data {$url}:{$port}.");
 		$msg = new XML_RPC_Message($method, $params);
 		$cli = new XML_RPC_Client('/xmlrpc.php', $url, $port);
