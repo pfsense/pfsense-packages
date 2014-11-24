@@ -1,7 +1,7 @@
-<?php 
+<?php
 /*
         Copyright 2011 Thomas Schaefer - Tomschaefer.org
-        Copyright 2011 Marcello Coutinho
+        Copyright 2011-2014 Marcello Coutinho
         Part of pfSense widgets (www.pfsense.org)
 
         Redistribution and use in source and binary forms, with or without
@@ -45,7 +45,7 @@ $img['Healthy']="<img src ='/themes/{$g['theme']}/images/icons/icon_interface_up
 
 #var_dump($pfb_table);
 #exit;
-?><div id='varnish'><?php 
+?><div id='varnish'><?php
 open_table();
 
 if ($config['installedpackages']['varnishsettings']['config'][0])
@@ -53,30 +53,30 @@ if ($config['installedpackages']['varnishsettings']['config'][0])
 if ($mgm != ""){
 	print "<pre>";
 	print "<td class=\"vncellt\"width=30%><strong>Cache hits</strong></td>";
-	print "<td class=\"vncellt\"width=30%><strong>Cache hits pass</strong></td>";	
+	print "<td class=\"vncellt\"width=30%><strong>Cache hits pass</strong></td>";
 	print "<td class=\"vncellt\"width=30%><strong>Cache Missed</strong></td></tr>";
-	
-	$backends=exec("varnishadm -T " . escapeshellarg($mgm) . " stats",$debug);	
+
+	$backends=exec("varnishadm -T " . escapeshellarg($mgm) . " stats",$debug);
 	foreach ($debug as $line){
 		if (preg_match("/(\d+)\s+Cache\s+(hits.for|hits|misses)/",$line,$matches))
 				$cache[preg_replace("/\s+/","",$matches[2])]=$matches[1];
 		if (preg_match("/(\d+)\s+Client\s+(\w+)/",$line,$matches))
-				$client[$matches[2]]=$matches[1];	
+				$client[$matches[2]]=$matches[1];
 		}
 	print "<td class=\"listlr\">".$cache['hits'] ."</td>";
 	print "<td class=\"listlr\">".$cache['hitsfor'] ."</td>";
-	print "<td class=\"listlr\">".$cache['misses']."</td></tr>";	
+	print "<td class=\"listlr\">".$cache['misses']."</td></tr>";
  	close_table();
- 	
+
  	open_table();
-	print "<td class=\"vncellt\" width=30%><strong>Conn. Accepted</strong></td>";	
+	print "<td class=\"vncellt\" width=30%><strong>Conn. Accepted</strong></td>";
 	print "<td class=\"vncellt\" width=30%><strong>Req. received</strong></td>";
 	print "<td class=\"vncellt\" width=30%><strong>Uptime</strong></td></tr>";
 	print "<td class=\"listlr\">".$client['connections'] ."</td>";
 	print "<td class=\"listlr\">".$client['requests'] ."</td>";
 	print "<td class=\"listlr\">".$client['uptime']."</td></tr>";
  	close_table();
- 	
+
  	open_table();
 	print "<td class=\"vncellt\" width=30%><strong>Backend</strong></td>";
 	print "<td class=\"vncellt\" width=30%><strong>LB applied</strong></td>";
@@ -86,20 +86,20 @@ if ($mgm != ""){
 			foreach ($lb['row'] as $lb_backend){
 				${$lb_backend['backendname']}++;
 				}
-			}	
-	$backends=exec("varnishadm -T " . escapeshellarg($mgm) . " debug.health",$debug);	
+			}
+	$backends=exec("varnishadm -T " . escapeshellarg($mgm) . " debug.health",$debug);
 	foreach ($debug as $line){
 		if (preg_match("/Backend (.*) is (\w+)/",$line,$matches)){
 			$backend=preg_replace("/BACKEND$/","",$matches[1]);
 			print "<td class=\"listlr\">". $backend ."</td>";
 			print "<td class=\"listlr\">". ${$backend} ."</td>";
-			print "<td class=\"listlr\">".$img[$matches[2]]."</td></tr>";	
+			print "<td class=\"listlr\">".$img[$matches[2]]."</td></tr>";
 			}
 		}
 	}
 else{
 	print "<td class=\"listlr\">Varnish Managment interface not set in config.</td></tr>";
-}	
+}
 echo"  </tr>";
 echo"</table></div>";
 

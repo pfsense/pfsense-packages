@@ -60,9 +60,9 @@ include("head.inc");
 		}
 		function activitycallback(transport) {
 			$('varnishstatlogs').innerHTML = '<font face="Courier"><pre>' + transport.responseText  + '</pre></font>';
-			setTimeout('getlogactivity()', 2500);		
+			setTimeout('getlogactivity()', 2500);
 		}
-		setTimeout('getlogactivity()', 1000);	
+		setTimeout('getlogactivity()', 1000);
 	</script>
 <?php include("fbegin.inc"); ?>
 
