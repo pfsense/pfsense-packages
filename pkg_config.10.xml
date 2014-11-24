@@ -684,7 +684,7 @@
 		<category>Security</category>
 		<depends_on_package_pbi>nmap-6.46-##ARCH##.pbi</depends_on_package_pbi>
 		<config_file>https://packages.pfsense.org/packages/config/nmap/nmap.xml</config_file>
-		<version>nmap-6.46 pkg v1.2.2</version>
+		<version>nmap-6.46 pkg v1.3</version>
 		<status>Stable</status>
 		<pkginfolink>https://doc.pfsense.org/index.php/Nmap_package</pkginfolink>
 		<required_version>2.2</required_version>

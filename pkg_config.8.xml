@@ -882,7 +882,7 @@
 		<depends_on_package>nmap-6.25_1.tbz</depends_on_package>
 		<depends_on_package_pbi>nmap-6.40_2-i386.pbi</depends_on_package_pbi>
 		<config_file>https://packages.pfsense.org/packages/config/nmap/nmap.xml</config_file>
-		<version>nmap-6.40_2 pkg v1.2.2</version>
+		<version>nmap-6.40_2 pkg v1.3</version>
 		<status>Stable</status>
 		<pkginfolink>https://doc.pfsense.org/index.php/Nmap_package</pkginfolink>
 		<required_version>2.0</required_version>
