@@ -48,35 +48,56 @@ $img['Healthy']="<img src ='/themes/{$g['theme']}/images/icons/icon_interface_up
 ?><div id='varnish'><?php
 open_table();
 
+print "<pre>";
+print "<td class=\"vncellt\"width=30%><strong>Cache hits</strong></td>";
+print "<td class=\"vncellt\"width=30%><strong>Cache hits pass</strong></td>";
+print "<td class=\"vncellt\"width=30%><strong>Cache Missed</strong></td></tr>";
+$backends=exec("varnishstat -1",$debug);
+foreach ($debug as $line){
+        if (preg_match("/(\S+)\s+(\d+)/",$line,$matches))
+                $vs[$matches[1]]=$matches[2];
+        }
+print "<td class=\"listlr\">".number_format($vs['cache_hit']) ."</td>";
+print "<td class=\"listlr\">".number_format($vs['cache_hitpass']) ."</td>";
+print "<td class=\"listlr\">".number_format($vs['cache_miss'])."</td></tr>";
+close_table();
+
+open_table();
+print "<td class=\"vncellt\" width=30%><strong>Conn. Accepted</strong></td>";
+print "<td class=\"vncellt\" width=30%><strong>Req. received</strong></td>";
+print "<td class=\"vncellt\" width=30%><strong>Uptime</strong></td></tr>";
+print "<td class=\"listlr\">".number_format($vs['client_conn']) ."</td>";
+print "<td class=\"listlr\">".number_format($vs['client_req']) ."</td>";
+print "<td class=\"listlr\">".(int)($vs['uptime'] / 86400) . "+ ". gmdate("H:i:s",($vs['uptime'] % 86400))."</td></tr>";
+close_table();
+
+open_table();
+print "<td class=\"vncellt\" width=70%><strong>Host</strong></td>";
+print "<td class=\"vncellt\" width=15%><strong>Header(Rx)</strong></td>";
+print "<td class=\"vncellt\" width=15%><strong>Header(Tx)</strong></td></tr>";
+unset($debug);
+$backends=exec("varnishtop -I '^Host:' -1",$debug);
+foreach ($debug as $line){
+        if (preg_match("/(\S+)\s+(\w+)Header.Host: (\S+)/",$line,$lm))
+           $varnish_hosts[$lm[3]][$lm[2]]=$lm[1];
+}
+if (is_array($varnish_hosts)){
+	foreach ($varnish_hosts as $v_key=>$v_value){
+        print "<td class=\"listlr\">". $v_key ."</td>";
+        print "<td class=\"listlr\" align=\"Right\">". number_format($v_value['Rx']) ."</td>";
+        print "<td class=\"listlr\" align=\"Right\">".number_format($v_value['Tx'])."</td></tr>";
+	}
+}
+else{
+	print "<td class=\"listlr\">No traffic</td><td class=\"listlr\"></td><td class=\"listlr\"></td></tr>";
+}
+
+close_table();
+
+
 if ($config['installedpackages']['varnishsettings']['config'][0])
-	$mgm=$config['installedpackages']['varnishsettings']['config'][0]['managment'];
+        $mgm=$config['installedpackages']['varnishsettings']['config'][0]['managment'];
 if ($mgm != ""){
-	print "<pre>";
-	print "<td class=\"vncellt\"width=30%><strong>Cache hits</strong></td>";
-	print "<td class=\"vncellt\"width=30%><strong>Cache hits pass</strong></td>";
-	print "<td class=\"vncellt\"width=30%><strong>Cache Missed</strong></td></tr>";
-
-	$backends=exec("varnishadm -T " . escapeshellarg($mgm) . " stats",$debug);
-	foreach ($debug as $line){
-		if (preg_match("/(\d+)\s+Cache\s+(hits.for|hits|misses)/",$line,$matches))
-				$cache[preg_replace("/\s+/","",$matches[2])]=$matches[1];
-		if (preg_match("/(\d+)\s+Client\s+(\w+)/",$line,$matches))
-				$client[$matches[2]]=$matches[1];
-		}
-	print "<td class=\"listlr\">".$cache['hits'] ."</td>";
-	print "<td class=\"listlr\">".$cache['hitsfor'] ."</td>";
-	print "<td class=\"listlr\">".$cache['misses']."</td></tr>";
- 	close_table();
-
- 	open_table();
-	print "<td class=\"vncellt\" width=30%><strong>Conn. Accepted</strong></td>";
-	print "<td class=\"vncellt\" width=30%><strong>Req. received</strong></td>";
-	print "<td class=\"vncellt\" width=30%><strong>Uptime</strong></td></tr>";
-	print "<td class=\"listlr\">".$client['connections'] ."</td>";
-	print "<td class=\"listlr\">".$client['requests'] ."</td>";
-	print "<td class=\"listlr\">".$client['uptime']."</td></tr>";
- 	close_table();
-
  	open_table();
 	print "<td class=\"vncellt\" width=30%><strong>Backend</strong></td>";
 	print "<td class=\"vncellt\" width=30%><strong>LB applied</strong></td>";

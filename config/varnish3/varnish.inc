@@ -34,12 +34,15 @@
 /* ========================================================================== */
 $shortcut_section = "varnish";
 
-$pf_version=substr(trim(file_get_contents("/etc/version")),0,3);
-if ($pf_version > 2.0)
-	define('VARNISH_LOCALBASE', '/usr/pbi/varnish-' . php_uname("m"));
-else
-  define('VARNISH_LOCALBASE','/usr/local');
-
+$pfs_version = substr(trim(file_get_contents("/etc/version")),0,3);
+if (is_dir('/usr/pbi/varnish-' . php_uname("m"))) {
+	if ($pfs_version == 2.2)
+		define('VARNISH_LOCALBASE', '/usr/pbi/varnish-' . php_uname("m")."/local");
+	else
+		define('VARNISH_LOCALBASE', '/usr/pbi/varnish-' . php_uname("m"));
+} else {
+	define('VARNISH_LOCALBASE','/usr/local');
+}
 
 function varnish_settings_post_validate($post, &$input_errors) {
 	if( !is_numeric($post['storagesize']))
@@ -463,7 +466,18 @@ function sync_package_varnish() {
 						$vcl_recv_set_basic .= "\tset req.http.X-Forwarded-For = req.http.X-Forwarded-For + \",\" + client.ip;\n\n";
 					break;
 					case 'create':
-						$vcl_recv_set_basic .= "\tset req.http.X-Forwarded-Varnish = client.ip;\n\n";
+						$vcl_acls="acl SslOffloadServers {\n\t\"localhost\";";
+						$sslservers= split (" ",$vcl['ssloffload']);
+						foreach ($sslservers as $sslserver){
+							if (preg_match("/(\S+)\/(d+)/",$sslserver,$sslm))
+								$vcl_acls.="\n\t\"{$sslm[1]}\"/{$sslm[2]};";
+							else
+								$vcl_acls.="\n\t\"{$sslserver}\";";
+						}
+						$vcl_acls.="}\n";
+						$vcl_recv_set_basic .= "\tif (req.http.X-Forwarded-For && client.ip ~ SslOffloadServers){\n\t\t";
+						$vcl_recv_set_basic .= "set req.http.X-Forwarded-Varnish = req.http.X-Forwarded-For;\n\t}";
+						$vcl_recv_set_basic .= "else{\n\t\tset req.http.X-Forwarded-Varnish = client.ip;\n\n\t}";
 					break;
 					case 'unset':
 						$vcl_recv_set_basic .= "\tunset req.http.X-Forwarded-For;\n\n";
@@ -578,6 +592,7 @@ sub vcl_error {
 
 {$backends}
 {$vcl_hash}
+{$vcl_acls}
 sub vcl_recv {
 	{$vcl_recv_early}
 	{$vcl_recv_set_basic}
