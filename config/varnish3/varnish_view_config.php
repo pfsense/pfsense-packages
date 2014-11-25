@@ -47,7 +47,7 @@ include("head.inc");
 <?php if ($savemsg) print_info_box($savemsg); ?>
 
 <form action="varnishstat_view_config.php" method="post">
-	
+
 <div id="mainlevel">
 	<table width="100%" border="0" cellpadding="0" cellspacing="0">
 		<tr><td>
@@ -70,7 +70,7 @@ include("head.inc");
 						<tr>
      						<td class="tabcont" >
 									<textarea id="varnishlogs" rows="50" cols="100%">
-<?php 
+<?php
 	$config_file = file_get_contents("/var/etc/default.vcl");
 	echo $config_file;
 ?>
