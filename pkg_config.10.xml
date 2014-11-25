@@ -422,7 +422,7 @@
 		<build_pbi>
 			<port>mail/postfix</port>
 		</build_pbi>
-		<build_options>WITH_PCRE=true;WITH_SPF=true;WITH_SASL2=true;WITH_TLS=true</build_options>
+		<build_options>postfix_SET_FORCE=PCRE SASL2 SPF TLS</build_options>
 	</package>
 	<package>
 		<name>Dansguardian</name>
