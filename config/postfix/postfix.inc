@@ -37,10 +37,7 @@ require_once("globals.inc");
 
 $pfs_version = substr(trim(file_get_contents("/etc/version")),0,3);
 if (is_dir('/usr/pbi/postfix-' . php_uname("m"))) {
-	if ($pfs_version == 2.2)
-		define('POSTFIX_LOCALBASE', '/usr/pbi/postfix-' . php_uname("m")."/local");
-	else
-		define('POSTFIX_LOCALBASE', '/usr/pbi/postfix-' . php_uname("m"));
+	define('POSTFIX_LOCALBASE', '/usr/pbi/postfix-' . php_uname("m"));
 } else {
 	define('POSTFIX_LOCALBASE','/usr/local');
 }
