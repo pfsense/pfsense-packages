@@ -574,6 +574,7 @@ else {
 
 // Add the HTTP Server-specific policies if configured, otherwise
 // just set default to IDS for all networks.
+$http_hosts_policy = "";
 $http_hosts_default_policy = "";
 if (!is_array($suricatacfg['libhtp_policy']['item']))
 	$suricatacfg['libhtp_policy']['item'] = array();
