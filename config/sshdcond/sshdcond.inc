@@ -37,27 +37,7 @@ require_once("config.inc");
 require_once("util.inc");
 
 function restart_sshd() {
-	// backup /etc/sshd before any change
-	$etc_sshd="/etc/sshd";
-	$pfsense_version=preg_replace("/\s/","",file_get_contents("/etc/version"));
-	if (!file_exists('/root/'.$pfsense_version.'.sshd.backup')) {
-		copy ($etc_sshd,'/root/'.$pfsense_version.'.sshd.backup');
-	}
-
-	#patch /etc/sshd if need
-	$sshd_file=file($etc_sshd);
-	$sshd_new_file="";
-	foreach ($sshd_file as $line) {
-		if (preg_match('/sshconf .= "Port/',$line)) {
-			$sshd_new_file.= $line;
-			$sshd_new_file.= "\t".'if(file_exists("/etc/ssh/sshd_extra")) {$sshconf.=file_get_contents("/etc/ssh/sshd_extra");}'."\n";
-		}
-		elseif(!preg_match('/sshd_extra/',$line)) {
-			$sshd_new_file.= $line;
-		}
-	}
-	file_put_contents($etc_sshd,$sshd_new_file,LOCK_EX);
-	mwexec_bg($etc_sshd);
+	mwexec_bg("/etc/sshd");
 }
 
 function sshdcond_custom_php_install_command() {
