@@ -41,35 +41,9 @@
 require_once("functions.inc");
 require_once("service-utils.inc");
 require_once("/usr/local/pkg/suricata/suricata.inc");
+require_once("/usr/local/pkg/suricata/suricata_defs.inc");
 
 global $g, $pkg_interface, $suricata_gui_include, $rebuild_rules;
-
-if (!defined("VRT_DNLD_URL"))
-	define("VRT_DNLD_URL", "https://www.snort.org/rules/");
-if (!defined("ET_VERSION"))
-	define("ET_VERSION", "2.9.0");
-if (!defined("ET_BASE_DNLD_URL"))
-	define("ET_BASE_DNLD_URL", "http://rules.emergingthreats.net/"); 
-if (!defined("ETPRO_BASE_DNLD_URL"))
-	define("ETPRO_BASE_DNLD_URL", "https://rules.emergingthreatspro.com/"); 
-if (!defined("ET_DNLD_FILENAME"))
-	define("ET_DNLD_FILENAME", "emerging.rules.tar.gz");
-if (!defined("ETPRO_DNLD_FILENAME"))
-	define("ETPRO_DNLD_FILENAME", "etpro.rules.tar.gz");
-if (!defined("GPLV2_DNLD_FILENAME"))
-	define("GPLV2_DNLD_FILENAME", "community-rules.tar.gz");
-if (!defined("GPLV2_DNLD_URL"))
-	define("GPLV2_DNLD_URL", "https://www.snort.org/downloads/community/");
-if (!defined("SURICATA_RULES_UPD_LOGFILE"))
-	define("SURICATA_RULES_UPD_LOGFILE", SURICATALOGDIR . "/suricata_rules_update.log");
-if (!defined("VRT_FILE_PREFIX"))
-	define("VRT_FILE_PREFIX", "snort_");
-if (!defined("GPL_FILE_PREFIX"))
-	define("GPL_FILE_PREFIX", "GPLv2_");
-if (!defined("ET_OPEN_FILE_PREFIX"))
-	define("ET_OPEN_FILE_PREFIX", "emerging-");
-if (!defined("ET_PRO_FILE_PREFIX"))
-	define("ET_PRO_FILE_PREFIX", "etpro-");
 
 $suricatadir = SURICATADIR;
 $suricatalogdir = SURICATALOGDIR;

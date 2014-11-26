@@ -40,6 +40,7 @@ $priv_list['page-services-suricata']['match'][] = "pkg_edit.php?xml=suricata/sur
 $priv_list['page-services-suricata']['match'][] = "suricata/suricata_check_cron_misc.inc*";
 $priv_list['page-services-suricata']['match'][] = "suricata/suricata_yaml_template.inc*";
 $priv_list['page-services-suricata']['match'][] = "suricata/suricata.inc*";
+$priv_list['page-services-suricata']['match'][] = "suricata/suricata_defs.inc*";
 $priv_list['page-services-suricata']['match'][] = "suricata/suricata_post_install.php*";
 $priv_list['page-services-suricata']['match'][] = "suricata/suricata_uninstall.php*";
 $priv_list['page-services-suricata']['match'][] = "suricata/suricata_generate_yaml.php*";
