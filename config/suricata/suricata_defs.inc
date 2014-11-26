@@ -38,6 +38,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
 */
 
+require_once("pkg-utils.inc");
+
 /*************************************************************************/
 /* This file contains definitions for various CONSTANTS used throughout  */
 /* the Suricata package.  It is included via a "require_once()" call in  */
