@@ -71,12 +71,20 @@ if ($config['installedpackages']['suricata']['config'][0]['suricata_config_ver']
 /**********************************************************/
 /* Create new Auto SID Mgmt settings if not set           */
 /**********************************************************/
-	if (empty($config['installedpackages']['suricata']['config'][0]['auto_manage_sids'])) {
-		$config['installedpackages']['suricata']['config'][0]['auto_manage_sids'] = "off";
-		$config['installedpackages']['suricata']['config'][0]['sid_changes_log_limit_size'] = "250";
-		$config['installedpackages']['suricata']['config'][0]['sid_changes_log_retention'] = "336";
-		$updated_cfg = true;
-	}
+if (empty($config['installedpackages']['suricata']['config'][0]['auto_manage_sids'])) {
+	$config['installedpackages']['suricata']['config'][0]['auto_manage_sids'] = "off";
+	$config['installedpackages']['suricata']['config'][0]['sid_changes_log_limit_size'] = "250";
+	$config['installedpackages']['suricata']['config'][0]['sid_changes_log_retention'] = "336";
+	$updated_cfg = true;
+}
+
+/**********************************************************/
+/* Create new Auto GeoIP update setting if not set        */
+/**********************************************************/
+if (empty($config['installedpackages']['suricata']['config'][0]['autogeoipupdate'])) {
+	$config['installedpackages']['suricata']['config'][0]['autogeoipupdate'] = "on";
+	$updated_cfg = true;
+}
 
 // Now process the interface-specific settings
 foreach ($rule as &$r) {

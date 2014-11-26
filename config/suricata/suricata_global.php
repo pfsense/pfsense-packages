@@ -66,6 +66,7 @@ else {
 	$pconfig['forcekeepsettings'] = $config['installedpackages']['suricata']['config'][0]['forcekeepsettings'];
 	$pconfig['snortcommunityrules'] = $config['installedpackages']['suricata']['config'][0]['snortcommunityrules'];
 	$pconfig['snort_rules_file'] = $config['installedpackages']['suricata']['config'][0]['snort_rules_file'];
+	$pconfig['autogeoipupdate'] = $config['installedpackages']['suricata']['config'][0]['autogeoipupdate'];
 }
 
 // Do input validation on parameters
@@ -97,6 +98,7 @@ if (!$input_errors) {
 		$config['installedpackages']['suricata']['config'][0]['snortcommunityrules'] = $_POST['snortcommunityrules'] ? 'on' : 'off';
 		$config['installedpackages']['suricata']['config'][0]['enable_etopen_rules'] = $_POST['enable_etopen_rules'] ? 'on' : 'off';
 		$config['installedpackages']['suricata']['config'][0]['enable_etpro_rules'] = $_POST['enable_etpro_rules'] ? 'on' : 'off';
+		$config['installedpackages']['suricata']['config'][0]['autogeoipupdate'] = $_POST['autogeoipupdate'] ? 'on' : 'off';
 
 		// If any rule sets are being turned off, then remove them
 		// from the active rules section of each interface.  Start
@@ -155,12 +157,20 @@ if (!$input_errors) {
 
 		$retval = 0;
 
+		write_config("Suricata pkg: modified global settings.");
+
+		/* Toggle cron task for GeoIP database updates if setting was changed */
+		if ($config['installedpackages']['suricata']['config'][0]['autogeoipupdate'] == 'on' && !suricata_cron_job_exists("/usr/local/pkg/suricata/suricata_geoipupdate.php")) {
+			include("/usr/local/pkg/suricata/suricata_geoipupdate.php");
+			install_cron_job("/usr/bin/nice -n20 /usr/local/bin/php -f /usr/local/pkg/suricata/suricata_geoipupdate.php", TRUE, 0, 0, 8, "*", "*", "root");
+		}
+		elseif ($config['installedpackages']['suricata']['config'][0]['autogeoipupdate'] == 'off' && suricata_cron_job_exists("/usr/local/pkg/suricata/suricata_geoipupdate.php"))
+			install_cron_job("/usr/local/pkg/suricata/suricata_geoipupdate.php", FALSE);
+
 		/* create passlist and homenet file, then sync files */
 		conf_mount_rw();
 		sync_suricata_package_config();
 		conf_mount_ro();
-
-		write_config("Suricata pkg: modified global settings.");
 
 		/* forces page to reload new settings */
 		header( 'Expires: Sat, 26 Jul 1997 05:00:00 GMT' );
@@ -350,6 +360,15 @@ if ($input_errors)
 	&nbsp;<?php echo gettext("Enable \"Live Swap\" reload of rules after downloading an update.  Default is ") . "<strong>" . gettext("Not Checked") . "</strong>"; ?><br/><br/>
 	<?php echo gettext("When enabled, Suricata will perform a live load of the new rules following an update instead of a hard restart.  " . 
 	"If issues are encountered with live load, uncheck this option to perform a hard restart of all Suricata instances following an update."); ?></td>
+</tr>
+<tr>
+	<td width="22%" valign="top" class="vncell"><?php echo gettext("GeoIP DB Update"); ?></td>
+	<td width="78%" class="vtable"><input name="autogeoipupdate" id="autogeoipupdate" type="checkbox" value="yes"
+	<?php if ($config['installedpackages']['suricata']['config'][0]['autogeoipupdate']=="on") echo " checked"; ?>/>
+	&nbsp;<?php echo gettext("Enable downloading of free GeoIP Country Database updates.  Default is ") . "<strong>" . gettext("Checked") . "</strong>"; ?><br/><br/>
+	<?php echo gettext("When enabled, Suricata will automatically download updates for the free legacy GeoIP country database on the 8th of each month at midnight.") . 
+	"<br/><br/>" . gettext("If you have a subscription for more current GeoIP updates, uncheck this option and instead create your own process to place the required database files in " . 
+	SURICATA_PBI_BASEDIR . "share/GeoIP/."); ?></td>
 </tr>
 <tr>
 	<td colspan="2" valign="top" class="listtopic"><?php echo gettext("General Settings"); ?></td>

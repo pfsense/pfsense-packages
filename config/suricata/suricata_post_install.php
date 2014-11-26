@@ -66,10 +66,6 @@ global $config, $g, $rebuild_rules, $pkg_interface, $suricata_gui_include;
  * updated version icluded with the     *
  * updated GUI package.                 *
  ****************************************/
-if (!defined('SURICATA_SID_MODS_PATH'))
-	define('SURICATA_SID_MODS_PATH', '/var/db/suricata/sidmods/');
-if (!defined('SURICATA_IPREP_PATH'))
-	define('SURICATA_IPREP_PATH', '/var/db/suricata/iprep/');
 if (!defined('SURICATA_PBI_BASEDIR'))
 	define('SURICATA_PBI_BASEDIR', '/usr/pbi/suricata-' . php_uname("m"));
 
@@ -115,6 +111,13 @@ safe_mkdir(SURICATALOGDIR);
 // Create the IP Rep and SID Mods lists directory
 safe_mkdir(SURICATA_SID_MODS_PATH);
 safe_mkdir(SURICATA_IPREP_PATH);
+
+// Download the latest GeoIP DB updates and create cron task if the feature is not disabled
+if ($config['installedpackages']['suricata']['config'][0]['autogeoipupdate'] != 'off') {
+	log_error(gettext("[Suricata] Installing free GeoIP country database files..."));
+	include("/usr/local/pkg/suricata/suricata_geoipupdate.php");
+	install_cron_job("/usr/bin/nice -n20 /usr/local/bin/php -f /usr/local/pkg/suricata/suricata_geoipupdate.php", TRUE, 0, 0, 8, "*", "*", "root");
+}
 
 // remake saved settings if previously flagged
 if ($config['installedpackages']['suricata']['config'][0]['forcekeepsettings'] == 'on') {

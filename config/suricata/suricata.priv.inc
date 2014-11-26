@@ -41,6 +41,7 @@ $priv_list['page-services-suricata']['match'][] = "suricata/suricata_check_cron_
 $priv_list['page-services-suricata']['match'][] = "suricata/suricata_yaml_template.inc*";
 $priv_list['page-services-suricata']['match'][] = "suricata/suricata.inc*";
 $priv_list['page-services-suricata']['match'][] = "suricata/suricata_defs.inc*";
+$priv_list['page-services-suricata']['match'][] = "suricata/suricata_geoipupdate.php*";
 $priv_list['page-services-suricata']['match'][] = "suricata/suricata_post_install.php*";
 $priv_list['page-services-suricata']['match'][] = "suricata/suricata_uninstall.php*";
 $priv_list['page-services-suricata']['match'][] = "suricata/suricata_generate_yaml.php*";
