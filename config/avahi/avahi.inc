@@ -48,26 +48,10 @@ function avahi_stop() {
 }
 
 function avahi_install() {
-	global $g, $config, $pfs_version;
+	global $g, $config;
 	conf_mount_rw();
 
-	// This old hacky install code should only happen on 1.x
-	if (php_uname("m") == "i386")
-		$archive = (substr(trim(file_get_contents("/etc/version")),0,1) == "1") ? "avahi.tar.gz" : "";
-	// Extract out libraries and avahi-daemon
-	if(!empty($archive) && file_exists("/root/{$archive}")) {
-		exec("mkdir -p " . AVAHI_BASE . "/etc/avahi/services/");
-		exec("mv " . AVAHI_BASE . "/etc/avahi/*.service " . AVAHI_BASE . "/etc/avahi/services/");
-		exec("/usr/bin/tar xzPUf /root/{$archive} -C /");
-		unlink("/root/{$archive}");
-		// Make sure everthing was extracted
-		if(!file_exists(AVAHI_BASE . "/sbin/avahi-daemon")) {
-			log_error("Sorry, something went wrong while extract avahi binaries.  Please try the operation again");
-			return;
-		}
-	}
-
-	if ($pfs_version >= 2.2 && !file_exists('/usr/local/etc/gnome.subr')) {
+	if (!file_exists('/usr/local/etc/gnome.subr')) {
 		@symlink(AVAHI_BASE . '/etc/gnome.subr', '/usr/local/etc/gnome.subr');
 	}
 
@@ -171,6 +155,9 @@ EOF;
 	$start .= "if [ ! -d /proc/0 ]; then\n";
 	$start .= "	mkdir -p /proc\n";
 	$start .= "	mount -t procfs procfs /proc\n";
+	$start .= "fi\n";
+	$start .= "if [ ! -f /usr/local/etc/gnome.subr ]; then\n";
+	$start .= "	ln -sf " . AVAHI_BASE . "/etc/gnome.subr /usr/local/etc/gnome.subr";
 	$start .= "fi\n";
 	$start .= "/usr/bin/killall avahi-daemon >/dev/null 2>&1\n";
 	if (file_exists(AVAHI_BASE . "/etc/rc.d/dbus")) {
