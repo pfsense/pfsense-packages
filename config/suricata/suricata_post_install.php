@@ -48,18 +48,20 @@
 require_once("config.inc");
 require_once("functions.inc");
 require_once("/usr/local/pkg/suricata/suricata.inc");
+require("/usr/local/pkg/suricata/suricata_defs.inc");
 
 global $config, $g, $rebuild_rules, $pkg_interface, $suricata_gui_include;
 
 /****************************************
  * Define any new constants here that   *
  * may not be yet defined in the old    *
- * "suricata.inc" include file that     *
- * might be cached and used by the      *
- * package manager installation code.   *
+ * "suricata_defs.inc" include file     *
+ * that might be cached and used by     *
+ * the package manager installation     *
+ * code.                                *
  *                                      *
  * This is a hack to work around the    *
- * fact the old version of suricata.inc *
+ * fact the old version of the inc file *
  * is cached and used instead of the    *
  * updated version icluded with the     *
  * updated GUI package.                 *
@@ -68,9 +70,11 @@ if (!defined('SURICATA_SID_MODS_PATH'))
 	define('SURICATA_SID_MODS_PATH', '/var/db/suricata/sidmods/');
 if (!defined('SURICATA_IPREP_PATH'))
 	define('SURICATA_IPREP_PATH', '/var/db/suricata/iprep/');
+if (!defined('SURICATA_PBI_BASEDIR'))
+	define('SURICATA_PBI_BASEDIR', '/usr/pbi/suricata-' . php_uname("m"));
 
 /****************************************
- * End of PHP cachine workaround        *
+ * End of PHP caching workaround        *
  ****************************************/
 
 // Initialize some common values from defined constants

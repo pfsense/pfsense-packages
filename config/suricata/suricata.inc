@@ -44,46 +44,12 @@ require_once("services.inc");
 require_once("service-utils.inc");
 require_once("pkg-utils.inc");
 require_once("filter.inc");
+require("/usr/local/pkg/suricata/suricata_defs.inc");
 
 global $g, $config;
 
 // Suricata GUI needs some extra PHP memory space to manipulate large rules arrays
 ini_set("memory_limit", "256M");
-
-if (!is_array($config['installedpackages']['suricata']))
-	$config['installedpackages']['suricata'] = array();
-
-/* Get installed package version for display */
-$suricata_package_version = "Suricata {$config['installedpackages']['package'][get_pkg_id("suricata")]['version']}";
-
-// Define the installed package version
-define('SURICATA_PKG_VER', $suricata_package_version);
-
-// Define the name of the pf table used for IP blocks
-define('SURICATA_PF_TABLE', 'snort2c');
-
-// Create some other useful defines
-$pf_version=substr(trim(file_get_contents("/etc/version")),0,3);
-if ($pf_version >= 2.2)
-	define('SURICATADIR', '/usr/pbi/suricata-' . php_uname("m") . '/local/etc/suricata/');
-else
-	define('SURICATADIR', '/usr/pbi/suricata-' . php_uname("m") . '/etc/suricata/');
-
-define('SURICATALOGDIR', "{$g['varlog_path']}/suricata/");
-define('SURICATA_RULES_UPD_LOGFILE', SURICATALOGDIR . 'suricata_rules_update.log');
-define('SURICATA_ENFORCING_RULES_FILENAME', 'suricata.rules');
-define('FLOWBITS_FILENAME', 'flowbit-required.rules');
-define('SURICATA_SID_MODS_PATH', "{$g['vardb_path']}/suricata/sidmods/");
-define('SURICATA_IPREP_PATH', "{$g['vardb_path']}/suricata/iprep/");
-
-// Rule set download filenames and prefixes
-define('ET_DNLD_FILENAME', 'emerging.rules.tar.gz');
-define('ETPRO_DNLD_FILENAME', 'etpro.rules.tar.gz');
-define('GPLV2_DNLD_FILENAME', 'community-rules.tar.gz');
-define('VRT_FILE_PREFIX', 'snort_');
-define('GPL_FILE_PREFIX', 'GPLv2_');
-define('ET_OPEN_FILE_PREFIX', 'emerging-');
-define('ET_PRO_FILE_PREFIX', 'etpro-');
 
 function suricata_generate_id() {
 	global $config;
@@ -139,10 +105,11 @@ function suricata_barnyard_start($suricatacfg, $if_real) {
 	$suricata_uuid = $suricatacfg['uuid'];
 	$suricatadir = SURICATADIR . "suricata_{$suricata_uuid}_{$if_real}";
 	$suricatalogdir = SURICATALOGDIR . "suricata_{$if_real}{$suricata_uuid}";
+	$suricatabindir = SURICATA_PBI_BINDIR;
 
 	if ($suricatacfg['barnyard_enable'] == 'on') {
 		log_error("[Suricata] Barnyard2 START for {$suricatacfg['descr']}({$if_real})...");
-		mwexec_bg("/usr/local/bin/barnyard2 -r {$suricata_uuid} -f unified2.alert --pid-path {$g['varrun_path']} --nolock-pidfile -c {$suricatadir}/barnyard2.conf -d {$suricatalogdir} -D -q");
+		mwexec_bg("{$suricatabindir}barnyard2 -r {$suricata_uuid} -f unified2.alert --pid-path {$g['varrun_path']} --nolock-pidfile -c {$suricatadir}/barnyard2.conf -d {$suricatalogdir} -D -q");
 	}
 }
 
@@ -151,10 +118,11 @@ function suricata_start($suricatacfg, $if_real) {
 
 	$suricatadir = SURICATADIR;
 	$suricata_uuid = $suricatacfg['uuid'];
+	$suricatabindir = SURICATA_PBI_BINDIR;
 
 	if ($suricatacfg['enable'] == 'on') {
 		log_error("[Suricata] Suricata START for {$suricatacfg['descr']}({$if_real})...");
-		mwexec_bg("/usr/local/bin/suricata -i {$if_real} -D -c {$suricatadir}suricata_{$suricata_uuid}_{$if_real}/suricata.yaml --pidfile {$g['varrun_path']}/suricata_{$if_real}{$suricata_uuid}.pid");
+		mwexec_bg("{$suricatabindir}suricata -i {$if_real} -D -c {$suricatadir}suricata_{$suricata_uuid}_{$if_real}/suricata.yaml --pidfile {$g['varrun_path']}/suricata_{$if_real}{$suricata_uuid}.pid");
 	}
 	else
 		return;
@@ -2921,6 +2889,7 @@ function suricata_create_rc() {
 
 	$suricatadir = SURICATADIR;
 	$suricatalogdir = SURICATALOGDIR;
+	$suricatabindir = SURICATA_PBI_BINDIR;
 	$rcdir = RCFILEPREFIX;	
 
 	// If no interfaces are configured for Suricata, exit
@@ -2953,7 +2922,7 @@ function suricata_create_rc() {
 
 	if [ -z \$pid ]; then
 		/usr/bin/logger -p daemon.info -i -t SuricataStartup "Barnyard2 START for {$value['descr']}({$suricata_uuid}_{$if_real})..."
-		/usr/local/bin/barnyard2 -r {$suricata_uuid} -f unified2.alert --pid-path {$g['varrun_path']} --nolock-pidfile -c {$suricatadir}suricata_{$suricata_uuid}_{$if_real}/barnyard2.conf -d {$suricatalogdir}suricata_{$if_real}{$suricata_uuid} -D -q > /dev/null 2>&1
+		{$suricatabindir}/barnyard2 -r {$suricata_uuid} -f unified2.alert --pid-path {$g['varrun_path']} --nolock-pidfile -c {$suricatadir}suricata_{$suricata_uuid}_{$if_real}/barnyard2.conf -d {$suricatalogdir}suricata_{$if_real}{$suricata_uuid} -D -q > /dev/null 2>&1
 	fi
 EOE;
 		$stop_barnyard2 = <<<EOE
@@ -3004,7 +2973,7 @@ EOE;
 
 	if [ -z \$pid ]; then
 		/usr/bin/logger -p daemon.info -i -t SuricataStartup "Suricata START for {$value['descr']}({$suricata_uuid}_{$if_real})..."
-		/usr/local/bin/suricata -i {$if_real} -D -c {$suricatadir}suricata_{$suricata_uuid}_{$if_real}/suricata.yaml --pidfile {$g['varrun_path']}/suricata_{$if_real}{$suricata_uuid}.pid > /dev/null 2>&1
+		{$suricatabindir}suricata -i {$if_real} -D -c {$suricatadir}suricata_{$suricata_uuid}_{$if_real}/suricata.yaml --pidfile {$g['varrun_path']}/suricata_{$if_real}{$suricata_uuid}.pid > /dev/null 2>&1
 	fi
 
 	sleep 1
