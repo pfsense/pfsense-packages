@@ -159,6 +159,10 @@ EOF;
 	$start .= "if [ ! -f /usr/local/etc/gnome.subr ]; then\n";
 	$start .= "	ln -sf " . AVAHI_BASE . "/etc/gnome.subr /usr/local/etc/gnome.subr\n";
 	$start .= "fi\n";
+	$start .= "if [ ! -d /var/run/dbus ]; then\n";
+	$start .= "        mkdir /var/run/dbus\n";
+	$start .= "        chown messagebus:messagebus /var/run/dbus\n";
+	$start .= "fi\n";
 	$start .= "/usr/bin/killall avahi-daemon >/dev/null 2>&1\n";
 	if (file_exists(AVAHI_BASE . "/etc/rc.d/dbus")) {
 		$start .= AVAHI_BASE . "/etc/rc.d/dbus onestop\n";
