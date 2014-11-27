@@ -45,35 +45,8 @@ require("/usr/local/pkg/snort/snort_defs.inc");
 
 global $config, $g, $rebuild_rules, $pkg_interface, $snort_gui_include;
 
-/****************************************
- * Define any new constants here that   *
- * may not be yet defined in the old    *
- * "snort.inc" include file that might  *
- * be cached and used by the package    *
- * manager installation code.           *
- *                                      *
- * This is a hack to work around the    *
- * fact the old version of suricata.inc *
- * is cached and used instead of the    *
- * updated version icluded with the     *
- * updated GUI package.                 *
- ****************************************/
-if (!defined('SNORT_SID_MODS_PATH'))
-	define('SNORT_SID_MODS_PATH', "{$g['vardb_path']}/snort/sidmods/");
-if (!defined('SNORT_ENFORCING_RULES_FILENAME'))
-	define("SNORT_ENFORCING_RULES_FILENAME", "snort.rules");
-if (!defined('SNORT_APPID_ODP_PATH'))
-	define('SNORT_APPID_ODP_PATH', "{$g['vardb_path']}/snort/app/");
-if (!defined('SNORT_OPENAPPID_DNLD_FILENAME'))
-	define("SNORT_OPENAPPID_DNLD_FILENAME", "snort-openappid.tar.gz");
-
-/****************************************
- * End of PHP caching workaround        *
- ****************************************/
-
 $snortdir = SNORTDIR;
 $snortlogdir = SNORTLOGDIR;
-$snortlibdir = "/usr/pbi/snort-" . php_uname("m") . "/lib";
 $rcdir = RCFILEPREFIX;
 $flowbit_rules_file = FLOWBITS_FILENAME;
 $snort_enforcing_rules_file = SNORT_ENFORCING_RULES_FILENAME;
