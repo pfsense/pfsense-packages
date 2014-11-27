@@ -35,11 +35,11 @@
 		<descr><![CDATA[Asterisk is an open source framework for building communications applications.<br />Asterisk turns an ordinary computer into a communications server.]]></descr>
 		<website>http://www.asterisk.org/</website>
 		<category>Services</category>
-		<version>1.8.28.0 pkg v0.3.1</version>
+		<version>1.8.32.1 pkg v0.3.1</version>
 		<status>Beta</status>
 		<required_version>2.2</required_version>
 		<config_file>https://packages.pfsense.org/packages/config/asterisk/asterisk.xml</config_file>
-		<depends_on_package_pbi>asterisk-1.8.28.0-##ARCH##.pbi</depends_on_package_pbi>
+		<depends_on_package_pbi>asterisk-1.8.32.1-##ARCH##.pbi</depends_on_package_pbi>
 		<build_pbi>
 			<port>net/asterisk</port>
 		</build_pbi>
@@ -53,12 +53,12 @@
 		<descr><![CDATA[The most widely used name server software]]></descr>
 		<website>http://www.isc.org/downloads/BIND/</website>
 		<category>Services</category>
-		<version>9.9.5P1_5 pkg v 0.3.5</version>
+		<version>9.9.6_1 pkg v 0.3.5</version>
 		<status>RC</status>
 		<required_version>2.2</required_version>
 		<config_file>https://packages.pfsense.org/packages/config/bind/bind.xml</config_file>
 		<configurationfile>bind.xml</configurationfile>
-		<depends_on_package_pbi>bind-9.9.5P1_5-##ARCH##.pbi</depends_on_package_pbi>
+		<depends_on_package_pbi>bind-9.9.6_1-##ARCH##.pbi</depends_on_package_pbi>
 		<build_pbi>
 			<custom_name>bind</custom_name>
 			<port>dns/bind99</port>
@@ -152,12 +152,12 @@
 				Supports ACLs for smart backend switching.]]></descr>
 		<website>http://haproxy.1wt.eu/</website>
 		<category>Services</category>
-		<version>1.5.3 pkg v 0.12</version>
+		<version>1.5.9 pkg v 0.12</version>
 		<status>Release</status>
 		<required_version>2.2</required_version>
 		<config_file>https://packages.pfsense.org/packages/config/haproxy-devel/haproxy.xml</config_file>
 		<configurationfile>haproxy.xml</configurationfile>
-		<depends_on_package_pbi>haproxy-devel-1.5.3-##ARCH##.pbi</depends_on_package_pbi>
+		<depends_on_package_pbi>haproxy-devel-1.5.9-##ARCH##.pbi</depends_on_package_pbi>
 		<build_pbi>
 			<ports_before>security/openssl</ports_before>
 			<custom_name>haproxy-devel</custom_name>
@@ -366,11 +366,11 @@
 		<descr>The olsr.org OLSR daemon is an implementation of the Optimized Link State Routing protocol. OLSR is a routing protocol for mobile ad-hoc networks. The protocol is pro-active, table driven and utilizes a technique called multipoint relaying for message flooding.</descr>
 		<category>Services</category>
 		<config_file>https://packages.pfsense.org/packages/config/olsrd.xml</config_file>
-		<depends_on_package_pbi>olsrd-0.6.5.2-##ARCH##.pbi</depends_on_package_pbi>
+		<depends_on_package_pbi>olsrd-0.6.6.2_1-##ARCH##.pbi</depends_on_package_pbi>
 		<build_pbi>
 			<port>net/olsrd</port>
 		</build_pbi>
-		<version>1.0.1</version>
+		<version>1.0.2</version>
 		<status>Stable</status>
 		<required_version>2.2</required_version>
 		<configurationfile>olsrd.xml</configurationfile>
@@ -392,8 +392,8 @@
 		<descr>Tarpits like spamd are fake SMTP servers, which accept connections but don't deliver mail. Instead, they keep the connections open and reply very slowly. If the peer is patient enough to actually complete the SMTP dialogue (which will take ten minutes or more), the tarpit returns a 'temporary error' code (4xx), which indicates that the mail could not be delivered successfully and that the sender should keep the mail in their queue and retry again later.</descr>
 		<category>Services</category>
 		<config_file>https://packages.pfsense.org/packages/config/spamd/spamd.xml</config_file>
-		<depends_on_package_pbi>spamd-4.9.1_1-##ARCH##.pbi</depends_on_package_pbi>
-		<version>4.9.1_1 v1.1.1</version>
+		<depends_on_package_pbi>spamd-4.9.1_2-##ARCH##.pbi</depends_on_package_pbi>
+		<version>4.9.1_2 v1.1.1</version>
 		<status>Beta</status>
 		<required_version>2.2</required_version>
 		<configurationfile>spamd.xml</configurationfile>
@@ -458,7 +458,7 @@
 		<config_file>https://packages.pfsense.org/packages/config/mailscanner/mailscanner.xml</config_file>
 		<pkginfolink>https://forum.pfsense.org/index.php/topic,43687.0.html</pkginfolink>
 		<depends_on_package_pbi>mailscanner-4.84.6-##ARCH##.pbi</depends_on_package_pbi>
-		<version>4.84.6 pkg v.0.2.11</version>
+		<version>4.84.6 pkg v.0.2.12</version>
 		<status>beta</status>
 		<required_version>2.2</required_version>
 		<configurationfile>mailscanner.xml</configurationfile>
@@ -493,7 +493,7 @@
 		<build_pbi>
 			<port>net/openbgpd</port>
 		</build_pbi>
-		<version>0.9.2</version>
+		<version>0.9.3</version>
 		<status>STABLE</status>
 		<pkginfolink>https://doc.pfsense.org/index.php/OpenBGPD_package</pkginfolink>
 		<required_version>2.2</required_version>
@@ -528,8 +528,8 @@
 		<category>Network Report</category>
 		<config_file>https://packages.pfsense.org/packages/config/sarg/sarg.xml</config_file>
 		<pkginfolink>https://forum.pfsense.org/index.php/topic,47765.0.html</pkginfolink>
-		<depends_on_package_pbi>sarg-2.3.6_2-##ARCH##.pbi</depends_on_package_pbi>
-		<version>2.3.6_2 pkg v.0.6.4</version>
+		<depends_on_package_pbi>sarg-2.3.9-##ARCH##.pbi</depends_on_package_pbi>
+		<version>2.3.9 pkg v.0.6.4</version>
 		<status>Release</status>
 		<required_version>2.2</required_version>
 		<configurationfile>sarg.xml</configurationfile>
@@ -549,8 +549,8 @@
 		<category>Security</category>
 		<config_file>https://packages.pfsense.org/packages/config/ipguard/ipguard.xml</config_file>
 		<pkginfolink>https://forum.pfsense.org/index.php/topic,49917.msg263664.html#msg263664</pkginfolink>
-		<depends_on_package_pbi>ipguard-1.04_1-##ARCH##.pbi</depends_on_package_pbi>
-		<version>1.0.4 pkg v.0.1</version>
+		<depends_on_package_pbi>ipguard-1.04_2-##ARCH##.pbi</depends_on_package_pbi>
+		<version>1.0.4_2 pkg v.0.1</version>
 		<status>beta</status>
 		<required_version>2.2</required_version>
 		<configurationfile>ipguard.xml</configurationfile>
