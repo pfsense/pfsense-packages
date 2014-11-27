@@ -2706,11 +2706,12 @@ function snort_load_sid_mods($sids) {
 		if (preg_match('/(\d+)\s*:\s*(\d+)/', $v, $match)) {
 			if (!is_array($result[$match[1]]))
 				$result[$match[1]] = array();
+			if (!is_array($result[$match[1]][$match[2]]))
+				$result[$match[1]][$match[2]] = array();
 			$result[$match[1]][$match[2]] = "{$match[1]}:{$match[2]}";
 		}
 	}
 	unset($tmp);
-
 	return $result;
 }
 
