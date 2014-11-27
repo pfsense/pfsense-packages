@@ -32,44 +32,10 @@
 
 require_once("functions.inc");
 require_once("service-utils.inc");
-require_once "/usr/local/pkg/snort/snort.inc";
+require_once("/usr/local/pkg/snort/snort.inc");
+require("/usr/local/pkg/snort/snort_defs.inc");
 
 global $g, $config, $pkg_interface, $snort_gui_include, $rebuild_rules;
-
-if (!defined("VRT_DNLD_URL"))
-	define("VRT_DNLD_URL", "https://www.snort.org/rules/");
-if (!defined("SNORT_BIN_VERSION"))
-	define("SNORT_BIN_VERSION", "2.9.7.0");
-if (!defined("ET_VERSION"))
-	define("ET_VERSION", "2.9.0");
-if (!defined("ET_BASE_DNLD_URL"))
-	define("ET_BASE_DNLD_URL", "http://rules.emergingthreats.net/"); 
-if (!defined("ETPRO_BASE_DNLD_URL"))
-	define("ETPRO_BASE_DNLD_URL", "https://rules.emergingthreatspro.com/"); 
-if (!defined("SNORT_ET_DNLD_FILENAME"))
-	define("SNORT_ET_DNLD_FILENAME", "emerging.rules.tar.gz");
-if (!defined("SNORT_ETPRO_DNLD_FILENAME"))
-	define("SNORT_ETPRO_DNLD_FILENAME", "etpro.rules.tar.gz");
-if (!defined("SNORT_GPLV2_DNLD_FILENAME"))
-	define("SNORT_GPLV2_DNLD_FILENAME", "community-rules.tar.gz");
-if (!defined("SNORT_OPENAPPID_DNLD_FILENAME"))
-	define("SNORT_OPENAPPID_DNLD_FILENAME", "snort-openappid.tar.gz");
-if (!defined("GPLV2_DNLD_URL"))
-	define("GPLV2_DNLD_URL", "https://www.snort.org/downloads/community/");
-if (!defined("SNORT_RULES_UPD_LOGFILE"))
-	define("SNORT_RULES_UPD_LOGFILE", SNORTLOGDIR . "/snort_rules_update.log");
-if (!defined("VRT_FILE_PREFIX"))
-	define("VRT_FILE_PREFIX", "snort_");
-if (!defined("GPL_FILE_PREFIX"))
-	define("GPL_FILE_PREFIX", "GPLv2_");
-if (!defined("ET_OPEN_FILE_PREFIX"))
-	define("ET_OPEN_FILE_PREFIX", "emerging-");
-if (!defined("ET_PRO_FILE_PREFIX"))
-	define("ET_PRO_FILE_PREFIX", "etpro-");
-if (!defined("SNORT_IPREP_PATH"))
-	define("SNORT_IPREP_PATH", "{$g['vardb_path']}/snort/iprep/");
-if (!defined('SNORT_APPID_ODP_PATH'))
-	define('SNORT_APPID_ODP_PATH', "{$g['vardb_path']}/snort/app/");
 
 $snortdir = SNORTDIR;
 $snortlibdir = "/usr/pbi/snort-" . php_uname("m") . "/lib";

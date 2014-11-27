@@ -41,6 +41,7 @@
 require_once("config.inc");
 require_once("functions.inc");
 require_once("/usr/local/pkg/snort/snort.inc");
+require("/usr/local/pkg/snort/snort_defs.inc");
 
 global $config, $g, $rebuild_rules, $pkg_interface, $snort_gui_include;
 

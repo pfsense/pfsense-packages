@@ -37,6 +37,7 @@ require_once("functions.inc");
 require_once("service-utils.inc");
 require_once("pkg-utils.inc");
 require_once("filter.inc");
+require("/usr/local/pkg/snort/snort_defs.inc");
 
 // Snort GUI needs some extra PHP memory space to manipulate large rules arrays
 ini_set("memory_limit", "256M");
@@ -53,31 +54,6 @@ $pfSense_snort_version = "3.2";
 
 /* get installed package version for display */
 $snort_package_version = "Snort {$config['installedpackages']['package'][get_pkg_id("snort")]['version']}";
-
-/* Define some useful constants for Snort */
-/* Be sure to include trailing slash on the URL defines */
-define("SNORTDIR", "/usr/pbi/snort-" . php_uname("m") . "/etc/snort");
-define("SNORTLOGDIR", "{$g['varlog_path']}/snort");
-define("SNORT_BIN_VERSION", "2.9.7.0");
-define("SNORT_ET_DNLD_FILENAME", "emerging.rules.tar.gz");
-define("SNORT_ETPRO_DNLD_FILENAME", "etpro.rules.tar.gz");
-define("SNORT_GPLV2_DNLD_FILENAME", "community-rules.tar.gz");
-define("SNORT_OPENAPPID_DNLD_FILENAME", "snort-openappid.tar.gz");
-define("SNORT_ENFORCING_RULES_FILENAME", "snort.rules");
-define("SNORT_RULES_UPD_LOGFILE", SNORTLOGDIR . "/snort_rules_update.log");
-define("SNORT_IPREP_PATH", "{$g['vardb_path']}/snort/iprep/");
-define('SNORT_SID_MODS_PATH', "{$g['vardb_path']}/snort/sidmods/");
-define('SNORT_APPID_ODP_PATH', "{$g['vardb_path']}/snort/app/");
-if (!defined("FLOWBITS_FILENAME"))
-	define("FLOWBITS_FILENAME", "flowbit-required.rules");
-if (!defined("VRT_FILE_PREFIX"))
-	define("VRT_FILE_PREFIX", "snort_");
-if (!defined("GPL_FILE_PREFIX"))
-	define("GPL_FILE_PREFIX", "GPLv2_");
-if (!defined("ET_OPEN_FILE_PREFIX"))
-	define("ET_OPEN_FILE_PREFIX", "emerging-");
-if (!defined("ET_PRO_FILE_PREFIX"))
-	define("ET_PRO_FILE_PREFIX", "etpro-");
 
 /* Rebuild Rules Flag -- if "true", rebuild enforcing rules and flowbit-rules files */
 $rebuild_rules = false;
