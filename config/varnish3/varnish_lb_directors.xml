@@ -130,6 +130,10 @@
 			<fieldname>grace</fieldname>
 		</columnitem>
 		<columnitem>
+			<fielddescr>SSL</fielddescr>
+			<fieldname>forcessl</fieldname>
+		</columnitem>
+		<columnitem>
 			<fielddescr>Failover</fielddescr>
 			<fieldname>failover</fieldname>
 		</columnitem>		
@@ -195,6 +199,13 @@
 			<fieldname>grace</fieldname>
 			<description><![CDATA[<a href="https://www.varnish-cache.org/trac/wiki/VCLExampleGrace">How many time varnish will keep cached objects for this director.</a> HINT 60s, 30m, 1h<br>Use 0s grace time to force no cache.]]></description>
 	    	<type>input</type>
+	    	<size>5</size>
+ 		</field>
+		<field>
+			<fielddescr>Force SSL</fielddescr>
+			<fieldname>forcessl</fieldname>
+			<description><![CDATA[Redirect to ssl if request does not came from ssl offload servers.]]></description>
+	    	<type>checkbox</type>
 	    	<size>5</size>
  		</field>
  		<field>
