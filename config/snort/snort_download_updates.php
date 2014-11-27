@@ -39,18 +39,10 @@ require_once("/usr/local/pkg/snort/snort.inc");
 /* Define some locally required variables from Snort constants */
 $snortdir = SNORTDIR;
 $snort_rules_upd_log = SNORT_RULES_UPD_LOGFILE;
+$snortbinver = SNORT_BIN_VERSION;
+$snortbinver = str_replace(".", "", $snortbinver);
 
-/* Grab the Snort binary version programmatically and */
-/* use it to construct the proper Snort VRT rules     */
-/* tarball filename.  Fallback to a safe default if   */
-/* we fail.                                           */
-$snortver = array();
-exec("/usr/local/bin/snort -V 2>&1 |/usr/bin/grep Version | /usr/bin/cut -c20-26", $snortver);
-if (empty($snortver[0]))
-	$snortver[0] = SNORT_BIN_VERSION;
-$snortver[0] = str_replace(".", "", $snortver[0]);
-
-$snort_rules_file = "snortrules-snapshot-{$snortver[0]}.tar.gz";
+$snort_rules_file = "snortrules-snapshot-{$snortbinver}.tar.gz";
 $snort_community_rules_filename = SNORT_GPLV2_DNLD_FILENAME;
 $snort_openappid_filename = SNORT_OPENAPPID_DNLD_FILENAME;
 

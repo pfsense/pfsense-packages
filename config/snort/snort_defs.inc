@@ -45,7 +45,8 @@ if (!defined("SNORTLOGDIR"))
 if (!defined("SNORT_BIN_VERSION")) {
 	// Grab the Snort binary version programmatically
 	$snortver = array();
-	mwexec("/usr/local/bin/snort -V 2>&1 |/usr/bin/grep Version | /usr/bin/cut -c20-26", $snortver);
+	$snortbindir = SNORT_PBI_BINDIR;
+	mwexec("{$snortbindir}/snort -V 2>&1 |/usr/bin/grep Version | /usr/bin/cut -c20-26", $snortver);
 	if (!empty($snortver[0]))
 		define("SNORT_BIN_VERSION", $snortver[0]);
 	else

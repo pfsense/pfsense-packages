@@ -36,6 +36,7 @@ require_once("/usr/local/pkg/snort/snort.inc");
 global $g, $rebuild_rules;
 
 $snortdir = SNORTDIR;
+$snortbindir = SNORT_PBI_BINDIR;
 $rules_map = array();
 $categories = array();
 $pconfig = array();
@@ -400,7 +401,7 @@ elseif ($_POST['save']) {
 	$rebuild_rules = false;
 	$output = "";
 	$retcode = "";
-	exec("/usr/local/bin/snort -T -c {$snortdir}/snort_{$snort_uuid}_{$if_real}/snort.conf 2>&1", $output, $retcode);
+	exec("{$snortbindir}snort -T -c {$snortdir}/snort_{$snort_uuid}_{$if_real}/snort.conf 2>&1", $output, $retcode);
 	if (intval($retcode) != 0) {
 		$error = "";
 		$start = count($output);

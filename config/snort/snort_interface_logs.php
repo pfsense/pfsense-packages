@@ -54,6 +54,9 @@ $if_real = get_real_interface($a_instance[$id]['interface']);
 // Construct a pointer to the instance's logging subdirectory
 $snortlogdir = SNORTLOGDIR . "/snort_{$if_real}{$snort_uuid}/";
 
+// Construct a pointer to the PBI_BIN directory
+$snortbindir = SNORT_PBI_BINDIR;
+
 // Limit all file access to just the currently selected interface's logging subdirectory
 $logfile = htmlspecialchars($snortlogdir . basename($_POST['file']));
 
@@ -71,7 +74,7 @@ if ($_POST['action'] == 'load') {
 		// Test for special unified2 format app-stats file because
 		// we have to use a Snort binary tool to display its contents.
 		if (strpos(basename($_POST['file']), "app-stats.log") !== FALSE)
-			$data = shell_exec("/usr/local/bin/u2openappid {$logfile} 2>&1");
+			$data = shell_exec("{$snortbindir}u2openappid {$logfile} 2>&1");
 		else 
 			$data = file_get_contents($logfile);
 		if($data === false) {

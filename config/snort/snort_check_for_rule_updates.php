@@ -41,6 +41,7 @@ $snortdir = SNORTDIR;
 $snortlibdir = "/usr/pbi/snort-" . php_uname("m") . "/lib";
 $snortlogdir = SNORTLOGDIR;
 $snortiprepdir = SNORT_IPREP_PATH;
+$snortbindir = SNORT_PBI_BINDIR;
 $mounted_rw = FALSE;
 
 /* Save the state of $pkg_interface so we can restore it */
@@ -67,7 +68,7 @@ $tmpfname = "{$g['tmp_path']}/snort_rules_up";
 /* the proper Snort VRT rules tarball and md5 filenames. Fallback to a    */
 /* default in the event we fail.                                          */
 $snortver = array();
-exec("/usr/local/bin/snort -V 2>&1 |/usr/bin/grep Version | /usr/bin/cut -c20-26", $snortver);
+exec("{$snortbindir}snort -V 2>&1 |/usr/bin/grep Version | /usr/bin/cut -c20-26", $snortver);
 // Save the version with decimal delimiters for use in extracting the rules
 $snort_version = $snortver[0];
 if (empty($snort_version))
