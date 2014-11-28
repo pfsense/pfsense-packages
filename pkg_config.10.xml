@@ -178,7 +178,7 @@
 		<status>ALPHA</status>
 		<required_version>2.2</required_version>
 		<config_file>https://packages.pfsense.org/packages/config/apache_mod_security-dev/apache_virtualhost.xml</config_file>
-		<depends_on_package_pbi>proxy_mod_security-2.4.9_4-##ARCH##.pbi git-1.9.3-##ARCH##.pbi</depends_on_package_pbi>
+		<depends_on_package_pbi>proxy_mod_security-2.4.9_4-##ARCH##.pbi git-2.1.2_1-##ARCH##.pbi</depends_on_package_pbi>
 		<configurationfile>apache_virtualhost.xml</configurationfile>
 		<build_pbi>
 			<custom_name>proxy_mod_security</custom_name>
@@ -568,12 +568,12 @@
 		<website>http://varnish-cache.org</website>
 		<pkginfolink>https://doc.pfsense.org/index.php/Varnish_package</pkginfolink>
 		<category>Services</category>
-		<version>3.0.5_2 pkg v.0.2.1</version>
+		<version>3.0.5_3 pkg v.0.2.1</version>
 		<status>RC</status>
 		<required_version>2.2</required_version>
 		<config_file>https://packages.pfsense.org/packages/config/varnish3/varnish_backends.xml</config_file>
 		<configurationfile>varnish_backends.xml</configurationfile>
-		<depends_on_package_pbi>varnish-3.0.5_2-##ARCH##.pbi</depends_on_package_pbi>
+		<depends_on_package_pbi>varnish-3.0.5_3-##ARCH##.pbi</depends_on_package_pbi>
 		<build_pbi>
 			<ports_before>lang/gcc</ports_before>
 			<port>www/varnish</port>
@@ -586,11 +586,11 @@
 		<descr>Vnstat is a console-based network traffic monitor&lt;br /&gt;The vnstat PHP frontend and vnstati adds a more user friendly way of displaying traffic usage.</descr>
 		<pkginfolink>https://forum.pfsense.org/index.php/topic,14179.0.html</pkginfolink>
 		<category>Network Management</category>
-		<depends_on_package_pbi>vnstat-1.11_5-##ARCH##.pbi</depends_on_package_pbi>
+		<depends_on_package_pbi>vnstat-1.11_6-##ARCH##.pbi</depends_on_package_pbi>
 		<build_pbi>
 			<port>net/vnstat</port>
 		</build_pbi>
-		<version>1.10_2</version>
+		<version>1.11_6</version>
 		<status>Stable</status>
 		<required_version>2.2</required_version>
 		<maintainer>crazypark2@yahoo.dk</maintainer>
@@ -619,13 +619,13 @@
 		<descr>pfSense version of TinyDNS which features failover host support</descr>
 		<website>http://cr.yp.to/djbdns.html</website>
 		<category>Services</category>
-		<version>1.0.6.19</version>
+		<version>1.0.6.20</version>
 		<status>Beta</status>
 		<pkginfolink>https://doc.pfsense.org/index.php/Tinydns_package</pkginfolink>
 		<required_version>2.2</required_version>
 		<config_file>https://packages.pfsense.org/packages/config/tinydns/tinydns.xml</config_file>
 		<configurationfile>tinydns.xml</configurationfile>
-		<depends_on_package_pbi>djbdns-1.05_15-##ARCH##.pbi</depends_on_package_pbi>
+		<depends_on_package_pbi>djbdns-1.05_20-##ARCH##.pbi</depends_on_package_pbi>
 		<build_pbi>
 			<ports_before>sysutils/ucspi-tcp sysutils/daemontools</ports_before>
 			<port>dns/djbdns</port>
@@ -637,7 +637,7 @@
 		<descr>VMware Tools</descr>
 		<website>http://open-vm-tools.sourceforge.net/</website>
 		<category>Services</category>
-		<version>1280544_6.1</version>
+		<version>1280544_9</version>
 		<status>Stable</status>
 		<pkginfolink>https://doc.pfsense.org/index.php/Open_VM_Tools_package</pkginfolink>
 		<required_version>2.2</required_version>
@@ -646,7 +646,7 @@
 		<build_pbi>
 			<port>emulators/open-vm-tools-nox11</port>
 		</build_pbi>
-		<depends_on_package_pbi>open-vm-tools-1280544_6-##ARCH##.pbi</depends_on_package_pbi>
+		<depends_on_package_pbi>open-vm-tools-1280544_9-##ARCH##.pbi</depends_on_package_pbi>
 	</package>
 	<package>
 		<name>AutoConfigBackup</name>
@@ -666,12 +666,12 @@
 		<descr>Broadcasts a who-has ARP packet on the network and prints answers. </descr>
 		<website>http://www.habets.pp.se/synscan/programs.php?prog=arping</website>
 		<category>Services</category>
-		<version>2.13 v1.1</version>
+		<version>2.14_1 v1.1</version>
 		<status>Stable</status>
 		<required_version>2.2</required_version>
 		<config_file>https://packages.pfsense.org/packages/config/arping/arping.xml</config_file>
 		<configurationfile>arping.xml</configurationfile>
-		<depends_on_package_pbi>arping-2.13-##ARCH##.pbi</depends_on_package_pbi>
+		<depends_on_package_pbi>arping-2.14_1-##ARCH##.pbi</depends_on_package_pbi>
 		<build_pbi>
 			<port>net/arping</port>
 		</build_pbi>
@@ -682,9 +682,9 @@
 		<maintainer>jimp@pfsense.org</maintainer>
 		<descr>NMap is a utility for network exploration or security auditing. It supports ping scanning (determine which hosts are up), many port scanning techniques (determine what services the hosts are offering), version detection (determine what application/service is runing on a port), and TCP/IP fingerprinting (remote host OS or device identification). It also offers flexible target and port specification, decoy/stealth scanning, SunRPC scanning, and more. Most Unix and Windows platforms are supported in both GUI and command line modes. Several popular handheld devices are also supported, including the Sharp Zaurus and the iPAQ.</descr>
 		<category>Security</category>
-		<depends_on_package_pbi>nmap-6.46-##ARCH##.pbi</depends_on_package_pbi>
+		<depends_on_package_pbi>nmap-6.47-##ARCH##.pbi</depends_on_package_pbi>
 		<config_file>https://packages.pfsense.org/packages/config/nmap/nmap.xml</config_file>
-		<version>nmap-6.46 pkg v1.3</version>
+		<version>nmap-6.47 pkg v1.3</version>
 		<status>Stable</status>
 		<pkginfolink>https://doc.pfsense.org/index.php/Nmap_package</pkginfolink>
 		<required_version>2.2</required_version>
@@ -699,13 +699,13 @@
 		<website>http://www.imspector.org/</website>
 		<category>Network Management</category>
 		<maintainer>marcellocoutinho@gmail.com</maintainer>
-		<version>20111108_1 pkg v 0.3.2</version>
+		<version>20111108_2 pkg v 0.3.2</version>
 		<required_version>2.2</required_version>
 		<status>BETA</status>
 		<pkginfolink>https://doc.pfsense.org/index.php/IMSpector_package</pkginfolink>
 		<config_file>https://packages.pfsense.org/packages/config/imspector/imspector.xml</config_file>
 		<configurationfile>imspector.xml</configurationfile>
-		<depends_on_package_pbi>imspector-20111108_1-##ARCH##.pbi</depends_on_package_pbi>
+		<depends_on_package_pbi>imspector-20111108_2-##ARCH##.pbi</depends_on_package_pbi>
 		<build_options>imspector_SET_FORCE=PLUGINS;imspector_UNSET_FORCE=IPFW</build_options>
 		<build_pbi>
 			<port>net-im/imspector</port>
@@ -716,13 +716,13 @@
 		<descr>Network UPS Tools</descr>
 		<website>http://www.networkupstools.org/</website>
 		<category>Network Management</category>
-		<version>2.6.5_1 pkg 2.0.2</version>
+		<version>2.7.2_6 pkg 2.0.2</version>
 		<status>BETA</status>
 		<required_version>2.2</required_version>
 		<maintainer>rswagoner@gmail.com</maintainer>
 		<config_file>https://packages.pfsense.org/packages/config/nut/nut.xml</config_file>
 		<configurationfile>nut.xml</configurationfile>
-		<depends_on_package_pbi>nut-2.6.5_1-##ARCH##.pbi</depends_on_package_pbi>
+		<depends_on_package_pbi>nut-2.7.2_6-##ARCH##.pbi</depends_on_package_pbi>
 		<build_pbi>
 			<port>sysutils/nut</port>
 		</build_pbi>
@@ -763,7 +763,7 @@
 		<category>Network Management</category>
 		<config_file>https://packages.pfsense.org/packages/config/pfflowd.xml</config_file>
 		<depends_on_package_pbi>pfflowd-0.8-##ARCH##.pbi</depends_on_package_pbi>
-		<version>0.8.3 pkg v1.0.1</version>
+		<version>0.8 pkg v1.0.2</version>
 		<status>Stable</status>
 		<required_version>2.2</required_version>
 		<configurationfile>pfflowd.xml</configurationfile>
@@ -779,7 +779,7 @@
 		<website>http://www.webweaving.org/widentd</website>
 		<category>Services</category>
 		<depends_on_package_pbi>widentd-1.03_2-##ARCH##.pbi</depends_on_package_pbi>
-		<version>1.03_1</version>
+		<version>1.03_2</version>
 		<status>Stable</status>
 		<pkginfolink>https://doc.pfsense.org/index.php/Widentd_package</pkginfolink>
 		<required_version>2.2</required_version>
@@ -836,8 +836,8 @@
 		<website>http://www.stunnel.org/</website>
 		<descr>An SSL encryption wrapper between remote client and local or remote servers. </descr>
 		<category>Network Management</category>
-		<depends_on_package_pbi>stunnel-5.00-##ARCH##.pbi</depends_on_package_pbi>
-		<version>5.00.0</version>
+		<depends_on_package_pbi>stunnel-5.07-##ARCH##.pbi</depends_on_package_pbi>
+		<version>5.07</version>
 		<status>Stable</status>
 		<pkginfolink>https://doc.pfsense.org/index.php/Stunnel_package</pkginfolink>
 		<required_version>2.2</required_version>
@@ -924,7 +924,7 @@
 		<pkginfolink>https://forum.pfsense.org/index.php/topic,48347.0.html</pkginfolink>
 		<website>http://www.squid-cache.org/</website>
 		<category>Network</category>
-		<version>3.4.9 pkg 0.1</version>
+		<version>3.4.9_1 pkg 0.1</version>
 		<status>beta</status>
 		<required_version>2.2</required_version>
 		<maintainer>marcellocoutinho@gmail.com fernando@netfilter.com.br seth.mos@dds.nl mfuchs77@googlemail.com jimp@pfsense.org</maintainer>
@@ -936,7 +936,7 @@
 		<build_options>c-icap_UNSET_FORCE=IPV6;squid_UNSET_FORCE=AUTH_SMB AUTH_SQL DNS_HELPER FS_COSS ESI SNMP ECAP STACKTRACES STRICT_HTTP TP_IPF TP_IPFW VIA_DB DEBUG DOCS EXAMPLES AUTH_SASL;squid_SET_FORCE=ARP_ACL AUTH_KERB AUTH_LDAP AUTH_NIS CACHE_DIGESTS DELAY_POOLS FOLLOW_XFF TP_PF MSSL_CRTD WCCP WCCPV2 FS_AUFS HTCP ICAP ICMP IDENT IPV6 KQUEUE LARGEFILE SSL SSL_CRTD</build_options>
 		<config_file>https://packages.pfsense.org/packages/config/squid3/34/squid.xml</config_file>
 		<configurationfile>squid.xml</configurationfile>
-		<depends_on_package_pbi>squid-3.4.9-##ARCH##.pbi</depends_on_package_pbi>
+		<depends_on_package_pbi>squid-3.4.9_1-##ARCH##.pbi</depends_on_package_pbi>
 	</package>
 	<package>
 		<name>squid3-dev</name>
@@ -947,7 +947,7 @@
 		<pkginfolink>https://forum.pfsense.org/index.php/topic,48347.0.html</pkginfolink>
 		<website>http://www.squid-cache.org/</website>
 		<category>Network</category>
-		<version>3.3.11_1 pkg 2.2.8</version>
+		<version>3.3.13_2 pkg 2.2.8</version>
 		<status>beta</status>
 		<required_version>2.2</required_version>
 		<maintainer>marcellocoutinho@gmail.com fernando@netfilter.com.br seth.mos@dds.nl mfuchs77@googlemail.com jimp@pfsense.org</maintainer>
@@ -959,18 +959,18 @@
 		<build_options>c-icap_UNSET_FORCE=IPV6;squid_UNSET_FORCE=AUTH_SMB AUTH_SQL DNS_HELPER FS_COSS ESI SNMP ECAP STACKTRACES STRICT_HTTP TP_IPF TP_IPFW VIA_DB DEBUG DOCS EXAMPLES AUTH_SASL;squid_SET_FORCE=ARP_ACL AUTH_KERB AUTH_LDAP AUTH_NIS CACHE_DIGESTS DELAY_POOLS FOLLOW_XFF TP_PF MSSL_CRTD WCCP WCCPV2 FS_AUFS HTCP ICAP ICMP IDENT IPV6 KQUEUE LARGEFILE SSL SSL_CRTD</build_options>
 		<config_file>https://packages.pfsense.org/packages/config/squid3/33/squid.xml</config_file>
 		<configurationfile>squid.xml</configurationfile>
-		<depends_on_package_pbi>squid-3.3.11_1-##ARCH##.pbi</depends_on_package_pbi>
+		<depends_on_package_pbi>squid-3.3.13_2-##ARCH##.pbi</depends_on_package_pbi>
 	</package>
 	<package>
 		<name>LCDproc</name>
 		<descr>LCD display driver</descr>
 		<website>http://www.lcdproc.org/</website>
 		<category>Utility</category>
-		<version>lcdproc-0.5.5 pkg.v.1.0.1</version>
+		<version>lcdproc-0.5.7_1 pkg.v.1.0.1</version>
 		<status>BETA</status>
 		<required_version>2.2</required_version>
 		<maintainer>seth.mos@dds.nl</maintainer>
-		<depends_on_package_pbi>lcdproc-0.5.6-##ARCH##.pbi</depends_on_package_pbi>
+		<depends_on_package_pbi>lcdproc-0.5.7_1-##ARCH##.pbi</depends_on_package_pbi>
 		<config_file>https://packages.pfsense.org/packages/config/lcdproc/lcdproc.xml</config_file>
 		<configurationfile>lcdproc.xml</configurationfile>
 		<build_pbi>
@@ -1077,7 +1077,7 @@
 		<name>OpenVPN Client Export Utility</name>
 		<descr>Allows a pre-configured OpenVPN Windows Client or Mac OSX's Viscosity configuration bundle to be exported directly from pfSense.</descr>
 		<category>Security</category>
-		<depends_on_package_pbi>zip-3.0-##ARCH##.pbi p7zip-9.20.1_2-##ARCH##.pbi</depends_on_package_pbi>
+		<depends_on_package_pbi>zip-3.0_1-##ARCH##.pbi p7zip-9.20.1_2-##ARCH##.pbi</depends_on_package_pbi>
 		<build_port_path>/usr/ports/archivers/p7zip</build_port_path>
 		<build_port_path>/usr/ports/archivers/zip</build_port_path>
 		<version>1.2.14</version>
@@ -1092,12 +1092,12 @@
 		<website>http://www.server-side.de/</website>
 		<descr>Antivirus:  HAVP (HTTP Antivirus Proxy) is a proxy with a ClamAV anti-virus scanner. The main aims are continuous, non-blocking downloads and smooth scanning of dynamic and password protected HTTP traffic. Havp antivirus proxy has a parent and transparent proxy mode. It can be used with squid or standalone. And File Scanner for local files.</descr>
 		<category>Network Management</category>
-		<depends_on_package_pbi>havp-0.91_1-##ARCH##.pbi</depends_on_package_pbi>
+		<depends_on_package_pbi>havp-0.91_3-##ARCH##.pbi</depends_on_package_pbi>
 		<build_pbi>
 			<port>www/havp</port>
 		</build_pbi>
 		<build_options>CLAMAVUSER=havp;CLAMAVGROUP=havp</build_options>
-		<version>0.91_1 pkg v1.02</version>
+		<version>0.91_3 pkg v1.02</version>
 		<status>BETA</status>
 		<required_version>2.2</required_version>
 		<config_file>https://packages.pfsense.org/packages/config/havp/havp.xml</config_file>
@@ -1182,14 +1182,14 @@
 		<website>http://wiki.nagios.org/index.php/Howtos:nrpe_nsca</website>
 		<descr>NRPE is an addon for Nagios that allows you to execute plugins on remote Linux/Unix hosts. This is useful if you need to monitor local resources/attributes like disk usage, CPU load, memory usage, etc. on a remote host.</descr>
 		<category>Services</category>
-		<depends_on_package_pbi>nrpe-2.15_3-##ARCH##.pbi</depends_on_package_pbi>
+		<depends_on_package_pbi>nrpe-2.15_5-##ARCH##.pbi</depends_on_package_pbi>
 		<build_pbi>
 			<ports_before>net-mgmt/nagios-plugins</ports_before>
 			<port>net-mgmt/nrpe</port>
 		</build_pbi>
 		<build_options>nrpe_SET_FORCE=SSL;nrpe_UNSET_FORCE=ARGS</build_options>
 		<config_file>https://packages.pfsense.org/packages/config/nrpe2/nrpe2.xml</config_file>
-		<version>2.15_4 v2.2</version>
+		<version>2.15_5 v2.2</version>
 		<status>Beta</status>
 		<required_version>2.2</required_version>
 		<maintainer>erik@erikkristensen.com</maintainer>
@@ -1257,10 +1257,10 @@
 		<name>Quagga OSPF</name>
 		<descr>OSPF routing protocol using Quagga -- WARNING! Installs files to the same place as OpenBGPD. Installing both will break things.</descr>
 		<maintainer>jimp@pfsense.org</maintainer>
-		<version>0.99.22.3 v0.6.2</version>
+		<version>0.99.22.3.1_2 v0.6.2</version>
 		<category>Routing</category>
 		<status>BETA</status>
-		<depends_on_package_pbi>quagga-0.99.22.3-##ARCH##.pbi</depends_on_package_pbi>
+		<depends_on_package_pbi>quagga-0.99.22.3.1_2-##ARCH##.pbi</depends_on_package_pbi>
 		<config_file>https://packages.pfsense.org/packages/config/quagga_ospfd/quagga_ospfd.xml</config_file>
 		<build_pbi>
 			<port>net/quagga</port>
@@ -1287,11 +1287,11 @@
 		<descr><![CDATA[Bacula is a set of Open Source, computer programs that permit you (or the system administrator) to manage backup, recovery, and verification of computer data across a network of computers of different kinds.]]></descr>
 		<website>http://www.bacula.org/</website>
 		<category>Services</category>
-		<version>5.2.12_3 pkg v 1.0.3</version>
+		<version>7.0.5 pkg v 1.0.3</version>
 		<status>Stable</status>
 		<required_version>2.2</required_version>
 		<config_file>https://packages.pfsense.org/packages/config/bacula-client/bacula-client.xml</config_file>
-		<depends_on_package_pbi>bacula-5.2.12_3-##ARCH##.pbi</depends_on_package_pbi>
+		<depends_on_package_pbi>bacula-7.0.5-##ARCH##.pbi</depends_on_package_pbi>
 		<build_pbi>
 			<port>sysutils/bacula-client</port>
 		</build_pbi>
@@ -1340,7 +1340,7 @@
 		<pkginfolink>https://forum.pfsense.org/</pkginfolink>
 		<descr><![CDATA[GIT Source Code Management (console/shell only)]]></descr>
 		<category>Services</category>
-		<version>1.9.2</version>
+		<version>2.1.2_1</version>
 		<status>Beta</status>
 		<required_version>2.2</required_version>
 		<config_file>https://packages.pfsense.org/packages/config/git/git.xml</config_file>
@@ -1350,7 +1350,7 @@
 		<build_pbi>
 			<port>devel/git</port>
 		</build_pbi>
-		<depends_on_package_pbi>git-1.9.3-##ARCH##.pbi</depends_on_package_pbi>
+		<depends_on_package_pbi>git-2.1.2_1-##ARCH##.pbi</depends_on_package_pbi>
 	</package>
 	<package>
 		<name>tinc</name>
@@ -1379,10 +1379,10 @@
 		<website>http://www.balabit.com/network-security/syslog-ng/</website>
 		<descr>Syslog-ng syslog server. This service is not intended to replace the default pfSense syslog server but rather acts as an independent syslog server.</descr>
 		<category>Services</category>
-		<version>3.5.4.1 pkg.v.1.0.2</version>
+		<version>3.6.1_1 pkg.v.1.0.2</version>
 		<status>ALPHA</status>
 		<required_version>2.2</required_version>
-		<depends_on_package_pbi>syslog-ng-3.5.4.1-##ARCH##.pbi</depends_on_package_pbi>
+		<depends_on_package_pbi>syslog-ng-3.6.1_1-##ARCH##.pbi</depends_on_package_pbi>
 		<build_pbi>
 			<ports_before>sysutils/logrotate</ports_before>
 			<port>sysutils/syslog-ng</port>
@@ -1397,7 +1397,7 @@
 		<descr>Monitoring agent.</descr>
 		<category>Services</category>
 		<config_file>https://packages.pfsense.org/packages/config/zabbix2/zabbix2-agent.xml</config_file>
-		<version>zabbix2-agent-2.2.5 pkg v0.8.3</version>
+		<version>zabbix2-agent-2.2.7 pkg v0.8.3</version>
 		<status>BETA</status>
 		<required_version>2.2</required_version>
 		<configurationfile>zabbix2-agent.xml</configurationfile>
@@ -1406,14 +1406,14 @@
 			<custom_name>zabbix22-agent</custom_name>
 			<port>net-mgmt/zabbix22-agent</port>
 		</build_pbi>
-		<depends_on_package_pbi>zabbix22-agent-2.2.5-##ARCH##.pbi</depends_on_package_pbi>
+		<depends_on_package_pbi>zabbix22-agent-2.2.7-##ARCH##.pbi</depends_on_package_pbi>
 	</package>
 	<package>
 		<name>Zabbix-2 Proxy</name>
 		<descr>Monitoring agent proxy.</descr>
 		<category>Services</category>
 		<config_file>https://packages.pfsense.org/packages/config/zabbix2/zabbix2-proxy.xml</config_file>
-		<version>zabbix2-proxy-2.2.5 pkg v0.8.3</version>
+		<version>zabbix2-proxy-2.2.7 pkg v0.8.3</version>
 		<status>BETA</status>
 		<required_version>2.2</required_version>
 		<configurationfile>zabbix2-proxy.xml</configurationfile>
@@ -1423,7 +1423,7 @@
 			<port>net-mgmt/zabbix22-proxy</port>
 		</build_pbi>
 		<build_options>OPTIONS_SET+= SQLITE IPV6;OPTIONS_UNSET+= MYSQL JABBER GSSAPI</build_options>
-		<depends_on_package_pbi>zabbix22-proxy-2.2.5-##ARCH##.pbi</depends_on_package_pbi>
+		<depends_on_package_pbi>zabbix22-proxy-2.2.7-##ARCH##.pbi</depends_on_package_pbi>
 	</package>
 	<package>
 		<!-- This does not exist yet, this is here to trigger a PBI build -->
@@ -1431,7 +1431,7 @@
 		<pkginfolink>https://forum.pfsense.org/</pkginfolink>
 		<descr><![CDATA[IPMI Tools for local/remote data retrieval and control (Console only, no GUI)]]></descr>
 		<category>Services</category>
-		<version>1.8.14</version>
+		<version>1.8.14_1</version>
 		<status>Beta</status>
 		<required_version>2.2</required_version>
 		<config_file>https://packages.pfsense.org/packages/config/ipmitool/ipmitool.xml</config_file>
@@ -1441,7 +1441,7 @@
 			<port>sysutils/ipmitool</port>
 		</build_pbi>
 		<build_options>ipmitool_SET_FORCE=FREEIPMI;freeipmi_UNSET_FORCE=DOCS DEBUG IOPERM</build_options>
-		<depends_on_package_pbi>ipmitool-1.8.14-##ARCH##.pbi</depends_on_package_pbi>
+		<depends_on_package_pbi>ipmitool-1.8.14_1-##ARCH##.pbi</depends_on_package_pbi>
 	</package>
 	<package>
 		<name>sudo</name>
@@ -1457,7 +1457,7 @@
 		<build_pbi>
 			<port>security/sudo</port>
 		</build_pbi>
-		<depends_on_package_pbi>sudo-1.8.10p3_1-##ARCH##.pbi</depends_on_package_pbi>
+		<depends_on_package_pbi>sudo-1.8.11p1-##ARCH##.pbi</depends_on_package_pbi>
 	</package>
 	<package>
 		<name>Service Watchdog</name>
@@ -1478,7 +1478,7 @@
 		<category>Network Management</category>
 		<config_file>https://packages.pfsense.org/packages/config/softflowd/softflowd.xml</config_file>
 		<depends_on_package_pbi>softflowd-0.9.8_2-##ARCH##.pbi</depends_on_package_pbi>
-		<version>0.9.8 pkg v1.0.1</version>
+		<version>0.9.8_2 pkg v1.0.1</version>
 		<status>Beta</status>
 		<required_version>2.2</required_version>
 		<configurationfile>softflowd.xml</configurationfile>
@@ -1492,7 +1492,7 @@
 		<descr>Set of programs for controlling APC UPS.</descr>
 		<category>Services</category>
 		<config_file>https://packages.pfsense.org/packages/config/apcupsd/apcupsd.xml</config_file>
-		<version>apcupsd-3.14.10_1 pkg v0.3.1</version>
+		<version>apcupsd-3.14.12_1 pkg v0.3.1</version>
 		<status>BETA</status>
 		<required_version>2.2</required_version>
 		<configurationfile>apcupsd.xml</configurationfile>
@@ -1502,16 +1502,16 @@
 			<port>sysutils/apcupsd</port>
 		</build_pbi>
 		<build_options>apcupsd_SET_FORCE=APCSMART_DRV APCDUMB_DRV PCNET_DRV USB TCP_WRAPPERS SNMP_DRV;apcupsd_UNSET_FORCE=CLIENT_ONLY CGI SNMP_DRV_OLD TEST_DRV GAPCMON DOCS</build_options>
-		<depends_on_package_pbi>apcupsd-3.14.10_1-##ARCH##.pbi</depends_on_package_pbi>
+		<depends_on_package_pbi>apcupsd-3.14.12_1-##ARCH##.pbi</depends_on_package_pbi>
 	</package>
 	<package>
 		<name>LADVD</name>
 		<descr>Send and decode link layer advertisements. Support for LLDP (Link Layer Discovery Protocol), CDP (Cisco Discovery Protocol), EDP (Extreme Discovery Protocol) and NDP (Nortel Discovery Protocol).</descr>
 		<website>https://code.google.com/p/ladvd/</website>
 		<category>Network Management</category>
-		<version>1.0.4</version>
+		<version>1.0.4_1</version>
 		<status>BETA</status>
-		<depends_on_package_pbi>ladvd-1.0.4-##ARCH##.pbi</depends_on_package_pbi>
+		<depends_on_package_pbi>ladvd-1.0.4_1-##ARCH##.pbi</depends_on_package_pbi>
 		<config_file>https://packages.pfsense.org/packages/config/ladvd/ladvd.xml</config_file>
 		<build_pbi>
 			<port>net/ladvd</port>
