@@ -80,12 +80,12 @@
 			<required/>
 		</field>
 		<field>
-			<fielddescr>Maximun Concurrent Jobs</fielddescr>
+			<fielddescr>Maximum Concurrent Jobs</fielddescr>
 			<fieldname>jobs</fieldname>
 			<type>input</type>
 			<size>3</size>
 			<required/>
-			<description>Maximun Concurrent Jobs. Default : 20</description>
+			<description>Maximum Concurrent Jobs. Default : 20</description>
 		</field>
 
 	</fields>
