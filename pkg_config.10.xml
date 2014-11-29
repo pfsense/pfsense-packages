@@ -1305,7 +1305,7 @@
 		<pkginfolink>https://forum.pfsense.org/</pkginfolink>
 		<descr><![CDATA[HTTP URL Sniffer (console/shell only)]]></descr>
 		<category>Services</category>
-		<version>2.3_4</version>
+		<version>2.4b1</version>
 		<status>Beta</status>
 		<required_version>2.2</required_version>
 		<config_file>https://packages.pfsense.org/packages/config/urlsnarf/urlsnarf.xml</config_file>
@@ -1314,7 +1314,7 @@
 		<build_pbi>
 			<port>security/dsniff</port>
 		</build_pbi>
-		<depends_on_package_pbi>dsniff-2.3_4-##ARCH##.pbi</depends_on_package_pbi>
+		<depends_on_package_pbi>dsniff-2.4b1-##ARCH##.pbi</depends_on_package_pbi>
 	</package>
 	<package>
 		<!-- This does not exist yet, this is here to trigger a PBI build -->
