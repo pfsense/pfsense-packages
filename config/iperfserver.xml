@@ -130,10 +130,10 @@
 		$iperf_options = "";
 		if($_POST['protocol'] == "udp") $iperf_options .= " -u";
 		if($_POST['format'] == "bytes") $iperf_options .= " -f A";
-		if($_POST['interval'] != "") $iperf_options .= " -i {$_POST['interval']}";
-		if($_POST['length'] != "") $iperf_options .= " -l {$_POST['length']}";
-		if($_POST['window'] != "") $iperf_options .= " -w {$_POST['window']}";
-		if($_POST['port'] != "") $iperf_options .= " -p {$_POST['port']}";
+		if($_POST['interval'] != "") $iperf_options .= " -i " . escapeshellarg($_POST['interval']);
+		if($_POST['length'] != "") $iperf_options .= " -l " . escapeshellarg($_POST['length']);
+		if($_POST['window'] != "") $iperf_options .= " -w " . escapeshellarg($_POST['window']);
+		if($_POST['port'] != "") $iperf_options .= " -p " . escapeshellarg($_POST['port']);
 		$iperf_options .= " -s";
 		mwexec_bg("/usr/local/bin/iperf" . $iperf_options);
 	</custom_add_php_command>
