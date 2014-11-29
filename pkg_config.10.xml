@@ -1311,6 +1311,7 @@
 		<config_file>https://packages.pfsense.org/packages/config/urlsnarf/urlsnarf.xml</config_file>
 		<maintainer>jimp@pfsense.org</maintainer>
 		<configurationfile>urlsnarf.xml</configurationfile>
+		<build_options>libnids_UNSET_FORCE=GLIB2</build_options>
 		<build_pbi>
 			<port>security/dsniff</port>
 		</build_pbi>
