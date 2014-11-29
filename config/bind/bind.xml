@@ -52,8 +52,8 @@
         <title>Bind: Domain Named Settings</title>
         <include_file>/usr/local/pkg/bind.inc</include_file>
         <menu>
-                <name>Bind Server</name>
-                <tooltiptext>Modify Bind settings</tooltiptext>
+                <name>BIND Server</name>
+                <tooltiptext>Modify BIND settings</tooltiptext>
                 <section>Services</section>
                 <url>/pkg_edit.php?xml=bind.xml</url>
         </menu>
@@ -135,17 +135,17 @@
                         <fieldname>temp01</fieldname>
                 </field>
                 <field>
-                        <fielddescr>Enable Bind</fielddescr>
+                        <fielddescr>Enable BIND</fielddescr>
                         <fieldname>enable_bind</fieldname>
-                        <description><![CDATA[Enable DNS Bind on Server<br>
-                        	Disable Dns forwarder service on selected interfaces before enabling bind.]]></description>
+                        <description><![CDATA[Enable BIND DNS server<br>
+                        	Disable DNS Forwarder and Resolver services on selected interfaces before enabling BIND.]]></description>
                         <type>checkbox</type>
                         <required/>
                 </field>
               <field>
-                        <fielddescr>Listen-on</fielddescr>
+                        <fielddescr>Listen on</fielddescr>
                         <fieldname>listenon</fieldname>
-                        <description><![CDATA[Enable Named to listen on.]]></description>
+                        <description><![CDATA[Choose the interfaces on which to enable BIND.]]></description>
                         <type>interfaces_selection</type>
                         <showlistenall/>
                         <showvirtualips/>
@@ -160,7 +160,7 @@
                 <field>
                         <fielddescr>Hide Version</fielddescr>
                         <fieldname>bind_hide_version</fieldname>
-                        <description>Hide the version of BIND (do not process queries to version.bind at all). This makes it more difficult to exploit the server.</description>
+                        <description>Hide the version of BIND (ignore queries for version.bind).</description>
                         <type>checkbox</type>
                 </field>
                 <field>
@@ -179,13 +179,13 @@
                 <field>
                         <fielddescr>Enable logging</fielddescr>
                         <fieldname>bind_logging</fieldname>
-                        <description><![CDATA[Enable Bind logs on status-> system logs -> resolver menu.]]></description>
+                        <description><![CDATA[Enable BIND logs under Status > System logs, Resolver tab.]]></description>
                         <type>checkbox</type>
                 </field>
 				<field>
-					<fielddescr>Loggin serverity</fielddescr>
+					<fielddescr>Logging serverity</fielddescr>
 					<fieldname>log_severity</fieldname>
-					<description><![CDATA[Select logging levels for selected categories.<BR>
+					<description><![CDATA[Choose logging levels for selected categories.<BR>
 								use CTRL+click to select/unselect.<br>
 								The value 'dynamic' means assume the global level defined by either the command line parameter -d or by running rndc trace.]]></description>
 					<type>select</type>
@@ -202,7 +202,7 @@
 						</options>
 				</field>
 				<field>
-					<fielddescr>Loggin options</fielddescr>
+					<fielddescr>Logging options</fielddescr>
 					<fieldname>log_options</fieldname>
 					<description><![CDATA[Select categories to log.<BR>
 								use CTRL+click to select/unselect.]]></description>
@@ -266,16 +266,16 @@
                         <fieldname>temp01</fieldname>
                 </field>
                 <field>
-                        <fielddescr>Forwarder</fielddescr>
+                        <fielddescr>Enable Forwarding</fielddescr>
                         <fieldname>bind_forwarder</fieldname>
-                        <description>Forwardes enable DNS Bind on Server.</description>
+                        <description>Enable forwarding queries to other DNS servers listed below rather than this server performing its own recursion.</description>
                         <type>checkbox</type>
                         <enablefields>bind_forwarder_ips</enablefields>
                 </field>
                 <field>
                         <fielddescr>Forwarder IPs</fielddescr>
                         <fieldname>bind_forwarder_ips</fieldname>
-                        <description>Enter IPs to forward. Separate by semi-colons (;). [Applies only to Forwarder mode]</description>
+                        <description>Enter IPs of DNS servers to use for recursion. Separate by semi-colons (;). Applies only if Enable Forwarding is chosen.</description>
                         <type>input</type>
                 	<size>80</size>
                 </field>

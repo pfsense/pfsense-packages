@@ -48,10 +48,10 @@
     <faq>Currently there are no FAQ items provided.</faq>
 	<name>bindacls</name>
 	<version>0.1.0</version>
-	<title>Bind: ACLs Settings</title>
+	<title>BIND: ACLs Settings</title>
 	<include_file>/usr/local/pkg/bind.inc</include_file>
 	<menu>
-		<name>Bind Server</name>
+		<name>BIND Server</name>
 		<tooltiptext></tooltiptext>
 		<section>Services</section>
 		<configfile>bind.xml</configfile>

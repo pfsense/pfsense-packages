@@ -51,7 +51,7 @@
 	<title>Bind: Views Settings</title>
 	<include_file>/usr/local/pkg/bind.inc</include_file>
 	<menu>
-		<name>Bind Server</name>
+		<name>BIND Server</name>
 		<tooltiptext></tooltiptext>
 		<section>Services</section>
 		<configfile>bind.xml</configfile>
