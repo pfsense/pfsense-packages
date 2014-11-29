@@ -1312,7 +1312,6 @@
 		<maintainer>jimp@pfsense.org</maintainer>
 		<configurationfile>urlsnarf.xml</configurationfile>
 		<build_pbi>
-			<ports_before>net/libnet10</ports_before>
 			<port>security/dsniff</port>
 		</build_pbi>
 		<depends_on_package_pbi>dsniff-2.3_4-##ARCH##.pbi</depends_on_package_pbi>
