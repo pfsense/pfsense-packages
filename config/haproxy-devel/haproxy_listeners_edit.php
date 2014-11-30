@@ -85,6 +85,10 @@ if (!is_numeric($id))
 {
 	//default value for new items.
 	$pconfig['ssloffloadacl'] = "yes";
+	$new_item = array();	
+	$new_item['extaddr'] = "wan_ipv4";
+	$new_item['extaddr_port'] = "80";
+	$pconfig['a_extaddr'][] = $new_item;
 }
 
 $servercerts = haproxy_get_certificates('server,user');
@@ -139,7 +143,7 @@ $fields_aclSelectionList[2]['type']="textbox";
 $fields_aclSelectionList[2]['size']="35";
 
 $interfaces = haproxy_get_bindable_interfaces();
-$interfaces_custom['']['name']="Use custom address:";
+$interfaces_custom['custom']['name']="Use custom address:";
 $interfaces = $interfaces_custom + $interfaces;
 
 $fields_externalAddress=array();
@@ -197,8 +201,8 @@ if ($_POST) {
 	$pconfig = $_POST;
 	
 	if ($pconfig['secondary'] != "yes") {
-		$reqdfields = explode(" ", "name type port");
-		$reqdfieldsn = explode(",", "Name,Type,Port");
+		$reqdfields = explode(" ", "name type");
+		$reqdfieldsn = explode(",", "Name,Type");
 	} else {
 		$reqdfields = explode(" ", "name");
 		$reqdfieldsn = explode(",", "Name");
@@ -383,20 +387,26 @@ $primaryfrontends = get_haproxy_frontends($excludefrontend);
 			}
 		}
 	}
-	
 	function updatevisibility()	{
 		d = document;
+		ssl = false;
 		ssloffload = d.getElementById("ssloffload");
+		for (i = 0; i < 99; i++) {
+			customEdit = document.getElementById("extaddr_ssl"+i);
+			if (customEdit && customEdit.checked)
+				ssl = true;
+		}
 		
 		var type;
 		var secondary = d.getElementById("secondary");
 		var primary_frontend = d.getElementById("primary_frontend");		
-		if ((secondary !== null) && (secondary.checked))
+		if ((secondary !== null) && (secondary.checked)) {
 			type = primaryfrontends[primary_frontend.value]['ref']['type'];
-		else
+			ssl = ssloffload.checked;
+		} else
 			type = d.getElementById("type").value;
 			
-		setCSSdisplay(".haproxy_ssloffloading_enabled", ssloffload.checked);
+		setCSSdisplay(".haproxy_ssloffloading_enabled", ssl);
 		setCSSdisplay(".haproxy_mode_http", type == "http");
 		if (secondary !== null) {
 			setCSSdisplay(".haproxy_primary", !secondary.checked);
@@ -521,29 +531,43 @@ $primaryfrontends = get_haproxy_frontends($excludefrontend);
 		<tr class="haproxy_primary">
 			  <td width="22%" valign="top" class="vncellreq">External address</td>
 			  <td width="78%" class="vtable">
-				<?
-				echo_html_select('extaddr', $interfaces, $pconfig['extaddr']);
-				?>
-				<br />
 			<?
 			$counter=0;
 			$a_extaddr = $pconfig['a_extaddr'];
-			haproxy_htmllist("table_extaddr", $a_extaddr, $fields_externalAddress, true);
+			$htmllist_extadd = new  HaproxyHtmlList("table_extaddr", $fields_externalAddress);
+			$htmllist_extadd->editmode = true;
+			$htmllist_extadd->Draw($a_extaddr);
 			?>
+			<script type="text/javascript">
+			function table_extaddr_row_added(tableid, rowid){
+				new AutoSuggestControl(document.getElementById("extaddr_custom"+rowid), new StateSuggestions(address_array));
+				new AutoSuggestControl(document.getElementById("extaddr_port"+rowid), new StateSuggestions(port_array));
+				table_extaddr_listitem_change(tableid,"",rowid, null);//disables address when not set to custom.
+			}
+			
+			function table_extaddr_listitem_change(tableId, fieldId, rowNr, field) {
+				if (fieldId == "extaddr" || fieldId == "") {
+					field = field || document.getElementById("extaddr"+rowNr);
+					customEdit = document.getElementById("extaddr_custom"+rowNr);
+					customdisabled = field.value == "custom" ? 0 : 1;
+					customEdit.disabled = customdisabled;
+				}
+				if (fieldId == "extaddr_ssl") {
+					updatevisibility();
+				}
+			}
+			
+			</script>
 				<br />
 				<span class="vexpl">
 					If you want this rule to apply to another IP address than the IP address of the interface chosen above,
 					select it here (you need to define <a href="firewall_virtual_ip.php">Virtual IP</a> addresses on the first).  
 					Also note that if you are trying to redirect connections on the LAN select the "any" option.
+
+					In the port to listen to, if you want to specify multiple ports, separate them with a comma (,). EXAMPLE: 80,8000
+					Or to listen on both 80 and 443 create 2 rows in the table.
 				</span>
 			  </td>
-		</tr>
-		<tr class="haproxy_primary" align="left">
-			<td width="22%" valign="top" class="vncellreq">External port</td>
-			<td width="78%" class="vtable" colspan="2">
-				<input name="port" id="port" type="text" <?if(isset($pconfig['port'])) echo "value=\"{$pconfig['port']}\"";?> size="10" maxlength="500" />
-				<div>The port to listen to. To specify multiple ports, separate with a comma (,). EXAMPLE: 80,8000</div>
-			</td>
 		</tr>
 		<tr class="haproxy_primary" align="left">
 			<td width="22%" valign="top" class="vncell">Max connections</td>
@@ -572,8 +596,8 @@ $primaryfrontends = get_haproxy_frontends($excludefrontend);
 			<td width="22%" valign="top" class="vncellreq">Type</td>
 			<td width="78%" class="vtable" colspan="2">
 				<select name="type" id="type" onchange="updatevisibility();">
-					<option value="http"<?php if($pconfig['type'] == "http") echo " SELECTED"; ?>>HTTP</option>
-					<option value="https"<?php if($pconfig['type'] == "https") echo " SELECTED"; ?>>HTTPS</option>
+					<option value="http"<?php if($pconfig['type'] == "http") echo " SELECTED"; ?>>HTTP / HTTPS(offloading)</option>
+					<option value="https"<?php if($pconfig['type'] == "https") echo " SELECTED"; ?>>SSL / HTTPS(TCP mode)</option>
 					<option value="tcp"<?php if($pconfig['type'] == "tcp") echo " SELECTED"; ?>>TCP</option>
 					<option value="health"<?php if($pconfig['type'] == "health") echo " SELECTED"; ?>>Health</option>
 				</select><br/>
@@ -699,14 +723,17 @@ $primaryfrontends = get_haproxy_frontends($excludefrontend);
 			<td colspan="2" valign="top" class="listtopic">SSL Offloading</td>
 		</tr>
 		<tr align="left">
-			<td width="22%" valign="top" class="vncell">Use Offloading</td>
 			<td width="78%" class="vtable" colspan="2">
-				<input id="ssloffload" name="ssloffload" type="checkbox" value="yes" <?php if ($pconfig['ssloffload']=='yes') echo "checked";?> onclick="updatevisibility();" /><strong>Use Offloading</strong>
-				<br/>
 				SSL Offloading will reduce web servers load by maintaining and encrypting connection with users on internet while sending and retrieving data without encrytion to internal servers.
 				Also more ACL rules and http logging may be configured when this option is used. 
 				Certificates can be imported into the <a href="/system_camanager.php" target="_blank">pfSense "Certificate Authority Manager"</a>
 				Please be aware this possibly will not work with all web applications. Some applications will require setting the SSL checkbox on the backend server configurations so the connection to the webserver will also be a encrypted connection, in that case there will be a slight overall performance loss.
+			</td>
+		</tr>
+		<tr align="left" class="haproxy_secondary" >
+			<td width="22%" valign="top" class="vncell">Use Offloading</td>
+			<td width="78%" class="vtable" colspan="2">
+				<input id="ssloffload" name="ssloffload" type="checkbox" value="yes" <?php if ($pconfig['ssloffload']=='yes') echo "checked";?> onclick="updatevisibility();" /><strong>Use Offloading</strong>
 			</td>
 		</tr>
 		<tr class="haproxy_ssloffloading_enabled" align="left">
@@ -804,10 +831,19 @@ $primaryfrontends = get_haproxy_frontends($excludefrontend);
 </script>
 <script type="text/javascript">
 	totalrows =  <?php echo $counter; ?>;
-	updatevisibility();
 	
-	var customarray  = <?= json_encode(get_alias_list(array("port", "url_ports", "urltable_ports"))) ?>;
-	var oTextbox1 = new AutoSuggestControl(document.getElementById("port"), new StateSuggestions(customarray));
+	var port_array  = <?= json_encode(get_alias_list(array("port", "url_ports", "urltable_ports"))) ?>;
+	var address_array = <?= json_encode(get_alias_list(array("host", "network", "openvpn", "urltable"))) ?>;
+
+	
+	for(i=0;i < <?=count($a_extaddr)?>;i++){
+		new AutoSuggestControl(document.getElementById('extaddr_custom'+i), new StateSuggestions(address_array));
+		new AutoSuggestControl(document.getElementById('extaddr_port'+i), new StateSuggestions(port_array));
+		// Initially set fields disabled where needed
+		table_extaddr_listitem_change('table_extaddr','',i,null);
+	}
+	
+	updatevisibility();
 </script>
 <?php 
 haproxy_htmllist_js();
