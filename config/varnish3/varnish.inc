@@ -122,6 +122,10 @@ function text_area_decode($text){
 
 function varnish_check_config(){
 	global $savemsg;
+
+	if (!isset($config['installedpackages']['varnishsettings']['config'][0]['enablevarnish']))
+		return;
+
 	exec(VARNISH_LOCALBASE."/bin/varnishd -C -f /var/etc/default.vcl 2>&1",$output,$return);
 	if ($return >0){
 		$savemsg.= implode("<br>",$output);
