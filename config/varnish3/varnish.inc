@@ -110,6 +110,17 @@ function varnish_backends_post_validate($post, &$input_errors) {
 
 function varnish_install() {
 	create_varnish_rcd_file();
+
+	if (file_exists(VARNISH_LOCALBASE . '/local/lib/varnish/libvarnish.so')) {
+		@symlink(VARNISH_LOCALBASE . '/local/lib/varnish/libvarnish.so',
+			 VARNISH_LOCALBASE . '/local/lib/libvarnish.so');
+		@symlink(VARNISH_LOCALBASE . '/local/lib/varnish/libvarnishcompat.so',
+			 VARNISH_LOCALBASE . '/local/lib/libvarnishcompat.so');
+		@symlink(VARNISH_LOCALBASE . '/local/lib/varnish/libvcl.so',
+			 VARNISH_LOCALBASE . '/local/lib/libvcl.so');
+		@symlink(VARNISH_LOCALBASE . '/local/lib/varnish/libvgz.so',
+			 VARNISH_LOCALBASE . '/local/lib/libvgz.so');
+	}
 }
 
 function varnish_deinstall() {
