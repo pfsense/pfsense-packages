@@ -130,6 +130,10 @@
 			<fieldname>grace</fieldname>
 		</columnitem>
 		<columnitem>
+			<fielddescr>SSL</fielddescr>
+			<fieldname>forcessl</fieldname>
+		</columnitem>
+		<columnitem>
 			<fielddescr>Failover</fielddescr>
 			<fieldname>failover</fieldname>
 		</columnitem>		
@@ -197,6 +201,13 @@
 	    	<type>input</type>
 	    	<size>5</size>
  		</field>
+		<field>
+			<fielddescr>Force SSL</fielddescr>
+			<fieldname>forcessl</fieldname>
+			<description><![CDATA[Redirect to ssl if request does not came from ssl offload servers.]]></description>
+	    	<type>checkbox</type>
+	    	<size>5</size>
+ 		</field>
  		<field>
 			<fielddescr>Additions options</fielddescr>
 			<fieldname>customapping</fieldname>
@@ -261,6 +272,7 @@
 		</field>
 	</fields>
 	<custom_php_command_before_form>
+	varnish_check_config();
 	</custom_php_command_before_form>
 	<custom_delete_php_command>
 		sync_package_varnish();

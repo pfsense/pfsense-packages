@@ -36,9 +36,6 @@ $shortcut_section = "varnish";
 
 $pfs_version = substr(trim(file_get_contents("/etc/version")),0,3);
 if (is_dir('/usr/pbi/varnish-' . php_uname("m"))) {
-	if ($pfs_version == 2.2)
-		define('VARNISH_LOCALBASE', '/usr/pbi/varnish-' . php_uname("m")."/local");
-	else
 		define('VARNISH_LOCALBASE', '/usr/pbi/varnish-' . php_uname("m"));
 } else {
 	define('VARNISH_LOCALBASE','/usr/local');
@@ -122,11 +119,25 @@ function varnish_deinstall() {
 function text_area_decode($text){
 	return preg_replace('/\r\n/', "\n",base64_decode($text));
 }
+
+function varnish_check_config(){
+	global $savemsg;
+	exec(VARNISH_LOCALBASE."/bin/varnishd -C -f /var/etc/default.vcl 2>&1",$output,$return);
+	if ($return >0){
+		$savemsg.= implode("<br>",$output);
+		$savemsg.= "<br>Daemon will not be restarted.";
+		return 1;
+		}
+	return 0;
+}
+
+
 function varnish_start() {
 	global $g, $config;
 	if ($config['installedpackages']['varnishsettings']['config'][0]['enablevarnish']){
 		exec("chmod +x /usr/local/etc/rc.d/varnish.sh");
-		mwexec("/usr/local/etc/rc.d/varnish.sh");}
+		if (varnish_check_config() == 0)
+			mwexec("/usr/local/etc/rc.d/varnish.sh");}
 	else{
 		exec("chmod -x /usr/local/etc/rc.d/varnish.sh");
 		mwexec("/usr/bin/killall varnishd");}
@@ -165,6 +176,13 @@ function varnish_get_url_mappings_txt() {
 				        $urlmappings .= "if (req.http.host $fieldtype ".'"'.$url['directorurl'].'"'." && req.url $fieldtype ".'"^'.$url['directorurl2'].'") {'."\n";
 
 					$urlbackend = "\t\t\tset req.backend = ".$url['directorname'].";";
+					// check force ssl option
+					if ($url['forcessl']){
+						$urlmappings .="\t\t#Force ssl for this host/director\n";
+						$urlmappings .="\t\tif((req.http.X-Forwarded-Proto !~ \"(?i)https\" ) && !(client.ip ~ SslOffloadServers)){\n";
+						$urlmappings .="\t\t\tset req.http.x-redir-url = \"https://\" + req.http.host + req.url;\n";
+      					$urlmappings .="\t\t\terror 750 req.http.x-redir-url;\n\t\t\t}\n";
+						}
 					// check rewrite options
 					if ($url['rewritehost'])
 						$urlmappings .= "\t\t\tset req.http.host = regsub(req.http.host, ".'"'.$url['directorurl'].'",'.'"'.$url['rewritehost'].'")'.";\n";
@@ -425,11 +443,23 @@ function sync_package_varnish() {
 				$vcl_pipe_late = text_area_decode($vcl['vcl_pipe_late']);
 		}
 	}
-		$vcl_recv_set_basic='#BASIC VCL RULES SETTING'."\n";
-		$vcl_recv_action_basic='#BASIC VCL RULES ACTIONS'."\n";
-		#$plataform=posix_uname();
-		if (is_array($config['installedpackages']['varnishsettings']['config']))
-		  foreach($config['installedpackages']['varnishsettings']['config'] as $vcl) {
+
+	$vcl_recv_set_basic='#BASIC VCL RULES SETTING'."\n";
+	$vcl_recv_action_basic='#BASIC VCL RULES ACTIONS'."\n";
+	#$plataform=posix_uname();
+	if (is_array($config['installedpackages']['varnishsettings']['config']))
+		foreach($config['installedpackages']['varnishsettings']['config'] as $vcl) {
+		  	if ($vcl['ssloffload']){
+		  		$vcl_acls="acl SslOffloadServers {\n\t\"localhost\";";
+				$sslservers= split (" ",$vcl['ssloffload']);
+				foreach ($sslservers as $sslserver){
+					if (preg_match("/(\S+)\/(d+)/",$sslserver,$sslm))
+						$vcl_acls.="\n\t\"{$sslm[1]}\"/{$sslm[2]};";
+					else
+						$vcl_acls.="\n\t\"{$sslserver}\";";
+					}
+				$vcl_acls.="\n\t}\n";
+		  	}
 			if ($vcl['streaming'])
 				$vcl_fetch_stream="set beresp.do_stream = true;\n";
 			if ($vcl['fixgzip']) {
@@ -466,15 +496,6 @@ function sync_package_varnish() {
 						$vcl_recv_set_basic .= "\tset req.http.X-Forwarded-For = req.http.X-Forwarded-For + \",\" + client.ip;\n\n";
 					break;
 					case 'create':
-						$vcl_acls="acl SslOffloadServers {\n\t\"localhost\";";
-						$sslservers= split (" ",$vcl['ssloffload']);
-						foreach ($sslservers as $sslserver){
-							if (preg_match("/(\S+)\/(d+)/",$sslserver,$sslm))
-								$vcl_acls.="\n\t\"{$sslm[1]}\"/{$sslm[2]};";
-							else
-								$vcl_acls.="\n\t\"{$sslserver}\";";
-						}
-						$vcl_acls.="}\n";
 						$vcl_recv_set_basic .= "\tif (req.http.X-Forwarded-For && client.ip ~ SslOffloadServers){\n\t\t";
 						$vcl_recv_set_basic .= "set req.http.X-Forwarded-Varnish = req.http.X-Forwarded-For;\n\t}";
 						$vcl_recv_set_basic .= "else{\n\t\tset req.http.X-Forwarded-Varnish = client.ip;\n\n\t}";
@@ -577,9 +598,15 @@ $varnish_config_file = <<<EOF
 # This file is located in /var/etc/default.vcl
 
 sub vcl_error {
-		if (obj.status == 503 && req.restarts < {$vcl_restarts}) {
-			return(restart);
+	if (obj.status == 503 && req.restarts < {$vcl_restarts}) {
+		return(restart);
 		}
+
+	if (obj.status == 750) {
+		set obj.http.Location = obj.response;
+		set obj.status = 301;
+		return(deliver);
+	}
 
 	set obj.http.Content-Type = "text/html; charset=utf-8";
 	synthetic {"<?xml version="1.0" encoding="utf-8"?>
@@ -669,7 +696,7 @@ sub vcl_fini {
 
 EOF;
 		file_put_contents("/var/etc/default.vcl",$varnish_config_file,LOCK_EX);
-		$cc_file="/usr/local/bin/cc";
+		$cc_file=VARNISH_LOCALBASE."/bin/cc";
 		foreach (glob(VARNISH_LOCALBASE."/bin/gcc*") as $bin_file) {
 			$gcc_file=$bin_file;
 		}

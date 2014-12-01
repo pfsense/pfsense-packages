@@ -293,6 +293,7 @@
 		varnish_install();
 	</custom_php_install_command>
 	<custom_php_command_before_form>
+		varnish_check_config();
 	</custom_php_command_before_form>
 	<custom_delete_php_command>
 		sync_package_varnish();
