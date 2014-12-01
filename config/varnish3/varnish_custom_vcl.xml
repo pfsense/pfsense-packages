@@ -169,6 +169,9 @@
 			<encoding>base64</encoding>
 		</field>
 	</fields>
+	<custom_php_command_before_form>
+	varnish_check_config();
+	</custom_php_command_before_form>
 	<custom_php_validation_command>
 	</custom_php_validation_command>	
 	<custom_php_resync_config_command>

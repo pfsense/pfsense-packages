@@ -28,7 +28,7 @@
 */
 
 require("guiconfig.inc");
-
+require("varnish.inc");
 $pf_version=substr(trim(file_get_contents("/etc/version")),0,3);
 if ($pf_version < 2.0)
 	$one_two = true;
@@ -44,7 +44,7 @@ include("head.inc");
 <p class="pgtitle"><?=$pgtitle?></font></p>
 <?php endif; ?>
 
-<?php if ($savemsg) print_info_box($savemsg); ?>
+<?php varnish_check_config();if ($savemsg) print_info_box($savemsg); ?>
 
 <form action="varnishstat_view_config.php" method="post">
 
@@ -71,8 +71,9 @@ include("head.inc");
      						<td class="tabcont" >
 									<textarea id="varnishlogs" rows="50" cols="100%">
 <?php
-	$config_file = file_get_contents("/var/etc/default.vcl");
-	echo $config_file;
+	$config_file = file("/var/etc/default.vcl");
+	foreach ($config_file as $l => $v)
+		echo ($l+1)." - {$v}";
 ?>
 									</textarea>
 							</td>
