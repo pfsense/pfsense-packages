@@ -575,8 +575,8 @@
 		<configurationfile>varnish_backends.xml</configurationfile>
 		<depends_on_package_pbi>varnish-3.0.5_3-##ARCH##.pbi</depends_on_package_pbi>
 		<build_pbi>
-			<ports_before>lang/gcc</ports_before>
 			<port>www/varnish</port>
+			<ports_after>lang/gcc</ports_after>
 		</build_pbi>
 		<build_options>gcc_UNSET_FORCE=JAVA</build_options>
 	</package>
