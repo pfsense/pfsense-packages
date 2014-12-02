@@ -140,7 +140,8 @@ function varnish_check_config(){
 	if (!isset($config['installedpackages']['varnishsettings']['config'][0]['enablevarnish']))
 		return;
 
-	exec(VARNISH_LOCALBASE."/bin/varnishd -C -f ".VARNISH_CONFFILE." 2>&1",$output,$return);
+	$path = '/usr/bin/env PATH=' . VARNISH_LOCALBASE . '/bin:/usr/local/bin:/usr/local/sbin:/usr/bin:/usr/sbin:/bin:/sbin';
+	exec($path . " " . VARNISH_LOCALBASE."/bin/varnishd -C -f ".VARNISH_CONFFILE." 2>&1",$output,$return);
 	if ($return == 0){
 		if (isset($_REQUEST['apply'])){
 			varnish_start(true);
@@ -309,6 +310,7 @@ function create_varnish_rcd_file() {
 	}
 	$fd = fopen("/usr/local/etc/rc.d/varnish.sh", "w");
 	$conf_file=VARNISH_CONFFILE;
+	$bin_path=VARNISH_LOCALBASE . '/bin';
 	$rc_file = <<<EOF
 #!/bin/sh
 mkdir -p /var/varnish
@@ -319,8 +321,7 @@ sysctl kern.ipc.somaxconn=16384
 sysctl kern.maxfiles=131072
 sysctl kern.maxfilesperproc=104856
 sysctl kern.threads.max_threads_per_proc=4096
-/usr/bin/env \
-PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin \
+export PATH={$bin_path}:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 /usr/local/bin/php -q -d auto_prepend_file=config.inc <<ENDOFF
 <?php
 	require_once("globals.inc");
@@ -744,6 +745,8 @@ EOF;
 
 		$cc_file=VARNISH_LOCALBASE."/bin/cc";
 		foreach (glob(VARNISH_LOCALBASE."/bin/gcc*") as $bin_file) {
+			if (strpos($bin_file, '.pbiopt') != FALSE)
+				continue;
 			$gcc_file=$bin_file;
 		}
 		if (!file_exists($cc_file) && file_exists($gcc_file)){
