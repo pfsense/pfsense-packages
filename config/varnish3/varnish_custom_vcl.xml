@@ -176,7 +176,5 @@
 	</custom_php_validation_command>	
 	<custom_php_resync_config_command>
 		sync_package_varnish();
-		create_varnish_rcd_file();
-		varnish_start();
 	</custom_php_resync_config_command>
 </packagegui>

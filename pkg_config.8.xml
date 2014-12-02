@@ -728,7 +728,7 @@
 		<website>http://varnish-cache.org</website>
 		<pkginfolink>https://doc.pfsense.org/index.php/Varnish_package</pkginfolink>
 		<category>Services</category>
-		<version>3.0.4 pkg v.0.2.2</version>
+		<version>3.0.4 pkg v.0.2.3</version>
 		<status>RC</status>
 		<required_version>2.0</required_version>
 		<config_file>https://packages.pfsense.org/packages/config/varnish3/varnish_backends.xml</config_file>
