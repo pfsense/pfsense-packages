@@ -35,9 +35,8 @@
 	require_once("service-utils.inc");
 
 	/* IMSpector */
-
 	define('IMSPECTOR_RCFILE', '/usr/local/etc/rc.d/imspector.sh');
-	define('IMSPECTOR_ETC', '/usr/local/etc/imspector');
+	define('IMSPECTOR_ETC', "/usr/pbi/imspector-" . php_uname("m") . "/local/etc/imspector");
 	define('IMSPECTOR_CONFIG', IMSPECTOR_ETC . '/imspector.conf');
 
 	function imspector_warn ($msg) { syslog(LOG_WARNING, "imspector: {$msg}"); }
