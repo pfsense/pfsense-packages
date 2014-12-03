@@ -1580,24 +1580,6 @@
 		<configurationfile>mailreport.xml</configurationfile>
 	</package>
 	<package>
-		<name>zebedee</name>
-		<descr><![CDATA[Zebedee is a simple program to establish an encrypted, compressed "tunnel" for TCP/IP or UDP data transfer between two systems.<br />
-				This allows traffic such as telnet, ftp and X to be protected from snooping as well as potentially gaining performance over low-bandwidth networks from compression.]]>
-		</descr>
-		<category>Services</category>
-		<version>1.2.2</version>
-		<status>BETA</status>
-		<website>http://www.winton.org.uk/zebedee/</website>
-		<maintainer>jorgelustosa@gmail.com marcellocoutinho@gmail.com</maintainer>
-		<required_version>2.0</required_version>
-		<depends_on_package_base_url>https://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
-		<depends_on_package>zebedee-2.5.3.tbz</depends_on_package>
-		<depends_on_package_pbi>zebedee-2.5.3-amd64.pbi</depends_on_package_pbi>
-		<config_file>https://packages.pfsense.org/packages/config/zebedee/zebedee.xml</config_file>
-		<configurationfile>zebedee.xml</configurationfile>
-		<build_port_path>/usr/ports/security/zebedee</build_port_path>
-	</package>
-	<package>
 		<name>OpenVPN tap Bridging Fix</name>
 		<descr>Patch to fix OpenVPN tap bridging on 2.0.x. WARNING! Cannot be uninstalled.</descr>
 		<category>System</category>
