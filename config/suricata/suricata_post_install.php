@@ -120,7 +120,7 @@ if ($config['installedpackages']['suricata']['config'][0]['autogeoipupdate'] != 
 }
 
 // Download the latest ET IQRisk updates and create cron task if the feature is not disabled
-if ($config['installedpackages']['suricata']['config'][0]['et_iqrisk_enable'] != 'off') {
+if ($config['installedpackages']['suricata']['config'][0]['et_iqrisk_enable'] == 'on') {
 	log_error(gettext("[Suricata] Installing Emerging Threats IQRisk IP List..."));
 	include("/usr/local/pkg/suricata/suricata_etiqrisk_update.php");
 	install_cron_job("/usr/bin/nice -n20 /usr/local/bin/php -f /usr/local/pkg/suricata/suricata_etiqrisk_update.php", TRUE, 0, 0, "*", "*", "*", "root");
