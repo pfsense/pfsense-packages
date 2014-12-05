@@ -95,6 +95,8 @@ if (!defined("ET_DNLD_FILENAME"))
 	define("ET_DNLD_FILENAME", "emerging.rules.tar.gz");
 if (!defined("ETPRO_DNLD_FILENAME"))
 	define("ETPRO_DNLD_FILENAME", "etpro.rules.tar.gz");
+if (!defined("ET_IQRISK_DNLD_URL"))
+	define("ET_IQRISK_DNLD_URL", "https://rules.emergingthreatspro.com/_xxx_/reputation/");
 if (!defined("GPLV2_DNLD_FILENAME"))
 	define("GPLV2_DNLD_FILENAME", "community-rules.tar.gz");
 if (!defined("GPLV2_DNLD_URL"))

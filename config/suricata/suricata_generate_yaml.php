@@ -702,6 +702,32 @@ else
 
 /* Configure the IP REP section */
 $iprep_path = rtrim(SURICATA_IPREP_PATH, '/');
+$iprep_config = "# IP Reputation\n";
+if ($suricatacfg['enable_iprep'] == "on") {
+	$iprep_config .= "default-reputation-path: {$iprep_path}\n";
+	$iprep_config .= "reputation-categories-file: {$iprep_path}/{$suricatacfg['iprep_catlist']}\n";
+	$iprep_config .= "reputation-files:";
+
+	if (!is_array($suricatacfg['iplist_files']['item']))
+		$suricatacfg['iplist_files']['item'] = array();
+
+	foreach ($suricatacfg['iplist_files']['item'] as $f)
+		$iprep_config .= "\n  - $f";
+}
+
+/* Configure Host Table settings */
+if (!empty($suricatacfg['host_memcap']))
+	$host_memcap = $suricatacfg['host_memcap'];
+else
+	$host_memcap = "16777216";
+if (!empty($suricatacfg['host_hash_size']))
+	$host_hash_size = $suricatacfg['host_hash_size'];
+else
+	$host_hash_size = "4096";
+if (!empty($suricatacfg['host_prealloc']))
+	$host_prealloc = $suricatacfg['host_prealloc'];
+else
+	$host_prealloc = "1000";
 
 // Create the rules files and save in the interface directory
 suricata_prepare_rule_files($suricatacfg, $suricatacfgdir);

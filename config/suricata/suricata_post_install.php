@@ -119,6 +119,13 @@ if ($config['installedpackages']['suricata']['config'][0]['autogeoipupdate'] != 
 	install_cron_job("/usr/bin/nice -n20 /usr/local/bin/php -f /usr/local/pkg/suricata/suricata_geoipupdate.php", TRUE, 0, 0, 8, "*", "*", "root");
 }
 
+// Download the latest ET IQRisk updates and create cron task if the feature is not disabled
+if ($config['installedpackages']['suricata']['config'][0]['et_iqrisk_enable'] != 'off') {
+	log_error(gettext("[Suricata] Installing Emerging Threats IQRisk IP List..."));
+	include("/usr/local/pkg/suricata/suricata_etiqrisk_update.php");
+	install_cron_job("/usr/bin/nice -n20 /usr/local/bin/php -f /usr/local/pkg/suricata/suricata_etiqrisk_update.php", TRUE, 0, 0, "*", "*", "*", "root");
+}
+
 // remake saved settings if previously flagged
 if ($config['installedpackages']['suricata']['config'][0]['forcekeepsettings'] == 'on') {
 	log_error(gettext("[Suricata] Saved settings detected... rebuilding installation with saved settings..."));
@@ -247,8 +254,8 @@ if (empty($config['installedpackages']['suricata']['config'][0]['forcekeepsettin
 conf_mount_ro();
 
 // Update Suricata package version in configuration
-$config['installedpackages']['suricata']['config'][0]['suricata_config_ver'] = "2.0.3";
-write_config("Suricata pkg v2.0.3: post-install configuration saved.");
+$config['installedpackages']['suricata']['config'][0]['suricata_config_ver'] = "2.1";
+write_config("Suricata pkg v2.1: post-install configuration saved.");
 
 // Done with post-install, so clear flag
 unset($g['suricata_postinstall']);

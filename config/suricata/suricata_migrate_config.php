@@ -86,6 +86,14 @@ if (empty($config['installedpackages']['suricata']['config'][0]['autogeoipupdate
 	$updated_cfg = true;
 }
 
+/**********************************************************/
+/* Create new ET IQRisk IP Reputation setting if not set  */
+/**********************************************************/
+if (empty($config['installedpackages']['suricata']['config'][0]['et_iqrisk_enable'])) {
+	$config['installedpackages']['suricata']['config'][0]['et_iqrisk_enable'] = "off";
+	$updated_cfg = true;
+}
+
 // Now process the interface-specific settings
 foreach ($rule as &$r) {
 
@@ -341,6 +349,26 @@ foreach ($rule as &$r) {
 	}
 	if (empty($pconfig['msn_parser'])) {
 		$pconfig['msn_parser'] = "detection-only";
+		$updated_cfg = true;
+	}
+
+	/**********************************************************/
+	/* Create interface IP Reputation settings if not set     */
+	/**********************************************************/
+	if (empty($pconfig['enable_iprep'])) {
+		$pconfig['enable_iprep'] = "off";
+		$updated_cfg = true;
+	}
+	if (empty($pconfig['host_memcap'])) {
+		$pconfig['host_memcap'] = "16777216";
+		$updated_cfg = true;
+	}
+	if (empty($pconfig['host_hash_size'])) {
+		$pconfig['host_hash_size'] = "4096";
+		$updated_cfg = true;
+	}
+	if (empty($pconfig['host_prealloc'])) {
+		$pconfig['host_prealloc'] = "1000";
 		$updated_cfg = true;
 	}
 

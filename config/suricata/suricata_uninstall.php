@@ -78,6 +78,7 @@ install_cron_job("suricata_check_for_rule_updates.php", false);
 install_cron_job("suricata_check_cron_misc.inc", false);
 install_cron_job("{$suri_pf_table}" , false);
 install_cron_job("suricata_geoipupdate.php" , false);
+install_cron_job("suricata_etiqrisk_update.php", false);
 
 /* See if we are to keep Suricata log files on uninstall */
 if ($config['installedpackages']['suricata']['config'][0]['clearlogs'] == 'on') {
