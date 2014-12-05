@@ -64,7 +64,7 @@ if (!defined('SURICATA_PBI_BASEDIR'))
 
 // Define the PBI binary wrapper directory
 if (!defined('SURICATA_PBI_BINDIR'))
-	define('SURICATA_PBI_BINDIR', '/usr/pbi/suricata-' . php_uname("m") . '/bin/');
+	define('SURICATA_PBI_BINDIR', SURICATA_PBI_BASEDIR . 'bin/');
 
 // Define the name of the pf table used for IP blocks
 if (!defined('SURICATA_PF_TABLE'))
@@ -72,7 +72,7 @@ if (!defined('SURICATA_PF_TABLE'))
 
 // Create some other useful defines
 if (!defined('SURICATADIR'))
-	define('SURICATADIR', '/usr/pbi/suricata-' . php_uname("m") . '/etc/suricata/');
+	define('SURICATADIR', SURICATA_PBI_BASEDIR . 'etc/suricata/');
 if (!defined('SURICATALOGDIR'))
 	define('SURICATALOGDIR', "{$g['varlog_path']}/suricata/");
 if (!defined('SURICATA_RULES_UPD_LOGFILE'))
