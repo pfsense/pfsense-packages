@@ -36,12 +36,16 @@ $priv_list['page-services-suricata']['match'][] = "suricata/suricata_rules_flowb
 $priv_list['page-services-suricata']['match'][] = "suricata/suricata_rulesets.php*";
 $priv_list['page-services-suricata']['match'][] = "suricata/suricata_os_policy_engine.php*";
 $priv_list['page-services-suricata']['match'][] = "suricata/suricata_global.php*";
+$priv_list['page-services-suricata']['match'][] = "suricata/suricata_ip_list_mgmt.php*";
+$priv_list['page-services-suricata']['match'][] = "suricata/suricata_ip_reputation.php*";
+$priv_list['page-services-suricata']['match'][] = "suricata/suricata_iprep_list_browser.php*";
 $priv_list['page-services-suricata']['match'][] = "pkg_edit.php?xml=suricata/suricata.xml*";
 $priv_list['page-services-suricata']['match'][] = "suricata/suricata_check_cron_misc.inc*";
 $priv_list['page-services-suricata']['match'][] = "suricata/suricata_yaml_template.inc*";
 $priv_list['page-services-suricata']['match'][] = "suricata/suricata.inc*";
 $priv_list['page-services-suricata']['match'][] = "suricata/suricata_defs.inc*";
 $priv_list['page-services-suricata']['match'][] = "suricata/suricata_geoipupdate.php*";
+$priv_list['page-services-suricata']['match'][] = "suricata/suricata_etiqrisk_update.php*";
 $priv_list['page-services-suricata']['match'][] = "suricata/suricata_post_install.php*";
 $priv_list['page-services-suricata']['match'][] = "suricata/suricata_uninstall.php*";
 $priv_list['page-services-suricata']['match'][] = "suricata/suricata_generate_yaml.php*";
