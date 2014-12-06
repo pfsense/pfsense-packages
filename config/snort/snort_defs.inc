@@ -37,9 +37,9 @@ global $g, $config;
 if (!defined("SNORT_PBI_BASEDIR"))
 	define("SNORT_PBI_BASEDIR", "/usr/pbi/snort-" . php_uname("m") . "/");
 if (!defined("SNORT_PBI_BINDIR"))
-	define("SNORT_PBI_BINDIR", "/usr/pbi/snort-" . php_uname("m") . "/bin/");
+	define("SNORT_PBI_BINDIR", SNORT_PBI_BASEDIR . "bin/");
 if (!defined("SNORTDIR"))
-	define("SNORTDIR", "/usr/pbi/snort-" . php_uname("m") . "/etc/snort");
+	define("SNORTDIR", SNORT_PBI_BASEDIR . "etc/snort");
 if (!defined("SNORTLOGDIR"))
 	define("SNORTLOGDIR", "{$g['varlog_path']}/snort");
 if (!defined("SNORT_BIN_VERSION")) {
