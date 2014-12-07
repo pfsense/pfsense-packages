@@ -18,11 +18,10 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #
-# The GeoLite databases by MaxMind Inc., are distributed under the Creative Commons 
+# The GeoLite databases by MaxMind Inc., are distributed under the Creative Commons
 # Attribution-ShareAlike 3.0 Unported License. The attribution requirement
 # may be met by including the following in all advertising and documentation
 # mentioning features of or use of this database.
-
 
 # Folder Locations
 pathfetch=/usr/bin/fetch
@@ -46,33 +45,18 @@ pathgeoipcsvfinal6=$pathdb/GeoIPv6.csv
 if [ ! -d $pathdb ]; then mkdir $pathdb; fi
 if [ ! -d $pathlog ]; then mkdir $pathlog; fi
 
-# Collect pfSense Version
-pfs_version="$(cut -c1-3 /etc/version)"
 now=$(date)
 echo; echo "$now - Updating pfBlockerNG - Country Database Files"
-echo "pfBlockerNG uses GeoLite data created by MaxMind, available from http://www.maxmind.com"
-echo "pfSense version: $pfs_version"; echo
+echo "pfBlockerNG uses GeoLite data created by MaxMind, available from http://www.maxmind.com"; echo
 
-
-##########
 #Function to update MaxMind GeoIP Binary (For Reputation Process)
 binaryupdate() {
 
+# Download Part 1 - GeoLite IPv4 Binary Database
+
 echo " ** Downloading MaxMind GeoLite IPv4 Binary Database (For Reputation/Alerts Processes) **"; echo
 URL="http://geolite.maxmind.com/download/geoip/database/GeoLiteCountry/GeoIP.dat.gz"
-
-case $pfs_version in
-	1.0|2.0|2.1)
-		$pathfetch -v -o $pathgeoipdatgz -T 20 $URL
-		;;
-	2.2)
-		$pathfetch -v --no-verify-peer -o $pathgeoipdatgz -T 20 $URL
-		;;
-	*)
-		$pathfetch -v --no-verify-peer -o $pathgeoipdatgz -T 20 $URL
-		;;
-esac
-
+$pathfetch -v -o $pathgeoipdatgz -T 20 $URL
 if [ "$?" -eq "0" ]; then
 	$pathgunzip -f $pathgeoipdatgz
 	echo; echo " ( MaxMind IPv4 GeoIP.dat has been updated )"; echo
@@ -81,27 +65,14 @@ if [ "$?" -eq "0" ]; then
 	echo
 else
 	echo; echo " => MaxMind IPv4 GeoIP.dat Update [ FAILED ]"; echo
-	echo "MaxMind IPV4 Binary Update FAIL [ $now ]" >> $errorlog 
+	echo "MaxMind IPV4 Binary Update FAIL [ $now ]" >> $errorlog
 fi
 
-
-#####
+# Download Part 2 - GeoLite IPv6 Binary Database
 
 echo; echo " ** Downloading MaxMind GeoLite IPv6 Binary Database (For Reputation/Alerts Processes) **"; echo
 URL="http://geolite.maxmind.com/download/geoip/database/GeoIPv6.dat.gz"
-
-case $pfs_version in
-	1.0|2.0|2.1)
-		$pathfetch -v -o $pathgeoipdatgzv6 -T 20 $URL
-		;;
-	2.2)
-		$pathfetch -v --no-verify-peer -o $pathgeoipdatgzv6 -T 20 $URL
-		;;
-	*)
-		$pathfetch -v --no-verify-peer -o $pathgeoipdatgzv6 -T 20 $URL
-		;;
-esac
-
+$pathfetch -v -o $pathgeoipdatgzv6 -T 20 $URL
 if [ "$?" -eq "0" ]; then
 	$pathgunzip -f $pathgeoipdatgzv6
 	echo; echo " ( MaxMind IPv6 GeoIPv6.dat has been updated )"; echo
@@ -112,11 +83,9 @@ else
 	echo; echo " => MaxMind IPv6 GeoIPv6.dat Update [ FAILED ]"; echo
 	echo "MaxMind IPv6 Binary Update FAIL [ $now ]" >> $errorlog
 fi
-
 }
 
 
-##########
 #Function to update MaxMind Country Code Files
 csvupdate() {
 
@@ -124,18 +93,7 @@ csvupdate() {
 
 echo; echo " ** Downloading MaxMind GeoLite IPv4 CSV Database **"; echo
 URL="http://geolite.maxmind.com/download/geoip/database/GeoIPCountryCSV.zip"
-case $pfs_version in
-	1.0|2.0|2.1)
-		$pathfetch -v -o $pathgeoipcsv4 -T 20 $URL
-		;;
-	2.2)
-		$pathfetch -v --no-verify-peer -o $pathgeoipcsv4 -T 20 $URL
-		;;
-	*)
-		$pathfetch -v --no-verify-peer -o $pathgeoipcsv4 -T 20 $URL
-		;;
-esac
-
+$pathfetch -v -o $pathgeoipcsv4 -T 20 $URL
 if [ "$?" -eq "0" ]; then
 	$pathtar -zxvf $pathgeoipcsv4 -C $pathdb
 	if [ "$?" -eq "0" ]; then
@@ -152,23 +110,11 @@ else
 	echo "MaxMind CSV Database Update FAIL [ $now ]" >> $errorlog
 fi
 
-
 # Download Part 2 - Country Definitions
 
 echo; echo " ** Downloading MaxMind GeoLite Database Country Definition File **"; echo
 URL="http://dev.maxmind.com/static/csv/codes/country_continent.csv"
-case $pfs_version in
-	1.0|2.0|2.1)
-		$pathfetch -v -o $pathgeoipcc -T 20 $URL
-		;;
-	2.2)
-		$pathfetch -v --no-verify-peer -o $pathgeoipcc -T 20 $URL
-		;;
-	*)
-		$pathfetch -v --no-verify-peer -o $pathgeoipcc -T 20 $URL
-		;;
-esac
-
+$pathfetch -v -o $pathgeoipcc -T 20 $URL
 if [ "$?" -eq "0" ]; then
 	echo; echo " ( MaxMind ISO 3166 Country Codes has been updated. )"; echo
 	echo "Current Date/Timestamp:"
@@ -183,20 +129,9 @@ fi
 
 echo " ** Downloading MaxMind GeoLite IPv6 CSV Database **"; echo
 URL="http://geolite.maxmind.com/download/geoip/database/GeoIPv6.csv.gz"
-case $pfs_version in
-	1.0|2.0|2.1)
-		$pathfetch -v -o $pathgeoipcsv6 -T 20 $URL
-		;;
-	2.2)
-		$pathfetch -v --no-verify-peer -o $pathgeoipcsv6 -T 20 $URL
-		;;
-	*)
-		$pathfetch -v --no-verify-peer -o $pathgeoipcsv6 -T 20 $URL
-		;;
-esac
-
+$pathfetch -v -o $pathgeoipcsv6 -T 20 $URL
 if [ "$?" -eq "0" ]; then
-	$pathgunzip -f $pathgeoipcsv6 
+	$pathgunzip -f $pathgeoipcsv6
 	echo; echo " ( MaxMind GeoIPv6.csv has been updated )"; echo
 	echo "Current Date/Timestamp:"
 	/bin/ls -alh $pathgeoipcsvfinal6
@@ -205,12 +140,10 @@ else
 	echo; echo " => MaxMind GeoLite IPv6 Update [ FAILED ]"; echo
 	echo "MaxMind GeoLite IPv6 Update FAIL [ $now ]" >> $errorlog
 fi
-
 }
 
-##########
-# CALL APPROPRIATE PROCESSES using Script Argument $1
 
+# CALL APPROPRIATE PROCESSES using Script Argument $1
 case $1 in
 	bu)
 		binaryupdate
