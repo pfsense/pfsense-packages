@@ -283,10 +283,13 @@
 			<encoding>base64</encoding>
 		</field>
 	</fields>
+	<custom_php_command_before_form>
+	varnish_check_config();
+	</custom_php_command_before_form>
+	
 	<custom_php_resync_config_command>
 		sync_package_varnish();
 		create_varnish_rcd_file();
-		varnish_start();
 	</custom_php_resync_config_command>
 	<custom_php_validation_command>
 		varnish_settings_post_validate($_POST, $input_errors);

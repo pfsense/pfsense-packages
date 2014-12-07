@@ -1,8 +1,9 @@
 <?php
 /*
-	varnishstat_view_logs.php
+	varnishstat.php
 	part of pfSense (https://www.pfsense.org/)
 	Copyright (C) 2006 Scott Ullrich <sullrich@gmail.com>
+	Copyright (C) 2014 Marcello Coutinho
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
@@ -28,11 +29,45 @@
 */
 
 require("guiconfig.inc");
-
+require("varnish.inc");
+function open_table(){
+	echo "<table style=\"padding-top:0px; padding-bottom:0px; padding-left:0px; padding-right:0px\" width=\"100%\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\">";
+	echo"  <tr>";
+}
+function close_table(){
+	echo"  </tr>";
+	echo"</table>";
+	echo "<br>";
+}
 if($_REQUEST['getactivity']) {
-	$varnishstatlogs = `varnishstat -1`;
+	//$varnishstatlogs = `varnishstat -1`;
+	$backends=exec("varnishstat -1",$debug);
 	echo "<h2>VarnishSTAT Server logs as of " . date("D M j G:i:s T Y")  . "</h2>";
-	echo $varnishstatlogs;
+	open_table();
+	print "<td class=\"vncellt\" width=30%><strong>Description</strong></td>";
+	print "<td class=\"vncellt\" width=15%><strong>Count</strong></td>";
+	print "<td class=\"vncellt\" width=15%><strong></strong></td>";
+	print "<td width=20%></td><td width=20%></td></tr>";
+	foreach ($debug as $line){
+		if (!preg_match("/^VBE/",$line,$lm) &&
+        	preg_match("/(\S+)\s+(\S+)\s+(\S+)\s+(.*)/",$line,$lm))
+           $varnish_stats[]=$lm;
+	}
+	unset($debug);
+	if (is_array($varnish_stats)){
+		foreach ($varnish_stats as $v){
+   	      print "<td class=\"listlr\"> $v[4] ($v[1])</td>";
+   	      print "<td class=\"listlr\" align=\"Right\">". @number_format($v[2]) ."</td>";
+          print "<td class=\"listlr\" align=\"Right\">$v[3]</td>";
+          print "<td>&nbsp;</td><td>&nbsp;</td></tr>";
+		}
+	}
+	else{
+		print "<td class=\"listlr\">No traffic</td><td class=\"listlr\"></td><td class=\"listlr\"></td></tr>";
+	}
+
+close_table();
+	//echo $varnishstatlogs;
 	exit;
 }
 
@@ -70,7 +105,7 @@ include("head.inc");
 <p class="pgtitle"><?=$pgtitle?></font></p>
 <?php endif; ?>
 
-<?php if ($savemsg) print_info_box($savemsg); ?>
+<?php varnish_check_config();if ($savemsg) print_info_box($savemsg); ?>
 
 <div id="mainlevel">
 	<table width="100%" border="0" cellpadding="0" cellspacing="0">
@@ -93,7 +128,7 @@ include("head.inc");
 					<table class="tabcont" width="100%" border="0" cellpadding="0" cellspacing="0">
 						<tr>
      						<td class="tabcont" >
-      							<form action="varnishstat_view_logs.php" method="post">
+      							<form action="varnishstat.php" method="post">
 								<div id="varnishstatlogs">
 									<pre>One moment please, loading VarnishSTAT...</pre>
 								</div>

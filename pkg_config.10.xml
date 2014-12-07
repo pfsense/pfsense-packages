@@ -569,15 +569,15 @@
 		<website>http://varnish-cache.org</website>
 		<pkginfolink>https://doc.pfsense.org/index.php/Varnish_package</pkginfolink>
 		<category>Services</category>
-		<version>3.0.5_3 pkg v.0.2.1</version>
+		<version>3.0.5_3 pkg v.0.2.4</version>
 		<status>RC</status>
 		<required_version>2.2</required_version>
 		<config_file>https://packages.pfsense.org/packages/config/varnish3/varnish_backends.xml</config_file>
 		<configurationfile>varnish_backends.xml</configurationfile>
 		<depends_on_package_pbi>varnish-3.0.5_3-##ARCH##.pbi</depends_on_package_pbi>
 		<build_pbi>
-			<ports_before>lang/gcc</ports_before>
 			<port>www/varnish</port>
+			<ports_after>lang/gcc</ports_after>
 		</build_pbi>
 		<build_options>gcc_UNSET_FORCE=JAVA</build_options>
 	</package>
@@ -598,22 +598,6 @@
 		<config_file>https://packages.pfsense.org/packages/config/vnstat2/vnstat2.xml</config_file>
 		<configurationfile>vnstat2.xml</configurationfile>
 		<after_install_info></after_install_info>
-	</package>
-	<package>
-		<name>phpSysInfo</name>
-		<website>http://phpsysinfo.sourceforge.net/</website>
-		<descr>PHPSysInfo is a customizable PHP Script that parses /proc, and formats information nicely. It will display information about system facts like Uptime, CPU, Memory, PCI devices, SCSI devices, IDE devices, Network adapters, Disk usage, and more.</descr>
-		<category>System</category>
-		<version>2.5.4</version>
-		<status>Beta</status>
-		<required_version>2.2</required_version>
-		<depends_on_package_pbi>mbmon-205_6-##ARCH##.pbi</depends_on_package_pbi>
-		<build_pbi>
-			<port>sysutils/mbmon</port>
-		</build_pbi>
-		<config_file>https://packages.pfsense.org/packages/config/phpsysinfo/phpsysinfo.xml</config_file>
-		<configurationfile>phpsysinfo.xml</configurationfile>
-		<noembedded>true</noembedded>
 	</package>
 	<package>
 		<name>dns-server</name>
@@ -1081,7 +1065,7 @@
 		<depends_on_package_pbi>zip-3.0_1-##ARCH##.pbi p7zip-9.20.1_2-##ARCH##.pbi</depends_on_package_pbi>
 		<build_port_path>/usr/ports/archivers/p7zip</build_port_path>
 		<build_port_path>/usr/ports/archivers/zip</build_port_path>
-		<version>1.2.14</version>
+		<version>1.2.15</version>
 		<status>RELEASE</status>
 		<required_version>2.2</required_version>
 		<config_file>https://packages.pfsense.org/packages/config/openvpn-client-export/openvpn-client-export.xml</config_file>
@@ -1237,31 +1221,13 @@
 		<configurationfile>mailreport.xml</configurationfile>
 	</package>
 	<package>
-		<name>zebedee</name>
-		<descr><![CDATA[Zebedee is a simple program to establish an encrypted, compressed "tunnel" for TCP/IP or UDP data transfer between two systems.<br />
-				This allows traffic such as telnet, ftp and X to be protected from snooping as well as potentially gaining performance over low-bandwidth networks from compression.]]>
-		</descr>
-		<category>Services</category>
-		<version>1.2.2</version>
-		<status>BETA</status>
-		<website>http://www.winton.org.uk/zebedee/</website>
-		<maintainer>jorgelustosa@gmail.com marcellocoutinho@gmail.com</maintainer>
-		<required_version>2.2</required_version>
-		<depends_on_package_pbi>zebedee-2.5.3-##ARCH##.pbi</depends_on_package_pbi>
-		<config_file>https://packages.pfsense.org/packages/config/zebedee/zebedee.xml</config_file>
-		<configurationfile>zebedee.xml</configurationfile>
-		<build_pbi>
-			<port>security/zebedee</port>
-		</build_pbi>
-	</package>
-	<package>
 		<name>Quagga OSPF</name>
 		<descr>OSPF routing protocol using Quagga -- WARNING! Installs files to the same place as OpenBGPD. Installing both will break things.</descr>
 		<maintainer>jimp@pfsense.org</maintainer>
 		<version>0.99.22.3.1_2 v0.6.2</version>
 		<category>Routing</category>
 		<status>BETA</status>
-		<depends_on_package_pbi>quagga-0.99.22.3.1_2-##ARCH##.pbi</depends_on_package_pbi>
+		<depends_on_package_pbi>quagga-0.99.23.1_2-##ARCH##.pbi</depends_on_package_pbi>
 		<config_file>https://packages.pfsense.org/packages/config/quagga_ospfd/quagga_ospfd.xml</config_file>
 		<build_pbi>
 			<port>net/quagga</port>
