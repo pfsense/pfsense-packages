@@ -113,7 +113,6 @@ if (empty($config['installedpackages']['snortglobal']['verbose_logging'])) {
 /**********************************************************/
 if (empty($config['installedpackages']['snortglobal']['openappid_detectors'])) {
 	$config['installedpackages']['snortglobal']['openappid_detectors'] = "off";
-	$config['installedpackages']['snortglobal']['openappid_dnload_url'] = "https://www.snort.org/downloads/openappid/877";
 	$updated_cfg = true;
 }
 

@@ -117,9 +117,7 @@ $snort_community_rules_url = GPLV2_DNLD_URL;
 /* Snort OpenAppID detectors filename and URL */
 $snort_openappid_filename = SNORT_OPENAPPID_DNLD_FILENAME;
 $snort_openappid_filename_md5 = SNORT_OPENAPPID_DNLD_FILENAME . ".md5";
-$snort_openappid_url = $config['installedpackages']['snortglobal']['openappid_dnload_url'];
-if (empty($config['installedpackages']['snortglobal']['openappid_dnload_url']))
-	$openappid_detectors == "off";
+$snort_openappid_url = SNORT_OPENAPPID_DNLD_URL;
 
 function snort_download_file_url($url, $file_out) {
 
@@ -429,12 +427,11 @@ if ($snortdownload == 'on') {
 
 /*  Check for and download any new Snort OpenAppID detectors */
 if ($openappid_detectors == 'on') {
-	$snort_openappid_baseurl = substr($snort_openappid_url, 0, strpos($snort_openappid_url, basename($snort_openappid_url)));
-	if (snort_check_rule_md5("{$snort_openappid_baseurl}{$snort_openappid_filename}/md5", "{$tmpfname}/{$snort_openappid_filename_md5}", "Snort OpenAppID detectors")) {
+	if (snort_check_rule_md5("{$snort_openappid_url}{$snort_openappid_filename}/md5", "{$tmpfname}/{$snort_openappid_filename_md5}", "Snort OpenAppID detectors")) {
 		$file_md5 = trim(file_get_contents("{$tmpfname}/{$snort_openappid_filename_md5}"));
 		file_put_contents("{$tmpfname}/{$snort_openappid_filename_md5}", $file_md5);
 		/* download snort-openappid file */
-		if (!snort_fetch_new_rules("{$snort_openappid_url}", "{$tmpfname}/{$snort_openappid_filename}", $file_md5, "Snort OpenAppID detectors"))
+		if (!snort_fetch_new_rules("{$snort_openappid_url}{$snort_openappid_filename}", "{$tmpfname}/{$snort_openappid_filename}", $file_md5, "Snort OpenAppID detectors"))
 			$openappid_detectors = 'off';
 	}
 	else

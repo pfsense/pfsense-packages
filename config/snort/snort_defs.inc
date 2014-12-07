@@ -81,10 +81,12 @@ if (!defined("SNORT_ETPRO_DNLD_FILENAME"))
 	define("SNORT_ETPRO_DNLD_FILENAME", "etpro.rules.tar.gz");
 if (!defined("SNORT_GPLV2_DNLD_FILENAME"))
 	define("SNORT_GPLV2_DNLD_FILENAME", "community-rules.tar.gz");
-if (!defined("SNORT_OPENAPPID_DNLD_FILENAME"))
-	define("SNORT_OPENAPPID_DNLD_FILENAME", "snort-openappid.tar.gz");
 if (!defined("GPLV2_DNLD_URL"))
 	define("GPLV2_DNLD_URL", "https://www.snort.org/downloads/community/");
+if (!defined("SNORT_OPENAPPID_DNLD_URL"))
+	define("SNORT_OPENAPPID_DNLD_URL", "https://www.snort.org/downloads/openappid/");
+if (!defined("SNORT_OPENAPPID_DNLD_FILENAME"))
+	define("SNORT_OPENAPPID_DNLD_FILENAME", "snort-openappid.tar.gz");
 if (!defined("SNORT_RULES_UPD_LOGFILE"))
 	define("SNORT_RULES_UPD_LOGFILE", SNORTLOGDIR . "/snort_rules_update.log");
 if (!defined("VRT_FILE_PREFIX"))

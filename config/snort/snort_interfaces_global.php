@@ -60,7 +60,6 @@ else {
 	$pconfig['clearblocks'] = $config['installedpackages']['snortglobal']['clearblocks'] == "on" ? 'on' : 'off';
 	$pconfig['verbose_logging'] = $config['installedpackages']['snortglobal']['verbose_logging'] == "on" ? 'on' : 'off';
 	$pconfig['openappid_detectors'] = $config['installedpackages']['snortglobal']['openappid_detectors'] == "on" ? 'on' : 'off';
-	$pconfig['openappid_dnload_url'] = $config['installedpackages']['snortglobal']['openappid_dnload_url'];
 }
 
 /* Set sensible values for any empty default params */
@@ -142,7 +141,6 @@ if (!$input_errors) {
 
 		$config['installedpackages']['snortglobal']['oinkmastercode'] = $_POST['oinkmastercode'];
 		$config['installedpackages']['snortglobal']['etpro_code'] = $_POST['etpro_code'];
-		$config['installedpackages']['snortglobal']['openappid_dnload_url'] = $_POST['openappid_dnload_url'];
 
 		$config['installedpackages']['snortglobal']['rm_blocked'] = $_POST['rm_blocked'];
 		$config['installedpackages']['snortglobal']['autorulesupdate7'] = $_POST['autorulesupdate7'];
@@ -161,12 +159,12 @@ if (!$input_errors) {
 
 		$retval = 0;
 
+		write_config("Snort pkg: modified global settings.");
+
 		/* create whitelist and homenet file, then sync files */
 		conf_mount_rw();
 		sync_snort_package_config();
 		conf_mount_ro();
-
-		write_config("Snort pkg: modified global settings.");
 
 		/* forces page to reload new settings */
 		header( 'Expires: Sat, 26 Jul 1997 05:00:00 GMT' );
@@ -326,15 +324,9 @@ if ($input_errors)
 				gettext("preprocessor and any user-provided application detection rules.  Once enabled, go to the ") . 
 				"<a href='/snort/snort_download_updates.php'>" . gettext("UPDATES") . "</a>" . gettext(" tab and click to download updates.");?></td>
 			</tr>
-			<tbody id="openappid_url_rows">
+			<tbody id="openappid_rows">
 			<tr>
 				<td class="vexpl" colspan="2"><br/><strong><?=gettext("OpenAppID Detection Package");?></strong></td>
-			</tr>
-			<tr>
-				<td class="vexpl" valign="top"><strong><?=gettext("URL:");?></strong></td>
-				<td><input name="openappid_dnload_url" type="text" class="formfld url" id="openappid_dnload_url" size="52" 
-				value="<?=htmlspecialchars($pconfig['openappid_dnload_url']);?>" /><br/>
-				<?php echo gettext("Paste the URL for the latest ") . "<a href='https://www.snort.org/downloads'>" . gettext("OpenAppID package download") . "</a>" . gettext(" here.");?></td>
 			</tr>
 			<tr>
 				<td class="vexpl" valign="top"><strong><?=gettext("VER:");?></strong></td>
@@ -469,9 +461,9 @@ function enable_change_rules_upd() {
 function enable_openappid_dnload() {
 	var endis = document.iform.openappid_detectors.checked;
 	if (endis)
-		document.getElementById("openappid_url_rows").style.display = "";
+		document.getElementById("openappid_rows").style.display = "";
 	else
-		document.getElementById("openappid_url_rows").style.display = "none";
+		document.getElementById("openappid_rows").style.display = "none";
 }
 
 // Initialize the form controls state based on saved settings
