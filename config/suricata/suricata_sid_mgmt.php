@@ -588,6 +588,8 @@ if ($savemsg) {
 
 
 <?php include("fend.inc"); ?>
+
+<?php if ($g['platform'] != "nanobsd") : ?>
 <script type="text/javascript">
 
 function enable_sid_conf() {
@@ -603,5 +605,7 @@ function enable_sid_conf() {
 enable_sid_conf();
 
 </script>
+<?php endif; ?>
+
 </body>
 </html>
