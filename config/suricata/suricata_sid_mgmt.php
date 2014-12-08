@@ -298,6 +298,11 @@ if ($savemsg) {
 		<div id="mainarea">
 		<table id="maintable" class="tabcont" width="100%" border="0" cellpadding="6" cellspacing="0">
 			<tbody>
+		<?php if ($g['platform'] == "nanobsd") : ?>
+			<tr>
+				<td colspan="2" class="listtopic"><?php echo gettext("SID auto-management is not supported on NanoBSD installs"); ?></td>
+			</tr>
+		<?php else: ?>
 			<tr>
 				<td colspan="2" valign="top" class="listtopic"><?php echo gettext("General Settings"); ?></td>
 			</tr>
@@ -572,6 +577,7 @@ if ($savemsg) {
 				&nbsp;&nbsp;<?=gettext("Remember to save changes before exiting this page"); ?>
 				</td>
 			</tr>
+		<?php endif; ?>
 			</tbody>
 		</table>
 		</div>
