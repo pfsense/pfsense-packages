@@ -393,7 +393,7 @@
 		</field>
 		<field>
 			<name><![CDATA[<ul>Click to SAVE Settings and/or Rule Edits. &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Changes are Applied via CRON or
-				'Manual Update'</ul>]]></name>
+				'Force Update'</ul>]]></name>
 			<type>listtopic</type>
 		</field>
 	</fields>

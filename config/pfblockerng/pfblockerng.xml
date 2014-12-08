@@ -379,16 +379,6 @@
 			<description>Keep Settings and Lists intact when pfBlockerNG is Disabled or After pfBlockerNG Re-Install/De-Install</description>
 		</field>
 		<field>
-			<fielddescr>Reload Existing Lists</fielddescr>
-			<fieldname>pfb_reuse</fieldname>
-			<type>checkbox</type>
-			<description><![CDATA[Advanced Option: A <strong>'ONE-TIME'</strong> Reload of Existing Blocklists without Downloading New Lists.<br>
-				This is useful if the Lists become out of 'sync' or Reputation changes were made.<br><br>
-				<strong>When Lists are removed, Reputation changes or Countries Enabled/Disabled, a 'Reload' should be executed.</strong><br><br>
-				After 'Enabling' this option, Hit 'SAVE' and <strong>perform a 'Manual Update' </strong>or wait for the Next CRON Job.]]>
-			</description>
-		</field>
-		<field>
 			<fielddescr>Global Enable Logging</fielddescr>
 			<fieldname>enable_log</fieldname>
 			<type>checkbox</type>
@@ -530,7 +520,7 @@
 		</field>
 		<field>
 			<name><![CDATA[<ul>Click to SAVE Settings and/or Rule Edits. &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Changes are Applied via CRON or
-			'Manual Update'</ul>]]></name>
+			'Force Update'</ul>]]></name>
 			<type>listtopic</type>
 		</field>
 	</fields>
