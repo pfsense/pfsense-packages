@@ -63,7 +63,7 @@ if (empty($et_header))
 	$pfb['et_header'] = FALSE;
 
 // Collect pfBlockerNGSuppress Alias and Create pfbsuppression.txt
-if ($pfb['supp'] == "on") 
+if ($pfb['supp'] == "on")
 	pfb_create_suppression_file();
 
 // Collect Number of Suppressed Hosts
@@ -294,7 +294,7 @@ $pgtitle = gettext("pfBlockerNG: Alerts");
 include_once("head.inc");
 ?>
 <body link="#000000" vlink="#0000CC" alink="#000000">
-<form action="/pfblockerng/pfblockerng_alerts.php" method="post">
+<form action="<?php echo $_SERVER['PHP_SELF']; ?>" method="post">
 <input type="hidden" name="ip" id="ip" value=""/>
 <input type="hidden" name="table" id="table" value=""/>
 <input type="hidden" name="descr" id="descr" value=""/>
@@ -305,7 +305,7 @@ include_once("fbegin.inc");
 
 /* refresh every 60 secs */
 if ($alertrefresh == 'on')
-	echo "<meta http-equiv=\"refresh\" content=\"60;url=\"" . $_SERVER['PHP_SELF'] . "\" />\n";
+	echo "<meta http-equiv=\"refresh\" content=\"60;url={$_SERVER['PHP_SELF']}\" />\n";
 if ($savemsg) {
 	print_info_box($savemsg);
 }
@@ -336,7 +336,7 @@ if ($savemsg) {
 		</td>
 	</tr>
 	<tr>
-		<td><div id="mainarea">
+	<td><div id="mainarea">
 		<table id="maintable" class="tabcont" width="100%" border="0" cellspacing="0" cellpadding="6">
 			<tr>
 				<td colspan="3" class="vncell" align="left"><?php echo gettext("LINKS :"); ?> &nbsp;
@@ -364,10 +364,9 @@ if ($savemsg) {
 				<?php printf(gettext('Enter number of log entries to view.')); ?>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 				<?php printf(gettext("Currently Suppressing &nbsp; %s$pfbsupp_cnt%s &nbsp; Hosts."), '<strong>', '</strong>');?>
 			</td>
-<?php
-
-// Create Three Output Windows 'Deny', 'Permit' and 'Match'
-foreach (array ("Deny" => $pfb['denydir'], "Permit" => $pfb['permitdir'], "Match" => $pfb['matchdir']) as $type => $pfbfolder ) {
+			</tr>
+<!--Create Three Output Windows 'Deny', 'Permit' and 'Match'-->
+<?php foreach (array ("Deny" => $pfb['denydir'], "Permit" => $pfb['permitdir'], "Match" => $pfb['matchdir']) as $type => $pfbfolder ):
 	switch($type) {
 		case "Deny":
 			$rtype = "block";
@@ -390,12 +389,18 @@ foreach (array ("Deny" => $pfb['denydir'], "Permit" => $pfb['permitdir'], "Match
 ?>
 			<table id="maintable" class="tabcont" width="100%" border="0" cellspacing="0" cellpadding="6">
 			<tr>
-				<td colspan="2" class="listtopic"><?php printf(gettext("&nbsp;$type&nbsp;&nbsp; - &nbsp; Last %s Alert Entries."), $pfbentries); ?>
-				<?php if ($pfb['pfsenseversion'] >= '2.2') { ?>
-				&nbsp;&nbsp;<?php echo gettext("(Firewall Logs must be in Reverse Order.)"); ?>
-				<?php } else { ?>
-				&nbsp;&nbsp;<?php echo gettext("(Firewall Logs must be in Reverse Order.) &nbsp;&nbsp;&nbsp; Firewall Rule changes can unsync these Alerts."); ?>
-				<?php } ?>
+				<!--Print Table Info-->
+				<td colspan="2" class="listtopic"><?php printf(gettext("&nbsp;{$type}&nbsp;&nbsp; - &nbsp; Last %s Alert Entries."), "{$pfbentries}"); ?>
+					<?php if ($pfb['pfsenseversion'] >= '2.2'): ?>
+						<?php if (!array_key_exists("reverse", $config['syslog'])): ?>
+							&nbsp;&nbsp;<?php echo gettext("Firewall Logs must be in Reverse Order."); ?>
+						<?php endif; ?>
+					<?php else: ?>
+						&nbsp;&nbsp;<?php echo gettext("Firewall Rule changes can unsync these Alerts."); ?>
+						<?php if (!array_key_exists("reverse", $config['syslog'])): ?>
+							&nbsp;&nbsp;<?php echo gettext("Firewall Logs must be in Reverse Order."); ?>
+						<?php endif; ?>
+					<?php endif; ?>
 				</td>
 			</tr>
 
@@ -531,7 +536,7 @@ if (isset($fields_array)) {
 				$dstport = " :" . $fields['dstport'];
 			}
 
-			// Don't add Suppress Icon to Country Block Lines 
+			// Don't add Suppress Icon to Country Block Lines
 			if (in_array(substr($rule_list[$rulenum]['name'], 0, -3), $continents)) {
 				$pfb_query = "Country";
 			}
@@ -564,10 +569,10 @@ if (isset($fields_array)) {
 					$hostname = "";
 				}
 		
-				$src_icons	= $alert_ip . "&nbsp;" . $supp_ip . "&nbsp";
+				$src_icons	= $alert_ip . "&nbsp;" . $supp_ip . "&nbsp;";
 				$dst_icons	= "";
 				$scc		= $country;
-				$dcc		= ""; 
+				$dcc		= "";
 			} else {
 				// Outbound
 				$rule = $rule_list[$rulenum]['name'] . "<br>(" . $rulenum .")";
@@ -596,7 +601,7 @@ if (isset($fields_array)) {
 				}
 
 				$src_icons	= "";
-				$dst_icons	= $alert_ip . "&nbsp;" . $supp_ip . "&nbsp";
+				$dst_icons	= $alert_ip . "&nbsp;" . $supp_ip . "&nbsp;";
 				$scc		= "";
 				$dcc		= $country; 
 			}
@@ -630,6 +635,7 @@ if (isset($fields_array)) {
 					for ($cnt = 1; $cnt <= 5; $cnt++) {
 						$host3 = $host2 - $cnt . '\'';
 						$pfb_query = exec("grep -H {$host1}{$host3} {$pfbfolder}/* | sed -e 's/^.*[a-zA-Z]\///' -e 's/\.txt:/ /' | {$pfb_ex2}");
+						// Break out of loop if found.
 						if (!empty($pfb_query))
 							$cnt = 6;
 					}
@@ -653,6 +659,7 @@ if (isset($fields_array)) {
 						$pfb_query = exec("grep -Hm1 {$host1} {$pfbfolder}/* | sed -e 's/^.*[a-zA-Z]\///' -e 's/\.txt:/ /' | {$pfb_ex1}");
 					}
 				}
+				// Default to "No Match" if not found.
 				if (empty($pfb_query))
 					$pfb_query = "No Match";
 			}
@@ -693,7 +700,7 @@ if (isset($fields_array)) {
 				<td nowrap class='listMRr' align='center' style='sorttable_customkey:{$fields['srcip']};' sorttable_customkey='{$fields['srcip']}'>{$src_icons}{$fields['srcip']}{$srcport}<br><small>{$hostname['src']}</small></td>
 				<td nowrap class='listMRr' align='center' style='sorttable_customkey:{$fields['dstip']};' sorttable_customkey='{$fields['dstip']}'>{$dst_icons}{$fields['dstip']}{$dstport}<br><small>{$hostname['dst']}</small></td>
 				<td class='listMRr' align='center'>{$countrycode}</td>
-				<td class='listbg' align='center' title='Country Block Rules cannot be suppressed.\n\nTo allow a particular Country IP, either remove the particular Country or add the Host\nto a Permit Alias in the Firewall Tab.\n\nIf the IP is not listed beside the List, this means that the Block is a /32 entry.\nOnly /32 or /24 CIDR Hosts can be suppressed.\n\nIf (Duplication) Checking is not enabled. You may see /24 and /32 CIDR Blocks for a given blocked Host' style=\"font-size: 10px\"; \"word-wrap:break-word;\">{$pfb_match[1]}<br>{$pfb_match[2]}</td></tr>";
+				<td class='listbg' align='center' title='Country Block Rules cannot be suppressed.\n\nTo allow a particular Country IP, either remove the particular Country or add the Host\nto a Permit Alias in the Firewall Tab.\n\nIf the IP is not listed beside the List, this means that the Block is a /32 entry.\nOnly /32 or /24 CIDR Hosts can be suppressed.\n\nIf (Duplication) Checking is not enabled. You may see /24 and /32 CIDR Blocks for a given blocked Host' style=\"font-size: 10px word-wrap:break-word;\">{$pfb_match[1]}<br>{$pfb_match[2]}</td></tr>";
 			$counter++;
 			if ($counter > 0 && $rtype == "block") {
 				$mycounter = $counter;
@@ -705,19 +712,16 @@ if (isset($fields_array)) {
 	</tbody>
 	</table>
 	</table>
-<?php
-}
-?>
+<?php endforeach; ?>	<!--End - Create Three Output Windows 'Deny', 'Permit' and 'Match'-->
 </td></tr>
 </table>
 
 </div>
 </td>
-</form>
 
 <script type="text/javascript">
 
-//  This function stuffs the passed HOST, Table values into hidden Form Fields for postback.
+// This function stuffs the passed HOST, Table values into hidden Form Fields for postback.
 function hostruleid(host,table) {
 	document.getElementById("ip").value = host;
 	document.getElementById("table").value = table;
@@ -749,6 +753,7 @@ function findhostnames(counter) {
 	}
 
 </script>
-<?php
-include("fend.inc");
-?>
+<?php include("fend.inc"); ?>
+</form>
+</body>
+</html>
