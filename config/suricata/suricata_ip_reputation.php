@@ -386,6 +386,7 @@ if ($savemsg)
 	</tbody>
 </table>
 
+<?php if $g['platform' != "nanobsd") : ?>
 <script type="text/javascript">
 Event.observe(
 	window, "load",
@@ -473,6 +474,7 @@ function iplistComplete(req) {
 }
 
 </script>
+<?php endif; ?>
 
 </form>
 <?php include("fend.inc"); ?>
