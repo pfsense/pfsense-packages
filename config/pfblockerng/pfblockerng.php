@@ -1020,7 +1020,7 @@ $xml = <<<EOF
 		</field>
 		<field>
 			<name><![CDATA[<ul>Click to SAVE Settings and/or Rule Edits. &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Changes are Applied via CRON or
-				'Manual Update']]>
+				'Force Update']]>
 			</name>
 			<type>listtopic</type>
 		</field>
@@ -1506,7 +1506,7 @@ $xmlrep = <<<EOF
 			<fieldname>et_update</fieldname>
 			<description><![CDATA[Default:<strong>Disable</strong><br>
 				Select - Enable ET Update if Category Changes are Made.<br>
-				You can perform a 'Manual Update' to enable these changes.<br>
+				You can perform a 'Force Update' to enable these changes.<br>
 				Cron will also resync this list at the next Scheduled Update.]]>
 			</description>
 			<type>select</type>
@@ -1517,7 +1517,7 @@ $xmlrep = <<<EOF
 		</field>
 		<field>
 			<name><![CDATA[<ul>Click to SAVE Settings and/or Rule Edits. &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Changes are Applied via CRON or
-				'Manual Update'</ul>]]></name>
+				'Force Update'</ul>]]></name>
 			<type>listtopic</type>
 		</field>
 	</fields>
