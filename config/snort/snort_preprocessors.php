@@ -1217,7 +1217,7 @@ if ($savemsg) {
 			$protos = array('all', 'tcp', 'udp', 'icmp', 'ip');
 			foreach ($protos as $val): ?>
 			<option value="<?=$val;?>"
-			<?php if ($val == $pconfig['pscan_protocol']) echo "selected"; ?>/> 
+			<?php if ($val == $pconfig['pscan_protocol']) echo "selected"; ?>> 
 				<?=gettext($val);?></option>
 				<?php endforeach; ?>
 			</select>&nbsp;&nbsp;<?php echo gettext("Choose the Portscan protocol type to alert for (all, tcp, udp, icmp or ip).  Default is ") . 
@@ -1232,7 +1232,7 @@ if ($savemsg) {
 			$protos = array('all', 'portscan', 'portsweep', 'decoy_portscan', 'distributed_portscan');
 			foreach ($protos as $val): ?>
 			<option value="<?=$val;?>"
-			<?php if ($val == $pconfig['pscan_type']) echo "selected"; ?>/> 
+			<?php if ($val == $pconfig['pscan_type']) echo "selected"; ?>> 
 				<?=gettext($val);?></option>
 				<?php endforeach; ?>
 			</select>&nbsp;&nbsp;<?php echo gettext("Choose the Portscan scan type to alert for.  Default is ") . 
@@ -1264,7 +1264,7 @@ if ($savemsg) {
 			$levels = array('low', 'medium', 'high');
 			foreach ($levels as $val): ?>
 			<option value="<?=$val;?>"
-			<?php if ($val == $pconfig['pscan_sense_level']) echo "selected"; ?>/> 
+			<?php if ($val == $pconfig['pscan_sense_level']) echo "selected"; ?>> 
 				<?=gettext(ucfirst($val));?></option>
 				<?php endforeach; ?>
 			</select>&nbsp;&nbsp;<?php echo gettext("Choose the Portscan sensitivity level (Low, Medium, High).  Default is ") . 
@@ -1340,7 +1340,7 @@ if ($savemsg) {
 			$values = array('stateful', 'stateless');
 			foreach ($values as $val): ?>
 			<option value="<?=$val;?>"
-			<?php if ($val == $pconfig['ftp_telnet_inspection_type']) echo "selected"; ?>/> 
+			<?php if ($val == $pconfig['ftp_telnet_inspection_type']) echo "selected"; ?>> 
 				<?=gettext($val);?></option>
 				<?php endforeach; ?>
 			</select>&nbsp;&nbsp;<?php echo gettext("Choose to operate in stateful or stateless mode.  Default is ") . 
@@ -1501,7 +1501,7 @@ if ($savemsg) {
 			$values = array('Credit Card', 'Email Addresses', 'U.S. Phone Numbers', 'U.S. Social Security Numbers');
 			foreach ($values as $val): ?>
 			<option value="<?=$val;?>"
-			<?php if (preg_match("/$val/",$pconfig['sdf_alert_data_type'])) echo "selected"; ?>/> 
+			<?php if (preg_match("/$val/",$pconfig['sdf_alert_data_type'])) echo "selected"; ?>> 
 				<?=gettext($val);?></option>
 				<?php endforeach; ?>
 			</select><br/><?php echo gettext("Choose which types of sensitive data to detect.  Use CTRL + Click for multiple selections."); ?><br/>
