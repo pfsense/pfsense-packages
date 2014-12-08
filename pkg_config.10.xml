@@ -1369,8 +1369,8 @@
 		<configurationfile>zabbix2-agent.xml</configurationfile>
 		<maintainer>dbaio@bsd.com.br</maintainer>
 		<build_pbi>
-			<custom_name>zabbix22-agent</custom_name>
-			<port>net-mgmt/zabbix22-agent</port>
+			<custom_name>zabbix24-agent</custom_name>
+			<port>net-mgmt/zabbix24-agent</port>
 		</build_pbi>
 		<depends_on_package_pbi>zabbix22-agent-2.2.7-##ARCH##.pbi</depends_on_package_pbi>
 	</package>
@@ -1385,8 +1385,8 @@
 		<configurationfile>zabbix2-proxy.xml</configurationfile>
 		<maintainer>dbaio@bsd.com.br</maintainer>
 		<build_pbi>
-			<custom_name>zabbix22-proxy</custom_name>
-			<port>net-mgmt/zabbix22-proxy</port>
+			<custom_name>zabbix24-proxy</custom_name>
+			<port>net-mgmt/zabbix24-proxy</port>
 		</build_pbi>
 		<build_options>OPTIONS_SET+= SQLITE IPV6;OPTIONS_UNSET+= MYSQL JABBER GSSAPI</build_options>
 		<depends_on_package_pbi>zabbix22-proxy-2.2.7-##ARCH##.pbi</depends_on_package_pbi>
