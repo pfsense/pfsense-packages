@@ -41,7 +41,7 @@
 require_once("guiconfig.inc");
 require_once("/usr/local/pkg/suricata/suricata.inc");
 
-global $config;
+global $config, $g;
 
 if (!is_array($config['installedpackages']['suricata']['rule']))
 	$config['installedpackages']['suricata']['rule'] = array();
@@ -204,6 +204,11 @@ if ($savemsg)
 	<div id="mainarea">
 		<table id="maintable" class="tabcont" width="100%" border="0" cellpadding="6" cellspacing="0">
 			<tbody>
+		<?php if ($g['platform'] == "nanobsd") : ?>
+			<tr>
+				<td colspan="2" class="listtopic"><?php echo gettext("IP Reputation is not supported on NanoBSD installs"); ?></td>
+			</tr>
+		<?php else: ?>
 			<tr>
 				<td colspan="2" class="listtopic"><?php echo gettext("Emerging Threats IQRisk Settings"); ?></td>
 			</tr>
@@ -357,6 +362,7 @@ if ($savemsg)
 					</table>
 				</td>
 			</tr>
+		<?php endif; ?>
 			</tbody>
 		</table>
 	</div>
