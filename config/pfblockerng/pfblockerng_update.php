@@ -15,11 +15,6 @@
 	Copyright (C) 2005 Colin Smith
 	All rights reserved.
 
-	Hide/Show Rollup Code originally coded in Suricata_alerts.php
-	Copyright (C) 2014 Bill Meeks
-	All rights reserved.
-
-
 	Redistribution and use in source and binary forms, with or without
 	modification, are permitted provided that the following conditions are met:
 
@@ -48,13 +43,10 @@ require_once("guiconfig.inc");
 require_once("globals.inc");
 require_once("pfsense-utils.inc");
 require_once("functions.inc");
+require_once("util.inc");
 require_once("/usr/local/pkg/pfblockerng/pfblockerng.inc");
 
 pfb_global();
-
-$filterlogentries = FALSE;
-$pfblog = "{$pfb['log']}";
-$pfb_output = "";
 
 // Collect pfBlockerNG log file and post Live output to Terminal window.
 function pfbupdate_output($text) {
@@ -82,64 +74,137 @@ function pfbupdate_status($status) {
 }
 
 
+// Function to perform a Force Update, Cron or Reload
+function pfb_cron_update($type) {
+
+	global $pfb;
+
+	// Query for any Active pfBlockerNG CRON Jobs
+	$result_cron = array();
+	$cron_event = exec ("/bin/ps -wx", $result_cron);
+	if (preg_grep("/pfblockerng[.]php\s+cron/", $result_cron) || preg_grep("/pfblockerng[.]php\s+update/", $result_cron)) {
+		pfbupdate_status(gettext("Force {$type} Terminated - Failed due to Active Running Task"));
+		exit;
+	}
+
+	if (!file_exists("{$pfb['log']}"))
+		touch("{$pfb['log']}");
+
+	// Update Status Window with correct Task
+	if ($type == "update") {
+		pfbupdate_status(gettext("Running Force Update Task"));
+	} elseif ($type == "reload") {
+		pfbupdate_status(gettext("Running Force Reload Task"));
+		$type = "update";
+	} else {
+		pfbupdate_status(gettext("Running Force CRON Task"));
+	}
+
+	// Remove any existing pfBlockerNG CRON Jobs
+	install_cron_job("pfblockerng.php cron", false);
+	write_config();
+
+	// Execute PHP Process in the Background
+	mwexec_bg("/usr/local/bin/php /usr/local/www/pfblockerng/pfblockerng.php {$type} >> {$pfb['log']} 2>&1");
+
+	// Start at EOF
+	$lastpos_old = "";
+	$len = filesize("{$pfb['log']}");
+	$lastpos = $len;
+
+	while (true) {
+		usleep(300000); //0.3s
+		clearstatcache(false,$pfb['log']);
+		$len = filesize("{$pfb['log']}");
+		if ($len < $lastpos) {
+			//file deleted or reset
+			$lastpos = $len;
+		} else {
+			$f = fopen($pfb['log'], "rb");
+			if ($f === false)
+				die();
+			fseek($f, $lastpos);
+
+			while (!feof($f)) {
+
+				$pfb_buffer = fread($f, 2048);
+				$pfb_output .= str_replace( "\r", "", $pfb_buffer);
+
+				// Refresh on new lines only. This allows Scrolling.
+				if ($lastpos != $lastpos_old)
+					pfbupdate_output($pfb_output);
+				$lastpos_old = $lastpos;
+				ob_flush();
+				flush();
+			}
+			$lastpos = ftell($f);
+			fclose($f);
+		}
+		// Capture Remaining Output before closing File
+		if (preg_match("/(UPDATE PROCESS ENDED)/",$pfb_output)) {
+			$f = fopen($pfb['log'], "rb");
+			fseek($f, $lastpos);
+			$pfb_buffer = fread($f, 2048);
+			$pfb_output .= str_replace( "\r", "", $pfb_buffer);
+			pfbupdate_output($pfb_output);
+			clearstatcache(false,$pfb['log']);
+			ob_flush();
+			flush();
+			fclose($f);
+			# Call Log Mgmt Function
+			pfb_log_mgmt();
+			die();
+		}
+	}
+}
+
+
 $pgtitle = gettext("pfBlockerNG: Update");
 include_once("head.inc");
 ?>
 <body link="#000000" vlink="#0000CC" alink="#000000">
-<form action="/pfblockerng/pfblockerng_update.php" method="post">
+<form action="<?php echo $_SERVER['PHP_SELF']; ?>" method="post">
+<?php include_once("fbegin.inc"); ?>
 
-<?php
-include_once("fbegin.inc");
-?>
+	<table width="100%" border="0" cellpadding="0" cellspacing="0">
+		<tr>
+			<td>
+				<?php
+					$tab_array = array();
+					$tab_array[] = array(gettext("General"), false, "/pkg_edit.php?xml=pfblockerng.xml&amp;id=0");
+					$tab_array[] = array(gettext("Update"), true, "/pfblockerng/pfblockerng_update.php");
+					$tab_array[] = array(gettext("Alerts"), false, "/pfblockerng/pfblockerng_alerts.php");
+					$tab_array[] = array(gettext("Reputation"), false, "/pkg_edit.php?xml=/pfblockerng/pfblockerng_reputation.xml&id=0");
+					$tab_array[] = array(gettext("IPv4"), false, "/pkg.php?xml=/pfblockerng/pfblockerng_v4lists.xml");
+					$tab_array[] = array(gettext("IPv6"), false, "/pkg.php?xml=/pfblockerng/pfblockerng_v6lists.xml");
+					$tab_array[] = array(gettext("Top 20"), false, "/pkg_edit.php?xml=/pfblockerng/pfblockerng_top20.xml&id=0");
+					$tab_array[] = array(gettext("Africa"), false, "/pkg_edit.php?xml=/pfblockerng/pfblockerng_Africa.xml&id=0");
+					$tab_array[] = array(gettext("Asia"), false, "/pkg_edit.php?xml=/pfblockerng/pfblockerng_Asia.xml&id=0");
+					$tab_array[] = array(gettext("Europe"), false, "/pkg_edit.php?xml=/pfblockerng/pfblockerng_Europe.xml&id=0");
+					$tab_array[] = array(gettext("N.A."), false, "/pkg_edit.php?xml=/pfblockerng/pfblockerng_NorthAmerica.xml&id=0");
+					$tab_array[] = array(gettext("Oceania"), false, "/pkg_edit.php?xml=/pfblockerng/pfblockerng_Oceania.xml&id=0");
+					$tab_array[] = array(gettext("S.A."), false, "/pkg_edit.php?xml=/pfblockerng/pfblockerng_SouthAmerica.xml&id=0");
+					$tab_array[] = array(gettext("Logs"), false, "/pfblockerng/pfblockerng_log.php");
+					$tab_array[] = array(gettext("Sync"), false, "/pkg_edit.php?xml=/pfblockerng/pfblockerng_sync.xml&id=0");
+					display_top_tabs($tab_array, true);
+				?>
+			</td>
+		</tr>
+	</table>
 	<div id="mainareapkg">
-		<table width="100%" border="0" cellpadding="0" cellspacing="0">
+		<table id="maintable" class="tabcont" width="100%" border="0" cellspacing="0" cellpadding="2">
 			<tr>
-				<td>
-					<?php
-						$tab_array = array();
-						$tab_array[] = array(gettext("General"), false, "/pkg_edit.php?xml=pfblockerng.xml&amp;id=0");
-						$tab_array[] = array(gettext("Update"), true, "/pfblockerng/pfblockerng_update.php");
-						$tab_array[] = array(gettext("Alerts"), false, "/pfblockerng/pfblockerng_alerts.php");
-						$tab_array[] = array(gettext("Reputation"), false, "/pkg_edit.php?xml=/pfblockerng/pfblockerng_reputation.xml&id=0");
-						$tab_array[] = array(gettext("IPv4"), false, "/pkg.php?xml=/pfblockerng/pfblockerng_v4lists.xml");
-						$tab_array[] = array(gettext("IPv6"), false, "/pkg.php?xml=/pfblockerng/pfblockerng_v6lists.xml");
-						$tab_array[] = array(gettext("Top 20"), false, "/pkg_edit.php?xml=/pfblockerng/pfblockerng_top20.xml&id=0");
-						$tab_array[] = array(gettext("Africa"), false, "/pkg_edit.php?xml=/pfblockerng/pfblockerng_Africa.xml&id=0");
-						$tab_array[] = array(gettext("Asia"), false, "/pkg_edit.php?xml=/pfblockerng/pfblockerng_Asia.xml&id=0");
-						$tab_array[] = array(gettext("Europe"), false, "/pkg_edit.php?xml=/pfblockerng/pfblockerng_Europe.xml&id=0");
-						$tab_array[] = array(gettext("N.A."), false, "/pkg_edit.php?xml=/pfblockerng/pfblockerng_NorthAmerica.xml&id=0");
-						$tab_array[] = array(gettext("Oceania"), false, "/pkg_edit.php?xml=/pfblockerng/pfblockerng_Oceania.xml&id=0");
-						$tab_array[] = array(gettext("S.A."), false, "/pkg_edit.php?xml=/pfblockerng/pfblockerng_SouthAmerica.xml&id=0");
-						$tab_array[] = array(gettext("Logs"), false, "/pfblockerng/pfblockerng_log.php");
-						$tab_array[] = array(gettext("Sync"), false, "/pkg_edit.php?xml=/pfblockerng/pfblockerng_sync.xml&id=0");
-						display_top_tabs($tab_array, true);
-					?>
-				</td>
-			</tr>
-		</table>
-		<table id="maintable" class="tabcont" width="100%" border="0" cellspacing="0" cellpadding="6">
-			<tr>
-				<td colspan="3" class="vncell" align="left"><?php echo gettext("LINKS :"); ?>&nbsp;
-				<a href='/firewall_aliases.php' target="_blank"><?php echo gettext("Firewall Alias"); ?></a> &nbsp;
-				<a href='/firewall_rules.php' target="_blank"><?php echo gettext("Firewall Rules"); ?></a> &nbsp;
-				<a href='/diag_logs_filter.php' target="_blank"><?php echo gettext("Firewall Logs"); ?></a><br>
+				<td colspan="2" class="vncell" align="left"><?php echo gettext("LINKS :"); ?>&nbsp;
+					<a href='/firewall_aliases.php' target="_blank"><?php echo gettext("Firewall Alias"); ?></a>&nbsp;
+					<a href='/firewall_rules.php' target="_blank"><?php echo gettext("Firewall Rules"); ?></a>&nbsp;
+					<a href='/diag_logs_filter.php' target="_blank"><?php echo gettext("Firewall Logs"); ?></a><br/>
 				</td>
 			</tr>
 			<tr>
-				<td colspan="2" class="listtopic"><?php echo gettext("Live Log Viewer only"); ?></td>
-			</tr>
-				<td colspan="2" <?php echo gettext("<br>"); ?></td>
-			<tr>
-				<td colspan="2" class="vncell">
-					<input type="submit" class="formbtns" name="pfbview" id="pfbview" value="VIEW" title="<?=gettext("VIEW pfBlockerNG LOG");?>"/>
-					<input type="submit" class="formbtns" name="pfbviewcancel" id="pfbviewcancel" value="End View" title="<?=gettext("END VIEW of pfBlockerNG LOG");?>"/>
-					<?php echo "&nbsp;&nbsp;" . gettext(" Select 'view' to open ") . "<strong>" . gettext(' pfBlockerNG ') . "</strong>" . gettext(" Log : &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; (Select 'End View' to terminate the viewer) <br><br>"); ?>
+				<td colspan="2" class="listtopic"><?php echo gettext("CRON Status"); ?></td>
 			</tr>
 			<tr>
-				<td colspan="2" class="listtopic"><?php echo gettext("CRON Status"); ?></td
-			</tr>
-			<tr>
-				<td colspan="2" class="vncell">
+				<td colspan="2" class="listr">
 				<?php
 					// Collect Existing CRON settings
 					if (is_array($config['cron']['item'])) {
@@ -150,7 +215,6 @@ include_once("fbegin.inc");
 							}
 						}
 					}
-
 					// Calculate Minutes Remaining till next CRON Event.
 					$currentmin = date('i');
 					switch ($pfb_min) {
@@ -183,93 +247,113 @@ include_once("fbegin.inc");
 					// Default to "< 1 minute" if empty
 					if (empty($min_remain))
 						$min_remain = "< 1";
-					if (empty($pfb['enable']))
-						$min_remain = " [ Disabled ] ";
 
-					echo "NEXT Scheduled CRON Event will run in :&nbsp; <font size=\"5\"><span class=\"red\">{$min_remain}</span></font> Minutes.";
-					// Query for any Active pfBlockerNG CRON Jobs
-					$result_cron = array();
-					$cron_event = exec ("/bin/ps -wax", $result_cron); 
-					if (preg_grep("/pfblockerng[.]php\s+cron/", $result_cron)) { 
-						echo "<font size=\"2\"><span class=\"red\">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Active pfBlockerNG CRON Job </span></font>&nbsp;&nbsp;";
-						echo "<img src = '/themes/{$g['theme']}/images/icons/icon_pass.gif' width='15' height='15' border='0' title='pfBockerNG Cron Task is Running.'/>";
+					// Next Scheduled Cron Time
+					if ($pfb_min == "0")
+						$pfb_min = "00";
+					$nextcron = (date('H') +1) . ":{$pfb_min}";
+
+					// If pfBlockerNG is Disabled or Cron Task is Missing
+					if (empty($pfb['enable']) || empty($pfb_min)) {
+						$min_remain = " -- ";
+						$nextcron = " [ Disabled ] ";
 					}
 
-					echo "<br><font size=\"3\"><span class=\"red\">Refresh</span></font> to update current Status and Minute(s) remaining<br>";
+					echo "NEXT Scheduled CRON Event will run at <font size=\"3\">&nbsp;{$nextcron}</font>&nbsp; in<font size=\"3\">
+						<span class=\"red\">&nbsp;{$min_remain}&nbsp;</span></font> Minutes.";
+
+					// Query for any Active pfBlockerNG CRON Jobs
+					$result_cron = array();
+					$cron_event = exec ("/bin/ps -wax", $result_cron);
+					if (preg_grep("/pfblockerng[.]php\s+cron/", $result_cron)) {
+						echo "<font size=\"2\"><span class=\"red\">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+							Active pfBlockerNG CRON Job </span></font>&nbsp;&nbsp;";
+						echo "<img src = '/themes/{$g['theme']}/images/icons/icon_pass.gif' width='15' height='15'
+							border='0' title='pfBockerNG Cron Task is Running.'/>";
+					}
+					echo "<br/><font size=\"3\"><span class=\"red\">Refresh</span></font> to update current Status and Minute(s) remaining";
 				?>
 				</td>
 			</tr>
 			<tr>
-				<td colspan="2" class="listtopic"><?php echo gettext("Run Manual Process Update"); ?></td>
+				<td colspan="2" class="vncell"><?php echo gettext("<br/>"); ?></td>
 			</tr>
-			<tr id="filter_enable_row" style="display:<?php if (!$filterlogentries) {echo "table-row;";} else {echo "none;";} ?>">
-				<td width="78%" class="vtable">
-					<input name="show_filter" id="show_filter" type="button" class="formbtns" value="<?=gettext("Show Option");?>" onclick="enable_showFilter();" title="<?=gettext("Click to display advanced Manual Update options dialog");?>" />
+			<tr>
+				<td colspan="2" class="listtopic"><?php echo gettext("Update Options"); ?></td>
+			</tr>
+			<tr>
+				<td colspan="2" class="listr">
+					<!-- Update Option Text -->
+					<?php echo "<span class='red'><strong>" . gettext("** AVOID ** ") . "&nbsp;" . "</strong></span>" .
+						gettext("Running these Options - when CRON is expected to RUN!") . gettext("<br/><br/>") .
+						"<strong>" . gettext("Force Update") . "</strong>" . gettext(" will download any new Alias/Lists.") .
+						gettext("<br/>") . "<strong>" . gettext("Force Cron") . "</strong>" .
+						gettext(" will download any Alias/Lists that are within the Frequency Setting (due for Update).") . gettext("<br/>") .
+						"<strong>" . gettext("Force Reload") . "</strong>" .
+						gettext("  will reload all Lists using the existing Downloaded files.") .
+						gettext(" This is useful when Lists are out of 'sync' or Reputation changes were made.") ;?><br/>
 				</td>
 			</tr>
-
-			<tr id="filter_options_row" style="display:<?php if ($filterlogentries) {echo "table-row;";} else {echo "none;";} ?>">
-				<td colspan="2">
-					<table style="height:100;colspacing:0" width="630" border="0" cellpadding="0" cellspacing="0" summary="images">
-				<td class="listr"><?php echo "<span class='red'><strong>" . gettext("** AVOID ** ") . "&nbsp;" . "</strong></span>" . gettext("Running a -Manual Update- when CRON is expected to RUN!"); ?></td><tr>
-				<td width="78%" class="tabcont" align="left">
-					<input type="submit" class="formbtns" name="pfbconfirm" id="pfbconfirm" value="Manual Update" title="<?=gettext("Execute MANUAL pfBlockerNG UPDATE");?>" />
-					<input type="submit" class="formbtns" name="pfbcancel" id="pfbcancel" value="Cancel" title="<?=gettext("Cancel MANUAL pfBlockerNG UPDATE");?>" />
+			<tr>
+				<td colspan="2" class="vncell">
+					<!-- Update Option Buttons -->
+					<input type="submit" class="formbtns" name="pfbupdate" id="pfbupdate" value="Force Update" 
+						title="<?=gettext("Run Force Update");?>" />
+					<input type="submit" class="formbtns" name="pfbcron" id="pfbcron" value="Force Cron" 
+						title="<?=gettext("Run Force Cron Update");?>" />
+					<input type="submit" class="formbtns" name="pfbreload" id="pfbreload" value="Force Reload" 
+						title="<?=gettext("Run Force Reload");?>" />
 				</td>
 			</tr>
-				<td width="100%" class="listr"><?php echo "<span class='red'><strong>" . gettext("NOTE: ") . "</strong></span>" . "&nbsp;" . gettext("Running this command will 'Disable' the next Scheduled pfBlockerNG CRON job until this process has completed.") ;?><tr><td></tr>
-							<td width="78%" class="tabcont" align="left">
-								<input name="Hide_filter" id="filterlogentries_hide" name="filterlogentries_hide" type="button" class="formbtns" value="<?=gettext("Hide Option");?>" onclick="enable_hideFilter();" title="<?=gettext("Hide Advanced options");?>" /></div>
-							</td>
-					</table>
+			<tr>
+				<td colspan="2" class="vncell"><?php echo gettext("<br/>"); ?></td>
+			</tr>
+			<tr>
+				<td colspan="2" class="listtopic"><?php echo gettext("Live Log Viewer only"); ?></td>
+			</tr>
+			<tr>
+				<td colspan="2" class="listr"><?php echo gettext("Selecting 'Live Log Viewer' will allow viewing a running Cron Update"); ?></td>
+			</tr>	
+			<tr>
+				<td colspan="2" class="vncell">
+					<!-- Log Viewer Buttons -->
+					<input type="submit" class="formbtns" name="pfbview" id="pfbview" value="VIEW" 
+						title="<?=gettext("VIEW pfBlockerNG LOG");?>"/>
+					<input type="submit" class="formbtns" name="pfbviewcancel" id="pfbviewcancel" value="End View" 
+						title="<?=gettext("END VIEW of pfBlockerNG LOG");?>"/>
+					<?php echo "&nbsp;&nbsp;" . gettext(" Select 'view' to open ") . "<strong>" . gettext(' pfBlockerNG ') . "</strong>" .
+						gettext(" Log. &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; (Select 'End View' to terminate the viewer.)"); ?><br/><br/>
 				</td>
 			</tr>
 			<tr>
 				<td class="tabcont" align="left">
 					<!-- status box -->
-					<textarea cols="80" rows="1" name="pfb_status" id="pfb_status" wrap="hard"><?=gettext("Manual Update Viewer Standby");?></textarea>
+					<textarea cols="90" rows="1" name="pfb_status" id="pfb_status"
+						wrap="hard"><?=gettext("Log Viewer Standby");?></textarea>
 				</td>
 			</tr>
 			<tr>
 				<td>
 					<!-- command output box -->
-					<textarea cols="80" rows="35" name="pfb_output" id="pfb_output" wrap="hard"></textarea>
+					<textarea cols="90" rows="35" name="pfb_output" id="pfb_output" wrap="hard"></textarea>
 				</td>
 			</tr>
 		</table>
 	</div>
-</form>
-
-<?php include("fend.inc"); ?>
-<script type="text/javascript">
-//<![CDATA[
-NiftyCheck();
-	Rounded("div#mainareapkg","bl br","#FFF","#eeeeee","smooth");
-//]]>
-
-function enable_showFilter() {
-	document.getElementById("filter_enable_row").style.display="none";
-	document.getElementById("filter_options_row").style.display="table-row";
-}
-
-function enable_hideFilter() {
-	document.getElementById("filter_enable_row").style.display="table-row";
-	document.getElementById("filter_options_row").style.display="none";
-}
-
-</script>
 
 <?php
+include("fend.inc");
 
+// Execute the Viewer output Window
 if (isset($_POST['pfbview'])) {
 
-	if (!file_exists($pfblog))
-		touch($pfblog);
+	if (!file_exists("{$pfb['log']}"))
+		touch("{$pfb['log']}");
 
 	// Reference: http://stackoverflow.com/questions/3218895/php-how-to-read-a-file-live-that-is-constantly-being-written-to
-	pfbupdate_status(gettext("Manual Update Viewing in process.    ** Press 'END VIEW' to Exit ** "));
+	pfbupdate_status(gettext("Log Viewing in process.    ** Press 'END VIEW' to Exit ** "));
 	$lastpos_old = "";
-	$len = filesize($pfblog);
+	$len = filesize("{$pfb['log']}");
 
 	// Start at EOF ( - 15000)
 	if ($len > 15000) {
@@ -280,13 +364,13 @@ if (isset($_POST['pfbview'])) {
 
 	while (true) {
 		usleep(300000); //0.3s
-		clearstatcache(false,$pfblog);
-		$len = filesize($pfblog);
+		clearstatcache(false,$pfb['log']);
+		$len = filesize("{$pfb['log']}");
 		if ($len < $lastpos) {
 			//file deleted or reset
 			$lastpos = $len;
 		} else {
-			$f = fopen($pfblog, "rb");
+			$f = fopen($pfb['log'], "rb");
 			if ($f === false)
 				die();
 			fseek($f, $lastpos);
@@ -296,7 +380,7 @@ if (isset($_POST['pfbview'])) {
 				$pfb_buffer = fread($f, 4096);
 				$pfb_output .= str_replace( "\r", "", $pfb_buffer);
 
-				// Refresh on new lines only
+				// Refresh on new lines only. This allows scrolling.
 				if ($lastpos != $lastpos_old) {
 					pfbupdate_output($pfb_output);
 				}
@@ -310,123 +394,32 @@ if (isset($_POST['pfbview'])) {
 	}
 }
 
-
+// End the Viewer output Window
 if (isset($_POST['pfbviewcancel'])) {
-	clearstatcache(false,$pfblog);
+	clearstatcache(false,$pfb['log']);
 	ob_flush();
 	flush();
-	fclose($pfblog);
+	fclose("{$pfb['log']}");
 }
 
-
-if (isset($_POST['pfbconfirm'])) {
-
-	// Query for any Active pfBlockerNG CRON Jobs
-	$result_cron = array();
-	$cron_event = exec ("/bin/ps -wx", $result_cron);
-	if (preg_grep("/pfblockerng[.]php\s+cron/", $result_cron)) {
-		pfbupdate_status(gettext("Manual Update Standby - Previous Attempt Failed due to Active Running CRON Task"));
-		exit;
-	}
-
-	if (!file_exists($pfblog))
-		touch($pfblog);
-	pfbupdate_status(gettext("Manual CRON Job will run within ( ** one minute ** ). Please Wait."));
-	// Remove any existing pfBlockerNG CRON Jobs
-	install_cron_job("pfblockerng.php cron", false);
-	install_cron_job("pfblockerng.php update", false);
-	write_config();
-
-	// Define 'Manual' pfBlockerNG CRON Job
-	$date_min_now = date('i');
-	$pfb_cmd = "/usr/local/bin/php /usr/local/www/pfblockerng/pfblockerng.php update >> {$pfb['log']} 2>&1";
-	$pfb_c_min = ($date_min_now + 1);
-	if ($pfb_c_min == "60")
-		$pfb_c_min = 0;
-	$pfb_hour = "*";
-	$pfb_mday = "*";
-	$pfb_month = "*";
-	$pfb_wday = "*";
-	$pfb_who = "root";
-
-	// Write CRON job (When pfBlockerNG CRON Task is complete. It will re-enable User Defined CRON Job)
-	install_cron_job($pfb_cmd, true, $pfb_c_min, $pfb_hour, $pfb_mday, $pfb_month, $pfb_wday, $pfb_who);
-	write_config();
-
-	// Start at EOF
-	$lastpos_old = "";
-	$len = filesize($pfblog);
-	$lastpos = $len;
-
-	while (true) {
-		usleep(300000); //0.3s
-		clearstatcache(false,$pfblog);
-		$len = filesize($pfblog);
-		if ($len < $lastpos) {
-			//file deleted or reset
-			$lastpos = $len;
-		} else {
-			$f = fopen($pfblog, "rb");
-			if ($f === false)
-				die();
-			fseek($f, $lastpos);
-
-			while (!feof($f)) {
-
-				$pfb_buffer = fread($f, 2048);
-				$pfb_output .= str_replace( "\r", "", $pfb_buffer);
-
-				// Refresh on new lines only
-				if ($lastpos != $lastpos_old)
-					pfbupdate_output($pfb_output);
-				$lastpos_old = $lastpos;
-				ob_flush();
-				flush();
-			}
-			$lastpos = ftell($f);
-			fclose($f);
-		}
-		// Capture Remaining Output before closing File
-		if (preg_match("/(UPDATE PROCESS ENDED)/",$pfb_output)) {
-			$f = fopen($pfblog, "rb");
-			fseek($f, $lastpos);
-			$pfb_buffer = fread($f, 2048);
-			$pfb_output .= str_replace( "\r", "", $pfb_buffer);
-			pfbupdate_output($pfb_output);
-			clearstatcache(false,$pfblog);
-			ob_flush();
-			flush();
-			fclose($f);
-			# Call Log Mgmt Function
-			pfb_log_mgmt();
-			die();
-		}
-	}
+// Execute a Force Update 
+if (isset($_POST['pfbupdate']) && $pfb['enable'] == "on") {
+	pfb_cron_update(update);
 }
 
+// Execute a CRON Command to update any Lists within the Frequency Settings
+if (isset($_POST['pfbcron']) && $pfb['enable'] == "on") {
+	pfb_cron_update(cron);
+}
 
-if (isset($_POST['pfbcancel'])) {
-
-	// Remove any pfBlockerNG CRON Jobs
-	install_cron_job("pfblockerng.php update", false);
-	install_cron_job("pfblockerng.php cron", false);
-
-	// Define pfBlockerNG CRON Job
-	$pfb_cmd = "/usr/local/bin/php /usr/local/www/pfblockerng/pfblockerng.php cron >> {$pfb['log']} 2>&1";
-	$pfb_min = $config['installedpackages']['pfblockerng']['config'][0]['pfb_min'];
-	$pfb_hour = "*";
-	$pfb_mday = "*";
-	$pfb_month = "*";
-	$pfb_wday = "*";
-	$pfb_who = "root";
-
-	install_cron_job($pfb_cmd, true, $pfb_min, $pfb_hour, $pfb_mday, $pfb_month, $pfb_wday, $pfb_who);
+// Execute a Reload of all Aliases and Lists
+if (isset($_POST['pfbreload']) && $pfb['enable'] == "on") {
+	$config['installedpackages']['pfblockerng']['config'][0]['pfb_reuse'] = "on";
 	write_config();
-
-	clearstatcache(false,$pfblog);
-	ob_flush();
-	flush();
-	fclose($pfblog);
+	pfb_cron_update(reload);
 }
 
 ?>
+</form>
+</body>
+</html>
