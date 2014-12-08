@@ -58,7 +58,6 @@ if (isset($_POST['pfblockerngack'])) {
 	header("Location: ../../index.php");
 }
 
-
 // This function will create the counts
 function pfBlockerNG_get_counts() {
 	global $config, $g, $pfb;
@@ -107,6 +106,7 @@ if ("{$pfb['enable']}" == "on") {
 $dcount = exec("cat {$pfb['denydir']}/*.txt | grep -cv '^#\|^$\|^1\.1\.1\.1'");
 $pcount = exec("cat {$pfb['permitdir']}/*.txt | grep -cv '^#\|^$\|^1\.1\.1\.1'");
 $mcount = exec("cat {$pfb['matchdir']}/*.txt | grep -cv '^#\|^$\|^1\.1\.1\.1'");
+$ncount = exec("cat {$pfb['nativedir']}/*.txt | grep -cv '^#\|^$\|^1\.1\.1\.1'");
 
 // Collect Number of Suppressed Hosts
 if (file_exists("{$pfb['supptxt']}")) {
@@ -118,7 +118,7 @@ if (file_exists("{$pfb['supptxt']}")) {
 #check rule count
 #(label, evaluations,packets total, bytes total, packets in, bytes in,packets out, bytes out)
 $packets = exec("/sbin/pfctl -s labels", $debug);
-if (!empty($packets)) {
+if (!empty($debug)) {
 	foreach ($debug as $line) {
 		// Auto-Rules start with 'pfB_', Alias Rules should start with 'pfb_' and exact spelling of Alias Name.
 		$line = str_replace("pfb_","pfB_",$line);
@@ -158,9 +158,6 @@ if (isset($_GET['getNewCounts'])) {
 	}
 }
 
-$out = "<img src ='/themes/{$g['theme']}/images/icons/icon_interface_down.gif' width='10' height='10' border='0' title=\"No Rules are Defined using this Alias\">";
-$in = "<img src ='/themes/{$g['theme']}/images/icons/icon_interface_up.gif' width='10' height='10' border='0' title=\"Rules are Defined using this Alias\">";
-
 // Report any Failed Downloads
 $results = array();
 $fails = exec("grep $(date +%m/%d/%y) {$pfb['errlog']} | grep 'FAIL'", $results);
@@ -171,32 +168,33 @@ $fails = exec("grep $(date +%m/%d/%y) {$pfb['errlog']} | grep 'FAIL'", $results)
 	<table border="0" cellspacing="0" cellpadding="0">
 		<thead>
 		<tr>
-			<td valign="middle"><?=gettext("Status") ?>&nbsp;<img src="<?= $pfb_status ?>" width="14" height="14" border="0" title="<?=gettext($pfb_msg) ?>"></td>
-			<td valign="middle">&nbsp;&nbsp;&nbsp;</td>
+			<td valign="middle">&nbsp;<img src="<?= $pfb_status ?>" width="13" height="13" border="0" title="<?=gettext($pfb_msg) ?>"></td>
+			<td valign="middle">&nbsp;&nbsp;</td>
 			<td valign="middle" p style="font-size:10px">
-									<?php if ($dcount != 0) { ?>
+									<?php if ($dcount != 0): ?>
 										<?=gettext("Deny:"); echo("&nbsp;<strong>" . $dcount . "</strong>") ?>
-									<?php }?>
-									<?php if ($pcount != 0) { ?>
+									<?php endif; ?>
+									<?php if ($pcount != 0): ?>
 										<?=gettext("&nbsp;Permit:"); echo("&nbsp;<strong>" . $pcount . "</strong>") ?>
-									<?php }?>
-									<?php if ($mcount != 0) { ?>
+									<?php endif; ?>
+									<?php if ($mcount != 0): ?>
 										<?=gettext("&nbsp;Match:"); echo("&nbsp;<strong>" . $mcount . "</strong>"); ?>
-									<?php }?>
-									<?php if ($pfbsupp_cnt != 0) { ?>
-										<?=gettext("&nbsp;Suppress:"); echo("&nbsp;<strong>" . $pfbsupp_cnt . "</strong>"); ?>
-									<?php }?></td>
-			<td valign="middle">&nbsp;&nbsp;&nbsp;</td>
+									<?php endif; ?>
+									<?php if ($ncount != 0): ?>
+										<?=gettext("&nbsp;Native:"); echo("&nbsp;<strong>" . $ncount . "</strong>"); ?>
+									<?php endif; ?>
+									<?php if ($pfbsupp_cnt != 0): ?>
+										<?=gettext("&nbsp;Supp:"); echo("&nbsp;<strong>" . $pfbsupp_cnt . "</strong>"); ?>
+									<?php endif; ?></td>
+			<td valign="middle">&nbsp;&nbsp;</td>
 			<td valign="top"><a href="pfblockerng/pfblockerng_log.php"><img src="/themes/<?=$g['theme']; ?>/images/icons/icon_logs.gif" width="13" height="13" border="0" title="<?=gettext("View pfBlockerNG Logs TAB") ?>"></a>&nbsp;
 			<td valign="top">
-
-		<?php if (!empty($results)) {	// Hide "Ack" Button when Failed Downloads are Empty. ?>
-			<form action="/widgets/widgets/pfblockerng.widget.php" method="post" name="widget_pfblockerng_ack">
-				<input type="hidden" value="clearack" name="pfblockerngack">
-				<input class="vexpl" type="image" name="pfblockerng_ackbutton" src="/themes/<?=$g['theme']; ?>/images/icons/icon_x.gif" width="14" height="14" border="0" title="<?=gettext("Clear Failed Downloads") ?>"/>
-			</form>
-		<?php }				// Hide "Ack" Button when Failed Downloads are Empty. ?>
-
+				<?php if (!empty($results)): ?>		<!--Hide "Ack" Button when Failed Downloads are Empty-->
+					<form action="/widgets/widgets/pfblockerng.widget.php" method="post" name="widget_pfblockerng_ack">
+						<input type="hidden" value="clearack" name="pfblockerngack">
+						<input class="vexpl" type="image" name="pfblockerng_ackbutton" src="/themes/<?=$g['theme']; ?>/images/icons/icon_x.gif" width="14" height="14" border="0" title="<?=gettext("Clear Failed Downloads") ?>"/>
+					</form>
+				<?php endif; ?>
 			</td>
 		</tr>
 		</thead>

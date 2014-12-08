@@ -15,7 +15,6 @@
 
 now=$(/bin/date +%m/%d/%y' '%T)
 mtype=$(/usr/bin/uname -m);
-pfs_version="$(cut -c 1-3 /etc/version)"
 
 # Application Paths
 pathgrepcidr="/usr/pbi/pfblockerng-$mtype/bin/grepcidr"
@@ -268,7 +267,7 @@ if [ -e "$pfbsuppression" ] && [ -s "$pfbsuppression" ]; then
 	if [ ! -z "$data" -a ! -z "$cc" ]; then
 		# Loop thru each Updated List to remove Suppression and RFC1918 Addresses
 		if [ "$cc" == "suppressheader" ]; then
-			echo "===[ Suppression Stats ]========================================"; echo
+			echo; echo "===[ Suppression Stats ]========================================"; echo
 			printf "%-20s %-10s %-10s %-10s %-10s\n" "List" "Pre" "RFC1918" "Suppress" "Masterfile"
 			echo "----------------------------------------------------------------"
 			exit
@@ -873,7 +872,7 @@ for i in $cc; do
 			awk 'FNR==NR{a[$0];next}!($0 in a)' $tempfile $masterfile > $tempfile2; mv -f $tempfile2 $masterfile
 			cut -d' ' -f2 $masterfile > $mastercat
 		fi
-		rm -rf $pfborig$header*; rm -rf $pfbdeny$header*; rm -rf $pfbmatch$header*; rm -rf $pfbpermit$header*
+		rm -rf $pfborig$header*; rm -rf $pfbdeny$header*; rm -rf $pfbmatch$header*; rm -rf $pfbpermit$header*; rm -rf $pfbnative$header*
 		echo "The Following list has been REMOVED [ $header ]"
 	fi
 	echo

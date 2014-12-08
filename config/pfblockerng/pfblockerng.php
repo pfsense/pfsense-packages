@@ -149,8 +149,8 @@ function pfb_update_check($header_url, $list_url, $url_format) {
 	global $pfb;
 
 	if ($url_format == "rsync" || $url_format == "html") {
-		print "[ {$header_url} ]\n";
-		print "  Skipping timestamp query\n";
+		$log = "[ {$header_url} ]\n  Skipping timestamp query\n";
+		pfb_logger("{$log}","1");
 		return TRUE;
 	}
 
@@ -174,7 +174,8 @@ function pfb_update_check($header_url, $list_url, $url_format) {
 			break;
 	}
 
-	print "[ {$header_url} ]\n";
+	$log = "[ {$header_url} ]\n";
+	pfb_logger("{$log}","1");
 	$host = @parse_url($list_url);
 	$local_file = "{$pfb['origdir']}/{$header_url}{$type}";
 	if (file_exists($local_file)) {
@@ -194,7 +195,8 @@ function pfb_update_check($header_url, $list_url, $url_format) {
 		if ("{$remote_tds}" != "{$local_tds}") {
 			return TRUE;
 		} else {
-			print "  Remote file unchanged. Download Terminated\n";
+			$log = "  Remote file unchanged. Download Terminated\n";
+			pfb_logger("{$log}","1");
 			return FALSE;
 		}
 	} else {
@@ -323,7 +325,8 @@ if ($argv[1] == 'cron') {
 
 							# Check if List file exists, if not found run Update
 							if (!file_exists($pfbfolder . '/' . $header_url . '.txt')) {
-								print "  Updates Found\n";
+								$log = "  Updates Found\n";
+								pfb_logger("{$log}","1");
 								$updates++;
 								continue;
 							}
@@ -331,7 +334,8 @@ if ($argv[1] == 'cron') {
 							switch ($list_cron) {
 								case "01hour":
 									if (pfb_update_check($header_url, $list_url, $url_format)) {
-										print "  Updates Found\n";
+										$log = "  Updates Found\n";
+										pfb_logger("{$log}","1");
 										unlink_if_exists($pfbfolder . '/' . $header_url . '.txt');
 										$updates++;
 									}
@@ -339,7 +343,8 @@ if ($argv[1] == 'cron') {
 								case "02hours":
 									if (in_array($hour, $e_sch2)) {
 										if (pfb_update_check($header_url, $list_url, $url_format)) {
-											print "  Updates Found\n";
+											$log = "  Updates Found\n";
+											pfb_logger("{$log}","1");
 											unlink_if_exists($pfbfolder . '/' . $header_url . '.txt');
 											$updates++;
 										}
@@ -348,7 +353,8 @@ if ($argv[1] == 'cron') {
 								case "03hours":
 									if (in_array($hour, $e_sch3)) {
 										if (pfb_update_check($header_url, $list_url, $url_format)) {
-											print "  Updates Found\n";
+											$log = "  Updates Found\n";
+											pfb_logger("{$log}","1");
 											unlink_if_exists($pfbfolder . '/' . $header_url . '.txt');
 											$updates++;
 										}
@@ -357,7 +363,8 @@ if ($argv[1] == 'cron') {
 								case "04hours":
 									if (in_array($hour, $e_sch4)) {
 										if (pfb_update_check($header_url, $list_url, $url_format)) {
-											print "  Updates Found\n";
+											$log = "  Updates Found\n";
+											pfb_logger("{$log}","1");
 											unlink_if_exists($pfbfolder . '/' . $header_url . '.txt');
 											$updates++;
 										}
@@ -366,7 +373,8 @@ if ($argv[1] == 'cron') {
 								case "06hours":
 									if (in_array($hour, $e_sch6)) {
 										if (pfb_update_check($header_url, $list_url, $url_format)) {
-											print "  Updates Found\n";
+											$log = "  Updates Found\n";
+											pfb_logger("{$log}","1");
 											unlink_if_exists($pfbfolder . '/' . $header_url . '.txt');
 											$updates++;
 										}
@@ -375,7 +383,8 @@ if ($argv[1] == 'cron') {
 								case "08hours":
 									if (in_array($hour, $e_sch8)) {
 										if (pfb_update_check($header_url, $list_url, $url_format)) {
-											print "  Updates Found\n";
+											$log = "  Updates Found\n";
+											pfb_logger("{$log}","1");
 											unlink_if_exists($pfbfolder . '/' . $header_url . '.txt');
 											$updates++;
 										}
@@ -384,7 +393,8 @@ if ($argv[1] == 'cron') {
 								case "12hours":
 									if (in_array($hour, $e_sch12)) {
 										if (pfb_update_check($header_url, $list_url, $url_format)) {
-											print "  Updates Found\n";
+											$log = "  Updates Found\n";
+											pfb_logger("{$log}","1");
 											unlink_if_exists($pfbfolder . '/' . $header_url . '.txt');
 											$updates++;
 										}
@@ -393,7 +403,8 @@ if ($argv[1] == 'cron') {
 								case "EveryDay":
 									if ($hour == $pfb['dailystart']) {
 										if (pfb_update_check($header_url, $list_url, $url_format)) {
-											print "  Updates Found\n";
+											$log = "  Updates Found\n";
+											pfb_logger("{$log}","1");
 											unlink_if_exists($pfbfolder . '/' . $header_url . '.txt');
 											$updates++;
 										}
@@ -402,7 +413,8 @@ if ($argv[1] == 'cron') {
 								case "Weekly":
 									if ($hour == $pfb['dailystart'] && $dow == $header_dow) {
 										if (pfb_update_check($header_url, $list_url, $url_format)) {
-											print "  Updates Found\n";
+											$log = "  Updates Found\n";
+											pfb_logger("{$log}","1");
 											unlink_if_exists($pfbfolder . '/' . $header_url . '.txt');
 											$updates++;
 										}
@@ -451,7 +463,7 @@ function pfblockerng_uc_countries() {
 		safe_mkdir ("{$folder}",0755);
 	}
 
-	$now = date("m/d/y G.i:s", time());
+	$now = date("m/d/y G:i:s", time());
 	$log = "Country Code Update Start - [ NOW ]\n\n";
 	print "Country Code Update Start - [ $now ]\n\n";
 	pfb_logger("{$log}","3");
@@ -565,7 +577,7 @@ function pfblockerng_uc_countries() {
 		$header		= "";
 		$pfb_file	= "";
 		$iso_key	= "";
-		$header		.= "# Generated from MaxMind Inc. on: " . date("m/d/y G.i:s", time()) . "\n";
+		$header		.= "# Generated from MaxMind Inc. on: " . date("m/d/y G:i:s", time()) . "\n";
 		$header		.= "# Continent IPv4: " . $cont_array[$counter]['continent'] . "\n";
 		$pfb_file	= $cont_array[$counter]['file4'];
 		$iso_key	= array_keys($iso);
@@ -618,7 +630,7 @@ function pfblockerng_uc_countries() {
 		$pfb_file	= "";
 		$iso_key	= "";
 
-		$header		.= "# Generated from MaxMind Inc. on: " . date("m/d/y G.i:s", time()) . "\n";
+		$header		.= "# Generated from MaxMind Inc. on: " . date("m/d/y G:i:s", time()) . "\n";
 		$header		.= "# Continent IPv6: " . $cont_array[$counter]['continent'] . "\n";
 		$pfb_file	= $cont_array[$counter]['file6'];
 		$iso_key	= array_keys($iso);

@@ -131,7 +131,7 @@ function pfb_log_mgmt() {
 function pfb_logger($log, $type) {
 	global $g,$pfb,$pfbarr;
 
-	$now = date("m/d/y G.i:s", time());
+	$now = date("m/d/y G:i:s", time());
 
 	# Only log timestamp if new
 	if (preg_match("/NOW/", $log)) {
@@ -336,7 +336,7 @@ function sync_package_pfblockerng($cron = "") {
 	$pfb['etblock']	= ($pfb['config_rep']['etblock'] != "" ? $pfb['config_rep']['etblock'] : "x");
 	# Emerging Threats IQRisk Match Categories
 	$pfb['etmatch']	= ($pfb['config_rep']['etmatch'] != "" ? $pfb['config_rep']['etmatch'] : "x");
-	# Perform a Manual Update on ET Categories
+	# Perform a Force Update on ET Categories
 	$pfb['etupdate']= $pfb['config_rep']['et_update'];
 
 	# Variables
@@ -384,7 +384,7 @@ function sync_package_pfblockerng($cron = "") {
 	$deny_outbound		= array();
 	# An Array of all Aliases (Active and non-Active)
 	$aliases_list		= array();
-	# This is an Array of Aliases that Have Updated Lists via CRON/Manual Update when 'Reputation' disabled.
+	# This is an Array of Aliases that Have Updated Lists via CRON/Force Update when 'Reputation' disabled.
 	$pfb_alias_lists	= array();
 	# This is an Array of All Active Aliases used when 'Reputation' enabled
 	$pfb_alias_lists_all = array();
@@ -424,8 +424,6 @@ function sync_package_pfblockerng($cron = "") {
 
 	# Discover if any Rules are AutoRules (If no AutoRules found, $pfb['autorules'] is FALSE, Skip Rules Re-Order )
 	# To configure Auto Rule Suffix. pfBlockerNG must be disabled to change Suffix and to avoid Duplicate Rules
-	# Also if $pfb['autorules'] is false, Skip Firewall Re-order Process.
-
 	$pfb['autorules'] = FALSE;
 	$pfb['found'] = FALSE;
 	foreach ($continents as $continent => $pfb_alias) {
@@ -634,7 +632,7 @@ function sync_package_pfblockerng($cron = "") {
 			}
 		}
 
-		# Find all Enabled IPv4 'Custom List' Header Names and Check if 'Emerging Threats Update' and 'Custom List Update' Needs Manual Updating
+		# Find all Enabled IPv4 'Custom List' Header Names and Check if 'Emerging Threats Update' and 'Custom List Update' Needs Force Updating
 		$list_type = array ("pfblockernglistsv4" => "_v4", "pfblockernglistsv6" => "_v6");
 		foreach ($list_type as $ip_type => $vtype) {
 			if ($config['installedpackages'][$ip_type]['config'] != "" && $pfb['enable'] == "on") {
@@ -676,7 +674,7 @@ function sync_package_pfblockerng($cron = "") {
 							$pfb['existing']['deny'][] = "{$pfb_alias},";	// Add Trailing ','
 							$pfbfolder = "{$pfb['denydir']}";
 						}
-						# Determine if 'Custom List' Needs Manual Updating before next CRON Event.
+						# Determine if 'Custom List' Needs Force Updating before next CRON Event.
 						if ($list['custom_update'] == "enabled") {
 							unlink_if_exists("{$pfbfolder}/{$pfb_alias}.txt");
 							# Uncheck 'Enabled' in List 'Custom_update' Setting
@@ -829,7 +827,7 @@ function sync_package_pfblockerng($cron = "") {
 
 						// Collect Selected ISO Country Files
 						foreach (explode(",", $continent_config[$c_type]) as $iso) {
-							if ($iso <> "" && file_exists($pfb['ccdir'] .'/' . $iso . $vtype . '.txt')) {
+							if ($iso != "" && file_exists($pfb['ccdir'] .'/' . $iso . $vtype . '.txt')) {
 								$continent .= file_get_contents ($pfb['ccdir'] . '/' . $iso . $vtype . '.txt');
 							}
 						}
@@ -1133,7 +1131,7 @@ function sync_package_pfblockerng($cron = "") {
 										if ($remote_tds == "local")
 											$remote_tds = gmdate ("D, d M Y H:i:s T", filemtime($file_dwn));
 										$remote_stamp = strtotime($remote_tds);
-										if (!isset($remote_stamp) && file_exists($file_dwn))
+										if (!empty($remote_stamp) && file_exists($file_dwn))
 											touch ($file_dwn, $remote_stamp);
 									}
 									$url_list = @gzfile($file_dwn);
@@ -1152,7 +1150,7 @@ function sync_package_pfblockerng($cron = "") {
 										if ($remote_tds == "local")
 											$remote_tds = gmdate ("D, d M Y H:i:s T", filemtime($file_dwn));
 										$remote_stamp = strtotime($remote_tds);
-										if (!isset($remote_stamp) && file_exists($file_dwn))
+										if (!empty($remote_stamp) && file_exists($file_dwn))
 											touch ($file_dwn, $remote_stamp);
 									}
 									$url_list = @file($pfb['origdir'] . '/' . $header_url . '.orig');
@@ -1173,7 +1171,7 @@ function sync_package_pfblockerng($cron = "") {
 											if ($remote_tds == "local")
 												$remote_tds = gmdate ("D, d M Y H:i:s T", filemtime($file_dwn));
 											$remote_stamp = strtotime($remote_tds);
-											if (!isset($remote_stamp) && file_exists($file_dwn))
+											if (!empty($remote_stamp) && file_exists($file_dwn))
 												touch ($file_dwn, $remote_stamp);
 										}
 									}
@@ -1194,7 +1192,7 @@ function sync_package_pfblockerng($cron = "") {
 										if ($remote_tds == "local")
 											$remote_tds = gmdate ("D, d M Y H:i:s T", filemtime($file_dwn));
 										$remote_stamp = strtotime($remote_tds);
-										if (!isset($remote_stamp) && file_exists($file_dwn))
+										if (!empty($remote_stamp) && file_exists($file_dwn))
 											touch ($file_dwn, $remote_stamp);
 									}
 									exec ("{$pfb['script']} et {$header_url} x x x x x {$pfb['etblock']} {$pfb['etmatch']} >> {$pfb['log']} 2>&1");
@@ -1213,7 +1211,7 @@ function sync_package_pfblockerng($cron = "") {
 										if ($remote_tds == "local")
 											$remote_tds = gmdate ("D, d M Y H:i:s T", filemtime($file_dwn));
 										$remote_stamp = strtotime($remote_tds);
-										if (!isset($remote_stamp) && file_exists($file_dwn))
+										if (!empty($remote_stamp) && file_exists($file_dwn))
 											touch ($file_dwn, $remote_stamp);
 									}
 									exec ("{$pfb['script']} xlsx {$header_url} >> {$pfb['log']} 2>&1");
@@ -1231,7 +1229,7 @@ function sync_package_pfblockerng($cron = "") {
 										if ($remote_tds == "local")
 											$remote_tds = gmdate ("D, d M Y H:i:s T", filemtime($file_dwn));
 										$remote_stamp = strtotime($remote_tds);
-										if (!isset($remote_stamp) && file_exists($file_dwn))
+										if (!empty($remote_stamp) && file_exists($file_dwn))
 											touch ($file_dwn, $remote_stamp);
 									}
 								}
@@ -1240,15 +1238,13 @@ function sync_package_pfblockerng($cron = "") {
 									$file_dwn = "{$pfb['origdir']}/{$header_url}.raw";
 									if ($pfb['reuse'] == "on" && file_exists($file_dwn)) {
 										# File Exists/Reuse
+										$return = 0;
 									} else {
 										$url_html = "{$row['url']}";
-										if ($pfb['pfsenseversion'] >= 2.2) {
-											exec ("/usr/bin/fetch -v --no-verify-peer -o {$file_dwn} -T 20 {$url_html}");
-										} else {
-											exec ("/usr/bin/fetch -v -o {$file_dwn} -T 20 {$url_html}");
-										}
+										exec ("/usr/bin/fetch -v -o {$file_dwn} -T 20 {$url_html}",$output,$return);
 									}
-									$url_list = @file($file_dwn);
+									if ($return == 0)
+										$url_list = @file($file_dwn);
 								}
 
 								elseif ($row['format'] == "rsync") {
@@ -1577,6 +1573,7 @@ function sync_package_pfblockerng($cron = "") {
 					#remove empty lists files if any
 					if (is_array($list['row'])) {
 						$update = 0;
+						${$alias} = "";
 						foreach ($list['row'] as $row) {
 							if ($row['url'] != "" && $row['format'] != "skip") {
 								if ($vtype == "_v4") {
@@ -2068,8 +2065,6 @@ function sync_package_pfblockerng($cron = "") {
 
 	# Clear any existing pfBlockerNG Cron Jobs
 	install_cron_job("pfblockerng.php cron", false);
-	# Clear any existing pfBlockerNG Manual Cron Jobs
-	install_cron_job("pfblockerng.php update", false);
 
 	# Replace Cron job with any User Changes to $pfb_min
 	if ($pfb['enable'] == "on") {
@@ -2187,7 +2182,7 @@ function sync_package_pfblockerng($cron = "") {
 	#             FINAL REPORTING               #
 	#############################################
 
-	# Only run with CRON or Manual Invoked Process
+	# Only run with CRON or Force Invoked Process
 	if ((!$pfb['save'] && $pfb['dupcheck'] && $pfb['enable'] == "on") || $pfb['summary']) {
 		# Script to run Final Script Processes.
 		exec ("{$pfb['script']} closing {$pfb['dup']} >> {$pfb['log']} 2>&1");
@@ -2226,14 +2221,16 @@ function pfblockerng_validate_input($post, &$input_errors) {
 }
 
 
-Function pfblockerng_php_install_command() {
+function pfblockerng_php_install_command() {
 	require_once("/usr/local/www/pfblockerng/pfblockerng.php");
 	global $config,$pfb;
 	pfb_global();
 
+	# Uncompress Country Code File and delete Archive after extraction.
+	exec("cd /{$pfb['ccdir']}; /usr/bin/tar -jxvf {$pfb['ccdir']}/countrycodes.tar.bz2");
+	unlink_if_exists("{$pfb['ccdir']}/countrycodes.tar.bz2");
 	# Download MaxMind Files and Create Country Code files and Build Continent XML Files
 	update_output_window(gettext("Downloading MaxMind Country Databases. This may take a minute..."));
-
 	exec("/bin/sh /usr/local/pkg/pfblockerng/geoipupdate.sh all");
 	update_output_window(gettext("MaxMind Country Database downloads completed..."));
 	update_output_window(gettext("Converting MaxMind Country Databases for pfBlockerNG. This may take a few minutes..."));
@@ -2256,7 +2253,6 @@ Function pfblockerng_php_install_command() {
 
 
 function pfblockerng_php_deinstall_command() {
-	require_once("/usr/local/www/pfblockerng/pfblockerng.php");
 	require_once("config.inc");
 	global $config,$pfb;
 
