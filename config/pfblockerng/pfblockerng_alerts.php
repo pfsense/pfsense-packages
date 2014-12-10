@@ -392,12 +392,12 @@ if ($savemsg) {
 				<!--Print Table Info-->
 				<td colspan="2" class="listtopic"><?php printf(gettext("&nbsp;{$type}&nbsp;&nbsp; - &nbsp; Last %s Alert Entries."), "{$pfbentries}"); ?>
 					<?php if ($pfb['pfsenseversion'] >= '2.2'): ?>
-						<?php if (!array_key_exists("reverse", $config['syslog'])): ?>
+						<?php if (!is_array($config['syslog']) || !array_key_exists("reverse", $config['syslog'])): ?>
 							&nbsp;&nbsp;<?php echo gettext("Firewall Logs must be in Reverse Order."); ?>
 						<?php endif; ?>
 					<?php else: ?>
 						&nbsp;&nbsp;<?php echo gettext("Firewall Rule changes can unsync these Alerts."); ?>
-						<?php if (!array_key_exists("reverse", $config['syslog'])): ?>
+						<?php if (!is_array($config['syslog']) || !array_key_exists("reverse", $config['syslog'])): ?>
 							&nbsp;&nbsp;<?php echo gettext("Firewall Logs must be in Reverse Order."); ?>
 						<?php endif; ?>
 					<?php endif; ?>

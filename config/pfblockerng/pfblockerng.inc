@@ -937,7 +937,7 @@ function sync_package_pfblockerng($cron = "") {
 									$rule['descr']= "{$pfb_alias}{$vtype}{$pfb['suffix']}";
 									$rule['source'] = array("any" => "");
 									$rule['destination'] = array ("address" => "{$pfb_alias}{$vtype}");
-									if ($pfb['config']['enable_log'] || $pfb_contlog == "enabled")
+									if ($pfb['config']['enable_log'] == "on" || $pfb_contlog == "enabled")
 										$rule['log'] = "";
 									$deny_outbound[] = $rule;
 									if ($continent_config['action'] != "Deny_Both")
@@ -952,7 +952,7 @@ function sync_package_pfblockerng($cron = "") {
 									$rule['descr'] = "{$pfb_alias}{$vtype}{$pfb['suffix']}";
 									$rule['source'] = array("address" => "{$pfb_alias}{$vtype}");
 									$rule['destination'] = array ("any" => "");
-									if ($pfb['config']['enable_log'] || $pfb_contlog == "enabled")
+									if ($pfb['config']['enable_log'] == "on" || $pfb_contlog == "enabled")
 										$rule['log'] = "";
 									$deny_inbound[] = $rule;
 									break;
@@ -967,7 +967,7 @@ function sync_package_pfblockerng($cron = "") {
 									$rule['descr'] = "{$pfb_alias}{$vtype}{$pfb['suffix']}";
 									$rule['source'] = array ("any" => "");
 									$rule['destination'] = array("address" => "{$pfb_alias}{$vtype}");
-									if ($pfb['config']['enable_log'] || $pfb_contlog == "enabled")
+									if ($pfb['config']['enable_log'] == "on" || $pfb_contlog == "enabled")
 										$rule['log'] = "";
 									$permit_outbound[] = $rule;
 									if ($continent_config['action'] != "Permit_Both")
@@ -982,7 +982,7 @@ function sync_package_pfblockerng($cron = "") {
 									$rule['descr'] = "{$pfb_alias}{$vtype}{$pfb['suffix']}";
 									$rule['source'] = array("address"=> "{$pfb_alias}{$vtype}");
 									$rule['destination'] = array ("any" => "");
-									if ($pfb['config']['enable_log'] || $pfb_contlog == "enabled")
+									if ($pfb['config']['enable_log'] == "on" || $pfb_contlog == "enabled")
 										$rule['log'] = "";
 									$permit_inbound[] = $rule;
 									break;
@@ -1010,7 +1010,7 @@ function sync_package_pfblockerng($cron = "") {
 									$rule['descr'] = "{$pfb_alias}{$vtype}{$pfb['suffix']}";
 									$rule['source'] = array ("address" => "{$pfb_alias}{$vtype}");
 									$rule['destination'] = array ( "any" => "");
-									if ($pfb['config']['enable_log'] || $pfb_contlog == "enabled")
+									if ($pfb['config']['enable_log'] == "on" || $pfb_contlog == "enabled")
 										$rule['log'] = "";
 									$match_inbound[] = $rule;
 									break;
@@ -1710,7 +1710,7 @@ function sync_package_pfblockerng($cron = "") {
 								$rule['descr'] = "{$alias}{$pfb['suffix']}";
 								$rule['source'] = array ("address" => "{$alias}");
 								$rule['destination'] = array ("any" => "");
-								if ($pfb['config']['enable_log'] || $alias_log == "enabled")
+								if ($pfb['config']['enable_log'] == "on" || $alias_log == "enabled")
 									$rule['log'] = "";
 								$permit_inbound[] = $rule;
 								break;
@@ -1738,7 +1738,7 @@ function sync_package_pfblockerng($cron = "") {
 								$rule['descr'] = "{$alias}{$pfb['suffix']}";
 								$rule['source'] = array ("address" => "{$alias}");
 								$rule['destination'] = array ("any" => "");
-								if ($pfb['config']['enable_log'] || $alias_log == "enabled")
+								if ($pfb['config']['enable_log'] == "on" || $alias_log == "enabled")
 									$rule['log'] = "";
 								$match_inbound[] = $rule;
 								break;
