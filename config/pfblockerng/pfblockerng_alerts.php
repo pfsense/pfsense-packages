@@ -653,7 +653,7 @@ if (!empty($fields_array)) {
 				// Report Specific ET IQRisk Details
 				if ($pfb['et_header'] && preg_match("/{$et_header}/", $pfb_query)) {
 					$host1 = preg_replace("/(\d{1,3})\.(\d{1,3}).(\d{1,3}).(\d{1,3})/", '\'$1\.$2\.$3\.$4\'', $host);
-					$pfb_query = exec("grep -Hm1 {$host1} {$pfb['etdir']} | sed -e 's/^.*[a-zA-Z]\///' -e 's/:.*//' -e 's/\..*/ /' -e 's/ET_/ET IPrep /' ");
+					$pfb_query = exec("grep -Hm1 {$host1} {$pfb['etdir']}/* | sed -e 's/^.*[a-zA-Z]\///' -e 's/:.*//' -e 's/\..*/ /' -e 's/ET_/ET IPrep /' ");
 					if (empty($pfb_query)) {
 						$host1 = preg_replace("/(\d{1,3})\.(\d{1,3}).(\d{1,3}).(\d{1,3})/", '\'$1.$2.$3.0/24\'', $host);
 						$pfb_query = exec("grep -rHm1 {$host1} {$pfbfolder} | sed -e 's/^.*[a-zA-Z]\///' -e 's/\.txt:/ /' | {$pfb_ex1}");
