@@ -134,10 +134,10 @@
 			<type>info</type>
 			</field>
 		<field>
-			<fielddescr><![CDATA[<br><strong>Top 20 IPv4</strong><br>Spammer Countries]]></fielddescr>
+			<fielddescr><![CDATA[<br /><strong>Top 20 IPv4</strong><br />Spammer Countries]]></fielddescr>
 			<fieldname>countries4</fieldname>
 			<description>
-			<![CDATA[Select Top IPv4 Spammer Countries you want to take an action on.<br>
+			<![CDATA[Select Top IPv4 Spammer Countries you want to take an action on.<br />
 					<strong>Use CTRL + CLICK to unselect countries</strong>]]>
 			</description>
 			<type>select</type>
@@ -167,10 +167,10 @@
 			<multiple/>
 		</field>
 		<field>
-			<fielddescr><![CDATA[<br><strong>Top 20 IPv6</strong><br>Spammer Countries]]></fielddescr>
+			<fielddescr><![CDATA[<br /><strong>Top 20 IPv6</strong><br />Spammer Countries]]></fielddescr>
 			<fieldname>countries6</fieldname>
 			<description>
-			<![CDATA[Select Top IPv6 Spammer Countries you want to take an action on.<br>
+			<![CDATA[Select Top IPv6 Spammer Countries you want to take an action on.<br />
 				<strong>Use CTRL + CLICK to unselect countries</strong>]]>
 			</description>
 			<type>select</type>
@@ -201,41 +201,41 @@
 		</field>
 		<field>
 			<fielddescr>List Action</fielddescr>
-			<description><![CDATA[<br>Default : <strong>Disabled</strong><br><br>
-				Select the <strong>Action</strong> for Firewall Rules on lists you have selected.<br><br>
-				<strong><u>'Disabled' Rules:</u></strong> Disables selection and does nothing to selected Alias.<br><br>
+			<description><![CDATA[<br />Default : <strong>Disabled</strong><br /><br />
+				Select the <strong>Action</strong> for Firewall Rules on lists you have selected.<br /><br />
+				<strong><u>'Disabled' Rules:</u></strong> Disables selection and does nothing to selected Alias.<br /><br />
 
-				<strong><u>'Deny' Rules:</u></strong><br>
+				<strong><u>'Deny' Rules:</u></strong><br />
 				'Deny' rules create high priority 'block' or 'reject' rules on the stated interfaces. They don't change the 'pass' rules on other
-				interfaces. Typical uses of 'Deny' rules are:<br>
+				interfaces. Typical uses of 'Deny' rules are:<br />
 				<ul><li><strong>Deny Both</strong> - blocks all traffic in both directions, if the source or destination IP is in the block list</li>
 				<li><strong>Deny Inbound/Deny Outbound</strong> - blocks all traffic in one direction <u>unless</u> it is part of a session started by
 				traffic sent in the other direction. Does not affect traffic in the other direction. </li>
 				<li>One way 'Deny' rules can be used to selectively block <u>unsolicited</u> incoming (new session) packets in one direction, while
 				still allowing <u>deliberate</u> outgoing sessions to be created in the other direction.</li></ul>
-				<strong><u>'Permit' Rules:</u></strong><br>
-				'Permit' rules create high priority 'pass' rules on the stated interfaces. They are not the opposite of Deny rules, and don't create
-				any 'blocking' effect anywhere. They have priority over all Deny rules. Typical uses of 'Permit' rules are:<br>
+				<strong><u>'Permit' Rules:</u></strong><br />
+				'Permit' rules create high priority 'pass' rules on the stated interfaces. They are the opposite of Deny rules, and don't create
+				any 'blocking' effect anywhere. They have priority over all Deny rules. Typical uses of 'Permit' rules are:<br />
 				<ul><li><strong>To ensure</strong> that traffic to/from the listed IPs will <u>always</u> be allowed in the stated directions. They
 				override <u>almost all other</u> Firewall rules on the stated interfaces.</li>
 				<li><strong>To act as a whitelist</strong> for Deny rule exceptions, for example if a large IP range or pre-created blocklist blocks a
 				few IPs that should be accessible.</li></ul>
-				<strong><u>'Match' Rules:</u></strong><br>
+				<strong><u>'Match' Rules:</u></strong><br />
 				'Match' or 'Log' only the traffic on the stated interfaces. This does not Block or Reject. It just Logs the traffic.
 				<ul><li><strong>Match Both</strong> - Matches all traffic in both directions, if the source or destination IP is in the list.</li>
-				<li><strong>Match Inbound/Match Outbound</strong> - Matches all traffic in one direction only.</ul></li>
-				<strong><u>'Alias' Rules:</u></strong><br>
+				<li><strong>Match Inbound/Match Outbound</strong> - Matches all traffic in one direction only.</li></ul>
+				<strong><u>'Alias' Rules:</u></strong><br />
 				<strong>'Alias'</strong> rules create an <a href="/firewall_aliases.php">alias</a> for the list (and do nothing else).
 				This enables a pfBlockerNG list to be used by name, in any firewall rule or pfSense function, as desired.
-				<ul><li><strong>Options &nbsp;&nbsp; - Alias Deny,&nbsp; Alias Permit,&nbsp; Alias Match,&nbsp; Alias Native</strong></li><br>
-				<li>'Alias Deny' can use De-Duplication and Reputation Processes if configured.</li><br>
-				<li>'Alias Permit' and 'Alias Match' will be saved in the Same folder as the other Permit/Match Auto-Rules</li><br>
-				<li>'Alias Native' lists are kept in their Native format without any modifications.</ul></li>
+				<ul><li><strong>Options &nbsp;&nbsp; - Alias Deny,&nbsp; Alias Permit,&nbsp; Alias Match,&nbsp; Alias Native</strong></li><br />
+				<li>'Alias Deny' can use De-Duplication and Reputation Processes if configured.</li><br />
+				<li>'Alias Permit' and 'Alias Match' will be saved in the Same folder as the other Permit/Match Auto-Rules</li><br />
+				<li>'Alias Native' lists are kept in their Native format without any modifications.</li></ul>
 				<strong>When using 'Alias' rules, change (pfB_) to ( pfb_ ) in the beginning of rule description and Use the 'Exact' spelling of
 				the Alias (no trailing Whitespace)&nbsp;</strong> Custom 'Alias' rules with 'pfB_  xxx' description will be removed by package if
-				using Auto Rule Creation.<br><br><strong>Tip</strong>: You can create the Auto Rules and remove "<u>auto rule</u>" from the Rule
+				using Auto Rule Creation.<br /><br /><strong>Tip</strong>: You can create the Auto Rules and remove "<u>auto rule</u>" from the Rule
 				Descriptions, then disable Auto Rules. This method will 'KEEP' these rules from being 'Deleted' which will allow editing for a Custom
-				Alias Configuration<br>]]>
+				Alias Configuration<br />]]>
 			</description>
 			<fieldname>action</fieldname>
 			<type>select</type>
@@ -258,7 +258,7 @@
 		<field>
 			<fielddescr>Enable Logging</fielddescr>
 			<fieldname>aliaslog</fieldname>
-			<description><![CDATA[Default:<strong>Enable</strong><br>
+			<description><![CDATA[Default:<strong>Enable</strong><br />
 				Select - Logging to Status: System Logs: FIREWALL ( Log )]]>
 			</description>
 			<type>select</type>

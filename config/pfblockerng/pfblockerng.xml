@@ -272,13 +272,13 @@
 			<fielddescr><![CDATA[<strong>Enable pfBlockerNG</strong>]]></fielddescr>
 			<fieldname>enable_cb</fieldname>
 			<type>checkbox</type>
-			<description><![CDATA[Note - with "Keep settings" enabled, pfBlockerNG will maintain run state on Installation/Upgrade<br>
+			<description><![CDATA[Note - with "Keep settings" enabled, pfBlockerNG will maintain run state on Installation/Upgrade<br />
 					If "Keep Settings" is not "enabled" on pkg Install/De-Install, all Settings will be Wiped!]]></description>
 		</field>
 		<field>
 			<fielddescr>CRON MIN Start Time</fielddescr>
 			<fieldname>pfb_min</fieldname>
-			<description><![CDATA[Default: <strong> : 00</strong><br>
+			<description><![CDATA[Default: <strong> : 00</strong><br />
 				Select Cron Update Minute ]]></description>
 			<type>select</type>
 			<options>
@@ -291,7 +291,7 @@
 		<field>
 			<fielddescr>CRON Base Hour Start Time</fielddescr>
 			<fieldname>pfb_hour</fieldname>
-			<description><![CDATA[Default: <strong> 1 </strong><br>
+			<description><![CDATA[Default: <strong> 1 </strong><br />
 				Select Cron Base Start Hour ]]></description>
 			<type>select</type>
 			<options>
@@ -324,8 +324,8 @@
 		<field>
 			<fielddescr>'Daily/Weekly' Start Hour</fielddescr>
 			<fieldname>pfb_dailystart</fieldname>
-			<description><![CDATA[Default: <strong> 1 </strong><br>
-				Select 'Daily' Schedule Start Hour <br>
+			<description><![CDATA[Default: <strong> 1 </strong><br />
+				Select 'Daily' Schedule Start Hour <br />
 				This is used for the 'Daily/Weekly' Scheduler Only.]]></description>
 			<type>select</type>
 			<options>
@@ -365,10 +365,10 @@
 			<fielddescr>Enable Suppression</fielddescr>
 			<fieldname>suppression</fieldname>
 			<type>checkbox</type>
-			<description><![CDATA[This will prevent Selected IPs from being Blocked. Only for IPv4 Lists (/32 and /24).<br>
-					Country Blocking Lists cannot be Suppressed.<br>
-					This will also remove RFC1918 addresses, 0.0.0.0 and 127.0.0.1 from all Lists.<br><br>
-					Alerts can be Suppressed using the '+' icon in the Alerts Tab and IPs added to the 'pfBlockerNGSuppress' Alias<br>
+			<description><![CDATA[This will prevent Selected IPs from being Blocked. Only for IPv4 Lists (/32 and /24).<br />
+					Country Blocking Lists cannot be Suppressed.<br />
+					This will also remove any RFC1918 addresses from all Lists.<br /><br />
+					Alerts can be Suppressed using the '+' icon in the Alerts Tab and IPs added to the 'pfBlockerNGSuppress' Alias<br />
 					A Blocked IP in a CIDR other than /24 will need to be Suppressed by an 'Permit Outbound' Firewall Rule]]>
 			</description>
 		</field>
@@ -388,14 +388,14 @@
 			<fielddescr>Disable MaxMind Country Database CRON Updates</fielddescr>
 			<fieldname>database_cc</fieldname>
 			<type>checkbox</type>
-			<description><![CDATA[This will Disable the MaxMind Monthly Country Database Cron Update.<br>
+			<description><![CDATA[This will Disable the MaxMind Monthly Country Database Cron Update.<br />
 				This does not affect the MaxMind Binary Cron Task]]>
 			</description>
 		</field>
 		<field>
 			<fielddescr>Logfile Size</fielddescr>
 			<fieldname>log_maxlines</fieldname>
-			<description><![CDATA[Default:<strong>20000</strong><br>
+			<description><![CDATA[Default:<strong>20000</strong><br />
 				Select number of Lines to Keep in Log File]]></description>
 			<type>select</type>
 			<options>
@@ -414,7 +414,7 @@
 		<field>
 			<fielddescr>Inbound Interface(s)</fielddescr>
 			<fieldname>inbound_interface</fieldname>
-			<description><![CDATA[Default: <strong>WAN</strong><br>Select the interface(s) you want to Apply Rules to]]></description>
+			<description><![CDATA[Default: <strong>WAN</strong><br />Select the interface(s) you want to Apply Rules to]]></description>
 			<type>interfaces_selection</type>
 			<hideinterfaceregex>loopback</hideinterfaceregex>
 			<required/>
@@ -423,7 +423,7 @@
 		<field>
 			<fielddescr> - Rule Action</fielddescr>
 			<fieldname>inbound_deny_action</fieldname>
-			<description><![CDATA[Default:<strong>Block</strong><br>
+			<description><![CDATA[Default:<strong>Block</strong><br />
 				Select 'Rule Action' for Inbound Rules]]></description>
 			<type>select</type>
 			<options>
@@ -434,7 +434,7 @@
 		<field>
 			<fielddescr>Outbound Interface(s)</fielddescr>
 			<fieldname>outbound_interface</fieldname>
-			<description><![CDATA[Default:<strong>LAN</strong> or none.<br>Select the interface(s) you want to Apply Rules to]]></description>
+			<description><![CDATA[Default:<strong>LAN</strong> or none.<br />Select the interface(s) you want to Apply Rules to]]></description>
 			<type>interfaces_selection</type>
 			<hideinterfaceregex>loopback</hideinterfaceregex>
 			<required/>
@@ -443,7 +443,7 @@
 		<field>
 			<fielddescr> - Rule Action</fielddescr>
 			<fieldname>outbound_deny_action</fieldname>
-			<description><![CDATA[Default:<strong>Reject</strong><br>
+			<description><![CDATA[Default:<strong>Reject</strong><br />
 				Select 'Rule Action' for Outbound rules]]></description>
 			<type>select</type>
 			<options>
@@ -461,16 +461,16 @@
 			<fielddescr><![CDATA[<strong>Floating Rules</strong>]]></fielddescr>
 			<fieldname>enable_float</fieldname>
 			<type>checkbox</type>
-			<description><![CDATA[<strong>Enabled:&nbsp;</strong> Auto-Rules will be generated in the 'Floating Rules' Tab<br><br>
-				<strong>Disabled:</strong> Auto-Rules will be generated in the Selected Inbound/Outbound Interfaces<br><br>
+			<description><![CDATA[<strong>Enabled:&nbsp;</strong> Auto-Rules will be generated in the 'Floating Rules' Tab<br /><br />
+				<strong>Disabled:</strong> Auto-Rules will be generated in the Selected Inbound/Outbound Interfaces<br /><br />
 				<strong>Rules will be ordered by the selection below.</strong>]]></description>
 		</field>
 		<field>
 			<fielddescr><![CDATA[<strong>Rule Order</strong>]]></fielddescr>
 			<fieldname>pass_order</fieldname>
-			<description><![CDATA[<br>Default Order:  <strong> | pfB_Block/Reject | All other Rules | (original format)<br></strong><br>
-				Select The '<strong>Order</strong>' of the Rules<br>
-				Selecting 'original format', sets pfBlockerNG rules at the top of the Firewall TAB.<br>
+			<description><![CDATA[<br />Default Order:  <strong> | pfB_Block/Reject | All other Rules | (original format)<br /></strong><br />
+				Select The '<strong>Order</strong>' of the Rules<br />
+				Selecting 'original format', sets pfBlockerNG rules at the top of the Firewall TAB.<br />
 				Selecting any other 'Order' will re-order <strong>all the Rules to the format indicated!</strong>]]></description>
 			<type>select</type>
 			<options>
@@ -483,7 +483,7 @@
 		<field>
 			<fielddescr><![CDATA[<strong>Auto Rule Suffix</strong>]]></fielddescr>
 			<fieldname>autorule_suffix</fieldname>
-			<description><![CDATA[Default:<strong>auto rule</strong><br>
+			<description><![CDATA[Default:<strong>auto rule</strong><br />
 				Select 'Auto Rule' Description Suffix for Auto Defined rules. pfBlockerNG Must be Disabled to Modify Suffix]]></description>
 			<type>select</type>
 			<options>
@@ -502,7 +502,7 @@
 			<type>info</type>
 			<description><![CDATA[<strong>
 				pfBlockerNG</strong> Created in 2014 by <a target=_new href='https://forum.pfsense.org/index.php?action=profile;u=238481'>BBcan177.</a>
-				<br><br>Based upon pfBlocker by Marcello Coutinho and Tom Schaefer.<br>
+				<br /><br />Based upon pfBlocker by Marcello Coutinho and Tom Schaefer.<br />
 				Country Database GeoLite distributed under the Creative Commons Attribution-ShareAlike 3.0 Unported License by:
 				MaxMind Inc. @ <a target=_new href='http://www.maxmind.com'>MaxMind.com</a>.
 				The Database is Automatically Updated the First Tuesday of Each Month]]></description>
@@ -516,7 +516,7 @@
 		<field>
 			<fielddescr>Gold Membership</fielddescr>
 			<type>info</type>
-			<description><![CDATA[If you like this package, please Support pfSense by subscribing to a <a target=_new href='https://portal.pfsense.org/gold-subscription.php'>Gold Membership</a><br> or support the developer @ BBCan177@gmail.com]]></description>
+			<description><![CDATA[If you like this package, please Support pfSense by subscribing to a <a target=_new href='https://portal.pfsense.org/gold-subscription.php'>Gold Membership</a><br /> or support the developer @ BBCan177@gmail.com]]></description>
 		</field>
 		<field>
 			<name><![CDATA[<ul>Click to SAVE Settings and/or Rule Edits. &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Changes are Applied via CRON or

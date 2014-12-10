@@ -922,10 +922,10 @@ $xml = <<<EOF
 			<type>info</type>
 		</field>
 		<field>	
-			<fielddescr><![CDATA[<br><strong>IPv4</strong><br>Countries]]></fielddescr>
+			<fielddescr><![CDATA[<br /><strong>IPv4</strong><br />Countries]]></fielddescr>
 			<fieldname>countries4</fieldname>
 			<description>
-			<![CDATA[Select IPv4 Countries you want to take an action on.<br>
+			<![CDATA[Select IPv4 Countries you want to take an action on.<br />
 				<strong>Use CTRL + CLICK to unselect countries</strong>]]>
 			</description>
 			<type>select</type>
@@ -936,10 +936,10 @@ $xml = <<<EOF
 			<multiple/>
 		</field>
 		<field>
-			<fielddescr><![CDATA[<br><strong>IPv6</strong><br>Countries]]></fielddescr>
+			<fielddescr><![CDATA[<br /><strong>IPv6</strong><br />Countries]]></fielddescr>
 			<fieldname>countries6</fieldname>
 			<description>
-			<![CDATA[Select IPv6 Countries you want to take an action on.<br>
+			<![CDATA[Select IPv6 Countries you want to take an action on.<br />
 				<strong>Use CTRL + CLICK to unselect countries</strong>]]>
 			</description>
 			<type>select</type>
@@ -951,41 +951,41 @@ $xml = <<<EOF
 		</field>
 		<field>
 			<fielddescr>List Action</fielddescr>
-			<description><![CDATA[<br>Default : <strong>Disabled</strong><br><br>
-				Select the <strong>Action</strong> for Firewall Rules on lists you have selected.<br><br>
-				<strong><u>'Disabled' Rules:</u></strong> Disables selection and does nothing to selected Alias.<br><br>
+			<description><![CDATA[<br />Default : <strong>Disabled</strong><br /><br />
+				Select the <strong>Action</strong> for Firewall Rules on lists you have selected.<br /><br />
+				<strong><u>'Disabled' Rules:</u></strong> Disables selection and does nothing to selected Alias.<br /><br />
 
-				<strong><u>'Deny' Rules:</u></strong><br>
+				<strong><u>'Deny' Rules:</u></strong><br />
 				'Deny' rules create high priority 'block' or 'reject' rules on the stated interfaces. They don't change the 'pass' rules on other
-				interfaces. Typical uses of 'Deny' rules are:<br>
+				interfaces. Typical uses of 'Deny' rules are:<br />
 				<ul><li><strong>Deny Both</strong> - blocks all traffic in both directions, if the source or destination IP is in the block list</li>
 				<li><strong>Deny Inbound/Deny Outbound</strong> - blocks all traffic in one direction <u>unless</u> it is part of a session started by
 				traffic sent in the other direction. Does not affect traffic in the other direction. </li>
 				<li>One way 'Deny' rules can be used to selectively block <u>unsolicited</u> incoming (new session) packets in one direction, while
 				still allowing <u>deliberate</u> outgoing sessions to be created in the other direction.</li></ul>
-				<strong><u>'Permit' Rules:</u></strong><br>
-				'Permit' rules create high priority 'pass' rules on the stated interfaces. They are not the opposite of Deny rules, and don't create
-				any 'blocking' effect anywhere. They have priority over all Deny rules. Typical uses of 'Permit' rules are:<br>
+				<strong><u>'Permit' Rules:</u></strong><br />
+				'Permit' rules create high priority 'pass' rules on the stated interfaces. They are the opposite of Deny rules, and don't create
+				any 'blocking' effect anywhere. They have priority over all Deny rules. Typical uses of 'Permit' rules are:<br />
 				<ul><li><strong>To ensure</strong> that traffic to/from the listed IPs will <u>always</u> be allowed in the stated directions. They
 				override <u>almost all other</u> Firewall rules on the stated interfaces.</li>
 				<li><strong>To act as a whitelist</strong> for Deny rule exceptions, for example if a large IP range or pre-created blocklist blocks a
 				few IPs that should be accessible.</li></ul>
-				<strong><u>'Match' Rules:</u></strong><br>
+				<strong><u>'Match' Rules:</u></strong><br />
 				'Match' or 'Log' only the traffic on the stated interfaces. This does not Block or Reject. It just Logs the traffic.
 				<ul><li><strong>Match Both</strong> - Matches all traffic in both directions, if the source or destination IP is in the list.</li>
-				<li><strong>Match Inbound/Match Outbound</strong> - Matches all traffic in one direction only.</ul></li>
-				<strong><u>'Alias' Rules:</u></strong><br>
-				<strong>'Alias'</strong> rules create an <a target=_new href="/firewall_aliases.php">alias</a> for the list (and do nothing else).
+				<li><strong>Match Inbound/Match Outbound</strong> - Matches all traffic in one direction only.</li></ul>
+				<strong><u>'Alias' Rules:</u></strong><br />
+				<strong>'Alias'</strong> rules create an <a href="/firewall_aliases.php">alias</a> for the list (and do nothing else).
 				This enables a pfBlockerNG list to be used by name, in any firewall rule or pfSense function, as desired.
-				<ul><li><strong>Options &nbsp;&nbsp; - Alias Deny,&nbsp; Alias Permit,&nbsp; Alias Match,&nbsp; Alias Native</strong></li><br>
-				<li>'Alias Deny' can use De-Duplication and Reputation Processes if configured.</li><br>
-				<li>'Alias Permit' and 'Alias Match' will be saved in the Same folder as the other Permit/Match Auto-Rules</li><br>
-				<li>'Alias Native' lists are kept in their Native format without any modifications.</ul></li>
+				<ul><li><strong>Options &nbsp;&nbsp; - Alias Deny,&nbsp; Alias Permit,&nbsp; Alias Match,&nbsp; Alias Native</strong></li><br />
+				<li>'Alias Deny' can use De-Duplication and Reputation Processes if configured.</li><br />
+				<li>'Alias Permit' and 'Alias Match' will be saved in the Same folder as the other Permit/Match Auto-Rules</li><br />
+				<li>'Alias Native' lists are kept in their Native format without any modifications.</li></ul>
 				<strong>When using 'Alias' rules, change (pfB_) to ( pfb_ ) in the beginning of rule description and use the 'Exact' spelling of
 				the Alias (no trailing Whitespace)&nbsp;</strong> Custom 'Alias' rules with 'pfB_  xxx' description will be removed by package if
-				using Auto Rule Creation.<br><br><strong>Tip</strong>: You can create the Auto Rules and remove "<u>auto rule</u>" from the Rule
+				using Auto Rule Creation.<br /><br /><strong>Tip</strong>: You can create the Auto Rules and remove "<u>auto rule</u>" from the Rule
 				Descriptions, then disable Auto Rules. This method will 'KEEP' these rules from being 'Deleted' which will allow editing for a Custom
-				Alias Configuration<br>]]>
+				Alias Configuration<br />]]>
 			</description>
 			<fieldname>action</fieldname>
 			<type>select</type>
@@ -1009,8 +1009,8 @@ $xml = <<<EOF
 		<field>
 			<fielddescr>Enable Logging</fielddescr>
 			<fieldname>aliaslog</fieldname>
-			<description><![CDATA[Default:<strong>Enable</strong><br>
-				Select - Logging to Status: System Logs: FIREWALL ( Log )<br>
+			<description><![CDATA[Default:<strong>Enable</strong><br />
+				Select - Logging to Status: System Logs: FIREWALL ( Log )<br />
 				This can be overriden by the 'Global Logging' Option in the General Tab.]]></description>
 			<type>select</type>
 			<options>
@@ -1020,7 +1020,7 @@ $xml = <<<EOF
 		</field>
 		<field>
 			<name><![CDATA[<ul>Click to SAVE Settings and/or Rule Edits. &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Changes are Applied via CRON or
-				'Force Update']]>
+				'Force Update'</ul>]]>
 			</name>
 			<type>listtopic</type>
 		</field>
@@ -1208,15 +1208,15 @@ $xmlrep = <<<EOF
 			<fieldname>why</fieldname>
 			<type>info</type>
 			<description><![CDATA[By Enabling '<strong>Reputation</strong>', each Blocklist will be analyzed for Repeat Offenders in each IP Range.
-				<ul>Example: &nbsp;&nbsp; x.x.x.1, x.x.x.2, x.x.x.3, x.x.x.4, x.x.x.5<br>
+				<ul>Example: &nbsp;&nbsp; x.x.x.1, x.x.x.2, x.x.x.3, x.x.x.4, x.x.x.5<br />
 				No. of <strong> Repeat Offending IPs </strong> [ &nbsp;<strong>5</strong>&nbsp; ], in a Blocklist within the same IP Range.</ul>
 				With '<strong>Reputation</strong> enabled, these 5 IPs will be removed and a single
-				<strong>x.x.x.0/24</strong> Block is used.<br>
-				This will completely Block/Reject this particular range from your Firewall.<br><br>
-				Selecting Blocklists from various Threat Sources will help to highlight Repeat Offending IP Ranges,<br>
-				Its Important to select a Broad Range of Blocklists that cover different types of Malicious Activity.<br><br>
-				You *may* experience some False Positives. Add any False Positive IPs manually to the<br>
-				<strong>pfBlockerNGSuppress Alias</strong> or use the "+" suppression Icon in the Alerts TAB<br><br>
+				<strong>x.x.x.0/24</strong> Block is used.<br />
+				This will completely Block/Reject this particular range from your Firewall.<br /><br />
+				Selecting Blocklists from various Threat Sources will help to highlight Repeat Offending IP Ranges,<br />
+				Its Important to select a Broad Range of Blocklists that cover different types of Malicious Activity.<br /><br />
+				You *may* experience some False Positives. Add any False Positive IPs manually to the<br />
+				<strong>pfBlockerNGSuppress Alias</strong> or use the "+" suppression Icon in the Alerts TAB<br /><br />
 				To help mitigate False Positives 'Countries' can be '<strong>Excluded</strong>' from this Process. (Refer to Country Code Settings)]]>
 			</description>
 		</field>
@@ -1226,7 +1226,7 @@ $xmlrep = <<<EOF
 		</field>
 		<field>
 			<fieldname></fieldname>
-			<fielddescr><![CDATA[<br><strong>Individual List Reputation</strong><br><br>]]></fielddescr>
+			<fielddescr><![CDATA[<br /><strong>Individual List Reputation</strong><br /><br />]]></fielddescr>
 			<type>info</type>
 			<description></description>
 		</field>
@@ -1239,7 +1239,7 @@ $xmlrep = <<<EOF
 		<field>
 			<fielddescr><![CDATA[&nbsp;&nbsp;&nbsp;[ <strong>Max</strong> ] Setting]]></fielddescr>
 			<fieldname>p24_max_var</fieldname>
-			<description><![CDATA[Default: <strong>5</strong><br>
+			<description><![CDATA[Default: <strong>5</strong><br />
 				Maximum number of Repeat Offenders allowed in a Single IP Range]]></description>
 			<type>select</type>
 			<options>
@@ -1253,22 +1253,22 @@ $xmlrep = <<<EOF
 		</field>
 		<field>
 			<fieldname></fieldname>
-			<fielddescr><![CDATA[<br><strong>Collective List Reputation</strong><br><br>]]></fielddescr>
+			<fielddescr><![CDATA[<br /><strong>Collective List Reputation</strong><br /><br />]]></fielddescr>
 			<type>info</type>
 			<description></description>
 		</field>
 		<field>
 			<fieldname></fieldname>
 			<type>info</type>
-			<description><![CDATA[Once all Blocklists are Downloaded, these two 'additional' processes <strong>[ pMax ] and [ dMax ]</strong><br>
-				Can be used to Further analyze for Repeat Offenders.<br>
+			<description><![CDATA[Once all Blocklists are Downloaded, these two 'additional' processes <strong>[ pMax ] and [ dMax ]</strong><br />
+				Can be used to Further analyze for Repeat Offenders.<br />
 				<ul>Analyzing All Blocklists as a Whole:</ul>
-				<ul><strong>[ pMax ]</strong> will analyze for Repeat Offenders in each IP Range but will not use the Country Exclusion.<br>
-				Default is 50 IPs in any Range. Having 50 Repeat Offenders IPs in any Range will Block the entire Range.<br><br></ul>
-				<ul><strong>[ dMax ]</strong> will analyze for Repeat Offenders in each IP Range. Country Exclusions will be applied.<br>
+				<ul><strong>[ pMax ]</strong> will analyze for Repeat Offenders in each IP Range but will not use the Country Exclusion.<br />
+				Default is 50 IPs in any Range. Having 50 Repeat Offenders IPs in any Range will Block the entire Range.<br /><br /></ul>
+				<ul><strong>[ dMax ]</strong> will analyze for Repeat Offenders in each IP Range. Country Exclusions will be applied.<br />
 				Default is 5 IPs in any Range.</ul>
 				Note: <strong>MAX</strong> performs on individual Blocklists, while <strong>pMAX / dMAX</strong>
-				perform on all Lists together.<br>]]>
+				perform on all Lists together.<br />]]>
 			</description>
 		</field>
 		<field>
@@ -1281,7 +1281,7 @@ $xmlrep = <<<EOF
 		<field>
 			<fielddescr><![CDATA[&nbsp;&nbsp;&nbsp;[ <strong>pMax</strong> ] Setting]]></fielddescr>
 			<fieldname>p24_pmax_var</fieldname>
-			<description><![CDATA[Default: <strong>50</strong><br>Maximum number of Repeat Offenders]]></description>
+			<description><![CDATA[Default: <strong>50</strong><br />Maximum number of Repeat Offenders]]></description>
 			<type>select</type>
 			<options>
 				<option><name>50</name><value>50</value></option>
@@ -1302,7 +1302,7 @@ $xmlrep = <<<EOF
 		<field>
 			<fielddescr><![CDATA[&nbsp;&nbsp;&nbsp;[ <strong>dMax</strong> ] Setting]]></fielddescr>
 			<fieldname>p24_dmax_var</fieldname>
-			<description><![CDATA[Default: <strong>5</strong><br>
+			<description><![CDATA[Default: <strong>5</strong><br />
 				Maximum number of Repeat Offenders]]></description>
 			<type>select</type>
 			<options>
@@ -1322,23 +1322,23 @@ $xmlrep = <<<EOF
 			<fieldname>INFO</fieldname>
 			<type>info</type>
 			<description><![CDATA[When performing Queries for Repeat Offenders, you can choose to <strong>ignore</strong> Repeat Offenders in select
-				Countries. The Original Blocklisted IPs remain intact. All other Repeat Offending Country Ranges will be processed.<br><br>
-				Define Repeat Offending Ranges [ <strong>Action</strong> ] Available settings are:<br>
+				Countries. The Original Blocklisted IPs remain intact. All other Repeat Offending Country Ranges will be processed.<br /><br />
+				Define Repeat Offending Ranges [ <strong>Action</strong> ] Available settings are:<br />
 				<ul><strong>Ignore</strong>: Repeat Offenders that are in the 'ccwhite' category will be 'Ignored' (Default)</ul>
 				<ul><strong>Block:</strong> Repeat Offenders are set to Block the entire Repeat Offending Range(s)</ul>
-				<ul><strong>Match:</strong> Repeat Offenders are added to a 'Match' List which can be used in a Floating Match Rule<br>
+				<ul><strong>Match:</strong> Repeat Offenders are added to a 'Match' List which can be used in a Floating Match Rule<br />
 				Selecting 'Match' will consume more processing time, so only select this option if you enable Rules for it.</ul>
-				'<strong>ccwhite</strong>' are Countries that are Selected to be excluded from the Repeat Offenders Search.<br>
-				'<strong>ccblack</strong>' are all other Countries that are not selected.<br><br>
+				'<strong>ccwhite</strong>' are Countries that are Selected to be excluded from the Repeat Offenders Search.<br />
+				'<strong>ccblack</strong>' are all other Countries that are not selected.<br /><br />
 				To use '<strong>Match</strong>' Lists, Create a new 'Alias'
-				and select one of the <strong>Action 'Match'</strong> Formats and<br> enter the 'Localfile' as:
+				and select one of the <strong>Action 'Match'</strong> Formats and<br /> enter the 'Localfile' as:
 				<ul>/var/db/pfblockerng/match/matchdedup.txt</ul>]]>
 			</description>
 		</field>
 		<field>
 			<fielddescr>ccwhite Action:</fielddescr>
 			<fieldname>ccwhite</fieldname>
-			<description><![CDATA[Default: <strong>Ignore</strong><br>
+			<description><![CDATA[Default: <strong>Ignore</strong><br />
 				Select the 'Action' format for ccwhite]]>
 			</description>
 			<type>select</type>
@@ -1350,7 +1350,7 @@ $xmlrep = <<<EOF
 		<field>
 			<fielddescr>ccblack Action:</fielddescr>
 			<fieldname>ccblack</fieldname>
-			<description><![CDATA[Default: <strong>Block</strong><br>
+			<description><![CDATA[Default: <strong>Block</strong><br />
 				Select the 'Action' format for ccblack]]>
 			</description>
 			<type>select</type>
@@ -1360,11 +1360,11 @@ $xmlrep = <<<EOF
 			</options>
 		</field>
 		<field>
-			<fielddescr><![CDATA[<br><strong>IPv4</strong><br>Country Exclusion<br>
-				<br>Geolite Data by:<br>MaxMind Inc.&nbsp;&nbsp;(ISO 3166)]]></fielddescr>
+			<fielddescr><![CDATA[<br /><strong>IPv4</strong><br />Country Exclusion<br />
+				<br />Geolite Data by:<br />MaxMind Inc.&nbsp;&nbsp;(ISO 3166)]]></fielddescr>
 			<fieldname>ccexclude</fieldname>
 			<description>
-				<![CDATA[Select Countries you want to <strong>Exclude</strong> from the Reputation Process.<br>
+				<![CDATA[Select Countries you want to <strong>Exclude</strong> from the Reputation Process.<br />
 				<strong>Use CTRL + CLICK to unselect countries</strong>]]>
 			</description>
 			<type>select</type>
@@ -1382,16 +1382,16 @@ $xmlrep = <<<EOF
 			<fielddescr>Subscription Pro. Blocklist</fielddescr>
 			<fieldname>ETINFO</fieldname>
 			<type>info</type>
-			<description><![CDATA[<strong>Emerging Threats IQRisk</strong> is a Subscription Professional Reputation List.<br><br>
+			<description><![CDATA[<strong>Emerging Threats IQRisk</strong> is a Subscription Professional Reputation List.<br /><br />
 					ET IQRisk Blocklist must be entered in the Lists Tab using the following example:
 					<ul>https://rules.emergingthreatspro.com/XXXXXXXXXXXXXXXX/reputation/iprepdata.txt.gz</ul>
-					Select the <strong>ET IQRisk'</strong> format. The URL should use the .gz File Type.<br>
+					Select the <strong>ET IQRisk'</strong> format. The URL should use the .gz File Type.<br />
 					Enter your "ETPRO" code in URL. Further information can be found @
-					<a target=_new href='http://emergingthreats.net/solutions/iqrisk-suite/'>ET IQRisk IP Reputation</a><br><br>
+					<a target=_new href='http://emergingthreats.net/solutions/iqrisk-suite/'>ET IQRisk IP Reputation</a><br /><br />
 					To use <strong>'Match'</strong> Lists, Create a new 'Alias' and select one of the <strong>
-					Action 'Match'</strong> Formats and <br>
+					Action 'Match'</strong> Formats and <br />
 					enter the 'Localfile' as: <ul>/var/db/pfblockerng/match/ETMatch.txt</ul>
-					ET IQRisk Individual Match Lists can be found in the following folder:<br>
+					ET IQRisk Individual Match Lists can be found in the following folder:<br />
 					<ul>/var/db/pfblockerng/ET</ul> ]]>
 			</description>
 		</field>
@@ -1399,7 +1399,7 @@ $xmlrep = <<<EOF
 			<fielddescr>ET IQRisk Header Name</fielddescr>
 			<fieldname>et_header</fieldname>
 			<type>input</type>
-			<description><![CDATA[Enter the 'Header Name' referenced in the IPv4 List TAB for ET IQRisk IPRep.<br>
+			<description><![CDATA[Enter the 'Header Name' referenced in the IPv4 List TAB for ET IQRisk IPRep.<br />
 				This will be used to improve the Alerts TAB reporting for ET IPRep.]]>
 			</description>
 		</field>
@@ -1407,9 +1407,9 @@ $xmlrep = <<<EOF
 			<fielddescr>ET IQRISK BLOCK LISTS</fielddescr>
 			<fieldname>etblock</fieldname>
 			<description>
-				<![CDATA[Select Lists you want to BLOCK.<br>
+				<![CDATA[Select Lists you want to BLOCK.<br />
 				<strong>Use CTRL + CLICK to unselect Categories</strong>
-				<br><br>Any Changes will take effect at the Next Scheduled CRON Task]]>
+				<br /><br />Any Changes will take effect at the Next Scheduled CRON Task]]>
 			</description>
 			<type>select</type>
 			<options>
@@ -1456,9 +1456,9 @@ $xmlrep = <<<EOF
 			<fielddescr>ET IQRISK Match LISTS</fielddescr>
 			<fieldname>etmatch</fieldname>
 			<description>
-				<![CDATA[Select Lists you want to MATCH.<br>
+				<![CDATA[Select Lists you want to MATCH.<br />
 				<strong>Use CTRL + CLICK to unselect Categories</strong>
-				<br><br>Any Changes will take effect at the Next Scheduled CRON Task]]>
+				<br /><br />Any Changes will take effect at the Next Scheduled CRON Task]]>
 			</description>
 			<type>select</type>
 			<options>
@@ -1504,9 +1504,9 @@ $xmlrep = <<<EOF
 		<field>
 			<fielddescr>Update ET Categories</fielddescr>
 			<fieldname>et_update</fieldname>
-			<description><![CDATA[Default:<strong>Disable</strong><br>
-				Select - Enable ET Update if Category Changes are Made.<br>
-				You can perform a 'Force Update' to enable these changes.<br>
+			<description><![CDATA[Default:<strong>Disable</strong><br />
+				Select - Enable ET Update if Category Changes are Made.<br />
+				You can perform a 'Force Update' to enable these changes.<br />
 				Cron will also resync this list at the next Scheduled Update.]]>
 			</description>
 			<type>select</type>

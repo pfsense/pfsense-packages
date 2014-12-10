@@ -64,8 +64,8 @@ function pfBlockerNG_get_counts() {
 
 	// Collect Alias Count and Update Date/Time
 	$pfb_table = array();
-	$out = "<img src ='/themes/{$g['theme']}/images/icons/icon_interface_down.gif' title=\"No Rules are Defined using this Alias\">";
-	$in = "<img src ='/themes/{$g['theme']}/images/icons/icon_interface_up.gif' title=\"Rules are Defined using this Alias\">";
+	$out = "<img src ='/themes/{$g['theme']}/images/icons/icon_interface_down.gif' title=\"No Rules are Defined using this Alias\" alt=\"\" />";
+	$in = "<img src ='/themes/{$g['theme']}/images/icons/icon_interface_up.gif' title=\"Rules are Defined using this Alias\" alt=\"\" />";
 	if (is_array($config['aliases']['alias'])) {
 		foreach ($config['aliases']['alias'] as $cbalias) {
 			if (preg_match("/pfB_/", $cbalias['name'])) {
@@ -168,7 +168,7 @@ $fails = exec("grep $(date +%m/%d/%y) {$pfb['errlog']} | grep 'FAIL'", $results)
 	<table border="0" cellspacing="0" cellpadding="0">
 		<thead>
 		<tr>
-			<td valign="middle">&nbsp;<img src="<?= $pfb_status ?>" width="13" height="13" border="0" title="<?=gettext($pfb_msg) ?>"></td>
+			<td valign="middle">&nbsp;<img src="<?= $pfb_status ?>" width="13" height="13" border="0" title="<?=gettext($pfb_msg) ?>" alt="" /></td>
 			<td valign="middle">&nbsp;&nbsp;</td>
 			<td valign="middle" p style="font-size:10px">
 									<?php if ($dcount != 0): ?>
@@ -187,11 +187,11 @@ $fails = exec("grep $(date +%m/%d/%y) {$pfb['errlog']} | grep 'FAIL'", $results)
 										<?=gettext("&nbsp;Supp:"); echo("&nbsp;<strong>" . $pfbsupp_cnt . "</strong>"); ?>
 									<?php endif; ?></td>
 			<td valign="middle">&nbsp;&nbsp;</td>
-			<td valign="top"><a href="pfblockerng/pfblockerng_log.php"><img src="/themes/<?=$g['theme']; ?>/images/icons/icon_logs.gif" width="13" height="13" border="0" title="<?=gettext("View pfBlockerNG Logs TAB") ?>"></a>&nbsp;
+			<td valign="top"><a href="pfblockerng/pfblockerng_log.php"><img src="/themes/<?=$g['theme']; ?>/images/icons/icon_logs.gif" width="13" height="13" border="0" title="<?=gettext("View pfBlockerNG Logs TAB") ?>" alt="" /></a>&nbsp;
 			<td valign="top">
 				<?php if (!empty($results)): ?>		<!--Hide "Ack" Button when Failed Downloads are Empty-->
 					<form action="/widgets/widgets/pfblockerng.widget.php" method="post" name="widget_pfblockerng_ack">
-						<input type="hidden" value="clearack" name="pfblockerngack">
+						<input type="hidden" value="clearack" name="pfblockerngack" />
 						<input class="vexpl" type="image" name="pfblockerng_ackbutton" src="/themes/<?=$g['theme']; ?>/images/icons/icon_x.gif" width="14" height="14" border="0" title="<?=gettext("Clear Failed Downloads") ?>"/>
 					</form>
 				<?php endif; ?>
