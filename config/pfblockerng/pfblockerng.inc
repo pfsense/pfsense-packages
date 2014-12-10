@@ -1036,23 +1036,16 @@ function sync_package_pfblockerng($cron = "") {
 	#############################################
 
 	# IPv4 REGEX Definitions
-	$pfb['range']	= '/((?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?))-((?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?))/';
-	$pfb['block']	= '/(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[ 0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.([0]{1})\s+/';
-	$pfb['cidr']	= '/(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)?\/[0-9]{2}/';
-	$pfb['single']	= '/(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\s+/';
-	$pfb['s_html']	= '/(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)/';
-
-	# IPv4 preg_replace Regex Filter array
-	$pfb_ipreg = array();
-	$pfb_ipreg[0] = '/\b0+(?=\d)/'; # Remove any Leading Zeros in each Octet
-	$pfb_ipreg[1] = '/\s/'; # Remove any Whitespaces
-	$pfb_ipreg[2] = '/127\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}/'; # Remove any Loopback Addresses 127/8
-	$pfb_ipreg[3] = '/0\.0\.0\.0/'; # Remove 0.0.0.0
+	$pfb['range']	= "/((?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?))-((?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?))/";
+	$pfb['block']	= "/(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[ 0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.([0]{1})\s+/";
+	$pfb['cidr']	= "/(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)?\/[0-9]{2}/";
+	$pfb['single']	= "/(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\s+/";
+	$pfb['s_html']	= "/(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)/";
 
 	# IPv6 REGEX Definitions  -- ** Still Needs some Adjustment on Regex Definition for IPv6 **
 	# https://mebsd.com/coding-snipits/php-regex-ipv6-with-preg_match.html
 	$pattern1 = '([A-Fa-f0-9]{1,4}:){7}[A-Fa-f0-9]{1,4}';
-	$pattern2 = '([A-Fa-f0-9]{1,4}::([A-Fa-f0-9]{1,4}:){0,5}[A-Fa-f0-9]{1,4}';
+	$pattern2 = '[A-Fa-f0-9]{1,4}::([A-Fa-f0-9]{1,4}:){0,5}[A-Fa-f0-9]{1,4}';
 	$pattern3 = '([A-Fa-f0-9]{1,4}:){2}:([A-Fa-f0-9]{1,4}:){0,4}[A-Fa-f0-9]{1,4}';
 	$pattern4 = '([A-Fa-f0-9]{1,4}:){3}:([A-Fa-f0-9]{1,4}:){0,3}[A-Fa-f0-9]{1,4}';
 	$pattern5 = '([A-Fa-f0-9]{1,4}:){4}:([A-Fa-f0-9]{1,4}:){0,2}[A-Fa-f0-9]{1,4}';
@@ -1267,15 +1260,15 @@ function sync_package_pfblockerng($cron = "") {
 
 								#extract range lists
 								$new_file = "";
-								if (!empty($url_list)) {
+								if (isset($url_list)) {
 									if ($row['format'] == "gz" && $vtype == "_v4") {
 										foreach ($url_list as $line) {
 											# Network range 192.168.0.0-192.168.0.254
 											if (preg_match($pfb['range'],$line,$matches)) {
 												$a_cidr = ip_range_to_subnet_array($matches[1],$matches[2]);
-												if (!empty($a_cidr)) {
+												if (isset($a_cidr)) {
 													foreach ($a_cidr as $cidr) {
-														$new_file .= preg_replace($pfb_ipreg,'',$cidr) . "\n";
+														$new_file .= preg_replace('/\s/', '',$cidr) . "\n";
 													}
 												}
 											}
@@ -1286,7 +1279,7 @@ function sync_package_pfblockerng($cron = "") {
 										foreach ($url_list as $line) {
 											# Block Type '218.77.79.0	218.77.79.255   24'
 											if (preg_match($pfb['block'],$line,$matches)) {
-												$new_file .= preg_replace($pfb_ipreg, '',$matches[0]) . "/24\n";
+												$new_file .= preg_replace('/\s/', '',$matches[0]) . "/24\n";
 											}
 										}
 									}
@@ -1295,11 +1288,11 @@ function sync_package_pfblockerng($cron = "") {
 										foreach ($url_list as $line) {
 											# CIDR format 192.168.0.0/16
 											if (preg_match($pfb['cidr'],$line,$matches)) {
-												$new_file .= preg_replace($pfb_ipreg, '',$matches[0]) . "\n";
+												$new_file .= preg_replace('/\s/', '',$matches[0]) . "\n";
 											}
 											# Single ip addresses
 											elseif (preg_match($pfb['s_html'],$line,$matches)) {
-												$new_file .= preg_replace($pfb_ipreg, '',$matches[0]) . "\n";
+												$new_file .= preg_replace('/\s/', '',$matches[0]) . "\n";
 											}
 										}
 									} 
@@ -1308,7 +1301,7 @@ function sync_package_pfblockerng($cron = "") {
 										foreach ($url_list as $line) {
 											# IPv6 Regex Match
 											if (preg_match($pfb['ipv6'],$line,$matches)) {
-												$new_file .= preg_replace($pfb_ipreg, '',$matches[0]) . "\n";
+												$new_file .= preg_replace('/\s/', '',$matches[0]) . "\n";
 											}
 										}
 									}
@@ -1317,11 +1310,11 @@ function sync_package_pfblockerng($cron = "") {
 										foreach ($url_list as $line) {
 											# CIDR format 192.168.0.0/16
 											if (preg_match($pfb['cidr'],$line,$matches)) {
-												$new_file .= preg_replace($pfb_ipreg, '',$matches[0]) . "\n";
+												$new_file .= preg_replace('/\s/', '',$matches[0]) . "\n";
 											}
 											# Single ip addresses
 											elseif (preg_match($pfb['single'],$line,$matches)) {
-												$new_file .= preg_replace($pfb_ipreg, '',$matches[0]) . "\n";
+												$new_file .= preg_replace('/\s/', '',$matches[0]) . "\n";
 											}
 										}
 									}
@@ -1477,30 +1470,30 @@ function sync_package_pfblockerng($cron = "") {
 							$url_list = @file($pfb['origdir'] . '/' . $aliascustom . '.orig');
 
 							$new_file = "";
-							if (!empty($url_list)) {
+							if (isset($url_list)) {
 								foreach ($url_list as $line) {
 									if ($vtype == "_v4") {
 										# CIDR format 192.168.0.0/16
 										if (preg_match($pfb['cidr'],$line,$matches)) {
-											$new_file .= preg_replace($pfb_ipreg, '',$matches[0]) . "\n";
+											$new_file .= preg_replace('/\s/', '',$matches[0]) . "\n";
 										}
 										# Single ip addresses
 										elseif (preg_match($pfb['s_html'],$line,$matches)) {
-											$new_file .= preg_replace($pfb_ipreg, '',$matches[0]) . "\n";
+											$new_file .= preg_replace('/\s/', '',$matches[0]) . "\n";
 										}
 										# Network range 192.168.0.0-192.168.0.254
 										elseif (preg_match($pfb['range'],$line,$matches)) {
 											$a_cidr = ip_range_to_subnet_array($matches[1],$matches[2]);
-											if (!empty($a_cidr)) {
+											if (isset($a_cidr)) {
 												foreach ($a_cidr as $cidr) {
-													$new_file .= preg_replace($pfb_ipreg, '',$cidr) . "\n";
+													$new_file .= preg_replace('/\s/', '',$cidr) . "\n";
 												}
 											}
 										}
 									} else {
 										# IPv6 Regex
 										if (preg_match($pfb['ipv6'],$line,$matches)) {
-											$new_file .= preg_replace($pfb_ipreg, '',$matches[0]) . "\n";
+											$new_file .= preg_replace('/\s/', '',$matches[0]) . "\n";
 										}
 									}
 								}
@@ -1827,7 +1820,7 @@ function sync_package_pfblockerng($cron = "") {
 			# Collect All Existing Rules
 			$rules = $config['filter']['rule'];
 			# Collect Existing pfSense Rules 'Pass', 'Match' and 'Other' pfSense rules into new Arrays.
-			if (!empty($rules)) {
+			if (isset($rules)) {
 				foreach ($rules as $rule) {
 					if (!preg_match("/pfB_.*" . $pfb['suffix'] . "/",$rule['descr']) && ($rule['interface'] != "")) {
 						// Floating rules collection 'Floating Pass/Match'. Balance to 'other'
@@ -1883,76 +1876,76 @@ function sync_package_pfblockerng($cron = "") {
 			#################################################################################
 
 			if ($pfb['float'] == "") {
-				if (!empty($fother_rules)) {
+				if (isset($fother_rules)) {
 					foreach ($fother_rules as $cb_rules) {
 						$new_rules[] = $cb_rules;
 					}
 				}
 			}
-			if (!empty($fpermit_rules) && $pfb['order'] == "order_1") {
+			if (isset($fpermit_rules) && $pfb['order'] == "order_1") {
 				foreach ($fpermit_rules as $cb_rules) {
 					$new_rules[] = $cb_rules;
 				}
 			}
-			if (!empty($fmatch_rules) && $pfb['order'] == "order_1") {
+			if (isset($fmatch_rules) && $pfb['order'] == "order_1") {
 				foreach ($fmatch_rules as $cb_rules) {
 					$new_rules[] = $cb_rules;
 				}
 			}
 
 			# Define Inbound Interface Rules
-			if (!empty($pfb['inbound_interfaces'])) {
+			if (isset($pfb['inbound_interfaces'])) {
 				$counter = 0;
 				foreach ($pfb['inbound_interfaces'] as $inbound_interface) {
-					if (!empty($permit_rules) && $pfb['order'] == "order_1") {
+					if (isset($permit_rules) && $pfb['order'] == "order_1") {
 						foreach ($permit_rules as $cb_rules) {
 							if ($cb_rules['interface'] == $inbound_interface)
 								$new_rules[] = $cb_rules;
 						}
 					}
-					if (!empty($match_rules) && $pfb['order'] == "order_1") {
+					if (isset($match_rules) && $pfb['order'] == "order_1") {
 						foreach ($match_rules as $cb_rules) {
 							if ($cb_rules['interface'] == $inbound_interface)
 								$new_rules[] = $cb_rules;
 						}
 					}
 					# Match Inbound Rules defined as Floating Only.
-					if (!empty($match_inbound) && $counter == 0) {
+					if (isset($match_inbound) && $counter == 0) {
 						foreach ($match_inbound as $cb_rules) {
 							$cb_rules['interface'] = $pfb['inbound_floating'];
 							$new_rules[] = $cb_rules;
 							$counter ++;
 						}
 					}
-					if (!empty($permit_inbound)) {
+					if (isset($permit_inbound)) {
 						foreach ($permit_inbound as $cb_rules) {
 							$cb_rules['interface'] = $inbound_interface;
 							$new_rules[] = $cb_rules;
 						}
 					}
-					if (!empty($fpermit_rules) && $pfb['order'] == "order_2") {
+					if (isset($fpermit_rules) && $pfb['order'] == "order_2") {
 						foreach ($fpermit_rules as $cb_rules) {
 							$new_rules[] = $cb_rules;
 						}
 					}
-					if (!empty($fmatch_rules) && $pfb['order'] == "order_2") {
+					if (isset($fmatch_rules) && $pfb['order'] == "order_2") {
 						foreach ($fmatch_rules as $cb_rules) {
 							$new_rules[] = $cb_rules;
 						}
 					}
-					if (!empty($permit_rules) && $pfb['order'] == "order_2") {
+					if (isset($permit_rules) && $pfb['order'] == "order_2") {
 						foreach ($permit_rules as $cb_rules) {
 							if ($cb_rules['interface'] == $inbound_interface)
 								$new_rules[] = $cb_rules;
 						}
 					}
-					if (!empty($match_rules) && $pfb['order'] == "order_2") {
+					if (isset($match_rules) && $pfb['order'] == "order_2") {
 						foreach ($match_rules as $cb_rules) {
 							if ($cb_rules['interface'] == $inbound_interface)
 								$new_rules[] = $cb_rules;
 						}
 					}
-					if (!empty($deny_inbound)) {
+					if (isset($deny_inbound)) {
 						foreach ($deny_inbound as $cb_rules) {
 							$cb_rules['interface'] = $inbound_interface;
 							$new_rules[] = $cb_rules;
@@ -1962,48 +1955,48 @@ function sync_package_pfblockerng($cron = "") {
 			}
 
 			# Define Outbound Interface Rules
-			if (!empty($pfb['outbound_interfaces'])) {
+			if (isset($pfb['outbound_interfaces'])) {
 				$counter = 0;
 				foreach ($pfb['outbound_interfaces'] as $outbound_interface) {
-					if (!empty($permit_rules) && $pfb['order'] == "order_1") {
+					if (isset($permit_rules) && $pfb['order'] == "order_1") {
 						foreach ($permit_rules as $cb_rules) {
 							if ($cb_rules['interface'] == $outbound_interface)
 								$new_rules[] = $cb_rules;
 						}
 					}
-					if (!empty($match_rules) && $pfb['order'] == "order_1") {
+					if (isset($match_rules) && $pfb['order'] == "order_1") {
 						foreach ($match_rules as $cb_rules) {
 							if ($cb_rules['interface'] == $outbound_interface)
 								$new_rules[] = $cb_rules;
 						}
 					}
 					# Match Outbound Rules defined as Floating Only.
-					if (!empty($match_outbound) && $counter == 0) {
+					if (isset($match_outbound) && $counter == 0) {
 						foreach ($match_outbound as $cb_rules) {
 							$cb_rules['interface'] = $pfb['outbound_floating'];
 							$new_rules[] = $cb_rules;
 							$counter++;
 						}
 					}
-					if (!empty($permit_outbound)) {
+					if (isset($permit_outbound)) {
 						foreach ($permit_outbound as $cb_rules) {
 							$cb_rules['interface'] = $outbound_interface;
 							$new_rules[] = $cb_rules;
 						}
 					}
-					if (!empty($permit_rules) && $pfb['order'] == "order_2") {
+					if (isset($permit_rules) && $pfb['order'] == "order_2") {
 						foreach ($permit_rules as $cb_rules) {
 							if ($cb_rules['interface'] == $outbound_interface)
 								$new_rules[] = $cb_rules;
 						}
 					}
-					if (!empty($match_rules) && $pfb['order'] == "order_2") {
+					if (isset($match_rules) && $pfb['order'] == "order_2") {
 						foreach ($match_rules as $cb_rules) {
 							if ($cb_rules['interface'] == $outbound_interface)
 								$new_rules[] = $cb_rules;
 						}
 					}
-					if (!empty($deny_outbound)) {
+					if (isset($deny_outbound)) {
 						foreach ($deny_outbound as $cb_rules) {
 							$cb_rules['interface'] = $outbound_interface;
 							$new_rules[] = $cb_rules;
@@ -2012,44 +2005,44 @@ function sync_package_pfblockerng($cron = "") {
 				}
 			}
 
-			if (!empty($fpermit_rules) && $pfb['order'] == "order_0") {
+			if (isset($fpermit_rules) && $pfb['order'] == "order_0") {
 				foreach ($fpermit_rules as $cb_rules) {
 					$new_rules[] = $cb_rules;
 				}
 			}
-			if (!empty($fmatch_rules) && $pfb['order'] == "order_0") {
+			if (isset($fmatch_rules) && $pfb['order'] == "order_0") {
 				foreach ($fmatch_rules as $cb_rules) {
 					$new_rules[] = $cb_rules;
 				}
 			}
-			if (!empty($fpermit_rules) && $pfb['order'] == "order_3") {
+			if (isset($fpermit_rules) && $pfb['order'] == "order_3") {
 				foreach ($fpermit_rules as $cb_rules) {
 					$new_rules[] = $cb_rules;
 				}
 			}
-			if (!empty($fmatch_rules) && $pfb['order'] == "order_3") {
+			if (isset($fmatch_rules) && $pfb['order'] == "order_3") {
 				foreach ($fmatch_rules as $cb_rules) {
 					$new_rules[] = $cb_rules;
 				}
 			}
-			if (!empty($permit_rules) && $pfb['order'] == "order_3") {
+			if (isset($permit_rules) && $pfb['order'] == "order_3") {
 				foreach ($permit_rules as $cb_rules) {
 					$new_rules[] = $cb_rules;
 				}
 			}
-			if (!empty($match_rules) && $pfb['order'] == "order_3") {
+			if (isset($match_rules) && $pfb['order'] == "order_3") {
 				foreach ($match_rules as $cb_rules) {
 					$new_rules[] = $cb_rules;
 				}
 			}
 			if ($pfb['float'] == "on") {
-				if (!empty($fother_rules)) {
+				if (isset($fother_rules)) {
 					foreach ($fother_rules as $cb_rules) {
 						$new_rules[] = $cb_rules;
 					}
 				}
 			}
-			if (!empty($other_rules)) {
+			if (isset($other_rules)) {
 				foreach ($other_rules as $cb_rules) {
 					$new_rules[] = $cb_rules;
 				}
@@ -2135,7 +2128,7 @@ function sync_package_pfblockerng($cron = "") {
 		pfb_logger("{$log}","1");
 
 		# Remove all pfBlockerNG Alias tables
-		if (!empty($aliases_list)) {
+		if (isset($aliases_list)) {
 			foreach ($aliases_list as $table) {
 				exec ("/sbin/pfctl -t " . escapeshellarg($table) . " -T kill 2>&1", $pfb_null);
 			}
