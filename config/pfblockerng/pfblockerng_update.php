@@ -197,7 +197,7 @@ include_once("head.inc");
 				<td colspan="2" class="vncell" align="left"><?php echo gettext("LINKS :"); ?>&nbsp;
 					<a href='/firewall_aliases.php' target="_blank"><?php echo gettext("Firewall Alias"); ?></a>&nbsp;
 					<a href='/firewall_rules.php' target="_blank"><?php echo gettext("Firewall Rules"); ?></a>&nbsp;
-					<a href='/diag_logs_filter.php' target="_blank"><?php echo gettext("Firewall Logs"); ?></a><br/>
+					<a href='/diag_logs_filter.php' target="_blank"><?php echo gettext("Firewall Logs"); ?></a><br />
 				</td>
 			</tr>
 			<tr>
@@ -271,12 +271,12 @@ include_once("head.inc");
 						echo "<img src = '/themes/{$g['theme']}/images/icons/icon_pass.gif' width='15' height='15'
 							border='0' title='pfBockerNG Cron Task is Running.'/>";
 					}
-					echo "<br/><font size=\"3\"><span class=\"red\">Refresh</span></font> to update current Status and Minute(s) remaining";
+					echo "<br /><font size=\"3\"><span class=\"red\">Refresh</span></font> to update current Status and Minute(s) remaining";
 				?>
 				</td>
 			</tr>
 			<tr>
-				<td colspan="2" class="vncell"><?php echo gettext("<br/>"); ?></td>
+				<td colspan="2" class="vncell"><?php echo gettext("<br />"); ?></td>
 			</tr>
 			<tr>
 				<td colspan="2" class="listtopic"><?php echo gettext("Update Options"); ?></td>
@@ -285,13 +285,13 @@ include_once("head.inc");
 				<td colspan="2" class="listr">
 					<!-- Update Option Text -->
 					<?php echo "<span class='red'><strong>" . gettext("** AVOID ** ") . "&nbsp;" . "</strong></span>" .
-						gettext("Running these Options - when CRON is expected to RUN!") . gettext("<br/><br/>") .
+						gettext("Running these Options - when CRON is expected to RUN!") . gettext("<br /><br />") .
 						"<strong>" . gettext("Force Update") . "</strong>" . gettext(" will download any new Alias/Lists.") .
-						gettext("<br/>") . "<strong>" . gettext("Force Cron") . "</strong>" .
-						gettext(" will download any Alias/Lists that are within the Frequency Setting (due for Update).") . gettext("<br/>") .
+						gettext("<br />") . "<strong>" . gettext("Force Cron") . "</strong>" .
+						gettext(" will download any Alias/Lists that are within the Frequency Setting (due for Update).") . gettext("<br />") .
 						"<strong>" . gettext("Force Reload") . "</strong>" .
 						gettext("  will reload all Lists using the existing Downloaded files.") .
-						gettext(" This is useful when Lists are out of 'sync' or Reputation changes were made.") ;?><br/>
+						gettext(" This is useful when Lists are out of 'sync' or Reputation changes were made.") ;?><br />
 				</td>
 			</tr>
 			<tr>
@@ -306,7 +306,7 @@ include_once("head.inc");
 				</td>
 			</tr>
 			<tr>
-				<td colspan="2" class="vncell"><?php echo gettext("<br/>"); ?></td>
+				<td colspan="2" class="vncell"><?php echo gettext("<br />"); ?></td>
 			</tr>
 			<tr>
 				<td colspan="2" class="listtopic"><?php echo gettext("Live Log Viewer only"); ?></td>
@@ -322,7 +322,7 @@ include_once("head.inc");
 					<input type="submit" class="formbtns" name="pfbviewcancel" id="pfbviewcancel" value="End View" 
 						title="<?=gettext("END VIEW of pfBlockerNG LOG");?>"/>
 					<?php echo "&nbsp;&nbsp;" . gettext(" Select 'view' to open ") . "<strong>" . gettext(' pfBlockerNG ') . "</strong>" .
-						gettext(" Log. &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; (Select 'End View' to terminate the viewer.)"); ?><br/><br/>
+						gettext(" Log. &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; (Select 'End View' to terminate the viewer.)"); ?><br /><br />
 				</td>
 			</tr>
 			<tr>
@@ -351,7 +351,7 @@ if (isset($_POST['pfbview'])) {
 		touch("{$pfb['log']}");
 
 	// Reference: http://stackoverflow.com/questions/3218895/php-how-to-read-a-file-live-that-is-constantly-being-written-to
-	pfbupdate_status(gettext("Log Viewing in process.    ** Press 'END VIEW' to Exit ** "));
+	pfbupdate_status(gettext("Log Viewing in progress.    ** Press 'END VIEW' to Exit ** "));
 	$lastpos_old = "";
 	$len = filesize("{$pfb['log']}");
 
