@@ -283,7 +283,7 @@ if [ -e "$pfbsuppression" ] && [ -s "$pfbsuppression" ]; then
 				# Count (PRE)	
 				countg=$(grep -c ^ $pfbfolder$alias".txt")
 
-				grep -Ev "^(192\.168|10\.|172\.1[6789]\.|172\.2[0-9]\.|172\.3[01]\.|127\.0\.0\.1|0\.0\.0\.0|#|$)" $pfbfolder$alias".txt" |
+				grep -Ev "^(192\.168|10\.|172\.1[6789]\.|172\.2[0-9]\.|172\.3[01]\.|#|$)" $pfbfolder$alias".txt" |
 					sort | uniq > $tempfile	
 				# Count (Post RFC1918)
 				countm=$(grep -c ^ $tempfile)
@@ -350,7 +350,7 @@ else
 
 		if [ ! "$alias" == "" ]; then
 			countg=$(grep -c ^ $pfbfolder$alias".txt")
-			grep -Ev "^(192\.168|10\.|172\.1[6789]\.|172\.2[0-9]\.|172\.3[01]\.|127\.0\.0\.1|0\.0\.0\.0|#|$)" $pfbfolder$alias".txt" |
+			grep -Ev "^(192\.168|10\.|172\.1[6789]\.|172\.2[0-9]\.|172\.3[01]\.|#|$)" $pfbfolder$alias".txt" |
 				sort | uniq > $tempfile; mv -f $tempfile $pfbfolder$alias".txt"
 			countx=$(grep -c ^ $pfbfolder$alias".txt")
 			# Update Masterfiles. Don't execute if Duplication Process is Disabled or if No Suppression Changes Found
