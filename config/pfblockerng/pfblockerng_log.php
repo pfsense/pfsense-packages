@@ -104,7 +104,7 @@ $pfb_logtypes = array(	'defaultlogs'	=> array('name'		=> 'Log Files',
 						'ext'		=> array('orig', 'raw'),
 						'logdir'	=> "{$pfb['dbdir']}/original/",
 						'download'	=> TRUE,
-						'clear'		=> FALSE
+						'clear'		=> TRUE
 						),
 			'denylogs'	=> array('name'		=> 'Deny Files',
 						'ext'		=> 'txt',
@@ -124,6 +124,12 @@ $pfb_logtypes = array(	'defaultlogs'	=> array('name'		=> 'Log Files',
 						'ext'		=> 'txt',
 						'txt'		=> 'match',
 						'logdir'	=> "{$pfb['dbdir']}/match/",
+						'download'	=> TRUE,
+						'clear'		=> FALSE
+						),
+			'nativelogs'	=> array('name'		=> 'Native Files',
+						'ext'		=> 'txt',
+						'logdir'	=> "{$pfb['dbdir']}/native/",
 						'download'	=> TRUE,
 						'clear'		=> FALSE
 						),
@@ -303,7 +309,7 @@ if ($savemsg) {
 				<td colspan="3" class="vncell" align="left"><?php echo gettext("LINKS :"); ?> &nbsp;
 				<a href='/firewall_aliases.php' target="_blank"><?php echo gettext("Firewall Alias"); ?></a> &nbsp;
 				<a href='/firewall_rules.php' target="_blank"><?php echo gettext("Firewall Rules"); ?></a> &nbsp;
-				<a href='/diag_logs_filter.php' target="_blank"><?php echo gettext("Firewall Logs"); ?></a><br/></td>
+				<a href='/diag_logs_filter.php' target="_blank"><?php echo gettext("Firewall Logs"); ?></a><br /></td>
 			</tr>
 			<tr>
 				<td width="22%" class="vncell"><?php echo gettext('Log/File type:'); ?></td>
