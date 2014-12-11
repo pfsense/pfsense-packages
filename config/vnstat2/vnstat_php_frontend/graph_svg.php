@@ -17,7 +17,7 @@
     // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
     //
     //
-    // see file COPYING or at http://www.gnu.org/licenses/gpl.html 
+    // see file COPYING or at http://www.gnu.org/licenses/gpl.html
     // for more information.
     //
     require 'config.php';
@@ -61,8 +61,8 @@
 	print "</g>\n";
     }
 
-    function svg_text($x, $y, $text, $options = array()) 
-    {	
+    function svg_text($x, $y, $text, $options = array())
+    {
 	printf("<text x=\"%F\" y=\"%F\" ", $x, $y);
 	svg_options($options);
 	print ">$text</text>\n";
@@ -75,7 +75,7 @@
 	print "/>\n";
     }
 
-    function svg_rect($x, $y, $w, $h, $options = array()) 
+    function svg_rect($x, $y, $w, $h, $options = array())
     {
 	printf("<rect x=\"%F\" y=\"%F\" width=\"%F\" height=\"%F\" ", $x, $y, $w, $h);
 	svg_options($options);
@@ -98,7 +98,7 @@
 	$col['opacity'] = sprintf("%F", (127 - $colors[3]) / 127);
 	return $col;
     }
-            
+
     function init_image()
     {
         global $xlm, $xrm, $ytm, $ybm, $iw, $ih,$graph, $cl, $iface, $colorscheme, $style;
@@ -108,7 +108,7 @@
 
         //
         // image object
-        //    
+        //
         $xlm = 70;
         $xrm = 20;
         $ytm = 35;
@@ -116,14 +116,14 @@
         if ($graph == 'small')
         {
             $iw = 300 + $xrm + $xlm;
-            $ih = 100 + $ytm + $ybm;    
+            $ih = 100 + $ytm + $ybm;
         }
         else
         {
             $iw = 600 + $xrm + $xlm;
             $ih = 200 + $ytm + $ybm;
         }
-	
+
 	svg_create($iw, $ih);
 
         //
@@ -141,11 +141,11 @@
         $cl['rx_border'] = allocate_color($cs['rx_border']);
         $cl['tx'] = allocate_color($cs['tx']);
         $cl['tx_border'] = allocate_color($cs['tx_border']);
-	
+
         svg_rect(0, 0, $iw, $ih, array( 'stroke' => 'none', 'stroke-width' => 0, 'fill' => $cl['image_background']['rgb']) );
 	svg_rect($xlm, $ytm, $iw-$xrm-$xlm, $ih-$ybm-$ytm, array( 'stroke' => 'none', 'stroke-width' => 0, 'fill' => $cl['background']['rgb']) );
-	
-	$depth = 12;
+
+	$depth = 12*SVG_DEPTH_SCALING;
 	svg_group( array( 'stroke' => 'none', 'stroke-width' => 0, 'fill' => $cl['background_2']['rgb'], 'fill-opacity' => $cl['background_2']['opacity']) );
 	svg_poly(array($xlm, $ytm, $xlm, $ih - $ybm, $xlm - $depth, $ih - $ybm + $depth, $xlm - $depth, $ytm + $depth));
 	svg_poly(array($xlm, $ih - $ybm, $xlm - $depth, $ih - $ybm + $depth, $iw - $xrm - $depth, $ih - $ybm  + $depth, $iw - $xrm, $ih - $ybm));
@@ -153,7 +153,7 @@
 
 	// draw title
 	$text = T('Traffic data for')." $iface";
-	svg_text($iw / 2, ($ytm / 2), $text, array( 'stroke' => $cl['text'], 'fill' => $cl['text']['rgb'],'stroke-width' => 0, 'font-family' => SVG_FONT, 'font-weight' => 'bold', 'text-anchor' => 'middle' ));
+	svg_text($iw / 2, ($ytm / 2), $text, array( 'stroke' => 'none', 'fill' => $cl['text']['rgb'],'stroke-width' => 0, 'font-family' => SVG_FONT, 'font-weight' => 'bold', 'text-anchor' => 'middle' ));
     }
 
     function draw_border()
@@ -161,14 +161,14 @@
         global $cl, $iw, $ih;
 	svg_rect(1, 1, $iw-2, $ih-2, array( 'stroke' => $cl['border']['rgb'], 'stroke-opacity' => $cl['border']['opacity'], 'stroke-width' => 1, 'fill' => 'none') );
     }
-    
+
     function draw_grid($x_ticks, $y_ticks)
     {
         global $cl, $iw, $ih, $xlm, $xrm, $ytm, $ybm;
         $x_step = ($iw - $xlm - $xrm) / $x_ticks;
         $y_step = ($ih - $ytm - $ybm) / $y_ticks;
-	
-	$depth = 12;
+
+	$depth = 12*SVG_DEPTH_SCALING;
 
 	svg_group( array( 'stroke' => $cl['grid_stipple_1']['rgb'], 'stroke-opacity' => $cl['grid_stipple_1']['opacity'], 'stroke-width' => '1px', 'stroke-dasharray' => '1,1' ) );
         for ($i = $xlm; $i <= ($iw - $xrm); $i += $x_step)
@@ -178,7 +178,7 @@
         }
         for ($i = $ytm; $i <= ($ih - $ybm); $i += $y_step)
         {
-            svg_line($xlm, $i, $iw - $xrm, $i); 
+            svg_line($xlm, $i, $iw - $xrm, $i);
 	    svg_line($xlm, $i, $xlm - $depth, $i + $depth);
         }
 	svg_group_end();
@@ -188,8 +188,8 @@
         svg_line($xlm, $ih - $ybm, $iw - $xrm, $ih - $ybm);
 	svg_group_end();
     }
-    
-    
+
+
     function draw_data($data)
     {
         global $cl,$iw,$ih,$xlm,$xrm,$ytm,$ybm;
@@ -231,7 +231,7 @@
             {
             $prescale = $prescale * 1024;
             $y_scale = $y_scale / 1024;
-            if ($unit == 'K') 
+            if ($unit == 'K')
                 $unit = 'M';
             else if ($unit == 'M')
                 $unit = 'G';
@@ -241,7 +241,7 @@
         }
 
         draw_grid($x_ticks, $y_ticks);
-	
+
         //
         // graph scale factor (per pixel)
         //
@@ -256,22 +256,22 @@
         {
             //
             // draw bars
-            //      
+            //
             for ($i=0; $i<$x_ticks; $i++)
             {
         	$x = $xlm + ($i * $x_step);
         	$y = $ytm + ($ih - $ytm - $ybm) - (($data[$i]['rx'] - $offset) / $sf);
-		
-		$depth = ($x_ticks < 20) ? 8 : 6;
+
+		$depth = ($x_ticks < 20) ? 8*SVG_DEPTH_SCALING : 6*SVG_DEPTH_SCALING;
 		$space = 0;
-		
+
 		$x1 = (int)$x;
 		$y1 = (int)$y;
 		$w = (int)($bar_w - $space);
 		$h = (int)($ih - $ybm - $y);
 		$x2 = (int)($x + $bar_w - $space);
 		$y2 = (int)($ih - $ybm);
-		
+
 		svg_group( array( 'stroke' => $cl['rx_border']['rgb'], 'stroke-opacity' => $cl['rx_border']['opacity'], 
 				  'stroke-width' => 1, 'stroke-linejoin' => 'round',
 			          'fill' => $cl['rx']['rgb'], 'fill-opacity' => $cl['rx']['opacity'] ) );
@@ -287,7 +287,7 @@
 		$w = (int)($bar_w - $space);
 		$h = (int)($ih - $ybm - $y1 - 1);
 
-		svg_group( array( 'stroke' => $cl['tx_border']['rgb'], 'stroke-opacity' => $cl['tx_border']['opacity'], 
+		svg_group( array( 'stroke' => $cl['tx_border']['rgb'], 'stroke-opacity' => $cl['tx_border']['opacity'],
 				  'stroke-width' => 1, 'stroke-linejoin' => 'round',
 			          'fill' => $cl['tx']['rgb'], 'fill-opacity' => $cl['tx']['opacity'] ) );
         	svg_rect($x1, $y1, $w, $h);
@@ -296,7 +296,7 @@
 		svg_poly(array($x2, $y1, $x2, $y2, $x2 - $depth, $y2 + $depth, $x2 - $depth, $y1 + $depth));
 		svg_group_end();
             }
-    
+
             //
             // axis labels
             //
@@ -359,4 +359,4 @@
 
     get_vnstat_data();
     output_image();
-?>        
+?>
