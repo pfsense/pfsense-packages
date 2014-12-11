@@ -1392,24 +1392,6 @@
 		<depends_on_package_pbi>zabbix22-proxy-2.2.7-##ARCH##.pbi</depends_on_package_pbi>
 	</package>
 	<package>
-		<!-- This does not exist yet, this is here to trigger a PBI build -->
-		<name>ipmitool</name>
-		<pkginfolink>https://forum.pfsense.org/</pkginfolink>
-		<descr><![CDATA[IPMI Tools for local/remote data retrieval and control (Console only, no GUI)]]></descr>
-		<category>Services</category>
-		<version>1.8.14_1</version>
-		<status>Beta</status>
-		<required_version>2.2</required_version>
-		<config_file>https://packages.pfsense.org/packages/config/ipmitool/ipmitool.xml</config_file>
-		<maintainer>jimp@pfsense.org</maintainer>
-		<configurationfile>ipmitool.xml</configurationfile>
-		<build_pbi>
-			<port>sysutils/ipmitool</port>
-		</build_pbi>
-		<build_options>ipmitool_SET_FORCE=FREEIPMI;freeipmi_UNSET_FORCE=DOCS DEBUG IOPERM</build_options>
-		<depends_on_package_pbi>ipmitool-1.8.14_1-##ARCH##.pbi</depends_on_package_pbi>
-	</package>
-	<package>
 		<name>sudo</name>
 		<pkginfolink>https://doc.pfsense.org/index.php/Sudo_Package</pkginfolink>
 		<descr><![CDATA[sudo allows delegation of privileges to users in the shell so commands can be run as other users, such as root.]]></descr>
