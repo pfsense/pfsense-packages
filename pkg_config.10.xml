@@ -1079,6 +1079,7 @@
 		<depends_on_package_pbi>havp-0.91_3-##ARCH##.pbi</depends_on_package_pbi>
 		<build_pbi>
 			<port>www/havp</port>
+			<ports_after>security/clamav</ports_after>
 		</build_pbi>
 		<build_options>CLAMAVUSER=havp;CLAMAVGROUP=havp</build_options>
 		<version>0.91_3 pkg v1.02</version>
