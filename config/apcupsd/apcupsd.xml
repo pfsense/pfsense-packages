@@ -334,6 +334,17 @@ UPSTYPE   DEVICE           Description <br>
 				<option><name>Share</name><value>share</value></option>
 			</options>
 		</field>
+		<field>
+			<name>Notifications</name>
+			<type>listtopic</type>
+		</field>
+		<field>
+			<fieldname>notification_info</fieldname>
+			<type>info</type>
+			<description>In order to receive e-mail notifications, you need to configure 
+			SMTP Email Notifications on Advanced/Notifications section, and also, 
+			install mailreport package.</description>
+		</field>
 	</fields>
 	<custom_php_install_command>php_install_apcupsd();</custom_php_install_command>
 	<custom_php_command_before_form></custom_php_command_before_form>
