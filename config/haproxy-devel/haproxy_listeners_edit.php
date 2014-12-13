@@ -63,6 +63,8 @@ if (!is_array($config['installedpackages']['haproxy']['ha_backends']['item'])) {
 
 $a_backend = &$config['installedpackages']['haproxy']['ha_backends']['item'];
 $a_pools = &$config['installedpackages']['haproxy']['ha_pools']['item'];
+if (!is_array($a_pools))
+	$a_pools = array();
 uasort($a_pools, haproxy_compareByName);
 
 global $simplefields;
@@ -772,7 +774,8 @@ $primaryfrontends = get_haproxy_frontends($excludefrontend);
 			</td>
 		</tr>
 		<tr class="haproxy_ssloffloading_enabled haproxy_primary">
-			<td class="vncell" colspan="2"><b>Client certificate verification options, leave this empty if you do want to ask for a client certificate</b></td>
+			<td class="vncell" colspan="2"><b>Client certificate verification options, leave this empty if you do not want to ask for a client certificate</b><br/>
+			The users that visit this site will need to load the client cert signed by the ca's listed below imported into their browser.</td>
 		</tr>
 		<tr class="haproxy_ssloffloading_enabled haproxy_primary">
 			<td width="22%" valign="top" class="vncell">Client verification CA certificates</td>

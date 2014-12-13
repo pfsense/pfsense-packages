@@ -196,6 +196,19 @@ $a_sticky_type['stick_rdp_cookie'] = array('name' => 'Stick on RDP-cookie',
 	'descr' => "Uses a RDP-Cookie send by the mstsc client, note that not all clients send this.",
 	'cookiedescr' => 'EXAMPLE: msts or mstshash');
 
+
+global $a_error;
+$a_error = array();
+$a_error['200'] = array('descr' => "stats or monitoring requests");
+$a_error['400'] = array('descr' => "request invalid or too large");
+$a_error['401'] = array('descr' => "authentication is required to perform the action");
+$a_error['403'] = array('descr' => "request is forbidden");
+$a_error['408'] = array('descr' => "timeout before the request is complete");
+$a_error['500'] = array('descr' => "internal error");
+$a_error['502'] = array('descr' => "server response invalid or blocked");
+$a_error['503'] = array('descr' => "no server was available to handle the request");
+$a_error['504'] = array('descr' => "timeout before the server responds");
+   
 if(!function_exists('group_ports')){
 // function group_ports() is present in pfSense 2.2 in util.inc
 /* create ranges of sequential port numbers (200:215) and remove duplicates */
@@ -304,6 +317,20 @@ function haproxy_hostoralias_to_list($host_or_alias) {
 	} else {
 		$result = array();
 		$result[] = $host_or_alias;
+	}
+	return $result;
+}
+
+function haproxy_get_fileslist() {
+	// returns the files array with 'keys'.
+	$result = array();
+	global $config;
+	// create a copy to not modify the original 'keyless' array
+	$a_files = $config['installedpackages']['haproxy']['files']['item'];
+	if (!is_array($a_files)) $a_files = array();	
+	foreach($a_files as $file) {
+		$key = $file['name'];
+		$result[$key] = $file;
 	}
 	return $result;
 }
@@ -603,7 +630,7 @@ function haproxy_find_acl($name) {
 function write_backend($configpath, $fd, $name, $pool, $frontend) {
 	if(!is_array($pool['ha_servers']['item']) && !$pool['stats_enabled']=='yes')
 		return;
-	global $a_checktypes, $a_cookiemode;
+	global $a_checktypes, $a_cookiemode, $a_files, $a_error;
 		
 	$a_servers = &$pool['ha_servers']['item'];
 	$frontendtype = $frontend['type'];
@@ -665,6 +692,23 @@ function write_backend($configpath, $fd, $name, $pool, $frontend) {
 				$scope_items = explode(",", $pool['stats_scope']);
 				foreach($scope_items as $scope_item)
 					fwrite ($fd, "\tstats\t\t\tscope " . $scope_item . "\n");
+			}
+		}
+
+		if (is_arrayset($pool,'errorfiles','item')) {
+			foreach($pool['errorfiles']['item'] as $errorfile) {
+				if (!is_array($a_files))// load only once
+					$a_files = haproxy_get_fileslist();
+				$file = $errorfile['errorfile'];
+				$errorcodes = explode(",",$errorfile['errorcode']);
+				foreach($errorcodes as $errorcode) {
+					$filename = "$configpath/errorfile_{$name}_{$errorcode}_{$file}";
+					$content = base64_decode($a_files[$file]['content']);
+					$content = str_replace('{errormsg}', $a_error[$errorcode]['descr'], $content);
+					$content = str_replace('{errorcode}', $errorcode, $content);
+					file_put_contents($filename, $content);
+					fwrite ($fd, "\terrorfile\t\t\t" . $errorcode ." " . $filename . "\n");
+				}
 			}
 		}
 	}
@@ -1668,7 +1712,7 @@ function get_frontend_ipport($frontend, $userfriendly=false) {
 	$mainfrontend = get_primaryfrontend($frontend);
 	$newline = "";
 	$result = array();
-	if (!isset($mainfrontend))
+	if (!is_arrayset($mainfrontend,"a_extaddr","item"))
 		return $result;
 	foreach($mainfrontend['a_extaddr']['item'] as $extaddr) {
 		if ($extaddr['extaddr'] == 'custom'){
@@ -1725,6 +1769,8 @@ function get_haproxy_frontends($excludeitem="") {
 	global $config;
 	$a_frontend = &$config['installedpackages']['haproxy']['ha_backends']['item'];
 	$result = array();
+	if(!is_array($a_frontend))
+		return $result;
 	foreach($a_frontend as &$frontend)
 	{
 		if ($frontend['secondary'])

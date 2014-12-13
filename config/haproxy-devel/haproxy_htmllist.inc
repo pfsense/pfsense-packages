@@ -46,6 +46,7 @@ class HaproxyHtmlList
 	private $fields = array();
 	public $editmode = false;
 	public $fields_details = null;
+	public $keyfield = "";
 	
 	public function HaproxyHtmlList($tablename, $fields){
 		$this->tablename = $tablename;
@@ -64,10 +65,25 @@ class HaproxyHtmlList
 			foreach($this->fields as $item){
 				$itemname = $item['name'];
 				$value[$itemname] = $_POST[$itemname.$x];
+				if ($item['type'] == 'textarea')
+					$value[$itemname] = base64_encode($value[$itemname]);
 				$add_item |= isset($_POST[$itemname.$x]);
 			}
-			if ($add_item)
-				$values[] = $value;
+			if ($add_item) {
+				if ($this->keyfield != "") {
+					if (isset($_POST[$this->tablename."_key".$x]))
+						$key = $_POST[$this->tablename."_key".$x];
+					else
+						$key = $_POST[$this->keyfield.$x];
+						
+				} else 
+					$key = "";
+					
+				if (isset($values[$key]))
+					$values[] = $value;
+				else
+					$values[$key] = $value;
+			}
 		}
 		return $values;
 	}
@@ -78,12 +94,16 @@ class HaproxyHtmlList
 		if ($editable) {
 			$itemtype = $item['type'];
 			if ($itemtype == "select"){
-				//updatevisibility()
 				echo_html_select($itemnamenr, $item['items'], $itemvalue,"","html_listitem_change(\"{$this->tablename}\",\"{$itemname}\",\"{$counter}\",this);", "width:{$item['size']}");
 			} else
 			if ($itemtype == "checkbox"){
 				$checked = $itemvalue=='yes' ? " checked" : "";
 				echo "<input onclick='html_listitem_change(\"{$this->tablename}\",\"{$itemname}\",\"{$counter}\",this);' name='$itemnamenr' id='$itemnamenr' type='checkbox'$checked value='yes' size='{$item['size']}' />";
+			}  else
+			if ($itemtype == "textarea"){
+				echo "<textarea name='$itemnamenr' id='$itemnamenr' type='text' cols='{$item['size']}' rows='10'>";
+				echo htmlspecialchars(base64_decode($itemvalue));
+				echo "</textarea>";
 			}  else
 				echo "<input name='$itemnamenr' id='$itemnamenr' type='text' value='{$itemvalue}' size='{$item['size']}' />";
 		} else {
@@ -93,7 +113,10 @@ class HaproxyHtmlList
 			if ($itemtype == "checkbox"){
 				echo $itemvalue=='yes' ? gettext('yes') : gettext('no');
 			} else
-				echo $itemvalue;
+			if ($itemtype == "textarea"){
+				echo htmlspecialchars(base64_decode($itemvalue));
+			} else
+				echo htmlspecialchars($itemvalue);
 		}
 	}
 
@@ -108,7 +131,16 @@ class HaproxyHtmlList
 		echo "<td width='5%' class=''></td>
 		</tr>";
 		if (is_array($rowvalues)){
-			foreach($rowvalues as $value){
+			foreach($rowvalues as $keyid => $value){
+				if ($this->keyfield != "") {
+					if (preg_match("/[^0-9]/", $keyid))
+						$itemvalue = $keyid;
+					else
+						$itemvalue = $value[$this->keyfield];
+					$key = "<input name='{$tablename}_key{$counter}' id='{$tablename}_key{$counter}' type='hidden' value='{$itemvalue}'>";
+				} else
+					$key = "";
+				
 				if (!$editstate) {
 					echo "<tr id='tr_view_$counter' ondblclick='editRow($counter); return false;' >";
 					$leftitem = true;
@@ -123,6 +155,7 @@ class HaproxyHtmlList
 							$this->haproxy_htmllist_drawcell($item, $itemvalue, false, $itemname, $counter);
 						echo "</td>";
 						$leftitem = false;
+						
 					}
 					echo "
 			<td class='list'>
@@ -144,12 +177,13 @@ class HaproxyHtmlList
 				foreach($items as $item){
 					$itemname = $item['name'];
 					$itemvalue = $value[$itemname];					
-					echo "<td class='vtable'>";
+					echo "<td class='vtable'>".$key;
 					if (isset($item['customdrawcell'])) {
 						$item['customdrawcell']($item, $itemvalue, true, $item['name'].$counter);
 					} else
 						$this->haproxy_htmllist_drawcell($item, $itemvalue, true, $itemname, $counter);
 					echo "</td>";
+					$key = "";
 				}
 				echo "
 		<td class='list'>
@@ -288,6 +322,10 @@ function haproxy_htmllist_js(){
 				td.innerHTML="<input size='" + items[i]['size'] + "' name='" + items[i]['name'] + totalrows +
 				"' id='" + items[i]['name'] + totalrows +
 				"'><\/input> ";
+			} else if(items[i]['type'] == 'textarea') {
+				td.innerHTML="<textarea cols='" + items[i]['size'] + "' rows='30' name='" + items[i]['name'] + totalrows +
+				"' id='" + items[i]['name'] + totalrows +
+				"'><\/textarea> ";
 			} else if(items[i]['type'] == 'select') {
 				seltext = htmllist_get_select_options(tableId, items[i]['name']);
 				td.innerHTML="<select style='width:" + items[i]['size'] + "'  name='" + items[i]['name'] + totalrows + 
