@@ -127,8 +127,8 @@
 		<name>haproxy</name>
 		<pkginfolink>https://doc.pfsense.org/index.php/haproxy_package</pkginfolink>
 		<descr><![CDATA[The Reliable, High Performance TCP/HTTP Load Balancer<br />
-				This package implements both TCP and HTTP balance features from Haproxy.<br />
-				Supports acl's for smart backend switching.]]></descr>
+				This package implements the TCP and HTTP balancing features of haproxy.<br />
+				Supports ACLs for smart backend switching.]]></descr>
 		<website>http://haproxy.1wt.eu/</website>
 		<category>Services</category>
 		<version>1.4.24 pkg v 1.2.5</version>
@@ -145,7 +145,7 @@
 		<name>haproxy-full</name>
 		<pkginfolink>https://doc.pfsense.org/index.php/haproxy_package</pkginfolink>
 		<descr><![CDATA[The Reliable, High Performance TCP/HTTP Load Balancer<br />
-				This package implements both TCP and HTTP balance features from Haproxy.<br />
+				This package implements the TCP and HTTP balancing features of haproxy.<br />
 				(Legacy version)]]></descr>
 		<website>http://haproxy.1wt.eu/</website>
 		<category>Services</category>
@@ -161,9 +161,9 @@
 	<package>
 		<name>haproxy-devel</name>
 		<pkginfolink>https://doc.pfsense.org/index.php/haproxy_package</pkginfolink>
-		<descr><![CDATA[The Reliable, High Performance TCP/HTTP(s) Load Balancer<br />
-				This package implements TCP, HTTP and HTTPS balance features from Haproxy.<br />
-				Supports acl's for smart backend switching.]]></descr>
+		<descr><![CDATA[The Reliable, High Performance TCP/HTTP(S) Load Balancer<br />
+				This package implements the TCP, HTTP and HTTPS balancing features of haproxy.<br />
+				Supports ACLs for smart backend switching.]]></descr>
 		<website>http://haproxy.1wt.eu/</website>
 		<category>Services</category>
 		<version>1.5.3 pkg v 0.12</version>
@@ -313,7 +313,7 @@
 		</build_pbi>
 		<depends_on_package>avahi-app-0.6.29_1.tbz</depends_on_package>
 		<depends_on_package_pbi>avahi-0.6.31-i386.pbi</depends_on_package_pbi>
-		<version>0.6.31 pkg v1.06</version>
+		<version>0.6.31 pkg v1.08</version>
 		<status>ALPHA</status>
 		<required_version>1.2.3</required_version>
 		<config_file>https://packages.pfsense.org/packages/config/avahi/avahi.xml</config_file>
@@ -533,7 +533,7 @@
 		<depends_on_package>postfix-2.10.2,1.tbz</depends_on_package>
 		<depends_on_package>perl5-5.16.3_4.tbz</depends_on_package>
 		<depends_on_package_pbi>postfix-2.10.2-i386.pbi</depends_on_package_pbi>
-		<version>2.10.2 pkg v.2.3.7</version>
+		<version>2.10.2 pkg v.2.3.9</version>
 		<status>Release</status>
 		<required_version>2.1</required_version>
 		<configurationfile>postfix.xml</configurationfile>
@@ -546,7 +546,7 @@
 		<descr><![CDATA[DansGuardian is an award winning Open Source web content filter.<br />
 						It filters the actual content of pages based on many methods including phrase matching, PICS filtering and URL filtering.<br />
 						It does not purely filter based on a banned list of sites like lesser totally commercial filters.<br />
-						For all non-commercial it's free, without cost.<br />
+						For all non-commercial its free, without cost.<br />
 						For all commercial use visit dansguardian website to get a licence.]]></descr>
 		<category>Services</category>
 		<config_file>https://packages.pfsense.org/packages/config/dansguardian/dansguardian.xml</config_file>
@@ -586,7 +586,7 @@
 		<depends_on_package>p5-IP-Country-2.28.tbz</depends_on_package>
 		<depends_on_package>MailScanner-4.84.5_3.tbz</depends_on_package>
 		<depends_on_package_pbi>mailscanner-4.84.6-i386.pbi</depends_on_package_pbi>
-		<version>4.84.6 pkg v.0.2.10</version>
+		<version>4.84.6 pkg v.0.2.11</version>
 		<status>beta</status>
 		<required_version>2.0</required_version>
 		<configurationfile>mailscanner.xml</configurationfile>
@@ -638,7 +638,7 @@
 	</package>
 	<package>
 		<name>Lightsquid</name>
-		<descr>High perfomance web proxy report (LightSquid). Proxy realtime stat (SQStat). Requires squid HTTP proxy.</descr>
+		<descr>High performance web proxy report (LightSquid). Proxy realtime stat (SQStat). Requires squid HTTP proxy.</descr>
 		<website>http://lightsquid.sf.net/</website>
 		<category>Network Report</category>
 		<version>1.8.2 pkg v.2.33</version>
@@ -663,8 +663,8 @@
 	<package>
 		<name>Sarg</name>
 		<website>http://www.dansguardian.org/</website>
-		<descr><![CDATA[Sarg - Squid Analysis Report Generator is a tool that allow you to view "where" your users are going to on the Internet.<br />
-						Sarg provides many informations about Proxy(squid,squidguard or dansguardian) users activities: times, bytes, sites, etc...]]></descr>
+		<descr><![CDATA[Sarg - Squid Analysis Report Generator - is a tool that generates reports about where your users are going on the Internet.<br />
+						Sarg provides information about proxy users' activities: times, bytes, sites, etc. for those using Squid, Squidguard or dansguardian.]]></descr>
 		<category>Network Report</category>
 		<config_file>https://packages.pfsense.org/packages/config/sarg/sarg.xml</config_file>
 		<pkginfolink>https://forum.pfsense.org/index.php/topic,47765.0.html</pkginfolink>
@@ -703,7 +703,7 @@
 	<package>
 		<name>Varnish</name>
 		<descr><![CDATA[Varnish is a state-of-the-art, high-performance HTTP accelerator.<br />
-						It uses the advanced features in FreeBSD 6/7/8 to achieve its high performance.]]></descr>
+						It uses the advanced features in FreeBSD to achieve its high performance.]]></descr>
 		<website>http://varnish-cache.org</website>
 		<pkginfolink>https://doc.pfsense.org/index.php/Varnish_package</pkginfolink>
 		<category>Services</category>
@@ -728,7 +728,7 @@
 		<website>http://varnish-cache.org</website>
 		<pkginfolink>https://doc.pfsense.org/index.php/Varnish_package</pkginfolink>
 		<category>Services</category>
-		<version>3.0.4 pkg v.0.2.1</version>
+		<version>3.0.4 pkg v.0.2.4</version>
 		<status>RC</status>
 		<required_version>2.0</required_version>
 		<config_file>https://packages.pfsense.org/packages/config/varnish3/varnish_backends.xml</config_file>
@@ -755,7 +755,7 @@
 		<depends_on_package>vnstat-1.11.tbz</depends_on_package>
 		<depends_on_package_pbi>vnstat-1.11_1-i386.pbi</depends_on_package_pbi>
 		<build_port_path>/usr/ports/net/vnstat</build_port_path>
-		<version>1.11_1</version>
+		<version>1.11_1,2</version>
 		<status>Stable</status>
 		<required_version>2.0</required_version>
 		<maintainer>bryan.paradis@gmail.com</maintainer>
@@ -849,7 +849,7 @@
 		<descr>Automatically backs up your pfSense configuration.  All contents are encrypted before being sent to the server.  Requires Gold Subscription from https://portal.pfsense.org</descr>
 		<website>https://portal.pfsense.org</website>
 		<category>Services</category>
-		<version>1.27</version>
+		<version>1.28</version>
 		<status>Stable</status>
 		<required_version>1.2</required_version>
 		<pkginfolink>https://doc.pfsense.org/index.php/AutoConfigBackup</pkginfolink>
@@ -882,7 +882,7 @@
 		<depends_on_package>nmap-6.25_1.tbz</depends_on_package>
 		<depends_on_package_pbi>nmap-6.40_2-i386.pbi</depends_on_package_pbi>
 		<config_file>https://packages.pfsense.org/packages/config/nmap/nmap.xml</config_file>
-		<version>nmap-6.40_2 pkg v1.2.2</version>
+		<version>nmap-6.40_2 pkg v1.3</version>
 		<status>Stable</status>
 		<pkginfolink>https://doc.pfsense.org/index.php/Nmap_package</pkginfolink>
 		<required_version>2.0</required_version>
@@ -1083,7 +1083,7 @@
 		<depends_on_package_base_url>https://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
 		<depends_on_package>iperf-2.0.5.tbz</depends_on_package>
 		<depends_on_package_pbi>iperf-2.0.5-i386.pbi</depends_on_package_pbi>
-		<version>2.0.5</version>
+		<version>2.0.5_1</version>
 		<status>Beta</status>
 		<pkginfolink>https://doc.pfsense.org/index.php/Iperf_package</pkginfolink>
 		<required_version>1.2.1</required_version>
@@ -1152,12 +1152,12 @@
 		<name>squid3</name>
 		<internal_name>squid</internal_name>
 		<descr><![CDATA[High performance web proxy cache.<br />
-			It combines squid as a proxy server with it's capabilities of acting as a HTTP / HTTPS reverse proxy.<br />
+			It combines squid as a proxy server with its capabilities of acting as a HTTP / HTTPS reverse proxy.<br />
 			It includes an Exchange-Web-Access (OWA) Assistant.]]></descr>
 		<pkginfolink>https://forum.pfsense.org/index.php/topic,48347.0.html</pkginfolink>
 		<website>http://www.squid-cache.org/</website>
 		<category>Network</category>
-		<version>3.1.20 pkg 2.1.1</version>
+		<version>3.1.20 pkg 2.1.2</version>
 		<status>beta</status>
 		<required_version>2.0</required_version>
 		<maintainer>marcellocoutinho@gmail.com fernando@netfilter.com.br seth.mos@dds.nl mfuchs77@googlemail.com jimp@pfsense.org</maintainer>
@@ -1179,12 +1179,12 @@
 		<name>squid3-dev</name>
 		<internal_name>squid</internal_name>
 		<descr><![CDATA[High performance web proxy cache.<br />
-			It combines squid as a proxy server with it's capabilities of acting as a HTTP / HTTPS reverse proxy.<br />
+			It combines squid as a proxy server with its capabilities of acting as a HTTP / HTTPS reverse proxy.<br />
 			It includes an Exchange-Web-Access (OWA) Assistant, ssl filtering and antivirus integration via i-cap]]></descr>
 		<pkginfolink>https://forum.pfsense.org/index.php/topic,48347.0.html</pkginfolink>
 		<website>http://www.squid-cache.org/</website>
 		<category>Network</category>
-		<version>3.3.10 pkg 2.2.6</version>
+		<version>3.3.10 pkg 2.2.8</version>
 		<status>beta</status>
 		<required_version>2.0</required_version>
 		<maintainer>marcellocoutinho@gmail.com fernando@netfilter.com.br seth.mos@dds.nl mfuchs77@googlemail.com jimp@pfsense.org</maintainer>
@@ -1245,7 +1245,7 @@
 	</package>
 	<package>
 		<name>arpwatch</name>
-		<descr>Arpwatch monitors ethernet/ip address pairings. It also logs certain changes to syslog.</descr>
+		<descr>Arpwatch monitors Ethernet to IP address pairings. It logs certain changes to syslog.</descr>
 		<website>http://www-nrg.ee.lbl.gov/</website>
 		<category>Security</category>
 		<depends_on_package_base_url>https://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
@@ -1264,7 +1264,7 @@
 	</package>
 	<package>
 		<name>squidGuard</name>
-		<descr>High perfomance web proxy URL filter. Requires proxy Squid 2.x package.</descr>
+		<descr>High performance web proxy URL filter. Requires proxy Squid 2.x package.</descr>
 		<website>http://www.squidGuard.org/</website>
 		<maintainer>dv_serg@mail.ru</maintainer>
 		<category>Network Management</category>
@@ -1289,7 +1289,7 @@
 	</package>
 	<package>
 		<name>squidGuard-devel</name>
-		<descr>High perfomance web proxy URL filter. Requires proxy Squid 2.x package.</descr>
+		<descr>High performance web proxy URL filter. Requires proxy Squid 2.x package.</descr>
 		<website>http://www.squidGuard.org/</website>
 		<maintainer>gugabsd@mundounix.com.br</maintainer>
 		<category>Network Management</category>
@@ -1309,7 +1309,7 @@
 	</package>
 	<package>
 		<name>squidGuard-squid3</name>
-		<descr>High perfomance web proxy URL filter. Requires proxy Squid 3.x package.</descr>
+		<descr>High performance web proxy URL filter. Requires proxy Squid 3.x package.</descr>
 		<website>http://www.squidGuard.org/</website>
 		<maintainer>dv_serg@mail.ru</maintainer>
 		<category>Network Management</category>
@@ -1377,7 +1377,7 @@
 		<depends_on_package_pbi>zip-3.0-i386.pbi p7zip-9.20.1-i386.pbi</depends_on_package_pbi>
 		<build_port_path>/usr/ports/archivers/p7zip</build_port_path>
 		<build_port_path>/usr/ports/archivers/zip</build_port_path>
-		<version>1.2.13</version>
+		<version>1.2.15</version>
 		<status>RELEASE</status>
 		<required_version>2.0</required_version>
 		<config_file>https://packages.pfsense.org/packages/config/openvpn-client-export/openvpn-client-export.xml</config_file>
@@ -1575,7 +1575,7 @@
 		<descr><![CDATA[Allows to define SSH overrides for users,groups,hosts and addresses using Match in a convenient way.<br />
 				This package acts as an access list frontend for ssh connections]]></descr>
 		<category>Enhancements</category>
-		<version>1.0</version>
+		<version>1.0.1</version>
 		<status>Beta</status>
 		<required_version>2.0</required_version>
 		<config_file>https://packages.pfsense.org/packages/config/sshdcond/sshdcond.xml</config_file>
@@ -1591,24 +1591,6 @@
 		<required_version>2.0</required_version>
 		<config_file>https://packages.pfsense.org/packages/config/mailreport/mailreport.xml</config_file>
 		<configurationfile>mailreport.xml</configurationfile>
-	</package>
-	<package>
-		<name>zebedee</name>
-		<descr><![CDATA[Zebedee is a simple program to establish an encrypted, compressed "tunnel" for TCP/IP or UDP data transfer between two systems.<br />
-				This allows traffic such as telnet, ftp and X to be protected from snooping as well as potentially gaining performance over low-bandwidth networks from compression.]]>
-		</descr>
-		<category>Services</category>
-		<version>1.2.2</version>
-		<status>BETA</status>
-		<website>http://www.winton.org.uk/zebedee/</website>
-		<maintainer>jorgelustosa@gmail.com marcellocoutinho@gmail.com</maintainer>
-		<required_version>2.0</required_version>
-		<depends_on_package_base_url>https://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
-		<depends_on_package>zebedee-2.5.3.tbz</depends_on_package>
-		<depends_on_package_pbi>zebedee-2.5.3-i386.pbi</depends_on_package_pbi>
-		<config_file>https://packages.pfsense.org/packages/config/zebedee/zebedee.xml</config_file>
-		<configurationfile>zebedee.xml</configurationfile>
-		<build_port_path>/usr/ports/security/zebedee</build_port_path>
 	</package>
 	<package>
 		<name>OpenVPN tap Bridging Fix</name>
@@ -1831,7 +1813,7 @@
 		<pkginfolink>https://doc.pfsense.org/index.php/Sudo_Package</pkginfolink>
 		<descr><![CDATA[sudo allows delegation of privileges to users in the shell so commands can be run as other users, such as root.]]></descr>
 		<category>Security</category>
-		<version>0.2.1</version>
+		<version>0.2.3</version>
 		<status>Beta</status>
 		<required_version>2.0.2</required_version>
 		<config_file>https://packages.pfsense.org/packages/config/sudo/sudo.xml</config_file>
@@ -1896,7 +1878,7 @@
 	</package>
 	<package>
 		<name>LADVD</name>
-		<descr>Send and decode link layer advertisements</descr>
+		<descr>Send and decode link layer advertisements. Support for LLDP (Link Layer Discovery Protocol), CDP (Cisco Discovery Protocol), EDP (Extreme Discovery Protocol) and NDP (Nortel Discovery Protocol).</descr>
 		<website>https://code.google.com/p/ladvd/</website>
 		<category>Network Management</category>
 		<version>1.0.4</version>
@@ -1923,7 +1905,7 @@
 			<port>security/suricata</port>
 			<ports_after>security/barnyard2</ports_after>
 		</build_pbi>
-		<build_options>barnyard2_UNSET=ODBC PGSQL PRELUDE;barnyard2_SET=GRE IPV6 MPLS MYSQL PORT_PCAP BRO;suricata_SET=IPFW PORTS_PCAP TESTS;suricata_UNSET=PRELUDE</build_options>
+		<build_options>barnyard2_UNSET=ODBC PGSQL PRELUDE;barnyard2_SET=GRE IPV6 MPLS MYSQL PORT_PCAP BRO;suricata_SET=IPFW PORTS_PCAP GEOIP JSON;suricata_UNSET=PRELUDE TESTS HTP_PORT</build_options>
 		<build_port_path>/usr/ports/security/suricata</build_port_path>
 		<depends_on_package_base_url>https://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
 		<depends_on_package_pbi>suricata-2.0.3-i386.pbi</depends_on_package_pbi>
