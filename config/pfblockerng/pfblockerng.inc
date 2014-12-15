@@ -429,7 +429,7 @@ function sync_package_pfblockerng($cron = "") {
 	foreach ($continents as $continent => $pfb_alias) {
 		if (is_array($config['installedpackages']['pfblockerng' . strtolower(preg_replace('/ /','',$continent))]['config'])) {
 			$continent_config = $config['installedpackages']['pfblockerng' . strtolower(preg_replace('/ /','',$continent))]['config'][0];
-			if ($continent_config['action'] != "Disabled" && $continent_config['action'] != "" && in_array($continent_config['action'],array('Deny_Both','Deny_Inbound','Deny_Outbound','Match_Both','Match_Inbound','Match_Outbound','Permit_Both','Permit_Inbound','Permit_Outbound'))) {
+			if ($continent_config['action'] != "Disabled" && in_array($continent_config['action'],array('Deny_Both','Deny_Inbound','Deny_Outbound','Match_Both','Match_Inbound','Match_Outbound','Permit_Both','Permit_Inbound','Permit_Outbound'))) {
 				$pfb['autorules'] = TRUE;
 				$pfb['found'] = TRUE;
 				break;
@@ -441,7 +441,7 @@ function sync_package_pfblockerng($cron = "") {
 	foreach ($list_type as $ip_type) {
 		if ($config['installedpackages'][$ip_type]['config'] != "" && !$pfb['found']) {
 			foreach($config['installedpackages'][$ip_type]['config'] as $list) {
-				if ($list['action'] != "Disabled" && $list['action'] != "" && in_array($list['action'],array('Deny_Both','Deny_Inbound','Deny_Outbound','Match_Both','Match_Inbound','Match_Outbound','Permit_Both','Permit_Inbound','Permit_Outbound'))) {
+				if ($list['action'] != "Disabled" && in_array($list['action'],array('Deny_Both','Deny_Inbound','Deny_Outbound','Match_Both','Match_Inbound','Match_Outbound','Permit_Both','Permit_Inbound','Permit_Outbound'))) {
 					$pfb['autorules'] = TRUE;
 					break;
 				}
@@ -517,6 +517,10 @@ function sync_package_pfblockerng($cron = "") {
 			$base_rule = $base_rule_reg;
 			$pfb['inbound_interfaces'] = explode(",",$pfb['config']['inbound_interface']);
 		}
+	} else {
+		# Define Empty Variable/Array
+		$pfb['inbound_interfaces_float'] = "";
+		$pfb['inbound_interfaces'] = array();
 	}
 
 	if (!empty($pfb['config']['outbound_interface'])) {
@@ -545,6 +549,10 @@ function sync_package_pfblockerng($cron = "") {
 				if (!in_array("openvpn",$sort_interfaces))
 					array_push($pfb['outbound_interfaces'], "openvpn");
 		}
+	} else {
+		# Define Empty Variable/Array
+		$pfb['outbound_interfaces_float'] = "";
+		$pfb['outbound_interfaces'] = array();
 	}
 
 
@@ -581,7 +589,7 @@ function sync_package_pfblockerng($cron = "") {
 		foreach ($continents as $continent => $pfb_alias) {
 			if (is_array($config['installedpackages']['pfblockerng' . strtolower(preg_replace('/ /','',$continent))]['config']) && $pfb['enable'] == "on") {
 				$continent_config = $config['installedpackages']['pfblockerng' . strtolower(preg_replace('/ /','',$continent))]['config'][0];
-				if ($continent_config['action'] != "Disabled" && $continent_config['action'] != "") {
+				if ($continent_config['action'] != "Disabled") {
 					$cont_type = array ("countries4" => "_v4", "countries6" => "_v6");
 					foreach ($cont_type as $c_type => $vtype) {
 						if ($continent_config[$c_type] != "") {
@@ -606,7 +614,7 @@ function sync_package_pfblockerng($cron = "") {
 		foreach ($list_type as $ip_type => $vtype) {
 			if ($config['installedpackages'][$ip_type]['config'] != "" && $pfb['enable'] == "on") {
 				foreach ($config['installedpackages'][$ip_type]['config'] as $list) {
-					if (is_array($list['row']) && $list['action'] != "Disabled" && $list['action'] != "") {
+					if (is_array($list['row']) && $list['action'] != "Disabled") {
 						foreach ($list['row'] as $row) {
 							if ($vtype == "_v4") {
 								$pfb_alias = "{$row['header']}";
@@ -614,7 +622,7 @@ function sync_package_pfblockerng($cron = "") {
 								$pfb_alias = "{$row['header']}_v6";
 							}
 							# Collect Enabled Lists
-							if ($row['url'] != "" && $row['format'] != "skip") {
+							if ($row['url'] != "" && $row['state'] != "Disabled") {
 								# Set Parameters for 'Match', 'Permit', 'Native' and 'Deny'
 								if (in_array($list['action'],array('Match_Both','Match_Inbound','Match_Outbound','Alias_Match'))) {
 									$pfb['existing']['match'][] = "{$pfb_alias}";
@@ -638,10 +646,10 @@ function sync_package_pfblockerng($cron = "") {
 			if ($config['installedpackages'][$ip_type]['config'] != "" && $pfb['enable'] == "on") {
 				$count = -1;
 				foreach ($config['installedpackages'][$ip_type]['config'] as $list) {
-					if (is_array($list['row']) && $list['action'] != "Disabled" && $list['action'] != "") {
+					if (is_array($list['row']) && $list['action'] != "Disabled") {
 						$count++;
 						# Check if 'Emerging Threats Update' Needs Updating before next CRON Event.
-						if (is_array($list['row']) && $pfb['etupdate'] == "enabled" && $vtype == "_v4") {
+						if (is_array($list['row']) && $row['state'] != "Disabled" && $pfb['etupdate'] == "enabled" && $vtype == "_v4") {
 							foreach ($list['row'] as $row) {
 								$aliasname = $row['header'];
 								if ($row['format'] == "et") {
@@ -810,7 +818,7 @@ function sync_package_pfblockerng($cron = "") {
 	foreach ($continents as $continent => $pfb_alias) {
 		if (is_array($config['installedpackages']['pfblockerng' . strtolower(preg_replace('/ /','',$continent))]['config'])) {
 			$continent_config = $config['installedpackages']['pfblockerng' . strtolower(preg_replace('/ /','',$continent))]['config'][0];
-			if ($continent_config['action'] != "Disabled" && $continent_config['action'] != "" && $pfb['enable'] == "on") {
+			if ($continent_config['action'] != "Disabled" && $pfb['enable'] == "on") {
 
 				# Determine Folder Location for Alias (return array $pfbarr)
 				pfb_determine_list_detail($continent_config['action']);
@@ -1065,11 +1073,11 @@ function sync_package_pfblockerng($cron = "") {
 	foreach ($list_type as $ip_type => $vtype) {
 		if ($config['installedpackages'][$ip_type]['config'] != "") {
 			foreach ($config['installedpackages'][$ip_type]['config'] as $list) {
-				if ($list['action'] != "Disabled" && $list['action'] != "" && $pfb['enable'] == "on" && !$pfb['save'] && is_array($list['row'])) {
+				if ($list['action'] != "Disabled" && $pfb['enable'] == "on" && !$pfb['save'] && is_array($list['row'])) {
 					# Capture Alias Name
 					$alias = "pfB_" . preg_replace("/\W/","",$list['aliasname']);
 					foreach ($list['row'] as $row) {
-						if ($row['url'] != "" && $row['format'] != "skip") {
+						if ($row['url'] != "" && $row['state'] != "Disabled") {
 
 							# Determine Folder Location for Alias (return array $pfbarr)
 							pfb_determine_list_detail($list['action']);
@@ -1100,8 +1108,9 @@ function sync_package_pfblockerng($cron = "") {
 							}
 
 							if (file_exists($pfbfolder . '/' . $header_url . '.txt') && $pfb['reuse'] == "") {
-								if ($row['format'] == "hold") {
+								if ($row['state'] == "Hold") {
 									$log = "\n[ {$header_url} ] {$log_tab} Static Hold  [ NOW ]\n";
+									$row['format'] = "Hold";
 								} else {
 									$log = "\n[ {$header_url} ] {$log_tab} exists, Reloading File [ NOW ]\n";
 								}
@@ -1576,13 +1585,13 @@ function sync_package_pfblockerng($cron = "") {
 						$final_alias = array_unique($pfb_alias_lists);
 				}
 
-				if ($list['action'] != "Disabled" && $list['action'] != "") {
+				if ($list['action'] != "Disabled") {
 					#remove empty lists files if any
 					if (is_array($list['row'])) {
 						$update = 0;
 						${$alias} = "";
 						foreach ($list['row'] as $row) {
-							if ($row['url'] != "" && $row['format'] != "skip") {
+							if ($row['url'] != "" && $row['state'] != "Disabled") {
 								if ($vtype == "_v4") {
 									$header_url = "{$row['header']}";
 								} else {
@@ -1829,7 +1838,7 @@ function sync_package_pfblockerng($cron = "") {
 			# Collect Existing pfSense Rules 'Pass', 'Match' and 'Other' pfSense rules into new Arrays.
 			if (!empty($rules)) {
 				foreach ($rules as $rule) {
-					if (!preg_match("/pfB_.*" . $pfb['suffix'] . "/",$rule['descr']) && ($rule['interface'] != "")) {
+					if (!preg_match("/pfB_.*" . $pfb['suffix'] . "/",$rule['descr'])) {
 						// Floating rules collection 'Floating Pass/Match'. Balance to 'other'
 						if ($pfb['float'] == "on") {
 							if ($rule['type'] == "pass" && $rule['floating'] == "yes") {

@@ -28,7 +28,6 @@
 	1. Redistributions of source code must retain the above copyright notice,
 	   this list of conditions and the following disclaimer.
 
-
 	2. Redistributions in binary form must reproduce the above copyright
 	   notice, this list of conditions and the following disclaimer in the
 	   documentation and/or other materials provided with the distribution.
@@ -61,7 +60,7 @@
 		<section>Firewall</section>
 		<configfile>pfblockerng_v6lists.xml</configfile>
 	</menu>
-		<tabs>
+	<tabs>
 		<tab>
 			<text>General</text>
 			<url>/pkg_edit.php?xml=pfblockerng.xml&amp;id=0</url>
@@ -124,7 +123,7 @@
 			<text>Sync</text>
 			<url>/pkg_edit.php?xml=/pfblockerng/pfblockerng_sync.xml&amp;id=0</url>
 		</tab>
-		</tabs>
+	</tabs>
 		<adddeleteeditpagefields>
 			<columnitem>
 				<fielddescr>Alias Name</fielddescr>
@@ -182,12 +181,12 @@
 			<type>info</type>
 			<description><![CDATA[<strong><u>'Format'</u></strong> : Select the Format Type<br /><br />
 				<strong><u>'URL'</u></strong> : Add direct link to list:
-				(Example: <a target=_new href='http://list.iblocklist.com/?list=bt_ads&fileformat=p2p&archiveformat=gz'>Ads</a>,
+				Example: <a target=_new href='http://list.iblocklist.com/?list=bt_ads&fileformat=p2p&archiveformat=gz'>Ads</a>,
 				<a target=_new href='http://list.iblocklist.com/?list=bt_spyware&fileformat=p2p&archiveformat=gz'>Spyware</a>,
-				<a target=_new href='http://list.iblocklist.com/?list=bt_proxy&fileformat=p2p&archiveformat=gz'>Proxies</a> )<br /><br />
+				<a target=_new href='http://list.iblocklist.com/?list=bt_proxy&fileformat=p2p&archiveformat=gz'>Proxies</a><br /><br />
 				<strong><u>'pfSense Local File'</u></strong> Format :<br /><br />
 				&nbsp;&nbsp;http(s)://127.0.0.1/NAME_OF_FILE &nbsp;&nbsp;<strong>or</strong>&nbsp;&nbsp; 
-				/usr/local/www/NAME_OF_FILE &nbsp;&nbsp; ((Files can also be placed in the /var/db/pfblockerng folders)<br /><br />
+				/usr/local/www/NAME_OF_FILE &nbsp;&nbsp; (Files can also be placed in the /var/db/pfblockerng folders)<br /><br />
 
 				<strong><u>'Header'</u></strong> : The <u>'Header' Field</u> must be <u>Unique</u>, it will
 				name the List File and it will be referenced in the pfBlockerNG Widget.
@@ -200,21 +199,20 @@
 			<description><![CDATA[<br /><strong>'Format'</strong> - Choose the file format that URL will retrieve.<br />
 
 				<ul><li><strong>'txt'</strong> Plain txt Lists</li><br />
-				<li><strong>'gz'</strong> - IBlock GZ Lists in Range Format</li><br />
-				<li><strong>'gz_2'</strong> - Other GZ Lists in IP or CIDR only</li><br />
+				<li><strong>'gz'</strong> - IBlock GZ Lists in Range Format only.</li><br />
+				<li><strong>'gz_2'</strong> - Other GZ Lists in IP or CIDR only.</li><br />
 				<li><strong>'zip'</strong> - ZIP'd Lists</li><br />
 				<li><strong>'block'</strong>- IP x.x.x.0 Block type</li><br />
 				<li><strong>'html'</strong> - Web Links</li><br />
 				<li><strong>'xlsx'</strong> - Excel Lists</li><br />
 				<li><strong>'rsync'</strong> - RSync Lists</li><br />
-				<li><strong>'SKIP'</strong> - This format can be used to 'Disable' an Individual List.</li><br />
-				<li><strong>'HOLD'</strong> - Once a List has been Downloaded, you can change to 'HOLD' to keep this list Static.</li><br />
-
-				<strong>Note: </strong><br />
-				Downloaded or pfSense local file must have only one network per line and follows the syntax below:<br />
-				Network ranges: <strong> TBC </strong><br />
+				<strong>'State'</strong> - Select the Run State for each list.<br />
+				<ul><li><strong>'ON/OFF'</strong> - Enabled / Disabled</li><br />
+				<li><strong>'HOLD'</strong> - Once a List has been Downloaded, list will remain Static.</li></ul>
+				<strong>'Note' -</strong> Downloaded or pfsense local file must have only one network per line and follows the syntax below:
+				<ul>Network ranges: <strong> TBC </strong><br />
 				IP Address: <strong> TBC </strong><br />
-				CIDR: <strong> TBC </strong></ul><br /><br />]]>
+				CIDR: <strong> TBC </strong></ul>]]>
 			</description>
 			<type>rowhelper</type>
 			<rowhelper>
@@ -231,15 +229,23 @@
 				<option><name>html</name><value>html</value></option>
 				<option><name>xlsx</name><value>xlsx</value></option>
 				<option><name>RSync</name><value>rsync</value></option>
-				<option><name>SKIP</name><value>skip</value></option>
-				<option><name>HOLD</name><value>hold</value></option>
 			</options>
+			</rowhelperfield>
+			<rowhelperfield>
+				<fielddescr>State</fielddescr>
+				<fieldname>state</fieldname>
+				<type>select</type>
+				<options>
+					<option><name>ON</name><value>Enabled</value></option>
+					<option><name>OFF</name><value>Disabled</value></option>
+					<option><name>HOLD</name><value>Hold</value></option>
+				</options>
 			</rowhelperfield>
 			<rowhelperfield>
 				<fielddescr>URL or pfSense local file</fielddescr>
 				<fieldname>url</fieldname>
 				<type>input</type>
-				<size>75</size>
+				<size>50</size>
 			</rowhelperfield>
 			<rowhelperfield>
 				<fielddescr>Header</fielddescr>
@@ -349,7 +355,8 @@
 			<fieldname>aliaslog</fieldname>
 			<description><![CDATA[Default:<strong>Enable</strong><br />
 				Select - Logging to Status: System Logs: FIREWALL ( Log )<br />
-				This can be overriden by the 'Global Logging' Option in the General Tab.]]></description>
+				This can be overriden by the 'Global Logging' Option in the General Tab.]]>
+			</description>
 			<type>select</type>
 			<options>
 				<option><name>Enable</name><value>enabled</value></option>
@@ -389,7 +396,7 @@
 		</field>
 		<field>
 			<name><![CDATA[<ul>Click to SAVE Settings and/or Rule Edits. &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Changes are Applied via CRON or
-			'Force Update'</ul>]]></name>
+				'Force Update'</ul>]]></name>
 			<type>listtopic</type>
 		</field>
 	</fields>

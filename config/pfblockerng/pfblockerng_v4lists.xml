@@ -26,11 +26,11 @@
 
 
 	1. Redistributions of source code must retain the above copyright notice,
-		this list of conditions and the following disclaimer.
+	   this list of conditions and the following disclaimer.
 
 	2. Redistributions in binary form must reproduce the above copyright
-		notice, this list of conditions and the following disclaimer in the
-		 documentation and/or other materials provided with the distribution.
+	   notice, this list of conditions and the following disclaimer in the
+	   documentation and/or other materials provided with the distribution.
 
 
 	THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
@@ -197,7 +197,7 @@
 		<field>
 			<fielddescr><![CDATA[<strong>IPv4</strong> Lists]]></fielddescr>
 			<fieldname>none</fieldname>
-			<description><![CDATA[<br /><strong>'Format'</strong> - Choose the file format that URL will retrieve.<br />
+			<description><![CDATA[<br /><strong>'Format'</strong> - Select the file format that URL will retrieve.<br />
 
 				<ul><li><strong>'txt'</strong> Plain txt Lists</li><br />
 				<li><strong>'gz'</strong> - IBlock GZ Lists in Range Format only.</li><br />
@@ -208,15 +208,14 @@
 				<li><strong>'html'</strong> - Web Links</li><br />
 				<li><strong>'xlsx'</strong> - Excel Lists</li><br />
 				<li><strong>'rsync'</strong> - RSync Lists</li><br />
-				<li><strong>'ET IQRisk'</strong> - Only</li><br />
-				<li><strong>'SKIP'</strong> - This format can be used to 'Disable' an Individual List.</li><br />
-				<li><strong>'HOLD'</strong> - Once a List has been Downloaded, you can change to 'HOLD' to keep this list Static.</li><br />
-
-				<strong>Note: </strong><br />
-				Downloaded or pfsense local file must have only one network per line and follows the syntax below:<br />
-				Network ranges: <strong>172.16.1.0-172.16.1.255</strong><br />
+				<li><strong>'ET' IQRisk</strong> - Only</li></ul>
+				<strong>'State'</strong> - Select the Run State for each list.<br />
+				<ul><li><strong>'ON/OFF'</strong> - Enabled / Disabled</li><br />
+				<li><strong>'HOLD'</strong> - Once a List has been Downloaded, list will remain Static.</li></ul>
+				<strong>'Note' -</strong> Downloaded or pfsense local file must have only one network per line and follows the syntax below:
+				<ul>Network ranges: <strong>172.16.1.0-172.16.1.255</strong><br />
 				IP Address: <strong>172.16.1.10</strong><br />
-				CIDR: <strong>172.16.1.0/24</strong></ul><br /><br />]]>
+				CIDR: <strong>172.16.1.0/24</strong></ul>]]>
 			</description>
 			<type>rowhelper</type>
 			<rowhelper>
@@ -234,16 +233,24 @@
 				<option><name>html</name><value>html</value></option>
 				<option><name>xlsx</name><value>xlsx</value></option>
 				<option><name>RSync</name><value>rsync</value></option>
-				<option><name>ET IQRisk</name><value>et</value></option>
-				<option><name>SKIP</name><value>skip</value></option>
-				<option><name>HOLD</name><value>hold</value></option>
+				<option><name>ET</name><value>et</value></option>
 			</options>
+			</rowhelperfield>
+			<rowhelperfield>
+				<fielddescr>State</fielddescr>
+				<fieldname>state</fieldname>
+				<type>select</type>
+				<options>
+					<option><name>ON</name><value>Enabled</value></option>
+					<option><name>OFF</name><value>Disabled</value></option>
+					<option><name>HOLD</name><value>Hold</value></option>
+				</options>
 			</rowhelperfield>
 			<rowhelperfield>
 				<fielddescr>URL or pfSense local file</fielddescr>
 				<fieldname>url</fieldname>
 				<type>input</type>
-				<size>75</size>
+				<size>50</size>
 			</rowhelperfield>
 			<rowhelperfield>
 				<fielddescr>Header</fielddescr>
@@ -314,7 +321,8 @@
 			<fielddescr>Update Frequency</fielddescr>
 			<fieldname>cron</fieldname>
 			<description><![CDATA[Default:<strong>Never</strong><br />
-				Select how often List files will be downloaded]]></description>
+				Select how often List files will be downloaded]]>
+			</description>
 			<type>select</type>
 			<options>
 				<option><name>Never</name><value>Never</value></option>

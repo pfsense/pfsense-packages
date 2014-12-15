@@ -304,9 +304,9 @@ if ($argv[1] == 'cron') {
 	foreach ($list_type as $ip_type => $vtype) {
 		if ($config['installedpackages'][$ip_type]['config'] != "") {
 			foreach ($config['installedpackages'][$ip_type]['config'] as $list) {
-				if (is_array($list['row']) && $list['action'] != "Disabled" && $list['action'] != "") {
+				if (is_array($list['row']) && $list['action'] != "Disabled") {
 					foreach ($list['row'] as $row) {
-						if ($row['url'] != "" && $row['format'] != "hold" && $row['format'] != "skip") {
+						if ($row['url'] != "" && $row['state'] != "Disabled") {
 
 							if ($vtype == "_v4") {
 								$header_url = "{$row['header']}";
@@ -322,6 +322,11 @@ if ($argv[1] == 'cron') {
 							$list_url = $row['url'];
 							$header_dow = $list['dow'];
 							$url_format = $row['format'];
+
+							// Bypass update if state is defined as "Hold" and list file exists
+							if (file_exists($pfbfolder . '/' . $header_url . '.txt') && $row['state'] == "Hold") {
+								continue;
+							}
 
 							# Check if List file exists, if not found run Update
 							if (!file_exists($pfbfolder . '/' . $header_url . '.txt')) {
