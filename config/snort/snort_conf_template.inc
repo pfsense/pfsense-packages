@@ -24,9 +24,6 @@ var RULE_PATH {$snortcfgdir}/rules
 # Define Server Ports #
 {$portvardef}
 
-# Configure quiet startup mode #
-config quiet
-
 # Configure the snort decoder #
 config checksum_mode: {$cksumcheck}
 config disable_decode_alerts

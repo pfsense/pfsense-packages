@@ -11,6 +11,7 @@ $priv_list['page-services-snort']['match'][] = "snort/snort_barnyard.php*";
 $priv_list['page-services-snort']['match'][] = "snort/snort_blocked.php*";
 $priv_list['page-services-snort']['match'][] = "snort/snort_check_for_rule_updates.php*";
 $priv_list['page-services-snort']['match'][] = "snort/snort_define_servers.php*";
+$priv_list['page-services-snort']['match'][] = "snort/snort_defs.inc*";
 $priv_list['page-services-snort']['match'][] = "snort/snort_download_rules.php*";
 $priv_list['page-services-snort']['match'][] = "snort/snort_download_updates.php*";
 $priv_list['page-services-snort']['match'][] = "snort/snort_edit_hat_data.php*";

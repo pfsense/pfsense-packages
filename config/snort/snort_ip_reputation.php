@@ -204,6 +204,7 @@ if ($savemsg)
 <?php endif; ?>
 
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
+	<tbody>
 	<tr>
 		<td>
 		<?php
@@ -239,6 +240,12 @@ if ($savemsg)
 	<tr>
 		<td><div id="mainarea">
 			<table id="maintable" class="tabcont" width="100%" border="0" cellpadding="6" cellspacing="0">
+				<tbody>
+			<?php if ($g['platform'] == "nanobsd") : ?>
+				<tr>
+					<td colspan="2" class="listtopic"><?php echo gettext("IP Reputation is not supported on NanoBSD installs"); ?></td>
+				</tr>
+			<?php else: ?>
 				<tr>
 					<td colspan="2" valign="top" class="listtopic"><?php echo gettext("IP Reputation Preprocessor Configuration"); ?></td>
 				</tr>
@@ -368,9 +375,9 @@ if ($savemsg)
 					<td width="22%" valign='top' class='vncell'><?php echo gettext("Whitelist Files"); ?>
 					</td>
 					<td width="78%" class="vtable">
-						<table width="95%" border="0" cellpadding="2" cellspacing="0">
 					<!-- wlist_chooser -->
 					<div id="wlistChooser" name="wlistChooser" style="display:none; border:1px dashed gray; width:98%;"></div>
+						<table width="95%" border="0" cellpadding="2" cellspacing="0">
 							<colgroup>
 								<col style="text-align:left;">
 								<col style="width: 30%; text-align:left;">
@@ -411,12 +418,16 @@ if ($savemsg)
 						</table>
 					</td>
 				</tr>
+			<?php endif; ?>
+				</tbody>
 			</table>
 		</div>
 		</td>
 	</tr>
+	</tbody>
 </table>
 
+<?php if ($g['platform'] != "nanobsd") : ?>
 <script type="text/javascript">
 Event.observe(
 	window, "load",
@@ -504,6 +515,7 @@ function wlistComplete(req) {
 }
 
 </script>
+<?php endif; ?>
 
 </form>
 <?php include("fend.inc"); ?>

@@ -73,27 +73,52 @@ if (empty($config['installedpackages']['snortglobal']['snort_config_ver']) &&
 /**********************************************************/
 /* Create new Auto SID Mgmt settings if not set           */
 /**********************************************************/
-	if (empty($config['installedpackages']['snortglobal']['auto_manage_sids'])) {
-		$config['installedpackages']['snortglobal']['auto_manage_sids'] = "off";
-		$updated_cfg = true;
-	}
+if (empty($config['installedpackages']['snortglobal']['auto_manage_sids'])) {
+	$config['installedpackages']['snortglobal']['auto_manage_sids'] = "off";
+	$updated_cfg = true;
+}
 
 /**********************************************************/
 /* Create new LOG MGMT settings if not set                */
 /**********************************************************/
-	if (empty($config['installedpackages']['snortglobal']['enable_log_mgmt'])) {
-		$config['installedpackages']['snortglobal']['enable_log_mgmt'] = "on";
-		$config['installedpackages']['snortglobal']['alert_log_limit_size'] = "500";
-		$config['installedpackages']['snortglobal']['alert_log_retention'] = "336";
-		$config['installedpackages']['snortglobal']['event_pkts_log_limit_size'] = "0";
-		$config['installedpackages']['snortglobal']['event_pkts_log_retention'] = "336";
-		$config['installedpackages']['snortglobal']['sid_changes_log_limit_size'] = "250";
-		$config['installedpackages']['snortglobal']['sid_changes_log_retention'] = "336";
-		$config['installedpackages']['snortglobal']['stats_log_limit_size'] = "500";
-		$config['installedpackages']['snortglobal']['stats_log_retention'] = "168";
-		$updated_cfg = true;
+if (empty($config['installedpackages']['snortglobal']['enable_log_mgmt'])) {
+	$config['installedpackages']['snortglobal']['enable_log_mgmt'] = "on";
+	$config['installedpackages']['snortglobal']['alert_log_limit_size'] = "500";
+	$config['installedpackages']['snortglobal']['alert_log_retention'] = "336";
+	$config['installedpackages']['snortglobal']['appid_stats_log_limit_size'] = "1000";
+	$config['installedpackages']['snortglobal']['appid_stats_log_retention'] = "168";
+	$config['installedpackages']['snortglobal']['event_pkts_log_limit_size'] = "0";
+	$config['installedpackages']['snortglobal']['event_pkts_log_retention'] = "336";
+	$config['installedpackages']['snortglobal']['sid_changes_log_limit_size'] = "250";
+	$config['installedpackages']['snortglobal']['sid_changes_log_retention'] = "336";
+	$config['installedpackages']['snortglobal']['stats_log_limit_size'] = "500";
+	$config['installedpackages']['snortglobal']['stats_log_retention'] = "168";
+	$updated_cfg = true;
+}
+if (empty($config['installedpackages']['snortglobal']['appid_stats_log_limit_size']))
+	$config['installedpackages']['snortglobal']['appid_stats_log_limit_size'] = "1000";
+if (empty($config['installedpackages']['snortglobal']['appid_stats_log_retention']))
+	$config['installedpackages']['snortglobal']['appid_stats_log_retention'] = "168";
+
+/**********************************************************/
+/* Create new VERBOSE_LOGGING setting if not set          */
+/**********************************************************/
+if (empty($config['installedpackages']['snortglobal']['verbose_logging'])) {
+	$config['installedpackages']['snortglobal']['verbose_logging'] = "off";
+	$updated_cfg = true;
 }
 
+/**********************************************************/
+/* Create new OpenAppID settings if not set               */
+/**********************************************************/
+if (empty($config['installedpackages']['snortglobal']['openappid_detectors'])) {
+	$config['installedpackages']['snortglobal']['openappid_detectors'] = "off";
+	$updated_cfg = true;
+}
+
+/**********************************************************/
+/* Migrate per interface settings if required.            */
+/**********************************************************/
 foreach ($rule as &$r) {
 	// Initialize arrays for supported preprocessors if necessary
 	if (!is_array($r['frag3_engine']['item']))
@@ -482,6 +507,24 @@ foreach ($rule as &$r) {
 		$updated_cfg = true;
 	}
 
+	// Default any unconfigured AppID preprocessor settings
+	if (empty($pconfig['appid_preproc'])) {
+		$pconfig['appid_preproc'] = 'off';
+		$updated_cfg = true;
+	}
+	if (empty($pconfig['sf_appid_mem_cap'])) {
+		$pconfig['sf_appid_mem_cap'] = '256';
+		$updated_cfg = true;
+	}
+	if (empty($pconfig['sf_appid_statslog'])) {
+		$pconfig['sf_appid_statslog'] = 'on';
+		$updated_cfg = true;
+	}
+	if (empty($pconfig['sf_appid_stats_period'])) {
+		$pconfig['sf_appid_stats_period'] = '300';
+		$updated_cfg = true;
+	}
+
 	// Save the new configuration data into the $config array pointer
 	$r = $pconfig;
 }
@@ -490,8 +533,7 @@ unset($r);
 
 // Log a message if we changed anything
 if ($updated_cfg) {
-	$config['installedpackages']['snortglobal']['snort_config_ver'] = "3.1.5";
-	log_error("[Snort] Saving configuration settings in new format...");
+	$config['installedpackages']['snortglobal']['snort_config_ver'] = "3.2";
 	log_error("[Snort] Settings successfully migrated to new configuration format...");
 }
 else
