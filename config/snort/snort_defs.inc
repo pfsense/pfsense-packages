@@ -57,7 +57,7 @@ if (!defined("SNORT_SID_MODS_PATH"))
 if (!defined("SNORT_IPREP_PATH"))
 	define("SNORT_IPREP_PATH", "{$g['vardb_path']}/snort/iprep/");
 if (!defined('SNORT_APPID_ODP_PATH'))
-	define('SNORT_APPID_ODP_PATH', "{$g['vardb_path']}/snort/app/");
+	define('SNORT_APPID_ODP_PATH', SNORTDIR . "/appid/");
 
 // Rules filenames, download URLs and prefixes.
 // Be sure to include the trailing backslash on URLs.
