@@ -579,7 +579,7 @@ $http_hosts_default_policy = "";
 if (!is_array($suricatacfg['libhtp_policy']['item']))
 	$suricatacfg['libhtp_policy']['item'] = array();
 if (count($suricatacfg['libhtp_policy']['item']) < 1) {
-	$http_hosts_default_policy = "default-config:\n     personality: IDS\n     request-body-limit: 4096\n     response-body-limit: 4096\n";
+	$http_hosts_default_policy = "     personality: IDS\n     request-body-limit: 4096\n     response-body-limit: 4096\n";
 	$http_hosts_default_policy .= "     double-decode-path: no\n     double-decode-query: no\n     uri-include-all: no\n";
 }
 else {
