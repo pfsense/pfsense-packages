@@ -386,7 +386,7 @@ if ($savemsg)
 	</tbody>
 </table>
 
-<?php if $g['platform' != "nanobsd") : ?>
+<?php if ($g['platform'] != "nanobsd") : ?>
 <script type="text/javascript">
 Event.observe(
 	window, "load",
