@@ -40,7 +40,7 @@
 
 require_once("config.inc");
 require_once("functions.inc");
-require("/usr/local/pkg/suricata/suricata_defs.inc");
+require_once("/usr/local/pkg/suricata/suricata.inc");
 
 /*************************************************************************
  * Hack for backwards compatibility with older 2.1.x pfSense versions    *
@@ -84,6 +84,42 @@ if(!function_exists("download_file")) {
 	}
 }
 
+function suricata_check_iprep_md5($filename) {
+
+	/**********************************************************/
+	/* This function attempts to download the MD5 hash for    */
+	/* the passed file and compare its contents to the        */
+	/* currently stored hash file to see if a new file has    */
+	/* been posted.                                           */
+	/*                                                        */
+	/* On Entry: $filename = IPREP file to check ('md5sum'    */
+	/*                       is auto-appended to the supplied */
+	/*                       filename.)                       */
+	/*                                                        */
+	/*  Returns: TRUE if new rule file download required.     */
+	/*           FALSE if rule download not required or an    */
+	/*           error occurred.                              */
+	/**********************************************************/
+
+	global $et_iqrisk_url, $iqRisk_tmppath, $iprep_path;
+	$new_md5 = $old_md5 = "";
+
+	if (download_file("{$et_iqrisk_url}{$filename}.md5sum", "{$iqRisk_tmppath}{$filename}.md5") == true) {
+		if (file_exists("{$iqRisk_tmppath}{$filename}.md5"))
+			$new_md5 = file_get_contents("{$iqRisk_tmppath}{$filename}.md5");
+		if (file_exists("{$iprep_path}{$filename}.md5"))
+			$old_md5 = file_get_contents("{$iprep_path}{$filename}.md5");
+		if ($new_md5 != $old_md5)
+			return TRUE;
+		else
+			log_error(gettext("[Suricata] IPREP file '{$filename}' is up to date."));
+	}
+	else
+		log_error(gettext("[Suricata] An error occurred downloading {$filename}.md5sum for IPREP.  Update of {$filename} file will be skipped."));
+
+	return FALSE;
+}
+
 /**********************************************************************
  * Start of main code                                                 *
  **********************************************************************/
@@ -92,7 +128,7 @@ $iprep_path = SURICATA_IPREP_PATH;
 $iqRisk_tmppath = "{$g['tmp_path']}/IQRisk/";
 $success = FALSE;
 
-// If auto-updates of GeoIP are disabled, then exit
+// If auto-updates of ET IQRisk are disabled, then exit
 if ($config['installedpackages']['suricata']['config'][0]['et_iqrisk_enable'] == "off")
 	return(0);
 else
@@ -109,21 +145,52 @@ else {
 
 // Download the IP List files to a temporary location
 safe_mkdir("$iqRisk_tmppath");
-if (download_file("{$et_iqrisk_url}categories.txt", "{$iqRisk_tmppath}categories.txt") != true)
-	log_error(gettext("[Suricata] An error occurred downloading the 'categories.txt' file for IQRisk."));
-if (download_file("{$et_iqrisk_url}iprepdata.txt.gz", "{$iqRisk_tmppath}iprepdata.txt.gz") != true)
-	log_error(gettext("[Suricata] An error occurred downloading the 'iprepdata.txt.gz' file for IQRisk."));
 
-// If the files downloaded successfully, unpack them and store
-// the list files in the SURICATA_IPREP_PATH directory.
-if (file_exists("{$iqRisk_tmppath}categories.txt")) {
-	@rename("{$iqRisk_tmppath}categories.txt", "{$iprep_path}categories.txt");
-	$success = TRUE;
+// Test the posted MD5 checksum file against our local copy
+// to see if an update has been posted for 'categories.txt'.
+if (suricata_check_iprep_md5("categories.txt")) {
+	log_error(gettext("[Suricata] An updated IPREP 'categories.txt' file is available...downloading new file."));
+	if (download_file("{$et_iqrisk_url}categories.txt", "{$iqRisk_tmppath}categories.txt") != true)
+		log_error(gettext("[Suricata] An error occurred downloading the 'categories.txt' file for IQRisk."));
+	else {
+		// If the files downloaded successfully, unpack them and store
+		// the list files in the SURICATA_IPREP_PATH directory.
+		if (file_exists("{$iqRisk_tmppath}categories.txt") && file_exists("{$iqRisk_tmppath}categories.txt.md5")) {
+			$new_md5 = file_get_contents("{$iqRisk_tmppath}categories.txt.md5");
+			if ($new_md5 = trim(md5_file("{$iqRisk_tmppath}categories.txt"))) {
+				@rename("{$iqRisk_tmppath}categories.txt", "{$iprep_path}categories.txt");
+				@rename("{$iqRisk_tmppath}categories.txt.md5", "{$iprep_path}categories.txt.md5");
+				$success = TRUE;
+				log_error(gettext("[Suricata] Successfully updated IPREP file 'categories.txt'."));
+			}
+			else
+				log_error(gettext("[Suricata] MD5 integrity check of downloaded 'categories.txt' file failed!  Skipping update of this IPREP file."));
+		}
+	}
 }
-if (file_exists("{$iqRisk_tmppath}iprepdata.txt.gz")) {
-	mwexec("/usr/bin/gunzip -f {$iqRisk_tmppath}iprepdata.txt.gz");
-	@rename("{$iqRisk_tmppath}iprepdata.txt", "{$iprep_path}iprepdata.txt");
-	$success = TRUE;
+
+// Test the posted MD5 checksum file against our local copy
+// to see if an update has been posted for 'iprepdata.txt.gz'.
+if (suricata_check_iprep_md5("iprepdata.txt.gz")) {
+	log_error(gettext("[Suricata] An updated IPREP 'iprepdata.txt' file is available...downloading new file."));
+	if (download_file("{$et_iqrisk_url}iprepdata.txt.gz", "{$iqRisk_tmppath}iprepdata.txt.gz") != true)
+		log_error(gettext("[Suricata] An error occurred downloading the 'iprepdata.txt.gz' file for IQRisk."));
+	else {
+		// If the files downloaded successfully, unpack them and store
+		// the list files in the SURICATA_IPREP_PATH directory.
+		if (file_exists("{$iqRisk_tmppath}iprepdata.txt.gz") && file_exists("{$iqRisk_tmppath}iprepdata.txt.gz.md5")) {
+			$new_md5 = file_get_contents("{$iqRisk_tmppath}iprepdata.txt.gz.md5");
+			if ($new_md5 = trim(md5_file("{$iqRisk_tmppath}iprepdata.txt.gz"))) {
+				mwexec("/usr/bin/gunzip -f {$iqRisk_tmppath}iprepdata.txt.gz");
+				@rename("{$iqRisk_tmppath}iprepdata.txt", "{$iprep_path}iprepdata.txt");
+				@rename("{$iqRisk_tmppath}iprepdata.txt.gz.md5", "{$iprep_path}iprepdata.txt.gz.md5");
+				$success = TRUE;
+				log_error(gettext("[Suricata] Successfully updated IPREP file 'iprepdata.txt'."));
+			}
+			else
+				log_error(gettext("[Suricata] MD5 integrity check of downloaded 'iprepdata.txt.gz' file failed!  Skipping update of this IPREP file."));
+		}
+	}
 }
 
 // Cleanup the tmp directory path
