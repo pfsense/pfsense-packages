@@ -39,24 +39,18 @@ require_once("/usr/local/pkg/snort/snort.inc");
 /* Define some locally required variables from Snort constants */
 $snortdir = SNORTDIR;
 $snort_rules_upd_log = SNORT_RULES_UPD_LOGFILE;
+$snortbinver = SNORT_BIN_VERSION;
+$snortbinver = str_replace(".", "", $snortbinver);
 
-/* Grab the Snort binary version programmatically and */
-/* use it to construct the proper Snort VRT rules     */
-/* tarball filename.  Fallback to a safe default if   */
-/* we fail.                                           */
-$snortver = array();
-exec("/usr/local/bin/snort -V 2>&1 |/usr/bin/grep Version | /usr/bin/cut -c20-26", $snortver);
-if (empty($snortver[0]))
-	$snortver[0] = SNORT_BIN_VERSION;
-$snortver[0] = str_replace(".", "", $snortver[0]);
-
-$snort_rules_file = "snortrules-snapshot-{$snortver[0]}.tar.gz";
+$snort_rules_file = "snortrules-snapshot-{$snortbinver}.tar.gz";
 $snort_community_rules_filename = SNORT_GPLV2_DNLD_FILENAME;
+$snort_openappid_filename = SNORT_OPENAPPID_DNLD_FILENAME;
 
 $snortdownload = $config['installedpackages']['snortglobal']['snortdownload'];
 $emergingthreats = $config['installedpackages']['snortglobal']['emergingthreats'];
 $etpro = $config['installedpackages']['snortglobal']['emergingthreats_pro'];
 $snortcommunityrules = $config['installedpackages']['snortglobal']['snortcommunityrules'];
+$openappid_detectors = $config['installedpackages']['snortglobal']['openappid_detectors'];
 
 /* Get last update information if available */
 if (!empty($config['installedpackages']['snortglobal']['last_rule_upd_time']))
@@ -70,21 +64,21 @@ else
 
 if ($etpro == "on") {
 	$emergingthreats_filename = SNORT_ETPRO_DNLD_FILENAME;
-	$et_name = "Emerging Threats Pro Rules";
+	$et_name = gettext("Emerging Threats Pro Rules");
 }
 else {
 	$emergingthreats_filename = SNORT_ET_DNLD_FILENAME;
-	$et_name = "Emerging Threats Open Rules";
+	$et_name = gettext("Emerging Threats Open Rules");
 }
 
 /* quick md5 chk of downloaded rules */
 if ($snortdownload == 'on') {
-	$snort_org_sig_chk_local = 'Not Downloaded';
-	$snort_org_sig_date = 'Not Downloaded';
+	$snort_org_sig_chk_local = gettext("Not Downloaded");
+	$snort_org_sig_date = gettext("Not Downloaded");
 }
 else {
-	$snort_org_sig_chk_local = 'Not Enabled';
-	$snort_org_sig_date = 'Not Enabled';
+	$snort_org_sig_chk_local = gettext("Not Enabled");
+	$snort_org_sig_date = gettext("Not Enabled");
 }
 if (file_exists("{$snortdir}/{$snort_rules_file}.md5") && $snortdownload == 'on') {
 	$snort_org_sig_chk_local = file_get_contents("{$snortdir}/{$snort_rules_file}.md5");
@@ -92,12 +86,12 @@ if (file_exists("{$snortdir}/{$snort_rules_file}.md5") && $snortdownload == 'on'
 }
 
 if ($etpro == "on" || $emergingthreats == "on") {
-	$emergingt_net_sig_chk_local = 'Not Downloaded';
-	$emergingt_net_sig_date = 'Not Downloaded';
+	$emergingt_net_sig_chk_local = gettext("Not Downloaded");
+	$emergingt_net_sig_date = gettext("Not Downloaded");
 }
 else {
-	$emergingt_net_sig_chk_local = 'Not Enabled';
-	$emergingt_net_sig_date = 'Not Enabled';
+	$emergingt_net_sig_chk_local = gettext("Not Enabled");
+	$emergingt_net_sig_date = gettext("Not Enabled");
 }
 if (file_exists("{$snortdir}/{$emergingthreats_filename}.md5") && ($etpro == "on" || $emergingthreats == "on")) {
 	$emergingt_net_sig_chk_local = file_get_contents("{$snortdir}/{$emergingthreats_filename}.md5");
@@ -105,16 +99,29 @@ if (file_exists("{$snortdir}/{$emergingthreats_filename}.md5") && ($etpro == "on
 }
 
 if ($snortcommunityrules == 'on') {
-	$snort_community_sig_chk_local = 'Not Downloaded';
-	$snort_community_sig_sig_date = 'Not Downloaded';
+	$snort_community_sig_chk_local = gettext("Not Downloaded");
+	$snort_community_sig_date = gettext("Not Downloaded");
 }
 else {
-	$snort_community_sig_chk_local = 'Not Enabled';
-	$snort_community_sig_sig_date = 'Not Enabled';
+	$snort_community_sig_chk_local = gettext("Not Enabled");
+	$snort_community_sig_date = gettext("Not Enabled");
 }
 if (file_exists("{$snortdir}/{$snort_community_rules_filename}.md5") && $snortcommunityrules == 'on') {
 	$snort_community_sig_chk_local = file_get_contents("{$snortdir}/{$snort_community_rules_filename}.md5");
-	$snort_community_sig_sig_date = date(DATE_RFC850, filemtime("{$snortdir}/{$snort_community_rules_filename}.md5"));
+	$snort_community_sig_date = date(DATE_RFC850, filemtime("{$snortdir}/{$snort_community_rules_filename}.md5"));
+}
+
+if ($openappid_detectors == 'on') {
+	$openappid_detectors_sig_chk_local = gettext("Not Downloaded");
+	$openappid_detectors_sig_date = gettext("Not Downloaded");
+}
+else {
+	$openappid_detectors_sig_chk_local = gettext("Not Enabled");
+	$openappid_detectors_sig_date = gettext("Not Enabled");
+}
+if (file_exists("{$snortdir}/{$snort_openappid_filename}.md5") && $openappid_detectors == 'on') {
+	$openappid_detectors_sig_chk_local = file_get_contents("{$snortdir}/{$snort_openappid_filename}.md5");
+	$openappid_detectors_sig_date = date(DATE_RFC850, filemtime("{$snortdir}/{$snort_openappid_filename}.md5"));
 }
 
 /* Check for postback to see if we should clear the update log file. */
@@ -122,7 +129,7 @@ if (isset($_POST['clear'])) {
 	unlink_if_exists($snort_rules_upd_log);
 }
 
-if (isset($_POST['check'])) {
+if (isset($_POST['update'])) {
 	header("Location: /snort/snort_download_rules.php");
 	exit;
 }
@@ -135,6 +142,7 @@ if ($_POST['force']) {
 	unlink_if_exists("{$snortdir}/{$emergingthreats_filename}.md5");
 	unlink_if_exists("{$snortdir}/{$snort_community_rules_filename}.md5");
 	unlink_if_exists("{$snortdir}/{$snort_rules_file}.md5");
+	unlink_if_exists("{$snortdir}/{$snort_openappid_filename}.md5");
 
 	// Revert file system to R/O.
 	conf_mount_ro();
@@ -204,19 +212,24 @@ include_once("head.inc");
 						</tr>
 					</thead>
 					<tr>
-						<td align="center" class="vncell vexpl"><b>Snort VRT Rules</b></td>
+						<td align="center" class="vncell vexpl"><b><?=gettext("Snort VRT Rules");?></b></td>
 						<td align="center" class="vncell vexpl"><? echo trim($snort_org_sig_chk_local);?></td>
 						<td align="center" class="vncell vexpl"><?php echo gettext($snort_org_sig_date);?></td>
 					</tr>
 					<tr>
-						<td align="center" class="vncell vexpl"><b>Snort GPLv2 Community Rules</b></td>
+						<td align="center" class="vncell vexpl"><b><?=gettext("Snort GPLv2 Community Rules");?></b></td>
 						<td align="center" class="vncell vexpl"><? echo trim($snort_community_sig_chk_local);?></td>
-						<td align="center" class="vncell vexpl"><?php echo gettext($snort_community_sig_sig_date);?></td>
+						<td align="center" class="vncell vexpl"><?php echo gettext($snort_community_sig_date);?></td>
 					</tr>
 					<tr>
 						<td align="center" class="vncell vexpl"><b><?=$et_name;?></b></td>
 						<td align="center" class="vncell vexpl"><? echo trim($emergingt_net_sig_chk_local);?></td>
 						<td align="center" class="vncell vexpl"><?php echo gettext($emergingt_net_sig_date);?></td>
+					</tr>
+					<tr>
+						<td align="center" class="vncell vexpl"><b><?=gettext("Snort OpenAppID Detectors");?></b></td>
+						<td align="center" class="vncell vexpl"><? echo trim($openappid_detectors_sig_chk_local);?></td>
+						<td align="center" class="vncell vexpl"><?php echo gettext($openappid_detectors_sig_date);?></td>
 					</tr>
 				</table><br/>
 				</td>
@@ -253,8 +266,8 @@ include_once("head.inc");
 						<br/></p>
 					<?php else: ?>
 						<br/>
-						<input type="submit" value="<?=gettext("Check");?>" name="check" id="check" class="formbtn" 
-						title="<?php echo gettext("Check for new updates to enabled rule sets"); ?>"/>&nbsp;&nbsp;&nbsp;&nbsp;
+						<input type="submit" value="<?=gettext("Update");?>" name="update" id="update" class="formbtn" 
+						title="<?php echo gettext("Check for and apply new update to enabled rule sets"); ?>"/>&nbsp;&nbsp;&nbsp;&nbsp;
 						<input type="submit" value="<?=gettext("Force");?>" name="force" id="force" class="formbtn" 
 						title="<?=gettext("Force an update of all enabled rule sets");?>" 
 						onclick="return confirm('<?=gettext("This will zero-out the MD5 hashes to force a fresh download of enabled rule sets.  Click OK to continue or CANCEL to quit");?>');"/>

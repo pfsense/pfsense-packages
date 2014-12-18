@@ -41,35 +41,12 @@
 require_once("config.inc");
 require_once("functions.inc");
 require_once("/usr/local/pkg/snort/snort.inc");
+require("/usr/local/pkg/snort/snort_defs.inc");
 
 global $config, $g, $rebuild_rules, $pkg_interface, $snort_gui_include;
 
-/****************************************
- * Define any new constants here that   *
- * may not be yet defined in the old    *
- * "snort.inc" include file that might  *
- * be cached and used by the package    *
- * manager installation code.           *
- *                                      *
- * This is a hack to work around the    *
- * fact the old version of suricata.inc *
- * is cached and used instead of the    *
- * updated version icluded with the     *
- * updated GUI package.                 *
- ****************************************/
-if (!defined('SNORT_SID_MODS_PATH'))
-	define('SNORT_SID_MODS_PATH', "{$g['vardb_path']}/snort/sidmods/");
-
-if (!defined('SNORT_ENFORCING_RULES_FILENAME'))
-	define("SNORT_ENFORCING_RULES_FILENAME", "snort.rules");
-
-/****************************************
- * End of PHP caching workaround        *
- ****************************************/
-
 $snortdir = SNORTDIR;
 $snortlogdir = SNORTLOGDIR;
-$snortlibdir = SNORTLIBDIR;
 $rcdir = RCFILEPREFIX;
 $flowbit_rules_file = FLOWBITS_FILENAME;
 $snort_enforcing_rules_file = SNORT_ENFORCING_RULES_FILENAME;
@@ -101,6 +78,7 @@ conf_mount_rw();
 @rename("{$snortdir}/threshold.conf-sample", "{$snortdir}/threshold.conf");
 @rename("{$snortdir}/sid-msg.map-sample", "{$snortdir}/sid-msg.map");
 @rename("{$snortdir}/unicode.map-sample", "{$snortdir}/unicode.map");
+@rename("{$snortdir}/file_magic.conf-sample", "{$snortdir}/file_magic.conf");
 @rename("{$snortdir}/classification.config-sample", "{$snortdir}/classification.config");
 @rename("{$snortdir}/generators-sample", "{$snortdir}/generators");
 @rename("{$snortdir}/reference.config-sample", "{$snortdir}/reference.config");
@@ -123,6 +101,7 @@ unlink_if_exists("{$rcdir}barnyard2");
 safe_mkdir(SNORTLOGDIR);
 safe_mkdir(SNORT_IPREP_PATH);
 safe_mkdir(SNORT_SID_MODS_PATH);
+safe_mkdir(SNORT_APPID_ODP_PATH);
 
 /* If installed, absorb the Snort Dashboard Widget into this package */
 /* by removing it as a separately installed package.                 */
@@ -263,8 +242,8 @@ if (stristr($config['widgets']['sequence'], "snort_alerts-container") === FALSE)
 	$config['widgets']['sequence'] .= ",{$snort_widget_container}";
 
 /* Update Snort package version in configuration */
-$config['installedpackages']['snortglobal']['snort_config_ver'] = "3.1.5";
-write_config("Snort pkg v3.1.5: post-install configuration saved.");
+$config['installedpackages']['snortglobal']['snort_config_ver'] = "3.2";
+write_config("Snort pkg v3.2: post-install configuration saved.");
 
 /* Done with post-install, so clear flag */
 unset($g['snort_postinstall']);

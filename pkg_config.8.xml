@@ -365,7 +365,7 @@
 			<ports_before>databases/redis databases/gdbm net/GeoIP x11-fonts/font-util x11-fonts/webfonts graphics/graphviz</ports_before>
 			<port>net/ntopng</port>
 		</build_pbi>
-		<version>1.1 v0.3</version>
+		<version>1.1 v0.2</version>
 		<status>ALPHA</status>
 		<required_version>2.1.4</required_version>
 		<config_file>https://packages.pfsense.org/packages/config/ntopng/ntopng.xml</config_file>
@@ -462,14 +462,14 @@
 		<descr>Snort is an open source network intrusion prevention and detection system (IDS/IPS). Combining the benefits of signature, protocol, and anomaly-based inspection.</descr>
 		<category>Security</category>
 		<depends_on_package_base_url>https://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
-		<depends_on_package_pbi>snort-2.9.6.2-i386.pbi</depends_on_package_pbi>
+		<depends_on_package_pbi>snort-2.9.7.0-i386.pbi</depends_on_package_pbi>
 		<build_pbi>
 			<port>security/snort</port>
 			<ports_after>security/barnyard2</ports_after>
 		</build_pbi>
-		<build_options>barnyard2_UNSET=ODBC PGSQL PRELUDE;barnyard2_SET=GRE IPV6 MPLS MYSQL PORT_PCAP;snort_UNSET=PULLEDPORK FILEINSPECT HA;snort_SET=PERFPROFILE GRE IPV6 NORMALIZER SOURCEFIRE APPID;perl_SET=THREADS;WITH_THREADS=yes</build_options>
+		<build_options>barnyard2_UNSET=ODBC PGSQL PRELUDE;barnyard2_SET=GRE IPV6 MPLS MYSQL PORT_PCAP BRO;snort_SET=PERFPROFILE SOURCEFIRE GRE IPV6 NORMALIZER APPID;snort_UNSET=PULLEDPORK FILEINSPECT HA;perl_SET=THREADS</build_options>
 		<config_file>https://packages.pfsense.org/packages/config/snort/snort.xml</config_file>
-		<version>2.9.6.2 pkg v3.1.5</version>
+		<version>2.9.7.0 pkg v3.2</version>
 		<required_version>2.1</required_version>
 		<status>Stable</status>
 		<configurationfile>/snort.xml</configurationfile>

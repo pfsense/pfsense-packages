@@ -365,8 +365,14 @@ if ($_POST["save"] && !$input_errors) {
 			if (!is_array($natent['stream5_tcp_engine']['item']))
 				$natent['stream5_tcp_engine']['item'] = array();
 			$natent['stream5_tcp_engine']['item'][] = $stream5_eng;
+
 			$natent['alertsystemlog_facility'] = "log_auth";
 			$natent['alertsystemlog_priority'] = "log_alert";
+
+			$natent['appid_preproc'] = "off";
+			$natent['sf_appid_mem_cap'] = "256";
+			$natent['sf_appid_statslog'] = "on";
+			$natent['sf_appid_stats_period'] = "300";
 
 			$a_rule[] = $natent;
 		}

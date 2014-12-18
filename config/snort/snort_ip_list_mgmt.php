@@ -152,6 +152,7 @@ if ($savemsg)
 <input type="hidden" name="MAX_FILE_SIZE" value="100000000" />
 <input type="hidden" name="iplist_fname" id="iplist_fname" value=""/>
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
+<tbody>
 <tr><td>
 <?php
         $tab_array = array();
@@ -170,21 +171,19 @@ if ($savemsg)
 ?>
 </td>
 </tr>
-<tbody id="uploader" style="display: none;" class="tabcont">
-	<tr>
-		<td colspan="4" class="list"><br/><?php echo gettext("Click BROWSE to select a file to import, and then click UPLOAD.  Click CLOSE to quit."); ?></td>
-	</tr>
-	<tr>
-		<td colspan="4" class="list"><input type="file" name="iprep_fileup" id="iprep_fileup" class="formfld file" size="50" />
-			&nbsp;&nbsp;<input type="submit" name="upload" id="upload" value="<?=gettext("Upload");?>" 
-			title="<?=gettext("Upload selected IP list to firewall");?>"/>&nbsp;&nbsp;<input type="button" 
-			value="<?=gettext("Close");?>" onClick="document.getElementById('uploader').style.display='none';" /><br/></td>
-		<td class="list"></td>
-	</tr>
-</tbody>
 <tr>
 	<td>
 	<div id="mainarea">
+
+	<?php if ($g['platform'] == "nanobsd") : ?>
+		<table id="maintable" class="tabcont" width="100%" border="0" cellpadding="6" cellspacing="0">
+			<tbody>
+			<tr>
+				<td colspan="2" class="listtopic"><?php echo gettext("IP Reputation is not supported on NanoBSD installs"); ?></td>
+			</tr>
+			</tbody>
+		</table>
+	<?php else: ?>
 		<table id="maintable" class="tabcont" width="100%" border="0" cellpadding="0" cellspacing="0">
 			<colgroup>
 				<col style="width: 50%;">
@@ -223,6 +222,18 @@ if ($savemsg)
 				height="17" border="0" title="<?php echo gettext('Delete this IP List');?>"/></td>
 			</tr>
 		<?php endforeach; ?>
+			<tbody id="uploader" style="display: none;">
+				<tr>
+					<td colspan="4" class="list"><br/><?php echo gettext("Click BROWSE to select a file to import, and then click UPLOAD.  Click CLOSE to quit."); ?></td>
+				</tr>
+				<tr>
+					<td colspan="4" class="list"><input type="file" name="iprep_fileup" id="iprep_fileup" class="formfld file" size="50" />
+					&nbsp;&nbsp;<input type="submit" name="upload" id="upload" value="<?=gettext("Upload");?>" 
+					title="<?=gettext("Upload selected IP list to firewall");?>"/>&nbsp;&nbsp;<input type="button" 
+					value="<?=gettext("Close");?>" onClick="document.getElementById('uploader').style.display='none';" /><br/></td>
+					<td colspan="4" class="list"></td>
+				</tr>
+			</tbody>
 			<tbody id="iplist_editor" style="<?=$iplist_edit_style;?>">
 			<tr>
 				<td colspan="4">&nbsp;</td>
@@ -267,9 +278,11 @@ if ($savemsg)
 				<td class="list"></td>
 			</tr>
 		</table>
+	<?php endif; ?>
 	</div>
 	</td>
 </tr>
+</tbody>
 </table>
 </form>
 <?php include("fend.inc"); ?>
