@@ -142,8 +142,7 @@ if ($_POST["save"]) {
 		$a_nat[$id]['autoflowbitrules'] = 'on';
 	else {
 		$a_nat[$id]['autoflowbitrules'] = 'off';
-		if (file_exists("{$suricatadir}suricata_{$suricata_uuid}_{$if_real}/rules/{$flowbit_rules_file}"))
-			@unlink("{$suricatadir}suricata_{$suricata_uuid}_{$if_real}/rules/{$flowbit_rules_file}");
+		unlink_if_exists("{$suricatadir}suricata_{$suricata_uuid}_{$if_real}/rules/{$flowbit_rules_file}");
 	}
 
 	write_config("Suricata pkg: save enabled rule categories for {$a_nat[$id]['interface']}.");
@@ -170,17 +169,43 @@ if ($_POST["save"]) {
 	suricata_sync_on_changes();
 }
 elseif ($_POST['unselectall']) {
+	if ($_POST['ips_policy_enable'] == "on") {
+		$a_nat[$id]['ips_policy_enable'] = 'on';
+		$a_nat[$id]['ips_policy'] = $_POST['ips_policy'];
+	}
+	else {
+		$a_nat[$id]['ips_policy_enable'] = 'off';
+		unset($a_nat[$id]['ips_policy']);
+	}
+
+	$pconfig['autoflowbits'] = $_POST['autoflowbits'];
+	$pconfig['ips_policy_enable'] = $_POST['ips_policy_enable'];
+	$pconfig['ips_policy'] = $_POST['ips_policy'];
+
 	// Remove all but the default events and files rules
 	$enabled_rulesets_array = array();
 	$enabled_rulesets_array = implode("||", $default_rules);
 
 	$savemsg = gettext("All rule categories have been de-selected.  ");
-	if ($_POST['ips_policy_enable'])
+	if ($_POST['ips_policy_enable'] == "on")
 		$savemsg .= gettext("Only the rules included in the selected IPS Policy will be used.");
 	else
 		$savemsg .= gettext("There currently are no inspection rules enabled for this Suricata instance!");
 }
 elseif ($_POST['selectall']) {
+	if ($_POST['ips_policy_enable'] == "on") {
+		$a_nat[$id]['ips_policy_enable'] = 'on';
+		$a_nat[$id]['ips_policy'] = $_POST['ips_policy'];
+	}
+	else {
+		$a_nat[$id]['ips_policy_enable'] = 'off';
+		unset($a_nat[$id]['ips_policy']);
+	}
+
+	$pconfig['autoflowbits'] = $_POST['autoflowbits'];
+	$pconfig['ips_policy_enable'] = $_POST['ips_policy_enable'];
+	$pconfig['ips_policy'] = $_POST['ips_policy'];
+
 	// Start with the required default events and files rules
 	$enabled_rulesets_array = $default_rules;
 
@@ -265,6 +290,7 @@ if ($savemsg) {
 	$tab_array[] = array(gettext("Logs Mgmt"), false, "/suricata/suricata_logs_mgmt.php");
 	$tab_array[] = array(gettext("SID Mgmt"), false, "/suricata/suricata_sid_mgmt.php");
 	$tab_array[] = array(gettext("Sync"), false, "/pkg_edit.php?xml=suricata/suricata_sync.xml");
+	$tab_array[] = array(gettext("IP Lists"), false, "/suricata/suricata_ip_list_mgmt.php");
 	display_top_tabs($tab_array, true);
 	echo '</td></tr>';
 	echo '<tr><td class="tabnavtbl">';
@@ -277,6 +303,7 @@ if ($savemsg) {
 	$tab_array[] = array($menu_iface . gettext("App Parsers"), false, "/suricata/suricata_app_parsers.php?id={$id}");
 	$tab_array[] = array($menu_iface . gettext("Variables"), false, "/suricata/suricata_define_vars.php?id={$id}");
 	$tab_array[] = array($menu_iface . gettext("Barnyard2"), false, "/suricata/suricata_barnyard.php?id={$id}");
+	$tab_array[] = array($menu_iface . gettext("IP Rep"), false, "/suricata/suricata_ip_reputation.php?id={$id}");
 	display_top_tabs($tab_array, true);
 ?>
 </td></tr>

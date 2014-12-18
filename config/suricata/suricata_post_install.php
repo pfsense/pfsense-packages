@@ -48,36 +48,36 @@
 require_once("config.inc");
 require_once("functions.inc");
 require_once("/usr/local/pkg/suricata/suricata.inc");
+require("/usr/local/pkg/suricata/suricata_defs.inc");
 
 global $config, $g, $rebuild_rules, $pkg_interface, $suricata_gui_include;
 
 /****************************************
  * Define any new constants here that   *
  * may not be yet defined in the old    *
- * "suricata.inc" include file that     *
- * might be cached and used by the      *
- * package manager installation code.   *
+ * "suricata_defs.inc" include file     *
+ * that might be cached and used by     *
+ * the package manager installation     *
+ * code.                                *
  *                                      *
  * This is a hack to work around the    *
- * fact the old version of suricata.inc *
+ * fact the old version of the inc file *
  * is cached and used instead of the    *
  * updated version icluded with the     *
  * updated GUI package.                 *
  ****************************************/
-if (!defined('SID_MODS_PATH'))
-	define('SID_MODS_PATH', '/var/db/suricata/sidmods/');
-if (!defined('IPREP_PATH'))
-	define('IPREP_PATH', '/var/db/suricata/iprep/');
+if (!defined('SURICATA_PBI_BASEDIR'))
+	define('SURICATA_PBI_BASEDIR', '/usr/pbi/suricata-' . php_uname("m"));
 
 /****************************************
- * End of PHP cachine workaround        *
+ * End of PHP caching workaround        *
  ****************************************/
 
 // Initialize some common values from defined constants
 $suricatadir = SURICATADIR;
 $suricatalogdir = SURICATALOGDIR;
 $flowbit_rules_file = FLOWBITS_FILENAME;
-$suricata_enforcing_rules_file = ENFORCING_RULES_FILENAME;
+$suricata_enforcing_rules_file = SURICATA_ENFORCING_RULES_FILENAME;
 $rcdir = RCFILEPREFIX;
 
 // Hard kill any running Suricata process that may have been started by any
@@ -103,14 +103,28 @@ $g['suricata_postinstall'] = true;
 conf_mount_rw();
 
 // Remove any previously installed script since we rebuild it
-@unlink("{$rcdir}suricata.sh");
+unlink_if_exists("{$rcdir}suricata.sh");
 
 // Create the top-tier log directory
 safe_mkdir(SURICATALOGDIR);
 
 // Create the IP Rep and SID Mods lists directory
-safe_mkdir(SID_MODS_PATH);
-safe_mkdir(IPREP_PATH);
+safe_mkdir(SURICATA_SID_MODS_PATH);
+safe_mkdir(SURICATA_IPREP_PATH);
+
+// Download the latest GeoIP DB updates and create cron task if the feature is not disabled
+if ($config['installedpackages']['suricata']['config'][0]['autogeoipupdate'] != 'off') {
+	log_error(gettext("[Suricata] Installing free GeoIP country database files..."));
+	include("/usr/local/pkg/suricata/suricata_geoipupdate.php");
+	install_cron_job("/usr/bin/nice -n20 /usr/local/bin/php -f /usr/local/pkg/suricata/suricata_geoipupdate.php", TRUE, 0, 0, 8, "*", "*", "root");
+}
+
+// Download the latest ET IQRisk updates and create cron task if the feature is not disabled
+if ($config['installedpackages']['suricata']['config'][0]['et_iqrisk_enable'] == 'on') {
+	log_error(gettext("[Suricata] Installing Emerging Threats IQRisk IP List..."));
+	include("/usr/local/pkg/suricata/suricata_etiqrisk_update.php");
+	install_cron_job("/usr/bin/nice -n20 /usr/local/bin/php -f /usr/local/pkg/suricata/suricata_etiqrisk_update.php", TRUE, 0, 0, "*", "*", "*", "root");
+}
 
 // remake saved settings if previously flagged
 if ($config['installedpackages']['suricata']['config'][0]['forcekeepsettings'] == 'on') {
@@ -149,7 +163,6 @@ if ($config['installedpackages']['suricata']['config'][0]['forcekeepsettings'] =
 				log_error(gettext("[Suricata] updated UUID for interface " . convert_friendly_interface_to_friendly_descr($suricatacfg['interface']) . " from {$old_uuid} to {$new_uuid}."));
 			}
 		}
-		write_config("Suricata pkg: updated interface UUIDs to eliminate duplicates.");
 		unset($uuids, $rulesets);
 	}
 	/****************************************************************/
@@ -167,6 +180,7 @@ if ($config['installedpackages']['suricata']['config'][0]['forcekeepsettings'] =
 	include('/usr/local/pkg/suricata/suricata_check_for_rule_updates.php');
 	update_status(gettext("Generating suricata.yaml configuration file from saved settings..."));
 	$rebuild_rules = true;
+	conf_mount_rw();
 
 	// Create the suricata.yaml files for each enabled interface
 	$suriconf = $config['installedpackages']['suricata']['rule'];
@@ -174,6 +188,7 @@ if ($config['installedpackages']['suricata']['config'][0]['forcekeepsettings'] =
 		$if_real = get_real_interface($suricatacfg['interface']);
 		$suricata_uuid = $suricatacfg['uuid'];
 		$suricatacfgdir = "{$suricatadir}suricata_{$suricata_uuid}_{$if_real}";
+		update_output_window(gettext("Generating configuration for " . convert_friendly_interface_to_friendly_descr($suricatacfg['interface']) . "..."));
 
 		// Pull in the PHP code that generates the suricata.yaml file
 		// variables that will be substituted further down below.
@@ -202,9 +217,6 @@ if ($config['installedpackages']['suricata']['config'][0]['forcekeepsettings'] =
 	suricata_rm_blocked_install_cron($config['installedpackages']['suricata']['config'][0]['rm_blocked'] != "never_b" ? true : false);
 	suricata_rules_up_install_cron($config['installedpackages']['suricata']['config'][0]['autoruleupdate'] != "never_up" ? true : false);
 
-	// Add the recurring jobs created above to crontab
-	configure_cron();
-
 	// Restore the Dashboard Widget if it was previously enabled and saved
 	if (!empty($config['installedpackages']['suricata']['config'][0]['dashboard_widget']) && !empty($config['widgets']['sequence'])) {
 		if (strpos($config['widgets']['sequence'], "suricata_alerts-container") === FALSE)
@@ -216,16 +228,20 @@ if ($config['installedpackages']['suricata']['config'][0]['forcekeepsettings'] =
 	}
 
 	$rebuild_rules = false;
-	update_output_window(gettext("Finished rebuilding Suricata configuration files..."));
+	if ($pkg_interface <> "console")
+		update_output_window(gettext("Finished rebuilding Suricata configuration files..."));
 	log_error(gettext("[Suricata] Finished rebuilding installation from saved settings..."));
 
 	// Only try to start Suricata if not in reboot
 	if (!$g['booting']) {
-		update_status(gettext("Starting Suricata using rebuilt configuration..."));
-		update_output_window(gettext("Please wait... while Suricata is started..."));
-		log_error(gettext("[Suricata] Starting Suricata using rebuilt configuration..."));
-		mwexec_bg("{$rcdir}suricata.sh start");
-		update_output_window(gettext("Suricata has been started using the rebuilt configuration..."));
+		if ($pkg_interface <> "console") {
+			update_status(gettext("Starting Suricata using rebuilt configuration..."));
+			update_output_window(gettext("Please wait while Suricata is started..."));
+			mwexec("{$rcdir}suricata.sh start");
+			update_output_window(gettext("Suricata has been started using the rebuilt configuration..."));
+		}
+		else
+			mwexec_bg("{$rcdir}suricata.sh start");
 	}
 }
 
@@ -238,8 +254,8 @@ if (empty($config['installedpackages']['suricata']['config'][0]['forcekeepsettin
 conf_mount_ro();
 
 // Update Suricata package version in configuration
-$config['installedpackages']['suricata']['config'][0]['suricata_config_ver'] = "2.0.2";
-write_config("Suricata pkg: updated GUI package version number.");
+$config['installedpackages']['suricata']['config'][0]['suricata_config_ver'] = "2.1";
+write_config("Suricata pkg v2.1: post-install configuration saved.");
 
 // Done with post-install, so clear flag
 unset($g['suricata_postinstall']);
