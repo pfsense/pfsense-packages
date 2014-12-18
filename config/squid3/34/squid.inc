@@ -42,8 +42,13 @@ if(!function_exists("filter_configure"))
 	require_once("filter.inc");
 
 $shortcut_section = "squid";
-define('SQUID_BASE', '/usr/pbi/squid-' . php_uname("m"));
-define('SQUID_LOCALBASE', SQUID_BASE . "/local");
+if (is_dir('/usr/pbi/squid-' . php_uname("m"))) {
+	define('SQUID_BASE', '/usr/pbi/squid-' . php_uname("m"));
+	define('SQUID_LOCALBASE', SQUID_BASE . "/local");
+} else {
+	define('SQUID_BASE', '/usr/local');
+	define('SQUID_LOCALBASE', '/usr/local');
+}
 
 define('SQUID_CONFBASE', SQUID_LOCALBASE .'/etc/squid');
 define('SQUID_CONFFILE', SQUID_CONFBASE . '/squid.conf');
