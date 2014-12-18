@@ -111,27 +111,27 @@ $pfb_logtypes = array(	'defaultlogs'	=> array('name'		=> 'Log Files',
 						'txt'		=> 'deny',
 						'logdir'	=> "{$pfb['denydir']}/",
 						'download'	=> TRUE,
-						'clear'		=> FALSE
+						'clear'		=> TRUE
 						),
 			'permitlogs'	=> array('name'		=> 'Permit Files',
 						'ext'		=> 'txt',
 						'txt'		=> 'permit',
 						'logdir'	=> "{$pfb['permitdir']}/",
 						'download'	=> TRUE,
-						'clear'		=> FALSE
+						'clear'		=> TRUE
 						),
 			'matchlogs'	=> array('name'		=> 'Match Files',
 						'ext'		=> 'txt',
 						'txt'		=> 'match',
 						'logdir'	=> "{$pfb['matchdir']}/",
 						'download'	=> TRUE,
-						'clear'		=> FALSE
+						'clear'		=> TRUE
 						),
 			'nativelogs'	=> array('name'		=> 'Native Files',
 						'ext'		=> 'txt',
 						'logdir'	=> "{$pfb['nativedir']}/",
 						'download'	=> TRUE,
-						'clear'		=> FALSE
+						'clear'		=> TRUE
 						),
 			'aliaslogs'	=> array('name'		=> 'Alias Files',
 						'ext'		=> 'txt',
