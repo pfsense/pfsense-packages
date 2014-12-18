@@ -1047,18 +1047,34 @@ function haproxy_writeconf($configpath) {
 			$listenip = "";
 			
 			// Process and add bind directives for ports
-			$ip = haproxy_interface_ip($bind['extaddr']);
-			if ($ip){
-				foreach($ports as $alias_or_port) {
-					if($alias_or_port) {
-						$portsnumeric = group_ports(haproxy_portoralias_to_list($alias_or_port));
-						foreach($portsnumeric as $portnumeric) {
-							$portnumeric = str_replace(":","-",$portnumeric);
-							$listenip .=  "\tbind\t\t\t$ip:{$portnumeric} {$ssl_info} {$advanced_bind}\n";
-						}
-					}
-				}
-			}
+			$ips = haproxy_interface_ip($bind['extaddr']);            
+	            if (is_array($ips)){                                       
+	                foreach($ports as $alias_or_port) {
+	                    if($alias_or_port) {
+	                        $portsnumeric = group_ports(haproxy_portoralias_to_list($alias_or_port));
+	                        foreach($portsnumeric as $portnumeric) {
+	                            $portnumeric = str_replace(":","-",$portnumeric);                            
+	                            foreach($ips as $ip) {
+	                                $listenip .=  "\tbind\t\t\t$ip:{$portnumeric} {$ssl_info} {$advanced_bind}\n";
+	                            }
+	                        }
+	                    }                        
+	                }
+	            }else{
+	                $ip = $ips;
+	    			if ($ip){
+	    				foreach($ports as $alias_or_port) {
+	    					if($alias_or_port) {
+	    						$portsnumeric = group_ports(haproxy_portoralias_to_list($alias_or_port));
+	    						foreach($portsnumeric as $portnumeric) {
+	    							$portnumeric = str_replace(":","-",$portnumeric);
+	    							//$listenip .=  "\tbind\t\t\t$ip:{$portnumeric} {$ssl_info} {$advanced_bind}\n";
+	    							$listenip .=  "\tbind\t\t\t$ip:{$portnumeric} {$ssl_info} {$advanced_bind}\n";
+	    						}
+	    					}
+	    				}
+	    			}
+	            }
 			
 			fwrite ($fd, "{$frontendinfo}");
 			fwrite ($fd, "{$listenip}");
