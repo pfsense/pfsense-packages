@@ -42,15 +42,7 @@ if(!function_exists("filter_configure"))
 	require_once("filter.inc");
 
 $shortcut_section = "squid";
-$pfs_version = substr(trim(file_get_contents("/etc/version")),0,3);
-if (is_dir('/usr/pbi/squid-' . php_uname("m"))) {
-	if ($pfs_version == 2.2)
-		define('SQUID_LOCALBASE', '/usr/pbi/squid-' . php_uname("m")."/local");
-	else
-		define('SQUID_LOCALBASE', '/usr/pbi/squid-' . php_uname("m"));
-} else {
-	define('SQUID_LOCALBASE','/usr/local');
-}
+define('SQUID_LOCALBASE', '/usr/pbi/squid-' . php_uname("m")."/local");
 
 define('SQUID_CONFBASE', SQUID_LOCALBASE .'/etc/squid');
 define('SQUID_CONFFILE', SQUID_CONFBASE . '/squid.conf');
