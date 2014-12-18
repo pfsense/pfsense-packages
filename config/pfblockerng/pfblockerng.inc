@@ -1109,7 +1109,8 @@ function sync_package_pfblockerng($cron = "") {
 
 							if (file_exists($pfbfolder . '/' . $header_url . '.txt') && $pfb['reuse'] == "") {
 								if ($row['state'] == "Hold") {
-									$log = "\n[ {$header_url} ] {$log_tab} Static Hold [ NOW ]\n";
+									$log = "\n[ {$header_url} ] {$log_tab} Static Hold  [ NOW ]\n";
+									$row['format'] = "Hold";
 								} else {
 									$log = "\n[ {$header_url} ] {$log_tab} exists, Reloading File [ NOW ]\n";
 								}
@@ -2256,17 +2257,12 @@ function pfblockerng_php_install_command() {
 
 	# Add Widget to Dashboard
 	update_output_window(gettext("Adding pfBlockerNG Widget to Dashboard."));
-	if ($pfb['keep'] == "on" && !empty($pfb['widgets'])) {
-		// Restore previous Widget setting if "Keep" is enabled.
-		$config['widgets']['sequence'] = $pfb['widgets'];
-	} else {
-		$widgets = $config['widgets']['sequence'];
-		if (!preg_match("/pfblockerng-container/", $widgets)) {
-			if (empty($widgets)) {
-				$config['widgets']['sequence'] = "pfblockerng-container:col2:show";
-			} else {
-				$config['widgets']['sequence'] .= ",pfblockerng-container:col2:show";
-			}
+	$widgets = $config['widgets']['sequence'];
+	if (!preg_match("/pfblockerng-container/", $widgets)) {
+		if (empty($widgets)) {
+			$config['widgets']['sequence'] = "pfblockerng-container:col2:show";
+		} else {
+			$config['widgets']['sequence'] .= ",pfblockerng-container:col2:show";
 		}
 	}
 }
@@ -2329,19 +2325,19 @@ function pfblockerng_php_deinstall_command() {
 				unlink_if_exists("{$pfb_file}.txt");
 			}
 		}
-	}
 
-	# Remove Widget (code from Snort deinstall)
-	$pfb['widgets'] = $config['widgets']['sequence'];
-	if (!empty($pfb['widgets'])) {
-		$widgetlist = explode(",", $pfb['widgets']);
-		foreach ($widgetlist as $key => $widget) {
-			if (strstr($widget, "pfblockerng-container")) {
-				unset($widgetlist[$key]);
-				break;
+		# Remove Widget (code from Snort deinstall)
+		$widgets = $config['widgets']['sequence'];
+		if (!empty($widgets)) {
+			$widgetlist = explode(",", $widgets);
+			foreach ($widgetlist as $key => $widget) {
+				if (strstr($widget, "pfblockerng-container")) {
+					unset($widgetlist[$key]);
+					break;
+				}
 			}
+			$config['widgets']['sequence'] = implode(",", $widgetlist);
 		}
-		$config['widgets']['sequence'] = implode(",", $widgetlist);
 	}
 	update_output_window(gettext("pfBlockerNG has been Uninstalled"));
 }
