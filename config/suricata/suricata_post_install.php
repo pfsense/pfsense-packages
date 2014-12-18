@@ -63,7 +63,7 @@ global $config, $g, $rebuild_rules, $pkg_interface, $suricata_gui_include;
  * This is a hack to work around the    *
  * fact the old version of the inc file *
  * is cached and used instead of the    *
- * updated version icluded with the     *
+ * updated version included with the    *
  * updated GUI package.                 *
  ****************************************/
 if (!defined('SURICATA_PBI_BASEDIR'))

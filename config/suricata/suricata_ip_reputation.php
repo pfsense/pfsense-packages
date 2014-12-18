@@ -136,7 +136,7 @@ if ($_POST['save'] || $_POST['apply']) {
 	if ($_POST['host_hash_size'] < 1024 || !is_numericint($_POST['host_hash_size']))
 		$input_errors[] = gettext("The value for 'Host Hash Size' must be a numeric integer greater than 1024!");
 	if ($_POST['host_prealloc'] < 10 || !is_numericint($_POST['host_prealloc']))
-		$input_errors[] = gettext("The value for 'Host Memcap' must be a numeric integer greater than 10!");
+		$input_errors[] = gettext("The value for 'Host Preallocations' must be a numeric integer greater than 10!");
 
 	// Validate CATEGORIES FILE
 	if ($_POST['enable_iprep'] == 'on') {
