@@ -42,7 +42,8 @@ if(!function_exists("filter_configure"))
 	require_once("filter.inc");
 
 $shortcut_section = "squid";
-define('SQUID_LOCALBASE', '/usr/pbi/squid-' . php_uname("m")."/local");
+define('SQUID_BASE', '/usr/pbi/squid-' . php_uname("m"));
+define('SQUID_LOCALBASE', SQUID_BASE . "/local");
 
 define('SQUID_CONFBASE', SQUID_LOCALBASE .'/etc/squid');
 define('SQUID_CONFFILE', SQUID_CONFBASE . '/squid.conf');
@@ -130,12 +131,12 @@ function squid_dash_z($cache_action='none') {
 
 	if(!is_dir($cachedir.'/00/')) {
 		log_error("Creating squid cache subdirs in $cachedir");
-		mwexec(SQUID_LOCALBASE. "/sbin/squid -k shutdown -f " . SQUID_CONFFILE);
+		mwexec(SQUID_BASE. "/sbin/squid -k shutdown -f " . SQUID_CONFFILE);
 		sleep(5);
-		mwexec(SQUID_LOCALBASE. "/sbin/squid -k kill -f " . SQUID_CONFFILE);
+		mwexec(SQUID_BASE. "/sbin/squid -k kill -f " . SQUID_CONFFILE);
 		// Double check permissions here, should be safe to recurse cache dir if it's small here.
 		mwexec("/usr/sbin/chown -R proxy:proxy $cachedir");
-		mwexec(SQUID_LOCALBASE. "/sbin/squid -z -f " . SQUID_CONFFILE);
+		mwexec(SQUID_BASE. "/sbin/squid -z -f " . SQUID_CONFFILE);
 	}
 
 	if(file_exists("/var/squid/cache/swap.state")) {
@@ -339,11 +340,11 @@ function squid_install_command() {
 	if (!is_service_running('squid')) {
 		update_status("Starting... One moment please...");
 		log_error("Starting Squid");
-		mwexec_bg(SQUID_LOCALBASE. "/sbin/squid -f " . SQUID_CONFFILE);
+		mwexec_bg(SQUID_BASE. "/sbin/squid -f " . SQUID_CONFFILE);
 	} else {
 		update_status("Reloading Squid for configuration sync... One moment please...");
 		log_error("Reloading Squid for configuration sync");
-		mwexec_bg(SQUID_LOCALBASE. "/sbin/squid -k reconfigure -f " . SQUID_CONFFILE);
+		mwexec_bg(SQUID_BASE. "/sbin/squid -k reconfigure -f " . SQUID_CONFFILE);
 	}
 
 	/* restart proxy alarm scripts */
@@ -728,7 +729,7 @@ function squid_install_cron($should_install) {
 	$rotate_job_id=-1;
 	$swapstate_job_id=-1;
 	$cron_cmd=($settings['clear_cache']=='on' ?  "/usr/local/pkg/swapstate_check.php clean; " : "");
-	$cron_cmd .= SQUID_LOCALBASE."/sbin/squid -k rotate -f " . SQUID_CONFFILE;
+	$cron_cmd .= SQUID_BASE."/sbin/squid -k rotate -f " . SQUID_CONFFILE;
 	$need_write = false;
 	foreach($config['cron']['item'] as $item) {
 		if(strstr($item['task_name'], "squid_rotate_logs")) {
@@ -1334,7 +1335,7 @@ function squid_resync_antivirus(){
 		#fix perl path on clwarn.cgi
 		$clwarn_file_new=file_get_contents($clwarn_file);
 		$c_pattern[]="@/usr/\S+/perl@";
-		$c_replacement[]=SQUID_LOCALBASE."/bin/perl";
+		$c_replacement[]=SQUID_BASE."/bin/perl";
 		/*$c_pattern[]="@redirect \S+/clwarn.cgi@";
 		$gui_proto=$config['system']['webgui']['protocol'];
 		$gui_port=$config['system']['webgui']['port'];
@@ -1432,15 +1433,12 @@ EOF;
 		#Check clamav database
 		if (count(glob("/var/db/clamav/*d"))==0){
 			log_error("Squid - Missing /var/db/clamav/*.cvd or *.cld files. Running freshclam on background.");
-			mwexec_bg(SQUID_LOCALBASE."/bin/freshclam");
+			mwexec_bg(SQUID_BASE."/bin/freshclam");
 		}
-		#check startup scripts on pfsense > 2.1
-		if (preg_match("/usr.pbi/",SQUID_LOCALBASE)){
-			$rcd_files = scandir(SQUID_LOCALBASE."/etc/rc.d");
-			foreach($rcd_files as $rcd_file)
-				if (!file_exists("/usr/local/etc/rc.d/{$rcd_file}"))
-					symlink (SQUID_LOCALBASE."/etc/rc.d/{$rcd_file}","/usr/local/etc/rc.d/{$rcd_file}");
-		}
+		$rcd_files = scandir(SQUID_LOCALBASE."/etc/rc.d");
+		foreach($rcd_files as $rcd_file)
+			if (!file_exists("/usr/local/etc/rc.d/{$rcd_file}"))
+				symlink (SQUID_LOCALBASE."/etc/rc.d/{$rcd_file}","/usr/local/etc/rc.d/{$rcd_file}");
 
 		#write advanced icap config files
 		file_put_contents(SQUID_LOCALBASE."/etc/c-icap/squidclamav.conf",base64_decode($antivirus_config['squidclamav']),LOCK_EX);
@@ -1890,12 +1888,12 @@ function squid_resync($via_rpc="no") {
 
 		if (!is_service_running('squid')) {
 			log_error("Starting Squid");
-			mwexec(SQUID_LOCALBASE . "/sbin/squid -f " . SQUID_CONFFILE);
+			mwexec(SQUID_BASE . "/sbin/squid -f " . SQUID_CONFFILE);
 			}
 		else {
 			if (!isset($boot_process)){
 				log_error("Reloading Squid for configuration sync");
-				mwexec(SQUID_LOCALBASE . "/sbin/squid -k reconfigure -f " . SQUID_CONFFILE);
+				mwexec(SQUID_BASE . "/sbin/squid -k reconfigure -f " . SQUID_CONFFILE);
 				}
 		}
 
@@ -2260,18 +2258,18 @@ function squid_write_rcfile() {
 	/* Declare a variable for the SQUID_CONFFILE constant. */
 	/* Then the variable can be referenced easily in the Heredoc text that generates the rc file. */
 	$squid_conffile_var = SQUID_CONFFILE;
-	$squid_local_base = SQUID_LOCALBASE;
+	$squid_base = SQUID_BASE;
 	$rc = array();
 	$rc['file'] = 'squid.sh';
 	$rc['start'] = <<<EOD
 if [ -z "`ps auxw | grep "[s]quid "|awk '{print $2}'`" ];then
-	{$squid_local_base}/sbin/squid -f {$squid_conffile_var}
+	{$squid_base}/sbin/squid -f {$squid_conffile_var}
 fi
 
 EOD;
 
 	$rc['stop'] = <<<EOD
-{$squid_local_base}/sbin/squid -k shutdown -f {$squid_conffile_var}
+{$squid_base}/sbin/squid -k shutdown -f {$squid_conffile_var}
 # Just to be sure...
 sleep 5
 
@@ -2286,9 +2284,9 @@ killall pinger 2>/dev/null
 EOD;
 	$rc['restart'] = <<<EOD
 if [ -z "`ps auxw | grep "[s]quid "|awk '{print $2}'`" ];then
-		{$squid_local_base}/sbin/squid -f {$squid_conffile_var}
+		{$squid_base}/sbin/squid -f {$squid_conffile_var}
 	else
-		{$squid_local_base}/sbin/squid -k reconfigure -f {$squid_conffile_var}
+		{$squid_base}/sbin/squid -k reconfigure -f {$squid_conffile_var}
 	fi
 
 EOD;
