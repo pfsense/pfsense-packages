@@ -470,8 +470,8 @@
 			<fieldname>pass_order</fieldname>
 			<description><![CDATA[<br />Default Order:  <strong> | pfB_Block/Reject | All other Rules | (original format)<br /></strong><br />
 				Select The '<strong>Order</strong>' of the Rules<br />
-				Selecting 'original format', sets pfBlockerNG rules at the top of the Firewall TAB.<br />
-				Selecting any other 'Order' will re-order <strong>all the Rules to the format indicated!</strong>]]></description>
+				&nbsp;&nbsp;Selecting 'original format', sets pfBlockerNG rules at the top of the Firewall TAB.<br />
+				&nbsp;&nbsp;Selecting any other 'Order' will re-order <strong>all the Rules to the format indicated!</strong>]]></description>
 			<type>select</type>
 			<options>
 				<option><name>| pfB_Block/Reject | All other Rules | (original format)</name><value>order_0</value></option>
