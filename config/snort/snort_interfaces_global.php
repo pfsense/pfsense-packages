@@ -89,9 +89,6 @@ if ($_POST['snortdownload'] == "on" && empty($_POST['oinkmastercode']))
 if ($_POST['emergingthreats_pro'] == "on" && empty($_POST['etpro_code']))
 		$input_errors[] = "You must supply a subscription code in the box provided in order to enable Emerging Threats Pro rules!";
 
-if ($_POST['openappid_detectors'] == "on" && empty($_POST['openappid_dnload_url']))
-		$input_errors[] = "You must supply a download URL in the box provided in order to enable OpenAppID detectors!";
-
 /* if no errors move foward with save */
 if (!$input_errors) {
 	if ($_POST["save"]) {
