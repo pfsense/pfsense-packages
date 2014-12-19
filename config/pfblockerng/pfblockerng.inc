@@ -2279,8 +2279,6 @@ function pfblockerng_php_deinstall_command() {
 	# Set these two variables to Disable pfBlockerNG on De-Install
 	$pfb['save'] = TRUE;
 	$pfb['install'] = TRUE;
-	pfb_global();
-
 	sync_package_pfblockerng();
 	rmdir_recursive("/usr/local/pkg/pfblockerng");
 	rmdir_recursive("/usr/local/www/pfblockerng");
@@ -2320,15 +2318,6 @@ function pfblockerng_php_deinstall_command() {
 			unset($config['installedpackages']['pfblockerngsouthamerica']);
 		if (is_array($config['installedpackages']['pfblockerngtopspammers']))
 			unset($config['installedpackages']['pfblockerngtopspammers']);
-
-		# Remove any pfBlockerNG Aliastable Files
-		$pfb_files = glob("{$pfb['aliasdir']}/pfB_*.txt");
-		if (!empty($pfb_files)) {
-			foreach ($pfb_files as $pfb_list) {
-				$pfb_file = basename($pfb_list, ".txt");
-				unlink_if_exists("{$pfb_file}.txt");
-			}
-		}
 	}
 
 	# Remove Widget (code from Snort deinstall)

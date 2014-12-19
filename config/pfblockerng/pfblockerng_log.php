@@ -181,15 +181,9 @@ if (isset($_POST['file'])) {
 if (isset($_POST['logFile'])) {
 	$s_logfile = $_POST['logFile'];
 
-	# Clear log
+	# Clear selected file
 	if (isset($_POST['clear'])) {
-		if (is_file($s_logfile)) {
-			# Only allow clearing of 'log' files
-			$ext = pathinfo($s_logfile, PATHINFO_EXTENSION);
-			if ($ext == "log") {
-				unlink_if_exists($s_logfile);
-			}
-		}
+		unlink_if_exists($s_logfile);
 	}
 
 	# Download log
