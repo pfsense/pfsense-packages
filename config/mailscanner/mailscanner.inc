@@ -29,7 +29,7 @@
 */
 $shortcut_section = "mailscanner";
 require_once("util.inc");
-require("globals.inc");
+require_once("globals.inc");
 #require("guiconfig.inc");
 
 $pf_version=substr(trim(file_get_contents("/etc/version")),0,3);
