@@ -427,7 +427,7 @@ EOD;
 	update_output_window($static_output);
 	
 	// make sure the version stays 'comparable'
-	if (is_arrayset($config,'installedpackages','haproxy'))
+	if (is_arrayset($config,'installedpackages','haproxy') && isset($config['installedpackages']['haproxy']['configversion']))
 		$configversion = $config['installedpackages']['haproxy']['configversion'];
 	else
 		$configversion = "00.12";
