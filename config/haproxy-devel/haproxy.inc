@@ -38,6 +38,13 @@ require_once("haproxy_xmlrpcsyncclient.inc");
 
 $d_haproxyconfdirty_path = $g['varrun_path'] . "/haproxy.conf.dirty";
 
+global $a_frontendmode;
+$a_frontendmode = array();
+$a_frontendmode['http'] = array('name' => "http / https(offloading)", 'shortname' => "http/https");
+$a_frontendmode['https'] = array('name' => "ssl / https(TCP mode)", 'shortname' => "ssl/https");
+$a_frontendmode['tcp'] = array('name' => "tcp", 'shortname' => "tcp");
+$a_frontendmode['health'] = array('name' => "health", 'shortname' => "health");
+
 global $a_acltypes;
 $a_acltypes = array();
 $a_acltypes["host_starts_with"] = array('name' => 'Host starts with:',
@@ -84,6 +91,8 @@ $a_acltypes["ssl_sni_starts_with"] = array('name' => 'Server Name Indication TLS
 				'mode' => 'https', 'syntax' => 'req.ssl_sni -m beg -i %1$s', 'advancedoptions' => "tcp-request content accept if { req.ssl_hello_type 1 }");
 $a_acltypes["ssl_sni_ends_with"] = array('name' => 'Server Name Indication TLS extension ends with:', 'inspect-delay' => '5',
 				'mode' => 'https', 'syntax' => 'req.ssl_sni -m end -i %1$s', 'advancedoptions' => "tcp-request content accept if { req.ssl_hello_type 1 }");
+$a_acltypes["ssl_sni_ends_with"] = array('name' => 'Server Name Indication TLS extension regex:', 'inspect-delay' => '5',
+				'mode' => 'https', 'syntax' => 'req.ssl_sni -m reg -i %1$s', 'advancedoptions' => "tcp-request content accept if { req.ssl_hello_type 1 }");
 $a_acltypes["custom"] = array('name' => 'Custom acl:',
 				'mode' => '', 'syntax' => '%1$s');
 
@@ -187,6 +196,19 @@ $a_sticky_type['stick_rdp_cookie'] = array('name' => 'Stick on RDP-cookie',
 	'descr' => "Uses a RDP-Cookie send by the mstsc client, note that not all clients send this.",
 	'cookiedescr' => 'EXAMPLE: msts or mstshash');
 
+
+global $a_error;
+$a_error = array();
+$a_error['200'] = array('descr' => "stats or monitoring requests");
+$a_error['400'] = array('descr' => "request invalid or too large");
+$a_error['401'] = array('descr' => "authentication is required to perform the action");
+$a_error['403'] = array('descr' => "request is forbidden");
+$a_error['408'] = array('descr' => "timeout before the request is complete");
+$a_error['500'] = array('descr' => "internal error");
+$a_error['502'] = array('descr' => "server response invalid or blocked");
+$a_error['503'] = array('descr' => "no server was available to handle the request");
+$a_error['504'] = array('descr' => "timeout before the server responds");
+   
 if(!function_exists('group_ports')){
 // function group_ports() is present in pfSense 2.2 in util.inc
 /* create ranges of sequential port numbers (200:215) and remove duplicates */
@@ -237,10 +259,11 @@ function group_ports($ports) {
 	return $result;
 }
 }
-	
+
 function haproxy_portoralias_to_list($port_or_alias) {
 	// input: a port or aliasname: 80 https MyPortAlias
 	// returns: a array of ports and portranges 80 443 8000:8010
+	
 	global $aliastable;
 	$portresult = array();
 	if (alias_get_type($port_or_alias) == "port") {
@@ -253,15 +276,39 @@ function haproxy_portoralias_to_list($port_or_alias) {
 		return $portresult;
 	} else if (is_portrange($port_or_alias)) {
 		return (array)$port_or_alias;
-	} else if (is_port($port_or_alias)) {
-		if (getservbyname($port_or_alias, "tcp"))
-			return (array)getservbyname($port_or_alias, "tcp");
-		if (getservbyname($port_or_alias, "udp"))
-			return (array)getservbyname($port_or_alias, "udp");
-		return (array)$port_or_alias;
+	} else {
+		$ports = explode(",", $port_or_alias);
+		foreach($ports as $port){
+			if (is_port($port)) {
+				if (getservbyname($port, "tcp"))
+					$port = getservbyname($port, "tcp");
+				if (getservbyname($port, "udp"))
+					$port = getservbyname($port, "udp");
+				$portresult[] = $port;
+			}
+		}
+		return $portresult;
 	}
-	else 
-		return null;
+}
+function haproxy_addressoralias_to_list($address_or_alias) {
+	global $aliastable;
+	$result = array();
+	$alias_type = alias_get_type($address_or_alias);
+	if (!empty($alias_type)) {
+		$alias = $aliastable[$address_or_alias];
+		if ($alias_type == "url") {
+			$result = explode(' ',$alias);
+		} else
+		if ($alias_type == "network") {
+			//$result = explode(' ',$alias);
+		} else
+		if ($alias_type == "host") {
+			$result = explode(' ',$alias);
+		}
+	} else {
+		$result[] = $address_or_alias;
+	}
+	return $result;
 }
 
 function haproxy_hostoralias_to_list($host_or_alias) {
@@ -270,6 +317,20 @@ function haproxy_hostoralias_to_list($host_or_alias) {
 	} else {
 		$result = array();
 		$result[] = $host_or_alias;
+	}
+	return $result;
+}
+
+function haproxy_get_fileslist() {
+	// returns the files array with 'keys'.
+	$result = array();
+	global $config;
+	// create a copy to not modify the original 'keyless' array
+	$a_files = $config['installedpackages']['haproxy']['files']['item'];
+	if (!is_array($a_files)) $a_files = array();	
+	foreach($a_files as $file) {
+		$key = $file['name'];
+		$result[$key] = $file;
 	}
 	return $result;
 }
@@ -365,107 +426,136 @@ EOD;
 	$static_output .= "HAProxy, update configuration\n";
 	update_output_window($static_output);
 	
+	// make sure the version stays 'comparable'
+	if (is_arrayset($config,'installedpackages','haproxy'))
+		$configversion = $config['installedpackages']['haproxy']['configversion'];
+	else
+		$configversion = "00.12";
+
+	$static_output .= "HAProxy, from version $configversion\n";
+	update_output_window($static_output);
+	
 	$writeconfigupdate = false;
-	/* Do XML upgrade from haproxy 0.31 to haproxy-dev */
-	if (is_array($config['installedpackages']['haproxy']['ha_servers'])) {
-		$static_output .= "HAProxy, Do XML upgrade from haproxy 0.31 to haproxy-dev\n";
-		update_output_window($static_output);
+	if ($configversion < "00.13") {
+		/* Do XML upgrade from haproxy 0.31 to haproxy-dev */
+		if (is_array($config['installedpackages']['haproxy']['ha_servers'])) {
+			$static_output .= "HAProxy, Do XML upgrade from haproxy 0.31 to haproxy-dev\n";
+			update_output_window($static_output);
 
-	/* We have an old config */
-		$config['installedpackages']['haproxy']['ha_pools']['item'] = array();
-		$a_global = &$config['installedpackages']['haproxy'];
-		$a_backends = &$config['installedpackages']['haproxy']['ha_backends']['item'];
-		$a_oldservers = &$config['installedpackages']['haproxy']['ha_servers']['item'];
-		$a_pools = &$config['installedpackages']['haproxy']['ha_pools']['item'];
+		/* We have an old config */
+			$config['installedpackages']['haproxy']['ha_pools']['item'] = array();
+			$a_global = &$config['installedpackages']['haproxy'];
+			$a_backends = &$config['installedpackages']['haproxy']['ha_backends']['item'];
+			$a_oldservers = &$config['installedpackages']['haproxy']['ha_servers']['item'];
+			$a_pools = &$config['installedpackages']['haproxy']['ha_pools']['item'];
 
-		foreach ($a_backends as $id => $be) {
-			$a_backends[$id]['status'] = 'active';
-		}
-		$id = 0;
-		foreach ($a_oldservers as $oldserver) {
-			$pool=$oldserver;
-			/* make server sub array */
-			$server=array();
-			$server['name'] = $oldserver['name'];
-			$server['address'] = $oldserver['address'];
-			$server['port'] = $oldserver['port'];
-			$server['weight'] = $oldserver['weight'];
-			$a_servers=array();
-			$a_servers[]=$server;
-			/* set new pool */
-			$pool['name'] = "pool$id";
-			$id++;
-			$pool['ha_servers']['item']=$a_servers;
-			/* link to frontend */
 			foreach ($a_backends as $id => $be) {
-				if ($a_backends[$id]['name'] == $oldserver['backend']) {
-					$a_backends[$id]['backend_serverpool'] = $pool['name'];
-					$pool['monitor_uri'] = $be['monitor_uri'];
-					unset($a_backends[$id]['monitor_uri']);
-					break;
+				$a_backends[$id]['status'] = 'active';
+			}
+			$id = 0;
+			foreach ($a_oldservers as $oldserver) {
+				$pool=$oldserver;
+				/* make server sub array */
+				$server=array();
+				$server['name'] = $oldserver['name'];
+				$server['address'] = $oldserver['address'];
+				$server['port'] = $oldserver['port'];
+				$server['weight'] = $oldserver['weight'];
+				$a_servers=array();
+				$a_servers[]=$server;
+				/* set new pool */
+				$pool['name'] = "pool$id";
+				$id++;
+				$pool['ha_servers']['item']=$a_servers;
+				/* link to frontend */
+				foreach ($a_backends as $id => $be) {
+					if ($a_backends[$id]['name'] == $oldserver['backend']) {
+						$a_backends[$id]['backend_serverpool'] = $pool['name'];
+						$pool['monitor_uri'] = $be['monitor_uri'];
+						unset($a_backends[$id]['monitor_uri']);
+						break;
+					}
+				}
+				unset($pool['backend']);
+				unset($pool['address']);
+				unset($pool['port']);
+				unset($pool['weight']);
+				$a_pools[] = $pool;
+			}
+			unset($config['installedpackages']['haproxy']['ha_servers']);
+			$writeconfigupdate = true;
+		}
+		
+		/* XML update to: pkg v1.3 and 'pool' changed to 'backend_serverpool' because 'pool' was added to listtags() in xmlparse.inc */
+		if (is_arrayset($config,'installedpackages','haproxy','ha_backends','item',0,'pool')) {
+			$static_output .= "HAProxy, Do XML upgrade, change to backend_serverpool from pool array\n";
+			update_output_window($static_output);
+		
+			foreach($config['installedpackages']['haproxy']['ha_backends']['item'] as &$frontend)
+			{
+				$backend_serverpool = $frontend['pool'][0];
+				$frontend['backend_serverpool'] = $backend_serverpool;
+				unset($frontend['pool']);
+			}
+			$writeconfigupdate = true;
+		}
+		//also move setting for existing 2.0 installations as only the new variable is used 
+		if (is_arrayset($config,'installedpackages','haproxy','ha_backends','item',0) &&
+			isset($config['installedpackages']['haproxy']['ha_backends']['item'][0]['pool'])) {
+			$static_output .= "HAProxy, Do XML upgrade, change to backend_serverpool from pool\n";
+			update_output_window($static_output);
+			foreach($config['installedpackages']['haproxy']['ha_backends']['item'] as &$frontend)
+			{
+				$backend_serverpool = $frontend['pool'];
+				$frontend['backend_serverpool'] = $backend_serverpool;
+				unset($frontend['pool']);
+			}
+			$writeconfigupdate = true;
+		}
+		// update config to "haproxy-devel 1.5-dev19 pkg v0.5"
+		if(is_arrayset($config,'installedpackages','haproxy','ha_backends','item')) {
+			$static_output .= "HAProxy, Do XML upgrade, update frontend options\n";
+			update_output_window($static_output);
+			foreach ($config['installedpackages']['haproxy']['ha_backends']['item'] as &$bind) {
+				if($bind['httpclose'] && $bind['httpclose'] == "yes" ) {
+					$bind['httpclose'] = "httpclose";
+					$writeconfigupdate = true;
+				}
+				if (!$bind['extaddr']){
+					$bind['extaddr'] = "wan_ipv4";
+					$writeconfigupdate = true;
+				}
+				if ($bind['extaddr'] == "localhost"){
+					$bind['extaddr'] = "localhost_ipv4";
+					$writeconfigupdate = true;
+				}
+				if ($bind['extaddr'] == "any"){
+					$bind['extaddr'] = "any_ipv4";
+					$writeconfigupdate = true;
 				}
 			}
-			unset($pool['backend']);
-			unset($pool['address']);
-			unset($pool['port']);
-			unset($pool['weight']);
-			$a_pools[] = $pool;
 		}
-		unset($config['installedpackages']['haproxy']['ha_servers']);
-		$writeconfigupdate = true;
 	}
-	
-	/* XML update to: pkg v1.3 and 'pool' changed to 'backend_serverpool' because 'pool' was added to listtags() in xmlparse.inc */
-	if (is_arrayset($config,'installedpackages','haproxy','ha_backends','item',0,'pool')) {
-		$static_output .= "HAProxy, Do XML upgrade, change to backend_serverpool from pool array\n";
-		update_output_window($static_output);
-	
-		foreach($config['installedpackages']['haproxy']['ha_backends']['item'] as &$frontend)
-		{
-			$backend_serverpool = $frontend['pool'][0];
-			$frontend['backend_serverpool'] = $backend_serverpool;
-			unset($frontend['pool']);
-		}
-		$writeconfigupdate = true;
-	}
-	//also move setting for existing 2.0 installations as only the new variable is used 
-	if (is_arrayset($config,'installedpackages','haproxy','ha_backends','item',0) &&
-		isset($config['installedpackages']['haproxy']['ha_backends']['item'][0]['pool'])) {
-		$static_output .= "HAProxy, Do XML upgrade, change to backend_serverpool from pool\n";
-		update_output_window($static_output);
-		foreach($config['installedpackages']['haproxy']['ha_backends']['item'] as &$frontend)
-		{
-			$backend_serverpool = $frontend['pool'];
-			$frontend['backend_serverpool'] = $backend_serverpool;
-			unset($frontend['pool']);
-		}
-		$writeconfigupdate = true;
-	}
-	// update config to "haproxy-devel 1.5-dev19 pkg v0.5"
-	if(is_arrayset($config,'installedpackages','haproxy','ha_backends','item')) {
-		$static_output .= "HAProxy, Do XML upgrade, update frontend options\n";
-		update_output_window($static_output);
+	if ($configversion == "00.12") {
+		// update config to "haproxy-devel 1.5-dev19 pkg v0.13"
 		foreach ($config['installedpackages']['haproxy']['ha_backends']['item'] as &$bind) {
-			if($bind['httpclose'] && $bind['httpclose'] == "yes" ) {
-				$bind['httpclose'] = "httpclose";
-				$writeconfigupdate = true;
+			if (isset($bind['extaddr'])) {
+				$new['extaddr'] = $bind['extaddr'];
+				$new['extaddr_port'] = $bind['port'];
+				$new['extaddr_ssl'] = $bind['ssloffload'];
+				$bind['a_extaddr']['item'][] = $new;
 			}
-			if (!$bind['extaddr']){
-				$bind['extaddr'] = "wan_ipv4";
-				$writeconfigupdate = true;
-			}
-			if ($bind['extaddr'] == "localhost"){
-				$bind['extaddr'] = "localhost_ipv4";
-				$writeconfigupdate = true;
-			}
-			if ($bind['extaddr'] == "any"){
-				$bind['extaddr'] = "any_ipv4";
-				$writeconfigupdate = true;
-			}
+			unset($bind['extaddr']);
+			unset($bind['port']);
+			//unset($bind['ssloffload']);
 		}
+		$configversion = "00.13";
 	}
+	
+	$writeconfigupdate = $config['installedpackages']['haproxy']['configversion'] <> $configversion;
 	if ($writeconfigupdate) {
-		$static_output .= "HAProxy, write updated config\n";
+		$config['installedpackages']['haproxy']['configversion'] = $configversion;
+		$static_output .= "HAProxy, write updated config to version: $configversion\n";
 		update_output_window($static_output);
 		write_config("HAProxy, update xml config version");
 	}
@@ -540,7 +630,7 @@ function haproxy_find_acl($name) {
 function write_backend($configpath, $fd, $name, $pool, $frontend) {
 	if(!is_array($pool['ha_servers']['item']) && !$pool['stats_enabled']=='yes')
 		return;
-	global $a_checktypes, $a_cookiemode;
+	global $a_checktypes, $a_cookiemode, $a_files, $a_error;
 		
 	$a_servers = &$pool['ha_servers']['item'];
 	$frontendtype = $frontend['type'];
@@ -602,6 +692,23 @@ function write_backend($configpath, $fd, $name, $pool, $frontend) {
 				$scope_items = explode(",", $pool['stats_scope']);
 				foreach($scope_items as $scope_item)
 					fwrite ($fd, "\tstats\t\t\tscope " . $scope_item . "\n");
+			}
+		}
+
+		if (is_arrayset($pool,'errorfiles','item')) {
+			foreach($pool['errorfiles']['item'] as $errorfile) {
+				if (!is_array($a_files))// load only once
+					$a_files = haproxy_get_fileslist();
+				$file = $errorfile['errorfile'];
+				$errorcodes = explode(",",$errorfile['errorcode']);
+				foreach($errorcodes as $errorcode) {
+					$filename = "$configpath/errorfile_{$name}_{$errorcode}_{$file}";
+					$content = base64_decode($a_files[$file]['content']);
+					$content = str_replace('{errormsg}', $a_error[$errorcode]['descr'], $content);
+					$content = str_replace('{errorcode}', $errorcode, $content);
+					file_put_contents($filename, $content);
+					fwrite ($fd, "\terrorfile\t\t\t" . $errorcode ." " . $filename . "\n");
+				}
 			}
 		}
 	}
@@ -875,6 +982,9 @@ function haproxy_write_certificate_fullchain($filename, $certid, $append = false
 
 function haproxy_writeconf($configpath) {
 	global $config;
+	global $aliastable;
+	if (!isset($aliastable))
+		alias_make_table($config);
 	$chroot_dir = "/tmp/haproxy_chroot"; // can contain socket to forward connection from backend to frontend. "/var/empty"
 	make_dirs($chroot_dir);
 
@@ -951,7 +1061,8 @@ function haproxy_writeconf($configpath) {
 			if(!$frontend['backend_serverpool'])
 				continue;
 			$primaryfrontend = get_primaryfrontend($frontend);
-			$bname = get_frontend_ipport($frontend);
+
+			$bname = $primaryfrontend['name'];
 			if (!is_array($a_bind[$bname])) {
 				$a_bind[$bname] = array();
 				$a_bind[$bname] = $primaryfrontend;
@@ -959,12 +1070,14 @@ function haproxy_writeconf($configpath) {
 			}
 
 			//check ssl info
-			if (strtolower($primaryfrontend['type']) == "http" && $frontend['ssloffload']){
+			$ssl = get_frontend_uses_ssl($frontend);
+			
+			if ($ssl) {
 				//ssl crt ./server.pem ca-file ./ca.crt verify optional crt-ignore-err all crl-file ./ca_crl.pem
-				$filename = "$configpath/{$frontend['name']}.{$frontend['port']}.pem";
+				$filename = "$configpath/{$frontend['name']}.pem";
 				$ssl_crt = " crt $filename";
 				haproxy_write_certificate_fullchain($filename, $frontend['ssloffloadcert']);
-				$subfolder = "$configpath/{$frontend['name']}.{$frontend['port']}";
+				$subfolder = "$configpath/{$frontend['name']}";
 				$certs = $frontend['ha_certificates']['item'];
 				if (is_array($certs)){
 					if (count($certs) > 0){
@@ -1032,8 +1145,8 @@ function haproxy_writeconf($configpath) {
 			}
 			
 			// Prepare ports for processing by splitting
-			$portss = "{$bind['port']},";
-			$ports = split(",", $portss);
+			//$portss = "{$bind['port']},";
+			//$ports = split(",", $portss);
 			
 			if($bind['type'] == "http") {
 				// ssl offloading is only possible in http mode.
@@ -1043,25 +1156,41 @@ function haproxy_writeconf($configpath) {
 				$ssl_info = "";
 				$advanced_bind = "";
 			}
+			
+			fwrite ($fd, "{$frontendinfo}");
+			
 			// Initialize variable
 			$listenip = "";
 			
 			// Process and add bind directives for ports
-			$ip = haproxy_interface_ip($bind['extaddr']);
-			if ($ip){
-				foreach($ports as $alias_or_port) {
-					if($alias_or_port) {
-						$portsnumeric = group_ports(haproxy_portoralias_to_list($alias_or_port));
-						foreach($portsnumeric as $portnumeric) {
-							$portnumeric = str_replace(":","-",$portnumeric);
-							$listenip .=  "\tbind\t\t\t$ip:{$portnumeric} {$ssl_info} {$advanced_bind}\n";
+			if (isset($bind['a_extaddr'])) {
+				foreach($bind['a_extaddr']['item'] as $extaddr) {
+					$a_ip = array();
+					if (isset($extaddr['extaddr']) && $extaddr['extaddr'] != "custom") {
+						$a_ip[] = haproxy_interface_ip($extaddr['extaddr']);
+					} else {						
+						$iporalias = $extaddr['extaddr_custom'];
+						$a_ip = haproxy_addressoralias_to_list($iporalias);
+					}
+					
+					if ($extaddr['extaddr_ssl'] == 'yes')
+						$ssl = $ssl_info;
+					else
+						$ssl = "";
+					
+					foreach($a_ip as $ip) {
+						$portsnumeric = group_ports(haproxy_portoralias_to_list($extaddr['extaddr_port']));
+						if (is_array($portsnumeric)) {
+							foreach($portsnumeric as $portnumeric) {
+								$portnumeric = str_replace(":","-",$portnumeric);
+								$listenip .=  "\tbind\t\t\t$ip:{$portnumeric} {$ssl} {$advanced_bind} {$extaddr['extaddr_advanced']}\n";
+							}
 						}
 					}
 				}
 			}
-			
-			fwrite ($fd, "{$frontendinfo}");
 			fwrite ($fd, "{$listenip}");
+			
 			if (use_frontend_as_unixsocket($bind['name'])){
 				fwrite ($fd, "\tbind /tmp/haproxy_chroot/{$bind['name']}.socket accept-proxy {$ssl_info} {$advanced_bind}\n");
 			}
@@ -1106,10 +1235,9 @@ function haproxy_writeconf($configpath) {
 
 				if($bind['forwardfor']) {
 					fwrite ($fd, "\toption\t\t\tforwardfor\n");
-					if($bind['ssloffload'] == "yes")
-						fwrite ($fd, "\treqadd X-Forwarded-Proto:\ https\n");
-					else
-						fwrite ($fd, "\treqadd X-Forwarded-Proto:\ http\n");
+					fwrite ($fd, "\tacl https ssl_fc\n");
+					fwrite ($fd, "\treqadd X-Forwarded-Proto:\ http if !https\n");
+					fwrite ($fd, "\treqadd X-Forwarded-Proto:\ https if https\n");
 				}
 			}
 
@@ -1392,8 +1520,7 @@ function haproxy_plugin_certificates($pluginparams) {
 		$result['certificatelist'] = array();
 		// return a array of used certificates.
 		foreach($config['installedpackages']['haproxy']['ha_backends']['item'] as &$frontend) {
-			$mainfrontend = get_primaryfrontend($frontend);
-			if (strtolower($mainfrontend['type']) == "http" && $mainfrontend['ssloffload']) {
+			if (get_frontend_uses_ssl($frontend)) {
 				if ($frontend['ssloffloadacl']){
 					$item = array();
 					$cert = $frontend['ssloffloadcert'];
@@ -1581,12 +1708,30 @@ function get_primaryfrontend($frontend) {
 	return $mainfrontend;
 }
 
-function get_frontend_ipport($frontend,$userfriendly=false) {
+function get_frontend_ipport($frontend, $userfriendly=false) {
 	$mainfrontend = get_primaryfrontend($frontend);
-	$result = haproxy_interface_ip($mainfrontend['extaddr'], $userfriendly);
-	if ($userfriendly and is_ipaddrv6($result))
-		$result = "[{$result}]";
-	return $result . ":" . $mainfrontend['port'];
+	$newline = "";
+	$result = array();
+	if (!is_arrayset($mainfrontend,"a_extaddr","item"))
+		return $result;
+	foreach($mainfrontend['a_extaddr']['item'] as $extaddr) {
+		if ($extaddr['extaddr'] == 'custom'){
+			$addr = $extaddr['extaddr_custom'];
+		} else {
+			$addr = haproxy_interface_ip($extaddr['extaddr'], $userfriendly);
+		}
+		if ($userfriendly and is_ipaddrv6($addr))
+			$addr = "[{$addr}]";
+		
+		$port = $extaddr['extaddr_port'];
+		$newitem = array();
+		$newitem['addr'] = $addr;
+		$newitem['port'] = $port;
+		$newitem['ssl'] = $extaddr['extaddr_ssl'];
+		$result[$addr.$port] = $newitem;
+	}
+	ksort($result);
+	return $result;
 }
 
 function haproxy_check_config() {
@@ -1599,17 +1744,20 @@ function haproxy_check_config() {
 	foreach($a_backends as $frontend) {
 		if (($frontend['status'] != 'active') || ($frontend['secondary'] == 'yes'))
 			continue;
-		$ipport = get_frontend_ipport($frontend);
-		if (isset($activefrontends[$ipport]))
-			$issues['P_'.$ipport] = "Multiple primary frontends with IP:Port \"$ipport\"";
-		else
-			$activefrontends[$ipport] = true;
+		$ipports = get_frontend_ipport($frontend);
+		foreach($ipports as $ipport) {
+			$id = "{$ipport['addr']}:{$ipport['port']}";
+			if (isset($activefrontends[$id]))
+				$issues['P_'.$id] = "Multiple primary frontends with IP:Port \"$id\"";
+			else
+				$activefrontends[$id] = true;
+		}
 	}
 	foreach($a_backends as $frontend) {
 		if (($frontend['status'] != 'active') || ($frontend['secondary'] != 'yes'))
 			continue;
-		$ipport = get_frontend_ipport($frontend);
-		if (!isset($activefrontends[$ipport]))
+		$mainfrontend = get_primaryfrontend($frontend);
+		if (!isset($mainfrontend))
 			$issues['S_'.$frontend['name']] = "Secondary frontend \"{$frontend['name']}\" without active primary frontend.";
 	}
 	foreach ($issues as $item)
@@ -1621,6 +1769,8 @@ function get_haproxy_frontends($excludeitem="") {
 	global $config;
 	$a_frontend = &$config['installedpackages']['haproxy']['ha_backends']['item'];
 	$result = array();
+	if(!is_array($a_frontend))
+		return $result;
 	foreach($a_frontend as &$frontend)
 	{
 		if ($frontend['secondary'])
@@ -1628,17 +1778,43 @@ function get_haproxy_frontends($excludeitem="") {
 		if ($frontend['name'] == $excludeitem)
 			continue;
 		
-		$serveradress = "{$frontend['extaddr']}:{$frontend['port']}";
-		$result[$frontend['name']]['name'] = "{$frontend['name']} - {$frontend['type']} ({$serveradress})";
+		$serveraddress = get_frontend_ipport($frontend, true);
+		$serveradresstext = null;
+		foreach($serveraddress as $addr) {
+			$serveradresstext .=($serveradresstext == null ? "" : ", ") . "{$addr['addr']}:{$addr['port']}";
+		}
+		$result[$frontend['name']]['name'] = "{$frontend['name']} - {$frontend['type']} ({$serveradresstext})";
 		$result[$frontend['name']]['ref'] = &$frontend;
 	}
 	uasort($result, haproxy_compareByName);
 	return $result;
 }
 
-function generate_cert_acl($crt, $defaultport, $nondefaultport){
-	// The host header send by a browser will contain the portnumber when a nondefault port is used for the server side.
+function get_frontend_uses_ssl($frontend) {
+	$mainfrontend = get_primaryfrontend($frontend);
+	$ssl = false;
+	if (is_arrayset($mainfrontend,'a_extaddr','item')) {
+		foreach($mainfrontend['a_extaddr']['item'] as $extaddr) {
+			if ($extaddr['extaddr_ssl'] == 'yes') {
+				$ssl = true;
+				break;
+			}
+		}
+	}
+	if ($mainfrontend['name'] != $frontend['name'])
+		$ssl = $ssl && $frontend['ssloffload'] == 'yes';
+	return $ssl;
+}
 
+function get_frontend_uses_ssl_only($frontend) {
+	$mainfrontend = get_primaryfrontend($frontend);
+	if (is_arrayset($mainfrontend,'a_extaddr','item')) {
+		foreach($mainfrontend['a_extaddr']['item'] as $extaddr) {
+			if ($extaddr['extaddr_ssl'] != 'yes')
+				return false;
+		}
+	}
+	return true;
 }
 
 function get_frontend_acls($frontend) {
@@ -1664,7 +1840,7 @@ function get_frontend_acls($frontend) {
 		}
 	}
 	
-	if (strtolower($mainfrontend['type']) == "http" && $mainfrontend['ssloffload']) {
+	if (get_frontend_uses_ssl($frontend)) {
 		$a_acl = &$frontend['ha_acls']['item'];
 		if(!is_array($a_acl)) 
 			$a_acl=array();
