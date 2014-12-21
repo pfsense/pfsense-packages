@@ -92,6 +92,8 @@ function pfb_global() {
 	# Max Lines in pfblockerng.log file
 	$pfb['logmax']	= $pfb['config']['log_maxlines'];
 	$pfb['iplocal']	= $config['interfaces']['lan']['ipaddr'];
+	# Disable Country Database CRON Updates
+	$pfb['cc']	= $pfb['config']['database_cc'];
 
 	# Set pfBlockerNG to Disabled on 'Re-Install'
 	if (isset($pfb['install']) && $pfb['install']) {
@@ -247,11 +249,11 @@ function sync_package_pfblockerng($cron = "") {
 	# Detect Boot Process or Update via CRON
 	if (isset($_POST) && $cron == "") {
 		if (!preg_match("/\w+/",$_POST['__csrf_magic'])) {
-			log_error("No pfBlockerNG action during boot process.");
+			log_error("[pfBlockerNG] Sync terminated during boot process.");
 			return;
 		}
 	}
-	log_error("Starting pfBlockerNG sync process.");
+	log_error("[pfBlockerNG] Starting sync process.");
 
 	# Start of pfBlockerNG Logging to 'pfblockerng.log'
 	if ($pfb['enable'] == "on" && !$pfb['save']) {
@@ -298,8 +300,6 @@ function sync_package_pfblockerng($cron = "") {
 	$pfb['min']	= $pfb['config']['pfb_min'];
 	# Reloads Existing Blocklists without Downloading New Lists
 	$pfb['reuse']	= $pfb['config']['pfb_reuse'];
-	# Disable Country Database CRON Updates
-	$pfb['cc']	= $pfb['config']['database_cc'];
 	# Enable OpenVPN AutoRules
 	$pfb['openvpn']	= $pfb['config']['openvpn_action'];
 	# Enable/Disable Floating Auto-Rules
@@ -2096,17 +2096,11 @@ function sync_package_pfblockerng($cron = "") {
 	}
 
 	# Clear any existing pfBlockerNG MaxMind CRON Job
-	install_cron_job("geoipupdate.sh", false);
+	install_cron_job("pfblockerng.php dc", false);
 
 	if ($pfb['enable'] == "on") {
 		# Define pfBlockerNG MaxMind CRON Job
-		# (Options - 'bu' Binary Update for Reputation/Alerts Page, 'all' for Country update and 'bu' options.
-
-		if ($pfb['cc'] == "") {
-			$pfb_gcmd = "/bin/sh /usr/local/pkg/pfblockerng/geoipupdate.sh all >> {$pfb['geolog']} 2>&1";
-		} else {
-			$pfb_gcmd = "/bin/sh /usr/local/pkg/pfblockerng/geoipupdate.sh bu >> {$pfb['geolog']} 2>&1";
-		}
+		$pfb_gcmd = "/usr/local/bin/php /usr/local/www/pfblockerng/pfblockerng.php dc >> {$pfb['geolog']} 2>&1";
 
 		# MaxMind GeoIP Cron Hour is randomized between 0-23 Hour to minimize effect on MaxMind Website
 
@@ -2246,7 +2240,7 @@ function pfblockerng_php_install_command() {
 	unlink_if_exists("{$pfb['ccdir']}/countrycodes.tar.bz2");
 	# Download MaxMind Files and Create Country Code files and Build Continent XML Files
 	update_output_window(gettext("Downloading MaxMind Country Databases. This may take a minute..."));
-	exec("/bin/sh /usr/local/pkg/pfblockerng/geoipupdate.sh all");
+	exec("/bin/sh /usr/local/pkg/pfblockerng/geoipupdate.sh all >> {$pfb['geolog']} 2>&1");
 	update_output_window(gettext("MaxMind Country Database downloads completed..."));
 	update_output_window(gettext("Converting MaxMind Country Databases for pfBlockerNG. This may take a few minutes..."));
 	pfblockerng_uc_countries();
@@ -2335,44 +2329,119 @@ function pfblockerng_php_deinstall_command() {
 	update_output_window(gettext("pfBlockerNG has been Uninstalled"));
 }
 
-
 /* Uses XMLRPC to synchronize the changes to a remote node */
 function pfblockerng_sync_on_changes() {
-	global $config, $g;
-	log_error("[pfBlockerNG] pfBlockerNG_xmlrpc_sync.php is starting.");
-	$synconchanges = $config['installedpackages']['pfblockerngsync']['config'][0]['synconchanges'];	
-	if (!$synconchanges)
+	global $config, $g, $pfb_sync;
+
+	// Create Array of Sync Settings and exit if Sync is Disabled.
+	if (is_array($config['installedpackages']['pfblockerngsync']['config'][0])) {
+		$pfb_sync = $config['installedpackages']['pfblockerngsync']['config'][0];
+		if ($pfb_sync['varsynconchanges'] == "disabled" || $pfb_sync['varsynconchanges'] == "")
+			return;
+
+		$synctimeout = $pfb_sync['varsynctimeout'];
+	} else {
 		return;
-	foreach ($config['installedpackages']['pfblockerngsync']['config'] as $rs ) {
-		foreach ($rs['row'] as $sh){
-			$sync_to_ip = $sh['ipaddress'];
-			$password   = $sh['password'];
-			if ($password && $sync_to_ip) {
-				pfblockerng_do_xmlrpc_sync($sync_to_ip, $password);
+	}
+
+	log_error("[pfBlockerNG] XMLRPC sync is starting.");
+
+	if (is_array($config['installedpackages']['pfblockerngsync']['config'])) {
+		switch ($pfb_sync['varsynconchanges']) {
+			case "manual":
+				if (is_array($pfb_sync[row])) {
+					$rs = $pfb_sync[row];
+				} else {
+					log_error("[pfBlockerNG] XMLRPC sync is enabled but there are no replication targets configured.");
+					return;
+				}
+				break;
+			case "auto":
+				if (is_array($config['installedpackages']['carpsettings']) && is_array($config['installedpackages']['carpsettings']['config'])){
+					$system_carp = $config['installedpackages']['carpsettings']['config'][0];
+					$rs[0]['varsyncipaddress'] = $system_carp['synchronizetoip'];
+					$rs[0]['varsyncusername'] = $system_carp['username'];
+					$rs[0]['varsyncpassword'] = $system_carp['password'];
+
+					// XMLRPC sync is currently only supported over connections using the same protocol and port as this system
+					if ($config['system']['webgui']['protocol'] == "http") {
+						$rs[0]['varsyncprotocol'] = "http";
+					} else {
+						$rs[0]['varsyncprotocol'] = "https";
+					}
+
+					if ($system_carp['synchronizetoip'] == "") {
+						log_error("[pfBlockerNG] XMLRPC sync is enabled but there are no replication targets configured.");
+						return;
+					}
+				} else {
+					log_error("[pfBlockerNG] XMLRPC sync is enabled but there are no replication targets configured.");
+					return;
+				}
+				break;
+			default:
+				return;
+				break;
+		}
+		if (is_array($rs)) {
+			foreach ($rs as $sh) {
+				// Only Sync Enabled Replication Targets
+				if ($sh['varsyncdestinenable'] == "ON") {
+					$sync_to_ip = $sh['varsyncipaddress'];
+					$port = $sh['varsyncport'];
+					$password = htmlspecialchars($sh['varsyncpassword']);
+					$protocol = $sh['varsyncprotocol'];
+
+					if (!empty($sh['varsyncusername'])) {
+						$username = $sh['varsyncusername'];
+					} else {
+						$username = "admin";
+					}
+
+					pfblockerng_do_xmlrpc_sync($sync_to_ip, $port, $protocol, $username, $password, $synctimeout);
+				}
 			}
+			if ($success)
+				log_error("[pfBlockerNG] XMLRPC sync completed successfully.");
 		}
 	}
-	log_error("[pfblockerng] pfBlockerNG_xmlrpc_sync.php is ending.");
 }
 
 
 /* Do the actual XMLRPC sync */
-function pfblockerng_do_xmlrpc_sync($sync_to_ip, $password) {
-	global $config, $g;
+function pfblockerng_do_xmlrpc_sync($sync_to_ip, $port, $protocol, $username, $password, $synctimeout) {
+	global $config, $g, $pfb_sync;
+	$success = TRUE;
 
-	if (!$password)
-		return;
-
-	if (!$sync_to_ip)
-		return;
-
-	$xmlrpc_sync_neighbor = $sync_to_ip;
-	if ($config['system']['webgui']['protocol'] != "") {
-		$synchronizetoip = $config['system']['webgui']['protocol'];
-		$synchronizetoip .= "://";
+	/* Exit on missing parameters */
+	if (empty($sync_to_ip) || empty($password)) {
+		log_error("[pfBlockerNG] XMLRPC sync parameter missing (host IP or password) ... aborting xmlrpc sync");
+		$success = FALSE;
+		return $success;
 	}
-	$port = $config['system']['webgui']['port'];
-	/* if port is empty lets rely on the protocol selection */
+
+	/* Do not attempt a package sync while booting up or installing package */
+	if ($g['booting'] || $g['pfblockerng_postinstall']) {
+		log_error("[pfBlockerNG] XMLRPC sync to Replication targets terminated during boot up or during package reinstallation.");
+		$success = FALSE;
+		return $success;
+	}
+
+	// Validate Replication Target IP Address and Port Settings
+	if (!is_ipaddr($sync_to_ip) || !is_port($port)) {
+		log_error("[pfBlockerNG] XMLRPC sync terminated due to mis-configured Replication Target IP Address or Port settings.");
+		$success = FALSE;
+		return $success;
+	}
+
+	/* Test key variables and set defaults if empty */
+	if (empty($synctimeout))
+		$synctimeout = 150;
+
+	$url = "{$protocol}://{$sync_to_ip}";
+
+	if ($port == "") { $port = $config['system']['webgui']['port']; };
+	/* If port is empty lets rely on the protocol selection */
 	if ($port == "") {
 		if ($config['system']['webgui']['protocol'] == "http") {
 			$port = "80";
@@ -2380,11 +2449,11 @@ function pfblockerng_do_xmlrpc_sync($sync_to_ip, $password) {
 			$port = "443";
 		}
 	}
-	$synchronizetoip .= $sync_to_ip;
-
 	/* xml will hold the sections to sync */
 	$xml = array();
-	$xml['pfblockerng'] = $config['installedpackages']['pfblockerng'];
+	// If User Disabled, remove 'General Tab Customizations' from Sync
+	if ($config['installedpackages']['pfblockerngsync']['config'][0]['syncinterfaces'] == "")
+		$xml['pfblockerng'] = $config['installedpackages']['pfblockerng'];
 	$xml['pfblockerngreputation'] = $config['installedpackages']['pfblockerngreputation'];
 	$xml['pfblockernglistsv4'] = $config['installedpackages']['pfblockernglistsv4'];
 	$xml['pfblockernglistsv6'] = $config['installedpackages']['pfblockernglistsv6'];
@@ -2396,66 +2465,41 @@ function pfblockerng_do_xmlrpc_sync($sync_to_ip, $password) {
 	$xml['pfblockerngnorthamerica'] = $config['installedpackages']['pfblockerngnorthamerica'];
 	$xml['pfblockerngoceania'] = $config['installedpackages']['pfblockerngoceania'];
 	$xml['pfblockerngsouthamerica'] = $config['installedpackages']['pfblockerngsouthamerica'];
+
 	/* assemble xmlrpc payload */
 	$params = array(
-		XML_RPC_encode($password),
-		XML_RPC_encode($xml)
-	);
+			XML_RPC_encode($password),
+			XML_RPC_encode($xml)
+		);
 
 	/* set a few variables needed for sync code borrowed from filter.inc */
-	$url = $synchronizetoip;
-	log_error("Beginning pfBlockerNG XMLRPC sync to {$url}:{$port}.");
+	log_error("[pfBlockerNG] XMLRPC syncing to {$url}:{$port}.");
 	$method = 'pfsense.merge_installedpackages_section_xmlrpc';
 	$msg = new XML_RPC_Message($method, $params);
 	$cli = new XML_RPC_Client('/xmlrpc.php', $url, $port);
-	$cli->setCredentials('admin', $password);
+	$cli->setCredentials($username, $password);
 	if ($g['debug']) {
 		$cli->setDebug(1);
 	}
-	/* send our XMLRPC message and timeout after 250 seconds */
-	$resp = $cli->send($msg, "250");
+
+	/* send our XMLRPC message and timeout after defined sync timeout value */
+	$resp = $cli->send($msg, $synctimeout);
+	$error = "";
 	if (!$resp) {
-		$error = "A communications error occurred while attempting pfBlockerNG XMLRPC sync with {$url}:{$port}.";
-		log_error($error);
+		log_error("[pfBlockerNG] XMLRPC communications error occurred while attempting sync with {$url}:{$port}.");
 		file_notice("sync_settings", $error, "pfBlockerNG Settings Sync", "");
+		$success = FALSE;
+		return $success;
 	} elseif ($resp->faultCode()) {
 		$cli->setDebug(1);
-		$resp = $cli->send($msg, "250");
-		$error = "An error code was received while attempting pfBlockerNG XMLRPC sync with {$url}:{$port} - Code " . $resp->faultCode() . ": " . $resp->faultString();
-		log_error($error);
+		$resp = $cli->send($msg, $synctimeout);
+		log_error("[pfBlockerNG] XMLRPC Error received while attempting sync with {$url}:{$port} - Code " . $resp->faultCode() . ": " . $resp->faultString());
 		file_notice("sync_settings", $error, "pfBlockerNG Settings Sync", "");
+		$success = FALSE;
+		return $success;
 	} else {
-		log_error("pfBlockerNG XMLRPC sync successfully completed with {$url}:{$port}.");
+		log_error("[pfBlockerNG] XMLRPC sync successfully completed with {$url}:{$port}.");
 	}
-	
-	/* tell pfblockerNG to reload our settings on the destination sync host. */
-	$method = 'pfsense.exec_php';
-	$execcmd  = "require_once('/usr/local/pkg/pfblockerng.inc');\n";
-	$execcmd .= "sync_package_pfblockerng();";
-	
-	/* assemble xmlrpc payload */
-	$params = array(
-		XML_RPC_encode($password),
-		XML_RPC_encode($execcmd)
-	);
-
-	log_error("pfBlockerNG XMLRPC reload data {$url}:{$port}.");
-	$msg = new XML_RPC_Message($method, $params);
-	$cli = new XML_RPC_Client('/xmlrpc.php', $url, $port);
-	$cli->setCredentials('admin', $password);
-	$resp = $cli->send($msg, "250");
-	if (!$resp) {
-		$error = "A communications error occurred while attempting pfBlockerNG XMLRPC sync with {$url}:{$port} (exec_php).";
-		log_error($error);
-		file_notice("sync_settings", $error, "pfBlockerNG Settings Sync", "");
-	} elseif($resp->faultCode()) {
-		$cli->setDebug(1);
-		$resp = $cli->send($msg, "250");
-		$error = "An error code was received while attempting pfBlockerNG XMLRPC exec with {$url}:{$port} - Code " . $resp->faultCode() . ": " . $resp->faultString();
-		log_error($error);
-		file_notice("sync_settings", $error, "pfBlockerNG Settings Sync", "");
-	} else {
-		log_error("pfBlockerNG XMLRPC reload data success with {$url}:{$port} (exec_php).");
-	}
+	return $success;
 }
 ?>
