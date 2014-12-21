@@ -544,7 +544,6 @@ function write_backend($configpath, $fd, $name, $pool, $frontend) {
 		
 	$a_servers = &$pool['ha_servers']['item'];
 	$frontendtype = $frontend['type'];
-	$frontend_ip = haproxy_interface_ip($frontend['extaddr']);
 	
 	fwrite ($fd, "backend " . $name . "\n");
 	// https is an alias for tcp for clarity purposes
@@ -678,11 +677,19 @@ function write_backend($configpath, $fd, $name, $pool, $frontend) {
 		$pool['retries'] = 3;
 	fwrite ($fd, "\tretries\t\t\t" . $pool['retries'] . "\n");
 
+	$uses_ipv6 = false;
+	$ips = get_frontend_ipport($frontend);
+	foreach($ips as $ip){
+		$uses_ipv6 = is_ipaddrv6($ip['addr']);
+		if ($uses_ipv6)
+			break;
+	}
+	
 	if ($pool['transparent_clientip']) {
-		if (is_ipaddrv4($frontend_ip))
-			fwrite ($fd, "\tsource 0.0.0.0 usesrc clientip\n");
-		else
+		if ($uses_ipv6)
 			fwrite ($fd, "\tsource ipv6@ usesrc clientip\n");
+		else
+			fwrite ($fd, "\tsource 0.0.0.0 usesrc clientip\n");
 	}
 
 	$uri = $pool['monitor_uri'];
