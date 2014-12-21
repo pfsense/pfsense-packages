@@ -142,8 +142,10 @@ function ip_range_to_subnet_array_temp($ip1, $ip2) {
 	return $out;
 }
 
-# Set php Memory Limit to 256M. This is required to process the MaxMind IP Database
-ini_set('memory_limit', '256M');
+# Set php Memory Limit
+$uname = posix_uname();
+if ($uname['machine'] == "amd64")
+	ini_set('memory_limit', '256M');
 
 function pfb_update_check($header_url, $list_url, $url_format) {
 	global $pfb;
@@ -209,9 +211,19 @@ if ($argv[1] == 'update') {
 	sync_package_pfblockerng("cron");
 }
 
-if ($argv[1] == 'uc') {
+if ($argv[1] == 'dc') {
+	# (Options - 'bu' Binary Update for Reputation/Alerts Page, 'all' for Country update and 'bu' options.
+	if ($pfb['cc'] == "") {
+		exec("/bin/sh /usr/local/pkg/pfblockerng/geoipupdate.sh all >> {$pfb['geolog']} 2>&1");
+	} else {
+		exec("/bin/sh /usr/local/pkg/pfblockerng/geoipupdate.sh bu >> {$pfb['geolog']} 2>&1");
+	}
 	pfblockerng_uc_countries();
 	pfblockerng_get_countries();
+}
+
+if ($argv[1] == 'uc') {
+	pfblockerng_uc_countries();
 }
 
 if ($argv[1] == 'gc') {
@@ -500,9 +512,9 @@ function pfblockerng_uc_countries() {
 	pfb_logger("{$log}","3");
 
 	$cont_array = array ( array($AF),array($AS),array($EU),array($NA),array($OC),array($SA));
-	$csv = array_map('str_getcsv', @file($maxmind_cont));
-	if (isset($csv)) {
-		foreach ($csv as $cc) {
+	if (($handle = fopen("{$maxmind_cont}",'r')) !== FALSE) {
+		while (($cc = fgetcsv($handle)) !== FALSE) {
+
 			$cc_key = $cc[0];
 			$cont_key = $cc[1];
 			switch ($cont_key) {
@@ -545,16 +557,17 @@ function pfblockerng_uc_countries() {
 			}
 		}
 	}
-	unset($csv);
+	unset($cc);
+	fclose($handle);
 
 	// Collect Country ISO Data IPv4 and Sort to Continent Array
 	$log = "Processing ISO IPv4 Continent/Country Data \n";
 	print $log;
 	pfb_logger("{$log}","3");
 
-	$csv2 = array_map('str_getcsv', @file($maxmind_cc4));
-	if (isset($csv2)) {
-		foreach ($csv2 as $cc) {
+	if (($handle = fopen("{$maxmind_cc4}",'r')) !== FALSE) {
+		while (($cc = fgetcsv($handle)) !== FALSE) {
+
 			$ip1_key	= $cc[0];
 			$ip2_key	= $cc[1];
 			$var1_key	= $cc[2];
@@ -574,7 +587,8 @@ function pfblockerng_uc_countries() {
 			}
 		}
 	}
-	unset($csv2);
+	unset($cc);
+	fclose($handle);
 
 	// Build Continent IPv4 CIDR Files
 	$counter = 0;
@@ -605,9 +619,9 @@ function pfblockerng_uc_countries() {
 	print $log;
 	pfb_logger("{$log}","3");
 
-	$csv3 = array_map('str_getcsv', @file($maxmind_cc6));
-	if (isset($csv3)) {
-		foreach ($csv3 as $cc) {
+	if (($handle = fopen("{$maxmind_cc6}",'r')) !== FALSE) {
+		while (($cc = fgetcsv($handle)) !== FALSE) {
+
 			$ip1_key	= $cc[0];
 			$ip2_key	= $cc[1];
 			$var1_key	= $cc[2];
@@ -626,7 +640,8 @@ function pfblockerng_uc_countries() {
 			}
 		}
 	}
-	unset ($csv3);
+	unset($cc);
+	fclose($handle);
 
 	// Build Continent IPv6 Files
 	$counter = 0;
