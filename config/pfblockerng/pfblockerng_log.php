@@ -222,6 +222,8 @@ if ($input_errors) {
 ?>
 <script type="text/javascript" src="/javascript/base64.js"></script>
 <script type="text/javascript">	
+//<![CDATA[
+
 	function loadFile() {
 		jQuery("#fileStatus").html("<?=gettext("Loading file"); ?> ...");
 		jQuery("#fileStatusBox").show(250);
@@ -258,6 +260,7 @@ if ($input_errors) {
 			jQuery("#fileContent").prop("disabled", true);
 		}
 	}
+//]]>
 </script>
 
 <?php
@@ -408,7 +411,9 @@ if ($savemsg) {
 
 <?php if (!isset($_POST['file'])): ?>
 <script type="text/javascript">
+//<![CDATA[
 	document.getElementById("logFile").selectedIndex=-1;
+//]]>
 </script>
 <?php endif; ?>
 <?php include("fend.inc"); ?>

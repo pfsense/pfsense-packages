@@ -274,5 +274,7 @@ if (is_array($pfb_table)) {
 </table>
 
 <script type="text/javascript">
+//<![CDATA[
 	var pfBlockerNGupdateDelay = 10000; // update every 10000 ms
+//]]>
 </script>

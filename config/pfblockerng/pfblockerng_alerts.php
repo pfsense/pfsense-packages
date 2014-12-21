@@ -720,6 +720,7 @@ if (!empty($fields_array)) {
 </td>
 
 <script type="text/javascript">
+//<![CDATA[
 
 // This function stuffs the passed HOST, Table values into hidden Form Fields for postback.
 function hostruleid(host,table) {
@@ -752,6 +753,7 @@ function findhostnames(counter) {
 		findhostnames(i);
 	}
 
+//]]>
 </script>
 <?php include("fend.inc"); ?>
 </form>
