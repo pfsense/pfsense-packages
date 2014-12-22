@@ -1456,7 +1456,7 @@
 		<descr>Unbound is a validating, recursive, and caching DNS resolver. This package is a drop in replacement for Services: DNS Forwarder and also supports DNSSEC extensions. Once installed please configure the Unbound service by visiting Services: Unbound DNS.</descr>
 		<website>http://www.unbound.net/</website>
 		<category>Services</category>
-		<version>1.4.22_2</version>
+		<version>1.5.1_2</version>
 		<status>Alpha</status>
 		<maintainer>warren@decoy.co.za</maintainer>
 		<required_version>2.0</required_version>
@@ -1476,7 +1476,7 @@
 			<ports_before>dns/ldns textproc/expat2 devel/libevent2</ports_before>
 			<port>dns/unbound</port>
 		</build_pbi>
-		<depends_on_package_pbi>unbound-1.4.22_2-amd64.pbi</depends_on_package_pbi>
+		<depends_on_package_pbi>unbound-1.5.1_2-amd64.pbi</depends_on_package_pbi>
 		<build_options>unbound_UNSET_FORCE=GOST ECDSA;unbound_SET=LIBEVENT20 THREADS</build_options>
 		<logging>
 			<facilityname>unbound</facilityname>
