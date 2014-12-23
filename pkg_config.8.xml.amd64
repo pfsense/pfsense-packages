@@ -1456,7 +1456,7 @@
 		<descr>Unbound is a validating, recursive, and caching DNS resolver. This package is a drop in replacement for Services: DNS Forwarder and also supports DNSSEC extensions. Once installed please configure the Unbound service by visiting Services: Unbound DNS.</descr>
 		<website>http://www.unbound.net/</website>
 		<category>Services</category>
-		<version>1.5.1_2</version>
+		<version>1.5.1_2_1</version>
 		<status>Alpha</status>
 		<maintainer>warren@decoy.co.za</maintainer>
 		<required_version>2.0</required_version>
