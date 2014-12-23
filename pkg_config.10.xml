@@ -917,7 +917,7 @@
 			<port>www/squid</port>
 			<ports_after>www/squid_radius_auth security/clamav www/squidclamav security/ca_root_nss www/c-icap-modules</ports_after>
 		</build_pbi>
-		<build_options>c-icap_UNSET_FORCE=IPV6;squid_UNSET_FORCE=AUTH_SMB AUTH_SQL DNS_HELPER FS_COSS ESI SNMP ECAP STACKTRACES STRICT_HTTP TP_IPF TP_IPFW VIA_DB DEBUG DOCS EXAMPLES AUTH_SASL;squid_SET_FORCE=ARP_ACL AUTH_KERB AUTH_LDAP AUTH_NIS CACHE_DIGESTS DELAY_POOLS FOLLOW_XFF TP_PF MSSL_CRTD WCCP WCCPV2 FS_AUFS HTCP ICAP ICMP IDENT IPV6 KQUEUE LARGEFILE SSL SSL_CRTD</build_options>
+		<build_options>c-icap_UNSET_FORCE=IPV6;squid_UNSET_FORCE=AUTH_SMB AUTH_SQL DNS_HELPER FS_COSS ESI SNMP ECAP STACKTRACES STRICT_HTTP TP_IPF TP_IPFW VIA_DB DEBUG DOCS EXAMPLES AUTH_SASL;squid_SET_FORCE=ARP_ACL AUTH_KERB AUTH_LDAP AUTH_NIS CACHE_DIGESTS DELAY_POOLS FOLLOW_XFF TP_PF WCCP WCCPV2 FS_AUFS HTCP ICAP ICMP IDENT IPV6 KQUEUE LARGEFILE SSL SSL_CRTD</build_options>
 		<config_file>https://packages.pfsense.org/packages/config/squid3/34/squid.xml</config_file>
 		<configurationfile>squid.xml</configurationfile>
 		<depends_on_package_pbi>squid-3.4.9_1-##ARCH##.pbi</depends_on_package_pbi>
