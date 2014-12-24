@@ -35,7 +35,8 @@
 
 	define('NUT_RCFILE', '/usr/local/etc/rc.d/nut.sh');
 
-	if (substr(trim(file_get_contents("/etc/version")),0,3) == "2.0") {
+	$pfs_version = substr(trim(file_get_contents("/etc/version")),0,3);
+	if ($pfs_version == "2.0") {
 		define('NUT_DIR','/usr/local/etc/nut');
 	} else {
 		define('NUT_DIR', '/usr/pbi/nut-' . php_uname("m") . '/etc/nut');
@@ -222,6 +223,8 @@ EOD;
 	}
 
 	function sync_package_nut_local() {
+		global $pfs_version;
+
 		$name = nut_config('name');
 		$driver = nut_config_sub('driver', 2);
 		$port = nut_config('port');
@@ -278,6 +281,11 @@ EOD;
 			$upsd_users .= "upsmon master\n";
 		}
 
+		if ($pfs_version == "2.1")
+			$upsdrvctl = "/usr/local/libexec/nut/upsdrvctl";
+		else
+			$upsdrvctl = "/usr/local/sbin/upsdrvctl";
+
 		/* upsmon.conf */
 		$upsmon_conf = <<<EOD
 MONITOR {$name}@localhost 1 monuser {$password} master
@@ -300,7 +308,7 @@ EOD;
 	fi
 	if [ `pgrep {$driver} | wc -l` != 0 ]; then
 		echo stopping {$driver}
-		/usr/local/libexec/nut/upsdrvctl stop
+		{$upsdrvctl} stop
 	fi
 	sleep 1
 	if [ `pgrep {$driver} | wc -l` != 0 ]; then
@@ -319,7 +327,7 @@ if [ `pgrep {$driver} | wc -l` != 0 ]; then
 	fi
 	{$port_set}
 	echo starting {$driver}
-	if /usr/local/libexec/nut/upsdrvctl start; then
+	if {$upsdrvctl} start; then
 		echo starting upsd
 		/usr/local/sbin/upsd {$ovr_user}
 		echo starting upsmon
@@ -394,6 +402,11 @@ EOD;
 			$upsd_users .= "upsmon master\n";
 		}
 
+		if ($pfs_version == "2.1")
+			$upsdrvctl = "/usr/local/libexec/nut/upsdrvctl";
+		else
+			$upsdrvctl = "/usr/local/sbin/upsdrvctl";
+
 		/* upsmon.conf */
 		$upsmon_conf = <<<EOD
 MONITOR {$name}@localhost 1 monuser {$password} master
@@ -416,7 +429,7 @@ EOD;
 	fi
 	if [ `pgrep {$driver} | wc -l` != 0 ]; then
 		echo stopping {$driver}
-		/usr/local/libexec/nut/upsdrvctl stop
+		{$upsdrvctl} stop
 	fi
 	sleep 1
 	if [ `pgrep {$driver} | wc -l` != 0 ]; then
@@ -435,7 +448,7 @@ if [ `pgrep {$driver} | wc -l` != 0 ]; then
 	fi
 	{$port_set}
 	echo starting {$driver}
-	if /usr/local/libexec/nut/upsdrvctl start; then
+	if {$upsdrvctl} start; then
 		echo starting upsd
 		/usr/local/sbin/upsd {$ovr_user}
 		echo starting upsmon
