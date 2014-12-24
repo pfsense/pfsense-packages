@@ -167,9 +167,7 @@ function sync_package_apcupsd(){
 		$apcupsd_start .= "	if [ ! -d {$lockfile} ]; then \n";
 		$apcupsd_start .= "		/bin/mkdir -p {$lockfile} \n";
 		$apcupsd_start .= "	fi \n";
-		$apcupsd_start .= "	for X in $(/bin/ls {$lockfile} | /usr/bin/grep LCK); do \n";
-		$apcupsd_start .= "		/bin/rm -f {$lockfile}/\${X} \n";
-		$apcupsd_start .= "	done \n";
+		$apcupsd_start .= "	/bin/rm -f {$lockfile}/*LCK* 2>/dev/null \n";
 		if ($apcupsd_config['killonpowerfail']=="on"){
 			$apcupsd_start .= "	" . APCUPSD_BASE . "/sbin/apcupsd --kill-on-powerfail";
 		}else{
