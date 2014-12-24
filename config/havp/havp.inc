@@ -1702,7 +1702,7 @@ function havp_get_av_viruslog()
         $log   = explode("\n", $log);
         $count = 0;
         foreach($log as $ln) {
-            if (substr_count(strtolower($ln), "virus clamd:"))
+            if (substr_count(strtolower($ln), "virus clam"))
                 $s[] = $ln;
         }
     }
@@ -1716,7 +1716,7 @@ function havp_get_av_statistic()
     if (file_exists(HVDEF_HAVP_ACCESSLOG)) {
         $log   = file_get_contents(HVDEF_HAVP_ACCESSLOG);
 
-        $count = substr_count(strtolower($log), "virus clamd:");
+        $count = substr_count(strtolower($log), "virus clam");
         $s     = "Found $count viruses (total).";
     }
 
