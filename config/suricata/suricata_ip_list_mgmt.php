@@ -101,11 +101,14 @@ if ($_POST['save']) {
 
 		/* Toggle cron task for ET IQRisk updates if setting was changed */
 		if ($config['installedpackages']['suricata']['config'][0]['et_iqrisk_enable'] == 'on' && !suricata_cron_job_exists("/usr/local/pkg/suricata/suricata_etiqrisk_update.php")) {
-			include("/usr/local/pkg/suricata/suricata_etiqrisk_update.php");
 			install_cron_job("/usr/bin/nice -n20 /usr/local/bin/php -f /usr/local/pkg/suricata/suricata_etiqrisk_update.php", TRUE, 0, 0, "*", "*", "*", "root");
 		}
 		elseif ($config['installedpackages']['suricata']['config'][0]['et_iqrisk_enable'] == 'off' && suricata_cron_job_exists("/usr/local/pkg/suricata/suricata_etiqrisk_update.php"))
 			install_cron_job("/usr/local/pkg/suricata/suricata_etiqrisk_update.php", FALSE);
+
+		/* Peform a manual ET IQRisk file check/download */
+		if ($config['installedpackages']['suricata']['config'][0]['et_iqrisk_enable'] == 'on')
+			include("/usr/local/pkg/suricata/suricata_etiqrisk_update.php");
 	}
 }
 
