@@ -106,9 +106,9 @@ function suricata_check_iprep_md5($filename) {
 
 	if (download_file("{$et_iqrisk_url}{$filename}.md5sum", "{$iqRisk_tmppath}{$filename}.md5") == true) {
 		if (file_exists("{$iqRisk_tmppath}{$filename}.md5"))
-			$new_md5 = file_get_contents("{$iqRisk_tmppath}{$filename}.md5");
+			$new_md5 = trim(file_get_contents("{$iqRisk_tmppath}{$filename}.md5"));
 		if (file_exists("{$iprep_path}{$filename}.md5"))
-			$old_md5 = file_get_contents("{$iprep_path}{$filename}.md5");
+			$old_md5 = trim(file_get_contents("{$iprep_path}{$filename}.md5"));
 		if ($new_md5 != $old_md5)
 			return TRUE;
 		else
@@ -156,8 +156,8 @@ if (suricata_check_iprep_md5("categories.txt")) {
 		// If the files downloaded successfully, unpack them and store
 		// the list files in the SURICATA_IPREP_PATH directory.
 		if (file_exists("{$iqRisk_tmppath}categories.txt") && file_exists("{$iqRisk_tmppath}categories.txt.md5")) {
-			$new_md5 = file_get_contents("{$iqRisk_tmppath}categories.txt.md5");
-			if ($new_md5 == trim(md5_file("{$iqRisk_tmppath}categories.txt"))) {
+			$new_md5 = trim(file_get_contents("{$iqRisk_tmppath}categories.txt.md5"));
+			if ($new_md5 == md5_file("{$iqRisk_tmppath}categories.txt")) {
 				@rename("{$iqRisk_tmppath}categories.txt", "{$iprep_path}categories.txt");
 				@rename("{$iqRisk_tmppath}categories.txt.md5", "{$iprep_path}categories.txt.md5");
 				$success = TRUE;
@@ -179,8 +179,8 @@ if (suricata_check_iprep_md5("iprepdata.txt.gz")) {
 		// If the files downloaded successfully, unpack them and store
 		// the list files in the SURICATA_IPREP_PATH directory.
 		if (file_exists("{$iqRisk_tmppath}iprepdata.txt.gz") && file_exists("{$iqRisk_tmppath}iprepdata.txt.gz.md5")) {
-			$new_md5 = file_get_contents("{$iqRisk_tmppath}iprepdata.txt.gz.md5");
-			if ($new_md5 == trim(md5_file("{$iqRisk_tmppath}iprepdata.txt.gz"))) {
+			$new_md5 = trim(file_get_contents("{$iqRisk_tmppath}iprepdata.txt.gz.md5"));
+			if ($new_md5 == md5_file("{$iqRisk_tmppath}iprepdata.txt.gz")) {
 				mwexec("/usr/bin/gunzip -f {$iqRisk_tmppath}iprepdata.txt.gz");
 				@rename("{$iqRisk_tmppath}iprepdata.txt", "{$iprep_path}iprepdata.txt");
 				@rename("{$iqRisk_tmppath}iprepdata.txt.gz.md5", "{$iprep_path}iprepdata.txt.gz.md5");
