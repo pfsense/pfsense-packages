@@ -185,8 +185,7 @@
 				<field>
 					<fielddescr>Logging serverity</fielddescr>
 					<fieldname>log_severity</fieldname>
-					<description><![CDATA[Choose logging levels for selected categories.<BR>
-								use CTRL+click to select/unselect.<br>
+					<description><![CDATA[Choose logging level for selected categories.<BR>
 								The value 'dynamic' means assume the global level defined by either the command line parameter -d or by running rndc trace.]]></description>
 					<type>select</type>
 						<options>
