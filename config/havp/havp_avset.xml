@@ -23,6 +23,10 @@
                         <url>/pkg_edit.php?xml=havp_avset.xml&amp;id=0</url>
                         <active/>
                 </tab>
+                <tab>
+                        <text>Log</text>
+                        <url>/havp_log.php</url>
+                </tab>
         </tabs>
         <fields>
                 <field>
