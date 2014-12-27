@@ -48,7 +48,8 @@ if(!function_exists("filter_configure"))
 define('HV_DEBUG',             'false');
 
 # use Clamd daemon (another - use libclam)
-define('HV_USE_CLAMD',         'true');
+$use_clamd_mode = $config['installedpackages']['havp']['config'][0]['use_clamd'];
+define('HV_USE_CLAMD',         $use_clamd_mode);
 define('HV_CLAMD_TCPSOCKET',   'true');
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
