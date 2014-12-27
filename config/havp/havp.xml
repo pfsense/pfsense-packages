@@ -69,7 +69,7 @@
                 </field>
                 <field>
                         <fielddescr>ClamAV mode</fielddescr>
-                        <fieldname>use_clamd</fieldname>
+                        <fieldname>useclamd</fieldname>
                         <description>
                             Select ClamAV running mode:&lt;br&gt;
                             &lt;b&gt;Daemon&lt;/b&gt; - HAVP will use ClamAV as socket scanner daemon. Default option.&lt;br&gt;
