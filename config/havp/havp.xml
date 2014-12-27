@@ -74,7 +74,6 @@
                             Select ClamAV running mode:&lt;br&gt;
                             &lt;b&gt;Daemon&lt;/b&gt; - HAVP will use ClamAV as socket scanner daemon. Default option.&lt;br&gt;
                             &lt;b&gt;Library&lt;/b&gt; - HAVP will use ClamAV as loaded library scanner. Note: this mode needs much more memory.&lt;br&gt;
-                            Attention: In order to switch mode properly, you need to save settings twice. Since don`t know why, simply save twice.
                         </description>
                         <type>select</type>
                         <default_value>true</default_value>
