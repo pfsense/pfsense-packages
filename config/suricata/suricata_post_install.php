@@ -112,6 +112,10 @@ safe_mkdir(SURICATALOGDIR);
 safe_mkdir(SURICATA_SID_MODS_PATH);
 safe_mkdir(SURICATA_IPREP_PATH);
 
+// Make sure config variable is an array
+if (!is_array($config['installedpackages']['suricata']['config'][0]))
+	$config['installedpackages']['suricata']['config'][0] = array();
+
 // Download the latest GeoIP DB updates and create cron task if the feature is not disabled
 if ($config['installedpackages']['suricata']['config'][0]['autogeoipupdate'] != 'off') {
 	log_error(gettext("[Suricata] Installing free GeoIP country database files..."));
