@@ -41,6 +41,7 @@
 require_once("config.inc");
 require_once("functions.inc");
 require_once("/usr/local/pkg/suricata/suricata.inc");
+require("/usr/local/pkg/suricata/suricata_defs.inc");
 
 /*************************************************************************
  * Hack for backwards compatibility with older 2.1.x pfSense versions    *
@@ -101,8 +102,9 @@ function suricata_check_iprep_md5($filename) {
 	/*           error occurred.                              */
 	/**********************************************************/
 
-	global $et_iqrisk_url, $iqRisk_tmppath, $iprep_path;
+	global $iqRisk_tmppath, $iprep_path;
 	$new_md5 = $old_md5 = "";
+	$et_iqrisk_url = str_replace("_xxx_", $config['installedpackages']['suricata']['config'][0]['iqrisk_code'], ET_IQRISK_DNLD_URL);
 
 	if (download_file("{$et_iqrisk_url}{$filename}.md5sum", "{$iqRisk_tmppath}{$filename}.md5") == true) {
 		if (file_exists("{$iqRisk_tmppath}{$filename}.md5"))
@@ -115,7 +117,7 @@ function suricata_check_iprep_md5($filename) {
 			log_error(gettext("[Suricata] IPREP file '{$filename}' is up to date."));
 	}
 	else
-		log_error(gettext("[Suricata] An error occurred downloading {$filename}.md5sum for IPREP.  Update of {$filename} file will be skipped."));
+		log_error(gettext("[Suricata] An error occurred downloading {$et_iqrisk_url}{$filename}.md5sum for IPREP.  Update of {$filename} file will be skipped."));
 
 	return FALSE;
 }
@@ -127,6 +129,9 @@ global $g, $config;
 $iprep_path = SURICATA_IPREP_PATH;
 $iqRisk_tmppath = "{$g['tmp_path']}/IQRisk/";
 $success = FALSE;
+
+if (!is_array($config['installedpackages']['suricata']['config'][0]))
+	$config['installedpackages']['suricata']['config'][0] = array();
 
 // If auto-updates of ET IQRisk are disabled, then exit
 if ($config['installedpackages']['suricata']['config'][0]['et_iqrisk_enable'] == "off")
