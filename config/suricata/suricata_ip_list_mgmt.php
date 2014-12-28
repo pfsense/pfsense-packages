@@ -290,7 +290,9 @@ if ($savemsg)
 								height="17" border="0" title="<?php echo gettext('Import/Upload an IP List');?>"/></th>
 							</tr>
 						</thead>
-					<?php foreach ($ipfiles as $file): ?>
+					<?php foreach ($ipfiles as $file): 
+						if (substr(strrchr($file, "."), 1) == "md5")
+							continue; ?>
 						<tr>
 							<td class="listr"><?php echo gettext($file); ?></td>
 							<td class="listr"><?=date('M-d Y g:i a', filemtime("{$iprep_path}{$file}")); ?></td>
