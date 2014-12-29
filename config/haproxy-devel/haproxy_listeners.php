@@ -184,8 +184,9 @@ include("head.inc");
 					if ($isadvset)
 						echo "<img src=\"$img_adv\" title=\"" . gettext("Advanced settings set") . ": {$isadvset}\" border=\"0\" />";
 					
+					$backend_serverpool_hint = "";
 					$backend_serverpool = $frontend['backend_serverpool'];
-					$backend = get_backend($backend_serverpool );
+					$backend = get_backend($backend_serverpool);
 					if ($backend && is_array($backend['ha_servers']) && is_array($backend['ha_servers']['item'])){
 						$servers = $backend['ha_servers']['item'];
 						$backend_serverpool_hint = gettext("Servers in pool:");

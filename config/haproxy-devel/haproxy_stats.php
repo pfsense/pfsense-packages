@@ -32,6 +32,10 @@ require_once("haproxy_socketinfo.inc");
 
 $pconfig = $config['installedpackages']['haproxy'];
 if (isset($_GET['haproxystats']) || isset($_GET['scope']) || (isset($_POST) && isset($_POST['action']))){
+	if (!(isset($pconfig['enable']) && $pconfig['localstatsport'] && is_numeric($pconfig['localstatsport']))){
+		print 'In the "Settings" configure a internal stats port and enable haproxy for this to be functional. Also make sure the service is running.';
+		return;
+	}
 	$fail = false;
 	try{
 		$request = "";
@@ -78,48 +82,6 @@ if (!is_array($config['installedpackages']['haproxy']['ha_backends']['item'])) {
 	$config['installedpackages']['haproxy']['ha_backends']['item'] = array();
 }
 $a_frontend = &$config['installedpackages']['haproxy']['ha_backends']['item'];
-
-function haproxy_add_stats_example() {
-	global $config, $d_haproxyconfdirty_path;
-	$a_backends = &$config['installedpackages']['haproxy']['ha_pools']['item'];
-	$a_frontends = &$config['installedpackages']['haproxy']['ha_backends']['item'];
-	$webcert = haproxy_find_create_certificate("HAProxy stats default");
-	
-	$backend = array();
-	$backend["name"] = "HAProxy_stats_ssl_backend";
-	$backend["stats_enabled"] = "yes";
-	$backend["stats_uri"] = "/";
-	$backend["stats_refresh"] = "10";
-	$a_backends[] = $backend;
-	$changecount++;
-	
-	$frontend = array();
-	$frontend["name"] = "HAProxy_stats_ssl_frontend";
-	$frontend["status"] = "active";
-	$frontend["type"] = "http";
-	$frontend["port"] = "444";
-	$frontend["extaddr"] = "lan_ipv4";
-	$frontend["ssloffload"] = "yes";
-	$frontend["ssloffloadcert"] = $webcert['refid'];
-	$frontend["backend_serverpool"] = $backend["name"];
-	$a_frontends[] = $frontend;
-	$changecount++;
-	$changedesc = "add new HAProxy stats example";
-	
-	if ($changecount > 0) {
-		echo "touching: $d_haproxyconfdirty_path";
-		touch($d_haproxyconfdirty_path);
-		write_config($changedesc);
-	}
-}
-	
-if (isset($_GET['add_stats_example'])) {
-	haproxy_add_stats_example();
-	write_config();
-	touch($d_haproxyconfdirty_path);
-	header("Location: haproxy_listeners.php");
-	exit;
-}
 
 if ($_POST) {
 	if ($_POST['apply']) {
@@ -177,26 +139,11 @@ echo "</td>";
 			<br/>
 			As the page is forwarded through the pfSense gui, this might cause some functionality to not work.<br/>
 			Though the normal haproxy stats page can be tweaked more, and doesn't use a user/pass from pfSense itself.<br/>
-			Some examples are configurable automatic page refresh,<br/>
-			only showing certain servers, not providing admin options, and can be accessed from wherever the associated frontend is accessible.(as long as rules permit access)<br/>
-			To use this or for simply an example how to use SSL-offloading configure stats on either a real backend while utilizing the 'stats uri'.
-			Or create a backend specifically for serving stats, for that you can start with  the 'stats example' template below.<br/>
+			Some examples are configurable automatic page refresh, only showing certain servers, not providing admin options,<br/>
+			and can be accessed from wherever the associated frontend is accessible.(as long as rules permit access)<br/>
+			To use this or for simply an example how to use SSL-offloading configure stats on either a real backend while utilizing the 'stats uri'.<br/>
+			Or create a backend specifically for serving stats, for that you can start with  the 'stats example' from the template tab.<br/>
 		</td>
-		</tr>
-		<tr>
-			<td>&nbsp;</td>
-		</tr>
-		<tr>
-			<td colspan="2" valign="top" class="listtopic">Stats example template</td>
-		</tr>
-		<tr>
-			<td width="22%" valign="top" class="vncell">Example</td>
-			<td class="vtable">
-				As an basic example you can use the link below to create a 'stats' frontend/backend page which offers with more options like setting user/password and 'admin mode' when you go to the backend settings.<br/>
-				<a href="haproxy_stats.php?add_stats_example=1">TEMPLATE: Create stats example configuration using a frontend/backend combination with ssl</a><br/>
-				<br/>
-				After applying the changes made by the template use this link to visit the stats page: <a target="_blank" href="https://<?=get_interface_ip("lan");?>:444">https://pfSense-LAN-ip:444/</a>
-			</td>
 		</tr>
 		<tr>
 			<td>&nbsp;</td>
@@ -241,7 +188,7 @@ echo "</td>";
 			<iframe id="frame_haproxy_stats" width="1000px" height="1500px" seamless=1 src="/haproxy_stats.php?haproxystats=1<?=$request;?>"></iframe>
 		<? } else { ?>
 			<br/>
-			In the "Settings" configure a internal stats port and enable haproxy for this to be functional.<br/>
+			In the "Settings" configure a internal stats port and enable haproxy for this to be functional. Also make sure the service is running.<br/>
 			<br/>
 		<? } ?>
 <?}?>		
