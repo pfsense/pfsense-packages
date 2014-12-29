@@ -112,6 +112,10 @@ safe_mkdir(SURICATALOGDIR);
 safe_mkdir(SURICATA_SID_MODS_PATH);
 safe_mkdir(SURICATA_IPREP_PATH);
 
+// Make sure config variable is an array
+if (!is_array($config['installedpackages']['suricata']['config'][0]))
+	$config['installedpackages']['suricata']['config'][0] = array();
+
 // Download the latest GeoIP DB updates and create cron task if the feature is not disabled
 if ($config['installedpackages']['suricata']['config'][0]['autogeoipupdate'] != 'off') {
 	log_error(gettext("[Suricata] Installing free GeoIP country database files..."));
@@ -123,7 +127,7 @@ if ($config['installedpackages']['suricata']['config'][0]['autogeoipupdate'] != 
 if ($config['installedpackages']['suricata']['config'][0]['et_iqrisk_enable'] == 'on') {
 	log_error(gettext("[Suricata] Installing Emerging Threats IQRisk IP List..."));
 	include("/usr/local/pkg/suricata/suricata_etiqrisk_update.php");
-	install_cron_job("/usr/bin/nice -n20 /usr/local/bin/php -f /usr/local/pkg/suricata/suricata_etiqrisk_update.php", TRUE, 0, 0, "*", "*", "*", "root");
+	install_cron_job("/usr/bin/nice -n20 /usr/local/bin/php -f /usr/local/pkg/suricata/suricata_etiqrisk_update.php", TRUE, 0, "*/6", "*", "*", "*", "root");
 }
 
 // remake saved settings if previously flagged
@@ -254,8 +258,8 @@ if (empty($config['installedpackages']['suricata']['config'][0]['forcekeepsettin
 conf_mount_ro();
 
 // Update Suricata package version in configuration
-$config['installedpackages']['suricata']['config'][0]['suricata_config_ver'] = "2.1";
-write_config("Suricata pkg v2.1: post-install configuration saved.");
+$config['installedpackages']['suricata']['config'][0]['suricata_config_ver'] = "2.1.2";
+write_config("Suricata pkg v2.1.2: post-install configuration saved.");
 
 // Done with post-install, so clear flag
 unset($g['suricata_postinstall']);

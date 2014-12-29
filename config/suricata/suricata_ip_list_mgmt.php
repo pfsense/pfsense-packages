@@ -101,11 +101,14 @@ if ($_POST['save']) {
 
 		/* Toggle cron task for ET IQRisk updates if setting was changed */
 		if ($config['installedpackages']['suricata']['config'][0]['et_iqrisk_enable'] == 'on' && !suricata_cron_job_exists("/usr/local/pkg/suricata/suricata_etiqrisk_update.php")) {
-			include("/usr/local/pkg/suricata/suricata_etiqrisk_update.php");
-			install_cron_job("/usr/bin/nice -n20 /usr/local/bin/php -f /usr/local/pkg/suricata/suricata_etiqrisk_update.php", TRUE, 0, 0, "*", "*", "*", "root");
+			install_cron_job("/usr/bin/nice -n20 /usr/local/bin/php -f /usr/local/pkg/suricata/suricata_etiqrisk_update.php", TRUE, 0, "*/6", "*", "*", "*", "root");
 		}
 		elseif ($config['installedpackages']['suricata']['config'][0]['et_iqrisk_enable'] == 'off' && suricata_cron_job_exists("/usr/local/pkg/suricata/suricata_etiqrisk_update.php"))
 			install_cron_job("/usr/local/pkg/suricata/suricata_etiqrisk_update.php", FALSE);
+
+		/* Peform a manual ET IQRisk file check/download */
+		if ($config['installedpackages']['suricata']['config'][0]['et_iqrisk_enable'] == 'on')
+			include("/usr/local/pkg/suricata/suricata_etiqrisk_update.php");
 	}
 }
 
@@ -287,7 +290,9 @@ if ($savemsg)
 								height="17" border="0" title="<?php echo gettext('Import/Upload an IP List');?>"/></th>
 							</tr>
 						</thead>
-					<?php foreach ($ipfiles as $file): ?>
+					<?php foreach ($ipfiles as $file): 
+						if (substr(strrchr($file, "."), 1) == "md5")
+							continue; ?>
 						<tr>
 							<td class="listr"><?php echo gettext($file); ?></td>
 							<td class="listr"><?=date('M-d Y g:i a', filemtime("{$iprep_path}{$file}")); ?></td>
