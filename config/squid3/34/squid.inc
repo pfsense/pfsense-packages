@@ -1698,6 +1698,11 @@ function squid_resync_auth() {
 			$conf .="http_access deny sglog\n";
 	}
 	if ($auth_method == 'none'  ) {
+		// SSL interception acl options part 2 without authentication
+		if ($settingsconfig['ssl_proxy'] == "on"){
+			$conf .= "always_direct allow all\n";
+			$conf .= "ssl_bump server-first all\n";
+			}
 		$conf .="# Setup allowed acls\n";
 		$allowed = array('allowed_subnets');
 		if ($settingsconfig['allow_interface'] == 'on') {

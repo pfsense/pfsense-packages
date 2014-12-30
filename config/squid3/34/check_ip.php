@@ -3,7 +3,7 @@
 /* $Id$ */
 /*
 	check_ip.php
-	Copyright (C) 2013-2014 Marcello Coutinho
+	Copyright (C) 2013-2015 Marcello Coutinho
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
@@ -27,6 +27,7 @@
 	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 	POSSIBILITY OF SUCH DAMAGE.
 */
+require_once("config.inc");
 error_reporting(0);
 // stdin loop
 if (! defined(STDIN)) {
@@ -39,40 +40,24 @@ while( !feof(STDIN)){
         $line = trim(fgets(STDIN));
         // %SRC
 
-$pf_version=substr(trim(file_get_contents("/etc/version")),0,3);
 unset($cp_db);
-if ($pf_version > 2.0){
-	$dir="/var/db";
-	$files=scandir($dir);
-	foreach ($files as $file){
-		if (preg_match("/captive.*db/",$file)){
-			$dbhandle = sqlite_open("$dir/$file", 0666, $error);
-			if ($dbhandle){
-				$query = "select * from captiveportal";
-				$result = sqlite_array_query($dbhandle, $query, SQLITE_ASSOC);
-				if ($result){
-					foreach ($result as $rownum => $row){
-						$cp_db[$rownum]=implode(",",$row);
-						}
-					sqlite_close($dbhandle);
-					}
-				}
+$files=scandir($g['vardb_path']);
+foreach ($files as $file){
+	if (preg_match("/captive.*db/",$file)){
+		$result=squid_cp_read_db("{$g['vardb_path']}/{$file}");
+		foreach ($result as $rownum => $row){
+			$cp_db[$rownum]=implode(",",$row);
 			}
-        }
+		}
 	}
-else{
-       $filename="/var/db/captiveportal.db";
-       if (file_exists($filename))
-        	$cp_db=file($filename);
-}
 
         $usuario="";
-        // 1376630450,2,172.16.3.65,00:50:56:9c:00:c7,admin,e1779ea20d0a11c7,,,,
+        //1419045939,1419045939,2000,2000,192.168.10.11,192.168.10.11,08:00:27:5c:e1:ee,08:00:27:5c:e1:ee,marcello,marcello,605a1f46e2d64556,605a1f46e2d64556,,,,,,,,,,,first,first
         if (is_array($cp_db)){
 	        foreach ($cp_db as $cpl){
 	        	$fields=explode(",",$cpl);
-	        	if ($fields[2] != "" && $fields[2]==$line)
-	        		$usuario=$fields[4];
+	        	if ($fields[4] != "" && $fields[4]==$line)
+	        		$usuario=$fields[8];
 	        }
         }
         if ($usuario !="")
@@ -82,5 +67,22 @@ else{
         fwrite (STDOUT, "{$resposta}\n");
         unset($cp_db);
 }
+
+/* read captive portal DB into array */
+function squid_cp_read_db($file) {
+	$cpdb = array();
+	$DB = new SQLite3($file);
+	if ($DB) {
+		$response = $DB->query("SELECT * FROM captiveportal");
+		if ($response != FALSE) {
+			while ($row = $response->fetchArray())
+				$cpdb[] = $row;
+		}
+		$DB->close();
+	}
+
+	return $cpdb;
+}
+
 ?>
 
