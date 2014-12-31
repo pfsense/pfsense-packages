@@ -905,11 +905,11 @@
 		<internal_name>squid</internal_name>
 		<descr><![CDATA[High performance web proxy cache.<br />
 			It combines squid as a proxy server with its capabilities of acting as a HTTP / HTTPS reverse proxy.<br />
-			It includes an Exchange-Web-Access (OWA) Assistant.]]></descr>
+			It includes an Exchange-Web-Access (OWA) Assistant, ssl filtering and antivirus integration via i-cap]]></descr>
 		<pkginfolink>https://forum.pfsense.org/index.php/topic,48347.0.html</pkginfolink>
 		<website>http://www.squid-cache.org/</website>
 		<category>Network</category>
-		<version>3.4.10_2 pkg 0.2</version>
+		<version>3.4.10_2 pkg 0.2.1</version>
 		<status>beta</status>
 		<required_version>2.2</required_version>
 		<maintainer>marcellocoutinho@gmail.com fernando@netfilter.com.br seth.mos@dds.nl mfuchs77@googlemail.com jimp@pfsense.org</maintainer>
@@ -918,7 +918,7 @@
 			<port>www/squid</port>
 			<ports_after>www/squid_radius_auth security/clamav www/squidclamav security/ca_root_nss www/c-icap-modules</ports_after>
 		</build_pbi>
-		<build_options>c-icap_UNSET_FORCE=IPV6;squid_UNSET_FORCE=AUTH_SMB AUTH_SQL DNS_HELPER FS_COSS ESI SNMP ECAP STACKTRACES STRICT_HTTP TP_IPF TP_IPFW VIA_DB DEBUG DOCS EXAMPLES AUTH_SASL;squid_SET_FORCE=ARP_ACL AUTH_KERB AUTH_LDAP AUTH_NIS CACHE_DIGESTS DELAY_POOLS FOLLOW_XFF TP_PF WCCP WCCPV2 FS_AUFS HTCP ICAP ICMP IDENT IPV6 KQUEUE LARGEFILE SSL SSL_CRTD</build_options>
+		<build_options>squid_UNSET_FORCE=AUTH_SASL AUTH_SMB AUTH_SQL DEBUG  DNS_HELPER  ESI FS_ROCK TP_IPF NETTLE  STACKTRACES VIA_DB  DOCS EXAMPLES;squid_SET_FORCE=ARP_ACL AUTH_KERB AUTH_LDAP AUTH_NIS DELAY_POOLS ECAP FOLLOW_XFF FS_AUFS FS_DISKD HTCP ICAP ICMP IDENT IPV6 KQUEUE LARGEFILE SNMP SSL SSL_CRTD LAX_HTTP TP_IPFW TP_PF WCCP WCCPV2 CACHE_DIGESTS</build_options>
 		<config_file>https://packages.pfsense.org/packages/config/squid3/34/squid.xml</config_file>
 		<configurationfile>squid.xml</configurationfile>
 		<depends_on_package_pbi>squid-3.4.10_2-##ARCH##.pbi</depends_on_package_pbi>
