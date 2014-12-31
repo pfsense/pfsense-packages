@@ -630,7 +630,7 @@ function haproxy_find_acl($name) {
 function write_backend($configpath, $fd, $name, $pool, $frontend) {
 	if(!is_array($pool['ha_servers']['item']) && !$pool['stats_enabled']=='yes')
 		return;
-	global $a_checktypes, $a_cookiemode, $a_files, $a_error;
+	global $a_checktypes, $a_cookiemode, $a_files_cache, $a_error;
 		
 	$a_servers = &$pool['ha_servers']['item'];
 	$frontendtype = $frontend['type'];
@@ -696,13 +696,13 @@ function write_backend($configpath, $fd, $name, $pool, $frontend) {
 
 		if (is_arrayset($pool,'errorfiles','item')) {
 			foreach($pool['errorfiles']['item'] as $errorfile) {
-				if (!is_array($a_files))// load only once
-					$a_files = haproxy_get_fileslist();
+				if (!is_array($a_files_cache))// load only once
+					$a_files_cache = haproxy_get_fileslist();
 				$file = $errorfile['errorfile'];
 				$errorcodes = explode(",",$errorfile['errorcode']);
 				foreach($errorcodes as $errorcode) {
 					$filename = "$configpath/errorfile_{$name}_{$errorcode}_{$file}";
-					$content = base64_decode($a_files[$file]['content']);
+					$content = base64_decode($a_files_cache[$file]['content']);
 					$content = str_replace('{errormsg}', $a_error[$errorcode]['descr'], $content);
 					$content = str_replace('{errorcode}', $errorcode, $content);
 					file_put_contents($filename, $content);
@@ -1285,6 +1285,7 @@ function haproxy_writeconf($configpath) {
 					$a_acl_combine[$name][] = $entry['ref'];
 				}
 				
+				$config_usebackend = "";
 				foreach ($a_acl_combine as $a_usebackend) {
 					$aclnames = "";
 					foreach ($a_usebackend as $entry) {
@@ -1308,7 +1309,7 @@ function haproxy_writeconf($configpath) {
 
 						$aclname = $i . "_" . $entry['name'];
 						$aclnames .= $aclname." ";
-						fwrite ($fd, "\tacl\t\t\t" . $aclname . "\t" . $expr . "\n");
+						$config_usebackend .= "\tacl\t\t\t" . $aclname . "\t" . $expr . "\n";
 						
 						if ($acl['inspect-delay'] != '')
 							$inspectdelay = $acl['inspect-delay'];
@@ -1317,16 +1318,19 @@ function haproxy_writeconf($configpath) {
 							$advancedextra[$acl['syntax']] = $acl['advancedoptions']."\n";
 						$i++;
 					}
-					fwrite ($fd, "\tuse_backend\t\t" . $poolname . " if " . $aclnames . "\n");
+					$config_usebackend .= "\tuse_backend\t\t" . $poolname . " if " . $aclnames . "\n";
 				}
 			}
-			if ($default_backend)
-				fwrite ($fd, "\tdefault_backend\t\t" . $default_backend . "\n");
-			
 			if ($inspectdelay > 0)
 				fwrite ($fd, "\ttcp-request inspect-delay\t" . $inspectdelay . "\n");
 			foreach($advancedextra as $extra)
 				fwrite ($fd, "\t".$extra."\n");
+
+			fwrite ($fd, $config_usebackend);
+			
+			if ($default_backend)
+				fwrite ($fd, "\tdefault_backend\t\t" . $default_backend . "\n");
+			
 			fwrite ($fd, "\n");
 		}
 	}
@@ -1755,7 +1759,7 @@ function haproxy_check_config() {
 		foreach($ipports as $ipport) {
 			$id = "{$ipport['addr']}:{$ipport['port']}";
 			if (isset($activefrontends[$id]))
-				$issues['P_'.$id] = "Multiple primary frontends with IP:Port \"$id\"";
+				$issues['P_'.$id] = "Multiple primary frontends with IP:Port \"$id\", use Shared-Frontends instead.";
 			else
 				$activefrontends[$id] = true;
 		}
