@@ -1259,6 +1259,7 @@ function haproxy_writeconf($configpath) {
 	
 			// Combine the rest of the frontend configs
 			$default_backend = "";
+			$config_usebackend = "";
 			$inspectdelay = 0;
 			$i = 0;
 			foreach ($bind['config'] as $frontend) {
@@ -1285,7 +1286,6 @@ function haproxy_writeconf($configpath) {
 					$a_acl_combine[$name][] = $entry['ref'];
 				}
 				
-				$config_usebackend = "";
 				foreach ($a_acl_combine as $a_usebackend) {
 					$aclnames = "";
 					foreach ($a_usebackend as $entry) {
