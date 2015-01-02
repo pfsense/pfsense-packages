@@ -59,7 +59,7 @@ function baculaclient_custom_php_deinstall_command(){
 	unlink_if_exists(BACULA_LOCALBASE."/etc/bacula-fd.conf");
 
 	// 2. Re-run sshd config generation script
-	exec("/usr/local/etc/rc.d/bacula-fd.sh stop");
+	exec(BACULA_LOCALBASE . "/etc/rc.d/bacula-fd.sh stop");
 	conf_mount_ro();
 }
 
@@ -67,11 +67,12 @@ function baculaclient_custom_php_write_config(){
 	global $g, $config;
 	conf_mount_rw();
 	//check config_file
-	$startup_file="/usr/local/etc/rc.d/bacula-fd";
+	$startup_file=BACULA_LOCALBASE . "/etc/rc.d/bacula-fd";
 	if (file_exists($startup_file)){
 		$startup_script=file_get_contents($startup_file);
 		$startup_script=preg_replace("/NO/","YES",$startup_script);
 		$startup_script=preg_replace("@/usr/local/etc/bacula-fd.conf@",BACULA_LOCALBASE."/etc/bacula-fd.conf",$startup_script);
+		$startup_script=preg_replace("@" . BACULA_LOCALBASE . "/etc/bacula/bacula-fd.conf@",BACULA_LOCALBASE."/etc/bacula-fd.conf",$startup_script);
 		file_put_contents("{$startup_file}.sh",$startup_script,LOCK_EX);
 		// Ensure bacula-fd has a+rx
 		exec("chmod a+rx {$startup_file}.sh");
@@ -111,7 +112,7 @@ function baculaclient_custom_php_write_config(){
 			}
 		$baculaclient_conf .= "FileDaemon { \n\t Name = {$LocalDirector}-fd #\n\t FDport = {$port}\n\t WorkingDirectory = /var/db/bacula\n\t Pid Directory = /var/run\n\tMaximum Concurrent Jobs = {$jobs}\n\t}\n";
 		file_put_contents(BACULA_LOCALBASE."/etc/bacula-fd.conf",$baculaclient_conf,LOCK_EX);
-		exec("/usr/local/etc/rc.d/bacula-fd.sh restart");
+		exec(BACULA_LOCALBASE . "/etc/rc.d/bacula-fd.sh restart");
 		// Mount Read-only
 		conf_mount_ro();
 		}
