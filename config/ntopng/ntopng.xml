@@ -182,8 +182,8 @@
 			$redis_path = "/usr/pbi/ntopng-" . php_uname("m") . "/bin";
 		}
 
-		$start = "ldconfig -m /usr/pbi/ntopng-i386/lib\n";
-		$start .= "\t{$redis_path}/redis-server &\n";
+		$start = "ldconfig -m /usr/pbi/ntopng-" . php_uname("m") . "/lib\n";
+		$start .= "\t{$redis_path}/redis-server --dir /var/db/ntopng/ --dbfilename ntopng.rdb &\n";
 		// TODO:
 		//  Add support for --data-dir /somewhere, --httpdocs-dir /somewhereelse,
 		//  --dump-timeline (on/off) --http-port, --https-port
@@ -207,6 +207,7 @@
 			$ntopng_config['password'] = "admin";
 		$password = md5($ntopng_config['password']);
 		mwexec_bg("{$redis_path}/redis-cli SET user.admin.password " . escapeshellarg($password));
+		mwexec_bg("{$redis_path}/redis-cli save");
 		conf_mount_ro();
 		config_unlock();
 	}

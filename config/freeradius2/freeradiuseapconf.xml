@@ -105,7 +105,7 @@
 		<field>
 			<fielddescr>Disable weak EAP types</fielddescr>
 			<fieldname>vareapconfdisableweakeaptypes</fieldname>
-			<description><![CDATA[Here you disable the weak EAP types MD5, GTC and LEAP. You should do this if you want that only stronger EAP types like TLS, TTLS, PEAP, MSCHAPv2 should be allowed. This option does not affect the "tunneled EAP sessions".]]></description>
+			<description><![CDATA[Here you can disable the weak EAP types MD5, GTC and LEAP. Check this to only allow stronger EAP types like TLS, TTLS, PEAP, MSCHAPv2 should be allowed. This option does not affect the "tunneled EAP sessions".]]></description>
 			<type>checkbox</type>
 		</field>
 		<field>
@@ -134,7 +134,7 @@
 		<field>
 			<fielddescr>Ignore Unknown EAP Types</fielddescr>
 			<fieldname>vareapconfignoreunknowneaptypes</fieldname>
-			<description><![CDATA[If the RADIUS does not know the EAP type it rejects it. If set to "yes" an other module <b>must</b> be configured to proxy the request to a further RADIUS server. (Default: no)]]></description>
+			<description><![CDATA[If the RADIUS server does not know the EAP type, it rejects it. If set to "yes" another module <b>must</b> be configured to proxy the request to a further RADIUS server. (Default: no)]]></description>
 			<type>select</type>
 			<default_value>no</default_value>
 					<options>
@@ -161,23 +161,23 @@
 			<default_value>4096</default_value>
 		</field>
 		<field>
-			<name>CERTIFICATES FOR TLS</name>
+			<name>Certificates for TLS</name>
 			<type>listtopic</type>
 		</field>
 		<field>
-			<fielddescr>Choose Cert-Manager</fielddescr>
+			<fielddescr>Choose Cert Manager</fielddescr>
 			<fieldname>vareapconfchoosecertmanager</fieldname>
 			<description><![CDATA[Choose your Cert manager. By default it is the freeradius cert manager because the server needs some default certs to start service. For more information take al look at "Certificates"-Tab.<br>
-									To use the firewall's built-in Cert Manager you have to create a CA and an Server Certificate first. (SYSTEM -> Cert Manager).<br><br>
-									<b>uncheked</b>: FreeRADIUS Cert-Manager (not recommended) (Default: unchecked)<br>
-									<b>cheked</b>: Firewall Cert-Manager (recommended)]]></description>
+									To use the firewall's built-in Certificate Manager you have to create a CA and an Server Certificate first. (SYSTEM -> Cert Manager).<br><br>
+									<b>unchecked</b>: FreeRADIUS Cert Manager (not recommended) (Default: unchecked)<br>
+									<b>checked</b>: Firewall Cert Manager (recommended)]]></description>
 			<type>checkbox</type>
 			<enablefields>ssl_ca_cert,ssl_ca_crl,ssl_server_cert</enablefields>
 		</field>
 		<field>
 			<fielddescr>Private Key Password</fielddescr>
 			<fieldname>vareapconfprivatekeypassword</fieldname>
-			<description><![CDATA[By default the certificates created by freeradius are protected with an "input/ouput" password from reading the certificate. The certificates created by the firewall's built-in Cert Manager are not protected so you must leave this field empty. (Default: whatever)]]></description>
+			<description><![CDATA[By default the certificates created by freeradius are protected with an "input/ouput" password from reading the certificate. The certificates created by the firewall's built-in Cert Manager are not protected so you must leave this field empty.]]></description>
 			<type>password</type>
 			<default_value>whatever</default_value>
 		</field>
@@ -306,7 +306,7 @@
 		
 		
 		<field>
-			<name>EAP-TLS - ENABLE CACHE</name>
+			<name>EAP-TLS - Enable Cache</name>
 			<type>listtopic</type>
 		</field>
 		<field>
@@ -334,7 +334,7 @@
 		<field>
 			<fielddescr>Max Entries</fielddescr>
 			<fieldname>vareapconfcachemaxentries</fieldname>
-			<description><![CDATA[The maximum number of entries in the cache.  Set to "0" for "infinite". This could be set to the number of users who are logged in... which can be a LOT. (Default: 255)]]></description>
+			<description><![CDATA[The maximum number of entries in the cache.  Set to "0" for "infinite." (Default: 255)]]></description>
 			<type>input</type>
 			<default_value>255</default_value>
 		</field>
@@ -470,7 +470,7 @@
 		<field>
 			<fielddescr>Microsoft Statement of Health (SoH) Support</fielddescr>
 			<fieldname>vareapconfpeapsohenable</fieldname>
-			<description><![CDATA[You can accept/reject clients if they have not actual windows updates and more. You need to change server-file for your needs. It cannot be changed from GUI and will be deleted after package (re)installation. (/usr/local/etc/raddb/sites-available/soh). (Default: no)]]></description>
+			<description><![CDATA[You can accept/reject clients based on Microsoft's Statement of Health, such as if they are missing Windows updates, don't have a firewall enabled, antivirus not in line with policy, etc. You need to change server-file for your needs. It cannot be changed from GUI and will be deleted after package reinstallation. (/usr/local/etc/raddb/sites-available/soh). (Default: no)]]></description>
 			<type>select</type>
 			<default_value>Disable</default_value>
 					<options>

@@ -2,7 +2,7 @@
 /*
 	postfix_view_config.php
 	part of pfSense (https://www.pfsense.org/)
-	Copyright (C) 2011-2013 Marcello Coutinho <marcellocoutinho@gmail.com>
+	Copyright (C) 2011-2014 Marcello Coutinho <marcellocoutinho@gmail.com>
 	based on varnish_view_config.
 	All rights reserved.
 
@@ -29,12 +29,12 @@
 */
 $shortcut_section = "postfix";
 require("guiconfig.inc");
-$pf_version=substr(trim(file_get_contents("/etc/version")),0,3);
-if ($pf_version > 2.0)
+if (is_dir('/usr/pbi/postfix-' . php_uname("m"))) {
 	define('POSTFIX_LOCALBASE', '/usr/pbi/postfix-' . php_uname("m"));
-else
-  define('POSTFIX_LOCALBASE','/usr/local');
-  
+} else {
+	define('POSTFIX_LOCALBASE','/usr/local');
+}
+
 function get_file($file){
 	$files['main']=POSTFIX_LOCALBASE."/etc/postfix/main.cf";
 	$files['master']=POSTFIX_LOCALBASE."/etc/postfix/master.cf";
@@ -59,22 +59,22 @@ else{
 	$pfSversion = str_replace("\n", "", file_get_contents("/etc/version"));
 	if ($pf_version < 2.0)
 		$one_two = true;
-	
+
 	$pgtitle = "Services: Postfix View Configuration";
 	include("head.inc");
-	
+
 	?>
 	<body link="#0000CC" vlink="#0000CC" alink="#0000CC">
 	<?php include("fbegin.inc"); ?>
-	
+
 	<?php if($one_two): ?>
 	<p class="pgtitle"><?=$pgtitle?></font></p>
 	<?php endif; ?>
-	
+
 	<?php if ($savemsg) print_info_box($savemsg); ?>
-	
+
 	<form action="postfix_view_config.php" method="post">
-		
+
 	<div id="mainlevel">
 		<table width="100%" border="0" cellpadding="0" cellspacing="0">
 			<tr><td>
@@ -117,7 +117,7 @@ else{
 								<tr>
 	     						<td class="tabcont" >
 	     						<div id="file_div"></div>
-									
+
 								</td>
 							</tr>
 						</table>
@@ -153,8 +153,8 @@ else{
 			scroll(0,0);
 		}
 	</script>
-	<?php 
-	include("fend.inc"); 
+	<?php
+	include("fend.inc");
 	}
 	?>
 	</body>

@@ -55,6 +55,10 @@
                         <text>Settings</text>
                         <url>/pkg_edit.php?xml=havp_avset.xml&amp;id=0</url>
                 </tab>
+                <tab>
+                        <text>Log</text>
+                        <url>/havp_log.php</url>
+                </tab>
         </tabs>
         <fields>
                 <field>
@@ -62,6 +66,21 @@
                         <fieldname>enable</fieldname>
                         <description>Check this for enable proxy.</description>
                         <type>checkbox</type>
+                </field>
+                <field>
+                        <fielddescr>ClamAV mode</fielddescr>
+                        <fieldname>useclamd</fieldname>
+                        <description>
+                            Select ClamAV running mode:&lt;br&gt;
+                            &lt;b&gt;Daemon&lt;/b&gt; - HAVP will use ClamAV as socket scanner daemon. Default option.&lt;br&gt;
+                            &lt;b&gt;Library&lt;/b&gt; - HAVP will use ClamAV as loaded library scanner. Note: this mode needs much more memory.&lt;br&gt;
+                        </description>
+                        <type>select</type>
+                        <default_value>true</default_value>
+                        <options>
+                                 <option><value>true</value><name>Daemon</name></option>
+                                 <option><value>false</value><name>Library</name></option>
+                        </options>
                 </field>
                 <field>
                         <fielddescr>Proxy mode</fielddescr>

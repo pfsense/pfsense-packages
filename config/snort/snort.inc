@@ -36,9 +36,8 @@ require_once("config.inc");
 require_once("functions.inc");
 require_once("service-utils.inc");
 require_once("pkg-utils.inc");
-
-// Needed on 2.0 because of filter_get_vpns_list()
 require_once("filter.inc");
+require("/usr/local/pkg/snort/snort_defs.inc");
 
 // Snort GUI needs some extra PHP memory space to manipulate large rules arrays
 ini_set("memory_limit", "256M");
@@ -48,46 +47,11 @@ global $g, $config, $rebuild_rules, $pfSense_snort_version;
 
 // Grab the Snort binary version programmatically, but if that fails use a safe default
 $snortver = array();
-exec("/usr/local/bin/snort -V 2>&1 |/usr/bin/grep Version | /usr/bin/cut -c20-26", $snortver);
-
-/* Used to indicate latest version of this include file has been loaded */
-$pfSense_snort_version = "3.1.4";
+$snortbindir = SNORT_PBI_BINDIR;
+exec("{$snortbindir}snort -V 2>&1 |/usr/bin/grep Version | /usr/bin/cut -c20-26", $snortver);
 
 /* get installed package version for display */
 $snort_package_version = "Snort {$config['installedpackages']['package'][get_pkg_id("snort")]['version']}";
-
-// Define SNORTDIR and SNORTLIBDIR constants according to pfSense version
-$pfs_version=substr(trim(file_get_contents("/etc/version")),0,3);
-if ($pfs_version >= 2.2) {
-	define("SNORTDIR", "/usr/pbi/snort-" . php_uname("m") . "/local/etc/snort");
-	define("SNORTLIBDIR", "/usr/pbi/snort-" . php_uname("m") . "/local/lib/snort");
-}
-else {
-	define("SNORTDIR", "/usr/pbi/snort-" . php_uname("m") . "/etc/snort");
-	define("SNORTLIBDIR", "/usr/pbi/snort-" . php_uname("m") . "/lib/snort");
-}
-
-/* Define some useful constants for Snort */
-/* Be sure to include trailing slash on the URL defines */
-define("SNORTLOGDIR", "{$g['varlog_path']}/snort");
-define("SNORT_BIN_VERSION", "2.9.6.2");
-define("SNORT_ET_DNLD_FILENAME", "emerging.rules.tar.gz");
-define("SNORT_ETPRO_DNLD_FILENAME", "etpro.rules.tar.gz");
-define("SNORT_GPLV2_DNLD_FILENAME", "community-rules.tar.gz");
-define("SNORT_ENFORCING_RULES_FILENAME", "snort.rules");
-define("SNORT_RULES_UPD_LOGFILE", SNORTLOGDIR . "/snort_rules_update.log");
-define("SNORT_IPREP_PATH", "{$g['vardb_path']}/snort/iprep/");
-define('SNORT_SID_MODS_PATH', "{$g['vardb_path']}/snort/sidmods/");
-if (!defined("FLOWBITS_FILENAME"))
-	define("FLOWBITS_FILENAME", "flowbit-required.rules");
-if (!defined("VRT_FILE_PREFIX"))
-	define("VRT_FILE_PREFIX", "snort_");
-if (!defined("GPL_FILE_PREFIX"))
-	define("GPL_FILE_PREFIX", "GPLv2_");
-if (!defined("ET_OPEN_FILE_PREFIX"))
-	define("ET_OPEN_FILE_PREFIX", "emerging-");
-if (!defined("ET_PRO_FILE_PREFIX"))
-	define("ET_PRO_FILE_PREFIX", "etpro-");
 
 /* Rebuild Rules Flag -- if "true", rebuild enforcing rules and flowbit-rules files */
 $rebuild_rules = false;
@@ -599,13 +563,14 @@ function snort_barnyard_start($snortcfg, $if_real, $background=FALSE) {
 	$snortdir = SNORTDIR;
 	$snortlogdir = SNORTLOGDIR;
 	$snort_uuid = $snortcfg['uuid'];
+	$snortbindir = SNORT_PBI_BINDIR;
 
 	if ($snortcfg['barnyard_enable'] == 'on' && !isvalidpid("{$g['varrun_path']}/barnyard2_{$if_real}{$snort_uuid}.pid")) {
 		log_error("[Snort] Barnyard2 START for " . convert_real_interface_to_friendly_descr($if_real) . "({$if_real})...");
 		if ($background)
-			mwexec_bg("/usr/local/bin/barnyard2 -r {$snort_uuid} -f \"snort_{$snort_uuid}_{$if_real}.u2\" --pid-path {$g['varrun_path']} --nolock-pidfile -c {$snortdir}/snort_{$snort_uuid}_{$if_real}/barnyard2.conf -d {$snortlogdir}/snort_{$if_real}{$snort_uuid} -D -q");
+			mwexec_bg("{$snortbindir}barnyard2 -r {$snort_uuid} -f \"snort_{$snort_uuid}_{$if_real}.u2\" --pid-path {$g['varrun_path']} --nolock-pidfile -c {$snortdir}/snort_{$snort_uuid}_{$if_real}/barnyard2.conf -d {$snortlogdir}/snort_{$if_real}{$snort_uuid} -D -q");
 	else
-			mwexec("/usr/local/bin/barnyard2 -r {$snort_uuid} -f \"snort_{$snort_uuid}_{$if_real}.u2\" --pid-path {$g['varrun_path']} --nolock-pidfile -c {$snortdir}/snort_{$snort_uuid}_{$if_real}/barnyard2.conf -d {$snortlogdir}/snort_{$if_real}{$snort_uuid} -D -q");
+			mwexec("{$snortbindir}barnyard2 -r {$snort_uuid} -f \"snort_{$snort_uuid}_{$if_real}.u2\" --pid-path {$g['varrun_path']} --nolock-pidfile -c {$snortdir}/snort_{$snort_uuid}_{$if_real}/barnyard2.conf -d {$snortlogdir}/snort_{$if_real}{$snort_uuid} -D -q");
 	}
 }
 
@@ -615,13 +580,19 @@ function snort_start($snortcfg, $if_real, $background=FALSE) {
 	$snortdir = SNORTDIR;
 	$snortlogdir = SNORTLOGDIR;
 	$snort_uuid = $snortcfg['uuid'];
+	$snortbindir = SNORT_PBI_BINDIR;
+
+	if ($config['installedpackages']['snortglobal']['verbose_logging'] == "on")
+		$quiet = "";
+	else
+		$quiet = "-q --suppress-config-log";
 
 	if ($snortcfg['enable'] == 'on' && !isvalidpid("{$g['varrun_path']}/snort_{$if_real}{$snort_uuid}.pid")) {
 		log_error("[Snort] Snort START for " . convert_real_interface_to_friendly_descr($if_real) . "({$if_real})...");
 		if ($background)
-			mwexec_bg("/usr/local/bin/snort -R {$snort_uuid} -D -q -l {$snortlogdir}/snort_{$if_real}{$snort_uuid} --pid-path {$g['varrun_path']} --nolock-pidfile -G {$snort_uuid} -c {$snortdir}/snort_{$snort_uuid}_{$if_real}/snort.conf -i {$if_real}");
+			mwexec_bg("{$snortbindir}snort -R {$snort_uuid} -D {$quiet} -l {$snortlogdir}/snort_{$if_real}{$snort_uuid} --pid-path {$g['varrun_path']} --nolock-pidfile -G {$snort_uuid} -c {$snortdir}/snort_{$snort_uuid}_{$if_real}/snort.conf -i {$if_real}");
 		else
-			mwexec("/usr/local/bin/snort -R {$snort_uuid} -D -q -l {$snortlogdir}/snort_{$if_real}{$snort_uuid} --pid-path {$g['varrun_path']} --nolock-pidfile -G {$snort_uuid} -c {$snortdir}/snort_{$snort_uuid}_{$if_real}/snort.conf -i {$if_real}");
+			mwexec("{$snortbindir}snort -R {$snort_uuid} -D {$quiet} -l {$snortlogdir}/snort_{$if_real}{$snort_uuid} --pid-path {$g['varrun_path']} --nolock-pidfile -G {$snort_uuid} -c {$snortdir}/snort_{$snort_uuid}_{$if_real}/snort.conf -i {$if_real}");
 		snort_barnyard_start($snortcfg, $if_real, $background);
 	}
 }
@@ -2735,11 +2706,12 @@ function snort_load_sid_mods($sids) {
 		if (preg_match('/(\d+)\s*:\s*(\d+)/', $v, $match)) {
 			if (!is_array($result[$match[1]]))
 				$result[$match[1]] = array();
+			if (!is_array($result[$match[1]][$match[2]]))
+				$result[$match[1]][$match[2]] = array();
 			$result[$match[1]][$match[2]] = "{$match[1]}:{$match[2]}";
 		}
 	}
 	unset($tmp);
-
 	return $result;
 }
 
@@ -2804,6 +2776,7 @@ function snort_create_rc() {
 
 	$snortdir = SNORTDIR;
 	$snortlogdir = SNORTLOGDIR;
+	$snortbindir = SNORT_PBI_BINDIR;
 	$rcdir = RCFILEPREFIX;	
 
 	$snortconf = $config['installedpackages']['snortglobal']['rule'];
@@ -2813,6 +2786,12 @@ function snort_create_rc() {
 		unlink_if_exists("{$rcdir}snort.sh");
 		return;
 	}
+
+	// See whether or not to enable detailed startup logging
+	if ($config['installedpackages']['snortglobal']['verbose_logging'] == "on")
+		$quiet = "";
+	else
+		$quiet = "-q --suppress-config-log";
 
 	// At least one interface is configured, so OK
 	$start_snort_iface_start = array();
@@ -2837,7 +2816,7 @@ function snort_create_rc() {
 	fi
 	if [ -z \$pid ]; then
 		/usr/bin/logger -p daemon.info -i -t SnortStartup "Barnyard2 START for {$value['descr']}({$snort_uuid}_{$if_real})..."
-		/usr/local/bin/barnyard2 -r {$snort_uuid} -f snort_{$snort_uuid}_{$if_real}.u2 --pid-path {$g['varrun_path']} --nolock-pidfile -c {$snortdir}/snort_{$snort_uuid}_{$if_real}/barnyard2.conf -d {$snortlogdir}/snort_{$if_real}{$snort_uuid} -D -q > /dev/null 2>&1
+		{$snortbindir}barnyard2 -r {$snort_uuid} -f snort_{$snort_uuid}_{$if_real}.u2 --pid-path {$g['varrun_path']} --nolock-pidfile -c {$snortdir}/snort_{$snort_uuid}_{$if_real}/barnyard2.conf -d {$snortlogdir}/snort_{$if_real}{$snort_uuid} -D -q > /dev/null 2>&1
 	fi
 EOE;
 		$stop_barnyard2 = <<<EOE
@@ -2888,7 +2867,7 @@ EOE;
 
 	if [ -z \$pid ]; then
 		/usr/bin/logger -p daemon.info -i -t SnortStartup "Snort START for {$value['descr']}({$snort_uuid}_{$if_real})..."
-		/usr/local/bin/snort -R {$snort_uuid} -D -q -l {$snortlogdir}/snort_{$if_real}{$snort_uuid} --pid-path {$g['varrun_path']} --nolock-pidfile -G {$snort_uuid} -c {$snortdir}/snort_{$snort_uuid}_{$if_real}/snort.conf -i {$if_real} > /dev/null 2>&1
+		{$snortbindir}snort -R {$snort_uuid} -D {$quiet} -l {$snortlogdir}/snort_{$if_real}{$snort_uuid} --pid-path {$g['varrun_path']} --nolock-pidfile -G {$snort_uuid} -c {$snortdir}/snort_{$snort_uuid}_{$if_real}/snort.conf -i {$if_real} > /dev/null 2>&1
 	fi
 
 	{$start_barnyard2}
@@ -3106,7 +3085,7 @@ function snort_deinstall() {
 	global $config, $g;
 
 	$snortdir = SNORTDIR;
-	$snortlibdir = SNORTLIBDIR;
+	$snortlibdir = "/usr/pbi/snort-" . php_uname("m") . "/lib";
 	$snortlogdir = SNORTLOGDIR;
 	$rcdir = RCFILEPREFIX;
 	$snort_rules_upd_log = SNORT_RULES_UPD_LOGFILE;
@@ -3205,6 +3184,8 @@ function snort_deinstall() {
 		rmdir_recursive("/usr/local/www/snort");
 		rmdir_recursive("/usr/local/etc/snort");
 		rmdir_recursive("/usr/local/lib/snort");
+		rmdir_recursive("/usr/local/lib/snort_dynamicengine");
+		rmdir_recursive("/usr/local/lib/snort_dynamicpreprocessor");
 	}
 
 	/* Keep this as a last step */
@@ -3518,10 +3499,9 @@ function snort_filter_preproc_rules($snortcfg, &$active_rules, $persist_log = fa
 	 * Format of array is:                             *
 	 *    "rule_option" => "dependent_preprocessor"    *
 	 *                                                 *
-	 * Last Update: 04/05/2013                         *
+	 * Last Update: 10/30/2014                         *
 	 *                                                 *
-	 * Added: http_inspect content modifiers and       *
-	 *        various "service" metadata values.       *
+	 * Added: appid: detection option                  *
 	 *                                                 *
 	 ***************************************************/
 	$rule_opts_preprocs = array("ssl_version:" => "ssl_preproc","ssl_state:" => "ssl_preproc",
@@ -3544,7 +3524,8 @@ function snort_filter_preproc_rules($snortcfg, &$active_rules, $persist_log = fa
 				    "uricontent:" => "http_inspect", "urilen:" => "http_inspect",
 				    "http_encode;" => "http_inspect", "service http" => "http_inspect",
 				    "service imap" => "imap_preproc", "service pop2" => "pop_preproc",
-				    "service pop3" => "pop_preproc", "service smtp" => "smtp_preprocessor");
+				    "service pop3" => "pop_preproc", "service smtp" => "smtp_preprocessor", 
+				    "appid:" => "appid_preproc" );
 
 	/***************************************************
 	 * Iterate the enabled rules, and check for rule   *
@@ -3650,7 +3631,7 @@ function snort_generate_conf($snortcfg) {
 		return;
 
 	$snortdir = SNORTDIR;
-	$snortlibdir = SNORTLIBDIR;
+	$snortlibdir = SNORT_PBI_BASEDIR . "lib";
 	$snortlogdir = SNORTLOGDIR;
 	$flowbit_rules_file = FLOWBITS_FILENAME;
 	$snort_enforcing_rules_file = SNORT_ENFORCING_RULES_FILENAME;

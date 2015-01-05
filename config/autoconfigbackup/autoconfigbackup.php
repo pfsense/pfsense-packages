@@ -357,10 +357,17 @@ EOF;
 					<center>
 					<b>Hostname:</b>
 					<select id="hostname" name="hostname" onChange="document.location='autoconfigbackup.php?hostname=' + this.value;">
-						<?foreach($hostnames as $hn):?>
-						<option value='<?=$hn?>'><?=$hn?></option>
+						<?
+						$host_not_found = true;
+						foreach($hostnames as $hn):
+						?>
+						<option value='<?=$hn?>' <? if ($hn == $hostname) {echo " selected=\"selected\""; $host_not_found = false;}?>>
+							<?=$hn?>
+						</option>
 						<?endforeach?>
-						<option value='<?=$hostname?>' SELECTED><?=$hostname?></option>
+						<? if ($host_not_found) { ?>
+							<option value='<?=$hostname?>' SELECTED><?=$hostname?></option>
+						<? } ?>
 					</select>
 				</td>
 			</tr>

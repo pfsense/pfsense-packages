@@ -204,7 +204,7 @@
 	</adddeleteeditpagefields>
 	<fields>
 		<field>
-			<name>GENERAL CONFIGURATION</name>
+			<name>General Configuration</name>
 			<type>listtopic</type>
 		</field>
 		<field>
@@ -280,19 +280,19 @@
 			<default_value>0</default_value>
 		</field>
 		<field>
-			<name>MISCELLANEOUS CONFIGURATION</name>
+			<name>Miscellaneous Configuration</name>
 			<type>listtopic</type>
 		</field>
 		<field>
 			<fielddescr>Number of simultaneous connections</fielddescr>
 			<fieldname>varuserssimultaneousconnect</fieldname>
-			<description><![CDATA[The maximum of simultaneous connections with this username. If you leave this field empty than there is no limit. If you are using FreeRADIUS with CaptivePortal you should leave this empty. Read the documentation!]]></description>
+			<description><![CDATA[The maximum of simultaneous connections with this username. If you leave this field empty than there is no limit. If you are using FreeRADIUS with Captive Portal you should leave this empty. Read the documentation!]]></description>
 			<type>input</type>
 		</field>
 		<field>
 			<fielddescr>Redirection URL</fielddescr>
 			<fieldname>varuserswisprredirectionurl</fieldname>			
-			<description><![CDATA[Enter the URL the user should be redirected to after successfull login. (e.g.: http://www.google.com)]]></description>
+			<description><![CDATA[Enter the URL the user should be redirected to after successful login. (e.g.: http://www.google.com)]]></description>
 			<type>input</type>
 		</field>
 		<field>
@@ -302,7 +302,7 @@
 			<type>input</type>
 		</field>
 		<field>
-			<name>NETWORK CONFIGURATION</name>
+			<name>Network Configuration</name>
 			<type>listtopic</type>
 		</field>
 		<field>
@@ -339,7 +339,7 @@
 			<type>input</type>
 		</field>		
 		<field>
-			<name>TIME CONFIGURATION</name>
+			<name>Time Configuration</name>
 			<type>listtopic</type>
 		</field>
 		<field>
@@ -384,7 +384,7 @@
 				</options>
 		</field>
 		<field>
-			<name>TRAFFIC AND BANDWIDTH</name>
+			<name>Traffic and Bandwidth</name>
 			<type>listtopic</type>
 		</field>
 		<field>
@@ -425,7 +425,7 @@
 			<type>input</type>
 		</field>
 		<field>
-			<name>ADVANCED CONFIGURATION</name>
+			<name>Advanced Configuration</name>
 			<type>listtopic</type>
 		</field>
 		<field>

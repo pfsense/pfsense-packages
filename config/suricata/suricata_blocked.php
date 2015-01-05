@@ -42,6 +42,8 @@
 require_once("guiconfig.inc");
 require_once("/usr/local/pkg/suricata/suricata.inc");
 
+global $g, $config;
+
 $suricatalogdir = SURICATALOGDIR;
 $suri_pf_table = SURICATA_PF_TABLE;
 
@@ -94,22 +96,22 @@ if ($_POST['download'])
 	exec("/sbin/pfctl -t {$suri_pf_table} -T show", $blocked_ips_array_save);
 	/* build the list */
 	if (is_array($blocked_ips_array_save) && count($blocked_ips_array_save) > 0) {
-		$save_date = exec('/bin/date "+%Y-%m-%d-%H-%M-%S"');
+		$save_date = date("Y-m-d-H-i-s");
 		$file_name = "suricata_blocked_{$save_date}.tar.gz";
-		exec('/bin/mkdir -p /tmp/suricata_blocked');
-		file_put_contents("/tmp/suricata_blocked/suricata_block.pf", "");
+		safe_mkdir("{$g['tmp_path']}/suricata_blocked");
+		file_put_contents("{$g['tmp_path']}/suricata_blocked/suricata_block.pf", "");
 		foreach($blocked_ips_array_save as $counter => $fileline) {
 			if (empty($fileline))
 				continue;
 			$fileline = trim($fileline, " \n\t");
-			file_put_contents("/tmp/suricata_blocked/suricata_block.pf", "{$fileline}\n", FILE_APPEND);
+			file_put_contents("{$g['tmp_path']}/suricata_blocked/suricata_block.pf", "{$fileline}\n", FILE_APPEND);
 		}
 
 		// Create a tar gzip archive of blocked host IP addresses
-		exec("/usr/bin/tar -czf /tmp/{$file_name} -C/tmp/suricata_blocked suricata_block.pf");
+		exec("/usr/bin/tar -czf {$g['tmp_path']}/{$file_name} -C{$g['tmp_path']}/suricata_blocked suricata_block.pf");
 
 		// If we successfully created the archive, send it to the browser.
-		if(file_exists("/tmp/{$file_name}")) {
+		if(file_exists("{$g['tmp_path']}/{$file_name}")) {
 			ob_start(); //important or other posts will fail
 			if (isset($_SERVER['HTTPS'])) {
 				header('Pragma: ');
@@ -119,14 +121,14 @@ if ($_POST['download'])
 				header("Cache-Control: private, must-revalidate");
 			}
 			header("Content-Type: application/octet-stream");
-			header("Content-length: " . filesize("/tmp/{$file_name}"));
+			header("Content-length: " . filesize("{$g['tmp_path']}/{$file_name}"));
 			header("Content-disposition: attachment; filename = {$file_name}");
 			ob_end_clean(); //important or other post will fail
-			readfile("/tmp/{$file_name}");
+			readfile("{$g['tmp_path']}/{$file_name}");
 
 			// Clean up the temp files and directory
-			@unlink("/tmp/{$file_name}");
-			exec("/bin/rm -fr /tmp/suricata_blocked");
+			unlink_if_exists("{$g['tmp_path']}/{$file_name}");
+			rmdir_recursive("{$g['tmp_path']}/suricata_blocked");
 		} else
 			$savemsg = gettext("An error occurred while creating archive");
 	} else
@@ -191,6 +193,7 @@ if ($savemsg) {
 	$tab_array[] = array(gettext("Logs Mgmt"), false, "/suricata/suricata_logs_mgmt.php");
 	$tab_array[] = array(gettext("SID Mgmt"), false, "/suricata/suricata_sid_mgmt.php");
 	$tab_array[] = array(gettext("Sync"), false, "/pkg_edit.php?xml=suricata/suricata_sync.xml");
+	$tab_array[] = array(gettext("IP Lists"), false, "/suricata/suricata_ip_list_mgmt.php");
 	display_top_tabs($tab_array, true);
 	?>
 	</td>
@@ -257,19 +260,67 @@ if ($savemsg) {
 			foreach (glob("{$suricatalogdir}*/block.log*") as $alertfile) {
 				$fd = fopen($alertfile, "r");
 				if ($fd) {
-					/*	       0         1      2             3      4       5   6              7        8     9  10   */
-					/* File format timestamp,action,sig_generator,sig_id,sig_rev,msg,classification,priority,proto,ip,port */
-					while (($fields = fgetcsv($fd, 1000, ',', '"')) !== FALSE) {
-						if(count($fields) != 11) {
-							log_error("[suricata] ERROR: block.log entry failed to parse correctly with too many or not enough CSV entities, skipping this entry...");
-							log_error("[suricata] Failed block.log entry fields are: " . print_r($fields, true));
-							continue;
+
+					/*************** FORMAT for file -- BLOCK -- **************************************************************************/
+					/* Line format: timestamp  action [**] [gid:sid:rev] msg [**] [Classification: class] [Priority: pri] {proto} ip:port */
+					/*              0          1            2   3   4    5                         6                 7     8      9  10   */
+					/**********************************************************************************************************************/
+
+					$buf = "";
+					while (($buf = fgets($fd)) !== FALSE) {
+						$fields = array();
+						$tmp = array();
+
+						/***************************************************************/
+						/* Parse block log entry to find the parts we want to display. */
+						/* We parse out all the fields even though we currently use    */
+						/* just a few of them.                                         */
+						/***************************************************************/
+
+						// Field 0 is the event timestamp
+						$fields['time'] = substr($buf, 0, strpos($buf, '  '));
+
+						// Field 1 is the action
+						if (strpos($buf, '[') !== FALSE && strpos($buf, ']') !== FALSE)
+							$fields['action'] = substr($buf, strpos($buf, '[') + 1, strpos($buf, ']') - strpos($buf, '[') - 1);
+						else
+							$fields['action'] = null;
+
+						// The regular expression match below returns an array as follows:
+						// [2] => GID, [3] => SID, [4] => REV, [5] => MSG, [6] => CLASSIFICATION, [7] = PRIORITY
+						preg_match('/\[\*{2}\]\s\[((\d+):(\d+):(\d+))\]\s(.*)\[\*{2}\]\s\[Classification:\s(.*)\]\s\[Priority:\s(\d+)\]\s/', $buf, $tmp);
+						$fields['gid'] = trim($tmp[2]);
+						$fields['sid'] = trim($tmp[3]);
+						$fields['rev'] = trim($tmp[4]);
+						$fields['msg'] = trim($tmp[5]);
+						$fields['class'] = trim($tmp[6]);
+						$fields['priority'] = trim($tmp[7]);
+
+						// The regular expression match below looks for the PROTO, IP and PORT fields
+						// and returns an array as follows:
+						// [1] = PROTO, [2] => IP:PORT
+						if (preg_match('/\{(.*)\}\s(.*)/', $buf, $tmp)) {
+							// Get PROTO
+							$fields['proto'] = trim($tmp[1]);
+
+							// Get IP
+							$fields['ip'] = trim(substr($tmp[2], 0, strrpos($tmp[2], ':')));
+							if (is_ipaddrv6($fields['ip']))
+								$fields['ip'] = inet_ntop(inet_pton($fields['ip']));
+
+							// Get PORT
+							$fields['port'] = trim(substr($tmp[2], strrpos($tmp[2], ':') + 1));
 						}
-						$fields[9] = inet_pton($fields[9]);
-						if (isset($tmpblocked[$fields[9]])) {
-							if (!is_array($src_ip_list[$fields[9]]))
-								$src_ip_list[$fields[9]] = array();
-							$src_ip_list[$fields[9]][$fields[5]] = "{$fields[5]} - " . substr($fields[0], 0, -7);
+
+						// In the unlikely event we read an old log file and fail to parse
+						// out an IP address, just skip the record since we can't use it.
+						if (empty($fields['ip']))
+							continue;
+						$fields['ip'] = inet_pton($fields['ip']);
+						if (isset($tmpblocked[$fields['ip']])) {
+							if (!is_array($src_ip_list[$fields['ip']]))
+								$src_ip_list[$fields['ip']] = array();
+							$src_ip_list[$fields['ip']][$fields['msg']] = "{$fields['msg']} - " . substr($fields['time'], 0, -7);
 						}
 					}
 					fclose($fd);

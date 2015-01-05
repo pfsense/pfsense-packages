@@ -876,13 +876,13 @@ function bind_do_xmlrpc_sync($sync_to_ip, $username, $password, $synctimeout,$ma
 	/* send our XMLRPC message and timeout after defined sync timeout value*/
 	$resp = $cli->send($msg, $synctimeout);
 	if(!$resp) {
-		$error = "A communications error occurred while attempting bind XMLRPC sync with {$url}:{$port}.";
+		$error = "A communications error occurred while attempting BIND XMLRPC sync with {$url}:{$port}.";
 		log_error($error);
 		file_notice("sync_settings", $error, "bind Settings Sync", "");
 	} elseif($resp->faultCode()) {
 		$cli->setDebug(1);
 		$resp = $cli->send($msg, $synctimeout);
-		$error = "An error code was received while attempting bind XMLRPC sync with {$url}:{$port} - Code " . $resp->faultCode() . ": " . $resp->faultString();
+		$error = "An error code was received while attempting BIND XMLRPC sync with {$url}:{$port} - Code " . $resp->faultCode() . ": " . $resp->faultString();
 		log_error($error);
 		file_notice("sync_settings", $error, "bind Settings Sync", "");
 	} else {
@@ -905,17 +905,17 @@ function bind_do_xmlrpc_sync($sync_to_ip, $username, $password, $synctimeout,$ma
 	$cli->setCredentials($username, $password);
 	$resp = $cli->send($msg, $synctimeout);
 	if(!$resp) {
-		$error = "A communications error occurred while attempting bind XMLRPC sync with {$url}:{$port} (pfsense.exec_php).";
+		$error = "A communications error occurred while attempting BIND XMLRPC sync with {$url}:{$port} (pfsense.exec_php).";
 		log_error($error);
 		file_notice("sync_settings", $error, "Bind Settings Sync", "");
 	} elseif($resp->faultCode()) {
 		$cli->setDebug(1);
 		$resp = $cli->send($msg, $synctimeout);
-		$error = "[Bind] An error code was received while attempting bind XMLRPC sync with {$url}:{$port} - Code " . $resp->faultCode() . ": " . $resp->faultString();
+		$error = "[Bind] An error code was received while attempting BIND XMLRPC sync with {$url}:{$port} - Code " . $resp->faultCode() . ": " . $resp->faultString();
 		log_error($error);
 		file_notice("sync_settings", $error, "bind Settings Sync", "");
 	} else {
-		log_error("Bind XMLRPC reload data success with {$url}:{$port} (pfsense.exec_php).");
+		log_error("BIND XMLRPC reload data success with {$url}:{$port} (pfsense.exec_php).");
 	}
 	
 }

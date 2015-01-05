@@ -90,6 +90,11 @@
 	<additional_files_needed>
 		<prefix>/usr/local/www/</prefix>
 		<chmod>077</chmod>
+		<item>https://packages.pfsense.org/packages/config/haproxy-devel/haproxy_files.php</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/www/</prefix>
+		<chmod>077</chmod>
 		<item>https://packages.pfsense.org/packages/config/haproxy-devel/haproxy_pools.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
@@ -101,6 +106,11 @@
 		<prefix>/usr/local/www/</prefix>
 		<chmod>077</chmod>
 		<item>https://packages.pfsense.org/packages/config/haproxy-devel/haproxy_stats.php</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/www/</prefix>
+		<chmod>077</chmod>
+		<item>https://packages.pfsense.org/packages/config/haproxy-devel/haproxy_templates.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>

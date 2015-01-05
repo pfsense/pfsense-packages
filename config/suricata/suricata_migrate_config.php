@@ -71,12 +71,28 @@ if ($config['installedpackages']['suricata']['config'][0]['suricata_config_ver']
 /**********************************************************/
 /* Create new Auto SID Mgmt settings if not set           */
 /**********************************************************/
-	if (empty($config['installedpackages']['suricata']['config'][0]['auto_manage_sids'])) {
-		$config['installedpackages']['suricata']['config'][0]['auto_manage_sids'] = "off";
-		$config['installedpackages']['suricata']['config'][0]['sid_changes_log_limit_size'] = "250";
-		$config['installedpackages']['suricata']['config'][0]['sid_changes_log_retention'] = "336";
-		$updated_cfg = true;
-	}
+if (empty($config['installedpackages']['suricata']['config'][0]['auto_manage_sids'])) {
+	$config['installedpackages']['suricata']['config'][0]['auto_manage_sids'] = "off";
+	$config['installedpackages']['suricata']['config'][0]['sid_changes_log_limit_size'] = "250";
+	$config['installedpackages']['suricata']['config'][0]['sid_changes_log_retention'] = "336";
+	$updated_cfg = true;
+}
+
+/**********************************************************/
+/* Create new Auto GeoIP update setting if not set        */
+/**********************************************************/
+if (empty($config['installedpackages']['suricata']['config'][0]['autogeoipupdate'])) {
+	$config['installedpackages']['suricata']['config'][0]['autogeoipupdate'] = "on";
+	$updated_cfg = true;
+}
+
+/**********************************************************/
+/* Create new ET IQRisk IP Reputation setting if not set  */
+/**********************************************************/
+if (empty($config['installedpackages']['suricata']['config'][0]['et_iqrisk_enable'])) {
+	$config['installedpackages']['suricata']['config'][0]['et_iqrisk_enable'] = "off";
+	$updated_cfg = true;
+}
 
 // Now process the interface-specific settings
 foreach ($rule as &$r) {
@@ -336,6 +352,26 @@ foreach ($rule as &$r) {
 		$updated_cfg = true;
 	}
 
+	/**********************************************************/
+	/* Create interface IP Reputation settings if not set     */
+	/**********************************************************/
+	if (empty($pconfig['enable_iprep'])) {
+		$pconfig['enable_iprep'] = "off";
+		$updated_cfg = true;
+	}
+	if (empty($pconfig['host_memcap'])) {
+		$pconfig['host_memcap'] = "16777216";
+		$updated_cfg = true;
+	}
+	if (empty($pconfig['host_hash_size'])) {
+		$pconfig['host_hash_size'] = "4096";
+		$updated_cfg = true;
+	}
+	if (empty($pconfig['host_prealloc'])) {
+		$pconfig['host_prealloc'] = "1000";
+		$updated_cfg = true;
+	}
+
 	// Save the new configuration data into the $config array pointer
 	$r = $pconfig;
 }
@@ -343,12 +379,8 @@ foreach ($rule as &$r) {
 unset($r);
 
 // Write out the new configuration to disk if we changed anything
-if ($updated_cfg) {
-	$config['installedpackages']['suricata']['config'][0]['suricata_config_ver'] = "2.0.2";
-	log_error("[Suricata] Saving configuration settings in new format...");
-	write_config("Suricata pkg: migrate existing settings to new format during package upgrade.");
+if ($updated_cfg)
 	log_error("[Suricata] Settings successfully migrated to new configuration format...");
-}
 else
 	log_error("[Suricata] Configuration version is current...");
 

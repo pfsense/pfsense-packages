@@ -42,6 +42,8 @@ if (!is_array($config['installedpackages']['haproxy']['ha_pools']['item'])) {
 
 $a_pools = &$config['installedpackages']['haproxy']['ha_pools']['item'];
 
+$a_files = haproxy_get_fileslist();
+
 if (isset($_POST['id']))
 	$id = $_POST['id'];
 else
@@ -172,6 +174,19 @@ $fields_servers_details[7]['colwidth']="15%";
 $fields_servers_details[7]['type']="textbox";
 $fields_servers_details[7]['size']="80";
 
+$fields_errorfile = array();
+$fields_errorfile[0]['name']="errorcode";
+$fields_errorfile[0]['columnheader']="errorcode(s)";
+$fields_errorfile[0]['colwidth']="15%";
+$fields_errorfile[0]['type']="textbox";
+$fields_errorfile[0]['size']="70px";
+$fields_errorfile[1]['name']="errorfile";
+$fields_errorfile[1]['columnheader']="Error Page";
+$fields_errorfile[1]['colwidth']="30%";
+$fields_errorfile[1]['type']="select";
+$fields_errorfile[1]['size']="170px";
+$fields_errorfile[1]['items']=&$a_files;
+
 if (isset($id) && $a_pools[$id]) {
 	$pconfig['advanced'] = base64_decode($a_pools[$id]['advanced']);
 	$pconfig['advanced_backend'] = base64_decode($a_pools[$id]['advanced_backend']);
@@ -179,6 +194,9 @@ if (isset($id) && $a_pools[$id]) {
 	
 	foreach($simplefields as $stat)
 		$pconfig[$stat] = $a_pools[$id][$stat];
+		
+	$a_errorfiles = &$a_pools[$id]['errorfiles']['item'];
+	if (!is_array($a_errorfiles)) $a_errorfiles = array();
 }
 
 if (isset($_GET['dup']))
@@ -269,6 +287,8 @@ if ($_POST) {
 			$input_errors[] = "The field 'Port' value is not a number.";
 	}
 	
+	$a_errorfiles = haproxy_htmllist_get_values($fields_errorfile);
+	
 	if ($_POST['strict_transport_security'] !== "" && !is_numeric($_POST['strict_transport_security']))
 		$input_errors[] = "The field 'Strict-Transport-Security' is not empty or a number.";
 
@@ -355,6 +375,9 @@ foreach($simplefields as $field){
 	function htmllist_get_select_options(tableId, fieldname) {
 		if (fieldname == 'forwardto')
 			return "<?=haproxy_js_select_options($primaryfrontends);?>";
+		else
+		if (fieldname == 'errorfile')
+			return "<?=haproxy_js_select_options($a_files);?>";
 		else
 			return "<?=haproxy_js_select_options($a_servermodes);?>";
 	}
@@ -920,6 +943,21 @@ set by the 'retries' parameter.</div>
 		</tr>
 		<tr><td>&nbsp;</td></tr>
 		<tr>
+			<td colspan="2" valign="top" class="listtopic">Error files</td>
+		</tr>
+		<tr class="" align="left" id='errorfiles'>
+		<td colspan="2" valign="top" class="vtable">
+		Use these to replace the error pages that haproxy can generate by custom pages created on the files tab.
+		For example haproxy will generate a 503 error page when no backend is available, you can replace that page here.
+		<br/>
+		<br/>
+		<?
+		haproxy_htmllist("table_errorfile", $a_errorfiles, $fields_errorfile);
+		?>
+		</td>
+		</tr>
+		<tr><td>&nbsp;</td></tr>
+		<tr>
 			<td colspan="2" valign="top" class="listtopic">Advanced</td>
 		</tr>
 		<tr class="" align="left" id='Strict-Transport-Security'>
@@ -961,9 +999,11 @@ set by the 'retries' parameter.</div>
 <?
 	phparray_to_javascriptarray($fields_servers,"fields_servers",Array('/*','/*/name','/*/type','/*/size','/*/items','/*/items/*','/*/items/*/*','/*/items/*/*/name'));
 	phparray_to_javascriptarray($fields_servers_details,"fields_details_servers",Array('/*','/*/name','/*/type'));
+	phparray_to_javascriptarray($fields_errorfile,"fields_errorfile",Array('/*','/*/name','/*/type','/*/size','/*/items','/*/items/*','/*/items/*/*','/*/items/*/*/name'));
 	phparray_to_javascriptarray($a_checktypes,"checktypes",Array('/*','/*/name','/*/descr'));
 	phparray_to_javascriptarray($a_cookiemode,"cookiemode",Array('/*','/*/name','/*/descr'));
 	phparray_to_javascriptarray($a_sticky_type,"sticky_type",Array('/*','/*/descr','/*/cookiedescr'));
+	phparray_to_javascriptarray($a_files,"a_files",Array('/*','/*/name','/*/descr'));
 ?>
 	browser_InnerText_support = (document.getElementsByTagName("body")[0].innerText != undefined) ? true : false;
 

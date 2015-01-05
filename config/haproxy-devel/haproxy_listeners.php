@@ -124,10 +124,11 @@ include("head.inc");
 		$a_frontend_grouped = array();
 		foreach($a_frontend as &$frontend2) {
 			$mainfrontend = get_primaryfrontend($frontend2);
+			$mainname = $mainfrontend['name'];
 			$ipport = get_frontend_ipport($frontend2, true);
 			$frontend2['ipport'] = $ipport;
 			$frontend2['type'] = $mainfrontend['type'];
-			$a_frontend_grouped[$ipport][] = $frontend2;
+			$a_frontend_grouped[$mainname][] = $frontend2;
 		}
 		ksort($a_frontend_grouped);
 		
@@ -142,6 +143,7 @@ include("head.inc");
 			if ((count($a_frontend) > 1 || $last_frontend_shared) && !$first) {
 				?> <tr class="<?=$textgray?>"><td colspan="7">&nbsp;</td></tr> <?	
 			}
+			$first = false;
 			$last_frontend_shared = count($a_frontend) > 1;
 			foreach ($a_frontend as $frontend) {
 				$frontendname = $frontend['name'];
@@ -161,7 +163,7 @@ include("head.inc");
 					if ($isaclset) 
 						echo "<img src=\"$img_acl\" title=\"" . gettext("acl's used") . ": {$isaclset}\" border=\"0\" />";
 						
-					if (strtolower($frontend['type']) == "http" && $frontend['ssloffload']) {
+					if (get_frontend_uses_ssl($frontend)) {
 						$cert = lookup_cert($frontend['ssloffloadcert']);
 						$descr = htmlspecialchars($cert['descr']);
 						if (is_array($frontend['ha_certificates']) && is_array($frontend['ha_certificates']['item'])) {
@@ -182,8 +184,9 @@ include("head.inc");
 					if ($isadvset)
 						echo "<img src=\"$img_adv\" title=\"" . gettext("Advanced settings set") . ": {$isadvset}\" border=\"0\" />";
 					
+					$backend_serverpool_hint = "";
 					$backend_serverpool = $frontend['backend_serverpool'];
-					$backend = get_backend($backend_serverpool );
+					$backend = get_backend($backend_serverpool);
 					if ($backend && is_array($backend['ha_servers']) && is_array($backend['ha_servers']['item'])){
 						$servers = $backend['ha_servers']['item'];
 						$backend_serverpool_hint = gettext("Servers in pool:");
@@ -205,10 +208,35 @@ include("head.inc");
 					<?=$frontend['desc'];?>
 				  </td>
 				  <td class="listlr" ondblclick="document.location='haproxy_listeners_edit.php?id=<?=$frontendname;?>';">
-					<?=str_replace(" ","&nbsp;",$frontend['ipport']);?>
+				    <?
+						$first = true;
+						foreach($frontend['ipport'] as $addr) {
+							if (!$first)
+								print "<br/>";
+							print "<div style='white-space:nowrap;'>";
+							print "{$addr['addr']}:{$addr['port']}";
+							if ($addr['ssl'] == 'yes') {
+								echo '<img src="'.$img_cert.'" title="SSL offloading" alt="SSL" border="0" height="11" width="11" />';
+							}
+							print "</div";
+							$first = false;
+						}
+					?>
 				  </td>
 				  <td class="listlr" ondblclick="document.location='haproxy_listeners_edit.php?id=<?=$frontendname;?>';">
-					<?=$frontend['type']?>
+				  <?
+					if ($frontend['type'] == 'http') {
+						$mainfrontend = get_primaryfrontend($frontend);
+						$sslused = get_frontend_uses_ssl($mainfrontend);
+						$httpused = !get_frontend_uses_ssl_only($frontend);
+						if ($httpused)
+							echo "http";
+						if ($sslused) {
+							echo ($httpused ? "/" : "") . "https";
+						}
+					} else
+						echo $a_frontendmode[$frontend['type']]['shortname'];
+				  ?>
 				  </td>
 				  <td class="listlr" ondblclick="document.location='haproxy_listeners_edit.php?id=<?=$frontendname;?>';">
 					<div title='<?=$backend_serverpool_hint;?>'>

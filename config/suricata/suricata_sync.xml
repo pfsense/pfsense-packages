@@ -110,6 +110,11 @@ POSSIBILITY OF SUCH DAMAGE.
 			<no_drop_down/>
 			<active/>
 		</tab>
+		<tab>
+			<text>IP Lists</text>
+			<url>/suricata/suricata_ip_list_mgmt.php</url>
+			<no_drop_down/>
+		</tab>
 	</tabs>
 	<fields>
 		<field>

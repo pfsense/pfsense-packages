@@ -58,8 +58,27 @@ function squid_resync_reverse() {
 				$reverse_key = SQUID_CONFBASE . "/{$settings["reverse_ssl_cert"]}.key";
        			}
 			}
+		} 
+	//Add Ca certificate for Client Validation
+    if (isset($settings["reverse_check_clientca"]) && $settings["reverse_check_clientca"] == "on") {
+        $clientca_cert=lookup_ca($settings["reverse_ssl_clientca"]);	
+		$clientca_prm='';
+		if ( $clientca_cert != false){
+		    if(base64_decode($clientca_cert['crt'])) {
+				file_put_contents(SQUID_CONFBASE . "/{$settings["reverse_ssl_clientca"]}.crt",sq_text_area_decode($clientca_cert['crt']));
+				$clientca_prm = "clientca=" . SQUID_CONFBASE . "/{$settings["reverse_ssl_clientca"]}.crt ";
+				}
+			}
+		$crl=lookup_crl($settings["reverse_ssl_clientcrl"]);
+		crl_update($crl);
+		if (  $crl != false){ 
+		   if(base64_decode($crl['text'])) {
+				file_put_contents(SQUID_CONFBASE . "/{$settings["reverse_ssl_clientcrl"]}.crl",base64_decode($crl['text']));
+				$clientca_prm .= "crlfile=" . SQUID_CONFBASE . "/{$settings["reverse_ssl_clientcrl"]}.crl sslflags=VERIFY_CRL ";
+				}
+			}
 		}
-       
+	
 	if (!empty($settings['reverse_int_ca']))
 		file_put_contents(SQUID_CONFBASE . "/{$settings["reverse_ssl_cert"]}.crt","\n" . sq_text_area_decode($settings['reverse_int_ca']),FILE_APPEND | LOCK_EX);
 
@@ -82,7 +101,7 @@ function squid_resync_reverse() {
 		      		$conf .= "http_port {$real_ifaces[$i][0]}:{$http_port} accel defaultsite={$http_defsite} vhost\n";
 		      //HTTPS
 		      if (!empty($settings['reverse_https']))
-		      		$conf .= "https_port {$real_ifaces[$i][0]}:{$https_port} accel cert={$reverse_crt} key={$reverse_key} defaultsite={$https_defsite} vhost\n";
+		      		$conf .= "https_port {$real_ifaces[$i][0]}:{$https_port} accel cert={$reverse_crt} ".$clientca_prm."key={$reverse_key} defaultsite={$https_defsite} vhost\n";
 			}
 		}
 		
@@ -241,5 +260,18 @@ function squid_resync_reverse() {
 		$conf .= "deny_info TCP_RESET allsrc\n";                                                                                          
 
 	return $conf;
+}
+function squid_refresh_crl()
+{
+    global $config;
+	if (isset($settings["reverse_check_clientca"]) && $settings["reverse_check_clientca"] == "on") {
+		$crl=lookup_crl($settings["reverse_ssl_clientcrl"]);
+		crl_update($crl);
+		if (  $crl != false){ 
+		   if(base64_decode($crl['text'])) {
+				file_put_contents(SQUID_CONFBASE . "/{$settings["reverse_ssl_clientcrl"]}.crl",base64_decode($crl['text']));
+				}
+			}
+		}
 }
 ?>

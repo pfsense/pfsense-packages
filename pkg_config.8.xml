@@ -53,7 +53,7 @@
 		<descr><![CDATA[The most widely used name server software]]></descr>
 		<website>http://www.isc.org/downloads/BIND/</website>
 		<category>Services</category>
-		<version>9.9.5P1_5 pkg v 0.3.5</version>
+		<version>9.9.5P1_5 pkg v 0.3.6</version>
 		<status>RC</status>
 		<required_version>2.1</required_version>
 		<config_file>https://packages.pfsense.org/packages/config/bind/bind.xml</config_file>
@@ -166,7 +166,7 @@
 				Supports ACLs for smart backend switching.]]></descr>
 		<website>http://haproxy.1wt.eu/</website>
 		<category>Services</category>
-		<version>1.5.3 pkg v 0.12</version>
+		<version>1.5.3 pkg v 0.15</version>
 		<status>Release</status>
 		<required_version>2.1</required_version>
 		<config_file>https://packages.pfsense.org/packages/config/haproxy-devel/haproxy.xml</config_file>
@@ -313,7 +313,7 @@
 		</build_pbi>
 		<depends_on_package>avahi-app-0.6.29_1.tbz</depends_on_package>
 		<depends_on_package_pbi>avahi-0.6.31-i386.pbi</depends_on_package_pbi>
-		<version>0.6.31 pkg v1.06</version>
+		<version>0.6.31 pkg v1.08</version>
 		<status>ALPHA</status>
 		<required_version>1.2.3</required_version>
 		<config_file>https://packages.pfsense.org/packages/config/avahi/avahi.xml</config_file>
@@ -462,14 +462,14 @@
 		<descr>Snort is an open source network intrusion prevention and detection system (IDS/IPS). Combining the benefits of signature, protocol, and anomaly-based inspection.</descr>
 		<category>Security</category>
 		<depends_on_package_base_url>https://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
-		<depends_on_package_pbi>snort-2.9.6.2-i386.pbi</depends_on_package_pbi>
+		<depends_on_package_pbi>snort-2.9.7.0-i386.pbi</depends_on_package_pbi>
 		<build_pbi>
 			<port>security/snort</port>
 			<ports_after>security/barnyard2</ports_after>
 		</build_pbi>
-		<build_options>barnyard2_UNSET=ODBC PGSQL PRELUDE;barnyard2_SET=GRE IPV6 MPLS MYSQL PORT_PCAP BRO;snort_SET=TARGETBASED PERFPROFILE SOURCEFIRE GRE IPV6 MPLS NORMALIZER ZLIB;snort_UNSET=PULLEDPORK;perl_SET=THREADS</build_options>
+		<build_options>barnyard2_UNSET=ODBC PGSQL PRELUDE;barnyard2_SET=GRE IPV6 MPLS MYSQL PORT_PCAP BRO;snort_SET=PERFPROFILE SOURCEFIRE GRE IPV6 NORMALIZER APPID;snort_UNSET=PULLEDPORK FILEINSPECT HA;perl_SET=THREADS</build_options>
 		<config_file>https://packages.pfsense.org/packages/config/snort/snort.xml</config_file>
-		<version>2.9.6.2 pkg v3.1.4</version>
+		<version>2.9.7.0 pkg v3.2.1</version>
 		<required_version>2.1</required_version>
 		<status>Stable</status>
 		<configurationfile>/snort.xml</configurationfile>
@@ -533,7 +533,7 @@
 		<depends_on_package>postfix-2.10.2,1.tbz</depends_on_package>
 		<depends_on_package>perl5-5.16.3_4.tbz</depends_on_package>
 		<depends_on_package_pbi>postfix-2.10.2-i386.pbi</depends_on_package_pbi>
-		<version>2.10.2 pkg v.2.3.7</version>
+		<version>2.10.2 pkg v.2.3.9</version>
 		<status>Release</status>
 		<required_version>2.1</required_version>
 		<configurationfile>postfix.xml</configurationfile>
@@ -546,7 +546,7 @@
 		<descr><![CDATA[DansGuardian is an award winning Open Source web content filter.<br />
 						It filters the actual content of pages based on many methods including phrase matching, PICS filtering and URL filtering.<br />
 						It does not purely filter based on a banned list of sites like lesser totally commercial filters.<br />
-						For all non-commercial it's free, without cost.<br />
+						For all non-commercial its free, without cost.<br />
 						For all commercial use visit dansguardian website to get a licence.]]></descr>
 		<category>Services</category>
 		<config_file>https://packages.pfsense.org/packages/config/dansguardian/dansguardian.xml</config_file>
@@ -586,7 +586,7 @@
 		<depends_on_package>p5-IP-Country-2.28.tbz</depends_on_package>
 		<depends_on_package>MailScanner-4.84.5_3.tbz</depends_on_package>
 		<depends_on_package_pbi>mailscanner-4.84.6-i386.pbi</depends_on_package_pbi>
-		<version>4.84.6 pkg v.0.2.10</version>
+		<version>4.84.6 pkg v.0.2.11</version>
 		<status>beta</status>
 		<required_version>2.0</required_version>
 		<configurationfile>mailscanner.xml</configurationfile>
@@ -638,7 +638,7 @@
 	</package>
 	<package>
 		<name>Lightsquid</name>
-		<descr>High perfomance web proxy report (LightSquid). Proxy realtime stat (SQStat). Requires squid HTTP proxy.</descr>
+		<descr>High performance web proxy report (LightSquid). Proxy realtime stat (SQStat). Requires squid HTTP proxy.</descr>
 		<website>http://lightsquid.sf.net/</website>
 		<category>Network Report</category>
 		<version>1.8.2 pkg v.2.33</version>
@@ -728,7 +728,7 @@
 		<website>http://varnish-cache.org</website>
 		<pkginfolink>https://doc.pfsense.org/index.php/Varnish_package</pkginfolink>
 		<category>Services</category>
-		<version>3.0.4 pkg v.0.2.1</version>
+		<version>3.0.4 pkg v.0.2.4</version>
 		<status>RC</status>
 		<required_version>2.0</required_version>
 		<config_file>https://packages.pfsense.org/packages/config/varnish3/varnish_backends.xml</config_file>
@@ -755,7 +755,7 @@
 		<depends_on_package>vnstat-1.11.tbz</depends_on_package>
 		<depends_on_package_pbi>vnstat-1.11_1-i386.pbi</depends_on_package_pbi>
 		<build_port_path>/usr/ports/net/vnstat</build_port_path>
-		<version>1.11_1</version>
+		<version>1.11_1,2</version>
 		<status>Stable</status>
 		<required_version>2.0</required_version>
 		<maintainer>bryan.paradis@gmail.com</maintainer>
@@ -849,7 +849,7 @@
 		<descr>Automatically backs up your pfSense configuration.  All contents are encrypted before being sent to the server.  Requires Gold Subscription from https://portal.pfsense.org</descr>
 		<website>https://portal.pfsense.org</website>
 		<category>Services</category>
-		<version>1.27</version>
+		<version>1.28</version>
 		<status>Stable</status>
 		<required_version>1.2</required_version>
 		<pkginfolink>https://doc.pfsense.org/index.php/AutoConfigBackup</pkginfolink>
@@ -875,14 +875,14 @@
 	<package>
 		<name>nmap</name>
 		<maintainer>jimp@pfsense.org</maintainer>
-		<descr>NMap is a utility for network exploration or security auditing. It supports ping scanning (determine which hosts are up), many port scanning techniques (determine what services the hosts are offering), version detection (determine what application/service is runing on a port), and TCP/IP fingerprinting (remote host OS or device identification). It also offers flexible target and port specification, decoy/stealth scanning, SunRPC scanning, and more. Most Unix and Windows platforms are supported in both GUI and command line modes. Several popular handheld devices are also supported, including the Sharp Zaurus and the iPAQ.</descr>
+		<descr>NMap is a utility for network exploration or security auditing. It supports ping scanning (determine which hosts are up), many port scanning techniques (determine what services the hosts are offering), version detection (determine what application/service is running on a port), and TCP/IP fingerprinting (remote host OS or device identification). It also offers flexible target and port specification, decoy/stealth scanning, SunRPC scanning, and more. </descr>
 		<category>Security</category>
 		<depends_on_package_base_url>https://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
 		<depends_on_package>lua-5.1.5_4.tbz</depends_on_package>
 		<depends_on_package>nmap-6.25_1.tbz</depends_on_package>
 		<depends_on_package_pbi>nmap-6.40_2-i386.pbi</depends_on_package_pbi>
 		<config_file>https://packages.pfsense.org/packages/config/nmap/nmap.xml</config_file>
-		<version>nmap-6.40_2 pkg v1.2.2</version>
+		<version>nmap-6.40_2 pkg v1.3</version>
 		<status>Stable</status>
 		<pkginfolink>https://doc.pfsense.org/index.php/Nmap_package</pkginfolink>
 		<required_version>2.0</required_version>
@@ -913,7 +913,7 @@
 		<descr>Network UPS Tools</descr>
 		<website>http://www.networkupstools.org/</website>
 		<category>Network Management</category>
-		<version>2.6.5_1 pkg 2.0.2</version>
+		<version>2.6.5_1 pkg 2.0.4</version>
 		<status>BETA</status>
 		<required_version>2.0</required_version>
 		<maintainer>rswagoner@gmail.com</maintainer>
@@ -1083,7 +1083,7 @@
 		<depends_on_package_base_url>https://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
 		<depends_on_package>iperf-2.0.5.tbz</depends_on_package>
 		<depends_on_package_pbi>iperf-2.0.5-i386.pbi</depends_on_package_pbi>
-		<version>2.0.5</version>
+		<version>2.0.5_1</version>
 		<status>Beta</status>
 		<pkginfolink>https://doc.pfsense.org/index.php/Iperf_package</pkginfolink>
 		<required_version>1.2.1</required_version>
@@ -1152,7 +1152,7 @@
 		<name>squid3</name>
 		<internal_name>squid</internal_name>
 		<descr><![CDATA[High performance web proxy cache.<br />
-			It combines squid as a proxy server with it's capabilities of acting as a HTTP / HTTPS reverse proxy.<br />
+			It combines squid as a proxy server with its capabilities of acting as a HTTP / HTTPS reverse proxy.<br />
 			It includes an Exchange-Web-Access (OWA) Assistant.]]></descr>
 		<pkginfolink>https://forum.pfsense.org/index.php/topic,48347.0.html</pkginfolink>
 		<website>http://www.squid-cache.org/</website>
@@ -1179,7 +1179,7 @@
 		<name>squid3-dev</name>
 		<internal_name>squid</internal_name>
 		<descr><![CDATA[High performance web proxy cache.<br />
-			It combines squid as a proxy server with it's capabilities of acting as a HTTP / HTTPS reverse proxy.<br />
+			It combines squid as a proxy server with its capabilities of acting as a HTTP / HTTPS reverse proxy.<br />
 			It includes an Exchange-Web-Access (OWA) Assistant, ssl filtering and antivirus integration via i-cap]]></descr>
 		<pkginfolink>https://forum.pfsense.org/index.php/topic,48347.0.html</pkginfolink>
 		<website>http://www.squid-cache.org/</website>
@@ -1264,7 +1264,7 @@
 	</package>
 	<package>
 		<name>squidGuard</name>
-		<descr>High perfomance web proxy URL filter. Requires proxy Squid 2.x package.</descr>
+		<descr>High performance web proxy URL filter. Requires proxy Squid 2.x package.</descr>
 		<website>http://www.squidGuard.org/</website>
 		<maintainer>dv_serg@mail.ru</maintainer>
 		<category>Network Management</category>
@@ -1289,7 +1289,7 @@
 	</package>
 	<package>
 		<name>squidGuard-devel</name>
-		<descr>High perfomance web proxy URL filter. Requires proxy Squid 2.x package.</descr>
+		<descr>High performance web proxy URL filter. Requires proxy Squid 2.x package.</descr>
 		<website>http://www.squidGuard.org/</website>
 		<maintainer>gugabsd@mundounix.com.br</maintainer>
 		<category>Network Management</category>
@@ -1309,7 +1309,7 @@
 	</package>
 	<package>
 		<name>squidGuard-squid3</name>
-		<descr>High perfomance web proxy URL filter. Requires proxy Squid 3.x package.</descr>
+		<descr>High performance web proxy URL filter. Requires proxy Squid 3.x package.</descr>
 		<website>http://www.squidGuard.org/</website>
 		<maintainer>dv_serg@mail.ru</maintainer>
 		<category>Network Management</category>
@@ -1377,7 +1377,7 @@
 		<depends_on_package_pbi>zip-3.0-i386.pbi p7zip-9.20.1-i386.pbi</depends_on_package_pbi>
 		<build_port_path>/usr/ports/archivers/p7zip</build_port_path>
 		<build_port_path>/usr/ports/archivers/zip</build_port_path>
-		<version>1.2.14</version>
+		<version>1.2.15</version>
 		<status>RELEASE</status>
 		<required_version>2.0</required_version>
 		<config_file>https://packages.pfsense.org/packages/config/openvpn-client-export/openvpn-client-export.xml</config_file>
@@ -1394,7 +1394,7 @@
 		<depends_on_package_pbi>havp-0.91_1-i386.pbi</depends_on_package_pbi>
 		<build_port_path>/usr/ports/www/havp</build_port_path>
 		<build_options>CLAMAVUSER=havp;CLAMAVGROUP=havp</build_options>
-		<version>0.91_1 pkg v1.02</version>
+		<version>0.91_1 pkg v1.04</version>
 		<status>BETA</status>
 		<required_version>1.2.2</required_version>
 		<config_file>https://packages.pfsense.org/packages/config/havp/havp.xml</config_file>
@@ -1469,7 +1469,7 @@
 		<descr>Unbound is a validating, recursive, and caching DNS resolver. This package is a drop in replacement for Services: DNS Forwarder and also supports DNSSEC extensions. Once installed please configure the Unbound service by visiting Services: Unbound DNS.</descr>
 		<website>http://www.unbound.net/</website>
 		<category>Services</category>
-		<version>1.4.22_2</version>
+		<version>1.5.1_2_1</version>
 		<status>Alpha</status>
 		<maintainer>warren@decoy.co.za</maintainer>
 		<required_version>2.0</required_version>
@@ -1489,8 +1489,8 @@
 			<ports_before>dns/ldns textproc/expat2 devel/libevent2</ports_before>
 			<port>dns/unbound</port>
 		</build_pbi>
-		<depends_on_package_pbi>unbound-1.4.22_2-i386.pbi</depends_on_package_pbi>
-		<build_options>unbound_UNSET_FORCE=GOST ECDSA;unbound_SET=LIBEVENT20 THREADS</build_options>
+		<depends_on_package_pbi>unbound-1.5.1_2-i386.pbi</depends_on_package_pbi>
+		<build_options>unbound_UNSET_FORCE=GOST ECDSA;unbound_SET=LIBEVENT THREADS</build_options>
 		<logging>
 			<facilityname>unbound</facilityname>
 			<logfilename>unbound.log</logfilename>
@@ -1575,7 +1575,7 @@
 		<descr><![CDATA[Allows to define SSH overrides for users,groups,hosts and addresses using Match in a convenient way.<br />
 				This package acts as an access list frontend for ssh connections]]></descr>
 		<category>Enhancements</category>
-		<version>1.0</version>
+		<version>1.0.1</version>
 		<status>Beta</status>
 		<required_version>2.0</required_version>
 		<config_file>https://packages.pfsense.org/packages/config/sshdcond/sshdcond.xml</config_file>
@@ -1591,24 +1591,6 @@
 		<required_version>2.0</required_version>
 		<config_file>https://packages.pfsense.org/packages/config/mailreport/mailreport.xml</config_file>
 		<configurationfile>mailreport.xml</configurationfile>
-	</package>
-	<package>
-		<name>zebedee</name>
-		<descr><![CDATA[Zebedee is a simple program to establish an encrypted, compressed "tunnel" for TCP/IP or UDP data transfer between two systems.<br />
-				This allows traffic such as telnet, ftp and X to be protected from snooping as well as potentially gaining performance over low-bandwidth networks from compression.]]>
-		</descr>
-		<category>Services</category>
-		<version>1.2.2</version>
-		<status>BETA</status>
-		<website>http://www.winton.org.uk/zebedee/</website>
-		<maintainer>jorgelustosa@gmail.com marcellocoutinho@gmail.com</maintainer>
-		<required_version>2.0</required_version>
-		<depends_on_package_base_url>https://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
-		<depends_on_package>zebedee-2.5.3.tbz</depends_on_package>
-		<depends_on_package_pbi>zebedee-2.5.3-i386.pbi</depends_on_package_pbi>
-		<config_file>https://packages.pfsense.org/packages/config/zebedee/zebedee.xml</config_file>
-		<configurationfile>zebedee.xml</configurationfile>
-		<build_port_path>/usr/ports/security/zebedee</build_port_path>
 	</package>
 	<package>
 		<name>OpenVPN tap Bridging Fix</name>
@@ -1654,7 +1636,7 @@
 		<descr><![CDATA[Bacula is a set of Open Source, computer programs that permit you (or the system administrator) to manage backup, recovery, and verification of computer data across a network of computers of different kinds.]]></descr>
 		<website>http://www.bacula.org/</website>
 		<category>Services</category>
-		<version>5.2.12_3 pkg v 1.0.3</version>
+		<version>5.2.12_3 pkg v 1.0.4</version>
 		<status>Stable</status>
 		<required_version>2.0</required_version>
 		<config_file>https://packages.pfsense.org/packages/config/bacula-client/bacula-client.xml</config_file>
@@ -1831,7 +1813,7 @@
 		<pkginfolink>https://doc.pfsense.org/index.php/Sudo_Package</pkginfolink>
 		<descr><![CDATA[sudo allows delegation of privileges to users in the shell so commands can be run as other users, such as root.]]></descr>
 		<category>Security</category>
-		<version>0.2.1</version>
+		<version>0.2.3</version>
 		<status>Beta</status>
 		<required_version>2.0.2</required_version>
 		<config_file>https://packages.pfsense.org/packages/config/sudo/sudo.xml</config_file>
@@ -1879,7 +1861,7 @@
 		<descr>Set of programs for controlling APC UPS.</descr>
 		<category>Services</category>
 		<config_file>https://packages.pfsense.org/packages/config/apcupsd/apcupsd.xml</config_file>
-		<version>apcupsd-3.14.10_1 pkg v0.3.1</version>
+		<version>apcupsd-3.14.10_1 pkg v0.3.2</version>
 		<status>BETA</status>
 		<required_version>2.0</required_version>
 		<configurationfile>apcupsd.xml</configurationfile>
@@ -1914,7 +1896,7 @@
 		<website>http://suricata-ids.org/</website>
 		<descr><![CDATA[High Performance Network IDS, IPS and Security Monitoring engine by OISF.]]></descr>
 		<category>Security</category>
-		<version>2.0.3 pkg v2.0.2</version>
+		<version>2.0.4 pkg v2.1.3</version>
 		<status>Stable</status>
 		<required_version>2.1</required_version>
 		<config_file>https://packages.pfsense.org/packages/config/suricata/suricata.xml</config_file>
@@ -1923,10 +1905,10 @@
 			<port>security/suricata</port>
 			<ports_after>security/barnyard2</ports_after>
 		</build_pbi>
-		<build_options>barnyard2_UNSET=ODBC PGSQL PRELUDE;barnyard2_SET=GRE IPV6 MPLS MYSQL PORT_PCAP BRO;suricata_SET=IPFW PORTS_PCAP TESTS;suricata_UNSET=PRELUDE</build_options>
+		<build_options>barnyard2_UNSET=ODBC PGSQL PRELUDE;barnyard2_SET=GRE IPV6 MPLS MYSQL PORT_PCAP BRO;suricata_SET=IPFW PORTS_PCAP GEOIP JSON;suricata_UNSET=PRELUDE TESTS HTP_PORT</build_options>
 		<build_port_path>/usr/ports/security/suricata</build_port_path>
 		<depends_on_package_base_url>https://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
-		<depends_on_package_pbi>suricata-2.0.3-i386.pbi</depends_on_package_pbi>
+		<depends_on_package_pbi>suricata-2.0.4-i386.pbi</depends_on_package_pbi>
 	</package>
 </packages>
 </pfsensepkgs>

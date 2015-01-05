@@ -12,7 +12,10 @@ $haproxy_tab_array['haproxy'] = array();
 $haproxy_tab_array['haproxy']['settings'] = Array(name => "Settings", url => "haproxy_global.php");
 $haproxy_tab_array['haproxy']['frontend'] = Array(name => "Frontend", url => "haproxy_listeners.php");
 $haproxy_tab_array['haproxy']['backend'] = Array(name => "Backend", url => "haproxy_pools.php");
+$haproxy_tab_array['haproxy']['files'] = Array(name => "Files", url => "haproxy_files.php");
 $haproxy_tab_array['haproxy']['stats'] = Array(name => "Stats", url => "haproxy_stats.php");
+$haproxy_tab_array['haproxy']['statsfs'] = Array(name => "Stats FS", url => "haproxy_stats.php?haproxystats=1");
+$haproxy_tab_array['haproxy']['templates'] = Array(name => "Templates", url => "haproxy_templates.php");
 
 function haproxy_display_top_tabs_active($top_tabs, $activetab) {
 	$tab_array = array();

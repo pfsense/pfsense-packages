@@ -182,7 +182,9 @@ if ($_POST['save']) {
 		write_config("Suricata pkg: modified PASS LIST {$p_list['name']}.");
 
 		/* create pass list and homenet file, then sync files */
+		conf_mount_rw();
 		sync_suricata_package_config();
+		conf_mount_ro();
 
 		header("Location: /suricata/suricata_passlist.php");
 		exit;
@@ -224,6 +226,7 @@ if ($savemsg)
 	$tab_array[] = array(gettext("Logs Mgmt"), false, "/suricata/suricata_logs_mgmt.php");
 	$tab_array[] = array(gettext("SID Mgmt"), false, "/suricata/suricata_sid_mgmt.php");
 	$tab_array[] = array(gettext("Sync"), false, "/pkg_edit.php?xml=suricata/suricata_sync.xml");
+	$tab_array[] = array(gettext("IP Lists"), false, "/suricata/suricata_ip_list_mgmt.php");
 	display_top_tabs($tab_array, true);
 ?>
 	</td>

@@ -173,7 +173,9 @@ if ($_POST["save"] || $_POST['apply']) {
 	if ($_POST['enable_log_mgmt'] != 'on') {
 		$config['installedpackages']['suricata']['config'][0]['enable_log_mgmt'] = $_POST['enable_log_mgmt'] ? 'on' :'off';
 		write_config("Suricata pkg: saved updated configuration for LOGS MGMT.");
+		conf_mount_rw();
 		sync_suricata_package_config();
+		conf_mount_ro();
 
 		/* forces page to reload new settings */
 		header( 'Expires: Sat, 26 Jul 1997 05:00:00 GMT' );
@@ -222,7 +224,9 @@ if ($_POST["save"] || $_POST['apply']) {
 		$config['installedpackages']['suricata']['config'][0]['sid_changes_log_retention'] = $_POST['sid_changes_log_retention'];
 
 		write_config("Suricata pkg: saved updated configuration for LOGS MGMT.");
+		conf_mount_rw();
 		sync_suricata_package_config();
+		conf_mount_ro();
 
 		/* forces page to reload new settings */
 		header( 'Expires: Sat, 26 Jul 1997 05:00:00 GMT' );
@@ -274,6 +278,7 @@ if ($savemsg) {
 	$tab_array[] = array(gettext("Logs Mgmt"), true, "/suricata/suricata_logs_mgmt.php");
 	$tab_array[] = array(gettext("SID Mgmt"), false, "/suricata/suricata_sid_mgmt.php");
 	$tab_array[] = array(gettext("Sync"), false, "/pkg_edit.php?xml=suricata/suricata_sync.xml");
+	$tab_array[] = array(gettext("IP Lists"), false, "/suricata/suricata_ip_list_mgmt.php");
         display_top_tabs($tab_array, true);
 ?>
 </td></tr>

@@ -55,7 +55,7 @@ $pconfig['auto_manage_sids'] = $config['installedpackages']['suricata']['config'
 
 // Hard-code the path where SID Mods Lists are stored
 // and disregard any user-supplied path element.
-$sidmods_path = SID_MODS_PATH;
+$sidmods_path = SURICATA_SID_MODS_PATH;
 
 // Set default to not show SID modification lists editor controls
 $sidmodlist_edit_style = "display: none;";
@@ -216,7 +216,7 @@ if (isset($_POST['sidlist_dnload']) && isset($_POST['sidlist_fname'])) {
 }
 
 if (isset($_POST['sidlist_dnload_all_x'])) {
-	$save_date = exec('/bin/date "+%Y-%m-%d-%H-%M-%S"');
+	$save_date = date("Y-m-d-H-i-s");
 	$file_name = "suricata_sid_conf_files_{$save_date}.tar.gz";
 	exec("cd {$sidmods_path} && /usr/bin/tar -czf /tmp/{$file_name} *");
 
@@ -236,7 +236,7 @@ if (isset($_POST['sidlist_dnload_all_x'])) {
 		readfile("/tmp/{$file_name}");
 
 		// Clean up the temp file
-		@unlink("/tmp/{$file_name}");
+		unlink_if_exists("/tmp/{$file_name}");
 	}
 	else
 		$savemsg = gettext("An error occurred while creating the gzip archive!");
@@ -290,6 +290,7 @@ if ($savemsg) {
 		$tab_array[] = array(gettext("Logs Mgmt"), false, "/suricata/suricata_logs_mgmt.php");
 		$tab_array[] = array(gettext("SID Mgmt"), true, "/suricata/suricata_sid_mgmt.php");
 		$tab_array[] = array(gettext("Sync"), false, "/pkg_edit.php?xml=suricata/suricata_sync.xml");
+		$tab_array[] = array(gettext("IP Lists"), false, "/suricata/suricata_ip_list_mgmt.php");
         	display_top_tabs($tab_array, true);
 	?>
 	</td></tr>
@@ -297,6 +298,11 @@ if ($savemsg) {
 		<div id="mainarea">
 		<table id="maintable" class="tabcont" width="100%" border="0" cellpadding="6" cellspacing="0">
 			<tbody>
+		<?php if ($g['platform'] == "nanobsd") : ?>
+			<tr>
+				<td colspan="2" class="listtopic"><?php echo gettext("SID auto-management is not supported on NanoBSD installs"); ?></td>
+			</tr>
+		<?php else: ?>
 			<tr>
 				<td colspan="2" valign="top" class="listtopic"><?php echo gettext("General Settings"); ?></td>
 			</tr>
@@ -571,6 +577,7 @@ if ($savemsg) {
 				&nbsp;&nbsp;<?=gettext("Remember to save changes before exiting this page"); ?>
 				</td>
 			</tr>
+		<?php endif; ?>
 			</tbody>
 		</table>
 		</div>
@@ -581,6 +588,8 @@ if ($savemsg) {
 
 
 <?php include("fend.inc"); ?>
+
+<?php if ($g['platform'] != "nanobsd") : ?>
 <script type="text/javascript">
 
 function enable_sid_conf() {
@@ -596,5 +605,7 @@ function enable_sid_conf() {
 enable_sid_conf();
 
 </script>
+<?php endif; ?>
+
 </body>
 </html>

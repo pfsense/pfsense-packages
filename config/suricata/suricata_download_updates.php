@@ -44,7 +44,7 @@ require_once("/usr/local/pkg/suricata/suricata.inc");
 
 /* Define some locally required variables from Suricata constants */
 $suricatadir = SURICATADIR;
-$suricata_rules_upd_log = RULES_UPD_LOGFILE;
+$suricata_rules_upd_log = SURICATA_RULES_UPD_LOGFILE;
 
 $snortdownload = $config['installedpackages']['suricata']['config'][0]['enable_vrt_rules'];
 $emergingthreats = $config['installedpackages']['suricata']['config'][0]['enable_etopen_rules'];
@@ -116,7 +116,7 @@ if ($snortcommunityrules == 'on' && file_exists("{$suricatadir}{$snort_community
 /* Check for postback to see if we should clear the update log file. */
 if ($_POST['clear']) {
 	if (file_exists("{$suricata_rules_upd_log}"))
-		mwexec("/bin/rm -f {$suricata_rules_upd_log}");
+		unlink_if_exists("{$suricata_rules_upd_log}");
 }
 
 if ($_POST['update']) {
@@ -130,12 +130,9 @@ if ($_POST['force']) {
 	conf_mount_rw();
 
 	// Remove the existing MD5 signature files to force a download
-	if (file_exists("{$suricatadir}{$emergingthreats_filename}.md5"))
-		@unlink("{$suricatadir}{$emergingthreats_filename}.md5");
-	if (file_exists("{$suricatadir}{$snort_community_rules_filename}.md5"))
-		@unlink("{$suricatadir}{$snort_community_rules_filename}.md5");
-	if (file_exists("{$suricatadir}{$snort_rules_file}.md5"))
-		@unlink("{$suricatadir}{$snort_rules_file}.md5");
+	unlink_if_exists("{$suricatadir}{$emergingthreats_filename}.md5");
+	unlink_if_exists("{$suricatadir}{$snort_community_rules_filename}.md5");
+	unlink_if_exists("{$suricatadir}{$snort_rules_file}.md5");
 
 	// Revert file system to R/O.
 	conf_mount_ro();
@@ -195,6 +192,7 @@ include_once("head.inc");
 	$tab_array[] = array(gettext("Logs Mgmt"), false, "/suricata/suricata_logs_mgmt.php");
 	$tab_array[] = array(gettext("SID Mgmt"), false, "/suricata/suricata_sid_mgmt.php");
 	$tab_array[] = array(gettext("Sync"), false, "/pkg_edit.php?xml=suricata/suricata_sync.xml");
+	$tab_array[] = array(gettext("IP Lists"), false, "/suricata/suricata_ip_list_mgmt.php");
         display_top_tabs($tab_array, true);
 ?>
 </td></tr>

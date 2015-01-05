@@ -248,7 +248,7 @@ function vnstat_php_frontend(){
     // see file COPYING or at http://www.gnu.org/licenses/gpl.html 
     // for more information.
     //
-    error_reporting(E_ALL | E_NOTICE);
+    //error_reporting(E_ALL | E_NOTICE);
     
     //
     // configuration parameters
