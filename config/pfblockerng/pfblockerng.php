@@ -879,11 +879,11 @@ $xml = <<<EOF
 		</tab>
 		<tab>
 			<text>IPv4</text>
-			<url>/pkg.php?xml=/pfblockerng/pfblockerng_v4lists.xml</url>
+			<url>/pkg.php?xml=/pfblockerng/pfblockerng_v4lists.xml&amp;id=0</url>
 		</tab>
 		<tab>
 			<text>IPv6</text>
-			<url>/pkg.php?xml=/pfblockerng/pfblockerng_v6lists.xml</url>
+			<url>/pkg.php?xml=/pfblockerng/pfblockerng_v6lists.xml&amp;id=0</url>
 		</tab>
 		<tab>
 			<text>Top 20</text>
@@ -936,7 +936,7 @@ $xml = <<<EOF
 		</field>
 		<field>
 			<fielddescr>LINKS</fielddescr>
-			<fieldname>none</fieldname>
+			<fieldname></fieldname>
 			<description><![CDATA[<a href="/firewall_aliases.php">Firewall Alias</a> &nbsp;&nbsp;&nbsp; <a href="/firewall_rules.php">Firewall Rules</a> &nbsp;&nbsp;&nbsp; <a href="diag_logs_filter.php">Firewall Logs</a>]]>
 			</description>
 			<type>info</type>
@@ -1168,11 +1168,11 @@ $xmlrep = <<<EOF
 		</tab>
 		<tab>
 			<text>IPv4</text>
-			<url>/pkg.php?xml=/pfblockerng/pfblockerng_v4lists.xml</url>
+			<url>/pkg.php?xml=/pfblockerng/pfblockerng_v4lists.xml&amp;id=0</url>
 		</tab>
 		<tab>
 			<text>IPv6</text>
-			<url>/pkg.php?xml=/pfblockerng/pfblockerng_v6lists.xml</url>
+			<url>/pkg.php?xml=/pfblockerng/pfblockerng_v6lists.xml&amp;id=0</url>
 		</tab>
 		<tab>
 			<text>Top 20</text>
@@ -1218,14 +1218,14 @@ $xmlrep = <<<EOF
 		</field>
 		<field>
 			<fielddescr>LINKS</fielddescr>
-			<fieldname>none</fieldname>
+			<fieldname></fieldname>
 			<description><![CDATA[<a href="/firewall_aliases.php">Firewall Alias</a> &nbsp;&nbsp;&nbsp; <a href="/firewall_rules.php">Firewall Rules</a> &nbsp;&nbsp;&nbsp; <a href="diag_logs_filter.php">Firewall Logs</a>]]>
 			</description>
 			<type>info</type>
 		</field>
 		<field>
 			<fielddescr><![CDATA[<strong>Why Reputation Matters:</strong>]]></fielddescr>
-			<fieldname>why</fieldname>
+			<fieldname></fieldname>
 			<type>info</type>
 			<description><![CDATA[By Enabling '<strong>Reputation</strong>', each Blocklist will be analyzed for Repeat Offenders in each IP Range.
 				<ul>Example: &nbsp;&nbsp; x.x.x.1, x.x.x.2, x.x.x.3, x.x.x.4, x.x.x.5<br />
@@ -1237,7 +1237,8 @@ $xmlrep = <<<EOF
 				Its Important to select a Broad Range of Blocklists that cover different types of Malicious Activity.<br /><br />
 				You *may* experience some False Positives. Add any False Positive IPs manually to the<br />
 				<strong>pfBlockerNGSuppress Alias</strong> or use the "+" suppression Icon in the Alerts TAB<br /><br />
-				To help mitigate False Positives 'Countries' can be '<strong>Excluded</strong>' from this Process. (Refer to Country Code Settings)]]>
+				To help mitigate False Positives 'Countries' can be '<strong>Excluded</strong>' from this Process. (Refer to Country Code Settings)
+				<br /><br />Enabling <strong>De-Duplication</strong> is highly recommended before utilizing 'Reputation' processes.]]>
 			</description>
 		</field>
 		<field>

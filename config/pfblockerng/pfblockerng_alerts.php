@@ -143,9 +143,14 @@ if (isset($_POST['addsuppress'])) {
 		$ip = $_POST['ip'];
 		$table = $_POST['table'];
 		$descr = $_POST['descr'];
-		if (empty($descr))
-			$descr = sprintf(gettext("Entry added %s"), date('r'));
 		$cidr = $_POST['cidr'];
+
+		// If Description or CIDR field is empty, exit.
+		if (empty($descr) || empty($cidr)) {
+			header("Location: " . $_SERVER['PHP_SELF']);
+			exit;
+		}
+
 		if (is_ipaddr($ip)) {
 
 			$savemsg1 = "Host IP address {$ip}";
@@ -730,8 +735,10 @@ function hostruleid(host,table) {
 	var description = prompt("Please enter Suppression Description");
 	document.getElementById("descr").value = description;
 
-	var cidr = prompt("Please enter CIDR [ 32 or 24 CIDR only supported ]","32");
-	document.getElementById("cidr").value = cidr;
+	if (description.value != "") {
+		var cidr = prompt("Please enter CIDR [ 32 or 24 CIDR only supported ]","32");
+		document.getElementById("cidr").value = cidr;
+	}
 }
 
 // Auto-Resolve of Alerted Hostnames
