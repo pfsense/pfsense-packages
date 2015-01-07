@@ -1222,7 +1222,7 @@ $xmlrep = <<<EOF
 			<description><![CDATA[<a href="/firewall_aliases.php">Firewall Alias</a> &nbsp;&nbsp;&nbsp; <a href="/firewall_rules.php">Firewall Rules</a> &nbsp;&nbsp;&nbsp; <a href="diag_logs_filter.php">Firewall Logs</a>]]>
 			</description>
 			<type>info</type>
-		</field>?
+		</field>
 		<field>
 			<fielddescr><![CDATA[<strong>Why Reputation Matters:</strong>]]></fielddescr>
 			<fieldname></fieldname>
