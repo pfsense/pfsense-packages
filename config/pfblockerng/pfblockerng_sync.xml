@@ -77,11 +77,11 @@
 		</tab>
 		<tab>
 			<text>IPv4</text>
-			<url>/pkg.php?xml=/pfblockerng/pfblockerng_v4lists.xml</url>
+			<url>/pkg.php?xml=/pfblockerng/pfblockerng_v4lists.xml&amp;id=0</url>
 		</tab>
 		<tab>
 			<text>IPv6</text>
-			<url>/pkg.php?xml=/pfblockerng/pfblockerng_v6lists.xml</url>
+			<url>/pkg.php?xml=/pfblockerng/pfblockerng_v6lists.xml&amp;id=0</url>
 		</tab>
 		<tab>
 			<text>Top 20</text>
@@ -190,21 +190,28 @@
 					</options>
 				</rowhelperfield>
 				<rowhelperfield>
-					<fielddescr>IP-Address</fielddescr>
+					<fielddescr>Target IP Address</fielddescr>
 					<fieldname>varsyncipaddress</fieldname>
 					<description><![CDATA[IP Address of the destination host.]]></description>
 					<type>input</type>
 					<size>15</size>
 				</rowhelperfield>
 				<rowhelperfield>
-					<fielddescr>Port</fielddescr>
+					<fielddescr>Target Port</fielddescr>
 					<fieldname>varsyncport</fieldname>
 					<description><![CDATA[Choose the sync port of the destination host.]]></description>
 					<type>input</type>
 					<size>3</size>
 				</rowhelperfield>
 				<rowhelperfield>
-					<fielddescr>Admin Password</fielddescr>
+					<fielddescr>Target Username (admin)</fielddescr>
+					<fieldname>varsyncusername</fieldname>
+					<description><![CDATA[Enter the Username Account for Authentication]]></description>
+					<type>input</type>
+					<size>15</size>
+				</rowhelperfield>
+				<rowhelperfield>
+					<fielddescr>Target Password</fielddescr>
 					<fieldname>varsyncpassword</fieldname>
 					<description><![CDATA[Password of the user "admin" on the destination host.]]></description>
 					<type>password</type>
