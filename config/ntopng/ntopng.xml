@@ -199,7 +199,7 @@
 		//  Add support for --data-dir /somewhere, --httpdocs-dir /somewhereelse,
 		//  --dump-timeline (on/off) --http-port, --https-port
 
-		$start .= "\t/usr/local/bin/ntopng -s -e {$dump_flows} {$ifaces} {$dns_mode} {$aggregations} {$local_networks} &";
+		$start .= "\t/usr/local/bin/ntopng -d /var/db/ntopng -G /var/run/ntopng.pid -s -e {$dump_flows} {$ifaces} {$dns_mode} {$aggregations} {$local_networks} &";
 		write_rcfile(array(
 					"file" => "ntopng.sh",
 					"start" => $start,
