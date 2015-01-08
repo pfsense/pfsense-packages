@@ -55,10 +55,15 @@
 	<menu>
 		<name>pfBlockerNG</name>
 		<configfile>pfblockerng.xml</configfile>
-		<tooltiptext>Configure pfblockerNG</tooltiptext>
+		<tooltiptext>Configure pfBlockerNG</tooltiptext>
 		<section>Firewall</section>
 		<url>/pkg_edit.php?xml=pfblockerng.xml</url>
 	</menu>
+	<additional_files_needed>
+		<item>https://packages.pfsense.org/packages/config/pfblockerng/pfblockerng.priv.inc</item>
+		<prefix>/etc/inc/priv/</prefix>
+		<chmod>0644</chmod>
+	</additional_files_needed>
 	<additional_files_needed>
 		<item>https://packages.pfsense.org/packages/config/pfblockerng/pfblockerng.inc</item>
 		<prefix>/usr/local/pkg/pfblockerng/</prefix>
@@ -125,62 +130,7 @@
 		<chmod>0644</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
-		<item>https://packages.pfsense.org/packages/config/pfblockerng/cc/Africa_v4.txt</item>
-		<prefix>/var/db/pfblockerng/cc/</prefix>
-		<chmod>0444</chmod>
-	</additional_files_needed>
-	<additional_files_needed>
-		<item>https://packages.pfsense.org/packages/config/pfblockerng/cc/Africa_v6.txt</item>
-		<prefix>/var/db/pfblockerng/cc/</prefix>
-		<chmod>0444</chmod>
-	</additional_files_needed>
-	<additional_files_needed>
-		<item>https://packages.pfsense.org/packages/config/pfblockerng/cc/Asia_v4.txt</item>
-		<prefix>/var/db/pfblockerng/cc/</prefix>
-		<chmod>0444</chmod>
-	</additional_files_needed>
-	<additional_files_needed>
-		<item>https://packages.pfsense.org/packages/config/pfblockerng/cc/Asia_v6.txt</item>
-		<prefix>/var/db/pfblockerng/cc/</prefix>
-		<chmod>0444</chmod>
-	</additional_files_needed>
-	<additional_files_needed>
-		<item>https://packages.pfsense.org/packages/config/pfblockerng/cc/Europe_v4.txt</item>
-		<prefix>/var/db/pfblockerng/cc/</prefix>
-		<chmod>0444</chmod>
-	</additional_files_needed>
-	<additional_files_needed>
-		<item>https://packages.pfsense.org/packages/config/pfblockerng/cc/Europe_v6.txt</item>
-		<prefix>/var/db/pfblockerng/cc/</prefix>
-		<chmod>0444</chmod>
-	</additional_files_needed>
-	<additional_files_needed>
-		<item>https://packages.pfsense.org/packages/config/pfblockerng/cc/North_America_v4.txt</item>
-		<prefix>/var/db/pfblockerng/cc/</prefix>
-		<chmod>0444</chmod>
-	</additional_files_needed>
-	<additional_files_needed>
-		<item>https://packages.pfsense.org/packages/config/pfblockerng/cc/North_America_v6.txt</item>
-		<prefix>/var/db/pfblockerng/cc/</prefix>
-		<chmod>0444</chmod>
-	</additional_files_needed>
-	<additional_files_needed>
-		<item>https://packages.pfsense.org/packages/config/pfblockerng/cc/Oceania_v4.txt</item>
-		<prefix>/var/db/pfblockerng/cc/</prefix>
-		<chmod>0444</chmod>
-	</additional_files_needed>
-	<additional_files_needed>
-		<item>https://packages.pfsense.org/packages/config/pfblockerng/cc/Oceania_v6.txt</item>
-		<prefix>/var/db/pfblockerng/cc/</prefix>
-		<chmod>0444</chmod>
-	</additional_files_needed>
-	<additional_files_needed>
-		<item>https://packages.pfsense.org/packages/config/pfblockerng/cc/South_America_v4.txt</item>
-		<prefix>/var/db/pfblockerng/cc/</prefix>
-		<chmod>0444</chmod>
-	</additional_files_needed>
-	<additional_files_needed>
-		<item>https://packages.pfsense.org/packages/config/pfblockerng/cc/South_America_v6.txt</item>
+		<item>https://packages.pfsense.org/packages/config/pfblockerng/countrycodes.tar.bz2</item>
 		<prefix>/var/db/pfblockerng/cc/</prefix>
 		<chmod>0444</chmod>
 	</additional_files_needed>
@@ -214,11 +164,11 @@
 		</tab>
 		<tab>
 			<text>IPv4</text>
-			<url>/pkg.php?xml=/pfblockerng/pfblockerng_v4lists.xml</url>
+			<url>/pkg.php?xml=/pfblockerng/pfblockerng_v4lists.xml&amp;id=0</url>
 		</tab>
 		<tab>
 			<text>IPv6</text>
-			<url>/pkg.php?xml=/pfblockerng/pfblockerng_v6lists.xml</url>
+			<url>/pkg.php?xml=/pfblockerng/pfblockerng_v6lists.xml&amp;id=0</url>
 		</tab>
 		<tab>
 			<text>Top20</text>
@@ -264,7 +214,7 @@
 		</field>
 		<field>
 			<fielddescr>LINKS</fielddescr>
-			<fieldname>none</fieldname>
+			<fieldname></fieldname>
 			<description><![CDATA[<a href="/firewall_aliases.php">Firewall Alias</a> &nbsp;&nbsp;&nbsp; <a href="/firewall_rules.php">Firewall Rules</a> &nbsp;&nbsp;&nbsp; <a href="diag_logs_filter.php">Firewall Logs</a>]]></description>
 			<type>info</type>
 		</field>
@@ -356,7 +306,7 @@
 			</options>
 		</field>
 		<field>
-			<fielddescr>Remove Duplication</fielddescr>
+			<fielddescr>Enable De-Duplication</fielddescr>
 			<fieldname>enable_dup</fieldname>
 			<type>checkbox</type>
 			<description>Only for IPv4 Lists</description>
@@ -414,7 +364,7 @@
 		<field>
 			<fielddescr>Inbound Interface(s)</fielddescr>
 			<fieldname>inbound_interface</fieldname>
-			<description><![CDATA[Default: <strong>WAN</strong><br />Select the interface(s) you want to Apply Rules to]]></description>
+			<description>Select the Inbound interface(s) you want to Apply Auto Rules to</description>
 			<type>interfaces_selection</type>
 			<hideinterfaceregex>loopback</hideinterfaceregex>
 			<required/>
@@ -434,7 +384,7 @@
 		<field>
 			<fielddescr>Outbound Interface(s)</fielddescr>
 			<fieldname>outbound_interface</fieldname>
-			<description><![CDATA[Default:<strong>LAN</strong> or none.<br />Select the interface(s) you want to Apply Rules to]]></description>
+			<description>Select the Outbound interface(s) you want to Apply Auto Rules to</description>
 			<type>interfaces_selection</type>
 			<hideinterfaceregex>loopback</hideinterfaceregex>
 			<required/>
