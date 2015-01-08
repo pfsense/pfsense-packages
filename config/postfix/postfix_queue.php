@@ -228,7 +228,7 @@ else{
 			//prevent multiple instances
 			if ($('run').value=="show queue" || loop== 'running'){
 				$('run').value="running...";
-				$('search_help').innerHTML ="<br><strong>You can change options while running.<br>To Stop seach, change update frequency to Never.</strong>";
+				$('search_help').innerHTML ="<br><strong>You can change options while running.<br>To Stop search, change update frequency to Never.</strong>";
 				var q_args=loopSelected('qshape');
 				var pars = 'cmd='+$('cmd').options[$('cmd').selectedIndex].value;
 				var pars = pars + '&qshape='+q_args;
