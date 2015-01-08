@@ -118,6 +118,12 @@
 				<option><value>lanonly</value><name>Consider only LAN interface local</name></option>
 			</options>
 		</field>
+		<field>
+			<fielddescr>Historical Data Storage</fielddescr>
+			<fieldname>dump_flows</fieldname>
+			<description>Turn historical data storages on</description>
+			<type>checkbox</type>
+		</field>
 	</fields>
 	<custom_php_global_functions>
 	<![CDATA[
@@ -175,6 +181,11 @@
 				break;
 		}
 
+		// Historical Data Storage, Dump expired flows
+		if ($ntopng_config['dump_flows'] >= on) {
+			$dump_flows = "-F";
+		}
+		
 		$pf_version=substr(trim(file_get_contents("/etc/version")),0,3);
 		if ($pf_version >= 2.2) {
 			$redis_path = "/usr/pbi/ntopng-" . php_uname("m") . "/local/bin";
@@ -188,7 +199,7 @@
 		//  Add support for --data-dir /somewhere, --httpdocs-dir /somewhereelse,
 		//  --dump-timeline (on/off) --http-port, --https-port
 
-		$start .= "\t/usr/local/bin/ntopng -s -e {$ifaces} {$dns_mode} {$aggregations} {$local_networks} &";
+		$start .= "\t/usr/local/bin/ntopng -s -e {$dump_flows} {$ifaces} {$dns_mode} {$aggregations} {$local_networks} &";
 		write_rcfile(array(
 					"file" => "ntopng.sh",
 					"start" => $start,
