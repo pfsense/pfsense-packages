@@ -352,7 +352,7 @@
 			<ports_before>databases/redis databases/gdbm net/GeoIP x11-fonts/font-util x11-fonts/webfonts graphics/graphviz</ports_before>
 			<port>net/ntopng</port>
 		</build_pbi>
-		<version>1.1 v0.2</version>
+		<version>1.1 v0.3</version>
 		<status>ALPHA</status>
 		<required_version>2.1.4</required_version>
 		<config_file>https://packages.pfsense.org/packages/config/ntopng/ntopng.xml</config_file>
@@ -1255,7 +1255,7 @@
 		<website>http://www.squidGuard.org/</website>
 		<maintainer>dv_serg@mail.ru</maintainer>
 		<category>Network Management</category>
-		<version>1.4_4 pkg v.1.9.6</version>
+		<version>1.4_4 pkg v.1.9.7</version>
 		<status>Beta</status>
 		<required_version>1.1</required_version>
 		<depends_on_package_base_url>https://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
