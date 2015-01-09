@@ -204,7 +204,7 @@ if (pfsense_version_A() == '1') {
 	$tab_array[] = array(gettext("General page"), true, "antivirus.php");
 	$tab_array[] = array(gettext("HTTP proxy"), false, "pkg_edit.php?xml=havp.xml&amp;id=0");
 	$tab_array[] = array(gettext("Settings"), false, "pkg_edit.php?xml=havp_avset.xml&amp;id=0");
-	$tab_array[] = array(gettext("Log"), false, "havp_log.php");
+	$tab_array[] = array(gettext("HAVP Log"), false, "havp_log.php");
 
 	display_top_tabs($tab_array);
 ?>
