@@ -56,7 +56,7 @@
                         <url>/pkg_edit.php?xml=havp_avset.xml&amp;id=0</url>
                 </tab>
                 <tab>
-                        <text>Log</text>
+                        <text>HAVP Log</text>
                         <url>/havp_log.php</url>
                 </tab>
         </tabs>
