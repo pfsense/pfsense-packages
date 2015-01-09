@@ -2221,7 +2221,7 @@ function sg_update_blacklist($from_file)
                     # if $current_dbpath exists, then $val['path'] will created as subdir - !it's worng!
                     if (file_exists($current_dbpath))
                         mwexec("/bin/rm -R {$current_dbpath}");
-                    mwexec("/usr/bin/tar -f {$val['path']}/ {$current_dbpath}");
+                    mwexec("/bin/mv -f {$val['path']}/ {$current_dbpath}");
                     sg_addlog("sg_update_blacklist", "Move {$val['path']}/ -> {$current_dbpath}.", SQUIDGUARD_INFO);
                 }
             }
