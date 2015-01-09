@@ -293,16 +293,16 @@
 						<default_value>on</default_value>
                 </field>				
                 <field>
-                        <fielddescr>Log</fielddescr>
+                        <fielddescr>HAVP Log</fielddescr>
                         <fieldname>log</fieldname>
-                        <description>Check this for enable log.</description>
+                        <description>Check this for enable HAVP log.</description>
                         <type>checkbox</type>
                         <enablefields>syslog</enablefields>
                 </field>
                 <field>
-                        <fielddescr>Syslog</fielddescr>
+                        <fielddescr>HAVP Syslog</fielddescr>
                         <fieldname>syslog</fieldname>
-                        <description>Check this for enable Syslog.</description>
+                        <description>Check this for enable HAVP Syslog.</description>
                         <type>checkbox</type>
                 </field>
         </fields>
