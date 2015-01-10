@@ -3094,7 +3094,7 @@ function snort_deinstall() {
 	log_error(gettext("[Snort] Snort package uninstall in progress..."));
 
 	/* Remove our rc.d startup shell script */
-	unlink_if_exists("{$rcdir}snort_pkg.sh");
+	unlink_if_exists("{$rcdir}snort.sh");
 
 	/* Make sure all active Snort processes are terminated */
 	/* Log a message only if a running process is detected */
