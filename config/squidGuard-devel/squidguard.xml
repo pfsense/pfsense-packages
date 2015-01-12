@@ -143,7 +143,7 @@
                 <field>
                         <fielddescr>LDAP DN Password</fielddescr>
                         <fieldname>ldapbindpass</fieldname>
-                        <description><![CDATA[LDAP DN Users password]]></description>
+                        <description><![CDATA[Password must be initialize with letters (Ex: Change123), valid format: [a-zA-Z\/][a-zA-Z0-9/_\-\.\/\:\%\+\?=&]]]></description>
                         <type>password</type>
                 </field>
                 <field>
