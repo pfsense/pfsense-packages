@@ -411,7 +411,7 @@
 		<website>http://www.postfix.org/</website>
 		<descr><![CDATA[Postfix mail forwarder acts as a relay server for your domain.<br />
 				It can do first and second line antispam combat before sending incoming mail to local mail servers.<br />
-				Postfix can also detect zombies, check RBLS, SPF, seach ldap for valid recipients and use third part antispam engines like policyd and mailscanner for better antispam solution.]]></descr>
+				Postfix can also detect zombies, check RBLS, SPF, search ldap for valid recipients and use third part antispam engines like policyd and mailscanner for better antispam solution.]]></descr>
 		<category>Services</category>
 		<pkginfolink>https://forum.pfsense.org/index.php/topic,40622.0.html</pkginfolink>
 		<config_file>https://packages.pfsense.org/packages/config/postfix/postfix.xml</config_file>
