@@ -186,8 +186,8 @@
 			&lt;input type=&quot;submit&quot; name=&quot;Submit&quot; value=&quot;Refresh full&quot;&gt;
 			&lt;br&gt; Press button for start background refresh (this take some time).
 			&lt;br&gt; &lt;span style=&quot;color: rgb(153, 51, 0);&quot;&gt; Note after installation:
-			&lt;br&gt; On the first - enable log in squid package with &quot;/var/squid/logs&quot; path.
-			&lt;br&gt; On the second - press Refresh button for create lightsquid reports, else you will have error diagnostic page.&lt;/span&gt;
+			&lt;br&gt; Firstly - enable log in squid package with &quot;/var/squid/logs&quot; path.
+			&lt;br&gt; Secondly - press Refresh button to create lightsquid reports, else you will have an error diagnostic page.&lt;/span&gt;
 			</description>
                         <type>select</type>
                         <value>lhp_none</value>
