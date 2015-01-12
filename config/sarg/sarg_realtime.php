@@ -220,7 +220,7 @@ else{
 			//prevent multiple instances
 			if ($('run').value=="show log" || loop== 'running'){
 				$('run').value="running...";
-				$('search_help').innerHTML ="<br><strong>You can change options while running.<br>To Stop seach, change update frequency to Never.</strong>";
+				$('search_help').innerHTML ="<br><strong>You can change options while running.<br>To Stop search, change update frequency to Never.</strong>";
 				var axel = Math.random() + "";
 				var num = axel * 1000000000000000000;
 				var q_args=loopSelected('qshape');
