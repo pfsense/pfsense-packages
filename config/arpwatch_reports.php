@@ -32,7 +32,15 @@
 require_once("guiconfig.inc");
 require_once("service-utils.inc");
 
-$logfile = "/var/log/arp.dat";
+//if for some reason it is not passed an interface...
+if(!isset($_GET['interface']) || $_GET['interface']=="default") {  
+	$interface = convert_friendly_interface_to_real_interface_name($config['installedpackages']['arpwatch']['config'][0]['interface_array'][0]);
+} 
+else { 
+	$interface = $_GET['interface'];
+}
+
+$logfile = "/var/log/arp." . $interface . ".dat";
 
 if ($_POST['clear']) {
         stop_service("arpwatch");
@@ -56,7 +64,7 @@ if(file_exists($logfile)) {
 		unset($mac);
 	}
 }
-$pgtitle = "arpwatch: Reports";
+$pgtitle = "Arpwatch: Reports";
 include("head.inc");
 
 ?>
@@ -64,22 +72,34 @@ include("head.inc");
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">
 <?php include("fbegin.inc"); ?>
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
-        <tr>
-                <td>
+	<tr><td class="tabnavtbl">
 <?php
-        $tab_array = array();
-        $tab_array[] = array("Settings", false, "pkg_edit.php?xml=arpwatch.xml&id=0");
+    $tab_array = array();
+    $tab_array[] = array("Settings", false, "pkg_edit.php?xml=arpwatch.xml&id=0");
 	$tab_array[] = array("Reports", true, "arpwatch_reports.php");
 	display_top_tabs($tab_array);
 ?>
-                </td>
-        </tr>
+	</td></tr>
+	<tr><td class="tabnavtbl">
+<?php
+	$tab_array = array();
+	foreach($config['installedpackages']['arpwatch']['config'][0]['interface_array'] as $iface) {
+			$if = convert_friendly_interface_to_real_interface_name($iface);
+			if($if) {
+				$tab_array[] = array(gettext($iface),
+				(($interface == $if)),
+				"/arpwatch_reports.php?interface={$if}");
+			}
+		}
+	display_top_tabs($tab_array);
+?>
+	</td></tr>
         <tr>
                 <td>
                         <div id="mainarea">
                         <table class="tabcont" width="100%" border="0" cellspacing="0" cellpadding="0">
                                 <tr>
-                                        <td colspan="4" class="listtopic">arp.dat entries</td>
+                                        <td colspan="4" class="listtopic"><?php echo convert_real_interface_to_friendly_interface_name($interface); ?> entries</td>
                                 </tr>
 				<tr>
 					<td width="15%" class="listhdrr">IP</td>
@@ -115,7 +135,7 @@ include("head.inc");
                                 <tr>
                                         <td>
                                                 <br>
-                                                <form action="arpwatch_reports.php" method="post">
+                                                <form action="arpwatch_reports.php?interface=<?php echo $interface;?>" method="post">
                                                 <input name="clear" type="submit" class="formbtn" value="Clear log">
                                                 </form>
                                         </td>
