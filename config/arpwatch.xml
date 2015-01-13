@@ -42,18 +42,18 @@
 	<requirements>None</requirements>
 	<faq>Currently there are no FAQ items provided.</faq>
 	<name>arpwatch</name>
-	<version>2.1.a14 pkg v1.1.1</version>
-	<title>arpwatch: Settings</title>
+	<version>2.1.a15 pkg v1.2</version>
+	<title>Arpwatch: Settings</title>
 	<aftersaveredirect>pkg_edit.php?xml=arpwatch.xml&amp;id=0</aftersaveredirect>
 	<menu>
-		<name>arpwatch</name>
+		<name>Arpwatch</name>
 		<tooltiptext>Modify arpwatch settings.</tooltiptext>
 		<section>Services</section>
 		<configfile>arpwatch.xml</configfile>
 		<url>/pkg_edit.php?xml=arpwatch.xml&amp;id=0</url>
 	</menu>
 	<service>
-		<name>arpwatch</name>
+		<name>Arpwatch</name>
 		<rcfile>arpwatch.sh</rcfile>
 		<executable>arpwatch</executable>
 	</service>
@@ -65,7 +65,7 @@
 		</tab>
 		<tab>
 			<text>Reports</text>
-			<url>/arpwatch_reports.php</url>
+			<url>/arpwatch_reports.php?interface=default</url>
 		</tab>
 	</tabs>
 	<configpath>installedpackages->package->$packagename->configuration->settings</configpath>
@@ -81,9 +81,12 @@
 	</additional_files_needed>
 	<fields>
 		<field>
-			<fielddescr>Listening Interface</fielddescr>
-			<fieldname>interface</fieldname>
-			<description>Choose the desired listening interface here.</description>
+			<fielddescr>Interfaces</fielddescr>
+			<fieldname>interface_array</fieldname>
+			<value>lan</value>
+			<multiple>true</multiple>
+			<size>10</size>
+			<hideinterfaceregex>(loopback)</hideinterfaceregex>
 			<type>interfaces_selection</type>
 		</field>
 		<field>
@@ -92,6 +95,7 @@
 			<type>checkbox</type>
 			<description>Sends an E-mail notification for each new station and ARP change as they are seen &lt;strong&gt;instead of&lt;/strong&gt; local reports.&lt;br/&gt;NOTE: Only works on pfSense 2.1 or later. &lt;br/&gt;NOTE 2: Disables local reports which rely on arpwatch debug mode, which does not work with e-mail notifications.&lt;br/&gt;Configure SMTP and address settings in System &gt; Advanced on the Notifications tab</description>
 		</field>
+		
 	</fields>
 	<custom_php_global_functions>
 	<![CDATA[
@@ -100,30 +104,39 @@
 		$pf_version=substr(trim(file_get_contents("/etc/version")),0,3);
 		conf_mount_rw();
 		config_lock();
-		$log_file = "/var/log/arp.dat";
-		if($_POST['interface'] != "") {
-			$int = $_POST['interface'];
+		
+		if(isset($_POST['interface_array'])) {
+			$int = $_POST['interface_array'];
 		} else {
-			$int = $config['installedpackages']['arpwatch']['config'][0]['interface'];
+			$int = $config['installedpackages']['arpwatch']['config'][0]['interface_array'];
 		}
+		
 		$mail = "";
 		$debug = "";
 		if(($pf_version > 2.0) && (isset($_POST['enable_email']) || ($config['installedpackages']['arpwatch']['config'][0]['enable_email'] == "on"))) {
 			if (!empty($config['notifications']['smtp']['notifyemailaddress']))
+				$mail = " -m {$config['notifications']['smtp']['notifyemailaddress']}";
 				$mail = " -m \"{$config['notifications']['smtp']['notifyemailaddress']}\"";
 		} else {
 			$debug = "-d";
 		}
-		$int = convert_friendly_interface_to_real_interface_name($int);
-		$start = "touch {$log_file}\n";
-		$start .= "/usr/local/sbin/arpwatch {$debug} -f {$log_file} {$mail} -i {$int} > /var/log/arpwatch.reports 2>&amp;1 &amp;";
+		
+		foreach($_POST['interface_array'] as $iface) {
+			$int = convert_friendly_interface_to_real_interface_name($iface);
+			if($int) {
+				$log_file = "/var/log/arp.{$int}.dat";
+				$start .= "touch {$log_file}\n";
+				$start .="/usr/local/sbin/arpwatch {$debug} -f {$log_file} {$mail} -i {$int} > /var/log/arpwatch.reports.{$int} 2>&amp;1 &amp;\n";	
+			}
+		}
+		
 		$stop = "/usr/bin/killall arpwatch";
 		write_rcfile(array(
 			"file" => "arpwatch.sh",
 			"start" => $start,
-			"stop" =>  $stop
-			)
+			"stop" =>  $stop)
 		);
+		
 		restart_service("arpwatch");
 		conf_mount_ro();
 		config_unlock();
