@@ -29,6 +29,7 @@
 
 if(!function_exists("filter_configure"))
 	require_once("filter.inc");
+require_once("service-utils.inc");
 
 // Check to find out on which system the package is running
 if (substr(trim(file_get_contents("/etc/version")),0,3) == "2.0") {
