@@ -969,8 +969,8 @@
 		<build_pbi>
 			<port>net-mgmt/arpwatch</port>
 		</build_pbi>
-		<version>2.1.a15_8 pkg v1.1.2</version>
-		<status>ALPHA</status>
+		<version>2.1.a15_8 pkg v1.2</version>
+		<status>Beta</status>
 		<required_version>2.2</required_version>
 		<config_file>https://packages.pfsense.org/packages/config/arpwatch.xml</config_file>
 		<configurationfile>arpwatch.xml</configurationfile>
