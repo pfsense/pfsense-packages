@@ -115,7 +115,6 @@
 		$debug = "";
 		if(($pf_version > 2.0) && (isset($_POST['enable_email']) || ($config['installedpackages']['arpwatch']['config'][0]['enable_email'] == "on"))) {
 			if (!empty($config['notifications']['smtp']['notifyemailaddress']))
-				$mail = " -m {$config['notifications']['smtp']['notifyemailaddress']}";
 				$mail = " -m \"{$config['notifications']['smtp']['notifyemailaddress']}\"";
 		} else {
 			$debug = "-d";
