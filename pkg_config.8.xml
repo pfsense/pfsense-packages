@@ -1252,8 +1252,8 @@
 		<depends_on_package>arpwatch-2.1.a15_6.tbz</depends_on_package>
 		<depends_on_package_pbi>arpwatch-2.1.a15_6-i386.pbi</depends_on_package_pbi>
 		<build_port_path>/usr/ports/net-mgmt/arpwatch</build_port_path>
-		<version>2.1.a15_6 pkg v1.1.2</version>
-		<status>ALPHA</status>
+		<version>2.1.a15_6 pkg v1.2</version>
+		<status>Beta</status>
 		<required_version>2.0</required_version>
 		<config_file>https://packages.pfsense.org/packages/config/arpwatch.xml</config_file>
 		<configurationfile>arpwatch.xml</configurationfile>
