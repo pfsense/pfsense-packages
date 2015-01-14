@@ -46,7 +46,7 @@
     <requirements>Describe your package requirements here</requirements>
     <faq>Currently there are no FAQ items provided.</faq>
 	<name>squid</name>
-	<version>3.4.10_2 pkg 0.2.2</version>
+	<version>3.4.10_2 pkg 0.2.4</version>
 	<title>Proxy server: General settings</title>
 	<include_file>/usr/local/pkg/squid.inc</include_file>
 	<menu>
