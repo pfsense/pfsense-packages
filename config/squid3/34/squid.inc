@@ -174,7 +174,7 @@ function squid_install_command() {
 		$settingsgen = $config['installedpackages']['squid']['config'][0];
 
 	if (file_exists("/usr/local/pkg/check_ip.php"))
-		rename("/usr/local/pkg/check_ip.php",SQUID_LOCALBASE . "/libexec/squid/check_ip.php");
+		rename("/usr/local/pkg/check_ip.php",SQUID_BASE . "/bin/check_ip.php");
 	/* Set storage system */
 	if ($g['platform'] == "nanobsd") {
 		$config['installedpackages']['squidcache']['config'][0]['harddisk_cache_system'] = 'null';
@@ -1480,14 +1480,23 @@ EOF;
 				}
 			mwexec_bg("/usr/local/etc/rc.d/c-icap start");
 			}
-		#check clamav
-		$clamav_rcfile="/usr/local/etc/rc.d/clamva-clamd";
+		#check clamav/freshclam
+		$rc_files=array("clamav-freshclam","clamav-clamd");
+		$clamm[0]="@/usr/local/(bin|sbin)@";
+		$clamm[1]="@/local/(bin|sbin)@";
+		$clamm[2]="@/usr/local/etc@";
+		$clamm[3]="@enable:=NO@";
+		$clamr[0]=SQUID_BASE."/bin";
+		$clamr[1]="/bin";
+		$clamr[2]=SQUID_LOCALBASE."/etc";
+		$clamr[3]="enable:=YES";
+		foreach ($rc_files as $rc_file){
+			$clamav_rcfile="/usr/local/etc/rc.d/{$rc_file}";
 			if (file_exists($clamav_rcfile)){
 				$sample_file=file_get_contents($clamav_rcfile);
-				$clamm[0]="@/usr/local@";
-				$clamr[0]=SQUID_LOCALBASE;
 				file_put_contents($clamav_rcfile,preg_replace($clamm,$clamr,$sample_file),LOCK_EX);
 				}
+			}
 		if (is_process_running("clamd"))
 			mwexec_bg("/usr/local/etc/rc.d/clamav-clamd reload");
 		else
@@ -1759,7 +1768,7 @@ function squid_resync_auth() {
 				$conf .= "auth_param basic program ". SQUID_LOCALBASE . "/libexec/squid/basic_radius_auth -w {$settings['radius_secret']} -h {$settings['auth_server']} $port\n";
 				break;
 			case 'cp':
-				$conf .= "external_acl_type check_cp children-startup={$processes} ttl={$auth_ttl} %SRC ". SQUID_LOCALBASE . "/libexec/squid/check_ip.php\n";
+				$conf .= "external_acl_type check_cp children-startup={$processes} ttl={$auth_ttl} %SRC ". SQUID_BASE . "/bin/check_ip.php\n";
 				$conf .= "acl password external check_cp\n";
 				break;
 			case 'msnt':
