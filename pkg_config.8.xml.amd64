@@ -1255,7 +1255,7 @@
 		<website>http://www.squidGuard.org/</website>
 		<maintainer>dv_serg@mail.ru</maintainer>
 		<category>Network Management</category>
-		<version>1.4_4 pkg v.1.9.9</version>
+		<version>1.4_4 pkg v.1.9.10</version>
 		<status>Beta</status>
 		<required_version>1.1</required_version>
 		<depends_on_package_base_url>https://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
