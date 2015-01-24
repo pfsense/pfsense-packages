@@ -149,6 +149,9 @@
 				case "20x4":
 					continue;
 					break;
+				case "42x7":
+					continue;
+					break;
 				default:
 					$input_errors[] = "The chosen display size is not valid";
 					break;
@@ -329,6 +332,10 @@
 					$config_text .= "Device={$realport}\n";
 					$config_text .= "OffBrightness=0\n";
 					$config_text .= "Brightness=500\n";
+					break;
+				case "RhinoOSLI":
+					$config_text .= "[{$lcdproc_config['driver']}]\n";
+					$config_text .= "Device={$realport}\n";
 					break;
 				default:
 					lcdproc_warn("The chosen lcdproc driver is not a valid choice");

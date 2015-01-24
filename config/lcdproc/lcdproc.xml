@@ -57,6 +57,11 @@
 	    <prefix>/usr/local/lib/lcdproc/</prefix>
 	    <chmod>0755</chmod>
 	</additional_files_needed>
+	<additional_files_needed>
+		<item>http://www.pfsense.org/packages/config/lcdproc/bin/RhinoOSLI.so</item>
+	    <prefix>/usr/local/lib/lcdproc/</prefix>
+	    <chmod>0755</chmod>
+	</additional_files_needed>
 	<service>
 		<name>lcdproc</name>
 		<rcfile>lcdproc.sh</rcfile>
@@ -151,6 +156,10 @@
 				<option>
 					<value>20x4</value>
 					<name>4 rows 20 colums</name>
+				</option>
+				<option>
+					<value>42x7</value>
+					<name>7 rows 42 colums</name>
 				</option>
 			</options>
 			<default_value>16x2</default_value>
@@ -328,6 +337,10 @@
 				<option>
 					<value>xosd</value>
 					<name>xosd</name>
+				</option>
+				<option>
+					<value>RhinoOSLI</value>
+					<name>RhinoOSLI</name>
 				</option>
 			</options>
 			<default_value>pyramid</default_value>
