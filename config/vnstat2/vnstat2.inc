@@ -114,8 +114,8 @@ EOF;
 	fwrite($hf2, $vnstat_conf_file);
 	fclose($hf2);
 	// Reinstall the symlink for the PBI, if this is a PBI install. (note: -f to overwrite any existing file)
-	if (file_exists('/usr/pbi/vnstat-i386')) { exec("ln -sf /usr/local/etc/vnstat.conf /usr/pbi/vnstat-i386/etc/vnstat.conf"); }
-	if (file_exists('/usr/pbi/vnstat-amd64')) { exec("ln -sf /usr/local/etc/vnstat.conf /usr/pbi/vnstat-amd64/etc/vnstat.conf"); }
+	if (file_exists('/usr/pbi/vnstat-i386')) { symlink("/usr/local/etc/vnstat.conf", "/usr/pbi/vnstat-i386/etc/vnstat.conf"); }
+	if (file_exists('/usr/pbi/vnstat-amd64')) { symlink("/usr/local/etc/vnstat.conf", "/usr/pbi/vnstat-amd64/etc/vnstat.conf"); }
 }
 
 function create_vnstati_image() {
