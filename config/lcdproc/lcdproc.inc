@@ -371,6 +371,9 @@ EOD;
 			conf_mount_rw();
 			lcdproc_write_script(LCDPROC_CLIENT, $client_script);
 			lcdproc_write_config(LCDPROC_CONFIG, $config_text);
+			// Check for pbi install and arch type then create symlinks (note: -f to overwrite any pre-existing file from the package install)
+			if (file_exists('/usr/pbi/lcdproc-i386')) { exec("ln -sf ".LCDPROC_CONFIG." /usr/pbi/lcdproc-i386/etc/LCDd.conf"); }
+			if (file_exists('/usr/pbi/lcdproc-amd64')) { exec("ln -sf ".LCDPROC_CONFIG." /usr/pbi/lcdproc-amd64/etc/LCDd.conf"); }
 			write_rcfile(array(
 					'file' => 'lcdproc.sh',
 					'start' => $start,
