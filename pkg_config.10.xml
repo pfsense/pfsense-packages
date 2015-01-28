@@ -183,7 +183,7 @@
 		<configurationfile>apache_virtualhost.xml</configurationfile>
 		<build_pbi>
 			<custom_name>proxy_mod_security</custom_name>
-			<ports_before>devel/gettext misc/help2man databases/db42 databases/gdbm devel/apr1 www/p5-LWP-UserAgent-Determined www/p5-LWP-Protocol-https security/gnupg security/p5-GnuPG net/spread textproc/p5-XML-Smart lang/p5-Switch www/p5-Data-Validate-URI devel/p5-Data-Types devel/p5-Acme-Comment</ports_before>
+			<ports_before>devel/gettext misc/help2man databases/db5 databases/gdbm devel/apr1 www/p5-LWP-UserAgent-Determined www/p5-LWP-Protocol-https security/gnupg security/p5-GnuPG net/spread textproc/p5-XML-Smart lang/p5-Switch www/p5-Data-Validate-URI devel/p5-Data-Types devel/p5-Acme-Comment</ports_before>
 			<port>www/apache24</port>
 			<ports_after>www/mod_security www/mod_memcache</ports_after>
 		</build_pbi>
@@ -204,7 +204,7 @@
 		<configurationfile>apache_mod_security.xml</configurationfile>
 		<build_pbi>
 			<custom_name>proxy_mod_security</custom_name>
-			<ports_before>devel/gettext misc/help2man databases/db42 databases/gdbm devel/apr1 www/p5-LWP-UserAgent-Determined www/p5-LWP-Protocol-https security/gnupg security/p5-GnuPG net/spread textproc/p5-XML-Smart lang/p5-Switch www/p5-Data-Validate-URI devel/p5-Data-Types devel/p5-Acme-Comment</ports_before>
+			<ports_before>devel/gettext misc/help2man databases/db5 databases/gdbm devel/apr1 www/p5-LWP-UserAgent-Determined www/p5-LWP-Protocol-https security/gnupg security/p5-GnuPG net/spread textproc/p5-XML-Smart lang/p5-Switch www/p5-Data-Validate-URI devel/p5-Data-Types devel/p5-Acme-Comment</ports_before>
 			<port>www/apache22-worker-mpm</port>
 			<ports_after>www/mod_security www/mod_memcache</ports_after>
 		</build_pbi>
@@ -990,7 +990,7 @@
 		<required_version>2.2</required_version>
 		<depends_on_package_pbi>squidguard-1.4_7-##ARCH##.pbi</depends_on_package_pbi>
 		<build_pbi>
-			<ports_before>databases/db41 security/cyrus-sasl2</ports_before>
+			<ports_before>databases/db5 security/cyrus-sasl2</ports_before>
 			<port>www/squidguard</port>
 		</build_pbi>
 		<build_options>squidGuard_UNSET_FORCE=SQUID32 SQUID33;squidGuard_SET_FORCE=SAMPLE_BL SASL LDAP SQUID27;squid_UNSET_FORCE=DNS_HELPER IPFILTER PINGER STACKTRACES STRICT_HTTP_DESC USERAGENT_LOG WCCPV2;squid_SET_FORCE=PF LDAP_AUTH NIS_AUTH SASL_AUTH ARP_ACL AUFS CACHE_DIGESTS CARP COSS DELAY_POOLS FOLLOW_XFF HTCP IDENT KERB_AUTH KQUEUE LARGEFILE REFERER_LOG SNMP SSL VIA_DB WCCP;SQUID_UID=proxy;SQUID_GID=proxy</build_options>
@@ -1008,7 +1008,7 @@
 		<required_version>2.2</required_version>
 		<depends_on_package_pbi>squidguard-devel-1.5_1-##ARCH##.pbi</depends_on_package_pbi>
 		<build_pbi>
-			<ports_before>databases/db46</ports_before>
+			<ports_before>databases/db5</ports_before>
 			<port>www/squidguard-devel</port>
 			<custom_name>squidguard-devel</custom_name>
 		</build_pbi>
@@ -1027,7 +1027,7 @@
 		<required_version>2.2</required_version>
 		<depends_on_package_pbi>squidguard-squid3-1.4_4-##ARCH##.pbi</depends_on_package_pbi>
 		<build_pbi>
-			<ports_before>www/squid33 databases/db41 security/cyrus-sasl2</ports_before>
+			<ports_before>www/squid33 databases/db5 security/cyrus-sasl2</ports_before>
 			<port>www/squidguard</port>
 			<custom_name>squidguard-squid3</custom_name>
 		</build_pbi>
