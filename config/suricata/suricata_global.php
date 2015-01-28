@@ -236,13 +236,13 @@ if ($input_errors)
 			<tr>
 				<td valign="top" width="8%"><input name="enable_etopen_rules" type="checkbox" value="on" onclick="enable_et_rules();" 
 				<?php if ($config['installedpackages']['suricata']['config'][0]['enable_etopen_rules']=="on") echo "checked"; ?>/></td>
-				<td><span class="vexpl"><?php echo gettext("ETOpen is an open source set of Snort rules whose coverage " .
+				<td><span class="vexpl"><?php echo gettext("ETOpen is an open source set of Suricata rules whose coverage " .
 				"is more limited than ETPro."); ?></span></td>
 			</tr>
 			<tr>
 				<td valign="top" width="8%"><input name="enable_etpro_rules" type="checkbox" value="on" onclick="enable_pro_rules();" 
 				<?php if ($config['installedpackages']['suricata']['config'][0]['enable_etpro_rules']=="on") echo "checked"; ?>/></td>
-				<td><span class="vexpl"><?php echo gettext("ETPro for Snort offers daily updates and extensive coverage of current malware threats."); ?></span></td>
+				<td><span class="vexpl"><?php echo gettext("ETPro for Suricata offers daily updates and extensive coverage of current malware threats."); ?></span></td>
 			</tr>
 		<tr>
 			<td>&nbsp;</td>
