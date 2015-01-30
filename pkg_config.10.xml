@@ -106,22 +106,6 @@
 		<configurationfile>filemgr.xml</configurationfile>
 	</package>
 	<package>
-		<name>pfBlocker</name>
-		<website/>
-		<descr><![CDATA[Introduce Enhanced Aliastable Feature to pfsense.<br />
-			Assign many IP urls lists from sites like I-blocklist to a single alias and then choose rule action to take.<br />
-			This package also Block countries and IP ranges.<br />
-			pfBlocker replaces Countryblock and IPblocklist.]]></descr>
-		<category>Firewall</category>
-		<pkginfolink>https://forum.pfsense.org/index.php/topic,42543.0.html</pkginfolink>
-		<config_file>https://packages.pfsense.org/packages/config/pf-blocker/pfblocker.xml</config_file>
-		<version>1.0.3</version>
-		<status>Release</status>
-		<required_version>2.2</required_version>
-		<maintainer>tom@tomschaefer.org marcellocoutinho@gmail.com</maintainer>
-		<configurationfile>pfblocker.xml</configurationfile>
-	</package>
-	<package>
 		<name>pfBlockerNG</name>
 		<website/>
 		<descr><![CDATA[pfBlockerNG is the Next Generation of pfBlocker.<br />
@@ -131,11 +115,11 @@
 				Provision to download from diverse List formats. Advanced Integration<br />
 				for Emerging Threats IQRisk IP Reputation Threat Sources.]]></descr>
 		<category>Firewall</category>
-		<pkginfolink></pkginfolink>
+		<pkginfolink>https://forum.pfsense.org/index.php?topic=86212.msg483663#msg483663</pkginfolink>
 		<config_file>https://packages.pfsense.org/packages/config/pfblockerng/pfblockerng.xml</config_file>
 		<version>1.0</version>
 		<status>Beta</status>
-		<required_version>3.0</required_version>
+		<required_version>2.2</required_version>
 		<maintainer>BBCan177@gmail.com</maintainer>
 		<configurationfile>pfblockerng.xml</configurationfile>
 		<depends_on_package_pbi>pfblockerng-1.6.3_1-##ARCH##.pbi</depends_on_package_pbi>
