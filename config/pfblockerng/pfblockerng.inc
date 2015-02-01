@@ -56,12 +56,12 @@ function pfb_global() {
 	$pfb['aliasdir']	= "{$g['vardb_path']}/aliastables";
 	$pfb['logdir']		= "{$g['varlog_path']}/pfblockerng";
 	$pfb['etdir']		= "{$pfb['dbdir']}/ET";
-	$pfb['ccdir']		= "{$pfb['dbdir']}/cc";
 	$pfb['nativedir']	= "{$pfb['dbdir']}/native";
 	$pfb['denydir']		= "{$pfb['dbdir']}/deny";
 	$pfb['matchdir']	= "{$pfb['dbdir']}/match";
 	$pfb['permitdir']	= "{$pfb['dbdir']}/permit";
 	$pfb['origdir']		= "{$pfb['dbdir']}/original";
+	$pfb['ccdir']		= "/usr/pbi/pfblockerng-" . php_uname("m") . "/share/GeoIP";
 
 	# Create Folders if not Exist.
 	$folder_array = array ("{$pfb['dbdir']}","{$pfb['logdir']}","{$pfb['ccdir']}","{$pfb['origdir']}","{$pfb['nativedir']}","{$pfb['denydir']}","{$pfb['matchdir']}","{$pfb['permitdir']}","{$pfb['aliasdir']}");
@@ -457,14 +457,15 @@ function sync_package_pfblockerng($cron = "") {
 	#            Configure ARRAYS               #
 	#############################################
 
-	$continents = array (	"Africa"	=> "pfB_Africa",
-				"Antartica"	=> "pfB_Antartica",
-				"Asia"		=> "pfB_Asia",
-				"Europe"	=> "pfB_Europe",
-				"North America"	=> "pfB_NAmerica",
-				"Oceania"	=> "pfB_Oceania",
-				"South America"	=> "pfB_SAmerica",
-				"Top Spammers"	=> "pfB_Top"
+	$continents = array (	"Africa"		=> "pfB_Africa",
+				"Antartica"		=> "pfB_Antartica",
+				"Asia"			=> "pfB_Asia",
+				"Europe"		=> "pfB_Europe",
+				"North America"		=> "pfB_NAmerica",
+				"Oceania"		=> "pfB_Oceania",
+				"South America"		=> "pfB_SAmerica",
+				"Top Spammers"		=> "pfB_Top",
+				"Proxy and Satellite"	=> "pfB_PS"
 				);
 
 	#create rules vars and arrays
@@ -1192,15 +1193,15 @@ function sync_package_pfblockerng($cron = "") {
 								$log_tab = "\t\t";
 							}
 
-							# Collect Active Alias List (Used for pfctl Update when 'Reputation' is enabled.
-							$pfb_alias_lists_all[] = "{$alias}";
-
 							// Empty Header Field Validation Check
-							if (empty($header_url)) {
-								$log = "\n [ {$row['url']} ] {$log_tab} Header Field cannot be Empty. *Skipping* \n";
+							if (empty($header_url) || preg_match("/\W/",$header_url)) {
+								$log = "\n [ {$row['url']} ]\n ** TERMINATED - Header contains Blank/International/Special or Spaces\n";
 								pfb_logger("{$log}","2");
 								continue;
 							}
+
+							# Collect Active Alias List (Used for pfctl Update when 'Reputation' is enabled.
+							$pfb_alias_lists_all[] = "{$alias}";
 
 							if (file_exists($pfbfolder . '/' . $header_url . '.txt') && $pfb['reuse'] == "") {
 								if ($row['state'] == "Hold") {
@@ -2330,18 +2331,31 @@ function pfblockerng_php_install_command() {
 	global $config,$pfb;
 	pfb_global();
 
+	// Remove previously used CC folder location if exists
+	@rmdir_recursive("{$pfb['dbdir']}/cc");
+
 	# Uncompress Country Code File and delete Archive after extraction.
 	exec("cd /{$pfb['ccdir']}; /usr/bin/tar -jxvf {$pfb['ccdir']}/countrycodes.tar.bz2");
 	unlink_if_exists("{$pfb['ccdir']}/countrycodes.tar.bz2");
 	# Download MaxMind Files and Create Country Code files and Build Continent XML Files
 	update_output_window(gettext("Downloading MaxMind Country Databases. This may take a minute..."));
 	exec("/bin/sh /usr/local/pkg/pfblockerng/geoipupdate.sh all >> {$pfb['geolog']} 2>&1");
+
+	@rename("{$pfb['dbdir']}/GeoIP.dat", "{$pfb['ccdir']}/GeoIP.dat");
+	@rename("{$pfb['dbdir']}/GeoIPv6.dat", "{$pfb['ccdir']}/GeoIPv6.dat");
+
 	update_output_window(gettext("MaxMind Country Database downloads completed..."));
 	update_output_window(gettext("Converting MaxMind Country Databases for pfBlockerNG. This may take a few minutes..."));
 	pfblockerng_uc_countries();
 	update_output_window(gettext("Creating pfBlockerNG Continenet XML Files..."));
 	pfblockerng_get_countries();
 	update_output_window(gettext("Completed Creating pfBlockerNG Continenet XML Files..."));
+
+	// Remove Original Maxmind Database Files
+	@unlink_if_exists("{$pfb['dbdir']}/GeoIPCountryCSV.zip");
+	@unlink_if_exists("{$pfb['dbdir']}/GeoIPCountryWhois.csv");
+	@unlink_if_exists("{$pfb['dbdir']}/GeoIPv6.csv");
+	@unlink_if_exists("{$pfb['dbdir']}/country_continent.csv");
 
 	# Add Widget to Dashboard
 	update_output_window(gettext("Adding pfBlockerNG Widget to Dashboard."));
@@ -2407,6 +2421,8 @@ function pfblockerng_php_deinstall_command() {
 			unset($config['installedpackages']['pfblockerngsouthamerica']);
 		if (is_array($config['installedpackages']['pfblockerngtopspammers']))
 			unset($config['installedpackages']['pfblockerngtopspammers']);
+		if (is_array($config['installedpackages']['pfblockerngproxyandsatellite']))
+			unset($config['installedpackages']['pfblockerngproxyandsatellite']);
 	}
 
 	# Remove Widget (code from Snort deinstall)
