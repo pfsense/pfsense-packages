@@ -53,7 +53,7 @@ $pathgeoip6	= "/usr/pbi/pfblockerng-" . php_uname("m") . "/bin/geoiplookup6";
 
 // Define File Locations
 $filter_logfile = "{$g['varlog_path']}/filter.log";
-$pathgeoipdat	= "/usr/pbi/pfblockerng-" . php_uname("m") . "/share/GeoIP/GeoIP.dat";
+$pathgeoipdat	= "/usr/pbi/pfblockerng-" . php_uname("m") . "/share/GeoIGeoIP.dat";
 $pathgeoipdat6	= "/usr/pbi/pfblockerng-" . php_uname("m") . "/share/GeoIP/GeoIPv6.dat";
 
 // Emerging Threats IQRisk Header Name Reference
