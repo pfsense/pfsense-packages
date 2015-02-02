@@ -25,7 +25,11 @@
                 </tab>
                 <tab>
                         <text>HAVP Log</text>
-                        <url>/havp_log.php</url>
+                        <url>/havp_log.php?logtab=havp</url>
+                </tab>
+                <tab>
+                        <text>Clamd Log</text>
+                        <url>/havp_log.php?logtab=clamd</url>
                 </tab>
         </tabs>
         <fields>
@@ -82,16 +86,16 @@
                         <rows>5</rows>
                 </field>
                 <field>
-                        <fielddescr>Log</fielddescr>
+                        <fielddescr>Clamd Log</fielddescr>
                         <fieldname>avsetlog</fieldname>
-                        <description>Check this for enable log.</description>
+                        <description>Check this for enable clamd log.</description>
                         <type>checkbox</type>
                         <enablefields>avsetsyslog</enablefields>
                 </field>
                 <field>
-                        <fielddescr>SysLog</fielddescr>
+                        <fielddescr>Clamd SysLog</fielddescr>
                         <fieldname>avsetsyslog</fieldname>
-                        <description>Check this for enable SysLog.</description>
+                        <description>Check this for enable clamd SysLog.</description>
                         <type>checkbox</type>
                 </field>
         </fields>
