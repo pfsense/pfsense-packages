@@ -485,10 +485,18 @@
 			<default_value>en</default_value>
 		</field>
 		<field>
-			<fielddescr>Disable X-Forward</fielddescr>
-			<fieldname>disable_xforward</fieldname>
-			<description>If not set, Squid will include your system's IP address or name in the HTTP requests it forwards.</description>
-			<type>checkbox</type>
+			<fielddescr>X-Forward Mode</fielddescr>
+			<fieldname>xforward_mode</fieldname>
+			<description>&lt;p&gt;&lt;b&gt; on:&lt;/b&gt; Squid will append your client's IP address in the HTTP requests it forwards. (Default)&lt;p&gt;          By default it looks like: X-Forwarded-For: 192.1.2.3  &lt;p&gt; &lt;b&gt; off:&lt;/b&gt; It will appear as: X-Forwarded-For: unknown&lt;p&gt; &lt;b&gt; transparent:&lt;/b&gt; Squid will not alter the X-Forwarded-For header in any way.&lt;p&gt; &lt;b&gt; delete:&lt;/b&gt; Squid will delete the entire X-Forwarded-For header.&lt;p&gt; &lt;b&gt; truncate:&lt;/b&gt; Squid will remove all existing X-Forwarded-For entries, and place the client IP as the sole entry.</description>
+			<type>select</type>
+			<default_value>on</default_value>
+			<options>
+				<option><name>(on)</name><value>on</value></option>
+				<option><name>off</name><value>off</value></option>
+				<option><name>transparent</name><value>transparent</value></option>
+				<option><name>delete</name><value>delete</value></option>
+				<option><name>truncate</name><value>truncate</value></option>
+			</options>
 		</field>
 		<field>
 			<fielddescr>Disable VIA</fielddescr>
