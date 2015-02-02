@@ -35,7 +35,7 @@ etblock=$(echo $8 | sed 's/,/, /g')
 etmatch=$(echo $9 | sed 's/,/, /g')
 
 # File Locations
-pathgeoipdat=/var/db/pfblockerng/GeoIP.dat
+pathgeoipdat=/usr/pbi/pfblockerng-$mtype/share/GeoIP/GeoIP.dat
 pfbsuppression=/var/db/pfblockerng/pfbsuppression.txt
 masterfile=/var/db/pfblockerng/masterfile
 mastercat=/var/db/pfblockerng/mastercat

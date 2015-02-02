@@ -53,8 +53,8 @@ $pathgeoip6	= "/usr/pbi/pfblockerng-" . php_uname("m") . "/bin/geoiplookup6";
 
 // Define File Locations
 $filter_logfile = "{$g['varlog_path']}/filter.log";
-$pathgeoipdat   = "{$pfb['dbdir']}/GeoIP.dat";
-$pathgeoipdat6  = "{$pfb['dbdir']}/GeoIPv6.dat";
+$pathgeoipdat	= "/usr/pbi/pfblockerng-" . php_uname("m") . "/share/GeoIP/GeoIP.dat";
+$pathgeoipdat6	= "/usr/pbi/pfblockerng-" . php_uname("m") . "/share/GeoIP/GeoIPv6.dat";
 
 // Emerging Threats IQRisk Header Name Reference
 $pfb['et_header'] = TRUE;
@@ -334,6 +334,7 @@ if ($savemsg) {
 				$tab_array[] = array(gettext("N.A."), false, "/pkg_edit.php?xml=/pfblockerng/pfblockerng_NorthAmerica.xml&id=0");
 				$tab_array[] = array(gettext("Oceania"), false, "/pkg_edit.php?xml=/pfblockerng/pfblockerng_Oceania.xml&id=0");
 				$tab_array[] = array(gettext("S.A."), false, "/pkg_edit.php?xml=/pfblockerng/pfblockerng_SouthAmerica.xml&id=0");
+				$tab_array[] = array(gettext("P.S."), false, "/pkg_edit.php?xml=/pfblockerng/pfblockerng_ProxyandSatellite.xml&id=0");
 				$tab_array[] = array(gettext("Logs"), false, "/pfblockerng/pfblockerng_log.php");
 				$tab_array[] = array(gettext("Sync"), false, "/pkg_edit.php?xml=/pfblockerng/pfblockerng_sync.xml&id=0");
 				display_top_tabs($tab_array, true);

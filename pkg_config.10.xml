@@ -133,7 +133,7 @@
 		<category>Firewall</category>
 		<pkginfolink></pkginfolink>
 		<config_file>https://packages.pfsense.org/packages/config/pfblockerng/pfblockerng.xml</config_file>
-		<version>1.0</version>
+		<version>1.01</version>
 		<status>Beta</status>
 		<required_version>3.0</required_version>
 		<maintainer>BBCan177@gmail.com</maintainer>

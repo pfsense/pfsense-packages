@@ -199,6 +199,10 @@
 			<url>/pkg_edit.php?xml=/pfblockerng/pfblockerng_SouthAmerica.xml&amp;id=0</url>
 		</tab>
 		<tab>
+			<text>P.S.</text>
+			<url>/pkg_edit.php?xml=/pfblockerng/pfblockerng_ProxyandSatellite.xml&amp;id=0</url>
+		</tab>
+		<tab>
 			<text>Logs</text>
 			<url>/pfblockerng/pfblockerng_log.php</url>
 		</tab>
