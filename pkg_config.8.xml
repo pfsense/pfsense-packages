@@ -1760,7 +1760,6 @@
 		<required_version>2.0</required_version>
 		<configurationfile>zabbix2-agent.xml</configurationfile>
 		<maintainer>dbaio@bsd.com.br</maintainer>
-		<build_port_path>/usr/ports/net-mgmt/zabbix22-agent</build_port_path>
 		<build_pbi>
 			<custom_name>zabbix22-agent</custom_name>
 			<port>net-mgmt/zabbix22-agent</port>
@@ -1779,7 +1778,6 @@
 		<required_version>2.0</required_version>
 		<configurationfile>zabbix2-proxy.xml</configurationfile>
 		<maintainer>dbaio@bsd.com.br</maintainer>
-		<build_port_path>/usr/ports/net-mgmt/zabbix22-proxy</build_port_path>
 		<build_pbi>
 			<custom_name>zabbix22-proxy</custom_name>
 			<port>net-mgmt/zabbix22-proxy</port>
