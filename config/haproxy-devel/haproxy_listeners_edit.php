@@ -6,6 +6,7 @@
 	Copyright (C) 2009 Scott Ullrich <sullrich@pfsense.com>
 	Copyright (C) 2008 Remco Hoef <remcoverhoef@pfsense.com>
 	Copyright (C) 2013 PiBa-NL merging (some of the) "haproxy-devel" changes from: Marcello Coutinho <marcellocoutinho@gmail.com>
+	Copyright (C) 2013-2015 PiBa-NL
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
@@ -71,6 +72,7 @@ global $simplefields;
 $simplefields = array('name','desc','status','secondary','primary_frontend','type','forwardfor','httpclose','extaddr','backend_serverpool',
 	'max_connections','client_timeout','port','ssloffloadcert','dcertadv','ssloffload','ssloffloadacl','ssloffloadaclnondefault','advanced_bind',
 	'ssloffloadacladditional','ssloffloadacladditionalnondefault',
+	'socket-stats',
 	'dontlognull','dontlog-normal','log-separate-errors','log-detailed');
 
 if (isset($_POST['id']))
@@ -103,7 +105,7 @@ $fields_sslCertificates[0]['size']="500px";
 $fields_sslCertificates[0]['items']=&$servercerts;
 
 $certs_ca = haproxy_get_certificates('ca');
-$ca_none['']['name']="None";
+$ca_none['']['name']="(None), allows for client without a (valid) certificate to connect. Make sure to add appropriate acl's.";
 $certs_ca = $ca_none + $certs_ca;
 $fields_caCertificates=array();
 $fields_caCertificates[0]['name']="cert_ca";
@@ -114,8 +116,8 @@ $fields_caCertificates[0]['size']="500px";
 $fields_caCertificates[0]['items']=&$certs_ca;
 
 $certs_crl = haproxy_get_crls();
-$ca_none['']['name']="None";
-$certs_crl = $ca_none + $certs_crl;
+//$ca_none['']['name']="None";
+//$certs_crl = $ca_none + $certs_crl;
 $fields_crlCertificates=array();
 $fields_crlCertificates[0]['name']="cert_crl";
 $fields_crlCertificates[0]['columnheader']="Certificate revocation lists";
@@ -138,11 +140,17 @@ $fields_aclSelectionList[1]['type']="select";
 $fields_aclSelectionList[1]['size']="10";
 $fields_aclSelectionList[1]['items']=&$a_acltypes;
 
-$fields_aclSelectionList[2]['name']="value";
-$fields_aclSelectionList[2]['columnheader']="Value";
-$fields_aclSelectionList[2]['colwidth']="35%";
-$fields_aclSelectionList[2]['type']="textbox";
-$fields_aclSelectionList[2]['size']="35";
+$fields_aclSelectionList[2]['name']="not";
+$fields_aclSelectionList[2]['columnheader']="Not";
+$fields_aclSelectionList[2]['colwidth']="5%";
+$fields_aclSelectionList[2]['type']="checkbox";
+$fields_aclSelectionList[2]['size']="5";
+
+$fields_aclSelectionList[3]['name']="value";
+$fields_aclSelectionList[3]['columnheader']="Value";
+$fields_aclSelectionList[3]['colwidth']="35%";
+$fields_aclSelectionList[3]['type']="textbox";
+$fields_aclSelectionList[3]['size']="35";
 
 $interfaces = haproxy_get_bindable_interfaces();
 $interfaces_custom['custom']['name']="Use custom address:";
@@ -623,6 +631,17 @@ $primaryfrontends = get_haproxy_frontends($excludefrontend);
 		</tr>
 		<tr class="haproxy_primary"><td>&nbsp;</td></tr>
 		<tr class="haproxy_primary">
+			<td colspan="2" valign="top" class="listtopic">Stats options</td>
+		</tr>
+		<tr class="haproxy_primary" align="left">
+			<td width="22%" valign="top" class="vncell">Separate sockets</td>
+			<td width="78%" class="vtable" colspan="2">
+				<input id="socket-stats" name="socket-stats" type="checkbox" value="yes" <?php if ($pconfig['socket-stats']=='yes') echo "checked"; ?> onclick='updatevisibility();' />
+				Enable collecting &amp; providing separate statistics for each socket.
+			</td>
+		</tr>
+		<tr class="haproxy_primary"><td>&nbsp;</td></tr>
+		<tr class="haproxy_primary">
 			<td colspan="2" valign="top" class="listtopic">Logging options</td>
 		</tr>
 		<tr class="haproxy_primary" align="left">
@@ -684,10 +703,6 @@ $primaryfrontends = get_haproxy_frontends($excludefrontend);
 				The 'forwardfor' option creates an HTTP 'X-Forwarded-For' header which
 				contains the client's IP address. This is useful to let the final web server
 				know what the client address was. (eg for statistics on domains)<br/>
-				<br/>
-				It is important to note that as long as HAProxy does not support keep-alive connections, 
-				only the first request of a connection will receive the header. For this reason, 
-				it is important to ensure that option httpclose is set when using this option.
 			</td>
 		</tr>
 		<tr align="left" class="haproxy_mode_http">
@@ -720,7 +735,7 @@ $primaryfrontends = get_haproxy_frontends($excludefrontend);
 			<td>&nbsp;</td>
 		</tr>
 	</table>
-	<table class="haproxy_mode_http" width="100%" border="0" cellpadding="6" cellspacing="0">
+	<table class="haproxy_ssloffloading_enabled" width="100%" border="0" cellpadding="6" cellspacing="0">
 		<tr>
 			<td colspan="2" valign="top" class="listtopic">SSL Offloading</td>
 		</tr>
@@ -735,7 +750,7 @@ $primaryfrontends = get_haproxy_frontends($excludefrontend);
 		<tr align="left" class="haproxy_secondary" >
 			<td width="22%" valign="top" class="vncell">Use Offloading</td>
 			<td width="78%" class="vtable" colspan="2">
-				<input id="ssloffload" name="ssloffload" type="checkbox" value="yes" <?php if ($pconfig['ssloffload']=='yes') echo "checked";?> onclick="updatevisibility();" /><strong>Use Offloading</strong>
+				<input id="ssloffload" name="ssloffload" type="checkbox" value="yes" <?php if ($pconfig['ssloffload']=='yes') echo "checked";?> onclick="updatevisibility();" /><strong>Specify additional certificates for this shared-frontend.</strong>
 			</td>
 		</tr>
 		<tr class="haproxy_ssloffloading_enabled" align="left">
@@ -745,10 +760,9 @@ $primaryfrontends = get_haproxy_frontends($excludefrontend);
 					echo_html_select("ssloffloadcert", $servercerts, $pconfig['ssloffloadcert'], '<b>No Certificates defined.</b> <br/>Create one under <a href="system_certmanager.php">System &gt; Cert Manager</a>.');
 				?>
 				<br/>
-				NOTE: choose the cert to use on this frontend.
+				Choose the cert to use on this frontend.
 				<br/>
-				<input id="ssloffloadacl" name="ssloffloadacl" type="checkbox" value="yes" <?php if ($pconfig['ssloffloadacl']=='yes') echo "checked";?> onclick="updatevisibility();" />Add ACL for certificate CommonName. (host header matches 'CN')<br/>
-				<input id="ssloffloadaclnondefault" name="ssloffloadaclnondefault" type="checkbox" value="yes" <?php if ($pconfig['ssloffloadaclnondefault']=='yes') echo "checked";?> onclick="updatevisibility();" />Add ACL for certificate CommonName for nondefault ports. (host header starts with 'CN:')
+				<input id="ssloffloadacl" name="ssloffloadacl" type="checkbox" value="yes" <?php if ($pconfig['ssloffloadacl']=='yes') echo "checked";?> onclick="updatevisibility();" />Add ACL for certificate CommonName. (host header matches the 'CN' of the certificate)<br/>
 			</td>
 		</tr>
 		<tr class="haproxy_ssloffloading_enabled">
@@ -760,8 +774,7 @@ $primaryfrontends = get_haproxy_frontends($excludefrontend);
 			haproxy_htmllist("tableA_sslCertificates", $a_certificates, $fields_sslCertificates);
 			?>
 				<br/>
-				<input id="ssloffloadacladditional" name="ssloffloadacladditional" type="checkbox" value="yes" <?php if ($pconfig['ssloffloadacladditional']=='yes') echo "checked";?> onclick="updatevisibility();" />Add ACL for certificate CommonName. (host header matches 'CN')<br/>
-				<input id="ssloffloadacladditionalnondefault" name="ssloffloadacladditionalnondefault" type="checkbox" value="yes" <?php if ($pconfig['ssloffloadacladditionalnondefault']=='yes') echo "checked";?> onclick="updatevisibility();" />Add ACL for certificate CommonName for nondefault ports. (host header starts with 'CN:')
+				<input id="ssloffloadacladditional" name="ssloffloadacladditional" type="checkbox" value="yes" <?php if ($pconfig['ssloffloadacladditional']=='yes') echo "checked";?> onclick="updatevisibility();" />Add ACL for certificate CommonName. (host header matches the 'CN' of the certificate)<br/>
 			</td>
 		</tr>
 		<tr class="haproxy_ssloffloading_enabled haproxy_primary" align="left">
@@ -775,7 +788,7 @@ $primaryfrontends = get_haproxy_frontends($excludefrontend);
 		</tr>
 		<tr class="haproxy_ssloffloading_enabled haproxy_primary">
 			<td class="vncell" colspan="2"><b>Client certificate verification options, leave this empty if you do not want to ask for a client certificate</b><br/>
-			The users that visit this site will need to load the client cert signed by the ca's listed below imported into their browser.</td>
+			The users that visit this site will need to load the client cert signed by one of the ca's listed below imported into their browser.</td>
 		</tr>
 		<tr class="haproxy_ssloffloading_enabled haproxy_primary">
 			<td width="22%" valign="top" class="vncell">Client verification CA certificates</td>

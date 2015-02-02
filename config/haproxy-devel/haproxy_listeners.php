@@ -3,7 +3,7 @@
 /*
 	haproxy_listeners.php
 	part of pfSense (https://www.pfsense.org/)
-	Copyright (C) 2013 PiBa-NL
+	Copyright (C) 2013-2015 PiBa-NL
 	Copyright (C) 2009 Scott Ullrich <sullrich@pfsense.com>
 	Copyright (C) 2008 Remco Hoef <remcoverhoef@pfsense.com>
 	All rights reserved.
@@ -36,10 +36,33 @@ require_once("certs.inc");
 require_once("haproxy_utils.inc");
 require_once("pkg_haproxy_tabs.inc");
 
+$changedesc = "Services: HAProxy: Frontends";
+
 if (!is_array($config['installedpackages']['haproxy']['ha_backends']['item'])) {
 	$config['installedpackages']['haproxy']['ha_backends']['item'] = array();
 }
 $a_frontend = &$config['installedpackages']['haproxy']['ha_backends']['item'];
+
+if($_GET['action'] == "toggle") {
+	$id = $_GET['id'];
+	echo "$id|";
+	if (isset($a_frontend[get_frontend_id($id)])) {
+		$frontent = &$a_frontend[get_frontend_id($id)];
+		if ($frontent['status'] != "disabled"){
+			$frontent['status'] = 'disabled';
+			echo "0|";
+		}else{
+			$frontent['status'] = 'active';
+			echo "1|";
+		}
+		$changedesc .= " set frontend '$id' status to: {$frontent['status']}";
+		
+		touch($d_haproxyconfdirty_path);
+		write_config($changedesc);
+	}
+	echo "ok|";
+	exit;
+}
 
 if ($_POST) {
 	$pconfig = $_POST;
@@ -70,10 +93,6 @@ if ($_GET['act'] == "del") {
 	}
 }
 
-$pf_version=substr(trim(file_get_contents("/etc/version")),0,3);
-if ($pf_version < 2.0)
-	$one_two = true;
-	
 $pgtitle = "Services: HAProxy: Frontends";
 include("head.inc");
 
@@ -81,14 +100,37 @@ include("head.inc");
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">
 <?php include("fbegin.inc"); ?>
 <form action="haproxy_listeners.php" method="post">
-<?php if($one_two): ?>
-<p class="pgtitle"><?=$pgtitle?></p>
-<?php endif; ?>
 <?php if ($input_errors) print_input_errors($input_errors); ?>
 <?php if ($savemsg) print_info_box($savemsg); ?>
-<?php if (file_exists($d_haproxyconfdirty_path)): ?>
-<?php print_info_box_np("The haproxy configuration has been changed.<br/>You must apply the changes in order for them to take effect.");?><br/>
-<?php endif; ?>
+<?php 
+$display_apply = file_exists($d_haproxyconfdirty_path) ? "" : "none";
+echo "<div id='showapplysettings' style='display: {$display_apply};'>";
+print_info_box_np("The haproxy configuration has been changed.<br/>You must apply the changes in order for them to take effect.");
+echo "<br/></div>";
+?>
+<script type="text/javascript" language="javascript" src="/javascript/haproxy_geturl.js"></script>
+<script language="javascript">
+function toggle_on(button, image) {
+	var item = document.getElementById(button);
+	item.src = image;
+}
+
+function js_callback(req) {
+	showapplysettings.style.display = 'block';
+	if(req.content != '') {
+		var itemsplit = req.content.split("|");
+		buttonid = itemsplit[0];
+		enabled = itemsplit[1];
+		if (enabled == 1){
+			img = 'pass';
+		} else {
+			img = 'reject';
+		}
+		toggle_on('btn_'+buttonid, './themes/<?=$g['theme'];?>/images/icons/icon_'+img+'.gif');
+	}
+}
+</script>
+
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
   <tr><td class="tabnavtbl">
   <?php
@@ -100,6 +142,7 @@ include("head.inc");
 	<div id="mainarea">
 	  <table class="tabcont sortable" width="100%" border="0" cellpadding="0" cellspacing="0">
 		<tr>
+		  <td width="5%" class="listhdrr">On</td>
 		  <td width="5%" class="listhdrr">Primary</td>
 		  <td width="20%" class="listhdrr">Advanced</td>
 		  <td width="20%" class="listhdrr">Name</td>
@@ -107,7 +150,7 @@ include("head.inc");
 		  <td width="20%" class="listhdrr">Address</td>
 		  <td width="5%" class="listhdrr">Type</td>
 		  <td width="10%" class="listhdrr">Backend</td>
-		  <td width="20%" class="listhdrr">Parent</td>
+		  <!--td width="20%" class="listhdrr">Parent</td-->
 		  <td width="5%" class="list"></td>
 		</tr>
 <?php
@@ -150,10 +193,22 @@ include("head.inc");
 				$textgray = $frontend['status'] != 'active' ? " gray" : "";
 				?>
 				<tr class="<?=$textgray?>">
-				  <td class="listlr" style="<?=$frontend['secondary']=='yes'?"visibility:hidden;":""?>" ondblclick="document.location='haproxy_listeners_edit.php?id=<?=$frontendname;?>';">
+				  <td class="listlr" ondblclick="document.location='haproxy_listeners_edit.php?id=<?=$frontendname;?>';">
+					<?
+						if ($frontend['status']=='disabled'){
+							$iconfn = "reject";
+						} else {
+							$iconfn = "pass";
+						}?>
+					<a href='javascript:getURL("?id=<?=$frontendname;?>&amp;action=toggle&amp;", js_callback);'>
+						<img id="btn_<?=$frontendname;?>" src="./themes/<?= $g['theme']; ?>/images/icons/icon_<?=$iconfn;?>.gif" width="11" height="11" border="0" 
+						title="<?=gettext("click to toggle enable/disable this frontend");?>" alt="icon" />
+					</a>
+				  </td>
+				  <td class="listr" style="<?=$frontend['secondary']=='yes'?"visibility:hidden;":""?>" ondblclick="document.location='haproxy_listeners_edit.php?id=<?=$frontendname;?>';">
 					<?=$frontend['secondary']!='yes'?"yes":"no";?>
 				  </td>
-				  <td class="listlr" ondblclick="document.location='haproxy_listeners_edit.php?id=<?=$frontendname;?>';">
+				  <td class="listr" ondblclick="document.location='haproxy_listeners_edit.php?id=<?=$frontendname;?>';">
 					<? 
 					$acls = get_frontend_acls($frontend);
 					$isaclset = "";
@@ -201,13 +256,13 @@ include("head.inc");
 					}
 					?>
 				  </td>
-				  <td class="listlr" ondblclick="document.location='haproxy_listeners_edit.php?id=<?=$frontendname;?>';">
+				  <td class="listr" ondblclick="document.location='haproxy_listeners_edit.php?id=<?=$frontendname;?>';">
 					<?=$frontend['name'];?>
 				  </td>
-				  <td class="listlr" ondblclick="document.location='haproxy_listeners_edit.php?id=<?=$frontendname;?>';">
+				  <td class="listr" ondblclick="document.location='haproxy_listeners_edit.php?id=<?=$frontendname;?>';">
 					<?=$frontend['desc'];?>
 				  </td>
-				  <td class="listlr" ondblclick="document.location='haproxy_listeners_edit.php?id=<?=$frontendname;?>';">
+				  <td class="listr" ondblclick="document.location='haproxy_listeners_edit.php?id=<?=$frontendname;?>';">
 				    <?
 						$first = true;
 						foreach($frontend['ipport'] as $addr) {
@@ -223,7 +278,7 @@ include("head.inc");
 						}
 					?>
 				  </td>
-				  <td class="listlr" ondblclick="document.location='haproxy_listeners_edit.php?id=<?=$frontendname;?>';">
+				  <td class="listr" ondblclick="document.location='haproxy_listeners_edit.php?id=<?=$frontendname;?>';">
 				  <?
 					if ($frontend['type'] == 'http') {
 						$mainfrontend = get_primaryfrontend($frontend);
@@ -238,16 +293,16 @@ include("head.inc");
 						echo $a_frontendmode[$frontend['type']]['shortname'];
 				  ?>
 				  </td>
-				  <td class="listlr" ondblclick="document.location='haproxy_listeners_edit.php?id=<?=$frontendname;?>';">
+				  <td class="listr" ondblclick="document.location='haproxy_listeners_edit.php?id=<?=$frontendname;?>';">
 					<div title='<?=$backend_serverpool_hint;?>'>
 					<a href="haproxy_pool_edit.php?id=<?=$frontend['backend_serverpool']?>">
 					<?=$frontend['backend_serverpool']?>
 					</a>
 					</div>
 				  </td>
-				  <td class="listlr" ondblclick="document.location='haproxy_listeners_edit.php?id=<?=$frontendname;?>';">
+				  <!--td class="listlr" ondblclick="document.location='haproxy_listeners_edit.php?id=<?=$frontendname;?>';">
 					<?=$frontend['secondary'] == 'yes' ? $frontend['primary_frontend'] : "";?>
-				  </td>
+				  </td-->
 				  <td class="list" nowrap>
 					<table border="0" cellspacing="0" cellpadding="1">
 					  <tr>
