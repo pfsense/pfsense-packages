@@ -2,7 +2,7 @@
 /*
 	haproxy_utils.php
 	part of pfSense (https://www.pfsense.org/)
-	Copyright (C) 2013 PiBa-NL
+	Copyright (C) 2013-2015 PiBa-NL
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
@@ -35,6 +35,30 @@ require_once("config.inc");
 
 class haproxy_utils {
 	public static $pf_version;
+
+	public function query_dns($host, $querytype="A,AAAA", $dnsserver = "127.0.0.1") {
+		$result = array();
+		$host = trim($host, " \t\n\r\0\x0B[];\"'");
+		$host_esc = escapeshellarg($host);
+		$types = explode(',',$querytype);
+		foreach($types as $type){
+			$resolved = gethostbyname($host);
+			if($resolved) {
+				$resolved = array();
+				if (haproxy_utils::$pf_version < '2.2')
+					exec("/usr/bin/dig   {$host_esc} $type @$dnsserver | /usr/bin/grep {$host_esc} | /usr/bin/grep -v ';' | /usr/bin/awk '{ print $5 }'", $resolved);
+				else
+					exec("/usr/bin/drill {$host_esc} $type @$dnsserver | /usr/bin/grep {$host_esc} | /usr/bin/grep -v ';' | /usr/bin/awk '{ print $5 }'", $resolved);
+				foreach($resolved as $item) {
+					$newitem = array();
+					$newitem["typeid"] = $type;
+					$newitem["data"] = $item;
+					$result[] = $newitem;
+				}
+			}
+		}
+		return $result;
+	}
 }
 haproxy_utils::$pf_version = substr(trim(file_get_contents("/etc/version")),0,3);
 

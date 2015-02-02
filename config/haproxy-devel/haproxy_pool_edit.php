@@ -790,7 +790,7 @@ set by the 'retries' parameter.</div>
 			<td width="78%" class="vtable" colspan="2">
 				<input id="persist_cookie_name" name="persist_cookie_name" type="text" <?if(isset($pconfig['persist_cookie_name'])) echo "value=\"{$pconfig['persist_cookie_name']}\"";?> size="64" /><br/>
 				The string name to track in Set-Cookie and Cookie HTTP headers.<br/>
-				EXAMPLE: MyLoadBalanceCookie JSESSIONID PHPSESSIONID ASP.NET_SessionId
+				EXAMPLE: MyLoadBalanceCookie JSESSIONID PHPSESSID ASP.NET_SessionId
 			</td>
 		</tr>
 		<tr class="haproxy_cookie_visible" align="left">

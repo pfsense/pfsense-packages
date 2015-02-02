@@ -147,6 +147,16 @@
 		<chmod>077</chmod>
 		<item>https://packages.pfsense.org/packages/config/haproxy-devel/pkg_haproxy_tabs.inc</item>
 	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/pkg/</prefix>
+		<chmod>077</chmod>
+		<item>https://packages.pfsense.org/packages/config/haproxy-devel/pkg/haproxy_upgrade_config.inc</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/www/javascript/</prefix>
+		<chmod>077</chmod>
+		<item>https://packages.pfsense.org/packages/config/haproxy-devel/www/javascript/haproxy_geturl.js</item>
+	</additional_files_needed>
 	<custom_delete_php_command>
 	</custom_delete_php_command>
 	<custom_add_php_command>
