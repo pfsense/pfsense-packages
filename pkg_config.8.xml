@@ -1394,7 +1394,7 @@
 		<depends_on_package_pbi>havp-0.91_1-i386.pbi</depends_on_package_pbi>
 		<build_port_path>/usr/ports/www/havp</build_port_path>
 		<build_options>CLAMAVUSER=havp;CLAMAVGROUP=havp</build_options>
-		<version>0.91_1 pkg v1.04</version>
+		<version>0.91_1 pkg v1.05</version>
 		<status>BETA</status>
 		<required_version>1.2.2</required_version>
 		<config_file>https://packages.pfsense.org/packages/config/havp/havp.xml</config_file>

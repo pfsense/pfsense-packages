@@ -633,7 +633,7 @@ function havp_config_havp()
     # log
     $conf[] = "\n# log ";
     $conf[] = "ACCESSLOG      " . HVDEF_HAVP_ACCESSLOG;
-    $conf[] = "ERRORLOG       " . HVDEF_HAVP_ERRORLOG;
+    $conf[] = "ERRORLOG       " . ($havp_config[F_LOG] === 'true' ? HVDEF_HAVP_ERRORLOG : "/dev/null");
     # syslog
     $conf[] = "\n# syslog";
     $conf[] = "USESYSLOG      {$havp_config[F_SYSLOG]}";
