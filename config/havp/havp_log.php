@@ -39,8 +39,16 @@ $nentries = $config['syslog']['nentries'];
 if (!$nentries)
 	$nentries = 50;
 
+if ($_GET['logtab'] === 'havp') {
+	define('HAVP_CLAMDTAB', false);
+	define('HAVP_LOGFILE', HVDEF_HAVP_ERRORLOG);
+} else {
+	define('HAVP_CLAMDTAB', true);
+	define('HAVP_LOGFILE', HVDEF_CLAM_LOG);
+}
+
 if ($_POST['clear']) 
-	file_put_contents(HVDEF_HAVP_ERRORLOG, '');
+	file_put_contents(HAVP_LOGFILE, '');
 
 function dump_havp_errorlog($logfile, $tail) {
 	global $g, $config;
@@ -50,22 +58,32 @@ function dump_havp_errorlog($logfile, $tail) {
 	if (is_dir($logfile)) {
 		$logarr = array("File $logfile is a directory.");
 	} elseif(file_exists($logfile) && filesize($logfile) == 0) {
-		$logarr = array(" ... Log file is empty.");
+		$logarr = array(" -> Log file is empty.");
 	} else {
 		exec("cat " . escapeshellarg($logfile) . "{$grepline} | /usr/bin/tail {$sor} -n " . escapeshellarg($tail), $logarr);
 	}
 	foreach ($logarr as $logent) {
-			$logent = preg_split("/\s+/", $logent, 3);
+			if (HAVP_CLAMDTAB) {
+				$logent = split(" -> ", $logent);
+				$entry_date_time = htmlspecialchars($logent[0]);
+				$entry_text = htmlspecialchars($logent[1]);
+			} else {
+				$logent = preg_split("/\s+/", $logent, 3);
+				$entry_date_time = htmlspecialchars($logent[0] . " " .  $logent[1]);
+				$entry_text = htmlspecialchars($logent[2]);
+			}
 			echo "<tr valign=\"top\">\n";
-			$entry_date_time = htmlspecialchars($logent[0] . " " .  $logent[1]);
-			$entry_text = htmlspecialchars($logent[2]);
 			echo "<td class=\"listlr nowrap\" width=\"130\">{$entry_date_time}</td>\n";
 			echo "<td class=\"listr\">{$entry_text}</td>\n";
 			echo "</tr>\n";
 	}
 }
 
-$pgtitle = "Antivirus: HAVP log";
+if ($_GET['logtab'] === 'havp') {
+	$pgtitle = "Antivirus: HAVP log";
+} else {
+	$pgtitle = "Antivirus: Clamd log";
+}
 include("head.inc");
 
 ?>
@@ -79,7 +97,8 @@ include("head.inc");
 	$tab_array[] = array(gettext("General page"), false, "antivirus.php");
 	$tab_array[] = array(gettext("HTTP proxy"), false, "pkg_edit.php?xml=havp.xml&amp;id=0");
 	$tab_array[] = array(gettext("Settings"), false, "pkg_edit.php?xml=havp_avset.xml&amp;id=0");
-	$tab_array[] = array(gettext("HAVP Log"), true, "havp_log.php");
+	$tab_array[] = array(gettext("HAVP Log"), !HAVP_CLAMDTAB, "havp_log.php?logtab=havp");
+	$tab_array[] = array(gettext("Clamd Log"), HAVP_CLAMDTAB, "havp_log.php?logtab=clamd");
 	display_top_tabs($tab_array);
 ?>
   </td></tr>
@@ -89,11 +108,11 @@ include("head.inc");
 		<table class="tabcont" width="100%" border="0" cellspacing="0" cellpadding="0">
 		  <tr>
 			<td colspan="2" class="listtopic">
-			  <?php printf(gettext("Last %s HAVP log entries"), $nentries);?></td>
+			  <?php printf(gettext("Last %s log entries"), $nentries);?></td>
 		  </tr>
-		  <?php dump_havp_errorlog(HVDEF_HAVP_ERRORLOG, $nentries); ?>
+		  <?php dump_havp_errorlog(HAVP_LOGFILE, $nentries); ?>
 		<tr><td><br/>
-		<form action="havp_log.php" method="post">
+		<form action="havp_log.php?logtab=<?=(HAVP_CLAMDTAB ? 'clamd' : 'havp'); ?>" method="post">
 			<input name="clear" type="submit" class="formbtn" value="<?=gettext("Clear log"); ?>" /></form></td></tr>
 		</table>
 	</div>
