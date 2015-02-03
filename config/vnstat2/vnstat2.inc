@@ -113,6 +113,9 @@ EOF;
 	}
 	fwrite($hf2, $vnstat_conf_file);
 	fclose($hf2);
+	// Reinstall the symlink for the PBI, if this is a PBI install. (note: -f to overwrite any existing file)
+	if (file_exists('/usr/pbi/vnstat-i386')) { exec("ln -sf /usr/local/etc/vnstat.conf /usr/pbi/vnstat-i386/etc/vnstat.conf"); }
+	if (file_exists('/usr/pbi/vnstat-amd64')) { exec("ln -sf /usr/local/etc/vnstat.conf /usr/pbi/vnstat-amd64/etc/vnstat.conf"); }
 }
 
 function create_vnstati_image() {
@@ -146,9 +149,9 @@ function vnstat_install_config() {
 //	exec("[ -d /var/db/vnstat ] && mv /var/db/vnstat /conf/vnstat");
 	exec("[ -d /usr/local/pkg/vnstat2/vnstat ] && mv /usr/local/pkg/vnstat2/vnstat /conf/vnstat");
 	exec("[ ! -d /conf/vnstat ] && mkdir /conf/vnstat");
-// Check for pbi install and arch type then create symlinks
-	if (file_exists('/usr/pbi/vnstat-i386')) { exec("ln -s /usr/local/etc/vnstat.conf /usr/pbi/vnstat-i386/etc/vnstat.conf"); }
-	if (file_exists('/usr/pbi/vnstat-amd64')) { exec("ln -s /usr/local/etc/vnstat.conf /usr/pbi/vnstat-amd64/etc/vnstat.conf"); }
+// Check for pbi install and arch type then create symlinks (note: -f to overwrite any file that was installed by the package)
+	if (file_exists('/usr/pbi/vnstat-i386')) { exec("ln -sf /usr/local/etc/vnstat.conf /usr/pbi/vnstat-i386/etc/vnstat.conf"); }
+	if (file_exists('/usr/pbi/vnstat-amd64')) { exec("ln -sf /usr/local/etc/vnstat.conf /usr/pbi/vnstat-amd64/etc/vnstat.conf"); }
 // Add MonthRotate value to config.xml and write /usr/local/etc/vnstat.conf
 	$no_monthrotate = $config['installedpackages']['vnstat2']['config'][0]['monthrotate'];	
 	if ($no_monthrotate == ""){

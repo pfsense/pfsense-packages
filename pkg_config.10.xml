@@ -575,7 +575,7 @@
 		<build_pbi>
 			<port>net/vnstat</port>
 		</build_pbi>
-		<version>1.11_6,2</version>
+		<version>1.11_6,3</version>
 		<status>Stable</status>
 		<required_version>2.2</required_version>
 		<maintainer>crazypark2@yahoo.dk</maintainer>
