@@ -814,7 +814,9 @@ function snort_snortloglimit_install_cron($should_install=TRUE) {
 	if ($should_install && snort_cron_job_exists("/usr/local/pkg/snort/snort_check_cron_misc.inc", TRUE, "*/5"))
 		return;
 
-	// Else install the new or updated cron job
+	// Else install the new or updated cron job by removing the
+	// existing job first, then installing the new or updated job.
+	install_cron_job("snort_check_cron_misc.inc", false);
 	install_cron_job("/usr/bin/nice -n20 /usr/local/bin/php -f /usr/local/pkg/snort/snort_check_cron_misc.inc", $should_install, "*/5");
 }
 
@@ -921,7 +923,9 @@ function snort_rm_blocked_install_cron($should_install) {
 
 	// Else install the new or updated cron job
 	if ($should_install) {
-		install_cron_job($command, $should_install, $snort_rm_blocked_min, $snort_rm_blocked_hr, $snort_rm_blocked_mday, $snort_rm_blocked_month, $snort_rm_blocked_wday, "root");
+		// Remove the existing job first, then install the new or updated job
+		install_cron_job("snort2c", false);
+		install_cron_job($command, true, $snort_rm_blocked_min, $snort_rm_blocked_hr, $snort_rm_blocked_mday, $snort_rm_blocked_month, $snort_rm_blocked_wday, "root");
 	}
 }
 
@@ -1009,8 +1013,11 @@ function snort_rules_up_install_cron($should_install) {
 		return;
 
 	// Else install the new or updated cron job
-	if ($should_install)
+	if ($should_install) {
+		// Remove the existing job first, then install the new or updated job
+		install_cron_job("snort_check_for_rule_updates.php", false);
 		install_cron_job($command, $should_install, $snort_rules_up_min, $snort_rules_up_hr, $snort_rules_up_mday, $snort_rules_up_month, $snort_rules_up_wday, "root");
+	}
 }
 
 /* Only run when all ifaces needed to sync. Expects filesystem rw */
