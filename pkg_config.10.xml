@@ -571,11 +571,11 @@
 		<descr>Vnstat is a console-based network traffic monitor&lt;br /&gt;The vnstat PHP frontend and vnstati adds a more user friendly way of displaying traffic usage.</descr>
 		<pkginfolink>https://forum.pfsense.org/index.php/topic,14179.0.html</pkginfolink>
 		<category>Network Management</category>
-		<depends_on_package_pbi>vnstat-1.11_6-##ARCH##.pbi</depends_on_package_pbi>
+		<depends_on_package_pbi>vnstat-1.12-##ARCH##.pbi</depends_on_package_pbi>
 		<build_pbi>
 			<port>net/vnstat</port>
 		</build_pbi>
-		<version>1.11_6,2</version>
+		<version>1.12,3</version>
 		<status>Stable</status>
 		<required_version>2.2</required_version>
 		<maintainer>crazypark2@yahoo.dk</maintainer>
