@@ -324,10 +324,11 @@ function snort_build_list($snortcfg, $listname = "", $whitelist = false, $extern
 	if (($externallist && $localnet == 'yes') || (!$externallist && (!$whitelist || $localnet == 'yes' || empty($localnet)))) {
 		if (is_ipaddr($snortip)) {
 			if ($snortcfg['interface'] <> "wan") {
-				$sn = get_interface_subnet($snortcfg['interface']);
-				$ip = gen_subnet($snortip, $sn) . "/{$sn}";
-				if (!in_array($ip, $home_net))
-					$home_net[] = $ip;
+				if ($sn = get_interface_subnet($snortcfg['interface'])) {
+					$ip = gen_subnet($snortip, $sn) . "/{$sn}";
+					if (!in_array($ip, $home_net))
+						$home_net[] = $ip;
+				}
 			}
 		}
 	}
@@ -346,10 +347,11 @@ function snort_build_list($snortcfg, $listname = "", $whitelist = false, $extern
 	if (($externallist && $localnet == 'yes') || (!$externallist && (!$whitelist || $localnet == 'yes' || empty($localnet)))) {
 		if (is_ipaddrv6($snortip)) {
 			if ($snortcfg['interface'] <> "wan") {
-				$sn = get_interface_subnetv6($snortcfg['interface']);
-				$ip = gen_subnetv6($snortip, $sn). "/{$sn}";
-				if (!in_array($ip, $home_net))
-					$home_net[] = $ip;
+				if ($sn = get_interface_subnetv6($snortcfg['interface'])) {
+					$ip = gen_subnetv6($snortip, $sn). "/{$sn}";
+					if (!in_array($ip, $home_net))
+						$home_net[] = $ip;
+				}
 			}
 		}
 	}
@@ -383,10 +385,11 @@ function snort_build_list($snortcfg, $listname = "", $whitelist = false, $extern
 				continue;
 			$subnet = get_interface_ip($int);
 			if (is_ipaddrv4($subnet)) {
-				$sn = get_interface_subnet($int);
-				$ip = gen_subnet($subnet, $sn) . "/{$sn}";
-				if (!in_array($ip, $home_net))
-					$home_net[] = $ip;
+				if ($sn = get_interface_subnet($int)) {
+					$ip = gen_subnet($subnet, $sn) . "/{$sn}";
+					if (!in_array($ip, $home_net))
+						$home_net[] = $ip;
+				}
 			}
 
 			$subnet = get_interface_ipv6($int);
@@ -394,10 +397,11 @@ function snort_build_list($snortcfg, $listname = "", $whitelist = false, $extern
 			if (strpos($subnet, "%") !== FALSE)
 				$subnet = substr($subnet, 0, strpos($subnet, "%"));
 			if (is_ipaddrv6($subnet)) {
-				$sn = get_interface_subnetv6($int);
-				$ip = gen_subnetv6($subnet, $sn). "/{$sn}";
-				if (!in_array($ip, $home_net))
-					$home_net[] = $ip;
+				if ($sn = get_interface_subnetv6($int)) {
+					$ip = gen_subnetv6($subnet, $sn). "/{$sn}";
+					if (!in_array($ip, $home_net))
+						$home_net[] = $ip;
+				}
 			}
 
 			// Add link-local address
