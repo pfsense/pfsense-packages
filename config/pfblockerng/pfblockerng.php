@@ -44,9 +44,13 @@ require_once("functions.inc");
 require_once("pkg-utils.inc");
 require_once("globals.inc");
 require_once("services.inc");
-require_once("/usr/local/pkg/pfblockerng/pfblockerng.inc");
 
-pfb_global();
+// Call Include File and Collect updated Global Settings
+if (in_array($argv[1], array( 'update','dc','uc','gc','cron' ))) {
+	require_once("/usr/local/pkg/pfblockerng/pfblockerng.inc");
+	pfb_global();
+}
+
 
 // IPv6 Range to CIDR function used courtesey from:
 // https://github.com/stilez/pfsense-leases/blob/50cc0fa81dba5fe91bcddaea016c245d1b8479cc/etc/inc/util.inc
@@ -147,7 +151,7 @@ $uname = posix_uname();
 if ($uname['machine'] == "amd64")
 	ini_set('memory_limit', '256M');
 
-function pfb_update_check($header_url, $list_url, $url_format) {
+function pfb_update_check($header_url, $list_url, $url_format, $pfbfolder) {
 	global $pfb;
 	$pfb['cron_update'] = FALSE;
 
@@ -230,6 +234,12 @@ if ($argv[1] == 'dc') {
 	}
 	pfblockerng_uc_countries();
 	pfblockerng_get_countries();
+
+	// Remove Original Maxmind Database Files
+	@unlink_if_exists("{$pfb['dbdir']}/GeoIPCountryCSV.zip");
+	@unlink_if_exists("{$pfb['dbdir']}/GeoIPCountryWhois.csv");
+	@unlink_if_exists("{$pfb['dbdir']}/GeoIPv6.csv");
+	@unlink_if_exists("{$pfb['dbdir']}/country_continent.csv");
 }
 
 if ($argv[1] == 'uc') {
@@ -425,7 +435,6 @@ if ($argv[1] == 'cron') {
 // Function to process the downloaded Maxmind Database and format into Continent txt files.
 function pfblockerng_uc_countries() {
 	global $g,$pfb;
-	pfb_global();
 
 	$maxmind_cont	= "{$pfb['dbdir']}/country_continent.csv";
 	$maxmind_cc4	= "{$pfb['dbdir']}/GeoIPCountryWhois.csv";
@@ -584,7 +593,6 @@ function pfblockerng_uc_countries() {
 // Function to process Continent txt files and create Country ISO files and to Generate GUI XML files.
 function pfblockerng_get_countries() {
 	global $g,$pfb;
-	pfb_global();
 
 	$files = array (	"Africa"		=> "{$pfb['ccdir']}/Africa_v4.txt",
 				"Asia"			=> "{$pfb['ccdir']}/Asia_v4.txt",
@@ -622,7 +630,9 @@ function pfblockerng_get_countries() {
 				if (preg_match("/#/",$line)) {
 					if ($pfb['complete']) {
 						${'coptions' . $type}[] = $country . '-' . $isocode . ' ('. $total .') ' . ' </name><value>' . $isocode . '</value></option>';
-						${'roptions' . $type}[] = $country . '-' . $isocode . ' ('. $total .') ' . ' </name><value>' . $isocode . '</value></option>';
+						// Only collect IPv4 for Reputation Tab 
+						if ($type == "4")
+							$roptions4[] = $country . '-' . $isocode . ' ('. $total .') ' . ' </name><value>' . $isocode . '</value></option>';
 
 						// Save ISO data
 						@file_put_contents($pfb['ccdir'] . '/' . $isocode . '_v' . $type . '.txt', $xml_data, LOCK_EX);
@@ -646,7 +656,8 @@ function pfblockerng_get_countries() {
 				if ($keycount == $lastkey) {
 					if (preg_match("/Total Networks: 0/", $line)) { continue;}	// Dont Display Countries with Null Data
 					${'coptions' . $type}[] = $country . '-' . $isocode . ' ('. $total .') ' . ' </name><value>' . $isocode . '</value></option>';
-					${'roptions' . $type}[] = $country . '-' . $isocode . ' ('. $total .') ' . ' </name><value>' . $isocode . '</value></option>';
+					if ($type == "4")
+						$roptions4[] = $country . '-' . $isocode . ' ('. $total .') ' . ' </name><value>' . $isocode . '</value></option>';
 					@file_put_contents($pfb['ccdir'] . '/' . $isocode . '_v' . $type . '.txt', $xml_data, LOCK_EX);
 					unset($total, $xml_data);
 				}
@@ -962,13 +973,12 @@ EOF;
 
 	// Sort Countries IPv4 Alphabetically and Build XML <option> Data for Reputation Tab (IPv6 not used by ET IQRisk)
 
-	$type = "4";
-	sort(${'roptions' . $type}, SORT_STRING);
-	$eoa = count(${'roptions' . $type});
+	sort($roptions4, SORT_STRING);
+	$eoa = count($roptions4);
 	$count = 1;
 	$etoptions = "";
 
-	foreach (${'roptions' . $type} as $option4) {
+	foreach ($roptions4 as $option4) {
 		if ($count == 1) { $et_options .= "\t" . '<option><name>' . $option4 . "\n"; $count++; continue; }
 		if ($eoa == $count) {
 			$et_options .= "\t\t\t\t" . '<option><name>' . $option4;
@@ -1470,6 +1480,6 @@ EOF;
 	pfb_logger("{$log}","3");
 
 	// Unset Arrays
-	unset ($et_options, $xmlrep);
+	unset ($roptions4, $et_options, $xmlrep);
 }
 ?>

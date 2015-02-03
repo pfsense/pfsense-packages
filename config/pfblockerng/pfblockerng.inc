@@ -2341,9 +2341,6 @@ function pfblockerng_php_install_command() {
 	update_output_window(gettext("Downloading MaxMind Country Databases. This may take a minute..."));
 	exec("/bin/sh /usr/local/pkg/pfblockerng/geoipupdate.sh all >> {$pfb['geolog']} 2>&1");
 
-	@rename("{$pfb['dbdir']}/GeoIP.dat", "{$pfb['ccdir']}/GeoIP.dat");
-	@rename("{$pfb['dbdir']}/GeoIPv6.dat", "{$pfb['ccdir']}/GeoIPv6.dat");
-
 	update_output_window(gettext("MaxMind Country Database downloads completed..."));
 	update_output_window(gettext("Converting MaxMind Country Databases for pfBlockerNG. This may take a few minutes..."));
 	pfblockerng_uc_countries();
