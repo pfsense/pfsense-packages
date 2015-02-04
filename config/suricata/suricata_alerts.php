@@ -424,20 +424,21 @@ if ($pconfig['arefresh'] == 'on')
 	echo "<meta http-equiv=\"refresh\" content=\"60;url=/suricata/suricata_alerts.php?instance={$instanceid}\" />\n";
 ?>
 
-<?php
-/* Display Alert message */
-if ($input_errors) {
-	print_input_errors($input_errors); // TODO: add checks
-}
-if ($savemsg) {
-	print_info_box($savemsg);
-}
-?>
 <form action="/suricata/suricata_alerts.php" method="post" id="formalert">
 <input type="hidden" name="sidid" id="sidid" value=""/>
 <input type="hidden" name="gen_id" id="gen_id" value=""/>
 <input type="hidden" name="ip" id="ip" value=""/>
 <input type="hidden" name="descr" id="descr" value=""/>
+
+<?php
+/* Display Alert message */
+if ($input_errors) {
+	print_input_errors($input_errors);
+}
+if ($savemsg) {
+	print_info_box($savemsg);
+}
+?>
 
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
 <tbody>

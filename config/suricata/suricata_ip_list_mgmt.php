@@ -170,6 +170,13 @@ include_once("head.inc");
 
 <?php
 include_once("fbegin.inc");
+?>
+
+<form action="/suricata/suricata_ip_list_mgmt.php" enctype="multipart/form-data" method="post" name="iform" id="iform">
+<input type="hidden" name="MAX_FILE_SIZE" value="100000000" />
+<input type="hidden" name="iplist_fname" id="iplist_fname" value=""/>
+
+<?php
 if ($input_errors) {
 	print_input_errors($input_errors);
 }
@@ -178,9 +185,6 @@ if ($savemsg)
 	print_info_box($savemsg);
 ?>
 
-<form action="/suricata/suricata_ip_list_mgmt.php" enctype="multipart/form-data" method="post" name="iform" id="iform">
-<input type="hidden" name="MAX_FILE_SIZE" value="100000000" />
-<input type="hidden" name="iplist_fname" id="iplist_fname" value=""/>
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
 <tbody>
 <tr><td>
