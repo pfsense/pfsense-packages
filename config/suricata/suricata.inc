@@ -327,10 +327,11 @@ function suricata_build_list($suricatacfg, $listname = "", $passlist = false, $e
 	if (($externallist && $localnet == 'yes') || (!$externallist && (!$passlist || $localnet == 'yes' || empty($localnet)))) {
 		if (is_ipaddrv4($suricataip)) {
 			if ($suricatacfg['interface'] <> "wan") {
-				$sn = get_interface_subnet($suricatacfg['interface']);
-				$ip = gen_subnet($suricataip, $sn) . "/{$sn}";
-				if (!in_array($ip, $home_net))
-					$home_net[] = $ip;
+				if ($sn = get_interface_subnet($suricatacfg['interface'])) {
+					$ip = gen_subnet($suricataip, $sn) . "/{$sn}";
+					if (!in_array($ip, $home_net))
+						$home_net[] = $ip;
+				}
 			}
 		}
 	}
@@ -349,10 +350,11 @@ function suricata_build_list($suricatacfg, $listname = "", $passlist = false, $e
 	if (($externallist && $localnet == 'yes') || (!$externallist && (!$passlist || $localnet == 'yes' || empty($localnet)))) {
 		if (is_ipaddrv6($suricataip)) {
 			if ($suricatacfg['interface'] <> "wan") {
-				$sn = get_interface_subnetv6($suricatacfg['interface']);
-				$ip = gen_subnetv6($suricataip, $sn). "/{$sn}";
-				if (!in_array($ip, $home_net))
-					$home_net[] = $ip;
+				if ($sn = get_interface_subnetv6($suricatacfg['interface'])) {
+					$ip = gen_subnetv6($suricataip, $sn). "/{$sn}";
+					if (!in_array($ip, $home_net))
+						$home_net[] = $ip;
+				}
 			}
 		}
 	}
@@ -386,10 +388,11 @@ function suricata_build_list($suricatacfg, $listname = "", $passlist = false, $e
 				continue;
 			$subnet = get_interface_ip($int);
 			if (is_ipaddrv4($subnet)) {
-				$sn = get_interface_subnet($int);
-				$ip = gen_subnet($subnet, $sn) . "/{$sn}";
-				if (!in_array($ip, $home_net))
-					$home_net[] = $ip;
+				if ($sn = get_interface_subnet($int)) {
+					$ip = gen_subnet($subnet, $sn) . "/{$sn}";
+					if (!in_array($ip, $home_net))
+						$home_net[] = $ip;
+				}
 			}
 
 			$subnet = get_interface_ipv6($int);
@@ -397,10 +400,11 @@ function suricata_build_list($suricatacfg, $listname = "", $passlist = false, $e
 			if (strpos($subnet, "%") !== FALSE)
 				$subnet = substr($subnet, 0, strpos($subnet, "%"));
 			if (is_ipaddrv6($subnet)) {
-				$sn = get_interface_subnetv6($int);
-				$ip = gen_subnetv6($subnet, $sn). "/{$sn}";
-				if (!in_array($ip, $home_net))
-					$home_net[] = $ip;
+				if ($sn = get_interface_subnetv6($int)) {
+					$ip = gen_subnetv6($subnet, $sn). "/{$sn}";
+					if (!in_array($ip, $home_net))
+						$home_net[] = $ip;
+				}
 			}
 
 			// Add link-local address
