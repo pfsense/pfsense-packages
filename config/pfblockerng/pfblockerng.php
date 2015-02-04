@@ -418,12 +418,10 @@ if ($argv[1] == 'cron') {
 	if ($pfb['update_cron']) {
 		sync_package_pfblockerng("cron");
 	} else {
-		$log = "\n  No Updates required. \n\n";
+		sync_package_pfblockerng("noupdates");
+		$log = "\n  No Updates required.\n CRON  PROCESS  ENDED\n UPDATE PROCESS ENDED\n";
 		pfb_logger("{$log}","1");
 	}
-
-	$log = " CRON  PROCESS  ENDED [ NOW ]\n";
-	pfb_logger("{$log}","1");
 
 	# Call Log Mgmt Function
 	// If Update GUI 'Manual view' is selected. Last output will be missed. So sleep for 5 secs.

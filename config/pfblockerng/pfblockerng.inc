@@ -350,13 +350,21 @@ function sync_package_pfblockerng($cron = "") {
 	}
 	log_error("[pfBlockerNG] Starting sync process.");
 
+	// Force Update - Set 'Save' variable when 'No Updates' found.
+	if ($cron == "noupdates") {
+		$pfb['save'] = TRUE;
+	}
+
 	# Start of pfBlockerNG Logging to 'pfblockerng.log'
 	if ($pfb['enable'] == "on" && !$pfb['save']) {
 		$log = " UPDATE PROCESS START [ NOW ]\n";
+		pfb_logger("{$log}","1");
 	} else {
-		$log = "\n**Saving Configuration [ NOW ] ...\n";
+		if ($cron != "noupdates") {
+			$log = "\n**Saving Configuration [ NOW ] ...\n";
+			pfb_logger("{$log}","1");
+		}
 	}
-	pfb_logger("{$log}","1");
 
 	# TBC if Required ! (Fetch Timeout in 2.2)
 
@@ -2561,18 +2569,19 @@ function pfblockerng_do_xmlrpc_sync($sync_to_ip, $port, $protocol, $username, $p
 	$xml = array();
 	// If User Disabled, remove 'General Tab Customizations' from Sync
 	if ($config['installedpackages']['pfblockerngsync']['config'][0]['syncinterfaces'] == "")
-		$xml['pfblockerng'] = $config['installedpackages']['pfblockerng'];
-	$xml['pfblockerngreputation'] = $config['installedpackages']['pfblockerngreputation'];
-	$xml['pfblockernglistsv4'] = $config['installedpackages']['pfblockernglistsv4'];
-	$xml['pfblockernglistsv6'] = $config['installedpackages']['pfblockernglistsv6'];
-	$xml['pfblockerngtopspammers'] = $config['installedpackages']['pfblockerngtopspammers'];
-	$xml['pfblockerngafrica'] = $config['installedpackages']['pfblockerngafrica'];
-	$xml['pfblockerngantartica'] = $config['installedpackages']['pfblockerngantartica'];
-	$xml['pfblockerngasia'] = $config['installedpackages']['pfblockerngasia'];
-	$xml['pfblockerngeurope'] = $config['installedpackages']['pfblockerngeurope'];
-	$xml['pfblockerngnorthamerica'] = $config['installedpackages']['pfblockerngnorthamerica'];
-	$xml['pfblockerngoceania'] = $config['installedpackages']['pfblockerngoceania'];
-	$xml['pfblockerngsouthamerica'] = $config['installedpackages']['pfblockerngsouthamerica'];
+		$xml['pfblockerng']		= $config['installedpackages']['pfblockerng'];
+	$xml['pfblockerngreputation']		= $config['installedpackages']['pfblockerngreputation'];
+	$xml['pfblockernglistsv4']		= $config['installedpackages']['pfblockernglistsv4'];
+	$xml['pfblockernglistsv6']		= $config['installedpackages']['pfblockernglistsv6'];
+	$xml['pfblockerngtopspammers']		= $config['installedpackages']['pfblockerngtopspammers'];
+	$xml['pfblockerngafrica']		= $config['installedpackages']['pfblockerngafrica'];
+	$xml['pfblockerngantartica']		= $config['installedpackages']['pfblockerngantartica'];
+	$xml['pfblockerngasia']			= $config['installedpackages']['pfblockerngasia'];
+	$xml['pfblockerngeurope']		= $config['installedpackages']['pfblockerngeurope'];
+	$xml['pfblockerngnorthamerica']		= $config['installedpackages']['pfblockerngnorthamerica'];
+	$xml['pfblockerngoceania']		= $config['installedpackages']['pfblockerngoceania'];
+	$xml['pfblockerngsouthamerica']		= $config['installedpackages']['pfblockerngsouthamerica'];
+	$xml['pfblockerngproxyandsatellite']	= $config['installedpackages']['pfblockerngproxyandsatellite'];
 
 	/* assemble xmlrpc payload */
 	$params = array(
