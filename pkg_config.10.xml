@@ -912,11 +912,11 @@
 		<descr>LCD display driver</descr>
 		<website>http://www.lcdproc.org/</website>
 		<category>Utility</category>
-		<version>lcdproc-0.5.7_1 pkg.v.1.0.1</version>
+		<version>lcdproc-0.5.7_2 pkg.v.1.0.1</version>
 		<status>BETA</status>
 		<required_version>2.2</required_version>
 		<maintainer>seth.mos@dds.nl</maintainer>
-		<depends_on_package_pbi>lcdproc-0.5.7_1-##ARCH##.pbi</depends_on_package_pbi>
+		<depends_on_package_pbi>lcdproc-0.5.7_2-##ARCH##.pbi</depends_on_package_pbi>
 		<config_file>https://packages.pfsense.org/packages/config/lcdproc/lcdproc.xml</config_file>
 		<configurationfile>lcdproc.xml</configurationfile>
 		<build_pbi>
@@ -930,12 +930,12 @@
 		<descr>LCD display driver - Development version</descr>
 		<website>http://www.lcdproc.org/</website>
 		<category>Utility</category>
-		<version>lcdproc-0.5.6 pkg v. 0.9.10</version>
+		<version>lcdproc-0.5.7_2 pkg v. 0.9.10</version>
 		<status>BETA</status>
 		<required_version>2.2</required_version>
 		<maintainer>michele@nt2.it</maintainer>
 		<pkginfolink>https://forum.pfsense.org/index.php/topic,44034.0.html</pkginfolink>
-		<depends_on_package_pbi>lcdproc-0.5.6-##ARCH##.pbi</depends_on_package_pbi>
+		<depends_on_package_pbi>lcdproc-0.5.7_2-##ARCH##.pbi</depends_on_package_pbi>
 		<config_file>https://packages.pfsense.org/packages/config/lcdproc-dev/lcdproc.xml</config_file>
 		<configurationfile>lcdproc.xml</configurationfile>
 		<build_pbi>
