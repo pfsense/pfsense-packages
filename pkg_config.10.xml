@@ -350,7 +350,7 @@
 		<website>http://www.olsr.org/</website>
 		<descr>The olsr.org OLSR daemon is an implementation of the Optimized Link State Routing protocol. OLSR is a routing protocol for mobile ad-hoc networks. The protocol is pro-active, table driven and utilizes a technique called multipoint relaying for message flooding.</descr>
 		<category>Services</category>
-		<config_file>https://packages.pfsense.org/packages/config/olsrd.xml</config_file>
+		<config_file>https://packages.pfsense.org/packages/config/olsrd/olsrd.xml</config_file>
 		<depends_on_package_pbi>olsrd-0.6.6.2_1-##ARCH##.pbi</depends_on_package_pbi>
 		<build_pbi>
 			<port>net/olsrd</port>
@@ -459,7 +459,7 @@
 		<website>http://siproxd.sourceforge.net/</website>
 		<descr>Proxy for handling NAT of multiple SIP devices to a single public IP.</descr>
 		<category>Services</category>
-		<config_file>https://packages.pfsense.org/packages/config/siproxd.xml</config_file>
+		<config_file>https://packages.pfsense.org/packages/config/siproxd/siproxd.xml</config_file>
 		<depends_on_package_pbi>siproxd-0.8.0-##ARCH##.pbi</depends_on_package_pbi>
 		<pkginfolink>https://doc.pfsense.org/index.php/Siproxd_package</pkginfolink>
 		<build_pbi>
@@ -730,7 +730,7 @@
 		<website>http://www.mindrot.org/pfflowd.html</website>
 		<descr>pfflowd converts OpenBSD PF status messages (sent via the pfsync interface) to Cisco NetFlow datagrams. These datagrams may be sent (via UDP) to a host of one's choice. Utilising the OpenBSD stateful packet filter infrastructure means that flow tracking is very fast and accurate.</descr>
 		<category>Network Management</category>
-		<config_file>https://packages.pfsense.org/packages/config/pfflowd.xml</config_file>
+		<config_file>https://packages.pfsense.org/packages/config/pfflowd/pfflowd.xml</config_file>
 		<depends_on_package_pbi>pfflowd-0.8-##ARCH##.pbi</depends_on_package_pbi>
 		<version>0.8 pkg v1.0.2</version>
 		<status>Stable</status>
@@ -752,7 +752,7 @@
 		<status>Stable</status>
 		<pkginfolink>https://doc.pfsense.org/index.php/Widentd_package</pkginfolink>
 		<required_version>2.2</required_version>
-		<config_file>https://packages.pfsense.org/packages/config/widentd.xml</config_file>
+		<config_file>https://packages.pfsense.org/packages/config/widentd/widentd.xml</config_file>
 		<configurationfile>widentd.xml</configurationfile>
 		<build_pbi>
 			<port>net/widentd</port>
@@ -810,7 +810,7 @@
 		<status>Stable</status>
 		<pkginfolink>https://doc.pfsense.org/index.php/Stunnel_package</pkginfolink>
 		<required_version>2.2</required_version>
-		<config_file>https://packages.pfsense.org/packages/config/stunnel.xml</config_file>
+		<config_file>https://packages.pfsense.org/packages/config/stunnel/stunnel.xml</config_file>
 		<configurationfile>stunnel.xml</configurationfile>
 		<build_pbi>
 			<port>security/stunnel</port>
@@ -822,7 +822,7 @@
 		<website>http://dast.nlanr.net/Projects/Iperf/</website>
 		<descr>Iperf is a tool for testing network throughput, loss, and jitter.</descr>
 		<category>Network Management</category>
-		<config_file>https://packages.pfsense.org/packages/config/iperf.xml</config_file>
+		<config_file>https://packages.pfsense.org/packages/config/iperf/iperf.xml</config_file>
 		<depends_on_package_pbi>iperf-2.0.5-##ARCH##.pbi</depends_on_package_pbi>
 		<version>2.0.5_1</version>
 		<status>Beta</status>
@@ -838,7 +838,7 @@
 		<website>http://freshmeat.net/projects/netio/</website>
 		<descr>This is a network benchmark for DOS, OS/2 2.x, Windows NT/2000 and Unix. It measures the net throughput of a network via NetBIOS and/or TCP/IP protocols (Unix and DOS only support TCP/IP) using various different packet sizes.</descr>
 		<category>Network Management</category>
-		<config_file>https://packages.pfsense.org/packages/config/netio.xml</config_file>
+		<config_file>https://packages.pfsense.org/packages/config/netio/netio.xml</config_file>
 		<depends_on_package_pbi>netio-1.26-##ARCH##.pbi</depends_on_package_pbi>
 		<version>1.26</version>
 		<required_version>2.2</required_version>
@@ -858,7 +858,7 @@
 		<version>0.85_1.1</version>
 		<status>Stable</status>
 		<required_version>2.2</required_version>
-		<config_file>https://packages.pfsense.org/packages/config/mtr-nox11.xml</config_file>
+		<config_file>https://packages.pfsense.org/packages/config/mtr-nox11/mtr-nox11.xml</config_file>
 		<configurationfile>mtr-nox11.xml</configurationfile>
 		<build_pbi>
 			<port>net/mtr</port>
@@ -956,7 +956,7 @@
 		<version>2.1.a15_8 pkg v1.1.2</version>
 		<status>ALPHA</status>
 		<required_version>2.2</required_version>
-		<config_file>https://packages.pfsense.org/packages/config/arpwatch.xml</config_file>
+		<config_file>https://packages.pfsense.org/packages/config/arpwatch/arpwatch.xml</config_file>
 		<configurationfile>arpwatch.xml</configurationfile>
 		<logging>
 			<facilityname>arpwatch</facilityname>

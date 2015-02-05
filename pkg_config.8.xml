@@ -282,7 +282,7 @@
 		<website>http://www.pureftpd.org/</website>
 		<descr>*DO NOT RUN THIS ON A FIREWALL. USE A DEDICATED MACHINE!* Pure FTPd Server is a fast, production quality, standards-conformant FTP server based on Troll-FTPd. It has no known vulnerabilities, is trivial to set up, and is especially designed for modern kernels. Features include PAM support, IPv6, chroot()ed home directories, virtual domains, built-in 'ls', FXP protocol, anti-warez system, bandwidth throttling, restricted ports for passive downloads, an LDAP backend, XML output, and more.</descr>
 		<category>FTP</category>
-		<config_file>https://packages.pfsense.org/packages/config/pure-ftpd.xml</config_file>
+		<config_file>https://packages.pfsense.org/packages/config/pure-ftpd/pure-ftpd.xml</config_file>
 		<depends_on_package_base_url>https://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
 		<depends_on_package>pure-ftpd-1.0.35.tbz</depends_on_package>
 		<depends_on_package_pbi>pure-ftpd-1.0.36-i386.pbi</depends_on_package_pbi>
@@ -480,7 +480,7 @@
 		<website>http://www.olsr.org/</website>
 		<descr>The olsr.org OLSR daemon is an implementation of the Optimized Link State Routing protocol. OLSR is a routing protocol for mobile ad-hoc networks. The protocol is pro-active, table driven and utilizes a technique called multipoint relaying for message flooding.</descr>
 		<category>Services</category>
-		<config_file>https://packages.pfsense.org/packages/config/olsrd.xml</config_file>
+		<config_file>https://packages.pfsense.org/packages/config/olsrd/olsrd.xml</config_file>
 		<depends_on_package_base_url>https://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
 		<depends_on_package>olsrd-0.6.2.tbz</depends_on_package>
 		<depends_on_package_pbi>olsrd-0.6.3-i386.pbi</depends_on_package_pbi>
@@ -607,7 +607,7 @@
 		<website>http://siproxd.sourceforge.net/</website>
 		<descr>Proxy for handling NAT of multiple SIP devices to a single public IP.</descr>
 		<category>Services</category>
-		<config_file>https://packages.pfsense.org/packages/config/siproxd.xml</config_file>
+		<config_file>https://packages.pfsense.org/packages/config/siproxd/siproxd.xml</config_file>
 		<depends_on_package_base_url>https://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
 		<depends_on_package>siproxd-0.8.0.tbz</depends_on_package>
 		<depends_on_package_pbi>siproxd-0.8.0-i386.pbi</depends_on_package_pbi>
@@ -958,7 +958,7 @@
 		<website>http://www.mindrot.org/pfflowd.html</website>
 		<descr>pfflowd converts OpenBSD PF status messages (sent via the pfsync interface) to Cisco NetFlow datagrams. These datagrams may be sent (via UDP) to a host of one's choice. Utilising the OpenBSD stateful packet filter infrastructure means that flow tracking is very fast and accurate.</descr>
 		<category>Network Management</category>
-		<config_file>https://packages.pfsense.org/packages/config/pfflowd.xml</config_file>
+		<config_file>https://packages.pfsense.org/packages/config/pfflowd/pfflowd.xml</config_file>
 		<depends_on_package_base_url>https://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
 		<depends_on_package>pfflowd-0.8.tbz</depends_on_package>
 		<depends_on_package_pbi>pfflowd-0.8-i386.pbi</depends_on_package_pbi>
@@ -981,7 +981,7 @@
 		<status>Stable</status>
 		<pkginfolink>https://doc.pfsense.org/index.php/Widentd_package</pkginfolink>
 		<required_version>1.2.1</required_version>
-		<config_file>https://packages.pfsense.org/packages/config/widentd.xml</config_file>
+		<config_file>https://packages.pfsense.org/packages/config/widentd/widentd.xml</config_file>
 		<configurationfile>widentd.xml</configurationfile>
 		<build_port_path>/usr/ports/net/widentd</build_port_path>
 	</package>
@@ -998,7 +998,7 @@
 		<depends_on_package>freeradius-1.1.8_4.tbz</depends_on_package>
 		<depends_on_package>libltdl-2.4_1.tbz</depends_on_package>
 		<depends_on_package_pbi>freeradius-1.1.8_5-i386.pbi</depends_on_package_pbi>
-		<config_file>https://packages.pfsense.org/packages/config/freeradius.xml</config_file>
+		<config_file>https://packages.pfsense.org/packages/config/freeradius/freeradius.xml</config_file>
 		<configurationfile>freeradius.xml</configurationfile>
 		<build_port_path>/usr/ports/net/freeradius</build_port_path>
 		<build_port_path>/usr/ports/devel/libltdl</build_port_path>
@@ -1069,7 +1069,7 @@
 		<status>Stable</status>
 		<pkginfolink>https://doc.pfsense.org/index.php/Stunnel_package</pkginfolink>
 		<required_version>1.2.1</required_version>
-		<config_file>https://packages.pfsense.org/packages/config/stunnel.xml</config_file>
+		<config_file>https://packages.pfsense.org/packages/config/stunnel/stunnel.xml</config_file>
 		<configurationfile>stunnel.xml</configurationfile>
 		<build_port_path>/usr/ports/security/stunnel</build_port_path>
 		<build_options>WITHOUT_FORK=true;WITH_PTHREAD=true;WITHOUT_UCONTEXT=true;WITHOUT_IPV6=true;WITH_LIBWRAP=true;WITHOUT_SSL_PORT=true</build_options>
@@ -1079,7 +1079,7 @@
 		<website>http://dast.nlanr.net/Projects/Iperf/</website>
 		<descr>Iperf is a tool for testing network throughput, loss, and jitter.</descr>
 		<category>Network Management</category>
-		<config_file>https://packages.pfsense.org/packages/config/iperf.xml</config_file>
+		<config_file>https://packages.pfsense.org/packages/config/iperf/iperf.xml</config_file>
 		<depends_on_package_base_url>https://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
 		<depends_on_package>iperf-2.0.5.tbz</depends_on_package>
 		<depends_on_package_pbi>iperf-2.0.5-i386.pbi</depends_on_package_pbi>
@@ -1095,7 +1095,7 @@
 		<website>http://freshmeat.net/projects/netio/</website>
 		<descr>This is a network benchmark for DOS, OS/2 2.x, Windows NT/2000 and Unix. It measures the net throughput of a network via NetBIOS and/or TCP/IP protocols (Unix and DOS only support TCP/IP) using various different packet sizes.</descr>
 		<category>Network Management</category>
-		<config_file>https://packages.pfsense.org/packages/config/netio.xml</config_file>
+		<config_file>https://packages.pfsense.org/packages/config/netio/netio.xml</config_file>
 		<depends_on_package_base_url>https://files.pfsense.org/packages/8/All</depends_on_package_base_url>
 		<depends_on_package>netio-1.26.tbz</depends_on_package>
 		<depends_on_package_pbi>netio-1.26-i386.pbi</depends_on_package_pbi>
@@ -1117,7 +1117,7 @@
 		<version>0.85_1.1</version>
 		<status>Stable</status>
 		<required_version>2.0</required_version>
-		<config_file>https://packages.pfsense.org/packages/config/mtr-nox11.xml</config_file>
+		<config_file>https://packages.pfsense.org/packages/config/mtr-nox11/mtr-nox11.xml</config_file>
 		<configurationfile>mtr-nox11.xml</configurationfile>
 		<build_port_path>/usr/ports/net/mtr</build_port_path>
 		<build_options>mtr_UNSET_FORCE=X11</build_options>
@@ -1255,7 +1255,7 @@
 		<version>2.1.a15_6 pkg v1.1.2</version>
 		<status>ALPHA</status>
 		<required_version>2.0</required_version>
-		<config_file>https://packages.pfsense.org/packages/config/arpwatch.xml</config_file>
+		<config_file>https://packages.pfsense.org/packages/config/arpwatch/arpwatch.xml</config_file>
 		<configurationfile>arpwatch.xml</configurationfile>
 		<logging>
 			<facilityname>arpwatch</facilityname>
