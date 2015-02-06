@@ -104,7 +104,7 @@
 			<type>input</type>
 		</field>
 		<field>
-			<fielddescr>Maximum Liftime</fielddescr>
+			<fielddescr>Maximum Lifetime</fielddescr>
 			<fieldname>timeout-maxlife</fieldname>
 			<description>(Seconds) This is the maximum lifetime that a flow may exist for.  All flows are forcibly expired when they pass maxlife seconds.  To disable this feature, specify a maxlife of 0.</description>
 			<type>input</type>
