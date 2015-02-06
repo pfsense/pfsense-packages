@@ -1308,10 +1308,10 @@
 		<website>http://www.balabit.com/network-security/syslog-ng/</website>
 		<descr>Syslog-ng syslog server. This service is not intended to replace the default pfSense syslog server but rather acts as an independent syslog server.</descr>
 		<category>Services</category>
-		<version>3.6.1_1 pkg.v.1.0.2</version>
+		<version>3.6.2_3 pkg.v.1.0.2</version>
 		<status>ALPHA</status>
 		<required_version>2.2</required_version>
-		<depends_on_package_pbi>syslog-ng-3.6.1_1-##ARCH##.pbi</depends_on_package_pbi>
+		<depends_on_package_pbi>syslog-ng-3.6.2_3-##ARCH##.pbi</depends_on_package_pbi>
 		<build_pbi>
 			<ports_before>sysutils/logrotate</ports_before>
 			<port>sysutils/syslog-ng</port>
