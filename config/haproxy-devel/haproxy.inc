@@ -1147,6 +1147,7 @@ function haproxy_writeconf($configpath) {
 			$default_backend = "";
 			$config_acls = "";
 			$config_usebackends = "";
+			$config_usedefaultbackends = "";
 			
 			$transparent_clientip = false;
 			foreach ($bind['config'] as $frontend) {
@@ -1171,11 +1172,13 @@ function haproxy_writeconf($configpath) {
 				$backend = haproxy_find_backend($frontend['backend_serverpool']);
 				$transparent_clientip = $backend["transparent_clientip"] == 'yes';
 				
+				$allowfordefaultbackend = true;
 				$ipv = array();
 				if ($transparent_clientip) {
 					if ($useipv4 && $useipv6) {
 						$ipv["ipv4"]['acl'] = " src_is_ipv4 ";
 						$ipv["ipv6"]['acl'] = " !src_is_ipv4 ";
+						$allowfordefaultbackend = false; // transparent backend must always match client-ip which is ipv4 v.s. ipv6 specific so there cannot be a default.
 					} else if ($useipv6)
 						$ipv["ipv6"]['acl'] = " ";
 					else
@@ -1217,10 +1220,12 @@ function haproxy_writeconf($configpath) {
 						$a_pendingpl[$poolname]['frontend'] = $bind;
 						$a_pendingpl[$poolname]['ipversion'] = $ipversion;
 					}
-					
+					$canbedefaultbackend = false;
 					// Write this out once, and must be before any backend config text
 					if (($default_backend == "" || $frontend['secondary'] != 'yes') && count($a_acl) == 0 ) {
-						$default_backend = $poolname;
+						$canbedefaultbackend = true;
+						if ($allowfordefaultbackend)
+							$default_backend = $poolname;
 					}
 				
 					foreach ($a_acl_combine as $a_usebackend) {
@@ -1281,12 +1286,17 @@ function haproxy_writeconf($configpath) {
 						$y++;
 					}
 
-					if (count($useracls) == 0) $useracls[] = ""; // add empty item to enter foreach loop at least once.
+					$systemacl = trim("{$certacl}{$ipversionoptions['acl']}");
+					if (!empty($systemacl) && count($useracls) == 0) $useracls[] = ""; // add empty item to enter foreach loop at least once when a system acl is pressent.
 					foreach($useracls as $useracl) {
 						$backendacl = "";
-						$backendacl .= "|| {$useracl}{$certacl}{$ipversionoptions['acl']}";
+						$backendacl .= "|| {$useracl}{$systemacl}";
 						$backendacl = substr($backendacl, 3);
-						$config_usebackends .= "\tuse_backend\t\t" . $poolname . " if " . $backendacl . "\n";
+						if ($canbedefaultbackend) {
+							// makes sure these come last even though systemacl's might have been added.
+							$config_usedefaultbackends .= "\tuse_backend\t\t" . $poolname . " if " . $backendacl . "\n";
+						} else
+							$config_usebackends .= "\tuse_backend\t\t" . $poolname . " if " . $backendacl . "\n";
 					}
 				}
 			}
@@ -1302,6 +1312,7 @@ function haproxy_writeconf($configpath) {
 
 			// Write backends after advanced options so custom use_backend rules can be applied first.
 			fwrite ($fd, $config_usebackends);
+			fwrite ($fd, $config_usedefaultbackends);
 			if ($default_backend)
 				fwrite ($fd, "\tdefault_backend\t\t" . $default_backend . "\n");
 			
