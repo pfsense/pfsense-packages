@@ -70,8 +70,8 @@ uasort($a_pools, haproxy_compareByName);
 
 global $simplefields;
 $simplefields = array('name','desc','status','secondary','primary_frontend','type','forwardfor','httpclose','extaddr','backend_serverpool',
-	'max_connections','client_timeout','port','ssloffloadcert','dcertadv','ssloffload','ssloffloadacl','ssloffloadaclnondefault','advanced_bind',
-	'ssloffloadacladditional','ssloffloadacladditionalnondefault',
+	'max_connections','client_timeout','port','advanced_bind',
+	'ssloffloadcert','dcertadv','ssloffload','ssloffloadacl','ssloffloadacladditional','sslclientcert-none','sslclientcert-invalid',
 	'socket-stats',
 	'dontlognull','dontlog-normal','log-separate-errors','log-detailed');
 
@@ -105,8 +105,6 @@ $fields_sslCertificates[0]['size']="500px";
 $fields_sslCertificates[0]['items']=&$servercerts;
 
 $certs_ca = haproxy_get_certificates('ca');
-$ca_none['']['name']="(None), allows for client without a (valid) certificate to connect. Make sure to add appropriate acl's.";
-$certs_ca = $ca_none + $certs_ca;
 $fields_caCertificates=array();
 $fields_caCertificates[0]['name']="cert_ca";
 $fields_caCertificates[0]['columnheader']="Certificates authorities";
@@ -248,9 +246,9 @@ if ($_POST) {
 	$a_certificates = haproxy_htmllist_get_values($fields_sslCertificates);
 	$pconfig['a_certificates'] = $a_certificates;
 	$a_clientcert_ca = haproxy_htmllist_get_values($fields_caCertificates);
-	$pconfig['a_clientcert_ca'] = $a_clientcert_ca;
+	$pconfig['clientcert_ca'] = $a_clientcert_ca;
 	$a_clientcert_crl = haproxy_htmllist_get_values($fields_crlCertificates);
-	$pconfig['a_clientcert_crl'] = $a_clientcert_crl;
+	$pconfig['clientcert_crl'] = $a_clientcert_crl;
 	
 	$a_acl = haproxy_htmllist_get_values($fields_aclSelectionList);
 	$pconfig['a_acl'] = $a_acl;
@@ -262,17 +260,31 @@ if ($_POST) {
 	foreach($a_acl as $acl) {
 		$acl_name = $acl['name'];
 		$acl_value = $acl['value'];
-		
+
+		$acltype = haproxy_find_acl($acl['expression']);
 		if (preg_match("/[^a-zA-Z0-9\.\-_]/", $acl_name))
 			$input_errors[] = "The field 'Name' contains invalid characters.";
 
-		if (!preg_match("/.{1,}/", $acl_value))
-			$input_errors[] = "The field 'Value' is required.";
+		if (!isset($acltype['novalue']))
+			if (!preg_match("/.{1,}/", $acl_value))
+				$input_errors[] = "The field 'Value' is required.";
 
 		if (!preg_match("/.{2,}/", $acl_name))
 			$input_errors[] = "The field 'Name' is required with at least 2 characters.";
 	}
-
+	foreach($a_extaddr as $extaddr) {
+		$ports = explode(",",$extaddr['extaddr_port']);
+		foreach($ports as $port){
+			if ($port && !is_numeric($port) && !is_portoralias($port))
+				$input_errors[] = "The field 'Port' value '".htmlspecialchars($port)."' is not a number or alias thereof.";
+		}
+	
+		if ($extaddr['extaddr'] == 'custom') {
+			$extaddr_custom = $extaddr['extaddr_custom'];
+			if (empty($extaddr_custom) || (!is_ipaddroralias($extaddr_custom)))
+				$input_errors[] = sprintf(gettext("%s is not a valid source IP address or alias."),$extaddr_custom);
+		}
+	}
 	if (!$input_errors) {
 		$backend = array();
 		if(isset($id) && $a_backend[$id])
@@ -331,6 +343,7 @@ $primaryfrontends = get_haproxy_frontends($excludefrontend);
 ?>
   <style type="text/css">
 	.haproxy_mode_http{display:none;}
+	.haproxy_ssloffloading_show{display:none;}
 	.haproxy_ssloffloading_enabled{display:none;}
 	.haproxy_primary{}
 	.haproxy_secondary{display:none;}
@@ -400,22 +413,31 @@ $primaryfrontends = get_haproxy_frontends($excludefrontend);
 	function updatevisibility()	{
 		d = document;
 		ssl = false;
+		sslshow = false;
 		ssloffload = d.getElementById("ssloffload");
-		for (i = 0; i < 99; i++) {
-			customEdit = document.getElementById("extaddr_ssl"+i);
-			if (customEdit && customEdit.checked)
-				ssl = true;
-		}
-		
 		var type;
+		var primary;
 		var secondary = d.getElementById("secondary");
-		var primary_frontend = d.getElementById("primary_frontend");		
+		var primary_frontend = d.getElementById("primary_frontend");
 		if ((secondary !== null) && (secondary.checked)) {
-			type = primaryfrontends[primary_frontend.value]['ref']['type'];
-			ssl = ssloffload.checked;
-		} else
+			primary = primaryfrontends[primary_frontend.value];
+			type = primary['ref']['type'];
+			for (i = 0; i < 99; i++) {
+				if (primary['ref']['a_extaddr']['item'][i] && primary['ref']['a_extaddr']['item'][i]['extaddr_ssl'] == 'yes')
+					sslshow = true;//ssloffload.checked;
+					ssl = ssloffload.checked;
+			}
+		} else {
 			type = d.getElementById("type").value;
+			for (i = 0; i < 99; i++) {
+				customEdit = document.getElementById("extaddr_ssl"+i);
+				if (customEdit && customEdit.checked)
+					sslshow = true;
+			}
+			ssl = sslshow;
+		}
 			
+		setCSSdisplay(".haproxy_ssloffloading_show", sslshow);
 		setCSSdisplay(".haproxy_ssloffloading_enabled", ssl);
 		setCSSdisplay(".haproxy_mode_http", type == "http");
 		if (secondary !== null) {
@@ -735,7 +757,7 @@ $primaryfrontends = get_haproxy_frontends($excludefrontend);
 			<td>&nbsp;</td>
 		</tr>
 	</table>
-	<table class="haproxy_ssloffloading_enabled" width="100%" border="0" cellpadding="6" cellspacing="0">
+	<table class="haproxy_ssloffloading_show" width="100%" border="0" cellpadding="6" cellspacing="0">
 		<tr>
 			<td colspan="2" valign="top" class="listtopic">SSL Offloading</td>
 		</tr>
@@ -787,8 +809,26 @@ $primaryfrontends = get_haproxy_frontends($excludefrontend);
 			</td>
 		</tr>
 		<tr class="haproxy_ssloffloading_enabled haproxy_primary">
-			<td class="vncell" colspan="2"><b>Client certificate verification options, leave this empty if you do not want to ask for a client certificate</b><br/>
+			<td class="vncell" colspan="2"><b>Client certificate verification options, leave all these options empty if you do not want to ask for a client certificate</b><br/>
 			The users that visit this site will need to load the client cert signed by one of the ca's listed below imported into their browser.</td>
+		</tr>
+		<tr class="haproxy_ssloffloading_enabled haproxy_primary" align="left">
+			<td width="22%" valign="top" class="vncell">Without client cert</td>
+			<td width="78%" class="vtable" colspan="2">
+				<input id="sslclientcert-none" name="sslclientcert-none" type="checkbox" value="yes" <?php if ($pconfig['sslclientcert-none']=='yes') echo "checked"; ?> onclick='updatevisibility();' />
+				Allows clients without a certificate to connect.
+				<div>Make sure to add appropriate acl's to check for presence of a user certificate where needed.</div>
+			</td>
+		</tr>
+		<tr class="haproxy_ssloffloading_enabled haproxy_primary" align="left">
+			<td width="22%" valign="top" class="vncell">Allow invalid cert</td>
+			<td width="78%" class="vtable" colspan="2">
+				<input id="sslclientcert-invalid" name="sslclientcert-invalid" type="checkbox" value="yes" <?php if ($pconfig['sslclientcert-invalid']=='yes') echo "checked"; ?> onclick='updatevisibility();' />
+				Allows client with a invalid/expired/revoked or otherwise wrong certificate to connect.
+				<div>Make sure to add appropriate acl's to check for valid certificates and verify errors using codes from the following list.
+				<a target="_blank" href="https://www.openssl.org/docs/apps/verify.html#DIAGNOSTICS">https://www.openssl.org/docs/apps/verify.html#DIAGNOSTICS</a></div>
+				
+			</td>
 		</tr>
 		<tr class="haproxy_ssloffloading_enabled haproxy_primary">
 			<td width="22%" valign="top" class="vncell">Client verification CA certificates</td>
@@ -836,7 +876,9 @@ $primaryfrontends = get_haproxy_frontends($excludefrontend);
 <br/>
 <script type="text/javascript">
 <?
-	phparray_to_javascriptarray($primaryfrontends,"primaryfrontends",Array('/*','/*/name','/*/ref','/*/ref/type','/*/ref/ssloffload'));
+	phparray_to_javascriptarray($primaryfrontends,"primaryfrontends",Array('/*',
+		'/*/name','/*/ref','/*/ref/type','/*/ref/a_extaddr','/*/ref/a_extaddr/item','/*/ref/a_extaddr/item/*',
+		'/*/ref/a_extaddr/item/*/extaddr_ssl'));
 	phparray_to_javascriptarray($a_closetypes,"closetypes",Array('/*','/*/name','/*/descr'));
 	phparray_to_javascriptarray($fields_sslCertificates,"fields_sslCertificates",Array('/*','/*/name','/*/type','/*/size','/*/items','/*/items/*','/*/items/*/*','/*/items/*/*/name'));
 	phparray_to_javascriptarray($fields_caCertificates,"fields_ca",Array('/*','/*/name','/*/type','/*/size','/*/items','/*/items/*','/*/items/*/*','/*/items/*/*/name'));

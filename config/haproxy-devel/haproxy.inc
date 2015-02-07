@@ -68,12 +68,12 @@ $a_acltypes["path_regex"] = array('name' => 'Path regex:',
 $a_acltypes["path_contains"] = array('name' => 'Path contains:',
 				'mode' => 'http', 'syntax' => 'path_dir -i %1$s');
 $a_acltypes["ssl_c_verify_code"] = array('name' => 'SSL Client certificate verify error result:',
-				'mode' => 'http', 'syntax' => 'ssl_fc_has_crt ssl_c_verify %1$s');
+				'mode' => 'http', 'syntax' => 'ssl_c_verify %1$s', 'require_client_cert' => '1');
 				// ssl_c_verify result codes: https://www.openssl.org/docs/apps/verify.html#DIAGNOSTICS
 $a_acltypes["ssl_c_verify"] = array('name' => 'SSL Client certificate valid.',
-				'mode' => 'http', 'syntax' => 'ssl_fc_has_crt ssl_c_verify 0 ');
+				'mode' => 'http', 'syntax' => 'ssl_c_verify 0', 'novalue' => '1', 'require_client_cert' => '1');
 $a_acltypes["ssl_c_ca_commonname"] = array('name' => 'SSL Client issued by CA common-name:',
-				'mode' => 'http', 'syntax' => 'ssl_c_i_dn(CN) %1$s');
+				'mode' => 'http', 'syntax' => 'ssl_c_i_dn(CN) %1$s', 'require_client_cert' => '1');
 $a_acltypes["source_ip"] = array('name' => 'Source IP matches IP or Alias:',
 				'mode' => '', 'syntax' => 'src %1$s');
 $a_acltypes["backendservercount"] = array('name' => 'Minimum count usable servers:',
@@ -151,9 +151,13 @@ $a_closetypes['forceclose'] = array('name' => 'forceclose', 'syntax' => 'forcecl
 global $a_servermodes;
 $a_servermodes = array();
 $a_servermodes["active"]['name'] = "active";
+$a_servermodes["active"]['sign'] = "";
 $a_servermodes["backup"]['name'] = "backup";
+$a_servermodes["backup"]['sign'] = "*";
 $a_servermodes["disabled"]['name'] = "disabled";
+$a_servermodes["disabled"]['sign'] = "?";
 $a_servermodes["inactive"]['name'] = "inactive";
+$a_servermodes["inactive"]['sign'] = "-";
 
 // http://www.exceliance.fr/sites/default/files/biblio/aloha_load_balancer_haproxy_cookie_persistence_methods_memo.pdf
 global $a_cookiemode;
@@ -1036,7 +1040,6 @@ function haproxy_writeconf($configpath) {
 
 			fwrite ($fd, "{$frontendinfo}");
 			
-			$allow_none = false;
 			$advancedextra = array();
 			$ca_file = "";
 			$first = true;
@@ -1046,10 +1049,9 @@ function haproxy_writeconf($configpath) {
 					if (!empty($ca['cert_ca'])){
 						haproxy_write_certificate_crt($filename, $ca['cert_ca'], false, !$first);
 						$first = false;
-					} else 
-						$allow_none = true;
+					}
 				}
-				$verify = $allow_none ? "verify optional" : "verify required";
+				$verify = $bind['sslclientcert-none'] == 'yes' ? "verify optional" : "verify required";
 				$ca_file = " ca-file $filename $verify";
 			}
 			$crl_file = "";
@@ -1062,15 +1064,11 @@ function haproxy_writeconf($configpath) {
 				}
 				$crl_file = " crl-file $filename";
 			}
-			
-			if($bind['type'] == "http") {
-				// ssl offloading is only possible in http mode.
-				$ssl_info = $bind['ssl_info'].$ca_file.$crl_file;
-				$advanced_bind = $bind['advanced_bind'];
-			} else {
-				$ssl_info = "";
-				$advanced_bind = "";
-			}
+			$advanced_bind = $bind['advanced_bind'];
+			$ssl_info = $bind['ssl_info'];
+			$ssl_info .= $ca_file . $crl_file;
+			if ($bind['sslclientcert-invalid'])
+				$ssl_info .= " crt-ignore-err all";
 			
 			$useipv4 = false;
 			$useipv6 = false;
@@ -1165,6 +1163,8 @@ function haproxy_writeconf($configpath) {
 			
 			$inspectdelay = 0;
 			$i = 0;
+			$acllist = array();
+			$acl_newid = 0;
 			foreach ($bind['config'] as $frontend) {
 				$a_acl = get_frontend_acls($frontend);
 
@@ -1187,12 +1187,27 @@ function haproxy_writeconf($configpath) {
 				$a_acl_combine = array();
 				foreach ($a_acl as $entry) {
 					$name = $entry['ref']['name'];
-					$a_acl_combine[$name][] = $entry['ref'];
+					
+					$acl = array();
+					$acl['ref'] = $entry['ref'];
+					$acltype = haproxy_find_acl($entry['ref']['expression']);
+					$acl['acltype'] = $acltype;
+					if (!isset($acltype))
+						continue;
+					$a_acl_combine[$name][] = $acl;
+					
+					if (isset($acltype['require_client_cert'])){
+						$acl = array();
+						$acl['ref']['expression'] = "ssl_c_used";
+						$acl['acltype']['syntax'] = "ssl_c_used";
+						$acl['acltype']['novalue'] = 1;
+						$a_acl_combine[$name][] = $acl;
+					}
 				}
 				
+				$certacl = "";
 				$y = 0;
 				foreach($ipv as $ipversion => $ipversionoptions) {
-					$certacls = array();
 					$useracls = array();
 					$poolname = $frontend['backend_serverpool'] . "_" . strtolower($bind['type'])."_".$ipversion;
 					if (!isset($a_pendingpl[$poolname])) {
@@ -1210,10 +1225,9 @@ function haproxy_writeconf($configpath) {
 				
 					foreach ($a_acl_combine as $a_usebackend) {
 						$aclnames = "";
-						foreach ($a_usebackend as $entry) {
-							$acl = haproxy_find_acl($entry['expression']);
-							if (!$acl)
-								continue;
+						foreach ($a_usebackend as $entry2) {
+							$entry = $entry2['ref'];
+							$acl = $entry2['acltype'];
 
 							// Filter out acls for different modes
 							if ($acl['mode'] != '' && $acl['mode'] != strtolower($bind['type']))
@@ -1231,33 +1245,49 @@ function haproxy_writeconf($configpath) {
 
 							$not = $entry['not'] == "yes" ? "!" : "";
 							
-							$aclname = $i . "_" . $entry['name'];
-							if ($entry['certacl'])
-								$certacls[] = $aclname . " ";
-							else
+							unset($aclkey);
+							foreach($acllist as $aclid => $aclitem) {
+								if ($aclitem['expr'] == $expr) {
+									$aclkey = $aclid;
+								}
+							}
+							if (isset($aclkey)) {
+								$aclname = $acllist[$aclkey]['aclname'];
+							} else {
+								$aclkey = $acl_newid++;
+								if ($entry['certacl']) {
+									$aclname = "aclcrt_".$frontend['name'];
+									$certacl = $aclname;
+								} else {
+									$aclname = "aclusr_{$entry['expression']}";
+									if (!isset($acl['novalue']))
+										$aclname .= "_{$entry['value']}";
+									$aclname = haproxy_escape_acl_name($aclname);
+									$i++;
+								}
+								$acllist[$aclkey]['aclname'] = $aclname;
+								$acllist[$aclkey]['expr'] = $expr;
+								$config_acls .= "\tacl\t\t\t" . $aclname . "\t" .  $expr . "\n";
+							}
+							if (!isset($entry['certacl']))
 								$useracls[$y] .= $not . $aclname . " ";
-							
-							$config_acls .= "\tacl\t\t\t" . $aclname . "\t" .  $expr . "\n";
 							
 							if ($acl['inspect-delay'] != '')
 								$inspectdelay = $acl['inspect-delay'];
 							
 							if ($acl['advancedoptions'] != '')
 								$advancedextra[$acl['syntax']] = $acl['advancedoptions']."\n";
-							$i++;
 						}
 						$y++;
 					}
 
-					if (count($certacls) == 0) $certacls[] = ""; // add empty item to enter foreach loop at least once.
 					if (count($useracls) == 0) $useracls[] = ""; // add empty item to enter foreach loop at least once.
-					$backendacl = "";
-					foreach($useracls as $useracl)
-						foreach($certacls as $certacl)
-							$backendacl .= "|| {$useracl}{$certacl}{$ipversionoptions['acl']}";
-					$backendacl = substr($backendacl, 3);
-					$config_usebackends .= "\tuse_backend\t\t" . $poolname . " if " . $backendacl . "\n";
-					//$config_usebackends .= "\tuse_backend\t\t" . $poolname . " if " . $backendacl . "\n";
+					foreach($useracls as $useracl) {
+						$backendacl = "";
+						$backendacl .= "|| {$useracl}{$certacl}{$ipversionoptions['acl']}";
+						$backendacl = substr($backendacl, 3);
+						$config_usebackends .= "\tuse_backend\t\t" . $poolname . " if " . $backendacl . "\n";
+					}
 				}
 			}
 			
@@ -1842,7 +1872,7 @@ function get_frontend_acls($frontend) {
 				continue;
 			$not = $entry['not'] == "yes" ? "not " : "";
 			$acl_item = array();
-			$acl_item['descr'] = $acl['name'] . ": " . $entry['value'];
+			$acl_item['descr'] = $acl['name'] . " " . (isset($acl['novalue']) ? "" : $entry['value']);
 			$acl_item['ref'] = $entry;
 			
 			$result[] = $acl_item;

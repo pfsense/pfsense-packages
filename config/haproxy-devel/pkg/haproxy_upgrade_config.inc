@@ -163,6 +163,22 @@ function haproxy_upgrade_config() {
 		update_output_window($static_output);
 		$configversion = "00.16";
 	}
+	if ($configversion < "00.17") {
+		$static_output .= "HAProxy, 00.17\n";
+		update_output_window($static_output);
+		// remove 'none' ca-cert, and set checkbox to allow for no certificate instead.
+		foreach ($config['installedpackages']['haproxy']['ha_backends']['item'] as &$bind) {
+			$list = array();
+			foreach ($bind['clientcert_ca']['item'] as $ca){
+				if (empty($ca['cert_ca']))
+					$bind['sslclientcert-none'] = 'yes';
+				else
+					$list[] = $ca;
+			}
+			$bind['clientcert_ca']['item'] = $list;
+		}
+		$configversion = "00.17";
+	}
 	
 	$writeconfigupdate = $config['installedpackages']['haproxy']['configversion'] <> $configversion;
 	if ($writeconfigupdate) {
