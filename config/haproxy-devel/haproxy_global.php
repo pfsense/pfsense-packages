@@ -191,7 +191,7 @@ function enable_change(enable_change) {
 					<table cellpadding="0" cellspacing="0">
 						<tr>
 							<td>
-								<input name="maxconn" type="text" class="formfld" id="maxconn" size="5" <?if ($pconfig['enable']!='yes') echo "enabled=\"false\"";?>  value="<?=htmlspecialchars($pconfig['maxconn']);?>" /> per Backend.
+								<input name="maxconn" type="text" class="formfld" id="maxconn" size="5" <?if ($pconfig['enable']!='yes') echo "enabled=\"false\"";?>  value="<?=htmlspecialchars($pconfig['maxconn']);?>" /> per process.
 							</td>
 						</tr>
 					</table>
@@ -253,7 +253,7 @@ function enable_change(enable_change) {
 					<input name="nbproc" type="text" class="formfld" id="nbproc" size="18" value="<?=htmlspecialchars($pconfig['nbproc']);?>" />
 					<br/>
 					Defaults to 1 if left blank (<?php echo trim(`/sbin/sysctl kern.smp.cpus | cut -d" " -f2`); ?> CPU core(s) detected).<br/>
-					Note : Consider leaving this value empty or 1  because in multi-process mode (nbproc > 1) memory is not shared between the processes, which could result in random behaviours for several options like ACL's, sticky connections and some others.<br/>
+					Note : Consider leaving this value empty or 1  because in multi-process mode (nbproc > 1) memory is not shared between the processes, which could result in random behaviours for several options like ACL's, sticky connections, stats pages, admin maintenance options and some others.<br/>
 					For more information about the <b>"nbproc"</b> option please see <b><a href='http://cbonte.github.io/haproxy-dconv/configuration-1.5.html#nbproc' target='_blank'>HAProxy Documentation</a> </b>
 				</td>
 			</tr>

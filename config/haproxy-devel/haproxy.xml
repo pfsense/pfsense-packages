@@ -52,6 +52,12 @@
 		<section>Services</section>
 		<url>/haproxy_listeners.php</url>
 	</menu>
+	<menu>
+		<name>HAProxy Stats</name>
+		<tooltiptext>Stats of HAProxy</tooltiptext>
+		<section>Status</section>
+		<url>/haproxy_stats.php?haproxystats=1</url>
+	</menu>
 	<service>
 		<name>HAProxy</name>
 		<rcfile>haproxy.sh</rcfile>

@@ -247,10 +247,12 @@ function js_callback(req) {
 						$backend_serverpool_hint = gettext("Servers in pool:");
 						if (is_array($servers)){
 							foreach($servers as $server){
+								$srvstatus = $server['status'];
+								$status = $a_servermodes[$srvstatus]['sign'];
 								if (isset($server['forwardto']) && $server['forwardto'] != "")
-									$backend_serverpool_hint .= "\n[".$server['forwardto']."]";
+									$backend_serverpool_hint .= "\n{$status}[{$server['forwardto']}]";
 								else								
-									$backend_serverpool_hint .= "\n".$server['address'].":".$server['port'];
+									$backend_serverpool_hint .= "\n{$status}{$server['address']}:{$server['port']}";
 							}
 						}
 					}
