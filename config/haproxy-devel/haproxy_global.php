@@ -271,26 +271,12 @@ function enable_change(enable_change) {
 					Carp monitor
 				</td>
 				<td class="vtable">
-					<select name="carpdev" class="formfld">
-					<option value="disabled" <?php if (!isset($pconfig['carpdev'])) echo "selected"; ?>>
-						disabled
-					</option>
-				<?php
-					if(is_array($config['virtualip']['vip'])) {
-					foreach($config['virtualip']['vip'] as $carp):
-						if ($carp['mode'] != "carp") continue;
-						$ipaddress = $carp['subnet'];
-						$carp_int = trim(find_carp_interface($ipaddress));
-				?>
-					<option value="<?=$carp_int;?>"
-					 <?php if (isset($pconfig['carpdev']) && $carp_int == $pconfig['carpdev']) echo "selected"; ?>>
-						<?=$carp_int;?> (<?=$ipaddress;?>)
-					</option>
-				<?php
-					endforeach;
-					}
-				?>
-					</select>
+					<?php
+					$vipinterfaces = array();
+					$vipinterfaces[] = array('ip' => '', 'name' => 'Disabled');
+					$vipinterfaces += haproxy_get_bindable_interfaces($ipv="ipv4,ipv6", $interfacetype="carp");
+					echo_html_select('carpdev',$vipinterfaces, $pconfig['carpdev'],"No carp interfaces pressent");
+					?>				
 					<br/>
 					Monitor carp interface and only run haproxy on the firewall which is MASTER.
 				</td>
