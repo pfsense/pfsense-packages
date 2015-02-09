@@ -129,7 +129,7 @@ nrpe2_enable=\${nrpe2_enable-"YES"}
 name="nrpe2"
 rcvar="\${name}"
 
-command="\${nrpe2_binary}"
+command="{$nrpe2_binary}"
 command_args="-d"
 extra_commands="reload"
 
