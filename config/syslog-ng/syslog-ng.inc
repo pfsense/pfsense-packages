@@ -37,8 +37,7 @@ require_once('service-utils.inc');
 if(!function_exists("filter_configure")) 
 	require_once("filter.inc");
 
-if (!defined("SYSLOGNG_BSEDIR"))
-	define("SYSLOGNG_BASEDIR", "/usr/pbi/syslog-ng-" . php_uname("m") . "/");
+define("SYSLOGNG_BASEDIR", "/usr/pbi/syslog-ng-" . php_uname("m") . "/");
 
 function syslogng_get_real_interface_address($interface) {
 	$interface = convert_friendly_interface_to_real_interface_name($interface);
@@ -50,6 +49,8 @@ function syslogng_get_real_interface_address($interface) {
 
 function syslogng_install_command() {
 	conf_mount_rw();
+	if (is_link("/usr/local/lib/syslog-ng"))
+		unlink_if_exists("/usr/local/lib/syslog-ng");
 	if (!file_exists("/usr/local/lib/syslog-ng"))
 		@symlink(SYSLOGNG_BASEDIR . "local/lib/syslog-ng", "/usr/local/lib/syslog-ng");
 	syslogng_install_cron(true);
