@@ -260,20 +260,22 @@ include_once("head.inc");
 
 <?php
 include("fbegin.inc"); 
+?>
 
+<form action="suricata_rulesets.php" method="post" name="iform" id="iform">
+<input type="hidden" name="id" id="id" value="<?=$id;?>" />
+
+<?php
 /* Display message */
 if ($input_errors) {
-	print_input_errors($input_errors); // TODO: add checks
+	print_input_errors($input_errors);
 }
 
 if ($savemsg) {
 	print_info_box($savemsg);
 }
-
 ?>
 
-<form action="suricata_rulesets.php" method="post" name="iform" id="iform">
-<input type="hidden" name="id" id="id" value="<?=$id;?>" />
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
 <tbody>
 <tr><td>

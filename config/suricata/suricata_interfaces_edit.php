@@ -307,6 +307,12 @@ if ($_POST["save"] && !$input_errors) {
 		if ($_POST['intf_promisc_mode'] == "on") { $natent['intf_promisc_mode'] = 'on'; }else{ $natent['intf_promisc_mode'] = 'off'; }
 		if ($_POST['configpassthru']) $natent['configpassthru'] = base64_encode(str_replace("\r\n", "\n", $_POST['configpassthru'])); else unset($natent['configpassthru']);
 
+		// Check if EVE OUTPUT TYPE is 'syslog' and auto-enable Suricata syslog output if true.
+		if ($natent['eve_output_type'] == "syslog" && $natent['alertsystemlog'] == "off") {
+			$natent['alertsystemlog'] = "on";
+			$savemsg = gettext("EVE Output to syslog requires Suricata alerts to be copied to the system log, so 'Send Alerts to System Log' has been auto-enabled.");
+		}
+
 		$if_real = get_real_interface($natent['interface']);
 		if (isset($id) && $a_rule[$id] && $action == '') {
 			// See if moving an existing Suricata instance to another physical interface
@@ -434,13 +440,8 @@ if ($_POST["save"] && !$input_errors) {
 		sync_suricata_package_config();
 		conf_mount_ro();
 
-		header( 'Expires: Sat, 26 Jul 1997 05:00:00 GMT' );
-		header( 'Last-Modified: ' . gmdate( 'D, d M Y H:i:s' ) . ' GMT' );
-		header( 'Cache-Control: no-store, no-cache, must-revalidate' );
-		header( 'Cache-Control: post-check=0, pre-check=0', false );
-		header( 'Pragma: no-cache' );
-		header("Location: /suricata/suricata_interfaces.php");
-		exit;
+		// Refresh page fields with just-saved values
+		$pconfig = $natent;
 	} else
 		$pconfig = $_POST;
 }
@@ -452,7 +453,13 @@ include_once("head.inc");
 
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">
 
-<?php include("fbegin.inc");
+<?php include("fbegin.inc");?>
+
+<form action="suricata_interfaces_edit.php<?php echo "?id=$id";?>" method="post" name="iform" id="iform">
+<input name="id" type="hidden" value="<?=$id;?>"/>
+<input name="action" type="hidden" value="<?=$action;?>"/>
+
+<?php
 /* Display Alert message */
 if ($input_errors) {
 	print_input_errors($input_errors);
@@ -461,10 +468,6 @@ if ($savemsg) {
 	print_info_box($savemsg);
 }
 ?>
-
-<form action="suricata_interfaces_edit.php<?php echo "?id=$id";?>" method="post" name="iform" id="iform">
-<input name="id" type="hidden" value="<?=$id;?>"/>
-<input name="action" type="hidden" value="<?=$action;?>"/>
 
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
 <tbody>
@@ -716,7 +719,7 @@ if ($savemsg) {
 				?> 
 				</select>&nbsp;&nbsp;
 				<?php echo gettext("Select EVE log output destination."); ?><br/>
-				<span class="red"><?php echo gettext("Hint:") . "</span>&nbsp;" . gettext("Choosing FILE is suggested, and it is the default value."); ?><br/>
+				<span class="red"><?php echo gettext("Hint:") . "</span>&nbsp;" . gettext("Choosing FILE is suggested, and is the default value."); ?><br/>
 			</td>
 		</tr>
 		<tr id="eve_systemlog_facility_row">

@@ -157,13 +157,7 @@ include_once("head.inc");
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">
 
 <?php 
-include("fbegin.inc"); 
-if($pfsense_stable == 'yes'){echo '<p class="pgtitle">' . $pgtitle . '</p>';}
-/* Display Alert message */
-if ($input_errors)
-	print_input_errors($input_errors); // TODO: add checks
-if ($savemsg)
-	print_info_box($savemsg);
+include("fbegin.inc");
 ?>
 
 <script type="text/javascript" src="/javascript/autosuggest.js">
@@ -171,6 +165,15 @@ if ($savemsg)
 <script type="text/javascript" src="/javascript/suggestions.js">
 </script>
 <form action="suricata_define_vars.php" method="post" name="iform" id="iform">
+
+<?php
+/* Display Alert message */
+if ($input_errors)
+	print_input_errors($input_errors);
+if ($savemsg)
+	print_info_box($savemsg);
+?>
+
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
 <tbody>
 <tr><td>

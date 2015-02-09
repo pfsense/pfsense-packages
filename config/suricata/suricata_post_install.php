@@ -130,6 +130,29 @@ if ($config['installedpackages']['suricata']['config'][0]['et_iqrisk_enable'] ==
 	install_cron_job("/usr/bin/nice -n20 /usr/local/bin/php -f /usr/local/pkg/suricata/suricata_etiqrisk_update.php", TRUE, 0, "*/6", "*", "*", "*", "root");
 }
 
+/*********************************************************/
+/* START OF BUG FIX CODE                                 */
+/*                                                       */
+/* Remove any Suricata cron tasks that may have been     */
+/* left from a previous uninstall due to a bug that      */
+/* saved edited cron tasks as new ones while still       */
+/* leaving the original task.  Correct cron task         */
+/* entries will be recreated below if saved settings     */
+/* are detected.                                         */
+/*********************************************************/
+$cron_count = 0;
+$suri_pf_table = SURICATA_PF_TABLE;
+while (suricata_cron_job_exists($suri_pf_table, FALSE)) {
+	install_cron_job($suri_pf_table, false);
+	$cron_count++;
+}
+if ($cron_count > 0)
+	log_error(gettext("[Suricata] Removed {$cron_count} duplicate 'remove_blocked_hosts' cron task(s)."));
+
+/*********************************************************/
+/* END OF BUG FIX CODE                                   */
+/*********************************************************/
+
 // remake saved settings if previously flagged
 if ($config['installedpackages']['suricata']['config'][0]['forcekeepsettings'] == 'on') {
 	log_error(gettext("[Suricata] Saved settings detected... rebuilding installation with saved settings..."));
@@ -258,8 +281,8 @@ if (empty($config['installedpackages']['suricata']['config'][0]['forcekeepsettin
 conf_mount_ro();
 
 // Update Suricata package version in configuration
-$config['installedpackages']['suricata']['config'][0]['suricata_config_ver'] = "2.1.2";
-write_config("Suricata pkg v2.1.2: post-install configuration saved.");
+$config['installedpackages']['suricata']['config'][0]['suricata_config_ver'] = "2.1.4";
+write_config("Suricata pkg v2.1.4: post-install configuration saved.");
 
 // Done with post-install, so clear flag
 unset($g['suricata_postinstall']);
