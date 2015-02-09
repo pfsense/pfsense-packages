@@ -51,7 +51,7 @@ function syslogng_get_real_interface_address($interface) {
 function syslogng_install_command() {
 	conf_mount_rw();
 	if (!file_exists("/usr/local/lib/syslog-ng"))
-		@symlink(SYSLOGNG_BSEDIR . "local/lib/syslog-ng", "/usr/local/lib/syslog-ng");
+		@symlink(SYSLOGNG_BASEDIR . "local/lib/syslog-ng", "/usr/local/lib/syslog-ng");
 	syslogng_install_cron(true);
 	conf_mount_ro();
 	syslogng_resync();
