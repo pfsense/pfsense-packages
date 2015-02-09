@@ -88,21 +88,23 @@ function baculaclient_custom_php_write_config(){
 			// create Director
 			switch ($bc['type']){
 			case "Director":
-				$baculaclient_conf .= "Director { \n\t Name = {$bc['director']}-dir #{$bc['description']}\n\t Password = \"{$bc['password']}\"\n\t}\n";
+				$baculaclient_conf .= "Director { \n\tName = {$bc['director']}-dir #{$bc['description']}\n\tPassword = \"{$bc['password']}\"\n}\n";
 				Break;
 			case "Monitor":
-				$baculaclient_conf .= "Director { \n\t Name = {$bc['director']}-mon #{$bc['description']}\n\t Password = \"{$bc['password']}\"\n\t Monitor = yes\n\t}\n";
+				$baculaclient_conf .= "Director { \n\tName = {$bc['director']}-mon #{$bc['description']}\n\tPassword = \"{$bc['password']}\"\n\tMonitor = yes\n}\n";
 				break;
 			case "Local":
-				$baculaclient_conf .= "Director { \n\t Name = {$bc['director']}-dir #{$bc['description']}\n\t Password = \"{$bc['password']}\"\n\t}\n";
-				$baculaclient_conf .= "Director { \n\t Name = {$bc['director']}-mon #{$bc['description']}\n\t Password = \"{$bc['password']}\"\n\t Monitor = yes\n\t}\n";
+				$baculaclient_conf .= "Director { \n\tName = {$bc['director']}-dir #{$bc['description']}\n\tPassword = \"{$bc['password']}\"\n}\n";
+				$baculaclient_conf .= "Director { \n\tName = {$bc['director']}-mon #{$bc['description']}\n\tPassword = \"{$bc['password']}\"\n\tMonitor = yes\n}\n";
 				$LocalDirector = $bc['director'];
 				}
 
 			}
 
 		// create Messages
-		$baculaclient_conf .= "Messages { \n\t Name = Standard \n\t director  = {$LocalDirector}-dir = all, !skipped, !restored\n\t}\n";
+		if (!empty($LocalDirector)) {
+			$baculaclient_conf .= "Messages { \n\tName = Standard \n\tdirector  = {$LocalDirector}-dir = all, !skipped, !restored\n}\n";
+		}
 		// create FielDaemon
 
 		if (is_array($config['installedpackages']['baculaclientfd']['config'])){
@@ -113,7 +115,10 @@ function baculaclient_custom_php_write_config(){
 			$port="9102";
 			$jobs="20";
 			}
-		$baculaclient_conf .= "FileDaemon { \n\t Name = {$LocalDirector}-fd #\n\t FDport = {$port}\n\t WorkingDirectory = /var/db/bacula\n\t Pid Directory = /var/run\n\tMaximum Concurrent Jobs = {$jobs}\n\t}\n";
+		if (!empty($LocalDirector)) {
+			$baculaclient_conf .= "FileDaemon { \n\tName = {$LocalDirector}-fd #\n\tFDport = {$port}\n\tWorkingDirectory = /var/db/bacula\n\tPid Directory = /var/run\n\tMaximum Concurrent Jobs = {$jobs}\n}\n";
+		}
+
 		file_put_contents(BACULA_LOCALBASE."/etc/bacula/bacula-fd.conf",$baculaclient_conf,LOCK_EX);
 		exec(BACULA_STARTUP_SCRIPT . " restart");
 		// Mount Read-only
