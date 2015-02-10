@@ -972,7 +972,7 @@
 		<version>1.4_7 pkg v.1.9.10</version>
 		<status>Beta</status>
 		<required_version>2.2</required_version>
-		<depends_on_package_pbi>squidguard-squid3-1.4_7-##ARCH##.pbi</depends_on_package_pbi>
+		<depends_on_package_pbi>squidguard-1.4_7-##ARCH##.pbi</depends_on_package_pbi>
 		<build_pbi>
 			<ports_before>www/squid33 databases/db5 security/cyrus-sasl2</ports_before>
 			<port>www/squidguard</port>
