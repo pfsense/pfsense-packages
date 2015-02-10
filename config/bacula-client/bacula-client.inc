@@ -73,7 +73,6 @@ function baculaclient_custom_php_write_config(){
 	if (file_exists($startup_file)){
 		$startup_script=file_get_contents($startup_file);
 		$startup_script=preg_replace("/NO/","YES",$startup_script);
-		$startup_script=preg_replace("@/usr/local/sbin/bacula-fd@",BACULA_LOCALBASE."/sbin/bacula-fd",$startup_script);
 		$startup_script=preg_replace("@/usr/local/etc/bacula-fd.conf@",BACULA_LOCALBASE."/etc/bacula/bacula-fd.conf",$startup_script);
 		$startup_script=preg_replace("@/usr/local/etc/bacula/bacula-fd.conf@",BACULA_LOCALBASE."/etc/bacula/bacula-fd.conf",$startup_script);
 		file_put_contents(BACULA_STARTUP_SCRIPT,$startup_script,LOCK_EX);
