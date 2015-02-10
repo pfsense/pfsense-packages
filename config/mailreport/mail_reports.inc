@@ -185,12 +185,18 @@ function set_mail_report_cron_jobs($a_mailreports) {
 	}
 }
 
-include('phpmailer/PHPMailerAutoload.php');
+include('phpmailer/class.phpmailer.php');
 
 function mail_report_send($headertext, $cmdtext, $logtext, $attachments) {
 	global $config, $g;
 
+	if (isset($config['notifications']['smtp']['disable']))
+		return;
+
 	if (empty($config['notifications']['smtp']['ipaddress']))
+		return;
+
+	if (empty($config['notifications']['smtp']['notifyemailaddress']))
 		return;
 
 	$mail = new PHPMailer();
