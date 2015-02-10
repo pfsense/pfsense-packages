@@ -45,8 +45,11 @@ switch ($pfs_version) {
 	case "2.0":
 		define('LIGHTSQUID_BASE','/usr/local');
 		break;
-	default:
+	case "2.1":
 		define('LIGHTSQUID_BASE', '/usr/pbi/lightsquid-' . php_uname("m"));
+		break;
+	default:
+		define('LIGHTSQUID_BASE', '/usr/pbi/lightsquid-' . php_uname("m") . '/local');
 }
 
 define ('CMD_PKGDELETE', 'pkg_delete lightsquid-1.7.1');
@@ -117,19 +120,38 @@ function lightsquid_install() {
 	// create lightsquid report catalog
 	if (!file_exists(LS_REPORTPATH)) {
 		update_log("lightsquid_install: Create report dir " . LS_REPORTPATH);
-		mwexec("mkdir -p " . LS_REPORTPATH);
+		mwexec("/bin/mkdir -p " . LS_REPORTPATH);
 	}
 
 	// install templates
 	$lstpl_file = "/var/tmp/lightsquid_tpl.tbz";
 	if (file_exists($lstpl_file)) {
-		mwexec("tar zxvf $lstpl_file -C " . LS_TEMPLATEPATH);
+		mwexec("/usr/bin/tar zxvf $lstpl_file -C " . LS_TEMPLATEPATH);
 		update_log("lightsquid_install: Install templates from $lstpl_file");
 	}
 
 	# check perl
-	if (!file_exists("/usr/bin/perl"))
-		mwexec("ln -s /usr/local/bin/perl /usr/bin/perl");
+	$perl_path = '/usr/bin/perl';
+
+	/* Clean up a bad perl link. */
+	ls_cleanup_bad_link($perl_path);
+
+	if (!file_exists("/usr/bin/perl")) {
+		if (is_executable('/usr/local/bin/perl')) {
+			symlink('/usr/local/bin/perl', '/usr/bin/perl');
+		} elseif (is_executable(LIGHTSQUID_BASE . '/bin/perl')) {
+			symlink(LIGHTSQUID_BASE . '/bin/perl', '/usr/bin/perl');
+		}
+	}
+	if (!is_dir('/usr/local/lib/perl5') && is_dir(LIGHTSQUID_BASE . '/lib/perl5')) {
+		symlink(LIGHTSQUID_BASE . '/lib/perl5', '/usr/local/lib/perl5');
+	}
+	if (!is_dir('/usr/local/etc/lightsquid') && is_dir(LS_CONFIGPATH)) {
+		symlink(LS_CONFIGPATH, '/usr/local/etc/lightsquid');
+	}
+	if (!is_dir('/usr/local/www/lightsquid') && is_dir(LS_WWWPATH)) {
+		symlink(LS_WWWPATH, '/usr/local/www/lightsquid');
+	}
 
 	update_log("lightsquid_install: stopped");
 }
@@ -434,6 +456,16 @@ function ls_get_real_interface_address($iface)
 	list($dummy, $ip, $dummy2, $netmask) = explode(" ", $line);
 
 	return array($ip, long2ip(hexdec($netmask)));
+}
+
+/* If a path is a symlink but the target is missing, remove the link. */
+function ls_cleanup_bad_link($link) {
+	if (file_exists($link) && is_link($link)) {
+		$target = readlink($link);
+		if (!file_exists($target) || !is_executable($target)) {
+			unlink($link);
+		}
+	}
 }
 
 ?>
