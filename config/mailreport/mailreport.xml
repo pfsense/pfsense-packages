@@ -37,7 +37,7 @@
 		]]>
 	</copyright>
 	<name>mailreport</name>
-	<version>2.2</version>
+	<version>2.3</version>
 	<title>Status: Email Reports</title>
 	<additional_files_needed>
 		<prefix>/usr/local/bin/</prefix>
@@ -47,6 +47,10 @@
 	<additional_files_needed>
 		<prefix>/etc/inc/</prefix>
 		<item>https://packages.pfsense.org/packages/config/mailreport/mail_reports.inc</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/etc/inc/phpmailer/</prefix>
+		<item>https://packages.pfsense.org/packages/config/mailreport/PHPMailerAutoload.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/etc/inc/phpmailer/</prefix>
@@ -90,6 +94,7 @@
 	<![CDATA[
 		exec("rm /usr/local/bin/mail_reports_generate.php");
 		exec("rm /usr/local/etc/mail_reports.inc");
+		exec("rm /usr/local/etc/phpmailer/PHPMailerAutoload.php");
 		exec("rm /usr/local/etc/phpmailer/class.phpmailer.php");
 		exec("rm /usr/local/etc/phpmailer/class.pop3.php");
 		exec("rm /usr/local/etc/phpmailer/class.smtp.php");
