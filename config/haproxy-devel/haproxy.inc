@@ -472,7 +472,7 @@ function haproxy_install_cron($should_install) {
 				$cron_item['month'] = "*";
 				$cron_item['wday'] = "*";
 				$cron_item['who'] = "root";
-				$cron_item['command'] = "/usr/local/etc/rc.d/haproxy.sh check";		
+				$cron_item['command'] = "/usr/local/etc/rc.d/haproxy.sh onecheck";		
 				$config['cron']['item'][] = $cron_item;
 				parse_config(true);
 				write_config("haproxy, install cron CARP job");
