@@ -131,7 +131,7 @@
 	</additional_files_needed>
 	<additional_files_needed>
 		<item>https://packages.pfsense.org/packages/config/pfblockerng/countrycodes.tar.bz2</item>
-		<prefix>/var/db/pfblockerng/cc/</prefix>
+		<prefix>/var/db/pfblockerng/</prefix>
 		<chmod>0444</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
