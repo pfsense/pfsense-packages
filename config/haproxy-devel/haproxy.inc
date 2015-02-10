@@ -374,7 +374,7 @@ function haproxy_custom_php_install_command() {
 . /etc/rc.subr
 
 name="haproxy"
-rcvar="\${name}"
+rcvar="\${name}_enable"
 command="/usr/pbi/haproxy-devel-`uname -m`/sbin/haproxy"
 haproxy_enable=\${haproxy-"YES"}
 

@@ -127,7 +127,7 @@ function nrpe2_custom_php_install_command() {
 
 nrpe2_enable=\${nrpe2_enable-"YES"}
 name="nrpe2"
-rcvar="\${name}"
+rcvar="\${name}_enable"
 
 command="{$nrpe2_binary}"
 command_args="-d"

@@ -42,7 +42,7 @@ checkvm_cmd="/usr/local/bin/vmware-checkvm > /dev/null"
 
 # VMware guest daemon
 name="vmware_guestd"
-rcvar="\${name}"
+rcvar="\${name}_enable"
 start_precmd="\${checkvm_cmd}"
 unset start_cmd
 stop_precmd="\${checkvm_cmd}"
@@ -100,7 +100,7 @@ vmware_guest_vmhgfs_start()
 
 # VMware kernel module: vmmemctl
 name="vmware_guest_vmmemctl"
-rcvar="\${name}"
+rcvar="\${name}_enable"
 start_precmd="\${checkvm_cmd}"
 start_cmd="vmware_guest_vmmemctl_start"
 stop_precmd="\${checkvm_cmd}"
@@ -112,7 +112,7 @@ run_rc_command "\$1"
 
 # VMware kernel module: vmxnet
 name="vmware_guest_vmxnet"
-rcvar="\${name}"
+rcvar="\${name}_enable"
 start_precmd="\${checkvm_cmd}"
 start_cmd="vmware_guest_vmxnet_start"
 stop_precmd="\${checkvm_cmd}"
@@ -124,7 +124,7 @@ run_rc_command "\$1"
 
 # VMware kernel module: vmblock
 name="vmware_guest_vmblock"
-rcvar="\${name}"
+rcvar="\${name}_enable"
 start_precmd="\${checkvm_cmd}"
 start_cmd="vmware_guest_vmblock_start"
 stop_precmd="\${checkvm_cmd}"
@@ -136,7 +136,7 @@ run_rc_command "\$1"
 
 # VMware kernel module: vmhgfs
 name="vmware_guest_vmhgfs"
-rcvar="\${name}"
+rcvar="\${name}_enable"
 start_precmd="\${checkvm_cmd}"
 start_cmd="vmware_guest_vmhgfs_start"
 stop_precmd="\${checkvm_cmd}"

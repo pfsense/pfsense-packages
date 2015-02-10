@@ -137,7 +137,7 @@
 				Supports ACLs for smart backend switching.]]></descr>
 		<website>http://haproxy.1wt.eu/</website>
 		<category>Services</category>
-		<version>1.5.9 pkg v 0.19</version>
+		<version>1.5.9 pkg v 0.20</version>
 		<status>Release</status>
 		<required_version>2.2</required_version>
 		<config_file>https://packages.pfsense.org/packages/config/haproxy-devel/haproxy.xml</config_file>
@@ -588,7 +588,7 @@
 		<descr>pfSense version of TinyDNS which features failover host support</descr>
 		<website>http://cr.yp.to/djbdns.html</website>
 		<category>Services</category>
-		<version>1.0.6.20</version>
+		<version>1.0.6.21</version>
 		<status>Beta</status>
 		<pkginfolink>https://doc.pfsense.org/index.php/Tinydns_package</pkginfolink>
 		<required_version>2.2</required_version>
@@ -606,7 +606,7 @@
 		<descr>VMware Tools</descr>
 		<website>http://open-vm-tools.sourceforge.net/</website>
 		<category>Services</category>
-		<version>1280544_9</version>
+		<version>1280544_10</version>
 		<status>Stable</status>
 		<pkginfolink>https://doc.pfsense.org/index.php/Open_VM_Tools_package</pkginfolink>
 		<required_version>2.2</required_version>
@@ -1136,7 +1136,7 @@
 		</build_pbi>
 		<build_options>nrpe_SET_FORCE=SSL;nrpe_UNSET_FORCE=ARGS</build_options>
 		<config_file>https://packages.pfsense.org/packages/config/nrpe2/nrpe2.xml</config_file>
-		<version>2.15_5 v2.2_2</version>
+		<version>2.15_5 v2.2_3</version>
 		<status>Beta</status>
 		<required_version>2.2</required_version>
 		<maintainer>erik@erikkristensen.com</maintainer>
