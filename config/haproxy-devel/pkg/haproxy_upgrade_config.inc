@@ -179,6 +179,20 @@ function haproxy_upgrade_config() {
 		}
 		$configversion = "00.17";
 	}
+	if ($configversion < "00.19") {
+		update_output_window($static_output);
+		$carpint = $config['installedpackages']['haproxy']['carpdev'];
+		if (is_arrayset($config, 'virtualip', 'vip') && is_arrayset($config, 'installedpackages', 'haproxy')) {
+			foreach($config['virtualip']['vip'] as $carp) {
+				$carp_int = "{$carp['interface']}_vip{$carp['vhid']}";
+				if ($carp_int == $carpint) {
+					$config['installedpackages']['haproxy']['carpdev'] = $carp['subnet'];
+					break;
+				}
+			}
+		}
+		$configversion = "00.19";
+	}
 	
 	$writeconfigupdate = $config['installedpackages']['haproxy']['configversion'] <> $configversion;
 	if ($writeconfigupdate) {

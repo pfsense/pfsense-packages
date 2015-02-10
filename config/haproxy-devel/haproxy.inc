@@ -472,7 +472,7 @@ function haproxy_install_cron($should_install) {
 				$cron_item['month'] = "*";
 				$cron_item['wday'] = "*";
 				$cron_item['who'] = "root";
-				$cron_item['command'] = "/usr/local/etc/rc.d/haproxy.sh check";		
+				$cron_item['command'] = "/usr/local/etc/rc.d/haproxy.sh onecheck";		
 				$config['cron']['item'][] = $cron_item;
 				parse_config(true);
 				write_config("haproxy, install cron CARP job");
@@ -1537,6 +1537,22 @@ function haproxy_plugin_certificates($pluginparams) {
 	return $result;
 }
 
+function haproxy_carpipismaster($ip) {
+	global $config;
+	foreach($config['virtualip']['vip'] as $carp) {
+		if ($carp['mode'] != "carp")
+			continue;
+		$ipaddress = $carp['subnet'];
+		if ($ipaddress != $ip)
+			continue;
+
+		$carp_int = "{$carp['interface']}_vip{$carp['vhid']}";
+		$status = get_carp_interface_status($carp_int);
+		return ($status == "MASTER");
+	}
+	return null;
+}
+
 function haproxy_check_run($reload) {
 	global $config, $g, $haproxy_run_message;
 
@@ -1549,8 +1565,8 @@ function haproxy_check_run($reload) {
 
 	if(isset($a_global['enable'])) {
 		if (isset($a_global['carpdev'])) {
-			$status = get_carp_interface_status($a_global['carpdev']);
-			if ($status != "MASTER") {
+			$status = haproxy_carpipismaster($a_global['carpdev']);
+			if (!$status) {
 				if (haproxy_is_running()) {
 					log_error("Stopping haproxy on CARP backup.");
 					//exec("/bin/pkill -F /var/run/haproxy.pid haproxy");//doesnt work for multiple pid's in a pidfile
