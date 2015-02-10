@@ -965,19 +965,19 @@
 	</package>
 	<package>
 		<name>squidGuard</name>
-		<descr>High performance web proxy URL filter. Requires proxy Squid 2.x package.</descr>
+		<descr>High performance web proxy URL filter. Works with both Squid 2.x and Squid 3.x.</descr>
 		<website>http://www.squidGuard.org/</website>
 		<maintainer>dv_serg@mail.ru</maintainer>
 		<category>Network Management</category>
 		<version>1.4_7 pkg v.1.9.10</version>
 		<status>Beta</status>
 		<required_version>2.2</required_version>
-		<depends_on_package_pbi>squidguard-1.4_7-##ARCH##.pbi</depends_on_package_pbi>
+		<depends_on_package_pbi>squidguard-squid3-1.4_7-##ARCH##.pbi</depends_on_package_pbi>
 		<build_pbi>
-			<ports_before>databases/db5 security/cyrus-sasl2</ports_before>
+			<ports_before>www/squid33 databases/db5 security/cyrus-sasl2</ports_before>
 			<port>www/squidguard</port>
 		</build_pbi>
-		<build_options>squidGuard_UNSET_FORCE=SQUID32 SQUID33;squidGuard_SET_FORCE=SAMPLE_BL SASL LDAP SQUID27;squid_UNSET_FORCE=DNS_HELPER IPFILTER PINGER STACKTRACES STRICT_HTTP_DESC USERAGENT_LOG WCCPV2;squid_SET_FORCE=PF LDAP_AUTH NIS_AUTH SASL_AUTH ARP_ACL AUFS CACHE_DIGESTS CARP COSS DELAY_POOLS FOLLOW_XFF HTCP IDENT KERB_AUTH KQUEUE LARGEFILE REFERER_LOG SNMP SSL VIA_DB WCCP;SQUID_UID=proxy;SQUID_GID=proxy</build_options>
+		<build_options>OPTIONS_SET_FORCE=FETCH LDAP;squidGuard_UNSET_FORCE=SQUID27;squidGuard_SET_FORCE=SAMPLE_BL SASL SQUID33;c-icap_UNSET_FORCE=IPV6 squid_UNSET_FORCE=AUTH_SMB AUTH_SQL DNS_HELPER FS_COSS ESI SNMP ECAP STACKTRACES STRICT_HTTP TP_IPF TP_IPFW VIA_DB DEBUG DOCS EXAMPLES;squid_SET_FORCE=ARP_ACL AUTH_KERB AUTH_LDAP AUTH_NIS AUTH_SASL CACHE_DIGESTS DELAY_POOLS FOLLOW_XFF TP_PF MSSL_CRTD WCCP WCCPV2 FS_AUFS HTCP ICAP ICMP IDENT IPV6 KQUEUE LARGEFILE SSL SSL_CRTD</build_options>
 		<config_file>https://packages.pfsense.org/packages/config/squidGuard/squidguard.xml</config_file>
 		<configurationfile>squidguard.xml</configurationfile>
 	</package>
@@ -998,25 +998,6 @@
 		</build_pbi>
 		<build_options>squidGuard-devel_UNSET_FORCE=SQUID32 SQUID33;squidGuard-devel_SET_FORCE=LDAP STRIPNT SQUID27;squid_UNSET_FORCE=DNS_HELPER IPFILTER PINGER STACKTRACES STRICT_HTTP_DESC USERAGENT_LOG WCCPV2;squid_SET_FORCE=PF LDAP_AUTH NIS_AUTH SASL_AUTH ARP_ACL AUFS CACHE_DIGESTS CARP COSS DELAY_POOLS FOLLOW_XFF HTCP IDENT KERB_AUTH KQUEUE LARGEFILE REFERER_LOG SNMP SSL VIA_DB WCCP;SQUID_UID=proxy;SQUID_GID=proxy</build_options>
 		<config_file>https://packages.pfsense.org/packages/config/squidGuard-devel/squidguard.xml</config_file>
-		<configurationfile>squidguard.xml</configurationfile>
-	</package>
-	<package>
-		<name>squidGuard-squid3</name>
-		<descr>High performance web proxy URL filter. Requires proxy Squid 3.x package.</descr>
-		<website>http://www.squidGuard.org/</website>
-		<maintainer>dv_serg@mail.ru</maintainer>
-		<category>Network Management</category>
-		<version>1.4_7 pkg v.1.9.6</version>
-		<status>Beta</status>
-		<required_version>2.2</required_version>
-		<depends_on_package_pbi>squidguard-squid3-1.4_7-##ARCH##.pbi</depends_on_package_pbi>
-		<build_pbi>
-			<ports_before>www/squid33 databases/db5 security/cyrus-sasl2</ports_before>
-			<port>www/squidguard</port>
-			<custom_name>squidguard-squid3</custom_name>
-		</build_pbi>
-		<build_options>OPTIONS_SET_FORCE=FETCH LDAP;squidGuard_UNSET_FORCE=SQUID27;squidGuard_SET_FORCE=SAMPLE_BL SASL SQUID33;c-icap_UNSET_FORCE=IPV6 squid_UNSET_FORCE=AUTH_SMB AUTH_SQL DNS_HELPER FS_COSS ESI SNMP ECAP STACKTRACES STRICT_HTTP TP_IPF TP_IPFW VIA_DB DEBUG DOCS EXAMPLES;squid_SET_FORCE=ARP_ACL AUTH_KERB AUTH_LDAP AUTH_NIS AUTH_SASL CACHE_DIGESTS DELAY_POOLS FOLLOW_XFF TP_PF MSSL_CRTD WCCP WCCPV2 FS_AUFS HTCP ICAP ICMP IDENT IPV6 KQUEUE LARGEFILE SSL SSL_CRTD</build_options>
-		<config_file>https://packages.pfsense.org/packages/config/squidGuard/squidguard.xml</config_file>
 		<configurationfile>squidguard.xml</configurationfile>
 	</package>
 	<package>
