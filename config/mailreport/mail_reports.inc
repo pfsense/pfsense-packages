@@ -532,7 +532,7 @@ function mail_report_generate_graph($database, $style, $graph, $start, $end) {
 		$graphcmd .= "--height 200 --width 620 ";
 
 		$iflist = get_configured_interface_list();
-		$g = 0;
+		$h = 0;
 		$operand = "";
 		$comma = "";
 		$graphtputbip = "";
@@ -578,7 +578,7 @@ function mail_report_generate_graph($database, $style, $graph, $start, $end) {
 			$graphcmd .= "CDEF:\"{$ifname}-bytes_out_t_block={$ifname}-out_bytes,0,$speedlimit,LIMIT,UN,0,{$ifname}-out_bytes_block,IF,$seconds,*\" ";
 			$graphcmd .= "CDEF:\"{$ifname}-bytes_t_pass={$ifname}-bytes_in_t_pass,{$ifname}-bytes_out_t_pass,+\" ";
 			$graphcmd .= "CDEF:\"{$ifname}-bytes_t_block={$ifname}-bytes_in_t_block,{$ifname}-bytes_out_t_block,+\" ";
-			if ($g > 0) {
+			if ($h > 0) {
 				$operand .= ",+";
 				$comma = ",";
 			}
@@ -594,7 +594,7 @@ function mail_report_generate_graph($database, $style, $graph, $start, $end) {
 			$graphtputbyob .= "{$comma}{$ifname}-bytes_out_t_block";
 			$graphtputbytp .= "{$comma}{$ifname}-bytes_t_pass";
 			$graphtputbytb .= "{$comma}{$ifname}-bytes_t_block";
-			$g++;
+			$h++;
 		}
 		$graphcmd .= "CDEF:\"tput-in_bits_pass={$graphtputbip}{$operand}\" ";
 		$graphcmd .= "CDEF:\"tput-out_bits_pass={$graphtputbop}{$operand}\" ";
