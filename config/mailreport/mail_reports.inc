@@ -185,7 +185,7 @@ function set_mail_report_cron_jobs($a_mailreports) {
 	}
 }
 
-include('phpmailer/class.phpmailer.php');
+include('phpmailer/PHPMailerAutoload.php');
 
 function mail_report_send($headertext, $cmdtext, $logtext, $attachments) {
 	global $config, $g;
