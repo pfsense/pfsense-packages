@@ -48,7 +48,6 @@ require_once("services.inc");
 
 # [ $pfb ] pfBlockerNG Global Array for Paths and Variables. This needs to be called to get the Updated Settings.
 function pfb_global() {
-
 	global $g,$config,$pfb;
 
 	# Folders
@@ -461,9 +460,9 @@ function sync_package_pfblockerng($cron = "") {
 	}
 
 
-	#############################################
-	#            Configure ARRAYS               #
-	#############################################
+	#################################
+	#	Configure ARRAYS	#
+	#################################
 
 	$continents = array (	"Africa"		=> "pfB_Africa",
 				"Antartica"		=> "pfB_Antartica",
@@ -522,9 +521,9 @@ function sync_package_pfblockerng($cron = "") {
 				);
 
 
-	#############################################
-	#          Configure Rule Suffix            #
-	#############################################
+	#########################################
+	#	Configure Rule Suffix		#
+	#########################################
 
 	# Discover if any Rules are AutoRules (If no AutoRules found, $pfb['autorules'] is FALSE, Skip Rules Re-Order )
 	# To configure Auto Rule Suffix. pfBlockerNG must be disabled to change Suffix and to avoid Duplicate Rules
@@ -594,9 +593,9 @@ function sync_package_pfblockerng($cron = "") {
 	}
 
 
-	#############################################
-	#   Configure INBOUND/OUTBOUND INTERFACES   #
-	#############################################
+	#########################################################
+	#	Configure INBOUND/OUTBOUND INTERFACES		#
+	#########################################################
 
 	# Collect pfSense Interface Order
 	$ifaces = get_configured_interface_list();
@@ -660,9 +659,9 @@ function sync_package_pfblockerng($cron = "") {
 	}
 
 
-	#############################################
-	#   Clear Removed Lists from Masterfiles    #
-	#############################################
+	#################################################
+	#	Clear Removed Lists from Masterfiles	#
+	#################################################
 
 	# Process to keep Masterfiles in Sync with Valid Lists from config.conf file.
 	$pfb['sync_master'] = TRUE;
@@ -886,9 +885,9 @@ function sync_package_pfblockerng($cron = "") {
 		}
 	}
 
-	##############################################
-	# Clear Match/Pass/ET/Original Files/Folders #
-	##############################################
+	#########################################################
+	#	Clear Match/Pass/ET/Original Files/Folders	#
+	#########################################################
 
 	# When pfBlockerNG is Disabled and 'Keep Blocklists' is Disabled.
 	if ($pfb['enable'] == "" && $pfb['keep'] == "" && !$pfb['install']) {
@@ -907,17 +906,17 @@ function sync_package_pfblockerng($cron = "") {
 	}
 
 
-	#############################################
-	#       Create Suppression Txt File         #
-	#############################################
+	#########################################
+	#	Create Suppression Txt File	#
+	#########################################
 
 	if ($pfb['enable'] == "on" && $pfb['supp'] == "on")
 		pfb_create_suppression_file();
 
 
-	#############################################
-	#          Assign Countries                 #
-	#############################################
+	#################################
+	#	Assign Countries	#
+	#################################
 
 	foreach ($continents as $continent => $pfb_alias) {
 		if (is_array($config['installedpackages']['pfblockerng' . strtolower(preg_replace('/ /','',$continent))]['config'])) {
@@ -1143,9 +1142,9 @@ function sync_package_pfblockerng($cron = "") {
 	# UNSET variables
 	unset ($continent, $continent_existing, $continent_new);
 
-	#############################################
-	#    Download and Collect IPv4/IPv6 lists   #
-	#############################################
+	#################################################
+	#	Download and Collect IPv4/IPv6 lists	#
+	#################################################
 
 	# IPv4 REGEX Definitions
 	$pfb['range']	= '/((?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?))-((?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?))/';
@@ -1230,7 +1229,7 @@ function sync_package_pfblockerng($cron = "") {
 								$host = @parse_url($row['url']);
 								$list_url = "{$row['url']}";
 								if ($row['format'] != "rsync" || $row['format'] != "html") {
-									if ($host['host'] == "127.0.0.1" || $host['host'] ==  $pfb['iplocal'] || empty($host['host'])) {
+									if ($host['host'] == "127.0.0.1" || $host['host'] == $pfb['iplocal'] || empty($host['host'])) {
 										$remote_tds = "local";
 									} else {
 										$remote_tds = @implode(preg_grep("/Last-Modified/", get_headers($list_url)));
@@ -1510,7 +1509,7 @@ function sync_package_pfblockerng($cron = "") {
 									$ip2 = preg_replace("/(\d{1,3})\.(\d{1,3}).(\d{1,3}).(\d{1,3})/", "\"^$1\.$2\.$3\.\"", $ip);
 
 									# Only Perform these Checks if they are not "localfiles"
-									if ($host['host'] == "127.0.0.1" || $host['host'] ==  $pfb['iplocal'] || empty($host['host'])) {
+									if ($host['host'] == "127.0.0.1" || $host['host'] == $pfb['iplocal'] || empty($host['host'])) {
 										$log = " [ {$alias} {$header_url} ] Local File Failure \n";
 										pfb_logger("{$log}","2");
 									} else {
@@ -1646,9 +1645,9 @@ function sync_package_pfblockerng($cron = "") {
 	}
 
 
-	#############################################
-	#           REPUTATION PROCESSES            #
-	#############################################
+	#################################
+	#	REPUTATION PROCESSES	#
+	#################################
 
 	# IP Reputation processes (pdup and ddup)
 	if ($pfb['pdup'] == "on" && $pfb['dupcheck'] && !$pfb['save'] && $pfb['enable'] == "on") {
@@ -1660,9 +1659,9 @@ function sync_package_pfblockerng($cron = "") {
 		exec ("{$pfb['script']} dedup x {$pfb['dmax']} {$pfb['dedup']} {$pfb['ccexclude']} {$pfb['ccwhite']} {$pfb['ccblack']} >> {$pfb['log']} 2>&1");
 	}
 
-	#############################################
-	#            CONFIGURE ALIASES              #
-	#############################################
+	#################################
+	#	CONFIGURE ALIASES	#
+	#################################
 
 	$list_type = array ("pfblockernglistsv4" => "_v4", "pfblockernglistsv6" => "_v6");
 	foreach ($list_type as $ip_type => $vtype) {
@@ -1871,9 +1870,9 @@ function sync_package_pfblockerng($cron = "") {
 	${$alias} = "";
 
 
-	#############################################
-	#       UPDATE PfSENSE ALIAS TABLES         #
-	#############################################
+	#########################################
+	#	UPDATE pfSense ALIAS TABLES	#
+	#########################################
 
 	#update pfsense alias table
 	if (is_array($config['aliases']['alias'])) {
@@ -1910,9 +1909,9 @@ function sync_package_pfblockerng($cron = "") {
 	unset($new_aliases, $cbalias);
 
 
-	#############################################
-	#              Assign rules                 #
-	#############################################
+	#########################
+	#	Assign Rules	#
+	#########################
 
 	# Only Execute if AutoRules are defined or if an Alias has been removed.
 	if ($pfb['autorules'] || $pfb['enable'] == "" || $pfb['remove']) {
@@ -2178,9 +2177,10 @@ function sync_package_pfblockerng($cron = "") {
 		unset ($other_rules,$fother_rules,$permit_rules,$fpermit_rules,$match_rules,$fmatch_rules);
 	}
 
-	#############################################
-	#          Define/Apply CRON Jobs           #
-	#############################################
+
+	#########################################
+	#       Define/Apply CRON Jobs          #
+	#########################################
 
 	# Clear any existing pfBlockerNG Cron Jobs
 	install_cron_job("pfblockerng.php cron", false);
@@ -2219,9 +2219,9 @@ function sync_package_pfblockerng($cron = "") {
 	}
 
 
-	#############################################
-	#             Closing Processes             #
-	#############################################
+	#################################
+	#	Closing Processes	#
+	#################################
 
 	#uncheck Reusing Existing Downloads Check box
 	if (!$pfb['save'] && $pfb['enable'] == "on")
@@ -2291,9 +2291,9 @@ function sync_package_pfblockerng($cron = "") {
 	#sync config
 	pfblockerng_sync_on_changes();
 
-	#############################################
-	#             FINAL REPORTING               #
-	#############################################
+	#################################
+	#	FINAL REPORTING		#
+	#################################
 
 	# Only run with CRON or Force Invoked Process
 	if ((!$pfb['save'] && $pfb['dupcheck'] && $pfb['enable'] == "on") || $pfb['summary']) {
