@@ -230,6 +230,12 @@
 					If "Keep Settings" is not "enabled" on pkg Install/De-Install, all Settings will be Wiped!]]></description>
 		</field>
 		<field>
+			<fielddescr><![CDATA[<strong>Keep Settings</strong>/Lists After Disable/Re-Install/De-Install]]></fielddescr>
+			<fieldname>pfb_keep</fieldname>
+			<type>checkbox</type>
+			<description>Keep Settings and Lists intact when pfBlockerNG is Disabled or After pfBlockerNG Re-Install/De-Install</description>
+		</field>
+		<field>
 			<fielddescr>CRON MIN Start Time</fielddescr>
 			<fieldname>pfb_min</fieldname>
 			<description><![CDATA[Default: <strong> : 00</strong><br />
@@ -325,12 +331,6 @@
 					Alerts can be Suppressed using the '+' icon in the Alerts Tab and IPs added to the 'pfBlockerNGSuppress' Alias<br />
 					A Blocked IP in a CIDR other than /24 will need to be Suppressed by an 'Permit Outbound' Firewall Rule]]>
 			</description>
-		</field>
-		<field>
-			<fielddescr><![CDATA[<strong>Keep Settings</strong>/Lists After Disable/Re-Install/De-Install]]></fielddescr>
-			<fieldname>pfb_keep</fieldname>
-			<type>checkbox</type>
-			<description>Keep Settings and Lists intact when pfBlockerNG is Disabled or After pfBlockerNG Re-Install/De-Install</description>
 		</field>
 		<field>
 			<fielddescr>Global Enable Logging</fielddescr>
