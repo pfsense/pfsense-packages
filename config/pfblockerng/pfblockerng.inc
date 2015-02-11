@@ -50,6 +50,9 @@ require_once("services.inc");
 function pfb_global() {
 	global $g,$config,$pfb;
 
+	# Collect pfSense Version
+	$pfb['pfsenseversion']	= substr(trim(file_get_contents("/etc/version")),0,3);
+
 	# Folders
 	$pfb['dbdir']		= "{$g['vardb_path']}/pfblockerng";
 	$pfb['aliasdir']	= "{$g['vardb_path']}/aliastables";
@@ -75,9 +78,6 @@ function pfb_global() {
 	$pfb['log']	= "{$pfb['logdir']}/pfblockerng.log";
 	$pfb['supptxt']	= "{$pfb['dbdir']}/pfbsuppression.txt";
 	$pfb['script']	= 'sh /usr/local/pkg/pfblockerng/pfblockerng.sh';
-
-	# Collect pfSense Version
-	$pfb['pfsenseversion'] = substr(trim(file_get_contents("/etc/version")),0,3);
 
 	# General Variables
 	$pfb['config']	= $config['installedpackages']['pfblockerng']['config'][0];
@@ -1155,21 +1155,25 @@ function sync_package_pfblockerng($cron = "") {
 
 	# IPv4 preg_replace Regex Filter array
 	$pfb_ipreg = array();
-	$pfb_ipreg[0] = '/\b0+(?=\d)/'; # Remove any Leading Zeros in each Octet
-	$pfb_ipreg[1] = '/\s/'; # Remove any Whitespaces
-	$pfb_ipreg[2] = '/127\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}/'; # Remove any Loopback Addresses 127/8
-	$pfb_ipreg[3] = '/0\.0\.0\.0/'; # Remove 0.0.0.0
+	$pfb_ipreg[0] = '/\b0+(?=\d)/';					# Remove any Leading Zeros in each Octet
+	$pfb_ipreg[1] = '/\s/';						# Remove any Whitespaces
+	$pfb_ipreg[2] = '/127\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}/';	# Remove any Loopback Addresses 127/8
+	$pfb_ipreg[3] = '/0\.0\.0\.0\/32/';				# Remove 0.0.0.0/32
+	$pfb_ipreg[4] = '/0\.0\.0\.0/';					# Remove 0.0.0.0
 
 	# IPv6 REGEX Definitions  -- ** Still Needs some Adjustment on Regex Definition for IPv6 **
 	# https://mebsd.com/coding-snipits/php-regex-ipv6-with-preg_match.html
 	$pattern1 = '([A-Fa-f0-9]{1,4}:){7}[A-Fa-f0-9]{1,4}';
-	$pattern2 = '([A-Fa-f0-9]{1,4}::([A-Fa-f0-9]{1,4}:){0,5}[A-Fa-f0-9]{1,4}';
+	$pattern2 = '[A-Fa-f0-9]{1,4}::([A-Fa-f0-9]{1,4}:){0,5}[A-Fa-f0-9]{1,4}';
 	$pattern3 = '([A-Fa-f0-9]{1,4}:){2}:([A-Fa-f0-9]{1,4}:){0,4}[A-Fa-f0-9]{1,4}';
 	$pattern4 = '([A-Fa-f0-9]{1,4}:){3}:([A-Fa-f0-9]{1,4}:){0,3}[A-Fa-f0-9]{1,4}';
 	$pattern5 = '([A-Fa-f0-9]{1,4}:){4}:([A-Fa-f0-9]{1,4}:){0,2}[A-Fa-f0-9]{1,4}';
 	$pattern6 = '([A-Fa-f0-9]{1,4}:){5}:([A-Fa-f0-9]{1,4}:){0,1}[A-Fa-f0-9]{1,4}';
 	$pattern7 = '([A-Fa-f0-9]{1,4}:){6}:[A-Fa-f0-9]{1,4}';
-	$pfb['ipv6'] = "/^($pattern1)$|^($pattern2)$|^($pattern3)$|^($pattern4)$|^($pattern5)$|^($pattern6)$|^($pattern7)$/";
+	$pattern8 = '[A-Fa-f0-9]{1,4}:[A-Fa-f0-9]{1,4}:[A-Fa-f0-9]{1,4}::\/[0-9]{2}';
+	$pattern9 = '[A-Fa-f0-9]{1,4}:([A-Fa-f0-9]{1,4}::)\/[0-9]{2}';
+	$pattern10 = '[A-Fa-f0-9]{1,4}::\/[0-9]{2}';
+	$pfb['ipv6'] = "/^($pattern1)$|^($pattern2)$|^($pattern3)$|^($pattern4)$|^($pattern5)$|^($pattern6)$|^($pattern7)$|^($pattern8)$|^($pattern9)$|^($pattern10)$/";
 
 	$pfb['supp_update'] = FALSE;
 	$list_type = array ("pfblockernglistsv4" => "_v4", "pfblockernglistsv6" => "_v6");
@@ -2177,48 +2181,6 @@ function sync_package_pfblockerng($cron = "") {
 		unset ($other_rules,$fother_rules,$permit_rules,$fpermit_rules,$match_rules,$fmatch_rules);
 	}
 
-
-	#########################################
-	#       Define/Apply CRON Jobs          #
-	#########################################
-
-	# Clear any existing pfBlockerNG Cron Jobs
-	install_cron_job("pfblockerng.php cron", false);
-
-	# Replace Cron job with any User Changes to $pfb_min
-	if ($pfb['enable'] == "on") {
-		# Define pfBlockerNG CRON Job
-		$pfb_cmd	= "/usr/local/bin/php /usr/local/www/pfblockerng/pfblockerng.php cron >> {$pfb['log']} 2>&1";
-		# $pfb['min'] ( User Defined Variable. Variable defined at start of Script )
-		$pfb_hour	= "*";
-		$pfb_mday	= "*";
-		$pfb_month	= "*";
-		$pfb_wday	= "*";
-		$pfb_who	= "root";
-
-		install_cron_job($pfb_cmd, true, $pfb['min'], $pfb_hour, $pfb_mday, $pfb_month, $pfb_wday, $pfb_who);
-	}
-
-	# Clear any existing pfBlockerNG MaxMind CRON Job
-	install_cron_job("pfblockerng.php dc", false);
-
-	if ($pfb['enable'] == "on") {
-		# Define pfBlockerNG MaxMind CRON Job
-		$pfb_gcmd = "/usr/local/bin/php /usr/local/www/pfblockerng/pfblockerng.php dc >> {$pfb['geolog']} 2>&1";
-
-		# MaxMind GeoIP Cron Hour is randomized between 0-23 Hour to minimize effect on MaxMind Website
-
-		$pfb_gmin	= "0";
-		$pfb_ghour	= rand(0,23);
-		$pfb_gmday	= "1,2,3,4,5,6,7";
-		$pfb_gmonth	= "*";
-		$pfb_gwday	= "2";
-		$pfb_gwho	= "root";
-
-		install_cron_job($pfb_gcmd, true, $pfb_gmin, $pfb_ghour, $pfb_gmday, $pfb_gmonth, $pfb_gwday, $pfb_gwho);
-	}
-
-
 	#################################
 	#	Closing Processes	#
 	#################################
@@ -2234,11 +2196,13 @@ function sync_package_pfblockerng($cron = "") {
 	if ($pfb['autorules'] && $rules != $new_rules || $pfb['enable'] == "" || $pfb['remove']) {
 		require_once("filter.inc");
 
-		$log = "\n===[  Aliastables / Rules  ]================================\n\n";
-		pfb_logger("{$log}","1");
+		if (!$pfb['save']) {
+			$log = "\n===[  Aliastables / Rules  ]================================\n\n";
+			pfb_logger("{$log}","1");
 
-		$log = "Firewall Rule Changes Found, Applying Filter Reload \n";
-		pfb_logger("{$log}","1");
+			$log = "Firewall Rule Changes Found, Applying Filter Reload \n";
+			pfb_logger("{$log}","1");
+		}
 
 		# Remove all pfBlockerNG Alias tables
 		if (!empty($aliases_list)) {
@@ -2304,6 +2268,47 @@ function sync_package_pfblockerng($cron = "") {
 	if ($pfb['enable'] == "on" && !$pfb['save']) {
 		$log = "\n\n UPDATE PROCESS ENDED [ NOW ]\n";
 		pfb_logger("{$log}","1");
+	}
+
+
+	#########################################
+	#       Define/Apply CRON Jobs          #
+	#########################################
+
+	# Clear any existing pfBlockerNG Cron Jobs
+	install_cron_job("pfblockerng.php cron", false);
+
+	# Replace Cron job with any User Changes to $pfb_min
+	if ($pfb['enable'] == "on") {
+		# Define pfBlockerNG CRON Job
+		$pfb_cmd        = "/usr/local/bin/php /usr/local/www/pfblockerng/pfblockerng.php cron >> {$pfb['log']} 2>&1";
+		# $pfb['min'] ( User Defined Variable. Variable defined at start of Script )
+		$pfb_hour       = "*";
+		$pfb_mday       = "*";
+		$pfb_month      = "*";
+		$pfb_wday       = "*";
+		$pfb_who        = "root";
+
+		install_cron_job($pfb_cmd, true, $pfb['min'], $pfb_hour, $pfb_mday, $pfb_month, $pfb_wday, $pfb_who);
+	}
+
+	# Clear any existing pfBlockerNG MaxMind CRON Job
+	install_cron_job("pfblockerng.php dc", false);
+
+	if ($pfb['enable'] == "on") {
+		# Define pfBlockerNG MaxMind CRON Job
+		$pfb_gcmd = "/usr/local/bin/php /usr/local/www/pfblockerng/pfblockerng.php dc >> {$pfb['geolog']} 2>&1";
+
+		# MaxMind GeoIP Cron Hour is randomized between 0-23 Hour to minimize effect on MaxMind Website
+
+		$pfb_gmin       = "0";
+		$pfb_ghour      = rand(0,23);
+		$pfb_gmday      = "1,2,3,4,5,6,7";
+		$pfb_gmonth     = "*";
+		$pfb_gwday      = "2";
+		$pfb_gwho       = "root";
+
+		install_cron_job($pfb_gcmd, true, $pfb_gmin, $pfb_ghour, $pfb_gmday, $pfb_gmonth, $pfb_gwday, $pfb_gwho);
 	}
 }
 
