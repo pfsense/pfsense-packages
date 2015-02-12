@@ -53,12 +53,12 @@
 		<descr><![CDATA[The most widely used name server software]]></descr>
 		<website>http://www.isc.org/downloads/BIND/</website>
 		<category>Services</category>
-		<version>9.9.6_1 pkg v 0.3.6</version>
+		<version>9.9.6P1_3 pkg v 0.3.6</version>
 		<status>RC</status>
 		<required_version>2.2</required_version>
 		<config_file>https://packages.pfsense.org/packages/config/bind/bind.xml</config_file>
 		<configurationfile>bind.xml</configurationfile>
-		<depends_on_package_pbi>bind-9.9.6_1-##ARCH##.pbi</depends_on_package_pbi>
+		<depends_on_package_pbi>bind-9.9.6P1_3-##ARCH##.pbi</depends_on_package_pbi>
 		<build_pbi>
 			<custom_name>bind</custom_name>
 			<port>dns/bind99</port>
@@ -1025,7 +1025,7 @@
 			<ports_after>security/clamav</ports_after>
 		</build_pbi>
 		<build_options>CLAMAVUSER=havp;CLAMAVGROUP=havp</build_options>
-		<version>0.91_3 pkg v1.05</version>
+		<version>0.91_3 pkg v1.05_1</version>
 		<status>BETA</status>
 		<required_version>2.2</required_version>
 		<config_file>https://packages.pfsense.org/packages/config/havp/havp.xml</config_file>
