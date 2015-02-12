@@ -1385,12 +1385,14 @@ function sync_package_pfblockerng($cron = "") {
 								if (!empty($url_list)) {
 									if ($row['format'] == "gz" && $vtype == "_v4") {
 										foreach ($url_list as $line) {
-											# Network range 192.168.0.0-192.168.0.254
-											if (preg_match($pfb['range'],$line,$matches)) {
-												$a_cidr = ip_range_to_subnet_array_temp2($matches[1],$matches[2]);
-												if (!empty($a_cidr)) {
-													foreach ($a_cidr as $cidr) {
-														$new_file .= preg_replace($pfb_ipreg,'',$cidr) . "\n";
+											if (!preg_match("/^#/", $line)) {
+												# Network range 192.168.0.0-192.168.0.254
+												if (preg_match($pfb['range'],$line,$matches)) {
+													$a_cidr = ip_range_to_subnet_array_temp2($matches[1],$matches[2]);
+													if (!empty($a_cidr)) {
+														foreach ($a_cidr as $cidr) {
+															$new_file .= preg_replace($pfb_ipreg,'',$cidr) . "\n";
+														}
 													}
 												}
 											}
@@ -1399,44 +1401,52 @@ function sync_package_pfblockerng($cron = "") {
 
 									elseif ($row['format'] == "block" && $vtype == "_v4") {
 										foreach ($url_list as $line) {
-											# Block Type '218.77.79.0	218.77.79.255   24'
-											if (preg_match($pfb['block'],$line,$matches)) {
-												$new_file .= preg_replace($pfb_ipreg, '',$matches[0]) . "/24\n";
+											if (!preg_match("/^#/", $line)) {
+												# Block Type '218.77.79.0	218.77.79.255   24'
+												if (preg_match($pfb['block'],$line,$matches)) {
+													$new_file .= preg_replace($pfb_ipreg, '',$matches[0]) . "/24\n";
+												}
 											}
 										}
 									}
 
 									elseif ($row['format'] == "html" && $vtype == "_v4") {
 										foreach ($url_list as $line) {
-											# CIDR format 192.168.0.0/16
-											if (preg_match($pfb['cidr'],$line,$matches)) {
-												$new_file .= preg_replace($pfb_ipreg, '',$matches[0]) . "\n";
-											}
-											# Single ip addresses
-											elseif (preg_match($pfb['s_html'],$line,$matches)) {
-												$new_file .= preg_replace($pfb_ipreg, '',$matches[0]) . "\n";
+											if (!preg_match("/^#/", $line)) {
+												# CIDR format 192.168.0.0/16
+												if (preg_match($pfb['cidr'],$line,$matches)) {
+													$new_file .= preg_replace($pfb_ipreg, '',$matches[0]) . "\n";
+												}
+												# Single ip addresses
+												elseif (preg_match($pfb['s_html'],$line,$matches)) {
+													$new_file .= preg_replace($pfb_ipreg, '',$matches[0]) . "\n";
+												}
 											}
 										}
 									} 
 
 									elseif ($vtype == "_v6") {
 										foreach ($url_list as $line) {
-											# IPv6 Regex Match
-											if (preg_match($pfb['ipv6'],$line,$matches)) {
-												$new_file .= preg_replace($pfb_ipreg, '',$matches[0]) . "\n";
+											if (!preg_match("/^#/", $line)) {
+												# IPv6 Regex Match
+												if (preg_match($pfb['ipv6'],$line,$matches)) {
+													$new_file .= preg_replace($pfb_ipreg, '',$matches[0]) . "\n";
+												}
 											}
 										}
 									}
 
 									else {
 										foreach ($url_list as $line) {
-											# CIDR format 192.168.0.0/16
-											if (preg_match($pfb['cidr'],$line,$matches)) {
-												$new_file .= preg_replace($pfb_ipreg, '',$matches[0]) . "\n";
-											}
-											# Single ip addresses
-											elseif (preg_match($pfb['single'],$line,$matches)) {
-												$new_file .= preg_replace($pfb_ipreg, '',$matches[0]) . "\n";
+											if (!preg_match("/^#/", $line)) {
+												# CIDR format 192.168.0.0/16
+												if (preg_match($pfb['cidr'],$line,$matches)) {
+													$new_file .= preg_replace($pfb_ipreg, '',$matches[0]) . "\n";
+												}
+												# Single ip addresses
+												elseif (preg_match($pfb['single'],$line,$matches)) {
+													$new_file .= preg_replace($pfb_ipreg, '',$matches[0]) . "\n";
+												}
 											}
 										}
 									}
