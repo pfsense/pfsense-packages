@@ -93,10 +93,24 @@ function haproxy_compareByName($a, $b) {
 function haproxy_interface_ip($interfacebindname,$userfriendly=false){
 	$list = haproxy_get_bindable_interfaces();
 	$item = $list[$interfacebindname];
-	$result = $item['ip'];
-	if ($userfriendly && !$result)
-		$result = $item['name'];
-	return $result;
+    if ($item['alias']){
+        global $config;
+        $result_array = array();        
+        foreach ($config['aliases']['alias'] as $alias) {
+            if ($alias['type']=='host' && $alias['name'] == $item['alias']){
+               $alias_exp = explode(' ',$alias['address']);
+               foreach ($alias_exp as $alias_ip) {
+                  $result_array[] = $alias_ip;
+               }                
+            }
+        }        
+        return $result_array;
+    }else{
+	   $result = $item['ip'];
+	   if ($userfriendly && !$result)
+	   $result = $item['name'];
+       return $result;
+    }	
 }
 
 function haproxy_get_bindable_interfaces($ipv="ipv4,ipv6", $interfacetype="any,localhost,real,carp,ipalias"){
@@ -112,6 +126,15 @@ function haproxy_get_bindable_interfaces($ipv="ipv4,ipv6", $interfacetype="any,l
 	$interfacetypes= split(',',$interfacetype);
 
 	$bindable = array();
+    if (in_array('alias',$interfacetypes)){
+        $aliases = get_alias_list(array('host'));   
+        foreach ($aliases as $alias){        
+                $item = array();
+                $item['alias'] = $alias;
+                $item['name'] = $alias. ' (Alias)';
+                $bindable[$alias] = $item;
+        }
+    }	
 	if (in_array("ipv4",$ipverions)){
 		if (in_array('any',$interfacetypes)){
 			$item = array();
