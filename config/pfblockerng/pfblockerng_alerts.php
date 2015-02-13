@@ -39,9 +39,19 @@
 	POSSIBILITY OF SUCH DAMAGE.
 */
 
+// Auto-Resolve Hostnames
+if (isset($_REQUEST['getpfhostname'])) {
+	$getpfhostname = htmlspecialchars($_REQUEST['getpfhostname']);
+	$hostname = htmlspecialchars(gethostbyaddr($getpfhostname), ENT_QUOTES);
+	if ($hostname == $getpfhostname) {
+		$hostname = 'unknown';
+	}
+	echo $hostname;
+	die;
+}
+
 require_once("util.inc");
 require_once("guiconfig.inc");
-require_once("globals.inc");
 require_once("filter_log.inc");
 require_once("/usr/local/pkg/pfblockerng/pfblockerng.inc");
 
@@ -267,18 +277,6 @@ if (isset($_POST['addsuppress'])) {
 	}
 }
 
-// Auto-Resolve Hostnames
-if (isset($_REQUEST['getpfhostname'])) {
-	$getpfhostname = htmlspecialchars($_REQUEST['getpfhostname']);
-	$hostname = htmlspecialchars(gethostbyaddr($getpfhostname), ENT_QUOTES);
-	if ($hostname == $getpfhostname) {
-		$hostname = 'unknown';
-	}
-	echo $hostname;
-	die;
-}
-
-
 // Host Resolve Function lookup
 function getpfbhostname($type = 'src', $hostip, $countme = 0) {
 	$hostnames['src'] = '';
@@ -448,9 +446,9 @@ if ($pfb['runonce']) {
 
 	// pfSense versions below 2.2 have the Logfiles in two lines.
 	if ($pfb['pfsenseversion'] >= '2.2') {
-		$pfblines = exec("/usr/bin/grep -c ^ {$filter_logfile}");
+		$pfblines = exec("/usr/local/sbin/clog {$filter_logfile} | /usr/bin/grep -c ^");
 	} else {
-		$pfblines = (exec("/usr/bin/grep -c ^ {$filter_logfile}") /2 );
+		$pfblines = (exec("/usr/local/sbin/clog {$filter_logfile} | /usr/bin/grep -c ^") /2 );
 	}
 	$fields_array = conv_log_filter($filter_logfile, $pfblines, $pfblines);
 
@@ -683,6 +681,14 @@ if (!empty($fields_array)) {
 				}
 			}
 
+			$pfb_matchtitle = "Country Block Rules cannot be suppressed.\n\nTo allow a particular Country IP, either remove the particular Country or add the Host\nto a Permit Alias in the Firewall Tab.\n\nIf the IP is not listed beside the List, this means that the Block is a /32 entry.\nOnly /32 or /24 CIDR Hosts can be suppressed.\n\nIf (Duplication) Checking is not enabled. You may see /24 and /32 CIDR Blocks for a given blocked Host";
+
+			// Truncate Long List Names
+			if (strlen($pfb_match[1]) >= 17) {
+				$pfb_matchtitle = $pfb_match[1];
+				$pfb_match[1]	= substr($pfb_match[1], 0, 16) . '...';
+			}
+
 			// Print Alternating Line Shading 
 			if ($pfb['pfsenseversion'] > '2.0') {
 				$alertRowEvenClass = "listMReven";
@@ -706,7 +712,7 @@ if (!empty($fields_array)) {
 				<td nowrap='nowrap' class='listMRr' align='center' style='sorttable_customkey:{$fields['srcip']};' sorttable_customkey='{$fields['srcip']}'>{$src_icons}{$fields['srcip']}{$srcport}<br /><small>{$hostname['src']}</small></td>
 				<td nowrap='nowrap' class='listMRr' align='center' style='sorttable_customkey:{$fields['dstip']};' sorttable_customkey='{$fields['dstip']}'>{$dst_icons}{$fields['dstip']}{$dstport}<br /><small>{$hostname['dst']}</small></td>
 				<td class='listMRr' align='center'>{$countrycode}</td>
-				<td class='listbg' align='center' title='Country Block Rules cannot be suppressed.\n\nTo allow a particular Country IP, either remove the particular Country or add the Host\nto a Permit Alias in the Firewall Tab.\n\nIf the IP is not listed beside the List, this means that the Block is a /32 entry.\nOnly /32 or /24 CIDR Hosts can be suppressed.\n\nIf (Duplication) Checking is not enabled. You may see /24 and /32 CIDR Blocks for a given blocked Host' style=\"font-size: 10px word-wrap:break-word;\">{$pfb_match[1]}<br />{$pfb_match[2]}</td></tr>";
+				<td class='listbg' align='center' title='{$pfb_matchtitle}' style=\"font-size: 10px word-wrap:break-word;\">{$pfb_match[1]}<br />{$pfb_match[2]}</td></tr>";
 			$counter++;
 			if ($counter > 0 && $rtype == "block") {
 				$mycounter = $counter;
@@ -756,10 +762,10 @@ function findhostnames(counter) {
 	)
 }
 
-	var lines = <?php echo $mycounter; ?>;
-	for (i = 0; i < lines; i++) {
-		findhostnames(i);
-	}
+var lines = <?php echo $mycounter; ?>;
+for (alertcount = 0; alertcount < lines; alertcount++) {
+	setTimeout(findhostnames(alertcount), 30);
+}
 
 //]]>
 </script>
