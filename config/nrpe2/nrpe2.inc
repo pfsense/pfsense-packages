@@ -34,7 +34,7 @@ if ($pfs_version == "2.0") {
 }
 
 if ($pfs_version == "2.1")
-	define('NRPE_BINARY', NRPE_BASE . "sbin/nrpe2");
+	define('NRPE_BINARY', NRPE_BASE . "/sbin/nrpe2");
 else
 	define('NRPE_BINARY', "/usr/local/sbin/nrpe2");
 
