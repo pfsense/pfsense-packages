@@ -1044,7 +1044,7 @@
 			<ports_after>security/clamav</ports_after>
 		</build_pbi>
 		<build_options>CLAMAVUSER=havp;CLAMAVGROUP=havp</build_options>
-		<version>0.91_3 pkg v1.05</version>
+		<version>0.91_3 pkg v1.06</version>
 		<status>BETA</status>
 		<required_version>2.2</required_version>
 		<config_file>https://packages.pfsense.org/packages/config/havp/havp.xml</config_file>
