@@ -175,6 +175,9 @@ function lightsquid_resync() {
 	if (!file_exists("/usr/bin/perl"))
 		mwexec("ln -s /usr/local/bin/perl /usr/bin/perl");
 
+	// Fixup library path so GD can find its libraries for graphs.
+	mwexec("/sbin/ldconfig -m " . LIGHTSQUID_BASE . "/lib/");
+
 	// create lightsquid report catalog
 	if (!file_exists(LS_REPORTPATH)) {
 		update_log("lightsquid_install: Create report dir " . LS_REPORTPATH);
