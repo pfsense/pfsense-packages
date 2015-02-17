@@ -659,7 +659,7 @@ function vhosts_sync_package_php()
 					$tmp .= "				\"PHP_FCGI_MAX_REQUESTS\" => \"500\",\n";
 					$tmp .= "				\"PHP_FCGI_CHILDREN\" => \"1\"\n";
 					$tmp .= "			),\n";
-					$tmp .= "			\"bin-path\" => \"/usr/local/php5/php-cgi\"\n";
+					$tmp .= "			\"bin-path\" => \"/usr/local/bin/php\"\n";
 					$tmp .= "		)\n";
 					$tmp .= "	)\n";
 					$tmp .= ")\n";
