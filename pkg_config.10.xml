@@ -1303,11 +1303,44 @@
 		<configurationfile>syslog-ng.xml</configurationfile>
 	</package>
 	<package>
-		<name>Zabbix-2 Agent</name>
+		<name>Zabbix-2.2 Agent</name>
 		<descr>Monitoring agent.</descr>
 		<category>Services</category>
 		<config_file>https://packages.pfsense.org/packages/config/zabbix2/zabbix2-agent.xml</config_file>
-		<version>zabbix2-agent-2.4.3 pkg v0.8.3</version>
+		<version>zabbix22-agent-2.2.7 pkg v0.8.3</version>
+		<status>BETA</status>
+		<required_version>2.2</required_version>
+		<configurationfile>zabbix2-agent.xml</configurationfile>
+		<maintainer>dbaio@bsd.com.br</maintainer>
+		<build_pbi>
+			<custom_name>zabbix22-agent</custom_name>
+			<port>net-mgmt/zabbix22-agent</port>
+		</build_pbi>
+		<depends_on_package_pbi>zabbix22-agent-2.2.7-##ARCH##.pbi</depends_on_package_pbi>
+	</package>
+	<package>
+		<name>Zabbix-2.2 Proxy</name>
+		<descr>Monitoring agent proxy.</descr>
+		<category>Services</category>
+		<config_file>https://packages.pfsense.org/packages/config/zabbix2/zabbix2-proxy.xml</config_file>
+		<version>zabbix22-proxy-2.2.7 pkg v0.8.3</version>
+		<status>BETA</status>
+		<required_version>2.2</required_version>
+		<configurationfile>zabbix2-proxy.xml</configurationfile>
+		<maintainer>dbaio@bsd.com.br</maintainer>
+		<build_pbi>
+			<custom_name>zabbix22-proxy</custom_name>
+			<port>net-mgmt/zabbix22-proxy</port>
+		</build_pbi>
+		<build_options>OPTIONS_SET+= SQLITE IPV6;OPTIONS_UNSET+= MYSQL JABBER GSSAPI</build_options>
+		<depends_on_package_pbi>zabbix22-proxy-2.2.7-##ARCH##.pbi</depends_on_package_pbi>
+	</package>
+	<package>
+		<name>Zabbix-2.4 Agent</name>
+		<descr>Monitoring agent.</descr>
+		<category>Services</category>
+		<config_file>https://packages.pfsense.org/packages/config/zabbix2/zabbix2-agent.xml</config_file>
+		<version>zabbix24-agent-2.4.3 pkg v0.8.3</version>
 		<status>BETA</status>
 		<required_version>2.2</required_version>
 		<configurationfile>zabbix2-agent.xml</configurationfile>
@@ -1319,11 +1352,11 @@
 		<depends_on_package_pbi>zabbix24-agent-2.4.3-##ARCH##.pbi</depends_on_package_pbi>
 	</package>
 	<package>
-		<name>Zabbix-2 Proxy</name>
+		<name>Zabbix-2.4 Proxy</name>
 		<descr>Monitoring agent proxy.</descr>
 		<category>Services</category>
 		<config_file>https://packages.pfsense.org/packages/config/zabbix2/zabbix2-proxy.xml</config_file>
-		<version>zabbix2-proxy-2.4.3 pkg v0.8.3</version>
+		<version>zabbix24-proxy-2.4.3 pkg v0.8.3</version>
 		<status>BETA</status>
 		<required_version>2.2</required_version>
 		<configurationfile>zabbix2-proxy.xml</configurationfile>

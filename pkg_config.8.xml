@@ -1751,7 +1751,7 @@
 		<configurationfile>syslog-ng.xml</configurationfile>
 	</package>
 	<package>
-		<name>Zabbix-2 Agent</name>
+		<name>Zabbix-2.2 Agent</name>
 		<descr>Monitoring agent.</descr>
 		<category>Services</category>
 		<config_file>https://packages.pfsense.org/packages/config/zabbix2/zabbix2-agent.xml</config_file>
@@ -1769,7 +1769,7 @@
 		<depends_on_package_pbi>zabbix22-agent-2.2.5-i386.pbi</depends_on_package_pbi>
 	</package>
 	<package>
-		<name>Zabbix-2 Proxy</name>
+		<name>Zabbix-2.2 Proxy</name>
 		<descr>Monitoring agent proxy.</descr>
 		<category>Services</category>
 		<config_file>https://packages.pfsense.org/packages/config/zabbix2/zabbix2-proxy.xml</config_file>
