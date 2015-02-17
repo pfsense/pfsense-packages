@@ -326,30 +326,26 @@ function conv_log_filter_lite($logfile, $nentries, $tail, $pfbdenycnt, $pfbpermi
 			if (!in_array($pfbalert[0], $rule_list['id']))
 				continue;
 
-			$pfbalert[1] = $rule_data[4];				// Realint
-			$pfbalert[3] = $rule_data[6];				// Act
-			$pfbalert[4] = $rule_data[8];				// Version
+			$pfbalert[1] = $rule_data[4];		// Realint
+			$pfbalert[3] = $rule_data[6];		// Act
+			$pfbalert[4] = $rule_data[8];		// Version
 
 			if ($pfbalert[4] == "4") {
-				$pfbalert[5]	= $rule_data[15];		// Protocol ID
-				$pfbalert[6]	= $rule_data[16];		// Protocol
-				$pfbalert[7]	= $rule_data[18];		// SRC IP
-				$pfbalert[8]	= $rule_data[19];		// DST IP
-				$pfbalert[9]	= $rule_data[20];		// SRC Port
-				$pfbalert[10]	= $rule_data[21]; 		// DST Port
-				$pfbalert[11]	= $rule_data[23]; 		// TCP Flags
+				$pfbalert[5] = $rule_data[15];	// Protocol ID
+				$pfbalert[6] = $rule_data[16];	// Protocol
+				$pfbalert[7] = $rule_data[18];	// SRC IP
+				$pfbalert[8] = $rule_data[19];	// DST IP
 			} else {
-				$pfbalert[5]	= $rule_data[13];		// Protocol ID
-				$pfbalert[6]	= $rule_data[12];		// Protocol
-				$pfbalert[7]	= "[" . $rule_data[15] . "]";	// SRC IP
-				$pfbalert[8]	= "[" . $rule_data[16] . "]";	// DST IP
-				$pfbalert[9]	= $rule_data[17]; 		// SRC Port
-				$pfbalert[10]	= $rule_data[18]; 		// DST Port
-				$pfbalert[11]	= $rule_data[20]; 		// TCP Flags
+				$pfbalert[5] = $rule_data[14];	// Protocol ID
+				$pfbalert[6] = $rule_data[13];	// Protocol
+				$pfbalert[7] = $rule_data[15];	// SRC IP
+				$pfbalert[8] = $rule_data[16];	// DST IP
 			}
 
 			if ($pfbalert[5] == "6" || $pfbalert[5] == "17") {
-				// skip
+				$pfbalert[9]  = $rule_data[20]; // SRC Port
+				$pfbalert[10] = $rule_data[21]; // DST Port
+				$pfbalert[11] = $rule_data[23]; // TCP Flags
 			} else {
 				$pfbalert[9]  = "";
 				$pfbalert[10] = "";
@@ -632,12 +628,12 @@ if (!empty($fields_array[$type]) && !empty($rule_list)) {
 			$proto = str_replace("TCP", "TCP-", $fields[6]) . $fields[11];
 
 			// Cleanup Port Output
-			if ($fields[6] == "ICMP" || $fields[6] == "ICMPV6") {
-				$srcport = "";
-				$dstport = "";
+			if ($fields[6] == "ICMP") {
+				$srcport = ""; 
+				$dstport = ""; 
 			} else {
-				$srcport = ":" . $fields[9];
-				$dstport = ":" . $fields[10];
+				$srcport = " :" . $fields[9];
+				$dstport = " :" . $fields[10];
 			}
 
 			// Don't add Suppress Icon to Country Block Lines
