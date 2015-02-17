@@ -364,12 +364,12 @@ function pfb_aliastables($mode) {
 		}
 	}
 	else {
-		// Remove earlyshellcmd if found.
+		// Remove Aliastables archive and earlyshellcmd if found.
+		@unlink_if_exists("{$pfb['aliasarchive']}");
 		if (is_array($config['system']['earlyshellcmd'])) {
 			$a_earlyshellcmd = &$config['system']['earlyshellcmd'];
 			if (preg_grep("/pfblockerng.sh aliastables/", $a_earlyshellcmd)) {
 				$a_earlyshellcmd = preg_grep("/pfblockerng.sh aliastables/", $a_earlyshellcmd, PREG_GREP_INVERT);
-				@unlink_if_exists("{$pfb['aliasarchive']}");
 				$msg = "\n** Removing earlyshellcmd **\n";
 			}
 		}
@@ -2459,12 +2459,12 @@ function pfblockerng_php_deinstall_command() {
 		rmdir_recursive("{$pfb['dbdir']}");
 		rmdir_recursive("{$pfb['logdir']}");
 
-		// Remove earlyshellcmd if found.
+		// Remove Aliastables archive and earlyshellcmd if found.
+		@unlink_if_exists("{$pfb['aliasarchive']}");
 		if (is_array($config['system']['earlyshellcmd'])) {
 			$a_earlyshellcmd = &$config['system']['earlyshellcmd'];
 			if (preg_grep("/pfblockerng.sh aliastables/", $a_earlyshellcmd)) {
 				$a_earlyshellcmd = preg_grep("/pfblockerng.sh aliastables/", $a_earlyshellcmd, PREG_GREP_INVERT);
-				@unlink_if_exists("{$pfb['aliasarchive']}");
 			}
 		}
 
