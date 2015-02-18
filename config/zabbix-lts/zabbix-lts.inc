@@ -47,7 +47,7 @@ function php_deinstall_zabbix_agent_lts(){
 
    conf_mount_rw();
 
-   define('ZABBIX_AGENT_BASE', '/usr/pbi/zabbix-agent-lts-' . php_uname("m"));
+   define('ZABBIX_AGENT_BASE', '/usr/pbi/zabbix22-agent-' . php_uname("m"));
 
    exec("/usr/bin/killall zabbix_agentd");
    unlink_if_exists(ZABBIX_AGENT_BASE . "/etc/rc.d/zabbix_agentd_lts.sh");
@@ -70,7 +70,7 @@ function php_deinstall_zabbix_proxy_lts(){
 
    conf_mount_rw();
 
-   define('ZABBIX_PROXY_BASE', '/usr/pbi/zabbix-proxy-lts-' . php_uname("m"));
+   define('ZABBIX_PROXY_BASE', '/usr/pbi/zabbix22-proxy-' . php_uname("m"));
 
    exec("/usr/bin/killall zabbix_proxy");
    unlink_if_exists(ZABBIX_PROXY_BASE . "/etc/rc.d/zabbix_proxy_lts.sh");
@@ -170,8 +170,8 @@ function sync_package_zabbix_lts(){
 
 	conf_mount_rw();
 
-	define('ZABBIX_AGENT_BASE', '/usr/pbi/zabbix-agent-lts-' . php_uname("m"));
-	define('ZABBIX_PROXY_BASE', '/usr/pbi/zabbix-proxy-lts-' . php_uname("m"));
+	define('ZABBIX_AGENT_BASE', '/usr/pbi/zabbix22-agent-' . php_uname("m"));
+	define('ZABBIX_PROXY_BASE', '/usr/pbi/zabbix22-proxy-' . php_uname("m"));
 
 	#check zabbix proxy config
 	if (is_array($config['installedpackages']['zabbixproxylts'])){
