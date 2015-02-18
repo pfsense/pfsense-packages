@@ -200,7 +200,7 @@ EOF;
 	}
 	/* check zabbix agent settings*/
 	if (is_array($config['installedpackages']['zabbixagentlts'])){
-		$zbagent_config = $config['installedpackages']['zabbixagent']['config'][0];
+		$zbagent_config = $config['installedpackages']['zabbixagentlts']['config'][0];
 		if ($zbagent_config['agentenabled']=="on"){
 			$RefreshActChecks=(preg_match("/(\d+)/",$zbagent_config['refreshactchecks'],$matches)? $matches[1] : "120");
 			$BufferSend=(preg_match("/(\d+)/",$zbagent_config['buffersend'],$matches)? $matches[1]  : "5"  );
