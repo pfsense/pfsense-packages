@@ -312,40 +312,40 @@ function conv_log_filter_lite($logfile, $nentries, $tail, $pfbdenycnt, $pfbpermi
 
 	if (!empty($logarr) && !empty($rule_list['id'])) {
 		foreach ($logarr as $logent) {
-			$pfbalert = array();
+			$pfbalert  = array();
 			$log_split = "";
 
 			if (!preg_match("/(.*)\s(.*)\sfilterlog:\s(.*)$/", $logent, $log_split))
 				continue;
 
 			list($all, $pfbalert[99], $host, $rule) = $log_split;
-			$rule_data = explode(",", $rule);
-			$pfbalert[0] = $rule_data[0];		// Rulenum
+			$rule_data	= explode(",", $rule);
+			$pfbalert[0]	= $rule_data[0];		// Rulenum
 
 			// Skip Alert if Rule is not a pfBNG Alert
 			if (!in_array($pfbalert[0], $rule_list['id']))
 				continue;
 
-			$pfbalert[1] = $rule_data[4];				// Realint
-			$pfbalert[3] = $rule_data[6];				// Act
-			$pfbalert[4] = $rule_data[8];				// Version
+			$pfbalert[1] = $rule_data[4];			// Realint
+			$pfbalert[3] = $rule_data[6];			// Act
+			$pfbalert[4] = $rule_data[8];			// Version
 
 			if ($pfbalert[4] == "4") {
-				$pfbalert[5]	= $rule_data[15];		// Protocol ID
-				$pfbalert[6]	= $rule_data[16];		// Protocol
-				$pfbalert[7]	= $rule_data[18];		// SRC IP
-				$pfbalert[8]	= $rule_data[19];		// DST IP
-				$pfbalert[9]	= $rule_data[20];		// SRC Port
-				$pfbalert[10]	= $rule_data[21]; 		// DST Port
-				$pfbalert[11]	= $rule_data[23]; 		// TCP Flags
+				$pfbalert[5]	= $rule_data[15];	// Protocol ID
+				$pfbalert[6]	= $rule_data[16];	// Protocol
+				$pfbalert[7]	= $rule_data[18];	// SRC IP
+				$pfbalert[8]	= $rule_data[19];	// DST IP
+				$pfbalert[9]	= $rule_data[20];	// SRC Port
+				$pfbalert[10]	= $rule_data[21];	// DST Port
+				$pfbalert[11]	= $rule_data[23];	// TCP Flags
 			} else {
-				$pfbalert[5]	= $rule_data[13];		// Protocol ID
-				$pfbalert[6]	= $rule_data[12];		// Protocol
-				$pfbalert[7]	= "[" . $rule_data[15] . "]";	// SRC IP
-				$pfbalert[8]	= "[" . $rule_data[16] . "]";	// DST IP
-				$pfbalert[9]	= $rule_data[17]; 		// SRC Port
-				$pfbalert[10]	= $rule_data[18]; 		// DST Port
-				$pfbalert[11]	= $rule_data[20]; 		// TCP Flags
+				$pfbalert[5]	= $rule_data[13];	// Protocol ID
+				$pfbalert[6]	= $rule_data[12];	// Protocol
+				$pfbalert[7]	= $rule_data[15];	// SRC IP
+				$pfbalert[8]	= $rule_data[16];	// DST IP
+				$pfbalert[9]	= $rule_data[17];	// SRC Port
+				$pfbalert[10]	= $rule_data[18];	// DST Port
+				$pfbalert[11]	= $rule_data[20];	// TCP Flags
 			}
 
 			if ($pfbalert[5] == "6" || $pfbalert[5] == "17") {
@@ -508,12 +508,12 @@ if ($savemsg) {
 <td width="100%" colspan="2">
 <table id="pfbAlertsTable" style="table-layout: fixed;" width="100%" class="sortable" border="0" cellpadding="0" cellspacing="0">
 	<colgroup>
-		<col width="8%" align="center" axis="date">
+		<col width="7%" align="center" axis="date">
 		<col width="6%" align="center" axis="string">
-		<col width="16%" align="center" axis="string">
+		<col width="15%" align="center" axis="string">
 		<col width="6%" align="center" axis="string">
-		<col width="20%" align="center" axis="string">
-		<col width="20%" align="center" axis="string">
+		<col width="21%" align="center" axis="string">
+		<col width="21%" align="center" axis="string">
 		<col width="3%" align="center" axis="string">
 		<col width="13%" align="center" axis="string">
 	</colgroup>
@@ -549,7 +549,7 @@ if ($pfb['runonce']) {
 	}
 
 	$fields_array = conv_log_filter_lite($filter_logfile, $pfblines, $pfblines, $pfbdenycnt, $pfbpermitcnt, $pfbmatchcnt);
-	$continents = array('pfB_Africa','pfB_Antartica','pfB_Asia','pfB_Europe','pfB_NAmerica','pfB_Oceania','pfB_SAmerica','pfB_Top');
+	$continents   = array('pfB_Africa','pfB_Antartica','pfB_Asia','pfB_Europe','pfB_NAmerica','pfB_Oceania','pfB_SAmerica','pfB_Top');
 
 	$supp_ip_txt .= "Clicking this Suppression Icon, will immediately remove the Block.\n\nSuppressing a /32 CIDR is better than Suppressing the full /24";
 	$supp_ip_txt .= " CIDR.\nThe Host will be added to the pfBlockerNG Suppress Alias Table.\n\nOnly 32 or 24 CIDR IPs can be Suppressed with the '+' Icon.";
@@ -651,12 +651,6 @@ if (!empty($fields_array[$type]) && !empty($rule_list)) {
 				$rule = $rule_list[$rulenum]['name'] . "<br />(" . $rulenum .")";
 				$host = $fields[7];
 
-				if (is_ipaddrv4($host)) {
-					$country = substr(exec("$pathgeoip -f $pathgeoipdat $host"),23,2);
-				} else {
-					$country = substr(exec("$pathgeoip6 -f $pathgeoipdat6 $host"),26,2);
-				}
-
 				$alert_ip .= "<a href='/pfblockerng/pfblockerng_diag_dns.php?host={$host}' title=\" " . gettext("Resolve host via Rev. DNS lookup");
 				$alert_ip .= "\"> <img src=\"/themes/{$g['theme']}/images/icons/icon_log.gif\" width=\"11\" height=\"11\" border=\"0\" ";
 				$alert_ip .= "alt=\"Icon Reverse Resolve with DNS\" style=\"cursor: pointer;\"/></a>";
@@ -680,12 +674,6 @@ if (!empty($fields_array[$type]) && !empty($rule_list)) {
 				$rule = $rule_list[$rulenum]['name'] . "<br />(" . $rulenum .")";
 				$host = $fields[8];
 
-				if (is_ipaddrv4($host)) {
-					$country = substr(exec("$pathgeoip -f $pathgeoipdat $host"),23,2);
-				} else {
-					$country = substr(exec("$pathgeoip6 -f $pathgeoipdat6 $host"),26,2);
-				}
-
 				$alert_ip .= "<a href='/pfblockerng/pfblockerng_diag_dns.php?host={$host}' title=\"" . gettext("Resolve host via Rev. DNS lookup");
 				$alert_ip .= "\"> <img src=\"/themes/{$g['theme']}/images/icons/icon_log.gif\" width=\"11\" height=\"11\" border=\"0\" ";
 				$alert_ip .= "alt=\"Icon Reverse Resolve with DNS\" style=\"cursor: pointer;\"/></a>";
@@ -706,26 +694,31 @@ if (!empty($fields_array[$type]) && !empty($rule_list)) {
 				$dst_icons = $alert_ip . "&nbsp;" . $supp_ip . "&nbsp;";
 			}
 
+			// Determine Country Code of Host
+			if (is_ipaddrv4($host)) {
+				$country = substr(exec("$pathgeoip -f $pathgeoipdat $host"),23,2);
+			} else {
+				$country = substr(exec("$pathgeoip6 -f $pathgeoipdat6 $host"),26,2);
+			}
+
 			# IP Query Grep Exclusion
 			$pfb_ex1 = "grep -v 'pfB\_\|\_v6\.txt'";
 			$pfb_ex2 = "grep -v 'pfB\_\|/32\|/24\|\_v6\.txt' | grep -m1 '/'";
 
 			// Find List which contains Blocked IP Host
-			if ($pfb_query == "Country") {
-				# Skip
-			} else {
+			if (is_ipaddrv4($host) && $pfb_query != "Country") {
 				// Search for exact IP Match
 				$host1 = preg_replace("/(\d{1,3})\.(\d{1,3}).(\d{1,3}).(\d{1,3})/", '\'$1\.$2\.$3\.$4\'', $host);
-				$pfb_query = exec("grep -rHm1 {$host1} {$pfbfolder} | sed -e 's/^.*[a-zA-Z]\///' -e 's/:.*//' -e 's/\..*/ /' | {$pfb_ex1}");
+				$pfb_query = exec("/usr/bin/grep -rHm1 {$host1} {$pfbfolder} | sed -e 's/^.*[a-zA-Z]\///' -e 's/:.*//' -e 's/\..*/ /' | {$pfb_ex1}");
 				// Search for IP in /24 CIDR
 				if (empty($pfb_query)) {
 					$host1 = preg_replace("/(\d{1,3})\.(\d{1,3}).(\d{1,3}).(\d{1,3})/", '\'$1\.$2\.$3\.0/24\'', $host);
-					$pfb_query = exec("grep -rHm1 {$host1} {$pfbfolder} | sed -e 's/^.*[a-zA-Z]\///' -e 's/\.txt:/ /' | {$pfb_ex1}");
+					$pfb_query = exec("/usr/bin/grep -rHm1 {$host1} {$pfbfolder} | sed -e 's/^.*[a-zA-Z]\///' -e 's/\.txt:/ /' | {$pfb_ex1}");
 				}
 				// Search for First Two IP Octets in CIDR Matches Only. Skip any pfB (Country Lists) or /32,/24 Addresses.
 				if (empty($pfb_query)) {
 					$host1 = preg_replace("/(\d{1,3})\.(\d{1,3}).(\d{1,3}).(\d{1,3})/", '\'^$1\.$2\.\'', $host);
-					$pfb_query = exec("grep -rH {$host1} {$pfbfolder} | sed -e 's/^.*[a-zA-Z]\///' -e 's/\.txt:/ /' | {$pfb_ex2}");
+					$pfb_query = exec("/usr/bin/grep -rH {$host1} {$pfbfolder} | sed -e 's/^.*[a-zA-Z]\///' -e 's/\.txt:/ /' | {$pfb_ex2}");
 				}
 				// Search for First Two IP Octets in CIDR Matches Only (Subtract 1 from second Octet on each loop).
 				// Skip (Country Lists) or /32,/24 Addresses.
@@ -734,7 +727,7 @@ if (!empty($fields_array[$type]) && !empty($rule_list)) {
 					$host2 = preg_replace("/(\d{1,3})\.(\d{1,3}).(\d{1,3}).(\d{1,3})/", '$2', $host);
 					for ($cnt = 1; $cnt <= 5; $cnt++) {
 						$host3 = $host2 - $cnt . '\'';
-						$pfb_query = exec("grep -rH {$host1}{$host3} {$pfbfolder} | sed -e 's/^.*[a-zA-Z]\///' -e 's/\.txt:/ /' | {$pfb_ex2}");
+						$pfb_query = exec("/usr/bin/grep -rH {$host1}{$host3} {$pfbfolder} | sed -e 's/^.*[a-zA-Z]\///' -e 's/\.txt:/ /' | {$pfb_ex2}");
 						// Break out of loop if found.
 						if (!empty($pfb_query))
 							$cnt = 6;
@@ -743,26 +736,30 @@ if (!empty($fields_array[$type]) && !empty($rule_list)) {
 				// Search for First Three Octets
 				if (empty($pfb_query)) {
 					$host1 = preg_replace("/(\d{1,3})\.(\d{1,3}).(\d{1,3}).(\d{1,3})/", '\'^$1\.$2\.$3\.\'', $host);
-					$pfb_query = exec("grep -rH {$host1} {$pfbfolder} | sed -e 's/^.*[a-zA-Z]\///' -e 's/\.txt:/ /' | {$pfb_ex2}");
+					$pfb_query = exec("/usr/bin/grep -rH {$host1} {$pfbfolder} | sed -e 's/^.*[a-zA-Z]\///' -e 's/\.txt:/ /' | {$pfb_ex2}");
 				}
 				// Search for First Two Octets
 				if (empty($pfb_query)) {
 					$host1 = preg_replace("/(\d{1,3})\.(\d{1,3}).(\d{1,3}).(\d{1,3})/", '\'^$1\.$2\.\'', $host);
-					$pfb_query = exec("grep -rH {$host1} {$pfbfolder} | sed -e 's/^.*[a-zA-Z]\///' -e 's/\.txt:/ /' | {$pfb_ex2}");
+					$pfb_query = exec("/usr/bin/grep -rH {$host1} {$pfbfolder} | sed -e 's/^.*[a-zA-Z]\///' -e 's/\.txt:/ /' | {$pfb_ex2}");
 				}
 				// Report Specific ET IQRisk Details
 				if ($pfb['et_header'] && preg_match("/{$et_header}/", $pfb_query)) {
 					$host1 = preg_replace("/(\d{1,3})\.(\d{1,3}).(\d{1,3}).(\d{1,3})/", '\'$1\.$2\.$3\.$4\'', $host);
-					$pfb_query = exec("grep -Hm1 {$host1} {$pfb['etdir']}/* | sed -e 's/^.*[a-zA-Z]\///' -e 's/:.*//' -e 's/\..*/ /' -e 's/ET_/ET IPrep /' ");
+					$pfb_query = exec("/usr/bin/grep -Hm1 {$host1} {$pfb['etdir']}/* | sed -e 's/^.*[a-zA-Z]\///' -e 's/:.*//' -e 's/\..*/ /' -e 's/ET_/ET IPrep /' ");
 					if (empty($pfb_query)) {
 						$host1 = preg_replace("/(\d{1,3})\.(\d{1,3}).(\d{1,3}).(\d{1,3})/", '\'$1.$2.$3.0/24\'', $host);
-						$pfb_query = exec("grep -rHm1 {$host1} {$pfbfolder} | sed -e 's/^.*[a-zA-Z]\///' -e 's/\.txt:/ /' | {$pfb_ex1}");
+						$pfb_query = exec("/usr/bin/grep -rHm1 {$host1} {$pfbfolder} | sed -e 's/^.*[a-zA-Z]\///' -e 's/\.txt:/ /' | {$pfb_ex1}");
 					}
 				}
-				// Default to "No Match" if not found.
-				if (empty($pfb_query))
-					$pfb_query = "No Match";
 			}
+			elseif (is_ipaddrv6($host) && $pfb_query != "Country") {
+				$pfb_query = exec("/usr/bin/grep -Hm1 '{$host}' {$pfbfolder} | sed -e 's/^.*[a-zA-Z]\///' -e 's/\.txt:/ /' | grep -v 'pfB\_'");
+			}
+
+			// Default to "No Match" if not found.
+			if (empty($pfb_query))
+				$pfb_query = "No Match";
 
 			# Split List Column into Two lines.
 			unset ($pfb_match);
@@ -775,6 +772,16 @@ if (!empty($fields_array[$type]) && !empty($rule_list)) {
 					$pfb_match[1] = "{$pfb_query}";
 					$pfb_match[2] = "";
 				}
+			}
+
+			// Add []'s to IPv6 Addresses and add a zero-width space as soft-break opportunity after each colon if we have an IPv6 address (from Snort)
+			if ($fields[4] == "6") {
+				$fields[97] = "[" . str_replace(":", ":&#8203;", $fields[7]) . "]";
+				$fields[98] = "[" . str_replace(":", ":&#8203;", $fields[8]) . "]";
+			}
+			else {
+				$fields[97] = $fields[7];
+				$fields[98] = $fields[8];
 			}
 
 			// Truncate Long List Names
@@ -800,8 +807,8 @@ if (!empty($fields_array[$type]) && !empty($rule_list)) {
 				<td class='listMRr' align='center'>{$fields[2]}</td>
 				<td class='listMRr' align='center' title='The pfBlockerNG Rule that Blocked this Host.'>{$rule}</td>
 				<td class='listMRr' align='center'>{$proto}</td>
-				<td nowrap='nowrap' class='listMRr' align='center' style='sorttable_customkey:{$fields[7]};' sorttable_customkey='{$fields[7]}'>{$src_icons}{$fields[7]}{$srcport}<br /><small>{$hostname['src']}</small></td>
-				<td nowrap='nowrap' class='listMRr' align='center' style='sorttable_customkey:{$fields[8]};' sorttable_customkey='{$fields[8]}'>{$dst_icons}{$fields[8]}{$dstport}<br /><small>{$hostname['dst']}</small></td>
+				<td class='listMRr' align='center' style='sorttable_customkey:{$fields[7]};' sorttable_customkey='{$fields[7]}'>{$src_icons}{$fields[97]}{$srcport}<br /><small>{$hostname['src']}</small></td>
+				<td class='listMRr' align='center' style='sorttable_customkey:{$fields[8]};' sorttable_customkey='{$fields[8]}'>{$dst_icons}{$fields[98]}{$dstport}<br /><small>{$hostname['dst']}</small></td>
 				<td class='listMRr' align='center'>{$country}</td>
 				<td class='listbg' align='center' title='{$pfb_matchtitle}' style=\"font-size: 10px word-wrap:break-word;\">{$pfb_match[1]}<br />{$pfb_match[2]}</td></tr>";
 			$counter++;
