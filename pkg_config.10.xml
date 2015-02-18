@@ -1303,14 +1303,17 @@
 		<configurationfile>syslog-ng.xml</configurationfile>
 	</package>
 	<package>
-		<name>Zabbix-2.2 Agent</name>
-		<descr>Monitoring agent.</descr>
+		<name>Zabbix Agent LTS</name>
+		<descr>LTS (Long Term Support) release of Zabbix Monitoring agent. Zabbix LTS releases are supported for 
+		Zabbix customers during five (5) years i.e. 3 years of Full Support (general, critical and security issues) 
+		and 2 additional years of Limited Support (critical and security issues only). Zabbix LTS version release 
+		will result in change of the first version number. More info in http://www.zabbix.com/life_cycle_and_release_policy.php </descr>
 		<category>Services</category>
-		<config_file>https://packages.pfsense.org/packages/config/zabbix2/zabbix2-agent.xml</config_file>
-		<version>zabbix22-agent-2.2.7 pkg v0.8.3</version>
+		<config_file>https://packages.pfsense.org/packages/config/zabbix-lts/zabbix-agent-lts.xml</config_file>
+		<version>zabbix-agent-lts-2.2.7 pkg v0.8.3</version>
 		<status>BETA</status>
 		<required_version>2.2</required_version>
-		<configurationfile>zabbix2-agent.xml</configurationfile>
+		<configurationfile>zabbix-agent-lts.xml</configurationfile>
 		<maintainer>dbaio@bsd.com.br</maintainer>
 		<build_pbi>
 			<custom_name>zabbix22-agent</custom_name>
@@ -1319,14 +1322,17 @@
 		<depends_on_package_pbi>zabbix22-agent-2.2.7-##ARCH##.pbi</depends_on_package_pbi>
 	</package>
 	<package>
-		<name>Zabbix-2.2 Proxy</name>
-		<descr>Monitoring agent proxy.</descr>
+		<name>Zabbix Proxy LTS</name>
+		<descr>LTS (Long Term Support) release of Zabbix agent proxy. Zabbix LTS releases are supported for 
+		Zabbix customers during five (5) years i.e. 3 years of Full Support (general, critical and security issues) 
+		and 2 additional years of Limited Support (critical and security issues only). Zabbix LTS version release 
+		will result in change of the first version number. More info in http://www.zabbix.com/life_cycle_and_release_policy.php </descr>
 		<category>Services</category>
-		<config_file>https://packages.pfsense.org/packages/config/zabbix2/zabbix2-proxy.xml</config_file>
-		<version>zabbix22-proxy-2.2.7 pkg v0.8.3</version>
+		<config_file>https://packages.pfsense.org/packages/config/zabbix-lts/zabbix-proxy-lts.xml</config_file>
+		<version>zabbix-proxy-lts-2.2.7 pkg v0.8.3</version>
 		<status>BETA</status>
 		<required_version>2.2</required_version>
-		<configurationfile>zabbix2-proxy.xml</configurationfile>
+		<configurationfile>zabbix-proxy-lts.xml</configurationfile>
 		<maintainer>dbaio@bsd.com.br</maintainer>
 		<build_pbi>
 			<custom_name>zabbix22-proxy</custom_name>
@@ -1336,8 +1342,12 @@
 		<depends_on_package_pbi>zabbix22-proxy-2.2.7-##ARCH##.pbi</depends_on_package_pbi>
 	</package>
 	<package>
-		<name>Zabbix-2.4 Agent</name>
-		<descr>Monitoring agent.</descr>
+		<name>Zabbix-2 Agent</name>
+		<descr>Standard release of Zabbix Monitoring agent. Standard Zabbix releases are supported for 
+		Zabbix customers during six (6) months of Full Support (general, critical and security issues) until 
+		the next Zabbix stable release, plus one (1) additional month of Limited Support (critical and security 
+		issues only). Zabbix Standard version release will result in change of the second version number.
+		More info in http://www.zabbix.com/life_cycle_and_release_policy.php </descr>
 		<category>Services</category>
 		<config_file>https://packages.pfsense.org/packages/config/zabbix2/zabbix2-agent.xml</config_file>
 		<version>zabbix24-agent-2.4.3 pkg v0.8.3</version>
@@ -1352,8 +1362,12 @@
 		<depends_on_package_pbi>zabbix24-agent-2.4.3-##ARCH##.pbi</depends_on_package_pbi>
 	</package>
 	<package>
-		<name>Zabbix-2.4 Proxy</name>
-		<descr>Monitoring agent proxy.</descr>
+		<name>Zabbix-2 Proxy</name>
+		<descr>Standard release of Zabbix agent proxy. Standard Zabbix releases are supported for 
+		Zabbix customers during six (6) months of Full Support (general, critical and security issues) until 
+		the next Zabbix stable release, plus one (1) additional month of Limited Support (critical and security 
+		issues only). Zabbix Standard version release will result in change of the second version number.
+		More info in http://www.zabbix.com/life_cycle_and_release_policy.php </descr>
 		<category>Services</category>
 		<config_file>https://packages.pfsense.org/packages/config/zabbix2/zabbix2-proxy.xml</config_file>
 		<version>zabbix24-proxy-2.4.3 pkg v0.8.3</version>
