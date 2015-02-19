@@ -234,6 +234,7 @@
 			<fieldname>pfb_keep</fieldname>
 			<type>checkbox</type>
 			<description>Keep Settings and Lists intact when pfBlockerNG is Disabled or After pfBlockerNG Re-Install/De-Install</description>
+			<default_value>on</default_value>
 		</field>
 		<field>
 			<fielddescr>CRON MIN Start Time</fielddescr>
