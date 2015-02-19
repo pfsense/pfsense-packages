@@ -251,7 +251,7 @@ if ($argv[1] == 'gc') {
 }
 
 if ($argv[1] == 'cron') {
-	$hour = date('H');
+	$hour = date('G');
 	$dow  = date('N');
 	$pfb['update_cron'] = FALSE;
 
@@ -270,7 +270,7 @@ if ($argv[1] == 'cron') {
 	$sch2 = strval($shour);
 	for ($i=0; $i<11; $i++) {
 		$shour += 2;
-		if ($shour > 24)
+		if ($shour >= 24)
 			$shour -= 24;
 		$sch2 .= "," . strval($shour);
 	}
@@ -280,7 +280,7 @@ if ($argv[1] == 'cron') {
 	$sch3 = strval($shour);
 	for ($i=0; $i<7; $i++) {
 		$shour += 3;
-		if ($shour > 24)
+		if ($shour >= 24)
 			$shour -= 24;
 		$sch3 .= "," . strval($shour);
 	}
@@ -290,7 +290,7 @@ if ($argv[1] == 'cron') {
 	$sch4 = strval($shour);
 	for ($i=0; $i<5; $i++) {
 		$shour += 4;
-		if ($shour > 24)
+		if ($shour >= 24)
 			$shour -= 24;
 		$sch4 .= "," . strval($shour);
 	}
@@ -300,7 +300,7 @@ if ($argv[1] == 'cron') {
 	$sch6 = strval($shour);
 	for ($i=0; $i<3; $i++) {
 		$shour += 6;
-		if ($shour > 24)
+		if ($shour >= 24)
 			$shour -= 24;
 		$sch6 .= "," . strval($shour);
 	}
@@ -310,7 +310,7 @@ if ($argv[1] == 'cron') {
 	$sch8 = strval($shour);
 	for ($i=0; $i<2; $i++) {
 		$shour += 8;
-		if ($shour > 24)
+		if ($shour >= 24)
 			$shour -= 24;
 		$sch8 .= "," . strval($shour);
 	}
@@ -319,7 +319,7 @@ if ($argv[1] == 'cron') {
 	$shour = intval(substr($pfb['hour'], 0, 2));
 	$sch12 = strval($shour) . ",";
 	$shour += 12;
-	if ($shour > 24)
+	if ($shour >= 24)
 		$shour -= 24;
 	$sch12 .= strval($shour);
 
