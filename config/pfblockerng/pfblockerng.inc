@@ -440,6 +440,8 @@ function sync_package_pfblockerng($cron = "") {
 	$pfb['validate']= $pfb['config']['pfblocker_cb'];
 	# User Defined CRON Start Minute
 	$pfb['min']	= $pfb['config']['pfb_min'];
+	# User Defined CRON Start Hour
+	$pfb['hour']	= $pfb['config']['pfb_hour'];
 	# Reloads Existing Blocklists without Downloading New Lists
 	$pfb['reuse']	= $pfb['config']['pfb_reuse'];
 	# Enable OpenVPN AutoRules
@@ -2339,13 +2341,13 @@ function sync_package_pfblockerng($cron = "") {
 		# Define pfBlockerNG CRON Job
 		$pfb_cmd	= "/usr/local/bin/php /usr/local/www/pfblockerng/pfblockerng.php cron >> {$pfb['log']} 2>&1";
 		# $pfb['min'] ( User Defined Variable. Variable defined at start of Script )
-		$pfb_hour	= "*";
+		# $pfb['hour'] ( User Defined Variable. Variable defined at start of Script )
 		$pfb_mday	= "*";
 		$pfb_month	= "*";
 		$pfb_wday	= "*";
 		$pfb_who	= "root";
 
-		install_cron_job($pfb_cmd, true, $pfb['min'], $pfb_hour, $pfb_mday, $pfb_month, $pfb_wday, $pfb_who);
+		install_cron_job($pfb_cmd, true, $pfb['min'], $pfb['hour'], $pfb_mday, $pfb_month, $pfb_wday, $pfb_who);
 	}
 
 	# Clear any existing pfBlockerNG MaxMind CRON Job
