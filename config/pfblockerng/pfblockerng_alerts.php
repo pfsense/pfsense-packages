@@ -570,7 +570,10 @@ if ($pfb['runonce']) {
 	// Collect Virtual IP Aliases for Inbound/Outbound List Matching
 	if (is_array($config['virtualip']['vip'])) {
 		foreach ($config['virtualip']['vip'] as $list) {
-			$pfb_local[] = $list['subnet'];
+			if ($list['type'] == "single" && $list['subnet_bits'] == "32")
+				$pfb_local[] = $list['subnet'];
+			elseif ($list['type'] == "single" || $list['type'] == "network")
+				$pfb_local = array_merge (subnet_expand ("{$list['subnet']}/{$list['subnet_bits']}"), $pfb_local);
 		}
 	}
 	// Collect NAT IP Addresses for Inbound/Outbound List Matching
