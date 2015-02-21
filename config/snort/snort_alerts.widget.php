@@ -46,7 +46,7 @@ $alertColClass = "listMRr";
 
 /* check if Snort widget alert display lines value is set */
 $snort_nentries = $config['widgets']['widget_snort_display_lines'];
-if (!isset($snort_nentries) || $snort_nentries < 0)
+if (!isset($snort_nentries) || $snort_nentries <= 0)
 	$snort_nentries = 5;
 
 /* array sorting of the alerts */
@@ -95,7 +95,11 @@ if (isset($_GET['getNewAlerts'])) {
 
 // See if saving new display line count value
 if(isset($_POST['widget_snort_display_lines'])) {
-	$config['widgets']['widget_snort_display_lines'] = $_POST['widget_snort_display_lines'];
+	if($_POST['widget_snort_display_lines'] == "") {
+		unset($config['widgets']['widget_snort_display_lines']);
+	} else {
+		$config['widgets']['widget_snort_display_lines'] = max(intval($_POST['widget_snort_display_lines']), 1);
+	}
 	write_config("Saved Snort Alerts Widget Displayed Lines Parameter via Dashboard");
 	header("Location: ../../index.php");
 }
