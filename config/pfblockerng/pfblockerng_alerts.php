@@ -578,8 +578,7 @@ if ($savemsg) {
 						</td>
 					</tr>
 						<td colspan="5" style="vertical-align:bottom">
-
-							<br /><?printf(gettext('Regex Style Matching Only! %1$s Regular Expression Help link%2$s.'), '<a target="_blank" href="http://www.php.net/manual/en/book.pcre.php">', '</a>');?>&nbsp;&nbsp <?=gettext("Precede with exclamation (!) as first character to exclude match.) ");?>
+							<br /><?printf(gettext('Regex Style Matching Only! %1$s Regular Expression Help link%2$s.'), '<a target="_blank" href="http://www.php.net/manual/en/book.pcre.php">', '</a>');?>&nbsp;&nbsp; <?=gettext("Precede with exclamation (!) as first character to exclude match.) ");?>
 							<br /><?printf(gettext("Example: ( ^80$ - Match Port 80, ^80$|^8080$ - Match both port 80 & 8080 ) "));?><br />
 					</tr>
 					<tr>
