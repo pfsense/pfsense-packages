@@ -934,6 +934,8 @@ if (!empty($fields_array[$type]) && !empty($rule_list)) {
 			$counter++;
 			if ($counter > 0 && $rtype == "block") {
 				$mycounter = $counter;
+			} else {
+				$mycounter = 0;
 			}
 		}
 	}
