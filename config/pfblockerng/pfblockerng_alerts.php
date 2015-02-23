@@ -167,7 +167,6 @@ if ($_POST['filterlogentries_submit']) {
 
 	$filterfieldsarray[9] = $_POST['filterlogentries_srcport'] ? $_POST['filterlogentries_srcport'] : null;
 	$filterfieldsarray[10] = $_POST['filterlogentries_dstport'] ? $_POST['filterlogentries_dstport'] : null;
-	$filterfieldsarray[90] = $_POST['filterlogentries_dnsbl'] ? $_POST['filterlogentries_dnsbl'] : null;
 	$filterfieldsarray[99] = $_POST['filterlogentries_date'] ? $_POST['filterlogentries_date'] : null;
 }
 
