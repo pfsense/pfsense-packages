@@ -69,6 +69,9 @@ $filter_logfile = "{$g['varlog_path']}/filter.log";
 $pathgeoipdat	= "/usr/pbi/pfblockerng-" . php_uname("m") . "/share/GeoIP/GeoIP.dat";
 $pathgeoipdat6	= "/usr/pbi/pfblockerng-" . php_uname("m") . "/share/GeoIP/GeoIPv6.dat";
 
+// Define Alerts Log filter Rollup window variable. (Alert Filtering Code adapted from B.Meeks - Snort Package)
+$pfb['filterlogentries'] = FALSE;
+
 // Emerging Threats IQRisk Header Name Reference
 $pfb['et_header'] = TRUE;
 $et_header = $config['installedpackages']['pfblockerngreputation']['config'][0]['et_header'];
@@ -126,6 +129,54 @@ if (is_array($config['installedpackages']['pfblockerngglobal'])) {
 	$pfbpermitcnt	= $config['installedpackages']['pfblockerngglobal']['pfbpermitcnt'];
 	$pfbmatchcnt	= $config['installedpackages']['pfblockerngglobal']['pfbmatchcnt'];
 }
+
+
+function pfb_match_filter_field($flent, $fields) {
+	foreach ($fields as $key => $field) {
+		if ($field == null)
+			continue;
+		if ((strpos($field, '!') === 0)) {
+			$field = substr($field, 1);
+			$field_regex = str_replace('/', '\/', str_replace('\/', '/', $field));
+			if (@preg_match("/{$field_regex}/i", $flent[$key]))
+				return false;
+		}
+		else {
+			$field_regex = str_replace('/', '\/', str_replace('\/', '/', $field));
+			if (!@preg_match("/{$field_regex}/i", $flent[$key]))
+				return false;
+		}
+	}
+	return true;
+}
+
+
+if ($_POST['filterlogentries_submit']) {
+	// Set flag for filtering alert entries
+	$pfb['filterlogentries'] = TRUE;
+
+	// Note the order of these fields must match the order decoded from the alerts log
+	$filterfieldsarray = array();
+	$filterfieldsarray[0] = $_POST['filterlogentries_rule'] ? $_POST['filterlogentries_rule'] : null;
+	$filterfieldsarray[2] = $_POST['filterlogentries_int'] ? $_POST['filterlogentries_int'] : null;
+	$filterfieldsarray[6] = strtolower($_POST['filterlogentries_proto']) ? $_POST['filterlogentries_proto'] : null;
+
+	// Remove any zero-length spaces added to the IP address that could creep in from a copy-paste operation
+	$filterfieldsarray[7] = $_POST['filterlogentries_srcip'] ? str_replace("\xE2\x80\x8B", "", $_POST['filterlogentries_srcip']) : null;
+	$filterfieldsarray[8] = $_POST['filterlogentries_dstip'] ? str_replace("\xE2\x80\x8B", "", $_POST['filterlogentries_dstip']) : null;
+
+	$filterfieldsarray[9] = $_POST['filterlogentries_srcport'] ? $_POST['filterlogentries_srcport'] : null;
+	$filterfieldsarray[10] = $_POST['filterlogentries_dstport'] ? $_POST['filterlogentries_dstport'] : null;
+	$filterfieldsarray[90] = $_POST['filterlogentries_dnsbl'] ? $_POST['filterlogentries_dnsbl'] : null;
+	$filterfieldsarray[99] = $_POST['filterlogentries_date'] ? $_POST['filterlogentries_date'] : null;
+}
+
+
+if ($_POST['filterlogentries_clear']) {
+	$pfb['filterlogentries'] = TRUE;
+	$filterfieldsarray = array();
+}
+
 
 // Collect pfBlockerNG Firewall Rules
 if (!empty($results)) {
@@ -298,7 +349,7 @@ function check_lan_dest($lan_ip,$lan_mask,$dest_ip,$dest_mask="32") {
 
 // Parse Filter log for pfBlockerNG Alerts
 function conv_log_filter_lite($logfile, $nentries, $tail, $pfbdenycnt, $pfbpermitcnt, $pfbmatchcnt) {
-	global $rule_list;
+	global $pfb, $rule_list, $filterfieldsarray;
 	$fields_array	= array();
 	$logarr		= "";
 	$denycnt	= 0;
@@ -360,8 +411,13 @@ function conv_log_filter_lite($logfile, $nentries, $tail, $pfbdenycnt, $pfbpermi
 			if (($pfbalert[3] . $pfbalert[8] . $pfbalert[10]) == $previous_dstip || ($pfbalert[3] . $pfbalert[7] . $pfbalert[9]) == $previous_srcip)
 				continue;
 
-			$pfbalert[2] = convert_real_interface_to_friendly_descr($rule_data[4]); // Friendly Interface Name
-			$pfbalert[6] = strtoupper($pfbalert[6]);
+			$pfbalert[2] = convert_real_interface_to_friendly_descr($rule_data[4]);					// Friendly Interface Name
+			$pfbalert[6] = str_replace("TCP", "TCP-", strtoupper($pfbalert[6]), $pfbalert[6]) . $pfbalert[11];	// Protocol Flags
+
+			// If Alerts Filtering is selected, process Filters as required.
+			if ($pfb['filterlogentries'] && !pfb_match_filter_field($pfbalert, $filterfieldsarray)) {
+				continue;
+			}
 
 			if ($pfbalert[3] == "block") {
 				if ($denycnt < $pfbdenycnt) {
@@ -445,7 +501,7 @@ if ($savemsg) {
 	</tr>
 	<tr>
 	<td><div id="mainarea">
-		<table id="maintable" class="tabcont" width="100%" border="0" cellspacing="0" cellpadding="6">
+		<table id="maintable" class="tabcont" width="100%" border="0" cellspacing="0" cellpadding="4">
 			<tr>
 				<td colspan="3" class="vncell" align="left"><?php echo gettext("LINKS :"); ?>&nbsp;
 				<a href='/firewall_aliases.php' target="_blank"><?php echo gettext("Firewall Alias"); ?></a>&nbsp;
@@ -473,6 +529,71 @@ if ($savemsg) {
 				<?php printf(gettext("Currently Suppressing &nbsp; %s$pfbsupp_cnt%s &nbsp; Hosts."), '<strong>', '</strong>');?>
 			</td>
 			</tr>
+			<tr>
+				<td colspan="3" class="listtopic"><?php echo gettext("Alert Log View Filter"); ?></td>
+			</tr>
+			<tr id="filter_enable_row" style="display:<?php if (!$pfb['filterlogentries']) {echo "table-row;";} else {echo "none;";} ?>">
+				<td width="10%" class="vncell"><?php echo gettext('Filter Options'); ?></td>
+				<td width="90%" class="vtable">
+					<input name="show_filter" id="show_filter" type="button" class="formbtns" value="<?=gettext("Show Filter");?>" onclick="enable_showFilter();" />
+					&nbsp;&nbsp;<?=gettext("Click to display advanced filtering options dialog");?>
+				</td>
+			</tr>
+			<tr id="filter_options_row" style="display:<?php if (!$pfb['filterlogentries']) {echo "none;";} else {echo "table-row;";} ?>">
+				<td colspan="2">
+					<table width="100%" border="0" cellspacing="0" cellpadding="1" summary="action">
+					<tr>
+						<td valign="top">
+							<div align="center"><?=gettext("Date");?></div>
+							<div align="center"><input id="filterlogentries_date" name="filterlogentries_date" class="formfld search" type="text" size="15" value="<?= $filterfieldsarray[99] ?>" /></div>
+						</td>
+						<td valign="top">
+							<div align="center"><?=gettext("Interface");?></div>
+							<div align="center"><input id="filterlogentries_int" name="filterlogentries_int" class="formfld search" type="text" size="15" value="<?= $filterfieldsarray[2] ?>" /></div>
+						</td>
+						<td valign="top">
+							<div align="center"><?=gettext("Rule Number Only");?></div>
+							<div align="center"><input id="filterlogentries_rule" name="filterlogentries_rule" class="formfld search" type="text" size="15" value="<?= $filterfieldsarray[0] ?>" /></div>
+						</td>
+						<td valign="top">
+							<div align="center"><?=gettext("Protocol");?></div>
+							<div align="center"><input id="filterlogentries_proto" name="filterlogentries_proto" class="formfld search" type="text" size="15" value="<?= $filterfieldsarray[6] ?>" /></div>
+						</td>
+					</tr>
+					<tr>
+						<td valign="top">
+							<div align="center"><?=gettext("Source IP Address");?></div>
+							<div align="center"><input id="filterlogentries_srcip" name="filterlogentries_srcip" class="formfld search" type="text" size="28" value="<?= $filterfieldsarray[7] ?>" /></div>
+						</td>
+						<td valign="top">
+							<div align="center"><?=gettext("Source Port");?></div>
+							<div align="center"><input id="filterlogentries_srcport" name="filterlogentries_srcport" class="formfld search" type="text" size="5" value="<?= $filterfieldsarray[9] ?>" /></div>
+						</td>
+						<td valign="top">
+							<div align="center"><?=gettext("Destination IP Address");?></div>
+							<div align="center"><input id="filterlogentries_dstip" name="filterlogentries_dstip" class="formfld search" type="text" size="28" value="<?= $filterfieldsarray[8] ?>" /></div>
+						</td>
+						<td valign="top">
+							<div align="center"><?=gettext("Destination Port");?></div>
+							<div align="center"><input id="filterlogentries_dstport" name="filterlogentries_dstport" class="formfld search" type="text" size="5" value="<?= $filterfieldsarray[10] ?>" /></div>
+						</td>
+					</tr>
+						<td colspan="5" style="vertical-align:bottom">
+
+							<br /><?printf(gettext('Regex Style Matching Only! %1$s Regular Expression Help link%2$s.'), '<a target="_blank" href="http://www.php.net/manual/en/book.pcre.php">', '</a>');?>&nbsp;&nbsp <?=gettext("Precede with exclamation (!) as first character to exclude match.) ");?>
+							<br /><?printf(gettext("Example: ( ^80$ - Match Port 80, ^80$|^8080$ - Match both port 80 & 8080 ) "));?><br />
+					</tr>
+					<tr>
+						<td colspan="1" style="vertical-align:bottom">
+							<div align="left"><input id="filterlogentries_submit" name="filterlogentries_submit" type="submit" class="formbtns" value="<?=gettext("Apply Filter");?>" title="<?=gettext("Apply filter"); ?>" />
+							&nbsp;&nbsp;&nbsp;<input id="filterlogentries_clear" name="filterlogentries_clear" type="submit" class="formbtns" value="<?=gettext("Clear");?>" title="<?=gettext("Remove filter");?>" />
+							&nbsp;&nbsp;&nbsp;<input id="filterlogentries_hide" name="filterlogentries_hide" type="button" class="formbtns" value="<?=gettext("Hide");?>" onclick="enable_hideFilter();" title="<?=gettext("Hide filter options");?>" /></div>
+						</td>
+					</tr>
+					</table>
+				</td>
+			</tr>
+
 <!--Create Three Output Windows 'Deny', 'Permit' and 'Match'-->
 <?php foreach (array ("Deny" => $pfb['denydir'] . " " . $pfb['nativedir'], "Permit" => $pfb['permitdir'], "Match" => $pfb['matchdir']) as $type => $pfbfolder ):
 	switch($type) {
@@ -632,8 +753,6 @@ if (!empty($fields_array[$type]) && !empty($rule_list)) {
 
 		$rulenum = $fields[0];
 		if ($counter < $pfbentries) {
-			$proto = str_replace("TCP", "TCP-", $fields[6]) . $fields[11];
-
 			// Cleanup Port Output
 			if ($fields[6] == "ICMP" || $fields[6] == "ICMPV6") {
 				$srcport = "";
@@ -660,7 +779,7 @@ if (!empty($fields_array[$type]) && !empty($rule_list)) {
 
 				if ($pfb_query != "Country" && $rtype == "block" && $pfb['supp'] == "on") {
 					$supp_ip .= "<input type='image' name='addsuppress[]' onclick=\"hostruleid('{$host}','{$rule_list[$rulenum]['name']}');\" ";
-					$supp_ip .= "src=\"../themes/{$g['theme']}/images/icons/icon_plus.gif\" title=\"";
+					$supp_ip .= "src=\"../themes/{$g['theme']}/images/icons/icon_pass_add.gif\" title=\"";
 					$supp_ip .= gettext($supp_ip_txt) . "\" border=\"0\" width='11' height='11'/>";
 				}
 
@@ -683,7 +802,7 @@ if (!empty($fields_array[$type]) && !empty($rule_list)) {
 
 				if ($pfb_query != "Country" && $rtype == "block" && $pfb['supp'] == "on") {
 					$supp_ip .= "<input type='image' name='addsuppress[]' onclick=\"hostruleid('{$host}','{$rule_list[$rulenum]['name']}');\" ";
-					$supp_ip .= "src=\"../themes/{$g['theme']}/images/icons/icon_plus.gif\" title=\"";
+					$supp_ip .= "src=\"../themes/{$g['theme']}/images/icons/icon_pass_add.gif\" title=\"";
 					$supp_ip .= gettext($supp_ip_txt) . "\" border=\"0\" width='11' height='11'/>";
 				}
 
@@ -757,7 +876,7 @@ if (!empty($fields_array[$type]) && !empty($rule_list)) {
 				}
 			}
 			elseif (is_ipaddrv6($host) && $pfb_query != "Country") {
-				$pfb_query = exec("/usr/bin/grep -Hm1 '{$host}' {$pfbfolder} | sed -e 's/^.*[a-zA-Z]\///' -e 's/\.txt:/ /' | grep -v 'pfB\_'");
+				$pfb_query = exec("/usr/bin/grep -Hm1 {$host} {$pfbfolder} | sed -e 's/^.*[a-zA-Z]\///' -e 's/\.txt:/ /' | grep -v 'pfB\_'");
 			}
 
 			// Default to "No Match" if not found.
@@ -809,7 +928,7 @@ if (!empty($fields_array[$type]) && !empty($rule_list)) {
 				<td class='listMRr' align='center'>{$fields[99]}</td>
 				<td class='listMRr' align='center'>{$fields[2]}</td>
 				<td class='listMRr' align='center' title='The pfBlockerNG Rule that Blocked this Host.'>{$rule}</td>
-				<td class='listMRr' align='center'>{$proto}</td>
+				<td class='listMRr' align='center'>{$fields[6]}</td>
 				<td class='listMRr' align='center' style='sorttable_customkey:{$fields[7]};' sorttable_customkey='{$fields[7]}'>{$src_icons}{$fields[97]}{$srcport}<br /><small>{$hostname['src']}</small></td>
 				<td class='listMRr' align='center' style='sorttable_customkey:{$fields[8]};' sorttable_customkey='{$fields[8]}'>{$dst_icons}{$fields[98]}{$dstport}<br /><small>{$hostname['dst']}</small></td>
 				<td class='listMRr' align='center'>{$country}</td>
@@ -870,6 +989,16 @@ if ( autoresolve == "on" ) {
 	for (alertcount = 0; alertcount < alertlines; alertcount++) {
 		setTimeout(findhostnames(alertcount), 30);
 	}
+}
+
+function enable_showFilter() {
+	document.getElementById("filter_enable_row").style.display="none";
+	document.getElementById("filter_options_row").style.display="table-row";
+}
+
+function enable_hideFilter() {
+	document.getElementById("filter_enable_row").style.display="table-row";
+	document.getElementById("filter_options_row").style.display="none";
 }
 
 //]]>
