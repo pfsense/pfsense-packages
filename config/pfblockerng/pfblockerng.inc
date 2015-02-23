@@ -78,6 +78,7 @@ function pfb_global() {
 	$pfb['log']	= "{$pfb['logdir']}/pfblockerng.log";
 	$pfb['supptxt']	= "{$pfb['dbdir']}/pfbsuppression.txt";
 	$pfb['script']	= 'sh /usr/local/pkg/pfblockerng/pfblockerng.sh';
+	$pfb['aliasarchive'] = "/usr/pbi/pfblockerng-" . php_uname("m") . "/etc/aliastables.tar.bz2";
 
 	# General Variables
 	$pfb['config']	= $config['installedpackages']['pfblockerng']['config'][0];
@@ -334,6 +335,58 @@ function ip_range_to_subnet_array_temp2($ip1, $ip2) {
 }
 
 
+// Archive Aliastables for NanoBSD and RAMDisk Installations
+function pfb_aliastables($mode) {
+	global $g,$config,$pfb;
+	$earlyshellcmd = "/usr/local/pkg/pfblockerng/pfblockerng.sh aliastables";
+	$msg = "";
+
+	// Only Execute function if Platform is NanoBSD or Ramdisks are used.
+	if (($g['platform'] != "pfSense") || isset($config['system']['use_mfs_tmpvar'])) {
+		conf_mount_rw();
+		if ($mode == "update") {
+			// Archive Aliastable Folder
+			exec ("cd {$pfb['aliasdir']}; ls -A pfB_*.txt && /usr/bin/tar -jcvf {$pfb['aliasarchive']} pfB_*.txt >/dev/null 2>&1");
+			$msg = "\n\nArchiving Aliastable Folder\n";
+		}
+		elseif ($mode == "conf") {
+			// Check conf file for earlyshellcmd
+			if (is_array($config['system']['earlyshellcmd'])) {
+				$a_earlyshellcmd = &$config['system']['earlyshellcmd'];
+				if (!preg_grep("/pfblockerng.sh aliastables/", $a_earlyshellcmd)) {
+					$a_earlyshellcmd[] = "{$earlyshellcmd}";
+					$msg = "\n** Adding earlyshellcmd **\n";
+				}
+			}
+			else {
+				$config['system']['earlyshellcmd'] = "{$earlyshellcmd}";
+				$msg = "\n** Adding earlyshellcmd **\n";
+			}
+		}
+		conf_mount_ro();
+	}
+	else {
+		if (file_exists("{$pfb['aliasarchive']}")) {
+			// Remove Aliastables archive if found.
+			conf_mount_rw();
+			@unlink_if_exists("{$pfb['aliasarchive']}");
+			conf_mount_ro();
+		}
+		// Remove earlyshellcmd if found.
+		if (is_array($config['system']['earlyshellcmd'])) {
+			$a_earlyshellcmd = &$config['system']['earlyshellcmd'];
+			if (preg_grep("/pfblockerng.sh aliastables/", $a_earlyshellcmd)) {
+				$a_earlyshellcmd = preg_grep("/pfblockerng.sh aliastables/", $a_earlyshellcmd, PREG_GREP_INVERT);
+				$msg = "\n** Removing earlyshellcmd **\n";
+			}
+		}
+	}
+
+	if ($msg != "")
+		pfb_logger("{$msg}","1");
+}
+
+
 # Main pfBlockerNG Function
 function sync_package_pfblockerng($cron = "") {
 
@@ -365,14 +418,8 @@ function sync_package_pfblockerng($cron = "") {
 		}
 	}
 
-	# TBC if Required ! (Fetch Timeout in 2.2)
-
-	#apply fetch timeout to pfsense-utils.inc
-	$pfsense_utils = file_get_contents('/etc/inc/pfsense-utils.inc');
-	$new_pfsense_utils = preg_replace("/\/usr\/bin\/fetch -q/","/usr/bin/fetch -T 5 -q",$pfsense_utils);
-	if ($new_pfsense_utils != $pfsense_utils) {
-		@file_put_contents('/etc/inc/pfsense-utils.inc',$new_pfsense_utils, LOCK_EX);
-	}
+	// Call function for NanoBSD/Ramdisk processes.
+	pfb_aliastables("conf");
 
 	# Collect pfSense Max Table Size Entry
 	$pfb['table_limit'] = ($config['system']['maximumtableentries'] != "" ? $config['system']['maximumtableentries'] : "2000000");
@@ -1173,7 +1220,7 @@ function sync_package_pfblockerng($cron = "") {
 	$pattern8 = '[A-Fa-f0-9]{1,4}:[A-Fa-f0-9]{1,4}:[A-Fa-f0-9]{1,4}::\/[0-9]{2}';
 	$pattern9 = '[A-Fa-f0-9]{1,4}:([A-Fa-f0-9]{1,4}::)\/[0-9]{2}';
 	$pattern10 = '[A-Fa-f0-9]{1,4}::\/[0-9]{2}';
-	$pfb['ipv6'] = "/^($pattern1)$|^($pattern2)$|^($pattern3)$|^($pattern4)$|^($pattern5)$|^($pattern6)$|^($pattern7)$|^($pattern8)$|^($pattern9)$|^($pattern10)$/";
+	$pfb['ipv6'] = "/($pattern1)|($pattern2)|($pattern3)|($pattern4)|($pattern5)|($pattern6)|($pattern7)|($pattern8)|($pattern9)|($pattern10)/";
 
 	$pfb['supp_update'] = FALSE;
 	$list_type = array ("pfblockernglistsv4" => "_v4", "pfblockernglistsv6" => "_v6");
@@ -2191,6 +2238,7 @@ function sync_package_pfblockerng($cron = "") {
 		unset ($other_rules,$fother_rules,$permit_rules,$fpermit_rules,$match_rules,$fmatch_rules);
 	}
 
+
 	#################################
 	#	Closing Processes	#
 	#################################
@@ -2223,6 +2271,9 @@ function sync_package_pfblockerng($cron = "") {
 
 		#load filter file which will create the pfctl tables
 		filter_configure();
+
+		// Call function for NanoBSD/Ramdisk processes.
+		pfb_aliastables("update");
 	} else {
 		# Don't Execute on User 'Save'
 		if (!$pfb['save']) {
@@ -2253,8 +2304,11 @@ function sync_package_pfblockerng($cron = "") {
 					$log = implode($result_pfctl);
 					pfb_logger("{$log}","1");
 				}
+
+				// Call function for NanoBSD/Ramdisk processes.
+				pfb_aliastables("update");
 			} else {
-				$log = "\n No Changes to Aliases, Skipping pfctl Update \n";
+				$log = "\nNo Changes to Aliases, Skipping pfctl Update \n";
 				pfb_logger("{$log}","1");
 			}
 		}
@@ -2282,7 +2336,7 @@ function sync_package_pfblockerng($cron = "") {
 
 
 	#########################################
-	#       Define/Apply CRON Jobs          #
+	#	Define/Apply CRON Jobs		#
 	#########################################
 
 	# Clear any existing pfBlockerNG Cron Jobs
@@ -2291,13 +2345,13 @@ function sync_package_pfblockerng($cron = "") {
 	# Replace Cron job with any User Changes to $pfb_min
 	if ($pfb['enable'] == "on") {
 		# Define pfBlockerNG CRON Job
-		$pfb_cmd        = "/usr/local/bin/php /usr/local/www/pfblockerng/pfblockerng.php cron >> {$pfb['log']} 2>&1";
+		$pfb_cmd	= "/usr/local/bin/php /usr/local/www/pfblockerng/pfblockerng.php cron >> {$pfb['log']} 2>&1";
 		# $pfb['min'] ( User Defined Variable. Variable defined at start of Script )
-		$pfb_hour       = "*";
-		$pfb_mday       = "*";
-		$pfb_month      = "*";
-		$pfb_wday       = "*";
-		$pfb_who        = "root";
+		$pfb_hour	= "*";
+		$pfb_mday	= "*";
+		$pfb_month	= "*";
+		$pfb_wday	= "*";
+		$pfb_who	= "root";
 
 		install_cron_job($pfb_cmd, true, $pfb['min'], $pfb_hour, $pfb_mday, $pfb_month, $pfb_wday, $pfb_who);
 	}
@@ -2311,12 +2365,12 @@ function sync_package_pfblockerng($cron = "") {
 
 		# MaxMind GeoIP Cron Hour is randomized between 0-23 Hour to minimize effect on MaxMind Website
 
-		$pfb_gmin       = "0";
-		$pfb_ghour      = rand(0,23);
-		$pfb_gmday      = "1,2,3,4,5,6,7";
-		$pfb_gmonth     = "*";
-		$pfb_gwday      = "2";
-		$pfb_gwho       = "root";
+		$pfb_gmin	= "0";
+		$pfb_ghour	= rand(0,23);
+		$pfb_gmday	= "1,2,3,4,5,6,7";
+		$pfb_gmonth	= "*";
+		$pfb_gwday	= "2";
+		$pfb_gwho	= "root";
 
 		install_cron_job($pfb_gcmd, true, $pfb_gmin, $pfb_ghour, $pfb_gmday, $pfb_gmonth, $pfb_gwday, $pfb_gwho);
 	}
@@ -2412,6 +2466,15 @@ function pfblockerng_php_deinstall_command() {
 		# Remove pfBlockerNG Log and DB Folder
 		rmdir_recursive("{$pfb['dbdir']}");
 		rmdir_recursive("{$pfb['logdir']}");
+
+		// Remove Aliastables archive and earlyshellcmd if found.
+		@unlink_if_exists("{$pfb['aliasarchive']}");
+		if (is_array($config['system']['earlyshellcmd'])) {
+			$a_earlyshellcmd = &$config['system']['earlyshellcmd'];
+			if (preg_grep("/pfblockerng.sh aliastables/", $a_earlyshellcmd)) {
+				$a_earlyshellcmd = preg_grep("/pfblockerng.sh aliastables/", $a_earlyshellcmd, PREG_GREP_INVERT);
+			}
+		}
 
 		# Remove Settings from Config
 		if (is_array($config['installedpackages']['pfblockerng']))
