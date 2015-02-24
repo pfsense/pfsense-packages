@@ -659,7 +659,7 @@ function vhosts_sync_package_php()
 					$tmp .= "				\"PHP_FCGI_MAX_REQUESTS\" => \"500\",\n";
 					$tmp .= "				\"PHP_FCGI_CHILDREN\" => \"1\"\n";
 					$tmp .= "			),\n";
-					$tmp .= "			\"bin-path\" => \"/usr/local/php5/php-cgi\"\n";
+					$tmp .= "			\"bin-path\" => \"/usr/local/bin/php\"\n";
 					$tmp .= "		)\n";
 					$tmp .= "	)\n";
 					$tmp .= ")\n";
@@ -681,11 +681,11 @@ function vhosts_sync_package_php()
 					);
 
 					//add or update a service
-						$a_service   = &$config['installedpackages']['service'];
 						$ent['name'] = "vhosts-ssl-$x";
 						$ent['rcfile'] = "vhosts-".$ipaddress."-".$port."-ssl.sh";
 						$ent['executable'] = "vhosts-".$ipaddress."-".$port."-ssl";
 						$ent['description'] = "vHosts SSL, Host: $host, IP Address: ".$ipaddress.", port: ".$port." desc: ".$description;
+						$ent['custom_php_service_status_command'] = "\$vhost_output=''; exec('/bin/pgrep -anf '.".escapeshellarg($ent['executable']).", \$vhost_output, \$retval); \$rc=(intval(\$retval) == 0);";
 						$a_service   = $config['installedpackages']['service'];
 						$service_id = get_service_id ($a_service, 'name', "vhosts-ssl-$x");
 						if (is_int($service_id)) {

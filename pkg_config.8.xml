@@ -131,7 +131,7 @@
 				Supports ACLs for smart backend switching.]]></descr>
 		<website>http://haproxy.1wt.eu/</website>
 		<category>Services</category>
-		<version>1.4.24 pkg v 1.2.5</version>
+		<version>1.4.24 pkg v 1.2.6</version>
 		<status>Release</status>
 		<required_version>2.0</required_version>
 		<config_file>https://packages.pfsense.org/packages/config/haproxy/haproxy.xml</config_file>
@@ -149,7 +149,7 @@
 				(Legacy version)]]></descr>
 		<website>http://haproxy.1wt.eu/</website>
 		<category>Services</category>
-		<version>1.4.24 pkg v 1.1.1</version>
+		<version>1.4.24 pkg v 1.1.2</version>
 		<status>Release</status>
 		<required_version>2.0</required_version>
 		<config_file>https://packages.pfsense.org/packages/config/haproxy-legacy/haproxy.xml</config_file>
@@ -166,7 +166,7 @@
 				Supports ACLs for smart backend switching.]]></descr>
 		<website>http://haproxy.1wt.eu/</website>
 		<category>Services</category>
-		<version>1.5.3 pkg v 0.15</version>
+		<version>1.5.3 pkg v 0.20</version>
 		<status>Release</status>
 		<required_version>2.1</required_version>
 		<config_file>https://packages.pfsense.org/packages/config/haproxy-devel/haproxy.xml</config_file>
@@ -282,7 +282,7 @@
 		<website>http://www.pureftpd.org/</website>
 		<descr>*DO NOT RUN THIS ON A FIREWALL. USE A DEDICATED MACHINE!* Pure FTPd Server is a fast, production quality, standards-conformant FTP server based on Troll-FTPd. It has no known vulnerabilities, is trivial to set up, and is especially designed for modern kernels. Features include PAM support, IPv6, chroot()ed home directories, virtual domains, built-in 'ls', FXP protocol, anti-warez system, bandwidth throttling, restricted ports for passive downloads, an LDAP backend, XML output, and more.</descr>
 		<category>FTP</category>
-		<config_file>https://packages.pfsense.org/packages/config/pure-ftpd.xml</config_file>
+		<config_file>https://packages.pfsense.org/packages/config/pure-ftpd/pure-ftpd.xml</config_file>
 		<depends_on_package_base_url>https://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
 		<depends_on_package>pure-ftpd-1.0.35.tbz</depends_on_package>
 		<depends_on_package_pbi>pure-ftpd-1.0.36-i386.pbi</depends_on_package_pbi>
@@ -469,7 +469,7 @@
 		</build_pbi>
 		<build_options>barnyard2_UNSET=ODBC PGSQL PRELUDE;barnyard2_SET=GRE IPV6 MPLS MYSQL PORT_PCAP BRO;snort_SET=PERFPROFILE SOURCEFIRE GRE IPV6 NORMALIZER APPID;snort_UNSET=PULLEDPORK FILEINSPECT HA;perl_SET=THREADS</build_options>
 		<config_file>https://packages.pfsense.org/packages/config/snort/snort.xml</config_file>
-		<version>2.9.7.0 pkg v3.2.1</version>
+		<version>2.9.7.0 pkg v3.2.3</version>
 		<required_version>2.1</required_version>
 		<status>Stable</status>
 		<configurationfile>/snort.xml</configurationfile>
@@ -480,7 +480,7 @@
 		<website>http://www.olsr.org/</website>
 		<descr>The olsr.org OLSR daemon is an implementation of the Optimized Link State Routing protocol. OLSR is a routing protocol for mobile ad-hoc networks. The protocol is pro-active, table driven and utilizes a technique called multipoint relaying for message flooding.</descr>
 		<category>Services</category>
-		<config_file>https://packages.pfsense.org/packages/config/olsrd.xml</config_file>
+		<config_file>https://packages.pfsense.org/packages/config/olsrd/olsrd.xml</config_file>
 		<depends_on_package_base_url>https://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
 		<depends_on_package>olsrd-0.6.2.tbz</depends_on_package>
 		<depends_on_package_pbi>olsrd-0.6.3-i386.pbi</depends_on_package_pbi>
@@ -607,13 +607,13 @@
 		<website>http://siproxd.sourceforge.net/</website>
 		<descr>Proxy for handling NAT of multiple SIP devices to a single public IP.</descr>
 		<category>Services</category>
-		<config_file>https://packages.pfsense.org/packages/config/siproxd.xml</config_file>
+		<config_file>https://packages.pfsense.org/packages/config/siproxd/siproxd.xml</config_file>
 		<depends_on_package_base_url>https://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
 		<depends_on_package>siproxd-0.8.0.tbz</depends_on_package>
 		<depends_on_package_pbi>siproxd-0.8.0-i386.pbi</depends_on_package_pbi>
 		<pkginfolink>https://doc.pfsense.org/index.php/Siproxd_package</pkginfolink>
 		<build_port_path>/usr/ports/net/siproxd</build_port_path>
-		<version>0.8.0_2 pkg v1.0.1</version>
+		<version>0.8.0_2 pkg v1.0.2</version>
 		<status>Beta</status>
 		<required_version>1.2.1</required_version>
 		<configurationfile>siproxd.xml</configurationfile>
@@ -641,7 +641,7 @@
 		<descr>High performance web proxy report (LightSquid). Proxy realtime stat (SQStat). Requires squid HTTP proxy.</descr>
 		<website>http://lightsquid.sf.net/</website>
 		<category>Network Report</category>
-		<version>1.8.2 pkg v.2.33</version>
+		<version>1.8.2 pkg v.2.35</version>
 		<maintainer>dv_serg@mail.ru</maintainer>
 		<depends_on_package_base_url>https://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
 		<depends_on_package>lightsquid-1.8_2.tbz</depends_on_package>
@@ -755,7 +755,7 @@
 		<depends_on_package>vnstat-1.11.tbz</depends_on_package>
 		<depends_on_package_pbi>vnstat-1.11_1-i386.pbi</depends_on_package_pbi>
 		<build_port_path>/usr/ports/net/vnstat</build_port_path>
-		<version>1.11_1,2</version>
+		<version>1.11_1,3</version>
 		<status>Stable</status>
 		<required_version>2.0</required_version>
 		<maintainer>bryan.paradis@gmail.com</maintainer>
@@ -784,7 +784,7 @@
 		<descr>pfSense version of TinyDNS which features failover host support</descr>
 		<website>http://cr.yp.to/djbdns.html</website>
 		<category>Services</category>
-		<version>1.0.6.19</version>
+		<version>1.0.6.21</version>
 		<status>Beta</status>
 		<pkginfolink>https://doc.pfsense.org/index.php/Tinydns_package</pkginfolink>
 		<required_version>2.0</required_version>
@@ -809,7 +809,7 @@
 		<descr>VMware Tools</descr>
 		<website>http://open-vm-tools.sourceforge.net/</website>
 		<category>Services</category>
-		<version>8.7.0.3046.1 (build-425873)</version>
+		<version>8.7.0.3046.1_1 (build-425873)</version>
 		<status>Stable</status>
 		<pkginfolink>https://doc.pfsense.org/index.php/Open_VM_Tools_package</pkginfolink>
 		<required_version>2.0</required_version>
@@ -958,7 +958,7 @@
 		<website>http://www.mindrot.org/pfflowd.html</website>
 		<descr>pfflowd converts OpenBSD PF status messages (sent via the pfsync interface) to Cisco NetFlow datagrams. These datagrams may be sent (via UDP) to a host of one's choice. Utilising the OpenBSD stateful packet filter infrastructure means that flow tracking is very fast and accurate.</descr>
 		<category>Network Management</category>
-		<config_file>https://packages.pfsense.org/packages/config/pfflowd.xml</config_file>
+		<config_file>https://packages.pfsense.org/packages/config/pfflowd/pfflowd.xml</config_file>
 		<depends_on_package_base_url>https://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
 		<depends_on_package>pfflowd-0.8.tbz</depends_on_package>
 		<depends_on_package_pbi>pfflowd-0.8-i386.pbi</depends_on_package_pbi>
@@ -981,7 +981,7 @@
 		<status>Stable</status>
 		<pkginfolink>https://doc.pfsense.org/index.php/Widentd_package</pkginfolink>
 		<required_version>1.2.1</required_version>
-		<config_file>https://packages.pfsense.org/packages/config/widentd.xml</config_file>
+		<config_file>https://packages.pfsense.org/packages/config/widentd/widentd.xml</config_file>
 		<configurationfile>widentd.xml</configurationfile>
 		<build_port_path>/usr/ports/net/widentd</build_port_path>
 	</package>
@@ -998,7 +998,7 @@
 		<depends_on_package>freeradius-1.1.8_4.tbz</depends_on_package>
 		<depends_on_package>libltdl-2.4_1.tbz</depends_on_package>
 		<depends_on_package_pbi>freeradius-1.1.8_5-i386.pbi</depends_on_package_pbi>
-		<config_file>https://packages.pfsense.org/packages/config/freeradius.xml</config_file>
+		<config_file>https://packages.pfsense.org/packages/config/freeradius/freeradius.xml</config_file>
 		<configurationfile>freeradius.xml</configurationfile>
 		<build_port_path>/usr/ports/net/freeradius</build_port_path>
 		<build_port_path>/usr/ports/devel/libltdl</build_port_path>
@@ -1069,7 +1069,7 @@
 		<status>Stable</status>
 		<pkginfolink>https://doc.pfsense.org/index.php/Stunnel_package</pkginfolink>
 		<required_version>1.2.1</required_version>
-		<config_file>https://packages.pfsense.org/packages/config/stunnel.xml</config_file>
+		<config_file>https://packages.pfsense.org/packages/config/stunnel/stunnel.xml</config_file>
 		<configurationfile>stunnel.xml</configurationfile>
 		<build_port_path>/usr/ports/security/stunnel</build_port_path>
 		<build_options>WITHOUT_FORK=true;WITH_PTHREAD=true;WITHOUT_UCONTEXT=true;WITHOUT_IPV6=true;WITH_LIBWRAP=true;WITHOUT_SSL_PORT=true</build_options>
@@ -1079,7 +1079,7 @@
 		<website>http://dast.nlanr.net/Projects/Iperf/</website>
 		<descr>Iperf is a tool for testing network throughput, loss, and jitter.</descr>
 		<category>Network Management</category>
-		<config_file>https://packages.pfsense.org/packages/config/iperf.xml</config_file>
+		<config_file>https://packages.pfsense.org/packages/config/iperf/iperf.xml</config_file>
 		<depends_on_package_base_url>https://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
 		<depends_on_package>iperf-2.0.5.tbz</depends_on_package>
 		<depends_on_package_pbi>iperf-2.0.5-i386.pbi</depends_on_package_pbi>
@@ -1095,7 +1095,7 @@
 		<website>http://freshmeat.net/projects/netio/</website>
 		<descr>This is a network benchmark for DOS, OS/2 2.x, Windows NT/2000 and Unix. It measures the net throughput of a network via NetBIOS and/or TCP/IP protocols (Unix and DOS only support TCP/IP) using various different packet sizes.</descr>
 		<category>Network Management</category>
-		<config_file>https://packages.pfsense.org/packages/config/netio.xml</config_file>
+		<config_file>https://packages.pfsense.org/packages/config/netio/netio.xml</config_file>
 		<depends_on_package_base_url>https://files.pfsense.org/packages/8/All</depends_on_package_base_url>
 		<depends_on_package>netio-1.26.tbz</depends_on_package>
 		<depends_on_package_pbi>netio-1.26-i386.pbi</depends_on_package_pbi>
@@ -1117,7 +1117,7 @@
 		<version>0.85_1.1</version>
 		<status>Stable</status>
 		<required_version>2.0</required_version>
-		<config_file>https://packages.pfsense.org/packages/config/mtr-nox11.xml</config_file>
+		<config_file>https://packages.pfsense.org/packages/config/mtr-nox11/mtr-nox11.xml</config_file>
 		<configurationfile>mtr-nox11.xml</configurationfile>
 		<build_port_path>/usr/ports/net/mtr</build_port_path>
 		<build_options>mtr_UNSET_FORCE=X11</build_options>
@@ -1211,7 +1211,7 @@
 		<descr>LCD display driver</descr>
 		<website>http://www.lcdproc.org/</website>
 		<category>Utility</category>
-		<version>lcdproc-0.5.5 pkg.v.1.0.1</version>
+		<version>lcdproc-0.5.5 pkg.v.1.0.2</version>
 		<status>BETA</status>
 		<required_version>1.2.1</required_version>
 		<maintainer>seth.mos@dds.nl</maintainer>
@@ -1229,7 +1229,7 @@
 		<descr>LCD display driver - Development version</descr>
 		<website>http://www.lcdproc.org/</website>
 		<category>Utility</category>
-		<version>lcdproc-0.5.6 pkg v. 0.9.10</version>
+		<version>lcdproc-0.5.6 pkg v. 0.9.11</version>
 		<status>BETA</status>
 		<required_version>2.0</required_version>
 		<maintainer>michele@nt2.it</maintainer>
@@ -1255,7 +1255,7 @@
 		<version>2.1.a15_6 pkg v1.1.2</version>
 		<status>ALPHA</status>
 		<required_version>2.0</required_version>
-		<config_file>https://packages.pfsense.org/packages/config/arpwatch.xml</config_file>
+		<config_file>https://packages.pfsense.org/packages/config/arpwatch/arpwatch.xml</config_file>
 		<configurationfile>arpwatch.xml</configurationfile>
 		<logging>
 			<facilityname>arpwatch</facilityname>
@@ -1268,7 +1268,7 @@
 		<website>http://www.squidGuard.org/</website>
 		<maintainer>dv_serg@mail.ru</maintainer>
 		<category>Network Management</category>
-		<version>1.4_4 pkg v.1.9.6</version>
+		<version>1.4_4 pkg v.1.9.10</version>
 		<status>Beta</status>
 		<required_version>1.1</required_version>
 		<depends_on_package_base_url>https://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
@@ -1293,7 +1293,7 @@
 		<website>http://www.squidGuard.org/</website>
 		<maintainer>gugabsd@mundounix.com.br</maintainer>
 		<category>Network Management</category>
-		<version>1.5_1.1 beta</version>
+		<version>1.5_1beta pkg v.1.5.6</version>
 		<status>Beta</status>
 		<required_version>2.1</required_version>
 		<depends_on_package_base_url>https://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
@@ -1313,8 +1313,8 @@
 		<website>http://www.squidGuard.org/</website>
 		<maintainer>dv_serg@mail.ru</maintainer>
 		<category>Network Management</category>
-		<version>1.4_4 pkg v.1.9.5</version>
-		<status>Experimental</status>
+		<version>1.4_4 pkg v.1.9.6</version>
+		<status>Beta</status>
 		<required_version>2.1</required_version>
 		<depends_on_package_base_url>https://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
 		<depends_on_package_pbi>squidguard-squid3-1.4_4-i386.pbi</depends_on_package_pbi>
@@ -1394,7 +1394,7 @@
 		<depends_on_package_pbi>havp-0.91_1-i386.pbi</depends_on_package_pbi>
 		<build_port_path>/usr/ports/www/havp</build_port_path>
 		<build_options>CLAMAVUSER=havp;CLAMAVGROUP=havp</build_options>
-		<version>0.91_1 pkg v1.04</version>
+		<version>0.91_1 pkg v1.05</version>
 		<status>BETA</status>
 		<required_version>1.2.2</required_version>
 		<config_file>https://packages.pfsense.org/packages/config/havp/havp.xml</config_file>
@@ -1543,7 +1543,7 @@
 		</build_pbi>
 		<build_options>nrpe_SET=SSL;nrpe_UNSET_FORCE=ARGS</build_options>
 		<config_file>https://packages.pfsense.org/packages/config/nrpe2/nrpe2.xml</config_file>
-		<version>2.12_4 v2.2</version>
+		<version>2.12_4 v2.2_4</version>
 		<status>Beta</status>
 		<required_version>1.2</required_version>
 		<maintainer>erik@erikkristensen.com</maintainer>
@@ -1586,7 +1586,7 @@
 		<name>mailreport</name>
 		<descr>Allows you to setup periodic e-mail reports containing command output, log file contents, and RRD graphs.</descr>
 		<category>Network Management</category>
-		<version>2.1</version>
+		<version>2.3</version>
 		<status>Stable</status>
 		<required_version>2.0</required_version>
 		<config_file>https://packages.pfsense.org/packages/config/mailreport/mailreport.xml</config_file>
@@ -1622,7 +1622,7 @@
 		<name>System Patches</name>
 		<descr>A package to apply and maintain custom system patches.</descr>
 		<maintainer>jimp@pfsense.org</maintainer>
-		<version>1.0.2</version>
+		<version>1.0.3</version>
 		<category>System</category>
 		<status>RELEASE</status>
 		<config_file>https://packages.pfsense.org/packages/config/systempatches/systempatches.xml</config_file>
@@ -1636,7 +1636,7 @@
 		<descr><![CDATA[Bacula is a set of Open Source, computer programs that permit you (or the system administrator) to manage backup, recovery, and verification of computer data across a network of computers of different kinds.]]></descr>
 		<website>http://www.bacula.org/</website>
 		<category>Services</category>
-		<version>5.2.12_3 pkg v 1.0.4</version>
+		<version>5.2.12_3 pkg v 1.0.7</version>
 		<status>Stable</status>
 		<required_version>2.0</required_version>
 		<config_file>https://packages.pfsense.org/packages/config/bacula-client/bacula-client.xml</config_file>
@@ -1760,7 +1760,6 @@
 		<required_version>2.0</required_version>
 		<configurationfile>zabbix2-agent.xml</configurationfile>
 		<maintainer>dbaio@bsd.com.br</maintainer>
-		<build_port_path>/usr/ports/net-mgmt/zabbix22-agent</build_port_path>
 		<build_pbi>
 			<custom_name>zabbix22-agent</custom_name>
 			<port>net-mgmt/zabbix22-agent</port>
@@ -1779,7 +1778,6 @@
 		<required_version>2.0</required_version>
 		<configurationfile>zabbix2-proxy.xml</configurationfile>
 		<maintainer>dbaio@bsd.com.br</maintainer>
-		<build_port_path>/usr/ports/net-mgmt/zabbix22-proxy</build_port_path>
 		<build_pbi>
 			<custom_name>zabbix22-proxy</custom_name>
 			<port>net-mgmt/zabbix22-proxy</port>
@@ -1847,7 +1845,7 @@
 		<config_file>https://packages.pfsense.org/packages/config/softflowd/softflowd.xml</config_file>
 		<depends_on_package_base_url>https://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
 		<depends_on_package_pbi>softflowd-0.9.8_2-i386.pbi</depends_on_package_pbi>
-		<version>0.9.8 pkg v1.0.1</version>
+		<version>0.9.8 pkg v1.1</version>
 		<status>Beta</status>
 		<required_version>2.1</required_version>
 		<configurationfile>softflowd.xml</configurationfile>
@@ -1861,7 +1859,7 @@
 		<descr>Set of programs for controlling APC UPS.</descr>
 		<category>Services</category>
 		<config_file>https://packages.pfsense.org/packages/config/apcupsd/apcupsd.xml</config_file>
-		<version>apcupsd-3.14.10_1 pkg v0.3.2</version>
+		<version>apcupsd-3.14.10_1 pkg v0.3.3</version>
 		<status>BETA</status>
 		<required_version>2.0</required_version>
 		<configurationfile>apcupsd.xml</configurationfile>
@@ -1896,7 +1894,7 @@
 		<website>http://suricata-ids.org/</website>
 		<descr><![CDATA[High Performance Network IDS, IPS and Security Monitoring engine by OISF.]]></descr>
 		<category>Security</category>
-		<version>2.0.4 pkg v2.1.3</version>
+		<version>2.0.4 pkg v2.1.4</version>
 		<status>Stable</status>
 		<required_version>2.1</required_version>
 		<config_file>https://packages.pfsense.org/packages/config/suricata/suricata.xml</config_file>

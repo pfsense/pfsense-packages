@@ -229,8 +229,10 @@ include_once("head.inc");
 ?>
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">
 
-<?php include("fbegin.inc"); 
+<?php include("fbegin.inc"); ?>
 
+<form action="suricata_barnyard.php" method="post" name="iform" id="iform">
+<?php
 	/* Display Alert message */
 	if ($input_errors) {
 		print_input_errors($input_errors);
@@ -239,10 +241,7 @@ include_once("head.inc");
 	if ($savemsg) {
 		print_info_box($savemsg);
 	}
-
 ?>
-
-<form action="suricata_barnyard.php" method="post" name="iform" id="iform">
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
 <tbody>
 <tr><td>

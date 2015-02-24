@@ -35,7 +35,8 @@ etblock=$(echo $8 | sed 's/,/, /g')
 etmatch=$(echo $9 | sed 's/,/, /g')
 
 # File Locations
-pathgeoipdat=/var/db/pfblockerng/GeoIP.dat
+aliasarchive="/usr/pbi/pfblockerng-$mtype/etc/aliastables.tar.bz2"
+pathgeoipdat=/usr/pbi/pfblockerng-$mtype/share/GeoIP/GeoIP.dat
 pfbsuppression=/var/db/pfblockerng/pfbsuppression.txt
 masterfile=/var/db/pfblockerng/masterfile
 mastercat=/var/db/pfblockerng/mastercat
@@ -46,6 +47,7 @@ errorlog=/var/log/pfblockerng/error.log
 etdir=/var/db/pfblockerng/ET
 tmpxlsx=/tmp/xlsx/
 
+pfbdbdir=/var/db/pfblockerng/
 pfbdeny=/var/db/pfblockerng/deny/
 pfborig=/var/db/pfblockerng/original/
 pfbmatch=/var/db/pfblockerng/match/
@@ -65,6 +67,17 @@ syncfile=/tmp/pfbsyncfile
 matchfile=/tmp/pfbmatchfile
 tempmatchfile=/tmp/pfbtempmatchfile
 
+PLATFORM=`cat /etc/platform`
+USE_MFS_TMPVAR=`/usr/bin/grep -c use_mfs_tmpvar /cf/conf/config.xml`
+DISK_NAME=`/bin/df /var/db/rrd | /usr/bin/tail -1 | /usr/bin/awk '{print $1;}'`
+DISK_TYPE=`/usr/bin/basename ${DISK_NAME} | /usr/bin/cut -c1-2`
+
+if [ "${PLATFORM}" != "pfSense" ] || [ ${USE_MFS_TMPVAR} -gt 0 ] || [ "${DISK_TYPE}" = "md" ]; then
+	/usr/local/bin/php /etc/rc.conf_mount_rw >/dev/null 2>&1
+	if [ ! -d $pfbdbdir ]; then mkdir $pfbdbdir; fi
+	if [ ! -d $pfsense_alias_dir ]; then mkdir $pfsense_alias_dir; fi
+fi
+
 if [ ! -f $masterfile ]; then touch $masterfile; fi
 if [ ! -f $mastercat ]; then touch $mastercat; fi
 if [ ! -f $tempfile ]; then touch $tempfile; fi
@@ -79,6 +92,16 @@ if [ ! -d $pfbmatch ]; then mkdir $pfbmatch; fi
 if [ ! -d $etdir ]; then mkdir $etdir; fi
 if [ ! -d $tmpxlsx ]; then mkdir $tmpxlsx; fi
 
+
+# Exit Function to set mount RO if required before Exiting
+exitnow() {
+	if [ "${PLATFORM}" != "pfSense" ] || [ ${USE_MFS_TMPVAR} -gt 0 ] || [ "${DISK_TYPE}" = "md" ]; then
+		/usr/local/bin/php /etc/rc.conf_mount_ro >/dev/null 2>&1
+	fi
+	exit
+}
+
+
 ##########
 # Process to condense an IP range if a "Max" amount of IP addresses are found in a /24 range per Alias Group.
 process24() {
@@ -86,7 +109,7 @@ process24() {
 if [ ! -x $pathgeoip ]; then 
 	echo "Process24 - Application [ GeoIP ] Not found. Can't proceed."
 	echo "Process24 - Application [ GeoIP ] Not found. Can't proceed. [ $now ]" >> $errorlog
-	exit
+	exitnow
 fi
 
 # Download MaxMind GeoIP.dat Binary on first Install.
@@ -98,7 +121,7 @@ fi
 if [ ! -f $pathgeoipdat ]; then 
 	echo "Process24 - Database GeoIP [ GeoIP.Dat ] not found. Can't proceed."
 	echo "Process24 - Database GeoIP [ GeoIP.Dat ] not found. Can't proceed. [ $now ]" >>  $errorlog
-	exit
+	exitnow
 fi
 
 count=$(grep -c ^ $pfbdeny$alias".txt")
@@ -192,6 +215,7 @@ echo "-------------------------------------------------------"
 cocount=$(grep -cv "^1\.1\.1\.1" $pfbdeny$alias".txt")
 echo "Post /24 Count   [ $cocount ]"; echo
 fi
+exitnow
 }
 
 
@@ -247,6 +271,7 @@ printf "%-10s %-10s %-10s %-30s\n" "Original" "Masterfile" "Outfile" "Sanity Che
 echo "----------------------------------------------------------"
 printf "%-10s %-10s %-10s %-30s\n" "$countg" "$countm" "$counto" " [ $sanity ]"
 echo "----------------------------------------------------------"
+exitnow
 }
 
 
@@ -257,7 +282,7 @@ suppress() {
 if [ ! -x $pathgrepcidr ]; then
 	echo "Application [ Grepcidr ] Not found. Can't proceed. [ $now ]"
 	echo "Application [ Grepcidr ] Not found. Can't proceed. [ $now ]" >> errorlog
-	exit
+	exitnow
 fi
 
 if [ -e "$pfbsuppression" ] && [ -s "$pfbsuppression" ]; then
@@ -270,7 +295,7 @@ if [ -e "$pfbsuppression" ] && [ -s "$pfbsuppression" ]; then
 			echo; echo "===[ Suppression Stats ]========================================"; echo
 			printf "%-20s %-10s %-10s %-10s %-10s\n" "List" "Pre" "RFC1918" "Suppress" "Masterfile"
 			echo "----------------------------------------------------------------"
-			exit
+			exitnow
 		fi
 
 		for i in $cc; do
@@ -342,7 +367,7 @@ else
 		echo "===[ Suppression Stats ]========================================"; echo
 		printf "%-20s %-10s %-10s %-10s %-10s\n" "List" "Pre" "RFC1918" "Suppress" "Masterfile"
 		echo "----------------------------------------------------------------"
-		exit
+		exitnow
 	fi
 	for i in $cc; do
 		alias=$(echo "${i%|*}")
@@ -372,6 +397,7 @@ else
 		fi
 	done
 fi
+exitnow
 }
 
 
@@ -382,7 +408,7 @@ duplicate() {
 if [ ! -x $pathgrepcidr ]; then
 	echo "Application [ Grepcidr ] Not found. Can't proceed. [ $now ]"
 	echo "Application [ Grepcidr ] Not found. Can't proceed. [ $now ]" >> errorlog
-	exit
+	exitnow
 fi
 
 dupcheck=yes
@@ -415,6 +441,7 @@ printf "%-10s %-10s %-10s %-30s\n" "Original" "Masterfile" "Outfile" " [ Post Du
 echo "----------------------------------------------------------"
 printf "%-10s %-10s %-10s %-30s\n" "$countg" "$countm" "$counto" " [ $sanity ]"
 echo "----------------------------------------------------------"
+exitnow
 }
 
 
@@ -425,7 +452,7 @@ deduplication() {
 if [ ! -x $pathgeoip ]; then
 	echo "d-duplication - Application [ GeoIP ] Not found. Can't proceed."
 	echo "d-duplication - Application [ GeoIP ] Not found. Can't proceed. [ $now ]" >> $errorlog
-	exit
+	exitnow
 fi
 
 # Download MaxMind GeoIP.dat on first Install.
@@ -438,7 +465,7 @@ fi
 if [ ! -f $pathgeoipdat ]; then
 	echo "d-duplication - Database GeoIP [ GeoIP.Dat ] not found. Can't proceed."
 	echo "d-duplication - Database GeoIP [ GeoIP.Dat ] not found. Can't proceed. [ $now ]" >> $errorlog
-	exit
+	exitnow
 fi
 
 > $tempfile; > $tempfile2; > $dupfile; > $addfile; > $dedupfile; > $matchfile; > $tempmatchfile; count=0; dcount=0; mcount=0; mmcount=0
@@ -541,6 +568,7 @@ echo " [ Post d-Deduplication count ]  [ $count ]"; echo
 # Write "1.1.1.1" to empty Final Blocklist Files
 emptyfiles=$(find $pfbdeny -size 0)
 for i in $emptyfiles; do echo "1.1.1.1" > $i; done
+exitnow
 }
 
 
@@ -551,7 +579,7 @@ pdeduplication(){
 if [ ! -x $pathgeoip ]; then
 	echo "p-duplication - Application [ GeoIP ] Not found. Can't proceed."
 	echo "p-duplication - Application [ GeoIP ] Not found. Can't proceed. [ $now ]" >> $errorlog
-	exit
+	exitnow
 fi
 
 # Download MaxMind GeoIP.dat on first Install.
@@ -563,7 +591,7 @@ fi
 if [ ! -f $pathgeoipdat ]; then
 	echo "p-duplication - Database GeoIP [ GeoIP.Dat ] not found. Can't proceed."
 	echo "p-duplication - Database GeoIP [ GeoIP.Dat ] not found. Can't proceed. [ $now ]" >> $errorlog
-	exit
+	exitnow
 fi
 
 > $tempfile; > $tempfile2; > $dupfile; > $addfile; > $dedupfile; count=0; dcount=0
@@ -616,6 +644,7 @@ echo; echo " [ Post p-Deduplication count ]  [ $count ]"
 # Write "1.1.1.1" to empty Final Blocklist Files
 emptyfiles=$(find $pfbdeny -size 0)
 for i in $emptyfiles; do echo "1.1.1.1" > $i; done
+exitnow
 }
 
 
@@ -626,7 +655,7 @@ processet() {
 if [ ! -x $pathgunzip ]; then
 	echo "Application [ Gunzip ] Not found, Can't proceed."
 	echo "Application [ Gunzip ] Not found, Can't proceed. [ $now ]" >> $errorlog
-	exit
+	exitnow
 fi
 
 if [ -s $pfborig$alias".gz" ]; then
@@ -714,6 +743,7 @@ if [ -s $pfborig$alias".gz" ]; then
 else
 	echo; echo "No ET .GZ File Found!"
 fi
+exitnow
 }
 
 # Process to extract IP addresses from XLSX Files
@@ -722,7 +752,7 @@ processxlsx() {
 if [ ! -x $pathtar ]; then
 	echo "Application [ TAR ] Not found, Can't proceed."
 	echo "Application [ TAR ] Not found, Can't proceed. [ $now ]" >> $errorlog
-	exit
+	exitnow
 fi
 
 if [ -s $pfborig$alias".zip" ]; then
@@ -738,6 +768,7 @@ else
 	echo "XLSX Download File Missing"
 	echo " [ $alias ] XLSX Download File Missing [ $now ]" >> $errorlog
 fi
+exitnow
 }
 
 closingprocess() {
@@ -856,6 +887,7 @@ echo; echo "pfSense Table Stats"; echo "-------------------"
 $pathpfctl -s memory | grep "table-entries"
 pfctlcount=$($pathpfctl -vvsTables | awk '/Addresses/ {s+=$2}; END {print s}')
 echo "Table Usage Count       " $pfctlcount
+exitnow
 }
 
 remove() {
@@ -883,6 +915,15 @@ emptychk=$(find $masterfile -size 0)
 if [ ! "$emptychk" == "" ]; then
 	rm -r $masterfile; rm -r $mastercat
 fi
+exitnow
+}
+
+# Process to restore aliasables from archive on reboot ( NanoBSD and Ramdisk Installations only )
+aliastables() {
+	if [ "${PLATFORM}" != "pfSense" ] || [ ${USE_MFS_TMPVAR} -gt 0 ] || [ "${DISK_TYPE}" = "md" ]; then
+		[ -f $aliasarchive ] && cd $pfsense_alias_dir && /usr/bin/tar -jxvf $aliasarchive
+	fi
+	exitnow
 }
 
 
@@ -920,8 +961,11 @@ case $1 in
 	remove)
 		remove
 		;;
+	aliastables)
+		aliastables
+		;;
 	*)
-		exit
+		exitnow
 		;;
 esac
-exit
+exitnow

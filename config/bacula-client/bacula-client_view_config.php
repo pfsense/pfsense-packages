@@ -37,8 +37,8 @@ if ($pf_version < 2.0)
 if ($pf_version > 2.0)
 	define('BACULA_LOCALBASE', '/usr/pbi/bacula-' . php_uname("m"));
 else
-  define('BACULA_LOCALBASE','/usr/local');
-	
+	define('BACULA_LOCALBASE','/usr/local');
+
 $pgtitle = "Bacula-Client: View Configuration";
 include("head.inc");
 
@@ -73,7 +73,7 @@ include("head.inc");
      						<td class="tabcont" >
 									<textarea id="varnishlogs" rows="50" cols="87%">
 <?php 
-	$config_file = file_get_contents(BACULA_LOCALBASE."/etc/bacula-fd.conf");
+	$config_file = file_get_contents(BACULA_LOCALBASE."/etc/bacula/bacula-fd.conf");
 	echo $config_file;
 ?>
 									</textarea>

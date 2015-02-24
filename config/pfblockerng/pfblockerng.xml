@@ -131,7 +131,7 @@
 	</additional_files_needed>
 	<additional_files_needed>
 		<item>https://packages.pfsense.org/packages/config/pfblockerng/countrycodes.tar.bz2</item>
-		<prefix>/var/db/pfblockerng/cc/</prefix>
+		<prefix>/var/db/pfblockerng/</prefix>
 		<chmod>0444</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
@@ -199,6 +199,10 @@
 			<url>/pkg_edit.php?xml=/pfblockerng/pfblockerng_SouthAmerica.xml&amp;id=0</url>
 		</tab>
 		<tab>
+			<text>P.S.</text>
+			<url>/pkg_edit.php?xml=/pfblockerng/pfblockerng_ProxyandSatellite.xml&amp;id=0</url>
+		</tab>
+		<tab>
 			<text>Logs</text>
 			<url>/pfblockerng/pfblockerng_log.php</url>
 		</tab>
@@ -224,6 +228,13 @@
 			<type>checkbox</type>
 			<description><![CDATA[Note - with "Keep settings" enabled, pfBlockerNG will maintain run state on Installation/Upgrade<br />
 					If "Keep Settings" is not "enabled" on pkg Install/De-Install, all Settings will be Wiped!]]></description>
+		</field>
+		<field>
+			<fielddescr><![CDATA[<strong>Keep Settings</strong>/Lists After Disable/Re-Install/De-Install]]></fielddescr>
+			<fieldname>pfb_keep</fieldname>
+			<type>checkbox</type>
+			<description>Keep Settings and Lists intact when pfBlockerNG is Disabled or After pfBlockerNG Re-Install/De-Install</description>
+			<default_value>on</default_value>
 		</field>
 		<field>
 			<fielddescr>CRON MIN Start Time</fielddescr>
@@ -321,12 +332,6 @@
 					Alerts can be Suppressed using the '+' icon in the Alerts Tab and IPs added to the 'pfBlockerNGSuppress' Alias<br />
 					A Blocked IP in a CIDR other than /24 will need to be Suppressed by an 'Permit Outbound' Firewall Rule]]>
 			</description>
-		</field>
-		<field>
-			<fielddescr><![CDATA[<strong>Keep Settings</strong>/Lists After Disable/Re-Install/De-Install]]></fielddescr>
-			<fieldname>pfb_keep</fieldname>
-			<type>checkbox</type>
-			<description>Keep Settings and Lists intact when pfBlockerNG is Disabled or After pfBlockerNG Re-Install/De-Install</description>
 		</field>
 		<field>
 			<fielddescr>Global Enable Logging</fielddescr>

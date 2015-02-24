@@ -29,7 +29,7 @@
 
 require_once("pkg-utils.inc");
 require_once("globals.inc");
-require_once("phpmailer/class.phpmailer.php");
+require_once("phpmailer/PHPMailerAutoload.php");
 
 global $config, $g;
 

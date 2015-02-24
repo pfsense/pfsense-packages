@@ -48,20 +48,22 @@ require_once("services.inc");
 
 # [ $pfb ] pfBlockerNG Global Array for Paths and Variables. This needs to be called to get the Updated Settings.
 function pfb_global() {
-
 	global $g,$config,$pfb;
+
+	# Collect pfSense Version
+	$pfb['pfsenseversion']	= substr(trim(file_get_contents("/etc/version")),0,3);
 
 	# Folders
 	$pfb['dbdir']		= "{$g['vardb_path']}/pfblockerng";
 	$pfb['aliasdir']	= "{$g['vardb_path']}/aliastables";
 	$pfb['logdir']		= "{$g['varlog_path']}/pfblockerng";
 	$pfb['etdir']		= "{$pfb['dbdir']}/ET";
-	$pfb['ccdir']		= "{$pfb['dbdir']}/cc";
 	$pfb['nativedir']	= "{$pfb['dbdir']}/native";
 	$pfb['denydir']		= "{$pfb['dbdir']}/deny";
 	$pfb['matchdir']	= "{$pfb['dbdir']}/match";
 	$pfb['permitdir']	= "{$pfb['dbdir']}/permit";
 	$pfb['origdir']		= "{$pfb['dbdir']}/original";
+	$pfb['ccdir']		= "/usr/pbi/pfblockerng-" . php_uname("m") . "/share/GeoIP";
 
 	# Create Folders if not Exist.
 	$folder_array = array ("{$pfb['dbdir']}","{$pfb['logdir']}","{$pfb['ccdir']}","{$pfb['origdir']}","{$pfb['nativedir']}","{$pfb['denydir']}","{$pfb['matchdir']}","{$pfb['permitdir']}","{$pfb['aliasdir']}");
@@ -76,9 +78,7 @@ function pfb_global() {
 	$pfb['log']	= "{$pfb['logdir']}/pfblockerng.log";
 	$pfb['supptxt']	= "{$pfb['dbdir']}/pfbsuppression.txt";
 	$pfb['script']	= 'sh /usr/local/pkg/pfblockerng/pfblockerng.sh';
-
-	# Collect pfSense Version
-	$pfb['pfsenseversion'] = substr(trim(file_get_contents("/etc/version")),0,3);
+	$pfb['aliasarchive'] = "/usr/pbi/pfblockerng-" . php_uname("m") . "/etc/aliastables.tar.bz2";
 
 	# General Variables
 	$pfb['config']	= $config['installedpackages']['pfblockerng']['config'][0];
@@ -240,6 +240,153 @@ function pfb_create_suppression_file() {
 }
 
 
+// IPv6 Range to CIDR function used courtesey from:
+// https://github.com/stilez/pfsense-leases/blob/50cc0fa81dba5fe91bcddaea016c245d1b8479cc/etc/inc/util.inc
+function ip_range_to_subnet_array_temp2($ip1, $ip2) {
+
+	if (is_ipaddrv4($ip1) && is_ipaddrv4($ip2)) {
+		$proto = 'ipv4';  // for clarity
+		$bits = 32;
+		$ip1bin = decbin(ip2long32($ip1));
+		$ip2bin = decbin(ip2long32($ip2));
+	} elseif (is_ipaddrv6($ip1) && is_ipaddrv6($ip2)) {
+		$proto = 'ipv6';
+		$bits = 128;
+		$ip1bin = Net_IPv6::_ip2Bin($ip1);
+		$ip2bin = Net_IPv6::_ip2Bin($ip2);
+	} else
+		return array();
+
+	// it's *crucial* that binary strings are guaranteed the expected length;  do this for certainty even though for IPv6 it's redundant
+	$ip1bin = str_pad($ip1bin, $bits, '0', STR_PAD_LEFT);
+	$ip2bin = str_pad($ip2bin, $bits, '0', STR_PAD_LEFT);
+
+	if ($ip1bin === $ip2bin)
+		return array($ip1 . '/' . $bits);
+	
+	if (strcmp($ip1bin, $ip2bin) > 0)
+		list ($ip1bin, $ip2bin) = array($ip2bin, $ip1bin);  // swap contents of ip1 <= ip2
+
+	$rangesubnets = array();
+	$netsize = 0;
+
+	do {
+		// at loop start, $ip1 is guaranteed strictly less than $ip2 (important for edge case trapping and preventing accidental binary wrapround)
+		// which means the assignments $ip1 += 1 and $ip2 -= 1 will always be "binary-wrapround-safe"
+
+		// step #1 if start ip (as shifted) ends in any '1's, then it must have a single cidr to itself (any cidr would include the '0' below it)
+		
+		if (substr($ip1bin, -1, 1) == '1') {
+			// the start ip must be in a separate one-IP cidr range
+			$new_subnet_ip = substr($ip1bin, $netsize, $bits - $netsize) . str_repeat('0', $netsize);
+			$rangesubnets[$new_subnet_ip] = $bits - $netsize;
+			$n = strrpos($ip1bin, '0');  //can't be all 1's
+			$ip1bin = ($n == 0 ? '' : substr($ip1bin, 0, $n)) . '1' . str_repeat('0', $bits - $n - 1);  // BINARY VERSION OF $ip1 += 1
+		} 
+
+		// step #2, if end ip (as shifted) ends in any zeros then that must have a cidr to itself (as cidr cant span the 1->0 gap)
+		
+		if (substr($ip2bin, -1, 1) == '0') {
+			// the end ip must be in a separate one-IP cidr range
+			$new_subnet_ip = substr($ip2bin, $netsize, $bits - $netsize) . str_repeat('0', $netsize);
+			$rangesubnets[$new_subnet_ip] = $bits - $netsize;
+			$n = strrpos($ip2bin, '1');  //can't be all 0's
+			$ip2bin = ($n == 0 ? '' : substr($ip2bin, 0, $n)) . '0' . str_repeat('1', $bits - $n - 1);  // BINARY VERSION OF $ip2 -= 1
+			// already checked for the edge case where end = start+1 and start ends in 0x1, above, so it's safe
+		}
+
+		// this is the only edge case arising from increment/decrement. 
+		// it happens if the range at start of loop is exactly 2 adjacent ips, that spanned the 1->0 gap. (we will have enumerated both by now)
+		
+		if (strcmp($ip2bin, $ip1bin) < 0)
+			continue;
+
+		// step #3 the start and end ip MUST now end in '0's and '1's respectively
+		// so we have a non-trivial range AND the last N bits are no longer important for CIDR purposes.
+
+		$shift = $bits - max(strrpos($ip1bin, '0'), strrpos($ip2bin, '1'));  // num of low bits which are '0' in ip1 and '1' in ip2
+		$ip1bin = str_repeat('0', $shift) . substr($ip1bin, 0, $bits - $shift);
+		$ip2bin = str_repeat('0', $shift) . substr($ip2bin, 0, $bits - $shift);
+		$netsize += $shift;
+		if ($ip1bin === $ip2bin) {
+			// we're done.
+			$new_subnet_ip = substr($ip1bin, $netsize, $bits - $netsize) . str_repeat('0', $netsize);
+			$rangesubnets[$new_subnet_ip] = $bits - $netsize;
+			continue;
+		}
+		
+		// at this point there's still a remaining range, and either startip ends with '1', or endip ends with '0'. So repeat cycle.
+	} while (strcmp($ip1bin, $ip2bin) < 0);
+
+	// subnets are ordered by bit size. Re sort by IP ("naturally") and convert back to IPv4/IPv6
+
+	ksort($rangesubnets, SORT_STRING);
+	$out = array();
+
+	foreach ($rangesubnets as $ip => $netmask) {
+		if ($proto == 'ipv4') {
+			$i = str_split($ip, 8);
+			$out[] = implode('.', array( bindec($i[0]),bindec($i[1]),bindec($i[2]),bindec($i[3]))) . '/' . $netmask;
+		} else
+			$out[] = Net_IPv6::compress(Net_IPv6::_bin2Ip($ip)) . '/' . $netmask;
+	}
+
+	return $out;
+}
+
+
+// Archive Aliastables for NanoBSD and RAMDisk Installations
+function pfb_aliastables($mode) {
+	global $g,$config,$pfb;
+	$earlyshellcmd = "/usr/local/pkg/pfblockerng/pfblockerng.sh aliastables";
+	$msg = "";
+
+	// Only Execute function if Platform is NanoBSD or Ramdisks are used.
+	if (($g['platform'] != "pfSense") || isset($config['system']['use_mfs_tmpvar'])) {
+		conf_mount_rw();
+		if ($mode == "update") {
+			// Archive Aliastable Folder
+			exec ("cd {$pfb['aliasdir']}; ls -A pfB_*.txt && /usr/bin/tar -jcvf {$pfb['aliasarchive']} pfB_*.txt >/dev/null 2>&1");
+			$msg = "\n\nArchiving Aliastable Folder\n";
+		}
+		elseif ($mode == "conf") {
+			// Check conf file for earlyshellcmd
+			if (is_array($config['system']['earlyshellcmd'])) {
+				$a_earlyshellcmd = &$config['system']['earlyshellcmd'];
+				if (!preg_grep("/pfblockerng.sh aliastables/", $a_earlyshellcmd)) {
+					$a_earlyshellcmd[] = "{$earlyshellcmd}";
+					$msg = "\n** Adding earlyshellcmd **\n";
+				}
+			}
+			else {
+				$config['system']['earlyshellcmd'] = "{$earlyshellcmd}";
+				$msg = "\n** Adding earlyshellcmd **\n";
+			}
+		}
+		conf_mount_ro();
+	}
+	else {
+		if (file_exists("{$pfb['aliasarchive']}")) {
+			// Remove Aliastables archive if found.
+			conf_mount_rw();
+			@unlink_if_exists("{$pfb['aliasarchive']}");
+			conf_mount_ro();
+		}
+		// Remove earlyshellcmd if found.
+		if (is_array($config['system']['earlyshellcmd'])) {
+			$a_earlyshellcmd = &$config['system']['earlyshellcmd'];
+			if (preg_grep("/pfblockerng.sh aliastables/", $a_earlyshellcmd)) {
+				$a_earlyshellcmd = preg_grep("/pfblockerng.sh aliastables/", $a_earlyshellcmd, PREG_GREP_INVERT);
+				$msg = "\n** Removing earlyshellcmd **\n";
+			}
+		}
+	}
+
+	if ($msg != "")
+		pfb_logger("{$msg}","1");
+}
+
+
 # Main pfBlockerNG Function
 function sync_package_pfblockerng($cron = "") {
 
@@ -255,22 +402,24 @@ function sync_package_pfblockerng($cron = "") {
 	}
 	log_error("[pfBlockerNG] Starting sync process.");
 
+	// Force Update - Set 'Save' variable when 'No Updates' found.
+	if ($cron == "noupdates") {
+		$pfb['save'] = TRUE;
+	}
+
 	# Start of pfBlockerNG Logging to 'pfblockerng.log'
 	if ($pfb['enable'] == "on" && !$pfb['save']) {
 		$log = " UPDATE PROCESS START [ NOW ]\n";
+		pfb_logger("{$log}","1");
 	} else {
-		$log = "\n**Saving Configuration [ NOW ] ...\n";
+		if ($cron != "noupdates") {
+			$log = "\n**Saving Configuration [ NOW ] ...\n";
+			pfb_logger("{$log}","1");
+		}
 	}
-	pfb_logger("{$log}","1");
 
-	# TBC if Required ! (Fetch Timeout in 2.2)
-
-	#apply fetch timeout to pfsense-utils.inc
-	$pfsense_utils = file_get_contents('/etc/inc/pfsense-utils.inc');
-	$new_pfsense_utils = preg_replace("/\/usr\/bin\/fetch -q/","/usr/bin/fetch -T 5 -q",$pfsense_utils);
-	if ($new_pfsense_utils != $pfsense_utils) {
-		@file_put_contents('/etc/inc/pfsense-utils.inc',$new_pfsense_utils, LOCK_EX);
-	}
+	// Call function for NanoBSD/Ramdisk processes.
+	pfb_aliastables("conf");
 
 	# Collect pfSense Max Table Size Entry
 	$pfb['table_limit'] = ($config['system']['maximumtableentries'] != "" ? $config['system']['maximumtableentries'] : "2000000");
@@ -358,18 +507,19 @@ function sync_package_pfblockerng($cron = "") {
 	}
 
 
-	#############################################
-	#            Configure ARRAYS               #
-	#############################################
+	#################################
+	#	Configure ARRAYS	#
+	#################################
 
-	$continents = array (	"Africa"	=> "pfB_Africa",
-				"Antartica"	=> "pfB_Antartica",
-				"Asia"		=> "pfB_Asia",
-				"Europe"	=> "pfB_Europe",
-				"North America"	=> "pfB_NAmerica",
-				"Oceania"	=> "pfB_Oceania",
-				"South America"	=> "pfB_SAmerica",
-				"Top Spammers"	=> "pfB_Top"
+	$continents = array (	"Africa"		=> "pfB_Africa",
+				"Antartica"		=> "pfB_Antartica",
+				"Asia"			=> "pfB_Asia",
+				"Europe"		=> "pfB_Europe",
+				"North America"		=> "pfB_NAmerica",
+				"Oceania"		=> "pfB_Oceania",
+				"South America"		=> "pfB_SAmerica",
+				"Top Spammers"		=> "pfB_Top",
+				"Proxy and Satellite"	=> "pfB_PS"
 				);
 
 	#create rules vars and arrays
@@ -418,9 +568,9 @@ function sync_package_pfblockerng($cron = "") {
 				);
 
 
-	#############################################
-	#          Configure Rule Suffix            #
-	#############################################
+	#########################################
+	#	Configure Rule Suffix		#
+	#########################################
 
 	# Discover if any Rules are AutoRules (If no AutoRules found, $pfb['autorules'] is FALSE, Skip Rules Re-Order )
 	# To configure Auto Rule Suffix. pfBlockerNG must be disabled to change Suffix and to avoid Duplicate Rules
@@ -490,9 +640,9 @@ function sync_package_pfblockerng($cron = "") {
 	}
 
 
-	#############################################
-	#   Configure INBOUND/OUTBOUND INTERFACES   #
-	#############################################
+	#########################################################
+	#	Configure INBOUND/OUTBOUND INTERFACES		#
+	#########################################################
 
 	# Collect pfSense Interface Order
 	$ifaces = get_configured_interface_list();
@@ -556,9 +706,9 @@ function sync_package_pfblockerng($cron = "") {
 	}
 
 
-	#############################################
-	#   Clear Removed Lists from Masterfiles    #
-	#############################################
+	#################################################
+	#	Clear Removed Lists from Masterfiles	#
+	#################################################
 
 	# Process to keep Masterfiles in Sync with Valid Lists from config.conf file.
 	$pfb['sync_master'] = TRUE;
@@ -782,9 +932,9 @@ function sync_package_pfblockerng($cron = "") {
 		}
 	}
 
-	##############################################
-	# Clear Match/Pass/ET/Original Files/Folders #
-	##############################################
+	#########################################################
+	#	Clear Match/Pass/ET/Original Files/Folders	#
+	#########################################################
 
 	# When pfBlockerNG is Disabled and 'Keep Blocklists' is Disabled.
 	if ($pfb['enable'] == "" && $pfb['keep'] == "" && !$pfb['install']) {
@@ -803,17 +953,17 @@ function sync_package_pfblockerng($cron = "") {
 	}
 
 
-	#############################################
-	#       Create Suppression Txt File         #
-	#############################################
+	#########################################
+	#	Create Suppression Txt File	#
+	#########################################
 
 	if ($pfb['enable'] == "on" && $pfb['supp'] == "on")
 		pfb_create_suppression_file();
 
 
-	#############################################
-	#          Assign Countries                 #
-	#############################################
+	#################################
+	#	Assign Countries	#
+	#################################
 
 	foreach ($continents as $continent => $pfb_alias) {
 		if (is_array($config['installedpackages']['pfblockerng' . strtolower(preg_replace('/ /','',$continent))]['config'])) {
@@ -1039,9 +1189,9 @@ function sync_package_pfblockerng($cron = "") {
 	# UNSET variables
 	unset ($continent, $continent_existing, $continent_new);
 
-	#############################################
-	#    Download and Collect IPv4/IPv6 lists   #
-	#############################################
+	#################################################
+	#	Download and Collect IPv4/IPv6 lists	#
+	#################################################
 
 	# IPv4 REGEX Definitions
 	$pfb['range']	= '/((?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?))-((?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?))/';
@@ -1052,21 +1202,25 @@ function sync_package_pfblockerng($cron = "") {
 
 	# IPv4 preg_replace Regex Filter array
 	$pfb_ipreg = array();
-	$pfb_ipreg[0] = '/\b0+(?=\d)/'; # Remove any Leading Zeros in each Octet
-	$pfb_ipreg[1] = '/\s/'; # Remove any Whitespaces
-	$pfb_ipreg[2] = '/127\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}/'; # Remove any Loopback Addresses 127/8
-	$pfb_ipreg[3] = '/0\.0\.0\.0/'; # Remove 0.0.0.0
+	$pfb_ipreg[0] = '/\b0+(?=\d)/';					# Remove any Leading Zeros in each Octet
+	$pfb_ipreg[1] = '/\s/';						# Remove any Whitespaces
+	$pfb_ipreg[2] = '/127\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}/';	# Remove any Loopback Addresses 127/8
+	$pfb_ipreg[3] = '/0\.0\.0\.0\/32/';				# Remove 0.0.0.0/32
+	$pfb_ipreg[4] = '/0\.0\.0\.0/';					# Remove 0.0.0.0
 
 	# IPv6 REGEX Definitions  -- ** Still Needs some Adjustment on Regex Definition for IPv6 **
 	# https://mebsd.com/coding-snipits/php-regex-ipv6-with-preg_match.html
 	$pattern1 = '([A-Fa-f0-9]{1,4}:){7}[A-Fa-f0-9]{1,4}';
-	$pattern2 = '([A-Fa-f0-9]{1,4}::([A-Fa-f0-9]{1,4}:){0,5}[A-Fa-f0-9]{1,4}';
+	$pattern2 = '[A-Fa-f0-9]{1,4}::([A-Fa-f0-9]{1,4}:){0,5}[A-Fa-f0-9]{1,4}';
 	$pattern3 = '([A-Fa-f0-9]{1,4}:){2}:([A-Fa-f0-9]{1,4}:){0,4}[A-Fa-f0-9]{1,4}';
 	$pattern4 = '([A-Fa-f0-9]{1,4}:){3}:([A-Fa-f0-9]{1,4}:){0,3}[A-Fa-f0-9]{1,4}';
 	$pattern5 = '([A-Fa-f0-9]{1,4}:){4}:([A-Fa-f0-9]{1,4}:){0,2}[A-Fa-f0-9]{1,4}';
 	$pattern6 = '([A-Fa-f0-9]{1,4}:){5}:([A-Fa-f0-9]{1,4}:){0,1}[A-Fa-f0-9]{1,4}';
 	$pattern7 = '([A-Fa-f0-9]{1,4}:){6}:[A-Fa-f0-9]{1,4}';
-	$pfb['ipv6'] = "/^($pattern1)$|^($pattern2)$|^($pattern3)$|^($pattern4)$|^($pattern5)$|^($pattern6)$|^($pattern7)$/";
+	$pattern8 = '[A-Fa-f0-9]{1,4}:[A-Fa-f0-9]{1,4}:[A-Fa-f0-9]{1,4}::\/[0-9]{2}';
+	$pattern9 = '[A-Fa-f0-9]{1,4}:([A-Fa-f0-9]{1,4}::)\/[0-9]{2}';
+	$pattern10 = '[A-Fa-f0-9]{1,4}::\/[0-9]{2}';
+	$pfb['ipv6'] = "/($pattern1)|($pattern2)|($pattern3)|($pattern4)|($pattern5)|($pattern6)|($pattern7)|($pattern8)|($pattern9)|($pattern10)/";
 
 	$pfb['supp_update'] = FALSE;
 	$list_type = array ("pfblockernglistsv4" => "_v4", "pfblockernglistsv6" => "_v6");
@@ -1097,15 +1251,15 @@ function sync_package_pfblockerng($cron = "") {
 								$log_tab = "\t\t";
 							}
 
-							# Collect Active Alias List (Used for pfctl Update when 'Reputation' is enabled.
-							$pfb_alias_lists_all[] = "{$alias}";
-
 							// Empty Header Field Validation Check
-							if (empty($header_url)) {
-								$log = "\n [ {$row['url']} ] {$log_tab} Header Field cannot be Empty. *Skipping* \n";
+							if (empty($header_url) || preg_match("/\W/",$header_url)) {
+								$log = "\n [ {$row['url']} ]\n ** TERMINATED - Header contains Blank/International/Special or Spaces\n";
 								pfb_logger("{$log}","2");
 								continue;
 							}
+
+							# Collect Active Alias List (Used for pfctl Update when 'Reputation' is enabled.
+							$pfb_alias_lists_all[] = "{$alias}";
 
 							if (file_exists($pfbfolder . '/' . $header_url . '.txt') && $pfb['reuse'] == "") {
 								if ($row['state'] == "Hold") {
@@ -1126,7 +1280,7 @@ function sync_package_pfblockerng($cron = "") {
 								$host = @parse_url($row['url']);
 								$list_url = "{$row['url']}";
 								if ($row['format'] != "rsync" || $row['format'] != "html") {
-									if ($host['host'] == "127.0.0.1" || $host['host'] ==  $pfb['iplocal'] || empty($host['host'])) {
+									if ($host['host'] == "127.0.0.1" || $host['host'] == $pfb['iplocal'] || empty($host['host'])) {
 										$remote_tds = "local";
 									} else {
 										$remote_tds = @implode(preg_grep("/Last-Modified/", get_headers($list_url)));
@@ -1278,12 +1432,14 @@ function sync_package_pfblockerng($cron = "") {
 								if (!empty($url_list)) {
 									if ($row['format'] == "gz" && $vtype == "_v4") {
 										foreach ($url_list as $line) {
-											# Network range 192.168.0.0-192.168.0.254
-											if (preg_match($pfb['range'],$line,$matches)) {
-												$a_cidr = ip_range_to_subnet_array($matches[1],$matches[2]);
-												if (!empty($a_cidr)) {
-													foreach ($a_cidr as $cidr) {
-														$new_file .= preg_replace($pfb_ipreg,'',$cidr) . "\n";
+											if (!preg_match("/^#/", $line)) {
+												# Network range 192.168.0.0-192.168.0.254
+												if (preg_match($pfb['range'],$line,$matches)) {
+													$a_cidr = ip_range_to_subnet_array_temp2($matches[1],$matches[2]);
+													if (!empty($a_cidr)) {
+														foreach ($a_cidr as $cidr) {
+															$new_file .= preg_replace($pfb_ipreg,'',$cidr) . "\n";
+														}
 													}
 												}
 											}
@@ -1292,44 +1448,52 @@ function sync_package_pfblockerng($cron = "") {
 
 									elseif ($row['format'] == "block" && $vtype == "_v4") {
 										foreach ($url_list as $line) {
-											# Block Type '218.77.79.0	218.77.79.255   24'
-											if (preg_match($pfb['block'],$line,$matches)) {
-												$new_file .= preg_replace($pfb_ipreg, '',$matches[0]) . "/24\n";
+											if (!preg_match("/^#/", $line)) {
+												# Block Type '218.77.79.0	218.77.79.255   24'
+												if (preg_match($pfb['block'],$line,$matches)) {
+													$new_file .= preg_replace($pfb_ipreg, '',$matches[0]) . "/24\n";
+												}
 											}
 										}
 									}
 
 									elseif ($row['format'] == "html" && $vtype == "_v4") {
 										foreach ($url_list as $line) {
-											# CIDR format 192.168.0.0/16
-											if (preg_match($pfb['cidr'],$line,$matches)) {
-												$new_file .= preg_replace($pfb_ipreg, '',$matches[0]) . "\n";
-											}
-											# Single ip addresses
-											elseif (preg_match($pfb['s_html'],$line,$matches)) {
-												$new_file .= preg_replace($pfb_ipreg, '',$matches[0]) . "\n";
+											if (!preg_match("/^#/", $line)) {
+												# CIDR format 192.168.0.0/16
+												if (preg_match($pfb['cidr'],$line,$matches)) {
+													$new_file .= preg_replace($pfb_ipreg, '',$matches[0]) . "\n";
+												}
+												# Single ip addresses
+												elseif (preg_match($pfb['s_html'],$line,$matches)) {
+													$new_file .= preg_replace($pfb_ipreg, '',$matches[0]) . "\n";
+												}
 											}
 										}
 									} 
 
 									elseif ($vtype == "_v6") {
 										foreach ($url_list as $line) {
-											# IPv6 Regex Match
-											if (preg_match($pfb['ipv6'],$line,$matches)) {
-												$new_file .= preg_replace($pfb_ipreg, '',$matches[0]) . "\n";
+											if (!preg_match("/^#/", $line)) {
+												# IPv6 Regex Match
+												if (preg_match($pfb['ipv6'],$line,$matches)) {
+													$new_file .= preg_replace($pfb_ipreg, '',$matches[0]) . "\n";
+												}
 											}
 										}
 									}
 
 									else {
 										foreach ($url_list as $line) {
-											# CIDR format 192.168.0.0/16
-											if (preg_match($pfb['cidr'],$line,$matches)) {
-												$new_file .= preg_replace($pfb_ipreg, '',$matches[0]) . "\n";
-											}
-											# Single ip addresses
-											elseif (preg_match($pfb['single'],$line,$matches)) {
-												$new_file .= preg_replace($pfb_ipreg, '',$matches[0]) . "\n";
+											if (!preg_match("/^#/", $line)) {
+												# CIDR format 192.168.0.0/16
+												if (preg_match($pfb['cidr'],$line,$matches)) {
+													$new_file .= preg_replace($pfb_ipreg, '',$matches[0]) . "\n";
+												}
+												# Single ip addresses
+												elseif (preg_match($pfb['single'],$line,$matches)) {
+													$new_file .= preg_replace($pfb_ipreg, '',$matches[0]) . "\n";
+												}
 											}
 										}
 									}
@@ -1406,7 +1570,7 @@ function sync_package_pfblockerng($cron = "") {
 									$ip2 = preg_replace("/(\d{1,3})\.(\d{1,3}).(\d{1,3}).(\d{1,3})/", "\"^$1\.$2\.$3\.\"", $ip);
 
 									# Only Perform these Checks if they are not "localfiles"
-									if ($host['host'] == "127.0.0.1" || $host['host'] ==  $pfb['iplocal'] || empty($host['host'])) {
+									if ($host['host'] == "127.0.0.1" || $host['host'] == $pfb['iplocal'] || empty($host['host'])) {
 										$log = " [ {$alias} {$header_url} ] Local File Failure \n";
 										pfb_logger("{$log}","2");
 									} else {
@@ -1498,7 +1662,7 @@ function sync_package_pfblockerng($cron = "") {
 										}
 										# Network range 192.168.0.0-192.168.0.254
 										elseif (preg_match($pfb['range'],$line,$matches)) {
-											$a_cidr = ip_range_to_subnet_array($matches[1],$matches[2]);
+											$a_cidr = ip_range_to_subnet_array_temp2($matches[1],$matches[2]);
 											if (!empty($a_cidr)) {
 												foreach ($a_cidr as $cidr) {
 													$new_file .= preg_replace($pfb_ipreg, '',$cidr) . "\n";
@@ -1542,9 +1706,9 @@ function sync_package_pfblockerng($cron = "") {
 	}
 
 
-	#############################################
-	#           REPUTATION PROCESSES            #
-	#############################################
+	#################################
+	#	REPUTATION PROCESSES	#
+	#################################
 
 	# IP Reputation processes (pdup and ddup)
 	if ($pfb['pdup'] == "on" && $pfb['dupcheck'] && !$pfb['save'] && $pfb['enable'] == "on") {
@@ -1556,9 +1720,9 @@ function sync_package_pfblockerng($cron = "") {
 		exec ("{$pfb['script']} dedup x {$pfb['dmax']} {$pfb['dedup']} {$pfb['ccexclude']} {$pfb['ccwhite']} {$pfb['ccblack']} >> {$pfb['log']} 2>&1");
 	}
 
-	#############################################
-	#            CONFIGURE ALIASES              #
-	#############################################
+	#################################
+	#	CONFIGURE ALIASES	#
+	#################################
 
 	$list_type = array ("pfblockernglistsv4" => "_v4", "pfblockernglistsv6" => "_v6");
 	foreach ($list_type as $ip_type => $vtype) {
@@ -1767,9 +1931,9 @@ function sync_package_pfblockerng($cron = "") {
 	${$alias} = "";
 
 
-	#############################################
-	#       UPDATE PfSENSE ALIAS TABLES         #
-	#############################################
+	#########################################
+	#	UPDATE pfSense ALIAS TABLES	#
+	#########################################
 
 	#update pfsense alias table
 	if (is_array($config['aliases']['alias'])) {
@@ -1806,9 +1970,9 @@ function sync_package_pfblockerng($cron = "") {
 	unset($new_aliases, $cbalias);
 
 
-	#############################################
-	#              Assign rules                 #
-	#############################################
+	#########################
+	#	Assign Rules	#
+	#########################
 
 	# Only Execute if AutoRules are defined or if an Alias has been removed.
 	if ($pfb['autorules'] || $pfb['enable'] == "" || $pfb['remove']) {
@@ -2074,9 +2238,106 @@ function sync_package_pfblockerng($cron = "") {
 		unset ($other_rules,$fother_rules,$permit_rules,$fpermit_rules,$match_rules,$fmatch_rules);
 	}
 
-	#############################################
-	#          Define/Apply CRON Jobs           #
-	#############################################
+
+	#################################
+	#	Closing Processes	#
+	#################################
+
+	#uncheck Reusing Existing Downloads Check box
+	if (!$pfb['save'] && $pfb['enable'] == "on")
+		$config['installedpackages']['pfblockerng']['config'][0]['pfb_reuse'] = "";
+
+	# Save all Changes to pfSense config file
+	write_config();
+
+	# If 'Rule Changes' are found, utilize the 'filter_configure()' function, if not, utilize 'pfctl replace' command
+	if ($pfb['autorules'] && $rules != $new_rules || $pfb['enable'] == "" || $pfb['remove']) {
+		require_once("filter.inc");
+
+		if (!$pfb['save']) {
+			$log = "\n===[  Aliastables / Rules  ]================================\n\n";
+			pfb_logger("{$log}","1");
+
+			$log = "Firewall Rule Changes Found, Applying Filter Reload \n";
+			pfb_logger("{$log}","1");
+		}
+
+		# Remove all pfBlockerNG Alias tables
+		if (!empty($aliases_list)) {
+			foreach ($aliases_list as $table) {
+				exec ("/sbin/pfctl -t " . escapeshellarg($table) . " -T kill 2>&1", $pfb_null);
+			}
+		}
+
+		#load filter file which will create the pfctl tables
+		filter_configure();
+
+		// Call function for NanoBSD/Ramdisk processes.
+		pfb_aliastables("update");
+	} else {
+		# Don't Execute on User 'Save'
+		if (!$pfb['save']) {
+
+			$log = "\n===[  Aliastables / Rules  ]================================\n\n";
+			pfb_logger("{$log}","1");
+
+			$log = "No Changes to Firewall Rules, Skipping Filter Reload \n";
+			pfb_logger("{$log}","1");
+
+			// Re-Save Only Aliases that have been updated only.
+			// When 'Reputation' is used, all Aliases Need to be Updated.
+			$final_alias = array();
+			if ($pfb['dedup'] == "on" || $pfb['pdup'] == "on") {
+				if (!empty($pfb_alias_lists_all))
+					$final_alias = array_unique($pfb_alias_lists_all);
+			} else {
+				if (!empty($pfb_alias_lists))
+					$final_alias = array_unique($pfb_alias_lists);
+			}
+
+			if (!empty($final_alias)) {
+				foreach ($final_alias as $final) {
+					$log = "\n Updating: {$final} \n";
+					pfb_logger("{$log}","1");
+					$result_pfctl = "";
+					exec ("/sbin/pfctl -t " . escapeshellarg($final) . " -T replace -f " . $pfb['aliasdir'] . "/" . escapeshellarg($final) . ".txt 2>&1", $result_pfctl);
+					$log = implode($result_pfctl);
+					pfb_logger("{$log}","1");
+				}
+
+				// Call function for NanoBSD/Ramdisk processes.
+				pfb_aliastables("update");
+			} else {
+				$log = "\nNo Changes to Aliases, Skipping pfctl Update \n";
+				pfb_logger("{$log}","1");
+			}
+		}
+	}
+	# UNSET Variables
+	unset($rules, $new_rules);
+
+	#sync config
+	pfblockerng_sync_on_changes();
+
+	#################################
+	#	FINAL REPORTING		#
+	#################################
+
+	# Only run with CRON or Force Invoked Process
+	if ((!$pfb['save'] && $pfb['dupcheck'] && $pfb['enable'] == "on") || $pfb['summary']) {
+		# Script to run Final Script Processes.
+		exec ("{$pfb['script']} closing {$pfb['dup']} >> {$pfb['log']} 2>&1");
+	}
+
+	if ($pfb['enable'] == "on" && !$pfb['save']) {
+		$log = "\n\n UPDATE PROCESS ENDED [ NOW ]\n";
+		pfb_logger("{$log}","1");
+	}
+
+
+	#########################################
+	#	Define/Apply CRON Jobs		#
+	#########################################
 
 	# Clear any existing pfBlockerNG Cron Jobs
 	install_cron_job("pfblockerng.php cron", false);
@@ -2113,94 +2374,6 @@ function sync_package_pfblockerng($cron = "") {
 
 		install_cron_job($pfb_gcmd, true, $pfb_gmin, $pfb_ghour, $pfb_gmday, $pfb_gmonth, $pfb_gwday, $pfb_gwho);
 	}
-
-
-	#############################################
-	#             Closing Processes             #
-	#############################################
-
-	#uncheck Reusing Existing Downloads Check box
-	if (!$pfb['save'] && $pfb['enable'] == "on")
-		$config['installedpackages']['pfblockerng']['config'][0]['pfb_reuse'] = "";
-
-	# Save all Changes to pfSense config file
-	write_config();
-
-	# If 'Rule Changes' are found, utilize the 'filter_configure()' function, if not, utilize 'pfctl replace' command
-	if ($pfb['autorules'] && $rules != $new_rules || $pfb['enable'] == "" || $pfb['remove']) {
-		require_once("filter.inc");
-
-		$log = "\n===[  Aliastables / Rules  ]================================\n\n";
-		pfb_logger("{$log}","1");
-
-		$log = "Firewall Rule Changes Found, Applying Filter Reload \n";
-		pfb_logger("{$log}","1");
-
-		# Remove all pfBlockerNG Alias tables
-		if (!empty($aliases_list)) {
-			foreach ($aliases_list as $table) {
-				exec ("/sbin/pfctl -t " . escapeshellarg($table) . " -T kill 2>&1", $pfb_null);
-			}
-		}
-
-		#load filter file which will create the pfctl tables
-		filter_configure();
-	} else {
-		# Don't Execute on User 'Save'
-		if (!$pfb['save']) {
-
-			$log = "\n===[  Aliastables / Rules  ]================================\n\n";
-			pfb_logger("{$log}","1");
-
-			$log = "No Changes to Firewall Rules, Skipping Filter Reload \n";
-			pfb_logger("{$log}","1");
-
-			// Re-Save Only Aliases that have been updated only.
-			// When 'Reputation' is used, all Aliases Need to be Updated.
-			$final_alias = array();
-			if ($pfb['dedup'] == "on" || $pfb['pdup'] == "on") {
-				if (!empty($pfb_alias_lists_all))
-					$final_alias = array_unique($pfb_alias_lists_all);
-			} else {
-				if (!empty($pfb_alias_lists))
-					$final_alias = array_unique($pfb_alias_lists);
-			}
-
-			if (!empty($final_alias)) {
-				foreach ($final_alias as $final) {
-					$log = "\n Updating: {$final} \n";
-					pfb_logger("{$log}","1");
-					$result_pfctl = "";
-					exec ("/sbin/pfctl -t " . escapeshellarg($final) . " -T replace -f " . $pfb['aliasdir'] . "/" . escapeshellarg($final) . ".txt 2>&1", $result_pfctl);
-					$log = implode($result_pfctl);
-					pfb_logger("{$log}","1");
-				}
-			} else {
-				$log = "\n No Changes to Aliases, Skipping pfctl Update \n";
-				pfb_logger("{$log}","1");
-			}
-		}
-	}
-	# UNSET Variables
-	unset($rules, $new_rules);
-
-	#sync config
-	pfblockerng_sync_on_changes();
-
-	#############################################
-	#             FINAL REPORTING               #
-	#############################################
-
-	# Only run with CRON or Force Invoked Process
-	if ((!$pfb['save'] && $pfb['dupcheck'] && $pfb['enable'] == "on") || $pfb['summary']) {
-		# Script to run Final Script Processes.
-		exec ("{$pfb['script']} closing {$pfb['dup']} >> {$pfb['log']} 2>&1");
-	}
-
-	if ($pfb['enable'] == "on" && !$pfb['save']) {
-		$log = "\n\n UPDATE PROCESS ENDED [ NOW ]\n";
-		pfb_logger("{$log}","1");
-	}
 }
 
 
@@ -2235,18 +2408,29 @@ function pfblockerng_php_install_command() {
 	global $config,$pfb;
 	pfb_global();
 
+	// Remove previously used CC folder location if exists
+	@rmdir_recursive("{$pfb['dbdir']}/cc");
+
 	# Uncompress Country Code File and delete Archive after extraction.
-	exec("cd /{$pfb['ccdir']}; /usr/bin/tar -jxvf {$pfb['ccdir']}/countrycodes.tar.bz2");
+	@rename("{$pfb['dbdir']}/countrycodes.tar.bz2", "{$pfb['ccdir']}/countrycodes.tar.bz2");
+	exec("cd {$pfb['ccdir']}; /usr/bin/tar -jxvf {$pfb['ccdir']}/countrycodes.tar.bz2");
 	unlink_if_exists("{$pfb['ccdir']}/countrycodes.tar.bz2");
 	# Download MaxMind Files and Create Country Code files and Build Continent XML Files
 	update_output_window(gettext("Downloading MaxMind Country Databases. This may take a minute..."));
 	exec("/bin/sh /usr/local/pkg/pfblockerng/geoipupdate.sh all >> {$pfb['geolog']} 2>&1");
+
 	update_output_window(gettext("MaxMind Country Database downloads completed..."));
 	update_output_window(gettext("Converting MaxMind Country Databases for pfBlockerNG. This may take a few minutes..."));
 	pfblockerng_uc_countries();
 	update_output_window(gettext("Creating pfBlockerNG Continenet XML Files..."));
 	pfblockerng_get_countries();
 	update_output_window(gettext("Completed Creating pfBlockerNG Continenet XML Files..."));
+
+	// Remove Original Maxmind Database Files
+	@unlink_if_exists("{$pfb['dbdir']}/GeoIPCountryCSV.zip");
+	@unlink_if_exists("{$pfb['dbdir']}/GeoIPCountryWhois.csv");
+	@unlink_if_exists("{$pfb['dbdir']}/GeoIPv6.csv");
+	@unlink_if_exists("{$pfb['dbdir']}/country_continent.csv");
 
 	# Add Widget to Dashboard
 	update_output_window(gettext("Adding pfBlockerNG Widget to Dashboard."));
@@ -2283,6 +2467,15 @@ function pfblockerng_php_deinstall_command() {
 		rmdir_recursive("{$pfb['dbdir']}");
 		rmdir_recursive("{$pfb['logdir']}");
 
+		// Remove Aliastables archive and earlyshellcmd if found.
+		@unlink_if_exists("{$pfb['aliasarchive']}");
+		if (is_array($config['system']['earlyshellcmd'])) {
+			$a_earlyshellcmd = &$config['system']['earlyshellcmd'];
+			if (preg_grep("/pfblockerng.sh aliastables/", $a_earlyshellcmd)) {
+				$a_earlyshellcmd = preg_grep("/pfblockerng.sh aliastables/", $a_earlyshellcmd, PREG_GREP_INVERT);
+			}
+		}
+
 		# Remove Settings from Config
 		if (is_array($config['installedpackages']['pfblockerng']))
 			unset($config['installedpackages']['pfblockerng']);
@@ -2312,6 +2505,8 @@ function pfblockerng_php_deinstall_command() {
 			unset($config['installedpackages']['pfblockerngsouthamerica']);
 		if (is_array($config['installedpackages']['pfblockerngtopspammers']))
 			unset($config['installedpackages']['pfblockerngtopspammers']);
+		if (is_array($config['installedpackages']['pfblockerngproxyandsatellite']))
+			unset($config['installedpackages']['pfblockerngproxyandsatellite']);
 	}
 
 	# Remove Widget (code from Snort deinstall)
@@ -2453,18 +2648,19 @@ function pfblockerng_do_xmlrpc_sync($sync_to_ip, $port, $protocol, $username, $p
 	$xml = array();
 	// If User Disabled, remove 'General Tab Customizations' from Sync
 	if ($config['installedpackages']['pfblockerngsync']['config'][0]['syncinterfaces'] == "")
-		$xml['pfblockerng'] = $config['installedpackages']['pfblockerng'];
-	$xml['pfblockerngreputation'] = $config['installedpackages']['pfblockerngreputation'];
-	$xml['pfblockernglistsv4'] = $config['installedpackages']['pfblockernglistsv4'];
-	$xml['pfblockernglistsv6'] = $config['installedpackages']['pfblockernglistsv6'];
-	$xml['pfblockerngtopspammers'] = $config['installedpackages']['pfblockerngtopspammers'];
-	$xml['pfblockerngafrica'] = $config['installedpackages']['pfblockerngafrica'];
-	$xml['pfblockerngantartica'] = $config['installedpackages']['pfblockerngantartica'];
-	$xml['pfblockerngasia'] = $config['installedpackages']['pfblockerngasia'];
-	$xml['pfblockerngeurope'] = $config['installedpackages']['pfblockerngeurope'];
-	$xml['pfblockerngnorthamerica'] = $config['installedpackages']['pfblockerngnorthamerica'];
-	$xml['pfblockerngoceania'] = $config['installedpackages']['pfblockerngoceania'];
-	$xml['pfblockerngsouthamerica'] = $config['installedpackages']['pfblockerngsouthamerica'];
+		$xml['pfblockerng']		= $config['installedpackages']['pfblockerng'];
+	$xml['pfblockerngreputation']		= $config['installedpackages']['pfblockerngreputation'];
+	$xml['pfblockernglistsv4']		= $config['installedpackages']['pfblockernglistsv4'];
+	$xml['pfblockernglistsv6']		= $config['installedpackages']['pfblockernglistsv6'];
+	$xml['pfblockerngtopspammers']		= $config['installedpackages']['pfblockerngtopspammers'];
+	$xml['pfblockerngafrica']		= $config['installedpackages']['pfblockerngafrica'];
+	$xml['pfblockerngantartica']		= $config['installedpackages']['pfblockerngantartica'];
+	$xml['pfblockerngasia']			= $config['installedpackages']['pfblockerngasia'];
+	$xml['pfblockerngeurope']		= $config['installedpackages']['pfblockerngeurope'];
+	$xml['pfblockerngnorthamerica']		= $config['installedpackages']['pfblockerngnorthamerica'];
+	$xml['pfblockerngoceania']		= $config['installedpackages']['pfblockerngoceania'];
+	$xml['pfblockerngsouthamerica']		= $config['installedpackages']['pfblockerngsouthamerica'];
+	$xml['pfblockerngproxyandsatellite']	= $config['installedpackages']['pfblockerngproxyandsatellite'];
 
 	/* assemble xmlrpc payload */
 	$params = array(

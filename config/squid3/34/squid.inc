@@ -42,13 +42,8 @@ if(!function_exists("filter_configure"))
 	require_once("filter.inc");
 
 $shortcut_section = "squid";
-if (is_dir('/usr/pbi/squid-' . php_uname("m"))) {
-	define('SQUID_BASE', '/usr/pbi/squid-' . php_uname("m"));
-	define('SQUID_LOCALBASE', SQUID_BASE . "/local");
-} else {
-	define('SQUID_BASE', '/usr/local');
-	define('SQUID_LOCALBASE', '/usr/local');
-}
+define('SQUID_BASE', '/usr/pbi/squid-' . php_uname("m"));
+define('SQUID_LOCALBASE', SQUID_BASE . "/local");
 
 define('SQUID_CONFBASE', SQUID_LOCALBASE .'/etc/squid');
 define('SQUID_CONFFILE', SQUID_CONFBASE . '/squid.conf');
@@ -174,7 +169,7 @@ function squid_install_command() {
 		$settingsgen = $config['installedpackages']['squid']['config'][0];
 
 	if (file_exists("/usr/local/pkg/check_ip.php"))
-		rename("/usr/local/pkg/check_ip.php",SQUID_LOCALBASE . "/libexec/squid/check_ip.php");
+		rename("/usr/local/pkg/check_ip.php",SQUID_BASE . "/bin/check_ip.php");
 	/* Set storage system */
 	if ($g['platform'] == "nanobsd") {
 		$config['installedpackages']['squidcache']['config'][0]['harddisk_cache_system'] = 'null';
@@ -407,6 +402,24 @@ function squid_before_form_general(&$pkg) {
 	for ($i = 0; $i < count($values) - 1; $i++)
 		$field['options']['option'][] = array('name' => $names[$i], 'value' => $values[$i]);
 }
+function squid_validate_antivirus($post, &$input_errors) {
+	global $config;
+	if ($post['enable']=="on"){
+		if($post['squidclamav'] && preg_match("/(\S+proxy.domain\S+)/",$post['squidclamav'],$a_match)){
+			$input_errors[] ="Squidclamav warns redirect points to sample config domain ({$a_match[1]})";
+			$input_errors[] ="Change redirect info on 'squidclamav.conf' field to pfsense gui or an external host. ";
+			}
+		if($post['c-icap_conf']) {
+			if( !preg_match("/squid_clamav/",$post['c-icap_conf'])){
+				$input_errors[] ="c-icap Squidclamav service definition  is no present.";
+				$input_errors[] ="Add 'Service squid_clamav squidclamav.so'(without quotes) to 'c-icap.conf' field in order to get it working.";
+				}
+			if (preg_match("/(Manager:Apassword\S+)/",$post['c-icap_conf'],$c_match)){
+				$input_errors[] ="Remove ldap configuration'{$c_match[1]}' from 'c-icap.conf' field.";
+			}
+		}
+	}
+}
 
 function squid_validate_general($post, &$input_errors) {
 	global $config;
@@ -613,7 +626,7 @@ function squid_validate_traffic($post, &$input_errors) {
 }
 
 function squid_validate_reverse($post, &$input_errors) {
-
+	global $config;
 	if(!empty($post['reverse_ip'])) {
 		$reverse_ip = explode(";", ($post['reverse_ip']));
 		foreach ($reverse_ip as $reip) {
@@ -626,13 +639,20 @@ function squid_validate_reverse($post, &$input_errors) {
 		$input_errors[] = 'The field \'external FQDN\' must contain a valid domain name';
 
 	$port = trim($post['reverse_http_port']);
+	preg_match("/(\d+)/",`sysctl net.inet.ip.portrange.first`,$portrange);
 	if (!empty($port) && !is_port($port))
 		$input_errors[] = 'The field \'reverse HTTP port\' must contain a valid port number';
-
+	if (!empty($port) && is_port($port) && $port < $portrange[1]){
+		$input_errors[] = "The field 'reverse HTTP port' must contain a port number higher than net.inet.ip.portrange.first sysctl value({$portrange[1]}).";
+		$input_errors[] = "To listen on low ports, change portrange.first sysctl value to 0 on system tunable options and restart squid daemon.";
+	}
 	$port = trim($post['reverse_https_port']);
 	if (!empty($port) && !is_port($port))
 		$input_errors[] = 'The field \'reverse HTTPS port\' must contain a valid port number';
-
+	if (!empty($port) && is_port($port) && $port < $portrange[1]){
+		$input_errors[] = "The field 'reverse HTTPS port' must contain a port number higher than net.inet.ip.portrange.first sysctl value({$portrange[1]}).";
+		$input_errors[] = "To listen on low ports, change portrange.first sysctl value to 0 on system tunable options and restart squid daemon.";
+	}
 	if ($post['reverse_ssl_cert'] == 'none')
 		$input_errors[] = 'A valid certificate for the external interface must be selected';
 
@@ -940,7 +960,12 @@ function squid_resync_general() {
 	}
 	$icp_port = ($settings['icp_port'] ? $settings['icp_port'] : 0);
 	$dns_v4_first= ($settings['dns_v4_first'] == "on" ? "on" : "off" );
-	$pidfile = "{$g['varrun_path']}/squid.pid";
+	$piddir="{$g['varrun_path']}/squid";
+	$pidfile = "{$piddir}/squid.pid";
+	if (!is_dir($piddir)){
+		make_dirs($piddir);
+		squid_chown_recursive($piddir, 'proxy', 'wheel');
+		}
 	$language = ($settings['error_language'] ? $settings['error_language'] : 'en');
 	$icondir = SQUID_CONFBASE . '/icons';
 	$hostname = ($settings['visible_hostname'] ? $settings['visible_hostname'] : 'localhost');
@@ -1000,7 +1025,8 @@ EOD;
 		$conf .= "acl localnet src $src\n";
 		$valid_acls[] = 'localnet';
 	}
-	if ($settings['disable_xforward']) $conf .= "forwarded_for off\n";
+	if ($settings['xforward_mode']) $conf .= "forwarded_for {$settings['xforward_mode']}\n";
+  else $conf .= "forwarded_for on\n"; //only used for first run
 	if ($settings['disable_via']) $conf .= "via off\n";
 	if ($settings['disable_squidversion']) $conf .= "httpd_suppress_version_string on\n";
 	if (!empty($settings['uri_whitespace'])) $conf .= "uri_whitespace {$settings['uri_whitespace']}\n";
@@ -1325,35 +1351,6 @@ function squid_resync_antivirus(){
 		}
 		if (is_array($config['installedpackages']['squid']))
 			$squid_config=$config['installedpackages']['squid']['config'][0];
-		$clwarn="clwarn.cgi.en_EN";
-		if (preg_match("/de/i",$squid_config['error_language']))
-			$clwarn="clwarn.cgi.de_DE";
-		if (preg_match("/ru/i",$squid_config['error_language']))
-			$clwarn="clwarn.cgi.ru_RU";
-		if (preg_match("/fr/i",$squid_config['error_language']))
-			$clwarn="clwarn.cgi.fr_FR";
-		if (preg_match("/pt_br/i",$squid_config['error_language']))
-			$clwarn="clwarn.cgi.pt_BR";
-		$clwarn_file="/usr/local/www/clwarn.cgi";
-		copy(SQUID_LOCALBASE."/libexec/squidclamav/{$clwarn}",$clwarn_file);
-
-		#fix perl path on clwarn.cgi
-		$clwarn_file_new=file_get_contents($clwarn_file);
-		$c_pattern[]="@/usr/\S+/perl@";
-		$c_replacement[]=SQUID_BASE."/bin/perl";
-		/*$c_pattern[]="@redirect \S+/clwarn.cgi@";
-		$gui_proto=$config['system']['webgui']['protocol'];
-		$gui_port=$config['system']['webgui']['port'];
-		if($gui_port == "") {
-			$gui_port($gui_proto == "http"?"80":"443");
-			}
-		$c_replacement[]=SQUID_LOCALBASE."redirect {$gui_proto}://127.0.0.1:{$gui_port}/clwarn.cgi";
-		*/
-		$clwarn_file_new=preg_replace($c_pattern, $c_replacement,$clwarn_file_new);
-		file_put_contents($clwarn_file, $clwarn_file_new,LOCK_EX);
-
-		#fix clwarn.cgi file permission
-		chmod($clwarn_file,0755);
 
 		$conf = <<< EOF
 icap_enable on
@@ -1364,11 +1361,10 @@ icap_client_username_header X-Authenticated-User
 icap_preview_enable on
 icap_preview_size 1024
 
-icap_service service_req reqmod_precache bypass=0 icap://127.0.0.1:1344/squidclamav
-icap_service service_resp respmod_precache bypass=0 icap://127.0.0.1:1344/squidclamav
-
-adaptation_access service_req allow all
-adaptation_access service_resp allow all
+icap_service service_avi_req reqmod_precache icap://[::1]:1344/squid_clamav bypass=off
+adaptation_access service_avi_req allow all
+icap_service service_avi_resp respmod_precache icap://[::1]:1344/squid_clamav bypass=on
+adaptation_access service_avi_resp allow all
 
 EOF;
 		#check if icap is enabled on rc.conf.local
@@ -1395,29 +1391,41 @@ EOF;
 			if (file_exists(SQUID_LOCALBASE."/etc/c-icap/squidclamav.conf.default")){
 				$sample_file=file_get_contents(SQUID_LOCALBASE."/etc/c-icap/squidclamav.conf.default");
 				$clamav_m[0]="@/var/run/clamav/clamd.ctl@";
+				$clamav_m[1]="@cgi-bin/clwarn.cgi@";
 				$clamav_r[0]="/var/run/clamav/clamd.sock";
+				$clamav_r[1]="squid_clwarn.php";
 				file_put_contents(SQUID_LOCALBASE."/etc/c-icap/squidclamav.conf.sample",preg_replace($clamav_m,$clamav_r,$sample_file),LOCK_EX);
 			}
 		#c-icap.conf
 		if (!file_exists(SQUID_LOCALBASE."/etc/c-icap/c-icap.conf.sample"))
 			if (file_exists(SQUID_LOCALBASE."/etc/c-icap/c-icap.conf.default")){
 				$sample_file=file_get_contents(SQUID_LOCALBASE."/etc/c-icap/c-icap.conf.default");
-				if (! preg_match ("/squidclamav/"))
-					$sample_file.="\nService squidclamav squidclamav.so\n";
-
-				file_put_contents(SQUID_LOCALBASE."/etc/c-icap/c-icap.conf.sample",$sample_file,LOCK_EX);
+				if (! preg_match("/squid_clamav/",$sample_file))
+					$sample_file.="\nService squid_clamav squidclamav.so\n";
+				$cicap_m[0]="@Manager:Apassword\S+@";
+				$cicap_r[0]="";
+				file_put_contents(SQUID_LOCALBASE."/etc/c-icap/c-icap.conf.sample",preg_replace($cicap_m,$cicap_r,$sample_file),LOCK_EX);
 			}
+		//check squidclamav files until pbis are gone(https://redmine.pfsense.org/issues/4197)
+		$ln_icap= array('bin/c-icap','bin/c-icap-client','c-icap-config','c-icap-libicapapi-config','c-icap-stretch','lib/c_icap','share/c_icap','etc/c-icap');
+		foreach ($ln_icap as $ln){
+			if (!file_exists("/usr/local/{$ln}") && file_exists(SQUID_LOCALBASE."/{$ln}"))
+				symlink(SQUID_LOCALBASE."/{$ln}","/usr/local/{$ln}");
+		}
+		if (!file_exists("/usr/local/lib/libicapapi.so.3") && file_exists(SQUID_LOCALBASE."/lib/libicapapi.so.3.0.5"))
+			symlink(SQUID_LOCALBASE."/lib/libicapapi.so.3.0.5","/usr/local/lib/libicapapi.so.3");
+
 		$loadsample=0;
 		if ($antivirus_config['squidclamav'] =="" && file_exists(SQUID_LOCALBASE."/etc/c-icap/squidclamav.conf.sample")){
-			$config['installedpackages']['squidantivirus']['config'][0]['squidclamav']=base64_encode(file_get_contents(SQUID_LOCALBASE."/etc/c-icap/squidclamav.conf.sample"));
+			$config['installedpackages']['squidantivirus']['config'][0]['squidclamav']=base64_encode(str_replace( "\r", "",file_get_contents(SQUID_LOCALBASE."/etc/c-icap/squidclamav.conf.sample")));
 			$loadsample++;
 		}
 		if ($antivirus_config['c-icap_conf'] =="" && file_exists(SQUID_LOCALBASE."/etc/c-icap/c-icap.conf.sample")){
-			$config['installedpackages']['squidantivirus']['config'][0]['c-icap_conf']=base64_encode(file_get_contents(SQUID_LOCALBASE."/etc/c-icap/c-icap.conf.sample"));
+			$config['installedpackages']['squidantivirus']['config'][0]['c-icap_conf']=base64_encode(str_replace( "\r", "",file_get_contents(SQUID_LOCALBASE."/etc/c-icap/c-icap.conf.sample")));
 			$loadsample++;
 		}
-		if ($antivirus_config['squidclamav'] =="" && file_exists(SQUID_LOCALBASE."/etc/c-icap/c-icap.magic.default")){
-			$config['installedpackages']['squidantivirus']['config'][0]['c-icap_magic']=base64_encode(file_get_contents(SQUID_LOCALBASE."/etc/c-icap/c-icap.magic.default"));
+		if ($antivirus_config['c-icap_magic'] =="" && file_exists(SQUID_LOCALBASE."/etc/c-icap/c-icap.magic.sample")){
+			$config['installedpackages']['squidantivirus']['config'][0]['c-icap_magic']=base64_encode(str_replace( "\r", "",file_get_contents(SQUID_LOCALBASE."/etc/c-icap/c-icap.magic.sample")));
 			$loadsample++;
 		}
 		if($loadsample > 0){
@@ -1462,11 +1470,29 @@ EOF;
 				$sample_file=file_get_contents($c_icap_rcfile);
 				$cicapm[0]="@c_icap_user=.*}@";
 				$cicapr[0]='c_icap_user="clamav"}';
+				$cicapm[1]="@/usr/local@";
+				$cicapr[1]=SQUID_LOCALBASE;
 				file_put_contents($c_icap_rcfile,preg_replace($cicapm,$cicapr,$sample_file),LOCK_EX);
 				}
 			mwexec_bg("/usr/local/etc/rc.d/c-icap start");
 			}
-		#check clamav
+		#check clamav/freshclam
+		$rc_files=array("clamav-freshclam","clamav-clamd");
+		$clamm[0]="@/usr/local/(bin|sbin)@";
+		$clamm[1]="@/local/(bin|sbin)@";
+		$clamm[2]="@/usr/local/etc@";
+		$clamm[3]="@enable:=NO@";
+		$clamr[0]=SQUID_BASE."/bin";
+		$clamr[1]="/bin";
+		$clamr[2]=SQUID_LOCALBASE."/etc";
+		$clamr[3]="enable:=YES";
+		foreach ($rc_files as $rc_file){
+			$clamav_rcfile="/usr/local/etc/rc.d/{$rc_file}";
+			if (file_exists($clamav_rcfile)){
+				$sample_file=file_get_contents($clamav_rcfile);
+				file_put_contents($clamav_rcfile,preg_replace($clamm,$clamr,$sample_file),LOCK_EX);
+				}
+			}
 		if (is_process_running("clamd"))
 			mwexec_bg("/usr/local/etc/rc.d/clamav-clamd reload");
 		else
@@ -1738,7 +1764,7 @@ function squid_resync_auth() {
 				$conf .= "auth_param basic program ". SQUID_LOCALBASE . "/libexec/squid/basic_radius_auth -w {$settings['radius_secret']} -h {$settings['auth_server']} $port\n";
 				break;
 			case 'cp':
-				$conf .= "external_acl_type check_cp children-startup={$processes} ttl={$auth_ttl} %SRC ". SQUID_LOCALBASE . "/libexec/squid/check_ip.php\n";
+				$conf .= "external_acl_type check_cp children-startup={$processes} ttl={$auth_ttl} %SRC ". SQUID_BASE . "/bin/check_ip.php\n";
 				$conf .= "acl password external check_cp\n";
 				break;
 			case 'msnt':
@@ -2272,6 +2298,7 @@ function squid_write_rcfile() {
 	$rc = array();
 	$rc['file'] = 'squid.sh';
 	$rc['start'] = <<<EOD
+#sysctl net.inet.ip.portrange.reservedhigh=0
 if [ -z "`ps auxw | grep "[s]quid "|awk '{print $2}'`" ];then
 	{$squid_base}/sbin/squid -f {$squid_conffile_var}
 fi

@@ -1,5 +1,28 @@
 <?php
 
+if (!function_exists('clear_log_file')) {
+//include_once('guiconfig.inc'); // needed for clear_log_file() during package installation while booting
+//however guiconfig.inc includes authgui.inc which requires a valid php session_auth(), and exits when not found..
+//so include the function here..
+	function clear_log_file($logfile = "/var/log/system.log", $restart_syslogd = true) {
+		global $config, $g;
+		if ($restart_syslogd)
+			exec("/usr/bin/killall syslogd");
+		if(isset($config['system']['disablesyslogclog'])) {
+			unlink($logfile);
+			touch($logfile);
+		} else {
+			$log_size = isset($config['syslog']['logfilesize']) ? $config['syslog']['logfilesize'] : "511488";
+			if(isset($config['system']['usefifolog']))
+				exec("/usr/sbin/fifolog_create -s {$log_size} " . escapeshellarg($logfile));
+			else
+				exec("/usr/local/sbin/clog -i -s {$log_size} " . escapeshellarg($logfile));
+		}
+		if ($restart_syslogd)
+			system_syslogd_start();
+	}
+}
+
 function tinc_save() {
 	global $config;
 	conf_mount_rw();

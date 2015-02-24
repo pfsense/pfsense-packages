@@ -1,4 +1,5 @@
 <?php
+require_once("util.inc");
 function vnstat_install_deinstall() {
 	conf_mount_rw();
 	global $config;
@@ -113,18 +114,22 @@ EOF;
 	}
 	fwrite($hf2, $vnstat_conf_file);
 	fclose($hf2);
+	vnstat_link_config();
+	vnstat_create_nic_dbs();
 }
 
 function create_vnstati_image() {
 	conf_mount_rw();
 	global $config;
+	$vnstat_tmp = "/tmp/vnstat";
 	$iface = $_POST['vnstat_interface'];
 	$ifaces_final = convert_friendly_interface_to_real_interface_name($iface);
 	$config['installedpackages']['vnstat2']['config'][0]['vnstat_interface'] = $ifaces_final;
-	exec("/usr/local/bin/vnstati -i ". $ifaces_final ." -vs -o /tmp/newpicture1.png");
-	exec("/usr/local/bin/vnstati -i ". $ifaces_final ." -m -o /tmp/newpicture2.png");
-	exec("/usr/local/bin/vnstati -i ". $ifaces_final ." -d -o /tmp/newpicture3.png");
-	exec("/usr/local/bin/vnstati -i ". $ifaces_final ." -t -o /tmp/newpicture4.png");
+	@mkdir($vnstat_tmp);
+	exec("/usr/local/bin/vnstati -i ". escapeshellarg($ifaces_final) ." -vs -o {$vnstat_tmp}/newpicture1.png");
+	exec("/usr/local/bin/vnstati -i ". escapeshellarg($ifaces_final) ." -m -o {$vnstat_tmp}/newpicture2.png");
+	exec("/usr/local/bin/vnstati -i ". escapeshellarg($ifaces_final) ." -d -o {$vnstat_tmp}/newpicture3.png");
+	exec("/usr/local/bin/vnstati -i ". escapeshellarg($ifaces_final) ." -t -o {$vnstat_tmp}/newpicture4.png");
 	write_config();
 	conf_mount_ro();
 }
@@ -139,50 +144,71 @@ function create_vnstat_output() {
 	conf_mount_ro();
 }
 
+function vnstat_link_config() {
+// Check for pbi install and arch type then create symlinks
+	if (file_exists('/usr/pbi/vnstat-' . php_uname("m"))) {
+		$conf_path = "/usr/local/etc/vnstat.conf";
+		$pbi_conf_path = "/usr/pbi/vnstat-" . php_uname("m") . "/etc/vnstat.conf";
+		unlink_if_exists($pbi_conf_path);
+		symlink($conf_path, $pbi_conf_path);
+	}
+}
+
+function vnstat_create_nic_dbs() {
+	global $config;
+	conf_mount_rw();
+	$vnstat_db_prefix = "/conf/vnstat";
+	@mkdir($vnstat_db_prefix);
+
+	// Locate NICs and create associated databases
+	$array_of_real_nic_names = array();
+	$array_of_custom_nic_names = array();
+	$ifdescrs = array('wan' => 'WAN', 'lan' => 'LAN');
+	for ($j = 1; isset($config['interfaces']['opt' . $j]); $j++) {
+		$ifdescrs['opt' . $j] = $config['interfaces']['opt' . $j]['descr'];
+	}
+	foreach ($ifdescrs as $ifdescr => $ifname) {
+		$real_nic_names = convert_friendly_interface_to_real_interface_name($ifdescr);
+		array_push($array_of_real_nic_names, $real_nic_names);
+	}
+	$vnstat_nic = array_map('basename', glob($vnstat_db_prefix . '/*', GLOB_ONLYDIR));
+
+	// Compare real NICs with NICs assigned to vnstat
+	$leftovers = array_diff($array_of_real_nic_names, $vnstat_nic);
+	// Create database for each NIC
+	foreach ($leftovers as $nic) {
+		exec("/usr/local/bin/vnstat -u -i ". escapeshellarg($nic));
+	}
+
+	conf_mount_ro();
+}
+
 function vnstat_install_config() {
-        global $config;
+	$vnstat_db_prefix = "/conf/vnstat";
 	conf_mount_rw();
 // Create vnstat database dir where it also will work for nanobsd
-//	exec("[ -d /var/db/vnstat ] && mv /var/db/vnstat /conf/vnstat");
-	exec("[ -d /usr/local/pkg/vnstat2/vnstat ] && mv /usr/local/pkg/vnstat2/vnstat /conf/vnstat");
-	exec("[ ! -d /conf/vnstat ] && mkdir /conf/vnstat");
-// Check for pbi install and arch type then create symlinks
-	if (file_exists('/usr/pbi/vnstat-i386')) { exec("ln -s /usr/local/etc/vnstat.conf /usr/pbi/vnstat-i386/etc/vnstat.conf"); }
-	if (file_exists('/usr/pbi/vnstat-amd64')) { exec("ln -s /usr/local/etc/vnstat.conf /usr/pbi/vnstat-amd64/etc/vnstat.conf"); }
+	if (is_dir("/usr/local/pkg/vnstat2/vnstat")) {
+		@rename("/usr/local/pkg/vnstat2/vnstat", $vnstat_db_prefix);
+	}
+	if (!is_dir($vnstat_db_prefix)) {
+		@mkdir($vnstat_db_prefix);
+	}
+	vnstat_link_config();
 // Add MonthRotate value to config.xml and write /usr/local/etc/vnstat.conf
 	$no_monthrotate = $config['installedpackages']['vnstat2']['config'][0]['monthrotate'];	
 	if ($no_monthrotate == ""){
 		$config['installedpackages']['vnstat2']['config'][0]['monthrotate'] = "1";
 	}
 	$no_vnstat_phpfrontend = $config['installedpackages']['vnstat2']['config'][0]['vnstat_phpfrontend'];
-        if ($no_vnstat_phpfrontend == "on"){
- 		vnstat_php_frontend();
+	if ($no_vnstat_phpfrontend == "on"){
+		vnstat_php_frontend();
 	}
 	write_conf_f();
 // Add cron job to config.xml
 	vnstat2_install_cron(true);
-// get system nic's and create a database for them
-        $array_of_real_nic_names = array();
-        $array_of_custom_nic_names = array();
-        $ifdescrs = array('wan' => 'WAN', 'lan' => 'LAN');
-		for ($j = 1; isset($config['interfaces']['opt' . $j]); $j++) {
-			$ifdescrs['opt' . $j] = $config['interfaces']['opt' . $j]['descr'];
-		}
-         		foreach ($ifdescrs as $ifdescr => $ifname):
-			$real_nic_names = convert_friendly_interface_to_real_interface_name($ifdescr);
-			array_push($array_of_real_nic_names, $real_nic_names);
-		endforeach;
-        // Get already nic's assigned to vnstat
-        exec("ls /conf/vnstat/ | grep -v '\.'", $vnstat_nic);
-        // Compare real nic's with nic's assigned to vnstat
-        $result = array_diff($array_of_real_nic_names, $vnstat_nic);
-        // Create database for each nic 
-        foreach ($result as $result2)
-        {
-           exec("/usr/local/bin/vnstat -u -i ". $result2);
-        }
-     	write_config();
-     	conf_mount_ro();
+	vnstat_create_nic_dbs();
+	write_config();
+	conf_mount_ro();
 }
 
 function vnstat_php_frontend(){

@@ -601,7 +601,7 @@ function useproxy_changed(obj) {
 						<td width="78%" class="vtable">
 							<select name="server" id="server" class="formselect" onchange="server_changed()">
 								<?php foreach($ras_server as & $server): ?>
-								<option value="<?=$server['sindex'];?>"><?=$server['name'];?></option>
+								<option value="<?=$server['index'];?>"><?=$server['name'];?></option>
 								<?php endforeach; ?>
 							</select>
 						</td>

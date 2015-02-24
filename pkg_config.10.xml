@@ -53,12 +53,12 @@
 		<descr><![CDATA[The most widely used name server software]]></descr>
 		<website>http://www.isc.org/downloads/BIND/</website>
 		<category>Services</category>
-		<version>9.9.6_1 pkg v 0.3.6</version>
+		<version>9.9.6P1_3 pkg v 0.3.6</version>
 		<status>RC</status>
 		<required_version>2.2</required_version>
 		<config_file>https://packages.pfsense.org/packages/config/bind/bind.xml</config_file>
 		<configurationfile>bind.xml</configurationfile>
-		<depends_on_package_pbi>bind-9.9.6_1-##ARCH##.pbi</depends_on_package_pbi>
+		<depends_on_package_pbi>bind-9.9.6P1_3-##ARCH##.pbi</depends_on_package_pbi>
 		<build_pbi>
 			<custom_name>bind</custom_name>
 			<port>dns/bind99</port>
@@ -106,22 +106,6 @@
 		<configurationfile>filemgr.xml</configurationfile>
 	</package>
 	<package>
-		<name>pfBlocker</name>
-		<website/>
-		<descr><![CDATA[Introduce Enhanced Aliastable Feature to pfsense.<br />
-			Assign many IP urls lists from sites like I-blocklist to a single alias and then choose rule action to take.<br />
-			This package also Block countries and IP ranges.<br />
-			pfBlocker replaces Countryblock and IPblocklist.]]></descr>
-		<category>Firewall</category>
-		<pkginfolink>https://forum.pfsense.org/index.php/topic,42543.0.html</pkginfolink>
-		<config_file>https://packages.pfsense.org/packages/config/pf-blocker/pfblocker.xml</config_file>
-		<version>1.0.3</version>
-		<status>Release</status>
-		<required_version>2.2</required_version>
-		<maintainer>tom@tomschaefer.org marcellocoutinho@gmail.com</maintainer>
-		<configurationfile>pfblocker.xml</configurationfile>
-	</package>
-	<package>
 		<name>pfBlockerNG</name>
 		<website/>
 		<descr><![CDATA[pfBlockerNG is the Next Generation of pfBlocker.<br />
@@ -131,11 +115,11 @@
 				Provision to download from diverse List formats. Advanced Integration<br />
 				for Emerging Threats IQRisk IP Reputation Threat Sources.]]></descr>
 		<category>Firewall</category>
-		<pkginfolink></pkginfolink>
+		<pkginfolink>https://forum.pfsense.org/index.php?topic=86212.0</pkginfolink>
 		<config_file>https://packages.pfsense.org/packages/config/pfblockerng/pfblockerng.xml</config_file>
-		<version>0.99</version>
+		<version>1.05</version>
 		<status>Beta</status>
-		<required_version>3.0</required_version>
+		<required_version>2.2</required_version>
 		<maintainer>BBCan177@gmail.com</maintainer>
 		<configurationfile>pfblockerng.xml</configurationfile>
 		<depends_on_package_pbi>pfblockerng-1.6.3_1-##ARCH##.pbi</depends_on_package_pbi>
@@ -153,7 +137,7 @@
 				Supports ACLs for smart backend switching.]]></descr>
 		<website>http://haproxy.1wt.eu/</website>
 		<category>Services</category>
-		<version>1.5.9 pkg v 0.15</version>
+		<version>1.5.9 pkg v 0.20</version>
 		<status>Release</status>
 		<required_version>2.2</required_version>
 		<config_file>https://packages.pfsense.org/packages/config/haproxy-devel/haproxy.xml</config_file>
@@ -183,7 +167,7 @@
 		<configurationfile>apache_virtualhost.xml</configurationfile>
 		<build_pbi>
 			<custom_name>proxy_mod_security</custom_name>
-			<ports_before>devel/gettext misc/help2man databases/db42 databases/gdbm devel/apr1 www/p5-LWP-UserAgent-Determined www/p5-LWP-Protocol-https security/gnupg security/p5-GnuPG net/spread textproc/p5-XML-Smart lang/p5-Switch www/p5-Data-Validate-URI devel/p5-Data-Types devel/p5-Acme-Comment</ports_before>
+			<ports_before>devel/gettext misc/help2man databases/db5 databases/gdbm devel/apr1 www/p5-LWP-UserAgent-Determined www/p5-LWP-Protocol-https security/gnupg security/p5-GnuPG net/spread textproc/p5-XML-Smart lang/p5-Switch www/p5-Data-Validate-URI devel/p5-Data-Types devel/p5-Acme-Comment</ports_before>
 			<port>www/apache24</port>
 			<ports_after>www/mod_security www/mod_memcache</ports_after>
 		</build_pbi>
@@ -204,7 +188,7 @@
 		<configurationfile>apache_mod_security.xml</configurationfile>
 		<build_pbi>
 			<custom_name>proxy_mod_security</custom_name>
-			<ports_before>devel/gettext misc/help2man databases/db42 databases/gdbm devel/apr1 www/p5-LWP-UserAgent-Determined www/p5-LWP-Protocol-https security/gnupg security/p5-GnuPG net/spread textproc/p5-XML-Smart lang/p5-Switch www/p5-Data-Validate-URI devel/p5-Data-Types devel/p5-Acme-Comment</ports_before>
+			<ports_before>devel/gettext misc/help2man databases/db5 databases/gdbm devel/apr1 www/p5-LWP-UserAgent-Determined www/p5-LWP-Protocol-https security/gnupg security/p5-GnuPG net/spread textproc/p5-XML-Smart lang/p5-Switch www/p5-Data-Validate-URI devel/p5-Data-Types devel/p5-Acme-Comment</ports_before>
 			<port>www/apache22-worker-mpm</port>
 			<ports_after>www/mod_security www/mod_memcache</ports_after>
 		</build_pbi>
@@ -355,7 +339,7 @@
 		</build_pbi>
 		<build_options>barnyard2_UNSET=ODBC PGSQL PRELUDE;barnyard2_SET=GRE IPV6 MPLS MYSQL PORT_PCAP BRO;snort_SET=PERFPROFILE SOURCEFIRE GRE IPV6 NORMALIZER APPID;snort_UNSET=PULLEDPORK FILEINSPECT HA;perl_SET=THREADS</build_options>
 		<config_file>https://packages.pfsense.org/packages/config/snort/snort.xml</config_file>
-		<version>2.9.7.0 pkg v3.2.1</version>
+		<version>2.9.7.0 pkg v3.2.3</version>
 		<required_version>2.2</required_version>
 		<status>Stable</status>
 		<configurationfile>/snort.xml</configurationfile>
@@ -366,7 +350,7 @@
 		<website>http://www.olsr.org/</website>
 		<descr>The olsr.org OLSR daemon is an implementation of the Optimized Link State Routing protocol. OLSR is a routing protocol for mobile ad-hoc networks. The protocol is pro-active, table driven and utilizes a technique called multipoint relaying for message flooding.</descr>
 		<category>Services</category>
-		<config_file>https://packages.pfsense.org/packages/config/olsrd.xml</config_file>
+		<config_file>https://packages.pfsense.org/packages/config/olsrd/olsrd.xml</config_file>
 		<depends_on_package_pbi>olsrd-0.6.6.2_1-##ARCH##.pbi</depends_on_package_pbi>
 		<build_pbi>
 			<port>net/olsrd</port>
@@ -411,7 +395,7 @@
 		<website>http://www.postfix.org/</website>
 		<descr><![CDATA[Postfix mail forwarder acts as a relay server for your domain.<br />
 				It can do first and second line antispam combat before sending incoming mail to local mail servers.<br />
-				Postfix can also detect zombies, check RBLS, SPF, seach ldap for valid recipients and use third part antispam engines like policyd and mailscanner for better antispam solution.]]></descr>
+				Postfix can also detect zombies, check RBLS, SPF, search ldap for valid recipients and use third part antispam engines like policyd and mailscanner for better antispam solution.]]></descr>
 		<category>Services</category>
 		<pkginfolink>https://forum.pfsense.org/index.php/topic,40622.0.html</pkginfolink>
 		<config_file>https://packages.pfsense.org/packages/config/postfix/postfix.xml</config_file>
@@ -475,13 +459,13 @@
 		<website>http://siproxd.sourceforge.net/</website>
 		<descr>Proxy for handling NAT of multiple SIP devices to a single public IP.</descr>
 		<category>Services</category>
-		<config_file>https://packages.pfsense.org/packages/config/siproxd.xml</config_file>
+		<config_file>https://packages.pfsense.org/packages/config/siproxd/siproxd.xml</config_file>
 		<depends_on_package_pbi>siproxd-0.8.0-##ARCH##.pbi</depends_on_package_pbi>
 		<pkginfolink>https://doc.pfsense.org/index.php/Siproxd_package</pkginfolink>
 		<build_pbi>
 			<port>net/siproxd</port>
 		</build_pbi>
-		<version>0.8.0_2 pkg v1.0.1</version>
+		<version>0.8.0_2 pkg v1.0.2</version>
 		<status>Beta</status>
 		<required_version>2.2</required_version>
 		<configurationfile>siproxd.xml</configurationfile>
@@ -494,7 +478,7 @@
 		<build_pbi>
 			<port>net/openbgpd</port>
 		</build_pbi>
-		<version>0.9.3</version>
+		<version>0.9.3_1</version>
 		<status>STABLE</status>
 		<pkginfolink>https://doc.pfsense.org/index.php/OpenBGPD_package</pkginfolink>
 		<required_version>2.2</required_version>
@@ -506,7 +490,7 @@
 		<descr>High performance web proxy report (LightSquid). Proxy realtime stat (SQStat). Requires squid HTTP proxy.</descr>
 		<website>http://lightsquid.sf.net/</website>
 		<category>Network Report</category>
-		<version>1.8.2 pkg v.2.33</version>
+		<version>1.8.2 pkg v.2.35</version>
 		<maintainer>dv_serg@mail.ru</maintainer>
 		<depends_on_package_pbi>lightsquid-1.8_2-##ARCH##.pbi</depends_on_package_pbi>
 		<build_pbi>
@@ -587,11 +571,11 @@
 		<descr>Vnstat is a console-based network traffic monitor&lt;br /&gt;The vnstat PHP frontend and vnstati adds a more user friendly way of displaying traffic usage.</descr>
 		<pkginfolink>https://forum.pfsense.org/index.php/topic,14179.0.html</pkginfolink>
 		<category>Network Management</category>
-		<depends_on_package_pbi>vnstat-1.11_6-##ARCH##.pbi</depends_on_package_pbi>
+		<depends_on_package_pbi>vnstat-1.12-##ARCH##.pbi</depends_on_package_pbi>
 		<build_pbi>
 			<port>net/vnstat</port>
 		</build_pbi>
-		<version>1.11_6,2</version>
+		<version>1.12,3</version>
 		<status>Stable</status>
 		<required_version>2.2</required_version>
 		<maintainer>crazypark2@yahoo.dk</maintainer>
@@ -604,7 +588,7 @@
 		<descr>pfSense version of TinyDNS which features failover host support</descr>
 		<website>http://cr.yp.to/djbdns.html</website>
 		<category>Services</category>
-		<version>1.0.6.20</version>
+		<version>1.0.6.21</version>
 		<status>Beta</status>
 		<pkginfolink>https://doc.pfsense.org/index.php/Tinydns_package</pkginfolink>
 		<required_version>2.2</required_version>
@@ -622,7 +606,7 @@
 		<descr>VMware Tools</descr>
 		<website>http://open-vm-tools.sourceforge.net/</website>
 		<category>Services</category>
-		<version>1280544_9</version>
+		<version>1280544_10</version>
 		<status>Stable</status>
 		<pkginfolink>https://doc.pfsense.org/index.php/Open_VM_Tools_package</pkginfolink>
 		<required_version>2.2</required_version>
@@ -746,7 +730,7 @@
 		<website>http://www.mindrot.org/pfflowd.html</website>
 		<descr>pfflowd converts OpenBSD PF status messages (sent via the pfsync interface) to Cisco NetFlow datagrams. These datagrams may be sent (via UDP) to a host of one's choice. Utilising the OpenBSD stateful packet filter infrastructure means that flow tracking is very fast and accurate.</descr>
 		<category>Network Management</category>
-		<config_file>https://packages.pfsense.org/packages/config/pfflowd.xml</config_file>
+		<config_file>https://packages.pfsense.org/packages/config/pfflowd/pfflowd.xml</config_file>
 		<depends_on_package_pbi>pfflowd-0.8-##ARCH##.pbi</depends_on_package_pbi>
 		<version>0.8 pkg v1.0.2</version>
 		<status>Stable</status>
@@ -768,7 +752,7 @@
 		<status>Stable</status>
 		<pkginfolink>https://doc.pfsense.org/index.php/Widentd_package</pkginfolink>
 		<required_version>2.2</required_version>
-		<config_file>https://packages.pfsense.org/packages/config/widentd.xml</config_file>
+		<config_file>https://packages.pfsense.org/packages/config/widentd/widentd.xml</config_file>
 		<configurationfile>widentd.xml</configurationfile>
 		<build_pbi>
 			<port>net/widentd</port>
@@ -783,11 +767,11 @@
 					On pfSense docs there is a how-to which could help you on porting users.]]></descr>
 		<pkginfolink>https://doc.pfsense.org/index.php/FreeRADIUS_2.x_package</pkginfolink>
 		<category>System</category>
-		<version>2.1.12_1/2.2.5_3 pkg v1.6.10</version>
+		<version>2.1.12_1/2.2.6_3 pkg v1.6.10</version>
 		<status>RC1</status>
 		<required_version>2.2</required_version>
 		<maintainer>nachtfalkeaw@web.de</maintainer>
-		<depends_on_package_pbi>freeradius-2.2.5_3-##ARCH##.pbi</depends_on_package_pbi>
+		<depends_on_package_pbi>freeradius-2.2.6_3-##ARCH##.pbi</depends_on_package_pbi>
 		<config_file>https://packages.pfsense.org/packages/config/freeradius2/freeradius.xml</config_file>
 		<configurationfile>freeradius.xml</configurationfile>
 		<after_install_info>Please visit Services: FreeRADIUS</after_install_info>
@@ -826,7 +810,7 @@
 		<status>Stable</status>
 		<pkginfolink>https://doc.pfsense.org/index.php/Stunnel_package</pkginfolink>
 		<required_version>2.2</required_version>
-		<config_file>https://packages.pfsense.org/packages/config/stunnel.xml</config_file>
+		<config_file>https://packages.pfsense.org/packages/config/stunnel/stunnel.xml</config_file>
 		<configurationfile>stunnel.xml</configurationfile>
 		<build_pbi>
 			<port>security/stunnel</port>
@@ -838,7 +822,7 @@
 		<website>http://dast.nlanr.net/Projects/Iperf/</website>
 		<descr>Iperf is a tool for testing network throughput, loss, and jitter.</descr>
 		<category>Network Management</category>
-		<config_file>https://packages.pfsense.org/packages/config/iperf.xml</config_file>
+		<config_file>https://packages.pfsense.org/packages/config/iperf/iperf.xml</config_file>
 		<depends_on_package_pbi>iperf-2.0.5-##ARCH##.pbi</depends_on_package_pbi>
 		<version>2.0.5_1</version>
 		<status>Beta</status>
@@ -854,7 +838,7 @@
 		<website>http://freshmeat.net/projects/netio/</website>
 		<descr>This is a network benchmark for DOS, OS/2 2.x, Windows NT/2000 and Unix. It measures the net throughput of a network via NetBIOS and/or TCP/IP protocols (Unix and DOS only support TCP/IP) using various different packet sizes.</descr>
 		<category>Network Management</category>
-		<config_file>https://packages.pfsense.org/packages/config/netio.xml</config_file>
+		<config_file>https://packages.pfsense.org/packages/config/netio/netio.xml</config_file>
 		<depends_on_package_pbi>netio-1.26-##ARCH##.pbi</depends_on_package_pbi>
 		<version>1.26</version>
 		<required_version>2.2</required_version>
@@ -874,7 +858,7 @@
 		<version>0.85_1.1</version>
 		<status>Stable</status>
 		<required_version>2.2</required_version>
-		<config_file>https://packages.pfsense.org/packages/config/mtr-nox11.xml</config_file>
+		<config_file>https://packages.pfsense.org/packages/config/mtr-nox11/mtr-nox11.xml</config_file>
 		<configurationfile>mtr-nox11.xml</configurationfile>
 		<build_pbi>
 			<port>net/mtr</port>
@@ -909,16 +893,16 @@
 		<pkginfolink>https://forum.pfsense.org/index.php/topic,48347.0.html</pkginfolink>
 		<website>http://www.squid-cache.org/</website>
 		<category>Network</category>
-		<version>3.4.10_2 pkg 0.2.1</version>
+		<version>3.4.10_2 pkg 0.2.6</version>
 		<status>beta</status>
 		<required_version>2.2</required_version>
 		<maintainer>marcellocoutinho@gmail.com fernando@netfilter.com.br seth.mos@dds.nl mfuchs77@googlemail.com jimp@pfsense.org</maintainer>
 		<build_pbi>
 			<ports_before>www/libwww security/cyrus-sasl2</ports_before>
 			<port>www/squid</port>
-			<ports_after>www/squid_radius_auth security/clamav www/squidclamav security/ca_root_nss www/c-icap-modules</ports_after>
+			<ports_after>www/squid_radius_auth security/clamav www/squidclamav security/ca_root_nss www/c-icap-modules devel/pcre</ports_after>
 		</build_pbi>
-		<build_options>squid_UNSET_FORCE=AUTH_SASL AUTH_SMB AUTH_SQL DEBUG  DNS_HELPER  ESI FS_ROCK TP_IPF NETTLE  STACKTRACES VIA_DB  DOCS EXAMPLES;squid_SET_FORCE=ARP_ACL AUTH_KERB AUTH_LDAP AUTH_NIS DELAY_POOLS ECAP FOLLOW_XFF FS_AUFS FS_DISKD HTCP ICAP ICMP IDENT IPV6 KQUEUE LARGEFILE SNMP SSL SSL_CRTD LAX_HTTP TP_IPFW TP_PF WCCP WCCPV2 CACHE_DIGESTS</build_options>
+		<build_options>c-icap_SET_FORCE=LARGE_FILES;squid_UNSET_FORCE=AUTH_SASL AUTH_SMB AUTH_SQL DEBUG TP_IPFW DNS_HELPER  ESI FS_ROCK TP_IPF NETTLE  STACKTRACES VIA_DB  DOCS EXAMPLES;squid_SET_FORCE=ARP_ACL AUTH_KERB AUTH_LDAP AUTH_NIS DELAY_POOLS ECAP FOLLOW_XFF FS_AUFS FS_DISKD HTCP ICAP ICMP IDENT IPV6 KQUEUE LARGEFILE SNMP SSL SSL_CRTD LAX_HTTP TP_PF WCCP WCCPV2 CACHE_DIGESTS</build_options>
 		<config_file>https://packages.pfsense.org/packages/config/squid3/34/squid.xml</config_file>
 		<configurationfile>squid.xml</configurationfile>
 		<depends_on_package_pbi>squid-3.4.10_2-##ARCH##.pbi</depends_on_package_pbi>
@@ -928,11 +912,11 @@
 		<descr>LCD display driver</descr>
 		<website>http://www.lcdproc.org/</website>
 		<category>Utility</category>
-		<version>lcdproc-0.5.7_1 pkg.v.1.0.1</version>
+		<version>lcdproc-0.5.7_2 pkg.v.1.0.2</version>
 		<status>BETA</status>
 		<required_version>2.2</required_version>
 		<maintainer>seth.mos@dds.nl</maintainer>
-		<depends_on_package_pbi>lcdproc-0.5.7_1-##ARCH##.pbi</depends_on_package_pbi>
+		<depends_on_package_pbi>lcdproc-0.5.7_2-##ARCH##.pbi</depends_on_package_pbi>
 		<config_file>https://packages.pfsense.org/packages/config/lcdproc/lcdproc.xml</config_file>
 		<configurationfile>lcdproc.xml</configurationfile>
 		<build_pbi>
@@ -946,12 +930,12 @@
 		<descr>LCD display driver - Development version</descr>
 		<website>http://www.lcdproc.org/</website>
 		<category>Utility</category>
-		<version>lcdproc-0.5.6 pkg v. 0.9.10</version>
+		<version>lcdproc-0.5.7_2 pkg v. 0.9.11</version>
 		<status>BETA</status>
 		<required_version>2.2</required_version>
 		<maintainer>michele@nt2.it</maintainer>
 		<pkginfolink>https://forum.pfsense.org/index.php/topic,44034.0.html</pkginfolink>
-		<depends_on_package_pbi>lcdproc-0.5.6-##ARCH##.pbi</depends_on_package_pbi>
+		<depends_on_package_pbi>lcdproc-0.5.7_2-##ARCH##.pbi</depends_on_package_pbi>
 		<config_file>https://packages.pfsense.org/packages/config/lcdproc-dev/lcdproc.xml</config_file>
 		<configurationfile>lcdproc.xml</configurationfile>
 		<build_pbi>
@@ -972,7 +956,7 @@
 		<version>2.1.a15_8 pkg v1.1.2</version>
 		<status>ALPHA</status>
 		<required_version>2.2</required_version>
-		<config_file>https://packages.pfsense.org/packages/config/arpwatch.xml</config_file>
+		<config_file>https://packages.pfsense.org/packages/config/arpwatch/arpwatch.xml</config_file>
 		<configurationfile>arpwatch.xml</configurationfile>
 		<logging>
 			<facilityname>arpwatch</facilityname>
@@ -981,19 +965,19 @@
 	</package>
 	<package>
 		<name>squidGuard</name>
-		<descr>High performance web proxy URL filter. Requires proxy Squid 2.x package.</descr>
+		<descr>High performance web proxy URL filter. Works with both Squid 2.x and Squid 3.x.</descr>
 		<website>http://www.squidGuard.org/</website>
 		<maintainer>dv_serg@mail.ru</maintainer>
 		<category>Network Management</category>
-		<version>1.4_4 pkg v.1.9.6</version>
+		<version>1.4_7 pkg v.1.9.10</version>
 		<status>Beta</status>
 		<required_version>2.2</required_version>
 		<depends_on_package_pbi>squidguard-1.4_7-##ARCH##.pbi</depends_on_package_pbi>
 		<build_pbi>
-			<ports_before>databases/db41 security/cyrus-sasl2</ports_before>
+			<ports_before>www/squid33 databases/db5 security/cyrus-sasl2</ports_before>
 			<port>www/squidguard</port>
 		</build_pbi>
-		<build_options>squidGuard_UNSET_FORCE=SQUID32 SQUID33;squidGuard_SET_FORCE=SAMPLE_BL SASL LDAP SQUID27;squid_UNSET_FORCE=DNS_HELPER IPFILTER PINGER STACKTRACES STRICT_HTTP_DESC USERAGENT_LOG WCCPV2;squid_SET_FORCE=PF LDAP_AUTH NIS_AUTH SASL_AUTH ARP_ACL AUFS CACHE_DIGESTS CARP COSS DELAY_POOLS FOLLOW_XFF HTCP IDENT KERB_AUTH KQUEUE LARGEFILE REFERER_LOG SNMP SSL VIA_DB WCCP;SQUID_UID=proxy;SQUID_GID=proxy</build_options>
+		<build_options>OPTIONS_SET_FORCE=FETCH LDAP;squidGuard_UNSET_FORCE=SQUID27;squidGuard_SET_FORCE=SAMPLE_BL SASL SQUID33;c-icap_UNSET_FORCE=IPV6 squid_UNSET_FORCE=AUTH_SMB AUTH_SQL DNS_HELPER FS_COSS ESI SNMP ECAP STACKTRACES STRICT_HTTP TP_IPF TP_IPFW VIA_DB DEBUG DOCS EXAMPLES;squid_SET_FORCE=ARP_ACL AUTH_KERB AUTH_LDAP AUTH_NIS AUTH_SASL CACHE_DIGESTS DELAY_POOLS FOLLOW_XFF TP_PF MSSL_CRTD WCCP WCCPV2 FS_AUFS HTCP ICAP ICMP IDENT IPV6 KQUEUE LARGEFILE SSL SSL_CRTD</build_options>
 		<config_file>https://packages.pfsense.org/packages/config/squidGuard/squidguard.xml</config_file>
 		<configurationfile>squidguard.xml</configurationfile>
 	</package>
@@ -1003,36 +987,17 @@
 		<website>http://www.squidGuard.org/</website>
 		<maintainer>gugabsd@mundounix.com.br</maintainer>
 		<category>Network Management</category>
-		<version>1.5_1.5 beta</version>
+		<version>1.5_1beta pkg v.1.5.6</version>
 		<status>Beta</status>
 		<required_version>2.2</required_version>
 		<depends_on_package_pbi>squidguard-devel-1.5_1-##ARCH##.pbi</depends_on_package_pbi>
 		<build_pbi>
-			<ports_before>databases/db46</ports_before>
+			<ports_before>databases/db5</ports_before>
 			<port>www/squidguard-devel</port>
 			<custom_name>squidguard-devel</custom_name>
 		</build_pbi>
 		<build_options>squidGuard-devel_UNSET_FORCE=SQUID32 SQUID33;squidGuard-devel_SET_FORCE=LDAP STRIPNT SQUID27;squid_UNSET_FORCE=DNS_HELPER IPFILTER PINGER STACKTRACES STRICT_HTTP_DESC USERAGENT_LOG WCCPV2;squid_SET_FORCE=PF LDAP_AUTH NIS_AUTH SASL_AUTH ARP_ACL AUFS CACHE_DIGESTS CARP COSS DELAY_POOLS FOLLOW_XFF HTCP IDENT KERB_AUTH KQUEUE LARGEFILE REFERER_LOG SNMP SSL VIA_DB WCCP;SQUID_UID=proxy;SQUID_GID=proxy</build_options>
 		<config_file>https://packages.pfsense.org/packages/config/squidGuard-devel/squidguard.xml</config_file>
-		<configurationfile>squidguard.xml</configurationfile>
-	</package>
-	<package>
-		<name>squidGuard-squid3</name>
-		<descr>High performance web proxy URL filter. Requires proxy Squid 3.x package.</descr>
-		<website>http://www.squidGuard.org/</website>
-		<maintainer>dv_serg@mail.ru</maintainer>
-		<category>Network Management</category>
-		<version>1.4_4 pkg v.1.9.5</version>
-		<status>Experimental</status>
-		<required_version>2.2</required_version>
-		<depends_on_package_pbi>squidguard-squid3-1.4_4-##ARCH##.pbi</depends_on_package_pbi>
-		<build_pbi>
-			<ports_before>www/squid33 databases/db41 security/cyrus-sasl2</ports_before>
-			<port>www/squidguard</port>
-			<custom_name>squidguard-squid3</custom_name>
-		</build_pbi>
-		<build_options>OPTIONS_SET_FORCE=FETCH LDAP;squidGuard_UNSET_FORCE=SQUID27;squidGuard_SET_FORCE=SAMPLE_BL SASL SQUID33;c-icap_UNSET_FORCE=IPV6 squid_UNSET_FORCE=AUTH_SMB AUTH_SQL DNS_HELPER FS_COSS ESI SNMP ECAP STACKTRACES STRICT_HTTP TP_IPF TP_IPFW VIA_DB DEBUG DOCS EXAMPLES;squid_SET_FORCE=ARP_ACL AUTH_KERB AUTH_LDAP AUTH_NIS AUTH_SASL CACHE_DIGESTS DELAY_POOLS FOLLOW_XFF TP_PF MSSL_CRTD WCCP WCCPV2 FS_AUFS HTCP ICAP ICMP IDENT IPV6 KQUEUE LARGEFILE SSL SSL_CRTD</build_options>
-		<config_file>https://packages.pfsense.org/packages/config/squidGuard/squidguard.xml</config_file>
 		<configurationfile>squidguard.xml</configurationfile>
 	</package>
 	<package>
@@ -1060,7 +1025,7 @@
 			<ports_after>security/clamav</ports_after>
 		</build_pbi>
 		<build_options>CLAMAVUSER=havp;CLAMAVGROUP=havp</build_options>
-		<version>0.91_3 pkg v1.04</version>
+		<version>0.91_3 pkg v1.05_1</version>
 		<status>BETA</status>
 		<required_version>2.2</required_version>
 		<config_file>https://packages.pfsense.org/packages/config/havp/havp.xml</config_file>
@@ -1152,7 +1117,7 @@
 		</build_pbi>
 		<build_options>nrpe_SET_FORCE=SSL;nrpe_UNSET_FORCE=ARGS</build_options>
 		<config_file>https://packages.pfsense.org/packages/config/nrpe2/nrpe2.xml</config_file>
-		<version>2.15_5 v2.2</version>
+		<version>2.15_5 v2.2_4</version>
 		<status>Beta</status>
 		<required_version>2.2</required_version>
 		<maintainer>erik@erikkristensen.com</maintainer>
@@ -1192,7 +1157,7 @@
 		<name>mailreport</name>
 		<descr>Allows you to setup periodic e-mail reports containing command output, log file contents, and RRD graphs.</descr>
 		<category>Network Management</category>
-		<version>2.1</version>
+		<version>2.3</version>
 		<status>Stable</status>
 		<required_version>2.2</required_version>
 		<config_file>https://packages.pfsense.org/packages/config/mailreport/mailreport.xml</config_file>
@@ -1218,7 +1183,7 @@
 		<name>System Patches</name>
 		<descr>A package to apply and maintain custom system patches.</descr>
 		<maintainer>jimp@pfsense.org</maintainer>
-		<version>1.0.2</version>
+		<version>1.0.3</version>
 		<category>System</category>
 		<status>RELEASE</status>
 		<config_file>https://packages.pfsense.org/packages/config/systempatches/systempatches.xml</config_file>
@@ -1232,7 +1197,7 @@
 		<descr><![CDATA[Bacula is a set of Open Source, computer programs that permit you (or the system administrator) to manage backup, recovery, and verification of computer data across a network of computers of different kinds.]]></descr>
 		<website>http://www.bacula.org/</website>
 		<category>Services</category>
-		<version>7.0.5 pkg v 1.0.4</version>
+		<version>7.0.5 pkg v 1.0.7</version>
 		<status>Stable</status>
 		<required_version>2.2</required_version>
 		<config_file>https://packages.pfsense.org/packages/config/bacula-client/bacula-client.xml</config_file>
@@ -1324,10 +1289,10 @@
 		<website>http://www.balabit.com/network-security/syslog-ng/</website>
 		<descr>Syslog-ng syslog server. This service is not intended to replace the default pfSense syslog server but rather acts as an independent syslog server.</descr>
 		<category>Services</category>
-		<version>3.6.1_1 pkg.v.1.0.2</version>
+		<version>3.6.2_3 pkg.v.1.0.6</version>
 		<status>ALPHA</status>
 		<required_version>2.2</required_version>
-		<depends_on_package_pbi>syslog-ng-3.6.1_1-##ARCH##.pbi</depends_on_package_pbi>
+		<depends_on_package_pbi>syslog-ng-3.6.2_3-##ARCH##.pbi</depends_on_package_pbi>
 		<build_pbi>
 			<ports_before>sysutils/logrotate</ports_before>
 			<port>sysutils/syslog-ng</port>
@@ -1338,14 +1303,17 @@
 		<configurationfile>syslog-ng.xml</configurationfile>
 	</package>
 	<package>
-		<name>Zabbix-2 Agent</name>
-		<descr>Monitoring agent.</descr>
+		<name>Zabbix Agent LTS</name>
+		<descr>LTS (Long Term Support) release of Zabbix Monitoring agent. Zabbix LTS releases are supported for 
+		Zabbix customers during five (5) years i.e. 3 years of Full Support (general, critical and security issues) 
+		and 2 additional years of Limited Support (critical and security issues only). Zabbix LTS version release 
+		will result in change of the first version number. More info in http://www.zabbix.com/life_cycle_and_release_policy.php </descr>
 		<category>Services</category>
-		<config_file>https://packages.pfsense.org/packages/config/zabbix2/zabbix2-agent.xml</config_file>
-		<version>zabbix2-agent-2.2.7 pkg v0.8.3</version>
+		<config_file>https://packages.pfsense.org/packages/config/zabbix-lts/zabbix-agent-lts.xml</config_file>
+		<version>zabbix-agent-lts-2.2.7 pkg v0.8.3</version>
 		<status>BETA</status>
 		<required_version>2.2</required_version>
-		<configurationfile>zabbix2-agent.xml</configurationfile>
+		<configurationfile>zabbix-agent-lts.xml</configurationfile>
 		<maintainer>dbaio@bsd.com.br</maintainer>
 		<build_pbi>
 			<custom_name>zabbix22-agent</custom_name>
@@ -1354,14 +1322,17 @@
 		<depends_on_package_pbi>zabbix22-agent-2.2.7-##ARCH##.pbi</depends_on_package_pbi>
 	</package>
 	<package>
-		<name>Zabbix-2 Proxy</name>
-		<descr>Monitoring agent proxy.</descr>
+		<name>Zabbix Proxy LTS</name>
+		<descr>LTS (Long Term Support) release of Zabbix agent proxy. Zabbix LTS releases are supported for 
+		Zabbix customers during five (5) years i.e. 3 years of Full Support (general, critical and security issues) 
+		and 2 additional years of Limited Support (critical and security issues only). Zabbix LTS version release 
+		will result in change of the first version number. More info in http://www.zabbix.com/life_cycle_and_release_policy.php </descr>
 		<category>Services</category>
-		<config_file>https://packages.pfsense.org/packages/config/zabbix2/zabbix2-proxy.xml</config_file>
-		<version>zabbix2-proxy-2.2.7 pkg v0.8.3</version>
+		<config_file>https://packages.pfsense.org/packages/config/zabbix-lts/zabbix-proxy-lts.xml</config_file>
+		<version>zabbix-proxy-lts-2.2.7 pkg v0.8.3</version>
 		<status>BETA</status>
 		<required_version>2.2</required_version>
-		<configurationfile>zabbix2-proxy.xml</configurationfile>
+		<configurationfile>zabbix-proxy-lts.xml</configurationfile>
 		<maintainer>dbaio@bsd.com.br</maintainer>
 		<build_pbi>
 			<custom_name>zabbix22-proxy</custom_name>
@@ -1369,6 +1340,47 @@
 		</build_pbi>
 		<build_options>OPTIONS_SET+= SQLITE IPV6;OPTIONS_UNSET+= MYSQL JABBER GSSAPI</build_options>
 		<depends_on_package_pbi>zabbix22-proxy-2.2.7-##ARCH##.pbi</depends_on_package_pbi>
+	</package>
+	<package>
+		<name>Zabbix-2 Agent</name>
+		<descr>Standard release of Zabbix Monitoring agent. Standard Zabbix releases are supported for 
+		Zabbix customers during six (6) months of Full Support (general, critical and security issues) until 
+		the next Zabbix stable release, plus one (1) additional month of Limited Support (critical and security 
+		issues only). Zabbix Standard version release will result in change of the second version number.
+		More info in http://www.zabbix.com/life_cycle_and_release_policy.php </descr>
+		<category>Services</category>
+		<config_file>https://packages.pfsense.org/packages/config/zabbix2/zabbix2-agent.xml</config_file>
+		<version>zabbix24-agent-2.4.3 pkg v0.8.3</version>
+		<status>BETA</status>
+		<required_version>2.2</required_version>
+		<configurationfile>zabbix2-agent.xml</configurationfile>
+		<maintainer>dbaio@bsd.com.br</maintainer>
+		<build_pbi>
+			<custom_name>zabbix24-agent</custom_name>
+			<port>net-mgmt/zabbix24-agent</port>
+		</build_pbi>
+		<depends_on_package_pbi>zabbix24-agent-2.4.3-##ARCH##.pbi</depends_on_package_pbi>
+	</package>
+	<package>
+		<name>Zabbix-2 Proxy</name>
+		<descr>Standard release of Zabbix agent proxy. Standard Zabbix releases are supported for 
+		Zabbix customers during six (6) months of Full Support (general, critical and security issues) until 
+		the next Zabbix stable release, plus one (1) additional month of Limited Support (critical and security 
+		issues only). Zabbix Standard version release will result in change of the second version number.
+		More info in http://www.zabbix.com/life_cycle_and_release_policy.php </descr>
+		<category>Services</category>
+		<config_file>https://packages.pfsense.org/packages/config/zabbix2/zabbix2-proxy.xml</config_file>
+		<version>zabbix24-proxy-2.4.3 pkg v0.8.3</version>
+		<status>BETA</status>
+		<required_version>2.2</required_version>
+		<configurationfile>zabbix2-proxy.xml</configurationfile>
+		<maintainer>dbaio@bsd.com.br</maintainer>
+		<build_pbi>
+			<custom_name>zabbix24-proxy</custom_name>
+			<port>net-mgmt/zabbix24-proxy</port>
+		</build_pbi>
+		<build_options>OPTIONS_SET+= SQLITE IPV6;OPTIONS_UNSET+= MYSQL JABBER GSSAPI</build_options>
+		<depends_on_package_pbi>zabbix24-proxy-2.4.3-##ARCH##.pbi</depends_on_package_pbi>
 	</package>
 	<package>
 		<name>sudo</name>
@@ -1405,7 +1417,7 @@
 		<category>Network Management</category>
 		<config_file>https://packages.pfsense.org/packages/config/softflowd/softflowd.xml</config_file>
 		<depends_on_package_pbi>softflowd-0.9.8_2-##ARCH##.pbi</depends_on_package_pbi>
-		<version>0.9.8_2 pkg v1.0.1</version>
+		<version>0.9.8_2 pkg v1.1</version>
 		<status>Beta</status>
 		<required_version>2.2</required_version>
 		<configurationfile>softflowd.xml</configurationfile>
@@ -1419,7 +1431,7 @@
 		<descr>Set of programs for controlling APC UPS.</descr>
 		<category>Services</category>
 		<config_file>https://packages.pfsense.org/packages/config/apcupsd/apcupsd.xml</config_file>
-		<version>apcupsd-3.14.12_1 pkg v0.3.2</version>
+		<version>apcupsd-3.14.12_1 pkg v0.3.3</version>
 		<status>BETA</status>
 		<required_version>2.2</required_version>
 		<configurationfile>apcupsd.xml</configurationfile>
@@ -1452,7 +1464,7 @@
 		<website>http://suricata-ids.org/</website>
 		<descr><![CDATA[High Performance Network IDS, IPS and Security Monitoring engine by OISF.]]></descr>
 		<category>Security</category>
-		<version>2.0.4 pkg v2.1.3</version>
+		<version>2.0.6 pkg v2.1.4</version>
 		<status>Stable</status>
 		<required_version>2.2</required_version>
 		<config_file>https://packages.pfsense.org/packages/config/suricata/suricata.xml</config_file>
@@ -1461,8 +1473,8 @@
 			<port>security/suricata</port>
 			<ports_after>security/barnyard2</ports_after>
 		</build_pbi>
-		<build_options>barnyard2_UNSET=ODBC PGSQL PRELUDE;barnyard2_SET=GRE IPV6 MPLS MYSQL PORT_PCAP BRO;suricata_SET=IPFW PORTS_PCAP GEOIP JSON;suricata_UNSET=PRELUDE TESTS HTP_PORT</build_options>
-		<depends_on_package_pbi>suricata-2.0.4-##ARCH##.pbi</depends_on_package_pbi>
+		<build_options>barnyard2_UNSET=ODBC PGSQL PRELUDE;barnyard2_SET=GRE IPV6 MPLS MYSQL PORT_PCAP BRO;suricata_SET=IPFW PORTS_PCAP GEOIP JSON NSS LUAJIT HTP_PORT;suricata_UNSET=PRELUDE TESTS SC LUA</build_options>
+		<depends_on_package_pbi>suricata-2.0.6-##ARCH##.pbi</depends_on_package_pbi>
 	</package>
 </packages>
 </pfsensepkgs>

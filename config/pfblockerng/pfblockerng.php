@@ -44,9 +44,13 @@ require_once("functions.inc");
 require_once("pkg-utils.inc");
 require_once("globals.inc");
 require_once("services.inc");
-require_once("/usr/local/pkg/pfblockerng/pfblockerng.inc");
 
-pfb_global();
+// Call Include File and Collect updated Global Settings
+if (in_array($argv[1], array( 'update','dc','uc','gc','cron' ))) {
+	require_once("/usr/local/pkg/pfblockerng/pfblockerng.inc");
+	pfb_global();
+}
+
 
 // IPv6 Range to CIDR function used courtesey from:
 // https://github.com/stilez/pfsense-leases/blob/50cc0fa81dba5fe91bcddaea016c245d1b8479cc/etc/inc/util.inc
@@ -147,13 +151,14 @@ $uname = posix_uname();
 if ($uname['machine'] == "amd64")
 	ini_set('memory_limit', '256M');
 
-function pfb_update_check($header_url, $list_url, $url_format) {
+function pfb_update_check($header_url, $list_url, $url_format, $pfbfolder) {
 	global $pfb;
+	$pfb['cron_update'] = FALSE;
 
 	if ($url_format == "rsync" || $url_format == "html") {
 		$log = "[ {$header_url} ]\n  Skipping timestamp query\n";
 		pfb_logger("{$log}","1");
-		return TRUE;
+		$pfb['cron_update'] = TRUE;
 	}
 
 	switch ($url_format) {
@@ -195,14 +200,23 @@ function pfb_update_check($header_url, $list_url, $url_format) {
 		$log = "  Local  timestamp: {$local_tds}\n";
 		pfb_logger("{$log}","1");
 		if ("{$remote_tds}" != "{$local_tds}") {
-			return TRUE;
+			$pfb['cron_update'] = TRUE;
 		} else {
 			$log = "  Remote file unchanged. Download Terminated\n";
 			pfb_logger("{$log}","1");
-			return FALSE;
+			$pfb['cron_update'] = FALSE;
 		}
 	} else {
-		return TRUE;
+		$pfb['cron_update'] = TRUE;
+	}
+
+	if ($pfb['cron_update']) {
+		// Trigger CRON Process if Updates are Found.
+		$pfb['update_cron'] = TRUE;
+
+		$log = "  Updates Found\n";
+		pfb_logger("{$log}","1");
+		unlink_if_exists($pfbfolder . '/' . $header_url . '.txt');
 	}
 }
 
@@ -220,6 +234,12 @@ if ($argv[1] == 'dc') {
 	}
 	pfblockerng_uc_countries();
 	pfblockerng_get_countries();
+
+	// Remove Original Maxmind Database Files
+	@unlink_if_exists("{$pfb['dbdir']}/GeoIPCountryCSV.zip");
+	@unlink_if_exists("{$pfb['dbdir']}/GeoIPCountryWhois.csv");
+	@unlink_if_exists("{$pfb['dbdir']}/GeoIPv6.csv");
+	@unlink_if_exists("{$pfb['dbdir']}/country_continent.csv");
 }
 
 if ($argv[1] == 'uc') {
@@ -231,8 +251,9 @@ if ($argv[1] == 'gc') {
 }
 
 if ($argv[1] == 'cron') {
-	$hour = date('H');
+	$hour = date('G');
 	$dow  = date('N');
+	$pfb['update_cron'] = FALSE;
 
 	# Start hour of the 'Once a day' Schedule
 	$pfb['dailystart'] = $config['installedpackages']['pfblockerng']['config'][0]['pfb_dailystart'];
@@ -249,7 +270,7 @@ if ($argv[1] == 'cron') {
 	$sch2 = strval($shour);
 	for ($i=0; $i<11; $i++) {
 		$shour += 2;
-		if ($shour > 24)
+		if ($shour >= 24)
 			$shour -= 24;
 		$sch2 .= "," . strval($shour);
 	}
@@ -259,7 +280,7 @@ if ($argv[1] == 'cron') {
 	$sch3 = strval($shour);
 	for ($i=0; $i<7; $i++) {
 		$shour += 3;
-		if ($shour > 24)
+		if ($shour >= 24)
 			$shour -= 24;
 		$sch3 .= "," . strval($shour);
 	}
@@ -269,7 +290,7 @@ if ($argv[1] == 'cron') {
 	$sch4 = strval($shour);
 	for ($i=0; $i<5; $i++) {
 		$shour += 4;
-		if ($shour > 24)
+		if ($shour >= 24)
 			$shour -= 24;
 		$sch4 .= "," . strval($shour);
 	}
@@ -279,7 +300,7 @@ if ($argv[1] == 'cron') {
 	$sch6 = strval($shour);
 	for ($i=0; $i<3; $i++) {
 		$shour += 6;
-		if ($shour > 24)
+		if ($shour >= 24)
 			$shour -= 24;
 		$sch6 .= "," . strval($shour);
 	}
@@ -289,7 +310,7 @@ if ($argv[1] == 'cron') {
 	$sch8 = strval($shour);
 	for ($i=0; $i<2; $i++) {
 		$shour += 8;
-		if ($shour > 24)
+		if ($shour >= 24)
 			$shour -= 24;
 		$sch8 .= "," . strval($shour);
 	}
@@ -298,7 +319,7 @@ if ($argv[1] == 'cron') {
 	$shour = intval(substr($pfb['hour'], 0, 2));
 	$sch12 = strval($shour) . ",";
 	$shour += 12;
-	if ($shour > 24)
+	if ($shour >= 24)
 		$shour -= 24;
 	$sch12 .= strval($shour);
 
@@ -344,101 +365,47 @@ if ($argv[1] == 'cron') {
 							if (!file_exists($pfbfolder . '/' . $header_url . '.txt')) {
 								$log = "  Updates Found\n";
 								pfb_logger("{$log}","1");
-								$updates++;
+								$pfb['update_cron'] = TRUE;
 								continue;
 							}
 
 							switch ($list_cron) {
 								case "01hour":
-									if (pfb_update_check($header_url, $list_url, $url_format)) {
-										$log = "  Updates Found\n";
-										pfb_logger("{$log}","1");
-										unlink_if_exists($pfbfolder . '/' . $header_url . '.txt');
-										$updates++;
-									}
+									pfb_update_check($header_url, $list_url, $url_format, $pfbfolder);
 									break;
 								case "02hours":
-									if (in_array($hour, $e_sch2)) {
-										if (pfb_update_check($header_url, $list_url, $url_format)) {
-											$log = "  Updates Found\n";
-											pfb_logger("{$log}","1");
-											unlink_if_exists($pfbfolder . '/' . $header_url . '.txt');
-											$updates++;
-										}
-									}
+									if (in_array($hour, $e_sch2))
+										pfb_update_check($header_url, $list_url, $url_format, $pfbfolder);
 									break;
 								case "03hours":
-									if (in_array($hour, $e_sch3)) {
-										if (pfb_update_check($header_url, $list_url, $url_format)) {
-											$log = "  Updates Found\n";
-											pfb_logger("{$log}","1");
-											unlink_if_exists($pfbfolder . '/' . $header_url . '.txt');
-											$updates++;
-										}
-									}
+									if (in_array($hour, $e_sch3))
+										pfb_update_check($header_url, $list_url, $url_format, $pfbfolder);
 									break;
 								case "04hours":
-									if (in_array($hour, $e_sch4)) {
-										if (pfb_update_check($header_url, $list_url, $url_format)) {
-											$log = "  Updates Found\n";
-											pfb_logger("{$log}","1");
-											unlink_if_exists($pfbfolder . '/' . $header_url . '.txt');
-											$updates++;
-										}
-									}
+									if (in_array($hour, $e_sch4))
+										pfb_update_check($header_url, $list_url, $url_format, $pfbfolder);
 									break;
 								case "06hours":
-									if (in_array($hour, $e_sch6)) {
-										if (pfb_update_check($header_url, $list_url, $url_format)) {
-											$log = "  Updates Found\n";
-											pfb_logger("{$log}","1");
-											unlink_if_exists($pfbfolder . '/' . $header_url . '.txt');
-											$updates++;
-										}
-									}
+									if (in_array($hour, $e_sch6))
+										pfb_update_check($header_url, $list_url, $url_format, $pfbfolder);
 									break;
 								case "08hours":
-									if (in_array($hour, $e_sch8)) {
-										if (pfb_update_check($header_url, $list_url, $url_format)) {
-											$log = "  Updates Found\n";
-											pfb_logger("{$log}","1");
-											unlink_if_exists($pfbfolder . '/' . $header_url . '.txt');
-											$updates++;
-										}
-									}
+									if (in_array($hour, $e_sch8))
+										pfb_update_check($header_url, $list_url, $url_format, $pfbfolder);
 									break;
 								case "12hours":
-									if (in_array($hour, $e_sch12)) {
-										if (pfb_update_check($header_url, $list_url, $url_format)) {
-											$log = "  Updates Found\n";
-											pfb_logger("{$log}","1");
-											unlink_if_exists($pfbfolder . '/' . $header_url . '.txt');
-											$updates++;
-										}
-									}
+									if (in_array($hour, $e_sch12))
+										pfb_update_check($header_url, $list_url, $url_format, $pfbfolder);
 									break;
 								case "EveryDay":
-									if ($hour == $pfb['dailystart']) {
-										if (pfb_update_check($header_url, $list_url, $url_format)) {
-											$log = "  Updates Found\n";
-											pfb_logger("{$log}","1");
-											unlink_if_exists($pfbfolder . '/' . $header_url . '.txt');
-											$updates++;
-										}
-									}
+									if ($hour == $pfb['dailystart'])
+										pfb_update_check($header_url, $list_url, $url_format, $pfbfolder);
 									break;
 								case "Weekly":
-									if ($hour == $pfb['dailystart'] && $dow == $header_dow) {
-										if (pfb_update_check($header_url, $list_url, $url_format)) {
-											$log = "  Updates Found\n";
-											pfb_logger("{$log}","1");
-											unlink_if_exists($pfbfolder . '/' . $header_url . '.txt');
-											$updates++;
-										}
-									}
+									if ($hour == $pfb['dailystart'] && $dow == $header_dow)
+										pfb_update_check($header_url, $list_url, $url_format, $pfbfolder);
 									break;
-								default: {
-									}
+								default:
 									break;
 							}
 						}
@@ -448,15 +415,13 @@ if ($argv[1] == 'cron') {
 		}
 	}
 
-	if ($updates > 0) {
+	if ($pfb['update_cron']) {
 		sync_package_pfblockerng("cron");
 	} else {
-		$log = "\n  No Updates required. \n\n";
+		sync_package_pfblockerng("noupdates");
+		$log = "\n  No Updates required.\n CRON  PROCESS  ENDED\n UPDATE PROCESS ENDED\n";
 		pfb_logger("{$log}","1");
 	}
-
-	$log = " CRON  PROCESS  ENDED [ NOW ]\n";
-	pfb_logger("{$log}","1");
 
 	# Call Log Mgmt Function
 	// If Update GUI 'Manual view' is selected. Last output will be missed. So sleep for 5 secs.
@@ -465,14 +430,13 @@ if ($argv[1] == 'cron') {
 }
 
 
+// Function to process the downloaded Maxmind Database and format into Continent txt files.
 function pfblockerng_uc_countries() {
-
 	global $g,$pfb;
-	pfb_global();
 
-	$maxmind_cont = "{$pfb['dbdir']}/country_continent.csv";
-	$maxmind_cc4  = "{$pfb['dbdir']}/GeoIPCountryWhois.csv";
-	$maxmind_cc6  = "{$pfb['dbdir']}/GeoIPv6.csv";
+	$maxmind_cont	= "{$pfb['dbdir']}/country_continent.csv";
+	$maxmind_cc4	= "{$pfb['dbdir']}/GeoIPCountryWhois.csv";
+	$maxmind_cc6	= "{$pfb['dbdir']}/GeoIPv6.csv";
 	
 	# Create Folders if not Exist
 	$folder_array = array ("{$pfb['dbdir']}","{$pfb['logdir']}","{$pfb['ccdir']}");
@@ -505,13 +469,12 @@ function pfblockerng_uc_countries() {
 	$maxmind_ver	.= "\nThese Timestamps should *match* \n";
 	@file_put_contents("{$pfb['logdir']}/maxmind_ver", $maxmind_ver);
 
-
 	// Collect ISO Codes for Each Continent
-	$log = "Processing Continent Data \n";
+	$log = "Processing Continent Data\n";
 	print $log;
 	pfb_logger("{$log}","3");
 
-	$cont_array = array ( array($AF),array($AS),array($EU),array($NA),array($OC),array($SA));
+	$cont_array = array ( array($AF),array($AS),array($EU),array($NA),array($OC),array($SA),array($AX));
 	if (($handle = fopen("{$maxmind_cont}",'r')) !== FALSE) {
 		while (($cc = fgetcsv($handle)) !== FALSE) {
 
@@ -560,244 +523,165 @@ function pfblockerng_uc_countries() {
 	unset($cc);
 	fclose($handle);
 
-	// Collect Country ISO Data IPv4 and Sort to Continent Array
-	$log = "Processing ISO IPv4 Continent/Country Data \n";
-	print $log;
-	pfb_logger("{$log}","3");
+	// Add Maxmind Anonymous Proxy and Satellite Providers to array
+	$cont_array[6]['continent']	= "Proxy and Satellite";
+	$cont_array[6]['iso']		= "A1,A2";
+	$cont_array[6]['file4'] 	= "{$pfb['ccdir']}/Proxy_Satellite_v4.txt";
+	$cont_array[6]['file6'] 	= "{$pfb['ccdir']}/Proxy_Satellite_v6.txt";
 
-	if (($handle = fopen("{$maxmind_cc4}",'r')) !== FALSE) {
-		while (($cc = fgetcsv($handle)) !== FALSE) {
+	// Collect Country ISO data and sort to Continent arrays (IPv4 and IPv6)
+	foreach (array("4", "6") as $type) {
+		$log = "Processing ISO IPv{$type} Continent/Country Data\n";
+		print $log;
+		pfb_logger("{$log}","3");
 
-			$ip1_key	= $cc[0];
-			$ip2_key	= $cc[1];
-			$var1_key	= $cc[2];
-			$var2_key	= $cc[3];
-			$cc_key		= $cc[4];
-			$country_key	= $cc[5];
-			$a_cidr		= implode(",", ip_range_to_subnet_array_temp($cc[0],$cc[1]));
+		if ($type == "4") {
+			$maxmind_cc = "{$pfb['dbdir']}/GeoIPCountryWhois.csv";
+		} else {
+			$maxmind_cc = "{$pfb['dbdir']}/GeoIPv6.csv";
+		}
+		$iptype = "ip{$type}";
+		$filetype = "file{$type}";
 
-			$counter = 0;
-			foreach ($cont_array as $iso) {
-				if (preg_match("/\b$cc_key\b/", $iso['iso'])) {
-					$cont_array[$counter][$cc_key]['ip4'] .= $a_cidr . ",";
-					$cont_array[$counter][$cc_key]['country'] = $country_key;
-					continue;
+		if (($handle = fopen("{$maxmind_cc}",'r')) !== FALSE) {
+			while (($cc = fgetcsv($handle)) !== FALSE) {
+				$cc_key		= $cc[4];
+				$country_key	= $cc[5];
+				$a_cidr		= implode(",", ip_range_to_subnet_array_temp($cc[0],$cc[1]));
+				$counter = 0;
+				foreach ($cont_array as $iso) {
+					if (preg_match("/\b$cc_key\b/", $iso['iso'])) {
+						$cont_array[$counter][$cc_key][$iptype] .= $a_cidr . ",";
+						$cont_array[$counter][$cc_key]['country'] = $country_key;
+						continue;
+					}
+					$counter++;
 				}
-				$counter++;
 			}
 		}
-	}
-	unset($cc);
-	fclose($handle);
+		unset($cc);
+		fclose($handle);
 
-	// Build Continent IPv4 CIDR Files
-	$counter = 0;
-	foreach ($cont_array as $iso) {
-		$header		= "";
-		$pfb_file	= "";
-		$iso_key	= "";
-		$header		.= "# Generated from MaxMind Inc. on: " . date("m/d/y G:i:s", time()) . "\n";
-		$header		.= "# Continent IPv4: " . $cont_array[$counter]['continent'] . "\n";
-		$pfb_file	= $cont_array[$counter]['file4'];
-		$iso_key	= array_keys($iso);
-		foreach ($iso_key as $key) {
-			if (preg_match("/[A-Z]{2}/", $key)) {
-				$header .= "# Country: " . $iso[$key]['country'] . "\n";
-				$header .= "# ISO Code: " . $key . "\n";
-				$header .= "# Total Networks: " . substr_count($iso[$key]['ip4'], ",") . "\n";
-				$header .= str_replace(",", "\n", $iso[$key]['ip4']);
-				$iso[$key]['ip4'] = "";
-			}
-		}
-		$counter++;
-		@file_put_contents($pfb_file, $header, LOCK_EX);
-	}
-
-
-	// Collect Country ISO Data IPv6 and Sort to Continent Array
-	$log = "Processing ISO IPv6 Continent/Country Data \n";
-	print $log;
-	pfb_logger("{$log}","3");
-
-	if (($handle = fopen("{$maxmind_cc6}",'r')) !== FALSE) {
-		while (($cc = fgetcsv($handle)) !== FALSE) {
-
-			$ip1_key	= $cc[0];
-			$ip2_key	= $cc[1];
-			$var1_key	= $cc[2];
-			$var2_key	= $cc[3];
-			$cc_key		= $cc[4];
-			$country_key	= $cc[5];
-			$a_cidr		= implode(",", ip_range_to_subnet_array_temp($cc[0],$cc[1]));
-
-			$counter = 0;
-			foreach ($cont_array as $iso) {
-				if (preg_match("/\b$cc_key\b/", $iso['iso'])) {
-					$cont_array[$counter][$cc_key]['ip6'] .= $a_cidr . ",";
-					continue;
+		// Build Continent Files
+		$counter = 0;
+		foreach ($cont_array as $iso) {
+			$header		= "";
+			$pfb_file	= "";
+			$iso_key	= "";
+			$header		.= "# Generated from MaxMind Inc. on: " . date("m/d/y G:i:s", time()) . "\n";
+			$header		.= "# Continent IPv{$type}: " . $cont_array[$counter]['continent'] . "\n";
+			$pfb_file	= $cont_array[$counter][$filetype];
+			$iso_key	= array_keys($iso);
+			foreach ($iso_key as $key) {
+				if (preg_match("/[A-Z]{2}|A1|A2/", $key)) {
+					$header .= "# Country: " . $iso[$key]['country'] . "\n";
+					$header .= "# ISO Code: " . $key . "\n";
+					$header .= "# Total Networks: " . substr_count($iso[$key][$iptype], ",") . "\n";
+					$header .= str_replace(",", "\n", $iso[$key][$iptype]);
+					$iso[$key][$iptype] = "";
 				}
-				$counter++;
 			}
+			$counter++;
+			@file_put_contents($pfb_file, $header, LOCK_EX);
 		}
 	}
-	unset($cc);
-	fclose($handle);
-
-	// Build Continent IPv6 Files
-	$counter = 0;
-	foreach ($cont_array as $iso) {
-		$header		= "";
-		$pfb_file	= "";
-		$iso_key	= "";
-
-		$header		.= "# Generated from MaxMind Inc. on: " . date("m/d/y G:i:s", time()) . "\n";
-		$header		.= "# Continent IPv6: " . $cont_array[$counter]['continent'] . "\n";
-		$pfb_file	= $cont_array[$counter]['file6'];
-		$iso_key	= array_keys($iso);
-		foreach ($iso_key as $key) {
-			if (preg_match("/[A-Z]{2}/", $key)) {
-				$header .= "# Country: " . $iso[$key]['country'] . "\n";
-				$header .= "# ISO Code: " . $key . "\n";
-				$header .= "# Total Networks: " . substr_count($iso[$key]['ip6'], ",") . "\n";
-				$header .= str_replace(",", "\n", $iso[$key]['ip6']);
-				$iso[$key]['ip6'] = "";
-			}
-		}
-		$counter++;
-		@file_put_contents($pfb_file, $header, LOCK_EX);
-	}
-	unset($cont_array);
 }
 
 
+// Function to process Continent txt files and create Country ISO files and to Generate GUI XML files.
 function pfblockerng_get_countries() {
-
 	global $g,$pfb;
-	pfb_global();
 
-	# These arrays are used to collect the <option> tags for the XML Continent Files
-	$roptions4 = array();
-	$coptions4 = array();
-	$roptions6 = array();
-	$coptions6 = array();
-
-	$files4 = array (	"Africa"	=> "{$pfb['ccdir']}/Africa_v4.txt",
-				"Asia"		=> "{$pfb['ccdir']}/Asia_v4.txt",
-				"Europe"	=> "{$pfb['ccdir']}/Europe_v4.txt",
-				"North America"	=> "{$pfb['ccdir']}/North_America_v4.txt",
-				"Oceania"	=> "{$pfb['ccdir']}/Oceania_v4.txt",
-				"South America"	=> "{$pfb['ccdir']}/South_America_v4.txt"
+	$files = array (	"Africa"		=> "{$pfb['ccdir']}/Africa_v4.txt",
+				"Asia"			=> "{$pfb['ccdir']}/Asia_v4.txt",
+				"Europe"		=> "{$pfb['ccdir']}/Europe_v4.txt",
+				"North America"		=> "{$pfb['ccdir']}/North_America_v4.txt",
+				"Oceania"		=> "{$pfb['ccdir']}/Oceania_v4.txt",
+				"South America"		=> "{$pfb['ccdir']}/South_America_v4.txt",
+				"Proxy and Satellite"	=> "{$pfb['ccdir']}/Proxy_Satellite_v4.txt"
 				);
 
-	# IPv4 Collect Data to generate new continent XML Files.
+	// Collect Data to generate new continent XML Files.
 	$log = "Building pfBlockerNG XML Files \n";
 	print $log;
 	pfb_logger("{$log}","3");
 
-	foreach ($files4 as $cont => $file) {
-		$log = "IPv4 " . $cont . "\n";
-		print $log;
-		pfb_logger("{$log}","3");
-		$ips = file_get_contents($file);
-		$convert = explode("\n", $ips);
-		$cont_name = preg_replace("/ /","",$cont);
-		$cont_name_lower = strtolower($cont_name);
-		$active = array( "$cont" => '<active/>');
-		$total4 = 0;
-		$pfb['complete'] = FALSE;
+	foreach ($files as $cont => $file) {
+		// Process the following for IPv4 and IPv6
+		foreach (array("4", "6") as $type) {
+			$log = "IPv{$type} " . $cont . "\n";
+			print $log;
+			pfb_logger("{$log}","3");
 
-		foreach ($convert as $line) {
-			if (preg_match("/#/",$line)) {
-				if ($pfb['complete']) {
-					$coptions4[] = $Country . '-' . $ISOCode . ' ('. $total4 .') ' . ' </name><value>' . $ISOCode . '</value></option>';
-					$roptions4[] = $Country . '-' . $ISOCode . ' ('. $total4 .') ' . ' </name><value>' . $ISOCode . '</value></option>';
+			if ($type == "6")
+				$file = preg_replace("/v4/", "v6", $file);
+			$convert		= explode("\n", file_get_contents($file));
+			$cont_name		= preg_replace("/ /", "", $cont);
+			$cont_name_lower	= strtolower($cont_name);
+			$active			= array("$cont" => '<active/>');
+			$lastkey		= count ($convert) - 1;
+			$pfb['complete']	= FALSE;
+			$keycount		= 1;
+			$total			= 0;
 
-					// Save ISO IPv4 Data
-					@file_put_contents($pfb['ccdir'] . '/' . $ISOCode . '_v4.txt',$pfb_v4,LOCK_EX);
+			foreach ($convert as $line) {
+				if (preg_match("/#/",$line)) {
+					if ($pfb['complete']) {
+						${'coptions' . $type}[] = $country . '-' . $isocode . ' ('. $total .') ' . ' </name><value>' . $isocode . '</value></option>';
+						// Only collect IPv4 for Reputation Tab 
+						if ($type == "4")
+							$roptions4[] = $country . '-' . $isocode . ' ('. $total .') ' . ' </name><value>' . $isocode . '</value></option>';
 
-					// Clear Variables and Restart Continent Collection process
-					$total4 = 0;
-					$pfb_v4 = "";
-					$pfb['complete'] = FALSE;
+						// Save ISO data
+						@file_put_contents($pfb['ccdir'] . '/' . $isocode . '_v' . $type . '.txt', $xml_data, LOCK_EX);
+
+						// Clear variables and restart Continent collection process
+						unset($total, $xml_data);
+						$pfb['complete'] = FALSE;
+					}
+					if (preg_match("/Total Networks: 0/", $line)) { continue;}	// Don't Display Countries with Null Data
+					if (preg_match("/Country:\s(.*)/",$line, $matches)) { $country = $matches[1];}
+					if (preg_match("/ISO Code:\s(.*)/",$line, $matches)) { $isocode = $matches[1];}
 				}
-				if (preg_match("/Country:\s(.*)/",$line, $matches)) { $Country = $matches[1];}
-				if (preg_match("/ISO Code:\s(.*)/",$line, $matches)) { $ISOCode = $matches[1];}
-			} elseif (!preg_match("/#/",$line)) {
-				$total4++;
-				if (!empty($line))
-					$pfb_v4 .= $line . "\n";
-				$pfb['complete'] = TRUE;
-			}
-		}
-		unset ($ips, $convert);
-
-		// Sort IPv4 Countries Alphabetically and Build XML <option> Data for Continents Tab
-		sort($coptions4, SORT_STRING);
-		$ftotal4 = count($coptions4);
-		$count = 1;
-		$options4 = "";
-
-		foreach ($coptions4 as $option4) {
-			if ($count == 1) { $options4 .= "\t" . '<option><name>' . $option4 . "\n"; $count++; continue;}
-			if ($ftotal4 == $count) {
-				$options4 .= "\t\t\t\t" . '<option><name>' . $option4;
-			} else {
-				$options4 .= "\t\t\t\t" . '<option><name>' . $option4 . "\n";
-			}
-			$count++;
-		}
-		unset ($coptions4);
-
-		// IPv6 Collect Data to generate new continent XML Files.
-		$file6 = preg_replace("/v4/", "v6", $file);
-		$ips = file_get_contents($file6);
-		$convert = explode("\n", $ips);
-		$log = "IPv6 " . $cont . "\n";
-		pfb_logger("{$log}","3");
-		$total6 = 0;
-		$pfb['complete'] = FALSE;
-
-		foreach ($convert as $line) {
-			if (preg_match("/#/",$line)) {
-				if ($pfb['complete']) {
-					$coptions6[] = $Country . '-' . $ISOCode . ' ('. $total6 .') ' . ' </name><value>' . $ISOCode . '</value></option>';
-					$roptions6[] = $Country . '-' . $ISOCode . ' ('. $total6 .') ' . ' </name><value>' . $ISOCode . '</value></option>';
-
-					// Save ISO IPv6 Data
-					@file_put_contents($pfb['ccdir'] . '/' . $ISOCode . '_v6.txt',$pfb_v6,LOCK_EX);
-
-					// Clear Variables and Restart Continent Collection process
-					$total6 = 0;
-					$pfb_v6 = "";
-					$pfb['complete'] = FALSE;
+				elseif (!preg_match("/#/",$line)) {
+					$total++;
+					if (!empty($line))
+						$xml_data .= $line . "\n";
+					$pfb['complete'] = TRUE;
 				}
-				if (preg_match("/Country:\s(.*)/",$line, $matches)) { $Country = $matches[1];}
-				if (preg_match("/ISO Code:\s(.*)/",$line, $matches)) { $ISOCode = $matches[1];}
-			} elseif (!preg_match("/#/",$line)) {
-				$total6++;
-				if (!empty($line))
-					$pfb_v6 .= $line . "\n";
-				$pfb['complete'] = TRUE;
+
+				// Save last EOF ISO IP data
+				if ($keycount == $lastkey) {
+					if (preg_match("/Total Networks: 0/", $line)) { continue;}	// Dont Display Countries with Null Data
+					${'coptions' . $type}[] = $country . '-' . $isocode . ' ('. $total .') ' . ' </name><value>' . $isocode . '</value></option>';
+					if ($type == "4")
+						$roptions4[] = $country . '-' . $isocode . ' ('. $total .') ' . ' </name><value>' . $isocode . '</value></option>';
+					@file_put_contents($pfb['ccdir'] . '/' . $isocode . '_v' . $type . '.txt', $xml_data, LOCK_EX);
+					unset($total, $xml_data);
+				}
+				$keycount++;
 			}
-		}
+			unset ($ips, $convert);
 
-		// Sort IPv6 Countries Alphabetically for Continents Tab
-		sort($coptions6, SORT_STRING);
-		$ftotal6 = count($coptions6);
-		$count = 1;
-		$options6 = "";
+			// Sort IP Countries alphabetically and build XML <option> data for Continents tab
+			if (!empty (${'coptions' . $type})) {
+				sort(${'coptions' . $type}, SORT_STRING);
+				${'ftotal' . $type} = count(${'coptions' . $type});
+				$count = 1;
+				${'options' . $type} = "";
 
-		foreach ($coptions6 as $option6) {
-			if ($count == 1) { $options6 .= "\t" . '<option><name>' . $option6 . "\n"; $count++; continue;}
-			if ($ftotal6 == $count) {
-				$options6 .= "\t\t\t\t" . '<option><name>' . $option6;
-			} else {
-				$options6 .= "\t\t\t\t" . '<option><name>' . $option6 . "\n";
+				foreach (${'coptions' . $type} as $option) {
+					if ($count == 1) { ${'options' . $type} .= "\t" . '<option><name>' . $option . "\n"; $count++; continue;}
+					if (${'ftotal' . $type} == $count) {
+						${'options' . $type} .= "\t\t\t\t" . '<option><name>' . $option;
+					} else {
+						${'options' . $type} .= "\t\t\t\t" . '<option><name>' . $option . "\n";
+					}
+					$count++;
+				}
 			}
-			$count++;
+			unset (${'coptions' . $type});
 		}
-		unset ($coptions6);
-
 
 $xml = <<<EOF
 <?xml version="1.0" encoding="utf-8" ?>
@@ -888,7 +772,6 @@ $xml = <<<EOF
 		<tab>
 			<text>Top 20</text>
 			<url>/pkg_edit.php?xml=/pfblockerng/pfblockerng_top20.xml&amp;id=0</url>
-			{$active['top']}
 		</tab>
 		<tab>
 			<text>Africa</text>
@@ -921,6 +804,11 @@ $xml = <<<EOF
 			{$active['South America']}
 		</tab>
 		<tab>
+			<text>P.S.</text>
+			<url>/pkg_edit.php?xml=/pfblockerng/pfblockerng_ProxyandSatellite.xml&amp;id=0</url>
+			{$active['Proxy and Satellite']}
+		</tab>
+		<tab>
 			<text>Logs</text>
 			<url>/pfblockerng/pfblockerng_log.php</url>
 		</tab>
@@ -950,11 +838,17 @@ $xml = <<<EOF
 			</description>
 			<type>select</type>
 			<options>
-			{$options4}
+			${'options4'}
 			</options>
-			<size>{$ftotal4}</size>
+			<size>${'ftotal4'}</size>
 			<multiple/>
 		</field>
+
+EOF;
+
+// Skip IPv6 when Null data found
+if (!empty (${'options6'})) {
+	$xml .= <<<EOF
 		<field>
 			<fielddescr><![CDATA[<br /><strong>IPv6</strong><br />Countries]]></fielddescr>
 			<fieldname>countries6</fieldname>
@@ -964,11 +858,16 @@ $xml = <<<EOF
 			</description>
 			<type>select</type>
 			<options>
-			{$options6}
+			${'options6'}
 			</options>
-			<size>{$ftotal6}</size>
+			<size>${'ftotal6'}</size>
 			<multiple/>
 		</field>
+
+EOF;
+}
+
+$xml .= <<<EOF
 		<field>
 			<fielddescr>List Action</fielddescr>
 			<description><![CDATA[<br />Default : <strong>Disabled</strong><br /><br />
@@ -1062,17 +961,20 @@ $xml = <<<EOF
 </packagegui>
 EOF;
 
-	// Update Each Continent XML file.
-	@file_put_contents('/usr/local/pkg/pfblockerng/pfblockerng_'.$cont_name.'.xml',$xml,LOCK_EX);
+		// Update Each Continent XML file.
+		@file_put_contents('/usr/local/pkg/pfblockerng/pfblockerng_'.$cont_name.'.xml',$xml,LOCK_EX);
 
-	}		// End foreach 'Six Continents' Update XML Process
+		// Unset Arrays
+		unset (${'options4'}, ${'options6'}, $xml);
 
+	}	// End foreach 'Six Continents and Proxy/Satellite' Update XML Process
 
 	// Sort Countries IPv4 Alphabetically and Build XML <option> Data for Reputation Tab (IPv6 not used by ET IQRisk)
+
 	sort($roptions4, SORT_STRING);
 	$eoa = count($roptions4);
 	$count = 1;
-	$options4 = "";
+	$etoptions = "";
 
 	foreach ($roptions4 as $option4) {
 		if ($count == 1) { $et_options .= "\t" . '<option><name>' . $option4 . "\n"; $count++; continue; }
@@ -1084,9 +986,7 @@ EOF;
 		$count++;
 	}
 
-
 // Update pfBlockerNG_Reputation.xml file with Country Code Changes
-
 
 $xmlrep = <<<EOF
 <?xml version="1.0" encoding="utf-8" ?>
@@ -1201,6 +1101,10 @@ $xmlrep = <<<EOF
 		<tab>
 			<text>S.A.</text>
 			<url>/pkg_edit.php?xml=/pfblockerng/pfblockerng_SouthAmerica.xml&amp;id=0</url>
+		</tab>
+		<tab>
+			<text>P.S.</text>
+			<url>/pkg_edit.php?xml=/pfblockerng/pfblockerng_ProxyandSatellite.xml&amp;id=0</url>
 		</tab>
 		<tab>
 			<text>Logs</text>
@@ -1558,22 +1462,22 @@ $xmlrep = <<<EOF
 	</custom_php_resync_config_command>
 </packagegui>
 EOF;
-	# Unset Arrays
-	unset ($options4, $options6, $et_options);
-
 	$log = "Saving pfBlockerNG Reputation TAB \n";
 	print $log;
 	pfb_logger("{$log}","3");
 
 	// Save pfBlockerng_reputation.xml file
-	@file_put_contents('/usr/local/pkg/pfblockerng/pfblockerng_reputation.xml',$xmlrep,LOCK_EX);
+	@file_put_contents('/usr/local/pkg/pfblockerng/pfblockerng_reputation.xml', $xmlrep, LOCK_EX);
+
 	$log = "\n Country Code - XML File Update completed.\n";
 	print $log;
 	pfb_logger("{$log}","3");
-
 	$now = date("m/d/y G.i:s", time());
 	$log = "Country Code Update Ended - [ NOW ]\n";
 	print "Country Code Update Ended - [ $now ]\n";
 	pfb_logger("{$log}","3");
+
+	// Unset Arrays
+	unset ($roptions4, $et_options, $xmlrep);
 }
 ?>

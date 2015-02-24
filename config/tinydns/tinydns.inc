@@ -73,7 +73,7 @@ function tinydns_custom_php_install_command() {
 . /etc/rc.subr
 
 name="svscan"
-rcvar=`set_rcvar`
+rcvar="\${name}_enable"
 command="/usr/local/bin/svscan"
 svscan_enable=\${svscan_enable-"YES"}
 svscan_servicedir=\${svscan_servicedir-"{$g['varrun_path']}/service"}

@@ -24,7 +24,7 @@
                         <active/>
                 </tab>
                 <tab>
-                        <text>Log</text>
+                        <text>HAVP Log</text>
                         <url>/havp_log.php</url>
                 </tab>
         </tabs>

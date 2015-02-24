@@ -39,12 +39,25 @@
 	POSSIBILITY OF SUCH DAMAGE.
 */
 
+// Auto-Resolve Hostnames
+if (isset($_REQUEST['getpfhostname'])) {
+	$getpfhostname = trim(htmlspecialchars($_REQUEST['getpfhostname']));
+	if (strlen($getpfhostname) >= 8) {
+		$hostname = htmlspecialchars(gethostbyaddr($getpfhostname), ENT_QUOTES);
+	} else {
+		$hostname = $getpfhostname;
+	}
+	if ($hostname == $getpfhostname) {
+		$hostname = 'unknown';
+	}
+	echo $hostname;
+	die;
+}
+
 require_once("util.inc");
 require_once("guiconfig.inc");
-require_once("globals.inc");
-require_once("filter_log.inc");
 require_once("/usr/local/pkg/pfblockerng/pfblockerng.inc");
-
+global $rule_list;
 pfb_global();
 
 // Application Paths
@@ -53,8 +66,11 @@ $pathgeoip6	= "/usr/pbi/pfblockerng-" . php_uname("m") . "/bin/geoiplookup6";
 
 // Define File Locations
 $filter_logfile = "{$g['varlog_path']}/filter.log";
-$pathgeoipdat   = "{$pfb['dbdir']}/GeoIP.dat";
-$pathgeoipdat6  = "{$pfb['dbdir']}/GeoIPv6.dat";
+$pathgeoipdat	= "/usr/pbi/pfblockerng-" . php_uname("m") . "/share/GeoIP/GeoIP.dat";
+$pathgeoipdat6	= "/usr/pbi/pfblockerng-" . php_uname("m") . "/share/GeoIP/GeoIPv6.dat";
+
+// Define Alerts Log filter Rollup window variable. (Alert Filtering Code adapted from B.Meeks - Snort Package)
+$pfb['filterlogentries'] = FALSE;
 
 // Emerging Threats IQRisk Header Name Reference
 $pfb['et_header'] = TRUE;
@@ -78,11 +94,11 @@ $rule_list = array();
 $results = array();
 $data = exec ("/sbin/pfctl -vv -sr | grep 'pfB_'", $results);
 
-if (empty($config['installedpackages']['pfblockerngglobal']['pfbdenycnt']))
+if (!isset($config['installedpackages']['pfblockerngglobal']['pfbdenycnt']))
 	$config['installedpackages']['pfblockerngglobal']['pfbdenycnt']		= '25';
-if (empty($config['installedpackages']['pfblockerngglobal']['pfbpermitcnt']))
+if (!isset($config['installedpackages']['pfblockerngglobal']['pfbpermitcnt']))
 	$config['installedpackages']['pfblockerngglobal']['pfbpermitcnt']	= '5';
-if (empty($config['installedpackages']['pfblockerngglobal']['pfbmatchcnt']))
+if (!isset($config['installedpackages']['pfblockerngglobal']['pfbmatchcnt']))
 	$config['installedpackages']['pfblockerngglobal']['pfbmatchcnt']	= '5';
 if (empty($config['installedpackages']['pfblockerngglobal']['alertrefresh']))
 	$config['installedpackages']['pfblockerngglobal']['alertrefresh']	= 'off';
@@ -113,6 +129,53 @@ if (is_array($config['installedpackages']['pfblockerngglobal'])) {
 	$pfbpermitcnt	= $config['installedpackages']['pfblockerngglobal']['pfbpermitcnt'];
 	$pfbmatchcnt	= $config['installedpackages']['pfblockerngglobal']['pfbmatchcnt'];
 }
+
+
+function pfb_match_filter_field($flent, $fields) {
+	foreach ($fields as $key => $field) {
+		if ($field == null)
+			continue;
+		if ((strpos($field, '!') === 0)) {
+			$field = substr($field, 1);
+			$field_regex = str_replace('/', '\/', str_replace('\/', '/', $field));
+			if (@preg_match("/{$field_regex}/i", $flent[$key]))
+				return false;
+		}
+		else {
+			$field_regex = str_replace('/', '\/', str_replace('\/', '/', $field));
+			if (!@preg_match("/{$field_regex}/i", $flent[$key]))
+				return false;
+		}
+	}
+	return true;
+}
+
+
+if ($_POST['filterlogentries_submit']) {
+	// Set flag for filtering alert entries
+	$pfb['filterlogentries'] = TRUE;
+
+	// Note the order of these fields must match the order decoded from the alerts log
+	$filterfieldsarray = array();
+	$filterfieldsarray[0] = $_POST['filterlogentries_rule'] ? $_POST['filterlogentries_rule'] : null;
+	$filterfieldsarray[2] = $_POST['filterlogentries_int'] ? $_POST['filterlogentries_int'] : null;
+	$filterfieldsarray[6] = strtolower($_POST['filterlogentries_proto']) ? $_POST['filterlogentries_proto'] : null;
+
+	// Remove any zero-length spaces added to the IP address that could creep in from a copy-paste operation
+	$filterfieldsarray[7] = $_POST['filterlogentries_srcip'] ? str_replace("\xE2\x80\x8B", "", $_POST['filterlogentries_srcip']) : null;
+	$filterfieldsarray[8] = $_POST['filterlogentries_dstip'] ? str_replace("\xE2\x80\x8B", "", $_POST['filterlogentries_dstip']) : null;
+
+	$filterfieldsarray[9] = $_POST['filterlogentries_srcport'] ? $_POST['filterlogentries_srcport'] : null;
+	$filterfieldsarray[10] = $_POST['filterlogentries_dstport'] ? $_POST['filterlogentries_dstport'] : null;
+	$filterfieldsarray[99] = $_POST['filterlogentries_date'] ? $_POST['filterlogentries_date'] : null;
+}
+
+
+if ($_POST['filterlogentries_clear']) {
+	$pfb['filterlogentries'] = TRUE;
+	$filterfieldsarray = array();
+}
+
 
 // Collect pfBlockerNG Firewall Rules
 if (!empty($results)) {
@@ -267,18 +330,6 @@ if (isset($_POST['addsuppress'])) {
 	}
 }
 
-// Auto-Resolve Hostnames
-if (isset($_REQUEST['getpfhostname'])) {
-	$getpfhostname = htmlspecialchars($_REQUEST['getpfhostname']);
-	$hostname = htmlspecialchars(gethostbyaddr($getpfhostname), ENT_QUOTES);
-	if ($hostname == $getpfhostname) {
-		$hostname = 'unknown';
-	}
-	echo $hostname;
-	die;
-}
-
-
 // Host Resolve Function lookup
 function getpfbhostname($type = 'src', $hostip, $countme = 0) {
 	$hostnames['src'] = '';
@@ -294,6 +345,112 @@ function check_lan_dest($lan_ip,$lan_mask,$dest_ip,$dest_mask="32") {
 	return $result;
 }
 
+
+// Parse Filter log for pfBlockerNG Alerts
+function conv_log_filter_lite($logfile, $nentries, $tail, $pfbdenycnt, $pfbpermitcnt, $pfbmatchcnt) {
+	global $pfb, $rule_list, $filterfieldsarray;
+	$fields_array	= array();
+	$logarr		= "";
+	$denycnt	= 0;
+	$permitcnt	= 0;
+	$matchcnt	= 0;
+
+	if (file_exists($logfile)) {
+		exec("/usr/local/sbin/clog " . escapeshellarg($logfile) . " | grep -v \"CLOG\" | grep -v \"\033\" | /usr/bin/grep 'filterlog:' | /usr/bin/tail -r -n {$tail}", $logarr);
+	}
+	else return;
+
+	if (!empty($logarr) && !empty($rule_list['id'])) {
+		foreach ($logarr as $logent) {
+			$pfbalert  = array();
+			$log_split = "";
+
+			if (!preg_match("/(.*)\s(.*)\sfilterlog:\s(.*)$/", $logent, $log_split))
+				continue;
+
+			list($all, $pfbalert[99], $host, $rule) = $log_split;
+			$rule_data	= explode(",", $rule);
+			$pfbalert[0]	= $rule_data[0];		// Rulenum
+
+			// Skip Alert if Rule is not a pfBNG Alert
+			if (!in_array($pfbalert[0], $rule_list['id']))
+				continue;
+
+			$pfbalert[1] = $rule_data[4];			// Realint
+			$pfbalert[3] = $rule_data[6];			// Act
+			$pfbalert[4] = $rule_data[8];			// Version
+
+			if ($pfbalert[4] == "4") {
+				$pfbalert[5]	= $rule_data[15];	// Protocol ID
+				$pfbalert[6]	= $rule_data[16];	// Protocol
+				$pfbalert[7]	= $rule_data[18];	// SRC IP
+				$pfbalert[8]	= $rule_data[19];	// DST IP
+				$pfbalert[9]	= $rule_data[20];	// SRC Port
+				$pfbalert[10]	= $rule_data[21];	// DST Port
+				$pfbalert[11]	= $rule_data[23];	// TCP Flags
+			} else {
+				$pfbalert[5]	= $rule_data[13];	// Protocol ID
+				$pfbalert[6]	= $rule_data[12];	// Protocol
+				$pfbalert[7]	= $rule_data[15];	// SRC IP
+				$pfbalert[8]	= $rule_data[16];	// DST IP
+				$pfbalert[9]	= $rule_data[17];	// SRC Port
+				$pfbalert[10]	= $rule_data[18];	// DST Port
+				$pfbalert[11]	= $rule_data[20];	// TCP Flags
+			}
+
+			if ($pfbalert[5] == "6" || $pfbalert[5] == "17") {
+				// skip
+			} else {
+				$pfbalert[9]  = "";
+				$pfbalert[10] = "";
+				$pfbalert[11] = "";
+			}
+
+			// Skip Repeated Alerts 
+			if (($pfbalert[3] . $pfbalert[8] . $pfbalert[10]) == $previous_dstip || ($pfbalert[3] . $pfbalert[7] . $pfbalert[9]) == $previous_srcip)
+				continue;
+
+			$pfbalert[2] = convert_real_interface_to_friendly_descr($rule_data[4]);					// Friendly Interface Name
+			$pfbalert[6] = str_replace("TCP", "TCP-", strtoupper($pfbalert[6]), $pfbalert[6]) . $pfbalert[11];	// Protocol Flags
+
+			// If Alerts Filtering is selected, process Filters as required.
+			if ($pfb['filterlogentries'] && !pfb_match_filter_field($pfbalert, $filterfieldsarray)) {
+				continue;
+			}
+
+			if ($pfbalert[3] == "block") {
+				if ($denycnt < $pfbdenycnt) {
+					$fields_array['Deny'][] = $pfbalert;
+					$denycnt++;
+				}
+			}
+			elseif ($pfbalert[3] == "pass") {
+				if ($permitcnt < $pfbpermitcnt) {
+					$fields_array['Permit'][] = $pfbalert;
+					$permitcnt++;
+				}
+			}
+			elseif ($pfbalert[3] == "unkn(%u)" || $pfbalert[3] == "unkn(11)") {
+				if ($matchcnt < $pfbmatchcnt) {
+					$fields_array['Match'][] = $pfbalert;
+					$matchcnt++;
+				}
+			}
+
+			// Exit function if Sufficinet Matches found.
+			if ($denycnt >= $pfbdenycnt && $permitcnt >= $pfbpermitcnt && $matchcnt >= $pfbmatchcnt) {
+				unset ($pfbalert, $logarr);
+				return $fields_array;
+			}
+
+			// Collect Details for Repeated Alert Comparison
+			$previous_srcip = $pfbalert[3] . $pfbalert[7] . $pfbalert[9];
+			$previous_dstip = $pfbalert[3] . $pfbalert[8] . $pfbalert[10];
+		}
+		unset ($pfbalert, $logarr);
+		return $fields_array;
+	}
+}
 
 $pgtitle = gettext("pfBlockerNG: Alerts");
 include_once("head.inc");
@@ -334,6 +491,7 @@ if ($savemsg) {
 				$tab_array[] = array(gettext("N.A."), false, "/pkg_edit.php?xml=/pfblockerng/pfblockerng_NorthAmerica.xml&id=0");
 				$tab_array[] = array(gettext("Oceania"), false, "/pkg_edit.php?xml=/pfblockerng/pfblockerng_Oceania.xml&id=0");
 				$tab_array[] = array(gettext("S.A."), false, "/pkg_edit.php?xml=/pfblockerng/pfblockerng_SouthAmerica.xml&id=0");
+				$tab_array[] = array(gettext("P.S."), false, "/pkg_edit.php?xml=/pfblockerng/pfblockerng_ProxyandSatellite.xml&id=0");
 				$tab_array[] = array(gettext("Logs"), false, "/pfblockerng/pfblockerng_log.php");
 				$tab_array[] = array(gettext("Sync"), false, "/pkg_edit.php?xml=/pfblockerng/pfblockerng_sync.xml&id=0");
 				display_top_tabs($tab_array, true);
@@ -342,7 +500,7 @@ if ($savemsg) {
 	</tr>
 	<tr>
 	<td><div id="mainarea">
-		<table id="maintable" class="tabcont" width="100%" border="0" cellspacing="0" cellpadding="6">
+		<table id="maintable" class="tabcont" width="100%" border="0" cellspacing="0" cellpadding="4">
 			<tr>
 				<td colspan="3" class="vncell" align="left"><?php echo gettext("LINKS :"); ?>&nbsp;
 				<a href='/firewall_aliases.php' target="_blank"><?php echo gettext("Firewall Alias"); ?></a>&nbsp;
@@ -370,6 +528,70 @@ if ($savemsg) {
 				<?php printf(gettext("Currently Suppressing &nbsp; %s$pfbsupp_cnt%s &nbsp; Hosts."), '<strong>', '</strong>');?>
 			</td>
 			</tr>
+			<tr>
+				<td colspan="3" class="listtopic"><?php echo gettext("Alert Log View Filter"); ?></td>
+			</tr>
+			<tr id="filter_enable_row" style="display:<?php if (!$pfb['filterlogentries']) {echo "table-row;";} else {echo "none;";} ?>">
+				<td width="10%" class="vncell"><?php echo gettext('Filter Options'); ?></td>
+				<td width="90%" class="vtable">
+					<input name="show_filter" id="show_filter" type="button" class="formbtns" value="<?=gettext("Show Filter");?>" onclick="enable_showFilter();" />
+					&nbsp;&nbsp;<?=gettext("Click to display advanced filtering options dialog");?>
+				</td>
+			</tr>
+			<tr id="filter_options_row" style="display:<?php if (!$pfb['filterlogentries']) {echo "none;";} else {echo "table-row;";} ?>">
+				<td colspan="2">
+					<table width="100%" border="0" cellspacing="0" cellpadding="1" summary="action">
+					<tr>
+						<td valign="top">
+							<div align="center"><?=gettext("Date");?></div>
+							<div align="center"><input id="filterlogentries_date" name="filterlogentries_date" class="formfld search" type="text" size="15" value="<?= $filterfieldsarray[99] ?>" /></div>
+						</td>
+						<td valign="top">
+							<div align="center"><?=gettext("Interface");?></div>
+							<div align="center"><input id="filterlogentries_int" name="filterlogentries_int" class="formfld search" type="text" size="15" value="<?= $filterfieldsarray[2] ?>" /></div>
+						</td>
+						<td valign="top">
+							<div align="center"><?=gettext("Rule Number Only");?></div>
+							<div align="center"><input id="filterlogentries_rule" name="filterlogentries_rule" class="formfld search" type="text" size="15" value="<?= $filterfieldsarray[0] ?>" /></div>
+						</td>
+						<td valign="top">
+							<div align="center"><?=gettext("Protocol");?></div>
+							<div align="center"><input id="filterlogentries_proto" name="filterlogentries_proto" class="formfld search" type="text" size="15" value="<?= $filterfieldsarray[6] ?>" /></div>
+						</td>
+					</tr>
+					<tr>
+						<td valign="top">
+							<div align="center"><?=gettext("Source IP Address");?></div>
+							<div align="center"><input id="filterlogentries_srcip" name="filterlogentries_srcip" class="formfld search" type="text" size="28" value="<?= $filterfieldsarray[7] ?>" /></div>
+						</td>
+						<td valign="top">
+							<div align="center"><?=gettext("Source Port");?></div>
+							<div align="center"><input id="filterlogentries_srcport" name="filterlogentries_srcport" class="formfld search" type="text" size="5" value="<?= $filterfieldsarray[9] ?>" /></div>
+						</td>
+						<td valign="top">
+							<div align="center"><?=gettext("Destination IP Address");?></div>
+							<div align="center"><input id="filterlogentries_dstip" name="filterlogentries_dstip" class="formfld search" type="text" size="28" value="<?= $filterfieldsarray[8] ?>" /></div>
+						</td>
+						<td valign="top">
+							<div align="center"><?=gettext("Destination Port");?></div>
+							<div align="center"><input id="filterlogentries_dstport" name="filterlogentries_dstport" class="formfld search" type="text" size="5" value="<?= $filterfieldsarray[10] ?>" /></div>
+						</td>
+					</tr>
+						<td colspan="5" style="vertical-align:bottom">
+							<br /><?printf(gettext('Regex Style Matching Only! %1$s Regular Expression Help link%2$s.'), '<a target="_blank" href="http://www.php.net/manual/en/book.pcre.php">', '</a>');?>&nbsp;&nbsp; <?=gettext("Precede with exclamation (!) as first character to exclude match.) ");?>
+							<br /><?printf(gettext("Example: ( ^80$ - Match Port 80, ^80$|^8080$ - Match both port 80 & 8080 ) "));?><br />
+					</tr>
+					<tr>
+						<td colspan="1" style="vertical-align:bottom">
+							<div align="left"><input id="filterlogentries_submit" name="filterlogentries_submit" type="submit" class="formbtns" value="<?=gettext("Apply Filter");?>" title="<?=gettext("Apply filter"); ?>" />
+							&nbsp;&nbsp;&nbsp;<input id="filterlogentries_clear" name="filterlogentries_clear" type="submit" class="formbtns" value="<?=gettext("Clear");?>" title="<?=gettext("Remove filter");?>" />
+							&nbsp;&nbsp;&nbsp;<input id="filterlogentries_hide" name="filterlogentries_hide" type="button" class="formbtns" value="<?=gettext("Hide");?>" onclick="enable_hideFilter();" title="<?=gettext("Hide filter options");?>" /></div>
+						</td>
+					</tr>
+					</table>
+				</td>
+			</tr>
+
 <!--Create Three Output Windows 'Deny', 'Permit' and 'Match'-->
 <?php foreach (array ("Deny" => $pfb['denydir'] . " " . $pfb['nativedir'], "Permit" => $pfb['permitdir'], "Match" => $pfb['matchdir']) as $type => $pfbfolder ):
 	switch($type) {
@@ -395,16 +617,9 @@ if ($savemsg) {
 			<table id="maintable" class="tabcont" width="100%" border="0" cellspacing="0" cellpadding="6">
 			<tr>
 				<!--Print Table Info-->
-				<td colspan="2" class="listtopic"><?php printf(gettext("&nbsp;{$type}&nbsp;&nbsp; - &nbsp; Last %s Alert Entries."), "{$pfbentries}"); ?>
-					<?php if ($pfb['pfsenseversion'] >= '2.2'): ?>
-						<?php if (!is_array($config['syslog']) || !array_key_exists("reverse", $config['syslog'])): ?>
-							&nbsp;&nbsp;<?php echo gettext("Firewall Logs must be in Reverse Order."); ?>
-						<?php endif; ?>
-					<?php else: ?>
-						&nbsp;&nbsp;<?php echo gettext("Firewall Rule changes can unsync these Alerts."); ?>
-						<?php if (!is_array($config['syslog']) || !array_key_exists("reverse", $config['syslog'])): ?>
-							&nbsp;&nbsp;<?php echo gettext("Firewall Logs must be in Reverse Order."); ?>
-						<?php endif; ?>
+				<td colspan="2" class="listtopic"><?php printf(gettext("&nbsp;{$type}&nbsp;&nbsp; - &nbsp; Last %s Alert Entries."),"{$pfbentries}"); ?>
+					<?php if ($type == "Deny"): ?>
+						&nbsp;&nbsp;&nbsp;&nbsp;<?php echo gettext("Firewall Rule changes can unsync these Alerts."); ?>
 					<?php endif; ?>
 				</td>
 			</tr>
@@ -412,12 +627,12 @@ if ($savemsg) {
 <td width="100%" colspan="2">
 <table id="pfbAlertsTable" style="table-layout: fixed;" width="100%" class="sortable" border="0" cellpadding="0" cellspacing="0">
 	<colgroup>
-		<col width="8%" align="center" axis="date">
+		<col width="7%" align="center" axis="date">
 		<col width="6%" align="center" axis="string">
-		<col width="16%" align="center" axis="string">
+		<col width="15%" align="center" axis="string">
 		<col width="6%" align="center" axis="string">
-		<col width="20%" align="center" axis="string">
-		<col width="20%" align="center" axis="string">
+		<col width="21%" align="center" axis="string">
+		<col width="21%" align="center" axis="string">
 		<col width="3%" align="center" axis="string">
 		<col width="13%" align="center" axis="string">
 	</colgroup>
@@ -447,13 +662,13 @@ if ($pfb['runonce']) {
 
 	// pfSense versions below 2.2 have the Logfiles in two lines.
 	if ($pfb['pfsenseversion'] >= '2.2') {
-		$pfblines = exec("/usr/bin/grep -c ^ {$filter_logfile}");
+		$pfblines = exec("/usr/local/sbin/clog {$filter_logfile} | /usr/bin/grep -c ^");
 	} else {
-		$pfblines = (exec("/usr/bin/grep -c ^ {$filter_logfile}") /2 );
+		$pfblines = (exec("/usr/local/sbin/clog {$filter_logfile} | /usr/bin/grep -c ^") /2 );
 	}
-	$fields_array = conv_log_filter($filter_logfile, $pfblines, $pfblines);
 
-	$continents = array('pfB_Africa','pfB_Antartica','pfB_Asia','pfB_Europe','pfB_NAmerica','pfB_Oceania','pfB_SAmerica','pfB_Top');
+	$fields_array = conv_log_filter_lite($filter_logfile, $pfblines, $pfblines, $pfbdenycnt, $pfbpermitcnt, $pfbmatchcnt);
+	$continents   = array('pfB_Africa','pfB_Antartica','pfB_Asia','pfB_Europe','pfB_NAmerica','pfB_Oceania','pfB_SAmerica','pfB_Top');
 
 	$supp_ip_txt .= "Clicking this Suppression Icon, will immediately remove the Block.\n\nSuppressing a /32 CIDR is better than Suppressing the full /24";
 	$supp_ip_txt .= " CIDR.\nThe Host will be added to the pfBlockerNG Suppress Alias Table.\n\nOnly 32 or 24 CIDR IPs can be Suppressed with the '+' Icon.";
@@ -474,7 +689,10 @@ if ($pfb['runonce']) {
 	// Collect Virtual IP Aliases for Inbound/Outbound List Matching
 	if (is_array($config['virtualip']['vip'])) {
 		foreach ($config['virtualip']['vip'] as $list) {
-			$pfb_local[] = $list['subnet'];
+			if ($list['type'] == "single" && $list['subnet_bits'] == "32")
+				$pfb_local[] = $list['subnet'];
+			elseif ($list['type'] == "single" || $list['type'] == "network")
+				$pfb_local = array_merge (subnet_expand ("{$list['subnet']}/{$list['subnet_bits']}"), $pfb_local);
 		}
 	}
 	// Collect NAT IP Addresses for Inbound/Outbound List Matching
@@ -515,30 +733,31 @@ if ($pfb['runonce']) {
 
 $counter = 0;
 // Process Fields_array and generate Output
-if (!empty($fields_array)) {
-	foreach ($fields_array as $fields) {
+if (!empty($fields_array[$type]) && !empty($rule_list)) {
+	$key = 0;
+	foreach ($fields_array[$type] as $fields) {
 		$rulenum	= "";
 		$alert_ip	= "";
 		$supp_ip	= "";
 		$pfb_query	= "";
 
-		$rulenum = $fields['rulenum'];
-		if ($fields['act'] == $rtype && !empty($rule_list) && in_array($rulenum, $rule_list['id']) && $counter < $pfbentries) {
+		/* Fields_array Reference	[0]	= Rulenum			[6]	= Protocol
+						[1]	= Real Interface		[7]	= SRC IP
+						[2]	= Friendly Interface Name	[8]	= DST IP
+						[3]	= Action			[9]	= SRC Port
+						[4]	= Version			[10]	= DST Port
+						[5]	= Protocol ID			[11]	= Flags
+						[99]	= Timestamp	*/
 
-			// Skip Repeated Events
-			if (($fields['dstip'] . $fields['dstport']) == $previous_dstip || ($fields['srcip'] . $fields['srcport']) == $previous_srcip) {
-				continue;
-			}
-
-			$proto = str_replace("TCP", "TCP-", $fields['proto']) . $fields['tcpflags'];
-
+		$rulenum = $fields[0];
+		if ($counter < $pfbentries) {
 			// Cleanup Port Output
-			if ($fields['proto'] == "ICMP") {
-				$srcport = $fields['srcport'];
-				$dstport = $fields['dstport'];
+			if ($fields[6] == "ICMP" || $fields[6] == "ICMPV6") {
+				$srcport = "";
+				$dstport = "";
 			} else {
-				$srcport = " :" . $fields['srcport'];
-				$dstport = " :" . $fields['dstport'];
+				$srcport = ":" . $fields[9];
+				$dstport = ":" . $fields[10];
 			}
 
 			// Don't add Suppress Icon to Country Block Lines
@@ -547,16 +766,10 @@ if (!empty($fields_array)) {
 			}
 
 			// Add DNS Resolve and Suppression Icons to External IPs only. GeoIP Code to External IPs only.
-			if (in_array($fields['dstip'], $pfb_local) || check_lan_dest($lan_ip,$lan_mask,$fields['dstip'],"32")) {
+			if (in_array($fields[8], $pfb_local) || check_lan_dest($lan_ip,$lan_mask,$fields[8],"32")) {
 				// Destination is Gateway/NAT/VIP
 				$rule = $rule_list[$rulenum]['name'] . "<br />(" . $rulenum .")";
-				$host = $fields['srcip'];
-
-				if (is_ipaddrv4($host)) {
-					$country = substr(exec("$pathgeoip -f $pathgeoipdat $host"),23,2);
-				} else {
-					$country = substr(exec("$pathgeoip6 -f $pathgeoipdat6 $host"),26,2);
-				}
+				$host = $fields[7];
 
 				$alert_ip .= "<a href='/pfblockerng/pfblockerng_diag_dns.php?host={$host}' title=\" " . gettext("Resolve host via Rev. DNS lookup");
 				$alert_ip .= "\"> <img src=\"/themes/{$g['theme']}/images/icons/icon_log.gif\" width=\"11\" height=\"11\" border=\"0\" ";
@@ -564,30 +777,22 @@ if (!empty($fields_array)) {
 
 				if ($pfb_query != "Country" && $rtype == "block" && $pfb['supp'] == "on") {
 					$supp_ip .= "<input type='image' name='addsuppress[]' onclick=\"hostruleid('{$host}','{$rule_list[$rulenum]['name']}');\" ";
-					$supp_ip .= "src=\"../themes/{$g['theme']}/images/icons/icon_plus.gif\" title=\"";
+					$supp_ip .= "src=\"../themes/{$g['theme']}/images/icons/icon_pass_add.gif\" title=\"";
 					$supp_ip .= gettext($supp_ip_txt) . "\" border=\"0\" width='11' height='11'/>";
 				}
 
 				if ($pfb_query != "Country" && $rtype == "block" && $hostlookup == "on") {
-					$hostname = getpfbhostname('src', $fields['srcip'], $counter);
+					$hostname = getpfbhostname('src', $fields[7], $counter);
 				} else {
 					$hostname = "";
 				}
 		
-				$src_icons	= $alert_ip . "&nbsp;" . $supp_ip . "&nbsp;";
-				$dst_icons	= "";
-				$scc		= $country;
-				$dcc		= "";
+				$src_icons = $alert_ip . "&nbsp;" . $supp_ip . "&nbsp;";
+				$dst_icons = "";
 			} else {
 				// Outbound
 				$rule = $rule_list[$rulenum]['name'] . "<br />(" . $rulenum .")";
-				$host = $fields['dstip'];
-
-				if (is_ipaddrv4($host)) {
-					$country = substr(exec("$pathgeoip -f $pathgeoipdat $host"),23,2);
-				} else {
-					$country = substr(exec("$pathgeoip6 -f $pathgeoipdat6 $host"),26,2);
-				}
+				$host = $fields[8];
 
 				$alert_ip .= "<a href='/pfblockerng/pfblockerng_diag_dns.php?host={$host}' title=\"" . gettext("Resolve host via Rev. DNS lookup");
 				$alert_ip .= "\"> <img src=\"/themes/{$g['theme']}/images/icons/icon_log.gif\" width=\"11\" height=\"11\" border=\"0\" ";
@@ -595,20 +800,25 @@ if (!empty($fields_array)) {
 
 				if ($pfb_query != "Country" && $rtype == "block" && $pfb['supp'] == "on") {
 					$supp_ip .= "<input type='image' name='addsuppress[]' onclick=\"hostruleid('{$host}','{$rule_list[$rulenum]['name']}');\" ";
-					$supp_ip .= "src=\"../themes/{$g['theme']}/images/icons/icon_plus.gif\" title=\"";
+					$supp_ip .= "src=\"../themes/{$g['theme']}/images/icons/icon_pass_add.gif\" title=\"";
 					$supp_ip .= gettext($supp_ip_txt) . "\" border=\"0\" width='11' height='11'/>";
 				}
 
 				if ($pfb_query != "Country" && $rtype == "block" && $hostlookup == "on") {
-					$hostname = getpfbhostname('dst', $fields['dstip'], $counter);
+					$hostname = getpfbhostname('dst', $fields[8], $counter);
 				} else {
 					$hostname = "";
 				}
 
-				$src_icons	= "";
-				$dst_icons	= $alert_ip . "&nbsp;" . $supp_ip . "&nbsp;";
-				$scc		= "";
-				$dcc		= $country; 
+				$src_icons = "";
+				$dst_icons = $alert_ip . "&nbsp;" . $supp_ip . "&nbsp;";
+			}
+
+			// Determine Country Code of Host
+			if (is_ipaddrv4($host)) {
+				$country = substr(exec("$pathgeoip -f $pathgeoipdat $host"),23,2);
+			} else {
+				$country = substr(exec("$pathgeoip6 -f $pathgeoipdat6 $host"),26,2);
 			}
 
 			# IP Query Grep Exclusion
@@ -616,21 +826,19 @@ if (!empty($fields_array)) {
 			$pfb_ex2 = "grep -v 'pfB\_\|/32\|/24\|\_v6\.txt' | grep -m1 '/'";
 
 			// Find List which contains Blocked IP Host
-			if ($pfb_query == "Country") {
-				# Skip
-			} else {
+			if (is_ipaddrv4($host) && $pfb_query != "Country") {
 				// Search for exact IP Match
 				$host1 = preg_replace("/(\d{1,3})\.(\d{1,3}).(\d{1,3}).(\d{1,3})/", '\'$1\.$2\.$3\.$4\'', $host);
-				$pfb_query = exec("grep -rHm1 {$host1} {$pfbfolder} | sed -e 's/^.*[a-zA-Z]\///' -e 's/:.*//' -e 's/\..*/ /' | {$pfb_ex1}");
+				$pfb_query = exec("/usr/bin/grep -rHm1 {$host1} {$pfbfolder} | sed -e 's/^.*[a-zA-Z]\///' -e 's/:.*//' -e 's/\..*/ /' | {$pfb_ex1}");
 				// Search for IP in /24 CIDR
 				if (empty($pfb_query)) {
 					$host1 = preg_replace("/(\d{1,3})\.(\d{1,3}).(\d{1,3}).(\d{1,3})/", '\'$1\.$2\.$3\.0/24\'', $host);
-					$pfb_query = exec("grep -rHm1 {$host1} {$pfbfolder} | sed -e 's/^.*[a-zA-Z]\///' -e 's/\.txt:/ /' | {$pfb_ex1}");
+					$pfb_query = exec("/usr/bin/grep -rHm1 {$host1} {$pfbfolder} | sed -e 's/^.*[a-zA-Z]\///' -e 's/\.txt:/ /' | {$pfb_ex1}");
 				}
 				// Search for First Two IP Octets in CIDR Matches Only. Skip any pfB (Country Lists) or /32,/24 Addresses.
 				if (empty($pfb_query)) {
 					$host1 = preg_replace("/(\d{1,3})\.(\d{1,3}).(\d{1,3}).(\d{1,3})/", '\'^$1\.$2\.\'', $host);
-					$pfb_query = exec("grep -rH {$host1} {$pfbfolder} | sed -e 's/^.*[a-zA-Z]\///' -e 's/\.txt:/ /' | {$pfb_ex2}");
+					$pfb_query = exec("/usr/bin/grep -rH {$host1} {$pfbfolder} | sed -e 's/^.*[a-zA-Z]\///' -e 's/\.txt:/ /' | {$pfb_ex2}");
 				}
 				// Search for First Two IP Octets in CIDR Matches Only (Subtract 1 from second Octet on each loop).
 				// Skip (Country Lists) or /32,/24 Addresses.
@@ -639,7 +847,7 @@ if (!empty($fields_array)) {
 					$host2 = preg_replace("/(\d{1,3})\.(\d{1,3}).(\d{1,3}).(\d{1,3})/", '$2', $host);
 					for ($cnt = 1; $cnt <= 5; $cnt++) {
 						$host3 = $host2 - $cnt . '\'';
-						$pfb_query = exec("grep -rH {$host1}{$host3} {$pfbfolder} | sed -e 's/^.*[a-zA-Z]\///' -e 's/\.txt:/ /' | {$pfb_ex2}");
+						$pfb_query = exec("/usr/bin/grep -rH {$host1}{$host3} {$pfbfolder} | sed -e 's/^.*[a-zA-Z]\///' -e 's/\.txt:/ /' | {$pfb_ex2}");
 						// Break out of loop if found.
 						if (!empty($pfb_query))
 							$cnt = 6;
@@ -648,26 +856,30 @@ if (!empty($fields_array)) {
 				// Search for First Three Octets
 				if (empty($pfb_query)) {
 					$host1 = preg_replace("/(\d{1,3})\.(\d{1,3}).(\d{1,3}).(\d{1,3})/", '\'^$1\.$2\.$3\.\'', $host);
-					$pfb_query = exec("grep -rH {$host1} {$pfbfolder} | sed -e 's/^.*[a-zA-Z]\///' -e 's/\.txt:/ /' | {$pfb_ex2}");
+					$pfb_query = exec("/usr/bin/grep -rH {$host1} {$pfbfolder} | sed -e 's/^.*[a-zA-Z]\///' -e 's/\.txt:/ /' | {$pfb_ex2}");
 				}
 				// Search for First Two Octets
 				if (empty($pfb_query)) {
 					$host1 = preg_replace("/(\d{1,3})\.(\d{1,3}).(\d{1,3}).(\d{1,3})/", '\'^$1\.$2\.\'', $host);
-					$pfb_query = exec("grep -rH {$host1} {$pfbfolder} | sed -e 's/^.*[a-zA-Z]\///' -e 's/\.txt:/ /' | {$pfb_ex2}");
+					$pfb_query = exec("/usr/bin/grep -rH {$host1} {$pfbfolder} | sed -e 's/^.*[a-zA-Z]\///' -e 's/\.txt:/ /' | {$pfb_ex2}");
 				}
 				// Report Specific ET IQRisk Details
 				if ($pfb['et_header'] && preg_match("/{$et_header}/", $pfb_query)) {
 					$host1 = preg_replace("/(\d{1,3})\.(\d{1,3}).(\d{1,3}).(\d{1,3})/", '\'$1\.$2\.$3\.$4\'', $host);
-					$pfb_query = exec("grep -Hm1 {$host1} {$pfb['etdir']}/* | sed -e 's/^.*[a-zA-Z]\///' -e 's/:.*//' -e 's/\..*/ /' -e 's/ET_/ET IPrep /' ");
+					$pfb_query = exec("/usr/bin/grep -Hm1 {$host1} {$pfb['etdir']}/* | sed -e 's/^.*[a-zA-Z]\///' -e 's/:.*//' -e 's/\..*/ /' -e 's/ET_/ET IPrep /' ");
 					if (empty($pfb_query)) {
 						$host1 = preg_replace("/(\d{1,3})\.(\d{1,3}).(\d{1,3}).(\d{1,3})/", '\'$1.$2.$3.0/24\'', $host);
-						$pfb_query = exec("grep -rHm1 {$host1} {$pfbfolder} | sed -e 's/^.*[a-zA-Z]\///' -e 's/\.txt:/ /' | {$pfb_ex1}");
+						$pfb_query = exec("/usr/bin/grep -rHm1 {$host1} {$pfbfolder} | sed -e 's/^.*[a-zA-Z]\///' -e 's/\.txt:/ /' | {$pfb_ex1}");
 					}
 				}
-				// Default to "No Match" if not found.
-				if (empty($pfb_query))
-					$pfb_query = "No Match";
 			}
+			elseif (is_ipaddrv6($host) && $pfb_query != "Country") {
+				$pfb_query = exec("/usr/bin/grep -Hm1 {$host} {$pfbfolder} | sed -e 's/^.*[a-zA-Z]\///' -e 's/\.txt:/ /' | grep -v 'pfB\_'");
+			}
+
+			// Default to "No Match" if not found.
+			if (empty($pfb_query))
+				$pfb_query = "No Match";
 
 			# Split List Column into Two lines.
 			unset ($pfb_match);
@@ -682,33 +894,48 @@ if (!empty($fields_array)) {
 				}
 			}
 
-			// Print Alternating Line Shading 
-			if ($pfb['pfsenseversion'] > '2.0') {
-				$alertRowEvenClass = "listMReven";
-				$alertRowOddClass = "listMRodd";
-			} else {
-				$alertRowEvenClass = "listr";
-				$alertRowOddClass = "listr";
+			// Add []'s to IPv6 Addresses and add a zero-width space as soft-break opportunity after each colon if we have an IPv6 address (from Snort)
+			if ($fields[4] == "6") {
+				$fields[97] = "[" . str_replace(":", ":&#8203;", $fields[7]) . "]";
+				$fields[98] = "[" . str_replace(":", ":&#8203;", $fields[8]) . "]";
+			}
+			else {
+				$fields[97] = $fields[7];
+				$fields[98] = $fields[8];
 			}
 
-			// Collect Details for Repeated Alert Comparison
-			$previous_srcip = $fields['srcip'] . $fields['srcport'];
-			$previous_dstip = $fields['dstip'] . $fields['dstport'];
-			$countrycode = trim($scc . $dcc);
+			// Truncate Long List Names
+			$pfb_matchtitle = "Country Block Rules cannot be suppressed.\n\nTo allow a particular Country IP, either remove the particular Country or add the Host\nto a Permit Alias in the Firewall Tab.\n\nIf the IP is not listed beside the List, this means that the Block is a /32 entry.\nOnly /32 or /24 CIDR Hosts can be suppressed.\n\nIf (Duplication) Checking is not enabled. You may see /24 and /32 CIDR Blocks for a given blocked Host";
+
+			if (strlen($pfb_match[1]) >= 17) {
+				$pfb_matchtitle = $pfb_match[1];
+				$pfb_match[1]	= substr($pfb_match[1], 0, 16) . '...';
+			}
+
+			// Print Alternating Line Shading 
+			if ($pfb['pfsenseversion'] > '2.0') {
+				$alertRowEvenClass	= "listMReven";
+				$alertRowOddClass	= "listMRodd";
+			} else {
+				$alertRowEvenClass	= "listr";
+				$alertRowOddClass	= "listr";
+			}
 
 			$alertRowClass = $counter % 2 ? $alertRowEvenClass : $alertRowOddClass;
 			echo "<tr class='{$alertRowClass}'>
-				<td class='listMRr' align='center'>{$fields['time']}</td>
-				<td class='listMRr' align='center'>{$fields['interface']}</td>
+				<td class='listMRr' align='center'>{$fields[99]}</td>
+				<td class='listMRr' align='center'>{$fields[2]}</td>
 				<td class='listMRr' align='center' title='The pfBlockerNG Rule that Blocked this Host.'>{$rule}</td>
-				<td class='listMRr' align='center'>{$proto}</td>
-				<td nowrap='nowrap' class='listMRr' align='center' style='sorttable_customkey:{$fields['srcip']};' sorttable_customkey='{$fields['srcip']}'>{$src_icons}{$fields['srcip']}{$srcport}<br /><small>{$hostname['src']}</small></td>
-				<td nowrap='nowrap' class='listMRr' align='center' style='sorttable_customkey:{$fields['dstip']};' sorttable_customkey='{$fields['dstip']}'>{$dst_icons}{$fields['dstip']}{$dstport}<br /><small>{$hostname['dst']}</small></td>
-				<td class='listMRr' align='center'>{$countrycode}</td>
-				<td class='listbg' align='center' title='Country Block Rules cannot be suppressed.\n\nTo allow a particular Country IP, either remove the particular Country or add the Host\nto a Permit Alias in the Firewall Tab.\n\nIf the IP is not listed beside the List, this means that the Block is a /32 entry.\nOnly /32 or /24 CIDR Hosts can be suppressed.\n\nIf (Duplication) Checking is not enabled. You may see /24 and /32 CIDR Blocks for a given blocked Host' style=\"font-size: 10px word-wrap:break-word;\">{$pfb_match[1]}<br />{$pfb_match[2]}</td></tr>";
+				<td class='listMRr' align='center'>{$fields[6]}</td>
+				<td class='listMRr' align='center' style='sorttable_customkey:{$fields[7]};' sorttable_customkey='{$fields[7]}'>{$src_icons}{$fields[97]}{$srcport}<br /><small>{$hostname['src']}</small></td>
+				<td class='listMRr' align='center' style='sorttable_customkey:{$fields[8]};' sorttable_customkey='{$fields[8]}'>{$dst_icons}{$fields[98]}{$dstport}<br /><small>{$hostname['dst']}</small></td>
+				<td class='listMRr' align='center'>{$country}</td>
+				<td class='listbg' align='center' title='{$pfb_matchtitle}' style=\"font-size: 10px word-wrap:break-word;\">{$pfb_match[1]}<br />{$pfb_match[2]}</td></tr>";
 			$counter++;
 			if ($counter > 0 && $rtype == "block") {
 				$mycounter = $counter;
+			} else {
+				$mycounter = 0;
 			}
 		}
 	}
@@ -718,6 +945,7 @@ if (!empty($fields_array)) {
 	</table>
 	</table>
 <?php endforeach; ?>	<!--End - Create Three Output Windows 'Deny', 'Permit' and 'Match'-->
+<?php unset ($fields_array); ?>
 </td></tr>
 </table>
 
@@ -755,10 +983,23 @@ function findhostnames(counter) {
 	)
 }
 
-	var lines = <?php echo $mycounter; ?>;
-	for (i = 0; i < lines; i++) {
-		findhostnames(i);
+var alertlines = <?php echo $mycounter; ?>;
+var autoresolve = "<?php echo $config['installedpackages']['pfblockerngglobal']['hostlookup']; ?>";
+if ( autoresolve == "on" ) {
+	for (alertcount = 0; alertcount < alertlines; alertcount++) {
+		setTimeout(findhostnames(alertcount), 30);
 	}
+}
+
+function enable_showFilter() {
+	document.getElementById("filter_enable_row").style.display="none";
+	document.getElementById("filter_options_row").style.display="table-row";
+}
+
+function enable_hideFilter() {
+	document.getElementById("filter_enable_row").style.display="table-row";
+	document.getElementById("filter_options_row").style.display="none";
+}
 
 //]]>
 </script>
