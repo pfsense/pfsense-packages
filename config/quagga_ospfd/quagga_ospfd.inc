@@ -422,4 +422,37 @@ function quagga_get_carp_status_by_ip($ipaddr) {
 	return $status;
 }
 
+function quagga_plugin_carp($pluginparams) {
+	global $config;
+	require_once("service-utils.inc");
+	// Called when a CARP interface changes state
+	// $pluginparams['event'] either 'rc.carpmaster' or 'rc.carpbackup'
+	// $pluginparams['interface'] contains the affected interface
+
+	/* If there is no OSPF config, then stop */
+	if(is_array($config['installedpackages']['quaggaospfd']['config'])) {
+		$ospfd_conf = &$config['installedpackages']['quaggaospfd']['config'][0];
+	} else {
+		return null;
+	}
+	/* If there is no properly configured CARP status check IP, then stop */
+	if (!is_ipaddr($ospfd_conf['carpstatusip'])) {
+		return null;
+	}
+	list($vhid, $iface) = explode("@", trim($pluginparams['interface']));
+	$friendly = convert_real_interface_to_friendly_interface_name($iface);
+	$carp_iface = "{$friendly}_vip${vhid}";
+
+	/* If this CARP transition is not from the IP address to check, then stop. */
+	if (get_interface_ip($carp_iface) != $ospfd_conf['carpstatusip']) {
+		return null;
+	}
+
+	/* Start or stop the service as needed based on the CARP transition. */
+	if ($pluginparams['event'] == "rc.carpmaster") {
+		start_service("Quagga OSPFd");
+	} elseif ($pluginparams['event'] == "rc.carpbackup") {
+		stop_service("Quagga OSPFd");
+	}
+}
 ?>

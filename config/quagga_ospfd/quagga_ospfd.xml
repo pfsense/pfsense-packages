@@ -1,6 +1,6 @@
 <packagegui>
 	<name>quagga_ospfd</name>
-	<version>0.6.3</version>
+	<version>0.6.4</version>
 	<title>Services: Quagga OSPFd</title>
 	<include_file>/usr/local/pkg/quagga_ospfd.inc</include_file>
 	<aftersaveredirect>pkg_edit.php?xml=quagga_ospfd.xml&amp;id=0</aftersaveredirect>
@@ -67,6 +67,11 @@
 		<executable>zebra</executable>
 		<description>Quagga core/abstraction daemon</description>
 	</service>
+	<plugins>
+		<item>
+			<type>plugin_carp</type>
+		</item>
+	</plugins>
 	<fields>
 		<field>
 			<fielddescr>Master Password</fielddescr>
