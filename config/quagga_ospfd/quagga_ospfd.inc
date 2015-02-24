@@ -266,8 +266,14 @@ function quagga_ospfd_install_conf() {
 
 	$carp_ip_status_check = "";
 	if (is_ipaddr($ospfd_conf['carpstatusip'])) {
-		$carpcheckinterface = trim(find_carp_interface($ospfd_conf['carpstatusip']));
-		$carp_ip_status_check = <<<EOF
+
+		$pfs_version = substr(trim(file_get_contents("/etc/version")),0,3);
+		switch ($pfs_version) {
+			case "2.0":
+			case "2.1":
+				/* Check for 2.1 and before */
+				$carpcheckinterface = trim(find_carp_interface($ospfd_conf['carpstatusip']));
+				$carp_ip_status_check = <<<EOF
 
 CARP_STATUS=`/sbin/ifconfig {$carpcheckinterface} | /usr/bin/grep carp: | /usr/bin/awk '{print \$2;}'`
 if [ \${CARP_STATUS} != "MASTER" ]; then
@@ -275,6 +281,27 @@ if [ \${CARP_STATUS} != "MASTER" ]; then
 fi
 
 EOF;
+				break;
+			case "2.2":
+			default:
+				/* Check for 2.2 and later */
+				if (is_array($config['virtualip']['vip'])) {
+					foreach ($config['virtualip']['vip'] as $vip) {
+						if (($vip['mode'] == "carp") && ($vip['subnet'] == $ospfd_conf['carpstatusip'])) {
+							$carpcheckinterface = escapeshellarg(get_real_interface($vip['interface']));
+							$vhid = escapeshellarg($vip['vhid']);
+							$carp_ip_status_check = <<<EOF
+
+CARP_STATUS=`/sbin/ifconfig {$carpcheckinterface} | /usr/bin/grep 'carp:' | /usr/bin/grep 'vhid {$vhid}' | /usr/bin/awk '{print \$2;}'`
+if [ \${CARP_STATUS} != "MASTER" ]; then
+	exit;
+fi
+EOF;
+						}
+					}
+				}
+				break;
+		}
 	}
 
 
