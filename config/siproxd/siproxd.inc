@@ -32,7 +32,8 @@ if(!function_exists("filter_configure"))
 require_once("service-utils.inc");
 
 // Check to find out on which system the package is running
-if (substr(trim(file_get_contents("/etc/version")),0,3) == "2.0") {
+$pfs_version = substr(trim(file_get_contents("/etc/version")),0,3);
+if ($pfs_version == "2.0") {
 	define('SIPROXD', '/usr/local');
 } else {
 	define('SIPROXD', '/usr/pbi/siproxd-' . php_uname("m"));
@@ -108,7 +109,7 @@ function siproxd_generate_rules($type) {
 }
 
 function sync_package_siproxd() {
-	global $config;
+	global $config, $pfs_version;
 
 	// put the constant to a variable
 	$varSIPROXD = SIPROXD;
@@ -250,9 +251,14 @@ function sync_package_siproxd() {
 
 	fclose($fout);
 
+	if ($pfs_version == '2.2')
+		$bin_dir='bin';
+	else
+		$bin_dir='sbin';
+
 	write_rcfile(array(
 		"file" => "siproxd.sh",
-		"start" => "$varSIPROXD/sbin/siproxd -c $varSIPROXD/etc/siproxd.conf &",
+		"start" => "$varSIPROXD/{$bin_dir}/siproxd -c $varSIPROXD/etc/siproxd.conf &",
 		"stop" => "/usr/bin/killall -9 siproxd"
 		)
 	);
