@@ -1478,7 +1478,7 @@
 	</package>
 	<package>
 		<name>FTP Client Proxy</name>
-		<descr><![CDATA[Basic FTP Client Proxy using ftp-proxy(8) from FreeBSD.]]</descr>
+		<descr><![CDATA[Basic FTP Client Proxy using ftp-proxy from FreeBSD]]></descr>
 		<maintainer>jimp@pfsense.org</maintainer>
 		<version>0.1</version>
 		<category>Services</category>
