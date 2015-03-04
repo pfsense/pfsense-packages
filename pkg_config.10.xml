@@ -1476,5 +1476,16 @@
 		<build_options>barnyard2_UNSET=ODBC PGSQL PRELUDE;barnyard2_SET=GRE IPV6 MPLS MYSQL PORT_PCAP BRO;suricata_SET=IPFW PORTS_PCAP GEOIP JSON NSS LUAJIT HTP_PORT;suricata_UNSET=PRELUDE TESTS SC LUA</build_options>
 		<depends_on_package_pbi>suricata-2.0.6-##ARCH##.pbi</depends_on_package_pbi>
 	</package>
+	<package>
+		<name>FTP Client Proxy</name>
+		<descr><![CDATA[Basic FTP Client Proxy using ftp-proxy(8) from FreeBSD.]]</descr>
+		<maintainer>jimp@pfsense.org</maintainer>
+		<version>0.1</version>
+		<category>Services</category>
+		<status>Alpha</status>
+		<config_file>https://packages.pfsense.org/packages/config/ftpproxy/ftpproxy.xml</config_file>
+		<required_version>2.2</required_version>
+		<configurationfile>ftpproxy.xml</configurationfile>
+	</package>
 </packages>
 </pfsensepkgs>
