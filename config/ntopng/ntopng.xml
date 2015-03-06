@@ -121,7 +121,7 @@
 		<field>
 			<fielddescr>Historical Data Storage</fielddescr>
 			<fieldname>dump_flows</fieldname>
-			<description>Turn historical data storages on</description>
+			<description>Enable historical data storage</description>
 			<type>checkbox</type>
 		</field>
 	</fields>
