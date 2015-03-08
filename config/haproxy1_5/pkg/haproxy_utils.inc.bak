@@ -354,7 +354,8 @@ function haproxy_get_certificates($type = 'server,user', $get_includeWebCert=fal
 				$ok |= stristr($type,',user,') && $purpose['server'] != 'Yes';
 				if (!$ok)
 					continue;
-				if ($get_includeWebCert == false && $cert['descr'] == "webConfigurator default")
+				//if ($get_includeWebCert == false && is_webgui_cert($cert['refid']))
+				if ($get_includeWebCert == false && $cert['descr'] == "def web cert")
 					continue;
 				$certificates[$cert['refid']]['name'] = haproxy_get_certificate_descriptivename($cert);
 			}
