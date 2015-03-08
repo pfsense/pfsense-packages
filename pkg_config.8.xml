@@ -159,6 +159,30 @@
 		<depends_on_package_pbi>haproxy-1.4.24-i386.pbi</depends_on_package_pbi>
 	</package>
 	<package>
+		<name>haproxy-1_5</name>
+		<pkginfolink>https://doc.pfsense.org/index.php/haproxy_package</pkginfolink>
+		<descr><![CDATA[The Reliable, High Performance TCP/HTTP(S) Load Balancer<br />
+				This package implements the TCP, HTTP and HTTPS balancing features of haproxy.<br />
+				Supports ACLs for smart backend switching.]]></descr>
+		<website>http://haproxy.1wt.eu/</website>
+		<category>Services</category>
+		<version>1.5.3 pkg v 0.21</version>
+		<status>Release</status>
+		<required_version>2.1</required_version>
+		<config_file>https://packages.pfsense.org/packages/config/haproxy1_5/haproxy.xml</config_file>
+		<configurationfile>haproxy.xml</configurationfile>
+		<depends_on_package_base_url>https://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
+		<depends_on_package>haproxy-1.4.22.tbz</depends_on_package>
+		<depends_on_package_pbi>haproxy-devel-1.5.3-i386.pbi</depends_on_package_pbi>
+		<build_port_path>/usr/ports/net/haproxy-devel</build_port_path>
+		<build_pbi>
+			<ports_before>security/openssl</ports_before>
+			<custom_name>haproxy-devel</custom_name>
+			<port>/usr/ports/net/haproxy-devel</port>
+		</build_pbi>
+		<build_options>WITH_OPENSSL_PORT=yes;OPTIONS_UNSET_FORCE=PCRE DPCRE;OPTIONS_SET=OPENSSL SPCRE</build_options>
+	</package>
+	<package>
 		<name>haproxy-devel</name>
 		<pkginfolink>https://doc.pfsense.org/index.php/haproxy_package</pkginfolink>
 		<descr><![CDATA[The Reliable, High Performance TCP/HTTP(S) Load Balancer<br />
@@ -166,7 +190,7 @@
 				Supports ACLs for smart backend switching.]]></descr>
 		<website>http://haproxy.1wt.eu/</website>
 		<category>Services</category>
-		<version>1.5.3 pkg v 0.20</version>
+		<version>1.5.3 pkg v 0.21</version>
 		<status>Release</status>
 		<required_version>2.1</required_version>
 		<config_file>https://packages.pfsense.org/packages/config/haproxy-devel/haproxy.xml</config_file>
