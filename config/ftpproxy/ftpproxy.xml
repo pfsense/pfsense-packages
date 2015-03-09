@@ -43,13 +43,6 @@
 			<multiple/>
 		</field>
 		<field>
-			<fielddescr>IPv6 Support</fielddescr>
-			<fieldname>ipv6_enable</fieldname>
-			<description>Support IPv6 FTP connections, otherwise only IPv4 connections are allowed.</description>
-			<type>checkbox</type>
-			<default_value>off</default_value>
-		</field>
-		<field>
 			<fielddescr>Anonymous Only</fielddescr>
 			<fieldname>anononly</fieldname>
 			<description>Only permit anonymous FTP connections using the &quot;ftp&quot; or &quot;anonymous&quot; users.</description>

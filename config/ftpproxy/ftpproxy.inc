@@ -21,9 +21,6 @@ function sync_package_ftpproxy() {
 	$start = "/usr/bin/killall -9 ftp-proxy\n";
 	$start .= "\t/usr/sbin/ftp-proxy ";
 
-	if ($cf["ipv6_enable"] == "on") {
-		$start .= " -6 ";
-	}
 	if ($cf["anononly"] == "on") {
 		$start .= " -A ";
 	}
@@ -121,9 +118,6 @@ function ftpproxy_generate_rules($type) {
 					continue;
 				}
 				$rules .= "rdr pass on {$interface} inet proto tcp from any to any port 21 -> 127.0.0.1 port " . ftpproxy_get_port() . "\n";
-				if ($cf["ipv6_enable"] == "on") {
-					$rules .= "rdr pass on {$interface} inet6 proto tcp from any to any port 21 -> ::1 port " . ftpproxy_get_port() . "\n";
-				}
 			}
 			break;
 		case "filter":
