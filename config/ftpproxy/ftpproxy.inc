@@ -75,6 +75,12 @@ function validate_form_ftpproxy($post, &$input_errors) {
 	if (!empty($post["idletimeout"]) && (is_numeric($post["idletimeout"]) || ($post["idletimeout"] <= 0) || ($post["idletimeout"] > 86400))) {
 		$input_errors[] = 'You must specify a valid number in the \'Idle Timeout\' field (Between 1 and 86400)';
 	}
+	if (!empty($post["bypasssrc"]) && !(is_alias($post["bypasssrc"]) || is_subnetv4($post["bypasssrc"]) || is_ipaddr($post["bypasssrc"]))) {
+		$input_errors[] = 'You must specify a valid IP address or alias for Proxy Bypass: Source';
+	}
+	if (!empty($post["bypassdst"]) && !(is_alias($post["bypassdst"]) || is_subnetv4($post["bypassdst"]) || is_ipaddr($post["bypassdst"]))) {
+		$input_errors[] = 'You must specify a valid IP address or alias for Proxy Bypass: Destination';
+	}
 }
 
 function ftpproxy_get_port() {
@@ -116,6 +122,16 @@ function ftpproxy_generate_rules($type) {
 				$interface = get_real_interface($interface_friendly);
 				if (empty($interface)) {
 					continue;
+				}
+				if (is_subnetv4($cf["bypasssrc"]) || is_ipaddr($cf["bypasssrc"])) {
+					$rules .= "no rdr on {$interface} inet proto tcp from {$cf['bypasssrc']} to any port 21\n";
+				} elseif (is_alias($cf["bypasssrc"])) {
+					$rules .= "no rdr on {$interface} inet proto tcp from \${$cf['bypasssrc']} to any port 21\n";
+				}
+				if (is_subnetv4($cf["bypassdst"]) || is_ipaddr($cf["bypassdst"])) {
+					$rules .= "no rdr on {$interface} inet proto tcp from any to {$cf['bypassdst']} port 21\n";
+				} elseif (is_alias($cf["bypassdst"])) {
+					$rules .= "no rdr on {$interface} inet proto tcp from any to \${$cf['bypassdst']} port 21\n";
 				}
 				$rules .= "rdr pass on {$interface} inet proto tcp from any to any port 21 -> 127.0.0.1 port " . ftpproxy_get_port() . "\n";
 			}

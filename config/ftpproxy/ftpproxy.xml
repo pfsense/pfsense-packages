@@ -1,6 +1,6 @@
 <packagegui>
 	<name>FTP Client Proxy</name>
-	<version>0.1</version>
+	<version>0.2</version>
 	<title>FTP Client Proxy</title>
 	<aftersaveredirect>pkg_edit.php?xml=ftpproxy.xml</aftersaveredirect>
 	<include_file>/usr/local/pkg/ftpproxy.inc</include_file>
@@ -52,13 +52,25 @@
 		<field>
 			<fielddescr>Source Address</fielddescr>
 			<fieldname>sourceaddr</fieldname>
-			<description>Enter a VIP to be the source of outgoing control traffic.</description>
+			<description>Enter a VIP to be the source of outgoing control traffic. Leave blank to use the default WAN IP address.</description>
+			<type>input</type>
+		</field>
+		<field>
+			<fielddescr>Proxy Bypass: Source</fielddescr>
+			<fieldname>bypasssrc</fieldname>
+			<description>Enter an IP address or alias for source client host(s) which should bypass the proxy.</description>
+			<type>input</type>
+		</field>
+		<field>
+			<fielddescr>Proxy Bypass: Destination</fielddescr>
+			<fieldname>bypassdst</fieldname>
+			<description>Enter an IP address or alias for destination server host(s) which should bypass the proxy.</description>
 			<type>input</type>
 		</field>
 		<field>
 			<fielddescr>Bind Port (Default: 8021)</fielddescr>
 			<fieldname>bindport</fieldname>
-			<description>Port where the proxy will listen for redirected connections.</description>
+			<description>Port where the proxy will listen for redirected connections. Do not set this to 21.</description>
 			<type>input</type>
 		</field>
 		<field>
@@ -70,7 +82,7 @@
 		<field>
 			<fielddescr>Traffic Shaping Queue</fielddescr>
 			<fieldname>tsq</fieldname>
-			<description>Create rules with queue appended, so that data connections can be queued.</description>
+			<description>Create rules with the specified queue appended so that data connections can be queued.</description>
 			<type>input</type>
 		</field>
 		<field>
