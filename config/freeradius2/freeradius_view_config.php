@@ -97,8 +97,8 @@ else{
 		display_top_tabs($tab_array);
 	?>
 			</td></tr>
-	 		<tr>
-	    		<td>
+			<tr>
+				<td>
 					<div id="mainarea">
 						<table class="tabcont" width="100%" border="0" cellpadding="8" cellspacing="0">
 						<tr><td></td></tr>
@@ -123,8 +123,8 @@ else{
 							</td>
 								</tr>
 								<tr>
-	     						<td class="tabcont" >
-	     						<div id="file_div"></div>
+								<td class="tabcont" >
+								<div id="file_div"></div>
 									
 								</td>
 							</tr>
