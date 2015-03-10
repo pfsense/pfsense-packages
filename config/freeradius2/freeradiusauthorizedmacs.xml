@@ -54,13 +54,6 @@
 		<section>Services</section>
 		<url>/pkg.php?xml=freeradiusauthorizedmacs.xml</url>
 	</menu>
-	<service>
-		<name>radiusd</name>
-		<rcfile>radiusd.sh</rcfile>
-		<executable>radiusd</executable>
-		<description><![CDATA[FreeRADIUS Server]]></description>
-	</service>
-
 	<tabs>
 		<tab>
 			<text>Users</text>
