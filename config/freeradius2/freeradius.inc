@@ -73,6 +73,7 @@ if ($pfs_version == "2.1") {
 	}
 	
 function freeradius_deinstall_command() {
+	exec("killall -9 radiusd");
 	return;
 }
 
