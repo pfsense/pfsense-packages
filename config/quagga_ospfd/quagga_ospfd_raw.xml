@@ -45,6 +45,11 @@
 		<rcfile>quagga.sh</rcfile>
 		<executable>zebra</executable>
 	</service>
+	<service>
+		<name>Quagga BGPd</name>
+		<rcfile>quagga.sh</rcfile>
+		<executable>bgpd</executable>
+	</service>
 	<fields>
 		<field>
 			<fielddescr>ospfd.conf</fielddescr>
@@ -58,6 +63,15 @@
 		<field>
 			<fielddescr>zebra.conf</fielddescr>
 			<fieldname>zebra</fieldname>
+			<description>Note: Once you click "Save" below, the assistant (in the "Global Settings" and "Interface Settings" tabs above) will be overridden with whatever you type here. To get back the assisted config save this form below once with both empty input fields.</description>
+			<type>textarea</type>
+			<encoding>base64</encoding>
+			<rows>30</rows>
+			<cols>65</cols>
+		</field>
+		<field>
+			<fielddescr>bgpd.conf</fielddescr>
+			<fieldname>bgpd</fieldname>
 			<description>Note: Once you click "Save" below, the assistant (in the "Global Settings" and "Interface Settings" tabs above) will be overridden with whatever you type here. To get back the assisted config save this form below once with both empty input fields.</description>
 			<type>textarea</type>
 			<encoding>base64</encoding>

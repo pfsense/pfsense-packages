@@ -55,6 +55,11 @@
 		<rcfile>quagga.sh</rcfile>
 		<executable>zebra</executable>
 	</service>
+	<service>
+		<name>Quagga BGPd</name>
+		<rcfile>quagga.sh</rcfile>
+		<executable>bgpd</executable>
+	</service>
 	<fields>
 		<field>
 			<fielddescr>Interface</fielddescr>

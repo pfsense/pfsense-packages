@@ -76,8 +76,8 @@ function quagga_ospfd_install_conf() {
 	$noaccept = "";
 	
 	// generate ospfd.conf based on the assistant
-	if(is_array($config['installedpackages']['quaggaospfd']['config']))
-		$ospfd_conf = &$config['installedpackages']['quaggaospfd']['config'][0];
+	if(is_array($config['installedpackages']['quaggaospfdraw']['config']))
+		$ospfd_conf = &$config['installedpackages']['quaggaospfdraw']['config'][0];
 	else {
 		log_error("Quagga OSPFd: No config data found.");
 		return;
@@ -264,6 +264,18 @@ function quagga_ospfd_install_conf() {
 	fwrite($fd, $zebraconffile);
 	fclose($fd);
 
+    /* Make bgpd config */
+    if (isset($config['installedpackages']['quaggaospfdraw']['config'][0]['bgpd'])
+        && !empty($config['installedpackages']['quaggaospfdraw']['config'][0]['bgpd'])) {
+            // if there is a raw config specified in the config.xml use that instead of the assisted config
+            $bgpdconffile = str_replace("\r","",base64_decode($config['installedpackages']['quaggaospfdraw']['config'][0]['bgpd']));
+    } else {
+        $bgpdconffile = "Use vtysh to modify content\n\n";
+    }
+    $fd = fopen("{$quagga_config_base}/bgpd.conf", "w");
+    fwrite($fd, $bgpdconffile);
+    fclose($fd);
+
 	$carp_ip_status_check = "";
 	if (is_ipaddr($ospfd_conf['carpstatusip'])) {
 
@@ -315,12 +327,19 @@ if [ -e /var/run/quagga/ospfd.pid ]; then
 	kill -9 `cat /var/run/quagga/ospfd.pid`
 	rm -f /var/run/quagga/ospfd.pid
 fi
+if [ -e /var/run/quagga/bgpd.pid ]; then
+	kill -9 `cat /var/run/quagga/bgpd.pid`
+	rm -f /var/run/quagga/bgpd.pid
+fi
 EOF;
 	$rc_file_start = <<<EOF
+/bin/mkdir -p {$quagga_config_base}
+/bin/mkdir -p /var/etc/quagga
 /bin/mkdir -p /var/run/quagga
 /bin/mkdir -p /var/log/quagga
 rm -f /var/run/quagga/zebra.pid
 rm -f /var/run/quagga/ospfd.pid
+rm -f /var/run/quagga/bgpd.pid
 
 if [ `pw groupshow {$pkg_group} 2>&1 | grep -c "pw: unknown group"` -gt 0 ]; then
 	/usr/sbin/pw groupadd {$pkg_group} -g {$pkg_gid}
@@ -329,16 +348,24 @@ if [ `pw usershow {$pkg_login} 2>&1 | grep -c "pw: no such user"` -gt 0 ]; then
 	/usr/sbin/pw useradd {$pkg_login} -u {$pkg_uid} -g {$pkg_gid} -c "{$pkg_gecos}" -d {$pkg_homedir} -s {$pkg_shell}
 fi
 
+/bin/chmod 777 {$quagga_config_base}
+/bin/chmod 777 /var/etc/quagga
 /usr/sbin/chown -R quagga:quagga {$quagga_config_base}
+/usr/sbin/chown -R quagga:quagga /var/etc/quagga
 /usr/sbin/chown -R quagga:quagga /var/run/quagga
 /usr/sbin/chown -R quagga:quagga /var/log/quagga
 # Ensure no other copies of the daemons are running or it breaks.
 killall -9 zebra 2>/dev/null
 killall -9 ospfd 2>/dev/null
+killall -9 bgpd 2>/dev/null
 sleep 1
 {$carp_ip_status_check}
+/usr/bin/touch {$quagga_config_base}/zebra.conf
+/usr/bin/touch {$quagga_config_base}/bgpd.conf
+/usr/bin/touch {$quagga_config_base}/ospfd.conf
 /usr/local/sbin/zebra -d -f {$quagga_config_base}/zebra.conf
 /usr/local/sbin/ospfd -d -f {$quagga_config_base}/ospfd.conf
+/usr/local/sbin/bgpd -d -f {$quagga_config_base}/bgpd.conf
 EOF;
 	write_rcfile(array(
 			"file" => "quagga.sh",
@@ -351,6 +378,7 @@ EOF;
 	exec("chmod a+rx /usr/local/etc/rc.d/quagga.sh");
 	exec("chmod u+rw,go-rw {$quagga_config_base}/ospfd.conf");
 	exec("chmod u+rw,go-rw {$quagga_config_base}/zebra.conf");
+	exec("chmod u+rw,go-rw {$quagga_config_base}/bgpd.conf");
 
 	// Kick off newly created rc.d script
 	if (is_ipaddr($ospfd_conf['carpstatusip'])) {
