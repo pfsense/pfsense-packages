@@ -1302,7 +1302,7 @@ function haproxy_writeconf($configpath) {
 			}
 			
 			if ($inspectdelay > 0)
-				fwrite ($fd, "\ttcp-request inspect-delay\t" . $inspectdelay . "\n");
+				fwrite ($fd, "\ttcp-request inspect-delay\t" . $inspectdelay . "s\n");
 				
 			// Write acl's first, so they may be used by advanced text options written by user.
 			fwrite ($fd, $config_acls);
@@ -1897,9 +1897,9 @@ function get_frontend_acls($frontend) {
 			// Filter out acls for different modes
 			if ($acl['mode'] != '' && $acl['mode'] != strtolower($mainfrontend['type']))
 				continue;
-			$not = $entry['not'] == "yes" ? "not " : "";
+			$not = $entry['not'] == "yes" ? "not: " : "";
 			$acl_item = array();
-			$acl_item['descr'] = $acl['name'] . " " . (isset($acl['novalue']) ? "" : $entry['value']);
+			$acl_item['descr'] = $acl['name'] . " " . (isset($acl['novalue']) ? "" : $not . $entry['value']);
 			$acl_item['ref'] = $entry;
 			
 			$result[] = $acl_item;
