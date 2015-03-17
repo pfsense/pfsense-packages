@@ -422,7 +422,7 @@ function quagga_get_carp_status_by_ip($ipaddr) {
 	return $status;
 }
 
-function quagga_plugin_carp($pluginparams) {
+function quagga_ospfd_plugin_carp($pluginparams) {
 	global $config;
 	require_once("service-utils.inc");
 	// Called when a CARP interface changes state
