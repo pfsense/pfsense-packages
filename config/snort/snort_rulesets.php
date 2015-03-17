@@ -531,7 +531,7 @@ if ($savemsg) {
 				sort($snortrules);
 				$i = count($emergingrules);
 				if ($i < count($snortsorules))
-					$i = count(snortsorules);
+					$i = count($snortsorules);
 				if ($i < count($snortrules))
 					$i = count($snortrules);
 
