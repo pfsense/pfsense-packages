@@ -3,7 +3,7 @@
 	pfBlockerNG.widget.php
 
 	pfBlockerNG
-	Copyright (C) 2014 BBcan177@gmail.com
+	Copyright (C) 2015 BBcan177@gmail.com
 	All rights reserved.
 
 	Based Upon pfblocker :
