@@ -47,11 +47,11 @@ if (is_array($config['aliases']['alias'])) {
 }
 $aliasname = str_replace(array(".","-"), "_", $host);
 $alias_exists = false;
-$counter=0;
-foreach($a_aliases as $a) {
-	if($a['name'] == $aliasname) {
+$counter = 0;
+foreach ($a_aliases as $a) {
+	if ($a['name'] == $aliasname) {
 		$alias_exists = true;
-		$id=$counter;
+		$id = $counter;
 	}
 	$counter++;
 }
@@ -65,36 +65,39 @@ if ($pfs_version > '2.2') {
 	$cmd = '/usr/bin/dig';
 }
 
-
-if(isset($_POST['create_alias']) && (is_hostname($host) || is_ipaddr($host))) {
-	if($_POST['override'])
+if (isset($_POST['create_alias']) && (is_hostname($host) || is_ipaddr($host))) {
+	if ($_POST['override']) {
 		$override = true;
+	}
 	$resolved = gethostbyname($host);
 	$type = "hostname";
-	if($resolved) {
+	if ($resolved) {
 		$resolved = array();
 		exec("{$cmd} {$host_esc} A | /usr/bin/grep {$host_esc} | /usr/bin/grep -v ';' | /usr/bin/awk '{ print $5 }'", $resolved);
 		$isfirst = true;
-		foreach($resolved as $re) {
-			if($re <> "") {
-				if(!$isfirst)
+		foreach ($resolved as $re) {
+			if ($re <> "") {
+				if (!$isfirst) {
 					$addresses .= " ";
+				}
 				$addresses .= rtrim($re) . "/32";
 				$isfirst = false;
 			}
 		}
 		$newalias = array();
-		if($override) 
+		if ($override) { 
 			$alias_exists = false;
-		if($alias_exists == false) {
+		}
+		if ($alias_exists == false) {
 			$newalias['name'] = $aliasname;
 			$newalias['type'] = "network";
 			$newalias['address'] = $addresses;
 			$newalias['descr'] = "Created from Diagnostics-> DNS Lookup";
-			if($override) 
+			if ($override) { 
 				$a_aliases[$id] = $newalias;
-			else
+			} else { 
 				$a_aliases[] = $newalias;
+			}
 			write_config();
 			$createdalias = true;
 		}
@@ -118,8 +121,9 @@ if ($_POST) {
 		exec("/usr/bin/grep nameserver /etc/resolv.conf | /usr/bin/cut -f2 -d' '", $dns_servers);
 		foreach ($dns_servers as $dns_server) {
 			$query_time = exec("{$cmd} {$host_esc} " . escapeshellarg("@" . trim($dns_server)) . " | /usr/bin/grep Query | /usr/bin/cut -d':' -f2");
-			if($query_time == "")
+			if ($query_time == "") {
 				$query_time = gettext("No response");
+			}
 			$new_qt = array();
 			$new_qt['dns_server'] = $dns_server;
 			$new_qt['query_time'] = $query_time;
@@ -137,24 +141,31 @@ if ($_POST) {
 			$type = "ip";
 			$resolved = gethostbyaddr($host);
 			$ipaddr = $host;
-			if ($host != $resolved)
+			if ($host != $resolved) {
 				$hostname = $resolved;
+			}
 		} elseif (is_hostname($host)) {
 			$type = "hostname";
 			$resolved = gethostbyname($host);
-			if($resolved) {
+			if ($resolved) {
 				$resolved = array();
 				exec("{$cmd} {$host_esc} A | /usr/bin/grep {$host_esc} | /usr/bin/grep -v ';' | /usr/bin/awk '{ print $5 }'", $resolved);
 			}
 			$hostname = $host;
-			if ($host != $resolved)
+			if ($host != $resolved) {
 				$ipaddr = $resolved[0];
+			}
 		}
 
 		if ($host == $resolved) {
 			$resolved = gettext("No record found");
 		}
 	}
+}
+
+if ( ($_POST['host']) && ($_POST['dialog_output']) ) {
+	display_host_results ($host,$resolved,$dns_speeds);
+	exit;
 }
 
 function display_host_results ($address,$hostname,$dns_speeds) {
@@ -179,12 +190,12 @@ function display_host_results ($address,$hostname,$dns_speeds) {
 include("head.inc"); ?>
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">
 <?php include("fbegin.inc"); ?>
-<table width="100%" border="0" cellpadding="0" cellspacing="0">
+<table width="100%" border="0" cellpadding="0" cellspacing="0" summary="pfblockerng diag dns">
 	<tr>
 		<td>
 <?php if ($input_errors) print_input_errors($input_errors); ?>
 	<form action="/pfblockerng/pfblockerng_diag_dns.php" method="post" name="iform" id="iform">
-	  <table width="100%" border="0" cellpadding="6" cellspacing="0">
+	<table width="100%" border="0" cellpadding="6" cellspacing="0" summary="tabcont">
 		<tr>
 			<td colspan="2" valign="top" class="listtopic"> <?=gettext("Resolve DNS hostname or IP");?></td>
 		</tr>
@@ -192,68 +203,67 @@ include("head.inc"); ?>
 		<td width="22%" valign="top" class="vncellreq"><?=gettext("Hostname or IP");?></td>
 		<td width="78%" class="vtable">
 	<?=$mandfldhtml;?>
-			<table>
+			<table summary="results">
 				<tr><td valign="top">
-			<input name="host" type="text" class="formfld" id="host" size="20" value="<?=htmlspecialchars($host);?>">
+			<input name="host" type="text" class="formfld unknown" id="host" size="20" value="<?=htmlspecialchars($host);?>">
 			</td>
-			<td>
 			<?php if ($resolved && $type) { ?>
-			=  <font size="+1">
+			<td valign="middle">&nbsp;=&nbsp;</td><td>
+			<font size="+1">
 <?php
 				$found = 0;
-				if(is_array($resolved)) { 
-					foreach($resolved as $hostitem) {
-						if($hostitem <> "") {
-							echo $hostitem . "<br/>";
+				if (is_array($resolved)) {
+					foreach ($resolved as $hostitem) {
+						if ($hostitem <> "") {
+							echo $hostitem . "<br />";
 							$found++;
 						}
 					}
 				} else {
-					echo $resolved; 
-				} 
-				if($found > 0) { ?>
-					<br/><font size='-2'>
-				<?PHP	if($alias_exists) { ?>
+					echo $resolved;
+				}
+				if ($found > 0) { ?>
+					<br /></font><font size='-2'>
+				<?php	if ($alias_exists) { ?>
 							An alias already exists for the hostname <?= htmlspecialchars($host) ?>. <br />
 							<input type="hidden" name="override" value="true"/>
 							<input type="submit" name="create_alias" value="Overwrite Alias"/>
-				<?PHP	} else {
-						if(!$createdalias) { ?>
+				<?php	} else {
+						if (!$createdalias) { ?>
 							<input type="submit" name="create_alias" value="Create Alias from These Entries"/>
-					<?PHP	} else { ?>
+					<?php	} else { ?>
 							Alias created with name <?= htmlspecialchars($newalias['name']) ?>
-					<?PHP	}
+					<?php	}
 					}
 				}
 ?>
-				<font size="-1">
 
-			<?	} ?>
-			</td></tr></table>
-		  </td>
+			<?php	} ?>
+			</font></td></tr></table>
+		</td>
 		</tr>
-<?php		if($_POST): ?>
+<?php		if ($_POST): ?>
 		<tr>
-		  <td width="22%" valign="top" class="vncell"><?=gettext("Resolution time per server");?></td>
-		  <td width="78%" class="vtable">
-				<table width="170" border="1" cellpadding="2" style="border-width: 1px 1px 1px 1px; border-collapse: collapse;">
+		<td width="22%" valign="top" class="vncell"><?=gettext("Resolution time per server");?></td>
+		<td width="78%" class="vtable">
+				<table width="170" border="0" cellpadding="6" cellspacing="0" summary="resolution time">
 					<tr>
-						<td>
-							<b><?=gettext("Server");?></b>
+						<td class="listhdrr">
+							<?=gettext("Server");?>
 						</td>
-						<td>
-							<b><?=gettext("Query time");?></b>
+						<td class="listhdrr">
+							<?=gettext("Query time");?>
 						</td>
 					</tr>
 <?php
-					if(is_array($dns_speeds))
-						foreach($dns_speeds as $qt):
+					if (is_array($dns_speeds))
+						foreach ($dns_speeds as $qt):
 ?>
 					<tr>
-						<td>
+						<td class="listlr">
 							<?=$qt['dns_server']?>
 						</td>
-						<td>
+						<td class="listr">
 							<?=$qt['query_time']?>
 						</td>
 					</tr>
@@ -261,58 +271,59 @@ include("head.inc"); ?>
 					endforeach;
 ?>
 				</table>
-		  </td>
+		</td>
 		</tr>
 		<?php endif; ?>
 		<?php if (!$input_errors && $ipaddr) { ?>
 		<tr>
-
-			<td width="22%" valign="top"  class="vncell"><?=gettext("More Information:");?></td>
+			<td width="22%" valign="top" class="vncell"><?=gettext("More Information:");?></td>
 			<td width="78%" class="vtable">
-				<a target="_new" href ="/diag_ping.php?host=<?=htmlspecialchars($host)?>&interface=wan&count=3"><?=gettext("Ping");?></a> <br/>
+				<a target="_new" href ="/diag_ping.php?host=<?=htmlspecialchars($host)?>&interface=wan&count=3"><?=gettext("Ping");?></a> <br />
 				<a target="_new" href ="/diag_traceroute.php?host=<?=htmlspecialchars($host)?>&ttl=18"><?=gettext("Traceroute");?></a>
 				<p/>
-				<?=gettext("NOTE: The following links are to external services, so their reliability cannot be guaranteed.");?><br/><br/>
+				<?=gettext("NOTE: The following links are to external services, so their reliability cannot be guaranteed.");?><br/><br />
 				<a target="_new" href="http://private.dnsstuff.com/tools/whois.ch?ip=<?php echo $ipaddr; ?>"><?=gettext("IP WHOIS @ DNS Stuff");?></a><br />
 				<a target="_new" href="http://private.dnsstuff.com/tools/ipall.ch?ip=<?php echo $ipaddr; ?>"><?=gettext("IP Info @ DNS Stuff");?></a>
 
-				<?=gettext("NOTE: The following links are to external services, so their reliability cannot be guaranteed.");?><br/><br/>
-				<a target="_new" href="http://kb.bothunter.net/ipInfo/nowait.php?IP=<?php echo $ipaddr; ?>"><?=gettext("BOTHunter");?></a><br/>
-				<a target="_new" href="http://www.ipvoid.com/scan/<?php echo $ipaddr; ?>/"><?=gettext("IPVOID");?></a><br/>
-				<a target="_new" href="http://www.tcpiputils.com/browse/ip-address/<?php echo $ipaddr; ?>/"><?=gettext("TCPUtils");?></a><br/>
-				<a target="_new" href="https://www.herdprotect.com/ip-address-<?php echo $ipaddr; ?>.aspx"><?=gettext("Herd Protect");?></a><br/>
-				<a target="_new" href="https://www.senderbase.org/lookup/ip/?search_string=<?php echo $ipaddr; ?>"><?=gettext("SenderBase");?></a><br/>
-				<a target="_new" href="http://www.ip-tracker.org/locator/ip-lookup.php?ip=<?php echo $ipaddr; ?>"><?=gettext("IP Tracker");?></a><br/>
+				<?=gettext("NOTE: The following links are to external services, so their reliability cannot be guaranteed.");?><br /><br />
+				<a target="_new" href="http://kb.bothunter.net/ipInfo/nowait.php?IP=<?php echo $ipaddr; ?>"><?=gettext("BOTHunter");?></a><br />
+				<a target="_new" href="http://www.ipvoid.com/scan/<?php echo $ipaddr; ?>/"><?=gettext("IPVOID");?></a><br />
+				<a target="_new" href="http://www.tcpiputils.com/browse/ip-address/<?php echo $ipaddr; ?>/"><?=gettext("TCPUtils");?></a><br />
+				<a target="_new" href="https://www.herdprotect.com/ip-address-<?php echo $ipaddr; ?>.aspx"><?=gettext("Herd Protect");?></a><br />
+				<a target="_new" href="https://www.senderbase.org/lookup/ip/?search_string=<?php echo $ipaddr; ?>"><?=gettext("SenderBase");?></a><br />
+				<a target="_new" href="http://www.ip-tracker.org/locator/ip-lookup.php?ip=<?php echo $ipaddr; ?>"><?=gettext("IP Tracker");?></a><br />
 
-				<a target="_new" href="https://www.fortiguard.com/ip_rep/index.php?data=/<?php echo $ipaddr; ?>?"><?=gettext("FortiGuard");?></a><br/>
-				<a target="_new" href="https://www.projecthoneypot.org/ip_<?php echo $ipaddr; ?>"><?=gettext("Project HoneyPot");?></a><br/>
-				<a target="_new" href="https://www.virustotal.com/en/ip-address/<?php echo $ipaddr; ?>/information"><?=gettext("VirusTotal Info");?></a><br/>
-				<a target="_new" href="https://www.mcafee.com/threat-intelligence/ip/default.aspx?ip=<?php echo $ipaddr; ?>"><?=gettext("McAfee Threat Center");?></a><br/>
-				<a target="_new" href="http://sitecheck2.sucuri.net/results/<?php echo $ipaddr; ?>"><?=gettext("Securi SiteCheck");?></a><br/>
-				<a target="_new" href="https://www.dshield.org/ipinfo.html?IP=<?php echo $ipaddr; ?>"><?=gettext("DShield Threat Lookup");?></a><br/>
-				<a target="_new" href="https://isc.sans.edu/ipinfo.html?ip=<?php echo $ipaddr; ?>"><?=gettext("Internet Storm Center");?></a><br/>
-				<a target="_new" href="https://www.mywot.com/en/scorecard/<?php echo $ipaddr; ?>"><?=gettext("Web of Trust (WOT) Scorecard");?></a><br/>
-				<a target="_new" href="https://quttera.com/sitescan/<?php echo $ipaddr; ?>"><?=gettext("Quattera");?></a><br/>
-				<a target="_new" href="https://www.iblocklist.com/search.php?string=<?php echo $ipaddr; ?>"><?=gettext("I-Block List");?></a><br/>
+				<a target="_new" href="https://www.fortiguard.com/ip_rep/index.php?data=/<?php echo $ipaddr; ?>?"><?=gettext("FortiGuard");?></a><br />
+				<a target="_new" href="https://www.projecthoneypot.org/ip_<?php echo $ipaddr; ?>"><?=gettext("Project HoneyPot");?></a><br />
+				<a target="_new" href="https://www.virustotal.com/en/ip-address/<?php echo $ipaddr; ?>/information"><?=gettext("VirusTotal Info");?></a><br />
+				<a target="_new" href="https://www.mcafee.com/threat-intelligence/ip/default.aspx?ip=<?php echo $ipaddr; ?>"><?=gettext("McAfee Threat Center");?></a><br />
+				<a target="_new" href="http://sitecheck2.sucuri.net/results/<?php echo $ipaddr; ?>"><?=gettext("Securi SiteCheck");?></a><br />
+				<a target="_new" href="https://www.dshield.org/ipinfo.html?IP=<?php echo $ipaddr; ?>"><?=gettext("DShield Threat Lookup");?></a><br />
+				<a target="_new" href="https://isc.sans.edu/ipinfo.html?ip=<?php echo $ipaddr; ?>"><?=gettext("Internet Storm Center");?></a><br />
+				<a target="_new" href="https://www.mywot.com/en/scorecard/<?php echo $ipaddr; ?>"><?=gettext("Web of Trust (WOT) Scorecard");?></a><br />
+				<a target="_new" href="https://quttera.com/sitescan/<?php echo $ipaddr; ?>"><?=gettext("Quattera");?></a><br />
+				<a target="_new" href="https://www.iblocklist.com/search.php?string=<?php echo $ipaddr; ?>"><?=gettext("I-Block List");?></a><br />
 				<p/>
-				<?=gettext("NOTE: Mail Server DNSRBL Lookups");?><br/><br/>
-				<a target="_new" href="https://senderscore.org/lookup.php?lookup=<?php echo $ipaddr; ?>&ipLookup=Go"><?=gettext("SenderScore");?></a><br/>
-				<a target="_new" href="http://www.spamhaus.org/query/bl?ip=<?php echo $ipaddr; ?>"><?=gettext("Spamhaus Blocklist");?></a><br/>
-				<a target="_new" href="http://www.spamcop.net/w3m?action=checkblock&ip=<?php echo $ipaddr; ?>"><?=gettext("SPAMcop Blocklist");?></a><br/>
-				<a target="_new" href="http://multirbl.valli.org/lookup/<?php echo $ipaddr; ?>.html"><?=gettext("multirbl RBL Lookup");?></a><br/>
-				<a target="_new" href="http://mxtoolbox.com/SuperTool.aspx?action=blacklist%3a<?php echo $ipaddr; ?>&run=toolpage"><?=gettext("MXToolbox");?></a><br/>
+				<?=gettext("NOTE: Mail Server DNSRBL Lookups");?><br /><br />
+				<a target="_new" href="https://senderscore.org/lookup.php?lookup=<?php echo $ipaddr; ?>&ipLookup=Go"><?=gettext("SenderScore");?></a><br />
+				<a target="_new" href="http://www.spamhaus.org/query/bl?ip=<?php echo $ipaddr; ?>"><?=gettext("Spamhaus Blocklist");?></a><br />
+				<a target="_new" href="http://www.spamcop.net/w3m?action=checkblock&ip=<?php echo $ipaddr; ?>"><?=gettext("SPAMcop Blocklist");?></a><br />
+				<a target="_new" href="http://multirbl.valli.org/lookup/<?php echo $ipaddr; ?>.html"><?=gettext("multirbl RBL Lookup");?></a><br />
+				<a target="_new" href="http://mxtoolbox.com/SuperTool.aspx?action=blacklist%3a<?php echo $ipaddr; ?>&run=toolpage"><?=gettext("MXToolbox");?></a><br />
 
 			</td>
 		</tr>
 		<?php } ?>
 		<tr>
-		  <td width="22%" valign="top">&nbsp;</td>
-		  <td width="78%">
-			<br/>&nbsp;
-            <input name="Submit" type="submit" class="formbtn" value="<?=gettext("DNS Lookup");?>">
+		<td width="22%" valign="top">&nbsp;</td>
+		<td width="78%">
+			<br />&nbsp;
+			<input name="Submit" type="submit" class="formbtn" value="<?=gettext("DNS Lookup");?>">
 		</td>
 		</tr>
 	</table>
-</td></tr></table>
 </form>
+</td></tr></table>
 <?php include("fend.inc"); ?>
+</body>
+</html>
