@@ -1361,9 +1361,9 @@ icap_client_username_header X-Authenticated-User
 icap_preview_enable on
 icap_preview_size 1024
 
-icap_service service_avi_req reqmod_precache icap://[::1]:1344/squid_clamav bypass=off
+icap_service service_avi_req reqmod_precache icap://localhost:1344/squid_clamav bypass=off
 adaptation_access service_avi_req allow all
-icap_service service_avi_resp respmod_precache icap://[::1]:1344/squid_clamav bypass=on
+icap_service service_avi_resp respmod_precache icap://localhost:1344/squid_clamav bypass=on
 adaptation_access service_avi_resp allow all
 
 EOF;
