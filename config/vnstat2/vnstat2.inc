@@ -63,8 +63,8 @@ function change_vnstat_conf(){
 	$config['installedpackages']['vnstat2']['config'][0]['vnstat_phpfrontend'] = $_POST['vnstat_phpfrontend']; 
 	write_conf_f();
 	write_config();
-	$no_vnstat_phpfrontend = $config['installedpackages']['vnstat2']['config'][0]['vnstat_phpfrontend'];
-        if ($no_vnstat_phpfrontend == "on"){
+
+	if ($config['installedpackages']['vnstat2']['config'][0]['vnstat_phpfrontend'] == "on"){
  		vnstat_php_frontend();
 		}
 	else {
@@ -195,12 +195,10 @@ function vnstat_install_config() {
 	}
 	vnstat_link_config();
 // Add MonthRotate value to config.xml and write /usr/local/etc/vnstat.conf
-	$no_monthrotate = $config['installedpackages']['vnstat2']['config'][0]['monthrotate'];	
-	if ($no_monthrotate == ""){
+	if ($config['installedpackages']['vnstat2']['config'][0]['monthrotate'] == ""){
 		$config['installedpackages']['vnstat2']['config'][0]['monthrotate'] = "1";
 	}
-	$no_vnstat_phpfrontend = $config['installedpackages']['vnstat2']['config'][0]['vnstat_phpfrontend'];
-	if ($no_vnstat_phpfrontend == "on"){
+	if ($config['installedpackages']['vnstat2']['config'][0]['vnstat_phpfrontend'] == "on"){
 		vnstat_php_frontend();
 	}
 	write_conf_f();
@@ -214,7 +212,7 @@ function vnstat_install_config() {
 function vnstat_php_frontend(){
 	global $config;
 // Copy vnstat_php_frontend to www 
-	exec("cp -a /usr/local/pkg/vnstat2/vnstat_php_frontend/. /usr/local/www/vnstat2/");
+	exec("/bin/cp -a /usr/local/pkg/vnstat2/vnstat_php_frontend/. /usr/local/www/vnstat2/");
 // Find information to be writing in config.php 
 	// $iface_list_array_items
         exec("ls /conf/vnstat/ | grep -v '\.'", $vnstat_nic_in);
