@@ -1,7 +1,7 @@
 #!/bin/sh
 #
 # pfBlockerNG MaxMind GeoLite GeoIP Updater Script - By BBcan177@gmail.com
-# Copyright (C) 2014 BBcan177@gmail.com
+# Copyright (C) 2015 BBcan177@gmail.com
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License Version 2 as

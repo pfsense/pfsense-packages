@@ -3,7 +3,7 @@
 	pfBlockerNG_Log.php
 
 	pfBlockerNG
-	Copyright (c) 2014 BBcan177@gmail.com
+	Copyright (c) 2015 BBcan177@gmail.com
 	All rights reserved.
 
 	Portions of this code are based on original work done for the
@@ -17,7 +17,7 @@
 	All rights reserved.
 
 	Adapted for Suricata by:
-	Copyright (C) 2014 Bill Meeks
+	Copyright (C) 2015 Bill Meeks
 	All rights reserved.
 
 	Javascript and Integration modifications by J. Nieuwenhuizen

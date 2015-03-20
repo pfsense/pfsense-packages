@@ -117,8 +117,8 @@
 		<category>Firewall</category>
 		<pkginfolink>https://forum.pfsense.org/index.php?topic=86212.0</pkginfolink>
 		<config_file>https://packages.pfsense.org/packages/config/pfblockerng/pfblockerng.xml</config_file>
-		<version>1.05</version>
-		<status>Beta</status>
+		<version>1.06</version>
+		<status>Stable</status>
 		<required_version>2.2</required_version>
 		<maintainer>BBCan177@gmail.com</maintainer>
 		<configurationfile>pfblockerng.xml</configurationfile>

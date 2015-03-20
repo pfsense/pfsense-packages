@@ -1,6 +1,6 @@
 #!/bin/sh
 # pfBlockerNG IP Reputation Script - By BBcan177@gmail.com - 04-12-14
-# Copyright (C) 2014 BBcan177@gmail.com
+# Copyright (C) 2015 BBcan177@gmail.com
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License Version 2 as

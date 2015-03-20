@@ -3,7 +3,7 @@
 	pfBlockerNG.php
 
 	pfBlockerNG
-	Copyright (C) 2014 BBcan177@gmail.com
+	Copyright (C) 2015 BBcan177@gmail.com
 	All rights reserved.
 
 	Based upon pfBlocker by
@@ -12,7 +12,7 @@
 
 	Hour Schedule Convertor code by
 	Snort Package
-	Copyright (c) 2014 Bill Meeks
+	Copyright (c) 2015 Bill Meeks
 
 	Redistribution and use in source and binary forms, with or without
 	modification, are permitted provided that the following conditions are met:
@@ -696,7 +696,7 @@ $xml = <<<EOF
 	pfblockerng_{$cont_name}.xml
 
 	pfBlockerNG
-	Copyright (C) 2014 BBcan177@gmail.com
+	Copyright (C) 2015 BBcan177@gmail.com
 	All rights reserved.
 
 	Based upon pfblocker for pfSense
@@ -1001,7 +1001,7 @@ $xmlrep = <<<EOF
 	pfBlockerNG_Reputation.xml
 
 	pfBlockerNG
-	Copyright (C) 2014 BBcan177@gmail.com
+	Copyright (C) 2015 BBcan177@gmail.com
 	All rights reserved.
 
 	Based upon pfblocker for pfSense

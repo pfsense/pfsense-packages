@@ -3,7 +3,7 @@
 	pfBlockerNG.inc
 
 	pfBlockerNG
-	Copyright (C) 2014 BBcan177@gmail.com
+	Copyright (C) 2015 BBcan177@gmail.com
 	All rights reserved.
 
 	part of the Postfix package for pfSense
@@ -226,8 +226,11 @@ function pfb_create_suppression_file() {
 
 		if ($pfb['found']) {
 			$pfb_suppress = str_replace(" ", "\n", $config['aliases']['alias'][$pfb_id]['address']);
-			if (!empty($pfb_suppress))
+			if (!empty($pfb_suppress)) {
 				@file_put_contents("{$pfb['supptxt']}",$pfb_suppress, LOCK_EX);
+			} else {
+				unlink_if_exists("{$pfb['supptxt']}");
+			}
 		} else {
 			# Delete Suppression File if Alias is Empty.
 			unlink_if_exists("{$pfb['supptxt']}");

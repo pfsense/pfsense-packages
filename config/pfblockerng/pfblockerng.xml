@@ -10,7 +10,7 @@
 	pfBlockerNG.xml
 
 	pfBlockerNG
-	Copyright (C) 2014 BBcan177@gmail.com
+	Copyright (C) 2015 BBcan177@gmail.com
 	All rights reserved.
 
 	Based upon pfblocker for pfSense
@@ -456,7 +456,7 @@
 			<fieldname>credits</fieldname>
 			<type>info</type>
 			<description><![CDATA[<strong>
-				pfBlockerNG</strong> Created in 2014 by <a target=_new href='https://forum.pfsense.org/index.php?action=profile;u=238481'>BBcan177.</a>
+				pfBlockerNG</strong> Created in 2015 by <a target=_new href='https://forum.pfsense.org/index.php?action=profile;u=238481'>BBcan177.</a>
 				<br /><br />Based upon pfBlocker by Marcello Coutinho and Tom Schaefer.<br />
 				Country Database GeoLite distributed under the Creative Commons Attribution-ShareAlike 3.0 Unported License by:
 				MaxMind Inc. @ <a target=_new href='http://www.maxmind.com'>MaxMind.com</a>.
