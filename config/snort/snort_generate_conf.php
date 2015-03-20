@@ -895,7 +895,7 @@ EOD;
 
 /* def AppID preprocessor */
 $appid_memcap = $snortcfg['sf_appid_mem_cap'] * 1024 * 1024;
-$appid_params = "app_detector_dir " . SNORT_APPID_ODP_PATH . ", \\\n\tmemcap {$appid_memcap}";
+$appid_params = "app_detector_dir " . rtrim(SNORT_APPID_ODP_PATH, '/') . ", \\\n\tmemcap {$appid_memcap}";
 if ($snortcfg['sf_appid_statslog'] == "on") {
 	$appid_params .= ", \\\n\tapp_stats_filename app-stats.log";
 	$appid_params .= ", \\\n\tapp_stats_period {$snortcfg['sf_appid_stats_period']}";
