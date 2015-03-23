@@ -1041,7 +1041,7 @@
 					On pfSense docs there is a how-to which could help you on porting users.]]></descr>
 		<pkginfolink>https://doc.pfsense.org/index.php/FreeRADIUS_2.x_package</pkginfolink>
 		<category>System</category>
-		<version>2.1.12_1/2.2.5_3 pkg v1.6.10</version>
+		<version>2.2.5_3 pkg v1.6.11</version>
 		<status>RC1</status>
 		<required_version>2.1</required_version>
 		<maintainer>nachtfalkeaw@web.de</maintainer>
