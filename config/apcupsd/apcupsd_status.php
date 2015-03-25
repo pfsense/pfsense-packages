@@ -148,7 +148,7 @@ pre {
 			pclose($ph);
 			puts("</pre>");
 		}else
-			echo "Not running Network Information Server (NIS). In order to run apcaccess on localhost, you need to enable it on APCupsd General settings. <br/>";
+			echo "Network Information Server (NIS) not running, in order to run apcaccess on localhost, you need to enable it on APCupsd General settings. <br/>";
    }else{
 		echo "pfSense version prior to 2.2 runs APCupsd 3.14.10 and apcaccess doesn't accept host parameter. <br/>";
 		if ($nis_server){
@@ -159,7 +159,7 @@ pre {
 			pclose($ph);
 			puts("</pre>");
 		}else
-			echo "Not Network Information Server (NIS). In order to run apcaccess on localhost, you need to enable it on APCupsd General settings. <br/>";
+			echo "Network Information Server (NIS) not running, in order to run apcaccess on localhost, you need to enable it on APCupsd General settings. <br/>";
    }
 
 ?>
