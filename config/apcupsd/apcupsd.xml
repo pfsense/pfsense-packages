@@ -40,7 +40,7 @@
 	<name>Apcupsd</name>
 	<title>Services: Apcupsd (General)</title>
 	<category>Monitoring</category>
-	<version>0.3.3</version>
+	<version>0.3.4</version>
 	<include_file>/usr/local/pkg/apcupsd.inc</include_file>
 	<addedit_string>Apcupsd has been created/modified.</addedit_string>
 	<delete_string>Apcupsd has been deleted.</delete_string>
