@@ -107,7 +107,7 @@ pre {
 				<td width="14%" valign="top" class="vncellreq">Host:</td>
 				<td width="86%" class="vtable">
 					<input name="strapcaccess" type="text" class="formfld unknown" id="strapcaccess" size="22" value="<? echo "{$strapcaccess}"; ?>">
-               <br/>
+					<br/>
 					<span class="vexpl">
      Default: <b>localhost</b><br/>
      apcaccess uses apcupsd's inbuilt Network Information Server (NIS) to obtain the current status information <br/>
@@ -120,46 +120,46 @@ pre {
 					<?php else: ?>
 						<input type="Submit" value="Execute" class="formbtn"/>
 					<?php endif; ?>
-               </span>
-            </td>
+					</span>
+				</td>
 			</tr>
 		</form>
 			<tr><td colspan="2">
 <?php
-   $nis_server = check_nis_running_apcupsd();
+	$nis_server = check_nis_running_apcupsd();
 
-   if ($pf_version >= 2.2){
-      if($strapcaccess) {
+	if ($pf_version >= 2.2){
+		if($strapcaccess) {
 			echo "Running: apcaccess -h {$strapcaccess} <br/>";
 			puts("<pre>");
 			putenv("PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin");
-         $ph = popen("apcaccess -h {$strapcaccess} 2>&1", "r" );
-         while ($line = fgets($ph)) echo htmlspecialchars($line);
-         pclose($ph);
-         puts("</pre>");
+			$ph = popen("apcaccess -h {$strapcaccess} 2>&1", "r" );
+			while ($line = fgets($ph)) echo htmlspecialchars($line);
+			pclose($ph);
+			puts("</pre>");
 		}elseif($nis_server){
-         $nisip=(check_nis_ip_apcupsd() != ''? check_nis_ip_apcupsd() : "0.0.0.0");
-         $nisport=(check_nis_port_apcupsd() != ''? check_nis_port_apcupsd() : "3551");
+			$nisip=(check_nis_ip_apcupsd() != ''? check_nis_ip_apcupsd() : "0.0.0.0");
+			$nisport=(check_nis_port_apcupsd() != ''? check_nis_port_apcupsd() : "3551");
 			echo "Running: apcaccess -h {$nisip}:{$nisport} <br/>";
 			puts("<pre>");
 			putenv("PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin");
-         $ph = popen("apcaccess -h localhost 2>&1", "r" );
+			$ph = popen("apcaccess -h localhost 2>&1", "r" );
 			while ($line = fgets($ph)) echo htmlspecialchars($line);
-         pclose($ph);
-         puts("</pre>");
+			pclose($ph);
+			puts("</pre>");
 		}else
-         echo "Not running Network Information Server (NIS). In order to run apcaccess on localhost, you need to enable it on APCupsd General settings. <br/>";
+			echo "Not running Network Information Server (NIS). In order to run apcaccess on localhost, you need to enable it on APCupsd General settings. <br/>";
    }else{
-      echo "pfSense version prior to 2.2 runs APCupsd 3.14.10 and apcaccess doesn't accept host parameter. <br/>";
-      if ($nis_server){
-         puts("<pre>");
-         putenv("PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin");
-         $ph = popen("apcaccess 2>&1", "r" );
-         while ($line = fgets($ph)) echo htmlspecialchars($line);
-         pclose($ph);
-         puts("</pre>");
-      }else
-         echo "Not Network Information Server (NIS). In order to run apcaccess on localhost, you need to enable it on APCupsd General settings. <br/>";
+		echo "pfSense version prior to 2.2 runs APCupsd 3.14.10 and apcaccess doesn't accept host parameter. <br/>";
+		if ($nis_server){
+			puts("<pre>");
+			putenv("PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin");
+			$ph = popen("apcaccess 2>&1", "r" );
+			while ($line = fgets($ph)) echo htmlspecialchars($line);
+			pclose($ph);
+			puts("</pre>");
+		}else
+			echo "Not Network Information Server (NIS). In order to run apcaccess on localhost, you need to enable it on APCupsd General settings. <br/>";
    }
 
 ?>
