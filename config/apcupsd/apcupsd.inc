@@ -224,5 +224,45 @@ EOF;
 
 }
 
+function check_nis_running_apcupsd(){
+   global $config, $g;
+
+   if (is_array($config['installedpackages']['apcupsd'])){
+      $apcupsd_config = $config['installedpackages']['apcupsd']['config'][0];
+
+      if ($apcupsd_config['apcupsdenabled']=="on" && $apcupsd_config['netserver']=="on" )
+         return(true);
+   }
+
+   return(false);
+}
+
+
+function check_nis_ip_apcupsd(){
+   global $config, $g;
+
+   if (is_array($config['installedpackages']['apcupsd'])){
+      $apcupsd_config = $config['installedpackages']['apcupsd']['config'][0];
+
+      if ($apcupsd_config['apcupsdenabled']=="on" && $apcupsd_config['netserver']=="on" )
+         return($apcupsd_config['nisip']);
+   }
+
+   return(false);
+}
+
+function check_nis_port_apcupsd(){
+   global $config, $g;
+
+   if (is_array($config['installedpackages']['apcupsd'])){
+      $apcupsd_config = $config['installedpackages']['apcupsd']['config'][0];
+
+      if ($apcupsd_config['apcupsdenabled']=="on" && $apcupsd_config['netserver']=="on" )
+         return($apcupsd_config['nisport']);
+   }
+
+   return(false);
+}
+
 ?>
 
