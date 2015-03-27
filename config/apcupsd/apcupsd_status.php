@@ -28,7 +28,7 @@
 */
 
 require("guiconfig.inc");
-require_once("/usr/local/pkg/apcupsd.inc");
+require_once("apcupsd.inc");
 
 $pf_version=substr(trim(file_get_contents("/etc/version")),0,3);
 if ($pf_version < 2.0)
