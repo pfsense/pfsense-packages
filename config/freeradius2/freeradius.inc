@@ -73,7 +73,15 @@ if ($pfs_version == "2.1") {
 	}
 	
 function freeradius_deinstall_command() {
-	exec("killall -9 radiusd");
+	$pidFile = "/var/run/radiusd.pid";
+	$i = 0;
+
+	while (isvalidpid($pidFile) && $i < 3) {
+		$sig = ($i == 2 ? SIGKILL : SIGTERM);
+		sigkillbypid($pidFile, $sig);
+		sleep(1);
+		$i++;
+	}
 	return;
 }
 
