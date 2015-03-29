@@ -427,7 +427,6 @@ class squidstat{
             else
             # i use ip2long() to make ip sorting work correctly
             if ($resolveip) {
-				echo $ip;
                 $hostname = gethostbyaddr($ip);
                 if ($hostname == $ip)
                      $ip = ip2long($ip); # resolve failed. use (ip2long) key
