@@ -969,7 +969,7 @@
 		<website>http://www.squidGuard.org/</website>
 		<maintainer>dv_serg@mail.ru</maintainer>
 		<category>Network Management</category>
-		<version>1.4_7 pkg v.1.9.10</version>
+		<version>1.4_7 pkg v.1.9.11</version>
 		<status>Beta</status>
 		<required_version>2.2</required_version>
 		<depends_on_package_pbi>squidguard-1.4_7-##ARCH##.pbi</depends_on_package_pbi>
