@@ -1087,16 +1087,6 @@ function haproxy_writeconf($configpath) {
 				fwrite ($fd, "\tbind /tmp/haproxy_chroot/{$bind['name']}.socket name unixsocket accept-proxy {$ssl_info} {$advanced_bind}\n");
 			}
 
-			// Advanced pass thru
-			if($bind['advanced']) {
-				$advanced	= explode("\n", base64_decode($bind['advanced']));
-				foreach($advanced as $adv_line) {
-					if ($adv_line != "") {
-						fwrite($fd, "\t" . str_replace("\r", "", $adv_line) . "\n");
-					}
-				}
-			}
-
 			// https is an alias for tcp for clarity purposes
 			if($bind['type'] == "https") {
 				$backend_type = "tcp";
@@ -1142,6 +1132,16 @@ function haproxy_writeconf($configpath) {
 			
 			fwrite ($fd, "\ttimeout client\t\t" . $bind['client_timeout'] . "\n");
 
+			
+			// Advanced pass thru
+			if($bind['advanced']) {
+				$advanced	= explode("\n", base64_decode($bind['advanced']));
+				foreach($advanced as $adv_line) {
+					if ($adv_line != "") {
+						fwrite($fd, "\t" . str_replace("\r", "", $adv_line) . "\n");
+					}
+				}
+			}
 	
 			// Combine the rest of the frontend configs
 			$default_backend = "";
