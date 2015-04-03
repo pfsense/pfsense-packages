@@ -53,7 +53,7 @@
 		<descr><![CDATA[The most widely used name server software]]></descr>
 		<website>http://www.isc.org/downloads/BIND/</website>
 		<category>Services</category>
-		<version>9.9.6P1_3 pkg v 0.3.6</version>
+		<version>9.9.6P1_3 pkg v 0.3.7</version>
 		<status>RC</status>
 		<required_version>2.2</required_version>
 		<config_file>https://packages.pfsense.org/packages/config/bind/bind.xml</config_file>
@@ -263,7 +263,7 @@
 			<ports_before>databases/redis databases/gdbm net/GeoIP x11-fonts/font-util x11-fonts/webfonts graphics/graphviz</ports_before>
 			<port>net/ntopng</port>
 		</build_pbi>
-		<version>1.2.1 v0.5</version>
+		<version>1.2.1 v0.4</version>
 		<status>ALPHA</status>
 		<required_version>2.2</required_version>
 		<config_file>https://packages.pfsense.org/packages/config/ntopng/ntopng.xml</config_file>
