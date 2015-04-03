@@ -39,7 +39,7 @@
 	]]>
 	</copyright>
 	<name>ntopng</name>
-	<version>1.2 v0.4</version>
+	<version>1.2 v0.5</version>
 	<title>Diagnostics: ntopng Settings</title>
 	<savetext>Change</savetext>
 	<aftersaveredirect>pkg_edit.php?xml=ntopng.xml</aftersaveredirect>
@@ -96,7 +96,12 @@
 		<field>
 			<fielddescr>DNS Mode</fielddescr>
 			<fieldname>dns_mode</fieldname>
-			<description>Configures how name resolution is handled</description>
+			<description>
+				Configures how name resolution is handled&lt;br/&gt;&lt;br/&gt;
+				Additionally, GeoIP Data can provide location information about IP addresses.&lt;br/&gt;
+				This product includes GeoLite data created by MaxMind, available from &lt;a href=&quot;http://www.maxmind.com&quot;&gt;http://www.maxmind.com&lt;/a&gt;.&lt;br/&gt;
+				&lt;input type=&quot;submit&quot; name=&quot;Submit&quot; value=&quot;Update GeoIP Data&quot;&gt;
+			</description>
 			<type>select</type>
 			<default_value>0</default_value>
 			<options>
@@ -134,6 +139,9 @@
 	<custom_php_global_functions>
 	<![CDATA[
 	function sync_package_ntopng() {
+		if ($_POST['Submit'] == "Update GeoIP Data") {
+			return;
+		}
 		conf_mount_rw();
 		config_lock();
 		global $config;
@@ -222,6 +230,7 @@
 			// Wait for ntopng to shut down cleanly.
 			sleep(20);
 		}
+		ntopng_fixup_geoip();
 		start_service("ntopng");
 		sleep(2);
 
@@ -233,6 +242,30 @@
 		conf_mount_ro();
 		config_unlock();
 	}
+	function ntopng_update_geoip() {
+		mwexec("/usr/pbi/ntopng-" . php_uname("m") . "/bin/ntopng-geoipupdate.sh");
+		ntopng_fixup_geoip();
+		restart_service("ntopng");
+	}
+	function ntopng_fixup_geoip() {
+		$target_dir = "/usr/pbi/ntopng-" . php_uname("m") . "/local/share/ntopng/httpdocs/geoip";
+		$source_dir = "/usr/pbi/ntopng-" . php_uname("m") . "/share/ntopng";
+
+		foreach(glob("{$source_dir}/Geo*.dat*") as $geofile) {
+			/* Decompress if needed. */
+			if (substr($geofile, -3, 3) == ".gz") {
+				mwexec("/usr/bin/gzip -d " . escapeshellarg($geofile));
+			}
+		}
+
+		/* Use a separate glob since the filenames could have changed since the last run */
+		foreach(glob("{$source_dir}/Geo*.dat*") as $geofile) {
+			$target_file = $target_dir . '/' . basename($geofile);
+			if (!file_exists($target_file)) {
+				symlink($geofile, $target_file);
+			}
+		}
+	}
 	]]>
 	</custom_php_global_functions>
 	<custom_add_php_command>
@@ -243,7 +276,7 @@
 	</custom_php_resync_config_command>
 	<custom_php_install_command>
 	<![CDATA[
-		mwexec_bg("/usr/pbi/ntopng-" . php_uname("m") . "/bin/geoipupdate.sh");
+		ntopng_update_geoip();
 		sync_package_ntopng();
 	]]>
 	</custom_php_install_command>
@@ -257,6 +290,9 @@
 			$input_errors[] = "You must provide (and confirm) ntopng's password.";
 		if ($_POST['password'] != $_POST['passwordagain'])
 			$input_errors[] = "The provided passwords did not match.";
+		if ($_POST['Submit'] == "Update GeoIP Data") {
+			ntopng_update_geoip();
+		}
 	}
 	]]>
 	</custom_php_validation_command>
