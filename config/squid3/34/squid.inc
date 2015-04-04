@@ -642,14 +642,14 @@ function squid_validate_reverse($post, &$input_errors) {
 	preg_match("/(\d+)/",`sysctl net.inet.ip.portrange.reservedhigh`,$portrange);
 	if (!empty($port) && !is_port($port))
 		$input_errors[] = 'The field \'reverse HTTP port\' must contain a valid port number';
-	if (!empty($port) && is_port($port) && $port < $portrange[1]){
+	if (!empty($port) && is_port($port) && $port <= $portrange[1]){
 		$input_errors[] = "The field 'reverse HTTP port' must contain a port number higher than net.inet.ip.portrange.reservedhigh sysctl value({$portrange[1]}).";
 		$input_errors[] = "To listen on low ports, change portrange.reservedhigh sysctl value to 0 on system tunable options and restart squid daemon.";
 	}
 	$port = trim($post['reverse_https_port']);
 	if (!empty($port) && !is_port($port))
 		$input_errors[] = 'The field \'reverse HTTPS port\' must contain a valid port number';
-	if (!empty($port) && is_port($port) && $port < $portrange[1]){
+	if (!empty($port) && is_port($port) && $port <= $portrange[1]){
 		$input_errors[] = "The field 'reverse HTTPS port' must contain a port number higher than net.inet.ip.portrange.reservedhigh sysctl value({$portrange[1]}).";
 		$input_errors[] = "To listen on low ports, change portrange.reservedhigh sysctl value to 0 on system tunable options and restart squid daemon.";
 	}
