@@ -1,0 +1,2 @@
+#!/bin/sh
+/usr/local/sbin/clog /var/log/filter.log |  /usr/local/pkg/dshield-sensor/pfsense_preprocessor.php | /usr/local/sbin/dshield-sensor | /usr/local/pkg/dshield-sensor/pfsense_mailer.php
