@@ -2,8 +2,8 @@
 <!DOCTYPE packagegui SYSTEM "./schema/packages.dtd">
 <?xml-stylesheet type="text/xsl" href="./xsl/package.xsl"?>
 <packagegui>
-        <copyright>
-        <![CDATA[
+	<copyright>
+		<![CDATA[
 /* $Id$ */
 /* ========================================================================== */
 /*
@@ -42,10 +42,10 @@
                                                                               */
 /* ========================================================================== */
         ]]>
-        </copyright>
-    <description>Describe your package here</description>
-    <requirements>Describe your package requirements here</requirements>
-    <faq>Currently there are no FAQ items provided.</faq>
+	</copyright>
+	<description>Describe your package here</description>
+	<requirements>Describe your package requirements here</requirements>
+	<faq>Currently there are no FAQ items provided.</faq>
 	<name>bindacls</name>
 	<version>0.1.0</version>
 	<title>BIND: ACLs Settings</title>
@@ -56,29 +56,29 @@
 		<section>Services</section>
 		<configfile>bind.xml</configfile>
 	</menu>
-	        <tabs>
-                <tab>
-                        <text>Settings</text>
-                        <url>/pkg_edit.php?xml=bind.xml</url>
-                </tab>
-                <tab>
-                        <text>ACLs</text>
-                        <url>/pkg.php?xml=bind_acls.xml</url>
-                        <active/>
-                </tab>
-                <tab>
-                        <text>Views</text>
-                        <url>/pkg.php?xml=bind_views.xml</url>
-                </tab>
-                <tab>
-                        <text>Zones</text>
-                        <url>/pkg.php?xml=bind_zones.xml</url>
-                </tab>
-                <tab>
-                        <text>Sync</text>
-                         <url>/pkg_edit.php?xml=bind_sync.xml</url>
-                </tab>
-        </tabs>
+	<tabs>
+		<tab>
+			<text>Settings</text>
+			<url>/pkg_edit.php?xml=bind.xml</url>
+		</tab>
+		<tab>
+			<text>ACLs</text>
+			<url>/pkg.php?xml=bind_acls.xml</url>
+			<active/>
+		</tab>
+		<tab>
+			<text>Views</text>
+			<url>/pkg.php?xml=bind_views.xml</url>
+		</tab>
+		<tab>
+			<text>Zones</text>
+			<url>/pkg.php?xml=bind_zones.xml</url>
+		</tab>
+		<tab>
+			<text>Sync</text>
+			<url>/pkg_edit.php?xml=bind_sync.xml</url>
+		</tab>
+	</tabs>
 	<configpath>['installedpackages']['bindacls']['config']</configpath>
 	<adddeleteeditpagefields>
 		<columnitem>
@@ -92,7 +92,7 @@
 		<movable>on</movable>
 	</adddeleteeditpagefields>
 	<!-- fields gets invoked when the user adds or edits a item.   the following items
-         will be parsed and rendered for the user as a gui with input, and selectboxes. -->
+		will be parsed and rendered for the user as a gui with input, and selectboxes. -->
 	<fields>
 		<field>
 			<fielddescr>ACL Name</fielddescr>
@@ -107,32 +107,32 @@
 			<description>Enter the description for this ACL.</description>
 			<type>input</type>
 		</field>
-                <field>
-                        <fielddescr>Enter IP or range block network.</fielddescr>
-                        <description>Leave blank to allow All</description>
-                        <fieldname>none</fieldname>
-                    <type>rowhelper</type>
-                    <rowhelper>
-                        <rowhelperfield>
-                            <fielddescr>Value</fielddescr>
-                            <fieldname>value</fieldname>
-                            <type>input</type>
-                            <size>20</size>
-                        </rowhelperfield>
-                        <rowhelperfield>
-                            <fielddescr>Description</fielddescr>
-                            <fieldname>description</fieldname>
-                            <type>input</type>
-                            <size>20</size>
-                        </rowhelperfield>
-                    </rowhelper>
-                </field>
+		<field>
+			<fielddescr>Enter IP or range block network.</fielddescr>
+			<description>Leave blank to allow All</description>
+			<fieldname>none</fieldname>
+			<type>rowhelper</type>
+			<rowhelper>
+				<rowhelperfield>
+					<fielddescr>Value</fielddescr>
+					<fieldname>value</fieldname>
+					<type>input</type>
+					<size>20</size>
+				</rowhelperfield>
+				<rowhelperfield>
+					<fielddescr>Description</fielddescr>
+					<fieldname>description</fieldname>
+					<type>input</type>
+					<size>20</size>
+				</rowhelperfield>
+			</rowhelper>
+		</field>
 	</fields>
-        <custom_php_command_before_form>
-        </custom_php_command_before_form>
+	<custom_php_command_before_form>
+	</custom_php_command_before_form>
 	<custom_delete_php_command>
-	</custom_delete_php_command>	
-        <custom_php_resync_config_command>
-	        bind_sync();
-        </custom_php_resync_config_command>
+	</custom_delete_php_command>
+	<custom_php_resync_config_command>
+		bind_sync();
+	</custom_php_resync_config_command>
 </packagegui>
