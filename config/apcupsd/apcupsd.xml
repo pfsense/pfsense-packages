@@ -346,6 +346,8 @@ UPSTYPE   DEVICE           Description <br>
 <strong>phpMailer</strong>	- In order to receive e-mail notifications through phpMailer, you need 
 to configure SMTP Email Notifications on Advanced/Notifications section, and also, 
 install mailreport package.<br>
+This feature is currently broken on pfSense 2.2, for more info see pfSense forum: 
+<a href="https://forum.pfsense.org/index.php?topic=89901.0">APCupsd package status for pfSense.</a><br>
 <br>
 <strong>SMTP built-in</strong> - A simple SMTP mail client for apcupsd. 
 It does not have smtp authentication of any kind.
