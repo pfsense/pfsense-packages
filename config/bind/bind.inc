@@ -318,6 +318,7 @@ EOD;
 			$zoneipslave = $zone['slaveip'];
 			$zoneforwarders=$zone['forwarders'];
 			$zonereverso = $zone['reverso'];
+			$zonereversv6o = $zone['reversv6o'];
 			
 			if (!(is_dir(CHROOT_LOCALBASE."/etc/namedb/$zonetype/$zoneview")))
             	mkdir(CHROOT_LOCALBASE."/etc/namedb/$zonetype/$zoneview",0755,true);
@@ -337,7 +338,10 @@ EOD;
 
 				if ($zoneview == $viewname){
 					if($zonereverso == "on")
-				 		$bind_conf .= "\tzone \"$zonename.in-addr.arpa\" {\n";
+						if($zonereversv6o == "on")
+					 		$bind_conf .= "\tzone \"$zonename.ip6.arpa\" {\n";
+						else
+							$bind_conf .= "\tzone \"$zonename.in-addr.arpa\" {\n";
 				  	else
 						$bind_conf .= "\tzone \"$zonename\" {\n";
         		
@@ -394,7 +398,8 @@ EOD;
 						$zoneminimum = ($zone['minimum']?$zone['minimum']:"3600");
 						$zonenameserver = $zone['nameserver'];
 						$zoneipns = $zone['ipns'];
-						$zonereverso = $zone['reverso'];
+						$zonereverso = $zone['reverso'];		
+						$zonereversv6o = $zone['reversv6o'];
 						if($zone['allowupdate'] == '')
 							$zoneallowupdate = "none";
 						else
@@ -409,7 +414,10 @@ EOD;
 							$zoneallowtransfer = str_replace(',','; ',$zone['allowtransfer']);
 						$zone_conf = "\$TTL {$zonetll}\n;\n";
 						if($zonereverso == "on")
-							$zone_conf .= "\$ORIGIN {$zonename}.in-addr.arpa.\n\n";
+							if($zonereversv6o == "on")
+								$zone_conf .= "\$ORIGIN {$zonename}.ip6.arpa.\n\n";
+							else
+								$zone_conf .= "\$ORIGIN {$zonename}.in-addr.arpa.\n\n";
 						else
 							$zone_conf .= "\$ORIGIN {$zonename}.\n\n";
 						$zone_conf .= ";\tDatabase file {$zonename}.DB for {$zonename} zone.\n";

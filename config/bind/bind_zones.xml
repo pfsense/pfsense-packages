@@ -165,6 +165,12 @@
 			<fieldname>reverso</fieldname>
 			<description>Enable if this is a reverse zone.</description>
 			<type>checkbox</type>
+		</field>		
+		<field>
+			<fielddescr>IPV6 Reverse Zone</fielddescr>
+			<fieldname>reversv6o</fieldname>
+			<description>Enable if this is a IPV6 reverse zone. Evaluated only if Reverse Zone is also selected.</description>
+			<type>checkbox</type>
 		</field>
 		<field>
 			<fielddescr>Custom Option</fielddescr>
