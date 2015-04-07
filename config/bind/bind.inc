@@ -117,11 +117,14 @@ function bind_sync()
 	$rndc_confgen = "/usr/local/sbin/rndc-confgen";
 	if (!file_exists(BIND_LOCALBASE."/etc/rndc-confgen.pfsense") && file_exists($rndc_confgen)) {
 		exec("$rndc_confgen ", $rndc_conf);
+		$confgen_file = "";
 		foreach ($rndc_conf as $line) {
 			$confgen_file .= "$line\n";
 		}
 		file_put_contents(BIND_LOCALBASE."/etc/rndc-confgen.pfsense", $confgen_file);
 	}
+	$rndc_bindconf = "";
+	$rndc_file = "";
 	if (file_exists(BIND_LOCALBASE."/etc/rndc-confgen.pfsense")) {
 		$rndc_conf = file(BIND_LOCALBASE."/etc/rndc-confgen.pfsense");
 		$confgen = "rndc.conf";
@@ -328,6 +331,7 @@ EOD;
 
 		// Add Zones in View
 		$write_config = 0;
+		$custom_root_zone = false;
 		for ($x = 0; $x < sizeof($bindzone); $x++) {
 			$zone = $bindzone[$x];
 			if ($zone['disabled'] == "on") {
@@ -335,7 +339,7 @@ EOD;
 			}
 			$zonename = $zone['name'];
 			if ($zonename == ".") {
-				$custom_root_zone[$i] = true;
+				$custom_root_zone = true;
 			}
 			$zonetype = $zone['type'];
 			$zoneview = $zone['view'];
@@ -436,21 +440,6 @@ EOD;
 						$zonenameserver = $zone['nameserver'];
 						$zoneipns = $zone['ipns'];
 						$zonereverso = $zone['reverso'];
-						if ($zone['allowupdate'] == '') {
-							$zoneallowupdate = "none";
-						} else {
-							$zoneallowupdate = str_replace(',', '; ', $zone['allowupdate']);
-						}
-						if ($zone['allowquery'] == '') {
-							$zoneallowquery = "none";
-						} else {
-							$zoneallowquery = str_replace(',', '; ', $zone['allowquery']);
-						}
-						if ($zone['allowtransfer'] == '') {
-							$zoneallowtransfer = "none";
-						} else {
-							$zoneallowtransfer = str_replace(',', '; ', $zone['allowtransfer']);
-						}
 
 						$zone_conf = "\$TTL {$zonetll}\n;\n";
 						if ($zonereverso == "on") {
@@ -639,7 +628,7 @@ EOD;
 				}
 			}
 		}
-		if (!$custom_root_zone[$i]) {
+		if (!$custom_root_zone) {
 			$bind_conf .= "\tzone \".\" {\n";
 			$bind_conf .= "\t\ttype hint;\n";
 			$bind_conf .= "\t\tfile \"/etc/namedb/named.root\";\n";
