@@ -3,7 +3,7 @@
 <?xml-stylesheet type="text/xsl" href="./xsl/package.xsl"?>
 <packagegui>
 	<copyright>
-	<![CDATA[
+		<![CDATA[
 /* $Id$ */
 /* ========================================================================== */
 /*
@@ -105,7 +105,7 @@
 			<fielddescr>Zone Master IP</fielddescr>
 			<fieldname>masterip</fieldname>
 			<description><![CDATA[Set master zone ip you want to use to sync backup server zones with master.<br>
-							<b>All master zones will be configured as backup on slave servers.<b>]]></description>
+						<b>All master zones will be configured as backup on slave servers.<b>]]></description>
 			<type>input</type>
 			<size>20</size>
 			<required/>
@@ -115,24 +115,24 @@
 			<fieldname>none</fieldname>
 			<type>rowhelper</type>
 			<description><![CDATA[<b>Do not forget to:</b><br>
-							&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Create firewall rules to allow zone transfer between master and slave servers.<br>
-							&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Create a acls with these slave servers.<br>
-							&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Include created acl on allow-transfer option on zone config.]]></description>
+						&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Create firewall rules to allow zone transfer between master and slave servers.<br>
+						&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Create a acls with these slave servers.<br>
+						&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Include created acl on allow-transfer option on zone config.]]></description>
 			<rowhelper>
-			<rowhelperfield>
-				<fielddescr>IP Address</fielddescr>
-				<fieldname>ipaddress</fieldname>
-				<description>IP Address of remote server</description>
-				<type>input</type>
-				<size>20</size>
-			</rowhelperfield>
-			<rowhelperfield>
-				<fielddescr>Password</fielddescr>
-				<fieldname>password</fieldname>
-				<description>Password for remote server.</description>
-				<type>password</type>
-				<size>20</size>
-			</rowhelperfield>
+				<rowhelperfield>
+					<fielddescr>IP Address</fielddescr>
+					<fieldname>ipaddress</fieldname>
+					<description>IP Address of remote server</description>
+					<type>input</type>
+					<size>20</size>
+				</rowhelperfield>
+				<rowhelperfield>
+					<fielddescr>Password</fielddescr>
+					<fieldname>password</fieldname>
+					<description>Password for remote server.</description>
+					<type>password</type>
+					<size>20</size>
+				</rowhelperfield>
 			</rowhelper>
 		</field>
 	</fields>

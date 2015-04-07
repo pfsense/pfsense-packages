@@ -2,8 +2,8 @@
 <!DOCTYPE packagegui SYSTEM "./schema/packages.dtd">
 <?xml-stylesheet type="text/xsl" href="./xsl/package.xsl"?>
 <packagegui>
-        <copyright>
-        <![CDATA[
+	<copyright>
+		<![CDATA[
 /* $Id$ */
 /* ========================================================================== */
 /*
@@ -42,10 +42,10 @@
                                                                               */
 /* ========================================================================== */
         ]]>
-        </copyright>
-    <description>Describe your package here</description>
-    <requirements>Describe your package requirements here</requirements>
-    <faq>Currently there are no FAQ items provided.</faq>
+	</copyright>
+	<description>Describe your package here</description>
+	<requirements>Describe your package requirements here</requirements>
+	<faq>Currently there are no FAQ items provided.</faq>
 	<name>bindzone</name>
 	<version>none</version>
 	<title>BIND: Zones Settings</title>
@@ -56,47 +56,47 @@
 		<section>Services</section>
 		<configfile>bind.xml</configfile>
 	</menu>
-        <tabs>
-                <tab>
-                        <text>Settings</text>
-                        <url>/pkg_edit.php?xml=bind.xml</url>
-                </tab>
-                <tab>
-                        <text>ACLs</text>
-                        <url>/pkg.php?xml=bind_acls.xml</url>
-                </tab>
-                <tab>
-                        <text>Views</text>
-                        <url>/pkg.php?xml=bind_views.xml</url>
-                </tab>
-                <tab>
-                        <text>Zones</text>
-                        <url>/pkg.php?xml=bind_zones.xml&amp;id=0</url>
-                        <active/>
-                </tab>
-                <tab>
-                        <text>Sync</text>
-                         <url>/pkg_edit.php?xml=bind_sync.xml</url>
-                </tab>
-        </tabs>
+	<tabs>
+		<tab>
+			<text>Settings</text>
+			<url>/pkg_edit.php?xml=bind.xml</url>
+		</tab>
+		<tab>
+			<text>ACLs</text>
+			<url>/pkg.php?xml=bind_acls.xml</url>
+		</tab>
+		<tab>
+			<text>Views</text>
+			<url>/pkg.php?xml=bind_views.xml</url>
+		</tab>
+		<tab>
+			<text>Zones</text>
+			<url>/pkg.php?xml=bind_zones.xml&amp;id=0</url>
+			<active/>
+		</tab>
+		<tab>
+			<text>Sync</text>
+			<url>/pkg_edit.php?xml=bind_sync.xml</url>
+		</tab>
+	</tabs>
 	<configpath>['installedpackages']['bindzone']['config']</configpath>
 	<adddeleteeditpagefields>
 		<columnitem>
-			<fielddescr>status</fielddescr>
+			<fielddescr>Status</fielddescr>
 			<fieldname>disabled</fieldname>
 			<listmodeon>Disabled</listmodeon>
 			<listmodeoff>Enabled</listmodeoff>
 		</columnitem>
 		<columnitem>
-			<fielddescr>Zone Name</fielddescr>
+			<fielddescr>Name</fielddescr>
 			<fieldname>name</fieldname>
 		</columnitem>
 		<columnitem>
-			<fielddescr>Zone Type</fielddescr>
+			<fielddescr>Type</fielddescr>
 			<fieldname>type</fieldname>
 		</columnitem>
 		<columnitem>
-			<fielddescr>View Name</fielddescr>
+			<fielddescr>View(s)</fielddescr>
 			<fieldname>view</fieldname>
 		</columnitem>
 		<columnitem>
@@ -111,9 +111,9 @@
 	</adddeleteeditpagefields>
 	<fields>
 		<field>
-		        <type>listtopic</type>
-                        <name>Domain Zone Configuration</name>
-                        <fieldname>temp01</fieldname>
+			<type>listtopic</type>
+			<name>Domain Zone Configuration</name>
+			<fieldname>temp01</fieldname>
 		</field>
 		<field>
 			<fielddescr>Disable this zone</fielddescr>
@@ -141,21 +141,21 @@
 			<fielddescr>Zone Type</fielddescr>
 			<fieldname>type</fieldname>
 			<description><![CDATA[Select zone type.]]></description>
-		        <type>select</type>
-					<options>
-						<option><name>Master</name><value>master</value><enablefields>description</enablefields></option>
-						<option><name>Slave</name><value>slave</value><enablefields>ttl</enablefields></option>
-						<option><name>Forward</name><value>forward</value><enablefields>forward</enablefields></option>
-						<option><name>Redirect</name><value>redirect</value><enablefields>redirect</enablefields></option>
-					</options>
-                       <onchange>on_type_zone_changed()</onchange>
+			<type>select</type>
+			<options>
+				<option><name>Master</name><value>master</value><enablefields>description</enablefields></option>
+				<option><name>Slave</name><value>slave</value><enablefields>ttl</enablefields></option>
+				<option><name>Forward</name><value>forward</value><enablefields>forward</enablefields></option>
+				<option><name>Redirect</name><value>redirect</value><enablefields>redirect</enablefields></option>
+			</options>
+			<onchange>on_type_zone_changed()</onchange>
 			<required/>
 		</field>
 		<field>
 			<fielddescr>View</fielddescr>
 			<fieldname>view</fieldname>
-			<description><![CDATA[Select the View that this area will belong.]]></description>
-	    	<type>select_source</type>
+			<description><![CDATA[Select the View that this zone will belong.]]></description>
+			<type>select_source</type>
 			<source><![CDATA[$config['installedpackages']['bindviews']['config']]]></source>
 			<source_name>name</source_name>
 			<source_value>name</source_value>
@@ -204,20 +204,21 @@
 			<encoding>base64</encoding>
 		</field>
 		<field>
-		        <type>listtopic</type>
-                        <name>Slave Zone Configuration </name>
-                        <fieldname>temp04</fieldname>
+			<type>listtopic</type>
+			<name>Slave Zone Configuration</name>
+			<fieldname>temp04</fieldname>
 		</field>
 		<field>
 			<fielddescr>Master Zone IP</fielddescr>
 			<fieldname>slaveip</fieldname>
-			<description>If this is a slave zone, enter the IP address of the master DNS server.</description>
+			<description>If this is a slave zone, enter the IP address of the master DNS server.
+			</description>
 			<type>input</type>
 		</field>
 		<field>
-		        <type>listtopic</type>
-                        <name>Forward Zone Configuration </name>
-                        <fieldname>temp04</fieldname>
+			<type>listtopic</type>
+			<name>Forward Zone Configuration</name>
+			<fieldname>temp04</fieldname>
 		</field>
 		<field>
 			<fielddescr>Forwarders</fielddescr>
@@ -228,14 +229,15 @@
 		</field>
 
 		<field>
-		        <type>listtopic</type>
-                        <name>Master Zone Configuration </name>
-                        <fieldname>temp03</fieldname>
+			<type>listtopic</type>
+			<name>Master Zone Configuration</name>
+			<fieldname>temp03</fieldname>
 		</field>
 		<field>
 			<fielddescr>TLL</fielddescr>
 			<fieldname>tll</fieldname>
-			<description>Default expiration time of all resource records without their own TTL value</description>
+			<description>Default expiration time of all resource records without their own TTL value
+			</description>
 			<type>input</type>
 		</field>
 		<field>
@@ -267,35 +269,35 @@
 			<fieldname>refresh</fieldname>
 			<description>Slave refresh (1 day)</description>
 			<type>input</type>
-	                	<default_value>1d</default_value>
+			<default_value>1d</default_value>
 		</field>
 		<field>
 			<fielddescr>Retry</fielddescr>
 			<fieldname>retry</fieldname>
 			<description>Slave retry time in case of a problem (2 hours)</description>
 			<type>input</type>
-	                	<default_value>2h</default_value>
+			<default_value>2h</default_value>
 		</field>
 		<field>
 			<fielddescr>Expire</fielddescr>
 			<fieldname>expire</fieldname>
 			<description>Slave expiration time (4 weeks)</description>
 			<type>input</type>
-	                	<default_value>4w</default_value>
+			<default_value>4w</default_value>
 		</field>
 		<field>
 			<fielddescr>Minimum</fielddescr>
 			<fieldname>minimum</fieldname>
 			<description>Maximum caching time in case of failed lookups (1 hour)</description>
 			<type>input</type>
-	                	<default_value>1h</default_value>
+			<default_value>1h</default_value>
 		</field>
 		<field>
 			<fielddescr>Allow-update</fielddescr>
 			<fieldname>allowupdate</fieldname>
 			<description><![CDATA[Select(CTRL+click) who are allowed to send updates to this zone.<br>
-						Allow-update defines a match list eg IP address(es) that are allowed to submit dynamic updates for 'master' zones ie it enables Dynamic DNS (DDNS).]]></description>
-	    	<type>select_source</type>
+						Allow-update defines a match list eg IP address(es) that are allowed to submit dynamic updates for 'master' zones, ie it enables Dynamic DNS (DDNS).]]></description>
+			<type>select_source</type>
 			<source><![CDATA[$config['installedpackages']['bindacls']['config']]]></source>
 			<source_name>name</source_name>
 			<source_value>name</source_value>
@@ -306,7 +308,7 @@
 			<fielddescr>Allow-query</fielddescr>
 			<fieldname>allowquery</fieldname>
 			<description><![CDATA[Select(CTRL+click) who are allowed to query this zone.<br>
-			Allow-query defines an match list of IP address(es) which are allowed to issue queries to the server.]]></description>
+						Allow-query defines an match list of IP address(es) which are allowed to issue queries to the server.]]></description>
 			<type>select_source</type>
 			<source><![CDATA[$config['installedpackages']['bindacls']['config']]]></source>
 			<source_name>name</source_name>
@@ -319,7 +321,7 @@
 			<fieldname>allowtransfer</fieldname>
 			<description><![CDATA[Select(CTRL+click) who are allowed to copy this zone.<br>
 						Allow-transfer defines a match list eg IP address(es) that are allowed to transfer (copy) the zone information from the server (master or slave for the zone). While on its face this may seem an excessively friendly default, DNS data is essentially public (that's why its there) and the bad guys can get all of it anyway. However if the thought of anyone being able to transfer your precious zone file is repugnant, or (and this is far more significant) you are concerned about possible DoS attack initiated by XFER requests, then use the following policy.]]></description>
-				    	<type>select_source</type>
+			<type>select_source</type>
 			<source><![CDATA[$config['installedpackages']['bindacls']['config']]]></source>
 			<source_name>name</source_name>
 			<source_value>name</source_value>
@@ -327,69 +329,72 @@
 			<size>03</size>
 		</field>
 		<field>
-		        <type>listtopic</type>
-                        <name>Zone Domain records</name>
-                        <fieldname>temp02</fieldname>
+			<type>listtopic</type>
+			<name>Zone Domain records</name>
+			<fieldname>temp02</fieldname>
 		</field>
-                <field>
-                        <fielddescr>Enter Domain records.</fielddescr>
-                        <description><![CDATA[<b>"Record"</b> is the name or last octet of IP. Example: www or pop<br>
-                        		 <b>"Type"</b> is the type of the record Sample: A CNAME MX NS<br>
-                        		 <b>"Priority"</b> in used only in mx records to define its priority<br>
-                        		 <b>"Alias or IP address"</b> is the destination host or ip address.<br><br>
-                        		 You can order elements on this list with drag and drop between columns.]]></description>
-                        <fieldname>none</fieldname>
-                    <type>rowhelper</type>
-                    <rowhelper>
-                        <rowhelperfield>
-                            <fielddescr>Record</fielddescr>
-                            <fieldname>hostname</fieldname>
-                            <description>Enter the Host Name (ex: www)</description>
-                            <type>input</type>
-                            <size>10</size>
-                        </rowhelperfield>
-                        <rowhelperfield>
-			<fielddescr>Type</fielddescr>
-			<fieldname>hosttype</fieldname>
-			<description>Select Type Host</description>
-		        <type>select</type>
-                        	<options>
-                                <option><name>A</name><value>A</value></option>
-                                <option><name>AAAA</name><value>AAAA</value></option>
-                                <option><name>DNAME</name><value>DNAME</value></option>
-                                <option><name>MX</name><value>MX</value></option>
-                                <option><name>CNAME</name><value>CNAME</value></option>
-                                <option><name>NS</name><value>NS</value></option>
-                                <option><name>LOC</name><value>LOC</value></option>
-                                <option><name>SRV</name><value>SRV</value></option>
-                                <option><name>PTR</name><value>PTR</value></option>
-                                <option><name>TXT</name><value>TXT</value></option>
-                                <option><name>SPF</name><value>SPF</value></option>
-                        </options>
-                        </rowhelperfield>
-                        <rowhelperfield>
-                            <fielddescr>Priority</fielddescr>
-                            <fieldname>hostvalue</fieldname>
-                            <description>MX 10 or 20</description>
-                            <type>input</type>
-                            <size>3</size>
-                        </rowhelperfield>
-                        <rowhelperfield>
-                            <fielddescr>Alias or IP address</fielddescr>
-                            <fieldname>hostdst</fieldname>
-                            <description>Enter the IP address or FQDN destination for domain MX (ex: 10.31.11.1 or mail.example.com)</description>
-                            <type>input</type>
-                            <size>35</size>
-                        </rowhelperfield>
-                        <movable>on</movable>
-                    </rowhelper>
-                </field>
+		<field>
+			<fielddescr>Enter Domain records.</fielddescr>
+			<description><![CDATA[<b>"Record"</b> is the name or last octet of IP. Example: www or pop<br>
+						<b>"Type"</b> is the type of the record Sample: A CNAME MX NS<br>
+						<b>"Priority"</b> in used only in mx records to define its priority<br>
+						<b>"Alias or IP address"</b> is the destination host or ip address.<br><br>
+						You can order elements on this list with drag and drop between columns.]]></description>
+			<fieldname>none</fieldname>
+			<type>rowhelper</type>
+			<rowhelper>
+				<rowhelperfield>
+					<fielddescr>Record</fielddescr>
+					<fieldname>hostname</fieldname>
+					<description>Enter the Host Name (ex: www)</description>
+					<type>input</type>
+					<size>10</size>
+				</rowhelperfield>
+				<rowhelperfield>
+					<fielddescr>Type</fielddescr>
+					<fieldname>hosttype</fieldname>
+					<description>Select Type Host</description>
+					<type>select</type>
+					<options>
+						<option><name>A</name><value>A</value></option>
+						<option><name>AAAA</name><value>AAAA</value></option>
+						<option><name>DNAME</name><value>DNAME</value></option>
+						<option><name>MX</name><value>MX</value></option>
+						<option><name>CNAME</name><value>CNAME</value></option>
+						<option><name>NS</name><value>NS</value></option>
+						<option><name>LOC</name><value>LOC</value></option>
+						<option><name>SRV</name><value>SRV</value></option>
+						<option><name>PTR</name><value>PTR</value></option>
+						<option><name>TXT</name><value>TXT</value></option>
+						<option><name>SPF</name><value>SPF</value></option>
+					</options>
+				</rowhelperfield>
+				<rowhelperfield>
+					<fielddescr>Priority</fielddescr>
+					<fieldname>hostvalue</fieldname>
+					<description>MX 10 or 20</description>
+					<type>input</type>
+					<size>3</size>
+				</rowhelperfield>
+				<rowhelperfield>
+					<fielddescr>Alias or IP address</fielddescr>
+					<fieldname>hostdst</fieldname>
+					<description>Enter the IP address or FQDN destination for domain MX (ex: 10.31.11.1 or mail.example.com)
+					</description>
+					<type>input</type>
+					<size>35</size>
+				</rowhelperfield>
+				<movable>on</movable>
+			</rowhelper>
+		</field>
 		<field>
 			<fieldname>regdhcpstatic</fieldname>
 			<fielddescr>Register DHCP static mappings</fielddescr>
-			<description>If this option is set, then DHCP static mappings will be registered in DNS, so that their name can be resolved.</description>
+			<description>If this option is set, then DHCP static mappings will be registered in DNS, so that
+					their name can be resolved.
+			</description>
 			<type>checkbox</type>
-        </field>
+		</field>
 		<field>
 			<type>listtopic</type>
 			<name>Custom Zone Domain records</name>
@@ -399,13 +404,13 @@
 			<fielddescr></fielddescr>
 			<fieldname>customzonerecords</fieldname>
 			<description><![CDATA[Paste any custom zone records to include in this zone.<br>
-							This can be used for a fast migration setup.]]></description>
-	                <type>textarea</type>
-                        <cols>84</cols>
-                        <rows>10</rows>
-		<encoding>base64</encoding>
-		<dontdisplayname/>
-		<usecolspan2/>
+						This can be used for a fast migration setup.]]></description>
+			<type>textarea</type>
+			<cols>84</cols>
+			<rows>10</rows>
+			<encoding>base64</encoding>
+			<dontdisplayname/>
+			<usecolspan2/>
 		</field>
 		<field>
 			<type>listtopic</type>
@@ -415,31 +420,32 @@
 			<fielddescr></fielddescr>
 			<fieldname>resultconfig</fieldname>
 			<description>Resulting BIND config file for this zone.</description>
-	                <type>textarea</type>
-                        <cols>84</cols>
-                        <rows>15</rows>
-		<encoding>base64</encoding>
-		<dontdisplayname/>
-		<usecolspan2/>
+			<type>textarea</type>
+			<cols>84</cols>
+			<rows>15</rows>
+			<encoding>base64</encoding>
+			<dontdisplayname/>
+			<usecolspan2/>
 		</field>
 	</fields>
-        <custom_php_after_form_command>
-                bind_print_javascript_type_zone2();
-        </custom_php_after_form_command>
-        <custom_php_after_head_command>
-                bind_print_javascript_type_zone();
-        </custom_php_after_head_command>
-        <custom_php_command_before_form>
-        </custom_php_command_before_form>
+	<custom_php_after_form_command>
+		bind_print_javascript_type_zone2();
+	</custom_php_after_form_command>
+	<custom_php_after_head_command>
+		bind_print_javascript_type_zone();
+	</custom_php_after_head_command>
+	<custom_php_command_before_form>
+	</custom_php_command_before_form>
 	<custom_php_validation_command>
-		if ($_POST['type']=="master" and $_POST['serial']=="")
+		if ($_POST['type']=="master" and $_POST['serial']=="") {
 			$_POST['serial']=(date("U")+ 1000000000);
+		}
 		bind_zone_validate($_POST, $input_errors);
 	</custom_php_validation_command>
 	<custom_delete_php_command>
-	        bind_sync();
-	</custom_delete_php_command>	
-        <custom_php_resync_config_command>
-	        bind_sync();
-        </custom_php_resync_config_command>
+		bind_sync();
+	</custom_delete_php_command>
+	<custom_php_resync_config_command>
+		bind_sync();
+	</custom_php_resync_config_command>
 </packagegui>
