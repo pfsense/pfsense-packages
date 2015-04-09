@@ -368,6 +368,10 @@ EOD;
 			} else {
 				$zoneallowupdate = str_replace(',', '; ', $zone['allowupdate']);
 			}
+			$zoneupdatepolicy = $zone['updatepolicy'];
+			if (!empty($zoneupdatepolicy)) {
+				$zoneupdatepolicy = rtrim($zoneupdatepolicy, ';');
+			}
 			if (empty($zone['allowquery'])) {
 				$zoneallowquery = "none";
 			} else {
@@ -416,9 +420,13 @@ EOD;
 						$bind_conf .= "\t\tallow-query { $zoneallowquery; };\n";
 						break;
 					default:
-						$bind_conf .= "\t\tallow-update { $zoneallowupdate; };\n";
 						$bind_conf .= "\t\tallow-query { $zoneallowquery; };\n";
 						$bind_conf .= "\t\tallow-transfer { $zoneallowtransfer; };\n";
+						if ($zone['enable_updatepolicy'] == "on") {
+							$bind_conf .= "\t\tupdate-policy { $zoneupdatepolicy; };\n";
+						} else {
+							$bind_conf .= "\t\tallow-update { $zoneallowupdate; };\n";
+						}
 						if ($zone['dnssec'] == "on") {
 							//https://kb.isc.org/article/AA-00626/
 							$bind_conf .= "\n\t\t# look for dnssec keys here:\n";
@@ -739,6 +747,8 @@ function bind_print_javascript_type_zone()
 					document.iform.minimum.disabled = 0;
 					document.iform.allowquery.disabled = 0;
 					document.iform.allowupdate.disabled = 0;
+					document.iform.enable_updatepolicy.disabled = 0;
+					document.iform.updatepolicy.disabled = 1;
 					break;
 				case 'slave':
 					document.iform.slaveip.disabled = 0;
@@ -759,6 +769,8 @@ function bind_print_javascript_type_zone()
 					document.iform.minimum.disabled = 1;
 					document.iform.allowquery.disabled = 0;
 					document.iform.allowupdate.disabled = 1;
+					document.iform.enable_updatepolicy.disabled = 1;
+					document.iform.updatepolicy.disabled = 1;
 					break;
 				case 'forward':
 					document.iform.slaveip.disabled = 1;
@@ -779,6 +791,8 @@ function bind_print_javascript_type_zone()
 					document.iform.minimum.disabled = 1;
 					document.iform.allowquery.disabled = 1;
 					document.iform.allowupdate.disabled = 1;
+					document.iform.enable_updatepolicy.disabled = 1;
+					document.iform.updatepolicy.disabled = 1;
 					break;
 				case 'redirect':
 					document.iform.slaveip.disabled = 1;
@@ -799,6 +813,8 @@ function bind_print_javascript_type_zone()
 					document.iform.minimum.disabled = 0;
 					document.iform.allowquery.disabled = 0;
 					document.iform.allowupdate.disabled = 1;
+					document.iform.enable_updatepolicy.disabled = 1;
+					document.iform.updatepolicy.disabled = 1;
 					break;
 				default:
 					break;

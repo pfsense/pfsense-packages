@@ -312,6 +312,22 @@
 			<size>03</size>
 		</field>
 		<field>
+			<fielddescr>Enable Update-policy</fielddescr>
+			<fieldname>enable_updatepolicy</fieldname>
+			<description><![CDATA[Enable Update-policy which overrides Allow-update.<br>
+						The update-policy statment replaces the allow-update statement.]]></description>
+			<type>checkbox</type>
+			<enablefields>updatepolicy</enablefields>
+		</field>
+		<field>
+			<fielddescr>Update-policy</fielddescr>
+			<fieldname>updatepolicy</fieldname>
+			<description><![CDATA[Update-policy defines the policy for submitting dynamic updates to 'master' zones.<br>
+						Do not include the surrounding { } when using multiple statements]]></description>
+			<type>input</type>
+			<size>75</size>
+		</field>
+		<field>
 			<fielddescr>Allow-query</fielddescr>
 			<fieldname>allowquery</fieldname>
 			<description><![CDATA[Select(CTRL+click) who are allowed to query this zone.<br>
