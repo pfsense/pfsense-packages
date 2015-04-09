@@ -1588,7 +1588,7 @@
 		</build_pbi>
 		<build_options></build_options>
 		<config_file>https://packages.pfsense.org/packages/config/checkmk-agent/checkmk.xml</config_file>
-		<version>v0.1.1</version>
+		<version>v0.1.2</version>
 		<status>RC1</status>
 		<required_version>2.0</required_version>
 		<maintainer>marcellocoutinho@gmail.com</maintainer>
