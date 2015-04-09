@@ -122,9 +122,11 @@ function quagga_ospfd_install_conf() {
 				if (!empty($conf['retransmitinterval'])) {
 					$conffile .= "  ip ospf retransmit-interval {$conf['retransmitinterval']}\n";
 				}
-				if (!empty($conf['deadtimer'])) {
+				if ($conf['enablefasthello']=='on') {
+					$conffile .= "  ip ospf dead-interval minimal hello-multiplier {$conf['hellomultiplier']}\n";
+				} else if (!empty($conf['deadtimer'])) {
 					$conffile .= "  ip ospf dead-interval {$conf['deadtimer']}\n";
-		}
+				}
 				if (!empty($conf['passive'])) {
 					$passive_interfaces[] = $realif;
 				}
@@ -389,6 +391,9 @@ function quagga_ospfd_validate_interface() {
 	}
 	if ($_POST['md5password'] && empty($_POST['password']))
 		$input_errors[] = "Please input a password.";
+	if ($_POST['enablefasthello'] == 'on' && ($_POST['hellomultiplier'] < 2 || $_POST['hellomultiplier'] > 20 || empty($_POST['hellomultiplier'])))
+		$input_errors[] = "Hello Multiplier needs to be between 2 and 20.";
+	
 }
 
 function quagga_ospfd_validate_input() {
