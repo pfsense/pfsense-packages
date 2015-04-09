@@ -131,7 +131,6 @@ function bind_sync()
 	if (file_exists(BIND_LOCALBASE."/etc/rndc-confgen.pfsense")) {
 		$rndc_conf = file(BIND_LOCALBASE."/etc/rndc-confgen.pfsense");
 		$confgen = "rndc.conf";
-		$rndc_bindconf = "";
 		foreach ($rndc_conf as $line) {
 			if ($confgen == "rndc.conf") {
 				if (!preg_match("/^#/", $line)) {
